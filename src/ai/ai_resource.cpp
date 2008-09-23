@@ -359,12 +359,12 @@ static int cnode_cmp(const void*const t0,
 }
 
 int 
-AiGetBuildRequestsCount(int counter[UnitTypeMax])
+AiGetBuildRequestsCount(PlayerAi *pai, int counter[UnitTypeMax])
 {
-	const int size = (int)AiPlayer->UnitTypeBuilt.size();
+	const int size = (int)pai->UnitTypeBuilt.size();
 	memset(counter, 0, sizeof(int) * UnitTypeMax);
 	for (int i = 0; i < size; ++i) {
-		AiBuildQueue *queue = &AiPlayer->UnitTypeBuilt[i];
+		AiBuildQueue *queue = &pai->UnitTypeBuilt[i];
 		counter[queue->Type->Slot] += queue->Want;
 	}
 	return size;
@@ -390,7 +390,7 @@ void AiNewDepotRequest(CUnit *worker) {
 	//
 	// Count the already made build requests.
 	//
-	AiGetBuildRequestsCount(counter);
+	AiGetBuildRequestsCount(worker->Player->Ai, counter);
 
 	n = AiHelpers.Depots[worker->CurrentResource - 1].size();
 
@@ -401,7 +401,7 @@ void AiNewDepotRequest(CUnit *worker) {
 			return;
 		}	
 
-		if (!AiRequestedTypeAllowed(AiPlayer->Player, type)) {
+		if (!AiRequestedTypeAllowed(worker->Player, type)) {
 			continue;
 		}
 				
@@ -412,7 +412,7 @@ void AiNewDepotRequest(CUnit *worker) {
 		
 		cost = 0;
 		for (c = 1; c < MaxCosts; ++c) {
-			cost += type->Stats[AiPlayer->Player->Index].Costs[c];
+			cost += type->Stats[worker->Player->Index].Costs[c];
 		}
 		
 		if(best_type == NULL || (cost < best_cost)) {
@@ -433,7 +433,7 @@ void AiNewDepotRequest(CUnit *worker) {
 			queue.Type = best_type;
 			queue.Want = 1;
 			queue.Made = 0;
-			
+
 			if(resinfo->TerrainHarvester) {
 				queue.X = worker->CurrentOrder()->Arg1.Resource.Pos.X;
 				queue.Y = worker->CurrentOrder()->Arg1.Resource.Pos.Y;
@@ -444,8 +444,8 @@ void AiNewDepotRequest(CUnit *worker) {
 					queue.Y = mine->Y;
 				}
 			}
-			
-			AiPlayer->UnitTypeBuilt.push_back(queue);
+
+			worker->Player->Ai->UnitTypeBuilt.push_back(queue);
 			
 			DebugPrint("%d: Worker %d report: Requesting new depot near [%d,%d].\n" 
 				_C_ worker->Player->Index _C_ worker->Slot 
@@ -485,7 +485,7 @@ static bool AiRequestSupply(void)
 	//
 	// Count the already made build requests.
 	//
-	AiGetBuildRequestsCount(counter);
+	AiGetBuildRequestsCount(AiPlayer, counter);
 	struct cnode cache[16];
 	int j;
 	
@@ -1561,6 +1561,11 @@ static void AiCheckRepair(void)
 	for (i = k; i < n; ++i) {
 		unit = AiPlayer->Player->Units[i];
 		repair_flag = true;
+
+		if (!unit->IsAliveOnMap()) {
+			continue;
+		}
+
 		// Unit damaged?
 		// Don't repair attacked unit (wait 5 sec before repairing)
 		if (unit->Type->RepairHP &&

@@ -73,7 +73,7 @@ int CurrentButtonLevel;
 	/// All buttons for units
 std::vector<ButtonAction *> UnitButtonTable;
 	/// Pointer to current buttons
-ButtonAction *CurrentButtons;
+ButtonActionProxy CurrentButtons;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -88,8 +88,7 @@ void InitButtons(void)
 	for (int z = 0; z < (int)UnitButtonTable.size(); ++z) {
 		UnitButtonTable[z]->Icon.Load();
 	}
-	delete[] CurrentButtons;
-	CurrentButtons = NULL;
+	CurrentButtons.Reset();
 }
 
 /*----------------------------------------------------------------------------
@@ -184,14 +183,14 @@ void CleanButtons(void)
 	UnitButtonTable.clear();
 
 	CurrentButtonLevel = 0;
-	delete[] CurrentButtons;
-	CurrentButtons = NULL;
+	CurrentButtons.Reset();
 }
 
 /**
 **  Return Status of button.
 **
 **  @param button  button to check status
+**  @param UnderCursor  Current Button Under Cursor
 **
 **  @return status of button
 **  @return Icon(Active | Selected | Clicked | AutoCast | Disabled).
@@ -199,18 +198,22 @@ void CleanButtons(void)
 **  @todo FIXME : add IconDisabled when needed.
 **  @todo FIXME : Should show the rally action for training unit ? (NewOrder)
 */
-static int GetButtonStatus(const ButtonAction *button)
+static int GetButtonStatus(const ButtonAction *button, int UnderCursor)
 {
-	int res;
+	int res = 0;
 	int action;
 	int i;
 
 	Assert(button);
-	Assert(NumSelected);
+	//Assert(NumSelected);
 
-	res = 0;
+	/* parallel drawing */
+	if (!NumSelected) {
+		return res;
+	}
+
 	// cursor is on that button
-	if (ButtonAreaUnderCursor == ButtonAreaButton && ButtonUnderCursor == button->Pos - 1) {
+	if (ButtonAreaUnderCursor == ButtonAreaButton && UnderCursor == button->Pos - 1) {
 		res |= IconActive;
 		if (MouseButtons & LeftButton) {
 			// Overwrite IconActive.
@@ -328,7 +331,7 @@ static int GetPopupCostsWidth(const CFont *font, const int *Costs)
 	return popupWidth;
 }
 
-static int DrawPopupCosts(int x, int y, const CFont *font, const int *Costs)
+static int DrawPopupCosts(int x, int y, const CLabel &label, const int *Costs)
 {
 	for (unsigned int i = 1; i < MaxCosts; ++i) {
 		if (Costs[i]) {
@@ -339,10 +342,10 @@ static int DrawPopupCosts(int x, int y, const CFont *font, const int *Costs)
 				G->DrawFrameClip(UI.Resources[i].IconFrame,	x , y);
 				x += ((x_offset != -1 ? x_offset : G->Width) + 5);
 				y_offset = G->Height;
-				y_offset -= font->Height();
+				y_offset -= label.Height();
 				y_offset /= 2;
 			}
-			x += VideoDrawNumber(x, y + y_offset, font, Costs[i]);
+			x += label.Draw(x, y + y_offset, Costs[i]);
 			x += 5;
 		}
 	}
@@ -385,9 +388,7 @@ void DrawPopupUnitInfo(const CUnitType *type,
 	int start_x = std::min(buttonX, Video.Width - 1 - popupWidth);
 	int y = buttonY - popupHeight - 10;
 	int x = start_x;
-
-	//SetDefaultTextColors("black", "red");
-	SetDefaultTextColors("white", "red");
+	CLabel label(font,"white", "red");
 
 	// Background
 	Video.FillTransRectangle(backgroundColor, x, y,
@@ -395,13 +396,13 @@ void DrawPopupUnitInfo(const CUnitType *type,
 	Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
 
 	// Name
-	VideoDrawText(x + 5, y + 5, font, type->Name);
+	label.Draw(x + 5, y + 5, type->Name);
 	Video.DrawHLine(ColorWhite, x, y + 15, popupWidth - 1);
 
 	y += 20;
 
 	// Costs
-	x = DrawPopupCosts(x + 5, y, font,  stats->Costs);
+	x = DrawPopupCosts(x + 5, y, label,  stats->Costs);
 
 	if(type->Demand) {
 			int y_offset = 0;
@@ -414,7 +415,7 @@ void DrawPopupUnitInfo(const CUnitType *type,
 				y_offset -= font->Height();
 				y_offset /= 2;
 			}
-			VideoDrawNumber(x, y + y_offset, font, type->Demand );
+			label.Draw(x, y + y_offset, type->Demand);
 			//x += 5;
 	}
 
@@ -425,7 +426,7 @@ void DrawPopupUnitInfo(const CUnitType *type,
 	{
 		std::ostringstream hitPoints;
 		hitPoints << "Hit Points: " << type->Variable[HP_INDEX].Value;
-		VideoDrawText(x + 5, y, font, hitPoints.str());
+		label.Draw(x + 5, y, hitPoints.str());
 		y += 15;
 	}
 
@@ -436,13 +437,13 @@ void DrawPopupUnitInfo(const CUnitType *type,
 			 type->Variable[BASICDAMAGE_INDEX].Value;
 		std::ostringstream damage;
 		damage << "Damage: " << min_damage << "-" << max_damage;
-		VideoDrawText(x + 5, y, font, damage.str());
+		label.Draw(x + 5, y, damage.str());
 		y += 15;
 
 		// Attack Range
 		std::ostringstream attackRange;
 		attackRange << "Attack Range: " << type->Variable[ATTACKRANGE_INDEX].Value;
-		VideoDrawText(x + 5, y, font, attackRange.str());
+		label.Draw(x + 5, y, attackRange.str());
 		y += 15;
 	}
 
@@ -450,7 +451,7 @@ void DrawPopupUnitInfo(const CUnitType *type,
 	{
 		std::ostringstream armor;
 		armor << "Armor: " << type->Variable[ARMOR_INDEX].Value;
-		VideoDrawText(x + 5, y, font, armor.str());
+		label.Draw(x + 5, y, armor.str());
 		y += 15;
 	}
 
@@ -458,12 +459,12 @@ void DrawPopupUnitInfo(const CUnitType *type,
 		// Radar Range
 		std::ostringstream radarRange;
 		radarRange << "Radar Range: " << type->Variable[RADAR_INDEX].Value;
-		VideoDrawText(x + 5, y, font, radarRange.str());
+		label.Draw(x + 5, y, radarRange.str());
 	} else {
 		// Sight Range
 		std::ostringstream sightRange;
 		sightRange << "Sight Range: " << type->Variable[SIGHTRANGE_INDEX].Value;
-		VideoDrawText(x + 5, y, font, sightRange.str());
+		label.Draw(x + 5, y, sightRange.str());
 	}
 	//y += 15;
 
@@ -473,28 +474,24 @@ void DrawPopupUnitInfo(const CUnitType *type,
 /**
 **  Draw popup
 */
-static void DrawPopup()
+static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 {
-	ButtonAction *button = &CurrentButtons[ButtonUnderCursor];
-	CUIButton *uibutton = &UI.ButtonPanel.Buttons[ButtonUnderCursor];
 	//Uint32 backgroundColor = Video.MapRGB(TheScreen->format, 255, 255, 200);
 	//Uint32 backgroundColor = Video.MapRGB(TheScreen->format, 255, 255, 255);
 	Uint32 backgroundColor = Video.MapRGB(TheScreen->format, 38, 38, 78);
 	CFont *font = SmallFont;
 	const int font_height = font->Height();
-	std::string nc, rc;
 	
 	int start_x, x, popupWidth;
 	int y, popupHeight;//
-	
-	GetDefaultTextColors(nc, rc);
-	
+
 	//GameFont
 	// Draw hint
 	switch(button->Action) {
 	
 		case ButtonResearch:
 		{
+			CLabel label(font,"white", "red");
 			int *Costs = AllUpgrades[button->Value]->Costs;
 			popupWidth = GetPopupCostsWidth(font, Costs);
 			popupWidth = std::max(popupWidth, font->Width(button->Hint) + 10);
@@ -505,8 +502,6 @@ static void DrawPopup()
 			
 			y = uibutton->Y - popupHeight - 10;
 			x = start_x;
-			
-			SetDefaultTextColors("white", "red");
 
 			// Background
 			Video.FillTransRectangle(backgroundColor, x, y,
@@ -514,17 +509,18 @@ static void DrawPopup()
 			Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
 
 			// Name
-			VideoDrawText(x + 5, y + 5, font, button->Hint);
+			label.Draw(x + 5, y + 5, button->Hint);
 			Video.DrawHLine(ColorWhite, x, y + 15, popupWidth - 1);
 
 			y += 20;
 			x = start_x;
-			DrawPopupCosts(x + 5, y, font, Costs);
+			DrawPopupCosts(x + 5, y, label, Costs);
 
 		}
 		break;
 		case ButtonSpellCast:
 		{
+			CLabel label(font,"white", "red");
 			// FIXME: hardcoded image!!!
 			const int IconID = GoldCost;
 			//SetCosts(SpellTypeTable[button->Value]->ManaCost, 0, NULL);
@@ -553,8 +549,6 @@ static void DrawPopup()
 			
 			x = std::min(uibutton->X, Video.Width - 1 - popupWidth);
 			y = uibutton->Y - popupHeight - 10;
-			
-			SetDefaultTextColors("white", "red");
 
 			// Background
 			Video.FillTransRectangle(backgroundColor, x, y,
@@ -564,7 +558,7 @@ static void DrawPopup()
 			if(spell->ManaCost) {
 				int y_offset = 0;
 				// Name
-				VideoDrawText(x + 5, y + 5, font, spell->Name);
+				label.Draw(x + 5, y + 5, spell->Name);
 				Video.DrawHLine(ColorWhite, x, y + 15, popupWidth - 1);			
 				y += 20;
 				if (G) {
@@ -577,11 +571,11 @@ static void DrawPopup()
 					y_offset -= font_height;
 					y_offset /= 2;
 				}
-				VideoDrawNumber(x, y + y_offset, font, spell->ManaCost );			
+				label.Draw(x, y + y_offset, spell->ManaCost );
 			} else {
 				// Only Hint
-				VideoDrawText(x + 5, y + (popupHeight - font_height)/2,
-					 font, button->Hint);
+				label.Draw(x + 5, y + (popupHeight - font_height)/2,
+					 button->Hint);
 			}
 		}
 		break;	
@@ -600,21 +594,18 @@ static void DrawPopup()
 			popupHeight = font_height + 10;//19;
 			x = std::min(uibutton->X, Video.Width - 1 - popupWidth);
 			y = uibutton->Y - popupHeight - 10;
-		
-			//SetDefaultTextColors("black", "red");
-			SetDefaultTextColors("white", "red");
 
 			// Background
 			Video.FillTransRectangle(backgroundColor, x, y, popupWidth, popupHeight, 128);
 			Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
 
 			// Hint
-			VideoDrawText(x + 5, y + (popupHeight - font_height)/2, font, button->Hint);
+			CLabel(font, "white", "red").Draw(x + 5, 
+				y + (popupHeight - font_height)/2, button->Hint);
 		break;
 	
 	}
-	
-	SetDefaultTextColors(nc, rc);
+
 }
 
 /**
@@ -625,7 +616,6 @@ static void DrawPopup()
 void CButtonPanel::Draw(void)
 {
 	CPlayer *player;
-	const ButtonAction *buttons;
 	char buf[8];
 
 	//
@@ -638,9 +628,10 @@ void CButtonPanel::Draw(void)
 	}
 
 	// No buttons
-	if (!(buttons = CurrentButtons)) {
+	if (!CurrentButtons.IsValid()) {
 		return;
 	}
+	ButtonActionProxy buttons(CurrentButtons);
 
 	Assert(NumSelected > 0);
 	player = Selected[0]->Player;
@@ -657,10 +648,10 @@ void CButtonPanel::Draw(void)
 		//  Tutorial show command key in icons
 		//
 		if (ShowCommandKey) {
-			if (CurrentButtons[i].Key == gcn::Key::ESCAPE) {
+			if (buttons[i].Key == gcn::Key::ESCAPE) {
 				strcpy_s(buf, sizeof(buf), "ESC");
 			} else {
-				buf[0] = toupper(CurrentButtons[i].Key);
+				buf[0] = toupper(buttons[i].Key);
 				buf[1] = '\0';
 			}
 		} else {
@@ -671,7 +662,7 @@ void CButtonPanel::Draw(void)
 		// Draw main Icon.
 		//
 		buttons[i].Icon.Icon->DrawUnitIcon(player, UI.ButtonPanel.Buttons[i].Style,
-			GetButtonStatus(&buttons[i]),
+			GetButtonStatus(&buttons[i], ButtonUnderCursor),
 			UI.ButtonPanel.Buttons[i].X, UI.ButtonPanel.Buttons[i].Y, buf);
 
 		//
@@ -679,7 +670,7 @@ void CButtonPanel::Draw(void)
 		//
 		if (ButtonAreaUnderCursor == ButtonAreaButton &&
 				ButtonUnderCursor == i && KeyState != KeyStateInput) {
-			DrawPopup();
+			DrawPopup(&buttons[i], &UI.ButtonPanel.Buttons[i]);
 			UpdateStatusLineForButton(&buttons[i]);
 		}
 	}
@@ -960,17 +951,16 @@ void CButtonPanel::Update(void)
 	CUnit *unit;
 	bool sameType;
 
-	// Default is no button.
-	delete[] CurrentButtons;
-	CurrentButtons = NULL;
 
 	if (!NumSelected) {
+		CurrentButtons.Reset();
 		return;
 	}
 
 	unit = Selected[0];
 	// foreign unit
 	if (unit->Player != ThisPlayer && !ThisPlayer->IsTeamed(unit)) {
+		CurrentButtons.Reset();
 		return;
 	}
 
@@ -1005,7 +995,7 @@ void CButtonPanel::DoClicked(int button)
 
 	Assert(0 <= button && button < (int)UI.ButtonPanel.Buttons.size());
 	// no buttons
-	if (!CurrentButtons) {
+	if (!CurrentButtons.IsValid()) {
 		return;
 	}
 	//
@@ -1255,7 +1245,7 @@ int CButtonPanel::DoKey(int key)
 	gcn::Key k = gcn::SDLInput::convertKeyCharacter(keysym);
 	key = k.getValue();
 
-	if (CurrentButtons) {
+	if (CurrentButtons.IsValid()) {
 		// This is required for action queues SHIFT+M should be `m'
 		if (isascii(key) && isupper(key)) {
 			key = tolower(key);

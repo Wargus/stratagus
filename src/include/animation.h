@@ -64,6 +64,18 @@ public:
 		memset(&D, 0, sizeof(D));
 	}
 
+	~CAnimation() {
+		if (Type == AnimationSound) {
+			delete[] D.Sound.Name;
+		} else if (Type == AnimationRandomSound) {
+			for (unsigned int i = 0; i < D.RandomSound.NumSounds; ++i) {
+				delete[] D.RandomSound.Name[i];
+			}
+			delete[] D.RandomSound.Name;
+			delete[] D.RandomSound.Sound;
+		}
+	}
+
 	AnimationType Type;
 	union {
 		struct {
@@ -114,6 +126,22 @@ public:
 		memset(Harvest, 0, sizeof(Harvest));
 	}
 
+	~CAnimations() {
+		delete[] Start;
+		delete[] Still;
+		delete[] Death;
+		delete[] Attack;
+		delete[] Move;
+		delete[] Repair;
+		delete[] Train;
+		delete[] Research;
+		delete[] Upgrade;
+		delete[] Build;
+		for ( int i = 0; i< MaxCosts; ++i) {
+			delete[] Harvest[i];
+		}
+	}
+	
 	CAnimation *Start;
 	CAnimation *Still;
 	CAnimation *Death;

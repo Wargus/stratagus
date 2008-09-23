@@ -518,7 +518,6 @@ class CRenderer : public CPrimitives {
 		unsigned int index;
 		const unsigned int pitch = TheScreen->pitch / BPP;
 
-		
 		if (sx == dx) {
 			unsigned int len = 1;
 			if (sy < dy) {

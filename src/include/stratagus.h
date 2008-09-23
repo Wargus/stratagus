@@ -272,6 +272,14 @@ extern void GameMainLoop(void);             /// Game main loop
 	/// Show load progress
 extern void ShowLoadProgress(const char *fmt, ...);
 
+struct DisplayAutoLocker {
+	DisplayAutoLocker();
+	~DisplayAutoLocker();
+};
+
+extern const int CPU_NUM;
+
+
 /*============================================================================
 ==  Misc
 ============================================================================*/

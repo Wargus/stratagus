@@ -1052,7 +1052,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_Lua :     // a lua function.
 			return CallLuaStringFunction(s->D.Index);
 		case EString_Dir :     // directly a string.
-			return new_strdup(s->D.Val);
+			return std::string(s->D.Val);
 		case EString_Concat :     // a + b -> "ab"
 			res = EvalString(s->D.Concat.Strings[0]);
 			for (int i = 1; i < s->D.Concat.n; i++) {
@@ -1061,9 +1061,9 @@ std::string EvalString(const StringDesc *s)
 			return res;
 		case EString_String :     // 42 -> "42".
 		{
-			char buffer[10]; // Should be enough ?
+			char buffer[16]; // Should be enough ?
 			sprintf(buffer, "%d", EvalNumber(s->D.Number));
-			return buffer;
+			return std::string(buffer);
 		}
 		case EString_InverseVideo : // "a" -> "~<a~>"
 			tmp1 = EvalString(s->D.String);
@@ -1075,7 +1075,7 @@ std::string EvalString(const StringDesc *s)
 			if (unit != NULL) {
 				return unit->Type->Name;
 			} else { // ERROR.
-				return "";
+				return std::string("");
 			}
 		case EString_If : // cond ? True : False;
 			if (EvalNumber(s->D.If.Cond)) {
@@ -1083,7 +1083,7 @@ std::string EvalString(const StringDesc *s)
 			} else if (s->D.If.False) {
 				return EvalString(s->D.If.False);
 			} else {
-				return "";
+				return std::string("");
 			}
 		case EString_SubString : // substring(s, begin, end)
 			if (s->D.SubString.String != NULL &&
@@ -1093,7 +1093,7 @@ std::string EvalString(const StringDesc *s)
 
 				begin = EvalNumber(s->D.SubString.Begin);
 				if ((unsigned) begin > tmp1.size() && begin > 0) {
-					return "";
+					return std::string("");
 				}
 				res = tmp1.c_str() + begin;
 				if (s->D.SubString.End) {
@@ -1106,12 +1106,12 @@ std::string EvalString(const StringDesc *s)
 				}
 				return res;
 			} else { // ERROR.
-				return "";
+				return std::string("");
 			}
 		case EString_Line : // line n of the string
 			if (s->D.Line.String == NULL ||
 					(tmp1 = EvalString(s->D.Line.String)).empty()) {
-				return ""; // ERROR.
+				return std::string(""); // ERROR.
 			} else {
 				int line;
 				int maxlen;
@@ -1119,7 +1119,7 @@ std::string EvalString(const StringDesc *s)
 
 				line = EvalNumber(s->D.Line.Line);
 				if (line <= 0) {
-					return "";
+					return std::string("");
 				}
 				if (s->D.Line.MaxLen) {
 					maxlen = EvalNumber(s->D.Line.MaxLen);
@@ -1134,7 +1134,7 @@ std::string EvalString(const StringDesc *s)
 				return res;
 			}
 	}
-	return NULL;
+	return std::string("");
 }
 
 

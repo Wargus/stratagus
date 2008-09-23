@@ -278,10 +278,8 @@ Missile *MakeLocalMissile(MissileType *mtype, int sx, int sy, int dx, int dy)
 */
 static void FreeMissile(std::vector<Missile *> &missiles, std::vector<Missile*>::size_type i)
 {
-	Missile *missile;
 	CUnit *unit;
-
-	missile = missiles[i];
+	Missile *missile = missiles[i];
 	//
 	// Release all unit references.
 	//
@@ -583,6 +581,43 @@ void MissileType::DrawMissileType(int frame, int x, int y) const
 	}
 }
 
+void MissileDrawProxy::DrawMissile(const CViewport *vp) const
+{
+	int x = this->X - vp->MapX * TileSizeX + vp->X - vp->OffsetX;
+	int y = this->Y - vp->MapY * TileSizeY + vp->Y - vp->OffsetY;
+	switch (this->Type->Class) {
+		case MissileClassHit:
+			CLabel(GameFont).DrawClip(x,y, this->data.Damage);
+			//VideoDrawNumberClip(x, y, GameFont, this->data.Damage);
+			break;
+		default:
+			this->Type->DrawMissileType(this->data.SpriteFrame, x, y);
+			break;
+	}	
+}
+
+void MissileDrawProxy::operator=(const Missile* missile) {
+	this->Type = missile->Type;
+	this->Slot = missile->Slot;
+	this->X = missile->X;
+	this->Y = missile->Y;
+	if (missile->Type->Class == MissileClassHit) {
+		this->data.Damage = missile->Damage;
+	} else {
+		this->data.SpriteFrame = missile->SpriteFrame;
+	}
+};
+
+bool MissileDrawProxy::MissileDrawLevelCompare(const MissileDrawProxy& l, 
+					const MissileDrawProxy& r)
+{
+	if (l.Type->DrawLevel == r.Type->DrawLevel) {
+		return l.Slot < r.Slot;
+	} else {
+		return l.Type->DrawLevel <= r.Type->DrawLevel;
+	}
+}
+
 /**
 **  Draw missile.
 */
@@ -608,7 +643,7 @@ void Missile::DrawMissile() const
 	y = this->Y - vp->MapY * TileSizeY + vp->Y - vp->OffsetY;
 	switch (this->Type->Class) {
 		case MissileClassHit:
-			VideoDrawNumberClip(x, y, GameFont, this->Damage);
+			CLabel(GameFont).DrawClip(x,y, this->Damage);
 			break;
 		default:
 			this->Type->DrawMissileType(this->SpriteFrame, x, y);
@@ -616,28 +651,6 @@ void Missile::DrawMissile() const
 	}
 }
 
-/**
-**  Compare Draw level. Used by qsort.
-**
-**  @param v1  adress of a missile pointer.
-**  @param v2  adress of a missile pointer.
-**
-**  @return    -1 if v1 < v2, 1 else.
-*/
-static int MissileDrawLevelCompare(const void *v1, const void *v2)
-{
-	const Missile *c1;
-	const Missile *c2;
-
-	c1 = *(Missile **)v1;
-	c2 = *(Missile **)v2;
-
-	if (c1->Type->DrawLevel == c2->Type->DrawLevel) {
-		return c1->Slot < c2->Slot ? -1 : 1;
-	} else {
-		return c1->Type->DrawLevel <= c2->Type->DrawLevel ? -1 : 1;
-	}
-}
 /**
 **  Sort visible missiles on map for display.
 **
@@ -647,7 +660,7 @@ static int MissileDrawLevelCompare(const void *v1, const void *v2)
 **
 **  @return           number of missiles returned in table
 */
-int FindAndSortMissiles(const CViewport *vp, Missile **table, int tablesize)
+int FindAndSortMissiles(const CViewport *vp, MissileDrawProxy *table, int tablesize)
 {
 	int nmissiles;
 	std::vector<Missile *>::const_iterator i;
@@ -657,24 +670,26 @@ int FindAndSortMissiles(const CViewport *vp, Missile **table, int tablesize)
 	//
 	nmissiles = 0;
 	for (i = GlobalMissiles.begin(); i != GlobalMissiles.end() && nmissiles < tablesize; ++i) {
-		if ((*i)->Delay || (*i)->Hidden) {
+		Missile *missile = (*i);
+		if (missile->Delay || missile->Hidden) {
 			continue;  // delayed or hidden -> aren't shown
 		}
 		// Draw only visible missiles
-		if (MissileVisibleInViewport(vp, *i)) {
-			table[nmissiles++] = *i;
+		if (MissileVisibleInViewport(vp, missile)) {
+			table[nmissiles++] = missile;
 		}
 	}
 
 	for (i = LocalMissiles.begin(); i != LocalMissiles.end() && nmissiles < tablesize; ++i) {
-		if ((*i)->Delay || (*i)->Hidden) {
+		Missile *missile = (*i);
+		if (missile->Delay || missile->Hidden) {
 			continue;  // delayed or hidden -> aren't shown
 		}
 		// Local missile are visible.
-		table[nmissiles++] = *i;
+		table[nmissiles++] = missile;
 	}
-	if (nmissiles) {
-		qsort((void *)table, nmissiles, sizeof(Missile *), MissileDrawLevelCompare);
+	if (nmissiles > 1) {
+		std::sort(table, table + nmissiles, MissileDrawProxy::MissileDrawLevelCompare);
 	}
 	return nmissiles;
 }
@@ -1117,31 +1132,32 @@ static void MissilesActionLoop(std::vector<Missile *> &missiles)
 	//
 	for (std::vector<Missile *>::size_type i = 0;
 			i != missiles.size();) {
+		Missile *missile = missiles[i];
 
-		if (missiles[i]->Delay) {
-			missiles[i]->Delay--;
+		if (missile->Delay) {
+			missile->Delay--;
 			++i;
 			continue;  // delay start of missile
 		}
 
-		if (missiles[i]->TTL > 0) {
-			missiles[i]->TTL--;  // overall time to live if specified
+		if (missile->TTL > 0) {
+			missile->TTL--;  // overall time to live if specified
 		}
 
-		if (!missiles[i]->TTL) {
+		if (!missile->TTL) {
 			FreeMissile(missiles, i);
 			continue;
 		}
 
-		Assert(missiles[i]->Wait);
-		if (--missiles[i]->Wait) {  // wait until time is over
+		Assert(missile->Wait);
+		if (--missile->Wait) {  // wait until time is over
 			++i;
 			continue;
 		}
 
-		missiles[i]->Action();
+		missile->Action();
 
-		if (!missiles[i]->TTL) {
+		if (!missile->TTL) {
 			FreeMissile(missiles, i);
 			continue;
 		}

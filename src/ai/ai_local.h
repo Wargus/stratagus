@@ -101,6 +101,10 @@ enum AiForceRole {
 	AiForceRoleDefend, /// Force should defend
 };
 
+#define AI_FORCE_STATE_WAITING		0
+#define AI_FORCE_STATE_BOARDING 	1
+//#define AI_FORCE_STATE_OERATIONAL 	2
+#define AI_FORCE_STATE_ATTACKING	3
 
 /**
 **  Define an AI force.
@@ -334,7 +338,7 @@ extern int AiFindUnitTypeEquiv(const CUnitType *i, int *result);
 	/// Finds all available equivalents units to a given one, in the prefered order
 extern int AiFindAvailableUnitTypeEquiv(const CUnitType *i,
 	int *result);
-extern int AiGetBuildRequestsCount(int counter[UnitTypeMax]);
+extern int AiGetBuildRequestsCount(PlayerAi*,int counter[UnitTypeMax]);
 
 extern void AiNewDepotRequest(CUnit *worker);
 

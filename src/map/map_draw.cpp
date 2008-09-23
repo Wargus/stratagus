@@ -322,9 +322,11 @@ void CViewport::DrawMapBackgroundInViewport() const
 			Video.DrawHLineClip(color, dx, dy, TileSizeX);
 			Video.DrawVLineClip(color, dx, dy, TileSizeY);
 			if ( 0 && my_mask ) {
-				VideoDrawNumber(dx + 2, dy +2, SmallFont, tile );
-				VideoDrawNumber(dx + 2, dy + SmallFont->Height() + 4,
-					 SmallFont, Map.Fields[sx].TilesetTile );
+				CLabel label(SmallFont);
+				label.Draw(dx + 2, dy +2, tile);
+				label.Draw(dx + 2, dy + SmallFont->Height() + 4,
+					 Map.Fields[sx].TilesetTile );
+
 			}
 #endif			
 			++sx;
@@ -340,49 +342,52 @@ void CViewport::DrawMapBackgroundInViewport() const
 */
 void CViewport::Draw() const
 {
-	CUnit *table[UnitMax];
-	Missile *missiletable[MAX_MISSILES * 9];
-	int nunits;
-	int nmissiles;
-	int i;
-	int j;
 
 	PushClipping();
 	SetClipping(this->X, this->Y, this->EndX, this->EndY);
+
+	/* this may take while */
 	this->DrawMapBackgroundInViewport();
 
-	//
-	// We find and sort units after draw level.
-	//
-	nunits = FindAndSortUnits(this, table);
-	nmissiles = FindAndSortMissiles(this, missiletable);
+	{
+		CUnit *table[UnitMax];
+		MissileDrawProxy missiletable[MAX_MISSILES * 9];
+		
+		//
+		// We find and sort units after draw level.
+		//
+		int nunits = FindAndSortUnits(this, table);
+		int nmissiles = FindAndSortMissiles(this, missiletable);
+		int i = 0;
+		int j = 0;
 
-	i = 0;
-	j = 0;
-	CurrentViewport = this;
-	while (i < nunits && j < nmissiles) {
-		if (table[i]->Type->DrawLevel <= missiletable[j]->Type->DrawLevel) {
+		CurrentViewport = this;
+		while (i < nunits && j < nmissiles) {
+			if (table[i]->Type->DrawLevel <= missiletable[j].Type->DrawLevel) {
+				table[i]->Draw();
+				++i;
+			} else {
+				missiletable[j].DrawMissile(this);
+				++j;
+			}
+		}
+		for (; i < nunits; ++i) {
 			table[i]->Draw();
-			++i;
-		} else {
-			missiletable[j]->DrawMissile();
-			++j;
+		}
+		for (; j < nmissiles; ++j) {
+			missiletable[j].DrawMissile(this);
 		}
 	}
-	for (; i < nunits; ++i) {
-		table[i]->Draw();
-	}
-	for (; j < nmissiles; ++j) {
-		missiletable[j]->DrawMissile();
-	}
+
 	this->DrawMapFogOfWar();
+
 	//
 	// Draw orders of selected units.
 	// Drawn here so that they are shown even when the unit is out of the screen.
 	//
 	if (Preference.ShowOrders < 0 ||
 		(ShowOrdersCount >= GameCycle) || (KeyModifiers & ModifierShift)) {
-		for (i = 0; i < NumSelected; ++i) {
+		for (int i = 0; i < NumSelected; ++i) {
 			ShowOrder(Selected[i]);
 		}
 	}

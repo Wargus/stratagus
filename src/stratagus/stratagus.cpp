@@ -288,6 +288,7 @@ void ShowLoadProgress(const char *fmt, ...)
 	va_end(va);
 
 	if (Video.Depth && GameFont && GameFont->IsLoaded()) {
+		DisplayAutoLocker autolock;
 		// Remove non printable chars
 		for (char *s = temp; *s; ++s) {
 			if (*s < 32) {
@@ -295,7 +296,7 @@ void ShowLoadProgress(const char *fmt, ...)
 			}
 		}
 		Video.FillRectangle(ColorBlack, 5, Video.Height - 18, Video.Width - 10, 18);
-		VideoDrawTextCentered(Video.Width / 2, Video.Height - 16, GameFont, temp);
+		CLabel(GameFont).DrawCentered(Video.Width / 2, Video.Height - 16, temp);
 		InvalidateArea(5, Video.Height - 18, Video.Width - 10, 18);
 		RealizeVideoMemory();
 	} else {
@@ -357,6 +358,7 @@ static int MenuLoop(void)
 
 extern void CleanMissiles();
 extern void CleanTriggers();
+
 /**
 **  Cleanup game.
 **
@@ -600,6 +602,11 @@ static int main1(int argc, char **argv)
 */
 void Exit(int err)
 {
+	if (GameRunning) {
+		StopGame(GameExit);
+		return;
+	}
+
 	StopMusic();
 	QuitSound();
 	NetworkQuit();

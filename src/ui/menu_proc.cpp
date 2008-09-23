@@ -60,10 +60,6 @@
 void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 	const std::string &text)
 {
-	std::string nc;
-	std::string rc;
-	std::string oldnc;
-	std::string oldrc;
 	int i;
 	ButtonStyleProperties *p;
 	ButtonStyleProperties *pimage;
@@ -99,24 +95,23 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 	//  Text
 	//
 	if (!text.empty()) {
+		std::string oldnc;
+		std::string oldrc;	
 		GetDefaultTextColors(oldnc, oldrc);
-		nc = !p->TextNormalColor.empty() ? p->TextNormalColor :
-			!style->TextNormalColor.empty() ? style->TextNormalColor : oldnc;
-		rc = !p->TextReverseColor.empty() ? p->TextReverseColor :
-			!style->TextReverseColor.empty() ? style->TextReverseColor : oldrc;
-		SetDefaultTextColors(nc, rc);
+		CLabel label(style->Font,
+			(!p->TextNormalColor.empty() ? p->TextNormalColor :
+			!style->TextNormalColor.empty() ? style->TextNormalColor : oldnc),
+			(!p->TextReverseColor.empty() ? p->TextReverseColor :
+			!style->TextReverseColor.empty() ? style->TextReverseColor : oldrc));
 
 		if (p->TextAlign == TextAlignCenter || p->TextAlign == TextAlignUndefined) {
-			VideoDrawTextCentered(x + p->TextX, y + p->TextY,
-				style->Font, text);
+			label.DrawCentered(x + p->TextX, y + p->TextY, text);
 		} else if (p->TextAlign == TextAlignLeft) {
-			VideoDrawText(x + p->TextX, y + p->TextY, style->Font, text);
+			label.Draw(x + p->TextX, y + p->TextY, text);
 		} else {
-			VideoDrawText(x + p->TextX - style->Font->Width(text), y + p->TextY,
-				style->Font, text);
+			label.Draw(x + p->TextX - style->Font->Width(text), y + p->TextY,text);
 		}
 
-		SetDefaultTextColors(oldnc, oldrc);
 	}
 
 	//

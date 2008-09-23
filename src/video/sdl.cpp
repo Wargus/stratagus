@@ -106,6 +106,8 @@ static int FrameFraction; /// Frame fractional term
 const EventCallback *Callbacks;
 
 #ifdef USE_OPENGL
+static bool RegenerateScreen = false;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -585,7 +587,7 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 						UiTogglePause();
 					}
 #ifdef USE_OPENGL
-						Video.ResizeScreen(Video.Width, Video.Height);
+					RegenerateScreen = true;
 #endif
 				}
 			}
@@ -610,6 +612,16 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 		handleInput(event);
 	}
 }
+
+#ifdef USE_OPENGL
+void ValidateOpenGLScreen(void)
+{
+	if (RegenerateScreen) {
+		Video.ResizeScreen(Video.Width, Video.Height);
+		RegenerateScreen = false;
+	}
+}
+#endif
 
 /**
 **  Set the current callbacks
@@ -749,11 +761,6 @@ void WaitEventsOneFrame()
 		SkipGameCycle = SkipFrames;
 	}
 
-#ifndef USE_OPENGL
-	if (GameRunning || Editor.Running) {
-		Video.ClearScreen();
-	}
-#endif
 }
 
 /**

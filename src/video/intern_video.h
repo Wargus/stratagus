@@ -92,7 +92,7 @@ extern int ClipY2; /// current clipping bottom right
 ** @param height unsigned int height to display
 ** (return value of width and height can be made smaller)
 */
-#define CLIP_RECTANGLE(x, y, width, height) { \
+#define CLIP_RECTANGLE(x, y, width, height) do { \
 	int f; \
 	if (x < ClipX1) { \
 		f = ClipX1 - x; \
@@ -122,7 +122,7 @@ extern int ClipY2; /// current clipping bottom right
 		} \
 		height = ClipY2 - y + 1; \
 	} \
-}
+} while(0)
 
 /**
 ** Clip rectangle area (just like CLIP_RECTANGLE), but also return offsets
@@ -147,7 +147,7 @@ extern int ClipY2; /// current clipping bottom right
 **
 ** @note there was no need for 'endy', as it isn't used to draw sprites..
 */
-#define CLIP_RECTANGLE_OFS(x, y, width, height, ofsx, ofsy, endx) { \
+#define CLIP_RECTANGLE_OFS(x, y, width, height, ofsx, ofsy, endx) do { \
 	if (y < ClipY1) { \
 		ofsy = ClipY1 - y; \
 		if (height <= ofsy) { \
@@ -183,7 +183,7 @@ extern int ClipY2; /// current clipping bottom right
 	} else { \
 		endx = 0; \
 	} \
-}
+} while(0)
 
 
 /*----------------------------------------------------------------------------

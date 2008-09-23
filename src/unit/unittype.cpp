@@ -302,18 +302,6 @@ void UpdateStats(int reset)
 }
 
 /**
-**  Get the animations structure by ident.
-**
-**  @param ident  Identifier for the animation.
-**
-**  @return  Pointer to the animation structure.
-*/
-CAnimations *AnimationsByIdent(const std::string &ident)
-{
-	return AnimationMap[ident];
-}
-
-/**
 **  Save state of an unit-stats to file.
 **
 **  @param stats  Unit-stats to save.
@@ -374,7 +362,11 @@ void SaveUnitTypes(CFile *file)
 */
 CUnitType *UnitTypeByIdent(const std::string &ident)
 {
-	return UnitTypeMap[ident];
+	std::map<std::string, CUnitType *>::iterator ret = UnitTypeMap.find(ident);
+	if (ret != UnitTypeMap.end()) {
+		return  (*ret).second;
+	}
+	return NULL;
 }
 
 /**
@@ -607,29 +599,6 @@ void LoadUnitTypes(void)
 	}
 }
 
-/**
-**  Clean animation
-*/
-static void CleanAnimation(CAnimation *anim)
-{
-	CAnimation *ptr;
-
-	ptr = anim;
-	while (ptr->Type != AnimationNone) {
-		if (ptr->Type == AnimationSound) {
-			delete[] ptr->D.Sound.Name;
-		} else if (ptr->Type == AnimationRandomSound) {
-			for (unsigned int i = 0; i < ptr->D.RandomSound.NumSounds; ++i) {
-				delete[] ptr->D.RandomSound.Name[i];
-			}
-			delete[] ptr->D.RandomSound.Name;
-			delete[] ptr->D.RandomSound.Sound;
-		}
-		++ptr;
-	}
-	delete[] anim;
-}
-
 void CUnitTypeVar::Init()
 {
 	// Variables.
@@ -651,6 +620,8 @@ void CUnitTypeVar::Clear()
 	DecoVar.clear();
 }
 
+extern void FreeAnimations(void);
+
 /**
 **  Cleanup the unit-type module.
 */
@@ -658,19 +629,7 @@ void CleanUnitTypes(void)
 {
 
 	DebugPrint("FIXME: icon, sounds not freed.\n");
-
-	// FIXME: scheme contains references on this structure.
-	// Clean all animations.
-	for (int j = 0; j < NumAnimations; ++j) {
-		CleanAnimation(AnimationsArray[j]);
-	}
-	NumAnimations = 0;
-
-	std::map<std::string, CAnimations *>::iterator at;
-	for (at = AnimationMap.begin(); at != AnimationMap.end(); ++at) {
-		delete (*at).second;
-	}
-	AnimationMap.clear();
+	FreeAnimations();
 
 	// Clean all unit-types
 

@@ -43,10 +43,13 @@ typedef enum GameResults {
 	GameDraw,      /// Game was draw
 	GameQuitToMenu,/// Quit to menu
 	GameRestart,   /// Restart game
+	GameExit
 };                 /// Game results
 
 
 extern GameResults GameResult;   /// Outcome of the game
+
+extern void StopGame(GameResults result);
 
 //@}
 

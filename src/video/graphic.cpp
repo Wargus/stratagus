@@ -707,20 +707,22 @@ void CGraphic::Free(CGraphic *g)
 	if (!g->Refs) {
 		// No more uses of this graphic
 #ifdef USE_OPENGL
-		if (g->Textures) {
-			glDeleteTextures(g->NumTextures, g->Textures);
-			delete[] g->Textures;
-		}
-		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
-		if (cg) {
-			for (int i = 0; i < PlayerMax; ++i) {
-				if (cg->PlayerColorTextures[i]) {
-					glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[i]);
-					delete[] cg->PlayerColorTextures[i];
+		{
+			DisplayAutoLocker autolock;
+			if (g->Textures) {
+				glDeleteTextures(g->NumTextures, g->Textures);
+				delete[] g->Textures;
+			}
+			CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
+			if (cg) {
+				for (int i = 0; i < PlayerMax; ++i) {
+					if (cg->PlayerColorTextures[i]) {
+						glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[i]);
+						delete[] cg->PlayerColorTextures[i];
+					}
 				}
 			}
 		}
-
 		Graphics.remove(g);
 #endif
 		FreeSurface(&g->Surface);
@@ -747,6 +749,7 @@ void CGraphic::Free(CGraphic *g)
 */
 void FreeOpenGLGraphics(void)
 {
+	DisplayAutoLocker autolock;
 	std::list<CGraphic *>::iterator i;
 	for (i = Graphics.begin(); i != Graphics.end(); ++i) {
 		if ((*i)->Textures) {
@@ -1083,6 +1086,7 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 */
 static void MakeTextures(CGraphic *g, int player, CUnitColors *colors)
 {
+	DisplayAutoLocker autolock;
 	int i;
 	int tw;
 	int th;
@@ -1212,7 +1216,7 @@ void CGraphic::Resize(int w, int h)
 	bpp = Surface->format->BytesPerPixel;
 	if (bpp == 1) {
 		SDL_Color pal[256];
-		
+
 		SDL_LockSurface(Surface);
 
 		pixels = (unsigned char *)Surface->pixels;

@@ -156,6 +156,7 @@ namespace gcn
          * down in the Gui hierarchy will be called.
          */
         virtual void draw();
+		virtual void draw(Widget* top);
 
         /**
          * Focus none of the Widgets in the Gui.

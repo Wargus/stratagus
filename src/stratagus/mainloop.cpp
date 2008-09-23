@@ -87,6 +87,24 @@ int MouseScrollState = ScrollNone;
 EventCallback GameCallbacks;   /// Game callbacks
 EventCallback EditorCallbacks; /// Editor callbacks
 
+const int CPU_NUM = get_cpu_count();
+
+static CMutex DisplayUpdateLocker;
+
+DisplayAutoLocker::DisplayAutoLocker()
+{
+	if (GameRunning && CPU_NUM > 1) {
+		DisplayUpdateLocker.Lock();
+	}
+}
+
+DisplayAutoLocker::~DisplayAutoLocker()
+{
+	if (GameRunning && CPU_NUM > 1) {
+		DisplayUpdateLocker.UnLock();
+	}
+};
+
 //----------------------------------------------------------------------------
 // Functions
 //----------------------------------------------------------------------------
@@ -246,114 +264,108 @@ static void InitGameCallbacks(void)
 	GameCallbacks.NetworkEvent = NetworkEvent;
 }
 
-//#define REALVIDEO
-
-/**
-**  Game main loop.
-**
-**  Unit actions.
-**  Missile actions.
-**  Players (AI).
-**  Cyclic events (color cycle,...)
-**  Display update.
-**  Input/Network/Sound.
-*/
-void GameMainLoop(void)
+static void GameLogicLoop(void)
 {
-#ifdef DEBUG  // removes the setjmp warnings
-	static bool showtip;
-#else
-	bool showtip;
-#endif
 	int player;
-#ifdef REALVIDEO
-	int RealVideoSyncSpeed;
-#endif
-	const EventCallback *old_callbacks;
+	
+	// Can't find a better place.
+	// FIXME: We need find better place!
+	SaveGameLoading = false;	
+	
+	//
+	// Game logic part
+	//
+	if (!GamePaused && NetworkInSync && !SkipGameCycle) {
+		SinglePlayerReplayEachCycle();
+		++GameCycle;
+		MultiPlayerReplayEachCycle();
+		NetworkCommands(); // Get network commands
+		UnitActions();      // handle units
+		MissileActions();   // handle missiles
+		PlayersEachCycle(); // handle players
+		UpdateTimer();      // update game timer
 
-	InitGameCallbacks();
-
-	old_callbacks = GetCallbacks();
-	SetCallbacks(&GameCallbacks);
-
-	SetVideoSync();
-	GameCursor = UI.Point.Cursor;
-	GameRunning = true;
-
-	CParticleManager::init();
-
-	showtip = false;
-#ifdef REALVIDEO
-	RealVideoSyncSpeed = VideoSyncSpeed;
-#endif
-	CclCommand("if (GameStarting ~= nil) then GameStarting() end");
-
-	MultiPlayerReplayEachCycle();
-
-	while (GameRunning) {
-
-		// Can't find a better place.
-		SaveGameLoading = false;
 		//
-		// Game logic part
+		// Work todo each second.
+		// Split into different frames, to reduce cpu time.
+		// Increment mana of magic units.
+		// Update mini-map.
+		// Update map fog of war.
+		// Call AI.
+		// Check game goals.
+		// Check rescue of units.
 		//
-		if (!GamePaused && NetworkInSync && !SkipGameCycle) {
-			SinglePlayerReplayEachCycle();
-			++GameCycle;
-			MultiPlayerReplayEachCycle();
-			NetworkCommands(); // Get network commands
-			UnitActions();      // handle units
-			MissileActions();   // handle missiles
-			PlayersEachCycle(); // handle players
-			UpdateTimer();      // update game timer
-
-			//
-			// Work todo each second.
-			// Split into different frames, to reduce cpu time.
-			// Increment mana of magic units.
-			// Update mini-map.
-			// Update map fog of war.
-			// Call AI.
-			// Check game goals.
-			// Check rescue of units.
-			//
-			switch (GameCycle % CYCLES_PER_SECOND) {
-				case 0: // At cycle 0, start all ai players...
-					if (GameCycle == 0) {
-						for (player = 0; player < NumPlayers; ++player) {
-							PlayersEachSecond(player);
-						}
-					}
-					break;
-				case 1:
-					break;
-				case 2:
-					break;
-				case 3: // minimap update
-					UI.Minimap.Update();
-					break;
-				case 4:
-					break;
-				case 5:
-					break;
-				case 6: // overtaking units
-					RescueUnits();
-					break;
-				default:
-					// FIXME: assume that NumPlayers < (CYCLES_PER_SECOND - 7)
-					player = (GameCycle % CYCLES_PER_SECOND) - 7;
-					Assert(player >= 0);
-					if (player < NumPlayers) {
+		switch (GameCycle % CYCLES_PER_SECOND) {
+			case 0: // At cycle 0, start all ai players...
+				if (GameCycle == 0) {
+					for (player = 0; player < NumPlayers; ++player) {
 						PlayersEachSecond(player);
 					}
-			}
+				}
+				break;
+			case 1:
+				break;
+			case 2:
+				break;
+			case 3: // minimap update
+				UI.Minimap.UpdateCache = true;
+				break;
+			case 4:
+				break;
+			case 5:
+				break;
+			case 6: // overtaking units
+				RescueUnits();
+				break;
+			default:
+				// FIXME: assume that NumPlayers < (CYCLES_PER_SECOND - 7)
+				player = (GameCycle % CYCLES_PER_SECOND) - 7;
+				Assert(player >= 0);
+				if (player < NumPlayers) {
+					PlayersEachSecond(player);
+				}
 		}
+	}
 
-		TriggersEachCycle();  // handle triggers
-		UpdateMessages();     // update messages
-		ParticleManager.update(); // handle particles
-		CheckMusicFinished(); // Check for next song
+	TriggersEachCycle();  // handle triggers		
+	UpdateMessages();     // update messages
+	ParticleManager.update(); // handle particles
+	CheckMusicFinished(); // Check for next song
+	
+	if (FastForwardCycle <= GameCycle || !(GameCycle & 0x3f)) {
+		WaitEventsOneFrame();
+	}
+		
+	if (!NetworkInSync) {
+		NetworkRecover(); // recover network
+	}
+	
+}
 
+//#define REALVIDEO
+#ifdef REALVIDEO
+static	int RealVideoSyncSpeed;
+#endif
+
+static void DisplayLoop(void)
+{
+#ifdef USE_OPENGL
+		/* update only if screen changed */
+		ValidateOpenGLScreen();
+#endif
+
+		/* update only if viewmode changed */
+		CheckViewportMode();
+		
+		/* 
+		 *	update only if Update flag is set 
+		 *	FIXME: still not secure
+		 */
+		if (UI.Minimap.UpdateCache) {
+			UI.Minimap.Update();
+			UI.Minimap.UpdateCache = false;
+		}
+		
 		//
 		// Map scrolling
 		//
@@ -384,17 +396,98 @@ void GameMainLoop(void)
 			VideoSyncSpeed = RealVideoSyncSpeed;
 		}
 #endif
-		if (FastForwardCycle <= GameCycle || !(GameCycle & 0x3f)) {
-			WaitEventsOneFrame();
+
+#ifndef USE_OPENGL
+	if ((GameRunning || Editor.Running) && (FastForwardCycle <= GameCycle || !(GameCycle & 0x3f))) {
+		Video.ClearScreen();
+	}
+#endif
+}
+
+static void SingleGameLoop(void)
+{
+	while (GameRunning) {
+		DisplayLoop();	
+		GameLogicLoop();
+	}
+}
+
+struct GameLogic: public CThread {
+	void Run(void)
+	{
+		while (GameRunning) {
+			GameLogicLoop();
 		}
-		if (!NetworkInSync) {
-			NetworkRecover(); // recover network
+	}
+};
+
+
+/**
+**  Game main loop.
+**
+**  Unit actions.
+**  Missile actions.
+**  Players (AI).
+**  Cyclic events (color cycle,...)
+**  Display update.
+**  Input/Network/Sound.
+*/
+void GameMainLoop(void)
+{
+#ifdef DEBUG  // removes the setjmp warnings
+	static bool showtip;
+#else
+	bool showtip;
+#endif
+	const EventCallback *old_callbacks;
+
+	InitGameCallbacks();
+
+	old_callbacks = GetCallbacks();
+	SetCallbacks(&GameCallbacks);
+
+	SetVideoSync();
+	GameCursor = UI.Point.Cursor;
+	GameRunning = true;
+
+	CParticleManager::init();
+
+	showtip = false;
+#ifdef REALVIDEO
+	RealVideoSyncSpeed = VideoSyncSpeed;
+#endif
+
+	CclCommand("if (GameStarting ~= nil) then GameStarting() end");
+
+	MultiPlayerReplayEachCycle();
+
+	if (CPU_NUM > 1) {
+		GameLogic GameThr;
+		if (GameThr.Start() == 0) {
+			printf("%d CPUs detected!\n", CPU_NUM);
+			while (GameRunning) {
+				DisplayUpdateLocker.Lock();
+				DisplayLoop();
+				DisplayUpdateLocker.UnLock();
+				/* Make CPU happy */
+				SDL_Delay(1);
+			}			
+			GameThr.Wait();
+		} else {
+			SingleGameLoop();
 		}
+	} else {
+		SingleGameLoop();
 	}
 
 	//
 	// Game over
 	//
+	if (GameResult == GameExit) {
+		Exit(0);
+		return;
+	}	
+
 #ifdef REALVIDEO	
 	if (FastForwardCycle > GameCycle) {
 		VideoSyncSpeed = RealVideoSyncSpeed;

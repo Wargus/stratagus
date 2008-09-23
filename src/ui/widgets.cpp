@@ -56,7 +56,6 @@ static EventCallback GuichanCallbacks;
 
 static std::stack<MenuScreen *> MenuStack;
 
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -166,6 +165,8 @@ void DrawGuichanWidgets()
 	if (Gui) {
 #ifndef USE_OPENGL
 		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running);
+#else
+		Gui->setUseDirtyDrawing(false);		
 #endif
 		Gui->draw();
 	}
@@ -1509,8 +1510,11 @@ int MenuScreen::run(bool loop)
 		const EventCallback *old_callbacks = GetCallbacks();
 		SetCallbacks(&GuichanCallbacks);
 		while (runLoop) {
-			UpdateDisplay();
-			RealizeVideoMemory();
+			if (!(GameRunning && CPU_NUM > 1)) {
+				/* No Parallel drawing... do it here */
+				UpdateDisplay();
+				RealizeVideoMemory();
+			}
 			WaitEventsOneFrame();
 		}
 		SetCallbacks(old_callbacks);
@@ -1566,12 +1570,12 @@ void MenuScreen::draw(gcn::Graphics *graphics)
 	if (this->drawUnder) {
 		gcn::Widget *w = Gui->getTop();
 		gcn::Widget *f = w->_getFocusHandler()->getFocused();
-		Gui->setTop(oldtop);
 		gcn::Rectangle r = Gui->getGraphics()->getCurrentClipArea();
 		Gui->getGraphics()->popClipArea();
-		Gui->draw();
-		Gui->setTop(w);
-		w->_getFocusHandler()->setFocus(f);
+		Gui->draw(oldtop);
+		if (f) {
+			w->_getFocusHandler()->setFocus(f);
+		}
 		Gui->getGraphics()->pushClipArea(r);
 	}
 	gcn::Container::draw(graphics);

@@ -48,10 +48,10 @@
 ----------------------------------------------------------------------------*/
 
 struct Node {
-	char Direction;     /// Direction for trace back
-	char InGoal;        /// is this point in the goal
 	int CostFromStart;  /// Real costs to reach this point
-	int CostToGoal;     /// Estimated cost to goal
+	short int CostToGoal;     /// Estimated cost to goal
+	char InGoal;        /// is this point in the goal	
+	char Direction;     /// Direction for trace back
 };
 
 struct Open {
@@ -123,15 +123,42 @@ static const int CacheNotSet = -5;
 #ifdef ASTAR_PROFILE
 
 #include <map>
+#ifndef __unix
 #include <windows.h>
+#else
+
+union LARGE_INTEGER {
+	uint64_t QuadPart;
+	uint32_t DoublePart[2];
+};
+inline int QueryPerformanceCounter(LARGE_INTEGER*ptr)
+{
+   unsigned int lo, hi;
+   __asm__ __volatile__ (      // serialize
+     "xorl %%eax,%%eax \n        cpuid"
+     ::: "%rax", "%rbx", "%rcx", "%rdx");
+   /* We cannot use "=A", since this would use %rax on x86_64 */
+   __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
+   ptr->DoublePart[0] = lo;
+   ptr->DoublePart[1] = hi;
+   return 1;
+};
+
+inline int QueryPerformanceFrequency(LARGE_INTEGER*ptr){
+	ptr->QuadPart = 1000;
+	return 1;
+}
+
+#endif
+
 #undef max
 #undef min
-static std::map<std::string, LARGE_INTEGER> functionTimerMap;
+static std::map<const char *const, LARGE_INTEGER> functionTimerMap;
 struct ProfileData {
 	unsigned long Calls;
 	unsigned long TotalTime;
 };
-static std::map<std::string, ProfileData> functionProfiles;
+static std::map<const char *const, ProfileData> functionProfiles;
 
 inline void ProfileInit()
 {
@@ -139,7 +166,7 @@ inline void ProfileInit()
 	functionProfiles.clear();
 }
 
-inline void ProfileBegin(const std::string &function)
+inline void ProfileBegin(const char *const function)
 {
 	LARGE_INTEGER counter;
 	if (!QueryPerformanceCounter(&counter)) {
@@ -148,7 +175,7 @@ inline void ProfileBegin(const std::string &function)
 	functionTimerMap[function] = counter;
 }
 
-inline void ProfileEnd(const std::string &function)
+inline void ProfileEnd(const char *const function)
 {
 	LARGE_INTEGER counter;
 	if (!QueryPerformanceCounter(&counter)) {
@@ -160,25 +187,44 @@ inline void ProfileEnd(const std::string &function)
 	data->TotalTime += time;
 }
 
+static bool compProfileData(const ProfileData* lhs, 
+						const ProfileData* rhs)
+{
+	return (lhs->TotalTime > rhs->TotalTime);
+}
+
+
 inline void ProfilePrint()
 {
 	LARGE_INTEGER frequency;
 	if (!QueryPerformanceFrequency(&frequency)) {
 		return;
 	}
+	std::vector<ProfileData*> prof;
+	for (std::map<const char *const, ProfileData>::iterator i
+		 = functionProfiles.begin(); i != functionProfiles.end(); ++i) {
+		ProfileData *data = &i->second;
+		prof.insert(std::upper_bound(prof.begin(), prof.end(), data, compProfileData), data);
+	}
 
-	std::map<std::string, ProfileData>::iterator i;
 
 	FILE *fd = fopen("profile.txt", "wb");
 	fprintf(fd, "    total\t    calls\t      per\tname\n");
 
-	for (i = functionProfiles.begin(); i != functionProfiles.end(); ++i) {
-		ProfileData *data = &i->second;
-		fprintf(fd, "%9.3f\t%9lu\t%9.3f\t%s\n",
+	for (std::vector<ProfileData*>::iterator i = prof.begin(); i != prof.end(); ++i) {
+		ProfileData *data = (*i);
+		fprintf(fd, "%9.3f\t%9lu\t%9.3f\t",
 			(double)data->TotalTime / frequency.QuadPart * 1000.0,
 			data->Calls,
-			(double)data->TotalTime / frequency.QuadPart * 1000.0 / data->Calls,
-			i->first.c_str());
+			(double)data->TotalTime / frequency.QuadPart * 1000.0 / data->Calls);
+			for (std::map<const char *const, ProfileData>::iterator j =
+				 functionProfiles.begin(); j != functionProfiles.end(); ++j) {
+				ProfileData *data2 = &j->second;
+				if (data == data2) {
+					fprintf(fd, "%s\n",j->first);
+				}
+			}
+			
 	}
 
 	fclose(fd);
@@ -452,17 +498,16 @@ static void AStarRemoveMinimum(int pos)
 **
 **  @return  0 or PF_FAILED
 */
-static int AStarAddNode(int x, int y, int o, int costs)
+static inline int AStarAddNode(int x, int y, int o, int costs)
 {
 	ProfileBegin("AStarAddNode");
 
-	int bigi, smalli;
+	int bigi = 0, smalli = OpenSetSize;
 	int midcost;
 	int midi;
-	int costToGoal;
-	int midCostToGoal;
-	int dist;
+	int midCostToGoal;	
 	int midDist;
+	const Open *open;
 	
 	if (OpenSetSize + 1 >= OpenSetMaxSize) {
 		fprintf(stderr, "A* internal error: raise Open Set Max Size "
@@ -471,20 +516,17 @@ static int AStarAddNode(int x, int y, int o, int costs)
 		return PF_FAILED;
 	}
 
-	costToGoal = AStarMatrix[o].CostToGoal;
-	dist = MyAbs(x - AStarGoalX) + MyAbs(y - AStarGoalY);
+	const int costToGoal = AStarMatrix[o].CostToGoal;
+	const int dist = MyAbs(x - AStarGoalX) + MyAbs(y - AStarGoalY);
 
 	// find where we should insert this node.
-	bigi = 0;
-	smalli = OpenSetSize;
-
 	// binary search where to insert the new node
 	while (bigi < smalli) {
 		midi = (smalli + bigi) >> 1;
-		midcost = OpenSet[midi].Costs;
-		midCostToGoal = AStarMatrix[OpenSet[midi].O].CostToGoal;
-		midDist = MyAbs(OpenSet[midi].X - AStarGoalX) +
-					 MyAbs(OpenSet[midi].Y - AStarGoalY);
+		open = &OpenSet[midi];
+		midcost = open->Costs;
+		midCostToGoal = AStarMatrix[open->O].CostToGoal;
+		midDist = MyAbs(open->X - AStarGoalX) + MyAbs(open->Y - AStarGoalY);
 		if (costs > midcost || (costs == midcost &&
 				(costToGoal > midCostToGoal || (costToGoal == midCostToGoal &&
 					dist > midDist)))) {
@@ -503,7 +545,7 @@ static int AStarAddNode(int x, int y, int o, int costs)
 		}
 	}
 
-	if (OpenSetSize > bigi) { 
+	if (OpenSetSize > bigi) {
 		// free a the slot for our node
 		memmove(&OpenSet[bigi+1], &OpenSet[bigi], (OpenSetSize - bigi) * sizeof(Open));
 	}
@@ -534,7 +576,8 @@ static void AStarReplaceNode(int pos, int costs)
 	// Remove the outdated node
 	node = OpenSet[pos];
 	OpenSetSize--;
-	memmove(&OpenSet[pos], &OpenSet[pos+1], sizeof(Open) * (OpenSetSize-pos));
+	//memmove(&OpenSet[pos], &OpenSet[pos+1], sizeof(Open) * (OpenSetSize-pos));
+	memcpy(&OpenSet[pos], &OpenSet[pos+1], sizeof(Open) * (OpenSetSize-pos));
 
 	// Re-add the node with the new cost
 	AStarAddNode(node.X, node.Y, node.O, node.Costs);

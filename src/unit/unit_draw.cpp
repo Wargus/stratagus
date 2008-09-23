@@ -488,7 +488,7 @@ void CDecoVarText::Draw(int x, int y, const CUnit *unit) const
 	if (this->IsCenteredInY) {
 		y -= this->Font->Height() / 2;
 	}
-	VideoDrawNumberClip(x, y, this->Font, unit->Variable[this->Index].Value);
+	CLabel(this->Font).DrawClip(x, y, unit->Variable[this->Index].Value);
 }
 
 /**
@@ -614,7 +614,7 @@ static void DrawDecoration(const CUnit *unit, const CUnitType *type, int x, int 
 		x += (type->TileWidth * TileSizeX + type->BoxWidth) / 2 - width;
 		width = GameFont->Height();
 		y += (type->TileHeight * TileSizeY + type->BoxHeight) / 2 - width;
-		VideoDrawNumberClip(x, y, GameFont, num);
+		CLabel(GameFont).DrawClip(x, y, num);
 	}
 }
 
@@ -1104,14 +1104,23 @@ void CUnit::Draw() const
 	CConstructionFrame *cframe;
 	CUnitType *type;
 
-	if (this->Type->Revealer) { // Revealers are not drawn
+	/* 
+	 * Since we can draw in parallel to game logic units may be already destroyed 
+	 * or removed (this->Container != NULL) most dangerus is destroyed state
+	 * but due existence of UnitCashe, unit memory is always valid only we need check
+	 * Destroyed flag... the hack is that  this->Type == NULL but 'or' logic
+	 * should secure this scenario and retir before this->Type->Revealer check
+	 */
+	if (this->Destroyed || this->Container || this->Type->Revealer) { // Revealers are not drawn
 		return;
 	}
 
-	// Those should have been filtered. Check doesn't make sense with ReplayRevealMap
-	Assert(ReplayRevealMap || this->Type->VisibleUnderFog || this->IsVisible(ThisPlayer));
+	bool IsVisible = this->IsVisible(ThisPlayer);
 
-	if (ReplayRevealMap || this->IsVisible(ThisPlayer)) {
+	// Those should have been filtered. Check doesn't make sense with ReplayRevealMap
+	Assert(ReplayRevealMap || this->Type->VisibleUnderFog || IsVisible);
+
+	if (ReplayRevealMap || IsVisible) {
 		type = this->Type;
 		frame = this->Frame;
 		y = this->IY;
@@ -1145,7 +1154,7 @@ void CUnit::Draw() const
 	}
 #endif
 
-	if (!this->IsVisible(ThisPlayer) && frame == UnitNotSeen) {
+	if (!IsVisible && frame == UnitNotSeen) {
 		DebugPrint("FIXME: Something is wrong, unit %d not seen but drawn time %lu?.\n" _C_
 			this->Slot _C_ GameCycle);
 		return;
@@ -1216,16 +1225,11 @@ void CUnit::Draw() const
 **
 **  @return -1 for v1 < v2, 1 for v2 < v1
 */
-static int DrawLevelCompare(const void *v1, const void *v2) {
+static inline bool DrawLevelCompare(const CUnit *c1, const CUnit *c2)
+{
 
-	const CUnit *c1;
-	const CUnit *c2;
 	int drawlevel1;
 	int drawlevel2;
-	int diffpos;
-
-	c1 = *(CUnit **)v1;
-	c2 = *(CUnit **)v2;
 
 	if (c1->CurrentAction() == UnitActionDie && c1->Type->CorpseType) {
 		drawlevel1 = c1->Type->CorpseType->DrawLevel;
@@ -1242,11 +1246,11 @@ static int DrawLevelCompare(const void *v1, const void *v2) {
 		// diffpos compares unit's Y positions (bottom of sprite) on the map
 		// and uses X position in case Y positions are equal.
 		// FIXME: Use BoxHeight?
-		diffpos = c1->Y * TileSizeY + c1->IY + c1->Type->Height -
-			(c2->Y * TileSizeY + c2->IY + c2->Type->Height);
-		return diffpos ? diffpos : c1->X - c2->X ? c1->X - c2->X : c1->Slot - c2->Slot;
+		const int pos1 = c1->Y * TileSizeY + c1->IY + c1->Type->Height;
+		const int pos2 = (c2->Y * TileSizeY + c2->IY + c2->Type->Height);
+		return pos1 == pos2 ? (c1->X - c2->X ? c1->X < c2->X : c1->Slot < c2->Slot) : pos1 < pos2;
 	} else {
-		return drawlevel1 <= drawlevel2 ? -1 : 1;
+		return drawlevel1 <= drawlevel2;
 	}
 }
 /**
@@ -1270,8 +1274,8 @@ int FindAndSortUnits(const CViewport *vp, CUnit **table)
 		}
 	}
 
-	if (n) {
-		qsort((void *)table, n, sizeof(CUnit *), DrawLevelCompare);
+	if (n > 1) {
+		std::sort(table, table + n, DrawLevelCompare);
 	}
 
 	return n;

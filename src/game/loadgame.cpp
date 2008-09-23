@@ -83,6 +83,10 @@ void CleanModules(void)
 	EndReplayLog();
 	CleanMessages();
 
+	CleanGroups();
+	CleanUnits();
+	CleanUnitTypes();
+	CleanSelections();	
 	CleanIcons();
 	CleanCursors();
 	CleanUserInterface();
@@ -93,15 +97,11 @@ void CleanModules(void)
 	CleanRaces();
 	CleanConstructions();
 	CleanDecorations();
-	CleanUnitTypes();
-	CleanUnits();
-	CleanSelections();
-	CleanGroups();
 	CleanUpgrades();
 	CleanDependencies();
 	CleanButtons();
-	CleanMissileTypes();
 	CleanMissiles();
+	CleanMissileTypes();
 	CleanTilesets();
 	Map.Clean();
 	Map.CleanFogOfWar();

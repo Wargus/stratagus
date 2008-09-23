@@ -490,7 +490,7 @@ static void HandleMouseOn(int x, int y)
 	for (unsigned int j = 0; j < size; ++j) {
 		if (OnButton(x, y, &UI.ButtonPanel.Buttons[j])) {
 			ButtonAreaUnderCursor = ButtonAreaButton;
-			if (CurrentButtons && CurrentButtons[j].Pos != -1) {
+			if (CurrentButtons.IsValid() && CurrentButtons[j].Pos != -1) {
 				ButtonUnderCursor = j;
 				CursorOn = CursorOnButton;
 				return;
@@ -1943,7 +1943,6 @@ static int GetPieUnderCursor(void)
 void DrawPieMenu(void)
 {
 	int i;
-	const ButtonAction *buttons;
 	CViewport *vp;
 	CPlayer *player;
 	char buf[2] = "?";
@@ -1951,11 +1950,13 @@ void DrawPieMenu(void)
 	if (CursorState != CursorStatePieMenu)
 		return;
 
-	if (!(buttons = CurrentButtons)) { // no buttons
+	if (!CurrentButtons.IsValid()) { // no buttons
 		CursorState = CursorStatePoint;
 		return;
 	}
-
+	ButtonActionProxy buttons(CurrentButtons);
+	
+	CLabel label(GameFont);
 	vp = UI.SelectedViewport;
 	PushClipping();
 	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
@@ -1982,13 +1983,13 @@ void DrawPieMenu(void)
 			if (UI.ButtonPanel.ShowCommandKey) {
 				const char *text;
 
-				if (CurrentButtons[i].Key == 27) {
+				if (buttons[i].Key == 27) {
 					text = "ESC";
 				} else {
-					buf[0] = toupper(CurrentButtons[i].Key);
+					buf[0] = toupper(buttons[i].Key);
 					text = (const char *)buf;
 				}
-				VideoDrawTextClip(x + 4, y + 4, GameFont, text);
+				label.DrawClip(x + 4, y + 4, text);
 			}
 		}
 	}
@@ -2006,7 +2007,7 @@ void DrawPieMenu(void)
 */
 static void HandlePieMenuMouseSelection(void)
 {
-	if (!CurrentButtons) {  // no buttons
+	if (!CurrentButtons.IsValid()) {  // no buttons
 		return;
 	}
 

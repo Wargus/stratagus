@@ -1609,12 +1609,14 @@ void CUnit::DeAssignWorkerFromMine(CUnit *mine)
 */
 	for(int i = 0; NULL != worker; worker = worker->NextWorker,++i)
 	{
-		if(worker == this) {
+		if (worker == this) {
 			CUnit *next = worker->NextWorker;
-			if(prev)
+			if (prev) {
 				prev->NextWorker = next;
-			if(worker == mine->Data.Resource.Workers)
+			}
+			if (worker == mine->Data.Resource.Workers) {
 				mine->Data.Resource.Workers = next;
+			}
 			worker->RefsDecrease();
 			break;
 		}
@@ -3565,29 +3567,29 @@ void CleanUnits(void)
 	//
 	//  Free memory for all units in unit table.
 	//
-/*
-	int count = NumUnits;
-	for (int i = 0; i < count; ++i) {
-		Units[i]->RefsDecrease();
-	}
-	Assert(NumUnits == 0);
-	memset(Units, 0 , sizeof(CUnit*) * MAX_UNIT_SLOTS);
-*/
-	CUnit **table;
-	//Splited on 2 loops due Orders referces to Units
-	for (table = Units; table < &Units[NumUnits]; ++table) {
-		for (std::vector<COrderPtr>::iterator order = (*table)->Orders.begin();
-			 order != (*table)->Orders.end(); ++order) {
-			delete *order;
-		}
-		(*table)->Orders.clear();
-	}
-	for (table = Units; table < &Units[NumUnits]; ++table) {
-
-		delete[] (*table)->AutoCastSpell;
-		delete[] (*table)->Variable;
-		delete *table;
-		*table = NULL;
+	while(NumUnits) {
+		int count = NumUnits;
+		do {
+			CUnit *unit = Units[count - 1];
+			if (!unit->Destroyed) {
+				if (//unit->Type->Harvester && 
+					unit->CurrentAction() == UnitActionResource) {
+					ResourceInfo *resinfo = unit->Type->ResInfo[unit->CurrentResource];
+					if (resinfo && !resinfo->TerrainHarvester) {
+						CUnit *mine = unit->CurrentOrder()->Arg1.Resource.Mine;
+						if (mine) {
+							unit->DeAssignWorkerFromMine(mine);
+							mine->RefsDecrease();
+							unit->CurrentOrder()->Arg1.Resource.Mine = NULL;
+						}
+					}
+				}
+				unit->CurrentOrder()->ClearGoal();
+				unit->Remove(NULL);
+				UnitClearOrders(unit);
+			}
+			unit->Release();
+		} while(--count);
 	}
 	NumUnits = 0;
 

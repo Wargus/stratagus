@@ -478,7 +478,7 @@ int AiFindWall(AiForce *force)
 	delete[] points;
 
 	if (destx != -1) {
-		force->State = 0;
+		force->State = AI_FORCE_STATE_WAITING;
 		for (i = 0; i < (int)force->Units.size(); ++i) {
 			aiunit = force->Units[i];
 			if (aiunit->Type->CanAttack) {
@@ -516,7 +516,7 @@ int AiPlanAttack(AiForce *force)
 	CUnit *transporter;
 
 	DebugPrint("%d: Planning for force #%lu of player #%d\n"_C_ AiPlayer->Player->Index
-	 _C_ static_cast<long unsigned int> (force - AiPlayer->Force) _C_ AiPlayer->Player->Index);
+	 _C_  (force - &(AiPlayer->Force[0])) _C_ AiPlayer->Player->Index);
 
 	watermatrix = CreateMatrix();
 
@@ -619,7 +619,7 @@ int AiPlanAttack(AiForce *force)
 		force->GoalY = y;
 		force->MustTransport = state == 2;
 
-		force->State = 1;
+		force->State = AI_FORCE_STATE_BOARDING;
 		return 1;
 	}
 	return 0;

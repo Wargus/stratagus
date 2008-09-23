@@ -50,7 +50,8 @@ class CMinimap
 	
 public:
 	CMinimap() : X(0), Y(0), W(0), H(0), XOffset(0), YOffset(0),
-		WithTerrain(false), ShowSelected(false), Transparent(false) {}
+		WithTerrain(false), ShowSelected(false),
+		Transparent(false), UpdateCache(false) {}
 
 	void UpdateXY(int tx, int ty);
 	void UpdateSeenXY(int tx, int ty) {}
@@ -77,6 +78,7 @@ public:
 	bool WithTerrain;
 	bool ShowSelected;
 	bool Transparent;
+	bool UpdateCache;
 };
 
 //@}

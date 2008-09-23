@@ -46,6 +46,7 @@
 #include "script.h"
 #include "player.h"
 #include "iolib.h"
+#include "actions.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

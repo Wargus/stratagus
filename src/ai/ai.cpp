@@ -208,7 +208,7 @@ static void AiCheckUnits(void)
 	//
 	//  Count the already made build requests.
 	//
-	AiGetBuildRequestsCount(counter);
+	AiGetBuildRequestsCount(AiPlayer, counter);
 	
 	//
 	//  Remove non active units.
@@ -832,6 +832,9 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 				}
 				
 				if (!aiForce->Defending && aiForce->State) {
+					DebugPrint("%d: %d(%s) belong to attacking force, don't defend it\n" _C_
+						defender->Player->Index _C_ UnitNumber(defender) _C_
+						defender->Type->Ident.c_str());				
 					// unit belongs to an attacking force, 
 					// so don't send others force in such case.
 					// FIXME: there may be other attacking the same place force who can help

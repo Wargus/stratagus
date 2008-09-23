@@ -330,18 +330,19 @@ void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 	Assert(unit || this->Index == -1);
 	Assert(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.GetNumberVariable()));
 
+	CLabel label(font);
+
 	if (this->Text) {
 		text = EvalString(this->Text);
 		if (this->Centered) {
-			VideoDrawTextCentered(x, y, font, text);
+			x += (label.DrawCentered(x, y, text) * 2);
 		} else {
-			VideoDrawText(x, y, font, text);
+			x += label.Draw(x, y, text);
 		}
-		x += font->Width(text);
 	}
 
 	if (this->ShowName) {
-		VideoDrawTextCentered(x, y, font, unit->Type->Name);
+		label.DrawCentered(x, y, unit->Type->Name);
 		return;
 	}
 
@@ -354,10 +355,10 @@ void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 				case VariableIncrease:
 				case VariableDiff:
 				case VariablePercent:
-					VideoDrawNumber(x, y, font, GetComponent(unit, this->Index, component, 0).i);
+					label.Draw(x, y, GetComponent(unit, this->Index, component, 0).i);
 					break;
 				case VariableName:
-					VideoDrawText(x, y, font, GetComponent(unit, this->Index, component, 0).s);
+					label.Draw(x, y, GetComponent(unit, this->Index, component, 0).s);
 					break;
 				default:
 					Assert(0);
@@ -367,11 +368,11 @@ void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 			int diff = unit->Stats->Variables[this->Index].Value - value;
 
 			if (!diff) {
-				VideoDrawNumber(x, y, font, value);
+				label.Draw(x, y, value);
 			} else {
 				char buf[64];
 				snprintf(buf,sizeof(buf), diff > 0 ? "%d~<+%d~>" : "%d~<-%d~>", value, diff);
-				VideoDrawText(x, y, font, buf);
+				label.Draw(x, y, buf);
 			}
 		}
 	}
@@ -397,18 +398,20 @@ void CContentTypeFormattedText::Draw(const CUnit *unit, CFont *defaultfont) cons
 	font = this->Font ? this->Font : defaultfont;
 	Assert(font);
 
+	CLabel label(font);
+
 	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
 	usi1 = GetComponent(unit, this->Index, this->Component, 0);
 	if (usi1.type == USTRINT_STR) {
-		sprintf(buf, this->Format.c_str(), usi1.s);
+		snprintf(buf,sizeof(buf), this->Format.c_str(), usi1.s);
 	} else {
-		sprintf(buf, this->Format.c_str(), usi1.i);
+		snprintf(buf,sizeof(buf), this->Format.c_str(), usi1.i);
 	}
 
 	if (this->Centered) {
-		VideoDrawTextCentered(this->PosX, this->PosY, font, buf);
+		label.DrawCentered(this->PosX, this->PosY, buf);
 	} else {
-		VideoDrawText(this->PosX, this->PosY, font, buf);
+		label.Draw(this->PosX, this->PosY, buf);
 	}
 }
 
@@ -431,26 +434,27 @@ void CContentTypeFormattedText2::Draw(const CUnit *unit, CFont *defaultfont) con
 	Assert(unit);
 	font = this->Font ? this->Font : defaultfont;
 	Assert(font);
+	CLabel label(font);
 
 	usi1 = GetComponent(unit, this->Index1, this->Component1, 0);
 	usi2 = GetComponent(unit, this->Index2, this->Component2, 0);
 	if (usi1.type == USTRINT_STR) {
 		if (usi2.type == USTRINT_STR) {
-			sprintf(buf, this->Format.c_str(), usi1.s, usi2.s);
+			snprintf(buf,sizeof(buf), this->Format.c_str(), usi1.s, usi2.s);
 		} else {
-			sprintf(buf, this->Format.c_str(), usi1.s, usi2.i);
+			snprintf(buf,sizeof(buf), this->Format.c_str(), usi1.s, usi2.i);
 		}
 	} else {
 		if (usi2.type == USTRINT_STR) {
-			sprintf(buf, this->Format.c_str(), usi1.i, usi2.s);
+			snprintf(buf,sizeof(buf), this->Format.c_str(), usi1.i, usi2.s);
 		} else {
-			sprintf(buf, this->Format.c_str(), usi1.i, usi2.i);
+			snprintf(buf,sizeof(buf), this->Format.c_str(), usi1.i, usi2.i);
 		}
 	}
 	if (this->Centered) {
-		VideoDrawTextCentered(this->PosX, this->PosY, font, buf);
+		label.DrawCentered(this->PosX, this->PosY, buf);
 	} else {
-		VideoDrawText(this->PosX, this->PosY, font, buf);
+		label.Draw(this->PosX, this->PosY, buf);
 	}
 }
 
@@ -567,6 +571,7 @@ static void DrawUnitInfo(CUnit *unit)
 	int x;
 	int y;
 	CUnit *uins;
+	CLabel label(GameFont);
 
 	Assert(unit);
 	UpdateUnitVariables(unit);
@@ -628,8 +633,9 @@ static void DrawUnitInfo(CUnit *unit)
 			case UnitActionTrain:
 				if (unit->OrderCount == 1 || unit->Orders[1]->Action != UnitActionTrain) {
 					if (!UI.SingleTrainingText.empty()) {
-						VideoDrawText(UI.SingleTrainingTextX, UI.SingleTrainingTextY,
-							UI.SingleTrainingFont, UI.SingleTrainingText);
+						label.SetFont(UI.SingleTrainingFont);
+						label.Draw(UI.SingleTrainingTextX, UI.SingleTrainingTextY,
+							UI.SingleTrainingText);
 					}
 					if (UI.SingleTrainingButton) {
 						unit->CurrentOrder()->Arg1.Type->Icon.Icon->DrawUnitIcon(unit->Player,
@@ -641,8 +647,9 @@ static void DrawUnitInfo(CUnit *unit)
 					}
 				} else {
 					if (!UI.TrainingText.empty()) {
-						VideoDrawTextCentered(UI.TrainingTextX, UI.TrainingTextY,
-							UI.TrainingFont, UI.TrainingText);
+						label.SetFont(UI.TrainingFont);
+						label.Draw(UI.TrainingTextX, UI.TrainingTextY,
+							UI.TrainingText);
 					}
 					if (!UI.TrainingButtons.empty()) {
 						for (i = 0; i < unit->OrderCount &&
@@ -730,9 +737,9 @@ static void DrawUnitInfo(CUnit *unit)
 */
 void DrawResources(void)
 {
-	char tmp[128];
 	int i;
 	int v;
+	CLabel label(GameFont);
 
 	// Draw all icons of resource.
 	for (i = 0; i <= ScoreCost; ++i) {
@@ -744,26 +751,28 @@ void DrawResources(void)
 	for (i = 0; i < MaxCosts; ++i) {
 		if (UI.Resources[i].TextX != -1) {
 			v = ThisPlayer->Resources[i];
-			VideoDrawNumber(UI.Resources[i].TextX,
-				UI.Resources[i].TextY + (v > 99999) * 3,
-				v > 99999 ? SmallFont : GameFont, v);
+			label.SetFont(v > 99999 ? SmallFont : GameFont);
+			label.Draw(UI.Resources[i].TextX,
+				UI.Resources[i].TextY + (v > 99999) * 3, v);
 		}
 	}
 	if (UI.Resources[FoodCost].TextX != -1) {
-		sprintf(tmp, "%d/%d", ThisPlayer->Demand, ThisPlayer->Supply);
+		char tmp[128];	
+		snprintf(tmp,sizeof(tmp), "%d/%d", ThisPlayer->Demand, ThisPlayer->Supply);
+		label.SetFont(GameFont);
 		if (ThisPlayer->Supply < ThisPlayer->Demand) {
-			VideoDrawReverseText(UI.Resources[FoodCost].TextX,
-				UI.Resources[FoodCost].TextY, GameFont, tmp);
+			label.DrawReverse(UI.Resources[FoodCost].TextX,
+				UI.Resources[FoodCost].TextY, tmp);
 		} else {
-			VideoDrawText(UI.Resources[FoodCost].TextX,
-				UI.Resources[FoodCost].TextY, GameFont, tmp);
+			label.Draw(UI.Resources[FoodCost].TextX,
+				UI.Resources[FoodCost].TextY, tmp);
 		}
 	}
 	if (UI.Resources[ScoreCost].TextX != -1) {
 		v = ThisPlayer->Score;
-		VideoDrawNumber(UI.Resources[ScoreCost].TextX,
-			UI.Resources[ScoreCost].TextY + (v > 99999) * 3,
-			v > 99999 ? SmallFont : GameFont, v);
+		label.SetFont(v > 99999 ? SmallFont : GameFont);
+		label.Draw(UI.Resources[ScoreCost].TextX,
+				UI.Resources[ScoreCost].TextY + (v > 99999) * 3, v);
 	}
 }
 
@@ -852,6 +861,7 @@ void MessagesDisplay::UpdateMessages()
 void MessagesDisplay::DrawMessages()
 {
 	if (show) {
+		CLabel label(UI.MessageFont);
 		// background so the text is easier to read
 		if (MessagesCount) {
 			int textHeight = MessagesCount * (UI.MessageFont->Height() + 1);
@@ -872,9 +882,15 @@ void MessagesDisplay::DrawMessages()
 				SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
 					Video.Height - 1);
 			}
-			VideoDrawTextClip(UI.MapArea.X + 8,
-				UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1) - MessagesScrollY,
-				UI.MessageFont, Messages[z]);
+			/*
+			 * Due parallel drawing we have to force message copy due temp 
+			 * std::string(Messages[z]) creation because 
+			 * char * pointer may change during text drawing.
+			 */
+			label.DrawClip(UI.MapArea.X + 8,
+				UI.MapArea.Y + 8 + 
+				z * (UI.MessageFont->Height() + 1) - MessagesScrollY,
+				std::string(Messages[z]));
 			if (z == 0) {
 				PopClipping();
 			}
@@ -1140,8 +1156,7 @@ void CStatusLine::Draw(void)
 		PushClipping();
 		SetClipping(this->TextX, this->TextY,
 			this->TextX + this->Width - 1, Video.Height - 1);
-		VideoDrawTextClip(this->TextX, this->TextY, this->Font,
-			this->StatusLine);
+		CLabel(this->Font).DrawClip(this->TextX, this->TextY, this->StatusLine);
 		PopClipping();
 	}
 }
@@ -1187,12 +1202,13 @@ static int Costs[MaxCosts + 1];          /// costs to display in status line
 void DrawCosts(void)
 {
 	int x = UI.StatusLine.TextX + 268;
+	CLabel label(GameFont);
 	if (CostsMana) {
 		// FIXME: hardcoded image!!!
 		UI.Resources[GoldCost].G->DrawFrameClip(3, x, UI.StatusLine.TextY);
 
 		x += 20;
-		x += VideoDrawNumber(x, UI.StatusLine.TextY, GameFont, CostsMana);
+		x+=label.Draw(x, UI.StatusLine.TextY, CostsMana);
 	}
 
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
@@ -1203,7 +1219,7 @@ void DrawCosts(void)
 					x, UI.StatusLine.TextY);
 				x+= 20;	
 			}
-			x += VideoDrawNumber(x, UI.StatusLine.TextY, GameFont, Costs[i]);
+			x+=label.Draw(x, UI.StatusLine.TextY, Costs[i]);
 			if (x > Video.Width - 60) {
 				break;
 			}
@@ -1399,8 +1415,8 @@ static void DrawInfoPanelMultipleSelected()
 		std::ostringstream os;
 		os << "+" << (unsigned)(NumSelected - UI.SelectedButtons.size());
 
-		VideoDrawText(UI.MaxSelectedTextX, UI.MaxSelectedTextY,
-			UI.MaxSelectedFont, os.str());
+		CLabel(UI.MaxSelectedFont).Draw(UI.MaxSelectedTextX,
+										 UI.MaxSelectedTextY, os.str());
 	}
 }
 
@@ -1430,13 +1446,13 @@ static void DrawInfoPanelNoneSelected()
 	std::string rc;
 	int x = UI.InfoPanel.X + 16;
 	int y = UI.InfoPanel.Y + 8;
+	CLabel label(GameFont);
 
-	VideoDrawText(x, y, GameFont, "Stratagus");
+	label.Draw(x,y, "Stratagus");
 	y += 16;
-	VideoDrawText(x, y, GameFont, "Cycle:");
-	VideoDrawNumber(x + 48, y, GameFont, GameCycle);
-	VideoDrawNumber(x + 110, y, GameFont,
-		CYCLES_PER_SECOND * VideoSyncSpeed / 100);
+	label.Draw(x, y, "Cycle:");
+	label.Draw(x + 48, y, GameCycle);
+	label.Draw(x + 110, y, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
 	y += 20;
 
 	if( y + PlayerMax * GameFont->Height() > Video.Height )
@@ -1449,24 +1465,23 @@ static void DrawInfoPanelNoneSelected()
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		if (Players[i].Type != PlayerNobody) {
 			if (ThisPlayer->Allied & (1 << Players[i].Index)) {
-				SetDefaultTextColors(FontGreen, rc);
+				label.SetNormalColor(FontGreen);
 			} else if (ThisPlayer->Enemy & (1 << Players[i].Index)) {
-				SetDefaultTextColors(FontRed, rc);
+				label.SetNormalColor(FontRed);
 			} else {
-				SetDefaultTextColors(nc, rc);
+				label.SetNormalColor(nc);
 			}
 
-			VideoDrawNumber(x + 15, y, GameFont, i);
+			label.Draw(x + 15, y, i);
 
 			Video.DrawRectangle(ColorWhite,x, y, 12, 12);
 			Video.FillRectangle(Players[i].Color, x + 1, y + 1, 10, 10);
 
-			VideoDrawText(x + 27, y, GameFont,Players[i].Name);
-			VideoDrawNumber(x + 117, y, GameFont,Players[i].Score);
+			label.Draw(x + 27, y, Players[i].Name);
+			label.Draw(x + 117, y, Players[i].Score);
 			y += 14;
 		}
 	}
-	SetDefaultTextColors(nc, rc);
 }
 
 /**
@@ -1509,8 +1524,7 @@ void DrawTimer(void)
 	} else {
 		snprintf(buf, sizeof(buf), "%d:%02d", min, sec);
 	}
-
-	VideoDrawText(UI.Timer.X, UI.Timer.Y, UI.Timer.Font, buf);
+	CLabel(UI.Timer.Font).Draw(UI.Timer.X, UI.Timer.Y, buf);
 }
 
 /**

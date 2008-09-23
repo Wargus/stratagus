@@ -256,6 +256,7 @@ int PlayMovie(const std::string &name)
 	SetCallbacks(&callbacks);
 
 	Invalidate();
+	DisplayAutoLocker autolock;
 	RealizeVideoMemory();
 
 	MovieStop = 0;

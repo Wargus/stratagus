@@ -899,6 +899,17 @@ public:
 	}
 
 	/**
+	**  Returns true if unit is alive.
+	**  Another unit can interact only with alive map units.
+	**
+	**  @return        True if alive, false otherwise.
+	*/
+	inline bool IsAlive() const
+	{
+		return !Destroyed && CurrentAction() != UnitActionDie;
+	}
+
+	/**
 	**  Returns true if unit is alive and on the map.
 	**  Another unit can interact only with alive map units.
 	**
@@ -906,7 +917,7 @@ public:
 	*/
 	inline bool IsAliveOnMap() const
 	{
-		return !Removed && !Destroyed && CurrentAction() != UnitActionDie;
+		return !Removed && IsAlive();
 	}
 
 	/**

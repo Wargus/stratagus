@@ -132,6 +132,8 @@ static void ShowTitleImage(TitleScreen *t)
 		timeout = -1;
 	}
 
+	CLabel label(GameFont);
+	DisplayAutoLocker autolock;
 	while (timeout-- && WaitNoEvent) {
 		g->DrawClip((Video.Width - g->Width) / 2, (Video.Height - g->Height) / 2);
 		TitleScreenLabel **labels = t->Labels;
@@ -144,7 +146,8 @@ static void ShowTitleImage(TitleScreen *t)
 				if (labels[j]->Flags & TitleFlagCenter) {
 					x -= labels[j]->Font->Width(labels[j]->Text) / 2;
 				}
-				VideoDrawText(x, y, labels[j]->Font, labels[j]->Text);
+				label.SetFont(labels[j]->Font);
+				label.Draw(x,y,labels[j]->Text);
 			}
 		}
 

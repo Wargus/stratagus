@@ -179,6 +179,33 @@ CUnitTypeVar::CVariableKeys::CVariableKeys() {
 int GetSpriteIndex(const char *SpriteName);
 
 /**
+**  Get the animations structure by ident.
+**
+**  @param ident  Identifier for the animation.
+**
+**  @return  Pointer to the animation structure.
+*/
+CAnimations *AnimationsByIdent(const std::string &ident)
+{
+	std::map<std::string, CAnimations *>::iterator ret = AnimationMap.find(ident);
+	if (ret != AnimationMap.end()) {
+		return  (*ret).second;
+	}
+	return NULL;
+}
+
+void FreeAnimations(void)
+{
+	std::map<std::string, CAnimations *>::iterator i;
+	for (i = AnimationMap.begin(); i != AnimationMap.end(); ++i) {
+		CAnimations *anims = (*i).second;
+		delete anims;
+	}
+	AnimationMap.clear();
+	NumAnimations = 0;
+}
+
+/**
 **  Get the resource ID from a SCM object.
 **
 **  @param l  Lua state.

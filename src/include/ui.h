@@ -206,12 +206,12 @@ public:
 **  @todo this should be later user configurable
 */
 enum ViewportModeType {
-	VIEWPORT_SINGLE,                /// Old single viewport
+	VIEWPORT_SINGLE = 0,                /// Old single viewport
 	VIEWPORT_SPLIT_HORIZ,           /// Two viewports split horizontal
 	VIEWPORT_SPLIT_HORIZ3,          /// Three viewports split horiontal
 	VIEWPORT_SPLIT_VERT,            /// Two viewports split vertical
 	VIEWPORT_QUAD,                  /// Four viewports split symmetric
-	NUM_VIEWPORT_MODES,             /// Number of different viewports.
+	NUM_VIEWPORT_MODES             /// Number of different viewports.
 };
 
 class CMapArea
@@ -680,6 +680,72 @@ public:
 	CGraphic *DefeatBackgroundG;        /// Defeat background graphic
 };
 
+/*	
+ *	Basic Shared Pointer for Current Selected Buttons 
+ *	parallel drawing problems.
+ */
+class ButtonActionProxy {
+    ButtonAction *ptr;		// pointer to the ButtonAction array
+    int* count;				// shared number of owners
+
+    void dispose() {
+        if (count == NULL || --*count == 0) {
+			delete count;
+			delete[] ptr;
+        }
+    }
+
+    ButtonActionProxy& operator= (ButtonAction *p) {
+        if (this->ptr != p) {
+			if (count == NULL || --*count == 0) {
+				delete[] ptr;
+				if (count) {
+					*count = 1;
+				}
+			}
+            ptr = p;
+        }
+        return *this;
+    }
+
+    friend void CButtonPanel::Update(void);
+public:
+
+  	ButtonActionProxy (): ptr(0), count(0) {}
+  
+    ButtonActionProxy (const ButtonActionProxy& p)
+     : ptr(p.ptr), count(p.count)
+    {
+     	if (!count) {
+     		count = new int(1);
+     		*count = 1;
+     	}
+        ++*count;
+    }
+
+    ~ButtonActionProxy () {
+        dispose();
+    }
+
+    void Reset() {
+    	dispose();
+		count = NULL;
+		ptr = NULL;
+    }
+
+	ButtonAction &operator[](unsigned int index) {
+		return ptr[index];
+	}
+    
+    bool IsValid(void)
+    {
+    	return ptr != NULL;
+    }
+    
+};
+
+extern ButtonActionProxy CurrentButtons;    /// Current Selected Buttons
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -690,7 +756,6 @@ extern CUserInterface UI;                           /// The user interface
 extern std::map<std::string, ButtonStyle *> ButtonStyleHash;
 
 extern bool RightButtonAttacks;         /// right button attacks
-extern ButtonAction *CurrentButtons;    /// Current Selected Buttons
 
 extern const char DefaultGroupKeys[];         /// Default group keys
 extern const char *UiGroupKeys;               /// Up to 11 keys used for group selection
@@ -734,6 +799,7 @@ extern CViewport *GetViewport(int x, int y);
 extern void CycleViewportMode(int);
 	/// Select viewport mode
 extern void SetViewportMode(ViewportModeType mode);
+extern void CheckViewportMode(void);
 
 	/// Use the mouse to scroll the map
 extern void MouseScrollMap(int x, int y);

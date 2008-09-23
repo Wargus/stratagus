@@ -127,7 +127,7 @@ struct AiForceAttackSender {
 		DebugPrint("%d: Attacking with force #%d\n" _C_ AiPlayer->Player->Index _C_ force);
 		AiForce *fptr = &AiPlayer->Force[force];
 		fptr->Attacking = true;
-		fptr->State = 3;
+		fptr->State = AI_FORCE_STATE_ATTACKING;
 		fptr->Units.for_each(*this);
 	}
 
@@ -137,7 +137,7 @@ struct AiForceAttackSender {
 		DebugPrint("%d: Attacking with force #%lu\n" _C_ AiPlayer->Player->Index
 			 _C_ (force  - &(AiPlayer->Force[0])));
 		force->Attacking = true;
-		force->State = 3;
+		force->State = AI_FORCE_STATE_ATTACKING;
 		force->Units.for_each(*this);
 	}
 
@@ -557,7 +557,7 @@ void AiAttackWithForce(unsigned int force)
 */
 static void AiGroupAttackerForTransport(AiForce &aiForce)
 {
-	Assert(aiForce.State == 1);
+	Assert(aiForce.State == AI_FORCE_STATE_BOARDING);
 
 	unsigned int nbToTransport = 0;
 	unsigned int transporterIndex = 0;
@@ -650,7 +650,7 @@ static void AiForceAttacks(AiForce *force)
 		return ;
 	}
 
-	if (force->State == 0) {
+	if (force->State == AI_FORCE_STATE_WAITING) {
 		if (!AiPlanAttack(force)) {
 			DebugPrint("Can't transport, look for walls\n");
 			if (!AiFindWall(force)) {
@@ -658,9 +658,9 @@ static void AiForceAttacks(AiForce *force)
 				return ;
 			}
 		}
-		force->State = 1;
+		force->State = AI_FORCE_STATE_BOARDING;
 	}
-	if (force->State == 1) {
+	if (force->State == AI_FORCE_STATE_BOARDING) {
 		AiGroupAttackerForTransport(*force);
 		return ;
 	}
@@ -668,7 +668,7 @@ static void AiForceAttacks(AiForce *force)
 
 	// Find a unit that isn't idle
 	unit = NoUnitP;
-	if (force->State == 3) {
+	if (force->State == AI_FORCE_STATE_ATTACKING) {
 		for (i = 0; i < force->Size(); ++i) {
 			aiunit = force->Units[i];
 			if (!aiunit->IsIdle()) {
@@ -716,7 +716,7 @@ static void AiForceAttacks(AiForce *force)
 	} else { // Everyone is idle, find a new target
 //FIXME: rb - I don't know if AI can use transport now
 #if 0
-		if (force->State == 3) {
+		if (force->State == AI_FORCE_STATE_ATTACKING) {
 			unit = NULL;
 
 			for (i = 0; i < force->Units.size(); ++i) {
@@ -752,7 +752,7 @@ static void AiForceAttacks(AiForce *force)
 		}
 		force->State = 3;
 #else
-		if (force->State == 3) {
+		if (force->State == AI_FORCE_STATE_ATTACKING) {
 
 			unit = AiForceEnemyFinder<false>(force).enemy;
 

@@ -416,6 +416,9 @@ extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player);
 #endif
 
 #ifdef USE_OPENGL
+	/// Regenerate Window screen if needed
+extern void ValidateOpenGLScreen(void);
+
 	/// Free OpenGL graphics
 extern void FreeOpenGLGraphics();
 	/// Reload OpenGL graphics

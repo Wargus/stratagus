@@ -73,7 +73,7 @@ static std::string DefaultReverseColorIndex;    /// Default reverse color index
 **  Font color graphics
 **  Usage: FontColorGraphics[CFont *font][CFontColor *color]
 */
-static std::map< const CFont *, std::map<CFontColor *, CGraphic *> > FontColorGraphics;
+static std::map< const CFont *, std::map<const CFontColor *, CGraphic *> > FontColorGraphics;
 #endif
 
 // FIXME: remove these
@@ -102,7 +102,7 @@ void CFont::drawString(gcn::Graphics *graphics, const std::string &txt,
 
 	PushClipping();
 	SetClipping(r.x, r.y, right, bottom);
-	VideoDrawTextClip(x + r.xOffset, y + r.yOffset, this, txt);
+	CLabel(this).DrawClip(x + r.xOffset, y + r.yOffset, txt);
 	PopClipping();
 }
 
@@ -123,17 +123,17 @@ void CFont::drawString(gcn::Graphics *graphics, const std::string &txt,
 */
 #ifndef USE_OPENGL
 static void VideoDrawChar(const CGraphic *g,
-	int gx, int gy, int w, int h, int x, int y)
+	int gx, int gy, int w, int h, int x, int y, const CFontColor *fc)
 {
 	SDL_Rect srect = {gx, gy, w, h};
 	SDL_Rect drect = {x, y, 0, 0};
 
-	SDL_SetColors(g->Surface, FontColor->Colors, 0, MaxFontColors);
+	SDL_SetColors(g->Surface, (SDL_Color*)fc->Colors, 0, MaxFontColors);
 	SDL_BlitSurface(g->Surface, &srect, TheScreen, &drect);
 }
 #else
 static void VideoDrawChar(const CGraphic *g,
-	int gx, int gy, int w, int h, int x, int y)
+	int gx, int gy, int w, int h, int x, int y, const CFontColor *fc)
 {
 	g->DrawSub(gx, gy, w, h, x, y);
 }
@@ -423,13 +423,13 @@ CFont::~CFont()
 **  @param y   Y screen position
 */
 static void VideoDrawCharClip(const CGraphic *g, int gx, int gy, int w, int h,
-	int x, int y)
+	int x, int y, const CFontColor *fc)
 {
 	int ox;
 	int oy;
 	int ex;
 	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, ex);
-	VideoDrawChar(g, gx + ox, gy + oy, w, h, x, y);
+	VideoDrawChar(g, gx + ox, gy + oy, w, h, x, y, fc);
 }
 
 /**
@@ -449,36 +449,21 @@ static void VideoDrawCharClip(const CGraphic *g, int gx, int gy, int w, int h,
 **
 **  @return      The length of the printed text.
 */
-static int DoDrawText(int x, int y, const CFont *font, const std::string &text,
-	int clip)
+template <const bool CLIP>
+int CLabel::DoDrawText(int x, int y,  
+	const char*const text, const size_t len, const CFontColor *fc) const
 {
-	int w;
-	int widths;
-	CFontColor *rev;
-	char *color;
-	const char *p;
-	void (*DrawChar)(const CGraphic *, int, int, int, int, int, int);
-	int ipr;
-	int c;
-	CGraphic *g;
+	int w,widths = 0;
+	std::string color;
 	int utf8;
-	size_t pos;
-
-	if (clip) {
-		DrawChar = VideoDrawCharClip;
-	} else {
-		DrawChar = VideoDrawChar;
-	}
-
+	size_t pos = 0;
+	const CFontColor *backup = fc;
 #ifndef USE_OPENGL
-	g = font->G;
+	CGraphic *g = font->G;
 #else
-	g = FontColorGraphics[font][FontColor];
+	CGraphic *g = FontColorGraphics[font][fc];
 #endif
-	rev = NULL;
-	widths = 0;
-	pos = 0;
-	while (GetUTF8(text, pos, utf8)) {
+	while (GetUTF8(text, len, pos, utf8)) {
 		if (utf8 == '~') {
 			switch (text[pos]) {
 				case '\0':  // wrong formatted string.
@@ -488,33 +473,39 @@ static int DoDrawText(int x, int y, const CFont *font, const std::string &text,
 					++pos;
 					break;
 				case '!':
-					rev = FontColor;
-					FontColor = ReverseTextColor;
+					if(fc != reverse) {
+						fc = reverse;
 #ifdef USE_OPENGL
-					g = FontColorGraphics[font][FontColor];
+						g = FontColorGraphics[font][fc];
 #endif
+					}
 					++pos;
 					continue;
 				case '<':
-					LastTextColor = FontColor;
-					FontColor = ReverseTextColor;
+					LastTextColor = (CFontColor *)fc;
+					if(fc != reverse) {
+						fc = reverse;
 #ifdef USE_OPENGL
-					g = FontColorGraphics[font][FontColor];
+						g = FontColorGraphics[font][fc];
 #endif
+					}
 					++pos;
 					continue;
 				case '>':
-					rev = LastTextColor;  // swap last and current color
-					LastTextColor = FontColor;
-					FontColor = rev;
+					if(fc != LastTextColor) {
+						const CFontColor *rev = LastTextColor;  // swap last and current color
+						LastTextColor = (CFontColor *)fc;
+						fc = rev;
 #ifdef USE_OPENGL
-					g = FontColorGraphics[font][FontColor];
-#endif
+						g = FontColorGraphics[font][fc];
+#endif						
+					}
 					++pos;
 					continue;
 
 				default:
-					p = text.c_str() + pos;
+				{
+					const char *p = text + pos;
 					while (*p && *p !='~') {
 						++p;
 					}
@@ -522,150 +513,145 @@ static int DoDrawText(int x, int y, const CFont *font, const std::string &text,
 						DebugPrint("oops, format your ~\n");
 						return widths;
 					}
-					color = new char[p - (text.c_str() + pos) + 1];
-					memcpy(color, text.c_str() + pos, p - (text.c_str() + pos));
-					color[p - (text.c_str() + pos)] = '\0';
-					pos = p - text.c_str() + 1;
-					LastTextColor = FontColor;
-					CFontColor *fc = CFontColor::Get(color);
-					if (fc) {
-						FontColor = fc;
+					color.insert(0,text + pos, p - (text + pos));
+					color[p - (text + pos)] = '\0';
+					pos = p - text + 1;
+					LastTextColor = (CFontColor *)fc;
+					const CFontColor *fc_tmp = CFontColor::Get(color);
+					if (fc_tmp) {
+						fc = fc_tmp;
 #ifdef USE_OPENGL
 						g = FontColorGraphics[font][fc];
 #endif
 					}
-					delete[] color;
 					continue;
+				}	
 			}
 		}
 
-		c = utf8 - 32;
+		int c = utf8 - 32;
 		Assert(c >= 0);
 
-		ipr = font->G->GraphicWidth / font->G->Width;
+		int ipr = font->G->GraphicWidth / font->G->Width;
 		if (c >= 0 && c < ipr * font->G->GraphicHeight / font->G->Height) {
 			w = font->CharWidth[c];
-			DrawChar(g, (c % ipr) * font->G->Width, (c / ipr) * font->G->Height,
-				w, font->G->Height, x + widths, y);
+			if (CLIP) {
+				VideoDrawCharClip(g, (c % ipr) * font->G->Width, 
+									(c / ipr) * font->G->Height,
+								w, font->G->Height, x + widths, y,fc);
+		
+			} else {
+				VideoDrawChar(g, (c % ipr) * font->G->Width, 
+									(c / ipr) * font->G->Height,
+								w, font->G->Height, x + widths, y,fc);
+			}			
 		} else {
 			w = font->CharWidth[0];
-			DrawChar(g, 0, 0, w, font->G->Height, x + widths, y);
+			if (CLIP) {
+				VideoDrawCharClip(g, 0, 0, w, font->G->Height, x + widths, y,fc);
+			} else {
+				VideoDrawChar(g, 0, 0, w, font->G->Height, x + widths, y,fc);
+			}
 		}
 		widths += w + 1;
-		if (rev) {
-			FontColor = rev;
+		if (fc != backup) {
+			fc = backup;
 #ifdef USE_OPENGL
-			g = FontColorGraphics[font][FontColor];
+			g = FontColorGraphics[font][fc];
 #endif
-			rev = NULL;
 		}
 	}
 
 	return widths;
 }
 
-/**
-**  Draw text with font at x,y unclipped.
-**
-**  @see DoDrawText
-**
-**  @param x     X screen position
-**  @param y     Y screen position
-**  @param font  Font number
-**  @param text  Text to be displayed.
-**
-**  @return      The length of the printed text.
-*/
-int VideoDrawText(int x, int y, const CFont *font, const std::string &text)
+
+CLabel::CLabel(const CFont *f): font(f)
 {
-	return DoDrawText(x, y, font, text, 0);
+	normal = CFontColor::Get(DefaultNormalColorIndex);
+	reverse = CFontColor::Get(DefaultReverseColorIndex);
 }
 
-/**
-**  Draw text with font at x,y clipped.
-**
-**  @see DoDrawText.
-**
-**  @param x     X screen position
-**  @param y     Y screen position
-**  @param font  Font number
-**  @param text  Text to be displayed.
-**
-**  @return      The length of the printed text.
-*/
-int VideoDrawTextClip(int x, int y, const CFont *font, const std::string &text)
+	/// Draw text/number unclipped
+int CLabel::Draw(int x, int y, const char*const text) const
 {
-	return DoDrawText(x, y, font, text, 1);
+	return DoDrawText<false>(x, y, text, strlen(text), normal);
 }
 
-/**
-**  Draw reverse text with font at x,y unclipped.
-**
-**  @see DoDrawText for full description.
-**
-**  @param x     X screen position
-**  @param y     Y screen position
-**  @param font  Font number
-**  @param text  Text to be displayed.
-**
-**  @return      The length of the printed text.
-*/
-int VideoDrawReverseText(int x, int y, const CFont *font, const std::string &text)
+int CLabel::Draw(int x, int y, const std::string &text) const
 {
-	int w;
-
-	FontColor = ReverseTextColor;
-	w = VideoDrawText(x, y, font, text);
-	FontColor = DefaultTextColor;
-
-	return w;
+	return DoDrawText<false>(x, y, text.c_str(), text.size(), normal);
 }
 
-/**
-**  Draw reverse text with font at x,y clipped.
-**
-**  @see DoDrawText for full description.
-**
-**  @param x     X screen position
-**  @param y     Y screen position
-**  @param font  Font number
-**  @param text  Text to be displayed.
-**
-**  @return      The length of the printed text.
-*/
-int VideoDrawReverseTextClip(int x, int y, const CFont *font,
- const std::string &text)
+int CLabel::Draw(int x, int y, int number) const
 {
-	int w;
-
-	FontColor = ReverseTextColor;
-	w = VideoDrawTextClip(x, y, font, text);
-	FontColor = DefaultTextColor;
-
-	return w;
+	char buf[sizeof(int) * 10 + 2];
+	size_t len = FormatNumber(number, buf);
+	return DoDrawText<false>(x, y, buf, len, normal);
 }
 
-/**
-**  Draw text with font at x,y centered.
-**
-**  @see DoDrawText for full description.
-**
-**  @param x     X screen position
-**  @param y     Y screen position
-**  @param font  Font number
-**  @param text  Text to be displayed.
-**
-**  @return      The length of the printed text.
-*/
-int VideoDrawTextCentered(int x, int y, const CFont *font, const std::string &text)
+	/// Draw text/number clipped
+int CLabel::DrawClip(int x, int y, const char*const text) const
 {
-	int dx;
+	return DoDrawText<true>(x, y, text, strlen(text), normal);
+}
 
-	dx = font->Width(text);
-	VideoDrawText(x - dx / 2, y, font, text);
+int CLabel::DrawClip(int x, int y, const std::string &text) const
+{
+	return DoDrawText<true>(x, y, text.c_str(), text.size(), normal);
+}
 
+int CLabel::DrawClip(int x, int y, int number) const
+{
+	char buf[sizeof(int) * 10 + 2];
+	size_t len = FormatNumber(number, buf);
+	return DoDrawText<true>(x, y, buf, len, normal);
+}
+
+
+	/// Draw reverse text/number unclipped	
+int CLabel::DrawReverse(int x, int y, const char*const text) const
+{
+	return DoDrawText<false>(x, y, text, strlen(text), reverse);
+}
+
+int CLabel::DrawReverse(int x, int y, const std::string &text) const
+{
+	return DoDrawText<false>(x, y, text.c_str(), text.size(), reverse);
+}
+
+int CLabel::DrawReverse(int x, int y, int number) const
+{
+	char buf[sizeof(int) * 10 + 2];
+	size_t len = FormatNumber(number, buf);
+	return DoDrawText<false>(x, y, buf, len, reverse);
+}
+
+	/// Draw reverse text/number clipped
+int CLabel::DrawReverseClip(int x, int y, const char*const text) const
+{
+	return DoDrawText<true>(x, y, text, strlen(text), reverse);
+}
+
+int CLabel::DrawReverseClip(int x, int y, const std::string &text) const
+{
+	return DoDrawText<true>(x, y, text.c_str(), text.size(), reverse);
+}
+
+int CLabel::DrawReverseClip(int x, int y, int number) const
+{
+	char buf[sizeof(int) * 10 + 2];
+	size_t len = FormatNumber(number, buf);
+	return DoDrawText<true>(x, y, buf, len, reverse);
+}
+
+int CLabel::DrawCentered(int x, int y, const std::string &text) const
+{
+	int dx = font->Width(text);
+	DoDrawText<false>(x - dx / 2, y, text.c_str(), text.size(), normal);
 	return dx / 2;
 }
+
 
 /**
 **  Format a number using commas
@@ -769,77 +755,6 @@ std::string GetLineFont(unsigned int line, const std::string &s, unsigned int ma
 	return s1.substr(0, res);
 }
 
-/**
-**  Draw number with font at x,y unclipped.
-**
-**  @param x       X screen position
-**  @param y       Y screen position
-**  @param font    Font number
-**  @param number  Number to be displayed.
-**
-**  @return        The length of the printed text.
-*/
-int VideoDrawNumber(int x, int y, const CFont *font, int number)
-{
-	char buf[sizeof(int) * 10 + 2];
-
-	FormatNumber(number, buf);
-	return VideoDrawText(x, y, font, buf);
-}
-
-/**
-**  Draw number with font at x,y clipped.
-**
-**  @param x       X screen position
-**  @param y       Y screen position
-**  @param font    Font number
-**  @param number  Number to be displayed.
-**
-**  @return        The length of the printed text.
-*/
-int VideoDrawNumberClip(int x, int y, const CFont *font, int number)
-{
-	char buf[sizeof(int) * 10 + 2];
-
-	FormatNumber(number, buf);
-	return VideoDrawTextClip(x, y, font, buf);
-}
-
-/**
-**  Draw reverse number with font at x,y unclipped.
-**
-**  @param x       X screen position
-**  @param y       Y screen position
-**  @param font    Font number
-**  @param number  Number to be displayed.
-**
-**  @return        The length of the printed text.
-*/
-int VideoDrawReverseNumber(int x, int y, const CFont *font, int number)
-{
-	char buf[sizeof(int) * 10 + 2];
-
-	FormatNumber(number, buf);
-	return VideoDrawReverseText(x, y, font, buf);
-}
-
-/**
-**  Draw reverse number with font at x,y clipped.
-**
-**  @param x       X screen position
-**  @param y       Y screen position
-**  @param font    Font number
-**  @param number  Number to be displayed.
-**
-**  @return        The length of the printed text.
-*/
-int VideoDrawReverseNumberClip(int x, int y, const CFont *font, int number)
-{
-	char buf[sizeof(int) * 10 + 2];
-
-	FormatNumber(number, buf);
-	return VideoDrawReverseTextClip(x, y, font, buf);
-}
 
 /**
 **  Calculate the width of each character

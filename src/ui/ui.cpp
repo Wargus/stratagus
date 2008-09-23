@@ -57,6 +57,7 @@
 
 bool RightButtonAttacks;                   /// right button attacks
 
+static	ViewportModeType NewViewportMode = VIEWPORT_SINGLE;
 
 /**
 **  The user interface configuration
@@ -627,16 +628,20 @@ void SetViewportMode(ViewportModeType new_mode)
 */
 void CycleViewportMode(int step)
 {
-	int new_mode;
+	NewViewportMode = (ViewportModeType)(UI.ViewportMode + step);
+	if (NewViewportMode >= NUM_VIEWPORT_MODES) {
+		NewViewportMode = VIEWPORT_SINGLE;
+	}
+	if (NewViewportMode < 0) {
+		NewViewportMode = (ViewportModeType)(NUM_VIEWPORT_MODES - 1);
+	}
+}
 
-	new_mode = UI.ViewportMode + step;
-	if (new_mode >= NUM_VIEWPORT_MODES) {
-		new_mode = 0;
+void CheckViewportMode(void)
+{
+	if (NewViewportMode != UI.ViewportMode) {
+		SetViewportMode(NewViewportMode);
 	}
-	if (new_mode < 0) {
-		new_mode = NUM_VIEWPORT_MODES - 1;
-	}
-	SetViewportMode((ViewportModeType)new_mode);
 }
 
 /**
