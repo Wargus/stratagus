@@ -234,6 +234,7 @@ namespace gcn
     void RadioButton::setCaption(const std::string &caption)
     {
         mCaption = caption;
+        setDirty(true);
     }
 
     bool RadioButton::keyPress(const Key& key)
