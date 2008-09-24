@@ -83,6 +83,7 @@ namespace gcn
     void Label::setCaption(const std::string& caption)
     {
         mCaption = caption;
+        setDirty(true);
     }
 
     void Label::setAlignment(unsigned int alignment)
