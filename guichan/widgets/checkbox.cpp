@@ -176,6 +176,7 @@ namespace gcn
     void CheckBox::setCaption(const std::string &caption)
     {
         mCaption = caption;
+        setDirty(true);
     }
   
     bool CheckBox::keyPress(const Key& key)

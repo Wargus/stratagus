@@ -162,6 +162,7 @@ namespace gcn
     void Window::setCaption(const std::string& caption)
     {
         mCaption = caption;
+        setDirty(true);
     }
 
     const std::string& Window::getCaption() const

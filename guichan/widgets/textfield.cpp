@@ -373,6 +373,7 @@ namespace gcn
         }
 
         fixScroll();
+        setDirty(true);
         return ret;
     }
 
