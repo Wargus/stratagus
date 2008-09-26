@@ -102,7 +102,6 @@ int Demolish::Cast(CUnit *caster, const SpellType *spell,
 	int ix;
 	int iy;
 	int n;
-	CUnit *table[UnitMax];
 
 	//
 	// Allow error margins. (Lame, I know)
@@ -137,12 +136,14 @@ int Demolish::Cast(CUnit *caster, const SpellType *spell,
 	//  Effect of the explosion on units. Don't bother if damage is 0
 	//
 	if (this->Damage) {
-		n = Map.Select(xmin, ymin, xmax + 1, ymax + 1, table, true);
+		CUnit* table[UnitMax];
+		n = Map.SelectFixed(xmin, ymin, xmax + 1, ymax + 1, table);
 		for (i = 0; i < n; ++i) {
-			if (table[i]->Type->UnitType != UnitTypeFly && table[i]->CurrentAction() != UnitActionDie &&
-					table[i]->MapDistanceTo(x, y) <= this->Range) {
+			CUnit *unit = (CUnit*)table[i];
+			if (unit->Type->UnitType != UnitTypeFly && unit->IsAlive() &&
+					unit->MapDistanceTo(x, y) <= this->Range) {
 				// Don't hit flying units!
-				HitUnit(caster, table[i], this->Damage);
+				HitUnit(caster, unit, this->Damage);
 			}
 		}
 	}
@@ -666,18 +667,14 @@ int Capture::Cast(CUnit *caster, const SpellType *spell,
 int Summon::Cast(CUnit *caster, const SpellType *spell,
 	CUnit *target, int x, int y)
 {
-	int ttl;
 	int cansummon;
-	int n;
-	CUnit *table[UnitMax];
-	CUnit *unit;
-	CUnitType *unittype;
-
-	unittype = this->UnitType;
-	ttl = this->TTL;
+	CUnitType *unittype = this->UnitType;
+	int ttl = this->TTL;
 
 	if (this->RequireCorpse) {
-		n = Map.Select(x - 1, y - 1, x + 2, y + 2, table);
+		CUnit *unit;	
+		CUnit *table[UnitMax];
+		int n = Map.Select(x - 1, y - 1, x + 2, y + 2, table);
 		cansummon = 0;
 		while (n) {
 			n--;

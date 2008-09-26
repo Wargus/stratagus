@@ -207,11 +207,12 @@ static CUnit *UnitToRepairInRange(CUnit *unit, int range)
 		unit->Y + unit->Type->TileHeight + range,
 		table);
 	for (int i = 0; i < n; ++i) {
-		if (table[i]->IsTeamed(unit) &&
-				table[i]->Type->RepairHP &&
-				table[i]->Variable[HP_INDEX].Value < table[i]->Variable[HP_INDEX].Max &&
-				table[i]->IsVisibleAsGoal(unit->Player)) {
-			return table[i];
+		CUnit *candidate = table[i];
+		if (candidate->IsTeamed(unit) &&
+				candidate->Type->RepairHP &&
+				candidate->Variable[HP_INDEX].Value < candidate->Variable[HP_INDEX].Max &&
+				candidate->IsVisibleAsGoal(unit->Player)) {
+			return candidate;
 		}
 	}
 	return NoUnitP;

@@ -325,6 +325,10 @@ static void GameLogicLoop(void)
 					PlayersEachSecond(player);
 				}
 		}
+
+		if (CPU_NUM > 1) {
+			UpdateViewports();
+		}
 	}
 
 	TriggersEachCycle();  // handle triggers		
@@ -365,7 +369,7 @@ static void DisplayLoop(void)
 			UI.Minimap.Update();
 			UI.Minimap.UpdateCache = false;
 		}
-		
+
 		//
 		// Map scrolling
 		//

@@ -644,6 +644,15 @@ void CheckViewportMode(void)
 	}
 }
 
+void UpdateViewports(void)
+{
+	CViewport *vp;
+	for (vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
+		vp->UpdateUnits();
+	}
+	return;
+}
+
 /**
 **  Check if mouse scrolling is enabled
 */

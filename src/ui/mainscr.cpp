@@ -574,7 +574,9 @@ static void DrawUnitInfo(CUnit *unit)
 	CLabel label(GameFont);
 
 	Assert(unit);
-	UpdateUnitVariables(unit);
+	if (CPU_NUM == 1) {
+		UpdateUnitVariables(unit);
+	}
 	for (i = 0; i < (int)UI.InfoPanelContents.size(); ++i) {
 		if (CanShowContent(UI.InfoPanelContents[i]->Condition, unit)) {
 			for (std::vector<CContentType *>::const_iterator content = UI.InfoPanelContents[i]->Contents.begin();

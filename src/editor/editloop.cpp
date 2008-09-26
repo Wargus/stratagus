@@ -1493,6 +1493,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			}
 			break;
 
+		case SDLK_BACKSPACE:
 		case SDLK_DELETE: // Delete
 			if (UnitUnderCursor) {
 				EditorRemoveUnit(UnitUnderCursor);

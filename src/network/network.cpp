@@ -830,8 +830,8 @@ void NetworkSendSelection(CUnit **units, int count)
 			ref = NetSendUDP(NetworkFildes, Hosts[teammates[i]].Host, Hosts[teammates[i]].Port,	buf, p - buf);
 		}
 	}
-
 }
+
 /**
 **  Process Received Unit Selection
 **

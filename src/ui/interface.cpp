@@ -140,7 +140,7 @@ static void UiBeginInput(void)
 static void UiUnselectAll(void)
 {
 	UnSelectAll();
-	NetworkSendSelection(NULL, 0);
+	NetworkSendSelection((CUnit **)NULL, 0);
 	SelectionChanged();
 }
 

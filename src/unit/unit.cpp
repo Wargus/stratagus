@@ -191,7 +191,7 @@ bool CUnit::COrder::CheckRange(void)
 **
 **  The unit is only released, if all references are dropped.
 */
-void CUnit::Release()
+void CUnit::Release(bool final)
 {
 	CUnit *temp;
 
@@ -212,7 +212,7 @@ void CUnit::Release()
 		//
 		Destroyed = 1; // mark as destroyed
 
-		if (Container) {
+		if (Container && !final) {
 			MapUnmarkUnitSight(this);
 			RemoveUnitFromContainer(this);
 		}
@@ -3585,10 +3585,12 @@ void CleanUnits(void)
 					}
 				}
 				unit->CurrentOrder()->ClearGoal();
-				unit->Remove(NULL);
+				if(!unit->Removed) {
+					unit->Remove(NULL);
+				}
 				UnitClearOrders(unit);
 			}
-			unit->Release();
+			unit->Release(true);
 		} while(--count);
 	}
 	NumUnits = 0;

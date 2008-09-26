@@ -143,7 +143,10 @@
 ============================================================================*/
 
 #include <string.h>
+
+#ifndef __UTIL_H__
 #include "util.h"
+#endif
 
 inline char *new_strdup(const char *str)
 {

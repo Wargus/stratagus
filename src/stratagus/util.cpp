@@ -513,38 +513,6 @@ CMutex::~CMutex ()
 #endif			
 }
 
-void CMutex::Lock ()
-{
-#if !defined (__unix)
-	EnterCriticalSection (&_mut);
-#else
-	pthread_mutex_lock (&_mut);
-#endif
-}
-
-void CMutex::UnLock () 
-{
-#if !defined (__unix)
-	LeaveCriticalSection (&_mut);
-#else
-	pthread_mutex_unlock (&_mut);
-#endif
-}
-
-bool CMutex::TryLock () 
-{
-#if !defined (__unix)
-	return TryEnterCriticalSection (&_mut);
-#else
-	int result = pthread_mutex_trylock (&_mut);
-	if (result == 0)
-		return true;
-	else //if (result == EBUSY)
-		return false;
-#endif		
-}
-
-
 #if !defined (__unix)
 unsigned long WINAPI CThread::threadFun (void *pThread)
 {

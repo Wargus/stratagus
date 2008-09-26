@@ -337,6 +337,61 @@ void CViewport::DrawMapBackgroundInViewport() const
 	}
 }
 
+struct CDrawProxy {
+
+	CDrawProxy(): nunits(0), nmissiles(0) {}
+	
+	CMutex lock;
+	CUnitDrawProxy unittable[UnitMax];
+	MissileDrawProxy missiletable[MAX_MISSILES * 9];
+	int nunits;
+	int nmissiles;
+	
+	void Update(const CViewport *const vp)
+	{
+		//
+		// We find and sort units after draw level.
+		//
+		if (lock.TryLock()) {
+			nunits = FindAndSortUnits(vp, unittable);
+			nmissiles = FindAndSortMissiles(vp, missiletable, MAX_MISSILES * 9);
+			lock.UnLock();
+		}
+	}
+	
+	void Draw(const CViewport *const vp)
+	{
+		int i = 0, j = 0;
+		lock.Lock ();
+		while (i < nunits && j < nmissiles) {
+			if (unittable[i].Type->DrawLevel <= missiletable[j].Type->DrawLevel) {
+				unittable[i].Draw(vp);
+				++i;
+			} else {
+				missiletable[j].DrawMissile(vp);
+				++j;
+			}
+		}
+		for (; i < nunits; ++i) {
+			unittable[i].Draw(vp);
+		}
+		for (; j < nmissiles; ++j) {
+			missiletable[j].DrawMissile(vp);
+		}
+		lock.UnLock();
+	}
+	
+
+};
+
+void CViewport::UpdateUnits()
+{
+	if (!Proxy) {
+		Proxy = new CDrawProxy();
+	}
+	Proxy->Update(this);
+}
+
 /**
 **  Draw a map viewport.
 */
@@ -349,33 +404,35 @@ void CViewport::Draw() const
 	/* this may take while */
 	this->DrawMapBackgroundInViewport();
 
-	{
-		CUnit *table[UnitMax];
-		MissileDrawProxy missiletable[MAX_MISSILES * 9];
+	CurrentViewport = this;
+	if (Proxy) {
+		Proxy->Draw(this);	
+	} else 	{
+		CUnit *unittable[UnitMax];
+		Missile* missiletable[MAX_MISSILES * 9];
 		
 		//
 		// We find and sort units after draw level.
 		//
-		int nunits = FindAndSortUnits(this, table);
-		int nmissiles = FindAndSortMissiles(this, missiletable);
+		int nunits = FindAndSortUnits(this, unittable);
+		int nmissiles = FindAndSortMissiles(this, missiletable, MAX_MISSILES * 9);
 		int i = 0;
 		int j = 0;
 
-		CurrentViewport = this;
 		while (i < nunits && j < nmissiles) {
-			if (table[i]->Type->DrawLevel <= missiletable[j].Type->DrawLevel) {
-				table[i]->Draw();
+			if (unittable[i]->Type->DrawLevel <= missiletable[j]->Type->DrawLevel) {
+				unittable[i]->Draw(this);
 				++i;
 			} else {
-				missiletable[j].DrawMissile(this);
+				missiletable[j]->DrawMissile(this);
 				++j;
 			}
 		}
 		for (; i < nunits; ++i) {
-			table[i]->Draw();
+			unittable[i]->Draw(this);
 		}
 		for (; j < nmissiles; ++j) {
-			missiletable[j].DrawMissile(this);
+			missiletable[j]->DrawMissile(this);
 		}
 	}
 
@@ -385,6 +442,7 @@ void CViewport::Draw() const
 	// Draw orders of selected units.
 	// Drawn here so that they are shown even when the unit is out of the screen.
 	//
+	//FIXME: This is still unsecure during parallel 	
 	if (Preference.ShowOrders < 0 ||
 		(ShowOrdersCount >= GameCycle) || (KeyModifiers & ModifierShift)) {
 		for (int i = 0; i < NumSelected; ++i) {
@@ -416,7 +474,11 @@ void CViewport::DrawBorder() const
 		this->EndY - this->Y + 1);
 }
 
-
+CViewport::~CViewport() {
+	if (Proxy) {
+		delete Proxy;
+	}
+}
 
 /**
 **  Initialize the fog of war.

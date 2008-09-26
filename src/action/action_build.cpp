@@ -533,7 +533,6 @@ void HandleActionBuilt(CUnit *unit)
 
 		if (type->GivesResource) {
 			// Set to Zero as it's part of a union
-			//unit->Data.Resource.Active = 0;
 			memset(&unit->Data, 0, sizeof(unit->Data));
 			// Has StartingResources, Use those
 			if (type->StartingResources) {
@@ -577,7 +576,9 @@ void HandleActionBuilt(CUnit *unit)
 				PlayUnitSound(unit, VoiceBuilding);
 			}
 		}
+
 		if (unit->Player->AiEnabled) {
+			/* Worker can be NULL */
 			AiWorkComplete(worker, unit);
 		}
 

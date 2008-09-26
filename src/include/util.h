@@ -78,9 +78,33 @@ public:
 	CMutex ();
 	~CMutex ();
 
-	void Lock ();
-	void UnLock ();
-	bool TryLock ();
+	void Lock ()
+	{
+#if !defined (__unix)
+		EnterCriticalSection (&_mut);
+#else
+		pthread_mutex_lock (&_mut);
+#endif
+	}
+
+	void UnLock ()
+	{
+#if !defined (__unix)
+		LeaveCriticalSection (&_mut);
+#else
+		pthread_mutex_unlock (&_mut);
+#endif
+	}
+
+	bool TryLock ()
+	{
+#if !defined (__unix)
+		return TryEnterCriticalSection (&_mut);
+#else
+		return 0 == pthread_mutex_trylock (&_mut);
+#endif		
+	}
+
 };
 
 

@@ -128,8 +128,8 @@ int CMap::Select(int x, int y, CUnit *table[],
 **
 **  @return           Returns the number of units found
 */
-int CMap::Select(int x1, int y1,  
-		int x2, int y2, CUnit *table[], bool fixed, const int tablesize)
+int CMap::SelectFixed(int x1, int y1,  
+		int x2, int y2, CUnit *table[], const int tablesize)
 {
 
 	// Optimize small searches.
@@ -141,18 +141,6 @@ int CMap::Select(int x1, int y1,
 	int n = 0;
 	CUnit *unit;
 	const CMapField *mf;
-
-	//
-	//  Reduce to map limits.
-	//
-	if(!fixed) {
-		x1 = std::max(x1, 0);
-		y1 = std::max(y1, 0);
-		x2 = std::min(x2, Info.MapWidth - 1);
-		y2 = std::min(y2, Info.MapHeight - 1);
-	}
-
-	
 	unsigned int index = getIndex(x1, y1);
 	int j = y2 - y1 + 1;
 	do {
@@ -229,5 +217,20 @@ int CMap::Select(int x1, int y1,
 
 
 	return n;
+}
+
+int CMap::Select(int x1, int y1,  
+		int x2, int y2, CUnit *table[], const int tablesize)
+{
+
+	//
+	//  Reduce to map limits.
+	//
+	x1 = std::max(x1, 0);
+	y1 = std::max(y1, 0);
+	x2 = std::min(x2, Info.MapWidth - 1);
+	y2 = std::min(y2, Info.MapHeight - 1);
+
+	return SelectFixed(x1,y1,x2,y2,table, tablesize);
 }
 

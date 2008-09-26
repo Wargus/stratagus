@@ -313,7 +313,7 @@ struct BestTargetFinder {
 		}
 	}
 
-	CUnit *Find(CUnit **table, const int table_size) {
+	CUnit *Find(CUnit* table[], const int table_size) {
 		for (int i = 0; i < table_size; ++i) {
 			this->operator() (table[i]);
 		}
@@ -506,7 +506,7 @@ struct BestRangeTargetFinder {
 		
 		}
 		
-		inline int Fill(CUnit **table, const int table_size) {
+		inline int Fill(CUnit *table[], const int table_size) {
 			for (int i = 0; i < table_size; ++i) {		
 				this->operator() (table[i]);
 			}
@@ -590,7 +590,7 @@ struct BestRangeTargetFinder {
 	}
 
 
-	inline CUnit *Find(CUnit **table, const int table_size) {
+	inline CUnit *Find(	CUnit* table[], const int table_size) {
 		FillBadGood(attacker, range, good, bad).Fill(table, table_size);
 		for (int i = 0; i < table_size; ++i) {		
 			this->operator() (table[i]);
@@ -606,30 +606,20 @@ struct BestRangeTargetFinder {
 
 };
 
-/**
-**  Reference unit used by CompareUnitDistance.
-*/
-static const CUnit *referenceunit;
-
-/**
-**  Returns a value less then 0, 0 or bigger then 0,
-**  when the first unit is repectively nearer, at the same distance
-**  or further away then the 2nd from the referenceunit.
-*/
-static int CompareUnitDistance(const void *v1, const void *v2)
-{
-	CUnit *c1 = *(CUnit **)v1;
-	CUnit *c2  = *(CUnit **)v2;
-
-	int d1 = referenceunit->MapDistanceTo(c1);
-	int d2 = referenceunit->MapDistanceTo(c2);
-
-	if (d1 - d2 != 0) {
-		return d1 - d2;
-	} else {
-		return c1->Slot - c2->Slot;
+struct CompareUnitDistance {
+	const CUnit *referenceunit;
+	CompareUnitDistance(const CUnit *unit): referenceunit(unit) {}
+	bool operator() (const CUnit*c1, const CUnit*c2)
+	{
+		int d1 = c1->MapDistanceTo(referenceunit);
+		int d2 = c2->MapDistanceTo(referenceunit);
+		if (d1 == d2) {
+			return c1->Slot < c2->Slot;
+		} else {
+			return d1 < d2;
+		}
 	}
-}
+};
 
 /**
 **  AutoAttack units in distance.
@@ -713,8 +703,7 @@ CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 			unit->Y + range + unit->Type->TileHeight, table);
 			
 		if (range > 25 && n > 9) {
-			referenceunit = unit;
-			qsort((void*)table, n, sizeof(CUnit*), &CompareUnitDistance);
+			std::sort(table, table + n, CompareUnitDistance(unit));
 		}
 			
 		//

@@ -89,7 +89,8 @@ namespace gcn
 
     void Button::setCaption(const std::string& caption)
     {
-        mCaption = caption;    
+        mCaption = caption;
+        setDirty(true);
     }
 
     const std::string& Button::getCaption() const

@@ -436,7 +436,7 @@ public:
 
 	virtual void Action() = 0;
 
-	void DrawMissile() const;
+	void DrawMissile(const CViewport *vp) const;
 	void SaveMissile(CFile *file) const;
 
 	int SourceX;  /// Missile Source X
@@ -473,7 +473,6 @@ public:
 struct MissileDrawProxy
 {
 	MissileType *Type;  /// missile-type pointer
-	unsigned int Slot;      /// unique number for draw level.
 	union {
 		int Damage;  /// direct damage that missile applies
 		int SpriteFrame; /// sprite frame counter
@@ -484,9 +483,6 @@ struct MissileDrawProxy
 	void DrawMissile(const CViewport *vp) const;
 
 	void operator=(const Missile* missile);
-
-	static bool MissileDrawLevelCompare(const MissileDrawProxy& l, 
-					const MissileDrawProxy& r);
 
 };
 
@@ -587,7 +583,10 @@ extern Missile *MakeLocalMissile(MissileType *mtype, int sx, int sy, int dx,
 	/// fire a missile
 extern void FireMissile(CUnit *unit);
 
-extern int FindAndSortMissiles(const CViewport *vp, MissileDrawProxy *table, int tablesize = MAX_MISSILES);
+extern int FindAndSortMissiles(const CViewport *vp, 
+	Missile *table[], const int tablesize);
+extern int FindAndSortMissiles(const CViewport *vp,
+	 MissileDrawProxy table[], const int tablesize);
 
 	/// handle all missiles
 extern void MissileActions(void);

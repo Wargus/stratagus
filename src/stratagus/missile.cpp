@@ -598,7 +598,6 @@ void MissileDrawProxy::DrawMissile(const CViewport *vp) const
 
 void MissileDrawProxy::operator=(const Missile* missile) {
 	this->Type = missile->Type;
-	this->Slot = missile->Slot;
 	this->X = missile->X;
 	this->Y = missile->Y;
 	if (missile->Type->Class == MissileClassHit) {
@@ -608,27 +607,15 @@ void MissileDrawProxy::operator=(const Missile* missile) {
 	}
 };
 
-bool MissileDrawProxy::MissileDrawLevelCompare(const MissileDrawProxy& l, 
-					const MissileDrawProxy& r)
-{
-	if (l.Type->DrawLevel == r.Type->DrawLevel) {
-		return l.Slot < r.Slot;
-	} else {
-		return l.Type->DrawLevel <= r.Type->DrawLevel;
-	}
-}
-
 /**
 **  Draw missile.
 */
-void Missile::DrawMissile() const
+void Missile::DrawMissile(const CViewport *vp) const
 {
 	int x;
 	int y;
-	const CViewport *vp;
 
 	Assert(this->Type);
-	Assert(CurrentViewport);
 
 	// FIXME: I should copy SourcePlayer for second level missiles.
 	if (this->SourceUnit && this->SourceUnit->Player) {
@@ -638,7 +625,7 @@ void Missile::DrawMissile() const
 		}
 #endif
 	}
-	vp = CurrentViewport;
+
 	x = this->X - vp->MapX * TileSizeX + vp->X - vp->OffsetX;
 	y = this->Y - vp->MapY * TileSizeY + vp->Y - vp->OffsetY;
 	switch (this->Type->Class) {
@@ -651,6 +638,16 @@ void Missile::DrawMissile() const
 	}
 }
 
+static bool MissileDrawLevelCompare(const Missile*const l, 
+					const Missile*const r)
+{
+	if (l->Type->DrawLevel == r->Type->DrawLevel) {
+		return l->Slot < r->Slot;
+	} else {
+		return l->Type->DrawLevel < r->Type->DrawLevel;
+	}
+}
+
 /**
 **  Sort visible missiles on map for display.
 **
@@ -660,7 +657,8 @@ void Missile::DrawMissile() const
 **
 **  @return           number of missiles returned in table
 */
-int FindAndSortMissiles(const CViewport *vp, MissileDrawProxy *table, int tablesize)
+int FindAndSortMissiles(const CViewport *vp, 
+	Missile *table[], const int tablesize)
 {
 	int nmissiles;
 	std::vector<Missile *>::const_iterator i;
@@ -689,10 +687,26 @@ int FindAndSortMissiles(const CViewport *vp, MissileDrawProxy *table, int tables
 		table[nmissiles++] = missile;
 	}
 	if (nmissiles > 1) {
-		std::sort(table, table + nmissiles, MissileDrawProxy::MissileDrawLevelCompare);
+		std::sort(table, table + nmissiles, MissileDrawLevelCompare);
 	}
 	return nmissiles;
 }
+
+int FindAndSortMissiles(const CViewport *vp, 
+	MissileDrawProxy table[], const int tablesize)
+{
+	Missile *buffer[MAX_MISSILES * 9];
+	Assert(tablesize <= MAX_MISSILES * 9);
+	int n = FindAndSortMissiles(vp,buffer, MAX_MISSILES * 9);
+	if (n > 0) {
+		table[0] = buffer[0];
+		for (int i = 1; i < n; ++i) {
+			table[i] = buffer[i];
+		}
+	}
+	return n;
+}
+
 
 /**
 **  Change missile heading from x,y.
@@ -919,7 +933,6 @@ void MissileHit(Missile *missile)
 	CUnit *goal;
 	int x;
 	int y;
-	CUnit *table[UnitMax];
 	int n;
 	int i;
 	int splash;
@@ -978,26 +991,30 @@ void MissileHit(Missile *missile)
 		return;
 	}
 
-	//
-	// Hits all units in range.
-	//
-	i = missile->Type->Range;
-	n = Map.Select(x - i + 1, y - i + 1, x + i, y + i, table);
-	Assert(missile->SourceUnit != NULL);
-	for (i = 0; i < n; ++i) {
-		goal = table[i];
+	{
+		CUnit *table[UnitMax];
+
 		//
-		// Can the unit attack the this unit-type?
-		// NOTE: perhaps this should be come a property of the missile.
+		// Hits all units in range.
 		//
-		if (CanTarget(missile->SourceUnit->Type, goal->Type)) {
-			splash = goal->MapDistanceTo(x, y);
-			if (splash) {
-				splash *= missile->Type->SplashFactor;
-			} else {
-				splash = 1;
+		i = missile->Type->Range;
+		n = Map.Select(x - i + 1, y - i + 1, x + i, y + i, table);
+		Assert(missile->SourceUnit != NULL);
+		for (i = 0; i < n; ++i) {
+			goal = (CUnit*)table[i];
+			//
+			// Can the unit attack the this unit-type?
+			// NOTE: perhaps this should be come a property of the missile.
+			//
+			if (CanTarget(missile->SourceUnit->Type, goal->Type)) {
+				splash = goal->MapDistanceTo(x, y);
+				if (splash) {
+					splash *= missile->Type->SplashFactor;
+				} else {
+					splash = 1;
+				}
+				MissileHitsGoal(missile, goal, splash);
 			}
-			MissileHitsGoal(missile, goal, splash);
 		}
 	}
 
@@ -1578,7 +1595,6 @@ void MissileFlameShield::Action()
 		-30, 5, -31, 0, -32, -5, -31, -10, -30, -16, -27, -20, -24, -24, -20,
 		-27, -15, -30, -10, -31, -5, -32, 0, -31, 5, -30, 10, -27, 16, -24,
 		20, -20, 24, -15, 27, -10, 30, -5, 31, 0, 32};
-	CUnit *table[UnitMax];
 	CUnit *unit;
 	int n;
 	int i;
@@ -1626,6 +1642,8 @@ void MissileFlameShield::Action()
 	if (this->TTL & 7) {
 		return;
 	}
+
+	CUnit* table[UnitMax];
 	n = Map.Select(ux - 1, uy - 1, ux + 1 + 1, uy + 1 + 1, table);
 	for (i = 0; i < n; ++i) {
 		if (table[i] == unit) {
@@ -1775,7 +1793,6 @@ void MissileWhirlwind::Action()
 */
 void MissileDeathCoil::Action()
 {
-	CUnit *table[UnitMax];
 	int i;
 	int n;
 	CUnit *source;
@@ -1807,6 +1824,7 @@ void MissileDeathCoil::Action()
 			int ec;  // enemy count
 			int x;
 			int y;
+			CUnit* table[UnitMax];
 
 			ec = 0;
 			x = this->DX / TileSizeX;

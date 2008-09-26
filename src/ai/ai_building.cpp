@@ -404,7 +404,7 @@ static int AiFindHallPlace(const CUnit *worker,
 					maxx = mine->X + mine->Type->TileWidth + 5; 
 					maxy = mine->Y + mine->Type->TileHeight + 5;
 					Map.FixSelectionArea(minx, miny, maxx, maxy);
-					nunits = Map.Select(minx, miny, maxx, maxy, units, true);
+					nunits = Map.SelectFixed(minx, miny, maxx, maxy, units);
 					for (j = 0; j < nunits; ++j) {
 						// Enemy near mine
 						if (AiPlayer->Player->Enemy &

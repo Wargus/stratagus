@@ -45,12 +45,22 @@
 #include <map>
 
 #include "SDL.h"
-#include "upgrade_structs.h"
-#include "cursor.h"
-#include "interface.h"
-#include "script.h"
-#include "minimap.h"
 
+#ifndef __UPGRADE_STRUCTS_H__
+#include "upgrade_structs.h"
+#endif
+#ifndef __CURSOR_H__
+#include "cursor.h"
+#endif
+#ifndef __INTERFACE_H__
+#include "interface.h"
+#endif
+#ifndef __SCRIPT_H__
+#include "script.h"
+#endif
+#ifndef __MINIMAP_H__
+#include "minimap.h"
+#endif
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -59,6 +69,7 @@ class CUnit;
 class CFile;
 class CFont;
 class LuaActionListener;
+class CDrawProxy;
 
 /*----------------------------------------------------------------------------
 --  Definitions
@@ -154,7 +165,10 @@ public:
 class CViewport {
 public:
 	CViewport() : X(0), Y(0), EndX(0), EndY(0), MapX(0), MapY(0),
-		OffsetX(0), OffsetY(0), MapWidth(0), MapHeight(0), Unit(NULL) {};
+		OffsetX(0), OffsetY(0), MapWidth(0), MapHeight(0), Unit(NULL),
+		Proxy(NULL) {}
+	~CViewport();
+		
 
 	/// Check if X and Y pixels are within map area
 	bool IsInsideMapArea(int x, int y) const;
@@ -179,6 +193,8 @@ protected:
 	/// Draw the map fog of war
 	void DrawMapFogOfWar() const;
 public:
+	void UpdateUnits();
+
 	/// Draw the full Viewport.
 	void Draw() const;
 	void DrawBorder() const;
@@ -198,6 +214,8 @@ public:
 	int MapHeight;              /// Height in map tiles
 
 	CUnit *Unit;                /// Bound to this unit
+	CDrawProxy *Proxy;
+
 };
 
 /**
@@ -800,6 +818,7 @@ extern void CycleViewportMode(int);
 	/// Select viewport mode
 extern void SetViewportMode(ViewportModeType mode);
 extern void CheckViewportMode(void);
+extern void UpdateViewports(void);
 
 	/// Use the mouse to scroll the map
 extern void MouseScrollMap(int x, int y);

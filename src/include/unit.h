@@ -859,7 +859,7 @@ public:
 	void AssignToPlayer(CPlayer *player);
 
 	/// Draw a single unit
-	void Draw() const;
+	void Draw(const CViewport *vp) const;
 	/// Place a unit on map
 	void Place(int x, int y);
 
@@ -877,7 +877,7 @@ public:
 	void DeAssignWorkerFromMine(CUnit *mine);
 	
 	/// Release a unit
-	void Release();
+	void Release(bool final = false);
 
 	bool RestoreOrder(void);
 	bool StoreOrder(void);
@@ -1026,9 +1026,54 @@ public:
 		return Type->CanMove();
 	}
 	
+	int GetDrawLevel(void) const
+	{
+		return ((Type->CorpseType && CurrentAction() == UnitActionDie) ?
+					Type->CorpseType->DrawLevel : Type->DrawLevel);
+	}
+	
 };
 
 typedef CUnit::COrder* COrderPtr;
+
+class CUnitDrawProxy {
+
+	void DrawSelectionAt(int x, int y) const;
+	void DrawDecorationAt(int x, int y) const;
+public:
+
+	CUnitDrawProxy(): Variable(0) {}
+	~CUnitDrawProxy() {
+		if (Variable) {
+			delete[] Variable;
+		}
+	}
+
+	int X;
+	int Y;
+	int frame;	
+	int TeamSelected; //unit->TeamSelected	
+	int GroupId; //unit->GroupId	
+	
+	signed char IX;	
+	signed char IY;
+	unsigned char CurrentResource;	
+
+	unsigned int IsAlive:1;
+	unsigned int Selected:1; //unit->Selected	
+	unsigned int ResourcesHeld:1;      /// isResources Held by a unit	
+	unsigned int state: 2;
+	unsigned int Blink: 3;	//unit->Blink
+	
+	const CConstructionFrame *cframe;
+	const CUnitType *Type;
+	const CPlayer *Player;
+	
+	CVariable *Variable;
+	
+	void operator=(const CUnit *unit);
+	void Draw(const CViewport *vp) const;	
+};
 
 //unit_find
 struct CUnitTypeFinder {
@@ -1082,7 +1127,7 @@ struct CResourceDepositFinder {
 	inline CUnit *Find(const CMapField *const mf) const
 	{
 		return mf->UnitCache.find(*this);
-	}	
+	}
 };
 
 #define NoUnitP (CUnit *)0        /// return value: for no unit found
@@ -1132,7 +1177,7 @@ extern bool EnableTrainingQueue;        /// Config: training queues enabled
 extern bool EnableBuildingCapture;      /// Config: building capture enabled
 extern bool RevealAttacker;             /// Config: reveal attacker enabled
 extern const CViewport *CurrentViewport; /// CurrentViewport
-extern void DrawUnitSelection(const CUnit *);
+extern void DrawUnitSelection(const CViewport *vp,const CUnit *);
 extern void (*DrawSelection)(Uint32, int, int, int, int);
 extern int MaxSelectable;                  /// How many units could be selected
 
@@ -1280,10 +1325,11 @@ extern void LoadDecorations(void);
 extern void CleanDecorations(void);
 
 	/// Draw unit's shadow
-extern void DrawShadow(const CUnit *unit, const CUnitType *type,
+extern void DrawShadow(const CUnitType *type,
 	int frame, int x, int y);
 	/// Draw all units visible on map in viewport
-extern int FindAndSortUnits(const CViewport *vp, CUnit **table);
+extern int FindAndSortUnits(const CViewport *vp, CUnit *table[]);
+extern int FindAndSortUnits(const CViewport *vp, CUnitDrawProxy table[]);
 	/// Show a unit's orders.
 extern void ShowOrder(const CUnit *unit);
 

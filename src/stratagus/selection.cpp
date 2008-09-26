@@ -187,8 +187,9 @@ void ChangeSelectedUnits(CUnit **units,int count)
 	UnSelectAll();
 	NetworkSendSelection(units, count);
 	for (n = i = 0; i < count; ++i) {
-		if (!units[i]->Removed && !units[i]->TeamSelected && !units[i]->Type->IsNotSelectable) {
-			Selected[n++] = unit = units[i];
+		unit = (CUnit*)units[i];
+		if (!unit->Removed && !unit->TeamSelected && !unit->Type->IsNotSelectable) {
+			Selected[n++] = unit;
 			unit->Selected = 1;
 			if (count > 1) {
 				unit->LastGroup = GroupId;
@@ -382,25 +383,14 @@ int ToggleSelectUnit(CUnit *unit)
 int SelectUnitsByType(CUnit *base)
 {
 	CUnit *unit;
-	CUnit *table[UnitMax];
-	const CUnitType *type;
+	const CUnitType *type = base->Type;
 	int r;
 	int i;
-	const CViewport *vp;
+	const CViewport *vp = UI.MouseViewport;
 
 	Assert(UI.MouseViewport);
 
-	type = base->Type;
-
-	// select all visible units.
-	// StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
-	/* FIXME: this should probably be cleaner implemented if SelectUnitsByType()
-	 * took parameters of the selection rectangle as arguments */
-	vp = UI.MouseViewport;
-	r = Map.Select(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
-		vp->MapY + vp->MapHeight + 1, table);
-
-	if (base->Type->ClicksToExplode) {
+	if (type->ClicksToExplode) {
 		HandleSuicideClick(base);
 	}
 
@@ -410,7 +400,7 @@ int SelectUnitsByType(CUnit *base)
 		return 0;
 	}
 
-	if (base->Type->IsNotSelectable && GameRunning) {
+	if (type->IsNotSelectable && GameRunning) {
 		return 0;
 	}
 	if (base->TeamSelected) { // Somebody else onteam has this unit
@@ -431,6 +421,15 @@ int SelectUnitsByType(CUnit *base)
 	//
 	// Search for other visible units of the same type
 	//
+	CUnit* table[UnitMax];
+	// select all visible units.
+	// StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
+	/* FIXME: this should probably be cleaner implemented if SelectUnitsByType()
+	 * took parameters of the selection rectangle as arguments */
+	r = Map.Select(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
+		vp->MapY + vp->MapHeight + 1, table);
+	
+	
 	// FIXME: peon/peasant with gold/wood & co are considered from
 	//   different type... idem for tankers
 	for (i = 0; i < r; ++i) {
@@ -480,21 +479,8 @@ int SelectUnitsByType(CUnit *base)
 int ToggleUnitsByType(CUnit *base)
 {
 	CUnit *unit;
-	CUnit *table[UnitMax];
-	const CUnitType *type;
-	int r;
+	const CUnitType *type = base->Type;
 	int i;
-
-	type = base->Type;
-
-	// select all visible units.
-	// StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
-	// FIXME: this should probably be cleaner implemented if SelectUnitsByType()
-	// took parameters of the selection rectangle as arguments */
-	r = Map.Select(UI.MouseViewport->MapX - 1,
-		UI.MouseViewport->MapY - 1,
-		UI.MouseViewport->MapX + UI.MouseViewport->MapWidth + 1,
-		UI.MouseViewport->MapY + UI.MouseViewport->MapHeight + 1, table);
 
 	// if unit is a cadaver or hidden (not on map)
 	// no unit can be selected.
@@ -513,6 +499,18 @@ int ToggleUnitsByType(CUnit *base)
 	//
 	//  Search for other visible units of the same type
 	//
+	
+	// select all visible units.
+	// StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
+	// FIXME: this should probably be cleaner implemented if SelectUnitsByType()
+	// took parameters of the selection rectangle as arguments */
+	CUnit* table[UnitMax];
+	const CViewport *vp = UI.MouseViewport;
+	int r = Map.Select(vp->MapX - 1, vp->MapY - 1,
+		vp->MapX + vp->MapWidth + 1,
+		vp->MapY + vp->MapHeight + 1, table);
+
+
 	// FIXME: peon/peasant with gold/wood & co are considered from
 	// different type... idem for tankers
 	for (i = 0; i < r; ++i) {
@@ -618,7 +616,7 @@ int SelectGroupFromUnit(CUnit *unit)
 **
 **  @return           the number of units found.
 */
-static int SelectOrganicUnitsInTable(CUnit **table, int num_units)
+static int SelectOrganicUnitsInTable(CUnit**table, int num_units)
 {
 	CUnit *unit;
 	int n;
@@ -667,11 +665,9 @@ static int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
 	for (i = n = 0; i < num_units; ++i) {
 		int sprite_x;
 		int sprite_y;
-		CUnit *unit;
-		const CUnitType *type;
+		CUnit* unit = (CUnit*)table[i];
+		const CUnitType *type = unit->Type;
 
-		unit = table[i];
-		type = unit->Type;
 		sprite_x = unit->X * TileSizeX + unit->IX;
 		sprite_x -= (type->BoxWidth - TileSizeX * type->TileWidth) / 2;
 		sprite_x += type->OffsetX;
@@ -695,6 +691,114 @@ static int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
 	return n;
 }
 
+static int DoSelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1,
+CUnit**table, int num_units = UnitMax)
+{
+	CUnit *unit;
+	CUnitType *type;
+	int r;
+	int n;
+	int i;
+	int tx0;
+	int ty0;
+	int tx1;
+	int ty1;
+
+	tx0 = sx0 / TileSizeX;
+	ty0 = sy0 / TileSizeY;
+	tx1 = sx1 / TileSizeX;
+	ty1 = sy1 / TileSizeY;
+
+	r = Map.Select(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1,
+		 table, num_units);
+	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
+
+	//
+	// 1) search for the player units selectable with rectangle
+	//
+	if ((n = SelectOrganicUnitsInTable(table, r))) {
+		ChangeSelectedUnits(table, n);
+		return n;
+	}
+
+	//
+	// 2) If no unit found, try a player's unit not selectable by rectangle
+	//
+	for (i = 0; i < r; ++i) {
+		unit = (CUnit*)table[i];
+		if (!CanSelectMultipleUnits(unit->Player)) {
+			continue;
+		}
+		// FIXME: Can we get this?
+		if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
+			SelectSingleUnit(unit);
+			return 1;
+		}
+	}
+
+	//
+	// 3) If no unit found, try a resource or a neutral critter
+	//
+	for (i = 0; i < r; ++i) {
+		unit = (CUnit*)table[i];
+		// Unit visible FIXME: write function UnitSelectable
+		if (!unit->IsVisibleInViewport(UI.SelectedViewport)) {
+			continue;
+		}
+		type = unit->Type;
+		// Buildings are visible but not selectable
+		if (type->Building && !unit->IsVisibleOnMap(ThisPlayer)) {
+			continue;
+		}
+		if ((type->GivesResource && !unit->Removed)) { // no built resources.
+			SelectSingleUnit(unit);
+			return 1;
+		}
+	}
+
+	//
+	// 4) If no unit found, select an enemy unit (first found)
+	//
+	for (i = 0; i < r; ++i) {
+		unit = (CUnit*)table[i];
+		// Unit visible FIXME: write function UnitSelectable
+		if (!unit->IsVisibleInViewport(UI.SelectedViewport)) {
+			continue;
+		}
+		// Buildings are visible but not selectable
+		if (unit->Type->Building && !unit->IsVisibleOnMap(ThisPlayer)) {
+			continue;
+		}
+		if (unit->IsAliveOnMap()) {
+			SelectSingleUnit(unit);
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+/**
+**  Select units in a rectangle.
+**  Proceed in order in none found:
+**    @li select local player mobile units
+**    @li select one local player static unit (random)
+**    @li select one neutral unit (critter, mine...)
+**    @li select one enemy unit (random)
+**
+**  @param sx0  X start of selection rectangle in tile coordinates
+**  @param sy0  Y start of selection rectangle in tile coordinates
+**  @param sx1  X start of selection rectangle in tile coordinates
+**  @param sy1  Y start of selection rectangle in tile coordinates
+**
+**  @return     the number of units found.
+*/
+int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
+{
+	CUnit* table[UnitMax];
+	return DoSelectUnitsInRectangle (sx0, sy0, sx1, sy1, table);
+}
+
 /**
 **  Add the units in the rectangle to the current selection
 **
@@ -707,15 +811,10 @@ static int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
 */
 int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 {
-	CUnit *table[UnitMax];
 	int toggle_num;
 	int n;
 	int i;
 
-	// If there is no selected unit yet, do a simple selection.
-	if (!NumSelected) {
-		return SelectUnitsInRectangle(x0, y0, x1, y1);
-	}
 
 	// Check if the original selected unit (if it's alone) is ours,
 	// and can be selectable by rectangle.
@@ -724,6 +823,13 @@ int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 			(!CanSelectMultipleUnits(Selected[0]->Player) ||
 				!Selected[0]->Type->SelectableByRectangle)) {
 		return NumSelected;
+	}
+
+	CUnit* table[UnitMax];
+	
+	// If there is no selected unit yet, do a simple selection.
+	if (!NumSelected) {
+		return DoSelectUnitsInRectangle(x0, y0, x1, y1, table);
 	}
 
 	// If no unit in rectangle area... do nothing
@@ -749,26 +855,10 @@ int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 	return NumSelected;
 }
 
-/**
-**  Select units in a rectangle.
-**  Proceed in order in none found:
-**    @li select local player mobile units
-**    @li select one local player static unit (random)
-**    @li select one neutral unit (critter, mine...)
-**    @li select one enemy unit (random)
-**
-**  @param sx0  X start of selection rectangle in tile coordinates
-**  @param sy0  Y start of selection rectangle in tile coordinates
-**  @param sx1  X start of selection rectangle in tile coordinates
-**  @param sy1  Y start of selection rectangle in tile coordinates
-**
-**  @return     the number of units found.
-*/
-int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
+static int DoSelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1,
+CUnit**table, int num_units = UnitMax)
 {
 	CUnit *unit;
-	CUnit *table[UnitMax];
-	CUnitType *type;
 	int r;
 	int n;
 	int i;
@@ -782,72 +872,32 @@ int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 	tx1 = sx1 / TileSizeX;
 	ty1 = sy1 / TileSizeY;
 
-	r = Map.Select(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
+	r = Map.Select(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table, num_units);
 	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
 
-	//
-	// 1) search for the player units selectable with rectangle
-	//
-	if ((n = SelectOrganicUnitsInTable(table, r))) {
+	for (n = i = 0; i < r; ++i) {
+		unit = (CUnit*)table[i];
+		if (!CanSelectMultipleUnits(unit->Player) || !unit->Type->SelectableByRectangle) {
+			continue;
+		}
+		if (unit->IsUnusable()) {  // guess SelectUnits doesn't check this
+			continue;
+		}
+		if (unit->Type->UnitType == UnitTypeFly) {
+			continue;
+		}
+		if (unit->TeamSelected) { // Somebody else onteam has this unit
+			continue;
+		}
+		table[n++] = unit;
+		if (n == MaxSelectable) {
+			break;
+		}
+	}
+	if (n) {
 		ChangeSelectedUnits(table, n);
-		return n;
 	}
-
-	//
-	// 2) If no unit found, try a player's unit not selectable by rectangle
-	//
-	for (i = 0; i < r; ++i) {
-		unit = table[i];
-		if (!CanSelectMultipleUnits(unit->Player)) {
-			continue;
-		}
-		// FIXME: Can we get this?
-		if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
-			SelectSingleUnit(unit);
-			return 1;
-		}
-	}
-
-	//
-	// 3) If no unit found, try a resource or a neutral critter
-	//
-	for (i = 0; i < r; ++i) {
-		unit = table[i];
-		// Unit visible FIXME: write function UnitSelectable
-		if (!unit->IsVisibleInViewport(UI.SelectedViewport)) {
-			continue;
-		}
-		type = unit->Type;
-		// Buildings are visible but not selectable
-		if (type->Building && !unit->IsVisibleOnMap(ThisPlayer)) {
-			continue;
-		}
-		if ((type->GivesResource && !unit->Removed)) { // no built resources.
-			SelectSingleUnit(unit);
-			return 1;
-		}
-	}
-
-	//
-	// 4) If no unit found, select an enemy unit (first found)
-	//
-	for (i = 0; i < r; ++i) {
-		unit = table[i];
-		// Unit visible FIXME: write function UnitSelectable
-		if (!unit->IsVisibleInViewport(UI.SelectedViewport)) {
-			continue;
-		}
-		// Buildings are visible but not selectable
-		if (unit->Type->Building && !unit->IsVisibleOnMap(ThisPlayer)) {
-			continue;
-		}
-		if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
-			SelectSingleUnit(unit);
-			return 1;
-		}
-	}
-
-	return 0;
+	return n;
 }
 
 /**
@@ -862,8 +912,14 @@ int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 */
 int SelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
+	CUnit* table[UnitMax];
+	return DoSelectGroundUnitsInRectangle(sx0, sy0, sx1, sy1, table);
+}
+
+int DoSelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1,
+CUnit**table, int num_units = UnitMax)
+{
 	CUnit *unit;
-	CUnit *table[UnitMax];
 	int r;
 	int n;
 	int i;
@@ -881,14 +937,14 @@ int SelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
 
 	for (n = i = 0; i < r; ++i) {
-		unit = table[i];
+		unit = (CUnit*)table[i];
 		if (!CanSelectMultipleUnits(unit->Player) || !unit->Type->SelectableByRectangle) {
 			continue;
 		}
 		if (unit->IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit->Type->UnitType == UnitTypeFly) {
+		if (unit->Type->UnitType != UnitTypeFly) {
 			continue;
 		}
 		if (unit->TeamSelected) { // Somebody else onteam has this unit
@@ -917,47 +973,8 @@ int SelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 */
 int SelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
-	CUnit *unit;
-	CUnit *table[UnitMax];
-	int r;
-	int n;
-	int i;
-	int tx0;
-	int ty0;
-	int tx1;
-	int ty1;
-
-	tx0 = sx0 / TileSizeX;
-	ty0 = sy0 / TileSizeY;
-	tx1 = sx1 / TileSizeX;
-	ty1 = sy1 / TileSizeY;
-
-	r = Map.Select(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
-	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
-
-	for (n = i = 0; i < r; ++i) {
-		unit = table[i];
-		if (!CanSelectMultipleUnits(unit->Player) || !unit->Type->SelectableByRectangle) {
-			continue;
-		}
-		if (unit->IsUnusable()) {  // guess SelectUnits doesn't check this
-			continue;
-		}
-		if (unit->Type->UnitType != UnitTypeFly) {
-			continue;
-		}
-		if (unit->TeamSelected) { // Somebody else onteam has this unit
-			continue;
-		}
-		table[n++] = unit;
-		if (n == MaxSelectable) {
-			break;
-		}
-	}
-	if (n) {
-		ChangeSelectedUnits(table, n);
-	}
-	return n;
+	CUnit* table[UnitMax];
+	return DoSelectAirUnitsInRectangle(sx0, sy0, sx1, sy1, table);
 }
 
 /**
@@ -973,7 +990,6 @@ int SelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
 	CUnit *unit;
-	CUnit *table[UnitMax];
 	int r;
 	int n;
 	int i;
@@ -982,11 +998,6 @@ int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	int tx1;
 	int ty1;
 
-	// If there is no selected unit yet, do a simple selection.
-	if (!NumSelected) {
-		return SelectGroundUnitsInRectangle(sx0, sy0, sx1, sy1);
-	}
-
 	// Check if the original selected unit (if it's alone) is ours,
 	// and can be selectable by rectangle.
 	// In this case, do nothing.
@@ -994,6 +1005,13 @@ int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 			(!CanSelectMultipleUnits(Selected[0]->Player) ||
 				!Selected[0]->Type->SelectableByRectangle)) {
 		return NumSelected;
+	}
+
+	CUnit* table[UnitMax];
+	
+	// If there is no selected unit yet, do a simple selection.
+	if (!NumSelected) {
+		return DoSelectGroundUnitsInRectangle(sx0, sy0, sx1, sy1, table);
 	}
 
 	tx0 = sx0 / TileSizeX;
@@ -1047,7 +1065,6 @@ int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
 	CUnit *unit;
-	CUnit *table[UnitMax];
 	int r;
 	int n;
 	int i;
@@ -1056,11 +1073,6 @@ int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	int tx1;
 	int ty1;
 
-	// If there is no selected unit yet, do a simple selection.
-	if (!NumSelected) {
-		return SelectAirUnitsInRectangle(sx0, sy0, sx1, sy1);
-	}
-
 	// Check if the original selected unit (if it's alone) is ours,
 	// and can be selectable by rectangle.
 	// In this case, do nothing.
@@ -1068,6 +1080,13 @@ int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 			(!CanSelectMultipleUnits(Selected[0]->Player) ||
 				!Selected[0]->Type->SelectableByRectangle)) {
 		return NumSelected;
+	}
+
+	CUnit* table[UnitMax];
+
+	// If there is no selected unit yet, do a simple selection.
+	if (!NumSelected) {
+		return DoSelectAirUnitsInRectangle(sx0, sy0, sx1, sy1, table);
 	}
 
 	tx0 = sx0 / TileSizeX;

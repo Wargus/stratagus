@@ -792,6 +792,7 @@ void MultiLineLabel::setCaption(const std::string &caption)
 {
 	this->mCaption = caption;
 	this->wordWrap();
+	this->setDirty(true);
 }
 
 /**
@@ -1443,6 +1444,7 @@ void StatBoxWidget::draw(gcn::Graphics *graphics)
 void StatBoxWidget::setCaption(const std::string &caption)
 {
 	this->caption = caption;
+	this->setDirty(true);
 }
 
 /**

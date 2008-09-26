@@ -1962,7 +1962,8 @@ void UpdateUnitVariables(const CUnit *unit)
 						" value = %d, max = %d\n"
 						_C_ type->Ident.c_str() _C_ unit->Slot _C_ UnitTypeVar.VariableNameLookup[i]
 						_C_ unit->Variable[i].Value _C_ unit->Variable[i].Max);
-		}
+			unit->Variable[i].Value = unit->Variable[i].Max;
+		} else
 #endif
 		Assert(unit->Variable[i].Value <= unit->Variable[i].Max);
 	}
