@@ -1194,7 +1194,8 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			}
 			break;
 
-		case SDLK_DELETE: // Delete
+		case SDLK_BACKSPACE:
+		case SDLK_DELETE:
 			if (PatchUnderCursor) {
 				Map.PatchManager.remove(PatchUnderCursor);
 				PatchUnderCursor = NULL;
