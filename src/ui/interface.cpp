@@ -500,6 +500,10 @@ bool HandleCommandKey(int key)
 	return ret;
 }
 
+#ifdef DEBUG
+extern void ToggleShowBuilListMessages(void);
+#endif
+
 /**
 **  Handle keys in command mode.
 **
@@ -659,6 +663,12 @@ static bool CommandKey(int key)
 			if (KeyModifiers & ModifierControl) {
 				ToggleShowMessages();
 			}
+#ifdef DEBUG
+			else
+			if (KeyModifiers & ModifierAlt) {
+				ToggleShowBuilListMessages();
+			}
+#endif	
 			break;
 
 		case SDLK_TAB: // TAB toggles minimap.

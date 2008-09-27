@@ -281,7 +281,7 @@ struct DisplayAutoLocker {
 };
 
 extern const int CPU_NUM;
-
+extern bool CanAccessFile(const char *filename);
 
 /*============================================================================
 ==  Misc

@@ -3042,13 +3042,19 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 		target->Player->Notify(NotifyRed, target->X, target->Y,
 			_("%s attacked"), target->Type->Name.c_str());
 
-		if (target->Player->AiEnabled) {
-			AiHelpMe(attacker, target);
-		} else {
-			if (target->GroupId) {
-				GroupHelpMe(attacker, target);
+		if (!target->Type->Building) {
+			if (target->Player->AiEnabled) {
+				AiHelpMe(attacker, target);
+			} else {
+				if (target->GroupId) {
+					GroupHelpMe(attacker, target);
+				}
 			}
 		}
+	}
+
+	if (target->Type->Building && target->Player->AiEnabled) {
+		AiHelpMe(attacker, target);
 	}
 
 	if (target->Variable[HP_INDEX].Value <= damage) { // unit is killed or destroyed

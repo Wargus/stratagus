@@ -181,7 +181,9 @@ bool AutoCast(CUnit *unit)
 {
 	if (unit->AutoCastSpell && !unit->Removed) { // Removed units can't cast any spells, from bunker)
 		for (int i = 0; i < (int)SpellTypeTable.size(); ++i) {
-			if (unit->AutoCastSpell[i] && AutoCastSpell(unit, SpellTypeTable[i])) {
+			if (unit->AutoCastSpell[i] && 
+				(SpellTypeTable[i]->AutoCast || SpellTypeTable[i]->AICast) &&
+					AutoCastSpell(unit, SpellTypeTable[i])) {
 				return true;
 			}
 		}

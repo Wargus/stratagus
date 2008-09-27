@@ -606,7 +606,11 @@ static void DrawDecoration(const CUnit *unit, const CUnitType *type, int x, int 
 	//
 	// Draw group number
 	//
-	if (unit->Selected && unit->GroupId != 0 && unit->Player == ThisPlayer) {
+	if (unit->Selected && unit->GroupId != 0
+#ifndef DEBUG
+	 	&& unit->Player == ThisPlayer
+#endif
+	 	) {
 		int num;
 		int width;
 
@@ -1319,7 +1323,11 @@ void CUnitDrawProxy::DrawDecorationAt(int x, int y) const
 	//
 	// Draw group number
 	//
-	if (Selected && GroupId != 0 && Player == ThisPlayer) {
+	if (Selected && GroupId != 0
+#ifndef DEBUG
+	 && Player == ThisPlayer
+#endif
+	 ) {
 		int num;
 		int width;
 

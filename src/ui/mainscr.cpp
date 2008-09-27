@@ -60,6 +60,10 @@
 #include "network.h"
 #include "menus.h"
 #include "spells.h"
+#ifdef DEBUG
+#include "../ai/ai_local.h"
+#endif
+
 
 /*----------------------------------------------------------------------------
 --  MENU BUTTON
@@ -795,6 +799,9 @@ class MessagesDisplay
 public:
 	MessagesDisplay() : show(true)
 	{
+#ifdef DEBUG
+		showBuilList = false;
+#endif	
 		CleanMessages();
 	}
 
@@ -805,6 +812,12 @@ public:
 	void ToggleShowMessages() {
 		show = !show;
 	};
+#ifdef DEBUG	
+	void ToggleShowBuilListMessages() {
+		showBuilList = !showBuilList;
+	};
+#endif
+
 protected:
 	void ShiftMessages();
 	void AddMessage(const char *msg);
@@ -817,6 +830,10 @@ private:
 	int  MessagesScrollY;
 	unsigned long MessagesFrameTimeout;       /// Frame to expire message
 	bool show;
+#ifdef DEBUG
+	bool showBuilList;
+#endif
+
 };
 
 /**
@@ -864,6 +881,34 @@ void MessagesDisplay::DrawMessages()
 {
 	if (show) {
 		CLabel label(UI.MessageFont);
+#ifdef DEBUG
+		if (showBuilList && ThisPlayer->Ai) {
+			char buffer[256];
+			int count = ThisPlayer->Ai->UnitTypeBuilt.size();
+			// Draw message line(s)
+			for (int z = 0; z < count; ++z) {
+				if (z == 0) {
+					PushClipping();
+					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
+						Video.Height - 1);
+				}		
+
+				snprintf(buffer, 256, "%s (%d/%d)",
+						ThisPlayer->Ai->UnitTypeBuilt[z].Type->Name.c_str(),
+						ThisPlayer->Ai->UnitTypeBuilt[z].Made,
+						ThisPlayer->Ai->UnitTypeBuilt[z].Want);
+												
+				label.DrawClip(UI.MapArea.X + 8,
+						UI.MapArea.Y + 8 + 
+						z * (UI.MessageFont->Height() + 1),
+						buffer);
+
+				if (z == 0) {
+					PopClipping();
+				}
+			}
+		} else {
+#endif
 		// background so the text is easier to read
 		if (MessagesCount) {
 			int textHeight = MessagesCount * (UI.MessageFont->Height() + 1);
@@ -900,6 +945,10 @@ void MessagesDisplay::DrawMessages()
 		if (MessagesCount < 1) {
 			MessagesSameCount = 0;
 		}
+#ifdef DEBUG
+		}
+#endif		
+		
 	}
 }
 
@@ -1144,6 +1193,11 @@ void ToggleShowMessages(void) {
 	allmessages.ToggleShowMessages();
 }
 
+#ifdef DEBUG
+void ToggleShowBuilListMessages(void) {
+	allmessages.ToggleShowBuilListMessages();
+}
+#endif
 
 /*----------------------------------------------------------------------------
 --  STATUS LINE

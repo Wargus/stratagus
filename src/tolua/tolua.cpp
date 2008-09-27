@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on Wed Sep  3 21:32:27 2008.
+** Generated automatically by tolua++-1.0.92 on Sat Sep 27 16:09:08 2008.
 */
 
 #ifndef __cplusplus
@@ -18949,6 +18949,35 @@ tolua_lerror:
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: CanAccessFile */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CanAccessFile00
+static int tolua_stratagus_CanAccessFile00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const char* filename = ((const char*)  tolua_tostring(tolua_S,1,0));
+  {
+   bool tolua_ret = (bool)  CanAccessFile(filename);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'CanAccessFile'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: Exit */
 #ifndef TOLUA_DISABLE_tolua_stratagus_Exit00
 static int tolua_stratagus_Exit00(lua_State* tolua_S)
@@ -20195,6 +20224,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"_",tolua_stratagus__00);
   tolua_function(tolua_S,"SyncRand",tolua_stratagus_SyncRand00);
   tolua_function(tolua_S,"SyncRand",tolua_stratagus_SyncRand01);
+  tolua_function(tolua_S,"CanAccessFile",tolua_stratagus_CanAccessFile00);
   tolua_function(tolua_S,"Exit",tolua_stratagus_Exit00);
   tolua_variable(tolua_S,"CliMapName",tolua_get_CliMapName,tolua_set_CliMapName);
  tolua_endmodule(tolua_S);

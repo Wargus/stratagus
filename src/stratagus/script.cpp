@@ -99,6 +99,16 @@ static int StringCounter = 0; /// Counter for lua function.
 --  Functions
 ----------------------------------------------------------------------------*/
 
+bool CanAccessFile(const char *filename)
+{
+	if (filename && filename[0] != '\0') {
+		char name[PATH_MAX];
+		name[0] = '\0';
+		LibraryFileName(filename, name, sizeof(name));
+		return (name[0] != '\0' && 0 == access(name, R_OK));
+	}
+	return false;
+}
 
 /// Usefull for getComponent.
 typedef enum {
