@@ -247,39 +247,7 @@ static void AiCheckUnits(void)
 		counter[t] -= x;
 	}
 
-	//
-	// Look through the forces what is missing.
-	//
-	for (i = AI_MAX_FORCES; i < AI_MAX_ATTACKING_FORCES; ++i) {
-
-		for (j = 0; j < (int)AiPlayer->Force[i].Units.size(); ++j) {
-			const CUnit *unit = AiPlayer->Force[i].Units[j];
-			attacking[unit->Type->Slot]++;
-		}
-	}
-
-	//
-	// create missing units
-	//
-	for (i = 0; i < AI_MAX_FORCES; ++i) {
-		// No troops for attacking force
-		if (!AiPlayer->Force[i].Defending && AiPlayer->Force[i].Attacking) {
-			continue;
-		}
-
-		for (j = 0; j < (int)AiPlayer->Force[i].UnitTypes.size(); ++j) {
-			const AiUnitType *aiut = &AiPlayer->Force[i].UnitTypes[j];
-			t = aiut->Type->Slot;
-			x = aiut->Want;
-			if (x > unit_types_count[t] + counter[t] - attacking[t]) {    // Request it.
-				AiAddUnitTypeRequest(aiut->Type,
-					x - (unit_types_count[t] + counter[t] - attacking[t]));
-				counter[t] += x - (unit_types_count[t] + counter[t] - attacking[t]);
-				AiPlayer->Force[i].Completed = false;
-			}
-			counter[t] -= x;
-		}
-	}
+	AiPlayer->Force.CheckUnits(counter);
 
 	//
 	//  Look if some upgrade-to are missing.
@@ -331,7 +299,7 @@ static void AiCheckUnits(void)
 */
 static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 {
-	int i,s;
+	unsigned int i,s;
 
 	file->printf("DefineAiPlayer(%d,\n", plynr);
 	file->printf("  \"ai-type\", \"%s\",\n", ai->AiType->Name.c_str());
@@ -343,8 +311,8 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 	//
 	//  All forces
 	//
-	for (i = 0; i < AI_MAX_ATTACKING_FORCES; ++i) {
-		int j;
+	for (i = 0; i < ai->Force.Size(); ++i) {
+		unsigned int j;
 
 		file->printf("  \"force\", {%d, %s%s%s", i,
 			ai->Force[i].Completed ? "\"complete\"," : "\"recruit\",",
@@ -773,7 +741,6 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 {
 	PlayerAi *pai;
 	CUnit *aiunit;
-	int force;
 	int x, y;
 	
 	/* Freandly Fire - typical splash */
@@ -799,55 +766,44 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 	//  If unit belongs to an attacking force, check if force members can help.
 	//
 	if (defender->GroupId) {
-		for (force = 0; force < AI_MAX_ATTACKING_FORCES; ++force) {
-			AiForce *aiForce = &pai->Force[force];
+		AiForce *aiForce = &pai->Force[defender->GroupId - 1];
 
-			//  Unit belongs to an force, check if brothers in arms can help
-			if (defender->GroupId == (1<<force)) {
-				for (unsigned int i = 0; i < aiForce->Units.size(); ++i) {
-					aiunit = aiForce->Units[i];
-					
-					if (defender == aiunit) {
-						continue;
-					}
-					
-					// if brother is idle or attack no-agressive target and
-					// can attack our attacker then ask for help
-					// FIXME ad support for help from Coward type units
-					if (aiunit->IsAgressive() && (aiunit->IsIdle() || 
-						!(aiunit->CurrentAction() == UnitActionAttack && 
-					 	aiunit->CurrentOrder()->HasGoal() &&
-					 	aiunit->CurrentOrder()->GetGoal()->IsAgressive()))
-					 	&& CanTarget(aiunit->Type, attacker->Type)) {
-					 	
-						if (aiunit->SavedOrder.Action == UnitActionStill) {
-							// FIXME: should rewrite command handling
-							CommandAttack(aiunit, aiunit->X, aiunit->Y, NoUnitP,
-								FlushCommands);
-							aiunit->SavedOrder = *aiunit->Orders[1];
-						}
-						CommandAttack(aiunit, attacker->X, attacker->Y,
-							 (CUnit*)attacker, FlushCommands);					 						 	
-					}
-				}
-				
-				if (!aiForce->Defending && aiForce->State) {
-					DebugPrint("%d: %d(%s) belong to attacking force, don't defend it\n" _C_
-						defender->Player->Index _C_ UnitNumber(defender) _C_
-						defender->Type->Ident.c_str());				
-					// unit belongs to an attacking force, 
-					// so don't send others force in such case.
-					// FIXME: there may be other attacking the same place force who can help
-					return;
-				} else {
-					// unit belongs to an defending force or
-					// unit belongs to an preparing (not send to attack)
-					// attacking force so we can call other forces for help.
-					// Defending Home
-					break;
-				}
+		//  Unit belongs to an force, check if brothers in arms can help
+		for (unsigned int i = 0; i < aiForce->Units.size(); ++i) {
+			aiunit = aiForce->Units[i];
 
+			if (defender == aiunit) {
+				continue;
 			}
+					
+			// if brother is idle or attack no-agressive target and
+			// can attack our attacker then ask for help
+			// FIXME ad support for help from Coward type units
+			if (aiunit->IsAgressive() && (aiunit->IsIdle() || 
+				!(aiunit->CurrentAction() == UnitActionAttack && 
+			 	aiunit->CurrentOrder()->HasGoal() &&
+			 	aiunit->CurrentOrder()->GetGoal()->IsAgressive()))
+			 	&& CanTarget(aiunit->Type, attacker->Type)) {
+				
+				if (aiunit->SavedOrder.Action == UnitActionStill) {
+					// FIXME: should rewrite command handling
+					CommandAttack(aiunit, aiunit->X, aiunit->Y, NoUnitP,
+						FlushCommands);
+					aiunit->SavedOrder = *aiunit->Orders[1];
+				}
+				CommandAttack(aiunit, attacker->X, attacker->Y,
+					 (CUnit*)attacker, FlushCommands);
+			}
+		}
+
+		if (!aiForce->Defending && aiForce->State > 0) {
+			DebugPrint("%d: %d(%s) belong to attacking force, don't defend it\n" _C_
+				defender->Player->Index _C_ UnitNumber(defender) _C_
+				defender->Type->Ident.c_str());				
+			// unit belongs to an attacking force, 
+			// so don't send others force in such case.
+			// FIXME: there may be other attacking the same place force who can help
+			return;
 		}
 	}
 
@@ -862,14 +818,15 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 		x = defender->X;
 		y = defender->Y;
 	}
-	for (unsigned int i = 0; i < AI_MAX_FORCES; ++i) {
+	for (unsigned int i = 0; i < pai->Force.Size(); ++i) {
 		AiForce *aiForce = &pai->Force[i];
 
-		if (aiForce->Size() > 0 && (aiForce->Role == AiForceRoleDefend && !aiForce->Attacking ||
+		if (aiForce->Size() > 0 &&
+			(aiForce->Role == AiForceRoleDefend && !aiForce->Attacking ||
 			aiForce->Role == AiForceRoleAttack && !aiForce->Attacking &&
 			!aiForce->State)) {  // none attacking
 			aiForce->Defending = true;
-			AiAttackWithForceAt(i, x, y);
+			aiForce->Attack(x, y);
 		}
 	}
 }
@@ -885,6 +842,19 @@ void AiUnitKilled(CUnit *unit)
 		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident.c_str());
 
 	Assert(unit->Player->Type != PlayerPerson);
+
+	if (unit->GroupId) {
+		AiForce *force = &(unit->Player->Ai->Force[unit->GroupId - 1]);
+		force->Remove(unit);
+		if (force->Size() == 0) {
+			force->Attacking = false;
+			if (!force->Defending && force->State > 0) {
+				DebugPrint("%d: Attack force #%lu was destroyed, giving up\n"
+					_C_ unit->Player->Index _C_ (force  - &(unit->Player->Ai->Force[0])));		
+				force->Reset(true);
+			}	
+		}
+	}
 
 	// FIXME: must handle all orders...
 	switch (unit->CurrentAction()) {
@@ -1155,9 +1125,9 @@ void AiTrainingComplete(CUnit *unit, CUnit *what)
 
 	AiRemoveFromBuilt(unit->Player->Ai, what->Type);
 
-	AiPlayer = unit->Player->Ai;
-	AiCleanForces();
-	AiAssignToForce(what);
+	unit->Player->Ai->Force.Clean();
+	unit->Player->Ai->Force.Assign(what);
+
 }
 
 /**

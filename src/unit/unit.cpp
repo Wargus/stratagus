@@ -2273,7 +2273,7 @@ public:
 
 };
 
-static CUnit *FindDepositNearLoc(CPlayer *p,
+CUnit *FindDepositNearLoc(CPlayer *p, 
 				int x, int y, int range, int resource)
 {
 	BestDepotFinder<true> finder(NULL,x,y,resource,range);

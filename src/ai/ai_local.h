@@ -101,6 +101,7 @@ enum AiForceRole {
 	AiForceRoleDefend, /// Force should defend
 };
 
+#define AI_FORCE_STATE_FREE			-1
 #define AI_FORCE_STATE_WAITING		0
 #define AI_FORCE_STATE_BOARDING 	1
 //#define AI_FORCE_STATE_OERATIONAL 	2
@@ -112,10 +113,28 @@ enum AiForceRole {
 **  A force is a group of units belonging together.
 */
 class AiForce {
+	friend class AiForceManager;
+
+	bool IsBelongsTo(const CUnitType *type);
+	void Insert(CUnit *unit)
+	{
+		Units.Insert(unit);
+		unit->RefsIncrease();
+	}
+
+	void Update(void);
 public:
 	AiForce() : Completed(false), Defending(false), Attacking(false),
-		Role(0), State(0), GoalX(0), GoalY(0),
+		Role(0), State(AI_FORCE_STATE_FREE), GoalX(0), GoalY(0),
 		MustTransport(false) {}
+
+	void Remove(CUnit *unit)
+	{
+		if (Units.Remove(unit)) {
+			unit->GroupId = 0;
+			unit->RefsDecrease();
+		}
+	}
 
 	/**
 	**  Reset the force. But don't change its role and its demand.
@@ -126,9 +145,11 @@ public:
 		Attacking = false;
 		if (types) {
 			UnitTypes.clear();
+			State = AI_FORCE_STATE_FREE;
+		} else {
+			State = AI_FORCE_STATE_WAITING;
 		}
 		Units.clear();
-		State = 0;
 		GoalX = GoalY = 0;
 		MustTransport = false;
 	}
@@ -136,6 +157,14 @@ public:
 	{
 		return Units.size();
 	}
+
+	inline bool IsAttacking(void) const
+	{
+		return (!Defending && Attacking);
+	}
+
+	void CountTypes(unsigned int *counter, const size_t len);
+
 	bool Completed;     /// Flag saying force is complete build
 	bool Defending;     /// Flag saying force is defending
 	bool Attacking;     /// Flag saying force is attacking
@@ -147,10 +176,50 @@ public:
 	//
 	// If attacking
 	//
-	unsigned int State;/// Attack state
+	int State;/// Attack state
 	int GoalX;         /// Attack point X tile map position
 	int GoalY;         /// Attack point Y tile map position
 	bool MustTransport;/// Flag must use transporter
+
+	void Attack(int goalX, int goalY);
+	void Clean(void);
+};
+
+	// forces
+#define AI_MAX_FORCES 10                    /// How many forces are supported
+//#define AI_MAX_ATTACKING_FORCES 30          /// Attacking forces (max supported 32)
+/**
+**  AI force manager.
+**
+**  A Forces container for the force manager to handle
+*/
+class AiForceManager {
+	std::vector<AiForce> forces;
+	char script[AI_MAX_FORCES];
+public:
+	AiForceManager();
+
+	inline size_t Size(void) const
+	{
+		return forces.size();
+	}
+
+	AiForce &operator[](unsigned int index) {
+		return forces[index];
+	}
+
+	inline unsigned int getScriptForce(unsigned int index) {
+		if (script[index] == -1) {
+			script[index] = FindFreeForce();
+		}
+		return script[index];
+	}
+
+	void Clean(void);
+	bool Assign(CUnit *unit);
+	void Update(void);
+	unsigned int FindFreeForce(int role = AiForceRoleAttack);
+	void CheckUnits(int *counter);
 };
 
 /**
@@ -216,10 +285,7 @@ public:
 	std::string Script;            /// Script executed
 	unsigned long SleepCycles;     /// Cycles to sleep
 
-	// forces
-#define AI_MAX_FORCES 10                    /// How many forces are supported
-#define AI_MAX_ATTACKING_FORCES 30          /// Attacking forces (max supported 32)
-	AiForce Force[AI_MAX_ATTACKING_FORCES]; /// Forces controlled by AI
+	AiForceManager	Force;		/// Forces controlled by AI
 
 	// resource manager
 	int Reserve[MaxCosts]; /// Resources to keep in reserve
@@ -362,6 +428,9 @@ extern void AiAssignFreeUnitsToForce(void);
 extern void AiAttackWithForceAt(unsigned int force, int x, int y);
 	/// Attack with force
 extern void AiAttackWithForce(unsigned int force);
+	/// Attack with forces in array
+extern void AiAttackWithForces(int *forces);
+
 	/// Periodic called force manager handler
 extern void AiForceManager(void);
 

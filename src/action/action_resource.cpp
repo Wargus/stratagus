@@ -669,7 +669,7 @@ static int MoveToDepot(CUnit *unit)
 	}
 
 	// Not ready
-	if(0 && unit->Player->AiEnabled && unit->Data.Move.Cycles > 300)
+	if(unit->Player->AiEnabled && unit->Data.Move.Cycles > 300)
 	{
 		AiNewDepotRequest(unit);		
 	}

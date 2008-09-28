@@ -525,7 +525,7 @@ int AiPlanAttack(AiForce *force)
 	// NOTE: finding free transportes was too much work for me.
 	//
 	state = 1;
-	for (unsigned int i = 0; i < force->Units.size(); ++i) {
+	for (unsigned int i = 0; i < force->Size(); ++i) {
 		aiunit = force->Units[i];
 		if (aiunit->Type->CanTransport()) {
 			DebugPrint("%d: Transporter #%d\n" _C_ AiPlayer->Player->Index

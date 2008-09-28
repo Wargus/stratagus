@@ -370,13 +370,18 @@ AiGetBuildRequestsCount(PlayerAi *pai, int counter[UnitTypeMax])
 	return size;
 }
 
-void AiNewDepotRequest(CUnit *worker) {
+extern CUnit *FindDepositNearLoc(CPlayer *p, 
+				int x, int y, int range, int resource);
 
+
+void AiNewDepotRequest(CUnit *worker) {
+/*
 	DebugPrint("%d: Worker %d report: Resource [%d] too far from depot, returning time [%d].\n" 
 				_C_ worker->Player->Index _C_ worker->Slot 
 				_C_ worker->CurrentResource
 				_C_ worker->Data.Move.Cycles
 				);
+	*/			
 	int i;
 	int n;
 	int c;
@@ -385,6 +390,32 @@ void AiNewDepotRequest(CUnit *worker) {
 	int cost, best_cost = 0;
 	//int best_mask = 0, needmask;
 	
+	int PosX = -1;
+	int PosY = -1;
+	
+	ResourceInfo *resinfo = 
+					worker->Type->ResInfo[worker->CurrentResource];	
+	
+	if(resinfo->TerrainHarvester) {
+		PosX = worker->CurrentOrder()->Arg1.Resource.Pos.X;
+		PosY = worker->CurrentOrder()->Arg1.Resource.Pos.Y;
+	} else {
+		CUnit *mine = worker->CurrentOrder()->Arg1.Resource.Mine;
+		if(mine) {
+			PosX = mine->X;
+			PosY = mine->Y;
+		}
+	}	
+
+
+	if (PosX != -1 && NULL != FindDepositNearLoc(worker->Player, 
+				PosX, PosY, 10, worker->CurrentResource)) {
+		/* 
+		 * New Depot has just be finished and worker just return to old depot 
+		 * (far away) from new Deopt.
+		 */
+		return;		
+	}
 				
 	int counter[UnitTypeMax];
 	//
@@ -425,25 +456,14 @@ void AiNewDepotRequest(CUnit *worker) {
 	
 	if(best_type) {
 		//if(!best_mask)	{
-			ResourceInfo *resinfo = 
-					worker->Type->ResInfo[worker->CurrentResource];
 						
 			AiBuildQueue queue;
 
 			queue.Type = best_type;
 			queue.Want = 1;
 			queue.Made = 0;
-
-			if(resinfo->TerrainHarvester) {
-				queue.X = worker->CurrentOrder()->Arg1.Resource.Pos.X;
-				queue.Y = worker->CurrentOrder()->Arg1.Resource.Pos.Y;
-			} else {
-				CUnit *mine = worker->CurrentOrder()->Arg1.Resource.Mine;
-				if(mine) {
-					queue.X = mine->X;
-					queue.Y = mine->Y;
-				}
-			}
+			queue.X = PosX;
+			queue.Y = PosY;
 
 			worker->Player->Ai->UnitTypeBuilt.push_back(queue);
 			

@@ -61,11 +61,11 @@ struct CUnitCache {
 	}
 	inline CUnit * operator[] (const unsigned int index) const
 	{
-		Assert(index < Units.size());
+		//Assert(index < Units.size());
 		return Units[index];
 	}
 	inline CUnit * operator[] (const unsigned int index) {
-		Assert(index < Units.size());
+		//Assert(index < Units.size());
 		return Units[index];
 	}
 
@@ -211,7 +211,6 @@ struct CUnitCache {
 		CUnit *tmp = Units[index];
 		if(size > 1) {
 			Units[index] = Units[size - 1];
-			Units[size - 1] = tmp;
 		}
 		Units.pop_back();
 		return tmp;
@@ -222,21 +221,20 @@ struct CUnitCache {
 	**
 	**  @param unit  Unit pointer to remove from container.
 	*/	
-	inline void Remove(CUnit *const unit)
+	inline bool Remove(CUnit *const unit)
 	{
 #ifndef SECURE_UNIT_REMOVING		
 		const size_t size = Units.size();
 		if(size == 1 && unit == Units[0]) {
 			Units.pop_back();
+			return true;
 		} else {
 			for(unsigned int i = 0; i < size; ++i) {
 				// Do we care on unit sequence in tile cache ?
 				if (Units[i] == unit) {
-					CUnit *tmp = Units[size - 1];
-					Units[size - 1] = unit;
-					Units[i] = tmp;
+					Units[i] = Units[size - 1];
 					Units.pop_back();
-					return;
+					return true;
 				}
 			}
 		}	
@@ -245,10 +243,11 @@ struct CUnitCache {
 			 i != end; ++i) {
 			if ((*i) == unit) {
 				Units.erase(i);
-				return;
+				return true;
 			}
 		}
 #endif
+		return false;
 	}
 
 	/**

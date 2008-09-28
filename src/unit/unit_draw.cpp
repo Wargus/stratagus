@@ -611,17 +611,11 @@ static void DrawDecoration(const CUnit *unit, const CUnitType *type, int x, int 
 	 	&& unit->Player == ThisPlayer
 #endif
 	 	) {
-		int num;
-		int width;
-
-		for (num = 0; !(unit->GroupId & (1 << num)); ++num) {
-			;
-		}
-		width = GameFont->Width(std::string(1, '0' + num));
-		x += (type->TileWidth * TileSizeX + type->BoxWidth) / 2 - width;
+		int width = GameFont->Width(unit->GroupId - 1);
+		x += (unit->Type->TileWidth * TileSizeX + unit->Type->BoxWidth) / 2 - width;
 		width = GameFont->Height();
-		y += (type->TileHeight * TileSizeY + type->BoxHeight) / 2 - width;
-		CLabel(GameFont).DrawClip(x, y, num);
+		y += (unit->Type->TileHeight * TileSizeY + unit->Type->BoxHeight) / 2 - width;
+		CLabel(GameFont).DrawClip(x, y, unit->GroupId - 1);
 	}
 }
 
@@ -1222,7 +1216,20 @@ void CUnitDrawProxy::operator=(const CUnit *unit)
 	TeamSelected = unit->TeamSelected;
 	Blink = unit->Blink;
 	ResourcesHeld = unit->ResourcesHeld > 0;
-	GroupId = unit->GroupId;
+
+	if (unit->GroupId) {
+		if (unit->Player->AiEnabled) {
+			GroupId = unit->GroupId;
+		} else {
+			int num = 0;
+			while(!(unit->GroupId & (1 << num))) {
+				++num;
+			}
+			GroupId = num + 1;
+		}
+	} else {
+		GroupId = 0;
+	}
 
 	if (unit->Variable) {
 		const unsigned int num_dec = UnitTypeVar.DecoVar.size();
@@ -1328,17 +1335,11 @@ void CUnitDrawProxy::DrawDecorationAt(int x, int y) const
 	 && Player == ThisPlayer
 #endif
 	 ) {
-		int num;
-		int width;
-
-		for (num = 0; !(GroupId & (1 << num)); ++num) {
-			;
-		}
-		width = GameFont->Width(std::string(1, '0' + num));
+		int width = GameFont->Width(GroupId - 1);
 		x += (Type->TileWidth * TileSizeX + Type->BoxWidth) / 2 - width;
 		width = GameFont->Height();
 		y += (Type->TileHeight * TileSizeY + Type->BoxHeight) / 2 - width;
-		CLabel(GameFont).DrawClip(x, y, num);
+		CLabel(GameFont).DrawClip(x, y, GroupId - 1);
 	}
 }
 

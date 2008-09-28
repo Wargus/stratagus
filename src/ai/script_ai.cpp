@@ -786,6 +786,7 @@ static int CclAiForce(lua_State *l)
 	if (force < 0 || force >= AI_MAX_FORCES) {
 		LuaError(l, "Force out of range: %d" _C_ force);
 	}
+	AiForce &aiforce = AiPlayer->Force[AiPlayer->Force.getScriptForce(force)];
 
 	args = lua_objlen(l, 2);
 	for (j = 0; j < args; ++j) {
@@ -807,14 +808,13 @@ static int CclAiForce(lua_State *l)
 		//
 		// Look if already in force.
 		//
-		for (i = 0; i < (int)AiPlayer->Force[force].UnitTypes.size(); ++i) {
-			aiut = &AiPlayer->Force[force].UnitTypes[i];
+		for (i = 0; i < (int)aiforce.UnitTypes.size(); ++i) {
+			aiut = &aiforce.UnitTypes[i];
 			if (aiut->Type->Slot == type->Slot) { // found
 				if (count) {
 					aiut->Want = count;
 				} else {
-					AiPlayer->Force[force].UnitTypes.erase(
-						AiPlayer->Force[force].UnitTypes.begin() + i);
+					aiforce.UnitTypes.erase(aiforce.UnitTypes.begin() + i);
 				}
 				break;
 			}
@@ -823,11 +823,11 @@ static int CclAiForce(lua_State *l)
 		//
 		// New type append it.
 		//
-		if (i == (int)AiPlayer->Force[force].UnitTypes.size()) {
+		if (i == (int)aiforce.UnitTypes.size()) {
 			AiUnitType newaiut;
 			newaiut.Want = count;
 			newaiut.Type = type;
-			AiPlayer->Force[force].UnitTypes.push_back(newaiut);
+			aiforce.UnitTypes.push_back(newaiut);
 		}
 	}
 
@@ -844,19 +844,20 @@ static int CclAiForce(lua_State *l)
 */
 static int CclAiForceRole(lua_State *l)
 {
-	int force;
-	const char *flag;
 
 	LuaCheckArgs(l, 2);
-	force = LuaToNumber(l, 1);
+	int force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCES) {
 		LuaError(l, "Force %i out of range" _C_ force);
 	}
-	flag = LuaToString(l, 2);
+
+	AiForce &aiforce = AiPlayer->Force[AiPlayer->Force.getScriptForce(force)];
+	
+	const char *flag = LuaToString(l, 2);
 	if (!strcmp(flag, "attack")) {
-		AiPlayer->Force[force].Role = AiForceRoleAttack;
+		aiforce.Role = AiForceRoleAttack;
 	} else if (!strcmp(flag, "defend")) {
-		AiPlayer->Force[force].Role = AiForceRoleDefend;
+		aiforce.Role = AiForceRoleDefend;
 	} else {
 		LuaError(l, "Unknown force role '%s'" _C_ flag);
 	}
@@ -872,14 +873,13 @@ static int CclAiForceRole(lua_State *l)
 */
 static int CclAiCheckForce(lua_State *l)
 {
-	int force;
 
 	LuaCheckArgs(l, 1);
-	force = LuaToNumber(l, 1);
+	int force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCES) {
 		lua_pushfstring(l, "Force out of range: %d", force);
 	}
-	if (AiPlayer->Force[force].Completed) {
+	if (AiPlayer->Force[AiPlayer->Force.getScriptForce(force)].Completed) {
 		lua_pushboolean(l, 1);
 		return 1;
 	}
@@ -894,14 +894,13 @@ static int CclAiCheckForce(lua_State *l)
 */
 static int CclAiWaitForce(lua_State *l)
 {
-	int force;
 
 	LuaCheckArgs(l, 1);
-	force = LuaToNumber(l, 1);
+	int force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCES) {
-		LuaError(l, "Force out of range: %d" _C_ force);
+		lua_pushfstring(l, "Force out of range: %d", force);
 	}
-	if (AiPlayer->Force[force].Completed) {
+	if (AiPlayer->Force[AiPlayer->Force.getScriptForce(force)].Completed) {
 		lua_pushboolean(l, 0);
 		return 1;
 	}
@@ -909,7 +908,7 @@ static int CclAiWaitForce(lua_State *l)
 #if 0
 	// Debuging
 	AiCleanForces();
-	Assert(!AiPlayer->Force[force].Completed);
+	Assert(!AiPlayer->Force.getScriptForce(f).Completed);
 #endif
 
 	lua_pushboolean(l, 1);
@@ -931,8 +930,65 @@ static int CclAiAttackWithForce(lua_State *l)
 		LuaError(l, "Force out of range: %d" _C_ force);
 	}
 
-	AiAttackWithForce(force);
+	AiAttackWithForce(AiPlayer->Force.getScriptForce(force));
 
+	lua_pushboolean(l, 0);
+	return 1;
+}
+
+/**
+**  Wait for a forces ready.
+**
+**  @param l  Lua state.
+*/
+static int CclAiWaitForces(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
+		LuaError(l, "incorrect argument");
+	}
+	int force, args = lua_objlen(l, 1);	
+	for (int i = 0; i < args; ++i) {
+		lua_rawgeti(l, 1, i + 1);
+		force = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+		if (force < 0 || force >= AI_MAX_FORCES) {
+			lua_pushfstring(l, "Force out of range: %d", force);
+		}					
+		if (!AiPlayer->Force[AiPlayer->Force.getScriptForce(force)].Completed) {
+			lua_pushboolean(l, 1);
+			return 1;
+		} 
+	}	
+	lua_pushboolean(l, 0);
+	return 1;
+}
+
+/**
+**  Attack with forces.
+**
+**  @param l  Lua state.
+*/
+static int CclAiAttackWithForces(lua_State *l)
+{
+	int Forces[AI_MAX_FORCES + 1];
+	
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
+		LuaError(l, "incorrect argument");
+	}
+	int force, args = lua_objlen(l, 1);	
+	for (int i = 0; i < args; ++i) {
+		lua_rawgeti(l, 1, i + 1);
+		force = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+		if (force < 0 || force >= AI_MAX_FORCES) {
+			lua_pushfstring(l, "Force out of range: %d", force);
+		}
+		Forces[i] = AiPlayer->Force.getScriptForce(force);
+	}
+	Forces[args] = -1;
+	AiAttackWithForces(Forces);
 	lua_pushboolean(l, 0);
 	return 1;
 }
@@ -1124,7 +1180,7 @@ static int CclAiDump(lua_State *l)
 	//
 	// PrintForce
 	//
-	for (i = 0; i < AI_MAX_FORCES; ++i) {
+	for (i = 0; i < (int)AiPlayer->Force.Size(); ++i) {
 		printf("Force(%d%s%s):\n", i,
 			AiPlayer->Force[i].Completed ? ",complete" : ",recruit",
 			AiPlayer->Force[i].Attacking ? ",attack" : "");
@@ -1647,6 +1703,9 @@ void AiCclRegister(void)
 	lua_register(Lua, "AiDump", CclAiDump);
 
 	lua_register(Lua, "DefineAiPlayer", CclDefineAiPlayer);
+	lua_register(Lua, "AiAttackWithForces", CclAiAttackWithForces);
+	lua_register(Lua, "AiWaitForces", CclAiWaitForces);
+
 }
 
 
