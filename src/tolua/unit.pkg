@@ -21,4 +21,4 @@ class CPreference
 
 CPreference Preference;
 
-CUnit *UnitUnderCursor;
+CUnit *GetUnitUnderCursor();

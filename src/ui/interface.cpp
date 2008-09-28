@@ -706,7 +706,10 @@ static bool CommandKey(int key)
 	return true;
 }
 
+#if defined(DEBUG) || defined(PROF)
 extern void MapUnmarkUnitGuard(CUnit *unit);
+#endif
+
 /**
 **  Handle cheats
 **

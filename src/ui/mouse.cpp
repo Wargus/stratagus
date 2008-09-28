@@ -71,7 +71,7 @@ int MouseButtons;                            /// Current pressed mouse buttons
 
 int KeyModifiers;                            /// Current keyboard modifiers
 
-CUnit *UnitUnderCursor;                      /// Unit under cursor
+CUnitPtr UnitUnderCursor;					/// Unit under cursor
 int ButtonAreaUnderCursor = -1;              /// Button area under cursor
 int ButtonUnderCursor = -1;                  /// Button under cursor
 bool GameMenuButtonClicked;                  /// Menu button was clicked
@@ -130,10 +130,12 @@ void DoRightButton(int sx, int sy)
 	//
 	flush = !(KeyModifiers & ModifierShift);
 
-	if (UnitUnderCursor && !UnitUnderCursor->Type->Decoration) {
+	CUnitPtr dest_lock(UnitUnderCursor);// just in case
+	if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->Decoration) {
 		dest = UnitUnderCursor;
 	} else {
 		dest = NULL;
+		dest_lock.Reset();
 	}
 
 	//
@@ -160,7 +162,7 @@ void DoRightButton(int sx, int sy)
 		return;
 	}
 
-	if (dest && dest->Type->CanTransport()) {
+	if (dest != NULL && dest->Type->CanTransport()) {
 		for (i = 0; i < NumSelected; i++) {
 			if (CanTransport(dest, Selected[i])) {
 				// We are clicking on a transporter. We have to:
@@ -180,7 +182,7 @@ void DoRightButton(int sx, int sy)
 	for (i = 0; i < NumSelected; ++i) {
 		unit = Selected[i];
 		// don't self targetting.
-		if (unit == dest) {
+		if (dest == unit) {
 			continue;
 		}
 		Assert(unit);
@@ -203,7 +205,7 @@ void DoRightButton(int sx, int sy)
 		//
 		//  Enter transporters ?
 		//
-		if (dest) {
+		if (dest != NULL) {
 			// dest is the transporter
 			if (dest->Type->CanTransport()) {
 				// Let the transporter move to the unit. And QUEUE!!!
@@ -244,7 +246,7 @@ void DoRightButton(int sx, int sy)
 		//
 		if (action == MouseActionHarvest) {
 			// Go and repair
-			if (type->RepairRange && dest &&
+			if (type->RepairRange && dest != NULL &&
 					dest->Type->RepairHP &&
 					dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max &&
 					(dest->Player == unit->Player || unit->IsAllied(dest))) {
@@ -254,7 +256,7 @@ void DoRightButton(int sx, int sy)
 			}
 			// Harvest
 			if (type->Harvester) {
-				if (dest) {
+				if (dest != NULL) {
 					// Return a loaded harvester to deposit
 					if (unit->ResourcesHeld > 0 &&
 							dest->Type->CanStore[unit->CurrentResource] &&
@@ -293,7 +295,7 @@ void DoRightButton(int sx, int sy)
 				}
 			}
 			// Follow another unit
-			if (UnitUnderCursor && dest && dest != unit &&
+			if (UnitUnderCursor != NULL && dest != NULL && dest != unit &&
 					(dest->Player == unit->Player || unit->IsAllied(dest))) {
 				dest->Blink = 4;
 				SendCommandFollow(unit, dest, flush);
@@ -308,7 +310,7 @@ void DoRightButton(int sx, int sy)
 		//  Fighters
 		//
 		if (action == MouseActionSpellCast || action == MouseActionAttack) {
-			if (dest && unit->CurrentAction() != UnitActionBuilt) {
+			if (dest != NULL && unit->CurrentAction() != UnitActionBuilt) {
 				if (unit->IsEnemy(dest)) {
 					dest->Blink = 4;
 					if (action == MouseActionSpellCast) {
@@ -374,7 +376,7 @@ void DoRightButton(int sx, int sy)
 		}
 
 		// Manage harvester from the destination side.
-		if (dest && dest->Type->Harvester) {
+		if (dest != NULL && dest->Type->Harvester) {
 			// tell to return a loaded harvester to deposit
 			if (dest->ResourcesHeld > 0 &&
 					type->CanStore[dest->CurrentResource] &&
@@ -398,7 +400,7 @@ void DoRightButton(int sx, int sy)
 		// Manage new order.
 		if (!unit->CanMove()) {
 			// Go and harvest from a unit
-			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest &&
+			if (dest != NULL && dest->Type->GivesResource && dest->Type->CanHarvest &&
 					(dest->Player == unit->Player || dest->Player->Index == PlayerNumNeutral)) {
 				dest->Blink = 4;
 				SendCommandResource(unit, dest, flush);
@@ -763,7 +765,7 @@ void UIHandleMouseMove(int x, int y)
 		return;
 	}
 
-	UnitUnderCursor = NULL;
+	UnitUnderCursor.Reset();
 	GameCursor = UI.Point.Cursor;  // Reset
 	HandleMouseOn(x, y);
 
@@ -821,9 +823,9 @@ void UIHandleMouseMove(int x, int y)
 	}
 
 	// NOTE: If unit is not selectable as a goal, you can't get a cursor hint
-	if (UnitUnderCursor && !UnitUnderCursor->IsVisibleAsGoal(ThisPlayer) &&
+	if (UnitUnderCursor != NULL && !UnitUnderCursor->IsVisibleAsGoal(ThisPlayer) &&
 			!ReplayRevealMap) {
-		UnitUnderCursor = NULL;
+		UnitUnderCursor.Reset();
 	}
 
 	//
@@ -832,7 +834,7 @@ void UIHandleMouseMove(int x, int y)
 	if (CursorState == CursorStateSelect) {
 		if (CursorOn == CursorOnMap || CursorOn == CursorOnMinimap) {
 			GameCursor = UI.YellowHair.Cursor;
-			if (UnitUnderCursor && !UnitUnderCursor->Type->Decoration) {
+			if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->Decoration) {
 				if (UnitUnderCursor->Player == ThisPlayer || 
 						ThisPlayer->IsAllied(UnitUnderCursor)) {
 					GameCursor = UI.GreenHair.Cursor;
@@ -860,7 +862,7 @@ void UIHandleMouseMove(int x, int y)
 		//
 		//  Map
 		//
-		if (UnitUnderCursor && !UnitUnderCursor->Type->Decoration &&
+		if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->Decoration &&
 				(UnitUnderCursor->IsVisible(ThisPlayer) || ReplayRevealMap)) {
 			GameCursor = UI.Glass.Cursor;
 		}
@@ -1502,7 +1504,7 @@ void UIHandleButtonDown(unsigned button)
 		}
 
 		if (MouseButtons & UI.PieMenu.MouseButton) { // enter pie menu
-			UnitUnderCursor = NULL;
+			UnitUnderCursor.Reset();
 			GameCursor = UI.Point.Cursor;  // Reset
 			CursorStartX = CursorX;
 			CursorStartY = CursorY;
@@ -1535,7 +1537,7 @@ void UIHandleButtonDown(unsigned button)
 				x = UI.MouseViewport->Viewport2MapX(CursorX);
 				y = UI.MouseViewport->Viewport2MapY(CursorY);
 
-				if (UnitUnderCursor && (unit = UnitOnMapTile(x, y,-1)) &&
+				if (UnitUnderCursor != NULL && (unit = UnitOnMapTile(x, y,-1)) &&
 						!UnitUnderCursor->Type->Decoration) {
 					unit->Blink = 4;                // if right click on building -- blink
 				} else { // if not not click on building -- green cross

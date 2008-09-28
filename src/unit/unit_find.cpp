@@ -489,7 +489,7 @@ struct BestRangeTargetFinder {
 
 			// Mark the good/bad array...
 			int yy_offset = x + y * 32;
-			for (int yy = 0; yy < dtype->TileWidth; ++yy) {
+			for (int yy = 0; yy < dtype->TileHeight; ++yy) {
 				if ((y + yy >= 0) && (y + yy < 2 * missile_range + 1)) {
 					for (int xx = 0; xx < dtype->TileWidth; ++xx) {
 						if ((x + xx >= 0) && (x + xx < 2 * missile_range + 1)) {
@@ -558,9 +558,9 @@ struct BestRangeTargetFinder {
 
 		int sbad = 0;
 		int sgood = 0;
-		int yy_offset = x + -(type->Missile.Missile->Range - 1) * 32;
-		for (int yy = -(type->Missile.Missile->Range - 1);
-			yy <= type->Missile.Missile->Range - 1; ++yy) {
+		int yy = -(type->Missile.Missile->Range - 1);
+		int yy_offset = x + yy * 32;
+		for (;yy <= type->Missile.Missile->Range - 1; ++yy) {
 			if ((y + yy >= 0) && ((y + yy) < 2 * missile_range + 1)) {		
 				for (int xx = -(type->Missile.Missile->Range - 1);
 					xx <= type->Missile.Missile->Range - 1; ++xx) {

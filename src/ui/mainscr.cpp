@@ -624,6 +624,11 @@ static void DrawUnitInfo(CUnit *unit)
 			x, y, "");
 	}
 
+	if (unit->Player != ThisPlayer && !ThisPlayer->IsAllied(unit->Player) )
+	{
+		return;
+	}
+
 	x = UI.InfoPanel.X;
 	y = UI.InfoPanel.Y;
 
@@ -893,10 +898,13 @@ void MessagesDisplay::DrawMessages()
 						Video.Height - 1);
 				}		
 
-				snprintf(buffer, 256, "%s (%d/%d)",
+				snprintf(buffer, 256, "%s (%d/%d) Wait %lu [%d,%d]",
 						ThisPlayer->Ai->UnitTypeBuilt[z].Type->Name.c_str(),
 						ThisPlayer->Ai->UnitTypeBuilt[z].Made,
-						ThisPlayer->Ai->UnitTypeBuilt[z].Want);
+						ThisPlayer->Ai->UnitTypeBuilt[z].Want,
+						ThisPlayer->Ai->UnitTypeBuilt[z].Wait,
+						ThisPlayer->Ai->UnitTypeBuilt[z].X,
+						ThisPlayer->Ai->UnitTypeBuilt[z].Y);
 												
 				label.DrawClip(UI.MapArea.X + 8,
 						UI.MapArea.Y + 8 + 
@@ -1492,9 +1500,10 @@ static void DrawInfoPanelSingleSelected()
 */
 static void DrawInfoPanelNoneSelected()
 {
+	CUnitPtr lock(UnitUnderCursor);
 	// Check if a unit is under the cursor
-	if (UnitUnderCursor && UnitUnderCursor->IsVisible(ThisPlayer)) {
-		DrawUnitInfo(UnitUnderCursor);
+	if (lock != NULL && lock->IsVisible(ThisPlayer)) {
+		DrawUnitInfo(lock);
 		return;
 	}
 

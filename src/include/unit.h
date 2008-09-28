@@ -1036,6 +1036,69 @@ public:
 
 typedef CUnit::COrder* COrderPtr;
 
+class CUnitPtr {
+	CUnit *unit;
+public:
+
+	void Reset(void) {
+		if (unit) {
+			unit->RefsDecrease();
+		}
+		unit = NULL;
+	}
+
+	CUnitPtr(): unit(NULL) {}	
+	CUnitPtr(CUnit *u): unit(u) {
+		if (unit) {
+			unit->RefsIncrease();
+		}
+	}
+	CUnitPtr(const CUnitPtr &u): unit(u.unit) {
+		if (unit) {
+			unit->RefsIncrease();
+		}
+	}
+	~CUnitPtr() {
+		Reset();
+	}
+
+
+	operator CUnit *() {
+		return unit;
+	}
+
+	CUnit & operator*() {
+		return *unit;
+	}
+	CUnit *operator->() const
+	{
+		return unit;
+	}
+
+	CUnitPtr& operator= (CUnit *u) {
+        if (this->unit != u) {
+        	if (u) {
+        		u->RefsIncrease();
+        	}
+			if (unit) {
+				unit->RefsDecrease();
+			}
+            unit = u;
+        }
+        return *this;
+    }
+
+	bool operator== (CUnit *u) const
+	{
+        return this->unit == u;
+	}
+	bool operator!= (CUnit *u) const
+	{
+        return this->unit != u;
+	}
+
+};
+
 class CUnitDrawProxy {
 
 	void DrawSelectionAt(int x, int y) const;

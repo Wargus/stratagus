@@ -15923,27 +15923,30 @@ static int tolua_set_Preference(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: UnitUnderCursor */
-#ifndef TOLUA_DISABLE_tolua_get_UnitUnderCursor_ptr
-static int tolua_get_UnitUnderCursor_ptr(lua_State* tolua_S)
-{
-  tolua_pushusertype(tolua_S,(void*)UnitUnderCursor,"CUnit");
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: UnitUnderCursor */
-#ifndef TOLUA_DISABLE_tolua_set_UnitUnderCursor_ptr
-static int tolua_set_UnitUnderCursor_ptr(lua_State* tolua_S)
+/* function: GetUnitUnderCursor */
+#ifndef TOLUA_DISABLE_tolua_stratagus_GetUnitUnderCursor00
+static int tolua_stratagus_GetUnitUnderCursor00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!tolua_isusertype(tolua_S,2,"CUnit",0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
 #endif
-  UnitUnderCursor = ((CUnit*)  tolua_tousertype(tolua_S,2,0))
-;
+ {
+  {
+   CUnit* tolua_ret = (CUnit*)  GetUnitUnderCursor();
+   tolua_pushusertype(tolua_S,(void*)tolua_ret,"CUnit");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetUnitUnderCursor'.",&tolua_err);
  return 0;
+#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -20016,7 +20019,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"ShowOrders",tolua_get_CPreference_unsigned_ShowOrders,tolua_set_CPreference_unsigned_ShowOrders);
   tolua_endmodule(tolua_S);
   tolua_variable(tolua_S,"Preference",tolua_get_Preference,tolua_set_Preference);
-  tolua_variable(tolua_S,"UnitUnderCursor",tolua_get_UnitUnderCursor_ptr,tolua_set_UnitUnderCursor_ptr);
+  tolua_function(tolua_S,"GetUnitUnderCursor",tolua_stratagus_GetUnitUnderCursor00);
   tolua_function(tolua_S,"GetEffectsVolume",tolua_stratagus_GetEffectsVolume00);
   tolua_function(tolua_S,"SetEffectsVolume",tolua_stratagus_SetEffectsVolume00);
   tolua_function(tolua_S,"GetMusicVolume",tolua_stratagus_GetMusicVolume00);

@@ -692,7 +692,7 @@ void CreateGame(const char *filename, CMap *map)
 	LoadIcons();
 
 	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
-	UnitUnderCursor = NoUnitP;
+	UnitUnderCursor.Reset();
 
 	InitMissileTypes();
 #ifndef DYNAMIC_LOAD

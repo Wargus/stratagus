@@ -36,14 +36,18 @@
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
-
+#ifndef __ICONS_H__
 #include "icons.h"
+#endif
+
+#ifndef __UNIT_H__
+#include "unit.h"
+#endif
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CUnit;
 struct _event_callback_;
 
 /*----------------------------------------------------------------------------
@@ -207,8 +211,8 @@ extern int KeyScrollState;
 extern int MouseScrollState;
 	/// current key state
 extern enum _key_state_ KeyState;
-	/// pointer to unit under the cursor
-extern CUnit *UnitUnderCursor;
+	/// shared pointer to unit under the cursor
+extern CUnitPtr UnitUnderCursor;
 	/// button area under the cursor
 extern int ButtonAreaUnderCursor;
 	/// button number under the cursor
@@ -233,6 +237,8 @@ extern int HoldClickDelay;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+extern CUnit *GetUnitUnderCursor(void);
 
 //
 // in botpanel.cpp

@@ -984,7 +984,7 @@ static void DrawMapCursor(void)
 			// If there is an unit under the cursor, it's selection thing
 			//  is drawn somewhere else (Check DrawUnitSelection.)
 			//
-			if (!UnitUnderCursor) {
+			if (UnitUnderCursor != NULL) {
 				PushClipping();
 				SetClipping(UI.MouseViewport->X, UI.MouseViewport->Y,
 					UI.MouseViewport->EndX, UI.MouseViewport->EndY);
@@ -1342,7 +1342,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	// Right click on a resource
 	//
 	if (Editor.State == EditorSelecting) {
-		if ((MouseButtons & RightButton && UnitUnderCursor)) {
+		if ((MouseButtons & RightButton && UnitUnderCursor != NULL)) {
 			CclCommand("if (EditUnitProperties ~= nil) then EditUnitProperties() end;");
 			return;
 		}
@@ -1495,7 +1495,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 
 		case SDLK_BACKSPACE:
 		case SDLK_DELETE: // Delete
-			if (UnitUnderCursor) {
+			if (UnitUnderCursor != NULL) {
 				EditorRemoveUnit(UnitUnderCursor);
 			}
 			break;
@@ -1517,7 +1517,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			KeyScrollState |= ScrollRight;
 			break;
 		case '0':
-			if (UnitUnderCursor) {
+			if (UnitUnderCursor != NULL) {
 				UnitUnderCursor->ChangeOwner(&Players[PlayerNumNeutral]);
 				UI.StatusLine.Set(_("Unit owner modified"));
 			}
@@ -1526,7 +1526,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case '3': case '4': case '5':
 		case '6': case '7': case '8':
 		case '9':
-			if (UnitUnderCursor && Map.Info.PlayerType[(int) key - '1'] != PlayerNobody) {
+			if (UnitUnderCursor != NULL && Map.Info.PlayerType[(int) key - '1'] != PlayerNobody) {
 				UnitUnderCursor->ChangeOwner(&Players[(int) key - '1']);
 				UI.StatusLine.Set(_("Unit owner modified"));
 				UpdateMinimap = true;
@@ -1930,7 +1930,7 @@ static void EditorCallbackMouse(int x, int y)
 	//
 	// Map
 	//
-	UnitUnderCursor = NULL;
+	UnitUnderCursor.Reset();
 	if (x >= UI.MapArea.X && x <= UI.MapArea.EndX &&
 			y >= UI.MapArea.Y && y <= UI.MapArea.EndY) {
 		CViewport *vp = GetViewport(x, y);
@@ -1951,7 +1951,7 @@ static void EditorCallbackMouse(int x, int y)
 				UI.MouseViewport->MapX * TileSizeX + UI.MouseViewport->OffsetX,
 			CursorY - UI.MouseViewport->Y +
 				UI.MouseViewport->MapY * TileSizeY + UI.MouseViewport->OffsetY);
-		if (UnitUnderCursor) {
+		if (UnitUnderCursor != NULL) {
 			ShowUnitInfo(UnitUnderCursor);
 			return;
 		}

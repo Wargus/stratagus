@@ -383,7 +383,7 @@ void CleanGame(void)
 	FreeVisionTable();
 	FreePathfinder();
 	CursorBuilding = NULL;
-	UnitUnderCursor = NULL;
+	UnitUnderCursor.Reset();
 }
 
 static void ExpandPath(std::string &newpath, const std::string &path)
