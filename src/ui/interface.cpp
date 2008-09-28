@@ -152,25 +152,36 @@ static void UiUnselectAll(void)
 **  @todo Improve this function, try to show all selected units
 **        or the most possible units.
 */
-static void UiCenterOnGroup(unsigned group)
+static void UiCenterOnGroup(unsigned group, GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY)
 {
 	CUnit **units;
 	int n;
-	int x;
-	int y;
+	int x = -1;
+	int y = -1;
 
-	n = GetNumberUnitsOfGroup(group);
+	n = GetNumberUnitsOfGroup(group, SELECT_ALL);
 	if (n--) {
 		units = GetUnitsOfGroup(group);
 		// FIXME: what should we do with the removed units? ignore?
-
-		x = units[n]->X;
-		y = units[n]->Y;
-		while (n--) {
-			x += (units[n]->X - x) / 2;
-			y += (units[n]->Y - y) / 2;
+		if (units[n]->Type && units[n]->Type->CanSelect(mode)) {
+			x = units[n]->X;
+			y = units[n]->Y;
 		}
-		UI.SelectedViewport->Center(x, y, TileSizeX / 2, TileSizeY / 2);
+
+		while (n--) {
+			if (units[n]->Type && units[n]->Type->CanSelect(mode)) {
+				if (x != -1) {
+					x += (units[n]->X - x) / 2;
+					y += (units[n]->Y - y) / 2;
+				} else {
+					x = units[n]->X;
+					y = units[n]->Y;
+				}
+			}
+		}
+		if (x != -1) {
+			UI.SelectedViewport->Center(x, y, TileSizeX / 2, TileSizeY / 2);
+		}
 	}
 }
 
@@ -179,9 +190,9 @@ static void UiCenterOnGroup(unsigned group)
 **
 **  @param group  Group number to select.
 */
-static void UiSelectGroup(unsigned group)
+static void UiSelectGroup(unsigned group, GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY)
 {
-	SelectGroup(group);
+	SelectGroup(group, mode);
 	SelectionChanged();
 }
 
@@ -195,7 +206,7 @@ static void UiAddGroupToSelection(unsigned group)
 	CUnit **units;
 	int n;
 
-	if (!(n = GetNumberUnitsOfGroup(group))) {
+	if (!(n = GetNumberUnitsOfGroup(group, SELECT_ALL))) {
 		return;
 	}
 
@@ -207,12 +218,9 @@ static void UiAddGroupToSelection(unsigned group)
 	}
 
 	units = GetUnitsOfGroup(group);
-	if (units[0]->Type->Building) {
-		return;
-	}
 
 	while (n--) {
-		if (!units[n]->Removed) {
+		if (!(units[n]->Removed || units[n]->Type->Building)) {
 			SelectUnit(units[n]);
 		}
 	}
@@ -227,6 +235,11 @@ static void UiAddGroupToSelection(unsigned group)
 */
 static void UiDefineGroup(unsigned group)
 {
+	for (int i= 0; i < NumSelected; ++i) {
+		if (Selected[i]->GroupId) {
+			RemoveUnitFromGroups(Selected[i]);
+		}
+	}
 	SetGroup(Selected, NumSelected, group);
 }
 
@@ -543,7 +556,11 @@ static bool CommandKey(int key)
 		case '9':
 			if (KeyModifiers & ModifierShift) {
 				if (KeyModifiers & (ModifierAlt | ModifierDoublePress)) {
-					UiCenterOnGroup(key - '0');
+					if (KeyModifiers & ModifierDoublePress) {
+						UiCenterOnGroup(key - '0', SELECT_ALL);
+					} else {
+						UiSelectGroup(key - '0', SELECT_ALL);
+					}
 				} else if (KeyModifiers & ModifierControl) {
 					UiAddToGroup(key - '0');
 				} else {
@@ -551,7 +568,15 @@ static bool CommandKey(int key)
 				}
 			} else {
 				if (KeyModifiers & (ModifierAlt | ModifierDoublePress)) {
-					UiCenterOnGroup(key - '0');
+					if (KeyModifiers & ModifierAlt) {
+						if (KeyModifiers & ModifierDoublePress) {
+							UiCenterOnGroup(key - '0', NON_SELECTABLE_BY_RECTANGLE_ONLY);
+						} else {
+							UiSelectGroup(key - '0', NON_SELECTABLE_BY_RECTANGLE_ONLY);
+						}
+					} else {
+						UiCenterOnGroup(key - '0');
+					}
 				} else if (KeyModifiers & ModifierControl) {
 					UiDefineGroup(key - '0');
 				} else {

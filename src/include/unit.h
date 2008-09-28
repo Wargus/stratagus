@@ -1434,7 +1434,7 @@ extern void CleanGroups(void);
 
 	// 2 functions to conseal the groups internal data structures...
 	/// Get the number of units in a particular group
-extern int GetNumberUnitsOfGroup(int num);
+extern int GetNumberUnitsOfGroup(int num, GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY);
 	/// Get the array of units of a particular group
 extern CUnit **GetUnitsOfGroup(int num);
 
@@ -1449,7 +1449,8 @@ extern void RemoveUnitFromGroups(CUnit *unit);
 	/// Register CCL group features
 extern void GroupCclRegister(void);
 	/// ask group members for help
-void GroupHelpMe(CUnit *attacker, CUnit *defender);
+extern void GroupHelpMe(CUnit *attacker, CUnit *defender);
+extern int IsGroupTainted(int num);
 
 // in selection.c
 
@@ -1479,7 +1480,7 @@ extern int SelectUnitsByType(CUnit *base);
 	/// Toggle units from the same type (if selectable by rectangle)
 extern int ToggleUnitsByType(CUnit *base);
 	/// Select the units belonging to a particular group
-extern int SelectGroup(int group_number);
+extern int SelectGroup(int group_number, GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY);
 	/// Add the units from the same group as the one in parameter
 extern int AddGroupFromUnitToSelection(CUnit *unit);
 	/// Select the units from the same group as the one in parameter

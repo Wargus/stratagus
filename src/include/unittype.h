@@ -543,6 +543,12 @@ class LuaCallback;
 
 CUnitType *UnitTypeByIdent(const std::string &ident);
 
+enum GroupSelectionMode {
+	SELECTABLE_BY_RECTANGLE_ONLY = 0,
+	NON_SELECTABLE_BY_RECTANGLE_ONLY,
+	SELECT_ALL
+};
+
 /**
 **  Missile type definition (used in config tables)
 **
@@ -1017,6 +1023,21 @@ public:
 	bool CanMove(void) const
 	{
 		return Animations && Animations->Move;
+	}
+
+	bool CanSelect(GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY) const
+	{
+		if(!IsNotSelectable) {
+			switch(mode) {
+				case SELECTABLE_BY_RECTANGLE_ONLY:
+					return SelectableByRectangle;
+				case NON_SELECTABLE_BY_RECTANGLE_ONLY:
+					return !SelectableByRectangle;
+				default:
+					return true;
+			}
+		}
+		return false;
 	}
 
 };

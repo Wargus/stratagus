@@ -163,6 +163,15 @@ void HandleActionTrain(CUnit *unit)
 			// New unit might supply food
 			UpdateForNewUnit(nunit, 0);
 
+			/* Auto Group Add */
+			if (!unit->Player->AiEnabled && unit->GroupId) {
+				int num = 0;
+				while(!(unit->GroupId & (1 << num))) {
+					++num;
+				}
+				AddToGroup(&nunit, 1, num);
+			}
+
 			DropOutOnSide(nunit, LookingW, type->TileWidth, type->TileHeight);
 
 			// Set life span

@@ -544,18 +544,31 @@ int ToggleUnitsByType(CUnit *base)
 **
 **  @return              number of units in the group.
 */
-int SelectGroup(int group_number)
+int SelectGroup(int group_number, GroupSelectionMode mode)
 {
-	int nunits;
-
 	Assert(group_number <= NUM_GROUPS);
-
-	if (!(nunits = GetNumberUnitsOfGroup(group_number))) {
-		return 0;
+	int nunits = GetNumberUnitsOfGroup(group_number, SELECT_ALL);
+	if (nunits) {
+		if (mode == SELECT_ALL || !IsGroupTainted(group_number)) {
+			ChangeSelectedUnits(GetUnitsOfGroup(group_number), nunits);
+			return NumSelected;	
+		} else {
+			int ntable=0;
+			CUnit* table[UnitMax];
+			CUnit** group = GetUnitsOfGroup(group_number);
+			for(int i= 0; i < nunits; ++i) {
+				const CUnitType *type = group[i]->Type;
+				if (type && type->CanSelect(mode)) {
+					table[ntable++] = group[i];
+				}
+			}
+			if (ntable) {
+				ChangeSelectedUnits(table, ntable);
+				return NumSelected;				
+			}
+		}	
 	}
-
-	ChangeSelectedUnits(GetUnitsOfGroup(group_number), nunits);
-	return NumSelected;
+	return 0;
 }
 
 /**

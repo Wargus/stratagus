@@ -58,6 +58,7 @@
 struct CUnitGroup {
 	CUnit **Units;                       /// Units in the group
 	int NumUnits;                        /// How many units in the group
+	int tainted;						/// Group hold unit which can't be SelectableByRectangle 
 };                                       /// group of units
 
 static CUnitGroup Groups[NUM_GROUPS];    /// Number of groups predefined
@@ -77,6 +78,7 @@ void InitGroups(void)
 		if (!Groups[i].Units) {
 			Groups[i].Units = new CUnit *[MaxSelectable];
 		}
+		Groups[i].tainted = 0;
 	}
 }
 
@@ -108,7 +110,12 @@ void CleanGroups(void)
 		delete[] Groups[i].Units;
 		Groups[i].Units = NULL;
 		Groups[i].NumUnits = 0;
+		Groups[i].tainted = 0;
 	}
+}
+
+int IsGroupTainted(int num) {
+	return Groups[num].tainted;
 }
 
 /**
@@ -118,8 +125,19 @@ void CleanGroups(void)
 **
 **  @return     Returns the number of units in the group.
 */
-int GetNumberUnitsOfGroup(int num)
+int GetNumberUnitsOfGroup(int num, GroupSelectionMode mode)
 {
+	if (mode != SELECT_ALL && Groups[num].tainted && Groups[num].NumUnits) {
+		int count = 0;
+		for(int i = 0; i < Groups[num].NumUnits; ++i)
+		{
+			const CUnitType *type = Groups[num].Units[i]->Type;
+			if (type && type->CanSelect(mode)) {
+				count++;
+			}
+		}
+		return count;		
+	}
 	return Groups[num].NumUnits;
 }
 
@@ -151,6 +169,7 @@ void ClearGroup(int num)
 		Assert(!group->Units[i]->Destroyed);
 	}
 	group->NumUnits = 0;
+	group->tainted = 0;
 }
 
 /**
@@ -168,19 +187,16 @@ void AddToGroup(CUnit **units, int nunits, int num)
 	Assert(num <= NUM_GROUPS);
 
 	group = &Groups[num];
-	// Check to make sure we don't have a building as the only group member
-	// If so, we are unable to add these units to the group.
-	if (group->NumUnits == 1 && !group->Units[0]->Type->SelectableByRectangle) {
-		return;
-	}
 	for (i = 0; group->NumUnits < MaxSelectable && i < nunits; ++i) {
-		// Add to group only if they are on our team, and are rectangle
-		// selectable.  Otherwise buildings and units can be in a group.
-		// or enemy units and my units. Exceptions is when there is only
-		// one unit in the group, then we can group a buildings.
-		if (ThisPlayer->IsTeamed(units[i]) &&
-				(units[i]->Type->SelectableByRectangle ||
-					(nunits == 1 && group->NumUnits == 0))) {
+		// Add to group only if they are on our team
+		// Buildings can be in group but it "taint" the group.
+		// Taited groups normaly select only SelectableByRectangle units but
+		// you can force selection to show hiden members (with buildings) by 
+		// seletcing ALT-(SHIFT)-#
+		if (ThisPlayer->IsTeamed(units[i])) {
+			if (!group->tainted) {
+				group->tainted = units[i]->Type->SelectableByRectangle != true;
+			}
 			group->Units[group->NumUnits++] = units[i];
 			units[i]->GroupId |= (1 << num);
 		}
@@ -231,6 +247,17 @@ void RemoveUnitFromGroups(CUnit *unit)
 		// to a group easily, or make an easy array walk...
 		if (i < --group->NumUnits) {
 			group->Units[i] = group->Units[group->NumUnits];
+		}
+
+		if (group->tainted && !unit->Type->SelectableByRectangle) {
+			for (i = 0; i < group->NumUnits; ++i) {
+				if (group->Units[i]->Type && !group->Units[i]->Type->SelectableByRectangle) {
+					break;
+				}
+			}
+			if (i == group->NumUnits) {
+				group->tainted = 0;
+			}
 		}
 	}
 }

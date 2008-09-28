@@ -283,6 +283,8 @@ void CUnit::Init(CUnitType *type)
 		Variable = new CVariable[UnitTypeVar.GetNumberVariable()];
 		memcpy(Variable, Type->Variable,
 			UnitTypeVar.GetNumberVariable() * sizeof(*Variable));
+	} else {
+		Variable = NULL;
 	}
 
 	// Set a heading for the unit if it Handles Directions
@@ -925,13 +927,11 @@ void UnitLost(CUnit *unit)
 	//
 	if (player && player->AiEnabled) {
 		AiUnitKilled(unit);
-	}
-
-	//
-	//  Remove unit from its groups
-	//
-	if (unit->GroupId) {
-		if (player && !player->AiEnabled) {
+	} else {
+		//
+		//  Remove unit from its groups
+		//
+		if (unit->GroupId) {
 			RemoveUnitFromGroups(unit);
 		}
 	}
