@@ -183,6 +183,7 @@ public:
 
 	void Attack(int goalX, int goalY);
 	void Clean(void);
+	int PlanAttack(void);
 };
 
 	// forces
@@ -207,6 +208,14 @@ public:
 	AiForce &operator[](unsigned int index) {
 		return forces[index];
 	}
+
+	int getIndex(AiForce *force) {
+		for (unsigned int i = 0; i < forces.size(); ++i) {
+			if (force == &forces[i]) return i;
+		}
+		return -1;
+	}
+
 
 	inline unsigned int getScriptForce(unsigned int index) {
 		if (script[index] == -1) {
@@ -440,7 +449,6 @@ extern void AiForceManager(void);
 	/// Find a wall to attack
 extern int AiFindWall(AiForce *force);
 	/// Plan the an attack
-extern int AiPlanAttack(AiForce *force);
 	/// Send explorers around the map
 extern void AiSendExplorers(void);
 	/// Enemy units in distance

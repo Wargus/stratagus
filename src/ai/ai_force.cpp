@@ -88,13 +88,19 @@ struct AiForceAttackSender {
 	int delta;
 	
 	inline void operator() (CUnit *const unit) {
-		// To avoid lot of CPU consuption, send them with a small time difference.	
-		unit->Wait = delta;
-		++delta;
-		if (unit->Type->CanAttack) {
-			CommandAttack(unit, goalX, goalY, NULL, FlushCommands);
-		} else {
-			CommandMove(unit, goalX, goalY, FlushCommands);
+	// this may be problem if units are in bunker and we want sent
+	// them to attack
+	if (unit->Container == NULL) {
+			// To avoid lot of CPU consuption, send them with a small time difference.	
+			unit->Wait = delta;
+			++delta;
+			if (unit->Type->CanTransport() && unit->BoardCount > 0) {
+				CommandUnload(unit, goalX, goalY, NULL, FlushCommands);
+			} else if (unit->Type->CanAttack) {
+				CommandAttack(unit, goalX, goalY, NULL, FlushCommands);
+			} else /*if (force->State == 2) */{
+				CommandMove(unit, goalX, goalY, FlushCommands);
+			}
 		}
 	}	
 
@@ -364,7 +370,7 @@ void AiForce::Attack(int goalX, int goalY)
 				
 		if(goalX == -1 || goalY == -1) {
 			DebugPrint("%d: Need to plan an attack with transporter\n" _C_ AiPlayer->Player->Index);
-			if (State == AI_FORCE_STATE_WAITING && !AiPlanAttack(this)) {
+			if (State == AI_FORCE_STATE_WAITING && !PlanAttack()) {
 				DebugPrint("%d: Can't transport\n" _C_ AiPlayer->Player->Index);
 				Attacking = false;
 			}
@@ -624,65 +630,63 @@ void AiAttackWithForces(int *forces)
 }
 
 
-//FIXME: rb - I don't know if AI can use transport now
-#if 0
 /**
 **  Load all unit before attack.
 **
 **  @param aiForce force to group.
 */
-static void AiGroupAttackerForTransport(AiForce &aiForce)
+static void AiGroupAttackerForTransport(AiForce *aiForce)
 {
-	Assert(aiForce.State == AI_FORCE_STATE_BOARDING);
+	Assert(aiForce->State == AI_FORCE_STATE_BOARDING);
 
 	unsigned int nbToTransport = 0;
 	unsigned int transporterIndex = 0;
 	bool goNext = true;
 
-	for (; transporterIndex < aiForce.Units.size(); ++transporterIndex) {
-		const CUnit &unit = *aiForce.Units[transporterIndex];
+	for (; transporterIndex < aiForce->Size(); ++transporterIndex) {
+		const CUnit *unit = aiForce->Units[transporterIndex];
 
-		if (unit.Type->CanTransport && unit.Type->MaxOnBoard - unit.BoardCount > 0) {
-			nbToTransport = unit.Type->MaxOnBoard - unit.BoardCount;
+		if (unit->Type->CanTransport() && unit->Type->MaxOnBoard - unit->BoardCount > 0) {
+			nbToTransport = unit->Type->MaxOnBoard - unit->BoardCount;
 			break;
 		}
 	}
-	if (transporterIndex == aiForce.Units.size()) {
-		aiForce.State++;
+	if (transporterIndex == aiForce->Size()) {
+		aiForce->State++;
 		return ;
 	}
-	for (unsigned int i = 0; i < aiForce.Units.size(); ++i) {
-		const CUnit &unit = *aiForce.Units[i];
-		const CUnit &transporter = *aiForce.Units[transporterIndex];
+	for (unsigned int i = 0; i < aiForce->Size(); ++i) {
+		const CUnit *unit = aiForce->Units[i];
+		const CUnit *transporter = aiForce->Units[transporterIndex];
 
-		if (CanTransport(&transporter, &unit) && unit.Container == NULL) {
+		if (CanTransport(transporter, unit) && unit->Container == NULL) {
 			goNext = false;
 		}
 	}
 	if (goNext == true) {
-		aiForce.State++;
+		aiForce->State++;
 		return ;
 	}
-	for (unsigned int i = 0; i < aiForce.Units.size(); ++i) {
-		CUnit &unit = *aiForce.Units[i];
-		CUnit &transporter = *aiForce.Units[transporterIndex];
+	for (unsigned int i = 0; i < aiForce->Size(); ++i) {
+		CUnit *unit = aiForce->Units[i];
+		CUnit *transporter = aiForce->Units[transporterIndex];
 
-		if (transporter.IsIdle() && unit.Orders[0]->Goal == &transporter) {
-			CommandFollow(&transporter, &unit, 0);
+		if (transporter->IsIdle() && unit->CurrentOrder()->GetGoal() == transporter) {
+			CommandFollow(transporter, unit, 0);
 		}
-		if (CanTransport(&transporter, &unit) && unit.IsIdle() && unit.Container == NULL) {
-			CommandBoard(&unit, &transporter, FlushCommands);
-			CommandFollow(&transporter, &unit, 0);
+		if (CanTransport(transporter, unit) && unit->IsIdle() && unit->Container == NULL) {
+			CommandBoard(unit, transporter, FlushCommands);
+			CommandFollow(transporter, unit, 0);
 			if (--nbToTransport == 0) { // full : nxt transporter.
-				for (++transporterIndex; transporterIndex < aiForce.Units.size(); ++transporterIndex) {
-					const CUnit &transporter = *aiForce.Units[transporterIndex];
+				for (++transporterIndex; transporterIndex < aiForce->Size(); ++transporterIndex) {
+					const CUnit *transporter = aiForce->Units[transporterIndex];
 
-					if (transporter.Type->CanTransport) {
-						nbToTransport = transporter.Type->MaxOnBoard - transporter.BoardCount;
+					if (transporter->Type->CanTransport()) {
+						nbToTransport = transporter->Type->MaxOnBoard - transporter->BoardCount;
 						break ;
 					}
 				}
-				if (transporterIndex == aiForce.Units.size()) { // No more transporter.
+				if (transporterIndex == aiForce->Size()) { // No more transporter.
 					break ;
 				}
 			}
@@ -713,9 +717,9 @@ void AiForce::Update(void)
 		}	
 		return;
 	}
-#if 0
+
 	Attacking = false;
-	for (i = 0; i < Units.size(); ++i) {
+	for (i = 0; i < Size(); ++i) {
 		aiunit = Units[i];
 		if (aiunit->Type->CanAttack) {
 			Attacking = true;
@@ -723,9 +727,15 @@ void AiForce::Update(void)
 		}
 	}
 	if (Attacking == false) {
+		if (!Defending && State > 0) {
+			DebugPrint("%d: Attack force #%lu has lost all agresive units, giving up\n"
+				_C_ AiPlayer->Player->Index _C_ (this  - &(AiPlayer->Force[0])));		
+			Reset(true);
+		}
 		return ;
 	}
 
+#if 0
 	if (State == AI_FORCE_STATE_WAITING) {
 		if (!AiPlanAttack(force)) {
 			DebugPrint("Can't transport, look for walls\n");
@@ -736,11 +746,13 @@ void AiForce::Update(void)
 		}
 		State = AI_FORCE_STATE_BOARDING;
 	}
+#endif
+
 	if (State == AI_FORCE_STATE_BOARDING) {
-		AiGroupAttackerForTransport(*force);
+		AiGroupAttackerForTransport(this);
 		return ;
 	}
-#endif
+
 
 	// Find a unit that isn't idle
 	unit = NoUnitP;

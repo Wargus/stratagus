@@ -1570,14 +1570,9 @@ void MenuScreen::addLogicCallback(LuaActionListener *listener)
 void MenuScreen::draw(gcn::Graphics *graphics)
 {
 	if (this->drawUnder) {
-		gcn::Widget *w = Gui->getTop();
-		gcn::Widget *f = w->_getFocusHandler()->getFocused();
 		gcn::Rectangle r = Gui->getGraphics()->getCurrentClipArea();
 		Gui->getGraphics()->popClipArea();
 		Gui->draw(oldtop);
-		if (f) {
-			w->_getFocusHandler()->setFocus(f);
-		}
 		Gui->getGraphics()->pushClipArea(r);
 	}
 	gcn::Container::draw(graphics);

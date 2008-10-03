@@ -506,7 +506,7 @@ int AiFindWall(AiForce *force)
 **  @todo transporter are more selective now (flag with unittypeland).
 **         We must manage it.
 */
-int AiPlanAttack(AiForce *force)
+int AiForce::PlanAttack(void)
 {
 	unsigned char *watermatrix;
 	const CUnit *aiunit = NULL;
@@ -516,7 +516,7 @@ int AiPlanAttack(AiForce *force)
 	CUnit *transporter;
 
 	DebugPrint("%d: Planning for force #%lu of player #%d\n"_C_ AiPlayer->Player->Index
-	 _C_  (force - &(AiPlayer->Force[0])) _C_ AiPlayer->Player->Index);
+	 _C_  (this - &(AiPlayer->Force[0])) _C_ AiPlayer->Player->Index);
 
 	watermatrix = CreateMatrix();
 
@@ -525,8 +525,8 @@ int AiPlanAttack(AiForce *force)
 	// NOTE: finding free transportes was too much work for me.
 	//
 	state = 1;
-	for (unsigned int i = 0; i < force->Size(); ++i) {
-		aiunit = force->Units[i];
+	for (unsigned int i = 0; i < Size(); ++i) {
+		aiunit = Units[i];
 		if (aiunit->Type->CanTransport()) {
 			DebugPrint("%d: Transporter #%d\n" _C_ AiPlayer->Player->Index
 			 _C_ UnitNumber(aiunit));
@@ -563,35 +563,38 @@ int AiPlanAttack(AiForce *force)
 	// Find a land unit of the force.
 	// FIXME: if force is split over different places -> broken
 	//
-	if(CUnitTypeFinder(UnitTypeLand).Find(force->Units) == NULL) {
+	if(CUnitTypeFinder(UnitTypeLand).Find(Units) == NULL) {
 		DebugPrint("%d: No land unit in force\n" _C_ AiPlayer->Player->Index);
 		return 0;
 	}
 
-	x = force->GoalX;
-	y = force->GoalY;
+	x = GoalX;
+	y = GoalY;
 	if (AiFindTarget(aiunit, watermatrix, &x, &y, &state)) {
 		if (state != 1) { // Need transporter.
 			if (transporter) {
 				DebugPrint("%d: Assign any transporter\n" _C_ AiPlayer->Player->Index);
-				force->Units.Insert(transporter);
-				transporter->RefsIncrease();
+				if (transporter->GroupId) {
+					transporter->Player->Ai->Force[transporter->GroupId - 1].Remove(transporter);
+				}
+				Insert(transporter);
+				transporter->GroupId = transporter->Player->Ai->Force.getIndex(this) + 1;
 			}
 			int totalBoardCapacity = 0;
 			CUnit *transporterAdded = transporter;
 
 			// Verify we have enough transporter.
 			// @note: Minimal check for unitType (flyers...)
-			for (unsigned int i = 0; i < force->Units.size(); ++i) {
-				CUnit *aiunit = force->Units[i];
+			for (unsigned int i = 0; i < Size(); ++i) {
+				CUnit *aiunit = Units[i];
 
 				if (aiunit->Type->CanTransport()) {
 					totalBoardCapacity += aiunit->Type->MaxOnBoard - aiunit->BoardCount;
 					transporter = aiunit;
 				}
 			}
-			for (unsigned int i = 0; i < force->Units.size(); ++i) {
-				CUnit *aiunit = force->Units[i];
+			for (unsigned int i = 0; i < Size(); ++i) {
+				CUnit *aiunit = Units[i];
 
 				if (CanTransport(transporter, aiunit)) {
 					totalBoardCapacity--;
@@ -604,8 +607,11 @@ int AiPlanAttack(AiForce *force)
 
 					if (transporterAdded != aiunit && aiunit->Type->CanTransport() && aiunit->IsIdle()) {
 						DebugPrint("%d: Assign another transporter.\n"_C_ AiPlayer->Player->Index);
-						force->Units.Insert(aiunit);
-						aiunit->RefsIncrease();
+						if (aiunit->GroupId) {
+							aiunit->Player->Ai->Force[aiunit->GroupId - 1].Remove(aiunit);
+						}
+						Insert(aiunit);
+						aiunit->GroupId = aiunit->Player->Ai->Force.getIndex(this) + 1;
 						totalBoardCapacity += aiunit->Type->MaxOnBoard - aiunit->BoardCount;
 						if (totalBoardCapacity >= 0) {
 							break;
@@ -615,11 +621,11 @@ int AiPlanAttack(AiForce *force)
 			}
 		}
 		DebugPrint("%d: Can attack\n" _C_ AiPlayer->Player->Index);
-		force->GoalX = x;
-		force->GoalY = y;
-		force->MustTransport = state == 2;
+		GoalX = x;
+		GoalY = y;
+		MustTransport = state == 2;
 
-		force->State = AI_FORCE_STATE_BOARDING;
+		State = AI_FORCE_STATE_BOARDING;
 		return 1;
 	}
 	return 0;
