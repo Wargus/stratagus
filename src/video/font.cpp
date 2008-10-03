@@ -566,11 +566,9 @@ int CLabel::DoDrawText(int x, int y,
 }
 
 
-CLabel::CLabel(const CFont *f): font(f)
-{
-	normal = CFontColor::Get(DefaultNormalColorIndex);
-	reverse = CFontColor::Get(DefaultReverseColorIndex);
-}
+CLabel::CLabel(const CFont *f):
+	 normal(DefaultTextColor),reverse(ReverseTextColor),font(f)
+{}
 
 	/// Draw text/number unclipped
 int CLabel::Draw(int x, int y, const char*const text) const

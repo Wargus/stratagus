@@ -112,6 +112,19 @@ void MapUnmarkUnitGuard(CUnit *unit)
 	}
 }
 
+void UnHideUnit(CUnit *unit)
+{
+	const int action = unit->CurrentAction();
+	const bool mark_guard = (action == UnitActionStill || 
+						action == UnitActionStandGround) && 
+						unit->Variable[INVISIBLE_INDEX].Value > 0;
+	unit->Variable[INVISIBLE_INDEX].Value = 0;
+	if (mark_guard)
+	{
+		MapMarkUnitGuard(unit);
+	}					
+}
+
 /**
 **  Move in a random direction
 **

@@ -80,7 +80,7 @@ void AnimateActionAttack(CUnit *unit)
 	//  FIXME : wait a little.
 	if (!unit->Type->Animations || !unit->Type->Animations->Attack) {
 		FireMissile(unit);
-		unit->Variable[INVISIBLE_INDEX].Value = 0; // unit is invisible until attacks
+		UnHideUnit(unit);// unit is invisible until attacks
 		return;
 	}
 	UnitShowAnimation(unit, unit->Type->Animations->Attack);

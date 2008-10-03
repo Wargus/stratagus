@@ -775,7 +775,7 @@ void PlayersEachCycle(void)
 			for(unsigned int i = 0; i < autoatacktargets.size();) {
 				CUnit *aatarget = autoatacktargets[i];
 				if(!aatarget->IsAliveOnMap() ||
-					Map.Field(aatarget->X, aatarget->Y)->Guard[player] == 0) {
+					Map.Field(aatarget->Offset)->Guard[player] == 0) {
 					autoatacktargets.Units.erase(autoatacktargets.Units.begin() + i);
 					aatarget->RefsDecrease();
 					continue;

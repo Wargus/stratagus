@@ -153,6 +153,7 @@ extern void ResourceGiveUp(CUnit *unit);
 extern int GetNumWaitingWorkers(const CUnit *mine);
 extern void AutoAttack(CUnit *unit, CUnitCache &targets, bool stand_ground);
 extern void MapUnmarkUnitGuard(CUnit *unit);
+extern void UnHideUnit(CUnit *unit);
 
 	/// Generic still action
 extern void ActionStillGeneric(CUnit *unit, bool stand_ground);

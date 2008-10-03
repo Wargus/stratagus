@@ -2363,6 +2363,8 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 	cdist = 0; // current distance is 0
 	bestmine = NoUnitP;
 
+	CResourceFinder res_finder(resource, 1);
+
 	//
 	// Pop a point from stack, push all neighbors which could be entered.
 	//
@@ -2391,7 +2393,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 				//
 				// Look if there is a mine
 				//
-				if ((mine = ResourceOnMap(x, y, resource)) &&
+				if ((mine = res_finder.Find(Map.Field(x,y))) &&
 						mine->Type->CanHarvest &&
 						(resinfo->HarvestFromOutside ||
 							mine->Player->Index == PlayerMax - 1 ||
