@@ -101,6 +101,9 @@ static PatchButton MouseOverButton;
 static int MouseOverTileX;
 static int MouseOverTileY;
 
+static bool DraggingFlag;
+static bool SetFlagWhileDragging;
+
 
 static void DoScroll()
 {
@@ -164,16 +167,20 @@ static void PatchEditorCallbackButtonDown(unsigned button)
 		if (ButtonSpeed0 <= CurrentButton && CurrentButton <= ButtonSpeed7) {
 			// replace speed value
 			newFlag = (flag & ~MapFieldSpeedMask) | FlagMap[CurrentButton];
+			SetFlagWhileDragging = true;
 		} else {
 			// toggle flag
 			newFlag = flag ^ FlagMap[CurrentButton];
+			SetFlagWhileDragging = (flag & FlagMap[CurrentButton]) == 0;
 		}
 		Patch->getType()->setFlag(MouseOverTileX, MouseOverTileY, newFlag);
+		DraggingFlag = true;
 	}
 }
 
 static void PatchEditorCallbackButtonUp(unsigned button)
 {
+	DraggingFlag = false;
 }
 
 static void PatchEditorCallbackKeyDown(unsigned key, unsigned keychar)
@@ -255,6 +262,9 @@ static void PatchEditorCallbackMouse(int x, int y)
 {
 	HandleCursorMove(&x, &y);
 
+	int oldTileX = MouseOverTileX;
+	int oldTileY = MouseOverTileY;
+
 	GameCursor = UI.Point.Cursor;
 	MouseOverButton = ButtonNone;
 	MouseOverTileX = -1;
@@ -271,15 +281,32 @@ static void PatchEditorCallbackMouse(int x, int y)
 
 	// Patch area
 	if (0 <= x && x < Video.Width - PatchMenuWidth &&
-			0 <= y && y < Video.Height)
+		0 <= y && y < Video.Height)
 	{
 		int tileX = (x - (int)ScrollX) / TileSizeX;
 		int tileY = (y - (int)ScrollY) / TileSizeY;
 		if (0 <= tileX && tileX < Patch->getType()->getTileWidth() &&
-				0 <= tileY && tileY < Patch->getType()->getTileHeight())
+			0 <= tileY && tileY < Patch->getType()->getTileHeight())
 		{
 			MouseOverTileX = tileX;
 			MouseOverTileY = tileY;
+
+			if (DraggingFlag &&
+				(oldTileX == -1 || oldTileX != MouseOverTileX || oldTileY != MouseOverTileY))
+			{
+				unsigned short newFlag;
+				unsigned short flag = Patch->getType()->getFlag(MouseOverTileX, MouseOverTileY);
+				if (ButtonSpeed0 <= CurrentButton && CurrentButton <= ButtonSpeed7) {
+					newFlag = (flag & ~MapFieldSpeedMask) | FlagMap[CurrentButton];
+				} else {
+					if (SetFlagWhileDragging) {
+						newFlag = flag | FlagMap[CurrentButton];
+					} else {
+						newFlag = flag & (~FlagMap[CurrentButton]);
+					}
+				}
+				Patch->getType()->setFlag(MouseOverTileX, MouseOverTileY, newFlag);
+			}
 		}
 	}
 
