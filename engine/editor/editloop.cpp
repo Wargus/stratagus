@@ -1951,15 +1951,15 @@ static void EditorMainLoop()
 			//
 			// Map scrolling
 			//
-			if (UI.MouseScroll)
+			if (UI.MouseScroll && MouseScrollState != ScrollNone)
 			{
 				DoScrollArea(MouseScrollState, 0);
 			}
-			if (UI.KeyScroll)
+			if (UI.KeyScroll && KeyScrollState != ScrollNone)
 			{
 				DoScrollArea(KeyScrollState, (KeyModifiers & ModifierControl) != 0);
 				if (CursorOn == CursorOnMap && (MouseButtons & LeftButton) &&
-					(Editor.State == EditorEditPatch || Editor.State == EditorEditUnit))
+					Editor.State == EditorEditUnit)
 				{
 					EditorCallbackButtonDown(0);
 				}

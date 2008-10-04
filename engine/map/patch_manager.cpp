@@ -260,6 +260,7 @@ CPatchManager::clear()
 		for (i = this->patchTypesMap.begin(); i != this->patchTypesMap.end(); ++i) {
 			i->second->clean();
 		}
+		loadedAll = false;
 	}
 }
 
