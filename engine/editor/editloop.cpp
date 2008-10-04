@@ -1216,8 +1216,10 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case SDLK_DELETE:
 			if (PatchUnderCursor)
 			{
+				int cursorMapX = UI.SelectedViewport->Viewport2MapX(CursorX);
+				int cursorMapY = UI.SelectedViewport->Viewport2MapY(CursorY);
 				Map.PatchManager.remove(PatchUnderCursor);
-				PatchUnderCursor = NULL;
+				PatchUnderCursor = Map.PatchManager.getPatch(cursorMapX, cursorMapY);
 				UI.StatusLine.Set(_("Patch deleted"));
 				UpdateMinimapTerrain = true;
 			}
