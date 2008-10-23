@@ -1810,46 +1810,41 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 **  Find the next idle worker
 **
 **  @param player    Player's units to search through
-**  @param last      Previous idle worker selected
 **
 **  @return NoUnitP or next idle worker
 */
-CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last)
+CUnit *FindIdleWorker(const CPlayer *player)
 {
 	CUnit *unit;
-	CUnit *FirstUnitFound;
+	CUnit *firstUnitFound;
 	int nunits;
-	int i;
-	int SelectNextUnit;
+	bool selectNextUnit = false;
 
-	FirstUnitFound = NoUnitP;
-	if (last == NoUnitP) {
-		SelectNextUnit = 1;
-	} else {
-		SelectNextUnit = 0;
-	}
+	firstUnitFound = NoUnitP;
 
 	nunits = player->TotalNumUnits;
 
-	for (i = 0; i < nunits; ++i) {
+	for (int i = 0; i < nunits; ++i) {
 		unit = player->Units[i];
 		if (unit->Type->Harvester && !unit->Removed) {
 			if (unit->Orders[0]->Action == UnitActionStill) {
-				if (SelectNextUnit && !IsOnlySelected(unit)) {
+				if (selectNextUnit) {
 					return unit;
 				}
-				if (FirstUnitFound == NULL) {
-					FirstUnitFound = unit;
+				if (firstUnitFound == NoUnitP) {
+					// Use the first possible unit if we can't select next
+					firstUnitFound = unit;
+				}
+				if (!selectNextUnit && IsOnlySelected(unit)) {
+					// If this unit is selected, select next unit
+					selectNextUnit = true;
 				}
 			}
 		}
-		if (unit == last) {
-			SelectNextUnit = 1;
-		}
 	}
 
-	if (FirstUnitFound != NoUnitP && !IsOnlySelected(FirstUnitFound)) {
-		return FirstUnitFound;
+	if (firstUnitFound != NoUnitP && !IsOnlySelected(firstUnitFound)) {
+		return firstUnitFound;
 	}
 
 	return NoUnitP;

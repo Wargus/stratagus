@@ -856,7 +856,7 @@ extern bool UnitHoldsResources(const CUnit *unit);
 	/// Find resource
 extern CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource = -1);
 	/// Find the next idle worker
-extern CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last);
+extern CUnit *FindIdleWorker(const CPlayer *player);
 
 	/// @todo more docu
 extern CUnit *UnitOnScreen(int x, int y);
