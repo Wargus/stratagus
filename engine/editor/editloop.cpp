@@ -1660,9 +1660,11 @@ static void EditorCallbackMouse(int x, int y)
 		if (PatchUnderCursor)
 		{
 			ShowPatchInfo(PatchUnderCursor);
+			HandleMouseScrollArea(x, y);
 			return;
 		}
 	}
+
 	//
 	// Scrolling Region Handling
 	//
