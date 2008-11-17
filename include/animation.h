@@ -9,7 +9,7 @@
 //
 /**@name animation.h - The animations headerfile. */
 //
-//      (c) Copyright 2005-2007 by Jimmy Salmon
+//      (c) Copyright 2005-2008 by Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-typedef enum AnimationType {
+enum AnimationType {
 	AnimationNone,
 	AnimationFrame,
 	AnimationExactFrame,

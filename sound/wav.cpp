@@ -9,7 +9,7 @@
 //
 /**@name wav.cpp - wav support */
 //
-//      (c) Copyright 2003-2007 by Lutz Sammer, Fabrice Rossi and Nehal Mistry
+//      (c) Copyright 2003-2008 by Lutz Sammer, Fabrice Rossi and Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -296,7 +296,7 @@ CSample *LoadWav(const std::string &name, int flags)
 		((CSampleWav *)sample)->Data.WavFile = f;
 		data = &((CSampleWav *)sample)->Data;
 	}
-	sample->Channels = wavfmt.Channels;
+	sample->Channels = (unsigned char)wavfmt.Channels;
 	sample->SampleSize = wavfmt.SampleSize * 8 / sample->Channels;
 	sample->Frequency = wavfmt.Frequency;
 	sample->BitsPerSample = wavfmt.BitsPerSample;
