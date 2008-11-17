@@ -9,7 +9,7 @@
 //
 /**@name results.h - The game results headerfile. */
 //
-//      (c) Copyright 2002-2007 by Lutz Sammer, Francois Beerten and Jimmy Salmon
+//      (c) Copyright 2002-2008 by Lutz Sammer, Francois Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
 /**
 **  Possible outcomes of the game.
 */
-typedef enum GameResults {
+enum GameResults {
 	GameNoResult,  /// Game has no result
 	GameVictory,   /// Game was won
 	GameDefeat,    /// Game was lost

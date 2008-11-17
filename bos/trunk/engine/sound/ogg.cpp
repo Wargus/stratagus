@@ -449,7 +449,7 @@ CSample *LoadVorbis(const std::string &name, int flags)
 			f->read(buf, 8192);
 			ogg_sync_wrote(&sync, 8192);
 			if (ogg_sync_pageout(&sync, &pg) == 1 && ogg_page_eos(&pg)) {
-				total = ogg_page_granulepos(&pg) * 2 * sample->Channels;
+				total = (int)(ogg_page_granulepos(&pg) * 2 * sample->Channels);
 				break;
 			}
 		}

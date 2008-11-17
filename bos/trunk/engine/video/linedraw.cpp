@@ -9,7 +9,7 @@
 //
 /**@name linedraw.cpp - The general linedraw functions. */
 //
-//      (c) Copyright 2000-2006 by Lutz Sammer, Stephan Rasenberg,
+//      (c) Copyright 2000-2008 by Lutz Sammer, Stephan Rasenberg,
 //                                 Jimmy Salmon, and Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -117,7 +117,7 @@ static void VideoDoDrawTransPixel16(Uint32 color, int x, int y, unsigned char al
 	dp = *p;
 	dp = ((dp << 16) | dp) & 0x07E0F81F;
 	dp = ((((dp - color) * alpha) >> 5) + color) & 0x07E0F81F;
-	*p = (dp >> 16) | dp;
+	*p = (Uint16)((dp >> 16) | dp);
 }
 
 /**
@@ -1237,7 +1237,11 @@ void DrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 	float xx1, yy1, xx2, yy2;
 	GLubyte r, g, b, a;
 
-	xx1 = x1; xx2 = x2; yy1 = y1; yy2 = y2;
+	xx1 = (float)x1;
+	xx2 = (float)x2;
+	yy1 = (float)y1;
+	yy2 = (float)y2;
+
 	if (xx1 <= xx2) {
 		xx2 += 0.5f;
 	} else {
