@@ -710,7 +710,8 @@ static int CclGetCompileFeature(lua_State *l)
 /**
 **  Send command to ccl.
 **
-**  @param command  Zero terminated command string.
+**  @param command      Zero terminated command string.
+**  @param exitOnError  Exit if an error occurs.
 */
 int CclCommand(const std::string &command, bool exitOnError)
 {
