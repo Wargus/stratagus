@@ -139,13 +139,13 @@ static void DoScroll()
 			Patch->getType()->getGraphic()->Width < (Video.Width - PatchMenuWidth)) {
 		ScrollX = 0.f;
 	} else if (ScrollX > Patch->getType()->getGraphic()->Width - (Video.Width - PatchMenuWidth)) {
-		ScrollX = Patch->getType()->getGraphic()->Width - (Video.Width - PatchMenuWidth);
+		ScrollX = (float)(Patch->getType()->getGraphic()->Width - (Video.Width - PatchMenuWidth));
 	}
 	if (ScrollY < 0.f ||
 			Patch->getType()->getGraphic()->Height < Video.Height) {
 		ScrollY = 0.f;
 	} else if (ScrollY > Patch->getType()->getGraphic()->Height - Video.Height) {
-		ScrollY = Patch->getType()->getGraphic()->Height - Video.Height;
+		ScrollY = (float)(Patch->getType()->getGraphic()->Height - Video.Height);
 	}
 }
 

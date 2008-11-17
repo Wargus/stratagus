@@ -1233,7 +1233,7 @@ static void NetworkResendCommands(void)
 	packet.Header.Type[0] = MessageResend;
 	packet.Header.Type[1] = MessageNone;
 	packet.Header.Cycle =
-		(GameCycle / NetworkUpdates) * NetworkUpdates + NetworkUpdates;
+		(Uint8)((GameCycle / NetworkUpdates) * NetworkUpdates + NetworkUpdates);
 
 	NetworkBroadcast(&packet, 1);
 }

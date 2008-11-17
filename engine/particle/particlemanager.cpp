@@ -113,7 +113,7 @@ CPosition CParticleManager::getScreenPos(const CPosition &pos)
 	int x = (int)pos.x;
 	int y = (int)pos.y;
 	vp->MapPixel2Viewport(x, y);
-	return CPosition(x, y);
+	return CPosition((float)x, (float)y);
 }
 
 //@}
