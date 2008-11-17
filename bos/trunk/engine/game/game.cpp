@@ -212,7 +212,7 @@ static int WriteMapPresentation(const std::string &mapname, CMap *map)
 /**
 **  Write the map setup file.
 **
-**  @param mapsetup  map filename
+**  @param mapSetup  map filename
 **  @param map       map to save
 */
 int WriteMapSetup(const char *mapSetup, CMap *map)
