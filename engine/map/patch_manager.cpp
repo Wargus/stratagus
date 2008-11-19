@@ -77,7 +77,9 @@ CPatchManager::updateMapFlags(int x1, int y1, int x2, int y2)
 			int offsetX, offsetY;
 			CPatch *patch = this->getPatch(i, j, &offsetX, &offsetY);
 			if (patch) {
-				Map.Field(i, j)->Flags = patch->getType()->getFlag(offsetX, offsetY);
+				unsigned short flags = patch->getType()->getFlag(offsetX, offsetY);
+				Map.Field(i, j)->Flags = flags;
+				Map.Field(i, j)->Cost = 1 << (flags & MapFieldSpeedMask); 
 			}
 		}
 	}
