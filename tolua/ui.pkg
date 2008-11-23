@@ -12,6 +12,7 @@ class LuaActionListener
 class CUIButton
 {
 	CUIButton();
+	~CUIButton();
 
 	int X;
 	int Y;
