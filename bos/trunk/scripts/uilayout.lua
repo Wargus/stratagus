@@ -98,6 +98,10 @@ UI.Fillers:push_back(b)
 UI.InfoPanel.X = Video.Width - 200
 UI.InfoPanel.Y = 152
 
+if (UI.SingleSelectedButton ~= nil) then
+  UI.SingleSelectedButton:delete()
+  UI.SingleSelectedButton = nil
+end
 b = CUIButton:new()
 b.X = Video.Width - 200 + 13
 b.Y = 152 + 16
@@ -127,6 +131,10 @@ UI.MaxSelectedFont = Fonts["game"]
 UI.MaxSelectedTextX = Video.Width - 200 + 10
 UI.MaxSelectedTextY = 152 + 10
 
+if (UI.SingleTrainingButton ~= nil) then
+  UI.SingleTrainingButton:delete()
+  UI.SingleTrainingButton = nil
+end
 b = CUIButton:new()
 b.X = Video.Width - 200 + 13
 b.Y = 152 + 91
