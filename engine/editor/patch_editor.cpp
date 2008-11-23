@@ -528,7 +528,9 @@ static void PatchEditorMainLoop()
 	Gui->setTop(oldTop);
 	delete PatchEditorContainer;
 	delete saveButton;
+	delete saveButtonListener;
 	delete exitButton;
+	delete exitButtonListener;
 }
 
 static void PatchAddIcon(int x, int y, CGraphic *g, PatchButton b)

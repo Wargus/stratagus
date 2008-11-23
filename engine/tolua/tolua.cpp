@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 03/04/08 21:10:06.
+** Generated automatically by tolua++-1.0.92 on Sun Nov 23 11:52:38 2008.
 */
 
 #ifndef __cplusplus
@@ -736,6 +736,35 @@ static int tolua_stratagus_CUIButton_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: delete of class  CUIButton */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CUIButton_delete00
+static int tolua_stratagus_CUIButton_delete00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"CUIButton",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  CUIButton* self = (CUIButton*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'delete'",NULL);
+#endif
+  delete self;
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'delete'.",&tolua_err);
  return 0;
 #endif
 }
@@ -19292,6 +19321,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_function(tolua_S,"new",tolua_stratagus_CUIButton_new00);
    tolua_function(tolua_S,"new_local",tolua_stratagus_CUIButton_new00_local);
    tolua_function(tolua_S,".call",tolua_stratagus_CUIButton_new00_local);
+   tolua_function(tolua_S,"delete",tolua_stratagus_CUIButton_delete00);
    tolua_variable(tolua_S,"X",tolua_get_CUIButton_X,tolua_set_CUIButton_X);
    tolua_variable(tolua_S,"Y",tolua_get_CUIButton_Y,tolua_set_CUIButton_Y);
    tolua_variable(tolua_S,"Text",tolua_get_CUIButton_Text,tolua_set_CUIButton_Text);
