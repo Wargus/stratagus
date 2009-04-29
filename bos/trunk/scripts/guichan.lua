@@ -9,7 +9,7 @@
 --
 --      guichan.lua - The main UI lua script.
 --
---      (c) Copyright 2005-2008 by François Beerten
+--      (c) Copyright 2005-2009 by François Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -318,12 +318,6 @@ Widget:setGlobalFont(Fonts["large"])
 
 
 -- Define the different menus ----------
-
-function RunSubMenu(s)
-  local menu
-  menu = BosMenu(_("Empty sub menu"))
-  menu:run()
-end
 
 function RunResultsMenu()
   local menu
