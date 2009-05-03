@@ -66,7 +66,7 @@ extern int sprintf_s(char *dest, size_t destSize, const char *format, ...);
 
 inline char *new_strdup(const char *str)
 {
-	int len = strlen(str) + 1;
+	size_t len = strlen(str) + 1;
 	char *newstr = new char[len];
 	strcpy_s(newstr, len, str);
 	return newstr;

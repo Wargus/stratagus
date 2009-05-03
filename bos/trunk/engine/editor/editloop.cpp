@@ -1754,23 +1754,25 @@ void CEditor::Init()
 	if (!*CurrentMapPath)
 	{
 		InitUnitTypes(1);
-		//
-		// Inititialize Map / Players.
-		//
 		InitPlayers();
+
 		for (i = 0; i < PlayerMax; ++i)
 		{
-			if (i == PlayerNumNeutral)
+			int playerType = PlayerNobody;
+
+			if (i == 0 || i == 1)
 			{
-				CreatePlayer(PlayerNeutral);
-				Map.Info.PlayerType[i] = PlayerNeutral;
-				Map.Info.PlayerSide[i] = 0;
+				// New maps should have 2 players by default
+				playerType = PlayerPerson;
 			}
-			else
+			else if (i == PlayerNumNeutral)
 			{
-				CreatePlayer(PlayerNobody);
-				Map.Info.PlayerType[i] = PlayerNobody;
+				playerType = PlayerNeutral;
 			}
+
+			CreatePlayer(playerType);
+			Map.Info.PlayerType[i] = playerType;
+			Map.Info.PlayerSide[i] = 0;
 		}
 
 		Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
@@ -2000,6 +2002,37 @@ static void EditorMainLoop()
 }
 
 /**
+**  Validate the width and height of the map
+**
+**  @param width   Width of the map
+**  @param height  Height of the map
+*/
+static void ValidateMapSize(int &width, int &height)
+{
+	// Make sure we have good values
+	if (width < 32)
+	{
+		fprintf(stderr, "Invalid map width, using default value\n");
+		width = 32;
+	}
+	else if (width > MaxMapWidth)
+	{
+		fprintf(stderr, "Invalid map width, using default value\n");
+		width = MaxMapWidth;
+	}
+	if (height < 32)
+	{
+		fprintf(stderr, "Invalid map height, using default value\n");
+		height = 32;
+	}
+	else if (height > MaxMapHeight)
+	{
+		fprintf(stderr, "Invalid map height, using default value\n");
+		height = MaxMapHeight;
+	}
+}
+
+/**
 **  Start the editor
 **
 **  @param filename  Map to load, empty string to create a new map
@@ -2027,27 +2060,7 @@ void StartEditor(const std::string &filename)
 		// new map, choose some default values
 		strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), "");
 		Map.Info.Description.clear();
-		// Make sure we have good values
-		if (Map.Info.MapWidth < 32)
-		{
-			fprintf(stderr, "Invalid map width, using default value\n");
-			Map.Info.MapWidth = 32;
-		}
-		else if (Map.Info.MapWidth > MaxMapWidth)
-		{
-			fprintf(stderr, "Invalid map width, using default value\n");
-			Map.Info.MapWidth = MaxMapWidth;
-		}
-		if (Map.Info.MapHeight < 32)
-		{
-			fprintf(stderr, "Invalid map height, using default value\n");
-			Map.Info.MapHeight = 32;
-		}
-		else if (Map.Info.MapHeight > MaxMapHeight)
-		{
-			fprintf(stderr, "Invalid map height, using default value\n");
-			Map.Info.MapHeight = MaxMapHeight;
-		}
+		ValidateMapSize(Map.Info.MapWidth, Map.Info.MapHeight);
 	}
 	
 	// Run the editor.
