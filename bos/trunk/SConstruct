@@ -8,7 +8,7 @@
 ##          This file is part of Bos Wars.
 ##
 ##      SConstruct build file. See http://www.scons.org for info about scons.
-##      (c) Copyright 2005-2008 by Francois Beerten
+##      (c) Copyright 2005-2009 by Francois Beerten
 ##
 ##      Stratagus is free software; you can redistribute it and/or modify
 ##      it under the terms of the GNU General Public License as published
