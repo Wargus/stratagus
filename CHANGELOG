@@ -2,7 +2,8 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
-- Fix header includes for GCC 4.4 (François Beerten)
+- Remove incomplete Dorcoz unit (Francois Beerten)
+- Fix header includes for GCC 4.4 (Francois Beerten)
 - Add the "grass" set of patches (Johannes Engelhardt)
 - Added undo and redo to the editor (Jimmy Salmon)
 - Add new defeat background graphic (Johannes Engelhardt)
