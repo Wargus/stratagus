@@ -9,7 +9,7 @@
 //
 /**@name translate.cpp - Translate languages. */
 //
-//      (c) Copyright 2005-2007 by Jimmy Salmon
+//      (c) Copyright 2005-2009 by Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@
 
 #include <map>
 #include <string>
+#include <cstdio>
 
 #include "translate.h"
 #include "iolib.h"
