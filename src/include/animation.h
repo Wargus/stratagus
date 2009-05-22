@@ -40,7 +40,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-typedef enum AnimationType {
+enum AnimationType {
 	AnimationNone,
 	AnimationFrame,
 	AnimationExactFrame,

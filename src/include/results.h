@@ -36,7 +36,7 @@
 /**
 **  Possible outcomes of the game.
 */
-typedef enum GameResults {
+enum GameResults {
 	GameNoResult,  /// Game has no result
 	GameVictory,   /// Game was won
 	GameDefeat,    /// Game was lost

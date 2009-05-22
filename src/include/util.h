@@ -46,6 +46,7 @@
 #endif
 #else
 #include <unistd.h>
+#include <pthread.h>
 #endif
 
 inline int get_cpu_count(void) {

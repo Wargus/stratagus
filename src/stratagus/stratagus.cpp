@@ -630,7 +630,7 @@ void Exit(int err)
 	lua_close(Lua);
 #endif
 
-	fprintf(stdout, _("Thanks for playing Stratagus.\n"));
+	fprintf(stdout, "%s", _("Thanks for playing Stratagus.\n"));
 	exit(err);
 }
 

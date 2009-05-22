@@ -693,7 +693,6 @@ static void AiGroupAttackerForTransport(AiForce *aiForce)
 		}
 	}
 }
-#endif
 
 /**
 ** Force on attack ride. We attack until there is no unit or enemy left.
