@@ -55,8 +55,14 @@ fi
 if test -d /usr/include/lua50; then
 	CPPFLAGS="$CPPFLAGS -I/usr/include/lua50"
 fi
+if test -d /usr/include/lua5.0; then
+	CPPFLAGS="$CPPFLAGS -I/usr/include/lua5.0"
+fi
 if test -d /usr/include/lua51; then
 	CPPFLAGS="$CPPFLAGS -I/usr/include/lua51"
+fi
+if test -d /usr/include/lua5.1; then
+	CPPFLAGS="$CPPFLAGS -I/usr/include/lua5.1"
 fi
 
 dnl --- EXTRA DIRS -------------
