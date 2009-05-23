@@ -120,7 +120,7 @@ clean::
 
 distclean:	clean
 	for i in $(MODULES_ALL); do \
-	[ $(OBJDIR) == "." ] || $(RM) -r $$i/$(OBJDIR); \
+	[ $(OBJDIR) = "." ] || $(RM) -r $$i/$(OBJDIR); \
 	$(RM) $$i/.#* $$i/*~; done
 	$(RM) $(OUTFILE) $(OUTFILE).exe gmon.sum .depend .#* *~ stderr.txt stdout.txt \
 	srcdoc/* .depend Rules.make config.log config.status configure
