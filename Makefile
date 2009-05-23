@@ -224,6 +224,9 @@ bin-dist-gl: all
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
 
+deb-dist:
+	debuild binary
+
 #----------------------------------------------------------------------------
 
 win32-bin-dist2: win32
