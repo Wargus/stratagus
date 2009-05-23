@@ -232,6 +232,12 @@ else
 fi
 
 
+if test "$datadir" = "NONE"; then
+	STRATAGUS_LIB_PATH="."
+else
+	STRATAGUS_LIB_PATH="$datadir"
+fi
+AC_SUBST(STRATAGUS_LIB_PATH)
 
 if test "$prefix" = "NONE"; then
 	PREFIX=/usr/local

@@ -17,7 +17,9 @@ MAKE=make
 # Prefix for 'make install'
 PREFIX=@PREFIX@
 
-CPPFLAGS=@DEFS@ @CPPFLAGS@ -DUSE_ZLIB -I$(TOPDIR) -I$(TOPDIR)/src/include -I$(TOPDIR)/src/guichan/include
+STRATAGUS_LIB_PATH=@STRATAGUS_LIB_PATH@
+
+CPPFLAGS=@DEFS@ @CPPFLAGS@ -DUSE_ZLIB -I$(TOPDIR) -I$(TOPDIR)/src/include -I$(TOPDIR)/src/guichan/include -DSTRATAGUS_LIB_PATH="\"@STRATAGUS_LIB_PATH@\""
 CXXFLAGS=@CXXFLAGS@
 LDFLAGS=@LDFLAGS@ -lpng -lz -lm
 
