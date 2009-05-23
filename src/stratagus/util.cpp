@@ -540,7 +540,7 @@ void CThread::Terminate ()
   if (m_bRunning)
   {
 #if !defined (__unix)
-	TerminateThread(m_hndlThread, 0)
+    TerminateThread(m_hndlThread, 0);
 #else 
     pthread_cancel(m_dThreadID);
 #endif
