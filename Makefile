@@ -28,12 +28,13 @@ TOPDIR=	.
 
 RULESFILE ?= Rules.make
 WINRULESFILE = Rules.make.WIN32
+OUTFILE ?= stratagus
 
 -include $(TOPDIR)/$(RULESFILE)
 
 OBJDIR ?= .
 
-CROSSDIR = /usr/local/cross
+CROSSDIR ?= /usr/local/cross
 
 INCLUDE_DIRS = src/include
 
@@ -100,30 +101,30 @@ doc::
 all-src: make-objdir $(OBJ)
 
 stratagus: $(OBJ) 
-	$(CXX) -o stratagus $^ $(CXXFLAGS) $(LDFLAGS)
+	$(CXX) -o $(OUTFILE) $^ $(CXXFLAGS) $(LDFLAGS)
 
 strip:
-	@if [ -f stratagus ]; then strip stratagus; fi
-	@if [ -f stratagus.exe ]; then $(CROSSDIR)/i386-mingw32msvc/bin/strip stratagus.exe; fi
+	@if [ -f $(OUTFILE) ]; then strip $(OUTFILE); fi
+	@if [ -f $(OUTFILE).exe ]; then $(CROSSDIR)/i386-mingw32msvc/bin/strip $(OUTFILE).exe; fi
 
 src/$(OBJDIR)/stratagusrc.o: src/stratagus.rc
 	if [ ! -d src/$(OBJDIR) ]; then mkdir src/$(OBJDIR); fi
 	cd src; windres -o $(OBJDIR)/stratagusrc.o stratagus.rc; cd ..
 
 clean::
-	$(RM) -rf $(OBJ)
+	$(RM) -r $(OBJ)
 	for i in $(MODULES_ALL); do \
-	$(RM) -rf $$i/*.doc; done
+	$(RM) -r $$i/*.doc; done
 	$(RM) core gmon.out cscope.out *.doc 
 	@echo
 
 distclean:	clean
 	for i in $(MODULES_ALL); do \
-	[ $(OBJDIR) == "." ] || $(RM) -rf $$i/$(OBJDIR); \
+	[ $(OBJDIR) == "." ] || $(RM) -r $$i/$(OBJDIR); \
 	$(RM) $$i/.#* $$i/*~; done
-	$(RM) -f stratagus stratagus.exe gmon.sum .depend .#* *~ stderr.txt stdout.txt \
+	$(RM) $(OUTFILE) $(OUTFILE).exe gmon.sum .depend .#* *~ stderr.txt stdout.txt \
 	srcdoc/* .depend Rules.make config.log config.status configure
-	$(RM) -rf autom4te.cache/
+	$(RM) -r autom4te.cache/
 	@echo
 
 depend:
@@ -183,7 +184,7 @@ dist: distlist
 	echo $(MISC) >>$(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
 	echo $(CONTRIB) >>$(DISTLIST)
-	rm -rf $(distdir)
+	$(RM) -r $(distdir)
 	mkdir $(distdir)
 	chmod 777 $(distdir)
 	for i in `cat $(DISTLIST)`; do echo $$i; done | while read j; do cp -a --parents $$j $(distdir); done
@@ -199,7 +200,7 @@ bin-dist: all
 	$(RM) $(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
 	echo stratagus >>$(DISTLIST)
-	rm -rf $(distdir)
+	$(RM) -r $(distdir)
 	mkdir $(distdir)
 	chmod 777 $(distdir)
 	for i in `cat $(DISTLIST)`; do echo $$i; done | while read j; do cp -a --parents $$j $(distdir); done
@@ -212,13 +213,13 @@ bin-dist: all
 bin-dist-gl: all
 	$(RM) $(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
-	echo stratagus >>$(DISTLIST)
+	echo $(OUTFILE) >>$(DISTLIST)
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 777 $(distdir)
 	for i in `cat $(DISTLIST)`; do echo $$i; done | while read j; do cp -a --parents $$j $(distdir); done
 	chmod -R a+rX $(distdir)
-	strip -s -R .comment $(distdir)/stratagus
+	strip -s -R .comment $(distdir)/$(OUTFILE)
 	tar czhf stratagus-$(mydate)-linux-gl.tar.gz $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
@@ -228,13 +229,13 @@ bin-dist-gl: all
 win32-bin-dist2: win32
 	@$(RM) $(DISTLIST)
 	@echo $(DOCS) >>$(DISTLIST)
-	@echo stratagus.exe >>$(DISTLIST)
+	@echo $(OUTFILE).exe >>$(DISTLIST)
 	@rm -rf $(distdir)
 	@mkdir $(distdir)
 	@chmod 777 $(distdir)
 	@for i in `cat $(DISTLIST)`; do echo $$i; done | while read j; do cp -a --parents $$j $(distdir); done
 	@chmod -R a+rX $(distdir)
-	@strip -s -R .comment $(distdir)/stratagus.exe
+	@strip -s -R .comment $(distdir)/$(OUTFILE).exe
 	@echo "(c) 2003 by the Stratagus Project http://Stratagus.Org" | \
 	zip -zq9r stratagus-$(mydate)-win32bin.zip $(distdir)
 	@$(RM) $(DISTLIST)
@@ -310,11 +311,11 @@ win32distclean:
 install:	all install-stratagus
 
 install-stratagus:
-	install -m 755 stratagus $(PREFIX)/bin
+	install -m 755 $(OUTFILE) $(PREFIX)/bin
 	@echo installation of stratagus complete
 
 uninstall:
 	@echo uninstalling stratagus and stratagus tools
-	rm $(PREFIX)/bin/stratagus
+	rm $(PREFIX)/bin/$(OUTFILE)
 	@echo uninstallation of stratagus complete
 
