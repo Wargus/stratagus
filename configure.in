@@ -231,19 +231,20 @@ else
 	LDFLAGS="$LDFLAGS `$SDLCONFIG --static-libs`"
 fi
 
+test "$prefix" = "NONE" && prefix=/usr/local
+datarootdir=.
+test "$datadir" = "NONE" && datadir=$datarootdir
 
-if test "$datadir" = "NONE"; then
-	STRATAGUS_LIB_PATH="."
-else
-	STRATAGUS_LIB_PATH="$datadir"
-fi
-AC_SUBST(STRATAGUS_LIB_PATH)
+eval PKGDATADIR="$datadir"
+AC_DEFINE_UNQUOTED(PKGDATADIR, "$PKGDATADIR",
+	[Define this to the path containing the game data.]
+)
+AC_SUBST(PKGDATADIR)
 
-if test "$prefix" = "NONE"; then
-	PREFIX=/usr/local
-else
-	PREFIX="$prefix"
-fi
+eval PREFIX="$prefix"
+AC_DEFINE_UNQUOTED(PREFIX, "$PREFIX",
+	[Define this to the prefix of the path to install stratagus to.]
+)
 AC_SUBST(PREFIX)
 
 if test "$ARCH" = "win32"; then
