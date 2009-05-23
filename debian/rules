@@ -69,8 +69,10 @@ install: build
 	dh_installdirs
 
 	OUTFILE="./stratagus-opengl" $(MAKE) install-stratagus PREFIX=$(CURDIR)/debian/stratagus-gl/usr
-	OUTFILE="./stratagus-no_opengl" $(MAKE) install-stratagus PREFIX=$(CURDIR)/debian/stratagus/usr
+	mv $(CURDIR)/debian/stratagus-gl/usr/bin $(CURDIR)/debian/stratagus-gl/usr/games/stratagus-opengl
 
+	OUTFILE="./stratagus-no_opengl" $(MAKE) install-stratagus PREFIX=$(CURDIR)/debian/stratagus/usr
+	mv $(CURDIR)/debian/stratagus/usr/bin $(CURDIR)/debian/stratagus/usr/games/stratagus-no_opengl
 
 # Build architecture-independent files here.
 binary-indep: build install
