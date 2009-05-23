@@ -94,7 +94,7 @@ typedef struct _OLD_INTERFACE_INFO
 	(int)(((ad) >> 24) & 0xff), (int)(((ad) >> 16) & 0xff), \
 	(int)(((ad) >> 8) & 0xff), (int)((ad) & 0xff)
 
-#ifdef USE_WIN32
+#ifdef USE_WINSOCK
 typedef SOCKET Socket;
 #else
 typedef int Socket;
