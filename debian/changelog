@@ -1,0 +1,508 @@
+stratagus (2.2.5-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- M. Gerhardy <tlh2000@users.sf.net>  Sat, 23 May 2009 10:51:08 +0200
+
+stratagus (2.1-8) unstable; urgency=low
+
+  * Let's see if we can calm Guilherme de S. Pastore. :-) (thanks for the
+    severe revision and sending patches).
+    - debian/control:
+      - Removed bogus ${misc:Depends} dependency (closes: #291102).
+      - Changed build dependency to libpng12-dev (closes: #303702).
+    - README now does not point to unshipped doc/install.html file (closes:
+    #298146).
+    - debian/copyright: Copyright and license are now clearly differentiated
+    (closes: #291098).
+    - Installed doc-base section for stratagus and stratagus-gl (closes:
+    #291103).
+
+ -- David Martínez Moreno <ender@debian.org>  Fri, 22 Apr 2005 17:26:35 +0200
+
+stratagus (2.1-7) unstable; urgency=low
+
+  * src/sdl.c: Imported from upstream CVS a fix for bug #268711 (stratagus unpauses when
+    minimized). Closes: #268711.
+  * debian/control: Applied patch from Guilherme de S. Pastore. In fact,
+    decided later to rewrite parts of Description fields to fit more closely
+    what stratagus is today. Closes: #268486.
+  * debian/stratagus.6: Fixed grammar mistakes, by Guilherme de S. Pastore.
+    Closes: #268488.
+
+ -- David Martínez Moreno <ender@debian.org>  Fri,  1 Oct 2004 11:34:52 +0200
+
+stratagus (2.1-6) unstable; urgency=low
+
+  * src/movie/movie.c: Added code to disable movies. Then disabled movies on
+    Alpha, due to segfaults in vp31 code. In next releases theora will be
+    used, which could be safe, but now it is avoiding to have updated
+    stratagus into sarge (closes: #261147).
+  * debian/rules, debian/control: Removed old stuff inherited from the
+    freecraft package. Stratagus, unlike FreeCraft, no longer use SVGAlib.
+
+ -- David Martínez Moreno <ender@debian.org>  Wed, 11 Aug 2004 09:12:11 +0200
+
+stratagus (2.1-5) unstable; urgency=low
+
+  * Really replaced the right upstream authors that Gilherme suggested in
+    debian/copyright. Ooops...
+  * debian/control: followed the guidelines for short description in the
+    Developers's Manual and decapitalized them.
+  * Argh. In 2.1-2 I added a superfluous /data to the default gamedir in
+    src/include/stratagus.h. Sorry. Thanks, Encolpe DEGOUTE (closes: #263183).
+
+ -- David Martínez Moreno <ender@debian.org>  Thu,  5 Aug 2004 19:34:22 +0200
+
+stratagus (2.1-4) unstable; urgency=low
+
+  * Fixed date and version in stratagus.6 manpage.
+  * debian/control: I keep forgetting that versioned Depends on virtual
+    packages DOES NOT WORK. Thanks to Yann Dirson for pointing this on bug
+    #260562. So removed the Provides: stratagus on stratagus-gl section. This
+    will be work for dataset, depending either on stratagus or stratagus-gl.
+
+ -- David Martínez Moreno <ender@debian.org>  Wed, 21 Jul 2004 14:32:17 +0200
+
+stratagus (2.1-3) unstable; urgency=low
+
+  * Big thanks to Guilherme de S. Pastore, who was *very* interested in
+    stratagus being packaged and did preliminar packages. He also provided a
+    lot of patches for current packages. You rock!
+  * Mmmm...it seems that I did not really fixed #259305 in 2.1-2, but another
+    different thing. Now the authors are really who they are.
+  * Fixed the manpage, it was a bit obsolete, and made references to Aleona
+    and fcmp. Also updated the authors' names (closes: #259309).
+  * debian/control:
+    - Removed autoconf references and removed configure removals. Sorry for
+      the annoyance.
+    - stratagus-gl provides stratagus.
+  * debian/rules: Removed Linux-specific check (closes: #259311).
+
+ -- David Martínez Moreno <ender@debian.org>  Tue, 20 Jul 2004 18:42:37 +0200
+
+stratagus (2.1-2) unstable; urgency=low
+
+  * debian/control:
+    - Added autoconf (closes: #258450).
+    - Stratagus is a realtime strategy game and not a realtime fantasy game.
+      Changed Description (Thanks, François Beerten).
+    - Cutted down too long lines in Description.
+  * It seems that stratagus 2.0-1 changelog was not processed. Closes:
+    #204661, #245692).
+  * debian/rules: By error switched lines and the epoch section of the fake
+    freecraft package was run before dh_gencontrol. Anyway, building of fake
+    freecraft packages is disabled by now, so this is not really important.
+  * Added some checks to the main Makefiles and added real use of OUTFILE
+    variable. This permitted to split package in stratagus and stratagus-gl
+    packages (with OpenGL disabled and enabled, respectively). This closes:
+    #258167.
+  * Added quotes in debian/*.menu for avoiding lintian warnings.
+  * Removed README.Debian, remnant from the FreeCraft times.
+  * Finally remembered to add a default dataset in include/stratagus.h
+    (/usr/share/games/stratagus/default) for running 'stratagus' alone.
+
+ -- David Martínez Moreno <ender@debian.org>  Mon, 12 Jul 2004 01:33:55 +0200
+
+stratagus (2.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * freecraft legacy packages are at this moment not built. As Guillerme said,
+    the upgrade path is not clear.
+
+ -- David Martínez Moreno <ender@debian.org>  Fri,  2 Jul 2004 15:27:21 +0200
+
+stratagus (2.0-1) unstable; urgency=low
+
+  * Many things had happened to give a complete explanation. Summarizing,
+    FreeCraft project was obligued to cease by Blizzard pressure. This package
+    is the official fork of the FreeCraft Project, thus continuing the superb
+    work of the many developers adhered to this project. Good bye, FreeCraft,
+    and long and peaceful life, Stratagus!
+  * I decided to maintain all the previous structure and create fake packages
+    to make the transition as smooth as possible.
+  * New upstream release (closes: #204661).
+  * Stratagus is packaged, so this closes the ITP (closes: #245692).
+  * debian/changelog: Changed to UTF-8.
+  * debian/copyright: Changed to UTF-8.
+  * debian/control:
+    - Added missing ${misc:Depends}.
+    - Changed to UTF-8.
+    - Added dependencies on libvorbis-dev and liblualib50-dev, and removed
+      bash by fixing the bashism in Makefile.
+    - The Description field now shows reality, not dreams. :-) (addresses
+      part of #197286).
+  * debian/rules: Cleaned all the freecraft references and rewritten some
+    parts to adapt to the new build system.
+  * debian/menu: Changed things to Stratagus.
+  * Removed debian/TODO.
+  * Updated stratagus manpage.
+
+ -- David Martínez Moreno <ender@debian.org>  Thu, 13 May 2004 19:40:26 +0200
+
+freecraft (1:1.18-1) unstable; urgency=medium
+
+  * New upstream release (closes: #182909). This really fixes the fcmp
+    breakage as well (closes: #185657).
+  * This is a much more advanced version, with tons of bugs fixed (literally).
+  * Options are now saved (closes: #177305).
+  * Save & Load is working now for single player (closes: #168800).
+  * This bug is unreproducible and it's probably fixed in this version,
+    whatever it were (closes: #167119).
+  * arts support was born in the middletime (not built in yet). More to come.
+    We have really had arts support before with libsdl1.2-arts...
+  * debian/patches: Dropped by now 02_sound_big_endian (merged upstream) and
+    04_64bit_archs_fix (makes freecraft campaigns segfault). The rest of the
+    patches went resynced. This brings freecraft campaign game again into life
+    (closes: #173645, #185069).
+  * debian/control: Bumped debhelper dependency to >> 4.0.0. Updated
+    dependencies to reflect the gcc-3.2 transition. Depends on fcmp
+    >=1.18.20030311. Dropped the Build-Conflicts because of 03_setup_fixes
+    patch. Now is more safe to build freecraft.
+  * debian/rules: Moved DH_COMPAT to debian/compat as joeyh recommends.
+    Rewrote several parts, because it was going messy. Fully support for debug
+    builds, with profiling included.
+  * This release has good sound. Please reopen if not fixed (closes: #163135).
+  * The font used for the buttons is now different, thus not making that
+    strange effect (closes: #137279).
+  * The tools for importing WCII data into freecraft are *not* working yet.
+    Added to README.Debian. Read it for details.
+
+ -- David Martínez Moreno <ender@debian.org>  Sun, 23 Mar 2003 04:27:24 +0100
+
+freecraft (1:1.17.2-5) unstable; urgency=low
+
+  * Added more options and completed the yet incomplete freecraft.6 manpage.
+  * debian/patches/04_64bit_archs_fix: Added nice patch from Steve Langasek
+    (the Debian postmodern programmer :-) for building really-working
+    freecraft binaries for 64-bit architectures (more to come). Closes:
+    #170603.
+  * Bumped Standards-Version to 3.5.8.
+  * debian/rules: s/debug/noopt/ in order to comply with Policy 3.5.8. Also
+    removed ChangeLog.html from doc/ directory because we already ship it as
+    changelog.gz.
+  * debian/control: Changed Standards-Version, removed last full-stop from
+    Description: line in order to kill lintian warning.
+
+ -- David Martínez Moreno <ender@debian.org>  Tue, 17 Dec 2002 01:53:24 +0100
+
+freecraft (1:1.17.2-4) unstable; urgency=low
+
+  * debian/patches/02_sound_big_endian: Fix for the sound on big-endian
+    architectures (ppc and the rest). Thanks, Ethan Benson, for remembering
+    it :-) (closes: #145777).
+  * debian/control: Bumped again libpng dependencies to libpng3.
+
+ -- David Martínez Moreno <ender@debian.org>  Tue, 27 Aug 2002 01:03:49 +0200
+
+freecraft (1:1.17.2-3) unstable; urgency=low
+
+  * debian/control: Removed g++ from the ia64 build environment.
+
+ -- David Martínez Moreno <ender@debian.org>  Mon,  8 Jul 2002 23:36:22 +0200
+
+freecraft (1:1.17.2-2) unstable; urgency=low
+
+  * debian/control: Added g++-3.0 for ia64 hoping that finally that fix the
+    autobuilds. Also bumped dependencies for fcmp (I recalled this in the very
+    moment I uploaded new version of freecraft). This will close #152057, but
+    this is work for fcmp changelog.
+  * Thanks to linda, added doc/ChangeLog.html as upstream changelog, and
+    removed doc/install.html from package.
+  * Finally added support for svgalib-dummyg1, so closes: #143260.
+
+ -- David Martínez Moreno <ender@debian.org>  Sat,  6 Jul 2002 10:22:39 +0200
+
+freecraft (1:1.17.2-1) unstable; urgency=low
+
+  * New upstream release.
+  * CVS sync as of 05 Jul 2002. This is just version 1.17.2 final.
+  * Lutz Summer, Jimmy Salmon, and the rest of the FreeCraft team keep killing
+    bugs at a extraordinary rate. The summary of the changes is:
+    - Fixed red/blue color for water in minimap (closes: #148697).
+    - Revamped Load & Save dialogs and routines. This has rendered #148285
+      unreproducible, so closes: #148285.
+    - Activated again the network menus (but not from command line). 1.17.2
+      games are incompatible with 1.17 network games.
+    - Fixed many memory leaks and crashes.
+    - Added global options, for resolution, fog mode, full-screen, etc.
+    - Added a simple map editor (primary intended for developers) in
+      FreeCraft. Not to replace crafted, but to give more flexibility to the
+      developers (crafted is far more user-friendly).
+    - Added a 'capture building' option with peons.
+    - Added Alt-R, Ctrl-R hotkeys to restart scenario.
+  * debian/control: Added Suggests: crafted.
+
+ -- David Martínez Moreno <ender@debian.org>  Fri,  5 Jul 2002 15:25:05 +0200
+
+freecraft (1:1.17-2) unstable; urgency=low
+
+  * Uups. I forgot to remove my ccache tests from the setup file. Sorry,
+    autobuilders. :-( (closes: #148570).
+  * CVS sync as of 05 Jun 2002. This is version 1.17.1pre1.
+    It kills several bugs (with the wrapper, and with multiplayer issues).
+    Also implements screenshots (even with a hotkey!).
+  * The multiplayer API is dropped at the moment. Changed freecraft.6 and
+    dropped patch #02_help_fixes.
+  * Now there is a hotkey to save the current game, Alt+Ctrl+S. BTW, I'm
+    unable to reproduce now #148285. Alfie?
+  * debian/control: Downgrade the libpng requirements to libpng2 (>=1.0.12).
+  * debian/answers.*: Upstream keeps changing the read semantic in setup, so
+    changed again to cope with the new (old) format. :-)
+  * Sorry, ia64 folks, for not really changing the compiler to gcc-3.0 in
+    1.17-1. Now I'm sure I've made the changes. Hope that works. This closes:
+    #143246.
+
+ -- David Martínez Moreno <ender@debian.org>  Tue, 18 Jun 2002 10:55:57 +0200
+
+freecraft (1:1.17-1) unstable; urgency=low
+
+  * New upstream release. This is FreeCraft 1.17 (final release)! (closes:
+    #148432).
+  * Changes in this release are many (as always, see doc/Changelog.html for
+    the gory details):
+    - Water effect intro screen (cool!).
+    - Multiple views in the screen (cooler!).
+    - Fixed a lot of bugs (coolest!).
+    - Diplomacy over network, enhanced usability.
+    - Network menus finally work (closes: #139150).
+    - Added more shortcuts.
+  * Added an epoch due to the versions scheme in previous releases.
+  * Cleaned a bit the debian/ dir.
+  * debian/control:
+    - Adjusted dependencies. freecraft needs at least fcmp version
+      1.17.20020526.
+    - Build-Conflicts with libmad0-dev and libflac-dev. I don't want by any
+      means to break my delicate answering machine for the setup.
+    - Changed the compiler to gcc-3.0 in ia64. gcc-2.96 is making a bad job
+      building freecraft (in fact, trying to).
+  * debian/answers.*: Upstream changed again the parsing procedure in
+    setup...this is becoming funny :-). Fixed.
+  * Enhanced the freecraft.6 manpage.
+  * debian/patches: Updated a little in order to fix offsets.
+
+ -- David Martínez Moreno <ender@debian.org>  Thu, 30 May 2002 11:31:23 +0200
+
+freecraft (1.17pre1build18-2) unstable; urgency=low
+
+  * CVS sync as of 09 May 2002. Changes:
+    - Support for complete campaign/level in a zip file.
+    - Scenario requester now remembers path during one game.
+    - Other fixes.
+  * Ryan Murray is the fastest autobuilder in the world. The package was in
+    incoming for minutes and he filed a bug against freecraft autobuilding...
+    :-) Now 01_cvs_pull patch exists (closes: #146355). Thanks, guy!
+
+ -- David Martínez Moreno <ender@debian.org>  Thu,  9 May 2002 10:58:18 +0200
+
+freecraft (1.17pre1build18-1) unstable; urgency=low
+
+  * New upstream release. This is build18.
+  * CVS sync as of 30 Apr 2002. The relevant changes (see
+    /usr/share/doc/freecraft/doc/Changelog.html for details) are:
+    - More fixes for the new OGG/MP3/WAV/FLAC support.
+    - The campaign menu is now configurable (closes: #143301).
+    - Added lots of control options (volume, keyboard, etc.).
+    - Fixed a bunch of other bugs.
+  * Upstream changed setup behaviour, so changed answers.* file format.
+  * This release, like previous ones, adds more stuff to freecraft.6 manpage.
+  * debian/patches: Fixed offsets in several of them.
+  * debian/control: Corrected description (thanks, Meinolf Sander). Closes:
+    #143185.
+
+ -- David Martínez Moreno <ender@debian.org>  Thu,  9 May 2002 08:44:54 +0200
+
+freecraft (1.17pre1build17-1) unstable; urgency=medium
+
+  * New upstream release. This is build17.
+  * CVS sync as of 8 Apr 2002 (closes: #139835). The relevant changes (for the
+    gory details see /usr/share/doc/freecraft/doc/Changelog.html) are:
+    - This release fixes several crashes observed by the most extensive tester
+      that freecraft in Debian has: Daniel Burrows (that I've noticed, maybe
+      there are others :-) .
+    - CD player support for libcda, SDL and madmp3.
+    - Flac, OGG and MP3 audio format added (not compiled in because are
+      unstable yet).
+    - Randomize start positions in network play, by Daniel Burrows (closes:
+      #137737).
+    - Added a lot of new displayings.
+    - Added more unit selection tools.
+    - Units now has an autogenerated name :-).
+    - Added big map mode (Alt-B, Ctrl-B).
+    - A lot of cosmetic issues (scrolling credits, pictures between
+      missions, stereo sound for missiles and units...)
+    - Fixed a bunch of other bugs.
+  * debian/control:
+    - Dropped definitely the bogus dependency on libsdl1.2debian-all, as
+      Daniel Burrows has nicely explained to me with patience (many thanks to
+      Daniel). Also modified the description accordingly. This closes: #137275.
+    - Depends: on new release of fcmp, because the old causes freecraft to
+      segfault sometimes (almost always for me).
+    - **Architectures field changed back to 'any'**. I'd like comments on this
+      issue, please. Is freecraft working on your sparc/alpha/mips/m68k/etc.
+      well? I'll keep looking at the autobuilders logs, but user experience is
+      the most reliable test. Closes: #140537.
+  * Compiled in with SDL_CD support. The rest of the new features (Flac, OGG,
+    MP3...) will have to wait.
+  * Commented out the line #include "rdtsc.h" in src/map/map_{draw,fog}.c and
+    src/ai/new_ai.c that were preventing freecraft from being compiled on all
+    the Debian architectures. This should deal with several open bugs. We'll
+    see...(closes: #54455, #110165).
+  * Compiled with -fsigned-char because the code is making a lot of
+    assumptions about the signedness of char data type. This deals with the
+    remaining part of #137338 and closes #140882, so closes: #137338, #140882.
+    Still remain probably many errors about signedness of other data types.
+    Please report them and send patches if you can.
+  * Also included the tools in /usr/lib/games/freecraft for converting the
+    original WarCraft II artwork to data format understood by freecraft, but
+    I'm not really supporting them yet (you're warned).
+  * debian/rules: Added support for debian/patches.
+  * Moved most of my modifications to debian/patches, as well as the CVS patch.
+  * Corrected freecraft.6 manpage, and added yet more stuff to it (closes:
+    #141517). At last we'll have a complete manpage, after all. :-)
+
+ -- David Martínez Moreno <ender@debian.org>  Tue, 16 Apr 2002 00:14:32 +0200
+
+freecraft (1.17pre1build16-4) unstable; urgency=low
+
+  * The 'Yes, I need more sleep, and also to test my releases' release.
+  * debian/control: Dropped for now dependency on freecraft-data because
+    we needed a versioned Depends against fcmp (and I found by any chance
+    that versioned dependency on virtual packages doesn't work).
+    Closes: #138392.
+  * Added some cruft to freecraft.6 manpage.
+
+ -- David Martínez Moreno <ender@debian.org>  Fri, 15 Mar 2002 10:45:14 +0100
+
+freecraft (1.17pre1build16-3) unstable; urgency=low
+
+  * CVS synced as of 3-10-2002.
+  * Lots of improvements:
+    - AI is now much better and clever, uses transports, and has several
+      things fixed.
+    - There is basic support for campaigns (also the last release of fcmp
+      had support in it, but I didn't think about it and things broke.)
+      Now this closes: #138361.
+    - CD player support with SDL.
+    - Added triggers support.
+    - And lots of other things, specially this release deals with the
+      segfault reported by Daniel Burrows, so closes: #137710.
+    - If you're interested, see the last 20 lines in doc/ChangeLog.html.
+  * Closing bugs fixed with the previous release (closes: #137875).
+  * Some signedness problems are addressed, but there are so many of
+    them in the code that I'll get some time fixing (see #137338).
+  * debian/control: Updated description, and added a tigher dependency
+    on fcmp (>=200203xx).
+  * Updated a lot the freecraft.6 manpage (still needs some polishing :-).
+
+ -- David Martínez Moreno <ender@debian.org>  Fri, 15 Mar 2002 01:20:24 +0100
+
+freecraft (1.17pre1build16-2) unstable; urgency=low
+
+  * Something weird happened with my upload to the new incoming
+    system, because it REJECTED my final upload on March 6th but
+    accepted a broken upload on March 1rd. :-? Some bugs were not
+    fixed yet, and ... eeerkk. Also aj and others are messing me
+    with advices and ... let's release this version at last.
+  * Get in sync with *my* version of freecraft. The following are
+    the lines that the 1.17pre1build16-1 release missed:
+    * Dear ftpmasters, this package is *really* ale-clone (with
+      another name).
+    * debian/control:
+      - Changed Architectures field. Now I'm sure that, at this moment,
+        freecraft won't compile on other architectures apart from i386
+        and alpha. This has to do with bug #54455 (ale-clone: not for
+        m68k?).
+    * I accept my NMU :-), so closes: #101414.
+    * Added a menu entry (closes: #57676).
+  * Now, it happens that Daniel Burrows has reviewed thoroughly freecraft
+    and filed several bugs (sadly most of them fixed in my real release).
+    Thank you, guy. :-)
+  * From the sync: Defined FREECRAFT_LIB_PATH as /usr/share/games/freecraft/default
+    in order to use the alternatives set up in fcmp.
+  * From the sync: Freecraft is again usable from any place you want (this and
+    the above closes: #137276).
+  * From the sync: Freecraft has a menu entry (closes: #57676, #137278).
+  * debian/control:
+    - Among other things, dropped doc generation (aj says that it's stupid).
+    - Changed Build-Depends to make svgalibg1-dev i386 only (address part
+      from #137338).
+  * Changed build options for non-i386 architectures, because svgalib only
+    exists on i386 (address part from #137338).
+  * Fixed width to less than 80 columns in README.Debian (closes: #137566).
+  * Freecraft built with new libSDL.
+
+ -- David Martínez Moreno <ender@debian.org>  Mon, 11 Mar 2002 05:25:29 +0100
+
+freecraft (1.17pre1build16-1) unstable; urgency=low
+
+  * Yes, I know that this package is not ale-clone anymore, but I
+    want to close (or maybe have noted) the bugs in ale-clone. The
+    bugs that this release close are relative to ale-clone, not
+    freecraft (an almost new package). But this release closes
+    several RC bugs, so I'm not really worried about closing bugs from
+    here.
+  * New upstream release and name change (closes: #94202).
+  * New maintainer (closes: #119258).
+  * Built with HAVE_EXPANSION, for preparing it for an eventual use
+    with non-free data (e.g. WarCraft II(tm) CD).
+  * debian/ files rewritten from scratch.
+  * debian/control:
+    - Added doc++ dependency for building the documentation.
+    - Upstream has changed the name of the package, so I've added
+      corresponding Conflicts/Provides.
+    - It seems that this release will be compatible with FCMP (FreeCraft Media
+      Project) out of the box. Because we need some game data, and we _want_
+      freecraft in main, I changed definitively the section and added Depends
+      on freecraft-data. Welcome to main, freecraft!
+    - Added Build-Conflicts on the various flavors of libsdl1.2debian and
+      a Build-Depends on libsdl1.2debian-all. This also closes: #104785,
+      #121684, #135325.
+    - Corrected typos in the description (closes: #124409).
+  * Fixed a lot of typos in the documentation.
+  * make depend is failing, so I've added $(EXTRA_CFLAGS) into Common.mk in
+    order to make gcc -E happy.
+  * I'm very anxious to see if buildd's can cope with this package.
+    Upstream claims that it'll compile. Time will say...
+  * Configured /usr/share/games/freecraft/data as the data directory.
+  * FreeCraft can now use X Windows System with 8/15/16/24/32bit X Server, so
+    this means that now closes: #127870.
+  * I accept my NMU :-), so closes: #121684.
+
+ -- David Martínez Moreno <ender@debian.org>  Fri,  1 Mar 2002 02:52:44 +0100
+
+freecraft (1.17pre1build15-1) unstable; urgency=low
+
+  * New maintainer (closes: #119258).
+  * New upstream release (closes: #94202).
+
+ -- David Martínez Moreno <ender@debian.org>  Wed, 27 Feb 2002 00:13:57 +0100
+
+ale-clone (1.15pre16.3-1.1) unstable; urgency=low
+
+  * NMU.
+  * Added #include <time.h> in src/clone/clone.c (closes: #101414).
+  * Added missing Build-Depends on debhelper, glib and others.
+
+ -- David Martínez Moreno <david.martinez@rediris.es>  Sat, 10 Nov 2001 05:13:35 +0100
+
+ale-clone (1.15pre16.3-1) unstable; urgency=low
+
+  * New upstream release.
+
+  * Added a `-d datapath' option.
+  * Moved data directory to /usr/share/games/ale-clone/WarII (rather than
+    .../data)
+  * Added some alternatives stuff to make cogliati gfx and WarII gfx mix
+    better. (From /usr/share/games/ale-clone/default)
+  * Renamed ale-clone-installer to ale-clone-war2.
+
+ -- Anthony Towns <ajt@debian.org>  Sun,  2 Jan 2000 00:40:25 +1000
+
+ale-clone (1.14.990122-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Anthony Towns <ajt@debian.org>  Tue,  7 Sep 1999 16:36:50 +1000
+
+  vim:ai:et:sts=2:sw=2:tw=78:

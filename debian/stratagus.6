@@ -1,0 +1,89 @@
+.TH STRATAGUS 6 "Jul 2004" "Stratagus v2.1"
+.SH NAME
+stratagus \- Realtime strategy game
+.SH SYNOPSIS
+.B stratagus
+.I "[-c file.ccl] [-d datapath] [-D depth] [-e] [-f factor] [-F] [-l logfile] [-L lag] [-n [localport:]host[:port]]
+.I [-N name] [-p\ nplayers] [-h] [map.pud|map.pud.gz|map.cm|map.cm.gz]"
+.SH "DESCRIPTION"
+This manual page documents briefly the flags that you can give to
+.BR stratagus
+, formerly known as FreeCraft, formerly known as ALE Clone.
+.PP
+.B stratagus
+is a powerful game engine for building realtime strategy games, a la AoE or WarCraft.
+.SH OPTIONS
+A summary of options is included below.
+.TP
+.B \-h
+Show summary of all options.
+.TP
+.B \-c file.ccl
+Choose a different clone config file.
+.TP
+.B \-d datapath
+Choose a different directory to use for game data files.
+.TP
+.B \-D depth
+Set the video mode depth, often called 'bpp' or 'bits per pixel'. This
+option is only valid for Win32/NT.
+.TP
+.B \- e
+Start the editor included in Stratagus.
+.TP
+.B \-f factor
+With this parameter you will set up the relative cost for the computer's units.
+Default is 100. If you set this to a higher value, computer will have to spend
+more resources for creating units, and viceversa.
+.TP
+.B \-F
+With this option you can start Stratagus in full screen video mode. This
+option is only supported if you have compiled stratagus with SDL support.
+.TP
+.B \-h
+This flag shows the online help.
+.TP
+.B \-l file
+With this option you can log stratagus messages into \fBfile\fR.
+.TP
+.B \-L lag
+This sets the network lag in number of frames (default 10 = 333 ms).
+.TP
+.B \-n [localport:]host[:port]
+With this option you can specify the network arguments for network play.
+.TP
+.B \-N name
+The name of the player (will appear in network games).
+.TP
+.B \-P port
+With this option you can set the network port to use in network games.
+The default value is port tcp/6660.
+.TP
+.B \-s number
+Number of frames before AI awakes. This is useful if the AI is beating
+you hard, and you want to make it sweet like a cat. The higher, the easier
+will be the game against the AI. Default is to sleep 0 time frames.
+.SH "FILES"
+.TP
+.B /usr/share/games/stratagus/default
+Default directory for Stratagus data files
+.TP
+.B /usr/share/games/stratagus/default/default.pud.gz
+Default PUD.
+.TP
+.B /usr/share/games/stratagus/default/ccl/clone.ccl
+Default start file.
+.SH "SEE ALSO"
+More complete documentation is available in /usr/share/doc/stratagus.
+.SH NOTES
+Stratagus needs a lot of data (maps and artwork), that can come from
+external datasets, like Battle of Survival (BoS), or even from the media
+in the WarCraft II CD, thanks to the Wargus dataset.
+.PP
+WarCraft II is a registered trademark of Blizzard Entertainment.
+.SH AUTHOR
+Stratagus is written by Nehal Mistry, Russell Smith and others.
+.PP
+This manual page was written by Anthony Towns <ajt@debian.org> and
+David Martínez Moreno <ender@debian.org> for the Debian GNU/Linux
+system (but may be used by others).

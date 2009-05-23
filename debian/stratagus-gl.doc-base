@@ -1,0 +1,12 @@
+Document: stratagus-gl
+Title: Debian Stratagus Manual
+Author: The Stratagus Team
+Abstract: This manual describes what Stratagus is
+ and how it can be used to
+ manage online manuals on Debian systems.
+Section: games
+
+Format: HTML
+Index: /usr/share/doc/stratagus-gl/doc/index.html
+Files: /usr/share/doc/stratagus-gl/doc/*.html
+

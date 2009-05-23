@@ -1,0 +1,30 @@
+This package was firstly debianized by David Martínez Moreno <ender@debian.org> on
+Thu, 14 Feb 2004 21:43:26 +0100.
+
+It was downloaded from http://stratagus.sf.net/
+
+Upstream Authors: Jimmy Salmon <jsalmon3@users.sourceforge.net>
+		  Russel Smith <mr-russ@users.sourceforge.net>
+		  Nehal Mistry <nehalmistry@users.sourceforge.net>
+
+Copyright: (C) 1998-2005 by The Stratagus Project.
+
+License:
+
+   This package is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 dated June, 1991.
+
+   This package is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this package; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+   02111-1307, USA.
+
+On Debian GNU/Linux systems, the complete text of the GNU General
+Public License can be found in `/usr/share/common-licenses/GPL'.
+

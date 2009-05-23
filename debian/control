@@ -1,0 +1,59 @@
+Source: stratagus
+Section: games
+Priority: optional
+Maintainer: David Martínez Moreno <ender@debian.org>
+Build-Depends: libsdl1.2-dev (>> 1.2.2), libvorbis-dev, 
+ libpng12-dev (>= 1.2.5), libbz2-dev, liblua5.1-dev, debhelper (>> 4.0.0), 
+ libpthread-stubs0-dev
+Standards-Version: 3.6.1
+
+Package: stratagus
+Architecture: any
+Suggests: stratagus-data
+Depends: ${shlibs:Depends}
+Conflicts: stratagus-gl
+Description: realtime strategy game for Unix and X
+ Stratagus is a free cross-platform real-time strategy gaming engine.
+ It includes support for playing over Internet/LAN, or playing vs.
+ computer opponents. The engine is configurable and can be used to
+ create games with a wide-range of features specific to your needs.
+ .
+ Stratagus started as a clone of the realtime fantasy strategy game
+ WarCraft II from Blizzard Entertainment, although it is used now as a
+ game engine to build other games, sci-fi or fantasy ones.
+ .
+ This is the stable release of Stratagus, and is both fairly playable and
+ fairly bug-free. It also has network connectivity for up to 8 players.
+ .
+ Please note that you have available an OpenGL-enabled version of this
+ game. Install stratagus-gl package.
+ .
+ This version is compiled with some of the possible options, and thus has
+ gzip, bunzip2, and SDL support. The sound options will depend on your
+ personal election on SDL packages.
+
+Package: stratagus-gl
+Architecture: any
+Suggests: stratagus-data
+Depends: ${shlibs:Depends}
+Conflicts: stratagus
+Description: realtime strategy game for Unix and X - OpenGL version
+ Stratagus is a free cross-platform real-time strategy gaming engine.
+ It includes support for playing over Internet/LAN, or playing vs.
+ computer opponents. The engine is configurable and can be used to
+ create games with a wide-range of features specific to your needs.
+ .
+ Stratagus started as a clone of the realtime fantasy strategy game
+ WarCraft II from Blizzard Entertainment, although it is used now as a
+ game engine to build other games, sci-fi or fantasy ones.
+ .
+ This is the stable release of Stratagus, and is both fairly playable and
+ fairly bug-free. It also has network connectivity for up to 8 players.
+ .
+ Please note that this is an OpenGL-enabled package. If stratagus is very
+ slow is probably due to not having hardware-enabled OpenGL. Switch to
+ stratagus package, built with OpenGL support disabled.
+ .
+ This version is compiled with some of the possible options, and thus has
+ gzip, bunzip2, SDL and OpenGL support. The sound options will depend on
+ your personal election on SDL packages.

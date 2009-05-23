@@ -1,0 +1,98 @@
+#!/usr/bin/make -f
+# debian/rules that uses debhelper.
+# GNU copyright 1997 to 1999 by Joey Hess.
+# GNU Copyright 2002-2004 by David Martínez Moreno.
+
+# Do you want verbosity...? Uncomment this.
+#export DH_VERBOSE=1
+
+export LC_ALL=C
+
+# We have to honor DEB_BUILD...
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+CONFIGURE_FLAGS += --enable-profile
+endif
+
+DEB_BUILD_GNU_CPU ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
+
+CONFIGURE_FLAGS=--prefix=/usr --datadir=/usr/share/games/stratagus/default
+
+export CFLAGS
+
+configure: configure-stamp
+
+configure-stamp-opengl:
+	dh_testdir
+
+	./autogen.sh
+	./configure --with-opengl $(CONFIGURE_FLAGS)
+
+	touch configure-stamp-opengl
+
+configure-stamp-no_opengl:
+	dh_testdir
+
+	./autogen.sh
+	./configure --without-opengl $(CONFIGURE_FLAGS)
+
+	touch configure-stamp-no_opengl
+
+build: build-stamp-opengl build-stamp-no_opengl
+
+build-stamp-opengl: configure-stamp-opengl
+	dh_testdir
+
+	OUTFILE="./stratagus-opengl" $(MAKE)
+
+	touch build-stamp-opengl
+
+build-stamp-no_opengl: configure-stamp-no_opengl
+	dh_testdir
+
+	OUTFILE="./stratagus-no_opengl" $(MAKE)
+
+	touch build-stamp-no_opengl
+
+clean: 
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp* configure-stamp*
+
+	-OUTFILE="./stratagus-opengl ./stratagus-no_opengl" $(MAKE) distclean
+
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+	OUTFILE="./stratagus-opengl" $(MAKE) install-stratagus PREFIX=$(CURDIR)/debian/stratagus-gl/usr
+	OUTFILE="./stratagus-no_opengl" $(MAKE) install-stratagus PREFIX=$(CURDIR)/debian/stratagus/usr
+
+
+# Build architecture-independent files here.
+binary-indep: build install
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+#	dh_installdebconf	
+	dh_installdocs -Xgpl.html -Xgpl.txt -Xinstall.html
+	dh_installmenu
+	dh_installman
+	dh_installchangelogs doc/ChangeLog.html
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install configure
+
