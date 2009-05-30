@@ -280,7 +280,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 		const int width = type->TileWidth;
 		int w, h = type->TileHeight;
 		bool success = false;
-		CMapField *mf; 
+		CMapField *mf;
 
 		// Need at least one coast tile
 		unsigned int index = Map.getIndex(x, y);
@@ -288,13 +288,13 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 			mf = Map.Field(index);
 			w = width;
 			do {
-				//if (Map.CoastOnMap(x ,y)) {			
+				//if (Map.CoastOnMap(x ,y)) {
 				if((mf->Flags & MapFieldCoastAllowed) == MapFieldCoastAllowed) {
 					success = true;
 				}
 				++mf;
 			} while(!success && --w);
-			index += Map.Info.MapWidth; 
+			index += Map.Info.MapWidth;
 		} while(!success && --h);
 		if (!success) {
 			return NULL;
@@ -316,8 +316,8 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 				}
 			}
 		}
-		return NULL;		
-	}	
+		return NULL;
+	}
 	return (unit == NULL) ? (CUnit *)1 : const_cast<CUnit *>(unit);
 }
 
@@ -335,7 +335,7 @@ bool CanBuildOn(int x, int y, int mask)
 	return (Map.Info.IsPointOnMap(x,y) && !Map.CheckMask(x, y,mask));
 }
 
-extern int 
+extern int
 MapFogFilterFlags(CPlayer *player, const unsigned int index, int mask);
 
 /**
@@ -388,13 +388,13 @@ CUnit *CanBuildUnitType(const CUnit *unit,
 		for (w = type->TileWidth; w--;) {
 			/* first part of if (!CanBuildOn(x + w, y + h, testmask)) */
 			if(!Map.Info.IsPointOnMap(x + w, y + h)) {
-				h = type->TileHeight;	
+				h = type->TileHeight;
 				ontop = NULL;
 				break;
 			}
 			if (player && !real) {
 				//testmask = MapFogFilterFlags(player, x + w, y + h, type->MovementMask);
-				testmask = MapFogFilterFlags(player, 
+				testmask = MapFogFilterFlags(player,
 						index + x + w, type->MovementMask);
 			} else {
 				testmask = type->MovementMask;
@@ -402,12 +402,12 @@ CUnit *CanBuildUnitType(const CUnit *unit,
 			/*secound part of if (!CanBuildOn(x + w, y + h, testmask)) */
 			if(Map.CheckMask(index + x + w,testmask))
 			{
-				h = type->TileHeight;	
+				h = type->TileHeight;
 				ontop = NULL;
 				break;
 			}
 			if (player && !Map.IsFieldExplored(player, index + x + w)) {
-				h = type->TileHeight;	
+				h = type->TileHeight;
 				ontop = NULL;
 				break;
 			}

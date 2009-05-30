@@ -51,7 +51,7 @@ struct CUnitCache {
 	std::vector<CUnit *> Units;
 
 	CUnitCache() : Units() { Units.clear();}
-	
+
 	inline size_t size() const
 	{
 		return Units.size();
@@ -94,18 +94,18 @@ struct CUnitCache {
 			int n = (size+3)/4;
 			const CUnit **cache = (const CUnit **)Units.data();
 			switch (size & 3) {
-				case 0: 
+				case 0:
 				do {
 					unit = *cache;
 					if(pred(unit))
 						return (CUnit *)unit;
 					cache++;
-				case 3:	
+				case 3:
 					unit = *cache;
 					if(pred(unit))
 						return (CUnit *)unit;
 					cache++;
-				case 2:	
+				case 2:
 					unit = *cache;
 					if(pred(unit))
 						return (CUnit *)unit;
@@ -119,7 +119,7 @@ struct CUnitCache {
 			}
 		}
 		return NULL;
-#endif		
+#endif
 	}
 
 	/**
@@ -129,10 +129,10 @@ struct CUnitCache {
 	 *
 	 *  Applies the function object @p f to each element in the cache.
 	 *  @p functor must not modify the order of the cache.
-	 */		
+	 */
 	template<typename _T>
 	inline void for_each(_T &functor)
-	{	
+	{
 		const size_t size = Units.size();
 #if __GNUC__ <  4
 		for(unsigned int i = 0; i < size; ++i)
@@ -143,7 +143,7 @@ struct CUnitCache {
 			int n = (size+3)/4;
 			CUnit **cache = (CUnit **)Units.data();
 			switch (size & 3) {
-				case 0: do { 
+				case 0: do {
 								functor(*cache++);
 				case 3:			functor(*cache++);
 				case 2:			functor(*cache++);
@@ -162,35 +162,35 @@ struct CUnitCache {
 	 *  Applies the function object @p f to each element in the cache.
 	 *  @p functor must not modify the order of the cache.
 	 *  If @p functor return false then loop is exited.
-	 */		
+	 */
 	template<typename _T>
 	inline int for_each_if(_T &functor)
-	{	
+	{
 		const size_t size = Units.size();
-		int count = 0;		
+		int count = 0;
 #ifdef _MSC_VER
-		while(size && functor(Units[count]) && ++count < size);		
+		while(size && functor(Units[count]) && ++count < size);
 #else
 		if(size) {
 			int n = (size+3)/4;
 			switch (size & 3) {
-				case 0: 
+				case 0:
 				do {
 					if(!functor(Units[count]))
 						return count;
-					count++;	
-				case 3:	
+					count++;
+				case 3:
 					if(!functor(Units[count]))
 						return count;
-					count++;	
-				case 2:	
+					count++;
+				case 2:
 					if(!functor(Units[count]))
 						return count;
-					count++;	
+					count++;
 				case 1:
 					if(!functor(Units[count]))
 						return count ;
-					count++;	
+					count++;
 					} while ( --n > 0 );
 			}
 		}
@@ -204,7 +204,7 @@ struct CUnitCache {
 	**
 	**  @param index  Unit index to remove from container.
 	**  @return pointer to removed element.
-	*/	
+	*/
 	inline CUnit * Remove(const unsigned int index)
 	{
 		const size_t size = Units.size();
@@ -216,15 +216,15 @@ struct CUnitCache {
 		Units.pop_back();
 		return tmp;
 	}
-	
+
 	/**
 	**  Remove unit from unit cache.
 	**
 	**  @param unit  Unit pointer to remove from container.
-	*/	
+	*/
 	inline bool Remove(CUnit *const unit)
 	{
-#ifndef SECURE_UNIT_REMOVING		
+#ifndef SECURE_UNIT_REMOVING
 		const size_t size = Units.size();
 		if(size == 1 && unit == Units[0]) {
 			Units.pop_back();
@@ -238,7 +238,7 @@ struct CUnitCache {
 					return true;
 				}
 			}
-		}	
+		}
 #else
 		for(std::vector<CUnit *>::iterator i(Units.begin()), end(Units.end());
 			 i != end; ++i) {
@@ -255,7 +255,7 @@ struct CUnitCache {
 	**  Remove unit from unit cache.
 	**
 	**  @param unit  Unit pointer to remove from container.
-	*/	
+	*/
 	inline void RemoveS(CUnit *const unit)
 	{
 		for(std::vector<CUnit *>::iterator i(Units.begin()), end(Units.end());
@@ -266,7 +266,7 @@ struct CUnitCache {
 			}
 		}
 	}
- 
+
 	/**
 	**  Insert new unit into tile cache.
 	**	Sorted version for binary searching.

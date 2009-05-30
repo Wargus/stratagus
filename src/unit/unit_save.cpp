@@ -165,7 +165,7 @@ void SaveOrder(const COrderPtr order, CFile *file)
 		case UnitActionBuild:
 		case UnitActionTransformInto:
 			file->printf(", \"type\", \"%s\"", order->Arg1.Type->Ident.c_str());
-		break;	
+		break;
 		case UnitActionPatrol:
 			file->printf(", \"patrol\", {%d, %d}",
 				order->Arg1.Patrol.X, order->Arg1.Patrol.Y);
@@ -183,7 +183,7 @@ void SaveOrder(const COrderPtr order, CFile *file)
 		case UnitActionResource :
 		case UnitActionReturnGoods :
 			if (order->CurrentResource) {
-				file->printf(", \"current-resource\", \"%s\",", 
+				file->printf(", \"current-resource\", \"%s\",",
 					DefaultResourceNames[order->CurrentResource].c_str());
 				if(order->CurrentResource == WoodCost) {
 					file->printf(" \"resource-pos\", {%d, %d}",
@@ -193,8 +193,8 @@ void SaveOrder(const COrderPtr order, CFile *file)
 						/* this unit is destroyed so it's not in the global unit
 						 * array - this means it won't be saved!!! */
 						printf ("FIXME: storing destroyed Mine - loading will fail.\n");
-					}				
-					file->printf(" \"resource-mine\", \"%s\"", 
+					}
+					file->printf(" \"resource-mine\", \"%s\"",
 						UnitReference(order->Arg1.Resource.Mine).c_str());
 				}
 			}
@@ -365,10 +365,10 @@ void SaveUnit(const CUnit *unit, CFile *file)
 			 * array - this means it won't be saved!!! */
 			printf ("FIXME: storing destroyed Worker - loading will fail.\n");
 		}
-		file->printf(" \"next-worker\", \"%s\",", 
-			UnitReference(unit->NextWorker).c_str());	
+		file->printf(" \"next-worker\", \"%s\",",
+			UnitReference(unit->NextWorker).c_str());
 	}
-	
+
 	file->printf(" \"units-boarded-count\", %d,", unit->BoardCount);
 
 	if (unit->UnitInside) {
@@ -416,7 +416,7 @@ void SaveUnit(const CUnit *unit, CFile *file)
 				 			* array - this means it won't be saved!!! */
 							printf ("FIXME: storing destroyed Worker - loading will fail.\n");
 						}
-						file->printf(", \"first-worker\", \"%s\"", 
+						file->printf(", \"first-worker\", \"%s\"",
 							UnitReference(unit->Data.Resource.Workers).c_str());
 					}
 					file->printf("}");

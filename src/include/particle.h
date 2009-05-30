@@ -180,7 +180,7 @@ public:
 
 	void add(CParticle *particle);
 	void clear();
-	
+
 	CPosition getScreenPos(const CPosition &pos);
 
 	inline void setLowDetail(bool detail) { lowDetail = detail; }
