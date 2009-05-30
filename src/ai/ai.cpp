@@ -822,9 +822,9 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 		AiForce *aiForce = &pai->Force[i];
 
 		if (aiForce->Size() > 0 &&
-			(aiForce->Role == AiForceRoleDefend && !aiForce->Attacking ||
-			aiForce->Role == AiForceRoleAttack && !aiForce->Attacking &&
-			!aiForce->State)) {  // none attacking
+			((aiForce->Role == AiForceRoleDefend && !aiForce->Attacking) ||
+			(aiForce->Role == AiForceRoleAttack && !aiForce->Attacking &&
+			!aiForce->State))) {  // none attacking
 			aiForce->Defending = true;
 			aiForce->Attack(x, y);
 		}

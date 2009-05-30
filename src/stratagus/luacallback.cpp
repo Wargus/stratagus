@@ -1,9 +1,9 @@
-//     ____                _       __               
+//     ____                _       __
 //    / __ )____  _____   | |     / /___ ___________
 //   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
-//  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  ) 
-// /_____/\____/____/     |__/|__/\__,_/_/  /____/  
-//                                              
+//  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  )
+// /_____/\____/____/     |__/|__/\__,_/_/  /____/
+//
 //       A futuristic real-time strategy game.
 //          This file is part of Bos Wars.
 //
@@ -29,10 +29,11 @@
 //@{
 
 
+#include <stdlib.h>
+
 #include "luacallback.h"
 #include "stratagus.h"
 #include "script.h"
-
 
 /**
 **  LuaCallback constructor
@@ -55,7 +56,7 @@ LuaCallback::LuaCallback(lua_State *l, lua_Object f) :
 **  Push the preamble on the stack to call the callback.
 **  Call this function before pushing the arguments on the lua stack.
 */
-void LuaCallback::pushPreamble() 
+void LuaCallback::pushPreamble()
 {
 	base = lua_gettop(luastate);
 	lua_getglobal(luastate, "_TRACEBACK");
@@ -69,7 +70,7 @@ void LuaCallback::pushPreamble()
 **
 **  @param value  the integer to push on the stack
 */
-void LuaCallback::pushInteger(int value) 
+void LuaCallback::pushInteger(int value)
 {
 	lua_pushnumber(luastate, value);
 	arguments++;
@@ -81,7 +82,7 @@ void LuaCallback::pushInteger(int value)
 **
 **  @param s  the string to push on the stack
 */
-void LuaCallback::pushString(const std::string &s) 
+void LuaCallback::pushString(const std::string &s)
 {
 	lua_pushstring(luastate, s.c_str());
 	arguments++;

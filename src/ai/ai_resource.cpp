@@ -283,8 +283,8 @@ static int AiBuildBuilding(const CUnitType *type, CUnitType *building,
 			if (action == UnitActionBuild ||
 				action == UnitActionRepair ||
 				action == UnitActionReturnGoods ||
-				action == UnitActionResource &&
-					 unit->SubAction > 55 /* SUB_START_GATHERING */) {
+				(action == UnitActionResource &&
+					 unit->SubAction > 55) /* SUB_START_GATHERING */) {
 				break;
 			}
 		}
@@ -1450,7 +1450,7 @@ static int AiRepairBuilding(const CUnitType *type, CUnit *building)
 	for (num = i = 0; i < nunits; ++i) {
 		unit = table[i];
 		if (unit->Type->RepairRange && unit->OrderCount == 1 &&
-			(unit->CurrentAction() == UnitActionResource && unit->SubAction <= 55 /* SUB_START_GATHERING */ ||
+			((unit->CurrentAction() == UnitActionResource && unit->SubAction <= 55) /* SUB_START_GATHERING */ ||
 				unit->CurrentAction() == UnitActionStill)) {
 			table[num++] = unit;
 		}

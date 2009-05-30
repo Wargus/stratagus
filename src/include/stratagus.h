@@ -78,7 +78,7 @@
 #endif  // } _MSC_VER
 
 #ifdef __GNUC__
-#if defined(__WIN32__) || defined(WIN32) || defined(_WIN32)
+#ifdef USE_WIN32
 #define makedir(dir, permissions) mkdir(dir)
 #else 
 #define makedir(dir, permissions) mkdir(dir, permissions)

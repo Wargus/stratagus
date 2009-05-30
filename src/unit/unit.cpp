@@ -2273,7 +2273,7 @@ public:
 
 };
 
-CUnit *FindDepositNearLoc(CPlayer *p, 
+CUnit *FindDepositNearLoc(CPlayer *p,
 				int x, int y, int range, int resource)
 {
 	BestDepotFinder<true> finder(NULL,x,y,resource,range);
@@ -3548,7 +3548,7 @@ bool CUnit::IsTeamed(const CUnit *x) const
 */
 bool CUnit::IsUnusable(bool ignore_built_state) const
 {
-	return !IsAliveOnMap() || !ignore_built_state && CurrentAction() == UnitActionBuilt;
+	return (!IsAliveOnMap() || (!ignore_built_state && CurrentAction() == UnitActionBuilt));
 }
 
 
@@ -3580,7 +3580,7 @@ void CleanUnits(void)
 		do {
 			CUnit *unit = Units[count - 1];
 			if (!unit->Destroyed) {
-				if (//unit->Type->Harvester && 
+				if (//unit->Type->Harvester &&
 					unit->CurrentAction() == UnitActionResource) {
 					ResourceInfo *resinfo = unit->Type->ResInfo[unit->CurrentResource];
 					if (resinfo && !resinfo->TerrainHarvester) {

@@ -2509,7 +2509,7 @@ std::string SaveGlobal(lua_State *l, bool is_root)
 		type_key = lua_type(l, -2);
 		type_value = lua_type(l, -1);
 		const std::string key = (type_key == LUA_TSTRING) ? lua_tostring(l, -2) : "";
-		if ((key == "_G") || (is_root &&
+		if ((key == "_G") || (is_root && (
 				(key == "assert") || (key == "gcinfo") || (key == "getfenv") ||
 				(key == "unpack") || (key == "tostring") || (key == "tonumber") ||
 				(key == "setmetatable") || (key == "require") || (key == "pcall") ||
@@ -2525,7 +2525,7 @@ std::string SaveGlobal(lua_State *l, bool is_root)
 				(key == "coroutine") || (key == "Icons") || (key == "Upgrades") ||
 				(key == "Fonts") || (key == "FontColors") || (key == "expansion")
 				// other string to protected ?
-				)) {
+				))) {
 			lua_pop(l, 1); // pop the value
 			continue;
 		}

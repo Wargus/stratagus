@@ -29,6 +29,8 @@
 
 //@{
 
+#include <stdlib.h>
+
 #include "stratagus.h"
 #include "particle.h"
 

@@ -523,7 +523,7 @@ public:
 		
 		void Init() {
 			Assert(Action != UnitActionResource || 
-					Action == UnitActionResource && Arg1.Resource.Mine == NULL);
+					(Action == UnitActionResource && Arg1.Resource.Mine == NULL));
 			Action = UnitActionNone;
 			Range = 0;
 			MinRange = 0;
