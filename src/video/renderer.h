@@ -60,7 +60,7 @@ static inline void PutPixel(void *const pixels,
 };// __attribute__ ((nothrow,nonnull (1)));
 
 template <const int BPP>
-static inline void 
+static inline void
 PutPixelDouble(void *pixels, const unsigned int index, Uint32 color)
 {
 	if(BPP == 1) {
@@ -88,7 +88,7 @@ PutPixelDouble(void *pixels, const unsigned int index, Uint32 color)
 };// __attribute__ ((nothrow,nonnull (1)));
 
 template <const int BPP>
-static inline void 
+static inline void
 PutPixelQuatro(void *pixels, unsigned int index, Uint32 color)
 {
 	if(BPP == 1) {
@@ -169,7 +169,7 @@ static inline void DrawHLine(void *pixels, unsigned int index,
 #endif	
 	}
 #ifdef __x86_64__
-	else if(BPP == 4 && ((uintptr_t)pixels) & BPP) { 
+	else if(BPP == 4 && ((uintptr_t)pixels) & BPP) {
 		PutPixel<BPP>(pixels, index, color);
 		index++;
 		--width;
@@ -302,15 +302,15 @@ class CRenderer : public CPrimitives {
 #else
 				Uint32 *p = (((Uint32 *)pixels) + index);
 			    /*
-			     *	FIXME:  
-			     *	Two Pixels Blend for litle endian and 
+			     *	FIXME:
+			     *	Two Pixels Blend for litle endian and
 			     *	big endian may be broken.
 			     */
 				unsigned int d1, s1 = color & 0xff00ff;
 				unsigned int dp = *p;
 				d1 = dp & 0xff00ff;				
 				
-				color &= 0xff00;     
+				color &= 0xff00;
 				color = (color >> 8) | (color << 8);
 				
 				d1 += (s1 - d1) * alpha >> 8;

@@ -21,37 +21,37 @@ msgid "You cannot reach building place"
 msgstr "Vous ne pouvez pas atteindre l'emplacement de construction"
 
 #: src/action/action_build.cpp:177
-#, c-format
+#, c-forma
 msgid "You cannot build %s here"
 msgstr "Vous ne pouvez pas construire %s ici"
 
 #: src/action/action_build.cpp:197
-#, c-format
+#, c-forma
 msgid "Not enough resources to build %s"
 msgstr "Pas assez de ressources pour construire %s"
 
 #: src/action/action_build.cpp:215
-#, c-format
+#, c-forma
 msgid "Can't build more units %s"
 msgstr "Ne peut créer plus d'unités %s"
 
 #: src/action/action_build.cpp:255
-#, c-format
+#, c-forma
 msgid "Unable to create building %s"
 msgstr "Impossible de construire le batiment %s"
 
 #: src/action/action_build.cpp:515
-#, c-format
+#, c-forma
 msgid "New %s done"
 msgstr "Construction de %s terminée"
 
 #: src/action/action_repair.cpp:84
-#, c-format
+#, c-forma
 msgid "We need more %s for repair!"
 msgstr "Nous avons besoin de plus de %s pour réparer"
 
 #: src/action/action_research.cpp:103
-#, c-format
+#, c-forma
 msgid "%s: complete"
 msgstr "%s: completé"
 
@@ -60,42 +60,42 @@ msgid "No Resources to Return."
 msgstr "Pas de ressouces à ramener."
 
 #: src/action/action_spellcast.cpp:181
-#, c-format
+#, c-forma
 msgid "%s: not enough mana for spell: %s"
 msgstr "%s: Pas assez de mana pour ce sort : %s"
 
 #: src/action/action_spellcast.cpp:185
-#, c-format
+#, c-forma
 msgid "%s: can't cast spell: %s"
 msgstr "%s: Ne peut invoquer le sort : %s"
 
 #: src/action/action_train.cpp:170
-#, c-format
+#, c-forma
 msgid "New %s ready"
 msgstr "Entraînement de %s terminé"
 
 #: src/action/action_train.cpp:217
-#, c-format
+#, c-forma
 msgid "Unable to train %s"
 msgstr "Impossible d'entrainer %s"
 
 #: src/action/action_upgradeto.cpp:199
-#, c-format
+#, c-forma
 msgid "Upgrade to %s canceled"
 msgstr "Optimisation de %s annulé"
 
 #: src/action/action_upgradeto.cpp:207
-#, c-format
+#, c-forma
 msgid "Upgrade to %s complete"
 msgstr "Optimisation de %s completé"
 
 #: src/action/command.cpp:1319
-#, c-format
+#, c-forma
 msgid "Player \"%s\" has left the game"
 msgstr "Joueur \"%s\" a quitté le jeu"
 
 #: src/action/command.cpp:1321
-#, c-format
+#, c-forma
 msgid "Player \"%s\" has been killed"
 msgstr "Joueur \"%s\" a été tué"
 
@@ -156,7 +156,7 @@ msgid "No sync info for this replay !"
 msgstr "Pas d'info de synchronisation pour ce replay !"
 
 #: src/network/commands.cpp:826
-#, c-format
+#, c-forma
 msgid "Replay got out of sync (%lu) !"
 msgstr "Replay hors de synchronisation (%lu) !"
 
@@ -169,7 +169,7 @@ msgid "End of replay"
 msgstr "Fin du Replay"
 
 #: src/network/network.cpp:928
-#, fuzzy, c-format
+#, fuzzy, c-forma
 msgid "%s sent bad command"
 msgstr "%s envoie une mauvaise commande"
 
@@ -178,7 +178,7 @@ msgid "Network out of sync"
 msgstr "Désynchronisation réseau"
 
 #: src/network/network.cpp:1256
-#, c-format
+#, c-forma
 msgid "Waiting for player \"%s\": %d:%02d"
 msgstr "En attente du joueur \"%s\": %d:%02d"
 
@@ -203,7 +203,7 @@ msgid "Total Unit Limit Reached"
 msgstr "Nombre total d'unités atteint"
 
 #: src/stratagus/player.cpp:569
-#, c-format
+#, c-forma
 msgid "Limit of %d reached for this unit type"
 msgstr "Limite de %d atteinte pour ce type d'unité"
 
@@ -217,7 +217,7 @@ msgid "Do it! Do it now!"
 msgstr "Faites-le ! Faites-le maintenant !"
 
 #: src/stratagus/stratagus.cpp:812
-#, c-format
+#, c-forma
 msgid "Thanks for playing Stratagus.\n"
 msgstr "Merci d'avoir joué à Stratagus.\n"
 
@@ -234,7 +234,7 @@ msgid "Unit training queue is full"
 msgstr "La file d'attente est pleine."
 
 #: src/ui/interface.cpp:95
-#, c-format
+#, c-forma
 msgid "MESSAGE:%s~!_"
 msgstr "MESSAGE:%s~!_"
 
@@ -295,26 +295,26 @@ msgid "Screenshot made."
 msgstr "Capture d'écran sauvegardé."
 
 #: src/ui/mainscr.cpp:971
-#, c-format
+#, c-forma
 msgid "Last message repeated ~<%d~> times"
 msgstr "Dernier message répété ~<%d~> fois"
 
 #: src/ui/mainscr.cpp:1047
-#, c-format
+#, c-forma
 msgid "~<Event: %s~>"
 msgstr "~<Événement : %s~>"
 
 #: src/ui/mouse.cpp:1904
-#, c-format
+#, c-forma
 msgid "You have ~<%d~> %ss"
 msgstr "Vous avez ~<%d~> %ss"
 
 #: src/ui/mouse.cpp:1908
-#, c-format
+#, c-forma
 msgid "You have ~<%d~> %s(s)"
 msgstr "Vous avez ~<%d~> %s(s)"
 
 #: src/unit/unit.cpp:2990
-#, c-format
+#, c-forma
 msgid "%s attacked"
 msgstr "%s attaqué"

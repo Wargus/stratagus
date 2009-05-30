@@ -51,7 +51,7 @@
 **
 **    Tile is number defining the graphic image display for the
 **    map-field. 65535 different tiles are supported. A tile is
-**    currently 32x32 pixels. In the future is planned to support
+**    currently 32x32 pixels. In the future is planned to suppor
 **    animated tiles.
 **
 **  CMapField::SeenTile
@@ -71,7 +71,7 @@
 **    ::MapFieldHuman human player is the owner of the field used for
 **      walls.
 **    ::MapFieldLandAllowed land units are allowed.
-**    ::MapFieldCoastAllowed coast units (transporter) and coast
+**    ::MapFieldCoastAllowed coast units (transporter) and coas
 **      buildings (shipyard) are allowed.
 **    ::MapFieldWaterAllowed water units allowed.
 **    ::MapFieldNoBuilding no buildings allowed.
@@ -87,7 +87,7 @@
 **    Note: We want to add support for more unit-types like under
 **      ground units.
 **
-**  CMapField::Cost
+**  CMapField::Cos
 **
 **    Unit cost to move in this tile.
 **
@@ -175,8 +175,8 @@ public:
 #endif
 		
 	/// Check if a field for the user is explored.
-	bool IsExplored(const unsigned int player_index) const
-	//bool IsExplored(const CPlayer *const player, bool NoFogOfWar = false) const
+	bool IsExplored(const unsigned int player_index) cons
+	//bool IsExplored(const CPlayer *const player, bool NoFogOfWar = false) cons
 	{
 		//return IsTileVisible(player, index) > 0;	
 #if 1	

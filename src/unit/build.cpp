@@ -61,7 +61,7 @@ CBuildRestrictionOnTop *OnTopDetails(const CUnit *unit, const CUnitType *parent)
 			i != unit->Type->BuildingRules.end(); ++i) {
 		if ((ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*i))) {
 			if (!parent) {
-				// Guess this is right
+				// Guess this is righ
 				return ontopb;
 			}
 			if (parent == ontopb->Parent) {
@@ -72,7 +72,7 @@ CBuildRestrictionOnTop *OnTopDetails(const CUnit *unit, const CUnitType *parent)
 					i != andb->_or_list.end(); ++i) {
 				if ((ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*i))) {
 					if (!parent) {
-						// Guess this is right
+						// Guess this is righ
 						return ontopb;
 					}
 					if (parent == ontopb->Parent) {
@@ -88,7 +88,7 @@ CBuildRestrictionOnTop *OnTopDetails(const CUnit *unit, const CUnitType *parent)
 /**
 **  Check And Restriction
 */
-bool CBuildRestrictionAnd::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const
+bool CBuildRestrictionAnd::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) cons
 {
 	for (std::vector<CBuildRestriction*>::const_iterator i = _or_list.begin();
 		i != _or_list.end(); ++i) {
@@ -102,7 +102,7 @@ bool CBuildRestrictionAnd::Check(const CUnitType *type, int x, int y, CUnit *&on
 /**
 **  Check Distance Restriction
 */
-bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const
+bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) cons
 {
 	CUnit *table[UnitMax];
 	int n;
@@ -171,7 +171,7 @@ bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit
 	return false;
 }
 
-inline bool CBuildRestrictionAddOn::functor::operator() (const CUnit *const unit) const
+inline bool CBuildRestrictionAddOn::functor::operator() (const CUnit *const unit) cons
 {
 	return (unit->Type == Parent &&
 				unit->X == x && unit->Y == y);
@@ -180,7 +180,7 @@ inline bool CBuildRestrictionAddOn::functor::operator() (const CUnit *const unit
 /**
 **  Check AddOn Restriction
 */
-bool CBuildRestrictionAddOn::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const
+bool CBuildRestrictionAddOn::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) cons
 {
 	int x1;
 	int y1;
@@ -216,7 +216,7 @@ inline bool CBuildRestrictionOnTop::functor::operator() (CUnit *const unit)
 	return true;
 }
 
-bool CBuildRestrictionOnTop::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const
+bool CBuildRestrictionOnTop::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) cons
 {
 #if 0
 	CUnit *table[UnitMax];
@@ -280,7 +280,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 		const int width = type->TileWidth;
 		int w, h = type->TileHeight;
 		bool success = false;
-		CMapField *mf; 
+		CMapField *mf;
 
 		// Need at least one coast tile
 		unsigned int index = Map.getIndex(x, y);
@@ -294,7 +294,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 				}
 				++mf;
 			} while(!success && --w);
-			index += Map.Info.MapWidth; 
+			index += Map.Info.MapWidth;
 		} while(!success && --h);
 		if (!success) {
 			return NULL;
@@ -335,7 +335,7 @@ bool CanBuildOn(int x, int y, int mask)
 	return (Map.Info.IsPointOnMap(x,y) && !Map.CheckMask(x, y,mask));
 }
 
-extern int 
+extern in
 MapFogFilterFlags(CPlayer *player, const unsigned int index, int mask);
 
 /**
@@ -345,7 +345,7 @@ MapFogFilterFlags(CPlayer *player, const unsigned int index, int mask);
 **  @param type  Building unit-type.
 **  @param x     X tile map position.
 **  @param y     Y tile map position.
-**  @param real  Really build, or just placement
+**  @param real  Really build, or just placemen
 **
 **  @return      OnTop, parent unit, builder on true, NULL false.
 **
@@ -394,7 +394,7 @@ CUnit *CanBuildUnitType(const CUnit *unit,
 			}
 			if (player && !real) {
 				//testmask = MapFogFilterFlags(player, x + w, y + h, type->MovementMask);
-				testmask = MapFogFilterFlags(player, 
+				testmask = MapFogFilterFlags(player,
 						index + x + w, type->MovementMask);
 			} else {
 				testmask = type->MovementMask;

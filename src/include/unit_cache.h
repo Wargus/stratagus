@@ -52,7 +52,7 @@ struct CUnitCache {
 
 	CUnitCache() : Units() { Units.clear();}
 	
-	inline size_t size() const
+	inline size_t size() cons
 	{
 		return Units.size();
 	}
@@ -60,7 +60,7 @@ struct CUnitCache {
 	{
 		Units.clear();
 	}
-	inline CUnit * operator[] (const unsigned int index) const
+	inline CUnit * operator[] (const unsigned int index) cons
 	{
 		//Assert(index < Units.size());
 		return Units[index];
@@ -77,7 +77,7 @@ struct CUnitCache {
 	 *  such that @p pred(*i) is true, or NULL if no such iterator exists.
 	 */
 	template<typename _T>
-	inline CUnit *find(const _T &pred) const
+	inline CUnit *find(const _T &pred) cons
 	{
 #if __GNUC__ <  4
 		if(Units.size()) {
@@ -94,7 +94,7 @@ struct CUnitCache {
 			int n = (size+3)/4;
 			const CUnit **cache = (const CUnit **)Units.data();
 			switch (size & 3) {
-				case 0: 
+				case 0:
 				do {
 					unit = *cache;
 					if(pred(unit))
@@ -143,7 +143,7 @@ struct CUnitCache {
 			int n = (size+3)/4;
 			CUnit **cache = (CUnit **)Units.data();
 			switch (size & 3) {
-				case 0: do { 
+				case 0: do {
 								functor(*cache++);
 				case 3:			functor(*cache++);
 				case 2:			functor(*cache++);
@@ -174,7 +174,7 @@ struct CUnitCache {
 		if(size) {
 			int n = (size+3)/4;
 			switch (size & 3) {
-				case 0: 
+				case 0:
 				do {
 					if(!functor(Units[count]))
 						return count;
@@ -266,7 +266,7 @@ struct CUnitCache {
 			}
 		}
 	}
- 
+
 	/**
 	**  Insert new unit into tile cache.
 	**	Sorted version for binary searching.

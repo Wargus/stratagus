@@ -371,7 +371,7 @@ static void AppendLog(LogEntry *log, CFile *dest)
 {
 	LogEntry **last;
 
-	// Append to linked list
+	// Append to linked lis
 	last = &CurrentReplay->Commands;
 	while (*last) {
 		last = &(*last)->Next;
@@ -401,7 +401,7 @@ static void AppendLog(LogEntry *log, CFile *dest)
 **  @param y       optional y map position.
 **  @param dest    optional destination unit.
 **  @param value   optional command argument (unit-type,...).
-**  @param num     optional number argument
+**  @param num     optional number argumen
 */
 void CommandLog(const char *action, const CUnit *unit, int flush,
 	int x, int y, const CUnit *dest, const char *value, int num)
@@ -496,7 +496,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 
 	log->SyncRandSeed = SyncRandSeed;
 
-	// Append it to ReplayLog list
+	// Append it to ReplayLog lis
 	AppendLog(log, LogFile);
 }
 
@@ -554,7 +554,7 @@ static int CclLog(lua_State *l)
 		lua_pop(l, 1);
 	}
 
-	// Append to linked list
+	// Append to linked lis
 	last = &CurrentReplay->Commands;
 	while (*last) {
 		last = &(*last)->Next;

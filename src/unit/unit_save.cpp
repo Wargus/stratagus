@@ -150,7 +150,7 @@ void SaveOrder(const COrderPtr order, CFile *file)
 	if (order->HasGoal()) {
 		CUnit *goal = order->GetGoal();
 		if (goal->Destroyed) {
-			/* this unit is destroyed so it's not in the global unit
+			/* this unit is destroyed so it's not in the global uni
 			 * array - this means it won't be saved!!! */
 			printf ("FIXME: storing destroyed Goal - loading will fail.\n");
 		}
@@ -183,18 +183,18 @@ void SaveOrder(const COrderPtr order, CFile *file)
 		case UnitActionResource :
 		case UnitActionReturnGoods :
 			if (order->CurrentResource) {
-				file->printf(", \"current-resource\", \"%s\",", 
+				file->printf(", \"current-resource\", \"%s\",",
 					DefaultResourceNames[order->CurrentResource].c_str());
 				if(order->CurrentResource == WoodCost) {
 					file->printf(" \"resource-pos\", {%d, %d}",
 						order->Arg1.Resource.Pos.X, order->Arg1.Resource.Pos.Y);
 				} else {
 					if (order->Arg1.Resource.Mine->Destroyed) {
-						/* this unit is destroyed so it's not in the global unit
+						/* this unit is destroyed so it's not in the global uni
 						 * array - this means it won't be saved!!! */
 						printf ("FIXME: storing destroyed Mine - loading will fail.\n");
 					}				
-					file->printf(" \"resource-mine\", \"%s\"", 
+					file->printf(" \"resource-mine\", \"%s\"",
 						UnitReference(order->Arg1.Resource.Mine).c_str());
 				}
 			}
@@ -219,7 +219,7 @@ void SaveUnit(const CUnit *unit, CFile *file)
 
 	file->printf("\nUnit(%d, ", UnitNumber(unit));
 
-	// 'type and 'player must be first, needed to create the unit slot
+	// 'type and 'player must be first, needed to create the unit slo
 	file->printf("\"type\", \"%s\", ", unit->Type->Ident.c_str());
 	if (unit->Seen.Type) {
 		file->printf("\"seen-type\", \"%s\", ", unit->Seen.Type->Ident.c_str());
@@ -361,11 +361,11 @@ void SaveUnit(const CUnit *unit, CFile *file)
 
 	if (unit->NextWorker) {
 		if (unit->NextWorker->Destroyed) {
-			/* this unit is destroyed so it's not in the global unit
+			/* this unit is destroyed so it's not in the global uni
 			 * array - this means it won't be saved!!! */
 			printf ("FIXME: storing destroyed Worker - loading will fail.\n");
 		}
-		file->printf(" \"next-worker\", \"%s\",", 
+		file->printf(" \"next-worker\", \"%s\",",
 			UnitReference(unit->NextWorker).c_str());	
 	}
 	
@@ -401,7 +401,7 @@ void SaveUnit(const CUnit *unit, CFile *file)
 	SaveOrder((COrderPtr)(&unit->NewOrder), file);
 
 	//
-	//  Order data part
+	//  Order data par
 	//
 	switch (unit->CurrentAction()) {
 		case UnitActionStill:
@@ -412,11 +412,11 @@ void SaveUnit(const CUnit *unit, CFile *file)
 					file->printf(", \"data-resource\", {\"assigned\", %d", unit->Data.Resource.Assigned);
 					if (unit->Data.Resource.Workers) {
 						if (unit->Data.Resource.Workers->Destroyed) {
-							/* this unit is destroyed so it's not in the global unit
+							/* this unit is destroyed so it's not in the global uni
 				 			* array - this means it won't be saved!!! */
 							printf ("FIXME: storing destroyed Worker - loading will fail.\n");
 						}
-						file->printf(", \"first-worker\", \"%s\"", 
+						file->printf(", \"first-worker\", \"%s\"",
 							UnitReference(unit->Data.Resource.Workers).c_str());
 					}
 					file->printf("}");

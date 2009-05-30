@@ -37,7 +37,7 @@
 class CFont;
 
 enum {
-	TitleFlagCenter = 1 << 0,  /// Center Text
+	TitleFlagCenter = 1 << 0,  /// Center Tex
 };
 
 class TitleScreenLabel {
