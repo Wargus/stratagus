@@ -539,7 +539,7 @@ void CreateGame(const std::string &filename, CMap *map)
 	}
 
 	for (i = 0; i < PlayerMax; ++i) {
-		int playertype = Map.Info.PlayerType[i];
+		PlayerTypes playertype = (PlayerTypes)Map.Info.PlayerType[i];
 		// Network games only:
 		if (GameSettings.Presets[i].Type != SettingsPresetMapDefault) {
 			playertype = GameSettings.Presets[i].Type;
@@ -711,7 +711,7 @@ void InitSettings(void)
 {
 	for (int i = 0; i < PlayerMax; ++i) {
 		GameSettings.Presets[i].Team = SettingsPresetMapDefault;
-		GameSettings.Presets[i].Type = SettingsPresetMapDefault;
+		GameSettings.Presets[i].Type = (PlayerTypes)SettingsPresetMapDefault;
 	}
 	GameSettings.Resources = SettingsPresetMapDefault;
 	GameSettings.NumUnits = SettingsPresetMapDefault;

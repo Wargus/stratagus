@@ -250,6 +250,64 @@ class CUnitType;
 class PlayerAi;
 class CFile;
 
+/**
+**  Types for the player
+**
+**  #PlayerNeutral
+**
+**    This player is controlled by the computer doing nothing.
+**
+**  #PlayerNobody
+**
+**    This player is unused. Nobody controlls this player.
+**
+**  #PlayerComputer
+**
+**    This player is controlled by the computer. CPlayer::AiNum
+**    selects the AI strategy.
+**
+**  #PlayerPerson
+**
+**    This player is contolled by a person. This can be the player
+**    sitting on the local computer or player playing over the
+**    network.
+**
+**  #PlayerRescuePassive
+**
+**    This player does nothing, the game pieces just sit in the game
+**    (being passive)... when a person player moves next to a
+**    PassiveRescue unit/building, then it is "rescued" and becomes
+**    part of that persons team. If the city center is rescued, than
+**    all units of this player are rescued.
+**
+**  #PlayerRescueActive
+**
+**    This player is controlled by the computer. CPlayer::AiNum
+**    selects the AI strategy. Until it is rescued it plays like
+**    an ally. The first person which reaches units of this player,
+**    can rescue them. If the city center is rescued, than all units
+**    of this player are rescued.
+*/
+enum PlayerTypes {
+	PlayerNeutral = 2,        /// neutral
+	PlayerNobody  = 3,        /// unused slot
+	PlayerComputer = 4,       /// computer player
+	PlayerPerson = 5,         /// human player
+	PlayerRescuePassive = 6,  /// rescued passive
+	PlayerRescueActive = 7,   /// rescued  active
+};
+
+#define PlayerNumNeutral (PlayerMax - 1)  /// this is the neutral player slot
+
+/**
+**  Notify types. Noties are send to the player.
+*/
+enum NotifyType {
+	NotifyRed,     /// Red alram
+	NotifyYellow,  /// Yellow alarm
+	NotifyGreen,   /// Green alarm
+};
+
 /*----------------------------------------------------------------------------
 --  Player type
 ----------------------------------------------------------------------------*/
@@ -261,7 +319,7 @@ public:
 	int Index;          /// player as number
 	std::string Name;   /// name of non computer
 
-	int Type;           /// type of player (human,computer,...)
+	PlayerTypes Type;   /// type of player (human,computer,...)
 	std::string AiName; /// AI for computer
 
 	// friend enemy detection
@@ -369,65 +427,6 @@ public:
 	bool IsTeamed(const CUnit *x) const;
 };
 
-
-/**
-**  Types for the player
-**
-**  #PlayerNeutral
-**
-**    This player is controlled by the computer doing nothing.
-**
-**  #PlayerNobody
-**
-**    This player is unused. Nobody controlls this player.
-**
-**  #PlayerComputer
-**
-**    This player is controlled by the computer. CPlayer::AiNum
-**    selects the AI strategy.
-**
-**  #PlayerPerson
-**
-**    This player is contolled by a person. This can be the player
-**    sitting on the local computer or player playing over the
-**    network.
-**
-**  #PlayerRescuePassive
-**
-**    This player does nothing, the game pieces just sit in the game
-**    (being passive)... when a person player moves next to a
-**    PassiveRescue unit/building, then it is "rescued" and becomes
-**    part of that persons team. If the city center is rescued, than
-**    all units of this player are rescued.
-**
-**  #PlayerRescueActive
-**
-**    This player is controlled by the computer. CPlayer::AiNum
-**    selects the AI strategy. Until it is rescued it plays like
-**    an ally. The first person which reaches units of this player,
-**    can rescue them. If the city center is rescued, than all units
-**    of this player are rescued.
-*/
-enum PlayerTypes {
-	PlayerNeutral = 2,        /// neutral
-	PlayerNobody  = 3,        /// unused slot
-	PlayerComputer = 4,       /// computer player
-	PlayerPerson = 5,         /// human player
-	PlayerRescuePassive = 6,  /// rescued passive
-	PlayerRescueActive = 7,   /// rescued  active
-};
-
-#define PlayerNumNeutral (PlayerMax - 1)  /// this is the neutral player slot
-
-/**
-**  Notify types. Noties are send to the player.
-*/
-enum NotifyType {
-	NotifyRed,     /// Red alram
-	NotifyYellow,  /// Yellow alarm
-	NotifyGreen,   /// Green alarm
-};
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -461,7 +460,7 @@ extern void FreePlayerColors();
 extern void SavePlayers(CFile *file);
 
 	/// Create a new player
-extern void CreatePlayer(int type);
+extern void CreatePlayer(PlayerTypes type);
 
 
 	/// Initialize the computer opponent AI
