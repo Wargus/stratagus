@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on Sun Nov 23 11:52:38 2008.
+** Generated automatically by tolua++-1.0.92 on Sat May 30 11:05:06 2009.
 */
 
 #ifndef __cplusplus
@@ -13766,7 +13766,7 @@ static int tolua_set_CPlayer_Type(lua_State* tolua_S)
   if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
    tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->Type = ((int)  tolua_tonumber(tolua_S,2,0))
+  self->Type = ((PlayerTypes) (int)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
@@ -16798,7 +16798,7 @@ static int tolua_set_SettingsPresets_Type(lua_State* tolua_S)
   if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
    tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->Type = ((int)  tolua_tonumber(tolua_S,2,0))
+  self->Type = ((PlayerTypes) (int)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }

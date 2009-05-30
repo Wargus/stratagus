@@ -85,11 +85,11 @@ public:
 */
 class MPPlayer {
 public:
-	MPPlayer() : Team(0), Type(0) {}
+	MPPlayer() : Team(0), Type((PlayerTypes)0) {}
 
 	std::string Name;
 	int Team;
-	int Type;
+	PlayerTypes Type;
 };
 
 /**
@@ -602,7 +602,7 @@ static int CclReplayLog(lua_State *l)
 					} else if (!strcmp(value, "Team")) {
 						replay->Players[j].Team = LuaToNumber(l, -1);
 					} else if (!strcmp(value, "Type")) {
-						replay->Players[j].Type = LuaToNumber(l, -1);
+						replay->Players[j].Type = (PlayerTypes)LuaToNumber(l, -1);
 					} else {
 						LuaError(l, "Unsupported key: %s" _C_ value);
 					}
