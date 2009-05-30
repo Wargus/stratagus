@@ -38,15 +38,15 @@
 
 class CFile;
 class CMap;
-
+enum PlayerTypes;
 
 /*----------------------------------------------------------------------------
 --  Settings
 ----------------------------------------------------------------------------*/
 
 struct SettingsPresets {
-	int Team;  /// Team of player -- NOT SELECTABLE YET
-	int Type;  /// Type of player (for network games)
+	int Team;          /// Team of player -- NOT SELECTABLE YET
+	PlayerTypes Type;  /// Type of player (for network games)
 };
 
 /**

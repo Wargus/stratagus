@@ -487,7 +487,7 @@ void SavePlayers(CFile *file)
 **
 **  @param type  Player type (Computer,Human,...).
 */
-void CreatePlayer(int type)
+void CreatePlayer(PlayerTypes type)
 {
 	int team;
 	int i;
@@ -654,7 +654,7 @@ void CPlayer::Clear()
 {
 	Index = 0;
 	Name.clear();
-	Type = 0;
+	Type = (PlayerTypes)0;
 	AiName.clear();
 	Team = 0;
 	Enemy = 0;

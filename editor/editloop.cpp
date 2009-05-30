@@ -1758,7 +1758,7 @@ void CEditor::Init()
 
 		for (i = 0; i < PlayerMax; ++i)
 		{
-			int playerType = PlayerNobody;
+			PlayerTypes playerType = PlayerNobody;
 
 			if (i == 0 || i == 1)
 			{

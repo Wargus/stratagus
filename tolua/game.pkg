@@ -44,7 +44,7 @@ $#include "settings.h"
 
 struct SettingsPresets {
 	int Team;
-	int Type;
+	PlayerTypes Type;
 };
 
 class Settings {
