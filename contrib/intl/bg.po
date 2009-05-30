@@ -22,37 +22,37 @@ msgid "You cannot reach building place"
 msgstr "Не мога да достигна мястото за стоене."
 
 #: src/action/action_build.cpp:177
-#, c-forma
+#, c-format
 msgid "You cannot build %s here"
 msgstr "Не можете да стоите %s тук"
 
 #: src/action/action_build.cpp:197
-#, c-forma
+#, c-format
 msgid "Not enough resources to build %s"
 msgstr "Няма достатъчно ресурси за строене %s"
 
 #: src/action/action_build.cpp:215
-#, c-forma
+#, c-format
 msgid "Can't build more units %s"
 msgstr "Не може да строите повече единици %s"
 
 #: src/action/action_build.cpp:255
-#, c-forma
+#, c-format
 msgid "Unable to create building %s"
 msgstr "Не мога да създам сградата %s"
 
 #: src/action/action_build.cpp:515
-#, c-forma
+#, c-format
 msgid "New %s done"
 msgstr "Новата %s Завършена?e"
 
 #: src/action/action_repair.cpp:84
-#, c-forma
+#, c-format
 msgid "We need more %s for repair!"
 msgstr "Има нужда от %s За поправка"
 
 #: src/action/action_research.cpp:103
-#, c-forma
+#, c-format
 msgid "%s: complete"
 msgstr "%s: Завършено"
 
@@ -61,42 +61,42 @@ msgid "No Resources to Return."
 msgstr "Няма ресурси за връщане."
 
 #: src/action/action_spellcast.cpp:181
-#, c-forma
+#, c-format
 msgid "%s: not enough mana for spell: %s"
 msgstr "%s: Няма достатъчно мана: %s"
 
 #: src/action/action_spellcast.cpp:185
-#, c-forma
+#, c-format
 msgid "%s: can't cast spell: %s"
 msgstr "%s: Не мога да хвърля магията: %s"
 
 #: src/action/action_train.cpp:170
-#, c-forma
+#, c-format
 msgid "New %s ready"
 msgstr "Новият %s Е готов?"
 
 #: src/action/action_train.cpp:217
-#, c-forma
+#, c-format
 msgid "Unable to train %s"
 msgstr "Не мога да обуча %s"
 
 #: src/action/action_upgradeto.cpp:199
-#, c-forma
+#, c-format
 msgid "Upgrade to %s canceled"
 msgstr "Ъпгрейда на %s Отказ?"
 
 #: src/action/action_upgradeto.cpp:207
-#, c-forma
+#, c-format
 msgid "Upgrade to %s complete"
 msgstr "Ъпгрейда на %s Завършен"
 
 #: src/action/command.cpp:1319
-#, c-forma
+#, c-format
 msgid "Player \"%s\" has left the game"
 msgstr "Играча \"%s\" напусна играта"
 
 #: src/action/command.cpp:1321
-#, c-forma
+#, c-format
 msgid "Player \"%s\" has been killed"
 msgstr "Играча \"%s\" Беше убит"
 
@@ -157,7 +157,7 @@ msgid "No sync info for this replay !"
 msgstr "No sync info for this replay !"
 
 #: src/network/commands.cpp:826
-#, c-forma
+#, c-format
 msgid "Replay got out of sync (%lu) !"
 msgstr "Replay got out of sync (%lu) !"
 
@@ -170,7 +170,7 @@ msgid "End of replay"
 msgstr "Край на повторението"
 
 #: src/network/network.cpp:928
-#, fuzzy, c-forma
+#, fuzzy, c-format
 msgid "%s sent bad command"
 msgstr "%s Sent Bad Command"
 
@@ -179,7 +179,7 @@ msgid "Network out of sync"
 msgstr "Network out of sync"
 
 #: src/network/network.cpp:1256
-#, c-forma
+#, c-format
 msgid "Waiting for player \"%s\": %d:%02d"
 msgstr "Чакам играча \"%s\": %d:%02d"
 
@@ -204,7 +204,7 @@ msgid "Total Unit Limit Reached"
 msgstr ""
 
 #: src/stratagus/player.cpp:569
-#, c-forma
+#, c-format
 msgid "Limit of %d reached for this unit type"
 msgstr ""
 
@@ -218,7 +218,7 @@ msgid "Do it! Do it now!"
 msgstr "Направи го! Направи го сега!!"
 
 #: src/stratagus/stratagus.cpp:812
-#, c-forma
+#, c-format
 msgid "Thanks for playing Stratagus.\n"
 msgstr "Благодаря ви, че играхте Stratagus.\n"
 
@@ -235,7 +235,7 @@ msgid "Unit training queue is full"
 msgstr "Няма място пред опашката за трениране на единици."
 
 #: src/ui/interface.cpp:95
-#, c-forma
+#, c-format
 msgid "MESSAGE:%s~!_"
 msgstr "MESSAGE:%s~!_"
 
@@ -296,27 +296,27 @@ msgid "Screenshot made."
 msgstr "Screenshot made."
 
 #: src/ui/mainscr.cpp:971
-#, c-forma
+#, c-format
 msgid "Last message repeated ~<%d~> times"
 msgstr "Last message repeated ~<%d~> times"
 
 #: src/ui/mainscr.cpp:1047
-#, c-forma
+#, c-format
 msgid "~<Event: %s~>"
 msgstr "~<?v?Event: %s~>"
 
 #: src/ui/mouse.cpp:1904
-#, c-forma
+#, c-format
 msgid "You have ~<%d~> %ss"
 msgstr "Вие имате ~<%d~> %ss"
 
 #: src/ui/mouse.cpp:1908
-#, c-forma
+#, c-format
 msgid "You have ~<%d~> %s(s)"
 msgstr "Вие имате ~<%d~> %s(s)"
 
 #: src/unit/unit.cpp:2990
-#, c-forma
+#, c-format
 msgid "%s attacked"
 msgstr "%s Атакуван"
 

@@ -45,7 +45,7 @@
 ----------------------------------------------------------------------------*/
 
 CUnit *UnitSlots[MAX_UNIT_SLOTS];  /// All possible units
-unsigned int UnitSlotFree;         /// First free unit slo
+unsigned int UnitSlotFree;         /// First free unit slot
 
 CUnitManager UnitManager;          /// Unit manager
 
@@ -72,9 +72,9 @@ void CUnitManager::Init()
 }
 
 /**
-**  Allocate a new uni
+**  Allocate a new unit
 **
-**  @return  New uni
+**  @return  New unit
 */
 CUnit *CUnitManager::AllocUnit()
 {
@@ -104,7 +104,7 @@ CUnit *CUnitManager::AllocUnit()
 }
 
 /**
-**  Release a uni
+**  Release a unit
 **
 **  @param unit  Unit to release
 */

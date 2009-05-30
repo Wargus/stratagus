@@ -153,7 +153,7 @@ public:
 		GoalX = GoalY = 0;
 		MustTransport = false;
 	}
-	inline size_t Size(void) const
+	inline size_t Size(void)
 	{
 		return Units.size();
 	}
@@ -304,7 +304,7 @@ public:
 	int NeededMask;        /// Mask for needed resources
 	bool NeedSupply;       /// Flag need food
 	bool ScriptDebug;              /// Flag script debuging on/off
-	
+
 	std::vector<AiExplorationRequest> FirstExplorationRequest;/// Requests for exploration
 	unsigned long LastExplorationGameCycle;         /// When did the last explore occur?
 	std::vector<AiTransportRequest> TransportRequests;/// Requests for transport
@@ -361,7 +361,7 @@ public:
 	** units/buildings which are equivalent.
 	*/
 	std::vector<std::vector<CUnitType *> > Equiv;
-	
+
 	/**
 	** The index is the resource id - 1 (we can't mine TIME), giving a table of all
 	** units/buildings/mines which can harvest this resource.
@@ -374,7 +374,7 @@ public:
 	*/
 	std::vector<std::vector<CUnitType *> > Depots;
 
-	
+
 };
 
 /*----------------------------------------------------------------------------

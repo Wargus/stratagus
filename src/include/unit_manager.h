@@ -64,7 +64,7 @@ private:
 ----------------------------------------------------------------------------*/
 
 extern CUnit *UnitSlots[];         /// All possible units
-extern unsigned int UnitSlotFree;  /// First free unit slo
+extern unsigned int UnitSlotFree;  /// First free unit slot
 
 extern CUnitManager UnitManager;   /// Unit manager
 

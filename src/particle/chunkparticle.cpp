@@ -44,7 +44,7 @@ static inline float deg2rad(int degrees) {
 
 
 CChunkParticle::CChunkParticle(CPosition position, Animation *smokeAnimation) :
-	CParticle(position), initialPos(position), nextSmokeTicks(0), age(0),
+	CParticle(position), initialPos(position), nextSmokeTicks(0), age(0), 
 	height(0.f)
 {
 	float radians = deg2rad(MyRand() % 360);
@@ -76,20 +76,20 @@ void CChunkParticle::draw()
 	CPosition screenPos = ParticleManager.getScreenPos(pos);
 	Uint32 color = ColorBlack;
 
-	Video.DrawRectangleClip(color, (int)screenPos.x - 1,
+	Video.DrawRectangleClip(color, (int)screenPos.x - 1, 
 		(int)calculateScreenPos(screenPos.y, height) - 1, 2, 2);
 }
 
-static float getHorizontalPosition(int initialVelocity,
+static float getHorizontalPosition(int initialVelocity, 
 	float trajectoryAngle, float time)
 {
     return (initialVelocity * cos(trajectoryAngle)) * time;
 }
 
-static float getVerticalPosition(int initialVelocity,
+static float getVerticalPosition(int initialVelocity, 
 	float trajectoryAngle, float time)
 {
-    return (initialVelocity * sin(trajectoryAngle)) * time -
+    return (initialVelocity * sin(trajectoryAngle)) * time - 
     	(gravity / 2.0f) * (time * time);
 }
 
@@ -115,7 +115,7 @@ void CChunkParticle::update(int ticks)
 
 	float time = age / 1000.f;
 
-	float distance =
+	float distance = 
 		getHorizontalPosition(initialVelocity, trajectoryAngle, time);
 	pos.x = initialPos.x + distance * direction.x;
 	pos.y = initialPos.y + distance * direction.y;

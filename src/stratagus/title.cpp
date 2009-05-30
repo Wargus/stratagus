@@ -1,9 +1,9 @@
-//     ____                _       __
+//     ____                _       __               
 //    / __ )____  _____   | |     / /___ ___________
 //   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
-//  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  )
-// /_____/\____/____/     |__/|__/\__,_/_/  /____/
-//
+//  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  ) 
+// /_____/\____/____/     |__/|__/\__,_/_/  /____/  
+//                                              
 //       A futuristic real-time strategy game.
 //          This file is part of Bos Wars.
 //
@@ -37,7 +37,7 @@
 
 
 TitleScreen **TitleScreens;          /// Title screens to show at startup
-static bool WaitNoEvent;             /// Flag got an even
+static bool WaitNoEvent;             /// Flag got an event
 
 
 /**
