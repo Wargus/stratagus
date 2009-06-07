@@ -51,6 +51,7 @@
 
 #include <winsock2.h>
 
+#define NOMINMAX
 #include <windows.h>
 #include <winsock.h>
 //#include <ws2tcpip.h>

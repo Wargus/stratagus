@@ -124,6 +124,7 @@ static const int CacheNotSet = -5;
 
 #include <map>
 #ifndef __unix
+#define NOMINMAX
 #include <windows.h>
 #else
 

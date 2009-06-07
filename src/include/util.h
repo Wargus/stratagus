@@ -38,6 +38,7 @@
 ----------------------------------------------------------------------------*/
 
 #ifndef __unix
+#define NOMINMAX
 #include <windows.h>
 #elif defined(__hpux)
 #include <sys/mpctl.h>

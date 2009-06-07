@@ -39,6 +39,7 @@
 #ifdef USE_WIN32
 #define WIN32_LEAN_AND_MEAN
 #undef NOUSER
+#define NOMINMAX
 #include <windows.h>
 #elif defined(HAVE_X)
 #include <X11/Xlib.h>
