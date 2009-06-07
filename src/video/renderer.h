@@ -256,7 +256,7 @@ class CRenderer : public CPrimitives {
 		} else {
 			assert(0);
 		}
-	} __attribute__ ((nothrow,nonnull (1)));
+	} // __attribute__ ((nothrow,nonnull (1)));
 
 	static inline void PutTransPixelDouble(void *pixels, unsigned int index,
 							 Uint32 color, unsigned int alpha)
@@ -334,7 +334,7 @@ class CRenderer : public CPrimitives {
 		} else {
 			assert(0);
 		}
-	} __attribute__ ((nothrow,nonnull (1)));
+	} // __attribute__ ((nothrow,nonnull (1)));
 
 
 	static inline void PutTransPixel128(void *pixels, unsigned int index,
@@ -405,7 +405,7 @@ class CRenderer : public CPrimitives {
 		} else {
 			assert(0);
 		}
-	} __attribute__ ((nothrow,nonnull (1)));
+	} // __attribute__ ((nothrow,nonnull (1)));
 
 	static void DrawVLine(void *pixels, const unsigned int pitch,
 				 unsigned int index, int height, Uint32 color)
@@ -415,7 +415,7 @@ class CRenderer : public CPrimitives {
 			DRAW::PutPixel<BPP>(pixels, index, color);
 			index += pitch;
 		} while (--height);
-	}__attribute__ ((nothrow,nonnull (1)));
+	} // __attribute__ ((nothrow,nonnull (1)));
 
 	static void DrawTransVLine(void *pixels, const unsigned int pitch,
 				 unsigned int index, int height, Uint32 color, unsigned int alpha)
@@ -432,7 +432,7 @@ class CRenderer : public CPrimitives {
 				index += pitch;
 			} while (--height);
 		}
-	} __attribute__ ((nothrow,nonnull (1)));
+	} // __attribute__ ((nothrow,nonnull (1)));
 
 	static inline void DrawTransHLine128(void *pixels,
 				 unsigned int index, int width, Uint32 color)
@@ -457,7 +457,7 @@ class CRenderer : public CPrimitives {
 	    if(width) PutTransPixel128(pixels, index, color);
 #endif
 
-	} __attribute__ ((nothrow,nonnull (1)));
+	} // __attribute__ ((nothrow,nonnull (1)));
 
 
 	static inline void DrawTransHLineNon128(void *pixels,
@@ -481,7 +481,7 @@ class CRenderer : public CPrimitives {
 #ifdef __x86_64__
 	    if(width) PutTransPixel(pixels, index, color, alpha);
 #endif
-	} __attribute__ ((nothrow,nonnull (1)));
+	} // __attribute__ ((nothrow,nonnull (1)));
 
 	static inline void DrawTransHLine(void *pixels,
 				 unsigned int index, int width, Uint32 color, unsigned int alpha)

@@ -171,13 +171,14 @@ CUnitType::~CUnitType()
 	CGraphic::Free(Sprite);
 	CGraphic::Free(ShadowSprite);
 #ifdef USE_MNG
-	if (type->Portrait.Num) {
-		for (j = 0; j < type->Portrait.Num; ++j) {
-			delete type->Portrait.Mngs[j];
-			delete[] type->Portrait.Files[j];
+	if (this->Portrait.Num) {
+		int j;
+		for (j = 0; j < this->Portrait.Num; ++j) {
+			delete this->Portrait.Mngs[j];
+//			delete[] this->Portrait.Files[j];
 		}
-		delete[] type->Portrait.Mngs;
-		delete[] type->Portrait.Files;
+		delete[] this->Portrait.Mngs;
+		delete[] this->Portrait.Files;
 	}
 #endif
 

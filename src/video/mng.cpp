@@ -68,7 +68,7 @@ static mng_bool MNG_DECL my_openstream(mng_handle handle)
 	Mng *mng;
 
 	mng = (Mng *)mng_get_userdata(handle);
-	mng->fd = fopen(mng->name, "rb");
+	mng->fd = fopen(mng->name.c_str(), "rb");
 	if (!mng->fd) {
 		return MNG_FALSE;
 	}
@@ -239,7 +239,7 @@ Mng::Mng() :
 
 Mng::~Mng()
 {
-	delete[] name;
+//	delete[] name;
 	if (handle) {
 		mng_cleanup(&handle);
 	}
