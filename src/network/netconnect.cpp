@@ -81,8 +81,6 @@ int NetConnectRunning;                 /// Network menu: Setup mode active
 NetworkState NetStates[PlayerMax];     /// Network menu: Server: Client Host states
 unsigned char NetLocalState;           /// Network menu: Local Server/Client connect state;
 int NetLocalHostsSlot;                 /// Network menu: Slot # in Hosts array of local client
-//char NetTriesText[32];                 /// Network menu: Client tries count text
-//char NetServerText[64];                /// Network menu: Text describing the Network Server IP
 int NetLocalPlayerNumber;              /// Player number of local client
 
 static int NetStateMsgCnt;              /// Number of consecutive msgs of same type sent
@@ -102,8 +100,10 @@ static int NetworkServerPort = NetworkDefaultPort; /// Server network port to us
 CServerSetup ServerSetupState;
 CServerSetup LocalSetupState;
 
-unsigned char *CNetworkHost::Serialize(unsigned char *buf) const
+
+unsigned char *CNetworkHost::Serialize() const
 {
+	unsigned char *buf = new unsigned char[CNetworkHost::Size()];
 	unsigned char *p = buf;
 
 	*(Uint32 *)p = this->Host;
@@ -113,11 +113,11 @@ unsigned char *CNetworkHost::Serialize(unsigned char *buf) const
 	*(Uint16 *)p = this->PlyNr;
 	p += 2;
 	memcpy(p, this->PlyName, sizeof(this->PlyName));
-	p += sizeof(this->PlyName);
-	return p;
+
+	return buf;
 }
 
-const unsigned char *CNetworkHost::Deserialize(const unsigned char *p)
+void CNetworkHost::Deserialize(const unsigned char *p)
 {
 	this->Host = *(Uint32 *)p;
 	p += 4;
@@ -126,11 +126,11 @@ const unsigned char *CNetworkHost::Deserialize(const unsigned char *p)
 	this->PlyNr = *(Uint16 *)p;
 	p += 2;
 	memcpy(this->PlyName, p, sizeof(this->PlyName));
-	return p + sizeof(this->PlyName);
 }
 
-unsigned char *CServerSetup::Serialize(unsigned char *buf) const
+unsigned char *CServerSetup::Serialize() const
 {
+	unsigned char *buf = new unsigned char[CServerSetup::Size()];
 	unsigned char *p = buf;
 	int i;
 
@@ -156,10 +156,10 @@ unsigned char *CServerSetup::Serialize(unsigned char *buf) const
 		p += 4;
 	}
 
-	return p;
+	return buf;
 }
 
-const unsigned char *CServerSetup::Deserialize(const unsigned char *p)
+void CServerSetup::Deserialize(const unsigned char *p)
 {
 	int i;
 
@@ -184,29 +184,13 @@ const unsigned char *CServerSetup::Deserialize(const unsigned char *p)
 		this->LastFrame[i] = *(Uint32 *)p;
 		p += 4;
 	}
-	return p;
 }
 
-const size_t CInitMessage::Size(int type) { 
-	const size_t len = 1+1+4+4+4+4+4+4+1;
-	switch(type) {
-		case ICMHello:
-		case ICMConfig:
-		case ICMWelcome:
-		case ICMResync:
-		case ICMGo:
-			return len + PlayerMax * CNetworkHost::Size();
-		case ICMMap:
-			return len + 256;
-		case ICMState:	
-			return len + CServerSetup::Size();	
-	}
-	return len;
-}
-
-unsigned char *CInitMessage::Serialize(unsigned char *buf) const
+unsigned char *CInitMessage::Serialize() const
 {
+	unsigned char *buf = new unsigned char[CInitMessage::Size()];
 	unsigned char *p = buf;
+	unsigned char *x;
 
 	*p++ = this->Type;
 	*p++ = this->SubType;
@@ -231,7 +215,10 @@ unsigned char *CInitMessage::Serialize(unsigned char *buf) const
 		case ICMResync:
 		case ICMGo:
 			for (int i = 0; i < PlayerMax; ++i) {
-				p = this->u.Hosts[i].Serialize(p);
+				x = this->u.Hosts[i].Serialize();
+				memcpy(p, x, CNetworkHost::Size());
+				p += CNetworkHost::Size();
+				delete[] x;
 			}			
 			break;
 		case ICMMap:
@@ -239,14 +226,17 @@ unsigned char *CInitMessage::Serialize(unsigned char *buf) const
 			p += sizeof(this->u.MapPath);
 			break;
 		case ICMState:
-			p = this->u.State.Serialize(p);
+			x = this->u.State.Serialize();
+			memcpy(p, x, CServerSetup::Size());
+			p += CServerSetup::Size();
+			delete[] x;
 			break;
 	}
 
-	return p;
+	return buf;
 }
 
-const unsigned char *CInitMessage::Deserialize(const unsigned char *p)
+void CInitMessage::Deserialize(const unsigned char *p)
 {
 	this->Type = *p++;
 	this->SubType = *p++;
@@ -271,7 +261,8 @@ const unsigned char *CInitMessage::Deserialize(const unsigned char *p)
 		case ICMResync:
 		case ICMGo:
 			for (int i = 0; i < PlayerMax; ++i) {
-				p = this->u.Hosts[i].Deserialize(p);
+				this->u.Hosts[i].Deserialize(p);
+				p += CNetworkHost::Size();
 			}
 			break;
 		case ICMMap:
@@ -279,10 +270,10 @@ const unsigned char *CInitMessage::Deserialize(const unsigned char *p)
 			p += sizeof(this->u.MapPath);
 			break;
 		case ICMState:
-			p = this->u.State.Deserialize(p);
+			this->u.State.Deserialize(p);
+			p += CServerSetup::Size();
 			break;
 	}
-	return p;
 }
 
 //----------------------------------------------------------------------------
@@ -301,14 +292,15 @@ const unsigned char *CInitMessage::Deserialize(const unsigned char *p)
 */
 static int NetworkSendICMessage(unsigned long host, int port, CInitMessage *msg)
 {
-	unsigned char buf[512];
 	msg->Stratagus = htonl(StratagusVersion);
 	msg->Version = htonl(NetworkProtocolVersion);
 	msg->Lag = htonl(NetworkLag);
 	msg->Updates = htonl(NetworkUpdates);
-	Assert(sizeof(buf) >= CInitMessage::Size(msg->SubType));
-	unsigned char *p = msg->Serialize(buf);
-	return NetSendUDP(NetworkFildes, host, port, buf, p - buf);
+
+	unsigned char *buf = msg->Serialize();
+	int ret = NetSendUDP(NetworkFildes, host, port, buf, CInitMessage::Size());
+	delete[] buf;
+	return ret;
 }
 
 #ifdef DEBUG
@@ -413,7 +405,6 @@ int NetworkSetupServerAddress(const std::string &serveraddr)
 	DebugPrint("SELECTED SERVER: %s (%d.%d.%d.%d)\n" _C_ serveraddr.c_str() _C_
 		NIPQUAD(ntohl(addr)));
 
-	//sprintf(NetServerText, "%d.%d.%d.%d", NIPQUAD(ntohl(addr)));
 	return 0;
 }
 
@@ -458,14 +449,6 @@ void NetworkDetachFromServer(void)
 	NetStateMsgCnt = 0;
 }
 
-static void SetNetworkHostPlyName(CNetworkHost &host, const std::string &name)
-{
-	size_t len = name.size();
-	if(len > sizeof(host.PlyName) - 1) len = sizeof(host.PlyName) - 1;
-	memcpy(host.PlyName, name.c_str(), len);
-	host.PlyName[len] = '\0';
-}
-
 /**
 ** Setup Network connect state machine for the server
 */
@@ -485,7 +468,7 @@ void NetworkInitServerConnect(int openslots)
 	}
 
 	// preset the server (initially always slot 0)
-	SetNetworkHostPlyName(Hosts[0], LocalPlayerName);
+	memcpy(Hosts[0].PlyName, LocalPlayerName.c_str(), sizeof(Hosts[0].PlyName) - 1);
 	
 	ServerSetupState.Clear();
 	LocalSetupState.Clear();
@@ -782,7 +765,7 @@ breakout:
 				continue;
 			}
 
-			if (n != (int)CInitMessage::Size(CInitMessage::DeserializeSubType(buf))) {
+			if (n != (int)CInitMessage::Size()) {
 				DebugPrint("Unexpected message size\n");
 				continue;
 			}
@@ -936,7 +919,7 @@ void NetworkGamePrepareGameSettings(void)
 */
 void NetworkConnectSetupGame(void)
 {
-	ThisPlayer->SetName(LocalPlayerName.c_str());
+	ThisPlayer->SetName(LocalPlayerName);
 	for (int i = 0; i < HostsCount; ++i) {
 		Players[Hosts[i].PlyNr].SetName(Hosts[i].PlyName);
 	}
@@ -970,7 +953,6 @@ void NetworkProcessClientRequest(void)
 
 	memset(&message, 0, sizeof(message));
 changed:
-	//sprintf(NetTriesText, "Connected try %d of 20", NetStateMsgCnt);
 	switch (NetLocalState) {
 		case ccs_disconnected:
 			message.Type = MessageInitHello;
@@ -998,10 +980,9 @@ changed:
 			if (NetStateMsgCnt < 48) { // 48 retries = 24 seconds
 				message.Type = MessageInitHello;
 				message.SubType = ICMHello;
-				SetNetworkHostPlyName(message.u.Hosts[0], LocalPlayerName);
+				memcpy(message.u.Hosts[0].PlyName, LocalPlayerName.c_str(), sizeof(message.u.Hosts[0].PlyName) - 1);
 				message.MapUID = 0L;
 				NetworkSendRateLimitedClientMessage(&message, 500);
-				//sprintf(NetTriesText, "Connecting try %d of 48", NetStateMsgCnt);
 			} else {
 				NetLocalState = ccs_unreachable;
 				NetConnectRunning = 0; // End the menu..
@@ -1257,7 +1238,7 @@ static void ClientParseConnecting(const CInitMessage *msg)
 					}
 				} else {
 					Hosts[i].PlyNr = i;
-					SetNetworkHostPlyName(Hosts[i], LocalPlayerName);
+					memcpy(Hosts[i].PlyName, LocalPlayerName.c_str(), sizeof(Hosts[i].PlyName) - 1);
 				}
 			}
 			break;
@@ -1420,7 +1401,7 @@ static void ClientParseSynced(const CInitMessage *msg)
 			Hosts[HostsCount].Host = 0;
 			Hosts[HostsCount].Port = 0;
 			Hosts[HostsCount].PlyNr = NetLocalPlayerNumber;
-			SetNetworkHostPlyName(Hosts[HostsCount], LocalPlayerName);
+			memcpy(Hosts[HostsCount].PlyName, LocalPlayerName.c_str(), sizeof(Hosts[HostsCount].PlyName) - 1);
 
 			NetLocalState = ccs_goahead;
 			NetStateMsgCnt = 0;
@@ -1455,7 +1436,7 @@ static void ClientParseAsync(const CInitMessage *msg)
 					}
 				} else {
 					Hosts[i].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
-					SetNetworkHostPlyName(Hosts[i], LocalPlayerName);
+					memcpy(Hosts[i].PlyName, LocalPlayerName.c_str(), sizeof(Hosts[i].PlyName) - 1);
 				}
 			}
 			NetLocalState = ccs_synced;
@@ -1592,7 +1573,7 @@ static void ServerParseHello(int h, const CInitMessage *msg)
 	message.Type = MessageInitReply;
 	message.SubType = ICMWelcome; // Acknowledge: Client is welcome
 	message.u.Hosts[0].PlyNr = htons(h); // Host array slot number
-	SetNetworkHostPlyName(message.u.Hosts[0], LocalPlayerName);
+	memcpy(message.u.Hosts[0].PlyName, LocalPlayerName.c_str(), sizeof(message.u.Hosts[0].PlyName) - 1); // Name of server player
 	message.MapUID = 0L;
 	for (i = 1; i < PlayerMax - 1; ++i) { // Info about other clients
 		if (i != h) {
@@ -1600,7 +1581,7 @@ static void ServerParseHello(int h, const CInitMessage *msg)
 				message.u.Hosts[i].Host = Hosts[i].Host;
 				message.u.Hosts[i].Port = Hosts[i].Port;
 				message.u.Hosts[i].PlyNr = htons(Hosts[i].PlyNr);
-				SetNetworkHostPlyName(message.u.Hosts[i], LocalPlayerName);
+				memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, sizeof(message.u.Hosts[i].PlyName) - 1);
 			} else {
 				message.u.Hosts[i].Host = 0;
 				message.u.Hosts[i].Port = 0;
@@ -1699,7 +1680,6 @@ static void ServerParseWaiting(const int h)
 			// this code path happens until client acknowledges the map
 			message.Type = MessageInitReply;
 			message.SubType = ICMMap; // Send Map info to the client
-			memset(message.u.MapPath, 0, sizeof(message.u.MapPath));
 			strncpy_s(message.u.MapPath, sizeof(message.u.MapPath), NetworkMapName.c_str(), NetworkMapName.size());
 			message.MapUID = htonl(Map.Info.MapUID);
 			n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
@@ -2107,7 +2087,7 @@ int NetworkParseSetupEvent(const unsigned char *buf, int size)
 {
 	CInitMessage msg;
 
-	if (size != (int)CInitMessage::Size(CInitMessage::DeserializeSubType(buf))) {
+	if (size != (int)CInitMessage::Size()) {
 		// FIXME: could be a bad packet
 		if (NetConnectRunning == 2 && NetLocalState == ccs_started) {
 			// Client has acked ready to start and receives first real network packet.
@@ -2135,5 +2115,7 @@ int NetworkParseSetupEvent(const unsigned char *buf, int size)
 	}
 	return 0;
 }
+
+
 
 //@}

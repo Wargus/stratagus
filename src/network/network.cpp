@@ -296,6 +296,7 @@ static int PlayerQuit[PlayerMax];          /// Player quit
 static CNetworkCommandQueue NCQs[MAX_NCQS]; /// CNetworkCommandQueues
 static int NumNCQs;                         /// Number of NCQs in use
 
+
 //----------------------------------------------------------------------------
 //  Serialize/Deserialize
 //----------------------------------------------------------------------------
@@ -378,8 +379,9 @@ void CNetworkPacketHeader::Deserialize(unsigned char *p)
 	}
 }
 
-unsigned char *CNetworkPacket::Serialize(unsigned char *buf, int numcommands) const
+unsigned char *CNetworkPacket::Serialize(int numcommands) const
 {
+	unsigned char *buf = new unsigned char[CNetworkPacket::Size(numcommands)];
 	unsigned char *p = buf;
 
 	this->Header.Serialize(p);
@@ -396,7 +398,7 @@ unsigned char *CNetworkPacket::Serialize(unsigned char *buf, int numcommands) co
 		p += CNetworkCommand::Size();
 	}
 
-	return p;
+	return buf;
 }
 
 int CNetworkPacket::Deserialize(unsigned char *p, unsigned int len)
@@ -444,17 +446,15 @@ int CNetworkPacket::Deserialize(unsigned char *p, unsigned int len)
 */
 static void NetworkBroadcast(const CNetworkPacket *packet, int numcommands)
 {
-	unsigned char buf[1 + 1 * MaxNetworkCommands  + //header
-		(2+2+2+2) * MaxNetworkCommands];
-
-	Assert(sizeof(buf) >= CNetworkPacket::Size(numcommands));
-
-	unsigned char *p = packet->Serialize(buf, numcommands);
+	unsigned char *buf = packet->Serialize(numcommands);
 
 	// Send to all clients.
 	for (int i = 0; i < HostsCount; ++i) {
-		NetSendUDP(NetworkFildes, Hosts[i].Host, Hosts[i].Port, buf, p - buf);
+		NetSendUDP(NetworkFildes, Hosts[i].Host, Hosts[i].Port, buf,
+			CNetworkPacket::Size(numcommands));
 	}
+
+	delete[] buf;
 }
 
 /**
@@ -780,9 +780,6 @@ void NetworkSendSelection(CUnit **units, int count)
 		return;
 	}
 
-	unsigned char buf[1 + 1 * MaxNetworkCommands  + //header
-		(2+2+2+2) * MaxNetworkCommands];
-
 	//
 	//  Build and send packets to cover all units.
 	//
@@ -822,16 +819,15 @@ void NetworkSendSelection(CUnit **units, int count)
 		// Send the Constructed packet to team members
 		//
 		int numcommands = (nosent + 3) / 4;
-		Assert(numcommands <= MaxNetworkCommands);
-		Assert(sizeof(buf) >= CNetworkPacketHeader::Size() + CNetworkSelection::Size() * numcommands);
-		unsigned char *p = packet.Serialize(buf, numcommands);
+		unsigned char *buf = packet.Serialize(numcommands);
 
 		for (i = 0; i < numteammates; ++i) {
-			ref = NetSendUDP(NetworkFildes, Hosts[teammates[i]].Host, Hosts[teammates[i]].Port,	buf, p - buf);
-		}
+			ref = NetSendUDP(NetworkFildes, Hosts[teammates[i]].Host, Hosts[teammates[i]].Port,
+				buf, CNetworkPacketHeader::Size() + CNetworkSelection::Size() * numcommands);
 	}
 }
 
+}
 /**
 **  Process Received Unit Selection
 **
@@ -1051,16 +1047,7 @@ void NetworkEvent(void)
 				validCommand = true;
 				break;
 			case MessageCommandDismiss:
-			{
-				unsigned int slot = ntohs(nc->Unit);
-				// Allow to explode critters.
-				if ((UnitSlots[slot]->Player->Index == PlayerNumNeutral) &&
-					UnitSlots[slot]->Type->ClicksToExplode) {
-					validCommand = true;
-					break;
-				}
 				// Fall through!
-			}
 			default:
 			{
 				unsigned int slot = ntohs(nc->Unit);
@@ -1248,7 +1235,7 @@ static void NetworkResendCommands(void)
 	packet.Header.Type[0] = MessageResend;
 	packet.Header.Type[1] = MessageNone;
 	packet.Header.Cycle =
-		(GameCycle / NetworkUpdates) * NetworkUpdates + NetworkUpdates;
+		(Uint8)((GameCycle / NetworkUpdates) * NetworkUpdates + NetworkUpdates);
 
 	NetworkBroadcast(&packet, 1);
 }

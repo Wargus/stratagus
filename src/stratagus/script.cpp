@@ -322,6 +322,7 @@ int LuaLoadFile(const std::string &file)
 static int CclGetCurrentLuaPath(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
+
 	std::string path = CurrentLuaFile;
 	size_t index = path.rfind('/');
 

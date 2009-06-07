@@ -66,8 +66,8 @@
 */
 class CNetworkHost {
 public:
-	unsigned char *Serialize(unsigned char *buf) const;
-	const unsigned char *Deserialize(const unsigned char *p);
+	unsigned char *Serialize() const;
+	void Deserialize(const unsigned char *p);
 	static size_t Size() { return 4+2+2+16; }
 
 	Uint32 Host;         /// Host address
@@ -90,8 +90,8 @@ typedef struct _network_state_ {
 */
 class CServerSetup {
 public:
-	unsigned char *Serialize(unsigned char *buf) const;
-	const unsigned char *Deserialize(const unsigned char *p);
+	unsigned char *Serialize() const;
+	void Deserialize(const unsigned char *p);
 	static size_t Size() { return 1+1+1+1+1+1+1+1+ 1*PlayerMax + 1*PlayerMax + 1*PlayerMax + 4*PlayerMax; }
 	void Clear() {
 		ResourcesOption = UnitsOption = FogOfWar = RevealMap =
@@ -124,13 +124,9 @@ public:
 */
 class CInitMessage {
 public:
-	unsigned char *Serialize(unsigned char *buf) const;
-	const unsigned char *Deserialize(const unsigned char *p);
-	static const int DeserializeSubType(const unsigned char *p) {
-		return (int)p[1];
-	};
-	
-	static const size_t Size(int subtype);
+	unsigned char *Serialize() const;
+	void Deserialize(const unsigned char *p);
+	static size_t Size() { return 1+1+4+4+4+4+4+4+1+256; }
 
 	Uint8  Type;        /// Init message type
 	Uint8  SubType;     /// Init message subtype
@@ -220,8 +216,6 @@ extern int NetConnectRunning;              /// Network menu: Setup mode active
 extern NetworkState NetStates[PlayerMax];  /// Network menu: Server: Client Host states
 extern unsigned char NetLocalState;        /// Network menu: Local Server/Client connect state
 extern int NetLocalHostsSlot;              /// Network menu: Slot # in Hosts array of local client
-//extern char NetTriesText[32];              /// Network menu: Client tries count text
-//extern char NetServerText[64];             /// Network menu: Text describing the Network Server IP
 extern int NetLocalPlayerNumber;           /// Player number of local client
 
 extern CServerSetup ServerSetupState;      /// Network menu: Multiplayer Server Menu selections state

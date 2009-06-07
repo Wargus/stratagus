@@ -176,12 +176,10 @@ PlayerAi *AiPlayer;             /// Current AI player
 */
 static void AiExecuteScript(void)
 {
-	PlayerAi *pai = AiPlayer;
-
-	if (!pai->Script.empty()) {
+	if (!AiPlayer->Script.empty()) {
 		lua_pushstring(Lua, "_ai_scripts_");
 		lua_gettable(Lua, LUA_GLOBALSINDEX);
-		lua_pushstring(Lua, pai->Script.c_str());
+		lua_pushstring(Lua, AiPlayer->Script.c_str());
 		lua_rawget(Lua, -2);
 		LuaCall(0, 1);
 		lua_pop(Lua, 1);

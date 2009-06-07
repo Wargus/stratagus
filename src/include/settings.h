@@ -125,7 +125,7 @@ extern Settings GameSettings;  /// Game settings
 	/// Show stats
 extern void ShowStats();
 	/// Create a game
-extern void CreateGame(const char *filename, CMap *map);
+extern void CreateGame(const std::string &filename, CMap *map);
 	/// Init Setting to default values
 extern void InitSettings(void);
 

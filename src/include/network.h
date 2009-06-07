@@ -44,8 +44,6 @@
 --  Defines
 ----------------------------------------------------------------------------*/
 
-//#define NetworkMaxLag 250  /// Debuging network lag (# game cycles)
-
 #define MaxNetworkCommands 9  /// Max Commands In A Packet
 
 #define IsNetworkGame() (NetworkFildes != (Socket)-1)
@@ -113,14 +111,6 @@ enum _extended_message_type_ {
 	ExtendedMessageDiplomacy,     /// Change diplomacy
 	ExtendedMessageSharedVision,  /// Change shared vision
 };
-#if 0
-/**
-**  Network acknowledge message.
-*/
-typedef struct _ack_message_ {
-	unsigned char Type;  /// Acknowledge message type
-} Acknowledge;
-#endif
 
 /**
 **  Network command message.
@@ -229,7 +219,7 @@ public:
 */
 class CNetworkPacket {
 public:
-	unsigned char *Serialize(unsigned char *buf, int numcommands) const;
+	unsigned char *Serialize(int numcommands) const;
 	int Deserialize(unsigned char *p, unsigned int len);
 	static size_t Size(int numcommands) {
 		return CNetworkPacketHeader::Size() + numcommands * CNetworkCommand::Size();

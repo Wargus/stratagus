@@ -83,10 +83,6 @@ void CleanModules(void)
 	EndReplayLog();
 	CleanMessages();
 
-	CleanGroups();
-	CleanUnits();
-	CleanUnitTypes();
-	CleanSelections();	
 	CleanIcons();
 	CleanCursors();
 	CleanUserInterface();
@@ -97,11 +93,15 @@ void CleanModules(void)
 	CleanRaces();
 	CleanConstructions();
 	CleanDecorations();
+	CleanUnitTypes();
+	CleanUnits();
+	CleanSelections();
+	CleanGroups();
 	CleanUpgrades();
 	CleanDependencies();
 	CleanButtons();
-	CleanMissiles();
 	CleanMissileTypes();
+	CleanMissiles();
 	CleanTilesets();
 	Map.Clean();
 	Map.CleanFogOfWar();
@@ -110,7 +110,7 @@ void CleanModules(void)
 	CleanSpells();
 	FreeVisionTable();
 	FreePathfinder();
-	
+
 	UnitTypeVar.Init(); // internal script. should be to a better place, don't find for restart.
 }
 
