@@ -9,7 +9,7 @@
 //
 /**@name settings.h - The game settings headerfile. */
 //
-//      (c) Copyright 2000-2007 by Andreas Arens and Jimmy Salmon
+//      (c) Copyright 2000-2009 by Andreas Arens and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -31,18 +31,10 @@
 //@{
 
 #include <vector>
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
+#include "player.h"
 
 class CFile;
 class CMap;
-enum PlayerTypes;
-
-/*----------------------------------------------------------------------------
---  Settings
-----------------------------------------------------------------------------*/
 
 struct SettingsPresets {
 	int Team;          /// Team of player -- NOT SELECTABLE YET
@@ -108,15 +100,7 @@ enum GameTypes {
 #endif
 };
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 extern Settings GameSettings;  /// Game settings
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 	/// Show stats
 extern void ShowStats();
@@ -127,4 +111,4 @@ extern void InitSettings(void);
 
 //@}
 
-#endif // !__SETTINGS_H__
+#endif
