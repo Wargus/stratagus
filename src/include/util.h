@@ -100,7 +100,7 @@ public:
 	bool TryLock ()
 	{
 #if !defined (__unix)
-		return TryEnterCriticalSection (&_mut);
+		return 0 != TryEnterCriticalSection (&_mut);
 #else
 		return 0 == pthread_mutex_trylock (&_mut);
 #endif
