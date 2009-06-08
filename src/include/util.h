@@ -38,7 +38,6 @@
 ----------------------------------------------------------------------------*/
 
 #ifndef __unix
-#define NOMINMAX
 #include <windows.h>
 #elif defined(__hpux)
 #include <sys/mpctl.h>
@@ -52,8 +51,8 @@
 
 inline int get_cpu_count(void) {
 #ifndef __unix
-  SYSTEM_INFO info;                                                                                                       
-  GetSystemInfo(&info);                              
+  SYSTEM_INFO info;
+  GetSystemInfo(&info);
   return info.dwNumberOfProcessors;
 #elif defined(__linux) || defined (__sun)
 	return sysconf (_SC_NPROCESSORS_ONLN);
@@ -104,7 +103,7 @@ public:
 		return TryEnterCriticalSection (&_mut);
 #else
 		return 0 == pthread_mutex_trylock (&_mut);
-#endif		
+#endif
 	}
 
 };

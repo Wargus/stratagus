@@ -117,17 +117,17 @@ bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit
 			this->DistanceType == GreaterThan ||
 			this->DistanceType == Equal ||
 			this->DistanceType == NotEqual) {
-		x1 = std::max(x - this->Distance, 0);
-		y1 = std::max(y - this->Distance, 0);
-		x2 = std::min(x + type->TileWidth + this->Distance, Map.Info.MapWidth);
-		y2 = std::min(y + type->TileHeight + this->Distance, Map.Info.MapHeight);
+		x1 = std::max<int>(x - this->Distance, 0);
+		y1 = std::max<int>(y - this->Distance, 0);
+		x2 = std::min<int>(x + type->TileWidth + this->Distance, Map.Info.MapWidth);
+		y2 = std::min<int>(y + type->TileHeight + this->Distance, Map.Info.MapHeight);
 		distance = this->Distance;
 	} else if (this->DistanceType == LessThan ||
 			this->DistanceType == GreaterThanEqual) {
-		x1 = std::max(x - this->Distance - 1, 0);
-		y1 = std::max(y - this->Distance - 1, 0);
-		x2 = std::min(x + type->TileWidth + this->Distance + 1, Map.Info.MapWidth);
-		y2 = std::min(y + type->TileHeight + this->Distance + 1, Map.Info.MapHeight);
+		x1 = std::max<int>(x - this->Distance - 1, 0);
+		y1 = std::max<int>(y - this->Distance - 1, 0);
+		x2 = std::min<int>(x + type->TileWidth + this->Distance + 1, Map.Info.MapWidth);
+		y2 = std::min<int>(y + type->TileHeight + this->Distance + 1, Map.Info.MapHeight);
 		distance = this->Distance - 1;
 	}
 	n = Map.Select(x1, y1, x2, y2, table);

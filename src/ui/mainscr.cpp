@@ -1460,7 +1460,7 @@ void CInfoPanel::Draw(void)
 static void DrawInfoPanelMultipleSelected()
 {
 	// Draw icons and a health bar
-	for (int i = 0; i < std::min(NumSelected, (int)UI.SelectedButtons.size()); ++i) {
+	for (int i = 0; i < std::min<int>(NumSelected, (int)UI.SelectedButtons.size()); ++i) {
 		CUIButton *button = &UI.SelectedButtons[i];
 		bool mouseOver = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i);
 

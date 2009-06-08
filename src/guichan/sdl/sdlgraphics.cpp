@@ -172,10 +172,10 @@ namespace gcn
 
         if (mAlpha)
         {
-			int x1 = std::max(area.x, top.x);
-			int y1 = std::max(area.y, top.y);
-			int x2 = std::min(area.x + area.width, top.x + top.width);
-			int y2 = std::min(area.y + area.height, top.y + top.height);
+			int x1 = std::max<int>(area.x, top.x);
+			int y1 = std::max<int>(area.y, top.y);
+			int x2 = std::min<int>(area.x + area.width, top.x + top.width);
+			int y2 = std::min<int>(area.y + area.height, top.y + top.height);
 
 			Video.FillTransRectangle(SDL_MapRGB(TheScreen->format, mColor.r, mColor.g, mColor.b),
 				x1, y1, x2 - x1, y2 - y1, mColor.a);

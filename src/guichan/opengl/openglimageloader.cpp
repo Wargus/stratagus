@@ -1,14 +1,14 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
- * Olof Naessén a.k.a jansem/yakslem                _asww7!uY`>  )\a//
+ * Olof Naessï¿½n a.k.a jansem/yakslem                _asww7!uY`>  )\a//
  *                                                 _Qhm`] _f "'c  1!5m
  * Visit: http://guichan.darkbits.org             )Qk<P ` _: :+' .'  "{[
  *                                               .)j(] .d_/ '-(  P .   S
@@ -53,12 +53,11 @@
  */
 
 /*
- * For comments regarding functions please see the header file. 
+ * For comments regarding functions please see the header file.
  */
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
 #include <windows.h>
 #endif
 
@@ -76,19 +75,19 @@ namespace gcn
 
     OpenGLImageLoader::OpenGLImageLoader()
     {
-        mImageLoader = 0;    
+        mImageLoader = 0;
     }
 
     OpenGLImageLoader::OpenGLImageLoader(ImageLoader* imageLoader)
     {
-        mImageLoader = imageLoader;    
+        mImageLoader = imageLoader;
     }
 
     void OpenGLImageLoader::setHostImageLoader(ImageLoader* imageLoader)
     {
-        mImageLoader = imageLoader;    
+        mImageLoader = imageLoader;
     }
-  
+
     void OpenGLImageLoader::prepare(const std::string& filename)
     {
         if(mImageLoader == NULL)
@@ -96,7 +95,7 @@ namespace gcn
             throw GCN_EXCEPTION("No host ImageLoader present.");
         }
 
-        mImageLoader->prepare(filename);    
+        mImageLoader->prepare(filename);
     }
 
     void* OpenGLImageLoader::getRawData()
@@ -108,7 +107,7 @@ namespace gcn
 
         return mImageLoader->getRawData();
     }
-  
+
     void* OpenGLImageLoader::finalize()
     {
         if(mImageLoader == NULL)
@@ -209,10 +208,10 @@ namespace gcn
 
             throw GCN_EXCEPTION(std::string("glGetError said: ") + errmsg);
         }
-    
+
         return (void *)texture;
     }
-  
+
     void OpenGLImageLoader::discard()
     {
         if(mImageLoader == NULL)
@@ -220,23 +219,23 @@ namespace gcn
             throw GCN_EXCEPTION("No host ImageLoader present.");
         }
 
-        mImageLoader->discard();    
+        mImageLoader->discard();
     }
-  
+
     void OpenGLImageLoader::free(Image* image)
-    {    
+    {
         glDeleteTextures(1, (GLuint *)image->_getData());
-    
+
         delete[] (GLuint *)(image->_getData());
     }
-  
+
     int OpenGLImageLoader::getWidth() const
     {
         if(mImageLoader == NULL)
         {
             throw GCN_EXCEPTION("No host ImageLoader present.");
         }
-    
+
         return mImageLoader->getWidth();
     }
 
@@ -246,7 +245,7 @@ namespace gcn
         {
             throw GCN_EXCEPTION("No host ImageLoader present.");
         }
-    
+
         return mImageLoader->getHeight();
     }
 
@@ -256,7 +255,7 @@ namespace gcn
         {
             throw GCN_EXCEPTION("No host ImageLoader present.");
         }
-        
+
         return mImageLoader->getPixel(x, y);
     }
 
@@ -266,7 +265,7 @@ namespace gcn
         {
             throw GCN_EXCEPTION("No host ImageLoader present.");
         }
-    
-        mImageLoader->putPixel(x, y, color);    
-    }  
+
+        mImageLoader->putPixel(x, y, color);
+    }
 }

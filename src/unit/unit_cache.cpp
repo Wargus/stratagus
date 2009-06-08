@@ -226,10 +226,10 @@ int CMap::Select(int x1, int y1,
 	//
 	//  Reduce to map limits.
 	//
-	x1 = std::max(x1, 0);
-	y1 = std::max(y1, 0);
-	x2 = std::min(x2, Info.MapWidth - 1);
-	y2 = std::min(y2, Info.MapHeight - 1);
+	x1 = std::max<int>(x1, 0);
+	y1 = std::max<int>(y1, 0);
+	x2 = std::min<int>(x2, Info.MapWidth - 1);
+	y2 = std::min<int>(y2, Info.MapHeight - 1);
 
 	return SelectFixed(x1,y1,x2,y2,table, tablesize);
 }

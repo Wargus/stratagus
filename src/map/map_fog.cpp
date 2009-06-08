@@ -674,10 +674,10 @@ void CViewport::DrawMapFogOfWar() const
 	}
 	p = ThisPlayer->Index;
 
-    sx = std::max(MapX - 1, 0);
-    ex = std::min(MapX + MapWidth + 1, Map.Info.MapWidth);
-    my = std::max(MapY - 1, 0);
-    ey = std::min(MapY + MapHeight + 1, Map.Info.MapHeight);
+    sx = std::max<int>(MapX - 1, 0);
+    ex = std::min<int>(MapX + MapWidth + 1, Map.Info.MapWidth);
+    my = std::max<int>(MapY - 1, 0);
+    ey = std::min<int>(MapY + MapHeight + 1, Map.Info.MapHeight);
 
     // Update for visibility all tile in viewport
 	// and 1 tile around viewport (for fog-of-war connection display)

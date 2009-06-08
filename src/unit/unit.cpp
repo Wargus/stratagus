@@ -2093,7 +2093,7 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 
 	destx = x;
 	desty = y;
-	size = std::min(Map.Info.MapWidth * Map.Info.MapHeight / 4, range * range * 5);
+	size = std::min<int>(Map.Info.MapWidth * Map.Info.MapHeight / 4, range * range * 5);
 	points = new p[size];
 
 	// Make movement matrix. FIXME: can create smaller matrix.
@@ -2336,7 +2336,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 
 	destx = x;
 	desty = y;
-	size = std::min(Map.Info.MapWidth * Map.Info.MapHeight / 4, range * range * 5);
+	size = std::min<int>(Map.Info.MapWidth * Map.Info.MapHeight / 4, range * range * 5);
 	points = new p[size];
 
 	// Find the nearest gold depot
@@ -2404,7 +2404,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 						bool better = (mine != bestmine);
 
 						if(better) {
-							n = std::max(MyAbs(destx - x), MyAbs(desty - y));
+							n = std::max<int>(MyAbs(destx - x), MyAbs(desty - y));
 							if(check_usage && mine->Type->MaxOnBoard) {
 								int assign = mine->Data.Resource.Assigned -
 														mine->Type->MaxOnBoard;
@@ -2561,7 +2561,7 @@ CUnit *UnitFindMiningArea(const CUnit *unit, int x, int y,
 
 	destx = x;
 	desty = y;
-	size = std::min(Map.Info.MapWidth * Map.Info.MapHeight / 4, range * range * 5);
+	size = std::min<int>(Map.Info.MapWidth * Map.Info.MapHeight / 4, range * range * 5);
 	points = new p[size];
 
 	// Find the nearest resource depot
@@ -2619,7 +2619,7 @@ CUnit *UnitFindMiningArea(const CUnit *unit, int x, int y,
 				//
 				if ((mine = ResourceOnMap(x, y, resource, false))) {
 					if (destu) {
-						n = std::max(MyAbs(destx - x), MyAbs(desty - y));
+						n = std::max<int>(MyAbs(destx - x), MyAbs(desty - y));
 						if (n < bestd) {
 							bestd = n;
 							bestmine = mine;

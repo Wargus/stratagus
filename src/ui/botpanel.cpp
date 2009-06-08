@@ -380,12 +380,12 @@ void DrawPopupUnitInfo(const CUnitType *type,
 		popupWidth += (font->Width(type->Demand) + 5);
 	}
 	popupWidth += 10;
-	popupWidth = std::max(popupWidth, font->Width(type->Name) + 10);
+	popupWidth = std::max<int>(popupWidth, font->Width(type->Name) + 10);
 
 	if(popupWidth < 120)
 		popupWidth = 120;
 		
-	int start_x = std::min(buttonX, Video.Width - 1 - popupWidth);
+	int start_x = std::min<int>(buttonX, Video.Width - 1 - popupWidth);
 	int y = buttonY - popupHeight - 10;
 	int x = start_x;
 	CLabel label(font,"white", "red");
@@ -432,7 +432,7 @@ void DrawPopupUnitInfo(const CUnitType *type,
 
 	if (type->CanAttack) {
 		// Damage
-		int min_damage = std::max(1, type->Variable[PIERCINGDAMAGE_INDEX].Value / 2);
+		int min_damage = std::max<int>(1, type->Variable[PIERCINGDAMAGE_INDEX].Value / 2);
 		int max_damage = type->Variable[PIERCINGDAMAGE_INDEX].Value +
 			 type->Variable[BASICDAMAGE_INDEX].Value;
 		std::ostringstream damage;
@@ -494,11 +494,11 @@ static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 			CLabel label(font,"white", "red");
 			int *Costs = AllUpgrades[button->Value]->Costs;
 			popupWidth = GetPopupCostsWidth(font, Costs);
-			popupWidth = std::max(popupWidth, font->Width(button->Hint) + 10);
+			popupWidth = std::max<int>(popupWidth, font->Width(button->Hint) + 10);
 	
 			popupHeight	= 40;
 	
-			start_x = std::min(uibutton->X, Video.Width - 1 - popupWidth);
+			start_x = std::min<int>(uibutton->X, Video.Width - 1 - popupWidth);
 			
 			y = uibutton->Y - popupHeight - 10;
 			x = start_x;
@@ -539,15 +539,15 @@ static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 					}
 				}
 				popupWidth += font->Width(spell->ManaCost);
-				popupWidth = std::max(popupWidth, font->Width(spell->Name) + 10);
+				popupWidth = std::max<int>(popupWidth, font->Width(spell->Name) + 10);
 			} else {
 				popupWidth = font->Width(button->Hint) + 10;
 				popupHeight = font_height + 10;
 			}
 
-			popupWidth = std::max(popupWidth, 100);
+			popupWidth = std::max<int>(popupWidth, 100);
 			
-			x = std::min(uibutton->X, Video.Width - 1 - popupWidth);
+			x = std::min<int>(uibutton->X, Video.Width - 1 - popupWidth);
 			y = uibutton->Y - popupHeight - 10;
 
 			// Background
@@ -592,7 +592,7 @@ static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 		default:
 			popupWidth = font->Width(button->Hint) + 10;
 			popupHeight = font_height + 10;//19;
-			x = std::min(uibutton->X, Video.Width - 1 - popupWidth);
+			x = std::min<int>(uibutton->X, Video.Width - 1 - popupWidth);
 			y = uibutton->Y - popupHeight - 10;
 
 			// Background

@@ -131,7 +131,7 @@ static void CreateMinimapTexture(void)
 void CMinimap::Create(void)
 {
 	int n;
-	int maxSize = std::max(Map.Info.MapWidth, Map.Info.MapHeight);
+	int maxSize = std::max<int>(Map.Info.MapWidth, Map.Info.MapHeight);
 
 	MinimapScaleX = (W * MINIMAP_FAC + maxSize - 1) / maxSize;
 	MinimapScaleY = (H * MINIMAP_FAC + maxSize - 1) / maxSize;
@@ -833,8 +833,8 @@ void CMinimap::Draw(int vx, int vy)
 int CMinimap::Screen2MapX(int x)
 {
 	int tx = (((x - X - XOffset) * MINIMAP_FAC) / MinimapScaleX);
-	tx = std::max(tx, 0);
-	tx = std::min(tx, Map.Info.MapWidth - 1);
+	tx = std::max<int>(tx, 0);
+	tx = std::min<int>(tx, Map.Info.MapWidth - 1);
 	return tx;
 }
 
@@ -848,8 +848,8 @@ int CMinimap::Screen2MapX(int x)
 int CMinimap::Screen2MapY(int y)
 {
 	int ty = (((y - Y - YOffset) * MINIMAP_FAC) / MinimapScaleY);
-	ty = std::max(ty, 0);
-	ty = std::min(ty, Map.Info.MapHeight - 1);
+	ty = std::max<int>(ty, 0);
+	ty = std::min<int>(ty, Map.Info.MapHeight - 1);
 	return ty;
 }
 

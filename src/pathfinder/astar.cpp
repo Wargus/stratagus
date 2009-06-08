@@ -50,7 +50,7 @@
 struct Node {
 	int CostFromStart;  /// Real costs to reach this point
 	short int CostToGoal;     /// Estimated cost to goal
-	char InGoal;        /// is this point in the goal	
+	char InGoal;        /// is this point in the goal
 	char Direction;     /// Direction for trace back
 };
 
@@ -62,7 +62,7 @@ struct Open {
 };
 
 /// heuristic cost function for a*
-#define AStarCosts(sx,sy,ex,ey) std::max(MyAbs(sx - ex), MyAbs(sy - ey))
+#define AStarCosts(sx,sy,ex,ey) std::max<int>(MyAbs(sx - ex), MyAbs(sy - ey))
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -124,7 +124,6 @@ static const int CacheNotSet = -5;
 
 #include <map>
 #ifndef __unix
-#define NOMINMAX
 #include <windows.h>
 #else
 
@@ -188,7 +187,7 @@ inline void ProfileEnd(const char *const function)
 	data->TotalTime += time;
 }
 
-static bool compProfileData(const ProfileData* lhs, 
+static bool compProfileData(const ProfileData* lhs,
 						const ProfileData* rhs)
 {
 	return (lhs->TotalTime > rhs->TotalTime);
@@ -225,7 +224,7 @@ inline void ProfilePrint()
 					fprintf(fd, "%s\n",j->first);
 				}
 			}
-			
+
 	}
 
 	fclose(fd);
@@ -479,7 +478,7 @@ static void CostMoveToCacheCleanUp(void)
 
 /**
 **  Find the best node in the current open node set
-**  Returns the position of this node in the open node set 
+**  Returns the position of this node in the open node set
 */
 #define AStarFindMinimum() (OpenSetSize - 1)
 
@@ -506,10 +505,10 @@ static inline int AStarAddNode(int x, int y, int o, int costs)
 	int bigi = 0, smalli = OpenSetSize;
 	int midcost;
 	int midi;
-	int midCostToGoal;	
+	int midCostToGoal;
 	int midDist;
 	const Open *open;
-	
+
 	if (OpenSetSize + 1 >= OpenSetMaxSize) {
 		fprintf(stderr, "A* internal error: raise Open Set Max Size "
 				"(current value %d)\n", OpenSetMaxSize);
@@ -564,7 +563,7 @@ static inline int AStarAddNode(int x, int y, int o, int costs)
 }
 
 /**
-**  Change the cost associated to an open node. 
+**  Change the cost associated to an open node.
 **  Can be further optimised knowing that the new cost MUST BE LOWER
 **  than the old one.
 */
@@ -616,7 +615,7 @@ static void AStarAddToClose(int node)
 }
 
 #define GetIndex(x,y) \
-	(x) + (y) * AStarMapWidth	
+	(x) + (y) * AStarMapWidth
 
 /**
 **  Compute the cost of crossing tile (x,y)
@@ -638,8 +637,8 @@ static inline int CostMoveTo(unsigned int index, void *data)
 	if(!CostMoveToCallback) {
 		/* build-in costmoveto code */
 		const CUnit *const unit = (const CUnit *)data;
-/*		
-		
+/*
+
 		// Doesn't cost anything to move to ourselves :)
 		// Used when marking goals mainly.  Could cause speed problems
 		if (unit->X == x && unit->Y == y) {
@@ -653,7 +652,7 @@ static inline int CostMoveTo(unsigned int index, void *data)
 		const int mask = unit->Type->MovementMask;
 		const CUnitTypeFinder unit_finder((UnitTypeType)unit->Type->UnitType);
 		const unsigned int player_index = unit->Player->Index;
-		
+
 		// verify each tile of the unit.
 		int h = unit->Type->TileHeight;
 		const int w = unit->Type->TileWidth;
@@ -699,7 +698,7 @@ static inline int CostMoveTo(unsigned int index, void *data)
 		} while(--h);
 		*c = cost;
 		return cost;
-	}	
+	}
 	return (*c = CostMoveToCallback(index, data));
 }
 
@@ -745,11 +744,11 @@ static int AStarMarkGoal(int gx, int gy, int gw, int gh,
 	}
 
 	if (minrange == 0) {
-		int sx = std::max(gx, 0);
-		int sy = std::max(gy, 0);
-		int ey = std::min(gy + gh, AStarMapHeight - tilesizey);
-		int ex = std::min(gx + gw, AStarMapWidth - tilesizex);
-		unsigned int offset = sy * AStarMapWidth;// + x; 		
+		int sx = std::max<int>(gx, 0);
+		int sy = std::max<int>(gy, 0);
+		int ey = std::min<int>(gy + gh, AStarMapHeight - tilesizey);
+		int ex = std::min<int>(gx + gw, AStarMapWidth - tilesizex);
+		unsigned int offset = sy * AStarMapWidth;// + x;
 		for (y = sy; y < ey; ++y) {
 			for (x = sx; x < ex; ++x) {
 				if (CostMoveTo(offset + x, data) >= 0) {
@@ -769,10 +768,10 @@ static int AStarMarkGoal(int gx, int gy, int gw, int gh,
 		gh--;
 	}
 
-	int sx = std::max(gx, 0);
-	int ex = std::min(gx + gw, AStarMapWidth - tilesizex);
-	int sy = std::max(gy, 0);
-	int ey = std::min(gy + gh, AStarMapHeight - tilesizey);
+	int sx = std::max<int>(gx, 0);
+	int ex = std::min<int>(gx + gw, AStarMapWidth - tilesizex);
+	int sy = std::max<int>(gy, 0);
+	int ey = std::min<int>(gy + gh, AStarMapHeight - tilesizey);
 
 	// Mark top, bottom, left, right
 	for (range = minrange; range <= maxrange; ++range) {
@@ -930,7 +929,7 @@ static int AStarSavePath(int startX, int startY, int endX, int endY, char *path,
 
 	// Save as much of the path as we can
 	if (path) {
-		pathLen = std::min(fullPathLength, pathLen);
+		pathLen = std::min<int>(fullPathLength, pathLen);
 		pathPos = fullPathLength;
 		currX = endX;
 		currY = endY;
@@ -1139,10 +1138,10 @@ int AStarFindPath(int sx, int sy, int gx, int gy, int gw, int gh,
 					ey < 0 || ey + tilesizey - 1 >= AStarMapHeight) {
 				continue;
 			}
-			
+
 			//eo = GetIndex(ex, ey);
 			eo = ex + (o-x) + Heading2O[i];
-			
+
 			// if the point is "move to"-able and
 			// if we have not reached this point before,
 			// or if we have a better path to it, we add it to open set

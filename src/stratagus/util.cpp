@@ -39,7 +39,6 @@
 #ifdef USE_WIN32
 #define WIN32_LEAN_AND_MEAN
 #undef NOUSER
-#define NOMINMAX
 #include <windows.h>
 #elif defined(HAVE_X)
 #include <X11/Xlib.h>
@@ -494,7 +493,7 @@ CMutex::CMutex ()
   #if defined (__linux)
 		if (pthread_mutexattr_settype (&_attr, PTHREAD_MUTEX_RECURSIVE_NP) == 0)
   #else // HP & SUN
-    	if (pthread_mutexattr_settype (&_attr, PTHREAD_MUTEX_RECURSIVE) == 0 && 
+    	if (pthread_mutexattr_settype (&_attr, PTHREAD_MUTEX_RECURSIVE) == 0 &&
     		pthread_mutexattr_setpshared (&_attr, PTHREAD_PROCESS_PRIVATE) == 0)
   #endif
   		{
@@ -504,14 +503,14 @@ CMutex::CMutex ()
 #endif
 }
 
-CMutex::~CMutex () 
+CMutex::~CMutex ()
 {
 #if !defined (__unix)
 	DeleteCriticalSection (&_mut);
 #else
 	pthread_mutex_destroy (&_mut);
 	pthread_mutexattr_destroy (&_attr);
-#endif			
+#endif
 }
 
 #if !defined (__unix)
@@ -542,7 +541,7 @@ void CThread::Terminate ()
   {
 #if !defined (__unix)
     TerminateThread(m_hndlThread, 0);
-#else 
+#else
     pthread_cancel(m_dThreadID);
 #endif
     m_bRunning = false;

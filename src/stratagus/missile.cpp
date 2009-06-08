@@ -326,7 +326,7 @@ static int CalculateDamageStats(const CUnitStats *attacker_stats,
 		piercing_damage *= 2;
 	}
 
-	damage = std::max(basic_damage - goal_stats->Variables[ARMOR_INDEX].Value, 1);
+	damage = std::max<int>(basic_damage - goal_stats->Variables[ARMOR_INDEX].Value, 1);
 	damage += piercing_damage;
 	damage -= SyncRand() % ((damage + 2) / 2);
 	Assert(damage >= 0);
@@ -491,8 +491,8 @@ void FireMissile(CUnit *unit)
 static void GetMissileMapArea(const Missile *missile, int *sx, int *sy,
 	int *ex, int *ey)
 {
-#define BoundX(x) std::min(std::max(0, x), Map.Info.MapWidth - 1)
-#define BoundY(y) std::min(std::max(0, y), Map.Info.MapHeight - 1)
+#define BoundX(x) std::min<int>(std::max<int>(0, x), Map.Info.MapWidth - 1)
+#define BoundY(y) std::min<int>(std::max<int>(0, y), Map.Info.MapHeight - 1)
 
 	*sx = BoundX(missile->X / TileSizeX);
 	*sy = BoundY(missile->Y / TileSizeY);

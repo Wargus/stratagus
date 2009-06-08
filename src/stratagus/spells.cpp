@@ -483,18 +483,18 @@ int AdjustVitals::Cast(CUnit *caster, const SpellType *spell,
 	//  Avoid div by 0 errors too!
 	castcount = 0;
 	if (hp) {
-		castcount = std::max(castcount, diffHP / abs(hp) + (((hp < 0) &&
+		castcount = std::max<int>(castcount, diffHP / abs(hp) + (((hp < 0) &&
 			(diffHP % (-hp) > 0)) ? 1 : 0));
 	}
 	if (mana) {
-		castcount = std::max(castcount, diffMana / abs(mana) + (((mana < 0) &&
+		castcount = std::max<int>(castcount, diffMana / abs(mana) + (((mana < 0) &&
 			(diffMana % (-mana) > 0)) ? 1 : 0));
 	}
 	if (manacost) {
-		castcount = std::min(castcount, caster->Variable[MANA_INDEX].Value / manacost);
+		castcount = std::min<int>(castcount, caster->Variable[MANA_INDEX].Value / manacost);
 	}
 	if (this->MaxMultiCast) {
-		castcount = std::min(castcount, this->MaxMultiCast);
+		castcount = std::min<int>(castcount, this->MaxMultiCast);
 	}
 
 	caster->Variable[MANA_INDEX].Value -= castcount * manacost;
