@@ -1420,7 +1420,7 @@ static void EditorCallbackButtonDown(unsigned button)
 */
 static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 {
-	char *ptr;
+	const char *ptr;
 
 	if (HandleKeyModifiersDown(key, keychar)) {
 		return;
