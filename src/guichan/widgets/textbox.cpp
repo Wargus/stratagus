@@ -218,7 +218,7 @@ namespace gcn
     {
         bool ret = false;
 
-        if (key.getValue() == Key::LEFT)
+        if (key.getValue() == Key::K_LEFT)
         {
             mCaretColumn = UTF8GetPrev(mTextRows[mCaretRow], mCaretColumn);
             if (mCaretColumn < 0)
@@ -238,7 +238,7 @@ namespace gcn
             ret = true;
         }
 
-        else if (key.getValue() == Key::RIGHT)
+        else if (key.getValue() == Key::K_RIGHT)
         {
             mCaretColumn = UTF8GetNext(mTextRows[mCaretRow], mCaretColumn);
             if (mCaretColumn > (int)mTextRows[mCaretRow].size())
@@ -263,31 +263,31 @@ namespace gcn
             ret = true;
         }
 
-        else if (key.getValue() == Key::DOWN)
+        else if (key.getValue() == Key::K_DOWN)
         {
             setCaretRow(mCaretRow + 1);
             ret = true;
         }
 
-        else if (key.getValue() == Key::UP)
+        else if (key.getValue() == Key::K_UP)
         {
             setCaretRow(mCaretRow - 1);
             ret = true;
         }
 
-        else if (key.getValue() == Key::HOME)
+        else if (key.getValue() == Key::K_HOME)
         {
             mCaretColumn = 0;
             ret = true;
         }    
 
-        else if (key.getValue() == Key::END)
+        else if (key.getValue() == Key::K_END)
         {
             mCaretColumn = mTextRows[mCaretRow].size();
             ret = true;
         }    
 
-        else if (key.getValue() == Key::ENTER && mEditable)
+        else if (key.getValue() == Key::K_ENTER && mEditable)
         {
             mTextRows.insert(mTextRows.begin() + mCaretRow + 1,
                              mTextRows[mCaretRow].substr(mCaretColumn, mTextRows[mCaretRow].size() - mCaretColumn));
@@ -297,7 +297,7 @@ namespace gcn
             ret = true;
         }
 
-        else if (key.getValue() == Key::BACKSPACE
+        else if (key.getValue() == Key::K_BACKSPACE
                  && mCaretColumn != 0
                  && mEditable)
         {
@@ -307,7 +307,7 @@ namespace gcn
             ret = true;
         }
 
-        else if (key.getValue() == Key::BACKSPACE
+        else if (key.getValue() == Key::K_BACKSPACE
                  && mCaretColumn == 0
                  && mCaretRow != 0
                  && mEditable)
@@ -319,7 +319,7 @@ namespace gcn
             ret = true;
         }
 
-        else if (key.getValue() == Key::DELETE
+        else if (key.getValue() == Key::K_DELETE
                  && mCaretColumn < (int)mTextRows[mCaretRow].size()
                  && mEditable)
         {
@@ -328,7 +328,7 @@ namespace gcn
             ret = true;
         }
 
-        else if (key.getValue() == Key::DELETE
+        else if (key.getValue() == Key::K_DELETE
                  && mCaretColumn == (int)mTextRows[mCaretRow].size()
                  && mCaretRow < ((int)mTextRows.size() - 1)
                  && mEditable)
@@ -338,7 +338,7 @@ namespace gcn
             ret = true;
         }
 
-        else if(key.getValue() == Key::PAGE_UP)
+        else if(key.getValue() == Key::K_PAGE_UP)
         {
             int w, h, rowsPerPage;
             getParent()->getDrawSize(w, h, this);
@@ -352,7 +352,7 @@ namespace gcn
             ret = true;
         }
 
-        else if(key.getValue() == Key::PAGE_DOWN)
+        else if(key.getValue() == Key::K_PAGE_DOWN)
         {
             int w, h, rowsPerPage;
             getParent()->getDrawSize(w, h, this);
@@ -366,7 +366,7 @@ namespace gcn
             ret = true;
         }
 
-        else if(key.getValue() == Key::TAB
+        else if(key.getValue() == Key::K_TAB
                 && mEditable)
         {
             mTextRows[mCaretRow].insert(mCaretColumn,std::string("    "));

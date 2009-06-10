@@ -59,10 +59,6 @@
 
 #include "guichan/platform.h"
 
-#ifdef DELETE
-#undef DELETE
-#endif
-
 namespace gcn
 {
     /**
@@ -75,14 +71,14 @@ namespace gcn
          * Constructor.
          */
         Key();
-    
+
         /**
          * Constructor.
          *
          * @param value the ascii or enum value for the key.
          */
         Key(int value);
-    
+
         /**
          * Checks whether a key is a character.
          *
@@ -96,7 +92,7 @@ namespace gcn
          * @return true if the key is a number (0-9).
          */
         bool isNumber() const;
-    
+
         /**
          * Checks whether a key is a letter.
          *
@@ -110,7 +106,7 @@ namespace gcn
          * @return true if shift was pressed at the same time as the key.
          */
         bool isShiftPressed() const;
-    
+
         /**
          * Sets the shift pressed flag.
          *
@@ -123,7 +119,7 @@ namespace gcn
          * @return true if control was pressed at the same time as the key.
          */    
         bool isControlPressed() const;
-    
+
         /**
          * Sets the control pressed flag.
          *
@@ -158,7 +154,7 @@ namespace gcn
          * @param pressed the meta flag value.
          */
         void setMetaPressed(bool pressed);
-    
+
         /**
          * Checks whether the key was pressed at the numeric pad.
          *
@@ -172,7 +168,7 @@ namespace gcn
          * @param numpad the numeric pad flag value.
          */
         void setNumericPad(bool numpad);
-    
+
         /**
          * Gets the value of the key. If an ascii value exists it will be
          * returned. Otherwise an enum value will be returned.
@@ -188,64 +184,64 @@ namespace gcn
          */
         void setValue(int value);
 
-		/**
-		 * Convert to a UTF8 string
-		 */
-		std::string toString() const;
+        /**
+         * Convert to a UTF8 string
+         */
+        std::string toString() const;
 
         /**
          * An enum with key values.
          */
         enum
         {
-            SPACE              = ' ',
-            TAB                = '\t', 
-            ENTER              = '\n',   
-            LEFT_ALT           = 1000,
-            RIGHT_ALT,
-            LEFT_SHIFT,
-            RIGHT_SHIFT,
-            LEFT_CONTROL,
-            RIGHT_CONTROL,
-            LEFT_META,
-            RIGHT_META,
-            LEFT_SUPER,
-            RIGHT_SUPER,
-            INSERT,
-            HOME,
-            PAGE_UP,
-            DELETE,
-            END,
-            PAGE_DOWN,
-            ESCAPE,
-            CAPS_LOCK,
-            BACKSPACE,
-            F1,
-            F2,
-            F3,
-            F4,
-            F5,
-            F6,
-            F7,
-            F8,
-            F9,
-            F10,
-            F11,
-            F12,
-            F13,
-            F14,
-            F15,
-            PRINT_SCREEN,
-            SCROLL_LOCK,
-            PAUSE,
-            NUM_LOCK,
-            ALT_GR,
-            LEFT,
-            RIGHT,
-            UP,
-            DOWN      
+            K_SPACE              = ' ',
+            K_TAB                = '\t',
+            K_ENTER              = '\n',
+            K_LEFT_ALT           = 1000,
+            K_RIGHT_ALT,
+            K_LEFT_SHIFT,
+            K_RIGHT_SHIFT,
+            K_LEFT_CONTROL,
+            K_RIGHT_CONTROL,
+            K_LEFT_META,
+            K_RIGHT_META,
+            K_LEFT_SUPER,
+            K_RIGHT_SUPER,
+            K_INSERT,
+            K_HOME,
+            K_PAGE_UP,
+            K_DELETE,
+            K_END,
+            K_PAGE_DOWN,
+            K_ESCAPE,
+            K_CAPS_LOCK,
+            K_BACKSPACE,
+            K_F1,
+            K_F2,
+            K_F3,
+            K_F4,
+            K_F5,
+            K_F6,
+            K_F7,
+            K_F8,
+            K_F9,
+            K_F10,
+            K_F11,
+            K_F12,
+            K_F13,
+            K_F14,
+            K_F15,
+            K_PRINT_SCREEN,
+            K_SCROLL_LOCK,
+            K_PAUSE,
+            K_NUM_LOCK,
+            K_ALT_GR,
+            K_LEFT,
+            K_RIGHT,
+            K_UP,
+            K_DOWN
         };
-    
+
     protected:
         int mValue;
         bool mShiftPressed;

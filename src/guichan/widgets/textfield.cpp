@@ -217,7 +217,7 @@ namespace gcn
 
         getTextSelectionPositions(&selFirst, &selLen);
 
-        if (key.getValue() == Key::LEFT)
+        if (key.getValue() == Key::K_LEFT)
         {
             if (mCaretPosition > 0) {
                 mCaretPosition = UTF8GetPrev(mText, mCaretPosition);
@@ -239,7 +239,7 @@ namespace gcn
             ret = true;
         }
 
-        else if (key.getValue() == Key::RIGHT)
+        else if (key.getValue() == Key::K_RIGHT)
         {
             if (mCaretPosition < (int)mText.size()) {
                 mCaretPosition = UTF8GetNext(mText, mCaretPosition);
@@ -262,7 +262,7 @@ namespace gcn
             ret = true;
         }
 
-        else if (key.getValue() == Key::DELETE )
+        else if (key.getValue() == Key::K_DELETE )
         {
 			if (selLen > 0) {
 				mText.erase(selFirst, selLen);
@@ -280,7 +280,7 @@ namespace gcn
 			}
         }
 
-        else if (key.getValue() == Key::BACKSPACE || key.getValue() == 'h' - 'a' + 1)
+        else if (key.getValue() == Key::K_BACKSPACE || key.getValue() == 'h' - 'a' + 1)
         {
 			if (selLen > 0) {
 				mText.erase(selFirst, selLen);
@@ -299,13 +299,13 @@ namespace gcn
 			}
         }
 
-        else if (key.getValue() == Key::ENTER)
+        else if (key.getValue() == Key::K_ENTER)
         {
             generateAction();
             ret = true;
         }
 
-        else if (key.getValue() == Key::HOME || key.getValue() == 'a' - 'a' + 1) // ctrl-a
+        else if (key.getValue() == Key::K_HOME || key.getValue() == 'a' - 'a' + 1) // ctrl-a
         {
 			if (key.isShiftPressed()) {
 				mSelectEndOffset -= mCaretPosition;
@@ -317,7 +317,7 @@ namespace gcn
 			ret = true;
         }    
 
-        else if (key.getValue() == Key::END || key.getValue() == 'e' - 'a' + 1)  //ctrl-e
+        else if (key.getValue() == Key::K_END || key.getValue() == 'e' - 'a' + 1)  //ctrl-e
         {
 			if (key.isShiftPressed()) {
 				mSelectEndOffset += mText.size() - mCaretPosition;

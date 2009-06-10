@@ -298,13 +298,13 @@ namespace gcn
 
         if (getOrientation() == HORIZONTAL)
         {
-            if (key.getValue() == Key::RIGHT)
+            if (key.getValue() == Key::K_RIGHT)
             {
                 setValue(getValue() + getStepLength());
                 generateAction();
                 ret = true;
             }
-            else if (key.getValue() == Key::LEFT)
+            else if (key.getValue() == Key::K_LEFT)
             {
                 setValue(getValue() - getStepLength());
                 generateAction();
@@ -313,13 +313,13 @@ namespace gcn
         }
         else
         {
-            if (key.getValue() == Key::UP)
+            if (key.getValue() == Key::K_UP)
             {
                 setValue(getValue() + getStepLength());
                 generateAction();
                 ret = true;
             }
-            else if (key.getValue() == Key::DOWN)
+            else if (key.getValue() == Key::K_DOWN)
             {
                 setValue(getValue() - getStepLength());
                 generateAction();

@@ -199,7 +199,7 @@ namespace gcn
                 KeyInput ki = mInput->dequeueKeyInput();
 
                 if (mTabbing
-                    && ki.getKey().getValue() == Key::TAB
+                    && ki.getKey().getValue() == Key::K_TAB
                     && ki.getType() == KeyInput::PRESS)
                 {
                     if (ki.getKey().isShiftPressed())

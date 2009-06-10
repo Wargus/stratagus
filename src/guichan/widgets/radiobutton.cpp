@@ -239,8 +239,8 @@ namespace gcn
 
     bool RadioButton::keyPress(const Key& key)
     {
-        if (key.getValue() == Key::ENTER ||
-            key.getValue() == Key::SPACE)
+        if (key.getValue() == Key::K_ENTER ||
+            key.getValue() == Key::K_SPACE)
         {
             setMarked(true);
             generateAction();

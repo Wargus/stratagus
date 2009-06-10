@@ -648,7 +648,7 @@ void CButtonPanel::Draw(void)
 		//  Tutorial show command key in icons
 		//
 		if (ShowCommandKey) {
-			if (buttons[i].Key == gcn::Key::ESCAPE) {
+			if (buttons[i].Key == gcn::Key::K_ESCAPE) {
 				strcpy_s(buf, sizeof(buf), "ESC");
 			} else {
 				buf[0] = toupper(buttons[i].Key);

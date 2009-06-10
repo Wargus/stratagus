@@ -256,7 +256,7 @@ namespace gcn
     {
         bool ret = false;
 
-        if (key.getValue() == Key::ENTER || key.getValue() == Key::SPACE)
+        if (key.getValue() == Key::K_ENTER || key.getValue() == Key::K_SPACE)
         {
             mKeyDown = true;
             ret = true;
@@ -271,7 +271,7 @@ namespace gcn
     {
         bool ret = false;
 
-        if ((key.getValue() == Key::ENTER || key.getValue() == Key::SPACE) && mKeyDown)
+        if ((key.getValue() == Key::K_ENTER || key.getValue() == Key::K_SPACE) && mKeyDown)
         {
             mKeyDown = false;
             generateAction();
