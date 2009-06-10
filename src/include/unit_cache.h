@@ -167,7 +167,7 @@ struct CUnitCache {
 	inline int for_each_if(_T &functor)
 	{
 		const size_t size = Units.size();
-		int count = 0;
+		size_t count = 0;
 #ifdef _MSC_VER
 		while(size && functor(Units[count]) && ++count < size);
 #else
