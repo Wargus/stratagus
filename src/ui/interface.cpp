@@ -526,7 +526,7 @@ extern void ToggleShowBuilListMessages(void);
 */
 static bool CommandKey(int key)
 {
-	char *ptr;
+	const char *ptr;
 
 	// FIXME: don't handle unicode well. Should work on all latin keyboard.
 	if ((ptr = strchr(UiGroupKeys, key))) {
