@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9,00"
 	Name="stratagus"
 	ProjectGUID="{2EEA7F48-45B3-4771-AA26-E2D4628E77AF}"
 	RootNamespace="stratagus"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -58,7 +59,7 @@
 				ObjectFile=".\Debug/"
 				ProgramDataBaseFileName=".\Debug/"
 				BrowseInformation="1"
-				WarningLevel="3"
+				WarningLevel="0"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
 			/>
@@ -85,6 +86,8 @@
 				ProgramDatabaseFile=".\Debug/stratagus.pdb"
 				SubSystem="2"
 				StackReserveSize="33554432"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -106,9 +109,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -182,6 +182,8 @@
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				StackReserveSize="33554432"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -203,9 +205,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -940,6 +939,10 @@
 								PreprocessorDefinitions=""
 							/>
 						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\src\game\replay.cpp"
+						>
 					</File>
 					<File
 						RelativePath="src\game\savegame.cpp"
@@ -2404,6 +2407,10 @@
 						</FileConfiguration>
 					</File>
 					<File
+						RelativePath=".\src\stratagus\luacallback.cpp"
+						>
+					</File>
+					<File
 						RelativePath="src\stratagus\mainloop.cpp"
 						>
 						<FileConfiguration
@@ -2622,6 +2629,10 @@
 								PreprocessorDefinitions=""
 							/>
 						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\src\stratagus\title.cpp"
+						>
 					</File>
 					<File
 						RelativePath="src\stratagus\translate.cpp"
@@ -3054,6 +3065,10 @@
 					Name="unit"
 					>
 					<File
+						RelativePath=".\src\unit\build.cpp"
+						>
+					</File>
+					<File
 						RelativePath="src\unit\depend.cpp"
 						>
 						<FileConfiguration
@@ -3206,6 +3221,14 @@
 								PreprocessorDefinitions=""
 							/>
 						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\src\unit\unit_manager.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\unit\unit_save.cpp"
+						>
 					</File>
 					<File
 						RelativePath="src\unit\unittype.cpp"
@@ -3474,6 +3497,30 @@
 								PreprocessorDefinitions=""
 							/>
 						</FileConfiguration>
+					</File>
+				</Filter>
+				<Filter
+					Name="particle"
+					>
+					<File
+						RelativePath=".\src\particle\chunkparticle.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\particle\graphicanimation.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\particle\particlemanager.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\particle\smokeparticle.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\particle\staticparticle.cpp"
+						>
 					</File>
 				</Filter>
 			</Filter>
