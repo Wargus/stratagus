@@ -124,9 +124,6 @@ CUnitType::CUnitType() :
 	GivesResource(0), Supply(0), Demand(0), FieldFlags(0), MovementMask(0),
 	Sprite(NULL), ShadowSprite(NULL)
 {
-#ifdef USE_MNG
-	memset(&Portrait, 0, sizeof(Portrait));
-#endif
 	memset(_Costs, 0, sizeof(_Costs));
 	memset(RepairCosts, 0, sizeof(RepairCosts));
 	memset(CanStore, 0, sizeof(CanStore));
@@ -170,18 +167,6 @@ CUnitType::~CUnitType()
 
 	CGraphic::Free(Sprite);
 	CGraphic::Free(ShadowSprite);
-#ifdef USE_MNG
-	if (this->Portrait.Num) {
-		int j;
-		for (j = 0; j < this->Portrait.Num; ++j) {
-			delete this->Portrait.Mngs[j];
-//			delete[] this->Portrait.Files[j];
-		}
-		delete[] this->Portrait.Mngs;
-		delete[] this->Portrait.Files;
-	}
-#endif
-
 }
 
 
@@ -545,18 +530,6 @@ void LoadUnitTypeSprite(CUnitType *type)
 			type->Sprite->Flip();
 		}
 	}
-
-#ifdef USE_MNG
-	if (type->Portrait.Num) {
-		for (i = 0; i < type->Portrait.Num; ++i) {
-			type->Portrait.Mngs[i] = new Mng;
-			type->Portrait.Mngs[i]->Load(type->Portrait.Files[i]);
-		}
-		// FIXME: should be configurable
-		type->Portrait.CurrMng = 0;
-		type->Portrait.NumIterations = SyncRand() % 16 + 1;
-	}
-#endif
 }
 
 /**

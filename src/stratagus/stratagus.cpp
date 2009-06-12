@@ -748,9 +748,6 @@ int main(int argc, char **argv)
 #ifdef USE_MIKMOD
 		"MIKMOD "
 #endif
-#ifdef USE_MNG
-		"MNG "
-#endif
 		""
 	;
 

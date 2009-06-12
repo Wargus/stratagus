@@ -186,19 +186,6 @@ if test "$with_mikmod" != "no"; then
 	fi
 fi
 
-dnl --- MNG --------------------
-AC_ARG_WITH(mng,
-	[  --with-mng		  [Use mng (default: no)]])
-if test "$with_mng" != "no" -a "x$with_mng" != "x"; then
-	AC_CHECK_HEADER(libmng.h,, MNG=no)
-	if test "$MNG" != "no"; then
-		AC_CHECK_LIB(mng, main, CPPFLAGS="$CPPFLAGS -DUSE_MNG" LDFLAGS="$LDFLAGS -lmng", MNG=no)
-	fi
-	if test "$MNG" = "no"; then
-		AC_MSG_ERROR(mng headers and/or libraries could not be found)
-	fi
-fi
-
 dnl --- LUA --------------------
 if test "$ARCH" = "linux"; then
 	LDFLAGS="$LDFLAGS -ldl"

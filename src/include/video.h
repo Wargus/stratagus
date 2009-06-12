@@ -145,30 +145,6 @@ public:
 	GLuint *PlayerColorTextures[PlayerMax];/// Textures with player colors
 };
 
-#ifdef USE_MNG
-#include <libmng.h>
-
-class Mng {
-public:
-	Mng();
-	~Mng();
-	int Load(const std::string &name);
-	void Reset();
-	void Draw(int x, int y);
-
-	std::string name;
-	FILE *fd;
-	mng_handle handle;
-	SDL_Surface *surface;
-	unsigned char *buffer;
-	unsigned long ticks;
-	int iteration;
-	GLfloat texture_width;   /// Width of the texture
-	GLfloat texture_height;  /// Height of the texture
-	GLuint texture_name;     /// Texture name
-};
-#endif
-
 	/// A platform independent color
 class CColor {
 public:

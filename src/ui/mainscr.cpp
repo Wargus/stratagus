@@ -598,23 +598,6 @@ static void DrawUnitInfo(CUnit *unit)
 	Assert(stats);
 
 	// Draw IconUnit
-#ifdef USE_MNG
-	if (type->Portrait.Num) {
-		type->Portrait.Mngs[type->Portrait.CurrMng]->Draw(
-			UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
-		if (type->Portrait.Mngs[type->Portrait.CurrMng]->iteration == type->Portrait.NumIterations) {
-			type->Portrait.Mngs[type->Portrait.CurrMng]->Reset();
-			// FIXME: should be configurable
-			if (type->Portrait.CurrMng == 0) {
-				type->Portrait.CurrMng = (SyncRand() % (type->Portrait.Num - 1)) + 1;
-				type->Portrait.NumIterations = 1;
-			} else {
-				type->Portrait.CurrMng = 0;
-				type->Portrait.NumIterations = SyncRand() % 16 + 1;
-			}
-		}
-	} else
-#endif
 	if (UI.SingleSelectedButton) {
 		x = UI.SingleSelectedButton->X;
 		y = UI.SingleSelectedButton->Y;

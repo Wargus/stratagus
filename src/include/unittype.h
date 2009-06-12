@@ -537,9 +537,6 @@ class CConstruction;
 class MissileType;
 class CFile;
 struct lua_State;
-#ifdef USE_MNG
-class Mng;
-#endif
 class LuaCallback;
 
 CUnitType *UnitTypeByIdent(const std::string &ident);
@@ -894,15 +891,6 @@ public:
 	int StillFrame;                 /// Still frame
 
 	IconConfig Icon;                /// Icon to display for this unit
-#ifdef USE_MNG
-	struct _portrait_ {
-		std::string *Files;
-		int Num;
-		Mng **Mngs;
-		int CurrMng;
-		int NumIterations;
-	} Portrait;
-#endif
 	MissileConfig Missile;          /// Missile weapon
 	MissileConfig Explosion;        /// Missile for unit explosion
 

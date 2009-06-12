@@ -467,22 +467,6 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Icon")) {
 			type->Icon.Name = LuaToString(l, -1);
 			type->Icon.Icon = NULL;
-#ifdef USE_MNG
-		} else if (!strcmp(value, "Portrait")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = lua_objlen(l, -1);
-			type->Portrait.Num = subargs;
-			type->Portrait.Files = new std::string[type->Portrait.Num];
-			type->Portrait.Mngs = new Mng *[type->Portrait.Num];
-			memset(type->Portrait.Mngs, 0, type->Portrait.Num * sizeof(Mng *));
-			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, -1, k + 1);
-				type->Portrait.Files[k] = LuaToString(l, -1);
-				lua_pop(l, 1);
-			}
-#endif
 		} else if (!strcmp(value, "Costs")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
