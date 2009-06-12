@@ -104,10 +104,8 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 	Uint32 Bmask;
 	mng_imgtype type;
 	Mng *mng;
-#ifdef USE_OPENGL
 	unsigned w;
 	unsigned h;
-#endif
 
 	type = mng_get_sigtype(handle);
 	if (type != mng_it_mng) {
@@ -116,21 +114,21 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 
 	mng = (Mng *)mng_get_userdata(handle);
 
-#ifdef USE_OPENGL
-	for (w = 1; w < width; w <<= 1) {
+	if (UseOpenGL) {
+		for (w = 1; w < width; w <<= 1) {
+		}
+		for (h = 1; h < height; h <<= 1) {
+		}
+		mng->texture_width = (float)width / w;
+		mng->texture_height = (float)height / h;
+		glGenTextures(1, &mng->texture_name);
+		glBindTexture(GL_TEXTURE_2D, mng->texture_name);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	}
-	for (h = 1; h < height; h <<= 1) {
-	}
-	mng->texture_width = (float)width / w;
-	mng->texture_height = (float)height / h;
-	glGenTextures(1, &mng->texture_name);
-	glBindTexture(GL_TEXTURE_2D, mng->texture_name);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-#endif
 
 	// Allocate the SDL surface to hold the image
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
@@ -176,11 +174,11 @@ static mng_bool MNG_DECL my_refresh(mng_handle handle, mng_uint32 x, mng_uint32 
 		memcpy((char *)mng->surface->pixels + i * mng->surface->pitch,
 			mng->buffer + i * mng->surface->w * 3, mng->surface->w * 3);
 	}
-#ifdef USE_OPENGL
-	glBindTexture(GL_TEXTURE_2D, mng->texture_name);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mng->surface->w, mng->surface->h,
-		GL_RGB, GL_UNSIGNED_BYTE, mng->surface->pixels);
-#endif
+	if (UseOpenGL) {
+		glBindTexture(GL_TEXTURE_2D, mng->texture_name);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mng->surface->w, mng->surface->h,
+				GL_RGB, GL_UNSIGNED_BYTE, mng->surface->pixels);
+	}
 	SDL_UnlockSurface(mng->surface);
 
 	return MNG_TRUE;
@@ -231,9 +229,9 @@ Mng::Mng() :
 	name(NULL), fd(NULL), handle(NULL), surface(NULL), buffer(NULL),
 	ticks(0), iteration(0)
 {
-#ifdef USE_OPENGL
-	texture_width = texture_height = texture_name = 0;
-#endif
+	if (UseOpenGL) {
+		texture_width = texture_height = texture_name = 0;
+	}
 }
 
 
@@ -247,11 +245,9 @@ Mng::~Mng()
 		SDL_FreeSurface(surface);
 	}
 	delete[] buffer;
-#ifdef USE_OPENGL
-	if (texture_width) {
+	if (UseOpenGL && texture_width) {
 		glDeleteTextures(1, &texture_name);
 	}
-#endif
 }
 
 
@@ -267,26 +263,26 @@ void Mng::Draw(int x, int y)
 		mng_display_resume(handle);
 	}
 
-#ifndef USE_OPENGL
-	SDL_Rect rect = {x, y, surface->w, surface->h};
-	SDL_BlitSurface(surface, NULL, TheScreen, &rect);
-#else
-	GLint sx = x;
-	GLint ex = sx + surface->w;
-	GLint sy = y;
-	GLint ey = sy + surface->h;
+	if (!UseOpenGL) {
+		SDL_Rect rect = {x, y, surface->w, surface->h};
+		SDL_BlitSurface(surface, NULL, TheScreen, &rect);
+	} else {
+		GLint sx = x;
+		GLint ex = sx + surface->w;
+		GLint sy = y;
+		GLint ey = sy + surface->h;
 
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 0.0f);
-	glVertex2i(sx, sy);
-	glTexCoord2f(0.0f, texture_height);
-	glVertex2i(sx, ey);
-	glTexCoord2f(texture_width, texture_height);
-	glVertex2i(ex, ey);
-	glTexCoord2f(texture_width, 0.0f);
-	glVertex2i(ex, sy);
-	glEnd();
-#endif
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex2i(sx, sy);
+		glTexCoord2f(0.0f, texture_height);
+		glVertex2i(sx, ey);
+		glTexCoord2f(texture_width, texture_height);
+		glVertex2i(ex, ey);
+		glTexCoord2f(texture_width, 0.0f);
+		glVertex2i(ex, sy);
+		glEnd();
+	}
 }
 
 /**

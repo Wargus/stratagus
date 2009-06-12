@@ -287,16 +287,16 @@ void SavePlayers(CFile *file)
 			file->printf("%d", p->UpgradeTimers.Upgrades[j]);
 		}
 		file->printf("}");
-		
+
 		if(p->AutoAttackTargets.size() > 0) {
-		
+
 			file->printf("\n  \"enemy-targets\", {");
-			
+
 			CUnitCache &autoatacktargets = p->AutoAttackTargets;
 			for(unsigned int k = 0; k < autoatacktargets.size();)
 			{
 				CUnit *aatarget = autoatacktargets[k];
-				
+
 				//Additional security
 				if(!aatarget->IsAliveOnMap() ||
 					Map.Field(aatarget->X, aatarget->Y)->Guard[i] == 0) {
@@ -306,13 +306,13 @@ void SavePlayers(CFile *file)
 				}
 				if (k) {
 					file->printf(" ,");
-				}				
+				}
 				file->printf("\"%s\"", UnitReference(aatarget).c_str());
 				++k;
 			}
 			file->printf("}");
 		}
-		
+
 		file->printf(")\n\n");
 	}
 
@@ -514,7 +514,7 @@ void CPlayer::SetName(const std::string &name)
 /**
 **  Clear all player data excepts members which don't change.
 **
-**  The fields that are not cleared are 
+**  The fields that are not cleared are
 **  UnitLimit, BuildingLimit, TotalUnitLimit and Allow.
 */
 void CPlayer::Clear()
@@ -785,16 +785,16 @@ void PlayersEachCycle(void)
 			if(autoatacktargets.size() > 0) {
 				for (int j = 0; j < p->TotalNumUnits; ++j) {
 					CUnit *guard = p->Units[j];
-					bool stand_ground = 
+					bool stand_ground =
 						guard->CurrentAction() == UnitActionStandGround;
-					if (guard->Type->CanAttack && 
+					if (guard->Type->CanAttack &&
 								(stand_ground || guard->IsIdle()) &&
 								 !guard->IsUnusable()) {
 						AutoAttack(guard, autoatacktargets, stand_ground);
 					}
 				}
 			}
-		}	
+		}
 		if (p->AiEnabled) {
 			AiEachCycle(p);
 		}
@@ -823,7 +823,6 @@ void PlayersEachSecond(int player)
 	}
 }
 
-#ifndef USE_OPENGL
 /**
 **  Change current color set to new player.
 **
@@ -845,7 +844,6 @@ void GraphicPlayerPixels(CPlayer *player, const CGraphic *sprite)
 	}
 	SDL_UnlockSurface(sprite->Surface);
 }
-#endif
 
 /**
 **  Setup the player colors for the current palette.

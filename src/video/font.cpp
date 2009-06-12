@@ -68,13 +68,11 @@ static CFontColor *ReverseTextColor;       /// Reverse text color
 static std::string DefaultNormalColorIndex;     /// Default normal color index
 static std::string DefaultReverseColorIndex;    /// Default reverse color index
 
-#ifdef USE_OPENGL
 /**
 **  Font color graphics
 **  Usage: FontColorGraphics[CFont *font][CFontColor *color]
 */
 static std::map< const CFont *, std::map<const CFontColor *, CGraphic *> > FontColorGraphics;
-#endif
 
 // FIXME: remove these
 CFont *SmallFont;       /// Small font used in stats
@@ -121,23 +119,19 @@ void CFont::drawString(gcn::Graphics *graphics, const std::string &txt,
 **  @param x   X screen position
 **  @param y   Y screen position
 */
-#ifndef USE_OPENGL
 static void VideoDrawChar(const CGraphic *g,
 	int gx, int gy, int w, int h, int x, int y, const CFontColor *fc)
 {
-	SDL_Rect srect = {gx, gy, w, h};
-	SDL_Rect drect = {x, y, 0, 0};
+	if (!UseOpenGL) {
+		SDL_Rect srect = {gx, gy, w, h};
+		SDL_Rect drect = {x, y, 0, 0};
 
-	SDL_SetColors(g->Surface, (SDL_Color*)fc->Colors, 0, MaxFontColors);
-	SDL_BlitSurface(g->Surface, &srect, TheScreen, &drect);
+		SDL_SetColors(g->Surface, (SDL_Color*)fc->Colors, 0, MaxFontColors);
+		SDL_BlitSurface(g->Surface, &srect, TheScreen, &drect);
+	} else {
+		g->DrawSub(gx, gy, w, h, x, y);
+	}
 }
-#else
-static void VideoDrawChar(const CGraphic *g,
-	int gx, int gy, int w, int h, int x, int y, const CFontColor *fc)
-{
-	g->DrawSub(gx, gy, w, h, x, y);
-}
-#endif
 
 /**
 **  Set the default text colors.
@@ -168,7 +162,7 @@ void GetDefaultTextColors(std::string &normalp, std::string &reversep)
 /**
 **  Get the next utf8 character from a string
 */
-static inline bool GetUTF8(const std::string &text, size_t &pos, int &utf8)
+static bool GetUTF8(const std::string &text, size_t &pos, int &utf8)
 {
 	// end of string
 	if (pos >= text.size()) {
@@ -450,7 +444,7 @@ static void VideoDrawCharClip(const CGraphic *g, int gx, int gy, int w, int h,
 **  @return      The length of the printed text.
 */
 template <const bool CLIP>
-int CLabel::DoDrawText(int x, int y,  
+int CLabel::DoDrawText(int x, int y,
 	const char*const text, const size_t len, const CFontColor *fc) const
 {
 	int w,widths = 0;
@@ -458,11 +452,14 @@ int CLabel::DoDrawText(int x, int y,
 	int utf8;
 	size_t pos = 0;
 	const CFontColor *backup = fc;
-#ifndef USE_OPENGL
-	CGraphic *g = font->G;
-#else
-	CGraphic *g = FontColorGraphics[font][fc];
-#endif
+	CGraphic *g;
+
+	if (!UseOpenGL) {
+		g = font->G;
+	} else {
+		g = FontColorGraphics[font][FontColor];
+	}
+
 	while (GetUTF8(text, len, pos, utf8)) {
 		if (utf8 == '~') {
 			switch (text[pos]) {
@@ -475,9 +472,9 @@ int CLabel::DoDrawText(int x, int y,
 				case '!':
 					if(fc != reverse) {
 						fc = reverse;
-#ifdef USE_OPENGL
-						g = FontColorGraphics[font][fc];
-#endif
+						if (UseOpenGL) {
+							g = FontColorGraphics[font][fc];
+						}
 					}
 					++pos;
 					continue;
@@ -485,9 +482,9 @@ int CLabel::DoDrawText(int x, int y,
 					LastTextColor = (CFontColor *)fc;
 					if(fc != reverse) {
 						fc = reverse;
-#ifdef USE_OPENGL
-						g = FontColorGraphics[font][fc];
-#endif
+						if (UseOpenGL) {
+							g = FontColorGraphics[font][fc];
+						}
 					}
 					++pos;
 					continue;
@@ -496,9 +493,9 @@ int CLabel::DoDrawText(int x, int y,
 						const CFontColor *rev = LastTextColor;  // swap last and current color
 						LastTextColor = (CFontColor *)fc;
 						fc = rev;
-#ifdef USE_OPENGL
-						g = FontColorGraphics[font][fc];
-#endif						
+						if (UseOpenGL) {
+							g = FontColorGraphics[font][fc];
+						}
 					}
 					++pos;
 					continue;
@@ -513,19 +510,19 @@ int CLabel::DoDrawText(int x, int y,
 						DebugPrint("oops, format your ~\n");
 						return widths;
 					}
-					color.insert(0,text + pos, p - (text + pos));
+					color.insert(0, text + pos, p - (text + pos));
 					color[p - (text + pos)] = '\0';
 					pos = p - text + 1;
 					LastTextColor = (CFontColor *)fc;
 					const CFontColor *fc_tmp = CFontColor::Get(color);
 					if (fc_tmp) {
 						fc = fc_tmp;
-#ifdef USE_OPENGL
-						g = FontColorGraphics[font][fc];
-#endif
+						if (UseOpenGL) {
+							g = FontColorGraphics[font][fc];
+						}
 					}
 					continue;
-				}	
+				}
 			}
 		}
 
@@ -536,15 +533,15 @@ int CLabel::DoDrawText(int x, int y,
 		if (c >= 0 && c < ipr * font->G->GraphicHeight / font->G->Height) {
 			w = font->CharWidth[c];
 			if (CLIP) {
-				VideoDrawCharClip(g, (c % ipr) * font->G->Width, 
+				VideoDrawCharClip(g, (c % ipr) * font->G->Width,
 									(c / ipr) * font->G->Height,
 								w, font->G->Height, x + widths, y,fc);
-		
+
 			} else {
-				VideoDrawChar(g, (c % ipr) * font->G->Width, 
+				VideoDrawChar(g, (c % ipr) * font->G->Width,
 									(c / ipr) * font->G->Height,
 								w, font->G->Height, x + widths, y,fc);
-			}			
+			}
 		} else {
 			w = font->CharWidth[0];
 			if (CLIP) {
@@ -556,9 +553,9 @@ int CLabel::DoDrawText(int x, int y,
 		widths += w + 1;
 		if (fc != backup) {
 			fc = backup;
-#ifdef USE_OPENGL
-			g = FontColorGraphics[font][fc];
-#endif
+			if (UseOpenGL) {
+				g = FontColorGraphics[font][fc];
+			}
 		}
 	}
 
@@ -607,7 +604,7 @@ int CLabel::DrawClip(int x, int y, int number) const
 }
 
 
-	/// Draw reverse text/number unclipped	
+	/// Draw reverse text/number unclipped
 int CLabel::DrawReverse(int x, int y, const char*const text) const
 {
 	return DoDrawText<false>(x, y, text, strlen(text), reverse);
@@ -759,7 +756,6 @@ std::string GetLineFont(unsigned int line, const std::string &s, unsigned int ma
 */
 void CFont::MeasureWidths()
 {
-	// FIXME: todo.. can this be optimized?
 	const unsigned char *sp;
 	const unsigned char *lp;
 	const unsigned char *gp;
@@ -806,7 +802,6 @@ void CFont::MeasureWidths()
 **
 **  @param font  Font number
 */
-#ifdef USE_OPENGL
 void MakeFontColorTextures(const CFont *font)
 {
 	SDL_Surface *s;
@@ -822,14 +817,14 @@ void MakeFontColorTextures(const CFont *font)
 	s = g->Surface;
 	for (int i = 0; i < (int)AllFontColors.size(); ++i) {
 		CFontColor *fc = AllFontColors[i];
-		newg = new CGraphic;
+		newg = FontColorGraphics[font][fc] = new CGraphic;
 		newg->Width = g->Width;
 		newg->Height = g->Height;
 		newg->NumFrames = g->NumFrames;
 		newg->GraphicWidth = g->GraphicWidth;
 		newg->GraphicHeight = g->GraphicHeight;
 		newg->Surface = g->Surface;
-		FontColorGraphics[font][fc] = newg;
+
 		SDL_LockSurface(s);
 		for (int j = 0; j < MaxFontColors; ++j) {
 			s->format->palette->colors[j] = fc->Colors[j];
@@ -839,12 +834,11 @@ void MakeFontColorTextures(const CFont *font)
 		MakeTexture(newg);
 	}
 }
-#endif
 
 /**
 **  Load all fonts.
 */
-void LoadFonts(void)
+void LoadFonts()
 {
 	CGraphic *g;
 
@@ -853,9 +847,9 @@ void LoadFonts(void)
 			ShowLoadProgress("Fonts %s", g->File.c_str());
 			g->Load();
 			AllFonts[i]->MeasureWidths();
-#ifdef USE_OPENGL
-			MakeFontColorTextures(AllFonts[i]);
-#endif
+			if (UseOpenGL) {
+				MakeFontColorTextures(AllFonts[i]);
+			}
 		}
 	}
 
@@ -867,11 +861,10 @@ void LoadFonts(void)
 	LargeTitleFont = CFont::Get("large-title");
 }
 
-#ifdef USE_OPENGL
 /**
 **  Free OpenGL fonts
 */
-void FreeOpenGLFonts(void)
+void FreeOpenGLFonts()
 {
 	for (int i = 0; i < (int)AllFonts.size(); ++i) {
 		CFont *font = AllFonts[i];
@@ -887,7 +880,7 @@ void FreeOpenGLFonts(void)
 /**
 **  Reload OpenGL fonts
 */
-void ReloadFonts(void)
+void ReloadFonts()
 {
 	for (int i = 0; i < (int)AllFonts.size(); ++i) {
 		const CFont *font = AllFonts[i];
@@ -903,7 +896,6 @@ void ReloadFonts(void)
 		}
 	}
 }
-#endif
 
 /**
 **  Create a new font
@@ -1008,23 +1000,23 @@ void CleanFonts(void)
 	for (i = 0; i < (int)AllFonts.size(); ++i) {
 		const CFont *font = AllFonts[i];
 
-#ifdef USE_OPENGL
-		if (!FontColorGraphics[font].empty()) {
-			for (int j = 0; j < (int)AllFontColors.size(); ++j) {
-				CGraphic *g = FontColorGraphics[font][AllFontColors[j]];
-				glDeleteTextures(g->NumTextures, g->Textures);
-				delete[] g->Textures;
-				delete g;
+		if (UseOpenGL) {
+			if (!FontColorGraphics[font].empty()) {
+				for (int j = 0; j < (int)AllFontColors.size(); ++j) {
+					CGraphic *g = FontColorGraphics[font][AllFontColors[j]];
+					glDeleteTextures(g->NumTextures, g->Textures);
+					delete[] g->Textures;
+					delete g;
+				}
+				FontColorGraphics[font].clear();
 			}
-			FontColorGraphics[font].clear();
 		}
-#endif
 
 		delete font;
 	}
-#ifdef USE_OPENGL
-	FontColorGraphics.clear();
-#endif
+	if (UseOpenGL) {
+		FontColorGraphics.clear();
+	}
 	AllFonts.clear();
 	Fonts.clear();
 

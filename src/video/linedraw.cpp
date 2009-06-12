@@ -49,13 +49,9 @@
 -- Declarations
 ----------------------------------------------------------------------------*/
 
-/*----------------------------------------------------------------------------
--- Clipping
-----------------------------------------------------------------------------*/
-
 /**
 ** Bitmask, denoting a postion left/right/above/below clip rectangle
-** (mainly used by DrawLineClip)
+** (mainly used by VideoDrawLineClip)
 */
 #define ClipCodeInside 0 /// Clipping inside rectangle
 #define ClipCodeAbove  1 /// Clipping above rectangle
@@ -63,178 +59,184 @@
 #define ClipCodeLeft   4 /// Clipping left rectangle
 #define ClipCodeRight  8 /// Clipping right rectangle
 
+
+namespace linedraw_sdl {
+
+void (*VideoDrawPixel)(Uint32 color, int x, int y);
+static void (*VideoDoDrawPixel)(Uint32 color, int x, int y);
+void (*VideoDrawTransPixel)(Uint32 color, int x, int y, unsigned char alpha);
+static void (*VideoDoDrawTransPixel)(Uint32 color, int x, int y, unsigned char alpha);
+
 /**
-**  Delivers bitmask denoting given point is left/right/above/below
-**      clip rectangle, used for faster determinination of clipped position.
-**
-**  @param x  pixel's x position (not restricted to screen width)
-**  @param y  pixel's y position (not restricted to screen height)
+**  Draw a 16-bit pixel
 */
-static inline int ClipCodeLine(int x, int y)
+static void VideoDoDrawPixel16(Uint32 color, int x, int y)
 {
-	int result = ClipCodeInside;
-
-	if (y < ClipY1) {
-		result = ClipCodeAbove;
-	} else if (y > ClipY2) {
-		result = ClipCodeBelow;
-	} /*else {
-		result = ClipCodeInside;
-	}*/
-
-	if (x < ClipX1) {
-		result |= ClipCodeLeft;
-	} else if (x > ClipX2) {
-		result |= ClipCodeRight;
-	}
-
-	return result;
+	((Uint16 *)TheScreen->pixels)[x + y * Video.Width] = color;
 }
 
 /**
-**  Denotes entire line located at the same side outside clip rectangle
-**      (point 1 and 2 are both as left/right/above/below the clip rectangle)
-**
-**  @param code1  ClipCode of one point of line
-**  @param code2  ClipCode of second point of line
+**  Draw a 16-bit pixel
 */
-static inline int LineIsUnclippedOnSameSide(int code1, int code2)
+void VideoDrawPixel16(Uint32 color, int x, int y)
 {
-	return code1 & code2;
+	Video.LockScreen();
+	VideoDoDrawPixel16(color, x, y);
+	Video.UnlockScreen();
 }
 
 /**
-**  Denotes part of (or entire) line located outside clip rectangle
-**      (point 1 and/or 2 is outside clip rectangle)
-**
-**  @param code1  ClipCode of one point of line
-**  @param code2  ClipCode of second point of line
+**  Draw a 32-bit pixel
 */
-static inline int LineIsUnclipped(int code1, int code2)
+static void VideoDoDrawPixel32(Uint32 color, int x, int y)
 {
-	return code1 | code2;
+	((Uint32 *)TheScreen->pixels)[x + y * Video.Width] = color;
 }
 
 /**
-**  Clip line coordinate.
-**      Based on Sutherland-Cohen clipping technique
-**      (Replaces Liang/Barksy clipping algorithm in CVS version 1.18, which
-**       might be faster, but that one contained some BUGs)
-**
-**  @param x1     Source x coordinate on the screen
-**  @param y1     Source y coordinate on the screen
-**  @param x2     Destination x coordinate on the screen
-**  @param y2     Destination y coordinate on the screen
+**  Draw a 32-bit pixel
 */
-static bool ClipLine(int &x1, int &y1, int &x2, int &y2)
+void VideoDrawPixel32(Uint32 color, int x, int y)
 {
-	int code1;
-	int code2;
-	int temp;
-
-	// Make sure coordinates or on/in clipped rectangle
-	while (code1 = ClipCodeLine(x1, y1), code2 = ClipCodeLine(x2, y2),
-		LineIsUnclipped(code1, code2)) {
-		if (LineIsUnclippedOnSameSide(code1, code2)) {
-			return false;
-		}
-
-		if (!code1) {
-			temp = x1; x1 = x2; x2 = temp;
-			temp = y1; y1 = y2; y2 = temp;
-			code1 = code2;
-		}
-
-		if (code1 & ClipCodeAbove) {
-			temp = ClipY1;
-			x1 += (int)(((long)(temp - y1) * (x2 - x1)) / (y2 - y1));
-			y1 = temp;
-		} else if (code1 & ClipCodeBelow) {
-			temp = ClipY2;
-			x1 += (int)(((long)(temp - y1) * (x2 - x1)) / (y2 - y1));
-			y1 = temp;
-		} else if (code1 & ClipCodeLeft) {
-			temp = ClipX1;
-			y1 += (int)(((long)(temp - x1) * (y2 - y1)) / (x2 - x1));
-			x1 = temp;
-		} else {  /* code1 & ClipCodeRight */
-			temp = ClipX2;
-			y1 += (int)(((long)(temp - x1) * (y2 - y1)) / (x2 - x1));
-			x1 = temp;
-		}
-	}
-	return true;
+	Video.LockScreen();
+	VideoDoDrawPixel32(color, x, y);
+	Video.UnlockScreen();
 }
 
-/*----------------------------------------------------------------------------
--- Variables
-----------------------------------------------------------------------------*/
+/**
+**  Draw a transparent 16-bit pixel
+*/
+static void VideoDoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
+{
+	Uint16 *p;
+	unsigned long dp;
 
-#ifndef USE_OPENGL
-#include "renderer.h"
+	// Loses precision for speed
+	alpha = (255 - alpha) >> 3;
 
-static Primitive16_555_t render16_555;
-static Primitive16_565_t render16_565;
-static Primitive32_t render32;
-static CPrimitives *Renderer = NULL;
-
-#endif
-
-// ===========================================================================
-// Pixel
-// ===========================================================================
-
-#ifndef USE_OPENGL
+	p = &((Uint16 *)TheScreen->pixels)[x + y * Video.Width];
+	color = (((color << 16) | color) & 0x07E0F81F);
+	dp = *p;
+	dp = ((dp << 16) | dp) & 0x07E0F81F;
+	dp = ((((dp - color) * alpha) >> 5) + color) & 0x07E0F81F;
+	*p = (Uint16)((dp >> 16) | dp);
+}
 
 /**
-**  FIXME: docu
+**  Draw a transparent 16-bit pixel
 */
-void CVideo::DrawPixelClip(Uint32 color, int x, int y)
+void VideoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
+{
+	Video.LockScreen();
+	VideoDoDrawTransPixel16(color, x, y, alpha);
+	Video.UnlockScreen();
+}
+
+/**
+**  Draw a transparent 32-bit pixel
+*/
+static void VideoDoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alpha)
+{
+	unsigned long sp2;
+	unsigned long dp1;
+	unsigned long dp2;
+	Uint32 *p;
+
+	alpha = 255 - alpha;
+
+	p = &((Uint32*)TheScreen->pixels)[x + y * Video.Width];
+
+	sp2 = (color & 0xFF00FF00) >> 8;
+	color &= 0x00FF00FF;
+
+	dp1 = *p;
+	dp2 = (dp1 & 0xFF00FF00) >> 8;
+	dp1 &= 0x00FF00FF;
+
+	dp1 = ((((dp1 - color) * alpha) >> 8) + color) & 0x00FF00FF;
+	dp2 = ((((dp2 - sp2) * alpha) >> 8) + sp2) & 0x00FF00FF;
+	*p = (dp1 | (dp2 << 8));
+}
+
+/**
+**  Draw a transparent 32-bit pixel
+*/
+void VideoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alpha)
+{
+	Video.LockScreen();
+	VideoDoDrawTransPixel32(color, x, y, alpha);
+	Video.UnlockScreen();
+}
+
+/**
+**  Draw a clipped pixel
+*/
+static void VideoDoDrawPixelClip(Uint32 color, int x, int y)
 {
 	if (x >= ClipX1 && y >= ClipY1 && x <= ClipX2 && y <= ClipY2) {
-		LockScreen();
-		Renderer->DrawPixel(color, x, y);
-		UnlockScreen();
+		VideoDoDrawPixel(color, x, y);
 	}
 }
 
 /**
-**  FIXME: docu
+**  Draw a clipped pixel
 */
-void CVideo::DrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
+void DrawPixelClip(Uint32 color, int x, int y)
+{
+	Video.LockScreen();
+	VideoDoDrawPixelClip(color, x, y);
+	Video.UnlockScreen();
+}
+
+/**
+**  Draw a transparent clipped pixel
+*/
+static void VideoDoDrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
 {
 	if (x >= ClipX1 && y >= ClipY1 && x <= ClipX2 && y <= ClipY2) {
-		LockScreen();
-		Renderer->DrawTransPixel(color, x, y, alpha);
-		UnlockScreen();
+		VideoDoDrawTransPixel(color, x, y, alpha);
 	}
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent clipped pixel
 */
-void CVideo::DrawVLine(Uint32 color, int x, int y, int height)
+void DrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
 {
-	LockScreen();
-	Renderer->DrawLine(color, x, y, x, (y + height));
-	UnlockScreen();
+	Video.LockScreen();
+	VideoDoDrawTransPixelClip(color, x, y, alpha);
+	Video.UnlockScreen();
 }
 
 /**
-**  FIXME: docu
+**  Draw a vertical line
 */
-void CVideo::DrawTransVLine(Uint32 color, int x, int y,
+void DrawVLine(Uint32 color, int x, int y, int height)
+{
+	Video.LockScreen();
+	for (int i = 0; i < height; ++i) {
+		VideoDoDrawPixel(color, x, y + i);
+	}
+	Video.UnlockScreen();
+}
+
+/**
+**  Draw a transparent vertical line
+*/
+void DrawTransVLine(Uint32 color, int x, int y,
 	int height, unsigned char alpha)
 {
-	LockScreen();
-	Renderer->DrawTransLine(color, x, y, x, y + height, alpha);
-	UnlockScreen();
+	Video.LockScreen();
+	for (int i = 0; i < height; ++i) {
+		VideoDoDrawTransPixel(color, x, y + i, alpha);
+	}
+	Video.UnlockScreen();
 }
 
 /**
-**  FIXME: docu
+**  Draw a vertical line clipped
 */
-void CVideo::DrawVLineClip(Uint32 color, int x, int y, int height)
+void DrawVLineClip(Uint32 color, int x, int y, int height)
 {
 	int w = 1;
 	CLIP_RECTANGLE(x, y, w, height);
@@ -242,36 +244,34 @@ void CVideo::DrawVLineClip(Uint32 color, int x, int y, int height)
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent vertical line clipped
 */
-void CVideo::DrawTransVLineClip(Uint32 color, int x, int y,
+void DrawTransVLineClip(Uint32 color, int x, int y,
 	int height, unsigned char alpha)
 {
-	if (x < ClipX1 || x > ClipX2 ||
-	 	y > ClipY2 || y + height < ClipY1) return;
-	
-	if (y < ClipY1) y = ClipY1;
-	if (y + height > ClipY2) height = ClipY2 - y;
-	
-	LockScreen();
-	Renderer->DrawTransLine(color, x, y, x, y + height, alpha);
-	UnlockScreen();
+	Video.LockScreen();
+	for (int i = 0; i < height; ++i) {
+		VideoDoDrawTransPixelClip(color, x, y + i, alpha);
+	}
+	Video.UnlockScreen();
 }
 
 /**
-**  FIXME: docu
+**  Draw a horizontal line
 */
-void CVideo::DrawHLine(Uint32 color, int x, int y, int width)
+void DrawHLine(Uint32 color, int x, int y, int width)
 {
-	LockScreen();
-	Renderer->DrawLine(color, x, y, x + width, y);
-	UnlockScreen();
+	Video.LockScreen();
+	for (int i = 0; i < width; ++i) {
+		VideoDoDrawPixel(color, x + i, y);
+	}
+	Video.UnlockScreen();
 }
 
 /**
-**  FIXME: docu
+**  Draw a horizontal line clipped
 */
-void CVideo::DrawHLineClip(Uint32 color, int x, int y, int width)
+void DrawHLineClip(Uint32 color, int x, int y, int width)
 {
 	int h = 1;
 	CLIP_RECTANGLE(x, y, width, h);
@@ -279,118 +279,310 @@ void CVideo::DrawHLineClip(Uint32 color, int x, int y, int width)
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent horizontal line
 */
-void CVideo::DrawTransHLine(Uint32 color, int x, int y,
+void DrawTransHLine(Uint32 color, int x, int y,
 	int width, unsigned char alpha)
 {
-	LockScreen();
-	Renderer->DrawTransLine(color, x, y, x + width, y, alpha);
-	UnlockScreen();
+	Video.LockScreen();
+	for (int i = 0; i < width; ++i) {
+		VideoDoDrawTransPixel(color, x + i, y, alpha);
+	}
+	Video.UnlockScreen();
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent horizontal line clipped
 */
-void CVideo::DrawTransHLineClip(Uint32 color, int x, int y,
+void DrawTransHLineClip(Uint32 color, int x, int y,
 	int width, unsigned char alpha)
 {
-	if (y < ClipY1 || y > ClipY2 ||
-		x >ClipX2 || x + width < ClipX1) return;	
-	
-	if (x < ClipX1) x = ClipX1;
-	if (x + width > ClipX2) width = ClipX2 - x;
-	
-	LockScreen();
-	Renderer->DrawTransLine(color, x, y, x + width, y, alpha);
-	UnlockScreen();
+	Video.LockScreen();
+	for (int i = 0; i < width; ++i) {
+		VideoDoDrawTransPixelClip(color, x + i, y, alpha);
+	}
+	Video.UnlockScreen();
 }
 
 /**
-**  FIXME: docu
+**  Draw a line
 */
-void CVideo::DrawLine(Uint32 color, int sx, int sy, int dx, int dy)
+void DrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 {
-	LockScreen();
-	Renderer->DrawLine(color, sx, sy, dx, dy);
-	UnlockScreen();
+	int x;
+	int y;
+	int xlen;
+	int ylen;
+	int incr;
+
+	if (sx == dx) {
+		if (sy < dy) {
+			DrawVLine(color, sx, sy, dy - sy + 1);
+		} else {
+			DrawVLine(color, dx, dy, sy - dy + 1);
+		}
+		return;
+	}
+
+	if (sy == dy) {
+		if (sx < dx) {
+			DrawHLine(color, sx, sy, dx - sx + 1);
+		} else {
+			DrawHLine(color, dx, dy, sx - dx + 1);
+		}
+		return;
+	}
+
+	// exchange coordinates
+	if (sy > dy) {
+		int t;
+		t = dx;
+		dx = sx;
+		sx = t;
+		t = dy;
+		dy = sy;
+		sy = t;
+	}
+	ylen = dy - sy;
+
+	if (sx > dx) {
+		xlen = sx - dx;
+		incr = -1;
+	} else {
+		xlen = dx - sx;
+		incr = 1;
+	}
+
+	y = sy;
+	x = sx;
+
+	if (xlen > ylen) {
+		int p;
+
+		if (sx > dx) {
+			int t;
+			t = sx;
+			sx = dx;
+			dx = t;
+			y = dy;
+		}
+
+		p = (ylen << 1) - xlen;
+
+		Video.LockScreen();
+		for (x = sx; x < dx; ++x) {
+			VideoDoDrawPixel(color, x, y);
+			if (p >= 0) {
+				y += incr;
+				p += (ylen - xlen) << 1;
+			} else {
+				p += (ylen << 1);
+			}
+		}
+		Video.UnlockScreen();
+		return;
+	}
+
+	if (ylen > xlen) {
+		int p;
+
+		p = (xlen << 1) - ylen;
+
+		Video.LockScreen();
+		for (y = sy; y < dy; ++y) {
+			VideoDoDrawPixel(color, x, y);
+			if (p >= 0) {
+				x += incr;
+				p += (xlen - ylen) << 1;
+			} else {
+				p += (xlen << 1);
+			}
+		}
+		Video.UnlockScreen();
+		return;
+	}
+
+	// Draw a diagonal line
+	if (ylen == xlen) {
+		Video.LockScreen();
+		while (y != dy) {
+			VideoDoDrawPixel(color, x, y);
+			x += incr;
+			++y;
+		}
+		Video.UnlockScreen();
+	}
 }
 
 /**
-**  FIXME: docu
+**  Draw a line clipped
 */
-void CVideo::DrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
+void DrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 {
-	if (dy > sy) {
-		if (dy < ClipY1 || sy > ClipY2) return;
-	} else {
-		if (sy < ClipY1 || dy > ClipY2) return;
+	int x;
+	int y;
+	int xlen;
+	int ylen;
+	int incr;
+
+	if (sx == dx) {
+		if (sy < dy) {
+			DrawVLineClip(color, sx, sy, dy - sy + 1);
+		} else {
+			DrawVLineClip(color, dx, dy, sy - dy + 1);
+		}
+		return;
 	}
-	
-	if (dx > sx) {
-		if (dx < ClipX1 || sx > ClipX2) return;
-	} else {
-		if (sx < ClipX1 || dx > ClipX2) return;
+
+	if (sy == dy) {
+		if (sx < dx) {
+			DrawHLineClip(color, sx, sy, dx - sx + 1);
+		} else {
+			DrawHLineClip(color, dx, dy, sx - dx + 1);
+		}
+		return;
 	}
-	
-	if (ClipLine(sx,sy,dx,dy)) {
-		LockScreen();
-		Renderer->DrawLine(color, sx, sy, dx, dy);
-		UnlockScreen();
+
+	// exchange coordinates
+	if (sy > dy) {
+		int t;
+		t = dx;
+		dx = sx;
+		sx = t;
+		t = dy;
+		dy = sy;
+		sy = t;
+	}
+	ylen = dy - sy;
+
+	if (sx > dx) {
+		xlen = sx - dx;
+		incr = -1;
+	} else {
+		xlen = dx - sx;
+		incr = 1;
+	}
+
+	y = sy;
+	x = sx;
+
+	if (xlen > ylen) {
+		int p;
+
+		if (sx > dx) {
+			int t;
+			t = sx;
+			sx = dx;
+			dx = t;
+			y = dy;
+		}
+
+		p = (ylen << 1) - xlen;
+
+		Video.LockScreen();
+		for (x = sx; x < dx; ++x) {
+			VideoDoDrawPixelClip(color, x, y);
+			if (p >= 0) {
+				y += incr;
+				p += (ylen - xlen) << 1;
+			} else {
+				p += (ylen << 1);
+			}
+		}
+		Video.UnlockScreen();
+		return;
+	}
+
+	if (ylen > xlen) {
+		int p;
+
+		p = (xlen << 1) - ylen;
+
+		Video.LockScreen();
+		for (y = sy; y < dy; ++y) {
+			VideoDoDrawPixelClip(color, x, y);
+			if (p >= 0) {
+				x += incr;
+				p += (xlen - ylen) << 1;
+			} else {
+				p += (xlen << 1);
+			}
+		}
+		Video.UnlockScreen();
+		return;
+	}
+
+	// Draw a diagonal line
+	if (ylen == xlen) {
+		Video.LockScreen();
+		while (y != dy) {
+			VideoDoDrawPixelClip(color, x, y);
+			x += incr;
+			++y;
+		}
+		Video.UnlockScreen();
 	}
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent line
 */
-void CVideo::DrawTransLine(Uint32 color, int sx, int sy,
+void DrawTransLine(Uint32 color, int sx, int sy,
 	int dx, int dy, unsigned char alpha)
 {
-	LockScreen();
-	Renderer->DrawTransLine(color, sx, sy, dx, dy,alpha);
-	UnlockScreen();
+	// FIXME: trans
+	DrawLine(color, sx, sy, dx, dy);
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent line clipped
 */
-void CVideo::DrawRectangle(Uint32 color, int x, int y, int w, int h)
+void DrawTransLineClip(Uint32 color, int sx, int sy,
+	int dx, int dy, unsigned char alpha)
 {
-	LockScreen();
-	Renderer->DrawRectangle(color, x, y, w, h);
-	UnlockScreen();
+	// FIXME: trans
+	DrawLineClip(color, sx, sy, dx, dy);
 }
 
 /**
-**  FIXME: docu
+**  Draw a rectangle
 */
-void CVideo::DrawRectangleClip(Uint32 color, int x, int y, int w, int h)
+void DrawRectangle(Uint32 color, int x, int y, int w, int h)
 {
-	DrawTransPixelClip(color, x, y, 128);
-	DrawHLineClip(color, x + 1, y, w - 2);
-	DrawTransPixelClip(color, x + w - 1, y, 128);
-	
-	DrawTransPixelClip(color, x, y + h - 1, 128);
-	DrawHLineClip(color, x + 1, y + h - 1, w - 2);
-	DrawTransPixelClip(color, x + w - 1, y + h - 1, 128);
-	
+	DrawHLine(color, x, y, w);
+	DrawHLine(color, x, y + h - 1, w);
+
+	DrawVLine(color, x, y + 1, h - 2);
+	DrawVLine(color, x + w - 1, y + 1, h - 2);
+}
+
+/**
+**  Draw a rectangle clipped
+*/
+void DrawRectangleClip(Uint32 color, int x, int y, int w, int h)
+{
+	DrawHLineClip(color, x, y, w);
+	DrawHLineClip(color, x, y + h - 1, w);
+
 	DrawVLineClip(color, x, y + 1, h - 2);
 	DrawVLineClip(color, x + w - 1, y + 1, h - 2);
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent rectangle
 */
-void CVideo::DrawTransRectangle(Uint32 color, int x, int y,
+void DrawTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
-	LockScreen();
-	Renderer->DrawTransRectangle(color, x, y, w, h, alpha);
-	UnlockScreen();
+	DrawTransHLine(color, x, y, w, alpha);
+	DrawTransHLine(color, x, y + h - 1, w, alpha);
+
+	DrawTransVLine(color, x, y + 1, h - 2, alpha);
+	DrawTransVLine(color, x + w - 1, y + 1, h - 2, alpha);
 }
 
 /**
-**  Draw translucent rectangle clipped.
+**  Draw a transparent rectangle clipped.
 **
 **  @param color  color
 **  @param x      x coordinate on the screen
@@ -399,34 +591,29 @@ void CVideo::DrawTransRectangle(Uint32 color, int x, int y,
 **  @param w      width of rectangle (0=don't draw).
 **  @param alpha  alpha value of pixels.
 */
-void CVideo::DrawTransRectangleClip(Uint32 color, int x, int y,
+void DrawTransRectangleClip(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
-	DrawTransPixelClip(color, x, y, alpha / 2);
-	DrawTransHLineClip(color, x + 1, y, w - 2, alpha);
-	DrawTransPixelClip(color, x + w - 1, y, alpha / 2);
-	
-	DrawTransPixelClip(color, x, y + h - 1, alpha / 2);
-	DrawTransHLineClip(color, x + 1, y + h - 1, w - 2, alpha);
-	DrawTransPixelClip(color, x + w - 1, y + h - 1, alpha / 2);
-	
+	DrawTransHLineClip(color, x, y, w, alpha);
+	DrawTransHLineClip(color, x, y + h - 1, w, alpha);
+
 	DrawTransVLineClip(color, x, y + 1, h - 2, alpha);
 	DrawTransVLineClip(color, x + w - 1, y + 1, h - 2, alpha);
 }
 
 /**
-**  FIXME: docu
+**  Draw a filled rectangle
 */
-void CVideo::FillRectangle(Uint32 color, int x, int y, int w, int h)
+void FillRectangle(Uint32 color, int x, int y, int w, int h)
 {
 	SDL_Rect drect = {x, y, w, h};
 	SDL_FillRect(TheScreen, &drect, color);
 }
 
 /**
-**  FIXME: docu
+**  Draw a filled rectangle clipped
 */
-void CVideo::FillRectangleClip(Uint32 color, int x, int y,
+void FillRectangleClip(Uint32 color, int x, int y,
 	int w, int h)
 {
 	SDL_Rect oldrect;
@@ -444,20 +631,28 @@ void CVideo::FillRectangleClip(Uint32 color, int x, int y,
 }
 
 /**
-**  FIXME: docu
+**  Draw a filled transparent rectangle
 */
-void CVideo::FillTransRectangle(Uint32 color, int x, int y,
+void FillTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
-	LockScreen();
-	Renderer->FillTransRectangle(color, x, y, w, h, alpha);
-	UnlockScreen();
+	int ex = x + w;
+	int ey = y + h;
+	int sx = x;
+
+	Video.LockScreen();
+	for (; y < ey; ++y) {
+		for (x = sx; x < ex; ++x) {
+			VideoDoDrawTransPixel(color, x, y, alpha);
+		}
+	}
+	Video.UnlockScreen();
 }
 
 /**
-**  FIXME: docu
+**  Draw a filled transparent rectangle clipped
 */
-void CVideo::FillTransRectangleClip(Uint32 color, int x, int y,
+void FillTransRectangleClip(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
 	CLIP_RECTANGLE(x, y, w, h);
@@ -465,30 +660,9 @@ void CVideo::FillTransRectangleClip(Uint32 color, int x, int y,
 }
 
 /**
-**  FIXME: docu
+**  Draw a circle
 */
-void CVideo::DrawCircle(Uint32 color, int x, int y, int r)
-{
-	LockScreen();
-	Renderer->DrawCircle(color, x, y, r);
-	UnlockScreen();
-}
-
-/**
-**  FIXME: docu
-*/
-void CVideo::DrawTransCircle(Uint32 color, int x, int y,
-	int r, unsigned char alpha)
-{
-	LockScreen();
-	Renderer->DrawTransCircle(color, x, y, r, alpha);
-	UnlockScreen();
-}
-
-/**
-**  FIXME: docu
-*/
-void CVideo::DrawCircleClip(Uint32 color, int x, int y, int r)
+void DrawCircle(Uint32 color, int x, int y, int r)
 {
 	int p;
 	int px;
@@ -497,22 +671,17 @@ void CVideo::DrawCircleClip(Uint32 color, int x, int y, int r)
 	p = 1 - r;
 	py = r;
 
-#define DoDrawPixelClip(color,x,y) \
-	if (x >= ClipX1 && y >= ClipY1 && x <= ClipX2 && y <= ClipY2) { \
-		Renderer->DrawPixel(color, x, y); \
-	}
-
-	LockScreen();
+	Video.LockScreen();
 	for (px = 0; px <= py + 1; ++px) {
-		DoDrawPixelClip(color, x + px, y + py);
-		DoDrawPixelClip(color, x + px, y - py);
-		DoDrawPixelClip(color, x - px, y + py);
-		DoDrawPixelClip(color, x - px, y - py);
+		VideoDoDrawPixel(color, x + px, y + py);
+		VideoDoDrawPixel(color, x + px, y - py);
+		VideoDoDrawPixel(color, x - px, y + py);
+		VideoDoDrawPixel(color, x - px, y - py);
 
-		DoDrawPixelClip(color, x + py, y + px);
-		DoDrawPixelClip(color, x + py, y - px);
-		DoDrawPixelClip(color, x - py, y + px);
-		DoDrawPixelClip(color, x - py, y - px);
+		VideoDoDrawPixel(color, x + py, y + px);
+		VideoDoDrawPixel(color, x + py, y - px);
+		VideoDoDrawPixel(color, x - py, y + px);
+		VideoDoDrawPixel(color, x - py, y - px);
 
 		if (p < 0) {
 			p += 2 * px + 3;
@@ -521,14 +690,13 @@ void CVideo::DrawCircleClip(Uint32 color, int x, int y, int r)
 			py -= 1;
 		}
 	}
-	UnlockScreen();
-#undef DoDrawPixelClip
+	Video.UnlockScreen();
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent circle
 */
-void CVideo::DrawTransCircleClip(Uint32 color, int x, int y,
+void DrawTransCircle(Uint32 color, int x, int y,
 	int r, unsigned char alpha)
 {
 	int p;
@@ -538,24 +706,17 @@ void CVideo::DrawTransCircleClip(Uint32 color, int x, int y,
 	p = 1 - r;
 	py = r;
 
-#define DoDrawTransPixel(color,x,y, alpha) \
-	if (x >= ClipX1 && y >= ClipY1 && x <= ClipX2 && y <= ClipY2) { \
-		Renderer->DrawTransPixel(color, x, y, alpha); \
-	}
-
-
-	LockScreen();
+	Video.LockScreen();
 	for (px = 0; px <= py + 1; ++px) {
+		VideoDoDrawTransPixel(color, x + px, y + py, alpha);
+		VideoDoDrawTransPixel(color, x + px, y - py, alpha);
+		VideoDoDrawTransPixel(color, x - px, y + py, alpha);
+		VideoDoDrawTransPixel(color, x - px, y - py, alpha);
 
-		DoDrawTransPixel(color, x + px, y + py, alpha);
-		DoDrawTransPixel(color, x + px, y - py, alpha);
-		DoDrawTransPixel(color, x - px, y + py, alpha);
-		DoDrawTransPixel(color, x - px, y - py, alpha);
-
-		DoDrawTransPixel(color, x + py, y + px, alpha);
-		DoDrawTransPixel(color, x + py, y - px, alpha);
-		DoDrawTransPixel(color, x - py, y + px, alpha);
-		DoDrawTransPixel(color, x - py, y - px, alpha);
+		VideoDoDrawTransPixel(color, x + py, y + px, alpha);
+		VideoDoDrawTransPixel(color, x + py, y - px, alpha);
+		VideoDoDrawTransPixel(color, x - py, y + px, alpha);
+		VideoDoDrawTransPixel(color, x - py, y - px, alpha);
 
 		if (p < 0) {
 			p += 2 * px + 3;
@@ -564,69 +725,197 @@ void CVideo::DrawTransCircleClip(Uint32 color, int x, int y,
 			py -= 1;
 		}
 	}
-	UnlockScreen();
-#undef DoDrawTransPixel
+	Video.UnlockScreen();
 }
 
 /**
-**  FIXME: docu
+**  Draw a circle clipped
 */
-void CVideo::FillCircle(Uint32 color, int x, int y, int r)
+void DrawCircleClip(Uint32 color, int x, int y, int r)
 {
-	LockScreen();
-	Renderer->FillCircle(color, x, y, r);
-	UnlockScreen();
+	int p;
+	int px;
+	int py;
+
+	p = 1 - r;
+	py = r;
+
+	Video.LockScreen();
+	for (px = 0; px <= py + 1; ++px) {
+		VideoDoDrawPixelClip(color, x + px, y + py);
+		VideoDoDrawPixelClip(color, x + px, y - py);
+		VideoDoDrawPixelClip(color, x - px, y + py);
+		VideoDoDrawPixelClip(color, x - px, y - py);
+
+		VideoDoDrawPixelClip(color, x + py, y + px);
+		VideoDoDrawPixelClip(color, x + py, y - px);
+		VideoDoDrawPixelClip(color, x - py, y + px);
+		VideoDoDrawPixelClip(color, x - py, y - px);
+
+		if (p < 0) {
+			p += 2 * px + 3;
+		} else {
+			p += 2 * (px - py) + 5;
+			py -= 1;
+		}
+	}
+	Video.UnlockScreen();
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent circle clipped
 */
-void CVideo::FillTransCircle(Uint32 color, int x, int y,
+void DrawTransCircleClip(Uint32 color, int x, int y,
 	int r, unsigned char alpha)
 {
-	LockScreen();
-	Renderer->FillTransCircle(color, x, y, r, alpha);
-	UnlockScreen();
+	int p;
+	int px;
+	int py;
+
+	p = 1 - r;
+	py = r;
+
+	Video.LockScreen();
+	for (px = 0; px <= py + 1; ++px) {
+		VideoDoDrawTransPixelClip(color, x + px, y + py, alpha);
+		VideoDoDrawTransPixelClip(color, x + px, y - py, alpha);
+		VideoDoDrawTransPixelClip(color, x - px, y + py, alpha);
+		VideoDoDrawTransPixelClip(color, x - px, y - py, alpha);
+
+		VideoDoDrawTransPixelClip(color, x + py, y + px, alpha);
+		VideoDoDrawTransPixelClip(color, x + py, y - px, alpha);
+		VideoDoDrawTransPixelClip(color, x - py, y + px, alpha);
+		VideoDoDrawTransPixelClip(color, x - py, y - px, alpha);
+
+		if (p < 0) {
+			p += 2 * px + 3;
+		} else {
+			p += 2 * (px - py) + 5;
+			py -= 1;
+		}
+	}
+	Video.UnlockScreen();
 }
 
 /**
-**  FIXME: docu
+**  Draw a filled circle
 */
-void CVideo::FillCircleClip(Uint32 color, int x, int y, int r)
+void FillCircle(Uint32 color, int x, int y, int r)
 {
-	int cx = 0;
-	int cy = r;
-	int df = 1 - r;
-	int d_e = 3;
-	int d_se = -2 * r + 5;
+	int p;
+	int px;
+	int py;
 
-	// FIXME: could be much improved :)
-	do {
-		DrawHLineClip(color, x - cy, y - cx, 1 + cy * 2);
-		if (cx) {
-			DrawHLineClip(color, x - cy, y + cx, 1 + cy * 2);
+	p = 1 - r;
+	py = r;
+
+	for (px = 0; px <= py; ++px) {
+
+		// Fill up the middle half of the circle
+		DrawVLine(color, x + px, y, py + 1);
+		DrawVLine(color, x + px, y - py, py);
+		if (px) {
+			DrawVLine(color, x - px, y, py + 1);
+			DrawVLine(color, x - px, y - py, py);
 		}
-		if (df < 0) {
-			df += d_e;
-			d_se += 2;
+
+		if (p < 0) {
+			p += 2 * px + 3;
 		} else {
-			if (cx != cy) {
-				DrawHLineClip(color, x - cx, y - cy, 1 + cx * 2);
-				DrawHLineClip(color, x - cx, y + cy, 1 + cx * 2);
+			p += 2 * (px - py) + 5;
+			py -= 1;
+			// Fill up the left/right half of the circle
+			if (py >= px) {
+				DrawVLine(color, x + py + 1, y, px + 1);
+				DrawVLine(color, x + py + 1, y - px, px);
+				DrawVLine(color, x - py - 1, y, px + 1);
+				DrawVLine(color, x - py - 1, y - px,  px);
 			}
-			df += d_se;
-			d_se += 4;
-			--cy;
 		}
-		d_e += 2;
-		++cx;
-	} while (cx <= cy);	
+	}
 }
 
 /**
-**  FIXME: docu
+**  Draw a filled transparent circle
 */
-void CVideo::FillTransCircleClip(Uint32 color, int x, int y,
+void FillTransCircle(Uint32 color, int x, int y,
+	int r, unsigned char alpha)
+{
+	int p;
+	int px;
+	int py;
+
+	p = 1 - r;
+	py = r;
+
+	for (px = 0; px <= py; ++px) {
+
+		// Fill up the middle half of the circle
+		DrawTransVLine(color, x + px, y, py + 1, alpha);
+		DrawTransVLine(color, x + px, y - py, py, alpha);
+		if (px) {
+			DrawTransVLine(color, x - px, y, py + 1, alpha);
+			DrawTransVLine(color, x - px, y - py, py, alpha);
+		}
+
+		if (p < 0) {
+			p += 2 * px + 3;
+		} else {
+			p += 2 * (px - py) + 5;
+			py -= 1;
+			// Fill up the left/right half of the circle
+			if (py >= px) {
+				DrawTransVLine(color, x + py + 1, y, px + 1, alpha);
+				DrawTransVLine(color, x + py + 1, y - px, px, alpha);
+				DrawTransVLine(color, x - py - 1, y, px + 1, alpha);
+				DrawTransVLine(color, x - py - 1, y - px,  px, alpha);
+			}
+		}
+	}
+}
+
+/**
+**  Draw a filled circle clipped
+*/
+void FillCircleClip(Uint32 color, int x, int y, int r)
+{
+	int p;
+	int px;
+	int py;
+
+	p = 1 - r;
+	py = r;
+
+	for (px = 0; px <= py; ++px) {
+
+		// Fill up the middle half of the circle
+		DrawVLineClip(color, x + px, y, py + 1);
+		DrawVLineClip(color, x + px, y - py, py);
+		if (px) {
+			DrawVLineClip(color, x - px, y, py + 1);
+			DrawVLineClip(color, x - px, y - py, py);
+		}
+
+		if (p < 0) {
+			p += 2 * px + 3;
+		} else {
+			p += 2 * (px - py) + 5;
+			py -= 1;
+			// Fill up the left/right half of the circle
+			if (py >= px) {
+				DrawVLineClip(color, x + py + 1, y, px + 1);
+				DrawVLineClip(color, x + py + 1, y - px, px);
+				DrawVLineClip(color, x - py - 1, y, px + 1);
+				DrawVLineClip(color, x - py - 1, y - px,  px);
+			}
+		}
+	}
+}
+
+/**
+**  Draw a filled transparent circle clipped
+*/
+void FillTransCircleClip(Uint32 color, int x, int y,
 	int r, unsigned char alpha)
 {
 	int p;
@@ -663,31 +952,27 @@ void CVideo::FillTransCircleClip(Uint32 color, int x, int y,
 }
 
 /**
-**  FIXME: docu
+**  Initialize line draw
 */
 void InitLineDraw(void)
 {
 	switch (Video.Depth) {
 		case 16:
-			DebugPrint("Init 16bit Software Renderer\n");
-			if(TheScreen->format->Gmask == 0x7e0)
-			{
-				Renderer = &render16_565;
-			} else {
-				if(TheScreen->format->Gmask == 0x3e0) {
-					Renderer = &render16_555;
-				} else {
-					assert(0);
-				}
-			}
+			VideoDrawPixel = VideoDrawPixel16;
+			VideoDoDrawPixel = VideoDoDrawPixel16;
+			VideoDrawTransPixel = VideoDrawTransPixel16;
+			VideoDoDrawTransPixel = VideoDoDrawTransPixel16;
 			break;
 		case 32:
-			DebugPrint("Init 32bit Software Renderer\n");
-			Renderer = &render32;
+			VideoDrawPixel = VideoDrawPixel32;
+			VideoDoDrawPixel = VideoDoDrawPixel32;
+			VideoDrawTransPixel = VideoDrawTransPixel32;
+			VideoDoDrawTransPixel = VideoDoDrawTransPixel32;
 	}
 }
 
-#else
+}
+namespace linedraw_gl {
 
 /**
 **  Draw pixel unclipped.
@@ -696,11 +981,11 @@ void InitLineDraw(void)
 **  @param x      x coordinate on the screen
 **  @param y      y coordinate on the screen
 */
-void VideoDrawPixel(Uint32 color, int x, int y)
+void DrawPixel(Uint32 color, int x, int y)
 {
 	GLubyte r, g, b, a;
 
-	Video.GetRGBA(color, &r, &g, &b, &a);
+	Video.GetRGBA(color, NULL, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
 	glBegin(GL_POINTS);
@@ -717,14 +1002,14 @@ void VideoDrawPixel(Uint32 color, int x, int y)
 **  @param y      y coordinate on the screen
 **  @param alpha  alpha value of pixel.
 */
-void VideoDrawTransPixel(Uint32 color, int x, int y,
+void DrawTransPixel(Uint32 color, int x, int y,
 	unsigned char alpha)
 {
 	GLubyte r, g, b;
 
-	Video.GetRGB(color, &r, &g, &b);
+	Video.GetRGB(color, NULL, &r, &g, &b);
 	color = Video.MapRGBA(0, r, g, b, alpha);
-	VideoDrawPixel(color, x, y);
+	DrawPixel(color, x, y);
 }
 
 /**
@@ -734,12 +1019,12 @@ void VideoDrawTransPixel(Uint32 color, int x, int y,
 **  @param x      x coordinate on the screen
 **  @param y      y coordinate on the screen
 */
-void CVideo::DrawPixelClip(Uint32 color, int x, int y)
+void DrawPixelClip(Uint32 color, int x, int y)
 {
 	if (x < ClipX1 || x > ClipX2 || y < ClipY1 || y > ClipY2) {
 		return;
 	}
-	VideoDrawPixel(color, x, y);
+	DrawPixel(color, x, y);
 }
 
 /**
@@ -750,13 +1035,13 @@ void CVideo::DrawPixelClip(Uint32 color, int x, int y)
 **  @param y      y coordinate on the screen
 **  @param alpha  alpha value of pixel.
 */
-void CVideo::DrawTransPixelClip(Uint32 color, int x, int y,
+void DrawTransPixelClip(Uint32 color, int x, int y,
 	unsigned char alpha)
 {
 	GLubyte r, g, b;
 
-	GetRGB(color, &r, &g, &b);
-	color = MapRGBA(0, r, g, b, alpha);
+	Video.GetRGB(color, NULL, &r, &g, &b);
+	color = Video.MapRGBA(0, r, g, b, alpha);
 	DrawPixelClip(color, x, y);
 }
 
@@ -768,11 +1053,11 @@ void CVideo::DrawTransPixelClip(Uint32 color, int x, int y,
 **  @param y      y coordinate on the screen
 **  @param width  width of line (0=don't draw).
 */
-void CVideo::DrawHLine(Uint32 color, int x, int y, int width)
+void DrawHLine(Uint32 color, int x, int y, int width)
 {
 	GLubyte r, g, b, a;
 
-	GetRGBA(color, &r, &g, &b, &a);
+	Video.GetRGBA(color, NULL, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
 	glBegin(GL_LINES);
@@ -791,13 +1076,13 @@ void CVideo::DrawHLine(Uint32 color, int x, int y, int width)
 **  @param width  width of line (0=don't draw).
 **  @param alpha  alpha value of pixels.
 */
-void CVideo::DrawTransHLine(Uint32 color, int x, int y, int width,
+void DrawTransHLine(Uint32 color, int x, int y, int width,
 	unsigned char alpha)
 {
 	GLubyte r, g, b;
 
-	GetRGB(color, &r, &g, &b);
-	color = MapRGBA(0, r, g, b, alpha);
+	Video.GetRGB(color, NULL, &r, &g, &b);
+	color = Video.MapRGBA(0, r, g, b, alpha);
 	DrawHLine(color, x, y, width);
 }
 
@@ -809,7 +1094,7 @@ void CVideo::DrawTransHLine(Uint32 color, int x, int y, int width,
 **  @param y      y coordinate on the screen
 **  @param width  width of line (0=don't draw).
 */
-void CVideo::DrawHLineClip(Uint32 color, int x, int y, int width)
+void DrawHLineClip(Uint32 color, int x, int y, int width)
 {
 	if (y < ClipY1 || y > ClipY2) {
 		return;
@@ -840,13 +1125,13 @@ void CVideo::DrawHLineClip(Uint32 color, int x, int y, int width)
 **  @param width  Width of line (0=don't draw)
 **  @param alpha  Alpha value of pixels
 */
-void CVideo::DrawTransHLineClip(Uint32 color, int x, int y, int width,
+void DrawTransHLineClip(Uint32 color, int x, int y, int width,
 	unsigned char alpha)
 {
 	GLubyte r, g, b;
 
-	GetRGB(color, &r, &g, &b);
-	color = MapRGBA(0, r, g, b, alpha);
+	Video.GetRGB(color, NULL, &r, &g, &b);
+	color = Video.MapRGBA(0, r, g, b, alpha);
 	DrawHLineClip(color, x, y, width);
 }
 
@@ -858,11 +1143,11 @@ void CVideo::DrawTransHLineClip(Uint32 color, int x, int y, int width,
 **  @param y       y coordinate on the screen
 **  @param height  height of line (0=don't draw).
 */
-void CVideo::DrawVLine(Uint32 color, int x, int y, int height)
+void DrawVLine(Uint32 color, int x, int y, int height)
 {
 	GLubyte r, g, b, a;
 
-	GetRGBA(color, &r, &g, &b, &a);
+	Video.GetRGBA(color, NULL, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
 	glBegin(GL_LINES);
@@ -881,13 +1166,13 @@ void CVideo::DrawVLine(Uint32 color, int x, int y, int height)
 **  @param height  height of line (0=don't draw).
 **  @param alpha   alpha value of pixels.
 */
-void CVideo::DrawTransVLine(Uint32 color, int x, int y, int height,
+void DrawTransVLine(Uint32 color, int x, int y, int height,
 	unsigned char alpha)
 {
 	GLubyte r, g, b;
 
-	GetRGB(color, &r, &g, &b);
-	color = MapRGBA(0, r, g, b, alpha);
+	Video.GetRGB(color, NULL, &r, &g, &b);
+	color = Video.MapRGBA(0, r, g, b, alpha);
 	DrawVLine(color, x, y, height);
 }
 
@@ -899,7 +1184,7 @@ void CVideo::DrawTransVLine(Uint32 color, int x, int y, int height,
 **  @param y       y coordinate on the screen
 **  @param height  height of line (0=don't draw).
 */
-void CVideo::DrawVLineClip(Uint32 color, int x, int y, int height)
+void DrawVLineClip(Uint32 color, int x, int y, int height)
 {
 	if (x < ClipX1 || x > ClipX2) {
 		return;
@@ -930,13 +1215,13 @@ void CVideo::DrawVLineClip(Uint32 color, int x, int y, int height)
 **  @param height  height of line (0=don't draw).
 **  @param alpha   alpha value of pixels.
 */
-void CVideo::DrawTransVLineClip(Uint32 color, int x, int y,
+void DrawTransVLineClip(Uint32 color, int x, int y,
 	int height, unsigned char alpha)
 {
 	GLubyte r, g, b;
 
-	GetRGB(color, &r, &g, &b);
-	color = MapRGBA(0, r, g, b, alpha);
+	Video.GetRGB(color, NULL, &r, &g, &b);
+	color = Video.MapRGBA(0, r, g, b, alpha);
 	DrawVLineClip(color, x, y, height);
 }
 
@@ -949,12 +1234,16 @@ void CVideo::DrawTransVLineClip(Uint32 color, int x, int y,
 **  @param x2     Destination x coordinate on the screen
 **  @param y2     Destination y coordinate on the screen
 */
-void CVideo::DrawLine(Uint32 color, int x1, int y1, int x2, int y2)
+void DrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 {
 	float xx1, yy1, xx2, yy2;
 	GLubyte r, g, b, a;
 
-	xx1 = x1; xx2 = x2; yy1 = y1; yy2 = y2;
+	xx1 = (float)x1;
+	xx2 = (float)x2;
+	yy1 = (float)y1;
+	yy2 = (float)y2;
+
 	if (xx1 <= xx2) {
 		xx2 += 0.5f;
 	} else {
@@ -966,7 +1255,7 @@ void CVideo::DrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 		yy1 += 0.5f;
 	}
 
-	GetRGBA(color, &r, &g, &b, &a);
+	Video.GetRGBA(color, NULL, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
 	glBegin(GL_LINES);
@@ -974,6 +1263,58 @@ void CVideo::DrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 	glVertex2f(xx2, yy2);
 	glEnd();
 	glEnable(GL_TEXTURE_2D);
+}
+
+/**
+**  Delivers bitmask denoting given point is left/right/above/below
+**      clip rectangle, used for faster determinination of clipped position.
+**
+**  @param x  pixel's x position (not restricted to screen width)
+**  @param y  pixel's y position (not restricted to screen height)
+*/
+static int ClipCodeLine(int x, int y)
+{
+	int result;
+
+	if (y < ClipY1) {
+		result = ClipCodeAbove;
+	} else if (y > ClipY2) {
+		result = ClipCodeBelow;
+	} else {
+		result = ClipCodeInside;
+	}
+
+	if (x < ClipX1) {
+		result |= ClipCodeLeft;
+	} else if (x > ClipX2) {
+		result |= ClipCodeRight;
+	}
+
+	return result;
+}
+
+/**
+**  Denotes entire line located at the same side outside clip rectangle
+**      (point 1 and 2 are both as left/right/above/below the clip rectangle)
+**
+**  @param code1  ClipCode of one point of line
+**  @param code2  ClipCode of second point of line
+*/
+static int LineIsUnclippedOnSameSide(int code1, int code2)
+{
+	return code1 & code2;
+}
+
+/**
+**  Denotes part of (or entire) line located outside clip rectangle
+**      (point 1 and/or 2 is outside clip rectangle)
+**
+**  @param code1  ClipCode of one point of line
+**  @param code2  ClipCode of second point of line
+*/
+static int LineIsUnclipped(int code1, int code2)
+{
+	return code1 | code2;
 }
 
 /**
@@ -988,18 +1329,72 @@ void CVideo::DrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 **  @param x2     Destination x coordinate on the screen
 **  @param y2     Destination y coordinate on the screen
 */
-void CVideo::DrawLineClip(Uint32 color, int x1, int y1, int x2, int y2)
+void DrawLineClip(Uint32 color, int x1, int y1, int x2, int y2)
 {
-	if (ClipLine(x1,y1,x2,y2)) {
-		// Draw line based on clipped coordinates
-		// FIXME: As the clipped coordinates are rounded to integers, the line's
-		//        direction vector might be slightly off. Somehow, the sub-pixel
-		//        position(s) on the clipped retangle should be denoted to the line
-		//        drawing routine..
-		Assert(x1 >= ClipX1 && x2 >= ClipX1 && x1 <= ClipX2 && x2 <= ClipX2 &&
-			y1 >= ClipY1 && y2 >= ClipY1 && y1 <= ClipY2 && y2 <= ClipY2);
-		DrawLine(color, x1, y1, x2, y2);
+	int code1;
+	int code2;
+	int temp;
+
+	// Make sure coordinates or on/in clipped rectangle
+	while (code1 = ClipCodeLine(x1, y1), code2 = ClipCodeLine(x2, y2),
+		LineIsUnclipped(code1, code2)) {
+		if (LineIsUnclippedOnSameSide(code1, code2)) {
+			return;
+		}
+
+		if (!code1) {
+			temp = x1; x1 = x2; x2 = temp;
+			temp = y1; y1 = y2; y2 = temp;
+			code1 = code2;
+		}
+
+		if (code1 & ClipCodeAbove) {
+			temp = ClipY1;
+			x1 += (int)(((long)(temp - y1) * (x2 - x1)) / (y2 - y1));
+			y1 = temp;
+		} else if (code1 & ClipCodeBelow) {
+			temp = ClipY2;
+			x1 += (int)(((long)(temp - y1) * (x2 - x1)) / (y2 - y1));
+			y1 = temp;
+		} else if (code1 & ClipCodeLeft) {
+			temp = ClipX1;
+			y1 += (int)(((long)(temp - x1) * (y2 - y1)) / (x2 - x1));
+			x1 = temp;
+		} else {  /* code1 & ClipCodeRight */
+			temp = ClipX2;
+			y1 += (int)(((long)(temp - x1) * (y2 - y1)) / (x2 - x1));
+			x1 = temp;
+		}
 	}
+
+	// Draw line based on clipped coordinates
+	// FIXME: As the clipped coordinates are rounded to integers, the line's
+	//        direction vector might be slightly off. Somehow, the sub-pixel
+	//        position(s) on the clipped retangle should be denoted to the line
+	//        drawing routine..
+	Assert(x1 >= ClipX1 && x2 >= ClipX1 && x1 <= ClipX2 && x2 <= ClipX2 &&
+		y1 >= ClipY1 && y2 >= ClipY1 && y1 <= ClipY2 && y2 <= ClipY2);
+	DrawLine(color, x1, y1, x2, y2);
+}
+
+/**
+**  Draw a transparent line
+*/
+void DrawTransLine(Uint32 color, int sx, int sy,
+	int dx, int dy, unsigned char alpha)
+{
+	// FIXME: trans
+	DrawLine(color, sx, sy, dx, dy);
+}
+
+/**
+**  Draw a transparent line clipped
+*/
+void DrawTransLineClip(Uint32 color, int sx, int sy,
+	int dx, int dy, unsigned char alpha)
+{
+	// FIXME: trans
+	DrawLineClip(color, sx, sy, dx, dy);
 }
 
 /**
@@ -1011,25 +1406,25 @@ void CVideo::DrawLineClip(Uint32 color, int x1, int y1, int x2, int y2)
 **  @param h      height of rectangle (0=don't draw).
 **  @param w      width of rectangle (0=don't draw).
 */
-void CVideo::DrawRectangle(Uint32 color, int x, int y, int w, int h)
+void DrawRectangle(Uint32 color, int x, int y, int w, int h)
 {
 	GLubyte r, g, b, a;
 
-	GetRGBA(color, &r, &g, &b, &a);
+	Video.GetRGBA(color, NULL, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
 	glBegin(GL_LINES);
 	glVertex2i(x, y);
 	glVertex2i(x + w, y);
 
-	glVertex2i(x + w - 1, y);
+	glVertex2i(x + w - 1, y + 1);
 	glVertex2i(x + w - 1, y + h);
 
-	glVertex2i(x + w, y + h - 1);
+	glVertex2i(x + w - 1, y + h - 1);
 	glVertex2i(x, y + h - 1);
 
-	glVertex2i(x, y + h);
-	glVertex2i(x, y);
+	glVertex2i(x, y + h - 1);
+	glVertex2i(x, y + 1);
 	glEnd();
 	glEnable(GL_TEXTURE_2D);
 }
@@ -1044,13 +1439,13 @@ void CVideo::DrawRectangle(Uint32 color, int x, int y, int w, int h)
 **  @param w      width of rectangle (0=don't draw).
 **  @param alpha  alpha value of pixel.
 */
-void CVideo::DrawTransRectangle(Uint32 color, int x, int y,
+void DrawTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
 	GLubyte r, g, b;
 
-	GetRGB(color, &r, &g, &b);
-	color = MapRGBA(0, r, g, b, alpha);
+	Video.GetRGB(color, NULL, &r, &g, &b);
+	color = Video.MapRGBA(0, r, g, b, alpha);
 	DrawRectangle(color, x, y, w, h);
 }
 
@@ -1063,7 +1458,7 @@ void CVideo::DrawTransRectangle(Uint32 color, int x, int y,
 **  @param h      height of rectangle (0=don't draw).
 **  @param w      width of rectangle (0=don't draw).
 */
-void CVideo::DrawRectangleClip(Uint32 color, int x, int y,
+void DrawRectangleClip(Uint32 color, int x, int y,
 	int w, int h)
 {
 	int f;
@@ -1149,13 +1544,13 @@ void CVideo::DrawRectangleClip(Uint32 color, int x, int y,
 **  @param w      width of rectangle (0=don't draw).
 **  @param alpha  alpha value of pixels.
 */
-void CVideo::DrawTransRectangleClip(Uint32 color, int x, int y,
+void DrawTransRectangleClip(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
 	GLubyte r, g, b;
 
-	GetRGB(color, &r, &g, &b);
-	color = MapRGBA(0, r, g, b, alpha);
+	Video.GetRGB(color, NULL, &r, &g, &b);
+	color = Video.MapRGBA(0, r, g, b, alpha);
 	DrawRectangleClip(color, x, y, w, h);
 }
 
@@ -1168,12 +1563,12 @@ void CVideo::DrawTransRectangleClip(Uint32 color, int x, int y,
 **  @param h      height of rectangle (0=don't draw).
 **  @param w      width of rectangle (0=don't draw).
 */
-void CVideo::FillRectangle(Uint32 color, int x, int y,
+void FillRectangle(Uint32 color, int x, int y,
 	int w, int h)
 {
 	GLubyte r, g, b, a;
 
-	GetRGBA(color, &r, &g, &b, &a);
+	Video.GetRGBA(color, NULL, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
 	glBegin(GL_TRIANGLE_STRIP);
@@ -1195,13 +1590,13 @@ void CVideo::FillRectangle(Uint32 color, int x, int y,
 **  @param w      width of rectangle (0=don't draw).
 **  @param alpha  alpha value of pixel.
 */
-void CVideo::FillTransRectangle(Uint32 color, int x, int y,
+void FillTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
 	GLubyte r, g, b;
 
-	GetRGB(color, &r, &g, &b);
-	color = MapRGBA(0, r, g, b, alpha);
+	Video.GetRGB(color, NULL, &r, &g, &b);
+	color = Video.MapRGBA(0, r, g, b, alpha);
 	FillRectangle(color, x, y, w, h);
 }
 
@@ -1214,7 +1609,7 @@ void CVideo::FillTransRectangle(Uint32 color, int x, int y,
 **  @param h      height of rectangle (0=don't draw).
 **  @param w      width of rectangle (0=don't draw).
 */
-void CVideo::FillRectangleClip(Uint32 color, int x, int y,
+void FillRectangleClip(Uint32 color, int x, int y,
 	int w, int h)
 {
 	CLIP_RECTANGLE(x, y, w, h);
@@ -1231,14 +1626,73 @@ void CVideo::FillRectangleClip(Uint32 color, int x, int y,
 **  @param w      width of rectangle (0=don't draw).
 **  @param alpha  alpha value of pixels.
 */
-void CVideo::FillTransRectangleClip(Uint32 color, int x, int y,
+void FillTransRectangleClip(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
 	GLubyte r, g, b;
 
-	GetRGB(color, &r, &g, &b);
-	color = MapRGBA(0, r, g, b, alpha);
+	Video.GetRGB(color, NULL, &r, &g, &b);
+	color = Video.MapRGBA(0, r, g, b, alpha);
 	FillRectangleClip(color, x, y, w, h);
+}
+
+/**
+**  Draw circle.
+**
+**  @param color   color
+**  @param x       Center x coordinate on the screen
+**  @param y       Center y coordinate on the screen
+**  @param radius  radius of circle
+*/
+void DrawCircle(Uint32 color, int x, int y, int radius)
+{
+	int cx;
+	int cy;
+	int df;
+	int d_e;
+	int d_se;
+
+	cx = 0;
+	cy = radius;
+	df = 1 - radius;
+	d_e = 3;
+	d_se = -2 * radius + 5;
+
+	// FIXME: could be much improved :)
+	do {
+		if (cx == 0) {
+			DrawPixel(color, x, y + cy);
+			DrawPixel(color, x, y - cy);
+			DrawPixel(color, x + cy, y);
+			DrawPixel(color, x - cy, y);
+		} else if (cx == cy) {
+			Assert(cx != 0 && cy != 0);
+			DrawPixel(color, x + cx, y + cy);
+			DrawPixel(color, x - cx, y + cy);
+			DrawPixel(color, x + cx, y - cy);
+			DrawPixel(color, x - cx, y - cy);
+		} else if (cx < cy) {
+			Assert(cx != 0 && cy != 0);
+			DrawPixel(color, x + cx, y + cy);
+			DrawPixel(color, x + cx, y - cy);
+			DrawPixel(color, x + cy, y + cx);
+			DrawPixel(color, x + cy, y - cx);
+			DrawPixel(color, x - cx, y + cy);
+			DrawPixel(color, x - cx, y - cy);
+			DrawPixel(color, x - cy, y + cx);
+			DrawPixel(color, x - cy, y - cx);
+		}
+		if (df < 0) {
+			df += d_e;
+			d_se += 2;
+		} else {
+			df += d_se;
+			d_se += 4;
+			--cy;
+		}
+		d_e += 2;
+		++cx;
+	} while (cx <= cy);
 }
 
 /**
@@ -1249,7 +1703,7 @@ void CVideo::FillTransRectangleClip(Uint32 color, int x, int y,
 **  @param y       Center y coordinate on the screen
 **  @param radius  radius of circle
 */
-void CVideo::DrawCircleClip(Uint32 color, int x, int y, int radius)
+void DrawCircleClip(Uint32 color, int x, int y, int radius)
 {
 	int cx;
 	int cy;
@@ -1301,7 +1755,7 @@ void CVideo::DrawCircleClip(Uint32 color, int x, int y, int radius)
 }
 
 /**
-**  Draw circle clipped.
+**  Draw translucent circle.
 **
 **  @param color   color
 **  @param x       Center x coordinate on the screen
@@ -1309,13 +1763,32 @@ void CVideo::DrawCircleClip(Uint32 color, int x, int y, int radius)
 **  @param radius  radius of circle
 **  @param alpha   alpha value of pixels.
 */
-void CVideo::DrawTransCircleClip(Uint32 color, int x, int y, int radius,
+void DrawTransCircle(Uint32 color, int x, int y, int radius,
 	unsigned char alpha)
 {
 	GLubyte r, g, b;
 	
-	GetRGB(color, &r, &g, &b);
-	color = MapRGBA(0, r, g, b, alpha);
+	Video.GetRGB(color, NULL, &r, &g, &b);
+	color = Video.MapRGBA(0, r, g, b, alpha);
+	DrawCircle(color, x, y, radius);
+}
+
+/**
+**  Draw translucent circle clipped.
+**
+**  @param color   color
+**  @param x       Center x coordinate on the screen
+**  @param y       Center y coordinate on the screen
+**  @param radius  radius of circle
+**  @param alpha   alpha value of pixels.
+*/
+void DrawTransCircleClip(Uint32 color, int x, int y, int radius,
+	unsigned char alpha)
+{
+	GLubyte r, g, b;
+	
+	Video.GetRGB(color, NULL, &r, &g, &b);
+	color = Video.MapRGBA(0, r, g, b, alpha);
 	DrawCircleClip(color, x, y, radius);
 }
 
@@ -1327,7 +1800,7 @@ void CVideo::DrawTransCircleClip(Uint32 color, int x, int y, int radius,
 **  @param y       Center y coordinate on the screen
 **  @param radius  radius of circle
 */
-void CVideo::FillCircle(Uint32 color, int x, int y, int radius)
+void FillCircle(Uint32 color, int x, int y, int radius)
 {
 	int p;
 	int px;
@@ -1370,13 +1843,13 @@ void CVideo::FillCircle(Uint32 color, int x, int y, int radius)
 **  @param radius  radius of circle
 **  @param alpha   alpha value of pixels.
 */
-void CVideo::FillTransCircle(Uint32 color, int x, int y,
+void FillTransCircle(Uint32 color, int x, int y,
 	int radius, unsigned char alpha)
 {
 	GLubyte r, g, b;
 	
-	GetRGB(color, &r, &g, &b);
-	color = MapRGBA(0, r, g, b, alpha);
+	Video.GetRGB(color, NULL, &r, &g, &b);
+	color = Video.MapRGBA(0, r, g, b, alpha);
 	FillCircle(color, x, y, radius);
 }
 
@@ -1388,7 +1861,7 @@ void CVideo::FillTransCircle(Uint32 color, int x, int y,
 **  @param y       Center y coordinate on the screen
 **  @param radius  radius of circle
 */
-void CVideo::FillCircleClip(Uint32 color, int x, int y, int radius)
+void FillCircleClip(Uint32 color, int x, int y, int radius)
 {
 	int cx;
 	int cy;
@@ -1426,7 +1899,7 @@ void CVideo::FillCircleClip(Uint32 color, int x, int y, int radius)
 }
 
 /**
-**  Fill circle clipped.
+**  Fill translucent circle clipped.
 **
 **  @param color   color
 **  @param x       Center x coordinate on the screen
@@ -1434,23 +1907,280 @@ void CVideo::FillCircleClip(Uint32 color, int x, int y, int radius)
 **  @param radius  radius of circle
 **  @param alpha   alpha value of pixels.
 */
-void CVideo::FillTransCircleClip(Uint32 color, int x, int y,
+void FillTransCircleClip(Uint32 color, int x, int y,
 	int radius, unsigned char alpha)
 {
 	GLubyte r, g, b;
 	
-	GetRGB(color, &r, &g, &b);
-	color = MapRGBA(0, r, g, b, alpha);
+	Video.GetRGB(color, NULL, &r, &g, &b);
+	color = Video.MapRGBA(0, r, g, b, alpha);
 	FillCircleClip(color, x, y, radius);
 }
 
 /**
-**  FIXME: docu
+**  Initialize line draw
 */
 void InitLineDraw(void)
 {
 }
 
-#endif
+}
+
+void CVideo::DrawPixelClip(Uint32 color, int x, int y)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawPixelClip(color, x, y);
+	} else {
+		linedraw_sdl::DrawPixelClip(color, x, y);
+	}
+}
+void CVideo::DrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawTransPixelClip(color, x, y, alpha);
+	} else {
+		linedraw_sdl::DrawTransPixelClip(color, x, y, alpha);
+	}
+}
+
+void CVideo::DrawVLine(Uint32 color, int x, int y, int height)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawVLine(color, x, y, height);
+	} else {
+		linedraw_sdl::DrawVLine(color, x, y, height);
+	}
+}
+void CVideo::DrawTransVLine(Uint32 color, int x, int y, int height, unsigned char alpha)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawTransVLine(color, x, y, height, alpha);
+	} else {
+		linedraw_sdl::DrawTransVLine(color, x, y, height, alpha);
+	}
+}
+void CVideo::DrawVLineClip(Uint32 color, int x, int y, int height)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawVLineClip(color, x, y, height);
+	} else {
+		linedraw_sdl::DrawVLineClip(color, x, y, height);
+	}
+}
+void CVideo::DrawTransVLineClip(Uint32 color, int x, int y, int height, unsigned char alpha)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawTransVLineClip(color, x, y, height, alpha);
+	} else {
+		linedraw_sdl::DrawTransVLineClip(color, x, y, height, alpha);
+	}
+}
+
+void CVideo::DrawHLine(Uint32 color, int x, int y, int width)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawHLine(color, x, y, width);
+	} else {
+		linedraw_sdl::DrawHLine(color, x, y, width);
+	}
+}
+void CVideo::DrawTransHLine(Uint32 color, int x, int y, int width, unsigned char alpha)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawTransHLine(color, x, y, width, alpha);
+	} else {
+		linedraw_sdl::DrawTransHLine(color, x, y, width, alpha);
+	}
+}
+void CVideo::DrawHLineClip(Uint32 color, int x, int y, int width)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawHLineClip(color, x, y, width);
+	} else {
+		linedraw_sdl::DrawHLineClip(color, x, y, width);
+	}
+}
+void CVideo::DrawTransHLineClip(Uint32 color, int x, int y, int width, unsigned char alpha)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawTransHLineClip(color, x, y, width, alpha);
+	} else {
+		linedraw_sdl::DrawTransHLineClip(color, x, y, width, alpha);
+	}
+}
+
+void CVideo::DrawLine(Uint32 color, int sx, int sy, int dx, int dy)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawLine(color, sx, sy, dx, dy);
+	} else {
+		linedraw_sdl::DrawLine(color, sx, sy, dx, dy);
+	}
+}
+void CVideo::DrawTransLine(Uint32 color, int sx, int sy, int dx, int dy, unsigned char alpha)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawTransLine(color, sx, sy, dx, dy, alpha);
+	} else {
+		linedraw_sdl::DrawTransLine(color, sx, sy, dx, dy, alpha);
+	}
+}
+void CVideo::DrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawLineClip(color, sx, sy, dx, dy);
+	} else {
+		linedraw_sdl::DrawLineClip(color, sx, sy, dx, dy);
+	}
+}
+void CVideo::DrawTransLineClip(Uint32 color, int sx, int sy, int dx, int dy, unsigned char alpha)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawTransLineClip(color, sx, sy, dx, dy, alpha);
+	} else {
+		linedraw_sdl::DrawTransLineClip(color, sx, sy, dx, dy, alpha);
+	}
+}
+
+void CVideo::DrawRectangle(Uint32 color, int x, int y, int w, int h)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawRectangle(color, x, y, w, h);
+	} else {
+		linedraw_sdl::DrawRectangle(color, x, y, w, h);
+	}
+}
+void CVideo::DrawTransRectangle(Uint32 color, int x, int y, int w, int h, unsigned char alpha)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawTransRectangle(color, x, y, w, h, alpha);
+	} else {
+		linedraw_sdl::DrawTransRectangle(color, x, y, w, h, alpha);
+	}
+}
+void CVideo::DrawRectangleClip(Uint32 color, int x, int y, int w, int h)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawRectangleClip(color, x, y, w, h);
+	} else {
+		linedraw_sdl::DrawRectangleClip(color, x, y, w, h);
+	}
+}
+void CVideo::DrawTransRectangleClip(Uint32 color, int x, int y, int w, int h, unsigned char alpha)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawTransRectangleClip(color, x, y, w, h, alpha);
+	} else {
+		linedraw_sdl::DrawTransRectangleClip(color, x, y, w, h, alpha);
+	}
+}
+
+void CVideo::FillRectangle(Uint32 color, int x, int y, int w, int h)
+{
+	if (UseOpenGL) {
+		linedraw_gl::FillRectangle(color, x, y, w, h);
+	} else {
+		linedraw_sdl::FillRectangle(color, x, y, w, h);
+	}
+}
+void CVideo::FillTransRectangle(Uint32 color, int x, int y, int w, int h, unsigned char alpha)
+{
+	if (UseOpenGL) {
+		linedraw_gl::FillTransRectangle(color, x, y, w, h, alpha);
+	} else {
+		linedraw_sdl::FillTransRectangle(color, x, y, w, h, alpha);
+	}
+}
+void CVideo::FillRectangleClip(Uint32 color, int x, int y, int w, int h)
+{
+	if (UseOpenGL) {
+		linedraw_gl::FillRectangleClip(color, x, y, w, h);
+	} else {
+		linedraw_sdl::FillRectangleClip(color, x, y, w, h);
+	}
+}
+void CVideo::FillTransRectangleClip(Uint32 color, int x, int y, int w, int h, unsigned char alpha)
+{
+	if (UseOpenGL) {
+		linedraw_gl::FillTransRectangleClip(color, x, y, w, h, alpha);
+	} else {
+		linedraw_sdl::FillTransRectangleClip(color, x, y, w, h, alpha);
+	}
+}
+
+void CVideo::DrawCircle(Uint32 color, int x, int y, int r)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawCircle(color, x, y, r);
+	} else {
+		linedraw_sdl::DrawCircle(color, x, y, r);
+	}
+}
+void CVideo::DrawTransCircle(Uint32 color, int x, int y, int r, unsigned char alpha)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawTransCircle(color, x, y, r, alpha);
+	} else {
+		linedraw_sdl::DrawTransCircle(color, x, y, r, alpha);
+	}
+}
+void CVideo::DrawCircleClip(Uint32 color, int x, int y, int r)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawCircleClip(color, x, y, r);
+	} else {
+		linedraw_sdl::DrawCircleClip(color, x, y, r);
+	}
+}
+void CVideo::DrawTransCircleClip(Uint32 color, int x, int y, int r, unsigned char alpha)
+{
+	if (UseOpenGL) {
+		linedraw_gl::DrawTransCircleClip(color, x, y, r, alpha);
+	} else {
+		linedraw_sdl::DrawTransCircleClip(color, x, y, r, alpha);
+	}
+}
+
+void CVideo::FillCircle(Uint32 color, int x, int y, int r)
+{
+	if (UseOpenGL) {
+		linedraw_gl::FillCircle(color, x, y, r);
+	} else {
+		linedraw_sdl::FillCircle(color, x, y, r);
+	}
+}
+void CVideo::FillTransCircle(Uint32 color, int x, int y, int r, unsigned char alpha)
+{
+	if (UseOpenGL) {
+		linedraw_gl::FillTransCircle(color, x, y, r, alpha);
+	} else {
+		linedraw_sdl::FillTransCircle(color, x, y, r, alpha);
+	}
+}
+void CVideo::FillCircleClip(Uint32 color, int x, int y, int r)
+{
+	if (UseOpenGL) {
+		linedraw_gl::FillCircleClip(color, x, y, r);
+	} else {
+		linedraw_sdl::FillCircleClip(color, x, y, r);
+	}
+}
+void CVideo::FillTransCircleClip(Uint32 color, int x, int y, int r, unsigned char alpha)
+{
+	if (UseOpenGL) {
+		linedraw_gl::FillTransCircleClip(color, x, y, r, alpha);
+	} else {
+		linedraw_sdl::FillTransCircleClip(color, x, y, r, alpha);
+	}
+}
+
+void InitLineDraw(void)
+{
+	if (UseOpenGL) {
+		linedraw_gl::InitLineDraw();
+	} else {
+		linedraw_sdl::InitLineDraw();
+	}
+}
 
 //@}

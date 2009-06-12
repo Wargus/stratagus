@@ -393,7 +393,7 @@ static void ExpandPath(std::string &newpath, const std::string &path)
 		if(!GameName.empty()) {
 			newpath += GameName;
 			newpath += "/";
-		}	
+		}
 		newpath += path.substr(1);
 	} else {
 		newpath = StratagusLibPath + "/" + path;
@@ -402,7 +402,7 @@ static void ExpandPath(std::string &newpath, const std::string &path)
 
 extern gcn::Gui *Gui;
 
-void StartMap(const std::string &filename, bool clean) 
+void StartMap(const std::string &filename, bool clean)
 {
 	std::string nc, rc;
 
@@ -444,7 +444,7 @@ void StartMap(const std::string &filename, bool clean)
 	delete container;
 }
 
-void StartSavedGame(const std::string &filename) 
+void StartSavedGame(const std::string &filename)
 {
 	std::string path;
 
@@ -456,7 +456,7 @@ void StartSavedGame(const std::string &filename)
 	StartMap(filename, false);
 	//SetDefaultTextColors(nc, rc);
 }
-	
+
 void StartReplay(const std::string &filename, bool reveal)
 {
 	std::string replay;
@@ -697,7 +697,7 @@ static void RedirectOutput()
 {
 	char path[MAX_PATH];
 	int pathlen;
-	
+
 	pathlen = GetModuleFileName(NULL, path, sizeof(path));
 	while (pathlen > 0 && path[pathlen] != '\\') {
 		--pathlen;
@@ -747,9 +747,6 @@ int main(int argc, char **argv)
 #endif
 #ifdef USE_MIKMOD
 		"MIKMOD "
-#endif
-#ifdef USE_OPENGL
-		"OPENGL "
 #endif
 #ifdef USE_MNG
 		"MNG "

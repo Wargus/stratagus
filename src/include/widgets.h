@@ -10,7 +10,7 @@
 //
 /**@name widgets.h - The widgets headerfile. */
 //
-//      (c) Copyright 2005-2006 by François Beerten and Jimmy Salmon
+//      (c) Copyright 2005-2006 by Franï¿½ois Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -53,7 +53,6 @@ public:
 	virtual ~LuaActionListener();
 };
 
-#ifdef USE_OPENGL
 class MyOpenGLGraphics : public gcn::Graphics
 {
 public:
@@ -74,7 +73,6 @@ public:
 private:
 	gcn::Color mColor;
 };
-#endif
 
 class ImageWidget : public gcn::Icon
 {
@@ -82,14 +80,14 @@ public:
 	ImageWidget(gcn::Image *img) : gcn::Icon(img) {}
 };
 
-class ButtonWidget : public gcn::Button 
+class ButtonWidget : public gcn::Button
 {
 public:
 	ButtonWidget(const std::string &caption) : Button(caption)
 	{
 		this->setHotKey(GetHotKey(caption));
 	}
-}; 
+};
 
 class ImageButton : public gcn::Button
 {

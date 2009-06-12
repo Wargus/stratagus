@@ -241,7 +241,7 @@ void UpdateDisplay(void)
 	DrawPieMenu(); // draw pie menu only if needed
 
 	DrawGuichanWidgets();
-	
+
 	if (CursorState != CursorStateRectangle) {
 		DrawCursor();
 	}
@@ -267,11 +267,11 @@ static void InitGameCallbacks(void)
 static void GameLogicLoop(void)
 {
 	int player;
-	
+
 	// Can't find a better place.
 	// FIXME: We need find better place!
-	SaveGameLoading = false;	
-	
+	SaveGameLoading = false;
+
 	//
 	// Game logic part
 	//
@@ -331,19 +331,19 @@ static void GameLogicLoop(void)
 		}
 	}
 
-	TriggersEachCycle();  // handle triggers		
+	TriggersEachCycle();  // handle triggers
 	UpdateMessages();     // update messages
 	ParticleManager.update(); // handle particles
 	CheckMusicFinished(); // Check for next song
-	
+
 	if (FastForwardCycle <= GameCycle || !(GameCycle & 0x3f)) {
 		WaitEventsOneFrame();
 	}
-		
+
 	if (!NetworkInSync) {
 		NetworkRecover(); // recover network
 	}
-	
+
 }
 
 //#define REALVIDEO
@@ -353,65 +353,65 @@ static	int RealVideoSyncSpeed;
 
 static void DisplayLoop(void)
 {
-#ifdef USE_OPENGL
+	if (UseOpenGL) {
 		/* update only if screen changed */
 		ValidateOpenGLScreen();
-#endif
+	}
 
-		/* update only if viewmode changed */
-		CheckViewportMode();
-		
-		/* 
-		 *	update only if Update flag is set 
-		 *	FIXME: still not secure
-		 */
-		if (UI.Minimap.UpdateCache) {
-			UI.Minimap.Update();
-			UI.Minimap.UpdateCache = false;
-		}
+	/* update only if viewmode changed */
+	CheckViewportMode();
 
-		//
-		// Map scrolling
-		//
-		DoScrollArea(MouseScrollState | KeyScrollState, (KeyModifiers & ModifierControl) != 0);
+	/*
+	 *	update only if Update flag is set
+	 *	FIXME: still not secure
+	 */
+	if (UI.Minimap.UpdateCache) {
+		UI.Minimap.Update();
+		UI.Minimap.UpdateCache = false;
+	}
+
+	//
+	// Map scrolling
+	//
+	DoScrollArea(MouseScrollState | KeyScrollState, (KeyModifiers & ModifierControl) != 0);
 
 #ifdef REALVIDEO
-		if (FastForwardCycle > GameCycle &&
-				RealVideoSyncSpeed != VideoSyncSpeed) {
-			RealVideoSyncSpeed = VideoSyncSpeed;
-			VideoSyncSpeed = 3000;
-		}
-#endif		
-		if (FastForwardCycle <= GameCycle || GameCycle <= 10 || !(GameCycle & 0x3f)) {
-			//FIXME: this might be better placed somewhere at front of the
-			// program, as we now still have a game on the background and
-			// need to go through the game-menu or supply a map file
-			UpdateDisplay();
-
-			//
-			// If double-buffered mode, we will display the contains of
-			// VideoMemory. If direct mode this does nothing. In X11 it does
-			// XFlush
-			//
-			RealizeVideoMemory();
-		}
-#ifdef REALVIDEO
-		if (FastForwardCycle == GameCycle) {
-			VideoSyncSpeed = RealVideoSyncSpeed;
-		}
-#endif
-
-#ifndef USE_OPENGL
-	if ((GameRunning || Editor.Running) && (FastForwardCycle <= GameCycle || !(GameCycle & 0x3f))) {
-		Video.ClearScreen();
+	if (FastForwardCycle > GameCycle &&
+			RealVideoSyncSpeed != VideoSyncSpeed) {
+		RealVideoSyncSpeed = VideoSyncSpeed;
+		VideoSyncSpeed = 3000;
 	}
 #endif
+	if (FastForwardCycle <= GameCycle || GameCycle <= 10 || !(GameCycle & 0x3f)) {
+		//FIXME: this might be better placed somewhere at front of the
+		// program, as we now still have a game on the background and
+		// need to go through the game-menu or supply a map file
+		UpdateDisplay();
+
+		//
+		// If double-buffered mode, we will display the contains of
+		// VideoMemory. If direct mode this does nothing. In X11 it does
+		// XFlush
+		//
+		RealizeVideoMemory();
+	}
+#ifdef REALVIDEO
+	if (FastForwardCycle == GameCycle) {
+		VideoSyncSpeed = RealVideoSyncSpeed;
+	}
+#endif
+
+	if (!UseOpenGL) {
+		if ((GameRunning || Editor.Running) && (FastForwardCycle <= GameCycle || !(GameCycle & 0x3f))) {
+			Video.ClearScreen();
+		}
+	}
 }
 
 static void SingleGameLoop(void)
 {
 	while (GameRunning) {
-		DisplayLoop();	
+		DisplayLoop();
 		GameLogicLoop();
 	}
 }
@@ -475,7 +475,7 @@ void GameMainLoop(void)
 				DisplayUpdateLocker.UnLock();
 				/* Make CPU happy */
 				SDL_Delay(1);
-			}			
+			}
 			GameThr.Wait();
 		} else {
 			SingleGameLoop();
@@ -490,13 +490,13 @@ void GameMainLoop(void)
 	if (GameResult == GameExit) {
 		Exit(0);
 		return;
-	}	
+	}
 
-#ifdef REALVIDEO	
+#ifdef REALVIDEO
 	if (FastForwardCycle > GameCycle) {
 		VideoSyncSpeed = RealVideoSyncSpeed;
 	}
-#endif	
+#endif
 	NetworkQuit();
 	EndReplayLog();
 

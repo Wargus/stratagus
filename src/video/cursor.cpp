@@ -91,9 +91,7 @@ CUnitType *CursorBuilding;           /// building cursor
 /*--- DRAW SPRITE CURSOR ---------------------------------------------------*/
 CCursor *GameCursor;                 /// current shown cursor-type
 
-#ifndef USE_OPENGL
 static SDL_Surface *HiddenSurface;
-#endif
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -269,7 +267,7 @@ static void DrawBuildingCursor(void)
 		while (w--) {
 			if (f && (ontop ||
 					CanBuildOn(mx + w, my + h, MapFogFilterFlags(ThisPlayer, mx + w, my + h,
-						mask & ((NumSelected && 
+						mask & ((NumSelected &&
 							Selected[0]->X == mx + w && Selected[0]->Y == my + h) ?
 								~(MapFieldLandUnit | MapFieldSeaUnit) : -1)))) &&
 					Map.IsFieldExplored(ThisPlayer, mx + w, my + h))  {
@@ -302,8 +300,7 @@ void DrawCursor(void)
 		DrawBuildingCursor();
 	}
 
-#ifndef USE_OPENGL
-	if (!GameRunning && !Editor.Running && GameCursor) {
+	if (!UseOpenGL && !GameRunning && !Editor.Running && GameCursor) {
 		if (!HiddenSurface ||
 			HiddenSurface->w != GameCursor->G->getWidth() ||
 			HiddenSurface->h != GameCursor->G->getHeight())
@@ -330,7 +327,7 @@ void DrawCursor(void)
 		};
 		SDL_BlitSurface(TheScreen, &srcRect, HiddenSurface, NULL);
 	}
-#endif
+
 	//
 	//  Last, Normal cursor.
 	//  Cursor may not exist if we are loading a game or something. Only
@@ -347,8 +344,7 @@ void DrawCursor(void)
 */
 void HideCursor(void)
 {
-#ifndef USE_OPENGL
-	if (!GameRunning && !Editor.Running && GameCursor) {
+	if (!UseOpenGL && !GameRunning && !Editor.Running && GameCursor) {
 		SDL_Rect dstRect = {
 			CursorX - GameCursor->HotX,
 			CursorY - GameCursor->HotY,
@@ -357,7 +353,6 @@ void HideCursor(void)
 		};
  		SDL_BlitSurface(HiddenSurface, NULL, TheScreen, &dstRect);
 	}
-#endif
 }
 
 /**

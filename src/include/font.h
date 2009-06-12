@@ -89,7 +89,7 @@ public:
 	virtual int getHeight() const { return Height(); }
 	virtual int getWidth(const std::string &text) const
 		{ return Width(text); }
-	virtual void drawString(gcn::Graphics *graphics, const std::string &text, 
+	virtual void drawString(gcn::Graphics *graphics, const std::string &text,
 		int x, int y);
 
 	void MeasureWidths();
@@ -159,12 +159,10 @@ extern int GetHotKey(const std::string &text);
 
 	/// Load and initialize the fonts
 extern void LoadFonts(void);
-#ifdef USE_OPENGL
 	/// Free OpenGL fonts
 extern void FreeOpenGLFonts(void);
 	/// Reload OpenGL fonts
 extern void ReloadFonts(void);
-#endif
 	/// Cleanup the font module
 extern void CleanFonts(void);
 
@@ -172,23 +170,23 @@ class CLabel {
 	const CFontColor *normal;
 	const CFontColor *reverse;
 	const CFont *font;
-	
+
 	template <const bool CLIP>
-	int DoDrawText(int x, int y, const char*const text, 
+	int DoDrawText(int x, int y, const char*const text,
 		const size_t len, const CFontColor *fc) const;
-	
+
 public:
 	CLabel(const CFont *f, const std::string &nc, const std::string &rc): font(f) {
 		normal = CFontColor::Get(nc);
 		reverse = CFontColor::Get(rc);
 	}
 	CLabel(const CFont *f);
-	
+
 	int Height(void) const
 	{
 		return font->Height();
 	}
-	
+
 	void SetFont(const CFont *f) {
 		font = f;
 	}
@@ -196,7 +194,7 @@ public:
 	void SetNormalColor(const std::string &nc) {
 		normal = CFontColor::Get(nc);
 	}
-	
+
 	/// Draw text/number unclipped
 	int Draw(int x, int y, const char*const text) const;
 	int Draw(int x, int y, const std::string &text) const;
@@ -205,17 +203,17 @@ public:
 	int DrawClip(int x, int y, const char*const text) const;
 	int DrawClip(int x, int y, const std::string &text) const;
 	int DrawClip(int x, int y, int number) const;
-	/// Draw reverse text/number unclipped	
-	int DrawReverse(int x, int y, const char*const text) const;	
+	/// Draw reverse text/number unclipped
+	int DrawReverse(int x, int y, const char*const text) const;
 	int DrawReverse(int x, int y, const std::string &text) const;
-	int DrawReverse(int x, int y, int number)const ;	
+	int DrawReverse(int x, int y, int number)const ;
 	/// Draw reverse text/number clipped
 	int DrawReverseClip(int x, int y, const char*const text) const;
 	int DrawReverseClip(int x, int y, const std::string &text) const;
 	int DrawReverseClip(int x, int y, int number) const;
 
 	int DrawCentered(int x, int y, const std::string &text) const;
-	
+
 };
 
 //@}

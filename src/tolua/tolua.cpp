@@ -13113,6 +13113,30 @@ static int tolua_stratagus_InitVideo00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: UseOpenGL */
+#ifndef TOLUA_DISABLE_tolua_get_UseOpenGL
+static int tolua_get_UseOpenGL(lua_State* tolua_S)
+{
+  tolua_pushboolean(tolua_S,(bool)UseOpenGL);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: UseOpenGL */
+#ifndef TOLUA_DISABLE_tolua_set_UseOpenGL
+static int tolua_set_UseOpenGL(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!tolua_isboolean(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  UseOpenGL = ((bool)  tolua_toboolean(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: Width of class  CVideo */
 #ifndef TOLUA_DISABLE_tolua_get_CVideo_Width
 static int tolua_get_CVideo_Width(lua_State* tolua_S)
@@ -13669,6 +13693,30 @@ static int tolua_set_CColor_unsigned_A(lua_State* tolua_S)
    tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
   self->A = ((unsigned char)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: UseGLTextureCompression */
+#ifndef TOLUA_DISABLE_tolua_get_UseGLTextureCompression
+static int tolua_get_UseGLTextureCompression(lua_State* tolua_S)
+{
+  tolua_pushboolean(tolua_S,(bool)UseGLTextureCompression);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: UseGLTextureCompression */
+#ifndef TOLUA_DISABLE_tolua_set_UseGLTextureCompression
+static int tolua_set_UseGLTextureCompression(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!tolua_isboolean(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  UseGLTextureCompression = ((bool)  tolua_toboolean(tolua_S,2,0))
 ;
  return 0;
 }
@@ -19881,6 +19929,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"NetworkMapName",tolua_get_NetworkMapName,tolua_set_NetworkMapName);
   tolua_function(tolua_S,"NetworkGamePrepareGameSettings",tolua_stratagus_NetworkGamePrepareGameSettings00);
   tolua_function(tolua_S,"InitVideo",tolua_stratagus_InitVideo00);
+  tolua_variable(tolua_S,"UseOpenGL",tolua_get_UseOpenGL,tolua_set_UseOpenGL);
   tolua_cclass(tolua_S,"CVideo","CVideo","",NULL);
   tolua_beginmodule(tolua_S,"CVideo");
    tolua_variable(tolua_S,"Width",tolua_get_CVideo_Width,tolua_set_CVideo_Width);
@@ -19916,6 +19965,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"B",tolua_get_CColor_unsigned_B,tolua_set_CColor_unsigned_B);
    tolua_variable(tolua_S,"A",tolua_get_CColor_unsigned_A,tolua_set_CColor_unsigned_A);
   tolua_endmodule(tolua_S);
+  tolua_variable(tolua_S,"UseGLTextureCompression",tolua_get_UseGLTextureCompression,tolua_set_UseGLTextureCompression);
   tolua_cclass(tolua_S,"CFont","CFont","",NULL);
   tolua_beginmodule(tolua_S,"CFont");
    tolua_function(tolua_S,"New",tolua_stratagus_CFont_New00);

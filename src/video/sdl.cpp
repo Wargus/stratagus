@@ -53,9 +53,7 @@
 #include <unistd.h>
 #endif
 #include "SDL.h"
-#ifdef USE_OPENGL
 #include "SDL_opengl.h"
-#endif
 
 #ifdef USE_BEOS
 #include <sys/socket.h>
@@ -87,14 +85,11 @@
 
 SDL_Surface *TheScreen; /// Internal screen
 
-#ifndef USE_OPENGL
 static SDL_Rect Rects[100];
 static int NumRects;
-#else
 GLint GLMaxTextureSize;   /// Max texture size supported on the video card
 bool GLTextureCompressionSupported; /// Is OpenGL texture compression supported
 bool UseGLTextureCompression;       /// Use OpenGL texture compression
-#endif
 
 static std::map<int, std::string> Key2Str;
 static std::map<std::string, int> Str2Key;
@@ -105,12 +100,12 @@ static int FrameFraction; /// Frame fractional term
 
 const EventCallback *Callbacks;
 
-#ifdef USE_OPENGL
 static bool RegenerateScreen = false;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
 // ARB_texture_compression
 PFNGLCOMPRESSEDTEXIMAGE3DARBPROC    glCompressedTexImage3DARB;
 PFNGLCOMPRESSEDTEXIMAGE2DARBPROC    glCompressedTexImage2DARB;
@@ -119,7 +114,7 @@ PFNGLCOMPRESSEDTEXSUBIMAGE3DARBPROC glCompressedTexSubImage3DARB;
 PFNGLCOMPRESSEDTEXSUBIMAGE2DARBPROC glCompressedTexSubImage2DARB;
 PFNGLCOMPRESSEDTEXSUBIMAGE1DARBPROC glCompressedTexSubImage1DARB;
 PFNGLGETCOMPRESSEDTEXIMAGEARBPROC   glGetCompressedTexImageARB;
-#endif
+
 /*----------------------------------------------------------------------------
 --  Sync
 ----------------------------------------------------------------------------*/
@@ -154,7 +149,6 @@ void SetVideoSync(void)
 --  Video
 ----------------------------------------------------------------------------*/
 
-#ifdef USE_OPENGL
 /**
 **  Check if an extension is supported
 */
@@ -275,7 +269,6 @@ void ReloadOpenGL()
 	ReloadFonts();
 	UI.Minimap.Reload();
 }
-#endif
 
 #if defined(DEBUG) && !defined(USE_WIN32)
 static void CleanExit(int signum)
@@ -430,9 +423,9 @@ void InitVideoSdl(void)
 	if (Video.FullScreen) {
 		flags |= SDL_FULLSCREEN;
 	}
-#ifdef USE_OPENGL
-	flags |= SDL_OPENGL;
-#endif
+	if (UseOpenGL) {
+		flags |= SDL_OPENGL;
+	}
 
 	if (!Video.Width || !Video.Height) {
 		Video.Width = 640;
@@ -460,9 +453,9 @@ void InitVideoSdl(void)
 	// Make default character translation easier
 	SDL_EnableUNICODE(1);
 
-#ifdef USE_OPENGL
-	InitOpenGL();
-#endif
+	if (UseOpenGL) {
+		InitOpenGL();
+	}
 
 	InitKey2Str();
 
@@ -500,15 +493,15 @@ int VideoValidResolution(int w, int h)
 */
 void InvalidateArea(int x, int y, int w, int h)
 {
-#ifndef USE_OPENGL
-	Assert(NumRects != sizeof(Rects) / sizeof(*Rects));
-	Assert(x >= 0 && y >= 0 && x + w <= Video.Width && y + h <= Video.Height);
-	Rects[NumRects].x = x;
-	Rects[NumRects].y = y;
-	Rects[NumRects].w = w;
-	Rects[NumRects].h = h;
-	++NumRects;
-#endif
+	if (!UseOpenGL) {
+		Assert(NumRects != sizeof(Rects) / sizeof(*Rects));
+		Assert(x >= 0 && y >= 0 && x + w <= Video.Width && y + h <= Video.Height);
+		Rects[NumRects].x = x;
+		Rects[NumRects].y = y;
+		Rects[NumRects].w = w;
+		Rects[NumRects].h = h;
+		++NumRects;
+	}
 }
 
 /**
@@ -516,13 +509,13 @@ void InvalidateArea(int x, int y, int w, int h)
 */
 void Invalidate(void)
 {
-#ifndef USE_OPENGL
-	Rects[0].x = 0;
-	Rects[0].y = 0;
-	Rects[0].w = Video.Width;
-	Rects[0].h = Video.Height;
-	NumRects = 1;
-#endif
+	if (!UseOpenGL) {
+		Rects[0].x = 0;
+		Rects[0].y = 0;
+		Rects[0].w = Video.Width;
+		Rects[0].h = Video.Height;
+		NumRects = 1;
+	}
 }
 
 /**
@@ -586,9 +579,9 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 						DoTogglePause = false;
 						UiTogglePause();
 					}
-#ifdef USE_OPENGL
-					RegenerateScreen = true;
-#endif
+					if (UseOpenGL) {
+						RegenerateScreen = true;
+					}
 				}
 			}
 			break;
@@ -613,7 +606,6 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 	}
 }
 
-#ifdef USE_OPENGL
 void ValidateOpenGLScreen(void)
 {
 	if (RegenerateScreen) {
@@ -621,7 +613,6 @@ void ValidateOpenGLScreen(void)
 		RegenerateScreen = false;
 	}
 }
-#endif
 
 /**
 **  Set the current callbacks
@@ -648,8 +639,6 @@ const EventCallback *GetCallbacks()
 **
 **  All events available are fetched. Sound and network only if available.
 **  Returns if the time for one frame is over.
-**
-**  FIXME: the initialization could be moved out of the loop
 */
 void WaitEventsOneFrame()
 {
@@ -663,14 +652,7 @@ void WaitEventsOneFrame()
 	Uint32 ticks;
 	int interrupts;
 
-	if (!++FrameCounter) {
-		// FIXME: tests with frame counter now fails :(
-		// FIXME: Should happen in 68 years :)
-		fprintf(stderr, "FIXME: *** round robin ***\n");
-		fprintf(stderr, "FIXME: *** round robin ***\n");
-		fprintf(stderr, "FIXME: *** round robin ***\n");
-		fprintf(stderr, "FIXME: *** round robin ***\n");
-	}
+	++FrameCounter;
 
 	ticks = SDL_GetTicks();
 	if (ticks > NextFrameTicks) { // We are too slow :(
@@ -768,15 +750,15 @@ void WaitEventsOneFrame()
 */
 void RealizeVideoMemory(void)
 {
-#ifdef USE_OPENGL
-	SDL_GL_SwapBuffers();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-#else
-	if (NumRects) {
-		SDL_UpdateRects(TheScreen, NumRects, Rects);
-		NumRects = 0;
+	if (UseOpenGL) {
+		SDL_GL_SwapBuffers();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	} else {
+		if (NumRects) {
+			SDL_UpdateRects(TheScreen, NumRects, Rects);
+			NumRects = 0;
+		}
 	}
-#endif
 	HideCursor();
 }
 
@@ -785,11 +767,11 @@ void RealizeVideoMemory(void)
 */
 void SdlLockScreen(void)
 {
-#ifndef USE_OPENGL
-	if (SDL_MUSTLOCK(TheScreen)) {
-		SDL_LockSurface(TheScreen);
+	if (!UseOpenGL) {
+		if (SDL_MUSTLOCK(TheScreen)) {
+			SDL_LockSurface(TheScreen);
+		}
 	}
-#endif
 }
 
 /**
@@ -797,11 +779,11 @@ void SdlLockScreen(void)
 */
 void SdlUnlockScreen(void)
 {
-#ifndef USE_OPENGL
-	if (SDL_MUSTLOCK(TheScreen)) {
-		SDL_UnlockSurface(TheScreen);
+	if (!UseOpenGL) {
+		if (SDL_MUSTLOCK(TheScreen)) {
+			SDL_UnlockSurface(TheScreen);
+		}
 	}
-#endif
 }
 
 /**
@@ -870,11 +852,9 @@ void ToggleFullScreen(void)
 	int w;
 	int h;
 	int bpp;
-#ifndef USE_OPENGL
 	unsigned char *pixels = NULL;
 	SDL_Color *palette = NULL;
 	int ncolors = 0;
-#endif
 
 	if (!TheScreen) { // don't bother if there's no surface.
 		return;
@@ -894,38 +874,33 @@ void ToggleFullScreen(void)
 	// save the contents of the screen.
 	framesize = w * h * TheScreen->format->BytesPerPixel;
 
-#ifndef USE_OPENGL
-	if (!(pixels = new unsigned char[framesize])) { // out of memory
-		return;
-	}
-	SDL_LockSurface(TheScreen);
-	memcpy(pixels, TheScreen->pixels, framesize);
-
-#ifdef DEBUG
-	// shut up compiler
-	palette = NULL;
-	ncolors=0;
-#endif
-	if (TheScreen->format->palette) {
-		ncolors = TheScreen->format->palette->ncolors;
-		if (!(palette = new SDL_Color[ncolors])) {
-			delete[] pixels;
+	if (!UseOpenGL) {
+		if (!(pixels = new unsigned char[framesize])) { // out of memory
 			return;
 		}
-		memcpy(palette, TheScreen->format->palette->colors,
-			ncolors * sizeof(SDL_Color));
+		SDL_LockSurface(TheScreen);
+		memcpy(pixels, TheScreen->pixels, framesize);
+
+		if (TheScreen->format->palette) {
+			ncolors = TheScreen->format->palette->ncolors;
+			if (!(palette = new SDL_Color[ncolors])) {
+				delete[] pixels;
+				return;
+			}
+			memcpy(palette, TheScreen->format->palette->colors,
+				ncolors * sizeof(SDL_Color));
+		}
+		SDL_UnlockSurface(TheScreen);
 	}
-	SDL_UnlockSurface(TheScreen);
-#endif
 
 	TheScreen = SDL_SetVideoMode(w, h, bpp, flags ^ SDL_FULLSCREEN);
 	if (!TheScreen) {
 		TheScreen = SDL_SetVideoMode(w, h, bpp, flags);
 		if (!TheScreen) { // completely screwed.
-#ifndef USE_OPENGL
-			delete[] pixels;
-			delete[] palette;
-#endif
+			if (!UseOpenGL) {
+				delete[] pixels;
+				delete[] palette;
+			}
 			fprintf(stderr, "Toggle to fullscreen, crashed all\n");
 			Exit(-1);
 		}
@@ -936,20 +911,20 @@ void ToggleFullScreen(void)
 	SDL_ShowCursor(SDL_ENABLE);
 	SDL_ShowCursor(SDL_DISABLE);
 
-#ifdef USE_OPENGL
-	ReloadOpenGL();
-#else
-	SDL_LockSurface(TheScreen);
-	memcpy(TheScreen->pixels, pixels, framesize);
-	delete[] pixels;
+	if (UseOpenGL) {
+		ReloadOpenGL();
+	} else {
+		SDL_LockSurface(TheScreen);
+		memcpy(TheScreen->pixels, pixels, framesize);
+		delete[] pixels;
 
-	if (TheScreen->format->palette) {
-		// !!! FIXME : No idea if that flags param is right.
-		SDL_SetPalette(TheScreen, SDL_LOGPAL, palette, 0, ncolors);
-		delete[] palette;
+		if (TheScreen->format->palette) {
+			// !!! FIXME : No idea if that flags param is right.
+			SDL_SetPalette(TheScreen, SDL_LOGPAL, palette, 0, ncolors);
+			delete[] palette;
+		}
+		SDL_UnlockSurface(TheScreen);
 	}
-	SDL_UnlockSurface(TheScreen);
-#endif
 
 	SDL_SetClipRect(TheScreen, &clip);
 

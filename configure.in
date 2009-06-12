@@ -121,19 +121,12 @@ else
 	CPPFLAGS="$CPPFLAGS -DDEBUG"
 fi
 
-dnl --- OPENGL -----------------
-AC_ARG_WITH(opengl,
-	[  --with-opengl		  [Use opengl (default: no)]],, with_opengl="no")
-if test "$with_opengl" != "no"; then
-	CPPFLAGS="$CPPFLAGS -DUSE_OPENGL"
-
-	if test "$ARCH" = "win32"; then
-		AC_CHECK_LIB(opengl32, main, LDFLAGS="$LDFLAGS -lopengl32", AC_MSG_ERROR(opengl libraries cannot be not found))
-	else
-		AC_SEARCH_LIBS(glViewport, GL opengl32 sdl, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(opengl libraries cannot be not found))
-	fi
+if test "$ARCH" = "win32"; then
+	AC_CHECK_LIB(opengl32, main, LDFLAGS="$LDFLAGS -lopengl32", AC_MSG_ERROR(opengl libraries cannot be not found))
+else
+	AC_SEARCH_LIBS(glViewport, GL opengl32 sdl, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(opengl libraries cannot be not found))
 fi
-
+	
 dnl --- BZIP2 ------------------
 AC_ARG_WITH(bzip2,
 	[  --with-bzip2		  [Use bzip2 (default: yes)]])

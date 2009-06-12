@@ -129,6 +129,8 @@ extern void SdlUnlockScreen(void);      /// Do SDL hardware unlock
 
 CVideo Video;
 
+bool UseOpenGL;                      /// Use OpenGL
+
 char VideoForceFullScreen;           /// fullscreen set from commandline
 
 unsigned long NextFrameTicks;        /// Ticks of begin of the next frame
@@ -238,19 +240,19 @@ void CVideo::ClearScreen(void)
 bool CVideo::ResizeScreen(int w, int h)
 {
 	if (VideoValidResolution(w, h)) {
-#ifdef USE_OPENGL
+		if (UseOpenGL) {
 			FreeOpenGLGraphics();
 			FreeOpenGLFonts();
 			UI.Minimap.FreeOpenGL();
-#endif
+		}
 		Width = w;
 		Height = h;
 		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel,
 			TheScreen->flags);
 		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
-#ifdef USE_OPENGL
+		if (UseOpenGL) {
 			ReloadOpenGL();
-#endif
+		}
 		return true;
 	}
 	return false;
