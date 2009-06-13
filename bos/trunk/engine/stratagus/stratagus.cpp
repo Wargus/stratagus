@@ -619,7 +619,6 @@ static void Usage(void)
 		\t-n server\tNetwork server host preset\n\
 		\t-L lag\t\tNetwork lag in # frames (default 10 = 333ms)\n\
 		\t-U update\tNetwork update rate in # frames (default 5=6x per s)\n\
-		\t-s sleep\tNumber of frames for the AI to sleep before it starts\n\
 		\t-v mode\t\tVideo mode (0=default,1=640x480,2=800x600,\n\
 		\t\t\t\t3=1024x768,4=1280x960,5=1600x1200)\n\
 		\t-D\t\tVideo mode depth = pixel per point (for Win32/TNT)\n\
@@ -737,7 +736,7 @@ int main(int argc, char **argv)
 	//  Parse commandline
 	//
 	for (;;) {
-		switch (getopt(argc, argv, "c:d:hln:P:s:v:D:N:E:FL:S:U:W?")) {
+		switch (getopt(argc, argv, "c:d:hln:P:v:D:N:E:FL:S:U:W?")) {
 			case 'c':
 				CclStartFile = optarg;
 				continue;
@@ -764,9 +763,6 @@ int main(int argc, char **argv)
 				continue;
 			case 'N':
 				LocalPlayerName = optarg;
-				continue;
-			case 's':
-				AiSleepCycles = atoi(optarg);
 				continue;
 			case 'v':
 				switch (atoi(optarg)) {

@@ -9,7 +9,7 @@
 //
 /**@name ai.h - The ai headerfile. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer
+//      (c) Copyright 1998-2009 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -40,49 +40,32 @@ class CUnit;
 class CUnitType;
 
 /*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-extern int AiSleepCycles;  /// Ai sleeps # cycles
-
-/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 extern void AiEachCycle(CPlayer *player);   /// Called each game cycle
 extern void AiEachSecond(CPlayer *player);  /// Called each second
 
-extern void InitAiModule(void);       /// Init AI global structures
-extern void AiInit(CPlayer *player);   /// Init AI for this player
-extern void CleanAi(void);            /// Cleanup the AI module
-extern void FreeAi(void);            /// Free the AI resources
-extern void SaveAi(CFile *file);     /// Save the AI state
+extern void InitAiModule();                 /// Init AI global structures
+extern void AiInit(CPlayer *player);        /// Init AI for this player
+extern void CleanAi();                      /// Cleanup the AI module
+extern void FreeAi();                       /// Free the AI resources
+extern void SaveAi(CFile *file);            /// Save the AI state
 
-extern void AiCclRegister(void);      /// Register ccl features
+extern void AiCclRegister();                /// Register ccl features
 
 /*--------------------------------------------------------
---  Call Backs/Triggers
+--  Callbacks/Triggers
 --------------------------------------------------------*/
 
-	/// Called if AI unit is attacked
 extern void AiHelpMe(const CUnit *attacker, CUnit *defender);
-	/// Called if AI unit is killed
 extern void AiUnitKilled(CUnit *unit);
-	/// Called if AI needs more farms
-extern void AiNeedMoreSupply(const CUnit *unit,
-	const CUnitType *what);
-	/// Called if AI unit has completed work
-extern void AiWorkComplete(CUnit *unit, CUnit *what);
-	/// Called if AI unit can't build
-extern void AiCanNotBuild(CUnit *unit,
-	const CUnitType *what);
-	/// Called if AI unit can't reach building place
-extern void AiCanNotReach(CUnit *unit,
-	const CUnitType *what);
-	/// Called if an AI unit can't move
+extern void AiNeedMoreSupply(const CUnit *unit, const CUnitType *unitType);
+extern void AiWorkComplete(CUnit *unit, CUnit *newUnit);
+extern void AiCanNotBuild(CUnit *unit, const CUnitType *unitType);
+extern void AiCanNotReach(CUnit *unit, const CUnitType *unitType);
 extern void AiCanNotMove(CUnit *unit);
-	/// Called if AI unit has completed training
-extern void AiTrainingComplete(CUnit *unit, CUnit *what);
+extern void AiTrainingComplete(CUnit *unit, CUnit *newUnit);
 
 //@}
 

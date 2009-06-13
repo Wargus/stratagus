@@ -89,7 +89,6 @@ end
 
 local ai_funcs = {
   function() AiDebug(false) return false end,
-  function() return AiSleep(AiGetSleepCycles()) end,
 
   -- Build magma pump or power plant first depending on resources
   function()

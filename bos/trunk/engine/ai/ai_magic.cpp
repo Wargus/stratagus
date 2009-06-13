@@ -9,7 +9,7 @@
 //
 /**@name ai_magic.cpp - AI magic functions. */
 //
-//      (c) Copyright 2002-2005 by Lutz Sammer, Joris Dauphin
+//      (c) Copyright 2002-2009 by Lutz Sammer, Joris Dauphin, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -32,15 +32,10 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "stratagus.h"
 #include "unittype.h"
 #include "unit.h"
 #include "spells.h"
-#include "actions.h"
-#include "map.h"
 #include "ai_local.h"
 #include "player.h"
 
@@ -49,39 +44,41 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**  Auto cast a spell
+**
+**  @param unit  The unit to cast a spell
+*/
+static void AiAutoCastSpell(CUnit *unit)
+{
+	if (!unit->Type->CanCastSpell)
+	{
+		return;
+	}
+
+	for (size_t i = 0; i < SpellTypeTable.size(); ++i)
+	{
+		// Check if we can cast this spell.
+		if (unit->Type->CanCastSpell[i] &&
+			(SpellTypeTable[i]->AutoCast || SpellTypeTable[i]->AICast))
+		{
+			if (AutoCastSpell(unit, SpellTypeTable[i]))
+			{
+				// Spell was cast
+				return;
+			}
+		}
+	}
+}
+
+/**
 **  Check what computer units can do with magic.
 **  In fact, turn on autocast for AI.
 */
-void AiCheckMagic(void)
+void AiCheckMagic()
 {
-	int i;
-	unsigned int j;
-	int n;
-	CUnit **units;
-	CUnit *unit;
-	const CPlayer *player;
-#ifdef DEBUG
-	int success;
-#endif
-
-	n = AiPlayer->Player->TotalNumUnits;
-	units = AiPlayer->Player->Units;
-	player = AiPlayer->Player; /*units[0]->Player */
-	for (i = 0; i < n; ++i) {
-		unit = units[i];
-		// Check only magic units
-		if (unit->Type->CanCastSpell) {
-			for (j = 0; j < SpellTypeTable.size(); ++j) {
-				// Check if we can cast this spell. SpellIsAvailable checks for upgrades.
-				if (unit->Type->CanCastSpell[j] && SpellIsAvailable(player, j) &&
-					(SpellTypeTable[j]->AutoCast || SpellTypeTable[j]->AICast)) {
-#ifdef DEBUG
-					success =  // Follow on next line (AutoCastSpell).
-#endif
-						AutoCastSpell(unit, SpellTypeTable[j]);
-				}
-			}
-		}
+	for (int i = 0; i < AiPlayer->Player->TotalNumUnits; ++i)
+	{
+		AiAutoCastSpell(AiPlayer->Player->Units[i]);
 	}
 }
 
