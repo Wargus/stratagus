@@ -9,7 +9,7 @@
 //
 /**@name ai_building.cpp - AI building functions. */
 //
-//      (c) Copyright 2001-2007 by Lutz Sammer
+//      (c) Copyright 2001-2009 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -87,22 +87,32 @@ static int AiCheckSurrounding(const CUnit *worker, const CUnitType *type, int x,
 	y = y0;
 	dir = -1;
 	surroundingnb = 0;
-	while (dir < 4) {
-		if ((unsigned)x < (unsigned)Map.Info.MapWidth && (unsigned)y < (unsigned)Map.Info.MapHeight) {
-			if (worker && x == worker->X && y == worker->Y) {
+	while (dir < 4)
+	{
+		if ((unsigned)x < (unsigned)Map.Info.MapWidth && (unsigned)y < (unsigned)Map.Info.MapHeight)
+		{
+			if (worker && x == worker->X && y == worker->Y)
+			{
 				surrounding[surroundingnb++] = 1;
-			} else if (Map.Field(x, y)->Flags & (MapFieldUnpassable | MapFieldBuilding)) {
+			}
+			else if (Map.Field(x, y)->Flags & (MapFieldUnpassable | MapFieldBuilding))
+			{
 				surrounding[surroundingnb++] = 0;
-			} else{
+			}
+			else
+			{
 				// Can pass there
 				surrounding[surroundingnb++] = (Map.Field(x, y)->Flags &
 					(MapFieldWaterAllowed + MapFieldCoastAllowed + MapFieldLandAllowed)) != 0;;
 			}
-		} else {
+		}
+		else
+		{
 			surrounding[surroundingnb++] = 0;
 		}
 
-		if ((x == x0 || x == x1) && (y == y0 || y == y1)) {
+		if ((x == x0 || x == x1) && (y == y0 || y == y1))
+		{
 			dir++;
 		}
 
@@ -112,20 +122,26 @@ static int AiCheckSurrounding(const CUnit *worker, const CUnitType *type, int x,
 
 	lastval = surrounding[surroundingnb - 1];
 	obstacle = 0;
-	for (i = 0 ; i < surroundingnb; ++i) {
-		if (lastval && !surrounding[i]) {
+	for (i = 0 ; i < surroundingnb; ++i)
+	{
+		if (lastval && !surrounding[i])
+		{
 			++obstacle;
 		}
 		lastval = surrounding[i];
 	}
 
-	if (obstacle == 0) {
+	if (obstacle == 0)
+	{
 		obstacle = !surrounding[0];
 	}
 
-	if (!type->ShoreBuilding) {
+	if (!type->ShoreBuilding)
+	{
 		backupok = obstacle < 5;
-	} else {
+	}
+	else
+	{
 		// Shore building have at least 2 obstacles : sea->ground & ground->sea
 		backupok = obstacle < 3;
 	}
@@ -178,13 +194,17 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 	//
 	// Look if we can build at current place.
 	//
-	if (CanBuildUnitType(worker, type, x, y, 1)) {
-		if (AiCheckSurrounding(worker, type, x, y, backupok)) {
+	if (CanBuildUnitType(worker, type, x, y, 1))
+	{
+		if (AiCheckSurrounding(worker, type, x, y, backupok))
+		{
 			*dx = x;
 			*dy = y;
 			delete[] points;
 			return 1;
-		} else if (backupok) {
+		}
+		else if (backupok)
+		{
 			backupx = x;
 			backupy = y;
 		}
@@ -203,12 +223,15 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 	points[0].Y = y;
 	// also use the bottom right
 	if ((type->TileWidth > 1 || type->TileHeight > 1) &&
-			x + type->TileWidth - 1 < Map.Info.MapWidth &&
-			y + type->TileHeight - 1 < Map.Info.MapHeight) {
+		x + type->TileWidth - 1 < Map.Info.MapWidth &&
+		y + type->TileHeight - 1 < Map.Info.MapHeight)
+	{
 		points[1].X = x + type->TileWidth - 1;
 		points[1].Y = y + type->TileHeight - 1;
 		ep = wp = 2; // start with two points
-	} else {
+	}
+	else
+	{
 		ep = wp = 1; // start with one point
 	}
 	matrix += w + w + 2;
@@ -218,15 +241,21 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 	//
 	// Pop a point from stack, push all neighbours which could be entered.
 	//
-	for (;;) {
-		while (rp != ep) {
+	for (;;)
+	{
+		while (rp != ep)
+		{
 			rx = points[rp].X;
 			ry = points[rp].Y;
-			for (i = 0; i < 8; ++i) { // mark all neighbors
+			for (i = 0; i < 8; ++i)
+			{
+				// mark all neighbors
 				x = rx + xoffset[i];
 				y = ry + yoffset[i];
 				m = matrix + x + y * w;
-				if (*m) { // already checked
+				if (*m)
+				{
+					// already checked
 					continue;
 				}
 
@@ -234,31 +263,44 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 				// Look if we can build here and no enemies nearby.
 				//
 				if (CanBuildUnitType(worker, type, x, y, 1) &&
-						!AiEnemyUnitsInDistance(worker->Player, NULL, x, y, 8)) {
-					if (AiCheckSurrounding(worker, type, x, y, backupok)) {
+					!AiEnemyUnitsInDistance(worker->Player, NULL, x, y, 8))
+				{
+					if (AiCheckSurrounding(worker, type, x, y, backupok))
+					{
 						*dx = x;
 						*dy = y;
 						delete[] points;
 						return 1;
-					} else if (backupok && backupx == -1) {
+					}
+					else if (backupok && backupx == -1)
+					{
 						backupx = x;
 						backupy = y;
 					}
 				}
 
-				if (CanMoveToMask(x, y, mask)) { // reachable
+				if (CanMoveToMask(x, y, mask))
+				{
+					// reachable
 					*m = 1;
 					points[wp].X = x; // push the point
 					points[wp].Y = y;
-					if (++wp >= size) { // round about
+					if (++wp >= size)
+					{
+						// round about
 						wp = 0;
 					}
-				} else { // unreachable
+				}
+				else
+				{
+					// unreachable
 					*m = 99;
 				}
 			}
 
-			if (++rp >= size) { // round about
+			if (++rp >= size)
+			{
+				// round about
 				rp = 0;
 			}
 		}
@@ -266,7 +308,9 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 		//
 		// Continue with next frame.
 		//
-		if (rp == wp) { // unreachable, no more points available
+		if (rp == wp)
+		{
+			// unreachable, no more points available
 			break;
 		}
 		ep = wp;
@@ -274,7 +318,8 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 
 	delete[] points;
 
-	if (backupx != -1) {
+	if (backupx != -1)
+	{
 		*dx = backupx;
 		*dy = backupy;
 		return 1;
