@@ -58,12 +58,6 @@ public:
 	std::string Name;     /// Name of this ai
 	std::string Class;    /// class of this ai
 
-#if 0
-	// nice flags
-	unsigned char AllExplored : 1; /// Ai sees unexplored area
-	unsigned char AllVisbile : 1;  /// Ai sees invisibile area
-#endif
-
 	std::string Script;       /// Main script
 };
 
@@ -106,7 +100,7 @@ enum AiForceRole {
 class AiForce {
 public:
 	AiForce() : Completed(false), Defending(false), Attacking(false), Role(0),
-		State(0), GoalX(0), GoalY(0), MustTransport(false) {}
+		State(0), GoalX(0), GoalY(0) {}
 
 	void Reset() {
 		Completed = false;
@@ -117,7 +111,6 @@ public:
 		Units.clear();
 		State = 0;
 		GoalX = GoalY = 0;
-		MustTransport = false;
 	}
 
 	bool Completed;     /// Flag saying force is complete build
@@ -134,7 +127,6 @@ public:
 	int State;         /// Attack state
 	int GoalX;         /// Attack point X tile map position
 	int GoalY;         /// Attack point Y tile map position
-	bool MustTransport;/// Flag must use transporter
 };
 
 /**
@@ -182,8 +174,7 @@ class PlayerAi {
 public:
 	PlayerAi() : Player(NULL), AiType(NULL), ScriptDebug(false),
 		SleepCycles(0), NeededMask(0), NeedSupply(false),
-		LastExplorationGameCycle(0), LastCanNotMoveGameCycle(0),
-		LastRepairBuilding(0)
+		LastCanNotMoveGameCycle(0), LastRepairBuilding(0)
 	{
 		memset(Needed, 0, sizeof(Needed));
 		memset(TriedRepairWorkers, 0, sizeof(TriedRepairWorkers));
@@ -206,9 +197,6 @@ public:
 	int NeededMask;        /// Mask for needed resources
 	bool NeedSupply;       /// Flag need food
 
-	std::vector<AiExplorationRequest> FirstExplorationRequest;/// Requests for exploration
-	unsigned long LastExplorationGameCycle;         /// When did the last explore occur?
-	std::vector<AiTransportRequest> TransportRequests;/// Requests for transport
 	unsigned long LastCanNotMoveGameCycle;          /// Last can not move cycle
 	std::vector<AiRequestType> UnitTypeRequests;    /// unit-types to build/train request,priority list
 	std::vector<AiBuildQueue> UnitTypeBuilt;        /// What the resource manager should build
@@ -273,8 +261,6 @@ extern PlayerAi *AiPlayer; /// Current AI player
 extern void AiAddUnitTypeRequest(CUnitType *type, int count);
 	/// Periodic called resource manager handler
 extern void AiResourceManager(void);
-	/// Ask the ai to explore around x,y
-extern void AiExplore(int x, int y, int exploreMask);
 	/// Make two unittypes be considered equals
 extern void AiNewUnitTypeEquiv(CUnitType *a, CUnitType *b);
 	/// Remove any equivalence between unittypes
@@ -282,39 +268,33 @@ extern void AiResetUnitTypeEquiv(void);
 	/// Finds all equivalents units to a given one
 extern int AiFindUnitTypeEquiv(const CUnitType *i, int *result);
 	/// Finds all available equivalents units to a given one, in the prefered order
-extern int AiFindAvailableUnitTypeEquiv(const CUnitType *i,
-	int *result);
+extern int AiFindAvailableUnitTypeEquiv(const CUnitType *i, int *result);
 
 //
 // Buildings
 //
 	/// Find nice building place
-extern int AiFindBuildingPlace(const CUnit *worker,
-	const CUnitType *type, int *dx, int *dy);
+extern int AiFindBuildingPlace(const CUnit *worker, const CUnitType *type, int *dx, int *dy);
 
 //
 // Forces
 //
 	/// Cleanup units in force
-extern void AiCleanForces(void);
+extern void AiCleanForces();
 	/// Assign a new unit to a force
 extern void AiAssignToForce(CUnit *unit);
 	/// Assign a free units to a force
-extern void AiAssignFreeUnitsToForce(void);
+extern void AiAssignFreeUnitsToForce();
 	/// Attack with force at position
 extern void AiAttackWithForceAt(int force, int x, int y);
 	/// Attack with force
 extern void AiAttackWithForce(int force);
 	/// Periodic called force manager handler
-extern void AiForceManager(void);
+extern void AiForceManager();
 
 //
 // Plans
 //
-	/// Plan the an attack
-extern int AiPlanAttack(AiForce *force);
-	/// Send explorers around the map
-extern void AiSendExplorers(void);
 	/// Enemy units in distance
 extern int AiEnemyUnitsInDistance(const CPlayer *player, const CUnitType *type,
 	int x, int y, unsigned range);

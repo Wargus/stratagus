@@ -9,7 +9,7 @@
 //
 /**@name ai_resource.cpp - AI resource manager. */
 //
-//      (c) Copyright 2000-2007 by Lutz Sammer and Antonis Chaniotis.
+//      (c) Copyright 2000-2009 by Lutz Sammer and Antonis Chaniotis.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -70,9 +70,12 @@ static int AiCheckCosts(const int *costs)
 {
 	int err = 0;
 
-	for (int i = 0; i < MaxCosts; ++i) {
-		if (costs[i] && AiPlayer->Player->ProductionRate[i] == 0 &&
-				AiPlayer->Player->StoredResources[i] == 0) {
+	for (int i = 0; i < MaxCosts; ++i)
+	{
+		if (costs[i] &&
+			AiPlayer->Player->ProductionRate[i] == 0 &&
+			AiPlayer->Player->StoredResources[i] == 0)
+		{
 			err |= (1 << i);
 		}
 	}
@@ -121,22 +124,27 @@ int AiEnemyUnitsInDistance(const CPlayer *player, const CUnitType *type, int x, 
 	//
 	// Find the enemy units which can attack
 	//
-	for (e = i = 0; i < n; ++i) {
+	for (e = i = 0; i < n; ++i)
+	{
 		dest = table[i];
 		//
 		// Those can't attack anyway.
 		//
-		if (dest->Removed || dest->Orders[0]->Action == UnitActionDie) {
+		if (dest->Removed || dest->Orders[0]->Action == UnitActionDie)
+		{
 			continue;
 		}
 
-		if (!player->IsEnemy(dest)) { // a friend or neutral
+		if (!player->IsEnemy(dest))
+		{
+			// a friend or neutral
 			continue;
 		}
 		//
 		// Unit can attack back?
 		//
-		if (!type || CanTarget(dest->Type, type)) {
+		if (!type || CanTarget(dest->Type, type))
+		{
 			++e;
 		}
 	}
@@ -182,20 +190,25 @@ static int AiBuildBuilding(const CUnitType *type, CUnitType *building)
 	// Remove all workers on the way building something
 	//
 	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table, UnitMax);
-	for (num = i = 0; i < nunits; ++i) {
+	for (num = i = 0; i < nunits; ++i)
+	{
 		unit = table[i];
-		for (x = 0; x < unit->OrderCount; ++x) {
+		for (x = 0; x < unit->OrderCount; ++x)
+		{
 			if (unit->Orders[x]->Action == UnitActionBuild ||
-					unit->Orders[x]->Action == UnitActionRepair) {
+				unit->Orders[x]->Action == UnitActionRepair)
+			{
 				break;
 			}
 		}
-		if (x == unit->OrderCount) {
+		if (x == unit->OrderCount)
+		{
 			table[num++] = unit;
 		}
 	}
 
-	if (num == 0) {
+	if (num == 0)
+	{
 		// No workers available to build
 		return 0;
 	}
@@ -204,7 +217,8 @@ static int AiBuildBuilding(const CUnitType *type, CUnitType *building)
 	unit = table[SyncRand() % num];
 
 	// Find a place to build.
-	if (AiFindBuildingPlace(unit, building, &x, &y)) {
+	if (AiFindBuildingPlace(unit, building, &x, &y))
+	{
 		CommandBuildBuilding(unit, x, y, building, FlushCommands);
 		return 1;
 	}
@@ -233,16 +247,18 @@ static int AiTrainUnit(const CUnitType *type, CUnitType *what)
 	// Remove all units already doing something.
 	//
 	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table, UnitMax);
-	for (num = i = 0; i < nunits; ++i) {
+	for (num = i = 0; i < nunits; ++i)
+	{
 		unit = table[i];
-		if (unit->IsIdle()) {
+		if (unit->IsIdle())
+		{
 			table[num++] = unit;
 		}
 	}
 
-	for (i = 0; i < num; ++i) {
+	for (i = 0; i < num; ++i)
+	{
 		unit = table[i];
-
 		CommandTrainUnit(unit, what, FlushCommands);
 
 		return 1;
@@ -259,39 +275,47 @@ static int AiTrainUnit(const CUnitType *type, CUnitType *what)
 int AiCountUnitBuilders(CUnitType *type)
 {
 	int result;
-	int i;
 	int n;
 	const int *unit_count;
 	std::vector<std::vector<CUnitType *> > *tablep;
 	const std::vector<CUnitType *> *table;
 
-	if (UnitIdAllowed(AiPlayer->Player, type->Slot) == 0) {
+	if (UnitIdAllowed(AiPlayer->Player, type->Slot) == 0)
+	{
 		DebugPrint("Can't build `%s' now\n" _C_ type->Ident.c_str());
 		return 0;
 	}
 	//
 	// Check if we have a place for building or a unit to build.
 	//
-	if (type->Building) {
+	if (type->Building)
+	{
 		n = AiHelpers.Build.size();
 		tablep = &AiHelpers.Build;
-	} else {
+	}
+	else
+	{
 		n = AiHelpers.Train.size();
 		tablep = &AiHelpers.Train;
 	}
-	if (type->Slot > n) { // Oops not known.
+	if (type->Slot > n)
+	{
+		// Oops not known.
 		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident.c_str());
 		return 0;
 	}
 	table = &(*tablep)[type->Slot];
-	if (!table->size()) { // Oops not known.
+	if (!table->size())
+	{
+		// Oops not known.
 		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident.c_str());
 		return 0;
 	}
 
 	unit_count = AiPlayer->Player->UnitTypesCount;
 	result = 0;
-	for (i = 0; i < (int)table->size(); ++i) {
+	for (size_t i = 0; i < table->size(); ++i)
+	{
 		//
 		// The type for builder/trainer is available
 		//
@@ -325,42 +349,56 @@ static int AiMakeUnit(CUnitType *type)
 	usableTypesCount = AiFindAvailableUnitTypeEquiv(type, usableTypes);
 
 	// Iterate them
-	for (currentType = 0; currentType < usableTypesCount; ++currentType) {
-
+	for (currentType = 0; currentType < usableTypesCount; ++currentType)
+	{
 		type = UnitTypes[usableTypes[currentType]];
 
 		//
 		// Check if we have a place for building or a unit to build.
 		//
-		if (type->Building) {
+		if (type->Building)
+		{
 			n = AiHelpers.Build.size();
 			tablep = &AiHelpers.Build;
-		} else {
+		}
+		else
+		{
 			n = AiHelpers.Train.size();
 			tablep = &AiHelpers.Train;
 		}
-		if (type->Slot > n) { // Oops not known.
+		if (type->Slot > n)
+		{
+			// Oops not known.
 			DebugPrint("Nothing known about `%s'\n" _C_ type->Ident.c_str());
 			continue;
 		}
 		table = &(*tablep)[type->Slot];
-		if (!table->size()) { // Oops not known.
+		if (!table->size())
+		{
+			// Oops not known.
 			DebugPrint("Nothing known about `%s'\n" _C_ type->Ident.c_str());
 			continue;
 		}
 
 		unit_count = AiPlayer->Player->UnitTypesCount;
-		for (i = 0; i < (int)table->size(); ++i) {
+		for (i = 0; i < (int)table->size(); ++i)
+		{
 			//
 			// The type for builder/trainer is available
 			//
-			if (unit_count[(*table)[i]->Slot]) {
-				if (type->Building) {
-					if (AiBuildBuilding((*table)[i], type)) {
+			if (unit_count[(*table)[i]->Slot])
+			{
+				if (type->Building)
+				{
+					if (AiBuildBuilding((*table)[i], type))
+					{
 						return 1;
 					}
-				} else {
-					if (AiTrainUnit((*table)[i], type)) {
+				}
+				else
+				{
+					if (AiTrainUnit((*table)[i], type))
+					{
 						return 1;
 					}
 				}
@@ -373,7 +411,7 @@ static int AiMakeUnit(CUnitType *type)
 /**
 **  Check what must be built / trained.
 */
-static void AiCheckingWork(void)
+static void AiCheckingWork()
 {
 	int c;
 	CUnitType *type;
@@ -383,7 +421,8 @@ static void AiCheckingWork(void)
 	// Look to the build requests, what can be done.
 	//
 	int sz = AiPlayer->UnitTypeBuilt.size();
-	for (int i = 0; i < sz; ++i) {
+	for (int i = 0; i < sz; ++i)
+	{
 		queue = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
 		type = queue->Type;
 
@@ -394,29 +433,39 @@ static void AiCheckingWork(void)
 		//
 		// Check limits, AI should be broken if reached.
 		//
-		if (queue->Want > queue->Made && AiPlayer->Player->CheckLimits(type) < 0) {
+		if (queue->Want > queue->Made && AiPlayer->Player->CheckLimits(type) < 0)
+		{
 			continue;
 		}
 		//
 		// Check if resources available.
 		//
-		if ((c = AiCheckUnitTypeCosts(type))) {
+		if ((c = AiCheckUnitTypeCosts(type)))
+		{
 			AiPlayer->NeededMask |= c;
 			//
 			// NOTE: we can continue and build things with lesser
 			//  resource or other resource need!
 			continue;
-		} else if (queue->Want > queue->Made && queue->Wait <= GameCycle) {
-			if (AiMakeUnit(type)) {
+		}
+		else if (queue->Want > queue->Made && queue->Wait <= GameCycle)
+		{
+			if (AiMakeUnit(type))
+			{
 				// AiRequestSupply can change UnitTypeBuilt so recalculate queue
 				queue = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
 				++queue->Made;
 				queue->Wait = 0;
-			} else if (queue->Type->Building) {
+			}
+			else if (queue->Type->Building)
+			{
 				// Finding a building place is costly, don't try again for a while
-				if (queue->Wait == 0) {
+				if (queue->Wait == 0)
+				{
 					queue->Wait = GameCycle + 150;
-				} else {
+				}
+				else
+				{
 					queue->Wait = GameCycle + 450;
 				}
 			}
@@ -439,21 +488,25 @@ static void AiCheckingWork(void)
 static int AiAssignHarvester(CUnit *unit, int resource)
 {
 	std::vector<CUnitType *>::iterator i;
-	int exploremask;
 	CUnit *dest;
 	int res = resource;
 
 	// It can't.
-	if (unit->Removed) {
+	if (unit->Removed)
+	{
 		return 0;
 	}
 
-	if (res == -1) {
+	if (res == -1)
+	{
 		// No resource specified, see which resource we need most
-		for (int i = 0; i < MaxCosts; ++i) {
-			if (unit->Player->ProductionRate[i] == 0) {
+		for (int i = 0; i < MaxCosts; ++i)
+		{
+			if (unit->Player->ProductionRate[i] == 0)
+			{
 				res = i;
-				if (unit->Player->StoredResources[i] == 0) {
+				if (unit->Player->StoredResources[i] == 0)
+				{
 					break;
 				}
 			}
@@ -464,34 +517,15 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 	// Find a resource to harvest from.
 	//
 	dest = UnitFindResource(unit, unit->X, unit->Y, 1000, res);
-	if (!dest && res != -1) {
+	if (!dest && res != -1)
+	{
 		dest = UnitFindResource(unit, unit->X, unit->Y, 1000, -1);
 	}
-	if (dest) {
+	if (dest)
+	{
 		CommandResource(unit, dest, FlushCommands);
 		return 1;
 	}
-
-	exploremask = 0;
-	for (i = UnitTypes.begin(); i != UnitTypes.end(); i++) {
-		if (*i && (*i)->CanHarvestFrom) {
-			switch ((*i)->UnitType) {
-			case UnitTypeLand:
-				exploremask |= MapFieldLandUnit;
-				break;
-			case UnitTypeFly:
-				exploremask |= MapFieldAirUnit;
-				break;
-			case UnitTypeNaval:
-				exploremask |= MapFieldSeaUnit;
-				break;
-			default:
-				Assert(0);
-			}
-		}
-	}
-	// Ask the AI to explore
-	AiExplore(unit->X, unit->Y, exploremask);
 
 	// Failed.
 	return 0;
@@ -500,27 +534,31 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 /**
 **  Assign workers to collect resources.
 */
-static void AiCollectResources(void)
+static void AiCollectResources()
 {
 	int i;
 	int needed = -1;
 	std::vector<CUnit *> harvesters;
 
 	// Check if we need a resource
-	if (AiPlayer->NeededMask) {
+	if (AiPlayer->NeededMask)
+	{
 		int n = AiPlayer->NeededMask;
-		while (n != 0) {
+		while (n != 0)
+		{
 			n >>= 1;
 			++needed;
 		}
 	}
 
 	// Build a list of all harvesters
-	for (i = 0; i < AiPlayer->Player->TotalNumUnits; ++i) {
+	for (i = 0; i < AiPlayer->Player->TotalNumUnits; ++i)
+	{
 		CUnit *unit = AiPlayer->Player->Units[i];
 
 		// Ignore non-harvesters
-		if (!unit->Type->Harvester) {
+		if (!unit->Type->Harvester)
+		{
 			continue;
 		}
 
@@ -528,39 +566,48 @@ static void AiCollectResources(void)
 	}
 
 	// If we need a resource, pick one unit to harvest it
-	if (needed != -1 && harvesters.size() != 0) {
+	if (needed != -1 && harvesters.size() != 0)
+	{
 		int best = -1;
-		for (i = 0; i < (int)harvesters.size(); ++i) {
+		for (i = 0; i < (int)harvesters.size(); ++i)
+		{
 			// Idle units are always best
-			if (harvesters[i]->IsIdle()) {
+			if (harvesters[i]->IsIdle())
+			{
 				best = i;
 				break;
 			}
 			// Unit harvesting the wrong resource
 			if (harvesters[i]->Orders[0]->Action == UnitActionResource &&
-					harvesters[i]->Data.Harvest.CurrentProduction[needed] == 0) {
+				harvesters[i]->Data.Harvest.CurrentProduction[needed] == 0)
+			{
 				best = i;
 			}
 		}
 
-		if (best == -1) {
+		if (best == -1)
+		{
 			// No best unit found, pick one at random
 			best = SyncRand() % harvesters.size();
 		}
 
-		if (AiAssignHarvester(harvesters[best], needed)) {
+		if (AiAssignHarvester(harvesters[best], needed))
+		{
 			harvesters.erase(harvesters.begin() + best);
 		}
 	}
 
 	// Assign one random idle harvester at a time
 	std::vector<CUnit *> idleHarvesters;
-	for (i = 0; i < (int)harvesters.size(); ++i) {
-		if (harvesters[i]->IsIdle()) {
+	for (i = 0; i < (int)harvesters.size(); ++i)
+	{
+		if (harvesters[i]->IsIdle())
+		{
 			idleHarvesters.push_back(harvesters[i]);
 		}
 	}
-	if (idleHarvesters.size() > 0) {
+	if (idleHarvesters.size() > 0)
+	{
 		AiAssignHarvester(idleHarvesters[SyncRand() % idleHarvesters.size()], -1);
 	}
 }
@@ -593,9 +640,8 @@ static int AiRepairBuilding(const CUnitType *type, CUnit *building)
 	int k;
 	int num;
 
-#ifdef DEBUG
 	unit = NoUnitP;
-#endif
+
 	//
 	// Remove all workers not mining. on the way building something
 	// FIXME: It is not clever to use workers with gold
@@ -607,41 +653,54 @@ static int AiRepairBuilding(const CUnitType *type, CUnit *building)
 
 	// Selection of mining workers.
 	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table, UnitMax);
-	for (num = i = 0; i < nunits; ++i) {
+	for (num = i = 0; i < nunits; ++i)
+	{
 		unit = table[i];
 		if (unit->Type->RepairRange &&
 			(unit->Orders[0]->Action == UnitActionResource ||
-				unit->Orders[0]->Action == UnitActionStill) && unit->OrderCount == 1) {
+			 unit->Orders[0]->Action == UnitActionStill) &&
+			unit->OrderCount == 1)
+		{
 			table[num++] = unit;
 		}
 	}
 
 	// Sort by distance loops -Antonis-
-	for (i = 0; i < num; ++i) {
+	for (i = 0; i < num; ++i)
+	{
 		unit = table[i];
 		// FIXME: Probably calculated from top left corner of building
-		if ((rX = unit->X - building->X) < 0) {
+		if ((rX = unit->X - building->X) < 0)
+		{
 			rX = -rX;
 		}
-		if ((rY = unit->Y - building->Y) < 0) {
+		if ((rY = unit->Y - building->Y) < 0)
+		{
 			rY = -rY;
 		}
-		if (rX < rY) {
+		if (rX < rY)
+		{
 			distance[i] = rX;
-		} else {
+		}
+		else
+		{
 			distance[i] = rY;
 		}
 	}
-	for (i = 0; i < num; ++i) {
+	for (i = 0; i < num; ++i)
+	{
 		r_temp = distance[i];
 		index_temp = i;
-		for (j = i; j < num; ++j) {
-			if (distance[j] < r_temp) {
+		for (j = i; j < num; ++j)
+		{
+			if (distance[j] < r_temp)
+			{
 				r_temp = distance[j];
 				index_temp = j;
 			}
 		}
-		if (index_temp > i) {
+		if (index_temp > i)
+		{
 			unit_temp = table[index_temp];
 			table[index_temp] = table[i];
 			distance[index_temp] = distance[i];
@@ -652,15 +711,17 @@ static int AiRepairBuilding(const CUnitType *type, CUnit *building)
 
 	// Check if building is reachable and try next trio of workers
 
-	if ((j = AiPlayer->TriedRepairWorkers[UnitNumber(building)]) > num) {
+	if ((j = AiPlayer->TriedRepairWorkers[UnitNumber(building)]) > num)
+	{
 		j = AiPlayer->TriedRepairWorkers[UnitNumber(building)] = 0;
 	}
 
-	for (k = i = j; i < num && i < j + 3; ++i) {
-
+	for (k = i = j; i < num && i < j + 3; ++i)
+	{
 		unit = table[i];
 
-		if (UnitReachable(unit, building, unit->Type->RepairRange)) {
+		if (UnitReachable(unit, building, unit->Type->RepairRange))
+		{
 			CommandRepair(unit, 0, 0, building, FlushCommands);
 			return 1;
 		}
@@ -679,7 +740,6 @@ static int AiRepairBuilding(const CUnitType *type, CUnit *building)
 */
 static int AiRepairUnit(CUnit *unit)
 {
-	int i;
 	int n;
 	const CUnitType *type;
 	const int *unit_count;
@@ -689,23 +749,28 @@ static int AiRepairUnit(CUnit *unit)
 	n = AiHelpers.Repair.size();
 	tablep = &AiHelpers.Repair;
 	type = unit->Type;
-	if (type->Slot > n) { // Oops not known.
+	if (type->Slot > n)
+	{
+		// Oops not known.
 		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident.c_str());
 		return 0;
 	}
 	table = &(*tablep)[type->Slot];
-	if (!table->size()) { // Oops not known.
+	if (!table->size())
+	{
+		// Oops not known.
 		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident.c_str());
 		return 0;
 	}
 
 	unit_count = AiPlayer->Player->UnitTypesCount;
-	for (i = 0; i < (int)table->size(); ++i) {
-		//
+	for (size_t i = 0; i < table->size(); ++i)
+	{
 		// The type is available
-		//
-		if (unit_count[(*table)[i]->Slot]) {
-			if (AiRepairBuilding((*table)[i], unit)) {
+		if (unit_count[(*table)[i]->Slot])
+		{
+			if (AiRepairBuilding((*table)[i], unit))
+			{
 				return 1;
 			}
 		}
@@ -717,7 +782,7 @@ static int AiRepairUnit(CUnit *unit)
 /**
 **  Check if there's a unit that should be repaired.
 */
-static void AiCheckRepair(void)
+static void AiCheckRepair()
 {
 	int i;
 	int k;
@@ -728,34 +793,42 @@ static void AiCheckRepair(void)
 	n = AiPlayer->Player->TotalNumUnits;
 	k = 0;
 	// Selector for next unit
-	for (i = n - 1; i >= 0; --i) {
+	for (i = n - 1; i >= 0; --i)
+	{
 		unit = AiPlayer->Player->Units[i];
-		if (UnitNumber(unit) == AiPlayer->LastRepairBuilding) {
+		if (UnitNumber(unit) == AiPlayer->LastRepairBuilding)
+		{
 			k = i + 1;
 		}
 	}
 
 
-	for (i = k; i < n; ++i) {
+	for (i = k; i < n; ++i)
+	{
 		unit = AiPlayer->Player->Units[i];
 		repair_flag = true;
 		// Unit damaged?
 		// Don't repair attacked unit (wait 5 sec before repairing)
 		if (unit->Type->RepairHP &&
-				unit->Orders[0]->Action != UnitActionBuilt &&
-				unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max &&
-				unit->Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
+			unit->Orders[0]->Action != UnitActionBuilt &&
+			unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max &&
+			unit->Attacked + 5 * CYCLES_PER_SECOND < GameCycle)
+		{
 
 			// FIXME: Repair only units under control
-			if (AiEnemyUnitsInDistance(unit, unit->Stats->Variables[SIGHTRANGE_INDEX].Max)) {
+			if (AiEnemyUnitsInDistance(unit, unit->Stats->Variables[SIGHTRANGE_INDEX].Max))
+			{
 				continue;
 			}
 			//
 			// Must check if there are enough resources
 			//
-			for (int j = 0; j < MaxCosts; ++j) {
-				if (unit->Type->ProductionCosts[j] && AiPlayer->Player->ProductionRate[j] == 0 &&
-						AiPlayer->Player->StoredResources[j] == 0) {
+			for (int j = 0; j < MaxCosts; ++j)
+			{
+				if (unit->Type->ProductionCosts[j] &&
+					AiPlayer->Player->ProductionRate[j] == 0 &&
+					AiPlayer->Player->StoredResources[j] == 0)
+				{
 					repair_flag = false;
 					break;
 				}
@@ -764,7 +837,8 @@ static void AiCheckRepair(void)
 			//
 			// Find a free worker, who can build this building can repair it?
 			//
-			if (repair_flag) {
+			if (repair_flag)
+			{
 				AiRepairUnit(unit);
 				AiPlayer->LastRepairBuilding = UnitNumber(unit);
 				return;
@@ -772,23 +846,30 @@ static void AiCheckRepair(void)
 		}
 
 		// Building under construction but no worker
-		if (unit->Orders[0]->Action == UnitActionBuilt) {
+		if (unit->Orders[0]->Action == UnitActionBuilt)
+		{
 			int j;
-			for (j = 0; j < AiPlayer->Player->TotalNumUnits; ++j) {
+			for (j = 0; j < AiPlayer->Player->TotalNumUnits; ++j)
+			{
 				COrder *order = AiPlayer->Player->Units[j]->Orders[0];
-				if (order->Action == UnitActionRepair && order->Goal == unit) {
+				if (order->Action == UnitActionRepair && order->Goal == unit)
+				{
 					break;
 				}
 			}
-			if (j == AiPlayer->Player->TotalNumUnits) {
+			if (j == AiPlayer->Player->TotalNumUnits)
+			{
 				// Make sure we have enough resources first
-				for (j = 0; j < MaxCosts; ++j) {
+				for (j = 0; j < MaxCosts; ++j)
+				{
 					// FIXME: the resources don't necessarily have to be in storage
-					if (AiPlayer->Player->StoredResources[j] < unit->Type->ProductionCosts[j]) {
+					if (AiPlayer->Player->StoredResources[j] < unit->Type->ProductionCosts[j])
+					{
 						break;
 					}
 				}
-				if (j == MaxCosts) {
+				if (j == MaxCosts)
+				{
 					AiRepairUnit(unit);
 					AiPlayer->LastRepairBuilding = UnitNumber(unit);
 					return;
@@ -818,29 +899,9 @@ void AiAddUnitTypeRequest(CUnitType *type, int count)
 }
 
 /**
-**  Mark that a zone is requiring exploration.
-**
-**  @param x     X pos of the zone
-**  @param y     Y pos of the zone
-**  @param mask  Mask to explore ( land/sea/air )
-*/
-void AiExplore(int x, int y, int mask)
-{
-	AiExplorationRequest req;
-
-	// Link into the exploration requests list
-	req.X = x;
-	req.Y = y;
-	req.Mask = mask;
-
-	AiPlayer->FirstExplorationRequest.insert(
-		AiPlayer->FirstExplorationRequest.begin(), req);
-}
-
-/**
 **  Entry point of resource manager, periodically called.
 */
-void AiResourceManager(void)
+void AiResourceManager()
 {
 	//
 	// Check if something needs to be build / trained.
@@ -851,7 +912,8 @@ void AiResourceManager(void)
 	// Collect resources.
 	//
 	if ((GameCycle / CYCLES_PER_SECOND) % COLLECT_RESOURCES_INTERVAL ==
-			(unsigned long)AiPlayer->Player->Index % COLLECT_RESOURCES_INTERVAL) {
+			(unsigned long)AiPlayer->Player->Index % COLLECT_RESOURCES_INTERVAL)
+	{
 		AiCollectResources();
 	}
 
