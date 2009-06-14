@@ -101,6 +101,3 @@ for i,f in ipairs(list) do
   end
 end
 
--- Map default to rush for now
-RegisterAi("default", "default", AiRush, InitAiScripts_rush)
-
