@@ -635,7 +635,7 @@ void AiForceManager()
 			for (size_t i = 0; i < AiPlayer->Force[force].Units.size(); ++i)
 			{
 				if (AiPlayer->Force[force].Units[i]->Type->CanAttack &&
-					AttackUnitsInReactRange(aiunit))
+					AttackUnitsInReactRange(AiPlayer->Force[force].Units[i]))
 				{
 					aiunit = AiPlayer->Force[force].Units[i];
 					break;
