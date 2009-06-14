@@ -55,7 +55,7 @@ DefineButton({
 	Action = "move", Hint = "~!MOVE",
 	ForUnit = {"unit-engineer", "unit-harvester", "unit-assault",
              "unit-grenadier", "unit-bazoo", "unit-medic",
-             "unit-apcs", "unit-buggy", "unit-dorcoz",
+             "unit-apcs", "unit-buggy",
              "elites-group"}})
 
 DefineButton({
@@ -63,7 +63,7 @@ DefineButton({
 	Action = "stop", Hint = "~!STOP",
 	ForUnit = {"unit-engineer", "unit-harvester", "unit-assault",
              "unit-grenadier", "unit-bazoo", "unit-medic",
-             "unit-apcs", "unit-buggy", "unit-dorcoz",
+             "unit-apcs", "unit-buggy",
              "unit-gturret", "unit-cannon",
              "elites-group"}})
 
@@ -71,7 +71,7 @@ DefineButton({
 	Pos = 3, Level = 0, Icon = "icon-attack",
 	Action = "attack", Hint = "~!ATTACK",
 	ForUnit = {"unit-assault", "unit-grenadier", "unit-bazoo",
-             "unit-apcs", "unit-buggy", "unit-dorcoz",
+             "unit-apcs", "unit-buggy",
              "unit-gturret", "unit-cannon",
              "elites-group",}})
 
@@ -79,14 +79,14 @@ DefineButton({
 	Pos = 4, Level = 0, Icon = "icon-patrol",
 	Action = "patrol", Hint = "~!PATROL",
 	ForUnit = {"unit-assault", "unit-grenadier", "unit-bazoo",
-             "unit-apcs", "unit-buggy", "unit-dorcoz", "unit-engineer",
+             "unit-apcs", "unit-buggy", "unit-engineer",
              "elites-group",}})
 
 DefineButton({
 	Pos = 5, Level = 0, Icon = "icon-stand-ground",
 	Action = "stand-ground", Hint = "S~!TAND GROUND",
 	ForUnit = {"unit-assault", "unit-grenadier", "unit-bazoo",
-             "unit-apcs", "unit-buggy", "unit-dorcoz",
+             "unit-apcs", "unit-buggy",
              "unit-medic", "elites-group",}})
 
 -- resource specific actions ---------------------------------------------------
