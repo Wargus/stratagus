@@ -70,7 +70,6 @@ local editor_types = {
   "unit-assault",
   "unit-bazoo",
   "unit-grenadier",
-  "unit-dorcoz",
   "unit-engineer",
   "unit-harvester",
   "unit-msilo",
