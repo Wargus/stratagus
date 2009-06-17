@@ -1,2 +1,0 @@
-?package(stratagus-gl):needs="x11" section="Games/Strategy" title="Stratagus" \
-longtitle="Stratagus - The War Begins" command="/usr/games/stratagus"
