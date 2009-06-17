@@ -218,7 +218,7 @@ static std::vector<CUnitType *> getRefineryUnits()
 #else
 	return res;
 #endif
-	
+
 }
 
 
@@ -237,7 +237,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 	std::vector<CUnitType *> reparableUnits = getReparableUnits();
 	std::vector<CUnitType *> supplyUnits = getSupplyUnits();
 	std::vector<CUnitType *> mineUnits = getRefineryUnits();
-	
+
 	for (std::vector<CUnitType *>::const_iterator i = supplyUnits.begin(); i != supplyUnits.end(); ++i) {
 		AiHelperInsert(aiHelper.UnitLimit, 0, *i);
 	}
@@ -249,8 +249,8 @@ static void InitAiHelper(AiHelper &aiHelper)
 				AiHelperInsert(aiHelper.Refinery, i - 1, *j);
 			}
 		}
-		
-		for (std::vector<CUnitType *>::const_iterator d = UnitTypes.begin(); 
+
+		for (std::vector<CUnitType *>::const_iterator d = UnitTypes.begin();
 			d != UnitTypes.end(); ++d) {
 			CUnitType *type = *d;
 
@@ -259,7 +259,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				AiHelperInsert(aiHelper.Depots, i - 1, *d);
 			}
 		}
-		
+
 	}
 
 	for (int i = 0; i < (int)UnitButtonTable.size(); ++i) {
@@ -852,7 +852,7 @@ static int CclAiForceRole(lua_State *l)
 	}
 
 	AiForce &aiforce = AiPlayer->Force[AiPlayer->Force.getScriptForce(force)];
-	
+
 	const char *flag = LuaToString(l, 2);
 	if (!strcmp(flag, "attack")) {
 		aiforce.Role = AiForceRoleAttack;
@@ -947,19 +947,19 @@ static int CclAiWaitForces(lua_State *l)
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
-	int force, args = lua_objlen(l, 1);	
+	int force, args = lua_objlen(l, 1);
 	for (int i = 0; i < args; ++i) {
 		lua_rawgeti(l, 1, i + 1);
 		force = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 		if (force < 0 || force >= AI_MAX_FORCES) {
 			lua_pushfstring(l, "Force out of range: %d", force);
-		}					
+		}
 		if (!AiPlayer->Force[AiPlayer->Force.getScriptForce(force)].Completed) {
 			lua_pushboolean(l, 1);
 			return 1;
-		} 
-	}	
+		}
+	}
 	lua_pushboolean(l, 0);
 	return 1;
 }
@@ -972,12 +972,12 @@ static int CclAiWaitForces(lua_State *l)
 static int CclAiAttackWithForces(lua_State *l)
 {
 	int Forces[AI_MAX_FORCES + 1];
-	
+
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
-	int force, args = lua_objlen(l, 1);	
+	int force, args = lua_objlen(l, 1);
 	for (int i = 0; i < args; ++i) {
 		lua_rawgeti(l, 1, i + 1);
 		force = LuaToNumber(l, -1);
@@ -1225,19 +1225,19 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 	if (!lua_istable(l, offset)) {
 		LuaError(l, "incorrect argument");
 	}
-	
+
 	const char *value;
 	int made;
 	int want;
 	int x = -1,y = -1;
-	
+
 	const int args = lua_objlen(l, offset);
 	for (int k = 0; k < args; ++k) {
 		lua_rawgeti(l, offset, k + 1);
 		value = LuaToString(l, -1);
 		lua_pop(l, 1);
 		++k;
-		
+
 		if (!strcmp(value, "onpos")) {
 				lua_rawgeti(l, offset, k + 1);
 				x = LuaToNumber(l, -1);
@@ -1247,7 +1247,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 				y = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 		} else {
-				
+
 				//lua_rawgeti(l, j + 1, k + 1);
 				//ident = LuaToString(l, -1);
 				//lua_pop(l, 1);
@@ -1259,14 +1259,14 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 				lua_rawgeti(l, offset, k + 1);
 				want = LuaToNumber(l, -1);
 				lua_pop(l, 1);
-				
+
 				AiBuildQueue queue;
 				queue.Type = UnitTypeByIdent(value);
 				queue.Want = want;
 				queue.Made = made;
 				queue.X = x;
 				queue.Y = y;
-				
+
 				ai->UnitTypeBuilt.push_back(queue);
 				x = -1;
 				y = -1;
@@ -1635,7 +1635,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				ai->ResearchRequests.push_back(CUpgrade::Get(ident));
 			}
 		} else if (!strcmp(value, "building")) {
-			CclParseBuildQueue(l, ai, j+1);		
+			CclParseBuildQueue(l, ai, j+1);
 		} else if (!strcmp(value, "repair-building")) {
 			ai->LastRepairBuilding = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "repair-workers")) {

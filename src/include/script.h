@@ -40,9 +40,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
 #ifdef __cplusplus
 }
 #endif
@@ -278,7 +278,7 @@ extern void InitCcl(void);                /// Initialise ccl
 extern void LoadCcl(void);                /// Load ccl config file
 extern void SaveCcl(CFile *file);        /// Save CCL module
 extern void SavePreferences(void);        /// Save user preferences
-extern int CclCommand(const std::string &command, bool exitOnError = true); 
+extern int CclCommand(const std::string &command, bool exitOnError = true);
 
 /// transform string in corresponding index.
 extern EnumVariable Str2EnumVariable(lua_State *l, const char *s);
