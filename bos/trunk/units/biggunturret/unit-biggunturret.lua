@@ -65,7 +65,7 @@ DefineUnitType("unit-biggunturret", {
     Image = {"file", "units/biggunturret/gturret.png", "size", {96, 96}},
     Shadow = {"file", "units/biggunturret/gturret_s.png", "size", {96, 96}},
     Animations = "animations-biggunturret",
-    Icon = "icon-gturret",
+    Icon = "icon-biggunturret",
     EnergyValue = 8000,
     MagmaValue = 2000,
     RepairHp = 20,
