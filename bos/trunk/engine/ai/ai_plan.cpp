@@ -9,7 +9,7 @@
 //
 /**@name ai_plan.cpp - AI planning functions. */
 //
-//      (c) Copyright 2002-2009 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2009 by Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -32,18 +32,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "stratagus.h"
-#include "missile.h"
-#include "unittype.h"
-#include "unit_cache.h"
-#include "map.h"
-#include "pathfinder.h"
-#include "actions.h"
-#include "ai_local.h"
-#include "player.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -52,62 +41,5 @@
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**  Choose enemy on map tile.
-**
-**  @param source  Unit which want to attack.
-**  @param tx      X position on map, tile-based.
-**  @param ty      Y position on map, tile-based.
-**
-**  @return        Returns ideal target on map tile.
-*/
-static CUnit *EnemyOnMapTile(const CUnit *source, int tx, int ty)
-{
-	CUnit *table[UnitMax];
-	CUnit *unit;
-	CUnit *best;
-	const CUnitType *type;
-	int n;
-	int i;
-
-	n = UnitCache.Select(tx, ty, table, UnitMax);
-	best = NoUnitP;
-
-	for (i = 0; i < n; ++i)
-	{
-		unit = table[i];
-		// unusable unit ?
-		// if (unit->IsUnusable()) can't attack constructions
-		// FIXME: did SelectUnitsOnTile already filter this?
-		if (unit->Removed ||
-			//(!UnitVisible(unit, source->Player)) ||
-			unit->Orders[0]->Action == UnitActionDie)
-		{
-			continue;
-		}
-		type = unit->Type;
-		if (tx < unit->X || tx >= unit->X + type->TileWidth ||
-			ty < unit->Y || ty >= unit->Y + type->TileHeight)
-		{
-			continue;
-		}
-		if (!CanTarget(source->Type, unit->Type))
-		{
-			continue;
-		}
-		if (!source->Player->IsEnemy(unit)) { // a friend or neutral
-			continue;
-		}
-		//
-		// Choose the best target.
-		//
-		if (!best || best->Type->Priority < unit->Type->Priority)
-		{
-			best = unit;
-		}
-	}
-	return best;
-}
 
 //@}
