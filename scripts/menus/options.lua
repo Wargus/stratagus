@@ -179,49 +179,43 @@ function BuildVideoOptionsMenu(menu)
   local x2 = (Video.Width / 3) * 2 - 100
   local offy = (Video.Height - 352) / 2
 
-  b = menu:addRadioButton("640 x 480", "video", x1, offy + 36 * 1.5,
-    function() SetVideoSize(640, 480) menu:stop(1) end)
-  if Video.Width == 640 then
-    b:setMarked(true)
-  end
-  b = menu:addRadioButton("800 x 600", "video", x1, offy + 36 * 2.5,
-    function() SetVideoSize(800, 600) menu:stop(1) end)
-  if Video.Width == 800 then
-    b:setMarked(true)
-  end
-  b = menu:addRadioButton("1024 x 768", "video", x1, offy + 36 * 3.5,
-    function() SetVideoSize(1024, 768) menu:stop(1) end)
-  if Video.Width == 1024 then
-    b:setMarked(true)
-  end
-  b = menu:addRadioButton("1600 x 1200", "video", x1, offy + 36 * 4.5,
-    function() SetVideoSize(1600, 1200) menu:stop(1) end)
-  if Video.Width == 1600 then
-    b:setMarked(true)
+  local modes = {
+     -- 4:3, 5:4 aspect ratio modes
+     {  640,  480 },
+     {  800,  600 },
+     { 1024,  768 },
+     { 1280, 1024 },
+     { 1600, 1200 },
+     -- 16:9, 8:5 (widescreen) aspect ratio modes
+     { 1280,  720 },
+     { 1440,  900 },
+     { 1680, 1050 },
+     { 1920, 1080 },
+     { 1920, 1200 }
+  }
+
+  local modes2 = math.ceil (#modes / 2);
+  local offybot = offy + 36 * modes2;
+
+  for i, size in ipairs (modes) do
+     local sx, sy = size[1], size[2];
+     local t = sx .. " x " .. sy;
+     local f = function ()
+                  SetVideoSize (sx, sy);
+                  menu:stop (1);
+               end;
+     local x;
+     if (i <= modes2) then x = x1; else x = x2; end;
+     local y1 = offy + 36 * (i + .5);
+     if (i <= modes2) then y = y1; else y = y1 - 36 * modes2; end;
+     local b = menu:addRadioButton (t, "video", x, y, f);
+
+     if (Video.Width == sx and Video.Height == sy) then
+        b:setMarked (true);
+     end
   end
 
-  b = menu:addRadioButton("1280 x 720", "video", x2, offy + 36 * 1.5,
-    function() SetVideoSize(1280, 720) menu:stop(1) end)
-  if Video.Width == 1280 then
-    b:setMarked(true)
-  end
-  b = menu:addRadioButton("1440 x 900", "video", x2, offy + 36 * 2.5,
-    function() SetVideoSize(1440, 900) menu:stop(1) end)
-  if Video.Width == 1440 then
-    b:setMarked(true)
-  end
-  b = menu:addRadioButton("1680 x 1050", "video", x2, offy + 36 * 3.5,
-    function() SetVideoSize(1680, 1050) menu:stop(1) end)
-  if Video.Width == 1680 then
-    b:setMarked(true)
-  end
-  b = menu:addRadioButton("1920 x 1200", "video", x2, offy + 36 * 4.5,
-    function() SetVideoSize(1920, 1200) menu:stop(1) end)
-  if Video.Width == 1920 then
-    b:setMarked(true)
-  end
-
-  fullScreen = menu:addCheckBox(_("Fullscreen"), x1, offy + 36 * 5.5,
+  fullScreen = menu:addCheckBox(_("Fullscreen"), x1, offybot + 36 * 1.5,
     function()
       ToggleFullScreen()
       preferences.VideoFullScreen = Video.FullScreen
@@ -229,7 +223,7 @@ function BuildVideoOptionsMenu(menu)
     end)
   fullScreen:setMarked(Video.FullScreen)
 
-  useopengl = menu:addCheckBox(_("Use OpenGL (restart required)"), x1, offy + 36 * 6.5,
+  useopengl = menu:addCheckBox(_("Use OpenGL (restart required)"), x1, offybot + 36 * 2.5,
     function()
       preferences.UseOpenGL = useopengl:isMarked()
       SavePreferences()
