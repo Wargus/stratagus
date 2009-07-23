@@ -31,7 +31,7 @@ ccflags = "-fsigned-char"
 SConsignFile()
 
 def DefineOptions(filename, args):
-   opts = Options(filename, args)
+   opts = Variables(filename, args)
    opts.Add('CPPPATH', 'Additional preprocessor paths', ['/usr/local/include'])
    opts.Add('CPPFLAGS', 'Additional preprocessor flags')
    opts.Add('CPPDEFINES', 'defined constants', Split(''))
