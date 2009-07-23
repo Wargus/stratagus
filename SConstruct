@@ -52,7 +52,7 @@ opts = DefineOptions("build_options.py", ARGUMENTS)
 env = Environment(ENV = {'PATH':os.environ['PATH']}) # for an unknown reason Environment(options=opts) doesnt work well
 opts.Update(env) # Needed as Environment(options=opts) doesnt seem to work
 Help(opts.GenerateHelpText(env))
-mingw = env.Copy()
+mingw = env.Clone()
 optionsChanged = True
 if os.path.exists('build_options.py'):
    os.rename('build_options.py', 'build_options_OLD_FOR_CHECK.py')
@@ -264,7 +264,7 @@ def addBosWarsPaths(env):
 addBosWarsPaths(env)
 
 # define the different build environments (variants)
-release = env.Copy()
+release = env.Clone()
 release.Append(CCFLAGS = Split('-O2 -pipe -fomit-frame-pointer -fexpensive-optimizations -ffast-math'))
 
 if mingw['extrapath']:
@@ -283,17 +283,17 @@ if mingw['extrapath']:
 else:
   mingw = None
 
-debug = env.Copy()
+debug = env.Clone()
 debug.Append(CPPDEFINES = 'DEBUG')
 debug.Append(CCFLAGS = Split('-g -Wsign-compare -Wall -Werror'))
 
-profile = debug.Copy()
+profile = debug.Clone()
 profile.Append(CCFLAGS = Split('-pg'))
 profile.Append(LINKFLAGS = Split('-pg'))
 
 staticenv = None
 if sys.platform.startswith('linux'):
-   staticenv = release.Copy()
+   staticenv = release.Clone()
    staticlibs = 'lua lua50 lua5.0 lua5.1 lua51 lualib lualib50 lualib5.0 vorbis theora ogg'
    staticlibs = staticlibs.split(' ')
    linkflags = '-L. -static-libgcc -Wl,-Bstatic -lstdc++ '
