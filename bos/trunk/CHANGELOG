@@ -2,6 +2,8 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Replace the deprecated SCons calls to env.Copy calls by calls to env.Clone.
+  This requires SCons 0.96.93 or higher. (Francois Beerten)
 - Remove incomplete Dorcoz unit (Francois Beerten)
 - Fix header includes for GCC 4.4 (Francois Beerten)
 - Add the "grass" set of patches (Johannes Engelhardt)
