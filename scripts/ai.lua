@@ -9,7 +9,7 @@
 --
 --	ai.lua		-	Define the AI.
 --
---	(c) Copyright 2000-2008 by Lutz Sammer, Frank Loeffler
+--	(c) Copyright 2000-2009 by Lutz Sammer, Frank Loeffler
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -70,7 +70,8 @@ DefineAiHelper(
   -- Unit can repair which units.
   --
   {"repair", "unit-engineer",
-   "unit-msilo", "unit-aircraftfactory", "unit-magmapump", "unit-camp", "unit-apcs",
+   "unit-msilo", "unit-aircraftfactory", "unit-magmapump", "unit-camp", 
+   "unit-apcs", "unit-biggunturret", "unit-cannon", 
    "unit-powerplant", "unit-hosp", "unit-vfac", "unit-vault", "unit-gturret",
    "unit-nukepowerplant", "unit-radar"},
   --
