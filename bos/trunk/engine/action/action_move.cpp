@@ -162,7 +162,7 @@ int DoActionMove(CUnit *unit)
 	}
 
 	move = UnitShowAnimationScaled(unit, unit->Type->Animations->Move,
-			Map.Field(unit->X, unit->Y)->Cost);
+		unit->Type->AirUnit ? 8 : Map.Field(unit->X, unit->Y)->Cost);
 
 	unit->IX += xd * move;
 	unit->IY += yd * move;
