@@ -52,7 +52,7 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  Check if the surrounding are free. Depending on the value of flag, it will check :
+**  Check if the surroundings are free. Depending on the value of flag, it will check:
 **  0: the building will not block any way
 **  1: all surrounding is free
 **
@@ -69,7 +69,7 @@
 static int AiCheckSurrounding(const CUnit *worker, const CUnitType *type, int x, int y, bool &backupok)
 {
 	static int dirs[5][2] = {{1,0},{0,1},{-1,0},{0,-1},{0,0}};
-	int surrounding[1024]; // Max criconference for building
+	int surrounding[1024]; // Max circumference for building
 	int surroundingnb;
 	int x0, y0, x1, y1;
 	int i;
@@ -89,22 +89,11 @@ static int AiCheckSurrounding(const CUnit *worker, const CUnitType *type, int x,
 	surroundingnb = 0;
 	while (dir < 4)
 	{
-		if ((unsigned)x < (unsigned)Map.Info.MapWidth && (unsigned)y < (unsigned)Map.Info.MapHeight)
+		if (x >= 0 && x < Map.Info.MapWidth &&
+			y >= 0 && y < Map.Info.MapHeight &&
+			(Map.Field(x, y)->Flags & (MapFieldUnpassable | MapFieldBuilding)) == 0)
 		{
-			if (worker && x == worker->X && y == worker->Y)
-			{
-				surrounding[surroundingnb++] = 1;
-			}
-			else if (Map.Field(x, y)->Flags & (MapFieldUnpassable | MapFieldBuilding))
-			{
-				surrounding[surroundingnb++] = 0;
-			}
-			else
-			{
-				// Can pass there
-				surrounding[surroundingnb++] = (Map.Field(x, y)->Flags &
-					(MapFieldWaterAllowed + MapFieldCoastAllowed + MapFieldLandAllowed)) != 0;;
-			}
+			surrounding[surroundingnb++] = 1;
 		}
 		else
 		{
@@ -185,6 +174,7 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 	int backupx = -1;
 	int backupy = -1;
 	bool backupok;
+	CUnit *ontop;
 
 	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
 	points = new p[size];
@@ -194,9 +184,10 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 	//
 	// Look if we can build at current place.
 	//
-	if (CanBuildUnitType(worker, type, x, y, 1))
+	if ((ontop = CanBuildUnitType(worker, type, x, y, 1)))
 	{
-		if (AiCheckSurrounding(worker, type, x, y, backupok))
+		if ((ontop != (CUnit *)1 && ontop != worker) ||
+			AiCheckSurrounding(worker, type, x, y, backupok))
 		{
 			*dx = x;
 			*dy = y;
@@ -262,10 +253,11 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 				//
 				// Look if we can build here and no enemies nearby.
 				//
-				if (CanBuildUnitType(worker, type, x, y, 1) &&
+				if ((ontop = CanBuildUnitType(worker, type, x, y, 1)) &&
 					!AiEnemyUnitsInDistance(worker->Player, NULL, x, y, 8))
 				{
-					if (AiCheckSurrounding(worker, type, x, y, backupok))
+					if ((ontop != (CUnit *)1 && ontop != worker) ||
+						AiCheckSurrounding(worker, type, x, y, backupok))
 					{
 						*dx = x;
 						*dy = y;
