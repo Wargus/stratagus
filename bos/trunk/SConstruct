@@ -82,7 +82,7 @@ def buildSourcesList(builddir):
 sourcesEngine = buildSourcesList('build')
 
 def ParseConfig(env, command, function=None):
-    import string
+    import subprocess
 
     """
     Copied from the scons, copyright 2001-2004 The SCons Foundation.
@@ -90,7 +90,7 @@ def ParseConfig(env, command, function=None):
     """
     # the default parse function
     def parse_conf(env, output):
-        dict = {
+        flags = {
            'ASFLAGS'       : [],
            'CCFLAGS'       : [],
            'CPPFLAGS'      : [],
@@ -101,39 +101,39 @@ def ParseConfig(env, command, function=None):
         }
         static_libs = []
 
-        params = string.split(output)
+        params = output.split()
         for arg in params:
             if arg[0] != '-':
                 static_libs.append(arg)
             elif arg[:2] == '-L':
-                dict['LIBPATH'].append(arg[2:])
+                flags['LIBPATH'].append(arg[2:])
             elif arg[:2] == '-l':
-                dict['LIBS'].append(arg[2:])
+                flags['LIBS'].append(arg[2:])
             elif arg[:2] == '-I':
-                dict['CPPPATH'].append(arg[2:])
+                flags['CPPPATH'].append(arg[2:])
             elif arg[:4] == '-Wa,':
-                dict['ASFLAGS'].append(arg)
+                flags['ASFLAGS'].append(arg)
             elif arg[:4] == '-Wl,':
-                dict['LINKFLAGS'].append(arg)
+                flags['LINKFLAGS'].append(arg)
             elif arg[:4] == '-Wp,':
-                dict['CPPFLAGS'].append(arg)
+                flags['CPPFLAGS'].append(arg)
             elif arg == '-pthread':
-                dict['CCFLAGS'].append(arg)
-                dict['LINKFLAGS'].append(arg)
+                flags['CCFLAGS'].append(arg)
+                flags['LINKFLAGS'].append(arg)
             else:
-                dict['CCFLAGS'].append(arg)
-        apply(env.Append, (), dict)
+                flags['CCFLAGS'].append(arg)
+        apply(env.Append, (), flags)
         return static_libs
 
     if function is None:
         function = parse_conf
-    if type(command) is type([]):
-        command = string.join(command)
-    command = env.subst(command)
-    _, f, _ = os.popen3(command)
-    read = f.read()
-    exitcode = f.close()
-    if exitcode == None:
+    if type(command) is type(""):
+        command = [env.subst(i) for i in command.split()]
+    p = subprocess.Popen(command, shell=False, stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
+    read,_ = p.communicate()
+    exitcode = p.wait()
+    if exitcode == 0:
         return (0, function(env, read))
     else:
         return (exitcode, [])
@@ -171,7 +171,7 @@ def CheckLuaLib(env, conf):
   if not 'USE_WIN32' in env['CPPDEFINES']:
      if env.WhereIs('pkg-config'):
         for packagename in ['lua5.1', 'lua51', 'lua']:
-           exitcode, _ = ParseConfig(env, 'pkg-config --cflags --libs ' + packagename)
+           exitcode,_ = ParseConfig(env, 'pkg-config --cflags --libs ' + packagename)
            if exitcode == 0:
               break
   if conf.CheckLibWithHeader('lua51', 'lua.h', 'c'):
