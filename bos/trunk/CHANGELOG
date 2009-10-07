@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Fix bug #25178 in patch editor; mouse placement confusion (Jimmy Salmon)
 - Nukes target the center of the target. (Jann Horn)
 - Fix use of settings from pkg-config in SCons. (Francois Beerten)
 - Replace the deprecated SCons Options class by Variables.
