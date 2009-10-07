@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Nukes target the center of the target. (Jann Horn)
 - Fix use of settings from pkg-config in SCons. (Francois Beerten)
 - Replace the deprecated SCons Options class by Variables.
   This requires SCons 0.98.1 or higher. (Francois Beerten)
