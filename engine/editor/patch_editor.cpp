@@ -283,8 +283,8 @@ static void PatchEditorCallbackMouse(int x, int y)
 	if (0 <= x && x < Video.Width - PatchMenuWidth &&
 		0 <= y && y < Video.Height)
 	{
-		int tileX = (x - (int)ScrollX) / TileSizeX;
-		int tileY = (y - (int)ScrollY) / TileSizeY;
+		int tileX = (x + (int)ScrollX) / TileSizeX;
+		int tileY = (y + (int)ScrollY) / TileSizeY;
 		if (0 <= tileX && tileX < Patch->getType()->getTileWidth() &&
 			0 <= tileY && tileY < Patch->getType()->getTileHeight())
 		{
