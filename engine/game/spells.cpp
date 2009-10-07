@@ -1073,8 +1073,13 @@ int SpellCast(CUnit *caster, const SpellType *spell, CUnit *target,
 	int mustSubtractMana; // false if action which have their own calculation is present.
 
 	if (target) {
-		x = target->X;
-		y = target->Y;
+		int xa;
+		int ya;
+		int xb;
+		int yb;
+		target->GetMapArea(&xa, &ya, &xb, &yb);
+		x = (xa+xb)/2;
+		y = (ya+yb)/2;
 	}
 	//
 	// For TargetSelf, you target.... YOURSELF
