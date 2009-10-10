@@ -431,7 +431,7 @@ msgstr "~!Spiel beenden"
 
 #: scripts/menus/ingame/game.lua:71
 msgid "Return to Game (~<Esc~>)"
-msgstr "Zurück zum Spiel (!<Esc~>)"
+msgstr "Zurück zum Spiel (~<Esc~>)"
 
 #: scripts/menus/ingame/game.lua:80
 msgid "Save Game"
