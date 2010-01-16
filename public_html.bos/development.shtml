@@ -31,7 +31,7 @@ with scons. To build a debug version (recommended for development) run:</p>
 <p>See the <a href="http://www.boswars.org/wiki/index.php/Bos/FAQ">Bos Wars FAQ</a> 
 and the documentation next to the sources for more information.</p>
 
-<p>You can browse the source code via <a href="http://www.seul.org/viewcvs/viewcvs.cgi/bos/trunk/?root=BosWars">viewcvs</a>.</p>
+<p>You can browse the source code via <a href="http://svn.seul.org/viewcvs/viewvc.cgi/bos/trunk/?root=BosWars">viewvc</a>.</p>
 
 <p>Some sources for the material used in the game can be found here:</p>
 <pre>  svn co svn://bos.seul.org/svn/bos/materials.bos/trunk materials.bos</pre>
