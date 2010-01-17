@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Removed broken elites campaign and maps (Francois Beerten)
 - Add code for dumping all received SDL events to stdout
   (Kalle Olavi Niemitalo)
 - Work around bug #27982 mouse centered when clicking in the window after
