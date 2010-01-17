@@ -9,7 +9,7 @@
 //
 /**@name sdl.cpp - SDL video support. */
 //
-//      (c) Copyright 1999-2008 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1999-2010 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -508,6 +508,195 @@ void Invalidate(void)
 	}
 }
 
+#if defined(DEBUG)
+ #define DUMP_SDL_EVENTS 1
+#endif
+
+#ifdef DUMP_SDL_EVENTS
+
+static void DumpSdlActiveEvent(const SDL_ActiveEvent &active, const char *type)
+{
+	printf("SDL_ActiveEvent {"
+	       " type=%s, gain=%d, state=%d }\n",
+	       type,
+	       static_cast<int>(active.gain),
+	       static_cast<int>(active.state));
+}
+
+static void DumpSdlKeyboardEvent(const SDL_KeyboardEvent &key, const char *type)
+{
+	printf("SDL_KeyboardEvent {"
+	       " type=%s, which=%d, state=%d, keysym={"
+	       " scancode=%d, sym=%d, mod=%d, unicode=%d }}\n",
+	       type,
+	       static_cast<int>(key.which),
+	       static_cast<int>(key.state),
+	       static_cast<int>(key.keysym.scancode),
+	       static_cast<int>(key.keysym.sym),
+	       static_cast<int>(key.keysym.mod),
+	       static_cast<int>(key.keysym.unicode));
+}
+
+static void DumpSdlMouseMotionEvent(const SDL_MouseMotionEvent &motion, const char *type)
+{
+	printf("SDL_MouseMotionEvent {"
+	       " type=%s, which=%d, state=%d,"
+	       " x=%d, y=%d, xrel=%d, yrel=%d }\n",
+	       type,
+	       static_cast<int>(motion.which),
+	       static_cast<int>(motion.state),
+	       static_cast<int>(motion.x),
+	       static_cast<int>(motion.y),
+	       static_cast<int>(motion.xrel),
+	       static_cast<int>(motion.yrel));
+}
+
+static void DumpSdlMouseButtonEvent(const SDL_MouseButtonEvent &button, const char *type)
+{
+	printf("SDL_MouseButtonEvent {"
+	       " type=%s, which=%d, button=%d, state=%d, x=%d, y=%d }\n",
+	       type,
+	       static_cast<int>(button.which),
+	       static_cast<int>(button.button),
+	       static_cast<int>(button.state),
+	       static_cast<int>(button.x),
+	       static_cast<int>(button.y));
+}
+
+static void DumpSdlJoyAxisEvent(const SDL_JoyAxisEvent &jaxis, const char *type)
+{
+	printf("SDL_JoyAxisEvent {"
+	       " type=%s, which=%d, axis=%d, value=%d }\n",
+	       type,
+	       static_cast<int>(jaxis.which),
+	       static_cast<int>(jaxis.axis),
+	       static_cast<int>(jaxis.value));
+}
+
+static void DumpSdlJoyBallEvent(const SDL_JoyBallEvent &jball, const char *type)
+{
+	printf("SDL_JoyBallEvent {"
+	       " type=%s, which=%d, ball=%d, xrel=%d, yrel=%d }\n",
+	       type,
+	       static_cast<int>(jball.which),
+	       static_cast<int>(jball.ball),
+	       static_cast<int>(jball.xrel),
+	       static_cast<int>(jball.yrel));
+}
+
+static void DumpSdlJoyHatEvent(const SDL_JoyHatEvent &jhat, const char *type)
+{
+	printf("SDL_JoyHatEvent {"
+	       " type=%s, which=%d, button=%d, state=%d }\n",
+	       type,
+	       static_cast<int>(jhat.which),
+	       static_cast<int>(jhat.hat),
+	       static_cast<int>(jhat.value));
+}
+
+static void DumpSdlJoyButtonEvent(const SDL_JoyButtonEvent &jbutton, const char *type)
+{
+	printf("SDL_JoyButtonEvent {"
+	       " type=%s, which=%d, button=%d, state=%d }\n",
+	       type,
+	       static_cast<int>(jbutton.which),
+	       static_cast<int>(jbutton.button),
+	       static_cast<int>(jbutton.state));
+}
+
+static void DumpSdlResizeEvent(const SDL_ResizeEvent &resize, const char *type)
+{
+	printf("SDL_ResizeEvent {"
+	       " type=%s, w=%d, h=%d }\n",
+	       type,
+	       static_cast<int>(resize.w),
+	       static_cast<int>(resize.h));
+}
+
+static void DumpSdlExposeEvent(const SDL_ExposeEvent &, const char *type)
+{
+	printf("SDL_ExposeEvent {"
+	       " type=%s }\n",
+	       type);
+}
+
+static void DumpSdlQuitEvent(const SDL_QuitEvent &, const char *type)
+{
+	printf("SDL_QuitEvent {"
+	       " type=%s }\n",
+	       type);
+}
+
+static void DumpSdlEvent(const SDL_Event *event)
+{
+	switch (event->type) {
+	case SDL_ACTIVEEVENT:
+		DumpSdlActiveEvent(event->active, "SDL_ACTIVEEVENT");
+		break;
+
+	case SDL_KEYDOWN:
+		DumpSdlKeyboardEvent(event->key, "SDL_KEYDOWN");
+		break;
+
+	case SDL_KEYUP:
+		DumpSdlKeyboardEvent(event->key, "SDL_KEYUP");
+		break;
+
+	case SDL_MOUSEMOTION:
+		DumpSdlMouseMotionEvent(event->motion, "SDL_MOUSEMOTION");
+		break;
+
+	case SDL_MOUSEBUTTONDOWN:
+		DumpSdlMouseButtonEvent(event->button, "SDL_MOUSEBUTTONDOWN");
+		break;
+
+	case SDL_MOUSEBUTTONUP:
+		DumpSdlMouseButtonEvent(event->button, "SDL_MOUSEBUTTONUP");
+		break;
+
+	case SDL_JOYAXISMOTION:
+		DumpSdlJoyAxisEvent(event->jaxis, "SDL_JOYAXISMOTION");
+		break;
+
+	case SDL_JOYBALLMOTION:
+		DumpSdlJoyBallEvent(event->jball, "SDL_JOYBALLMOTION");
+		break;
+
+	case SDL_JOYHATMOTION:
+		DumpSdlJoyHatEvent(event->jhat, "SDL_JOYHATMOTION");
+		break;
+
+	case SDL_JOYBUTTONDOWN:
+		DumpSdlJoyButtonEvent(event->jbutton, "SDL_JOYBUTTONDOWN");
+		break;
+
+	case SDL_JOYBUTTONUP:
+		DumpSdlJoyButtonEvent(event->jbutton, "SDL_JOYBUTTONUP");
+		break;
+
+	case SDL_VIDEORESIZE:
+		DumpSdlResizeEvent(event->resize, "SDL_VIDEORESIZE");
+		break;
+		
+	case SDL_VIDEOEXPOSE:
+		DumpSdlExposeEvent(event->expose, "SDL_VIDEOEXPOSE");
+		break;
+		
+	case SDL_QUIT:
+		DumpSdlQuitEvent(event->quit, "SDL_QUIT");
+		break;
+
+	default:
+		printf("SDL_Event { type=%d, ... }\n",
+		       static_cast<int>(event->type));
+		break;
+		
+	}
+	fflush(stdout);
+}
+
+#endif // DUMP_SDL_EVENTS
+
 /**
 **  Handle interactive input event.
 **
@@ -516,6 +705,10 @@ void Invalidate(void)
 */
 static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 {
+#ifdef DUMP_SDL_EVENTS
+	DumpSdlEvent(event);
+#endif
+
 	switch (event->type) {
 		case SDL_MOUSEBUTTONDOWN:
 			InputMouseButtonPress(callbacks, SDL_GetTicks(),
