@@ -9,7 +9,7 @@
 //
 /**@name mouse.cpp - The mouse handling. */
 //
-//      (c) Copyright 1998-2008 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2009 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -578,12 +578,6 @@ void HandleMouseExit(void)
 
 	// Prevent scrolling while out of focus (on other applications) */
 	KeyScrollState = MouseScrollState = ScrollNone;
-
-	// Show hour-glass (to denote to the user, the game is waiting)
-	// FIXME: couldn't define a hour-glass that easily, so used pointer
-	CursorX = Video.Width / 2;
-	CursorY = Video.Height / 2;
-	GameCursor = UI.Point.Cursor;
 }
 
 /**
