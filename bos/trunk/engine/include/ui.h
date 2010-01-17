@@ -453,9 +453,6 @@ public:
 /// SoundConfig PlacementError;         /// played on placements errors
 /// SoundConfig PlacementSuccess;       /// played on placements success
 /// SoundConfig Click;                  /// click noice used often
-
-	CGraphic *VictoryBackgroundG;       /// Victory background graphic
-	CGraphic *DefeatBackgroundG;        /// Defeat background graphic
 };
 
 /*----------------------------------------------------------------------------
