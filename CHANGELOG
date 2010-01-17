@@ -2,6 +2,8 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Work around bug #27982 mouse centered when clicking in the window after
+  having left (Kalle Olavi Niemitalo and Francois Beerten)
 - Fix bug #25178 in patch editor; mouse placement confusion (Jimmy Salmon)
 - Nukes target the center of the target. (Jann Horn)
 - Fix use of settings from pkg-config in SCons. (Francois Beerten)
