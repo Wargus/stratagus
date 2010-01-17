@@ -9,7 +9,7 @@
 //
 /**@name ui.cpp - The user interface globals. */
 //
-//      (c) Copyright 1999-2008 by Lutz Sammer, Andreas Arens, and
+//      (c) Copyright 1999-2010 by Lutz Sammer, Andreas Arens, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -77,8 +77,7 @@ CUserInterface::CUserInterface() :
 	ViewportMode(VIEWPORT_SINGLE), MouseViewport(NULL),
 	SelectedViewport(NULL), NumViewports(0),
 	MessageFont(NULL), MessageScrollSpeed(5),
-	ViewportCursorColor(0), Offset640X(0), Offset480Y(0),
-	VictoryBackgroundG(NULL), DefeatBackgroundG(NULL)
+	ViewportCursorColor(0), Offset640X(0), Offset480Y(0)
 {
 	memset(&CompletedBarColorRGB, 0, sizeof(CompletedBarColorRGB));
 
@@ -265,10 +264,6 @@ void CleanUserInterface(void)
 
 	// Pie Menu
 	CGraphic::Free(UI.PieMenu.G);
-
-	// Backgrounds
-	CGraphic::Free(UI.VictoryBackgroundG);
-	CGraphic::Free(UI.DefeatBackgroundG);
 
 	// Title Screens
 	if (TitleScreens) {
