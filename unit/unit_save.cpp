@@ -165,6 +165,86 @@ void SaveOrder(const COrder *order, CFile *file)
 	file->printf("}");
 }
 
+/** Save the progress of the current order to a file.
+**
+**  @param unit  Unit pointer to be saved.
+**  @param file  Output file.
+**
+**  Each unit must always have a current order, which is kept in
+**  unit->Orders[0], and then possibly some other orders that it will
+**  execute after the current order completes.  When the unit begins
+**  executing an order, it can save additional order-specific data to
+**  some member of the unit->Data union.  For example, the various
+**  movement orders save a precalculated path in unit->Data.Move.
+**  While the unit is executing the order, it can then read and update
+**  this data.
+**
+**  This function saves the appropriate member of unit->Data to the
+**  specified file.  unit->Orders[0]->Action controls which member that
+**  is.
+*/
+static void SaveOrderData(const CUnit *unit, CFile *file)
+{
+	int i;
+
+	switch (unit->Orders[0]->Action) {
+		case UnitActionStill:
+			break;
+		case UnitActionBuilt:
+			{
+				CConstructionFrame *cframe;
+				int frame;
+
+				cframe = unit->Type->Construction->Frames;
+				frame = 0;
+				while (cframe != unit->Data.Built.Frame) {
+					cframe = cframe->Next;
+					++frame;
+				}
+				file->printf(",\n  \"data-built\", {");
+
+				if (unit->Data.Built.Worker) {
+					file->printf("\"worker\", \"%s\", ",
+						UnitReference(unit->Data.Built.Worker).c_str());
+				}
+				file->printf("\"progress\", %d, \"frame\", %d,",
+					unit->Data.Built.Progress, frame);
+				if (unit->Data.Built.Cancel) {
+					file->printf(" \"cancel\",");
+				}
+				file->printf("}");
+				break;
+			}
+		case UnitActionTrain:
+			file->printf(",\n  \"data-train\", {");
+			file->printf("\"ticks\", %d, ", unit->Data.Train.Ticks);
+			file->printf("}");
+			break;
+		case UnitActionResource:
+			file->printf(",\n  \"data-harvest\", {");
+			file->printf("\"current-production\", {");
+			for (i = 0; i < MaxCosts; ++i) {
+				file->printf("%s%d", (i ? ", " : ""), unit->Data.Harvest.CurrentProduction[i]);
+			}
+			file->printf("}}");
+			break;
+		default:
+			file->printf(",\n  \"data-move\", {");
+			if (unit->Data.Move.Fast) {
+				file->printf("\"fast\", ");
+			}
+			if (unit->Data.Move.Length > 0) {
+				file->printf("\"path\", {");
+				for (i = 0; i < unit->Data.Move.Length; ++i) {
+					file->printf("%d, ", unit->Data.Move.Path[i]);
+				}
+				file->printf("},");
+			}
+			file->printf("}");
+			break;
+	}
+}
+
 /**
 **  Save the state of a unit to file.
 **
@@ -350,62 +430,7 @@ void SaveUnit(const CUnit *unit, CFile *file)
 	//
 	//  Order data part
 	//
-	switch (unit->Orders[0]->Action) {
-		case UnitActionStill:
-			break;
-		case UnitActionBuilt:
-			{
-				CConstructionFrame *cframe;
-				int frame;
-
-				cframe = unit->Type->Construction->Frames;
-				frame = 0;
-				while (cframe != unit->Data.Built.Frame) {
-					cframe = cframe->Next;
-					++frame;
-				}
-				file->printf(",\n  \"data-built\", {");
-
-				if (unit->Data.Built.Worker) {
-					file->printf("\"worker\", \"%s\", ",
-						UnitReference(unit->Data.Built.Worker).c_str());
-				}
-				file->printf("\"progress\", %d, \"frame\", %d,",
-					unit->Data.Built.Progress, frame);
-				if (unit->Data.Built.Cancel) {
-					file->printf(" \"cancel\",");
-				}
-				file->printf("}");
-				break;
-			}
-		case UnitActionTrain:
-			file->printf(",\n  \"data-train\", {");
-			file->printf("\"ticks\", %d, ", unit->Data.Train.Ticks);
-			file->printf("}");
-			break;
-		case UnitActionResource:
-			file->printf(",\n  \"data-harvest\", {");
-			file->printf("\"current-production\", {");
-			for (i = 0; i < MaxCosts; ++i) {
-				file->printf("%s%d", (i ? ", " : ""), unit->Data.Harvest.CurrentProduction[i]);
-			}
-			file->printf("}}");
-			break;
-		default:
-			file->printf(",\n  \"data-move\", {");
-			if (unit->Data.Move.Fast) {
-				file->printf("\"fast\", ");
-			}
-			if (unit->Data.Move.Length > 0) {
-				file->printf("\"path\", {");
-				for (i = 0; i < unit->Data.Move.Length; ++i) {
-					file->printf("%d, ", unit->Data.Move.Path[i]);
-				}
-				file->printf("},");
-			}
-			file->printf("}");
-			break;
-	}
+	SaveOrderData(unit, file);
 
 	if (unit->Goal) {
 		file->printf(",\n  \"goal\", %d", UnitNumber(unit->Goal));
