@@ -275,7 +275,7 @@ void UnSelectUnit(CUnit *unit)
 	if (unit->TeamSelected) {
 		for (i = 0; i < PlayerMax; ++i) {
 			if (unit->TeamSelected & (1 << i)) {
-				for (j = 0; TeamSelected[i][j] != unit; ++i) {
+				for (j = 0; TeamSelected[i][j] != unit; ++j) {
 					;
 				}
 				Assert(j < TeamNumSelected[i]);

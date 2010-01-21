@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Fix teams in UnSelectUnit (Kalle Olavi Niemitalo)
 - Removed broken elites campaign and maps (Francois Beerten)
 - Add code for dumping all received SDL events to stdout
   (Kalle Olavi Niemitalo)
