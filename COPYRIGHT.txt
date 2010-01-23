@@ -49,7 +49,6 @@ As a special exception the sources are not required for the following files:
   graphics/elites/ui/ui_800_bpanel.png
   graphics/elites/ui/ui_info.png
   graphics/elites/ui/ui_minimap.png
-  graphics/general/ui_buttons.png
   graphics/missiles/green_cross.png
   graphics/neutral/units/corpses.png
   graphics/screens/defeat.png
@@ -193,11 +192,6 @@ As a special exception the sources are not required for the following files:
   units/nukeplant/sfx_pplnt.die.wav
   units/nukeplant/sfx_pplnt.select.wav
   units/radar/sfx_rdar.select.wav
-  units/research/research.completed.wav
-  units/research/research.facility.completed.wav
-  units/research/research.facility.underattack.wav
-  units/research/sfx_rfac.die.wav
-  units/research/sfx_rfac.select.wav
   units/rocks/rock_1i.png
   units/rocks/rock_1.png
   units/rocks/rock_1s.png
@@ -234,8 +228,6 @@ As a special exception the sources are not required for the following files:
   units/tree03/tree03_s.png
   units/tree04/tree04.png
   units/tree04/tree04_s.png
-  units/vault/elite.fort.completed.wav
-  units/vault/elite.fort.underattack.wav
   units/vault/sfx_fort.die.wav
   units/vault/sfx_fort.select.wav
   units/vehiclefactory/sfx_vfac.die.wav
@@ -246,8 +238,6 @@ As a special exception the sources are not required for the following files:
   units/vehiclefactory/vehicle_factory.png
   units/vehiclefactory/vehicle_factory_s.png
   units/vehiclefactory/vehicle.factory.underattack.wav
-  video/bos_intro.ogg
-  video/stratagus_intro.ogg
 If a file from this list is renamed, this list should be changed accordingly. 
 If a file from this list is deleted, then it should be 
 removed from this list. The exception does not apply if a file from this
