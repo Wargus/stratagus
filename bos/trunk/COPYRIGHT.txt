@@ -41,14 +41,14 @@ The sources can be downloaded from the project website (http://bos.seul.org) or
 got upon request.
 
 As a special exception the sources are not required for the following files:
-  graphics/elites/missile/nuke.png
-  graphics/elites/ui/ui_1024_bpanel.png
-  graphics/elites/ui/ui_1280_bpanel.png
-  graphics/elites/ui/ui_1600_bpanel.png
-  graphics/elites/ui/ui_640_bpanel.png
-  graphics/elites/ui/ui_800_bpanel.png
-  graphics/elites/ui/ui_info.png
-  graphics/elites/ui/ui_minimap.png
+  graphics/missile/nuke.png
+  graphics/ui/ui_1024_bpanel.png
+  graphics/ui/ui_1280_bpanel.png
+  graphics/ui/ui_1600_bpanel.png
+  graphics/ui/ui_640_bpanel.png
+  graphics/ui/ui_800_bpanel.png
+  graphics/ui/ui_info.png
+  graphics/ui/ui_minimap.png
   graphics/missiles/green_cross.png
   graphics/neutral/units/corpses.png
   graphics/screens/defeat.png
@@ -57,24 +57,24 @@ As a special exception the sources are not required for the following files:
   graphics/tiles/desert.png
   graphics/ui/rosace1.png
   graphics/ui/x_startpoint.png
-  maps/antarticum/terrain.png
-  maps/battlefield/terrain.png
-  maps/bridge/terrain.png
-  maps/canyon/terrain.png
-  maps/islandwar/terrain.png
-  maps/patches/128x.png
-  maps/patches/256x.png
-  maps/patches/32x.png
-  maps/patches/512-hill-01x.png
-  maps/patches/512-hill-02x.png
-  maps/patches/512-hill-03x.png
-  maps/patches/512-hill-04x.png
-  maps/patches/512-lake-01x.png
-  maps/patches/512x.png
-  maps/patches/64x.png
-  maps/patches/terrain.png
-  maps/river/terrain.png
-  maps/tutorial/terrain.png
+  maps/antarticum.map/terrain.png
+  maps/battlefield.map/terrain.png
+  maps/bridge.map/terrain.png
+  maps/canyon.map/terrain.png
+  maps/islandwar.map/terrain.png
+  maps/patches.map/128x.png
+  maps/patches.map/256x.png
+  maps/patches.map/32x.png
+  maps/patches.map/512-hill-01x.png
+  maps/patches.map/512-hill-02x.png
+  maps/patches.map/512-hill-03x.png
+  maps/patches.map/512-hill-04x.png
+  maps/patches.map/512-lake-01x.png
+  maps/patches.map/512x.png
+  maps/patches.map/64x.png
+  maps/patches.map/terrain.png
+  maps/river.map/terrain.png
+  maps/campaigns/tutorial/tutorial.map/terrain.png
   sounds/bazoo_g_hit.wav
   sounds/grenadier_g_hit.wav
   sounds/ui/click.wav.gz
@@ -134,10 +134,10 @@ As a special exception the sources are not required for the following files:
   units/engineer/unit_engineer_c.png
   units/engineer/unit_engineer.png
   units/engineer/unit_engineer_s.png
-  units/generator/power.plant.completed.wav
-  units/generator/power.plant.underattack.wav
-  units/generator/sfx_pplnt.die.wav
-  units/generator/sfx_pplnt.select.wav
+  units/powerplant/power.plant.completed.wav
+  units/powerplant/power.plant.underattack.wav
+  units/powerplant/sfx_pplnt.die.wav
+  units/powerplant/sfx_pplnt.select.wav
   units/grenadier/grenadier_action.wav
   units/grenadier/grenadier_attack.wav
   units/grenadier/grenadier_die.wav
