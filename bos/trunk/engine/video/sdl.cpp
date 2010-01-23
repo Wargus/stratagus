@@ -508,11 +508,8 @@ void Invalidate(void)
 	}
 }
 
-#if defined(DEBUG)
- #define DUMP_SDL_EVENTS 1
-#endif
 
-#ifdef DUMP_SDL_EVENTS
+#if defined(DEBUG) && defined(DUMP_SDL_EVENTS)
 
 static void DumpSdlActiveEvent(const SDL_ActiveEvent &active, const char *type)
 {
