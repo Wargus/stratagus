@@ -41,7 +41,7 @@ The sources can be downloaded from the project website (http://bos.seul.org) or
 got upon request.
 
 As a special exception the sources are not required for the following files:
-  graphics/missile/nuke.png
+  graphics/missiles/nuke.png
   graphics/ui/ui_1024_bpanel.png
   graphics/ui/ui_1280_bpanel.png
   graphics/ui/ui_1600_bpanel.png
@@ -121,9 +121,6 @@ As a special exception the sources are not required for the following files:
   units/chopper/unit_chopper.png
   units/chopper/unit_chopper_s.png
   units/corpses/build-dead-2.png
-  units/dorcoz/ico_dorcoz.png
-  units/dorcoz/mis_plasma_sml.png
-  units/dorcoz/unit_dorcoz.png
   units/engineer/engineer_action.wav
   units/engineer/engineer_attack.wav
   units/engineer/engineer_die.wav
