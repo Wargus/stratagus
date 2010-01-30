@@ -1,0 +1,5 @@
+-- File licensed under the GNU GPL version 2 or later.
+
+DefinePlayerTypes("person", "person")
+PresentMap("", 2, 256, 64, 7)
+DefineMapSetup(GetCurrentLuaPath().."/level01.sms")
