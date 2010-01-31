@@ -30,9 +30,9 @@
 local briefingtext01 = 
  "Chapter One\n"..
  "Lahen, a failing and broken inventor, managed to sell his "..
- "rubish solar panels to the Obersims at an enormous price. "..
+ "rubbish solar panels to the Obersims at an enormous price. "..
  "After having paid, the Obersims discovered how much they had been cheated. "..
- "The pride Obersims could not allow this and cried for revenge:\n"..
+ "The proud Obersims could not allow this and cried for revenge:\n"..
  "   Lahen wanted ! Dead!\n"..
  "\n"..
  "Lahen knows of the danger and now tries to escape in the "..
