@@ -9,7 +9,7 @@
 //
 /**@name stratagus.cpp - The main file. */
 //
-//      (c) Copyright 1998-2008 by Lutz Sammer, Francois Beerten, and
+//      (c) Copyright 1998-2010 by Lutz Sammer, Francois Beerten, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -225,7 +225,7 @@ std::string LocalPlayerName;         /// Name of local player
 
 	/// Name, Version, Copyright
 static std::string NameLine =
-	"Bos Wars V" VERSION ", (c) 1998-2008 by the Bos Wars and Stratagus Project.";
+	"Bos Wars V" VERSION ", (c) 1998-2010 by the Bos Wars and Stratagus Project.";
 
 std::string CliMapName;          /// Filename of the map given on the command line
 std::string CompileOptions;          /// Compile options.
