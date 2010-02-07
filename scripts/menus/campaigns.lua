@@ -9,7 +9,7 @@
 --
 --      campaigns.lua - The main UI lua script.
 --
---      (c) Copyright 2006 by François Beerten
+--      (c) Copyright 2006-2010 by François Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 --
 
 
-function RunBriefingMenu(objectivestext, briefingtext, briefingsound)
+function RunBriefingMenu(objectivestext, briefingtext, briefingsound, background)
   local menu
   local b
   local channel = nil
@@ -38,7 +38,7 @@ function RunBriefingMenu(objectivestext, briefingtext, briefingsound)
   end
 
   SetObjectives(objectivestext)
-  menu = BosMenu(_("Briefing"))
+  menu = BosMenu(_("Briefing"), background)
   local text = briefingtext .. 
       "\n\n" ..
       _("Objectives:") ..
