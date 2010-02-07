@@ -48,11 +48,21 @@ function DisplayEnding()
    "To find out and to play the rest of the campaign, "..
    "help us finish it. There is a big need for new maps."
   obj = "Go to boswars.org and contact us to help on the campaign."
-  RunBriefingMenu(obj, t)
+  RunBriefingMenu(obj, t, nil, "campaigns/swindler/swindler.png")
+end
+
+local function CreateSwindlerMapStep(map, objectivestext, briefingtext, briefingsound)
+   function RunCampaignMap()
+     RunBriefingMenu(objectivestext, briefingtext, briefingsound,
+                     "campaigns/swindler/swindler.png")
+     Load(map) -- Needed to force the load of the presentation
+     RunMap(map, objectivestext) 
+   end
+   return RunCampaignMap
 end
 
 campaign_steps = {
-  CreateMapStep("campaigns/swindler/level01.smp",
+  CreateSwindlerMapStep("campaigns/swindler/level01.smp",
       "Get to the upper mountains without getting seen.", 
       briefingtext01),
   DisplayEnding,
