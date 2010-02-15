@@ -1,0 +1,15 @@
+--     ____                _       __
+--    / __ )____  _____   | |     / /___ ___________
+--   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
+--  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  )
+-- /_____/\____/____/     |__/|__/\__,_/_/  /____/
+--
+--       A futuristic real-time strategy game.
+--          This file is part of Bos Wars.
+--
+-- Boswars Presentation
+-- File licensed under the GNU GPL version 2 or later.
+
+DefinePlayerTypes("person", "person", "person", "person")
+PresentMap("Go East!", 4, 256, 32, 4)
+DefineMapSetup(GetCurrentLuaPath().."/setup.sms")
