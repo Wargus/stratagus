@@ -792,8 +792,9 @@ void DrawCosts(void)
 {
 	int x = UI.StatusLine.TextX + 268;
 	if (CostsMana) {
-		// FIXME: hardcoded image!!!
-		UI.Resources[EnergyCost].G->DrawFrameClip(3, x, UI.StatusLine.TextY);
+		if (UI.Resources[EnergyCost].G->NumFrames >= 3) {
+			UI.Resources[EnergyCost].G->DrawFrameClip(3, x, UI.StatusLine.TextY);
+		}
 
 		VideoDrawNumber(x + 15, UI.StatusLine.TextY, GameFont, CostsMana);
 		x += 60;
