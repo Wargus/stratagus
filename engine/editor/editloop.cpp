@@ -1115,6 +1115,9 @@ static void EditorCallbackButtonDown(unsigned button)
 				{
 					// Create a new patch
 					const CPatchType *patchType = Editor.ShownPatchTypes[Editor.SelectedPatchIndex].PatchType;
+					if (PatchUnderCursor) {
+						Map.PatchManager.remove(PatchUnderCursor);
+					}
 					PatchUnderCursor = Map.PatchManager.add(patchType->getName(), cursorMapX, cursorMapY);
 					PatchPlacedThisPress = true;
 					UpdateMinimapTerrain = true;
