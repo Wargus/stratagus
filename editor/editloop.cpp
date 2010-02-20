@@ -1214,7 +1214,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 
 		case SDLK_BACKSPACE:
 		case SDLK_DELETE:
-			if (PatchUnderCursor)
+			if (Editor.State != EditorEditUnit && PatchUnderCursor)
 			{
 				int cursorMapX = UI.SelectedViewport->Viewport2MapX(CursorX);
 				int cursorMapY = UI.SelectedViewport->Viewport2MapY(CursorY);
@@ -1223,7 +1223,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				UI.StatusLine.Set(_("Patch deleted"));
 				UpdateMinimapTerrain = true;
 			}
-			else if (UnitUnderCursor)
+			else if (Editor.State != EditorEditPatch && UnitUnderCursor)
 			{
 				EditorRemoveUnit(UnitUnderCursor);
 			}
