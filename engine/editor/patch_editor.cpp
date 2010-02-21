@@ -265,6 +265,7 @@ static void PatchEditorCallbackMouse(int x, int y)
 	int oldTileX = MouseOverTileX;
 	int oldTileY = MouseOverTileY;
 
+	MouseScrollState = ScrollNone;
 	GameCursor = UI.Point.Cursor;
 	MouseOverButton = ButtonNone;
 	MouseOverTileX = -1;
