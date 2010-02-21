@@ -958,6 +958,21 @@ static void EditorCallbackButtonUp(unsigned button)
 	}
 }
 
+static void EditorPlacePatch(int cursorMapX, int cursorMapY)
+{
+	if (!PatchPlacedThisPress && Editor.SelectedPatchIndex != -1)
+	{
+		// Create a new patch
+		const CPatchType *patchType = Editor.ShownPatchTypes[Editor.SelectedPatchIndex].PatchType;
+		if (PatchUnderCursor) {
+			Map.PatchManager.remove(PatchUnderCursor);
+		}
+		PatchUnderCursor = Map.PatchManager.add(patchType->getName(), cursorMapX, cursorMapY);
+		PatchPlacedThisPress = true;
+		UpdateMinimapTerrain = true;
+	}
+}
+
 /**
 **  Called if mouse button pressed down.
 **
@@ -1111,17 +1126,7 @@ static void EditorCallbackButtonDown(unsigned button)
 			}
 			else if (Editor.State == EditorEditPatch)
 			{
-				if (!PatchPlacedThisPress && Editor.SelectedPatchIndex != -1)
-				{
-					// Create a new patch
-					const CPatchType *patchType = Editor.ShownPatchTypes[Editor.SelectedPatchIndex].PatchType;
-					if (PatchUnderCursor) {
-						Map.PatchManager.remove(PatchUnderCursor);
-					}
-					PatchUnderCursor = Map.PatchManager.add(patchType->getName(), cursorMapX, cursorMapY);
-					PatchPlacedThisPress = true;
-					UpdateMinimapTerrain = true;
-				}
+				EditorPlacePatch(cursorMapX, cursorMapY);
 			}
 			else if (Editor.State == EditorEditUnit)
 			{
