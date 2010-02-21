@@ -11,70 +11,70 @@ For multiplayer games, make sure each player has a copy of the map.</p>
 
 <h2 style="clear: both;"><span>Enemyterritory2</span></h2> 
 <div style="width:100px; float: left;">
-    <img src="/addons/maps/EnemyTerritory2.map.png" alt="Enemyterritory2 mini map" />
+    <img src="/addons/boswars25/maps/EnemyTerritory2.map.png" alt="Enemyterritory2 mini map" />
 </div>
 <div style="float:left;">
     <ul>
         <li>EnemyTerritory</li>
         <li>256x256</li>
         <li>7 players</li>
-        <li>Download: <a href="/addons/maps/EnemyTerritory2.map.tgz">Tar.Gz</a> (37K) <a href="/addons/maps/EnemyTerritory2.map.zip">Zip</a> (33K)</li>
+        <li>Download: <a href="/addons/boswars25/maps/EnemyTerritory2.map.tgz">Tar.Gz</a> (37K) <a href="/addons/boswars25/maps/EnemyTerritory2.map.zip">Zip</a> (33K)</li>
     </ul>
 </div>
 
 
 <h2 style="clear: both;"><span>Grass</span></h2> 
 <div style="width:100px; float: left;">
-    <img src="/addons/maps/grass.map.png" alt="Grass mini map" />
+    <img src="/addons/boswars25/maps/grass.map.png" alt="Grass mini map" />
 </div>
 <div style="float:left;">
     <ul>
         <li>Grass</li>
         <li>256x256</li>
         <li>4 players</li>
-        <li>Download: <a href="/addons/maps/grass.map.tgz">Tar.Gz</a> (236K) <a href="/addons/maps/grass.map.zip">Zip</a> (236K)</li>
+        <li>Download: <a href="/addons/boswars25/maps/grass.map.tgz">Tar.Gz</a> (236K) <a href="/addons/boswars25/maps/grass.map.zip">Zip</a> (236K)</li>
     </ul>
 </div>
 
 
 <h2 style="clear: both;"><span>Greenlands</span></h2> 
 <div style="width:100px; float: left;">
-    <img src="/addons/maps/greenlands.map.png" alt="Greenlands mini map" />
+    <img src="/addons/boswars25/maps/greenlands.map.png" alt="Greenlands mini map" />
 </div>
 <div style="float:left;">
     <ul>
         <li>Green lands</li>
         <li>62x46</li>
         <li>2 players</li>
-        <li>Download: <a href="/addons/maps/greenlands.map.tgz">Tar.Gz</a> (1M) <a href="/addons/maps/greenlands.map.zip">Zip</a> (1M)</li>
+        <li>Download: <a href="/addons/boswars25/maps/greenlands.map.tgz">Tar.Gz</a> (1M) <a href="/addons/boswars25/maps/greenlands.map.zip">Zip</a> (1M)</li>
     </ul>
 </div>
 
 
 <h2 style="clear: both;"><span>Obese</span></h2> 
 <div style="width:100px; float: left;">
-    <img src="/addons/maps/obese.map.png" alt="Obese mini map" />
+    <img src="/addons/boswars25/maps/obese.map.png" alt="Obese mini map" />
 </div>
 <div style="float:left;">
     <ul>
         <li>Obesity is a hungry disease</li>
         <li>256x256</li>
         <li>1 players</li>
-        <li>Download: <a href="/addons/maps/obese.map.tgz">Tar.Gz</a> (16M) <a href="/addons/maps/obese.map.zip">Zip</a> (16M)</li>
+        <li>Download: <a href="/addons/boswars25/maps/obese.map.tgz">Tar.Gz</a> (16M) <a href="/addons/boswars25/maps/obese.map.zip">Zip</a> (16M)</li>
     </ul>
 </div>
 
 
 <h2 style="clear: both;"><span>Plains</span></h2> 
 <div style="width:100px; float: left;">
-    <img src="/addons/maps/plains.map.png" alt="Plains mini map" />
+    <img src="/addons/boswars25/maps/plains.map.png" alt="Plains mini map" />
 </div>
 <div style="float:left;">
     <ul>
         <li>Ah, those wide open spaces...</li>
         <li>64x64</li>
         <li>2 players</li>
-        <li>Download: <a href="/addons/maps/plains.map.tgz">Tar.Gz</a> (1M) <a href="/addons/maps/plains.map.zip">Zip</a> (1M)</li>
+        <li>Download: <a href="/addons/boswars25/maps/plains.map.tgz">Tar.Gz</a> (1M) <a href="/addons/boswars25/maps/plains.map.zip">Zip</a> (1M)</li>
         <li>Author: $author</li>
     </ul>
 </div>
@@ -82,42 +82,42 @@ For multiplayer games, make sure each player has a copy of the map.</p>
 
 <h2 style="clear: both;"><span>Turbo Grounds</span></h2> 
 <div style="width:100px; float: left;">
-    <img src="/addons/maps/turbo_grounds.map.png" alt="Turbo Grounds mini map" />
+    <img src="/addons/boswars25/maps/turbo_grounds.map.png" alt="Turbo Grounds mini map" />
 </div>
 <div style="float:left;">
     <ul>
         <li></li>
         <li>175x175</li>
         <li>2 players</li>
-        <li>Download: <a href="/addons/maps/turbo_grounds.map.tgz">Tar.Gz</a> (3K) <a href="/addons/maps/turbo_grounds.map.zip">Zip</a> (3K)</li>
+        <li>Download: <a href="/addons/boswars25/maps/turbo_grounds.map.tgz">Tar.Gz</a> (3K) <a href="/addons/boswars25/maps/turbo_grounds.map.zip">Zip</a> (3K)</li>
     </ul>
 </div>
 
 
 <h2 style="clear: both;"><span>Wargrounds</span></h2> 
 <div style="width:100px; float: left;">
-    <img src="/addons/maps/wargrounds.map.png" alt="Wargrounds mini map" />
+    <img src="/addons/boswars25/maps/wargrounds.map.png" alt="Wargrounds mini map" />
 </div>
 <div style="float:left;">
     <ul>
         <li>WAAAR!</li>
         <li>128x128</li>
         <li>1 players</li>
-        <li>Download: <a href="/addons/maps/wargrounds.map.tgz">Tar.Gz</a> (10M) <a href="/addons/maps/wargrounds.map.zip">Zip</a> (10M)</li>
+        <li>Download: <a href="/addons/boswars25/maps/wargrounds.map.tgz">Tar.Gz</a> (10M) <a href="/addons/boswars25/maps/wargrounds.map.zip">Zip</a> (10M)</li>
     </ul>
 </div>
 
 
 <h2 style="clear: both;"><span>Wetlands03</span></h2> 
 <div style="width:100px; float: left;">
-    <img src="/addons/maps/wetlands03.map.png" alt="Wetlands03 mini map" />
+    <img src="/addons/boswars25/maps/wetlands03.map.png" alt="Wetlands03 mini map" />
 </div>
 <div style="float:left;">
     <ul>
         <li>Wetlands 03</li>
         <li>32x32</li>
         <li>2 players</li>
-        <li>Download: <a href="/addons/maps/wetlands03.map.tgz">Tar.Gz</a> (853K) <a href="/addons/maps/wetlands03.map.zip">Zip</a> (854K)</li>
+        <li>Download: <a href="/addons/boswars25/maps/wetlands03.map.tgz">Tar.Gz</a> (853K) <a href="/addons/boswars25/maps/wetlands03.map.zip">Zip</a> (854K)</li>
     </ul>
 </div>
 
