@@ -9,7 +9,7 @@
 //
 /**@name editloop.cpp - The editor main loop. */
 //
-//      (c) Copyright 2002-2008 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2010 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -964,8 +964,13 @@ static void EditorPlacePatch(int cursorMapX, int cursorMapY)
 	{
 		// Create a new patch
 		const CPatchType *patchType = Editor.ShownPatchTypes[Editor.SelectedPatchIndex].PatchType;
-		if (PatchUnderCursor) {
-			Map.PatchManager.remove(PatchUnderCursor);
+		for (int i = 0; i < patchType->getTileWidth(); i++) {
+			for (int j = 0; j < patchType->getTileHeight(); j++) {
+				CPatch *p = Map.PatchManager.getPatch(cursorMapX+i, cursorMapY+j);
+				if (p) {
+					Map.PatchManager.remove(p);
+				}
+			}
 		}
 		PatchUnderCursor = Map.PatchManager.add(patchType->getName(), cursorMapX, cursorMapY);
 		PatchPlacedThisPress = true;
