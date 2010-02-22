@@ -4,6 +4,18 @@
 
 <h1><span>Bos Wars Downloads</span></h1>
 
+<h2><span>Development version</span></h2> 
+
+<p>
+The latest and the greatest can be downloaded from subversion as explained
+in the <a href="/development.shtml">development</a> page.
+</p>
+
+<p>For the development version of Bos Wars, we 
+have <a href="http://www.boswars.org/addons/addons.shtml">extra maps</a>.
+</p>
+
+
 <h2><span>Version 2.5 (2008/3/1)</span></h2> 
 
 <ul>
@@ -13,8 +25,6 @@
   <li>Source (zip): <a href="dist/releases/boswars-2.5-src.zip">boswars-2.5-src.zip</a></li>
 </ul>
 
-
-<h1><span>Add-ons</span></h1>
 <p>
 For Bos Wars 2.5, we have <a href="http://www.boswars.org/addons25.shtml">extra maps</a>
 </p>
