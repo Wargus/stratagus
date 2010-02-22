@@ -4,11 +4,10 @@
 
 <div id="footer">
 <ul>
-  <li>&copy;2004-2008 <a href="/team.shtml">Bos Wars Team</a></li>
+  <li>&copy;2004-2010 <a href="/team.shtml">Bos Wars Team</a></li>
   <li><a href="http://savannah.nongnu.org/projects/stratagus-bos/">Project Page</a></li>
 </ul>
 </div><!-- footer -->
 
-<!-- $Id: footer.shtml,v 1.1 2004/07/27 19:08:53 feb Exp $ -->
 </body>
 </html>
