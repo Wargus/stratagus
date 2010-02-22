@@ -19,7 +19,7 @@ Don't ask us what Bos means because we haven't figure it out either.
 The game features a wide variety of units although all you have to do is use tanks to win. 
 Have fun!!-->
 
-<div id="logo"><img src="images/logo-dark.png" width="544" height="157" alt="Bos Wars Logo" /></div>
+<div id="logo"><img src="/images/logo-dark.png" width="544" height="157" alt="Bos Wars Logo" /></div>
 
 <div id="wrapper">
 
