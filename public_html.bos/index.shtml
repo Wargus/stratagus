@@ -24,84 +24,9 @@ and Mac OS X.
 Bos Wars aims to create a completely original and fun open source RTS game.
 </p>
 
-<p>Bos Wars is copyrighted in 2004-2008 by Tina Petersen Jensen, Fran&ccedil;ois 
+<p>Bos Wars is copyrighted in 2004-2010 by Tina Petersen Jensen, Fran&ccedil;ois 
 Beerten et al. See COPYRIGHT.txt in the package for the full
 copyright notice.</p>
-
-<h1><span>News</span></h1>
-
-<h2><span>Version 2.5</span></h2>
-<p>After some fixes, we are proud to announce Bos Wars 2.5. As seen in the 
-preliminary version, this version adds recyclable buildings and beautiful 
-explosions using particle graphics.</p> 
-
-<p>Jim also insists that the start position in campaign level 5 got fixed as 
-he explained on IRC: 
-<quote>"<jim4> i know people are looking forward to that change".</quote>
-</p>
-
-<h2><span>Preliminary 2.5 Version</span></h2>
-<p>A new version of Bos Wars is coming. You can try out the preliminary version  
-<a href="download.shtml">Bos Wars pre2.5</a>. This version features
-recyclable buildings and beautiful explosions using particle graphics. You will
-also find some graphical improvements, bug fixes and new maps.
-</p>
-
-<h2><span>Version 2.4.1</span></h2>
-<p>After less than a month <a href="download.shtml">Bos Wars 2.4.1</a> is here. 
-This update uses a new map layout, fixes a load/save bug and makes OpenGL a 
-run-time option.
-</p>
-
-<h2><span>Version 2.4</span></h2>
-<p><a href="download.shtml">Bos Wars 2.4</a> has been released ! 
-This new version features a brand new rate-based economy that completely 
-replaces the old system of harvesting resources.  The new system uses 
-energy and magma. Now, you consume resources as they are being produced 
-instead of making one large up-front payment.  Other changes include a new 
-tutorial, new translations, and several bug fixes.
-</p><p>
-Happy gaming.
-</p>
-
-<h2><span>Preliminary 2.4 version.</span></h2>
-<p>The preliminary version of <a href="download.shtml">Bos Wars 2.4</a> is ready ! 
-This version introduces a completely new rate-based economy. Energy is produced by 
-power plants and magma by magma pumps. Building also consume resources 
-continously instead of requiring an upfront payment. With all those changes, we 
-rebalanced the units a bit, but more tuning will probably come. We also hope to 
-ship a more complete tutorial with explanations about the new economy in the 
-final 2.4 version. 
-</p><p>
-Tell us your gaming experience and about eventual bugs. 
-We wait for your feedback before the final 2.4 version. Happy gaming.
-</p>
-
-<h2><span>New gameplay and help wanted.</span></h2>
-<p>The next release will have a completely new gameplay. The economy system 
-switches to a rate based economy. For this release and the next ones, all help
-is welcome. Graphics, modeling, bug hunting, programming, documentation, beta testing 
-and so on, all need help.
-</p>
-<h2><span>First release of Bos Wars.</span></h2>
-<p><a href="download.shtml">Bos Wars 2.3</a> has been released. This is the 
-first version with the new name and that integrates the engine. This version
-also supports Lua 5.1.
-</p>
-<p>
-Development will now concentrate on new gameplay mechanics. 
-After that, new maps and campaigns can be created.
-</p>
-
-<h2><span>Project renamed to Bos Wars.</span></h2>
-<p>Invasion - Battle of Survival has been renamed to Bos Wars.</p>
-
-<h2><span>Merge of the Stratagus engine into the BOS project.</span></h2>
-<p>To speed up development, the Stratagus engine has been merged 
-into the BOS project. Due to the merge, the subversion URL has changed.
-You can find all details in the <a href="development.shtml">
-development</a> page.
-</p>
 
 
 <h1><span>Project</span></h1>
