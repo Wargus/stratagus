@@ -54,7 +54,7 @@ DefineUnitType("unit-start-location", {
   Animations = "animations-building", Icon = "icon-start-location",
   Speed = 0, HitPoints = 0, DrawLevel = 0, TileSize = {1, 1},
   BoxSize = {31, 31}, SightRange = 0, BasicDamage = 0, PiercingDamage = 0,
-  Missile = "missile-none", Priority = 0, Type = "land",
+  Missile = "missile-none", Priority = 0, Type = "land", NumDirections = 1,
  })
 SetEditorStartUnit("unit-start-location")
 
