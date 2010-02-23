@@ -588,7 +588,7 @@ void Exit(int err)
 	lua_close(Lua);
 #endif
 
-	fprintf(stdout, _("Thanks for playing Bos Wars.\n"));
+	fputs(_("Thanks for playing Bos Wars.\n"), stdout);
 	exit(err);
 }
 
