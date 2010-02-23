@@ -63,6 +63,7 @@ DefineUnitType("unit-rocksfield", {
     ExplodeWhenKilled = "missile-explosion",
     Type = "land",
     Building = true,
+    NumDirections = 1,
     CanHarvestFrom = true,
     Neutral = true
 })
