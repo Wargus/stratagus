@@ -44,115 +44,153 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
-	int ex, int ey, int x, int y, int flip)
+/** Draw a rectangular part of a CGraphic to the screen.
+**
+**  This function does not attempt to clip the CGraphic based on the
+**  screen coordinates.  If the caller wants clipping, it can set the
+**  parameters accordingly, or perhaps configure OpenGL to clip the
+**  output.
+**
+**  @param g
+**    The graphic to be drawn.  It may consist of multiple
+**    OpenGL textures if it is too large to fit in one texture.
+**  @param textures
+**    The OpenGL textures to be drawn.  There must be g->NumTextures
+**    elements in the array.  These textures may be the same as
+**    g->Textures, or perhaps variants of them with different colors
+**    for a specific player.
+**  @param gx_beg
+**    X coordinate of the left side of the rectangle to be drawn from @a *g.
+**  @param gy_beg
+**    Y coordinate of the top of the rectangle to be drawn from @a *g.
+**  @param gx_end
+**    X coordinate of the right side of the rectangle to be drawn from @a *g.
+**  @param gy_end
+**    Y coordinate of the bottom of the rectangle to be drawn from @a *g.
+**  @param sx_beg
+**    X coordinate of the left side of the graphic on the screen.
+**  @param sy_beg
+**    Y coordinate of the top of the graphic on the screen.
+**  @param flip
+**    Whether to flip the graphic in the X direction.
+**    In any case, the graphic will extend from @a sx_beg
+**    to (@a gx_end - @a gx_beg + @a sx_beg) on the screen.
+**    Flipping controls which of those values corresponds
+**    to @a gx_beg and which one to @a gx_end.
+*/
+void DrawTexture(const CGraphic *g, GLuint *textures,
+	int gx_beg, int gy_beg, int gx_end, int gy_end,
+	int sx_beg, int sy_beg, int flip)
 {
-	GLfloat stx, etx;
-	GLfloat sty, ety;
-	int texture;
-	int minw, minh;
-	int maxw, maxh;
-	int i, j;
-	int tw, th;
-	int sx2, sy2;
-	int ex2, ey2;
-	int w, h;
-	int x2, y2;
-	int nextsx2, nextsy2;
+	// gx and gy coordinates count pixels from the top left corner
+	//           of the CGraphic, which can span multiple textures.
+	// tx and ty coordinates are in an individual texture,
+	//           as GLfloats between 0.0 and 1.0, like OpenGL requires.
+	// sx and sy coordinates are on the screen.  This function does not
+	//           know what the origin is there.
 
-	tw = ex / GLMaxTextureSize - sx / GLMaxTextureSize + 1;
-	th = ey / GLMaxTextureSize - sy / GLMaxTextureSize + 1;
+	Assert(0 <= gx_beg);
+	Assert(0 <= gy_beg);
+	Assert(gx_beg <= gx_end); // draws nothing if equal
+	Assert(gy_beg <= gy_end); // draws nothing if equal
+	Assert(gx_end <= g->GraphicWidth);
+	Assert(gy_end <= g->GraphicHeight);
 
-	x2 = x;
-	y2 = y;
+	for (int tex_gy_beg = gy_beg / GLMaxTextureSize * GLMaxTextureSize;;
+	     tex_gy_beg += GLMaxTextureSize) {
+		int tex_gy_end = tex_gy_beg + GLMaxTextureSize;
+		int clip_gy_beg = std::max(gy_beg, tex_gy_beg);
+		int clip_gy_end = std::min(gy_end, tex_gy_end);
+		if (clip_gy_beg >= clip_gy_end)
+			break;
 
-	sy2 = sy;
-	for (j = 0; j < th; ++j) {
-		minh = sy2 / GLMaxTextureSize * GLMaxTextureSize;
-		maxh = std::min((const int)(minh + GLMaxTextureSize), g->GraphicHeight);
-		if (sy > minh) {
-			h = ey - sy;
+		int clip_sy_beg = clip_gy_beg - gy_beg + sy_beg;
+		int clip_sy_end = clip_gy_end - gy_beg + sy_beg;
+		Assert(clip_sy_end != clip_sy_beg);
+		Assert(abs(clip_sy_end - clip_sy_beg) <= g->GraphicHeight);
+
+		GLfloat clip_ty_beg, clip_ty_end;
+		if (tex_gy_end >= g->GraphicHeight) {
+			// This is the last row of textures in
+			// the Y direction.  These textures may
+			// be smaller than the ones at the top.
+			clip_ty_beg = (clip_gy_beg - tex_gy_beg)
+				* g->TextureHeight
+				/ (g->GraphicHeight - tex_gy_beg);
+			clip_ty_end = (clip_gy_end - tex_gy_beg)
+				* g->TextureHeight
+				/ (g->GraphicHeight - tex_gy_beg);
 		} else {
-			h = ey - minh;
+			clip_ty_beg = (clip_gy_beg - tex_gy_beg)
+				/ GLfloat(GLMaxTextureSize);
+			clip_ty_end = (clip_gy_end - tex_gy_beg)
+				/ GLfloat(GLMaxTextureSize);
 		}
-		if (h > maxh) {
-			h = maxh;
-		}
+		Assert(0.0f <= clip_ty_beg);
+		Assert(clip_ty_beg < clip_ty_end);
+		Assert(clip_ty_end <= 1.0f);
 
-		sx2 = sx;
-		for (i = 0; i < tw; ++i) {
-			minw = sx2 / GLMaxTextureSize * GLMaxTextureSize;
-			maxw = std::min((const int)(minw + GLMaxTextureSize), g->GraphicWidth);
-			if (sx > minw) {
-				w = ex - sx;
-			} else {
-				w = ex - minw;
-			}
-			if (w > maxw) {
-				w = maxw;
-			}
+		for (int tex_gx_beg = gx_beg / GLMaxTextureSize
+			     * GLMaxTextureSize;;
+		     tex_gx_beg += GLMaxTextureSize) {
+			int tex_gx_end = tex_gx_beg + GLMaxTextureSize;
+			int clip_gx_beg = std::max(gx_beg, tex_gx_beg);
+			int clip_gx_end = std::min(gx_end, tex_gx_end);
+			if (clip_gx_beg >= clip_gx_end)
+				break;
 
-			stx = (GLfloat)(sx2 - minw) / (maxw - minw);
-			sty = (GLfloat)(sy2 - minh) / (maxh - minh);
-			if (ex > maxw) {
-				ex2 = maxw;
+			// Flipping does not change which parts of the
+			// CGraphic get drawn.  It only changes where
+			// they get drawn.
+			int clip_sx_beg, clip_sx_end;
+			if (flip) {
+				clip_sx_beg = sx_beg + (gx_end - clip_gx_beg);
+				clip_sx_end = sx_beg + (gx_end - clip_gx_end);
 			} else {
-				ex2 = ex;
+				clip_sx_beg = sx_beg + (clip_gx_beg - gx_beg);
+				clip_sx_end = sx_beg + (clip_gx_end - gx_beg);
 			}
-			etx = (GLfloat)(ex2 - sx2);
-			if (maxw == g->GraphicWidth) {
-				stx *= g->TextureWidth;
-				etx = stx + etx / (maxw - minw) * g->TextureWidth;
-			} else {
-				etx = stx + (etx / GLMaxTextureSize);
-			}
-			if (ey > maxh) {
-				ey2 = maxh;
-			} else {
-				ey2 = ey;
-			}
-			ety = (GLfloat)(ey2 - sy2);
-			if (maxh == g->GraphicHeight) {
-				sty *= g->TextureHeight;
-				ety = sty + ety / (maxh - minh) * g->TextureHeight;
-			} else {
-				ety = sty + (ety / GLMaxTextureSize);
-			}
+			Assert(clip_sx_end != clip_sx_beg);
+			Assert(abs(clip_sx_end - clip_sx_beg) <= g->GraphicWidth);
 
-			texture = sy2 / GLMaxTextureSize * ((g->GraphicWidth - 1) / GLMaxTextureSize + 1) +
-				sx2 / GLMaxTextureSize;
+			GLfloat clip_tx_beg, clip_tx_end;
+			if (tex_gx_end >= g->GraphicWidth) {
+				// This is the last column of textures in
+				// the X direction.  These textures may
+				// be smaller than the ones at the left.
+				clip_tx_beg = (clip_gx_beg - tex_gx_beg)
+					* g->TextureWidth
+					/ (g->GraphicWidth - tex_gx_beg);
+				clip_tx_end = (clip_gx_end - tex_gx_beg)
+					* g->TextureWidth
+					/ (g->GraphicWidth - tex_gx_beg);
+			} else {
+				clip_tx_beg = (clip_gx_beg - tex_gx_beg)
+					/ GLfloat(GLMaxTextureSize);
+				clip_tx_end = (clip_gx_end - tex_gx_beg)
+					/ GLfloat(GLMaxTextureSize);
+			}
+			Assert(0.0f <= clip_tx_beg);
+			Assert(clip_tx_beg < clip_tx_end);
+			Assert(clip_tx_end <= 1.0f);
+			
+			int texture = tex_gy_beg / GLMaxTextureSize
+				* ((g->GraphicWidth - 1) / GLMaxTextureSize + 1)
+				+ tex_gx_beg / GLMaxTextureSize;
+			Assert(texture >= 0 && texture < g->NumTextures);
 
 			glBindTexture(GL_TEXTURE_2D, textures[texture]);
 			glBegin(GL_QUADS);
-			if (!flip) {
-				glTexCoord2f(stx, sty);
-				glVertex2i(x2, y2);
-				glTexCoord2f(stx, ety);
-				glVertex2i(x2, y2 + h);
-				glTexCoord2f(etx, ety);
-				glVertex2i(x2 + w, y2 + h);
-				glTexCoord2f(etx, sty);
-				glVertex2i(x2 + w, y2);
-			} else {
-				glTexCoord2f(stx, sty);
-				glVertex2i(x + (ex - sx) - (x2 - x), y2);
-				glTexCoord2f(stx, ety);
-				glVertex2i(x + (ex - sx) - (x2 - x), y2 + h);
-				glTexCoord2f(etx, ety);
-				glVertex2i(x + (ex - sx) - (x2 + w - x), y2 + h);
-				glTexCoord2f(etx, sty);
-				glVertex2i(x + (ex - sx) - (x2 + w - x), y2);
-			}
+			glTexCoord2f(clip_tx_beg, clip_ty_beg);
+			glVertex2i(clip_sx_beg, clip_sy_beg);
+			glTexCoord2f(clip_tx_beg, clip_ty_end);
+			glVertex2i(clip_sx_beg, clip_sy_end);
+			glTexCoord2f(clip_tx_end, clip_ty_end);
+			glVertex2i(clip_sx_end, clip_sy_end);
+			glTexCoord2f(clip_tx_end, clip_ty_beg);
+			glVertex2i(clip_sx_end, clip_sy_beg);
 			glEnd();
-
-			nextsx2 = (sx2 + GLMaxTextureSize) / GLMaxTextureSize * GLMaxTextureSize;
-			x2 += nextsx2 - sx2;
-			sx2 = nextsx2;
 		}
-
-		nextsy2 = (sy2 + GLMaxTextureSize) / GLMaxTextureSize * GLMaxTextureSize;
-		y2 += nextsy2 - sy2;
-		sy2 = nextsy2;
 	}
 }
 
