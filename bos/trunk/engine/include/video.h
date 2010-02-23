@@ -421,8 +421,9 @@ extern Uint32 ColorRed;
 extern Uint32 ColorGreen;
 extern Uint32 ColorYellow;
 
-void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
-	int ex, int ey, int x, int y, int flip);
+void DrawTexture(const CGraphic *g, GLuint *textures,
+	int gx_beg, int gy_beg, int gx_end, int gy_end,
+	int sx_beg, int sy_beg, int flip);
 
 #ifdef DEBUG
 extern void FreeGraphics();
