@@ -1,3 +1,6 @@
+function HandlePatchEditorIngameCommandKey(key, ctrl, alt, shift)
+  return false
+end
 
 function RunNewPatchMenu()
   local menu
@@ -44,6 +47,7 @@ function RunNewPatchMenu()
       end
 
       patchType(name, image, width, height, flags)
+      HandleCommandKey = HandlePatchEditorIngameCommandKey
       StartPatchEditor(name)
       menu:stop()
     end)
@@ -81,8 +85,9 @@ function RunLoadPatchMenu()
   menu:addButton(_("Load ~!Patch"), x, Video.Height - 140,
     function()
       name = names[nameDropDown:getSelected() + 1]
-
+      HandleCommandKey = HandlePatchEditorIngameCommandKey
       StartPatchEditor(name)
+      HandleCommandKey = HandleIngameCommandKey
       menu:stop()
     end)
   menu:addButton(_("~!Cancel"), x, Video.Height - 100,
