@@ -2,6 +2,8 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Make GLMaxTextureSize configurable for systems where the value reported
+  by OpenGL causes slow displays (Kalle Olavi Niemitalo)
 - Add the Go-East map (Michiel van der Wulp)
 - Added a new background image for the swindler campaign (Johannes Engelhardt, Francois Beerten)
 - Add the lava-river map (Michiel van der Wulp)
