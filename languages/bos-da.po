@@ -339,12 +339,12 @@ msgid "Save Map"
 msgstr "Gem kort"
 
 #: scripts/menus/ingame/editor.lua:78 scripts/menus/ingame/game.lua:91
-msgid "Save"
-msgstr "Gem"
+msgid "~!Save"
+msgstr "~!Gem"
 
 #: scripts/menus/ingame/editor.lua:87 scripts/menus/ingame/game.lua:112
-msgid "Cancel"
-msgstr "Fortryd"
+msgid "~!Cancel"
+msgstr "~!Fortryd"
 
 #: scripts/menus/ingame/editor.lua:99
 msgid "Map Properties"
@@ -1079,20 +1079,20 @@ msgid "Language Selection"
 msgstr "Sprog Valg"
 
 #: scripts/menus/options.lua:313
-msgid "Sound"
-msgstr "Lyd"
+msgid "~!Sound"
+msgstr "~!Lyd"
 
 #: scripts/menus/options.lua:314
-msgid "Video"
-msgstr "Video"
+msgid "~!Video"
+msgstr "~!Video"
 
 #: scripts/menus/options.lua:315
-msgid "Speed"
-msgstr "Hastighed"
+msgid "S~!peed"
+msgstr "~!Hastighed"
 
 #: scripts/menus/options.lua:316
-msgid "Language"
-msgstr "Sprog"
+msgid "~!Language"
+msgstr "~!Sprog"
 
 #: scripts/menus/options.lua:318
 msgid "~!Main menu"

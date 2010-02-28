@@ -342,12 +342,12 @@ msgid "Save Map"
 msgstr "Haritayı Kaydet"
 
 #: scripts/menus/ingame/editor.lua:78 scripts/menus/ingame/game.lua:91
-msgid "Save"
-msgstr "Kaydet"
+msgid "~!Save"
+msgstr "~!Kaydet"
 
 #: scripts/menus/ingame/editor.lua:87 scripts/menus/ingame/game.lua:112
-msgid "Cancel"
-msgstr "İptal et"
+msgid "~!Cancel"
+msgstr "~!İptal et"
 
 #: scripts/menus/ingame/editor.lua:99
 msgid "Map Properties"
@@ -1082,20 +1082,20 @@ msgid "Language Selection"
 msgstr "Dil Seçenekleri"
 
 #: scripts/menus/options.lua:313
-msgid "Sound"
-msgstr "Ses"
+msgid "~!Sound"
+msgstr "~!Ses"
 
 #: scripts/menus/options.lua:314
-msgid "Video"
-msgstr "Görüntü"
+msgid "~!Video"
+msgstr "~!Görüntü"
 
 #: scripts/menus/options.lua:315
-msgid "Speed"
-msgstr "Hız"
+msgid "S~!peed"
+msgstr "~!Hız"
 
 #: scripts/menus/options.lua:316
-msgid "Language"
-msgstr "Dil"
+msgid "~!Language"
+msgstr "~!Dil"
 
 #: scripts/menus/options.lua:318
 msgid "~!Main menu"

@@ -88,7 +88,7 @@ function RunSaveMenu()
   end
   browser:setActionCallback(cb)
 
-  menu:addSmallButton(_("Save"), 16, 248,
+  menu:addSmallButton(_("~!Save"), 16, 248,
     -- FIXME: use a confirm menu if the file exists already
     function()
       local name = t:getText()
@@ -109,7 +109,7 @@ function RunSaveMenu()
       menu:stop()
     end)
 
-  menu:addSmallButton(_("Cancel"), 16 + 12 + 106, 248,
+  menu:addSmallButton(_("~!Cancel"), 16 + 12 + 106, 248,
     function() menu:stop() end)
 
   menu:run(false)

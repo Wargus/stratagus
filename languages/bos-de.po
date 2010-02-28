@@ -341,12 +341,12 @@ msgid "Save Map"
 msgstr "Karte speichern"
 
 #: scripts/menus/ingame/editor.lua:78 scripts/menus/ingame/game.lua:91
-msgid "Save"
-msgstr "Speichern"
+msgid "~!Save"
+msgstr "~!Speichern"
 
 #: scripts/menus/ingame/editor.lua:87 scripts/menus/ingame/game.lua:112
-msgid "Cancel"
-msgstr "Abbrechen"
+msgid "~!Cancel"
+msgstr "~!Abbrechen"
 
 #: scripts/menus/ingame/editor.lua:99
 msgid "Map Properties"
@@ -1081,20 +1081,20 @@ msgid "Language Selection"
 msgstr "Sprachauswahl"
 
 #: scripts/menus/options.lua:313
-msgid "Sound"
-msgstr "Sound"
+msgid "~!Sound"
+msgstr "~!Sound"
 
 #: scripts/menus/options.lua:314
-msgid "Video"
-msgstr "Video"
+msgid "~!Video"
+msgstr "~!Video"
 
 #: scripts/menus/options.lua:315
-msgid "Speed"
-msgstr "Geschwindigkeit"
+msgid "S~!peed"
+msgstr "~!Geschwindigkeit"
 
 #: scripts/menus/options.lua:316
-msgid "Language"
-msgstr "Sprache"
+msgid "~!Language"
+msgstr "S~!prache"
 
 #: scripts/menus/options.lua:318
 msgid "~!Main menu"
