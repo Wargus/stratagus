@@ -74,6 +74,7 @@ function RunNewPatchMenu()
       patchType(name, image, width, height, flags)
       HandleCommandKey = HandlePatchEditorIngameCommandKey
       StartPatchEditor(name)
+      HandleCommandKey = HandleIngameCommandKey
       menu:stop()
     end)
   menu:addButton(_("~!Cancel"), x, Video.Height - 100,
