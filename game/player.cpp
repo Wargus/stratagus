@@ -836,7 +836,7 @@ void GraphicPlayerPixels(CPlayer *player, const CGraphic *sprite)
 
 	// Skip units whose color palette does not cover the indexes
 	// for the player color.
-	if (ncolors < PlayerColorIndexStart + PlayerColorIndexCount) {
+	if (sprite->Surface->format->palette->ncolors < PlayerColorIndexStart + PlayerColorIndexCount) {
 		return;
 	}
 
