@@ -187,8 +187,19 @@ static void SaveOrderData(const CUnit *unit, CFile *file)
 {
 	int i;
 
+	// If the unit has not yet begun executing this order, then
+	// unit->Data can still contain data from the previous order.
+	// Do not attempt to save the data in that case, because
+	// integers in it may be out of range, and pointers in it can
+	// point to invalid addresses.
+	if (unit->SubAction == 0)
+		return;
+	
 	switch (unit->Orders[0]->Action) {
+		case UnitActionNone:
 		case UnitActionStill:
+		case UnitActionStandGround:
+		case UnitActionDie:
 			break;
 		case UnitActionBuilt:
 			{
@@ -221,6 +232,9 @@ static void SaveOrderData(const CUnit *unit, CFile *file)
 			file->printf("}");
 			break;
 		case UnitActionResource:
+			/// @bug Should save unit->Data.Move instead,
+			/// if unit->SubAction == SUB_MOVE_TO_RESOURCE.
+			/// However, that macro is not visible here.
 			file->printf(",\n  \"data-harvest\", {");
 			file->printf("\"current-production\", {");
 			for (i = 0; i < MaxCosts; ++i) {
@@ -228,12 +242,23 @@ static void SaveOrderData(const CUnit *unit, CFile *file)
 			}
 			file->printf("}}");
 			break;
-		default:
+		case UnitActionFollow:
+		case UnitActionMove:
+		case UnitActionAttack:
+		case UnitActionAttackGround:
+		case UnitActionSpellCast:
+		case UnitActionBoard:
+		case UnitActionUnload:
+		case UnitActionPatrol:
+		case UnitActionBuild:
+		case UnitActionRepair:
 			file->printf(",\n  \"data-move\", {");
 			if (unit->Data.Move.Fast) {
 				file->printf("\"fast\", ");
 			}
 			if (unit->Data.Move.Length > 0) {
+				Assert(unit->Data.Move.Length <= MAX_PATH_LENGTH);
+
 				file->printf("\"path\", {");
 				for (i = 0; i < unit->Data.Move.Length; ++i) {
 					file->printf("%d, ", unit->Data.Move.Path[i]);
@@ -242,6 +267,8 @@ static void SaveOrderData(const CUnit *unit, CFile *file)
 			}
 			file->printf("}");
 			break;
+		default:
+			DebugPrint("Unknown action in order\n");
 	}
 }
 

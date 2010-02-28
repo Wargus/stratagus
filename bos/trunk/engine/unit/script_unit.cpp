@@ -384,6 +384,17 @@ static void CclParseMove(lua_State *l, CUnit *unit)
 	int args;
 	int j;
 
+	// Bos Wars 2.5 used to save unit->Data.Move as "data-move"
+	// even for UnitActionDie, which doesn't actually use
+	// unit->Data.Move at all and leaves it uninitialized.
+	// This could cause out-of-range values in save files.
+	// To work around the bug and allow loading such files,
+	// ignore "data-move" when the unit is already dying.
+	if (!unit->Orders.empty()
+	    && unit->Orders[0]->Action == UnitActionDie) {
+		return;
+	}
+
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
@@ -405,6 +416,10 @@ static void CclParseMove(lua_State *l, CUnit *unit)
 				LuaError(l, "incorrect argument");
 			}
 			subargs = lua_objlen(l, -1);
+			if (subargs > MAX_PATH_LENGTH) {
+				// unit->Data.Move.Path[] would overflow.
+				LuaError(l, "path data is too long");
+			}
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				unit->Data.Move.Path[k] = LuaToNumber(l, -1);
