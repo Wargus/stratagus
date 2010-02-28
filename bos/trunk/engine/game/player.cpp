@@ -9,7 +9,7 @@
 //
 /**@name player.cpp - The players. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2010 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -834,10 +834,19 @@ void GraphicPlayerPixels(CPlayer *player, const CGraphic *sprite)
 {
 	Assert(PlayerColorIndexCount);
 
+	// Skip units whose color palette does not cover the indexes
+	// for the player color.
+	if (ncolors < PlayerColorIndexStart + PlayerColorIndexCount) {
+		return;
+	}
+
 	SDL_LockSurface(sprite->Surface);
 	SDL_SetColors(sprite->Surface, player->UnitColors.Colors,
 		PlayerColorIndexStart, PlayerColorIndexCount);
 	if (sprite->SurfaceFlip) {
+		// The flipped surface is supposed to have a similar palette.
+		Assert(sprite->SurfaceFlip->format->palette->ncolors
+		       == sprite->Surface->format->palette->ncolors);
 		SDL_SetColors(sprite->SurfaceFlip,
 			player->UnitColors.Colors, PlayerColorIndexStart, PlayerColorIndexCount);
 	}
