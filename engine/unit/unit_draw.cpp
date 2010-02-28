@@ -935,10 +935,30 @@ int FindAndSortUnits(const CViewport *vp, CUnit **table, int tablesize)
 	int n = UnitCache.Select(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
 		vp->MapY + vp->MapHeight + 1, table, tablesize);
 
+	// If only one unit is selected, then draw that one even if it
+	// is not in the viewport, as long as the player is entitled
+	// to see it.  This is because the sight, react, and attack
+	// circles drawn by DrawInformations may still reach the
+	// viewport.
+	CUnit *addToTable = NULL;
+	if (NumSelected == 1
+	    && ((ThisPlayer != NULL && Selected[0]->IsVisible(ThisPlayer))
+		|| ReplayRevealMap)) {
+		addToTable = Selected[0];
+	}
+
 	for (int i = 0; i < n; ++i) {
 		if (!table[i]->IsVisibleInViewport(vp)) {
 			table[i--] = table[--n];
+		} else if (table[i] == addToTable) {
+			// The unit is already in the table and need
+			// not be added.
+			addToTable = NULL;
 		}
+	}
+
+	if (addToTable != NULL && n < tablesize) {
+		table[n++] = addToTable;
 	}
 
 	if (n) {
