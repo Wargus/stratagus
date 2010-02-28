@@ -9,7 +9,7 @@
 --
 --      guichan.lua - The main UI lua script.
 --
---      (c) Copyright 2005-2009 by François Beerten
+--      (c) Copyright 2005-2010 by François Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -435,8 +435,8 @@ function GameStarting()
   Cheater = false
 
   -- FIXME: get the version from somewhere else
-  UI.StatusLine:Set("Bos Wars V" .. "2.5.0" ..
-    ", (c) 1998-2008 by the Bos Wars and Stratagus Project.")
+  UI.StatusLine:Set("Bos Wars V" .. "2.6.0 Alpha" ..
+    ", (c) 1998-2010 by the Bos Wars and Stratagus Project.")
 end
 
 
