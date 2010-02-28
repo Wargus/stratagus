@@ -196,9 +196,16 @@ if (preferences == nil) then
   }
 end
 
+-- If the user's preferences.lua does not yet have this setting,
+-- then add it, to make it easier to discover.
+if (preferences.MaxOpenGLTexture == nil) then
+   preferences.MaxOpenGLTexture = 0
+end
+
 UseOpenGL = preferences.UseOpenGL
 SetVideoResolution(preferences.VideoWidth, preferences.VideoHeight)
 SetVideoFullScreen(preferences.VideoFullScreen)
+SetMaxOpenGLTexture(preferences.MaxOpenGLTexture)
 SetLocalPlayerName(preferences.PlayerName)
 SetFogOfWar(preferences.FogOfWar)
 UI.ButtonPanel.ShowCommandKey = preferences.ShowCommandKey
