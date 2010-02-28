@@ -20,7 +20,7 @@ msgstr ""
 
 #: scripts/boswars.lua:231
 msgid "Eliminate your enemies."
-msgstr "Éléminer vos ennemis."
+msgstr "Éliminer vos ennemis."
 
 #: scripts/guichan.lua:324
 msgid "Empty sub menu"
@@ -40,7 +40,7 @@ msgstr "Défaite !"
 
 #: scripts/guichan.lua:348
 msgid "Cheater"
-msgstr ""
+msgstr "Tricheur"
 
 #: scripts/guichan.lua:351
 msgid "Results"
@@ -131,7 +131,7 @@ msgstr "normal"
 #: scripts/guichan.lua:492 scripts/menus/network.lua:148
 #: scripts/menus/network.lua:343
 msgid "hard"
-msgstr "dur"
+msgstr "difficile"
 
 #: scripts/guichan.lua:495 scripts/menus/network.lua:151
 #: scripts/menus/network.lua:350
@@ -181,7 +181,7 @@ msgstr "Droite contre gauche"
 #: scripts/guichan.lua:500 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Man vs Machine"
-msgstr "Humains contre l'ordinnateur"
+msgstr "Humains contre l'ordinateur"
 
 #: scripts/guichan.lua:532 scripts/guichan.lua:564 scripts/guichan.lua:608
 #: scripts/guichan.lua:676 scripts/guichan.lua:728
@@ -196,7 +196,7 @@ msgstr "~!Démarrer"
 
 #: scripts/guichan.lua:543
 msgid "Show a Replay"
-msgstr "Montrer un enregistrement"
+msgstr "Montrer un replay"
 
 #: scripts/guichan.lua:577
 msgid "Load Game"
@@ -208,7 +208,7 @@ msgstr "Éditeur"
 
 #: scripts/guichan.lua:623
 msgid "Create ~!New Map"
-msgstr "Créer une nouvelle carte"
+msgstr "Créer une ~!nouvelle carte"
 
 #: scripts/guichan.lua:625
 msgid "~!Load Map"
@@ -232,7 +232,7 @@ msgstr "~!Démarrer la partie"
 
 #: scripts/guichan.lua:751
 msgid "~!Load Game"
-msgstr "~!Charger une partie"
+msgstr "Charger une ~!partie"
 
 #: scripts/guichan.lua:752
 msgid "~!Campaigns"
@@ -240,7 +240,7 @@ msgstr "~!Campagnes"
 
 #: scripts/guichan.lua:753
 msgid "Show ~!Replay"
-msgstr "~!Montrer un enregistrement"
+msgstr "Mo~!ntrer un replay"
 
 #: scripts/guichan.lua:755
 msgid "~!MultiPlayer"
@@ -252,7 +252,7 @@ msgstr "~!Options"
 
 #: scripts/guichan.lua:758
 msgid "Cre~!dits"
-msgstr "~!Crédits"
+msgstr "C~!rédits"
 
 #: scripts/guichan.lua:761
 msgid "E~!xit"
@@ -272,7 +272,7 @@ msgstr "Liste des campagnes"
 
 #: scripts/menus/credits.lua:36
 msgid "Graphics:"
-msgstr "Graphiques :"
+msgstr "Graphismes :"
 
 #: scripts/menus/credits.lua:43
 msgid "Scripting:"
@@ -308,15 +308,15 @@ msgstr "tout ceux qui ont contribué"
 
 #: scripts/menus/credits.lua:128
 msgid "patches, bug reports, ideas."
-msgstr "patchs, rapport de bgues, idées."
+msgstr "patchs, rapport de bogues, idées."
 
 #: scripts/menus/credits.lua:131
 msgid "Bos Wars Credits"
-msgstr "Bos Wars: Crédits"
+msgstr "Bos Wars : crédits"
 
 #: scripts/menus/ingame/editor.lua:49
 msgid "Editor Menu"
-msgstr "Menu Éditeur"
+msgstr "Menu éditeur"
 
 #: scripts/menus/ingame/editor.lua:50 scripts/menus/ingame/game.lua:58
 msgid "Save (~<F11~>)"
@@ -324,35 +324,35 @@ msgstr "Sauver (~<F11~>)"
 
 #: scripts/menus/ingame/editor.lua:52
 msgid "Map Properties (~<F5~>)"
-msgstr "Propriétés de la Carte (~<F5~>)"
+msgstr "Propriétés de la carte (~<F5~>)"
 
 #: scripts/menus/ingame/editor.lua:54
 msgid "Player Properties (~<F6~>)"
-msgstr "Propriétés du Joueur (~<F6~>)"
+msgstr "Propriétés du joueur (~<F6~>)"
 
 #: scripts/menus/ingame/editor.lua:57
 msgid "~!Exit to menu"
-msgstr "~!Quitter vers le Menu"
+msgstr "~!Quitter vers le menu"
 
 #: scripts/menus/ingame/editor.lua:59
 msgid "Return to the Editor (~<Esc~>)"
-msgstr "Retourner à l'Éditeur (~<Echap~>)"
+msgstr "Retourner à l'éditeur (~<Echap~>)"
 
 #: scripts/menus/ingame/editor.lua:68
 msgid "Save Map"
-msgstr "Sauver la Carte"
+msgstr "Sauver la carte"
 
 #: scripts/menus/ingame/editor.lua:78 scripts/menus/ingame/game.lua:91
-msgid "Save"
-msgstr "Sauver"
+msgid "~!Save"
+msgstr "~!Sauver"
 
 #: scripts/menus/ingame/editor.lua:87 scripts/menus/ingame/game.lua:112
-msgid "Cancel"
-msgstr "Annuler"
+msgid "~!Cancel"
+msgstr "~!Annuler"
 
 #: scripts/menus/ingame/editor.lua:99
 msgid "Map Properties"
-msgstr "Propriétés de la Carte"
+msgstr "Propriétés de la carte"
 
 #: scripts/menus/ingame/editor.lua:101
 msgid "Map Description:"
@@ -369,7 +369,7 @@ msgstr "~!OK"
 
 #: scripts/menus/ingame/editor.lua:140
 msgid "Player Properties"
-msgstr "Propriétés de la Carte"
+msgstr "Propriétés de la carte"
 
 #: scripts/menus/ingame/editor.lua:149
 msgid "Type"
@@ -385,11 +385,11 @@ msgstr "Ordinateur"
 
 #: scripts/menus/ingame/editor.lua:154
 msgid "Rescue (Passive)"
-msgstr "Renfort (Passif)"
+msgstr "Renfort (passif)"
 
 #: scripts/menus/ingame/editor.lua:155
 msgid "Rescue (Active)"
-msgstr "Renfort (Actif)"
+msgstr "Renfort (actif)"
 
 #: scripts/menus/ingame/editor.lua:155
 msgid "Neutral"
@@ -413,7 +413,7 @@ msgstr "Magma"
 
 #: scripts/menus/ingame/game.lua:57
 msgid "Game Menu"
-msgstr "Menu de la Partie"
+msgstr "Menu de la partie"
 
 #: scripts/menus/ingame/game.lua:63
 msgid "Options (~<F5~>)"
@@ -429,23 +429,23 @@ msgstr "~!Objectifs"
 
 #: scripts/menus/ingame/game.lua:69
 msgid "~!End Game"
-msgstr "~!Quitter la Partie"
+msgstr "~!Quitter la partie"
 
 #: scripts/menus/ingame/game.lua:71
 msgid "Return to Game (~<Esc~>)"
-msgstr "Retourner à la Partie (~<Echap~>)"
+msgstr "Retourner à la partie (~<Echap~>)"
 
 #: scripts/menus/ingame/game.lua:80
 msgid "Save Game"
-msgstr "Démarrer la Partie"
+msgstr "Sauver la partie"
 
 #: scripts/menus/ingame/game.lua:121 scripts/menus/options.lua:157
 msgid "Sound Options"
-msgstr "Options Sons"
+msgstr "Options sons"
 
 #: scripts/menus/ingame/game.lua:130 scripts/menus/ingame/game.lua:146
 msgid "Game Options"
-msgstr "Options de Jeu"
+msgstr "Options de jeu"
 
 #: scripts/menus/ingame/game.lua:131
 msgid "Sound (~<F7~>)"
@@ -457,7 +457,7 @@ msgstr "Partie (~<F9~>)"
 
 #: scripts/menus/ingame/game.lua:135
 msgid "~!Diplomacy"
-msgstr "~!Diplomacie"
+msgstr "~!Diplomatie"
 
 #: scripts/menus/ingame/game.lua:137 scripts/menus/ingame/game.lua:339
 #: scripts/menus/ingame/game.lua:379 scripts/menus/ingame/game.lua:459
@@ -466,7 +466,7 @@ msgstr "Précédent (~<Echap~>)"
 
 #: scripts/menus/ingame/game.lua:149
 msgid "Fog of War Enabled"
-msgstr "Brouillard de Guerre Activé"
+msgstr "Brouillard de guerre activé"
 
 #: scripts/menus/ingame/game.lua:157
 msgid "Show command key"
@@ -486,7 +486,7 @@ msgstr "rapide"
 
 #: scripts/menus/ingame/game.lua:198
 msgid "Diplomacy"
-msgstr "Diplomacie"
+msgstr "Diplomatie"
 
 #: scripts/menus/ingame/game.lua:200
 msgid "Allied"
@@ -542,7 +542,7 @@ msgstr "Êtes-vous sûr de vouloir de sortir de Bos Wars?"
 
 #: scripts/menus/ingame/game.lua:363
 msgid "E~!xit Program"
-msgstr "Quitter le ~!Programme"
+msgstr "Quitter le ~!programme"
 
 #: scripts/menus/ingame/game.lua:374
 msgid "Help Menu"
@@ -550,11 +550,11 @@ msgstr "Menu d'Aide"
 
 #: scripts/menus/ingame/game.lua:375
 msgid "Keystroke ~!Help"
-msgstr "Aide pour les ~!Raccourcis"
+msgstr "Aide pour les ~!raccourcis"
 
 #: scripts/menus/ingame/game.lua:377
 msgid "Bos Wars ~!Tips"
-msgstr "Bos Wars Astuces"
+msgstr "~!Astuces Bos Wars"
 
 #: scripts/menus/ingame/game.lua:386
 msgid "Alt-F"
@@ -563,7 +563,7 @@ msgstr ""
 #: scripts/menus/ingame/game.lua:386
 #, fuzzy
 msgid "- toggle full screen"
-msgstr "Plein Écran"
+msgstr "Plein écran"
 
 #: scripts/menus/ingame/game.lua:387
 msgid "Alt-G"
@@ -579,7 +579,7 @@ msgstr ""
 
 #: scripts/menus/ingame/game.lua:388
 msgid "- mute sound"
-msgstr ""
+msgstr "Couper les effets sonores"
 
 #: scripts/menus/ingame/game.lua:389
 msgid "Ctrl-M"
@@ -587,7 +587,7 @@ msgstr ""
 
 #: scripts/menus/ingame/game.lua:389
 msgid "- mute music"
-msgstr ""
+msgstr "Couper la musique"
 
 #: scripts/menus/ingame/game.lua:390
 msgid "+"
@@ -595,7 +595,7 @@ msgstr ""
 
 #: scripts/menus/ingame/game.lua:390
 msgid "- increase game speed"
-msgstr ""
+msgstr "Augmenter la vitesse du jeu"
 
 #: scripts/menus/ingame/game.lua:391
 msgid "-"
@@ -603,7 +603,7 @@ msgstr ""
 
 #: scripts/menus/ingame/game.lua:391
 msgid "- decrease game speed"
-msgstr ""
+msgstr "Diminuer la vitesse du jeu"
 
 #: scripts/menus/ingame/game.lua:392
 msgid "Ctrl-P"
@@ -611,7 +611,7 @@ msgstr ""
 
 #: scripts/menus/ingame/game.lua:392 scripts/menus/ingame/game.lua:393
 msgid "- pause game"
-msgstr ""
+msgstr "Pause"
 
 #: scripts/menus/ingame/game.lua:393
 msgid "PAUSE"
@@ -623,7 +623,7 @@ msgstr ""
 
 #: scripts/menus/ingame/game.lua:394
 msgid "- make screen shot"
-msgstr ""
+msgstr "Faire une capture d'écran"
 
 #: scripts/menus/ingame/game.lua:395
 msgid "Alt-H"
@@ -632,7 +632,7 @@ msgstr ""
 #: scripts/menus/ingame/game.lua:395
 #, fuzzy
 msgid "- help menu"
-msgstr "Menu d'Aide"
+msgstr "Menu d'aide"
 
 #: scripts/menus/ingame/game.lua:396
 msgid "Alt-R"
@@ -641,7 +641,7 @@ msgstr ""
 #: scripts/menus/ingame/game.lua:396
 #, fuzzy
 msgid "- restart game"
-msgstr "~!Redémarrer la partie"
+msgstr "Redémarrer la partie"
 
 #: scripts/menus/ingame/game.lua:397
 msgid "Alt-Q"
@@ -650,7 +650,7 @@ msgstr ""
 #: scripts/menus/ingame/game.lua:397
 #, fuzzy
 msgid "- quit to main menu"
-msgstr "~!Quitter vers le Menu"
+msgstr "Quitter vers le Menu"
 
 #: scripts/menus/ingame/game.lua:398
 msgid "Alt-X"
@@ -658,7 +658,7 @@ msgstr ""
 
 #: scripts/menus/ingame/game.lua:398
 msgid "- quit game"
-msgstr ""
+msgstr "Quitter le jeu"
 
 #: scripts/menus/ingame/game.lua:399
 msgid "Alt-B"
@@ -675,7 +675,7 @@ msgstr ""
 #: scripts/menus/ingame/game.lua:400 scripts/menus/ingame/game.lua:421
 #, fuzzy
 msgid "- game menu"
-msgstr "Menu de la Partie"
+msgstr "Menu de la partie"
 
 #: scripts/menus/ingame/game.lua:401
 msgid "ENTER"
@@ -683,7 +683,7 @@ msgstr ""
 
 #: scripts/menus/ingame/game.lua:401
 msgid "- write a message"
-msgstr ""
+msgstr "Ecrire un message"
 
 #: scripts/menus/ingame/game.lua:402
 msgid "SPACE"
@@ -838,7 +838,7 @@ msgstr ""
 
 #: scripts/menus/ingame/game.lua:420
 msgid "- preferences"
-msgstr ""
+msgstr "Préférences"
 
 #: scripts/menus/ingame/game.lua:421
 msgid "F10"
@@ -851,7 +851,7 @@ msgstr ""
 #: scripts/menus/ingame/game.lua:422
 #, fuzzy
 msgid "- save game"
-msgstr "Démarrer la Partie"
+msgstr "Sauver la partie"
 
 #: scripts/menus/ingame/game.lua:423
 msgid "F12"
@@ -864,8 +864,7 @@ msgstr "Charger une partie"
 
 #: scripts/menus/ingame/game.lua:458
 msgid "Keystroke Help Menu"
-msgstr "Menu d'Aide des Raccourcis"
-
+msgstr "Menu d'aide des raccourcis"
 #: scripts/menus/ingame/game.lua:466
 msgid ""
 "You can select all of your currently visible units of the same type by "
@@ -881,16 +880,16 @@ msgstr ""
 
 #: scripts/menus/ingame/game.lua:469
 msgid "Use your engineers to repair damaged buildings."
-msgstr ""
+msgstr "Utilisez vos ingénieurs (engineers) pour réparer les bâtiments endommagés."
 
 #: scripts/menus/ingame/game.lua:470
 #, fuzzy
 msgid "Explore your surroundings early in the game."
-msgstr "Êtes-vous sûr de vouloir redémarrer la partie ?"
+msgstr "Explorez les alentours tôt dans la partie."
 
 #: scripts/menus/ingame/game.lua:473
 msgid "Keep all engineers working. Use ALT-I to find idle engineers."
-msgstr ""
+msgstr "Faites travailler tous vos ingénieurs (engineers). Utilisez ALT-I pour trouver les ingénieurs inoccupés."
 
 #: scripts/menus/ingame/game.lua:474
 msgid ""
@@ -935,7 +934,7 @@ msgstr ""
 
 #: scripts/menus/ingame/game.lua:496
 msgid "Bos Wars Tips"
-msgstr "Bos Wars Astuces"
+msgstr "Astuces Bos Wars"
 
 #: scripts/menus/ingame/game.lua:527
 msgid "Show tips at startup"
@@ -943,11 +942,11 @@ msgstr "Montrer les conseils au démarrage"
 
 #: scripts/menus/ingame/game.lua:535
 msgid "~!Previous Tip"
-msgstr "Conseil ~!Précédent"
+msgstr "~!Précédent"
 
 #: scripts/menus/ingame/game.lua:537
 msgid "~!Next Tip"
-msgstr "Conseil ~!Suivant"
+msgstr "~!Suivant"
 
 #: scripts/menus/ingame/game.lua:549
 msgid "Objectives"
@@ -1012,11 +1011,11 @@ msgstr "~!Joindre une partie"
 
 #: scripts/menus/network.lua:293
 msgid "Invalid server name"
-msgstr "Nom du serveur invalid"
+msgstr "Nom du serveur non valide"
 
 #: scripts/menus/network.lua:316 scripts/menus/network.lua:417
 msgid "Create MultiPlayer game"
-msgstr "Crer une partie multi-joueurs"
+msgstr "Créer une partie multi-joueurs"
 
 #: scripts/menus/network.lua:397
 msgid "Waiting for players"
@@ -1048,7 +1047,7 @@ msgstr "Options Vitesse"
 
 #: scripts/menus/options.lua:77
 msgid "Effects Volume"
-msgstr "Volume des Effets"
+msgstr "Volume des effets"
 
 #: scripts/menus/options.lua:93 scripts/menus/options.lua:125
 msgid "min"
@@ -1064,43 +1063,43 @@ msgstr "Actif"
 
 #: scripts/menus/options.lua:109
 msgid "Music Volume"
-msgstr "Volume de la Musique"
+msgstr "Volume de la musique"
 
 #: scripts/menus/options.lua:224
 msgid "Fullscreen"
-msgstr "Plein Écran"
+msgstr "Plein écran"
 
 #: scripts/menus/options.lua:232
 msgid "Use OpenGL (restart required)"
-msgstr ""
+msgstr "Utiliser OpenGL (redémarrage nécessaire)"
 
 #: scripts/menus/options.lua:245
 msgid "Video Options"
-msgstr "Options Vidéo"
+msgstr "Options vidéo"
 
 #: scripts/menus/options.lua:263
 msgid "Language Selection"
 msgstr "Choix de la Langue"
 
 #: scripts/menus/options.lua:313
-msgid "Sound"
-msgstr "Son"
+msgid "~!Sound"
+msgstr "~!Son"
 
 #: scripts/menus/options.lua:314
-msgid "Video"
-msgstr "Vidéo"
+msgid "~!Video"
+msgstr "~!Vidéo"
 
 #: scripts/menus/options.lua:315
-msgid "Speed"
-msgstr "Vitesse"
+msgid "S~!peed"
+msgstr "V~!itesse"
 
 #: scripts/menus/options.lua:316
-msgid "Language"
-msgstr "Langue"
+msgid "~!Language"
+msgstr "~!Langue"
 
 #: scripts/menus/options.lua:318
 msgid "~!Main menu"
-msgstr "~!Menu Principal"
+msgstr "~!Menu principal"
 
 #: scripts/menus/options.lua:326
 msgid "Options"
