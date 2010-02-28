@@ -242,15 +242,15 @@ msgstr "Capture d'écran sauvegardé."
 
 #: ui/mainscr.cpp:171
 msgid "Armor: "
-msgstr ""
+msgstr "Armure:"
 
 #: ui/mainscr.cpp:177
 msgid "Radar Range: "
-msgstr ""
+msgstr "Portée du radar:"
 
 #: ui/mainscr.cpp:182
 msgid "Sight Range: "
-msgstr ""
+msgstr "Vision:"
 
 #: ui/mainscr.cpp:189
 msgid "Kills: "
@@ -258,11 +258,11 @@ msgstr ""
 
 #: ui/mainscr.cpp:194
 msgid "Attack Range: "
-msgstr ""
+msgstr "Portée:"
 
 #: ui/mainscr.cpp:201
 msgid "Damage: "
-msgstr ""
+msgstr "Dégât:"
 
 #: ui/mainscr.cpp:206
 msgid "Mana: "
