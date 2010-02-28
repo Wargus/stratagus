@@ -331,6 +331,8 @@ extern SDL_Surface *TheScreen;
 
 	/// Max texture size supported on the video card
 extern GLint GLMaxTextureSize;
+	/// User-specified limit for ::GLMaxTextureSize
+extern GLint GLMaxTextureSizeOverride;
 	/// Is OpenGL texture compression supported
 extern bool GLTextureCompressionSupported;
 	/// Use OpenGL texture compression
