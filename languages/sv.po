@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-02-02 15:52-0800\n"
-"PO-Revision-Date: 2007-09-10 22:18+0200\n"
+"PO-Revision-Date: 2008-02-03 21:11+0100\n"
 "Last-Translator: Olov Gustavsson <olov.gustavsson@bredband.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -241,31 +241,31 @@ msgstr "Skärmbild skapad."
 
 #: ui/mainscr.cpp:171
 msgid "Armor: "
-msgstr ""
+msgstr "Skydd:"
 
 #: ui/mainscr.cpp:177
 msgid "Radar Range: "
-msgstr ""
+msgstr "Radarsikt:"
 
 #: ui/mainscr.cpp:182
 msgid "Sight Range: "
-msgstr ""
+msgstr "Sikt:"
 
 #: ui/mainscr.cpp:189
 msgid "Kills: "
-msgstr ""
+msgstr "Dödade:"
 
 #: ui/mainscr.cpp:194
 msgid "Attack Range: "
-msgstr ""
+msgstr "Räckvidd:"
 
 #: ui/mainscr.cpp:201
 msgid "Damage: "
-msgstr ""
+msgstr "Styrka:"
 
 #: ui/mainscr.cpp:206
 msgid "Mana: "
-msgstr ""
+msgstr "Manna:"
 
 #: ui/mainscr.cpp:376
 msgid "Energy"
@@ -302,7 +302,7 @@ msgstr "%s attackerad"
 
 #: video/sdl.cpp:268
 msgid "esc"
-msgstr ""
+msgstr "esc"
 
 #~ msgid "~!OK"
 #~ msgstr "~!OK"
