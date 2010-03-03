@@ -296,8 +296,8 @@ msgstr "Sie haben ~<%d~> %ss"
 
 #: ui/mouse.cpp:1778
 #, c-format
-msgid "You have ~<%d~> %s(s)"
-msgstr "Sie haben ~<%d~> %s(s)"
+msgid "You have ~<1~> %s"
+msgstr "Sie haben ~<1~> %s"
 
 #: unit/unit.cpp:2117
 #, c-format
