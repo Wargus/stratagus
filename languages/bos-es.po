@@ -917,7 +917,7 @@ msgid ""
 "You can give way points, if you press the SHIFT key, while you click right "
 "for the move command."
 msgstr ""
-Puedes dar puntos por los cuales la(s) unidad(es) van a pasar 
+"Puedes dar puntos por los cuales la(s) unidad(es) van a pasar "
 "si mantienes presionada la tecla SHIFT, mientras das un clic derecho "
 "para ejecutar la orden de movimiento."
 
