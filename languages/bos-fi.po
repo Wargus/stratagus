@@ -352,10 +352,6 @@ msgstr "Tallenna kartta"
 msgid "~!Save"
 msgstr "~!Tallenna"
 
-#: scripts/menus/ingame/editor.lua:87 scripts/menus/ingame/game.lua:112
-msgid "~!Cancel"
-msgstr "~!Peruuta"
-
 #: scripts/menus/ingame/editor.lua:99
 msgid "Map Properties"
 msgstr "Kartan ominaisuudet"
