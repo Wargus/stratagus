@@ -1264,11 +1264,6 @@ void CUnit::ChangeOwner(CPlayer *newplayer)
 	//
 	//  Must change food/gold and other.
 	//
-	if (oldplayer->UnitsConsumingResourcesRequested.count(this) != 0) {
-		newplayer->AddToUnitsConsumingResources(
-			this, oldplayer->UnitsConsumingResourcesRequested[this]);
-		oldplayer->RemoveFromUnitsConsumingResources(this);
-	}
 	UnitLost(this);
 
 	//
