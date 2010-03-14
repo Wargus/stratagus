@@ -89,7 +89,6 @@ DefineUnitType("unit-magmapump", {
     Corpse = "build-dead-magmapump",
     Type = "land",
     Building = true,
-    BuilderOutside = true,
     VisibleUnderFog = true,
     MagmaProductionRate = 12,
     BuildingRules = {{"ontop",

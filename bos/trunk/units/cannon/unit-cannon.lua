@@ -109,7 +109,6 @@ DefineUnitType("unit-cannon", {
     Corpse = "build-dead-cannon",
     Type = "land",
     Building = true,
-    BuilderOutside = true,
     VisibleUnderFog = true,
     CanHarvestFrom = true,
     Sounds = {

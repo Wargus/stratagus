@@ -84,7 +84,6 @@ DefineUnitType("unit-hosp", {
     Corpse = "build-dead-hosp",
     Type = "land",
     Building = true,
-    BuilderOutside = true,
     VisibleUnderFog = true,
     MaxEnergyUtilizationRate = 20,
     MaxMagmaUtilizationRate = 10,

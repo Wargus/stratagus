@@ -86,7 +86,6 @@ DefineUnitType("unit-nukepowerplant", {
     Corpse = "build-dead-nukepowerplant",
     Type = "land",
     Building = true,
-    BuilderOutside = true,
     VisibleUnderFog = true,
     CanHarvestFrom = true,
     Sounds = {

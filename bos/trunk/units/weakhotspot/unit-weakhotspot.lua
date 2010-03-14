@@ -71,7 +71,6 @@ DefineUnitType("unit-weakhotspot", {
     Corpse = "unit-destroyed-1x1-place",
     Type = "land",
     Building = true,
-    BuilderOutside = true,
     VisibleUnderFog = true,
     Neutral = true,
     NumDirections = 1,

@@ -88,7 +88,6 @@ DefineUnitType("unit-camp", {
     Corpse = "build-dead-camp",
     Type = "land",
     Building = true,
-    BuilderOutside = true,
     VisibleUnderFog = true,
     MaxEnergyUtilizationRate = 40,
     MaxMagmaUtilizationRate = 20,

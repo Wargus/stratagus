@@ -85,7 +85,6 @@ DefineUnitType("unit-radar", {
     Corpse = "radar_destroyed",
     Type = "land",
     Building = true,
-    BuilderOutside = true,
     VisibleUnderFog = true,
     NumDirections = 1,
     RadarRange = 40,

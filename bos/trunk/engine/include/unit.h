@@ -647,7 +647,6 @@ public:
 		char Path[MAX_PATH_LENGTH]; /// directions of stored path
 	} Move; /// ActionMove,...
 	struct _order_built_ {
-		CUnit *Worker;              /// Worker building this unit
 		int Progress;               /// Progress counter, in 1/100 cycles.
 		int Cancel;                 /// Cancel construction
 		CConstructionFrame *Frame;  /// Construction frame

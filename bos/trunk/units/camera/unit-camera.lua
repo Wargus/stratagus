@@ -99,7 +99,6 @@ DefineUnitType("unit-cam", {
     Corpse = "camera_destroyed",
     Type = "land",
     Building = true,
-    BuilderOutside = true,
     VisibleUnderFog = true,
     CanHarvestFrom = true,
     Sounds = {"selected", "camera-selected",

@@ -84,7 +84,6 @@ DefineUnitType("unit-msilo", {
     MaxMana = 1000,
     CanCastSpell = {"spell-nuke"},
     Building = true,
-    BuilderOutside = true,
     VisibleUnderFog = true,
     CanHarvestFrom = true,
 })

@@ -88,7 +88,6 @@ DefineUnitType("unit-vault", {
     Corpse = "build-dead-vault",
     Type = "land",
     Building = true,
-    BuilderOutside = true,
     VisibleUnderFog = true,
     EnergyStorageCapacity = 10000,
     MagmaStorageCapacity = 2000,

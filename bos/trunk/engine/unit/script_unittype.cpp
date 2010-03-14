@@ -548,10 +548,6 @@ static int CclDefineUnitType(lua_State *l)
 				ParseBuildingRules(l, type->BuildingRules);
 				lua_pop(l, 1);
 			}
-		} else if (!strcmp(value, "BuilderOutside")) {
-			type->BuilderOutside = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "BuilderLost")) {
-			type->BuilderLost = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "ShoreBuilding")) {
 			type->ShoreBuilding = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "LandUnit")) {

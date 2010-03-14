@@ -86,7 +86,6 @@ DefineUnitType("unit-vfac", {
     Corpse = "build-dead-vfac",
     Type = "land",
     Building = true,
-    BuilderOutside = true,
     VisibleUnderFog = true,
     MaxEnergyUtilizationRate = 60,
     MaxMagmaUtilizationRate = 30,

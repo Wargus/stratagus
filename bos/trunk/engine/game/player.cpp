@@ -232,9 +232,6 @@ void CPlayer::RebuildUnitsConsumingResourcesList()
 		if (unit->Orders[0]->Action == UnitActionTrain && unit->SubAction != 0) {
 			CalculateRequestedAmount(unit->Type, unit->Orders[0]->Type->ProductionCosts, costs);
 			AddToUnitsConsumingResources(unit, costs);
-		} else if (unit->Orders[0]->Action == UnitActionBuilt && !unit->Type->BuilderOutside) {
-			CalculateRequestedAmount(unit->Type, unit->Type->ProductionCosts, costs);
-			unit->Player->AddToUnitsConsumingResources(unit, costs);
 		} else if (unit->Orders[0]->Action == UnitActionRepair && unit->SubAction == 20) {
 			CalculateRequestedAmount(unit->Type, unit->Orders[0]->Goal->Type->ProductionCosts, costs);
 			AddToUnitsConsumingResources(unit, costs);

@@ -88,7 +88,6 @@ DefineUnitType("unit-aircraftfactory", {
     Type = "land",
     VisibleUnderFog = true,
     Building = true,
-    BuilderOutside = true,
     MaxEnergyUtilizationRate = 60,
     MaxMagmaUtilizationRate = 30,
     CanHarvestFrom = true,
