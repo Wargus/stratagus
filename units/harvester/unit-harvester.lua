@@ -9,7 +9,7 @@
 --
 --	unit-harvester.lua	-	Define the harvester unit
 --
---	(c) Copyright 2001 - 2007 by Fran�is Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2010 by Francois Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -70,7 +70,6 @@ DefineUnitType("unit-harvester", {
     Name = "Harvester",
     Image = {"file", GetCurrentLuaPath().."/unit_harv.png", "size", {96, 96}},
     Shadow = {"file", GetCurrentLuaPath().."/unit_harv_s.png", "size", {96, 96}},
-    DrawLevel = 40,
     Animations = "animations-harvester",
     Icon = "icon-harvester",
     Flip = true,
@@ -82,7 +81,7 @@ DefineUnitType("unit-harvester", {
     ExplodeWhenKilled = "missile-160x128-explosion",
     Speed = 10,
     HitPoints = 200,
-    DrawLevel = 40,
+    DrawLevel = 25,
     TileSize = {1, 1},
     BoxSize = {63, 63},
     SightRange = 5,
