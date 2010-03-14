@@ -54,7 +54,14 @@
 ----------------------------------------------------------------------------*/
 
 CTimer GameTimer;               /// The game timer
-static int Trigger;
+
+/* Index of the trigger in the _trigger_ table where TriggersEachCycle will
+   start at the next cycle. */
+static int nextTrigger; 
+
+/* Trigger activation flags loaded from a saved game. Only triggers defined 
+   by AddTrigger which have the true flag in ActiveTriggers will be 
+   effectively added. */
 static bool *ActiveTriggers;
 
 /// Some data accessible for script during the game.
@@ -587,7 +594,7 @@ static int CclAddTrigger(lua_State *l)
 */
 void SetTrigger(int trigger)
 {
-	Trigger = trigger;
+	nextTrigger = trigger;
 }
 
 /**
@@ -665,8 +672,8 @@ void TriggersEachCycle(void)
 	lua_gettable(Lua, LUA_GLOBALSINDEX);
 	triggers = lua_objlen(Lua, -1);
 
-	if (Trigger >= triggers) {
-		Trigger = 0;
+	if (nextTrigger >= triggers) {
+		nextTrigger = 0;
 	}
 
 	if (GamePaused) {
@@ -675,17 +682,17 @@ void TriggersEachCycle(void)
 	}
 
 	// Skip to the next trigger
-	while (Trigger < triggers) {
-		lua_rawgeti(Lua, -1, Trigger + 1);
+	while (nextTrigger < triggers) {
+		lua_rawgeti(Lua, -1, nextTrigger + 1);
 		if (!lua_isnumber(Lua, -1)) {
 			break;
 		}
 		lua_pop(Lua, 1);
-		Trigger += 2;
+		nextTrigger += 2;
 	}
-	if (Trigger < triggers) {
-		int currentTrigger = Trigger;
-		Trigger += 2;
+	if (nextTrigger < triggers) {
+		int currentTrigger = nextTrigger;
+		nextTrigger += 2;
 		LuaCall(0, 0);
 		// If condition is true execute action
 		if (lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1)) {
@@ -741,7 +748,7 @@ void SaveTriggers(CFile *file)
 	}
 	file->printf(")\n");
 
-	file->printf("SetTrigger(%d)\n", Trigger);
+	file->printf("SetTrigger(%d)\n", nextTrigger);
 
 	if (GameTimer.Init) {
 		file->printf("ActionSetTimer(%ld, %s)\n",
@@ -781,7 +788,7 @@ void CleanTriggers(void)
 	lua_pushnil(Lua);
 	lua_settable(Lua, LUA_GLOBALSINDEX);
 
-	Trigger = 0;
+	nextTrigger = 0;
 
 	delete[] ActiveTriggers;
 	ActiveTriggers = NULL;

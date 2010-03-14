@@ -189,7 +189,7 @@ class CMapInfo
 {
 public:
 	std::string Description;    /// Map description
-	std::string Filename;       /// Map filename
+	std::string Filename;       /// Map setup filename
 	int MapWidth;               /// Map width
 	int MapHeight;              /// Map height
 	int PlayerType[PlayerMax];  /// Same player->Type
