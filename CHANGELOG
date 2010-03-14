@@ -2,8 +2,6 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
-- Fix crash when rescuing a building that is constructing a unit 
-  (Kalle Olavi Niemitalo)
 - Make GLMaxTextureSize configurable for systems where the value reported
   by OpenGL causes slow displays (Kalle Olavi Niemitalo)
 - Add the Go-East map (Michiel van der Wulp)
