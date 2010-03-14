@@ -110,13 +110,12 @@ void SaveGame(const std::string &filename)
 	file.printf("---  \"type\",    \"%s\",\n", "single-player");
 	file.printf("---  \"date\",    \"%s\",\n", s);
 	file.printf("---  \"map\",     \"%s\",\n", Map.Info.Description.c_str());
-	file.printf("---  \"media-version\", \"%s\"", "Undefined");
+	file.printf("---  \"media-version\", \"%s\",\n", "Undefined");
 	file.printf("---  \"engine\",  {%d, %d, %d},\n",
 		StratagusMajorVersion, StratagusMinorVersion, StratagusPatchLevel);
 	file.printf("  SyncHash = %d, \n", SyncHash);
 	file.printf("  SyncRandSeed = %d, \n", SyncRandSeed);
 	file.printf("  SaveFile = \"%s\"\n", CurrentMapPath);
-	file.printf("\n---  \"preview\", \"%s.pam\",\n", filename.c_str());
 	file.printf("} )\n\n");
 
 	// FIXME: probably not the right place for this
