@@ -9,12 +9,13 @@ msgstr ""
 "Project-Id-Version: boswars 2.6\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-03-05 20:29+0100\n"
-"PO-Revision-Date: 2010-03-06 00:52+0200\n"
+"PO-Revision-Date: 2010-03-13 20:14+0200\n"
 "Last-Translator: Kalle Olavi Niemitalo <kon@iki.fi>\n"
 "Language-Team: Kimmo Kalevi Merikivi <fi@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: fi\n"
 "X-Generator: KBabel 1.11.2\n"
 
 #: scripts/boswars.lua:239
@@ -225,7 +226,7 @@ msgstr "~!Maastopalaeditori"
 #: scripts/menus/patch.lua:80 scripts/menus/patch.lua:119
 #: scripts/menus/patch.lua:137
 msgid "~!Cancel"
-msgstr "~!Peruuta"
+msgstr "Peruuta (~<Esc~>)"
 
 #: scripts/guichan.lua:672 scripts/guichan.lua:724 scripts/guichan.lua:754
 msgid "Start ~!Editor"
@@ -438,7 +439,7 @@ msgstr "Ohje (~<F1~>)"
 
 #: scripts/menus/ingame/game.lua:67
 msgid "~!Objectives"
-msgstr "Tehtävänanto"
+msgstr "~!Tehtävänanto"
 
 #: scripts/menus/ingame/game.lua:69
 #, fuzzy
@@ -521,7 +522,6 @@ msgid "Are you sure you want to restart the game?"
 msgstr "Haluatko varmasti käynnistää pelin uudelleen?"
 
 #: scripts/menus/ingame/game.lua:313 scripts/menus/ingame/game.lua:326
-#, fuzzy
 msgid "~!Restart Game"
 msgstr "~!Aloita alusta"
 
@@ -540,16 +540,15 @@ msgstr "Lopeta peli"
 
 #: scripts/menus/ingame/game.lua:331 scripts/menus/ingame/game.lua:334
 msgid "~!Surrender"
-msgstr "~!Antaudu"
+msgstr "A~!ntaudu"
 
 #: scripts/menus/ingame/game.lua:333
 msgid "Are you sure you want to surrender to your enemies?"
 msgstr "Haluatko varmasti antautua vihollisillesi?"
 
 #: scripts/menus/ingame/game.lua:337
-#, fuzzy
 msgid "E~!xit Bos Wars"
-msgstr "~!Poistu Bos Warsista"
+msgstr "Poistu ~!Bos Warsista"
 
 #: scripts/menus/ingame/game.lua:352 scripts/menus/ingame/game.lua:365
 msgid "Cancel (~<Esc~>)"
@@ -590,7 +589,7 @@ msgstr "Alt-G"
 
 #: scripts/menus/ingame/game.lua:387
 msgid "- toggle grab mouse"
-msgstr ""
+msgstr "- kaappaa/vapauta hiiri"
 
 #: scripts/menus/ingame/game.lua:388
 msgid "Ctrl-S"
@@ -806,11 +805,11 @@ msgstr ""
 
 #: scripts/menus/ingame/game.lua:415
 msgid "F2-F4"
-msgstr ""
+msgstr "F2-F4"
 
 #: scripts/menus/ingame/game.lua:415
 msgid "- recall map position"
-msgstr ""
+msgstr "- palaa tallennettuun sijaintiin"
 
 #: scripts/menus/ingame/game.lua:416
 msgid "Shift F2-F4"
@@ -818,11 +817,11 @@ msgstr ""
 
 #: scripts/menus/ingame/game.lua:416
 msgid "- save map postition"
-msgstr ""
+msgstr "- tallenna sijainti kartalla"
 
 #: scripts/menus/ingame/game.lua:417
 msgid "F5"
-msgstr ""
+msgstr "F5"
 
 #: scripts/menus/ingame/game.lua:417
 msgid "- game options"
@@ -830,7 +829,7 @@ msgstr "- peliasetukset"
 
 #: scripts/menus/ingame/game.lua:418
 msgid "F7"
-msgstr ""
+msgstr "F7"
 
 #: scripts/menus/ingame/game.lua:418
 msgid "- sound options"
@@ -838,7 +837,7 @@ msgstr "- ääniasetukset"
 
 #: scripts/menus/ingame/game.lua:419
 msgid "F8"
-msgstr ""
+msgstr "F8"
 
 #: scripts/menus/ingame/game.lua:419
 msgid "- speed options"
@@ -846,7 +845,7 @@ msgstr "- nopeusasetukset"
 
 #: scripts/menus/ingame/game.lua:420
 msgid "F9"
-msgstr ""
+msgstr "F9"
 
 #: scripts/menus/ingame/game.lua:420
 msgid "- preferences"
@@ -854,11 +853,11 @@ msgstr ""
 
 #: scripts/menus/ingame/game.lua:421
 msgid "F10"
-msgstr ""
+msgstr "F10"
 
 #: scripts/menus/ingame/game.lua:422
 msgid "F11"
-msgstr ""
+msgstr "F11"
 
 #: scripts/menus/ingame/game.lua:422
 msgid "- save game"
@@ -866,7 +865,7 @@ msgstr "- tallenna peli"
 
 #: scripts/menus/ingame/game.lua:423
 msgid "F12"
-msgstr ""
+msgstr "F12"
 
 #: scripts/menus/ingame/game.lua:423
 msgid "- load game"
@@ -1042,9 +1041,8 @@ msgid "No map"
 msgstr "Ei karttaa"
 
 #: scripts/menus/network.lua:454 scripts/menus/network.lua:488
-#, fuzzy
 msgid "Create ~!Game"
-msgstr "~!Luo peli"
+msgstr "Luo ~!peli"
 
 #: scripts/menus/network.lua:471
 msgid "MultiPlayer"
