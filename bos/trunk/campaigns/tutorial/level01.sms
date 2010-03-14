@@ -9,7 +9,7 @@
 --
 --  level01.sms  -  Tutorial map 1.
 --
---  (c) Copyright 2006-2007 by Francois Berteen and Jimmy Salmon
+--  (c) Copyright 2006-2010 by Francois Berteen and Jimmy Salmon
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -61,33 +61,30 @@ AddTrigger(
 
     DefineAllow("unit-powerplant", AllowAll)
     DefineAllow("unit-magmapump", AllowAll)
-    AddTrigger2()
-    AddTrigger3()
     return false
   end)
 
 -- Started gathering resources
-function AddTrigger2()
-  local function resname()
-    if (ThisPlayer.EnergyStored ~= 0) then
-      return "energy"
-    else
-      return "magma"
-    end
-  end
-
-  AddTrigger(
-    function() return ThisPlayer.EnergyStored ~= 0 or ThisPlayer.MagmaStored ~= 0 end,
+AddTrigger(
+    function() 
+        return Players[1].TotalNumUnits == 0 and 
+               (ThisPlayer.EnergyStored ~= 0 or ThisPlayer.MagmaStored ~= 0) end,
     function()
+      local function resname()
+        if (ThisPlayer.EnergyStored ~= 0) then
+           return "energy"
+        else
+           return "magma"
+        end
+     end
       AddMessage("Good job. You are now gathering " .. resname() .. " and storing it in the vault to use later.")
       AddMessage("The numbers at the top of the screen indicate the rate you are collecting and using each resource followed by the amount you have in storage.")
       return false
     end)
-end
+
 
 -- Power plants and magma pump
-function AddTrigger3()
-  AddTrigger(
+AddTrigger(
     function() return GetOwnUnitsAmount("unit-powerplant") >= 2 and
       GetOwnUnitsAmount("unit-magmapump") >= 1 end,
     function()
@@ -100,14 +97,11 @@ function AddTrigger3()
 
       DefineAllow("unit-camp", AllowAll)
       DefineAllow("unit-assault", AllowAll)
-      AddTrigger4()
       return false
     end)
-end
 
 -- Training camp
-function AddTrigger4()
-  AddTrigger(
+AddTrigger(
     function() return GetOwnUnitsAmount("unit-camp") >= 1 end,
     function()
       AddMessage("-- Incoming transmission from Central Command: --")
@@ -116,35 +110,30 @@ function AddTrigger4()
       AddMessage("-- End transmission --")
       Play("level01-04.wav")
       SetObjectives("Train 3 assault units")
-
-      AddTrigger5()
       return false
     end)
-end
 
 -- Assault units
-function AddTrigger5()
-  AddTrigger(
+AddTrigger(
     function() return GetOwnUnitsAmount("unit-assault") >= 3 end,
     function()
       AddMessage("-- Incoming transmission from Central Command: --")
       AddMessage("Excellent work. The base is now in good enough shape to be able to defend itself from future attacks.")
       AddMessage("-- End transmission --")
       Play("level01-05.wav")
-      AddTrigger6(GameCycle)
+      delayedEnding = GameCycle + 400
       return false
     end)
-end
 
 -- Delay after last message
-function AddTrigger6(cycle)
-  AddTrigger(
-    function() return GameCycle >= cycle + 400 end,
+AddTrigger(
+    function() return GetOwnUnitsAmount("unit-assault") >= 3  and GameCycle >= delayedEnding end,
     function() return StopGame(GameVictory) end)
-end
 
 
 Players[0]:SetStartView(5, 59)
-AddMessage("You must first locate the base.")
-AddMessage("Start by clicking on your engineer then order it to move to the center of the map.")
+if GameCycle == 0 then
+    AddMessage("You must first locate the base.")
+    AddMessage("Start by clicking on your engineer then order it to move to the center of the map.")
+end
 
