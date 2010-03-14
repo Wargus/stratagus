@@ -268,17 +268,7 @@ static void CclParseBuilt(lua_State *l, CUnit *unit)
 		value = LuaToString(l, -1);
 		lua_pop(l, 1);
 		++j;
-		if (!strcmp(value, "worker")) {
-			int slot;
-
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
-			slot = strtol(value + 1, NULL, 16);
-			Assert(UnitSlots[slot]);
-			unit->Data.Built.Worker = UnitSlots[slot];
-			//++UnitSlots[slot]->Refs;
-		} else if (!strcmp(value, "progress")) {
+		if (!strcmp(value, "progress")) {
 			lua_rawgeti(l, -1, j + 1);
 			unit->Data.Built.Progress = LuaToNumber(l, -1);
 			lua_pop(l, 1);

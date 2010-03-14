@@ -647,19 +647,9 @@ void CommandBuildBuilding(CUnit *unit, int x, int y,
 		order->Y = y;
 		order->Width = what->TileWidth;
 		order->Height = what->TileHeight;
-		if (what->BuilderOutside) {
-			order->Range = unit->Type->RepairRange;
-		} else {
-			// If building inside, but be next to stop
-			if (what->ShoreBuilding && unit->Type->UnitType == UnitTypeLand) {
-					// Peon won't dive :-)
-				order->Range = 1;
-			}
-		}
+		order->Range = unit->Type->RepairRange;
 		order->Type = what;
-		if (what->BuilderOutside) {
-			order->MinRange = 1;
-		}
+		order->MinRange = 1;
 	}
 	ClearSavedAction(unit);
 }

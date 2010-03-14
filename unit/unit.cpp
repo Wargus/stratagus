@@ -1907,8 +1907,7 @@ CUnit *UnitOnScreen(int x, int y)
 */
 void UnitRemoveConsumingResources(CUnit *unit)
 {
-	if ((unit->Orders[0]->Action == UnitActionBuild && !unit->Type->BuilderOutside && unit->SubAction == 40) ||
-			(unit->Orders[0]->Action == UnitActionRepair && unit->SubAction == 20)) {
+	if (unit->Orders[0]->Action == UnitActionRepair && unit->SubAction == 20) {
 		unit->Player->RemoveFromUnitsConsumingResources(unit);
 	} else if (unit->Orders[0]->Action == UnitActionResource && unit->SubAction >= 55) {
 		for (int u = 0; u < MaxCosts; ++u) {
@@ -1972,16 +1971,6 @@ void LetUnitDie(CUnit *unit)
 				unit->Player->StoredResources[u] = unit->Player->StorageCapacity[u];
 			}
 		}
-	}
-
-	// During resource build, the worker holds the resource amount,
-	// but if canceling building the platform, the worker is already
-	// outside.
-	if (type->CanHarvestFrom &&
-			unit->Orders[0]->Action == UnitActionBuilt &&
-			unit->Data.Built.Worker) {
-		// Restore value for oil-patch
-		memcpy(unit->ResourcesHeld, unit->Data.Built.Worker->ResourcesHeld, sizeof(unit->ResourcesHeld));
 	}
 
 	// Transporters lose their units and building their workers
