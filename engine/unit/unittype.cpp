@@ -88,7 +88,7 @@ CUnitType::CUnitType() :
 	ExplodeWhenKilled(0), Building(0), VisibleUnderFog(0),
 	Coward(0), AttackFromTransporter(0),
 	Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
-	BuilderOutside(0), BuilderLost(0), CanHarvestFrom(0), Harvester(0),
+	CanHarvestFrom(0), Harvester(0),
 	Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
 	Indestructible(0), Organic(0), Variable(NULL),
 	ProductionEfficiency(100), FieldFlags(0), MovementMask(0),

@@ -61,7 +61,6 @@ DefineUnitType("unit-tree04", {
     Corpse = "unit-destroyed-1x1-place",
     Type = "land",
     Building = true,
-    BuilderOutside = true,
     VisibleUnderFog = true,
     NumDirections = 1,
     CanHarvestFrom = true,

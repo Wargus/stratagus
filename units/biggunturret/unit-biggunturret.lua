@@ -95,7 +95,6 @@ DefineUnitType("unit-biggunturret", {
     Corpse = "build-dead-biggunturret",
     Type = "land",
     Building = true,
-    BuilderOutside = true,
     VisibleUnderFog = true,
     CanHarvestFrom = true,
 })

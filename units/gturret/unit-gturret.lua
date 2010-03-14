@@ -95,7 +95,6 @@ DefineUnitType("unit-gturret", {
     Corpse = "build-dead-gturret",
     Type = "land",
     Building = true,
-    BuilderOutside = true,
     VisibleUnderFog = true,
     CanHarvestFrom = true,
     Sounds = {

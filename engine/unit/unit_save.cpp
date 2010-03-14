@@ -214,10 +214,6 @@ static void SaveOrderData(const CUnit *unit, CFile *file)
 				}
 				file->printf(",\n  \"data-built\", {");
 
-				if (unit->Data.Built.Worker) {
-					file->printf("\"worker\", \"%s\", ",
-						UnitReference(unit->Data.Built.Worker).c_str());
-				}
 				file->printf("\"progress\", %d, \"frame\", %d,",
 					unit->Data.Built.Progress, frame);
 				if (unit->Data.Built.Cancel) {

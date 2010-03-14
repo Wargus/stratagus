@@ -67,7 +67,6 @@ DefineUnitType("unit-antharus", {
     Corpse = "unit-destroyed-2x2-place",
     Type = "land",
     Building = true,
-    BuilderOutside = true,
     VisibleUnderFog = false,
     CanHarvestFrom = true,
     NumDirections = 1,

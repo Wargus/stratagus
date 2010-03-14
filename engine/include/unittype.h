@@ -300,19 +300,6 @@
 **    If units have a repair range, they can repair, and this is the
 **    distance.
 **
-**  CUnitType::BuilderOutside
-**
-**    Only valid for buildings. When building the worker will
-**    remain outside inside the building.
-**
-**  @warning Workers that can build buildings with the
-**  @warning BuilderOutside flag must have the CanRepair flag.
-**
-**  CUnitType::BuilderLost
-**
-**    Only valid for buildings without the BuilderOutside flag.
-**    The worker is lost when the building is completed.
-**
 **  CUnitType::SelectableByRectangle
 **
 **    Selectable with mouse rectangle
@@ -663,8 +650,6 @@ public:
 	unsigned GroundAttack : 1;      /// Can do command ground attack.
 	unsigned ShoreBuilding : 1;     /// Building must be build on coast.
 	unsigned CanAttack : 1;         /// Unit can attack.
-	unsigned BuilderOutside : 1;    /// The builder stays outside during the build.
-	unsigned BuilderLost : 1;       /// The builder is lost after the build.
 	unsigned CanHarvestFrom : 1;    /// Resource can be harvested.
 	unsigned Harvester : 1;         /// unit is a resource harvester.
 	unsigned Neutral : 1;           /// Unit is neutral, used by the editor

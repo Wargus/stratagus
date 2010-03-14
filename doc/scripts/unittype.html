@@ -111,7 +111,7 @@ Spells use these to determine who to hit, and units can be restricted too.
 Try to avoid using names with other meanings (nothing from spell condition definition.)
 Some Flags are already defined in the engine : the UnitType flags.
 So following flags are the value of the unitType :
-"Building", "BuilderOutSide", "BuilderLost", "ShoreBuilding",
+"Building", "ShoreBuilding",
 "Coward", "Harvester", "Revealer",
 "LandUnit", "AirUnit", "SeaUnit",
 "ExplodeWhenKilled", "VisibleUnderFog", "PermanentCloack", "AttackFromTransporter",
@@ -371,11 +371,6 @@ buildings.
 <dd>Unit is a shore building, and imobile. This is used for those unique buildings
 that have to be build on sea and have at least one point on coast.
 </dd>
-<dt>BuilderOutside</dt>
-<dd>true if the builder builds a building from the outside</dd>
-<dt>BuilderLost</dt>
-<dd>true if you would like the builder to die once the building has been completed (used for morphing
-into a building)</dd>
 <dt>AutoBuildRate</dt>
 <dd>The rate at which the building builds itself <b>NOT IMPLEMENTED</b></dd>
 <dt>BuildingRules = { { "distance", { Distance = 3, DistanceType = ">", Type = "unit-gold-mine"}}}

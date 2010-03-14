@@ -266,13 +266,6 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 		return;
 	}
 
-	if (!type->BuilderOutside) {
-		// Start using resources
-		int costs[MaxCosts];
-		CalculateRequestedAmount(build->Type, build->Type->ProductionCosts, costs);
-		build->Player->AddToUnitsConsumingResources(build, costs);
-	}
-
 	build->Constructed = 1;
 	build->CurrentSightRange = 0;
 
@@ -298,9 +291,6 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	
 	// Must place after previous for map flags
 	build->Place(x, y);
-	if (!type->BuilderOutside) {
-		build->CurrentSightRange = 1;
-	}
 
 	// HACK: the building is not ready yet
 	build->Player->UnitTypesCount[type->Slot]--;
@@ -311,30 +301,18 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	UpdateConstructionFrame(build);
 
 	// We need somebody to work on it.
-	if (!type->BuilderOutside) {
-		// Place the builder inside the building
-		build->Data.Built.Worker = unit;
-		// HACK allows the unit to be removed
-		build->CurrentSightRange = 1;
-		unit->Remove(build);
-		build->CurrentSightRange = 0;
-		unit->X = x;
-		unit->Y = y;
-		unit->ClearAction();
-		unit->Orders[0]->Goal = NULL;
-	} else {
-		// Use repair to do the building
-		unit->Orders[0]->Action = UnitActionRepair;
-		unit->Orders[0]->Goal = build;
-		unit->Orders[0]->X = unit->Orders[0]->Y = -1;
-		unit->Orders[0]->Range = unit->Type->RepairRange;
-		unit->SubAction = 0;
-		unit->Direction = DirectionToHeading(x - unit->X, y - unit->Y);
-		UnitUpdateHeading(unit);
-		build->RefsIncrease();
-		// Mark the new building seen.
-		MapMarkUnitSight(build);
-	}
+	// Use repair to do the building
+	unit->Orders[0]->Action = UnitActionRepair;
+	unit->Orders[0]->Goal = build;
+	unit->Orders[0]->X = unit->Orders[0]->Y = -1;
+	unit->Orders[0]->Range = unit->Type->RepairRange;
+	unit->SubAction = 0;
+	unit->Direction = DirectionToHeading(x - unit->X, y - unit->Y);
+	UnitUpdateHeading(unit);
+	build->RefsIncrease();
+	// Mark the new building seen.
+	MapMarkUnitSight(build);
+
 	UpdateConstructionFrame(build);
 }
 
@@ -365,46 +343,13 @@ void HandleActionBuild(CUnit *unit)
 */
 void HandleActionBuilt(CUnit *unit)
 {
-	CUnit *worker;
 	int pcost = GetProductionCost(unit->Type);
-
-	// hp is the current damage taken by the unit.
-	int hp = (unit->Data.Built.Progress * unit->Variable[HP_INDEX].Max) / pcost - unit->Variable[HP_INDEX].Value;
-
-	if (!unit->Type->BuilderOutside) {
-		// Update build progress
-		int *costs = unit->Player->UnitsConsumingResourcesActual[unit];
-		int cost = costs[EnergyCost] ? costs[EnergyCost] : costs[MagmaCost];
-		unit->Data.Built.Progress += cost * SpeedBuild;
-		if (unit->Data.Built.Progress > pcost) {
-			unit->Data.Built.Progress = pcost;
-		}
-
-		// Keep the same level of damage while increasing HP.
-		unit->Variable[HP_INDEX].Value = (unit->Data.Built.Progress * unit->Variable[HP_INDEX].Max) / pcost - hp;
-		if (unit->Variable[HP_INDEX].Value > unit->Stats->Variables[HP_INDEX].Max) {
-			unit->Variable[HP_INDEX].Value = unit->Stats->Variables[HP_INDEX].Max;
-		}
-	}
 
 	//
 	// Check if construction should be canceled
 	//
 	if (unit->Data.Built.Cancel || unit->Data.Built.Progress < 0) {
 		DebugPrint("%s canceled.\n" _C_ unit->Type->Name.c_str());
-		// Drop out unit
-		if ((worker = unit->Data.Built.Worker)) {
-			worker->ClearAction();
-			unit->Data.Built.Worker = NoUnitP;
-			// HACK: make sure the sight is updated correctly
-			unit->CurrentSightRange = 1;
-			DropOutOnSide(worker, LookingW, unit->Type->TileWidth, unit->Type->TileHeight);
-			unit->CurrentSightRange = 0;
-		}
-
-		if (!unit->Type->BuilderOutside) {
-			unit->Player->RemoveFromUnitsConsumingResources(unit);
-		}
 
 		// Cancel building
 		LetUnitDie(unit);
@@ -430,45 +375,20 @@ void HandleActionBuilt(CUnit *unit)
 			unit->Frame = unit->Type->StillFrame;
 		}
 
-		if ((worker = unit->Data.Built.Worker)) {
-			// Bye bye worker.
-			if (unit->Type->BuilderLost) {
-				// FIXME: enough?
-				LetUnitDie(worker);
-			// Drop out the worker.
-			} else {
-				worker->ClearAction();
-				// HACK: make sure the sight is updated correctly
-				unit->CurrentSightRange = 1;
-				DropOutOnSide(worker, LookingW, unit->Type->TileWidth, unit->Type->TileHeight);
-				//
-				// If we can harvest from the new building, do it.
-				//
-				if (worker->Type->Harvester) {
-					CommandResource(worker, unit, 0);
-				}
-			}
-		}
-
 		unit->Player->Notify(NotifyGreen, unit->X, unit->Y,
 			_("New %s done"), unit->Type->Name.c_str());
 		if (unit->Player == ThisPlayer) {
 			if (unit->Type->Sound.Ready.Sound) {
 				PlayUnitSound(unit, VoiceReady);
-			} else if (worker) {
-				PlayUnitSound(worker, VoiceWorkCompleted);
 			} else {
 				PlayUnitSound(unit, VoiceBuilding);
 			}
 		}
 		if (unit->Player->AiEnabled) {
-			AiWorkComplete(worker, unit);
+			AiWorkComplete(NULL, unit);
 		}
 
 		UpdateForNewUnit(unit, 0);
-		if (!unit->Type->BuilderOutside) {
-			unit->Player->RemoveFromUnitsConsumingResources(unit);
-		}
 
 		// Set the direction of the building if it supports them
 		if (unit->Type->NumDirections > 1) {
