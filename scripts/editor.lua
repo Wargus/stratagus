@@ -82,6 +82,7 @@ local editor_types = {
   "unit-vfac",
   "unit-gturret",
   "unit-biggunturret",
+  "unit-cannon",
   "unit-cam",
   "unit-radar",
   "unit-buggy",
