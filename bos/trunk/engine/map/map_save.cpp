@@ -121,8 +121,6 @@ void CMap::Save(CFile *file) const
 		}
 	}
 	file->printf("}})\n");
-
-	file->printf("%s", PatchManager.savePatches().c_str());
 }
 
 //@}

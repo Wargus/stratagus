@@ -123,6 +123,12 @@ static int CclStratagusMap(lua_State *l)
 					lua_rawgeti(l, j + 1, k + 1);
 					Map.Info.Filename = LuaToString(l, -1);
 					lua_pop(l, 1);
+					// Load the original map
+					char path[PATH_MAX];
+					LibraryFileName(Map.Info.Filename.c_str(), path, sizeof(path));
+					LuaLoadFile(path);
+					// Players array will be re-created correctly later
+					CleanPlayers();
 				} else if (!strcmp(value, "map-fields")) {
 					int i;
 					int subsubargs;

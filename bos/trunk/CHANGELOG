@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Recover map specific triggers and settings when loading a saved game (Francois Beerten)
 - Add the bottleneck map (Kyran Jackson)
 - Make GLMaxTextureSize configurable for systems where the value reported
   by OpenGL causes slow displays (Kalle Olavi Niemitalo)

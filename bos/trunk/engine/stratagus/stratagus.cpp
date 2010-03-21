@@ -418,9 +418,10 @@ void StartSavedGame(const std::string &filename)
 	ExpandPath(path, filename);
 	LoadGame(path);
 
-	StartMap(filename, false);
+	// the filename argument of StartMap is unused with saved games
+	StartMap("", false);
 }
-	
+
 void StartReplay(const std::string &filename, bool reveal)
 {
 	std::string replay;
