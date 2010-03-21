@@ -199,7 +199,7 @@ end
 -- If the user's preferences.lua does not yet have this setting,
 -- then add it, to make it easier to discover.
 if (preferences.MaxOpenGLTexture == nil) then
-   preferences.MaxOpenGLTexture = 0
+   preferences.MaxOpenGLTexture = 512
 end
 
 UseOpenGL = preferences.UseOpenGL
