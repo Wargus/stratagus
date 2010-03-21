@@ -518,6 +518,7 @@ void FileWriter::printf(const char *format, ...)
 	va_start(ap, format);
 	buf[buf_size - 1] = '\0';
 	ret = vsnprintf(buf, buf_size - 1, format, ap);
+	va_end(ap);
 	while (ret == -1 || ret >= buf_size - 1) {
 		if (buf != static_buf) {
 			delete[] buf;
@@ -529,7 +530,9 @@ void FileWriter::printf(const char *format, ...)
 			ExitFatal(-1);
 		}
 		buf[buf_size - 1] = '\0';
+		va_start(ap, format);
 		ret = vsnprintf(buf, buf_size - 1, format, ap);
+		va_end(ap);
 	}
 	va_end(ap);
 	write(buf, strlen(buf));
