@@ -122,9 +122,9 @@ void SaveGame(const std::string &filename)
 	file.printf("GameCycle = %lu\n", GameCycle);
 
 	SaveCcl(&file);
-	SaveUpgrades(&file);
-	SavePlayers(&file);
 	Map.Save(&file);
+	SavePlayers(&file);
+	SaveUpgrades(&file);
 	SaveUnits(&file);
 	SaveUserInterface(&file);
 	SaveAi(&file);
