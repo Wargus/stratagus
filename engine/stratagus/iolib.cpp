@@ -534,7 +534,6 @@ void FileWriter::printf(const char *format, ...)
 		ret = vsnprintf(buf, buf_size - 1, format, ap);
 		va_end(ap);
 	}
-	va_end(ap);
 	write(buf, strlen(buf));
 
 	if (buf != static_buf) {
