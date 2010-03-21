@@ -826,6 +826,10 @@ static int CclCreateUnit(lua_State *l)
 	int ix;
 	int iy;
 
+	if (SaveGameLoading) {
+        	return 1;
+        }    
+
 	LuaCheckArgs(l, 3);
 
 	lua_pushvalue(l, 1);
