@@ -9,7 +9,7 @@
 //
 /**@name script_map.cpp - The map ccl functions. */
 //
-//      (c) Copyright 1999-2008 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2010 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@
 #include "iolib.h"
 #include "video.h"
 #include "version.h"
+#include "iocompat.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
