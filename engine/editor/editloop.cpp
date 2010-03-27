@@ -2059,6 +2059,7 @@ void StartEditor(const std::string &filename)
 
 	DebugPrint("StartEditor - %s\n" _C_ !filename.empty() ? filename.c_str() : "new map");
 
+	CleanPlayers();
 	newMap = filename.empty();
 	if (!newMap)
 	{
