@@ -196,6 +196,15 @@ void HandleActionTrain(CUnit *unit)
 				unit->SubAction = 0;
 			}
 
+			if (unit->NewOrder.Goal) {
+				if (unit->NewOrder.Goal->Destroyed) {
+					DebugPrint("Destroyed unit in train unit\n");
+					unit->NewOrder.Goal->RefsDecrease();
+					unit->NewOrder.Goal = NoUnitP;
+					unit->NewOrder.Action = UnitActionStill;
+				}
+			}
+
 			if (!CanHandleOrder(nunit, &unit->NewOrder)) {
 				DebugPrint("Wrong order for unit\n");
 
@@ -206,16 +215,6 @@ void HandleActionTrain(CUnit *unit)
 					nunit->Orders[0]->Goal->RefsIncrease();
 				}
 			} else {
-				if (unit->NewOrder.Goal) {
-					if (unit->NewOrder.Goal->Destroyed) {
-						// FIXME: perhaps we should use another goal?
-						DebugPrint("Destroyed unit in train unit\n");
-						unit->NewOrder.Goal->RefsDecrease();
-						unit->NewOrder.Goal = NoUnitP;
-						unit->NewOrder.Action = UnitActionStill;
-					}
-				}
-
 				*nunit->Orders[0] = unit->NewOrder;
 
 				//
