@@ -2,6 +2,8 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Fix bug #29110 "Fatal error 'bad player' when loading map to editor"
+  (Francois Beerten)
 - Discard NewOrder if it refers to destroyed unit (Kalle Olavi Niemitalo)
 - Recover map specific triggers and settings when loading a saved game (Francois Beerten)
 - Add the bottleneck map (Kyran Jackson)
