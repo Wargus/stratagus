@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Add italian translation (Simone Rucci)
 - Fix bug #29110 "Fatal error 'bad player' when loading map to editor"
   (Francois Beerten)
 - Discard NewOrder if it refers to destroyed unit (Kalle Olavi Niemitalo)
