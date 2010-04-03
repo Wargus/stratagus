@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Add the 4on4 map (Michiel van der Wulp)
 - Add the hospitality map (Kyran Jackson)
 - Add italian translation (Simone Rucci)
 - Fix bug #29110 "Fatal error 'bad player' when loading map to editor"
