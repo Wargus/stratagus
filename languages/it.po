@@ -1,0 +1,309 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR Simone Rucci <simrucci@hotmail.com>, YEAR. 2010
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: bos-sv\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-03-29 04:34+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=2; plural=(n > 1);\n"
+
+
+#: action/action_build.cpp:131
+msgid "You cannot reach building place"
+msgstr "Non puoi raggiungere il punto di costruzione"
+
+#: action/action_build.cpp:214
+#, c-format
+msgid "You cannot build %s here"
+msgstr "Non puoi costuire %s qui"
+
+#: action/action_build.cpp:228
+#, c-format
+msgid "Can't build more units %s"
+msgstr "Non puoi costruire più unità %s"
+
+#: action/action_build.cpp:260
+#, c-format
+msgid "Unable to create building %s"
+msgstr "Impossibile creare edifico %s"
+
+#: action/action_build.cpp:454
+#, c-format
+msgid "New %s done"
+msgstr "Nuovo %s eseguito"
+
+#: action/action_spellcast.cpp:171
+#, c-format
+msgid "%s: not enough mana for spell: %s"
+msgstr "%s: non hai abbastanza mana per l'incantesimo: %s"
+
+#: action/action_spellcast.cpp:175
+#, c-format
+msgid "%s: can't cast spell: %s"
+msgstr "%s: non puoi lanciare l'incantesimo: %s"
+
+#: action/action_train.cpp:184
+#, c-format
+msgid "New %s ready"
+msgstr "Nuovo %s pronto"
+
+#: action/action_train.cpp:235
+#, c-format
+msgid "Unable to train %s"
+msgstr "Impossibile addestrare %s"
+
+#: action/command.cpp:1025
+#, c-format
+msgid "Player \"%s\" has left the game"
+msgstr "Il giocatore \"%s\" ha lasciato la partita"
+
+#: action/command.cpp:1027
+#, c-format
+msgid "Player \"%s\" has been killed"
+msgstr "Il giocatore \"%s\" è stato ucciso"
+
+#: editor/editloop.cpp:1229
+msgid "Unit can't be placed here."
+msgstr "L'unità non può essere piazzata qui"
+
+#: editor/editloop.cpp:1301
+msgid "Mirror editing enabled: 2-side"
+msgstr "Montaggio dello specchio abilitato: 2-lati"
+
+#: editor/editloop.cpp:1304
+msgid "Mirror editing enabled: 4-side"
+msgstr "Montaggio dello specchio abilitato: 4-lati"
+
+#: editor/editloop.cpp:1307
+msgid "Mirror editing disabled"
+msgstr "Montaggio dello specchio disabilitato"
+
+#: editor/editloop.cpp:1327
+msgid "Unit deleted"
+msgstr "Unità eliminata"
+
+#: editor/editloop.cpp:1350 editor/editloop.cpp:1359
+msgid "Unit owner modified"
+msgstr "Proprietario dell'unità modificato"
+
+#: editor/editloop.cpp:1680
+msgid "Select mode"
+msgstr "Modalità seleziona"
+
+#: editor/editloop.cpp:1690
+msgid "Unit mode"
+msgstr "Modalità unità"
+
+#: editor/editloop.cpp:1701
+msgid "Tile mode"
+msgstr "Modalità piastrella"
+
+#: editor/editloop.cpp:1712
+msgid "Set start location mode"
+msgstr "Imposta posizione iniziale"
+
+#: game/player.cpp:705
+msgid "Building Limit Reached"
+msgstr "Limite di costruzioni raggiunto"
+
+#: game/player.cpp:709
+msgid "Unit Limit Reached"
+msgstr "Limite unità raggiunto"
+
+#: game/player.cpp:713
+msgid "Total Unit Limit Reached"
+msgstr "Limite totale unità raggiunto"
+
+#: game/player.cpp:717
+#, c-format
+msgid "Limit of %d reached for this unit type"
+msgstr "Limite di %d raggiunto per questo tipo di unità"
+
+#: game/player.cpp:723
+msgid "Cannot create more units."
+msgstr "Non puoi creare altre unità"
+
+#: game/replay.cpp:787
+msgid "No sync info for this replay !"
+msgstr "Nessuna informazione di sincro per il replay !"
+
+#: game/replay.cpp:789
+#, c-format
+msgid "Replay got out of sync (%lu) !"
+msgstr "Replay fuori sincro (%lu) !"
+
+#: game/replay.cpp:798
+msgid "Replay got out of sync !"
+msgstr "Replay fuori sincro !"
+
+#: game/replay.cpp:896 game/replay.cpp:910
+msgid "End of replay"
+msgstr "Fine del replay"
+
+#: network/network.cpp:1060
+#, c-format
+msgid "%s sent bad command"
+msgstr "%s inviato comando non valido"
+
+#: network/network.cpp:1157
+msgid "Network out of sync"
+msgstr "Rete fuori sincro"
+
+#: network/network.cpp:1390
+#, c-format
+msgid "Waiting for player \"%s\": %d:%02d"
+msgstr "In attesa del giocatore \"%s\": %d:%02d"
+
+#: network/network.cpp:1406
+msgid "Timed out"
+msgstr "Interrotto"
+
+#: stratagus/stratagus.cpp:594
+#, c-format
+msgid "Thanks for playing Bos Wars.\n"
+msgstr "Grazie per aver giocato a Bos Wars.\n"
+
+#: ui/botpanel.cpp:785 ui/botpanel.cpp:850
+msgid "Select Target"
+msgstr "Seleziona Bersaglio"
+
+#: ui/botpanel.cpp:898
+msgid "Select Location"
+msgstr "Seleziona locazione"
+
+#: ui/interface.cpp:107
+#, c-format
+msgid "MESSAGE:%s~!_"
+msgstr "MESSAGGIO:%s~!_"
+
+#: ui/interface.cpp:259
+msgid "Sound is on."
+msgstr "Suono acceso"
+
+#: ui/interface.cpp:261
+msgid "Sound is off."
+msgstr "Suono spento"
+
+#: ui/interface.cpp:276
+msgid "Music is off."
+msgstr "Musica spenta"
+
+#: ui/interface.cpp:279
+msgid "Music is on."
+msgstr "Musica accesa"
+
+#: ui/interface.cpp:292 ui/mouse.cpp:1609
+msgid "Game Paused"
+msgstr "Partita in pausa"
+
+#: ui/interface.cpp:294
+msgid "Game Resumed"
+msgstr "Partita ripresa"
+
+#: ui/interface.cpp:325
+msgid "Big map enabled"
+msgstr "Mappa estesa attivata"
+
+#: ui/interface.cpp:334
+msgid "Returning to old map"
+msgstr "Ritorno all vecchia mappa"
+
+#: ui/interface.cpp:348
+msgid "Faster"
+msgstr "Più veloce"
+
+#: ui/interface.cpp:367
+msgid "Slower"
+msgstr "Più lento"
+
+#: ui/interface.cpp:422
+msgid "Terrain displayed."
+msgstr "Terreno visualizzato"
+
+#: ui/interface.cpp:424
+msgid "Terrain hidden."
+msgstr "Terreno nascosto"
+
+#: ui/interface.cpp:457
+msgid "Grab mouse toggled."
+msgstr "Mouse attivato"
+
+#: ui/interface.cpp:939
+msgid "Screenshot made."
+msgstr "Immagine scattata."
+
+#: ui/mainscr.cpp:171
+msgid "Armor: "
+msgstr "Armatura: "
+
+#: ui/mainscr.cpp:177
+msgid "Radar Range: "
+msgstr "Raggio radar: "
+
+#: ui/mainscr.cpp:182
+msgid "Sight Range: "
+msgstr "Raggio sensore: "
+
+#: ui/mainscr.cpp:189
+msgid "Kills: "
+msgstr "Uccisi: "
+
+#: ui/mainscr.cpp:194
+msgid "Attack Range: "
+msgstr "Raggio di attacco: "
+
+#: ui/mainscr.cpp:201
+msgid "Damage: "
+msgstr "Danno: "
+
+#: ui/mainscr.cpp:206
+msgid "Mana: "
+msgstr "Mana: "
+
+#: ui/mainscr.cpp:376
+msgid "Energy"
+msgstr "Energia"
+
+#: ui/mainscr.cpp:376
+msgid "Magma"
+msgstr "Magma"
+
+#: ui/mainscr.cpp:602
+#, c-format
+msgid "Last message repeated ~<%d~> times"
+msgstr "Ultimo messaggio ripetuto ~<%d~> volte"
+
+#: ui/mainscr.cpp:734
+#, c-format
+msgid "~<Event: %s~>"
+msgstr "~<Evento: %s~>"
+
+#: ui/mouse.cpp:1774
+#, c-format
+msgid "You have ~<%d~> %ss"
+msgstr "Tu hai ~<%d~> %ss"
+
+#: ui/mouse.cpp:1778
+#, c-format
+msgid "You have ~<%d~> %s(s)"
+msgstr "Tu hai ~<%d~> %s(s)"
+
+#: unit/unit.cpp:2117
+#, c-format
+msgid "%s attacked"
+msgstr "%s attaccato"
+
+#: video/sdl.cpp:268
+msgid "esc"
+msgstr "esci"
