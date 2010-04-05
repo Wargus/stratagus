@@ -192,7 +192,11 @@ static void SaveOrderData(const CUnit *unit, CFile *file)
 	// Do not attempt to save the data in that case, because
 	// integers in it may be out of range, and pointers in it can
 	// point to invalid addresses.
-	if (unit->SubAction == 0)
+	//
+	// HOWEVER... UnitActionBuilt apparently keeps SubAction == 0
+	// at all times, and StartBuilding which sets UnitActionBuilt
+	// also initializes unit->Data.  So there we must allow 0 too.
+	if (unit->SubAction == 0 && unit->Orders[0]->Action != UnitActionBuilt)
 		return;
 	
 	switch (unit->Orders[0]->Action) {
