@@ -100,6 +100,61 @@ function AddMenuHelpers(menu)
     return self:addLabel(text, x, y, Fonts["large"], false)
   end
 
+  -- Arrange widgets in a grid, with automatic column widths and
+  -- padding.  Align the left sides of the widgets in each column.
+  -- This function moves the widgets only horizontally, leaving
+  -- the Y coordinates unchanged.
+  --
+  -- The grid parameter is a table of rows, each of which is a table
+  -- of widgets.  Each row should have the same number of widgets.
+  -- All keys in these tables must be numbers starting from 1.
+  -- (Actually, because this function ignores the Y coordinates,
+  -- it might be more natural if the parameter were a table of columns;
+  -- but the current format is a bit easier for the caller to provide.)
+  function menu:adjustColumnWidths(grid)
+    local columnWidths = {}
+    local width
+    local spareWidth
+    local rowNumber
+    local row
+    local columnNumber
+    local maxGap = menu:getWidth() / 16
+    local gap
+    local x
+    -- Compute the width needed for each column.
+    for rowNumber = 1, #grid do
+      row = grid[rowNumber]
+      for columnNumber = 1, #row do
+        width = row[columnNumber]:getWidth()
+        if columnWidths[columnNumber] == nil or columnWidths[columnNumber] < width then
+          columnWidths[columnNumber] = width
+        end
+      end
+    end
+    -- How much width will be left over from the columns?
+    spareWidth = menu:getWidth()
+    for columnNumber = 1, #columnWidths do
+      spareWidth = spareWidth - columnWidths[columnNumber]
+    end
+    -- Keep the columns as far from the edges of the menu
+    -- as they are from each other.
+    gap = spareWidth / (#columnWidths + 1)
+    -- However, if the columns would get too far from each other,
+    -- then move them closer, and leave more space at the edges.
+    if gap > maxGap then
+      gap = maxGap
+    end
+    -- Move all the widgets to their final positions.
+    for rowNumber = 1, #grid do
+      row = grid[rowNumber]
+      x = (spareWidth - gap * (#columnWidths - 1)) / 2
+      for columnNumber = 1, #row do
+        row[columnNumber]:setX(x)
+        x = x + columnWidths[columnNumber] + gap
+      end
+    end
+  end
+
   function menu:addButton(caption, x, y, callback, size)
     local b = ButtonWidget(caption)
     b:setActionCallback(callback)
@@ -325,6 +380,7 @@ function RunResultsMenu()
   local sx = Video.Width / 20
   local sy = Video.Height / 20
   local result
+  local grid
 
   if GameResult == GameVictory then
     result = _("Victory !")
@@ -345,21 +401,29 @@ function RunResultsMenu()
   menu = BosMenu(_("Results"), background)
   menu:writeLargeText(result, sx*6, sy*5)
 
-  menu:writeText(_("Player"), sx*3, sy*7)
-  menu:writeText(_("Units"), sx*6, sy*7)
-  menu:writeText(_("Buildings"), sx*8, sy*7)
-  menu:writeText(_("Kills"), sx*10, sy*7)
-  menu:writeText(_("Razings"), sx*12, sy*7)
+  -- The X coordinates of these widgets will be set after all the
+  -- widgets have been created and their sizes are known.
+  grid = {{
+    menu:writeText(_("Player"), 0, sy*7),
+    menu:writeText(_("Units"), 0, sy*7),
+    menu:writeText(_("Buildings"), 0, sy*7),
+    menu:writeText(_("Kills"), 0, sy*7),
+    menu:writeText(_("Razings"), 0, sy*7)
+  }}
 
   for i=0,7 do
     if (Players[i].TotalUnits > 0) then
-      menu:writeText(i .. " ".. Players[i].Name, sx*3, sy*(8+i))
-      menu:writeText(Players[i].TotalUnits, sx*6, sy*(8+i))
-      menu:writeText(Players[i].TotalBuildings, sx*8, sy*(8+i))
-      menu:writeText(Players[i].TotalKills, sx*10, sy*(8+i))
-      menu:writeText(Players[i].TotalRazings, sx*12, sy*(8+i))     
+      table.insert(grid, {
+	menu:writeText(i .. " ".. Players[i].Name, 0, sy*(8+i)),
+	menu:writeText(Players[i].TotalUnits, 0, sy*(8+i)),
+	menu:writeText(Players[i].TotalBuildings, 0, sy*(8+i)),
+	menu:writeText(Players[i].TotalKills, 0, sy*(8+i)),
+	menu:writeText(Players[i].TotalRazings, 0, sy*(8+i))
+      })
     end
   end
+
+  menu:adjustColumnWidths(grid)
 
   menu:addButton(_("~!Continue"), Video.Width / 2 - 100, Video.Height - 100,
                  function() menu:stop() end)
