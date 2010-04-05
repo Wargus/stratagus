@@ -107,7 +107,6 @@ function AddMenuHelpers(menu)
   --
   -- The grid parameter is a table of rows, each of which is a table
   -- of widgets.  Each row should have the same number of widgets.
-  -- All keys in these tables must be numbers starting from 1.
   -- (Actually, because this function ignores the Y coordinates,
   -- it might be more natural if the parameter were a table of columns;
   -- but the current format is a bit easier for the caller to provide.)
@@ -122,10 +121,9 @@ function AddMenuHelpers(menu)
     local gap
     local x
     -- Compute the width needed for each column.
-    for rowNumber = 1, #grid do
-      row = grid[rowNumber]
-      for columnNumber = 1, #row do
-        width = row[columnNumber]:getWidth()
+    for rowNumber,row in ipairs(grid) do
+      for columnNumber,widget in ipairs(row) do
+        width = widget:getWidth()
         if columnWidths[columnNumber] == nil or columnWidths[columnNumber] < width then
           columnWidths[columnNumber] = width
         end
@@ -133,8 +131,8 @@ function AddMenuHelpers(menu)
     end
     -- How much width will be left over from the columns?
     spareWidth = menu:getWidth()
-    for columnNumber = 1, #columnWidths do
-      spareWidth = spareWidth - columnWidths[columnNumber]
+    for k,v in ipairs(columnWidths) do
+      spareWidth = spareWidth - v
     end
     -- Keep the columns as far from the edges of the menu
     -- as they are from each other.
@@ -145,11 +143,10 @@ function AddMenuHelpers(menu)
       gap = maxGap
     end
     -- Move all the widgets to their final positions.
-    for rowNumber = 1, #grid do
-      row = grid[rowNumber]
+    for rowNumber,row in ipairs(grid) do
       x = (spareWidth - gap * (#columnWidths - 1)) / 2
-      for columnNumber = 1, #row do
-        row[columnNumber]:setX(x)
+      for columnNumber,widget in ipairs(row) do
+        widget:setX(x)
         x = x + columnWidths[columnNumber] + gap
       end
     end
