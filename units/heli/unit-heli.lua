@@ -46,8 +46,8 @@ DefineAnimations("animations-heli", {
         "frame 10", "wait 1", "frame 5", "wait 1", "frame 0", "wait 1",
         "unbreakable end", "wait 1", },
     Death = {"unbreakable begin", "frame 30", "wait 4", "frame 35", 
-        "wait 4", "frame 45", "wait 4",
-        "frame 50", "wait 6", "unbreakable end", "wait 2", },
+        "wait 4", "frame 40", "wait 4",
+        "frame 45", "wait 6", "unbreakable end", "wait 2", },
     })
 
 DefineIcon({
