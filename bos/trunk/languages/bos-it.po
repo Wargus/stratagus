@@ -1087,21 +1087,21 @@ msgstr "Opzioni video"
 msgid "Language Selection"
 msgstr "Selezione lingua"
 
-#: scripts/menus/options.lua:313
-msgid "Sound"
+#: scripts/menus/options.lua:307
+msgid "~!Sound"
 msgstr "Suono"
 
-#: scripts/menus/options.lua:314
-msgid "Video"
-msgstr "Video"
+#: scripts/menus/options.lua:308
+msgid "~!Video"
+msgstr "~!Video"
 
-#: scripts/menus/options.lua:315
-msgid "Speed"
-msgstr "Velocità"
+#: scripts/menus/options.lua:309
+msgid "S~!peed"
+msgstr "V~!elocità"
 
-#: scripts/menus/options.lua:316
-msgid "Language"
-msgstr "Lingua"
+#: scripts/menus/options.lua:310
+msgid "~!Language"
+msgstr "~!Lingua"
 
 #: scripts/menus/options.lua:318
 msgid "~!Main menu"
@@ -1110,3 +1110,36 @@ msgstr "~!Menù principale"
 #: scripts/menus/options.lua:326
 msgid "Options"
 msgstr "Opzioni"
+
+#: scripts/menus/patch.lua:39 scripts/menus/patch.lua:95
+#: scripts/menus/patch.lua:130
+msgid "Patch Editor"
+msgstr "Patch Editor"
+
+#: scripts/menus/patch.lua:41 scripts/menus/patch.lua:103
+msgid "Name:"
+msgstr "Nome"
+
+#: scripts/menus/patch.lua:47
+msgid "Image:"
+msgstr "Immagine"
+
+#: scripts/menus/patch.lua:56
+msgid "x"
+msgstr "x"
+
+#: scripts/menus/patch.lua:62
+msgid "Create ~!Patch"
+msgstr "Cr~!ea Patch"
+
+#: scripts/menus/patch.lua:111
+msgid "Load ~!Patch"
+msgstr "Carica P~!atch"
+
+#: scripts/menus/patch.lua:132
+msgid "Create ~!New Patch"
+msgstr "Crea N~!uova Patch!"
+
+#: scripts/menus/patch.lua:134
+msgid "~!Load Patch"
+msgstr "Carica P~!atch"
