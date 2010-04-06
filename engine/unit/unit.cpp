@@ -1248,6 +1248,7 @@ void CUnit::ChangeOwner(CPlayer *newplayer)
 	CPlayer *oldplayer;
 	int requestedCosts[MaxCosts];
 	bool hasRequestedCosts = false;
+	bool isProducingResources = false;
 
 	oldplayer = Player;
 
@@ -1271,6 +1272,18 @@ void CUnit::ChangeOwner(CPlayer *newplayer)
 		       MaxCosts * sizeof(int));
 		hasRequestedCosts = true;
 		oldplayer->RemoveFromUnitsConsumingResources(this);
+	}
+
+	// Likewise, disconnect any resource production from the old
+	// owner.  Data.Harvest.CurrentProduction is unfortunately
+	// uninitialized until SubAction SUB_START_GATHERING, and
+	// then zero until SUB_GATHER_RESOURCE.
+	if (Orders[0]->Action == UnitActionResource
+	    && SubAction == /* SUB_GATHER_RESOURCE */ 60) {
+		isProducingResources = true;
+		for (i = 0; i < MaxCosts; ++i) {
+			oldplayer->ProductionRate[i] -= Data.Harvest.CurrentProduction[i];
+		}
 	}
 
 	//
@@ -1305,6 +1318,12 @@ void CUnit::ChangeOwner(CPlayer *newplayer)
 	// CalculateCosts called by PlayersEachCycle.
 	if (hasRequestedCosts) {
 		newplayer->AddToUnitsConsumingResources(this, requestedCosts);
+	}
+
+	if (isProducingResources) {
+		for (i = 0; i < MaxCosts; ++i) {
+			newplayer->ProductionRate[i] += Data.Harvest.CurrentProduction[i];
+		}
 	}
 
 	//

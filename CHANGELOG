@@ -2,6 +2,8 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Fix resource consumption and production issues when rescueing units 
+  (Kalle Olavi Niemitalo)
 - Add portuguese (pt-pt) translation (Tiago Faria)
 - Add the 4on4 map (Michiel van der Wulp)
 - Add the hospitality map (Kyran Jackson)
