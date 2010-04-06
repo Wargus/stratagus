@@ -1246,6 +1246,8 @@ void CUnit::ChangeOwner(CPlayer *newplayer)
 	int i;
 	CUnit *uins;
 	CPlayer *oldplayer;
+	int requestedCosts[MaxCosts];
+	bool hasRequestedCosts = false;
 
 	oldplayer = Player;
 
@@ -1259,6 +1261,16 @@ void CUnit::ChangeOwner(CPlayer *newplayer)
 	uins = UnitInside;
 	for (i = InsideCount; i; --i, uins = uins->NextContained) {
 		uins->ChangeOwner(newplayer);
+	}
+
+	// Stop the unit from consuming resources, and remember how
+	// much it did.
+	if (oldplayer->UnitsConsumingResourcesRequested.count(this) != 0) {
+		memcpy(requestedCosts,
+		       oldplayer->UnitsConsumingResourcesRequested[this],
+		       MaxCosts * sizeof(int));
+		hasRequestedCosts = true;
+		oldplayer->RemoveFromUnitsConsumingResources(this);
 	}
 
 	//
@@ -1286,6 +1298,14 @@ void CUnit::ChangeOwner(CPlayer *newplayer)
 	Stats = &Type->Stats[newplayer->Index];
 	UpdateUnitSightRange(this);
 	MapMarkUnitSight(this);
+
+	// If the unit was trying to consume resources from the old
+	// player, then request similar resources from the new player.
+	// The resources actually granted will be computed by
+	// CalculateCosts called by PlayersEachCycle.
+	if (hasRequestedCosts) {
+		newplayer->AddToUnitsConsumingResources(this, requestedCosts);
+	}
 
 	//
 	//  Must change food/gold and other.
