@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Support libpng 1.4 (Francois Beerten)
 - Fix resource consumption and production issues when rescueing units 
   (Kalle Olavi Niemitalo)
 - Add portuguese (pt-pt) translation (Tiago Faria)
