@@ -98,11 +98,6 @@
 **
 ** Called if a unit owned by the AI is killed.
 **
-** ::AiNeedMoreSupply()
-**
-** Called if an trained unit is ready, but not enough food is
-** available for it.
-**
 ** ::AiWorkComplete()
 **
 ** Called if a unit has completed its work.
@@ -347,10 +342,6 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 		}
 	}
 	file->printf("},\n");
-	if (ai->NeedSupply)
-	{
-		file->printf("  \"need-supply\",\n");
-	}
 
 	//
 	//  Requests
@@ -996,18 +987,6 @@ void AiCanNotMove(CUnit *unit)
 		AiMoveUnitInTheWay(unit);
 		return;
 	}
-}
-
-/**
-**  Called if the AI needs more farms.
-**
-**  @param unit      The unit trying to train a new unit.
-**  @param unitType  The unit type to be trained.
-*/
-void AiNeedMoreSupply(const CUnit *unit, const CUnitType *unitType)
-{
-	Assert(unit->Player->Type != PlayerPerson);
-	unit->Player->Ai->NeedSupply = true;
 }
 
 /**
