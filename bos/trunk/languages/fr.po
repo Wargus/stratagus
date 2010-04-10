@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Stratagus traduction\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-02 15:52-0800\n"
+"POT-Creation-Date: 2010-04-10 09:24+0200\n"
 "PO-Revision-Date: 2005-12-31 14:12+0100\n"
 "Last-Translator: Francois Beerten\n"
 "Language-Team: FRENCH\n"
@@ -35,147 +35,181 @@ msgstr "Ne peut créer plus d'unités %s"
 msgid "Unable to create building %s"
 msgstr "Impossible de construire le batiment %s"
 
-#: action/action_build.cpp:454
+#: action/action_build.cpp:379
 #, c-format
 msgid "New %s done"
 msgstr "Construction de %s terminée"
 
-#: action/action_spellcast.cpp:171
+#: action/action_spellcast.cpp:170
 #, c-format
 msgid "%s: not enough mana for spell: %s"
 msgstr "%s: Pas assez de mana pour ce sort : %s"
 
-#: action/action_spellcast.cpp:175
+#: action/action_spellcast.cpp:174
 #, c-format
 msgid "%s: can't cast spell: %s"
 msgstr "%s: Ne peut invoquer le sort : %s"
 
-#: action/action_train.cpp:184
+#: action/action_train.cpp:180
 #, c-format
 msgid "New %s ready"
 msgstr "Entraînement de %s terminé"
 
-#: action/action_train.cpp:235
+#: action/action_train.cpp:230
 #, c-format
 msgid "Unable to train %s"
 msgstr "Impossible d'entrainer %s"
 
-#: action/command.cpp:1025
+#: action/command.cpp:1008
 #, c-format
 msgid "Player \"%s\" has left the game"
 msgstr "Joueur \"%s\" a quitté le jeu"
 
-#: action/command.cpp:1027
+#: action/command.cpp:1010
 #, c-format
 msgid "Player \"%s\" has been killed"
 msgstr "Joueur \"%s\" a été tué"
 
-#: editor/editloop.cpp:1229
-msgid "Unit can't be placed here."
-msgstr "L'unité ne peut pas être placé ici."
-
-#: editor/editloop.cpp:1301
-msgid "Mirror editing enabled: 2-side"
-msgstr "Edition miroir activée: 2-côtés"
-
-#: editor/editloop.cpp:1304
-msgid "Mirror editing enabled: 4-side"
-msgstr "Edition miroir activée: 4-côtés"
-
-#: editor/editloop.cpp:1307
-msgid "Mirror editing disabled"
-msgstr "Edition Miroir désactivée"
-
-#: editor/editloop.cpp:1327
+#: editor/editloop.cpp:312
 msgid "Unit deleted"
 msgstr "Unité supprimée"
 
-#: editor/editloop.cpp:1350 editor/editloop.cpp:1359
+#: editor/editloop.cpp:542 editor/editloop.cpp:835
+msgid "Player"
+msgstr ""
+
+#: editor/editloop.cpp:547
+msgid "Neutral"
+msgstr ""
+
+#: editor/editloop.cpp:551
+msgid "Nobody"
+msgstr ""
+
+#: editor/editloop.cpp:554
+msgid "Person"
+msgstr ""
+
+#: editor/editloop.cpp:559
+msgid "Computer"
+msgstr ""
+
+#: editor/editloop.cpp:840
+msgid "Amount of"
+msgstr ""
+
+#: editor/editloop.cpp:856
+msgid "Patch"
+msgstr ""
+
+#: editor/editloop.cpp:1152
+msgid "Unit can't be placed here."
+msgstr "L'unité ne peut pas être placé ici."
+
+#: editor/editloop.cpp:1236
+#, fuzzy
+msgid "Patch deleted"
+msgstr "Unité supprimée"
+
+#: editor/editloop.cpp:1268
 msgid "Unit owner modified"
 msgstr "Propriétaire de l'unité modifié"
 
-#: editor/editloop.cpp:1680
+#: editor/editloop.cpp:1484
+#, fuzzy
+msgid "Select player #"
+msgstr "Selectionnez une cible"
+
+#: editor/editloop.cpp:1581
 msgid "Select mode"
 msgstr "Selectionnez un mode"
 
-#: editor/editloop.cpp:1690
+#: editor/editloop.cpp:1592
 msgid "Unit mode"
 msgstr "Mode unité"
 
-#: editor/editloop.cpp:1701
-msgid "Tile mode"
-msgstr "Mode titre"
+#: editor/editloop.cpp:1603
+#, fuzzy
+msgid "Patch mode"
+msgstr "Mode unité"
 
-#: editor/editloop.cpp:1712
+#: editor/editloop.cpp:1614
 msgid "Set start location mode"
 msgstr "Mode destination de départ"
 
-#: game/player.cpp:705
+#: editor/patch_editor.cpp:503
+msgid "Save"
+msgstr ""
+
+#: editor/patch_editor.cpp:509
+msgid "Exit"
+msgstr ""
+
+#: game/player.cpp:702
 msgid "Building Limit Reached"
 msgstr "Nombre limite de bâtiments atteint"
 
-#: game/player.cpp:709
+#: game/player.cpp:706
 msgid "Unit Limit Reached"
 msgstr "Nombre limite d'unités atteint"
 
-#: game/player.cpp:713
+#: game/player.cpp:710
 msgid "Total Unit Limit Reached"
 msgstr "Nombre total d'unités atteint"
 
-#: game/player.cpp:717
+#: game/player.cpp:714
 #, c-format
 msgid "Limit of %d reached for this unit type"
 msgstr "Limite de %d atteinte pour ce type d'unité"
 
-#: game/player.cpp:723
+#: game/player.cpp:720
 msgid "Cannot create more units."
 msgstr "Ne peut créer plus d'unités."
 
-#: game/replay.cpp:787
+#: game/replay.cpp:788
 msgid "No sync info for this replay !"
 msgstr "Pas d'info de synchronisation pour ce replay !"
 
-#: game/replay.cpp:789
+#: game/replay.cpp:790
 #, c-format
 msgid "Replay got out of sync (%lu) !"
 msgstr "Replay hors de synchronisation (%lu) !"
 
-#: game/replay.cpp:798
+#: game/replay.cpp:799
 msgid "Replay got out of sync !"
 msgstr "Replay hors de synchronisation !"
 
-#: game/replay.cpp:896 game/replay.cpp:910
+#: game/replay.cpp:897 game/replay.cpp:911
 msgid "End of replay"
 msgstr "Fin du Replay"
 
-#: network/network.cpp:1060
+#: network/network.cpp:1069
 #, c-format
 msgid "%s sent bad command"
 msgstr "%s envoie une mauvaise commande"
 
-#: network/network.cpp:1157
+#: network/network.cpp:1166
 msgid "Network out of sync"
 msgstr "Désynchronisation réseau"
 
-#: network/network.cpp:1390
+#: network/network.cpp:1399
 #, c-format
 msgid "Waiting for player \"%s\": %d:%02d"
 msgstr "En attente du joueur \"%s\": %d:%02d"
 
-#: network/network.cpp:1406
+#: network/network.cpp:1415
 msgid "Timed out"
 msgstr "Temps réglementaire fini"
 
-#: stratagus/stratagus.cpp:594
-#, c-format
+#: stratagus/stratagus.cpp:592
 msgid "Thanks for playing Bos Wars.\n"
 msgstr "Merci d'avoir joué à Bos Wars.\n"
 
-#: ui/botpanel.cpp:785 ui/botpanel.cpp:850
+#: ui/botpanel.cpp:783 ui/botpanel.cpp:848
 msgid "Select Target"
 msgstr "Selectionnez une cible"
 
-#: ui/botpanel.cpp:898
+#: ui/botpanel.cpp:896
 msgid "Select Location"
 msgstr "Selectionnez un emplacement"
 
@@ -200,7 +234,7 @@ msgstr "Musique désactivée."
 msgid "Music is on."
 msgstr "Musique activée."
 
-#: ui/interface.cpp:292 ui/mouse.cpp:1609
+#: ui/interface.cpp:292 ui/mouse.cpp:1613
 msgid "Game Paused"
 msgstr "Jeu en Pause"
 
@@ -232,78 +266,90 @@ msgstr "Terrain montré."
 msgid "Terrain hidden."
 msgstr "Terrain caché."
 
-#: ui/interface.cpp:457
+#: ui/interface.cpp:454
 msgid "Grab mouse toggled."
 msgstr "Saisie à la souris activée/désactivée"
 
-#: ui/interface.cpp:939
+#: ui/interface.cpp:936
 msgid "Screenshot made."
 msgstr "Capture d'écran sauvegardé."
 
-#: ui/mainscr.cpp:171
+#: ui/mainscr.cpp:170
 msgid "Armor: "
 msgstr "Armure:"
 
-#: ui/mainscr.cpp:177
+#: ui/mainscr.cpp:176
 msgid "Radar Range: "
 msgstr "Portée du radar:"
 
-#: ui/mainscr.cpp:182
+#: ui/mainscr.cpp:181
 msgid "Sight Range: "
 msgstr "Vision:"
 
-#: ui/mainscr.cpp:189
+#: ui/mainscr.cpp:188
 msgid "Kills: "
 msgstr ""
 
-#: ui/mainscr.cpp:194
+#: ui/mainscr.cpp:193
 msgid "Attack Range: "
 msgstr "Portée:"
 
-#: ui/mainscr.cpp:201
+#: ui/mainscr.cpp:200
 msgid "Damage: "
 msgstr "Dégât:"
 
-#: ui/mainscr.cpp:206
+#: ui/mainscr.cpp:205
 msgid "Mana: "
 msgstr ""
 
-#: ui/mainscr.cpp:376
+#: ui/mainscr.cpp:375
 msgid "Energy"
 msgstr "Energie"
 
-#: ui/mainscr.cpp:376
+#: ui/mainscr.cpp:375
 msgid "Magma"
 msgstr "Magma"
 
-#: ui/mainscr.cpp:602
+#: ui/mainscr.cpp:601
 #, c-format
 msgid "Last message repeated ~<%d~> times"
 msgstr "Dernier message répété ~<%d~> fois"
 
-#: ui/mainscr.cpp:734
+#: ui/mainscr.cpp:733
 #, c-format
 msgid "~<Event: %s~>"
 msgstr "~<Événement : %s~>"
 
-#: ui/mouse.cpp:1774
+#: ui/mouse.cpp:1778
 #, c-format
 msgid "You have ~<%d~> %ss"
 msgstr "Vous avez ~<%d~> %ss"
 
-#: ui/mouse.cpp:1778
+#: ui/mouse.cpp:1782
 #, c-format
 msgid "You have ~<1~> %s"
 msgstr "Vous avez ~<1~> %s"
 
-#: unit/unit.cpp:2117
+#: unit/unit.cpp:2150
 #, c-format
 msgid "%s attacked"
 msgstr "%s attaqué"
 
-#: video/sdl.cpp:268
+#: video/sdl.cpp:285
 msgid "esc"
 msgstr "echap"
+
+#~ msgid "Mirror editing enabled: 2-side"
+#~ msgstr "Edition miroir activée: 2-côtés"
+
+#~ msgid "Mirror editing enabled: 4-side"
+#~ msgstr "Edition miroir activée: 4-côtés"
+
+#~ msgid "Mirror editing disabled"
+#~ msgstr "Edition Miroir désactivée"
+
+#~ msgid "Tile mode"
+#~ msgstr "Mode titre"
 
 #~ msgid "~!OK"
 #~ msgstr "~!OK"

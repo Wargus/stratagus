@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bos-sv\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-29 04:34+0200\n"
+"POT-Creation-Date: 2010-04-10 09:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,243 +18,248 @@ msgstr ""
 "X-Generator: KBabel 1.11.4\n"
 "Plural-Forms:  nplurals=2; plural=(n > 1);\n"
 
-#: scripts/boswars.lua:232
+#: scripts/boswars.lua:239
 msgid "Eliminate your enemies."
 msgstr "Elimina il tuo nemico"
 
-#: scripts/guichan.lua:324
-msgid "Empty sub menu"
-msgstr "Sotto menu vuoto"
-
-#: scripts/guichan.lua:336
+#: scripts/guichan.lua:383
 msgid "Victory !"
 msgstr "Vittoria !"
 
-#: scripts/guichan.lua:339
+#: scripts/guichan.lua:386
 msgid "Draw !"
 msgstr "Pareggio !"
 
-#: scripts/guichan.lua:341
+#: scripts/guichan.lua:388
 msgid "Defeat !"
 msgstr "Sconfitta !"
 
-#: scripts/guichan.lua:348
+#: scripts/guichan.lua:395
 msgid "Cheater"
 msgstr "Imbroglione"
 
-#: scripts/guichan.lua:351
+#: scripts/guichan.lua:398
 msgid "Results"
 msgstr "Risultati"
 
-#: scripts/guichan.lua:354
+#: scripts/guichan.lua:404
 msgid "Player"
 msgstr "Giocatore"
 
-#: scripts/guichan.lua:355
+#: scripts/guichan.lua:405
 msgid "Units"
 msgstr "Unità"
 
-#: scripts/guichan.lua:356
+#: scripts/guichan.lua:406
 msgid "Buildings"
 msgstr "Edifici"
 
-#: scripts/guichan.lua:357
+#: scripts/guichan.lua:407
 msgid "Kills"
 msgstr "Uccisioni"
 
-#: scripts/guichan.lua:358
+#: scripts/guichan.lua:408
 msgid "Razings"
 msgstr "Raziati"
 
-#: scripts/guichan.lua:370
+#: scripts/guichan.lua:425
 msgid "~!Continue"
 msgstr "~!Continua"
 
-#: scripts/guichan.lua:469
+#: scripts/guichan.lua:523
 msgid "Start Game"
 msgstr "Nuova Partita"
 
-#: scripts/guichan.lua:471 scripts/guichan.lua:693
+#: scripts/guichan.lua:525 scripts/guichan.lua:747
 #: scripts/menus/network.lua:130 scripts/menus/network.lua:318
 msgid "Map"
 msgstr "Mappa"
 
-#: scripts/guichan.lua:472 scripts/guichan.lua:694
+#: scripts/guichan.lua:526 scripts/guichan.lua:748
 #: scripts/menus/network.lua:131 scripts/menus/network.lua:319
 #: scripts/menus/network.lua:419
 msgid "File:"
 msgstr "File:"
 
-#: scripts/guichan.lua:475 scripts/guichan.lua:660 scripts/guichan.lua:698
+#: scripts/guichan.lua:529 scripts/guichan.lua:714 scripts/guichan.lua:752
 #: scripts/menus/ingame/editor.lua:109 scripts/menus/network.lua:424
+#: scripts/menus/patch.lua:53
 msgid "Size:"
 msgstr "Misure:"
 
-#: scripts/guichan.lua:478 scripts/guichan.lua:696
+#: scripts/guichan.lua:532 scripts/guichan.lua:750
 #: scripts/menus/network.lua:134 scripts/menus/network.lua:322
 #: scripts/menus/network.lua:422
 msgid "Players:"
 msgstr "Giocatore"
 
-#: scripts/guichan.lua:480 scripts/guichan.lua:700
+#: scripts/guichan.lua:534 scripts/guichan.lua:754
 #: scripts/menus/network.lua:136 scripts/menus/network.lua:324
 #: scripts/menus/network.lua:426
 msgid "Description:"
 msgstr "Descrizione:"
 
-#: scripts/guichan.lua:484 scripts/menus/network.lua:140
+#: scripts/guichan.lua:538 scripts/menus/network.lua:140
 #: scripts/menus/network.lua:333
 msgid "Fog of war"
 msgstr "Nebbia di guerra"
 
-#: scripts/guichan.lua:487 scripts/guichan.lua:553
+#: scripts/guichan.lua:541 scripts/guichan.lua:607
 #: scripts/menus/network.lua:144 scripts/menus/network.lua:340
 msgid "Reveal map"
 msgstr "Mostra mappa"
 
-#: scripts/guichan.lua:491 scripts/menus/network.lua:147
+#: scripts/guichan.lua:545 scripts/menus/network.lua:147
 #: scripts/menus/network.lua:342
 msgid "Difficulty:"
 msgstr "Difficoltà:"
 
-#: scripts/guichan.lua:492 scripts/menus/network.lua:148
+#: scripts/guichan.lua:546 scripts/menus/network.lua:148
 #: scripts/menus/network.lua:343
 msgid "easy"
 msgstr "facile"
 
-#: scripts/guichan.lua:492 scripts/guichan.lua:496
+#: scripts/guichan.lua:546 scripts/guichan.lua:550
 #: scripts/menus/network.lua:148 scripts/menus/network.lua:152
 #: scripts/menus/network.lua:343 scripts/menus/network.lua:351
 msgid "normal"
 msgstr "normale"
 
-#: scripts/guichan.lua:492 scripts/menus/network.lua:148
+#: scripts/guichan.lua:546 scripts/menus/network.lua:148
 #: scripts/menus/network.lua:343
 msgid "hard"
 msgstr "difficile"
 
-#: scripts/guichan.lua:495 scripts/menus/network.lua:151
+#: scripts/guichan.lua:549 scripts/menus/network.lua:151
 #: scripts/menus/network.lua:350
 msgid "Starting resources:"
 msgstr "Risorse iniziali:"
 
-#: scripts/guichan.lua:496 scripts/menus/network.lua:152
+#: scripts/guichan.lua:550 scripts/menus/network.lua:152
 #: scripts/menus/network.lua:351
 msgid "high"
 msgstr "Alte"
 
-#: scripts/guichan.lua:496 scripts/menus/network.lua:152
+#: scripts/guichan.lua:550 scripts/menus/network.lua:152
 #: scripts/menus/network.lua:351
 msgid "low"
 msgstr "Basse"
 
-#: scripts/guichan.lua:499 scripts/menus/network.lua:155
+#: scripts/guichan.lua:553 scripts/menus/network.lua:155
 #: scripts/menus/network.lua:358
 msgid "Game type:"
 msgstr "Tipo di gioco:"
 
-#: scripts/guichan.lua:500 scripts/menus/network.lua:156
+#: scripts/guichan.lua:554 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Map Default"
 msgstr "Mappa predefinita"
 
-#: scripts/guichan.lua:500 scripts/menus/network.lua:156
+#: scripts/guichan.lua:554 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Melee"
 msgstr "Mischia"
 
-#: scripts/guichan.lua:500 scripts/menus/network.lua:156
+#: scripts/guichan.lua:554 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Free For All"
 msgstr "Libera tutti"
 
-#: scripts/guichan.lua:500 scripts/menus/network.lua:156
+#: scripts/guichan.lua:554 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Top vs Bottom"
 msgstr "Alto vs Basso"
 
-#: scripts/guichan.lua:500 scripts/menus/network.lua:156
+#: scripts/guichan.lua:554 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Left vs Right"
 msgstr "Sinistra vs Destra"
 
-#: scripts/guichan.lua:500 scripts/menus/network.lua:156
+#: scripts/guichan.lua:554 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Man vs Machine"
 msgstr "Uomo vs Macchina"
 
-#: scripts/guichan.lua:532 scripts/guichan.lua:564 scripts/guichan.lua:608
-#: scripts/guichan.lua:676 scripts/guichan.lua:728
+#: scripts/guichan.lua:586 scripts/guichan.lua:618 scripts/guichan.lua:662
+#: scripts/guichan.lua:730 scripts/guichan.lua:782
 #: scripts/menus/campaigns.lua:141 scripts/menus/credits.lua:141
 msgid "~!Main Menu"
 msgstr "~!Menù principale"
 
-#: scripts/guichan.lua:534 scripts/guichan.lua:566 scripts/guichan.lua:610
+#: scripts/guichan.lua:588 scripts/guichan.lua:620 scripts/guichan.lua:664
 #: scripts/menus/campaigns.lua:57 scripts/menus/campaigns.lua:143
 msgid "~!Start"
 msgstr "~!Inizio"
 
-#: scripts/guichan.lua:543
+#: scripts/guichan.lua:597
 msgid "Show a Replay"
 msgstr "Mostra replay"
 
-#: scripts/guichan.lua:577
+#: scripts/guichan.lua:631
 msgid "Load Game"
 msgstr "Carica"
 
-#: scripts/guichan.lua:621 scripts/guichan.lua:641 scripts/guichan.lua:691
+#: scripts/guichan.lua:675 scripts/guichan.lua:698 scripts/guichan.lua:745
 msgid "Editor"
 msgstr "Editor"
 
-#: scripts/guichan.lua:623
+#: scripts/guichan.lua:677
 msgid "Create ~!New Map"
 msgstr "Crea ~! Nuova mappa"
 
-#: scripts/guichan.lua:625
+#: scripts/guichan.lua:679
 msgid "~!Load Map"
 msgstr "~!Carica mappa"
 
-#: scripts/guichan.lua:628 scripts/menus/ingame/editor.lua:125
-#: scripts/menus/ingame/editor.lua:230 scripts/menus/ingame/game.lua:304
+#: scripts/guichan.lua:682
+#, fuzzy
+msgid "~!Patch Editor"
+msgstr "Patch Editor"
+
+#: scripts/guichan.lua:685 scripts/menus/ingame/editor.lua:87
+#: scripts/menus/ingame/editor.lua:125 scripts/menus/ingame/editor.lua:230
+#: scripts/menus/ingame/game.lua:112 scripts/menus/ingame/game.lua:304
 #: scripts/menus/network.lua:177 scripts/menus/network.lua:243
 #: scripts/menus/network.lua:304 scripts/menus/network.lua:378
 #: scripts/menus/network.lua:452 scripts/menus/network.lua:499
+#: scripts/menus/patch.lua:80 scripts/menus/patch.lua:119
+#: scripts/menus/patch.lua:137
 msgid "~!Cancel"
 msgstr "~!Cancella"
 
-#: scripts/guichan.lua:678 scripts/guichan.lua:730 scripts/guichan.lua:759
+#: scripts/guichan.lua:732 scripts/guichan.lua:784 scripts/guichan.lua:814
 msgid "Start ~!Editor"
 msgstr "Inizia ~!Editor"
 
-#: scripts/guichan.lua:750 scripts/menus/network.lua:381
+#: scripts/guichan.lua:805 scripts/menus/network.lua:381
 msgid "~!Start Game"
 msgstr "~!Inizia partita"
 
-#: scripts/guichan.lua:751
+#: scripts/guichan.lua:806
 msgid "~!Load Game"
 msgstr "~!Carica"
 
-#: scripts/guichan.lua:752
+#: scripts/guichan.lua:807
 msgid "~!Campaigns"
 msgstr "Ca~!mpagna"
 
-#: scripts/guichan.lua:753
+#: scripts/guichan.lua:808
 msgid "Show ~!Replay"
 msgstr "Mostra ~!Replay"
 
-#: scripts/guichan.lua:755
+#: scripts/guichan.lua:810
 msgid "~!MultiPlayer"
 msgstr "Multig~!iocatore"
 
-#: scripts/guichan.lua:756
+#: scripts/guichan.lua:811
 msgid "~!Options"
 msgstr "~!Opzioni"
 
-#: scripts/guichan.lua:758
+#: scripts/guichan.lua:813
 msgid "Cre~!dits"
 msgstr "Cre~!diti"
 
-#: scripts/guichan.lua:761
+#: scripts/guichan.lua:816
 msgid "E~!xit"
 msgstr "U~!scita"
 
@@ -343,12 +348,9 @@ msgid "Save Map"
 msgstr "Salva la mappa"
 
 #: scripts/menus/ingame/editor.lua:78 scripts/menus/ingame/game.lua:91
-msgid "Save"
+#, fuzzy
+msgid "~!Save"
 msgstr "Salva"
-
-#: scripts/menus/ingame/editor.lua:87 scripts/menus/ingame/game.lua:112
-msgid "Cancel"
-msgstr "Cancella"
 
 #: scripts/menus/ingame/editor.lua:99
 msgid "Map Properties"
@@ -362,8 +364,8 @@ msgstr "Descrizione mappa:"
 #: scripts/menus/ingame/game.lua:180 scripts/menus/ingame/game.lua:254
 #: scripts/menus/ingame/game.lua:533 scripts/menus/ingame/game.lua:559
 #: scripts/menus/network.lua:67 scripts/menus/options.lua:64
-#: scripts/menus/options.lua:141 scripts/menus/options.lua:247
-#: scripts/menus/options.lua:306
+#: scripts/menus/options.lua:141 scripts/menus/options.lua:241
+#: scripts/menus/options.lua:302
 msgid "~!OK"
 msgstr "~!OK"
 
@@ -862,16 +864,16 @@ msgid ""
 "holding down the CTRL key and selecting a unit or by \"double clicking\" on "
 "a unit."
 msgstr ""
-"Puoi selezonare le tue unità visibili dello stesso tipo"
-"tenendo premuto CTRL e selezionando un unità o cliccandoci due volte sopra." 
+"Puoi selezonare le tue unità visibili dello stesso tipotenendo premuto CTRL "
+"e selezionando un unità o cliccandoci due volte sopra."
 
 #: scripts/menus/ingame/game.lua:467
 msgid ""
 "The more engineers you have collecting resources, the faster your economy "
 "will grow."
 msgstr ""
-"Più Ingegneri raccoglieranno le risorse, più velocemente crescerà la tua"
-"economia."
+"Più Ingegneri raccoglieranno le risorse, più velocemente crescerà la "
+"tuaeconomia."
 
 #: scripts/menus/ingame/game.lua:469
 msgid "Use your engineers to repair damaged buildings."
@@ -883,7 +885,8 @@ msgstr "Esplora presto l'ambiente di gioco. "
 
 #: scripts/menus/ingame/game.lua:473
 msgid "Keep all engineers working. Use ALT-I to find idle engineers."
-msgstr "Mantieni operativi gli ingegneri. Usa ALT-I per gli ingegneri inattivi."
+msgstr ""
+"Mantieni operativi gli ingegneri. Usa ALT-I per gli ingegneri inattivi."
 
 #: scripts/menus/ingame/game.lua:474
 msgid ""
@@ -892,40 +895,40 @@ msgid ""
 "off."
 msgstr ""
 "Puoi performare automaticamente delle azioni speciali selezionando un unità "
-"premendo CTRL e cliccando sull'icona. CTRL e Click nuovamente per" 
-"disattivarlo."
+"premendo CTRL e cliccando sull'icona. CTRL e Click nuovamente "
+"perdisattivarlo."
 
 #: scripts/menus/ingame/game.lua:477
 msgid ""
 "You can give an unit an order which is executed after it finishes the "
 "current work, if you hold the SHIFT key."
 msgstr ""
-"Premendo SHIFT puoi dare un ordine ad una unita che sarà eseguito"
-"appena avrà finito il lavoro corrente."
+"Premendo SHIFT puoi dare un ordine ad una unita che sarà eseguitoappena avrà "
+"finito il lavoro corrente."
 
 #: scripts/menus/ingame/game.lua:478
 msgid ""
 "You can give way points, if you press the SHIFT key, while you click right "
 "for the move command."
 msgstr ""
-"Puoi dare dei punti di movimento premendo SHIFT mentre clicchi"
-"col tasto destro per il movimento."
+"Puoi dare dei punti di movimento premendo SHIFT mentre clicchicol tasto "
+"destro per il movimento."
 
 #: scripts/menus/ingame/game.lua:479
 msgid ""
 "You can order an engineer to build one building after the other, if you hold "
 "the SHIFT key, while you place the building."
 msgstr ""
-"Puoi ordinare agli ingegneri di costruire un edificio vicino all'altro"
-"tenendo premuto SHIFT mentre posizioni l'edificio."
+"Puoi ordinare agli ingegneri di costruire un edificio vicino "
+"all'altrotenendo premuto SHIFT mentre posizioni l'edificio."
 
 #: scripts/menus/ingame/game.lua:480
 msgid ""
 "You can build many of the same building, if you hold the ALT and SHIFT keys "
 "while you place the buildings."
 msgstr ""
-"Puoi costruire più edifici dello stesso tipo tenendo premuto ALT e SHIFT"
-"mentre posizioni l'edificio."
+"Puoi costruire più edifici dello stesso tipo tenendo premuto ALT e "
+"SHIFTmentre posizioni l'edificio."
 
 #: scripts/menus/ingame/game.lua:482
 msgid ""
@@ -1071,43 +1074,43 @@ msgstr "Abilitato"
 msgid "Music Volume"
 msgstr "Volume musica"
 
-#: scripts/menus/options.lua:224
+#: scripts/menus/options.lua:218
 msgid "Fullscreen"
 msgstr "Schermo intero"
 
-#: scripts/menus/options.lua:232
+#: scripts/menus/options.lua:226
 msgid "Use OpenGL (restart required)"
 msgstr "Usa OpenGl (neccessario il riavvio)"
 
-#: scripts/menus/options.lua:245
+#: scripts/menus/options.lua:239
 msgid "Video Options"
 msgstr "Opzioni video"
 
-#: scripts/menus/options.lua:263
+#: scripts/menus/options.lua:257
 msgid "Language Selection"
 msgstr "Selezione lingua"
 
-#: scripts/menus/options.lua:307
+#: scripts/menus/options.lua:309
 msgid "~!Sound"
 msgstr "Suono"
 
-#: scripts/menus/options.lua:308
+#: scripts/menus/options.lua:310
 msgid "~!Video"
 msgstr "~!Video"
 
-#: scripts/menus/options.lua:309
+#: scripts/menus/options.lua:311
 msgid "S~!peed"
 msgstr "V~!elocità"
 
-#: scripts/menus/options.lua:310
+#: scripts/menus/options.lua:312
 msgid "~!Language"
 msgstr "~!Lingua"
 
-#: scripts/menus/options.lua:318
+#: scripts/menus/options.lua:314
 msgid "~!Main menu"
 msgstr "~!Menù principale"
 
-#: scripts/menus/options.lua:326
+#: scripts/menus/options.lua:322
 msgid "Options"
 msgstr "Opzioni"
 
@@ -1143,3 +1146,9 @@ msgstr "Crea N~!uova Patch!"
 #: scripts/menus/patch.lua:134
 msgid "~!Load Patch"
 msgstr "Carica P~!atch"
+
+#~ msgid "Empty sub menu"
+#~ msgstr "Sotto menu vuoto"
+
+#~ msgid "Cancel"
+#~ msgstr "Cancella"
