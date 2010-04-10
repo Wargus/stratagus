@@ -147,10 +147,6 @@ void HandleActionTrain(CUnit *unit)
 		//
 		food = player->CheckLimits(unit->Orders[0]->Type);
 		if (food < 0) {
-			if (food == -3 && unit->Player->AiEnabled) {
-				AiNeedMoreSupply(unit, unit->Orders[0]->Type);
-			}
-
 			unit->Data.Train.Ticks = pcost;
 			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
