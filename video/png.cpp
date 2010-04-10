@@ -9,7 +9,7 @@
 //
 /**@name png.cpp - The png graphic file loader. */
 //
-//      (c) Copyright 1998-2008 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2010 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -101,6 +101,7 @@ int LoadGraphicPNG(CGraphic *g)
 	png_color_16 *transv;
 	char name[PATH_MAX];
 	int ret;
+	int channels;
 
 	ckey = -1;
 	ret = 0;
@@ -144,7 +145,7 @@ int LoadGraphicPNG(CGraphic *g)
 	 * the normal method of doing things with libpng).  REQUIRED unless you
 	 * set up your own error handlers in png_create_read_struct() earlier.
 	 */
-	if (setjmp(png_ptr->jmpbuf)) {
+	if (setjmp(png_jmpbuf(png_ptr))) {
 		fprintf(stderr, "Error reading the PNG file.\n");
 		ret = -1;
 		goto done;
@@ -216,6 +217,7 @@ int LoadGraphicPNG(CGraphic *g)
 
 	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth,
 		&color_type, &interlace_type, NULL, NULL);
+	channels = png_get_channels(png_ptr, info_ptr);
 
 	/* Allocate the SDL surface to hold the image */
 	Rmask = Gmask = Bmask = Amask = 0 ;
@@ -224,11 +226,11 @@ int LoadGraphicPNG(CGraphic *g)
 			Rmask = 0x000000FF;
 			Gmask = 0x0000FF00;
 			Bmask = 0x00FF0000;
-			Amask = (info_ptr->channels == 4) ? 0xFF000000 : 0;
+			Amask = (channels == 4) ? 0xFF000000 : 0;
 		} else {
 			int s;
 
-			s = (info_ptr->channels == 4) ? 0 : 8;
+			s = (channels == 4) ? 0 : 8;
 			Rmask = 0xFF000000 >> s;
 			Gmask = 0x00FF0000 >> s;
 			Bmask = 0x0000FF00 >> s;
@@ -236,7 +238,7 @@ int LoadGraphicPNG(CGraphic *g)
 		}
 	}
 	surface = SDL_AllocSurface(SDL_SWSURFACE, width, height,
-		bit_depth * info_ptr->channels, Rmask, Gmask, Bmask, Amask);
+		bit_depth * channels, Rmask, Gmask, Bmask, Amask);
 	if (surface == NULL) {
 		fprintf(stderr, "Out of memory");
 		goto done;
@@ -275,6 +277,9 @@ int LoadGraphicPNG(CGraphic *g)
 	/* Load the palette, if any */
 	palette = surface->format->palette;
 	if (palette) {
+		int num_palette;
+		png_colorp png_palette;
+		png_get_PLTE(png_ptr, info_ptr, &png_palette, &num_palette);
 		if (color_type == PNG_COLOR_TYPE_GRAY) {
 			palette->ncolors = 256;
 			for (i = 0; i < 256; ++i) {
@@ -282,12 +287,12 @@ int LoadGraphicPNG(CGraphic *g)
 				palette->colors[i].g = i;
 				palette->colors[i].b = i;
 			}
-		} else if (info_ptr->num_palette > 0) {
-			palette->ncolors = info_ptr->num_palette;
-			for (i = 0; i < info_ptr->num_palette; ++i) {
-				palette->colors[i].b = info_ptr->palette[i].blue;
-				palette->colors[i].g = info_ptr->palette[i].green;
-				palette->colors[i].r = info_ptr->palette[i].red;
+		} else if (num_palette > 0) {
+			palette->ncolors = num_palette;
+			for (i = 0; i < num_palette; ++i) {
+				palette->colors[i].b = png_palette[i].blue;
+				palette->colors[i].g = png_palette[i].green;
+				palette->colors[i].r = png_palette[i].red;
 			}
 		}
 	}
@@ -340,7 +345,7 @@ void SaveScreenshotPNG(const std::string &name)
 		return;
 	}
 
-	if (setjmp(png_ptr->jmpbuf)) {
+	if (setjmp(png_jmpbuf(png_ptr))) {
 		/* If we get here, we had a problem reading the file */
 		fclose(fp);
 		png_destroy_write_struct(&png_ptr, &info_ptr);
