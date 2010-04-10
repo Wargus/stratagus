@@ -3,6 +3,14 @@
 <!--#include file="header.shtml" -->
  
 <h1><span>Screenshots</span></h1>
+
+<h2><span>Bos Wars 2.6</span></h2>
+<p>The editor now works with patches and we have a patch editor:</p>
+<div class="center">
+  <a href="images/boswars-2.6-0.jpg"><img src="images/boswars-2.6-0s.jpg" alt="boswars-2.6-0.jpg" /></a>
+  <a href="images/boswars-2.6-1.jpg"><img src="images/boswars-2.6-1s.jpg" alt="boswars-2.6-1.jpg" /></a>
+</div>
+
 <h2><span>Bos Wars 2.4</span></h2>
 <div class="center">
   <a href="images/boswars-2.4-0.jpg"><img src="images/boswars-2.4-0s.jpg" alt="boswars-2.4-0.jpg" /></a>
