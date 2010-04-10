@@ -82,6 +82,7 @@ static int HelpMeLastY;                   /// Last Y coordinate HelpMe sound pla
 ----------------------------------------------------------------------------*/
 
 static void RemoveUnitFromContainer(CUnit *unit);
+static void UnitRemoveProductionAndStorage(CUnit *unit);
 
 /**
 **  Increase a unit's reference count.
@@ -1283,6 +1284,7 @@ void CUnit::ChangeOwner(CPlayer *newplayer)
 	// owner.  Data.Harvest.CurrentProduction is unfortunately
 	// uninitialized until SubAction SUB_START_GATHERING, and
 	// then zero until SUB_GATHER_RESOURCE.
+	UnitRemoveProductionAndStorage(this);
 	if (Orders[0]->Action == UnitActionResource
 	    && SubAction == /* SUB_GATHER_RESOURCE */ 60) {
 		isProducingResources = true;
@@ -2007,15 +2009,7 @@ void LetUnitDie(CUnit *unit)
 	}
 
 	UnitRemoveConsumingResources(unit);
-	if (unit->Orders[0]->Action != UnitActionBuilt) {
-		for (int u = 0; u < MaxCosts; ++u) {
-			unit->Player->ProductionRate[u] -= unit->Type->ProductionRate[u] * unit->ProductionEfficiency / 100;
-			unit->Player->StorageCapacity[u] -= unit->Type->StorageCapacity[u];
-			if (unit->Player->StoredResources[u] > unit->Player->StorageCapacity[u]) {
-				unit->Player->StoredResources[u] = unit->Player->StorageCapacity[u];
-			}
-		}
-	}
+	UnitRemoveProductionAndStorage(unit);
 
 	// Transporters lose their units and building their workers
 	if (unit->UnitInside) {
@@ -2050,6 +2044,33 @@ void LetUnitDie(CUnit *unit)
 		UnitCache.Insert(unit);
 	}
 	MapMarkUnitSight(unit);
+}
+
+/**
+** Subtract the production rate and storage capacity of the unit from
+** the player that owns it.  However, do nothing if the unit hasn't
+** yet been fully built, because that means the production rate and
+** storage capacity haven't even been added to the player yet.
+**
+** This function is called when the player is losing the unit: either
+** because the unit is dying, or because the unit is being transferred
+** to another player.
+**
+** This function ignores harvesting.  If the unit may be harvesting
+** some resources, the caller must deduct that from the player in some
+** other way.
+*/
+static void UnitRemoveProductionAndStorage(CUnit *unit)
+{
+	if (unit->Orders[0]->Action != UnitActionBuilt) {
+		for (int u = 0; u < MaxCosts; ++u) {
+			unit->Player->ProductionRate[u] -= unit->Type->ProductionRate[u] * unit->ProductionEfficiency / 100;
+			unit->Player->StorageCapacity[u] -= unit->Type->StorageCapacity[u];
+			if (unit->Player->StoredResources[u] > unit->Player->StorageCapacity[u]) {
+				unit->Player->StoredResources[u] = unit->Player->StorageCapacity[u];
+			}
+		}
+	}
 }
 
 /**
