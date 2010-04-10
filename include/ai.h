@@ -60,7 +60,6 @@ extern void AiCclRegister();                /// Register ccl features
 
 extern void AiHelpMe(const CUnit *attacker, CUnit *defender);
 extern void AiUnitKilled(CUnit *unit);
-extern void AiNeedMoreSupply(const CUnit *unit, const CUnitType *unitType);
 extern void AiWorkComplete(CUnit *unit, CUnit *newUnit);
 extern void AiCanNotBuild(CUnit *unit, const CUnitType *unitType);
 extern void AiCanNotReach(CUnit *unit, const CUnitType *unitType);

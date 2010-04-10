@@ -173,7 +173,7 @@ public:
 class PlayerAi {
 public:
 	PlayerAi() : Player(NULL), AiType(NULL), ScriptDebug(false),
-		SleepCycles(0), NeededMask(0), NeedSupply(false),
+		SleepCycles(0), NeededMask(0),
 		LastCanNotMoveGameCycle(0), LastRepairBuilding(0)
 	{
 		memset(Needed, 0, sizeof(Needed));
@@ -195,7 +195,6 @@ public:
 	// resource manager
 	int Needed[MaxCosts];  /// Needed resources
 	int NeededMask;        /// Mask for needed resources
-	bool NeedSupply;       /// Flag need food
 
 	unsigned long LastCanNotMoveGameCycle;          /// Last can not move cycle
 	std::vector<AiRequestType> UnitTypeRequests;    /// unit-types to build/train request,priority list
