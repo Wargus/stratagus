@@ -1,7 +1,7 @@
 Change log for Bos Wars
 -----------------------
 
-Development version:
+Version 2.6 (2010 04 10):
 - Support libpng 1.4 (Francois Beerten)
 - Fix resource consumption and production issues when rescueing units 
   (Kalle Olavi Niemitalo)
