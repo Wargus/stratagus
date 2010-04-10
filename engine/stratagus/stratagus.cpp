@@ -744,10 +744,7 @@ int main(int argc, char **argv)
 			case 'd':
 			{
 				StratagusLibPath = optarg;
-				size_t index;
-				while ((index = StratagusLibPath.find('\\')) != std::string::npos) {
-					StratagusLibPath[index] = '/';
-				}
+				replace(StratagusLibPath.begin(), StratagusLibPath.end(), '\\', '/');
 				continue;
 			}
 			case 'E':
@@ -840,11 +837,8 @@ int main(int argc, char **argv)
 	}
 
 	if (argc - optind) {
-		size_t index;
 		CliMapName = argv[optind];
-		while ((index = CliMapName.find('\\')) != std::string::npos) {
-			CliMapName[index] = '/';
-		}
+		replace(CliMapName.begin(), CliMapName.end(), '\\', '/');
 		--argc;
 	}
 
