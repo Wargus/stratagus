@@ -1141,11 +1141,3 @@ msgstr "Opret ~!Nyt Kort"
 msgid "~!Load Patch"
 msgstr "~!Hent Kort"
 
-#~ msgid "Empty sub menu"
-#~ msgstr "Tom under menu"
-
-#~ msgid "Kill them all !"
-#~ msgstr "Dræb alle !"
-
-#~ msgid "Start"
-#~ msgstr "Start"

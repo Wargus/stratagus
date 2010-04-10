@@ -341,18 +341,3 @@ msgstr "%s napaden"
 #: video/sdl.cpp:285
 msgid "esc"
 msgstr ""
-
-#~ msgid "Mirror editing enabled: 2-side"
-#~ msgstr "Mirror editing povoleno: 2-strany"
-
-#~ msgid "Mirror editing enabled: 4-side"
-#~ msgstr "Mirror editing povoleno: 4-strany"
-
-#~ msgid "Mirror editing disabled"
-#~ msgstr "Mirror editing zakázáno"
-
-#~ msgid "Tile mode"
-#~ msgstr "\"Dláždicí\" režim"
-
-#~ msgid "~!Cancel"
-#~ msgstr "Zrušit (~!c)"

@@ -1148,8 +1148,3 @@ msgstr "Maak ~!Nieuwe kaart"
 msgid "~!Load Patch"
 msgstr "~!Laad kaart"
 
-#~ msgid "Empty sub menu"
-#~ msgstr "Leeg submenu"
-
-#~ msgid "Kill them all !"
-#~ msgstr "Dood ze allemaal !"

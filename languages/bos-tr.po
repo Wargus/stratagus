@@ -1143,9 +1143,3 @@ msgstr "Oluştur ~!Yeni Harita"
 #, fuzzy
 msgid "~!Load Patch"
 msgstr "~!Harita Yükle"
-
-#~ msgid "Empty sub menu"
-#~ msgstr "ALt menüyü temizle"
-
-#~ msgid "Kill them all !"
-#~ msgstr "Hepsini öldür !"

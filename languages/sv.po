@@ -338,20 +338,3 @@ msgstr "%s attackerad"
 msgid "esc"
 msgstr "esc"
 
-#~ msgid "Mirror editing enabled: 2-side"
-#~ msgstr "Speglade förändringar aktiverade: 2 sidor"
-
-#~ msgid "Mirror editing enabled: 4-side"
-#~ msgstr "Speglade förändringar aktiverade: 4 sidor"
-
-#~ msgid "Mirror editing disabled"
-#~ msgstr "Speglade förändringar avaktiverade"
-
-#~ msgid "Tile mode"
-#~ msgstr "Terräng"
-
-#~ msgid "~!OK"
-#~ msgstr "~!OK"
-
-#~ msgid "~!Cancel"
-#~ msgstr "Avbryt (~!C)"

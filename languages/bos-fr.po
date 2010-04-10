@@ -1148,11 +1148,3 @@ msgstr "Créer une ~!nouvelle carte"
 msgid "~!Load Patch"
 msgstr "~!Charger une carte"
 
-#~ msgid "Empty sub menu"
-#~ msgstr "Sous menu vide"
-
-#~ msgid "Kill them all !"
-#~ msgstr "Rasez tout "
-
-#~ msgid "Start"
-#~ msgstr "Démarrer"

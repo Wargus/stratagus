@@ -1147,8 +1147,3 @@ msgstr "Crea N~!uova Patch!"
 msgid "~!Load Patch"
 msgstr "Carica P~!atch"
 
-#~ msgid "Empty sub menu"
-#~ msgstr "Sotto menu vuoto"
-
-#~ msgid "Cancel"
-#~ msgstr "Cancella"
