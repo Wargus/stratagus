@@ -107,6 +107,7 @@ function AddMenuHelpers(menu)
   --
   -- The grid parameter is a table of rows, each of which is a table
   -- of widgets.  Each row should have the same number of widgets.
+  -- A rows must be a plain array without specific keys.
   -- (Actually, because this function ignores the Y coordinates,
   -- it might be more natural if the parameter were a table of columns;
   -- but the current format is a bit easier for the caller to provide.)
