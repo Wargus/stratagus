@@ -208,7 +208,7 @@ msgstr "~!Laad kaart"
 #: scripts/guichan.lua:682
 #, fuzzy
 msgid "~!Patch Editor"
-msgstr "Start ~!Editor"
+msgstr "~!Patch Editor"
 
 #: scripts/guichan.lua:685 scripts/menus/ingame/editor.lua:87
 #: scripts/menus/ingame/editor.lua:125 scripts/menus/ingame/editor.lua:230
@@ -998,7 +998,6 @@ msgid "Incompatible engine version"
 msgstr "Onverenigbare engine versie"
 
 #: scripts/menus/network.lua:272
-#, fuzzy
 msgid "Incompatible network version"
 msgstr "Onverenigbare netwerk versie"
 
@@ -1112,39 +1111,34 @@ msgstr "Opties"
 
 #: scripts/menus/patch.lua:39 scripts/menus/patch.lua:95
 #: scripts/menus/patch.lua:130
-#, fuzzy
 msgid "Patch Editor"
-msgstr "Start ~!Editor"
+msgstr "Patch Editor"
 
 #: scripts/menus/patch.lua:41 scripts/menus/patch.lua:103
-#, fuzzy
 msgid "Name:"
-msgstr "Bijnaam :"
+msgstr "Naam :"
 
 #: scripts/menus/patch.lua:47
 msgid "Image:"
-msgstr ""
+msgstr "Beeld :"
 
 #: scripts/menus/patch.lua:56
 msgid "x"
 msgstr ""
 
 #: scripts/menus/patch.lua:62
-#, fuzzy
 msgid "Create ~!Patch"
-msgstr "Begin spel (~!G)"
+msgstr ""
 
 #: scripts/menus/patch.lua:111
 msgid "Load ~!Patch"
 msgstr ""
 
 #: scripts/menus/patch.lua:132
-#, fuzzy
 msgid "Create ~!New Patch"
-msgstr "Maak ~!Nieuwe kaart"
+msgstr "Maak ~!Nieuwe Patch"
 
 #: scripts/menus/patch.lua:134
-#, fuzzy
 msgid "~!Load Patch"
-msgstr "~!Laad kaart"
+msgstr "~!Laad Patch"
 
