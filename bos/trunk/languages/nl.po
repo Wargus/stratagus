@@ -102,18 +102,16 @@ msgid "Unit can't be placed here."
 msgstr "Eenheid kan hier niet geplaatst worden."
 
 #: editor/editloop.cpp:1236
-#, fuzzy
 msgid "Patch deleted"
-msgstr "Eenheid verwijderd"
+msgstr "Patch verwijderd"
 
 #: editor/editloop.cpp:1268
 msgid "Unit owner modified"
 msgstr "Eenheid eigenaar veranderd"
 
 #: editor/editloop.cpp:1484
-#, fuzzy
 msgid "Select player #"
-msgstr "Selecteer doel"
+msgstr "Selecteer speler #"
 
 #: editor/editloop.cpp:1581
 msgid "Select mode"
@@ -124,9 +122,8 @@ msgid "Unit mode"
 msgstr "Eenheid modus"
 
 #: editor/editloop.cpp:1603
-#, fuzzy
 msgid "Patch mode"
-msgstr "Eenheid modus"
+msgstr "Patch modus"
 
 #: editor/editloop.cpp:1614
 msgid "Set start location mode"
@@ -321,9 +318,8 @@ msgid "You have ~<%d~> %ss"
 msgstr "Je hebt ~<%d~> %ss"
 
 #: ui/mouse.cpp:1782
-#, fuzzy, c-format
 msgid "You have ~<1~> %s"
-msgstr "Je hebt ~<%d~> %ss"
+msgstr "Je hebt ~<1~> %s"
 
 #: unit/unit.cpp:2150
 #, c-format
