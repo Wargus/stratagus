@@ -1,5 +1,5 @@
 # translation of bos-fr.po to
-# Copyright (C) 2006 GNU GPL version 2
+# Copyright (C) 2006-2010 GNU GPL version 2
 # This file is distributed under the same license as the BOS package.
 #
 # Francois Beerten , 2006.
@@ -212,9 +212,8 @@ msgid "~!Load Map"
 msgstr "~!Charger une carte"
 
 #: scripts/guichan.lua:682
-#, fuzzy
 msgid "~!Patch Editor"
-msgstr "~!Editeur"
+msgstr "~!Editeur de Patch"
 
 #: scripts/guichan.lua:685 scripts/menus/ingame/editor.lua:87
 #: scripts/menus/ingame/editor.lua:125 scripts/menus/ingame/editor.lua:230
@@ -562,7 +561,6 @@ msgid "Alt-F"
 msgstr ""
 
 #: scripts/menus/ingame/game.lua:386
-#, fuzzy
 msgid "- toggle full screen"
 msgstr "Plein écran"
 
@@ -631,7 +629,6 @@ msgid "Alt-H"
 msgstr ""
 
 #: scripts/menus/ingame/game.lua:395
-#, fuzzy
 msgid "- help menu"
 msgstr "Menu d'aide"
 
@@ -640,7 +637,6 @@ msgid "Alt-R"
 msgstr ""
 
 #: scripts/menus/ingame/game.lua:396
-#, fuzzy
 msgid "- restart game"
 msgstr "Redémarrer la partie"
 
@@ -649,7 +645,6 @@ msgid "Alt-Q"
 msgstr ""
 
 #: scripts/menus/ingame/game.lua:397
-#, fuzzy
 msgid "- quit to main menu"
 msgstr "Quitter vers le Menu"
 
@@ -674,7 +669,6 @@ msgid "Alt-M"
 msgstr ""
 
 #: scripts/menus/ingame/game.lua:400 scripts/menus/ingame/game.lua:421
-#, fuzzy
 msgid "- game menu"
 msgstr "Menu de la partie"
 
@@ -811,7 +805,6 @@ msgid "F5"
 msgstr ""
 
 #: scripts/menus/ingame/game.lua:417
-#, fuzzy
 msgid "- game options"
 msgstr "Options de Jeu"
 
@@ -820,7 +813,6 @@ msgid "F7"
 msgstr ""
 
 #: scripts/menus/ingame/game.lua:418
-#, fuzzy
 msgid "- sound options"
 msgstr "Options Sons"
 
@@ -829,7 +821,6 @@ msgid "F8"
 msgstr ""
 
 #: scripts/menus/ingame/game.lua:419
-#, fuzzy
 msgid "- speed options"
 msgstr "Options Vitesse"
 
@@ -850,7 +841,6 @@ msgid "F11"
 msgstr ""
 
 #: scripts/menus/ingame/game.lua:422
-#, fuzzy
 msgid "- save game"
 msgstr "Sauver la partie"
 
@@ -859,7 +849,6 @@ msgid "F12"
 msgstr ""
 
 #: scripts/menus/ingame/game.lua:423
-#, fuzzy
 msgid "- load game"
 msgstr "Charger une partie"
 
@@ -886,7 +875,6 @@ msgstr ""
 "Utilisez vos ingénieurs (engineers) pour réparer les bâtiments endommagés."
 
 #: scripts/menus/ingame/game.lua:470
-#, fuzzy
 msgid "Explore your surroundings early in the game."
 msgstr "Explorez les alentours tôt dans la partie."
 
@@ -998,7 +986,6 @@ msgid "Incompatible engine version"
 msgstr "Version du moteur incompatible"
 
 #: scripts/menus/network.lua:272
-#, fuzzy
 msgid "Incompatible network version"
 msgstr "Version du réseau incompatible"
 
@@ -1112,14 +1099,12 @@ msgstr "Options"
 
 #: scripts/menus/patch.lua:39 scripts/menus/patch.lua:95
 #: scripts/menus/patch.lua:130
-#, fuzzy
 msgid "Patch Editor"
-msgstr "~!Editeur"
+msgstr "Editeur de Patch"
 
 #: scripts/menus/patch.lua:41 scripts/menus/patch.lua:103
-#, fuzzy
 msgid "Name:"
-msgstr "Surnom :"
+msgstr "Nom :"
 
 #: scripts/menus/patch.lua:47
 msgid "Image:"
@@ -1130,21 +1115,18 @@ msgid "x"
 msgstr ""
 
 #: scripts/menus/patch.lua:62
-#, fuzzy
 msgid "Create ~!Patch"
-msgstr "Crer une ~!Partie"
+msgstr "Creér un ~!Patch"
 
 #: scripts/menus/patch.lua:111
 msgid "Load ~!Patch"
-msgstr ""
+msgstr "Charger un Patch"
 
 #: scripts/menus/patch.lua:132
-#, fuzzy
 msgid "Create ~!New Patch"
-msgstr "Créer une ~!nouvelle carte"
+msgstr "Créer un ~!nouveaux patch"
 
 #: scripts/menus/patch.lua:134
-#, fuzzy
 msgid "~!Load Patch"
-msgstr "~!Charger une carte"
+msgstr "~!Charger un patch"
 

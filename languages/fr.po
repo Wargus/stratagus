@@ -76,49 +76,47 @@ msgstr "Unité supprimée"
 
 #: editor/editloop.cpp:542 editor/editloop.cpp:835
 msgid "Player"
-msgstr ""
+msgstr "Joueur"
 
 #: editor/editloop.cpp:547
 msgid "Neutral"
-msgstr ""
+msgstr "Neutre"
 
 #: editor/editloop.cpp:551
 msgid "Nobody"
-msgstr ""
+msgstr "Personne"
 
 #: editor/editloop.cpp:554
 msgid "Person"
-msgstr ""
+msgstr "Personne"
 
 #: editor/editloop.cpp:559
 msgid "Computer"
-msgstr ""
+msgstr "Ordinateur"
 
 #: editor/editloop.cpp:840
 msgid "Amount of"
-msgstr ""
+msgstr "Quantité de"
 
 #: editor/editloop.cpp:856
 msgid "Patch"
-msgstr ""
+msgstr "Patch"
 
 #: editor/editloop.cpp:1152
 msgid "Unit can't be placed here."
-msgstr "L'unité ne peut pas être placé ici."
+msgstr "L'unité ne peut pas être placée ici."
 
 #: editor/editloop.cpp:1236
-#, fuzzy
 msgid "Patch deleted"
-msgstr "Unité supprimée"
+msgstr "Patch supprimée"
 
 #: editor/editloop.cpp:1268
 msgid "Unit owner modified"
 msgstr "Propriétaire de l'unité modifié"
 
 #: editor/editloop.cpp:1484
-#, fuzzy
 msgid "Select player #"
-msgstr "Selectionnez une cible"
+msgstr "Selectionnez le joueur #"
 
 #: editor/editloop.cpp:1581
 msgid "Select mode"
@@ -129,9 +127,8 @@ msgid "Unit mode"
 msgstr "Mode unité"
 
 #: editor/editloop.cpp:1603
-#, fuzzy
 msgid "Patch mode"
-msgstr "Mode unité"
+msgstr "Mode patch"
 
 #: editor/editloop.cpp:1614
 msgid "Set start location mode"
@@ -139,11 +136,11 @@ msgstr "Mode destination de départ"
 
 #: editor/patch_editor.cpp:503
 msgid "Save"
-msgstr ""
+msgstr "Sauvegarder"
 
 #: editor/patch_editor.cpp:509
 msgid "Exit"
-msgstr ""
+msgstr "Sortie"
 
 #: game/player.cpp:702
 msgid "Building Limit Reached"
