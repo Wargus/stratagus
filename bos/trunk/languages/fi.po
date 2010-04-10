@@ -340,12 +340,3 @@ msgstr "%s hyökkäyksen kohteena!"
 #: video/sdl.cpp:285
 msgid "esc"
 msgstr "esc"
-
-#~ msgid "Tile mode"
-#~ msgstr "Maastotila"
-
-#~ msgid "~!OK"
-#~ msgstr "Valmis"
-
-#~ msgid "~!Cancel"
-#~ msgstr "Peruuta"

@@ -334,23 +334,3 @@ msgstr "%s aangevallen"
 msgid "esc"
 msgstr ""
 
-#~ msgid "Mirror editing enabled: 2-side"
-#~ msgstr "Spiegelbewerken ingeschakeld: 2 kanten"
-
-#~ msgid "Mirror editing enabled: 4-side"
-#~ msgstr "Spiegelbewerken ingeschakeld: 4 kanten"
-
-#~ msgid "Mirror editing disabled"
-#~ msgstr "Spiegelbewerken uitgeschakeld"
-
-#~ msgid "Tile mode"
-#~ msgstr "Tegel modus"
-
-#~ msgid "You have 1 %s"
-#~ msgstr "Je hebt 1 %s"
-
-#~ msgid "~!OK"
-#~ msgstr "~!OK"
-
-#~ msgid "~!Cancel"
-#~ msgstr "~!Annuleer"

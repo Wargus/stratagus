@@ -339,20 +339,3 @@ msgstr "%s attaqué"
 msgid "esc"
 msgstr "echap"
 
-#~ msgid "Mirror editing enabled: 2-side"
-#~ msgstr "Edition miroir activée: 2-côtés"
-
-#~ msgid "Mirror editing enabled: 4-side"
-#~ msgstr "Edition miroir activée: 4-côtés"
-
-#~ msgid "Mirror editing disabled"
-#~ msgstr "Edition Miroir désactivée"
-
-#~ msgid "Tile mode"
-#~ msgstr "Mode titre"
-
-#~ msgid "~!OK"
-#~ msgstr "~!OK"
-
-#~ msgid "~!Cancel"
-#~ msgstr "~!Annuler"

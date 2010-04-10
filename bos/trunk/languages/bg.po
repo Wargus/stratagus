@@ -341,15 +341,3 @@ msgstr "%s Атакуван"
 #: video/sdl.cpp:285
 msgid "esc"
 msgstr ""
-
-#~ msgid "Mirror editing enabled: 2-side"
-#~ msgstr "Mirror editing enabled: 2-side"
-
-#~ msgid "Mirror editing enabled: 4-side"
-#~ msgstr "Mirror editing enabled: 4-side"
-
-#~ msgid "Mirror editing disabled"
-#~ msgstr "Mirror editing disabled"
-
-#~ msgid "Tile mode"
-#~ msgstr "Tile mode"

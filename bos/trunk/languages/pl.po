@@ -340,15 +340,3 @@ msgstr "%s zaatakowany"
 #: video/sdl.cpp:285
 msgid "esc"
 msgstr ""
-
-#~ msgid "Mirror editing enabled: 2-side"
-#~ msgstr "Lustrzana edycja włączona: 2 strony"
-
-#~ msgid "Mirror editing enabled: 4-side"
-#~ msgstr "Lustrzana edycja włączona: 4 strony"
-
-#~ msgid "Mirror editing disabled"
-#~ msgstr "Lustrzana edycja wyłączona"
-
-#~ msgid "Tile mode"
-#~ msgstr "Tryb terenu"

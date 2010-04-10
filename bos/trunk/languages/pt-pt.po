@@ -306,8 +306,3 @@ msgstr "%s está sendo atacado"
 msgid "esc"
 msgstr "esc"
 
-#~ msgid "~!OK"
-#~ msgstr "~!OK"
-#~ msgid "~!Cancel"
-#~ msgstr "~!Cancelar"
-

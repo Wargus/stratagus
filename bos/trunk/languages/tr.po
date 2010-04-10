@@ -339,21 +339,3 @@ msgstr "%s saldırıldı"
 #: video/sdl.cpp:285
 msgid "esc"
 msgstr ""
-
-#~ msgid "Mirror editing enabled: 2-side"
-#~ msgstr "Yansı düzenlemesi etkinleştirildi: 2-taraf"
-
-#~ msgid "Mirror editing enabled: 4-side"
-#~ msgstr "Yansı düzenlemesi etkinleştirildi: 4-taraf"
-
-#~ msgid "Mirror editing disabled"
-#~ msgstr "Yansı düzenlemesi kapatıldı"
-
-#~ msgid "Tile mode"
-#~ msgstr "Döşeme modu"
-
-#~ msgid "~!OK"
-#~ msgstr "~!Tamam"
-
-#~ msgid "~!Cancel"
-#~ msgstr "~!İptal et"

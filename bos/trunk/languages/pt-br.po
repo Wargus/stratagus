@@ -301,9 +301,3 @@ msgstr "%s está sendo atacado"
 #: video/sdl.cpp:268
 msgid "esc"
 msgstr ""
-
-#~ msgid "~!OK"
-#~ msgstr "~!OK"
-
-#~ msgid "~!Cancel"
-#~ msgstr "~!Cancelar"

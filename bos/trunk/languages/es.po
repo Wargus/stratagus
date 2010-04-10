@@ -336,20 +336,3 @@ msgstr "%s está siendo atacada"
 msgid "esc"
 msgstr ""
 
-#~ msgid "Mirror editing enabled: 2-side"
-#~ msgstr "Edición espejo disponible: 2 lados"
-
-#~ msgid "Mirror editing enabled: 4-side"
-#~ msgstr "Edición espejo disponible : 4 lados"
-
-#~ msgid "Mirror editing disabled"
-#~ msgstr "Edición espejo deshabilitada"
-
-#~ msgid "Tile mode"
-#~ msgstr "Modo cuadricula"
-
-#~ msgid "~!OK"
-#~ msgstr "~!OK"
-
-#~ msgid "~!Cancel"
-#~ msgstr "~!Cancelar"

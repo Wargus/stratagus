@@ -340,18 +340,3 @@ msgstr "%s attaccato"
 #: video/sdl.cpp:285
 msgid "esc"
 msgstr "esci"
-
-#~ msgid "Mirror editing enabled: 2-side"
-#~ msgstr "Montaggio dello specchio abilitato: 2-lati"
-
-#~ msgid "Mirror editing enabled: 4-side"
-#~ msgstr "Montaggio dello specchio abilitato: 4-lati"
-
-#~ msgid "Mirror editing disabled"
-#~ msgstr "Montaggio dello specchio disabilitato"
-
-#~ msgid "Tile mode"
-#~ msgstr "Modalità piastrella"
-
-#~ msgid "You have ~<%d~> %s(s)"
-#~ msgstr "Tu hai ~<%d~> %s(s)"
