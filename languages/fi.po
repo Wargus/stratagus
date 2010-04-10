@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: boswars 2.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-05 20:29+0100\n"
+"POT-Creation-Date: 2010-04-10 09:24+0200\n"
 "PO-Revision-Date: 2010-03-06 00:52+0200\n"
 "Last-Translator: Kalle Olavi Niemitalo <kon@iki.fi>\n"
 "Language-Team: Kimmo Kalevi Merikivi <fi@li.org>\n"
@@ -36,7 +36,7 @@ msgstr "Ei voi rakentaa useampaa yksikköä %s"
 msgid "Unable to create building %s"
 msgstr "Rakennuksen %s teko ei onnistunut"
 
-#: action/action_build.cpp:454
+#: action/action_build.cpp:379
 #, c-format
 msgid "New %s done"
 msgstr "Uusi %s valmiina"
@@ -51,22 +51,22 @@ msgstr "%s: Ei tarpeeksi manaa loitsuun %s"
 msgid "%s: can't cast spell: %s"
 msgstr "%s: loitsu %s ei onnistu."
 
-#: action/action_train.cpp:184
+#: action/action_train.cpp:180
 #, c-format
 msgid "New %s ready"
 msgstr "Uusi %s valmiina"
 
-#: action/action_train.cpp:235
+#: action/action_train.cpp:230
 #, c-format
 msgid "Unable to train %s"
 msgstr "Yksikön %s koulutus ei onnistu"
 
-#: action/command.cpp:1018
+#: action/command.cpp:1008
 #, c-format
 msgid "Player \"%s\" has left the game"
 msgstr "Pelaaja \"%s\" poistui pelistä"
 
-#: action/command.cpp:1020
+#: action/command.cpp:1010
 #, c-format
 msgid "Player \"%s\" has been killed"
 msgstr "Pelaaja \"%s\" on tapettu"
@@ -144,24 +144,24 @@ msgstr "Tallenna"
 msgid "Exit"
 msgstr "Poistu"
 
-#: game/player.cpp:705
+#: game/player.cpp:702
 msgid "Building Limit Reached"
 msgstr "Liikaa rakennuksia"
 
-#: game/player.cpp:709
+#: game/player.cpp:706
 msgid "Unit Limit Reached"
 msgstr "Liikaa yksiköitä"
 
-#: game/player.cpp:713
+#: game/player.cpp:710
 msgid "Total Unit Limit Reached"
 msgstr "Yksiköiden yhteisyläraja saavutettu"
 
-#: game/player.cpp:717
+#: game/player.cpp:714
 #, c-format
 msgid "Limit of %d reached for this unit type"
 msgstr "Tämän yksikkötyypin yläraja (%d) saavutettu."
 
-#: game/player.cpp:723
+#: game/player.cpp:720
 #, fuzzy
 msgid "Cannot create more units."
 msgstr "Ei voi tehdä enempää yksiköitä."
@@ -201,7 +201,7 @@ msgstr "Odotetaan pelaajaa \"%s\": %d:%02d"
 msgid "Timed out"
 msgstr "Aikakatkaisu"
 
-#: stratagus/stratagus.cpp:591
+#: stratagus/stratagus.cpp:592
 msgid "Thanks for playing Bos Wars.\n"
 msgstr "Kiitos, kun pelasit Bos Warsia.\n"
 
@@ -332,7 +332,7 @@ msgstr "Sinulla on ~<%d~> %s"
 msgid "You have ~<1~> %s"
 msgstr "Sinulla on ~<1~> %s"
 
-#: unit/unit.cpp:2117
+#: unit/unit.cpp:2150
 #, c-format
 msgid "%s attacked"
 msgstr "%s hyökkäyksen kohteena!"
