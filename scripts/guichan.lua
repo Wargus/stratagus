@@ -496,8 +496,7 @@ function GameStarting()
   Cheater = false
 
   -- FIXME: get the version from somewhere else
-  UI.StatusLine:Set("Bos Wars V" .. "2.6.0 Alpha" ..
-    ", (c) 1998-2010 by the Bos Wars and Stratagus Project.")
+  UI.StatusLine:Set("Bos Wars V2.6.0 (c) 1998-2010 by the Bos Wars Team.")
 end
 
 
