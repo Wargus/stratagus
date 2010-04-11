@@ -4,11 +4,21 @@
 
 <h1><span>News</span></h1>
 
+<h2><span>Version 2.6</span></h2>
+<p>Today we have released <a href="download.shtml">Bos Wars 2.6</a>.
+Bos Wars 2.6 uses a new patch based system for maps. The editor now also 
+works with patches. The patch editor provides a convenient interface to set
+the accessibility flags (water, road, and so on). New units have been added
+and many old bugs have been fixed. Read the CHANGELOG for all the 
+details.</p>
+
+<p>Thanks to all who contributed to this release.</p>
+
 <h2><span>Add-ons</span></h2>
 <p>The <a href="download.shtml">map add-ons</a> for the 
 <a hre="development.shtml">development version</a> are now available.
 Give them a try.
-</p> 
+</p>
 
 <h2><span>Version 2.5</span></h2>
 <p>After some fixes, we are proud to announce Bos Wars 2.5. As seen in the 
