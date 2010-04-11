@@ -184,9 +184,21 @@ static void MoveToLocation(CUnit *unit)
 **  Animate unit repair
 **
 **  @param unit  Unit to animate.
+**  @param goal  Unit being repaired.
 */
-static int AnimateActionRepair(CUnit *unit)
+static int AnimateActionRepair(CUnit *unit, const CUnit *goal)
 {
+	if (goal) {
+		int dx = (goal->X - unit->X) * TileSizeX
+			+ (goal->Type->TileWidth - unit->Type->TileWidth)
+			  * TileSizeX / 2
+			+ (goal->IX - unit->IX);
+		int dy = (goal->Y - unit->Y) * TileSizeY
+			+ (goal->Type->TileHeight - unit->Type->TileHeight)
+			  * TileSizeY / 2
+			+ (goal->IY - unit->IY);
+		UnitHeadingFromDeltaXY(unit, dx, dy);
+	}
 	UnitShowAnimation(unit, unit->Type->Animations->Repair);
 	return 0;
 }
@@ -262,7 +274,7 @@ static void RepairUnit(CUnit *unit)
 		goal = unit->Orders[0]->Goal;
 	}
 
-	AnimateActionRepair(unit);
+	AnimateActionRepair(unit, goal);
 	if (unit->Anim.Unbreakable) {
 		return;
 	}
