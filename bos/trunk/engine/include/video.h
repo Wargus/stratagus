@@ -427,9 +427,8 @@ void DrawTexture(const CGraphic *g, GLuint *textures,
 	int gx_beg, int gy_beg, int gx_end, int gy_end,
 	int sx_beg, int sy_beg, int flip);
 
-#ifdef DEBUG
 extern void FreeGraphics();
-#endif
+
 
 // ARB_texture_compression
 extern PFNGLCOMPRESSEDTEXIMAGE3DARBPROC    glCompressedTexImage3DARB;
