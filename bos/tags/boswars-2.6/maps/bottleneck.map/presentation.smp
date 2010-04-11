@@ -1,0 +1,21 @@
+--     ____                _       __
+--    / __ )____  _____   | |     / /___ ___________
+--   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
+--  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  )
+-- /_____/\____/____/     |__/|__/\__,_/_/  /____/
+--
+--       A futuristic real-time strategy game.
+--          This file is part of Bos Wars.
+--
+-- Copyright 2010 Kyran Jackson
+-- File licensed under the GNU GPL version 2 or later.
+
+-- Bottleneck, formally known as UIN, since that's what the map looks like.
+-- Both players start on this own island at separate ends of the map. 
+-- Each island has plenty of space to expand (an oversight from having the map too big) and features an easily defended entrance. 
+-- Most fighting should take place on the center island, where the majority of the map's resources are located.
+-- Anti-aircraft would come in really handy on this map.
+
+DefinePlayerTypes("nobody", "nobody", "nobody", "nobody", "person", "person")
+PresentMap("Island adventure!", 2, 128, 64, 8)
+DefineMapSetup(GetCurrentLuaPath().."/setup.sms")

@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--
+----	(c) Copyright 2002-2007 by Lutz Sammer, Russell Smith
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Bos Wars Spripting API: Map Presentation</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+</head>
+<body>
+    <h1>Bos Wars Scripting API: Map Presentation</h1>
+<hr>
+<a href="../index.html">Stratagus</a>
+<a href="../faq.html">FAQ</a>
+<a href="magic.html">PREV</a>
+<a href="mapsetup.html">NEXT</a>
+<a href="index.html">LUA Index</a>
+<hr>
+<a href="#PresentMap">PresentMap</a>
+<a href="#DefinePlayerTypes">DefinePlayerTypes</a>
+<a href="#SetMapMiniImage">SetMapMiniImage</a>
+<a href="#DefineMapSetup">DefineMapSetup</a>
+<a href="#GetMapOption">GetMapOption</a>
+<a href="#DefineMapOption">DefineMapOption</a>
+<hr>
+<h2>Intro - Introduction to functions to present maps</h2>
+
+A map is defined in 2 steps: <br>
+<ul>
+  <li>First the presentation step which tells what the map will be
+alike. The presentation step is used before starting a game and allows
+the player to select the map he wants. </li>
+</ul>
+<ul>
+  <li>The setup step builds the map when starting a game. At that stage
+the needed tilesets and the whole map are loaded into the engine.</li>
+</ul>
+<p>
+This page documents map presentation functions.
+
+
+<a name="PresentMap"></a>
+<h3>PresentMap(description, numplayers, mapwidth, mapheight, mapuid)</h3>
+
+<dl>
+<dt>description</dt>
+<dd>A textual description of the map that can be displayed to the user.</dd>
+<dt>numplayers</dt>
+<dd>The maximum number of players for this map.</dd>
+<dt>mapwidth and mapheight</dt>
+<dd>The sizes of the map.</dd>
+<dt>mapuid</dt>
+<dd>Random number to distinguish maps with the same file name. Be sure to change 
+    this number when changing the map.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    PresentMap("Doom World", 4, 64, 64)
+</pre>
+
+<a name="SetMapMiniImage"></a>
+<h3>SetMapMiniImage(mapimage)</h3>
+
+Set a small image of the map to display when the user previews the map.
+<p>
+<dl>
+<dt>mapimage</dt>
+<dd>
+Path to the file with the graphic.
+</dd></dl>
+
+<p>
+Note: This is for the new map format. Not implemented yet.
+
+<h4>Example</h4>
+
+<pre>
+    SetMiniImage("doomworld/doomworld.png")
+</pre>
+
+<a name="DefinePlayerTypes"></a>
+<h3>DefinePlayerType(player1, player2, ...)</h3>
+
+Define the number of players and their type on the map. Possible values for player type are:
+<ul>
+<li>"neutral"</li>
+<li>"nobody"</li>
+<li>"computer"</li>
+<li>"person"</li>
+<li>"rescue-passive"</li>
+<li>"rescue-active"</li>
+</ul>
+
+<h4>Example</h4>
+
+<pre>
+    DefinePlayerTypes("person", "person")
+</pre>
+
+<a name="DefineMapSetup"></a>
+<h3>DefineMapSetup(luafile)</h3>
+
+Define the map setup file that will be loaded if the player starts a game with this map.
+
+<h4>Example</h4>
+
+<pre>
+    DefineMapSetup("doomworld/doomworld.map")
+</pre>
+
+
+<a name="GetMapOption"></a>
+<h3>GetMapOption(name)</h3>
+
+Returns the value of the option.
+<p>
+A map can define configuration options. A player can modify those
+options just before starting a game. For example: the tileset to use, your race, game type,
+number of opponents or the amount of resources on the map.
+<p>
+Note: This is for the new map format. Not implemented yet.
+
+<h4>Example</h4>
+
+<pre>
+    tileset = GetMapOption("tileset")
+</pre>
+
+
+<a name="DefineMapOption"></a>
+<h3>DefineMapOption(name, {possible-values})</h3>
+<dl>
+  <dt>name</dt>
+  <dd>Name of the option.</dd>
+  <dt>possible-values</dt>
+  <dd>List of values the player can select. The first value is the default value.</dd>
+</dl>
+
+<p>
+Note: This is for the new map format. Not implemented yet. 
+
+<h4>Example</h4>
+
+<pre>
+   DefineMapOption("Resources", {"Map default", "Low", "Medium", "High"})
+   DefineMapOption("Difficulty", {"finger in the nose", "easy", "mission impossible"})
+   DefineMapOption("TileSet", {"desert", "winter", "forest"})
+</pre>
+
+<p>
+
+<hr>
+All trademarks and copyrights on this page are owned by their respective owners.
+<address>(c) 2002-2007 by the <a href="http://boswars.org">
+Bos Wars Project</a></address></body></html>

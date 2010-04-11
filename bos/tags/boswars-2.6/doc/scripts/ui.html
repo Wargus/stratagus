@@ -1,0 +1,1254 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--
+----	(c) Copyright 2002-2007 by Lutz Sammer, Russell Smith
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Bos Wars Scripting API: User Interface (UI)</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+</head>
+<body>
+    <h1>Bos Wars Scripting API: User Interface (UI)</h1>
+<hr>
+<a href="../index.html">Stratagus</a>
+<a href="../faq.html">FAQ</a>
+<a href="triggers.html">PREV</a>
+<a href="unittype.html">NEXT</a>
+<a href="index.html">LUA Index</a>
+<hr>
+<a href="#DefineButton">DefineButton</a>
+<a href="#DefineButtonStyle">DefineButtonStyle</a>
+<a href="#DefineCheckboxStyle">DefineCheckboxStyle</a>
+<a href="#DefineCursor">DefineCursor</a>
+<a href="#DefineMenu">DefineMenu</a>
+<a href="#DefineMenuGraphics">DefineMenuGraphics</a>
+<a href="#DefineMenuItem">DefineMenuItem</a>
+<a href="#DefinePanelContents">DefinePanelContents</a>
+<a href="#DefineUI">DefineUI</a>
+<a href="#DefineViewports">DefineViewports</a>
+<a href="#SetGameCursor">SetGameCursor</a>
+<hr>
+<h2>Intro - Introduction to UI functions and variables</h2>
+
+Everything around the user interface.
+<h2>Functions</h2>
+<a name="DefineButton"></a>
+<h3>DefineButton({tag1 = value1, tag2 value2, ...})</h3>
+
+Define a button in the button panel show during the game. Possible tags:
+
+<dl>
+<dt>Pos = number</dt>
+<dd>Position number.
+<pre>
+0 1 2
+3 4 5
+6 7 8
+</pre>
+</dd>
+<dt>Level = number</dt>
+<dd>Visible when in this button level (0 default, 9 cancel-only)
+</dd>
+<dt>Icon = "icon-name"</dt>
+<dd>Name of the icon to display.
+</dd>
+<dt>Action = "action"</dt>
+<dd>Action to perform when the button is clicked.  Can be any of the following:
+<dl>
+  <dt>"move"</dt>
+  <dd>The unit moves to location</dd>
+  <dt>"stop"</dt>
+  <dd>the unit stops. Orders queue is also erased. The unit wait for order but can react by itself.</dd>
+  <dt>"attack"</dt>
+  <dd>The unit attacks target. if target is a unit then it attacks only the unit.
+If target is a position, it will move to location by attacking any opponent on the way.</dd>
+  <dt>"repair"</dt>
+  <dd>The unit will repair the target unit.</dd>
+  <dt>"harvest"</dt>
+  <dd>The unit will harvest the ressources.</dd>
+  <dt>"button"</dt>
+  <dd>FIXME. Need Value = number.</dd>
+  <dt>"build"</dt>
+  <dd>The unit will build the unit (building structure)</dd>
+  <dt>"train-unit"</dt>
+  <dd>The unit trains an unit. Generally use for building to create news units.
+Need Value = "unit-name".</dd>
+  <dt>"patrol"</dt>
+  <dd>The unit patrol between target position and current position and attack any opponent
+on the way.</dd>
+  <dt>"stand-ground"</dt>
+  <dd>The unit doesn't move. The unit stay at its location until it receives a new order.</dd>
+  <dt>"attack-ground"</dt>
+  <dd>The unit attack a location. Usefull for unit with spalsh damage.</dd>
+  <dt>"return-goods"</dt>
+  <dd>The unit with ressources return goods.</dd>
+  <dt>"cast-spell"</dt>
+  <dd>The unit cast a spell.
+Need Value = "spell-name"</dd>
+  <dt>"research"</dt>
+  <dd>launch the research of an upgrade. Usefull to add technology.
+Need Value = "upgrade-name"</dd>
+  <dt>"upgrade-to"</dt>
+  <dd>The unit will be trasform in an other unit (like polyporm spell).
+Need Value = "Unit".
+  </dd>
+  <dt>"unload"</dt>
+  <dd>The unit unload unit inside of itself. Usefull for transporter or bunkers.</dd>
+  <dt>"cancel"</dt>
+  <dd>FIXME : difference between cancels.</dd>
+  <dt>"cancel-upgrade"</dt>
+  <dd>FIXME</dd>
+  <dt>"cancel-train-unit"</dt>
+  <dd>FIXME</dd>
+  <dt>"cancel-build"</dt>
+  <dd>FIXME</dd>
+  </dl>
+  </dd>
+<dt>Value = arg</dt>
+<dd>Optional value associated with the action.
+</dd>
+<dt>Allowed = "check-name"</dt>
+<dd>Optional check to see if a button is allowed. Can be any of the following:
+  <dl>
+  <dt>"check-true"</dt>
+  <dd>No restriction on this button.</dd>
+  <dt>"check-false"</dt>
+  <dd>this button is forbidden. FIXME : ? to be removed. What is its usage ?</dd>
+  <dt>"check-upgrade"</dt>
+  <dd>This button can be clicked only when a specific upgrade is searched.
+  Need Allowarg = {"upgrade-name"}</dd>
+  <dt>"check-units-or"</dt>
+  <dd>this button is available if at least one of the unit are available.
+  Need AllowArg = {"unit-name1", "unit-name2"}</dd>
+  <dt>"check-units-and"</dt>
+  <dd>FIXME</dd>
+  <dt>"check-network"</dt>
+  <dd>Button is available only if network is available too.</dd>
+  <dt>"check-no-network"</dt>
+  <dd>Button is available only if network is not available.</dd>
+  <dt>"check-no-work"</dt>
+  <dd>FIXME</dd>
+  <dt>"check-no-research"</dt>
+  <dd>this button is available if the unit is not researching (upgrade-to or upgrade research).</dd>
+  <dt>"check-attack"</dt>
+  <dd>FIXME</dd>
+  <dt>"check-upgrade-to"</dt>
+  <dd>FIXME. No arg</dd>
+  <dt>"check-research"</dt>
+  <dd>FIXME</dd>
+  <dt>"check-single-research"</dt>
+  <dd>FIXME. No arg</dd>
+  </dl>
+</dd>
+<dt>AllowArg = {"arg1", ...}</dt>
+<dd>Optional argument used by the allowed function.
+</dd>
+<dt>Key = "char"</dt>
+<dd>Shortcut key for the button. (FE "c" for key 'c' or "\27" for Escape)
+</dd>
+<dt>Hint = "string"</dt>
+<dd>Hint to be displayed for the button.
+</dd>
+<dt>ForUnit = {"unit-name1", ...} or {"*"} </dt>
+<dd>List of units the button applies to, or {"*"} for all units.
+</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+DefineButton( { Pos = 8, Level = 0, Icon = "icon-build-advanced",
+  Action = "button", Value = 2,
+  Allowed = "check-units-or", AllowArg = {"unit-elven-lumber-mill", "unit-keep"},
+  Key = "v", Hint = "BUILD AD~!VANCED STRUCTURE",
+  ForUnit = {"unit-peasant"} } )
+</pre>
+
+<a name="DefineButtonStyle"></a>
+<h3>DefineButtonStyle(style, {tag = value, ...})</h3>
+
+Define a button style. Possible tags:
+
+<dl>
+<dt>Size = {x, y}</dt>
+<dd>Size of the button.
+</dd>
+<dt>Font = font-name</dt>
+<dd>Name of the font to use.
+</dd>
+<dt>TextNormalColor = color, TextReverseColor = color</dt>
+<dd>Color to use for the normal and reverse text.
+</dd>
+<dt>TextAlign = align</dt>
+<dd>Align the text.  Possible values are "Left", "Right", and "Center".
+</dd>
+<dt>TextPos = {posx, posy}</dt>
+<dd>Set the position of the text relative to the upper left corner of the image.
+</dd>
+<dt>Default = {tag = value, ...}, Hover = {}, Selected = {}, Clicked = {}, Disabled = {}</dt>
+<dd>Set attributes for when the mouse is over the button (Hover), the button is
+Selected, Clicked, Disabled, or the Default setting. Possible tags:
+  <dl>
+  <dt>File = file</dt>
+  <dd>The filename.
+  </dd>
+  <dt>Size = size</dt>
+  <dd>The size of the image (only needed when using an image with multiple frames).
+  </dd>
+  <dt>Frame = frame</dt>
+  <dd>Select the frame number from an image (only needed when using an image with multiple frames).
+  </dd>
+  <dt>TextNormalColor = color, TextReverseColor = color</dt>
+  <dd>Color to use for the normal and reverse text (overrides the main colors).
+  </dd>
+  <dt>TextPos = {x, y}</dt>
+  <dd>Display the text at this position (overrides the main position).
+  </dd>
+  <dt>Border = { Color = color, Size = size}</dt>
+  <dd>Draw a border with the specified color and size.
+  </dd>
+  </dl>
+</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+DefineButtonStyle("main", {
+  Size = {128, 20},
+  Font = "game",
+  TextNormalColor = "yellow",
+  TextReverseColor = "white",
+  TextAlign = "Center",
+  TextPos = {64, 4},
+  Default = {
+    File = "ui/buttons_1.png", Size = {300, 144}, Frame = 4,
+  },
+  Hover = {
+    TextNormalColor = "white",
+  },
+  Selected = {
+    Border = {
+      Color = {252, 252, 0}, Size = 1,
+    },
+  },
+  Clicked = {
+    File = "ui/buttons_1.png", Size = {300, 144}, Frame = 5,
+    TextNormalColor = "white",
+    TextPos = {66, 6},
+  },
+  Disabled = {
+    File = "ui/buttons_1.png", Size = {300, 144}, Frame = 3,
+    TextNormalColor = "grey",
+    TextReverseColor = "grey",
+  },
+})
+</pre>
+
+<a name="DefineCheckboxStyle"></a>
+<h3>DefineCheckboxStyle(style, {tag = value, ...})</h3>
+
+Define a checkbox style. Possible tags:
+
+<dl>
+<dt>Size = {x, y}</dt>
+<dd>Size of the button.
+</dd>
+<dt>Font = font-name</dt>
+<dd>Name of the font to use.
+</dd>
+<dt>TextNormalColor = color, TextReverseColor = color</dt>
+<dd>Color to use for the normal and reverse text.
+</dd>
+<dt>TextAlign = align</dt>
+<dd>Align the text.  Possible values are "Left", "Right", and "Center".
+</dd>
+<dt>TextPos = {posx, posy}</dt>
+<dd>Set the position of the text relative to the upper left corner of the image.
+</dd>
+<dt>Default = {tag = value, ...}, Hover = {}, Selected = {}, Clicked = {}, Disabled = {},
+Checked = {}, CheckedHover = {}, CheckedSelected = {}, CheckedClicked = {}, CheckedDisabled = {}</dt>
+<dd>Set attributes for when the mouse is over the checkbox (Hover), the
+checkbox is Selected, Clicked, Disabled, the Default setting, and for when the
+checkbox is Checked. Possible tags:
+  <dl>
+  <dt>File = file</dt>
+  <dd>The filename.
+  </dd>
+  <dt>Size = size</dt>
+  <dd>The size of the image (only needed when using an image with multiple frames).
+  </dd>
+  <dt>Frame = frame</dt>
+  <dd>Select the frame number from an image (only needed when using an image with multiple frames).
+  </dd>
+  <dt>TextNormalColor = color, TextReverseColor = color</dt>
+  <dd>Color to use for the normal and reverse text (overrides the main colors).
+  </dd>
+  <dt>TextPos = {x, y}</dt>
+  <dd>Display the text at this position (overrides the main position).
+  </dd>
+  <dt>Border = { Color = color, Size = size}</dt>
+  <dd>Draw a border with the specified color and size.
+  </dd>
+  </dl>
+</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+DefineCheckboxStyle("round", {
+  Size = {19, 19},
+  Font = "game",
+  TextNormalColor = "yellow",
+  TextReverseColor = "white",
+  TextAlign = "Left",
+  TextPos = {24, 4},
+  Default = {
+    File = "ui/buttons_1.png", Size = {300, 144}, Frame = 19,
+  },
+  Hover = {
+    TextNormalColor = "white",
+  },
+  Selected = {
+    Border = {
+      Color = {252, 252, 0}, Size = 1,
+    },
+  },
+  Disabled = {
+    File = "ui/buttons_1.png", Size = {300, 144}, Frame = 18,
+  },
+  Clicked = {
+    File = "ui/buttons_1.png", Size = {300, 144}, Frame = 20,
+    TextNormalColor = "white",
+  },
+  Checked = {
+    File = "ui/buttons_1.png", Size = {300, 144}, Frame = 21,
+  },
+  CheckedHover = {
+    TextNormalColor = "white",
+  },
+  CheckedSelected = {
+    Border = {
+      Color = {252, 252, 0}, Size = 1,
+    },
+  },
+  CheckedClicked = {
+    File = "ui/buttons_1.png", Size = {300, 144}, Frame = 22,
+    TextNormalColor = "white",
+  },
+  CheckedDisabled = {
+    File = "ui/buttons_1.png", Size = {300, 144}, Frame = 18,
+  },
+})
+</pre>
+
+<a name="DefineCursor"></a>
+<h3>DefineCursor({tag = value, ...})</h3>
+
+Define a cursor.
+
+<dl>
+<dt>Name = "ident"</dt>
+<dd>Unique identifier of the cursor, used to reference it in config files and
+during startup.
+</dd>
+<dt>Race = "race-name" or "any"</dt>
+<dd>Race to use this cursor with or "any" to use with any race.
+</dd>
+</dl>
+Possible tags:
+<dl>
+<dt>File = "icon-file"</dt>
+<dd>Path to the image graphic.</dd>
+<dt>HotSpot = {x, y}</dt>
+<dd>Hot spot of the cursor in pixels. Relative to the sprite origin {0, 0}. The
+hot spot of a cursor is the point to which Stratagus refers in tracking the
+cursor's position.
+</dd>
+<dt>Size = {width, height}</dt>
+<dd>Size of the cursor in pixels.</dd>
+<dt>Rate = millisecond</dt>
+<dd>Rate of changing the frames if using an animated cursor. The "rate" tells
+the engine how many milliseconds to hold each frame of the animation.
+</dd>
+</dl>
+
+Note: Name, File and Size must be filled.
+
+<h4>Example</h4>
+<pre>
+DefineCursor({
+  Name = "cursor-cross",
+  Race = "any",
+  File = "ui/cursors/small_green_cross.png",
+  HotSpot = {8,  8},
+  Size = {18, 18}})
+</pre>
+
+<a name="DefineMenu"></a>
+<h3>DefineMenu("tag1", value1, ...)</h3>
+
+FIXME: incomplete docu<br>
+Possible tags:
+
+<dl>
+<dt>"geometry", {x, y, width, height}</dt>
+<dd>Position and size of the menu.
+</dd>
+<dt>"name", "menu-name"</dt>
+<dd>Name of this menu.</dd>
+<dt>"panel", "panel-name" or "none"</dt>
+<dd>Panel name (FIXME: how is it used?).</dd>
+<dt>"default", number</dt>
+<dd>Initial selected item number</dd>
+<dt>"init", "function_name"</dt>
+<dd>FIXME (function = "save-replay-init" or "scen-select-init" ? )</dd>
+<dt>"exit", "function_name"</dt>
+<dd>FIXME ("speed-options-exit" or "load-game-exit" ? )</dd>
+
+<dt>"netaction", "menu-action"</dt>
+<dd>FIXME: which are menu-action ?</dd>
+<dl>
+  <dt>"terminate-net-connect"</dt>
+  <dd>FIXME</dd>
+</dl>
+</dl>
+
+<h4>Example</h4>
+<pre>
+-- menu-sound-options
+DefineMenu("name", "menu-sound-options", "geometry", {224, 64, 352, 352},
+  "panel", "panel5", "default", 23)
+</pre>
+
+<a name="DefineMenuGraphics"></a>
+<h3>DefineMenuGraphics({{"tag", value, ...}, ...})</h3>
+
+Define the menu graphics for each of the races.
+FIXME : 1st graph is the 1st race ? ... Explain better
+
+<dl>
+<dt>"file", "filename"</dt>
+<dd>Path to the file containing the menu graphics.</dd>
+<dt>"size", {width, height}</dt>
+<dd>Width and height of an image in the menu graphic.</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+DefineMenuGraphics({
+  {"file", "ui/buttons_1.png", "size", {300, 144}},
+  {"file", "ui/buttons_2.png", "size", {300, 144}}})
+</pre>
+
+<a name="DefineMenuItem"></a>
+<h3>DefineMenuItem("tag1", value1, ...)</h3>
+
+Add an item to a menu. This could be any item, it depends
+on the tags used.<br>
+FIXME: incomplete docu<br>
+
+<dl>
+<dt>"pos", {x, y}</dt>
+<dd>position of menuitem (FIXME abolute, or relative to something ?)</dd>
+<dt>"menu", "menu-name"</dt>
+<dd>Menu this item belongs to.</dd>
+<dt>"transparent"</dt>
+<dd>FIXME. No value</dd>
+<dt>"flags", {"value",...}</dt>
+<dd>FIXME
+  <dl>
+  <dt>"active"</dt>
+  <dd>FIXME</dd>
+  <dt>"clicked"</dt>
+  <dd>FIXME</dd>
+  <dt>"selected"</dt>
+  <dd>FIXME</dd>
+  <dt>"disabled"</dt>
+  <dd>FIXME</dd>
+  </dl>
+</dd>
+<dt>"font", "font-name"</dt>
+<dd>Use "game", "small", "large", "small-title", "large-title",
+"user1", "user2", "user3", "user4", "user5"</dd>
+<dt>type, {arg_type}</dt>
+<dd>type could be :</dd>
+  <dl>
+  <dt>"text", {values, ...}</dt>
+  <dd>The item is a text label.<br>
+  The value is a list of tags, allowed tags:
+  <dl>
+    <dt>"align", "left" or "right" or "center"</dt>
+    <dd>aligns text respectively at left, right or center.</dd>
+    <dt>"caption", "text"</dt>
+    <dd>The text.</dd>
+    <dt>"func", "function-name"</dt>
+    <dd>C handler. FIXME: when called?</dd>
+    <dt>"color-normal", "color-name"</dt>
+    <dd>FIXME.</dd>
+    <dt>"color-reverse", "color-name"</dt>
+    <dd>FIXME.</dd>
+  </dl>
+  </dd>
+For example:
+<pre>
+   "text", {"caption", "Connecting to server",
+            "align", "center"}
+</pre>
+  <dt>"button" = {values, ...}</dt>
+  <dd>The item is a button.<br>
+  The value is a list of tags like:
+  <dl>
+    <dt>"caption", "text"</dt>
+    <dd>The text.</dd>
+    <dt>"color-normal", "color-name"</dt>
+    <dd>FIXME.</dd>
+    <dt>"color-reverse", "color-name"</dt>
+    <dd>FIXME.</dd>
+    <dt>"hotkey", "key"</dt>
+    <dd>A string like &quot;f8&quot;. FIXME</dd>
+    <dt>"func", "function-name" or Lua function</dt>
+    <dd>Called when a button is clicked</dd>
+    <dt>"style", style-name</dt>
+    <dd>Complete list of possible styles-name:
+     FIXME (not all for buttons)
+    <dl>
+      <dt>"main"</dt>
+      <dd>FIXME</dd>
+      <dt>"network"</dt>
+      <dd>FIXME</dd>
+      <dt>"gm-half"</dt>
+      <dd>FIXME</dd>
+      <dt>"132"</dt>
+      <dd>FIXME</dd>
+      <dt>"gm-full"</dt>
+      <dd>FIXME</dd>
+      <dt>"gem-round"</dt>
+      <dd>FIXME</dd>
+      <dt>"gem-square"</dt>
+      <dd>FIXME</dd>
+      <dt>"up-arrow"</dt>
+      <dd>FIXME</dd>
+      <dt>"down-arrow"</dt>
+      <dd>FIXME</dd>
+      <dt>"left-arrow"</dt>
+      <dd>FIXME</dd>
+      <dt>"right-arrow"</dt>
+      <dd>FIXME</dd>
+      <dt>"s-knob"</dt>
+      <dd>FIXME</dd>
+      <dt>"s-vcont"</dt>
+      <dd>FIXME</dd>
+      <dt>"s-hcont"</dt>
+      <dd>FIXME</dd>
+      <dt>"pulldown"</dt>
+      <dd>FIXME</dd>
+      <dt>"vthin"</dt>
+      <dd>FIXME</dd>
+      <dt>"folder"</dt>
+      <dd>FIXME</dd>
+      <dt>"sc-gem-round"</dt>
+      <dd>FIXME</dd>
+      <dt>"sc-gem-square"</dt>
+      <dd>FIXME</dd>
+      <dt>"sc-up-arrow"</dt>
+      <dd>FIXME</dd>
+      <dt>"sc-down-arrow"</dt>
+      <dd>FIXME</dd>
+      <dt>"sc-left-arrow"</dt>
+      <dd>FIXME</dd>
+      <dt>"sc-right-arrow"</dt>
+      <dd>FIXME</dd>
+      <dt>"sc-s-knob"</dt>
+      <dd>FIXME</dd>
+      <dt>"sc-s-vcont"</dt>
+      <dd>FIXME</dd>
+      <dt>"sc-s-hcont"</dt>
+      <dd>FIXME</dd>
+      <dt>"sc-pulldown"</dt>
+      <dd>FIXME</dd>
+      <dt>"sc-button-left"</dt>
+      <dd>FIXME</dd>
+      <dt>"sc-button"</dt>
+      <dd>FIXME</dd>
+      <dt>"sc-button-right"</dt>
+      <dd>FIXME</dd>
+    </dl>
+  FIXME: describe them
+  </dd>
+  </dl>
+  </dd>
+  Example.
+<pre>
+    "button", {"size",  {224, 27},
+               "caption", "~!Surrender",
+               "hotkey", "s",
+               "func", "surrender-confirm-menu"
+               "style", "gm-full"}
+</pre>
+  <dt>"pulldown"</dt>
+  <dd>The item is a pulldown menu.
+  <dl>
+    <dt>"size" = (width, height)</dt>
+    <dd>Dimensions.</dd>
+    <dt>"options", {"string1", "string2", ...}</dt>
+    <dd>A list of strings to select from.</dd>
+    <dt>"color-normal", "color-name"</dt>
+    <dd>FIXME.</dd>
+    <dt>"color-reverse", "color-name"</dt>
+    <dd>FIXME.</dd>
+    <dt>"func", function-name</dt>
+    <dd>C handler. FIXME: when called?</dd>
+    <dt>"state", "passive"</dt>
+    <dd>FIXME</dd>
+    <dt>"default", number</dt>
+    <dd>An integer for the default selection id, starting with 0.</dd>
+    <dt>"current", number</dt>
+    <dd>An integer for the current selection id, starting with 0.</dd>
+    <dt>"style" = style-name</dt>
+    <dd>see above. FIXME which are available ?</dd>
+
+  </dl>
+</dd>
+Example:
+<pre>
+    "pulldown", {"size", {152, 20},
+                 "style", "pulldown",
+                 "func", "null",
+                 "options", {"Forest", "Winter", "Wasteland", "Orc Swamp"},
+                 "default, 0, -- "Forest"
+                 "current", 0} -- "Forest"
+</pre>
+
+  <dt>"listbox"</dt>
+  <dd>The item is a list box.<br>
+  Allowed tags:
+  <dl>
+    <dt>"size" = (width, height)</dt>
+    <dd>Dimensions.</dd>
+    <dt>"func", function-name</dt>
+    <dd>C handler. FIXME: when called?</dd>
+    <dt>"handler", function-name</dt>
+    <dd>C handler. FIXME: when is it called?</dd>
+    <dt>"retopt", function-name</dt>
+    <dd>C handler to retrieve the list of options, I guess. FIXME</dd>
+    <dt>"startline", number</dt>
+    <dd>For scrolling, I guess. Probably only used in savegames. FIXME</dd>
+    <dt>"nlines", number</dt>
+    <dd>Number of lines.</dd>
+    <dt>"default", number</dt>
+    <dd>An integer for the default selection id, starting with 0.</dd>
+    <dt>"current", number</dt>
+    <dd>An integer for the current selection id, starting with 0.</dd>
+    <dt>"style" = style-name</dt>
+    <dd>see above. FIXME which are available ?</dd>
+    <dt>"color-normal", "color-name"</dt>
+    <dd>FIXME.</dd>
+    <dt>"color-reverse", "color-name"</dt>
+    <dd>FIXME.</dd>
+  </dl>
+</dd>
+Example:
+<pre>
+    "listbox", {"size", {288, 108},
+                "style", "pulldown",
+                "func", "scen-select-lb-action",
+                "retopt", "scen-select-lb-retrieve",
+                "handler", "scen-select-ok",
+                "nlines", 6}
+</pre>
+
+
+  <dt>"vslider" or "hslider", {values}</dt>
+  <dd>The item is a vertical (or horizontal) slider.<br>
+  Allowed tags: size default current style (see above) and:
+  <dl>
+    <dt>"size" = (width, height)</dt>
+    <dd>Dimensions.</dd>
+    <dt>"func", function-name</dt>
+    <dd>C handler. FIXME: when called?</dd>
+    <dt>"handler", function-name</dt>
+    <dd>C handler. FIXME: when is it called?</dd>
+    <dt>"flags", "up" or "down" or "left" or "right" or "knob" or "cont"</dt>
+    <dd>FIXME: never seen this used.</dd>
+    <dt>"default", number</dt>
+    <dd>An integer for the default selection id, starting with 0.</dd>
+    <dt>"current", number</dt>
+    <dd>An integer for the current selection id, starting with 0.</dd>
+    <dt>"style" = style-name</dt>
+    <dd>see above. FIXME which are available ?</dd>
+  </dl>
+Examples:
+<pre>
+  "vslider", {"size", {18, 108},
+              "func", "editor-main-load-vs-action",
+              "handler", "editor-main-load-ok"}
+</pre>
+<pre>
+  "hslider", {"size", {198, 18},
+              "func", "master-volume-hs-action",
+              "handler", "scen-select-ok"}
+</pre>
+</dd>
+  <dt>"drawfunc", function-name</dt>
+  <dd>The item is drawn from a C function.<br>
+Example:
+<pre>
+    DefineMenuItem("pos", {0, 0}, "font", "game", "init", "game-setup-init",
+      "drawfunc", "game-draw-func",
+      "menu" "menu-custom-game")
+</pre>
+FIXME.
+</dd>
+
+  <dt>"input"</dt>
+  <dd>The item is a text input field.<br>
+Allowed tags: size func style color-normal color-reverse (see above)
+and:
+  <dl>
+    <dt>"size" = (width, height)</dt>
+    <dd>Dimensions.</dd>
+    <dt>"func", function-name</dt>
+    <dd>C handler, seems to be called when a key is pressed
+    and just checks whether it is RETURN.
+    </dd>
+    <dt>"style" = style-name</dt>
+    <dd>see above. FIXME which are available ?</dd>
+    <dt>"color-normal", "color-name"</dt>
+    <dd>FIXME.</dd>
+    <dt>"color-reverse", "color-name"</dt>
+    <dd>FIXME.</dd>
+    <dt>"maxch", number</dt>
+    <dd>Maximal number of characters. FIXME: never seen this used.</dd>
+  </dl>
+</dd>
+Example:
+<pre>
+    "input", {"size", {212, 20},
+      "func", "enter-master-action",
+      "style", "pulldown"}
+</pre>
+
+
+  <dt>"gem"</dt>
+  <dd>The item is a gem.<br>
+Allowed tags: size func style text color-normal color-reverse (see
+above) and:
+  <dl>
+    <dt>"size" = (width, height)</dt>
+    <dd>Dimensions.</dd>
+    <dt>"func", function-name</dt>
+    <dd>C handler. FIXME: when called?</dd>
+    <dt>"state", "checked" or "unchecked" or "passive" or "invisible"</dt>
+    <dd>FIXME.</dd>
+    <dt>"style" = style-name</dt>
+    <dd>see above. FIXME which are available ?</dd>
+    <dt>"text", "text"</dt>
+    <dd>The text.</dd>
+    <dt>"color-normal", "color-name"</dt>
+    <dd>FIXME.</dd>
+    <dt>"color-reverse", "color-name"</dt>
+    <dd>FIXME.</dd>
+    <dt>"maxch", number</dt>
+    <dd>Maximal number of characters. FIXME: never seen this used.</dd>
+  </dl>
+</dd>
+Example:
+<pre>
+  "gem", {"size", {18, 18},
+          "text", "640 x 480",
+          "state", "unchecked",
+          "func", "global-options-resolution-gem",
+          "style", "gem-round"}
+</pre>
+  </dl>
+</dl>
+<h4>Example</h4>
+<pre>
+    DefineMenuItem("pos", {16, 288 - 40}, "font", "large",
+                   "button", {"size", {224, 27},
+                              "caption", "Return to Game (~<Esc~>)",
+                              "hotkey", "esc",
+                              "func", "game-menu-return",
+                              "style", "gm-full"},
+                   "menu", "menu-game")
+</pre>
+
+<a name="DefinePanelContents"></a>
+<h3>DefinePanelContents({flag = value}, ...)</h3>
+
+Define panel content when an unit is selected.
+
+<dl>
+  <dt>Ident = "name"</dt>
+  <dd>identifier of the panel.</dd>
+  <dt>Pos = {x, y}<dt>
+  <dd>position of the panel. The other coordonate are relative to this point.</dd>
+  <dt>DefaultFont = "font-name"<dt>
+  <dd>Default font used in content if not redefined.</dd>
+  <dt>Condition = {flag = value}</dt>
+  <dd>condition to show the panel.
+  <dl>
+    <dt>ShowOnlySelected = Boolean</dt>
+    <dd>if true, show only if unit is selected (not just pointed).</dd>
+    <dt>HideNeutral = Boolean</dt>
+    <dd>if true, hide for neutral units.</dd>
+    <dt>HideAllied = Boolean</dt>
+    <dd>if true, hide for allied units.</dd>
+    <dt>ShowOpponent = Boolean</dt>
+    <dd>if true, show for opponent units.</dd>
+    <dt>Variable = "only", "false", "true"<dt>
+    <dd>For variables defined by DefineVariables(), show info if unit correpond with the criteria<dd>
+    <dt>Flag = "only", "false", "true"<dt>
+    <dd>For flags defined by DefineBoolFlags(), show info if unit correpond with the criteria<dd>
+  </dl> </dd>
+  <dt>Contents = {flag = value}</dt>
+  <dd>The info to show, and the method associated.
+  <dl>
+    <dt>Pos = {x, y}</dt>
+    <dd>Coordinate to show element. (relatif to Panel' coordinates)</dd>
+    <dt>Condition = {flag = value}</dt>
+    <dd>Extra condition for content itself. Identic as Panel's condition</dd>
+    <dt>More = {"method-name", ExtraData}</dt>
+    <dd>Tell the method to show informations.
+    <dl>
+      <dt>"Text", "texttodisplay" or {flag = value}</dt>
+      <dd>Show simple text "texttodisplay" and after one optional variable.
+      <dl>
+        <dt>Text = StringDesc</dt>
+        <dd>text to display (See StringDesc in Trigger).</dd>
+        <dt>Font = "font-name"</dt>
+        <dd>font to use.</dd>
+        <dt>Centered = boolean</dt>
+        <dd>if true then text is centered on the position.</dd>
+        <dt>Variable = "variable-name"</dt>
+        <dd>Variable name to show. See DefineVariable() for more details.</dd>
+        <dt>Component = "Name" or "Value" or "Max" or "Increase" or "Diff" or "Percent"</dt>
+        <dd>component of value to show. Diff represent Max - value and Percent represent 100 * Value / Max.</dd>
+        <dt>ShowName = boolean</dt>
+        <dd>if true show the name of the unit and no variable information.</dd>
+        <dt>Stat = boolean</dt>
+        <dd>if true and value != Original value, then show original value + diff else show value.
+		Original value is default value with no upgrade.
+		</dd>
+      </dl></dd>
+
+      <dt>"FormatedText", {flag = value, ...}</dt>
+      <dd>Show text with a given format.
+      <dl>
+        <dt>Format = "texttodisplay"</dt>
+        <dd>format of the text. Must have 1 %d (for number)or %s (for string). Use ~< ~> for reverse mode.</dd>
+        <dt>Font = "font-name"</dt>
+        <dd>font to use.</dd>
+        <dt>Variable = "variable-name"</dt>
+        <dd>Variable name to show. See DefineVariable() for more details.</dd>
+        <dt>Component = "Name" or "Value" or "Max" or "Increase" or "Diff" or "Percent"</dt>
+        <dd>component of value to show. Diff represent Max - value and Percent represent 100 * Value / Max.</dd>
+        <dt>Centered = boolean</dt>
+        <dd>if true then text is centered on the position.</dd>
+      </dl></dd>
+
+      <dt>"FormatedText2", {flag = value, ...}</dt>
+      <dd>Similar of FormatedText but with 2 variables.
+      <dl>
+        <dt>Format = "texttodisplay"</dt>
+        <dd>format of the text. Must have 2 %d (for number)or %s (for string). Use ~< ~> for reverse mode.</dd>
+        <dt>Font = "font-name"</dt>
+        <dd>font to use.</dd>
+        <dt>Variable1 = "variable-name"</dt>
+        <dd>1st Variable name to show. See DefineVariable() for more details.</dd>
+        <dt>Variable2 = "variable-name"</dt>
+        <dd>2nd Variable name to show. See DefineVariable() for more details.</dd>
+        <dt>Variable = "variable-name"</dt>
+        <dd>Variable name to show(Assume var1 == var2). See DefineVariable() for more details.</dd>
+        <dt>Component1 = "Name" or "Value" or "Max" or "Increase" or "Diff" or "Percent"</dt>
+        <dd>component of the 1st value to show. Diff represent Max - value and Percent represent 100 * Value / Max.</dd>
+        <dt>Component2 = "Name" or "Value" or "Max" or "Increase" or "Diff" or "Percent"</dt>
+        <dd>component of 2nd value to show. Diff represent Max - value and Percent represent 100 * Value / Max.</dd>
+        <dt>Component = "Name" or "Value" or "Max" or "Increase" or "Diff" or "Percent"</dt>
+        <dd>Assume that component1 == component2.</dd>
+        <dt>Centered = boolean</dt>
+        <dd>if true then text is centered on the position.</dd>
+      </dl></dd>
+
+      <dt>"Icon", {flag = value, ...}</dt>
+      <dd>Draw the icon of a specified unit.
+      <dl>
+        <dt>Unit = "ItSelf" or "Inside" or "Container" or "Worker" or "Goal"</dt>
+        <dd>which unit to draw : itself or first unit inside or its container
+            or the unit which is building it or the goal objective.</dd>
+      </dl></dd>
+
+      <dt>"LifeBar", {flag = value, ...}</dt>
+      <dd>Draw a bar which represent the variable. Change color depend of the percent.
+      <dl>
+        <dt>Variable = "variable-name"</dt>
+        <dd>Variable name to show. See DefineVariable() for more details.</dd>
+        <dt>Height = value</dt>
+        <dd>Height of the bar.</dd>
+        <dt>Width = value</dt>
+        <dd>width of the bar.</dd>
+      </dl></dd>
+      <dt>"CompleteBar", {flag = value, ...}</dt>
+      <dd>Draw a bar which represent the variable.
+      <dl>
+        <dt>Variable = "variable-name"</dt>
+        <dd>Variable name to show. See DefineVariable() for more details.</dd>
+        <dt>Height = value</dt>
+        <dd>Height of the bar.</dd>
+        <dt>Width = value</dt>
+        <dd>width of the bar.</dd>
+        <dt>Border = boolean</dt>
+        <dd>if true then add border for the bar.</dd>
+      </dl></dd>
+    </dl></dd>
+  </dd></dl>
+</dl>
+
+
+<a name="DefineUI"></a>
+<h3>DefineUI("race-name", screen-width, screen-height, tag1, value1, tag2, value2, ...)</h3>
+
+<dl>
+<dt>"race-name"</dt>
+<dd>FIXME</dd>
+<dt>screen-width, screen-height</dt>
+<dd>FIXME</dd>
+</dl>
+
+All of those tags should be given:
+
+<dl>
+<dt>"normal-font-color", "color-name"</dt>
+<dd>FIXME</dd>
+<dt>"reverse-font-color", "color-name"</dt>
+<dd>FIXME</dd>
+<dt>"filler", {tag, value, ...}</dt>
+<dd>FIXME:
+<dl>
+  <dt>"file", "path"</dt>
+  <dd>FIXME</dd>
+  <dt>"pos", {x, y}</dt>
+  <dd>FIXME</dd>
+</dl>
+</dd>
+<dt>"resource-line", {"file-name", x, y}</dt>
+<dd>
+FIXME
+<dl>
+  <dt>"file-name"</dt>
+  <dd>FIXME</dd>
+  <dt>x, y</dt>
+  <dd>FIXME</dd>
+</dl>
+</dd>
+<dt>"resources", {"ressource-name", {tag, value, ...}, ...}</dt>
+<dd>
+<dl>
+  <dt>"ressource-name" or "food" or "score"</dt>
+  <dd>FIXME</dd>
+</dl>
+FIXME
+<dl>
+  <dt>"file", "file-name"</dt>
+  <dd>FIXME</dd>
+  <dt>"frame", number</dt>
+  <dd>FIXME</dd>
+  <dt>"pos", {x, y}</dt>
+  <dd>FIXME</dd>
+  <dt>"size", {width, height}</dt>
+  <dd>FIXME</dd>
+  <dt>"text-pos", {x, y}</dt>
+  <dd>FIXME</dd>
+</dl>
+</dd>
+<dt>"info-panel", {tag, value, ...}</dt>
+<dd>
+<dl>
+  <dt>"panel", {tag, value}</dt>
+  <dd>FIXME
+  <dl>
+    <dt>"file", "file-name"</dt>
+    <dd>FIXME</dd>
+    <dt>"pos", {x, y}</dt>
+    <dd>FIXME</dd>
+    <dt>"size", {width, height}</dt>
+    <dd>FIXME</dd>
+  </dl>
+  </dd>
+  <dt>"panels", "panel-ident" or {"panel-ident1", ...}</dt>
+  <dd>Panel ident to show when unit is selected. (see DefinePanels() for more details)</dd>
+  <dt>"selected", {tag, value}</dt>
+  <dd>FIXME
+  <dl>
+    <dt>"single", {tag, value}</dt>
+    <dd>FIXME
+    <dl>
+      <dt>"text", {tag, value}</dt>
+      <dd>FIXME</dd>
+      <dt>"icon", {tag, value}</dt>
+      <dd>FIXME</dd>
+    </dl>
+    </dd>
+    <dt>"multiple", {tag, value}</dt>
+    <dd>FIXME
+    <dl>
+      <dt>"icons", {{tag, value}, ...}</dt>
+      <dd>FIXME, see above (icon)</dd>
+      <dt>"max-text", {tag, value}</dt>
+      <dd>FIXME, see above (text)</dd>
+    </dl>
+    </dd>
+  </dl>
+  </dd>
+
+  <dt>"training", {tag, value}</dt>
+  <dd>FIXME
+  <dl>
+    <dt>"single", {tag, value}</dt>
+    <dd>FIXME
+    <dl>
+      <dt>"icon", {tag, value}</dt>
+      <dd>FIXME</dd>
+    </dl>
+    </dd>
+    <dt>"multiple", {tag, value}</dt>
+    <dd>FIXME
+    <dl>
+      <dt>"text", {tag, value}</dt>
+      <dd>FIXME</dd>
+      <dt>"icons", {{tag, value}, ...}</dt>
+      <dd>FIXME, see above (icon)</dd>
+    </dl>
+    </dd>
+
+  </dl>
+  </dd>
+
+  <dt>"upgrading", {tag, value}</dt>
+  <dd>FIXME
+  <dl>
+    <dt>"icon", {tag, value}</dt>
+    <dd>FIXME</dd>
+  </dl>
+  </dd>
+
+  <dt>"researching", {tag, value}</dt>
+  <dd>FIXME
+  <dl>
+    <dt>"icon", {tag, value}</dt>
+    <dd>FIXME</dd>
+  </dl>
+  </dd>
+
+  <dt>"transporting", {tag, value}</dt>
+  <dd>FIXME
+  <dl>
+    <dt>"icons", {{tag, value}, ...}</dt>
+    <dd>FIXME, see above (icon)</dd>
+  </dl>
+  </dd>
+
+  <dt>"completed-bar", {tag, value}</dt>
+  <dd>FIXME
+  <dl>
+    <dt>"color", {r, g, b}</dt>
+    <dd>FIXME</dd>
+    <dt>"has-shadow"</dt>
+    <dd>FIXME</dd>
+  </dl>
+  </dd>
+</dl>
+</dd>
+<dt>"button-panel", {tag, value, ...}</dt>
+<dd>
+<dl>
+  <dt>"panel", {tag, value, ...}</dt>
+  <dd>FIXME
+  <dl>
+    <dt>"file", "filename"</dt>
+    <dd>FIXME</dd>
+    <dt>"pos", {x, y}</dt>
+    <dd>FIXME</dd>
+  </dl>
+  </dd>
+  <dt>"icon", {tag, value, ...}</dt>
+  <dd>FIXME
+  <dl>
+    <dt>FIXME</dt>
+    <dd>FIXME</dd>
+  </dl>
+  </dd>
+</dl>
+</dd>
+<dt>"pie-menu", {tag, value, ...}</dt>
+<dd>
+<dl>
+  <dt>"radius", radius</dt>
+  <dd>The radius in pixels of the pie menu.</dd>
+  <dt>"file", "filename"</dt>
+  <dd>The image file for the background of the pie menu.</dd>
+  <dt>"mouse-button", "buttonname"</dt>
+  <dd>Which mouse button pops up the pie menu. Can be "right", "middle" or "left".
+  </dd>
+</dl>
+</dd>
+<dt>"map-area", {"pos", {x, y}, size, {w, h}}</dt>
+<dd>FIXME</dd>
+<dt>"menu-panel", {tag, value}</dt>
+<dd>FIXME
+<dl>
+  <dt>"panel", {tag, value, ...}</dt>
+  <dd>FIXME
+  <dl>
+    <dt>"file", "filename"</dt>
+    <dd>FIXME</dd>
+    <dt>"pos", {x, y}</dt>
+    <dd>FIXME</dd>
+  </dl>
+  </dd>
+
+  <dt>type-menu-button, {tag, value, ...}</dt>
+  <dd>type-menu-button is one of the following :
+  <dl>
+    <dt>"menu-button"</dt>
+    <dd>FIXME</dd>
+    <dt>"network-menu-button"</dt>
+    <dd>FIXME</dd>
+    <dt>"network-diplomacy-button"</dt>
+    <dd>FIXME</dd>
+  </dl>
+  <br>
+  And tag and value :
+  <dl>
+    <dt>"caption" , "text"</dt>
+    <dd>FIXME</dd>
+    <dt>"pos", {x, y}</dt>
+    <dd>FIXME</dd>
+    <dt>"style", "style-name"</dt>
+    <dd>FIXME, see above</dd>
+  </dl>
+  </dd>
+</dl>
+</dd>
+<dt>"minimap", {tag, value}</dt>
+<dd>
+There is a minimap panel an the minimap on it. The panel graphic has
+certain palette restrictions (FIXME: exactly? probably the same as the
+tileset?).
+<dl>
+  <dt>"file", filename</dt>
+  <dd>FIXME</dd>
+  <dt>"panel-pos", {x, y}</dt>
+  <dd>FIXME</dd>
+  <dt>"pos", {x, y}</dt>
+  <dd>Pos is the absoloute position of the minimap on the screen
+  (the upper left corner of it).
+  </dd>
+  <dt>"size", {w, h}</dt>
+  <dd>FIXME</dd>
+  <dt>"transparent"</dt>
+  <dd>If you give "transparent", the panel
+  graphic will be displayed on unexplored terrain, black otherwise.
+  </dd>
+</dl>
+</dd>
+<dt>"status-line", {tag, value}</dt>
+<dd>FIXME
+<dl>
+  <dt>"file", "file-name"</dt>
+  <dd>FIXME</dd>
+  <dt>"pos", {x, y}</dt>
+  <dd>FIXME</dd>
+  <dt>"text-pos", {x, y}</dt>
+  <dd>FIXME</dd>
+  <dt>"font", "font-name"</dt>
+  <dd>FIXME</dd>
+</dl>
+</dd>
+<dt>"cursors", {tag, name}</dt>
+<dd>FIXME
+<dl>
+  <dt>"point", "name"</dt>
+  <dd>FIXME</dd>
+  <dt>"glass", "name"</dt>
+  <dd>FIXME</dd>
+  <dt>"cross", "name"</dt>
+  <dd>FIXME</dd>
+  <dt>"yellow", "name"</dt>
+  <dd>FIXME</dd>
+  <dt>"green", "name"</dt>
+  <dd>FIXME</dd>
+  <dt>"red", "name"</dt>
+  <dd>FIXME</dd>
+  <dt>"scroll", "name"</dt>
+  <dd>FIXME</dd>
+  <dt>"arrow-e" or "arrow-ne" or "arrow-n" or "arrow-nw" or "arrow-w" or "arrow-sw" or "arrow-s" or "arrow-se", "name"</dt>
+  <dd>FIXME</dd>
+</dl>
+</dd>
+
+<dt>"menu-panels", {"panel-name1", "file1", ...}</dt>
+<dd>FIXME: this really needs docu or change, if you dig out the
+requirement of the pictures, write them down here. Example:
+</dd>
+
+<dt>"victory-background", "file-name"</dt>
+<dd>Background image for the victory screen. The image will be scaled.</dd>
+<dt>"defeat-background", "file-name"</dt>
+<dd>Background image for the victory screen. The image will be scaled.</dd>
+
+</dl>
+
+<a name="DefineViewports"></a>
+<h3>DefineViewports("mode", mode, "viewport", {mapx, mapy}, ...)</h3>
+
+Define the viewports. Only used in savegames, but could be useful for
+scenarios.
+
+<dl>
+<dt>"mode", number</dt>
+<dd>Number corresponding to the viewport mode.  See the ViewportMode enum. FIXME</dd>
+<dt>"viewport", {mapx, mapy}</dt>
+<dd>X, Y coordinate of the map tile.
+</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+-- Defines the viewports to use mode 1 (split horizontal) with the first
+-- viewport having map coordinates 82,31 and the second having coordinates 64,31.
+DefineViewports("mode", 1, "viewport", {82, 31},
+                           "viewport", {64, 31})
+</pre>
+
+<a name="SetGameCursor"></a>
+<h3>SetGameCursor("cursor-ident")</h3>
+Set the game cursor.
+<dl>
+<dt>"cursor-ident"</dt>
+<dd>Unique identifier of the cursor.</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+-- Set the game cursor to 'cursor-point'.
+SetGameCursor("cursor-point")
+</pre>
+
+<hr>
+All trademarks and copyrights on this page are owned by their respective owners.
+<address>(c) 2002-2007 by <a href="http://boswars.org">
+The Bos Wars Project</a></address></body></html>
+

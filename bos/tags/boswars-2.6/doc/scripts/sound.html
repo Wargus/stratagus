@@ -1,0 +1,363 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--
+----	(c) Copyright 2002-2007 by Lutz Sammer, Russell Smith
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Bos Wars Scripting API: Icon</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+</head>
+<body>
+    <h1>Bos Wars Scripting API: Sound</h1>
+<hr>
+<a href="../index.html">Stratagus</a> 
+<a href="../faq.html">FAQ</a> 
+<a href="savegame.html">PREV</a> 
+<a href="tileset.html">NEXT</a> 
+<a href="index.html">LUA Index</a>
+<hr>
+<a href="#DefineGameSounds">DefineGameSounds</a>
+<a href="#MakeSound">MakeSound</a>
+<a href="#MakeSoundGroup">MakeSoundGroup</a>
+<a href="#MapSound">MapSound</a>
+<a href="#PlayFile">PlayFile</a>
+<a href="#PlayMusic">PlayMusic</a>
+<a href="#PlaySound">PlaySound</a>
+<a href="#SetCdMode">SetCdMode</a>
+<a href="#SetGlobalSoundRange">SetGlobalSoundRange</a>
+<a href="#SetMusicVolume">SetMusicVolume</a>
+<a href="#SetSoundRange">SetSoundRange</a>
+<a href="#SetSoundVolume">SetSoundVolume</a>
+<a href="#SoundForName">SoundForName</a>
+<a href="#SoundOff">SoundOff</a>
+<a href="#SoundOn">SoundOn</a>
+<a href="#StopMusic">StopMusic</a>
+<hr>
+<h2>Intro - Introduction to sound functions and variables</h2>
+
+Everything around sound.
+<h2>Functions</h2>
+<a name="DefineGameSounds"></a>
+<h3>DefineGameSounds("name", arg, [[name2, arg] ...])</h3>
+
+Specify some global sounds.
+
+
+<dl>
+<dt>"name", arg</dt>
+<dd>One of the following:
+<dl>"click", SoundId</dl>
+<dl>"placement-error", SoundId</dl>
+<dl>"placement-success", SoundId</dl>
+
+<dl>"rescue",{"RaceName", SoundId}</dl>
+<dl>"work-complete", {RaceName, SoundId}</dl>
+</dd>
+<dt>Where Soundid is the sound to use</dt>
+<dt>And RaceName the concerned race.</dt>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+--	Define sounds used by game
+--
+DefineGameSounds(
+
+  "placement-error", MakeSound("placement error", "ui/placement_error.wav"),
+  "placement-success", MakeSound("placement success", "ui/placement_success.wav"),
+  "click", sound_click, -- sound_click already define as SoundId
+
+-- FIXME: Not ready
+--  "transport-docking",
+--  "building-construction",
+
+  "work-complete", {"human", MakeSound("basic human voices work complete", "human/basic_voices/work_complete.wav")},
+  "work-complete", {"orc", MakeSound("basic orc voices work complete", "orc/basic_voices/work_complete.wav")},
+
+  "rescue", {"human", MakeSound("human rescue", "human/rescue.wav")},
+  "rescue", {"orc", MakeSound("orc rescue", "orc/rescue.wav")} )
+</pre>
+
+<a name="MakeSound"></a>
+<h3>MakeSound("name", "file" or {"file1", "file2", ...})</h3>
+
+Asks the sound system to register a sound under a given name, with an 
+associated list of files (the list can be replaced by only one file).
+
+<dl>
+<dt>name</dt>
+<dd>Name of the sound.
+</dd>
+<dt>file</dt>
+<dd>Name of the file or a list of files.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+-- Makes the sounds "lightning" and "basic human voices acknowledge".
+MakeSound("lightning", "spells/lightning.wav")
+
+MakeSound("basic human voices acknowledge",
+	{"human/basic_voices/acknowledgement/1.wav",
+	"human/basic_voices/acknowledgement/2.wav",
+	"human/basic_voices/acknowledgement/3.wav",
+	"human/basic_voices/acknowledgement/4.wav"})
+</pre>
+
+<a name="MakeSoundGroup"></a>
+<h3>MakeSoundGroup("name", "groupname1" or SoundId, "groupname2" or SoundId)</h3>
+
+Asks the sound system to build a special sound group.
+
+
+<dl>
+<dt>name</dt>
+<dd>Name of the sound.
+</dd>
+<dt>group</dt>
+<dd>sound-id or string
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+--	Define selection sound groups.
+MakeSoundGroup("footman-selected",
+	"basic human voices selected", "basic human voices annoyed")
+</pre>
+
+<a name="MapSound"></a>
+<h3>MapSound("name", "sound")</h3>
+
+Ask the sound system to remap a sound id to a given name.
+
+<dl>
+<dt>name</dt>
+<dd>Name of the sound.
+</dd>
+<dt>sound</dt>
+<dd>Sound to map to.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+-- Maps the name "footman-acknowledge" to "basic human voices acknowledge".
+MapSound("footman-acknowledge", "basic human voices acknowledge")
+</pre>
+
+<a name="PlayFile"></a>
+<h3>PlayFile("name")</h3>
+Play a sound file.
+<dl>
+<dt>name</dt>
+<dd>Name of the file to play.
+</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+-- Play the file "spells/lightning.wav".
+PlayFile("spells/lightning.wav")
+</pre>
+
+<a name="PlayMusic"></a>
+<h3>PlayMusic("name")</h3>
+
+Name of the music file to play.
+
+<dl>
+<dt>name</dt>
+<dd>Name of the music file.
+</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+-- Plays the music file "music/default.mod".
+PlayMusic("music/default.mod")
+</pre>
+
+<a name="PlaySound"></a>
+<h3>PlaySound("name")</h3>
+
+Ask the sound system to play the specified sound.
+
+<dl>
+<dt>"name"</dt>
+<dd>Name of the sound to play.
+</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+-- Play the sound "basic human voices ready".
+PlaySound("basic human voices ready")
+</pre>
+
+<a name="SetCdMode"></a>
+<h3>SetCdMode("mode")</h3>
+
+Set the cd mode.
+
+<dl>
+<dt>"all"</dt>
+<dd>plays all tracks</dd>
+<dt>"random"</dt>
+<dd>plays random tracks</dd>
+<dt>"defined"</dt>
+<dd>play according to playlist below. define before playlist = {"song1", "song2", ...}</dd>
+<dt>"off"</dt>
+<dd>turns cd player off</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+-- Set the cd mode to play songs in a random order.
+SetCdMode("random")
+</pre>
+
+<a name="SetGlobalSoundRange"></a>
+<h3>SetGlobalSoundRange(distance)</h3>
+
+Set the cut off distance.
+<dl>
+<dt>distance</dt>
+<dd>Max tile distance to hear sounds.
+</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+-- Set the sound range to 40.
+SetGlobalSoundRange(40)
+</pre>
+
+<a name="SetMusicVolume"></a>
+<h3>SetMusicVolume(volume)</h3>
+
+Set the music volume.
+
+<dl>
+<dt>volume</dt>
+<dd>Number between 0 and MaxVolume.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+-- Set the music volume to 128.
+SetMusicVolume(128)
+</pre>
+
+<a name="SetSoundRange"></a>
+<h3>SetSoundRange("name", distance)</h3>
+
+Set the range of a given sound.
+
+<dl>
+<dt>name</dt>
+<dd>Name of the sound.
+</dd>
+<dt>distance</dt>
+<dd>Max tile distance to hear the sound.
+</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+-- Set the range of the sound "basic human voices ready" to 20.
+SetSoundRange("basic human voices ready", 20)
+</pre>
+
+<a name="SetSoundVolume"></a>
+<h3>SetSoundVolume(volume)</h3>
+
+Global volume support.
+
+<dl>
+<dt>volume</dt>
+<dd>Number between 0 and MaxVolume.
+</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+-- Set the sound volume to 128.
+SetSoundVolume(128)
+</pre>
+
+<a name="SoundForName"></a>
+<h3>SoundForName("name")</h3>
+
+Ask the sound system to associate a sound id to a sound name.
+
+<dl>
+<dt>name</dt>
+<dd>Name of the sound.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+SoundForName("peasant attack")
+</pre>
+<a name="SoundOff"></a>
+<h3>SoundOff()</h3>
+
+Turn off sound.
+
+<h4>Example</h4>
+
+<pre>
+-- Turns off sound.
+SoundOff()
+</pre>
+
+<a name="SoundOn"></a>
+<h3>SoundOn()</h3>
+
+Turn on sound.
+
+<h4>Example</h4>
+
+<pre>
+-- Turns on sound.
+SoundOn()
+</pre>
+
+<a name="StopMusic"></a>
+<h3>StopMusic()</h3>
+
+Stop playing music.
+
+<h4>Example</h4>
+<pre>
+-- Stop playing music.
+StopMusic()
+</pre>
+
+<hr>
+All trademarks and copyrights on this page are owned by their respective owners.
+<address>(c) 2002-2007 by <a href="http://boswars.org">
+The Bos Wars Project</a></address></body></html>
