@@ -571,9 +571,13 @@ void Exit(int err)
 	NetworkQuit();
 
 	ExitNetwork1();
+	
 	CleanModules();
 	FreeBurningBuildingFrames();
+	// FreeGraphics must be called before exit to avoid the static 
+	// deinitialization fiasco.
 	FreeGraphics();
+	
 #ifdef DEBUG
 	FreeSounds();
 	FreePlayerColors();
