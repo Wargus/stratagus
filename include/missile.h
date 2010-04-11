@@ -562,9 +562,9 @@ extern void CleanMissileTypes(void);
 extern void InitMissiles(void);
 	/// Clean missiles
 extern void CleanMissiles(void);
-#ifdef DEBUG
+
 extern void FreeBurningBuildingFrames();
-#endif
+
 
 //@}
 

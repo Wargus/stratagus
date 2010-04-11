@@ -571,11 +571,11 @@ void Exit(int err)
 	NetworkQuit();
 
 	ExitNetwork1();
-#ifdef DEBUG
 	CleanModules();
 	FreeBurningBuildingFrames();
-	FreeSounds();
 	FreeGraphics();
+#ifdef DEBUG
+	FreeSounds();
 	FreePlayerColors();
 	FreeButtonStyles();
 	for (size_t i = 0; i < Containers.size(); ++i) {
