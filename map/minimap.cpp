@@ -162,6 +162,7 @@ void CMinimap::Create(void)
 		MinimapTerrainSurfaceGL = new unsigned char[MinimapTextureWidth * MinimapTextureHeight * 4];
 		MinimapSurfaceGL = new unsigned char[MinimapTextureWidth * MinimapTextureHeight * 4];
 		memset(MinimapSurfaceGL, 0, MinimapTextureWidth * MinimapTextureHeight * 4);
+		memset(MinimapTerrainSurfaceGL, 0, MinimapTextureWidth * MinimapTextureHeight * 4);
 		CreateMinimapTexture();
 	}
 
