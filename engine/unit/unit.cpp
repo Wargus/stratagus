@@ -808,12 +808,10 @@ void UpdateForNewUnit(const CUnit *unit, int upgrade)
 	const CUnitType *type = unit->Type;
 	CPlayer *player = unit->Player;
 
-	//
 	// Update resources.  Until the unit has been fully built, it
 	// does not produce any resources or provide storage capacity.
-	// There is a corresponding check in LetUnitDie, which
-	// subtracts them back out.
-	//
+	// There is a corresponding check in UnitRemoveProductionAndStorage,
+	// which subtracts them back out.
 	if (unit->Orders[0]->Action != UnitActionBuilt) {
 		for (int u = 0; u < MaxCosts; ++u) {
 			player->ProductionRate[u] += type->ProductionRate[u] * unit->ProductionEfficiency / 100;
