@@ -78,6 +78,9 @@ GameResults GameResult;                      /// Outcome of the game
 --  Functions
 ----------------------------------------------------------------------------*/
 
+static void WriteCreateUnits(FileWriter *f);
+static void WriteCreateUnit(FileWriter *f, const CUnit *unit);
+
 /*----------------------------------------------------------------------------
 --  Map loading/saving
 ----------------------------------------------------------------------------*/
@@ -242,15 +245,7 @@ int WriteMapSetup(const char *mapSetup, CMap *map)
 		f->printf("\n");
 
 		f->printf("-- place units\n");
-		for (i = 0; i < NumUnits; ++i) {
-			f->printf("CreateUnit(\"%s\", ", Units[i]->Type->Ident.c_str());
-			if (Units[i]->Player->Index == PlayerMax - 1) {
-				f->printf("PlayerNumNeutral");
-			} else {
-				f->printf("%d", Units[i]->Player->Index);
-			}
-			f->printf(", {%d, %d})\n", Units[i]->X, Units[i]->Y);
-		}
+		WriteCreateUnits(f);
 		f->printf("\n\n");
 	} catch (const FileException &) {
 		fprintf(stderr,"Can't save map setup: `%s' \n", mapSetup);
@@ -262,6 +257,67 @@ int WriteMapSetup(const char *mapSetup, CMap *map)
 	return 1;
 }
 
+/**
+**  Write Lua CreateUnit calls for all existing units to the map setup
+**  file.  When the map is later loaded, these calls will recreate the
+**  units.
+**
+**  @param f     file writer for the map setup file
+*/
+static void WriteCreateUnits(FileWriter *f)
+{
+	int i;
+
+	// Hot-spot units must be created before the magma-pump units
+	// that are built on top of them.  Otherwise, the map would
+	// not be correctly loaded.
+	//
+	// When the user first adds a hot spot and a magma pump in the
+	// editor, they end up in the correct order in the Units
+	// array.  However, if the user then deletes some other unit,
+	// CUnit::Release moves the last unit in the array to the slot
+	// of the deleted unit, and this can move the magma pump in
+	// front of the hot spot.  If the units are saved in that order,
+	// and the map is then loaded, CclCreateUnit will refuse to
+	// place the hot spot on top of the magma pump, and will instead
+	// place it somewhere nearby.  This behavior of CclCreateUnit
+	// is necessary because it can be called from triggers too.
+	//
+	// Currently, magma pumps are the only unit type with any
+	// building rules, so we just check that.  This code may have
+	// to be revised if building rules are added to other unit
+	// types, especially if the rules are chained (X on top of Y
+	// on top of Z).
+	for (i = 0; i < NumUnits; ++i) {
+		if (Units[i]->Type->BuildingRules.empty()) {
+			WriteCreateUnit(f, Units[i]);
+		}
+	}
+	for (i = 0; i < NumUnits; ++i) {
+		if (!Units[i]->Type->BuildingRules.empty()) {
+			WriteCreateUnit(f, Units[i]);
+		}
+	}
+}
+
+/**
+**  Write a Lua CreateUnit call for the specified unit to the map
+**  setup file.  When the map is later loaded, this call will recreate
+**  the unit.
+**
+**  @param f     file writer for the map setup file
+**  @param unit  unit to be created when the map is loaded
+*/
+static void WriteCreateUnit(FileWriter *f, const CUnit *unit)
+{
+	f->printf("CreateUnit(\"%s\", ", unit->Type->Ident.c_str());
+	if (unit->Player->Index == PlayerMax - 1) {
+		f->printf("PlayerNumNeutral");
+	} else {
+		f->printf("%d", unit->Player->Index);
+	}
+	f->printf(", {%d, %d})\n", unit->X, unit->Y);
+}
 
 
 /**

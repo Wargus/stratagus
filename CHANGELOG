@@ -1,7 +1,8 @@
 Change log for Bos Wars
 -----------------------
 
-Version 2.6 (2010 04 10):
+Version 2.6 (2010 04 11):
+- Fix bug map editor places magma pump next to hotspot. (Kalle Olavi Niemitalo)
 - Support libpng 1.4 (Francois Beerten)
 - Fix resource consumption and production issues when rescueing units 
   (Kalle Olavi Niemitalo)
