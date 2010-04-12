@@ -46,7 +46,7 @@ local function GetOwnUnitsAmount(type)
   return ThisPlayer.UnitTypesCount[UnitTypeByIdent(type).Slot]
 end
 
-delayEnding = 999999999
+delayedEnding = 999999999
 
 -- Vault rescued
 AddTrigger(
