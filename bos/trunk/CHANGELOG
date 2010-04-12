@@ -1,6 +1,9 @@
 Change log for Bos Wars
 -----------------------
 
+Development version:
+- Fix crash at the end of the Tutorial campaign (Francois Beerten)
+
 Version 2.6 (2010 04 11):
 - Fix crash on exit in Windows (Francois Beerten, Nehal Mistry, Jimmy Salmon)
 - Fix bug map editor places magma pump next to hotspot. (Kalle Olavi Niemitalo)
