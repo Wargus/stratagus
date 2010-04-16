@@ -54,7 +54,6 @@ As a special exception the sources are not required for the following files:
   graphics/screens/defeat.png
   graphics/screens/menu.png
   graphics/screens/victory.png
-  graphics/tiles/desert.png
   graphics/ui/rosace1.png
   graphics/ui/x_startpoint.png
   maps/antarticum.map/terrain.png
