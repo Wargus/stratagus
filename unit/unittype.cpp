@@ -463,8 +463,6 @@ static void CleanAnimation(CAnimation *anim)
 */
 void CleanUnitTypes(void)
 {
-	int j;
-
 	// Clean all animations.
 	for (int j = 0; j < NumAnimations; ++j) {
 		CleanAnimation(AnimationsArray[j]);
@@ -485,7 +483,7 @@ void CleanUnitTypes(void)
 	UnitTypes.clear();
 	UnitTypeMap.clear();
 
-	for (j = 0; j < UnitTypeVar.NumberVariable; ++j) { // User defined variables
+	for (int j = 0; j < UnitTypeVar.NumberVariable; ++j) { // User defined variables
 		delete[] UnitTypeVar.VariableName[j];
 	}
 	delete[] UnitTypeVar.VariableName;

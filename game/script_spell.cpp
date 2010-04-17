@@ -639,7 +639,6 @@ static int CclDefineSpell(lua_State *l)
 	SpellType *spell;
 	const char *value;
 	int args;
-	int i;
 
 	args = lua_gettop(l);
 	identname = LuaToString(l, 1);
@@ -666,7 +665,7 @@ static int CclDefineSpell(lua_State *l)
 		}
 		SpellTypeTable.push_back(spell);
 	}
-	for (i = 1; i < args; ++i) {
+	for (int i = 1; i < args; ++i) {
 		value = LuaToString(l, i + 1);
 		++i;
 		if (!strcmp(value, "showname")) {

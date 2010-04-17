@@ -487,7 +487,6 @@ static void AiCheckingWork()
 */
 static int AiAssignHarvester(CUnit *unit, int resource)
 {
-	std::vector<CUnitType *>::iterator i;
 	CUnit *dest;
 	int res = resource;
 

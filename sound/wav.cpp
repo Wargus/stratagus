@@ -312,7 +312,7 @@ CSample *LoadWav(const std::string &name, int flags)
 		int rem;
 		int read;
 		int bufrem;
-		char sndbuf[SOUND_BUFFER_SIZE];
+		char *sndbuf = new char[SOUND_BUFFER_SIZE];
 
 		sample->Buffer = NULL;
 		read = 0;
@@ -365,6 +365,8 @@ CSample *LoadWav(const std::string &name, int flags)
 
 			sample->Len += comp;
 		}
+
+		delete[] sndbuf;
 
 		data->WavFile->close();
 		delete data->WavFile;

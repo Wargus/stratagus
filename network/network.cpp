@@ -967,10 +967,10 @@ void NetworkEvent(void)
 		// Handle some messages.
 		//
 		if (packet.Header.Type[i] == MessageQuit) {
-			int player = ntohs(nc->X);
+			int playerNum = ntohs(nc->X);
 
-			if (player >= 0 && player < NumPlayers) {
-				PlayerQuit[player] = 1;
+			if (playerNum >= 0 && playerNum < NumPlayers) {
+				PlayerQuit[playerNum] = 1;
 				validCommand = true;
 			}
 		}

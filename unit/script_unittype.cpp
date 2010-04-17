@@ -1245,11 +1245,10 @@ static int CclDefineDecorations(lua_State *l)
 */
 void UpdateUnitVariables(const CUnit *unit)
 {
-	int i;
 	const CUnitType *type; // unit->Type.
 
 	type = unit->Type;
-	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
+	for (int i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX ||
 				i == BASICDAMAGE_INDEX || i == MANA_INDEX ||
 				i == KILL_INDEX || i == HP_INDEX) {
@@ -1327,7 +1326,7 @@ void UpdateUnitVariables(const CUnit *unit)
 	unit->Variable[SLOT_INDEX].Value = unit->Slot;
 	unit->Variable[SLOT_INDEX].Max = UnitSlotFree - 1;
 
-	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
+	for (int i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		unit->Variable[i].Enable &= unit->Variable[i].Max > 0;
 #ifdef DEBUG
 		if (unit->Variable[i].Value > unit->Variable[i].Max) {
