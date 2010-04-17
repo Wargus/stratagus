@@ -96,7 +96,6 @@ int LoadGraphicPNG(CGraphic *g)
 	SDL_Palette *palette;
 	png_bytep *volatile row_pointers;
 	int row;
-	int i;
 	volatile int ckey;
 	png_color_16 *transv;
 	char name[PATH_MAX];
@@ -282,14 +281,14 @@ int LoadGraphicPNG(CGraphic *g)
 		png_get_PLTE(png_ptr, info_ptr, &png_palette, &num_palette);
 		if (color_type == PNG_COLOR_TYPE_GRAY) {
 			palette->ncolors = 256;
-			for (i = 0; i < 256; ++i) {
+			for (int i = 0; i < 256; ++i) {
 				palette->colors[i].r = i;
 				palette->colors[i].g = i;
 				palette->colors[i].b = i;
 			}
 		} else if (num_palette > 0) {
 			palette->ncolors = num_palette;
-			for (i = 0; i < num_palette; ++i) {
+			for (int i = 0; i < num_palette; ++i) {
 				palette->colors[i].b = png_palette[i].blue;
 				palette->colors[i].g = png_palette[i].green;
 				palette->colors[i].r = png_palette[i].red;

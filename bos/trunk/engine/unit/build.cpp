@@ -68,9 +68,9 @@ CBuildRestrictionOnTop *OnTopDetails(const CUnit *unit, const CUnitType *parent)
 				return ontopb;
 			}
 		} else if ((andb = dynamic_cast<CBuildRestrictionAnd *>(*i))) {
-			for (std::vector<CBuildRestriction *>::iterator i = andb->_or_list.begin();
-					i != andb->_or_list.end(); ++i) {
-				if ((ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*i))) {
+			for (std::vector<CBuildRestriction *>::iterator it = andb->_or_list.begin();
+					it != andb->_or_list.end(); ++it) {
+				if ((ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*it))) {
 					if (!parent) {
 						// Guess this is right
 						return ontopb;

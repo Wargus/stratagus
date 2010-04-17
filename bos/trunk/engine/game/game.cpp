@@ -112,7 +112,7 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 		strcpy_s(mapfull, sizeof(mapfull), StratagusLibPath.c_str());
 		strcat_s(mapfull, sizeof(mapfull), "/");
 		strcat_s(mapfull, sizeof(mapfull), smpname.c_str());
-		char *p = strrchr(mapfull, '/');
+		p = strrchr(mapfull, '/');
 		if (!p) {
 			p = mapfull;
 		} else {

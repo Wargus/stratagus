@@ -915,7 +915,7 @@ static int DrawLevelCompare(const void *v1, const void *v2) {
 		// FIXME: Use BoxHeight?
 		diffpos = c1->Y * TileSizeY + c1->IY + c1->Type->Height -
 			(c2->Y * TileSizeY + c2->IY + c2->Type->Height);
-		return diffpos ? diffpos : c1->X - c2->X ? c1->X - c2->X : c1->Slot - c2->Slot;
+		return diffpos ? diffpos : (c1->X - c2->X ? c1->X - c2->X : c1->Slot - c2->Slot);
 	} else {
 		return drawlevel1 <= drawlevel2 ? -1 : 1;
 	}

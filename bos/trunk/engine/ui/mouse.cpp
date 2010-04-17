@@ -1298,7 +1298,6 @@ void UIHandleButtonDown(unsigned button)
 	static bool OldShowAttackRange;
 	static bool OldValid = false;
 	CUnit *uins;
-	int i;
 
 /**
 **  Detect long selection click, FIXME: tempory hack to test the feature.
@@ -1537,7 +1536,7 @@ void UIHandleButtonDown(unsigned button)
 						ThisPlayer->IsTeamed(Selected[0])) {
 					if (Selected[0]->BoardCount >= ButtonUnderCursor) {
 						uins = Selected[0]->UnitInside;
-						for (i = ButtonUnderCursor; i; uins = uins->NextContained) {
+						for (int i = ButtonUnderCursor; i; uins = uins->NextContained) {
 							if (uins->Boarded) {
 								--i;
 							}

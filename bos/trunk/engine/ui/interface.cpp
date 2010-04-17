@@ -746,7 +746,6 @@ int HandleCheats(const std::string &input)
 static int InputKey(int key)
 {
 	char ChatMessage[sizeof(Input) + 40];
-	int i;
 	char *namestart;
 	char *p;
 	char *q;
@@ -835,7 +834,7 @@ static int InputKey(int key)
 			if (!strlen(namestart)) {
 				return 1;
 			}
-			for (i = 0; i < PlayerMax; ++i) {
+			for (int i = 0; i < PlayerMax; ++i) {
 				if (Players[i].Type != PlayerPerson) {
 					continue;
 				}
