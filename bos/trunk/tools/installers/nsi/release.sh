@@ -16,7 +16,7 @@ cp engine/Release/boswars.exe boswars
 cp tools/installers/nsi/Microsoft.VC80.CRT.manifest boswars
 
 echo "Creating installer"
-"c:/Program Files/NSIS/makensis.exe" /NOCD tools/installers/nsi/bos.nsi
+"c:/Program Files (x86)/NSIS/makensis.exe" /NOCD tools/installers/nsi/bos.nsi
 
 echo "Cleaning up"
 rm -rf boswars
