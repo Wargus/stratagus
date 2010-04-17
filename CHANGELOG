@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- On Windows, use the application directory to save user data (Nehal Mistry)
 - Fix crash at the end of the Tutorial campaign (Francois Beerten)
 
 Version 2.6 (2010 04 11):
