@@ -1015,13 +1015,15 @@ void CreateUserDirectories(void)
 	std::string directory;
 	UserDirectory = "";
 
-#ifndef USE_WIN32
 	std::string s;
+#ifdef USE_WIN32
+	s = getenv("APPDATA");
+#else
 	s = getenv("HOME");
+#endif
 	if (!s.empty()) {
 		UserDirectory = s + "/";
 	}
-#endif
 	
 	UserDirectory += STRATAGUS_HOME_PATH;
 	makedir(UserDirectory.c_str(), 0777);
