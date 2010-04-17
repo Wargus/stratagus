@@ -98,19 +98,10 @@ on the way.</dd>
   <dt>"cast-spell"</dt>
   <dd>The unit cast a spell.
 Need Value = "spell-name"</dd>
-  <dt>"research"</dt>
-  <dd>launch the research of an upgrade. Usefull to add technology.
-Need Value = "upgrade-name"</dd>
-  <dt>"upgrade-to"</dt>
-  <dd>The unit will be trasform in an other unit (like polyporm spell).
-Need Value = "Unit".
-  </dd>
   <dt>"unload"</dt>
   <dd>The unit unload unit inside of itself. Usefull for transporter or bunkers.</dd>
   <dt>"cancel"</dt>
   <dd>FIXME : difference between cancels.</dd>
-  <dt>"cancel-upgrade"</dt>
-  <dd>FIXME</dd>
   <dt>"cancel-train-unit"</dt>
   <dd>FIXME</dd>
   <dt>"cancel-build"</dt>
@@ -127,9 +118,6 @@ Need Value = "Unit".
   <dd>No restriction on this button.</dd>
   <dt>"check-false"</dt>
   <dd>this button is forbidden. FIXME : ? to be removed. What is its usage ?</dd>
-  <dt>"check-upgrade"</dt>
-  <dd>This button can be clicked only when a specific upgrade is searched.
-  Need Allowarg = {"upgrade-name"}</dd>
   <dt>"check-units-or"</dt>
   <dd>this button is available if at least one of the unit are available.
   Need AllowArg = {"unit-name1", "unit-name2"}</dd>
@@ -141,16 +129,8 @@ Need Value = "Unit".
   <dd>Button is available only if network is not available.</dd>
   <dt>"check-no-work"</dt>
   <dd>FIXME</dd>
-  <dt>"check-no-research"</dt>
-  <dd>this button is available if the unit is not researching (upgrade-to or upgrade research).</dd>
   <dt>"check-attack"</dt>
   <dd>FIXME</dd>
-  <dt>"check-upgrade-to"</dt>
-  <dd>FIXME. No arg</dd>
-  <dt>"check-research"</dt>
-  <dd>FIXME</dd>
-  <dt>"check-single-research"</dt>
-  <dd>FIXME. No arg</dd>
   </dl>
 </dd>
 <dt>AllowArg = {"arg1", ...}</dt>
@@ -1249,6 +1229,6 @@ SetGameCursor("cursor-point")
 
 <hr>
 All trademarks and copyrights on this page are owned by their respective owners.
-<address>(c) 2002-2007 by <a href="http://boswars.org">
+<address>(c) 2002-2010 by <a href="http://boswars.org">
 The Bos Wars Project</a></address></body></html>
 
