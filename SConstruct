@@ -188,6 +188,11 @@ def CheckLuaLib(env, conf):
 def AutoConfigure(env):
   conf = Configure(env)
 
+  ## check for required tools ##
+  if not conf.CheckCXX():
+     print 'C++ compiler missing, exiting !'
+     Exit(1)
+
   ## check for required libs ##
   if not conf.CheckLibWithHeader('png', 'png.h', 'c'):
      print 'Did not find png library or headers, exiting!'
