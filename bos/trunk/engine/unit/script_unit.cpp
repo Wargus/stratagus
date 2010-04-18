@@ -1080,16 +1080,19 @@ static int CclKillUnitAt(lua_State *l)
 	int j;
 	int s;
 
-	LuaCheckArgs(l, 2);
+	LuaCheckArgs(l, 5);
+
+	lua_pushvalue(l, 1);
+	unittype = TriggerGetUnitType(l);
+	lua_pop(l, 1);
 
 	lua_pushvalue(l, 2);
 	plynr = TriggerGetPlayer(l);
 	lua_pop(l, 1);
+
 	q = LuaToNumber(l, 3);
-	lua_pushvalue(l, 1);
-	unittype = TriggerGetUnitType(l);
-	lua_pop(l, 1);
-	if (!lua_istable(l, 4)) {
+
+	if (!lua_istable(l, 4) || lua_objlen(l, 4) != 2) {
 		LuaError(l, "incorrect argument");
 	}
 	lua_rawgeti(l, 4, 1);
@@ -1098,10 +1101,14 @@ static int CclKillUnitAt(lua_State *l)
 	lua_rawgeti(l, 4, 2);
 	y1 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
-	lua_rawgeti(l, 4, 3);
+
+	if (!lua_istable(l, 5) || lua_objlen(l, 5) != 2) {
+		LuaError(l, "incorrect argument");
+	}
+	lua_rawgeti(l, 5, 1);
 	x2 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
-	lua_rawgeti(l, 4, 4);
+	lua_rawgeti(l, 5, 2);
 	y2 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 

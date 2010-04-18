@@ -1,6 +1,9 @@
 Change log for Bos Wars
 -----------------------
 
+Version 2.6.2 (2010 xx xx):
+- Fixed bug #29579: KillUnitAt takes 5 parameters (Jimmy Salmon)
+
 Version 2.6.1 (2010 04 18):
 - Fix the position of the morels (Kalle Olavi Niemitalo)
 - Correct the draw level of some unit types (Kalle Olavi Niemitalo)
