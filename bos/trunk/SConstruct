@@ -189,7 +189,8 @@ def AutoConfigure(env):
   conf = Configure(env)
 
   ## check for required tools ##
-  if not conf.CheckCXX():
+  # CheckCXX is available only since SCons 1.1
+  if conf.CheckCXX and not conf.CheckCXX():
      print 'C++ compiler missing, exiting !'
      Exit(1)
 
