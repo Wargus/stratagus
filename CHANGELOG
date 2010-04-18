@@ -1,7 +1,7 @@
 Change log for Bos Wars
 -----------------------
 
-Development version:
+Version 2.6.1 (2010 04 18):
 - Fix the position of the morels (Kalle Olavi Niemitalo)
 - Correct the draw level of some unit types (Kalle Olavi Niemitalo)
 - Update the documentation of the scripting API (Francois Beerten)
