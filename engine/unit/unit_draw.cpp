@@ -893,7 +893,7 @@ static int DrawLevelCompare(const void *v1, const void *v2) {
 
 	const CUnit *c1, *c2;
 	int drawlevel1, drawlevel2;
-	int diffpos;
+	int y1, y2;
 
 	c1 = *(CUnit **)v1;
 	c2 = *(CUnit **)v2;
@@ -909,16 +909,30 @@ static int DrawLevelCompare(const void *v1, const void *v2) {
 		drawlevel2 = c2->Type->DrawLevel;
 	}
 
-	if (drawlevel1 == drawlevel2) {
-		// diffpos compares unit's Y positions (bottom of sprite) on the map
-		// and uses X position in case Y positions are equal.
-		// FIXME: Use BoxHeight?
-		diffpos = c1->Y * TileSizeY + c1->IY + c1->Type->Height -
-			(c2->Y * TileSizeY + c2->IY + c2->Type->Height);
-		return diffpos ? diffpos : (c1->X - c2->X ? c1->X - c2->X : c1->Slot - c2->Slot);
-	} else {
+	if (drawlevel1 != drawlevel2) {
 		return drawlevel1 <= drawlevel2 ? -1 : 1;
 	}
+
+	// Compare the units' Y positions (bottom of sprite) on the map.
+	// FIXME: Use BoxHeight?
+	y1 = (c1->Y * TileSizeY) + c1->IY + c1->Type->Height;
+	y2 = (c2->Y * TileSizeY) + c2->IY + c2->Type->Height;
+	if (y1 != y2) {
+		return y1 - y2;
+	}
+	
+	// Use X positions in case Y positions are equal.
+	if (c1->X != c2->X) {
+		return c1->X - c2->X;
+	}
+
+	// We don't really care which of these two units gets drawn in
+	// front of the other.  However, it must be consistent during
+	// a frame, because qsort might crash otherwise, and should
+	// also be consistent between frames, to avoid annoying
+	// flicker.  Therefore, use the slot numbers as the ultimate
+	// fallback.
+	return c1->Slot - c2->Slot;
 }
 /**
 **  Find all units to draw in viewport.
