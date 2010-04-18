@@ -913,10 +913,12 @@ static int DrawLevelCompare(const void *v1, const void *v2) {
 		return drawlevel1 <= drawlevel2 ? -1 : 1;
 	}
 
-	// Compare the units' Y positions (bottom of sprite) on the map.
-	// FIXME: Use BoxHeight?
-	y1 = (c1->Y * TileSizeY) + c1->IY + c1->Type->Height;
-	y2 = (c2->Y * TileSizeY) + c2->IY + c2->Type->Height;
+	// Compare the units' Y positions (center tile) on the map.
+	// The size of the sprite (->Type->Height) plays no part in
+	// this because many frames typically have a transparent area
+	// at the bottom.
+	y1 = (c1->Y * TileSizeY) + c1->IY + (c1->Type->TileHeight * TileSizeY / 2);
+	y2 = (c2->Y * TileSizeY) + c2->IY + (c2->Type->TileHeight * TileSizeY / 2);
 	if (y1 != y2) {
 		return y1 - y2;
 	}
