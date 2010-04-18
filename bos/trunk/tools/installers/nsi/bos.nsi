@@ -1,7 +1,7 @@
 !include "MUI.nsh"
 
 !define NAME "Bos Wars"
-!define VERSION "2.6"
+!define VERSION "2.6.1"
 
 Name "${NAME}"
 OutFile "BosWars-${VERSION}.exe"
