@@ -468,9 +468,6 @@ Here are the supported operations, their paramenters, and what they do.
 	<dd>If this tag is given the caster will die after casting the spell.</dd></dl></dd>
 </dl>
 </dd>
-<dt>"depend-upgrade", "upgrade-name"</dt>
-<dd>The dependency of the spell. Spell is available only once the upgrade is searched.
-Upgrade must be already declare.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -488,7 +485,6 @@ DefineSpell("spell-healing",
 		"Building", "false",
 		"HitPoints", {MaxValuePercent = 100}
 	},
-	"depend-upgrade", "upgrade-healing",
 	"sound-when-cast", "healing",
 	"autocast", {"range", 6, "condition", {"alliance", "only", "HitPoints", {MaxValuePercent = 90}}}
 )

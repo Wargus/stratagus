@@ -83,9 +83,7 @@
 <a href="#SetShowSightRange">SetShowSightRange</a>
 <a href="#SetShowTips">SetShowTips</a>
 <a href="#SetSpeedBuild">SetSpeedBuild</a>
-<a href="#SetSpeedResearch">SetSpeedResearch</a>
 <a href="#SetSpeedTrain">SetSpeedTrain</a>
-<a href="#SetSpeedUpgrade">SetSpeedUpgrade</a>
 <a href="#SetSpeeds">SetSpeeds</a>
 <a href="#SetTitleScreens">SetTitleScreens</a>
 <a href="#SetTrainingQueue">SetTrainingQueue</a>
@@ -347,10 +345,6 @@ Define how to show variables.
     <dd>represent ressource for gathering and gathered unit.</dd>
     <dt>Training</dt>
     <dd>represent the elapsed time of unit in training.</dd>
-    <dt>Research</dt>
-    <dd>represent the elapsed time for research.</dd>
-    <dt>UpgradeTo</dt>
-    <dd>represent the elapse time to evolve in the new unit.</dd>
     <dt>variable</dt>
     <dd>variable defined with <a href="unittype.html#DefineVariables">DefineVariables()</a></dd>
   </dl>
@@ -956,20 +950,10 @@ enable/disable show tips at the start of a level
 
 Decrease the time to build a unit by this factor.
 
-<a name="SetSpeedResearch"></a>
-<h3>SetSpeedResearch(number)</h3>
-
-Decrease the time to research by this factor.
-
 <a name="SetSpeedTrain"></a>
 <h3>SetSpeedTrain(number)</h3>
 
 Decrease the time to train a unit by this factor.
-
-<a name="SetSpeedUpgrade"></a>
-<h3>SetSpeedUpgrade(number)</h3>
-
-Decrease the time to upgrade a unit by this factor.
 
 <a name="SetSpeeds"></a>
 <h3>SetSpeeds(number)</h3>
@@ -981,8 +965,6 @@ This is equivalent to
   SetSpeedResourcesReturn("all-resource", number)
   SetSpeedBuild(number)
   SetSpeedTrain(number)
-  SetSpeedUpgrade(number)
-  SetSpeedResearch(number)
 </pre>
 
 <a name="SetTitleScreens"></a>
