@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Fix the position of the morels (Kalle Olavi Niemitalo)
 - Correct the draw level of some unit types (Kalle Olavi Niemitalo)
 - Update the documentation of the scripting API (Francois Beerten)
 - On Windows, use the application directory to save user data (Nehal Mistry)
