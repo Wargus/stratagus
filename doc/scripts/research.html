@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head>
 <!--
-----	(c) Copyright 2002-2007 by Lutz Sammer, Russell Smith
+----	(c) Copyright 2010 by Francois Beerten
 
 ----    This program is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -29,73 +29,66 @@
 <a href="savegame.html">NEXT</a> 
 <a href="index.html">LUA Index</a> 
 <hr>
-<a href="#DefineAllow">DefineAllow</a>
 <a href="#DefineUnitAllow">DefineUnitAllow</a>
+<a href="#DefineAllow">DefineAllow</a>
 <hr>
 <h2>Functions</h2>
 
 <a name="DefineUnitAllow"></a>
-<h3>DefineUnitAllow(name, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N)</h3>
+<h3>DefineUnitAllow(name, N, N, N, N, N, N, N, N, N)</h3>
 
 Define how many units of a given type each player can have.
 
 <dl>
 <dt>name</dt>
-<dd>Name of an unit-type to be defined.
+<dd>Name of an unit-type.
 </dd>
 <dt>N</dt>
 <dd>
-  The initial quantity of units per type at level start.
-  Each player has his quatinty, the first is for player 0 and the last
-  is for player 15.
+  The maximum number of units of th given type allowed for the player.
+  There's a number for each player. The first is player 0 and the last
+  is player 8.
 </dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    -- Allow 1 unit-assault for the 2nd player.
-    DefineUnitAllow("unit-assault", 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    -- Allow 1 assault unit for the 2nd player.
+    DefineUnitAllow("unit-assault", 0, 1, 0, 0, 0, 0, 0, 0, 0, 0)
 </pre>
 
 
 <a name="DefineAllow"></a>
-<h3>DefineAllow(name, str16)</h3>
+<h3>DefineAllow(name, str9)</h3>
 
-Define what upgrades are enabled for each player during
-a level.
+Define which unit types are allowed for each player.
 
 <dl>
 <dt>name</dt>
-<dd>Name of an upgrade to be defined.
+<dd>Name of the unit type.
 </dd>
-<dt>str16</dt>
+<dt>str9</dt>
 <dd>
   The initial allow state for the upgrade at level start:
   <ul>
   <li>A - Allowed
-  <li>E - Enabled, allowed by level but currently forbidden
   <li>F - Forbidden
-  <li>R - Researched or acquired
-  <li>Q - Acquired but currently forbidden (does it make sense?:)
   </ul>
-  Each player has his own character, the first is for player 0 and the last
-  is for player 15.
+  There is one letter per player. The first applies to player 0 and the last
+  applies to player 8.
 </dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    -- Allow the metal upgrade for all 16 players.
-    DefineAllow("upgrade-metal", "AAAAAAAAAAAAAAAA")
-    --                            ^- player 0    ^- player 15
+    -- Allow assault units all players.
+    DefineAllow("upgrade-metal", "AAAAAAAAA")
 </pre>
-
-
 
 
 <hr>
 All trademarks and copyrights on this page are owned by their respective owners.
-<address>(c) 2002-2007 by<a href="http://boswars.org">
+<address>(c) 2010 by<a href="http://boswars.org">
 The Bos Wars Project</a></address></body></html>
