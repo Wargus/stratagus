@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head>
 <!--
-----	(c) Copyright 2002-2007 by Lutz Sammer, Russell Smith
+----	(c) Copyright 2002-2010 by Lutz Sammer, Russell Smith
 
 ----    This program is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@
 <hr>
 <h2>Intro - Introduction to AI functions and variables</h2>
 
-Everything around the control of the Stratagus AI.
+Everything around the control of the Bos Wars AI.
 
 <p>
 Warning: The AI documentation is slightly outdated. This documentation hasn't 
@@ -57,7 +57,7 @@ been fully converted to the lua API yet.
 
 <h2>How does it work</h2>
 
-AI in Stratagus is script based. Each AI player keeps executing scripts.
+AI in Bos Wars is script based. Each AI player keeps executing scripts.
 There are two kinds of scripts : 
 <ul>
   <li>The main script. It starts buildings, ...</li>
@@ -614,8 +614,8 @@ Don't forget to request a unit-type, before you wait on it.
 
 <pre>
     -- Proceed only if a peasant is ready.
-    AiNeed("unit-peasant")
-    AiWait("unit-peasant")
+    AiNeed("unit-engineer")
+    AiWait("unit-engineer")
 </pre>
 
 <a name="AiWaitForce"></a>
@@ -635,9 +635,9 @@ supported.
 <h4>Example</h4>
 
 <pre>
-    -- Force 0 is build with one footman. The script continues processing, if the
-    -- footman is ready trained.
-    AiForce(0, "unit-footman", 1)
+    -- Force 0 is build with one assault unitn. The script continues processing, if the
+    -- unit is ready trained.
+    AiForce(0, "unit-assault", 1)
     AiWaitForce(0)
 </pre>
 
@@ -649,25 +649,25 @@ If you want to write this you know who to contact.
 <h2>Examples</h2>
 
 <pre>
-DefineAi("wc2-example", "land-attack",
+DefineAi("harsh-example", "land-attack",
  function()
 </pre><p style="margin-left:1cm;">
-This is the AI "wc2-example" usable for land-attack.
+This is the AI "harsh-example" usable for land-attack.
 </p><pre>
-     AiNeed("unit-great-hall")
+     AiNeed("unit-vault")
 </pre><p style="margin-left:1cm;">
 The first need unit is the great-hall.
 </p><pre>
-     AiNeed("unit-peon")
+     AiNeed("unit-engineer")
 </pre><p style="margin-left:1cm;">
 The next unit should be the peon.
 </p><pre>
-     AiWait("unit-great-hall")
+     AiWait("unit-vault")
 </pre><p style="margin-left:1cm;">
-Now wait until the great hall is available. Could hang if no great hall can be
+Now wait until the vault is available. Could hang if no great vault can be
 build.
 </p><pre>
-     AiWait("unit-peon")
+     AiWait("unit-engineer")
 </pre><p style="margin-left:1cm;">
 Now wait unit we have a worker to build the next things.
 </p>
@@ -676,5 +676,5 @@ FIXME: need some complex examples.
 
 <hr>
 All trademarks and copyrights on this page are owned by their respective owners.
-<address>(c) 2002-2007 by <a href="http://boswars.org">
+<address>(c) 2002-2010 by <a href="http://boswars.org">
 The Bos Wars Project</a></address></body></html>

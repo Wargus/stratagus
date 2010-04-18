@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"Output all lua functions defined in the Stratagus source code."
+"Output all lua functions defined in the engine source code."
 
 import os
 import os, sys
