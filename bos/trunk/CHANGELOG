@@ -2,6 +2,8 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Correct the draw level of some unit types (Kalle Olavi Niemitalo)
+- Update the documentation of the scripting API (Francois Beerten)
 - On Windows, use the application directory to save user data (Nehal Mistry)
 - Fix crash at the end of the Tutorial campaign (Francois Beerten)
 
