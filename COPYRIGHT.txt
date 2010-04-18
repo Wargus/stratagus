@@ -237,8 +237,9 @@ As a special exception the sources are not required for the following files:
 If a file from this list is renamed, this list should be changed accordingly. 
 If a file from this list is deleted, then it should be 
 removed from this list. The exception does not apply if a file from this
-list is replaced or changed. In that case, the file has to be removed from 
-the list and sources provided.
+list is replaced. In that case, the file has to be removed from 
+the list and sources provided. If new elements are added to the file,
+the sources of those new elements must be provided.
 
 By default, the content of Bos Wars is distributed under the GNU General 
 Public License version 2, or (at your option) any later version. 
