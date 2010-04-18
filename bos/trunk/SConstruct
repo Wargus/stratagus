@@ -188,12 +188,6 @@ def CheckLuaLib(env, conf):
 def AutoConfigure(env):
   conf = Configure(env)
 
-  ## check for required tools ##
-  # CheckCXX is available only since SCons 1.1
-  if conf.CheckCXX and not conf.CheckCXX():
-     print 'C++ compiler missing, exiting !'
-     Exit(1)
-
   ## check for required libs ##
   if not conf.CheckLibWithHeader('png', 'png.h', 'c'):
      print 'Did not find png library or headers, exiting!'
