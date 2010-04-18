@@ -65,7 +65,6 @@ DefineUnitType("unit-engineer", {
     Name = "Engineer",
     Image = {"file", GetCurrentLuaPath().."/unit_engineer.png", "size", {56, 56}},
     Shadow = {"file", GetCurrentLuaPath().."/unit_engineer_s.png", "size", {56, 56}},
-    DrawLevel = 25,
     Animations = "animations-engineer",
     Icon = "icon-engineer",
     Flip = true,
