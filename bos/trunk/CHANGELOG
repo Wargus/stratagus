@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Version 2.6.2 (2010 xx xx):
+- Fixed bug #29274: Disabling command log crashes and doesn't always work as expected (Jimmy Salmon)
 - Fixed bug #29579: KillUnitAt takes 5 parameters (Jimmy Salmon)
 
 Version 2.6.1 (2010 04 18):
