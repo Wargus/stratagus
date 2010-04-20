@@ -1,0 +1,28 @@
+$#include "editor.h"
+
+enum EditorRunningType {
+	EditorNotRunning = 0,    /// Not Running
+	EditorStarted = 1,       /// Editor Enabled at all
+	EditorCommandLine = 2,   /// Called from Command Line
+	EditorEditing = 4,       /// Editor is fully running
+};
+
+class CEditor
+{
+	vector<string> UnitTypes;
+	const CUnitType *StartUnit;
+	EditorRunningType Running;
+};
+
+extern void SetEditorSelectIcon(const std::string &icon);
+extern void SetEditorUnitsIcon(const std::string &icon);
+extern void SetEditorPatchIcon(const std::string &icon);
+extern void SetEditorStartUnit(const std::string &name);
+
+extern CEditor Editor;
+
+void StartEditor(const std::string &filename);
+int EditorSaveMap(const std::string &file);
+
+void StartPatchEditor(const std::string &patchName);
+

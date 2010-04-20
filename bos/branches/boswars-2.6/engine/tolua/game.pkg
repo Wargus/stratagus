@@ -1,0 +1,82 @@
+$bool IsReplayGame();
+bool IsReplayGame();
+
+
+$void StartMap(const string &str, bool clean = true);
+void StartMap(const string str, bool clean = true);
+$void StartReplay(const string &str, bool reveal = false);
+void StartReplay(const string str, bool reveal = false);
+$void StartSavedGame(const string &str);
+void StartSavedGame(const string str);
+
+$int SaveReplay(const std::string &filename);
+int SaveReplay(const std::string filename);
+
+$#include "results.h"
+
+typedef enum {
+    GameNoResult,
+    GameVictory,
+    GameDefeat,
+    GameDraw,
+    GameQuitToMenu,
+    GameRestart,
+} GameResults;
+
+GameResults GameResult;
+
+$void StopGame(GameResults result);
+void StopGame(GameResults result);
+
+extern bool GameRunning;
+extern void SetGamePaused(bool paused);
+extern bool GetGamePaused();
+extern tolua_property__s bool GamePaused;
+extern void SetGameSpeed(int speed);
+extern int GetGameSpeed();
+extern tolua_property__s int GameSpeed;
+extern bool GameObserve;
+
+extern unsigned long GameCycle;
+
+
+$#include "settings.h"
+
+struct SettingsPresets {
+	int Team;
+	PlayerTypes Type;
+};
+
+class Settings {
+	int NetGameType;
+
+	SettingsPresets Presets[PlayerMax];
+
+	int Resources;
+	int NumUnits;
+	int Opponents;
+	int Difficulty;
+	int GameType;
+	bool NoFogOfWar;
+	int RevealMap;
+	int MapRichness;
+};
+
+extern Settings GameSettings;
+
+#define SettingsPresetMapDefault -1
+
+enum GameTypes {
+	SettingsGameTypeMapDefault = SettingsPresetMapDefault,
+	SettingsGameTypeMelee = 0,
+	SettingsGameTypeFreeForAll,
+	SettingsGameTypeTopVsBottom,
+	SettingsGameTypeLeftVsRight,
+	SettingsGameTypeManVsMachine,
+	SettingsGameTypeManTeamVsMachine,
+};
+
+$extern int AlliedUnitRecyclingEfficiency[MaxCosts];
+$extern int EnemyUnitRecyclingEfficiency[MaxCosts];
+int AlliedUnitRecyclingEfficiency[MaxCosts];
+int EnemyUnitRecyclingEfficiency[MaxCosts];

@@ -1,0 +1,20 @@
+--     ____                _       __
+--    / __ )____  _____   | |     / /___ ___________
+--   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
+--  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  )
+-- /_____/\____/____/     |__/|__/\__,_/_/  /____/
+--
+--       A futuristic real-time strategy game.
+--          This file is part of Bos Wars.
+--
+-- Copyright 2010 Kyran Jackson
+-- File licensed under the GNU GPL version 2 or later.
+
+-- Hospitality
+-- The multiplayer version of Ragtag, a map which probably won't see the light
+-- due to some people not liking custom units. You know who you are.
+-- You may blame paakku for the name.
+
+DefinePlayerTypes("person", "person", "person", "person")
+PresentMap("", 4, 96, 128, 6228354)
+DefineMapSetup(GetCurrentLuaPath().."/setup.sms")

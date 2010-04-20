@@ -1,0 +1,141 @@
+--     ____                _       __               
+--    / __ )____  _____   | |     / /___ ___________
+--   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
+--  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  ) 
+-- /_____/\____/____/     |__/|__/\__,_/_/  /____/  
+--                                              
+--       A futuristic real-time strategy game.
+--          This file is part of Bos Wars.
+--
+--  level01.sms  -  Tutorial map 1.
+--
+--  (c) Copyright 2006-2010 by Francois Beerten and Jimmy Salmon
+--
+--      This program is free software; you can redistribute it and/or modify
+--      it under the terms of the GNU General Public License as published by
+--      the Free Software Foundation; either version 2 of the License, or
+--      (at your option) any later version.
+--  
+--      This program is distributed in the hope that it will be useful,
+--      but WITHOUT ANY WARRANTY; without even the implied warranty of
+--      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+--      GNU General Public License for more details.
+--  
+--      You should have received a copy of the GNU General Public License
+--      along with this program; if not, write to the Free Software
+--      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+--
+--=============================================================================
+--  Define level 01 Map Presentation
+--
+
+Load("maps/campaigns/tutorial/tutorial.map/setup.sms")
+
+CreateUnit("unit-engineer", 0, {5, 59})
+CreateUnit("unit-vault", 1, {22, 38})
+
+DisallowAllUnits()
+
+local function Play(sound)
+  StopAllChannels()
+  PlaySoundFile("campaigns/tutorial/" .. sound, function() end)
+end
+
+
+local function GetOwnUnitsAmount(type)
+  return ThisPlayer.UnitTypesCount[UnitTypeByIdent(type).Slot]
+end
+
+delayedEnding = 999999999
+
+-- Vault rescued
+AddTrigger(
+  function() return Players[1].TotalNumUnits == 0 end,
+  function()
+    AddMessage("-- Incoming transmission from Central Command: --")
+    AddMessage("It appears the entire base was destroyed except for this vault.")
+    AddMessage("We need to rebuild this base as quickly as possible before it gets attacked again.")
+    AddMessage("Your new orders are to build 2 power plants and a magma pump.")
+    AddMessage("You'll need to gather some resources first. Use your engineer to harvest some energy from the trees or magma from the rocks.")
+    AddMessage("-- End transmission --")
+    Play("level01-01.wav")
+    SetObjectives("Build 2 power plants and a magma pump")
+
+    DefineAllow("unit-powerplant", AllowAll)
+    DefineAllow("unit-magmapump", AllowAll)
+    return false
+  end)
+
+-- Started gathering resources
+AddTrigger(
+    function() 
+        return Players[1].TotalNumUnits == 0 and 
+               (ThisPlayer.EnergyStored ~= 0 or ThisPlayer.MagmaStored ~= 0) end,
+    function()
+      local function resname()
+        if (ThisPlayer.EnergyStored ~= 0) then
+           return "energy"
+        else
+           return "magma"
+        end
+     end
+      AddMessage("Good job. You are now gathering " .. resname() .. " and storing it in the vault to use later.")
+      AddMessage("The numbers at the top of the screen indicate the rate you are collecting and using each resource followed by the amount you have in storage.")
+      return false
+    end)
+
+
+-- Power plants and magma pump
+AddTrigger(
+    function() return GetOwnUnitsAmount("unit-powerplant") >= 2 and
+      GetOwnUnitsAmount("unit-magmapump") >= 1 end,
+    function()
+      AddMessage("-- Incoming transmission from Central Command: --")
+      AddMessage("Nice work. Now that we've got some resources to work with we should concentrate on building some defenses.")
+      AddMessage("Your next objective is to build a training camp then some assault units.")
+      AddMessage("-- End transmission --")
+      Play("level01-03.wav")
+      SetObjectives("Build a training camp and 3 assault units")
+
+      DefineAllow("unit-camp", AllowAll)
+      DefineAllow("unit-assault", AllowAll)
+      return false
+    end)
+
+-- Training camp
+AddTrigger(
+    function() return GetOwnUnitsAmount("unit-camp") >= 1 end,
+    function()
+      AddMessage("-- Incoming transmission from Central Command: --")
+      AddMessage("Now that you have a training camp you can start training assault units.")
+      AddMessage("Click on the training camp then train 3 assault units.")
+      AddMessage("-- End transmission --")
+      Play("level01-04.wav")
+      SetObjectives("Train 3 assault units")
+      return false
+    end)
+
+-- Assault units
+AddTrigger(
+    function() return GetOwnUnitsAmount("unit-assault") >= 3 end,
+    function()
+      AddMessage("-- Incoming transmission from Central Command: --")
+      AddMessage("Excellent work. The base is now in good enough shape to be able to defend itself from future attacks.")
+      AddMessage("-- End transmission --")
+      Play("level01-05.wav")
+      delayedEnding = GameCycle + 400
+      return false
+    end)
+
+-- Delay after last message
+AddTrigger(
+    function() return GetOwnUnitsAmount("unit-assault") >= 3  and GameCycle >= delayedEnding end,
+    function() return StopGame(GameVictory) end)
+
+
+Players[0]:SetStartView(5, 59)
+if GameCycle == 0 then
+    AddMessage("You must first locate the base.")
+    AddMessage("Start by clicking on your engineer then order it to move to the center of the map.")
+end
+
