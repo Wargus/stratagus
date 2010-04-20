@@ -1,6 +1,9 @@
 Change log for Bos Wars
 -----------------------
 
+Development version:
+- Add moon patches (TimberDragon)
+
 Version 2.6.2 (2010 xx xx):
 - Fixed bug #29274: Disabling command log crashes and doesn't always work as expected (Jimmy Salmon)
 - Fixed bug #29579: KillUnitAt takes 5 parameters (Jimmy Salmon)
