@@ -85,27 +85,17 @@ static int CclStratagusMap(lua_State *l)
 		} else if (!strcmp(value, "description")) {
 			Map.Info.Description = LuaToString(l, j + 1);
 		} else if (!strcmp(value, "the-map")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, j + 1);
 			subargs = lua_objlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
+				value = LuaToString(l, j + 1, k + 1);
 				++k;
 
 				if (!strcmp(value, "size")) {
 					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
-					}
-					lua_rawgeti(l, -1, 1);
-					Map.Info.MapWidth = LuaToNumber(l, -1);
-					lua_pop(l, 1);
-					lua_rawgeti(l, -1, 2);
-					Map.Info.MapHeight = LuaToNumber(l, -1);
-					lua_pop(l, 1);
+					LuaCheckTable(l, -1);
+					Map.Info.MapWidth = LuaToNumber(l, -1, 1);
+					Map.Info.MapHeight = LuaToNumber(l, -1, 2);
 					lua_pop(l, 1);
 
 					delete[] Map.Fields;
@@ -121,9 +111,7 @@ static int CclStratagusMap(lua_State *l)
 					Map.NoFogOfWar = true;
 					--k;
 				} else if (!strcmp(value, "filename")) {
-					lua_rawgeti(l, j + 1, k + 1);
-					Map.Info.Filename = LuaToString(l, -1);
-					lua_pop(l, 1);
+					Map.Info.Filename = LuaToString(l, j + 1, k + 1);
 					// Load the original map
 					char path[PATH_MAX];
 					LibraryFileName(Map.Info.Filename.c_str(), path, sizeof(path));
@@ -136,9 +124,7 @@ static int CclStratagusMap(lua_State *l)
 					int subk;
 
 					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
-					}
+					LuaCheckTable(l, -1);
 
 					subsubargs = lua_objlen(l, -1);
 					if (subsubargs != Map.Info.MapWidth * Map.Info.MapHeight) {
@@ -150,21 +136,15 @@ static int CclStratagusMap(lua_State *l)
 						int j2;
 
 						lua_rawgeti(l, -1, subk + 1);
-						if (!lua_istable(l, -1)) {
-							LuaError(l, "incorrect argument");
-						}
+						LuaCheckTable(l, -1);
 						args2 = lua_objlen(l, -1);
 						j2 = 0;
 
 						for (; j2 < args2; ++j2) {
-							lua_rawgeti(l, -1, j2 + 1);
-							value = LuaToString(l, -1);
-							lua_pop(l, 1);
+							value = LuaToString(l, -1, j2 + 1);
 							if (!strcmp(value, "explored")) {
 								++j2;
-								lua_rawgeti(l, -1, j2 + 1);
-								Map.Fields[i].Visible[(int)LuaToNumber(l, -1)] = 1;
-								lua_pop(l, 1);
+								Map.Fields[i].Visible[LuaToNumber(l, -1, j2 + 1)] = 1;
 
 							} else if (!strcmp(value, "land")) {
 								Map.Fields[i].Flags |= MapFieldLandAllowed;

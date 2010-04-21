@@ -1157,9 +1157,7 @@ static int CclSelection(lua_State *l)
 	int j;
 
 	LuaCheckArgs(l, 2);
-	if (!lua_istable(l, 2)) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckTable(l, 2);
 	InitSelections();
 	NumSelected = LuaToNumber(l, 1);
 	i = 0;
@@ -1167,9 +1165,7 @@ static int CclSelection(lua_State *l)
 	for (j = 0; j < args; ++j) {
 		const char *str;
 
-		lua_rawgeti(l, 2, j + 1);
-		str = LuaToString(l, -1);
-		lua_pop(l, 1);
+		str = LuaToString(l, 2, j + 1);
 		Selected[i++] = UnitSlots[strtol(str + 1, NULL, 16)];
 	}
 

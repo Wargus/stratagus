@@ -138,31 +138,19 @@ static int CclPlayer(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "start")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, j + 1, 1);
-			player->StartX = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
-			player->StartY = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			LuaCheckTableSize(l, j + 1, 2);
+			player->StartX = LuaToNumber(l, j + 1, 1);
+			player->StartY = LuaToNumber(l, j + 1, 2);
 		} else if (!strcmp(value, "production-rate")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, j + 1);
 			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
+				value = LuaToString(l, j + 1, k + 1);
 				++k;
 
 				for (i = 0; i < MaxCosts; ++i) {
 					if (value == DefaultResourceNames[i]) {
-						lua_rawgeti(l, j + 1, k + 1);
-						player->ProductionRate[i] = LuaToNumber(l, -1);
-						lua_pop(l, 1);
+						player->ProductionRate[i] = LuaToNumber(l, j + 1, k + 1);
 						break;
 					}
 				}
@@ -171,21 +159,15 @@ static int CclPlayer(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "stored-resources")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, j + 1);
 			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
+				value = LuaToString(l, j + 1, k + 1);
 				++k;
 
 				for (i = 0; i < MaxCosts; ++i) {
 					if (value == DefaultResourceNames[i]) {
-						lua_rawgeti(l, j + 1, k + 1);
-						player->StoredResources[i] = LuaToNumber(l, -1);
-						lua_pop(l, 1);
+						player->StoredResources[i] = LuaToNumber(l, j + 1, k + 1);
 						break;
 					}
 				}
@@ -194,21 +176,15 @@ static int CclPlayer(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "storage-capacity")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, j + 1);
 			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
+				value = LuaToString(l, j + 1, k + 1);
 				++k;
 
 				for (i = 0; i < MaxCosts; ++i) {
 					if (value == DefaultResourceNames[i]) {
-						lua_rawgeti(l, j + 1, k + 1);
-						player->StorageCapacity[i] = LuaToNumber(l, -1);
-						lua_pop(l, 1);
+						player->StorageCapacity[i] = LuaToNumber(l, j + 1, k + 1);
 						break;
 					}
 				}
@@ -239,35 +215,23 @@ static int CclPlayer(lua_State *l)
 		} else if (!strcmp(value, "total-kills")) {
 			player->TotalKills = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "total-resources")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, j + 1);
 			subargs = lua_objlen(l, j + 1);
 			if (subargs != MaxCosts) {
 				LuaError(l, "Wrong number of total-resources: %d" _C_ i);
 			}
 			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				player->TotalResources[k] = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				player->TotalResources[k] = LuaToNumber(l, j + 1, k + 1);
 			}
 		} else if (!strcmp(value, "color")) {
 			int r;
 			int g;
 			int b;
 
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 3) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, j + 1, 1);
-			r = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
-			g = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 3);
-			b = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			LuaCheckTableSize(l, j + 1, 3);
+			r = LuaToNumber(l, j + 1, 1);
+			g = LuaToNumber(l, j + 1, 2);
+			b = LuaToNumber(l, j + 1, 3);
 			player->Color = Video.MapRGB(TheScreen->format, r, g, b);
 		} else {
 		   LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -294,28 +258,13 @@ static int CclChangeUnitsOwner(lua_State *l)
 	int y2;
 
 	LuaCheckArgs(l, 4);
-	if (!lua_istable(l, 1) || !lua_istable(l, 2)) {
-		LuaError(l, "incorrect argument");
-	}
-	if (lua_objlen(l, 1) != 2) {
-		LuaError(l, "incorrect argument");
-	}
-	lua_rawgeti(l, 1, 1);
-	x1 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, 1, 1);
-	y1 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
+	LuaCheckTableSize(l, 1, 2);
+	x1 = LuaToNumber(l, 1, 1);
+	y1 = LuaToNumber(l, 1, 2);
 
-	if (lua_objlen(l, 2) != 2) {
-		LuaError(l, "incorrect argument");
-	}
-	lua_rawgeti(l, 2, 1);
-	x2 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, 2, 1);
-	y2 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
+	LuaCheckTableSize(l, 2, 2);
+	x2 = LuaToNumber(l, 2, 1);
+	y2 = LuaToNumber(l, 2, 2);
 
 	n = UnitCache.Select(x1, y1, x2 + 1, y2 + 1, table, UnitMax);
 	oldp = LuaToNumber(l, 3);
@@ -486,36 +435,25 @@ static int CclDefinePlayerColors(lua_State *l)
 	int numcolors;
 
 	LuaCheckArgs(l, 1);
-	if (!lua_istable(l, 1)) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckTable(l, 1);
 
 	args = lua_objlen(l, 1);
 	for (i = 0; i < args; ++i) {
-		lua_rawgeti(l, 1, i + 1);
-		PlayerColorNames[i / 2] = LuaToString(l, -1);
-		lua_pop(l, 1);
+		PlayerColorNames[i / 2] = LuaToString(l, 1, i + 1);
 		++i;
 		lua_rawgeti(l, 1, i + 1);
-		if (!lua_istable(l, -1)) {
-			LuaError(l, "incorrect argument");
-		}
+		LuaCheckTable(l, -1);
 		numcolors = lua_objlen(l, -1);
 		if (numcolors != PlayerColorIndexCount) {
 			LuaError(l, "You should use %d colors (See DefinePlayerColorIndex())" _C_ PlayerColorIndexCount);
 		}
 		for (j = 0; j < numcolors; ++j) {
 			lua_rawgeti(l, -1, j + 1);
-			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 3) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			lua_rawgeti(l, -2, 2);
-			lua_rawgeti(l, -3, 3);
-			PlayerColorsRGB[i / 2][j].r = LuaToNumber(l, -3);
-			PlayerColorsRGB[i / 2][j].g = LuaToNumber(l, -2);
-			PlayerColorsRGB[i / 2][j].b = LuaToNumber(l, -1);
-			lua_pop(l, 3 + 1);
+			LuaCheckTableSize(l, -1, 3);
+			PlayerColorsRGB[i / 2][j].r = LuaToNumber(l, -1, 1);
+			PlayerColorsRGB[i / 2][j].g = LuaToNumber(l, -1, 2);
+			PlayerColorsRGB[i / 2][j].b = LuaToNumber(l, -1, 3);
+			lua_pop(l, 1);
 		}
 	}
 

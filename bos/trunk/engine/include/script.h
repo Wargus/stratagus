@@ -82,6 +82,20 @@ extern int LuaCall(int narg, int clear, bool exitOnError = true);
 		} \
 	} while (0)
 
+#define LuaCheckTable(l, index) \
+	do { \
+		if (!lua_istable((l), (index))) { \
+			LuaError(l, "incorrect argument"); \
+		} \
+	} while (0)
+
+#define LuaCheckTableSize(l, index, size) \
+	do { \
+		if (!lua_istable((l), (index)) || lua_objlen((l), (index)) != (size)) { \
+			LuaError(l, "incorrect argument"); \
+		} \
+	} while (0)
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -93,9 +107,11 @@ extern int CclInConfigFile;        /// True while config file parsing
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern const char *LuaToString(lua_State *l, int narg);
-extern int LuaToNumber(lua_State *l, int narg);
-extern bool LuaToBoolean(lua_State *l, int narg);
+extern const char *LuaToString(lua_State *l, int index);
+extern const char *LuaToString(lua_State *l, int tableIndex, int stringIndex);
+extern int LuaToNumber(lua_State *l, int index);
+extern int LuaToNumber(lua_State *l, int tableIndex, int numberIndex);
+extern bool LuaToBoolean(lua_State *l, int index);
 
 extern void CclGarbageCollect(int fast);    /// Perform garbage collection
 extern void InitCcl(void);                  /// Initialise ccl

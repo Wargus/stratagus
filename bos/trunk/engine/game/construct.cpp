@@ -160,9 +160,7 @@ static int CclDefineConstruction(lua_State *l)
 	int k;
 
 	LuaCheckArgs(l, 2);
-	if (!lua_istable(l, 2)) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckTable(l, 2);
 
 	// Slot identifier
 
@@ -196,9 +194,7 @@ static int CclDefineConstruction(lua_State *l)
 			int w = 0;
 			int h = 0;
 
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, -1);
 			lua_pushnil(l);
 			while (lua_next(l, -2)) {
 				value = LuaToString(l, -2);
@@ -206,15 +202,9 @@ static int CclDefineConstruction(lua_State *l)
 				if (!strcmp(value, "File")) {
 					file = LuaToString(l, -1);
 				} else if (!strcmp(value, "Size")) {
-					if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
-						LuaError(l, "incorrect argument");
-					}
-					lua_rawgeti(l, -1, 1);
-					w = LuaToNumber(l, -1);
-					lua_pop(l, 1);
-					lua_rawgeti(l, -1, 2);
-					h = LuaToNumber(l, -1);
-					lua_pop(l, 1);
+					LuaCheckTableSize(l, -1, 2);
+					w = LuaToNumber(l, -1, 1);
+					h = LuaToNumber(l, -1, 2);
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
@@ -242,9 +232,7 @@ static int CclDefineConstruction(lua_State *l)
 				frame = 0;
 
 				lua_rawgeti(l, -1, k + 1);
-				if (!lua_istable(l, -1)) {
-					LuaError(l, "incorrect argument");
-				}
+				LuaCheckTable(l, -1);
 				lua_pushnil(l);
 				while (lua_next(l, -2)) {
 					value = LuaToString(l, -2);

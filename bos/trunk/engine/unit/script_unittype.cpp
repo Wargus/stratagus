@@ -126,14 +126,10 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 	Assert(!(args & 1)); // must be even
 
 	for (int i = 0; i < args; ++i) {
-		lua_rawgeti(l, -1, i + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		value = LuaToString(l, -1, i + 1);
 		++i;
 		lua_rawgeti(l, -1, i + 1);
-		if (!lua_istable(l, -1)) {
-			LuaError(l, "incorrect argument");
-		}
+		LuaCheckTable(l, -1);
 		if (!strcmp(value, "distance")) {
 			CBuildRestrictionDistance *b = new CBuildRestrictionDistance;
 
@@ -225,9 +221,7 @@ static int CclDefineUnitType(lua_State *l)
 	int k;
 
 	LuaCheckArgs(l, 2);
-	if (!lua_istable(l, 2)) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckTable(l, 2);
 
 	// Slot identifier
 	str = LuaToString(l, 1);
@@ -249,89 +243,53 @@ static int CclDefineUnitType(lua_State *l)
 		if (!strcmp(value, "Name")) {
 			type->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Image")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, -1);
 			subargs = lua_objlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, -1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
+				value = LuaToString(l, -1, k + 1);
 				++k;
 
 				if (!strcmp(value, "file")) {
-					lua_rawgeti(l, -1, k + 1);
-					type->File = LuaToString(l, -1);
-					lua_pop(l, 1);
+					type->File = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "size")) {
 					lua_rawgeti(l, -1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
-					}
-					lua_rawgeti(l, -1, 1);
-					type->Width = LuaToNumber(l, -1);
-					lua_pop(l, 1);
-					lua_rawgeti(l, -1, 2);
-					type->Height = LuaToNumber(l, -1);
-					lua_pop(l, 1);
+					LuaCheckTable(l, -1);
+					type->Width = LuaToNumber(l, -1, 1);
+					type->Height = LuaToNumber(l, -1, 2);
 					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported image tag: %s" _C_ value);
 				}
 			}
 		} else if (!strcmp(value, "Shadow")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, -1);
 			subargs = lua_objlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, -1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
+				value = LuaToString(l, -1, k + 1);
 				++k;
 
 				if (!strcmp(value, "file")) {
-					lua_rawgeti(l, -1, k + 1);
-					type->ShadowFile = LuaToString(l, -1);
-					lua_pop(l, 1);
+					type->ShadowFile = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "size")) {
 					lua_rawgeti(l, -1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
-					}
-					lua_rawgeti(l, -1, 1);
-					type->ShadowWidth = LuaToNumber(l, -1);
-					lua_pop(l, 1);
-					lua_rawgeti(l, -1, 2);
-					type->ShadowHeight = LuaToNumber(l, -1);
-					lua_pop(l, 1);
+					LuaCheckTable(l, -1);
+					type->ShadowWidth = LuaToNumber(l, -1, 1);
+					type->ShadowHeight = LuaToNumber(l, -1, 2);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "offset")) {
 					lua_rawgeti(l, -1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
-					}
-					lua_rawgeti(l, -1, 1);
-					type->ShadowOffsetX = LuaToNumber(l, -1);
-					lua_pop(l, 1);
-					lua_rawgeti(l, -1, 2);
-					type->ShadowOffsetY = LuaToNumber(l, -1);
-					lua_pop(l, 1);
+					LuaCheckTable(l, -1);
+					type->ShadowOffsetX = LuaToNumber(l, -1, 1);
+					type->ShadowOffsetY = LuaToNumber(l, -1, 2);
 					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported shadow tag: %s" _C_ value);
 				}
 			}
 		} else if (!strcmp(value, "Offset")) {
-			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			type->OffsetX = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			type->OffsetY = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			LuaCheckTableSize(l, -1, 2);
+			type->OffsetX = LuaToNumber(l, -1, 1);
+			type->OffsetY = LuaToNumber(l, -1, 2);
 		} else if (!strcmp(value, "Flip")) {
 			type->Flip = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Animations")) {
@@ -401,40 +359,20 @@ static int CclDefineUnitType(lua_State *l)
 			type->Variable[MANA_INDEX].Increase = 1;
 			type->Variable[MANA_INDEX].Enable = 1;
 		} else if (!strcmp(value, "TileSize")) {
-			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			type->TileWidth = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			type->TileHeight = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			LuaCheckTableSize(l, -1, 2);
+			type->TileWidth = LuaToNumber(l, -1, 1);
+			type->TileHeight = LuaToNumber(l, -1, 2);
 		} else if (!strcmp(value, "Decoration")) {
 			type->Decoration = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NeutralMinimapColor")) {
-			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 3) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			type->NeutralMinimapColorRGB.r = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			type->NeutralMinimapColorRGB.g = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 3);
-			type->NeutralMinimapColorRGB.b = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			LuaCheckTableSize(l, -1, 3);
+			type->NeutralMinimapColorRGB.r = LuaToNumber(l, -1, 1);
+			type->NeutralMinimapColorRGB.g = LuaToNumber(l, -1, 2);
+			type->NeutralMinimapColorRGB.b = LuaToNumber(l, -1, 3);
 		} else if (!strcmp(value, "BoxSize")) {
-			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			type->BoxWidth = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			type->BoxHeight = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			LuaCheckTableSize(l, -1, 2);
+			type->BoxWidth = LuaToNumber(l, -1, 1);
+			type->BoxHeight = LuaToNumber(l, -1, 2);
 		} else if (!strcmp(value, "NumDirections")) {
 			type->NumDirections = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Revealer")) {
@@ -530,9 +468,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "VisibleUnderFog")) {
 			type->VisibleUnderFog = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "BuildingRules")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, -1);
 			subargs = lua_objlen(l, -1);
 			// Free any old restrictions if they are redefined
 			for (std::vector<CBuildRestriction *>::iterator b = type->BuildingRules.begin();
@@ -542,9 +478,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->BuildingRules.clear();
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
-				if (!lua_istable(l, -1)) {
-					LuaError(l, "incorrect argument");
-				}
+				LuaCheckTable(l, -1);
 				ParseBuildingRules(l, type->BuildingRules);
 				lua_pop(l, 1);
 			}
@@ -573,9 +507,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Vanishes")) {
 			type->Vanishes = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "CanCastSpell")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, -1);
 			//
 			// Warning: can-cast-spell should only be used AFTER all spells
 			// have been defined. FIXME: MaxSpellType=500 or something?
@@ -593,19 +525,15 @@ static int CclDefineUnitType(lua_State *l)
 			for (k = 0; k < subargs; ++k) {
 				const SpellType *spell;
 
-				lua_rawgeti(l, -1, k + 1);
-				value = LuaToString(l, -1);
+				value = LuaToString(l, -1, k + 1);
 				spell = SpellTypeByIdent(value);
 				if (spell == NULL) {
 					LuaError(l, "Unknown spell type: %s" _C_ value);
 				}
-				lua_pop(l, 1);
 				type->CanCastSpell[spell->Slot] = 1;
 			}
 		} else if (!strcmp(value, "AutoCastActive")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, -1);
 			//
 			// Warning: AutoCastActive should only be used AFTER all spells
 			// have been defined.
@@ -623,8 +551,7 @@ static int CclDefineUnitType(lua_State *l)
 			for (k = 0; k < subargs; ++k) {
 				const SpellType *spell;
 
-				lua_rawgeti(l, -1, k + 1);
-				value = LuaToString(l, -1);
+				value = LuaToString(l, -1, k + 1);
 				spell = SpellTypeByIdent(value);
 				if (spell == NULL) {
 					LuaError(l, "AutoCastActive : Unknown spell type: %s" _C_ value);
@@ -632,7 +559,6 @@ static int CclDefineUnitType(lua_State *l)
 				if (!spell->AutoCast) {
 					LuaError(l, "AutoCastActive : Define autocast method for %s." _C_ value);
 				}
-				lua_pop(l, 1);
 				type->AutoCastActive[spell->Slot] = 1;
 			}
 		} else if (!strcmp(value, "ProductionEfficiency")) {
@@ -644,44 +570,26 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Organic")) {
 			type->Organic = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Sounds")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, -1);
 			subargs = lua_objlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, -1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
+				value = LuaToString(l, -1, k + 1);
 				++k;
 
 				if (!strcmp(value, "selected")) {
-					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Selected.Name = LuaToString(l, -1);
-					lua_pop(l, 1);
+					type->Sound.Selected.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "acknowledge")) {
-					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Acknowledgement.Name = LuaToString(l, -1);
-					lua_pop(l, 1);
+					type->Sound.Acknowledgement.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "ready")) {
-					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Ready.Name = LuaToString(l, -1);
-					lua_pop(l, 1);
+					type->Sound.Ready.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "repair")) {
-					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Repair.Name = LuaToString(l, -1);
-					lua_pop(l, 1);
+					type->Sound.Repair.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "harvest")) {
-					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Harvest.Name = LuaToString(l, -1);
-					lua_pop(l, 1);
+					type->Sound.Harvest.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "help")) {
-					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Help.Name = LuaToString(l, -1);
-					lua_pop(l, 1);
+					type->Sound.Help.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "dead")) {
-					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Dead.Name = LuaToString(l, -1);
-					lua_pop(l, 1);
+					type->Sound.Dead.Name = LuaToString(l, -1, k + 1);
 				} else {
 					LuaError(l, "Unsupported sound tag: %s" _C_ value);
 				}
@@ -925,9 +833,7 @@ static CAnimation *ParseAnimation(lua_State *l, int idx)
 	int j;
 	const char *str;
 
-	if (!lua_istable(l, idx)) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckTable(l, idx);
 	args = lua_objlen(l, idx);
 	anim = new CAnimation[args + 1];
 	tail = NULL;
@@ -935,9 +841,7 @@ static CAnimation *ParseAnimation(lua_State *l, int idx)
 	LabelsLater.clear();
 
 	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, idx, j + 1);
-		str = LuaToString(l, -1);
-		lua_pop(l, 1);
+		str = LuaToString(l, idx, j + 1);
 		ParseAnimationFrame(l, str, &anim[j]);
 		if (!tail) {
 			tail = &anim[j];
@@ -976,9 +880,7 @@ static int CclDefineAnimations(lua_State *l)
 	CAnimations *anims;
 
 	LuaCheckArgs(l, 2);
-	if (!lua_istable(l, 2)) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckTable(l, 2);
 
 	name = LuaToString(l, 1);
 	anims = AnimationsByIdent(name);
@@ -1162,19 +1064,13 @@ static int CclDefineDecorations(lua_State *l)
 				tmp.Index = GetVariableIndex(LuaToString(l, -1));
 				Assert(tmp.Index != -1);
 			} else if (!strcmp(key, "Offset")) {
-				Assert(lua_istable(l, -1));
-				lua_rawgeti(l, -1, 1); // X
-				lua_rawgeti(l, -2, 2); // Y
-				tmp.OffsetX = LuaToNumber(l, -2);
-				tmp.OffsetY = LuaToNumber(l, -1);
-				lua_pop(l, 2); // Pop X and Y
+				LuaCheckTableSize(l, -1, 2);
+				tmp.OffsetX = LuaToNumber(l, -1, 1);
+				tmp.OffsetY = LuaToNumber(l, -1, 2);
 			} else if (!strcmp(key, "OffsetPercent")) {
-				Assert(lua_istable(l, -1));
-				lua_rawgeti(l, -1, 1); // X
-				lua_rawgeti(l, -2, 2); // Y
-				tmp.OffsetXPercent = LuaToNumber(l, -2);
-				tmp.OffsetYPercent = LuaToNumber(l, -1);
-				lua_pop(l, 2); // Pop X and Y
+				LuaCheckTableSize(l, -1, 2);
+				tmp.OffsetXPercent = LuaToNumber(l, -1, 1);
+				tmp.OffsetYPercent = LuaToNumber(l, -1, 2);
 			} else if (!strcmp(key, "CenterX")) {
 				tmp.IsCenteredInX = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "CenterY")) {
@@ -1195,7 +1091,7 @@ static int CclDefineDecorations(lua_State *l)
 				Assert(lua_istable(l, -1));
 				lua_rawgeti(l, -1, 1); // MethodName
 				lua_rawgeti(l, -2, 2); // Data
-				Assert(lua_istable(l, -1));
+				LuaCheckTable(l, -1);
 				key = LuaToString(l, -2);
 				if (!strcmp(key, "sprite")) {
 					CDecoVarSpriteBar *decovarspritebar = new CDecoVarSpriteBar;
