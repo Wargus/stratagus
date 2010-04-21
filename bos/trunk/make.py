@@ -29,16 +29,16 @@ target = 'boswars'
 gccflags = '-Wall -fsigned-char -D_GNU_SOURCE=1 -D_REENTRANT'.split()
 incpaths = 'engine/include engine/guichan/include /usr/include/SDL'.split()
 
-def globSources(sourceDirs):
-  sources = []
-  sourceDirs = sourceDirs.split()
-  for d in sourceDirs:
-    sources += glob.glob('engine' + '/' + d + '/*.cpp')
-  return sources
-
-sources = globSources('action ai editor game map network '
-    ' particle pathfinder sound stratagus ui unit video tolua '
-    'guichan guichan/sdl guichan/widgets')
+def find(startdir, pattern):
+    import fnmatch
+    results = []
+    for dirpath,dirnames,files in os.walk(startdir):
+       for f in files:
+          if fnmatch.fnmatch(f, pattern):
+             results.append(dirpath+'/'+f)
+    return results
+    
+sources = find('engine', '*.cpp')
 
 class Gcc:
   def __init__(self, cflags=[], ldflags=[], cc='g++'):
@@ -145,15 +145,6 @@ def inBuildDir(source, builddir):
 def mkdir(dir):
     if not os.access(dir, os.F_OK):
         os.makedirs(dir)
-
-def find(dir, pattern):
-    import fnmatch
-    results = []
-    for dirpath,dirnames,files in os.walk('.'):
-       for f in files:
-          if fnmatch.fnmatch(f, pattern):
-             results.append(dirpath+'/'+f)
-    return results
 
 def Check(b, lib=None, header='', function='', name='', 
        builddir='fbuild/conftests'):
