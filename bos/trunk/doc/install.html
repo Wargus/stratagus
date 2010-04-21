@@ -3,7 +3,7 @@
 <head>
 <!--
 
-----	(c) Copyright 2002-2008 by Nehal Mistry, Francois Beerten.
+----	(c) Copyright 2002-2010 by Nehal Mistry, Francois Beerten.
 
 ----    This program is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@
 
     <h2>Software Requirements</h2>
     <ul>
-	<li><b>A supported operating system:</b> Linux or Microsoft Windows (98SE, 2000 or XP).
+	<li><b>A supported operating system:</b> Linux or Microsoft Windows (2000 or higher).
 	Possibly any other Unix/POSIX OS.
 	</li>
 
@@ -76,7 +76,6 @@
 	<li>Compiler suite: GCC or MINGW or MSVC</li>
 	<li>The development files for the libraries listed above.</li>
 	<li><a href="http://www.codenix.com/~tolua/">toLua++</a> version 1.0.92 if you plan to change the Lua API</li>
-	<li><a href="http://scons.org">Scons</a> version 0.98.1 or higher.</li>
     </ul>
 
     <p>
@@ -109,11 +108,12 @@
 
     <h3>Step 3: Compile:</h3>
 	<ul>
-	    <li><b>On Posix systems like Linux</b> 
-	        using <a href="http://www.scons.org">scons</a>:
+	    <li><b>On Posix systems like Linux:</b> 
 		<ul>
-		<li>Run 'scons'.</li>
+		<li>Run 'make.py' for the release build.</li>
+		<li>Run 'make.py debug' for the debug build.</li>
 		</ul>
+                The build results are stored in the <i>fbuild/</i> directory.
 	    </li>
 	    <li><b>Microsoft Visual Studio 2005:</b>
 	    <ul>
@@ -129,7 +129,7 @@
 	<br>
 
 <hr>
-(C) Copyright 1998-2008 by The <a href="http://boswars.org">Bos Wars</a> Project 
+(C) Copyright 1998-2010 by The <a href="http://boswars.org">Bos Wars</a> Project 
 under the <a href="gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>
