@@ -136,9 +136,7 @@ static int CclMakeSound(lua_State *l)
 		args = lua_objlen(l, 2);
 		c_files = new char *[args];
 		for (j = 0; j < args; ++j) {
-			lua_rawgeti(l, 2, j + 1);
-			c_files[j] = new_strdup(LuaToString(l, -1));
-			lua_pop(l, 1);
+			c_files[j] = new_strdup(LuaToString(l, 2, j + 1));
 		}
 		id = MakeSound(c_name, (const char **)c_files, args);
 		for (j = 0; j < args; ++j) {

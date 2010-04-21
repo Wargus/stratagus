@@ -256,9 +256,7 @@ static int CclGroup(lua_State *l)
 	for (j = 0; j < args; ++j) {
 		const char *str;
 
-		lua_rawgeti(l, 3, j + 1);
-		str = LuaToString(l, -1);
-		lua_pop(l, 1);
+		str = LuaToString(l, 3, j + 1);
 		grp->Units[i++] = UnitSlots[strtol(str + 1, NULL, 16)];
 	}
 

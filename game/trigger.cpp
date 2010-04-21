@@ -212,24 +212,12 @@ static int CclGetNumUnitsAt(lua_State *l)
 	lua_pushvalue(l, 2);
 	unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
-	if (!lua_istable(l, 3) || lua_objlen(l, 3) != 2) {
-		LuaError(l, "incorrect argument");
-	}
-	lua_rawgeti(l, 3, 1);
-	x1 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, 3, 2);
-	y1 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	if (!lua_istable(l, 4) || lua_objlen(l, 4) != 2) {
-		LuaError(l, "incorrect argument");
-	}
-	lua_rawgeti(l, 4, 1);
-	x2 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, 4, 2);
-	y2 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
+	LuaCheckTableSize(l, 3, 2);
+	x1 = LuaToNumber(l, 3, 1);
+	y1 = LuaToNumber(l, 3, 2);
+	LuaCheckTableSize(l, 4, 2);
+	x2 = LuaToNumber(l, 4, 1);
+	y2 = LuaToNumber(l, 4, 2);
 
 	//
 	// Get all unit types in location.

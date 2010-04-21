@@ -486,9 +486,7 @@ static int CclLog(lua_State *l)
 	const char *value;
 
 	LuaCheckArgs(l, 1);
-	if (!lua_istable(l, 1)) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckTable(l, 1);
 
 	Assert(CurrentReplay);
 
@@ -555,9 +553,7 @@ static int CclReplayLog(lua_State *l)
 	int j;
 
 	LuaCheckArgs(l, 1);
-	if (!lua_istable(l, 1)) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckTable(l, 1);
 
 	Assert(CurrentReplay == NULL);
 
@@ -585,16 +581,12 @@ static int CclReplayLog(lua_State *l)
 		} else if (!strcmp(value, "LocalPlayer")) {
 			replay->LocalPlayer = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Players")) {
-			if (!lua_istable(l, -1) || lua_objlen(l, -1) != PlayerMax) {
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTableSize(l, -1, PlayerMax);
 			for (j = 0; j < PlayerMax; ++j) {
 				int top;
 
 				lua_rawgeti(l, -1, j + 1);
-				if (!lua_istable(l, -1)) {
-					LuaError(l, "incorrect argument");
-				}
+				LuaCheckTable(l, -1);
 				top = lua_gettop(l);
 				lua_pushnil(l);
 				while (lua_next(l, top) != 0) {
@@ -629,31 +621,15 @@ static int CclReplayLog(lua_State *l)
 		} else if (!strcmp(value, "MapRichness")) {
 			replay->MapRichness = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Engine")) {
-			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 3) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			replay->Engine[0] = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			replay->Engine[1] = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 3);
-			replay->Engine[2] = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			LuaCheckTableSize(l, -1, 3);
+			replay->Engine[0] = LuaToNumber(l, -1, 1);
+			replay->Engine[1] = LuaToNumber(l, -1, 2);
+			replay->Engine[2] = LuaToNumber(l, -1, 3);
 		} else if (!strcmp(value, "Network")) {
-			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 3) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			replay->Network[0] = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			replay->Network[1] = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 3);
-			replay->Network[2] = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			LuaCheckTableSize(l, -1, 3);
+			replay->Network[0] = LuaToNumber(l, -1, 1);
+			replay->Network[1] = LuaToNumber(l, -1, 2);
+			replay->Network[2] = LuaToNumber(l, -1, 3);
 		} else {
 			LuaError(l, "Unsupported key: %s" _C_ value);
 		}
