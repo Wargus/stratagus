@@ -65,21 +65,15 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 
 	Assert(location != NULL);
 
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckTable(l, -1);
 	args = lua_objlen(l, -1);
 	j = 0;
 
 	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		value = LuaToString(l, -1, j + 1);
 		++j;
 		if (!strcmp(value, "base")) {
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			value = LuaToString(l, -1, j + 1);
 			if (!strcmp(value, "caster")) {
 				location->Base = LocBaseCaster;
 			} else if (!strcmp(value, "target")) {
@@ -88,21 +82,13 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 				LuaError(l, "Unsupported missile location base flag: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "add-x")) {
-			lua_rawgeti(l, -1, j + 1);
-			location->AddX = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			location->AddX = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "add-y")) {
-			lua_rawgeti(l, -1, j + 1);
-			location->AddY = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			location->AddY = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "add-rand-x")) {
-			lua_rawgeti(l, -1, j + 1);
-			location->AddRandX = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			location->AddRandX = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "add-rand-y")) {
-			lua_rawgeti(l, -1, j + 1);
-			location->AddRandY = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			location->AddRandY = LuaToNumber(l, -1, j + 1);
 		} else {
 			LuaError(l, "Unsupported missile location description flag: %s" _C_ value);
 		}
@@ -120,36 +106,24 @@ static SpellActionType *CclSpellAction(lua_State *l)
 	int args;
 	int j;
 
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckTable(l, -1);
 	args = lua_objlen(l, -1);
 	j = 0;
 
-	lua_rawgeti(l, -1, j + 1);
-	value = LuaToString(l, -1);
-	lua_pop(l, 1);
+	value = LuaToString(l, -1, j + 1);
 	++j;
 
 	if (!strcmp(value, "spawn-missile")) {
 		SpawnMissile *spellaction = new SpawnMissile;
 		for (; j < args; ++j) {
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			value = LuaToString(l, -1, j + 1);
 			++j;
 			if (!strcmp(value, "damage")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->Damage = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				spellaction->Damage = LuaToNumber(l, -1, j + 1);
 			} else if (!strcmp(value, "delay")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->Delay = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				spellaction->Delay = LuaToNumber(l, -1, j + 1);
 			} else if (!strcmp(value, "ttl")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->TTL = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				spellaction->TTL = LuaToNumber(l, -1, j + 1);
 			} else if (!strcmp(value, "start-point")) {
 				lua_rawgeti(l, -1, j + 1);
 				CclSpellMissileLocation(l, &spellaction->StartPoint);
@@ -159,13 +133,11 @@ static SpellActionType *CclSpellAction(lua_State *l)
 				CclSpellMissileLocation(l, &spellaction->EndPoint);
 				lua_pop(l, 1);
 			} else if (!strcmp(value, "missile")) {
-				lua_rawgeti(l, -1, j + 1);
-				value = LuaToString(l, -1);
+				value = LuaToString(l, -1, j + 1);
 				spellaction->Missile = MissileTypeByIdent(value);
 				if (spellaction->Missile == NULL) {
 					DebugPrint("in spawn-missile : missile %s does not exist\n" _C_ value);
 				}
-				lua_pop(l, 1);
 			} else {
 				LuaError(l, "Unsupported spawn-missile tag: %s" _C_ value);
 			}
@@ -178,18 +150,12 @@ static SpellActionType *CclSpellAction(lua_State *l)
 	} else if (!strcmp(value, "area-adjust-vitals")) {
 		AreaAdjustVitals *spellaction = new AreaAdjustVitals;
 		for (; j < args; ++j) {
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			value = LuaToString(l, -1, j + 1);
 			++j;
 			if (!strcmp(value, "hit-points")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->HP = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				spellaction->HP = LuaToNumber(l, -1, j + 1);
 			} else if (!strcmp(value, "mana-points")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->Mana = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				spellaction->Mana = LuaToNumber(l, -1, j + 1);
 			} else {
 				LuaError(l, "Unsupported area-adjust-vitals tag: %s" _C_ value);
 			}
@@ -198,38 +164,24 @@ static SpellActionType *CclSpellAction(lua_State *l)
 	} else if (!strcmp(value, "area-bombardment")) {
 		AreaBombardment *spellaction = new AreaBombardment;
 		for (; j < args; ++j) {
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			value = LuaToString(l, -1, j + 1);
 			++j;
 			if (!strcmp(value, "fields")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->Fields = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				spellaction->Fields = LuaToNumber(l, -1, j + 1);
 			} else if (!strcmp(value, "shards")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->Shards = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				spellaction->Shards = LuaToNumber(l, -1, j + 1);
 			} else if (!strcmp(value, "damage")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->Damage = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				spellaction->Damage = LuaToNumber(l, -1, j + 1);
 			} else if (!strcmp(value, "start-offset-x")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->StartOffsetX = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				spellaction->StartOffsetX = LuaToNumber(l, -1, j + 1);
 			} else if (!strcmp(value, "start-offset-y")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->StartOffsetY = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				spellaction->StartOffsetY = LuaToNumber(l, -1, j + 1);
 			} else if (!strcmp(value, "missile")) {
-				lua_rawgeti(l, -1, j + 1);
-				value = LuaToString(l, -1);
+				value = LuaToString(l, -1, j + 1);
 				spellaction->Missile = MissileTypeByIdent(value);
 				if (spellaction->Missile == NULL) {
 					DebugPrint("in area-bombardement : missile %s does not exist\n" _C_ value);
 				}
-				lua_pop(l, 1);
 			} else {
 				LuaError(l, "Unsupported area-bombardment tag: %s" _C_ value);
 			}
@@ -242,18 +194,12 @@ static SpellActionType *CclSpellAction(lua_State *l)
 	} else if (!strcmp(value, "demolish")) {
 		Demolish *spellaction = new Demolish;
 		for (; j < args; ++j) {
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			value = LuaToString(l, -1, j + 1);
 			++j;
 			if (!strcmp(value, "range")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->Range = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				spellaction->Range = LuaToNumber(l, -1, j + 1);
 			} else if (!strcmp(value, "damage")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->Damage = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				spellaction->Damage = LuaToNumber(l, -1, j + 1);
 			} else {
 				LuaError(l, "Unsupported demolish tag: %s" _C_ value);
 			}
@@ -262,9 +208,7 @@ static SpellActionType *CclSpellAction(lua_State *l)
 	} else if (!strcmp(value, "adjust-variable")) {
 		AdjustVariable *spellaction = new AdjustVariable;
 		lua_rawgeti(l, -1, j + 1);
-		if (!lua_istable(l, -1)) {
-			LuaError(l, "Table expected for adjust-variable.");
-		}
+		LuaCheckTable(l, -1);
 		spellaction->Var = new SpellActionTypeAdjustVariable[UnitTypeVar.NumberVariable];
 		for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 			int i;
@@ -329,23 +273,17 @@ static SpellActionType *CclSpellAction(lua_State *l)
 	} else if (!strcmp(value, "summon")) {
 		Summon *spellaction = new Summon;
 		for (; j < args; ++j) {
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			value = LuaToString(l, -1, j + 1);
 			++j;
 			if (!strcmp(value, "unit-type")) {
-				lua_rawgeti(l, -1, j + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
+				value = LuaToString(l, -1, j + 1);
 				spellaction->UnitType = UnitTypeByIdent(value);
 				if (!spellaction->UnitType) {
 					spellaction->UnitType = 0;
 					DebugPrint("unit type \"%s\" not found for summon spell.\n" _C_ value);
 				}
 			} else if (!strcmp(value, "time-to-live")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->TTL = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				spellaction->TTL = LuaToNumber(l, -1, j + 1);
 			} else if (!strcmp(value, "require-corpse")) {
 				spellaction->RequireCorpse = 1;
 				--j;
@@ -361,14 +299,10 @@ static SpellActionType *CclSpellAction(lua_State *l)
 	} else if (!strcmp(value, "spawn-portal")) {
 		SpawnPortal *spellaction = new SpawnPortal;
 		for (; j < args; ++j) {
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			value = LuaToString(l, -1, j + 1);
 			++j;
 			if (!strcmp(value, "portal-type")) {
-				lua_rawgeti(l, -1, j + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
+				value = LuaToString(l, -1, j + 1);
 				spellaction->PortalType = UnitTypeByIdent(value);
 				if (!spellaction->PortalType) {
 					spellaction->PortalType = 0;
@@ -386,20 +320,14 @@ static SpellActionType *CclSpellAction(lua_State *l)
 	} else if (!strcmp(value, "capture")) {
 		Capture *spellaction = new Capture;
 		for (; j < args; ++j) {
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			value = LuaToString(l, -1, j + 1);
 			++j;
 			if (!strcmp(value, "sacrifice")) {
 				spellaction->SacrificeEnable = 1;
 			} else if (!strcmp(value, "damage")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->Damage = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				spellaction->Damage = LuaToNumber(l, -1, j + 1);
 			} else if (!strcmp(value, "percent")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->DamagePercent = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				spellaction->DamagePercent = LuaToNumber(l, -1, j + 1);
 			} else {
 				LuaError(l, "Unsupported Capture tag: %s" _C_ value);
 			}
@@ -408,14 +336,10 @@ static SpellActionType *CclSpellAction(lua_State *l)
 	} else if (!strcmp(value, "polymorph")) {
 		Polymorph *spellaction = new Polymorph;
 		for (; j < args; ++j) {
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			value = LuaToString(l, -1, j + 1);
 			++j;
 			if (!strcmp(value, "new-form")) {
-				lua_rawgeti(l, -1, j + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
+				value = LuaToString(l, -1, j + 1);
 				spellaction->NewForm = UnitTypeByIdent(value);
 				if (!spellaction->NewForm) {
 					spellaction->NewForm= 0;
@@ -437,22 +361,14 @@ static SpellActionType *CclSpellAction(lua_State *l)
 	} else if (!strcmp(value, "adjust-vitals")) {
 		AdjustVitals *spellaction = new AdjustVitals;
 		for (; j < args; ++j) {
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			value = LuaToString(l, -1, j + 1);
 			++j;
 			if (!strcmp(value, "hit-points")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->HP = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				spellaction->HP = LuaToNumber(l, -1, j + 1);
 			} else if (!strcmp(value, "mana-points")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->Mana = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				spellaction->Mana = LuaToNumber(l, -1, j + 1);
 			} else if (!strcmp(value, "max-multi-cast")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->MaxMultiCast = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				spellaction->MaxMultiCast = LuaToNumber(l, -1, j + 1);
 			} else {
 				LuaError(l, "Unsupported adjust-vitals tag: %s" _C_ value);
 			}
@@ -518,42 +434,26 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 		condition->Variable[i].MaxValuePercent = 1024;
 	}
 	//  Now parse the list and set values.
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckTable(l, -1);
 	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		value = LuaToString(l, -1, j + 1);
 		++j;
 		if (!strcmp(value, "alliance")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->Alliance = Ccl2Condition(l, LuaToString(l, -1));
-			lua_pop(l, 1);
+			condition->Alliance = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else if (!strcmp(value, "opponent")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->Opponent = Ccl2Condition(l, LuaToString(l, -1));
-			lua_pop(l, 1);
+			condition->Opponent = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else if (!strcmp(value, "self")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->TargetSelf = Ccl2Condition(l, LuaToString(l, -1));
-			lua_pop(l, 1);
+			condition->TargetSelf = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else if (!strcmp(value, "Building")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->Building = Ccl2Condition(l, LuaToString(l, -1));
-			lua_pop(l, 1);
+			condition->Building = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else if (!strcmp(value, "Organic")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->Organic = Ccl2Condition(l, LuaToString(l, -1));
-			lua_pop(l, 1);
+			condition->Organic = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else {
 			i = GetVariableIndex(value);
 			if (i != -1) { // Valid index.
 				lua_rawgeti(l, -1, j + 1);
-				if (!lua_istable(l, -1)) {
-					LuaError(l, "Table expected in variable in condition");
-				}
+				LuaCheckTable(l, -1);
 				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 					const char *key;
 
@@ -598,23 +498,15 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 	int args;
 	int j;
 
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckTable(l, -1);
 	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		value = LuaToString(l, -1, j + 1);
 		++j;
 		if (!strcmp(value, "range")) {
-			lua_rawgeti(l, -1, j + 1);
-			autocast->Range = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			autocast->Range = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "combat")) {
-			lua_rawgeti(l, -1, j + 1);
-			autocast->Combat = Ccl2Condition(l, LuaToString(l, -1));
-			lua_pop(l, 1);
+			autocast->Combat = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else if (!strcmp(value, "condition")) {
 			if (!autocast->Condition) {
 				autocast->Condition = new ConditionInfo;
@@ -701,9 +593,7 @@ static int CclDefineSpell(lua_State *l)
 			int subargs;
 			int k;
 
-			if (!lua_istable(l, i + 1)) {
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, i + 1);
 			subargs = lua_objlen(l, i + 1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, i + 1, k + 1);

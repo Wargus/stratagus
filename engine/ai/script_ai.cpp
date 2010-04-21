@@ -203,15 +203,10 @@ static int CclDefineAiHelper(lua_State *l)
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j)
 	{
-		if (!lua_istable(l, j + 1))
-		{
-			LuaError(l, "incorrect argument");
-		}
+		LuaCheckTable(l, j + 1);
 		subargs = lua_objlen(l, j + 1);
 		k = 0;
-		lua_rawgeti(l, j + 1, k + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		value = LuaToString(l, j + 1, k + 1);
 		++k;
 
 		//
@@ -253,9 +248,7 @@ static int CclDefineAiHelper(lua_State *l)
 		//
 
 		// FIXME: support value as list!
-		lua_rawgeti(l, j + 1, k + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		value = LuaToString(l, j + 1, k + 1);
 		++k;
 		base = UnitTypeByIdent(value);
 		if (!base)
@@ -268,9 +261,7 @@ static int CclDefineAiHelper(lua_State *l)
 		//
 		for (; k < subargs; ++k)
 		{
-			lua_rawgeti(l, j + 1, k + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			value = LuaToString(l, j + 1, k + 1);
 			type = UnitTypeByIdent(value);
 			if (!type)
 			{
@@ -598,10 +589,7 @@ static int CclAiForce(lua_State *l)
 	size_t i;
 
 	LuaCheckArgs(l, 2);
-	if (!lua_istable(l, 2))
-	{
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckTable(l, 2);
 	force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCES)
 	{
@@ -615,9 +603,7 @@ static int CclAiForce(lua_State *l)
 		type = CclGetUnitType(l);
 		lua_pop(l, 1);
 		++j;
-		lua_rawgeti(l, 2, j + 1);
-		count = LuaToNumber(l, -1);
-		lua_pop(l, 1);
+		count = LuaToNumber(l, 2, j + 1);
 
 		if (!type)
 		{
@@ -913,21 +899,14 @@ static int CclDefineAiPlayer(lua_State *l)
 		}
 		else if (!strcmp(value, "force"))
 		{
-			if (!lua_istable(l, j + 1))
-			{
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, j + 1);
 			subargs = lua_objlen(l, j + 1);
 			k = 0;
-			lua_rawgeti(l, j + 1, k + 1);
-			i = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			i = LuaToNumber(l, j + 1, k + 1);
 			++k;
 			for (; k < subargs; ++k)
 			{
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
+				value = LuaToString(l, j + 1, k + 1);
 				++k;
 				if (!strcmp(value, "complete"))
 				{
@@ -951,9 +930,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				}
 				else if (!strcmp(value, "role"))
 				{
-					lua_rawgeti(l, j + 1, k + 1);
-					value = LuaToString(l, -1);
-					lua_pop(l, 1);
+					value = LuaToString(l, j + 1, k + 1);
 					if (!strcmp(value, "attack"))
 					{
 						ai->Force[i].Role = AiForceRoleAttack;
@@ -973,10 +950,7 @@ static int CclDefineAiPlayer(lua_State *l)
 					int subk;
 
 					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1))
-					{
-						LuaError(l, "incorrect argument");
-					}
+					LuaCheckTable(l, -1);
 					subsubargs = lua_objlen(l, -1);
 					for (subk = 0; subk < subsubargs; ++subk)
 					{
@@ -984,13 +958,9 @@ static int CclDefineAiPlayer(lua_State *l)
 						const char *ident;
 						AiUnitType queue;
 
-						lua_rawgeti(l, -1, subk + 1);
-						num = LuaToNumber(l, -1);
-						lua_pop(l, 1);
+						num = LuaToNumber(l, -1, subk + 1);
 						++subk;
-						lua_rawgeti(l, -1, subk + 1);
-						ident = LuaToString(l, -1);
-						lua_pop(l, 1);
+						ident = LuaToString(l, -1, subk + 1);
 						queue.Want = num;
 						queue.Type = UnitTypeByIdent(ident);
 						ai->Force[i].UnitTypes.push_back(queue);
@@ -1003,44 +973,31 @@ static int CclDefineAiPlayer(lua_State *l)
 					int subk;
 
 					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1))
-					{
-						LuaError(l, "incorrect argument");
-					}
+					LuaCheckTable(l, -1);
 					subsubargs = lua_objlen(l, -1);
 					for (subk = 0; subk < subsubargs; ++subk)
 					{
 						int num;
 						const char *ident;
 
-						lua_rawgeti(l, -1, subk + 1);
-						num = LuaToNumber(l, -1);
-						lua_pop(l, 1);
+						num = LuaToNumber(l, -1, subk + 1);
 						++subk;
-						lua_rawgeti(l, -1, subk + 1);
-						ident = LuaToString(l, -1);
-						lua_pop(l, 1);
+						ident = LuaToString(l, -1, subk + 1);
 						ai->Force[i].Units.push_back(UnitSlots[num]);
 					}
 					lua_pop(l, 1);
 				}
 				else if (!strcmp(value, "state"))
 				{
-					lua_rawgeti(l, j + 1, k + 1);
-					ai->Force[i].State = LuaToNumber(l, -1);
-					lua_pop(l, 1);
+					ai->Force[i].State = LuaToNumber(l, j + 1, k + 1);
 				}
 				else if (!strcmp(value, "goalx"))
 				{
-					lua_rawgeti(l, j + 1, k + 1);
-					ai->Force[i].GoalX = LuaToNumber(l, -1);
-					lua_pop(l, 1);
+					ai->Force[i].GoalX = LuaToNumber(l, j + 1, k + 1);
 				}
 				else if (!strcmp(value, "goaly"))
 				{
-					lua_rawgeti(l, j + 1, k + 1);
-					ai->Force[i].GoalY = LuaToNumber(l, -1);
-					lua_pop(l, 1);
+					ai->Force[i].GoalY = LuaToNumber(l, j + 1, k + 1);
 				}
 				else
 				{
@@ -1050,40 +1007,28 @@ static int CclDefineAiPlayer(lua_State *l)
 		}
 		else if (!strcmp(value, "needed"))
 		{
-			if (!lua_istable(l, j + 1))
-			{
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, j + 1);
 			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k)
 			{
 				const char *type;
 				int num;
 
-				lua_rawgeti(l, j + 1, k + 1);
-				type = LuaToString(l, -1);
-				lua_pop(l, 1);
+				type = LuaToString(l, j + 1, k + 1);
 				++k;
-				lua_rawgeti(l, j + 1, k + 1);
-				num = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				num = LuaToNumber(l, j + 1, k + 1);
 				ai->Needed[DefaultResourceNumber(type)] = num;
 			}
 		}
 		else if (!strcmp(value, "need-mask"))
 		{
-			if (!lua_istable(l, j + 1))
-			{
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, j + 1);
 			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k)
 			{
 				const char *type;
 
-				lua_rawgeti(l, j + 1, k + 1);
-				type = LuaToString(l, -1);
-				lua_pop(l, 1);
+				type = LuaToString(l, j + 1, k + 1);
 				ai->NeededMask |= (1 << DefaultResourceNumber(type));
 			}
 		}
@@ -1093,10 +1038,7 @@ static int CclDefineAiPlayer(lua_State *l)
 		}
 		else if (!strcmp(value, "unit-type"))
 		{
-			if (!lua_istable(l, j + 1))
-			{
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, j + 1);
 			subargs = lua_objlen(l, j + 1);
 			i = 0;
 			if (subargs)
@@ -1108,13 +1050,9 @@ static int CclDefineAiPlayer(lua_State *l)
 				const char *ident;
 				int count;
 
-				lua_rawgeti(l, j + 1, k + 1);
-				ident = LuaToString(l, -1);
-				lua_pop(l, 1);
+				ident = LuaToString(l, j + 1, k + 1);
 				++k;
-				lua_rawgeti(l, j + 1, k + 1);
-				count = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				count = LuaToNumber(l, j + 1, k + 1);
 				ai->UnitTypeRequests[i].Type = UnitTypeByIdent(ident);
 				ai->UnitTypeRequests[i].Count = count;
 				++i;
@@ -1122,10 +1060,7 @@ static int CclDefineAiPlayer(lua_State *l)
 		}
 		else if (!strcmp(value, "building"))
 		{
-			if (!lua_istable(l, j + 1))
-			{
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, j + 1);
 			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k)
 			{
@@ -1134,17 +1069,11 @@ static int CclDefineAiPlayer(lua_State *l)
 				int want;
 				AiBuildQueue queue;
 
-				lua_rawgeti(l, j + 1, k + 1);
-				ident = LuaToString(l, -1);
-				lua_pop(l, 1);
+				ident = LuaToString(l, j + 1, k + 1);
 				++k;
-				lua_rawgeti(l, j + 1, k + 1);
-				made = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				made = LuaToNumber(l, j + 1, k + 1);
 				++k;
-				lua_rawgeti(l, j + 1, k + 1);
-				want = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				want = LuaToNumber(l, j + 1, k + 1);
 				queue.Type = UnitTypeByIdent(ident);
 				queue.Want = want;
 				queue.Made = made;
@@ -1157,23 +1086,16 @@ static int CclDefineAiPlayer(lua_State *l)
 		}
 		else if (!strcmp(value, "repair-workers"))
 		{
-			if (!lua_istable(l, j + 1))
-			{
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, j + 1);
 			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k)
 			{
 				int num;
 				int workers;
 
-				lua_rawgeti(l, j + 1, k + 1);
-				num = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				num = LuaToNumber(l, j + 1, k + 1);
 				++k;
-				lua_rawgeti(l, j + 1, k + 1);
-				workers = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				workers = LuaToNumber(l, j + 1, k + 1);
 				ai->TriedRepairWorkers[num] = workers;
 				++i;
 			}

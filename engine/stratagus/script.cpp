@@ -351,9 +351,7 @@ static int CclSavedGameInfo(lua_State *l)
 	const char *value;
 
 	LuaCheckArgs(l, 1);
-	if (!lua_istable(l, 1)) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckTable(l, 1);
 
 	lua_pushnil(l);
 	while (lua_next(l, 1)) {
@@ -383,50 +381,92 @@ static int CclSavedGameInfo(lua_State *l)
 }
 
 /**
-**  Convert lua string in char*.
-**  It checks also type and exit in case of error.
+**  Convert lua string to char*.
+**  It also checks the type and exits in case of error.
 **
 **  @note char* could be invalidated with lua garbage collector.
 **
-**  @param l     Lua state.
-**  @param narg  Argument number.
+**  @param l      Lua state.
+**  @param index  Argument number.
 **
-**  @return      char* from lua.
+**  @return       char* from lua.
 */
-const char *LuaToString(lua_State *l, int narg)
+const char *LuaToString(lua_State *l, int index)
 {
-	luaL_checktype(l, narg, LUA_TSTRING);
-	return lua_tostring(l, narg);
+	luaL_checktype(l, index, LUA_TSTRING);
+	return lua_tostring(l, index);
 }
 
 /**
-**  Convert lua number in C number.
-**  It checks also type and exit in case of error.
+**  Convert lua string in a table to char*.
+**  It also checks the type and exits in case of error.
 **
-**  @param l     Lua state.
-**  @param narg  Argument number.
+**  @note char* could be invalidated with lua garbage collector.
 **
-**  @return      C number from lua.
+**  @param l            Lua state.
+**  @param tableIndex   Index number of the table.
+**  @param stringIndex  Index number of the string in the table.
+**
+**  @return             char* from lua.
 */
-int LuaToNumber(lua_State *l, int narg)
+const char *LuaToString(lua_State *l, int tableIndex, int stringIndex)
 {
-	luaL_checktype(l, narg, LUA_TNUMBER);
-	return static_cast<int>(lua_tonumber(l, narg));
+	const char *str;
+	lua_rawgeti(l, tableIndex, stringIndex);
+	luaL_checktype(l, -1, LUA_TSTRING);
+	str = lua_tostring(l, -1);
+	lua_pop(l, 1);
+	return str;
+}
+
+/**
+**  Convert lua number to int.
+**  It also checks the type and exits in case of error.
+**
+**  @param l      Lua state.
+**  @param index  Argument number.
+**
+**  @return       int from lua.
+*/
+int LuaToNumber(lua_State *l, int index)
+{
+	luaL_checktype(l, index, LUA_TNUMBER);
+	return static_cast<int>(lua_tonumber(l, index));
+}
+
+/**
+**  Convert lua number in a table to int.
+**  It also checks the type and exits in case of error.
+**
+**  @param l            Lua state.
+**  @param tableIndex   Index number of the table
+**  @param numberIndex  Index number of the string in the table.
+**
+**  @return             int from lua.
+*/
+int LuaToNumber(lua_State *l, int tableIndex, int numberIndex)
+{
+	int num;
+	lua_rawgeti(l, tableIndex, numberIndex);
+	luaL_checktype(l, -1, LUA_TNUMBER);
+	num = static_cast<int>(lua_tonumber(l, -1));
+	lua_pop(l, 1);
+	return num;
 }
 
 /**
 **  Convert lua boolean to bool.
-**  It also checks type and exits in case of error.
+**  It also checks the type and exits in case of error.
 **
-**  @param l     Lua state.
-**  @param narg  Argument number.
+**  @param l      Lua state.
+**  @param index  Argument number.
 **
-**  @return      1 for true, 0 for false from lua.
+**  @return       1 for true, 0 for false from lua.
 */
-bool LuaToBoolean(lua_State *l, int narg)
+bool LuaToBoolean(lua_State *l, int index)
 {
-	luaL_checktype(l, narg, LUA_TBOOLEAN);
-	return lua_toboolean(l, narg) != 0;
+	luaL_checktype(l, index, LUA_TBOOLEAN);
+	return lua_toboolean(l, index) != 0;
 }
 
 /**

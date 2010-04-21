@@ -106,9 +106,7 @@ void CclParseOrder(lua_State *l, COrder *order)
 	//
 	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		value = LuaToString(l, -1, j + 1);
 		if (!strcmp(value, "action-none")) {
 			order->Action = UnitActionNone;
 		} else if (!strcmp(value, "action-still")) {
@@ -145,31 +143,21 @@ void CclParseOrder(lua_State *l, COrder *order)
 			order->Action = UnitActionResource;
 		} else if (!strcmp(value, "range")) {
 			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->Range = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			order->Range = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "min-range")) {
 			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->MinRange = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			order->MinRange = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "width")) {
 			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->Width = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			order->Width = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "height")) {
 			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->Height = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			order->Height = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "goal")) {
 			int slot;
 
 			++j;
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			value = LuaToString(l, -1, j + 1);
 
 			slot = strtol(value + 1, NULL, 16);
 			order->Goal = UnitSlots[slot];
@@ -181,42 +169,26 @@ void CclParseOrder(lua_State *l, COrder *order)
 		} else if (!strcmp(value, "tile")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
-			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			order->X = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			order->Y = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			LuaCheckTableSize(l, -1, 2);
+			order->X = LuaToNumber(l, -1, 1);
+			order->Y = LuaToNumber(l, -1, 2);
 			lua_pop(l, 1);
 
 		} else if (!strcmp(value, "type")) {
 			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->Type = UnitTypeByIdent(LuaToString(l, -1));
-			lua_pop(l, 1);
+			order->Type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
 
 		} else if (!strcmp(value, "patrol")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
-			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			order->Arg1.Patrol.X = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			order->Arg1.Patrol.Y = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			LuaCheckTableSize(l, -1, 2);
+			order->Arg1.Patrol.X = LuaToNumber(l, -1, 1);
+			order->Arg1.Patrol.Y = LuaToNumber(l, -1, 2);
 			lua_pop(l, 1);
 
 		} else if (!strcmp(value, "spell")) {
 			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->Arg1.Spell = SpellTypeByIdent(LuaToString(l, -1));
-			lua_pop(l, 1);
+			order->Arg1.Spell = SpellTypeByIdent(LuaToString(l, -1, j + 1));
 
 		} else {
 		   // This leaves a half initialized unit
@@ -259,19 +231,13 @@ static void CclParseBuilt(lua_State *l, CUnit *unit)
 	int args;
 	int j;
 
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckTable(l, -1);
 	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		value = LuaToString(l, -1, j + 1);
 		++j;
 		if (!strcmp(value, "progress")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.Built.Progress = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			unit->Data.Built.Progress = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "cancel")) {
 			unit->Data.Built.Cancel = 1;
 			--j;
@@ -279,9 +245,7 @@ static void CclParseBuilt(lua_State *l, CUnit *unit)
 			int frame;
 			CConstructionFrame *cframe;
 
-			lua_rawgeti(l, -1, j + 1);
-			frame = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			frame = LuaToNumber(l, -1, j + 1);
 			cframe = unit->Type->Construction->Frames;
 			while (frame--) {
 				cframe = cframe->Next;
@@ -305,19 +269,13 @@ static void CclParseTrain(lua_State *l, CUnit *unit)
 	int args;
 	int j;
 
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckTable(l, -1);
 	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		value = LuaToString(l, -1, j + 1);
 		++j;
 		if (!strcmp(value, "ticks")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.Train.Ticks = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			unit->Data.Train.Ticks = LuaToNumber(l, -1, j + 1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -336,24 +294,16 @@ static void CclParseHarvest(lua_State *l, CUnit *unit)
 	int args;
 	int j;
 
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckTable(l, -1);
 	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		value = LuaToString(l, -1, j + 1);
 		++j;
 		if (!strcmp(value, "current-production")) {
 			lua_rawgeti(l, -1, j + 1);
-			if (!lua_istable(l, -1) || lua_objlen(l, -1) != MaxCosts) {
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTableSize(l, -1, MaxCosts);
 			for (int i = 0; i < MaxCosts; ++i) {
-				lua_rawgeti(l, -1, i + 1);
-				unit->Data.Harvest.CurrentProduction[i] = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				unit->Data.Harvest.CurrentProduction[i] = LuaToNumber(l, -1, i + 1);
 			}
 			lua_pop(l, 1);
 		} else {
@@ -385,14 +335,10 @@ static void CclParseMove(lua_State *l, CUnit *unit)
 		return;
 	}
 
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckTable(l, -1);
 	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		value = LuaToString(l, -1, j + 1);
 		++j;
 		if (!strcmp(value, "fast")) {
 			unit->Data.Move.Fast = 1;
@@ -402,18 +348,14 @@ static void CclParseMove(lua_State *l, CUnit *unit)
 			int k;
 
 			lua_rawgeti(l, -1, j + 1);
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, -1);
 			subargs = lua_objlen(l, -1);
 			if (subargs > MAX_PATH_LENGTH) {
 				// unit->Data.Move.Path[] would overflow.
 				LuaError(l, "path data is too long");
 			}
 			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, -1, k + 1);
-				unit->Data.Move.Path[k] = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				unit->Data.Move.Path[k] = LuaToNumber(l, -1, k + 1);
 			}
 			unit->Data.Move.Length = subargs;
 			lua_pop(l, 1);
@@ -498,65 +440,31 @@ static int CclUnit(lua_State *l)
 			int w;
 			int h;
 
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 4) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, j + 1, 1);
-			x = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
-			y = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 3);
-			w = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 4);
-			h = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			LuaCheckTableSize(l, j + 1, 4);
+			x = LuaToNumber(l, j + 1, 1);
+			y = LuaToNumber(l, j + 1, 2);
+			w = LuaToNumber(l, j + 1, 3);
+			h = LuaToNumber(l, j + 1, 4);
 			MapSight(player, x, y, w, h, unit->CurrentSightRange, MapMarkTileSight);
 
 		} else if (!strcmp(value, "tile")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, j + 1, 1);
-			unit->X = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
-			unit->Y = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			LuaCheckTableSize(l, j + 1, 2);
+			unit->X = LuaToNumber(l, j + 1, 1);
+			unit->Y = LuaToNumber(l, j + 1, 2);
 		} else if (!strcmp(value, "seen-tile")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, j + 1, 1);
-			unit->Seen.X = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
-			unit->Seen.Y = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			LuaCheckTableSize(l, j + 1, 2);
+			unit->Seen.X = LuaToNumber(l, j + 1, 1);
+			unit->Seen.Y = LuaToNumber(l, j + 1, 2);
 		} else if (!strcmp(value, "stats")) {
 			unit->Stats = &type->Stats[(int)LuaToNumber(l, j + 1)];
 		} else if (!strcmp(value, "pixel")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, j + 1, 1);
-			unit->IX = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
-			unit->IY = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			LuaCheckTableSize(l, j + 1, 2);
+			unit->IX = LuaToNumber(l, j + 1, 1);
+			unit->IY = LuaToNumber(l, j + 1, 2);
 		} else if (!strcmp(value, "seen-pixel")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, j + 1, 1);
-			unit->Seen.IX = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
-			unit->Seen.IY = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			LuaCheckTableSize(l, j + 1, 2);
+			unit->Seen.IX = LuaToNumber(l, j + 1, 1);
+			unit->Seen.IY = LuaToNumber(l, j + 1, 2);
 		} else if (!strcmp(value, "frame")) {
 			unit->Frame = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "seen")) {
@@ -632,13 +540,9 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "last-group")) {
 			unit->LastGroup = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "resources-held")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != MaxCosts) {
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTableSize(l, j + 1, MaxCosts);
 			for (i = 0; i < MaxCosts; ++i) {
-				lua_rawgeti(l, j + 1, i + 1);
-				unit->ResourcesHeld[i] = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				unit->ResourcesHeld[i] = LuaToNumber(l, j + 1, i + 1);
 			}
 		} else if (!strcmp(value, "production-efficiency")) {
 			unit->ProductionEfficiency = LuaToNumber(l, j + 1);
@@ -674,14 +578,10 @@ static int CclUnit(lua_State *l)
 			int subargs;
 			int k;
 
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
+			LuaCheckTable(l, j + 1);
 			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
+				value = LuaToString(l, j + 1, k + 1);
 				slot = strtol(value + 1, NULL, 16);
 				UnitSlots[slot]->AddInContainer(unit);
 				Assert(UnitSlots[slot]);
@@ -789,12 +689,9 @@ static int CclMoveUnit(lua_State *l)
 	unit = CclGetUnit(l);
 	lua_pop(l, 1);
 
-	lua_rawgeti(l, 2, 1);
-	ix = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, 2, 2);
-	iy = LuaToNumber(l, -1);
-	lua_pop(l, 1);
+	LuaCheckTableSize(l, 2, 2);
+	ix = LuaToNumber(l, 2, 1);
+	iy = LuaToNumber(l, 2, 2);
 
 	heading = SyncRand() % 256;
 	if (UnitCanBeAt(unit, ix, iy)) {
@@ -835,15 +732,9 @@ static int CclCreateUnit(lua_State *l)
 	lua_pushvalue(l, 1);
 	unittype = CclGetUnitType(l);
 	lua_pop(l, 1);
-	if (!lua_istable(l, 3) || lua_objlen(l, 3) != 2) {
-		LuaError(l, "incorrect argument !!");
-	}
-	lua_rawgeti(l, 3, 1);
-	ix = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, 3, 2);
-	iy = LuaToNumber(l, -1);
-	lua_pop(l, 1);
+	LuaCheckTableSize(l, 3, 2);
+	ix = LuaToNumber(l, 3, 1);
+	iy = LuaToNumber(l, 3, 2);
 
 	heading = SyncRand() % 256;
 	lua_pushvalue(l, 2);
@@ -894,18 +785,14 @@ static int CclSetResourcesHeld(lua_State *l)
 	if (lua_isnil(l, 1)) {
 		return 0;
 	}
-	if (!lua_istable(l, 2) || lua_objlen(l, 2) != MaxCosts) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckTableSize(l, 2, MaxCosts);
 
 	lua_pushvalue(l, 1);
 	unit = CclGetUnit(l);
 	lua_pop(l, 1);
 
 	for (int i = 0; i < MaxCosts; ++i) {
-		lua_rawgeti(l, 2, i + 1);
-		unit->ResourcesHeld[i] = LuaToNumber(l, -1) * CYCLES_PER_SECOND;
-		lua_pop(l, 1);
+		unit->ResourcesHeld[i] = LuaToNumber(l, 2, i + 1) * CYCLES_PER_SECOND;
 	}
 
 	return 0;
@@ -944,42 +831,22 @@ static int CclOrderUnit(lua_State *l)
 	lua_pushvalue(l, 2);
 	unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
-	if (!lua_istable(l, 3)) {
-		LuaError(l, "incorrect argument");
-	}
-	lua_rawgeti(l, 3, 1);
-	x1 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, 3, 2);
-	y1 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
+	LuaCheckTable(l, 3);
+	x1 = LuaToNumber(l, 3, 1);
+	y1 = LuaToNumber(l, 3, 2);
 	if (lua_objlen(l, 3) == 4) {
-		lua_rawgeti(l, 3, 3);
-		x2 = LuaToNumber(l, -1);
-		lua_pop(l, 1);
-		lua_rawgeti(l, 3, 4);
-		y2 = LuaToNumber(l, -1);
-		lua_pop(l, 1);
+		x2 = LuaToNumber(l, 3, 3);
+		y2 = LuaToNumber(l, 3, 4);
 	} else {
 		x2 = x1;
 		y2 = y1;
 	}
-	if (!lua_istable(l, 4)) {
-		LuaError(l, "incorrect argument");
-	}
-	lua_rawgeti(l, 4, 1);
-	dx1 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, 4, 2);
-	dy1 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
+	LuaCheckTable(l, 4);
+	dx1 = LuaToNumber(l, 4, 1);
+	dy1 = LuaToNumber(l, 4, 2);
 	if (lua_objlen(l, 4) == 4) {
-		lua_rawgeti(l, 4, 3);
-		dx2 = LuaToNumber(l, -1);
-		lua_pop(l, 1);
-		lua_rawgeti(l, 4, 4);
-		dy2 = LuaToNumber(l, -1);
-		lua_pop(l, 1);
+		dx2 = LuaToNumber(l, 4, 3);
+		dy2 = LuaToNumber(l, 4, 4);
 	} else {
 		dx2 = dx1;
 		dy2 = dy1;
@@ -1092,25 +959,13 @@ static int CclKillUnitAt(lua_State *l)
 
 	q = LuaToNumber(l, 3);
 
-	if (!lua_istable(l, 4) || lua_objlen(l, 4) != 2) {
-		LuaError(l, "incorrect argument");
-	}
-	lua_rawgeti(l, 4, 1);
-	x1 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, 4, 2);
-	y1 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
+	LuaCheckTableSize(l, 4, 2);
+	x1 = LuaToNumber(l, 4, 1);
+	y1 = LuaToNumber(l, 4, 2);
 
-	if (!lua_istable(l, 5) || lua_objlen(l, 5) != 2) {
-		LuaError(l, "incorrect argument");
-	}
-	lua_rawgeti(l, 5, 1);
-	x2 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, 5, 2);
-	y2 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
+	LuaCheckTableSize(l, 5, 2);
+	x2 = LuaToNumber(l, 5, 1);
+	y2 = LuaToNumber(l, 5, 2);
 
 	an = UnitCache.Select(x1, y1, x2 + 1, y2 + 1, table, UnitMax);
 	for (j = s = 0; j < an && s < q; ++j) {
