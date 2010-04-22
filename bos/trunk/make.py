@@ -294,14 +294,9 @@ def clean():
 def pot():
     luas = find('.', '*.lua')
     luas.sort()
-    run('xgettext','-d','bos','-k_','-o','languages/bos.pot',
-         luas)
-    s = list(sources)
-    s.sort()
-    run('xgettext','-d','engine','-k_','-o','languages/engine.pot',
-         s)
-def po():
-    pass
+    run('xgettext','-d','bos','-k_','-o','languages/bos.pot', luas)
+    s = sorted(sources)
+    run('xgettext','-d','engine','-k_','-o','languages/engine.pot', s)
 
 def all(**kwargs):
     release(**kwargs)
