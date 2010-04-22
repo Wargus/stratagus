@@ -977,13 +977,20 @@ static int CclKillUnitAt(lua_State *l)
 	an = UnitCache.Select(x1, y1, x2 + 1, y2 + 1, table, UnitMax);
 	for (j = s = 0; j < an && s < q; ++j) {
 		unit = table[j];
-		if (unit->Destroyed || unit->Orders[0]->Action == UnitActionDie) {
+
+		// can't kill dead or indestructible units
+		if (unit->Destroyed ||
+			unit->Orders[0]->Action == UnitActionDie ||
+			unit->Type->Indestructible)
+		{
 			continue;
 		}
+
 		if (unittype == ANY_UNIT ||
-				(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
-				(unittype == ALL_BUILDINGS && unit->Type->Building) ||
-				unittype==unit->Type) {
+			(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
+			(unittype == ALL_BUILDINGS && unit->Type->Building) ||
+			unittype==unit->Type)
+		{
 			if (plynr == -1 || plynr == unit->Player->Index) {
 				LetUnitDie(unit);
 				++s;
