@@ -264,9 +264,23 @@ def profile(builddir='fbuild/profile',**kwargs):
 
 def static(builddir='fbuild/static', **kwargs):
     b = compiler(builddir=builddir, **kwargs)
-    mkdir(builddir)
+    b.incpath('engine/apbuild')
     b.incpath('deps/incs')
     b.libpath('deps/libs')
+    b.cflags += [
+        '-fno-stack-protector', # disable stack protection to avoid dependency on
+                                                #__stack_chk_fail@@GLIBC_2.4
+        '-U_FORTIFY_SOURCE', # requires glibc 2.3.4 or higher
+        '-include', 'engine/apbuild/apsymbols.h',
+       ]
+    b.ldflags += [
+        #'-Wl,--as-needed',  # must be set after all object files or the binary breaks
+        '-Wl,--hash-style=both', # By default FC6 only generates a .gnu.hash section
+                              # Do all main distros support .gnu.hash now ?
+        '-static-libgcc',
+        '-Wl,-Bstatic', '-lstdc++', '-llua', '-Wl,-Bdynamic',
+        ]
+    mkdir(builddir)
     detect(b)
     staticlibs = 'lua lua5.1 lua51 vorbis theora ogg'.split()
     for i in staticlibs:
@@ -276,12 +290,8 @@ def static(builddir='fbuild/static', **kwargs):
     b.cflags.remove('-DUSE_THEORA')
     b.cflags.remove('-DUSE_VORBIS')
     b.cflags.remove('-DUSE_OGG')
-    b.ldflags += ['-Wl,-Bstatic', '-lstdc++', '-llua',
-          '-Wl,-Bdynamic']
-    b.cc = 'apg++'
     b.optimize()
     b.libpath('.')
-    b.ldflags += ['-static-libgcc']
     p = os.popen(b.cc + ' -print-file-name=libstdc++.a')
     stdcxx = p.read().strip()
     run('ln', '-sf', stdcxx)
