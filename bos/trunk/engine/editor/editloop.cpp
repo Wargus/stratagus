@@ -837,7 +837,7 @@ static void ShowUnitInfo(const CUnit *unit)
 	if (unit->Type->CanHarvestFrom)
 	{
 		int res = unit->Type->ProductionCosts[0] ? 0 : 1;
-		o << " - " << _("Amount of") << " " << DefaultResourceNames[res] << ": "
+		o << " - " << _("Amount of") << " " << _(DefaultDisplayResourceNames[res].c_str()) << ": "
 		  << unit->ResourcesHeld[res] / CYCLES_PER_SECOND;
 	}
 

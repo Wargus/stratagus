@@ -326,7 +326,7 @@ static void DrawUnitInfo(CUnit *unit)
 
 		for (int i = 0; i < MaxCosts; ++i) {
 			if (unit->ResourcesHeld[i] != 0) {
-				resourceName = DefaultResourceNames[i];
+				resourceName = _(DefaultDisplayResourceNames[i].c_str());
 				amount = unit->ResourcesHeld[i] / CYCLES_PER_SECOND;
 				break;
 			}
@@ -372,7 +372,6 @@ static void DrawUnitInfo(CUnit *unit)
 */
 void DrawResources(void)
 {
-	const char *names[] = {_("Energy"), _("Magma")};
 	char tmp[128];
 	int totalproduction = 0;
 	int totalrequested = 0;
@@ -381,7 +380,7 @@ void DrawResources(void)
 
 	for (i = 0; i < MaxCosts; ++i) {
 		sprintf_s(tmp, sizeof(tmp), "%s:+%d-%d %d/%d",
-			names[i],
+			_(DefaultDisplayResourceNames[i].c_str()),
 			ThisPlayer->ProductionRate[i],
 			ThisPlayer->RequestedUtilizationRate[i],
 			ThisPlayer->StoredResources[i] / CYCLES_PER_SECOND / 100,

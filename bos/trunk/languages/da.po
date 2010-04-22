@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-10 09:24+0200\n"
+"POT-Creation-Date: 2010-04-21 20:58-0700\n"
 "PO-Revision-Date: 2006-12-25 21:22-0800\n"
 "Last-Translator: Bent Jakobsen\n"
 "MIME-Version: 1.0\n"
@@ -165,20 +165,20 @@ msgstr "Grænse på %d nået for denne enheds type"
 msgid "Cannot create more units."
 msgstr "Kan ikke lave flere enheder."
 
-#: game/replay.cpp:788
+#: game/replay.cpp:766
 msgid "No sync info for this replay !"
 msgstr "Ingen synk information for dette replay !"
 
-#: game/replay.cpp:790
+#: game/replay.cpp:768
 #, c-format
 msgid "Replay got out of sync (%lu) !"
 msgstr "Replay gik ud af synk (%lu) !"
 
-#: game/replay.cpp:799
+#: game/replay.cpp:777
 msgid "Replay got out of sync !"
 msgstr "Replay gik ud af synk !"
 
-#: game/replay.cpp:897 game/replay.cpp:911
+#: game/replay.cpp:875 game/replay.cpp:889
 msgid "End of replay"
 msgstr "Slut på replay"
 
@@ -200,7 +200,7 @@ msgstr "Venter på spiller \"%s\": %d:%02d"
 msgid "Timed out"
 msgstr "Tiden løb ud"
 
-#: stratagus/stratagus.cpp:592
+#: stratagus/stratagus.cpp:596
 msgid "Thanks for playing Bos Wars.\n"
 msgstr "Tak for at du spillede Bos Wars.\n"
 
@@ -233,7 +233,7 @@ msgstr "Musik er afbrudt."
 msgid "Music is on."
 msgstr "Musik er aktiv."
 
-#: ui/interface.cpp:292 ui/mouse.cpp:1613
+#: ui/interface.cpp:292 ui/mouse.cpp:1612
 msgid "Game Paused"
 msgstr "Spil Pauset"
 
@@ -269,7 +269,7 @@ msgstr "Terræn skjult."
 msgid "Grab mouse toggled."
 msgstr "Tag musen valgt."
 
-#: ui/interface.cpp:936
+#: ui/interface.cpp:935
 msgid "Screenshot made."
 msgstr "Skærmbillede lavet."
 
@@ -301,35 +301,27 @@ msgstr ""
 msgid "Mana: "
 msgstr ""
 
-#: ui/mainscr.cpp:375
-msgid "Energy"
-msgstr "Energi"
-
-#: ui/mainscr.cpp:375
-msgid "Magma"
-msgstr "Magma"
-
-#: ui/mainscr.cpp:601
+#: ui/mainscr.cpp:600
 #, c-format
 msgid "Last message repeated ~<%d~> times"
 msgstr "Sidste besked gentaget ~<%d~> gange"
 
-#: ui/mainscr.cpp:733
+#: ui/mainscr.cpp:732
 #, c-format
 msgid "~<Event: %s~>"
 msgstr "~<Handling: %s~>"
 
-#: ui/mouse.cpp:1778
+#: ui/mouse.cpp:1777
 #, c-format
 msgid "You have ~<%d~> %ss"
 msgstr "Du har ~<%d~> %ser"
 
-#: ui/mouse.cpp:1782
+#: ui/mouse.cpp:1781
 #, c-format
 msgid "You have ~<1~> %s"
 msgstr "Du har ~<1~> %s"
 
-#: unit/unit.cpp:2150
+#: unit/unit.cpp:2169
 #, c-format
 msgid "%s attacked"
 msgstr "%s angrebet"
@@ -337,6 +329,12 @@ msgstr "%s angrebet"
 #: video/sdl.cpp:285
 msgid "esc"
 msgstr ""
+
+#~ msgid "Energy"
+#~ msgstr "Energi"
+
+#~ msgid "Magma"
+#~ msgstr "Magma"
 
 #~ msgid "Mirror editing enabled: 2-side"
 #~ msgstr "Spejl redigering aktiveret: 2-sides"

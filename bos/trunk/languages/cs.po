@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-10 09:24+0200\n"
+"POT-Creation-Date: 2010-04-21 20:58-0700\n"
 "PO-Revision-Date: 2007-07-27 00:22+0100\n"
 "Last-Translator: Radim Luža <radimluza@seznam.cz>\n"
 "Language-Team: Czech\n"
@@ -168,20 +168,20 @@ msgstr "Limit %d dosažen pro tento typ jednotky"
 msgid "Cannot create more units."
 msgstr "Nelze vytvořit více jednotek %s."
 
-#: game/replay.cpp:788
+#: game/replay.cpp:766
 msgid "No sync info for this replay !"
 msgstr "Chybí synchronizační info pro tento záznam !"
 
-#: game/replay.cpp:790
+#: game/replay.cpp:768
 #, c-format
 msgid "Replay got out of sync (%lu) !"
 msgstr "Záznam se dostal mimo synchronizaci (%lu) !"
 
-#: game/replay.cpp:799
+#: game/replay.cpp:777
 msgid "Replay got out of sync !"
 msgstr "Záznam se dostal mimo synchronizaci !"
 
-#: game/replay.cpp:897 game/replay.cpp:911
+#: game/replay.cpp:875 game/replay.cpp:889
 msgid "End of replay"
 msgstr "Konec záznamu"
 
@@ -203,7 +203,7 @@ msgstr "Čeká se na hráče \"%s\": %d:%02d"
 msgid "Timed out"
 msgstr "Vypršení času"
 
-#: stratagus/stratagus.cpp:592
+#: stratagus/stratagus.cpp:596
 #, fuzzy
 msgid "Thanks for playing Bos Wars.\n"
 msgstr "Děkujeme, že jste hrál(a) Bos Wars.\n"
@@ -237,7 +237,7 @@ msgstr "Hudba je vypnuta."
 msgid "Music is on."
 msgstr "Hudba je zapnuta."
 
-#: ui/interface.cpp:292 ui/mouse.cpp:1613
+#: ui/interface.cpp:292 ui/mouse.cpp:1612
 msgid "Game Paused"
 msgstr "Hra pozastavena"
 
@@ -273,7 +273,7 @@ msgstr "Terén skryt."
 msgid "Grab mouse toggled."
 msgstr "Zachytávání myši přepnuto."
 
-#: ui/interface.cpp:936
+#: ui/interface.cpp:935
 msgid "Screenshot made."
 msgstr "Screenshot pořízen."
 
@@ -305,35 +305,27 @@ msgstr ""
 msgid "Mana: "
 msgstr ""
 
-#: ui/mainscr.cpp:375
-msgid "Energy"
-msgstr "Energie"
-
-#: ui/mainscr.cpp:375
-msgid "Magma"
-msgstr ""
-
-#: ui/mainscr.cpp:601
+#: ui/mainscr.cpp:600
 #, c-format
 msgid "Last message repeated ~<%d~> times"
 msgstr "Poslední zpráva opakována ~<%d~>-krát"
 
-#: ui/mainscr.cpp:733
+#: ui/mainscr.cpp:732
 #, c-format
 msgid "~<Event: %s~>"
 msgstr "~<Událost: %s~>"
 
-#: ui/mouse.cpp:1778
+#: ui/mouse.cpp:1777
 #, c-format
 msgid "You have ~<%d~> %ss"
 msgstr "Máte ~<%d~> %ss"
 
-#: ui/mouse.cpp:1782
+#: ui/mouse.cpp:1781
 #, c-format
 msgid "You have ~<1~> %s"
 msgstr "Máte ~<1~> %s"
 
-#: unit/unit.cpp:2150
+#: unit/unit.cpp:2169
 #, c-format
 msgid "%s attacked"
 msgstr "%s napaden"
@@ -341,3 +333,6 @@ msgstr "%s napaden"
 #: video/sdl.cpp:285
 msgid "esc"
 msgstr ""
+
+#~ msgid "Energy"
+#~ msgstr "Energie"

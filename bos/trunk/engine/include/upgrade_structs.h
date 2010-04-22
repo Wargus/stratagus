@@ -75,6 +75,11 @@ extern int DefaultResourcesHigh[MaxCosts];
 extern std::string DefaultResourceNames[MaxCosts];
 
 /**
+**  Default names for the resources used for display (localized).
+*/
+extern std::string DefaultDisplayResourceNames[MaxCosts];
+
+/**
 **  These are the current stats of a unit. Upgraded or downgraded.
 */
 class CUnitStats {

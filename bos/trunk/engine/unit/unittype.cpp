@@ -67,6 +67,11 @@ std::map<std::string, CUnitType *> UnitTypeMap;
 */
 std::string DefaultResourceNames[MaxCosts];
 
+/**
+**  Default names for the resources used for display (localized).
+*/
+std::string DefaultDisplayResourceNames[MaxCosts];
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/

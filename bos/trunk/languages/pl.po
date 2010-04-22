@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-10 09:24+0200\n"
+"POT-Creation-Date: 2010-04-21 20:58-0700\n"
 "PO-Revision-Date: 2005-12-10 02:25+0100\n"
 "Last-Translator: Wojciech Zylinski <gulldarek@tlen.pl>\n"
 "Language-Team: Polish <LL@li.org>\n"
@@ -167,20 +167,20 @@ msgstr ""
 msgid "Cannot create more units."
 msgstr "Nie można zbudować więcej jednostek: %s"
 
-#: game/replay.cpp:788
+#: game/replay.cpp:766
 msgid "No sync info for this replay !"
 msgstr "Brak informacji o synchronizacji dla tej powtórki!"
 
-#: game/replay.cpp:790
+#: game/replay.cpp:768
 #, c-format
 msgid "Replay got out of sync (%lu) !"
 msgstr "Powtórka niezschynronizowana (%lu) !"
 
-#: game/replay.cpp:799
+#: game/replay.cpp:777
 msgid "Replay got out of sync !"
 msgstr "Powtórka niezschynronizowana!"
 
-#: game/replay.cpp:897 game/replay.cpp:911
+#: game/replay.cpp:875 game/replay.cpp:889
 msgid "End of replay"
 msgstr "Koniec powtórki"
 
@@ -202,7 +202,7 @@ msgstr "Oczekiwanie na gracza \"%s\": %d:%02d"
 msgid "Timed out"
 msgstr "Przekroczony czas"
 
-#: stratagus/stratagus.cpp:592
+#: stratagus/stratagus.cpp:596
 #, fuzzy
 msgid "Thanks for playing Bos Wars.\n"
 msgstr "Dziękujemy za grę w Stratagus.\n"
@@ -236,7 +236,7 @@ msgstr "Muzyka jest wyłączona."
 msgid "Music is on."
 msgstr "Muzyka jest włączona."
 
-#: ui/interface.cpp:292 ui/mouse.cpp:1613
+#: ui/interface.cpp:292 ui/mouse.cpp:1612
 msgid "Game Paused"
 msgstr "Gra zatrzymana"
 
@@ -272,7 +272,7 @@ msgstr "Teren ukryty."
 msgid "Grab mouse toggled."
 msgstr "Przechwytywanie myszy włączone."
 
-#: ui/interface.cpp:936
+#: ui/interface.cpp:935
 msgid "Screenshot made."
 msgstr "Zrzut ekranu wykonany."
 
@@ -304,35 +304,27 @@ msgstr ""
 msgid "Mana: "
 msgstr ""
 
-#: ui/mainscr.cpp:375
-msgid "Energy"
-msgstr ""
-
-#: ui/mainscr.cpp:375
-msgid "Magma"
-msgstr ""
-
-#: ui/mainscr.cpp:601
+#: ui/mainscr.cpp:600
 #, c-format
 msgid "Last message repeated ~<%d~> times"
 msgstr "Ostatnia wiadomość powtórzona ~<%d~> razy"
 
-#: ui/mainscr.cpp:733
+#: ui/mainscr.cpp:732
 #, c-format
 msgid "~<Event: %s~>"
 msgstr "~<Zdarzenie: %s~>"
 
-#: ui/mouse.cpp:1778
+#: ui/mouse.cpp:1777
 #, c-format
 msgid "You have ~<%d~> %ss"
 msgstr "Masz ~<%d~> %sów"
 
-#: ui/mouse.cpp:1782
+#: ui/mouse.cpp:1781
 #, c-format
 msgid "You have ~<1~> %s"
 msgstr "Masz ~<1~> %s"
 
-#: unit/unit.cpp:2150
+#: unit/unit.cpp:2169
 #, c-format
 msgid "%s attacked"
 msgstr "%s zaatakowany"
