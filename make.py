@@ -41,10 +41,11 @@ def find(startdir, pattern):
 sources = find('engine', '*.cpp')
 
 class Gcc:
-  def __init__(self, cflags=[], ldflags=[], cc='g++'):
+  def __init__(self, cflags=[], ldflags=[], cc='g++', builddir='fbuild'):
      self.cflags = gccflags + list(cflags)
      self.ldflags = list(ldflags)
      self.cc = cc
+     self.builddir = builddir
   def copy(self):
      g = Gcc(self.cflags, self.ldflags, self.cc)
      return g
@@ -83,11 +84,12 @@ class Gcc:
 
 class Msvc:
   ''' UNTESTED !!!! '''
-  def __init__(self, cflags=[], ldflags=[], cc='cl.exe'):
+  def __init__(self, cflags=[], ldflags=[], cc='cl.exe', builddir='fbuild/release'):
      self.cflags = ['/Wall', '/DUSE_WIN32'] + list(cflags)
      self.ldflags = list(ldflags)
      self.cc = 'cl.exe'
      self.linker = 'link.exe'
+     self.builddir = builddir
   def copy(self):
      g = Msvc(self.cflags, self.ldflags, self.cc)
      return g
@@ -146,11 +148,10 @@ def mkdir(dir):
     if not os.access(dir, os.F_OK):
         os.makedirs(dir)
 
-def Check(b, lib=None, header='', function='', name='', 
-       builddir='fbuild/conftests'):
+def Check(b, lib=None, header='', function='', name=''):
     t = b.copy()
     name = name or lib or function or header.replace('/','_')
-    testdir = 'fbuild/conftests/'
+    testdir = b.builddir + '/conftests/'
     testname = testdir+'test'+name
     s = testname+'.c'
     mkdir(testdir)
@@ -226,41 +227,44 @@ def detect(b):
     if CheckLib(b, 'ogg'):
        b.define('USE_OGG')
 
-def compile(b, builddir='fbuild/release'):
-    objects = [b.cxx(inBuildDir(s, builddir), s) for s in sources]
+def compile(b):
+    objects = [b.cxx(inBuildDir(s, b.builddir), s) for s in sources]
     return objects
 
-def link(b, builddir='fbuild/release'):
-    objects = [b.oname(inBuildDir(s, builddir)) for s in sources]
-    apptarget = builddir + '/' + target
+def link(b):
+    objects = [b.oname(inBuildDir(s, b.builddir)) for s in sources]
+    apptarget = b.builddir + '/' + target
     b.ld(apptarget, objects)
 
-def make(b, builddir):
-    mkdir(builddir)
-    compile(b, builddir)
-    link(b, builddir)
+def make(b):
+    compile(b)
+    link(b)
 
-def release(**kwargs):
-    b = compiler(**kwargs)
+def release(builddir='fbuild/release',**kwargs):
+    b = compiler(builddir=builddir, **kwargs)
+    mkdir(builddir)
     detect(b)
     b.optimize()
-    make(b, 'fbuild/release')
+    make(b)
 
-def debug(**kwargs):
-    b = compiler(**kwargs)
+def debug(builddir='fbuild/debug',**kwargs):
+    b = compiler(builddir=builddir, **kwargs)
+    mkdir(builddir)
     detect(b)
     b.debug()
     b.define('DEBUG')
-    make(b, 'fbuild/debug')
+    make(b)
 
-def profile(**kwargs):
-    b = compiler(**kwargs)
+def profile(builddir='fbuild/profile',**kwargs):
+    b = compiler(builddir=builddir, **kwargs)
+    mkdir(builddir)
     detect(b)
     b.profile()
-    make(b, 'fbuild/profile')
+    make(b)
 
-def static(**kwargs):
-    b = compiler(**kwargs)
+def static(builddir='fbuild/static', **kwargs):
+    b = compiler(builddir=builddir, **kwargs)
+    mkdir(builddir)
     b.incpath('deps/incs')
     b.libpath('deps/libs')
     detect(b)
@@ -281,8 +285,8 @@ def static(**kwargs):
     p = os.popen(b.cc + ' -print-file-name=libstdc++.a')
     stdcxx = p.read().strip()
     run('ln', '-sf', stdcxx)
-    make(b, 'fbuild/static')
-    run('strip', 'fbuild/static/boswars')
+    make(b)
+    run('strip', builddir + '/boswars')
 
 def clean():
     autoclean()
