@@ -68,7 +68,7 @@ DefineUnitType("unit-hotspot", {
     AnnoyComputerFactor = 0,
     Points = 0,
     ExplodeWhenKilled = "missile-64x64-explosion",
-    Corpse = "unit-destroyed-1x1-place",
+    Corpse = "unit-destroyed-2x2-place",
     Type = "land",
     Building = true,
     VisibleUnderFog = true,

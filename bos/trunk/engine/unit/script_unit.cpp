@@ -828,9 +828,11 @@ static int CclOrderUnit(lua_State *l)
 	lua_pushvalue(l, 1);
 	plynr = TriggerGetPlayer(l);
 	lua_pop(l, 1);
+
 	lua_pushvalue(l, 2);
 	unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
+
 	LuaCheckTable(l, 3);
 	x1 = LuaToNumber(l, 3, 1);
 	y1 = LuaToNumber(l, 3, 2);
@@ -841,6 +843,7 @@ static int CclOrderUnit(lua_State *l)
 		x2 = x1;
 		y2 = y1;
 	}
+
 	LuaCheckTable(l, 4);
 	dx1 = LuaToNumber(l, 4, 1);
 	dy1 = LuaToNumber(l, 4, 2);
@@ -851,11 +854,15 @@ static int CclOrderUnit(lua_State *l)
 		dx2 = dx1;
 		dy2 = dy1;
 	}
+
 	order = LuaToString(l, 5);
 
 	an = UnitCache.Select(x1, y1, x2 + 1, y2 + 1, table, UnitMax);
 	for (j = 0; j < an; ++j) {
 		unit = table[j];
+		if (unit->Destroyed || unit->Orders[0]->Action == UnitActionDie) {
+			continue;
+		}
 		if (unittype == ANY_UNIT ||
 				(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
 				(unittype == ALL_BUILDINGS && unit->Type->Building) ||
@@ -970,6 +977,9 @@ static int CclKillUnitAt(lua_State *l)
 	an = UnitCache.Select(x1, y1, x2 + 1, y2 + 1, table, UnitMax);
 	for (j = s = 0; j < an && s < q; ++j) {
 		unit = table[j];
+		if (unit->Destroyed || unit->Orders[0]->Action == UnitActionDie) {
+			continue;
+		}
 		if (unittype == ANY_UNIT ||
 				(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
 				(unittype == ALL_BUILDINGS && unit->Type->Building) ||
