@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Build static binary without requiring apg++ from autopackage (Francois Beerten)
 - Fixed bug #29100: Cannot translate resource names shown in map editor (Jimmy Salmon)
 - Add build script using fabricate (Francois Beerten)
 - Add moon patches (TimberDragon)
