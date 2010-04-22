@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: boswars 2.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-10 09:24+0200\n"
+"POT-Creation-Date: 2010-04-21 20:58-0700\n"
 "PO-Revision-Date: 2010-03-06 00:52+0200\n"
 "Last-Translator: Kalle Olavi Niemitalo <kon@iki.fi>\n"
 "Language-Team: Kimmo Kalevi Merikivi <fi@li.org>\n"
@@ -166,20 +166,20 @@ msgstr "Tämän yksikkötyypin yläraja (%d) saavutettu."
 msgid "Cannot create more units."
 msgstr "Ei voi tehdä enempää yksiköitä."
 
-#: game/replay.cpp:788
+#: game/replay.cpp:766
 msgid "No sync info for this replay !"
 msgstr "Ajastusinformaatio puuttuu"
 
-#: game/replay.cpp:790
+#: game/replay.cpp:768
 #, c-format
 msgid "Replay got out of sync (%lu) !"
 msgstr "Nauhoitteen ajastus pielessä (%lu)"
 
-#: game/replay.cpp:799
+#: game/replay.cpp:777
 msgid "Replay got out of sync !"
 msgstr "Nauhoitteen ajastus pielessä"
 
-#: game/replay.cpp:897 game/replay.cpp:911
+#: game/replay.cpp:875 game/replay.cpp:889
 msgid "End of replay"
 msgstr "Nauhoitteen loppu"
 
@@ -201,7 +201,7 @@ msgstr "Odotetaan pelaajaa \"%s\": %d:%02d"
 msgid "Timed out"
 msgstr "Aikakatkaisu"
 
-#: stratagus/stratagus.cpp:592
+#: stratagus/stratagus.cpp:596
 msgid "Thanks for playing Bos Wars.\n"
 msgstr "Kiitos, kun pelasit Bos Warsia.\n"
 
@@ -234,7 +234,7 @@ msgstr "Musiikki pois."
 msgid "Music is on."
 msgstr "Musiikki päällä."
 
-#: ui/interface.cpp:292 ui/mouse.cpp:1613
+#: ui/interface.cpp:292 ui/mouse.cpp:1612
 msgid "Game Paused"
 msgstr "Tauko"
 
@@ -270,7 +270,7 @@ msgstr "Maasto piilotettu."
 msgid "Grab mouse toggled."
 msgstr "Hiiren karkaaminen estetty."
 
-#: ui/interface.cpp:936
+#: ui/interface.cpp:935
 msgid "Screenshot made."
 msgstr "Kuvaruutu kaapattu."
 
@@ -303,36 +303,28 @@ msgstr "Vaurio: "
 msgid "Mana: "
 msgstr "Mana: "
 
-#: ui/mainscr.cpp:375
-msgid "Energy"
-msgstr "Energia"
-
-#: ui/mainscr.cpp:375
-msgid "Magma"
-msgstr "Magma"
-
-#: ui/mainscr.cpp:601
+#: ui/mainscr.cpp:600
 #, c-format
 msgid "Last message repeated ~<%d~> times"
 msgstr "Viimeisin viesti ~<%d~> kertaa"
 
-#: ui/mainscr.cpp:733
+#: ui/mainscr.cpp:732
 #, c-format
 msgid "~<Event: %s~>"
 msgstr "~<Tapahtuma: %s~>"
 
 # Miten tähänkin muka saa partitiivin... no otetaan edes "s" pois.
-#: ui/mouse.cpp:1778
+#: ui/mouse.cpp:1777
 #, c-format
 msgid "You have ~<%d~> %ss"
 msgstr "Sinulla on ~<%d~> %s"
 
-#: ui/mouse.cpp:1782
+#: ui/mouse.cpp:1781
 #, c-format
 msgid "You have ~<1~> %s"
 msgstr "Sinulla on ~<1~> %s"
 
-#: unit/unit.cpp:2150
+#: unit/unit.cpp:2169
 #, c-format
 msgid "%s attacked"
 msgstr "%s hyökkäyksen kohteena!"
@@ -340,3 +332,9 @@ msgstr "%s hyökkäyksen kohteena!"
 #: video/sdl.cpp:285
 msgid "esc"
 msgstr "esc"
+
+#~ msgid "Energy"
+#~ msgstr "Energia"
+
+#~ msgid "Magma"
+#~ msgstr "Magma"

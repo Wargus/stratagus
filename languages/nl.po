@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-10 09:24+0200\n"
+"POT-Creation-Date: 2010-04-21 20:58-0700\n"
 "PO-Revision-Date: 2007-12-15 01:30+0100\n"
 "Last-Translator: Eric Kok <erickok@gmail.com>\n"
 "Language-Team: Dutch <foppe.benedictus@gmail.com>\n"
@@ -158,20 +158,20 @@ msgstr "Limiet van %d bereikt voor dit eenheidtype"
 msgid "Cannot create more units."
 msgstr "Kan niet meer eenheden produceren."
 
-#: game/replay.cpp:788
+#: game/replay.cpp:766
 msgid "No sync info for this replay !"
 msgstr "Geen synchronisatieinfo voor deze herhaling !"
 
-#: game/replay.cpp:790
+#: game/replay.cpp:768
 #, c-format
 msgid "Replay got out of sync (%lu) !"
 msgstr "Herhalingsynchronisatieprobleem (%lu) !"
 
-#: game/replay.cpp:799
+#: game/replay.cpp:777
 msgid "Replay got out of sync !"
 msgstr "Herhalingsynchronisatieprobleem"
 
-#: game/replay.cpp:897 game/replay.cpp:911
+#: game/replay.cpp:875 game/replay.cpp:889
 msgid "End of replay"
 msgstr "Einde van herhaling"
 
@@ -193,7 +193,7 @@ msgstr "Wacht op speler \"%s\": %d:%02d"
 msgid "Timed out"
 msgstr "Tijdslimiet verstreken"
 
-#: stratagus/stratagus.cpp:592
+#: stratagus/stratagus.cpp:596
 msgid "Thanks for playing Bos Wars.\n"
 msgstr "Bedankt voor het spelen van Bos Wars.\n"
 
@@ -226,7 +226,7 @@ msgstr "Muziek staat aan."
 msgid "Music is on."
 msgstr "Muziek staat uit."
 
-#: ui/interface.cpp:292 ui/mouse.cpp:1613
+#: ui/interface.cpp:292 ui/mouse.cpp:1612
 msgid "Game Paused"
 msgstr "Spel gepauzeerd"
 
@@ -262,7 +262,7 @@ msgstr "Terrein verborgen."
 msgid "Grab mouse toggled."
 msgstr "Muis 'vast in venster' aan/uit"
 
-#: ui/interface.cpp:936
+#: ui/interface.cpp:935
 msgid "Screenshot made."
 msgstr "Screenshot gemaakt."
 
@@ -294,34 +294,27 @@ msgstr ""
 msgid "Mana: "
 msgstr ""
 
-#: ui/mainscr.cpp:375
-msgid "Energy"
-msgstr "Energie"
-
-#: ui/mainscr.cpp:375
-msgid "Magma"
-msgstr "Magma"
-
-#: ui/mainscr.cpp:601
+#: ui/mainscr.cpp:600
 #, c-format
 msgid "Last message repeated ~<%d~> times"
 msgstr "Laatste bericht ~<%d~> keren herhaald"
 
-#: ui/mainscr.cpp:733
+#: ui/mainscr.cpp:732
 #, c-format
 msgid "~<Event: %s~>"
 msgstr "~<Evenement: %s~>"
 
-#: ui/mouse.cpp:1778
+#: ui/mouse.cpp:1777
 #, c-format
 msgid "You have ~<%d~> %ss"
 msgstr "Je hebt ~<%d~> %ss"
 
-#: ui/mouse.cpp:1782
+#: ui/mouse.cpp:1781
+#, c-format
 msgid "You have ~<1~> %s"
 msgstr "Je hebt ~<1~> %s"
 
-#: unit/unit.cpp:2150
+#: unit/unit.cpp:2169
 #, c-format
 msgid "%s attacked"
 msgstr "%s aangevallen"
@@ -330,3 +323,8 @@ msgstr "%s aangevallen"
 msgid "esc"
 msgstr ""
 
+#~ msgid "Energy"
+#~ msgstr "Energie"
+
+#~ msgid "Magma"
+#~ msgstr "Magma"

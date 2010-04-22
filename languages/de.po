@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: de\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-10 09:24+0200\n"
+"POT-Creation-Date: 2010-04-21 20:58-0700\n"
 "PO-Revision-Date: 2006-05-05 18:31+0200\n"
 "Last-Translator: Dirk\n"
 "Language-Team:  <de@li.org>\n"
@@ -169,20 +169,20 @@ msgstr ""
 msgid "Cannot create more units."
 msgstr "Kann nicht mehr Einheiten bauen"
 
-#: game/replay.cpp:788
+#: game/replay.cpp:766
 msgid "No sync info for this replay !"
 msgstr "Keine Synchronisationsdaten für diese Aufnahme gefunden !"
 
-#: game/replay.cpp:790
+#: game/replay.cpp:768
 #, c-format
 msgid "Replay got out of sync (%lu) !"
 msgstr "Aufnahme hat Synchronisation verloren (%lu) !"
 
-#: game/replay.cpp:799
+#: game/replay.cpp:777
 msgid "Replay got out of sync !"
 msgstr "Aufnahme hat Synchronisation verloren !"
 
-#: game/replay.cpp:897 game/replay.cpp:911
+#: game/replay.cpp:875 game/replay.cpp:889
 msgid "End of replay"
 msgstr "Ende der Aufnahme"
 
@@ -204,7 +204,7 @@ msgstr "Warten auf Spieler \"%s\": %d:%02d"
 msgid "Timed out"
 msgstr "Zeit abgelaufen"
 
-#: stratagus/stratagus.cpp:592
+#: stratagus/stratagus.cpp:596
 msgid "Thanks for playing Bos Wars.\n"
 msgstr "Danke, dass Sie Bos Wars gespielt haben.\n"
 
@@ -237,7 +237,7 @@ msgstr "Musik ist deaktiviert."
 msgid "Music is on."
 msgstr "Musik ist aktiviert."
 
-#: ui/interface.cpp:292 ui/mouse.cpp:1613
+#: ui/interface.cpp:292 ui/mouse.cpp:1612
 msgid "Game Paused"
 msgstr "Spiel pausiert"
 
@@ -273,7 +273,7 @@ msgstr "Terrain versteckt."
 msgid "Grab mouse toggled."
 msgstr "Maus fesseln umgeschaltet"
 
-#: ui/interface.cpp:936
+#: ui/interface.cpp:935
 msgid "Screenshot made."
 msgstr "Screenshot erstellt."
 
@@ -305,35 +305,27 @@ msgstr ""
 msgid "Mana: "
 msgstr ""
 
-#: ui/mainscr.cpp:375
-msgid "Energy"
-msgstr "Energie"
-
-#: ui/mainscr.cpp:375
-msgid "Magma"
-msgstr "Magma"
-
-#: ui/mainscr.cpp:601
+#: ui/mainscr.cpp:600
 #, c-format
 msgid "Last message repeated ~<%d~> times"
 msgstr "Letzte Nachricht wurde ~<%d~> mal wiederholt"
 
-#: ui/mainscr.cpp:733
+#: ui/mainscr.cpp:732
 #, c-format
 msgid "~<Event: %s~>"
 msgstr "~<Ereignis: %s~>"
 
-#: ui/mouse.cpp:1778
+#: ui/mouse.cpp:1777
 #, c-format
 msgid "You have ~<%d~> %ss"
 msgstr "Sie haben ~<%d~> %ss"
 
-#: ui/mouse.cpp:1782
+#: ui/mouse.cpp:1781
 #, c-format
 msgid "You have ~<1~> %s"
 msgstr "Sie haben ~<1~> %s"
 
-#: unit/unit.cpp:2150
+#: unit/unit.cpp:2169
 #, c-format
 msgid "%s attacked"
 msgstr "%s wird attackiert"
@@ -341,3 +333,9 @@ msgstr "%s wird attackiert"
 #: video/sdl.cpp:285
 msgid "esc"
 msgstr ""
+
+#~ msgid "Energy"
+#~ msgstr "Energie"
+
+#~ msgid "Magma"
+#~ msgstr "Magma"

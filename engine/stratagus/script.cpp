@@ -723,6 +723,26 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 }
 
 /**
+**  Define default names for the resources.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineDefaultDisplayResourceNames(lua_State *l)
+{
+	int i;
+	int args;
+
+	for (i = 0; i < MaxCosts; ++i) {
+		DefaultDisplayResourceNames[i].clear();
+	}
+	args = lua_gettop(l);
+	for (i = 0; i < MaxCosts && i < args; ++i) {
+		DefaultDisplayResourceNames[i] = LuaToString(l, i + 1);
+	}
+	return 0;
+}
+
+/**
 **  Compiled with sound.
 **
 **  @param l  Lua state.
@@ -825,6 +845,7 @@ void InitCcl(void)
 	lua_register(Lua, "SetSpeeds", CclSetSpeeds);
 
 	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
+	lua_register(Lua, "DefineDefaultDisplayResourceNames", CclDefineDefaultDisplayResourceNames);
 	lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);
 
 	lua_register(Lua, "SavePreferences", CclSavePreferences);

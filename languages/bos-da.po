@@ -7,212 +7,220 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-10 09:24+0200\n"
+"POT-Creation-Date: 2010-04-21 20:58-0700\n"
 "PO-Revision-Date: 2006-12-25 22:11+0100\n"
 "Last-Translator: Bent Jakobsen <jakobsen.bent@gmail.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: scripts/boswars.lua:239
+#: scripts/boswars.lua:120 scripts/menus/ingame/editor.lua:195
+msgid "Energy"
+msgstr "Energi"
+
+#: scripts/boswars.lua:120 scripts/menus/ingame/editor.lua:207
+msgid "Magma"
+msgstr "Magma"
+
+#: scripts/boswars.lua:240
 msgid "Eliminate your enemies."
 msgstr "Udryd dine fjender."
 
-#: scripts/guichan.lua:383
+#: scripts/guichan.lua:384
 msgid "Victory !"
 msgstr "Sejr !"
 
-#: scripts/guichan.lua:386
+#: scripts/guichan.lua:387
 msgid "Draw !"
 msgstr "Træk !"
 
-#: scripts/guichan.lua:388
+#: scripts/guichan.lua:389
 msgid "Defeat !"
 msgstr "Besejret !"
 
-#: scripts/guichan.lua:395
+#: scripts/guichan.lua:396
 msgid "Cheater"
 msgstr ""
 
-#: scripts/guichan.lua:398
+#: scripts/guichan.lua:399
 msgid "Results"
 msgstr "Resultater"
 
-#: scripts/guichan.lua:404
+#: scripts/guichan.lua:405
 msgid "Player"
 msgstr "Spiller"
 
-#: scripts/guichan.lua:405
+#: scripts/guichan.lua:406
 msgid "Units"
 msgstr "Enheder"
 
-#: scripts/guichan.lua:406
+#: scripts/guichan.lua:407
 msgid "Buildings"
 msgstr "Bygninger"
 
-#: scripts/guichan.lua:407
+#: scripts/guichan.lua:408
 msgid "Kills"
 msgstr "Drab"
 
-#: scripts/guichan.lua:408
+#: scripts/guichan.lua:409
 msgid "Razings"
 msgstr "Opførsler"
 
-#: scripts/guichan.lua:425
+#: scripts/guichan.lua:426
 msgid "~!Continue"
 msgstr "~!Forsæt"
 
-#: scripts/guichan.lua:523
+#: scripts/guichan.lua:524
 msgid "Start Game"
 msgstr "Start spil"
 
-#: scripts/guichan.lua:525 scripts/guichan.lua:747
+#: scripts/guichan.lua:526 scripts/guichan.lua:748
 #: scripts/menus/network.lua:130 scripts/menus/network.lua:318
 msgid "Map"
 msgstr "Kort"
 
-#: scripts/guichan.lua:526 scripts/guichan.lua:748
+#: scripts/guichan.lua:527 scripts/guichan.lua:749
 #: scripts/menus/network.lua:131 scripts/menus/network.lua:319
 #: scripts/menus/network.lua:419
 msgid "File:"
 msgstr "Fil:"
 
-#: scripts/guichan.lua:529 scripts/guichan.lua:714 scripts/guichan.lua:752
+#: scripts/guichan.lua:530 scripts/guichan.lua:715 scripts/guichan.lua:753
 #: scripts/menus/ingame/editor.lua:109 scripts/menus/network.lua:424
 #: scripts/menus/patch.lua:53
 msgid "Size:"
 msgstr "Størrelse:"
 
-#: scripts/guichan.lua:532 scripts/guichan.lua:750
+#: scripts/guichan.lua:533 scripts/guichan.lua:751
 #: scripts/menus/network.lua:134 scripts/menus/network.lua:322
 #: scripts/menus/network.lua:422
 msgid "Players:"
 msgstr "Spillere:"
 
-#: scripts/guichan.lua:534 scripts/guichan.lua:754
+#: scripts/guichan.lua:535 scripts/guichan.lua:755
 #: scripts/menus/network.lua:136 scripts/menus/network.lua:324
 #: scripts/menus/network.lua:426
 msgid "Description:"
 msgstr "Beskrivelse:"
 
-#: scripts/guichan.lua:538 scripts/menus/network.lua:140
+#: scripts/guichan.lua:539 scripts/menus/network.lua:140
 #: scripts/menus/network.lua:333
 msgid "Fog of war"
 msgstr "Krigs skygge"
 
-#: scripts/guichan.lua:541 scripts/guichan.lua:607
+#: scripts/guichan.lua:542 scripts/guichan.lua:608
 #: scripts/menus/network.lua:144 scripts/menus/network.lua:340
 msgid "Reveal map"
 msgstr "Afslør kort"
 
-#: scripts/guichan.lua:545 scripts/menus/network.lua:147
+#: scripts/guichan.lua:546 scripts/menus/network.lua:147
 #: scripts/menus/network.lua:342
 msgid "Difficulty:"
 msgstr "Sværhedsgrad:"
 
-#: scripts/guichan.lua:546 scripts/menus/network.lua:148
+#: scripts/guichan.lua:547 scripts/menus/network.lua:148
 #: scripts/menus/network.lua:343
 msgid "easy"
 msgstr "let"
 
-#: scripts/guichan.lua:546 scripts/guichan.lua:550
+#: scripts/guichan.lua:547 scripts/guichan.lua:551
 #: scripts/menus/network.lua:148 scripts/menus/network.lua:152
 #: scripts/menus/network.lua:343 scripts/menus/network.lua:351
 msgid "normal"
 msgstr "normal"
 
-#: scripts/guichan.lua:546 scripts/menus/network.lua:148
+#: scripts/guichan.lua:547 scripts/menus/network.lua:148
 #: scripts/menus/network.lua:343
 msgid "hard"
 msgstr "svær"
 
-#: scripts/guichan.lua:549 scripts/menus/network.lua:151
+#: scripts/guichan.lua:550 scripts/menus/network.lua:151
 #: scripts/menus/network.lua:350
 msgid "Starting resources:"
 msgstr "Start resourcer:"
 
-#: scripts/guichan.lua:550 scripts/menus/network.lua:152
+#: scripts/guichan.lua:551 scripts/menus/network.lua:152
 #: scripts/menus/network.lua:351
 msgid "high"
 msgstr "høj"
 
-#: scripts/guichan.lua:550 scripts/menus/network.lua:152
+#: scripts/guichan.lua:551 scripts/menus/network.lua:152
 #: scripts/menus/network.lua:351
 msgid "low"
 msgstr "lav"
 
-#: scripts/guichan.lua:553 scripts/menus/network.lua:155
+#: scripts/guichan.lua:554 scripts/menus/network.lua:155
 #: scripts/menus/network.lua:358
 msgid "Game type:"
 msgstr "Spil type:"
 
-#: scripts/guichan.lua:554 scripts/menus/network.lua:156
+#: scripts/guichan.lua:555 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Map Default"
 msgstr "Kort Standard"
 
-#: scripts/guichan.lua:554 scripts/menus/network.lua:156
+#: scripts/guichan.lua:555 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Melee"
 msgstr "Melee"
 
-#: scripts/guichan.lua:554 scripts/menus/network.lua:156
+#: scripts/guichan.lua:555 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Free For All"
 msgstr "Frit for alle"
 
-#: scripts/guichan.lua:554 scripts/menus/network.lua:156
+#: scripts/guichan.lua:555 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Top vs Bottom"
 msgstr "Top imod Bund"
 
-#: scripts/guichan.lua:554 scripts/menus/network.lua:156
+#: scripts/guichan.lua:555 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Left vs Right"
 msgstr "Venstre mod Højre"
 
-#: scripts/guichan.lua:554 scripts/menus/network.lua:156
+#: scripts/guichan.lua:555 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Man vs Machine"
 msgstr "Menneske imod Maskine"
 
-#: scripts/guichan.lua:586 scripts/guichan.lua:618 scripts/guichan.lua:662
-#: scripts/guichan.lua:730 scripts/guichan.lua:782
+#: scripts/guichan.lua:587 scripts/guichan.lua:619 scripts/guichan.lua:663
+#: scripts/guichan.lua:731 scripts/guichan.lua:783
 #: scripts/menus/campaigns.lua:141 scripts/menus/credits.lua:141
 msgid "~!Main Menu"
 msgstr "~!Hovedmenu"
 
-#: scripts/guichan.lua:588 scripts/guichan.lua:620 scripts/guichan.lua:664
+#: scripts/guichan.lua:589 scripts/guichan.lua:621 scripts/guichan.lua:665
 #: scripts/menus/campaigns.lua:57 scripts/menus/campaigns.lua:143
 msgid "~!Start"
 msgstr "~!Start"
 
-#: scripts/guichan.lua:597
+#: scripts/guichan.lua:598
 msgid "Show a Replay"
 msgstr "Vis et replay"
 
-#: scripts/guichan.lua:631
+#: scripts/guichan.lua:632
 msgid "Load Game"
 msgstr "Hent spil"
 
-#: scripts/guichan.lua:675 scripts/guichan.lua:698 scripts/guichan.lua:745
+#: scripts/guichan.lua:676 scripts/guichan.lua:699 scripts/guichan.lua:746
 msgid "Editor"
 msgstr "Editor"
 
-#: scripts/guichan.lua:677
+#: scripts/guichan.lua:678
 msgid "Create ~!New Map"
 msgstr "Opret ~!Nyt Kort"
 
-#: scripts/guichan.lua:679
+#: scripts/guichan.lua:680
 msgid "~!Load Map"
 msgstr "~!Hent Kort"
 
-#: scripts/guichan.lua:682
+#: scripts/guichan.lua:683
 #, fuzzy
 msgid "~!Patch Editor"
 msgstr "Start ~!Editor"
 
-#: scripts/guichan.lua:685 scripts/menus/ingame/editor.lua:87
+#: scripts/guichan.lua:686 scripts/menus/ingame/editor.lua:87
 #: scripts/menus/ingame/editor.lua:125 scripts/menus/ingame/editor.lua:230
 #: scripts/menus/ingame/game.lua:112 scripts/menus/ingame/game.lua:304
 #: scripts/menus/network.lua:177 scripts/menus/network.lua:243
@@ -223,39 +231,39 @@ msgstr "Start ~!Editor"
 msgid "~!Cancel"
 msgstr "~!Fortryd"
 
-#: scripts/guichan.lua:732 scripts/guichan.lua:784 scripts/guichan.lua:814
+#: scripts/guichan.lua:733 scripts/guichan.lua:785 scripts/guichan.lua:815
 msgid "Start ~!Editor"
 msgstr "Start ~!Editor"
 
-#: scripts/guichan.lua:805 scripts/menus/network.lua:381
+#: scripts/guichan.lua:806 scripts/menus/network.lua:381
 msgid "~!Start Game"
 msgstr "~!Start spil"
 
-#: scripts/guichan.lua:806
+#: scripts/guichan.lua:807
 msgid "~!Load Game"
 msgstr "~!Hent Spil"
 
-#: scripts/guichan.lua:807
+#: scripts/guichan.lua:808
 msgid "~!Campaigns"
 msgstr "~!Kampagner"
 
-#: scripts/guichan.lua:808
+#: scripts/guichan.lua:809
 msgid "Show ~!Replay"
 msgstr "Vis ~!Replay"
 
-#: scripts/guichan.lua:810
+#: scripts/guichan.lua:811
 msgid "~!MultiPlayer"
 msgstr "~!FlereSpillere"
 
-#: scripts/guichan.lua:811
+#: scripts/guichan.lua:812
 msgid "~!Options"
 msgstr "~!Muligheder"
 
-#: scripts/guichan.lua:813
+#: scripts/guichan.lua:814
 msgid "Cre~!dits"
 msgstr "Kre~!dit"
 
-#: scripts/guichan.lua:816
+#: scripts/guichan.lua:817
 msgid "E~!xit"
 msgstr "A~!fslut"
 
@@ -399,14 +407,6 @@ msgstr "Ingen"
 #: scripts/menus/ingame/editor.lua:168
 msgid "AI"
 msgstr "KI"
-
-#: scripts/menus/ingame/editor.lua:195
-msgid "Energy"
-msgstr "Energi"
-
-#: scripts/menus/ingame/editor.lua:207
-msgid "Magma"
-msgstr "Magma"
 
 #: scripts/menus/ingame/game.lua:57
 msgid "Game Menu"
@@ -1140,4 +1140,3 @@ msgstr "Opret ~!Nyt Kort"
 #, fuzzy
 msgid "~!Load Patch"
 msgstr "~!Hent Kort"
-
