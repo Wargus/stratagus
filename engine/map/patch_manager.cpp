@@ -67,6 +67,11 @@ CPatchManager::~CPatchManager()
 void
 CPatchManager::updateMapFlags(int x1, int y1, int x2, int y2)
 {
+	// The patch editor doesn't have a fully initialized map
+	if (!Map.Fields) {
+		return;
+	}
+
 	x1 = std::max(x1, 0);
 	y1 = std::max(y1, 0);
 	x2 = std::min(x2, Map.Info.MapWidth - 1);
