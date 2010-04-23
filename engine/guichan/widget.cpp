@@ -62,6 +62,7 @@
 #include "guichan/widget.h"
 
 #include <iostream>
+#include <string.h>
 
 #include "guichan/sdl/sdlinput.h"
 #include "SDL.h"
