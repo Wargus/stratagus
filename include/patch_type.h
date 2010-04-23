@@ -40,8 +40,8 @@ public:
 	**  Patch type constructor
 	*/
 	CPatchType(const std::string &name, const std::string &file,
-	           int tileWidth, int tileHeight, unsigned short *flags) :
-		name(name), file(file), graphic(NULL), tileWidth(tileWidth), tileHeight(tileHeight)
+	           int tileWidth, int tileHeight, unsigned short *flags, bool customPatch) :
+		name(name), file(file), graphic(NULL), tileWidth(tileWidth), tileHeight(tileHeight), customPatch(customPatch)
 	{
 		this->flags = new unsigned short[this->tileWidth * this->tileHeight];
 		memcpy(this->flags, flags, this->tileWidth * this->tileHeight * sizeof(unsigned short));
@@ -127,6 +127,14 @@ public:
 		return this->flags;
 	}
 
+	/**
+	**  Is this a custom patch
+	*/
+	inline bool isCustomPatch()
+	{
+		return this->customPatch;
+	}
+
 private:
 	std::string name;
 	std::string file;
@@ -134,6 +142,7 @@ private:
 	int tileWidth;
 	int tileHeight;
 	unsigned short *flags;
+	bool customPatch;
 };
 
 //@}
