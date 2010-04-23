@@ -27,7 +27,7 @@ from fabricate import *
 
 target = 'boswars'
 gccflags = '-Wall -fsigned-char -D_GNU_SOURCE=1 -D_REENTRANT'.split()
-incpaths = 'engine/include engine/guichan/include /usr/include/SDL'.split()
+incpaths = 'engine/include engine/guichan/include'.split()
 
 def find(startdir, pattern):
     import fnmatch
@@ -41,13 +41,15 @@ def find(startdir, pattern):
 sources = find('engine', '*.cpp')
 
 class Gcc(object):
-  def __init__(self, cflags=[], ldflags=[], cc='g++', builddir='fbuild'):
+  def __init__(self, cflags=[], ldflags=[], cc='g++', builddir='fbuild', 
+                      usepkgconfig=True):
      self.cflags = gccflags + list(cflags)
      self.ldflags = list(ldflags)
      self.cc = cc
      self.builddir = builddir
+     self.usepkgconfig = usepkgconfig
   def copy(self):
-     g = Gcc(self.cflags, self.ldflags, self.cc, self.builddir)
+     g = Gcc(self.cflags, self.ldflags, self.cc, self.builddir, self.usepkgconfig)
      return g
   def oname(self, source):
      base = os.path.splitext(source)[0]
@@ -116,6 +118,14 @@ def Check(b, lib=None, header='', function='', name=''):
        return False
     return True
 
+def pkgconfig(b, package):
+    try:
+        b.cflags += shell('pkg-config', '--cflags', package).strip().split()
+        b.ldflags += shell('pkg-config', '--libs', package).strip().split()
+    except ExecutionError, e:
+        return False
+    return True
+
 def CheckLib(b, lib, header=''):
     if Check(b, lib, header):
        b.lib(lib)
@@ -136,10 +146,14 @@ def CheckLibAlternatives(b, libs, header=''):
 
 def detectLua(b):
     libs = 'lua lua5.1 lua51'.split()
-    r = CheckLibAlternatives(b, libs, header='lua.h')
-    if not r:
-       print('Did not find the Lua library, exiting !')
-       sys.exit(1)
+    if CheckLibAlternatives(b, libs, header='lua.h'):
+        return
+    if b.usepkgconfig:
+        for i in libs:
+            if pkgconfig(b, i):
+                return
+    print('Did not find the Lua library, exiting !')
+    sys.exit(1)
 
 def detectOpenGl(b):
     libs = 'GL opengl3 opengl32'.split()
@@ -150,11 +164,20 @@ def detectOpenGl(b):
        print('Did not find the OpenGL library, exiting !')
        sys.exit(1)
 
+def detectSdl(b):
+    b.incpath('/usr/include/SDL')
+    if CheckLib(b, 'SDL', header='SDL.h'):
+        return
+    r = pkgconfig(b, 'sdl')
+    if not r:
+       print('Did not find the SDL library, exiting !')
+       sys.exit(1)
+
 def detectAlwaysDynamic(b):
     RequireLib(b, 'png', 'png.h')
     RequireLib(b, 'z', 'zlib.h')
     detectOpenGl(b)
-    RequireLib(b, 'SDL')
+    detectSdl(b)
     if Check(b, function='strcasestr'):
        b.define('HAVE_STRCASESTR')
     if Check(b, function='strnlen'):
@@ -222,10 +245,10 @@ class StaticGcc(Gcc):
         super(StaticGcc, self).lib(*names)
         self.ldflags += ['-Wl,-Bdynamic']
     def  copy(self):
-        return StaticGcc(self.cflags,self.ldflags,self.cc,self.builddir)
+        return StaticGcc(self.cflags, self.ldflags, self.cc, self.builddir, self.usepkgconfig)
 
 def static(builddir='fbuild/static', **kwargs):
-    b = compiler(builddir=builddir, **kwargs)
+    b = compiler(builddir=builddir, usepkgconfig=False, **kwargs)
     b.incpath('engine/apbuild')
     b.incpath('deps/incs')
     b.libpath('deps/libs')
@@ -256,7 +279,7 @@ def static(builddir='fbuild/static', **kwargs):
     make(b)
 
 def mingw(builddir='fbuild/mingw', cc='i486-mingw32-g++', **kwargs):
-    b = compiler(builddir=builddir, cc=cc, **kwargs)
+    b = compiler(builddir=builddir, cc=cc, usepkgconfig=False, **kwargs)
     b.define('USE_WIN32')
     b.incpath('mingwdeps/include')
     b.libpath('mingwdeps/lib')
