@@ -294,7 +294,8 @@ def static(builddir='fbuild/static', **kwargs):
         '-Wl,--hash-style=both', # By default FC6 only generates a .gnu.hash section
                               # Do all main distros support .gnu.hash now ?
         '-static-libgcc',
-        '-Wl,-Bstatic', '-lstdc++', '-llua', '-Wl,-Bdynamic',
+        '-Wl,-Bstatic', '-lstdc++', '-Wl,-Bdynamic',
+        '-Wl,-s'
         ]
     p = os.popen(b.cc + ' -print-file-name=libstdc++.a')
     stdcxx = p.read().strip()
@@ -308,7 +309,6 @@ def static(builddir='fbuild/static', **kwargs):
     b.libpath('.')
     p = os.popen(b.cc + ' -print-file-name=libstdc++.a')
     make(b)
-    run('strip', builddir + '/boswars')
 
 def clean():
     autoclean()
