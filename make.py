@@ -82,62 +82,8 @@ class Gcc(object):
      flags = [] + flags + self.ldflags + self.cflags
      run(self.cc, sources, '-o', target, flags)
 
-class Msvc:
-  ''' UNTESTED !!!! '''
-  def __init__(self, cflags=[], ldflags=[], cc='cl.exe', builddir='fbuild/release'):
-     self.cflags = ['/Wall', '/DUSE_WIN32'] + list(cflags)
-     self.ldflags = list(ldflags)
-     self.cc = 'cl.exe'
-     self.linker = 'link.exe'
-     self.builddir = builddir
-  def copy(self):
-     g = Msvc(self.cflags, self.ldflags, self.cc)
-     return g
-  def normalize(self, path):
-     return path.replace('/','\\')
-  def oname(self, source):
-     base = os.path.splitext(source)[0]
-     return '%s.obj' % (base)
-  def lib(self, name):
-     self.ldflags += [self.normalize(name)+'.lib']
-  def incpath(self, name):
-     self.cflags += ['/I', self.normalize(name)]
-  def libpath(self, name):
-     self.ldflags += ['/LIBPATH:' + self.normalize(name)]
-  def define(self,name, value=''):
-     if value:
-       name += '='+value
-     self.cflags += ['/D'+name]
-  def debug(self):
-     self.ldflags += ['/Zi']
-     self.ldflags += ['/DEBUG']
-  def optimize(self, level=2):
-     self.cflags += ['/O2']
-  def profile(self):
-     raise Exception('Not supported')
-  def cxx(self, target, sources, flags=[]):
-     cflags = []+flags + self.cflags
-     target = self.normalize(self.oname(target))
-     sources = [self.normalize(s) for s in sources]
-     run(self.cc, '/c', s, '/OUT', target, cflags)
-     return target
-  def ld(self, target, sources, flags=[]):
-     ldflags = flags + self.ldflags
-     objects = [self.normalize(self.oname(s)) for s in sources]
-     run(self.linker, objects, '/OUT:'+target+'.exe', ldflags)
-  def build(self, target, sources, flags=[]):
-     obj = self.normalize(self.oname(sources[0]))
-     self.cxx(obj, sources, flags)
-     self.ld(self.normalize(target), obj, flags)
-
 def compiler(**kwargs):
-    b = Gcc(**kwargs)
-    if Check(b, name='gcc'):
-        return b
-    b = Msvc(**kwargs)
-    if Check(b, name='msvc'):
-        return b
-    return None
+    return Gcc(**kwargs)
 
 
 def inBuildDir(source, builddir):
@@ -307,7 +253,6 @@ def static(builddir='fbuild/static', **kwargs):
     detectEmbedable(b)
     b.optimize()
     b.libpath('.')
-    p = os.popen(b.cc + ' -print-file-name=libstdc++.a')
     make(b)
 
 def clean():
