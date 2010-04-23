@@ -40,14 +40,14 @@ def find(startdir, pattern):
     
 sources = find('engine', '*.cpp')
 
-class Gcc:
+class Gcc(object):
   def __init__(self, cflags=[], ldflags=[], cc='g++', builddir='fbuild'):
      self.cflags = gccflags + list(cflags)
      self.ldflags = list(ldflags)
      self.cc = cc
      self.builddir = builddir
   def copy(self):
-     g = Gcc(self.cflags, self.ldflags, self.cc)
+     g = Gcc(self.cflags, self.ldflags, self.cc, self.builddir)
      return g
   def oname(self, source):
      base = os.path.splitext(source)[0]
@@ -204,10 +204,9 @@ def detectOpenGl(b):
        print('Did not find the OpenGL library, exiting !')
        sys.exit(1)
 
-def detect(b):
+def detectAlwaysDynamic(b):
     RequireLib(b, 'png', 'png.h')
     RequireLib(b, 'z', 'zlib.h')
-    detectLua(b)
     detectOpenGl(b)
     RequireLib(b, 'SDL')
     if Check(b, function='strcasestr'):
@@ -220,12 +219,19 @@ def detect(b):
        b.define('HAVE_X')
     for i in incpaths:
        b.incpath(i)
+
+def detectEmbedable(b):
+    detectLua(b)
     if CheckLib(b, 'vorbis'):
        b.define('USE_VORBIS')
     if CheckLib(b, 'theora'):
        b.define('USE_THEORA')
     if CheckLib(b, 'ogg'):
        b.define('USE_OGG')
+
+def detect(b):
+    detectAlwaysDynamic(b)
+    detectEmbedable(b)
 
 def compile(b):
     objects = [b.cxx(inBuildDir(s, b.builddir), s) for s in sources]
@@ -262,6 +268,16 @@ def profile(builddir='fbuild/profile',**kwargs):
     b.profile()
     make(b)
 
+class StaticGcc(Gcc):
+    def __init__(self,*args,**kwargs):
+        super(StaticGcc,self).__init__(*args,**kwargs)
+    def lib(self, *names):
+        self.ldflags += ['-Wl,-Bstatic']
+        super(StaticGcc, self).lib(*names)
+        self.ldflags += ['-Wl,-Bdynamic']
+    def  copy(self):
+        return StaticGcc(self.cflags,self.ldflags,self.cc,self.builddir)
+
 def static(builddir='fbuild/static', **kwargs):
     b = compiler(builddir=builddir, **kwargs)
     b.incpath('engine/apbuild')
@@ -280,21 +296,17 @@ def static(builddir='fbuild/static', **kwargs):
         '-static-libgcc',
         '-Wl,-Bstatic', '-lstdc++', '-llua', '-Wl,-Bdynamic',
         ]
-    mkdir(builddir)
-    detect(b)
-    staticlibs = 'lua lua5.1 lua51 vorbis theora ogg'.split()
-    for i in staticlibs:
-       lib = '-l'+i
-       if lib in b.ldflags:
-           b.ldflags.remove(lib)
-    b.cflags.remove('-DUSE_THEORA')
-    b.cflags.remove('-DUSE_VORBIS')
-    b.cflags.remove('-DUSE_OGG')
-    b.optimize()
-    b.libpath('.')
     p = os.popen(b.cc + ' -print-file-name=libstdc++.a')
     stdcxx = p.read().strip()
     run('ln', '-sf', stdcxx)
+    
+    mkdir(builddir)
+    detectAlwaysDynamic(b)
+    b = StaticGcc(b.cflags,b.ldflags, b.cc,b.builddir)
+    detectEmbedable(b)
+    b.optimize()
+    b.libpath('.')
+    p = os.popen(b.cc + ' -print-file-name=libstdc++.a')
     make(b)
     run('strip', builddir + '/boswars')
 
