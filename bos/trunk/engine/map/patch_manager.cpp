@@ -38,6 +38,7 @@
 #include "patch.h"
 #include "iolib.h"
 #include "map.h"
+#include "script.h"
 
 #include <algorithm>
 #include <sstream>
@@ -261,13 +262,19 @@ CPatchManager::clear()
 	clearPatches(this->patches);
 	clearPatches(this->removedPatches);
 
-	if (loadedAll) {
-		std::map<std::string, CPatchType *>::const_iterator i;
+	std::map<std::string, CPatchType *>::const_iterator i;
 
+	if (loadedAll) {
 		for (i = this->patchTypesMap.begin(); i != this->patchTypesMap.end(); ++i) {
 			i->second->clean();
 		}
 		loadedAll = false;
+	}
+	
+	for (i = this->patchTypesMap.begin(); i != this->patchTypesMap.end(); ++i) {
+		if (i->second->isCustomPatch()) {
+			i = this->patchTypesMap.erase(i);
+		}
 	}
 }
 
@@ -297,7 +304,7 @@ CPatchManager::newPatchType(const std::string &name, const std::string &file,
 		return this->patchTypesMap[name];
 	}
 
-	CPatchType *patchType = new CPatchType(name, file, tileWidth, tileHeight, flags);
+	CPatchType *patchType = new CPatchType(name, file, tileWidth, tileHeight, flags, !CclInConfigFile);
 	this->patchTypesMap[name] = patchType;
 
 	return patchType;
