@@ -255,6 +255,18 @@ def static(builddir='fbuild/static', **kwargs):
     b.libpath('.')
     make(b)
 
+def mingw(builddir='fbuild/mingw', cc='i486-mingw32-g++', **kwargs):
+    b = compiler(builddir=builddir, cc=cc, **kwargs)
+    b.define('USE_WIN32')
+    b.incpath('mingwdeps/include')
+    b.libpath('mingwdeps/lib')
+    b.lib('mingw32', 'SDLmain', 'wsock32', 'ws2_32')
+    b.ldflags += ['-mwindows']
+    mkdir(builddir)
+    detect(b)
+    b.cflags += ['-UHAVE_STRCASESTR','-UHAVE_STRNLEN']
+    make(b)
+
 def clean():
     autoclean()
 
