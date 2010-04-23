@@ -290,7 +290,7 @@ def static(builddir='fbuild/static', **kwargs):
         '-include', 'engine/apbuild/apsymbols.h',
        ]
     b.ldflags += [
-        #'-Wl,--as-needed',  # must be set after all object files or the binary breaks
+        '-Wl,--as-needed',  # must be set after all object files or the binary breaks
         '-Wl,--hash-style=both', # By default FC6 only generates a .gnu.hash section
                               # Do all main distros support .gnu.hash now ?
         '-static-libgcc',
