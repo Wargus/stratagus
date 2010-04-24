@@ -578,7 +578,7 @@ function RunStartGameMenu(s)
 
   AllowAllUnits()
   local function startgamebutton(s)
-    print("Starting map -------")
+    DebugPrint("Starting map -------")
     RunMap(browser:getSelectedMap(), nil, fow:isMarked(),
            revealmap:isMarked())
     PresentMap = OldPresentMap
@@ -608,7 +608,7 @@ function RunReplayMenu(s)
   local reveal = menu:addCheckBox(_("Reveal map"), 100, 250, function() end)
 
   function startreplaybutton(s)
-    print("Starting map -------")
+    DebugPrint("Starting map -------")
     ResetMapOptions()
     InitGameVariables()
     StartReplay("~logs/" .. browser:getSelectedItem(), reveal:isMarked())
@@ -634,7 +634,7 @@ function RunLoadGameMenu(s)
   local browser = menu:addBrowser("~save", lister, 
                                  Video.Width / 2 - 150, 100, 300, 200)
   function startgamebutton(s)
-      print("Starting saved game")
+      DebugPrint("Starting saved game")
       currentCampaign = nil
       loop = true
       while (loop) do

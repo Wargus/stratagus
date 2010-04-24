@@ -160,7 +160,6 @@ function RunJoiningMapMenu(s)
 
   local OldPresentMap = PresentMap
   PresentMap = function(description, nplayers, w, h, id)
-    print(description)
     players:setCaption(""..nplayers)
     descr:setCaption(description)
     numplayers = nplayers
@@ -429,7 +428,6 @@ function RunCreateMultiGameMenu(s)
 
   local OldPresentMap = PresentMap
   PresentMap = function(desc, nplayers, w, h, id)
-    print(description)
     numplayers = nplayers
     players:setCaption(""..numplayers)
     players:adjustSize()
@@ -443,7 +441,6 @@ function RunCreateMultiGameMenu(s)
   local browser = menu:addMapBrowser("maps/", sx*10, sy*2+20, sx*8, sy*11, mapfile)
   local function cb(s)
     mapfile = browser:getSelectedMap()
-    print(browser:getSelectedMap())
     Load(mapfile)
     maptext:setCaption(browser:getSelectedItem())
   end
@@ -453,7 +450,6 @@ function RunCreateMultiGameMenu(s)
                  function() menu:stop(1) end)
   menu:addButton(_("Create ~!Game"), Video.Width / 2 + 50, Video.Height - 100,
     function(s)    
-      print (description)
       RunServerMultiGameMenu(browser:getSelectedMap(), description, numplayers)
       menu:stop()
     end

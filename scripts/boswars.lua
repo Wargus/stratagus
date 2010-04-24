@@ -27,7 +27,14 @@
 --
 
 
-print("Bos Wars default config file loading ...\n")
+if (CompileFeature("DEBUG")) then
+  DebugPrint = print
+else
+  function DebugPrint(x) end
+end
+
+
+DebugPrint("Bos Wars default config file loading ...\n")
 
 -------------------------------------------------------------------------------
 --	Config-Part
@@ -49,7 +56,7 @@ playlist = {}
 local musiclist = ListFilesInDirectory("music/")
 for i,f in ipairs(musiclist) do
   if(string.find(f, ".ogg$") or string.find(f, ".wav$") or string.find(f, ".mp3$")) then 
-    print("Added music file:" .. f) 
+    DebugPrint("Added music file:" .. f) 
     playlist[i] = f
   end
 end
@@ -239,4 +246,4 @@ Load("scripts/patches.lua")
 
 default_objective = _("Eliminate your enemies.")
 
-print("... ready!")
+DebugPrint("... ready!")
