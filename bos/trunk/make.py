@@ -74,15 +74,14 @@ class Gcc(object):
   def cxx(self, target, source, flags=[]):
      cflags = flags + self.cflags
      target = self.oname(target)
-     run(self.cc, '-c', source, '-o', self.oname(target), cflags)
-     return target
+     return (self.cc, '-c', source, '-o', self.oname(target), cflags)
   def ld(self, target, sources, flags=[]):
      ldflags = flags + self.ldflags
      objects = [self.oname(s) for s in sources]
-     run(self.cc, objects, '-o', target, ldflags)
+     return (self.cc, objects, '-o', target, ldflags)
   def build(self, target, sources, flags=[]):
      flags = [] + flags + self.ldflags + self.cflags
-     run(self.cc, sources, '-o', target, flags)
+     return (self.cc, sources, '-o', target, flags)
 
 def compiler(**kwargs):
     return Gcc(**kwargs)
@@ -113,7 +112,7 @@ def Check(b, lib=None, header='', function='', name=''):
     if lib:
         t.lib(lib)
     try:
-       t.build(testname, [s])
+       run(*t.build(testname, [s]))
     except ExecutionError, e:
        return False
     return True
@@ -202,14 +201,18 @@ def detect(b):
     detectAlwaysDynamic(b)
     detectEmbedable(b)
 
+def runall(commands):
+    for i in commands:
+        run(*i)
+
 def compile(b):
-    objects = [b.cxx(inBuildDir(s, b.builddir), s) for s in sources]
-    return objects
+    commands = [b.cxx(inBuildDir(s, b.builddir), s) for s in sources]
+    runall(commands)
 
 def link(b):
     objects = [b.oname(inBuildDir(s, b.builddir)) for s in sources]
     apptarget = b.builddir + '/' + target
-    b.ld(apptarget, objects)
+    run(*b.ld(apptarget, objects))
 
 def make(b):
     compile(b)
