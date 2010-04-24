@@ -319,6 +319,13 @@ static void PatchEditorCallbackMouse(int x, int y)
 
 static void PatchEditorCallbackExit(void)
 {
+	// Disabled
+	if (!LeaveStops) {
+		return;
+	}
+
+	// Prevent scrolling while out of focus (on other applications) */
+	KeyScrollState = MouseScrollState = ScrollNone;
 }
 
 static void DrawPatch()
