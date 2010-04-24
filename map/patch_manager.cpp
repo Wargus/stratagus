@@ -273,9 +273,10 @@ CPatchManager::clear()
 	
 	i = this->patchTypesMap.begin();
 	while(i != this->patchTypesMap.end()) {
-	        std::map<std::string, CPatchType *>::iterator p = i;
-	        ++i;
+		std::map<std::string, CPatchType *>::iterator p = i;
+		++i;
 		if (p->second->isCustomPatch()) {
+			delete p->second;
 			this->patchTypesMap.erase(p);	
 		}
 	}
