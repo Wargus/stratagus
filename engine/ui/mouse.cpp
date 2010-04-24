@@ -573,10 +573,11 @@ void HandleMouseExit(void)
 	if (!LeaveStops) {
 		return;
 	}
+
 	// Denote cursor not on anything in window (used?)
 	CursorOn = CursorOnUnknown;
 
-	// Prevent scrolling while out of focus (on other applications) */
+	// Prevent scrolling while out of focus (on other applications)
 	KeyScrollState = MouseScrollState = ScrollNone;
 }
 

@@ -1696,6 +1696,16 @@ static void EditorCallbackMouse(int x, int y)
 */
 static void EditorCallbackExit()
 {
+	// Disabled
+	if (!LeaveStops) {
+		return;
+	}
+
+	// Denote cursor not on anything in window (used?)
+	CursorOn = CursorOnUnknown;
+
+	// Prevent scrolling while out of focus (on other applications) */
+	KeyScrollState = MouseScrollState = ScrollNone;
 }
 
 /**
