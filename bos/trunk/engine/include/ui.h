@@ -118,6 +118,7 @@ public:
 };
 
 #define MAX_NUM_VIEWPORTS 8         /// Number of supported viewports
+#define MAX_SAVED_MAP_POSITIONS 3   /// Number of supported saved map positions
 
 /**
 **  A map viewport.
@@ -409,6 +410,10 @@ public:
 	CFont *MessageFont;                 /// Font used for messages
 	int MessageScrollSpeed;             /// Scroll speed in seconds for messages
 
+	// Saved map positions
+	int SavedMapPositionX[MAX_SAVED_MAP_POSITIONS]; /// Saved map position X
+	int SavedMapPositionY[MAX_SAVED_MAP_POSITIONS]; /// Saved map position Y
+
 	// Menu buttons
 	CUIButton MenuButton;               /// menu button
 	CUIButton NetworkMenuButton;        /// network menu button
@@ -527,6 +532,10 @@ extern void SetGrabMouse(bool enabled);
 extern bool GetLeaveStops(void);
 	/// Enable/disable leaving the window stops scrolling
 extern void SetLeaveStops(bool enabled);
+	/// Set saved map position
+extern void SetSavedMapPosition(int index, int x, int y);
+	/// Recall map position
+extern void RecallSavedMapPosition(int index);
 
 extern int AddHandler(lua_State *l);
 extern void CallHandler(unsigned int handle, int value);

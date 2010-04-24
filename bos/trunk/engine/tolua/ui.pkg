@@ -201,6 +201,7 @@ extern bool GetGrabMouse(void);
 extern void SetGrabMouse(bool enabled);
 extern bool GetLeaveStops(void);
 extern void SetLeaveStops(bool enabled);
+extern void SetSavedMapPosition(int index, int x, int y);
 extern int GetDoubleClickDelay(void);
 extern void SetDoubleClickDelay(int delay);
 extern int GetHoldClickDelay(void);
