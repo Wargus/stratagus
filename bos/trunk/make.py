@@ -22,6 +22,8 @@
 import os
 import glob
 import sys
+import Queue
+import threading
 from fabricate import *
 
 
@@ -201,9 +203,47 @@ def detect(b):
     detectAlwaysDynamic(b)
     detectEmbedable(b)
 
-def runall(commands):
-    for i in commands:
-        run(*i)
+def parallel_run(commands, jobs=2, builder=default_builder):
+        """ The different commands must be independent. """
+        requests, results = Queue.Queue(), Queue.Queue()
+        for i in commands:
+            c = builder.prepare(i)
+            if builder.should_run(*c):
+                requests.put(c)
+        totalrequests = requests.qsize()
+        requests.active = True
+
+        def runQueuedCommands(requests, results):
+            while requests.active:
+                c = requests.get()
+                if c is None:
+                    return
+                arglist, command = c
+                builder.echo_command(command)
+                try:
+                     deps, outputs = builder.runner(*arglist)
+                     results.put((command, deps, outputs))
+                except ExecutionError, e:
+                     results.put(e)
+                     requests.active = True  # abort future requests
+
+        for i in xrange(jobs):
+            t = threading.Thread(target=runQueuedCommands, args=(requests, results))
+            t.daemon = True
+            requests.put(None)
+            t.start()
+        for _ in xrange(totalrequests):
+           r = results.get()
+           if isinstance(r, ExecutionError): raise r
+           command, deps, outputs = r
+           builder.store_deps(command, deps, outputs)
+
+def runall(commands, jobs=1):
+    if jobs > 1:
+        parallel_run(commands)
+    else:
+        for i in commands:
+           run(*i)
 
 def compile(b):
     commands = [b.cxx(inBuildDir(s, b.builddir), s) for s in sources]
