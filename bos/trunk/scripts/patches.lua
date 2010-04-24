@@ -12,7 +12,7 @@ function LoadPatches(path)
   local list = ListFilesInDirectory(path)
   for k,v in ipairs(list) do
     if (string.find(v, ".lua$")) then
-      print("Loading patch: " .. v)
+      DebugPrint("Loading patch: " .. v)
       Load(path .. v)
     end
   end

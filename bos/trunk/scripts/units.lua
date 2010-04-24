@@ -172,7 +172,7 @@ for i,f in ipairs(list) do
      local subdirlist = ListFilesInDirectory("units/" .. f)
      for ii,ff in ipairs(subdirlist) do
         if (string.find(ff, "^unit-.*%.lua$")) then
-          print("Loading unit: " .. ff)
+          DebugPrint("Loading unit: " .. ff)
           Load("units/"..f.."/"..ff)
         end
      end

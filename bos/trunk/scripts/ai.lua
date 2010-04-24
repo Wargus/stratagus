@@ -97,7 +97,7 @@ list = ListFilesInDirectory("scripts/ais/")
 
 for i,f in ipairs(list) do
   if(string.find(f, "^.*%.lua$")) then
-    print("Loading AI: " .. f)
+    DebugPrint("Loading AI: " .. f)
     Load("scripts/ais/" .. f)
   end
 end

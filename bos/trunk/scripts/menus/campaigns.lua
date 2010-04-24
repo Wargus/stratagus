@@ -61,7 +61,6 @@ function RunBriefingMenu(objectivestext, briefingtext, briefingsound, background
     end)
   menu:addButton(_("~!Cancel"), Video.Width / 2 - 100, Video.Height - 65,
     function()
-print("Cancel pressed")
       if (channel ~= nil) then StopChannel(channel) end
       menu:stop(1)
     end)
@@ -100,7 +99,6 @@ end
 function CreateMapStep(map, objectivestext, briefingtext, briefingsound, briefingbackground)
   function RunCampaignMap()
     if (RunBriefingMenu(objectivestext, briefingtext, briefingsound, briefingbackground) ~= 0) then
-print("returned non-0")
       GameResult = GameQuitToMenu
       return
     end
@@ -143,7 +141,7 @@ function RunCampaignsMenu(s)
   local browser = menu:addBrowser("campaigns/", lister,
                                  Video.Width / 2 - 150, 100, 300, 200)
   function startgamebutton(s)
-    print("Starting campaign")
+    DebugPrint("Starting campaign")
     position = nil
     RunCampaign("campaigns/" .. browser:getSelectedItem() .. "/campaign.lua")
     menu:stop()

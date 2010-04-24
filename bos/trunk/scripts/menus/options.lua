@@ -279,7 +279,6 @@ function RunLanguageOptionsMenu(s)
     return rb
   end
      
-  print(StratagusTranslation)
   b = AddLanguage("English", "en", 
         "languages/engine.pot", "languages/bos.pot")
   if StratagusTranslation == "" then
