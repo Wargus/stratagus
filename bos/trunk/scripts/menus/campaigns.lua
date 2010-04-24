@@ -59,12 +59,18 @@ function RunBriefingMenu(objectivestext, briefingtext, briefingsound, background
       if (channel ~= nil) then StopChannel(channel) end
       menu:stop()
     end)
+  menu:addButton(_("~!Cancel"), Video.Width / 2 - 100, Video.Height - 65,
+    function()
+print("Cancel pressed")
+      if (channel ~= nil) then StopChannel(channel) end
+      menu:stop(1)
+    end)
 
   if (briefingsound ~= nil) then
     channel = PlaySoundFile(briefingsound, function() channel = nil end)
   end
 
-  menu:run()
+  return menu:run()
 end
 
 function AddCampaignMessage(when, text)
@@ -91,13 +97,17 @@ function AddCampaignFinalAssault(when, text)
 end
 
 
-function CreateMapStep(map, objectivestext, briefingtext, briefingsound)
-   function RunCampaignMap()
-     RunBriefingMenu(objectivestext, briefingtext, briefingsound)
-     Load(map) -- Needed to force the load of the presentation
-     RunMap(map, objectivestext) 
-   end
-   return RunCampaignMap
+function CreateMapStep(map, objectivestext, briefingtext, briefingsound, briefingbackground)
+  function RunCampaignMap()
+    if (RunBriefingMenu(objectivestext, briefingtext, briefingsound, briefingbackground) ~= 0) then
+print("returned non-0")
+      GameResult = GameQuitToMenu
+      return
+    end
+    Load(map) -- Needed to force the load of the presentation
+    RunMap(map, objectivestext) 
+  end
+  return RunCampaignMap
 end
 
 

@@ -51,20 +51,12 @@ function DisplayEnding()
   RunBriefingMenu(obj, t, nil, "campaigns/swindler/swindler.png")
 end
 
-local function CreateSwindlerMapStep(map, objectivestext, briefingtext, briefingsound)
-   function RunCampaignMap()
-     RunBriefingMenu(objectivestext, briefingtext, briefingsound,
-                     "campaigns/swindler/swindler.png")
-     Load(map) -- Needed to force the load of the presentation
-     RunMap(map, objectivestext) 
-   end
-   return RunCampaignMap
-end
-
 campaign_steps = {
-  CreateSwindlerMapStep("campaigns/swindler/level01.smp",
-      "Get to the upper mountains without getting seen.", 
-      briefingtext01),
+  CreateMapStep("campaigns/swindler/level01.smp",
+      "Get to the upper mountains without being seen.", 
+      briefingtext01,
+      nil,
+      "campaigns/swindler/swindler.png"),
   DisplayEnding,
 }
 
