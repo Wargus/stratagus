@@ -128,6 +128,14 @@ public:
 	}
 
 	/**
+	**  Set custom patch
+	*/
+	inline void setCustomPatch(bool customPatch)
+	{
+		this->customPatch = customPatch;
+	}
+
+	/**
 	**  Is this a custom patch
 	*/
 	inline bool isCustomPatch()

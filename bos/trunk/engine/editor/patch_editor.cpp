@@ -451,6 +451,8 @@ public:
 		file.printf("%s", Map.PatchManager.savePatchType(Patch->getType()).c_str());
 		file.close();
 		// TODO: show success
+
+		Patch->getType()->setCustomPatch(false);
 	}
 };
 
