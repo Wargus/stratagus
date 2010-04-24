@@ -238,7 +238,8 @@ def parallel_run(commands, jobs=2, builder=default_builder):
            command, deps, outputs = r
            builder.store_deps(command, deps, outputs)
 
-def runall(commands, jobs=1):
+def runall(commands, jobs=None):
+    jobs= jobs or main.options.jobs
     if jobs > 1:
         parallel_run(commands)
     else:
@@ -352,5 +353,9 @@ def default(**kwargs):
 
 setup(default='default')
 if __name__ == '__main__':
-    main()
+    import optparse
+    j = optparse.Option('-j', '--jobs', action='store',
+                      help='the number of jobs to run simultaneously',
+                      default=1)
+    main(extra_options=[j])
 
