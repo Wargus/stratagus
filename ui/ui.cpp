@@ -81,6 +81,9 @@ CUserInterface::CUserInterface() :
 {
 	memset(&CompletedBarColorRGB, 0, sizeof(CompletedBarColorRGB));
 
+	memset(SavedMapPositionX, 0, sizeof(SavedMapPositionX));
+	memset(SavedMapPositionY, 0, sizeof(SavedMapPositionY));
+
 	Point.Name = "cursor-point";
 	Glass.Name = "cursor-glass";
 	Cross.Name = "cursor-cross";
@@ -217,6 +220,23 @@ static void SaveViewports(CFile *file, const CUserInterface *ui)
 }
 
 /**
+**  Save the saved map positions.
+**
+**  @param file  Save file handle
+**  @param ui    User interface to save
+*/
+static void SaveSavedMapPositions(CFile *file, const CUserInterface *ui)
+{
+	for (int i = 0; i < MAX_SAVED_MAP_POSITIONS; ++i)
+	{
+		file->printf("SetSavedMapPosition(%d, %d, %d)\n",
+			i,
+			ui->SavedMapPositionX[i],
+			ui->SavedMapPositionY[i]);
+	}
+}
+
+/**
 **  Save the user interface module.
 **
 **  @param file  Save file handle
@@ -224,6 +244,7 @@ static void SaveViewports(CFile *file, const CUserInterface *ui)
 void SaveUserInterface(CFile *file)
 {
 	SaveViewports(file, &UI);
+	SaveSavedMapPositions(file, &UI);
 }
 
 /**
@@ -684,6 +705,38 @@ bool GetLeaveStops(void)
 void SetLeaveStops(bool enabled)
 {
 	LeaveStops = enabled;
+}
+
+/**
+**  Set saved map position
+**
+**  @param index  Saved map position slot.
+*/
+void SetSavedMapPosition(int index, int x, int y)
+{
+	if (index < 0 || index >= MAX_SAVED_MAP_POSITIONS) {
+		return;
+	}
+
+	UI.SavedMapPositionX[index] = x;
+	UI.SavedMapPositionY[index] = y;
+}
+
+
+/**
+**  Recall map position
+**
+**  @param index  Saved map position slot.
+*/
+void RecallSavedMapPosition(int index)
+{
+	if (index < 0 || index >= MAX_SAVED_MAP_POSITIONS) {
+		return;
+	}
+
+	UI.SelectedViewport->Set(
+		UI.SavedMapPositionX[index], UI.SavedMapPositionY[index],
+		TileSizeX / 2, TileSizeY / 2);
 }
 
 //@}
