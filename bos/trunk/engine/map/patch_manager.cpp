@@ -271,10 +271,12 @@ CPatchManager::clear()
 		loadedAll = false;
 	}
 	
-	for (i = this->patchTypesMap.begin(); i != this->patchTypesMap.end(); ++i) {
-		if (i->second->isCustomPatch()) {
-			this->patchTypesMap.erase(i);
-			++i;
+	i = this->patchTypesMap.begin();
+	while(i != this->patchTypesMap.end()) {
+	        std::map<std::string, CPatchType *>::iterator p = i;
+	        ++i;
+		if (p->second->isCustomPatch()) {
+			this->patchTypesMap.erase(p);	
 		}
 	}
 }
