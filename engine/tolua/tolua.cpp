@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on Sat May 30 11:05:06 2009.
+** Generated automatically by tolua++-1.0.92 on 04/23/10 23:21:31.
 */
 
 #ifndef __cplusplus
@@ -5201,6 +5201,38 @@ static int tolua_stratagus_SetLeaveStops00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SetLeaveStops'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetSavedMapPosition */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetSavedMapPosition00
+static int tolua_stratagus_SetSavedMapPosition00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  int index = ((int)  tolua_tonumber(tolua_S,1,0));
+  int x = ((int)  tolua_tonumber(tolua_S,2,0));
+  int y = ((int)  tolua_tonumber(tolua_S,3,0));
+  {
+   SetSavedMapPosition(index,x,y);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetSavedMapPosition'.",&tolua_err);
  return 0;
 #endif
 }
@@ -19552,6 +19584,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"SetGrabMouse",tolua_stratagus_SetGrabMouse00);
   tolua_function(tolua_S,"GetLeaveStops",tolua_stratagus_GetLeaveStops00);
   tolua_function(tolua_S,"SetLeaveStops",tolua_stratagus_SetLeaveStops00);
+  tolua_function(tolua_S,"SetSavedMapPosition",tolua_stratagus_SetSavedMapPosition00);
   tolua_function(tolua_S,"GetDoubleClickDelay",tolua_stratagus_GetDoubleClickDelay00);
   tolua_function(tolua_S,"SetDoubleClickDelay",tolua_stratagus_SetDoubleClickDelay00);
   tolua_function(tolua_S,"GetHoldClickDelay",tolua_stratagus_GetHoldClickDelay00);

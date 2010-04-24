@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Fixed bug #29389: Save/recall map position not preserved during save/reload of game (Jimmy Salmon)
 - Fixed bug #29284: Custom patches aren't completely cleaned (Jimmy Salmon)
 - Build static binary without requiring apg++ from autopackage (Francois Beerten)
 - Fixed bug #29100: Cannot translate resource names shown in map editor (Jimmy Salmon)

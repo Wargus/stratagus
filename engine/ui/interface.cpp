@@ -77,8 +77,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static int SavedMapPositionX[3];     /// Saved map position X
-static int SavedMapPositionY[3];     /// Saved map position Y
 static char Input[80];               /// line input for messages/long commands
 static int InputIndex;               /// current index into input
 static char InputStatusLine[99];     /// Last input status line
@@ -391,28 +389,6 @@ static void UiCenterOnSelected(void)
 }
 
 /**
-**  Save current map position.
-**
-**  @param position  Map position slot.
-*/
-static void UiSaveMapPosition(unsigned position)
-{
-	SavedMapPositionX[position] = UI.SelectedViewport->MapX;
-	SavedMapPositionY[position] = UI.SelectedViewport->MapY;
-}
-
-/**
-**  Recall map position.
-**
-**  @param position  Map position slot.
-*/
-static void UiRecallMapPosition(unsigned position)
-{
-	UI.SelectedViewport->Set(
-		SavedMapPositionX[position], SavedMapPositionY[position], TileSizeX / 2, TileSizeY / 2);
-}
-
-/**
 **  Toggle terrain display on/off.
 */
 static void UiToggleTerrain(void)
@@ -555,9 +531,9 @@ static bool CommandKey(int key)
 		case SDLK_F3:
 		case SDLK_F4: // Set/Goto place
 			if (KeyModifiers & ModifierShift) {
-				UiSaveMapPosition(key - SDLK_F2);
+				SetSavedMapPosition(key - SDLK_F2, UI.SelectedViewport->MapX, UI.SelectedViewport->MapY);
 			} else {
-				UiRecallMapPosition(key - SDLK_F2);
+				RecallSavedMapPosition(key - SDLK_F2);
 			}
 			break;
 
