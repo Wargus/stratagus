@@ -19,7 +19,7 @@ copyright (c) 2009 Brush Technology. Full text of the license is here:
 # so you can do "from fabricate import *" to simplify your build script
 __all__ = ['ExecutionError', 'shell', 'md5_hasher', 'mtime_hasher',
            'Runner', 'AtimesRunner', 'StraceRunner', 'AlwaysRunner',
-           'SmartRunner', 'Builder',
+           'SmartRunner', 'Builder', 'default_builder',
            'setup', 'run', 'autoclean', 'memoize', 'outofdate', 'main']
 
 # fabricate version number
@@ -720,22 +720,30 @@ class Builder(object):
     def run(self, *args):
         """ Run command given in args as per shell(), but only if its
             dependencies or outputs have changed or don't exist. """
+        arglist,command = self.prepare(args)
+        if not self.should_run(arglist, command):
+            return
+        # use runner to run command and collect dependencies
+        self.echo_command(command)
+        deps, outputs = self.runner(*arglist)
+        self.store_deps(command, deps, outputs)
+
+    def prepare(self, args):
         arglist = args_to_list(args)
         if not arglist:
             raise TypeError('run() takes at least 1 argument (0 given)')
         # we want a command line string for the .deps file key and for display
         command = subprocess.list2cmdline(arglist)
-        if not self.cmdline_outofdate(command):
-            return
+        return arglist, command
 
+    def should_run(self, arglist, command):
+        if not self.cmdline_outofdate(command):
+            return False
         # if just checking up-to-date-ness, set flag and do nothing more
         self.outofdate_flag = True
-        if self.checking:
-            return
-
-        # use runner to run command and collect dependencies
-        self.echo_command(command)
-        deps, outputs = self.runner(*arglist)
+        return not self.checking
+  
+    def store_deps(self, command, deps, outputs):
         if deps is not None or outputs is not None:
             deps_dict = {}
             # hash the dependency inputs and outputs
