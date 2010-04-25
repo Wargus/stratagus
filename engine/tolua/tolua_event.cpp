@@ -370,7 +370,30 @@ static int class_le_event (lua_State* L)
 
 static int class_eq_event (lua_State* L)
 {
-	return do_operator(L,".eq");
+	/* copying code from do_operator here to return false when no operator is found */
+	if (lua_isuserdata(L,1))
+	{
+		/* Try metatables */
+		lua_pushvalue(L,1);                     /* stack: op1 op2 */
+		while (lua_getmetatable(L,-1))
+		{                                       /* stack: op1 op2 op1 mt */
+			lua_remove(L,-2);                      /* stack: op1 op2 mt */
+			lua_pushstring(L,".eq");                  /* stack: op1 op2 mt key */
+			lua_rawget(L,-2);                      /* stack: obj key mt func */
+			if (lua_isfunction(L,-1))
+			{
+				lua_pushvalue(L,1);
+				lua_pushvalue(L,2);
+				lua_call(L,2,1);
+				return 1;
+			}
+			lua_settop(L,3);
+		}
+	}
+
+	lua_settop(L, 3);
+	lua_pushboolean(L, 0);
+	return 1;
 }
 
 /*
