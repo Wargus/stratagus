@@ -2,6 +2,8 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Added unit-rocksfield to the map editor (Kalle Olavi Niemitalo)
+- Updated tolua++ to 1.0.93 (Jimmy Salmon)
 - Fixed bug #22211: Arrow keys don't work right when selecting maps (Jimmy Salmon)
 - Fixed bug #29096: Adjacent air units flicker in z-order (Jimmy Salmon)
 - Fixed bug #29533: No way to exit the campaign in the briefing screen (Jimmy Salmon)
