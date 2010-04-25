@@ -262,6 +262,7 @@ public:
 	virtual void setBackgroundColor(const gcn::Color &color);
 	virtual void setFont(gcn::Font *font);
 	virtual void addActionListener(gcn::ActionListener *actionListener);
+	virtual bool getDirty() const;
 private:
 	void adjustSize();
 private:
