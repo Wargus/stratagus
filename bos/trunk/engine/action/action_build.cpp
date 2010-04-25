@@ -392,7 +392,7 @@ void HandleActionBuilt(CUnit *unit)
 
 		// Set the direction of the building if it supports them
 		if (unit->Type->NumDirections > 1) {
-			unit->Direction = (MyRand() >> 8) & 0xFF; // random heading
+			unit->Direction = (MyRand() >> 3) & 0xFF; // random heading
 			UnitUpdateHeading(unit);
 		}
 
