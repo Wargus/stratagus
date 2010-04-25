@@ -599,7 +599,7 @@ TOLUA_API void tolua_set_call_event(lua_State* L, lua_CFunction func, char* type
 /* Map constant number
 	* It assigns a constant number into the current module (or class)
 */
-TOLUA_API void tolua_constant (lua_State* L, const char* name, double value)
+TOLUA_API void tolua_constant (lua_State* L, const char* name, lua_Number value)
 {
 	lua_pushstring(L,name);
 	tolua_pushnumber(L,value);
