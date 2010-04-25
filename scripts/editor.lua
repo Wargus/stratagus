@@ -98,6 +98,7 @@ local editor_types = {
   "unit-tree02",
   "unit-tree03",
   "unit-tree04",
+  "unit-rocksfield",
   "unit-rock-1",
   "unit-rock-2",
   "unit-rock-3",
