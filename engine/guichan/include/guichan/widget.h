@@ -673,6 +673,7 @@ namespace gcn
          * Generates an action to the Widget's ActionListeners.
          */
         void generateAction();
+        void generateAction(const std::string &eventId);
         
         typedef std::list<MouseListener*> MouseListenerList;
         MouseListenerList mMouseListeners;

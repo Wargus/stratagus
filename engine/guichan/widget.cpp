@@ -585,11 +585,16 @@ namespace gcn
     
     void Widget::generateAction()
     {
+        generateAction(mEventId);
+    }
+
+    void Widget::generateAction(const std::string &eventId)
+    {
         ActionListenerIterator iter;
         for (iter = mActionListeners.begin(); iter != mActionListeners.end(); ++iter)
         {
-            (*iter)->action(mEventId);
-        }        
+            (*iter)->action(eventId);
+        }
     }
     
     Font* Widget::getFont() const

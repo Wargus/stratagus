@@ -1338,6 +1338,14 @@ void ListBoxWidget::addActionListener(gcn::ActionListener *actionListener)
 	listbox.addActionListener(actionListener);
 }
 
+/**
+**  Get dirty
+*/
+bool ListBoxWidget::getDirty() const
+{
+	return listbox.getDirty();
+}
+
 
 /*----------------------------------------------------------------------------
 --  DropDownWidget

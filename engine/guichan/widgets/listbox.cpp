@@ -62,6 +62,9 @@
 #include "guichan/widgets/listbox.h"
 #include "guichan/widgets/scrollarea.h"
 
+
+static const std::string selectEventId = "select";
+
 namespace gcn
 {
     ListBox::ListBox()
@@ -189,6 +192,7 @@ namespace gcn
                 scrollArea->scrollToRectangle(scroll);
             }
         }
+        setDirty(true);
     }
 
     bool ListBox::keyPress(const Key& key)
@@ -208,12 +212,14 @@ namespace gcn
             {
                 setSelected(0);
             }
+            generateAction(selectEventId);
             ret = true;
         }
         else if (key.getValue() == Key::DOWN)
         {
             setSelected(mSelected + 1);
-			ret = true;
+            generateAction(selectEventId);
+            ret = true;
         }
 
         return ret;

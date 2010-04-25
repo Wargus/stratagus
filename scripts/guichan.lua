@@ -238,19 +238,21 @@ function AddMenuHelpers(menu)
     -- Otherwise call the user's callback
     local function cb(s)
       local f = bq:getSelectedItem()
-      if (f == "../") then
-        local i
-        for i = string.len(bq.path) - 1, 1, -1 do
-          if (string.sub(bq.path, i, i) == "/") then
-            bq.path = string.sub(bq.path, 1, i)
-            updateList()
-            break
+      if (s ~= "select") then
+        if (f == "../") then
+          local i
+          for i = string.len(bq.path) - 1, 1, -1 do
+            if (string.sub(bq.path, i, i) == "/") then
+              bq.path = string.sub(bq.path, 1, i)
+              updateList()
+              break
+            end
           end
+        elseif (string.sub(f, string.len(f)) == '/') then
+          bq.path = bq.path .. f
+          updateList()
         end
-      elseif (string.sub(f, string.len(f)) == '/') then
-        bq.path = bq.path .. f
-        updateList()
-      else
+      elseif (string.sub(f, string.len(f)) ~= '/') then
         if (bq.actioncb ~= nil) then
           bq:actioncb(s)
         end
