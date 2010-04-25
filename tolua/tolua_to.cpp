@@ -16,7 +16,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-TOLUA_API double tolua_tonumber (lua_State* L, int narg, double def)
+TOLUA_API lua_Number tolua_tonumber (lua_State* L, int narg, lua_Number def)
 {
  return lua_gettop(L)<abs(narg) ? def : lua_tonumber(L,narg);
 }
@@ -70,7 +70,7 @@ TOLUA_API int tolua_toboolean (lua_State* L, int narg, int def)
  return lua_gettop(L)<abs(narg) ?  def : lua_toboolean(L,narg);
 }
 
-TOLUA_API double tolua_tofieldnumber (lua_State* L, int lo, int index, double def)
+TOLUA_API lua_Number tolua_tofieldnumber (lua_State* L, int lo, int index, lua_Number def)
 {
  double v;
  lua_pushnumber(L,index);
