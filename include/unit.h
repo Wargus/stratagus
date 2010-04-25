@@ -162,15 +162,10 @@
 **  CUnit::IX CUnit::IY
 **
 **  Coordinate displacement in pixels or coordinates inside a tile.
-**  Can be !=0 for two reasons:
-**
-**  (1) If the unit is moving from one tile to an adjacent one.
-**      CUnit::IX is then between -::TileSizeX and +::TileSizeX,
-**      and counts towards 0 during horizontal motion.
-**      CUnit::IY is similar.
-**
-**  (2) In air and sea units floating in place, CUnit::IY flickers
-**      randomly between 0 and 1.
+**  If the unit is moving from one tile to an adjacent one.
+**  CUnit::IX is between -::TileSizeX and +::TileSizeX,
+**  and counts towards 0 during horizontal motion.
+**  CUnit::IY is similar.
 **
 **  CUnit::Frame
 **
