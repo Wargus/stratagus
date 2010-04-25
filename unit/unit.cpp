@@ -215,7 +215,7 @@ void CUnit::Init(CUnitType *type)
 	// Don't set a building heading, as only 1 construction direction
 	//   is allowed.
 	if (type->NumDirections > 1 && type->Sprite && !type->Building) {
-		Direction = (MyRand() >> 8) & 0xFF; // random heading
+		Direction = (MyRand() >> 3) & 0xFF; // random heading
 		UnitUpdateHeading(this);
 	}
 

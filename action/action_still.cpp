@@ -217,12 +217,6 @@ void ActionStillGeneric(CUnit *unit, bool stand_ground)
 	}
 
 	AutoAttack(unit, stand_ground);
-
-	// Sea and air units are floating up/down.
-	// FIXME: remove this and use animations instead
-	if (unit->Type->SeaUnit || unit->Type->AirUnit) {
-		unit->IY = (MyRand() >> 15) & 1;
-	}
 }
 
 /**

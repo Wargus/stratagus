@@ -324,7 +324,7 @@ static void PatchEditorCallbackExit(void)
 		return;
 	}
 
-	// Prevent scrolling while out of focus (on other applications) */
+	// Prevent scrolling while out of focus (on other applications)
 	KeyScrollState = MouseScrollState = ScrollNone;
 }
 
