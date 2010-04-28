@@ -36,7 +36,7 @@ msgstr "Victoire !"
 
 #: scripts/guichan.lua:387
 msgid "Draw !"
-msgstr "Dessiné !"
+msgstr "Match nul !"
 
 #: scripts/guichan.lua:389
 msgid "Defeat !"
@@ -221,7 +221,7 @@ msgstr "~!Charger une carte"
 
 #: scripts/guichan.lua:683
 msgid "~!Patch Editor"
-msgstr "~!Editeur de Patch"
+msgstr "~!Editeur de patch"
 
 #: scripts/guichan.lua:686 scripts/menus/ingame/editor.lua:87
 #: scripts/menus/ingame/editor.lua:125 scripts/menus/ingame/editor.lua:230
@@ -514,11 +514,11 @@ msgstr "Êtes-vous sûr de vouloir quitter pour le menu principal ?"
 
 #: scripts/menus/ingame/game.lua:319 scripts/menus/ingame/game.lua:335
 msgid "~!Quit to Menu"
-msgstr "~!Quitter pour le Menu"
+msgstr "~!Quitter pour le menu"
 
 #: scripts/menus/ingame/game.lua:325
 msgid "End Game"
-msgstr "Quitter la Partie"
+msgstr "Quitter la partie"
 
 #: scripts/menus/ingame/game.lua:331 scripts/menus/ingame/game.lua:334
 msgid "~!Surrender"
@@ -674,7 +674,7 @@ msgstr "Menu de la partie"
 
 #: scripts/menus/ingame/game.lua:401
 msgid "ENTER"
-msgstr ""
+msgstr "Entrée"
 
 #: scripts/menus/ingame/game.lua:401
 msgid "- write a message"
@@ -682,19 +682,19 @@ msgstr "Ecrire un message"
 
 #: scripts/menus/ingame/game.lua:402
 msgid "SPACE"
-msgstr ""
+msgstr "Espace"
 
 #: scripts/menus/ingame/game.lua:402
 msgid "- goto last event"
-msgstr ""
+msgstr "aller au dernier évènement"
 
 #: scripts/menus/ingame/game.lua:403
 msgid "TAB"
-msgstr ""
+msgstr "Tabulation"
 
 #: scripts/menus/ingame/game.lua:403
 msgid "- hide/unhide terrain"
-msgstr ""
+msgstr "afficher/cacher le terrain"
 
 #: scripts/menus/ingame/game.lua:404
 msgid "Ctrl-T"
@@ -702,7 +702,7 @@ msgstr ""
 
 #: scripts/menus/ingame/game.lua:404
 msgid "- track unit"
-msgstr ""
+msgstr "suivre une unité"
 
 #: scripts/menus/ingame/game.lua:405
 msgid "Alt-I"
@@ -718,7 +718,7 @@ msgstr ""
 
 #: scripts/menus/ingame/game.lua:406
 msgid "- center on selected unit"
-msgstr ""
+msgstr "centrer sur l'unité selectionnée"
 
 #: scripts/menus/ingame/game.lua:407
 msgid "Alt-V"
@@ -790,7 +790,7 @@ msgstr ""
 
 #: scripts/menus/ingame/game.lua:415
 msgid "- recall map position"
-msgstr ""
+msgstr "afficher la position de la carte"
 
 #: scripts/menus/ingame/game.lua:416
 msgid "Shift F2-F4"
@@ -798,7 +798,7 @@ msgstr ""
 
 #: scripts/menus/ingame/game.lua:416
 msgid "- save map postition"
-msgstr ""
+msgstr "sauver la position de la carte"
 
 #: scripts/menus/ingame/game.lua:417
 msgid "F5"
@@ -1023,7 +1023,7 @@ msgstr "Pas de carte"
 
 #: scripts/menus/network.lua:454 scripts/menus/network.lua:488
 msgid "Create ~!Game"
-msgstr "Crer une ~!Partie"
+msgstr "Créer une ~!partie"
 
 #: scripts/menus/network.lua:471
 msgid "MultiPlayer"
@@ -1100,7 +1100,7 @@ msgstr "Options"
 #: scripts/menus/patch.lua:39 scripts/menus/patch.lua:95
 #: scripts/menus/patch.lua:130
 msgid "Patch Editor"
-msgstr "Editeur de Patch"
+msgstr "Editeur de patch"
 
 #: scripts/menus/patch.lua:41 scripts/menus/patch.lua:103
 msgid "Name:"
@@ -1116,11 +1116,11 @@ msgstr ""
 
 #: scripts/menus/patch.lua:62
 msgid "Create ~!Patch"
-msgstr "Creér un ~!Patch"
+msgstr "Creér un ~!patch"
 
 #: scripts/menus/patch.lua:111
 msgid "Load ~!Patch"
-msgstr "Charger un Patch"
+msgstr "~!Charger un patch"
 
 #: scripts/menus/patch.lua:132
 msgid "Create ~!New Patch"
