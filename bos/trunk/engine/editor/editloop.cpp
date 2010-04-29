@@ -96,6 +96,8 @@ static int ButtonPanelHeight;
 static CPatch *PatchUnderCursor;            /// Patch under cursor
 static int PatchOffsetX;
 static int PatchOffsetY;
+static int PatchDragStartX;
+static int PatchDragStartY;
 static bool UnitPlacedThisPress = false;    /// Only allow one unit per press
 static bool PatchPlacedThisPress = false;   /// Only allow one patch per press
 static bool UpdateMinimap = false;          /// Update units on the minimap
@@ -114,6 +116,9 @@ enum EditorActionType
 {
 	EditorActionTypePlaceUnit,
 	EditorActionTypeRemoveUnit,
+	EditorActionTypePlacePatch,
+	EditorActionTypeRemovePatch,
+	EditorActionTypeMovePatch,
 };
 
 struct EditorAction
@@ -123,6 +128,9 @@ struct EditorAction
 	int Y;
 	CUnitType *UnitType;
 	CPlayer *Player;
+	const CPatchType *PatchType;
+	int DestX;
+	int DestY;
 };
 
 static std::deque<EditorAction> EditorUndoActions;
@@ -225,12 +233,24 @@ void SetEditorStartUnit(const std::string &name)
 	Editor.StartUnitName = name;
 }
 
+/**
+**  Called after a patch has been placed, removed, or moved
+*/
+static void PatchChanged()
+{
+	int cursorMapX = UI.MouseViewport->Viewport2MapX(CursorX);
+	int cursorMapY = UI.MouseViewport->Viewport2MapY(CursorY);
+
+	PatchUnderCursor = Map.PatchManager.getPatch(cursorMapX, cursorMapY);
+	UpdateMinimapTerrain = true;
+}
+
 /*----------------------------------------------------------------------------
 --  Actions
 ----------------------------------------------------------------------------*/
 
 /**
-**  Place unit.
+**  Place a unit.
 **
 **  @param x       X map tile coordinate.
 **  @param y       Y map tile coordinate.
@@ -280,7 +300,7 @@ static void EditorActionPlaceUnit(int x, int y, CUnitType *type, CPlayer *player
 }
 
 /**
-**  Edit unit.
+**  Place a unit.
 **
 **  @param x       X map tile coordinate.
 **  @param y       Y map tile coordinate.
@@ -329,6 +349,106 @@ static void EditorRemoveUnit(CUnit *unit)
 	EditorAddUndoAction(editorAction);
 }
 
+/**
+**  Place a patch
+*/
+static void EditorActionPlacePatch(int x, int y, const CPatchType *patchType)
+{
+	Map.PatchManager.add(patchType->getName(), x, y);
+	PatchChanged();
+}
+
+/**
+**  Place a patch
+*/
+static void EditorPlacePatch(int x, int y, const CPatchType *patchType)
+{
+	EditorAction editorAction;
+	editorAction.Type = EditorActionTypePlacePatch;
+	editorAction.X = x;
+	editorAction.Y = y;
+	editorAction.PatchType = patchType;
+
+	EditorActionPlacePatch(x, y, patchType);
+	EditorAddUndoAction(editorAction);
+}
+
+/**
+**  Remove a patch
+*/
+static void EditorActionRemovePatch(CPatch *patch)
+{
+	Map.PatchManager.remove(patch);
+	PatchChanged();
+}
+
+/**
+**  Remove a patch
+*/
+static void EditorRemovePatch(CPatch *patch)
+{
+	EditorAction editorAction;
+	editorAction.Type = EditorActionTypeRemovePatch;
+	editorAction.X = patch->getX();
+	editorAction.Y = patch->getY();
+	editorAction.PatchType = patch->getType();
+
+	EditorActionRemovePatch(patch);
+	EditorAddUndoAction(editorAction);
+}
+
+/**
+**  Remove all patches at a location
+*/
+static void EditorRemovePatches(int x, int y, int w, int h)
+{
+	for (int i = 0; i < w; ++i)
+	{
+		for (int j = 0; j < h; ++j)
+		{
+			CPatch *patch = Map.PatchManager.getPatch(x + i, y + j);
+			if (patch)
+			{
+				EditorRemovePatch(patch);
+			}
+		}
+	}
+}
+
+/**
+**  Move a patch
+*/
+static void EditorActionMovePatch(CPatch *patch, int x, int y)
+{
+	Map.PatchManager.move(patch, x, y);
+	PatchChanged();
+}
+
+/**
+**  Move a patch
+*/
+static void EditorLogMovePatch(CPatch *patch, int startx, int starty, int destx, int desty)
+{
+	EditorAction editorAction;
+	editorAction.Type = EditorActionTypeMovePatch;
+	editorAction.X = startx;
+	editorAction.Y = starty;
+	editorAction.DestX = destx;
+	editorAction.DestY = desty;
+	editorAction.PatchType = patch->getType();
+
+	EditorAddUndoAction(editorAction);
+}
+
+/**
+**  Move a patch
+*/
+static void EditorMovePatch(CPatch *patch, int x, int y)
+{
+	EditorLogMovePatch(patch, patch->getX(), patch->getY(), x, y);
+	EditorActionMovePatch(patch, x, y);
+}
+
 /*----------------------------------------------------------------------------
 --  Undo/Redo
 ----------------------------------------------------------------------------*/
@@ -355,6 +475,26 @@ static void EditorUndoAction()
 		case EditorActionTypeRemoveUnit:
 			EditorActionPlaceUnit(action.X, action.Y, action.UnitType, action.Player);
 			break;
+
+		case EditorActionTypePlacePatch:
+		{
+			CPatch *patch = Map.PatchManager.getPatch(action.X, action.Y);
+			Assert(patch->getType() == action.PatchType);
+			EditorActionRemovePatch(patch);
+			break;
+		}
+
+		case EditorActionTypeRemovePatch:
+			EditorActionPlacePatch(action.X, action.Y, action.PatchType);
+			break;
+
+		case EditorActionTypeMovePatch:
+		{
+			CPatch *patch = Map.PatchManager.getPatch(action.DestX, action.DestY);
+			Assert(patch->getType() == action.PatchType);
+			EditorActionMovePatch(patch, action.X, action.Y);
+			break;
+		}
 	}
 
 	EditorRedoActions.push_back(action);
@@ -380,6 +520,26 @@ static void EditorRedoAction()
 		{
 			CUnit *unit = UnitOnMapTile(action.X, action.Y, action.UnitType->UnitType);
 			EditorActionRemoveUnit(unit);
+			break;
+		}
+
+		case EditorActionTypePlacePatch:
+			EditorActionPlacePatch(action.X, action.Y, action.PatchType);
+			break;
+
+		case EditorActionTypeRemovePatch:
+		{
+			CPatch *patch = Map.PatchManager.getPatch(action.X, action.Y);
+			Assert(patch->getType() == action.PatchType);
+			EditorActionRemovePatch(patch);
+			break;
+		}
+
+		case EditorActionTypeMovePatch:
+		{
+			CPatch *patch = Map.PatchManager.getPatch(action.X, action.Y);
+			Assert(patch->getType() == action.PatchType);
+			EditorActionMovePatch(patch, action.DestX, action.DestY);
 			break;
 		}
 	}
@@ -954,27 +1114,26 @@ static void EditorCallbackButtonUp(unsigned button)
 	{
 		PatchPlacedThisPress = false;
 		UnitPlacedThisPress = false;
-		DraggingPatch = false;
-	}
-}
 
-static void EditorPlacePatch(int cursorMapX, int cursorMapY)
-{
-	if (!PatchPlacedThisPress && Editor.SelectedPatchIndex != -1)
-	{
-		// Create a new patch
-		const CPatchType *patchType = Editor.ShownPatchTypes[Editor.SelectedPatchIndex].PatchType;
-		for (int i = 0; i < patchType->getTileWidth(); i++) {
-			for (int j = 0; j < patchType->getTileHeight(); j++) {
-				CPatch *p = Map.PatchManager.getPatch(cursorMapX+i, cursorMapY+j);
-				if (p) {
-					Map.PatchManager.remove(p);
-				}
+		// If a patch was dragged, remove any patches under it and record the move so undo/redo will work
+		if (DraggingPatch)
+		{
+			if (PatchDragStartX != PatchUnderCursor->getX() ||
+				PatchDragStartY != PatchUnderCursor->getY())
+			{
+				const CPatchType *patchType = PatchUnderCursor->getType();
+				int x = PatchUnderCursor->getX();
+				int y = PatchUnderCursor->getY();
+
+				Map.PatchManager.remove(PatchUnderCursor);
+				EditorRemovePatches(x, y, patchType->getTileWidth(), patchType->getTileHeight());
+				PatchUnderCursor = Map.PatchManager.add(patchType->getName(), x, y);
+
+				EditorLogMovePatch(PatchUnderCursor, PatchDragStartX, PatchDragStartY, PatchUnderCursor->getX(), PatchUnderCursor->getY());
 			}
+
+			DraggingPatch = false;
 		}
-		PatchUnderCursor = Map.PatchManager.add(patchType->getName(), cursorMapX, cursorMapY);
-		PatchPlacedThisPress = true;
-		UpdateMinimapTerrain = true;
 	}
 }
 
@@ -1124,6 +1283,8 @@ static void EditorCallbackButtonDown(unsigned button)
 				if (PatchUnderCursor)
 				{
 					// Start dragging the patch
+					PatchDragStartX = PatchUnderCursor->getX();
+					PatchDragStartY = PatchUnderCursor->getY();
 					PatchOffsetX = cursorMapX - PatchUnderCursor->getX();
 					PatchOffsetY = cursorMapY - PatchUnderCursor->getY();
 					DraggingPatch = true;
@@ -1131,7 +1292,16 @@ static void EditorCallbackButtonDown(unsigned button)
 			}
 			else if (Editor.State == EditorEditPatch)
 			{
-				EditorPlacePatch(cursorMapX, cursorMapY);
+				if (!PatchPlacedThisPress && Editor.SelectedPatchIndex != -1)
+				{
+					// Remove any patches under the new patch
+					const CPatchType *patchType = Editor.ShownPatchTypes[Editor.SelectedPatchIndex].PatchType;
+					EditorRemovePatches(cursorMapX, cursorMapY, patchType->getTileWidth(), patchType->getTileHeight());
+
+					// Create the new patch
+					EditorPlacePatch(cursorMapX, cursorMapY, patchType);
+					PatchPlacedThisPress = true;
+				}
 			}
 			else if (Editor.State == EditorEditUnit)
 			{
@@ -1229,12 +1399,8 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case SDLK_DELETE:
 			if (Editor.State != EditorEditUnit && PatchUnderCursor)
 			{
-				int cursorMapX = UI.SelectedViewport->Viewport2MapX(CursorX);
-				int cursorMapY = UI.SelectedViewport->Viewport2MapY(CursorY);
-				Map.PatchManager.remove(PatchUnderCursor);
-				PatchUnderCursor = Map.PatchManager.getPatch(cursorMapX, cursorMapY);
+				EditorRemovePatch(PatchUnderCursor);
 				UI.StatusLine.Set(_("Patch deleted"));
-				UpdateMinimapTerrain = true;
 			}
 			else if (Editor.State != EditorEditPatch && UnitUnderCursor)
 			{
