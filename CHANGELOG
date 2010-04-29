@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Fixed bug #28951: Undo/redo in the editor now supports patches (Jimmy Salmon)
 - Added unit-rocksfield to the map editor (Kalle Olavi Niemitalo)
 - Updated tolua++ to 1.0.93 (Jimmy Salmon)
 - Fixed bug #22211: Arrow keys don't work right when selecting maps (Jimmy Salmon)
