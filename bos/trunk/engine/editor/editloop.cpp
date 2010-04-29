@@ -94,15 +94,10 @@ static int ButtonPanelWidth;
 static int ButtonPanelHeight;
 
 static CPatch *PatchUnderCursor;            /// Patch under cursor
-static int PatchOffsetX;
-static int PatchOffsetY;
-static int PatchDragStartX;
-static int PatchDragStartY;
 static bool UnitPlacedThisPress = false;    /// Only allow one unit per press
 static bool PatchPlacedThisPress = false;   /// Only allow one patch per press
 static bool UpdateMinimap = false;          /// Update units on the minimap
 static bool UpdateMinimapTerrain = false;   /// Terrain has changed, minimap needs updating
-static bool DraggingPatch = false;          /// The user is currently dragging a patch
 static int VisibleIcons;                    /// Number of icons that are visible at a time
 
 enum _mode_buttons_ {
@@ -118,7 +113,6 @@ enum EditorActionType
 	EditorActionTypeRemoveUnit,
 	EditorActionTypePlacePatch,
 	EditorActionTypeRemovePatch,
-	EditorActionTypeMovePatch,
 };
 
 struct EditorAction
@@ -129,8 +123,6 @@ struct EditorAction
 	CUnitType *UnitType;
 	CPlayer *Player;
 	const CPatchType *PatchType;
-	int DestX;
-	int DestY;
 };
 
 static std::deque<EditorAction> EditorUndoActions;
@@ -415,40 +407,6 @@ static void EditorRemovePatches(int x, int y, int w, int h)
 	}
 }
 
-/**
-**  Move a patch
-*/
-static void EditorActionMovePatch(CPatch *patch, int x, int y)
-{
-	Map.PatchManager.move(patch, x, y);
-	PatchChanged();
-}
-
-/**
-**  Move a patch
-*/
-static void EditorLogMovePatch(CPatch *patch, int startx, int starty, int destx, int desty)
-{
-	EditorAction editorAction;
-	editorAction.Type = EditorActionTypeMovePatch;
-	editorAction.X = startx;
-	editorAction.Y = starty;
-	editorAction.DestX = destx;
-	editorAction.DestY = desty;
-	editorAction.PatchType = patch->getType();
-
-	EditorAddUndoAction(editorAction);
-}
-
-/**
-**  Move a patch
-*/
-static void EditorMovePatch(CPatch *patch, int x, int y)
-{
-	EditorLogMovePatch(patch, patch->getX(), patch->getY(), x, y);
-	EditorActionMovePatch(patch, x, y);
-}
-
 /*----------------------------------------------------------------------------
 --  Undo/Redo
 ----------------------------------------------------------------------------*/
@@ -487,14 +445,6 @@ static void EditorUndoAction()
 		case EditorActionTypeRemovePatch:
 			EditorActionPlacePatch(action.X, action.Y, action.PatchType);
 			break;
-
-		case EditorActionTypeMovePatch:
-		{
-			CPatch *patch = Map.PatchManager.getPatch(action.DestX, action.DestY);
-			Assert(patch->getType() == action.PatchType);
-			EditorActionMovePatch(patch, action.X, action.Y);
-			break;
-		}
 	}
 
 	EditorRedoActions.push_back(action);
@@ -532,14 +482,6 @@ static void EditorRedoAction()
 			CPatch *patch = Map.PatchManager.getPatch(action.X, action.Y);
 			Assert(patch->getType() == action.PatchType);
 			EditorActionRemovePatch(patch);
-			break;
-		}
-
-		case EditorActionTypeMovePatch:
-		{
-			CPatch *patch = Map.PatchManager.getPatch(action.X, action.Y);
-			Assert(patch->getType() == action.PatchType);
-			EditorActionMovePatch(patch, action.DestX, action.DestY);
 			break;
 		}
 	}
@@ -1114,26 +1056,6 @@ static void EditorCallbackButtonUp(unsigned button)
 	{
 		PatchPlacedThisPress = false;
 		UnitPlacedThisPress = false;
-
-		// If a patch was dragged, remove any patches under it and record the move so undo/redo will work
-		if (DraggingPatch)
-		{
-			if (PatchDragStartX != PatchUnderCursor->getX() ||
-				PatchDragStartY != PatchUnderCursor->getY())
-			{
-				const CPatchType *patchType = PatchUnderCursor->getType();
-				int x = PatchUnderCursor->getX();
-				int y = PatchUnderCursor->getY();
-
-				Map.PatchManager.remove(PatchUnderCursor);
-				EditorRemovePatches(x, y, patchType->getTileWidth(), patchType->getTileHeight());
-				PatchUnderCursor = Map.PatchManager.add(patchType->getName(), x, y);
-
-				EditorLogMovePatch(PatchUnderCursor, PatchDragStartX, PatchDragStartY, PatchUnderCursor->getX(), PatchUnderCursor->getY());
-			}
-
-			DraggingPatch = false;
-		}
 	}
 }
 
@@ -1280,15 +1202,7 @@ static void EditorCallbackButtonDown(unsigned button)
 
 			if (Editor.State == EditorSelecting)
 			{
-				if (PatchUnderCursor)
-				{
-					// Start dragging the patch
-					PatchDragStartX = PatchUnderCursor->getX();
-					PatchDragStartY = PatchUnderCursor->getY();
-					PatchOffsetX = cursorMapX - PatchUnderCursor->getX();
-					PatchOffsetY = cursorMapY - PatchUnderCursor->getY();
-					DraggingPatch = true;
-				}
+				// Nothing to do
 			}
 			else if (Editor.State == EditorEditPatch)
 			{
@@ -1539,10 +1453,12 @@ static void EditorCallbackMouse(int x, int y)
 	}
 
 	//
-	// Dragging patches or units on map.
+	// Dragging new units on map.
 	//
-	if (CursorOn == CursorOnMap && (MouseButtons & LeftButton) &&
-			(Editor.State == EditorSelecting || Editor.State == EditorEditUnit))
+	if (CursorOn == CursorOnMap &&
+		(MouseButtons & LeftButton) &&
+		Editor.State == EditorEditUnit &&
+		CursorBuilding)
 	{
 		int moveX = 0;
 		int moveY = 0;
@@ -1573,24 +1489,12 @@ static void EditorCallbackMouse(int x, int y)
 		//
 		RestrictCursorToViewport();
 
-		if (Editor.State == EditorSelecting && PatchUnderCursor != NULL)
+		if (!UnitPlacedThisPress &&
+			CanBuildUnitType(NULL, CursorBuilding, cursorMapX, cursorMapY, 1))
 		{
-			// Drag patch under cursor
-			Map.PatchManager.move(PatchUnderCursor, cursorMapX - PatchOffsetX, cursorMapY - PatchOffsetY);
-			ShowPatchInfo(PatchUnderCursor);
-			UpdateMinimapTerrain = true;
-		}
-		else if (Editor.State == EditorEditUnit && CursorBuilding)
-		{
-			if (!UnitPlacedThisPress)
-			{
-				if (CanBuildUnitType(NULL, CursorBuilding, cursorMapX, cursorMapY, 1))
-				{
-					EditorPlaceUnit(cursorMapX, cursorMapY, CursorBuilding, Players + Editor.SelectedPlayer);
-					UnitPlacedThisPress = true;
-					UI.StatusLine.Clear();
-				}
-			}
+			EditorPlaceUnit(cursorMapX, cursorMapY, CursorBuilding, Players + Editor.SelectedPlayer);
+			UnitPlacedThisPress = true;
+			UI.StatusLine.Clear();
 		}
 		return;
 	}
@@ -1628,9 +1532,38 @@ static void EditorCallbackMouse(int x, int y)
 	}
 
 	//
+	// Handle start location area
+	//
+	if (Editor.State == EditorSetStartLocation)
+	{
+		// Select player
+		bx = UI.InfoPanel.X + 8;
+		by = UI.InfoPanel.Y + 4 + IconHeight + 10;
+		for (i = 0; i < PlayerMax; ++i)
+		{
+			if (bx < x && x < bx + 20 && by < y && y < by + 20)
+			{
+				if (Map.Info.PlayerType[i] != PlayerNobody)
+				{
+					std::ostringstream o;
+					o << _("Select player #") << i;
+					UI.StatusLine.Set(o.str());
+				}
+				else
+				{
+					UI.StatusLine.Clear();
+				}
+				Editor.CursorPlayer = i;
+				return;
+			}
+			bx += 20;
+		}
+	}
+
+	//
 	// Handle edit unit area
 	//
-	if (Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation)
+	if (Editor.State == EditorEditUnit)
 	{
 		// Scrollbar
 		if (UI.ButtonPanel.X + 4 < CursorX && CursorX < UI.ButtonPanel.X + 176 - 4 &&
@@ -1638,6 +1571,8 @@ static void EditorCallbackMouse(int x, int y)
 		{
 			return;
 		}
+
+		// Select player
 		bx = UI.InfoPanel.X + 8;
 		by = UI.InfoPanel.Y + 4 + IconHeight + 10;
 		for (i = 0; i < PlayerMax; ++i)
@@ -1660,6 +1595,7 @@ static void EditorCallbackMouse(int x, int y)
 			bx += 20;
 		}
 
+		// Unit buttons
 		i = Editor.UnitIndex;
 		by = UI.ButtonPanel.Y + 24;
 		while (by < UI.ButtonPanel.Y + ButtonPanelHeight - IconHeight)
@@ -2126,7 +2062,7 @@ static void EditorMainLoop()
 
 			if ((FrameCounter % (5 * FRAMES_PER_SECOND)) == 0)
 			{
-				if (UpdateMinimapTerrain && !DraggingPatch)
+				if (UpdateMinimapTerrain)
 				{
 					UI.Minimap.UpdateTerrain();
 					UpdateMinimapTerrain = false;
