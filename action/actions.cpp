@@ -140,7 +140,7 @@ int UnitShowAnimationScaled(CUnit *unit, const CAnimation *anim, int scale)
 				break;
 
 			case AnimationWait:
-				unit->Anim.Wait = unit->Anim.Anim->D.Wait.Wait << scale >> 8;
+				unit->Anim.Wait = (unit->Anim.Anim->D.Wait.Wait * scale) >> 3;
 				if (unit->Anim.Wait <= 0)
 					unit->Anim.Wait = 1;
 				break;
