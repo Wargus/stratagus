@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Added water scout unit (TimberDragon and Francois Beerten)
 - Fixed bug #28951: Undo/redo in the editor now supports patches (Jimmy Salmon)
 - Added unit-rocksfield to the map editor (Kalle Olavi Niemitalo)
 - Updated tolua++ to 1.0.93 (Jimmy Salmon)
