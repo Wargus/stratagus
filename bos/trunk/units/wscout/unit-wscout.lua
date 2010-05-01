@@ -47,7 +47,7 @@ DefineIcon({
 
 DefineUnitType("unit-wscout", {
     Name = "Water Scout",
-    Image = {"file", "units/wscout/wscout.png", "size", {64, 64}},
+    Image = {"file", "units/wscout/wscout.png", "size", {96, 64}},
     Animations = "animations-wscout",
     Icon = "icon-wscout",
     EnergyValue = 600,
@@ -56,8 +56,8 @@ DefineUnitType("unit-wscout", {
     Speed = 20,
     HitPoints = 40,
     DrawLevel = 25,
-    TileSize = {1, 1},
-    BoxSize = {48, 48},
+    TileSize = {2, 2},
+    BoxSize = {84, 64},
     SightRange = 8,
     Armor = 10,
     BasicDamage = 5,
