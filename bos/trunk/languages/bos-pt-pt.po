@@ -860,7 +860,7 @@ msgid "Shift F2-F4"
 msgstr "Shift F2-F4"
 
 #: scripts/menus/ingame/game.lua:416
-msgid "- save map postition"
+msgid "- save map position"
 msgstr "- Salvar posição do mapa"
 
 #: scripts/menus/ingame/game.lua:417
