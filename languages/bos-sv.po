@@ -801,7 +801,7 @@ msgid "Shift F2-F4"
 msgstr "Skift F2-F4"
 
 #: scripts/menus/ingame/game.lua:416
-msgid "- save map postition"
+msgid "- save map position"
 msgstr "- spara kartposition"
 
 #: scripts/menus/ingame/game.lua:417
