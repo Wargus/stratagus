@@ -168,6 +168,16 @@ static void PatchEditorCallbackButtonDown(unsigned button)
 			// replace speed value
 			newFlag = (flag & ~MapFieldSpeedMask) | FlagMap[CurrentButton];
 			SetFlagWhileDragging = true;
+		} else if (CurrentButton == ButtonWater) {
+			if (flag & FlagMap[CurrentButton]) {
+				// set default to land
+				newFlag = (flag ^ FlagMap[CurrentButton]) | MapFieldLandAllowed;
+			} else {
+				// clear existing land/water flags then set the new flag
+				newFlag = flag & ~(MapFieldLandAllowed | MapFieldCoastAllowed | MapFieldWaterAllowed | MapFieldNoBuilding);
+				newFlag |= FlagMap[CurrentButton];
+			}
+			SetFlagWhileDragging = (flag & FlagMap[CurrentButton]) == 0;
 		} else {
 			// toggle flag
 			newFlag = flag ^ FlagMap[CurrentButton];

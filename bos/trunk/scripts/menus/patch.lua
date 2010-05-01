@@ -68,7 +68,7 @@ function RunNewPatchMenu()
 
       local flags = {}
       for i=1,width * height do
-        table.insert(flags, 3)
+        table.insert(flags, 0x13)
       end
 
       patchType(name, image, width, height, flags)
