@@ -633,24 +633,24 @@ class AlwaysRunner(Runner):
         return None, None
 
 class SmartRunner(Runner):
-    def __init__(self, builder):
+    def __init__(self, builder, candidates=[StraceRunner,AtimesRunner, AlwaysRunner]):
         self._builder = builder
         self._runner = None
+        self._candidates = candidates
 
     def __call__(self, *args):
         """ Smart command runner that uses StraceRunner if it can,
             otherwise AtimesRunner if available, otherwise AlwaysRunner.
             When first called, it caches which runner it used for next time."""
-
         if self._runner is None:
-            try:
-                self._runner = StraceRunner(self._builder)
-            except RunnerUnsupportedException:
+            for runner in self._candidates:
                 try:
-                    self._runner = AtimesRunner(self._builder)
+                    self._runner = runner(self._builder)
+                    break
                 except RunnerUnsupportedException:
-                    self._runner = AlwaysRunner(self._builder)
-
+                    pass
+            else:
+                raise RunnerUnsupportedException()
         return self._runner(*args)
 
 class Builder(object):
