@@ -37,8 +37,6 @@ DefineAnimations("animations-wscout", {
         "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1",
         "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1",
         "frame 0", "move 2", "unbreakable end", "wait 1", },
-    Death = {"unbreakable begin", "frame 5", "wait 5", 
-        "frame 10", "wait 5", "frame 15", "unbreakable end", "wait 20", },
     })
 
 DefineIcon({
@@ -49,8 +47,7 @@ DefineIcon({
 
 DefineUnitType("unit-wscout", {
     Name = "Water Scout",
-    Image = {"file", "units/wscout/wscout.png", "size", {96, 96}},
-    Shadow = {"file", "units/wscout/wscout_s.png", "size", {96, 96}},
+    Image = {"file", "units/wscout/wscout.png", "size", {64, 64}},
     Animations = "animations-wscout",
     Icon = "icon-wscout",
     EnergyValue = 600,
@@ -59,8 +56,8 @@ DefineUnitType("unit-wscout", {
     Speed = 20,
     HitPoints = 40,
     DrawLevel = 25,
-    TileSize = {2, 2},
-    BoxSize = {96, 96},
+    TileSize = {1, 1},
+    BoxSize = {48, 48},
     SightRange = 8,
     Armor = 10,
     BasicDamage = 5,
