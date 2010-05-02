@@ -722,7 +722,7 @@ function RunEditorNewMenu()
   local defaultSize = {64, 64}
   local returnToMainMenu = false
 
-  menu = BosMenu(_("Editor"))
+  menu = BosMenu(_("Create New Map"))
 
   function starteditorbutton(s)
     local n = tonumber(xsize:getText())
@@ -772,7 +772,7 @@ function RunEditorLoadMenu()
   local numplayers = 2
   local returnToMainMenu = false
 
-  menu = BosMenu(_("Editor"))
+  menu = BosMenu(_("Select Map to Edit"))
 
   menu:writeLargeText(_("Map"), sx, sy*3)
   menu:writeText(_("File:"), sx, sy*3+30)

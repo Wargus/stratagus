@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-02 13:10+0300\n"
+"POT-Creation-Date: 2010-05-02 14:29+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -76,30 +76,30 @@ msgstr ""
 msgid "Start Game"
 msgstr ""
 
-#: scripts/guichan.lua:531 scripts/guichan.lua:757
+#: scripts/guichan.lua:531 scripts/guichan.lua:777
 #: scripts/menus/network.lua:130 scripts/menus/network.lua:317
 msgid "Map"
 msgstr ""
 
-#: scripts/guichan.lua:532 scripts/guichan.lua:758
+#: scripts/guichan.lua:532 scripts/guichan.lua:778
 #: scripts/menus/network.lua:131 scripts/menus/network.lua:318
 #: scripts/menus/network.lua:418
 msgid "File:"
 msgstr ""
 
-#: scripts/guichan.lua:535 scripts/guichan.lua:724 scripts/guichan.lua:762
+#: scripts/guichan.lua:535 scripts/guichan.lua:742 scripts/guichan.lua:782
 #: scripts/menus/ingame/editor.lua:109 scripts/menus/network.lua:423
 #: scripts/menus/patch.lua:53
 msgid "Size:"
 msgstr ""
 
-#: scripts/guichan.lua:538 scripts/guichan.lua:760
+#: scripts/guichan.lua:538 scripts/guichan.lua:780
 #: scripts/menus/network.lua:134 scripts/menus/network.lua:321
 #: scripts/menus/network.lua:421
 msgid "Players:"
 msgstr ""
 
-#: scripts/guichan.lua:540 scripts/guichan.lua:764
+#: scripts/guichan.lua:540 scripts/guichan.lua:784
 #: scripts/menus/network.lua:136 scripts/menus/network.lua:323
 #: scripts/menus/network.lua:425
 msgid "Description:"
@@ -187,9 +187,8 @@ msgid "Man vs Machine"
 msgstr ""
 
 #: scripts/guichan.lua:592 scripts/guichan.lua:624 scripts/guichan.lua:668
-#: scripts/guichan.lua:740 scripts/guichan.lua:792
-#: scripts/menus/campaigns.lua:149 scripts/menus/credits.lua:141
-#: scripts/menus/options.lua:313
+#: scripts/guichan.lua:711 scripts/menus/campaigns.lua:149
+#: scripts/menus/credits.lua:141 scripts/menus/options.lua:313
 msgid "Main Menu (~<Esc~>)"
 msgstr ""
 
@@ -206,7 +205,7 @@ msgstr ""
 msgid "Load Game"
 msgstr ""
 
-#: scripts/guichan.lua:683 scripts/guichan.lua:708 scripts/guichan.lua:755
+#: scripts/guichan.lua:683
 msgid "Editor"
 msgstr ""
 
@@ -214,63 +213,71 @@ msgstr ""
 msgid "Create ~!New Map"
 msgstr ""
 
-#: scripts/guichan.lua:687
+#: scripts/guichan.lua:691
 msgid "~!Load Map"
 msgstr ""
 
-#: scripts/guichan.lua:690
+#: scripts/guichan.lua:698
 msgid "C~!reate New Patch"
 msgstr ""
 
-#: scripts/guichan.lua:692 scripts/menus/patch.lua:111
+#: scripts/guichan.lua:704 scripts/menus/patch.lua:115
 msgid "Load ~!Patch"
 msgstr ""
 
-#: scripts/guichan.lua:695 scripts/menus/campaigns.lua:62
-#: scripts/menus/ingame/editor.lua:87 scripts/menus/ingame/editor.lua:125
-#: scripts/menus/ingame/editor.lua:230 scripts/menus/ingame/game.lua:112
-#: scripts/menus/ingame/game.lua:304 scripts/menus/ingame/game.lua:352
-#: scripts/menus/ingame/game.lua:365 scripts/menus/network.lua:176
-#: scripts/menus/network.lua:242 scripts/menus/network.lua:303
-#: scripts/menus/network.lua:377 scripts/menus/network.lua:449
-#: scripts/menus/network.lua:495 scripts/menus/patch.lua:80
-#: scripts/menus/patch.lua:119
+#: scripts/guichan.lua:725
+msgid "Create New Map"
+msgstr ""
+
+#: scripts/guichan.lua:758 scripts/guichan.lua:813
+#: scripts/menus/campaigns.lua:62 scripts/menus/ingame/editor.lua:87
+#: scripts/menus/ingame/editor.lua:125 scripts/menus/ingame/editor.lua:230
+#: scripts/menus/ingame/game.lua:112 scripts/menus/ingame/game.lua:304
+#: scripts/menus/ingame/game.lua:352 scripts/menus/ingame/game.lua:365
+#: scripts/menus/network.lua:176 scripts/menus/network.lua:242
+#: scripts/menus/network.lua:303 scripts/menus/network.lua:377
+#: scripts/menus/network.lua:449 scripts/menus/network.lua:495
+#: scripts/menus/patch.lua:62 scripts/menus/patch.lua:113
 msgid "Cancel (~<Esc~>)"
 msgstr ""
 
-#: scripts/guichan.lua:742 scripts/guichan.lua:794 scripts/guichan.lua:824
+#: scripts/guichan.lua:760 scripts/guichan.lua:815 scripts/guichan.lua:846
 msgid "Start ~!Editor"
 msgstr ""
 
-#: scripts/guichan.lua:815 scripts/menus/network.lua:380
+#: scripts/guichan.lua:775
+msgid "Select Map to Edit"
+msgstr ""
+
+#: scripts/guichan.lua:837 scripts/menus/network.lua:380
 msgid "~!Start Game"
 msgstr ""
 
-#: scripts/guichan.lua:816
+#: scripts/guichan.lua:838
 msgid "~!Load Game"
 msgstr ""
 
-#: scripts/guichan.lua:817
+#: scripts/guichan.lua:839
 msgid "~!Campaigns"
 msgstr ""
 
-#: scripts/guichan.lua:818
+#: scripts/guichan.lua:840
 msgid "Show ~!Replay"
 msgstr ""
 
-#: scripts/guichan.lua:820
+#: scripts/guichan.lua:842
 msgid "~!MultiPlayer"
 msgstr ""
 
-#: scripts/guichan.lua:821
+#: scripts/guichan.lua:843
 msgid "~!Options"
 msgstr ""
 
-#: scripts/guichan.lua:823
+#: scripts/guichan.lua:845
 msgid "Cre~!dits"
 msgstr ""
 
-#: scripts/guichan.lua:826
+#: scripts/guichan.lua:848
 msgid "E~!xit"
 msgstr ""
 
@@ -1090,11 +1097,11 @@ msgstr ""
 msgid "Options"
 msgstr ""
 
-#: scripts/menus/patch.lua:39 scripts/menus/patch.lua:95
-msgid "Patch Editor"
+#: scripts/menus/patch.lua:39
+msgid "Create New Patch"
 msgstr ""
 
-#: scripts/menus/patch.lua:41 scripts/menus/patch.lua:103
+#: scripts/menus/patch.lua:41 scripts/menus/patch.lua:105
 msgid "Name:"
 msgstr ""
 
@@ -1106,6 +1113,10 @@ msgstr ""
 msgid "x"
 msgstr ""
 
-#: scripts/menus/patch.lua:62
+#: scripts/menus/patch.lua:64
 msgid "Create ~!Patch"
+msgstr ""
+
+#: scripts/menus/patch.lua:97
+msgid "Select Patch to Edit"
 msgstr ""

@@ -36,7 +36,7 @@ function RunNewPatchMenu()
   local height = 1
   local returnToMainMenu = false
 
-  menu = BosMenu(_("Patch Editor"))
+  menu = BosMenu(_("Create New Patch"))
 
   menu:addLabel(_("Name:"), Video.Width / 2 - 80, y)
   local nameInput = menu:addTextInputField(name,
@@ -94,7 +94,7 @@ function RunLoadPatchMenu()
   local names = {}
   local returnToMainMenu = false
 
-  menu = BosMenu(_("Patch Editor"))
+  menu = BosMenu(_("Select Patch to Edit"))
 
   typeNames = Map.PatchManager:getPatchTypeNames()
   -- Convert vector to lua table
