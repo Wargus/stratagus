@@ -35,6 +35,7 @@ function RunNewPatchMenu()
   local image = ""
   local width = 1
   local height = 1
+  local returnToMainMenu = false
 
   menu = BosMenu(_("Patch Editor"))
 
@@ -76,11 +77,13 @@ function RunNewPatchMenu()
       StartPatchEditor(name)
       HandleCommandKey = HandleIngameCommandKey
       menu:stop()
+      returnToMainMenu = true
     end)
   menu:addButton(_("Cancel (~<Esc~>)"), x, Video.Height - 100,
     function() menu:stop() end)
 
   menu:run()
+  return returnToMainMenu
 end
 
 
@@ -91,6 +94,7 @@ function RunLoadPatchMenu()
   local name = ""
   local typeNames
   local names = {}
+  local returnToMainMenu = false
 
   menu = BosMenu(_("Patch Editor"))
 
@@ -115,9 +119,11 @@ function RunLoadPatchMenu()
       StartPatchEditor(name)
       HandleCommandKey = HandleIngameCommandKey
       menu:stop()
+      returnToMainMenu = true
     end)
   menu:addButton(_("Cancel (~<Esc~>)"), x, Video.Height - 100,
     function() menu:stop() end)
 
   menu:run()
+  return returnToMainMenu
 end
