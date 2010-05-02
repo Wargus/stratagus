@@ -356,7 +356,7 @@ msgstr "Kartan ominaisuudet (~<F5~>)"
 msgid "Player Properties (~<F6~>)"
 msgstr "Pelaajien ominaisuudet (~<F6~>)"
 
-# poistuu editorista
+# poistuu editorista päävalikkoon
 #: scripts/menus/ingame/editor.lua:57
 msgid "~!Exit to menu"
 msgstr "~!Poistu valikkoon"

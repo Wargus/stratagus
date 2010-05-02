@@ -683,16 +683,32 @@ function RunEditorMenu(s)
   menu = BosMenu(_("Editor"))
 
   menu:addButton(_("Create ~!New Map"), x1, 220,
-    function() RunEditorNewMenu(); menu:stop() end)
+    function()
+      if RunEditorNewMenu() then
+        menu:stop()
+      end
+    end)
   menu:addButton(_("~!Load Map"), x1, 260,
-    function() RunEditorLoadMenu(); menu:stop() end)
+    function()
+      if RunEditorLoadMenu() then
+        menu:stop()
+      end
+    end)
 
   menu:addButton(_("C~!reate New Patch"), x2, 220,
-    function() RunNewPatchMenu(); menu:stop() end)
+    function()
+      if RunNewPatchMenu() then
+        menu:stop()
+      end
+    end)
   menu:addButton(_("Load ~!Patch"), x2, 260,
-    function() RunLoadPatchMenu(); menu:stop() end)
+    function()
+      if RunLoadPatchMenu() then
+        menu:stop()
+      end
+    end)
 
-  menu:addButton(_("Cancel (~<Esc~>)"), x, Video.Height - 100,
+  menu:addButton(_("Main Menu (~<Esc~>)"), x, Video.Height - 100,
     function() menu:stop() end)
 
   menu:run()
@@ -704,6 +720,7 @@ function RunEditorNewMenu()
   local xsize
   local ysize
   local defaultSize = {64, 64}
+  local returnToMainMenu = false
 
   menu = BosMenu(_("Editor"))
 
@@ -718,6 +735,7 @@ function RunEditorNewMenu()
     StartEditor(nil)
     Load("scripts/uilayout.lua")
     HandleCommandKey = HandleIngameCommandKey
+    returnToMainMenu = true
     menu:stop()
   end
 
@@ -737,12 +755,13 @@ function RunEditorNewMenu()
   ysize = menu:addTextInputField(tostring(defaultSize[2]),
     Video.Width / 2 + 10 + 60, 8 * sy, 40)
 
-  menu:addButton(_("Main Menu (~<Esc~>)"), Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("Cancel (~<Esc~>)"), Video.Width / 2 - 250, Video.Height - 100,
     function() menu:stop() end)
   menu:addButton(_("Start ~!Editor"), Video.Width / 2 + 50, Video.Height - 100,
     starteditorbutton)
 
   menu:run()
+  return returnToMainMenu
 end
 
 function RunEditorLoadMenu()
@@ -751,6 +770,7 @@ function RunEditorLoadMenu()
   local sy = Video.Height / 20
   local selectedmap = "islandwar.map"
   local numplayers = 2
+  local returnToMainMenu = false
 
   menu = BosMenu(_("Editor"))
 
@@ -788,14 +808,16 @@ function RunEditorLoadMenu()
     Load("scripts/uilayout.lua")
     HandleCommandKey = HandleIngameCommandKey
     menu:stop()
+    returnToMainMenu = true
   end
-  menu:addButton(_("Main Menu (~<Esc~>)"), Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("Cancel (~<Esc~>)"), Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop() end)
   menu:addButton(_("Start ~!Editor"), Video.Width / 2 + 50, Video.Height -100,
                  starteditorbutton)
 
   menu:run()
   PresentMap = OldPresentMap
+  return returnToMainMenu
 end
 
 Load("scripts/menus/network.lua")
