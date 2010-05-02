@@ -86,6 +86,7 @@ DefineUnitType("unit-rtank", {
     CanAttack = true,
     CanTargetLand = true,
     CanTargetAir = true,
+    CanTargetSea = true,
     NumDirections = 8,
     MaxAttackRange = 6,
     Sounds = {
