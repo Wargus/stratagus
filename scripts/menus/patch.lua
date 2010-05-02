@@ -29,7 +29,6 @@ end
 
 function RunNewPatchMenu()
   local menu
-  local x = Video.Width / 2 - 100
   local y = Video.Height * 4 / 10
   local name = ""
   local image = ""
@@ -60,7 +59,9 @@ function RunNewPatchMenu()
 
   y = y + 30
 
-  menu:addButton(_("Create ~!Patch"), x, Video.Height - 140,
+  menu:addButton(_("Cancel (~<Esc~>)"), Video.Width / 2 - 250, Video.Height - 100,
+    function() menu:stop() end)
+  menu:addButton(_("Create ~!Patch"), Video.Width / 2 + 50, Video.Height - 100,
     function()
       name = nameInput:getText()
       image = imageInput:getText()
@@ -79,8 +80,6 @@ function RunNewPatchMenu()
       menu:stop()
       returnToMainMenu = true
     end)
-  menu:addButton(_("Cancel (~<Esc~>)"), x, Video.Height - 100,
-    function() menu:stop() end)
 
   menu:run()
   return returnToMainMenu
@@ -89,7 +88,6 @@ end
 
 function RunLoadPatchMenu()
   local menu
-  local x = Video.Width / 2 - 100
   local y = 260
   local name = ""
   local typeNames
@@ -112,7 +110,9 @@ function RunLoadPatchMenu()
 
   y = y + 40
 
-  menu:addButton(_("Load ~!Patch"), x, Video.Height - 140,
+  menu:addButton(_("Cancel (~<Esc~>)"), Video.Width / 2 - 250, Video.Height - 100,
+    function() menu:stop() end)
+  menu:addButton(_("Load ~!Patch"), Video.Width / 2 + 50, Video.Height - 100,
     function()
       name = names[nameDropDown:getSelected() + 1]
       HandleCommandKey = HandlePatchEditorIngameCommandKey
@@ -121,8 +121,6 @@ function RunLoadPatchMenu()
       menu:stop()
       returnToMainMenu = true
     end)
-  menu:addButton(_("Cancel (~<Esc~>)"), x, Video.Height - 100,
-    function() menu:stop() end)
 
   menu:run()
   return returnToMainMenu
