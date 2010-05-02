@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: boswars 2.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-02 12:36+0300\n"
+"POT-Creation-Date: 2010-05-02 12:54+0300\n"
 "PO-Revision-Date: 2010-03-13 20:14+0200\n"
 "Last-Translator: Kalle Olavi Niemitalo <kon@iki.fi>\n"
 "Language-Team: Kimmo Kalevi Merikivi <fi@li.org>\n"
@@ -191,6 +191,7 @@ msgstr "Ihminen vs. kone"
 #: scripts/guichan.lua:592 scripts/guichan.lua:624 scripts/guichan.lua:668
 #: scripts/guichan.lua:736 scripts/guichan.lua:788
 #: scripts/menus/campaigns.lua:149 scripts/menus/credits.lua:141
+#: scripts/menus/options.lua:313
 msgid "~!Main Menu"
 msgstr "~!Päävalikko"
 
@@ -1104,10 +1105,6 @@ msgstr "~!Nopeus"
 #: scripts/menus/options.lua:311
 msgid "~!Language"
 msgstr "~!Kieli"
-
-#: scripts/menus/options.lua:313
-msgid "~!Main menu"
-msgstr "~!Päävalikko"
 
 #: scripts/menus/options.lua:321
 msgid "Options"

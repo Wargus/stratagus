@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bos-de\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-02 12:36+0300\n"
+"POT-Creation-Date: 2010-05-02 12:54+0300\n"
 "PO-Revision-Date: 2006-05-05 18:34+0200\n"
 "Last-Translator: Dirk\n"
 "Language-Team:  <de@li.org>\n"
@@ -189,6 +189,7 @@ msgstr "Mensch gegen Maschine"
 #: scripts/guichan.lua:592 scripts/guichan.lua:624 scripts/guichan.lua:668
 #: scripts/guichan.lua:736 scripts/guichan.lua:788
 #: scripts/menus/campaigns.lua:149 scripts/menus/credits.lua:141
+#: scripts/menus/options.lua:313
 msgid "~!Main Menu"
 msgstr "Haupt~!menü"
 
@@ -1093,10 +1094,6 @@ msgstr "~!Geschwindigkeit"
 #: scripts/menus/options.lua:311
 msgid "~!Language"
 msgstr "S~!prache"
-
-#: scripts/menus/options.lua:313
-msgid "~!Main menu"
-msgstr "Haupt~!menü"
 
 #: scripts/menus/options.lua:321
 msgid "Options"
