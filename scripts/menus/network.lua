@@ -173,7 +173,7 @@ function RunJoiningMapMenu(s)
   end
   menu:addCheckBox(_("~!Ready"), sx*11,  sy*14, readycb)
 
-  menu:addButton(_("~!Cancel"), sx * 10 - 100, Video.Height - 100,
+  menu:addButton(_("Cancel (~<Esc~>)"), sx * 10 - 100, Video.Height - 100,
                  function() 
                  NetworkDetachFromServer() menu:stop() end
   )
@@ -239,7 +239,7 @@ function RunJoiningGameMenu(s)
   menu:add(sb, x-50, Video.Height/2)
   sb:setBackgroundColor(dark)
 
-  menu:addButton(_("~!Cancel"), x, Video.Height - 100,
+  menu:addButton(_("Cancel (~<Esc~>)"), x, Video.Height - 100,
                  function() menu:stop() end)
 
   local function checkconnection() 
@@ -300,7 +300,7 @@ function RunJoinIpMenu()
       menu:stop() 
     end
   )
-  menu:addButton(_("~!Cancel"), x, Video.Height - 100,
+  menu:addButton(_("Cancel (~<Esc~>)"), x, Video.Height - 100,
                  function() menu:stop() end)
   menu:run()
 end
@@ -374,7 +374,7 @@ function RunServerMultiGameMenu(map, description, numplayers)
   ServerSetupState.ResourcesOption = 3
   ServerSetupState.GameTypeOption = SettingsGameTypeMapDefault
 
-  menu:addButton(_("~!Cancel"), Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("Cancel (~<Esc~>)"), Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop() end)
 
   startgame = menu:addButton(_("~!Start Game"), 
@@ -446,7 +446,7 @@ function RunCreateMultiGameMenu(s)
   end
   browser:setActionCallback(cb)
   
-  menu:addButton(_("~!Cancel"), Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("Cancel (~<Esc~>)"), Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop(1) end)
   menu:addButton(_("Create ~!Game"), Video.Width / 2 + 50, Video.Height - 100,
     function(s)    
@@ -492,7 +492,7 @@ function RunMultiPlayerMenu(s)
       menu:stop(1)
     end)
 
-  menu:addButton(_("~!Cancel"), Video.Width / 2 - 100, Video.Height - 100,
+  menu:addButton(_("Cancel (~<Esc~>)"), Video.Width / 2 - 100, Video.Height - 100,
                  function() menu:stop() end)
   menu:run()
   ExitNetwork1()

@@ -59,7 +59,7 @@ function RunBriefingMenu(objectivestext, briefingtext, briefingsound, background
       if (channel ~= nil) then StopChannel(channel) end
       menu:stop()
     end)
-  menu:addButton(_("~!Cancel"), Video.Width / 2 - 100, Video.Height - 65,
+  menu:addButton(_("Cancel (~<Esc~>)"), Video.Width / 2 - 100, Video.Height - 65,
     function()
       if (channel ~= nil) then StopChannel(channel) end
       menu:stop(1)

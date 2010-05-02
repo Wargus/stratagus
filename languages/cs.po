@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-21 20:58-0700\n"
+"POT-Creation-Date: 2010-05-02 12:36+0300\n"
 "PO-Revision-Date: 2007-07-27 00:22+0100\n"
 "Last-Translator: Radim Luža <radimluza@seznam.cz>\n"
 "Language-Team: Czech\n"
@@ -71,78 +71,78 @@ msgstr "Hráč \"%s\" opustil hru"
 msgid "Player \"%s\" has been killed"
 msgstr "Hráč \"%s\" byl zničen"
 
-#: editor/editloop.cpp:312
+#: editor/editloop.cpp:371
 msgid "Unit deleted"
 msgstr "Jednotka smazána"
 
-#: editor/editloop.cpp:542 editor/editloop.cpp:835
+#: editor/editloop.cpp:694 editor/editloop.cpp:987
 msgid "Player"
 msgstr ""
 
-#: editor/editloop.cpp:547
+#: editor/editloop.cpp:699
 msgid "Neutral"
 msgstr ""
 
-#: editor/editloop.cpp:551
+#: editor/editloop.cpp:703
 msgid "Nobody"
 msgstr ""
 
-#: editor/editloop.cpp:554
+#: editor/editloop.cpp:706
 msgid "Person"
 msgstr ""
 
-#: editor/editloop.cpp:559
+#: editor/editloop.cpp:711
 msgid "Computer"
 msgstr ""
 
-#: editor/editloop.cpp:840
+#: editor/editloop.cpp:992
 msgid "Amount of"
 msgstr ""
 
-#: editor/editloop.cpp:856
+#: editor/editloop.cpp:1008
 msgid "Patch"
 msgstr ""
 
-#: editor/editloop.cpp:1152
+#: editor/editloop.cpp:1290
 msgid "Unit can't be placed here."
 msgstr "Jednotka zde nemůže být umístěna"
 
-#: editor/editloop.cpp:1236
+#: editor/editloop.cpp:1371
 #, fuzzy
 msgid "Patch deleted"
 msgstr "Jednotka smazána"
 
-#: editor/editloop.cpp:1268
+#: editor/editloop.cpp:1402
 msgid "Unit owner modified"
 msgstr "Vlastník jednotky změněn"
 
-#: editor/editloop.cpp:1484
+#: editor/editloop.cpp:1603 editor/editloop.cpp:1639
 #, fuzzy
 msgid "Select player #"
 msgstr "Vyberte Cíl"
 
-#: editor/editloop.cpp:1581
+#: editor/editloop.cpp:1737
 msgid "Select mode"
 msgstr "Režim výběru"
 
-#: editor/editloop.cpp:1592
+#: editor/editloop.cpp:1748
 msgid "Unit mode"
 msgstr "Režim jednotek"
 
-#: editor/editloop.cpp:1603
+#: editor/editloop.cpp:1759
 #, fuzzy
 msgid "Patch mode"
 msgstr "Režim jednotek"
 
-#: editor/editloop.cpp:1614
+#: editor/editloop.cpp:1770
 msgid "Set start location mode"
 msgstr "Režim nastavení výchozí pozice"
 
-#: editor/patch_editor.cpp:503
+#: editor/patch_editor.cpp:522
 msgid "Save"
 msgstr ""
 
-#: editor/patch_editor.cpp:509
+#: editor/patch_editor.cpp:528
 msgid "Exit"
 msgstr ""
 
@@ -216,64 +216,64 @@ msgstr "Vyberte Cíl"
 msgid "Select Location"
 msgstr "Vyberte Umístění"
 
-#: ui/interface.cpp:107
+#: ui/interface.cpp:105
 #, c-format
 msgid "MESSAGE:%s~!_"
 msgstr "ZPRÁVA:%s~!_"
 
-#: ui/interface.cpp:259
+#: ui/interface.cpp:257
 msgid "Sound is on."
 msgstr "Zvuk je zapnut."
 
-#: ui/interface.cpp:261
+#: ui/interface.cpp:259
 msgid "Sound is off."
 msgstr "Zvuk je vypnut."
 
-#: ui/interface.cpp:276
+#: ui/interface.cpp:274
 msgid "Music is off."
 msgstr "Hudba je vypnuta."
 
-#: ui/interface.cpp:279
+#: ui/interface.cpp:277
 msgid "Music is on."
 msgstr "Hudba je zapnuta."
 
-#: ui/interface.cpp:292 ui/mouse.cpp:1612
+#: ui/interface.cpp:290 ui/mouse.cpp:1613
 msgid "Game Paused"
 msgstr "Hra pozastavena"
 
-#: ui/interface.cpp:294
+#: ui/interface.cpp:292
 msgid "Game Resumed"
 msgstr "Hra pokračuje"
 
-#: ui/interface.cpp:325
+#: ui/interface.cpp:323
 msgid "Big map enabled"
 msgstr "Velká mapa povolena"
 
-#: ui/interface.cpp:334
+#: ui/interface.cpp:332
 msgid "Returning to old map"
 msgstr "Navráceno ke staré mapě"
 
-#: ui/interface.cpp:348
+#: ui/interface.cpp:346
 msgid "Faster"
 msgstr "Rychleji"
 
-#: ui/interface.cpp:367
+#: ui/interface.cpp:365
 msgid "Slower"
 msgstr "Pomaleji"
 
-#: ui/interface.cpp:422
+#: ui/interface.cpp:398
 msgid "Terrain displayed."
 msgstr "Terén zobrazen."
 
-#: ui/interface.cpp:424
+#: ui/interface.cpp:400
 msgid "Terrain hidden."
 msgstr "Terén skryt."
 
-#: ui/interface.cpp:454
+#: ui/interface.cpp:430
 msgid "Grab mouse toggled."
 msgstr "Zachytávání myši přepnuto."
 
-#: ui/interface.cpp:935
+#: ui/interface.cpp:911
 msgid "Screenshot made."
 msgstr "Screenshot pořízen."
 
@@ -315,12 +315,12 @@ msgstr "Poslední zpráva opakována ~<%d~>-krát"
 msgid "~<Event: %s~>"
 msgstr "~<Událost: %s~>"
 
-#: ui/mouse.cpp:1777
+#: ui/mouse.cpp:1778
 #, c-format
 msgid "You have ~<%d~> %ss"
 msgstr "Máte ~<%d~> %ss"
 
-#: ui/mouse.cpp:1781
+#: ui/mouse.cpp:1782
 #, c-format
 msgid "You have ~<1~> %s"
 msgstr "Máte ~<1~> %s"
