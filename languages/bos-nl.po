@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bos-nl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-02 12:36+0300\n"
+"POT-Creation-Date: 2010-05-02 12:54+0300\n"
 "PO-Revision-Date: 2007-12-15 01:30+0100\n"
 "Last-Translator: Eric Kok <erickok@gmail.com>\n"
 "Language-Team: Dutch <foppe.benedictus@gmail.com>\n"
@@ -185,6 +185,7 @@ msgstr "Mens tegen Machine"
 #: scripts/guichan.lua:592 scripts/guichan.lua:624 scripts/guichan.lua:668
 #: scripts/guichan.lua:736 scripts/guichan.lua:788
 #: scripts/menus/campaigns.lua:149 scripts/menus/credits.lua:141
+#: scripts/menus/options.lua:313
 msgid "~!Main Menu"
 msgstr "~!Hoofdmenu"
 
@@ -1097,10 +1098,6 @@ msgstr "~!Snelheid"
 #: scripts/menus/options.lua:311
 msgid "~!Language"
 msgstr "~!Taal"
-
-#: scripts/menus/options.lua:313
-msgid "~!Main menu"
-msgstr "Hoofdmenu (~!M)"
 
 #: scripts/menus/options.lua:321
 msgid "Options"

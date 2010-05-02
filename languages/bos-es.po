@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-02 12:36+0300\n"
+"POT-Creation-Date: 2010-05-02 12:54+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -188,6 +188,7 @@ msgstr "Humano vs Maquina "
 #: scripts/guichan.lua:592 scripts/guichan.lua:624 scripts/guichan.lua:668
 #: scripts/guichan.lua:736 scripts/guichan.lua:788
 #: scripts/menus/campaigns.lua:149 scripts/menus/credits.lua:141
+#: scripts/menus/options.lua:313
 msgid "~!Main Menu"
 msgstr "~!Menú Principal"
 
@@ -1114,10 +1115,6 @@ msgstr "V~!elocidad"
 #: scripts/menus/options.lua:311
 msgid "~!Language"
 msgstr "~!Idioma"
-
-#: scripts/menus/options.lua:313
-msgid "~!Main menu"
-msgstr "Menu ~!Principal"
 
 #: scripts/menus/options.lua:321
 msgid "Options"
