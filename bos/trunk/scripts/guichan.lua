@@ -688,7 +688,7 @@ function RunEditorMenu(s)
   menu:addButton(_("~!Patch Editor"), x, 320,
     function() RunPatchEditorMenu(); menu:stop() end)
 
-  menu:addButton(_("~!Cancel"), x, Video.Height - 100,
+  menu:addButton(_("Cancel (~<Esc~>)"), x, Video.Height - 100,
     function() menu:stop() end)
 
   menu:run()

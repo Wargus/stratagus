@@ -109,7 +109,7 @@ function RunSaveMenu()
       menu:stop()
     end)
 
-  menu:addSmallButton(_("~!Cancel"), 16 + 12 + 106, 248,
+  menu:addSmallButton(_("Cancel (~<Esc~>)"), 16 + 12 + 106, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -301,7 +301,7 @@ function RunDiplomacyMenu()
       end
       menu:stop()
     end)
-  menu:addSmallButton(_("~!Cancel"), 195, 384 - 40, function() menu:stop() end)
+  menu:addSmallButton(_("Cancel (~<Esc~>)"), 195, 384 - 40, function() menu:stop() end)
 
   menu:run(false)
 end

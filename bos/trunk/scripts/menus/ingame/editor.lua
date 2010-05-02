@@ -84,7 +84,7 @@ function RunEditorSaveMenu()
       menu:stop()
     end)
 
-  menu:addSmallButton(_("~!Cancel"), 16 + 12 + 106, 248,
+  menu:addSmallButton(_("Cancel (~<Esc~>)"), 16 + 12 + 106, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -122,7 +122,7 @@ function RunEditorMapPropertiesMenu()
     end
   )
 
-  menu:addSmallButton(_("~!Cancel"), (288 - (288 - (106 * 2)) / 4) - 106, 256 - 11 - 27,
+  menu:addSmallButton(_("Cancel (~<Esc~>)"), (288 - (288 - (106 * 2)) / 4) - 106, 256 - 11 - 27,
     function()
       menu:stop()
     end
@@ -227,7 +227,7 @@ function RunEditorPlayerPropertiesMenu()
       menu:stop()
     end)
 
-  menu:addSmallButton(_("~!Cancel"), (500 - (500 - (106 * 2)) / 4) - 106, 270,
+  menu:addSmallButton(_("Cancel (~<Esc~>)"), (500 - (500 - (106 * 2)) / 4) - 106, 270,
     function() menu:stop() end)
 
   menu:run(false)

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bos-sv\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-21 20:58-0700\n"
+"POT-Creation-Date: 2010-05-02 12:36+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -72,78 +72,78 @@ msgstr "Il giocatore \"%s\" ha lasciato la partita"
 msgid "Player \"%s\" has been killed"
 msgstr "Il giocatore \"%s\" è stato ucciso"
 
-#: editor/editloop.cpp:312
+#: editor/editloop.cpp:371
 msgid "Unit deleted"
 msgstr "Unità eliminata"
 
-#: editor/editloop.cpp:542 editor/editloop.cpp:835
+#: editor/editloop.cpp:694 editor/editloop.cpp:987
 msgid "Player"
 msgstr ""
 
-#: editor/editloop.cpp:547
+#: editor/editloop.cpp:699
 msgid "Neutral"
 msgstr ""
 
-#: editor/editloop.cpp:551
+#: editor/editloop.cpp:703
 msgid "Nobody"
 msgstr ""
 
-#: editor/editloop.cpp:554
+#: editor/editloop.cpp:706
 msgid "Person"
 msgstr ""
 
-#: editor/editloop.cpp:559
+#: editor/editloop.cpp:711
 msgid "Computer"
 msgstr ""
 
-#: editor/editloop.cpp:840
+#: editor/editloop.cpp:992
 msgid "Amount of"
 msgstr ""
 
-#: editor/editloop.cpp:856
+#: editor/editloop.cpp:1008
 msgid "Patch"
 msgstr ""
 
-#: editor/editloop.cpp:1152
+#: editor/editloop.cpp:1290
 msgid "Unit can't be placed here."
 msgstr "L'unità non può essere piazzata qui"
 
-#: editor/editloop.cpp:1236
+#: editor/editloop.cpp:1371
 #, fuzzy
 msgid "Patch deleted"
 msgstr "Unità eliminata"
 
-#: editor/editloop.cpp:1268
+#: editor/editloop.cpp:1402
 msgid "Unit owner modified"
 msgstr "Proprietario dell'unità modificato"
 
-#: editor/editloop.cpp:1484
+#: editor/editloop.cpp:1603 editor/editloop.cpp:1639
 #, fuzzy
 msgid "Select player #"
 msgstr "Seleziona Bersaglio"
 
-#: editor/editloop.cpp:1581
+#: editor/editloop.cpp:1737
 msgid "Select mode"
 msgstr "Modalità seleziona"
 
-#: editor/editloop.cpp:1592
+#: editor/editloop.cpp:1748
 msgid "Unit mode"
 msgstr "Modalità unità"
 
-#: editor/editloop.cpp:1603
+#: editor/editloop.cpp:1759
 #, fuzzy
 msgid "Patch mode"
 msgstr "Modalità unità"
 
-#: editor/editloop.cpp:1614
+#: editor/editloop.cpp:1770
 msgid "Set start location mode"
 msgstr "Imposta posizione iniziale"
 
-#: editor/patch_editor.cpp:503
+#: editor/patch_editor.cpp:522
 msgid "Save"
 msgstr ""
 
-#: editor/patch_editor.cpp:509
+#: editor/patch_editor.cpp:528
 msgid "Exit"
 msgstr ""
 
@@ -215,64 +215,64 @@ msgstr "Seleziona Bersaglio"
 msgid "Select Location"
 msgstr "Seleziona locazione"
 
-#: ui/interface.cpp:107
+#: ui/interface.cpp:105
 #, c-format
 msgid "MESSAGE:%s~!_"
 msgstr "MESSAGGIO:%s~!_"
 
-#: ui/interface.cpp:259
+#: ui/interface.cpp:257
 msgid "Sound is on."
 msgstr "Suono acceso"
 
-#: ui/interface.cpp:261
+#: ui/interface.cpp:259
 msgid "Sound is off."
 msgstr "Suono spento"
 
-#: ui/interface.cpp:276
+#: ui/interface.cpp:274
 msgid "Music is off."
 msgstr "Musica spenta"
 
-#: ui/interface.cpp:279
+#: ui/interface.cpp:277
 msgid "Music is on."
 msgstr "Musica accesa"
 
-#: ui/interface.cpp:292 ui/mouse.cpp:1612
+#: ui/interface.cpp:290 ui/mouse.cpp:1613
 msgid "Game Paused"
 msgstr "Partita in pausa"
 
-#: ui/interface.cpp:294
+#: ui/interface.cpp:292
 msgid "Game Resumed"
 msgstr "Partita ripresa"
 
-#: ui/interface.cpp:325
+#: ui/interface.cpp:323
 msgid "Big map enabled"
 msgstr "Mappa estesa attivata"
 
-#: ui/interface.cpp:334
+#: ui/interface.cpp:332
 msgid "Returning to old map"
 msgstr "Ritorno all vecchia mappa"
 
-#: ui/interface.cpp:348
+#: ui/interface.cpp:346
 msgid "Faster"
 msgstr "Più veloce"
 
-#: ui/interface.cpp:367
+#: ui/interface.cpp:365
 msgid "Slower"
 msgstr "Più lento"
 
-#: ui/interface.cpp:422
+#: ui/interface.cpp:398
 msgid "Terrain displayed."
 msgstr "Terreno visualizzato"
 
-#: ui/interface.cpp:424
+#: ui/interface.cpp:400
 msgid "Terrain hidden."
 msgstr "Terreno nascosto"
 
-#: ui/interface.cpp:454
+#: ui/interface.cpp:430
 msgid "Grab mouse toggled."
 msgstr "Mouse attivato"
 
-#: ui/interface.cpp:935
+#: ui/interface.cpp:911
 msgid "Screenshot made."
 msgstr "Immagine scattata."
 
@@ -314,12 +314,12 @@ msgstr "Ultimo messaggio ripetuto ~<%d~> volte"
 msgid "~<Event: %s~>"
 msgstr "~<Evento: %s~>"
 
-#: ui/mouse.cpp:1777
+#: ui/mouse.cpp:1778
 #, c-format
 msgid "You have ~<%d~> %ss"
 msgstr "Tu hai ~<%d~> %ss"
 
-#: ui/mouse.cpp:1781
+#: ui/mouse.cpp:1782
 #, fuzzy, c-format
 msgid "You have ~<1~> %s"
 msgstr "Tu hai ~<%d~> %ss"

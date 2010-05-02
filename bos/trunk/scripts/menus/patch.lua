@@ -77,7 +77,7 @@ function RunNewPatchMenu()
       HandleCommandKey = HandleIngameCommandKey
       menu:stop()
     end)
-  menu:addButton(_("~!Cancel"), x, Video.Height - 100,
+  menu:addButton(_("Cancel (~<Esc~>)"), x, Video.Height - 100,
     function() menu:stop() end)
 
   menu:run()
@@ -116,7 +116,7 @@ function RunLoadPatchMenu()
       HandleCommandKey = HandleIngameCommandKey
       menu:stop()
     end)
-  menu:addButton(_("~!Cancel"), x, Video.Height - 100,
+  menu:addButton(_("Cancel (~<Esc~>)"), x, Video.Height - 100,
     function() menu:stop() end)
 
   menu:run()
@@ -134,7 +134,7 @@ function RunPatchEditorMenu()
   menu:addButton(_("~!Load Patch"), x, 300,
     function() RunLoadPatchMenu(); menu:stop() end)
 
-  menu:addButton(_("~!Cancel"), x, Video.Height - 100,
+  menu:addButton(_("Cancel (~<Esc~>)"), x, Video.Height - 100,
     function() menu:stop() end)
 
   menu:run()

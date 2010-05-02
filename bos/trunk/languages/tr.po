@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tr\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-21 20:58-0700\n"
+"POT-Creation-Date: 2010-05-02 12:36+0300\n"
 "PO-Revision-Date: 2007-07-10 00:08+0300\n"
 "Last-Translator: Murat Şenel <muratasenel@gmail.com>\n"
 "Language-Team:  <tr@li.org>\n"
@@ -71,78 +71,78 @@ msgstr "Oyuncu \"%s\" oynu terk etti"
 msgid "Player \"%s\" has been killed"
 msgstr "Oyuncu \"%s\" öldürüldü"
 
-#: editor/editloop.cpp:312
+#: editor/editloop.cpp:371
 msgid "Unit deleted"
 msgstr "Birlik silindi"
 
-#: editor/editloop.cpp:542 editor/editloop.cpp:835
+#: editor/editloop.cpp:694 editor/editloop.cpp:987
 msgid "Player"
 msgstr ""
 
-#: editor/editloop.cpp:547
+#: editor/editloop.cpp:699
 msgid "Neutral"
 msgstr ""
 
-#: editor/editloop.cpp:551
+#: editor/editloop.cpp:703
 msgid "Nobody"
 msgstr ""
 
-#: editor/editloop.cpp:554
+#: editor/editloop.cpp:706
 msgid "Person"
 msgstr ""
 
-#: editor/editloop.cpp:559
+#: editor/editloop.cpp:711
 msgid "Computer"
 msgstr ""
 
-#: editor/editloop.cpp:840
+#: editor/editloop.cpp:992
 msgid "Amount of"
 msgstr ""
 
-#: editor/editloop.cpp:856
+#: editor/editloop.cpp:1008
 msgid "Patch"
 msgstr ""
 
-#: editor/editloop.cpp:1152
+#: editor/editloop.cpp:1290
 msgid "Unit can't be placed here."
 msgstr "Birlik buraya yerleştirilemez."
 
-#: editor/editloop.cpp:1236
+#: editor/editloop.cpp:1371
 #, fuzzy
 msgid "Patch deleted"
 msgstr "Birlik silindi"
 
-#: editor/editloop.cpp:1268
+#: editor/editloop.cpp:1402
 msgid "Unit owner modified"
 msgstr "Birliğin sahibi değiştirildi"
 
-#: editor/editloop.cpp:1484
+#: editor/editloop.cpp:1603 editor/editloop.cpp:1639
 #, fuzzy
 msgid "Select player #"
 msgstr "Hedef Seçin"
 
-#: editor/editloop.cpp:1581
+#: editor/editloop.cpp:1737
 msgid "Select mode"
 msgstr "Seçme modu"
 
-#: editor/editloop.cpp:1592
+#: editor/editloop.cpp:1748
 msgid "Unit mode"
 msgstr "Birlik modu"
 
-#: editor/editloop.cpp:1603
+#: editor/editloop.cpp:1759
 #, fuzzy
 msgid "Patch mode"
 msgstr "Birlik modu"
 
-#: editor/editloop.cpp:1614
+#: editor/editloop.cpp:1770
 msgid "Set start location mode"
 msgstr "Başlangıç noktası belirleme modu"
 
-#: editor/patch_editor.cpp:503
+#: editor/patch_editor.cpp:522
 msgid "Save"
 msgstr ""
 
-#: editor/patch_editor.cpp:509
+#: editor/patch_editor.cpp:528
 msgid "Exit"
 msgstr ""
 
@@ -214,64 +214,64 @@ msgstr "Hedef Seçin"
 msgid "Select Location"
 msgstr "Yer Seçin"
 
-#: ui/interface.cpp:107
+#: ui/interface.cpp:105
 #, c-format
 msgid "MESSAGE:%s~!_"
 msgstr "MESAJ:%s~!_"
 
-#: ui/interface.cpp:259
+#: ui/interface.cpp:257
 msgid "Sound is on."
 msgstr "Ses açık."
 
-#: ui/interface.cpp:261
+#: ui/interface.cpp:259
 msgid "Sound is off."
 msgstr "Ses kapalı."
 
-#: ui/interface.cpp:276
+#: ui/interface.cpp:274
 msgid "Music is off."
 msgstr "Müzik açık."
 
-#: ui/interface.cpp:279
+#: ui/interface.cpp:277
 msgid "Music is on."
 msgstr "Müzik kapalı."
 
-#: ui/interface.cpp:292 ui/mouse.cpp:1612
+#: ui/interface.cpp:290 ui/mouse.cpp:1613
 msgid "Game Paused"
 msgstr "Oyun Durduruldu"
 
-#: ui/interface.cpp:294
+#: ui/interface.cpp:292
 msgid "Game Resumed"
 msgstr "Oyun Yeniden Başlatıldı"
 
-#: ui/interface.cpp:325
+#: ui/interface.cpp:323
 msgid "Big map enabled"
 msgstr "Büyük harita etkinleştirildi"
 
-#: ui/interface.cpp:334
+#: ui/interface.cpp:332
 msgid "Returning to old map"
 msgstr "Eski haritaya geri dönülüyor"
 
-#: ui/interface.cpp:348
+#: ui/interface.cpp:346
 msgid "Faster"
 msgstr "Daha hızlı"
 
-#: ui/interface.cpp:367
+#: ui/interface.cpp:365
 msgid "Slower"
 msgstr "Daha yavaş"
 
-#: ui/interface.cpp:422
+#: ui/interface.cpp:398
 msgid "Terrain displayed."
 msgstr "Arazi gösteriliyor."
 
-#: ui/interface.cpp:424
+#: ui/interface.cpp:400
 msgid "Terrain hidden."
 msgstr "Arazi gösterilmiyor."
 
-#: ui/interface.cpp:454
+#: ui/interface.cpp:430
 msgid "Grab mouse toggled."
 msgstr "Fare geçişi."
 
-#: ui/interface.cpp:935
+#: ui/interface.cpp:911
 msgid "Screenshot made."
 msgstr "Ekran görüntüsü alındı."
 
@@ -313,12 +313,12 @@ msgstr "~<%d~>tekrarlanan son mesaj"
 msgid "~<Event: %s~>"
 msgstr "~<Olay: %s~>"
 
-#: ui/mouse.cpp:1777
+#: ui/mouse.cpp:1778
 #, c-format
 msgid "You have ~<%d~> %ss"
 msgstr "~<%d~> %ss sahipsiniz"
 
-#: ui/mouse.cpp:1781
+#: ui/mouse.cpp:1782
 #, c-format
 msgid "You have ~<1~> %s"
 msgstr "~<1~> %s sahipsiniz"
