@@ -886,8 +886,6 @@ void DebugPlayers(void)
 			continue;
 		}
 		switch (Players[i].Type) {
-			case 0: playertype = "Don't know 0"; break;
-			case 1: playertype = "Don't know 1"; break;
 			case 2: playertype = "neutral     "; break;
 			case 3: playertype = "nobody      "; break;
 			case 4: playertype = "computer    "; break;
