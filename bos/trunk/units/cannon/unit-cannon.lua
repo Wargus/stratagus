@@ -9,7 +9,7 @@
 --
 --	unit-cannon.lua	-	Define the cannon unit.
 --
---	(c) Copyright 2004-2006 by Francois Beerten.
+--	(c) Copyright 2004-2010 by Francois Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -105,6 +105,7 @@ DefineUnitType("unit-cannon", {
     CanAttack = true,
     CanTargetLand = true,
     CanTargetAir = false,
+    CanTargetSea = true,
     NumDirections = 8,
     Corpse = "build-dead-cannon",
     Type = "land",

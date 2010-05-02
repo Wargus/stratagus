@@ -9,7 +9,7 @@
 --
 --	unit-jet.lua	-	Define the jet unit.
 --
---	(c) Copyright 2005-2006 by Francois Beerten.
+--	(c) Copyright 2005-2010 by Francois Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -88,6 +88,7 @@ DefineUnitType("unit-jet", {
     CanAttack = true,
     CanTargetLand = true,
     CanTargetAir = true,
+    CanTargetSea = true,
     NumDirections = 8,
     MaxAttackRange = 5,
     Sounds = {

@@ -88,6 +88,7 @@ DefineUnitType("unit-bomber", {
     SelectableByRectangle = true,
     CanAttack = true,
     CanTargetLand = true,
+    CanTargetSea = true,
     NumDirections = 8,
     MaxAttackRange = 1,
     Sounds = {
