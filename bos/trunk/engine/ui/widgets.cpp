@@ -1218,14 +1218,11 @@ void Windows::setBaseColor(const gcn::Color &color)
 */
 void LuaListModel::setList(lua_State *lua, lua_Object *lo)
 {
-	int args;
-	int j;
+	clear();
 
-	list.clear();
-
-	args = lua_objlen(lua, *lo);
-	for (j = 0; j < args; ++j) {
-		list.push_back(std::string(LuaToString(lua, *lo, j + 1)));
+	int args = lua_objlen(lua, *lo);
+	for (int j = 0; j < args; ++j) {
+		add(std::string(LuaToString(lua, *lo, j + 1)));
 	}
 }
 

@@ -135,6 +135,8 @@ static void EditorAddUndoAction(EditorAction action);
 extern gcn::Gui *Gui;
 static gcn::Container *editorContainer;
 static gcn::Slider *editorUnitSlider;
+static gcn::DropDown *editorUnitDropDown;
+static StringListModel *editorUnitListModel;
 static gcn::Slider *editorPatchSlider;
 
 class EditorUnitSliderListener : public gcn::ActionListener
@@ -157,6 +159,51 @@ public:
 };
 
 static EditorUnitSliderListener *editorUnitSliderListener;
+
+typedef bool (*UnitFilterFunc)(const CUnitType *);
+static void RecalculateShownUnits(UnitFilterFunc filter);
+
+static bool unitFilterAll(const CUnitType *type)
+{
+	return true;
+}
+static bool unitFilterUnits(const CUnitType *type)
+{
+	return !type->Building;
+}
+static bool unitFilterBuildings(const CUnitType *type)
+{
+	return type->Building && !type->Neutral;
+}
+static bool unitFilterNeutral(const CUnitType *type)
+{
+	return type->Neutral;
+}
+
+struct UnitFilter
+{
+	UnitFilterFunc filter;
+	std::string name;
+};
+
+static UnitFilter unitFilters[] = {
+	{ &unitFilterAll, "All" },
+	{ &unitFilterUnits, "Units" },
+	{ &unitFilterBuildings, "Buildings" },
+	{ &unitFilterNeutral, "Neutral" },
+};
+
+class EditorUnitDropDownListener : public gcn::ActionListener
+{
+public:
+	virtual void action(const std::string &eventId)
+	{
+		int selected = editorUnitDropDown->getSelected();
+		RecalculateShownUnits(unitFilters[selected].filter);
+	}
+};
+
+static EditorUnitDropDownListener *editorUnitDropDownListener;
 
 class EditorPatchSliderListener : public gcn::ActionListener
 {
@@ -558,7 +605,7 @@ static void CalculateMaxIconSize()
 /**
 **  Recalculate the shown units.
 */
-static void RecalculateShownUnits()
+static void RecalculateShownUnits(UnitFilterFunc filter)
 {
 	const CUnitType *type;
 
@@ -567,7 +614,10 @@ static void RecalculateShownUnits()
 	for (int i = 0; i < (int)Editor.UnitTypes.size(); ++i)
 	{
 		type = UnitTypeByIdent(Editor.UnitTypes[i]);
-		Editor.ShownUnitTypes.push_back(type);
+		if (!filter || filter(type))
+		{
+			Editor.ShownUnitTypes.push_back(type);
+		}
 	}
 
 	if (Editor.UnitIndex >= (int)Editor.ShownUnitTypes.size())
@@ -1111,12 +1161,14 @@ static void EditorCallbackButtonDown(unsigned button)
 				Editor.State = EditorSelecting;
 				Editor.ShowPatchOutlines = false;
 				editorUnitSlider->setVisible(false);
+				editorUnitDropDown->setVisible(false);
 				editorPatchSlider->setVisible(false);
 				return;
 			case UnitButton:
 				Editor.State = EditorEditUnit;
 				Editor.ShowPatchOutlines = false;
 				editorUnitSlider->setVisible(true);
+				editorUnitDropDown->setVisible(true);
 				editorPatchSlider->setVisible(false);
 				return;
 			case PatchButton :
@@ -1126,12 +1178,14 @@ static void EditorCallbackButtonDown(unsigned button)
 					Editor.ShowPatchOutlines = true;
 				}
 				editorUnitSlider->setVisible(false);
+				editorUnitDropDown->setVisible(false);
 				editorPatchSlider->setVisible(true);
 				return;
 			case StartButton:
 				Editor.State = EditorSetStartLocation;
 				Editor.ShowPatchOutlines = false;
 				editorUnitSlider->setVisible(false);
+				editorUnitDropDown->setVisible(false);
 				editorPatchSlider->setVisible(false);
 				return;
 			default:
@@ -1954,7 +2008,7 @@ void CEditor::Init()
 
 	CreatePatchIcons();
 
-	RecalculateShownUnits();
+	RecalculateShownUnits(NULL);
 
 	EditorUndoActions.clear();
 	EditorRedoActions.clear();
@@ -2016,25 +2070,45 @@ static void EditorMainLoop()
 	Gui->setTop(editorContainer);
 
 	editorUnitSliderListener = new EditorUnitSliderListener();
+	editorUnitDropDownListener = new EditorUnitDropDownListener();
 	editorPatchSliderListener = new EditorPatchSliderListener();
 
+	gcn::Color darkNoAlphaColor(38, 38, 78);
+	gcn::Color clearColor(200, 200, 120);
+
 	editorUnitSlider = new gcn::Slider();
-	editorUnitSlider->setBaseColor(gcn::Color(38, 38, 78));
-	editorUnitSlider->setForegroundColor(gcn::Color(200, 200, 120));
-	editorUnitSlider->setBackgroundColor(gcn::Color(200, 200, 120));
+	editorUnitSlider->setBaseColor(darkNoAlphaColor);
+	editorUnitSlider->setForegroundColor(clearColor);
+	editorUnitSlider->setBackgroundColor(clearColor);
 	editorUnitSlider->setSize(176, 16);
 	editorUnitSlider->setVisible(false);
 	editorUnitSlider->addActionListener(editorUnitSliderListener);
 
+	editorUnitListModel = new StringListModel();
+	for (int i = 0; i < sizeof(unitFilters) / sizeof(*unitFilters); ++i)
+	{
+		editorUnitListModel->add(unitFilters[i].name);
+	}
+
+	editorUnitDropDown = new gcn::DropDown();
+	editorUnitDropDown->setFont(GameFont);
+	editorUnitDropDown->setBaseColor(darkNoAlphaColor);
+	editorUnitDropDown->setForegroundColor(clearColor);
+	editorUnitDropDown->setBackgroundColor(darkNoAlphaColor);
+	editorUnitDropDown->setVisible(false);
+	editorUnitDropDown->addActionListener(editorUnitDropDownListener);
+	editorUnitDropDown->setListModel(editorUnitListModel);
+
 	editorPatchSlider = new gcn::Slider();
-	editorPatchSlider->setBaseColor(gcn::Color(38, 38, 78));
-	editorPatchSlider->setForegroundColor(gcn::Color(200, 200, 120));
-	editorPatchSlider->setBackgroundColor(gcn::Color(200, 200, 120));
+	editorPatchSlider->setBaseColor(darkNoAlphaColor);
+	editorPatchSlider->setForegroundColor(clearColor);
+	editorPatchSlider->setBackgroundColor(clearColor);
 	editorPatchSlider->setSize(176, 16);
 	editorPatchSlider->setVisible(false);
 	editorPatchSlider->addActionListener(editorPatchSliderListener);
 
 	editorContainer->add(editorUnitSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y + 4);
+	editorContainer->add(editorUnitDropDown, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 20);
 	editorContainer->add(editorPatchSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y + 4);
 
 	UpdateMinimap = true;
@@ -2121,8 +2195,11 @@ static void EditorMainLoop()
 	Gui->setTop(oldTop);
 	delete editorContainer;
 	delete editorUnitSliderListener;
+	delete editorUnitDropDownListener;
+	delete editorUnitListModel;
 	delete editorPatchSliderListener;
 	delete editorUnitSlider;
+	delete editorUnitDropDown;
 	delete editorPatchSlider;
 }
 

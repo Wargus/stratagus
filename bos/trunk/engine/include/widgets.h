@@ -241,15 +241,22 @@ private:
                               /// @todo Method to set this variable. Maybe set the variable static.
 };
 
-class LuaListModel : public gcn::ListModel
+class StringListModel : public gcn::ListModel
 {
-	std::vector<std::string> list;
 public:
-	LuaListModel() {}
+	virtual int getNumberOfElements() { return mElements.size(); }
+	virtual std::string getElementAt(int i) { return mElements[i]; }
+	void add(std::string element) { mElements.push_back(element); }
+	void clear() { mElements.clear(); }
 
+private:
+	std::vector<std::string> mElements;
+};
+
+class LuaListModel : public StringListModel
+{
+public:
 	void setList(lua_State *lua, lua_Object *lo);
-	virtual int getNumberOfElements() {return list.size();}
-	virtual std::string getElementAt(int i) {return list[i];}
 };
 
 class ListBoxWidget : public gcn::ScrollArea
