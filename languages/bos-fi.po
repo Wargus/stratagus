@@ -192,8 +192,8 @@ msgstr "Ihminen vs. kone"
 #: scripts/guichan.lua:736 scripts/guichan.lua:788
 #: scripts/menus/campaigns.lua:149 scripts/menus/credits.lua:141
 #: scripts/menus/options.lua:313
-msgid "~!Main Menu"
-msgstr "~!Päävalikko"
+msgid "Main Menu (~<Esc~>)"
+msgstr "Päävalikko (~<Esc~>)"
 
 #: scripts/guichan.lua:594 scripts/guichan.lua:626 scripts/guichan.lua:670
 #: scripts/menus/campaigns.lua:57 scripts/menus/campaigns.lua:151

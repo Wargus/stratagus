@@ -192,8 +192,8 @@ msgstr "Humains contre l'ordinateur"
 #: scripts/guichan.lua:736 scripts/guichan.lua:788
 #: scripts/menus/campaigns.lua:149 scripts/menus/credits.lua:141
 #: scripts/menus/options.lua:313
-msgid "~!Main Menu"
-msgstr "~!Menu principal"
+msgid "Main Menu (~<Esc~>)"
+msgstr "Menu principal (~<Echap~>)"
 
 #: scripts/guichan.lua:594 scripts/guichan.lua:626 scripts/guichan.lua:670
 #: scripts/menus/campaigns.lua:57 scripts/menus/campaigns.lua:151
