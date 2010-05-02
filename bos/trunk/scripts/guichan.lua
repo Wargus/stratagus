@@ -589,7 +589,7 @@ function RunStartGameMenu(s)
     PresentMap = OldPresentMap
     menu:stop()
   end
-  menu:addButton(_("~!Main Menu"), Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("Main Menu (~<Esc~>)"), Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop() end)
   menu:addButton(_("~!Start"), Video.Width / 2 + 50 ,  Video.Height - 100,
                  startgamebutton)
@@ -621,7 +621,7 @@ function RunReplayMenu(s)
     menu:stop()
   end
 
-  menu:addButton(_("~!Main Menu"), Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("Main Menu (~<Esc~>)"), Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop() end)
   menu:addButton(_("~!Start"), Video.Width / 2 + 50 ,  Video.Height - 100,
                  startreplaybutton)
@@ -665,7 +665,7 @@ function RunLoadGameMenu(s)
       end
     menu:stop()
   end
-  menu:addButton(_("~!Main Menu"), Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("Main Menu (~<Esc~>)"), Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop() end)
   menu:addButton(_("~!Start"), Video.Width / 2 + 50 ,  Video.Height - 100,
                  startgamebutton)
@@ -733,7 +733,7 @@ function RunEditorNewMenu()
   ysize = menu:addTextInputField(tostring(defaultSize[2]),
     Video.Width / 2 + 10 + 60, 8 * sy, 40)
 
-  menu:addButton(_("~!Main Menu"), Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("Main Menu (~<Esc~>)"), Video.Width / 2 - 250, Video.Height - 100,
     function() menu:stop() end)
   menu:addButton(_("Start ~!Editor"), Video.Width / 2 + 50, Video.Height - 100,
     starteditorbutton)
@@ -785,7 +785,7 @@ function RunEditorLoadMenu()
     HandleCommandKey = HandleIngameCommandKey
     menu:stop()
   end
-  menu:addButton(_("~!Main Menu"), Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("Main Menu (~<Esc~>)"), Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop() end)
   menu:addButton(_("Start ~!Editor"), Video.Width / 2 + 50, Video.Height -100,
                  starteditorbutton)

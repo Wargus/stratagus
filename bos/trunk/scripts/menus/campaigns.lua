@@ -146,7 +146,7 @@ function RunCampaignsMenu(s)
     RunCampaign("campaigns/" .. browser:getSelectedItem() .. "/campaign.lua")
     menu:stop()
   end
-  menu:addButton(_("~!Main Menu"), Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("Main Menu (~<Esc~>)"), Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop() end)
   menu:addButton(_("~!Start"), Video.Width / 2 + 50 ,  Video.Height - 100,
                  startgamebutton)

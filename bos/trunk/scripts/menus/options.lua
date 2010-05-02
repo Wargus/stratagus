@@ -310,7 +310,7 @@ function BuildOptionsMenu(menu)
   menu:addButton(_("S~!peed"), x, 220, RunSpeedOptionsMenu)
   menu:addButton(_("~!Language"), x, 260, function() RunLanguageOptionsMenu() menu:stop(1) end)
 
-  menu:addButton(_("~!Main Menu"), x, Video.Height - 100, function() menu:stop() end)
+  menu:addButton(_("Main Menu (~<Esc~>)"), x, Video.Height - 100, function() menu:stop() end)
 end
 
 function RunOptionsMenu(s)
