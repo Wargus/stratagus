@@ -121,21 +121,3 @@ function RunLoadPatchMenu()
 
   menu:run()
 end
-
-
-function RunPatchEditorMenu()
-  local menu
-  local x = Video.Width / 2 - 100
-
-  menu = BosMenu(_("Patch Editor"))
-
-  menu:addButton(_("Create ~!New Patch"), x, 260,
-    function() RunNewPatchMenu(); menu:stop() end)
-  menu:addButton(_("~!Load Patch"), x, 300,
-    function() RunLoadPatchMenu(); menu:stop() end)
-
-  menu:addButton(_("Cancel (~<Esc~>)"), x, Video.Height - 100,
-    function() menu:stop() end)
-
-  menu:run()
-end

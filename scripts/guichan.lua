@@ -677,16 +677,20 @@ end
 function RunEditorMenu(s)
   local menu
   local x = Video.Width / 2 - 100
+  local x1 = Video.Width / 3 - 100
+  local x2 = Video.Width * 2 / 3 - 100
 
   menu = BosMenu(_("Editor"))
 
-  menu:addButton(_("Create ~!New Map"), x, 220,
+  menu:addButton(_("Create ~!New Map"), x1, 220,
     function() RunEditorNewMenu(); menu:stop() end)
-  menu:addButton(_("~!Load Map"), x, 260,
+  menu:addButton(_("~!Load Map"), x1, 260,
     function() RunEditorLoadMenu(); menu:stop() end)
 
-  menu:addButton(_("~!Patch Editor"), x, 320,
-    function() RunPatchEditorMenu(); menu:stop() end)
+  menu:addButton(_("C~!reate New Patch"), x2, 220,
+    function() RunNewPatchMenu(); menu:stop() end)
+  menu:addButton(_("Load ~!Patch"), x2, 260,
+    function() RunLoadPatchMenu(); menu:stop() end)
 
   menu:addButton(_("Cancel (~<Esc~>)"), x, Video.Height - 100,
     function() menu:stop() end)
