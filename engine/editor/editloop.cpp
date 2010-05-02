@@ -2085,7 +2085,7 @@ static void EditorMainLoop()
 	editorUnitSlider->addActionListener(editorUnitSliderListener);
 
 	editorUnitListModel = new StringListModel();
-	for (int i = 0; i < sizeof(unitFilters) / sizeof(*unitFilters); ++i)
+	for (size_t i = 0; i < sizeof(unitFilters) / sizeof(*unitFilters); ++i)
 	{
 		editorUnitListModel->add(unitFilters[i].name);
 	}
