@@ -91,6 +91,7 @@ DefineUnitType("unit-gturret", {
     CanAttack = true,
     CanTargetLand = true,
     CanTargetAir = true,
+    CanTargetSea = true,
     NumDirections = 8,
     Corpse = "build-dead-gturret",
     Type = "land",
