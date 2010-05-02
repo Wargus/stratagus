@@ -47,7 +47,7 @@ DefineAnimations("animations-tank", {
 
 DefineIcon({
 	Name = "icon-tank",
-	Size = {48, 39},
+	Size = {46, 38},
 	Frame = 0,
 	File = "units/tank/ico_tank.png"})
 
