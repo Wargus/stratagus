@@ -299,6 +299,7 @@ namespace gcn
                 }
                 mText.erase(newpos, mCaretPosition - newpos);
                 mCaretPosition = newpos;
+                mSelectStart = newpos;
                 ret = true;
             }
         }
