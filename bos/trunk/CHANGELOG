@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Added Atoll Walk map (Michiel van der Wulp)
 - Added destroyer ship (TimberDragon and Francois Beerten)
 - Added water scout unit (TimberDragon and Francois Beerten)
 - Fixed bug #28951: Undo/redo in the editor now supports patches (Jimmy Salmon)
