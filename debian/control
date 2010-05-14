@@ -8,7 +8,7 @@ Build-Depends: automake, libsdl1.2-dev (>> 1.2.2), libvorbis-dev,
  libgl-dev | libsdl-gles1.2-dev, libogg-dev, libtheora-dev, libmikmod2-dev
 Standards-Version: 3.6.1
 Homepage: http://stratagus.sourceforge.net
-Vcs-Svn: https://code.launchpad.net/~pali.rohar/+junk/stratagus
+Vcs-Bzr: lp:~pali.rohar/+junk/stratagus
 
 Package: stratagus
 Architecture: any
