@@ -15,7 +15,7 @@ endif
 
 DEB_BUILD_GNU_CPU ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
 
-CONFIGURE_FLAGS=--prefix=/usr --datadir=/usr/share/games/stratagus/default
+CONFIGURE_FLAGS=--prefix=/usr --datadir=/usr/share/games/stratagus/default --with-theora
 
 export CFLAGS
 
@@ -65,6 +65,7 @@ binary-arch: build install
 	dh_testroot
 #	dh_installdebconf	
 	dh_installdocs -Xgpl.html -Xgpl.txt -Xinstall.html
+	rm -rf `find debian/ | grep .svn`
 	dh_installmenu
 	dh_installman
 	dh_installchangelogs doc/ChangeLog.html

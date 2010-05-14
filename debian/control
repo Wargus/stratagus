@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: David Martínez Moreno <ender@debian.org>
 Build-Depends: libsdl1.2-dev (>> 1.2.2), libvorbis-dev, 
  libpng12-dev (>= 1.2.5), libbz2-dev, liblua5.1-dev, debhelper (>> 4.0.0), 
- libpthread-stubs0-dev, libgl-dev, libogg-dev, libtheora-dev, libvorbis-dev
+ libpthread-stubs0-dev, libgl-dev, libogg-dev, libtheora-dev
 Standards-Version: 3.6.1
 Homepage: http://stratagus.sourceforge.net
 Vcs-Svn: https://stratagus.svn.sourceforge.net/svnroot/stratagus/stratugus/trunk
@@ -26,9 +26,6 @@ Description: realtime strategy game for Unix and X
  This is the stable release of Stratagus, and is both fairly playable and
  fairly bug-free. It also has network connectivity for up to 8 players.
  .
- Please note that you have available an OpenGL-enabled version of this
- game. Install stratagus-gl package.
- .
  This version is compiled with some of the possible options, and thus has
- gzip, bunzip2, and SDL support. The sound options will depend on your
- personal election on SDL packages.
+ gzip, bunzip2, SDL and OpenGL support. The sound options will depend on
+ your personal election on SDL packages.
