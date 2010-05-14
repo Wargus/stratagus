@@ -1,3 +1,9 @@
+stratagus (2.2.5-2ubuntu1~lucid~palippa1) lucid; urgency=low
+
+  * Build from https://code.launchpad.net/~pali.rohar/+junk/stratagus rev. 11
+
+ -- Pali Rohár <pali.rohar@gmail.com>  Fri, 14 May 2010 13:36:19 +0200
+
 stratagus (2.2.5-2ubuntu1~karmic~palippa1) karmic; urgency=low
 
   * Build from https://code.launchpad.net/~pali.rohar/+junk/stratagus rev. 11
