@@ -195,13 +195,14 @@ int PlayMovie(const std::string &name)
 
 	if (f.open(buffer, CL_OPEN_READ) == -1) {
 		fprintf(stderr, "Can't open file `%s'\n", name.c_str());
-		return -1;
+		return 0;
 	}
 
 	memset(&data, 0, sizeof(data));
 	if (OggInit(&f, &data) || !data.video) {
 		OggFree(&data);
 		f.close();
+		fprintf(stderr, "OggInit() failed\n");
 		return -1;
 	}
 
@@ -311,7 +312,7 @@ int PlayMovie(const std::string &name)
 */
 int PlayMovie(const std::string &name)
 {
-	if (strstr(name.c_str(), ".ogg") || strstr(name.c_str(), ".avi")) {
+	if (strstr(name.c_str(), ".ogg") || strstr(name.c_str(), ".ogv") || strstr(name.c_str(), ".avi")) {
 		return 0;
 	}
 	return -1;
