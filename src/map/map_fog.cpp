@@ -785,10 +785,10 @@ void CMap::InitFogOfWar(void)
 		AlphaFogG->NumFrames = 16;//1;
 		AlphaFogG->GenFramesMap();
 		AlphaFogG->UseDisplayFormat();
-	} else {
-		delete[] VisibleTable;
-		VisibleTable = new unsigned short[Info.MapWidth * Info.MapHeight];
 	}
+	
+	delete[] VisibleTable;
+	VisibleTable = new unsigned short[Info.MapWidth * Info.MapHeight];
 }
 
 /**

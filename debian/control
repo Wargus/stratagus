@@ -28,15 +28,13 @@ Description: realtime strategy game for Unix and X
  fairly bug-free. It also has network connectivity for up to 8 players.
  .
  This version is compiled with some of the possible options, and thus has
- gzip, bunzip2, SDL, vorbis, theora and OpenGL support. The sound options
- will depend on your personal election on SDL packages.
+ gzip, bunzip2, SDL, vorbis, theora and OpenGL (or OpenGL ES) support.
+ The sound options will depend on your personal election on SDL packages.
 
 Package: stratagus-gl
 Architecture: all
 Depends: stratagus
 Description: Transitional package
- This dummy package is provided for a smooth transition to the new stratagus
- Please note that you have available an OpenGL-enabled version of this
- game. Install stratagus-gl package.
+ This dummy package is provided for a smooth transition to the new stratagus.
  .
  It may safely be removed after installation.
