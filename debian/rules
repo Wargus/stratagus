@@ -56,6 +56,31 @@ install: build
 	OUTFILE="./stratagus" $(MAKE) install-stratagus PREFIX=$(CURDIR)/debian/stratagus/usr
 	mv $(CURDIR)/debian/stratagus/usr/bin $(CURDIR)/debian/stratagus/usr/games/stratagus
 
+	## Maemo section
+	if test "`uname -a | grep -is arm`" && test -f /etc/maemo_version; then
+		## Optify
+		mkdir -p $(CURDIR)/debian/stratagus/opt/stratagus/bin
+		mkdir -p $(CURDIR)/debian/stratagus/opt/stratagus/share/doc
+		mkdir -p $(CURDIR)/debian/stratagus/opt/stratagus/share/doc-base
+		mkdir -p $(CURDIR)/debian/stratagus/opt/stratagus/share/stratagus
+		mkdir -p $(CURDIR)/debian/stratagus/opt/stratagus/share/man
+		mkdir -p $(CURDIR)/debian/stratagus/opt/stratagus/share/menu
+
+		mv $(CURDIR)/debian/stratagus/usr/games/stratagus $(CURDIR)/debian/stratagus/opt/stratagus/bin/stratagus
+		mv $(CURDIR)/debian/stratagus/usr/share/doc/stratagus $(CURDIR)/debian/stratagus/opt/stratagus/share/doc
+		mv $(CURDIR)/debian/stratagus/usr/share/doc-base/stratagus $(CURDIR)/debian/stratagus/opt/stratagus/share/doc-base
+		mv $(CURDIR)/debian/stratagus/usr/share/games/stratagus $(CURDIR)/debian/stratagus/opt/stratagus/share/stratagus
+		mv $(CURDIR)/debian/stratagus/usr/share/man/stratagus $(CURDIR)/debian/stratagus/opt/stratagus/share/man
+		mv $(CURDIR)/debian/stratagus/usr/share/menu/stratagus $(CURDIR)/debian/stratagus/opt/stratagus/share/menu
+
+		ln -s /opt/stratagus/bin/stratagus $(CURDIR)/debian/stratagus/usr/games/stratagus
+		ln -s /opt/stratagus/share/doc/ $(CURDIR)/debian/stratagus/usr/share/doc/stratagus
+		ln -s /opt/stratagus/share/doc-base/ $(CURDIR)/debian/stratagus/usr/share/doc-base/stratagus
+		ln -s /opt/stratagus/share/stratagus/ $(CURDIR)/debian/stratagus/usr/share/games/stratagus
+		ln -s /opt/stratagus/share/man/ $(CURDIR)/debian/stratagus/usr/share/man/stratagus
+		ln -s /opt/stratagus/share/menu/ $(CURDIR)/debian/stratagus/usr/share/menu/stratagus
+	fi
+
 # Build architecture-independent files here.
 binary-indep: build install
 
