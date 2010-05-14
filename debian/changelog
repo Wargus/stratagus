@@ -1,3 +1,9 @@
+stratagus (2.2.5-2maemo1) fremantle; urgency=low
+
+  * Build from https://code.launchpad.net/~pali.rohar/+junk/stratagus rev. 11
+
+ -- Pali Rohár <pali.rohar@gmail.com>  Fri, 14 May 2010 14:04:46 +0200
+
 stratagus (2.2.5-2ubuntu1~lucid~palippa1) lucid; urgency=low
 
   * Build from https://code.launchpad.net/~pali.rohar/+junk/stratagus rev. 11
