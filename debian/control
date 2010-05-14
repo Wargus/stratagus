@@ -1,14 +1,14 @@
 Source: stratagus
 Section: games
 Priority: optional
-Maintainer: David Martínez Moreno <ender@debian.org>
+Maintainer: Pali Rohár <pali.rohar@gmail.com>
 Build-Depends: libsdl1.2-dev (>> 1.2.2), libvorbis-dev,
  libpng12-dev (>= 1.2.5), libbz2-dev, liblua5.1-dev | liblua5.1-0-dev,
  debhelper (>> 4.0.0), libpthread-stubs0-dev, libgl-dev | libsdl-gles1.2-dev,
  libogg-dev, libtheora-dev, libmikmod2-dev
 Standards-Version: 3.6.1
 Homepage: http://stratagus.sourceforge.net
-Vcs-Svn: https://stratagus.svn.sourceforge.net/svnroot/stratagus/stratugus/trunk
+Vcs-Svn: https://code.launchpad.net/~pali.rohar/+junk/stratagus
 
 Package: stratagus
 Architecture: any
