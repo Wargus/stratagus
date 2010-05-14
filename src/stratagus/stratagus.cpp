@@ -664,12 +664,34 @@ static void Usage(void)
 \t-U update\tNetwork update rate in # frames (default 5=6x per s)\n\
 \t-N name\t\tName of the player\n\
 \t-s sleep\tNumber of frames for the AI to sleep before it starts\n\
+"
+#ifdef USE_MAEMO
+"\
+\t-v mode\t\tVideo mode (0=default,1=800x480)\n\
+"
+#else
+"\
 \t-v mode\t\tVideo mode (0=default,1=640x480,2=800x600,\n\
 \t\t\t\t3=1024x768,4=1280x960,5=1600x1200)\n\
+"
+#endif
+"\
 \t-D\t\tVideo mode depth = pixel per point (for Win32/TNT)\n\
+"
+#ifndef USE_MAEMO
+"\
 \t-F\t\tFull screen video mode\n\
+"
+#endif
+"\
 \t-S\t\tSync speed (100 = 30 frames/s)\n\
+"
+#ifndef USE_MAEMO
+"\
 \t-W\t\tWindowed video mode\n\
+"
+#endif
+"\
 map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n\
 ");
 }
@@ -839,6 +861,12 @@ int main(int argc, char **argv)
 				switch (atoi(optarg)) {
 					case 0:
 						continue;
+#ifdef USE_MAEMO
+					case 1:
+						Video.Width = 800;
+						Video.Height = 480;
+						continue;
+#else
 					case 1:
 						Video.Width = 640;
 						Video.Height = 480;
@@ -859,6 +887,7 @@ int main(int argc, char **argv)
 						Video.Width = 1600;
 						Video.Height = 1200;
 						continue;
+#endif
 					default:
 						Usage();
 						ExitFatal(-1);
@@ -876,7 +905,7 @@ int main(int argc, char **argv)
 			case 'U':
 				NetworkUpdates = atoi(optarg);
 				continue;
-
+#ifndef USE_MAEMO
 			case 'F':
 				VideoForceFullScreen = 1;
 				Video.FullScreen = 1;
@@ -885,6 +914,7 @@ int main(int argc, char **argv)
 				VideoForceFullScreen = 1;
 				Video.FullScreen = 0;
 				continue;
+#endif
 			case 'D':
 				Video.Depth = atoi(optarg);
 				continue;

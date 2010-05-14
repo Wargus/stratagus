@@ -24,6 +24,12 @@ else
 	ARCH=linux
 fi
 
+## Maemo section
+if test "$ARCH" = "linux" && test "`uname -a | grep -is arm`" && test -f /etc/maemo_version; then
+	CPPFLAGS="$CPPFLAGS -DUSE_MAEMO"
+	MAEMO=yes
+fi
+
 if test "$ARCH" = "bsd" ; then
 	CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include -I/usr/local/include"
 	LIBS="$LIBS -L/usr/local/lib"
@@ -118,7 +124,11 @@ fi
 if test "$ARCH" = "win32"; then
 	AC_CHECK_LIB(opengl32, main, LDFLAGS="$LDFLAGS -lopengl32", AC_MSG_ERROR(opengl libraries cannot be not found))
 else
-	AC_SEARCH_LIBS(glViewport, GL opengl32 sdl, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(opengl libraries cannot be not found))
+	if test "$MAEMO" = "yes"; then
+		AC_SEARCH_LIBS(glViewport, GLES_CM opengl32 sdl, LDFLAGS="$LDFLAGS $LIBS -lSDL_gles", AC_MSG_ERROR(gles libraries cannot be not found))
+	else
+		AC_SEARCH_LIBS(glViewport, GL opengl32 sdl, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(opengl libraries cannot be not found))
+	fi
 fi
 
 dnl --- BZIP2 ------------------

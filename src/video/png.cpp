@@ -366,7 +366,11 @@ void SaveScreenshotPNG(const char *name)
 			fprintf(stderr, "Out of memory\n");
 			exit(1);
 		}
+#ifdef USE_MAEMO
+#warning TODO: convert glReadBuffer(GL_FRONT); to GLES
+#else
 		glReadBuffer(GL_FRONT);
+#endif
 		glReadPixels(0, 0, Video.Width, Video.Height, GL_RGB, GL_UNSIGNED_BYTE,
 			pixels);
 		for (i = 0; i < Video.Height; ++i) {

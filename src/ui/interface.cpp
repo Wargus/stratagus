@@ -1264,8 +1264,13 @@ void HandleButtonUp(unsigned button)
 --  Lowlevel input functions
 ----------------------------------------------------------------------------*/
 
+#ifdef USE_MAEMO
+int DoubleClickDelay = 1000;             /// Time to detect double clicks.
+int HoldClickDelay = 2000;              /// Time to detect hold clicks.
+#else
 int DoubleClickDelay = 300;             /// Time to detect double clicks.
 int HoldClickDelay = 1000;              /// Time to detect hold clicks.
+#endif
 
 static enum {
 	InitialMouseState,                  /// start state
@@ -1365,12 +1370,26 @@ void InputMouseMove(const EventCallback *callbacks,
 	unsigned ticks, int x, int y)
 {
 	// Don't reset the mouse state unless we really moved
+#ifdef USE_MAEMO
+#define buff 32
+	if (((x - buff) <= MouseX && MouseX <= (x + buff)) == 0 ||
+			((y - buff) <= MouseY && MouseY <= (y + buff)) == 0) {
+		MouseState = InitialMouseState;
+		LastMouseTicks = ticks;
+	}
+	if (MouseX != x || MouseY != y) {
+		MouseX = x;
+		MouseY = y;
+	}
+#undef buff
+#else
 	if (MouseX != x || MouseY != y) {
 		MouseState = InitialMouseState;
 		LastMouseTicks = ticks;
 		MouseX = x;
 		MouseY = y;
 	}
+#endif
 	callbacks->MouseMoved(x, y);
 }
 

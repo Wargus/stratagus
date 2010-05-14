@@ -127,6 +127,9 @@ void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
 				sx2 / GLMaxTextureSize;
 
 			glBindTexture(GL_TEXTURE_2D, textures[texture]);
+#ifdef USE_MAEMO
+#warning TODO: convert glBegin(GL_QUADS); to GLES
+#else
 			glBegin(GL_QUADS);
 			if (!flip) {
 				glTexCoord2f(stx, sty);
@@ -148,6 +151,7 @@ void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
 				glVertex2i(x + (ex - sx) - (x2 + w - x), y2);
 			}
 			glEnd();
+#endif
 
 			nextsx2 = (sx2 + GLMaxTextureSize) / GLMaxTextureSize * GLMaxTextureSize;
 			x2 += nextsx2 - sx2;

@@ -107,8 +107,12 @@ static void CreateMinimapTexture(void)
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glGenTextures(1, &MinimapTexture);
 	glBindTexture(GL_TEXTURE_2D, MinimapTexture);
+#ifdef USE_MAEMO
+#warning TODO: convert glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); to GLES
+#else
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+#endif
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, MinimapTextureWidth,
@@ -629,6 +633,9 @@ void CMinimap::Draw(int vx, int vy)
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, MinimapTextureWidth, MinimapTextureHeight,
 			GL_RGBA, GL_UNSIGNED_BYTE, MinimapSurfaceGL);
 
+#ifdef USE_MAEMO
+#warning TODO: convert glBegin(GL_QUADS) to GLES
+#else
 		glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 0.0f);
 		glVertex2i(X, Y);
@@ -639,6 +646,7 @@ void CMinimap::Draw(int vx, int vy)
 		glTexCoord2f((float)W / MinimapTextureWidth, 0.0f);
 		glVertex2i(X + W, Y);
 		glEnd();
+#endif
 	}
 
 	DrawEvents();

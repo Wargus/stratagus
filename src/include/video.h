@@ -34,7 +34,12 @@
 //@{
 
 #include "SDL.h"
+#ifdef USE_MAEMO
+#include "SDL_gles.h"
+#include "GLES/gl.h"
+#else
 #include "SDL_opengl.h"
+#endif
 #include "guichan.h"
 
 class CFont;
@@ -445,6 +450,7 @@ extern void FreeGraphics();
 
 
 // ARB_texture_compression
+#ifndef USE_MAEMO
 extern PFNGLCOMPRESSEDTEXIMAGE3DARBPROC    glCompressedTexImage3DARB;
 extern PFNGLCOMPRESSEDTEXIMAGE2DARBPROC    glCompressedTexImage2DARB;
 extern PFNGLCOMPRESSEDTEXIMAGE1DARBPROC    glCompressedTexImage1DARB;
@@ -452,6 +458,7 @@ extern PFNGLCOMPRESSEDTEXSUBIMAGE3DARBPROC glCompressedTexSubImage3DARB;
 extern PFNGLCOMPRESSEDTEXSUBIMAGE2DARBPROC glCompressedTexSubImage2DARB;
 extern PFNGLCOMPRESSEDTEXSUBIMAGE1DARBPROC glCompressedTexSubImage1DARB;
 extern PFNGLGETCOMPRESSEDTEXIMAGEARBPROC   glGetCompressedTexImageARB;
+#endif
 
 //@}
 

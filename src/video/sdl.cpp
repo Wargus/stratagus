@@ -53,7 +53,12 @@
 #include <unistd.h>
 #endif
 #include "SDL.h"
+#ifdef USE_MAEMO
+#include "SDL_gles.h"
+#include "GLES/gl.h"
+#else
 #include "SDL_opengl.h"
+#endif
 
 #ifdef USE_BEOS
 #include <sys/socket.h>
@@ -107,6 +112,7 @@ static bool RegenerateScreen = false;
 ----------------------------------------------------------------------------*/
 
 // ARB_texture_compression
+#ifndef USE_MAEMO
 PFNGLCOMPRESSEDTEXIMAGE3DARBPROC    glCompressedTexImage3DARB;
 PFNGLCOMPRESSEDTEXIMAGE2DARBPROC    glCompressedTexImage2DARB;
 PFNGLCOMPRESSEDTEXIMAGE1DARBPROC    glCompressedTexImage1DARB;
@@ -114,6 +120,7 @@ PFNGLCOMPRESSEDTEXSUBIMAGE3DARBPROC glCompressedTexSubImage3DARB;
 PFNGLCOMPRESSEDTEXSUBIMAGE2DARBPROC glCompressedTexSubImage2DARB;
 PFNGLCOMPRESSEDTEXSUBIMAGE1DARBPROC glCompressedTexSubImage1DARB;
 PFNGLGETCOMPRESSEDTEXIMAGEARBPROC   glGetCompressedTexImageARB;
+#endif
 
 /*----------------------------------------------------------------------------
 --  Sync
@@ -191,6 +198,7 @@ static bool IsExtensionSupported(const char *extension)
 static void InitOpenGLExtensions()
 {
 	// ARB_texture_compression
+#ifndef USE_MAEMO
 	if (IsExtensionSupported("GL_ARB_texture_compression"))
 	{
 		glCompressedTexImage3DARB =
@@ -220,6 +228,9 @@ static void InitOpenGLExtensions()
 			GLTextureCompressionSupported = false;
 		}
 	}
+#else
+	GLTextureCompressionSupported = false;
+#endif
 }
 
 /**
@@ -232,13 +243,21 @@ static void InitOpenGL(void)
 	glViewport(0, 0, (GLsizei)Video.Width, (GLsizei)Video.Height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
+#ifdef USE_MAEMO
+#warning TODO: convert glOrtho(0, Video.Width, Video.Height, 0, -1, 1); to GLES
+#else
 	glOrtho(0, Video.Width, Video.Height, 0, -1, 1);
+#endif
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glTranslatef(0.375, 0.375, 0.);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+#ifdef USE_MAEMO
+	glClearDepthf(1.0f);
+#else
 	glClearDepth(1.0f);
+#endif
 	glShadeModel(GL_FLAT);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
@@ -420,15 +439,32 @@ void InitVideoSdl(void)
 	flags = 0;
 	// Sam said: better for windows.
 	/* SDL_HWSURFACE|SDL_HWPALETTE | */
+#ifdef USE_MAEMO
+	Video.FullScreen = 1;
+	Video.Width = 800;
+	Video.Height = 480;
+#endif
 	if (Video.FullScreen) {
 		flags |= SDL_FULLSCREEN;
 	}
 	if (UseOpenGL) {
+#ifdef USE_MAEMO
+		if (SDL_GLES_Init(SDL_GLES_VERSION_1_1) < 0) {
+			fprintf(stderr, "Couldn't initialize SDL_GLES: %s\n", SDL_GetError());
+			exit(1);
+		}
+		flags |= SDL_SWSURFACE;
+#else
 		flags |= SDL_OPENGL;
+#endif
 	}
 
 	if (!Video.Width || !Video.Height) {
+#ifdef USE_MAEMO
+		Video.Width = 800;
+#else
 		Video.Width = 640;
+#endif
 		Video.Height = 480;
 	}
 
@@ -454,6 +490,17 @@ void InitVideoSdl(void)
 	SDL_EnableUNICODE(1);
 
 	if (UseOpenGL) {
+#ifdef USE_MAEMO
+		SDL_GLES_Context *context = SDL_GLES_CreateContext();
+		if (!context) {
+			fprintf(stderr, "Couldn't initialize SDL_GLES_CreateContext: %s\n", SDL_GetError());
+			exit(1);
+		}
+		if (SDL_GLES_MakeCurrent(context) < 0) {
+			fprintf(stderr, "Couldn't initialize SDL_GLES_MakeCurrent: %s\n", SDL_GetError());
+			exit(1);
+		}
+#endif
 		InitOpenGL();
 	}
 
@@ -480,6 +527,10 @@ void InitVideoSdl(void)
 */
 int VideoValidResolution(int w, int h)
 {
+#ifdef USE_MAEMO
+	if (w != 800 || h != 480)
+		return 0;
+#endif
 	return SDL_VideoModeOK(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
 }
 
@@ -845,6 +896,9 @@ void ToggleGrabMouse(int mode)
 */
 void ToggleFullScreen(void)
 {
+#ifdef USE_MAEMO
+	return;
+#endif
 #ifdef USE_WIN32
 	long framesize;
 	SDL_Rect clip;

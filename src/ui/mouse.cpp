@@ -1447,6 +1447,10 @@ void UIHandleButtonDown(unsigned button)
 		}
 	}
 
+#ifdef USE_MAEMO
+	printf("UIHandleButtonDown [0x%x] [0x%x]\n", button, MouseButtons);
+#endif
+
 	//
 	//  Cursor is on the map area
 	//
@@ -1512,20 +1516,12 @@ void UIHandleButtonDown(unsigned button)
 					CursorState == CursorStatePoint) {
 				CursorState = CursorStatePieMenu;
 			}
-		} else if (MouseButtons & LeftButton) { // enter select mode
-			CursorStartX = CursorX;
-			CursorStartY = CursorY;
-			CursorStartScrMapX = CursorStartX - UI.MouseViewport->X +
-				TileSizeX * UI.MouseViewport->MapX + UI.MouseViewport->OffsetX;
-			CursorStartScrMapY = CursorStartY - UI.MouseViewport->Y +
-				TileSizeY * UI.MouseViewport->MapY + UI.MouseViewport->OffsetY;
-			GameCursor = UI.Cross.Cursor;
-			CursorState = CursorStateRectangle;
-		} else if (MouseButtons & MiddleButton) {// enter move map mode
-			CursorStartX = CursorX;
-			CursorStartY = CursorY;
-			GameCursor = UI.Scroll.Cursor;
+#ifdef USE_MAEMO
+		} else if (MouseButtons == 0x202) {
+			printf ("left double click detected\n");
+#else
 		} else if (MouseButtons & RightButton) {
+#endif
 			int x;
 			int y;
 
@@ -1551,6 +1547,19 @@ void UIHandleButtonDown(unsigned button)
 				}
 				DoRightButton(x * TileSizeX, y * TileSizeY);
 			}
+		} else if (MouseButtons & LeftButton) { // enter select mode
+			CursorStartX = CursorX;
+			CursorStartY = CursorY;
+			CursorStartScrMapX = CursorStartX - UI.MouseViewport->X +
+				TileSizeX * UI.MouseViewport->MapX + UI.MouseViewport->OffsetX;
+			CursorStartScrMapY = CursorStartY - UI.MouseViewport->Y +
+				TileSizeY * UI.MouseViewport->MapY + UI.MouseViewport->OffsetY;
+			GameCursor = UI.Cross.Cursor;
+			CursorState = CursorStateRectangle;
+		} else if (MouseButtons & MiddleButton) {// enter move map mode
+			CursorStartX = CursorX;
+			CursorStartY = CursorY;
+			GameCursor = UI.Scroll.Cursor;
 		}
 	//
 	//  Cursor is on the minimap area
