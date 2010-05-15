@@ -621,6 +621,31 @@ CPlayerColorGraphic *CPlayerColorGraphic::ForceNew(const std::string &file, int 
 }
 
 /**
+**  Load the size of a graphic, but not the actual pixels.
+**  Also, unlike Load(), this does not abort the whole process
+**  if the file cannot be loaded.
+**
+**  @param[out] w     width of the graphic, in pixels
+**  @param[out] h     height of the graphic, in pixels
+**
+**  @return true on success, or false on error.
+*/
+bool CGraphic::LoadGraphicSize(int *w, int *h)
+{
+	if (GraphicWidth == 0 && GraphicHeight == 0) {
+		if (LoadGraphicPNG(this, true) == -1) {
+			return false;
+		}
+	}
+
+	Assert(GraphicWidth != 0 && GraphicHeight != 0);
+	*w = GraphicWidth;
+	*h = GraphicHeight;
+	return true;
+}
+
+
+/**
 **  Load a graphic
 */
 void CGraphic::Load()
@@ -630,7 +655,7 @@ void CGraphic::Load()
 	}
 
 	// TODO: More formats?
-	if (LoadGraphicPNG(this) == -1) {
+	if (LoadGraphicPNG(this, false) == -1) {
 		fprintf(stderr, "Can't load the graphic `%s'\n", File.c_str());
 		ExitFatal(-1);
 	}

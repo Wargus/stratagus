@@ -81,6 +81,7 @@ public:
 
 	static void Free(CGraphic *g);
 
+	bool LoadGraphicSize(int *w, int *h);
 	void Load();
 	void Flip();
 	void UseDisplayFormat();
@@ -345,7 +346,7 @@ extern void InitVideo(void);
 extern int VideoValidResolution(int w, int h);
 
 	/// Load graphic from PNG file
-extern int LoadGraphicPNG(CGraphic *g);
+extern int LoadGraphicPNG(CGraphic *g, bool headerOnly);
 
 	/// Make an OpenGL texture
 extern void MakeTexture(CGraphic *graphic);
