@@ -33,6 +33,7 @@ class CPatchManager
 	CPatch *getPatch(int x, int y) const;
 
 	vector<string> getPatchTypeNames() const;
+	vector<string> getPatchTypeNamesUsingGraphic(std::string graphicFile) const;
 
 	CPatchType *newPatchType(const std::string &name, const std::string &file,
 		int width, int height, int flags[width*height]);

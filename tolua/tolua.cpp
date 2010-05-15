@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on Tue May  4 22:25:19 2010.
+** Generated automatically by tolua++-1.0.92 on Tue May  4 23:08:21 2010.
 */
 
 #ifndef __cplusplus
@@ -18056,6 +18056,50 @@ static int tolua_stratagus_CPatchManager_getPatchTypeNames00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: getPatchTypeNamesUsingGraphic of class  CPatchManager */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPatchManager_getPatchTypeNamesUsingGraphic00
+static int tolua_stratagus_CPatchManager_getPatchTypeNamesUsingGraphic00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const CPatchManager",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const CPatchManager* self = (const CPatchManager*)  tolua_tousertype(tolua_S,1,0);
+  std::string graphicFile = ((std::string)  tolua_tocppstring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getPatchTypeNamesUsingGraphic'", NULL);
+#endif
+  {
+   vector<string> tolua_ret = (vector<string>)  self->getPatchTypeNamesUsingGraphic(graphicFile);
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((vector<string>)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"vector<string>");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(vector<string>));
+     tolua_pushusertype(tolua_S,tolua_obj,"vector<string>");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getPatchTypeNamesUsingGraphic'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: newPatchType of class  CPatchManager */
 #ifndef TOLUA_DISABLE_tolua_stratagus_CPatchManager_newPatchType00
 static int tolua_stratagus_CPatchManager_newPatchType00(lua_State* tolua_S)
@@ -20473,6 +20517,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_function(tolua_S,"moveToBottom",tolua_stratagus_CPatchManager_moveToBottom00);
    tolua_function(tolua_S,"getPatch",tolua_stratagus_CPatchManager_getPatch00);
    tolua_function(tolua_S,"getPatchTypeNames",tolua_stratagus_CPatchManager_getPatchTypeNames00);
+   tolua_function(tolua_S,"getPatchTypeNamesUsingGraphic",tolua_stratagus_CPatchManager_getPatchTypeNamesUsingGraphic00);
    tolua_function(tolua_S,"newPatchType",tolua_stratagus_CPatchManager_newPatchType00);
    tolua_function(tolua_S,"computePatchSize",tolua_stratagus_CPatchManager_computePatchSize00);
   tolua_endmodule(tolua_S);

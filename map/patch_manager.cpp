@@ -224,6 +224,22 @@ CPatchManager::getPatchTypeNames() const
 	return names;
 }
 
+std::vector<std::string>
+CPatchManager::getPatchTypeNamesUsingGraphic(
+	const std::string &graphicFile) const
+{
+	std::vector<std::string> names;
+	std::map<std::string, CPatchType *>::const_iterator i;
+
+	for (i = this->patchTypesMap.begin(); i != this->patchTypesMap.end(); ++i) {
+		if (i->second->getFile() == graphicFile) {
+			names.push_back(i->second->getName());
+		}
+	}
+
+	return names;
+}
+
 
 void
 CPatchManager::load()
