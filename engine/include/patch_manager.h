@@ -136,6 +136,14 @@ public:
 	*/
 	std::string savePatchType(CPatchType *patchType) const;
 
+	/**
+	**  Compute how large the patch type should be if one were
+	**  created for the graphic in the specified file.
+	**  This function is intended to be called from Lua.
+	*/
+	bool computePatchSize(const std::string &graphicFile,
+	                      int *width, int *height) const;
+
 private:
 	void updateMapFlags(int x1, int y1, int x2, int y2);
 

@@ -368,4 +368,23 @@ CPatchManager::savePatchType(CPatchType *patchType) const
 	return ostr.str();
 }
 
+bool
+CPatchManager::computePatchSize(const std::string &graphicFile,
+	int *width, int *height) const
+{
+	CGraphic *graphic = CGraphic::New(graphicFile);
+	int graphicWidth = 0;
+	int graphicHeight = 0;
+	bool ok = graphic->LoadGraphicSize(&graphicWidth, &graphicHeight);
+	if (ok) {
+		*width = (graphicWidth + TileSizeX - 1) / TileSizeX;
+		*height = (graphicHeight + TileSizeY - 1) / TileSizeY;
+	} else {
+		*width = 0;
+		*height = 0;
+	}
+	CGraphic::Free(graphic);
+	return ok;
+}
+
 //@}

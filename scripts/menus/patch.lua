@@ -113,6 +113,15 @@ function RunNewPatchMenu()
     patchName = string.gsub(patchName, "%.png$", "", 1)
     patchName = string.gsub(patchName, "/", "-")
     nameInput:setText(patchName)
+
+    local ok,width,height = Map.PatchManager:computePatchSize(imageDirAndFile)
+    if ok then
+      widthInput:setText(tostring(width))
+      heightInput:setText(tostring(height))
+    else
+      widthInput:setText("")
+      heightInput:setText("")
+    end
   end
   browser:setActionCallback(browserCallback)
 
