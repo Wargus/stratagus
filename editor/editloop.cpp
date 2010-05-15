@@ -2128,6 +2128,7 @@ static void EditorMainLoop()
 		GameCursor = UI.Point.Cursor;
 		InterfaceState = IfaceStateNormal;
 		Editor.State = EditorSelecting;
+		Editor.ShowPatchOutlines = false;
 		UI.SelectedViewport = UI.Viewports;
 
 		while (Editor.Running)
