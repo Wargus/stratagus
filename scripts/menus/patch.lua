@@ -29,39 +29,63 @@ end
 
 function RunNewPatchMenu()
   local menu
-  local y = Video.Height * 4 / 10
+  local buttonsY = Video.Height - 100
+  local labelX
+  local inputX
+  local y
+  local smallX = Video.Width / 20
+  local smallY = Video.Height / 20
   local name = ""
   local image = ""
   local width = 1
   local height = 1
   local returnToMainMenu = false
 
+  local function listDirsAndGraphics(path)
+    local list = {}
+    for pos,name in ipairs(ListDirsInDirectory(path)) do
+      table.insert(list, name .. "/")
+    end
+    for pos,name in ipairs(ListFilesInDirectory(path)) do
+      if string.find(name, "%.png$") then
+        table.insert(list, name)
+      end
+    end
+    return list
+  end
+
   menu = BosMenu(_("Create New Patch"))
 
-  menu:addLabel(_("Name:"), Video.Width / 2 - 80, y)
+  labelX = smallX
+  inputX = labelX + 30
+  y = 2 * smallY + 20
+  local browser = menu:addBrowser("patches/", listDirsAndGraphics,
+                                  smallX * 10, y,
+                                  smallX * 8, buttonsY - 2 * smallY - y)
+  menu:addLabel(_("Name:"), labelX, y)
   local nameInput = menu:addTextInputField(name,
-    Video.Width / 2 - 50, y, 100)
+    inputX, y, smallX * 9 - inputX)
 
   y = y + 30
 
-  menu:addLabel(_("Image:"), Video.Width / 2 - 80, y)
+  menu:addLabel(_("Image:"), labelX, y)
   local imageInput = menu:addTextInputField(image,
-    Video.Width / 2 - 50, y)
+    inputX, y, smallX * 9 - inputX)
 
   y = y + 30
 
-  menu:addLabel(_("Size:"), Video.Width / 2 - 80, y)
+  menu:addLabel(_("Size:"), labelX, y)
   local widthInput = menu:addTextInputField(tostring(width),
-    Video.Width / 2 - 50, y, 24)
-  menu:addLabel(_("x"), Video.Width / 2 + 34 - 50, y)
+    inputX, y, 34)
+  menu:addLabel(_("x"), inputX + 44, y)
   local heightInput = menu:addTextInputField(tostring(height),
-    Video.Width / 2 + 44 - 50, y, 24)
+    inputX + 54, y, 34)
 
   y = y + 30
 
-  menu:addButton(_("Cancel (~<Esc~>)"), Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("Cancel (~<Esc~>)"), Video.Width / 2 - 250, buttonsY,
     function() menu:stop() end)
-  menu:addButton(_("Create ~!Patch"), Video.Width / 2 + 50, Video.Height - 100,
+  menu:addButton(_("Create ~!Patch"), Video.Width / 2 + 50, buttonsY,
     function()
       name = nameInput:getText()
       image = imageInput:getText()
@@ -80,6 +104,17 @@ function RunNewPatchMenu()
       menu:stop()
       returnToMainMenu = true
     end)
+
+  local function browserCallback(event)
+    local imageDirAndFile = browser.path .. browser:getSelectedItem()
+    imageInput:setText(imageDirAndFile)
+
+    local patchName = string.gsub(imageDirAndFile, "^patches/", "", 1)
+    patchName = string.gsub(patchName, "%.png$", "", 1)
+    patchName = string.gsub(patchName, "/", "-")
+    nameInput:setText(patchName)
+  end
+  browser:setActionCallback(browserCallback)
 
   menu:run()
   return returnToMainMenu
