@@ -76,9 +76,13 @@ static void CL_png_read_data(png_structp png_ptr, png_bytep data, png_size_t len
 **
 **  @param g  graphic to load.
 **
+**  @param headerOnly  If true, load only the image header, not the pixels.
+**                     Can be called again later to load the pixels too.
+**                     
+**
 **  @return   0 for success, -1 for error.
 */
-int LoadGraphicPNG(CGraphic *g)
+int LoadGraphicPNG(CGraphic *g, bool headerOnly)
 {
 	CFile fp;
 	SDL_Surface *volatile surface;
@@ -157,6 +161,13 @@ int LoadGraphicPNG(CGraphic *g)
 	png_read_info(png_ptr, info_ptr);
 	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth,
 		&color_type, &interlace_type, NULL, NULL);
+
+	if (headerOnly) {
+		ret = 0;
+		g->GraphicWidth = width;
+		g->GraphicHeight = height;
+		goto done;
+	}
 
 	/* tell libpng to strip 16 bit/color files down to 8 bits/color */
 	png_set_strip_16(png_ptr) ;

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 04/25/10 10:21:39.
+** Generated automatically by tolua++-1.0.92 on Tue May  4 22:25:19 2010.
 */
 
 #ifndef __cplusplus
@@ -18126,6 +18126,46 @@ static int tolua_stratagus_CPatchManager_newPatchType00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: computePatchSize of class  CPatchManager */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPatchManager_computePatchSize00
+static int tolua_stratagus_CPatchManager_computePatchSize00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const CPatchManager",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const CPatchManager* self = (const CPatchManager*)  tolua_tousertype(tolua_S,1,0);
+  std::string graphicFile = ((std::string)  tolua_tocppstring(tolua_S,2,0));
+  int width = ((int)  tolua_tonumber(tolua_S,3,0));
+  int height = ((int)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'computePatchSize'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->computePatchSize(graphicFile,&width,&height);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushnumber(tolua_S,(lua_Number)width);
+   tolua_pushnumber(tolua_S,(lua_Number)height);
+  }
+ }
+ return 3;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'computePatchSize'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: AStarFixedUnitCrossingCost */
 #ifndef TOLUA_DISABLE_tolua_get_AStarFixedUnitCrossingCost
 static int tolua_get_AStarFixedUnitCrossingCost(lua_State* tolua_S)
@@ -20434,6 +20474,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_function(tolua_S,"getPatch",tolua_stratagus_CPatchManager_getPatch00);
    tolua_function(tolua_S,"getPatchTypeNames",tolua_stratagus_CPatchManager_getPatchTypeNames00);
    tolua_function(tolua_S,"newPatchType",tolua_stratagus_CPatchManager_newPatchType00);
+   tolua_function(tolua_S,"computePatchSize",tolua_stratagus_CPatchManager_computePatchSize00);
   tolua_endmodule(tolua_S);
   tolua_variable(tolua_S,"AStarFixedUnitCrossingCost",tolua_get_AStarFixedUnitCrossingCost,tolua_set_AStarFixedUnitCrossingCost);
   tolua_variable(tolua_S,"AStarMovingUnitCrossingCost",tolua_get_AStarMovingUnitCrossingCost,tolua_set_AStarMovingUnitCrossingCost);
