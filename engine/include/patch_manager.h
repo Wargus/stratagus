@@ -93,6 +93,13 @@ public:
 	std::vector<std::string> getPatchTypeNames() const;
 
 	/**
+	**  Get the names of the patch types that use the graphic in
+	**  the specified file.
+	*/
+	std::vector<std::string> getPatchTypeNamesUsingGraphic(
+		const std::string &graphicFile) const;
+
+	/**
 	**  Load the patches used in the map
 	*/
 	void load();
