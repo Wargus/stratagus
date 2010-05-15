@@ -83,6 +83,9 @@ function RunNewPatchMenu()
 
   y = y + 30
 
+  local usedLabel = menu:addMultiLineLabel("", labelX, y,
+    Fonts["game"], false, smallX * 9 - labelX)
+
   menu:addButton(_("Cancel (~<Esc~>)"), Video.Width / 2 - 250, buttonsY,
     function() menu:stop() end)
   menu:addButton(_("Create ~!Patch"), Video.Width / 2 + 50, buttonsY,
@@ -106,7 +109,8 @@ function RunNewPatchMenu()
     end)
 
   local function browserCallback(event)
-    local imageDirAndFile = browser.path .. browser:getSelectedItem()
+    local imageFile = browser:getSelectedItem()
+    local imageDirAndFile = browser.path .. imageFile
     imageInput:setText(imageDirAndFile)
 
     local patchName = string.gsub(imageDirAndFile, "^patches/", "", 1)
@@ -122,6 +126,18 @@ function RunNewPatchMenu()
       widthInput:setText("")
       heightInput:setText("")
     end
+
+    local usedIn = Map.PatchManager:getPatchTypeNamesUsingGraphic(imageDirAndFile)
+    if usedIn:empty() then
+      usedLabel:setCaption("")
+    else
+      -- Include the name of the image in this label so the claim will
+      -- remain correct even if the user types a different file name
+      -- in imageInput after selecting an image from the browser.
+      usedLabel:setCaption(string.format(_("The image %q is already used in the patch type %q."),
+          imageFile, usedIn[0]))
+    end
+    usedLabel:adjustSize()
   end
   browser:setActionCallback(browserCallback)
 

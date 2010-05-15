@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: boswars 2.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-02 14:25+0300\n"
-"PO-Revision-Date: 2010-05-02 14:31+0300\n"
+"POT-Creation-Date: 2010-05-15 21:05+0300\n"
+"PO-Revision-Date: 2010-05-15 21:08+0300\n"
 "Last-Translator: Kalle Olavi Niemitalo <kon@iki.fi>\n"
 "Language-Team: Kimmo Kalevi Merikivi <fi@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -91,7 +91,7 @@ msgstr "Tiedosto:"
 
 #: scripts/guichan.lua:535 scripts/guichan.lua:742 scripts/guichan.lua:782
 #: scripts/menus/ingame/editor.lua:109 scripts/menus/network.lua:423
-#: scripts/menus/patch.lua:53
+#: scripts/menus/patch.lua:77
 msgid "Size:"
 msgstr "Koko:"
 
@@ -223,7 +223,7 @@ msgstr "~!Lataa kartta"
 msgid "C~!reate New Patch"
 msgstr "Luo uusi maasto~!pala"
 
-#: scripts/guichan.lua:704 scripts/menus/patch.lua:115
+#: scripts/guichan.lua:704 scripts/menus/patch.lua:175
 msgid "Load ~!Patch"
 msgstr "Lataa ~!maastopala"
 
@@ -239,7 +239,7 @@ msgstr "Luo uusi kartta"
 #: scripts/menus/network.lua:176 scripts/menus/network.lua:242
 #: scripts/menus/network.lua:303 scripts/menus/network.lua:377
 #: scripts/menus/network.lua:449 scripts/menus/network.lua:495
-#: scripts/menus/patch.lua:62 scripts/menus/patch.lua:113
+#: scripts/menus/patch.lua:89 scripts/menus/patch.lua:173
 msgid "Cancel (~<Esc~>)"
 msgstr "Peruuta (~<Esc~>)"
 
@@ -1119,31 +1119,35 @@ msgstr "~!Kieli"
 msgid "Options"
 msgstr "Asetukset"
 
-#: scripts/menus/patch.lua:39
+#: scripts/menus/patch.lua:57
 msgid "Create New Patch"
 msgstr "Luo uusi maastopala"
 
-#: scripts/menus/patch.lua:41 scripts/menus/patch.lua:105
+#: scripts/menus/patch.lua:65 scripts/menus/patch.lua:165
 msgid "Name:"
 msgstr "Nimi:"
 
-#: scripts/menus/patch.lua:47
+#: scripts/menus/patch.lua:71
 msgid "Image:"
 msgstr "Kuva:"
 
-#: scripts/menus/patch.lua:56
+#: scripts/menus/patch.lua:80
 msgid "x"
 msgstr "x"
 
-#: scripts/menus/patch.lua:64
+#: scripts/menus/patch.lua:91
 msgid "Create ~!Patch"
 msgstr "Luo maasto~!pala"
+
+#: scripts/menus/patch.lua:137
+msgid "The image %q is already used in the patch type %q."
+msgstr "Kuvaa %q käyttää jo maastopalatyyppi %q."
 
 # "Valitse muokattava maastopala" olisi liian pitkä;
 # 640x480-tarkkuudella sen loppuosa osuisi oranssin "BOS"-logon
 # päälle, ja koska teksti on keltainen, niin se ei siellä näkyisi
 # juuri ollenkaan.
-#: scripts/menus/patch.lua:97
+#: scripts/menus/patch.lua:157
 msgid "Select Patch to Edit"
 msgstr "Valitse maastopala"
 
