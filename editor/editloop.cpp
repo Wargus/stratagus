@@ -997,16 +997,73 @@ static void ShowUnitInfo(const CUnit *unit)
 }
 
 /**
-**  Show info about a patch.
+**  Show info about a patch and about one of its fields.
 **
 **  @param patch  Patch pointer.
+**  @param field  Map field to describe.  This function assumes that most
+**                properties of the field have been copied from the patch.
 */
-static void ShowPatchInfo(const CPatch *patch)
+static void ShowPatchInfo(const CPatch *patch, const CMapField *field)
 {
 	std::ostringstream o;
 
 	o << _("Patch") << ": " << patch->getType()->getName() << " - ("
 	  << patch->getX() << ", " << patch->getY() << ")";
+
+	bool comma = false;
+	Assert(!(field->Flags & MapFieldTransparent));
+	if (field->Flags & MapFieldUnpassable)
+	{
+		o << (comma++ ? ", " : ": ")
+		  << _("impassable");
+	}
+	if (field->Flags & MapFieldLandAllowed)
+	{
+		o << (comma++ ? ", " : ": ")
+		  << _("land");
+	}
+	if (field->Flags & MapFieldCoastAllowed)
+	{
+		o << (comma++ ? ", " : ": ")
+		  << _("coast");
+	}
+	if (field->Flags & MapFieldWaterAllowed)
+	{
+		o << (comma++ ? ", " : ": ")
+		  << _("water");
+	}
+	if (field->Flags & MapFieldNoBuilding)
+	{
+		// If you edit here, please check that xgettext still
+		// copies the TRANSLATORS comment to engine.pot.
+
+		o << (comma++ ? ", " : ": ");
+		// TRANSLATORS: This flag means players cannot build
+		// here, e.g. because the ground is too soft.  There
+		// may be a building here anyway, if the map designer
+		// has found a way to circumvent the restriction.
+		o << _("no building");
+	}
+	// Ignore MapFieldLandUnit etc. because this function
+	// is supposed to describe the patch and not the units.
+
+	// The patch editor displays the speed from the flags,
+	// rather than CMapField::Cost (which is a larger number),
+	// so do the same here.
+	int speed = field->Flags & MapFieldSpeedMask;
+	if (speed != MapFieldNormalSpeed)
+	{
+		o << (comma++ ? ", " : ": ")
+		  << _("speed=") << speed;
+		if (speed < MapFieldNormalSpeed)
+		{
+			o << _(" (fast)");
+		}
+		else
+		{
+			o << _(" (slow)");
+		}
+	}
 
 	UI.StatusLine.Set(o.str());
 }
@@ -1835,7 +1892,8 @@ static void EditorCallbackMouse(int x, int y)
 		PatchUnderCursor = Map.PatchManager.getPatch(cursorMapX, cursorMapY);
 		if (PatchUnderCursor)
 		{
-			ShowPatchInfo(PatchUnderCursor);
+			ShowPatchInfo(PatchUnderCursor,
+				Map.Field(cursorMapX, cursorMapY));
 			HandleMouseScrollArea(x, y);
 			return;
 		}
