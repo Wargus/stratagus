@@ -173,6 +173,8 @@ public:
 #define MapFieldUnpassable   0x0100  /// Field is movement blocked
 #define MapFieldTransparent  0x0200  /// Field is transparent
 
+#define MapFieldPatchMask    0x01F7  /// Flags copied from patch to map field
+
 #define MapFieldLandUnit     0x1000  /// Land unit on field
 #define MapFieldAirUnit      0x2000  /// Air unit on field
 #define MapFieldSeaUnit      0x4000  /// Water unit on field
