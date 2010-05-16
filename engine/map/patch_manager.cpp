@@ -82,11 +82,20 @@ CPatchManager::updateMapFlags(int x1, int y1, int x2, int y2)
 		for (int i = x1; i <= x2; ++i) {
 			int offsetX, offsetY;
 			CPatch *patch = this->getPatch(i, j, &offsetX, &offsetY);
+			unsigned short flags;
+			
 			if (patch) {
-				unsigned short flags = patch->getType()->getFlag(offsetX, offsetY);
-				Map.Field(i, j)->Flags = flags;
-				Map.Field(i, j)->Cost = 1 << (flags & MapFieldSpeedMask); 
+				flags = patch->getType()->getFlag(offsetX, offsetY);
+			} else {
+				// No patch here.  Allow this so that
+				// authors can test their incomplete maps.
+				flags = MapFieldUnpassable | MapFieldNormalSpeed;
 			}
+
+			Map.Field(i, j)->Flags = (flags & MapFieldPatchMask)
+				| (Map.Field(i, j)->Flags & ~MapFieldPatchMask);
+				
+			Map.Field(i, j)->Cost = 1 << (flags & MapFieldSpeedMask);
 		}
 	}
 }
