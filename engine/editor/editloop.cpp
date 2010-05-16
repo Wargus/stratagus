@@ -99,6 +99,7 @@ static bool PatchPlacedThisPress = false;   /// Only allow one patch per press
 static bool UpdateMinimap = false;          /// Update units on the minimap
 static bool UpdateMinimapTerrain = false;   /// Terrain has changed, minimap needs updating
 static int VisibleIcons;                    /// Number of icons that are visible at a time
+static bool EditorTerrainFlagsVisible = false; /// Whether to show CMapField::Flags
 
 enum _mode_buttons_ {
 	SelectButton = 201,  /// Select mode button
@@ -950,6 +951,140 @@ static void DrawMapCursor()
 }
 
 /**
+**  Draw some flags of map fields as a colorful overlay.
+**  This is intended to let the map designer easily see
+**  which paths are blocked and which ones are not.
+**  (However, if the map designer has difficulty with that,
+**  then the player probably will too; it would be best
+**  to make the boundaries clearly visible in the graphics
+**  of the patches.)
+**
+**  This function reads MapFieldLandUnit and related flags
+**  from CUnitType::FieldFlags rather than CMapField::Flags;
+**  thus, it cannot be used for testing whether the latter
+**  is correctly maintained.
+**
+**  @param vp  Viewport in which to draw.
+*/
+static void EditorDrawTerrainFlags(const CViewport *vp)
+{
+	PushClipping();
+	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
+
+	for (int mapY = std::max(vp->MapY, 0);
+	     mapY < vp->MapY + vp->MapHeight && mapY < Map.Info.MapHeight;
+	     ++mapY)
+	{
+		const int screenY = vp->Map2ViewportY(mapY);
+		for (int mapX = std::max(vp->MapX, 0);
+		     mapX < vp->MapX + vp->MapWidth && mapX < Map.Info.MapWidth;
+		     ++mapX)
+		{
+			const int screenX = vp->Map2ViewportX(mapX);
+			const CMapField *const field = Map.Field(mapX, mapY);
+			Uint32 color;
+
+			if (field->Flags & MapFieldUnpassable)
+			{
+				color = ColorRed;
+			}
+			else if (field->Flags & MapFieldNoBuilding)
+			{
+				color = ColorOrange;
+			}
+			else if (field->Flags & MapFieldWaterAllowed)
+			{
+				color = ColorBlue;
+			}
+			else if (field->Flags & MapFieldLandAllowed)
+			{
+				const int speed = field->Flags & MapFieldSpeedMask;
+				if (speed == MapFieldNormalSpeed)
+				{
+					color = ColorGreen;
+				}
+				else if (speed < MapFieldNormalSpeed) // road
+				{
+					color = ColorGray;
+				}
+				else // difficult terrain
+				{
+					color = ColorYellow;
+				}
+			}
+			else // probably no patch here at all
+			{
+				color = ColorBlack;
+			}
+
+			Video.FillTransRectangleClip(
+				color, screenX, screenY,
+				TileSizeX, TileSizeY, 64);
+		}
+	}
+
+	// Mark the units that could block other units; but not if the
+	// editor is in patch-placement mode, because then the user
+	// presumably wants to ignore the units.  Draw each unit as a
+	// contiguous rectangle even if it spans multiple map tiles.
+	if (Editor.State != EditorEditPatch)
+	{
+		const int marginX = TileSizeX / 8;
+		const int marginY = TileSizeY / 8;
+		CUnit *units[UnitMax];
+		int nunits = FindAndSortUnits(vp, units, UnitMax);
+
+		for (int i = 0; i < nunits; ++i)
+		{
+			CUnit *const unit = units[i];
+
+			// Ignore air units because they typically block
+			// only each other and are unaffected by the
+			// terrain.  Also ignore decorative units that
+			// can be walked through; this is why we check
+			// FieldFlags rather than enum UnitTypeType.
+			if (unit->Type->FieldFlags & (
+				    MapFieldLandUnit |
+				    MapFieldSeaUnit |
+				    MapFieldBuilding))
+			{
+				// The alpha must be pretty high here
+				// because this feature is useful for
+				// showing paths in forests and those
+				// already have much luma variation.
+				Video.FillTransRectangleClip(
+					ColorBlack,
+					vp->Map2ViewportX(unit->X) + marginX,
+					vp->Map2ViewportY(unit->Y) + marginY,
+					unit->Type->TileWidth * TileSizeX
+						- 2 * marginX,
+					unit->Type->TileHeight * TileSizeY
+						- 2 * marginY,
+					96);
+			}
+		}
+	}
+
+	PopClipping();
+}
+
+/**
+**  Draw some flags of map fields as a colorful overlay, if this
+**  feature has been enabled.  See ::EditorDrawTerrainFlags for
+**  more information.
+*/
+static void EditorDrawTerrainFlagsIfEnabled()
+{
+	if (EditorTerrainFlagsVisible)
+	{
+		for (const CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp)
+		{
+			EditorDrawTerrainFlags(vp);
+		}
+	}
+}
+
+/**
 **  Draw the start locations of all active players on the map
 */
 static void DrawStartLocations()
@@ -1074,6 +1209,7 @@ static void ShowPatchInfo(const CPatch *patch, const CMapField *field)
 static void EditorUpdateDisplay()
 {
 	DrawMapArea();
+	EditorDrawTerrainFlagsIfEnabled();
 
 	DrawStartLocations();
 
@@ -1394,6 +1530,13 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				break;
 			}
 			ToggleFullScreen();
+			break;
+
+		case 't': // 't': Show or hide terrain flags
+			if (!(KeyModifiers & (ModifierControl | ModifierAlt | ModifierSuper)))
+			{
+				EditorTerrainFlagsVisible = !EditorTerrainFlagsVisible;
+			}
 			break;
 
 		case 'v': // 'v' Viewport
