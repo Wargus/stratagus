@@ -1170,6 +1170,13 @@ static void EditorCallbackButtonDown(unsigned button)
 				editorUnitSlider->setVisible(true);
 				editorUnitDropDown->setVisible(true);
 				editorPatchSlider->setVisible(false);
+
+				// DrawBuildingCursor doesn't draw blocked
+				// map fields correctly if ThisPlayer is
+				// a player whose type is PlayerNobody,
+				// because UnitCountSeen does not compute
+				// the visibility of units to such players.
+				ThisPlayer = Players + Editor.SelectedPlayer;
 				return;
 			case PatchButton :
 				if (EditorEditPatch)
