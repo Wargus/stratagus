@@ -7,7 +7,7 @@
 --       A futuristic real-time strategy game.
 --          This file is part of Bos Wars.
 --
---	unit-destroyer.lua	-	Define the water scout unit.
+--	unit-destroyer.lua	-	Define the destroyer unit.
 --
 --	(c) Copyright 2005-2010 by Francois Beerten.
 --
@@ -51,7 +51,7 @@ DefineIcon({
     File = "units/destroyer/destroyer_i.png"})
 
 DefineUnitType("unit-destroyer", {
-    Name = "Water Scout",
+    Name = "Destroyer",
     Image = {"file", "units/destroyer/destroyer.png", "size", {128, 96}},
     Animations = "animations-destroyer",
     Icon = "icon-destroyer",
