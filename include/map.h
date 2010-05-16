@@ -178,6 +178,9 @@ public:
 #define MapFieldSeaUnit      0x4000  /// Water unit on field
 #define MapFieldBuilding     0x8000  /// Building on field
 
+#define MapFieldNormalSpeed  3       /// Normal CMapField::Flags & MapFieldSpeedMask
+#define MapFieldNormalCost   (1 << MapFieldNormalSpeed) /// Normal CMapField::Cost
+
 /*----------------------------------------------------------------------------
 --  Map info structure
 ----------------------------------------------------------------------------*/

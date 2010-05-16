@@ -86,7 +86,7 @@ static void UnitRotate(CUnit *unit, int rotate)
 */
 int UnitShowAnimation(CUnit *unit, const CAnimation *anim)
 {
-	return UnitShowAnimationScaled(unit, anim, 8);
+	return UnitShowAnimationScaled(unit, anim, MapFieldNormalCost);
 }
 
 /**
@@ -94,7 +94,8 @@ int UnitShowAnimation(CUnit *unit, const CAnimation *anim)
 **
 **  @param unit   Unit of the animation.
 **  @param anim   Animation script to handle.
-**  @param scale  Scaling factor of the wait times in animation (8 means no scaling).
+**  @param scale  Scaling factor of the wait times in animation
+**                (MapFieldNormalCost means no scaling).
 **
 **  @return       The flags of the current script step.
 */
@@ -140,7 +141,7 @@ int UnitShowAnimationScaled(CUnit *unit, const CAnimation *anim, int scale)
 				break;
 
 			case AnimationWait:
-				unit->Anim.Wait = (unit->Anim.Anim->D.Wait.Wait * scale) >> 3;
+				unit->Anim.Wait = (unit->Anim.Anim->D.Wait.Wait * scale) >> MapFieldNormalSpeed;
 				if (unit->Anim.Wait <= 0)
 					unit->Anim.Wait = 1;
 				break;
