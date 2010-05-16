@@ -95,6 +95,7 @@ local editor_types = {
   "unit-heli",
   
   "unit-wscout",
+  "unit-destroyer",
 
   "unit-tree",
   "unit-tree02",
