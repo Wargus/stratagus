@@ -167,7 +167,6 @@ namespace gcn
         int mCaretPosition;
         int mXScroll;
 		int mSelectStart;
-		int mSelectEndOffset;
     };
 }
 
