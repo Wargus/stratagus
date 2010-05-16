@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: boswars 2.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-02 12:36+0300\n"
-"PO-Revision-Date: 2010-03-06 00:52+0200\n"
+"POT-Creation-Date: 2010-05-16 13:51+0300\n"
+"PO-Revision-Date: 2010-05-16 13:34+0200\n"
 "Last-Translator: Kalle Olavi Niemitalo <kon@iki.fi>\n"
 "Language-Team: Kimmo Kalevi Merikivi <fi@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -100,39 +100,75 @@ msgstr "Tietokone"
 msgid "Amount of"
 msgstr "Yksikön sisältämä"
 
-#: editor/editloop.cpp:1008
+#: editor/editloop.cpp:1010
 msgid "Patch"
 msgstr "Maastopala"
 
-#: editor/editloop.cpp:1290
+#: editor/editloop.cpp:1018
+msgid "impassable"
+msgstr "kulkueste"
+
+#: editor/editloop.cpp:1023
+msgid "land"
+msgstr "maata"
+
+#: editor/editloop.cpp:1028
+msgid "coast"
+msgstr "rantaa"
+
+#: editor/editloop.cpp:1033
+msgid "water"
+msgstr "vettä"
+
+#. TRANSLATORS: This flag means players cannot build
+#. here, e.g. because the ground is too soft.  There
+#. may be a building here anyway, if the map designer
+#. has found a way to circumvent the restriction.
+#: editor/editloop.cpp:1045
+msgid "no building"
+msgstr "rakennuskielto"
+
+#: editor/editloop.cpp:1057
+msgid "speed="
+msgstr "nopeus="
+
+#: editor/editloop.cpp:1060
+msgid " (fast)"
+msgstr " (nopea)"
+
+#: editor/editloop.cpp:1064
+msgid " (slow)"
+msgstr " (hidas)"
+
+#: editor/editloop.cpp:1347
 msgid "Unit can't be placed here."
 msgstr "Yksikköä ei voi sijoittaa tähän."
 
-#: editor/editloop.cpp:1371
+#: editor/editloop.cpp:1428
 msgid "Patch deleted"
 msgstr "Maastopala poistettu"
 
-#: editor/editloop.cpp:1402
+#: editor/editloop.cpp:1459
 msgid "Unit owner modified"
 msgstr "Yksikön omistaja vaihdettu"
 
-#: editor/editloop.cpp:1603 editor/editloop.cpp:1639
+#: editor/editloop.cpp:1660 editor/editloop.cpp:1696
 msgid "Select player #"
 msgstr "Valitse pelaaja #"
 
-#: editor/editloop.cpp:1737
+#: editor/editloop.cpp:1794
 msgid "Select mode"
 msgstr "Valintatila"
 
-#: editor/editloop.cpp:1748
+#: editor/editloop.cpp:1805
 msgid "Unit mode"
 msgstr "Yksikkötila"
 
-#: editor/editloop.cpp:1759
+#: editor/editloop.cpp:1816
 msgid "Patch mode"
 msgstr "Maastopalatila"
 
-#: editor/editloop.cpp:1770
+#: editor/editloop.cpp:1827
 msgid "Set start location mode"
 msgstr "Aloituspaikkatila"
 
