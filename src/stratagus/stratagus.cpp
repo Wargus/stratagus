@@ -671,8 +671,8 @@ static void Usage(void)
 "
 #else
 "\
-\t-v mode\t\tVideo mode (0=default,1=640x480,2=800x600,\n\
-\t\t\t\t3=1024x768,4=1280x960,5=1600x1200)\n\
+\t-v mode\t\tVideo mode (0=default,1=640x480,2=800x480,\n\
+\t\t\t\t3=800x600,4=1024x768,5=1280x960,6=1600x1200)\n\
 "
 #endif
 "\
@@ -804,7 +804,7 @@ int main(int argc, char **argv)
 
 	//  Default player name to username on unix systems.
 	LocalPlayerName.clear();
-#ifdef USE_WIN32
+#ifdef USE_WIN32 || USE_MAEMO
 	LocalPlayerName = "Anonymous";
 #else
 	{
@@ -873,17 +873,21 @@ int main(int argc, char **argv)
 						continue;
 					case 2:
 						Video.Width = 800;
-						Video.Height = 600;
+						Video.Height = 480;
 						continue;
 					case 3:
+						Video.Width = 800;
+						Video.Height = 600;
+						continue;
+					case 4:
 						Video.Width = 1024;
 						Video.Height = 768;
 						continue;
-					case 4:
+					case 5:
 						Video.Width = 1280;
 						Video.Height = 960;
 						continue;
-					case 5:
+					case 6:
 						Video.Width = 1600;
 						Video.Height = 1200;
 						continue;

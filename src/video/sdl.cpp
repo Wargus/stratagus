@@ -897,6 +897,7 @@ void ToggleGrabMouse(int mode)
 void ToggleFullScreen(void)
 {
 #ifdef USE_MAEMO
+	// On Maemo is only supported fullscreen mode
 	return;
 #endif
 #ifdef USE_WIN32
