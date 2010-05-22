@@ -11,6 +11,7 @@ class CEditor
 {
 	vector<string> UnitTypes;
 	const CUnitType *StartUnit;
+	bool ShowTerrainFlags;
 	EditorRunningType Running;
 };
 
