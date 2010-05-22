@@ -121,10 +121,11 @@ else
 	CPPFLAGS="$CPPFLAGS -DDEBUG"
 fi
 
+dnl --- GLES ------------------
 AC_ARG_WITH(gles,
-	[  --with-gles		  [Use OpenGL ES 1.1 instead OpenGL (default: autodetect)])
+	[  --with-gles		  [Use OpenGL ES 1.1 instead OpenGL (default: autodetect)]])
 if test "$with_gles" != "no"; then
-	AC_CHECK_HEADER(GLES1/gl.h,, GLES=no)
+	AC_CHECK_HEADER(GLES/gl.h,, GLES=no)
 	AC_CHECK_HEADER(SDL/SDL_gles.h,, GLES=no)
 	if test "$GLES" != "no"; then
 		AC_SEARCH_LIBS(glViewport, GLES_CM, LDFLAGS="$LDFLAGS $LIBS", GLES=no)
@@ -133,7 +134,6 @@ if test "$with_gles" != "no"; then
 	if test "$with_gles" != "" -a "$GLES" = "no"; then
 		AC_MSG_ERROR(gles libraries cannot be not found)
 	fi
-	CPPFLAGS="$CPPFLAGS -DUSE_GLES"
 else
 	GLES=no
 fi
@@ -144,6 +144,8 @@ if test "$GLES" = "no"; then
 	else
 		AC_SEARCH_LIBS(glViewport, GL opengl32 sdl, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(opengl libraries cannot be not found))
 	fi
+else
+	CPPFLAGS="$CPPFLAGS -DUSE_GLES"
 fi
 
 dnl --- BZIP2 ------------------

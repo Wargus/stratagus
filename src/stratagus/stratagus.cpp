@@ -804,7 +804,7 @@ int main(int argc, char **argv)
 
 	//  Default player name to username on unix systems.
 	LocalPlayerName.clear();
-#ifdef USE_WIN32 || USE_MAEMO
+#if defined(USE_WIN32) || defined(USE_MAEMO)
 	LocalPlayerName = "Anonymous";
 #else
 	{
