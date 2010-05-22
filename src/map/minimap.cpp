@@ -109,6 +109,7 @@ static void CreateMinimapTexture(void)
 	glBindTexture(GL_TEXTURE_2D, MinimapTexture);
 #ifdef USE_GLES
 #warning TODO: convert glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); to GLES
+#warning TODO: convert glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); to GLES
 #else
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);

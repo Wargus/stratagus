@@ -313,7 +313,7 @@ int PlayMovie(const std::string &name)
 int PlayMovie(const std::string &name)
 {
 	if (strstr(name.c_str(), ".ogg") || strstr(name.c_str(), ".ogv") || strstr(name.c_str(), ".avi")) {
-		fprintf(stderr, "PlayMovie() '%s' is not supported, please recompile stratagus with theora support\n", name.c_str())
+		fprintf(stderr, "PlayMovie() '%s' is not supported, please recompile stratagus with theora support\n", name.c_str());
 		return 0;
 	}
 	return -1;
