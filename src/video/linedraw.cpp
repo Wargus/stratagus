@@ -989,7 +989,16 @@ void DrawPixel(Uint32 color, int x, int y)
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
 #ifdef USE_GLES
-#warning TODO: convert glBegin(GL_POINTS); to GLES
+	float vertex[] = {
+		x, y,
+	};
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	
+	glVertexPointer(2, GL_FLOAT, 0, vertex);
+	glDrawArrays(GL_POINTS, 0, 1);
+	
+	glDisableClientState(GL_VERTEX_ARRAY);
 #else
 	glBegin(GL_POINTS);
 	glVertex2i(x, y);
@@ -1065,7 +1074,17 @@ void DrawHLine(Uint32 color, int x, int y, int width)
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
 #ifdef USE_GLES
-#warning TODO: convert glBegin(GL_LINES); to GLES
+	float vertex[] = {
+		x, y,
+		x + width, y
+	};
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	
+	glVertexPointer(2, GL_FLOAT, 0, vertex);
+	glDrawArrays(GL_LINES, 0, 2);
+	
+	glDisableClientState(GL_VERTEX_ARRAY);
 #else
 	glBegin(GL_LINES);
 	glVertex2i(x, y);
@@ -1159,7 +1178,17 @@ void DrawVLine(Uint32 color, int x, int y, int height)
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
 #ifdef USE_GLES
-#warning TODO: convert glBegin(GL_LINES); to GLES
+	float vertex[] = {
+		x, y,
+		x, y + height
+	};
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	
+	glVertexPointer(2, GL_FLOAT, 0, vertex);
+	glDrawArrays(GL_LINES, 0, 2);
+	
+	glDisableClientState(GL_VERTEX_ARRAY);
 #else
 	glBegin(GL_LINES);
 	glVertex2i(x, y);
@@ -1271,7 +1300,17 @@ void DrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
 #ifdef USE_GLES
-#warning TODO: convert glBegin(GL_LINES); to GLES
+	float vertex[] = {
+		xx1, yy1,
+		xx1, yy2
+	};
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	
+	glVertexPointer(2, GL_FLOAT, 0, vertex);
+	glDrawArrays(GL_LINES, 0, 2);
+	
+	glDisableClientState(GL_VERTEX_ARRAY);
 #else
 	glBegin(GL_LINES);
 	glVertex2f(xx1, yy1);
@@ -1430,7 +1469,23 @@ void DrawRectangle(Uint32 color, int x, int y, int w, int h)
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
 #ifdef USE_GLES
-#warning TODO: convert glBegin(GL_LINES); to GLES
+	float vertex[] = {
+		x, y,
+		x + w, y,
+		x + w - 1, y + 1,
+		x + w - 1, y + h,
+		x + w - 1, y + h - 1,
+		x, y + h - 1,
+		x, y + h - 1,
+		x, y + 1
+	};
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	
+	glVertexPointer(2, GL_FLOAT, 0, vertex);
+	glDrawArrays(GL_LINES, 0, 8);
+	
+	glDisableClientState(GL_VERTEX_ARRAY);
 #else
 	glBegin(GL_LINES);
 	glVertex2i(x, y);
@@ -1600,14 +1655,11 @@ void FillRectangle(Uint32 color, int x, int y,
 	};
 
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	
-//	glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
 	glVertexPointer(2, GL_FLOAT, 0, vertex);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	
 	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 #else
 	glBegin(GL_TRIANGLE_STRIP);
 	glVertex2i(x, y);

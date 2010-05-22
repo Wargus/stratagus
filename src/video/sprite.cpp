@@ -128,7 +128,41 @@ void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
 
 			glBindTexture(GL_TEXTURE_2D, textures[texture]);
 #ifdef USE_GLES
-#warning TODO: convert glBegin(GL_QUADS); to GLES
+			float texCoord[] = {
+				stx, sty,
+				stx, ety,
+				etx, ety,
+				etx, sty
+			};
+
+			float vertex[8];
+			
+			if (!flip) {
+				float vertex[8] = {
+					x2, y2,
+					x2, y2 + h,
+					x2 + w, y2 + h,
+					x2 + w, y2
+				};
+			} else {
+				float vertex[8] = {
+					x + (ex - sx) - (x2 - x), y2,
+					x + (ex - sx) - (x2 - x), y2 + h,
+					x + (ex - sx) - (x2 + w - x), y2 + h,
+					x + (ex - sx) - (x2 + w - x), y2
+				};
+			}
+
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			glEnableClientState(GL_VERTEX_ARRAY);
+			
+			glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
+			glVertexPointer(2, GL_FLOAT, 0, vertex);
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+			
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+			glDisableClientState(GL_VERTEX_ARRAY);
+
 #else
 			glBegin(GL_QUADS);
 			if (!flip) {

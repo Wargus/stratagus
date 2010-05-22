@@ -635,7 +635,29 @@ void CMinimap::Draw(int vx, int vy)
 			GL_RGBA, GL_UNSIGNED_BYTE, MinimapSurfaceGL);
 
 #ifdef USE_GLES
-#warning TODO: convert glBegin(GL_QUADS) to GLES
+		float texCoord[] = {
+			0.0f, 0.0f,
+			0.0f, (float)H / MinimapTextureHeight,
+			(float)W / MinimapTextureWidth, (float)H / MinimapTextureHeight,
+			(float)W / MinimapTextureWidth, 0.0f
+		};
+
+		float vertex[] = {
+			X, Y,
+			X, Y + H,
+			X + W, Y + H,
+			X + W, Y
+		};
+
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glEnableClientState(GL_VERTEX_ARRAY);
+         
+		glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
+		glVertexPointer(2, GL_FLOAT, 0, vertex);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		glDisableClientState(GL_VERTEX_ARRAY);
 #else
 		glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 0.0f);
