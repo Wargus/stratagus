@@ -76,7 +76,7 @@ binary-arch: build install
 	dh_installdeb
 
 	## Maemo section - Optify
-	if test "`uname -a | grep -is arm`" && test -f /etc/maemo_version; then \
+	if [ -f /etc/maemo_version ]; then \
 		mkdir -p $(CURDIR)/debian/stratagus/opt/stratagus/bin; \
 		mkdir -p $(CURDIR)/debian/stratagus/opt/stratagus/share/doc; \
 		mkdir -p $(CURDIR)/debian/stratagus/opt/stratagus/share/man; \

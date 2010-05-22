@@ -25,7 +25,7 @@ else
 fi
 
 ## Maemo section
-if test "$ARCH" = "linux" && test "`uname -a | grep -is arm`" && test -f /etc/maemo_version; then
+if test "$ARCH" = "linux" && test -f /etc/maemo_version; then
 	CPPFLAGS="$CPPFLAGS -DUSE_MAEMO"
 	MAEMO=yes
 fi
