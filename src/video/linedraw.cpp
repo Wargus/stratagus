@@ -1592,7 +1592,22 @@ void FillRectangle(Uint32 color, int x, int y,
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
 #ifdef USE_GLES
-#warning TODO: convert glBegin(GL_TRIANGLE_STRIP); to GLES
+	float vertex[] = {
+		x, y,
+		x + w, y,
+		x, y + h,
+		x + w, y + h
+	};
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	
+//	glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
+	glVertexPointer(2, GL_FLOAT, 0, vertex);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 #else
 	glBegin(GL_TRIANGLE_STRIP);
 	glVertex2i(x, y);

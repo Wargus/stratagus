@@ -248,7 +248,7 @@ static void InitOpenGL(void)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 #ifdef USE_GLES
-#warning TODO: convert glOrtho(0, Video.Width, Video.Height, 0, -1, 1); to GLES
+	glOrthof(0, Video.Width, Video.Height, 0, -1, 1);
 #else
 	glOrtho(0, Video.Width, Video.Height, 0, -1, 1);
 #endif
