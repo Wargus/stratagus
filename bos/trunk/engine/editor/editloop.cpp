@@ -99,7 +99,6 @@ static bool PatchPlacedThisPress = false;   /// Only allow one patch per press
 static bool UpdateMinimap = false;          /// Update units on the minimap
 static bool UpdateMinimapTerrain = false;   /// Terrain has changed, minimap needs updating
 static int VisibleIcons;                    /// Number of icons that are visible at a time
-static bool EditorTerrainFlagsVisible = false; /// Whether to show CMapField::Flags
 
 enum _mode_buttons_ {
 	SelectButton = 201,  /// Select mode button
@@ -1075,7 +1074,7 @@ static void EditorDrawTerrainFlags(const CViewport *vp)
 */
 static void EditorDrawTerrainFlagsIfEnabled()
 {
-	if (EditorTerrainFlagsVisible)
+	if (Editor.ShowTerrainFlags)
 	{
 		for (const CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp)
 		{
@@ -1530,13 +1529,6 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				break;
 			}
 			ToggleFullScreen();
-			break;
-
-		case 't': // 't': Show or hide terrain flags
-			if (!(KeyModifiers & (ModifierControl | ModifierAlt | ModifierSuper)))
-			{
-				EditorTerrainFlagsVisible = !EditorTerrainFlagsVisible;
-			}
 			break;
 
 		case 'v': // 'v' Viewport
@@ -2337,6 +2329,7 @@ static void EditorMainLoop()
 		InterfaceState = IfaceStateNormal;
 		Editor.State = EditorSelecting;
 		Editor.ShowPatchOutlines = false;
+		Editor.ShowTerrainFlags = false;
 		UI.SelectedViewport = UI.Viewports;
 
 		while (Editor.Running)

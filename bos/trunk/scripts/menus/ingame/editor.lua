@@ -36,6 +36,8 @@ function HandleEditorIngameCommandKey(key, ctrl, alt, shift)
     RunEditorMapPropertiesMenu()
   elseif (key == "f6") then
     RunEditorPlayerPropertiesMenu()
+  elseif (key == "t" and not (ctrl or alt)) then
+    Editor.ShowTerrainFlags = not Editor.ShowTerrainFlags
   else
     return false
   end
@@ -45,7 +47,9 @@ end
 
 function RunEditorIngameMenu(s)
   local menu = BosGameMenu()
+  local showTerrain
 
+  menu:setSize(256, 324)
   menu:addLabel(_("Editor Menu"), 128, 11)
   menu:addButton(_("Save (~<F11~>)"), 16, 40,
     function() RunEditorSaveMenu() end)
@@ -53,10 +57,14 @@ function RunEditorIngameMenu(s)
     function() RunEditorMapPropertiesMenu() end)
   menu:addButton(_("Player Properties (~<F6~>)"), 16, 40 + (36 * 2),
     function() RunEditorPlayerPropertiesMenu() end)
+  showTerrain = menu:addCheckBox(_("Show terrain attributes"), 16, 40 + (36 * 3),
+    function() Editor.ShowTerrainFlags = showTerrain:isMarked() end)
+  showTerrain:setFont(Fonts["large"])
+  showTerrain:setMarked(Editor.ShowTerrainFlags)
 
-  menu:addButton(_("~!Exit to menu"), 16, 40 + (36 * 4),
+  menu:addButton(_("~!Exit to menu"), 16, 40 + (36 * 5),
     function() Editor.Running = EditorNotRunning; menu:stop() end)
-  menu:addButton(_("Return to the Editor (~<Esc~>)"), 16, 248,
+  menu:addButton(_("Return to the Editor (~<Esc~>)"), 16, 284,
     function() menu:stop() end)
 
   menu:run(false)
