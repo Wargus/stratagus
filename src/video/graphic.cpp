@@ -982,8 +982,9 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 
 	SDL_LockSurface(g->Surface);
 	glBindTexture(GL_TEXTURE_2D, texture);
-#ifdef USE_MAEMO
+#ifdef USE_GLES
 #warning TODO: Convert glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); to GLES
+#warning TODO: Convert glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); to GLES
 #else
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
@@ -1051,7 +1052,7 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	}
 
 	GLint internalformat = GL_RGBA;
-#ifdef USE_MAEMO
+#ifdef USE_GLES
 #warning GL_COMPRESSED_RGBA is not supported
 #else
 	if (GLTextureCompressionSupported && UseGLTextureCompression) {

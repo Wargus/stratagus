@@ -53,7 +53,7 @@
 #include <unistd.h>
 #endif
 #include "SDL.h"
-#ifdef USE_MAEMO
+#ifdef USE_GLES
 #include "SDL_gles.h"
 #include "GLES/gl.h"
 #else
@@ -112,7 +112,7 @@ static bool RegenerateScreen = false;
 ----------------------------------------------------------------------------*/
 
 // ARB_texture_compression
-#ifndef USE_MAEMO
+#ifndef USE_GLES
 PFNGLCOMPRESSEDTEXIMAGE3DARBPROC    glCompressedTexImage3DARB;
 PFNGLCOMPRESSEDTEXIMAGE2DARBPROC    glCompressedTexImage2DARB;
 PFNGLCOMPRESSEDTEXIMAGE1DARBPROC    glCompressedTexImage1DARB;
@@ -198,7 +198,7 @@ static bool IsExtensionSupported(const char *extension)
 static void InitOpenGLExtensions()
 {
 	// ARB_texture_compression
-#ifndef USE_MAEMO
+#ifndef USE_GLES
 	if (IsExtensionSupported("GL_ARB_texture_compression"))
 	{
 		glCompressedTexImage3DARB =
@@ -228,6 +228,10 @@ static void InitOpenGLExtensions()
 			GLTextureCompressionSupported = false;
 		}
 	}
+	else
+	{
+		GLTextureCompressionSupported = false;
+	}
 #else
 	GLTextureCompressionSupported = false;
 #endif
@@ -243,7 +247,7 @@ static void InitOpenGL(void)
 	glViewport(0, 0, (GLsizei)Video.Width, (GLsizei)Video.Height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-#ifdef USE_MAEMO
+#ifdef USE_GLES
 #warning TODO: convert glOrtho(0, Video.Width, Video.Height, 0, -1, 1); to GLES
 #else
 	glOrtho(0, Video.Width, Video.Height, 0, -1, 1);
@@ -253,7 +257,7 @@ static void InitOpenGL(void)
 	glTranslatef(0.375, 0.375, 0.);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-#ifdef USE_MAEMO
+#ifdef USE_GLES
 	glClearDepthf(1.0f);
 #else
 	glClearDepth(1.0f);
@@ -448,7 +452,7 @@ void InitVideoSdl(void)
 		flags |= SDL_FULLSCREEN;
 	}
 	if (UseOpenGL) {
-#ifdef USE_MAEMO
+#ifdef USE_GLES
 		if (SDL_GLES_Init(SDL_GLES_VERSION_1_1) < 0) {
 			fprintf(stderr, "Couldn't initialize SDL_GLES: %s\n", SDL_GetError());
 			exit(1);
@@ -490,7 +494,7 @@ void InitVideoSdl(void)
 	SDL_EnableUNICODE(1);
 
 	if (UseOpenGL) {
-#ifdef USE_MAEMO
+#ifdef USE_GLES
 		SDL_GLES_Context *context = SDL_GLES_CreateContext();
 		if (!context) {
 			fprintf(stderr, "Couldn't initialize SDL_GLES_CreateContext: %s\n", SDL_GetError());

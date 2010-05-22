@@ -34,7 +34,7 @@
 //@{
 
 #include "SDL.h"
-#ifdef USE_MAEMO
+#ifdef USE_GLES
 #include "SDL_gles.h"
 #include "GLES/gl.h"
 #else
@@ -450,7 +450,7 @@ extern void FreeGraphics();
 
 
 // ARB_texture_compression
-#ifndef USE_MAEMO
+#ifndef USE_GLES
 extern PFNGLCOMPRESSEDTEXIMAGE3DARBPROC    glCompressedTexImage3DARB;
 extern PFNGLCOMPRESSEDTEXIMAGE2DARBPROC    glCompressedTexImage2DARB;
 extern PFNGLCOMPRESSEDTEXIMAGE1DARBPROC    glCompressedTexImage1DARB;

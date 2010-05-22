@@ -366,7 +366,7 @@ void SaveScreenshotPNG(const char *name)
 			fprintf(stderr, "Out of memory\n");
 			exit(1);
 		}
-#ifdef USE_MAEMO
+#ifdef USE_GLES
 #warning TODO: convert glReadBuffer(GL_FRONT); to GLES
 #else
 		glReadBuffer(GL_FRONT);

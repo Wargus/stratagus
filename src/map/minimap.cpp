@@ -107,7 +107,7 @@ static void CreateMinimapTexture(void)
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glGenTextures(1, &MinimapTexture);
 	glBindTexture(GL_TEXTURE_2D, MinimapTexture);
-#ifdef USE_MAEMO
+#ifdef USE_GLES
 #warning TODO: convert glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); to GLES
 #else
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -633,7 +633,7 @@ void CMinimap::Draw(int vx, int vy)
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, MinimapTextureWidth, MinimapTextureHeight,
 			GL_RGBA, GL_UNSIGNED_BYTE, MinimapSurfaceGL);
 
-#ifdef USE_MAEMO
+#ifdef USE_GLES
 #warning TODO: convert glBegin(GL_QUADS) to GLES
 #else
 		glBegin(GL_QUADS);

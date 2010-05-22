@@ -127,7 +127,7 @@ void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
 				sx2 / GLMaxTextureSize;
 
 			glBindTexture(GL_TEXTURE_2D, textures[texture]);
-#ifdef USE_MAEMO
+#ifdef USE_GLES
 #warning TODO: convert glBegin(GL_QUADS); to GLES
 #else
 			glBegin(GL_QUADS);

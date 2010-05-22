@@ -988,7 +988,7 @@ void DrawPixel(Uint32 color, int x, int y)
 	Video.GetRGBA(color, NULL, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
-#ifdef USE_MAEMO
+#ifdef USE_GLES
 #warning TODO: convert glBegin(GL_POINTS); to GLES
 #else
 	glBegin(GL_POINTS);
@@ -1064,7 +1064,7 @@ void DrawHLine(Uint32 color, int x, int y, int width)
 	Video.GetRGBA(color, NULL, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
-#ifdef USE_MAEMO
+#ifdef USE_GLES
 #warning TODO: convert glBegin(GL_LINES); to GLES
 #else
 	glBegin(GL_LINES);
@@ -1158,7 +1158,7 @@ void DrawVLine(Uint32 color, int x, int y, int height)
 	Video.GetRGBA(color, NULL, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
-#ifdef USE_MAEMO
+#ifdef USE_GLES
 #warning TODO: convert glBegin(GL_LINES); to GLES
 #else
 	glBegin(GL_LINES);
@@ -1270,7 +1270,7 @@ void DrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 	Video.GetRGBA(color, NULL, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
-#ifdef USE_MAEMO
+#ifdef USE_GLES
 #warning TODO: convert glBegin(GL_LINES); to GLES
 #else
 	glBegin(GL_LINES);
@@ -1429,7 +1429,7 @@ void DrawRectangle(Uint32 color, int x, int y, int w, int h)
 	Video.GetRGBA(color, NULL, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
-#ifdef USE_MAEMO
+#ifdef USE_GLES
 #warning TODO: convert glBegin(GL_LINES); to GLES
 #else
 	glBegin(GL_LINES);
@@ -1591,7 +1591,7 @@ void FillRectangle(Uint32 color, int x, int y,
 	Video.GetRGBA(color, NULL, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
-#ifdef USE_MAEMO
+#ifdef USE_GLES
 #warning TODO: convert glBegin(GL_TRIANGLE_STRIP); to GLES
 #else
 	glBegin(GL_TRIANGLE_STRIP);
