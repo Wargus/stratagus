@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on Tue May  4 23:08:21 2010.
+** Generated automatically by tolua++-1.0.92 on Sat May 22 10:21:34 2010.
 */
 
 #ifndef __cplusplus
@@ -16138,6 +16138,36 @@ static int tolua_get_CEditor_StartUnit_ptr(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: ShowTerrainFlags of class  CEditor */
+#ifndef TOLUA_DISABLE_tolua_get_CEditor_ShowTerrainFlags
+static int tolua_get_CEditor_ShowTerrainFlags(lua_State* tolua_S)
+{
+  CEditor* self = (CEditor*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ShowTerrainFlags'",NULL);
+#endif
+  tolua_pushboolean(tolua_S,(bool)self->ShowTerrainFlags);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: ShowTerrainFlags of class  CEditor */
+#ifndef TOLUA_DISABLE_tolua_set_CEditor_ShowTerrainFlags
+static int tolua_set_CEditor_ShowTerrainFlags(lua_State* tolua_S)
+{
+  CEditor* self = (CEditor*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ShowTerrainFlags'",NULL);
+  if (!tolua_isboolean(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->ShowTerrainFlags = ((bool)  tolua_toboolean(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: Running of class  CEditor */
 #ifndef TOLUA_DISABLE_tolua_get_CEditor_Running
 static int tolua_get_CEditor_Running(lua_State* tolua_S)
@@ -20416,6 +20446,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_beginmodule(tolua_S,"CEditor");
    tolua_variable(tolua_S,"UnitTypes",tolua_get_CEditor_UnitTypes,tolua_set_CEditor_UnitTypes);
    tolua_variable(tolua_S,"StartUnit",tolua_get_CEditor_StartUnit_ptr,NULL);
+   tolua_variable(tolua_S,"ShowTerrainFlags",tolua_get_CEditor_ShowTerrainFlags,tolua_set_CEditor_ShowTerrainFlags);
    tolua_variable(tolua_S,"Running",tolua_get_CEditor_Running,tolua_set_CEditor_Running);
   tolua_endmodule(tolua_S);
   tolua_function(tolua_S,"SetEditorSelectIcon",tolua_stratagus_SetEditorSelectIcon00);

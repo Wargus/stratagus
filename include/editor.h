@@ -104,6 +104,8 @@ public:
 	bool ShowPatchOutlines;      /// Show outlines around patches
 	Uint32 PatchOutlineColor;    /// Patch outline color
 
+	bool ShowTerrainFlags;       /// Show CMapField::Flags
+
 	EditorRunningType Running;   /// Editor is running
 
 	EditorStateType State;       /// Current editor state
