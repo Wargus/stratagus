@@ -240,8 +240,7 @@ int WriteMapSetup(const char *mapSetup, CMap *map)
 		}
 		f->printf("\n");
 
-		f->printf("-- patches\n");
-		f->printf("%s", Map.PatchManager.savePatches(true).c_str());
+		f->printf("Load(GetCurrentLuaPath() .. \"/terrain.lua\")\n");
 		f->printf("\n");
 
 		f->printf("-- place units\n");
@@ -319,6 +318,20 @@ static void WriteCreateUnit(FileWriter *f, const CUnit *unit)
 	f->printf(", {%d, %d})\n", unit->X, unit->Y);
 }
 
+/**
+**  Write a terrain into the given file.
+**
+**  @param path  pathname of the file to write the terrain into
+**  @param map   whose terrain must be saved
+*/
+static void WriteTerrain(std::string &path, const CMap *map)
+{
+	FileWriter *f = CreateFileWriter(path.c_str());
+	f->printf("-- terrain\n");
+	f->printf("%s", Map.PatchManager.savePatches(true).c_str());
+	f->printf("\n");
+}
+
 
 /**
 **  Save a Stratagus map.
@@ -346,6 +359,9 @@ int SaveStratagusMap(const std::string &mapName, CMap *map)
 	if (WriteMapPresentation(mapPresentation, map) == -1) {
 		return -1;
 	}
+	
+	std::string terrainName = mapName + std::string("/terrain.lua");
+	WriteTerrain(terrainName, map);
 
 	return WriteMapSetup(mapSetup.c_str(), map);
 }
