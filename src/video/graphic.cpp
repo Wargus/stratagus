@@ -1052,9 +1052,7 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	}
 
 	GLint internalformat = GL_RGBA;
-#ifdef USE_GLES
-#warning GL_COMPRESSED_RGBA is not supported
-#else
+#ifndef USE_GLES
 	if (GLTextureCompressionSupported && UseGLTextureCompression) {
 		internalformat = GL_COMPRESSED_RGBA;
 	}
