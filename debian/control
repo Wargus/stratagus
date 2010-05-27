@@ -8,7 +8,8 @@ Build-Depends: automake, libsdl1.2-dev (>> 1.2.2), libvorbis-dev,
  libgl-dev | libsdl-gles1.2-dev, libogg-dev, libtheora-dev, libmikmod2-dev
 Standards-Version: 3.6.1
 Homepage: http://stratagus.sourceforge.net
-Vcs-Bzr: lp:~pali.rohar/+junk/stratagus
+Vcs-Browser: https://bazaar.launchpad.net/~pali.rohar/+junk/stratagus
+Vcs-Bzr: https://code.launchpad.net/~pali.rohar/+junk/stratagus
 
 Package: stratagus
 Architecture: any
@@ -28,7 +29,7 @@ Description: realtime strategy game for Unix and X
  fairly bug-free. It also has network connectivity for up to 8 players.
  .
  This version is compiled with some of the possible options, and thus has
- gzip, bunzip2, SDL, vorbis, theora and OpenGL (or OpenGL ES) support.
+ gzip, bunzip2, SDL, vorbis, theora and OpenGL (or OpenGL ES 1.1) support.
  The sound options will depend on your personal election on SDL packages.
 
 Package: stratagus-gl
