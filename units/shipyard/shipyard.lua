@@ -57,8 +57,8 @@ DefineAnimations("animations-shipyard", {
 
 DefineUnitType("unit-shipyard", {
     Name = "Shipyard",
-    Image = {"file", GetCurrentLuaPath().."/shipyard.png", "size", {320, 320}},
-    Shadow = {"file", GetCurrentLuaPath().."/shipyard_s.png", "size", {320, 320}},
+    Image = {"file", GetCurrentLuaPath().."/shipyard.png", "size", {256, 256}},
+    Shadow = {"file", GetCurrentLuaPath().."/shipyard_s.png", "size", {256, 256}},
     Animations = "animations-shipyard",
     Icon = "icon-shipyard",
     EnergyValue = 6000,
@@ -68,8 +68,8 @@ DefineUnitType("unit-shipyard", {
     Speed = 0,
     HitPoints = 550,
     DrawLevel = 25,
-    TileSize = {7, 5},
-    BoxSize = {220, 156},
+    TileSize = {6, 5},
+    BoxSize = {192, 160},
     SightRange = 2,
     Armor = 30,
     BasicDamage = 0,
