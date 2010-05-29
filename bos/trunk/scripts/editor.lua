@@ -94,6 +94,7 @@ local editor_types = {
   "unit-jet",
   "unit-heli",
   
+  "unit-shipyard",
   "unit-wscout",
   "unit-destroyer",
 
