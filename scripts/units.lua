@@ -9,7 +9,7 @@
 --
 --	units.lua	-	Define the used unit-types.
 --
---	(c) Copyright 1998 - 2007 by Lutz Sammer, Crestez Leonard
+--	(c) Copyright 1998 - 2010 by Lutz Sammer, Crestez Leonard
 --                               and Francois Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
@@ -159,6 +159,7 @@ DefineAllow("unit-destroyed-4x4-place", AllowAll)
 Load("units/vault/vault.lua")
 Load("units/engineer/engineer.lua")
 Load("units/vehiclefactory/vehiclefactory.lua")
+Load("units/shipyard/shipyard.lua")
 
 -- Find and load all other units
 local list

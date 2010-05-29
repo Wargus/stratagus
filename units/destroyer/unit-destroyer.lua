@@ -88,10 +88,10 @@ DefineUnitType("unit-destroyer", {
 
 DefineAllow("unit-destroyer", AllowAll)
 
---DefineButton({
---    Pos = 3, Level = 0, Icon = "icon-destroyer", Action = "train-unit",
---    Value = "unit-detroyer", Hint = "BUILD ~!Destroyer",
---    ForUnit = {"unit-shipyard"}})
+DefineButton({
+   Pos = 3, Level = 0, Icon = "icon-destroyer", Action = "train-unit",
+   Value = "unit-destroyer", Hint = "BUILD ~!Destroyer",
+   ForUnit = {"unit-shipyard"}})
 
 DefineCommonButtons({"unit-destroyer"})
 

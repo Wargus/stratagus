@@ -81,10 +81,10 @@ DefineUnitType("unit-wscout", {
 
 DefineAllow("unit-wscout", AllowAll)
 
---DefineButton({
---    Pos = 5, Level = 0, Icon = "icon-wscout", Action = "train-unit",
---    Value = "unit-rtank", Hint = "BUILD ~!ROCKET TANK",
---    ForUnit = {"unit-vfac"}})
+DefineButton({
+   Pos = 2, Level = 0, Icon = "icon-wscout", Action = "train-unit",
+   Value = "unit-wscout", Hint = "BUILD ~!WATER SCOUT",
+   ForUnit = {"unit-shipyard"}})
 
 DefineCommonButtons({"unit-wscout"})
 
