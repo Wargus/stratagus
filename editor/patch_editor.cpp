@@ -101,8 +101,8 @@ static PatchButton MouseOverButton;
 static int MouseOverTileX;
 static int MouseOverTileY;
 
-static bool DraggingFlag;
-static bool SetFlagWhileDragging;
+static unsigned short DraggingClearFlags;
+static unsigned short DraggingSetFlags; // overrides DraggingClearFlags
 
 
 static void DoScroll()
@@ -149,6 +149,22 @@ static void DoScroll()
 	}
 }
 
+/**
+**  Change the patch-tile flags at (::MouseOverTileX, ::MouseOverTileY),
+**  as specified with ::DraggingClearFlags and ::DraggingSetFlags.
+**
+**  The patch editor has no real map, so this function does not
+**  attempt to update any CMapField.
+*/
+static void ChangeFlagsAtMouse()
+{
+	CPatchType *patchType = Patch->getType();
+	unsigned short flag = patchType->getFlag(MouseOverTileX, MouseOverTileY);
+	flag &= ~DraggingClearFlags;
+	flag |= DraggingSetFlags;
+	patchType->setFlag(MouseOverTileX, MouseOverTileY, flag);
+}
+
 static void PatchEditorCallbackButtonDown(unsigned button)
 {
 	if ((1 << button) != LeftButton) {
@@ -162,35 +178,33 @@ static void PatchEditorCallbackButtonDown(unsigned button)
 
 	// Patch area
 	if (MouseOverTileX != -1) {
-		unsigned short newFlag;
 		unsigned short flag = Patch->getType()->getFlag(MouseOverTileX, MouseOverTileY);
 		if (ButtonSpeed0 <= CurrentButton && CurrentButton <= ButtonSpeed7) {
-			// replace speed value
-			newFlag = (flag & ~MapFieldSpeedMask) | FlagMap[CurrentButton];
-			SetFlagWhileDragging = true;
+			DraggingClearFlags = MapFieldSpeedMask;
+			DraggingSetFlags = FlagMap[CurrentButton];
 		} else if (CurrentButton == ButtonWater) {
+			// clear existing land/water flags then set the new flag
+			DraggingClearFlags = (MapFieldLandAllowed | MapFieldCoastAllowed | MapFieldWaterAllowed | MapFieldNoBuilding);
 			if (flag & FlagMap[CurrentButton]) {
 				// set default to land
-				newFlag = (flag ^ FlagMap[CurrentButton]) | MapFieldLandAllowed;
+				DraggingSetFlags = MapFieldLandAllowed;
 			} else {
-				// clear existing land/water flags then set the new flag
-				newFlag = flag & ~(MapFieldLandAllowed | MapFieldCoastAllowed | MapFieldWaterAllowed | MapFieldNoBuilding);
-				newFlag |= FlagMap[CurrentButton];
+				DraggingSetFlags = FlagMap[CurrentButton];
 			}
-			SetFlagWhileDragging = (flag & FlagMap[CurrentButton]) == 0;
 		} else {
 			// toggle flag
-			newFlag = flag ^ FlagMap[CurrentButton];
-			SetFlagWhileDragging = (flag & FlagMap[CurrentButton]) == 0;
+			DraggingClearFlags = flag & FlagMap[CurrentButton];
+			DraggingSetFlags = DraggingClearFlags ^ FlagMap[CurrentButton];
 		}
-		Patch->getType()->setFlag(MouseOverTileX, MouseOverTileY, newFlag);
-		DraggingFlag = true;
+
+		ChangeFlagsAtMouse();
 	}
 }
 
 static void PatchEditorCallbackButtonUp(unsigned button)
 {
-	DraggingFlag = false;
+	DraggingClearFlags = 0;
+	DraggingSetFlags = 0;
 }
 
 static void PatchEditorCallbackKeyDown(unsigned key, unsigned keychar)
@@ -302,21 +316,10 @@ static void PatchEditorCallbackMouse(int x, int y)
 			MouseOverTileX = tileX;
 			MouseOverTileY = tileY;
 
-			if (DraggingFlag &&
+			if ((DraggingClearFlags || DraggingSetFlags) &&
 				(oldTileX == -1 || oldTileX != MouseOverTileX || oldTileY != MouseOverTileY))
 			{
-				unsigned short newFlag;
-				unsigned short flag = Patch->getType()->getFlag(MouseOverTileX, MouseOverTileY);
-				if (ButtonSpeed0 <= CurrentButton && CurrentButton <= ButtonSpeed7) {
-					newFlag = (flag & ~MapFieldSpeedMask) | FlagMap[CurrentButton];
-				} else {
-					if (SetFlagWhileDragging) {
-						newFlag = flag | FlagMap[CurrentButton];
-					} else {
-						newFlag = flag & (~FlagMap[CurrentButton]);
-					}
-				}
-				Patch->getType()->setFlag(MouseOverTileX, MouseOverTileY, newFlag);
+				ChangeFlagsAtMouse();
 			}
 		}
 	}
