@@ -286,9 +286,6 @@ static void PatchEditorCallbackMouse(int x, int y)
 {
 	HandleCursorMove(&x, &y);
 
-	int oldTileX = MouseOverTileX;
-	int oldTileY = MouseOverTileY;
-
 	MouseScrollState = ScrollNone;
 	GameCursor = UI.Point.Cursor;
 	MouseOverButton = ButtonNone;
@@ -316,11 +313,11 @@ static void PatchEditorCallbackMouse(int x, int y)
 			MouseOverTileX = tileX;
 			MouseOverTileY = tileY;
 
-			if ((DraggingClearFlags || DraggingSetFlags) &&
-				(oldTileX == -1 || oldTileX != MouseOverTileX || oldTileY != MouseOverTileY))
-			{
-				ChangeFlagsAtMouse();
-			}
+			// If dragging did not begin in the patch area,
+			// then DraggingClearFlags and DraggingSetFlags
+			// are both zero, and this call doesn't change
+			// anything.
+			ChangeFlagsAtMouse();
 		}
 	}
 
