@@ -80,7 +80,7 @@ class COrderPointerPrinter:
         if self.val != 0:
             order = self.val.dereference()
             action = order["Action"].cast(gdb.lookup_type("enum _unit_action_"))
-            result = result + " {" + str(action) + "}"
+            result = result + (" {%s}" % action)
         return result
 
     @staticmethod
@@ -104,7 +104,7 @@ class CUnitTypePointerPrinter:
         result = str(self.val.cast(voidPointerType))
         if self.val != 0:
             unitTypeIdent = self.val.dereference()["Ident"]
-            result = result + " {" + str(unitTypeIdent) + "}"
+            result = result + (" {%s}" % unitTypeIdent)
         return result
 
     @staticmethod
@@ -131,7 +131,7 @@ class CUnitPointerPrinter:
             unitTypePointer = unit["Type"]
             if unitTypePointer != 0:
                 unitTypeIdent = unitTypePointer.dereference()["Ident"]
-                result = result + " {" + str(unitTypeIdent) + "}"
+                result = result + (" {%s}" % unitTypeIdent)
         return result
 
     @staticmethod
@@ -140,6 +140,83 @@ class CUnitPointerPrinter:
         if val.type.code == gdb.TYPE_CODE_PTR:
             if val.type.target().tag == "CUnit":
                 return CUnitPointerPrinter(val)
+
+class CGraphicPointerPrinter:
+    "Pretty-print a pointer to CGraphic."
+
+    def __init__(self, val):
+        object.__init__(self)
+        self.val = val
+
+    def to_string(self):
+        "Called by GDB to find what to display as the value."
+        voidPointerType = gdb.lookup_type("void").pointer()
+        # str(self.val) would cause a recursive call; the cast avoids that.
+        result = str(self.val.cast(voidPointerType))
+        if self.val != 0:
+            graphic = self.val.dereference()
+            result = result + (" {%s}" % graphic["File"])
+        return result
+
+    @staticmethod
+    def lookup_printer(val):
+        "Return a printer for the value, if supported; else None."
+        if val.type.code == gdb.TYPE_CODE_PTR:
+            if val.type.target().tag == "CGraphic":
+                return CGraphicPointerPrinter(val)
+
+class CPatchTypePointerPrinter:
+    "Pretty-print a pointer to CPatchType."
+
+    def __init__(self, val):
+        object.__init__(self)
+        self.val = val
+
+    def to_string(self):
+        "Called by GDB to find what to display as the value."
+        voidPointerType = gdb.lookup_type("void").pointer()
+        # str(self.val) would cause a recursive call; the cast avoids that.
+        result = str(self.val.cast(voidPointerType))
+        if self.val != 0:
+            patchType = self.val.dereference()
+            result = result + (" {%s}" % patchType["name"])
+        return result
+
+    @staticmethod
+    def lookup_printer(val):
+        "Return a printer for the value, if supported; else None."
+        if val.type.code == gdb.TYPE_CODE_PTR:
+            if val.type.target().tag == "CPatchType":
+                return CPatchTypePointerPrinter(val)
+
+class CPatchPointerPrinter:
+    "Pretty-print a pointer to CPatch."
+
+    def __init__(self, val):
+        object.__init__(self)
+        self.val = val
+
+    def to_string(self):
+        "Called by GDB to find what to display as the value."
+        voidPointerType = gdb.lookup_type("void").pointer()
+        # str(self.val) would cause a recursive call; the cast avoids that.
+        result = str(self.val.cast(voidPointerType))
+        if self.val != 0:
+            patch = self.val.dereference()
+            result = result + (" {(%d,%d)" % (patch["x"], patch["y"]))
+            patchTypePointer = patch["type"]
+            if patchTypePointer != 0:
+                patchType = patchTypePointer.dereference()
+                result = result + (" %s" % patchType["name"])
+            result = result + "}"
+        return result
+
+    @staticmethod
+    def lookup_printer(val):
+        "Return a printer for the value, if supported; else None."
+        if val.type.code == gdb.TYPE_CODE_PTR:
+            if val.type.target().tag == "CPatch":
+                return CPatchPointerPrinter(val)
 
 class StructPrinter:
     """Pretty-print an arbitrary named struct.
@@ -179,8 +256,7 @@ OBJFILE may be an objfile, a progspace, or the entire gdb module."""
     objfile.pretty_printers.append(COrderPointerPrinter.lookup_printer)
     objfile.pretty_printers.append(CUnitTypePointerPrinter.lookup_printer)
     objfile.pretty_printers.append(CUnitPointerPrinter.lookup_printer)
+    objfile.pretty_printers.append(CGraphicPointerPrinter.lookup_printer)
+    objfile.pretty_printers.append(CPatchTypePointerPrinter.lookup_printer)
+    objfile.pretty_printers.append(CPatchPointerPrinter.lookup_printer)
     objfile.pretty_printers.append(StructPrinter.lookup_printer)
-    objfile.pretty_printers.append(StdStringPrinter.lookup_printer)
-    objfile.pretty_printers.append(StdVectorPrinter.lookup_printer)
-    objfile.pretty_printers.append(StdListPrinter.lookup_printer)
-    objfile.pretty_printers.append(StdMapPrinter.lookup_printer)
