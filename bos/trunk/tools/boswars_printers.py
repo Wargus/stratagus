@@ -48,10 +48,8 @@ class COrderPrinter:
                     if enum.bitpos == self.val["Action"]:
                         if enum.name == "UnitActionPatrol":
                             yield "Arg1.Patrol", self.val["Arg1"]["Patrol"];
-                            usedArg1 = true
                         elif enum.name == "UnitActionSpellCast":
                             yield "Arg1.Spell", self.val["Arg1"]["Spell"];
-                            usedArg1 = true
             else:
                 yield field.name, self.val[field.name]
 
