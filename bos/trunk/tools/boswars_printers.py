@@ -77,26 +77,6 @@ class CUnitTypePrinter:
         "Called by GDB to find what to display as the value."
         return "CUnitType"
 
-class StructPrinter:
-    """Pretty-print an arbitrary named struct.
-This just displays the data members, without any special interpretation.
-However, without this pretty printer, GDB 7.0.1 would not apply
-the std::string pretty printer to such data members."""
-
-    def __init__(self, val):
-        object.__init__(self)
-        self.val = val
-
-    def children(self):
-        "Called by GDB to enumerate the children of the value."
-        for field in self.val.type.fields():
-            fieldValue = self.val[field.name]
-            yield field.name, self.val[field.name]
-
-    def to_string(self):
-        "Called by GDB to find what to display as the value."
-        return self.val.type.tag
-
 class COrderPointerPrinter:
     "Pretty-print a pointer to COrder."
 
@@ -184,14 +164,6 @@ def lookup_printer(val):
             return COrderPrinter(val)
         elif tag == "CUnitType":
             return CUnitTypePrinter(val)
-        elif tag == "CEditor" \
-                or tag == "CMapInfo" \
-                or tag == "CPatchType" \
-                or tag == "CPlayer" \
-                or tag == "IconConfig" \
-                or tag == "MissileConfig" \
-                or tag == "SoundConfig":
-            return StructPrinter(val)
     elif type.code == gdb.TYPE_CODE_PTR:
         tag = type.target().tag # might be None
         if tag == "CConstruction":

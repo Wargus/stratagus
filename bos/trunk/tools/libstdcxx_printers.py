@@ -38,7 +38,7 @@ import re
 class StdStringPrinter:
     "Pretty-print an std::string."
 
-    __typeRegex = re.compile("^std::basic_string<.*>$|^std::string")
+    __typeRegex = re.compile("^std::basic_string<.*>$")
 
     def __init__(self, val):
         object.__init__(self)
@@ -60,7 +60,7 @@ class StdStringPrinter:
     @staticmethod
     def lookup_printer(val):
         "Return a printer for the value, if supported; else None."
-        tag = val.type.tag
+        tag = val.type.strip_typedefs().tag
         if tag and StdStringPrinter.__typeRegex.match(tag):
             return StdStringPrinter(val)
 
