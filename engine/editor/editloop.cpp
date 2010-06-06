@@ -991,9 +991,17 @@ static void EditorDrawTerrainFlags(const CViewport *vp)
 			{
 				color = ColorOrange;
 			}
+			else if (field->Flags & MapFieldDeepSea)
+			{
+				color = ColorDarkBlue;
+			}
 			else if (field->Flags & MapFieldWaterAllowed)
 			{
 				color = ColorBlue;
+			}
+			else if (field->Flags & MapFieldCoastAllowed)
+			{
+				color = ColorCyan;
 			}
 			else if (field->Flags & MapFieldLandAllowed)
 			{
@@ -1018,7 +1026,7 @@ static void EditorDrawTerrainFlags(const CViewport *vp)
 
 			Video.FillTransRectangleClip(
 				color, screenX, screenY,
-				TileSizeX, TileSizeY, 64);
+				TileSizeX, TileSizeY, 80);
 		}
 	}
 
@@ -1165,6 +1173,11 @@ static void ShowPatchInfo(const CPatch *patch, const CMapField *field)
 	{
 		o << (comma++ ? ", " : ": ")
 		  << _("water");
+	}
+	if (field->Flags & MapFieldDeepSea)
+	{
+		o << (comma++ ? ", " : ": ")
+		  << _("deep sea");
 	}
 	if (field->Flags & MapFieldNoBuilding)
 	{

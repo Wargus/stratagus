@@ -122,7 +122,8 @@ void CMap::Reveal(void)
 bool CMap::WaterOnMap(int tx, int ty) const
 {
 	Assert(tx >= 0 && ty >= 0 && tx < Info.MapWidth && ty < Info.MapHeight);
-	return (this->Field(tx, ty)->Flags & MapFieldWaterAllowed) != 0;
+	return (this->Field(tx, ty)->Flags
+		& (MapFieldWaterAllowed | MapFieldDeepSea)) != 0;
 }
 
 /**

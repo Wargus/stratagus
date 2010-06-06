@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: boswars 2.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-16 13:51+0300\n"
-"PO-Revision-Date: 2010-05-16 13:34+0200\n"
+"POT-Creation-Date: 2010-06-06 23:59+0300\n"
+"PO-Revision-Date: 2010-06-06 23:59+0300\n"
 "Last-Translator: Kalle Olavi Niemitalo <kon@iki.fi>\n"
 "Language-Team: Kimmo Kalevi Merikivi <fi@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -75,7 +75,7 @@ msgstr "Pelaaja \"%s\" on tapettu"
 msgid "Unit deleted"
 msgstr "Yksikkö poistettu"
 
-#: editor/editloop.cpp:694 editor/editloop.cpp:987
+#: editor/editloop.cpp:694 editor/editloop.cpp:1129
 msgid "Player"
 msgstr "Pelaaja"
 
@@ -96,87 +96,91 @@ msgid "Computer"
 msgstr "Tietokone"
 
 # esim. "Yksikön sisältämä energia" jos siitä voi kerätä energiaa
-#: editor/editloop.cpp:992
+#: editor/editloop.cpp:1134
 msgid "Amount of"
 msgstr "Yksikön sisältämä"
 
-#: editor/editloop.cpp:1010
+#: editor/editloop.cpp:1152
 msgid "Patch"
 msgstr "Maastopala"
 
-#: editor/editloop.cpp:1018
+#: editor/editloop.cpp:1160
 msgid "impassable"
 msgstr "kulkueste"
 
-#: editor/editloop.cpp:1023
+#: editor/editloop.cpp:1165
 msgid "land"
 msgstr "maata"
 
-#: editor/editloop.cpp:1028
+#: editor/editloop.cpp:1170
 msgid "coast"
 msgstr "rantaa"
 
-#: editor/editloop.cpp:1033
+#: editor/editloop.cpp:1175
 msgid "water"
 msgstr "vettä"
+
+#: editor/editloop.cpp:1180
+msgid "deep sea"
+msgstr "syvää merta"
 
 #. TRANSLATORS: This flag means players cannot build
 #. here, e.g. because the ground is too soft.  There
 #. may be a building here anyway, if the map designer
 #. has found a way to circumvent the restriction.
-#: editor/editloop.cpp:1045
+#: editor/editloop.cpp:1192
 msgid "no building"
 msgstr "rakennuskielto"
 
-#: editor/editloop.cpp:1057
+#: editor/editloop.cpp:1204
 msgid "speed="
 msgstr "nopeus="
 
-#: editor/editloop.cpp:1060
+#: editor/editloop.cpp:1207
 msgid " (fast)"
 msgstr " (nopea)"
 
-#: editor/editloop.cpp:1064
+#: editor/editloop.cpp:1211
 msgid " (slow)"
 msgstr " (hidas)"
 
-#: editor/editloop.cpp:1347
+#: editor/editloop.cpp:1502
 msgid "Unit can't be placed here."
 msgstr "Yksikköä ei voi sijoittaa tähän."
 
-#: editor/editloop.cpp:1428
+#: editor/editloop.cpp:1583
 msgid "Patch deleted"
 msgstr "Maastopala poistettu"
 
-#: editor/editloop.cpp:1459
+#: editor/editloop.cpp:1614
 msgid "Unit owner modified"
 msgstr "Yksikön omistaja vaihdettu"
 
-#: editor/editloop.cpp:1660 editor/editloop.cpp:1696
+#: editor/editloop.cpp:1815 editor/editloop.cpp:1851
 msgid "Select player #"
 msgstr "Valitse pelaaja #"
 
-#: editor/editloop.cpp:1794
+#: editor/editloop.cpp:1949
 msgid "Select mode"
 msgstr "Valintatila"
 
-#: editor/editloop.cpp:1805
+#: editor/editloop.cpp:1960
 msgid "Unit mode"
 msgstr "Yksikkötila"
 
-#: editor/editloop.cpp:1816
+#: editor/editloop.cpp:1971
 msgid "Patch mode"
 msgstr "Maastopalatila"
 
-#: editor/editloop.cpp:1827
+#: editor/editloop.cpp:1982
 msgid "Set start location mode"
 msgstr "Aloituspaikkatila"
 
-#: editor/patch_editor.cpp:522
+#: editor/patch_editor.cpp:542
 msgid "Save"
 msgstr "Tallenna"
 
-#: editor/patch_editor.cpp:528
+#: editor/patch_editor.cpp:548
 msgid "Exit"
 msgstr "Poistu"
 
