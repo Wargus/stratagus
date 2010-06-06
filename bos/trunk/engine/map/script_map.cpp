@@ -152,6 +152,8 @@ static int CclStratagusMap(lua_State *l)
 								Map.Fields[i].Flags |= MapFieldCoastAllowed;
 							} else if (!strcmp(value, "water")) {
 								Map.Fields[i].Flags |= MapFieldWaterAllowed;
+							} else if (!strcmp(value, "sea")) {
+								Map.Fields[i].Flags |= MapFieldDeepSea;
 
 							} else if (!strcmp(value, "mud")) {
 								Map.Fields[i].Flags |= MapFieldNoBuilding;

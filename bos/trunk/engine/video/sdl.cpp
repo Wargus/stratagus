@@ -456,7 +456,9 @@ void InitVideoSdl(void)
 
 	ColorBlack = Video.MapRGB(TheScreen->format, 0, 0, 0);
 	ColorDarkGreen = Video.MapRGB(TheScreen->format, 48, 100, 4);
+	ColorDarkBlue = Video.MapRGB(TheScreen->format, 0, 0, 96);
 	ColorBlue = Video.MapRGB(TheScreen->format, 0, 0, 252);
+	ColorCyan = Video.MapRGB(TheScreen->format, 0, 160, 208);
 	ColorOrange = Video.MapRGB(TheScreen->format, 248, 140, 20);
 	ColorWhite = Video.MapRGB(TheScreen->format, 252, 248, 240);
 	ColorGray = Video.MapRGB(TheScreen->format, 128, 128, 128);
