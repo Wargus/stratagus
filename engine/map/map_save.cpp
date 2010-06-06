@@ -87,10 +87,10 @@ void CMap::Save(CFile *file) const
 			if (mf->Flags & MapFieldCoastAllowed) {
 				file->printf(" \"coast\",");
 			}
-			if (mf->Flags & MapFieldWaterAllowed) {
+			if (mf->Flags & MapFieldShallowWater) {
 				file->printf(" \"water\",");
 			}
-			if (mf->Flags & MapFieldDeepSea) {
+			if (mf->Flags & MapFieldDeepWater) {
 				file->printf(" \"sea\",");
 			}
 			if (mf->Flags & MapFieldNoBuilding) {

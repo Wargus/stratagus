@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: boswars 2.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-06-06 23:59+0300\n"
-"PO-Revision-Date: 2010-06-06 23:59+0300\n"
+"POT-Creation-Date: 2010-06-07 01:52+0300\n"
+"PO-Revision-Date: 2010-06-07 01:52+0300\n"
 "Last-Translator: Kalle Olavi Niemitalo <kon@iki.fi>\n"
 "Language-Team: Kimmo Kalevi Merikivi <fi@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -117,12 +117,12 @@ msgid "coast"
 msgstr "rantaa"
 
 #: editor/editloop.cpp:1175
-msgid "water"
-msgstr "vettä"
+msgid "shallow water"
+msgstr "matalaa vettä"
 
 #: editor/editloop.cpp:1180
-msgid "deep sea"
-msgstr "syvää merta"
+msgid "deep water"
+msgstr "syvää vettä"
 
 #. TRANSLATORS: This flag means players cannot build
 #. here, e.g. because the ground is too soft.  There

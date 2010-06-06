@@ -991,11 +991,11 @@ static void EditorDrawTerrainFlags(const CViewport *vp)
 			{
 				color = ColorOrange;
 			}
-			else if (field->Flags & MapFieldDeepSea)
+			else if (field->Flags & MapFieldDeepWater)
 			{
 				color = ColorDarkBlue;
 			}
-			else if (field->Flags & MapFieldWaterAllowed)
+			else if (field->Flags & MapFieldShallowWater)
 			{
 				color = ColorBlue;
 			}
@@ -1169,15 +1169,15 @@ static void ShowPatchInfo(const CPatch *patch, const CMapField *field)
 		o << (comma++ ? ", " : ": ")
 		  << _("coast");
 	}
-	if (field->Flags & MapFieldWaterAllowed)
+	if (field->Flags & MapFieldShallowWater)
 	{
 		o << (comma++ ? ", " : ": ")
-		  << _("water");
+		  << _("shallow water");
 	}
-	if (field->Flags & MapFieldDeepSea)
+	if (field->Flags & MapFieldDeepWater)
 	{
 		o << (comma++ ? ", " : ": ")
-		  << _("deep sea");
+		  << _("deep water");
 	}
 	if (field->Flags & MapFieldNoBuilding)
 	{
