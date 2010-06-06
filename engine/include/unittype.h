@@ -229,6 +229,10 @@
 **
 **    Sea animated
 **
+**  CUnitType::BigShip
+**
+**    Cannot enter shallow water
+**
 **  CUnitType::ExplodeWhenKilled
 **
 **    Death explosion animated
@@ -641,6 +645,7 @@ public:
 	unsigned LandUnit : 1;          /// Land animated
 	unsigned AirUnit : 1;           /// Air animated
 	unsigned SeaUnit : 1;           /// Sea animated
+	unsigned BigShip : 1;		/// Cannot enter shallow water
 	unsigned ExplodeWhenKilled : 1; /// Death explosion animated
 	unsigned Building : 1;          /// Building
 	unsigned VisibleUnderFog : 1;   /// Unit is visible under fog of war.
