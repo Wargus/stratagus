@@ -57,8 +57,8 @@
 **    ::MapFieldLandAllowed land units are allowed.
 **    ::MapFieldCoastAllowed coast units (transporter) and coast
 **      buildings (shipyard) are allowed.
-**    ::MapFieldWaterAllowed water units allowed.
-**    ::MapFieldDeepSea seaworthy ships allowed.
+**    ::MapFieldShallowWater small water units allowed.
+**    ::MapFieldDeepWater both small and big water units allowed.
 **    ::MapFieldNoBuilding no buildings allowed.
 **    ::MapFieldUnpassable field is movement blocked.
 **    ::MapFieldLandUnit land unit on field.
@@ -166,10 +166,10 @@ public:
 
 #define MapFieldSpeedMask    0x0007  /// Move faster on this tile
 
-#define MapFieldDeepSea      0x0008  /// Only seaworthy ships allowed
+#define MapFieldDeepWater    0x0008  /// Small and big water units allowed
 #define MapFieldLandAllowed  0x0010  /// Land units allowed
 #define MapFieldCoastAllowed 0x0020  /// Coast (transporter) units allowed
-#define MapFieldWaterAllowed 0x0040  /// Water units allowed
+#define MapFieldShallowWater 0x0040  /// Small water units allowed
 #define MapFieldNoBuilding   0x0080  /// No buildings allowed
 
 #define MapFieldUnpassable   0x0100  /// Field is movement blocked
