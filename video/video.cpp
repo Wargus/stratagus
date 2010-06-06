@@ -146,7 +146,9 @@ int SkipFrames; /// Skip this frames
 
 Uint32 ColorBlack;
 Uint32 ColorDarkGreen;
+Uint32 ColorDarkBlue;
 Uint32 ColorBlue;
+Uint32 ColorCyan;
 Uint32 ColorOrange;
 Uint32 ColorWhite;
 Uint32 ColorGray;

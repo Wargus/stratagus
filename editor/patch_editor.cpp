@@ -64,8 +64,12 @@ static CGraphic *TransparentG;
 static CGraphic *TransparentSmallG;
 static CGraphic *ImpassableG;
 static CGraphic *ImpassableSmallG;
+static CGraphic *CoastG;
+static CGraphic *CoastSmallG;
 static CGraphic *WaterG;
 static CGraphic *WaterSmallG;
+static CGraphic *DeepSeaG;
+static CGraphic *DeepSeaSmallG;
 #define NumSpeeds 7
 static CGraphic *SpeedG[NumSpeeds + 1];
 static CGraphic *SpeedSmallG[NumSpeeds + 1];
@@ -73,7 +77,9 @@ static CGraphic *SpeedSmallG[NumSpeeds + 1];
 enum PatchButton {
 	ButtonNone,
 	ButtonImpassable,
+	ButtonCoast,
 	ButtonWater,
+	ButtonDeepSea,
 	ButtonSpeed0,
 	ButtonSpeed1,
 	ButtonSpeed2,
@@ -182,9 +188,15 @@ static void PatchEditorCallbackButtonDown(unsigned button)
 		if (ButtonSpeed0 <= CurrentButton && CurrentButton <= ButtonSpeed7) {
 			DraggingClearFlags = MapFieldSpeedMask;
 			DraggingSetFlags = FlagMap[CurrentButton];
-		} else if (CurrentButton == ButtonWater) {
+		} else if (CurrentButton == ButtonCoast
+			|| CurrentButton == ButtonWater
+			|| CurrentButton == ButtonDeepSea) {
 			// clear existing land/water flags then set the new flag
-			DraggingClearFlags = (MapFieldLandAllowed | MapFieldCoastAllowed | MapFieldWaterAllowed | MapFieldNoBuilding);
+			DraggingClearFlags = (MapFieldLandAllowed
+					      | MapFieldCoastAllowed
+					      | MapFieldWaterAllowed
+					      | MapFieldDeepSea
+					      | MapFieldNoBuilding);
 			if (flag & FlagMap[CurrentButton]) {
 				// set default to land
 				DraggingSetFlags = MapFieldLandAllowed;
@@ -365,8 +377,16 @@ static void DrawPatchTileIcons()
 				g = ImpassableSmallG;
 				g->DrawClip(x, y);
 			}
+			if (flags & MapFieldCoastAllowed) {
+				g = CoastSmallG;
+				g->DrawClip(x + 16, y);
+			}
 			if (flags & MapFieldWaterAllowed) {
 				g = WaterSmallG;
+				g->DrawClip(x + 16, y);
+			}
+			if (flags & MapFieldDeepSea) {
+				g = DeepSeaSmallG;
 				g->DrawClip(x + 16, y);
 			}
 			if ((flags & MapFieldSpeedMask) != 3) {
@@ -566,10 +586,10 @@ static void PatchAddIcon(int x, int y, CGraphic *g, PatchButton b)
 static void PatchLoadIcons()
 {
 	std::string patchEditorPath = "ui/patcheditor/";
-	int spacing = 15;
+	int spacing = 5;
 	int leftX = Video.Width - PatchMenuWidth + spacing;
 	int rightX = Video.Width - 48 - spacing;
-	int topY = 100;
+	int topY = 60;
 
 	ImpassableG = CGraphic::New(patchEditorPath + "impassable.png");
 	ImpassableG->Load();
@@ -578,12 +598,26 @@ static void PatchLoadIcons()
 	PatchAddIcon(leftX, topY, ImpassableG, ButtonImpassable);
 	FlagMap[ButtonImpassable] = MapFieldUnpassable;
 
+	CoastSmallG = CGraphic::New(patchEditorPath + "coast-small.png");
+	CoastSmallG->Load();
+	CoastG = CGraphic::New(patchEditorPath + "coast.png");
+	CoastG->Load();
+	PatchAddIcon(rightX, topY, CoastG, ButtonCoast);
+	FlagMap[ButtonCoast] = MapFieldCoastAllowed;
+
 	WaterG = CGraphic::New(patchEditorPath + "water.png");
 	WaterG->Load();
 	WaterSmallG = CGraphic::New(patchEditorPath + "water-small.png");
 	WaterSmallG->Load();
-	PatchAddIcon(rightX, topY, WaterG, ButtonWater);
+	PatchAddIcon(leftX, topY + (48 + spacing), WaterG, ButtonWater);
 	FlagMap[ButtonWater] = MapFieldWaterAllowed;
+
+	DeepSeaG = CGraphic::New(patchEditorPath + "deep-sea.png");
+	DeepSeaG->Load();
+	DeepSeaSmallG = CGraphic::New(patchEditorPath + "deep-sea-small.png");
+	DeepSeaSmallG->Load();
+	PatchAddIcon(rightX, topY + (48 + spacing), DeepSeaG, ButtonDeepSea);
+	FlagMap[ButtonDeepSea] = MapFieldDeepSea;
 
 	for (int i = 0; i <= NumSpeeds; ++i) {
 		std::ostringstream o;
@@ -595,7 +629,7 @@ static void PatchLoadIcons()
 		o << patchEditorPath << "speed" << i << "-small.png";
 		SpeedSmallG[i] = CGraphic::New(o.str());
 		SpeedSmallG[i]->Load();
-		PatchAddIcon((!(i & 1) ? leftX : rightX), topY + (48 + spacing) * ((i + 2) / 2), SpeedG[i], (PatchButton)(ButtonSpeed0 + i));
+		PatchAddIcon((!(i & 1) ? leftX : rightX), topY + (48 + spacing) * ((i + 4) / 2), SpeedG[i], (PatchButton)(ButtonSpeed0 + i));
 		FlagMap[ButtonSpeed0 + i] = i;
 	}
 
@@ -603,7 +637,7 @@ static void PatchLoadIcons()
 	TransparentG->Load();
 	TransparentSmallG = CGraphic::New(patchEditorPath + "transparent-small.png");
 	TransparentSmallG->Load();
-	PatchAddIcon(leftX, topY + (48 + spacing) * ((NumSpeeds + 3) / 2), TransparentG, ButtonTransparent);
+	PatchAddIcon(leftX, topY + (48 + spacing) * ((NumSpeeds + 5) / 2), TransparentG, ButtonTransparent);
 	FlagMap[ButtonTransparent] = MapFieldTransparent;
 }
 
@@ -614,10 +648,20 @@ static void PatchFreeIcons()
 	CGraphic::Free(ImpassableSmallG);
 	ImpassableSmallG = NULL;
 
+	CGraphic::Free(CoastG);
+	CoastG = NULL;
+	CGraphic::Free(CoastSmallG);
+	CoastSmallG = NULL;
+
 	CGraphic::Free(WaterG);
 	WaterG = NULL;
 	CGraphic::Free(WaterSmallG);
 	WaterSmallG = NULL;
+
+	CGraphic::Free(DeepSeaG);
+	DeepSeaG = NULL;
+	CGraphic::Free(DeepSeaSmallG);
+	DeepSeaSmallG = NULL;
 
 	PatchIcons.clear();
 	FlagMap.clear();

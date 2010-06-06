@@ -90,6 +90,9 @@ void CMap::Save(CFile *file) const
 			if (mf->Flags & MapFieldWaterAllowed) {
 				file->printf(" \"water\",");
 			}
+			if (mf->Flags & MapFieldDeepSea) {
+				file->printf(" \"sea\",");
+			}
 			if (mf->Flags & MapFieldNoBuilding) {
 				file->printf(" \"mud\",");
 			}
