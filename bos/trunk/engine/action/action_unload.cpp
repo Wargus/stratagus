@@ -54,8 +54,8 @@
 	MapFieldLandUnit | \
 	MapFieldBuilding | \
 	MapFieldCoastAllowed | \
-	MapFieldWaterAllowed | \
-	MapFieldDeepSea | \
+	MapFieldShallowWater | \
+	MapFieldDeepWater | \
 	MapFieldUnpassable)
 
 #define NavalUnitMask ( \

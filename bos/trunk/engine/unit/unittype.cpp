@@ -168,8 +168,8 @@ void UpdateStats(int reset)
 					MapFieldSeaUnit |
 					MapFieldBuilding | // already occuppied
 					MapFieldCoastAllowed |
-					MapFieldWaterAllowed |
-					MapFieldDeepSea | // can't move on this
+					MapFieldShallowWater |
+					MapFieldDeepWater | // can't move on this
 					MapFieldUnpassable;
 				break;
 			case UnitTypeFly:                               // in air
@@ -182,8 +182,7 @@ void UpdateStats(int reset)
 						MapFieldLandUnit |
 						MapFieldSeaUnit |
 						MapFieldBuilding | // already occuppied
-						MapFieldLandAllowed |
-						MapFieldDeepSea; // can't move on this
+						MapFieldLandAllowed; // can't move on this
 					// Johns: MapFieldUnpassable only for land units?
 				} else {
 					type->MovementMask =
@@ -191,6 +190,7 @@ void UpdateStats(int reset)
 						MapFieldSeaUnit |
 						MapFieldBuilding | // already occuppied
 						MapFieldCoastAllowed |
+						MapFieldShallowWater |
 						MapFieldLandAllowed | // can't move on this
 						MapFieldUnpassable;
 				}
