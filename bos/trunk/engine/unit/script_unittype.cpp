@@ -490,6 +490,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->AirUnit = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SeaUnit")) {
 			type->SeaUnit = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "BigShip")) {
+			type->BigShip = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Indestructible")) {
 			type->Indestructible = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "CanTransport")) {

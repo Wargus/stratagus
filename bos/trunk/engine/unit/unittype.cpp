@@ -89,7 +89,7 @@ CUnitType::CUnitType() :
 	CanTransport(false), MaxOnBoard(0),
 	UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0),
 	MouseAction(0), Points(0), CanTarget(0),
-	Flip(0), Revealer(0), LandUnit(0), AirUnit(0), SeaUnit(0),
+	Flip(0), Revealer(0), LandUnit(0), AirUnit(0), SeaUnit(0), BigShip(0),
 	ExplodeWhenKilled(0), Building(0), VisibleUnderFog(0),
 	Coward(0), AttackFromTransporter(0),
 	Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
@@ -177,22 +177,21 @@ void UpdateStats(int reset)
 					MapFieldAirUnit; // already occuppied
 				break;
 			case UnitTypeNaval:                             // on water
-				if (type->CanTransport) {
-					type->MovementMask =
-						MapFieldLandUnit |
-						MapFieldSeaUnit |
-						MapFieldBuilding | // already occuppied
-						MapFieldLandAllowed; // can't move on this
-					// Johns: MapFieldUnpassable only for land units?
-				} else {
-					type->MovementMask =
-						MapFieldLandUnit |
-						MapFieldSeaUnit |
-						MapFieldBuilding | // already occuppied
+				type->MovementMask =
+					MapFieldLandUnit |
+					MapFieldSeaUnit |
+					MapFieldBuilding | // already occupied
+					MapFieldLandAllowed; // can't move on this
+				// Johns: MapFieldUnpassable only for land units?
+				if (!type->CanTransport) {
+					type->MovementMask |=
 						MapFieldCoastAllowed |
-						MapFieldShallowWater |
-						MapFieldLandAllowed | // can't move on this
 						MapFieldUnpassable;
+				}
+				if (type->BigShip) {
+					Assert(!type->CanTransport);
+					type->MovementMask |=
+						MapFieldShallowWater; // would touch bottom
 				}
 				break;
 			default:
