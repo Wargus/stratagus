@@ -269,6 +269,7 @@ class Widget
 	virtual void setHotKey(const char *key);
 
 	virtual void addActionListener(LuaActionListener *actionListener);
+	virtual void requestFocus();
 };
 
 $[
