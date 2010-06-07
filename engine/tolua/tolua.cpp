@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on Sat May 22 10:21:34 2010.
+** Generated automatically by tolua++-1.0.92 on Mon Jun  7 22:44:05 2010.
 */
 
 #ifndef __cplusplus
@@ -6571,6 +6571,37 @@ static int tolua_stratagus_Widget_addActionListener00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'addActionListener'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: requestFocus of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_requestFocus00
+static int tolua_stratagus_Widget_requestFocus00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'requestFocus'", NULL);
+#endif
+  {
+   self->requestFocus();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'requestFocus'.",&tolua_err);
  return 0;
 #endif
 }
@@ -19813,6 +19844,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_function(tolua_S,"setHotKey",tolua_stratagus_Widget_setHotKey00);
    tolua_function(tolua_S,"setHotKey",tolua_stratagus_Widget_setHotKey01);
    tolua_function(tolua_S,"addActionListener",tolua_stratagus_Widget_addActionListener00);
+   tolua_function(tolua_S,"requestFocus",tolua_stratagus_Widget_requestFocus00);
   tolua_endmodule(tolua_S);
 
   { /* begin embedded lua code */
