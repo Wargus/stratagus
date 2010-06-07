@@ -148,40 +148,43 @@ end
 
 function RunLoadPatchMenu()
   local menu
-  local y = 260
-  local name = ""
+  local buttonsY = Video.Height - 100
+  local y
+  local smallX = Video.Width / 20
+  local smallY = Video.Height / 20
   local typeNames
   local names = {}
-  local returnToMainMenu = false
 
   menu = BosMenu(_("Select Patch to Edit"))
 
   typeNames = Map.PatchManager:getPatchTypeNames()
   -- Convert vector to lua table
   for i = 0, typeNames:size() - 1 do
-   table.insert(names, typeNames[i])
+    table.insert(names, typeNames[i])
   end
 
-  menu:addLabel(_("Name:"), Video.Width / 2 - 80, y)
-  local nameDropDown = menu:addDropDown(names,
-    Video.Width / 2 - 50, y,
-    function() end)
-  nameDropDown:setSize(210, nameDropDown:getHeight())
+  y = 2 * smallY + 20
+  local nameListBox = menu:addListBox(smallX * 10, y,
+                                      smallX * 8, buttonsY - 2 * smallY - y,
+                                      names)
 
-  y = y + 40
-
-  menu:addButton(_("Cancel (~<Esc~>)"), Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("Cancel (~<Esc~>)"), Video.Width / 2 - 250, buttonsY,
     function() menu:stop() end)
-  menu:addButton(_("Load ~!Patch"), Video.Width / 2 + 50, Video.Height - 100,
+  menu:addButton(_("Load ~!Patch"), Video.Width / 2 + 50, buttonsY,
     function()
-      name = names[nameDropDown:getSelected() + 1]
+      local name = names[nameListBox:getSelected() + 1]
       HandleCommandKey = HandlePatchEditorIngameCommandKey
       StartPatchEditor(name)
       HandleCommandKey = HandleIngameCommandKey
-      menu:stop()
-      returnToMainMenu = true
+
+      -- Make it easy for the user to edit another patch type in the
+      -- same series.
+      nameListBox:getContent():requestFocus()
+
+      -- Should the list of patch types be refreshed here?
+      -- Typically, there's a new one whose name begins with "user-".
     end)
 
-  menu:run()
-  return returnToMainMenu
+  menu:run() -- loops until menu:stop is called
+  return false -- i.e. return only one level up, not to main menu
 end
