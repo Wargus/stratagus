@@ -229,10 +229,6 @@
 **
 **    Sea animated
 **
-**  CUnitType::BigShip
-**
-**    Cannot enter shallow water
-**
 **  CUnitType::ExplodeWhenKilled
 **
 **    Death explosion animated
@@ -327,6 +323,20 @@
 **
 **    Movement mask, this value is and'ed to the map field flags, to
 **    see if a unit can enter or placed on the map field.
+**
+**  CUnitType::ExplicitAllowTerrainMask
+**
+**    Flags that the script explicitly wants to clear in MovementMask,
+**    so that units of this type are allowed in those terrains.
+**    This is used only for computing MovementMask, not in any actual
+**    movement checks.
+**
+**  CUnitType::ExplicitForbidTerrainMask
+**
+**    Flags that the script explicitly wants to set in MovementMask,
+**    so that units of this type are forbidden in those terrains.
+**    This is used only for computing MovementMask, not in any actual
+**    movement checks.
 **
 **  CUnitType::Stats[::PlayerMax]
 **
@@ -645,7 +655,6 @@ public:
 	unsigned LandUnit : 1;          /// Land animated
 	unsigned AirUnit : 1;           /// Air animated
 	unsigned SeaUnit : 1;           /// Sea animated
-	unsigned BigShip : 1;		/// Cannot enter shallow water
 	unsigned ExplodeWhenKilled : 1; /// Death explosion animated
 	unsigned Building : 1;          /// Building
 	unsigned VisibleUnderFog : 1;   /// Unit is visible under fog of war.
@@ -702,6 +711,8 @@ public:
 
 	unsigned FieldFlags;            /// Unit map field flags
 	unsigned MovementMask;          /// Unit check this map flags for move
+	unsigned ExplicitAllowTerrainMask; /// Flags to clear from MovementMask
+	unsigned ExplicitForbidTerrainMask; /// Flags to set in MovementMask
 
 	/// @todo This stats should? be moved into the player struct
 	CUnitStats Stats[PlayerMax];     /// Unit status for each player

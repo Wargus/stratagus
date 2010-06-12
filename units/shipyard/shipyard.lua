@@ -80,6 +80,7 @@ DefineUnitType("unit-shipyard", {
     Points = 200,
     DeathExplosion = largeExplosion,
     Type = "naval",
+    AllowTerrainCoast = true,
     Building = true,
     VisibleUnderFog = true,
     MaxEnergyUtilizationRate = 60,
