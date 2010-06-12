@@ -206,6 +206,22 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 }
 
 /**
+**  Explicitly allow or disallow the unit type in the specified terrain.
+**  This overrides the automatic CUnitType::MovementMask computation.
+**  For use when the author of the Lua script knows best.
+*/
+static void SetExplicitTerrain(CUnitType *type, unsigned mask, bool allow)
+{
+	if (allow) {
+		type->ExplicitAllowTerrainMask |= mask;
+		type->ExplicitForbidTerrainMask &= ~mask;
+	} else {
+		type->ExplicitAllowTerrainMask &= ~mask;
+		type->ExplicitForbidTerrainMask |= mask;
+	}
+}
+		
+/**
 **  Parse unit-type.
 **
 **  @param l  Lua state.
@@ -234,6 +250,8 @@ static int CclDefineUnitType(lua_State *l)
 	}
 
 	type->NumDirections = 0;
+	type->ExplicitAllowTerrainMask = 0;
+	type->ExplicitForbidTerrainMask = 0;
 
 	//
 	//  Parse the list: (still everything could be changed!)
@@ -418,6 +436,19 @@ static int CclDefineUnitType(lua_State *l)
 				LuaError(l, "Unsupported Type: %s" _C_ value);
 			}
 
+		} else if (!strcmp(value, "AllowTerrainLand")) {
+			SetExplicitTerrain(type, MapFieldLandAllowed,
+					   LuaToBoolean(l, -1));
+		} else if (!strcmp(value, "AllowTerrainCoast")) {
+			SetExplicitTerrain(type, MapFieldCoastAllowed,
+					   LuaToBoolean(l, -1));
+		} else if (!strcmp(value, "AllowTerrainShallowWater")) {
+			SetExplicitTerrain(type, MapFieldShallowWater,
+					   LuaToBoolean(l, -1));
+		} else if (!strcmp(value, "AllowTerrainDeepWater")) {
+			SetExplicitTerrain(type, MapFieldDeepWater,
+					   LuaToBoolean(l, -1));
+
 		} else if (!strcmp(value, "RightMouseAction")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "none")) {
@@ -490,8 +521,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->AirUnit = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SeaUnit")) {
 			type->SeaUnit = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "BigShip")) {
-			type->BigShip = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Indestructible")) {
 			type->Indestructible = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "CanTransport")) {
@@ -632,6 +661,7 @@ static int CclDefineUnitType(lua_State *l)
 
 	return 0;
 }
+
 
 // ----------------------------------------------------------------------------
 

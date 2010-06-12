@@ -89,7 +89,7 @@ CUnitType::CUnitType() :
 	CanTransport(false), MaxOnBoard(0),
 	UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0),
 	MouseAction(0), Points(0), CanTarget(0),
-	Flip(0), Revealer(0), LandUnit(0), AirUnit(0), SeaUnit(0), BigShip(0),
+	Flip(0), Revealer(0), LandUnit(0), AirUnit(0), SeaUnit(0),
 	ExplodeWhenKilled(0), Building(0), VisibleUnderFog(0),
 	Coward(0), AttackFromTransporter(0),
 	Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
@@ -97,6 +97,7 @@ CUnitType::CUnitType() :
 	Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
 	Indestructible(0), Organic(0), Variable(NULL),
 	ProductionEfficiency(100), FieldFlags(0), MovementMask(0),
+	ExplicitAllowTerrainMask(0), ExplicitForbidTerrainMask(0),
 	Sprite(NULL), ShadowSprite(NULL)
 {
 	memset(&NeutralMinimapColorRGB, 0, sizeof(NeutralMinimapColorRGB));
@@ -188,11 +189,6 @@ void UpdateStats(int reset)
 						MapFieldCoastAllowed |
 						MapFieldUnpassable;
 				}
-				if (type->BigShip) {
-					Assert(!type->CanTransport);
-					type->MovementMask |=
-						MapFieldShallowWater; // would touch bottom
-				}
 				break;
 			default:
 				DebugPrint("Where moves this unit?\n");
@@ -233,6 +229,9 @@ void UpdateStats(int reset)
 				type->FieldFlags = 0;
 				break;
 		}
+
+		type->MovementMask &= ~type->ExplicitAllowTerrainMask;
+		type->MovementMask |= type->ExplicitForbidTerrainMask;
 	}
 }
 

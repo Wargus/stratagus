@@ -111,7 +111,7 @@ Some Flags are already defined in the engine : the UnitType flags.
 So following flags are the value of the unitType :
 "Building", "ShoreBuilding",
 "Coward", "Harvester", "Revealer",
-"LandUnit", "AirUnit", "SeaUnit", "BigShip",
+"LandUnit", "AirUnit", "SeaUnit",
 "ExplodeWhenKilled", "VisibleUnderFog", "PermanentCloack", "AttackFromTransporter",
 "GroundAttack", "CanAttack", "CanHarvest",
 "Vanishes", "Flip", "Decoration", "IsNotSelectable", "SelectableByRectangle",
@@ -367,6 +367,18 @@ buildings.
 <dd>Unit is a shore building, and imobile. This is used for those unique buildings
 that have to be build on sea and have at least one point on coast.
 </dd>
+<dt>AllowTerrainLand = boolean</dt>
+<dd>Explicitly allow or forbid moving the unit to dry land.
+By default, only air units and land units are allowed there.</dd>
+<dt>AllowTerrainCoast = boolean</dt>
+<dd>Explicitly allow or forbid moving the unit to coasts.
+By default, only air units and naval transporter units are allowed there.</dd>
+<dt>AllowTerrainShallowWater = boolean</dt>
+<dd>Explicitly allow or forbid moving the unit to shallow water.
+By default, only air units and naval units are allowed there.</dd>
+<dt>AllowTerrainDeepWater = boolean</dt>
+<dd>Explicitly allow or forbid moving the unit to deep water.
+By default, only air units and naval units are allowed there.</dd>
 <dt>AutoBuildRate</dt>
 <dd>The rate at which the building builds itself <b>NOT IMPLEMENTED</b></dd>
 <dt>BuildingRules = { { "distance", { Distance = 3, DistanceType = ">", Type = "unit-gold-mine"}}}
