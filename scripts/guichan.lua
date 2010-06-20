@@ -583,6 +583,8 @@ function RunStartGameMenu(s)
 
   AllowAllUnits()
   local function startgamebutton(s)
+    preferences.FogOfWar = fow:isMarked()
+    SavePreferences()
     DebugPrint("Starting map -------")
     RunMap(browser:getSelectedMap(), nil, fow:isMarked(),
            revealmap:isMarked())
