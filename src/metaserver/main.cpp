@@ -59,6 +59,10 @@ extern int optopt;
 extern int getopt(int argc, char *const *argv, const char *opt);
 #endif
 
+#ifdef USE_WIN32
+#include "attachconsole.h"
+#endif
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -125,7 +129,11 @@ int main(int argc, char **argv)
 	//
 	// Standard SDL Init.
 	//
-	if (SDL_Init(0) == -1) {
+	int res = SDL_Init(0);
+#ifdef USE_WIN32
+	WINAPI_AttachConsole();
+#endif
+	if (res == -1)
 		printf("SDL_Init: %s\n", SDL_GetError());
 		exit(1);
 	}

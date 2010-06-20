@@ -18,6 +18,7 @@
 */
 
 #ifdef WIN32
+
 #define WINVER 0x0501
 #include <windows.h>
 #include <wincon.h>
@@ -25,12 +26,11 @@
 #include <fcntl.h>
 #include <cstdio>
 #include <iostream>
-#endif //WIN32
+
+#include "attachconsole.h"
 
 /// Try attach console of parent process for std input/output in Windows NT, 2000, XP or new
 bool WINAPI_AttachConsole() {
-
-#ifdef WIN32
 
 	OSVERSIONINFO osvi;
 
@@ -78,6 +78,10 @@ bool WINAPI_AttachConsole() {
 	if ( ! fpIn || ! fpOut || ! fpErr )
 		return false;
 
+	fclose(stdin);
+	fclose(stdout);
+	fclose(stderr);
+
 	*stdin = *fpIn;
 	*stdout = *fpOut;
 	*stderr = *fpErr;
@@ -96,10 +100,6 @@ bool WINAPI_AttachConsole() {
 
 	return true;
 
-#else
-
-	return false;
+}
 
 #endif //WIN32
-
-}

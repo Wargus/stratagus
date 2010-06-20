@@ -17,6 +17,13 @@
 
 */
 
+#ifdef WIN32
+
 /// Try attach console of parent process for std input/output in Windows NT, 2000, XP or new
 bool WINAPI_AttachConsole();
 
+#else
+
+bool WINAPI_AttachConsole() { return false; }
+
+#endif //WIN32
