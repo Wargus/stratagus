@@ -13,6 +13,7 @@
 CXX=@CXX@
 RM=rm -f
 MAKE=make
+WINDRES=@WINDRES@
 
 # Prefix for 'make install'
 PREFIX=@PREFIX@
@@ -24,6 +25,7 @@ CXXFLAGS=@CXXFLAGS@
 LDFLAGS=@LDFLAGS@ -lpng -lz -lm
 
 OBJDIR=@OBJDIR@
+OUTFILE=@OUTFILE@
 
 DISTLIST=$(TOPDIR)/distlist
 TAGS=$(TOPDIR)/src/tags

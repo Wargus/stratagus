@@ -6,6 +6,9 @@ CXXFLAGS=$CXXFLAGS
 AC_PROG_CXX
 AM_CONFIG_HEADER(config.h)
 
+PATH=$prefix/bin:$PATH
+LDFLAGS="$LDFLAGS -L$prefix/lib -L$prefix/bin"
+
 OBJDIR=obj
 if test "`uname -a | grep -is cygwin`" -o "`uname -a | grep -is mingw`"; then
 	ARCH=win32
@@ -56,13 +59,6 @@ if test "$ARCH" = "macosx" ; then
 	if test -d /opt/local/lib; then
 		LIBS="$LIBS -L/opt/local/lib"
 	fi
-fi
-
-if test -d /usr/include/lua51; then
-	CPPFLAGS="$CPPFLAGS -I/usr/include/lua51"
-fi
-if test -d /usr/include/lua5.1; then
-	CPPFLAGS="$CPPFLAGS -I/usr/include/lua5.1"
 fi
 
 dnl --- EXTRA DIRS -------------
@@ -207,14 +203,6 @@ if test "$with_mikmod" != "no"; then
 	fi
 fi
 
-dnl --- LUA --------------------
-if test "$ARCH" = "linux"; then
-	LDFLAGS="$LDFLAGS -ldl"
-fi
-AC_CHECK_HEADER(lua.h,, AC_MSG_ERROR(could not find lua.h))
-AC_SEARCH_LIBS(lua_getfenv, lua lua51 lua5.1, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(Lua5.1 is required))
-AC_SEARCH_LIBS(luaopen_base, lualib lualib51 lualib5.1, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(Lualib5.1 is required))
-
 dnl --- SDL --------------------
 AC_CHECK_PROGS(SDLCONFIG, sdl-config)
 if test "x$SDLCONFIG" = "x"; then
@@ -236,6 +224,26 @@ test "$prefix" = "NONE" && prefix=/usr/local
 datarootdir=.
 test "$datadir" = "NONE" && datadir=$datarootdir
 
+dnl --- LUA includes -----------
+AC_ARG_WITH(lua-includes, [  --with-lua-includes=DIR  [Location of lua include directiories (default: check [PREFIX/include/lua51] and [PREFIX/include/lua5.1])]], LUA_INCLUDES="$withval")
+if test "$LUA_INCLUDES" != ""; then
+	CPPFLAGS="$CPPFLAGS -I$LUA_INCLUDES"
+fi
+if test -d "$prefix/include/lua51"; then
+	CPPFLAGS="$CPPFLAGS -I$prefix/include/lua51"
+fi
+if test -d "$prefix/include/lua5.1"; then
+	CPPFLAGS="$CPPFLAGS -I$prefix/include/lua5.1"
+fi
+
+dnl --- LUA --------------------
+if test "$ARCH" = "linux"; then
+	LDFLAGS="$LDFLAGS -ldl"
+fi
+AC_CHECK_HEADER(lua.h,, AC_MSG_ERROR(could not find lua.h))
+AC_SEARCH_LIBS(lua_getfenv, lua lua51 lua5.1, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(Lua5.1 is required))
+AC_SEARCH_LIBS(luaopen_base, lualib lualib51 lualib5.1, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(Lualib5.1 is required))
+
 eval PKGDATADIR="$datadir"
 AC_DEFINE_UNQUOTED(PKGDATADIR, "$PKGDATADIR",
 	[Define this to the path containing the game data.]
@@ -256,6 +264,31 @@ if test "$ARCH" = "win32"; then
 	fi
 fi
 
+if test "$ARCH" = "win32"; then
+	if test "$WINDRES" == ""; then
+		WINDRES="$host-windres";
+	fi
+	AC_CHECK_PROGS(WINDRES_CHECK, $WINDRES)
+	if test "x$WINDRES_CHECK" = "x"; then
+		WINDRES="windres"
+		AC_CHECK_PROGS(WINDRES_CHECK, $WINDRES)
+		if test "x$WINDRES_CHECK" = "x"; then
+			echo "*** windres not found";
+			exit 1;
+		fi
+	fi
+else
+	WINDRES=""
+fi
+
+OUTFILE=stratagus
+if test "$ARCH" = "win32"; then
+	OUTFILE=stratagus.exe
+fi
+
+AC_SUBST(OUTFILE)
+
+AC_SUBST(WINDRES)
 AC_SUBST(CPPFLAGS)
 AC_SUBST(CXXFLAGS)
 AC_SUBST(LDFLAGS)

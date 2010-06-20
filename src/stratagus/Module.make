@@ -31,4 +31,8 @@ MSRC =   construct.cpp groups.cpp iolib.cpp mainloop.cpp missile.cpp \
          script_spell.cpp selection.cpp spells.cpp stratagus.cpp translate.cpp \
          util.cpp luacallback.cpp title.cpp
 
+ifneq ($(findstring -DUSE_WIN32, $(CPPFLAGS)),)
+	MSRC += attachconsole.cpp
+endif
+
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))

@@ -38,6 +38,7 @@
 
 #include <map>
 #include <string>
+#include <cstdio>
 
 #include "translate.h"
 #include "iolib.h"

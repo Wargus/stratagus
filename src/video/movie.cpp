@@ -302,6 +302,7 @@ int PlayMovie(const std::string &name)
 
 #include <string>
 #include <string.h>
+#include <stdio.h>
 
 /**
 **  Play a video file.

@@ -225,12 +225,12 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "title.h"
 #include "map.h"
 
-#ifdef DEBUG
-#include "missile.h" //for FreeBurningBuildingFrames
+#ifdef WIN32
+#include "attachconsole.h"
 #endif
 
-#if defined(_MSC_VER) && SDL_VERSION_ATLEAST(1, 2, 13)
-#define REDIRECT_OUTPUT
+#ifdef DEBUG
+#include "missile.h" //for FreeBurningBuildingFrames
 #endif
 
 extern void CreateUserDirectories(void);
@@ -696,49 +696,6 @@ map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n\
 ");
 }
 
-#ifdef REDIRECT_OUTPUT
-
-static std::string stdoutFile;
-static std::string stderrFile;
-
-static void CleanupOutput()
-{
-	fclose(stdout);
-	fclose(stderr);
-
-	struct stat st;
-	if (stat(stdoutFile.c_str(), &st) == 0 && st.st_size == 0) {
-		unlink(stdoutFile.c_str());
-	}
-	if (stat(stderrFile.c_str(), &st) == 0 && st.st_size == 0) {
-		unlink(stderrFile.c_str());
-	}
-}
-
-static void RedirectOutput()
-{
-	char path[MAX_PATH];
-	int pathlen;
-
-	pathlen = GetModuleFileName(NULL, path, sizeof(path));
-	while (pathlen > 0 && path[pathlen] != '\\') {
-		--pathlen;
-	}
-	path[pathlen] = '\0';
-
-	stdoutFile = std::string(path) + "\\stdout.txt";
-	stderrFile = std::string(path) + "\\stderr.txt";
-
-	if (!freopen(stdoutFile.c_str(), "w", stdout)) {
-		printf("freopen stdout failed");
-	}
-	if (!freopen(stderrFile.c_str(), "w", stderr)) {
-		printf("freopen stderr failed");
-	}
-	atexit(CleanupOutput);
-}
-#endif
-
 /**
 **  The main program: initialise, parse options and arguments.
 **
@@ -747,8 +704,8 @@ static void RedirectOutput()
 */
 int main(int argc, char **argv)
 {
-#ifdef REDIRECT_OUTPUT
-	RedirectOutput();
+#ifdef WIN32
+	WINAPI_AttachConsole();
 #endif
 
 	CompileOptions =

@@ -33,10 +33,12 @@
 
 //@{
 
+#ifndef STDCALL
 #ifdef _MSC_VER
 #define STDCALL __stdcall
 #else
 #define STDCALL
+#endif
 #endif
 
 #if defined(DEBUG_ASTAR)
