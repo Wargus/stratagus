@@ -668,6 +668,8 @@ static void Usage(void)
 \t-U update\tNetwork update rate in # frames (default 5=6x per s)\n\
 \t-N name\t\tName of the player\n\
 \t-s sleep\tNumber of frames for the AI to sleep before it starts\n\
+\t-S\t\tSync speed (100 = 30 frames/s)\n\
+\t-D\t\tVideo mode depth = pixel per point (for Win32/TNT)\n\
 "
 #ifdef USE_MAEMO
 "\
@@ -676,22 +678,9 @@ static void Usage(void)
 #else
 "\
 \t-v mode\t\tVideo mode (0=default,1=640x480,2=800x480,\n\
-\t\t\t\t3=800x600,4=1024x768,5=1280x960,6=1600x1200)\n\
-"
-#endif
-"\
-\t-D\t\tVideo mode depth = pixel per point (for Win32/TNT)\n\
-"
-#ifndef USE_MAEMO
-"\
+\t\t\t\t3=800x600,4=1024x768,5=1280x800,6=1280x960,\n\
+\t\t\t\t7=1280x1024,8=1400x1050,9=1680x1050,10=1600x1200)\n\
 \t-F\t\tFull screen video mode\n\
-"
-#endif
-"\
-\t-S\t\tSync speed (100 = 30 frames/s)\n\
-"
-#ifndef USE_MAEMO
-"\
 \t-W\t\tWindowed video mode\n\
 "
 #endif
@@ -896,11 +885,27 @@ int main(int argc, char **argv)
 						continue;
 					case 5:
 						Video.Width = 1280;
-						Video.Height = 960;
+						Video.Height = 800;
 						continue;
 					case 6:
+						Video.Width = 1280;
+						Video.Height = 960;
+						continue;
+					case 7:
+						Video.Width = 1280;
+						Video.Height = 1024;
+						continue;
+					case 8:
+						Video.Width = 1400;
+						Video.Height = 1050;
+						continue;
+					case 9:
 						Video.Width = 1600;
 						Video.Height = 1200;
+						continue;
+					case 10:
+						Video.Width = 1680;
+						Video.Height = 1050;
 						continue;
 #endif
 					default:
