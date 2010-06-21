@@ -3,26 +3,43 @@
 Name "Stratagus"
 OutFile "stratagus-install.exe"
 Icon "contrib/stratagus.ico"
-InstallDir $PROGRAMFILES\Stratagus
 BrandingText " "
+
+!ifdef AMD64
+InstallDir $PROGRAMFILES64\Stratagus
+!else
+InstallDir $PROGRAMFILES\Stratagus
+!endif
 
 ;--------------------------------
 
+!ifdef AMD64
+
 Function .onInit
- 
-	ReadRegStr $R0 HKLM "Software\Stratagus" "InstallDir"
-	StrCmp $R0 "" done
-		 
-	MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "Stratagus is already installed. $\n$\nClick `OK` to remove the previous version or `Cancel` to cancel this upgrade." IDOK uninstall
+
+	System::Call "kernel32::GetCurrentProcess() i .s"
+	System::Call "kernel32::IsWow64Process(i s, *i .r0)"
+
+	IntCmp $0 0 0 end
+
+	MessageBox MB_OK|MB_ICONSTOP "This version is for 64 bits computers only."
 	Abort
 
-uninstall:
+end:
 
-	ClearErrors
-	ExecWait "$R0\uninstall.exe _?=$R0"
-	RMDir /r $INSTDIR
+FunctionEnd
 
-done:
+!endif
+
+Function Uninstall
+
+	ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Stratagus" "InstallLocation"
+	StrCmp $R0 "" end
+	DetailPrint "Removing previous installation"
+	ExecWait "$R0\uninstall.exe /S _?=$R0"
+	RMDir /r $R0
+
+end:
 
 FunctionEnd
 
@@ -35,19 +52,29 @@ Page instfiles
 
 Section ""
 
+	Call Uninstall
+
 	SetOutPath $INSTDIR
 	File "stratagus.exe"
-	WriteRegStr HKLM "Software\Stratagus" "InstallDir" $INSTDIR
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Stratagus" "DisplayName" "Stratagus"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Stratagus" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Stratagus" "QuietUninstallString" "$\"$INSTDIR\uninstall.exe$\" /S"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Stratagus" "InstallLocation" "$INSTDIR"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Stratagus" "DisplayIcon" "$\"$INSTDIR\stratagus.exe$\",0"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Stratagus" "NoModify" 1
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Stratagus" "NoRepair" 1
 	WriteUninstaller $INSTDIR\uninstall.exe
 
 SectionEnd
 
 ;--------------------------------
 
+Uninstalltext "This will uninstall Stratagus."
+
 Section "Uninstall"
 
 	RMDir /r $INSTDIR
-	DeleteRegKey /ifempty HKLM "Software\Stratagus"
+	DeleteRegKey /ifempty HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Stratagus"
 
 SectionEnd
 
