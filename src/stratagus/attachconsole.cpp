@@ -64,9 +64,15 @@ bool WINAPI_AttachConsole() {
 	if ( hIn == INVALID_HANDLE_VALUE || hOut == INVALID_HANDLE_VALUE || hErr == INVALID_HANDLE_VALUE )
 		return false;
 
+#ifdef _WIN64
+	int osIn = _open_osfhandle((long long) hIn, O_TEXT);
+	int osOut = _open_osfhandle((long long) hOut, O_TEXT);
+	int osErr = _open_osfhandle((long long) hErr, O_TEXT);
+#else
 	int osIn = _open_osfhandle((long) hIn, O_TEXT);
 	int osOut = _open_osfhandle((long) hOut, O_TEXT);
 	int osErr = _open_osfhandle((long) hErr, O_TEXT);
+#endif
 				
 	if ( osIn == -1 || osOut == -1 || osErr == -1 )
 		return false;

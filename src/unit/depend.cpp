@@ -90,7 +90,12 @@ static void AddDependency(const std::string &target, const std::string required,
 			target.c_str());
 		return;
 	}
+
+#ifdef _WIN64
+	hash = (int)((long long)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
+#else
 	hash = (int)((long)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
+#endif
 
 	//
 	//  Find correct hash slot.
@@ -198,7 +203,12 @@ static bool CheckDependByRule(const CPlayer *player, DependRule *rule)
 	//
 	//  Find rule
 	//
+
+#ifdef _WIN64
+	i = (int)((long long)rule->Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
+#else
 	i = (int)((long)rule->Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
+#endif
 
 	if ((node = DependHash[i])) {  // find correct entry
 		while (node->Type != rule->Type ||

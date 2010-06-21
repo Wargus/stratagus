@@ -70,18 +70,6 @@ AC_ARG_WITH(extra-libs,
 AC_CHECK_FUNCS(strcasestr)
 AC_CHECK_FUNCS(strnlen)
 
-AC_PATH_X
-if test "$no_x" != "yes"; then
-	if test "x$x_includes" != "x"; then
-		CPPFLAGS="$CPPFLAGS -I$x_includes"
-	fi
-	if test "x$x_libraries" != "x"; then
-		LDFLAGS="$LDFLAGS -L$x_libraries"
-	fi
-	LDFLAGS="$LDFLAGS -lX11"
-	AC_DEFINE(HAVE_X, 1, Define to 1 if you have X. Used for pasting from the clipboard.)
-fi
-
 AC_CHECK_HEADER(zlib.h,, AC_MSG_ERROR(could not find zlib.h))
 AC_CHECK_HEADER(png.h,, AC_MSG_ERROR(could not find png.h))
 
@@ -95,6 +83,22 @@ if test "$enable_win32" = "yes"; then
 fi
 
 AC_SUBST(OBJDIR)
+
+if test "$ARCH" != win32; then
+	AC_PATH_X
+else
+	no_x=yes
+fi
+if test "$no_x" != "yes"; then
+	if test "x$x_includes" != "x"; then
+		CPPFLAGS="$CPPFLAGS -I$x_includes"
+	fi
+	if test "x$x_libraries" != "x"; then
+		LDFLAGS="$LDFLAGS -L$x_libraries"
+	fi
+	LDFLAGS="$LDFLAGS -lX11"
+	AC_DEFINE(HAVE_X, 1, Define to 1 if you have X. Used for pasting from the clipboard.)
+fi
 
 AC_ARG_ENABLE(static,
 	[  --enable-static	  Compile a static binary (default: no)])
@@ -258,9 +262,15 @@ AC_SUBST(PREFIX)
 
 if test "$ARCH" = "win32"; then
 	if test "`uname -a | grep -is cygwin`"; then
-		LDFLAGS="$LDFLAGS -lwsock32 -lws2_32"
+		LDFLAGS="$LDFLAGS -lws2_32"
 	else
-		LDFLAGS="$LDFLAGS -lwsock32 -lws2_32 -lmingwex -lgmon"
+		LDFLAGS="$LDFLAGS -lws2_32 -lmingwex"
+	fi
+	if ! test `echo $host | grep -is amd64`; then
+		LDFLAGS="$LDFLAGS -lwsock32"
+	fi
+	if ! test `echo $host | grep -is amd64` && ! test "`uname -a | grep -is cygwin`"; then
+		LDFLAGS="-lgmon"
 	fi
 fi
 
