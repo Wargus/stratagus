@@ -270,7 +270,7 @@ if test "$ARCH" = "win32"; then
 		LDFLAGS="$LDFLAGS -lwsock32"
 	fi
 	if ! test `echo $host | grep -is amd64` && ! test "`uname -a | grep -is cygwin`"; then
-		LDFLAGS="-lgmon"
+		LDFLAGS="$LDFLAGS -lgmon"
 	fi
 fi
 
