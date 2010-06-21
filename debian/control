@@ -5,7 +5,8 @@ Maintainer: Pali Rohár <pali.rohar@gmail.com>
 Build-Depends: automake, libsdl1.2-dev (>> 1.2.2), libvorbis-dev,
  libpng12-dev (>= 1.2.5), libbz2-dev, liblua5.1-dev | liblua5.1-0-dev,
  debhelper (>> 4.0.0), libpthread-stubs0-dev, libgl-dev | libgles1-sgx-img-dev,
- libgl-dev | libsdl-gles1.2-dev, libogg-dev, libtheora-dev, libmikmod2-dev
+ libgl-dev | libsdl-gles1.2-dev, libogg-dev, libtheora-dev, libmikmod2-dev,
+ imagemagick, sharutils
 Standards-Version: 3.6.1
 Homepage: http://stratagus.sourceforge.net
 Vcs-Browser: https://bazaar.launchpad.net/~pali.rohar/+junk/stratagus
