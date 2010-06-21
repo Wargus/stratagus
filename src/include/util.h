@@ -38,6 +38,7 @@
 ----------------------------------------------------------------------------*/
 
 #ifndef __unix
+#include <winsock2.h>
 #include <windows.h>
 #elif defined(__hpux)
 #include <sys/mpctl.h>
