@@ -219,6 +219,7 @@ int PlayMovie(const std::string &name)
 		rect.y = 0;
 	}
 
+	SDL_FillRect(SDL_GetVideoSurface(), NULL, 0);
 	yuv_overlay = SDL_CreateYUVOverlay(data.tinfo.frame_width,
 		data.tinfo.frame_height, SDL_YV12_OVERLAY, TheScreen);
 
