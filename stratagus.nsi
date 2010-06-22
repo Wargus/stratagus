@@ -13,23 +13,30 @@ InstallDir $PROGRAMFILES\Stratagus
 
 ;--------------------------------
 
-!ifdef AMD64
 
 Function .onInit
+
+!ifdef AMD64
 
 	System::Call "kernel32::GetCurrentProcess() i .s"
 	System::Call "kernel32::IsWow64Process(i s, *i .r0)"
 
-	IntCmp $0 0 0 end
+	IntCmp $0 0 0 endAMD64
 
-	MessageBox MB_OK|MB_ICONSTOP "This version is for 64 bits computers only."
+	MessageBox MB_OK|MB_ICONSTOP "This version is for 64 bit computers only."
 	Abort
+
+endAMD64:
+
+!endif
+
+	ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Stratagus" "InstallLocation"
+	StrCmp $R0 "" end
+	StrCpy $instdir $R0
 
 end:
 
 FunctionEnd
-
-!endif
 
 Function Uninstall
 
@@ -37,7 +44,7 @@ Function Uninstall
 	StrCmp $R0 "" end
 	DetailPrint "Removing previous installation"
 	ExecWait "$R0\uninstall.exe /S _?=$R0"
-	RMDir /r $R0
+	RMDir $R0
 
 end:
 
@@ -47,8 +54,6 @@ FunctionEnd
 
 Page directory
 Page instfiles
-
-;--------------------------------
 
 Section ""
 
@@ -69,11 +74,14 @@ SectionEnd
 
 ;--------------------------------
 
-Uninstalltext "This will uninstall Stratagus."
+UninstPage uninstConfirm
+UninstPage instfiles
 
 Section "Uninstall"
 
-	RMDir /r $INSTDIR
+	Delete $INSTDIR\stratagus.exe
+	Delete $INSTDIR\uninstall.exe
+	RMDir $INSTDIR
 	DeleteRegKey /ifempty HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Stratagus"
 
 SectionEnd
