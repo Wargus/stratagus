@@ -1,5 +1,6 @@
 $extern void InitVideo();
 void InitVideo();
+extern int PlayMovie(const std::string name);
 
 extern bool UseOpenGL;
 

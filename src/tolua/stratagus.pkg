@@ -12,6 +12,7 @@ $#include "sound_server.h"
 $#include "netconnect.h"
 $#include "map.h"
 $#include "ai.h"
+$#include "movie.h"
 
 $#ifdef _MSC_VER
 $#pragma warning(disable:4800)
