@@ -202,7 +202,6 @@ int PlayMovie(const std::string &name)
 	if (OggInit(&f, &data) || !data.video) {
 		OggFree(&data);
 		f.close();
-		fprintf(stderr, "OggInit() failed '%s'\n", name.c_str());
 		return -1;
 	}
 
@@ -313,7 +312,7 @@ int PlayMovie(const std::string &name)
 */
 int PlayMovie(const std::string &name)
 {
-	if (strstr(name.c_str(), ".ogg") || strstr(name.c_str(), ".ogv") || strstr(name.c_str(), ".avi")) {
+	if (strstr(name.c_str(), ".ogg") || strstr(name.c_str(), ".ogv")) {
 		fprintf(stderr, "PlayMovie() '%s' is not supported, please recompile stratagus with theora support\n", name.c_str());
 		return 0;
 	}
