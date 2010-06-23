@@ -1,3 +1,9 @@
+stratagus (2.2.5.1-1ubuntu1~karmic~palippa1) karmic; urgency=low
+
+  * Build for karmic rev. 55
+
+ -- Pali Rohár <pali.rohar@gmail.com>  Wed, 23 Jun 2010 15:21:13 +0200
+
 stratagus (2.2.5-2maemo3) fremantle; urgency=low
 
   * Build for fremantle rev. 30
