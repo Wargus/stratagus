@@ -1,3 +1,9 @@
+stratagus (2.2.5.1-1maemo1) fremantle; urgency=low
+
+  * Build for fremantle rev. 55
+
+ -- Pali Rohár <pali.rohar@gmail.com>  Wed, 23 Jun 2010 16:06:55 +0200
+
 stratagus (2.2.5.1-1ubuntu1~lucid~palippa1) lucid; urgency=low
 
   * Build for lucid rev. 55
