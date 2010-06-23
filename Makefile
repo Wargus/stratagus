@@ -125,7 +125,7 @@ distclean:	clean
 	$(RM) $(OUTFILE) $(OUTFILE).exe gmon.sum .depend .#* *~ stderr.txt stdout.txt \
 	srcdoc/* .depend Rules.make config.log config.status configure
 	$(RM) Rules.make Rules.make.WIN32 aclocal.m4 config.h config.h.in
-	$(RM) -r src/winobj/ src/guichan/sdl/winobj/ src/guichan/widgets/winobj/
+	$(RM) -r src/winobj/ src/guichan/sdl/winobj/ src/guichan/widgets/winobj/ src/guichan/sdl/obj/ src/guichan/widgets/obj/
 	$(RM) -r autom4te.cache/
 	@echo
 
