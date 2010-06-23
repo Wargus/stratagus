@@ -233,7 +233,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "missile.h" //for FreeBurningBuildingFrames
 #endif
 
-#ifdef USE_WIN32
+#if defined(USE_WIN32) && ! defined(NO_STDIO_REDIRECT)
 #define REDIRECT_OUTPUT
 #endif
 
@@ -742,6 +742,8 @@ int main(int argc, char **argv)
 {
 #ifdef REDIRECT_OUTPUT
 	RedirectOutput();
+#endif
+#ifdef USE_WIN32
 	WINAPI_AttachConsole();
 #endif
 

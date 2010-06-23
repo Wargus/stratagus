@@ -224,6 +224,14 @@ else
 	LDFLAGS="$LDFLAGS `$SDLCONFIG --static-libs`"
 fi
 
+if test "$ARCH" = "win32"; then
+	AC_ARG_ENABLE(stdio-redirect,
+		[  --enable-stdio-redirect	Redirect STDIO to files on Win32 (default=yes)])
+	if test "$enable_stdio_redirect" = "no"; then
+		CPPFLAGS="$CPPFLAGS -DNO_STDIO_REDIRECT"
+	fi
+fi
+
 test "$prefix" = "NONE" && prefix=/usr/local
 datarootdir=.
 test "$datadir" = "NONE" && datadir=$datarootdir
