@@ -130,7 +130,7 @@ int main(int argc, char **argv)
 	// Standard SDL Init.
 	//
 	int res = SDL_Init(0);
-#ifdef USE_WIN32
+#if defined(USE_WIN32) && ! defined(NO_STDIO_REDIRECT)
 	WINAPI_AttachConsole();
 #endif
 	if (res == -1)

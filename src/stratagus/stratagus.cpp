@@ -742,8 +742,7 @@ int main(int argc, char **argv)
 {
 #ifdef REDIRECT_OUTPUT
 	RedirectOutput();
-#endif
-#ifdef USE_WIN32
+#elif defined(USE_WIN32)
 	WINAPI_AttachConsole();
 #endif
 
