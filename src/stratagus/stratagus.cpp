@@ -538,7 +538,7 @@ int SaveReplay(const std::string &filename)
 static void PrintHeader(void)
 {
 	fprintf(stdout, "%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n"
-		"Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon, and others.\n"
+		"Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon, Pali Rohar, and others.\n"
 		"\t(http://stratagus.org)"
 		"\nCompile options %s", NameLine, CompileOptions.c_str());
 }

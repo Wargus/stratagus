@@ -2,6 +2,7 @@
 # debian/rules that uses debhelper.
 # GNU copyright 1997 to 1999 by Joey Hess.
 # GNU Copyright 2002-2004 by David Martínez Moreno.
+# GNU Copyright 2010 by Pali Rohar
 
 # Do you want verbosity...? Uncomment this.
 #export DH_VERBOSE=1
