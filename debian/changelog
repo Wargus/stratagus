@@ -1,3 +1,9 @@
+stratagus (2.2.5.1-1ubuntu1~lucid~palippa1) lucid; urgency=low
+
+  * Build for lucid rev. 55
+
+ -- Pali Rohár <pali.rohar@gmail.com>  Wed, 23 Jun 2010 16:00:25 +0200
+
 stratagus (2.2.5.1-1ubuntu1~karmic~palippa1) karmic; urgency=low
 
   * Build for karmic rev. 55
