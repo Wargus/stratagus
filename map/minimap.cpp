@@ -9,7 +9,7 @@
 //
 /**@name minimap.cpp - The minimap. */
 //
-//      (c) Copyright 1998-2008 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2010 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -80,8 +80,10 @@ static int Map2MinimapY[MaxMapHeight];     /// fast conversion table
 // MinimapScale:
 // 32x32 64x64 96x96 128x128 256x256 512x512 ...
 // *4 *2 *4/3   *1 *1/2 *1/4
-static int MinimapScaleX;                  /// Minimap scale to fit into window
-static int MinimapScaleY;                  /// Minimap scale to fit into window
+static int MinimapScaleX;   /// Minimap scale to fit into window rounded up
+static int MinimapScaleY;   /// Minimap scale to fit into window rounded up
+static int lowMinimapScaleX;   /// Minimap scale to fit into window rounded down
+static int lowMinimapScaleY;   /// Minimap scale to fit into window rounded down
 
 #define MAX_MINIMAP_EVENTS 8
 
@@ -124,9 +126,11 @@ void CMinimap::Create(void)
 
 	MinimapScaleX = (W * MINIMAP_FAC + maxSize - 1) / maxSize;
 	MinimapScaleY = (H * MINIMAP_FAC + maxSize - 1) / maxSize;
+	lowMinimapScaleX = (W * MINIMAP_FAC) / maxSize;
+	lowMinimapScaleY = (H * MINIMAP_FAC) / maxSize;
 
-	XOffset = (W - (Map.Info.MapWidth * MinimapScaleX) / MINIMAP_FAC + 1) / 2;
-	YOffset = (H - (Map.Info.MapHeight * MinimapScaleY) / MINIMAP_FAC + 1) / 2;
+	XOffset = (W - (Map.Info.MapWidth * lowMinimapScaleX) / MINIMAP_FAC + 1) / 2;
+	YOffset = (H - (Map.Info.MapHeight * lowMinimapScaleY) / MINIMAP_FAC + 1) / 2;
 
 	//
 	// Calculate minimap fast lookup tables.
@@ -142,10 +146,10 @@ void CMinimap::Create(void)
 		Minimap2MapY[n] = (((n - YOffset) * MINIMAP_FAC) / MinimapScaleY);
 	}
 	for (n = 0; n < Map.Info.MapWidth; ++n) {
-		Map2MinimapX[n] = (n * MinimapScaleX) / MINIMAP_FAC;
+		Map2MinimapX[n] = (n * lowMinimapScaleX) / MINIMAP_FAC;
 	}
 	for (n = 0; n < Map.Info.MapHeight; ++n) {
-		Map2MinimapY[n] = (n * MinimapScaleY) / MINIMAP_FAC;
+		Map2MinimapY[n] = (n * lowMinimapScaleY) / MINIMAP_FAC;
 	}
 
 	if (!UseOpenGL) {
@@ -579,10 +583,10 @@ void CMinimap::Destroy()
 void CMinimap::DrawCursor(int vx, int vy)
 {
 	// Determine and save region below minimap cursor
-	int x = X + XOffset + (vx * MinimapScaleX) / MINIMAP_FAC;
-	int y = Y + YOffset + (vy * MinimapScaleY) / MINIMAP_FAC;
-	int w = (UI.SelectedViewport->MapWidth * MinimapScaleX) / MINIMAP_FAC;
-	int h = (UI.SelectedViewport->MapHeight * MinimapScaleY) / MINIMAP_FAC;
+	int x = X + XOffset + (vx * lowMinimapScaleX) / MINIMAP_FAC;
+	int y = Y + YOffset + (vy * lowMinimapScaleY) / MINIMAP_FAC;
+	int w = (UI.SelectedViewport->MapWidth * lowMinimapScaleX) / MINIMAP_FAC;
+	int h = (UI.SelectedViewport->MapHeight * lowMinimapScaleY) / MINIMAP_FAC;
 
 	// Draw cursor as rectangle (Note: unclipped, as it is always visible)
 	Video.DrawTransRectangle(UI.ViewportCursorColor, x, y, w, h, 128);
@@ -602,8 +606,8 @@ void CMinimap::AddEvent(int x, int y)
 
 	MinimapEvent *minimapEvent = &MinimapEvents[NumMinimapEvents++];
 
-	minimapEvent->X = X + XOffset + (x * MinimapScaleX) / MINIMAP_FAC;
-	minimapEvent->Y = Y + YOffset + (y * MinimapScaleY) / MINIMAP_FAC;
+	minimapEvent->X = X + XOffset + (x * lowMinimapScaleX) / MINIMAP_FAC;
+	minimapEvent->Y = Y + YOffset + (y * lowMinimapScaleY) / MINIMAP_FAC;
 	minimapEvent->Size = (W < H) ? W / 3 : H / 3;
 }
 
