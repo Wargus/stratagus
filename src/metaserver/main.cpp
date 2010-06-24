@@ -60,7 +60,7 @@ extern int optopt;
 extern int getopt(int argc, char *const *argv, const char *opt);
 #endif
 
-#if defined(USE_WIN32) && ! defined(NO_STDIO_REDIRECT)
+#if defined(USE_WIN32) && defined(NO_STDIO_REDIRECT)
 #include "attachconsole.h"
 #endif
 
@@ -131,7 +131,7 @@ int main(int argc, char **argv)
 	// Standard SDL Init.
 	//
 	int res = SDL_Init(0);
-#if defined(USE_WIN32) && ! defined(NO_STDIO_REDIRECT)
+#if defined(USE_WIN32) && defined(NO_STDIO_REDIRECT)
 	WINAPI_AttachConsole();
 #endif
 	if (res == -1)

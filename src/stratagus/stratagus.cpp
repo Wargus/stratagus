@@ -226,7 +226,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "title.h"
 #include "map.h"
 
-#if defined(USE_WIN32) && ! defined(NO_STDIO_REDIRECT)
+#if defined(USE_WIN32) && defined(NO_STDIO_REDIRECT)
 #include "attachconsole.h"
 #endif
 

@@ -33,7 +33,7 @@ MSRC =   construct.cpp groups.cpp iolib.cpp mainloop.cpp missile.cpp \
          util.cpp luacallback.cpp title.cpp
 
 ifneq ($(findstring -DUSE_WIN32, $(CPPFLAGS)),)
-	ifeq ($(findstring -DNO_STDIO_REDIRECT, $(CPPFLAGS)),)
+	ifneq ($(findstring -DNO_STDIO_REDIRECT, $(CPPFLAGS)),)
 		MSRC += attachconsole.cpp
 	endif
 endif

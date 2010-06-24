@@ -67,6 +67,9 @@
 
 #ifdef USE_WIN32
 #include "net_lowlevel.h"
+#endif
+
+#if defined(USE_WIN32) && defined(NO_STDIO_REDIRECT)
 #include "attachconsole.h"
 #endif
 
@@ -423,7 +426,7 @@ void InitVideoSdl(void)
 #endif
 				SDL_INIT_AUDIO | SDL_INIT_VIDEO |
 				SDL_INIT_TIMER);
-#if defined(USE_WIN32) && ! defined(NO_STDIO_REDIRECT)
+#if defined(USE_WIN32) && defined(NO_STDIO_REDIRECT)
 		WINAPI_AttachConsole();
 #endif
 		if ( res < 0 ) {
