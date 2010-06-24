@@ -84,6 +84,7 @@
 <a href="#SetKeyScroll">SetKeyScroll</a>
 <a href="#SetKeyScrollSpeed">SetKeyScrollSpeed</a>
 <a href="#SetLeaveStops">SetLeaveStops</a>
+<a href="#SetMaxOpenGLTexture">SetMaxOpenGLTexture</a>
 <a href="#SetMaxSelectable">SetMaxSelectable</a>
 <a href="#SetMetaServer">SetMetaServer</a>
 <a href="#SetMinimapTerrain">SetMinimapTerrain</a>
@@ -825,6 +826,27 @@ Enable/disable stopping scrolling on mouse leave.
 <h4>Example</h4>
 <pre>
 SetLeaveStops(true)
+</pre>
+
+<a name="SetMaxOpenGLTexture"></a>
+<h3>SetMaxOpenGLTexture(number)</h3>
+
+<p>Limit the size of OpenGL textures.  If the game is slower with
+OpenGL than without it, try setting 1024, 512, or 256 as the limit.</p>
+
+<p>Bos Wars asks OpenGL how large textures it supports, and then
+splits all of its graphics into pieces of that size or smaller.  In
+some computers however, OpenGL reports support for e.g. 4096x4096
+textures but draws those much slower than smaller ones.  You can then
+set a smaller limit with this function.  The new limit takes effect
+on the next InitVideo call.</p>
+
+<p>If the parameter is 0, or greater than the limit reported by
+OpenGL, then Bos Wars uses the OpenGL limit instead.</p>
+
+<h4>Example</h4>
+<pre>
+SetMaxOpenGLTexture(512)
 </pre>
 
 <a name="SetMaxSelectable"></a>
