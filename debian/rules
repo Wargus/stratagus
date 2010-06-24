@@ -94,11 +94,11 @@ binary-arch: build install
 
 	# Maemo section - Hildon Application Manager
 	if [ -f /etc/maemo_version ]; then \
-		sed "s/Section: .*/Section: user\/games/" -i $(CURDIR)/debian/wargus/DEBIAN/control; \
-		echo "Maemo-Display-Name: Strategy gaming engine" >> $(CURDIR)/debian/wargus/DEBIAN/control; \
-		echo "Maemo-Icon-26:" >> $(CURDIR)/debian/wargus/DEBIAN/control; \
+		sed "s/Section: .*/Section: user\/games/" -i $(CURDIR)/debian/stratagus/DEBIAN/control; \
+		echo "Maemo-Display-Name: Strategy gaming engine" >> $(CURDIR)/debian/stratagus/DEBIAN/control; \
+		echo "Maemo-Icon-26:" >> $(CURDIR)/debian/stratagus/DEBIAN/control; \
 		for line in $(shell convert contrib/stratagus.ico -resize 48x48 png:- | uuencode -m - | tail -n +2 | head -n -1); do \
-			echo " $$line" >> $(CURDIR)/debian/wargus/DEBIAN/control; \
+			echo " $$line" >> $(CURDIR)/debian/stratagus/DEBIAN/control; \
 		done; \
 	fi
 

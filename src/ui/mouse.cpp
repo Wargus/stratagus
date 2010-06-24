@@ -1392,19 +1392,32 @@ static void UISelectStateButtonDown(unsigned button)
 */
 void UIHandleButtonDown(unsigned button)
 {
+	
+/**
+ * Detect long left selection click
+ **/
+#define LongLeftButton (MouseButtons & ((LeftButton << MouseHoldShift)))
+
+/**
+ * Detect double left click
+ **/
+#define DoubleLeftButton (MouseButtons & (LeftButton << MouseDoubleShift))
+
+#ifdef USE_MAEMO
+	// If we are moving with stylus, left button on Maemo is still clicked
+	// Ignore handle if left button is long cliked
+	if (LongLeftButton)
+		return;
+#endif
+		
 	static bool OldShowSightRange;
 	static bool OldShowReactionRange;
 	static bool OldShowAttackRange;
 	static bool OldValid = false;
 	CUnit *uins;
 	int i;
-
-/**
-**  Detect long selection click, FIXME: tempory hack to test the feature.
-*/
-#define LongSelected (MouseButtons & ((LeftButton << MouseHoldShift)))
-
-	if (LongSelected) {
+	
+	if (LongLeftButton) {
 		if (!OldValid) {
 			OldShowSightRange = Preference.ShowSightRange;
 			OldShowAttackRange = Preference.ShowAttackRange;
@@ -1447,10 +1460,6 @@ void UIHandleButtonDown(unsigned button)
 		}
 	}
 
-#ifdef USE_MAEMO
-	printf("UIHandleButtonDown [0x%x] [0x%x]\n", button, MouseButtons);
-#endif
-
 	//
 	//  Cursor is on the map area
 	//
@@ -1466,6 +1475,11 @@ void UIHandleButtonDown(unsigned button)
 
 		// to redraw the cursor immediately (and avoid up to 1 sec delay
 		if (CursorBuilding) {
+#ifdef USE_MAEMO
+			// On Maemo building is started with double left click
+			if (!DoubleLeftButton)
+				return;
+#endif
 			// Possible Selected[0] was removed from map
 			// need to make sure there is a unit to build
 			if (Selected[0] && (MouseButtons & LeftButton) &&
@@ -1517,8 +1531,7 @@ void UIHandleButtonDown(unsigned button)
 				CursorState = CursorStatePieMenu;
 			}
 #ifdef USE_MAEMO
-		} else if (MouseButtons == 0x202) {
-			printf ("left double click detected\n");
+		} else if (DoubleLeftButton) {
 #else
 		} else if (MouseButtons & RightButton) {
 #endif
