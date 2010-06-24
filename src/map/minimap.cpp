@@ -11,6 +11,7 @@
 /**@name minimap.cpp - The minimap. */
 //
 //      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2010      by Pali Rohár
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -108,8 +109,8 @@ static void CreateMinimapTexture(void)
 	glGenTextures(1, &MinimapTexture);
 	glBindTexture(GL_TEXTURE_2D, MinimapTexture);
 #ifdef USE_GLES
-#warning TODO: convert glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); to GLES
-#warning TODO: convert glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); to GLES
+#warning TODO: Port glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); to GLES
+#warning TODO: Port glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); to GLES
 #else
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);

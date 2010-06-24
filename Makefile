@@ -11,6 +11,7 @@
 ##	Makefile	-	The make file.
 ##
 ##	(c) Copyright 1998-2003 by Lutz Sammer and Nehal Mistry
+##	(c) Copyright 2010      by Pali Rohár
 ##
 ##	Stratagus is free software; you can redistribute it and/or modify
 ##	it under the terms of the GNU General Public License as published

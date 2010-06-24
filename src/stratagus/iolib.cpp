@@ -11,6 +11,7 @@
 /**@name iolib.cpp - Compression-IO helper functions. */
 //
 //      (c) Copyright 2000-2005 by Andreas Arens, Lutz Sammer, and Jimmy Salmon
+//      (c) Copyright 2010      by Pali Rohár
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -544,6 +545,7 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 	}
 #endif
 
+#ifndef USE_WIN32
 	//  In user home directory
 	if ((s = getenv("HOME")) && !GameName.empty()) {
 		sprintf(buffer, "%s/%s/%s/%s", s, STRATAGUS_HOME_PATH, GameName.c_str(), file);
@@ -551,6 +553,7 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 			return buffer;
 		}
 	}
+#endif
 
 	// In global shared directory
 	sprintf(buffer, "%s/%s", StratagusLibPath.c_str(), file);

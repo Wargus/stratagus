@@ -11,6 +11,7 @@
 ##	Module.make	-	Module Makefile (included from Makefile).
 ##
 ##	(c) Copyright 2004 by The Stratagus Team
+##	(c) Copyright 2010 by Pali Rohár
 ##
 ##      This program is free software; you can redistribute it and/or modify
 ##      it under the terms of the GNU General Public License as published by
@@ -32,7 +33,9 @@ MSRC =   construct.cpp groups.cpp iolib.cpp mainloop.cpp missile.cpp \
          util.cpp luacallback.cpp title.cpp
 
 ifneq ($(findstring -DUSE_WIN32, $(CPPFLAGS)),)
-	MSRC += attachconsole.cpp
+	ifeq ($(findstring -DNO_STDIO_REDIRECT, $(CPPFLAGS)),)
+		MSRC += attachconsole.cpp
+	endif
 endif
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))

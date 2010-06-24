@@ -12,6 +12,7 @@
 //
 //      (c) Copyright 1998-2008 by Lutz Sammer, Francois Beerten, and
 //                                 Jimmy Salmon
+//      (c) Copyright 2010      by Pali Rohár
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -225,7 +226,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "title.h"
 #include "map.h"
 
-#ifdef USE_WIN32
+#if defined(USE_WIN32) && ! defined(NO_STDIO_REDIRECT)
 #include "attachconsole.h"
 #endif
 
@@ -537,10 +538,13 @@ int SaveReplay(const std::string &filename)
 */
 static void PrintHeader(void)
 {
-	fprintf(stdout, "%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n"
-		"Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon, Pali Rohar, and others.\n"
-		"\t(http://stratagus.org)"
-		"\nCompile options %s", NameLine, CompileOptions.c_str());
+	fprintf(stdout,
+		"%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n"
+		"Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon, Pali Rohar,\n"
+		"and others.\n"
+		"\t(http://stratagus.org)\n"
+		"Compile options %s",
+		NameLine, CompileOptions.c_str());
 }
 
 /**

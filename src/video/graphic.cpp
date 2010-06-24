@@ -11,6 +11,7 @@
 /**@name graphic.cpp - The general graphic functions. */
 //
 //      (c) Copyright 1999-2006 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
+//      (c) Copyright 2010      by Pali Rohár
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -983,8 +984,8 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	SDL_LockSurface(g->Surface);
 	glBindTexture(GL_TEXTURE_2D, texture);
 #ifdef USE_GLES
-#warning TODO: Convert glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); to GLES
-#warning TODO: Convert glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); to GLES
+#warning TODO: Port glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); to GLES
+#warning TODO: Port glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); to GLES
 #else
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
