@@ -183,6 +183,32 @@ void DrawTexture(const CGraphic *g, GLuint *textures,
 			Assert(texture >= 0 && texture < g->NumTextures);
 
 			glBindTexture(GL_TEXTURE_2D, textures[texture]);
+#ifdef USE_GLES
+			float texCoord[] = {
+				clip_tx_beg, clip_ty_beg,
+				clip_tx_beg, clip_ty_end,
+				clip_tx_end, clip_ty_end,
+				clip_tx_end, clip_ty_beg
+			};
+
+			float vertex[] = {
+				clip_sx_beg, clip_sy_beg,
+				clip_sx_beg, clip_sy_end,
+				clip_sx_end, clip_sy_end,
+				clip_sx_end, clip_sy_beg
+			};
+
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			glEnableClientState(GL_VERTEX_ARRAY);
+
+			glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
+			glVertexPointer(2, GL_FLOAT, 0, vertex);
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+			SDL_GLES_SwapBuffers();
+
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+			glDisableClientState(GL_VERTEX_ARRAY);
+#else
 			glBegin(GL_QUADS);
 			glTexCoord2f(clip_tx_beg, clip_ty_beg);
 			glVertex2i(clip_sx_beg, clip_sy_beg);
@@ -193,6 +219,7 @@ void DrawTexture(const CGraphic *g, GLuint *textures,
 			glTexCoord2f(clip_tx_end, clip_ty_beg);
 			glVertex2i(clip_sx_end, clip_sy_beg);
 			glEnd();
+#endif
 		}
 	}
 }
