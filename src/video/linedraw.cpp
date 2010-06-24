@@ -998,6 +998,7 @@ void DrawPixel(Uint32 color, int x, int y)
 	
 	glVertexPointer(2, GL_FLOAT, 0, vertex);
 	glDrawArrays(GL_POINTS, 0, 1);
+	SDL_GLES_SwapBuffers();
 	
 	glDisableClientState(GL_VERTEX_ARRAY);
 #else
@@ -1084,6 +1085,7 @@ void DrawHLine(Uint32 color, int x, int y, int width)
 	
 	glVertexPointer(2, GL_FLOAT, 0, vertex);
 	glDrawArrays(GL_LINES, 0, 2);
+	SDL_GLES_SwapBuffers();
 	
 	glDisableClientState(GL_VERTEX_ARRAY);
 #else
@@ -1188,6 +1190,7 @@ void DrawVLine(Uint32 color, int x, int y, int height)
 	
 	glVertexPointer(2, GL_FLOAT, 0, vertex);
 	glDrawArrays(GL_LINES, 0, 2);
+	SDL_GLES_SwapBuffers();
 	
 	glDisableClientState(GL_VERTEX_ARRAY);
 #else
@@ -1310,6 +1313,7 @@ void DrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 	
 	glVertexPointer(2, GL_FLOAT, 0, vertex);
 	glDrawArrays(GL_LINES, 0, 2);
+	SDL_GLES_SwapBuffers();
 	
 	glDisableClientState(GL_VERTEX_ARRAY);
 #else
@@ -1485,6 +1489,7 @@ void DrawRectangle(Uint32 color, int x, int y, int w, int h)
 	
 	glVertexPointer(2, GL_FLOAT, 0, vertex);
 	glDrawArrays(GL_LINES, 0, 8);
+	SDL_GLES_SwapBuffers();
 	
 	glDisableClientState(GL_VERTEX_ARRAY);
 #else
@@ -1659,6 +1664,7 @@ void FillRectangle(Uint32 color, int x, int y,
 	
 	glVertexPointer(2, GL_FLOAT, 0, vertex);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	SDL_GLES_SwapBuffers();
 	
 	glDisableClientState(GL_VERTEX_ARRAY);
 #else

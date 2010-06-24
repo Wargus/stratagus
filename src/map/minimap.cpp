@@ -656,6 +656,7 @@ void CMinimap::Draw(int vx, int vy)
 		glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
 		glVertexPointer(2, GL_FLOAT, 0, vertex);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		SDL_GLES_SwapBuffers();
 
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);

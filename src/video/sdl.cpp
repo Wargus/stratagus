@@ -244,14 +244,15 @@ static void InitOpenGLExtensions()
 */
 static void InitOpenGL(void)
 {
+
 	InitOpenGLExtensions();
 
-	glViewport(0, 0, (GLsizei)Video.Width, (GLsizei)Video.Height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
 #ifdef USE_GLES
 	glOrthof(0, Video.Width, Video.Height, 0, -1, 1);
 #else
+	glViewport(0, 0, (GLsizei)Video.Width, (GLsizei)Video.Height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
 	glOrtho(0, Video.Width, Video.Height, 0, -1, 1);
 #endif
 	glMatrixMode(GL_MODELVIEW);
