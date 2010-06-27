@@ -251,10 +251,11 @@ void CViewport::Center(int x, int y, int offsetx, int offsety)
 */
 void CViewport::DrawMapBackgroundInViewport() const
 {
-	std::list<CPatch *> patches = Map.PatchManager.getPatches();
-	while (!patches.empty()) {
-		CPatch *patch = patches.front();
-		patches.pop_front();
+	const std::list<CPatch *> &patches = Map.PatchManager.getPatches();
+	std::list<CPatch *>::const_iterator i;
+
+	for (i = patches.begin(); i != patches.end(); ++i) {
+		const CPatch *patch = *i;
 
 		const CGraphic *g = patch->getType()->getGraphic();
 		int x = this->X - ((this->MapX - patch->getX()) * TileSizeX + this->OffsetX);
