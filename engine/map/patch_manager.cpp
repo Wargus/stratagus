@@ -189,9 +189,10 @@ CPatchManager::getPatch(int x, int y, int *xOffset, int *yOffset) const
 	// Search the patches from top to bottom
 	rend = this->patches.rend();
 	for (i = this->patches.rbegin(); i != rend; ++i) {
-		int patchX = (*i)->getX();
-		int patchY = (*i)->getY();
-		CPatchType *patchType = (*i)->getType();
+		const CPatch *patch = *i;
+		int patchX = patch->getX();
+		int patchY = patch->getY();
+		CPatchType *patchType = patch->getType();
 
 		// See if the patch is at location x,y
 		if (patchX <= x && x < patchX + patchType->getTileWidth() &&
@@ -214,7 +215,7 @@ CPatchManager::getPatch(int x, int y, int *xOffset, int *yOffset) const
 	return NULL;
 }
 
-std::list<CPatch *>
+const std::list<CPatch *> &
 CPatchManager::getPatches() const
 {
 	return this->patches;
