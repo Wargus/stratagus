@@ -85,7 +85,7 @@ public:
 	/**
 	**  Get all of the patches
 	*/
-	std::list<CPatch *> getPatches() const;
+	const std::list<CPatch *> &getPatches() const;
 
 	/**
 	**  Get all of the patch names
