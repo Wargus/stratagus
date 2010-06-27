@@ -9,7 +9,7 @@
 //
 /**@name game.cpp - The game set-up and creation. */
 //
-//      (c) Copyright 1998-2008 by Lutz Sammer, Andreas Arens, and
+//      (c) Copyright 1998-2010 by Lutz Sammer, Andreas Arens, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -326,10 +326,21 @@ static void WriteCreateUnit(FileWriter *f, const CUnit *unit)
 */
 static void WriteTerrain(std::string &path, const CMap *map)
 {
-	FileWriter *f = CreateFileWriter(path.c_str());
-	f->printf("-- terrain\n");
-	f->printf("%s", Map.PatchManager.savePatches(true).c_str());
-	f->printf("\n");
+	FileWriter *f = NULL;
+
+	try
+	{
+		f = CreateFileWriter(path);
+		f->printf("-- terrain\n");
+		f->printf("%s", Map.PatchManager.savePatches(true).c_str());
+		f->printf("\n");
+	}
+	catch (const FileException &)
+	{
+		fprintf(stderr,"Can't save map terrain: `%s' \n", path.c_str());
+	}
+
+	delete f;
 }
 
 
