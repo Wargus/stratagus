@@ -980,12 +980,15 @@ void AiCanNotMove(CUnit *unit)
 		gy = unit->Orders[0]->Y;
 	}
 
-	if (unit->Type->UnitType == UnitTypeFly ||
-		PlaceReachable(unit, gx, gy, gw, gh, minrange, maxrange))
+	if (GameCycle != AiPlayer->LastCanNotMoveGameCycle)
 	{
-		// Path probably closed by unit here
-		AiMoveUnitInTheWay(unit);
-		return;
+		if (unit->Type->UnitType == UnitTypeFly ||
+			PlaceReachable(unit, gx, gy, gw, gh, minrange, maxrange))
+		{
+			// Path probably closed by unit here
+			AiMoveUnitInTheWay(unit);
+			return;
+		}
 	}
 }
 
