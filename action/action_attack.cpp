@@ -276,17 +276,11 @@ static void MoveToTarget(CUnit *unit)
 	//
 	if (err == PF_UNREACHABLE) {
 		unit->State = 0;
-		if (!goal) {
-			//
-			// When attack-moving we have to allow a bigger range
-			//
-			if (unit->Orders[0]->Range < Map.Info.MapWidth ||
-					unit->Orders[0]->Range < Map.Info.MapHeight) {
-				// Try again with more range
-				unit->Orders[0]->Range++;
-				unit->Wait = 5;
-				return;
-			}
+		if (!goal && unit->Orders[0]->Range == 0) {
+			// Try again with unit's max attack range
+			unit->Orders[0]->Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
+			unit->Wait = 15;
+			return;
 		}
 	}
 	//
