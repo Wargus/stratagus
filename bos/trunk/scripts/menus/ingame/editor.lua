@@ -9,7 +9,7 @@
 --
 --      editor.lua - In-game menus.
 --
---      (c) Copyright 2006 by Francois Beerten and Jimmy Salmon
+--      (c) Copyright 2006-2010 by Francois Beerten and Jimmy Salmon
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -26,6 +26,29 @@
 --      02111-1307, USA.
 --
 --      $Id: game.lua 453 2006-06-26 18:36:19Z feb $
+
+function ErrorEditorMenu(errmsg)
+  local menu = BosGameMenu()
+  menu:setBaseColor(darkNoAlpha)
+  menu:setDrawMenusUnder(true)
+
+  menu:addLabel(_("Error"), menu:getWidth() / 2, 11)
+
+  local l = MultiLineLabel(errmsg)
+  l:setFont(Fonts["large"])
+  l:setAlignment(MultiLineLabel.CENTER)
+  l:setVerticalAlignment(MultiLineLabel.CENTER)
+  l:setLineWidth(240)
+  l:setWidth(240)
+  l:setHeight(200)
+  l:setBackgroundColor(dark)
+  menu:add(l, menu:getWidth() / 2 - l:getWidth() / 2, 50)
+
+  menu:addSmallButton(_("~!OK"), menu:getWidth() / 2 - 50, 248,
+    function() menu:stop() end)
+
+  menu:run(false)
+end
 
 function HandleEditorIngameCommandKey(key, ctrl, alt, shift)
   if ((key == "m" and alt) or key == "f10") then
@@ -226,6 +249,20 @@ function RunEditorPlayerPropertiesMenu()
 
   menu:addSmallButton(_("~!OK"), (500 - (106 * 2)) / 4, 270,
     function()
+      -- Check for at least 1 Person player type
+      local foundPlayer = false
+      for i=0,7 do
+        if (pt2[typeWidgets[i]:getSelected()] == 5) then
+          foundPlayer = true
+          break
+        end
+      end
+
+      if (foundPlayer == false) then
+        ErrorEditorMenu(_("Must have at least one Type set to Person"))
+        return
+      end
+
       for i=0,7 do
         Map.Info.PlayerType[i] = pt2[typeWidgets[i]:getSelected()]
         Players[i].AiName = "ai-" .. itypes[aiWidgets[i]:getSelected()]
