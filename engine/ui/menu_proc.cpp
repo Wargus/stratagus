@@ -58,11 +58,10 @@
 void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 	const std::string &text)
 {
-	std::string nc;
-	std::string rc;
+	std::string *nc;
+	std::string *rc;
 	std::string oldnc;
 	std::string oldrc;
-	int i;
 	ButtonStyleProperties *p;
 	ButtonStyleProperties *pimage;
 
@@ -98,11 +97,11 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 	//
 	if (!text.empty()) {
 		GetDefaultTextColors(oldnc, oldrc);
-		nc = !p->TextNormalColor.empty() ? p->TextNormalColor :
-			!style->TextNormalColor.empty() ? style->TextNormalColor : oldnc;
-		rc = !p->TextReverseColor.empty() ? p->TextReverseColor :
-			!style->TextReverseColor.empty() ? style->TextReverseColor : oldrc;
-		SetDefaultTextColors(nc, rc);
+		nc = !p->TextNormalColor.empty() ? &p->TextNormalColor :
+			!style->TextNormalColor.empty() ? &style->TextNormalColor : &oldnc;
+		rc = !p->TextReverseColor.empty() ? &p->TextReverseColor :
+			!style->TextReverseColor.empty() ? &style->TextReverseColor : &oldrc;
+		SetDefaultTextColors(*nc, *rc);
 
 		if (p->TextAlign == TextAlignCenter || p->TextAlign == TextAlignUndefined) {
 			VideoDrawTextCentered(x + p->TextX, y + p->TextY,
@@ -125,7 +124,7 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 			p->BorderColorRGB.r, p->BorderColorRGB.g, p->BorderColorRGB.b);
 	}
 	if (p->BorderSize) {
-		for (i = 0; i < p->BorderSize; ++i) {
+		for (int i = 0; i < p->BorderSize; ++i) {
 			Video.DrawRectangleClip(p->BorderColor, x - i, y - i,
 				style->Width + 2 * i, style->Height + 2 * i);
 		}
