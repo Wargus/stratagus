@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Fixed bug #29740: Map editor adds units even if dragging began in the sidebar (Jimmy Salmon)
 - Fixed bug #30164: Map editor doesn't close terrain file (Jimmy Salmon)
 - Fixed bug #30244: Crash with some map sizes in minimap (Francois Beerten)
 - Added Clover map (Michiel van der Wulp)
