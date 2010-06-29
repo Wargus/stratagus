@@ -629,27 +629,6 @@ static void RecalculateShownUnits(UnitFilterFunc filter)
 	Editor.SelectedUnitIndex = -1;
 }
 
-
-static MenuScreen *editAiMenu;
-static gcn::Label *editAiLabel;
-static gcn::CheckBox *editAiCheckBox;
-static gcn::Button *editAiOKButton;
-static gcn::Button *editAiCancelButton;
-
-static void CleanEditAi()
-{
-	delete editAiMenu;
-	editAiMenu = NULL;
-	delete editAiLabel;
-	editAiLabel = NULL;
-	delete editAiCheckBox;
-	editAiCheckBox = NULL;
-	delete editAiOKButton;
-	editAiOKButton = NULL;
-	delete editAiCancelButton;
-	editAiCancelButton = NULL;
-}
-
 /*----------------------------------------------------------------------------
 --  Display
 ----------------------------------------------------------------------------*/
@@ -2497,7 +2476,6 @@ void StartEditor(const std::string &filename)
 	CleanPatchIcons();
 	CleanGame();
 	CleanPlayers();
-	CleanEditAi();
 
 	SetDefaultTextColors(nc, rc);
 }
