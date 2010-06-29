@@ -1285,243 +1285,6 @@ static void EditorUpdateDisplay()
 ----------------------------------------------------------------------------*/
 
 /**
-**  Callback for input.
-*/
-static void EditorCallbackButtonUp(unsigned button)
-{
-	if (GameCursor == UI.Scroll.Cursor)
-	{
-		// Move map.
-		GameCursor = UI.Point.Cursor; // Reset
-		return;
-	}
-
-	if ((1 << button) == LeftButton && GameMenuButtonClicked)
-	{
-		GameMenuButtonClicked = false;
-		if (ButtonUnderCursor == ButtonUnderMenu)
-		{
-			if (UI.MenuButton.Callback)
-			{
-				UI.MenuButton.Callback->action("");
-			}
-		}
-	}
-	if ((1 << button) == LeftButton)
-	{
-		PatchPlacedThisPress = false;
-		UnitPlacedThisPress = false;
-	}
-}
-
-/**
-**  Called if mouse button pressed down.
-**
-**  @param button  Mouse button number (0 left, 1 middle, 2 right)
-*/
-static void EditorCallbackButtonDown(unsigned button)
-{
-	if ((button >> MouseHoldShift) != 0)
-	{
-		// Ignore repeated events when holding down a button
-		return;
-	}
-
-	//
-	// Click on menu button
-	//
-	if (CursorOn == CursorOnButton && ButtonAreaUnderCursor == ButtonAreaMenu &&
-		(MouseButtons & LeftButton) && !GameMenuButtonClicked)
-	{
-		PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-		GameMenuButtonClicked = true;
-		return;
-	}
-
-	//
-	// Click on minimap
-	//
-	if (CursorOn == CursorOnMinimap)
-	{
-		// enter move mini-mode
-		if (MouseButtons & LeftButton)
-		{
-			UI.SelectedViewport->Set(
-				UI.Minimap.Screen2MapX(CursorX) - UI.SelectedViewport->MapWidth / 2,
-				UI.Minimap.Screen2MapY(CursorY) - UI.SelectedViewport->MapHeight / 2,
-				TileSizeX / 2, TileSizeY / 2);
-		}
-		return;
-	}
-
-	//
-	// Click on mode area
-	//
-	if (CursorOn == CursorOnButton)
-	{
-		CursorBuilding = NULL;
-		switch (ButtonUnderCursor)
-		{
-			case SelectButton :
-				Editor.State = EditorSelecting;
-				Editor.ShowPatchOutlines = false;
-				editorUnitSlider->setVisible(false);
-				editorUnitDropDown->setVisible(false);
-				editorPatchSlider->setVisible(false);
-				return;
-			case UnitButton:
-				Editor.State = EditorEditUnit;
-				Editor.ShowPatchOutlines = false;
-				editorUnitSlider->setVisible(true);
-				editorUnitDropDown->setVisible(true);
-				editorPatchSlider->setVisible(false);
-
-				// DrawBuildingCursor doesn't draw blocked
-				// map fields correctly if ThisPlayer is
-				// a player whose type is PlayerNobody,
-				// because UnitCountSeen does not compute
-				// the visibility of units to such players.
-				ThisPlayer = Players + Editor.SelectedPlayer;
-				return;
-			case PatchButton :
-				if (EditorEditPatch)
-				{
-					Editor.State = EditorEditPatch;
-					Editor.ShowPatchOutlines = true;
-				}
-				editorUnitSlider->setVisible(false);
-				editorUnitDropDown->setVisible(false);
-				editorPatchSlider->setVisible(true);
-				return;
-			case StartButton:
-				Editor.State = EditorSetStartLocation;
-				Editor.ShowPatchOutlines = false;
-				editorUnitSlider->setVisible(false);
-				editorUnitDropDown->setVisible(false);
-				editorPatchSlider->setVisible(false);
-				return;
-			default:
-				break;
-		}
-	}
-	
-	//
-	// Click on player area
-	//
-	if (Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation)
-	{
-		// Cursor on player icons
-		if (Editor.CursorPlayer != -1)
-		{
-			if (Map.Info.PlayerType[Editor.CursorPlayer] != PlayerNobody)
-			{
-				Editor.SelectedPlayer = Editor.CursorPlayer;
-				ThisPlayer = Players + Editor.SelectedPlayer;
-			}
-			return;
-		}
-	}
-
-	//
-	// Click on unit area
-	//
-	if (Editor.State == EditorEditUnit)
-	{
-		// Cursor on unit icons
-		if (Editor.CursorUnitIndex != -1)
-		{
-			Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
-			CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
-			return;
-		}
-	}
-
-	//
-	// Click on patch area
-	//
-	if (Editor.State == EditorEditPatch)
-	{
-		// Cursor on patch icons
-		if (Editor.CursorPatchIndex != -1)
-		{
-			Editor.SelectedPatchIndex = Editor.CursorPatchIndex;
-			return;
-		}
-	}
-
-	//
-	// Click on map area
-	//
-	if (CursorOn == CursorOnMap)
-	{
-		// Check if the selected viewport changed
-		CViewport *vp = GetViewport(CursorX, CursorY);
-		if ((MouseButtons & LeftButton) && UI.SelectedViewport != vp)
-		{
-			UI.SelectedViewport = vp;
-		}
-
-		if (MouseButtons & LeftButton)
-		{
-			int cursorMapX = UI.MouseViewport->Viewport2MapX(CursorX);
-			int cursorMapY = UI.MouseViewport->Viewport2MapY(CursorY);
-
-			if (Editor.State == EditorSelecting)
-			{
-				// Nothing to do
-			}
-			else if (Editor.State == EditorEditPatch)
-			{
-				if (!PatchPlacedThisPress && Editor.SelectedPatchIndex != -1)
-				{
-					// Remove any patches under the new patch
-					const CPatchType *patchType = Editor.ShownPatchTypes[Editor.SelectedPatchIndex].PatchType;
-					EditorRemovePatches(cursorMapX, cursorMapY, patchType->getTileWidth(), patchType->getTileHeight());
-
-					// Create the new patch
-					EditorPlacePatch(cursorMapX, cursorMapY, patchType);
-					PatchPlacedThisPress = true;
-				}
-			}
-			else if (Editor.State == EditorEditUnit)
-			{
-				if (!UnitPlacedThisPress && CursorBuilding)
-				{
-					// Try to place a new unit
-					if (CanBuildUnitType(NULL, CursorBuilding, cursorMapX, cursorMapY, 1))
-					{
-						PlayGameSound(GameSounds.PlacementSuccess.Sound,
-							MaxSampleVolume);
-						EditorPlaceUnit(cursorMapX, cursorMapY,
-							CursorBuilding, Players + Editor.SelectedPlayer);
-						UnitPlacedThisPress = true;
-						UI.StatusLine.Clear();
-					}
-					else
-					{
-						UI.StatusLine.Set(_("Unit can't be placed here."));
-						PlayGameSound(GameSounds.PlacementError.Sound,
-							MaxSampleVolume);
-					}
-				}
-			}
-			else if (Editor.State == EditorSetStartLocation)
-			{
-				Players[Editor.SelectedPlayer].StartX = cursorMapX;
-				Players[Editor.SelectedPlayer].StartY = cursorMapY;
-			}
-		}
-		else if (MouseButtons & MiddleButton)
-		{
-			// enter move map mode
-			CursorStartX = CursorX;
-			CursorStartY = CursorY;
-			GameCursor = UI.Scroll.Cursor;
-		}
-	}
-}
-
-/**
 **  Handle key down.
 **
 **  @param key      Key scancode.
@@ -1718,63 +1481,68 @@ static void EditorCallbackMouse(int x, int y)
 		UnitPlacedThisPress = false;
 	}
 
-	//
-	// Dragging new units on map.
-	//
-	if (CursorOn == CursorOnMap &&
-		(MouseButtons & LeftButton) &&
-		Editor.State == EditorEditUnit &&
-		CursorBuilding)
+	// Dragging mouse
+	if ((MouseButtons & LeftButton) == LeftButton)
 	{
-		int moveX = 0;
-		int moveY = 0;
-
 		//
-		// Scroll the map
+		// Dragging new units on map.
 		//
-		if (CursorX <= UI.SelectedViewport->X)
-			moveX = -1;
-		else if (CursorX >= UI.SelectedViewport->EndX)
-			moveX = +1;
-		if (CursorY <= UI.SelectedViewport->Y)
-			moveY = -1;
-		else if (CursorY >= UI.SelectedViewport->EndY)
-			moveY = +1;
-
-		if (moveX != 0 || moveY != 0)
+		if (CursorOn == CursorOnMap &&
+			Editor.State == EditorEditUnit &&
+			CursorBuilding)
 		{
+			int moveX = 0;
+			int moveY = 0;
+
+			//
+			// Scroll the map
+			//
+			if (CursorX <= UI.SelectedViewport->X)
+				moveX = -1;
+			else if (CursorX >= UI.SelectedViewport->EndX)
+				moveX = +1;
+			if (CursorY <= UI.SelectedViewport->Y)
+				moveY = -1;
+			else if (CursorY >= UI.SelectedViewport->EndY)
+				moveY = +1;
+
+			if (moveX != 0 || moveY != 0)
+			{
+				UI.SelectedViewport->Set(
+					UI.SelectedViewport->MapX + moveX,
+					UI.SelectedViewport->MapY + moveY,
+					UI.SelectedViewport->OffsetX,
+					UI.SelectedViewport->OffsetY);
+			}
+
+			//
+			// Scroll the map, if cursor moves outside the viewport.
+			//
+			RestrictCursorToViewport();
+
+			if (!UnitPlacedThisPress &&
+				CanBuildUnitType(NULL, CursorBuilding, cursorMapX, cursorMapY, 1))
+			{
+				EditorPlaceUnit(cursorMapX, cursorMapY, CursorBuilding, Players + Editor.SelectedPlayer);
+				UnitPlacedThisPress = true;
+				UI.StatusLine.Clear();
+			}
+			return;
+		}
+
+		//
+		// Minimap move viewpoint
+		//
+		if (CursorOn == CursorOnMinimap)
+		{
+			RestrictCursorToMinimap();
 			UI.SelectedViewport->Set(
-				UI.SelectedViewport->MapX + moveX,
-				UI.SelectedViewport->MapY + moveY,
-				UI.SelectedViewport->OffsetX,
-				UI.SelectedViewport->OffsetY);
+				UI.Minimap.Screen2MapX(CursorX) - UI.SelectedViewport->MapWidth / 2,
+				UI.Minimap.Screen2MapY(CursorY) - UI.SelectedViewport->MapHeight / 2,
+				0, 0);
+			return;
 		}
 
-		//
-		// Scroll the map, if cursor moves outside the viewport.
-		//
-		RestrictCursorToViewport();
-
-		if (!UnitPlacedThisPress &&
-			CanBuildUnitType(NULL, CursorBuilding, cursorMapX, cursorMapY, 1))
-		{
-			EditorPlaceUnit(cursorMapX, cursorMapY, CursorBuilding, Players + Editor.SelectedPlayer);
-			UnitPlacedThisPress = true;
-			UI.StatusLine.Clear();
-		}
-		return;
-	}
-
-	//
-	// Minimap move viewpoint
-	//
-	if (CursorOn == CursorOnMinimap && (MouseButtons & LeftButton))
-	{
-		RestrictCursorToMinimap();
-		UI.SelectedViewport->Set(
-			UI.Minimap.Screen2MapX(CursorX) - UI.SelectedViewport->MapWidth / 2,
-			UI.Minimap.Screen2MapY(CursorY) - UI.SelectedViewport->MapHeight / 2,
-			0, 0);
 		return;
 	}
 
@@ -2058,6 +1826,244 @@ static void EditorCallbackMouse(int x, int y)
 	// Not reached if cursor is inside the scroll area
 
 	UI.StatusLine.Clear();
+}
+
+/**
+**  Callback for input.
+*/
+static void EditorCallbackButtonUp(unsigned button)
+{
+	if (GameCursor == UI.Scroll.Cursor)
+	{
+		// Move map.
+		GameCursor = UI.Point.Cursor; // Reset
+		return;
+	}
+
+	if ((1 << button) == LeftButton && GameMenuButtonClicked)
+	{
+		GameMenuButtonClicked = false;
+		if (ButtonUnderCursor == ButtonUnderMenu)
+		{
+			if (UI.MenuButton.Callback)
+			{
+				UI.MenuButton.Callback->action("");
+			}
+		}
+	}
+	if ((1 << button) == LeftButton)
+	{
+		PatchPlacedThisPress = false;
+		UnitPlacedThisPress = false;
+		EditorCallbackMouse(CursorX, CursorY);
+	}
+}
+
+/**
+**  Called if mouse button pressed down.
+**
+**  @param button  Mouse button number (0 left, 1 middle, 2 right)
+*/
+static void EditorCallbackButtonDown(unsigned button)
+{
+	if ((button >> MouseHoldShift) != 0)
+	{
+		// Ignore repeated events when holding down a button
+		return;
+	}
+
+	//
+	// Click on menu button
+	//
+	if (CursorOn == CursorOnButton && ButtonAreaUnderCursor == ButtonAreaMenu &&
+		(MouseButtons & LeftButton) && !GameMenuButtonClicked)
+	{
+		PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+		GameMenuButtonClicked = true;
+		return;
+	}
+
+	//
+	// Click on minimap
+	//
+	if (CursorOn == CursorOnMinimap)
+	{
+		// enter move mini-mode
+		if (MouseButtons & LeftButton)
+		{
+			UI.SelectedViewport->Set(
+				UI.Minimap.Screen2MapX(CursorX) - UI.SelectedViewport->MapWidth / 2,
+				UI.Minimap.Screen2MapY(CursorY) - UI.SelectedViewport->MapHeight / 2,
+				TileSizeX / 2, TileSizeY / 2);
+		}
+		return;
+	}
+
+	//
+	// Click on mode area
+	//
+	if (CursorOn == CursorOnButton)
+	{
+		CursorBuilding = NULL;
+		switch (ButtonUnderCursor)
+		{
+			case SelectButton :
+				Editor.State = EditorSelecting;
+				Editor.ShowPatchOutlines = false;
+				editorUnitSlider->setVisible(false);
+				editorUnitDropDown->setVisible(false);
+				editorPatchSlider->setVisible(false);
+				return;
+			case UnitButton:
+				Editor.State = EditorEditUnit;
+				Editor.ShowPatchOutlines = false;
+				editorUnitSlider->setVisible(true);
+				editorUnitDropDown->setVisible(true);
+				editorPatchSlider->setVisible(false);
+
+				// DrawBuildingCursor doesn't draw blocked
+				// map fields correctly if ThisPlayer is
+				// a player whose type is PlayerNobody,
+				// because UnitCountSeen does not compute
+				// the visibility of units to such players.
+				ThisPlayer = Players + Editor.SelectedPlayer;
+				return;
+			case PatchButton :
+				if (EditorEditPatch)
+				{
+					Editor.State = EditorEditPatch;
+					Editor.ShowPatchOutlines = true;
+				}
+				editorUnitSlider->setVisible(false);
+				editorUnitDropDown->setVisible(false);
+				editorPatchSlider->setVisible(true);
+				return;
+			case StartButton:
+				Editor.State = EditorSetStartLocation;
+				Editor.ShowPatchOutlines = false;
+				editorUnitSlider->setVisible(false);
+				editorUnitDropDown->setVisible(false);
+				editorPatchSlider->setVisible(false);
+				return;
+			default:
+				break;
+		}
+	}
+	
+	//
+	// Click on player area
+	//
+	if (Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation)
+	{
+		// Cursor on player icons
+		if (Editor.CursorPlayer != -1)
+		{
+			if (Map.Info.PlayerType[Editor.CursorPlayer] != PlayerNobody)
+			{
+				Editor.SelectedPlayer = Editor.CursorPlayer;
+				ThisPlayer = Players + Editor.SelectedPlayer;
+			}
+			return;
+		}
+	}
+
+	//
+	// Click on unit area
+	//
+	if (Editor.State == EditorEditUnit)
+	{
+		// Cursor on unit icons
+		if (Editor.CursorUnitIndex != -1)
+		{
+			Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
+			CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
+			return;
+		}
+	}
+
+	//
+	// Click on patch area
+	//
+	if (Editor.State == EditorEditPatch)
+	{
+		// Cursor on patch icons
+		if (Editor.CursorPatchIndex != -1)
+		{
+			Editor.SelectedPatchIndex = Editor.CursorPatchIndex;
+			return;
+		}
+	}
+
+	//
+	// Click on map area
+	//
+	if (CursorOn == CursorOnMap)
+	{
+		// Check if the selected viewport changed
+		CViewport *vp = GetViewport(CursorX, CursorY);
+		if ((MouseButtons & LeftButton) && UI.SelectedViewport != vp)
+		{
+			UI.SelectedViewport = vp;
+		}
+
+		if (MouseButtons & LeftButton)
+		{
+			int cursorMapX = UI.MouseViewport->Viewport2MapX(CursorX);
+			int cursorMapY = UI.MouseViewport->Viewport2MapY(CursorY);
+
+			if (Editor.State == EditorSelecting)
+			{
+				// Nothing to do
+			}
+			else if (Editor.State == EditorEditPatch)
+			{
+				if (!PatchPlacedThisPress && Editor.SelectedPatchIndex != -1)
+				{
+					// Remove any patches under the new patch
+					const CPatchType *patchType = Editor.ShownPatchTypes[Editor.SelectedPatchIndex].PatchType;
+					EditorRemovePatches(cursorMapX, cursorMapY, patchType->getTileWidth(), patchType->getTileHeight());
+
+					// Create the new patch
+					EditorPlacePatch(cursorMapX, cursorMapY, patchType);
+					PatchPlacedThisPress = true;
+				}
+			}
+			else if (Editor.State == EditorEditUnit)
+			{
+				if (!UnitPlacedThisPress && CursorBuilding)
+				{
+					// Try to place a new unit
+					if (CanBuildUnitType(NULL, CursorBuilding, cursorMapX, cursorMapY, 1))
+					{
+						PlayGameSound(GameSounds.PlacementSuccess.Sound,
+							MaxSampleVolume);
+						EditorPlaceUnit(cursorMapX, cursorMapY,
+							CursorBuilding, Players + Editor.SelectedPlayer);
+						UnitPlacedThisPress = true;
+						UI.StatusLine.Clear();
+					}
+					else
+					{
+						UI.StatusLine.Set(_("Unit can't be placed here."));
+						PlayGameSound(GameSounds.PlacementError.Sound,
+							MaxSampleVolume);
+					}
+				}
+			}
+			else if (Editor.State == EditorSetStartLocation)
+			{
+				Players[Editor.SelectedPlayer].StartX = cursorMapX;
+				Players[Editor.SelectedPlayer].StartY = cursorMapY;
+			}
+		}
+		else if (MouseButtons & MiddleButton)
+		{
+			// enter move map mode
+			CursorStartX = CursorX;
+			CursorStartY = CursorY;
+			GameCursor = UI.Scroll.Cursor;
+		}
+	}
 }
 
 /**
