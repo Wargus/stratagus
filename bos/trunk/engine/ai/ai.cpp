@@ -830,13 +830,6 @@ static void AiMoveUnitInTheWay(CUnit *unit)
 	int movablenb;
 
 	AiPlayer = unit->Player->Ai;
-
-	// No more than 1 move per cycle ( avoid stressing the pathfinder )
-	if (GameCycle == AiPlayer->LastCanNotMoveGameCycle)
-	{
-		return;
-	}
-
 	unittype = unit->Type;
 
 	ux0 = unit->X;
@@ -942,7 +935,6 @@ static void AiMoveUnitInTheWay(CUnit *unit)
 	{
 		i = SyncRand() % movablenb;
 		CommandMove(movableunits[i], movablepos[i][0], movablepos[i][1], FlushCommands);
-		AiPlayer->LastCanNotMoveGameCycle = GameCycle;
 	}
 }
 
@@ -953,43 +945,44 @@ static void AiMoveUnitInTheWay(CUnit *unit)
 */
 void AiCanNotMove(CUnit *unit)
 {
-	int gx, gy, gw, gh;
-	int minrange, maxrange;
-
 	AiPlayer = unit->Player->Ai;
 
-	if (unit->Orders[0]->Goal)
+	if (GameCycle >= AiPlayer->LastCanNotMoveGameCycle + CYCLES_PER_SECOND)
 	{
-		gw = unit->Orders[0]->Goal->Type->TileWidth;
-		gh = unit->Orders[0]->Goal->Type->TileHeight;
-		gx = unit->Orders[0]->Goal->X;
-		gy = unit->Orders[0]->Goal->Y;
-		maxrange = unit->Orders[0]->Range;
-		minrange = unit->Orders[0]->MinRange;
-	}
-	else
-	{
-		// Take care of non square goals :)
-		// If goal is non square, range states a non-existant goal rather
-		// than a tile.
-		gw = unit->Orders[0]->Width;
-		gh = unit->Orders[0]->Height;
-		maxrange = unit->Orders[0]->Range;
-		minrange = unit->Orders[0]->MinRange;
-		gx = unit->Orders[0]->X;
-		gy = unit->Orders[0]->Y;
-	}
+		int gx, gy, gw, gh;
+		int minrange, maxrange;
 
-	if (GameCycle != AiPlayer->LastCanNotMoveGameCycle)
-	{
+		if (unit->Orders[0]->Goal)
+		{
+			gw = unit->Orders[0]->Goal->Type->TileWidth;
+			gh = unit->Orders[0]->Goal->Type->TileHeight;
+			gx = unit->Orders[0]->Goal->X;
+			gy = unit->Orders[0]->Goal->Y;
+			maxrange = unit->Orders[0]->Range;
+			minrange = unit->Orders[0]->MinRange;
+		}
+		else
+		{
+			// Take care of non square goals :)
+			// If goal is non square, range states a non-existant goal rather
+			// than a tile.
+			gw = unit->Orders[0]->Width;
+			gh = unit->Orders[0]->Height;
+			maxrange = unit->Orders[0]->Range;
+			minrange = unit->Orders[0]->MinRange;
+			gx = unit->Orders[0]->X;
+			gy = unit->Orders[0]->Y;
+		}
+
 		if (unit->Type->UnitType == UnitTypeFly ||
 			PlaceReachable(unit, gx, gy, gw, gh, minrange, maxrange))
 		{
 			// Path probably closed by unit here
 			AiMoveUnitInTheWay(unit);
-			return;
 		}
 	}
+
+	AiPlayer->LastCanNotMoveGameCycle = GameCycle;
 }
 
 /**
