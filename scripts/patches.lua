@@ -1,6 +1,9 @@
 
-function patchType(name, file, tileWidth, tileHeight, flags)
-  return Map.PatchManager:newPatchType(name, file, tileWidth, tileHeight, flags)
+function patchType(name, file, tileWidth, tileHeight, flags, theme)
+  if (theme == nil) then
+    theme = ""
+  end
+  return Map.PatchManager:newPatchType(name, file, tileWidth, tileHeight, flags, theme)
 end
 
 function patch(name, x, y)
