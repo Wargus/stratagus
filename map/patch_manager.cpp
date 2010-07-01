@@ -9,7 +9,7 @@
 //
 /**@name minimap.cpp - The patch manager. */
 //
-//      (c) Copyright 2008 by Jimmy Salmon
+//      (c) Copyright 2008-2010 by Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -250,6 +250,35 @@ CPatchManager::getPatchTypeNamesUsingGraphic(
 	return names;
 }
 
+static bool themeCompare(const std::string &a, const std::string &b)
+{
+	return strcasecmp(a.c_str(), b.c_str()) < 0;
+}
+
+std::vector<std::string>
+CPatchManager::getPatchTypeThemes() const
+{
+	std::vector<std::string> themes;
+
+	// Get all themes
+	for (std::map<std::string, CPatchType *>::const_iterator i = this->patchTypesMap.begin(); i != this->patchTypesMap.end(); ++i) {
+		const std::string &theme = i->second->getTheme();
+		if (!theme.empty())
+		{
+			themes.push_back(theme);
+		}
+	}
+
+	// Sort
+	std::sort(themes.begin(), themes.end(), themeCompare);
+
+	// Remove duplicates
+	std::vector<std::string>::iterator it;
+	it = std::unique(themes.begin(), themes.end());
+	themes.resize(it - themes.begin());
+
+	return themes;
+}
 
 void
 CPatchManager::load()
@@ -312,14 +341,14 @@ CPatchManager::clear()
 
 CPatchType *
 CPatchManager::newPatchType(const std::string &name, const std::string &file,
-	int tileWidth, int tileHeight, int *flags)
+	int tileWidth, int tileHeight, int *flags, const std::string &theme)
 {
 	unsigned short *newFlags = new unsigned short[tileWidth * tileHeight];
 	for (int i = 0; i < tileWidth * tileHeight; ++i) {
 		newFlags[i] = flags[i];
 	}
 
-	CPatchType *patchType = newPatchType(name, file, tileWidth, tileHeight, newFlags);
+	CPatchType *patchType = newPatchType(name, file, tileWidth, tileHeight, newFlags, theme);
 
 	delete[] newFlags;
 	return patchType;
@@ -327,14 +356,14 @@ CPatchManager::newPatchType(const std::string &name, const std::string &file,
 
 CPatchType *
 CPatchManager::newPatchType(const std::string &name, const std::string &file,
-	int tileWidth, int tileHeight, unsigned short *flags)
+	int tileWidth, int tileHeight, unsigned short *flags, const std::string &theme)
 {
 	// Loading a game might redefine a patch, just ignore it
 	if (this->patchTypesMap[name] != NULL) {
 		return this->patchTypesMap[name];
 	}
 
-	CPatchType *patchType = new CPatchType(name, file, tileWidth, tileHeight, flags, !CclInConfigFile);
+	CPatchType *patchType = new CPatchType(name, file, tileWidth, tileHeight, flags, !CclInConfigFile, theme);
 	this->patchTypesMap[name] = patchType;
 
 	return patchType;

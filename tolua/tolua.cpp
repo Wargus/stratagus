@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on Mon Jun  7 22:44:05 2010.
+** Generated automatically by tolua++-1.0.92 on 06/30/10 19:16:35.
 */
 
 #ifndef __cplusplus
@@ -18174,7 +18174,8 @@ static int tolua_stratagus_CPatchManager_newPatchType00(lua_State* tolua_S)
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
      !tolua_istable(tolua_S,6,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_iscppstring(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,8,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18190,6 +18191,7 @@ static int tolua_stratagus_CPatchManager_newPatchType00(lua_State* tolua_S)
 #else
   int* flags = (int*) malloc((width*height)*sizeof(int));
 #endif
+  const std::string theme = ((const std::string)  tolua_tocppstring(tolua_S,7,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'newPatchType'", NULL);
 #endif
@@ -18206,10 +18208,11 @@ static int tolua_stratagus_CPatchManager_newPatchType00(lua_State* tolua_S)
    }
   }
   {
-   CPatchType* tolua_ret = (CPatchType*)  self->newPatchType(name,file,width,height,flags);
+   CPatchType* tolua_ret = (CPatchType*)  self->newPatchType(name,file,width,height,flags,theme);
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"CPatchType");
    tolua_pushcppstring(tolua_S,(const char*)name);
    tolua_pushcppstring(tolua_S,(const char*)file);
+   tolua_pushcppstring(tolua_S,(const char*)theme);
   }
   {
    int i;
@@ -18222,7 +18225,7 @@ static int tolua_stratagus_CPatchManager_newPatchType00(lua_State* tolua_S)
   free(flags);
 #endif
  }
- return 3;
+ return 4;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'newPatchType'.",&tolua_err);

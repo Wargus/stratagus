@@ -36,7 +36,7 @@ class CPatchManager
 	vector<string> getPatchTypeNamesUsingGraphic(std::string graphicFile) const;
 
 	CPatchType *newPatchType(const std::string &name, const std::string &file,
-		int width, int height, int flags[width*height]);
+		int width, int height, int flags[width*height], const std::string &theme);
 	bool computePatchSize(std::string graphicFile,
 		int *width = 0, int *height = 0) const;
 };

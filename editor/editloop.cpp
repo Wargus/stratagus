@@ -138,6 +138,8 @@ static gcn::Slider *editorUnitSlider;
 static gcn::DropDown *editorUnitDropDown;
 static StringListModel *editorUnitListModel;
 static gcn::Slider *editorPatchSlider;
+static gcn::DropDown *editorPatchDropDown;
+static StringListModel *editorPatchListModel;
 
 class EditorUnitSliderListener : public gcn::ActionListener
 {
@@ -225,6 +227,21 @@ public:
 };
 
 static EditorPatchSliderListener *editorPatchSliderListener;
+
+static void RecalculateShownPatches(const std::string &theme);
+
+class EditorPatchDropDownListener : public gcn::ActionListener
+{
+public:
+	virtual void action(const std::string &eventId)
+	{
+		int selected = editorPatchDropDown->getSelected();
+		const std::string &theme = selected != 0 ? editorPatchListModel->getElementAt(selected) : "";
+		RecalculateShownPatches(theme);
+	}
+};
+
+static EditorPatchDropDownListener *editorPatchDropDownListener;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -629,6 +646,31 @@ static void RecalculateShownUnits(UnitFilterFunc filter)
 	Editor.SelectedUnitIndex = -1;
 }
 
+/**
+**  Recalculate the shown patches.
+*/
+static void RecalculateShownPatches(const std::string &theme)
+{
+	Editor.ShownPatchTypes.clear();
+
+	for (std::map<std::string, CPatchIcon *>::iterator i = Editor.AllPatchTypes.begin(); i != Editor.AllPatchTypes.end(); ++i)
+	{
+		CPatchIcon *patchIcon = i->second;
+		if (theme.empty() || patchIcon->PatchType->getTheme() == theme)
+		{
+			Editor.ShownPatchTypes.push_back(patchIcon);
+		}
+	}
+
+	if (Editor.PatchIndex >= (int)Editor.ShownPatchTypes.size())
+	{
+		Editor.PatchIndex = Editor.ShownPatchTypes.size() / VisibleIcons * VisibleIcons;
+	}
+	// Quick & dirty make them invalid
+	Editor.CursorPatchIndex = -1;
+	Editor.SelectedPatchIndex = -1;
+}
+
 /*----------------------------------------------------------------------------
 --  Display
 ----------------------------------------------------------------------------*/
@@ -780,7 +822,7 @@ static void DrawPatchIcons()
 			{
 				break;
 			}
-			g = Editor.ShownPatchTypes[i].G;
+			g = Editor.ShownPatchTypes[i]->G;
 			g->DrawClip(x, y);
 
 			Video.DrawRectangleClip(ColorGray, x, y, IconWidth, IconHeight);
@@ -900,7 +942,7 @@ static void DrawMapCursor()
 			if (Editor.SelectedPatchIndex != -1)
 			{
 				// Draw an outline where the new patch would be placed
-				const CPatchType *patchType = Editor.ShownPatchTypes[Editor.SelectedPatchIndex].PatchType;
+				const CPatchType *patchType = Editor.ShownPatchTypes[Editor.SelectedPatchIndex]->PatchType;
 				PushClipping();
 				SetClipping(UI.MouseViewport->X, UI.MouseViewport->Y,
 					UI.MouseViewport->EndX, UI.MouseViewport->EndY);
@@ -1664,7 +1706,7 @@ static void EditorCallbackMouse(int x, int y)
 				if (bx < x && x < bx + IconWidth &&
 					by < y && y < by + IconHeight)
 				{
-					CPatchType *patchType = Editor.ShownPatchTypes[i].PatchType;
+					CPatchType *patchType = Editor.ShownPatchTypes[i]->PatchType;
 					std::ostringstream ostr;
 					ostr << patchType->getName() << " ("
 					     << patchType->getTileWidth() << "x"
@@ -1892,6 +1934,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				editorUnitSlider->setVisible(false);
 				editorUnitDropDown->setVisible(false);
 				editorPatchSlider->setVisible(false);
+				editorPatchDropDown->setVisible(false);
 				return;
 			case UnitButton:
 				Editor.State = EditorEditUnit;
@@ -1899,6 +1942,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				editorUnitSlider->setVisible(true);
 				editorUnitDropDown->setVisible(true);
 				editorPatchSlider->setVisible(false);
+				editorPatchDropDown->setVisible(false);
 
 				// DrawBuildingCursor doesn't draw blocked
 				// map fields correctly if ThisPlayer is
@@ -1916,6 +1960,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				editorUnitSlider->setVisible(false);
 				editorUnitDropDown->setVisible(false);
 				editorPatchSlider->setVisible(true);
+				editorPatchDropDown->setVisible(true);
 				return;
 			case StartButton:
 				Editor.State = EditorSetStartLocation;
@@ -1923,6 +1968,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				editorUnitSlider->setVisible(false);
 				editorUnitDropDown->setVisible(false);
 				editorPatchSlider->setVisible(false);
+				editorPatchDropDown->setVisible(false);
 				return;
 			default:
 				break;
@@ -1999,7 +2045,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				if (!PatchPlacedThisPress && Editor.SelectedPatchIndex != -1)
 				{
 					// Remove any patches under the new patch
-					const CPatchType *patchType = Editor.ShownPatchTypes[Editor.SelectedPatchIndex].PatchType;
+					const CPatchType *patchType = Editor.ShownPatchTypes[Editor.SelectedPatchIndex]->PatchType;
 					EditorRemovePatches(cursorMapX, cursorMapY, patchType->getTileWidth(), patchType->getTileHeight());
 
 					// Create the new patch
@@ -2082,8 +2128,7 @@ static void CreatePatchIcons()
 
 		g->Resize(IconWidth, IconHeight);
 
-		CPatchIcon patchIcon(patchType, g);
-		Editor.ShownPatchTypes.push_back(patchIcon);
+		Editor.AllPatchTypes[*i] = new CPatchIcon(patchType, g);
 	}
 }
 
@@ -2092,11 +2137,14 @@ static void CreatePatchIcons()
 */
 static void CleanPatchIcons()
 {
-	for (size_t i = 0; i < Editor.ShownPatchTypes.size(); ++i)
-	{
-		CGraphic::Free(Editor.ShownPatchTypes[i].G);
-	}
 	Editor.ShownPatchTypes.clear();
+
+	for (std::map<std::string, CPatchIcon *>::iterator i = Editor.AllPatchTypes.begin(); i != Editor.AllPatchTypes.end(); ++i)
+	{
+		CGraphic::Free(i->second->G);
+		delete i->second;
+	}
+	Editor.AllPatchTypes.clear();
 }
 
 /**
@@ -2207,6 +2255,7 @@ void CEditor::Init()
 	CreatePatchIcons();
 
 	RecalculateShownUnits(NULL);
+	RecalculateShownPatches("");
 
 	EditorUndoActions.clear();
 	EditorRedoActions.clear();
@@ -2270,6 +2319,7 @@ static void EditorMainLoop()
 	editorUnitSliderListener = new EditorUnitSliderListener();
 	editorUnitDropDownListener = new EditorUnitDropDownListener();
 	editorPatchSliderListener = new EditorPatchSliderListener();
+	editorPatchDropDownListener = new EditorPatchDropDownListener();
 
 	gcn::Color darkNoAlphaColor(38, 38, 78);
 	gcn::Color clearColor(200, 200, 120);
@@ -2305,9 +2355,28 @@ static void EditorMainLoop()
 	editorPatchSlider->setVisible(false);
 	editorPatchSlider->addActionListener(editorPatchSliderListener);
 
+	std::vector<std::string> themes = Map.PatchManager.getPatchTypeThemes();
+
+	editorPatchListModel = new StringListModel();
+	editorPatchListModel->add(_("All"));
+	for (size_t i = 0; i < themes.size(); ++i)
+	{
+		editorPatchListModel->add(themes[i]);
+	}
+
+	editorPatchDropDown = new gcn::DropDown();
+	editorPatchDropDown->setFont(GameFont);
+	editorPatchDropDown->setBaseColor(darkNoAlphaColor);
+	editorPatchDropDown->setForegroundColor(clearColor);
+	editorPatchDropDown->setBackgroundColor(darkNoAlphaColor);
+	editorPatchDropDown->setVisible(false);
+	editorPatchDropDown->addActionListener(editorPatchDropDownListener);
+	editorPatchDropDown->setListModel(editorPatchListModel);
+
 	editorContainer->add(editorUnitSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y + 4);
 	editorContainer->add(editorUnitDropDown, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 20);
 	editorContainer->add(editorPatchSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y + 4);
+	editorContainer->add(editorPatchDropDown, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 20);
 
 	UpdateMinimap = true;
 
@@ -2398,9 +2467,12 @@ static void EditorMainLoop()
 	delete editorUnitDropDownListener;
 	delete editorUnitListModel;
 	delete editorPatchSliderListener;
+	delete editorPatchDropDownListener;
+	delete editorPatchListModel;
 	delete editorUnitSlider;
 	delete editorUnitDropDown;
 	delete editorPatchSlider;
+	delete editorPatchDropDown;
 }
 
 /**
