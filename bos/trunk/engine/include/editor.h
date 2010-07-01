@@ -9,7 +9,7 @@
 //
 /**@name editor.h - The editor file. */
 //
-//      (c) Copyright 2002-2008 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2010 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -80,7 +80,8 @@ public:
 	std::vector<std::string> UnitTypes;             /// Sorted editor unit-type table.
 	std::vector<const CUnitType *> ShownUnitTypes;  /// Shown editor unit-type table.
 
-	std::vector<CPatchIcon> ShownPatchTypes;        /// Shown editor patch-type table.
+	std::vector<CPatchIcon *> ShownPatchTypes;         /// Shown editor patch-type table.
+	std::map<std::string, CPatchIcon *> AllPatchTypes; /// All editor patch-type table.
 
 	IconConfig Select;           /// Editor's select icon.
 	IconConfig Units;            /// Editor's units icon.

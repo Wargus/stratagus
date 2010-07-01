@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Added patch themes (Jimmy Salmon)
 - Fixed bug #30173: Map editor should require at least one player type to be a person (Jimmy Salmon)
 - Fixed bug #29740: Map editor adds units even if dragging began in the sidebar (Jimmy Salmon)
 - Fixed bug #30164: Map editor doesn't close terrain file (Jimmy Salmon)

@@ -9,7 +9,7 @@
 //
 /**@name patch_type.h - The patch type header. */
 //
-//      (c) Copyright 2008 by Jimmy Salmon
+//      (c) Copyright 2008-2010 by Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -40,8 +40,8 @@ public:
 	**  Patch type constructor
 	*/
 	CPatchType(const std::string &name, const std::string &file,
-	           int tileWidth, int tileHeight, unsigned short *flags, bool customPatch) :
-		name(name), file(file), graphic(NULL), tileWidth(tileWidth), tileHeight(tileHeight), customPatch(customPatch)
+	           int tileWidth, int tileHeight, unsigned short *flags, bool customPatch, const std::string &theme = "") :
+		name(name), file(file), graphic(NULL), tileWidth(tileWidth), tileHeight(tileHeight), customPatch(customPatch), theme(theme)
 	{
 		this->flags = new unsigned short[this->tileWidth * this->tileHeight];
 		memcpy(this->flags, flags, this->tileWidth * this->tileHeight * sizeof(unsigned short));
@@ -143,6 +143,11 @@ public:
 		return this->customPatch;
 	}
 
+	/**
+	**  Get the theme
+	*/
+	inline const std::string &getTheme() const { return this->theme; }
+
 private:
 	std::string name;
 	std::string file;
@@ -151,6 +156,7 @@ private:
 	int tileHeight;
 	unsigned short *flags;
 	bool customPatch;
+	std::string theme;
 };
 
 //@}

@@ -9,7 +9,7 @@
 //
 /**@name patch.h - The patch manager header. */
 //
-//      (c) Copyright 2008 by Jimmy Salmon
+//      (c) Copyright 2008-2010 by Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
 #include <list>
 #include <map>
 #include <vector>
+#include <string>
 
 class CPatchType;
 class CPatch;
@@ -100,6 +101,11 @@ public:
 		const std::string &graphicFile) const;
 
 	/**
+	**  Get all of the patch themes
+	*/
+	std::vector<std::string> getPatchTypeThemes() const;
+
+	/**
 	**  Load the patches used in the map
 	*/
 	void load();
@@ -119,14 +125,14 @@ public:
 	**  Types should be created only once and last for the duration of the game.
 	*/
 	CPatchType *newPatchType(const std::string &name, const std::string &file,
-		int tileWidth, int tileHeight, int *flags);
+		int tileWidth, int tileHeight, int *flags, const std::string &theme = "");
 
 	/**
 	**  Define a new patch type.
 	**  Types should be created only once and last for the duration of the game.
 	*/
 	CPatchType *newPatchType(const std::string &name, const std::string &file,
-		int tileWidth, int tileHeight, unsigned short *flags);
+		int tileWidth, int tileHeight, unsigned short *flags, const std::string &theme = "");
 
 	/**
 	**  Get a patch type
