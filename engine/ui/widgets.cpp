@@ -127,7 +127,9 @@ void initGuichan()
 */
 void freeGuichan() 
 {
-	delete Gui->getGraphics();
+	if (Gui) {
+		delete Gui->getGraphics();
+	}
 	delete Gui;
 	delete Input;
 
