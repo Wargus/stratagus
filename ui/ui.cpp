@@ -711,6 +711,8 @@ void SetLeaveStops(bool enabled)
 **  Set saved map position
 **
 **  @param index  Saved map position slot.
+**  @param x      X coordinate
+**  @param y      Y coordinate
 */
 void SetSavedMapPosition(int index, int x, int y)
 {
