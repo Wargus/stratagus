@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 06/30/10 19:16:35.
+** Generated automatically by tolua++-1.0.92 on 07/01/10 20:01:13.
 */
 
 #ifndef __cplusplus
@@ -16229,6 +16229,37 @@ static int tolua_set_CEditor_Running(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: TileSelectedPatch of class  CEditor */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CEditor_TileSelectedPatch00
+static int tolua_stratagus_CEditor_TileSelectedPatch00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"CEditor",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  CEditor* self = (CEditor*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'TileSelectedPatch'", NULL);
+#endif
+  {
+   self->TileSelectedPatch();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'TileSelectedPatch'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: SetEditorSelectIcon */
 #ifndef TOLUA_DISABLE_tolua_stratagus_SetEditorSelectIcon00
 static int tolua_stratagus_SetEditorSelectIcon00(lua_State* tolua_S)
@@ -20483,6 +20514,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"StartUnit",tolua_get_CEditor_StartUnit_ptr,NULL);
    tolua_variable(tolua_S,"ShowTerrainFlags",tolua_get_CEditor_ShowTerrainFlags,tolua_set_CEditor_ShowTerrainFlags);
    tolua_variable(tolua_S,"Running",tolua_get_CEditor_Running,tolua_set_CEditor_Running);
+   tolua_function(tolua_S,"TileSelectedPatch",tolua_stratagus_CEditor_TileSelectedPatch00);
   tolua_endmodule(tolua_S);
   tolua_function(tolua_S,"SetEditorSelectIcon",tolua_stratagus_SetEditorSelectIcon00);
   tolua_function(tolua_S,"SetEditorUnitsIcon",tolua_stratagus_SetEditorUnitsIcon00);

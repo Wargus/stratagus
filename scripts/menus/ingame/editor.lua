@@ -61,6 +61,8 @@ function HandleEditorIngameCommandKey(key, ctrl, alt, shift)
     RunEditorPlayerPropertiesMenu()
   elseif (key == "t" and not (ctrl or alt)) then
     Editor.ShowTerrainFlags = not Editor.ShowTerrainFlags
+  elseif (key == "t" and (ctrl and shift)) then
+    Editor:TileSelectedPatch()
   else
     return false
   end
