@@ -546,7 +546,7 @@ static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 			break;
 		case ButtonTrain:
 		case ButtonBuild:
-			res = true;
+			res = UnitIdAllowed(unit->Player, buttonaction->Value) != 0;
 			break;
 		case ButtonSpellCast:
 			res = SpellIsAvailable(unit->Player, buttonaction->Value);
