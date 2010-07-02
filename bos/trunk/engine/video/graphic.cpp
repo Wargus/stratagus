@@ -1131,6 +1131,12 @@ void CGraphic::Resize(int w, int h)
 		FreeSurface(&Surface);
 		FreeSurface(&SurfaceFlip);
 
+		if (UseOpenGL && Textures) {
+			glDeleteTextures(NumTextures, Textures);
+			delete[] Textures;
+			Textures = NULL;
+		}
+
 		this->Width = this->Height = 0;
 		this->Load();
 
@@ -1241,7 +1247,7 @@ void CGraphic::Resize(int w, int h)
 	Width = GraphicWidth = w;
 	Height = GraphicHeight = h;
 
-	if (UseOpenGL) {
+	if (UseOpenGL && Textures) {
 		glDeleteTextures(NumTextures, Textures);
 		delete[] Textures;
 		Textures = NULL;
