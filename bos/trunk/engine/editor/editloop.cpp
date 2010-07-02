@@ -471,6 +471,27 @@ static void EditorRemovePatches(int x, int y, int w, int h)
 	}
 }
 
+void CEditor::TileSelectedPatch()
+{
+	if (Editor.State == EditorEditPatch && Editor.SelectedPatchIndex != -1)
+	{
+		// Remove all patches
+		const CPatchType *patchType = Editor.ShownPatchTypes[Editor.SelectedPatchIndex]->PatchType;
+		EditorRemovePatches(0, 0, Map.Info.MapWidth, Map.Info.MapHeight);
+
+		// Create the new patches
+		for (int j = 0; j <= Map.Info.MapHeight - patchType->getTileHeight(); j += patchType->getTileHeight())
+		{
+			for (int i = 0; i <= Map.Info.MapWidth - patchType->getTileWidth(); i += patchType->getTileWidth())
+			{
+				EditorPlacePatch(i, j, patchType);
+			}
+		}
+
+		PatchPlacedThisPress = true;
+	}
+}
+
 /*----------------------------------------------------------------------------
 --  Undo/Redo
 ----------------------------------------------------------------------------*/

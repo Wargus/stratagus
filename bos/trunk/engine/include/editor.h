@@ -110,6 +110,8 @@ public:
 	EditorRunningType Running;   /// Editor is running
 
 	EditorStateType State;       /// Current editor state
+
+	void TileSelectedPatch();
 };
 
 /*----------------------------------------------------------------------------

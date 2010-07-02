@@ -13,6 +13,8 @@ class CEditor
 	const CUnitType *StartUnit;
 	bool ShowTerrainFlags;
 	EditorRunningType Running;
+
+	void TileSelectedPatch();
 };
 
 extern void SetEditorSelectIcon(const std::string &icon);
