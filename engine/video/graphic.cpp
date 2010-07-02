@@ -738,14 +738,18 @@ void CGraphic::Free(CGraphic *g)
 				}
 			}
 
-			Graphics.remove(g);
+			if (!Graphics.empty()) {
+				Graphics.remove(g);
+			}
 		}
 
 		FreeSurface(&g->Surface);
 		FreeSurface(&g->SurfaceFlip);
 
 		if (!g->HashFile.empty()) {
-			GraphicHash.erase(g->HashFile);
+			if (!GraphicHash.empty()) {
+				GraphicHash.erase(g->HashFile);
+			}
 		}
 		delete g;
 	}
