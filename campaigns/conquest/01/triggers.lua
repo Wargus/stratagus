@@ -12,19 +12,22 @@ AddTrigger(
   end,
   function()
     AddMessage("The outpost is now under your control.")
-    AddMessage("You must improve the defenses by building a gun turret.")
+    AddMessage("You must finish constructing the base by building a gun turret and a training camp.")
     SetObjectives("Build a gun turret")
+    SetObjectives("Build a training")
     DefineAllow("unit-engineer", AllowAll)
     DefineAllow("unit-gturret", AllowAll)
+    DefineAllow("unit-camp", AllowAll)
     return false
   end)
 
 AddTrigger(
   function()
-    return GetOwnUnitsAmount("unit-gturret") >= 1
+    return GetOwnUnitsAmount("unit-gturret") >= 1 and
+           GetOwnUnitsAmount("unit-camp") >= 1
   end,
   function()
-    AddMessage("")
+    AddMessage("Well done, the base is now operational.")
     delayedEnding = GameCycle + 400
     return false
   end)
