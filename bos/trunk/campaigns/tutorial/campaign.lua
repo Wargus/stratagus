@@ -31,7 +31,7 @@
 
 campaign_steps = {
   CreateMapStep("campaigns/tutorial/level01.smp",
-    "Investigate base E418.",
+    {"Investigate base E418."},
     "-- Incoming transmission from Central Command: --\n\n"..
     "We've received unconfirmed reports about an enemy attack on our "..
     "new base E418. We are no longer receiving radio transmissions so "..
@@ -40,7 +40,7 @@ campaign_steps = {
     "campaigns/tutorial/level01.wav"),
 --[[
   CreateMapStep("campaigns/tutorial/level02.smp",
-    "Train 2 engineers and build 1 power plant",
+    {"Train 2 engineers and build 1 power plant"},
     "News from the Front:\n\n"..
     "We finally arrived at our camp.\n"..
     "Despite the recent attacks, the vault is still "..
@@ -52,7 +52,7 @@ campaign_steps = {
     "for our base.\n"..
     "-- End of transmission 2. Sergeant TJ --"),
   CreateMapStep("campaigns/tutorial/level03.smp", 
-    "Harvest until you have 3000 energy and 1700 magma in storage",
+    {"Harvest until you have 3000 energy and 1700 magma in storage"},
     "News from the Front:\n\n"..
     "The abandoned vault has few resources left. "..
     "For the extension of the base, we need 200 "..

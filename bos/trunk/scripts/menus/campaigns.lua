@@ -32,18 +32,22 @@ function RunBriefingMenu(objectivestext, briefingtext, briefingsound, background
   local b
   local channel = nil
 
-  if objectivestext == nil then
-    SetObjectives(default_objective)
-    return
+  if (objectivestext == nil) then
+    objectivestext = default_objectives
+  end
+  SetObjectives(objectivestext)
+
+  local objText = ""
+  for i,f in ipairs(objectivestext) do
+    objText = objText .. f .. "\n"
   end
 
-  SetObjectives(objectivestext)
   menu = BosMenu(_("Briefing"), background)
   local text = briefingtext .. 
       "\n\n" ..
       _("Objectives:") ..
       "         \n" ..
-      objectivestext
+      objText
   local t= MultiLineLabel(text)
   t:setFont(Fonts["large"])
   t:setAlignment(MultiLineLabel.LEFT)
