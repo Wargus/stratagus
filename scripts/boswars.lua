@@ -244,6 +244,6 @@ Load("scripts/cheats.lua")
 Load("scripts/patches.lua")
 
 
-default_objective = _("Eliminate your enemies.")
+default_objectives = {_("Eliminate your enemies.")}
 
 DebugPrint("... ready!")

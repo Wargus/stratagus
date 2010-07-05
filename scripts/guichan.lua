@@ -434,11 +434,11 @@ function RunResultsMenu()
   menu:run()
 end
 
-function RunMap(map, objective, fow, revealmap)
-  if objective == nil then
-    SetObjectives(default_objective)
+function RunMap(map, objectives, fow, revealmap)
+  if (objectives == nil) then
+    SetObjectives(default_objectives)
   else
-    SetObjectives(objective)
+    SetObjectives(objectives)
   end
   loop = true
   while (loop) do
@@ -457,17 +457,13 @@ function RunMap(map, objective, fow, revealmap)
   RunResultsMenu()
 end
 
-current_objectives = ""
+current_objectives = {}
 function ClearObjectives()
-  current_objectives = ""
+  current_objectives = {}
 end
 
 function AddObjective(objective)
-  if (current_objectives ~= "") then
-    current_objectives = current_objective .. "\n" .. objective
-  else
-    current_objectives = objective
-  end
+  current_objectives:insert(objective)
 end
 
 function SetObjectives(objectives)
