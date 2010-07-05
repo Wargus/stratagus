@@ -463,7 +463,7 @@ function ClearObjectives()
 end
 
 function AddObjective(objective)
-  current_objectives:insert(objective)
+  table.insert(current_objectives, objective)
 end
 
 function SetObjectives(objectives)
