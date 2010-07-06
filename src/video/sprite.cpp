@@ -186,16 +186,16 @@ void DrawTexture(const CGraphic *g, GLuint *textures,
 #ifdef USE_GLES
 			float texCoord[] = {
 				clip_tx_beg, clip_ty_beg,
+				clip_tx_end, clip_ty_beg,
 				clip_tx_beg, clip_ty_end,
-				clip_tx_end, clip_ty_end,
-				clip_tx_end, clip_ty_beg
+				clip_tx_end, clip_ty_end
 			};
 
 			float vertex[] = {
-				clip_sx_beg, clip_sy_beg,
-				clip_sx_beg, clip_sy_end,
-				clip_sx_end, clip_sy_end,
-				clip_sx_end, clip_sy_beg
+				2.0f/(GLfloat)Video.Width*clip_sx_beg-1.0f, -2.0f/(GLfloat)Video.Height*clip_sy_beg+1.0f,
+				2.0f/(GLfloat)Video.Width*clip_sx_end-1.0f, -2.0f/(GLfloat)Video.Height*clip_sy_beg+1.0f,
+				2.0f/(GLfloat)Video.Width*clip_sx_beg-1.0f, -2.0f/(GLfloat)Video.Height*clip_sy_end+1.0f,
+				2.0f/(GLfloat)Video.Width*clip_sx_end-1.0f, -2.0f/(GLfloat)Video.Height*clip_sy_end+1.0f
 			};
 
 			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -204,7 +204,6 @@ void DrawTexture(const CGraphic *g, GLuint *textures,
 			glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
 			glVertexPointer(2, GL_FLOAT, 0, vertex);
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-			SDL_GLES_SwapBuffers();
 
 			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 			glDisableClientState(GL_VERTEX_ARRAY);

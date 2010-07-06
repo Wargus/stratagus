@@ -991,14 +991,13 @@ void DrawPixel(Uint32 color, int x, int y)
 	glColor4ub(r, g, b, a);
 #ifdef USE_GLES
 	float vertex[] = {
-		x, y,
+		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*y+1.0f
 	};
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	
 	glVertexPointer(2, GL_FLOAT, 0, vertex);
 	glDrawArrays(GL_POINTS, 0, 1);
-	SDL_GLES_SwapBuffers();
 	
 	glDisableClientState(GL_VERTEX_ARRAY);
 #else
@@ -1077,15 +1076,14 @@ void DrawHLine(Uint32 color, int x, int y, int width)
 	glColor4ub(r, g, b, a);
 #ifdef USE_GLES
 	float vertex[] = {
-		x, y,
-		x + width, y
+		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*y+1.0f,
+		2.0f/(GLfloat)Video.Width*(x+width)-1.0f, -2.0f/(GLfloat)Video.Height*y+1.0f
 	};
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	
 	glVertexPointer(2, GL_FLOAT, 0, vertex);
 	glDrawArrays(GL_LINES, 0, 2);
-	SDL_GLES_SwapBuffers();
 	
 	glDisableClientState(GL_VERTEX_ARRAY);
 #else
@@ -1182,15 +1180,14 @@ void DrawVLine(Uint32 color, int x, int y, int height)
 	glColor4ub(r, g, b, a);
 #ifdef USE_GLES
 	float vertex[] = {
-		x, y,
-		x, y + height
+		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*y+1.0f,
+		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*(y+height)+1.0f
 	};
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	
 	glVertexPointer(2, GL_FLOAT, 0, vertex);
 	glDrawArrays(GL_LINES, 0, 2);
-	SDL_GLES_SwapBuffers();
 	
 	glDisableClientState(GL_VERTEX_ARRAY);
 #else
@@ -1305,15 +1302,14 @@ void DrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 	glColor4ub(r, g, b, a);
 #ifdef USE_GLES
 	float vertex[] = {
-		xx1, yy1,
-		xx1, yy2
+		2.0f/(GLfloat)Video.Width*xx1-1.0f, -2.0f/(GLfloat)Video.Height*yy1+1.0f,
+		2.0f/(GLfloat)Video.Width*xx2-1.0f, -2.0f/(GLfloat)Video.Height*yy2+1.0f
 	};
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	
 	glVertexPointer(2, GL_FLOAT, 0, vertex);
 	glDrawArrays(GL_LINES, 0, 2);
-	SDL_GLES_SwapBuffers();
 	
 	glDisableClientState(GL_VERTEX_ARRAY);
 #else
@@ -1475,21 +1471,20 @@ void DrawRectangle(Uint32 color, int x, int y, int w, int h)
 	glColor4ub(r, g, b, a);
 #ifdef USE_GLES
 	float vertex[] = {
-		x, y,
-		x + w, y,
-		x + w - 1, y + 1,
-		x + w - 1, y + h,
-		x + w - 1, y + h - 1,
-		x, y + h - 1,
-		x, y + h - 1,
-		x, y + 1
+		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*y+1.0f,
+		2.0f/(GLfloat)Video.Width*(x+w)-1.0f, -2.0f/(GLfloat)Video.Height*y+1.0f,
+		2.0f/(GLfloat)Video.Width*(x+w-1)-1.0f, -2.0f/(GLfloat)Video.Height*(y+1)+1.0f,
+		2.0f/(GLfloat)Video.Width*(x+w-1)-1.0f, -2.0f/(GLfloat)Video.Height*(y+h)+1.0f,
+		2.0f/(GLfloat)Video.Width*(x+w-1)-1.0f, -2.0f/(GLfloat)Video.Height*(y+h-1)+1.0f,
+		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*(y+h-1)+1.0f,
+		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*(y+h-1)+1.0f,
+		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*(y+1)+1.0f
 	};
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	
 	glVertexPointer(2, GL_FLOAT, 0, vertex);
 	glDrawArrays(GL_LINES, 0, 8);
-	SDL_GLES_SwapBuffers();
 	
 	glDisableClientState(GL_VERTEX_ARRAY);
 #else
@@ -1654,17 +1649,16 @@ void FillRectangle(Uint32 color, int x, int y,
 	glColor4ub(r, g, b, a);
 #ifdef USE_GLES
 	float vertex[] = {
-		x, y,
-		x + w, y,
-		x, y + h,
-		x + w, y + h
+		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*y+1.0f,
+		2.0f/(GLfloat)Video.Width*(x+w)-1.0f, -2.0f/(GLfloat)Video.Height*y+1.0f,
+		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*(y+h)+1.0f,
+		2.0f/(GLfloat)Video.Width*(x+w)-1.0f, -2.0f/(GLfloat)Video.Height*(y+h)+1.0f
 	};
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	
 	glVertexPointer(2, GL_FLOAT, 0, vertex);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	SDL_GLES_SwapBuffers();
 	
 	glDisableClientState(GL_VERTEX_ARRAY);
 #else

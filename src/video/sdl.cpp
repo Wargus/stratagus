@@ -251,24 +251,34 @@ static void InitOpenGL(void)
 
 	InitOpenGLExtensions();
 
-#ifdef USE_GLES
-	glOrthof(0, Video.Width, Video.Height, 0, -1, 1);
-#else
 	glViewport(0, 0, (GLsizei)Video.Width, (GLsizei)Video.Height);
+	
+#ifndef USE_GLES
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
+#endif
+	
+#ifdef USE_GLES
+	glOrthof(0.0f, (GLfloat)Video.Width, (GLfloat)Video.Height, 0.0f, -1.0f, 1.0f);
+#else
 	glOrtho(0, Video.Width, Video.Height, 0, -1, 1);
 #endif
+	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+	
+#ifndef USE_GLES
 	glTranslatef(0.375, 0.375, 0.);
-
+#endif
+	
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	
 #ifdef USE_GLES
 	glClearDepthf(1.0f);
 #else
 	glClearDepth(1.0f);
 #endif
+	
 	glShadeModel(GL_FLAT);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
@@ -472,6 +482,10 @@ void InitVideoSdl(void)
 			fprintf(stderr, "Couldn't initialize SDL_GLES: %s\n", SDL_GetError());
 			exit(1);
 		}
+		
+		// Clean up GLES on exit
+		atexit(SDL_GLES_Quit);
+		
 		flags |= SDL_SWSURFACE;
 #else
 		flags |= SDL_OPENGL;
@@ -519,6 +533,7 @@ void InitVideoSdl(void)
 			fprintf(stderr, "Couldn't initialize SDL_GLES_MakeCurrent: %s\n", SDL_GetError());
 			exit(1);
 		}
+//		atexit(GLES_DeleteContext(context));
 #endif
 		InitOpenGL();
 	}
@@ -821,7 +836,11 @@ void WaitEventsOneFrame()
 void RealizeVideoMemory(void)
 {
 	if (UseOpenGL) {
+#ifdef USE_GLES
+		SDL_GLES_SwapBuffers();
+#else
 		SDL_GL_SwapBuffers();
+#endif
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	} else {
 		if (NumRects) {

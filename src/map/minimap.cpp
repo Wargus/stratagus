@@ -638,16 +638,16 @@ void CMinimap::Draw(int vx, int vy)
 #ifdef USE_GLES
 		float texCoord[] = {
 			0.0f, 0.0f,
+			(float)W / MinimapTextureWidth, 0.0f,
 			0.0f, (float)H / MinimapTextureHeight,
-			(float)W / MinimapTextureWidth, (float)H / MinimapTextureHeight,
-			(float)W / MinimapTextureWidth, 0.0f
+			(float)W / MinimapTextureWidth, (float)H / MinimapTextureHeight
 		};
 
 		float vertex[] = {
-			X, Y,
-			X, Y + H,
-			X + W, Y + H,
-			X + W, Y
+			2.0f/(GLfloat)Video.Width*X-1.0f, -2.0f/(GLfloat)Video.Height*Y+1.0f,
+			2.0f/(GLfloat)Video.Width*(X+W)-1.0f, -2.0f/(GLfloat)Video.Height*Y+1.0f,
+			2.0f/(GLfloat)Video.Width*X-1.0f, -2.0f/(GLfloat)Video.Height*(Y+H)+1.0f,
+			2.0f/(GLfloat)Video.Width*(X+W)-1.0f, -2.0f/(GLfloat)Video.Height*(Y+H)+1.0f
 		};
 
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -656,7 +656,6 @@ void CMinimap::Draw(int vx, int vy)
 		glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
 		glVertexPointer(2, GL_FLOAT, 0, vertex);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		SDL_GLES_SwapBuffers();
 
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);
