@@ -780,7 +780,8 @@ function RunEditorLoadMenu()
   menu:writeText(_("Size:"), sx, sy*3+70)
   local mapsize = menu:writeText("       ", sx+70, sy*3+70)
   menu:writeText(_("Description:"), sx, sy*3+90)
-  local descr = menu:writeText("                                        ", sx+20, sy*3+110)
+  local descr = menu:writeText("No map", sx+20, sy*3+110)
+  descr:setWidth(sx * 9 - 20 - 20)
 
   local OldPresentMap = PresentMap
   PresentMap = function(description, nplayers, w, h, id)
