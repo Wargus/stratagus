@@ -118,6 +118,7 @@ enum EditorActionType
 struct EditorAction
 {
 	EditorActionType Type;
+	bool IsFirstOfGroup;
 	int X;
 	int Y;
 	CUnitType *UnitType;
@@ -128,8 +129,8 @@ struct EditorAction
 static std::deque<EditorAction> EditorUndoActions;
 static std::deque<EditorAction> EditorRedoActions;
 
-static void EditorUndoAction();
-static void EditorRedoAction();
+static void EditorUndoAction(const EditorAction &);
+static void EditorRedoAction(const EditorAction &);
 static void EditorAddUndoAction(EditorAction action);
 
 extern gcn::Gui *Gui;
@@ -367,6 +368,7 @@ static void EditorPlaceUnit(int x, int y, CUnitType *type, CPlayer *player)
 {
 	EditorAction editorAction;
 	editorAction.Type = EditorActionTypePlaceUnit;
+	editorAction.IsFirstOfGroup = true;
 	editorAction.X = x;
 	editorAction.Y = y;
 	editorAction.UnitType = type;
@@ -396,6 +398,7 @@ static void EditorRemoveUnit(CUnit *unit)
 {
 	EditorAction editorAction;
 	editorAction.Type = EditorActionTypeRemoveUnit;
+	editorAction.IsFirstOfGroup = true;
 	editorAction.X = unit->X;
 	editorAction.Y = unit->Y;
 	editorAction.UnitType = unit->Type;
@@ -417,13 +420,17 @@ static void EditorActionPlacePatch(int x, int y, const CPatchType *patchType)
 /**
 **  Place a patch
 */
-static void EditorPlacePatch(int x, int y, const CPatchType *patchType)
+static void EditorPlacePatch(int x, int y, const CPatchType *patchType,
+			     bool *isFirstOfGroup)
 {
 	EditorAction editorAction;
 	editorAction.Type = EditorActionTypePlacePatch;
+	editorAction.IsFirstOfGroup = *isFirstOfGroup;
 	editorAction.X = x;
 	editorAction.Y = y;
 	editorAction.PatchType = patchType;
+
+	*isFirstOfGroup = false;
 
 	EditorActionPlacePatch(x, y, patchType);
 	EditorAddUndoAction(editorAction);
@@ -441,13 +448,16 @@ static void EditorActionRemovePatch(CPatch *patch)
 /**
 **  Remove a patch
 */
-static void EditorRemovePatch(CPatch *patch)
+static void EditorRemovePatch(CPatch *patch, bool *isFirstOfGroup)
 {
 	EditorAction editorAction;
 	editorAction.Type = EditorActionTypeRemovePatch;
+	editorAction.IsFirstOfGroup = *isFirstOfGroup;
 	editorAction.X = patch->getX();
 	editorAction.Y = patch->getY();
 	editorAction.PatchType = patch->getType();
+
+	*isFirstOfGroup = false;
 
 	EditorActionRemovePatch(patch);
 	EditorAddUndoAction(editorAction);
@@ -456,7 +466,8 @@ static void EditorRemovePatch(CPatch *patch)
 /**
 **  Remove all patches at a location
 */
-static void EditorRemovePatches(int x, int y, int w, int h)
+static void EditorRemovePatches(int x, int y, int w, int h,
+				bool *isFirstOfGroup)
 {
 	for (int i = 0; i < w; ++i)
 	{
@@ -465,7 +476,7 @@ static void EditorRemovePatches(int x, int y, int w, int h)
 			CPatch *patch = Map.PatchManager.getPatch(x + i, y + j);
 			if (patch)
 			{
-				EditorRemovePatch(patch);
+				EditorRemovePatch(patch, isFirstOfGroup);
 			}
 		}
 	}
@@ -473,18 +484,22 @@ static void EditorRemovePatches(int x, int y, int w, int h)
 
 void CEditor::TileSelectedPatch()
 {
+	bool isFirstOfGroup = true;
+
 	if (Editor.State == EditorEditPatch && Editor.SelectedPatchIndex != -1)
 	{
 		// Remove all patches
 		const CPatchType *patchType = Editor.ShownPatchTypes[Editor.SelectedPatchIndex]->PatchType;
-		EditorRemovePatches(0, 0, Map.Info.MapWidth, Map.Info.MapHeight);
+		EditorRemovePatches(0, 0, Map.Info.MapWidth, Map.Info.MapHeight,
+				    &isFirstOfGroup);
 
 		// Create the new patches
 		for (int j = 0; j <= Map.Info.MapHeight - patchType->getTileHeight(); j += patchType->getTileHeight())
 		{
 			for (int i = 0; i <= Map.Info.MapWidth - patchType->getTileWidth(); i += patchType->getTileWidth())
 			{
-				EditorPlacePatch(i, j, patchType);
+				EditorPlacePatch(i, j, patchType,
+						 &isFirstOfGroup);
 			}
 		}
 
@@ -496,82 +511,115 @@ void CEditor::TileSelectedPatch()
 --  Undo/Redo
 ----------------------------------------------------------------------------*/
 
-static void EditorUndoAction()
+static void EditorUndoAction(const EditorAction &action)
+{
+	switch (action.Type)
+	{
+		case EditorActionTypePlaceUnit:
+		{
+			CUnit *unit = UnitOnMapTile(action.X, action.Y, action.UnitType->UnitType);
+			EditorActionRemoveUnit(unit);
+			break;
+		}
+
+		case EditorActionTypeRemoveUnit:
+			EditorActionPlaceUnit(action.X, action.Y, action.UnitType, action.Player);
+			break;
+
+		case EditorActionTypePlacePatch:
+		{
+			CPatch *patch = Map.PatchManager.getPatch(action.X, action.Y);
+			Assert(patch->getType() == action.PatchType);
+			EditorActionRemovePatch(patch);
+			break;
+		}
+
+		case EditorActionTypeRemovePatch:
+			EditorActionPlacePatch(action.X, action.Y, action.PatchType);
+			break;
+	}
+}
+
+static void EditorUndoGroup()
 {
 	if (EditorUndoActions.empty())
 	{
 		return;
 	}
 
-	EditorAction action = EditorUndoActions.back();
-	EditorUndoActions.pop_back();
+	// If the oldest undo group is not properly tagged, detect
+	// that bug before popping the actions off the queue, so that
+	// it is easier to debug.  In release builds, this assertion
+	// does not run, and the EditorUndoActions.empty() check in
+	// the loop instead prevents crashes.
+	Assert(EditorUndoActions.front().IsFirstOfGroup);
 
+	EditorAction action;
+	do
+	{
+		action = EditorUndoActions.back();
+		EditorUndoActions.pop_back();
+		EditorUndoAction(action);
+		EditorRedoActions.push_back(action);
+	}
+	while (!action.IsFirstOfGroup && !EditorUndoActions.empty());
+}
+
+static void EditorRedoAction(const EditorAction &action)
+{
 	switch (action.Type)
 	{
 		case EditorActionTypePlaceUnit:
+			EditorActionPlaceUnit(action.X, action.Y, action.UnitType, action.Player);
+			break;
+
+		case EditorActionTypeRemoveUnit:
 		{
 			CUnit *unit = UnitOnMapTile(action.X, action.Y, action.UnitType->UnitType);
 			EditorActionRemoveUnit(unit);
 			break;
 		}
 
-		case EditorActionTypeRemoveUnit:
-			EditorActionPlaceUnit(action.X, action.Y, action.UnitType, action.Player);
+		case EditorActionTypePlacePatch:
+			EditorActionPlacePatch(action.X, action.Y, action.PatchType);
 			break;
 
-		case EditorActionTypePlacePatch:
+		case EditorActionTypeRemovePatch:
 		{
 			CPatch *patch = Map.PatchManager.getPatch(action.X, action.Y);
 			Assert(patch->getType() == action.PatchType);
 			EditorActionRemovePatch(patch);
 			break;
 		}
-
-		case EditorActionTypeRemovePatch:
-			EditorActionPlacePatch(action.X, action.Y, action.PatchType);
-			break;
 	}
-
-	EditorRedoActions.push_back(action);
 }
 
-static void EditorRedoAction()
+static void EditorRedoGroup()
 {
 	if (EditorRedoActions.empty())
 	{
 		return;
 	}
 
-	EditorAction action = EditorRedoActions.back();
-	EditorRedoActions.pop_back();
+	// Because moving the actions from EditorUndoActions to
+	// EditorRedoActions reverses their sequence but does not
+	// alter the IsFirstOfGroup flags, the flagged action is the
+	// last one pushed to the back of EditorRedoActions and the
+	// first one to be popped from there.  The following assertion
+	// and loop thus differ from the ones in EditorUndoGroup().
 
-	switch (action.Type)
+	Assert(EditorRedoActions.back().IsFirstOfGroup);
+
+	EditorAction action;
+	do
 	{
-		case EditorActionTypePlaceUnit:
-			EditorActionPlaceUnit(action.X, action.Y, action.UnitType, action.Player);
-			break;
-
-		case EditorActionTypeRemoveUnit:
-		{
-			CUnit *unit = UnitOnMapTile(action.X, action.Y, action.UnitType->UnitType);
-			EditorActionRemoveUnit(unit);
-			break;
-		}
-
-		case EditorActionTypePlacePatch:
-			EditorActionPlacePatch(action.X, action.Y, action.PatchType);
-			break;
-
-		case EditorActionTypeRemovePatch:
-		{
-			CPatch *patch = Map.PatchManager.getPatch(action.X, action.Y);
-			Assert(patch->getType() == action.PatchType);
-			EditorActionRemovePatch(patch);
-			break;
-		}
+		action = EditorRedoActions.back();
+		EditorRedoActions.pop_back();
+		EditorRedoAction(action);
+		EditorUndoActions.push_back(action);
 	}
-
-	EditorUndoActions.push_back(action);
+	while (!EditorRedoActions.empty()
+	       && !EditorRedoActions.back().IsFirstOfGroup);
 }
 
 static void EditorAddUndoAction(EditorAction action)
@@ -1370,13 +1418,13 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case 'z':
 			if (KeyModifiers & ModifierControl)
 			{
-				EditorUndoAction();
+				EditorUndoGroup();
 			}
 			break;
 		case 'y':
 			if (KeyModifiers & ModifierControl)
 			{
-				EditorRedoAction();
+				EditorRedoGroup();
 			}
 			break;
 
@@ -1384,7 +1432,8 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case SDLK_DELETE:
 			if (Editor.State != EditorEditUnit && PatchUnderCursor)
 			{
-				EditorRemovePatch(PatchUnderCursor);
+				bool isFirstOfGroup = true;
+				EditorRemovePatch(PatchUnderCursor, &isFirstOfGroup);
 				UI.StatusLine.Set(_("Patch deleted"));
 			}
 			else if (Editor.State != EditorEditPatch && UnitUnderCursor)
@@ -1474,13 +1523,13 @@ static void EditorCallbackKeyRepeated(unsigned key, unsigned keychar)
 		case 'z':
 			if (KeyModifiers & ModifierControl)
 			{
-				EditorUndoAction();
+				EditorUndoGroup();
 			}
 			break;
 		case 'y':
 			if (KeyModifiers & ModifierControl)
 			{
-				EditorRedoAction();
+				EditorRedoGroup();
 			}
 			break;
 	}
@@ -2067,10 +2116,13 @@ static void EditorCallbackButtonDown(unsigned button)
 				{
 					// Remove any patches under the new patch
 					const CPatchType *patchType = Editor.ShownPatchTypes[Editor.SelectedPatchIndex]->PatchType;
-					EditorRemovePatches(cursorMapX, cursorMapY, patchType->getTileWidth(), patchType->getTileHeight());
+					bool isFirstOfGroup = true;
+					EditorRemovePatches(cursorMapX, cursorMapY, patchType->getTileWidth(), patchType->getTileHeight(),
+							    &isFirstOfGroup);
 
 					// Create the new patch
-					EditorPlacePatch(cursorMapX, cursorMapY, patchType);
+					EditorPlacePatch(cursorMapX, cursorMapY, patchType,
+							 &isFirstOfGroup);
 					PatchPlacedThisPress = true;
 				}
 			}
