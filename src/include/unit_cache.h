@@ -37,6 +37,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <stdio.h>
 
 /*----------------------------------------------------------------------------
 --  Declarations

@@ -249,7 +249,7 @@ std::string LocalPlayerName;         /// Name of local player
 
 	/// Name, Version, Copyright
 const char NameLine[] =
-	"Stratagus V" VERSION ", (c) 1998-2008 by The Stratagus Project.";
+	"Stratagus V" VERSION ", (c) 1998-2010 by The Stratagus Project.";
 
 std::string CliMapName;          /// Filename of the map given on the command line
 std::string CompileOptions;          /// Compile options.
