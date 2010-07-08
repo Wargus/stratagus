@@ -725,6 +725,10 @@ void SaveTriggers(CFile *file)
 	int i;
 	int triggers;
 
+	file->printf("\n--- -----------------------------------------\n");
+	file->printf("--- MODULE: triggers\n");
+
+	file->printf("\n");
 	lua_pushstring(Lua, "_triggers_");
 	lua_gettable(Lua, LUA_GLOBALSINDEX);
 	triggers = lua_objlen(Lua, -1);
@@ -753,6 +757,10 @@ void SaveTriggers(CFile *file)
 			file->printf("ActionStartTimer()\n");
 		}
 	}
+
+	file->printf("\n");
+	file->printf("if (Triggers ~= nil) then assert(loadstring(Triggers))() end\n");
+	file->printf("\n");
 }
 
 /**

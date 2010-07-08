@@ -152,13 +152,13 @@ void SaveGame(const std::string &filename)
 	SaveSelections(&file);
 	SaveGroups(&file);
 	SaveMissiles(&file);
-	SaveTriggers(&file);
 	SaveReplayList(&file);
 	// FIXME: find all state information which must be saved.
 	s = SaveGlobal(Lua, true);
 	if (!s.empty()) {
 		file.printf("-- Lua state\n\n %s\n", s.c_str());
 	}
+	SaveTriggers(&file); //Triggers are saved in SaveGlobal, so load it after Global
 	file.close();
 }
 

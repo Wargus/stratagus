@@ -317,6 +317,10 @@ static void SaveFullLog(CFile *dest)
 	LogEntry *log;
 	int i;
 
+	dest->printf("\n--- -----------------------------------------\n");
+	dest->printf("--- MODULE: replay list\n");
+
+	dest->printf("\n");
 	dest->printf("ReplayLog( {\n");
 	dest->printf("  Comment1 = \"%s\",\n", CurrentReplay->Comment1.c_str());
 	dest->printf("  Comment2 = \"%s\",\n", CurrentReplay->Comment2.c_str());

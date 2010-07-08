@@ -2542,7 +2542,7 @@ std::string SaveGlobal(lua_State *l, bool is_root)
 				value = b ? "true" : "false";
 				break;
 			case LUA_TSTRING:
-				value = std::string("\"") + lua_tostring(l, -1) + "\"";
+				value = ( ( std::string(lua_tostring(l, -1)).find('\n') != std::string::npos ) ? ( std::string("[[") + lua_tostring(l, -1) + "]]" ) : ( std::string("\"") + lua_tostring(l, -1) + "\"" ) );
 				break;
 			case LUA_TTABLE:
 				lua_pushvalue(l, -1);
