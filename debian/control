@@ -32,11 +32,3 @@ Description: realtime strategy game for Unix and X
  This version is compiled with some of the possible options, and thus has
  gzip, bunzip2, SDL, vorbis, theora and OpenGL (or OpenGL ES 1.1) support.
  The sound options will depend on your personal election on SDL packages.
-
-Package: stratagus-gl
-Architecture: all
-Depends: stratagus
-Description: Transitional package
- This dummy package is provided for a smooth transition to the new stratagus.
- .
- It may safely be removed after installation.
