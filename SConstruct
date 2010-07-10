@@ -153,7 +153,7 @@ def CheckOpenGL(env, conf):
   if 'USE_WIN32' in env['CPPDEFINES']:
      glconfig = {'LIBS': ['opengl32']}
   else:
-     if sys.platform[:5] == 'linux':
+     if sys.platform[:5] == 'linux' or sys.platform.startswith('gnukfreebsd'):
         platform = 'linux'
      glconfig = opengl.get(platform, {})
   for key in glconfig:
@@ -292,7 +292,7 @@ profile.Append(CCFLAGS = Split('-pg'))
 profile.Append(LINKFLAGS = Split('-pg'))
 
 staticenv = None
-if sys.platform.startswith('linux'):
+if sys.platform.startswith('linux') or sys.platform.startswith('gnukfreebsd'):
    staticenv = release.Clone()
    staticlibs = 'lua lua50 lua5.0 lua5.1 lua51 lualib lualib50 lualib5.0 vorbis theora ogg'
    staticlibs = staticlibs.split(' ')
