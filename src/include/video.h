@@ -45,6 +45,7 @@
 
 class CFont;
 
+extern char ForceUseOpenGL;
 extern bool UseOpenGL;
 
 class CGraphic : public gcn::Image {

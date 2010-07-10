@@ -129,6 +129,7 @@ extern void SdlUnlockScreen(void);      /// Do SDL hardware unlock
 
 CVideo Video;
 
+char ForceUseOpenGL;
 bool UseOpenGL;                      /// Use OpenGL
 
 char VideoForceFullScreen;           /// fullscreen set from commandline

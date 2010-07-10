@@ -675,6 +675,17 @@ static void Usage(void)
 \t-S\t\tSync speed (100 = 30 frames/s)\n\
 \t-D\t\tVideo mode depth = pixel per point (for Win32/TNT)\n\
 "
+#ifdef USE_GLES
+"\
+\t-O\t\tUse OpenGL ES 1.1\n\
+\t-o\t\tDo not use OpenGL ES 1.1\n\
+"
+#else
+"\
+\t-O\t\tUse OpenGL\n\
+\t-o\t\tDo not use OpenGL\n\
+"
+#endif
 #ifdef USE_MAEMO
 "\
 \t-v mode\t\tVideo mode (0=default,1=800x480)\n\
@@ -828,7 +839,11 @@ int main(int argc, char **argv)
 	//  Parse commandline
 	//
 	for (;;) {
-		switch (getopt(argc, argv, "c:d:ef:hln:P:s:t:v:wD:N:E:FL:S:U:W?")) {
+#ifdef USE_MAEMO
+		switch (getopt(argc, argv, "c:d:ef:hln:P:s:t:v:wD:N:E:S:U:OL:o?")) {
+#else
+		switch (getopt(argc, argv, "c:d:ef:hln:P:s:t:v:wD:N:E:FL:S:U:W?OL:o?")) {
+#endif
 			case 'c':
 				CclStartFile = optarg;
 				continue;
@@ -940,6 +955,14 @@ int main(int argc, char **argv)
 				Video.FullScreen = 0;
 				continue;
 #endif
+			case 'O':
+				ForceUseOpenGL = 1;
+				UseOpenGL = 1;
+				continue;
+			case 'o':
+				ForceUseOpenGL = 1;
+				UseOpenGL = 0;
+				continue;
 			case 'D':
 				Video.Depth = atoi(optarg);
 				continue;

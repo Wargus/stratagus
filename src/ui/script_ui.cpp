@@ -153,6 +153,19 @@ static int CclSetMaxOpenGLTexture(lua_State *l)
 	return 0;
 }
 
+
+static int CclSetUseOpenGL(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	if (CclInConfigFile) {
+		// May have been set from the command line
+		if(!ForceUseOpenGL) {
+			UseOpenGL = LuaToBoolean(l, 1);
+		}
+	}
+	return 0;
+}
+
 /**
 **  Set the video resolution.
 **
@@ -1444,6 +1457,7 @@ void UserInterfaceCclRegister(void)
 	lua_register(Lua, "SetDamageMissile", CclSetDamageMissile);
 
 	lua_register(Lua, "SetMaxOpenGLTexture", CclSetMaxOpenGLTexture);
+	lua_register(Lua, "SetUseOpenGL", CclSetUseOpenGL);
 	lua_register(Lua, "SetVideoResolution", CclSetVideoResolution);
 	lua_register(Lua, "GetVideoResolution", CclGetVideoResolution);
 	lua_register(Lua, "SetVideoFullScreen", CclSetVideoFullScreen);
