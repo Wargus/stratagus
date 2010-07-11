@@ -51,6 +51,7 @@
 #ifndef _MSC_VER
 #include <sys/time.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #endif
 #include "SDL.h"
@@ -67,6 +68,7 @@
 
 #ifdef USE_WIN32
 #include "net_lowlevel.h"
+#include "SDL_syswm.h"
 #endif
 
 #if defined(USE_WIN32) && defined(NO_STDIO_REDIRECT)
@@ -459,8 +461,65 @@ void InitVideoSdl(void)
 		signal(SIGSEGV, CleanExit);
 		signal(SIGABRT, CleanExit);
 #endif
+		if (FullGameName.empty())
+			FullGameName = "Stratagus";
+
 		// Set WindowManager Title
-		SDL_WM_SetCaption("Stratagus", "Stratagus");
+		SDL_WM_SetCaption(FullGameName.c_str(), FullGameName.c_str());
+
+#ifndef USE_WIN32
+		SDL_Surface * icon = NULL;
+		CGraphic * g = NULL;
+		struct stat st;
+		char buf[1024];
+		sprintf(buf, "/usr/share/pixmaps/%s.png", FullGameName.c_str());
+
+		if (stat(buf, &st) == 0) {
+			g = CGraphic::New(buf);
+			g->Load();
+			icon = g->Surface;
+		}
+
+		if (!icon) {
+			FullGameName[0] = tolower(FullGameName[0]);
+			sprintf(buf, "/usr/share/pixmaps/%s.png", FullGameName.c_str());
+
+			if (stat(buf, &st) == 0) {
+				if (g)
+					CGraphic::Free(g);
+				g = CGraphic::New(buf);
+				g->Load();
+				icon = g->Surface;
+			}
+		}
+
+		if (icon)
+			SDL_WM_SetIcon(icon, 0);
+
+		if (g)
+			CGraphic::Free(g);
+#else
+		int argc = 0;
+		LPWSTR * argv = NULL;
+		HWND hwnd = NULL;
+		HICON hicon = NULL;
+		SDL_SysWMinfo info;
+		SDL_VERSION(&info.version);
+
+		argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+
+		if (SDL_GetWMInfo(&info))
+			hwnd = info.window;
+
+		if (hwnd)
+			hicon = ExtractIcon(GetModuleHandle(NULL), argv[0], 0);
+
+		if (hicon) {
+			SendMessage(hwnd, (UINT)WM_SETICON, ICON_BIG, (LPARAM)hicon);
+			SetClassLong(hwnd, GCL_HICON, (LONG)hicon);
+			DestroyIcon(hicon);
+		}
+#endif
 	}
 
 	// Initialize the display

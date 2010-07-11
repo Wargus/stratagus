@@ -83,6 +83,7 @@ lua_State *Lua;                       /// Structure to work with lua files.
 std::string CclStartFile;             /// CCL start file
 std::string UserDirectory;
 std::string GameName;
+std::string FullGameName;
 int CclInConfigFile;                  /// True while config file parsing
 bool SaveGameLoading;                 /// If a Saved Game is Loading
 std::string CurrentLuaFile;           /// Lua file currently being interpreted
@@ -1928,6 +1929,21 @@ static int CclSetGameName(lua_State *l)
 	return 0;
 }
 
+static int CclSetFullGameName(lua_State *l)
+{
+	int args;
+
+	args = lua_gettop(l);
+	if (args > 1 || (args == 1 && (!lua_isnil(l, 1) && !lua_isstring(l, 1)))) {
+		LuaError(l, "incorrect argument");
+	}
+	if (args == 1 && !lua_isnil(l, 1)) {
+		FullGameName = lua_tostring(l, 1);
+	}
+
+	return 0;
+}
+
 /**
 **  Set the video sync speed
 **
@@ -2381,6 +2397,7 @@ void InitCcl(void)
 	lua_register(Lua, "ListFilesInDirectory", CclListFilesInDirectory);
 	lua_register(Lua, "ListDirsInDirectory", CclListDirsInDirectory);
 	lua_register(Lua, "SetGameName", CclSetGameName);
+	lua_register(Lua, "SetFullGameName", CclSetFullGameName);
 	lua_register(Lua, "SetVideoSyncSpeed", CclSetVideoSyncSpeed);
 	lua_register(Lua, "SetLocalPlayerName", CclSetLocalPlayerName);
 	lua_register(Lua, "GetLocalPlayerName", CclGetLocalPlayerName);

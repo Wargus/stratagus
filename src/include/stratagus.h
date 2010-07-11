@@ -242,6 +242,7 @@ extern const char NameLine[];
 extern std::string UserDirectory;           /// Directory containing user settings and data
 extern std::string StratagusLibPath;        /// Location of stratagus data
 extern std::string GameName;                /// Name of the game
+extern std::string FullGameName;            /// Full Name of the game
 extern std::string ClickMissile;            /// Missile to show when you click
 extern std::string DamageMissile;           /// Missile to show damage caused
 
