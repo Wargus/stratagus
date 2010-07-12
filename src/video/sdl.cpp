@@ -512,11 +512,13 @@ void InitVideoSdl(void)
 			hwnd = info.window;
 
 		if (hwnd)
-			hicon = ExtractIcon(GetModuleHandle(NULL), argv[0], 0);
+			hicon = ExtractIcon(GetModuleHandle(NULL), (CHAR *)argv[0], 0);
 
 		if (hicon) {
 			SendMessage(hwnd, (UINT)WM_SETICON, ICON_BIG, (LPARAM)hicon);
+#ifndef _WIN64
 			SetClassLong(hwnd, GCL_HICON, (LONG)hicon);
+#endif
 			DestroyIcon(hicon);
 		}
 #endif
