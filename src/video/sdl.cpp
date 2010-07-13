@@ -476,13 +476,14 @@ void InitVideoSdl(void)
 		CGraphic * g = NULL;
 		struct stat st;
 
-		char pixmaps[3][1024];
+		char pixmaps[4][1024];
 		sprintf(pixmaps[0], "/usr/share/pixmaps/%s.png", FullGameName.c_str());
 		sprintf(pixmaps[1], "/usr/share/pixmaps/%s.png", FullGameName.c_str());
 		sprintf(pixmaps[2], "/usr/share/pixmaps/stratagus.png");
-		pixmaps[1][0] = tolower(pixmaps[1][0]);
+		sprintf(pixmaps[3], "/usr/share/pixmaps/Stratagus.png");
+		pixmaps[1][19] = tolower(pixmaps[1][19]);
 
-		for (int i=0; i<3; ++i) {
+		for (int i=0; i<4; ++i) {
 			if (stat(pixmaps[i], &st) == 0) {
 				if (g) CGraphic::Free(g);
 				g = CGraphic::New(pixmaps[i]);
