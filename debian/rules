@@ -58,6 +58,8 @@ install: build
 	OUTFILE="./stratagus" $(MAKE) install-stratagus PREFIX=$(CURDIR)/debian/stratagus/usr
 	mv $(CURDIR)/debian/stratagus/usr/bin $(CURDIR)/debian/stratagus/usr/games/stratagus
 
+	convert contrib/stratagus.ico $(CURDIR)/debian/stratagus/usr/share/pixmaps/stratagus.png
+
 # Build architecture-independent files here.
 binary-indep: build install
 

@@ -461,35 +461,30 @@ void InitVideoSdl(void)
 		signal(SIGSEGV, CleanExit);
 		signal(SIGABRT, CleanExit);
 #endif
-		if (FullGameName.empty())
-			FullGameName = "Stratagus";
-
 		// Set WindowManager Title
-		SDL_WM_SetCaption(FullGameName.c_str(), FullGameName.c_str());
+		if (FullGameName.empty())
+			SDL_WM_SetCaption("Stratagus", "Stratagus");
+		else
+			SDL_WM_SetCaption(FullGameName.c_str(), FullGameName.c_str());
 
 #ifndef USE_WIN32
 		SDL_Surface * icon = NULL;
 		CGraphic * g = NULL;
 		struct stat st;
-		char buf[1024];
-		sprintf(buf, "/usr/share/pixmaps/%s.png", FullGameName.c_str());
 
-		if (stat(buf, &st) == 0) {
-			g = CGraphic::New(buf);
-			g->Load();
-			icon = g->Surface;
-		}
+		char pixmaps[3][1024];
+		sprintf(pixmaps[0], "/usr/share/pixmaps/%s.png", FullGameName.c_str());
+		sprintf(pixmaps[1], "/usr/share/pixmaps/%s.png", FullGameName.c_str());
+		sprintf(pixmaps[2], "/usr/share/pixmaps/stratagus.png");
+		pixmaps[1][0] = tolower(pixmaps[1][0]);
 
-		if (!icon) {
-			FullGameName[0] = tolower(FullGameName[0]);
-			sprintf(buf, "/usr/share/pixmaps/%s.png", FullGameName.c_str());
-
-			if (stat(buf, &st) == 0) {
-				if (g)
-					CGraphic::Free(g);
-				g = CGraphic::New(buf);
+		for (int i=0; i<3; ++i) {
+			if (stat(pixmaps[i], &st) == 0) {
+				if (g) CGraphic::Free(g);
+				g = CGraphic::New(pixmaps[i]);
 				g->Load();
 				icon = g->Surface;
+				if (icon) break;
 			}
 		}
 
@@ -511,15 +506,12 @@ void InitVideoSdl(void)
 		if (SDL_GetWMInfo(&info))
 			hwnd = info.window;
 
-		if (hwnd)
-			hicon = ExtractIcon(GetModuleHandle(NULL), (CHAR *)argv[0], 0);
+		if (hwnd && argc > 0 && argv)
+			hicon = ExtractIconW(GetModuleHandle(NULL), argv[0], 0);
 
 		if (hicon) {
+			SendMessage(hwnd, (UINT)WM_SETICON, ICON_SMALL, (LPARAM)hicon);
 			SendMessage(hwnd, (UINT)WM_SETICON, ICON_BIG, (LPARAM)hicon);
-#ifndef _WIN64
-			SetClassLong(hwnd, GCL_HICON, (LONG)hicon);
-#endif
-			DestroyIcon(hicon);
 		}
 #endif
 	}
