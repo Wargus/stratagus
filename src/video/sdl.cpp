@@ -468,6 +468,10 @@ void InitVideoSdl(void)
 			SDL_WM_SetCaption(FullGameName.c_str(), FullGameName.c_str());
 
 #ifndef USE_WIN32
+		// Make sure, that we not create OpenGL textures (and do not call OpenGL functions), when creating icon surface
+		bool UseOpenGL_orig = UseOpenGL;
+		UseOpenGL = false;
+		
 		SDL_Surface * icon = NULL;
 		CGraphic * g = NULL;
 		struct stat st;
@@ -493,6 +497,8 @@ void InitVideoSdl(void)
 
 		if (g)
 			CGraphic::Free(g);
+
+		UseOpenGL = UseOpenGL_orig;
 #else
 		int argc = 0;
 		LPWSTR * argv = NULL;
