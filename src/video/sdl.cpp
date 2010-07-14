@@ -260,27 +260,27 @@ static void InitOpenGL(void)
 	InitOpenGLExtensions();
 
 	glViewport(0, 0, (GLsizei)Video.Width, (GLsizei)Video.Height);
-	
+
 #ifndef USE_GLES
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 #endif
-	
+
 #ifdef USE_GLES
 	glOrthof(0.0f, (GLfloat)Video.Width, (GLfloat)Video.Height, 0.0f, -1.0f, 1.0f);
 #else
 	glOrtho(0, Video.Width, Video.Height, 0, -1, 1);
 #endif
-	
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	
+
 #ifndef USE_GLES
 	glTranslatef(0.375, 0.375, 0.);
 #endif
-	
+
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	
+
 #ifdef USE_GLES
 	glClearDepthf(1.0f);
 #else

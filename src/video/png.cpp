@@ -367,9 +367,7 @@ void SaveScreenshotPNG(const char *name)
 			fprintf(stderr, "Out of memory\n");
 			exit(1);
 		}
-#ifdef USE_GLES
-#warning TODO: Port glReadBuffer(GL_FRONT); to GLES
-#else
+#ifndef USE_GLES
 		glReadBuffer(GL_FRONT);
 #endif
 		glReadPixels(0, 0, Video.Width, Video.Height, GL_RGB, GL_UNSIGNED_BYTE,
