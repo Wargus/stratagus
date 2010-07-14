@@ -31,6 +31,9 @@ fi
 if test "$ARCH" = "linux" && test -f /etc/maemo_version; then
 	CPPFLAGS="$CPPFLAGS -DUSE_MAEMO"
 	MAEMO=yes
+	CFLAGS="$CFLAGS $(pkg-config --cflags libosso)"
+	CXXFLAGS="$CXXFLAGS $(pkg-config --cflags libosso)"
+	LDFLAGS="$LDFLAGS $(pkg-config --libs libosso)"
 fi
 
 if test "$ARCH" = "bsd" ; then

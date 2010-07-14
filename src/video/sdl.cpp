@@ -75,6 +75,10 @@
 #include "attachconsole.h"
 #endif
 
+#ifdef USE_MAEMO
+#include <libosso.h>
+#endif
+
 #include "video.h"
 #include "font.h"
 #include "interface.h"
@@ -164,6 +168,7 @@ void SetVideoSync(void)
 --  Video
 ----------------------------------------------------------------------------*/
 
+#ifndef USE_GLES
 /**
 **  Check if an extension is supported
 */
@@ -199,6 +204,7 @@ static bool IsExtensionSupported(const char *extension)
 	}
 	return false;
 }
+#endif
 
 /**
 **  Initialize OpenGL extensions
@@ -429,6 +435,56 @@ static void InitKey2Str()
 	Key2Str[SDLK_UNDO] = "undo";
 }
 
+#ifdef USE_MAEMO
+osso_context_t * osso = NULL;
+SDL_TimerID timer;
+
+static Uint32 OssoKeepBacklightAlive(Uint32 interval, void *param)
+{
+	if (!osso)
+		return interval;
+	
+	osso_display_state_on(osso);
+	osso_display_blanking_pause(osso);
+	
+	return interval;
+}
+
+void OssoInitialize()
+{
+	char * application;
+	
+	if (FullGameName.empty())
+		application = (char *)"org.stratagus";
+	else
+		application = (char *)std::string("org.stratagus." + FullGameName).c_str();
+	
+	if (strlen(application) > 14)
+		application[14] = tolower(application[14]);
+
+	osso = osso_initialize(application, VERSION, TRUE, NULL);
+
+	if (!osso) {
+		fprintf(stderr, "Couldn't initialize OSSO\n");
+		exit(OSSO_ERROR);
+	}
+
+	timer = SDL_AddTimer(50000, OssoKeepBacklightAlive, NULL);
+
+	if (!timer) {
+		fprintf(stderr, "Couldn't initialize SDL_AddTimer: %s\n", SDL_GetError());
+		exit(1);
+	}
+}
+
+void OssoDeinitialize()
+{
+	SDL_RemoveTimer(timer);
+	osso_deinitialize(osso);
+
+}
+#endif
+
 /**
 **  Initialize the video part for SDL.
 */
@@ -467,7 +523,7 @@ void InitVideoSdl(void)
 		else
 			SDL_WM_SetCaption(FullGameName.c_str(), FullGameName.c_str());
 
-#ifndef USE_WIN32
+#if ! defined(USE_WIN32) && ! defined(USE_MAEMO)
 		// Make sure, that we not create OpenGL textures (and do not call OpenGL functions), when creating icon surface
 		bool UseOpenGL_orig = UseOpenGL;
 		UseOpenGL = false;
@@ -500,7 +556,8 @@ void InitVideoSdl(void)
 			CGraphic::Free(g);
 
 		UseOpenGL = UseOpenGL_orig;
-#else
+#endif
+#ifdef USE_WIN32
 		int argc = 0;
 		LPWSTR * argv = NULL;
 		HWND hwnd = NULL;
@@ -597,6 +654,11 @@ void InitVideoSdl(void)
 #endif
 		InitOpenGL();
 	}
+
+#ifdef USE_MAEMO
+	OssoInitialize();
+	atexit(OssoDeinitialize);
+#endif
 
 	InitKey2Str();
 
