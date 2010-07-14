@@ -1049,7 +1049,9 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 
 	GLint internalformat = GL_RGBA;
 	if (GLTextureCompressionSupported && UseGLTextureCompression) {
+#ifndef USE_GLES
 		internalformat = GL_COMPRESSED_RGBA;
+#endif
 	}
 
 	glTexImage2D(GL_TEXTURE_2D, 0, internalformat, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
