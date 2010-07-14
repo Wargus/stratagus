@@ -514,7 +514,7 @@ int SaveReplay(const std::string &filename)
 		delete[] buf;
 		return -1;
 	}
-	fread(buf, sb.st_size, 1, fd);
+	(void)fread(buf, sb.st_size, 1, fd);
 	fclose(fd);
 
 	fd = fopen(destination.c_str(), "wb");
