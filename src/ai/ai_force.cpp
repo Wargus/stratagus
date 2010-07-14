@@ -119,7 +119,7 @@ struct AiForceAttackSender {
 		 goalX(x), goalY(y), delta(0) {
 		 
 		DebugPrint("%d: Attacking with force #%lu\n" _C_ AiPlayer->Player->Index
-			 _C_ (force  - &(AiPlayer->Force[0])));
+			 _C_ (long unsigned int)(force  - &(AiPlayer->Force[0])));
 		force->Attacking = true;
 		force->State = AI_FORCE_STATE_ATTACKING;
 		force->Units.for_each(*this);
@@ -711,7 +711,7 @@ void AiForce::Update(void)
 		Attacking = false;
 		if (!Defending && State > 0) {
 			DebugPrint("%d: Attack force #%lu was destroyed, giving up\n"
-				_C_ AiPlayer->Player->Index _C_ (this  - &(AiPlayer->Force[0])));		
+				_C_ AiPlayer->Player->Index _C_ (long unsigned int)(this  - &(AiPlayer->Force[0])));		
 			Reset(true);
 		}	
 		return;
@@ -728,7 +728,7 @@ void AiForce::Update(void)
 	if (Attacking == false) {
 		if (!Defending && State > 0) {
 			DebugPrint("%d: Attack force #%lu has lost all agresive units, giving up\n"
-				_C_ AiPlayer->Player->Index _C_ (this  - &(AiPlayer->Force[0])));		
+				_C_ AiPlayer->Player->Index _C_ (long unsigned int)(this  - &(AiPlayer->Force[0])));		
 			Reset(true);
 		}
 		return ;
@@ -847,7 +847,7 @@ void AiForce::Update(void)
 				// No enemy found, give up
 				// FIXME: should the force go home or keep trying to attack?
 				DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
-					_C_ AiPlayer->Player->Index _C_ (this  - &(AiPlayer->Force[0])));
+					_C_ AiPlayer->Player->Index _C_ (long unsigned int)(this  - &(AiPlayer->Force[0])));
 				Attacking = false;
 				return;
 			}

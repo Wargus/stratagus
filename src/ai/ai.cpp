@@ -848,7 +848,7 @@ void AiUnitKilled(CUnit *unit)
 			force->Attacking = false;
 			if (!force->Defending && force->State > 0) {
 				DebugPrint("%d: Attack force #%lu was destroyed, giving up\n"
-					_C_ unit->Player->Index _C_ (force  - &(unit->Player->Ai->Force[0])));		
+					_C_ unit->Player->Index _C_ (long unsigned int)(force  - &(unit->Player->Ai->Force[0])));
 				force->Reset(true);
 			}	
 		}

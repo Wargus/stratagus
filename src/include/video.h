@@ -114,8 +114,8 @@ public:
 	std::string File;          /// Filename
 	std::string HashFile;      /// Filename used in hash
 	SDL_Surface *Surface;      /// Surface
-	frame_pos_t *frame_map;
 	SDL_Surface *SurfaceFlip;  /// Flipped surface
+	frame_pos_t *frame_map;
 	frame_pos_t *frameFlip_map;
 	void GenFramesMap();
 	int Width;                 /// Width of a frame
