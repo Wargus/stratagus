@@ -120,7 +120,7 @@ AC_ARG_ENABLE(debug,
 if test "$enable_debug" != "yes" -a "$enable_profile" != "yes"; then
 	CXXFLAGS="$CXXFLAGS -O2 -pipe -fsigned-char -fomit-frame-pointer -fexpensive-optimizations -ffast-math"
 else
-	CXXFLAGS="$CXXFLAGS -O0 -g -fsigned-char -Wsign-compare -Wall"
+	CXXFLAGS="$CXXFLAGS -O0 -g -fsigned-char -Wsign-compare -Werror -Wall"
 	CPPFLAGS="$CPPFLAGS -DDEBUG"
 fi
 
@@ -182,9 +182,9 @@ fi
 
 dnl --- THEORA -----------------
 AC_ARG_WITH(theora,
-	[  --with-theora		  [Use theora (default: no)]])
-if test "$with_theora" != "no" -a "x$with_theora" != "x"; then
-	if test "$VORBIS" = "no"; then
+	[  --with-theora		  [Use theora (default: autodetect)]])
+if test "$with_theora" != "no"; then
+	if test "$VORBIS" = "no" -a "x$with_theora" != "x"; then
 		AC_MSG_ERROR(vorbis is required for theora support)
 	fi
 	AC_CHECK_HEADER(ogg/ogg.h,, THEORA=no)
@@ -195,6 +195,8 @@ if test "$with_theora" != "no" -a "x$with_theora" != "x"; then
 	if test "x$with_theora" != "x" -a "$THEORA" = "no"; then
 		AC_MSG_ERROR(theora headers and/or libraries could not be found)
 	fi
+else
+	THEORA=no
 fi
 
 dnl --- MIKMOD -----------------
@@ -240,7 +242,8 @@ datarootdir=.
 test "$datadir" = "NONE" && datadir=$datarootdir
 
 dnl --- LUA includes -----------
-AC_ARG_WITH(lua-includes, [  --with-lua-includes=DIR  [Location of lua include directiories (default: check [PREFIX/include/lua51] and [PREFIX/include/lua5.1])]], LUA_INCLUDES="$withval")
+AC_ARG_WITH(lua-includes, [  --with-lua-includes=DIR  [Location of lua include directiories
+  (default: check [PREFIX/include/lua51], [PREFIX/include/lua5.1] and [/usr/include/lua51], [/usr/include/lua5.1])]], LUA_INCLUDES="$withval")
 if test "$LUA_INCLUDES" != ""; then
 	CPPFLAGS="$CPPFLAGS -I$LUA_INCLUDES"
 fi
@@ -249,6 +252,12 @@ if test -d "$prefix/include/lua51"; then
 fi
 if test -d "$prefix/include/lua5.1"; then
 	CPPFLAGS="$CPPFLAGS -I$prefix/include/lua5.1"
+fi
+if test -d "/usr/include/lua51"; then
+	CPPFLAGS="$CPPFLAGS -I/usr/include/lua51"
+fi
+if test -d "/usr/include/lua5.1"; then
+	CPPFLAGS="$CPPFLAGS -I/usr/include/lua5.1"
 fi
 
 dnl --- LUA --------------------
