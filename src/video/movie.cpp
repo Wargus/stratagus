@@ -220,6 +220,13 @@ int PlayMovie(const std::string &name)
 		rect.y = 0;
 	}
 
+#ifndef USE_GLES
+	// When SDL_OPENGL is used, it is not possible to call SDL_CreateYUVOverlay, so turn temporary OpenGL off
+	// With GLES is all ok
+	if (UseOpenGL)
+		SDL_SetVideoMode(Video.Width, Video.Height, Video.Depth, SDL_GetVideoSurface()->flags & ~SDL_OPENGL);
+#endif
+
 	SDL_FillRect(SDL_GetVideoSurface(), NULL, 0);
 	yuv_overlay = SDL_CreateYUVOverlay(data.tinfo.frame_width,
 		data.tinfo.frame_height, SDL_YV12_OVERLAY, TheScreen);
@@ -293,6 +300,13 @@ int PlayMovie(const std::string &name)
 
 	OggFree(&data);
 	f.close();
+
+#ifndef USE_GLES
+	if (UseOpenGL) {
+		SDL_SetVideoMode(Video.Width, Video.Height, Video.Depth, SDL_GetVideoSurface()->flags | SDL_OPENGL);
+		ReloadOpenGL();
+	}
+#endif
 
 	SetCallbacks(old_callbacks);
 
