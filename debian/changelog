@@ -1,8 +1,8 @@
-stratagus (2.2.5.2) UNRELEASED; urgency=low
+stratagus (2.2.5.2) unstable; urgency=low
 
-  * UNRELEASED
+  * New upstream release
 
- -- Pali Rohár <pali.rohar@gmail.com>  Mon, 12 Jul 2010 10:29:03 +0200
+ -- Pali Rohár <pali.rohar@gmail.com>  Tue, 27 Jul 2010 10:51:27 +0200
 
 stratagus (2.2.5-1) unstable; urgency=low
 
