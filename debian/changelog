@@ -1,80 +1,8 @@
-stratagus (2.2.5.1-1maemo1) fremantle; urgency=low
+stratagus (2.2.5.2) UNRELEASED; urgency=low
 
-  * Build for fremantle rev. 55
+  * UNRELEASED
 
- -- Pali Rohár <pali.rohar@gmail.com>  Wed, 23 Jun 2010 16:06:55 +0200
-
-stratagus (2.2.5.1-1ubuntu1~lucid~palippa1) lucid; urgency=low
-
-  * Build for lucid rev. 55
-
- -- Pali Rohár <pali.rohar@gmail.com>  Wed, 23 Jun 2010 16:00:25 +0200
-
-stratagus (2.2.5.1-1ubuntu1~karmic~palippa1) karmic; urgency=low
-
-  * Build for karmic rev. 55
-
- -- Pali Rohár <pali.rohar@gmail.com>  Wed, 23 Jun 2010 15:21:13 +0200
-
-stratagus (2.2.5-2maemo3) fremantle; urgency=low
-
-  * Build for fremantle rev. 30
-
- -- Pali Rohár <pali.rohar@gmail.com>  Sat, 22 May 2010 18:23:52 +0200
-
-stratagus (2.2.5-2ubuntu1~lucid~palippa3) lucid; urgency=low
-
-  * Build for lucid rev. 30
-
- -- Pali Rohár <pali.rohar@gmail.com>  Sat, 22 May 2010 18:22:06 +0200
-
-stratagus (2.2.5-2ubuntu1~karmic~palippa3) karmic; urgency=low
-
-  * Build for karmic rev. 30
-
- -- Pali Rohár <pali.rohar@gmail.com>  Sat, 22 May 2010 18:19:56 +0200
-
-stratagus (2.2.5-2maemo2) fremantle; urgency=low
-
-  * Build for fremantle rev. 20
-
- -- Pali Rohár <pali.rohar@gmail.com>  Fri, 14 May 2010 17:31:05 +0200
-
-stratagus (2.2.5-2maemo1) fremantle; urgency=low
-
-  * Build for fremantle rev. 14
-
- -- Pali Rohár <pali.rohar@gmail.com>  Fri, 14 May 2010 14:38:03 +0200
-
-stratagus (2.2.5-2ubuntu1~lucid~palippa2) lucid; urgency=low
-
-  * Build for lucid rev. 14
-
- -- Pali Rohár <pali.rohar@gmail.com>  Fri, 14 May 2010 14:32:05 +0200
-
-stratagus (2.2.5-2ubuntu1~karmic~palippa2) karmic; urgency=low
-
-  * Build for karmic rev. 14
-
- -- Pali Rohár <pali.rohar@gmail.com>  Fri, 14 May 2010 14:30:43 +0200
-
-stratagus (2.2.5-2maemo1) fremantle; urgency=low
-
-  * Build from https://code.launchpad.net/~pali.rohar/+junk/stratagus rev. 11
-
- -- Pali Rohár <pali.rohar@gmail.com>  Fri, 14 May 2010 14:04:46 +0200
-
-stratagus (2.2.5-2ubuntu1~lucid~palippa1) lucid; urgency=low
-
-  * Build from https://code.launchpad.net/~pali.rohar/+junk/stratagus rev. 11
-
- -- Pali Rohár <pali.rohar@gmail.com>  Fri, 14 May 2010 13:36:19 +0200
-
-stratagus (2.2.5-2ubuntu1~karmic~palippa1) karmic; urgency=low
-
-  * Build from https://code.launchpad.net/~pali.rohar/+junk/stratagus rev. 11
-
- -- Pali Rohár <pali.rohar@gmail.com>  Fri, 14 May 2010 13:29:33 +0200
+ -- Pali Rohár <pali.rohar@gmail.com>  Mon, 12 Jul 2010 10:29:03 +0200
 
 stratagus (2.2.5-1) unstable; urgency=low
 
