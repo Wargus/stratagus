@@ -6,7 +6,7 @@ Build-Depends: automake, libsdl1.2-dev (>> 1.2.2), libvorbis-dev,
  libpng12-dev (>= 1.2.5), libbz2-dev, liblua5.1-dev | liblua5.1-0-dev,
  debhelper (>> 4.0.0), libpthread-stubs0-dev, libgl-dev | libgles1-sgx-img-dev,
  libgl-dev | libsdl-gles1.2-dev, libogg-dev, libtheora-dev, libmikmod2-dev,
- imagemagick, sharutils
+ imagemagick, sharutils, libosso-dev
 Standards-Version: 3.6.1
 Homepage: https://launchpad.net/stratagus
 Vcs-Browser: https://bazaar.launchpad.net/~pali.rohar/stratagus/main
