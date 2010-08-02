@@ -5,6 +5,7 @@
 ----	$Id$
 
 ----	(c) Copyright 2002-2007 by Nehal Mistry, Francois Beerten.
+----	(c) Copyright 2010      by Pali Rohár
 
 ----    This program is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -31,7 +32,7 @@
 
     <h2>Software Requirements</h2>
     <ul>
-	<li><b>A supported operating system:</b> Linux, Mac OS X, BSD, 
+	<li><b>A supported operating system:</b> Linux, Linux Maemo based devices, Mac OS X, BSD, 
 	Possibly any other Unix/POSIX OS.<br>
 	Microsoft Windows 98 SE, or higher.
 	<font color=red>NOTE: some features of Winsock2 (WS2_32.DLL) are used. So even 
@@ -51,7 +52,7 @@
 	<li><a href="http://mikmod.raphnet.net/">libmikmod</a> (optional).<p>
 	<li><a href="http://sources.redhat.com/bzip2/">libbzip2</a> (optional).<p>
 
-	<a href="http://stratagus.sourceforge.net/games.shtml">A stratagus game</a>.<br>
+	<a href="https://launchpad.net/stratagus">A stratagus game</a>.<br>
     </ul>
 
     <h2>Hardware Requirements</h2>
@@ -75,10 +76,8 @@
 	<li><b>Step 1, Download and Extract:</b><p>
 
 	<ul>
-	    <li><a href="http://sourceforge.net/project/showfiles.php?group_id=84903">
+	    <li><a href="https://launchpad.net/stratagus">
 		Download</a> the source code.<br>
-	    <font color="red">NOTE: both the tar.gz and zip files are the same, 
-	    we provide both formats for convenience.</font><p>
 
 	    <li>Extract the source stratagus-DATE.tar.gz with 
 	    'tar -zxvf stratagus-DATE.tar.gz'
@@ -100,27 +99,20 @@
 		it should compile a working stratagus binary.<p>
 		</ul>
 
-	    <li><b>MSVC users:</b>
-	    <ul>
-		<li><a href="http://stratagus.sourceforge.net/msvc-libs.zip">
-		Download</a> the VC++ libraries and extract them into the root
-    		stratagus directory.
-		<li>Open the workspace file stratagus.dsw and compile.
-	    </ul>
 	</ul>
 
 	<br>
 	<li><b>Step 3: Build packages</b><p>
 
 	This step is optional.<br />
-	You can build debian packages by typing 'make deb-dist' or using 'debuild' directly.<p>
+	You can build debian packages by using 'debuild' directly.<p>
 
 	<br>
 	<li><b>Step 4, Run:</b><p>
 
 	You may now go into the toplevel stratagus directory and run the binary.
 	Remember, you have to obtain the 
-	<a href="http://stratagus.sourceforge.net/datasets.shtml">game data</a> 
+	<a href="https://launchpad.net/stratagus">game data</a> 
 	to start the engine. By default, stratagus looks in './data', 
 	if your data is in a different location you 
 	will need to run stratagus with '-d /path_to_data'.<p>
@@ -128,6 +120,8 @@
 
 <hr>
 (C) Copyright 1998-2007 by The <a href="http://stratagus.org">Stratagus</a> Project 
+under the <a href="gpl.html">GNU General Public License</a>.<br>
+(C) Copyright 2010 by <a href="mailto:pali.rohar@gmail.com">Pali Rohár</a>
 under the <a href="gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>

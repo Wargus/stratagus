@@ -5,6 +5,7 @@
 ----	$Id$
 
 ----	(c) Copyright 2001-2007 by Lutz Sammer, Francois Beerten and Nehal Mistry
+----	(c) Copyright 2010      by Pali Rohár
 
 ----    This program is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -31,87 +32,33 @@
 
 This file should give you some information to help with development of Stratagus.<p>
 
-<h2>IRC - Internet Relay Chat</h2>
-
-You can try to meet other Stratagus developers and users on the 
-<a href="http://www.freenode.net/">FreeNode</a> IRC Network, in the
-<a href="irc://irc.freenode.net/stratagus">#stratagus</a> channel.
-
-<h2>Mailing list</h2>
-
-If you want to help with development for Stratagus you should 
-<a href="http://lists.sourceforge.net/mailman/listinfo/stratagus-devel">join</a> 
-the stratagus-devel mailing list.<br> You may also want to look at the 
-<a href="http://sourceforge.net/mailarchive/forum.php?forum_id=39600">archives.</a>
-
-<h2>Bugs and tasks</h2>
+<h2>Bugs</h2>
 
 You can find <a
-href="http://sourceforge.net/tracker/?group_id=84903&atid=574265">known bugs</a>
-and <a href="http://sourceforge.net/pm/?group_id=84903">planned
-tasks</a> on the <a
-href="http://sourceforge.net/projects/stratagus/">Sourceforge pages
+href="https://bugs.launchpad.net/stratagus">known bugs</a>
+on the <a
+href="https://launchpad.net/stratagus">Launchpad pages
 for Stratagus</a>.<p>
-
-Before starting on a bug or task, please ask on the mailing list or in the 
-IRC channel whether anybody else is already working on it.
 
 <h2>Building Stratagus</h2>
 
-<h3>Installing the Subversion client</h3>
-
-If you want to help develop, you should use Subversion. 
-The online book <a href="http://svnbook.red-bean.com/">Version Control with
-Subversion</a> will help you master Subversion.
-
-<h3>Getting Stratagus from Subversion</h3>
-
-<h4>The subversion repository of stratagus has two main directories:</h4>
-
-<ul>
-    <li>stratagus - The Stratagus engine source<p>
-	The source to the Stratagus engine. The source is licenced
-	under the GNU General Public License.
-	<b>This contains the sources needed for development.</b>
-
-    <li>htdocs - The Stratagus Website<p>
-	The website is stored in subversion for easy updating and version management
-	by mulitple people.  This module is not needed unless you plan to update
-	the stratagus website 
-</ul>
-
-<h4>The stratagus directory is itself divided into 3 subdirectories:</h4>
-
-<ul>
-    <li>trunk - The main development branch. 
-        Almost all activity happens in this directory.
-    <li>branches - Special development branches.
-    <li>tags - Snapshots of the code of special interest like releases. 
-</ul>
+<h3>Getting Stratagus from Launchpad Bazaar branches</h3>
 
 <h4>How do I get the latest source code of Stratagus?</h4>
 
 The instructions for accessing the source code are on the 
-<a href="http://sourceforge.net/svn/?group_id=84903">project subversion</a> page.<br> 
+<a href="https://code.launchpad.net/stratagus">launchpad project</a> page.<br> 
 <p>
 
 For example:<p>
 
-<pre>svn co https://svn.sourceforge.net/svnroot/stratagus/stratagus/trunk stratagus</pre>
+<pre>bzr branch lp:stratagus</pre>
 <p>
 
 This is done only once. To update your working copy, go into 
-the directory and type 'svn up'.<p>
+the directory and type 'bzr pull'.<p>
 
-<h3>Getting Stratagus without Subversion</h3>
-
-Only releases are made outside of Subversion.  If you wish to be involved with
-development, you should obtain the sources via Subversion. 
-Subversion usually remains quite stable and is easier
-for you to keep up to date. Release versions of stratagus are available 
-<a href="http://sourceforge.net/project/showfiles.php?group_id=84903">here</a>. 
-Many of the games that use the stratagus engine will, and should bundle these 
-files with their release, to ensure compatibility.
+<h3>Getting Stratagus without Bazaar</h3>
 
 <h3>Compiling Stratagus</h3>
 
@@ -277,20 +224,10 @@ and always update the copyright year if required.<p>
 
 <h2>Sending a patch</h2>
 
-Once you have completed some work, you will probably want it to be 
-included in the main Stratagus source.<p>
-
-Follow these steps:<p>
-
-<ul>
-    <li>svn up
-    <li>svn diff &gt; your-nickname.diff
-    <li>upload 'your-nickname.diff' to the
-    <a href="http://sourceforge.net/tracker/?group_id=84903&atid=574267">patch tracker</a>.
-</ul>
-
 <hr>
 (C) Copyright 1998-2007 by The <a href="http://stratagus.org">Stratagus</a> Project 
+under the <a href="gpl.html">GNU General Public License</a>.<br>
+(C) Copyright 2010 by <a href="mailto:pali.rohar@gmail.com">Pali Rohár</a>
 under the <a href="gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>
