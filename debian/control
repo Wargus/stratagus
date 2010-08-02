@@ -9,22 +9,33 @@ Build-Depends: automake, libsdl1.2-dev (>> 1.2.2), libvorbis-dev,
  imagemagick, sharutils, libosso-dev
 Standards-Version: 3.6.1
 Homepage: https://launchpad.net/stratagus
-Vcs-Browser: https://bazaar.launchpad.net/~pali.rohar/stratagus/main
-Vcs-Bzr: bzr+ssh://bazaar.launchpad.net/~pali.rohar/stratagus/main
+Vcs-Browser: https://code.launchpad.net/stratagus
+Vcs-Bzr: lp:stratagus
 
 Package: stratagus
 Architecture: any
-Suggests: stratagus-data
+Suggests: wargus, war1gus, stargus, stratagus-data
 Depends: ${shlibs:Depends}
-Description: realtime strategy game for Unix and X
+Description: Strategy Gaming Engine
  Stratagus is a free cross-platform real-time strategy gaming engine.
  It includes support for playing over Internet/LAN, or playing vs.
  computer opponents. The engine is configurable and can be used to
  create games with a wide-range of features specific to your needs.
  .
  Stratagus started as a clone of the realtime fantasy strategy game
- WarCraft II from Blizzard Entertainment, although it is used now as a
+ Warcraft II from Blizzard Entertainment, although it is used now as a
  game engine to build other games, sci-fi or fantasy ones.
+ .
+ Stratagus is developed together for Windows, Linux and Linux Maemo based
+ devices (Nokia N900).
+ .
+ Games which use Stratagus:
+  * Wargus - Warcraft II - https://launchpad.net/wargus
+  * War1gus - Warcraft I - https://launchpad.net/war1gus
+  * Stargus - Starcraft I - https://launchpad.net/stargus
+ .
+ This package provides no game and no game data set. This is only engine.
+ To play one of game, install package wargus, war1gus or stargus.
  .
  This is the stable release of Stratagus, and is both fairly playable and
  fairly bug-free. It also has network connectivity for up to 8 players.
