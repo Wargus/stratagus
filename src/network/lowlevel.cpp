@@ -377,7 +377,7 @@ int NetSocketAddr(const Socket sock)
 **
 **  @return If success the socket fildes, -1 otherwise.
 */
-Socket NetOpenUDP(int port)
+Socket NetOpenUDP(char* addr, int port)
 {
 	Socket sockfd;
 
@@ -392,7 +392,10 @@ Socket NetOpenUDP(int port)
 
 		memset(&sock_addr, 0, sizeof(sock_addr));
 		sock_addr.sin_family = AF_INET;
-		sock_addr.sin_addr.s_addr = INADDR_ANY;
+		if (addr)
+			sock_addr.sin_addr.s_addr = inet_addr(addr);
+		else
+			sock_addr.sin_addr.s_addr = INADDR_ANY;
 		sock_addr.sin_port = htons(port);
 		// Bind the socket for listening
 		if (bind(sockfd, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0) {
@@ -413,7 +416,7 @@ Socket NetOpenUDP(int port)
 **
 **  @return If success the socket fildes, -1 otherwise
 */
-Socket NetOpenTCP(int port)
+Socket NetOpenTCP(char* addr, int port)
 {
 	Socket sockfd;
 
@@ -428,7 +431,10 @@ Socket NetOpenTCP(int port)
 
 		memset(&sock_addr, 0, sizeof(sock_addr));
 		sock_addr.sin_family = AF_INET;
-		sock_addr.sin_addr.s_addr = INADDR_ANY;
+		if (addr)
+			sock_addr.sin_addr.s_addr = inet_addr(addr);
+		else
+			sock_addr.sin_addr.s_addr = INADDR_ANY;
 		sock_addr.sin_port = htons(port);
 
 		opt = 1;

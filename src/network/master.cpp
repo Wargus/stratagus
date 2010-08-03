@@ -104,7 +104,7 @@ int MetaInit(void)
 	reply = NULL;
 	MetaServerFildes = NetworkFildes;
 	for (i = port_range_min; i < port_range_max; ++i) {
-		MetaServerFildes = NetOpenTCP(i);  //FIXME: need to make a dynamic port allocation there...if (!MetaServerFildes) {...}
+		MetaServerFildes = NetOpenTCP(NetworkAddr, i);  //FIXME: need to make a dynamic port allocation there...if (!MetaServerFildes) {...}
 		if (MetaServerFildes != (Socket)-1) {
 			if (NetConnectTCP(MetaServerFildes, NetResolveHost(MasterHost), MasterPort) != -1) {
 				break;

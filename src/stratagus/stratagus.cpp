@@ -666,6 +666,7 @@ static void Usage(void)
 \t-e\t\tStart editor\n\
 \t-h\t\tHelp shows this page\n\
 \t-l\t\tDisable command log\n\
+\t-I addr\t\tNetwork address to use\n\
 \t-P port\t\tNetwork port to use\n\
 \t-n server\tNetwork server host preset\n\
 \t-L lag\t\tNetwork lag in # frames (default 10 = 333ms)\n\
@@ -840,9 +841,9 @@ int main(int argc, char **argv)
 	//
 	for (;;) {
 #ifdef USE_MAEMO
-		switch (getopt(argc, argv, "c:d:ef:hln:P:s:t:v:wD:N:E:S:U:OL:o?")) {
+		switch (getopt(argc, argv, "c:d:ef:hln:I:P:s:t:v:wD:N:E:S:U:OL:o?")) {
 #else
-		switch (getopt(argc, argv, "c:d:ef:hln:P:s:t:v:wD:N:E:FL:S:U:W?OL:o?")) {
+		switch (getopt(argc, argv, "c:d:ef:hln:I:P:s:t:v:wD:N:E:FL:S:U:W?OL:o?")) {
 #endif
 			case 'c':
 				CclStartFile = optarg;
@@ -864,6 +865,9 @@ int main(int argc, char **argv)
 				continue;
 			case 'l':
 				CommandLogDisabled = true;
+				continue;
+			case 'I':
+				NetworkAddr = optarg;
 				continue;
 			case 'P':
 				NetworkPort = atoi(optarg);
