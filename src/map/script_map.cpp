@@ -395,6 +395,33 @@ static int CclSetForestRegeneration(lua_State *l)
 }
 
 /**
+**  Set Fog color.
+**
+**  @param l  Lua state.
+*/
+static int CclSetFogOfWarColor(lua_State* l)
+{
+	int r,g,b;
+
+	LuaCheckArgs(l, 3);
+	r = LuaToNumber(l, 1);
+	g = LuaToNumber(l, 2);
+	b = LuaToNumber(l, 3);
+
+	if ( (r < 0 || r > 255) ||
+	     (g < 0 || g > 255) ||
+	     (b < 0 || b > 255) ) {
+		LuaError(l, "Arguments must be in the range 0-255");
+	}
+
+	FogOfWarColor[0] = r;
+	FogOfWarColor[1] = g;
+	FogOfWarColor[2] = b;
+
+	return 0;
+}
+
+/**
 **  Define Fog graphics
 **
 **  @param l  Lua state.
@@ -536,6 +563,7 @@ void MapCclRegister(void)
 
 	lua_register(Lua, "SetFogOfWarGraphics", CclSetFogOfWarGraphics);
 	lua_register(Lua, "SetFogOfWarOpacity", CclSetFogOfWarOpacity);
+	lua_register(Lua, "SetFogOfWarColor", CclSetFogOfWarColor);
 
 	lua_register(Lua, "SetForestRegeneration",CclSetForestRegeneration);
 

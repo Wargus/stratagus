@@ -75,6 +75,7 @@
 <a href="#SetEditorUnitsIcon">SetEditorUnitsIcon</a>
 <a href="#SetEditorStartUnit">SetEditorStartUnit</a>
 <a href="#SetFogOfWar">SetFogOfWar</a>
+<a href="#SetFogOfWarColor">SetFogOfWarColor</a>
 <a href="#SetFogOfWarGraphics">SetFogOfWarGraphics</a>
 <a href="#SetFogOfWarOpacity">SetFogOfWarOpacity</a>
 <a href="#SetGrabMouse">SetGrabMouse</a>
@@ -747,6 +748,16 @@ Set the unit used in the editor to show the start location.
 <h3>SetFogOfWar(boolean)</h3>
 
 If true, enable fog of war.
+
+<a name="SetFogOfWarColor"></a>
+<h3>SetFogOfWarColor(red,green,blue)</h3>
+
+Set the color of the fog of war.  Each parameter is in the range 0-255.
+
+<h4>Example (white fog of war)</h4>
+<pre>
+  SetFogOfWarColor(255,255,255)
+</pre>
 
 <a name="SetFogOfWarGraphics"></a>
 <h3>SetFogOfWarGraphics(graphic)</h3>

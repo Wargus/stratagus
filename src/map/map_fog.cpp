@@ -60,6 +60,9 @@
 ----------------------------------------------------------------------------*/
 
 int FogOfWarOpacity;                 /// Fog of war Opacity.
+Uint32 FogOfWarColorSDL;
+int FogOfWarColor[3];
+
 CGraphic *CMap::FogGraphic;
 
 /**
@@ -697,7 +700,7 @@ void CViewport::DrawMapFogOfWar() const
 			if (VisibleTable[sx]) {
 				DrawFogOfWarTile(sx, sy, dx, dy);
 			} else {
-				Video.FillRectangleClip(ColorBlack, dx, dy, TileSizeX, TileSizeY);
+				Video.FillRectangleClip(FogOfWarColorSDL, dx, dy, TileSizeX, TileSizeY);
 			}
 			++sx;
 			dx += TileSizeX;
@@ -713,6 +716,9 @@ void CViewport::DrawMapFogOfWar() const
 */
 void CMap::InitFogOfWar(void)
 {
+	//calculate this once from the settings and store it
+	FogOfWarColorSDL = Video.MapRGB(TheScreen->format, FogOfWarColor[0], FogOfWarColor[1], FogOfWarColor[2]);
+
 	Uint8 r, g, b;
 	Uint32 color;
 	SDL_Surface *s;
@@ -726,8 +732,7 @@ void CMap::InitFogOfWar(void)
 		s = SDL_CreateRGBSurface(SDL_SWSURFACE, TileSizeX, TileSizeY,
 			32, RMASK, GMASK, BMASK, AMASK);
 
-		// FIXME: Make the color configurable
-		SDL_GetRGB(ColorBlack, TheScreen->format, &r, &g, &b);
+		SDL_GetRGB(FogOfWarColorSDL, TheScreen->format, &r, &g, &b);
 		color = Video.MapRGB(s->format, r, g, b);
 
 		SDL_FillRect(s, NULL, color);
