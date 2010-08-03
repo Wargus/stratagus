@@ -89,12 +89,12 @@ void CleanModules(void)
 	CleanFonts();
 	CleanTriggers();
 	FreeAi();
-	CleanPlayers();
 	CleanRaces();
 	CleanConstructions();
 	CleanDecorations();
-	CleanUnitTypes();
 	CleanUnits();
+	CleanUnitTypes();
+	CleanPlayers();
 	CleanSelections();
 	CleanGroups();
 	CleanUpgrades();

@@ -371,7 +371,8 @@ static int CclDefineSprites(lua_State *l)
 */
 void DecorationCclRegister(void)
 {
-	memset(&DecoSprite, 0, sizeof(DecoSprite));
+	DecoSprite.Name.clear();
+	DecoSprite.SpriteArray.clear();
 
 	lua_register(Lua, "DefineSprites", CclDefineSprites);
 }

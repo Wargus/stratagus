@@ -87,7 +87,11 @@ int MouseScrollState = ScrollNone;
 EventCallback GameCallbacks;   /// Game callbacks
 EventCallback EditorCallbacks; /// Editor callbacks
 
+#ifdef USE_WIN32
+const int CPU_NUM = 1;
+#else
 const int CPU_NUM = get_cpu_count();
+#endif
 
 static CMutex DisplayUpdateLocker;
 

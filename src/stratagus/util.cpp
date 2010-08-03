@@ -37,11 +37,7 @@
 #include "stratagus.h"
 #include "util.h"
 
-#ifdef USE_WIN32
-#define WIN32_LEAN_AND_MEAN
-#undef NOUSER
-#include <windows.h>
-#elif defined(HAVE_X)
+#ifdef HAVE_X
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #endif

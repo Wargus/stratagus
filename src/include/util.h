@@ -38,6 +38,7 @@
 ----------------------------------------------------------------------------*/
 
 #ifndef __unix
+#undef NOUSER
 #include <winsock2.h>
 #include <windows.h>
 #elif defined(__hpux)
