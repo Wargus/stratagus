@@ -17,6 +17,7 @@ $]
 
 extern int PlayMusic(const std::string name);
 extern void StopMusic(void);
+extern bool IsMusicPlaying();
 
 extern int SetChannelVolume(int channel, int volume);
 extern int SetChannelStereo(int channel, int stereo);

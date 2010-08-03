@@ -16334,6 +16334,33 @@ static int tolua_stratagus_StopMusic00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: IsMusicPlaying */
+#ifndef TOLUA_DISABLE_tolua_stratagus_IsMusicPlyaing00
+static int tolua_stratagus_IsMusicPlaying00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   bool tolua_ret = (bool)  IsMusicPlaying();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsMusicPlaying'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: SetChannelVolume */
 #ifndef TOLUA_DISABLE_tolua_stratagus_SetChannelVolume00
 static int tolua_stratagus_SetChannelVolume00(lua_State* tolua_S)
@@ -20128,6 +20155,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
 
   tolua_function(tolua_S,"PlayMusic",tolua_stratagus_PlayMusic00);
   tolua_function(tolua_S,"StopMusic",tolua_stratagus_StopMusic00);
+  tolua_function(tolua_S,"IsMusicPlaying",tolua_stratagus_IsMusicPlaying00);
   tolua_function(tolua_S,"SetChannelVolume",tolua_stratagus_SetChannelVolume00);
   tolua_function(tolua_S,"SetChannelStereo",tolua_stratagus_SetChannelStereo00);
   tolua_function(tolua_S,"StopChannel",tolua_stratagus_StopChannel00);
