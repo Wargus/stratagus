@@ -31,6 +31,9 @@
 !define UNINSTALL "uninstall.exe"
 !define INSTALLER "${NAME}-${VERSION}.exe"
 !define INSTALLDIR "$PROGRAMFILES\${NAME}\"
+!define HOMEPAGE "https://launchpad.net/stratagus"
+!define COPYRIGHT "Copyright © 1998-2010 by The Stratagus Project and Pali Rohar"
+!define LANGUAGE "English"
 
 !ifdef AMD64
 !undef INSTALLER
@@ -42,7 +45,6 @@
 !endif
 
 !define REGKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}"
-!define LANGUAGE "English"
 
 ;--------------------------------
 
@@ -85,7 +87,13 @@ OutFile "${INSTALLER}"
 InstallDir "${INSTALLDIR}"
 InstallDirRegKey HKLM "${REGKEY}" "InstallLocation"
 
-BrandingText " "
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${NAME}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "${COPYRIGHT}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${NAME}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${VERSION}"
+VIProductVersion "${VERSION}"
+
+BrandingText "${NAME} - ${VERSION}  ${HOMEPAGE}"
 ShowInstDetails Show
 ShowUnInstDetails Show
 XPStyle on
@@ -142,6 +150,9 @@ Section "${NAME}"
 	WriteRegStr HKLM "${REGKEY}" "InstallLocation" "$INSTDIR"
 	WriteRegStr HKLM "${REGKEY}" "DisplayIcon" "$\"$INSTDIR\${STRATAGUS}$\",0"
 	WriteRegStr HKLM "${REGKEY}" "DisplayVersion" "${VERSION}"
+	WriteRegStr HKLM "${REGKEY}" "HelpLink" "${HOMEPAGE}"
+	WriteRegStr HKLM "${REGKEY}" "URLUpdateInfo" "${HOMEPAGE}"
+	WriteRegStr HKLM "${REGKEY}" "URLInfoAbout" "${HOMEPAGE}"
 	WriteRegDWORD HKLM "${REGKEY}" "NoModify" 1
 	WriteRegDWORD HKLM "${REGKEY}" "NoRepair" 1
 	WriteUninstaller "$INSTDIR\${UNINSTALL}"

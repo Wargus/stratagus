@@ -47,7 +47,7 @@
 **
 ** @section Informations Informations
 **
-** Visit the http://stratagus.org web page for the latest news and
+** Visit the https://launchpad.net/stratagus web page for the latest news and
 ** ../doc/readme.html for other documentations.
 **
 ** @section Modules Modules
@@ -542,7 +542,7 @@ static void PrintHeader(void)
 		"%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n"
 		"  Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon, Pali Rohar,\n"
 		"  and others.\n"
-		"\t(http://stratagus.org)\n"
+		"\thttps://launchpad.net/stratagus\n"
 		"Compile options %s",
 		NameLine, CompileOptions.c_str());
 }

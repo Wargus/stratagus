@@ -1,13 +1,15 @@
 This package was firstly debianized by David Martínez Moreno <ender@debian.org> on
 Thu, 14 Feb 2004 21:43:26 +0100.
 
-It was downloaded from http://stratagus.sf.net/
+It was downloaded from https://launchpad.net/stratagus
 
 Upstream Authors: Jimmy Salmon <jsalmon3@users.sourceforge.net>
 		  Russel Smith <mr-russ@users.sourceforge.net>
 		  Nehal Mistry <nehalmistry@users.sourceforge.net>
+		  Pali Rohár <pali.rohar@gmail.com>
 
 Copyright: (C) 1998-2005 by The Stratagus Project.
+	   (C) 2010      by Pali Rohár
 
 License:
 
