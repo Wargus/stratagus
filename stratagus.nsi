@@ -23,6 +23,9 @@
 
 !define NAME "Stratagus"
 !define VERSION "2.2.5.2"
+!define HOMEPAGE "https://launchpad.net/stratagus"
+!define LICENSE "GPL v2"
+!define COPYRIGHT "Copyright (c) 1998-2010 by The Stratagus Project and Pali Rohar"
 
 ;--------------------------------
 
@@ -31,8 +34,6 @@
 !define UNINSTALL "uninstall.exe"
 !define INSTALLER "${NAME}-${VERSION}.exe"
 !define INSTALLDIR "$PROGRAMFILES\${NAME}\"
-!define HOMEPAGE "https://launchpad.net/stratagus"
-!define COPYRIGHT "Copyright © 1998-2010 by The Stratagus Project and Pali Rohar"
 !define LANGUAGE "English"
 
 !ifdef AMD64
@@ -87,10 +88,15 @@ OutFile "${INSTALLER}"
 InstallDir "${INSTALLDIR}"
 InstallDirRegKey HKLM "${REGKEY}" "InstallLocation"
 
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${NAME}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "${COPYRIGHT}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${NAME}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${NAME} Installer - Strategy Gaming Engine"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${VERSION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "InternalName" "${NAME} Installer"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "${COPYRIGHT}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "License" "${LICENSE}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "Homepage" "${HOMEPAGE}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "OriginalFilename" "${INSTALLER}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${NAME} Installer"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VERSION}"
 VIProductVersion "${VERSION}"
 
 BrandingText "${NAME} - ${VERSION}  ${HOMEPAGE}"

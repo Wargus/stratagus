@@ -249,7 +249,7 @@ std::string LocalPlayerName;         /// Name of local player
 
 	/// Name, Version, Copyright
 const char NameLine[] =
-	"Stratagus V" VERSION ", (c) 1998-2010 by The Stratagus Project.";
+	NAME " V" VERSION ", " COPYRIGHT;
 
 std::string CliMapName;          /// Filename of the map given on the command line
 std::string CompileOptions;          /// Compile options.
@@ -542,7 +542,7 @@ static void PrintHeader(void)
 		"%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n"
 		"  Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon, Pali Rohar,\n"
 		"  and others.\n"
-		"\thttps://launchpad.net/stratagus\n"
+		"\t" HOMEPAGE "\n"
 		"Compile options %s",
 		NameLine, CompileOptions.c_str());
 }

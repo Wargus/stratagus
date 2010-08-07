@@ -110,7 +110,7 @@ strip:
 
 src/$(OBJDIR)/stratagusrc.o: src/stratagus.rc
 	if [ ! -d src/$(OBJDIR) ]; then mkdir src/$(OBJDIR); fi
-	cd src; $(WINDRES) -o $(OBJDIR)/stratagusrc.o stratagus.rc; cd ..
+	cd src; $(WINDRES) $(CPPFLAGS) -o $(OBJDIR)/stratagusrc.o stratagus.rc; cd ..
 
 clean::
 	$(RM) -r $(OBJ)

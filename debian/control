@@ -31,8 +31,8 @@ Description: Strategy Gaming Engine
  .
  Games which use Stratagus:
   * Wargus - Warcraft II - https://launchpad.net/wargus
-  * War1gus - Warcraft I - https://launchpad.net/war1gus
   * Stargus - Starcraft I - https://launchpad.net/stargus
+  * War1gus - Warcraft I - https://launchpad.net/war1gus
  .
  This package provides no game and no game data set. This is only engine.
  To play one of game, install package wargus, war1gus or stargus.

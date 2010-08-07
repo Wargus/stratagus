@@ -318,6 +318,26 @@ int LuaLoadFile(const std::string &file)
 }
 
 /**
+**  Get Stratagus Version
+*/
+static int CclGetStratagusVersion(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushstring(l, VERSION);
+	return 1;
+}
+
+/**
+**  Get Stratagus Homepage
+*/
+static int CclGetStratagusHomepage(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushstring(l, HOMEPAGE);
+	return 1;
+}
+
+/**
 **  Get the directory of the current lua file
 */
 static int CclGetCurrentLuaPath(lua_State *l)
@@ -2429,6 +2449,9 @@ void InitCcl(void)
 	lua_register(Lua, "LoadBuffer", CclLoadBuffer);
 	lua_register(Lua, "GetCurrentLuaPath", CclGetCurrentLuaPath);
 	lua_register(Lua, "SavedGameInfo", CclSavedGameInfo);
+
+	lua_register(Lua, "GetStratagusVersion", CclGetStratagusVersion);
+	lua_register(Lua, "GetStratagusHomepage", CclGetStratagusHomepage);
 
 	AliasRegister();
 	ReplayCclRegister();

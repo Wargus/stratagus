@@ -43,6 +43,7 @@
 #include "network.h"
 #include "netconnect.h"
 #include "editor.h"
+#include "sound.h"
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -1499,6 +1500,8 @@ int MenuScreen::run(bool loop)
 	GameCursor = UI.Point.Cursor;
 	CursorOn = CursorOnUnknown;
 
+	CallbackMusicOn();
+
 	if (loop) {
 		const EventCallback *old_callbacks = GetCallbacks();
 		SetCallbacks(&GuichanCallbacks);
@@ -1508,6 +1511,7 @@ int MenuScreen::run(bool loop)
 				UpdateDisplay();
 				RealizeVideoMemory();
 			}
+			CheckMusicFinished();
 			WaitEventsOneFrame();
 		}
 		SetCallbacks(old_callbacks);
