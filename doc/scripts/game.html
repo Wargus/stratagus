@@ -318,27 +318,39 @@ Define the campaign.
 
 <a name="DefineConstruction"></a>
 <h3>DefineConstruction(ident ...)</h3>
-Defines a construction.<br>
+Defines a construction, which controls how the game draws units that
+are being built.  To make use of the construction thus defined,
+you must also make one or more unit types refer to it;
+see <a href="unittype.html#DefineUnitType">DefineUnitType</a>.<br>
 <br>
-Constructions can specify multiple files and shadow files.  Shadows are 
-optional.<br>
+As the unit nears completion, the game shows the frames of the
+construction one at a time.  This sequence of frames does not repeat.
+The construction affects only the appearance of the unit, not how long
+it takes to build.  Constructions are not used for units that are
+being trained rather than built, because those do not appear on the
+map before they are complete.<br>
+<br>
+The game can load these frames from the graphics files of the unit
+type or from separate construction-specific files: a primary file and
+a shadow file.  If you omit the shadow file, the unit will not have a
+shadow in these frames.<br>
 <br>
 The construction frames should be ordered by increasing percentages and the
 first frame should be 0.
 
 <pre>
-DefineConstruction( ident
+DefineConstruction( ident,
   Files = {
     File = filename,
     Size = {x, y}},
-  ShadowFile = {{
-    Tileset = tileset,
+  ShadowFile = {
     File = filename,
-    Size = {x, y}}},
+    Size = {x, y}},
   Constructions = {{
-    percent = percent,
-    file = construction-file,
-    frame = frame-number}}
+      percent = percent,
+      file = construction-file,
+      frame = frame-number},
+    ...}
 })
 </pre>
 
@@ -346,38 +358,44 @@ DefineConstruction( ident
 <dt>ident</dt>
 <dd>Unique name of the construction.
 </dd>
-<dt>tileset</dt>
-<dd>Name of tileset or default to use with any tileset.
+<dt>Files = {...}</dt>
+<dd>The construction-specific graphic file.
+Needed only if some construction-file is "construction".
+Although this section is tagged "Files", you cannot specify multiple files.
 </dd>
 <dt>filename</dt>
 <dd>Path of the graphic.
+</dd>
+<dt>x, y</dt>
+<dd>The size of each frame in the graphic.
+</dd>
+<dt>ShadowFile = {...}</dt>
+<dd>The construction-specific graphic file.
+Needed only if some construction-file is "construction"
+and you also want shadows for those frames.
 </dd>
 <dt>percent</dt>
 <dd>Percentage of construction complete.
 </dd>
 <dt>construction-file</dt>
-<dd>Can be construction or main, specifies which image should be displayed.
+<dd>Can be "construction" or "main", specifies which image should be displayed.
 </dd>
 <dt>frame-number</dt>
-<dd>Specfies which frame number to display.
+<dd>Specifies which frame number to display.
 </dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    -- Defines construction-land with different graphics for summer and winter
-    -- tilesets.  Buildings 0-24 percent complete use frame 0 of the construction
+    -- Defines construction-land with a construction-specific graphics file.
+    -- Buildings 0-24 percent complete use frame 0 of the construction
     -- image, 25-49 percent complete use frame 1 of the construction image, and 50-99
     -- percent complete use the frame 1 of the main building graphic.
     DefineConstruction("construction-land", {
-        Files= {{
-                Tileset = "desert",
+        Files= {
                 File = "neutral/buildings/land_construction_site.png",
-                Size = {64, 64}},{
-                Tileset = "winter",
-                File = "tilesets/winter/neutral/buildings/land_construction_site.png",
-                Size = {64, 64}}},
+                Size = {64, 64}},
         Constructions = {{
                 Percent = 0,
                 File = "construction",
