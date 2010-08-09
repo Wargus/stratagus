@@ -17,7 +17,8 @@
 ;
 ;
 
-!include "MUI.nsh"
+!include "MUI2.nsh"
+!include "FileFunc.nsh"
 
 ;--------------------------------
 
@@ -49,6 +50,8 @@
 
 ;--------------------------------
 
+LangString INSTALLER_RUNNING ${LANG_ENGLISH} "${NAME} Installer is already running"
+LangString GAMES_AVAILABLE ${LANG_ENGLISH} "Some ${NAME} Games are installed and available on system.$\nFirst uninstall all ${NAME} Games, then ${NAME}"
 LangString REMOVEPREVIOUS ${LANG_ENGLISH} "Removing previous installation"
 LangString REMOVECONFIGURATION ${LANG_ENGLISH} "Removing configuration files:"
 LangString DESC_REMOVEEXE ${LANG_ENGLISH} "Remove ${NAME} executable"
@@ -107,22 +110,45 @@ RequestExecutionLevel admin
 
 ;--------------------------------
 
-!ifdef AMD64
-
 Function .onInit
+
+	System::Call 'kernel32::CreateMutexA(i 0, i 0, t "${NAME}") i .r1 ?e'
+	Pop $0
+	StrCmp $0 0 +3
+
+	MessageBox MB_OK|MB_ICONEXCLAMATION "$(INSTALLER_RUNNING)"
+	Abort
+
+!ifdef AMD64
 
 	System::Call "kernel32::GetCurrentProcess() i .s"
 	System::Call "kernel32::IsWow64Process(i s, *i .r0)"
-	IntCmp $0 0 0 0 end
+	IntCmp $0 0 0 0 +3
 
 	MessageBox MB_OK|MB_ICONSTOP "$(AMD64ONLY)"
 	Abort
 
-end:
+!endif
 
 FunctionEnd
 
-!endif
+;--------------------------------
+
+Function un.onInit
+
+	ClearErrors
+	${GetParameters} $0
+	${GetOptions} "$0" "/P" $1
+	IfErrors 0 +6
+
+	ClearErrors
+	EnumRegValue $0 HKLM "${REGKEY}\Games" 0
+	IfErrors +3
+
+	MessageBox MB_OK|MB_ICONSTOP "$(GAMES_AVAILABLE)"
+	Abort
+
+FunctionEnd
 
 ;--------------------------------
 
@@ -130,17 +156,15 @@ Section "-${NAME}" UninstallPrevious
 
 	SectionIn RO
 
-	ReadRegStr $R0 HKLM "${REGKEY}" "InstallLocation"
-	StrCmp $R0 "" end
+	ReadRegStr $0 HKLM "${REGKEY}" "InstallLocation"
+	StrCmp $0 "" +7
 
 	DetailPrint "$(REMOVEPREVIOUS)"
 	SetDetailsPrint none
-	ExecWait "$R0\${UNINSTALL} /S _?=$R0"
-	Delete "$R0\${UNINSTALL}"
-	RMDir $R0
+	ExecWait "$0\${UNINSTALL} /S /P _?=$0"
+	Delete "$0\${UNINSTALL}"
+	RMDir $0
 	SetDetailsPrint lastused
-
-end:
 
 SectionEnd
 
