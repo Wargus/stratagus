@@ -105,8 +105,7 @@ stratagus: $(OBJ)
 	$(CXX) -o $(OUTFILE) $^ $(CXXFLAGS) $(LDFLAGS)
 
 strip:
-	@if [ -f $(OUTFILE) ]; then strip $(OUTFILE); fi
-	@if [ -f $(OUTFILE).exe ]; then $(CROSSDIR)/i386-mingw32msvc/bin/strip $(OUTFILE).exe; fi
+	@if [ -f $(OUTFILE) ]; then $(STRIP) $(OUTFILE); fi
 
 src/$(OBJDIR)/stratagusrc.o: src/stratagus.rc
 	if [ ! -d src/$(OBJDIR) ]; then mkdir src/$(OBJDIR); fi

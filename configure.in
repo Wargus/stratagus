@@ -311,6 +311,19 @@ else
 	WINDRES=""
 fi
 
+if test "$STRIP" == ""; then
+	STRIP="$host-strip";
+fi
+AC_CHECK_PROGS(STRIP_CHECK, $STRIP)
+if test "x$STRIP_CHECK" = "x"; then
+	STRIP="strip"
+	AC_CHECK_PROGS(STRIP_CHECK, $STRIP)
+fi
+if test "x$STRIP_CHECK" = "x"; then
+	echo "*** strip not found"
+	exit 1
+fi
+
 OUTFILE=stratagus
 if test "$ARCH" = "win32"; then
 	OUTFILE=stratagus.exe
@@ -319,6 +332,7 @@ fi
 AC_SUBST(OUTFILE)
 
 AC_SUBST(WINDRES)
+AC_SUBST(STRIP)
 AC_SUBST(CPPFLAGS)
 AC_SUBST(CXXFLAGS)
 AC_SUBST(LDFLAGS)
