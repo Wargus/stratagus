@@ -63,6 +63,8 @@ LangString AMD64ONLY ${LANG_ENGLISH} "This version is for 64 bits computers only
 
 ;--------------------------------
 
+SetCompressor lzma
+
 !define MUI_ICON "${ICON}"
 !define MUI_UNICON "${ICON}"
 
@@ -213,6 +215,11 @@ SectionEnd
 !insertmacro MUI_DESCRIPTION_TEXT ${Executable} $(DESC_REMOVEEXE)
 !insertmacro MUI_DESCRIPTION_TEXT ${Configuration} $(DESC_REMOVECONF)
 !insertmacro MUI_UNFUNCTION_DESCRIPTION_END
+
+;--------------------------------
+
+!packhdr "exehead.tmp" "upx -9 exehead.tmp"
+;!finalize "gpg --armor --sign --detach-sig %1"
 
 ;--------------------------------
 
