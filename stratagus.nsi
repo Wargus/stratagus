@@ -23,7 +23,7 @@
 ;--------------------------------
 
 !define NAME "Stratagus"
-!define VERSION "2.2.5.2"
+!define VERSION "2.2.5.3"
 !define HOMEPAGE "https://launchpad.net/stratagus"
 !define LICENSE "GPL v2"
 !define COPYRIGHT "Copyright (c) 1998-2010 by The Stratagus Project and Pali Rohar"

@@ -9,7 +9,7 @@
 #define DESCRIPTION NAME " - Strategy Gaming Engine"
 
 /// Engine version shown
-#define VERSION  "2.2.5.2"
+#define VERSION  "2.2.5.3"
 
 /// Stratagus major version
 #define StratagusMajorVersion  2
@@ -21,7 +21,7 @@
 #define StratagusPatchLevel    5
 
 /// Stratagus patch level 2
-#define StratagusPatchLevel2   2
+#define StratagusPatchLevel2   3
 
 /// Stratagus version (1,2,3) -> 10203
 #define StratagusVersion (StratagusMajorVersion * 10000 + StratagusMinorVersion * 100 + StratagusPatchLevel)
