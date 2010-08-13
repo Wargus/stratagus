@@ -135,12 +135,10 @@ CCursor *CursorByIdent(const std::string &ident)
 	std::vector<CCursor>::iterator i;
 
 	for (i = AllCursors.begin(); i != AllCursors.end(); ++i) {
-		if ((*i).Ident != ident) {
+		if ((*i).Ident != ident || ! (*i).G->IsLoaded())
 			continue;
-		}
-		if ((*i).Race.empty() || (*i).G->IsLoaded()) {
+		if ((*i).Race.empty() || ! ThisPlayer || (*i).Race == PlayerRaces.Name[ThisPlayer->Race])
 			return &(*i);
-		}
 	}
 	DebugPrint("Cursor `%s' not found, please check your code.\n" _C_ ident.c_str());
 	return NULL;
