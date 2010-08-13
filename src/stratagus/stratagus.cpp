@@ -254,6 +254,7 @@ const char NameLine[] =
 std::string CliMapName;          /// Filename of the map given on the command line
 std::string CompileOptions;          /// Compile options.
 static std::vector<gcn::Container *> Containers;
+std::string MenuRace;
 
 /*----------------------------------------------------------------------------
 --  Speedups FIXME: Move to some other more logic place
@@ -325,7 +326,11 @@ void PreMenuSetup(void)
 
 	InitVideoCursors();
 
-	LoadCursors(PlayerRaces.Name[0]);
+	if (MenuRace.empty())
+		LoadCursors(PlayerRaces.Name[0]);
+	else
+		LoadCursors(MenuRace);
+
 	InitSettings();
 
 	InitUserInterface();

@@ -337,6 +337,13 @@ static int CclGetStratagusHomepage(lua_State *l)
 	return 1;
 }
 
+static int CclSetMenuRace(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	MenuRace = LuaToString(l, 1);
+	return 0;
+}
+
 /**
 **  Get the directory of the current lua file
 */
@@ -2449,6 +2456,7 @@ void InitCcl(void)
 	lua_register(Lua, "LoadBuffer", CclLoadBuffer);
 	lua_register(Lua, "GetCurrentLuaPath", CclGetCurrentLuaPath);
 	lua_register(Lua, "SavedGameInfo", CclSavedGameInfo);
+	lua_register(Lua, "SetMenuRace", CclSetMenuRace);
 
 	lua_register(Lua, "GetStratagusVersion", CclGetStratagusVersion);
 	lua_register(Lua, "GetStratagusHomepage", CclGetStratagusHomepage);

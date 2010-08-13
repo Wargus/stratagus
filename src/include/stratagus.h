@@ -227,6 +227,7 @@ extern std::string GameName;                /// Name of the game
 extern std::string FullGameName;            /// Full Name of the game
 extern std::string ClickMissile;            /// Missile to show when you click
 extern std::string DamageMissile;           /// Missile to show damage caused
+extern std::string MenuRace;
 
 extern int SpeedBuild;                      /// Speed factor for building
 extern int SpeedTrain;                      /// Speed factor for training
