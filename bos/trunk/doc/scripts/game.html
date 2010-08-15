@@ -317,7 +317,7 @@ Define the campaign.
 </pre>
 
 <a name="DefineConstruction"></a>
-<h3>DefineConstruction(ident ...)</h3>
+<h3>DefineConstruction(ident, {...})</h3>
 Defines a construction, which controls how the game draws units that
 are being built.  To make use of the construction thus defined,
 you must also make one or more unit types refer to it;
@@ -339,7 +339,7 @@ The construction frames should be ordered by increasing percentages and the
 first frame should be 0.
 
 <pre>
-DefineConstruction( ident,
+DefineConstruction(ident, {
   Files = {
     File = filename,
     Size = {x, y}},
@@ -356,7 +356,8 @@ DefineConstruction( ident,
 
 <dl>
 <dt>ident</dt>
-<dd>Unique name of the construction.
+<dd>Unique name of the construction.  The Construction parameter of
+<a href="unittype.html#DefineUnitType">DefineUnitType</a> refers to this.
 </dd>
 <dt>Files = {...}</dt>
 <dd>The construction-specific graphic file.
@@ -370,7 +371,7 @@ Although this section is tagged "Files", you cannot specify multiple files.
 <dd>The size of each frame in the graphic.
 </dd>
 <dt>ShadowFile = {...}</dt>
-<dd>The construction-specific graphic file.
+<dd>The construction-specific shadow graphic file.
 Needed only if some construction-file is "construction"
 and you also want shadows for those frames.
 </dd>
@@ -393,7 +394,7 @@ and you also want shadows for those frames.
     -- image, 25-49 percent complete use frame 1 of the construction image, and 50-99
     -- percent complete use the frame 1 of the main building graphic.
     DefineConstruction("construction-land", {
-        Files= {
+        Files = {
                 File = "neutral/buildings/land_construction_site.png",
                 Size = {64, 64}},
         Constructions = {{
