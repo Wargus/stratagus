@@ -159,7 +159,7 @@ msgstr "Spieltyp:"
 #: scripts/guichan.lua:560 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:358
 msgid "Map Default"
-msgstr "Kartenstandart"
+msgstr "Kartenstandard"
 
 #: scripts/guichan.lua:560 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:358
