@@ -515,12 +515,6 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "ShoreBuilding")) {
 			type->ShoreBuilding = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "LandUnit")) {
-			type->LandUnit = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "AirUnit")) {
-			type->AirUnit = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SeaUnit")) {
-			type->SeaUnit = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Indestructible")) {
 			type->Indestructible = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "CanTransport")) {

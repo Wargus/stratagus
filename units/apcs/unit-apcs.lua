@@ -89,7 +89,6 @@ DefineUnitType("unit-apcs", {
     RepairHp = 2,
     RightMouseAction = "attack",
     ExplodeWhenKilled = "missile-160x128-explosion",
-    LandUnit = true,
     CanAttack = true,
     CanTargetLand = true,
     CanTargetAir = true,

@@ -71,7 +71,6 @@ DefineUnitType("unit-wscout", {
     ComputerReactionRange = 10,
     PersonReactionRange = 10,
     RightMouseAction = "move",
-    SeaUnit = true,
     SelectableByRectangle = true,
     CanAttack = false,
     CanTargetLand = true,

@@ -83,7 +83,6 @@ DefineUnitType("unit-jet", {
     ComputerReactionRange = 10,
     PersonReactionRange = 10,
     RightMouseAction = "attack",
-    AirUnit = true,
     SelectableByRectangle = true,
     CanAttack = true,
     CanTargetLand = true,

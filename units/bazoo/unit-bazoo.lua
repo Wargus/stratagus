@@ -89,7 +89,6 @@ DefineUnitType("unit-bazoo", {
     CanTargetLand = true,
     CanTargetAir = true,
     CanTargetSea = true,
-    LandUnit = true,
     Organic = true,
     SelectableByRectangle = true,
     Sounds = {

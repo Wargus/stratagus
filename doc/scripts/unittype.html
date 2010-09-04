@@ -111,7 +111,6 @@ Some Flags are already defined in the engine : the UnitType flags.
 So following flags are the value of the unitType :
 "Building", "ShoreBuilding",
 "Coward", "Harvester", "Revealer",
-"LandUnit", "AirUnit", "SeaUnit",
 "ExplodeWhenKilled", "VisibleUnderFog", "PermanentCloack", "AttackFromTransporter",
 "GroundAttack", "CanAttack", "CanHarvest",
 "Vanishes", "Flip", "Decoration", "IsNotSelectable", "SelectableByRectangle",
@@ -587,7 +586,6 @@ DefineUnitType("unit-footman", { Name = "Footman",
   RightMouseAction = "attack",
   CanAttack = true,
   CanTargetLand = true,
-  LandUnit = true,
   organic = true,
   SelectableByRectangle = true,
   -- distance is &gt;3 from gold, and &lt;2 from a watch tower

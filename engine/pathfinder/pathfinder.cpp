@@ -255,7 +255,7 @@ static int STDCALL CostMoveTo(int x, int y, void *data)
 				// Tend against unknown tiles.
 				cost += AStarUnknownTerrainCost;
 			}
-			if (!unit->Type->AirUnit) {
+			if (unit->Type->UnitType != UnitTypeFly) {
 				// Add tile movement cost
 				cost += Map.Field(i, j)->Cost;
 			}

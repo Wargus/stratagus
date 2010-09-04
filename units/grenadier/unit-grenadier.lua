@@ -87,7 +87,6 @@ DefineUnitType("unit-grenadier", {
     Type = "land",
     CanAttack = true,
     CanTargetLand = true,
-    LandUnit = true,
     Organic = true,
     SelectableByRectangle = true,
     Sounds = {

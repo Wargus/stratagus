@@ -117,7 +117,6 @@ DefineUnitType("unit-buggy", {
     CanAttack = true,
     CanTargetLand = true,
     RightMouseAction = "attack",
-    LandUnit = true,
     SelectableByRectangle = true,
     VisibleUnderFog = true,
     Sounds = {
