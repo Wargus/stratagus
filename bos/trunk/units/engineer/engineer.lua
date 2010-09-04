@@ -93,7 +93,6 @@ DefineUnitType("unit-engineer", {
     RepairRange = 1,
     AutoRepairRange = 5,
     CanTargetLand = true,
-    LandUnit = true,
     Coward = true,
     Harvester = true,
     Organic = true,

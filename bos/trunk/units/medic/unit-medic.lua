@@ -124,7 +124,6 @@ DefineUnitType("unit-medic", {
   Corpse = "unit-dead-body5",
   Type = "land",
   CanTargetLand = true,
-  LandUnit = true,
   Organic = true,
   SelectableByRectangle = true,
   CanCastSpell = {"spell-healing"},

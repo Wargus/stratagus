@@ -76,7 +76,6 @@ DefineUnitType("unit-destroyer", {
     ComputerReactionRange = 10,
     PersonReactionRange = 10,
     RightMouseAction = "attack",
-    SeaUnit = true,
     SelectableByRectangle = true,
     CanAttack = true,
     CanTargetLand = true,

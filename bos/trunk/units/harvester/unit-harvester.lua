@@ -98,7 +98,6 @@ DefineUnitType("unit-harvester", {
     RightMouseAction = "harvest",
     CanAttack = true,
     CanTargetLand = true,
-    LandUnit = true,
     Coward = true,
     Harvester = true,
     SelectableByRectangle = true,

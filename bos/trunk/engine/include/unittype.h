@@ -217,18 +217,6 @@
 **    has active sight even when Removed. It's used for Reveal map
 **    type of spells.
 **
-**  CUnitType::LandUnit
-**
-**    Land animated
-**
-**  CUnitType::AirUnit
-**
-**    Air animated
-**
-**  CUnitType::SeaUnit
-**
-**    Sea animated
-**
 **  CUnitType::ExplodeWhenKilled
 **
 **    Death explosion animated
@@ -652,9 +640,6 @@ public:
 
 	unsigned Flip : 1;              /// Flip image when facing left
 	unsigned Revealer : 1;          /// reveal the fog of war
-	unsigned LandUnit : 1;          /// Land animated
-	unsigned AirUnit : 1;           /// Air animated
-	unsigned SeaUnit : 1;           /// Sea animated
 	unsigned ExplodeWhenKilled : 1; /// Death explosion animated
 	unsigned Building : 1;          /// Building
 	unsigned VisibleUnderFog : 1;   /// Unit is visible under fog of war.
