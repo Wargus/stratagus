@@ -257,12 +257,6 @@ static int CclDefineGameSounds(lua_State *l)
 				LuaError(l, "Sound id expected");
 			}
 			GameSounds.PlacementSuccess.Sound = (CSound *)data->Data;
-		} else if (!strcmp(value, "work-complete")) {
-			if (!lua_isuserdata(l, j + 1) ||
-					(data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
-				LuaError(l, "Sound id expected");
-			}
-			GameSounds.WorkComplete.Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "rescue")) {
 			if (!lua_isuserdata(l, j + 1) ||
 					(data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {

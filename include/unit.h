@@ -458,7 +458,6 @@ enum UnitVoiceGroup {
 	VoiceReady,             /// Command completed
 	VoiceHelpMe,            /// If attacked
 	VoiceDying,             /// If killed
-	VoiceWorkCompleted,     /// only worker, work completed
 	VoiceBuilding,          /// only for building under construction
 	VoiceDocking,           /// only for transport reaching coast
 };
