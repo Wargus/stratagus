@@ -244,13 +244,14 @@ static int AiTrainUnit(const CUnitType *type, CUnitType *what)
 	int num;
 
 	//
-	// Remove all units already doing something.
+	// Remove all units already doing something
+	// or located in an unsuitable terrain.
 	//
 	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table, UnitMax);
 	for (num = i = 0; i < nunits; ++i)
 	{
 		unit = table[i];
-		if (unit->IsIdle())
+		if (unit->IsIdle() && TerrainAllowsTraining(unit, what))
 		{
 			table[num++] = unit;
 		}
