@@ -605,8 +605,6 @@ static int CclDefineUnitType(lua_State *l)
 					type->Sound.Acknowledgement.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "ready")) {
 					type->Sound.Ready.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "repair")) {
-					type->Sound.Repair.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "help")) {
 					type->Sound.Help.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "dead")) {
