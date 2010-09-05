@@ -565,6 +565,18 @@ public:
 	CUnitType *RestrictType;
 };
 
+class CBuildRestrictionTerrain : public CBuildRestriction {
+public:
+	CBuildRestrictionTerrain(unsigned fieldFlags, int min, int max)
+		: FieldFlags(fieldFlags), Min(min), Max(max) {}
+	virtual bool Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const;
+
+private:
+	unsigned FieldFlags;
+	int Min;
+	int Max;
+};
+
 	/// Base structure of unit-type
 class CUnitType {
 public:
