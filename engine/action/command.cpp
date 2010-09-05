@@ -713,6 +713,54 @@ void CommandResource(CUnit *unit, CUnit *dest, int flush)
 }
 
 /**
+**  Check whether the terrain is suitable for training a unit of a
+**  given type.  For example, you cannot train battleships at a
+**  shipyard if there is no deep water anywhere near it.
+**
+**  @param trainer      A unit that would train another unit.
+**                      Typically, this is a building.
+**  @param traineeType  What type of unit it would train.
+**
+**  @return true if there is at least one suitable map field near
+**  the proposed trainer unit, false if not.  Unexplored map fields
+**  are never suitable.
+**
+**  This function only checks that training the unit would look at
+**  least somewhat sensible.  It does not check whether there are
+**  other units blocking the way, because the situation could change
+**  before the training would end.  It also ignores the size of the
+**  trained unit.
+*/
+bool TerrainAllowsTraining(const CUnit *trainer, const CUnitType *traineeType)
+{
+	// Make this nonzero if you also want to check tiles around
+	// the trainer unit.
+	const int around = 0;
+
+	const int xMin = std::max(0, trainer->X - around);
+	const int yMin = std::max(0, trainer->Y - around);
+	const int xEnd = std::min(Map.Info.MapWidth,
+		trainer->X + trainer->Type->TileWidth + around);
+	const int yEnd = std::min(Map.Info.MapHeight,
+		trainer->Y + trainer->Type->TileHeight + around);
+
+	// Ignore any units in the way.  Especially ignore buildings
+	// because the trainer unit itself is probably a building.
+	const unsigned obstacles = traineeType->MovementMask & MapFieldPatchMask;
+	
+	for (int y = yMin; y < yEnd; y++) {
+		for (int x = xMin; x < xEnd; x++) {
+			if (Map.IsFieldExplored(trainer->Player, x, y)
+			    && !(Map.Field(x, y)->Flags & obstacles)) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+/**
 **  Building starts training a unit.
 **
 **  @param unit   pointer to unit.

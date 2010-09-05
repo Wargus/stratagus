@@ -106,6 +106,42 @@ void HandleActionTrain(CUnit *unit)
 	// First entry
 	//
 	if (!unit->SubAction) {
+		// Check the terrain here rather than in
+		// CommandTrainUnit because, if the train command is
+		// queued after a move, CommandTrainUnit might not
+		// know in advance where the move will end.  Usually
+		// though, units that can train are buildings and
+		// unable to move.
+		if (!TerrainAllowsTraining(unit, unit->Orders[0]->Type)) {
+			unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
+				_("Cannot train %s here"),
+				unit->Orders[0]->Type->Name.c_str());
+
+			if (unit->Player->AiEnabled) {
+				// There is no AiCanNotTrain but this
+				// call will work.  To the AI, the
+				// primary difference between training
+				// and building is that trained units
+				// get drafted into forces; there is
+				// no such unit here because the
+				// training attempt failed.
+				AiCanNotBuild(unit, unit->Orders[0]->Type);
+			}
+
+			if (unit->OrderCount == 1) {
+				unit->ClearAction();
+			} else {
+				unit->OrderFlush = 1;
+				unit->SubAction = 0;
+			}
+
+			if (IsOnlySelected(unit)) {
+				UI.ButtonPanel.Update();
+			}
+
+			return;
+		}
+
 		unit->Data.Train.Ticks = 0;
 		unit->SubAction = 1;
 

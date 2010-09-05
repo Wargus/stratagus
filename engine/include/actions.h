@@ -122,6 +122,8 @@ extern void CommandAnyOrder(CUnit *unit, COrder *order, int flush);
 	/// Move an order in command queue
 extern void CommandMoveOrder(CUnit *unit, int src, int dst);
 
+extern bool TerrainAllowsTraining(const CUnit *trainer, const CUnitType *traineeType);
+
 /*----------------------------------------------------------------------------
 --  Actions: in action_<name>.c
 ----------------------------------------------------------------------------*/
