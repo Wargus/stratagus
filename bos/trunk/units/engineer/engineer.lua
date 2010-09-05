@@ -101,7 +101,6 @@ DefineUnitType("unit-engineer", {
         "selected", "engineer-selected",
         "acknowledge", "engineer-acknowledge",
         "ready", "engineer-ready",
-        "repair", "engineer-repair",
         "help", "engineer-help",
         "dead", "engineer-die"}
 })
