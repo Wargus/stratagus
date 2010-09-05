@@ -51,6 +51,7 @@
 #include "spells.h"
 #include "sound.h"
 #include "map.h"
+#include "actions.h"
 #include "commands.h"
 #include "video.h"
 #include "font.h"
@@ -545,6 +546,9 @@ static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 			}
 			break;
 		case ButtonTrain:
+			res = UnitIdAllowed(unit->Player, buttonaction->Value) != 0
+				&& TerrainAllowsTraining(unit, UnitTypes[buttonaction->Value]);
+			break;
 		case ButtonBuild:
 			res = UnitIdAllowed(unit->Player, buttonaction->Value) != 0;
 			break;
