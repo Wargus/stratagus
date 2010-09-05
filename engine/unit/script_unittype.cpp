@@ -461,8 +461,6 @@ static int CclDefineUnitType(lua_State *l)
 				type->MouseAction = MouseActionHarvest;
 			} else if (!strcmp(value, "spell-cast")) {
 				type->MouseAction = MouseActionSpellCast;
-			} else if (!strcmp(value, "sail")) {
-				type->MouseAction = MouseActionSail;
 			} else {
 				LuaError(l, "Unsupported RightMouseAction: %s" _C_ value);
 			}
