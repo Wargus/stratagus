@@ -125,10 +125,6 @@ void MapUnitSounds(void)
 				type->Sound.Repair.Sound =
 					SoundForName(type->Sound.Repair.Name);
 			}
-			if (!type->Sound.Harvest.Name.empty()) {
-				type->Sound.Harvest.Sound =
-					SoundForName(type->Sound.Harvest.Name);
-			}
 			if (!type->Sound.Help.Name.empty()) {
 				type->Sound.Help.Sound =
 					SoundForName(type->Sound.Help.Name);

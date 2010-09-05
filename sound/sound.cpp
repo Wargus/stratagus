@@ -190,8 +190,6 @@ static CSound *ChooseUnitVoiceSound(const CUnit *unit, UnitVoiceGroup voice)
 			return GameSounds.Docking.Sound;
 		case VoiceRepairing:
 			return unit->Type->Sound.Repair.Sound;
-		case VoiceHarvesting:
-			return unit->Type->Sound.Harvest.Sound;
 	}
 
 	return NO_SOUND;
