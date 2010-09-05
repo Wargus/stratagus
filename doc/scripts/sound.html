@@ -64,7 +64,6 @@ Specify some global sounds.
 <dl>"placement-success", SoundId</dl>
 
 <dl>"rescue",{"RaceName", SoundId}</dl>
-<dl>"work-complete", {RaceName, SoundId}</dl>
 </dd>
 <dt>Where Soundid is the sound to use</dt>
 <dt>And RaceName the concerned race.</dt>
@@ -84,9 +83,6 @@ DefineGameSounds(
 -- FIXME: Not ready
 --  "transport-docking",
 --  "building-construction",
-
-  "work-complete", {"human", MakeSound("basic human voices work complete", "human/basic_voices/work_complete.wav")},
-  "work-complete", {"orc", MakeSound("basic orc voices work complete", "orc/basic_voices/work_complete.wav")},
 
   "rescue", {"human", MakeSound("human rescue", "human/rescue.wav")},
   "rescue", {"orc", MakeSound("orc rescue", "orc/rescue.wav")} )

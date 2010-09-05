@@ -67,7 +67,6 @@ public:
 	SoundConfig Click;                 /// used by ui
 	SoundConfig Docking;               /// ship reaches coast
 	SoundConfig BuildingConstruction;  /// building under construction
-	SoundConfig WorkComplete;          /// building ready
 	SoundConfig Rescue;                /// rescue units
 	SoundConfig ChatMessage;           /// chat message
 };

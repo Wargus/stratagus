@@ -71,7 +71,6 @@ GameSound GameSounds
 	SoundConfig("click"),
 	SoundConfig("transport docking"),
 	SoundConfig("building construction"),
-	SoundConfig("basic human voices work complete"),
 	SoundConfig("rescue (human) UNUSED"),
 }
 #endif
@@ -182,8 +181,6 @@ static CSound *ChooseUnitVoiceSound(const CUnit *unit, UnitVoiceGroup voice)
 			return unit->Type->Sound.Help.Sound;
 		case VoiceDying:
 			return unit->Type->Sound.Dead.Sound;
-		case VoiceWorkCompleted:
-			return GameSounds.WorkComplete.Sound;
 		case VoiceBuilding:
 			return GameSounds.BuildingConstruction.Sound;
 		case VoiceDocking:
@@ -500,11 +497,6 @@ void InitSoundClient(void)
 	if (!GameSounds.BuildingConstruction.Sound) {
 		GameSounds.BuildingConstruction.Sound =
 			SoundForName(GameSounds.BuildingConstruction.Name);
-	}
-	if (!GameSounds.WorkComplete.Sound &&
-			!GameSounds.WorkComplete.Name.empty()) {
-		GameSounds.WorkComplete.Sound =
-			SoundForName(GameSounds.WorkComplete.Name);
 	}
 	if (!GameSounds.Rescue.Sound && !GameSounds.Rescue.Name.empty()) {
 		GameSounds.Rescue.Sound =
