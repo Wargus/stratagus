@@ -111,6 +111,65 @@ unsigned CclGetResourceByName(lua_State *l)
 }
 
 /**
+**  Parse a "terrain" build restriction.
+**
+**  @param l  Lua state where the value at the top of the stack
+**            is the table containing arguments for the "terrain"
+**            build restriction.  On exit, it will be the same.
+**
+**  @return   The freshly constructed build restriction.
+**            The caller is responsible of deleting it.
+**
+**  If the argument table is invalid, this function indirectly calls
+**  lua_error and thus longjmp.  This function doesn't itself leak
+**  memory in that case, but its careless callers can do so.
+*/
+static CBuildRestrictionTerrain *ParseBuildRestrictionTerrain(lua_State *l)
+{
+	const char *value;
+	unsigned fieldFlags = 0;
+	int min = 0;
+	int max = INT_MAX;
+
+	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+		value = LuaToString(l, -2);
+		if (!strcmp(value, "CountLand")) {
+			if (LuaToBoolean(l, -1)) {
+				fieldFlags |= MapFieldLandAllowed;
+			} else {
+				fieldFlags &= ~MapFieldLandAllowed;
+			}
+		} else if (!strcmp(value, "CountCoast")) {
+			if (LuaToBoolean(l, -1)) {
+				fieldFlags |= MapFieldCoastAllowed;
+			} else {
+				fieldFlags &= ~MapFieldCoastAllowed;
+			}
+		} else if (!strcmp(value, "CountShallowWater")) {
+			if (LuaToBoolean(l, -1)) {
+				fieldFlags |= MapFieldShallowWater;
+			} else {
+				fieldFlags &= ~MapFieldShallowWater;
+			}
+		} else if (!strcmp(value, "CountDeepWater")) {
+			if (LuaToBoolean(l, -1)) {
+				fieldFlags |= MapFieldDeepWater;
+			} else {
+				fieldFlags &= ~MapFieldDeepWater;
+			}
+		} else if (!strcmp(value, "Min")) {
+			min = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Max")) {
+			max = LuaToNumber(l, -1);
+		} else {
+			LuaError(l, "Unsupported BuildingRules terrain tag: %s" _C_ value);
+		}
+	}
+
+	return new CBuildRestrictionTerrain(fieldFlags, min, max);
+}
+
+/**
 **  Parse BuildingRules
 **
 **  @param l      Lua state.
@@ -197,6 +256,8 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 				}
 			}
 			andlist->push_back(b);
+		} else if (!strcmp(value, "terrain")) {
+			andlist->push_back(ParseBuildRestrictionTerrain(l));
 		} else {
 			LuaError(l, "Unsupported BuildingRules tag: %s" _C_ value);
 		}

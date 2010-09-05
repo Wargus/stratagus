@@ -225,6 +225,34 @@ bool CBuildRestrictionOnTop::Check(const CUnitType *type, int x, int y, CUnit *&
 	return ontoptarget != NULL;
 }
 
+/**
+**  Check Terrain Restriction
+*/
+bool CBuildRestrictionTerrain::Check(const CUnitType *type, int xMin, int yMin, CUnit *&ontoptarget) const
+{
+	Assert(xMin >= 0);
+	Assert(xMin + type->TileWidth < Map.Info.MapWidth);
+	Assert(yMin >= 0);
+	Assert(yMin + type->TileHeight < Map.Info.MapHeight);
+
+	int count = 0;
+	for (int y = yMin; y < yMin + type->TileHeight; y++) {
+		for (int x = xMin; x < xMin + type->TileWidth; x++) {
+			// In principle, if the player hasn't explored
+			// the map field yet, this function should not
+			// leak any information about it.  However,
+			// CanBuildHere seems to be the only caller,
+			// and after Check returns true, it verifies
+			// that the tiles have been explored, and
+			// prevents building if not.
+			if (Map.Field(x, y)->Flags & this->FieldFlags) {
+				count++;
+			}
+		}
+	}
+
+	return count >= this->Min && count <= this->Max;
+}
 
 /**
 **  Can build unit here.
