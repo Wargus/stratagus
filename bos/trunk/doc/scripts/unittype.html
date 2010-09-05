@@ -417,6 +417,10 @@ or sails/dives in the water.  This affects several things:
 <dt id="DefineUnitType.ShoreBuilding">ShoreBuilding = boolean</dt>
 <dd>Unit is a shore building, and immobile. This is used for those unique buildings
 that have to be built on sea and have at least one point on coast.
+This restriction is like BuildingRules = {{"terrain", {CountCoast=true, Min=1}}},
+but ShoreBuilding also affects other things: see
+<a href="#DefineUnitType.CanTargetSea">CanTargetSea<a> and
+<a href="#DefineUnitType.AllowTerrainCoast">AllowTerrainCoast</a>.
 </dd>
 <dt id="DefineUnitType.AllowTerrainLand">AllowTerrainLand = boolean</dt>
 <dd>Explicitly allow or forbid moving the unit to dry land.
@@ -460,14 +464,6 @@ the example for details.
 		<dt>Type</dt>
 		<dd>Type of the unit that this unit is an addon too</dd>
 	</dl></dd>
-	<dt>"tile" <b>NOT IMPLEMENTED</b></dt>
-	<dd>Implement a tile restriction, unit must be placed on certain types of tiles.
-	<dl>
-	    <dt>NumberOnMask</dt>
-		<dd>The number of tiles that are needed until the build of a type to satisfy</dd>
-		<dt>Mask</dt>
-		<dd>Mask of the tiles that needs to be meet <b>Will be updated to tiletype</b></dd>
-	</dl></dd>
 	<dt id="DefineUnitType.BuildingRules.ontop">"ontop"</dt>
 	<dd>Building must be built on top of another building type.<br>
 	    NOTE: the engine may not be able to guess the correct parent if the rules are complex enough.
@@ -485,6 +481,21 @@ the example for details.
 		<dd>boolean, true if you want the original unit to be replaced when this unit dies</dd>
 		<dt>ReplaceOnBuild</dt>
 		<dd>boolean, true if you want to remove the old unit underneath when you build this one</dd>
+	</dl></dd>
+	<dt id="DefineUnitType.BuildingRules.terrain">"terrain"</dt>
+	<dd>Implement a tile restriction, unit must be placed on certain types of tiles.
+	<dl>
+		<dt>CountLand = boolean</dt>
+		<dt>CountCoast = boolean</dt>
+		<dt>CountShallowWater = boolean</dt>
+		<dt>CountDeepWater = boolean</dt>
+		<dd>Which types of terrain tiles are being counted.</dd>
+		<dt>Min = number</dt>
+		<dd>Smallest permitted number of such terrain tiles under the unit.
+		    If omitted, there is no minimum limit.</dd>
+		<dt>Max = number</dt>
+		<dd>Greatest permitted number of such terrain tiles under the unit.
+		    If omitted, there is no maximum limit.</dd>
 	</dl></dd>
 	<dt>"direction" <b>NOT IMPLEMENTED</b></dt>
 	<dd><dl>

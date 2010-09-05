@@ -80,6 +80,23 @@ DefineUnitType("unit-shipyard", {
     Points = 200,
     DeathExplosion = largeExplosion,
     Type = "naval",
+    BuildingRules = {
+        -- Both conditions below must be satisfied.
+        {
+            -- The shipyard must have at least one land or coast tile
+            -- under it; it cannot be built in the open sea.  This
+            -- restriction exists for the map editor.  In the game,
+            -- engineers wouldn't be able to reach such a building
+            -- place anyway.
+            "terrain", {CountLand = true, CountCoast = true, Min = 1},
+
+            -- The shipyard must not have more than 8 land tiles under
+            -- it.  (The total size is 6*5 = 30 tiles.)  This limit
+            -- must be at least 5 so that an engineer with sight range
+            -- 5 walking along a coast can explore the whole building
+            -- site beforehand without cameras.
+         "terrain", {CountLand = true, Max = 8}}},
+    AllowTerrainLand = true,
     AllowTerrainCoast = true,
     Building = true,
     VisibleUnderFog = true,
