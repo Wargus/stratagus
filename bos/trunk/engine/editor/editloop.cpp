@@ -1231,17 +1231,29 @@ static void ShowUnitInfo(const CUnit *unit)
 /**
 **  Show info about a patch and about one of its fields.
 **
-**  @param patch  Patch pointer.
-**  @param field  Map field to describe.  This function assumes that most
-**                properties of the field have been copied from the patch.
+**  @param patch  Patch pointer.  Can be NULL.
+**  @param mapX   X coordinate of the cursor on the map.
+**  @param mapY   Y coordinate of the cursor on the map.
 */
-static void ShowPatchInfo(const CPatch *patch, const CMapField *field)
+static void ShowPatchInfo(const CPatch *patch, int mapX, int mapY)
 {
 	std::ostringstream o;
 
-	o << _("Patch") << ": " << patch->getType()->getName() << " - ("
-	  << patch->getX() << ", " << patch->getY() << ")";
+	if (patch == NULL)
+	{
+		o << _("Patch missing");
+	}
+	else
+	{
+		o << _("Patch") << " (" << patch->getX() << ", "
+		  << patch->getY() << "): " << patch->getType()->getName();
+	}
 
+	o << " - ";
+
+	const CMapField *field = Map.Field(mapX, mapY);
+	o << _("Field") << " (" << mapX << ", " << mapY << ")";
+	
 	bool comma = false;
 	Assert(!(field->Flags & MapFieldTransparent));
 	if (field->Flags & MapFieldUnpassable)
@@ -1897,13 +1909,9 @@ static void EditorCallbackMouse(int x, int y)
 
 		// Show what patch is under the cursor
 		PatchUnderCursor = Map.PatchManager.getPatch(cursorMapX, cursorMapY);
-		if (PatchUnderCursor)
-		{
-			ShowPatchInfo(PatchUnderCursor,
-				Map.Field(cursorMapX, cursorMapY));
-			HandleMouseScrollArea(x, y);
-			return;
-		}
+		ShowPatchInfo(PatchUnderCursor, cursorMapX, cursorMapY);
+		HandleMouseScrollArea(x, y);
+		return;
 	}
 
 	//
