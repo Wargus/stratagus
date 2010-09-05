@@ -121,10 +121,6 @@ void MapUnitSounds(void)
 				SetSoundRange(type->Sound.Ready.Sound,
 					INFINITE_SOUND_RANGE);
 			}
-			if (!type->Sound.Repair.Name.empty()) {
-				type->Sound.Repair.Sound =
-					SoundForName(type->Sound.Repair.Name);
-			}
 			if (!type->Sound.Help.Name.empty()) {
 				type->Sound.Help.Sound =
 					SoundForName(type->Sound.Help.Name);

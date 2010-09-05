@@ -461,7 +461,6 @@ enum UnitVoiceGroup {
 	VoiceWorkCompleted,     /// only worker, work completed
 	VoiceBuilding,          /// only for building under construction
 	VoiceDocking,           /// only for transport reaching coast
-	VoiceRepairing,         /// repairing
 };
 
 /**
