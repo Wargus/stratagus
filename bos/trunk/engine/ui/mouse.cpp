@@ -321,7 +321,7 @@ void DoRightButton(int sx, int sy)
 		}
 
 		// FIXME: attack/follow/board ...
-		if ((action == MouseActionMove || action == MouseActionSail) &&
+		if ((action == MouseActionMove) &&
 				(dest && dest != unit) &&
 				(dest->Player == unit->Player || unit->IsAllied(dest))) {
 			dest->Blink = 4;

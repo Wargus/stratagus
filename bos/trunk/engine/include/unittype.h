@@ -631,7 +631,6 @@ public:
 #define MouseActionMove      2      /// Move
 #define MouseActionHarvest   3      /// Harvest resources
 #define MouseActionSpellCast 5      /// Cast the first spell known
-#define MouseActionSail      6      /// Sail
 	int Points;                     /// How many points you get for unit
 	int CanTarget;                  /// Which units can it attack
 #define CanTargetLand 1             /// Can attack land units
