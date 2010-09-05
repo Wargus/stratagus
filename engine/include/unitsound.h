@@ -67,7 +67,6 @@ public:
 	SoundConfig Acknowledgement;    /// acknowledge of use command
 	SoundConfig Ready;              /// unit training... ready
 	SoundConfig Repair;             /// unit repairing
-	SoundConfig Harvest;            /// unit harvesting
 	SoundConfig Help;               /// unit is attacked
 	SoundConfig Dead;               /// unit is killed
 };
