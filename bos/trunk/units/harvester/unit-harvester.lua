@@ -105,7 +105,6 @@ DefineUnitType("unit-harvester", {
         "selected", "harvester-selected",
         "acknowledge", "harvester-acknowledge",
         "ready", "harvester-ready",
-        "harvest", "harvester-harvest",
         "help", "harvester-help",
         "dead", "harvester-die"}
 })
