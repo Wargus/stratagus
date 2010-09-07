@@ -2476,19 +2476,44 @@ int ViewPointDistanceToUnit(const CUnit *dest)
 */
 int CanTarget(const CUnitType *source, const CUnitType *dest)
 {
-	if (dest->UnitType == UnitTypeLand) {
-		if (dest->ShoreBuilding) {
-			return source->CanTarget & (CanTargetLand | CanTargetSea);
-		}
-		return source->CanTarget & CanTargetLand;
+	switch (dest->UnitType) {
+		case UnitTypeLand:
+		case UnitTypeNaval:
+			// A building that straddles the shoreline should be
+			// targetable with both CanTargetLand and
+			// CanTargetSea, even if it isn't a ShoreBuilding.
+			// (ShoreBuilding would require at least one
+			// MapFieldCoastAllowed under the building, which is
+			// not feasible with some patch sets.)
+			//
+			// To support such units, treat UnitTypeLand and
+			// UnitTypeNaval as equivalent, and instead examine
+			// MovementMask.  Another possibility would be to
+			// look at the map fields under the individual
+			// CUnit, but that would be slower and could cause
+			// weird effects if an already targeted unit becomes
+			// untargetable as a result of moving from the land
+			// to the sea or vice versa.
+			//
+			// Ignore MapFieldCoastAllowed in ~MovementMask
+			// because it is typically used by transporter ships
+			// that CanTargetLand should not cover and
+			// CanTargetSea already covers by virtue of the
+			// other water flags.
+			if ((source->CanTarget & CanTargetLand)
+			    && (~dest->MovementMask & MapFieldLandAllowed))
+				return 1;
+			if ((source->CanTarget & CanTargetSea)
+			    && (~dest->MovementMask & (MapFieldShallowWater | MapFieldDeepWater)))
+				return 1;
+			return 0;
+
+		case UnitTypeFly:
+			return source->CanTarget & CanTargetAir;
+
+		default:
+			return 0;
 	}
-	if (dest->UnitType == UnitTypeFly) {
-		return source->CanTarget & CanTargetAir;
-	}
-	if (dest->UnitType == UnitTypeNaval) {
-		return source->CanTarget & CanTargetSea;
-	}
-	return 0;
 }
 
 /**
