@@ -279,14 +279,20 @@ files are not declared here. Please see the documentation on <a href="sound.html
 <dd>Whether the unit can attack at all.
 </dd>
 <dt id="DefineUnitType.CanTargetLand">CanTargetLand = boolean<dt>
-<dd>Whether the unit can attack units that have <a href="#DefineUnitType.Type">Type</a> = "land".
+<dd>Whether the unit can attack land units (<a href="#DefineUnitType.Type">Type</a> = "land").
+Actually, it can attack naval units too, if they are explicitly allowed on land
+(see <a href="#DefineUnitType.AllowTerrainLand">AllowTerrainLand</a>).
+It does not matter whether the targeted unit currently is on land.
 </dd>
 <dt id="DefineUnitType.CanTargetSea">CanTargetSea = boolean<dt>
-<dd>Whether the unit can attack units that have <a href="#DefineUnitType.Type">Type</a> = "naval",
-or that have both Type = "land" and <a href="#DefineUnitType.ShoreBuilding">ShoreBuilding</a> = true.
+<dd>Whether the unit can attack naval units (<a href="#DefineUnitType.Type">Type</a> = "naval").
+Actually, it can attack land units too, if they are explicitly allowed in some type of water
+(see <a href="#DefineUnitType.AllowTerrainShallowWater">AllowTerrainShallowWater</a>
+and <a href="#DefineUnitType.AllowTerrainDeepWater">AllowTerrainDeepWater</a>).
+It does not matter whether the targeted unit currently is in water.
 </dd>
 <dt id="DefineUnitType.CanTargetAir">CanTargetAir = boolean<dt>
-<dd>Whether the unit can attack units that have <a href="#DefineUnitType.Type">Type</a> = "fly".
+<dd>Whether the unit can attack flying units (<a href="#DefineUnitType.Type">Type</a> = "fly").
 </dd>
 <dt>MaxMana = number</dt>
 <dd>Maximum mana of the unit.  When a unit of this type is created, it
@@ -417,25 +423,36 @@ or sails/dives in the water.  This affects several things:
 <dt id="DefineUnitType.ShoreBuilding">ShoreBuilding = boolean</dt>
 <dd>Unit is a shore building, and immobile. This is used for those unique buildings
 that have to be built on sea and have at least one point on coast.
-This restriction is like BuildingRules = {{"terrain", {CountCoast=true, Min=1}}},
-but ShoreBuilding also affects other things: see
-<a href="#DefineUnitType.CanTargetSea">CanTargetSea<a> and
-<a href="#DefineUnitType.AllowTerrainCoast">AllowTerrainCoast</a>.
+This restriction is like <a href="#DefineUnitType.BuildingRules">BuildingRules</a> =
+{{<a href="#DefineUnitType.BuildingRules.terrain">"terrain"</a>, {CountCoast=true, Min=1}}},
+but ShoreBuilding also affects other things:
+see <a href="#DefineUnitType.AllowTerrainCoast">AllowTerrainCoast</a>.
 </dd>
 <dt id="DefineUnitType.AllowTerrainLand">AllowTerrainLand = boolean</dt>
 <dd>Explicitly allow or forbid moving the unit to dry land.
-By default, only <a href="#DefineUnitType.Type">air units and land units</a> are allowed there.</dd>
+By default, only <a href="#DefineUnitType.Type">air units and land units</a> are allowed there.
+This also affects whether the unit can be targeted as a land unit
+(see <a href="#DefineUnitType.CanTargetLand">CanTargetLand</a>).
+</dd>
 <dt id="DefineUnitType.AllowTerrainCoast">AllowTerrainCoast = boolean</dt>
 <dd>Explicitly allow or forbid moving the unit to coasts.
 By default, only air units, naval <a href="#DefineUnitType.CanTransport">transporter</a> units,
-and <a href="#DefineUnitType.ShoreBuilding">shore buildings</a> are allowed there.</dd>
+and <a href="#DefineUnitType.ShoreBuilding">shore buildings</a> are allowed there.
+This does not affect which units can target the unit.
+</dd>
 <dt id="DefineUnitType.AllowTerrainShallowWater">AllowTerrainShallowWater = boolean</dt>
 <dd>Explicitly allow or forbid moving the unit to shallow water.
-By default, only air units and naval units are allowed there.</dd>
+By default, only air units and naval units are allowed there.
+This also affects whether the unit can be targeted as a naval unit
+(see <a href="#DefineUnitType.CanTargetSea">CanTargetSea</a>).
+</dd>
 <dt id="DefineUnitType.AllowTerrainDeepWater">AllowTerrainDeepWater = boolean</dt>
 <dd>Explicitly allow or forbid moving the unit to deep water.
-By default, only air units and naval units are allowed there.</dd>
-<dt>BuildingRules = { { "distance", { Distance = 3, DistanceType = ">", Type = "unit-gold-mine"}}}
+By default, only air units and naval units are allowed there.
+This also affects whether the unit can be targeted as a naval unit
+(see <a href="#DefineUnitType.CanTargetSea">CanTargetSea</a>).
+</dd>
+<dt id="DefineUnitType.BuildingRules">BuildingRules = { { "distance", { Distance = 3, DistanceType = ">", Type = "unit-gold-mine"}}}
 <dd>BuildingRules allows you to specify a list of restrictions to make when building. The
 list is in nested tables, the inter list is and'd together, and or'd with the other lists. See
 the example for details.
@@ -640,7 +657,7 @@ Which properties get overridden depends on the type of the value you provide:
   <dd>Overrides individual properties of the variable.
     The tags and values of the table have the same meanings
     as in <a href="#DefineVariables">DefineVariables</a>.
-    If you omit some tags from the list, then the corresponding properties
+    If you omit some tags from the table, then the corresponding properties
     set with DefineVariables remain in force.</dd>
   <dt><var>variable</var> = number</dt>
   <dd>Assigns the number as both the initial value and the maximum value
