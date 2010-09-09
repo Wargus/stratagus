@@ -6,6 +6,10 @@ CXXFLAGS=$CXXFLAGS
 AC_PROG_CXX
 AM_CONFIG_HEADER(config.h)
 
+test "$prefix" = "NONE" && prefix=/usr/local
+datarootdir=.
+test "$datadir" = "NONE" && datadir=$datarootdir
+
 PATH=$prefix/bin:$PATH
 LDFLAGS="$LDFLAGS -L$prefix/lib -L$prefix/bin"
 
@@ -242,10 +246,6 @@ if test "$ARCH" = "win32"; then
 		CPPFLAGS="$CPPFLAGS -DNO_STDIO_REDIRECT"
 	fi
 fi
-
-test "$prefix" = "NONE" && prefix=/usr/local
-datarootdir=.
-test "$datadir" = "NONE" && datadir=$datarootdir
 
 dnl --- LUA includes -----------
 AC_ARG_WITH(lua-includes, [  --with-lua-includes=DIR [Location of lua include directiories
