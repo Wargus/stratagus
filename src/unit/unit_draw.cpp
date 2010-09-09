@@ -846,6 +846,10 @@ void ShowOrder(const CUnit *unit)
 		return;
 	}
 
+	if (unit->Player != ThisPlayer && !ThisPlayer->IsAllied(unit)) {
+		return;
+	}
+
 	// Get current position
 	x1 = CurrentViewport->Map2ViewportX(
 		unit->X) + unit->IX + unit->Type->TileWidth * TileSizeX / 2;
