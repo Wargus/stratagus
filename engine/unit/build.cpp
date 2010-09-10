@@ -231,9 +231,9 @@ bool CBuildRestrictionOnTop::Check(const CUnitType *type, int x, int y, CUnit *&
 bool CBuildRestrictionTerrain::Check(const CUnitType *type, int xMin, int yMin, CUnit *&ontoptarget) const
 {
 	Assert(xMin >= 0);
-	Assert(xMin + type->TileWidth < Map.Info.MapWidth);
+	Assert(xMin + type->TileWidth <= Map.Info.MapWidth);
 	Assert(yMin >= 0);
-	Assert(yMin + type->TileHeight < Map.Info.MapHeight);
+	Assert(yMin + type->TileHeight <= Map.Info.MapHeight);
 
 	int count = 0;
 	for (int y = yMin; y < yMin + type->TileHeight; y++) {
