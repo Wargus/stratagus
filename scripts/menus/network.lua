@@ -9,7 +9,7 @@
 --
 --      network.lua - The multiplayer UI.
 --
---      (c) Copyright 2005-2008 by François Beerten
+--      (c) Copyright 2005-2010 by François Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -80,16 +80,16 @@ function addPlayersList(menu, numplayers)
 
   menu:writeLargeText(_("Players"), sx * 11, sy*3)
   for i=1,8 do
-    players_name[i] = menu:writeText("Player"..i, sx * 11, sy*4 + i*18)
+    players_name[i] = menu:writeText(_("Player")..i, sx * 11, sy*4 + i*18)
     players_name[i]:setWidth(80)
-    players_state[i] = menu:writeText("Preparing", sx * 11 + 85, sy*4 + i*18)
+    players_state[i] = menu:writeText(_("Preparing"), sx * 11 + 85, sy*4 + i*18)
   end
-  numplayers_text = menu:writeText("Open slots: " .. numplayers - 1, sx *11, sy*4 + 162)
+  numplayers_text = menu:writeText(_("Open slots: ") .. numplayers - 1, sx *11, sy*4 + 162)
 
   local function updatePlayers()
     local connected_players = 0
     local ready_players = 0
-    players_state[1]:setCaption("Creator")
+    players_state[1]:setCaption(_("Creator"))
     players_name[1]:setCaption(Hosts[0].PlyName)
     for i=2,8 do
       if Hosts[i-1].PlyName == "" then
@@ -99,14 +99,14 @@ function addPlayersList(menu, numplayers)
         connected_players = connected_players + 1
         if ServerSetupState.Ready[i-1] == 1 then
           ready_players = ready_players + 1
-          players_state[i]:setCaption("Ready")    
+          players_state[i]:setCaption(_("Ready"))    
         else
-          players_state[i]:setCaption("Preparing")
+          players_state[i]:setCaption(_("Preparing"))
         end
         players_name[i]:setCaption(Hosts[i-1].PlyName)
      end
     end
-    numplayers_text:setCaption("Open slots : " .. numplayers - 1 - connected_players)
+    numplayers_text:setCaption(_("Open slots : ") .. numplayers - 1 - connected_players)
     numplayers_text:adjustSize()
     return (connected_players > 0 and ready_players == connected_players)
   end
@@ -134,7 +134,7 @@ function RunJoiningMapMenu(s)
   menu:writeText(_("Players:"), sx, sy*3+50)
   players = menu:writeText(numplayers, sx+70, sy*3+50)
   menu:writeText(_("Description:"), sx, sy*3+70)
-  descr = menu:writeText("Unknown map", sx+20, sy*3+90)
+  descr = menu:writeText(_("Unknown map"), sx+20, sy*3+90)
   descr:setWidth(sx * 9 - 20 - 20)
 
   local fow = menu:addCheckBox(_("Fog of war"), sx, sy*3+120, function() end)
@@ -234,7 +234,7 @@ function RunJoiningGameMenu(s)
   menu = BosMenu(_("Joining game"))
 
   local sb = StatBoxWidget(300, 30)
-  sb:setCaption("Connecting ...")
+  sb:setCaption(_("Connecting ..."))
   sb:setPercent(0)
   menu:add(sb, x-50, Video.Height/2)
   sb:setBackgroundColor(dark)
