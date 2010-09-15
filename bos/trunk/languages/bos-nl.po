@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bos-nl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-02 12:54+0300\n"
+"POT-Creation-Date: 2010-09-09 13:55+0200\n"
 "PO-Revision-Date: 2007-12-15 01:30+0100\n"
 "Last-Translator: Eric Kok <erickok@gmail.com>\n"
 "Language-Team: Dutch <foppe.benedictus@gmail.com>\n"
@@ -11,11 +11,30 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Dutch\n"
 
-#: scripts/boswars.lua:127 scripts/menus/ingame/editor.lua:195
+#: campaigns/conquest/campaign.lua:82 scripts/guichan.lua:592
+#: scripts/guichan.lua:624 scripts/guichan.lua:668
+#: scripts/menus/campaigns.lua:61 scripts/menus/campaigns.lua:155
+msgid "~!Start"
+msgstr "~!Start"
+
+#: campaigns/conquest/campaign.lua:87 scripts/guichan.lua:756
+#: scripts/guichan.lua:812 scripts/menus/campaigns.lua:66
+#: scripts/menus/ingame/editor.lua:120 scripts/menus/ingame/editor.lua:158
+#: scripts/menus/ingame/editor.lua:277 scripts/menus/ingame/game.lua:112
+#: scripts/menus/ingame/game.lua:304 scripts/menus/ingame/game.lua:352
+#: scripts/menus/ingame/game.lua:365 scripts/menus/network.lua:176
+#: scripts/menus/network.lua:242 scripts/menus/network.lua:303
+#: scripts/menus/network.lua:377 scripts/menus/network.lua:449
+#: scripts/menus/network.lua:495 scripts/menus/patch.lua:89
+#: scripts/menus/patch.lua:171
+msgid "Cancel (~<Esc~>)"
+msgstr "Annuleer (~<Esc~>)"
+
+#: scripts/boswars.lua:127 scripts/menus/ingame/editor.lua:228
 msgid "Energy"
 msgstr "Energie"
 
-#: scripts/boswars.lua:127 scripts/menus/ingame/editor.lua:207
+#: scripts/boswars.lua:127 scripts/menus/ingame/editor.lua:240
 msgid "Magma"
 msgstr "Magma"
 
@@ -37,13 +56,13 @@ msgstr "Verslagen !"
 
 #: scripts/guichan.lua:401
 msgid "Cheater"
-msgstr ""
+msgstr "Valsspeler"
 
 #: scripts/guichan.lua:404
 msgid "Results"
 msgstr "Resultaten"
 
-#: scripts/guichan.lua:410
+#: scripts/guichan.lua:410 scripts/menus/network.lua:83
 msgid "Player"
 msgstr "Speler"
 
@@ -67,142 +86,136 @@ msgstr "Verwoeste gebouwen"
 msgid "~!Continue"
 msgstr "Doorgaan (~!C)"
 
-#: scripts/guichan.lua:529
+#: scripts/guichan.lua:525
 msgid "Start Game"
 msgstr "Start spel"
 
-#: scripts/guichan.lua:531 scripts/guichan.lua:753
+#: scripts/guichan.lua:527 scripts/guichan.lua:775
 #: scripts/menus/network.lua:130 scripts/menus/network.lua:317
 msgid "Map"
 msgstr "Kaart"
 
-#: scripts/guichan.lua:532 scripts/guichan.lua:754
+#: scripts/guichan.lua:528 scripts/guichan.lua:776
 #: scripts/menus/network.lua:131 scripts/menus/network.lua:318
 #: scripts/menus/network.lua:418
 msgid "File:"
 msgstr "Bestand:"
 
-#: scripts/guichan.lua:535 scripts/guichan.lua:720 scripts/guichan.lua:758
-#: scripts/menus/ingame/editor.lua:109 scripts/menus/network.lua:423
-#: scripts/menus/patch.lua:53
+#: scripts/guichan.lua:531 scripts/guichan.lua:740 scripts/guichan.lua:780
+#: scripts/menus/ingame/editor.lua:142 scripts/menus/network.lua:423
+#: scripts/menus/patch.lua:77
 msgid "Size:"
 msgstr "Grootte:"
 
-#: scripts/guichan.lua:538 scripts/guichan.lua:756
+#: scripts/guichan.lua:534 scripts/guichan.lua:778
 #: scripts/menus/network.lua:134 scripts/menus/network.lua:321
 #: scripts/menus/network.lua:421
 msgid "Players:"
 msgstr "Spelers:"
 
-#: scripts/guichan.lua:540 scripts/guichan.lua:760
+#: scripts/guichan.lua:536 scripts/guichan.lua:782
 #: scripts/menus/network.lua:136 scripts/menus/network.lua:323
 #: scripts/menus/network.lua:425
 msgid "Description:"
 msgstr "Omschrijving:"
 
-#: scripts/guichan.lua:544 scripts/menus/network.lua:140
+#: scripts/guichan.lua:540 scripts/menus/network.lua:140
 #: scripts/menus/network.lua:332
 msgid "Fog of war"
 msgstr "Oorlogsmist"
 
-#: scripts/guichan.lua:547 scripts/guichan.lua:613
+#: scripts/guichan.lua:543 scripts/guichan.lua:611
 #: scripts/menus/network.lua:144 scripts/menus/network.lua:339
 msgid "Reveal map"
 msgstr "Onthul kaart"
 
-#: scripts/guichan.lua:551 scripts/menus/network.lua:147
+#: scripts/guichan.lua:547 scripts/menus/network.lua:147
 #: scripts/menus/network.lua:341
 msgid "Difficulty:"
 msgstr "Moeilijkheid:"
 
-#: scripts/guichan.lua:552 scripts/menus/network.lua:148
+#: scripts/guichan.lua:548 scripts/menus/network.lua:148
 #: scripts/menus/network.lua:342
 msgid "easy"
 msgstr "gemakkelijk"
 
-#: scripts/guichan.lua:552 scripts/guichan.lua:556
+#: scripts/guichan.lua:548 scripts/guichan.lua:552
 #: scripts/menus/network.lua:148 scripts/menus/network.lua:152
 #: scripts/menus/network.lua:342 scripts/menus/network.lua:350
 msgid "normal"
 msgstr "normaal"
 
-#: scripts/guichan.lua:552 scripts/menus/network.lua:148
+#: scripts/guichan.lua:548 scripts/menus/network.lua:148
 #: scripts/menus/network.lua:342
 msgid "hard"
 msgstr "moeilijk"
 
-#: scripts/guichan.lua:555 scripts/menus/network.lua:151
+#: scripts/guichan.lua:551 scripts/menus/network.lua:151
 #: scripts/menus/network.lua:349
 msgid "Starting resources:"
 msgstr "Beginvoorraad:"
 
-#: scripts/guichan.lua:556 scripts/menus/network.lua:152
+#: scripts/guichan.lua:552 scripts/menus/network.lua:152
 #: scripts/menus/network.lua:350
 msgid "high"
 msgstr "hoog"
 
-#: scripts/guichan.lua:556 scripts/menus/network.lua:152
+#: scripts/guichan.lua:552 scripts/menus/network.lua:152
 #: scripts/menus/network.lua:350
 msgid "low"
 msgstr "laag"
 
-#: scripts/guichan.lua:559 scripts/menus/network.lua:155
+#: scripts/guichan.lua:555 scripts/menus/network.lua:155
 #: scripts/menus/network.lua:357
 msgid "Game type:"
 msgstr "Speltype:"
 
-#: scripts/guichan.lua:560 scripts/menus/network.lua:156
+#: scripts/guichan.lua:556 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:358
 msgid "Map Default"
 msgstr "Kaart standaard"
 
-#: scripts/guichan.lua:560 scripts/menus/network.lua:156
+#: scripts/guichan.lua:556 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:358
 #, fuzzy
 msgid "Melee"
 msgstr "Lijf-aan-lijfgevecht"
 
-#: scripts/guichan.lua:560 scripts/menus/network.lua:156
+#: scripts/guichan.lua:556 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:358
 msgid "Free For All"
-msgstr "Vrij voor iedereen"
+msgstr "Iedereen tegen iedereen"
 
-#: scripts/guichan.lua:560 scripts/menus/network.lua:156
+#: scripts/guichan.lua:556 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:358
 msgid "Top vs Bottom"
 msgstr "Boven tegen Onder"
 
-#: scripts/guichan.lua:560 scripts/menus/network.lua:156
+#: scripts/guichan.lua:556 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:358
 msgid "Left vs Right"
 msgstr "Links tegen Rechts"
 
-#: scripts/guichan.lua:560 scripts/menus/network.lua:156
+#: scripts/guichan.lua:556 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:358
 msgid "Man vs Machine"
 msgstr "Mens tegen Machine"
 
-#: scripts/guichan.lua:592 scripts/guichan.lua:624 scripts/guichan.lua:668
-#: scripts/guichan.lua:736 scripts/guichan.lua:788
-#: scripts/menus/campaigns.lua:149 scripts/menus/credits.lua:141
-#: scripts/menus/options.lua:313
+#: scripts/guichan.lua:590 scripts/guichan.lua:622 scripts/guichan.lua:666
+#: scripts/guichan.lua:709 scripts/menus/campaigns.lua:153
+#: scripts/menus/credits.lua:142 scripts/menus/options.lua:313
 msgid "Main Menu (~<Esc~>)"
 msgstr "Hoofdmenu (~<Esc~>)"
 
-#: scripts/guichan.lua:594 scripts/guichan.lua:626 scripts/guichan.lua:670
-#: scripts/menus/campaigns.lua:57 scripts/menus/campaigns.lua:151
-msgid "~!Start"
-msgstr "~!Start"
-
-#: scripts/guichan.lua:603
+#: scripts/guichan.lua:601
 msgid "Show a Replay"
 msgstr "Toon een herhaling"
 
-#: scripts/guichan.lua:637
+#: scripts/guichan.lua:635
 msgid "Load Game"
 msgstr "Laad spel"
 
-#: scripts/guichan.lua:681 scripts/guichan.lua:704 scripts/guichan.lua:751
+#: scripts/guichan.lua:681
 msgid "Editor"
 msgstr "Editor"
 
@@ -210,78 +223,79 @@ msgstr "Editor"
 msgid "Create ~!New Map"
 msgstr "Maak ~!Nieuwe kaart"
 
-#: scripts/guichan.lua:685
+#: scripts/guichan.lua:689
 msgid "~!Load Map"
 msgstr "~!Laad kaart"
 
-#: scripts/guichan.lua:688
+#: scripts/guichan.lua:696
 #, fuzzy
-msgid "~!Patch Editor"
-msgstr "~!Patch Editor"
+msgid "C~!reate New Patch"
+msgstr "~!Maak Nieuw Grondvlak"
 
-#: scripts/guichan.lua:691 scripts/menus/campaigns.lua:62
-#: scripts/menus/ingame/editor.lua:87 scripts/menus/ingame/editor.lua:125
-#: scripts/menus/ingame/editor.lua:230 scripts/menus/ingame/game.lua:112
-#: scripts/menus/ingame/game.lua:304 scripts/menus/ingame/game.lua:352
-#: scripts/menus/ingame/game.lua:365 scripts/menus/network.lua:176
-#: scripts/menus/network.lua:242 scripts/menus/network.lua:303
-#: scripts/menus/network.lua:377 scripts/menus/network.lua:449
-#: scripts/menus/network.lua:495 scripts/menus/patch.lua:80
-#: scripts/menus/patch.lua:119 scripts/menus/patch.lua:137
-msgid "Cancel (~<Esc~>)"
-msgstr "Annuleer (~<Esc~>)"
+#: scripts/guichan.lua:702 scripts/menus/patch.lua:173
+msgid "Load ~!Patch"
+msgstr "Laad ~!Grondvlak"
 
-#: scripts/guichan.lua:738 scripts/guichan.lua:790 scripts/guichan.lua:820
+#: scripts/guichan.lua:723
+#, fuzzy
+msgid "Create New Map"
+msgstr "Maak ~!Nieuwe kaart"
+
+#: scripts/guichan.lua:758 scripts/guichan.lua:814 scripts/guichan.lua:845
 msgid "Start ~!Editor"
 msgstr "Start ~!Editor"
 
-#: scripts/guichan.lua:811 scripts/menus/network.lua:380
+#: scripts/guichan.lua:773
+msgid "Select Map to Edit"
+msgstr "Kies Kaart om te bewerken"
+
+#: scripts/guichan.lua:836 scripts/menus/network.lua:380
 msgid "~!Start Game"
 msgstr "~!Start spel"
 
-#: scripts/guichan.lua:812
+#: scripts/guichan.lua:837
 msgid "~!Load Game"
 msgstr "~!Laad spel"
 
-#: scripts/guichan.lua:813
+#: scripts/guichan.lua:838
 msgid "~!Campaigns"
-msgstr "Veldtochten (~!C)"
+msgstr "~!Veldtochten"
 
-#: scripts/guichan.lua:814
+#: scripts/guichan.lua:839
 msgid "Show ~!Replay"
-msgstr "Toon he~!rhaling"
+msgstr "Toon ~!Herhaling"
 
-#: scripts/guichan.lua:816
+#: scripts/guichan.lua:841
 msgid "~!MultiPlayer"
-msgstr "~!MultiPlayer"
+msgstr "~!Meerdere Spelers"
 
-#: scripts/guichan.lua:817
+#: scripts/guichan.lua:842
 msgid "~!Options"
 msgstr "~!Opties"
 
-#: scripts/guichan.lua:819
+#: scripts/guichan.lua:844
 msgid "Cre~!dits"
-msgstr "Cre~!dits"
+msgstr "~!Bedankjes"
 
-#: scripts/guichan.lua:822
+#: scripts/guichan.lua:847
 msgid "E~!xit"
-msgstr "Sluiten (~!X)"
+msgstr "E~!xit"
 
-#: scripts/menus/campaigns.lua:41
+#: scripts/menus/campaigns.lua:45
 msgid "Briefing"
 msgstr "Briefing"
 
-#: scripts/menus/campaigns.lua:44
+#: scripts/menus/campaigns.lua:48
 msgid "Objectives:"
 msgstr "Doelen:"
 
-#: scripts/menus/campaigns.lua:137
+#: scripts/menus/campaigns.lua:141
 msgid "List of Campaigns"
 msgstr "Lijst van veldtochten"
 
 #: scripts/menus/credits.lua:36
 msgid "Graphics:"
-msgstr "Graphics:"
+msgstr "Grafisch ontwerp:"
 
 #: scripts/menus/credits.lua:43
 msgid "Scripting:"
@@ -297,116 +311,129 @@ msgstr "Geluid:"
 
 #: scripts/menus/credits.lua:55
 msgid "Engine Programmers:"
-msgstr "Engine programmeurs:"
+msgstr "Centrale code:"
 
-#: scripts/menus/credits.lua:112
+#: scripts/menus/credits.lua:113
 msgid "Patches"
-msgstr "Patches"
+msgstr "Grondvlakken"
 
-#: scripts/menus/credits.lua:121
+#: scripts/menus/credits.lua:122
 msgid "Stratagus Media Project Graphics"
 msgstr "Stratagus Media Project Graphics"
 
-#: scripts/menus/credits.lua:126
+#: scripts/menus/credits.lua:127
 msgid "The Bos Wars Team thanks"
 msgstr "Het Bos Wars Team bedankt"
 
-#: scripts/menus/credits.lua:127
-msgid "everybody who has contributed"
-msgstr "iedereen die heeft bijgedragen"
-
 #: scripts/menus/credits.lua:128
+msgid "everybody who has contributed"
+msgstr "iedereen die grondvlakken, foutmeldingen"
+
+#: scripts/menus/credits.lua:129
 msgid "patches, bug reports, ideas."
-msgstr "patches, bug reports, ideeën."
+msgstr "of ideeën heeft bijgedragen."
 
-#: scripts/menus/credits.lua:131
+#: scripts/menus/credits.lua:132
 msgid "Bos Wars Credits"
-msgstr "Bos Wars Credits"
+msgstr "Bos Wars Bedankjes"
 
-#: scripts/menus/ingame/editor.lua:49
-msgid "Editor Menu"
-msgstr "Editor menu"
+#: scripts/menus/ingame/editor.lua:35 scripts/menus/network.lua:55
+msgid "Error"
+msgstr "Fout"
 
-#: scripts/menus/ingame/editor.lua:50 scripts/menus/ingame/game.lua:58
-msgid "Save (~<F11~>)"
-msgstr "Opslaan (~<F11~>)"
-
-#: scripts/menus/ingame/editor.lua:52
-msgid "Map Properties (~<F5~>)"
-msgstr "Kaart eigenschappen (~<F5~>)"
-
-#: scripts/menus/ingame/editor.lua:54
-msgid "Player Properties (~<F6~>)"
-msgstr "Speler eigenschappen (~<F6~>)"
-
-#: scripts/menus/ingame/editor.lua:57
-msgid "~!Exit to menu"
-msgstr "Sluit naar menu (~!E)"
-
-#: scripts/menus/ingame/editor.lua:59
-msgid "Return to the Editor (~<Esc~>)"
-msgstr "Terug naar editor (~<Esc~>)"
-
-#: scripts/menus/ingame/editor.lua:68
-msgid "Save Map"
-msgstr "Kaart opslaan"
-
-#: scripts/menus/ingame/editor.lua:78 scripts/menus/ingame/game.lua:91
-msgid "~!Save"
-msgstr "~!Opslaan"
-
-#: scripts/menus/ingame/editor.lua:99
-msgid "Map Properties"
-msgstr "Kaart eigenschappen"
-
-#: scripts/menus/ingame/editor.lua:101
-msgid "Map Description:"
-msgstr "Kaart beschrijving"
-
-#: scripts/menus/ingame/editor.lua:118 scripts/menus/ingame/editor.lua:219
-#: scripts/menus/ingame/game.lua:180 scripts/menus/ingame/game.lua:254
-#: scripts/menus/ingame/game.lua:533 scripts/menus/ingame/game.lua:559
-#: scripts/menus/network.lua:67 scripts/menus/options.lua:64
-#: scripts/menus/options.lua:141 scripts/menus/options.lua:241
-#: scripts/menus/options.lua:301
+#: scripts/menus/ingame/editor.lua:47 scripts/menus/ingame/editor.lua:151
+#: scripts/menus/ingame/editor.lua:252 scripts/menus/ingame/game.lua:180
+#: scripts/menus/ingame/game.lua:254 scripts/menus/ingame/game.lua:533
+#: scripts/menus/ingame/game.lua:564 scripts/menus/network.lua:67
+#: scripts/menus/options.lua:64 scripts/menus/options.lua:141
+#: scripts/menus/options.lua:241 scripts/menus/options.lua:301
 msgid "~!OK"
 msgstr "~!OK"
 
-#: scripts/menus/ingame/editor.lua:140
+#: scripts/menus/ingame/editor.lua:78
+msgid "Editor Menu"
+msgstr "Editor Menu"
+
+#: scripts/menus/ingame/editor.lua:79 scripts/menus/ingame/game.lua:58
+msgid "Save (~<F11~>)"
+msgstr "Opslaan (~<F11~>)"
+
+#: scripts/menus/ingame/editor.lua:81
+msgid "Map Properties (~<F5~>)"
+msgstr "Kaart eigenschappen (~<F5~>)"
+
+#: scripts/menus/ingame/editor.lua:83
+msgid "Player Properties (~<F6~>)"
+msgstr "Speler eigenschappen (~<F6~>)"
+
+#: scripts/menus/ingame/editor.lua:85
+#, fuzzy
+msgid "Show terrain attributes"
+msgstr "Toon veld eigenschappen"
+
+#: scripts/menus/ingame/editor.lua:90
+msgid "~!Exit to menu"
+msgstr "Terug naar ~!menu"
+
+#: scripts/menus/ingame/editor.lua:92
+msgid "Return to the Editor (~<Esc~>)"
+msgstr "Terug naar editor (~<Esc~>)"
+
+#: scripts/menus/ingame/editor.lua:101
+msgid "Save Map"
+msgstr "Kaart opslaan"
+
+#: scripts/menus/ingame/editor.lua:111 scripts/menus/ingame/game.lua:91
+msgid "~!Save"
+msgstr "~!Opslaan"
+
+#: scripts/menus/ingame/editor.lua:132
+msgid "Map Properties"
+msgstr "Kaart eigenschappen"
+
+#: scripts/menus/ingame/editor.lua:134
+msgid "Map Description:"
+msgstr "Kaart beschrijving"
+
+#: scripts/menus/ingame/editor.lua:173
 msgid "Player Properties"
 msgstr "Speler eigenschappen"
 
-#: scripts/menus/ingame/editor.lua:149
+#: scripts/menus/ingame/editor.lua:182
 msgid "Type"
 msgstr "Type"
 
-#: scripts/menus/ingame/editor.lua:154
+#: scripts/menus/ingame/editor.lua:187
 msgid "Person"
 msgstr "Persoon"
 
-#: scripts/menus/ingame/editor.lua:154
+#: scripts/menus/ingame/editor.lua:187
 msgid "Computer"
 msgstr "Computer"
 
-#: scripts/menus/ingame/editor.lua:154
+#: scripts/menus/ingame/editor.lua:187
 msgid "Rescue (Passive)"
 msgstr "Redding (Passief)"
 
-#: scripts/menus/ingame/editor.lua:155
+#: scripts/menus/ingame/editor.lua:188
 msgid "Rescue (Active)"
 msgstr "Redding (Actief)"
 
-#: scripts/menus/ingame/editor.lua:155
+#: scripts/menus/ingame/editor.lua:188
 msgid "Neutral"
 msgstr "Neutraal"
 
-#: scripts/menus/ingame/editor.lua:155
+#: scripts/menus/ingame/editor.lua:188
 msgid "Nobody"
 msgstr "Niemand"
 
-#: scripts/menus/ingame/editor.lua:168
+#: scripts/menus/ingame/editor.lua:201
 msgid "AI"
 msgstr "AI"
+
+#: scripts/menus/ingame/editor.lua:264
+msgid "Must have at least one Type set to Person"
+msgstr "Minstens één speler type moet een Persoon zijn"
 
 #: scripts/menus/ingame/game.lua:57
 msgid "Game Menu"
@@ -454,7 +481,7 @@ msgstr "Spel (~<F9~>)"
 
 #: scripts/menus/ingame/game.lua:135
 msgid "~!Diplomacy"
-msgstr "~!Diplomacie"
+msgstr "~!Diplomatie"
 
 #: scripts/menus/ingame/game.lua:137 scripts/menus/ingame/game.lua:339
 #: scripts/menus/ingame/game.lua:379 scripts/menus/ingame/game.lua:459
@@ -483,7 +510,7 @@ msgstr "snel"
 
 #: scripts/menus/ingame/game.lua:198
 msgid "Diplomacy"
-msgstr "Diplomacie"
+msgstr "Diplomatie"
 
 #: scripts/menus/ingame/game.lua:200
 msgid "Allied"
@@ -507,7 +534,7 @@ msgstr "~!Herstart spel"
 
 #: scripts/menus/ingame/game.lua:318
 msgid "Are you sure you want to quit to the main menu?"
-msgstr "Weet je zeker dat je wilt sluit en terug naar het hoofdmenu?"
+msgstr "Weet je zeker dat je wilt sluiten en terug naar het hoofdmenu gaan?"
 
 #: scripts/menus/ingame/game.lua:319 scripts/menus/ingame/game.lua:335
 msgid "~!Quit to Menu"
@@ -523,7 +550,7 @@ msgstr "Opgeven (~!S)"
 
 #: scripts/menus/ingame/game.lua:333
 msgid "Are you sure you want to surrender to your enemies?"
-msgstr "Weet je zeker dat je wilt overgeven aan je vijanden?"
+msgstr "Weet je zeker dat je je wilt overgeven aan je vijanden?"
 
 #: scripts/menus/ingame/game.lua:337
 msgid "E~!xit Bos Wars"
@@ -607,7 +634,7 @@ msgstr "- pauzeer spel"
 
 #: scripts/menus/ingame/game.lua:393
 msgid "PAUSE"
-msgstr "PAUSE"
+msgstr "PAUZE"
 
 #: scripts/menus/ingame/game.lua:394
 msgid "PRINT"
@@ -675,7 +702,7 @@ msgstr "- schrijf een bericht"
 
 #: scripts/menus/ingame/game.lua:402
 msgid "SPACE"
-msgstr "SPACE"
+msgstr "SPATIE"
 
 #: scripts/menus/ingame/game.lua:402
 msgid "- goto last event"
@@ -815,7 +842,7 @@ msgstr "F8"
 
 #: scripts/menus/ingame/game.lua:419
 msgid "- speed options"
-msgstr "shelheidsopties"
+msgstr "- snelheidsopties"
 
 #: scripts/menus/ingame/game.lua:420
 msgid "F9"
@@ -929,7 +956,8 @@ msgid ""
 "than monitor your base and lead an attack."
 msgstr ""
 "Gebruik CTRL-V of ALT-V om te switchen tussen de verschillende "
-"vensterindelingen, om je basis en een aanval te monitoren. "
+"vensterindelingen, om je basis te monitoren en tegelijk een aanval te "
+"leiden. "
 
 #: scripts/menus/ingame/game.lua:484
 msgid "Know a useful tip?  Then add it here!"
@@ -945,27 +973,49 @@ msgstr "Toon tips bij het opstarten"
 
 #: scripts/menus/ingame/game.lua:535
 msgid "~!Previous Tip"
-msgstr "Vorige tip (~!P)"
+msgstr "Vo~!rige"
 
 #: scripts/menus/ingame/game.lua:537
 msgid "~!Next Tip"
-msgstr "Volgende tip (~!N)"
+msgstr "Vo~!lgende"
 
 #: scripts/menus/ingame/game.lua:549
 msgid "Objectives"
 msgstr "Doelen"
 
-#: scripts/menus/network.lua:55
-msgid "Error"
-msgstr "Fout"
-
 #: scripts/menus/network.lua:81
 msgid "Players"
 msgstr "Spelers"
 
+#: scripts/menus/network.lua:85 scripts/menus/network.lua:104
+msgid "Preparing"
+msgstr "Voorbereiding"
+
+#: scripts/menus/network.lua:87
+msgid "Open slots: "
+msgstr "Open plaatsen: "
+
+#: scripts/menus/network.lua:92
+#, fuzzy
+msgid "Creator"
+msgstr "Maker"
+
+#: scripts/menus/network.lua:102
+#, fuzzy
+msgid "Ready"
+msgstr "~!Klaar"
+
+#: scripts/menus/network.lua:109
+msgid "Open slots : "
+msgstr "Open plaatsen : "
+
 #: scripts/menus/network.lua:128
 msgid "Joining game: Map"
-msgstr ""
+msgstr "Een spel vervoegen: Kaart"
+
+#: scripts/menus/network.lua:137
+msgid "Unknown map"
+msgstr "Onbekende kaart"
 
 #: scripts/menus/network.lua:174
 msgid "~!Ready"
@@ -977,7 +1027,11 @@ msgstr "Kan server niet bereiken"
 
 #: scripts/menus/network.lua:234
 msgid "Joining game"
-msgstr ""
+msgstr "Een spel vervoegen"
+
+#: scripts/menus/network.lua:237
+msgid "Connecting ..."
+msgstr "Connectie maken ..."
 
 #: scripts/menus/network.lua:256
 msgid "Map not available"
@@ -1009,7 +1063,7 @@ msgstr "IP of server naam :"
 
 #: scripts/menus/network.lua:288 scripts/menus/network.lua:474
 msgid "~!Join Game"
-msgstr ""
+msgstr "~!Vervoeg Spel"
 
 #: scripts/menus/network.lua:292
 msgid "Invalid server name"
@@ -1017,7 +1071,7 @@ msgstr "Ongeldige servernaam"
 
 #: scripts/menus/network.lua:315 scripts/menus/network.lua:416
 msgid "Create MultiPlayer game"
-msgstr "Begin multiplayerspel"
+msgstr "Begin spel met meerdere spelers"
 
 #: scripts/menus/network.lua:396
 msgid "Waiting for players"
@@ -1025,7 +1079,7 @@ msgstr "Wacht op spelers"
 
 #: scripts/menus/network.lua:409
 msgid "No Map"
-msgstr "Geen kaart"
+msgstr "Geen Kaart"
 
 #: scripts/menus/network.lua:410
 msgid "No map"
@@ -1033,11 +1087,11 @@ msgstr "Geen kaart"
 
 #: scripts/menus/network.lua:451 scripts/menus/network.lua:484
 msgid "Create ~!Game"
-msgstr "Begin spel (~!G)"
+msgstr "Begin ~!Nieuw Spel"
 
 #: scripts/menus/network.lua:467
 msgid "MultiPlayer"
-msgstr "MultiPlayer"
+msgstr "Meerdere spelers"
 
 #: scripts/menus/network.lua:469
 msgid "Nickname :"
@@ -1103,38 +1157,30 @@ msgstr "~!Taal"
 msgid "Options"
 msgstr "Opties"
 
-#: scripts/menus/patch.lua:39 scripts/menus/patch.lua:95
-#: scripts/menus/patch.lua:130
-msgid "Patch Editor"
-msgstr "Patch Editor"
+#: scripts/menus/patch.lua:57
+msgid "Create New Patch"
+msgstr "Maak Nieuw Grondvlak"
 
-#: scripts/menus/patch.lua:41 scripts/menus/patch.lua:103
+#: scripts/menus/patch.lua:65
 msgid "Name:"
 msgstr "Naam :"
 
-#: scripts/menus/patch.lua:47
+#: scripts/menus/patch.lua:71
 msgid "Image:"
 msgstr "Beeld :"
 
-#: scripts/menus/patch.lua:56
+#: scripts/menus/patch.lua:80
 msgid "x"
-msgstr ""
+msgstr "x"
 
-#: scripts/menus/patch.lua:62
+#: scripts/menus/patch.lua:91
 msgid "Create ~!Patch"
-msgstr ""
+msgstr "~!Maak Nieuw Grondvlak"
 
-#: scripts/menus/patch.lua:111
-msgid "Load ~!Patch"
-msgstr ""
+#: scripts/menus/patch.lua:137
+msgid "The image %q is already used in the patch type %q."
+msgstr "Het beeld %q is al in gebruik in grondvlak type %q."
 
-#: scripts/menus/patch.lua:132
-msgid "Create ~!New Patch"
-msgstr "Maak ~!Nieuwe Patch"
-
-#: scripts/menus/patch.lua:134
-msgid "~!Load Patch"
-msgstr "~!Laad Patch"
-
-#~ msgid "~!Cancel"
-#~ msgstr "~!Annuleer"
+#: scripts/menus/patch.lua:158
+msgid "Select Patch to Edit"
+msgstr "Selecteer Grondvlak om te bewerken"
