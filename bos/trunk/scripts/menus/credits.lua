@@ -109,6 +109,7 @@ function RunCreditsMenu(s)
      "  Dave Turner",
      "  Ben Hines",
      "  Kachalov Anton",
+     " ",
      _("Patches"),
      "  Martin Renold",
      "  Martin Hajduch",
