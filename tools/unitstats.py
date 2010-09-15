@@ -30,7 +30,8 @@ importantkeys = ['Name',
                  'EnergyProductionRate', 'MagmaProductionRate',
                  'EnergyStorageCapacity', 'MagmaStorageCapacity',
                  'HitPoints', 'SightRange', 'Armor', 'BasicDamage', 
-                 'PiercingDamage', 'MaxAttackRange', 'MovementDelay']
+                 'PiercingDamage', 'MaxAttackRange', 'MovementDelay',
+                 'AttackDelay']
 
 def findunits():
     u = os.listdir('units')
@@ -120,29 +121,32 @@ def parseDefineUnitType(text):
         unit.stats[prevKey] = replaceTabs(stats[-1].strip())
     return unit
 
-def parseMovements(text):
-    if 'Move =' not in text:
+def parseWaits(text, section):
+    section += ' ='
+    if section not in text:
         return 0
-    _, text = text.split('Move =', 1)
+    _, text = text.split(section, 1)
     text,_ = text.split('}',1)
     if 'unbreakable' in text:
         _, text, _ = text.split('"unbreakable', 2)
     m =re.findall(r'"wait \d+"', text)
-    movement = 0
+    waits = 0
     for i in m:
         v = int(i[6:-1])
-        movement += v
-    return movement
+        waits += v
+    return waits
 
 def parseScript(path):
     parsedscript = ParsedScript(path)
     s = file(path, 'rt').read()
     elements = s.split('DefineUnitType(')
     parsedscript.head = elements[0]
-    movement = parseMovements(s)
+    movement = parseWaits(s, 'Move')
+    attackwait = parseWaits(s, 'Attack')
     for e in elements[1:]:
         unit = parseDefineUnitType(e)
         unit.stats['MovementDelay'] = movement
+        unit.stats['AttackDelay'] = attackwait
         parsedscript.units.append(unit)
     return parsedscript
 
