@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-02 12:36+0300\n"
+"POT-Creation-Date: 2010-09-09 11:07+0200\n"
 "PO-Revision-Date: 2007-12-15 01:30+0100\n"
 "Last-Translator: Eric Kok <erickok@gmail.com>\n"
 "Language-Team: Dutch <foppe.benedictus@gmail.com>\n"
@@ -45,97 +45,155 @@ msgstr "%s: niet genoeg kracht voor vloek: %s"
 msgid "%s: can't cast spell: %s"
 msgstr "%s: kan vloek niet uitspreken: %s"
 
-#: action/action_train.cpp:180
+#: action/action_train.cpp:117
+#, fuzzy, c-format
+msgid "Cannot train %s here"
+msgstr "Je kunt %s hier niet bouwen"
+
+#: action/action_train.cpp:216
 #, c-format
 msgid "New %s ready"
 msgstr "Nieuwe %s klaar"
 
-#: action/action_train.cpp:230
+#: action/action_train.cpp:266
 #, c-format
 msgid "Unable to train %s"
 msgstr "Kan %s niet trainen"
 
-#: action/command.cpp:1008
+#: action/command.cpp:1056
 #, c-format
 msgid "Player \"%s\" has left the game"
 msgstr "Speler \"%s\" heeft het spel verlaten"
 
-#: action/command.cpp:1010
+#: action/command.cpp:1058
 #, c-format
 msgid "Player \"%s\" has been killed"
 msgstr "Speler \"%s\" is gedood"
 
-#: editor/editloop.cpp:371
+#: editor/editloop.cpp:390
 msgid "Unit deleted"
 msgstr "Eenheid verwijderd"
 
-#: editor/editloop.cpp:694 editor/editloop.cpp:987
+#: editor/editloop.cpp:784 editor/editloop.cpp:1219
 msgid "Player"
-msgstr ""
+msgstr "Speler"
 
-#: editor/editloop.cpp:699
+#: editor/editloop.cpp:789
 msgid "Neutral"
-msgstr ""
+msgstr "Neutraal"
 
-#: editor/editloop.cpp:703
+#: editor/editloop.cpp:793
 msgid "Nobody"
-msgstr ""
+msgstr "Niemand"
 
-#: editor/editloop.cpp:706
+#: editor/editloop.cpp:796
 msgid "Person"
-msgstr ""
+msgstr "Persoon"
 
-#: editor/editloop.cpp:711
+#: editor/editloop.cpp:801
 msgid "Computer"
-msgstr ""
+msgstr "Computer"
 
-#: editor/editloop.cpp:992
+#: editor/editloop.cpp:1224
 msgid "Amount of"
-msgstr ""
+msgstr "Hoeveelheid"
 
-#: editor/editloop.cpp:1008
+#: editor/editloop.cpp:1244
+#, fuzzy
+msgid "Patch missing"
+msgstr "Geen grondvlak"
+
+#: editor/editloop.cpp:1248
 msgid "Patch"
-msgstr ""
+msgstr "Grondvlak"
 
-#: editor/editloop.cpp:1290
-msgid "Unit can't be placed here."
-msgstr "Eenheid kan hier niet geplaatst worden."
+#: editor/editloop.cpp:1255
+msgid "Field"
+msgstr "Veld"
 
-#: editor/editloop.cpp:1371
+#: editor/editloop.cpp:1262
+msgid "impassable"
+msgstr "onbegaanbaar"
+
+#: editor/editloop.cpp:1267
+msgid "land"
+msgstr "land"
+
+#: editor/editloop.cpp:1272
+msgid "coast"
+msgstr "kust"
+
+#: editor/editloop.cpp:1277
+msgid "shallow water"
+msgstr "ondiep water"
+
+#: editor/editloop.cpp:1282
+msgid "deep water"
+msgstr "diep water"
+
+#. TRANSLATORS: This flag means players cannot build
+#. here, e.g. because the ground is too soft.  There
+#. may be a building here anyway, if the map designer
+#. has found a way to circumvent the restriction.
+#: editor/editloop.cpp:1294
+msgid "no building"
+msgstr "niet bebouwbaar"
+
+#: editor/editloop.cpp:1306
+msgid "speed="
+msgstr "snelheid="
+
+#: editor/editloop.cpp:1309
+msgid " (fast)"
+msgstr " (snel)"
+
+#: editor/editloop.cpp:1313
+msgid " (slow)"
+msgstr " (traag)"
+
+#: editor/editloop.cpp:1449
 msgid "Patch deleted"
-msgstr "Patch verwijderd"
+msgstr "Grondvlak verwijderd"
 
-#: editor/editloop.cpp:1402
+#: editor/editloop.cpp:1480
 msgid "Unit owner modified"
 msgstr "Eenheid eigenaar veranderd"
 
-#: editor/editloop.cpp:1603 editor/editloop.cpp:1639
+#: editor/editloop.cpp:1686 editor/editloop.cpp:1722
 msgid "Select player #"
 msgstr "Selecteer speler #"
 
-#: editor/editloop.cpp:1737
+#: editor/editloop.cpp:1820
 msgid "Select mode"
 msgstr "Selecteer modus"
 
-#: editor/editloop.cpp:1748
+#: editor/editloop.cpp:1831
 msgid "Unit mode"
 msgstr "Eenheid modus"
 
-#: editor/editloop.cpp:1759
+#: editor/editloop.cpp:1842
 msgid "Patch mode"
-msgstr "Patch modus"
+msgstr "Grondvlak modus"
 
-#: editor/editloop.cpp:1770
+#: editor/editloop.cpp:1853
 msgid "Set start location mode"
 msgstr "Startplaats modus"
 
-#: editor/patch_editor.cpp:522
-msgid "Save"
-msgstr ""
+#: editor/editloop.cpp:2153
+msgid "Unit can't be placed here."
+msgstr "Eenheid kan hier niet geplaatst worden."
 
-#: editor/patch_editor.cpp:528
+#: editor/editloop.cpp:2442
+msgid "All"
+msgstr "Allemaal"
+
+#: editor/patch_editor.cpp:542
+msgid "Save"
+msgstr "Bewaar"
+
+#: editor/patch_editor.cpp:548
 msgid "Exit"
-msgstr ""
+msgstr "Verlaat"
 
 #: game/player.cpp:702
 msgid "Building Limit Reached"
@@ -143,7 +201,7 @@ msgstr "Bouwlimiet bereikt"
 
 #: game/player.cpp:706
 msgid "Unit Limit Reached"
-msgstr "Eenheidlimiet bereikt"
+msgstr "Eenhedenlimiet bereikt"
 
 #: game/player.cpp:710
 msgid "Total Unit Limit Reached"
@@ -197,11 +255,11 @@ msgstr "Tijdslimiet verstreken"
 msgid "Thanks for playing Bos Wars.\n"
 msgstr "Bedankt voor het spelen van Bos Wars.\n"
 
-#: ui/botpanel.cpp:783 ui/botpanel.cpp:848
+#: ui/botpanel.cpp:787 ui/botpanel.cpp:852
 msgid "Select Target"
 msgstr "Selecteer doel"
 
-#: ui/botpanel.cpp:896
+#: ui/botpanel.cpp:900
 msgid "Select Location"
 msgstr "Selecteer locatie"
 
@@ -268,31 +326,31 @@ msgstr "Screenshot gemaakt."
 
 #: ui/mainscr.cpp:170
 msgid "Armor: "
-msgstr ""
+msgstr "Pantser: "
 
 #: ui/mainscr.cpp:176
 msgid "Radar Range: "
-msgstr ""
+msgstr "Radar bereik: "
 
 #: ui/mainscr.cpp:181
 msgid "Sight Range: "
-msgstr ""
+msgstr "Zicht: "
 
 #: ui/mainscr.cpp:188
 msgid "Kills: "
-msgstr ""
+msgstr "Overwinningen: "
 
 #: ui/mainscr.cpp:193
 msgid "Attack Range: "
-msgstr ""
+msgstr "Aanvalsbereik: "
 
 #: ui/mainscr.cpp:200
 msgid "Damage: "
-msgstr ""
+msgstr "Schade: "
 
 #: ui/mainscr.cpp:205
 msgid "Mana: "
-msgstr ""
+msgstr "Mana: "
 
 #: ui/mainscr.cpp:600
 #, c-format
@@ -321,10 +379,4 @@ msgstr "%s aangevallen"
 
 #: video/sdl.cpp:285
 msgid "esc"
-msgstr ""
-
-#~ msgid "Energy"
-#~ msgstr "Energie"
-
-#~ msgid "Magma"
-#~ msgstr "Magma"
+msgstr "esc"
