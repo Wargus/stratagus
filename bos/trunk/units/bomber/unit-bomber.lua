@@ -28,7 +28,7 @@
 
 DefineAnimations("animations-bomber", {
     Still = {"frame 0", "wait 1", },
-    Attack= {"unbreakable begin", 
+    Attack = {"unbreakable begin", 
         "frame 0", "wait 5", "attack",
         "frame 0", "wait 1", "frame 0","wait 35",
 	"unbreakable end", "wait 1", },
