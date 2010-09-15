@@ -22,6 +22,7 @@
 import os
 import sys
 import csv
+import re
 
 importantkeys = ['Name', 
                  'EnergyValue', 'MagmaValue',
@@ -29,7 +30,7 @@ importantkeys = ['Name',
                  'EnergyProductionRate', 'MagmaProductionRate',
                  'EnergyStorageCapacity', 'MagmaStorageCapacity',
                  'HitPoints', 'SightRange', 'Armor', 'BasicDamage', 
-                 'PiercingDamage', 'MaxAttackRange']
+                 'PiercingDamage', 'MaxAttackRange', 'MovementDelay']
 
 def findunits():
     u = os.listdir('units')
@@ -118,14 +119,30 @@ def parseDefineUnitType(text):
         unit.orderedkeys.append(prevKey)
         unit.stats[prevKey] = replaceTabs(stats[-1].strip())
     return unit
-    
+
+def parseMovements(text):
+    if 'Move =' not in text:
+        return 0
+    _, text = text.split('Move =', 1)
+    text,_ = text.split('}',1)
+    if 'unbreakable' in text:
+        _, text, _ = text.split('"unbreakable', 2)
+    m =re.findall(r'"wait \d+"', text)
+    movement = 0
+    for i in m:
+        v = int(i[6:-1])
+        movement += v
+    return movement
+
 def parseScript(path):
     parsedscript = ParsedScript(path)
     s = file(path, 'rt').read()
     elements = s.split('DefineUnitType(')
     parsedscript.head = elements[0]
+    movement = parseMovements(s)
     for e in elements[1:]:
         unit = parseDefineUnitType(e)
+        unit.stats['MovementDelay'] = movement
         parsedscript.units.append(unit)
     return parsedscript
 
