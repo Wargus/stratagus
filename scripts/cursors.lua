@@ -9,7 +9,7 @@
 --
 --      ui.lua - Define the widgets
 --
---      (c) Copyright 2000 - 2008 by Lutz Sammer, Francois Beerten
+--      (c) Copyright 2000 - 2010 by Lutz Sammer, Francois Beerten
 --                     and Crestez Leonard.
 --
 --      This program is free software; you can redistribute it and/or modify
@@ -55,19 +55,19 @@ DefineCursor({
    Name = "cursor-arrow-ne",
    File = "graphics/ui/cursors/arrow_NE.png",
    HotSpot = {20, 2},
-   Size = {32, 24}})
+   Size = {32,24}})
 
 DefineCursor({
    Name = "cursor-arrow-n",
    File = "graphics/ui/cursors/arrow_N.png",
    HotSpot = {12, 2},
-   Size = {32, 24}})
+   Size = {24, 32}})
 
 DefineCursor({
    Name = "cursor-arrow-nw",
    File = "graphics/ui/cursors/arrow_NW.png",
    HotSpot = {2, 2},
-   Size = {32, 24}})
+   Size = {24,32}})
 
 DefineCursor({
    Name = "cursor-arrow-w",
@@ -79,19 +79,19 @@ DefineCursor({
    Name = "cursor-arrow-s",
    File = "graphics/ui/cursors/arrow_S.png",
    HotSpot = {12, 22},
-   Size = {32, 24}})
+   Size = {24,32}})
 
 DefineCursor({
    Name = "cursor-arrow-sw",
    File = "graphics/ui/cursors/arrow_SW.png",
    HotSpot = {2, 18},
-   Size = {32, 24}})
+   Size = {32,24}})
 
 DefineCursor({
    Name = "cursor-arrow-se",
    File = "graphics/ui/cursors/arrow_SE.png",
    HotSpot = {20, 18},
-   Size = {32, 24}})
+   Size = { 24,32}})
 
 DefineCursor({
    Name = "cursor-point",
