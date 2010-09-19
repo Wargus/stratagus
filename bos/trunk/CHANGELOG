@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Fixed bug #30856: Workers swich to other resourse type after one deposit complete (Kalle Olavi Niemitalo)
 - New arrow and cross cursor graphics (Leonid Gutmann)
 - Added "terrain" build restriction (Kalle Olavi Niemitalo)
 - Added the Tokelau map (Michiel van der Wulp)

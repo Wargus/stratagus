@@ -143,6 +143,39 @@ static void AnimateActionHarvest(CUnit *unit)
 }
 
 /**
+**  Check which type of resource was harvested from a unit,
+**  so that the caller can look for more of the same.
+**
+**  @param exhausted  Unit from which resources were harvested.
+**
+**  @return           Either enum CostType, or -1 if the resource
+**                    type could not be identified.
+*/
+static int HarvestedResourceType(const CUnit *exhausted)
+{
+	int found = -1;
+	for (int res = 0; res < MaxCosts; res++) {
+		// exhausted->ResourcesHeld[res] is presumably zero
+		// already so check the unit type instead.
+		if (exhausted->Type->ProductionCosts[res] > 0) {
+			if (found == -1) {
+				found = res;
+			} else {
+				// It contains more than one type of
+				// resource.  We could find the
+				// largest number but the amounts are
+				// not really comparable.
+				return -1;
+			}
+		}
+	}
+
+	// The unit type contains just one type of resource, or none
+	// at all.  In the latter case, found == -1 still.
+	return found;
+}
+
+/**
 **  Find something else to do when the resource is exhausted.
 **  This is called from GatherResource when the resource is empty.
 **
@@ -150,11 +183,12 @@ static void AnimateActionHarvest(CUnit *unit)
 */
 static void FindNewResource(CUnit *unit)
 {
+	const int res = HarvestedResourceType(unit->Orders[0]->Goal);
 	unit->Orders[0]->Goal->RefsDecrease();
 	unit->Orders[0]->Goal = NoUnitP;
 
 	unit->Orders[0]->X = unit->Orders[0]->Y = -1;
-	if ((unit->Orders[0]->Goal = UnitFindResource(unit, unit->X, unit->Y, 10))) {
+	if ((unit->Orders[0]->Goal = UnitFindResource(unit, unit->X, unit->Y, 10, res))) {
 		DebugPrint("Unit %d found another resource.\n" _C_ unit->Slot);
 		unit->SubAction = SUB_START_RESOURCE;
 		unit->State = 0;
