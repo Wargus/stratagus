@@ -44,8 +44,16 @@
 #include "player.h"
 
 /*----------------------------------------------------------------------------
---  Variables
+--  Types
 ----------------------------------------------------------------------------*/
+
+enum
+{
+	AiBuildingPlaceTried  = 0x01, // tried to place a building there
+	AiBuildingPlaceBlock  = 0x02, // worker cannot walk there
+	AiBuildingPlaceWalked = 0x04, // worker can walk there
+	AiBuildingPlaceEdge   = 0x62  // = 98, which InitMatrix uses
+};
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -138,6 +146,67 @@ static int AiCheckSurrounding(const CUnit *worker, const CUnitType *type, int x,
 }
 
 /**
+**  Try to place a building in each position within a rectangle,
+**  except positions that have already been tried in earlier calls.
+**
+**  @param worker  Worker to build building.
+**  @param type    Type of building.
+**  @param matrix  Origin in a 2d array that shows which positions
+**                 have already been tried.
+**  @param minx    Smallest X position to try building
+**  @param miny    Smallest Y position to try building
+**  @param maxx    Greatest X position to try building
+**  @param maxy    Greatest Y position to try building
+**  @param chosenx Pointer for good X position returned.
+**  @param choseny Pointer for good Y position returned.
+**  @param backupx Pointer for worse X position returned.
+**  @param backupx Pointer for worse Y position returned.
+**
+**  @return        True if good position found, false if not found.
+**
+**  This function ignores TileWidth and TileHeight of the building,
+**  so the caller should adjust maxx and maxy accordingly.
+*/
+static inline bool AiTryBuildingPlacesRect(const CUnit *worker, const CUnitType* type,
+					   unsigned char *matrix, int mwidth,
+					   int minx, int miny, int maxx, int maxy,
+					   int *chosenx, int *choseny,
+					   int *backupx, int *backupy)
+{
+	for (int y = miny; y <= maxy; y++)
+	{
+		for (int x = minx; x <= maxx; x++)
+		{
+			unsigned char *ptr = matrix + x + y * mwidth;
+			if (!(*ptr & AiBuildingPlaceTried))
+			{
+				CUnit *ontop = CanBuildUnitType(worker, type, x, y, 1);
+				if (ontop)
+				{
+					bool backupok;
+					if ((ontop != (CUnit *)1 && ontop != worker) ||
+					    AiCheckSurrounding(worker, type, x, y, backupok))
+					{
+						*chosenx = x;
+						*choseny = y;
+						return true;
+					}
+					else if (backupok && *backupx == -1)
+					{
+						*backupx = x;
+						*backupy = y;
+					}
+				}
+
+				*ptr |= AiBuildingPlaceTried;
+			} // if not tried
+		} // for x
+	} // for y
+
+	return false;
+}
+
+/**
 **  Find free building place. (flood fill version)
 **
 **  @param worker  Worker to build building.
@@ -175,6 +244,10 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 	int backupy = -1;
 	bool backupok;
 	CUnit *ontop;
+	int minoffx;
+	int minoffy;
+	int maxoffx;
+	int maxoffy;
 
 	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
 	points = new p[size];
@@ -229,6 +302,30 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 	rp = 0;
 	matrix[x + y * w] = 1; // mark start point
 
+	if (mask & ~type->MovementMask || !type->BuildingRules.empty())
+	{
+		// The worker cannot move to some types of tiles where
+		// the building can be built.  For example, the worker
+		// can only walk on land and the building needs to be
+		// built in water.
+		//
+		// Or, the building type has some BuildingRules.
+		// Some of them might be BuildRestrictionOnTop,
+		// which implies there already is a building that
+		// would block the worker.
+		minoffx = -type->TileWidth;
+		minoffy = -type->TileHeight;
+		maxoffx = 1;
+		maxoffy = 1;
+	}
+	else
+	{
+		minoffx = 0;
+		minoffy = 0;
+		maxoffx = 0;
+		maxoffy = 0;
+	}
+
 	//
 	// Pop a point from stack, push all neighbours which could be entered.
 	//
@@ -244,51 +341,46 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 				x = rx + xoffset[i];
 				y = ry + yoffset[i];
 				m = matrix + x + y * w;
-				if (*m)
+				if (*m & (AiBuildingPlaceWalked | AiBuildingPlaceBlock))
 				{
 					// already checked
 					continue;
 				}
 
+				if (!CanMoveToMask(x, y, mask))
+				{
+					// unreachable
+					*m |= AiBuildingPlaceBlock;
+					continue;
+				}
+				
 				//
 				// Look if we can build here and no enemies nearby.
 				//
-				if ((ontop = CanBuildUnitType(worker, type, x, y, 1)) &&
-					!AiEnemyUnitsInDistance(worker->Player, NULL, x, y, 8))
+				if (!AiEnemyUnitsInDistance(worker->Player, NULL, x, y, 8)
+				    && AiTryBuildingPlacesRect(
+					    worker, type,
+					    matrix, w,
+					    std::max(x + minoffx, 0),
+					    std::max(y + minoffy, 0),
+					    std::min(x + maxoffx, Map.Info.MapWidth - type->TileWidth),
+					    std::min(y + maxoffy, Map.Info.MapHeight - type->TileHeight),
+					    dx, dy,
+					    &backupx, &backupy))
 				{
-					if ((ontop != (CUnit *)1 && ontop != worker) ||
-						AiCheckSurrounding(worker, type, x, y, backupok))
-					{
-						*dx = x;
-						*dy = y;
-						delete[] points;
-						return 1;
-					}
-					else if (backupok && backupx == -1)
-					{
-						backupx = x;
-						backupy = y;
-					}
+					delete[] points;
+					return 1;
 				}
 
-				if (CanMoveToMask(x, y, mask))
+				*m |= AiBuildingPlaceWalked;
+				points[wp].X = x; // push the point
+				points[wp].Y = y;
+				if (++wp >= size)
 				{
-					// reachable
-					*m = 1;
-					points[wp].X = x; // push the point
-					points[wp].Y = y;
-					if (++wp >= size)
-					{
-						// round about
-						wp = 0;
-					}
+					// round about
+					wp = 0;
 				}
-				else
-				{
-					// unreachable
-					*m = 99;
-				}
-			}
+			} // for i
 
 			if (++rp >= size)
 			{
