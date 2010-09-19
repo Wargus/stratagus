@@ -113,6 +113,7 @@ static int CheckForDeadGoal(CUnit *unit)
 
 	goal->RefsDecrease();
 	unit->Orders[0]->Goal = NoUnitP;
+	unit->SubAction &= ~WEAK_TARGET; // No target at all, so not weak
 
 	//
 	// If we have a saved order continue this saved order.
@@ -354,6 +355,8 @@ static void AttackTarget(CUnit *unit)
 				Assert(unit->SavedOrder.Goal == NoUnitP);
 				return;
 			}
+			// There's no goal, so the goal can't be weak.
+			Assert(!(unit->SubAction & WEAK_TARGET));
 			unit->SubAction = MOVE_TO_TARGET;
 			return;
 		}
@@ -400,7 +403,7 @@ static void AttackTarget(CUnit *unit)
 			unit->Orders[0]->Goal = goal = temp;
 			unit->Orders[0]->X = unit->Orders[0]->Y = -1;
 			unit->Orders[0]->MinRange = unit->Type->MinAttackRange;
-			unit->SubAction = MOVE_TO_TARGET;
+			unit->SubAction = MOVE_TO_TARGET | WEAK_TARGET;
 			NewResetPath(unit);
 		}
 	}
@@ -429,7 +432,8 @@ static void AttackTarget(CUnit *unit)
 		unit->SubAction |= MOVE_TO_TARGET;
 	}
 	if (MapDistanceBetweenUnits(unit, goal) < unit->Type->MinAttackRange) {
-		unit->SubAction = MOVE_TO_TARGET;
+		unit->SubAction &= WEAK_TARGET;
+		unit->SubAction |= MOVE_TO_TARGET;
 	}
 
 	//
@@ -477,6 +481,9 @@ void HandleActionAttack(CUnit *unit)
 			if (CheckForTargetInRange(unit)) {
 				return;
 			}
+			// CheckForTargetInRange may have set
+			// SubAction |= WEAK_TARGET.
+
 			// Can we already attack ?
 			if (unit->Orders[0]->Goal) {
 				dist = MapDistanceBetweenUnits(unit, unit->Orders[0]->Goal);
@@ -484,12 +491,14 @@ void HandleActionAttack(CUnit *unit)
 					UnitHeadingFromDeltaXY(unit,
 						unit->Orders[0]->Goal->X + (unit->Orders[0]->Goal->Type->TileWidth - 1) / 2 - unit->X,
 						unit->Orders[0]->Goal->Y + (unit->Orders[0]->Goal->Type->TileHeight - 1) / 2 - unit->Y);
-					unit->SubAction = ATTACK_TARGET;
+					unit->SubAction &= WEAK_TARGET;
+					unit->SubAction |= ATTACK_TARGET;
 					AttackTarget(unit);
 					return;
 				}
 			}
-			unit->SubAction = MOVE_TO_TARGET;
+			unit->SubAction &= WEAK_TARGET;
+			unit->SubAction |= MOVE_TO_TARGET;
 			NewResetPath(unit);
 			//
 			// FIXME: should use a reachable place to reduce pathfinder time.
