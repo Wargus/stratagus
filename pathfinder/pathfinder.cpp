@@ -146,12 +146,21 @@ unsigned char *MakeMatrix(void)
 **  @param minrange  min range to the tile
 **  @param range     Range to the tile.
 **
+**  @pre             The unit's field flags must have been marked
+**                   on the map; see MarkUnitFieldFlags.
+**
 **  @return          Distance to place.
 */
 int PlaceReachable(const CUnit *src, int x, int y, int w, int h, int minrange, int range)
 {
+	// Please do not use UnmarkUnitFieldFlags and MarkUnitFieldFlags
+	// around PlaceReachable calls.
+	Assert((Map.Field(src->X, src->Y)->Flags & src->Type->FieldFlags) != 0);
+
+	UnmarkUnitFieldFlags(src);
 	int i = AStarFindPath(src->X, src->Y, x, y, w, h,
 		src->Type->TileWidth, src->Type->TileHeight, minrange, range, NULL, 0, (void *)src);
+	MarkUnitFieldFlags(src);
 
 	switch (i) {
 		case PF_FAILED:
@@ -179,11 +188,18 @@ int PlaceReachable(const CUnit *src, int x, int y, int w, int h, int minrange, i
 **  @param dst    Unit to be reached.
 **  @param range  Range to unit.
 **
+**  @pre          The unit's field flags must have been marked
+**                on the map; see MarkUnitFieldFlags.
+**
 **  @return       Distance to place.
 */
 int UnitReachable(const CUnit *src, const CUnit *dst, int range)
 {
 	int depth;
+
+	// Please do not use UnmarkUnitFieldFlags and MarkUnitFieldFlags
+	// around UnitReachable calls.
+	Assert((Map.Field(src->X, src->Y)->Flags & src->Type->FieldFlags) != 0);
 
 	//
 	//  Find a path to the goal.
@@ -199,9 +215,14 @@ int UnitReachable(const CUnit *src, const CUnit *dst, int range)
 /**
 **  Compute the cost of crossing tile (dx,dy)
 **
-**  @param data  user data.
+**  @param data  The CUnit * that wants to cross the tile.  This is
+**               passed in as void * so that the low-level A* code
+**               need not know about CUnit.
 **  @param x     X tile where to move.
 **  @param y     Y tile where to move.
+**
+**  @pre         The unit's field flags must have been unmarked
+**               on the map; see UnmarkUnitFieldFlags.
 **
 **  @return      -1 -> impossible to cross.
 **                0 -> no induced cost, except move
@@ -240,6 +261,12 @@ static int STDCALL CostMoveTo(int x, int y, void *data)
 					Assert(0);
 					return -1;
 				}
+
+				// The unit must not be blocked by itself.
+				// Please use UnmarkUnitFieldFlags and
+				// MarkUnitFieldFlags around pathfinder calls.
+				Assert(goal != unit);
+
 				if (goal->Moving)  {
 					// moving unit are crossable
 					cost += AStarMovingUnitCrossingCost;
@@ -278,6 +305,9 @@ static int STDCALL CostMoveTo(int x, int y, void *data)
 **
 **  @param unit  Path for this unit.
 **
+**  @pre         The unit's field flags must have been unmarked
+**               on the map; see UnmarkUnitFieldFlags.
+**
 **  @return      >0 remaining path length, 0 wait for path, -1
 **               reached goal, -2 can't reach the goal.
 */
@@ -291,6 +321,10 @@ int NewPath(CUnit *unit)
 	int minrange;
 	int maxrange;
 	char *path;
+
+	// Please use UnmarkUnitFieldFlags and MarkUnitFieldFlags
+	// around NewPath calls.
+	Assert((Map.Field(unit->X, unit->Y)->Flags & unit->Type->FieldFlags) == 0);
 
 	if (unit->Orders[0]->Goal) {
 		gw = unit->Orders[0]->Goal->Type->TileWidth;
@@ -347,12 +381,19 @@ int NewPath(CUnit *unit)
 **  @param pxd   Pointer for the x direction.
 **  @param pyd   Pointer for the y direction.
 **
+**  @pre         The unit's field flags must have been unmarked
+**               on the map; see UnmarkUnitFieldFlags.
+**
 **  @return >0 remaining path length, 0 wait for path, -1
 **  reached goal, -2 can't reach the goal.
 */
 int NextPathElement(CUnit *unit, int *pxd, int *pyd)
 {
 	int result;
+
+	// Please use UnmarkUnitFieldFlags and MarkUnitFieldFlags
+	// around NextPathElement calls.
+	Assert((Map.Field(unit->X, unit->Y)->Flags & unit->Type->FieldFlags) == 0);
 
 	// Attempt to use path cache
 	// FIXME: If there is a goal, it may have moved, ruining the cache
