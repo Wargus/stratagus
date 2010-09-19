@@ -942,9 +942,16 @@ static void AiMoveUnitInTheWay(CUnit *unit)
 **  Called if a unit can't move. Try to move unit in the way
 **
 **  @param unit  Pointer to unit what builds the building.
+**
+**  @pre         The unit's field flags must have been marked
+**               on the map; see MarkUnitFieldFlags.
 */
 void AiCanNotMove(CUnit *unit)
 {
+	// Please do not use UnmarkUnitFieldFlags and MarkUnitFieldFlags
+	// around AiCanNotMove calls.
+	Assert((Map.Field(unit->X, unit->Y)->Flags & unit->Type->FieldFlags) != 0);
+
 	AiPlayer = unit->Player->Ai;
 
 	if (GameCycle >= AiPlayer->LastCanNotMoveGameCycle + CYCLES_PER_SECOND)
