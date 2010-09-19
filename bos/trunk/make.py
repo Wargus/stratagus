@@ -167,10 +167,12 @@ def detectOpenGl(b):
 
 def detectSdl(b):
     b.incpath('/usr/include/SDL')
-    if CheckLib(b, 'SDL', header='SDL.h'):
+    header = 'SDL.h'
+    if '-DUSE_WIN32' in b.cflags:
+        header = ''
+    if CheckLib(b, 'SDL', header=header):
         return
-    r = pkgconfig(b, 'sdl')
-    if not r:
+    if not b.usepkgconfig or not pkgconfig(b, 'sdl'):
        print('Did not find the SDL library, exiting !')
        sys.exit(1)
 
