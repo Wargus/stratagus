@@ -63,8 +63,8 @@ static CSound *FindSound(const std::string &name)
 	if (ret != SoundMap.end()) {
 		return  (*ret).second;
 	}
-	return NULL;	
-};
+	return NULL;
+}
 
 /**
 **  Add a new mapping (sound name to sound id) in the hash table
@@ -98,7 +98,7 @@ CSound *SoundForName(const std::string &name)
 		return sound;
 	}
 	DebugPrint("Can't find sound `%s' in sound table\n" _C_ name.c_str());
-	return NULL;	
+	return NULL;
 }
 
 /**

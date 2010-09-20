@@ -158,7 +158,7 @@ int push_table_instance(lua_State* L, int lo) {
 	};
 
 	return 0;
-};
+}
 
 /* the equivalent of lua_is* for usertype */
 static int lua_isusertype (lua_State* L, int lo, const char* type)

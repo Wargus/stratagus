@@ -48,7 +48,7 @@ enum EditorRunningType {
 	EditorNotRunning = 0,    /// Not Running
 	EditorStarted = 1,       /// Editor Enabled at all
 	EditorCommandLine = 2,   /// Called from Command Line
-	EditorEditing = 4,       /// Editor is fully running
+	EditorEditing = 4        /// Editor is fully running
 };
 
 enum EditorStateType {
@@ -62,7 +62,7 @@ class CEditor {
 public:
 	CEditor() : TerrainEditable(true),
 		StartUnit(NULL),
-		UnitIndex(0), CursorUnitIndex(-1), SelectedUnitIndex(-1), 
+		UnitIndex(0), CursorUnitIndex(-1), SelectedUnitIndex(-1),
 		TileIndex(0), CursorTileIndex(-1), SelectedTileIndex(-1),
 		CursorPlayer(-1), SelectedPlayer(PlayerNumNeutral),
 		MapLoaded(false), WriteCompressedMaps(true), PopUpX(-1), PopUpY(-1)
@@ -91,7 +91,7 @@ public:
 	int TileIndex;              /// tile icon draw index.
 	int CursorTileIndex;		/// tile icon under cursor.
 	int SelectedTileIndex;       /// tile type to draw.
-	
+
 	int CursorPlayer;            /// Player under the cursor.
 	int SelectedPlayer;          /// Player selected for draw.
 
@@ -101,10 +101,10 @@ public:
 	EditorRunningType Running;   /// Editor is running
 
 	EditorStateType State;       /// Current editor state
-	
+
 	int PopUpX;
 	int PopUpY;
-	
+
 };
 
 /*----------------------------------------------------------------------------

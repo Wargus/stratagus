@@ -308,14 +308,11 @@ void MapSight(const CPlayer *player, int x, int y, int w, int h, int range,
 	int cy[4];
 	int steps;
 	int cycle;
-	int p;
 
 	// Units under construction have no sight range.
 	if (!range) {
 		return;
 	}
-
-	p = player->Index;
 
 #ifdef MARKER_ON_INDEX
 	unsigned int index = y * Map.Info.MapWidth;
@@ -350,7 +347,7 @@ void MapSight(const CPlayer *player, int x, int y, int w, int h, int range,
 			}
 		}
 #ifdef MARKER_ON_INDEX
-	index += Map.Info.MapWidth;
+		index += Map.Info.MapWidth;
 #endif
 	}
 
@@ -369,7 +366,7 @@ void MapSight(const CPlayer *player, int x, int y, int w, int h, int range,
 			}
 		}
 #ifdef MARKER_ON_INDEX
-	index += Map.Info.MapWidth;
+		index += Map.Info.MapWidth;
 #endif
 	}
 
@@ -663,7 +660,6 @@ void CViewport::DrawMapFogOfWar() const
 	int ex;
 	int dy;
 	int ey;
-	int p;
 	int my;
 	int mx;
 
@@ -671,7 +667,6 @@ void CViewport::DrawMapFogOfWar() const
 	if (ReplayRevealMap) {
 		return;
 	}
-	p = ThisPlayer->Index;
 
     sx = std::max<int>(MapX - 1, 0);
     ex = std::min<int>(MapX + MapWidth + 1, Map.Info.MapWidth);
@@ -792,7 +787,7 @@ void CMap::InitFogOfWar(void)
 		AlphaFogG->GenFramesMap();
 		AlphaFogG->UseDisplayFormat();
 	}
-	
+
 	delete[] VisibleTable;
 	VisibleTable = new unsigned short[Info.MapWidth * Info.MapHeight];
 }

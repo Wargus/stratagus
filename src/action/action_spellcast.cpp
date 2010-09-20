@@ -143,14 +143,12 @@ static void SpellMoveToTarget(CUnit *unit)
 */
 void HandleActionSpellCast(CUnit *unit)
 {
-	int flags;
-
 	if (unit->Wait) {
 		unit->Wait--;
 		return;
 	}
 	COrderPtr order = unit->CurrentOrder();
-	const SpellType *spell = order->Arg1.Spell;	
+	const SpellType *spell = order->Arg1.Spell;
 	switch (unit->SubAction) {
 		case 0:
 			//
@@ -196,7 +194,7 @@ void HandleActionSpellCast(CUnit *unit)
 		case 2:                         // Cast spell on the target.
 			// FIXME: should use AnimateActionSpellCast here
 			if (unit->Type->Animations->Attack && !spell->IsCasterOnly()) {
-				flags = UnitShowAnimation(unit, unit->Type->Animations->Attack);
+				UnitShowAnimation(unit, unit->Type->Animations->Attack);
 				if (unit->Anim.Unbreakable) { // end of animation
 					return;
 				}

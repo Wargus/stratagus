@@ -55,12 +55,12 @@
 template <const bool IN_REACT_RANGE>
 struct AiForceEnemyFinder {
 	const CUnit *enemy;
-	
+
 	inline bool found(void) {
 		return enemy != NULL;
 	}
-	
-	inline bool operator() (const CUnit *const unit) 
+
+	inline bool operator() (const CUnit *const unit)
 	{
 		if(IN_REACT_RANGE) {
 			if (unit->Type->CanAttack)
@@ -70,28 +70,28 @@ struct AiForceEnemyFinder {
 				enemy = AttackUnitsInDistance(unit, MaxMapWidth);
 		}
 		return enemy == NULL;
-	}	
+	}
 
 	AiForceEnemyFinder(int force): enemy(NULL) {
 		AiPlayer->Force[force].Units.for_each_if(*this);
 	}
-	
+
 	AiForceEnemyFinder(AiForce *force):	enemy(NULL) {
 		force->Units.for_each_if(*this);
 	}
-	
+
 };
 
 struct AiForceAttackSender {
 	int goalX;
 	int goalY;
 	int delta;
-	
+
 	inline void operator() (CUnit *const unit) {
 	// this may be problem if units are in bunker and we want sent
 	// them to attack
 	if (unit->Container == NULL) {
-			// To avoid lot of CPU consuption, send them with a small time difference.	
+			// To avoid lot of CPU consuption, send them with a small time difference.
 			unit->Wait = delta;
 			++delta;
 			if (unit->Type->CanTransport() && unit->BoardCount > 0) {
@@ -102,7 +102,7 @@ struct AiForceAttackSender {
 				CommandMove(unit, goalX, goalY, FlushCommands);
 			}
 		}
-	}	
+	}
 
 	//
 	//  Send all units in the force to enemy at x,y.
@@ -117,7 +117,7 @@ struct AiForceAttackSender {
 
 	AiForceAttackSender(AiForce *force, int x, int y):
 		 goalX(x), goalY(y), delta(0) {
-		 
+
 		DebugPrint("%d: Attacking with force #%lu\n" _C_ AiPlayer->Player->Index
 			 _C_ (long unsigned int)(force  - &(AiPlayer->Force[0])));
 		force->Attacking = true;
@@ -223,7 +223,6 @@ int AiFindAvailableUnitTypeEquiv(const CUnitType *unittype, int *usableTypes)
 	int i;
 	int j;
 	int tmp;
-	int playerid;
 	int bestlevel;
 	int curlevel;
 
@@ -242,8 +241,6 @@ int AiFindAvailableUnitTypeEquiv(const CUnitType *unittype, int *usableTypes)
 	}
 
 	// 3 - Sort by level
-	playerid = AiPlayer->Player->Index;
-
 	// We won't have usableTypesCount>4, so simple sort should do it
 	for (i = 0; i < usableTypesCount - 1; ++i) {
 		bestlevel = UnitTypes[usableTypes[i]]->Priority;
@@ -268,7 +265,7 @@ int AiFindAvailableUnitTypeEquiv(const CUnitType *unittype, int *usableTypes)
 
 struct AiForceCounter {
 	unsigned int *data;//[UnitTypeMax + 1];
-	
+
 	inline void operator() (CUnit *const unit) {
 		data[UnitTypeEquivs[unit->Type->Slot]]++;
 	}
@@ -277,7 +274,7 @@ struct AiForceCounter {
 	{
 		memset(data, 0, len);
 		units.for_each(*this);
-	}	
+	}
 };
 
 void AiForce::CountTypes(unsigned int *counter, const size_t len) {
@@ -351,23 +348,23 @@ void AiForce::Clean(void) {
 void AiForce::Attack(int goalX, int goalY)
 {
 	Clean();
-	
+
 	Attacking = false;
 	if (Units.size() > 0) {
 		Attacking = true;
 
 		if(goalX == -1 || goalY == -1) {
 			/* Search in entire map */
-			const CUnit *enemy = AiForceEnemyFinder<false>(this).enemy;			
+			const CUnit *enemy = AiForceEnemyFinder<false>(this).enemy;
 			if (enemy) {
 				goalX = enemy->X;
 				goalY = enemy->Y;
 			}
 		}
-		
+
 		GoalX = goalX;
 		GoalY = goalY;
-				
+
 		if(goalX == -1 || goalY == -1) {
 			DebugPrint("%d: Need to plan an attack with transporter\n" _C_ AiPlayer->Player->Index);
 			if (State == AI_FORCE_STATE_WAITING && !PlanAttack()) {
@@ -382,7 +379,7 @@ void AiForce::Attack(int goalX, int goalY)
 		//
 		AiForceAttackSender(this, goalX, goalY);
 	}
-	
+
 }
 
 AiForceManager::AiForceManager() {
@@ -432,7 +429,7 @@ bool AiForceManager::Assign(CUnit *unit)
 		// No troops for attacking force
 		if (force->IsAttacking()) {
 			continue;
-		}					
+		}
 		if (unit->GroupId == 0 && force->IsBelongsTo(unit->Type)) {
 			force->Insert(unit);
 			unit->GroupId = i + 1;
@@ -447,9 +444,9 @@ void AiForceManager::CheckUnits(int *counter)
 	int attacking[UnitTypeMax];
 	unsigned int i,j;
 	const int *unit_types_count = AiPlayer->Player->UnitTypesCount;
-	
+
 	memset(attacking, 0, sizeof(attacking));
-	
+
 	//
 	// Look through the forces what is missing.
 	//
@@ -560,7 +557,7 @@ void AiAttackWithForceAt(unsigned int force, int x, int y)
 		DebugPrint("Force out of range: %d" _C_ force);
 		return ;
 	}
-	
+
 	if (!Map.Info.IsPointOnMap(x,y)) {
 		DebugPrint("(%d, %d) not in the map(%d, %d)" _C_ x _C_ y
 			_C_ Map.Info.MapWidth _C_ Map.Info.MapHeight);
@@ -602,7 +599,7 @@ void AiAttackWithForces(int *forces)
 		if (!AiPlayer->Force[force].Defending)
 		{
 			found = true;
-			
+
 			//Fixme: this is triky but should work
 			AiPlayer->Force[f].Role = AiPlayer->Force[force].Role;
 
@@ -711,9 +708,9 @@ void AiForce::Update(void)
 		Attacking = false;
 		if (!Defending && State > 0) {
 			DebugPrint("%d: Attack force #%lu was destroyed, giving up\n"
-				_C_ AiPlayer->Player->Index _C_ (long unsigned int)(this  - &(AiPlayer->Force[0])));		
+				_C_ AiPlayer->Player->Index _C_ (long unsigned int)(this  - &(AiPlayer->Force[0])));
 			Reset(true);
-		}	
+		}
 		return;
 	}
 
@@ -728,7 +725,7 @@ void AiForce::Update(void)
 	if (Attacking == false) {
 		if (!Defending && State > 0) {
 			DebugPrint("%d: Attack force #%lu has lost all agresive units, giving up\n"
-				_C_ AiPlayer->Player->Index _C_ (long unsigned int)(this  - &(AiPlayer->Force[0])));		
+				_C_ AiPlayer->Player->Index _C_ (long unsigned int)(this  - &(AiPlayer->Force[0])));
 			Reset(true);
 		}
 		return ;
@@ -869,14 +866,14 @@ void AiForceManager::Update(void)
 		AiForce *force = &forces[f];
 		//
 		//  Look if our defenders still have enemies in range.
-		//		
+		//
 		if (force->Defending) {
 			force->Clean();
 			//
 			//  Look if still enemies in attack range.
 			//
 			if(!AiForceEnemyFinder<true>(force).found()) {
-				DebugPrint("%d:FIXME: not written, should send force #%d home\n" 
+				DebugPrint("%d:FIXME: not written, should send force #%d home\n"
 					_C_ AiPlayer->Player->Index _C_ f);
 				force->Defending = false;
 				force->Attacking = false;

@@ -184,7 +184,7 @@
 **
 **  Contains the binary angle (0-255) in which the direction the
 **  unit looks. 0, 32, 64, 128, 160, 192, 224, 256 corresponds to
-**  0°, 45°, 90°, 135°, 180°, 225°, 270°, 315°, 360° or north,
+**  0ï¿½, 45ï¿½, 90ï¿½, 135ï¿½, 180ï¿½, 225ï¿½, 270ï¿½, 315ï¿½, 360ï¿½ or north,
 **  north-east, east, south-east, south, south-west, west,
 **  north-west, north. Currently only 8 directions are used, this
 **  is more for the future.
@@ -471,7 +471,7 @@ enum UnitVoiceGroup {
 	VoiceBuilding,          /// only for building under construction
 	VoiceDocking,           /// only for transport reaching coast
 	VoiceRepairing,         /// repairing
-	VoiceHarvesting,        /// harvesting
+	VoiceHarvesting         /// harvesting
 };
 
 /**
@@ -490,7 +490,7 @@ enum _directions_ {
 	LookingS  = 4 * 32,      /// Unit looking south
 	LookingSW = 5 * 32,      /// Unit looking south west
 	LookingW  = 6 * 32,      /// Unit looking west
-	LookingNW = 7 * 32,      /// Unit looking north west
+	LookingNW = 7 * 32       /// Unit looking north west
 };
 
 #define NextDirection 32        /// Next direction N->NE->E...
@@ -506,7 +506,7 @@ public:
 	class COrder {
 		friend void CclParseOrder(lua_State *l, COrder *order);
 		CUnit *Goal;            /// goal of the order (if any)
-		
+
 	public:
 		COrder() : Goal(NULL), Range(0), MinRange(0), Width(0),
 			Height(0),Action(UnitActionNone), CurrentResource(0),
@@ -520,9 +520,9 @@ public:
 		void Release(void);
 		COrder& operator=(const COrder &rhs);
 		bool CheckRange(void);
-		
+
 		void Init() {
-			Assert(Action != UnitActionResource || 
+			Assert(Action != UnitActionResource ||
 					(Action == UnitActionResource && Arg1.Resource.Mine == NULL));
 			Action = UnitActionNone;
 			Range = 0;
@@ -540,7 +540,7 @@ public:
 		unsigned char Width;    /// Goal Width (used when Goal is not)
 		unsigned char Height;   /// Goal Height (used when Goal is not)
 		unsigned char Action;   /// global action
-		unsigned char CurrentResource;	 //used in 	UnitActionResource and 
+		unsigned char CurrentResource;	 //used in 	UnitActionResource and
 											//UnitActionReturnGoods
 
 		int X;                  /// or X tile coordinate of destination
@@ -594,7 +594,7 @@ public:
 			}
 			Goal = new_goal;
 		};
-	
+
 		inline void ClearGoal(void)
 		{
 			if (Goal) {
@@ -604,7 +604,7 @@ public:
 		};
 
 	};
-	
+
 	CUnit() { Init(); }
 
 	void Init() {
@@ -686,7 +686,7 @@ public:
 	CUnit *NextContained; /// Next unit in the container.
 	CUnit *PrevContained; /// Previous unit in the container.
 	CUnit *NextWorker; //pointer to next assigned worker to "Goal" resource.
-	
+
 	int X; /// Map position X
 	int Y; /// Map position Y
 	unsigned int Offset;/// Map position as flat index offset (x + y * w)
@@ -699,7 +699,7 @@ public:
 // DISPLAY:
 	int         Frame;      /// Image frame: <0 is mirrored
 	CUnitColors *Colors;    /// Player colors
-	
+
 	signed char IX;         /// X image displacement to map position
 	signed char IY;         /// Y image displacement to map position
 	unsigned char Direction; //: 8; /// angle (0-255) unit looking
@@ -718,7 +718,7 @@ public:
 	unsigned Destroyed : 1; /// unit is destroyed pending reference
 	unsigned Removed : 1;   /// unit is removed (not on map)
 	unsigned Selected : 1;  /// unit is selected
-	
+
 
 	unsigned Constructed : 1;    /// Unit is in construction
 	unsigned Active : 1;         /// Unit is active for AI
@@ -742,7 +742,7 @@ public:
 		unsigned            Constructed : 1;         /// Unit seen construction
 		unsigned            State : 3;               /// Unit seen build/upgrade state
 		unsigned            Destroyed : PlayerMax;   /// Unit seen destroyed or not
-		unsigned            ByPlayer : PlayerMax;    /// Track unit seen by player	
+		unsigned            ByPlayer : PlayerMax;    /// Track unit seen by player
 	} Seen;
 
 	CVariable *Variable; /// array of User Defined variables.
@@ -814,22 +814,22 @@ public:
 
 	inline COrder * CreateOrder(void) {
 		Orders.push_back(new COrder);
-		return Orders[(int)OrderCount++];	
+		return Orders[(int)OrderCount++];
 	}
 
-	inline COrder *CurrentOrder() const 
+	inline COrder *CurrentOrder() const
 	{
 #if __GNUC__ <  4
 		return Orders[0];
 #else
 		return *(Orders.data());
-#endif		
+#endif
 	}
 	inline UnitAction CurrentAction() const
 	{
 		return (UnitAction)(CurrentOrder()->Action);
 	}
-	
+
 	inline bool IsIdle() const {
 		return OrderCount == 1 && CurrentAction() == UnitActionStill;
 	}
@@ -842,7 +842,7 @@ public:
 		}
 	}
 
-	inline int GetReactRange() const 
+	inline int GetReactRange() const
 	{
 		return (Player->Type == PlayerPerson ?
 			Type->ReactRangePerson : Type->ReactRangeComputer);
@@ -875,15 +875,15 @@ public:
 
 	void AssignWorkerToMine(CUnit *mine);
 	void DeAssignWorkerFromMine(CUnit *mine);
-	
+
 	/// Release a unit
 	void Release(bool final = false);
 
 	bool RestoreOrder(void);
 	bool StoreOrder(void);
-	
+
 	// Cowards and invisible units don't attack unless ordered.
-	bool IsAgressive(void) const 
+	bool IsAgressive(void) const
 	{
 		return (Type->CanAttack && !Type->Coward &&
 			Variable[INVISIBLE_INDEX].Value == 0);
@@ -946,7 +946,7 @@ public:
 				!(Seen.Destroyed & (1 << player->Index));
 		}
 	}
-	
+
 	/**
 	**  Returns true, if unit is visible for this player on the map.
 	**  The unit has to be out of fog of war and alive
@@ -958,17 +958,17 @@ public:
 	inline bool IsVisibleOnMap(const CPlayer *player) const
 	{
 		return IsAliveOnMap() && !IsInvisibile(player) && IsVisible(player);
-	}	
+	}
 
 	/// Returns true if unit is visible on minimap. Only for ThisPlayer.
 	bool IsVisibleOnMinimap() const;
-	
+
 	// Returns true if unit is visible under radar (By player, or by shared vision)
 	bool IsVisibleOnRadar(const CPlayer *pradar) const;
-	
+
 	/// Returns true if unit is visible in an viewport. Only for ThisPlayer.
 	bool IsVisibleInViewport(const CViewport *vp) const;
-	
+
 	/// Returns true, if unit is visible on current map view (any viewport).
 	bool IsVisibleOnScreen() const;
 
@@ -987,7 +987,7 @@ public:
 	bool IsTeamed(const CUnit *x) const;
 
 	bool IsUnusable(bool ignore_built_state = false) const;
-	
+
 	/**
 	 **  Returns the map distance between this unit and dst units.
 	 **
@@ -1000,7 +1000,7 @@ public:
 		return MapDistanceBetweenTypes(Type, X, Y,
 			dst->Type, dst->X, dst->Y);
 	}
-	
+
 	/**
 	 **  Returns the map distance to unit.
 	 **
@@ -1025,13 +1025,13 @@ public:
 	{
 		return Type->CanMove();
 	}
-	
+
 	int GetDrawLevel(void) const
 	{
 		return ((Type->CorpseType && CurrentAction() == UnitActionDie) ?
 					Type->CorpseType->DrawLevel : Type->DrawLevel);
 	}
-	
+
 };
 
 typedef CUnit::COrder* COrderPtr;
@@ -1047,7 +1047,7 @@ public:
 		unit = NULL;
 	}
 
-	CUnitPtr(): unit(NULL) {}	
+	CUnitPtr(): unit(NULL) {}
 	CUnitPtr(CUnit *u): unit(u) {
 		if (unit) {
 			unit->RefsIncrease();
@@ -1114,28 +1114,28 @@ public:
 
 	int X;
 	int Y;
-	int frame;	
-	int TeamSelected; //unit->TeamSelected	
-	int GroupId; //unit->GroupId	
-	
-	signed char IX;	
+	int frame;
+	int TeamSelected; //unit->TeamSelected
+	int GroupId; //unit->GroupId
+
+	signed char IX;
 	signed char IY;
-	unsigned char CurrentResource;	
+	unsigned char CurrentResource;
 
 	unsigned int IsAlive:1;
-	unsigned int Selected:1; //unit->Selected	
-	unsigned int ResourcesHeld:1;      /// isResources Held by a unit	
+	unsigned int Selected:1; //unit->Selected
+	unsigned int ResourcesHeld:1;      /// isResources Held by a unit
 	unsigned int state: 2;
 	unsigned int Blink: 3;	//unit->Blink
-	
+
 	const CConstructionFrame *cframe;
 	const CUnitType *Type;
 	const CPlayer *Player;
-	
+
 	CVariable *Variable;
-	
+
 	void operator=(const CUnit *unit);
-	void Draw(const CViewport *vp) const;	
+	void Draw(const CViewport *vp) const;
 };
 
 //unit_find
@@ -1154,7 +1154,7 @@ struct CUnitTypeFinder {
 	{
 			return cache.find(*this);
 	}
-	
+
 	inline CUnit *Find(const CMapField *const mf) const
 	{
 			return mf->UnitCache.find(*this);
@@ -1168,8 +1168,8 @@ struct CResourceFinder {
 	inline bool operator () (const CUnit *const unit) const
 	{
 		const CUnitType *const type = unit->Type;
-		return (type->GivesResource == resource 
-			&& unit->ResourcesHeld != 0 
+		return (type->GivesResource == resource
+			&& unit->ResourcesHeld != 0
 			&& (mine_on_top ? type->CanHarvest : !type->CanHarvest)
 			&& !unit->IsUnusable(true) //allow mines under construction
 			);
@@ -1177,7 +1177,7 @@ struct CResourceFinder {
 	inline CUnit *Find(const CMapField *const mf) const
 	{
 		return mf->UnitCache.find(*this);
-	}	
+	}
 };
 
 struct CResourceDepositFinder {
@@ -1278,12 +1278,12 @@ extern void UnitGoesUnderFog(CUnit *unit, const CPlayer *player);
 extern void UnitGoesOutOfFog(CUnit *unit, const CPlayer *player);
 	/// Marks a unit as seen
 extern void UnitsOnTileMarkSeen(const CPlayer *player, int x, int y, int p);
-extern void 
+extern void
 UnitsOnTileMarkSeen(const CPlayer *player, 	const unsigned int index, int p);
 
 	/// Unmarks a unit as seen
 extern void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y, int p);
-extern void 
+extern void
 UnitsOnTileUnmarkSeen(const CPlayer *player, const unsigned int index, int p);
 
 	/// Does a recount for VisCount
@@ -1319,7 +1319,7 @@ extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, 
 extern CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range,
 		 int resource, bool check_usage = false, const CUnit *destu = NULL);
 extern CUnit *UnitFindMiningArea(const CUnit *unit, int x, int y,
-		 int range, int resource);		 
+		 int range, int resource);
 	/// Find nearest deposit
 extern CUnit *FindDeposit(const CUnit *unit, int range, int resource);
 	/// Find the next idle worker
@@ -1407,7 +1407,7 @@ extern CUnit *UnitOnMapTile(int tx, int ty, unsigned int type);// = -1);
 extern CUnit *TargetOnMap(const CUnit *unit, int x1, int y1, int x2, int y2);
 
 	/// Return resource, if on map tile
-extern CUnit *ResourceOnMap(int tx, int ty, int resource, 
+extern CUnit *ResourceOnMap(int tx, int ty, int resource,
 		bool mine_on_top = true);
 	/// Return resource deposit, if on map tile
 extern CUnit *ResourceDepositOnMap(int tx, int ty, int resource);
@@ -1420,7 +1420,7 @@ extern CUnit *AttackUnitsInRange(const CUnit *unit);
 extern CUnit *AttackUnitsInReactRange(const CUnit *unit);
 
 extern CUnit *
-AutoAttackUnitsInDistance(const CUnit *unit, int range, 
+AutoAttackUnitsInDistance(const CUnit *unit, int range,
 		CUnitCache &autotargets);
 
 // in groups.c

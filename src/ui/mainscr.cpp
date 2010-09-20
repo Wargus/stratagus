@@ -620,7 +620,7 @@ static void DrawUnitInfo(CUnit *unit)
 	//
 	if (NumSelected == 1 && Selected[0] == unit) {
 		switch(unit->CurrentAction()) {
-		
+
 			//
 			//  Building training units.
 			//
@@ -751,7 +751,7 @@ void DrawResources(void)
 		}
 	}
 	if (UI.Resources[FoodCost].TextX != -1) {
-		char tmp[128];	
+		char tmp[128];
 		snprintf(tmp,sizeof(tmp), "%d/%d", ThisPlayer->Demand, ThisPlayer->Supply);
 		label.SetFont(GameFont);
 		if (ThisPlayer->Supply < ThisPlayer->Demand) {
@@ -789,7 +789,7 @@ public:
 	{
 #ifdef DEBUG
 		showBuilList = false;
-#endif	
+#endif
 		CleanMessages();
 	}
 
@@ -800,7 +800,7 @@ public:
 	void ToggleShowMessages() {
 		show = !show;
 	};
-#ifdef DEBUG	
+#ifdef DEBUG
 	void ToggleShowBuilListMessages() {
 		showBuilList = !showBuilList;
 	};
@@ -879,7 +879,7 @@ void MessagesDisplay::DrawMessages()
 					PushClipping();
 					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
 						Video.Height - 1);
-				}		
+				}
 
 				snprintf(buffer, 256, "%s (%d/%d) Wait %lu [%d,%d]",
 						ThisPlayer->Ai->UnitTypeBuilt[z].Type->Name.c_str(),
@@ -888,9 +888,9 @@ void MessagesDisplay::DrawMessages()
 						ThisPlayer->Ai->UnitTypeBuilt[z].Wait,
 						ThisPlayer->Ai->UnitTypeBuilt[z].X,
 						ThisPlayer->Ai->UnitTypeBuilt[z].Y);
-												
+
 				label.DrawClip(UI.MapArea.X + 8,
-						UI.MapArea.Y + 8 + 
+						UI.MapArea.Y + 8 +
 						z * (UI.MessageFont->Height() + 1),
 						buffer);
 
@@ -905,12 +905,12 @@ void MessagesDisplay::DrawMessages()
 			int textHeight = MessagesCount * (UI.MessageFont->Height() + 1);
 			Uint32 color = Video.MapRGB(TheScreen->format, 38, 38, 78);
 			Video.FillTransRectangleClip(color, UI.MapArea.X + 7, UI.MapArea.Y + 7,
-				UI.MapArea.EndX - UI.MapArea.X - 16, 
+				UI.MapArea.EndX - UI.MapArea.X - 16,
 				textHeight - MessagesScrollY + 1, 0x80);
-			
+
 			Video.DrawRectangle(color, UI.MapArea.X + 6, UI.MapArea.Y + 6,
 				UI.MapArea.EndX - UI.MapArea.X - 15,
-				textHeight - MessagesScrollY + 2);	
+				textHeight - MessagesScrollY + 2);
 		}
 
 		// Draw message line(s)
@@ -921,12 +921,12 @@ void MessagesDisplay::DrawMessages()
 					Video.Height - 1);
 			}
 			/*
-			 * Due parallel drawing we have to force message copy due temp 
-			 * std::string(Messages[z]) creation because 
+			 * Due parallel drawing we have to force message copy due temp
+			 * std::string(Messages[z]) creation because
 			 * char * pointer may change during text drawing.
 			 */
 			label.DrawClip(UI.MapArea.X + 8,
-				UI.MapArea.Y + 8 + 
+				UI.MapArea.Y + 8 +
 				z * (UI.MessageFont->Height() + 1) - MessagesScrollY,
 				std::string(Messages[z]));
 			if (z == 0) {
@@ -938,8 +938,8 @@ void MessagesDisplay::DrawMessages()
 		}
 #ifdef DEBUG
 		}
-#endif		
-		
+#endif
+
 	}
 }
 
@@ -1264,7 +1264,7 @@ void DrawCosts(void)
 			if (UI.Resources[i].G) {
 				UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame,
 					x, UI.StatusLine.TextY);
-				x+= 20;	
+				x+= 20;
 			}
 			x+=label.Draw(x, UI.StatusLine.TextY, Costs[i]);
 			if (x > Video.Width - 60) {

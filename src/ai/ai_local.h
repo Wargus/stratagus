@@ -98,7 +98,7 @@ public:
 */
 enum AiForceRole {
 	AiForceRoleAttack = 0, /// Force should attack
-	AiForceRoleDefend, /// Force should defend
+	AiForceRoleDefend      /// Force should defend
 };
 
 #define AI_FORCE_STATE_FREE			-1

@@ -69,7 +69,7 @@ enum _play_audio_flags_ {
 	PlayAudioStream = 1,        /// Stream the file from medium
 	PlayAudioPreLoad = 2,       /// Load compressed in memory
 	PlayAudioLoadInMemory = 4,  /// Preload file into memory
-	PlayAudioLoadOnDemand = 8,  /// Load only if needed.
+	PlayAudioLoadOnDemand = 8   /// Load only if needed.
 };
 
 /*----------------------------------------------------------------------------

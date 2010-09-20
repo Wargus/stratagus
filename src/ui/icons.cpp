@@ -130,7 +130,7 @@ void IconConfig::Load()
 		ExitFatal(-1);
 	}
 #endif
-};
+}
 
 /**
 **  Init the icons.

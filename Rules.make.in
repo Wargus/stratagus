@@ -21,7 +21,7 @@ PREFIX=@PREFIX@
 
 PKGDATADIR=@PKGDATADIR@
 
-CPPFLAGS=@DEFS@ @CPPFLAGS@ -DUSE_ZLIB -I$(TOPDIR) -I$(TOPDIR)/src/include -I$(TOPDIR)/src/guichan/include -DSTRATAGUS_LIB_PATH="\"@PKGDATADIR@\""
+CPPFLAGS=@DEFS@ @CPPFLAGS@ -DUSE_ZLIB -I$(TOPDIR) -I$(TOPDIR)/src/include -I$(TOPDIR)/src/guichan/include -DSTRATAGUS_LIB_PATH="\"@PKGDATADIR@\"" -Wextra -Wno-long-long -pedantic
 CXXFLAGS=@CXXFLAGS@
 LDFLAGS=@LDFLAGS@ -lpng -lz -lm
 

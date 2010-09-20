@@ -813,7 +813,7 @@ void NetworkSendSelection(CUnit **units, int count)
 		for (; i < MaxNetworkCommands; ++i) {
 			packet.Header.Type[i] = MessageNone;
 		}
-		
+
 
 		//
 		// Send the Constructed packet to team members
@@ -1052,7 +1052,7 @@ void NetworkEvent(void)
 			{
 				unsigned int slot = ntohs(nc->Unit);
 
-				if (slot >= 0 && slot < UnitSlotFree &&
+				if (slot < UnitSlotFree &&
 						(UnitSlots[slot]->Player->Index == player ||
 							Players[player].IsTeamed(UnitSlots[slot]))) {
 					validCommand = true;
@@ -1069,8 +1069,8 @@ void NetworkEvent(void)
 			NetworkIn[packet.Header.Cycle][player][i].Data = *nc;
 		} else {
 			SetMessage(_("%s sent bad command"), Players[player].Name.c_str());
-			DebugPrint("%s sent bad command: 0x%x\n" _C_ 
-				Players[player].Name.c_str() _C_ 
+			DebugPrint("%s sent bad command: 0x%x\n" _C_
+				Players[player].Name.c_str() _C_
 				packet.Header.Type[i] & 0x7F);
 		}
 	}

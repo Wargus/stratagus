@@ -694,7 +694,7 @@ static bool CommandKey(int key)
 			if (KeyModifiers & ModifierAlt) {
 				ToggleShowBuilListMessages();
 			}
-#endif	
+#endif
 			break;
 
 		case SDLK_TAB: // TAB toggles minimap.
@@ -759,10 +759,10 @@ int HandleCheats(const std::string &input)
 			SetMessage("Cannot disable 'ai me' cheat");
 #endif
 		} else {
-		
+
 			for (int j = 0; j < ThisPlayer->TotalNumUnits; ++j) {
 				CUnit *guard = ThisPlayer->Units[j];
-				bool stand_ground = 
+				bool stand_ground =
 					guard->CurrentAction() == UnitActionStandGround;
 				if ((stand_ground || guard->IsIdle()) &&
 							 !guard->IsUnusable()) {
@@ -1275,7 +1275,7 @@ int HoldClickDelay = 1000;              /// Time to detect hold clicks.
 
 static enum {
 	InitialMouseState,                  /// start state
-	ClickedMouseState,                  /// button is clicked
+	ClickedMouseState                   /// button is clicked
 } MouseState;                           /// Current state of mouse
 
 static int MouseX;                       /// Last mouse X position

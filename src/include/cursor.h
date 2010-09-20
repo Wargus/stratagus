@@ -156,7 +156,7 @@ enum CursorStates {
 	CursorStatePoint,      /// Normal cursor
 	CursorStateSelect,     /// Select position
 	CursorStateRectangle,  /// Rectangle selecting
-	CursorStatePieMenu,    /// Displaying Pie Menu
+	CursorStatePieMenu     /// Displaying Pie Menu
 };
 
 /*----------------------------------------------------------------------------

@@ -55,7 +55,7 @@ enum AnimationType {
 	AnimationUnbreakable,
 	AnimationLabel,
 	AnimationGoto,
-	AnimationRandomGoto,
+	AnimationRandomGoto
 };
 
 class CAnimation {
@@ -141,7 +141,7 @@ public:
 			delete[] Harvest[i];
 		}
 	}
-	
+
 	CAnimation *Start;
 	CAnimation *Still;
 	CAnimation *Death;

@@ -108,7 +108,7 @@ enum _mode_buttons_ {
 enum EditorActionType
 {
 	EditorActionTypePlaceUnit,
-	EditorActionTypeRemoveUnit,
+	EditorActionTypeRemoveUnit
 };
 
 struct EditorAction
@@ -651,7 +651,7 @@ static void DrawPlayers(void)
 	}
 }
 
-extern void DrawPopupUnitInfo(const CUnitType *type, 
+extern void DrawPopupUnitInfo(const CUnitType *type,
 		int player_index, CFont *font,
 		Uint32 backgroundColor, int buttonX, int buttonY);
 
@@ -659,8 +659,8 @@ static void DrawPopup(void) {
 	if (Editor.State == EditorEditUnit && Editor.CursorUnitIndex != -1) {
 		std::string nc, rc;
 		GetDefaultTextColors(nc, rc);
-		DrawPopupUnitInfo(Editor.ShownUnitTypes[Editor.CursorUnitIndex], 
-				Editor.SelectedPlayer, SmallFont, 
+		DrawPopupUnitInfo(Editor.ShownUnitTypes[Editor.CursorUnitIndex],
+				Editor.SelectedPlayer, SmallFont,
 				Video.MapRGB(TheScreen->format, 38, 38, 78),
 				Editor.PopUpX, Editor.PopUpY);
 		SetDefaultTextColors(nc, rc);
@@ -709,7 +709,7 @@ static void DrawUnitIcons(void)
 				Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
 					icon->G->Width + 2, icon->G->Height + 2);
 				Editor.PopUpX = x;
-				Editor.PopUpY = y;				
+				Editor.PopUpY = y;
 			}
 
 			x += IconWidth + 8;
@@ -823,10 +823,10 @@ static void DrawTileIcons(void)
 					TileSizeX-2, TileSizeY-2);
 			}
 			if (i == Editor.CursorTileIndex) {
-				Video.DrawRectangleClip(ColorWhite, x - 1, y - 1, 
+				Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
 					TileSizeX+2, TileSizeY+2);
 				Editor.PopUpX = x;
-				Editor.PopUpY = y;	
+				Editor.PopUpY = y;
 			}
 
 			x += TileSizeX + 8;
@@ -1271,7 +1271,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				editorUnitSlider->setVisible(false);
 		 		if (VisibleTileIcons < (int)Editor.ShownTileTypes.size()) {
 					editorSlider->setVisible(true);
-				}	
+				}
 				return;
 			case StartButton:
 				Editor.State = EditorSetStartLocation;
@@ -1352,7 +1352,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	// Click on map area
 	//
 	if (CursorOn == CursorOnMap) {
-	
+
 		if (MouseButtons & RightButton) {
 			if (Editor.State == EditorEditUnit &&
 				 Editor.SelectedUnitIndex != -1) {
@@ -1365,8 +1365,8 @@ static void EditorCallbackButtonDown(unsigned button)
 				 	CursorBuilding = NULL;
 				 	return;
 				}
-		}	
-	
+		}
+
 		CViewport *vp = GetViewport(CursorX, CursorY);
 		Assert(vp);
 		if ((MouseButtons & LeftButton) && UI.SelectedViewport != vp) {
@@ -1376,11 +1376,11 @@ static void EditorCallbackButtonDown(unsigned button)
 
 		if (MouseButtons & LeftButton) {
 			int tileX = UI.MouseViewport->Viewport2MapX(CursorX);
-			int tileY = UI.MouseViewport->Viewport2MapY(CursorY);				
+			int tileY = UI.MouseViewport->Viewport2MapY(CursorY);
 
 			if (Editor.State == EditorEditTile &&
 				Editor.SelectedTileIndex != -1) {
-				EditTiles(tileX, tileY, 
+				EditTiles(tileX, tileY,
 					Editor.ShownTileTypes[Editor.SelectedTileIndex],
 					TileCursorSize);
 			} else if (Editor.State == EditorEditUnit) {
@@ -1827,8 +1827,8 @@ static void EditorCallbackMouse(int x, int y)
 			}
 			++i;
 			by += 20;
-		}	
-	
+		}
+
 		i = Editor.TileIndex;
 		by = UI.ButtonPanel.Y + 24;
 		while (by < UI.ButtonPanel.Y + ButtonPanelHeight - TileSizeY) {
@@ -1891,10 +1891,10 @@ static void EditorCallbackMouse(int x, int y)
 			return;
 		}
 	}
-	
-	int StartUnitWidth = Editor.StartUnit ? 
+
+	int StartUnitWidth = Editor.StartUnit ?
 			Editor.StartUnit->Icon.Icon->G->Width : TileSizeX + 7;
-	int StartUnitHeight = Editor.StartUnit ? 
+	int StartUnitHeight = Editor.StartUnit ?
 			Editor.StartUnit->Icon.Icon->G->Height : TileSizeY + 7;
 	if (UI.InfoPanel.X + 4 + START_ICON_X < CursorX &&
 			CursorX < UI.InfoPanel.X + 4 + START_ICON_X + StartUnitWidth &&
@@ -1983,9 +1983,9 @@ static void CreateTileIcons(void)
 	for(int i = 0; 0x10 + i < Map.Tileset.NumTiles; i+=16) {
 		TileInfo *info = &Map.Tileset.Tiles[0x10 + i];
 		if (info->BaseTerrain && !info->MixTerrain) {
-			Editor.ShownTileTypes.push_back(0x10 + i);			
+			Editor.ShownTileTypes.push_back(0x10 + i);
 		}
-	}	
+	}
 }
 
 /**
@@ -2088,7 +2088,7 @@ void CEditor::Init(void)
 
 	CreateTileIcons();
 	VisibleTileIcons = CalculateVisibleIcons(true);
-	
+
 	RecalculateShownUnits();
 
 	EditorUndoActions.clear();
@@ -2181,7 +2181,7 @@ void EditorMainLoop(void)
 			editorUnitSlider->setSize(ButtonPanelWidth/*176*/, 16);
 			editorSlider->setSize(ButtonPanelWidth/*176*/, 16);
 			editorContainer->add(editorUnitSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y + 4);
-			editorContainer->add(editorSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y + 4);			
+			editorContainer->add(editorSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y + 4);
 		}
 		//ProcessMenu("menu-editor-tips", 1);
 		InterfaceState = IfaceStateNormal;

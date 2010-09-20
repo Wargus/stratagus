@@ -146,15 +146,13 @@ static int CheckForTargetInRange(CUnit *unit)
 	}
 
 	COrderPtr order = unit->CurrentOrder();
-	int wall;
 
 	//
 	// No goal: if meeting enemy attack it.
 	//
-	wall = 0;
-	if (!order->HasGoal() && 
+	if (!order->HasGoal() &&
 		order->Action != UnitActionAttackGround &&
-		!(wall = Map.WallOnMap(order->X, order->Y))) {
+		!Map.WallOnMap(order->X, order->Y)) {
 		CUnit *goal = AttackUnitsInReactRange(unit);
 		if (goal) {
 #ifdef DEBUG
@@ -299,7 +297,7 @@ static void AttackTarget(CUnit *unit)
 {
 
 	Assert(unit);
-	Assert(unit->CurrentOrder()->HasGoal() || 
+	Assert(unit->CurrentOrder()->HasGoal() ||
 		(unit->CurrentOrder()->X != -1 && unit->CurrentOrder()->Y != -1));
 
 	AnimateActionAttack(unit);

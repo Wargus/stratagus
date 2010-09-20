@@ -44,7 +44,7 @@
 enum ReplayType {
 	ReplayNone,          /// No replay
 	ReplaySinglePlayer,  /// Single player replay
-	ReplayMultiPlayer,   /// Multi player replay
+	ReplayMultiPlayer    /// Multi player replay
 };                       /// Replay types
 
 class CFile;

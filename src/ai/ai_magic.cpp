@@ -62,9 +62,6 @@ void AiCheckMagic(void)
 	CUnit **units;
 	CUnit *unit;
 	const CPlayer *player;
-#ifdef DEBUG
-	int success;
-#endif
 
 	n = AiPlayer->Player->TotalNumUnits;
 	units = AiPlayer->Player->Units;
@@ -77,9 +74,6 @@ void AiCheckMagic(void)
 				// Check if we can cast this spell. SpellIsAvailable checks for upgrades.
 				if (unit->Type->CanCastSpell[j] && SpellIsAvailable(player, j) &&
 					(SpellTypeTable[j]->AutoCast || SpellTypeTable[j]->AICast)) {
-#ifdef DEBUG
-					success =  // Follow on next line (AutoCastSpell).
-#endif
 						AutoCastSpell(unit, SpellTypeTable[j]);
 				}
 			}

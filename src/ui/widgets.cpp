@@ -374,6 +374,7 @@ void ImageButton::draw(gcn::Graphics *graphics)
 			textX = getWidth() - 4;
 			break;
 		default:
+			textX = 0;
 			Assert(!"Unknown alignment.");
 			//throw GCN_EXCEPTION("Unknown alignment.");
 	}
@@ -884,6 +885,7 @@ void MultiLineLabel::draw(gcn::Graphics *graphics)
 			textX = this->getWidth();
 			break;
 		default:
+			textX = 0;
 			Assert(!"Unknown alignment.");
 			//throw GCN_EXCEPTION("Unknown alignment.");
 	}
@@ -898,6 +900,7 @@ void MultiLineLabel::draw(gcn::Graphics *graphics)
 			textY = this->getHeight() - (int)this->mTextRows.size() * this->getFont()->getHeight();
 			break;
 		default:
+			textY = 0;
 			Assert(!"Unknown alignment.");
 			//throw GCN_EXCEPTION("Unknown alignment.");
 	}

@@ -101,7 +101,7 @@ class CUpgrade;
 
 enum {
 	DependRuleUnitType,  /// Kind is an unit-type
-	DependRuleUpgrade,   /// Kind is an upgrade
+	DependRuleUpgrade    /// Kind is an upgrade
 };
 
 	/// Dependency rule

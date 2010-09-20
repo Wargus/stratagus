@@ -529,7 +529,7 @@ void* CThread::threadFun (void *pThread)
 		ptr->Run ();
 	}
 	return NULL;
-};
+}
 #endif
 
 void CThread::Terminate ()
@@ -585,7 +585,7 @@ int CThread::Wait ()
 		m_bRunning = false;
 	}
 	return 0;
-};
+}
 
 void CThread::Exit ()
 {

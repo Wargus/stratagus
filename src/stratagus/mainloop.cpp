@@ -107,7 +107,7 @@ DisplayAutoLocker::~DisplayAutoLocker()
 	if (GameRunning && CPU_NUM > 1) {
 		DisplayUpdateLocker.UnLock();
 	}
-};
+}
 
 //----------------------------------------------------------------------------
 // Functions

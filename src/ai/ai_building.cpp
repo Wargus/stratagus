@@ -81,7 +81,7 @@ static int AiCheckSurrounding(const CUnit *worker,
 	int dir;
 	int obstacle;
 	int y_offset;
-	
+
 	x0 = x - 1;
 	y0 = y - 1;
 	x1 = x0 + type->TileWidth + 1;
@@ -98,17 +98,17 @@ static int AiCheckSurrounding(const CUnit *worker,
 						 (unsigned)y < (unsigned)Map.Info.MapHeight) {
 			if (worker && x == worker->X && y == worker->Y) {
 				surrounding[surroundingnb++] = 1;
-			} else if (	Map.CheckMask(x + y_offset, 
+			} else if (	Map.CheckMask(x + y_offset,
 						(MapFieldUnpassable | MapFieldWall | MapFieldRocks |
 						MapFieldForest | MapFieldBuilding))
 						) {
 				surrounding[surroundingnb++] = 0;
 			} else{
 				// Can pass there
-				surrounding[surroundingnb++] = Map.CheckMask(x + y_offset, 
-						(MapFieldWaterAllowed + 
+				surrounding[surroundingnb++] = Map.CheckMask(x + y_offset,
+						(MapFieldWaterAllowed +
 								MapFieldCoastAllowed + MapFieldLandAllowed));
-						
+
 			}
 		} else {
 			surrounding[surroundingnb++] = 0;
@@ -197,10 +197,10 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 			backupy = y;
 		}
 	}
-	
+
 	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
 	points = new p[size];
-	
+
 	//
 	//  Make movement matrix.
 	//
@@ -319,8 +319,8 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 */
 static int AiFindHallPlace(const CUnit *worker,
 						 const CUnitType *type,
-						 int nx, int ny, 
-						 int *dx, int *dy, 
+						 int nx, int ny,
+						 int *dx, int *dy,
 						 int resource = GoldCost)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
@@ -344,11 +344,9 @@ static int AiFindHallPlace(const CUnit *worker,
 	unsigned char *morg;
 	unsigned char *matrix;
 	CUnit *mine;
-	int destx;
-	int desty;
 
-	destx = x = (nx != -1 ? nx : worker->X);
-	desty = y = (ny != -1 ? ny : worker->Y);
+	x = (nx != -1 ? nx : worker->X);
+	y = (ny != -1 ? ny : worker->Y);
 	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
 	points = new p[size];
 
@@ -401,7 +399,7 @@ static int AiFindHallPlace(const CUnit *worker,
 					//
 					minx = mine->X - 5;
 					miny = mine->Y - 5;
-					maxx = mine->X + mine->Type->TileWidth + 5; 
+					maxx = mine->X + mine->Type->TileWidth + 5;
 					maxy = mine->Y + mine->Type->TileHeight + 5;
 					Map.FixSelectionArea(minx, miny, maxx, maxy);
 					nunits = Map.SelectFixed(minx, miny, maxx, maxy, units);
@@ -479,7 +477,7 @@ static int AiFindHallPlace(const CUnit *worker,
 **  @todo          FIXME: This is slow really slow, using two flood
 **                 fills, is not a perfect solution.
 */
-static int AiFindLumberMillPlace(const CUnit *worker, const CUnitType *type, 
+static int AiFindLumberMillPlace(const CUnit *worker, const CUnitType *type,
 	int nx,int ny, int *dx, int *dy)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
@@ -581,8 +579,8 @@ static int AiFindLumberMillPlace(const CUnit *worker, const CUnitType *type,
 
 static int AiFindMiningPlace(const CUnit *worker,
 						 const CUnitType *type,
-						 int nx, int ny, 
-						 int *dx, int *dy, 
+						 int nx, int ny,
+						 int *dx, int *dy,
 						 int resource)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
@@ -606,11 +604,9 @@ static int AiFindMiningPlace(const CUnit *worker,
 	unsigned char *morg;
 	unsigned char *matrix;
 	CUnit *mine;
-	int destx;
-	int desty;
 
-	destx = x = (nx != -1 ? nx : worker->X);
-	desty = y = (ny != -1 ? ny : worker->Y);
+	x = (nx != -1 ? nx : worker->X);
+	y = (ny != -1 ? ny : worker->Y);
 	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
 	points = new p[size];
 
@@ -701,13 +697,13 @@ static int AiFindMiningPlace(const CUnit *worker,
 **  @todo          Better and faster way to find building place of oil
 **                 platforms Special routines for special buildings.
 */
-int AiFindBuildingPlace(const CUnit *worker, const CUnitType *type, 
+int AiFindBuildingPlace(const CUnit *worker, const CUnitType *type,
 		int nx, int ny, int *dx, int *dy)
 {
 	//
 	// Find a good place for a new hall
 	//
-	DebugPrint("%d: Want to build a %s(%s)\n" _C_ AiPlayer->Player->Index 
+	DebugPrint("%d: Want to build a %s(%s)\n" _C_ AiPlayer->Player->Index
 		_C_ type->Ident.c_str() _C_ type->Name.c_str());
 
 	//Mines and Depots
@@ -728,14 +724,14 @@ int AiFindBuildingPlace(const CUnit *worker, const CUnitType *type,
 					return AiFindMiningPlace(worker, type, nx, ny,  dx, dy, i);
 				} else {
 					//Mine can be build without resource restrictions: solar panels, etc
-					return AiFindBuildingPlace2(worker, type, 
+					return AiFindBuildingPlace2(worker, type,
 							(nx != -1 ? nx : worker->X),
 							(ny != -1 ? ny : worker->Y), dx, dy);
 				}
 			}
 	}
-	
-	return AiFindBuildingPlace2(worker, type, 
+
+	return AiFindBuildingPlace2(worker, type,
 			(nx != -1 ? nx : worker->X), (ny != -1 ? ny : worker->Y), dx, dy);
 }
 

@@ -441,7 +441,7 @@ public:
 
 enum PlayerRacesOld {
 	PlayerRaceHuman = 0,  /// belongs to human
-	PlayerRaceOrc  = 1,   /// belongs to orc
+	PlayerRaceOrc  = 1    /// belongs to orc
 };
 
 /**
@@ -488,7 +488,7 @@ enum PlayerTypes {
 	PlayerComputer = 4,       /// computer player
 	PlayerPerson = 5,         /// human player
 	PlayerRescuePassive = 6,  /// rescued passive
-	PlayerRescueActive = 7,   /// rescued  active
+	PlayerRescueActive = 7    /// rescued  active
 };
 
 #define PlayerNumNeutral (PlayerMax - 1)  /// this is the neutral player slot
@@ -499,7 +499,7 @@ enum PlayerTypes {
 enum NotifyType {
 	NotifyRed,     /// Red alram
 	NotifyYellow,  /// Yellow alarm
-	NotifyGreen,   /// Green alarm
+	NotifyGreen    /// Green alarm
 };
 
 /*----------------------------------------------------------------------------

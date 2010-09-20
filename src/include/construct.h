@@ -106,7 +106,7 @@ class CPlayerColorGraphic;
 
 enum ConstructionFileType {
 	ConstructionFileConstruction,
-	ConstructionFileMain,
+	ConstructionFileMain
 };
 
 	/// Construction frame

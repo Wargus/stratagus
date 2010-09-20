@@ -220,7 +220,7 @@ enum TileType {
 	TileTypeCoast,      /// Any coast tile
 	TileTypeHumanWall,  /// Any human wall tile
 	TileTypeOrcWall,    /// Any orc wall tile
-	TileTypeWater,      /// Any water tile
+	TileTypeWater       /// Any water tile
 };
 
 	/// Single tile definition
@@ -307,7 +307,7 @@ public:
 
 	unsigned HumanWallTable[16];    /// Human wall placement table
 	unsigned OrcWallTable[16];      /// Orc wall placement table
-	
+
 	bool IsSeenTile(unsigned short type, unsigned short seen) const
 	{
 		if(TileTypeTable) {
@@ -322,7 +322,7 @@ public:
 		}
 		return false;
 	};
-	
+
 };
 
 /*----------------------------------------------------------------------------

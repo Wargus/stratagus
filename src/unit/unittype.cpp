@@ -120,7 +120,7 @@ CUnitType::CUnitType() :
 	Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
 	BuilderOutside(0), BuilderLost(0), CanHarvest(0), Harvester(0),
 	Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
-	Indestructible(0), Teleporter(0), Variable(NULL), 
+	Indestructible(0), Teleporter(0), Variable(NULL),
 	GivesResource(0), Supply(0), Demand(0), FieldFlags(0), MovementMask(0),
 	Sprite(NULL), ShadowSprite(NULL)
 {
@@ -138,7 +138,7 @@ CUnitType::~CUnitType()
 
 	delete[] Variable;
 	BoolFlag.clear();
-	
+
 	for (int i = 0; i < PlayerMax; ++i) {
 		delete[] Stats[i].Variables;
 	}
@@ -172,7 +172,7 @@ CUnitType::~CUnitType()
 
 bool CUnitType::CheckUserBoolFlags(char *BoolFlags) {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); ++i) { // User defined flags
-		if (BoolFlags[i] != CONDITION_TRUE && 
+		if (BoolFlags[i] != CONDITION_TRUE &&
 			((BoolFlags[i] == CONDITION_ONLY) ^ (BoolFlag[i].value))) {
 			return false;
 		}
@@ -205,7 +205,7 @@ void UpdateStats(int reset)
 				if (!stats->Variables) {
 					stats->Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
 				}
-				memcpy(stats->Variables, type->Variable, 
+				memcpy(stats->Variables, type->Variable,
 					UnitTypeVar.GetNumberVariable() * sizeof(*type->Variable));
 			}
 		}
@@ -581,12 +581,12 @@ void CUnitTypeVar::Init()
 	for (unsigned int i = 0; i < UnitTypes.size(); ++i) { // adjust array for unit already defined
 		UnitTypes[i]->BoolFlag.resize(new_size);
 	}
-};
+}
 
 void CUnitTypeVar::Clear()
 {
 	Variable.clear();
-	
+
 	for (std::vector<CDecoVar *>::iterator it = DecoVar.begin();
 		it != DecoVar.end(); ++it) {
 		delete (*it);

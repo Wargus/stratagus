@@ -75,7 +75,7 @@ enum ButtonCmd {
 	ButtonCancel,         /// cancel
 	ButtonCancelUpgrade,  /// cancel upgrade
 	ButtonCancelTrain,    /// cancel training
-	ButtonCancelBuild,    /// cancel building
+	ButtonCancelBuild     /// cancel building
 };
 
 class ButtonAction;
@@ -109,20 +109,20 @@ enum _button_area_ {
 	ButtonAreaResearching,   /// Researching button
 	ButtonAreaTransporting,  /// Transporting button
 	ButtonAreaButton,        /// Button panel button
-	ButtonAreaMenu,          /// Menu button
+	ButtonAreaMenu           /// Menu button
 };
 
 	/// Menu button under cursor
 enum _menu_button_under_ {
 	ButtonUnderMenu,              /// Menu button
 	ButtonUnderNetworkMenu,       /// Network menu button
-	ButtonUnderNetworkDiplomacy,  /// Diplomacy button
+	ButtonUnderNetworkDiplomacy   /// Diplomacy button
 };
 
 	/// current interface state
 enum _iface_state_ {
 	IfaceStateNormal,  /// Normal Game state
-	IfaceStateMenu,    /// Menu active
+	IfaceStateMenu     /// Menu active
 };
 
 	/// current key state
@@ -168,7 +168,7 @@ enum _cursor_on_ {
 	CursorOnScrollLeftUp,     /// in scroll left+up area
 	CursorOnScrollLeftDown,   /// in scroll left+down area
 	CursorOnScrollRightUp,    /// in scroll right+up area
-	CursorOnScrollRightDown,  /// in scroll right+down area
+	CursorOnScrollRightDown   /// in scroll right+down area
 };
 
 	/// Are We Scrolling With the Keyboard ?

@@ -63,7 +63,7 @@ inline int get_cpu_count(void) {
 #else
 	return 1;
 #endif
-};
+}
 
 
 class CMutex
@@ -107,7 +107,6 @@ public:
 		return 0 == pthread_mutex_trylock (&_mut);
 #endif
 	}
-
 };
 
 

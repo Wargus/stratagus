@@ -98,7 +98,7 @@ enum GameTypes {
 	SettingsGameTypeTopVsBottom,
 	SettingsGameTypeLeftVsRight,
 	SettingsGameTypeManVsMachine,
-	SettingsGameTypeManTeamVsMachine,
+	SettingsGameTypeManTeamVsMachine
 
 	// Future game type ideas
 #if 0
@@ -108,7 +108,7 @@ enum GameTypes {
 	SettingsGameTypeSlaughter,
 	SettingsGameTypeSuddenDeath,
 	SettingsGameTypeTeamMelee,
-	SettingsGameTypeTeamCaptureTheFlag,
+	SettingsGameTypeTeamCaptureTheFlag
 #endif
 };
 

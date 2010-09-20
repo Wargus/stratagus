@@ -79,7 +79,7 @@ enum TextAlignment {
 	TextAlignUndefined,
 	TextAlignCenter,
 	TextAlignLeft,
-	TextAlignRight,
+	TextAlignRight
 };
 
 class ButtonStyleProperties {
@@ -101,7 +101,7 @@ public:
 	int TextY;                      /// Text Y location
 	std::string TextNormalColor;    /// Normal text color
 	std::string TextReverseColor;   /// Reverse text color
-} ;
+};
 
 class ButtonStyle {
 public:
@@ -168,7 +168,7 @@ public:
 		OffsetX(0), OffsetY(0), MapWidth(0), MapHeight(0), Unit(NULL),
 		Proxy(NULL) {}
 	~CViewport();
-		
+
 
 	/// Check if X and Y pixels are within map area
 	bool IsInsideMapArea(int x, int y) const;
@@ -429,9 +429,9 @@ class CFiller
 	struct bits_map {
 		bits_map() : Width(0), Height(0), bstore(NULL) {}
 		~bits_map();
-		
+
 		void Init(CGraphic *g);
-		
+
 		bool TransparentPixel(int x, int y)
 		{
 			if(bstore) {
@@ -443,18 +443,18 @@ class CFiller
 			}
 			return false;
 		};
-		
+
 		int Width;
 		int Height;
-		unsigned int *bstore; 
+		unsigned int *bstore;
 	};
-	
+
 	bits_map map;
 public:
 	CFiller() : G(NULL), X(0), Y(0) {}
 
 	void Load(void);
-	
+
 	bool OnGraphic(int x, int y) {
 		x -= X;
 		y -= Y;
@@ -698,8 +698,8 @@ public:
 	CGraphic *DefeatBackgroundG;        /// Defeat background graphic
 };
 
-/*	
- *	Basic Shared Pointer for Current Selected Buttons 
+/*
+ *	Basic Shared Pointer for Current Selected Buttons
  *	parallel drawing problems.
  */
 class ButtonActionProxy {
@@ -730,7 +730,7 @@ class ButtonActionProxy {
 public:
 
   	ButtonActionProxy (): ptr(0), count(0) {}
-  
+
     ButtonActionProxy (const ButtonActionProxy& p)
      : ptr(p.ptr), count(p.count)
     {
@@ -754,12 +754,12 @@ public:
 	ButtonAction &operator[](unsigned int index) {
 		return ptr[index];
 	}
-    
+
     bool IsValid(void)
     {
     	return ptr != NULL;
     }
-    
+
 };
 
 extern ButtonActionProxy CurrentButtons;    /// Current Selected Buttons

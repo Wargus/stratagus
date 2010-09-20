@@ -564,7 +564,7 @@ class ResourceInfo {
 public:
 	ResourceInfo() : WaitAtResource(0), ResourceStep(0),
 		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0), FinalResource(0),
-		TerrainHarvester(0), LoseResources(0), HarvestFromOutside(0), 
+		TerrainHarvester(0), LoseResources(0), HarvestFromOutside(0),
 		SpriteWhenLoaded(NULL), SpriteWhenEmpty(NULL)
 	{}
 
@@ -579,7 +579,7 @@ public:
 	unsigned char TerrainHarvester;      /// Unit will harvest terrain(wood only for now).
 	unsigned char LoseResources;         /// The unit will lose it's resource when distracted.
 	unsigned char HarvestFromOutside;    /// Unit harvests without entering the building.
-	unsigned char RefineryHarvester;    /// Unit have to build Refinery buildings for harvesting.	
+	unsigned char RefineryHarvester;    /// Unit have to build Refinery buildings for harvesting.
 	//  Runtime info:
 	CPlayerColorGraphic *SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.
 	CPlayerColorGraphic *SpriteWhenEmpty;  /// The graphic corresponding to FileWhenEmpty
@@ -740,7 +740,7 @@ class CDecoVarSpriteBar : public CDecoVar
 public:
 	CDecoVarSpriteBar() : NSprite(-1) {};
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, 
+	virtual void Draw(int x, int y,
 		const CUnitType *Type, const CVariable &Variable) const;
 
 	char NSprite; /// Index of number. (@see DefineSprites and @see GetSpriteIndex)
@@ -763,7 +763,7 @@ public:
 enum UnitTypeType {
 	UnitTypeLand,               /// Unit lives on land
 	UnitTypeFly,                /// Unit lives in air
-	UnitTypeNaval,              /// Unit lives on water
+	UnitTypeNaval               /// Unit lives on water
 };
 
 enum DistanceTypeType {
@@ -772,7 +772,7 @@ enum DistanceTypeType {
 	LessThan,
 	LessThanEqual,
 	GreaterThan,
-	GreaterThanEqual,
+	GreaterThanEqual
 };
 
 
@@ -814,7 +814,7 @@ public:
 
 class CBuildRestrictionAddOn : public CBuildRestriction {
 	struct functor {
-		const CUnitType *const Parent;   /// building that is unit is an addon too.	
+		const CUnitType *const Parent;   /// building that is unit is an addon too.
 		const int x,y;	//functor work position
 		functor(const CUnitType *type, int _x, int _y): Parent(type), x(_x), y(_y) {}
 		inline bool operator() (const CUnit *const unit) const;
@@ -833,8 +833,8 @@ public:
 
 class CBuildRestrictionOnTop : public CBuildRestriction {
 	struct functor {
-		CUnit *ontop;   /// building that is unit is an addon too.		
-		const CUnitType *const Parent;   /// building that is unit is an addon too.		
+		CUnit *ontop;   /// building that is unit is an addon too.
+		const CUnitType *const Parent;   /// building that is unit is an addon too.
 		const int x,y;	//functor work position
 		functor(const CUnitType *type, int _x, int _y): ontop(0), Parent(type), x(_x), y(_y) {}
 		inline bool operator() (CUnit *const unit);
@@ -970,10 +970,10 @@ public:
 	unsigned Indestructible : 1;        /// Unit is indestructible (take no damage).
 	unsigned Teleporter : 1;            /// Can teleport other units.
 
-	CVariable *Variable;            /// Array of user defined variables.	
+	CVariable *Variable;            /// Array of user defined variables.
 	struct BoolFlags {
 		bool value;					/// User defined flag. Used for (dis)allow target.
-		char CanTransport;			/// Can transport units with this flag.	
+		char CanTransport;			/// Can transport units with this flag.
 		char CanTargetFlag;			/// Flag needed to target with missile.
 	};
 	std::vector<BoolFlags> BoolFlag;
@@ -1003,7 +1003,7 @@ public:
 	CGraphic *ShadowSprite;          /// Shadow sprite image
 
 	/* API */
-	
+
 	bool CheckUserBoolFlags(char *BoolFlags);
 	bool CanTransport(void)  const
 	{
@@ -1055,11 +1055,11 @@ public:
 	struct CKeys {
 
 		struct DataKey
-		{			
-			static bool key_pred(const DataKey& lhs, 
+		{
+			static bool key_pred(const DataKey& lhs,
 									const DataKey& rhs)
 			{
-				return ((lhs.keylen == rhs.keylen) ? 
+				return ((lhs.keylen == rhs.keylen) ?
 					(strcmp(lhs.key, rhs.key) < 0) : (lhs.keylen < rhs.keylen));
 			}
 			int offset;
@@ -1068,22 +1068,22 @@ public:
 		};
 
 		CKeys(): TotalKeys(SIZE) {}
-	
+
 		DataKey buildin[SIZE];
 		std::map<std::string, int> user;
 		unsigned int TotalKeys;
-		
+
 		void Init() {
-			std::sort(buildin, buildin+SIZE, DataKey::key_pred);	
+			std::sort(buildin, buildin+SIZE, DataKey::key_pred);
 		}
-	
+
 		const char *operator[](int index) {
 			for (unsigned int i = 0; i < SIZE; ++i) {
 				if (buildin[i].offset == index) {
 					return buildin[i].key;
 				}
 			}
-			for (std::map<std::string, int>::iterator 
+			for (std::map<std::string, int>::iterator
 				it(user.begin()), end(user.end());
 				it != end; ++it) {
 				if ((*it).second == index) {
@@ -1092,31 +1092,31 @@ public:
 			}
 			return NULL;
 		}
-		
+
 		/**
 		**  Return the index of the external storage array/vector.
 		**
 		**  @param varname  Name of the variable.
 		**
 		**  @return         Index of the variable, -1 if not found.
-		*/	
+		*/
 		int operator[](const char*const key) {
 			DataKey k;
 			k.key = key;
 			k.keylen = strlen(key);
-		   	const DataKey* p = std::lower_bound(buildin, buildin + SIZE, 
+		   	const DataKey* p = std::lower_bound(buildin, buildin + SIZE,
 		   		k, DataKey::key_pred);
-		   	if ((p != buildin + SIZE) && p->keylen == k.keylen && 
+		   	if ((p != buildin + SIZE) && p->keylen == k.keylen &&
 		   		0 == strcmp(p->key, key)) {
 				return p->offset;
 			} else {
-				std::map<std::string, int>::iterator 
+				std::map<std::string, int>::iterator
 						ret(user.find(key));
 				if (ret != user.end()) {
 					return  (*ret).second;
 				}
 			}
-			return -1;	
+			return -1;
 		}
 
 		int AddKey(const char*const key)
@@ -1129,7 +1129,7 @@ public:
 			user[key] = TotalKeys++;
 			return TotalKeys - 1;
 		}
-		
+
 	};
 
 	struct CBoolKeys : public CKeys<NBARALREADYDEFINED> {
@@ -1141,17 +1141,17 @@ public:
 	};
 
 	CUnitTypeVar() {}
-	
+
 	void Init();
 	void Clear();
-		
+
 	CBoolKeys BoolFlagNameLookup;		/// Container of name of user defined bool flag.
 	CVariableKeys VariableNameLookup;	/// Container of names of user defined variables.
-	
+
 //	EventType *Event;                   /// Array of functions sets to call when en event occurs.
-	std::vector<CVariable> Variable;	/// Array of user defined variables (default value for unittype).	
+	std::vector<CVariable> Variable;	/// Array of user defined variables (default value for unittype).
 	std::vector<CDecoVar *> DecoVar;    /// Array to describe how showing variable.
-	
+
 	unsigned int GetNumberBoolFlag(void) {
 		return BoolFlagNameLookup.TotalKeys;
 	}
@@ -1160,8 +1160,8 @@ public:
 		return VariableNameLookup.TotalKeys;
 	}
 
-	
-	
+
+
 };
 
 extern CUnitTypeVar UnitTypeVar;

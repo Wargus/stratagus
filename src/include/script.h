@@ -62,7 +62,7 @@ typedef struct _lua_user_data_ {
 
 enum {
 	LuaUnitType = 100,
-	LuaSoundType,
+	LuaSoundType
 };
 
 extern lua_State *Lua;
@@ -156,7 +156,7 @@ typedef enum {
 	UnitRefInside,          /// unit->Inside.
 	UnitRefContainer,       /// Unit->Container.
 	UnitRefWorker,          /// unit->Data.Built.Worker
-	UnitRefGoal,            /// unit->Goal
+	UnitRefGoal             /// unit->Goal
 } EnumUnit;
 
 

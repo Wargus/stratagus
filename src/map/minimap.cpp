@@ -519,7 +519,6 @@ void CMinimap::Update(void)
 	int my;
 	int n;
 	int visiontype; // 0 unexplored, 1 explored, >1 visible.
-	int bpp;
 
 	red_phase_changed = red_phase != (int)((FrameCounter / FRAMES_PER_SECOND) & 1);
 	if (red_phase_changed) {
@@ -536,7 +535,6 @@ void CMinimap::Update(void)
 	}
 
 	if (!UseOpenGL) {
-		bpp = MinimapSurface->format->BytesPerPixel;
 	}
 
 	//
@@ -563,6 +561,7 @@ void CMinimap::Update(void)
 			}
 
 			if ( visiontype == 0 || (visiontype == 1 && ((mx & 1) != (my & 1))))  {
+				const int bpp = MinimapSurface->format->BytesPerPixel;
 				if (!UseOpenGL) {
 					if (bpp == 2) {
 						*(Uint16 *)&((Uint8 *)MinimapSurface->pixels)[mx * bpp + my * MinimapSurface->pitch] =
@@ -647,7 +646,7 @@ void CMinimap::Draw(int vx, int vy)
 
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		glEnableClientState(GL_VERTEX_ARRAY);
-         
+
 		glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
 		glVertexPointer(2, GL_FLOAT, 0, vertex);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

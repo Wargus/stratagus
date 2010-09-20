@@ -593,7 +593,7 @@ void MissileDrawProxy::DrawMissile(const CViewport *vp) const
 		default:
 			this->Type->DrawMissileType(this->data.SpriteFrame, x, y);
 			break;
-	}	
+	}
 }
 
 void MissileDrawProxy::operator=(const Missile* missile) {
@@ -605,7 +605,7 @@ void MissileDrawProxy::operator=(const Missile* missile) {
 	} else {
 		this->data.SpriteFrame = missile->SpriteFrame;
 	}
-};
+}
 
 /**
 **  Draw missile.
@@ -638,7 +638,7 @@ void Missile::DrawMissile(const CViewport *vp) const
 	}
 }
 
-static bool MissileDrawLevelCompare(const Missile*const l, 
+static bool MissileDrawLevelCompare(const Missile*const l,
 					const Missile*const r)
 {
 	if (l->Type->DrawLevel == r->Type->DrawLevel) {
@@ -657,7 +657,7 @@ static bool MissileDrawLevelCompare(const Missile*const l,
 **
 **  @return           number of missiles returned in table
 */
-int FindAndSortMissiles(const CViewport *vp, 
+int FindAndSortMissiles(const CViewport *vp,
 	Missile *table[], const int tablesize)
 {
 	int nmissiles;
@@ -692,7 +692,7 @@ int FindAndSortMissiles(const CViewport *vp,
 	return nmissiles;
 }
 
-int FindAndSortMissiles(const CViewport *vp, 
+int FindAndSortMissiles(const CViewport *vp,
 	MissileDrawProxy table[], const int tablesize)
 {
 	Missile *buffer[MAX_MISSILES * 9];
@@ -1327,7 +1327,7 @@ MissileType::MissileType(const std::string &ident) :
 {
 	FiredSound.Sound = NULL;
 	ImpactSound.Sound = NULL;
-};
+}
 
 /**
 **  Destructor.
@@ -1672,7 +1672,7 @@ struct LandMineTargetFinder {
 	inline CUnit *FindOnTile(const CMapField *const mf) const
 	{
 		return mf->UnitCache.find(*this);
-	}	
+	}
 };
 
 /**
@@ -1687,10 +1687,10 @@ void MissileLandMine::Action()
 
 	if(LandMineTargetFinder(this->SourceUnit,
 		 this->Type->CanHitOwner).FindOnTile(Map.Field(x,y)) != NULL) {
-		DebugPrint("Landmine explosion at %d,%d.\n" _C_ x _C_ y);	
+		DebugPrint("Landmine explosion at %d,%d.\n" _C_ x _C_ y);
 		MissileHit(this);
 		this->TTL = 0;
-		return;	
+		return;
 	}
 	if (!this->AnimWait--) {
 		NextMissileFrame(this, 1, 0);

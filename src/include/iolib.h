@@ -56,7 +56,7 @@ class CMapInfo;
 /**
 **  Exception thrown by FileWriter objects.
 **/
-class FileException 
+class FileException
 {
 };
 
@@ -131,7 +131,7 @@ enum {
 	CLF_TYPE_INVALID,  /// invalid file handle
 	CLF_TYPE_PLAIN,    /// plain text file handle
 	CLF_TYPE_GZIP,     /// gzip file handle
-	CLF_TYPE_BZIP2,    /// bzip2 file handle
+	CLF_TYPE_BZIP2     /// bzip2 file handle
 };
 
 #define CL_OPEN_READ 0x1
