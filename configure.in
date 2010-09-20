@@ -36,7 +36,7 @@ AC_ARG_ENABLE(maemo,
 	[  --enable-maemo	  Build for Linux Maemo based devices (default: autodetect)])
 AC_MSG_CHECKING([whether we are building for Linux Maemo based devices])
 if ( test "$ARCH" = "linux" && test -f /etc/maemo_version && test "$enable_maemo" != "no" ) || test "$enable_maemo" = "yes"; then
-	CPPFLAGS="$CPPFLAGS -DUSE_MAEMO"
+	CPPFLAGS="$CPPFLAGS -DUSE_MAEMO -DHAVE_STRCASESTR -DHAVE_STRNLEN"
 	MAEMO=yes
 	CFLAGS="$CFLAGS $(pkg-config --cflags libosso)"
 	CXXFLAGS="$CXXFLAGS $(pkg-config --cflags libosso)"
