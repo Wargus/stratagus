@@ -39,7 +39,7 @@ local briefingtext01 =
  "mountains."
 
 function DisplayEnding()
-  t = 
+  t =
    "The End ?\n"..
    "Lehan managed to escape in the mountains.\n"..
    "But the Obersims are searching him.\n\n"..
@@ -47,7 +47,7 @@ function DisplayEnding()
    "How will the Tubbies react ?\n"..
    "To find out and to play the rest of the campaign, "..
    "help us finish it. There is a big need for new maps."
-  obj = {"Go to boswars.org and contact us to help on the campaign."}
+  obj = {_("Go to boswars.org and contact us to help on the campaign.")}
   RunBriefingMenu(obj, t, nil, "campaigns/swindler/swindler.png")
 end
 
