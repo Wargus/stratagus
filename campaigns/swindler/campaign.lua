@@ -47,13 +47,13 @@ function DisplayEnding()
    "How will the Tubbies react ?\n"..
    "To find out and to play the rest of the campaign, "..
    "help us finish it. There is a big need for new maps."
-  obj = "Go to boswars.org and contact us to help on the campaign."
+  obj = {"Go to boswars.org and contact us to help on the campaign."}
   RunBriefingMenu(obj, t, nil, "campaigns/swindler/swindler.png")
 end
 
 campaign_steps = {
   CreateMapStep("campaigns/swindler/level01.smp",
-      "Get to the upper mountains without being seen.", 
+      {"Get to the upper mountains without being seen."}, 
       briefingtext01,
       nil,
       "campaigns/swindler/swindler.png"),
