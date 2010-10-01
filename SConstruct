@@ -312,11 +312,11 @@ def DefineVariant(venv, v, vv = None):
    if vv == None:
       vv = '-' + v
    BuildDir('build/' + v, engineSourceDir, duplicate = 0)
-   r = venv.Program('boswars' + vv, buildSourcesList('build/' + v))
+   r = venv.Program('build/boswars' + vv, buildSourcesList('build/' + v))
    Alias(v, 'boswars' + vv)
    return r 
 
-r = DefineVariant(release, 'release', '')
+r = DefineVariant(release, 'release')
 Default(r)
 DefineVariant(debug, 'debug')
 DefineVariant(profile, 'profile')
