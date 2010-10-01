@@ -20,7 +20,8 @@ and if nobody else is working on it.
 <pre>  svn co svn://bos.seul.org/svn/bos/bos/trunk boswars</pre>
 
 <p>Before playing you'll have to compile the engine. This can be done easily 
-with scons. To build a debug version (recommended for development) run:</p>
+with the make.py tool. To build a debug version (recommended for development) 
+run:</p>
 <pre>  ./make.py debug</pre>
 
 <p>Finally, you can run the game with :</p>
