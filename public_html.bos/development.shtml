@@ -21,10 +21,10 @@ and if nobody else is working on it.
 
 <p>Before playing you'll have to compile the engine. This can be done easily 
 with scons. To build a debug version (recommended for development) run:</p>
-<pre>  scons debug</pre>
+<pre>  ./make.py debug</pre>
 
 <p>Finally, you can run the game with :</p>
-<pre>  ./boswars</pre>
+<pre>  ./fbuild/debug/boswars</pre>
 
 <p>You can also compile using visual c++ by opening up the bos.sln file.</p>
 
