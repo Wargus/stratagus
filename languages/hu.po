@@ -1,0 +1,334 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-05-02 12:58+0300\n"
+"PO-Revision-Date: 2010-09-26 19:32+0100\n"
+"Last-Translator: Balázs Úr <urbalazs@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: action/action_build.cpp:131
+msgid "You cannot reach building place"
+msgstr "Nem érhető el az épület helye"
+
+#: action/action_build.cpp:214
+#, c-format
+msgid "You cannot build %s here"
+msgstr "%s nem építhető ide"
+
+#: action/action_build.cpp:228
+#, c-format
+msgid "Can't build more units %s"
+msgstr "Nem építhető több %s egység"
+
+#: action/action_build.cpp:260
+#, c-format
+msgid "Unable to create building %s"
+msgstr "Nem hozható létre több %s épület"
+
+#: action/action_build.cpp:379
+#, c-format
+msgid "New %s done"
+msgstr "Az új %s felépült"
+
+#: action/action_spellcast.cpp:170
+#, c-format
+msgid "%s: not enough mana for spell: %s"
+msgstr "%s: nincs elég mana a varázslathoz: %s"
+
+#: action/action_spellcast.cpp:174
+#, c-format
+msgid "%s: can't cast spell: %s"
+msgstr "%s: nem tud varázsolni: %s"
+
+#: action/action_train.cpp:180
+#, c-format
+msgid "New %s ready"
+msgstr "Az új %s elkészült"
+
+#: action/action_train.cpp:230
+#, c-format
+msgid "Unable to train %s"
+msgstr "%s nem képezhető ki"
+
+#: action/command.cpp:1008
+#, c-format
+msgid "Player \"%s\" has left the game"
+msgstr "\"%s\" játékos kilépett a játékból"
+
+#: action/command.cpp:1010
+#, c-format
+msgid "Player \"%s\" has been killed"
+msgstr "\"%s\" játékost megölték"
+
+#: editor/editloop.cpp:371
+msgid "Unit deleted"
+msgstr "Egység törölve"
+
+#: editor/editloop.cpp:694
+#: editor/editloop.cpp:987
+msgid "Player"
+msgstr "Játékos"
+
+#: editor/editloop.cpp:699
+msgid "Neutral"
+msgstr "Semleges"
+
+#: editor/editloop.cpp:703
+msgid "Nobody"
+msgstr "Senki"
+
+#: editor/editloop.cpp:706
+msgid "Person"
+msgstr "Ember"
+
+#: editor/editloop.cpp:711
+msgid "Computer"
+msgstr "Számítógép"
+
+#: editor/editloop.cpp:992
+msgid "Amount of"
+msgstr "Mennyiség"
+
+#: editor/editloop.cpp:1008
+msgid "Patch"
+msgstr "Domborzat"
+
+#: editor/editloop.cpp:1290
+msgid "Unit can't be placed here."
+msgstr "Az egység nem helyezhető ide."
+
+#: editor/editloop.cpp:1371
+msgid "Patch deleted"
+msgstr "Domborzat törölve"
+
+#: editor/editloop.cpp:1402
+msgid "Unit owner modified"
+msgstr "Az egység tulajdonosa megváltozott"
+
+#: editor/editloop.cpp:1603
+#: editor/editloop.cpp:1639
+msgid "Select player #"
+msgstr "# játékos kiválasztása"
+
+#: editor/editloop.cpp:1737
+msgid "Select mode"
+msgstr "Kiválasztó mód"
+
+#: editor/editloop.cpp:1748
+msgid "Unit mode"
+msgstr "Egység mód"
+
+#: editor/editloop.cpp:1759
+msgid "Patch mode"
+msgstr "Domborzat mód"
+
+#: editor/editloop.cpp:1770
+msgid "Set start location mode"
+msgstr "Starthely kiválasztása mód"
+
+#: editor/patch_editor.cpp:522
+msgid "Save"
+msgstr "Mentés"
+
+#: editor/patch_editor.cpp:528
+msgid "Exit"
+msgstr "Kilépés"
+
+#: game/player.cpp:702
+msgid "Building Limit Reached"
+msgstr "Elérted a épületek számának határát"
+
+#: game/player.cpp:706
+msgid "Unit Limit Reached"
+msgstr "Elérted az egységek számának határát"
+
+#: game/player.cpp:710
+msgid "Total Unit Limit Reached"
+msgstr "Elérted az összes egység számának határát"
+
+#: game/player.cpp:714
+#, c-format
+msgid "Limit of %d reached for this unit type"
+msgstr "A %d határt elérted ebből az egységből"
+
+#: game/player.cpp:720
+msgid "Cannot create more units."
+msgstr "Nem hozható létre több egység."
+
+#: game/replay.cpp:766
+msgid "No sync info for this replay !"
+msgstr "Nincs szinkronizációs információ ehhez a visszajátszáshoz!"
+
+#: game/replay.cpp:768
+#, c-format
+msgid "Replay got out of sync (%lu) !"
+msgstr "A visszajátszásnál szinkronizációs hiba lépett fel (%lu)!"
+
+#: game/replay.cpp:777
+msgid "Replay got out of sync !"
+msgstr "A visszajátszásnál szinkronizációs hiba lépett fel!"
+
+#: game/replay.cpp:875
+#: game/replay.cpp:889
+msgid "End of replay"
+msgstr "Ismétlés vége"
+
+#: network/network.cpp:1069
+#, c-format
+msgid "%s sent bad command"
+msgstr "%s hibás parancsot adott"
+
+#: network/network.cpp:1166
+msgid "Network out of sync"
+msgstr "Hálózatszinkronizációs hiba"
+
+#: network/network.cpp:1399
+#, c-format
+msgid "Waiting for player \"%s\": %d:%02d"
+msgstr "Várakozás \"%s\" játékosra: %d:%02d"
+
+#: network/network.cpp:1415
+msgid "Timed out"
+msgstr "Megszakadt"
+
+#: stratagus/stratagus.cpp:596
+msgid "Thanks for playing Bos Wars.\n"
+msgstr "Köszönjük, hogy a Bos Wars-szal játszottál!\n"
+
+#: ui/botpanel.cpp:783
+#: ui/botpanel.cpp:848
+msgid "Select Target"
+msgstr "Válassz célt"
+
+#: ui/botpanel.cpp:896
+msgid "Select Location"
+msgstr "Válassz egy helyet"
+
+#: ui/interface.cpp:105
+#, c-format
+msgid "MESSAGE:%s~!_"
+msgstr "ÜZENET: %s~!_"
+
+#: ui/interface.cpp:257
+msgid "Sound is on."
+msgstr "Hang bekapcsolva."
+
+#: ui/interface.cpp:259
+msgid "Sound is off."
+msgstr "Hang kikapcsolva."
+
+#: ui/interface.cpp:274
+msgid "Music is off."
+msgstr "Zene kikapcsolva."
+
+#: ui/interface.cpp:277
+msgid "Music is on."
+msgstr "Zene bekapcsolva."
+
+#: ui/interface.cpp:290
+#: ui/mouse.cpp:1613
+msgid "Game Paused"
+msgstr "Játék megállítva"
+
+#: ui/interface.cpp:292
+msgid "Game Resumed"
+msgstr "Játék folytatása"
+
+#: ui/interface.cpp:323
+msgid "Big map enabled"
+msgstr "Nagy térkép engedélyezve"
+
+#: ui/interface.cpp:332
+msgid "Returning to old map"
+msgstr "Visszatérés a régi térképhez"
+
+#: ui/interface.cpp:346
+msgid "Faster"
+msgstr "Gyorsabb"
+
+#: ui/interface.cpp:365
+msgid "Slower"
+msgstr "Lassabb"
+
+#: ui/interface.cpp:398
+msgid "Terrain displayed."
+msgstr "Domborzat bekapcsolva."
+
+#: ui/interface.cpp:400
+msgid "Terrain hidden."
+msgstr "Domborzat elrejtve."
+
+#: ui/interface.cpp:430
+msgid "Grab mouse toggled."
+msgstr "Egér elfogva."
+
+#: ui/interface.cpp:911
+msgid "Screenshot made."
+msgstr "A képernyőkép elékészült."
+
+#: ui/mainscr.cpp:170
+msgid "Armor: "
+msgstr "Páncél: "
+
+#: ui/mainscr.cpp:176
+msgid "Radar Range: "
+msgstr "Radar távolság: "
+
+#: ui/mainscr.cpp:181
+msgid "Sight Range: "
+msgstr "Látótávolság: "
+
+#: ui/mainscr.cpp:188
+msgid "Kills: "
+msgstr "Gyilkolás: "
+
+#: ui/mainscr.cpp:193
+msgid "Attack Range: "
+msgstr "Lövés távolság: "
+
+#: ui/mainscr.cpp:200
+msgid "Damage: "
+msgstr "Sebzés: "
+
+#: ui/mainscr.cpp:205
+msgid "Mana: "
+msgstr "Mana: "
+
+#: ui/mainscr.cpp:600
+#, c-format
+msgid "Last message repeated ~<%d~> times"
+msgstr "Az utolsó üzenet ~<%d~> alkalommal lett ismételve"
+
+#: ui/mainscr.cpp:732
+#, c-format
+msgid "~<Event: %s~>"
+msgstr "~<Esemény: %s~>"
+
+#: ui/mouse.cpp:1778
+#, c-format
+msgid "You have ~<%d~> %ss"
+msgstr "~<%d~> %s egységed van"
+
+#: ui/mouse.cpp:1782
+#, c-format
+msgid "You have ~<1~> %s"
+msgstr "~<1~> %s egységed van"
+
+#: unit/unit.cpp:2169
+#, c-format
+msgid "%s attacked"
+msgstr "%s támadás alatt"
+
+#: video/sdl.cpp:285
+msgid "esc"
+msgstr "esc"
+
