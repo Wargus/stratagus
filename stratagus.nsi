@@ -189,6 +189,9 @@ Section "${NAME}"
 	WriteRegDWORD HKLM "${REGKEY}" "NoRepair" 1
 	WriteUninstaller "$INSTDIR\${UNINSTALL}"
 
+	System::Call "msvcrt.dll::_chmod(t $\"$INSTDIR$\", i 0x01c0) i .s"
+
+
 SectionEnd
 
 ;--------------------------------
