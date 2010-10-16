@@ -24,6 +24,7 @@
 
 !define NAME "Stratagus"
 !define VERSION "2.2.5.4"
+!define VIVERSION "${VERSION}"
 !define HOMEPAGE "https://launchpad.net/stratagus"
 !define LICENSE "GPL v2"
 !define COPYRIGHT "Copyright (c) 1998-2010 by The Stratagus Project and Pali Rohar"
@@ -102,7 +103,7 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "Homepage" "${HOMEPAGE}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "OriginalFilename" "${INSTALLER}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${NAME} Installer"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VERSION}"
-VIProductVersion "${VERSION}"
+VIProductVersion "${VIVERSION}"
 
 BrandingText "${NAME} - ${VERSION}  ${HOMEPAGE}"
 ShowInstDetails Show
