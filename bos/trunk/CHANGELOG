@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Fixed Debian bug #559615: uncontrollable with Wacom tablet when in full-screen mode (Kalle Olavi Niemitalo)
 - Added Swamp Dwellers map (Michiel van der Wulp)
 - Added hungarian translation (Ur Balazs)
 - Added the trenches map (Michiel van der Wulp)
