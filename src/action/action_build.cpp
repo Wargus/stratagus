@@ -531,15 +531,6 @@ void HandleActionBuilt(CUnit *unit)
 			unit->Frame = 0;
 		}
 
-		if (type->GivesResource) {
-			// Set to Zero as it's part of a union
-			memset(&unit->Data, 0, sizeof(unit->Data));
-			// Has StartingResources, Use those
-			if (type->StartingResources) {
-				unit->ResourcesHeld = type->StartingResources;
-			}
-		}
-
 		if ((worker = unit->Data.Built.Worker)) {
 			// Bye bye worker.
 			if (type->BuilderLost) {
@@ -562,6 +553,15 @@ void HandleActionBuilt(CUnit *unit)
 				if (worker->Type->ResInfo[type->GivesResource]) {
 					CommandResource(worker, unit, 0);
 				}
+			}
+		}
+
+		if (type->GivesResource) {
+			// Set to Zero as it's part of a union
+			memset(&unit->Data, 0, sizeof(unit->Data));
+			// Has StartingResources, Use those
+			if (type->StartingResources) {
+				unit->ResourcesHeld = type->StartingResources;
 			}
 		}
 
