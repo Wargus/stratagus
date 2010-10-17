@@ -386,6 +386,48 @@ void InitVideoSdl(void)
 	Uint32 flags;
 
 	if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
+#ifdef HAVE_X
+		// Fix tablet input in full-screen mode.
+		//
+		// By default, SDL 1.2 on X11 uses mouse relative mode
+		// if the mouse cursor is hidden and input is grabbed.
+		// In this mode, SDL attempts to report the direction
+		// in which the mouse is moving.  SDL computes this
+		// from the mouse-cursor coordinates it gets from X.
+		// If the mouse cursor of X were to hit an edge of the
+		// screen, SDL would not know whether the user keeps
+		// moving the mouse in that direction.  To prevent
+		// that, SDL warps the mouse cursor of X back to the
+		// center of the screen whenever it gets too far.
+		// SDL then compensates for this warping in its
+		// relative-motion computations, and uses the relative
+		// coordinates to maintain its own idea of the mouse
+		// cursor location, separately from what X thinks.
+		//
+		// All of the above works great with mice but fails
+		// horribly with tablet or touch-screen devices, where
+		// the coordinates reported by X depend only on the
+		// position of the stylus and not at all on where SDL
+		// previously warped the pointer.  Because Bos Wars
+		// doesn't actually care about relative mouse motion,
+		// let's just disable that whole feature in SDL.  The
+		// easiest way to do that is by setting an environment
+		// variable.  Do this before SDL_Init in case that
+		// caches the value.
+		//
+		// SDL 1.2 documentation warns that environment
+		// variables are mostly for debugging and might not be
+		// supported in future SDL releases.  In that event,
+		// Bos Wars can instead use the same trick as Barrage
+		// does: tell SDL to show the mouse cursor, but make
+		// all of its pixels transparent, so it's actually
+		// invisible.  However, SDL 1.3 is apparently going to
+		// support tablet devices natively, so this might not
+		// be needed then.
+		static char mouseRelative0[] = "SDL_MOUSE_RELATIVE=0";
+		SDL_putenv(mouseRelative0); // doesn't want const
+#endif
+
 		if (SDL_Init(
 #ifdef DEBUG
 				SDL_INIT_NOPARACHUTE |
