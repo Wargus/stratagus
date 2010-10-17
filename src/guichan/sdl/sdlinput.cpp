@@ -223,8 +223,10 @@ namespace gcn
               break;
         } 
 
-        //throw GCN_EXCEPTION("Unknown SDL mouse type.");
-    	assert(!"Unknown SDL mouse type.");
+#ifdef DEBUG
+    	fprintf(stderr,"Unknown SDL mouse button.\n");
+#endif
+
         return 0;
     }
 
