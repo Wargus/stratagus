@@ -218,7 +218,6 @@ inline bool CBuildRestrictionOnTop::functor::operator() (CUnit *const unit)
 
 bool CBuildRestrictionOnTop::Check(const CUnitType *, int x, int y, CUnit *&ontoptarget) const
 {
-#if 0
 	CUnit *table[UnitMax];
 	int n;
 	int i;
@@ -232,18 +231,9 @@ bool CBuildRestrictionOnTop::Check(const CUnitType *, int x, int y, CUnit *&onto
 					table[i]->CurrentAction() != UnitActionBuilt) {
 				// Available to build on
 				ontoptarget = table[i];
-			} else {
-				// Something else is built on this already
-				ontoptarget = NULL;
-				return false;
 			}
 		}
 	}
-#else
-		functor f(Parent, x, y);
-		Map.Field(x,y)->UnitCache.for_each_if(f);
-		ontoptarget = f.ontop;
-#endif
 
 	return ontoptarget != NULL;
 }
