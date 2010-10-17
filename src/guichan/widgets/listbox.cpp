@@ -219,7 +219,7 @@ namespace gcn
         return ret;
     }
 
-    void ListBox::mousePress(int x, int y, int button)
+    void ListBox::mousePress(int, int y, int button)
     {
         if (button == MouseInput::LEFT && hasMouse())
         {

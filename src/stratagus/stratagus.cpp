@@ -558,7 +558,7 @@ static void PrintHeader(void)
 **  @param argc  Number of arguments.
 **  @param argv  Vector of arguments.
 */
-static int main1(int argc, char **argv)
+static int main1(int, char **)
 {
 	PrintHeader();
 	printf(

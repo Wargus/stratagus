@@ -567,7 +567,7 @@ static inline int AStarAddNode(int x, int y, int o, int costs)
 **  Can be further optimised knowing that the new cost MUST BE LOWER
 **  than the old one.
 */
-static void AStarReplaceNode(int pos, int costs)
+static void AStarReplaceNode(int pos, int)
 {
 	ProfileBegin("AStarReplaceNode");
 
@@ -955,8 +955,8 @@ static int AStarSavePath(int startX, int startY, int endX, int endY, char *path,
 **  Check if we're at the goal or if it's 1 tile away
 */
 static int AStarFindSimplePath(int sx, int sy, int gx, int gy, int gw, int gh,
-	int tilesizex, int tilesizey, int minrange, int maxrange,
-	 char *path, int pathlen, void *data)
+	int, int, int minrange, int maxrange,
+	 char *path, int, void *data)
 {
 	ProfileBegin("AStarFindSimplePath");
 	// At exact destination point already

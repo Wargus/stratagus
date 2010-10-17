@@ -930,7 +930,7 @@ int SelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 }
 
 int DoSelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1,
-CUnit**table, int num_units = UnitMax)
+CUnit**table)
 {
 	CUnit *unit;
 	int r;

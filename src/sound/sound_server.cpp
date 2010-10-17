@@ -336,7 +336,7 @@ static void MixIntoBuffer(void *buffer, int samples)
 **  @param stream  pointer to buffer you want to fill with information.
 **  @param len     is length of audio buffer in bytes.
 */
-static void FillAudio(void *udata, Uint8 *stream, int len)
+static void FillAudio(void *, Uint8 *stream, int len)
 {
 	len >>= 1;
 	MixIntoBuffer(stream, len);

@@ -509,7 +509,7 @@ void AiInit(CPlayer *player)
 	ait = NULL;
 
 	DebugPrint("%d - %p - looking for class %s\n" _C_
-		player->Index _C_ player _C_ player->AiName.c_str());
+		player->Index _C_ (void *)player _C_ player->AiName.c_str());
 	//MAPTODO print the player name (player->Name) instead of the pointer
 
 	//
@@ -1101,7 +1101,7 @@ void AiCanNotMove(CUnit *unit)
 **  @param unit  Point to unit.
 **  @param what  Pointer to unit-type.
 */
-void AiNeedMoreSupply(const CUnit *unit, const CUnitType *what)
+void AiNeedMoreSupply(const CUnit *unit, const CUnitType *)
 {
 	Assert(unit->Player->Type != PlayerPerson);
 	unit->Player->Ai->NeedSupply = true;

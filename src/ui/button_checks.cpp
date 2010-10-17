@@ -59,7 +59,7 @@
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckTrue(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckTrue(const CUnit *, const ButtonAction *)
 {
 	return true;
 }
@@ -73,7 +73,7 @@ bool ButtonCheckTrue(const CUnit *unit, const ButtonAction *button)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckFalse(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckFalse(const CUnit *, const ButtonAction *)
 {
 	return false;
 }
@@ -151,7 +151,7 @@ bool ButtonCheckUnitsAnd(const CUnit *unit, const ButtonAction *button)
 **
 **  @note: this check could also be moved into intialisation.
 */
-bool ButtonCheckNetwork(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckNetwork(const CUnit *, const ButtonAction *)
 {
 	return IsNetworkGame();
 }
@@ -166,7 +166,7 @@ bool ButtonCheckNetwork(const CUnit *unit, const ButtonAction *button)
 **
 **  @note: this check could also be moved into intialisation.
 */
-bool ButtonCheckNoNetwork(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckNoNetwork(const CUnit *, const ButtonAction *)
 {
 	return !IsNetworkGame();
 }
@@ -180,7 +180,7 @@ bool ButtonCheckNoNetwork(const CUnit *unit, const ButtonAction *button)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckNoWork(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckNoWork(const CUnit *unit, const ButtonAction *)
 {
 	int action = unit->CurrentAction(); 
 	return action != UnitActionTrain &&
@@ -196,7 +196,7 @@ bool ButtonCheckNoWork(const CUnit *unit, const ButtonAction *button)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckNoResearch(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckNoResearch(const CUnit *unit, const ButtonAction *)
 {
 	int action = unit->CurrentAction();
 	return action != UnitActionUpgradeTo &&
@@ -228,7 +228,7 @@ bool ButtonCheckUpgradeTo(const CUnit *unit, const ButtonAction *button)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckAttack(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckAttack(const CUnit *unit, const ButtonAction *)
 {
 	return unit->Type->CanAttack;
 }

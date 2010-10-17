@@ -135,7 +135,7 @@ static gcn::Slider *editorSlider;
 class EditorUnitSliderListener : public gcn::ActionListener
 {
 public:
-	virtual void action(const std::string &eventId) {
+	virtual void action(const std::string &) {
 		int iconsPerStep = VisibleUnitIcons;
 		int steps = (Editor.ShownUnitTypes.size() + iconsPerStep - 1) / iconsPerStep;
 		double value = editorUnitSlider->getValue();
@@ -153,7 +153,7 @@ static EditorUnitSliderListener *editorUnitSliderListener;
 class EditorSliderListener : public gcn::ActionListener
 {
 public:
-	virtual void action(const std::string &eventId) {
+	virtual void action(const std::string &) {
 		int iconsPerStep = VisibleTileIcons;
 		int steps = (Editor.ShownTileTypes.size() + iconsPerStep - 1) / iconsPerStep;
 		double value = editorSlider->getValue();
@@ -1577,7 +1577,7 @@ static void EditorCallbackKeyUp(unsigned key, unsigned keychar)
 /**
 **  Callback for input.
 */
-static void EditorCallbackKeyRepeated(unsigned key, unsigned keychar)
+static void EditorCallbackKeyRepeated(unsigned key, unsigned)
 {
 	switch (key) {
 		case 'z':

@@ -807,7 +807,7 @@ void CommandReturnGoods(CUnit *unit, CUnit *goal, int flush)
 **  @param type   unit type to train.
 **  @param flush  if true, flush command queue.
 */
-void CommandTrainUnit(CUnit *unit, CUnitType *type, int flush)
+void CommandTrainUnit(CUnit *unit, CUnitType *type, int)
 {
 	COrderPtr order;
 

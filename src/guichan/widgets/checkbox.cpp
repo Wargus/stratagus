@@ -190,7 +190,7 @@ namespace gcn
         return false;
     }
   
-    void CheckBox::mouseClick(int x, int y, int button, int count)
+    void CheckBox::mouseClick(int, int, int button, int)
     {
         if (button == MouseInput::LEFT)
         {

@@ -81,6 +81,7 @@ GameSound GameSounds
 	{ SoundConfig("rescue (human) UNUSED"),
 		SoundConfig("rescue (orc) UNUSED"),
 	},
+	SoundConfig("click"),
 }
 #endif
 	;

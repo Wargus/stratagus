@@ -440,7 +440,7 @@ static int CclDefineDependency(lua_State *l)
 */
 static int CclGetDependency(lua_State *l)
 {
-	DebugPrint("FIXME: write this %p\n" _C_ l);
+	DebugPrint("FIXME: write this %p\n" _C_ (void*)l);
 
 	return 0;
 }
@@ -454,7 +454,7 @@ static int CclGetDependency(lua_State *l)
 */
 static int CclCheckDependency(lua_State *l)
 {
-	DebugPrint("FIXME: write this %p\n" _C_ l);
+	DebugPrint("FIXME: write this %p\n" _C_ (void *)l);
 
 	return 0;
 }

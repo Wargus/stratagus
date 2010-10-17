@@ -94,7 +94,7 @@ public:
 	virtual ~CParticle() {}
 
 	virtual void draw() {}
-	virtual void update(int ticks) {}
+	virtual void update(int) {}
 
 	inline void destroy() { destroyed = true; }
 	inline bool isDestroyed() { return destroyed; }

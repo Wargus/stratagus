@@ -1266,7 +1266,7 @@ static int CclSetUnitTypeName(lua_State *l)
 /**
 **  Add a label
 */
-static void AddLabel(lua_State *l, CAnimation *anim, const std::string &name)
+static void AddLabel(lua_State *, CAnimation *anim, const std::string &name)
 {
 	LabelsStruct label;
 	label.Anim = anim;
@@ -1291,7 +1291,7 @@ static CAnimation *FindLabel(lua_State *l, const std::string &name)
 /**
 **  Find a label later
 */
-static void FindLabelLater(lua_State *l, CAnimation **anim, const std::string &name)
+static void FindLabelLater(lua_State *, CAnimation **anim, const std::string &name)
 {
 	LabelsLaterStruct label;
 	label.Anim = anim;

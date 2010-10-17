@@ -335,7 +335,7 @@ namespace gcn
         BasicContainer::_mouseOutMessage();
     }
   
-    void ScrollArea::mousePress(int x, int y, int button)
+    void ScrollArea::mousePress(int x, int y, int)
     {
         if (getUpButtonDimension().isPointInRect(x, y))
         {
@@ -369,7 +369,7 @@ namespace gcn
         } 
     }
 
-    void ScrollArea::mouseRelease(int x, int y, int button)
+    void ScrollArea::mouseRelease(int, int, int)
     {
         mUpButtonPressed = false;
         mDownButtonPressed = false;
@@ -1278,7 +1278,7 @@ namespace gcn
         }
     }
 
-    void ScrollArea::mouseWheelUp(int x, int y)
+    void ScrollArea::mouseWheelUp(int, int)
     {    
         if (hasMouse())
         {
@@ -1286,7 +1286,7 @@ namespace gcn
         }    
     }
 
-    void ScrollArea::mouseWheelDown(int x, int y)
+    void ScrollArea::mouseWheelDown(int, int)
     {    
         if (hasMouse())
         {

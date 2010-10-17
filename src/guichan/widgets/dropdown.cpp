@@ -381,7 +381,7 @@ namespace gcn
 		return false;
     }
   
-    void DropDown::mousePress(int x, int y, int button)
+    void DropDown::mousePress(int, int y, int button)
     {
         if (button == MouseInput::LEFT && hasMouse() && !mDroppedDown)
         {
@@ -400,7 +400,7 @@ namespace gcn
         }        
     }
 
-    void DropDown::mouseRelease(int x, int y, int button)
+    void DropDown::mouseRelease(int, int, int button)
     {
         if (button == MouseInput::LEFT)
         {      
@@ -599,7 +599,7 @@ namespace gcn
         foldUp();        
     }
 
-    void DropDown::moveToTop(Widget* widget)
+    void DropDown::moveToTop(Widget*)
     {
         if (getParent())
         {
@@ -607,7 +607,7 @@ namespace gcn
         }        
     }
 
-    void DropDown::moveToBottom(Widget* widget)
+    void DropDown::moveToBottom(Widget*)
     {
         if (getParent())
         {
@@ -628,7 +628,7 @@ namespace gcn
         }        
     }
 
-    void DropDown::action(const std::string& eventId)
+    void DropDown::action(const std::string&)
     {
         foldUp();
         generateAction();        

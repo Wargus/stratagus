@@ -468,7 +468,7 @@ void CContentTypeFormattedText2::Draw(const CUnit *unit, CFont *defaultfont) con
 **  @param unit         unit with icon to show.
 **  @param defaultfont  unused.
 */
-void CContentTypeIcon::Draw(const CUnit *unit, CFont *defaultfont) const
+void CContentTypeIcon::Draw(const CUnit *unit, CFont *) const
 {
 	Assert(unit);
 	unit = GetUnitRef(unit, this->UnitRef);
@@ -486,7 +486,7 @@ void CContentTypeIcon::Draw(const CUnit *unit, CFont *defaultfont) const
 **
 **  @todo Color and percent value Parametrisation.
 */
-void CContentTypeLifeBar::Draw(const CUnit *unit, CFont *defaultfont) const
+void CContentTypeLifeBar::Draw(const CUnit *unit, CFont *) const
 {
 	Assert(unit);
 	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
@@ -524,7 +524,7 @@ void CContentTypeLifeBar::Draw(const CUnit *unit, CFont *defaultfont) const
 **
 **  @todo Color and percent value Parametrisation.
 */
-void CContentTypeCompleteBar::Draw(const CUnit *unit, CFont *defaultfont) const
+void CContentTypeCompleteBar::Draw(const CUnit *unit, CFont *) const
 {
 	Assert(unit);
 	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());

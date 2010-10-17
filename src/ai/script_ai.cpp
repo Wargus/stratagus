@@ -1297,7 +1297,7 @@ static int CclDefineAiPlayer(lua_State *l)
 	++j;
 
 	Assert(i >= 0 && i <= PlayerMax);
-	DebugPrint("%p %d\n" _C_ Players[i].Ai _C_ Players[i].AiEnabled );
+	DebugPrint("%p %d\n" _C_ (void *)Players[i].Ai _C_ Players[i].AiEnabled );
 	// FIXME: lose this:
 	// Assert(!Players[i].Ai && Players[i].AiEnabled);
 

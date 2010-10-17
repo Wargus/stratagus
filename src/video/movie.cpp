@@ -71,30 +71,30 @@ static int MovieStop;
 **  Callbacks for movie input.
 */
 
-static void MovieCallbackButtonPressed(unsigned dummy)
+static void MovieCallbackButtonPressed(unsigned)
 {
 	MovieStop = 1;
 }
 
-static void MovieCallbackButtonReleased(unsigned dummy)
+static void MovieCallbackButtonReleased(unsigned)
 {
 }
 
-static void MovieCallbackKeyPressed(unsigned dummya, unsigned dummyb)
+static void MovieCallbackKeyPressed(unsigned, unsigned)
 {
 	MovieStop = 1;
 }
 
 
-static void MovieCallbackKeyReleased(unsigned dummya, unsigned dummyb)
+static void MovieCallbackKeyReleased(unsigned, unsigned)
 {
 }
 
-static void MovieCallbackKeyRepeated(unsigned dummya, unsigned dummyb)
+static void MovieCallbackKeyRepeated(unsigned, unsigned)
 {
 }
 
-static void MovieCallbackMouseMove(int dummya, int dummyb)
+static void MovieCallbackMouseMove(int, int)
 {
 }
 

@@ -509,7 +509,7 @@ bool LuaToBoolean(lua_State *l, int narg)
 **
 **  @param fast  set this flag to disable slow GC (during game)
 */
-void CclGarbageCollect(int fast)
+void CclGarbageCollect(int)
 {
 #if LUA_VERSION_NUM >= 501
 	DebugPrint("Garbage collect (before): %d\n" _C_
@@ -1187,7 +1187,7 @@ std::string EvalString(const StringDesc *s)
 **
 **  @param unitdesc  struct to free
 */
-void FreeUnitDesc(UnitDesc *unitdesc)
+void FreeUnitDesc(UnitDesc *)
 {
 #if 0 // Nothing to free mow.
 	if (!unitdesc) {

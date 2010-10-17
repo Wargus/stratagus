@@ -228,7 +228,7 @@ namespace gcn
         return (hasMouse() && mMouseDown) || mKeyDown || mHotKeyDown;
     }
     
-    void Button::mouseClick(int x, int y, int button, int count)
+    void Button::mouseClick(int, int, int button, int)
     {
         if (button == MouseInput::LEFT)
         {
@@ -236,7 +236,7 @@ namespace gcn
         }
     }
 
-    void Button::mousePress(int x, int y, int button)
+    void Button::mousePress(int, int, int button)
     {
         if (button == MouseInput::LEFT && hasMouse())
         {      
@@ -244,7 +244,7 @@ namespace gcn
         }
     }
 
-    void Button::mouseRelease(int x, int y, int button)
+    void Button::mouseRelease(int, int, int button)
     {
         if (button == MouseInput::LEFT)
         {      

@@ -43,7 +43,7 @@ static bool WaitNoEvent;             /// Flag got an event
 /**
 **  Callback for input.
 */
-static void WaitCallbackButtonPressed(unsigned dummy)
+static void WaitCallbackButtonPressed(unsigned)
 {
 	WaitNoEvent = false;
 }
@@ -51,14 +51,14 @@ static void WaitCallbackButtonPressed(unsigned dummy)
 /**
 **  Callback for input.
 */
-static void WaitCallbackButtonReleased(unsigned dummy)
+static void WaitCallbackButtonReleased(unsigned)
 {
 }
 
 /**
 **  Callback for input.
 */
-static void WaitCallbackKeyPressed(unsigned dummy1, unsigned dummy2)
+static void WaitCallbackKeyPressed(unsigned, unsigned)
 {
 	WaitNoEvent = false;
 }
@@ -66,21 +66,21 @@ static void WaitCallbackKeyPressed(unsigned dummy1, unsigned dummy2)
 /**
 **  Callback for input.
 */
-static void WaitCallbackKeyReleased(unsigned dummy1, unsigned dummy2)
+static void WaitCallbackKeyReleased(unsigned, unsigned)
 {
 }
 
 /**
 **  Callback for input.
 */
-static void WaitCallbackKeyRepeated(unsigned dummy1, unsigned dummy2)
+static void WaitCallbackKeyRepeated(unsigned, unsigned)
 {
 }
 
 /**
 **  Callback for input.
 */
-static void WaitCallbackMouse(int x, int y)
+static void WaitCallbackMouse(int, int)
 {
 }
 

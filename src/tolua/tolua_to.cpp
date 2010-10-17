@@ -122,7 +122,7 @@ TOLUA_API int tolua_tofieldvalue (lua_State* L, int lo, int index, int def)
  return v;
 }
 
-TOLUA_API int tolua_getfieldboolean (lua_State* L, int lo, int index, int def)
+TOLUA_API int tolua_getfieldboolean (lua_State* L, int lo, int index, int)
 {
  int v;
  lua_pushnumber(L,index);

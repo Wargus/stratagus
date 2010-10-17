@@ -87,17 +87,17 @@ namespace gcn
          *
          * @param key the key pressed.
          */
-        virtual bool keyPress(const Key& key) { return false; }
+        virtual bool keyPress(const Key&) { return false; }
 
         /**
          * Called if a key is released when the widget has keyboard focus.
          *
          * @param key the key released.
          */
-        virtual bool keyRelease(const Key& key) { return false; }
+        virtual bool keyRelease(const Key&) { return false; }
 
-		virtual void hotKeyPress(const Key& key) { }
-		virtual void hotKeyRelease(const Key& key) { }
+		virtual void hotKeyPress(const Key&) { }
+		virtual void hotKeyRelease(const Key&) { }
 
     protected:
         /**

@@ -232,7 +232,7 @@ namespace gcn
         }
     }
     
-    void Slider::mouseRelease(int x, int y, int button)
+    void Slider::mouseRelease(int, int, int)
     {
         mMouseDrag = false;
     }

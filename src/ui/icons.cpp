@@ -198,7 +198,7 @@ void CIcon::DrawIcon(const CPlayer *player, int x, int y) const
 **  @param y       Y display pixel position
 **  @param text    Optional text to display
 */
-void CIcon::DrawUnitIcon(const CPlayer *player, ButtonStyle *style,
+void CIcon::DrawUnitIcon(const CPlayer *, ButtonStyle *style,
 	unsigned flags, int x, int y, const std::string &text) const
 {
 	ButtonStyle s(*style);

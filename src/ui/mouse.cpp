@@ -1263,7 +1263,7 @@ static void SendCommand(int sx, int sy)
 **  @param num     Button number.
 **  @param button  Mouse Button pressed.
 */
-static void DoSelectionButtons(int num, unsigned button)
+static void DoSelectionButtons(int num, unsigned)
 {
 	if (GameObserve || GamePaused) {
 		return;
@@ -1309,7 +1309,7 @@ static void DoSelectionButtons(int num, unsigned button)
 **
 **  @param button  Button pressed down.
 */
-static void UISelectStateButtonDown(unsigned button)
+static void UISelectStateButtonDown(unsigned)
 {
 	if (GameObserve || GamePaused) {
 		return;

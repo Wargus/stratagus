@@ -101,7 +101,7 @@ namespace gcn
          *          itself.
          * @param button the button pressed.
          */
-        virtual void mousePress(int x, int y, int button) { }
+        virtual void mousePress(int, int, int) { }
 
         /**
          * Called when a mouse button is released when the mouse is in the
@@ -114,7 +114,7 @@ namespace gcn
          *          itself.
          * @param button the button released.
          */
-        virtual void mouseRelease(int x, int y, int button) { }
+        virtual void mouseRelease(int, int, int) { }
 
 
         /**
@@ -129,7 +129,7 @@ namespace gcn
          * @param button the button clicked.
          * @param count the number of clicks.
          */
-        virtual void mouseClick(int x, int y, int button, int count) { }
+        virtual void mouseClick(int, int, int, int) { }
     
         /**
          * Called on a mouse wheel up when the mouse is in the Widget
@@ -140,7 +140,7 @@ namespace gcn
          * @param y the y coordinate of the mouse relative to the Widget
          *          itself.
          */
-        virtual void mouseWheelUp(int x, int y) { }
+        virtual void mouseWheelUp(int, int) { }
 
         /**
          * Called on a mouse wheel down when the mouse is in the Widget
@@ -151,7 +151,7 @@ namespace gcn
          * @param y the y coordinate of the mouse relative to the Widget
          *          itself.
          */
-        virtual void mouseWheelDown(int x, int y) { }
+        virtual void mouseWheelDown(int, int) { }
 
         /**
          * Called when the mouse moves and the mouse is in the Widget
@@ -162,7 +162,7 @@ namespace gcn
          * @param y the y coordinate of the mouse relative to the Widget
          *          itself.
          */
-        virtual void mouseMotion(int x, int y) { }
+        virtual void mouseMotion(int, int) { }
 
     protected:
         /**

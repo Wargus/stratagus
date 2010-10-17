@@ -91,8 +91,8 @@ std::vector<SpellType*> SpellTypeTable;
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int Demolish::Cast(CUnit *caster, const SpellType *spell,
-	CUnit *target, int x, int y)
+int Demolish::Cast(CUnit *caster, const SpellType *,
+	CUnit *, int x, int y)
 {
 	int xmin;
 	int ymin;
@@ -162,8 +162,8 @@ int Demolish::Cast(CUnit *caster, const SpellType *spell,
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int SpawnPortal::Cast(CUnit *caster, const SpellType *spell,
-	CUnit *target, int x, int y)
+int SpawnPortal::Cast(CUnit *caster, const SpellType *,
+	CUnit *, int x, int y)
 {
 	// FIXME: vladi: cop should be placed only on explored land
 	CUnit *portal;
@@ -252,8 +252,8 @@ int AreaAdjustVitals::Cast(CUnit *caster, const SpellType *spell,
 **  @internal: vladi: blizzard differs than original in this way:
 **   original: launches 50 shards at 5 random spots x 10 for 25 mana.
 */
-int AreaBombardment::Cast(CUnit *caster, const SpellType *spell,
-	CUnit *target, int x, int y)
+int AreaBombardment::Cast(CUnit *caster, const SpellType *,
+	CUnit *, int x, int y)
 {
 	int fields;
 	int shards;
@@ -351,7 +351,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation *location,
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int SpawnMissile::Cast(CUnit *caster, const SpellType *spell,
+int SpawnMissile::Cast(CUnit *caster, const SpellType *,
 	CUnit *target, int x, int y)
 {
 	::Missile *missile;
@@ -390,8 +390,8 @@ int SpawnMissile::Cast(CUnit *caster, const SpellType *spell,
 **
 **  @return        =!0 if spell should be repeated, 0 if not
 */
-int AdjustVariable::Cast(CUnit *caster, const SpellType *spell,
-	CUnit *target, int x, int y)
+int AdjustVariable::Cast(CUnit *caster, const SpellType *,
+	CUnit *target, int, int)
 {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		CUnit *unit = (this->Var[i].TargetIsCaster) ? caster : target;
@@ -447,7 +447,7 @@ int AdjustVariable::Cast(CUnit *caster, const SpellType *spell,
 **  @return             =!0 if spell should be repeated, 0 if not
 */
 int AdjustVitals::Cast(CUnit *caster, const SpellType *spell,
-	CUnit *target, int x, int y)
+	CUnit *target, int, int)
 {
 	int castcount;
 	int diffHP;
@@ -603,7 +603,7 @@ int Polymorph::Cast(CUnit *caster, const SpellType *spell,
 **  @return             =!0 if spell should be repeated, 0 if not
 */
 int Capture::Cast(CUnit *caster, const SpellType *spell,
-	CUnit *target, int x, int y)
+	CUnit *target, int, int)
 {
 	if (!target || caster->Player == target->Player) {
 		return 0;
@@ -772,7 +772,7 @@ static Target *NewTargetPosition(int x, int y)
 **  @return            true if passed, false otherwise.
 */
 static bool PassCondition(const CUnit *caster, const SpellType *spell, const CUnit *target,
-	int x, int y, const ConditionInfo *condition)
+	int, int, const ConditionInfo *condition)
 {
 	if (caster->Variable[MANA_INDEX].Value < spell->ManaCost) { // Check caster mana.
 		return false;

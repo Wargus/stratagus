@@ -190,8 +190,8 @@ void DrawUnitSelection(const CViewport *vp, const CUnit *unit)
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionNone(Uint32 color, int x1, int y1,
-	int x2, int y2)
+void DrawSelectionNone(Uint32, int, int,
+	int, int)
 {
 }
 
@@ -483,7 +483,7 @@ void CDecoVarBar::Draw(int x, int y,
 **  @todo fix font/color configuration.
 */
 void CDecoVarText::Draw(int x, int y, 
-	const CUnitType *Type, const CVariable &Variable) const
+	const CUnitType *, const CVariable &Variable) const
 {
 	if (this->IsCenteredInX) {
 		x -= 2; // GameFont->Width(buf) / 2, with buf = str(Value)
@@ -503,7 +503,7 @@ void CDecoVarText::Draw(int x, int y,
 **  @todo fix sprite configuration.
 */
 void CDecoVarSpriteBar::Draw(int x, int y, 
-	const CUnitType *Type, const CVariable &Variable) const
+	const CUnitType *, const CVariable &Variable) const
 {
 	int n;                   // frame of the sprite to show.
 	CGraphic *sprite;        // the sprite to show.
@@ -539,7 +539,7 @@ void CDecoVarSpriteBar::Draw(int x, int y,
 **  @todo fix sprite configuration configuration.
 */
 void CDecoVarStaticSprite::Draw(int x, int y, 
-	const CUnitType *Type, const CVariable &Variable) const
+	const CUnitType *, const CVariable &) const
 {
 	CGraphic *sprite;         // the sprite to show.
 	Decoration *decosprite;  // Info on the sprite.

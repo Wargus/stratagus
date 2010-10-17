@@ -102,7 +102,7 @@ bool CBuildRestrictionAnd::Check(const CUnitType *type, int x, int y, CUnit *&on
 /**
 **  Check Distance Restriction
 */
-bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const
+bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit *&) const
 {
 	CUnit *table[UnitMax];
 	int n;
@@ -180,7 +180,7 @@ inline bool CBuildRestrictionAddOn::functor::operator() (const CUnit *const unit
 /**
 **  Check AddOn Restriction
 */
-bool CBuildRestrictionAddOn::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const
+bool CBuildRestrictionAddOn::Check(const CUnitType *, int x, int y, CUnit *&) const
 {
 	int x1;
 	int y1;
@@ -216,7 +216,7 @@ inline bool CBuildRestrictionOnTop::functor::operator() (CUnit *const unit)
 	return true;
 }
 
-bool CBuildRestrictionOnTop::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const
+bool CBuildRestrictionOnTop::Check(const CUnitType *, int x, int y, CUnit *&ontoptarget) const
 {
 #if 0
 	CUnit *table[UnitMax];

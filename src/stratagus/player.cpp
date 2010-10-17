@@ -908,7 +908,7 @@ void DebugPlayers(void)
 **  @note The parameter type, isn't yet used.
 **  @todo FIXME: We must also notfiy allied players.
 */
-void CPlayer::Notify(int type, int x, int y, const char *fmt, ...) const
+void CPlayer::Notify(int, int x, int y, const char *fmt, ...) const
 {
 	char temp[128];
 	va_list va;

@@ -80,29 +80,29 @@ public:
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static BOOL Seek(struct MREADER *mreader, long off, int whence)
+static BOOL Seek(struct MREADER *, long off, int whence)
 {
 	return CurrentFile->seek(off, whence);
 }
 
-static long Tell(struct MREADER *mreader)
+static long Tell(struct MREADER *)
 {
 	return CurrentFile->tell();
 }
 
-static BOOL Read(struct MREADER *mreader, void *buf, size_t len)
+static BOOL Read(struct MREADER *, void *buf, size_t len)
 {
 	return CurrentFile->read(buf, len);
 }
 
-static int Get(struct MREADER *mreader)
+static int Get(struct MREADER *)
 {
 	char c;
 	CurrentFile->read(&c, 1);
 	return c;
 }
 
-static BOOL Eof(struct MREADER *mreader)
+static BOOL Eof(struct MREADER *)
 {
 	return 0;
 }

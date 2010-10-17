@@ -529,7 +529,7 @@ void DrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 **  Draw a transparent line
 */
 void DrawTransLine(Uint32 color, int sx, int sy,
-	int dx, int dy, unsigned char alpha)
+	int dx, int dy, unsigned char)
 {
 	// FIXME: trans
 	DrawLine(color, sx, sy, dx, dy);
@@ -539,7 +539,7 @@ void DrawTransLine(Uint32 color, int sx, int sy,
 **  Draw a transparent line clipped
 */
 void DrawTransLineClip(Uint32 color, int sx, int sy,
-	int dx, int dy, unsigned char alpha)
+	int dx, int dy, unsigned char)
 {
 	// FIXME: trans
 	DrawLineClip(color, sx, sy, dx, dy);
@@ -1437,7 +1437,7 @@ void DrawLineClip(Uint32 color, int x1, int y1, int x2, int y2)
 **  Draw a transparent line
 */
 void DrawTransLine(Uint32 color, int sx, int sy,
-	int dx, int dy, unsigned char alpha)
+	int dx, int dy, unsigned char)
 {
 	// FIXME: trans
 	DrawLine(color, sx, sy, dx, dy);
@@ -1447,7 +1447,7 @@ void DrawTransLine(Uint32 color, int sx, int sy,
 **  Draw a transparent line clipped
 */
 void DrawTransLineClip(Uint32 color, int sx, int sy,
-	int dx, int dy, unsigned char alpha)
+	int dx, int dy, unsigned char)
 {
 	// FIXME: trans
 	DrawLineClip(color, sx, sy, dx, dy);

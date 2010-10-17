@@ -124,7 +124,7 @@ namespace gcn
          *
          * @param graphics a Graphics object to draw with.
          */
-        virtual void drawBorder(Graphics* graphics) { }
+        virtual void drawBorder(Graphics*) { }
         
         /**
          * Called for all Widgets in the gui each time Gui::logic is called.

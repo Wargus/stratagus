@@ -62,10 +62,10 @@ static std::stack<MenuScreen *> MenuStack;
 ----------------------------------------------------------------------------*/
 
 
-static void MenuHandleButtonDown(unsigned buttons)
+static void MenuHandleButtonDown(unsigned)
 {
 }
-static void MenuHandleButtonUp(unsigned buttons)
+static void MenuHandleButtonUp(unsigned)
 {
 }
 static void MenuHandleMouseMove(int x, int y)
@@ -149,11 +149,15 @@ void handleInput(const SDL_Event *event)
 {
 	if (event) {
 		if (Input) {
+#ifndef DEBUG
 			try {
+#endif
 				Input->pushInput(*event);
+#ifndef DEBUG
 			} catch (const gcn::Exception &) {
 				// ignore unhandled buttons
 			}
+#endif
 		}
 	} else {
 		if (Gui) {
@@ -493,7 +497,7 @@ void ImageRadioButton::draw(gcn::Graphics *graphics)
 /**
 **  Mouse button pressed callback
 */
-void ImageRadioButton::mousePress(int x, int y, int button)
+void ImageRadioButton::mousePress(int, int, int button)
 {
 	if (button == gcn::MouseInput::LEFT && hasMouse()) {
 		mMouseDown = true;
@@ -503,7 +507,7 @@ void ImageRadioButton::mousePress(int x, int y, int button)
 /**
 **  Mouse button released callback
 */
-void ImageRadioButton::mouseRelease(int x, int y, int button)
+void ImageRadioButton::mouseRelease(int, int, int button)
 {
 	if (button == gcn::MouseInput::LEFT) {
 		mMouseDown = false;
@@ -513,7 +517,7 @@ void ImageRadioButton::mouseRelease(int x, int y, int button)
 /**
 **  Mouse clicked callback
 */
-void ImageRadioButton::mouseClick(int x, int y, int button, int count)
+void ImageRadioButton::mouseClick(int, int, int button, int)
 {
 	if (button == gcn::MouseInput::LEFT) {
         setMarked(true);
@@ -629,7 +633,7 @@ void ImageCheckBox::drawBox(gcn::Graphics *graphics)
 /**
 **  Mouse button pressed callback
 */
-void ImageCheckBox::mousePress(int x, int y, int button)
+void ImageCheckBox::mousePress(int, int, int button)
 {
 	if (button == gcn::MouseInput::LEFT && hasMouse()) {
 		mMouseDown = true;
@@ -639,7 +643,7 @@ void ImageCheckBox::mousePress(int x, int y, int button)
 /**
 **  Mouse button released callback
 */
-void ImageCheckBox::mouseRelease(int x, int y, int button)
+void ImageCheckBox::mouseRelease(int, int, int button)
 {
 	if (button == gcn::MouseInput::LEFT) {
 		mMouseDown = false;
@@ -649,7 +653,7 @@ void ImageCheckBox::mouseRelease(int x, int y, int button)
 /**
 **  Mouse clicked callback
 */
-void ImageCheckBox::mouseClick(int x, int y, int button, int count)
+void ImageCheckBox::mouseClick(int, int, int button, int)
 {
 	if (button == gcn::MouseInput::LEFT) {
 		toggle();

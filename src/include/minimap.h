@@ -54,7 +54,7 @@ public:
 		Transparent(false), UpdateCache(false) {}
 
 	void UpdateXY(int tx, int ty);
-	void UpdateSeenXY(int tx, int ty) {}
+	void UpdateSeenXY(int, int) {}
 	void Update(void);
 	void Create(void);
 	void FreeOpenGL(void);

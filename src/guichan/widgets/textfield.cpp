@@ -179,7 +179,7 @@ namespace gcn
         graphics->drawLine(x, getHeight() - 2, x, 1);    
     }
   
-    void TextField::mousePress(int x, int y, int button)
+    void TextField::mousePress(int x, int, int button)
     {
         if (hasMouse() && button == MouseInput::LEFT)
         {
@@ -199,7 +199,7 @@ namespace gcn
         }
     }
 
-	void TextField::mouseMotion(int x, int y)
+	void TextField::mouseMotion(int x, int)
 	{
 		if (isDragged() && mClickButton == MouseInput::LEFT)
 		{

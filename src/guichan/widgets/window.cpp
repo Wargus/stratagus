@@ -131,7 +131,7 @@ namespace gcn
         return mTitleBarHeight;
     }
 
-    void Window:: _announceDeath(Widget *widget)
+    void Window:: _announceDeath(Widget *)
     {
         mContent = NULL;
     }
@@ -326,7 +326,7 @@ namespace gcn
         }
     }
   
-    void Window::mouseRelease(int x, int y, int button)
+    void Window::mouseRelease(int, int, int button)
     {
         if (button == 1)
         {

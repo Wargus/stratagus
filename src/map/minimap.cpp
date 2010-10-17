@@ -622,7 +622,7 @@ static void DrawEvents(void)
 /**
 **  Draw the minimap on the screen
 */
-void CMinimap::Draw(int vx, int vy)
+void CMinimap::Draw(int, int)
 {
 	if (!UseOpenGL) {
 		SDL_Rect drect = {X, Y, 0, 0};

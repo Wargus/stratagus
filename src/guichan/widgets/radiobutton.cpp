@@ -249,7 +249,7 @@ namespace gcn
         return false;
     }
 
-    void RadioButton::mouseClick(int x, int y, int button, int count)
+    void RadioButton::mouseClick(int, int, int button, int)
     {
         if (button == MouseInput::LEFT)
         {
