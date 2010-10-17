@@ -298,6 +298,7 @@ function RunLanguageOptionsMenu(s)
   AddLanguage("Svenska", "sv")
   AddLanguage("Italiano", "it")
   AddLanguage("Magyar", "hu")
+  AddLanguage("Lietuviškai", "lt")
 
   menu:addButton(_("~!OK"), Video.Width / 2 - 100, Video.Height - 100,
     function() menu:stop() end)
