@@ -41,6 +41,7 @@
 
 #include "translate.h"
 #include "iolib.h"
+#include <cstdio>
 
 /*----------------------------------------------------------------------------
 -- Variables

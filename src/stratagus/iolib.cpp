@@ -48,6 +48,8 @@
 #include "util.h"
 #include "iolib.h"
 
+#include <zlib.h>
+
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
@@ -454,7 +456,7 @@ long CFile::tell()
 /**
 **  Find a file with its correct extension ("", ".gz" or ".bz2")
 **
-**  @param file      The string with the file path. Upon success, the string 
+**  @param file      The string with the file path. Upon success, the string
 **                   is replaced by the full filename witht he correct extension.
 **  @param filesize  Size of the file buffer
 **
@@ -681,11 +683,11 @@ int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *),
 
 
 
-void FileWriter::printf(const char *format, ...) 
+void FileWriter::printf(const char *format, ...)
 {
 	// FIXME: hardcoded size
 	char buf[1024];
-	
+
 	va_list ap;
 	va_start(ap, format);
 	buf[sizeof(buf) - 1] = '\0';
