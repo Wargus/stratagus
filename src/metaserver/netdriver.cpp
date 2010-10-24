@@ -127,7 +127,7 @@ int ServerInit(int port)
 		return -1;
 	}
 
-	if ((MasterSocket = NetOpenTCP(port)) == (Socket)-1) {
+	if ((MasterSocket = NetOpenTCP(NULL, port)) == (Socket)-1) {
    		fprintf(stderr, "NetOpenTCP failed\n");
    		return -2;
 	}
