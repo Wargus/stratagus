@@ -1,113 +1,60 @@
 #!/usr/bin/make -f
-# debian/rules that uses debhelper.
-# GNU copyright 1997 to 1999 by Joey Hess.
-# GNU Copyright 2002-2004 by David Martínez Moreno.
-# GNU Copyright 2010 by Pali Rohár
+#
+#    debian/rules
+#    Copyright (C) 2010  Pali Rohár <pali.rohar@gmail.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#
 
-# Do you want verbosity...? Uncomment this.
-#export DH_VERBOSE=1
+include /usr/share/cdbs/1/rules/debhelper.mk
 
-export LC_ALL=C
+clean::
+	$(MAKE) distclean
+	$(RM) stratagus-dbg
 
-# We have to honor DEB_BUILD...
-ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
-CONFIGURE_FLAGS += --enable-profile
-endif
-
-DEB_BUILD_GNU_CPU ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
-
-CONFIGURE_FLAGS=--prefix=/usr --datadir=/usr/share/games/stratagus/default
-
-export CFLAGS
-
-configure: configure-stamp
-
-configure-stamp:
-	dh_testdir
-
+build:
 	./autogen.sh
-	./configure $(CONFIGURE_FLAGS)
+	./configure --prefix=/usr
+	$(MAKE) OUTFILE=stratagus
+	$(MAKE) clean
+	./configure --prefix=/usr --enable-debug
+	$(MAKE) OUTFILE=stratagus-dbg
 
-	touch configure-stamp
+install/stratagus::
+	install -m0755 stratagus $(CURDIR)/debian/stratagus/usr/games/
+	convert $(CURDIR)/contrib/stratagus.ico $(CURDIR)/debian/stratagus/usr/share/pixmaps/stratagus.png
 
-build: build-stamp
+install/stratagus-dbg::
+	install -m0755 stratagus-dbg $(CURDIR)/debian/stratagus-dbg/usr/games/
 
-build-stamp: configure-stamp
-	dh_testdir
-
-	OUTFILE="./stratagus" $(MAKE)
-
-	touch build-stamp
-
-clean: 
-	dh_testdir
-	dh_testroot
-	rm -f build-stamp* configure-stamp*
-
-	-OUTFILE="./stratagus" $(MAKE) distclean
-	rm -rf aclocal.m4 config.h config.h.in src/guichan/sdl/obj/ src/guichan/widgets/obj/
-
-	dh_clean
-
-install: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_installdirs
-
-	OUTFILE="./stratagus" $(MAKE) install-stratagus PREFIX=$(CURDIR)/debian/stratagus/usr
-	mv $(CURDIR)/debian/stratagus/usr/bin $(CURDIR)/debian/stratagus/usr/games/stratagus
-
-	convert contrib/stratagus.ico $(CURDIR)/debian/stratagus/usr/share/pixmaps/stratagus.png
-
-# Build architecture-independent files here.
-binary-indep: build install
-
-# Build architecture-dependent files here.
-binary-arch: build install
-	dh_testdir
-	dh_testroot
-#	dh_installdebconf	
-	dh_installdocs -Xgpl.html -Xgpl.txt -Xinstall.html
-	rm -rf `find debian/ | grep .svn`
-	dh_installmenu
-	dh_installman
-	dh_installchangelogs doc/ChangeLog.html
-	dh_strip
-	dh_compress
-	dh_fixperms
-	dh_installdeb
-
-	## Maemo section - Optify
+binary-predeb/stratagus::
 	if [ -f /etc/maemo_version ]; then \
 		mkdir -p $(CURDIR)/debian/stratagus/opt/stratagus/bin; \
 		mkdir -p $(CURDIR)/debian/stratagus/opt/stratagus/share/doc; \
-		mkdir -p $(CURDIR)/debian/stratagus/opt/stratagus/share/man; \
+		mkdir -p $(CURDIR)/debian/stratagus/opt/man/man6; \
 		mv $(CURDIR)/debian/stratagus/usr/games/stratagus $(CURDIR)/debian/stratagus/opt/stratagus/bin/; \
 		mv $(CURDIR)/debian/stratagus/usr/share/doc/stratagus $(CURDIR)/debian/stratagus/opt/stratagus/share/doc/; \
-		mv $(CURDIR)/debian/stratagus/usr/share/man/man6/stratagus.6.gz $(CURDIR)/debian/stratagus/opt/stratagus/share/man/; \
+		mv $(CURDIR)/debian/stratagus/usr/share/man/man6/stratagus.6.gz $(CURDIR)/debian/stratagus/opt/man/man6; \
 		ln -s /opt/stratagus/bin/stratagus $(CURDIR)/debian/stratagus/usr/games/stratagus; \
 		ln -s /opt/stratagus/share/doc/stratagus/ $(CURDIR)/debian/stratagus/usr/share/doc/stratagus; \
 		ln -s /opt/stratagus/share/man/stratagus.6.gz $(CURDIR)/debian/stratagus/usr/share/man/man6/stratagus.6.gz; \
-	fi
-
-	dh_shlibdeps
-	dh_gencontrol
-
-	# Maemo section - Hildon Application Manager
-	if [ -f /etc/maemo_version ]; then \
 		sed "s/Section: .*/Section: user\/games/" -i $(CURDIR)/debian/stratagus/DEBIAN/control; \
 		echo "Bugtracker: https://bugs.launchpad.net/stratagus" >> $(CURDIR)/debian/stratagus/DEBIAN/control; \
 		echo "Maemo-Display-Name: Stratagus" >> $(CURDIR)/debian/stratagus/DEBIAN/control; \
 		echo "Maemo-Icon-26:" >> $(CURDIR)/debian/stratagus/DEBIAN/control; \
-		for line in $(shell convert contrib/stratagus.ico -resize 48x48 png:- | uuencode -m - | tail -n +2 | head -n -1); do \
+		for line in $(shell convert $(CURDIR)/contrib/stratagus.ico -resize 48x48 png:- | uuencode -m - | tail -n +2 | head -n -1); do \
 			echo " $$line" >> $(CURDIR)/debian/stratagus/DEBIAN/control; \
 		done; \
 	fi
-
-	dh_md5sums
-	dh_builddeb
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install configure
-
