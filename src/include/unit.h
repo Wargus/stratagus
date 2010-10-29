@@ -921,8 +921,7 @@ public:
 	}
 
 	/**
-	**  Returns true, if unit is visible as an action goal for a player
-	**  on the map.
+	**  Returns true, if unit is visible as an action goal for a player on the map.
 	**
 	**  @param player  Player to check for.
 	**
@@ -930,15 +929,12 @@ public:
 	*/
 	inline bool IsVisibleAsGoal(const CPlayer *const player) const
 	{
-		//
 		// Invisibility
-		//
 		if (IsInvisibile(player)) {
 			return false;
 		}
-		if ((player->Type == PlayerComputer && !this->Type->PermanentCloak) ||
-			VisCount[player->Index] || IsVisible(player) ||
-			IsVisibleOnRadar(player)) {
+		if ((player->Type == PlayerComputer && !this->Type->PermanentCloak)
+			|| IsVisible(player) || IsVisibleOnRadar(player)) {
 			return IsAliveOnMap();
 		} else {
 			return Type->VisibleUnderFog &&
