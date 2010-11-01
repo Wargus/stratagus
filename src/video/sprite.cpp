@@ -102,8 +102,8 @@ void DrawTexture(const CGraphic *g, GLuint *textures,
 	for (int tex_gy_beg = gy_beg / GLMaxTextureSize * GLMaxTextureSize;;
 	     tex_gy_beg += GLMaxTextureSize) {
 		int tex_gy_end = tex_gy_beg + GLMaxTextureSize;
-		int clip_gy_beg = std::max(gy_beg, tex_gy_beg);
-		int clip_gy_end = std::min(gy_end, tex_gy_end);
+		int clip_gy_beg = std::max<int>(gy_beg, tex_gy_beg);
+		int clip_gy_end = std::min<int>(gy_end, tex_gy_end);
 		if (clip_gy_beg >= clip_gy_end)
 			break;
 
@@ -137,8 +137,8 @@ void DrawTexture(const CGraphic *g, GLuint *textures,
 			     * GLMaxTextureSize;;
 		     tex_gx_beg += GLMaxTextureSize) {
 			int tex_gx_end = tex_gx_beg + GLMaxTextureSize;
-			int clip_gx_beg = std::max(gx_beg, tex_gx_beg);
-			int clip_gx_end = std::min(gx_end, tex_gx_end);
+			int clip_gx_beg = std::max<int>(gx_beg, tex_gx_beg);
+			int clip_gx_end = std::min<int>(gx_end, tex_gx_end);
 			if (clip_gx_beg >= clip_gx_end)
 				break;
 
