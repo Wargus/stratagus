@@ -204,14 +204,14 @@
 **
 **  The missile structure members:
 **
-**  Missile::X Missile::Y
+**  Missile::position
 **
 **    Missile current map position in pixels.  To convert a map tile
 **    position to pixel position use: (mapx * ::TileSizeX + ::TileSizeX / 2)
 **    and (mapy * ::TileSizeY + ::TileSizeY / 2)
 **    @note ::TileSizeX % 2 == 0 && ::TileSizeY % 2 == 0
 **
-**  Missile::SourceX Missile::SourceY
+**  Missile::source
 **
 **    Missile original map position in pixels.  To convert a map tile
 **    position to pixel position use: (mapx*::TileSizeX+::TileSizeX/2)
@@ -219,7 +219,7 @@
 **    @note ::TileSizeX%2==0 && ::TileSizeY%2==0 and ::TileSizeX,
 **    ::TileSizeY are currently fixed 32 pixels.
 **
-**  Missile::DX Missile::DY
+**  Missile::destination
 **
 **    Missile destination on the map in pixels.  If
 **    Missile::X==Missile::DX and Missile::Y==Missile::DY the missile
@@ -397,8 +397,6 @@ public:
 	std::string Ident;         /// missile name
 	int Transparency;          /// missile transparency
 	Vec2i size;                /// missile size in pixels
-//	int Width;                 /// missile width in pixels
-//	int Height;                /// missile height in pixels
 	int DrawLevel;             /// Level to draw missile at
 	int SpriteFrames;          /// number of sprite frames in graphic
 	int NumDirections;         /// number of directions missile can face
