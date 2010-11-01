@@ -316,6 +316,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "unitsound.h"
+#include "vec2i.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -383,13 +384,21 @@ public:
 	/// load the graphics for a missile type
 	void LoadMissileSprite();
 	void Init(void);
-	void DrawMissileType(int frame, int x, int y) const;
+	void DrawMissileType(int frame, const Vec2i &pos) const;
+	void DrawMissileType(int frame, int x, int y) const {
+		Vec2i pos = {x, y};
 
+		DrawMissileType(frame, pos);
+	}
+
+	int Width() const { return size.x; }
+	int Height() const { return size.y; }
 
 	std::string Ident;         /// missile name
 	int Transparency;          /// missile transparency
-	int Width;                 /// missile width in pixels
-	int Height;                /// missile height in pixels
+	Vec2i size;                /// missile size in pixels
+//	int Width;                 /// missile width in pixels
+//	int Height;                /// missile height in pixels
 	int DrawLevel;             /// Level to draw missile at
 	int SpriteFrames;          /// number of sprite frames in graphic
 	int NumDirections;         /// number of directions missile can face
@@ -432,19 +441,22 @@ protected:
 public:
 	virtual ~Missile() {};
 
-	static Missile *Init(MissileType *mtype, int sx, int sy, int dx, int dy);
+	static Missile *Init(MissileType *mtype, const Vec2i &startPos, const Vec2i &destPos);
+	static Missile *Init(MissileType *mtype, int sx, int sy, int dx, int dy) {
+		Vec2i startPos = {sx, sy};
+		Vec2i destPos = {dx, dy};
+
+		return Init(mtype, startPos, destPos);
+	}
 
 	virtual void Action() = 0;
 
 	void DrawMissile(const CViewport *vp) const;
 	void SaveMissile(CFile *file) const;
 
-	int SourceX;  /// Missile Source X
-	int SourceY;  /// Missile Source Y
-	int X;        /// missile pixel position
-	int Y;        /// missile pixel position
-	int DX;       /// missile pixel destination
-	int DY;       /// missile pixel destination
+	Vec2i source; /// Missile source position
+	Vec2i position;   /// missile pixel position
+	Vec2i destination;  /// missile pixel destination
 	MissileType *Type;  /// missile-type pointer
 	int SpriteFrame;  /// sprite frame counter
 	int State;        /// state
@@ -479,7 +491,7 @@ struct MissileDrawProxy
 	} data;
 	short X;
 	short Y;
-	
+
 	void DrawMissile(const CViewport *vp) const;
 
 	void operator=(const Missile* missile);
@@ -575,21 +587,32 @@ extern MissileType *NewMissileTypeSlot(const std::string& ident);
 	/// Get missile-type by ident
 extern MissileType *MissileTypeByIdent(const std::string& ident);
 	/// create a missile
-extern Missile *MakeMissile(MissileType *mtype, int sx, int sy, int dx,
-	int dy);
+extern Missile *MakeMissile(MissileType *mtype, const Vec2i &startPos, const Vec2i &destPos);
+inline Missile *MakeMissile(MissileType *mtype, int sx, int sy, int dx, int dy) {
+	const Vec2i startPos = {sx, sy};
+	const Vec2i destPos = {dx, dy};
+
+	return MakeMissile(mtype, startPos, destPos);
+}
 	/// create a local missile
-extern Missile *MakeLocalMissile(MissileType *mtype, int sx, int sy, int dx,
-	int dy);
+extern Missile *MakeLocalMissile(MissileType *mtype, const Vec2i &startPos, const Vec2i &destPos);
+inline Missile *MakeLocalMissile(MissileType *mtype, int sx, int sy, int dx, int dy) {
+	const Vec2i startPos = {sx, sy};
+	const Vec2i destPos = {dx, dy};
+
+	return MakeLocalMissile(mtype, startPos, destPos);
+}
+
 	/// fire a missile
 extern void FireMissile(CUnit *unit);
 
-extern int FindAndSortMissiles(const CViewport *vp, 
+extern int FindAndSortMissiles(const CViewport *vp,
 	Missile *table[], const int tablesize);
 extern int FindAndSortMissiles(const CViewport *vp,
 	 MissileDrawProxy table[], const int tablesize);
 
 	/// handle all missiles
-extern void MissileActions(void);
+extern void MissileActions();
 	/// distance from view point to missile
 extern int ViewPointDistanceToMissile(const Missile *missile);
 
@@ -600,13 +623,13 @@ extern MissileType *MissileBurningBuilding(int percent);
 extern void SaveMissiles(CFile *file);
 
 	/// Initialize missile-types
-extern void InitMissileTypes(void);
+extern void InitMissileTypes();
 	/// Clean missile-types
-extern void CleanMissileTypes(void);
+extern void CleanMissileTypes();
 	/// Initialize missiles
-extern void InitMissiles(void);
+extern void InitMissiles();
 	/// Clean missiles
-extern void CleanMissiles(void);
+extern void CleanMissiles();
 
 #ifdef DEBUG
 extern void FreeBurningBuildingFrames();
