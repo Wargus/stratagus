@@ -1387,7 +1387,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				if (!UnitPlacedThisPress && CursorBuilding) {
 					if (CanBuildUnitType(NULL, CursorBuilding,
 							tileX, tileY, 1)) {
-						PlayGameSound(GameSounds.PlacementSuccess.Sound,
+						PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound,
 							MaxSampleVolume);
 						EditorPlaceUnit(tileX, tileY,
 							CursorBuilding, Players + Editor.SelectedPlayer);
@@ -1395,7 +1395,7 @@ static void EditorCallbackButtonDown(unsigned button)
 						UI.StatusLine.Clear();
 					} else {
 						UI.StatusLine.Set(_("Unit can't be placed here."));
-						PlayGameSound(GameSounds.PlacementError.Sound,
+						PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound,
 							MaxSampleVolume);
 					}
 				}

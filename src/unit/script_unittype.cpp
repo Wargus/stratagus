@@ -954,6 +954,10 @@ static int CclDefineUnitType(lua_State *l)
 					lua_rawgeti(l, -1, k + 1);
 					type->Sound.Acknowledgement.Name = LuaToString(l, -1);
 					lua_pop(l, 1);
+				} else if (!strcmp(value, "attack")) {
+					lua_rawgeti(l, -1, k + 1);
+					type->Sound.Attack.Name = LuaToString(l, -1);
+					lua_pop(l, 1);
 				} else if (!strcmp(value, "ready")) {
 					lua_rawgeti(l, -1, k + 1);
 					type->Sound.Ready.Name = LuaToString(l, -1);

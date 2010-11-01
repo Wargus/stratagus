@@ -145,6 +145,10 @@ void MapUnitSounds(void)
 					INFINITE_SOUND_RANGE);
 				*/
 			}
+			if (!type->Sound.Attack.Name.empty()) {
+				type->Sound.Attack.Sound =
+					SoundForName(type->Sound.Attack.Name);
+			}
 			if (!type->Sound.Ready.Name.empty()) {
 				type->Sound.Ready.Sound =
 					SoundForName(type->Sound.Ready.Name);

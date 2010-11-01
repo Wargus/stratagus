@@ -186,10 +186,6 @@ void DoRightButton(int sx, int sy)
 			continue;
 		}
 		Assert(unit);
-		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
-			acknowledged = 1;
-		}
 		type = unit->Type;
 		action = type->MouseAction;
 
@@ -198,6 +194,10 @@ void DoRightButton(int sx, int sy)
 		//
 		if ((KeyModifiers & ModifierControl) && dest) {
 			dest->Blink = 4;
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceAcknowledging);
+				acknowledged = 1;
+			}
 			SendCommandFollow(unit, dest, flush);
 			continue;
 		}
@@ -212,12 +212,20 @@ void DoRightButton(int sx, int sy)
 				if (dest->CanMove() && CanTransport(dest, unit)) {
 					DebugPrint("Send command follow\n");
 					// is flush value correct ?
+					if (!acknowledged) {
+						PlayUnitSound(unit, VoiceAcknowledging);
+						acknowledged = 1;
+					}
 					SendCommandFollow(dest, unit, 0);
 				}
 				// FIXME : manage correctly production units.
 				if (!unit->CanMove() || CanTransport(dest, unit)) {
 					dest->Blink = 4;
 					DebugPrint("Board transporter\n");
+					if (!acknowledged) {
+						PlayUnitSound(unit, VoiceAcknowledging);
+						acknowledged = 1;
+					}
 					SendCommandBoard(unit, -1, -1, dest, flush);
 					continue;
 				}
@@ -229,6 +237,10 @@ void DoRightButton(int sx, int sy)
 				if (unit->CanMove()) {
 					DebugPrint("Send command follow\n");
 					// is flush value correct ?
+					if (!acknowledged) {
+						PlayUnitSound(unit, VoiceAcknowledging);
+						acknowledged = 1;
+					}
 					SendCommandFollow(unit, dest, 0);
 				} else if (!dest->CanMove()) {
 					DebugPrint("Want to transport but no unit can move\n");
@@ -236,6 +248,10 @@ void DoRightButton(int sx, int sy)
 				}
 				dest->Blink = 4;
 				DebugPrint("Board transporter\n");
+				if (!acknowledged) {
+					PlayUnitSound(unit, VoiceAcknowledging);
+					acknowledged = 1;
+				}
 				SendCommandBoard(dest, -1, -1, unit, flush);
 				continue;
 			}
@@ -251,6 +267,10 @@ void DoRightButton(int sx, int sy)
 					dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max &&
 					(dest->Player == unit->Player || unit->IsAllied(dest))) {
 				dest->Blink = 4;
+				if (!acknowledged) {
+					PlayUnitSound(unit, VoiceAcknowledging);
+					acknowledged = 1;
+				}
 				SendCommandRepair(unit, x, y, dest, flush);
 				continue;
 			}
@@ -262,6 +282,10 @@ void DoRightButton(int sx, int sy)
 							dest->Type->CanStore[unit->CurrentResource] &&
 							dest->Player == unit->Player) {
 						dest->Blink = 4;
+						if (!acknowledged) {
+							PlayUnitSound(unit, VoiceAcknowledging);
+							acknowledged = 1;
+						}
 						SendCommandReturnGoods(unit, dest, flush);
 						continue;
 					}
@@ -273,6 +297,10 @@ void DoRightButton(int sx, int sy)
 							(dest->Player == unit->Player ||
 								(dest->Player->Index == PlayerNumNeutral))) {
 						dest->Blink = 4;
+						if (!acknowledged) {
+							PlayUnitSound(unit, VoiceAcknowledging);
+							acknowledged = 1;
+						}
 						SendCommandResource(unit, dest, flush);
 						continue;
 					}
@@ -285,6 +313,10 @@ void DoRightButton(int sx, int sy)
 								Map.ForestOnMap(x, y) &&
 								((unit->CurrentResource != res) ||
 									(unit->ResourcesHeld < type->ResInfo[res]->ResourceCapacity))) {
+							if (!acknowledged) {
+								PlayUnitSound(unit, VoiceAcknowledging);
+								acknowledged = 1;
+							}
 							SendCommandResourceLoc(unit, x, y, flush);
 							break;
 						}
@@ -298,10 +330,18 @@ void DoRightButton(int sx, int sy)
 			if (UnitUnderCursor != NULL && dest != NULL && dest != unit &&
 					(dest->Player == unit->Player || unit->IsAllied(dest))) {
 				dest->Blink = 4;
+				if (!acknowledged) {
+					PlayUnitSound(unit, VoiceAcknowledging);
+					acknowledged = 1;
+				}
 				SendCommandFollow(unit, dest, flush);
 				continue;
 			}
 			// Move
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceAcknowledging);
+				acknowledged = 1;
+			}
 			SendCommandMove(unit, x, y, flush);
 			continue;
 		}
@@ -313,6 +353,10 @@ void DoRightButton(int sx, int sy)
 			if (dest != NULL && unit->CurrentAction() != UnitActionBuilt) {
 				if (unit->IsEnemy(dest)) {
 					dest->Blink = 4;
+					if (!acknowledged) {
+						PlayUnitSound(unit, VoiceAttack);
+						acknowledged = 1;
+					}
 					if (action == MouseActionSpellCast) {
 						// This is for demolition squads and such
 						Assert(unit->Type->CanCastSpell);
@@ -331,6 +375,10 @@ void DoRightButton(int sx, int sy)
 				if ((dest->Player == unit->Player || unit->IsAllied(dest)) &&
 						dest != unit) {
 					dest->Blink = 4;
+					if (!acknowledged) {
+						PlayUnitSound(unit, VoiceAcknowledging);
+						acknowledged = 1;
+					}
 					SendCommandFollow(unit, dest, flush);
 					continue;
 				}
@@ -351,14 +399,30 @@ void DoRightButton(int sx, int sy)
 			if ((KeyModifiers & ModifierControl)) {
 				if (RightButtonAttacks) {
 					SendCommandMove(unit, x, y, flush);
+					if (!acknowledged) {
+						PlayUnitSound(unit, VoiceAcknowledging);
+						acknowledged = 1;
+					}
 				} else {
+					if (!acknowledged) {
+						PlayUnitSound(unit, VoiceAttack);
+						acknowledged = 1;
+					}
 					SendCommandAttack(unit, x, y, NoUnitP, flush);
 				}
 			} else {
 				if (RightButtonAttacks) {
+					if (!acknowledged) {
+						PlayUnitSound(unit, VoiceAttack);
+						acknowledged = 1;
+					}
 					SendCommandAttack(unit, x, y, NoUnitP, flush);
 				} else {
 					// Note: move is correct here, right default is move
+					if (!acknowledged) {
+						PlayUnitSound(unit, VoiceAcknowledging);
+						acknowledged = 1;
+					}
 					SendCommandMove(unit, x, y, flush);
 				}
 			}
@@ -371,6 +435,10 @@ void DoRightButton(int sx, int sy)
 				(dest && dest != unit) &&
 				(dest->Player == unit->Player || unit->IsAllied(dest))) {
 			dest->Blink = 4;
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceAcknowledging);
+				acknowledged = 1;
+			}
 			SendCommandFollow(unit, dest, flush);
 			continue;
 		}
@@ -383,6 +451,10 @@ void DoRightButton(int sx, int sy)
 					dest->Player == unit->Player) {
 				dest->Blink = 4;
 				SendCommandReturnGoods(dest, unit, flush);
+				if (!acknowledged) {
+					PlayUnitSound(unit, VoiceAcknowledging);
+					acknowledged = 1;
+				}
 				continue;
 			}
 			// tell to go and harvest from a building
@@ -403,14 +475,26 @@ void DoRightButton(int sx, int sy)
 			if (dest != NULL && dest->Type->GivesResource && dest->Type->CanHarvest &&
 					(dest->Player == unit->Player || dest->Player->Index == PlayerNumNeutral)) {
 				dest->Blink = 4;
+				if (!acknowledged) {
+					PlayUnitSound(unit, VoiceAcknowledging);
+					acknowledged = 1;
+				}
 				SendCommandResource(unit, dest, flush);
 				continue;
 			}
 			// FIXME: support harvesting more types of terrain.
 			if (Map.IsFieldExplored(unit->Player, x, y) && Map.ForestOnMap(x, y)) {
+				if (!acknowledged) {
+					PlayUnitSound(unit, VoiceAcknowledging);
+					acknowledged = 1;
+				}
 				SendCommandResourceLoc(unit, x, y, flush);
 				break;
 			}
+		}
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
 		}
 
 		SendCommandMove(unit, x, y, flush);
@@ -1246,7 +1330,15 @@ static void SendCommand(int sx, int sy)
 	if (ret) {
 		// Acknowledge the command with first selected unit.
 		for (int i = 0; i < NumSelected; ++i) {
-			if (Selected[i]->Type->Sound.Acknowledgement.Sound) {
+			if (ret==ButtonAttack || ret==ButtonAttackGround || ret==ButtonSpellCast) {
+				if (Selected[i]->Type->Sound.Attack.Sound) {
+					PlayUnitSound(Selected[i], VoiceAttack);
+					break;
+				} else if (Selected[i]->Type->Sound.Acknowledgement.Sound) {
+					PlayUnitSound(Selected[i], VoiceAcknowledging);
+					break;
+				}
+			} else if (Selected[i]->Type->Sound.Acknowledgement.Sound) {
 				PlayUnitSound(Selected[i], VoiceAcknowledging);
 				break;
 			}
@@ -1502,7 +1594,7 @@ void UIHandleButtonDown(unsigned button)
 				// 0 Test build, don't really build
 				if (CanBuildUnitType(Selected[0], CursorBuilding, x, y, 0) &&
 						(explored || ReplayRevealMap)) {
-					PlayGameSound(GameSounds.PlacementSuccess.Sound,
+					PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound,
 						MaxSampleVolume);
 					for (int i = 0; i < NumSelected; ++i) {
 						SendCommandBuildBuilding(Selected[i], x, y, CursorBuilding,
@@ -1512,7 +1604,7 @@ void UIHandleButtonDown(unsigned button)
 						CancelBuildingMode();
 					}
 				} else {
-					PlayGameSound(GameSounds.PlacementError.Sound,
+					PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound,
 						MaxSampleVolume);
 				}
 			} else {

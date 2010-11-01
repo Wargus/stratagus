@@ -63,28 +63,8 @@
 
 /**
 **  Various sounds used in game.
-**
-**  FIXME: @todo support more races. Must remove static config.
 */
-GameSound GameSounds
-#ifndef laterUSE_CCL
-// FIXME: Removing this crashes?
-={
-	SoundConfig("placement error"),
-	SoundConfig("placement success"),
-	SoundConfig("click"),
-	SoundConfig("transport docking"),
-	SoundConfig("building construction"),
-	{ SoundConfig("basic human voices work complete"),
-		SoundConfig("basic orc voices work complete"),
-	},
-	{ SoundConfig("rescue (human) UNUSED"),
-		SoundConfig("rescue (orc) UNUSED"),
-	},
-	SoundConfig("click"),
-}
-#endif
-	;
+GameSound GameSounds;
 
 /**
 **  Selection handling
@@ -187,6 +167,8 @@ static CSound *ChooseUnitVoiceSound(const CUnit *unit, UnitVoiceGroup voice)
 	switch (voice) {
 		case VoiceAcknowledging:
 			return unit->Type->Sound.Acknowledgement.Sound;
+		case VoiceAttack:
+			return unit->Type->Sound.Attack.Sound;
 		case VoiceReady:
 			return unit->Type->Sound.Ready.Sound;
 		case VoiceSelected:
@@ -198,7 +180,7 @@ static CSound *ChooseUnitVoiceSound(const CUnit *unit, UnitVoiceGroup voice)
 		case VoiceWorkCompleted:
 			return GameSounds.WorkComplete[ThisPlayer->Race].Sound;
 		case VoiceBuilding:
-			return GameSounds.BuildingConstruction.Sound;
+			return GameSounds.BuildingConstruction[ThisPlayer->Race].Sound;
 		case VoiceDocking:
 			return GameSounds.Docking.Sound;
 		case VoiceRepairing:
@@ -503,14 +485,22 @@ void InitSoundClient(void)
 	}
 	// let's map game sounds, look if already setup in ccl.
 
-	if (!GameSounds.PlacementError.Sound) {
-		GameSounds.PlacementError.Sound =
-			SoundForName(GameSounds.PlacementError.Name);
+	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
+		if (!GameSounds.PlacementError[i].Sound &&
+				!GameSounds.PlacementError[i].Name.empty()) {
+			GameSounds.PlacementError[i].Sound =
+				SoundForName(GameSounds.PlacementError[i].Name);
+		}
 	}
-	if (!GameSounds.PlacementSuccess.Sound) {
-		GameSounds.PlacementSuccess.Sound =
-			SoundForName(GameSounds.PlacementSuccess.Name);
+
+	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
+		if (!GameSounds.PlacementSuccess[i].Sound &&
+				!GameSounds.PlacementSuccess[i].Name.empty()) {
+			GameSounds.PlacementSuccess[i].Sound =
+				SoundForName(GameSounds.PlacementSuccess[i].Name);
+		}
 	}
+
 	if (!GameSounds.Click.Sound) {
 		GameSounds.Click.Sound = SoundForName(GameSounds.Click.Name);
 	}
@@ -518,15 +508,47 @@ void InitSoundClient(void)
 		GameSounds.Docking.Sound =
 			SoundForName(GameSounds.Docking.Name);
 	}
-	if (!GameSounds.BuildingConstruction.Sound) {
-		GameSounds.BuildingConstruction.Sound =
-			SoundForName(GameSounds.BuildingConstruction.Name);
+
+	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
+		if (!GameSounds.BuildingConstruction[i].Sound &&
+				!GameSounds.BuildingConstruction[i].Name.empty()) {
+			GameSounds.BuildingConstruction[i].Sound =
+				SoundForName(GameSounds.BuildingConstruction[i].Name);
+		}
 	}
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
 		if (!GameSounds.WorkComplete[i].Sound &&
 				!GameSounds.WorkComplete[i].Name.empty()) {
 			GameSounds.WorkComplete[i].Sound =
 				SoundForName(GameSounds.WorkComplete[i].Name);
+		}
+	}
+	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
+		if (!GameSounds.ResearchComplete[i].Sound &&
+				!GameSounds.ResearchComplete[i].Name.empty()) {
+			GameSounds.ResearchComplete[i].Sound =
+				SoundForName(GameSounds.ResearchComplete[i].Name);
+		}
+	}
+	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
+		if (!GameSounds.NotEnough1[i].Sound &&
+				!GameSounds.NotEnough1[i].Name.empty()) {
+			GameSounds.NotEnough1[i].Sound =
+				SoundForName(GameSounds.NotEnough1[i].Name);
+		}
+	}
+	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
+		if (!GameSounds.NotEnough2[i].Sound &&
+				!GameSounds.NotEnough2[i].Name.empty()) {
+			GameSounds.NotEnough2[i].Sound =
+				SoundForName(GameSounds.NotEnough2[i].Name);
+		}
+	}
+	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
+		if (!GameSounds.NotEnoughFood[i].Sound &&
+				!GameSounds.NotEnoughFood[i].Name.empty()) {
+			GameSounds.NotEnoughFood[i].Sound =
+				SoundForName(GameSounds.NotEnoughFood[i].Name);
 		}
 	}
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {

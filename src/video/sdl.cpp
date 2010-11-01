@@ -48,13 +48,16 @@
 #include <string.h>
 
 #include <limits.h>
+
 #ifndef _MSC_VER
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #endif
+
 #include "SDL.h"
+
 #ifdef USE_GLES
 #include "SDL_gles.h"
 #include "GLES/gl.h"
@@ -69,6 +72,7 @@
 #ifdef USE_WIN32
 #include "net_lowlevel.h"
 #include "SDL_syswm.h"
+#include <shellapi.h>
 #endif
 
 #ifdef USE_MAEMO

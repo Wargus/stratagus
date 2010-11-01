@@ -3142,6 +3142,7 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 	}
 
 	/* Target Reaction on Hit */
+	if (target->Player->AiEnabled){
 	switch(target->CurrentAction()) {
 		case UnitActionTrain:
 		case UnitActionUpgradeTo:
@@ -3158,12 +3159,12 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 			//
 			return;
 		case UnitActionResource:
-			if (target->SubAction >= 65/* SUB_STOP_GATHERING */)
+			if (target->SubAction >= 65)
 			{
 				//Normal return to depot
 				return;
 			}
-			if (target->SubAction > 55 /* SUB_START_GATHERING */ &&
+			if (target->SubAction > 55  &&
 				target->ResourcesHeld > 0) {
 				//escape to Depot with this what you have;
 				target->Data.ResWorker.DoneHarvesting = 1;
@@ -3184,11 +3185,12 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 		default:
 		break;
 	}
+	}
 
 	//
 	// Attack units in range (which or the attacker?)
 	//
-	if (attacker && target->IsAgressive()) {
+	if (attacker && target->IsAgressive() && target->CanMove()) {
 			if (RevealAttacker && CanTarget(target->Type, attacker->Type)) {
 				// Reveal Unit that is attacking
 				goal = attacker;
@@ -3200,6 +3202,8 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 					goal = AttackUnitsInReactRange(target);
 				}
 			}
+			if (target->CurrentAction()!=UnitActionStill && !target->Player->AiEnabled)
+					return;
 			if (goal) {
 				if (target->SavedOrder.Action == UnitActionStill) {
 					// FIXME: should rewrite command handling

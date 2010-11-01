@@ -70,6 +70,7 @@ class CUnitSound {
 public:
 	SoundConfig Selected;           /// selected by user
 	SoundConfig Acknowledgement;    /// acknowledge of use command
+	SoundConfig Attack;             /// attack confirm command
 	SoundConfig Ready;              /// unit training... ready
 	SoundConfig Repair;             /// unit repairing
 	SoundConfig Harvest[MaxCosts];  /// unit harvesting

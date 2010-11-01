@@ -100,6 +100,11 @@ void HandleActionResearch(CUnit *unit)
 
 		unit->Player->Notify(NotifyGreen, unit->X, unit->Y,
 			_("%s: complete"), unit->Type->Name.c_str());
+		if (unit->Player == ThisPlayer) {
+			if (GameSounds.ResearchComplete[unit->Player->Race].Sound) 
+				PlayGameSound(GameSounds.ResearchComplete[unit->Player->Race].Sound,
+							MaxSampleVolume);
+		}
 		if (unit->Player->AiEnabled) {
 			AiResearchComplete(unit, upgrade);
 		}

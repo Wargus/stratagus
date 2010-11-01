@@ -208,6 +208,8 @@ int UnitReachable(const CUnit *src, const CUnit *dst, int range)
 	//
 	//  Find a path to the goal.
 	//
+	if (src->Type->Building)
+		return 0;
 	depth = PlaceReachable(src, dst->X, dst->Y,
 	 dst->Type->TileWidth, dst->Type->TileHeight, 0, range);
 	if (depth <= 0) {

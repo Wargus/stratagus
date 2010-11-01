@@ -1040,7 +1040,7 @@ void CButtonPanel::DoClicked(int button)
 				int autocast = 0;
 
 				if (!SpellTypeTable[spellId]->AutoCast) {
-					PlayGameSound(GameSounds.PlacementError.Sound,
+					PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound,
 						MaxSampleVolume);
 					break;
 				}
@@ -1202,7 +1202,10 @@ void CButtonPanel::DoClicked(int button)
 					!(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();
 				ClearCosts();
-			}
+			} else if (Selected[0]->Player->CheckLimits(type) == -3)
+				if (GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound) 
+					PlayGameSound(GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound,
+								MaxSampleVolume);
 			break;
 
 		case ButtonUpgradeTo:

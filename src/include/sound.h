@@ -65,14 +65,18 @@ class LuaActionListener;
 class GameSound
 {
 public:
-	SoundConfig PlacementError;    /// used by ui
-	SoundConfig PlacementSuccess;  /// used by ui
-	SoundConfig Click;             /// used by ui
-	SoundConfig Docking;               /// ship reaches coast
-	SoundConfig BuildingConstruction;  /// building under construction
-	SoundConfig WorkComplete[MAX_RACES];  /// building ready
-	SoundConfig Rescue[MAX_RACES];  /// rescue units
-	SoundConfig ChatMessage;           /// chat message
+	SoundConfig PlacementError[MAX_RACES];        /// used by ui
+	SoundConfig PlacementSuccess[MAX_RACES];      /// used by ui
+	SoundConfig Click;                            /// used by ui
+	SoundConfig Docking;                          /// ship reaches coast
+	SoundConfig BuildingConstruction[MAX_RACES];  /// building under construction
+	SoundConfig WorkComplete[MAX_RACES];          /// building ready
+	SoundConfig Rescue[MAX_RACES];                /// rescue units
+	SoundConfig ChatMessage;                      /// chat message
+	SoundConfig ResearchComplete[MAX_RACES];      /// research complete message
+	SoundConfig NotEnough1[MAX_RACES];            /// not enough minerals message
+	SoundConfig NotEnough2[MAX_RACES];            /// not enough ore message
+	SoundConfig NotEnoughFood[MAX_RACES];         /// not enough food message
 };
 
 /**

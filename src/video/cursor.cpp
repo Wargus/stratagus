@@ -232,6 +232,12 @@ static void DrawBuildingCursor(void)
 	DrawShadow(CursorBuilding, CursorBuilding->StillFrame, x, y);
 	DrawUnitType(CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
 		CursorBuilding->StillFrame, x, y);
+	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value>0){
+		Video.DrawCircleClip(ColorRed,
+					x + CursorBuilding->TileWidth * TileSizeX / 2,
+					y + CursorBuilding->TileHeight * TileSizeY / 2,
+					(CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileWidth - 1)) * TileSizeX + 1);
+	}
 
 	//
 	//  Draw the allow overlay

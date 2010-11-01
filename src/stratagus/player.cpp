@@ -636,6 +636,14 @@ int CPlayer::CheckCosts(const int *costs) const
 				DefaultResourceNames[i].c_str(), DefaultActions[i].c_str(), DefaultResourceNames[i].c_str());
 
 			err |= 1 << i;
+			if (i==1)
+				if (GameSounds.NotEnough1[this->Race].Sound) 
+					PlayGameSound(GameSounds.NotEnough1[this->Race].Sound,
+								MaxSampleVolume);
+			if (i==2)
+				if (GameSounds.NotEnough2[this->Race].Sound) 
+					PlayGameSound(GameSounds.NotEnough2[this->Race].Sound,
+								MaxSampleVolume);
 		}
 	}
 	return err;
