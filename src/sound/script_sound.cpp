@@ -251,6 +251,12 @@ static int CclDefineGameSounds(lua_State *l)
 				LuaError(l, "Sound id expected");
 			}
 			GameSounds.Click.Sound = (CSound *)data->Data;
+		} else if (!strcmp(value, "transport-docking")) {
+			if (!lua_isuserdata(l, j + 1) ||
+					(data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
+				LuaError(l, "Sound id expected");
+			}
+			GameSounds.Docking.Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "placement-error")) {
 			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
@@ -427,6 +433,28 @@ static int CclDefineGameSounds(lua_State *l)
 			}
 			lua_pop(l, 1);
 			GameSounds.Rescue[i].Sound = (CSound *)data->Data;
+		} else if (!strcmp(value, "building-construction")) {
+			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
+				LuaError(l, "incorrect argument");
+			}
+			lua_rawgeti(l, j + 1, 1);
+			value = LuaToString(l, -1);
+			lua_pop(l, 1);
+			for (i = 0; i < PlayerRaces.Count; ++i) {
+				if (!strcmp(PlayerRaces.Name[i].c_str(), value)) {
+					break;
+				}
+			}
+			if (i == PlayerRaces.Count) {
+				LuaError(l, "Unknown race: %s" _C_ value);
+			}
+			lua_rawgeti(l, j + 1, 2);
+			if (!lua_isuserdata(l, -1) ||
+					(data = (LuaUserData *)lua_touserdata(l, -1))->Type != LuaSoundType) {
+				LuaError(l, "Sound id expected");
+			}
+			lua_pop(l, 1);
+			GameSounds.BuildingConstruction[i].Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "chat-message")) {
 			if (!lua_isuserdata(l, j + 1) ||
 					(data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
