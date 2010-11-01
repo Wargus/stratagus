@@ -766,7 +766,7 @@ static int WaitInDepot(CUnit *unit)
 			DebugPrint("%d: Worker %d report: [%d,%d] Resource gone near [%d,%d] in range %d. Sit and play dumb.\n"
 				_C_ unit->Player->Index _C_ unit->Slot
 				_C_ unit->tilePos.x _C_ unit->tilePos.y
-				_C_ x _C_ y _C_ range);
+				_C_ pos.x _C_ pos.y _C_ range);
 			if(depot)
 				DropOutOnSide(unit,
 					LookingW, depot->Type->TileWidth, depot->Type->TileHeight);

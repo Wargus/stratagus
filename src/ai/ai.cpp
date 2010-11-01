@@ -748,7 +748,7 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 
 	DebugPrint("%d: %d(%s) attacked at %d,%d\n" _C_
 		defender->Player->Index _C_ UnitNumber(defender) _C_
-		defender->Type->Ident.c_str() _C_ defender->X _C_ defender->Y);
+		defender->Type->Ident.c_str() _C_ defender->tilePos.x _C_ defender->tilePos.y);
 
 	//
 	//  Don't send help to scouts (zeppelin,eye of vision).
@@ -890,10 +890,10 @@ void AiWorkComplete(CUnit *unit, CUnit *what)
 	if (unit) {
 		DebugPrint("%d: %d(%s) build %s at %d,%d completed\n" _C_
 			what->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident.c_str() _C_
-			what->Type->Ident.c_str() _C_ unit->X _C_ unit->Y);
+			what->Type->Ident.c_str() _C_ unit->tilePos.x _C_ unit->tilePos.y);
 	} else {
 		DebugPrint("%d: building %s at %d,%d completed\n" _C_
-			what->Player->Index _C_ what->Type->Ident.c_str() _C_ what->X _C_ what->Y);
+			what->Player->Index _C_ what->Type->Ident.c_str() _C_ what->tilePos.x _C_ what->tilePos.y);
 	}
 
 	Assert(what->Player->Type != PlayerPerson);
@@ -910,7 +910,7 @@ void AiCanNotBuild(CUnit *unit, const CUnitType *what)
 {
 	DebugPrint("%d: %d(%s) Can't build %s at %d,%d\n" _C_
 		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident.c_str() _C_
-		what->Ident.c_str() _C_ unit->X _C_ unit->Y);
+		what->Ident.c_str() _C_ unit->tilePos.x _C_ unit->tilePos.y);
 
 	Assert(unit->Player->Type != PlayerPerson);
 	AiReduceMadeInBuilt(unit->Player->Ai, what);
@@ -1087,7 +1087,7 @@ void AiTrainingComplete(CUnit *unit, CUnit *what)
 {
 	DebugPrint("%d: %d(%s) training %s at %d,%d completed\n" _C_
 		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident.c_str() _C_
-		what->Type->Ident.c_str() _C_ unit->X _C_ unit->Y);
+		what->Type->Ident.c_str() _C_ unit->tilePos.x _C_ unit->tilePos.y);
 
 	Assert(unit->Player->Type != PlayerPerson);
 
@@ -1108,7 +1108,7 @@ void AiUpgradeToComplete(CUnit *unit, const CUnitType *what)
 {
 	DebugPrint("%d: %d(%s) upgrade-to %s at %d,%d completed\n" _C_
 		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident.c_str() _C_
-		what->Ident.c_str() _C_ unit->X _C_ unit->Y);
+		what->Ident.c_str() _C_ unit->tilePos.x _C_ unit->tilePos.y);
 
 	Assert(unit->Player->Type != PlayerPerson);
 }
@@ -1123,7 +1123,7 @@ void AiResearchComplete(CUnit *unit, const CUpgrade *what)
 {
 	DebugPrint("%d: %d(%s) research %s at %d,%d completed\n" _C_
 		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident.c_str() _C_
-		what->Ident.c_str() _C_ unit->X _C_ unit->Y);
+		what->Ident.c_str() _C_ unit->tilePos.x _C_ unit->tilePos.y);
 
 	Assert(unit->Player->Type != PlayerPerson);
 

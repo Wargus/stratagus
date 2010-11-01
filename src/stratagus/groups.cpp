@@ -277,7 +277,7 @@ void GroupHelpMe(CUnit *attacker, CUnit *defender)
 
 	DebugPrint("%d: GroupHelpMe %d(%s) attacked at %d,%d\n" _C_
 		defender->Player->Index _C_ UnitNumber(defender) _C_
-		defender->Type->Ident.c_str() _C_ defender->X _C_ defender->Y);
+		defender->Type->Ident.c_str() _C_ defender->tilePos.x _C_ defender->tilePos.y);
 
 	//
 	//  Don't send help to scouts (zeppelin,eye of vision).

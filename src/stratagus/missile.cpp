@@ -1689,7 +1689,7 @@ void MissileWhirlwind::Action()
 		this->source = this->position;
 		this->State = 0;
 		DebugPrint("Whirlwind new direction: %d, %d, TTL: %d\n" _C_
-			this->DX _C_ this->DY _C_ this->TTL);
+			this->destination.x _C_ this->destination.y _C_ this->TTL);
 	}
 }
 

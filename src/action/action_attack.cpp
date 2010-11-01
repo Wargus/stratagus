@@ -204,7 +204,7 @@ static void MoveToTarget(CUnit *unit)
 		unit->CurrentAction() == UnitActionAttackGround);
 	Assert(unit->CanMove());
 	Assert(unit->CurrentOrder()->HasGoal()
-		 || (unit->CurrentOrder()->X != -1 && unit->CurrentOrder()->Y != -1));
+		 || (unit->CurrentOrder()->goalPos.x != -1 && unit->CurrentOrder()->goalPos.y != -1));
 
 	int err = DoActionMove(unit);
 
@@ -296,7 +296,7 @@ static void AttackTarget(CUnit *unit)
 
 	Assert(unit);
 	Assert(unit->CurrentOrder()->HasGoal() ||
-		(unit->CurrentOrder()->X != -1 && unit->CurrentOrder()->Y != -1));
+		(unit->CurrentOrder()->goalPos.x != -1 && unit->CurrentOrder()->goalPos.y != -1));
 
 	AnimateActionAttack(unit);
 	if (unit->Anim.Unbreakable) {
@@ -419,7 +419,7 @@ void HandleActionAttack(CUnit *unit)
 	Assert(unit->CurrentAction() == UnitActionAttackGround ||
 		unit->CurrentAction() == UnitActionAttack);
 	Assert(unit->CurrentOrder()->HasGoal() ||
-		 (unit->CurrentOrder()->X != -1 && unit->CurrentOrder()->Y != -1));
+		 (unit->CurrentOrder()->goalPos.x != -1 && unit->CurrentOrder()->goalPos.y != -1));
 
 	if (unit->Wait) {
 		unit->Wait--;
