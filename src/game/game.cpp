@@ -287,7 +287,7 @@ int WriteMapSetup(const char *mapSetup, CMap *map, int writeTerrain)
 			f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
 				Units[i]->Type->Ident.c_str(),
 				Units[i]->Player->Index,
-				Units[i]->X, Units[i]->Y);
+				Units[i]->tilePos.x, Units[i]->tilePos.y);
 			if (Units[i]->Type->GivesResource) {
 				f->printf("SetResourcesHeld(unit, %d)\n", Units[i]->ResourcesHeld);
 			}

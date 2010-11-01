@@ -82,7 +82,7 @@ void HandleActionFollow(CUnit *unit)
 			return;
 		}
 
-		if (goal->X == order->X && goal->Y == order->Y) {
+		if (goal->tilePos == order->goalPos) {
 
 			// Move to the next order
 			if (unit->OrderCount > 1) {
@@ -132,18 +132,17 @@ void HandleActionFollow(CUnit *unit)
 
 				// Teleport the unit
 				unit->Remove(NULL);
-				unit->X = goal->Goal->X;
-				unit->Y = goal->Goal->Y;
+				unit->tilePos = goal->Goal->tilePos;
 				DropOutOnSide(unit, unit->Direction, 1, 1);
 #if 0
 				// FIXME: SoundForName() should be called once
 				PlayGameSound(SoundForName("invisibility"), MaxSampleVolume);
 				// FIXME: MissileTypeByIdent() should be called once
 				MakeMissile(MissileTypeByIdent("missile-normal-spell"),
-					unit->X * TileSizeX + TileSizeX / 2,
-					unit->Y * TileSizeY + TileSizeY / 2,
-					unit->X * TileSizeX + TileSizeX / 2,
-					unit->Y * TileSizeY + TileSizeY / 2);
+					unit->tilePos.x * TileSizeX + TileSizeX / 2,
+					unit->tilePos.y * TileSizeY + TileSizeY / 2,
+					unit->tilePos.x * TileSizeX + TileSizeX / 2,
+					unit->tilePos.y * TileSizeY + TileSizeY / 2);
 #endif
 				unit->ClearAction();
 
@@ -175,7 +174,7 @@ void HandleActionFollow(CUnit *unit)
 
 						*(unit->CurrentOrder()) = dest->NewOrder;
 						unit->CurrentResource = dest->CurrentResource;
-						
+
 					}
 				}
 				return;
@@ -186,8 +185,7 @@ void HandleActionFollow(CUnit *unit)
 				unit->ClearAction();
 				return;
 			}
-			unit->CurrentOrder()->X = goal->X;
-			unit->CurrentOrder()->Y = goal->Y;
+			unit->CurrentOrder()->goalPos = goal->tilePos;
 			unit->SubAction = 128;
 
 			// FALL THROUGH
@@ -201,8 +199,7 @@ void HandleActionFollow(CUnit *unit)
 	goal = unit->CurrentOrder()->GetGoal();
 	if (goal && !goal->IsVisibleAsGoal(unit->Player)) {
 		DebugPrint("Goal gone\n");
-		unit->CurrentOrder()->X = goal->X + goal->Type->TileWidth / 2;
-		unit->CurrentOrder()->Y = goal->Y + goal->Type->TileHeight / 2;
+		unit->CurrentOrder()->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
 		unit->CurrentOrder()->ClearGoal();
 		goal = NoUnitP;
 		NewResetPath(unit);
@@ -220,7 +217,7 @@ void HandleActionFollow(CUnit *unit)
 					goal->CurrentAction() == UnitActionStill)) {
 			goal = AttackUnitsInReactRange(unit);
 			if (goal) {
-				CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
+				CommandAttack(unit, goal->tilePos.x, goal->tilePos.y, NULL, FlushCommands);
 				// Save current command to come back.
 				unit->SavedOrder = *(unit->CurrentOrder());
 				// This stops the follow command and the attack is executed

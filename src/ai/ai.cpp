@@ -207,7 +207,7 @@ static void AiCheckUnits(void)
 	//  Count the already made build requests.
 	//
 	AiGetBuildRequestsCount(AiPlayer, counter);
-	
+
 	//
 	//  Remove non active units.
 	//
@@ -442,7 +442,7 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 			file->printf("\"onpos\", %d, %d, ", queue->X, queue->Y);
 		}
 		/* */
-		
+
 		file->printf("\"%s\", %d, %d", queue->Type->Ident.c_str(), queue->Made, queue->Want);
 		if(i < s - 1)
 			file->printf(",\n");
@@ -739,8 +739,7 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 {
 	PlayerAi *pai;
 	CUnit *aiunit;
-	int x, y;
-	
+
 	/* Freandly Fire - typical splash */
 	if (attacker->Player->Index == defender->Player->Index) {
 		//FIXME - try react somehow
@@ -773,23 +772,23 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 			if (defender == aiunit) {
 				continue;
 			}
-					
+
 			// if brother is idle or attack no-agressive target and
 			// can attack our attacker then ask for help
 			// FIXME ad support for help from Coward type units
-			if (aiunit->IsAgressive() && (aiunit->IsIdle() || 
-				!(aiunit->CurrentAction() == UnitActionAttack && 
+			if (aiunit->IsAgressive() && (aiunit->IsIdle() ||
+				!(aiunit->CurrentAction() == UnitActionAttack &&
 			 	aiunit->CurrentOrder()->HasGoal() &&
 			 	aiunit->CurrentOrder()->GetGoal()->IsAgressive()))
 			 	&& CanTarget(aiunit->Type, attacker->Type)) {
-				
+
 				if (aiunit->SavedOrder.Action == UnitActionStill) {
 					// FIXME: should rewrite command handling
-					CommandAttack(aiunit, aiunit->X, aiunit->Y, NoUnitP,
+					CommandAttack(aiunit, aiunit->tilePos.x, aiunit->tilePos.y, NoUnitP,
 						FlushCommands);
 					aiunit->SavedOrder = *aiunit->Orders[1];
 				}
-				CommandAttack(aiunit, attacker->X, attacker->Y,
+				CommandAttack(aiunit, attacker->tilePos.x, attacker->tilePos.y,
 					 (CUnit*)attacker, FlushCommands);
 			}
 		}
@@ -797,8 +796,8 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 		if (!aiForce->Defending && aiForce->State > 0) {
 			DebugPrint("%d: %d(%s) belong to attacking force, don't defend it\n" _C_
 				defender->Player->Index _C_ UnitNumber(defender) _C_
-				defender->Type->Ident.c_str());				
-			// unit belongs to an attacking force, 
+				defender->Type->Ident.c_str());
+			// unit belongs to an attacking force,
 			// so don't send others force in such case.
 			// FIXME: there may be other attacking the same place force who can help
 			return;
@@ -809,12 +808,11 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 	//  Send defending forces, also send attacking forces if they are home/traning.
 	//	This is still basic model where we suspect only one base ;(
 	//
+	Vec2i pos;
 	if (attacker) {
-		x = attacker->X;
-		y = attacker->Y;
+		pos = attacker->tilePos;
 	} else {
-		x = defender->X;
-		y = defender->Y;
+		pos = defender->tilePos;
 	}
 	for (unsigned int i = 0; i < pai->Force.Size(); ++i) {
 		AiForce *aiForce = &pai->Force[i];
@@ -824,7 +822,7 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 			(aiForce->Role == AiForceRoleAttack && !aiForce->Attacking &&
 			!aiForce->State))) {  // none attacking
 			aiForce->Defending = true;
-			aiForce->Attack(x, y);
+			aiForce->Attack(pos.x, pos.y);
 		}
 	}
 }
@@ -850,7 +848,7 @@ void AiUnitKilled(CUnit *unit)
 				DebugPrint("%d: Attack force #%lu was destroyed, giving up\n"
 					_C_ unit->Player->Index _C_ (long unsigned int)(force  - &(unit->Player->Ai->Force[0])));
 				force->Reset(true);
-			}	
+			}
 		}
 	}
 
@@ -935,23 +933,9 @@ void AiCanNotReach(CUnit *unit, const CUnitType *what)
 */
 static void AiMoveUnitInTheWay(CUnit *unit)
 {
-	static int dirs[8][2] = {{-1,-1},{-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1}};
-	int ux0;
-	int uy0;
-	int ux1;
-	int uy1;
-	int bx0;
-	int by0;
-	int bx1;
-	int by1;
-	int x;
-	int y;
-	int trycount,i;
-	CUnit *blocker;
-	CUnitType *unittype;
-	CUnitType *blockertype;
+	static Vec2i dirs[8] = {{-1,-1},{-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1}};
 	CUnit *movableunits[16];
-	int movablepos[16][2];
+	Vec2i movablepos[16];
 	int movablenb;
 
 	AiPlayer = unit->Player->Ai;
@@ -961,55 +945,45 @@ static void AiMoveUnitInTheWay(CUnit *unit)
 		return;
 	}
 
-	unittype = unit->Type;
-
-	ux0 = unit->X;
-	uy0 = unit->Y;
-	ux1 = ux0 + unittype->TileWidth - 1;
-	uy1 = uy0 + unittype->TileHeight - 1;
+	CUnitType *unittype = unit->Type;
+	const Vec2i u0 = unit->tilePos;
+	const Vec2i u1 = {u0.x + unittype->TileWidth - 1, u0.y + unittype->TileHeight - 1};
 
 	movablenb = 0;
 
-
 	// Try to make some unit moves around it
-	for (i = 0; i < NumUnits; ++i) {
-		blocker = Units[i];
+	for (int it = 0; it < NumUnits; ++it) {
+		CUnit *blocker = Units[it];
 
 		if (blocker->IsUnusable()) {
 			continue;
 		}
-
 		if (!blocker->IsIdle()) {
 			continue;
 		}
-
 		if (blocker->Player != unit->Player) {
 			// Not allied
 			if (!(blocker->Player->Allied & (1 << unit->Player->Index))) {
 				continue;
 			}
 		}
-
-		blockertype = blocker->Type;
+		CUnitType *blockertype = blocker->Type;
 
 		if (blockertype->UnitType != unittype->UnitType) {
 			continue;
 		}
-
 		if (!blocker->CanMove()) {
 			continue;
 		}
 
-		bx0 = blocker->X;
-		by0 = blocker->Y;
-		bx1 = bx0 + blocker->Type->TileWidth - 1;
-		by1 = by0 + blocker->Type->TileHeight - 1;;
+		const Vec2i b0 = blocker->tilePos;
+		const Vec2i b1 = {b0.x + blocker->Type->TileWidth - 1, b0.y + blocker->Type->TileHeight - 1};
 
 		// Check for collision
-		if (!((ux0 == bx1 + 1 || ux1 == bx0 - 1) &&
-				(std::max<int>(by0, uy0) <= std::min<int>(by1, uy1))) &&
-			!((uy0 == by1 + 1 || uy1 == by0 - 1) &&
-				(std::max<int>(bx0, ux0) <= std::min<int>(bx1, ux1))))
+		if (!((u0.x == b1.x + 1 || u1.x == b0.x - 1) &&
+				(std::max<int>(b0.y, u0.y) <= std::min<int>(b1.y, u1.y))) &&
+			!((u0.y == b1.y + 1 || u1.y == b0.y - 1) &&
+				(std::max<int>(b0.x, u0.x) <= std::min<int>(b1.x, u1.x))))
 		{
 			continue;
 		}
@@ -1019,27 +993,25 @@ static void AiMoveUnitInTheWay(CUnit *unit)
 		}
 
 		// Move blocker in a rand dir
-		i = SyncRand() & 7;
-		trycount = 8;
+		int i = SyncRand() & 7;
+		int trycount = 8;
 		while (trycount > 0) {
 			i = (i + 1) & 7;
 			--trycount;
 
-			x = blocker->X + dirs[i][0];
-			y = blocker->Y + dirs[i][1];
+			const Vec2i pos = blocker->tilePos + dirs[i];
 
 			// Out of the map => no !
-			if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
+			if (pos.x < 0 || pos.y < 0 || pos.x >= Map.Info.MapWidth || pos.y >= Map.Info.MapHeight) {
 				continue;
 			}
 			// move to blocker ? => no !
-			if (x == ux0 && y == uy0) {
+			if (pos == u0) {
 				continue;
 			}
 
 			movableunits[movablenb] = blocker;
-			movablepos[movablenb][0] = x;
-			movablepos[movablenb][1] = y;
+			movablepos[movablenb] = pos;
 
 			++movablenb;
 			trycount = 0;
@@ -1051,9 +1023,8 @@ static void AiMoveUnitInTheWay(CUnit *unit)
 
 	// Don't move more than 1 unit.
 	if (movablenb) {
-		i = SyncRand() % movablenb;
-		CommandMove(movableunits[i], movablepos[i][0], movablepos[i][1],
-			FlushCommands);
+		int index = SyncRand() % movablenb;
+		CommandMove(movableunits[index], movablepos[index].x, movablepos[index].y, FlushCommands);
 		AiPlayer->LastCanNotMoveGameCycle = GameCycle;
 	}
 }
@@ -1065,7 +1036,8 @@ static void AiMoveUnitInTheWay(CUnit *unit)
 */
 void AiCanNotMove(CUnit *unit)
 {
-	int gx, gy, gw, gh;
+	Vec2i goalPos;
+	int gw, gh;
 	AiPlayer = unit->Player->Ai;
 	COrderPtr order = unit->CurrentOrder();
 	int minrange = order->MinRange;
@@ -1075,20 +1047,18 @@ void AiCanNotMove(CUnit *unit)
 		CUnit *goal = order->GetGoal();
 		gw = goal->Type->TileWidth;
 		gh = goal->Type->TileHeight;
-		gx = goal->X;
-		gy = goal->Y;
+		goalPos = goal->tilePos;
 	} else {
 		// Take care of non square goals :)
 		// If goal is non square, range states a non-existant goal rather
 		// than a tile.
 		gw = order->Width;
 		gh = order->Height;
-		gx = order->X;
-		gy = order->Y;
+		goalPos = order->goalPos;
 	}
 
 	if (unit->Type->UnitType == UnitTypeFly ||
-			PlaceReachable(unit, gx, gy, gw, gh, minrange, maxrange)) {
+			PlaceReachable(unit, goalPos.x, goalPos.y, gw, gh, minrange, maxrange)) {
 		// Path probably closed by unit here
 		AiMoveUnitInTheWay(unit);
 		return;

@@ -173,10 +173,10 @@ void DrawUnitSelection(const CViewport *vp, const CUnit *unit)
 	}
 
 	const CUnitType *type = unit->Type;
-	int x = vp->Map2ViewportX(unit->X) + unit->IX +
+	int x = vp->Map2ViewportX(unit->tilePos.x) + unit->IX +
 		type->TileWidth * TileSizeX / 2 - type->BoxWidth / 2 -
 		(type->Width - type->Sprite->Width) / 2;
-	int y = vp->Map2ViewportY(unit->Y) + unit->IY +
+	int y = vp->Map2ViewportY(unit->tilePos.y) + unit->IY +
 		type->TileHeight * TileSizeY / 2 - type->BoxHeight / 2 -
 		(type->Height - type->Sprite->Height) / 2;
 
@@ -676,21 +676,21 @@ static void GetOrderPosition(const CUnit *unit, const COrderPtr order, int *x, i
 	// FIXME: n0body: Check for goal gone?
 	if ((goal = order->GetGoal()) && (!goal->Removed)) {
 		// Order has a goal, get it's location.
-		*x = CurrentViewport->Map2ViewportX(goal->X) + goal->IX +
+		*x = CurrentViewport->Map2ViewportX(goal->tilePos.x) + goal->IX +
 			goal->Type->TileWidth * TileSizeX / 2;
-		*y = CurrentViewport->Map2ViewportY(goal->Y) + goal->IY +
+		*y = CurrentViewport->Map2ViewportY(goal->tilePos.y) + goal->IY +
 			goal->Type->TileHeight * TileSizeY / 2;
 	} else {
-		if (order->X >= 0 && order->Y >= 0) {
+		if (order->goalPos.x >= 0 && order->goalPos.y >= 0) {
 			// Order is for a location, show that.
-			*x = CurrentViewport->Map2ViewportX(order->X) + TileSizeX / 2;
-			*y = CurrentViewport->Map2ViewportY(order->Y) + TileSizeY / 2;
+			*x = CurrentViewport->Map2ViewportX(order->goalPos.x) + TileSizeX / 2;
+			*y = CurrentViewport->Map2ViewportY(order->goalPos.y) + TileSizeY / 2;
 		} else {
 			// Some orders ignore x,y (like StandStill).
 			// Use the unit's position instead.
-			*x = CurrentViewport->Map2ViewportX(unit->X) + unit->IX +
+			*x = CurrentViewport->Map2ViewportX(unit->tilePos.x) + unit->IX +
 				unit->Type->TileWidth * TileSizeX / 2;
-			*y = CurrentViewport->Map2ViewportY(unit->Y) + unit->IY +
+			*y = CurrentViewport->Map2ViewportY(unit->tilePos.y) + unit->IY +
 				unit->Type->TileHeight * TileSizeY / 2;
 		}
 		if (order->Action == UnitActionBuild) {
@@ -752,8 +752,8 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrderPtr o
 			break;
 
 		case UnitActionAttackGround:
-			x2 = CurrentViewport->Map2ViewportX(order->X) + TileSizeX / 2;
-			y2 = CurrentViewport->Map2ViewportY(order->Y) + TileSizeY / 2;
+			x2 = CurrentViewport->Map2ViewportX(order->goalPos.x) + TileSizeX / 2;
+			y2 = CurrentViewport->Map2ViewportY(order->goalPos.y) + TileSizeY / 2;
 			// FALL THROUGH
 		case UnitActionAttack:
 			if (unit->SubAction & 2) { // Show weak targets.
@@ -855,9 +855,9 @@ void ShowOrder(const CUnit *unit)
 
 	// Get current position
 	x1 = CurrentViewport->Map2ViewportX(
-		unit->X) + unit->IX + unit->Type->TileWidth * TileSizeX / 2;
+		unit->tilePos.x) + unit->IX + unit->Type->TileWidth * TileSizeX / 2;
 	y1 = CurrentViewport->Map2ViewportY(
-		unit->Y) + unit->IY + unit->Type->TileHeight * TileSizeY / 2;
+		unit->tilePos.y) + unit->IY + unit->Type->TileHeight * TileSizeY / 2;
 
 	// If the current order is cancelled show the next one
 	if (unit->OrderCount > 1 && unit->OrderFlush) {
@@ -1121,8 +1121,8 @@ void CUnit::Draw(const CViewport *vp) const
 		frame = this->Frame;
 		y = this->IY;
 		x = this->IX;
-		x += vp->Map2ViewportX(this->X);
-		y += vp->Map2ViewportY(this->Y);
+		x += vp->Map2ViewportX(this->tilePos.x);
+		y += vp->Map2ViewportY(this->tilePos.y);
 		state = (action == UnitActionBuilt) |
 				((action == UnitActionUpgradeTo) << 1);
 		constructed = this->Constructed;
@@ -1261,8 +1261,8 @@ void CUnitDrawProxy::operator=(const CUnit *unit)
 		frame = unit->Frame;
 		IY = unit->IY;
 		IX = unit->IX;
-		X = unit->X;
-		Y = unit->Y;
+		X = unit->tilePos.x;
+		Y = unit->tilePos.y;
 
 		state = (action == UnitActionBuilt) |
 				((action == UnitActionUpgradeTo) << 1);
@@ -1484,10 +1484,10 @@ static inline bool DrawLevelCompare(const CUnit*c1,
 		// diffpos compares unit's Y positions (bottom of sprite) on the map
 		// and uses X position in case Y positions are equal.
 		// FIXME: Use BoxHeight?
-		const int pos1 = (c1->Y * TileSizeY + c1->IY + c1->Type->Height);
-		const int pos2 = (c2->Y * TileSizeY + c2->IY + c2->Type->Height);
+		const int pos1 = (c1->tilePos.y * TileSizeY + c1->IY + c1->Type->Height);
+		const int pos2 = (c2->tilePos.y * TileSizeY + c2->IY + c2->Type->Height);
 		return pos1 == pos2 ?
-			(c1->X - c2->X ? c1->X < c2->X : c1->Slot < c2->Slot) : pos1 < pos2;
+			(c1->tilePos.x - c2->tilePos.x ? c1->tilePos.x < c2->tilePos.x : c1->Slot < c2->Slot) : pos1 < pos2;
 	} else {
 		return drawlevel1 < drawlevel2;
 	}

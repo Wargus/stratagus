@@ -157,31 +157,27 @@ static void UiCenterOnGroup(unsigned group, GroupSelectionMode mode = SELECTABLE
 {
 	CUnit **units;
 	int n;
-	int x = -1;
-	int y = -1;
+	Vec2i pos = {-1, -1};
 
 	n = GetNumberUnitsOfGroup(group, SELECT_ALL);
 	if (n--) {
 		units = GetUnitsOfGroup(group);
 		// FIXME: what should we do with the removed units? ignore?
 		if (units[n]->Type && units[n]->Type->CanSelect(mode)) {
-			x = units[n]->X;
-			y = units[n]->Y;
+			pos = units[n]->tilePos;
 		}
 
 		while (n--) {
 			if (units[n]->Type && units[n]->Type->CanSelect(mode)) {
-				if (x != -1) {
-					x += (units[n]->X - x) / 2;
-					y += (units[n]->Y - y) / 2;
+				if (pos.x != -1) {
+					pos += (units[n]->tilePos - pos) / 2;
 				} else {
-					x = units[n]->X;
-					y = units[n]->Y;
+					pos = units[n]->tilePos;
 				}
 			}
 		}
-		if (x != -1) {
-			UI.SelectedViewport->Center(x, y, TileSizeX / 2, TileSizeY / 2);
+		if (pos.x != -1) {
+			UI.SelectedViewport->Center(pos.x, pos.y, TileSizeX / 2, TileSizeY / 2);
 		}
 	}
 }
@@ -391,18 +387,15 @@ static void UiDecreaseGameSpeed(void)
 */
 static void UiCenterOnSelected(void)
 {
-	int x;
-	int y;
 	int n;
 
 	if ((n = NumSelected)) {
-		x = Selected[--n]->X;
-		y = Selected[n]->Y;
+		Vec2i pos = Selected[--n]->tilePos;
+
 		while (n--) {
-			x += (Selected[n]->X - x) / 2;
-			y += (Selected[n]->Y - y) / 2;
+			pos += (Selected[n]->tilePos - pos) / 2;
 		}
-		UI.SelectedViewport->Center(x, y, TileSizeX / 2, TileSizeY / 2);
+		UI.SelectedViewport->Center(pos.x, pos.y, TileSizeX / 2, TileSizeY / 2);
 	}
 }
 
@@ -459,7 +452,7 @@ static void UiFindIdleWorker(void)
 		CurrentButtonLevel = 0;
 		PlayUnitSound(Selected[0], VoiceSelected);
 		SelectionChanged();
-		UI.SelectedViewport->Center(unit->X, unit->Y, TileSizeX / 2, TileSizeY / 2);
+		UI.SelectedViewport->Center(unit->tilePos.x, unit->tilePos.y, TileSizeX / 2, TileSizeY / 2);
 	}
 }
 

@@ -426,8 +426,8 @@ static void EditorRemoveUnit(CUnit *unit)
 {
 	EditorAction editorAction;
 	editorAction.Type = EditorActionTypeRemoveUnit;
-	editorAction.X = unit->X;
-	editorAction.Y = unit->Y;
+	editorAction.X = unit->tilePos.x;
+	editorAction.Y = unit->tilePos.y;
 	editorAction.UnitType = unit->Type;
 	editorAction.Player = unit->Player;
 

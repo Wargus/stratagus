@@ -243,9 +243,9 @@ void CclParseOrder(lua_State *l, COrderPtr order)
 			order->Goal = CclGetUnitFromRef(l);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "tile")) {
-			++j;			
+			++j;
 			lua_rawgeti(l, -1, j + 1);
-			CclGetPos(l, &order->X , &order->Y);
+			CclGetPos(l, &order->goalPos.x , &order->goalPos.y);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "type")) {
 			++j;
@@ -277,11 +277,11 @@ void CclParseOrder(lua_State *l, COrderPtr order)
 		} else if (!strcmp(value, "resource-pos")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
-			CclGetPos(l, &order->Arg1.Resource.Pos.X , 
+			CclGetPos(l, &order->Arg1.Resource.Pos.X ,
 								&order->Arg1.Resource.Pos.Y);
 			lua_pop(l, 1);
 
-			//FIXME: hardcoded wood	
+			//FIXME: hardcoded wood
 			Assert(order->CurrentResource && order->CurrentResource == WoodCost);
 		} else if (!strcmp(value, "resource-mine")) {
 			++j;
@@ -329,7 +329,7 @@ void CclParseOrder(lua_State *l, COrderPtr order)
 static void CclParseOrders(lua_State *l, CUnit *unit)
 {
 	COrderPtr order;
-	const int n = unit->OrderCount;	
+	const int n = unit->OrderCount;
 	for (std::vector<COrderPtr>::iterator order = unit->Orders.begin();
 			order != unit->Orders.end();
 			++order) {
@@ -706,8 +706,8 @@ static int CclUnit(lua_State *l)
 			// Radar(Jammer) not.
 
 		} else if (!strcmp(value, "tile")) {
-			CclGetPos(l, &unit->X , &unit->Y, j + 1);
-			unit->Offset = Map.getIndex(unit->X, unit->Y);
+			CclGetPos(l, &unit->tilePos.x , &unit->tilePos.y, j + 1);
+			unit->Offset = Map.getIndex(unit->tilePos.x, unit->tilePos.y);
 		} else if (!strcmp(value, "stats")) {
 			unit->Stats = &type->Stats[(int)LuaToNumber(l, j + 1)];
 		} else if (!strcmp(value, "pixel")) {
@@ -964,8 +964,8 @@ static int CclMoveUnit(lua_State *l)
 	if (UnitCanBeAt(unit, ix, iy)) {
 		unit->Place(ix, iy);
 	} else {
-		unit->X = ix;
-		unit->Y = iy;
+		unit->tilePos.x = ix;
+		unit->tilePos.y = iy;
 		DropOutOnSide(unit, heading, 1, 1);
 	}
 
@@ -1029,8 +1029,8 @@ static int CclCreateUnit(lua_State *l)
 				(unit->Type->Building && CanBuildUnitType(NULL, unit->Type, ix, iy, 0))) {
 			unit->Place(ix, iy);
 		} else {
-			unit->X = ix;
-			unit->Y = iy;
+			unit->tilePos.x = ix;
+			unit->tilePos.y = iy;
 			DropOutOnSide(unit, heading, 1, 1);
 		}
 		UpdateForNewUnit(unit, 0);

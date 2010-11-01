@@ -262,13 +262,13 @@ static int SelectAroundUnit(CUnit *unit, CUnit **around)
 	// FIXME: Yes, but caller should check.
 	// NOTE: +1 right,bottom isn't inclusive :(
 	if (unit->Type->UnitType == UnitTypeLand) {
-		return Map.Select(unit->X - 1, unit->Y - 1,
-			unit->X + unit->Type->TileWidth + 1,
-			unit->Y + unit->Type->TileHeight + 1, around);
+		return Map.Select(unit->tilePos.x - 1, unit->tilePos.y - 1,
+			unit->tilePos.x + unit->Type->TileWidth + 1,
+			unit->tilePos.y + unit->Type->TileHeight + 1, around);
 	} else {
-		return Map.Select(unit->X - 2, unit->Y - 2,
-			unit->X + unit->Type->TileWidth + 2,
-			unit->Y + unit->Type->TileHeight + 2, around);
+		return Map.Select(unit->tilePos.x - 2, unit->tilePos.y - 2,
+			unit->tilePos.x + unit->Type->TileWidth + 2,
+			unit->tilePos.y + unit->Type->TileHeight + 2, around);
 	}
 }
 
@@ -399,7 +399,7 @@ static int CclIfRescuedNearUnit(lua_State *l)
 		int s;
 
 		unit = table[i];
-		an = SelectAroundUnit(unit, around);		
+		an = SelectAroundUnit(unit, around);
 
 		//
 		// Count the requested units

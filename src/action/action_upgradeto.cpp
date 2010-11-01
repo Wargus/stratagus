@@ -62,37 +62,29 @@
 */
 int TransformUnitIntoType(CUnit *unit, CUnitType *newtype)
 {
-	CPlayer *player;
-	CUnitType *oldtype;
-	const CUnitStats *newstats;
-	int x;
-	int y;
-	CUnit *container;
-
 	Assert(unit);
 	Assert(newtype);
 
-	oldtype = unit->Type;
+	CUnitType *oldtype = unit->Type;
 	if (oldtype == newtype) { // nothing to do
 		return 1;
 	}
-	x = unit->X + (oldtype->TileWidth - newtype->TileWidth) / 2;
-	y = unit->Y + (oldtype->TileHeight - newtype->TileHeight) / 2;
+	Vec2i pos = unit->tilePos + oldtype->GetHalfTileSize() - newtype->GetHalfTileSize();
+	CUnit *container = unit->Container;
 
-	container = unit->Container;
 	if (container) {
 		MapUnmarkUnitSight(unit);
 	} else {
 		SaveSelection();
 		unit->Remove(NULL);
-		if (!UnitTypeCanBeAt(newtype, x, y)) {
-			unit->Place(unit->X, unit->Y);
+		if (!UnitTypeCanBeAt(newtype, pos.x, pos.y)) {
+			unit->Place(unit->tilePos.x, unit->tilePos.y);
 			RestoreSelection();
 			// FIXME unit is not modified, try later ?
 			return 0;
 		}
 	}
-	player = unit->Player;
+	CPlayer *player = unit->Player;
 	player->UnitTypesCount[oldtype->Slot]--;
 	player->UnitTypesCount[newtype->Slot]++;
 
@@ -100,7 +92,7 @@ int TransformUnitIntoType(CUnit *unit, CUnitType *newtype)
 	player->Supply += newtype->Supply - oldtype->Supply;
 
 	//  adjust Variables with percent.
-	newstats = &newtype->Stats[player->Index];
+	const CUnitStats *newstats = &newtype->Stats[player->Index];
 
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		if (unit->Variable[i].Max) {
@@ -126,7 +118,7 @@ int TransformUnitIntoType(CUnit *unit, CUnitType *newtype)
 	//  Update Possible sight range change
 	UpdateUnitSightRange(unit);
 	if (!container) {
-		unit->Place(x, y);
+		unit->Place(pos.x, pos.y);
 		RestoreSelection();
 	} else {
 		MapMarkUnitSight(unit);
@@ -195,7 +187,7 @@ void HandleActionUpgradeTo(CUnit *unit)
 	unit->State = 0;
 
 	if (TransformUnitIntoType(unit, newtype) == 0) {
-		player->Notify(NotifyGreen, unit->X, unit->Y,
+		player->Notify(NotifyGreen, unit->tilePos.x, unit->tilePos.y,
 			_("Upgrade to %s canceled"), newtype->Name.c_str());
 		return ;
 	}
@@ -203,7 +195,7 @@ void HandleActionUpgradeTo(CUnit *unit)
 	if (player->AiEnabled) {
 		AiUpgradeToComplete(unit, newtype);
 	}
-	player->Notify(NotifyGreen, unit->X, unit->Y,
+	player->Notify(NotifyGreen, unit->tilePos.x, unit->tilePos.y,
 		_("Upgrade to %s complete"), unit->Type->Name.c_str());
 }
 

@@ -389,8 +389,8 @@ void FireMissile(CUnit *unit)
 	if (unit->Type->Missile.Missile->Class == MissileClassNone) {
 		// No goal, take target coordinates
 		if (!goal) {
-			dx = unit->CurrentOrder()->X;
-			dy = unit->CurrentOrder()->Y;
+			dx = unit->CurrentOrder()->goalPos.x;
+			dy = unit->CurrentOrder()->goalPos.y;
 			if (Map.WallOnMap(dx, dy)) {
 				if (Map.HumanWallOnMap(dx, dy)) {
 					Map.HitWall(dx, dy,
@@ -414,11 +414,11 @@ void FireMissile(CUnit *unit)
 
 	// If Firing from inside a Bunker
 	if (unit->Container) {
-		x = unit->Container->X * TileSizeX + TileSizeX / 2;  // missile starts in tile middle
-		y = unit->Container->Y * TileSizeY + TileSizeY / 2;
+		x = unit->Container->tilePos.x * TileSizeX + TileSizeX / 2;  // missile starts in tile middle
+		y = unit->Container->tilePos.y * TileSizeY + TileSizeY / 2;
 	} else {
-		x = unit->X * TileSizeX + TileSizeX / 2;  // missile starts in tile middle
-		y = unit->Y * TileSizeY + TileSizeY / 2;
+		x = unit->tilePos.x * TileSizeX + TileSizeX / 2;  // missile starts in tile middle
+		y = unit->tilePos.y * TileSizeY + TileSizeY / 2;
 	}
 
 	if (goal) {
@@ -435,13 +435,13 @@ void FireMissile(CUnit *unit)
 		// Fire to nearest point of the unit!
 		// If Firing from inside a Bunker
 		if (unit->Container) {
-			NearestOfUnit(goal, unit->Container->X, unit->Container->Y, &dx, &dy);
+			NearestOfUnit(goal, unit->Container->tilePos.x, unit->Container->tilePos.y, &dx, &dy);
 		} else {
-			NearestOfUnit(goal, unit->X, unit->Y, &dx, &dy);
+			NearestOfUnit(goal, unit->tilePos.x, unit->tilePos.y, &dx, &dy);
 		}
 	} else {
-		dx = unit->CurrentOrder()->X;
-		dy = unit->CurrentOrder()->Y;
+		dx = unit->CurrentOrder()->goalPos.x;
+		dy = unit->CurrentOrder()->goalPos.y;
 		// FIXME: Can this be too near??
 	}
 
@@ -705,7 +705,7 @@ static void MissileNewHeadingFromXY(Missile &missile, const Vec2i &delta)
 
 	const int nextdir = 256 / missile.Type->NumDirections;
 	Assert(nextdir != 0);
-	const int dir = ((DirectionToHeading(10 * delta.x, 10 * delta.y) + nextdir / 2) & 0xFF) / nextdir;
+	const int dir = ((DirectionToHeading(delta) + nextdir / 2) & 0xFF) / nextdir;
 	if (dir <= LookingS / nextdir) { // north->east->south
 		missile.SpriteFrame += dir;
 	} else {
@@ -1530,14 +1530,13 @@ void MissileFlameShield::Action()
 	while (unit->Container) {
 		unit = unit->Container;
 	}
-	const int ux = unit->X;
-	const int uy = unit->Y;
+	const Vec2i upos = unit->tilePos;
 	const int ix = unit->IX;
 	const int iy = unit->IY;
 	const int uw = unit->Type->TileWidth;
 	const int uh = unit->Type->TileHeight;
-	this->position.x = ux * TileSizeX + ix + uw * TileSizeX / 2 + dx - 16;
-	this->position.y = uy * TileSizeY + iy + uh * TileSizeY / 2 + dy - 32;
+	this->position.x = upos.x * TileSizeX + ix + uw * TileSizeX / 2 + dx - 16;
+	this->position.y = upos.y * TileSizeY + iy + uh * TileSizeY / 2 + dy - 32;
 	if (unit->CurrentAction() == UnitActionDie) {
 		this->TTL = index;
 	}
@@ -1555,7 +1554,7 @@ void MissileFlameShield::Action()
 	}
 
 	CUnit* table[UnitMax];
-	const int n = Map.Select(ux - 1, uy - 1, ux + 1 + 1, uy + 1 + 1, table);
+	const int n = Map.Select(upos.x - 1, upos.y - 1, upos.x + 1 + 1, upos.y + 1 + 1, table);
 	for (int i = 0; i < n; ++i) {
 		if (table[i] == unit) {
 			// cannot hit target unit

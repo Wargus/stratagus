@@ -315,7 +315,7 @@ static int GetButtonStatus(const ButtonAction *button, int UnderCursor)
 static int GetPopupCostsWidth(const CFont *font, const int *Costs)
 {
 	int popupWidth = 0;
-	for (unsigned int i = 1; i < MaxCosts; ++i) {	
+	for (unsigned int i = 1; i < MaxCosts; ++i) {
 		if (Costs[i]) {
 			if(UI.Resources[i].IconWidth != -1)	{
 				popupWidth += (UI.Resources[i].IconWidth + 5);
@@ -336,7 +336,7 @@ static int DrawPopupCosts(int x, int y, const CLabel &label, const int *Costs)
 	for (unsigned int i = 1; i < MaxCosts; ++i) {
 		if (Costs[i]) {
 			int y_offset = 0;
-			const CGraphic *G = UI.Resources[i].G;		
+			const CGraphic *G = UI.Resources[i].G;
 			if (G) {
 				int x_offset = UI.Resources[i].IconWidth;
 				G->DrawFrameClip(UI.Resources[i].IconFrame,	x , y);
@@ -352,20 +352,20 @@ static int DrawPopupCosts(int x, int y, const CLabel &label, const int *Costs)
 	return x;
 }
 
-void DrawPopupUnitInfo(const CUnitType *type, 
+void DrawPopupUnitInfo(const CUnitType *type,
 		int player_index, CFont *font, Uint32 backgroundColor,
 		int buttonX, int buttonY) {
 
 	const CGraphic *G;
 	const CUnitStats *stats = &type->Stats[player_index];
-	
-	//detect max Height	
+
+	//detect max Height
 	int popupHeight = 85;//
 	if (type->CanAttack) {
 		popupHeight += 30;
 	}
 
-	//detect max Width	
+	//detect max Width
 	int popupWidth = GetPopupCostsWidth(font, stats->Costs);
 	if(type->Demand) {
 		if(UI.Resources[FoodCost].IconWidth != -1)
@@ -384,7 +384,7 @@ void DrawPopupUnitInfo(const CUnitType *type,
 
 	if(popupWidth < 120)
 		popupWidth = 120;
-		
+
 	int start_x = std::min<int>(buttonX, Video.Width - 1 - popupWidth);
 	int y = buttonY - popupHeight - 10;
 	int x = start_x;
@@ -481,25 +481,25 @@ static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 	Uint32 backgroundColor = Video.MapRGB(TheScreen->format, 38, 38, 78);
 	CFont *font = SmallFont;
 	const int font_height = font->Height();
-	
+
 	int start_x, x, popupWidth;
 	int y, popupHeight;//
 
 	//GameFont
 	// Draw hint
 	switch(button->Action) {
-	
+
 		case ButtonResearch:
 		{
 			CLabel label(font,"white", "red");
 			int *Costs = AllUpgrades[button->Value]->Costs;
 			popupWidth = GetPopupCostsWidth(font, Costs);
 			popupWidth = std::max<int>(popupWidth, font->Width(button->Hint) + 10);
-	
+
 			popupHeight	= 40;
-	
+
 			start_x = std::min<int>(uibutton->X, Video.Width - 1 - popupWidth);
-			
+
 			y = uibutton->Y - popupHeight - 10;
 			x = start_x;
 
@@ -524,9 +524,9 @@ static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 			// FIXME: hardcoded image!!!
 			const int IconID = GoldCost;
 			//SetCosts(SpellTypeTable[button->Value]->ManaCost, 0, NULL);
-			const CGraphic *G = UI.Resources[IconID].G; 
+			const CGraphic *G = UI.Resources[IconID].G;
 			const SpellType *spell = SpellTypeTable[button->Value];
-			
+
 			if(spell->ManaCost) {
 				popupHeight = 40;
 				popupWidth = 10;
@@ -546,7 +546,7 @@ static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 			}
 
 			popupWidth = std::max<int>(popupWidth, 100);
-			
+
 			x = std::min<int>(uibutton->X, Video.Width - 1 - popupWidth);
 			y = uibutton->Y - popupHeight - 10;
 
@@ -559,7 +559,7 @@ static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 				int y_offset = 0;
 				// Name
 				label.Draw(x + 5, y + 5, spell->Name);
-				Video.DrawHLine(ColorWhite, x, y + 15, popupWidth - 1);			
+				Video.DrawHLine(ColorWhite, x, y + 15, popupWidth - 1);
 				y += 20;
 				if (G) {
 					int x_offset =  UI.Resources[IconID].IconWidth;
@@ -578,12 +578,12 @@ static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 					 button->Hint);
 			}
 		}
-		break;	
-	
-		case ButtonBuild: 	
+		break;
+
+		case ButtonBuild:
 		case ButtonTrain:
 		case ButtonUpgradeTo:
-			DrawPopupUnitInfo(UnitTypes[button->Value], 
+			DrawPopupUnitInfo(UnitTypes[button->Value],
 				ThisPlayer->Index, font, backgroundColor,
 				uibutton->X, uibutton->Y);
 		break;
@@ -600,10 +600,10 @@ static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 			Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
 
 			// Hint
-			CLabel(font, "white", "red").Draw(x + 5, 
+			CLabel(font, "white", "red").Draw(x + 5,
 				y + (popupHeight - font_height)/2, button->Hint);
 		break;
-	
+
 	}
 
 }
@@ -1019,9 +1019,9 @@ void CButtonPanel::DoClicked(int button)
 			//  That or a bunker.
 			//
 			if ((NumSelected == 1 && Selected[0]->CurrentAction() == UnitActionStill &&
-					Map.CoastOnMap(Selected[0]->X, Selected[0]->Y)) || !Selected[0]->CanMove()) {
+					Map.CoastOnMap(Selected[0]->tilePos.x, Selected[0]->tilePos.y)) || !Selected[0]->CanMove()) {
 				SendCommandUnload(Selected[0],
-					Selected[0]->X, Selected[0]->Y, NoUnitP,
+					Selected[0]->tilePos.x, Selected[0]->tilePos.y, NoUnitP,
 					!(KeyModifiers & ModifierShift));
 				break;
 			}
@@ -1035,7 +1035,7 @@ void CButtonPanel::DoClicked(int button)
 			break;
 		case ButtonSpellCast:
 		{
-			int spellId = CurrentButtons[button].Value;		
+			int spellId = CurrentButtons[button].Value;
 			if (KeyModifiers & ModifierControl) {
 				int autocast = 0;
 
@@ -1067,8 +1067,8 @@ void CButtonPanel::DoClicked(int button)
 				for (i = 0; i < NumSelected; ++i) {
 					unit = Selected[i];
 					// CursorValue here holds the spell type id
-					SendCommandSpellCast(unit, unit->X, unit->Y, unit, spellId, 
-										!(KeyModifiers & ModifierShift));					
+					SendCommandSpellCast(unit, unit->tilePos.x, unit->tilePos.y, unit, spellId,
+										!(KeyModifiers & ModifierShift));
 				}
 				break;
 			}
@@ -1193,8 +1193,8 @@ void CButtonPanel::DoClicked(int button)
 			// FIXME: this can be correct written, with a little more code.
 			if (Selected[0]->CurrentAction() == UnitActionTrain &&
 					!EnableTrainingQueue) {
-				Selected[0]->Player->Notify(NotifyYellow, Selected[0]->X,
-					Selected[0]->Y, _("Unit training queue is full"));
+				Selected[0]->Player->Notify(NotifyYellow, Selected[0]->tilePos.x,
+					Selected[0]->tilePos.y, _("Unit training queue is full"));
 			} else if (Selected[0]->Player->CheckLimits(type) >= 0 &&
 					!Selected[0]->Player->CheckUnitType(type)) {
 				//PlayerSubUnitType(player,type);

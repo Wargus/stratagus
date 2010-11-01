@@ -134,15 +134,15 @@ static const char HASTE_KEY[] = "Haste";
 static const char SLOW_KEY[] = "Slow";
 static const char INVISIBLE_KEY[] = "Invisible";
 static const char UNHOLYARMOR_KEY[] = "UnholyArmor";
-static const char SLOT_KEY[] = "Slot";	
+static const char SLOT_KEY[] = "Slot";
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-		
+
 CUnitTypeVar::CBoolKeys::CBoolKeys() {
 
-	const char *const tmp[] = {COWARD_KEY,BUILDING_KEY,FLIP_KEY,REVEALER_KEY, 
+	const char *const tmp[] = {COWARD_KEY,BUILDING_KEY,FLIP_KEY,REVEALER_KEY,
 		LANDUNIT_KEY,AIRUNIT_KEY,SEAUNIT_KEY,EXPLODEWHENKILLED_KEY,
 		VISIBLEUNDERFOG_KEY, PERMANENTCLOACK_KEY,DETECTCLOAK_KEY,
 		ATTACKFROMTRANSPORTER_KEY,VANISHES_KEY,GROUNDATTACK_KEY,
@@ -160,7 +160,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys() {
 
 CUnitTypeVar::CVariableKeys::CVariableKeys() {
 
-	const char *const tmp[] = {HITPOINTS_KEY,BUILD_KEY,MANA_KEY,TRANSPORT_KEY, 
+	const char *const tmp[] = {HITPOINTS_KEY,BUILD_KEY,MANA_KEY,TRANSPORT_KEY,
 		RESEARCH_KEY,TRAINING_KEY,UPGRADETO_KEY,GIVERESOURCE_KEY,
 		CARRYRESOURCE_KEY, XP_KEY,KILL_KEY,	SUPPLY_KEY,DEMAND_KEY,ARMOR_KEY,
 		SIGHTRANGE_KEY, ATTACKRANGE_KEY,PIERCINGDAMAGE_KEY,
@@ -214,7 +214,7 @@ void FreeAnimations(void)
 */
 unsigned CclGetResourceByName(lua_State *l)
 {
-	const char *const tmp = LuaToString(l, -1);	
+	const char *const tmp = LuaToString(l, -1);
 	const std::string value = tmp ? tmp : "";
 
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
@@ -912,7 +912,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			if (type->BoolFlag.size() < UnitTypeVar.GetNumberBoolFlag()) {
 				type->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
-			}			
+			}
 			subargs = lua_objlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
@@ -1605,7 +1605,7 @@ static int CclDefineVariables(lua_State *l)
 
 		index = UnitTypeVar.VariableNameLookup.AddKey(str);
 		if(index == old) {
-			old++;		
+			old++;
 			UnitTypeVar.Variable.resize(old);
 		} else {
 			DebugPrint("Warning, User Variable \"%s\" redefined\n" _C_ str);
@@ -1634,7 +1634,7 @@ static int CclDefineBoolFlags(lua_State *l)
 	args = lua_gettop(l);
 	for (int j = 0; j < args; ++j) {
 		str = LuaToString(l, j + 1);
-		//int index = 
+		//int index =
 		UnitTypeVar.BoolFlagNameLookup.AddKey(str);
 
 	}
@@ -1888,7 +1888,7 @@ void UpdateUnitVariables(const CUnit *unit)
 		default:
 		break;
 	}
-	
+
 	// Resources.
 	if (unit->Type->GivesResource) {
 		unit->Variable[GIVERESOURCE_INDEX].Value = unit->ResourcesHeld;
@@ -1921,9 +1921,9 @@ void UpdateUnitVariables(const CUnit *unit)
 	unit->Variable[ATTACKRANGE_INDEX].Max = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
 
 	// Position
-	unit->Variable[POSX_INDEX].Value = unit->X;
+	unit->Variable[POSX_INDEX].Value = unit->tilePos.x;
 	unit->Variable[POSX_INDEX].Max = Map.Info.MapWidth;
-	unit->Variable[POSY_INDEX].Value = unit->Y;
+	unit->Variable[POSY_INDEX].Value = unit->tilePos.y;
 	unit->Variable[POSY_INDEX].Max = Map.Info.MapHeight;
 
 	// RadarRange

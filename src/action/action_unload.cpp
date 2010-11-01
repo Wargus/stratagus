@@ -147,15 +147,14 @@ static int FindUnloadPosition(int x, int y, int *resx, int *resy, int mask)
 */
 int UnloadUnit(CUnit *unit)
 {
-	int x;
-	int y;
+	Vec2i pos;
 
 	Assert(unit->Removed);
-	if (!FindUnloadPosition(unit->X, unit->Y, &x, &y, unit->Type->MovementMask)) {
+	if (!FindUnloadPosition(unit->tilePos.x, unit->tilePos.y, &pos.x, &pos.y, unit->Type->MovementMask)) {
 		return 0;
 	}
 	unit->Boarded = 0;
-	unit->Place(x, y);
+	unit->Place(pos.x, pos.y);
 	return 1;
 }
 
@@ -335,8 +334,7 @@ static void LeaveTransporter(CUnit *unit)
 			return;
 		}
 		unit->CurrentOrder()->ClearGoal();
-		goal->X = unit->X;
-		goal->Y = unit->Y;
+		goal->tilePos = unit->tilePos;
 		// Try to unload the unit. If it doesn't work there is no problem.
 		if (UnloadUnit(goal)) {
 			unit->BoardCount--;
@@ -346,8 +344,7 @@ static void LeaveTransporter(CUnit *unit)
 		goal = unit->UnitInside;
 		for (i = unit->InsideCount; i; --i, goal = goal->NextContained) {
 			if (goal->Boarded) {
-				goal->X = unit->X;
-				goal->Y = unit->Y;
+				goal->tilePos = unit->tilePos;
 				if (!UnloadUnit(goal)) {
 					++stillonboard;
 				} else {
@@ -366,8 +363,7 @@ static void LeaveTransporter(CUnit *unit)
 		// so it will search for a piece of free coast nearby.
 		unit->CurrentOrder()->Action = UnitActionUnload;
 		unit->CurrentOrder()->ClearGoal();
-		unit->CurrentOrder()->X = unit->X;
-		unit->CurrentOrder()->Y = unit->Y;
+		unit->CurrentOrder()->goalPos = unit->tilePos;
 		unit->SubAction = 0;
 	} else {
 		unit->ClearAction();
@@ -382,8 +378,7 @@ static void LeaveTransporter(CUnit *unit)
 void HandleActionUnload(CUnit *unit)
 {
 	int i;
-	int x;
-	int y;
+	Vec2i pos;
 
 	if (!unit->CanMove()) {
 		unit->SubAction = 2;
@@ -395,13 +390,12 @@ void HandleActionUnload(CUnit *unit)
 		case 0:
 			if (!unit->CurrentOrder()->HasGoal()) {
 				if (!ClosestFreeDropZone(unit,
-					unit->CurrentOrder()->X, unit->CurrentOrder()->Y, &x, &y)) {
+					unit->CurrentOrder()->goalPos.x, unit->CurrentOrder()->goalPos.y, &pos.x, &pos.y)) {
 					// Sorry... I give up.
 					unit->ClearAction();
 					return;
 				}
-				unit->CurrentOrder()->X = x;
-				unit->CurrentOrder()->Y = y;
+				unit->CurrentOrder()->goalPos = pos;
 			}
 
 			NewResetPath(unit);

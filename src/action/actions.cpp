@@ -174,7 +174,7 @@ int UnitShowAnimationScaled(CUnit *unit, const CAnimation *anim, int scale)
 					} else {
 						COrderPtr order = unit->CurrentOrder();
 						unit->ReCast = SpellCast(unit, order->Arg1.Spell,
-											goal, order->X, order->Y);
+											goal, order->goalPos.x, order->goalPos.y);
 					}
 				} else {
 					FireMissile(unit);
@@ -438,9 +438,9 @@ static void HandleBuffs(CUnit *unit, int amount)
 	// User defined variables
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
 		if (unit->Variable[i].Enable && unit->Variable[i].Increase) {
-			if (i == INVISIBLE_INDEX && 
+			if (i == INVISIBLE_INDEX &&
 				unit->Variable[INVISIBLE_INDEX].Value > 0 &&
-				unit->Variable[INVISIBLE_INDEX].Value + 
+				unit->Variable[INVISIBLE_INDEX].Value +
 				unit->Variable[INVISIBLE_INDEX].Increase <= 0)
 			{
 				UnHideUnit(unit);
@@ -510,7 +510,7 @@ static void HandleUnitAction(CUnit *unit)
 			}
 #ifdef DEBUG
 			 else {
-				if (unit->CurrentResource && 
+				if (unit->CurrentResource &&
 					!unit->Type->ResInfo[unit->CurrentResource]->TerrainHarvester) {
 					Assert(order->Action != UnitActionResource);
 				}
@@ -527,7 +527,7 @@ static void HandleUnitAction(CUnit *unit)
 				unit->Orders[z] = unit->Orders[z + 1];
 			}
 			unit->Orders.pop_back();
-			
+
 			//
 			// Note subaction 0 should reset.
 			//
@@ -614,8 +614,8 @@ void UnitActions(void)
 				table[i--] = table[--tabsize];
 				continue;
 			}
-			
-			// 1) Blink flag.			
+
+			// 1) Blink flag.
 			//if (blinkthiscycle && table[i]->Blink)
 			if (table[i]->Blink)
 			{
@@ -624,14 +624,14 @@ void UnitActions(void)
 			// 2) Buffs...
 			//if (buffsthiscycle)
 			{
-				HandleBuffs(table[i], CYCLES_PER_SECOND);			
+				HandleBuffs(table[i], CYCLES_PER_SECOND);
 			}
 			// 3) Increase health mana, burn and stuff
 			//if (regenthiscycle)
 			{
-				HandleRegenerations(table[i]);			
+				HandleRegenerations(table[i]);
 			}
-		}			
+		}
 	}
 #endif
 

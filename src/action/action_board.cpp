@@ -61,21 +61,17 @@
 */
 static int MoveToTransporter(CUnit *unit)
 {
-	int i;
-	int x;
-	int y;
+	const Vec2i oldPos = unit->tilePos;
+	const int res = DoActionMove(unit);
 
-	x = unit->X;
-	y = unit->Y;
-	i = DoActionMove(unit);
 	// We have to reset a lot, or else they will circle each other and stuff.
-	if (x != unit->X || y != unit->Y) {
+	if (oldPos != unit->tilePos) {
 		unit->CurrentOrder()->Range = 1;
 		NewResetPath(unit);
 	}
 	// New code has this as default.
 	Assert(unit->CurrentAction() == UnitActionBoard);
-	return i;
+	return res;
 }
 
 /**

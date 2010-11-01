@@ -194,7 +194,7 @@ void DrawMapArea(void)
 					vp->Unit->CurrentAction() == UnitActionDie) {
 				vp->Unit = NoUnitP;
 			} else {
-				vp->Center(vp->Unit->X, vp->Unit->Y,
+				vp->Center(vp->Unit->tilePos.x, vp->Unit->tilePos.y,
 					vp->Unit->IX + TileSizeX / 2, vp->Unit->IY + TileSizeY / 2);
 			}
 		}

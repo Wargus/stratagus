@@ -137,7 +137,7 @@ bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit
 		case GreaterThanEqual :
 			for (i = 0; i < n; ++i) {
 				if (this->RestrictType == table[i]->Type &&
-					MapDistanceBetweenTypes(type, x, y, table[i]->Type, table[i]->X, table[i]->Y) <= distance) {
+					MapDistanceBetweenTypes(type, x, y, table[i]->Type, table[i]->tilePos.x, table[i]->tilePos.y) <= distance) {
 					return false;
 				}
 			}
@@ -146,7 +146,7 @@ bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit
 		case LessThanEqual :
 			for (i = 0; i < n; ++i) {
 				if (this->RestrictType == table[i]->Type &&
-					MapDistanceBetweenTypes(type, x, y, table[i]->Type, table[i]->X, table[i]->Y) <= distance) {
+					MapDistanceBetweenTypes(type, x, y, table[i]->Type, table[i]->tilePos.x, table[i]->tilePos.y) <= distance) {
 					return true;
 				}
 			}
@@ -154,7 +154,7 @@ bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit
 		case Equal :
 			for (i = 0; i < n; ++i) {
 				if (this->RestrictType == table[i]->Type &&
-					MapDistanceBetweenTypes(type, x, y, table[i]->Type, table[i]->X, table[i]->Y) == distance) {
+					MapDistanceBetweenTypes(type, x, y, table[i]->Type, table[i]->tilePos.x, table[i]->tilePos.y) == distance) {
 					return true;
 				}
 			}
@@ -162,7 +162,7 @@ bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit
 		case NotEqual :
 			for (i = 0; i < n; ++i) {
 				if (this->RestrictType == table[i]->Type &&
-					MapDistanceBetweenTypes(type, x, y, table[i]->Type, table[i]->X, table[i]->Y) == distance) {
+					MapDistanceBetweenTypes(type, x, y, table[i]->Type, table[i]->tilePos.x, table[i]->tilePos.y) == distance) {
 					return false;
 				}
 			}
@@ -173,8 +173,7 @@ bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit
 
 inline bool CBuildRestrictionAddOn::functor::operator() (const CUnit *const unit) const
 {
-	return (unit->Type == Parent &&
-				unit->X == x && unit->Y == y);
+	return (unit->Type == Parent && unit->tilePos.x == x && unit->tilePos.y == y);
 }
 
 /**
@@ -201,7 +200,7 @@ bool CBuildRestrictionAddOn::Check(const CUnitType *, int x, int y, CUnit *&) co
 */
 inline bool CBuildRestrictionOnTop::functor::operator() (CUnit *const unit)
 {
-	if (unit->X == x && unit->Y == y &&
+	if (unit->tilePos.x == x && unit->tilePos.y == y &&
 		!unit->Destroyed &&	unit->Orders[0]->Action != UnitActionDie) {
 		if (unit->Type == this->Parent &&
 				unit->Orders[0]->Action != UnitActionBuilt) {
@@ -225,7 +224,7 @@ bool CBuildRestrictionOnTop::Check(const CUnitType *, int x, int y, CUnit *&onto
 	ontoptarget = NULL;
 	n = Map.Select(x, y, table, UnitMax);
 	for (i = 0; i < n; ++i) {
-		if (table[i]->X == x && table[i]->Y == y && !table[i]->Destroyed &&
+		if (table[i]->tilePos.x == x && table[i]->tilePos.y == y && !table[i]->Destroyed &&
 				table[i]->CurrentAction() != UnitActionDie) {
 			if (table[i]->Type == this->Parent &&
 					table[i]->CurrentAction() != UnitActionBuilt) {

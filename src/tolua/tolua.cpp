@@ -15685,7 +15685,7 @@ static int tolua_get_CUnit_X(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'X'",NULL);
 #endif
-  tolua_pushnumber(tolua_S,(lua_Number)self->X);
+  tolua_pushnumber(tolua_S,(lua_Number)self->tilePos.x);
  return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -15701,7 +15701,7 @@ static int tolua_set_CUnit_X(lua_State* tolua_S)
   if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
    tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->X = ((int)  tolua_tonumber(tolua_S,2,0))
+  self->tilePos.x = ((int)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
@@ -15715,7 +15715,7 @@ static int tolua_get_CUnit_Y(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Y'",NULL);
 #endif
-  tolua_pushnumber(tolua_S,(lua_Number)self->Y);
+  tolua_pushnumber(tolua_S,(lua_Number)self->tilePos.y);
  return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -15731,7 +15731,7 @@ static int tolua_set_CUnit_Y(lua_State* tolua_S)
   if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
    tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->Y = ((int)  tolua_tonumber(tolua_S,2,0))
+  self->tilePos.y = ((int)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }

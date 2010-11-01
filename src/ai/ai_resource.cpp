@@ -245,7 +245,7 @@ int AiEnemyUnitsInDistance(const CPlayer *player,
 int AiEnemyUnitsInDistance(const CUnit *unit, unsigned range)
 {
 	return AiEnemyUnitsInDistance(unit->Player,
-						unit->Type, unit->X, unit->Y, range);
+						unit->Type, unit->tilePos.x, unit->tilePos.y, range);
 }
 
 /**
@@ -402,8 +402,8 @@ void AiNewDepotRequest(CUnit *worker) {
 	} else {
 		CUnit *mine = worker->CurrentOrder()->Arg1.Resource.Mine;
 		if(mine) {
-			PosX = mine->X;
-			PosY = mine->Y;
+			PosX = mine->tilePos.x;
+			PosY = mine->tilePos.y;
 		}
 	}
 
@@ -1058,19 +1058,19 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 		// Code for terrain harvesters. Search for piece of terrain to mine.
 		//
 		if (FindTerrainType(unit->Type->MovementMask, MapFieldForest, 0, 1000,
-				unit->Player, unit->X, unit->Y, &forestx, &foresty)) {
+				unit->Player, unit->tilePos.x, unit->tilePos.y, &forestx, &foresty)) {
 			CommandResourceLoc(unit, forestx, foresty, FlushCommands);
 			return 1;
 		}
 		// Ask the AI to explore...
-		AiExplore(unit->X, unit->Y, MapFieldLandUnit);
+		AiExplore(unit->tilePos.x, unit->tilePos.y, MapFieldLandUnit);
 	} else {
 		int exploremask = 0;
 		//
 		// Find a resource to harvest from.
 		//
 		CUnit *dest = UnitFindResource(unit,
-				unit->X, unit->Y, 1000, resource, true);
+				unit->tilePos.x, unit->tilePos.y, 1000, resource, true);
 
 		if (dest) {
 			//FIXME: rb - when workers can speedup building then such assign may be ok.
@@ -1143,7 +1143,7 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 			}
 		}
 		// Ask the AI to explore
-		AiExplore(unit->X, unit->Y, exploremask);
+		AiExplore(unit->tilePos.x, unit->tilePos.y, exploremask);
 	}
 
 	// Failed.
@@ -1456,10 +1456,10 @@ static int AiRepairBuilding(const CUnitType *type, CUnit *building)
 	for (i = 0; i < num; ++i) {
 		unit = table[i];
 		// FIXME: Probably calculated from top left corner of building
-		if ((rX = unit->X - building->X) < 0) {
+		if ((rX = unit->tilePos.x - building->tilePos.x) < 0) {
 			rX = -rX;
 		}
-		if ((rY = unit->Y - building->Y) < 0) {
+		if ((rY = unit->tilePos.y - building->tilePos.y) < 0) {
 			rY = -rY;
 		}
 		if (rX < rY) {

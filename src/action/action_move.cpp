@@ -70,8 +70,7 @@
 */
 int DoActionMove(CUnit *unit)
 {
-	int xd;     // X movement in tile.
-	int yd;     // Y movement in tile.
+	Vec2i posd; // movement in tile.
 	int d;
 	int x;      // Unit->X
 	int y;      // Unit->Y
@@ -88,7 +87,7 @@ int DoActionMove(CUnit *unit)
 
 		MapUnmarkUnitGuard(unit);
 		UnmarkUnitFieldFlags(unit);
-		d = NextPathElement(unit, &xd, &yd);
+		d = NextPathElement(unit, &posd.x, &posd.y);
 		MarkUnitFieldFlags(unit);
 		switch (d) {
 			case PF_UNREACHABLE: // Can't reach, stop
@@ -113,21 +112,21 @@ int DoActionMove(CUnit *unit)
 				unit->Moving = 1;
 				break;
 		}
-		x = unit->X;
-		y = unit->Y;
+		x = unit->tilePos.x;
+		y = unit->tilePos.y;
 		off = unit->Offset;
 		//
 		// Transporter (un)docking?
 		//
 		// FIXME: This is an ugly hack
 		if (unit->Type->CanTransport() &&
-				((Map.WaterOnMap(off) && Map.CoastOnMap(x + xd, y + yd)) ||
-				(Map.CoastOnMap(off) && Map.WaterOnMap(x + xd, y + yd)))) {
+				((Map.WaterOnMap(off) && Map.CoastOnMap(x + posd.x, y + posd.y)) ||
+				(Map.CoastOnMap(off) && Map.WaterOnMap(x + posd.x, y + posd.y)))) {
 			PlayUnitSound(unit, VoiceDocking);
 		}
 
-		x = unit->X + xd;
-		y = unit->Y + yd;
+		x = unit->tilePos.x + posd.x;
+		y = unit->tilePos.y + posd.y;
 		unit->MoveToXY(x, y);
 
 		// Remove unit from the current selection
@@ -141,13 +140,13 @@ int DoActionMove(CUnit *unit)
 			}
 		}
 
-		unit->IX = -xd * TileSizeX;
-		unit->IY = -yd * TileSizeY;
+		unit->IX = -posd.x * TileSizeX;
+		unit->IY = -posd.y * TileSizeY;
 		unit->Frame = unit->Type->StillFrame;
-		UnitHeadingFromDeltaXY(unit, xd, yd);
+		UnitHeadingFromDeltaXY(unit, posd);
 	} else {
-		xd = Heading2X[unit->Direction / NextDirection];
-		yd = Heading2Y[unit->Direction / NextDirection];
+		posd.x = Heading2X[unit->Direction / NextDirection];
+		posd.y = Heading2Y[unit->Direction / NextDirection];
 		d = unit->Data.Move.Length + 1;
 	}
 
@@ -155,9 +154,8 @@ int DoActionMove(CUnit *unit)
 	move = UnitShowAnimationScaled(unit, unit->Type->Animations->Move,
 			Map.Field(unit->Offset)->Cost);
 
-
-	unit->IX += xd * move;
-	unit->IY += yd * move;
+	unit->IX += posd.x * move;
+	unit->IY += posd.y * move;
 
 	// Finished move animation, set Moving to 0 so we recalculate the path
 	// next frame
@@ -165,7 +163,6 @@ int DoActionMove(CUnit *unit)
 	if (!unit->Anim.Unbreakable && !unit->IX && !unit->IY) {
 		unit->Moving = 0;
 	}
-
 	return d;
 }
 
@@ -226,8 +223,7 @@ void HandleActionMove(CUnit *unit)
 	goal = unit->CurrentOrder()->GetGoal();
 	if (goal && goal->Destroyed) {
 		DebugPrint("Goal dead\n");
-		unit->CurrentOrder()->X = goal->X + goal->Type->TileWidth / 2;
-		unit->CurrentOrder()->Y = goal->Y + goal->Type->TileHeight / 2;
+		unit->CurrentOrder()->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
 		unit->CurrentOrder()->ClearGoal();
 		NewResetPath(unit);
 	}

@@ -444,7 +444,7 @@ static void HandleMouseOn(int x, int y)
 	int i;
 	bool on_ui;
 	size_t size;
-	
+
 	MouseScrollState = ScrollNone;
 	ButtonAreaUnderCursor = -1;
 	ButtonUnderCursor = -1;
@@ -500,7 +500,7 @@ static void HandleMouseOn(int x, int y)
 		}
 	}
 	if (NumSelected > 0) {
-	
+
 		if (NumSelected == 1 && Selected[0]->Type->CanTransport() &&
 				Selected[0]->BoardCount) {
 			size = UI.TransportingButtons.size();
@@ -835,7 +835,7 @@ void UIHandleMouseMove(int x, int y)
 		if (CursorOn == CursorOnMap || CursorOn == CursorOnMinimap) {
 			GameCursor = UI.YellowHair.Cursor;
 			if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->Decoration) {
-				if (UnitUnderCursor->Player == ThisPlayer || 
+				if (UnitUnderCursor->Player == ThisPlayer ||
 						ThisPlayer->IsAllied(UnitUnderCursor)) {
 					GameCursor = UI.GreenHair.Cursor;
 				} else if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
@@ -1392,7 +1392,7 @@ static void UISelectStateButtonDown(unsigned)
 */
 void UIHandleButtonDown(unsigned button)
 {
-	
+
 /**
  * Detect long left selection click
  **/
@@ -1409,14 +1409,14 @@ void UIHandleButtonDown(unsigned button)
 	if (LongLeftButton)
 		return;
 #endif
-		
+
 	static bool OldShowSightRange;
 	static bool OldShowReactionRange;
 	static bool OldShowAttackRange;
 	static bool OldValid = false;
 	CUnit *uins;
 	int i;
-	
+
 	if (LongLeftButton) {
 		if (!OldValid) {
 			OldShowSightRange = Preference.ShowSightRange;
@@ -1627,8 +1627,8 @@ void UIHandleButtonDown(unsigned button)
 				//
 				if (ButtonUnderCursor == 0 && NumSelected == 1) {
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-					UI.SelectedViewport->Center(Selected[0]->X,
-						Selected[0]->Y, Selected[0]->IX + TileSizeX / 2,
+					UI.SelectedViewport->Center(Selected[0]->tilePos.x,
+						Selected[0]->tilePos.y, Selected[0]->IX + TileSizeX / 2,
 						Selected[0]->IY + TileSizeY / 2);
 				}
 			//
@@ -1689,7 +1689,7 @@ void UIHandleButtonDown(unsigned button)
 						}
 						Assert(uins->Boarded);
 						SendCommandUnload(Selected[0],
-							Selected[0]->X, Selected[0]->Y, uins,
+							Selected[0]->tilePos.x, Selected[0]->tilePos.y, uins,
 							!(KeyModifiers & ModifierShift));
 					}
 				}
@@ -1979,7 +1979,7 @@ void DrawPieMenu(void)
 		return;
 	}
 	ButtonActionProxy buttons(CurrentButtons);
-	
+
 	CLabel label(GameFont);
 	vp = UI.SelectedViewport;
 	PushClipping();

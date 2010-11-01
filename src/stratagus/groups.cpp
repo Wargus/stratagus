@@ -58,7 +58,7 @@
 struct CUnitGroup {
 	CUnit **Units;                       /// Units in the group
 	int NumUnits;                        /// How many units in the group
-	int tainted;						/// Group hold unit which can't be SelectableByRectangle 
+	int tainted;						/// Group hold unit which can't be SelectableByRectangle
 };                                       /// group of units
 
 static CUnitGroup Groups[NUM_GROUPS];    /// Number of groups predefined
@@ -136,7 +136,7 @@ int GetNumberUnitsOfGroup(int num, GroupSelectionMode mode)
 				count++;
 			}
 		}
-		return count;		
+		return count;
 	}
 	return Groups[num].NumUnits;
 }
@@ -191,7 +191,7 @@ void AddToGroup(CUnit **units, int nunits, int num)
 		// Add to group only if they are on our team
 		// Buildings can be in group but it "taint" the group.
 		// Taited groups normaly select only SelectableByRectangle units but
-		// you can force selection to show hiden members (with buildings) by 
+		// you can force selection to show hiden members (with buildings) by
 		// seletcing ALT-(SHIFT)-#
 		if (ThisPlayer->IsTeamed(units[i])) {
 			if (!group->tainted) {
@@ -299,26 +299,26 @@ void GroupHelpMe(CUnit *attacker, CUnit *defender)
 
 				for (int i = 0; i < group->NumUnits; ++i) {
 					gunit = group->Units[i];
-					
+
 					if (defender == gunit) {
 						continue;
 					}
-					
+
 					// if brother is idle or attack no-agressive target and
 					// can attack our attacker then ask for help
-					if (gunit->IsAgressive() && (gunit->IsIdle() || 
-						!(gunit->CurrentAction() == UnitActionAttack && 
+					if (gunit->IsAgressive() && (gunit->IsIdle() ||
+						!(gunit->CurrentAction() == UnitActionAttack &&
 					 	gunit->CurrentOrder()->HasGoal() &&
 					 	gunit->CurrentOrder()->GetGoal()->IsAgressive()))
 					 	&& CanTarget(gunit->Type, attacker->Type)) {
-					 	
+
 						if (gunit->SavedOrder.Action == UnitActionStill) {
 							// FIXME: should rewrite command handling
-							CommandAttack(gunit, gunit->X, gunit->Y, NoUnitP,
+							CommandAttack(gunit, gunit->tilePos.x, gunit->tilePos.y, NoUnitP,
 								FlushCommands);
 							gunit->SavedOrder = *gunit->Orders[1];
 						}
-						CommandAttack(gunit, attacker->X, attacker->Y,
+						CommandAttack(gunit, attacker->tilePos.x, attacker->tilePos.y,
 							attacker, FlushCommands);
 					}
 				}

@@ -319,12 +319,12 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation *location,
 	CUnit *caster, CUnit *target, int x, int y, int *resx, int *resy)
 {
 	if (location->Base == LocBaseCaster) {
-		*resx = caster->X * TileSizeX + TileSizeX / 2;
-		*resy = caster->Y * TileSizeY + TileSizeY / 2;
+		*resx = caster->tilePos.x * TileSizeX + TileSizeX / 2;
+		*resy = caster->tilePos.y * TileSizeY + TileSizeY / 2;
 	} else {
 		if (target) {
-			*resx = target->X * TileSizeX + TileSizeX / 2;
-			*resy = target->Y * TileSizeY + TileSizeY / 2;
+			*resx = target->tilePos.x * TileSizeX + TileSizeX / 2;
+			*resy = target->tilePos.y * TileSizeY + TileSizeY / 2;
 		} else {
 			*resx = x * TileSizeX + TileSizeX / 2;
 			*resy = y * TileSizeY + TileSizeY / 2;
@@ -505,7 +505,7 @@ int AdjustVitals::Cast(CUnit *caster, const SpellType *spell,
 			target->Variable[HP_INDEX].Value += castcount * hp;
 			if (target->Variable[HP_INDEX].Value < 0) {
 				target->Variable[HP_INDEX].Value = 0;
-			}			
+			}
 		}
 	} else {
 		target->Variable[HP_INDEX].Value += castcount * hp;
@@ -574,7 +574,7 @@ int Polymorph::Cast(CUnit *caster, const SpellType *spell,
 	for (i = 0; i < type->TileWidth; ++i) {
 		for (j = 0; j < type->TileHeight; ++j) {
 			if (!UnitTypeCanBeAt(type, x + i, y + j)) {
-				target->Place(target->X, target->Y);
+				target->Place(target->tilePos.x, target->tilePos.y);
 				return 0;
 			}
 		}
@@ -672,7 +672,7 @@ int Summon::Cast(CUnit *caster, const SpellType *spell,
 	int ttl = this->TTL;
 
 	if (this->RequireCorpse) {
-		CUnit *unit;	
+		CUnit *unit;
 		CUnit *table[UnitMax];
 		int n = Map.Select(x - 1, y - 1, x + 2, y + 2, table);
 		cansummon = 0;
@@ -683,8 +683,8 @@ int Summon::Cast(CUnit *caster, const SpellType *spell,
 				//
 				//  Found a corpse. eliminate it and proceed to summoning.
 				//
-				x = unit->X;
-				y = unit->Y;
+				x = unit->tilePos.x;
+				y = unit->tilePos.y;
 				unit->Remove(NULL);
 				unit->Release();
 				cansummon = 1;
@@ -705,8 +705,8 @@ int Summon::Cast(CUnit *caster, const SpellType *spell,
 		target = MakeUnit(unittype, caster->Player);
 		if (target != NoUnitP) {
 			// This is a hack to walk around behaviour of DropOutOnSide
-			target->X = x + 1;
-			target->Y = y;
+			target->tilePos.x = x + 1;
+			target->tilePos.y = y;
 			DropOutOnSide(target, LookingW, 0, 0); // FIXME : 0,0) : good parameter ?
 			//
 			//  set life span. ttl=0 results in a permanent unit.
@@ -881,16 +881,16 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit *caster, const SpellType *spell
 		autocast = spell->AutoCast;
 	}
 	Assert(autocast);
-	x = caster->X;
-	y = caster->Y;
+	x = caster->tilePos.x;
+	y = caster->tilePos.y;
 	range = spell->AutoCast->Range;
 
 	//
 	// Select all units aroung the caster
 	//
-	nunits = Map.Select(caster->X - range, caster->Y - range,
-		caster->X + range + caster->Type->TileWidth,
-		caster->Y + range + caster->Type->TileHeight, table);
+	nunits = Map.Select(caster->tilePos.x - range, caster->tilePos.y - range,
+		caster->tilePos.x + range + caster->Type->TileWidth,
+		caster->tilePos.y + range + caster->Type->TileHeight, table);
 	//
 	//  Check every unit if it is hostile
 	//
@@ -1093,15 +1093,15 @@ int SpellCast(CUnit *caster, const SpellType *spell, CUnit *target,
 
 	caster->Variable[INVISIBLE_INDEX].Value = 0;// unit is invisible until attacks // FIXME: Must be configurable
 	if (target) {
-		x = target->X;
-		y = target->Y;
+		x = target->tilePos.x;
+		y = target->tilePos.y;
 	}
 	//
 	// For TargetSelf, you target.... YOURSELF
 	//
 	if (spell->Target == TargetSelf) {
-		x = caster->X;
-		y = caster->Y;
+		x = caster->tilePos.x;
+		y = caster->tilePos.y;
 		target = caster;
 	}
 	DebugPrint("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->Ident.c_str() _C_

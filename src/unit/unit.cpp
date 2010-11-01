@@ -136,7 +136,7 @@ void CUnit::COrder::Release(void) {
 CUnit::COrder::COrder(const CUnit::COrder &ths): Goal(ths.Goal), Range(ths.Range),
 	 MinRange(ths.MinRange), Width(ths.Width), Height(ths.Height),
 	 Action(ths.Action), CurrentResource(ths.CurrentResource),
-	 X(ths.X), Y(ths.Y)
+	 goalPos(ths.goalPos)
  {
 	if (Goal) {
 		Goal->RefsIncrease();
@@ -167,12 +167,11 @@ CUnit::COrder& CUnit::COrder::operator=(const CUnit::COrder &rhs) {
 		Height = rhs.Height;
 		CurrentResource = rhs.CurrentResource;
 		SetGoal(rhs.Goal);
-		X = rhs.X;
-		Y = rhs.Y;
+		goalPos = rhs.goalPos;
 		memcpy(&Arg1, &rhs.Arg1, sizeof(Arg1));
 
 		//FIXME: Hardcoded wood
-		if(Action == UnitActionResource &&
+		if (Action == UnitActionResource &&
 			 CurrentResource != WoodCost && Arg1.Resource.Mine) {
 			 Arg1.Resource.Mine->RefsIncrease();
 		}
@@ -313,16 +312,16 @@ void CUnit::Init(CUnitType *type)
 
 	OrderCount = 1; // No orders
 	CurrentOrder()->Action = UnitActionStill;
-	CurrentOrder()->X = CurrentOrder()->Y = -1;
+	CurrentOrder()->goalPos.x = CurrentOrder()->goalPos.y = -1;
 	Assert(!CurrentOrder()->HasGoal());
 	NewOrder.Action = UnitActionStill;
-	NewOrder.X = NewOrder.Y = -1;
+	NewOrder.goalPos.x = NewOrder.goalPos.y = -1;
 	Assert(!NewOrder.HasGoal());
 	SavedOrder.Action = UnitActionStill;
-	SavedOrder.X = SavedOrder.Y = -1;
+	SavedOrder.goalPos.x = SavedOrder.goalPos.y = -1;
 	Assert(!SavedOrder.HasGoal());
 	CriticalOrder.Action = UnitActionStill;
-	CriticalOrder.X = CriticalOrder.Y = -1;
+	CriticalOrder.goalPos.x = CriticalOrder.goalPos.y = -1;
 	Assert(!CriticalOrder.HasGoal());
 }
 
@@ -371,8 +370,9 @@ bool CUnit::StoreOrder(void)
 		if (temp) {
 			DebugPrint("Have goal to come back %d\n" _C_
 					UnitNumber(temp));
-			this->SavedOrder.X = temp->X + temp->Type->TileWidth / 2;
-			this->SavedOrder.Y = temp->Y + temp->Type->TileHeight / 2;
+			const Vec2i halfSize = {temp->Type->TileWidth / 2, temp->Type->TileHeight / 2};
+
+			this->SavedOrder.goalPos = temp->tilePos + halfSize;
 			this->SavedOrder.MinRange = 0;
 			this->SavedOrder.Range = 0;
 			this->SavedOrder.ClearGoal();
@@ -539,17 +539,17 @@ void MapMarkUnitSight(CUnit *unit)
 	Assert(container->Type);
 
 	MapMarkUnitSightRec(unit,
-		container->X, container->Y, container->Type->TileWidth, container->Type->TileHeight,
+		container->tilePos.x, container->tilePos.y, container->Type->TileWidth, container->Type->TileHeight,
 		MapMarkTileSight, MapMarkTileDetectCloak);
 
 	// Never mark radar, except if the top unit, and unit is usable
 	if (unit == container && !unit->IsUnusable()) {
 		if (unit->Stats->Variables[RADAR_INDEX].Value) {
-			MapMarkRadar(unit->Player, unit->X, unit->Y, unit->Type->TileWidth,
+			MapMarkRadar(unit->Player, unit->tilePos.x, unit->tilePos.y, unit->Type->TileWidth,
 				unit->Type->TileHeight, unit->Stats->Variables[RADAR_INDEX].Value);
 		}
 		if (unit->Stats->Variables[RADARJAMMER_INDEX].Value) {
-			MapMarkRadarJammer(unit->Player, unit->X, unit->Y, unit->Type->TileWidth,
+			MapMarkRadarJammer(unit->Player, unit->tilePos.x, unit->tilePos.y, unit->Type->TileWidth,
 				unit->Type->TileHeight, unit->Stats->Variables[RADARJAMMER_INDEX].Value);
 		}
 	}
@@ -572,17 +572,17 @@ void MapUnmarkUnitSight(CUnit *unit)
 	container = GetFirstContainer(unit);
 	Assert(container->Type);
 	MapMarkUnitSightRec(unit,
-		container->X, container->Y, container->Type->TileWidth, container->Type->TileHeight,
+		container->tilePos.x, container->tilePos.y, container->Type->TileWidth, container->Type->TileHeight,
 		MapUnmarkTileSight, MapUnmarkTileDetectCloak);
 
 	// Never mark radar, except if the top unit?
 	if (unit == container && !unit->IsUnusable()) {
 		if (unit->Stats->Variables[RADAR_INDEX].Value) {
-			MapUnmarkRadar(unit->Player, unit->X, unit->Y, unit->Type->TileWidth,
+			MapUnmarkRadar(unit->Player, unit->tilePos.x, unit->tilePos.y, unit->Type->TileWidth,
 				unit->Type->TileHeight, unit->Stats->Variables[RADAR_INDEX].Value);
 		}
 		if (unit->Stats->Variables[RADARJAMMER_INDEX].Value) {
-			MapUnmarkRadarJammer(unit->Player, unit->X, unit->Y, unit->Type->TileWidth,
+			MapUnmarkRadarJammer(unit->Player, unit->tilePos.x, unit->tilePos.y, unit->Type->TileWidth,
 				unit->Type->TileHeight, unit->Stats->Variables[RADARJAMMER_INDEX].Value);
 		}
 	}
@@ -756,9 +756,9 @@ static void UnitInXY(CUnit *unit, int x, int y)
 	Assert(unit);
 	CUnit *unit_inside = unit->UnitInside;
 
-	unit->X = x;
-	unit->Y = y;
-	unit->Offset = Map.getIndex(x,y);
+	unit->tilePos.x = x;
+	unit->tilePos.y = y;
+	unit->Offset = Map.getIndex(x, y);
 
 	if(!unit->Container) {
 		//Only Top Units
@@ -877,7 +877,7 @@ void CUnit::Remove(CUnit *host)
 	if (host) {
 		AddInContainer(host);
 		UpdateUnitSightRange(this);
-		UnitInXY(this, host->X, host->Y);
+		UnitInXY(this, host->tilePos.x, host->tilePos.y);
 		MapMarkUnitSight(this);
 	}
 
@@ -1007,7 +1007,7 @@ void UnitLost(CUnit *unit)
 	// Destroy resource-platform, must re-make resource patch.
 	if ((b = OnTopDetails(unit, NULL)) != NULL) {
 		if (b->ReplaceOnDie && (unit->Type->GivesResource && unit->ResourcesHeld != 0)) {
-			temp = MakeUnitAndPlace(unit->X, unit->Y, b->Parent, &Players[PlayerNumNeutral]);
+			temp = MakeUnitAndPlace(unit->tilePos.x, unit->tilePos.y, b->Parent, &Players[PlayerNumNeutral]);
 			if (temp == NoUnitP) {
 				DebugPrint("Unable to allocate Unit");
 			} else {
@@ -1086,8 +1086,8 @@ void UpdateForNewUnit(const CUnit *unit, int upgrade)
 */
 void NearestOfUnit(const CUnit *unit, int tx, int ty, int *dx, int *dy)
 {
-	int x = unit->X;
-	int y = unit->Y;
+	int x = unit->tilePos.x;
+	int y = unit->tilePos.y;
 
 	if (tx >= x + unit->Type->TileWidth) {
 		*dx = x + unit->Type->TileWidth - 1;
@@ -1114,8 +1114,8 @@ void NearestOfUnit(const CUnit *unit, int tx, int ty, int *dx, int *dy)
 static void UnitFillSeenValues(CUnit *unit)
 {
 	// Seen values are undefined for visible units.
-	unit->Seen.Y = unit->Y;
-	unit->Seen.X = unit->X;
+	unit->Seen.Y = unit->tilePos.y;
+	unit->Seen.X = unit->tilePos.x;
 	unit->Seen.IY = unit->IY;
 	unit->Seen.IX = unit->IX;
 	unit->Seen.Frame = unit->Frame;
@@ -1444,8 +1444,8 @@ bool CUnit::IsVisibleInViewport(const CViewport *vp) const
 	//
 	// Check if the graphic is inside the viewport.
 	//
-	int x = X * TileSizeX + IX - (Type->Width - Type->TileWidth * TileSizeX) / 2 + Type->OffsetX;
-	int y = Y * TileSizeY + IY - (Type->Height - Type->TileHeight * TileSizeY) / 2 + Type->OffsetY;
+	int x = tilePos.x * TileSizeX + IX - (Type->Width - Type->TileWidth * TileSizeX) / 2 + Type->OffsetX;
+	int y = tilePos.y * TileSizeY + IY - (Type->Height - Type->TileHeight * TileSizeY) / 2 + Type->OffsetY;
 
 	if (x + Type->Width < vp->MapX * TileSizeX + vp->OffsetX ||
 			x > vp->MapX * TileSizeX + vp->OffsetX + (vp->EndX - vp->X) ||
@@ -1508,9 +1508,9 @@ bool CUnit::IsVisibleOnScreen() const
 */
 void CUnit::GetMapArea(int *sx, int *sy, int *ex, int *ey) const
 {
-	*sx = X - (IX < 0);
+	*sx = tilePos.x - (IX < 0);
 	*ex = *sx + Type->TileWidth - !IX;
-	*sy = Y - (IY < 0);
+	*sy = tilePos.y - (IY < 0);
 	*ey = *sy + Type->TileHeight - !IY;
 }
 
@@ -1699,14 +1699,14 @@ void RescueUnits(void)
 
 				if (unit->Type->UnitType == UnitTypeLand) {
 					n = Map.Select(
-							unit->X - 1, unit->Y - 1,
-							unit->X + unit->Type->TileWidth + 1,
-							unit->Y + unit->Type->TileHeight + 1, around);
+							unit->tilePos.x - 1, unit->tilePos.y - 1,
+							unit->tilePos.x + unit->Type->TileWidth + 1,
+							unit->tilePos.y + unit->Type->TileHeight + 1, around);
 				} else {
 					n = Map.Select(
-							unit->X - 2, unit->Y - 2,
-							unit->X + unit->Type->TileWidth + 2,
-							unit->Y + unit->Type->TileHeight + 2, around);
+							unit->tilePos.x - 2, unit->tilePos.y - 2,
+							unit->tilePos.x + unit->Type->TileWidth + 2,
+							unit->tilePos.y + unit->Type->TileHeight + 2, around);
 				}
 				//
 				//  Look if ally near the unit.
@@ -1767,28 +1767,27 @@ static int myatan(int val)
 /**
 **  Convert direction to heading.
 **
-**  @param delta_x  Delta X.
-**  @param delta_y  Delta Y.
+**  @param delta  Delta.
 **
 **  @return         Angle (0..255)
 */
-int DirectionToHeading(int delta_x, int delta_y)
+int DirectionToHeading(const Vec2i& delta)
 {
 	//
 	//  Check which quadrant.
 	//
-	if (delta_x > 0) {
-		if (delta_y < 0) { // Quadrant 1?
-			return myatan((delta_x * 64) / -delta_y);
+	if (delta.x > 0) {
+		if (delta.y < 0) { // Quadrant 1?
+			return myatan((delta.x * 64) / -delta.y);
 		}
 		// Quadrant 2?
-		return myatan((delta_y * 64) / delta_x) + 64;
+		return myatan((delta.y * 64) / delta.x) + 64;
 	}
-	if (delta_y>0) { // Quadrant 3?
-		return myatan((delta_x * -64) / delta_y) + 64 * 2;
+	if (delta.y > 0) { // Quadrant 3?
+		return myatan((delta.x * -64) / delta.y) + 64 * 2;
 	}
-	if (delta_x) { // Quadrant 4.
-		return myatan((delta_y * -64) / -delta_x) + 64 * 3;
+	if (delta.x) { // Quadrant 4.
+		return myatan((delta.y * -64) / -delta.x) + 64 * 3;
 	}
 	return 0;
 }
@@ -1829,12 +1828,11 @@ void UnitUpdateHeading(CUnit *unit)
 **  Change unit heading/frame from delta direction x, y.
 **
 **  @param unit  Unit for new direction looking.
-**  @param dx    X map tile delta direction.
-**  @param dy    Y map tile delta direction.
+**  @param delta  map tile delta direction.
 */
-void UnitHeadingFromDeltaXY(CUnit *unit, int dx, int dy)
+void UnitHeadingFromDeltaXY(CUnit *unit, const Vec2i &delta)
 {
-	unit->Direction = DirectionToHeading(dx, dy);
+	unit->Direction = DirectionToHeading(delta);
 	UnitUpdateHeading(unit);
 }
 
@@ -1852,61 +1850,58 @@ void UnitHeadingFromDeltaXY(CUnit *unit, int dx, int dy)
 */
 void DropOutOnSide(CUnit *unit, int heading, int addx, int addy)
 {
-	int x;
-	int y;
+	Vec2i pos;
 	int i;
 
 	if (unit->Container) {
-		x = unit->Container->X;
-		y = unit->Container->Y;
+		pos = unit->Container->tilePos;
 	} else {
-		x = unit->X;
-		y = unit->Y;
+		pos = unit->tilePos;
 	}
 
 	if (heading < LookingNE || heading > LookingNW) {
-		x += addx - 1;
-		--y;
+		pos.x += addx - 1;
+		--pos.y;
 		goto startn;
 	}
 	if (heading < LookingSE) {
-		x += addx;
-		y += addy - 1;
+		pos.x += addx;
+		pos.y += addy - 1;
 		goto starte;
 	}
 	if (heading < LookingSW) {
-		y += addy;
+		pos.y += addy;
 		goto starts;
 	}
-	--x;
+	--pos.x;
 	goto startw;
 
 	// FIXME: don't search outside of the map
 	for (;;) {
 startw:
-		for (i = addy; i--; ++y) {
-			if (UnitCanBeAt(unit, x, y)) {
+		for (i = addy; i--; ++pos.y) {
+			if (UnitCanBeAt(unit, pos.x, pos.y)) {
 				goto found;
 			}
 		}
 		++addx;
 starts:
-		for (i = addx; i--; ++x) {
-			if (UnitCanBeAt(unit, x, y)) {
+		for (i = addx; i--; ++pos.x) {
+			if (UnitCanBeAt(unit, pos.x, pos.y)) {
 				goto found;
 			}
 		}
 		++addy;
 starte:
-		for (i = addy; i--; --y) {
-			if (UnitCanBeAt(unit, x, y)) {
+		for (i = addy; i--; --pos.y) {
+			if (UnitCanBeAt(unit, pos.x, pos.y)) {
 				goto found;
 			}
 		}
 		++addx;
 startn:
-		for (i = addx; i--; --x) {
-			if (UnitCanBeAt(unit, x, y)) {
+		for (i = addx; i--; --pos.x) {
+			if (UnitCanBeAt(unit, pos.x, pos.y)) {
 				goto found;
 			}
 		}
@@ -1914,92 +1909,79 @@ startn:
 	}
 
 found:
-	unit->Place(x, y);
+	unit->Place(pos.x, pos.y);
 }
 
 /**
 **  Place a unit on the map nearest to x, y.
 **
 **  @param unit  Unit to drop out.
-**  @param gx    Goal X map tile position.
-**  @param gy    Goal Y map tile position.
+**  @param goalPos Goal map tile position.
 **  @param addx  Tile width of unit it's dropping out of.
 **  @param addy  Tile height of unit it's dropping out of.
 */
-void DropOutNearest(CUnit *unit, int gx, int gy, int addx, int addy)
+void DropOutNearest(CUnit *unit, const Vec2i &goalPos, int addx, int addy)
 {
-	int x;
-	int y;
-	int i;
-	int bestx;
-	int besty;
-	int bestd;
-	int n;
+	Vec2i pos;
+	Vec2i bestPos = {0, 0};
+	int bestd = 99999;
 
 	Assert(unit->Removed);
 
-	x = y = -1;
 	if (unit->Container) {
-		x = unit->Container->X;
-		y = unit->Container->Y;
+		pos = unit->Container->tilePos;
 	} else {
-		x = unit->X;
-		y = unit->Y;
+		pos = unit->tilePos;
 	}
 
-	Assert(x != -1 && y != -1);
-
-	bestd = 99999;
-	bestx = besty = 0;
-
 	// FIXME: if we reach the map borders we can go fast up, left, ...
-	--x;
+	--pos.x;
 	for (;;) {
-		for (i = addy; i--; ++y) { // go down
-			if (UnitCanBeAt(unit, x, y)) {
-				n = MapDistance(gx, gy, x, y);
+		for (int i = addy; i--; ++pos.y) { // go down
+			if (UnitCanBeAt(unit, pos.x, pos.y)) {
+				const int n = MapDistance(goalPos.x, goalPos.y, pos.x, pos.y);
+
 				if (n < bestd) {
 					bestd = n;
-					bestx = x;
-					besty = y;
+					bestPos = pos;
 				}
 			}
 		}
 		++addx;
-		for (i = addx; i--; ++x) { // go right
-			if (UnitCanBeAt(unit, x, y)) {
-				n = MapDistance(gx, gy, x, y);
+		for (int i = addx; i--; ++pos.x) { // go right
+			if (UnitCanBeAt(unit, pos.x, pos.y)) {
+				const int n = MapDistance(goalPos.x, goalPos.y, pos.x, pos.y);
+
 				if (n < bestd) {
 					bestd = n;
-					bestx = x;
-					besty = y;
+					bestPos = pos;
 				}
 			}
 		}
 		++addy;
-		for (i = addy; i--; --y) { // go up
-			if (UnitCanBeAt(unit, x, y)) {
-				n = MapDistance(gx, gy, x, y);
+		for (int i = addy; i--; --pos.y) { // go up
+			if (UnitCanBeAt(unit, pos.x, pos.y)) {
+				const int n = MapDistance(goalPos.x, goalPos.y, pos.x, pos.y);
+
 				if (n < bestd) {
 					bestd = n;
-					bestx = x;
-					besty = y;
+					bestPos = pos;
 				}
 			}
 		}
 		++addx;
-		for (i = addx; i--; --x) { // go left
-			if (UnitCanBeAt(unit, x, y)) {
-				n = MapDistance(gx, gy, x, y);
+		for (int i = addx; i--; --pos.x) { // go left
+			if (UnitCanBeAt(unit, pos.x, pos.y)) {
+				const int n = MapDistance(goalPos.x, goalPos.y, pos.x, pos.y);
+
 				if (n < bestd) {
 					bestd = n;
-					bestx = x;
-					besty = y;
+					bestPos = pos;
 				}
 			}
 		}
 		if (bestd != 99999) {
-			unit->Place(bestx, besty);
+			unit->Place(bestPos.x, bestPos.y);
 			return;
 		}
 		++addy;
@@ -2042,7 +2024,7 @@ void DropOutAll(const CUnit *source)
 int FindWoodInSight(const CUnit *unit, int *x, int *y)
 {
 	return FindTerrainType(unit->Type->MovementMask, 0, MapFieldForest, 9999,
-		unit->Player, unit->X, unit->Y, x, y);
+		unit->Player, unit->tilePos.x, unit->tilePos.y, x, y);
 }
 
 /**
@@ -2357,7 +2339,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 	points[0].X = x;
 	points[0].Y = y;
 	rp = 0;
-	if(unit->X == x && unit->Y == y)
+	if (unit->tilePos.x == x && unit->tilePos.y == y)
 		matrix[x + y * w] = 1; // mark start point
 	ep = wp = 1; // start with one point
 	cdist = 0; // current distance is 0
@@ -2583,7 +2565,7 @@ CUnit *UnitFindMiningArea(const CUnit *unit, int x, int y,
 	points[0].X = x;
 	points[0].Y = y;
 	rp = 0;
-	if(unit->X == x && unit->Y == y)
+	if (unit->tilePos.x == x && unit->tilePos.y == y)
 		matrix[x + y * w] = 1; // mark start point
 	ep = wp = 1; // start with one point
 	cdist = 0; // current distance is 0
@@ -2792,7 +2774,7 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 		//
 		// Check if mouse is over the unit.
 		//
-		gx = unit->X * TileSizeX + unit->IX;
+		gx = unit->tilePos.x * TileSizeX + unit->IX;
 
 		{
 			const int local_width = type->TileWidth * TileSizeX;
@@ -2804,7 +2786,7 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 			}
 		}
 
-		gy = unit->Y * TileSizeY + unit->IY;
+		gy = unit->tilePos.y * TileSizeY + unit->IY;
 		{
 			const int local_height = type->TileHeight * TileSizeY;
 			if (y + (type->BoxHeight - local_height) / 2 < gy) {
@@ -2865,15 +2847,15 @@ void LetUnitDie(CUnit *unit)
 	//
 	if (type->ExplodeWhenKilled) {
 		MakeMissile(type->Explosion.Missile,
-			unit->X * TileSizeX + type->TileWidth * TileSizeX / 2,
-			unit->Y * TileSizeY + type->TileHeight * TileSizeY / 2,
+			unit->tilePos.x * TileSizeX + type->TileWidth * TileSizeX / 2,
+			unit->tilePos.y * TileSizeY + type->TileHeight * TileSizeY / 2,
 			0, 0);
 	}
 	if (type->DeathExplosion) {
 		type->DeathExplosion->pushPreamble();
-		type->DeathExplosion->pushInteger(unit->X * TileSizeX +
+		type->DeathExplosion->pushInteger(unit->tilePos.x * TileSizeX +
 				type->TileWidth * TileSizeX / 2);
-		type->DeathExplosion->pushInteger(unit->Y * TileSizeY +
+		type->DeathExplosion->pushInteger(unit->tilePos.y * TileSizeY +
 				type->TileHeight * TileSizeY / 2);
 		type->DeathExplosion->run();
 	}
@@ -3030,18 +3012,18 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 			if (HelpMeLastCycle < GameCycle) {
 				if (!HelpMeLastCycle ||
 						HelpMeLastCycle + CYCLES_PER_SECOND * 120 < GameCycle ||
-						target->X < HelpMeLastX - 14 ||
-						target->X > HelpMeLastX + 14 ||
-						target->Y < HelpMeLastY - 14 ||
-						target->Y > HelpMeLastY + 14) {
+						target->tilePos.x < HelpMeLastX - 14 ||
+						target->tilePos.x > HelpMeLastX + 14 ||
+						target->tilePos.y < HelpMeLastY - 14 ||
+						target->tilePos.y > HelpMeLastY + 14) {
 					HelpMeLastCycle = GameCycle + CYCLES_PER_SECOND * 2;
-					HelpMeLastX = target->X;
-					HelpMeLastY = target->Y;
+					HelpMeLastX = target->tilePos.x;
+					HelpMeLastY = target->tilePos.y;
 					PlayUnitSound(target, VoiceHelpMe);
 				}
 			}
 		}
-		target->Player->Notify(NotifyRed, target->X, target->Y,
+		target->Player->Notify(NotifyRed, target->tilePos.x, target->tilePos.y,
 			_("%s attacked"), target->Type->Name.c_str());
 
 		if (!target->Type->Building) {
@@ -3102,10 +3084,10 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 
 	if ((target->IsVisibleOnMap(ThisPlayer) || ReplayRevealMap) && !DamageMissile.empty()) {
 		MakeLocalMissile(MissileTypeByIdent(DamageMissile),
-				target->X * TileSizeX + target->Type->TileWidth * TileSizeX / 2,
-				target->Y * TileSizeY + target->Type->TileHeight * TileSizeY / 2,
-				target->X * TileSizeX + target->Type->TileWidth * TileSizeX / 2 + 3,
-				target->Y * TileSizeY + target->Type->TileHeight * TileSizeY / 2 -
+				target->tilePos.x * TileSizeX + target->Type->TileWidth * TileSizeX / 2,
+				target->tilePos.y * TileSizeY + target->Type->TileHeight * TileSizeY / 2,
+				target->tilePos.x * TileSizeX + target->Type->TileWidth * TileSizeX / 2 + 3,
+				target->tilePos.y * TileSizeY + target->Type->TileHeight * TileSizeY / 2 -
 					MissileTypeByIdent(DamageMissile)->Range)->Damage = -damage;
 	}
 
@@ -3113,13 +3095,13 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 	// FIXME: want to show hits.
 	if (type->Organic) {
 		MakeMissile(MissileBlood,
-			target->X * TileSizeX + TileSizeX / 2,
-			target->Y * TileSizeY + TileSizeY / 2, 0, 0);
+			target->tilePos.x * TileSizeX + TileSizeX / 2,
+			target->tilePos.y * TileSizeY + TileSizeY / 2, 0, 0);
 	}
 	if (type->Building) {
 		MakeMissile(MissileSmallFire,
-			target->X * TileSizeX + (type->TileWidth * TileSizeX) / 2,
-			target->Y * TileSizeY + (type->TileHeight * TileSizeY) / 2, 0, 0);
+			target->tilePos.x * TileSizeX + (type->TileWidth * TileSizeX) / 2,
+			target->tilePos.y * TileSizeY + (type->TileHeight * TileSizeY) / 2, 0, 0);
 	}
 #endif
 
@@ -3132,8 +3114,8 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 		fire = MissileBurningBuilding(f);
 		if (fire) {
 			missile = MakeMissile(fire,
-				target->X * TileSizeX + (type->TileWidth * TileSizeX) / 2,
-				target->Y * TileSizeY + (type->TileHeight * TileSizeY) / 2 - TileSizeY,
+				target->tilePos.x * TileSizeX + (type->TileWidth * TileSizeX) / 2,
+				target->tilePos.y * TileSizeY + (type->TileHeight * TileSizeY) / 2 - TileSizeY,
 				0, 0);
 			missile->SourceUnit = target;
 			target->Burning = 1;
@@ -3203,11 +3185,11 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 			if (goal) {
 				if (target->SavedOrder.Action == UnitActionStill) {
 					// FIXME: should rewrite command handling
-					CommandAttack(target, target->X, target->Y, NoUnitP,
+					CommandAttack(target, target->tilePos.x, target->tilePos.y, NoUnitP,
 						FlushCommands);
 					target->SavedOrder = *target->Orders[1];
 				}
-				CommandAttack(target, goal->X, goal->Y, NoUnitP, FlushCommands);
+				CommandAttack(target, goal->tilePos.x, goal->tilePos.y, NoUnitP, FlushCommands);
 				return;
 			}
 	}
@@ -3223,30 +3205,26 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 	// Can't attack run away.
 	//
 	if (target->CanMove()) {
-		int x;
-		int y;
-		int d;
+		Vec2i pos = target->tilePos - attacker->tilePos;
+		int d = isqrt(pos.x * pos.x + pos.y * pos.y);
 
-		x = target->X - attacker->X;
-		y = target->Y - attacker->Y;
-		d = isqrt(x * x + y * y);
 		if (!d) {
 			d = 1;
 		}
-		x = target->X + (x * 5) / d + (SyncRand() & 3);
-		if (x < 0) {
-			x = 0;
-		} else if (x >= Map.Info.MapWidth) {
-			x = Map.Info.MapWidth - 1;
+		pos.x = target->tilePos.x + (pos.x * 5) / d + (SyncRand() & 3);
+		if (pos.x < 0) {
+			pos.x = 0;
+		} else if (pos.x >= Map.Info.MapWidth) {
+			pos.x = Map.Info.MapWidth - 1;
 		}
-		y = target->Y + (y * 5) / d + (SyncRand() & 3);
-		if (y < 0) {
-			y = 0;
-		} else if (y >= Map.Info.MapHeight) {
-			y = Map.Info.MapHeight - 1;
+		pos.y = target->tilePos.y + (pos.y * 5) / d + (SyncRand() & 3);
+		if (pos.y < 0) {
+			pos.y = 0;
+		} else if (pos.y >= Map.Info.MapHeight) {
+			pos.y = Map.Info.MapHeight - 1;
 		}
 		CommandStopUnit(target);
-		CommandMove(target, x, y, 0);
+		CommandMove(target, pos.x, pos.y, 0);
 	}
 }
 

@@ -428,8 +428,8 @@ int SelectUnitsByType(CUnit *base)
 	 * took parameters of the selection rectangle as arguments */
 	r = Map.Select(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
 		vp->MapY + vp->MapHeight + 1, table);
-	
-	
+
+
 	// FIXME: peon/peasant with gold/wood & co are considered from
 	//   different type... idem for tankers
 	for (i = 0; i < r; ++i) {
@@ -499,7 +499,7 @@ int ToggleUnitsByType(CUnit *base)
 	//
 	//  Search for other visible units of the same type
 	//
-	
+
 	// select all visible units.
 	// StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
 	// FIXME: this should probably be cleaner implemented if SelectUnitsByType()
@@ -551,7 +551,7 @@ int SelectGroup(int group_number, GroupSelectionMode mode)
 	if (nunits) {
 		if (mode == SELECT_ALL || !IsGroupTainted(group_number)) {
 			ChangeSelectedUnits(GetUnitsOfGroup(group_number), nunits);
-			return NumSelected;	
+			return NumSelected;
 		} else {
 			int ntable=0;
 			CUnit* table[UnitMax];
@@ -564,9 +564,9 @@ int SelectGroup(int group_number, GroupSelectionMode mode)
 			}
 			if (ntable) {
 				ChangeSelectedUnits(table, ntable);
-				return NumSelected;				
+				return NumSelected;
 			}
-		}	
+		}
 	}
 	return 0;
 }
@@ -681,10 +681,10 @@ static int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
 		CUnit* unit = (CUnit*)table[i];
 		const CUnitType *type = unit->Type;
 
-		sprite_x = unit->X * TileSizeX + unit->IX;
+		sprite_x = unit->tilePos.x * TileSizeX + unit->IX;
 		sprite_x -= (type->BoxWidth - TileSizeX * type->TileWidth) / 2;
 		sprite_x += type->OffsetX;
-		sprite_y = unit->Y * TileSizeY + unit->IY;
+		sprite_y = unit->tilePos.y * TileSizeY + unit->IY;
 		sprite_y -= (type->BoxHeight - TileSizeY * type->TileHeight) / 2;
 		sprite_y += type->OffsetY;
 		if (sprite_x + type->BoxWidth < sx0) {
@@ -839,7 +839,7 @@ int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 	}
 
 	CUnit* table[UnitMax];
-	
+
 	// If there is no selected unit yet, do a simple selection.
 	if (!NumSelected) {
 		return DoSelectUnitsInRectangle(x0, y0, x1, y1, table);
@@ -1021,7 +1021,7 @@ int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	}
 
 	CUnit* table[UnitMax];
-	
+
 	// If there is no selected unit yet, do a simple selection.
 	if (!NumSelected) {
 		return DoSelectGroundUnitsInRectangle(sx0, sy0, sx1, sy1, table);
