@@ -528,6 +528,8 @@
 #include "animation.h"
 #endif
 
+#include "vec2i.h"
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -873,6 +875,12 @@ class CUnitType {
 public:
 	CUnitType();
 	~CUnitType();
+
+	Vec2i GetHalfTileSize() const {
+		Vec2i res = {TileWidth / 2, TileHeight / 2};
+
+		return res;
+	}
 
 	std::string Ident;              /// Identifier
 	std::string Name;               /// Pretty name shown from the engine

@@ -190,7 +190,7 @@ static void PlaceUnits()
 	for (int i = 0; i < NumUnits; ++i) {
 		if (!Units[i]->Removed) {
 			Units[i]->Removed = 1;
-			Units[i]->Place(Units[i]->X, Units[i]->Y);
+			Units[i]->Place(Units[i]->tilePos.x, Units[i]->tilePos.y);
 		}
 	}
 }

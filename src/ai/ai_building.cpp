@@ -96,7 +96,7 @@ static int AiCheckSurrounding(const CUnit *worker,
 	while (dir < 4) {
 		if ((unsigned)x < (unsigned)Map.Info.MapWidth &&
 						 (unsigned)y < (unsigned)Map.Info.MapHeight) {
-			if (worker && x == worker->X && y == worker->Y) {
+			if (worker && x == worker->tilePos.x && y == worker->tilePos.y) {
 				surrounding[surroundingnb++] = 1;
 			} else if (	Map.CheckMask(x + y_offset,
 						(MapFieldUnpassable | MapFieldWall | MapFieldRocks |
@@ -345,8 +345,8 @@ static int AiFindHallPlace(const CUnit *worker,
 	unsigned char *matrix;
 	CUnit *mine;
 
-	x = (nx != -1 ? nx : worker->X);
-	y = (ny != -1 ? ny : worker->Y);
+	x = (nx != -1 ? nx : worker->tilePos.x);
+	y = (ny != -1 ? ny : worker->tilePos.y);
 	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
 	points = new p[size];
 
@@ -397,10 +397,10 @@ static int AiFindHallPlace(const CUnit *worker,
 					//
 					// Check units around mine
 					//
-					minx = mine->X - 5;
-					miny = mine->Y - 5;
-					maxx = mine->X + mine->Type->TileWidth + 5;
-					maxy = mine->Y + mine->Type->TileHeight + 5;
+					minx = mine->tilePos.x - 5;
+					miny = mine->tilePos.y - 5;
+					maxx = mine->tilePos.x + mine->Type->TileWidth + 5;
+					maxy = mine->tilePos.y + mine->Type->TileHeight + 5;
 					Map.FixSelectionArea(minx, miny, maxx, maxy);
 					nunits = Map.SelectFixed(minx, miny, maxx, maxy, units);
 					for (j = 0; j < nunits; ++j) {
@@ -501,8 +501,8 @@ static int AiFindLumberMillPlace(const CUnit *worker, const CUnitType *type,
 	unsigned char *morg;
 	unsigned char *matrix;
 
-	x = nx != -1 ? nx : worker->X;
-	y = ny != -1 ? ny : worker->Y;
+	x = nx != -1 ? nx : worker->tilePos.x;
+	y = ny != -1 ? ny : worker->tilePos.y;
 	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
 	points = new p[size];
 
@@ -605,8 +605,8 @@ static int AiFindMiningPlace(const CUnit *worker,
 	unsigned char *matrix;
 	CUnit *mine;
 
-	x = (nx != -1 ? nx : worker->X);
-	y = (ny != -1 ? ny : worker->Y);
+	x = (nx != -1 ? nx : worker->tilePos.x);
+	y = (ny != -1 ? ny : worker->tilePos.y);
 	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
 	points = new p[size];
 
@@ -644,7 +644,7 @@ static int AiFindMiningPlace(const CUnit *worker,
 				// Look if there is a mine area
 				//
 				if ((mine = ResourceOnMap(x, y, resource, false)) &&
-						 AiFindBuildingPlace2(worker, type, mine->X, mine->Y, dx, dy)) {
+						 AiFindBuildingPlace2(worker, type, mine->tilePos.x, mine->tilePos.y, dx, dy)) {
 							delete[] morg;
 							delete[] points;
 							return 1;
@@ -725,14 +725,14 @@ int AiFindBuildingPlace(const CUnit *worker, const CUnitType *type,
 				} else {
 					//Mine can be build without resource restrictions: solar panels, etc
 					return AiFindBuildingPlace2(worker, type,
-							(nx != -1 ? nx : worker->X),
-							(ny != -1 ? ny : worker->Y), dx, dy);
+							(nx != -1 ? nx : worker->tilePos.x),
+							(ny != -1 ? ny : worker->tilePos.y), dx, dy);
 				}
 			}
 	}
 
 	return AiFindBuildingPlace2(worker, type,
-			(nx != -1 ? nx : worker->X), (ny != -1 ? ny : worker->Y), dx, dy);
+			(nx != -1 ? nx : worker->tilePos.x), (ny != -1 ? ny : worker->tilePos.y), dx, dy);
 }
 
 //@}

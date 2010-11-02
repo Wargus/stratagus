@@ -57,15 +57,15 @@ void CMap::Insert(CUnit *unit)
 	const int h = unit->Type->TileHeight;
 	int j,i = h;
 	CMapField *mf;
-	do {	
+	do {
 		mf = Field(index);
 		j = w;
 		do {
 			mf->UnitCache.Insert(unit);
 			++mf;
-		} while( --j && unit->X + (j - w) < Info.MapWidth);
+		} while( --j && unit->tilePos.x + (j - w) < Info.MapWidth);
 		index += Info.MapWidth;
-	} while( --i && unit->Y + (i - h) < Info.MapHeight);
+	} while( --i && unit->tilePos.y + (i - h) < Info.MapHeight);
 }
 
 /**
@@ -81,15 +81,15 @@ void CMap::Remove(CUnit *unit)
 	const int h = unit->Type->TileHeight;
 	int j,i = h;
 	CMapField *mf;
-	do {	
+	do {
 		mf = Field(index);
 		j = w;
 		do {
 			mf->UnitCache.Remove(unit);
 			++mf;
-		} while( --j && unit->X + (j - w) < Info.MapWidth);
+		} while( --j && unit->tilePos.x + (j - w) < Info.MapWidth);
 		index += Info.MapWidth;
-	} while( --i && unit->Y + (i - h) < Info.MapHeight);
+	} while( --i && unit->tilePos.y + (i - h) < Info.MapHeight);
 }
 
 /**
@@ -102,7 +102,7 @@ void CMap::Remove(CUnit *unit)
 **
 **  @return           Returns the number of units found
 */
-int CMap::Select(int x, int y, CUnit *table[],  
+int CMap::Select(int x, int y, CUnit *table[],
 							const int tablesize)
 {
 	int n = 0;
@@ -128,13 +128,13 @@ int CMap::Select(int x, int y, CUnit *table[],
 **
 **  @return           Returns the number of units found
 */
-int CMap::SelectFixed(int x1, int y1,  
+int CMap::SelectFixed(int x1, int y1,
 		int x2, int y2, CUnit *table[], const int tablesize)
 {
 
 	// Optimize small searches.
 	if (x1 >= x2 - 1 && y1 >= y2 - 1) {
-		return Select(x1, y1, table, tablesize);		
+		return Select(x1, y1, table, tablesize);
 	}
 
 	int i;
@@ -148,7 +148,7 @@ int CMap::SelectFixed(int x1, int y1,
 		i = x2 - x1 + 1;
 		do {
 #if __GNUC__ >  3
-			//GCC version only, since std::vector::data() is not in STL		
+			//GCC version only, since std::vector::data() is not in STL
 			size_t count = mf->UnitCache.size();
 			if(count) {
 				CUnit **cache = (CUnit **)mf->UnitCache.Units.data();
@@ -163,13 +163,13 @@ int CMap::SelectFixed(int x1, int y1,
 						Assert(!unit->Removed);
 						unit->CacheLock = 1;
 						table[n++] = unit;
-					}				
+					}
 					++cache;
 				} while(--count && n < tablesize);
 			}
 #else
 			const size_t count = mf->UnitCache.size();
-			if(count) {	
+			if(count) {
 				unsigned int k = 0;
 				const CUnitCache &cache = mf->UnitCache;
 				do {
@@ -183,10 +183,10 @@ int CMap::SelectFixed(int x1, int y1,
 						Assert(!unit->Removed);
 						unit->CacheLock = 1;
 						table[n++] = unit;
-					}				
+					}
 				} while(++k < count && n < tablesize);
 			}
-#endif			
+#endif
 			++mf;
 		} while(--i && n < tablesize);
 		index += Info.MapWidth;
@@ -205,7 +205,7 @@ int CMap::SelectFixed(int x1, int y1,
 	i = 0;
 	j = (n+3)/4;
 	switch (n & 3) {
-		case 0: do { 
+		case 0: do {
 						table[i++]->CacheLock = 0;
 		case 3:			table[i++]->CacheLock = 0;
 		case 2:			table[i++]->CacheLock = 0;
@@ -219,7 +219,7 @@ int CMap::SelectFixed(int x1, int y1,
 	return n;
 }
 
-int CMap::Select(int x1, int y1,  
+int CMap::Select(int x1, int y1,
 		int x2, int y2, CUnit *table[], const int tablesize)
 {
 

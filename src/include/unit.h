@@ -116,7 +116,7 @@
 **  does not include for instance stuff like harvesters returning
 **  cargo.
 **
-**  CUnit::X CUnit::Y
+**  CUnit::tilePos
 **
 **  The tile map coordinates of the unit. 0,0 is the upper left on
 **  the map. To convert the map coordinates into pixels, they
@@ -370,6 +370,8 @@
 #include "player.h"
 #endif
 
+#include "vec2i.h"
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -510,9 +512,10 @@ public:
 
 	public:
 		COrder() : Goal(NULL), Range(0), MinRange(0), Width(0),
-			Height(0),Action(UnitActionNone), CurrentResource(0),
-			X(-1), Y(-1)
+			Height(0),Action(UnitActionNone), CurrentResource(0)
 		{
+			goalPos.x = -1;
+			goalPos.y = -1;
 			memset(&Arg1, 0, sizeof(Arg1));
 		};
 		COrder(const COrder &ths);
@@ -532,7 +535,8 @@ public:
 			Height = 0;
 			CurrentResource = 0;
 			Assert(!Goal);
-			X = -1; Y = -1;
+			goalPos.x = -1;
+			goalPos.y = -1;
 			memset(&Arg1, 0, sizeof(Arg1));
 		};
 
@@ -544,8 +548,7 @@ public:
 		unsigned char CurrentResource;	 //used in 	UnitActionResource and
 											//UnitActionReturnGoods
 
-		int X;                  /// or X tile coordinate of destination
-		int Y;                  /// or Y tile coordinate of destination
+		Vec2i goalPos;          /// or tile coordinate of destination
 
 		union {
 			struct {
@@ -621,8 +624,8 @@ public:
 		NextContained = NULL;
 		PrevContained = NULL;
 		NextWorker = NULL;
-		X = 0;
-		Y = 0;
+		tilePos.x = 0;
+		tilePos.y = 0;
 		Offset = 0;
 		Type = NULL;
 		Player = NULL;
@@ -688,8 +691,8 @@ public:
 	CUnit *PrevContained; /// Previous unit in the container.
 	CUnit *NextWorker; //pointer to next assigned worker to "Goal" resource.
 
-	int X; /// Map position X
-	int Y; /// Map position Y
+	Vec2i tilePos; /// Map position X
+
 	unsigned int Offset;/// Map position as flat index offset (x + y * w)
 
 	CUnitType  *Type;              /// Pointer to unit-type (peon,...)
@@ -994,8 +997,8 @@ public:
 	 */
 	int MapDistanceTo(const CUnit *const dst) const
 	{
-		return MapDistanceBetweenTypes(Type, X, Y,
-			dst->Type, dst->X, dst->Y);
+		return MapDistanceBetweenTypes(Type, tilePos.x, tilePos.y,
+			dst->Type, dst->tilePos.x, dst->tilePos.y);
 	}
 
 	/**
@@ -1009,7 +1012,7 @@ public:
 	 */
 	int MapDistanceTo(int x, int y) const
 	{
-		return MapDistanceToType(x, y, Type, X, Y);
+		return MapDistanceToType(x, y, Type, this->tilePos.x, this->tilePos.y);
 	}
 
 	/**
@@ -1287,19 +1290,22 @@ UnitsOnTileUnmarkSeen(const CPlayer *player, const unsigned int index, int p);
 extern void UnitCountSeen(CUnit *unit);
 
 	/// Check for rescue each second
-extern void RescueUnits(void);
+extern void RescueUnits();
 
 	/// Convert direction (dx,dy) to heading (0-255)
-extern int DirectionToHeading(int, int);
+extern int DirectionToHeading(const Vec2i &dir);
+
 	/// Update frame from heading
 extern void UnitUpdateHeading(CUnit *unit);
-	/// Heading and frame from delta direction x,y
-extern void UnitHeadingFromDeltaXY(CUnit *unit, int x, int y);
+	/// Heading and frame from delta direction
+extern void UnitHeadingFromDeltaXY(CUnit *unit, const Vec2i &delta);
+
 
 	/// @todo more docu
 extern void DropOutOnSide(CUnit *unit, int heading, int addx, int addy);
 	/// @todo more docu
-extern void DropOutNearest(CUnit *unit, int x, int y, int addx, int addy);
+extern void DropOutNearest(CUnit *unit, const Vec2i &goalPos, int addx, int addy);
+
 	/// Drop out all units in the unit
 extern void DropOutAll(const CUnit *unit);
 
@@ -1358,9 +1364,9 @@ extern void SaveUnit(const CUnit *unit, CFile *file);
 extern void SaveUnits(CFile *file);
 
 	/// Initialize unit module
-extern void InitUnits(void);
+extern void InitUnits();
 	/// Clean unit module
-extern void CleanUnits(void);
+extern void CleanUnits();
 
 // in unit_draw.c
 //--------------------
@@ -1378,11 +1384,11 @@ extern void DrawSelectionRectangleWithTrans(Uint32, int, int, int, int);
 extern void DrawSelectionCorners(Uint32, int, int, int, int);
 
 	/// Register CCL decorations features
-extern void DecorationCclRegister(void);
+extern void DecorationCclRegister();
 	/// Load the decorations (health,mana) of units
-extern void LoadDecorations(void);
+extern void LoadDecorations();
 	/// Clean the decorations (health,mana) of units
-extern void CleanDecorations(void);
+extern void CleanDecorations();
 
 	/// Draw unit's shadow
 extern void DrawShadow(const CUnitType *type,
@@ -1423,11 +1429,11 @@ AutoAttackUnitsInDistance(const CUnit *unit, int range,
 // in groups.c
 
 	/// Initialize data structures for groups
-extern void InitGroups(void);
+extern void InitGroups();
 	/// Save groups
 extern void SaveGroups(CFile *file);
 	/// Cleanup groups
-extern void CleanGroups(void);
+extern void CleanGroups();
 
 	// 2 functions to conseal the groups internal data structures...
 	/// Get the number of units in a particular group
@@ -1444,7 +1450,7 @@ extern void SetGroup(CUnit **units, int nunits, int num);
 	/// Remove a unit from a group
 extern void RemoveUnitFromGroups(CUnit *unit);
 	/// Register CCL group features
-extern void GroupCclRegister(void);
+extern void GroupCclRegister();
 	/// ask group members for help
 extern void GroupHelpMe(CUnit *attacker, CUnit *defender);
 extern int IsGroupTainted(int num);
@@ -1455,11 +1461,11 @@ extern int IsGroupTainted(int num);
 #define IsOnlySelected(unit) (NumSelected == 1 && Selected[0] == (unit))
 
 	///  Save selection to restore after.
-extern void SaveSelection(void);
+extern void SaveSelection();
 	///  Restore selection.
-extern void RestoreSelection(void);
+extern void RestoreSelection();
 	/// Clear current selection
-extern void UnSelectAll(void);
+extern void UnSelectAll();
 	/// Select group as selection
 extern void ChangeSelectedUnits(CUnit **units, int num_units);
 	/// Changed TeamUnit Selection
@@ -1496,20 +1502,20 @@ extern int AddSelectedGroundUnitsInRectangle(int tx, int ty, int w, int h);
 extern int AddSelectedAirUnitsInRectangle(int tx, int ty, int w, int h);
 
 	/// Init selections
-extern void InitSelections(void);
+extern void InitSelections();
 	/// Save current selection state
 extern void SaveSelections(CFile *file);
 	/// Clean up selections
-extern void CleanSelections(void);
+extern void CleanSelections();
 	/// Register CCL selection features
-extern void SelectionCclRegister(void);
+extern void SelectionCclRegister();
 
 // in ccl_unit.c
 
 	/// Parse order
 extern void CclParseOrder(lua_State *l, COrderPtr order);
 	/// register CCL units features
-extern void UnitCclRegister(void);
+extern void UnitCclRegister();
 
 //@}
 

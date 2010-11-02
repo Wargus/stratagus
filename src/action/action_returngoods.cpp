@@ -65,7 +65,7 @@ void HandleActionReturnGoods(CUnit *unit)
 			(unit->ResourcesHeld != unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity &&
 				unit->Type->ResInfo[unit->CurrentResource]->LoseResources)) {
 		DebugPrint("Unit can't return resources, it doesn't carry any.\n");
-		unit->Player->Notify(NotifyYellow, unit->X, unit->Y, _("No Resources to Return."));
+		unit->Player->Notify(NotifyYellow, unit->tilePos.x, unit->tilePos.y, _("No Resources to Return."));
 
 		ResourceGiveUp(unit);
 		return;

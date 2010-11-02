@@ -113,16 +113,14 @@ static void SpellMoveToTarget(CUnit *unit)
 
 		// there is goal and it is in range
 		unit->State = 0;
-		UnitHeadingFromDeltaXY(unit,
-			goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
-			goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
+		UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit->tilePos);
 		unit->SubAction++; // cast the spell
 		return;
-	} else if (!goal && unit->MapDistanceTo(order->X, order->Y) <= order->Range) {
+	} else if (!goal && unit->MapDistanceTo(order->goalPos.x, order->goalPos.y) <= order->Range) {
 		// there is no goal and target spot is in range
-		UnitHeadingFromDeltaXY(unit,
-			order->X + order->Arg1.Spell->Range - unit->X,
-			order->Y + order->Arg1.Spell->Range - unit->Y);
+		const Vec2i diag = {order->Arg1.Spell->Range, order->Arg1.Spell->Range};
+
+		UnitHeadingFromDeltaXY(unit, order->goalPos + diag - unit->tilePos);
 		unit->SubAction++; // cast the spell
 		return;
 	} else if (err == PF_UNREACHABLE) {
@@ -154,17 +152,17 @@ void HandleActionSpellCast(CUnit *unit)
 			//
 			// Check if we can cast the spell.
 			//
-			if (!CanCastSpell(unit, spell, order->GetGoal(), order->X, order->Y)) {
+			if (!CanCastSpell(unit, spell, order->GetGoal(), order->goalPos.x, order->goalPos.y)) {
 
 				//
 				// Notify player about this problem
 				//
 				if (unit->Variable[MANA_INDEX].Value < spell->ManaCost) {
-					unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
+					unit->Player->Notify(NotifyYellow, unit->tilePos.x, unit->tilePos.y,
 						_("%s: not enough mana for spell: %s"),
 						unit->Type->Name.c_str(), spell->Name.c_str());
 				} else {
-					unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
+					unit->Player->Notify(NotifyYellow, unit->tilePos.x, unit->tilePos.y,
 						_("%s: can't cast spell: %s"),
 						unit->Type->Name.c_str(), spell->Name.c_str());
 				}
@@ -204,7 +202,7 @@ void HandleActionSpellCast(CUnit *unit)
 				if (goal && goal != unit && !goal->IsVisibleAsGoal(unit->Player)) {
 					unit->ReCast = 0;
 				} else {
-					unit->ReCast = SpellCast(unit, spell, goal, order->X, order->Y);
+					unit->ReCast = SpellCast(unit, spell, goal, order->goalPos.x, order->goalPos.y);
 				}
 			}
 			if (!unit->ReCast && unit->CurrentAction() != UnitActionDie) {

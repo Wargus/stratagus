@@ -125,10 +125,10 @@ static int CclDefineMissileType(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
-			mtype->Width = LuaToNumber(l, -1);
+			mtype->size.x = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, -1, 2);
-			mtype->Height = LuaToNumber(l, -1);
+			mtype->size.y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "Frames")) {
 			mtype->SpriteFrames = LuaToNumber(l, -1);
@@ -183,7 +183,7 @@ static int CclDefineMissileType(lua_State *l)
 	}
 
 	if (!file.empty()) {
-		mtype->G = CGraphic::New(file, mtype->Width, mtype->Height);
+		mtype->G = CGraphic::New(file, mtype->Width(), mtype->Height());
 	}
 
 	return 0;
@@ -196,27 +196,17 @@ static int CclDefineMissileType(lua_State *l)
 */
 static int CclMissile(lua_State *l)
 {
-	const char *value;
-	MissileType *type;
-	int x;
-	int y;
-	int dx;
-	int dy;
-	int sx;
-	int sy;
-	Missile *missile;
-	int args;
-	int j;
+	MissileType *type = NULL;
+	Vec2i position = {-1, -1};
+	Vec2i destination = {-1, -1};
+	Vec2i source = {-1, -1};
+	Missile *missile = NULL;
 
 	DebugPrint("FIXME: not finished\n");
 
-	missile = NULL;
-	type = NULL;
-	x = dx = y = dy = sx = sy = -1;
-
-	args = lua_gettop(l);
-	for (j = 0; j < args; ++j) {
-		value = LuaToString(l, j + 1);
+	const int args = lua_gettop(l);
+	for (int j = 0; j < args; ++j) {
+		const char *value = LuaToString(l, j + 1);
 		++j;
 
 		if (!strcmp(value, "type")) {
@@ -226,45 +216,42 @@ static int CclMissile(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
-			x = LuaToNumber(l, -1);
+			position.x = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, j + 1, 2);
-			y = LuaToNumber(l, -1);
+			position.y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "origin-pos")) {
 			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
-			sx = LuaToNumber(l, -1);
+			source.x = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, j + 1, 2);
-			sy = LuaToNumber(l, -1);
+			source.y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "goal")) {
 			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
-			dx = LuaToNumber(l, -1);
+			destination.x = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, j + 1, 2);
-			dy = LuaToNumber(l, -1);
+			destination.y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "local")) {
 			Assert(type);
-			missile = MakeLocalMissile(type, x, y, dx, dy);
+			missile = MakeLocalMissile(type, position, destination);
 			missile->Local = 1;
 			--j;
 		} else if (!strcmp(value, "global")) {
 			Assert(type);
-			missile = MakeMissile(type, x, y, dx, dy);
-			missile->X = x;
-			missile->Y = y;
-			missile->SourceX = sx;
-			missile->SourceY = sy;
-			missile->DX = dx;
-			missile->DY = dy;
+			missile = MakeMissile(type, position, destination);
+			missile->position = position;
+			missile->source = source;
+			missile->destination = destination;
 			missile->Local = 0;
 			--j;
 		} else if (!strcmp(value, "frame")) {
@@ -322,12 +309,9 @@ static int CclMissile(lua_State *l)
 	// the way InitMissile() (called from MakeLocalMissile()) computes
 	// them - it works for creating a missile during a game but breaks
 	// loading the missile from a file.
-	missile->X = x;
-	missile->Y = y;
-	missile->SourceX = sx;
-	missile->SourceY = sy;
-	missile->DX = dx;
-	missile->DY = dy;
+	missile->position = position;
+	missile->source = source;
+	missile->destination = destination;
 	return 0;
 }
 

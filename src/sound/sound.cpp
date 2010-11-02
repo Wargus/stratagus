@@ -252,7 +252,7 @@ static char CalculateStereo(const CUnit *unit)
 {
 	int stereo;
 
-	stereo = ((unit->X * TileSizeX + unit->Type->TileWidth * TileSizeX / 2 +
+	stereo = ((unit->tilePos.x * TileSizeX + unit->Type->TileWidth * TileSizeX / 2 +
 		unit->IX - UI.SelectedViewport->MapX * TileSizeX) * 256 /
 		((UI.SelectedViewport->MapWidth - 1) * TileSizeX)) - 128;
 	if (stereo < -128) {
@@ -319,7 +319,7 @@ void PlayMissileSound(const Missile *missile, CSound *sound)
 {
 	int stereo;
 
-	stereo = ((missile->X + missile->Type->G->Width / 2 -
+	stereo = ((missile->position.x + missile->Type->G->Width / 2 -
 		UI.SelectedViewport->MapX * TileSizeX) * 256 /
 		((UI.SelectedViewport->MapWidth - 1) * TileSizeX)) - 128;
 	if (stereo < -128) {

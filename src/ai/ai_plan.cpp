@@ -70,8 +70,8 @@ struct _EnemyOnMapTile {
 				unit->CurrentAction() == UnitActionDie) {
 			return;
 		}
-		if (x < unit->X || x >= unit->X + type->TileWidth ||
-				y < unit->Y || y >= unit->Y + type->TileHeight) {
+		if (x < unit->tilePos.x || x >= unit->tilePos.x + type->TileWidth ||
+				y < unit->tilePos.y || y >= unit->tilePos.y + type->TileHeight) {
 			return;
 		}
 		if (!CanTarget(source->Type, type)) {
@@ -135,8 +135,8 @@ static void AiMarkWaterTransporter(const CUnit *unit, unsigned char *matrix)
 	int w;
 	unsigned char *m;
 
-	x = unit->X;
-	y = unit->Y;
+	x = unit->tilePos.x;
+	y = unit->tilePos.y;
 	w = Map.Info.MapWidth + 2;
 	matrix += w + w + 2;
 	if (matrix[x + y * w]) { // already marked
@@ -249,8 +249,8 @@ static bool AiFindTarget(const CUnit *unit,
 	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
 	points = new p[size];
 
-	x = unit->X;
-	y = unit->Y;
+	x = unit->tilePos.x;
+	y = unit->tilePos.y;
 
 	w = Map.Info.MapWidth + 2;
 	mask = unit->Type->MovementMask;
@@ -407,8 +407,8 @@ int AiFindWall(AiForce *force)
 		}
 	}
 
-	x = unit->X;
-	y = unit->Y;
+	x = unit->tilePos.x;
+	y = unit->tilePos.y;
 	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
 	points = new p[size];
 
@@ -711,7 +711,7 @@ void AiSendExplorers(void)
 				continue;
 			}
 
-			if ((*unit)->X == -1 || (*unit)->Y == -1) {
+			if ((*unit)->tilePos.x == -1 || (*unit)->tilePos.y == -1) {
 				continue;
 			}
 
@@ -735,7 +735,7 @@ void AiSendExplorers(void)
 				flyeronly = 1;
 			}
 
-			distance = ((*unit)->X - x) * ((*unit)->X - x) + ((*unit)->Y - y) * ((*unit)->Y - y);
+			distance = ((*unit)->tilePos.x - x) * ((*unit)->tilePos.x - x) + ((*unit)->tilePos.y - y) * ((*unit)->tilePos.y - y);
 			if (bestdistance == -1 || distance <= bestdistance ||
 					(bestunit->Type->UnitType != UnitTypeFly && type->UnitType == UnitTypeFly)) {
 				bestdistance = distance;

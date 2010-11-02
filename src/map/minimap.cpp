@@ -476,8 +476,8 @@ static void DrawUnitOn(CUnit *unit, int red_phase)
 		color = unit->Player->Color;
 	}
 
-	mx = 1 + UI.Minimap.XOffset + Map2MinimapX[unit->X];
-	my = 1 + UI.Minimap.YOffset + Map2MinimapY[unit->Y];
+	mx = 1 + UI.Minimap.XOffset + Map2MinimapX[unit->tilePos.x];
+	my = 1 + UI.Minimap.YOffset + Map2MinimapY[unit->tilePos.y];
 	w = Map2MinimapX[type->TileWidth];
 	if (mx + w >= UI.Minimap.W) { // clip right side
 		w = UI.Minimap.W - mx;

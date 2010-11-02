@@ -156,7 +156,7 @@ void SaveOrder(const COrderPtr order, CFile *file)
 		}
 		file->printf(" \"goal\", \"%s\",", UnitReference(goal).c_str());
 	}
-	file->printf(" \"tile\", {%d, %d}", order->X, order->Y);
+	file->printf(" \"tile\", {%d, %d}", order->goalPos.x, order->goalPos.y);
 
 	// Extra arg.
 	switch (order->Action) {
@@ -231,7 +231,7 @@ void SaveUnit(const CUnit *unit, CFile *file)
 		file->printf("\"next\", %d, ", UnitNumber(unit->Next));
 	}
 
-	file->printf("\"tile\", {%d, %d}, ", unit->X, unit->Y);
+	file->printf("\"tile\", {%d, %d}, ", unit->tilePos.x, unit->tilePos.y);
 	file->printf("\"refs\", %d, ", unit->Refs);
 #if 0
 	// latimerius: why is this so complex?
@@ -281,7 +281,7 @@ void SaveUnit(const CUnit *unit, CFile *file)
 	// SEE unit loading code.
 	if (unit->Container && unit->Removed) {
 		file->printf(" \"host-info\", {%d, %d, %d, %d}, ",
-			unit->Container->X, unit->Container->Y,
+			unit->Container->tilePos.x, unit->Container->tilePos.y,
 			unit->Container->Type->TileWidth,
 			unit->Container->Type->TileHeight);
 	}

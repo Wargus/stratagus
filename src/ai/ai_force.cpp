@@ -357,8 +357,8 @@ void AiForce::Attack(int goalX, int goalY)
 			/* Search in entire map */
 			const CUnit *enemy = AiForceEnemyFinder<false>(this).enemy;
 			if (enemy) {
-				goalX = enemy->X;
-				goalY = enemy->Y;
+				goalX = enemy->tilePos.x;
+				goalY = enemy->tilePos.x;
 			}
 		}
 
@@ -773,11 +773,11 @@ void AiForce::Update(void)
 		// FIXME: may not be a good goal
 		COrderPtr order = unit->CurrentOrder();
 		if (order->HasGoal()) {
-			x = order->GetGoal()->X;
-			y = order->GetGoal()->Y;
-		} else if (order->X != -1 && order->Y != -1) {
-			x = order->X;
-			y = order->Y;
+			x = order->GetGoal()->tilePos.x;
+			y = order->GetGoal()->tilePos.y;
+		} else if (order->goalPos.x != -1 && order->goalPos.y != -1) {
+			x = order->goalPos.x;
+			y = order->goalPos.y;
 		} else {
 			x = GoalX;
 			y = GoalY;
@@ -817,8 +817,8 @@ void AiForce::Update(void)
 				Attacking = false;
 				return;
 			}
-			x = unit->X;
-			y = unit->Y;
+			x = unit->tilePos.x;
+			y = unit->tilePos.y;
 		} else {
 			x = GoalX;
 			y = GoalY;
@@ -848,8 +848,8 @@ void AiForce::Update(void)
 				Attacking = false;
 				return;
 			}
-			x = unit->X;
-			y = unit->Y;
+			x = unit->tilePos.x;
+			y = unit->tilePos.y;
 		} else {
 			x = GoalX;
 			y = GoalY;

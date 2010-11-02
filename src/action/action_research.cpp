@@ -98,7 +98,7 @@ void HandleActionResearch(CUnit *unit)
 	if (unit->Player->UpgradeTimers.Upgrades[upgrade->ID] >=
 			upgrade->Costs[TimeCost]) {
 
-		unit->Player->Notify(NotifyGreen, unit->X, unit->Y,
+		unit->Player->Notify(NotifyGreen, unit->tilePos.x, unit->tilePos.y,
 			_("%s: complete"), unit->Type->Name.c_str());
 		if (unit->Player == ThisPlayer) {
 			if (GameSounds.ResearchComplete[unit->Player->Race].Sound) 

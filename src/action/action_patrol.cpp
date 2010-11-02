@@ -59,11 +59,11 @@ static void SwapPatrolPoints(CUnit *unit)
 	int tmp;
 	COrderPtr order = unit->CurrentOrder();
 	tmp = order->Arg1.Patrol.X;
-	order->Arg1.Patrol.X = order->X;
-	order->X = tmp;
+	order->Arg1.Patrol.X = order->goalPos.x;
+	order->goalPos.x = tmp;
 	tmp = order->Arg1.Patrol.Y;
-	order->Arg1.Patrol.Y = order->Y;
-	order->Y = tmp;
+	order->Arg1.Patrol.Y = order->goalPos.y;
+	order->goalPos.y = tmp;
 
 	unit->Data.Move.Cycles = 0; //moving counter
 	NewResetPath(unit);
@@ -139,9 +139,9 @@ void HandleActionPatrol(CUnit *unit)
 
 				unit->ClearAction();
 				unit->CurrentOrder()->ClearGoal();
-				
+
 				DebugPrint("Patrol attack %d\n" _C_ UnitNumber(goal));
-				CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
+				CommandAttack(unit, goal->tilePos.x, goal->tilePos.y, NULL, FlushCommands);
 				return;
 			}
 		}

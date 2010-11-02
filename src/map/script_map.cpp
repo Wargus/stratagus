@@ -295,8 +295,8 @@ static int CclShowMapLocation(lua_State *l)
 	if (target != NoUnitP) {
 		target->CurrentOrder()->Action = UnitActionStill;
 		target->Variable[HP_INDEX].Value = 0;
-		target->X = LuaToNumber(l, 1);
-		target->Y = LuaToNumber(l, 2);
+		target->tilePos.x = LuaToNumber(l, 1);
+		target->tilePos.y = LuaToNumber(l, 2);
 		target->TTL = GameCycle + LuaToNumber(l, 4);
 		target->CurrentSightRange = LuaToNumber(l, 3);
 		MapMarkUnitSight(target);
@@ -472,11 +472,11 @@ void SetTile(int tile, int w, int h, int value)
 		Map.Fields[index].Tile = Map.Tileset.Table[tile];
 		Map.Fields[index].Value = value;
 		Map.Fields[index].Flags = Map.Tileset.FlagsTable[tile];
-		Map.Fields[index].Cost = 
+		Map.Fields[index].Cost =
 			1 << (Map.Tileset.FlagsTable[tile] & MapFieldSpeedMask);
 #ifdef DEBUG
 		Map.Fields[index].TilesetTile = tile;
-#endif			
+#endif
 	}
 }
 
@@ -538,7 +538,7 @@ static int CclLoadTileModels(lua_State *l)
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	strcpy_s(Map.TileModelsFileName, sizeof(Map.TileModelsFileName), LuaToString(l, 1));  
+	strcpy_s(Map.TileModelsFileName, sizeof(Map.TileModelsFileName), LuaToString(l, 1));
 	LibraryFileName(Map.TileModelsFileName, buf, sizeof(buf));
 	if (LuaLoadFile(buf) == -1) {
 		DebugPrint("Load failed: %s\n" _C_ LuaToString(l, 1));

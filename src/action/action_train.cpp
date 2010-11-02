@@ -119,7 +119,7 @@ void HandleActionTrain(CUnit *unit)
 	player = unit->Player;
 	ntype = unit->CurrentOrder()->Arg1.Type;
 	cost = ntype->Stats[player->Index].Costs[TimeCost];
-	
+
 	unit->Data.Train.Ticks += SpeedTrain;
 	// FIXME: Should count down
 	if (unit->Data.Train.Ticks >= cost) {
@@ -151,14 +151,12 @@ void HandleActionTrain(CUnit *unit)
 		nunit = MakeUnit(ntype, player);
 		if (nunit != NoUnitP) {
 			const CUnitType *type = unit->Type;
-			nunit->X = unit->X;
-			nunit->Y = unit->Y;
+			nunit->tilePos = unit->tilePos;
 
 			// DropOutOnSide set unit to belong to the building
 			// training it. This was an ugly hack, setting X and Y is enough,
 			// no need to add the unit only to be removed.
-			nunit->X = unit->X;
-			nunit->Y = unit->Y;
+			nunit->tilePos = unit->tilePos;
 
 			// New unit might supply food
 			UpdateForNewUnit(nunit, 0);
@@ -179,7 +177,7 @@ void HandleActionTrain(CUnit *unit)
 				nunit->TTL = GameCycle + type->DecayRate * 6 * CYCLES_PER_SECOND;
 			}
 
-			player->Notify(NotifyYellow, nunit->X, nunit->Y,
+			player->Notify(NotifyYellow, nunit->tilePos.x, nunit->tilePos.y,
 				_("New %s ready"), nunit->Type->Name.c_str());
 			if (player == ThisPlayer) {
 				PlayUnitSound(nunit, VoiceReady);
@@ -220,7 +218,7 @@ void HandleActionTrain(CUnit *unit)
 			}
 			return;
 		} else {
-			player->Notify(NotifyYellow, unit->X, unit->Y,
+			player->Notify(NotifyYellow, unit->tilePos.x, unit->tilePos.y,
 				_("Unable to train %s"), ntype->Name.c_str());
 		}
 	}

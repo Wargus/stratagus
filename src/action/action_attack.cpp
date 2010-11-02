@@ -110,8 +110,7 @@ static int CheckForDeadGoal(CUnit *unit)
 
 	// Goal could be destroyed or unseen
 	// So, cannot use type.
-	order->X = goal->X;
-	order->Y = goal->Y;
+	order->goalPos = goal->tilePos;
 	order->MinRange = 0;
 	order->Range = 0;
 	order->ClearGoal();
@@ -152,7 +151,7 @@ static int CheckForTargetInRange(CUnit *unit)
 	//
 	if (!order->HasGoal() &&
 		order->Action != UnitActionAttackGround &&
-		!Map.WallOnMap(order->X, order->Y)) {
+		!Map.WallOnMap(order->goalPos.x, order->goalPos.y)) {
 		CUnit *goal = AttackUnitsInReactRange(unit);
 		if (goal) {
 #ifdef DEBUG
@@ -165,7 +164,7 @@ static int CheckForTargetInRange(CUnit *unit)
 			order->SetGoal(goal);
 			order->MinRange = unit->Type->MinAttackRange;
 			order->Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
-			order->X = order->Y = -1;
+			order->goalPos.x = order->goalPos.y = -1;
 			unit->SubAction |= WEAK_TARGET; // weak target
 			NewResetPath(unit);
 		}
@@ -179,7 +178,7 @@ static int CheckForTargetInRange(CUnit *unit)
 		if (temp && temp->Type->Priority > goal->Type->Priority) {
 			unit->StoreOrder();
 			order->SetGoal(temp);
-			order->X = order->Y = -1;
+			order->goalPos.x = order->goalPos.y = -1;
 			NewResetPath(unit);
 		}
 	}
@@ -205,7 +204,7 @@ static void MoveToTarget(CUnit *unit)
 		unit->CurrentAction() == UnitActionAttackGround);
 	Assert(unit->CanMove());
 	Assert(unit->CurrentOrder()->HasGoal()
-		 || (unit->CurrentOrder()->X != -1 && unit->CurrentOrder()->Y != -1));
+		 || (unit->CurrentOrder()->goalPos.x != -1 && unit->CurrentOrder()->goalPos.y != -1));
 
 	int err = DoActionMove(unit);
 
@@ -219,7 +218,7 @@ static void MoveToTarget(CUnit *unit)
 	COrderPtr order = unit->CurrentOrder();
 	if (err == 0 && !order->HasGoal()) {
 		// Check if we're in range when attacking a location and we are waiting
-		if (unit->MapDistanceTo(order->X, order->Y) <
+		if (unit->MapDistanceTo(order->goalPos.x, order->goalPos.y) <
 				unit->Stats->Variables[ATTACKRANGE_INDEX].Max) {
 			err = PF_REACHED;
 		}
@@ -239,22 +238,21 @@ static void MoveToTarget(CUnit *unit)
 				unit->Stats->Variables[ATTACKRANGE_INDEX].Max) {
 			// Reached another unit, now attacking it
 			unit->State = 0;
-			UnitHeadingFromDeltaXY(unit,
-				goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
-				goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
+			const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit->tilePos;
+			UnitHeadingFromDeltaXY(unit, dir);
 			unit->SubAction++;
 			return;
 		}
 		//
 		// Attacking wall or ground.
 		//
-		if (!goal && (Map.WallOnMap(order->X, order->Y) ||
+		if (!goal && (Map.WallOnMap(order->goalPos.x, order->goalPos.y) ||
 					order->Action == UnitActionAttackGround) &&
-				unit->MapDistanceTo(order->X, order->Y) <=
+				unit->MapDistanceTo(order->goalPos.x, order->goalPos.y) <=
 					unit->Stats->Variables[ATTACKRANGE_INDEX].Max) {
 			// Reached wall or ground, now attacking it
 			unit->State = 0;
-			UnitHeadingFromDeltaXY(unit, order->X - unit->X, order->Y - unit->Y);
+			UnitHeadingFromDeltaXY(unit, order->goalPos - unit->tilePos);
 			unit->SubAction &= WEAK_TARGET;
 			unit->SubAction |= ATTACK_TARGET;
 			return;
@@ -298,7 +296,7 @@ static void AttackTarget(CUnit *unit)
 
 	Assert(unit);
 	Assert(unit->CurrentOrder()->HasGoal() ||
-		(unit->CurrentOrder()->X != -1 && unit->CurrentOrder()->Y != -1));
+		(unit->CurrentOrder()->goalPos.x != -1 && unit->CurrentOrder()->goalPos.y != -1));
 
 	AnimateActionAttack(unit);
 	if (unit->Anim.Unbreakable) {
@@ -309,7 +307,7 @@ static void AttackTarget(CUnit *unit)
 	//
 	COrderPtr order = unit->CurrentOrder();
 	if (!order->HasGoal() && (order->Action == UnitActionAttackGround ||
-								Map.WallOnMap(order->X, order->Y))) {
+								Map.WallOnMap(order->goalPos.x, order->goalPos.y))) {
 		return;
 	}
 
@@ -352,7 +350,7 @@ static void AttackTarget(CUnit *unit)
 #endif
 
 		order->SetGoal(goal);
-		order->X = order->Y = -1;
+		order->goalPos.x = order->goalPos.y = -1;
 		order->MinRange = unit->Type->MinAttackRange;
 		order->Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
 		NewResetPath(unit);
@@ -369,7 +367,7 @@ static void AttackTarget(CUnit *unit)
 				unit->StoreOrder();
 				goal = temp;
 				order->SetGoal(temp);
-				order->X = order->Y = -1;
+				order->goalPos.x = order->goalPos.y = -1;
 				order->MinRange = unit->Type->MinAttackRange;
 				unit->SubAction = MOVE_TO_TARGET;
 				NewResetPath(unit);
@@ -397,9 +395,8 @@ static void AttackTarget(CUnit *unit)
 	// Turn always to target
 	//
 	if (goal) {
-		UnitHeadingFromDeltaXY(unit,
-			goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
-			goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
+		const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit->tilePos;
+		UnitHeadingFromDeltaXY(unit, dir);
 	}
 }
 
@@ -422,7 +419,7 @@ void HandleActionAttack(CUnit *unit)
 	Assert(unit->CurrentAction() == UnitActionAttackGround ||
 		unit->CurrentAction() == UnitActionAttack);
 	Assert(unit->CurrentOrder()->HasGoal() ||
-		 (unit->CurrentOrder()->X != -1 && unit->CurrentOrder()->Y != -1));
+		 (unit->CurrentOrder()->goalPos.x != -1 && unit->CurrentOrder()->goalPos.y != -1));
 
 	if (unit->Wait) {
 		unit->Wait--;
@@ -445,9 +442,9 @@ void HandleActionAttack(CUnit *unit)
 				int dist = goal->MapDistanceTo(unit);
 				if (unit->Type->MinAttackRange < dist &&
 					 dist <= unit->Stats->Variables[ATTACKRANGE_INDEX].Max) {
-					UnitHeadingFromDeltaXY(unit,
-						goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
-						goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
+					const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit->tilePos;
+
+					UnitHeadingFromDeltaXY(unit, dir);
 					unit->SubAction = ATTACK_TARGET;
 					AttackTarget(unit);
 					return;

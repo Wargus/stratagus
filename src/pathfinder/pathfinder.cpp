@@ -165,7 +165,7 @@ unsigned char *MakeMatrix(void)
 int PlaceReachable(const CUnit *src, int x, int y, int w, int h,
 	 int minrange, int range)
 {
-	int i = AStarFindPath(src->X, src->Y, x, y, w, h,
+	int i = AStarFindPath(src->tilePos.x, src->tilePos.y, x, y, w, h,
 		src->Type->TileWidth, src->Type->TileHeight,
 		 minrange, range, NULL, 0, (void *)src);
 
@@ -173,7 +173,7 @@ int PlaceReachable(const CUnit *src, int x, int y, int w, int h,
 		case PF_FAILED:
 		case PF_UNREACHABLE:
 			i = 0;
-			break;		
+			break;
 		case PF_REACHED:
 			/* sice most of this function usage check return value as bool
 			 * then reached state should be track as true value */
@@ -210,7 +210,7 @@ int UnitReachable(const CUnit *src, const CUnit *dst, int range)
 	//
 	if (src->Type->Building)
 		return 0;
-	depth = PlaceReachable(src, dst->X, dst->Y,
+	depth = PlaceReachable(src, dst->tilePos.x, dst->tilePos.y,
 	 dst->Type->TileWidth, dst->Type->TileHeight, 0, range);
 	if (depth <= 0) {
 		return 0;
@@ -252,8 +252,8 @@ int NewPath(CUnit *unit)
 		CUnit *goal = order->GetGoal();
 		gw = goal->Type->TileWidth;
 		gh = goal->Type->TileHeight;
-		gx = goal->X;
-		gy = goal->Y;
+		gx = goal->tilePos.x;
+		gy = goal->tilePos.y;
 	} else {
 		// Take care of non square goals :)
 		// If goal is non square, range states a non-existant goal rather
@@ -261,17 +261,17 @@ int NewPath(CUnit *unit)
 		gw = order->Width;
 		gh = order->Height;
 		// Large units may have a goal that goes outside the map, fix it here
-		if (order->X + unit->Type->TileWidth - 1 >= Map.Info.MapWidth) {
-			order->X = Map.Info.MapWidth - unit->Type->TileWidth;
+		if (order->goalPos.x + unit->Type->TileWidth - 1 >= Map.Info.MapWidth) {
+			order->goalPos.x = Map.Info.MapWidth - unit->Type->TileWidth;
 		}
-		if (order->Y + unit->Type->TileHeight - 1 >= Map.Info.MapHeight) {
-			order->Y = Map.Info.MapHeight - unit->Type->TileHeight;
+		if (order->goalPos.y + unit->Type->TileHeight - 1 >= Map.Info.MapHeight) {
+			order->goalPos.y = Map.Info.MapHeight - unit->Type->TileHeight;
 		}
-		gx = order->X;
-		gy = order->Y;
+		gx = order->goalPos.x;
+		gy = order->goalPos.y;
 	}
 	path = unit->Data.Move.Path;
-	i = AStarFindPath(unit->X, unit->Y, gx, gy, gw, gh,
+	i = AStarFindPath(unit->tilePos.x, unit->tilePos.y, gx, gy, gw, gh,
 		unit->Type->TileWidth, unit->Type->TileHeight,
 		 minrange, maxrange, path, MAX_PATH_LENGTH, unit);
 	if (i == PF_FAILED) {
@@ -316,8 +316,7 @@ int NextPathElement(CUnit *unit, int *pxd, int *pyd)
 
 	// Goal has moved, need to recalculate path or no cached path
 	if (unit->Data.Move.Length <= 0 ||
-		((goal = order->GetGoal()) && (goal->X != order->X || 
-			goal->Y != order->Y))) {
+		((goal = order->GetGoal()) && goal->tilePos != order->goalPos)) {
 		result = NewPath(unit);
 
 		if (result == PF_UNREACHABLE) {
@@ -329,8 +328,7 @@ int NextPathElement(CUnit *unit, int *pxd, int *pyd)
 		}
 		if (unit->Goal) {
 			// Update Orders
-			order->X = unit->Goal->X;
-			order->Y = unit->Goal->Y;
+			order->goalPos = unit->Goal->tilePos;
 		}
 	}
 
@@ -338,7 +336,7 @@ int NextPathElement(CUnit *unit, int *pxd, int *pyd)
 	*pyd = Heading2Y[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length - 1]];
 	result = unit->Data.Move.Length;
 	unit->Data.Move.Length--;
-	if (!UnitCanBeAt(unit, *pxd + unit->X, *pyd + unit->Y)) {
+	if (!UnitCanBeAt(unit, *pxd + unit->tilePos.x, *pyd + unit->tilePos.y)) {
 		// If obstructing unit is moving, wait for a bit.
 		if (unit->Data.Move.Fast) {
 			unit->Data.Move.Fast--;
@@ -355,7 +353,7 @@ int NextPathElement(CUnit *unit, int *pxd, int *pyd)
 			if (result > 0) {
 				*pxd = Heading2X[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length - 1]];
 				*pyd = Heading2Y[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length - 1]];
-				if (!UnitCanBeAt(unit, *pxd + unit->X, *pyd + unit->Y)) {
+				if (!UnitCanBeAt(unit, *pxd + unit->tilePos.x, *pyd + unit->tilePos.y)) {
 					// There may be unit in the way, Astar may allow you to walk onto it.
 					result = PF_UNREACHABLE;
 					*pxd = 0;

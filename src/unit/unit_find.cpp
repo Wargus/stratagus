@@ -182,8 +182,8 @@ CUnit *TargetOnMap(const CUnit *source, int x1, int y1, int x2, int y2)
 			continue;
 		}
 		type = unit->Type;
-		if (x2 < unit->X || x1 >= unit->X + type->TileWidth ||
-				y2 < unit->Y || y1 >= unit->Y + type->TileHeight) {
+		if (x2 < unit->tilePos.x || x1 >= unit->tilePos.x + type->TileWidth ||
+				y2 < unit->tilePos.y || y1 >= unit->tilePos.y + type->TileHeight) {
 			continue;
 		}
 		if (!CanTarget(source->Type, unit->Type)) {
@@ -242,17 +242,17 @@ struct BestTargetFinder {
 	const int range;
 	CUnit *best_unit;
 	int best_cost;
-	
+
 	BestTargetFinder(const CUnit *a, int r): attacker(a), range(r),
 		 best_unit(0), best_cost(INT_MAX) {};
-	
+
 	inline void operator() (CUnit *const dest) {
 		const CPlayer *const player = attacker->Player;
 
 		if (!player->IsEnemy(dest)) { // a friend or neutral
 			return;
 		}
-		
+
 		if (!dest->IsVisibleAsGoal(player)) {
 			return;
 		}
@@ -345,7 +345,7 @@ struct BestRangeTargetFinder {
 	int best_cost;
 	int good[32*32];
 	int bad[32*32];
-	
+
 	/**
 	**  @param a      Find in distance for this unit.
 	**  @param range  Distance range to look.
@@ -354,7 +354,7 @@ struct BestRangeTargetFinder {
 	BestRangeTargetFinder(const CUnit *a, const int r) : attacker(a), range(r),
 		 best_unit(0), best_cost(INT_MIN) {
 		memset(good, 0 , sizeof(int) * 32 * 32);
-		memset(bad, 0 , sizeof(int) * 32 * 32);		 
+		memset(bad, 0 , sizeof(int) * 32 * 32);
 	};
 
 	struct FillBadGood {
@@ -363,16 +363,16 @@ struct BestRangeTargetFinder {
 		int enemy_count;
 		int *good;
 		int *bad;
-		
-		FillBadGood(const CUnit *a, int r, int *g, int *b): 
+
+		FillBadGood(const CUnit *a, int r, int *g, int *b):
 			attacker(a), range(r),
 			enemy_count(0), good(g), bad(b) {
 		}
-				
+
 		inline void operator() (CUnit *const dest)
 		{
-			const CPlayer *const player = attacker->Player;		
-			
+			const CPlayer *const player = attacker->Player;
+
 			if (!dest->IsVisibleAsGoal(player)) {
 				dest->CacheLock = 1;
 				return;
@@ -392,10 +392,10 @@ struct BestRangeTargetFinder {
 			//
 
 			int cost = 0;
-			const int hp_damage_evaluate = 
+			const int hp_damage_evaluate =
 				attacker->Stats->Variables[BASICDAMAGE_INDEX].Value
 						+ attacker->Stats->Variables[PIERCINGDAMAGE_INDEX].Value;
-						
+
 			if (!player->IsEnemy(dest)) { // a friend or neutral
 				dest->CacheLock = 1;
 
@@ -425,7 +425,7 @@ struct BestRangeTargetFinder {
 				//
 				// calculate HP which will remain in the enemy unit, after hit
 				//
-				int effective_hp = 
+				int effective_hp =
 					(dest->Variable[HP_INDEX].Value - 2 * hp_damage_evaluate);
 
 				//
@@ -473,9 +473,9 @@ struct BestRangeTargetFinder {
 					d = attacker->MapDistanceTo(dest);
 				}
 
-				int attackrange = 
+				int attackrange =
 					attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
-				if (d <= attackrange || 
+				if (d <= attackrange ||
 					(d <= range && UnitReachable(attacker, dest, attackrange))) {
 					++enemy_count;
 				} else {
@@ -484,8 +484,8 @@ struct BestRangeTargetFinder {
 			}
 
 			const int missile_range = type->Missile.Missile->Range + range - 1;
-			const int x = dest->X - attacker->X + missile_range + 1;
-			const int y = dest->Y - attacker->Y + missile_range + 1;
+			const int x = dest->tilePos.x - attacker->tilePos.x + missile_range + 1;
+			const int y = dest->tilePos.y - attacker->tilePos.y + missile_range + 1;
 
 			// Mark the good/bad array...
 			int yy_offset = x + y * 32;
@@ -503,65 +503,65 @@ struct BestRangeTargetFinder {
 				}
 				yy_offset += 32;
 			}
-		
+
 		}
-		
+
 		inline int Fill(CUnit *table[], const int table_size) {
-			for (int i = 0; i < table_size; ++i) {		
+			for (int i = 0; i < table_size; ++i) {
 				this->operator() (table[i]);
 			}
 			return enemy_count;
 		}
-				
+
 		inline int Fill(CUnitCache &cache) {
 			cache.for_each(*this);
 			return enemy_count;
 		}
 
-	
+
 	};
-	
+
 	inline void operator() (CUnit *const dest) {
-	
+
 		if (dest->CacheLock) {
 			dest->CacheLock = 0;
 			return;
 		}
 
-		const CUnitType *const type =  attacker->Type;	
+		const CUnitType *const type =  attacker->Type;
 		const CUnitType *const dtype = dest->Type;
-		const int missile_range = type->Missile.Missile->Range + range - 1;		
+		const int missile_range = type->Missile.Missile->Range + range - 1;
 		int x,y;
 
 		// put in x-y the real point which will be hit...
 		// (only meaningful when dtype->TileWidth > 1)
-		if (attacker->X < dest->X) {
-			x = dest->X;
-		} else if (attacker->X > dest->X + dtype->TileWidth - 1) {
-			x = dest->X + dtype->TileWidth - 1;
+		if (attacker->tilePos.x < dest->tilePos.x) {
+			x = dest->tilePos.x;
+		} else if (attacker->tilePos.x > dest->tilePos.x + dtype->TileWidth - 1) {
+			x = dest->tilePos.x + dtype->TileWidth - 1;
 		} else {
-			x = attacker->X;
+			x = attacker->tilePos.x;
 		}
 
-		if (attacker->Y < dest->Y) {
-			y = dest->Y;
-		} else if (attacker->Y > dest->Y + dtype->TileHeight - 1) {
-			y = dest->Y + dtype->TileHeight - 1;
+		if (attacker->tilePos.y < dest->tilePos.y) {
+			y = dest->tilePos.y;
+		} else if (attacker->tilePos.y > dest->tilePos.y + dtype->TileHeight - 1) {
+			y = dest->tilePos.y + dtype->TileHeight - 1;
 		} else {
-			y = attacker->Y;
+			y = attacker->tilePos.y;
 		}
 
 		// Make x,y relative to u->x...
-		
-		x = x - attacker->X + missile_range + 1;
-		y = y - attacker->Y + missile_range + 1;
+
+		x = x - attacker->tilePos.x + missile_range + 1;
+		y = y - attacker->tilePos.x + missile_range + 1;
 
 		int sbad = 0;
 		int sgood = 0;
 		int yy = -(type->Missile.Missile->Range - 1);
 		int yy_offset = x + yy * 32;
 		for (;yy <= type->Missile.Missile->Range - 1; ++yy) {
-			if ((y + yy >= 0) && ((y + yy) < 2 * missile_range + 1)) {		
+			if ((y + yy >= 0) && ((y + yy) < 2 * missile_range + 1)) {
 				for (int xx = -(type->Missile.Missile->Range - 1);
 					xx <= type->Missile.Missile->Range - 1; ++xx) {
 					if ((x + xx >= 0) && ((x + xx) < 2 * missile_range + 1)) {
@@ -592,7 +592,7 @@ struct BestRangeTargetFinder {
 
 	inline CUnit *Find(	CUnit* table[], const int table_size) {
 		FillBadGood(attacker, range, good, bad).Fill(table, table_size);
-		for (int i = 0; i < table_size; ++i) {		
+		for (int i = 0; i < table_size; ++i) {
 			this->operator() (table[i]);
 		}
 		return best_unit;
@@ -634,14 +634,14 @@ struct CompareUnitDistance {
 **  @return       Unit to be attacked.
 **
 */
-CUnit *AutoAttackUnitsInDistance(const CUnit *unit, int range, 
+CUnit *AutoAttackUnitsInDistance(const CUnit *unit, int range,
 		CUnitCache &autotargets)
 {
 	// if necessary, take possible damage on allied units into account...
 	if (unit->Type->Missile.Missile->Range > 1 &&
 			(range + unit->Type->Missile.Missile->Range < 15)) {
 		return BestRangeTargetFinder(unit, range).Find(autotargets);
-	} else {			
+	} else {
 		//
 		// Find the best unit to auto attack
 		//
@@ -674,19 +674,19 @@ CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 		//
 
 		int missile_range = unit->Type->Missile.Missile->Range + range - 1;
-		
+
 		Assert(2 * missile_range + 1 < 32);
 		//
 		// If unit is removed, use containers x and y
 		if (unit->Removed) {
-			int x = unit->Container->X;
-			int y = unit->Container->Y;
+			int x = unit->Container->tilePos.x;
+			int y = unit->Container->tilePos.y;
 			n = Map.Select(x - missile_range, y - missile_range,
 				x + missile_range + unit->Container->Type->TileWidth,
 				y + missile_range + unit->Container->Type->TileHeight, table);
 		} else {
-			int x = unit->X;
-			int y = unit->Y;
+			int x = unit->tilePos.x;
+			int y = unit->tilePos.y;
 			n = Map.Select(x - missile_range, y - missile_range,
 				x + missile_range + unit->Type->TileWidth,
 				y + missile_range + unit->Type->TileHeight, table);
@@ -698,14 +698,14 @@ CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 		return NoUnitP;
 
 	} else {
-		n = Map.Select(unit->X - range, unit->Y - range,
-			unit->X + range + unit->Type->TileWidth,
-			unit->Y + range + unit->Type->TileHeight, table);
-			
+		n = Map.Select(unit->tilePos.x - range, unit->tilePos.y - range,
+			unit->tilePos.x + range + unit->Type->TileWidth,
+			unit->tilePos.y + range + unit->Type->TileHeight, table);
+
 		if (range > 25 && n > 9) {
 			std::sort(table, table + n, CompareUnitDistance(unit));
 		}
-			
+
 		//
 		// Find the best unit to attack
 		//

@@ -173,10 +173,10 @@ void DrawUnitSelection(const CViewport *vp, const CUnit *unit)
 	}
 
 	const CUnitType *type = unit->Type;
-	int x = vp->Map2ViewportX(unit->X) + unit->IX +
+	int x = vp->Map2ViewportX(unit->tilePos.x) + unit->IX +
 		type->TileWidth * TileSizeX / 2 - type->BoxWidth / 2 -
 		(type->Width - type->Sprite->Width) / 2;
-	int y = vp->Map2ViewportY(unit->Y) + unit->IY +
+	int y = vp->Map2ViewportY(unit->tilePos.y) + unit->IY +
 		type->TileHeight * TileSizeY / 2 - type->BoxHeight / 2 -
 		(type->Height - type->Sprite->Height) / 2;
 
@@ -411,7 +411,7 @@ void CleanDecorations(void)
 **  @param unit    Unit pointer
 **  @todo fix color configuration.
 */
-void CDecoVarBar::Draw(int x, int y, 
+void CDecoVarBar::Draw(int x, int y,
 	const CUnitType *Type, const CVariable &Variable) const
 {
 	int height;
@@ -482,7 +482,7 @@ void CDecoVarBar::Draw(int x, int y,
 **  @param unit    Unit pointer
 **  @todo fix font/color configuration.
 */
-void CDecoVarText::Draw(int x, int y, 
+void CDecoVarText::Draw(int x, int y,
 	const CUnitType *, const CVariable &Variable) const
 {
 	if (this->IsCenteredInX) {
@@ -502,7 +502,7 @@ void CDecoVarText::Draw(int x, int y,
 **  @param unit    Unit pointer
 **  @todo fix sprite configuration.
 */
-void CDecoVarSpriteBar::Draw(int x, int y, 
+void CDecoVarSpriteBar::Draw(int x, int y,
 	const CUnitType *, const CVariable &Variable) const
 {
 	int n;                   // frame of the sprite to show.
@@ -538,7 +538,7 @@ void CDecoVarSpriteBar::Draw(int x, int y,
 **
 **  @todo fix sprite configuration configuration.
 */
-void CDecoVarStaticSprite::Draw(int x, int y, 
+void CDecoVarStaticSprite::Draw(int x, int y,
 	const CUnitType *, const CVariable &) const
 {
 	CGraphic *sprite;         // the sprite to show.
@@ -612,11 +612,14 @@ static void DrawDecoration(const CUnit *unit, const CUnitType *type, int x, int 
 	 	&& unit->Player == ThisPlayer
 #endif
 	 	) {
-		int width = GameFont->Width(unit->GroupId - 1);
+		int groupId = 0;
+		for (groupId = 0; !(unit->GroupId & (1 << groupId)); ++groupId)
+			;
+		int width = GameFont->Width(groupId);
 		x += (unit->Type->TileWidth * TileSizeX + unit->Type->BoxWidth) / 2 - width;
 		width = GameFont->Height();
 		y += (unit->Type->TileHeight * TileSizeY + unit->Type->BoxHeight) / 2 - width;
-		CLabel(GameFont).DrawClip(x, y, unit->GroupId - 1);
+		CLabel(GameFont).DrawClip(x, y, groupId);
 	}
 }
 
@@ -673,21 +676,21 @@ static void GetOrderPosition(const CUnit *unit, const COrderPtr order, int *x, i
 	// FIXME: n0body: Check for goal gone?
 	if ((goal = order->GetGoal()) && (!goal->Removed)) {
 		// Order has a goal, get it's location.
-		*x = CurrentViewport->Map2ViewportX(goal->X) + goal->IX +
+		*x = CurrentViewport->Map2ViewportX(goal->tilePos.x) + goal->IX +
 			goal->Type->TileWidth * TileSizeX / 2;
-		*y = CurrentViewport->Map2ViewportY(goal->Y) + goal->IY +
+		*y = CurrentViewport->Map2ViewportY(goal->tilePos.y) + goal->IY +
 			goal->Type->TileHeight * TileSizeY / 2;
 	} else {
-		if (order->X >= 0 && order->Y >= 0) {
+		if (order->goalPos.x >= 0 && order->goalPos.y >= 0) {
 			// Order is for a location, show that.
-			*x = CurrentViewport->Map2ViewportX(order->X) + TileSizeX / 2;
-			*y = CurrentViewport->Map2ViewportY(order->Y) + TileSizeY / 2;
+			*x = CurrentViewport->Map2ViewportX(order->goalPos.x) + TileSizeX / 2;
+			*y = CurrentViewport->Map2ViewportY(order->goalPos.y) + TileSizeY / 2;
 		} else {
 			// Some orders ignore x,y (like StandStill).
 			// Use the unit's position instead.
-			*x = CurrentViewport->Map2ViewportX(unit->X) + unit->IX +
+			*x = CurrentViewport->Map2ViewportX(unit->tilePos.x) + unit->IX +
 				unit->Type->TileWidth * TileSizeX / 2;
-			*y = CurrentViewport->Map2ViewportY(unit->Y) + unit->IY +
+			*y = CurrentViewport->Map2ViewportY(unit->tilePos.y) + unit->IY +
 				unit->Type->TileHeight * TileSizeY / 2;
 		}
 		if (order->Action == UnitActionBuild) {
@@ -749,8 +752,8 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrderPtr o
 			break;
 
 		case UnitActionAttackGround:
-			x2 = CurrentViewport->Map2ViewportX(order->X) + TileSizeX / 2;
-			y2 = CurrentViewport->Map2ViewportY(order->Y) + TileSizeY / 2;
+			x2 = CurrentViewport->Map2ViewportX(order->goalPos.x) + TileSizeX / 2;
+			y2 = CurrentViewport->Map2ViewportY(order->goalPos.y) + TileSizeY / 2;
 			// FALL THROUGH
 		case UnitActionAttack:
 			if (unit->SubAction & 2) { // Show weak targets.
@@ -852,9 +855,9 @@ void ShowOrder(const CUnit *unit)
 
 	// Get current position
 	x1 = CurrentViewport->Map2ViewportX(
-		unit->X) + unit->IX + unit->Type->TileWidth * TileSizeX / 2;
+		unit->tilePos.x) + unit->IX + unit->Type->TileWidth * TileSizeX / 2;
 	y1 = CurrentViewport->Map2ViewportY(
-		unit->Y) + unit->IY + unit->Type->TileHeight * TileSizeY / 2;
+		unit->tilePos.y) + unit->IY + unit->Type->TileHeight * TileSizeY / 2;
 
 	// If the current order is cancelled show the next one
 	if (unit->OrderCount > 1 && unit->OrderFlush) {
@@ -1009,7 +1012,7 @@ void DrawUnitPlayerColor(const CUnitType *type, CGraphic *sprite,
 **  @param x       X position.
 **  @param y       Y position.
 */
-static void DrawConstructionShadow(const CUnitType *type, 
+static void DrawConstructionShadow(const CUnitType *type,
 	const CConstructionFrame *cframe,
 	int frame, int x, int y)
 {
@@ -1095,8 +1098,8 @@ void CUnit::Draw(const CViewport *vp) const
 	CConstructionFrame *cframe;
 	CUnitType *type;
 
-	/* 
-	 * Since we can draw in parallel to game logic units may be already destroyed 
+	/*
+	 * Since we can draw in parallel to game logic units may be already destroyed
 	 * or removed (this->Container != NULL) most dangerus is destroyed state
 	 * but due existence of UnitCashe, unit memory is always valid only we need check
 	 * Destroyed flag... the hack is that  this->Type == NULL but 'or' logic
@@ -1118,9 +1121,9 @@ void CUnit::Draw(const CViewport *vp) const
 		frame = this->Frame;
 		y = this->IY;
 		x = this->IX;
-		x += vp->Map2ViewportX(this->X);
-		y += vp->Map2ViewportY(this->Y);
-		state = (action == UnitActionBuilt) | 
+		x += vp->Map2ViewportX(this->tilePos.x);
+		y += vp->Map2ViewportY(this->tilePos.y);
+		state = (action == UnitActionBuilt) |
 				((action == UnitActionUpgradeTo) << 1);
 		constructed = this->Constructed;
 		// Reset Type to the type being upgraded to
@@ -1210,9 +1213,9 @@ void CUnit::Draw(const CViewport *vp) const
 
 void CUnitDrawProxy::operator=(const CUnit *unit)
 {
-	int action = unit->CurrentAction();	
+	int action = unit->CurrentAction();
 	bool IsVisible = unit->IsVisible(ThisPlayer);
-	
+
 	IsAlive = action != UnitActionDie;
 	Player = unit->RescuedFrom ? unit->RescuedFrom : unit->Player;
 	cframe = NULL;
@@ -1252,23 +1255,23 @@ void CUnitDrawProxy::operator=(const CUnit *unit)
 			}
 		}
 	}
-	
+
 	if (ReplayRevealMap || IsVisible) {
 		Type = unit->Type;
 		frame = unit->Frame;
 		IY = unit->IY;
 		IX = unit->IX;
-		X = unit->X;
-		Y = unit->Y;
-	
-		state = (action == UnitActionBuilt) | 
+		X = unit->tilePos.x;
+		Y = unit->tilePos.y;
+
+		state = (action == UnitActionBuilt) |
 				((action == UnitActionUpgradeTo) << 1);
-						
+
 		// Reset Type to the type being upgraded to
 		if (state == 2) {
 			Type = unit->CurrentOrder()->Arg1.Type;
 		}
-		
+
 		if (unit->Constructed) {
 			// This is trash unless the unit is being built, and that's when we use it.
 			cframe = unit->Data.Built.Frame;
@@ -1281,7 +1284,7 @@ void CUnitDrawProxy::operator=(const CUnit *unit)
 		frame = unit->Seen.Frame;
 		Type = unit->Seen.Type;
 		state = unit->Seen.State;
-		
+
 		if (unit->Seen.Constructed) {
 			cframe = unit->Seen.CFrame;
 		}
@@ -1305,7 +1308,7 @@ void CUnitDrawProxy::operator=(const CUnit *unit)
 */
 void CUnitDrawProxy::DrawDecorationAt(int x, int y) const
 {
-	
+
 	// Now show decoration for each variable.
 	if (Variable) {
 		const unsigned int num_dec = UnitTypeVar.DecoVar.size();
@@ -1331,7 +1334,7 @@ void CUnitDrawProxy::DrawDecorationAt(int x, int y) const
 			}
 		}
 	}
-	
+
 	//
 	// Draw group number
 	//
@@ -1469,7 +1472,7 @@ void CUnitDrawProxy::Draw(const CViewport *vp) const
 **  @param c2  Second Unit to compare (*Unit)
 **
 */
-static inline bool DrawLevelCompare(const CUnit*c1, 
+static inline bool DrawLevelCompare(const CUnit*c1,
 	const CUnit*c2)
 {
 
@@ -1481,10 +1484,10 @@ static inline bool DrawLevelCompare(const CUnit*c1,
 		// diffpos compares unit's Y positions (bottom of sprite) on the map
 		// and uses X position in case Y positions are equal.
 		// FIXME: Use BoxHeight?
-		const int pos1 = (c1->Y * TileSizeY + c1->IY + c1->Type->Height);
-		const int pos2 = (c2->Y * TileSizeY + c2->IY + c2->Type->Height);
-		return pos1 == pos2 ? 
-			(c1->X - c2->X ? c1->X < c2->X : c1->Slot < c2->Slot) : pos1 < pos2;
+		const int pos1 = (c1->tilePos.y * TileSizeY + c1->IY + c1->Type->Height);
+		const int pos2 = (c2->tilePos.y * TileSizeY + c2->IY + c2->Type->Height);
+		return pos1 == pos2 ?
+			(c1->tilePos.x - c2->tilePos.x ? c1->tilePos.x < c2->tilePos.x : c1->Slot < c2->Slot) : pos1 < pos2;
 	} else {
 		return drawlevel1 < drawlevel2;
 	}
@@ -1530,7 +1533,7 @@ int FindAndSortUnits(const CViewport *vp, CUnitDrawProxy table[])
 
 	for (int i = 0; i < n; ++i) {
 		if (!buffer[i]->IsVisibleInViewport(vp) ||
-			 buffer[i]->Destroyed || buffer[i]->Container || 
+			 buffer[i]->Destroyed || buffer[i]->Container ||
 			 buffer[i]->Type->Revealer) {
 			buffer[i--] = buffer[--n];
 		}

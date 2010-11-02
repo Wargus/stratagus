@@ -104,7 +104,7 @@ static COrderPtr GetNextOrder(CUnit *unit, int flush)
 static void RemoveOrder(CUnit *unit, int order)
 {
 	int i;
-	
+
 	Assert(0 <= order && order < unit->OrderCount);
 	if (order != 0) {
 		delete unit->Orders[order];
@@ -277,8 +277,7 @@ void CommandFollow(CUnit *unit, CUnit *dest, int flush)
 		// Unit::Refs is used as timeout counter.
 		//
 		if (dest->Destroyed) {
-			order->X = dest->X + dest->Type->TileWidth / 2;
-			order->Y = dest->Y + dest->Type->TileHeight / 2;
+			order->goalPos = dest->tilePos + dest->Type->GetHalfTileSize();
 		} else {
 			order->SetGoal(dest);
 			order->Range = 1;
@@ -300,6 +299,7 @@ void CommandMove(CUnit *unit, int x, int y, int flush)
 	COrderPtr order;
 
 	Assert(x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight);
+	const Vec2i pos = {x, y};
 
 	//
 	//  Check if unit is still valid? (NETWORK!)
@@ -315,8 +315,7 @@ void CommandMove(CUnit *unit, int x, int y, int flush)
 		order->Init();
 
 		order->Action = UnitActionMove;
-		order->X = x;
-		order->Y = y;
+		order->goalPos = pos;
 	}
 	ClearSavedAction(unit);
 }
@@ -355,15 +354,14 @@ void CommandRepair(CUnit *unit, int x, int y, CUnit *dest, int flush)
 		//
 		if (dest) {
 			if (dest->Destroyed) {
-				order->X = dest->X + dest->Type->TileWidth / 2;
-				order->Y = dest->Y + dest->Type->TileHeight / 2;
+				order->goalPos = dest->tilePos + dest->Type->GetHalfTileSize();
 			} else {
 				order->SetGoal(dest);
 				order->Range = unit->Type->RepairRange;
 			}
 		} else {
-			order->X = x;
-			order->Y = y;
+			order->goalPos.x = x;
+			order->goalPos.y = y;
 		}
 	}
 	ClearSavedAction(unit);
@@ -421,8 +419,7 @@ void CommandAttack(CUnit *unit, int x, int y, CUnit *attack, int flush)
 			// Unit::Refs is used as timeout counter.
 			//
 			if (attack->Destroyed) {
-				order->X = attack->X + attack->Type->TileWidth / 2;
-				order->Y = attack->Y + attack->Type->TileHeight / 2;
+				order->goalPos = attack->tilePos + attack->Type->GetHalfTileSize();
 			} else {
 				// Removed, Dying handled by action routine.
 				order->SetGoal(attack);
@@ -431,13 +428,13 @@ void CommandAttack(CUnit *unit, int x, int y, CUnit *attack, int flush)
 			}
 		} else if (Map.WallOnMap(x,y)) {
 			// FIXME: look into action_attack.c about this ugly problem
-			order->X = x;
-			order->Y = y;
+			order->goalPos.x = x;
+			order->goalPos.y = y;
 			order->Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
 			order->MinRange = unit->Type->MinAttackRange;
 		} else {
-			order->X = x;
-			order->Y = y;
+			order->goalPos.x = x;
+			order->goalPos.y = y;
 		}
 	}
 	ClearSavedAction(unit);
@@ -471,8 +468,8 @@ void CommandAttackGround(CUnit *unit, int x, int y, int flush)
 		order->Init();
 
 		order->Action = UnitActionAttackGround;
-		order->X = x;
-		order->Y = y;
+		order->goalPos.x = x;
+		order->goalPos.y = y;
 		order->Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
 		order->MinRange = unit->Type->MinAttackRange;
 
@@ -511,11 +508,11 @@ void CommandPatrolUnit(CUnit *unit, int x, int y, int flush)
 		order->Init();
 
 		order->Action = UnitActionPatrol;
-		order->X = x;
-		order->Y = y;
-		Assert(!(unit->X & ~0xFFFF) && !(unit->Y & ~0xFFFF));
-		order->Arg1.Patrol.X = unit->X;
-		order->Arg1.Patrol.Y = unit->Y;
+		order->goalPos.x = x;
+		order->goalPos.y = y;
+		Assert(!(unit->tilePos.x & ~0xFFFF) && !(unit->tilePos.y & ~0xFFFF));
+		order->Arg1.Patrol.X = unit->tilePos.x;
+		order->Arg1.Patrol.Y = unit->tilePos.y;
 	}
 	ClearSavedAction(unit);
 }
@@ -583,8 +580,8 @@ void CommandUnload(CUnit *unit, int x, int y, CUnit *what, int flush)
 		order->Init();
 
 		order->Action = UnitActionUnload;
-		order->X = x;
-		order->Y = y;
+		order->goalPos.x = x;
+		order->goalPos.y = y;
 		//
 		// Destination could be killed.
 		// Should be handled in action, but is not possible!
@@ -625,8 +622,8 @@ void CommandBuildBuilding(CUnit *unit, int x, int y,
 		order->Init();
 
 		order->Action = UnitActionBuild;
-		order->X = x;
-		order->Y = y;
+		order->goalPos.x = x;
+		order->goalPos.y = y;
 		order->Width = what->TileWidth;
 		order->Height = what->TileHeight;
 		if (what->BuilderOutside) {
@@ -711,8 +708,8 @@ void CommandResourceLoc(CUnit *unit, int x, int y, int flush)
 			nx = x;
 			ny = y;
 		}
-		order->X = nx;
-		order->Y = ny;
+		order->goalPos.x = nx;
+		order->goalPos.y = ny;
 
 		order->Range = 1;
 	}
@@ -893,7 +890,7 @@ void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 			unit->Orders[slot]->Arg1.Type->Stats[unit->Player->Index].Costs,
 			CancelTrainingCostsFactor);
 
-	
+
 		if (!slot) { // Canceled in work slot
 			unit->Data.Train.Ticks = 0;
 		}
@@ -1035,7 +1032,7 @@ void CommandResearch(CUnit *unit, CUpgrade *what, int flush)
 		unit->Player->SubCosts(what->Costs);
 
 		order->Action = UnitActionResearch;
-		order->X = order->Y = -1;
+		order->goalPos.x = order->goalPos.y = -1;
 		order->Arg1.Upgrade = what;
 	}
 	ClearSavedAction(unit);
@@ -1110,16 +1107,16 @@ void CommandSpellCast(CUnit *unit, int x, int y, CUnit *dest,
 			if (dest->Destroyed) {
 				// FIXME: where check if spell needs a unit as destination?
 				// FIXME: dest->Type is now set to 0. maybe we shouldn't bother.
-				order->X = dest->X /*+ dest->Type->TileWidth / 2*/  - order->Range;
-				order->Y = dest->Y /*+ dest->Type->TileHeight / 2*/ - order->Range;
+				const Vec2i diag = {order->Range, order->Range};
+				order->goalPos = dest->tilePos /* + dest->Type->GetHalfTileSize() */ - diag;
 				order->Range <<= 1;
 			} else {
 				order->SetGoal(dest);
 			}
 		} else {
 			order->Range = 1;
-			order->X = x;
-			order->Y = y;
+			order->goalPos.x = x;
+			order->goalPos.y = y;
 		}
 		order->Arg1.Spell = spell;
 	}

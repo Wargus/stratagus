@@ -84,7 +84,7 @@ static void RepairUnit(CUnit *unit, CUnit *goal)
 			if (player->Resources[i] < goal->Type->RepairCosts[i]) {
 				snprintf(buf, 100, _("We need more %s for repair!"),
 					DefaultResourceNames[i].c_str());
-				player->Notify(NotifyYellow, unit->X, unit->Y, buf);
+				player->Notify(NotifyYellow, unit->tilePos.x, unit->tilePos.y, buf);
 				if (player->AiEnabled) {
 					// FIXME: call back to AI?
 					unit->CurrentOrder()->ClearGoal();
@@ -121,7 +121,7 @@ static void RepairUnit(CUnit *unit, CUnit *goal)
 		//unit->Data.Built.Worker->Type->BuilderSpeedFactor;
 		goal->Data.Built.Progress += 100 * animlength * SpeedBuild;
 		// Keep the same level of damage while increasing HP.
-		goal->Variable[HP_INDEX].Value = 
+		goal->Variable[HP_INDEX].Value =
 			(goal->Data.Built.Progress * goal->Stats->Variables[HP_INDEX].Max) /
 			costs - hp;
 		if (goal->Variable[HP_INDEX].Value > goal->Variable[HP_INDEX].Max) {
@@ -176,10 +176,9 @@ void HandleActionRepair(CUnit *unit)
 				if (goal) {
 					if (!goal->IsVisibleAsGoal(unit->Player)) {
 						DebugPrint("repair target gone.\n");
-						unit->CurrentOrder()->X = goal->X;
-						unit->CurrentOrder()->Y = goal->Y;
+						unit->CurrentOrder()->goalPos = goal->tilePos;
 						// FIXME: should I clear this here?
-						unit->CurrentOrder()->ClearGoal(); 
+						unit->CurrentOrder()->ClearGoal();
 						goal = NULL;
 						NewResetPath(unit);
 					}
@@ -196,9 +195,8 @@ void HandleActionRepair(CUnit *unit)
 					unit->State = 0;
 					unit->SubAction = 2;
 					unit->Data.Repair.Cycles = 0;
-					UnitHeadingFromDeltaXY(unit,
-						goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
-						goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
+					const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit->tilePos;
+					UnitHeadingFromDeltaXY(unit, dir);
 				} else if (err < 0) {
 					unit->CurrentOrder()->ClearGoal();
 					if (!unit->RestoreOrder()) {
@@ -230,8 +228,7 @@ void HandleActionRepair(CUnit *unit)
 				if (goal) {
 					if (!goal->IsVisibleAsGoal(unit->Player)) {
 						DebugPrint("repair goal is gone\n");
-						unit->CurrentOrder()->X = goal->X;
-						unit->CurrentOrder()->Y = goal->Y;
+						unit->CurrentOrder()->goalPos = goal->tilePos;
 						// FIXME: should I clear this here?
 						unit->CurrentOrder()->ClearGoal();
 						goal = NULL;
@@ -246,7 +243,7 @@ void HandleActionRepair(CUnit *unit)
 							unit->State = 0;
 							unit->SubAction = 0;
 						}
-					}					
+					}
 				}
 
 
