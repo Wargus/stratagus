@@ -1484,7 +1484,7 @@ static void UISelectStateButtonDown(unsigned)
 */
 void UIHandleButtonDown(unsigned button)
 {
-	
+
 /**
  * Detect long left selection click
  **/
@@ -1501,14 +1501,14 @@ void UIHandleButtonDown(unsigned button)
 	if (LongLeftButton)
 		return;
 #endif
-		
+
 	static bool OldShowSightRange;
 	static bool OldShowReactionRange;
 	static bool OldShowAttackRange;
 	static bool OldValid = false;
 	CUnit *uins;
 	int i;
-	
+
 	if (LongLeftButton) {
 		if (!OldValid) {
 			OldShowSightRange = Preference.ShowSightRange;
@@ -1890,6 +1890,7 @@ void UIHandleButtonUp(unsigned button)
 		CUnit *unit;
 
 		unit = NULL;
+		num = 0;
 		//
 		//  Little threshold
 		//
@@ -1938,7 +1939,13 @@ void UIHandleButtonUp(unsigned button)
 					num = SelectUnitsInRectangle(x0, y0, x1, y1);
 				}
 			}
+#ifdef USE_MAEMO
+		// On Maemo select single unit only when long click is detected
+		// This fix problem with emulating right mouse button as long left click on touch screens
+		} else if (button==0x1000001) {
+#else
 		} else {
+#endif
 			//
 			// Select single unit
 			//

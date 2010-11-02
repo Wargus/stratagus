@@ -493,6 +493,10 @@ void InitVideoSdl(void)
 	Uint32 flags;
 
 	if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
+#ifndef USE_WIN32
+		// Fix tablet input in full-screen mode
+		SDL_putenv(strdup("SDL_MOUSE_RELATIVE=0"));
+#endif
 		int res = SDL_Init(
 #ifdef DEBUG
 				SDL_INIT_NOPARACHUTE |
