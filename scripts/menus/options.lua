@@ -249,10 +249,9 @@ end
 function RunLanguageOptionsMenu(s)
   local menu 
   local b
-  local stepx = Video.Width / 6 
+  local grid = {{}, {}, {}, {}, {}, {}}
   local offy = (Video.Height - 300) / 2
-  local offx = stepx * 2
-  local i = 0
+  local i = 1
 
   menu = BosMenu(_("Language Selection"))
   local function AddLanguage(language, po, enginepo, bospo)
@@ -267,11 +266,11 @@ function RunLanguageOptionsMenu(s)
       SavePreferences()
     end      
     local rb = menu:addRadioButton(language, "lang", 
-                                   offx, offy + i * 36, SetLanguage)
+                                   0, offy + i * 36, SetLanguage)
+    grid[i][#grid[i] + 1] = rb
     i = i + 1
-    if i > 5 then
-       i = 0
-       offx = stepx + offx
+    if i > #grid then
+       i = 1
     end
     if StratagusTranslation == enginepo then
       rb:setMarked(true)
@@ -299,6 +298,7 @@ function RunLanguageOptionsMenu(s)
   AddLanguage("Italiano", "it")
   AddLanguage("Magyar", "hu")
   AddLanguage("Lietuviškai", "lt")
+  menu:adjustColumnWidths(grid)
 
   menu:addButton(_("~!OK"), Video.Width / 2 - 100, Video.Height - 100,
     function() menu:stop() end)
