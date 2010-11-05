@@ -26,10 +26,10 @@ clean::
 
 build:
 	./autogen.sh
-	./configure --prefix=/usr
+	./configure --prefix=/usr --datadir=/usr/share/games/stratagus/default
 	$(MAKE) OUTFILE=stratagus
 	$(MAKE) clean
-	./configure --prefix=/usr --enable-debug
+	./configure --prefix=/usr --datadir=/usr/share/games/stratagus/default --enable-debug
 	$(MAKE) OUTFILE=stratagus-dbg
 
 install/stratagus::
