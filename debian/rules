@@ -46,7 +46,7 @@ binary-predeb/stratagus::
 		mkdir -p $(CURDIR)/debian/stratagus/opt/man/man6; \
 		mv $(CURDIR)/debian/stratagus/usr/games/stratagus $(CURDIR)/debian/stratagus/opt/stratagus/bin/; \
 		mv $(CURDIR)/debian/stratagus/usr/share/doc/stratagus $(CURDIR)/debian/stratagus/opt/stratagus/share/doc/; \
-		mv $(CURDIR)/debian/stratagus/usr/share/man/man6/stratagus.6.gz $(CURDIR)/debian/stratagus/opt/man/man6; \
+		mv $(CURDIR)/debian/stratagus/usr/share/man/man6/stratagus.6.gz $(CURDIR)/debian/stratagus/opt/man/man6/; \
 		ln -s /opt/stratagus/bin/stratagus $(CURDIR)/debian/stratagus/usr/games/stratagus; \
 		ln -s /opt/stratagus/share/doc/stratagus/ $(CURDIR)/debian/stratagus/usr/share/doc/stratagus; \
 		ln -s /opt/stratagus/share/man/stratagus.6.gz $(CURDIR)/debian/stratagus/usr/share/man/man6/stratagus.6.gz; \
