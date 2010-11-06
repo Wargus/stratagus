@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: boswars 2.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-06-07 01:52+0300\n"
-"PO-Revision-Date: 2010-06-07 01:52+0300\n"
+"POT-Creation-Date: 2010-11-03 00:29+0200\n"
+"PO-Revision-Date: 2010-11-06 02:26+0200\n"
 "Last-Translator: Kalle Olavi Niemitalo <kon@iki.fi>\n"
-"Language-Team: Kimmo Kalevi Merikivi <fi@li.org>\n"
+"Language-Team: Finnish <translation-team-fi@lists.sourceforge.net>\n"
+"Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -51,76 +52,89 @@ msgstr "%s: Ei tarpeeksi manaa loitsuun %s"
 msgid "%s: can't cast spell: %s"
 msgstr "%s: loitsu %s ei onnistu."
 
-#: action/action_train.cpp:180
+#: action/action_train.cpp:117
+#, c-format
+msgid "Cannot train %s here"
+msgstr "Yksikköä %s ei voi kouluttaa täällä"
+
+#: action/action_train.cpp:216
 #, c-format
 msgid "New %s ready"
 msgstr "Uusi %s valmiina"
 
-#: action/action_train.cpp:230
+#: action/action_train.cpp:266
 #, c-format
 msgid "Unable to train %s"
 msgstr "Yksikön %s koulutus ei onnistu"
 
-#: action/command.cpp:1008
+#: action/command.cpp:1056
 #, c-format
 msgid "Player \"%s\" has left the game"
 msgstr "Pelaaja \"%s\" poistui pelistä"
 
-#: action/command.cpp:1010
+#: action/command.cpp:1058
 #, c-format
 msgid "Player \"%s\" has been killed"
 msgstr "Pelaaja \"%s\" on tapettu"
 
-#: editor/editloop.cpp:371
+#: editor/editloop.cpp:390
 msgid "Unit deleted"
 msgstr "Yksikkö poistettu"
 
-#: editor/editloop.cpp:694 editor/editloop.cpp:1129
+#: editor/editloop.cpp:784 editor/editloop.cpp:1219
 msgid "Player"
 msgstr "Pelaaja"
 
-#: editor/editloop.cpp:699
+#: editor/editloop.cpp:789
 msgid "Neutral"
 msgstr "Neutraali"
 
-#: editor/editloop.cpp:703
+#: editor/editloop.cpp:793
 msgid "Nobody"
 msgstr "Ei kukaan"
 
-#: editor/editloop.cpp:706
+#: editor/editloop.cpp:796
 msgid "Person"
 msgstr "Henkilö"
 
-#: editor/editloop.cpp:711
+#: editor/editloop.cpp:801
 msgid "Computer"
 msgstr "Tietokone"
 
 # esim. "Yksikön sisältämä energia" jos siitä voi kerätä energiaa
-#: editor/editloop.cpp:1134
+#: editor/editloop.cpp:1224
 msgid "Amount of"
 msgstr "Yksikön sisältämä"
 
-#: editor/editloop.cpp:1152
+#: editor/editloop.cpp:1244
+msgid "Patch missing"
+msgstr "Maastopala puuttuu"
+
+#: editor/editloop.cpp:1248
 msgid "Patch"
 msgstr "Maastopala"
 
-#: editor/editloop.cpp:1160
+#: editor/editloop.cpp:1255
+msgid "Field"
+msgstr ""
+
+#: editor/editloop.cpp:1262
 msgid "impassable"
 msgstr "kulkueste"
 
-#: editor/editloop.cpp:1165
+#: editor/editloop.cpp:1267
 msgid "land"
 msgstr "maata"
 
-#: editor/editloop.cpp:1170
+#: editor/editloop.cpp:1272
 msgid "coast"
 msgstr "rantaa"
 
-#: editor/editloop.cpp:1175
+#: editor/editloop.cpp:1277
 msgid "shallow water"
 msgstr "matalaa vettä"
 
-#: editor/editloop.cpp:1180
+#: editor/editloop.cpp:1282
 msgid "deep water"
 msgstr "syvää vettä"
 
@@ -128,53 +142,57 @@ msgstr "syvää vettä"
 #. here, e.g. because the ground is too soft.  There
 #. may be a building here anyway, if the map designer
 #. has found a way to circumvent the restriction.
-#: editor/editloop.cpp:1192
+#: editor/editloop.cpp:1294
 msgid "no building"
 msgstr "rakennuskielto"
 
-#: editor/editloop.cpp:1204
+#: editor/editloop.cpp:1306
 msgid "speed="
 msgstr "nopeus="
 
-#: editor/editloop.cpp:1207
+#: editor/editloop.cpp:1309
 msgid " (fast)"
 msgstr " (nopea)"
 
-#: editor/editloop.cpp:1211
+#: editor/editloop.cpp:1313
 msgid " (slow)"
 msgstr " (hidas)"
 
-#: editor/editloop.cpp:1502
-msgid "Unit can't be placed here."
-msgstr "Yksikköä ei voi sijoittaa tähän."
-
-#: editor/editloop.cpp:1583
+#: editor/editloop.cpp:1449
 msgid "Patch deleted"
 msgstr "Maastopala poistettu"
 
-#: editor/editloop.cpp:1614
+#: editor/editloop.cpp:1480
 msgid "Unit owner modified"
 msgstr "Yksikön omistaja vaihdettu"
 
-#: editor/editloop.cpp:1815 editor/editloop.cpp:1851
+#: editor/editloop.cpp:1686 editor/editloop.cpp:1722
 msgid "Select player #"
 msgstr "Valitse pelaaja #"
 
-#: editor/editloop.cpp:1949
+#: editor/editloop.cpp:1820
 msgid "Select mode"
 msgstr "Valintatila"
 
-#: editor/editloop.cpp:1960
+#: editor/editloop.cpp:1831
 msgid "Unit mode"
 msgstr "Yksikkötila"
 
-#: editor/editloop.cpp:1971
+#: editor/editloop.cpp:1842
 msgid "Patch mode"
 msgstr "Maastopalatila"
 
-#: editor/editloop.cpp:1982
+#: editor/editloop.cpp:1853
 msgid "Set start location mode"
 msgstr "Aloituspaikkatila"
+
+#: editor/editloop.cpp:2153
+msgid "Unit can't be placed here."
+msgstr "Yksikköä ei voi sijoittaa tähän."
+
+#: editor/editloop.cpp:2442
+msgid "All"
+msgstr "Kaikki"
 
 #: editor/patch_editor.cpp:542
 msgid "Save"
@@ -245,11 +263,11 @@ msgstr "Aikakatkaisu"
 msgid "Thanks for playing Bos Wars.\n"
 msgstr "Kiitos, kun pelasit Bos Warsia.\n"
 
-#: ui/botpanel.cpp:783 ui/botpanel.cpp:848
+#: ui/botpanel.cpp:787 ui/botpanel.cpp:852
 msgid "Select Target"
 msgstr "Valitse kohde"
 
-#: ui/botpanel.cpp:896
+#: ui/botpanel.cpp:900
 msgid "Select Location"
 msgstr "Valitse sijainti"
 
