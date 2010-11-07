@@ -97,10 +97,6 @@ int Demolish::Cast(CUnit &caster, const SpellType *, CUnit *, int x, int y)
 	int ymin;
 	int xmax;
 	int ymax;
-	int i;
-	int ix;
-	int iy;
-	int n;
 
 	//
 	// Allow error margins. (Lame, I know)
@@ -115,18 +111,19 @@ int Demolish::Cast(CUnit &caster, const SpellType *, CUnit *, int x, int y)
 	//
 	// Terrain effect of the explosion
 	//
-	for (ix = xmin; ix <= xmax; ++ix) {
-		for (iy = ymin; iy <= ymax; ++iy) {
-			n = Map.Field(ix + iy)->Flags;
-			if (MapDistance(ix, iy, x, y ) > this->Range) {
+	Vec2i ipos;
+	for (ipos.x = xmin; ipos.x <= xmax; ++ipos.x) {
+		for (ipos.y = ymin; ipos.y <= ymax; ++ipos.y) {
+			const int flag = Map.Field(ipos)->Flags;
+			if (MapDistance(ipos.x, ipos.y, x, y) > this->Range) {
 				// Not in circle range
 				continue;
-			} else if (n & MapFieldWall) {
-				Map.RemoveWall(ix, iy);
-			} else if (n & MapFieldRocks) {
-				Map.ClearTile(MapFieldRocks, ix, iy);
-			} else if (n & MapFieldForest) {
-				Map.ClearTile(MapFieldForest, ix, iy);
+			} else if (flag & MapFieldWall) {
+				Map.RemoveWall(ipos.x, ipos.y);
+			} else if (flag & MapFieldRocks) {
+				Map.ClearTile(MapFieldRocks, ipos);
+			} else if (flag & MapFieldForest) {
+				Map.ClearTile(MapFieldForest, ipos);
 			}
 		}
 	}
@@ -136,8 +133,8 @@ int Demolish::Cast(CUnit &caster, const SpellType *, CUnit *, int x, int y)
 	//
 	if (this->Damage) {
 		CUnit* table[UnitMax];
-		n = Map.SelectFixed(xmin, ymin, xmax + 1, ymax + 1, table);
-		for (i = 0; i < n; ++i) {
+		const int n = Map.SelectFixed(xmin, ymin, xmax + 1, ymax + 1, table);
+		for (int i = 0; i < n; ++i) {
 			CUnit &unit = *table[i];
 			if (unit.Type->UnitType != UnitTypeFly && unit.IsAlive() &&
 					unit.MapDistanceTo(x, y) <= this->Range) {
