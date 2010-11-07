@@ -1253,7 +1253,7 @@ extern void UnitClearOrders(CUnit &unit);
 	/// @todo more docu
 extern void UpdateForNewUnit(const CUnit &unit, int upgrade);
 	/// @todo more docu
-extern void NearestOfUnit(const CUnit &unit, int tx, int ty, int *dx, int *dy);
+extern void NearestOfUnit(const CUnit &unit, int tx, int ty, Vec2i *dpos);
 
 	/// Call when an Unit goes under fog.
 extern void UnitGoesUnderFog(CUnit &unit, const CPlayer *player);

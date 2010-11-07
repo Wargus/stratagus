@@ -1069,27 +1069,26 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 **  @param unit  Pointer to unit.
 **  @param tx    X tile map postion.
 **  @param ty    Y tile map postion.
-**  @param dx    Out: nearest point X tile map postion to (tx,ty).
-**  @param dy    Out: nearest point Y tile map postion to (tx,ty).
+**  @param dpos  Out: nearest point tile map postion to (tx,ty).
 */
-void NearestOfUnit(const CUnit &unit, int tx, int ty, int *dx, int *dy)
+void NearestOfUnit(const CUnit &unit, int tx, int ty, Vec2i *dpos)
 {
 	int x = unit.tilePos.x;
 	int y = unit.tilePos.y;
 
 	if (tx >= x + unit.Type->TileWidth) {
-		*dx = x + unit.Type->TileWidth - 1;
+		dpos->x = x + unit.Type->TileWidth - 1;
 	} else if (tx < x) {
-		*dx = x;
+		dpos->x = x;
 	} else {
-		*dx = tx;
+		dpos->x = tx;
 	}
 	if (ty >= y + unit.Type->TileHeight) {
-		*dy = y + unit.Type->TileHeight - 1;
+		dpos->y = y + unit.Type->TileHeight - 1;
 	} else if (ty < y) {
-		*dy = y;
+		dpos->y = y;
 	} else {
-		*dy = ty;
+		dpos->y = ty;
 	}
 }
 
@@ -2290,21 +2289,19 @@ CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range, int resource
 	unsigned char *matrix;
 	CUnit *mine;
 	CUnit *bestmine;
-	int destx;
-	int desty;
+	Vec2i dest = {x, y};
 	int bestd = 99999, bestw = 99999, besta = 99999;
 	int cdist;
 	const ResourceInfo *resinfo = unit.Type->ResInfo[resource];
 
-	destx = x;
-	desty = y;
 	size = std::min<int>(Map.Info.MapWidth * Map.Info.MapHeight / 4, range * range * 5);
 	points = new Vec2i[size];
 
 	// Find the nearest gold depot
-	if (!destu) destu = FindDepositNearLoc(unit.Player,x,y,range,resource);
+	if (!destu)
+		destu = FindDepositNearLoc(unit.Player,x,y,range,resource);
 	if (destu) {
-		NearestOfUnit(*destu, x, y, &destx, &desty);
+		NearestOfUnit(*destu, x, y, &dest);
 	}
 
 	// Make movement matrix. FIXME: can create smaller matrix.
@@ -2366,7 +2363,7 @@ CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range, int resource
 						bool better = (mine != bestmine);
 
 						if(better) {
-							n = std::max<int>(MyAbs(destx - x), MyAbs(desty - y));
+							n = std::max<int>(MyAbs(dest.x - x), MyAbs(dest.y - y));
 							if(check_usage && mine->Type->MaxOnBoard) {
 								int assign = mine->Data.Resource.Assigned -
 														mine->Type->MaxOnBoard;
@@ -2511,21 +2508,18 @@ CUnit *UnitFindMiningArea(const CUnit &unit, int x, int y,  int range, int resou
 	const CUnit *destu;
 	CUnit *mine;
 	CUnit *bestmine;
-	int destx;
-	int desty;
+	Vec2i dest = {x, y};
 	int bestd;
 	int cdist;
 	//const ResourceInfo *resinfo = unit.Type->ResInfo[resource];
 
-	destx = x;
-	desty = y;
 	size = std::min<int>(Map.Info.MapWidth * Map.Info.MapHeight / 4, range * range * 5);
 	points = new Vec2i[size];
 
 	// Find the nearest resource depot
 	if ((destu = FindDepositNearLoc(unit.Player,x,y,range,resource)))
 	{
-		NearestOfUnit(*destu, x, y, &destx, &desty);
+		NearestOfUnit(*destu, x, y, &dest);
 	}
 	bestd = 99999;
 	// Make movement matrix. FIXME: can create smaller matrix.
@@ -2577,7 +2571,7 @@ CUnit *UnitFindMiningArea(const CUnit &unit, int x, int y,  int range, int resou
 				//
 				if ((mine = ResourceOnMap(x, y, resource, false))) {
 					if (destu) {
-						n = std::max<int>(MyAbs(destx - x), MyAbs(desty - y));
+						n = std::max<int>(MyAbs(dest.x - x), MyAbs(dest.y - y));
 						if (n < bestd) {
 							bestd = n;
 							bestmine = mine;

@@ -360,8 +360,6 @@ void FireMissile(CUnit &unit)
 {
 	int x;
 	int y;
-	int dx;
-	int dy;
 	CUnit *goal = unit.CurrentOrder()->GetGoal();
 
 	//
@@ -389,26 +387,24 @@ void FireMissile(CUnit &unit)
 	if (unit.Type->Missile.Missile->Class == MissileClassNone) {
 		// No goal, take target coordinates
 		if (!goal) {
-			dx = unit.CurrentOrder()->goalPos.x;
-			dy = unit.CurrentOrder()->goalPos.y;
-			if (Map.WallOnMap(dx, dy)) {
-				if (Map.HumanWallOnMap(dx, dy)) {
-					Map.HitWall(dx, dy,
+			const Vec2i& goalPos = unit.CurrentOrder()->goalPos;
+
+			if (Map.WallOnMap(goalPos.x, goalPos.y)) {
+				if (Map.HumanWallOnMap(goalPos.x, goalPos.y)) {
+					Map.HitWall(goalPos.x, goalPos.y,
 						CalculateDamageStats(*unit.Stats,
 							*UnitTypeHumanWall->Stats, unit.Variable[BLOODLUST_INDEX].Value));
 				} else {
-					Map.HitWall(dx, dy,
+					Map.HitWall(goalPos.x, goalPos.y,
 						CalculateDamageStats(*unit.Stats,
 							*UnitTypeOrcWall->Stats, unit.Variable[BLOODLUST_INDEX].Value));
 				}
 				return;
 			}
-
 			DebugPrint("Missile-none hits no unit, shouldn't happen!\n");
 			return;
 		}
 		HitUnit(&unit, *goal, CalculateDamage(unit, *goal));
-
 		return;
 	}
 
@@ -421,6 +417,7 @@ void FireMissile(CUnit &unit)
 		y = unit.tilePos.y * TileSizeY + TileSizeY / 2;
 	}
 
+	Vec2i dpos;
 	if (goal) {
 		Assert(goal->Type);  // Target invalid?
 		//
@@ -435,20 +432,19 @@ void FireMissile(CUnit &unit)
 		// Fire to nearest point of the unit!
 		// If Firing from inside a Bunker
 		if (unit.Container) {
-			NearestOfUnit(*goal, unit.Container->tilePos.x, unit.Container->tilePos.y, &dx, &dy);
+			NearestOfUnit(*goal, unit.Container->tilePos.x, unit.Container->tilePos.y, &dpos);
 		} else {
-			NearestOfUnit(*goal, unit.tilePos.x, unit.tilePos.y, &dx, &dy);
+			NearestOfUnit(*goal, unit.tilePos.x, unit.tilePos.y, &dpos);
 		}
 	} else {
-		dx = unit.CurrentOrder()->goalPos.x;
-		dy = unit.CurrentOrder()->goalPos.y;
+		dpos = unit.CurrentOrder()->goalPos;
 		// FIXME: Can this be too near??
 	}
 
 	// Fire to the tile center of the destination.
-	dx = dx * TileSizeX + TileSizeX / 2;
-	dy = dy * TileSizeY + TileSizeY / 2;
-	Missile *missile = MakeMissile(unit.Type->Missile.Missile, x, y, dx, dy);
+	dpos.x = dpos.x * TileSizeX + TileSizeX / 2;
+	dpos.y = dpos.y * TileSizeY + TileSizeY / 2;
+	Missile *missile = MakeMissile(unit.Type->Missile.Missile, x, y, dpos.x, dpos.y);
 	//
 	// Damage of missile
 	//
