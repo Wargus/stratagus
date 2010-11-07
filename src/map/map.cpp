@@ -139,42 +139,41 @@ void CMap::MarkSeenTile(const unsigned int index)
 /**
 **  Reveal the entire map.
 */
-void CMap::Reveal(void)
+void CMap::Reveal()
 {
-	int x;
-	int y;
 	int p;  // iterator on player.
 
 	//
 	//  Mark every explored tile as visible. 1 turns into 2.
 	//
-	for (x = 0; x < this->Info.MapWidth; ++x) {
-		for (y = 0; y < this->Info.MapHeight; ++y) {
+	Vec2i pos;
+	for (pos.x = 0; pos.x < this->Info.MapWidth; ++pos.x) {
+		for (pos.y = 0; pos.y < this->Info.MapHeight; ++pos.y) {
 			for (p = 0; p < PlayerMax; ++p) {
-				if (!this->Field(x, y)->Visible[p]) {
-					this->Field(x, y)->Visible[p] = 1;
+				if (!this->Field(pos)->Visible[p]) {
+					this->Field(pos)->Visible[p] = 1;
 				}
 			}
-			MarkSeenTile(x, y);
+			MarkSeenTile(pos);
 		}
 	}
 	//
 	//  Global seen recount. Simple and effective.
 	//
-	for (x = 0; x < NumUnits; ++x) {
+	for (int i = 0; i < NumUnits; ++i) {
 		//
 		//  Reveal neutral buildings. Gold mines:)
 		//
-		if (Units[x]->Player->Type == PlayerNeutral) {
+		if (Units[i]->Player->Type == PlayerNeutral) {
 			for (p = 0; p < PlayerMax; ++p) {
 				if (Players[p].Type != PlayerNobody &&
-						(!(Units[x]->Seen.ByPlayer & (1 << p)))) {
-					UnitGoesOutOfFog(*Units[x], Players + p);
-					UnitGoesUnderFog(*Units[x], Players + p);
+						(!(Units[i]->Seen.ByPlayer & (1 << p)))) {
+					UnitGoesOutOfFog(*Units[i], Players + p);
+					UnitGoesUnderFog(*Units[i], Players + p);
 				}
 			}
 		}
-		UnitCountSeen(*Units[x]);
+		UnitCountSeen(*Units[i]);
 	}
 }
 
@@ -230,15 +229,14 @@ bool CMap::OrcWallOnMap(int tx, int ty) const
 /**
 **  Can move to this point, applying mask.
 **
-**  @param x     X map tile position.
-**  @param y     Y map tile position.
+**  @param pos   map tile position.
 **  @param mask  Mask for movement to apply.
 **
 **  @return      True if could be entered, false otherwise.
 */
-bool CheckedCanMoveToMask(int x, int y, int mask)
+bool CheckedCanMoveToMask(const Vec2i &pos, int mask)
 {
-	return Map.Info.IsPointOnMap(x,y) && !Map.CheckMask(x, y, mask);
+	return Map.Info.IsPointOnMap(pos) && !Map.CheckMask(pos, mask);
 }
 
 /**
@@ -258,26 +256,16 @@ bool UnitTypeCanBeAt(const CUnitType *type, int x, int y)
 
 	Assert(type);
 	mask = type->MovementMask;
-#if 0
-	for (addx = 0; addx < type->TileWidth; ++addx) {
-		for (addy = 0; addy < type->TileHeight; ++addy) {
-			if (!CheckedCanMoveToMask(x + addx, y + addy, mask)) {
-				return false;
-			}
-		}
-	}
-#else
 	unsigned int index = y * Map.Info.MapWidth;
 	for (addy = 0; addy < type->TileHeight; ++addy) {
 		for (addx = 0; addx < type->TileWidth; ++addx) {
-			if(!(Map.Info.IsPointOnMap(x + addx,y + addy) &&
+			if (!(Map.Info.IsPointOnMap(x + addx, y + addy) &&
 				!Map.CheckMask(x + addx + index, mask))) {
 				return false;
 			}
 		}
 		index += Map.Info.MapWidth;
 	}
-#endif
 	return true;
 }
 
@@ -421,6 +409,7 @@ bool CMap::IsSeenTile(unsigned short type, int x, int y) const
 */
 void CMap::FixTile(unsigned short type, int seen, int x, int y)
 {
+	const Vec2i pos = {x, y};
 	int tile;
 	int ttup;
 	int ttdown;
@@ -432,12 +421,12 @@ void CMap::FixTile(unsigned short type, int seen, int x, int y)
 	CMapField *mf;
 	unsigned int index;
 	//  Outside of map or no wood.
-	if (!Info.IsPointOnMap(x, y))
+	if (!Info.IsPointOnMap(pos))
 	{
 		return;
 	}
 
-	index = getIndex(x,y);
+	index = getIndex(pos);
 	mf = this->Field(index);
 
 	if (seen && !Tileset.IsSeenTile(type, mf->SeenTile)) {
@@ -467,7 +456,7 @@ void CMap::FixTile(unsigned short type, int seen, int x, int y)
 	//  Find out what each tile has with respect to wood, or grass.
 	//
 	tile = 0;
-	if (y - 1 < 0) {
+	if (pos.y - 1 < 0) {
 		ttup = 15; //Assign trees in all directions
 	} else {
 		CMapField *new_mf = (mf - this->Info.MapWidth);
@@ -477,7 +466,7 @@ void CMap::FixTile(unsigned short type, int seen, int x, int y)
 			ttup = this->Tileset.MixedLookupTable[new_mf->Tile];
 		}
 	}
-	if (x + 1 >= this->Info.MapWidth) {
+	if (pos.x + 1 >= this->Info.MapWidth) {
 		ttright = 15; //Assign trees in all directions
 	} else {
 		CMapField *new_mf = (mf + 1);
@@ -487,7 +476,7 @@ void CMap::FixTile(unsigned short type, int seen, int x, int y)
 			ttright = this->Tileset.MixedLookupTable[new_mf->Tile];
 		}
 	}
-	if (y + 1 >= this->Info.MapHeight) {
+	if (pos.y + 1 >= this->Info.MapHeight) {
 		ttdown = 15; //Assign trees in all directions
 	} else {
 		CMapField *new_mf = (mf + this->Info.MapWidth);
@@ -497,7 +486,7 @@ void CMap::FixTile(unsigned short type, int seen, int x, int y)
 			ttdown = this->Tileset.MixedLookupTable[new_mf->Tile];
 		}
 	}
-	if (x - 1 < 0) {
+	if (pos.x - 1 < 0) {
 		ttleft = 15; //Assign trees in all directions
 	} else {
 		CMapField *new_mf = (mf - 1);
@@ -548,12 +537,12 @@ void CMap::FixTile(unsigned short type, int seen, int x, int y)
 	if (tile == -1) { // No valid wood remove it.
 		if (seen) {
 			mf->SeenTile = removedtile;
-			this->FixNeighbors(type, seen, x, y);
+			this->FixNeighbors(type, seen, pos.x, pos.y);
 		} else {
 			mf->Tile = removedtile;
 			mf->Flags &= ~flags;
 			mf->Value = 0;
-			UI.Minimap.UpdateXY(x, y);
+			UI.Minimap.UpdateXY(pos.x, pos.y);
 		}
 	} else if (seen && this->Tileset.MixedLookupTable[mf->SeenTile] ==
 				this->Tileset.MixedLookupTable[tile]) { //Same Type
@@ -567,10 +556,10 @@ void CMap::FixTile(unsigned short type, int seen, int x, int y)
 	}
 
 	//maybe isExplored
-	if(IsTileVisible(ThisPlayer, index) > 0) {
-		UI.Minimap.UpdateSeenXY(x, y);
+	if (IsTileVisible(ThisPlayer, index) > 0) {
+		UI.Minimap.UpdateSeenXY(pos.x, pos.y);
 		if (!seen) {
-			MarkSeenTile(x, y);
+			MarkSeenTile(pos);
 		}
 	}
 }
@@ -599,15 +588,14 @@ void CMap::FixNeighbors(unsigned short type, int seen, int x, int y)
 **  Remove wood from the map.
 **
 **  @param type  TileType to clear
-**  @param x     Map X tile-position.
-**  @param y     Map Y tile-position.
+**  @param pos   Map tile-position.
 */
-void CMap::ClearTile(unsigned short type, unsigned x, unsigned y)
+void CMap::ClearTile(unsigned short type, const Vec2i &pos)
 {
 	int removedtile;
 	int flags;
 
-	unsigned int index = getIndex(x,y);
+	unsigned int index = getIndex(pos);
 	CMapField *mf = this->Field(index);
 
 	// Select Table to lookup
@@ -628,13 +616,13 @@ void CMap::ClearTile(unsigned short type, unsigned x, unsigned y)
 	mf->Flags &= ~flags;
 	mf->Value = 0;
 
-	UI.Minimap.UpdateXY(x, y);
-	FixNeighbors(type, 0, x, y);
+	UI.Minimap.UpdateXY(pos.x, pos.y);
+	FixNeighbors(type, 0, pos.x, pos.y);
 
 	//maybe isExplored
-	if(IsTileVisible(ThisPlayer, index) > 0) {
-		UI.Minimap.UpdateSeenXY(x, y);
-		MarkSeenTile(x, y);
+	if (IsTileVisible(ThisPlayer, index) > 0) {
+		UI.Minimap.UpdateSeenXY(pos.x, pos.y);
+		MarkSeenTile(pos);
 	}
 }
 

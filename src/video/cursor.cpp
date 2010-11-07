@@ -200,8 +200,6 @@ static void DrawBuildingCursor(void)
 	int i;
 	int x;
 	int y;
-	int mx;
-	int my;
 	Uint32 color;
 	int f;
 	int w;
@@ -215,8 +213,7 @@ static void DrawBuildingCursor(void)
 	vp = UI.MouseViewport;
 	x = CursorX - (CursorX - vp->X + vp->OffsetX) % TileSizeX;
 	y = CursorY - (CursorY - vp->Y + vp->OffsetY) % TileSizeY;
-	mx = vp->Viewport2MapX(x);
-	my = vp->Viewport2MapY(y);
+	const Vec2i mpos = {vp->Viewport2MapX(x), vp->Viewport2MapY(y)};
 	ontop = NULL;
 
 	//
@@ -245,12 +242,12 @@ static void DrawBuildingCursor(void)
 	if (NumSelected) {
 		f = 1;
 		for (i = 0; f && i < NumSelected; ++i) {
-			f = ((ontop = CanBuildHere(Selected[i], CursorBuilding, mx, my)) != NULL);
+			f = ((ontop = CanBuildHere(Selected[i], CursorBuilding, mpos.x, mpos.y)) != NULL);
 			// Assign ontop or NULL
 			ontop = (ontop == Selected[i] ? NULL : ontop);
 		}
 	} else {
-		f = ((ontop = CanBuildHere(NoUnitP, CursorBuilding, mx, my)) != NULL);
+		f = ((ontop = CanBuildHere(NoUnitP, CursorBuilding, mpos.x, mpos.y)) != NULL);
 		if (!Editor.Running || (Editor.Running && ontop == (CUnit *)1)) {
 			ontop = NULL;
 		}
@@ -259,22 +256,22 @@ static void DrawBuildingCursor(void)
 	mask = CursorBuilding->MovementMask;
 	h = CursorBuilding->TileHeight;
 	// reduce to view limits
-	if (my + h > vp->MapY + vp->MapHeight) {
-		h = vp->MapY + vp->MapHeight - my;
+	if (mpos.y + h > vp->MapY + vp->MapHeight) {
+		h = vp->MapY + vp->MapHeight - mpos.y;
 	}
 	w0 = CursorBuilding->TileWidth;
-	if (mx + w0 > vp->MapX + vp->MapWidth) {
-		w0 = vp->MapX + vp->MapWidth - mx;
+	if (mpos.x + w0 > vp->MapX + vp->MapWidth) {
+		w0 = vp->MapX + vp->MapWidth - mpos.x;
 	}
 	while (h--) {
 		w = w0;
 		while (w--) {
+			const Vec2i posIt = {mpos.x + w, mpos.y + h};
 			if (f && (ontop ||
-					CanBuildOn(mx + w, my + h, MapFogFilterFlags(ThisPlayer, mx + w, my + h,
-						mask & ((NumSelected &&
-							Selected[0]->tilePos.x == mx + w && Selected[0]->tilePos.y == my + h) ?
+					CanBuildOn(posIt, MapFogFilterFlags(ThisPlayer, posIt.x, posIt.y,
+						mask & ((NumSelected && Selected[0]->tilePos == posIt) ?
 								~(MapFieldLandUnit | MapFieldSeaUnit) : -1)))) &&
-					Map.IsFieldExplored(ThisPlayer, mx + w, my + h))  {
+					Map.IsFieldExplored(ThisPlayer, posIt))  {
 				color = ColorGreen;
 			} else {
 				color = ColorRed;

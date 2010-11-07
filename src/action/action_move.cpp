@@ -72,8 +72,7 @@ int DoActionMove(CUnit &unit)
 {
 	Vec2i posd; // movement in tile.
 	int d;
-	int x;      // Unit->X
-	int y;      // Unit->Y
+	Vec2i pos;
 	int move;
 	int off;
 
@@ -112,25 +111,23 @@ int DoActionMove(CUnit &unit)
 				unit.Moving = 1;
 				break;
 		}
-		x = unit.tilePos.x;
-		y = unit.tilePos.y;
+		pos = unit.tilePos;
 		off = unit.Offset;
 		//
 		// Transporter (un)docking?
 		//
 		// FIXME: This is an ugly hack
 		if (unit.Type->CanTransport() &&
-				((Map.WaterOnMap(off) && Map.CoastOnMap(x + posd.x, y + posd.y)) ||
-				(Map.CoastOnMap(off) && Map.WaterOnMap(x + posd.x, y + posd.y)))) {
+				((Map.WaterOnMap(off) && Map.CoastOnMap(pos + posd)) ||
+				(Map.CoastOnMap(off) && Map.WaterOnMap(pos + posd)))) {
 			PlayUnitSound(unit, VoiceDocking);
 		}
 
-		x = unit.tilePos.x + posd.x;
-		y = unit.tilePos.y + posd.y;
-		unit.MoveToXY(x, y);
+		pos = unit.tilePos + posd;
+		unit.MoveToXY(pos.x, pos.y);
 
 		// Remove unit from the current selection
-		if (unit.Selected && !Map.IsFieldVisible(ThisPlayer, x, y)) {
+		if (unit.Selected && !Map.IsFieldVisible(ThisPlayer, pos)) {
 			if (NumSelected == 1) { //  Remove building cursor
 				CancelBuildingMode();
 			}

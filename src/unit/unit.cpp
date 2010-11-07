@@ -2037,12 +2037,10 @@ int FindWoodInSight(const CUnit &unit, Vec2i *pos)
 int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 	const CPlayer *player, int x, int y, Vec2i *terrainPos)
 {
-	static const int xoffset[] = {  0,-1,+1, 0, -1,+1,-1,+1 };
-	static const int yoffset[] = { -1, 0, 0,+1, -1,-1,+1,+1 };
+	const Vec2i offset[] = {{0, -1}, {-1, 0}, {1, 0}, {0, 1}, {-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
 	Vec2i *points;
 	int size;
-	int rx;
-	int ry;
+	Vec2i rpos;
 	int wp;
 	int rp;
 	int ep;
@@ -2050,12 +2048,11 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 	int w;
 	unsigned char *m;
 	unsigned char *matrix;
-	int destx;
-	int desty;
 	int cdist;
+	Vec2i pos = {x, y};
 
-	destx = x;
-	desty = y;
+	Vec2i dest = pos;
+
 	size = std::min<int>(Map.Info.MapWidth * Map.Info.MapHeight / 4, range * range * 5);
 	points = new Vec2i[size];
 
@@ -2063,10 +2060,9 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 	matrix = CreateMatrix();
 	w = Map.Info.MapWidth + 2;
 	matrix += w + w + 2;
-	points[0].x = x;
-	points[0].y = y;
+	points[0] = pos;
 	rp = 0;
-	matrix[x + y * w] = 1; // mark start point
+	matrix[pos.x + pos.y * w] = 1; // mark start point
 	ep = wp = 1; // start with one point
 	cdist = 0; // current distance is 0
 
@@ -2075,36 +2071,32 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 	//
 	for (;;) {
 		while (rp != ep) {
-			rx = points[rp].x;
-			ry = points[rp].y;
+			rpos = points[rp];
 			for (i = 0; i < 8; ++i) { // mark all neighbors
-				x = rx + xoffset[i];
-				y = ry + yoffset[i];
+				pos = rpos + offset[i];
 				//  Make sure we don't leave the map.
-				if (!Map.Info.IsPointOnMap(x, y)) {
+				if (!Map.Info.IsPointOnMap(pos)) {
 					continue;
 				}
-				m = matrix + x + y * w;
+				m = matrix + pos.x + pos.y * w;
 				/*
 				 *  Check if visited or unexplored for non
 				 *	AI players (our exploration code is too week for real
 				 *	competition with human players)
 				 */
-				if (*m || (player && !player->AiEnabled &&!Map.IsFieldExplored(player, x, y))) {
+				if (*m || (player && !player->AiEnabled &&!Map.IsFieldExplored(player, pos))) {
 					continue;
 				}
 				// Look if found what was required.
-				bool can_move_to = CanMoveToMask(x, y, resmask);
+				bool can_move_to = CanMoveToMask(pos.x, pos.y, resmask);
 				if ((rvresult ? can_move_to : !can_move_to)) {
-					terrainPos->x = x;
-					terrainPos->y = y;
+					*terrainPos = pos;
 					delete[] points;
 					return 1;
 				}
-				if (CanMoveToMask(x, y, movemask)) { // reachable
+				if (CanMoveToMask(pos.x, pos.y, movemask)) { // reachable
 					*m = 1;
-					points[wp].x = x; // push the point
-					points[wp].y = y;
+					points[wp] = pos; // push the point
 					if (++wp >= size) { // round about
 						wp = 0;
 					}
@@ -2269,15 +2261,13 @@ CUnit *FindDepositNearLoc(CPlayer *p,
 **
 **  @return            NoUnitP or resource unit
 */
-CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range, int resource
-		,bool check_usage,const CUnit *destu)
+CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range, int resource,
+		bool check_usage, const CUnit *destu)
 {
-	static const int xoffset[] = { 0, 0,-1,+1, 0, -1,+1,-1,+1 };
-	static const int yoffset[] = { 0,-1, 0, 0,+1, -1,-1,+1,+1 };
+	const Vec2i offset[] = {{0, 0}, {0, -1}, {-1, 0}, {1, 0}, {0, 1}, {-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
 	Vec2i *points;
 	int size;
-	int rx;
-	int ry;
+	Vec2i rpos;
 	int mask;
 	int wp;
 	int rp;
@@ -2289,7 +2279,8 @@ CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range, int resource
 	unsigned char *matrix;
 	CUnit *mine;
 	CUnit *bestmine;
-	Vec2i dest = {x, y};
+	Vec2i pos = {x, y};
+	Vec2i dest = pos;
 	int bestd = 99999, bestw = 99999, besta = 99999;
 	int cdist;
 	const ResourceInfo *resinfo = unit.Type->ResInfo[resource];
@@ -2299,9 +2290,9 @@ CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range, int resource
 
 	// Find the nearest gold depot
 	if (!destu)
-		destu = FindDepositNearLoc(unit.Player,x,y,range,resource);
+		destu = FindDepositNearLoc(unit.Player, pos.x, pos.y, range, resource);
 	if (destu) {
-		NearestOfUnit(*destu, x, y, &dest);
+		NearestOfUnit(*destu, pos.x, pos.y, &dest);
 	}
 
 	// Make movement matrix. FIXME: can create smaller matrix.
@@ -2313,11 +2304,10 @@ CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range, int resource
 	//  Ignore all units along the way. Might seem wierd, but otherwise
 	//  peasants would lock at a mine with a lot of workers.
 	mask &= ~(MapFieldLandUnit | MapFieldSeaUnit | MapFieldAirUnit);
-	points[0].x = x;
-	points[0].y = y;
+	points[0] = pos;
 	rp = 0;
-	if (unit.tilePos.x == x && unit.tilePos.y == y)
-		matrix[x + y * w] = 1; // mark start point
+	if (unit.tilePos == pos)
+		matrix[pos.x + pos.y * w] = 1; // mark start point
 	ep = wp = 1; // start with one point
 	cdist = 0; // current distance is 0
 	bestmine = NoUnitP;
@@ -2329,12 +2319,10 @@ CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range, int resource
 	//
 	for (;;) {
 		while (rp != ep) {
-			rx = points[rp].x;
-			ry = points[rp].y;
+			rpos = points[rp];
 			for (i = 0; i < 9; ++i) { // mark all neighbors
-				x = rx + xoffset[i];
-				y = ry + yoffset[i];
-				m = matrix + x + y * w;
+				pos = rpos + offset[i];
+				m = matrix + pos.x + pos.y * w;
 				if (*m) { // already checked
 					continue;
 				}
@@ -2345,14 +2333,14 @@ CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range, int resource
 				 *	competition with human players.
 				 */
 				if (!unit.Player->AiEnabled &&
-					 !Map.IsFieldExplored(unit.Player, x, y)) { // Unknown.
+					 !Map.IsFieldExplored(unit.Player, pos)) { // Unknown.
 					continue;
 				}
 
 				//
 				// Look if there is a mine
 				//
-				if ((mine = res_finder.Find(Map.Field(x,y))) &&
+				if ((mine = res_finder.Find(Map.Field(pos))) &&
 						mine->Type->CanHarvest &&
 						(resinfo->HarvestFromOutside ||
 							mine->Player->Index == PlayerMax - 1 ||
@@ -2363,20 +2351,17 @@ CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range, int resource
 						bool better = (mine != bestmine);
 
 						if(better) {
-							n = std::max<int>(MyAbs(dest.x - x), MyAbs(dest.y - y));
+							n = std::max<int>(MyAbs(dest.x - pos.x), MyAbs(dest.y - pos.y));
 							if(check_usage && mine->Type->MaxOnBoard) {
-								int assign = mine->Data.Resource.Assigned -
-														mine->Type->MaxOnBoard;
-								int waiting =
-										(assign > 0 ?
-											 GetNumWaitingWorkers(*mine) : 0);
-								if(bestmine != NoUnitP) {
-									if(besta >= assign)
+								int assign = mine->Data.Resource.Assigned -mine->Type->MaxOnBoard;
+								int waiting = (assign > 0 ? GetNumWaitingWorkers(*mine) : 0);
+								if (bestmine != NoUnitP) {
+									if (besta >= assign)
 									{
-										if(assign > 0) {
+										if (assign > 0) {
 											waiting = GetNumWaitingWorkers(*mine);
-											if(besta == assign) {
-												if(bestw < waiting) {
+											if (besta == assign) {
+												if (bestw < waiting) {
 													better = false;
 												} else {
 												  	if(bestw == waiting && bestd < n)
@@ -2397,18 +2382,18 @@ CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range, int resource
 										}
 									}
 								}
-								if(better) {
+								if (better) {
 									besta = assign;
 									bestw = waiting;
 								}
 							} else {
-								if(bestmine != NoUnitP && bestd < n)
+								if (bestmine != NoUnitP && bestd < n)
 								{
 									better = false;
 								}
 							}
 						}
-						if(better) {
+						if (better) {
 							bestd = n;
 							bestmine = mine;
 						}
@@ -2439,10 +2424,9 @@ CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range, int resource
 					}
 				}
 
-				if (CanMoveToMask(x, y, mask)) { // reachable
+				if (CanMoveToMask(pos.x, pos.y, mask)) { // reachable
 					*m = 1;
-					points[wp].x = x; // push the point
-					points[wp].y = y;
+					points[wp] = pos; // push the point
 					if (++wp >= size) { // round about
 						wp = 0;
 					}
@@ -2490,12 +2474,10 @@ CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range, int resource
 */
 CUnit *UnitFindMiningArea(const CUnit &unit, int x, int y,  int range, int resource)
 {
-	static const int xoffset[] = {0,  0,-1,+1, 0, -1,+1,-1,+1 };
-	static const int yoffset[] = {0, -1, 0, 0,+1, -1,-1,+1,+1 };
+	const Vec2i offset[] = {{0, 0}, {0, -1}, {-1, 0}, {1, 0}, {0, 1}, {-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
 	Vec2i *points;
 	int size;
-	int rx;
-	int ry;
+	Vec2i rpos;
 	int mask;
 	int wp;
 	int rp;
@@ -2508,6 +2490,7 @@ CUnit *UnitFindMiningArea(const CUnit &unit, int x, int y,  int range, int resou
 	const CUnit *destu;
 	CUnit *mine;
 	CUnit *bestmine;
+	Vec2i pos = {x, y};
 	Vec2i dest = {x, y};
 	int bestd;
 	int cdist;
@@ -2517,9 +2500,9 @@ CUnit *UnitFindMiningArea(const CUnit &unit, int x, int y,  int range, int resou
 	points = new Vec2i[size];
 
 	// Find the nearest resource depot
-	if ((destu = FindDepositNearLoc(unit.Player,x,y,range,resource)))
+	if ((destu = FindDepositNearLoc(unit.Player, pos.x, pos.y, range, resource)))
 	{
-		NearestOfUnit(*destu, x, y, &dest);
+		NearestOfUnit(*destu, pos.x, pos.y, &dest);
 	}
 	bestd = 99999;
 	// Make movement matrix. FIXME: can create smaller matrix.
@@ -2532,11 +2515,10 @@ CUnit *UnitFindMiningArea(const CUnit &unit, int x, int y,  int range, int resou
 	//  peasants would lock at a mine with a lot of workers.
 	mask &= ~(MapFieldLandUnit | MapFieldSeaUnit | MapFieldAirUnit);
 
-	points[0].x = x;
-	points[0].y = y;
+	points[0] = pos;
 	rp = 0;
-	if (unit.tilePos.x == x && unit.tilePos.y == y)
-		matrix[x + y * w] = 1; // mark start point
+	if (unit.tilePos == pos)
+		matrix[pos.x + pos.y * w] = 1; // mark start point
 	ep = wp = 1; // start with one point
 	cdist = 0; // current distance is 0
 	bestmine = NoUnitP;
@@ -2546,12 +2528,10 @@ CUnit *UnitFindMiningArea(const CUnit &unit, int x, int y,  int range, int resou
 	//
 	for (;;) {
 		while (rp != ep) {
-			rx = points[rp].x;
-			ry = points[rp].y;
-			for (i = 0; i < 8; ++i) { // mark all neighbors
-				x = rx + xoffset[i];
-				y = ry + yoffset[i];
-				m = matrix + x + y * w;
+			rpos = points[rp];
+			for (i = 0; i < 9; ++i) { // mark all neighbors
+				pos = rpos + offset[i];
+				m = matrix + pos.x + pos.y * w;
 				if (*m) { // already checked
 					continue;
 				}
@@ -2562,16 +2542,16 @@ CUnit *UnitFindMiningArea(const CUnit &unit, int x, int y,  int range, int resou
 				 *	competition with human players.
 				 */
 				if (!unit.Player->AiEnabled &&
-					 !Map.IsFieldExplored(unit.Player, x, y)) { // Unknown.
+					 !Map.IsFieldExplored(unit.Player, pos)) { // Unknown.
 					continue;
 				}
 
 				//
 				// Look if there is a mine area
 				//
-				if ((mine = ResourceOnMap(x, y, resource, false))) {
+				if ((mine = ResourceOnMap(pos.x, pos.y, resource, false))) {
 					if (destu) {
-						n = std::max<int>(MyAbs(dest.x - x), MyAbs(dest.y - y));
+						n = std::max<int>(MyAbs(dest.x - pos.x), MyAbs(dest.y - pos.y));
 						if (n < bestd) {
 							bestd = n;
 							bestmine = mine;
@@ -2583,10 +2563,9 @@ CUnit *UnitFindMiningArea(const CUnit &unit, int x, int y,  int range, int resou
 					}
 				}
 
-				if (CanMoveToMask(x, y, mask)) { // reachable
+				if (CanMoveToMask(pos.x, pos.y, mask)) { // reachable
 					*m = 1;
-					points[wp].x = x; // push the point
-					points[wp].y = y;
+					points[wp] = pos; // push the point
 					if (++wp >= size) { // round about
 						wp = 0;
 					}

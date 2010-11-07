@@ -1163,17 +1163,10 @@ void CommandDiplomacy(int player, int state, int opponent)
 */
 void CommandSharedVision(int player, bool state, int opponent)
 {
-	int before;
-	int after;
-	int x;
-	int y;
-	int i;
-	CMapField *mf;
-
 	//
 	// Do a real hardcore seen recount. First we unmark EVERYTHING.
 	//
-	for (i = 0; i < NumUnits; ++i) {
+	for (int i = 0; i < NumUnits; ++i) {
 		if (!Units[i]->Destroyed) {
 			MapUnmarkUnitSight(*Units[i]);
 		}
@@ -1182,31 +1175,33 @@ void CommandSharedVision(int player, bool state, int opponent)
 	//
 	// Compute Before and after.
 	//
-	before = Players[player].IsBothSharedVision(&Players[opponent]);
+	const int before = Players[player].IsBothSharedVision(&Players[opponent]);
 	if (state == false) {
 		Players[player].SharedVision &= ~(1 << opponent);
 	} else {
 		Players[player].SharedVision |= (1 << opponent);
 	}
-	after = Players[player].IsBothSharedVision(&Players[opponent]);
+	const int after = Players[player].IsBothSharedVision(&Players[opponent]);
 
 	if (before && !after) {
 		//
 		// Don't share vision anymore. Give each other explored terrain for good-bye.
 		//
-		for (x = 0; x < Map.Info.MapWidth; ++x) {
-			for (y = 0; y < Map.Info.MapHeight; ++y) {
-				mf = Map.Field(x, y);
-				if (mf->Visible[player] && !mf->Visible[opponent]) {
-					mf->Visible[opponent] = 1;
+		Vec2i pos;
+		for (pos.x = 0; pos.x < Map.Info.MapWidth; ++pos.x) {
+			for (pos.y = 0; pos.y < Map.Info.MapHeight; ++pos.y) {
+				CMapField &mf = *Map.Field(pos);
+
+				if (mf.Visible[player] && !mf.Visible[opponent]) {
+					mf.Visible[opponent] = 1;
 					if (opponent == ThisPlayer->Index) {
-						Map.MarkSeenTile(x, y);
+						Map.MarkSeenTile(pos);
 					}
 				}
-				if (mf->Visible[opponent] && !mf->Visible[player]) {
-					mf->Visible[player] = 1;
+				if (mf.Visible[opponent] && !mf.Visible[player]) {
+					mf.Visible[player] = 1;
 					if (player == ThisPlayer->Index) {
-						Map.MarkSeenTile(x, y);
+						Map.MarkSeenTile(pos);
 					}
 				}
 			}
@@ -1216,7 +1211,7 @@ void CommandSharedVision(int player, bool state, int opponent)
 	//
 	// Do a real hardcore seen recount. Now we remark EVERYTHING
 	//
-	for (i = 0; i < NumUnits; ++i) {
+	for (int i = 0; i < NumUnits; ++i) {
 		if (!Units[i]->Destroyed) {
 			MapMarkUnitSight(*Units[i]);
 		}

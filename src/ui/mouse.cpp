@@ -106,8 +106,6 @@ void CancelBuildingMode(void)
 void DoRightButton(int sx, int sy)
 {
 	int i;
-	int x;                  // coordinate in tile.
-	int y;                  // coordinate in tile.
 	CUnit *dest;            // unit under the cursor if any.
 	CUnit *unit;            // one of the selected unit.
 	CUnitType *type;
@@ -122,8 +120,7 @@ void DoRightButton(int sx, int sy)
 		return;
 	}
 
-	x = sx / TileSizeX;
-	y = sy / TileSizeY;
+	const Vec2i pos = {sx / TileSizeX, sy / TileSizeY};
 
 	//
 	//  Right mouse with SHIFT appends command to old commands.
@@ -271,7 +268,7 @@ void DoRightButton(int sx, int sy)
 					PlayUnitSound(*unit, VoiceAcknowledging);
 					acknowledged = 1;
 				}
-				SendCommandRepair(*unit, x, y, dest, flush);
+				SendCommandRepair(*unit, pos.x, pos.y, dest, flush);
 				continue;
 			}
 			// Harvest
@@ -309,15 +306,15 @@ void DoRightButton(int sx, int sy)
 					for (res = 0; res < MaxCosts; ++res) {
 						if (type->ResInfo[res] &&
 								type->ResInfo[res]->TerrainHarvester &&
-								Map.IsFieldExplored(unit->Player, x, y) &&
-								Map.ForestOnMap(x, y) &&
+								Map.IsFieldExplored(unit->Player, pos) &&
+								Map.ForestOnMap(pos) &&
 								((unit->CurrentResource != res) ||
 									(unit->ResourcesHeld < type->ResInfo[res]->ResourceCapacity))) {
 							if (!acknowledged) {
 								PlayUnitSound(*unit, VoiceAcknowledging);
 								acknowledged = 1;
 							}
-							SendCommandResourceLoc(*unit, x, y, flush);
+							SendCommandResourceLoc(*unit, pos.x, pos.y, flush);
 							break;
 						}
 					}
@@ -342,7 +339,7 @@ void DoRightButton(int sx, int sy)
 				PlayUnitSound(*unit, VoiceAcknowledging);
 				acknowledged = 1;
 			}
-			SendCommandMove(*unit, x, y, flush);
+			SendCommandMove(*unit, pos.x, pos.y, flush);
 			continue;
 		}
 
@@ -362,12 +359,12 @@ void DoRightButton(int sx, int sy)
 						Assert(unit->Type->CanCastSpell);
 						for (spellnum = 0; !type->CanCastSpell[spellnum] &&
 								spellnum < SpellTypeTable.size() ; spellnum++) ;
-						SendCommandSpellCast(*unit, x, y, dest, spellnum, flush);
+						SendCommandSpellCast(*unit, pos.x, pos.y, dest, spellnum, flush);
 					} else {
 						if (CanTarget(type, dest->Type)) {
-							SendCommandAttack(*unit, x, y, dest, flush);
+							SendCommandAttack(*unit, pos.x, pos.y, dest, flush);
 						} else { // No valid target
-							SendCommandAttack(*unit, x, y, NoUnitP, flush);
+							SendCommandAttack(*unit, pos.x, pos.y, NoUnitP, flush);
 						}
 					}
 					continue;
@@ -383,22 +380,22 @@ void DoRightButton(int sx, int sy)
 					continue;
 				}
 			}
-			if (Map.WallOnMap(x, y)) {
+			if (Map.WallOnMap(pos.x, pos.y)) {
 				if (unit->Player->Race == PlayerRaceHuman &&
-						Map.OrcWallOnMap(x, y)) {
-					SendCommandAttack(*unit, x, y, NoUnitP, flush);
+						Map.OrcWallOnMap(pos.x, pos.y)) {
+					SendCommandAttack(*unit, pos.x, pos.y, NoUnitP, flush);
 					continue;
 				}
 				if (unit->Player->Race == PlayerRaceOrc &&
-						Map.HumanWallOnMap(x, y)) {
-					SendCommandAttack(*unit, x, y, NoUnitP, flush);
+						Map.HumanWallOnMap(pos.x, pos.y)) {
+					SendCommandAttack(*unit, pos.x, pos.y, NoUnitP, flush);
 					continue;
 				}
 			}
 			// empty space
 			if ((KeyModifiers & ModifierControl)) {
 				if (RightButtonAttacks) {
-					SendCommandMove(*unit, x, y, flush);
+					SendCommandMove(*unit, pos.x, pos.y, flush);
 					if (!acknowledged) {
 						PlayUnitSound(*unit, VoiceAcknowledging);
 						acknowledged = 1;
@@ -408,7 +405,7 @@ void DoRightButton(int sx, int sy)
 						PlayUnitSound(*unit, VoiceAttack);
 						acknowledged = 1;
 					}
-					SendCommandAttack(*unit, x, y, NoUnitP, flush);
+					SendCommandAttack(*unit, pos.x, pos.y, NoUnitP, flush);
 				}
 			} else {
 				if (RightButtonAttacks) {
@@ -416,14 +413,14 @@ void DoRightButton(int sx, int sy)
 						PlayUnitSound(*unit, VoiceAttack);
 						acknowledged = 1;
 					}
-					SendCommandAttack(*unit, x, y, NoUnitP, flush);
+					SendCommandAttack(*unit, pos.x, pos.y, NoUnitP, flush);
 				} else {
 					// Note: move is correct here, right default is move
 					if (!acknowledged) {
 						PlayUnitSound(*unit, VoiceAcknowledging);
 						acknowledged = 1;
 					}
-					SendCommandMove(*unit, x, y, flush);
+					SendCommandMove(*unit, pos.x, pos.y, flush);
 				}
 			}
 			// FIXME: ALT-RIGHT-CLICK, move but fight back if attacked.
@@ -483,12 +480,12 @@ void DoRightButton(int sx, int sy)
 				continue;
 			}
 			// FIXME: support harvesting more types of terrain.
-			if (Map.IsFieldExplored(unit->Player, x, y) && Map.ForestOnMap(x, y)) {
+			if (Map.IsFieldExplored(unit->Player, pos) && Map.ForestOnMap(pos)) {
 				if (!acknowledged) {
 					PlayUnitSound(*unit, VoiceAcknowledging);
 					acknowledged = 1;
 				}
-				SendCommandResourceLoc(*unit, x, y, flush);
+				SendCommandResourceLoc(*unit, pos.x, pos.y, flush);
 				break;
 			}
 		}
@@ -497,7 +494,7 @@ void DoRightButton(int sx, int sy)
 			acknowledged = 1;
 		}
 
-		SendCommandMove(*unit, x, y, flush);
+		SendCommandMove(*unit, pos.x, pos.y, flush);
 	}
 	ShowOrdersCount = GameCycle + Preference.ShowOrders * CYCLES_PER_SECOND;
 }
@@ -816,8 +813,6 @@ void MouseScrollMap(int x, int y)
 */
 void UIHandleMouseMove(int x, int y)
 {
-	int mx;
-	int my;
 	enum _cursor_on_ OldCursorOn;
 
 	OldCursorOn = CursorOn;
@@ -893,16 +888,17 @@ void UIHandleMouseMove(int x, int y)
 	// FIXME: This must done new, moving units, scrolling...
 	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorX, CursorY)) {
 		const CViewport *vp = UI.MouseViewport;
-		if (Map.IsFieldExplored(ThisPlayer, vp->Viewport2MapX(x), vp->Viewport2MapY(y)) ||
-				ReplayRevealMap) {
+		const Vec2i tilePos = {vp->Viewport2MapX(x), vp->Viewport2MapY(y)};
+
+		if (Map.IsFieldExplored(ThisPlayer, tilePos) || ReplayRevealMap) {
 			UnitUnderCursor = UnitOnScreen(NULL, x - vp->X + vp->MapX * TileSizeX + vp->OffsetX,
 				y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY);
 		}
 	} else if (CursorOn == CursorOnMinimap) {
-		mx = UI.Minimap.Screen2MapX(x);
-		my = UI.Minimap.Screen2MapY(y);
-		if (Map.IsFieldExplored(ThisPlayer, mx, my) || ReplayRevealMap) {
-			UnitUnderCursor = UnitOnMapTile(mx, my,-1);
+		const Vec2i tilePos = {UI.Minimap.Screen2MapX(x), UI.Minimap.Screen2MapY(y)};
+
+		if (Map.IsFieldExplored(ThisPlayer, tilePos) || ReplayRevealMap) {
+			UnitUnderCursor = UnitOnMapTile(tilePos.x, tilePos.y, -1);
 		}
 	}
 
@@ -1152,16 +1148,10 @@ static int SendPatrol(int sx, int sy)
 */
 static int SendResource(int sx, int sy)
 {
-	int x;
-	int y;
 	int res;
-	CUnit *dest;
-	int ret;
-
-	ret = 0;
-	dest = UnitUnderCursor;
-	x = sx / TileSizeX;
-	y = sy / TileSizeY;
+	CUnit *dest = UnitUnderCursor;
+	int ret = 0;
+	const Vec2i pos = {sx / TileSizeX, sy / TileSizeY};
 
 	for (int i = 0; i < NumSelected; ++i) {
 		CUnit &unit = *Selected[i];
@@ -1182,12 +1172,12 @@ static int SendResource(int sx, int sy)
 				for (res = 0; res < MaxCosts; ++res) {
 					if (unit.Type->ResInfo[res] &&
 							unit.Type->ResInfo[res]->TerrainHarvester &&
-							Map.IsFieldExplored(unit.Player, x, y) &&
-							Map.ForestOnMap(x, y) &&
+							Map.IsFieldExplored(unit.Player, pos) &&
+							Map.ForestOnMap(pos) &&
 							Selected[i]->ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity &&
 							((unit.CurrentResource != res) ||
 								(unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity))) {
-						SendCommandResourceLoc(unit, x, y,
+						SendCommandResourceLoc(unit, pos.x, pos.y,
 							!(KeyModifiers & ModifierShift));
 						ret = 1;
 						break;
@@ -1205,12 +1195,12 @@ static int SendResource(int sx, int sy)
 				ret = 1;
 				continue;
 			}
-			if (Map.IsFieldExplored(unit.Player, x, y) && Map.ForestOnMap(x, y)) {
-				SendCommandResourceLoc(unit, x, y, !(KeyModifiers & ModifierShift));
+			if (Map.IsFieldExplored(unit.Player, pos) && Map.ForestOnMap(pos)) {
+				SendCommandResourceLoc(unit, pos.x, pos.y, !(KeyModifiers & ModifierShift));
 				ret = 1;
 				continue;
 			}
-			SendCommandMove(unit, x, y, !(KeyModifiers & ModifierShift));
+			SendCommandMove(unit, pos.x, pos.y, !(KeyModifiers & ModifierShift));
 			ret = 1;
 			continue;
 		}
@@ -1575,27 +1565,27 @@ void UIHandleButtonDown(unsigned button)
 			if (Selected[0] && (MouseButtons & LeftButton) &&
 					UI.MouseViewport->IsInsideMapArea(CursorX, CursorY)) {// enter select mode
 				int explored;
-				int x = UI.MouseViewport->Viewport2MapX(CursorX);
-				int y = UI.MouseViewport->Viewport2MapY(CursorY);
-
+				const Vec2i tilePos = {UI.MouseViewport->Viewport2MapX(CursorX),
+										UI.MouseViewport->Viewport2MapY(CursorY)};
 				// FIXME: error messages
 
 				explored = 1;
 				for (int j = 0; explored && j < Selected[0]->Type->TileHeight; ++j) {
 					for (int i = 0; i < Selected[0]->Type->TileWidth; ++i) {
-						if (!Map.IsFieldExplored(ThisPlayer, x + i, y + j)) {
+						const Vec2i tempPos = {i, j};
+						if (!Map.IsFieldExplored(ThisPlayer, tilePos + tempPos)) {
 							explored = 0;
 							break;
 						}
 					}
 				}
 				// 0 Test build, don't really build
-				if (CanBuildUnitType(Selected[0], CursorBuilding, x, y, 0) &&
+				if (CanBuildUnitType(Selected[0], CursorBuilding, tilePos.x, tilePos.y, 0) &&
 						(explored || ReplayRevealMap)) {
 					PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound,
 						MaxSampleVolume);
 					for (int i = 0; i < NumSelected; ++i) {
-						SendCommandBuildBuilding(*Selected[i], x, y, CursorBuilding,
+						SendCommandBuildBuilding(*Selected[i], tilePos.x, tilePos.y, CursorBuilding,
 							!(KeyModifiers & ModifierShift));
 					}
 					if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
@@ -1625,18 +1615,14 @@ void UIHandleButtonDown(unsigned button)
 #else
 		} else if (MouseButtons & RightButton) {
 #endif
-			int x;
-			int y;
-
 			if (!GameObserve && !GamePaused && UI.MouseViewport->IsInsideMapArea(CursorX, CursorY)) {
 				CUnit *unit;
 				// FIXME: Rethink the complete chaos of coordinates here
 				// FIXME: Johns: Perhaps we should use a pixel map coordinates
+				const Vec2i tilePos = {UI.MouseViewport->Viewport2MapX(CursorX),
+										UI.MouseViewport->Viewport2MapY(CursorY)};
 
-				x = UI.MouseViewport->Viewport2MapX(CursorX);
-				y = UI.MouseViewport->Viewport2MapY(CursorY);
-
-				if (UnitUnderCursor != NULL && (unit = UnitOnMapTile(x, y,-1)) &&
+				if (UnitUnderCursor != NULL && (unit = UnitOnMapTile(tilePos.x, tilePos.y,-1)) &&
 						!UnitUnderCursor->Type->Decoration) {
 					unit->Blink = 4;                // if right click on building -- blink
 				} else { // if not not click on building -- green cross
@@ -1648,7 +1634,7 @@ void UIHandleButtonDown(unsigned button)
 								CursorY - UI.MouseViewport->Y + UI.MouseViewport->OffsetY, 0, 0);
 					}
 				}
-				DoRightButton(x * TileSizeX, y * TileSizeY);
+				DoRightButton(tilePos.x * TileSizeX, tilePos.y * TileSizeY);
 			}
 		} else if (MouseButtons & LeftButton) { // enter select mode
 			CursorStartX = CursorX;
@@ -1949,12 +1935,10 @@ void UIHandleButtonUp(unsigned button)
 			//
 			// cade: cannot select unit on invisible space
 			// FIXME: johns: only complete invisibile units
-			if (Map.IsFieldVisible(ThisPlayer,
-					UI.MouseViewport->Viewport2MapX(CursorX),
-					UI.MouseViewport->Viewport2MapY(CursorY)) || ReplayRevealMap) {
-				unit = UnitOnScreen(unit,
-					CursorX - UI.MouseViewport->X + UI.MouseViewport->MapX * TileSizeX + UI.MouseViewport->OffsetX,
-					CursorY - UI.MouseViewport->Y + UI.MouseViewport->MapY * TileSizeY + UI.MouseViewport->OffsetY);
+			const Vec2i cursorTilePos = {UI.MouseViewport->Viewport2MapX(CursorX),
+										UI.MouseViewport->Viewport2MapY(CursorY)};
+			if (Map.IsFieldVisible(ThisPlayer, cursorTilePos) || ReplayRevealMap) {
+				unit = UnitOnScreen(unit, cursorTilePos.x, cursorTilePos.y);
 			}
 			if (unit) {
 				// FIXME: Not nice coded, button number hardcoded!

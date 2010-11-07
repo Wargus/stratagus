@@ -615,21 +615,17 @@ int AiForce::PlanAttack(void)
 /**
 **  Respond to ExplorationRequests
 */
-void AiSendExplorers(void)
+void AiSendExplorers()
 {
 	AiExplorationRequest *request;
 	int requestcount;
 	int requestid;
-	int centerx;
-	int centery;
-	int x;
-	int y;
+	Vec2i pos;
 	int i;
 	int targetok;
 	int ray;
 	int trycount;
 	int outtrycount;
-
 	CUnit **unit;
 	CUnitType *type;
 	CUnit *bestunit;
@@ -655,19 +651,18 @@ void AiSendExplorers(void)
 		request = &AiPlayer->FirstExplorationRequest[requestid];
 
 		// Choose a target, "near"
-		centerx = request->X;
-		centery = request->Y;
+		const Vec2i center = { request->X, request->Y };
 		ray = 3;
 		trycount = 0;
 
 		do {
 			targetok = 0;
 
-			x = centerx + SyncRand() % (2 * ray + 1) - ray;
-			y = centery + SyncRand() % (2 * ray + 1) - ray;
+			pos.x = center.x + SyncRand() % (2 * ray + 1) - ray;
+			pos.y = center.y + SyncRand() % (2 * ray + 1) - ray;
 
-			if (Map.Info.IsPointOnMap(x, y)) {
-				targetok = !Map.IsFieldExplored(AiPlayer->Player, x, y);
+			if (Map.Info.IsPointOnMap(pos)) {
+				targetok = !Map.IsFieldExplored(AiPlayer->Player, pos);
 			}
 
 			ray = 3 * ray / 2;
@@ -716,7 +711,7 @@ void AiSendExplorers(void)
 				flyeronly = 1;
 			}
 
-			distance = ((*unit)->tilePos.x - x) * ((*unit)->tilePos.x - x) + ((*unit)->tilePos.y - y) * ((*unit)->tilePos.y - y);
+			distance = ((*unit)->tilePos.x - pos.x) * ((*unit)->tilePos.x - pos.x) + ((*unit)->tilePos.y - pos.y) * ((*unit)->tilePos.y - pos.y);
 			if (bestdistance == -1 || distance <= bestdistance ||
 					(bestunit->Type->UnitType != UnitTypeFly && type->UnitType == UnitTypeFly)) {
 				bestdistance = distance;
@@ -726,7 +721,7 @@ void AiSendExplorers(void)
 	} while (outtrycount <= 4 && !bestunit);
 
 	if (bestunit) {
-		CommandMove(*bestunit, x, y, FlushCommands);
+		CommandMove(*bestunit, pos.x, pos.y, FlushCommands);
 		AiPlayer->LastExplorationGameCycle = GameCycle;
 	}
 

@@ -130,8 +130,7 @@ int MapFogFilterFlags(CPlayer *player, int x, int y, int mask)
 **  @param x       X tile to mark.
 **  @param y       Y tile to mark.
 */
-void MapMarkTileSight(const CPlayer *player,
-	const unsigned int index)
+void MapMarkTileSight(const CPlayer *player, const unsigned int index)
 {
 	//v = &Map.Field(x, y)->Visible[player->Index];
 	unsigned short *v = &(Map.Field(index)->Visible[player->Index]);
@@ -153,26 +152,7 @@ void MapMarkTileSight(const CPlayer *player,
 void MapMarkTileSight(const CPlayer *player, int x, int y)
 {
 	Assert(Map.Info.IsPointOnMap(x, y));
-#ifdef MARKER_ON_INDEX
 	MapMarkTileSight(player, Map.getIndex(x,y));
-#else
-	const unsigned int index = Map.getIndex(x,y);
-	unsigned short *v = &(Map.Field(index)->Visible[player->Index]);
-	if (*v == 0 || *v == 1) { // Unexplored or unseen
-		// When there is no fog only unexplored tiles are marked.
-		if (!Map.NoFogOfWar || *v == 0) {
-			UnitsOnTileMarkSeen(player, index, 0);
-		}
-		*v = 2;
-		//if (Map.IsTileVisible(ThisPlayer, x, y) > 1) {
-		if (Map.IsTileVisible(ThisPlayer, index) > 1) {
-			Map.MarkSeenTile(x, y);
-		}
-		return;
-	}
-	Assert(*v != 65535);
-	++*v;
-#endif
 }
 
 
@@ -209,34 +189,9 @@ void MapUnmarkTileSight(const CPlayer *player, const unsigned int index)
 
 void MapUnmarkTileSight(const CPlayer *player, int x, int y)
 {
-	Assert(Map.Info.IsPointOnMap(x, y));
-#ifdef MARKER_ON_INDEX
-	MapUnmarkTileSight(player, Map.getIndex(x,y));
-#else
-	const unsigned int index = Map.getIndex(x,y);
-	unsigned short *v = &(Map.Field(index)->Visible[player->Index]);
-	switch (*v) {
-		case 0:  // Unexplored
-		case 1:
-			// We are at minimum, don't do anything shouldn't happen.
-			Assert(0);
-			break;
-		case 2:
-			// When there is NoFogOfWar units never get unmarked.
-			if (!Map.NoFogOfWar) {
-				//UnitsOnTileUnmarkSeen(player, x, y, 0);
-				UnitsOnTileUnmarkSeen(player, index, 0);
-			}
-			// Check visible Tile, then deduct...
-			//if (Map.IsTileVisible(ThisPlayer, x, y) > 1) {
-			if (Map.IsTileVisible(ThisPlayer, index) > 1) {
-				Map.MarkSeenTile(x, y);
-			}
-		default:  // seen -> seen
-			--*v;
-			break;
-	}
-#endif
+	const Vec2i pos = {x, y};
+	Assert(Map.Info.IsPointOnMap(pos));
+	MapUnmarkTileSight(player, Map.getIndex(pos));
 }
 
 

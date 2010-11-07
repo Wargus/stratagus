@@ -95,15 +95,16 @@ static int MapIsSeenTileWall(int x, int y, int walltype)
 */
 void MapFixSeenWallTile(int x, int y)
 {
+	const Vec2i pos = {x, y};
 	int t;
 	int tile;
 	CMapField *mf;
 
 	//  Outside of map or no wall.
-	if (!Map.Info.IsPointOnMap(x, y)) {
+	if (!Map.Info.IsPointOnMap(pos)) {
 		return;
 	}
-	mf = Map.Field(x, y);
+	mf = Map.Field(pos);
 	t = Map.Tileset.TileTypeTable[mf->SeenTile];
 	if (t != TileTypeHumanWall && t != TileTypeOrcWall) {
 		return;
@@ -113,16 +114,16 @@ void MapFixSeenWallTile(int x, int y)
 	//  Calculate the correct tile. Depends on the surrounding.
 	//
 	tile = 0;
-	if ((y - 1) < 0 || MapIsSeenTileWall(x, y - 1, t)) {
+	if ((pos.y - 1) < 0 || MapIsSeenTileWall(pos.x, pos.y - 1, t)) {
 		tile |= 1 << 0;
 	}
-	if ((x + 1) >= Map.Info.MapWidth || MapIsSeenTileWall(x + 1, y, t)) {
+	if ((pos.x + 1) >= Map.Info.MapWidth || MapIsSeenTileWall(pos.x + 1, y, t)) {
 		tile |= 1 << 1;
 	}
-	if ((y + 1) >= Map.Info.MapHeight || MapIsSeenTileWall(x, y + 1, t)) {
+	if ((pos.y + 1) >= Map.Info.MapHeight || MapIsSeenTileWall(pos.x, pos.y + 1, t)) {
 		tile |= 1 << 2;
 	}
-	if ((x - 1) < 0 || MapIsSeenTileWall(x - 1, y, t)) {
+	if ((pos.x - 1) < 0 || MapIsSeenTileWall(pos.x - 1, pos.y, t)) {
 		tile |= 1 << 3;
 	}
 
@@ -161,8 +162,8 @@ void MapFixSeenWallTile(int x, int y)
 		mf->SeenTile = tile;
 
 		// FIXME: can this only happen if seen?
-		if (Map.IsFieldVisible(ThisPlayer, x, y)) {
-			UI.Minimap.UpdateSeenXY(x, y);
+		if (Map.IsFieldVisible(ThisPlayer, pos)) {
+			UI.Minimap.UpdateSeenXY(pos.x, pos.y);
 		}
 	}
 }
@@ -189,15 +190,16 @@ void MapFixSeenWallNeighbors(int x, int y)
 */
 void MapFixWallTile(int x, int y)
 {
+	const Vec2i pos = {x, y};
 	int tile;
 	CMapField *mf;
 	int t;
 
 	//  Outside of map or no wall.
-	if (!Map.Info.IsPointOnMap(x, y)) {
+	if (!Map.Info.IsPointOnMap(pos)) {
 		return;
 	}
-	mf = Map.Field(x, y);
+	mf = Map.Field(pos);
 	if (!(mf->Flags & MapFieldWall)) {
 		return;
 	}
@@ -207,19 +209,19 @@ void MapFixWallTile(int x, int y)
 	//  Calculate the correct tile. Depends on the surrounding.
 	//
 	tile = 0;
-	if ((y - 1) < 0 || (Map.Field(x, (y - 1))->
+	if ((pos.y - 1) < 0 || (Map.Field(pos.x, (pos.y - 1))->
 			Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 0;
 	}
-	if ((x + 1) >= Map.Info.MapWidth || (Map.Field(x + 1, y)->
+	if ((pos.x + 1) >= Map.Info.MapWidth || (Map.Field(pos.x + 1, pos.y)->
 			Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 1;
 	}
-	if ((y + 1) >= Map.Info.MapHeight || (Map.Field(x, (y + 1))->
+	if ((pos.y + 1) >= Map.Info.MapHeight || (Map.Field(pos.x, pos.y + 1)->
 			Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 2;
 	}
-	if ((x - 1) < 0 || (Map.Field(x - 1, y)->
+	if ((pos.x - 1) < 0 || (Map.Field(pos.x - 1, pos.y)->
 			Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 3;
 	}
@@ -257,11 +259,11 @@ void MapFixWallTile(int x, int y)
 
 	if (mf->Tile != tile) {
 		mf->Tile = tile;
-		UI.Minimap.UpdateXY(x, y);
+		UI.Minimap.UpdateXY(pos.x, pos.y);
 
-		if (Map.IsFieldVisible(ThisPlayer, x, y)) {
-			UI.Minimap.UpdateSeenXY(x, y);
-			Map.MarkSeenTile(x, y);
+		if (Map.IsFieldVisible(ThisPlayer, pos)) {
+			UI.Minimap.UpdateSeenXY(pos.x, pos.y);
+			Map.MarkSeenTile(pos);
 		}
 	}
 }
@@ -288,20 +290,20 @@ static void MapFixWallNeighbors(int x, int y)
 */
 void CMap::RemoveWall(unsigned x, unsigned y)
 {
-	CMapField *mf;
+	const Vec2i pos = {x, y};
+	CMapField *mf = Field(pos);
 
-	mf = this->Fields + x + y * this->Info.MapWidth;
 	mf->Value = 0;
 	// FIXME: support more walls of different races.
 	mf->Flags &= ~(MapFieldHuman | MapFieldWall | MapFieldUnpassable);
 
-	UI.Minimap.UpdateXY(x, y);
-	MapFixWallTile(x, y);
-	MapFixWallNeighbors(x, y);
+	UI.Minimap.UpdateXY(pos.x, pos.y);
+	MapFixWallTile(pos.x, pos.y);
+	MapFixWallNeighbors(pos.x, pos.y);
 
-	if (Map.IsFieldVisible(ThisPlayer, x, y)) {
-		UI.Minimap.UpdateSeenXY(x, y);
-		this->MarkSeenTile(x, y);
+	if (Map.IsFieldVisible(ThisPlayer, pos)) {
+		UI.Minimap.UpdateSeenXY(pos.x, pos.y);
+		this->MarkSeenTile(pos);
 	}
 }
 
@@ -316,9 +318,8 @@ void CMap::RemoveWall(unsigned x, unsigned y)
 */
 void CMap::SetWall(unsigned x, unsigned y, int humanwall)
 {
-	CMapField *mf;
-
-	mf = this->Fields + x + y * this->Info.MapWidth;
+	const Vec2i pos = {x, y};
+	CMapField *mf = Field(pos);
 
 	// FIXME: support more walls of different races.
 	if (humanwall) {
@@ -333,13 +334,13 @@ void CMap::SetWall(unsigned x, unsigned y, int humanwall)
 		mf->Value = UnitTypeOrcWall->Variable[HP_INDEX].Max;
 	}
 
-	UI.Minimap.UpdateXY(x, y);
-	MapFixWallTile(x, y);
-	MapFixWallNeighbors(x, y);
+	UI.Minimap.UpdateXY(pos.x, pos.y);
+	MapFixWallTile(pos.x, pos.y);
+	MapFixWallNeighbors(pos.x, pos.y);
 
-	if (Map.IsFieldVisible(ThisPlayer, x, y)) {
-		UI.Minimap.UpdateSeenXY(x, y);
-		this->MarkSeenTile(x, y);
+	if (Map.IsFieldVisible(ThisPlayer, pos)) {
+		UI.Minimap.UpdateSeenXY(pos.x, pos.y);
+		this->MarkSeenTile(pos);
 	}
 }
 

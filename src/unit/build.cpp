@@ -313,15 +313,14 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 /**
 **  Can build on this point.
 **
-**  @param x     X tile map position.
-**  @param y     Y tile map position.
+**  @param pos   tile map position.
 **  @param  mask terrain mask
 **
 **  @return 1 if we can build on this point.
 */
-bool CanBuildOn(int x, int y, int mask)
+bool CanBuildOn(const Vec2i &pos, int mask)
 {
-	return (Map.Info.IsPointOnMap(x,y) && !Map.CheckMask(x, y,mask));
+	return (Map.Info.IsPointOnMap(pos) && !Map.CheckMask(pos, mask));
 }
 
 extern int

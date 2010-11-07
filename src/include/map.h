@@ -105,6 +105,8 @@
 #include "tile.h"
 #endif
 
+#include "vec2i.h"
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -162,6 +164,10 @@ public:
 		return (x >= 0 && y >= 0 && x < MapWidth && y < MapHeight);
 	}
 
+	bool IsPointOnMap(const Vec2i &pos) const
+	{
+		return IsPointOnMap(pos.x, pos.y);
+	}
 };
 
 /*----------------------------------------------------------------------------
@@ -177,6 +183,11 @@ public:
 		return x + y * this->Info.MapWidth;
 	}
 
+	unsigned int getIndex(const Vec2i &pos) const
+	{
+		return getIndex(pos.x, pos.y);
+	}
+
 	inline CMapField *Field(unsigned int index) const {
 		return &this->Fields[index];
 	}
@@ -190,7 +201,7 @@ public:
 	/// Cleanup memory for fog of war tables
 	void CleanFogOfWar(void);
 	/// Remove wood/rock from the map.
-	void ClearTile(unsigned short type, unsigned x, unsigned y);
+	void ClearTile(unsigned short type, const Vec2i &pos);
 
 	/**
 	**  Find out if a field is seen (By player, or by shared vision)
@@ -232,12 +243,12 @@ public:
 	bool CheckMask(const unsigned int index, const int mask) const
 	{
 		return (this->Fields[index].Flags & mask) != 0;
-	};
+	}
 
-	bool CheckMask(int x, int y, int mask) const
+	bool CheckMask(const Vec2i &pos, int mask) const
 	{
-		return (this->Fields[x + y * this->Info.MapWidth].Flags & mask) != 0;
-	};
+		return CheckMask(getIndex(pos), mask);
+	}
 
 	/// Check if a field for the user is explored.
 	bool IsFieldExplored(const CPlayer *const player,
@@ -254,39 +265,41 @@ public:
 	};
 
 	/// Check if a field for the user is visible.
-	bool IsFieldVisible(const CPlayer *const player,
-			const unsigned int index) const
+	bool IsFieldVisible(const CPlayer *const player, const unsigned int index) const
 	{
 		return IsTileVisible(player, index) > 1;
-	};
+	}
 
-
-	unsigned short IsTileVisible(const CPlayer *const player,
-			int x, int y) const
+	unsigned short IsTileVisible(const CPlayer *const player, const Vec2i &pos) const
 	{
-		return IsTileVisible(player, getIndex(x,y));
-	};
+		return IsTileVisible(player, getIndex(pos));
+	}
 
 	/// Check if a field for the user is explored.
-	bool IsFieldExplored(const CPlayer *const player, int x, int y) const
+	bool IsFieldExplored(const CPlayer *const player, const Vec2i &pos)
 	{
-	 	return IsFieldExplored(player, getIndex(x,y));
+		Assert(Info.IsPointOnMap(pos));
+		return IsFieldExplored(player, getIndex(pos));
 	}
 
+
 	/// Check if a field for the user is visible.
-	bool IsFieldVisible(const CPlayer *const player, int x, int y) const
+	bool IsFieldVisible(const CPlayer *const player, const Vec2i &pos)
 	{
-		return IsTileVisible(player, getIndex(x,y)) > 1;
+		return IsTileVisible(player, getIndex(pos)) > 1;
 	}
+
 
 	/// Mark a tile as seen by the player.
 	void MarkSeenTile(const unsigned int index);
 
 	/// Mark a tile as seen by the player.
-	void MarkSeenTile(int x, int y)
+	void MarkSeenTile(const Vec2i &pos)
 	{
-		MarkSeenTile(getIndex(x,y));
+		Assert(Info.IsPointOnMap(pos));
+		MarkSeenTile(getIndex(pos));
 	}
+
 
 	/// Reveal the complete map, make everything known.
 	void Reveal(void);
@@ -296,6 +309,10 @@ public:
 	/// Get the MapField at location x,y
 	inline CMapField *Field(int x, int y) const {
 		return &this->Fields[x + y * this->Info.MapWidth];
+	}
+	CMapField* Field(const Vec2i &pos) const
+	{
+		return Field(pos.x, pos.y);
 	}
 
 //
@@ -329,16 +346,15 @@ public:
 	/**
 	**  Water on map tile.
 	**
-	**  @param tx  X map tile position.
-	**  @param ty  Y map tile position.
+	**  @param pos  map tile position.
 	**
 	**  @return    True if water, false otherwise.
 	*/
-	bool WaterOnMap(int tx, int ty) const
+	bool WaterOnMap(const Vec2i &pos) const
 	{
-		Assert(Info.IsPointOnMap(tx, ty));
-		return WaterOnMap(getIndex(tx,ty));
-	};
+		Assert(Info.IsPointOnMap(pos));
+		return WaterOnMap(getIndex(pos));
+	}
 
 	/// Returns true, if coast on the map tile field
 	bool CoastOnMap(const unsigned int index) const
@@ -349,16 +365,16 @@ public:
 	/**
 	**  Coast on map tile.
 	**
-	**  @param tx  X map tile position.
-	**  @param ty  Y map tile position.
+	**  @param pos  map tile position.
 	**
 	**  @return    True if coast, false otherwise.
 	*/
-	bool CoastOnMap(int tx, int ty) const
+	bool CoastOnMap(const Vec2i &pos) const
 	{
-		Assert(Info.IsPointOnMap(tx, ty));
-		return CoastOnMap(getIndex(tx,ty));
-	};
+		Assert(Info.IsPointOnMap(pos));
+		return CoastOnMap(getIndex(pos));
+	}
+
 
 	/// Returns true, if forest on the map tile field
 	bool ForestOnMap(const unsigned int index) const
@@ -369,16 +385,15 @@ public:
 	/**
 	**  Forest on map tile.
 	**
-	**  @param tx  X map tile position.
-	**  @param ty  Y map tile position.
+	**  @param pos  map tile position.
 	**
 	**  @return    True if forest, false otherwise.
 	*/
-	bool ForestOnMap(int tx, int ty) const
+	bool ForestOnMap(const Vec2i& pos) const
 	{
-		Assert(Info.IsPointOnMap(tx, ty));
-		return ForestOnMap(getIndex(tx,ty));
-	};
+		Assert(Info.IsPointOnMap(pos));
+		return ForestOnMap(getIndex(pos));
+	}
 
 
 	/// Returns true, if rock on the map tile field
@@ -390,15 +405,14 @@ public:
 	/**
 	**  Rock on map tile.
 	**
-	**  @param tx  X map tile position.
-	**  @param ty  Y map tile position.
+	**  @param pos  map tile position.
 	**
 	**  @return    True if rock, false otherwise.
 	*/
-	bool RockOnMap(int tx, int ty) const
+	bool RockOnMap(const Vec2i& pos) const
 	{
-		Assert(Info.IsPointOnMap(tx, ty));
-		return RockOnMap(getIndex(tx,ty));
+		Assert(Info.IsPointOnMap(pos));
+		return RockOnMap(getIndex(pos));
 	};
 
 //UnitCache
@@ -579,7 +593,7 @@ extern void LoadStratagusMapInfo(const std::string &mapname);
 extern void FreeMapInfo(CMapInfo *info);
 
 	/// Returns true, if the unit-type(mask can enter field with bounds check
-extern bool CheckedCanMoveToMask(int x, int y, int mask);
+extern bool CheckedCanMoveToMask(const Vec2i &pos, int mask);
 	/// Returns true, if the unit-type can enter the field
 extern bool UnitTypeCanBeAt(const CUnitType *type, int x, int y);
 	/// Returns true, if the unit can enter the field
@@ -601,7 +615,8 @@ void MapUnmarkUnitSight(CUnit &unit);
 
 	/// Can a unit with 'mask' enter the field
 inline bool CanMoveToMask(int x, int y, int mask) {
-	return !Map.CheckMask(x, y, mask);
+	const Vec2i pos = {x, y};
+	return !Map.CheckMask(pos, mask);
 }
 
 inline void MapMarkSight(const CPlayer *player, int x, int y, int w, int h, int range) {

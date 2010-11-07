@@ -561,7 +561,8 @@ void CMinimap::Update(void)
 			if (ReplayRevealMap) {
 				visiontype = 2;
 			} else {
-				visiontype = Map.IsTileVisible(ThisPlayer, Minimap2MapX[mx], Minimap2MapY[my] / Map.Info.MapWidth);
+				const Vec2i tilePos = {Minimap2MapX[mx], Minimap2MapY[my] / Map.Info.MapWidth};
+				visiontype = Map.IsTileVisible(ThisPlayer, tilePos);
 			}
 
 			if ( visiontype == 0 || (visiontype == 1 && ((mx & 1) != (my & 1))))  {

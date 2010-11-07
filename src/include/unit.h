@@ -1297,7 +1297,7 @@ extern CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *
 	/// @todo more docu
 extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y);
 	/// @todo more docu
-extern bool CanBuildOn(int x, int y, int mask);
+extern bool CanBuildOn(const Vec2i &pos, int mask);
 	/// FIXME: more docu
 extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, int real);
 

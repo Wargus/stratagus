@@ -496,9 +496,10 @@ static int MissileVisibleInViewport(const CViewport *vp, const Missile *missile)
 	if (!vp->AnyMapAreaVisibleInViewport(boxmin.x, boxmin.y, boxmax.x, boxmax.y)) {
 		return 0;
 	}
-	for (int x = boxmin.x; x <= boxmax.x; ++x) {
-		for (int y = boxmin.y; y <= boxmax.y; ++y) {
-			if (ReplayRevealMap || Map.IsFieldVisible(ThisPlayer, x, y)) {
+	Vec2i pos;
+	for (pos.x = boxmin.x; pos.x <= boxmax.x; ++pos.x) {
+		for (pos.y = boxmin.y; pos.y <= boxmax.y; ++pos.y) {
+			if (ReplayRevealMap || Map.IsFieldVisible(ThisPlayer, pos)) {
 				return 1;
 			}
 		}

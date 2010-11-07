@@ -81,7 +81,7 @@ static int MoveToResource(CUnit &unit)
 		Vec2i pos = unit.CurrentOrder()->goalPos;
 
 		// Wood gone, look somewhere else.
-		if ((!Map.ForestOnMap(pos.x, pos.y)) && (!unit.IX) && (!unit.IY)) {
+		if ((!Map.ForestOnMap(pos)) && (!unit.IX) && (!unit.IY)) {
 			if (!FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 16,
 					unit.Player, unit.CurrentOrder()->goalPos.x, unit.CurrentOrder()->goalPos.y, &pos)) {
 				// no wood in range
@@ -165,7 +165,7 @@ static int StartGathering(CUnit &unit)
 	if (resinfo->TerrainHarvester) {
 		// This shouldn't happend?
 #if 0
-		if (!Map.ForestOnMap(unit.Orders->X, unit.Orders->Y)) {
+		if (!Map.ForestOnMap(unit.Orders->goalPos)) {
 			DebugPrint("Wood gone, just like that?\n");
 			return 0;
 		}
@@ -354,7 +354,7 @@ static int GatherResource(CUnit &unit)
 
 	// Target gone?
 	if (resinfo->TerrainHarvester &&
-		!Map.ForestOnMap(unit.CurrentOrder()->goalPos.x, unit.CurrentOrder()->goalPos.y)) {
+		!Map.ForestOnMap(unit.CurrentOrder()->goalPos)) {
 		if (!unit.Anim.Unbreakable) {
 			// Action now breakable, move to resource again.
 			unit.SubAction = SUB_MOVE_TO_RESOURCE;
@@ -393,8 +393,7 @@ static int GatherResource(CUnit &unit)
 			unit.ResourcesHeld += addload;
 
 			if (addload && unit.ResourcesHeld == resinfo->ResourceCapacity) {
-				Map.ClearTile(MapFieldForest,
-					unit.CurrentOrder()->goalPos.x, unit.CurrentOrder()->goalPos.y);
+				Map.ClearTile(MapFieldForest, unit.CurrentOrder()->goalPos);
 			}
 		} else {
 			if (resinfo->HarvestFromOutside) {
