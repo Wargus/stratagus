@@ -473,33 +473,29 @@ int UpgradeIdByIdent(const std::string &ident)
 */
 static void ConvertUnitTypeTo(CPlayer *player, const CUnitType *src, CUnitType *dst)
 {
-	CUnit *unit;
-	int i;
-	int j;
-
-	for (i = 0; i < player->TotalNumUnits; ++i) {
-		unit = player->Units[i];
+	for (int i = 0; i < player->TotalNumUnits; ++i) {
+		CUnit &unit = *player->Units[i];
 		//
 		//  Convert already existing units to this type.
 		//
-		if (unit->Type == src) {
+		if (unit.Type == src) {
 			CommandTransformIntoType(unit, dst);
 		//
 		//  Convert trained units to this type.
 		//  FIXME: what about buildings?
 		//
 		} else {
-			for (j = 0; j < unit->OrderCount; ++j) {
-				if (unit->Orders[j]->Action == UnitActionTrain &&
-						unit->Orders[j]->Arg1.Type == src) {
+			for (int j = 0; j < unit.OrderCount; ++j) {
+				if (unit.Orders[j]->Action == UnitActionTrain &&
+						unit.Orders[j]->Arg1.Type == src) {
 						if (j == 0) {
 							// Must Adjust Ticks to the fraction that was trained
-							unit->Data.Train.Ticks =
-								unit->Data.Train.Ticks *
+							unit.Data.Train.Ticks =
+								unit.Data.Train.Ticks *
 								dst->Stats[player->Index].Costs[TimeCost] /
 								src->Stats[player->Index].Costs[TimeCost];
 						}
-					unit->Orders[j]->Arg1.Type = dst;
+					unit.Orders[j]->Arg1.Type = dst;
 				}
 			}
 		}
@@ -522,7 +518,6 @@ static void ApplyUpgradeModifier(CPlayer *player, const CUpgradeModifier *um)
 	int varModified;            // 0 if variable is not modified.
 	int numunits;               // number of unit of the current type.
 	CUnit *unitupgrade[UnitMax]; // array of unit of the current type
-	CUnit *unit;                 // current unit.
 
 	Assert(player);
 	Assert(um);
@@ -563,10 +558,10 @@ static void ApplyUpgradeModifier(CPlayer *player, const CUpgradeModifier *um)
 			if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
 				numunits = FindUnitsByType(UnitTypes[z], unitupgrade);
 				for (numunits--; numunits >= 0; --numunits) {
-					unit = unitupgrade[numunits];
-					if (unit->Player->Index == pn && !unit->Removed) {
+					CUnit &unit = *unitupgrade[numunits];
+					if (unit.Player->Index == pn && !unit.Removed) {
 						MapUnmarkUnitSight(unit);
-						unit->CurrentSightRange = UnitTypes[z]->Stats[pn].Variables[SIGHTRANGE_INDEX].Max +
+						unit.CurrentSightRange = UnitTypes[z]->Stats[pn].Variables[SIGHTRANGE_INDEX].Max +
 							um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
 						MapMarkUnitSight(unit);
 					}
@@ -601,23 +596,23 @@ static void ApplyUpgradeModifier(CPlayer *player, const CUpgradeModifier *um)
 				numunits = FindUnitsByType(UnitTypes[z], unitupgrade);
 				numunits--; // Change to 0 Start not 1 start
 				for (; numunits >= 0; --numunits) {
-					unit = unitupgrade[numunits];
-					if (unit->Player->Index != player->Index) {
+					CUnit &unit = *unitupgrade[numunits];
+					if (unit.Player->Index != player->Index) {
 						continue;
 					}
 					for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
-						unit->Variable[j].Value += um->Modifier.Variables[j].Value;
-						if (unit->Variable[j].Value < 0) {
-							unit->Variable[j].Value = 0;
+						unit.Variable[j].Value += um->Modifier.Variables[j].Value;
+						if (unit.Variable[j].Value < 0) {
+							unit.Variable[j].Value = 0;
 						}
-						unit->Variable[j].Max += um->Modifier.Variables[j].Max;
-						if (unit->Variable[j].Max < 0) {
-							unit->Variable[j].Max = 0;
+						unit.Variable[j].Max += um->Modifier.Variables[j].Max;
+						if (unit.Variable[j].Max < 0) {
+							unit.Variable[j].Max = 0;
 						}
-						if (unit->Variable[j].Value > unit->Variable[j].Max) {
-							unit->Variable[j].Value = unit->Variable[j].Max;
+						if (unit.Variable[j].Value > unit.Variable[j].Max) {
+							unit.Variable[j].Value = unit.Variable[j].Max;
 						}
-						unit->Variable[j].Increase += um->Modifier.Variables[j].Increase;
+						unit.Variable[j].Increase += um->Modifier.Variables[j].Increase;
 					}
 				}
 			}

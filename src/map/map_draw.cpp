@@ -258,7 +258,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 	int ey = this->EndY;
 	const int map_max = Map.Info.MapWidth * Map.Info.MapHeight;
 	unsigned short int tile;
-	
+
 	while (sy  < 0) {
 		sy++;
 		dy += TileSizeY;
@@ -314,7 +314,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 				default:
 				break;
 			}
-						
+
 			Video.DrawHLineClip(color, dx, dy, TileSizeX);
 			Video.DrawVLineClip(color, dx, dy, TileSizeY);
 			if ( 0 && my_mask ) {
@@ -324,7 +324,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 					 Map.Fields[sx].TilesetTile );
 
 			}
-#endif			
+#endif
 			++sx;
 			dx += TileSizeX;
 		}
@@ -336,13 +336,13 @@ void CViewport::DrawMapBackgroundInViewport() const
 struct CDrawProxy {
 
 	CDrawProxy(): nunits(0), nmissiles(0) {}
-	
+
 	CMutex lock;
 	CUnitDrawProxy unittable[UnitMax];
 	MissileDrawProxy missiletable[MAX_MISSILES * 9];
 	int nunits;
 	int nmissiles;
-	
+
 	void Update(const CViewport *const vp)
 	{
 		//
@@ -354,7 +354,7 @@ struct CDrawProxy {
 			lock.UnLock();
 		}
 	}
-	
+
 	void Draw(const CViewport *const vp)
 	{
 		int i = 0, j = 0;
@@ -376,7 +376,7 @@ struct CDrawProxy {
 		}
 		lock.UnLock();
 	}
-	
+
 
 };
 
@@ -402,11 +402,11 @@ void CViewport::Draw() const
 
 	CurrentViewport = this;
 	if (Proxy) {
-		Proxy->Draw(this);	
+		Proxy->Draw(this);
 	} else 	{
 		CUnit *unittable[UnitMax];
 		Missile* missiletable[MAX_MISSILES * 9];
-		
+
 		//
 		// We find and sort units after draw level.
 		//
@@ -438,11 +438,11 @@ void CViewport::Draw() const
 	// Draw orders of selected units.
 	// Drawn here so that they are shown even when the unit is out of the screen.
 	//
-	//FIXME: This is still unsecure during parallel 	
+	//FIXME: This is still unsecure during parallel
 	if (Preference.ShowOrders < 0 ||
 		(ShowOrdersCount >= GameCycle) || (KeyModifiers & ModifierShift)) {
 		for (int i = 0; i < NumSelected; ++i) {
-			ShowOrder(Selected[i]);
+			ShowOrder(*Selected[i]);
 		}
 	}
 

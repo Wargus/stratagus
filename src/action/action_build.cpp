@@ -60,15 +60,15 @@
 **
 **  @param unit  The building under construction.
 */
-static void UpdateConstructionFrame(CUnit *unit)
+static void UpdateConstructionFrame(CUnit &unit)
 {
 	CConstructionFrame *cframe;
 	CConstructionFrame *tmp;
 	int percent;
 
-	percent = unit->Data.Built.Progress /
-		(unit->Type->Stats[unit->Player->Index].Costs[TimeCost] * 6);
-	cframe = tmp = unit->Type->Construction->Frames;
+	percent = unit.Data.Built.Progress /
+		(unit.Type->Stats[unit.Player->Index].Costs[TimeCost] * 6);
+	cframe = tmp = unit.Type->Construction->Frames;
 	while (tmp) {
 		if (percent < tmp->Percent) {
 			break;
@@ -76,12 +76,12 @@ static void UpdateConstructionFrame(CUnit *unit)
 		cframe = tmp;
 		tmp = tmp->Next;
 	}
-	if (cframe != unit->Data.Built.Frame) {
-		unit->Data.Built.Frame = cframe;
-		if (unit->Frame < 0) {
-			unit->Frame = -cframe->Frame - 1;
+	if (cframe != unit.Data.Built.Frame) {
+		unit.Data.Built.Frame = cframe;
+		if (unit.Frame < 0) {
+			unit.Frame = -cframe->Frame - 1;
 		} else {
-			unit->Frame = cframe->Frame;
+			unit.Frame = cframe->Frame;
 		}
 	}
 }
@@ -91,17 +91,17 @@ static void UpdateConstructionFrame(CUnit *unit)
 **
 **  @param unit  Unit to move
 */
-static void MoveToLocation(CUnit *unit)
+static void MoveToLocation(CUnit &unit)
 {
 	// First entry
-	if (!unit->SubAction) {
-		unit->SubAction = 1;
+	if (!unit.SubAction) {
+		unit.SubAction = 1;
 		NewResetPath(unit);
 	}
 
-	if (unit->Wait) {
+	if (unit.Wait) {
 		// FIXME: show still animation while we wait?
-		unit->Wait--;
+		unit.Wait--;
 		return;
 	}
 
@@ -110,24 +110,24 @@ static void MoveToLocation(CUnit *unit)
 			//
 			// Some tries to reach the goal
 			//
-			if (unit->SubAction++ < 10) {
+			if (unit.SubAction++ < 10) {
 				// To keep the load low, retry each 1/4 second.
 				// NOTE: we can already inform the AI about this problem?
-				unit->Wait = CYCLES_PER_SECOND / 4 + unit->SubAction;
+				unit.Wait = CYCLES_PER_SECOND / 4 + unit.SubAction;
 				return;
 			}
 
-			unit->Player->Notify(NotifyYellow, unit->tilePos.x, unit->tilePos.y,
+			unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
 				_("You cannot reach building place"));
-			if (unit->Player->AiEnabled) {
-				AiCanNotReach(unit, unit->CurrentOrder()->Arg1.Type);
+			if (unit.Player->AiEnabled) {
+				AiCanNotReach(unit, unit.CurrentOrder()->Arg1.Type);
 			}
 
-			unit->ClearAction();
+			unit.ClearAction();
 			return;
 
 		case PF_REACHED:
-			unit->SubAction = 20;
+			unit.SubAction = 20;
 			return;
 
 		default:
@@ -136,20 +136,22 @@ static void MoveToLocation(CUnit *unit)
 	}
 }
 
-struct AlreadyBuildingFinder {
-	const CUnit *const worker;
-	const CUnitType *const type;
-	AlreadyBuildingFinder(const CUnit *unit, const CUnitType *t):
-			 worker(unit), type(t) {}
+class AlreadyBuildingFinder {
+public:
+	AlreadyBuildingFinder(const CUnit &unit, const CUnitType *t) :
+		worker(&unit), type(t) {}
 	inline bool operator() (const CUnit *const unit) const
 	{
 		return (!unit->Destroyed && unit->Type == type &&
-				(worker->Player == unit->Player || worker->IsAllied(unit)));
+				(worker->Player == unit->Player || worker->IsAllied(*unit)));
 	}
 	inline CUnit *Find(const CMapField *const mf) const
 	{
 		return mf->UnitCache.find(*this);
 	}
+private:
+	const CUnit *worker;
+	const CUnitType *type;
 };
 
 /**
@@ -157,24 +159,24 @@ struct AlreadyBuildingFinder {
 **
 **  @param unit  Unit to check
 */
-static CUnit *CheckCanBuild(CUnit *unit)
+static CUnit *CheckCanBuild(CUnit &unit)
 {
 	CUnit *ontop;
 
-	if (unit->Wait) {
+	if (unit.Wait) {
 		// FIXME: show still animation while we wait?
-		unit->Wait--;
+		unit.Wait--;
 		return NULL;
 	}
 
-	COrderPtr order = unit->CurrentOrder();
+	COrderPtr order = unit.CurrentOrder();
 	const Vec2i pos = order->goalPos;
 	CUnitType *type = order->Arg1.Type;
 
 	//
 	// Check if the building could be built there.
 	//
-	if ((ontop = CanBuildUnitType(unit, type, pos.x, pos.y, 1)) == NULL) {
+	if ((ontop = CanBuildUnitType(&unit, type, pos.x, pos.y, 1)) == NULL) {
 		/*
 		 *	FIXME: rb - CheckAlreadyBuilding should be somehow
 		 *	ebabled/disable via game lua scripting
@@ -183,60 +185,60 @@ static CUnit *CheckCanBuild(CUnit *unit)
 			AlreadyBuildingFinder(unit, type).Find(Map.Field(pos.x, pos.y))
 			) != NULL) {
 			DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
-					_C_ unit->Player->Index _C_ unit->Slot
+					_C_ unit.Player->Index _C_ unit.Slot
 					_C_ ontop->Type->Name.c_str()
 					_C_ ontop->Slot);
 			order->Init();
 			order->Action = UnitActionRepair;
 			order->SetGoal(ontop);
-			order->Range = unit->Type->RepairRange;
-			unit->SubAction = 0;
+			order->Range = unit.Type->RepairRange;
+			unit.SubAction = 0;
 			return NULL;
 		}
 
 		//
 		// Some tries to build the building.
 		//
-		if (unit->SubAction++ < 30) {
+		if (unit.SubAction++ < 30) {
 			// To keep the load low, retry each 10 cycles
 			// NOTE: we can already inform the AI about this problem?
-			unit->Wait = 10;
+			unit.Wait = 10;
 			return NULL;
 		}
 
-		unit->Player->Notify(NotifyYellow, unit->tilePos.x, unit->tilePos.y,
+		unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
 			_("You cannot build %s here"), type->Name.c_str());
-		if (unit->Player->AiEnabled) {
+		if (unit.Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
-		unit->ClearAction();
+		unit.ClearAction();
 		return NULL;
 	}
 
 	//
 	// Check if enough resources for the building.
 	//
-	if (unit->Player->CheckUnitType(type)) {
+	if (unit.Player->CheckUnitType(type)) {
 		// FIXME: Better tell what is missing?
-		unit->Player->Notify(NotifyYellow, unit->tilePos.x, unit->tilePos.y,
+		unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
 			_("Not enough resources to build %s"), type->Name.c_str());
-		if (unit->Player->AiEnabled) {
+		if (unit.Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
-		unit->ClearAction();
+		unit.ClearAction();
 		return NULL;
 	}
 
 	//
 	// Check if hiting any limits for the building.
 	//
-	if (unit->Player->CheckLimits(type) < 0) {
-		unit->Player->Notify(NotifyYellow, unit->tilePos.x, unit->tilePos.y,
+	if (unit.Player->CheckLimits(type) < 0) {
+		unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
 			_("Can't build more units %s"), type->Name.c_str());
-		if (unit->Player->AiEnabled) {
+		if (unit.Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
-		unit->ClearAction();
+		unit.ClearAction();
 		return NULL;
 	}
 	return ontop;
@@ -245,26 +247,26 @@ static CUnit *CheckCanBuild(CUnit *unit)
 /**
 **  Start building
 */
-static void StartBuilding(CUnit *unit, CUnit *ontop)
+static void StartBuilding(CUnit &unit, CUnit &ontop)
 {
 	const CUnitStats *stats;
-	COrderPtr order = unit->CurrentOrder();
+	COrderPtr order = unit.CurrentOrder();
 	const Vec2i pos = order->goalPos;
 	CUnitType *type = order->Arg1.Type;
 
-	unit->Player->SubUnitType(type);
+	unit.Player->SubUnitType(type);
 
-	CUnit *build = MakeUnit(type, unit->Player);
+	CUnit *build = MakeUnit(type, unit.Player);
 
 	// If unable to make unit, stop, and report message
 	if (build == NoUnitP) {
 		// FIXME: Should we retry this?
-		unit->Player->Notify(NotifyYellow, unit->tilePos.x, unit->tilePos.y,
+		unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
 			_("Unable to create building %s"), type->Name.c_str());
-		if (unit->Player->AiEnabled) {
+		if (unit.Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
-		unit->ClearAction();
+		unit.ClearAction();
 		return;
 	}
 
@@ -272,17 +274,17 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	build->CurrentSightRange = 0;
 
 	// Building on top of something, may remove what is beneath it
-	if (ontop != unit) {
+	if (&ontop != &unit) {
 		CBuildRestrictionOnTop *b;
 
-		b = static_cast<CBuildRestrictionOnTop *> (OnTopDetails(build, ontop->Type));
+		b = static_cast<CBuildRestrictionOnTop *> (OnTopDetails(*build, ontop.Type));
 		Assert(b);
 		if (b->ReplaceOnBuild) {
-			build->ResourcesHeld = ontop->ResourcesHeld; // We capture the value of what is beneath.
-			ontop->Remove(NULL); // Destroy building beneath
+			build->ResourcesHeld = ontop.ResourcesHeld; // We capture the value of what is beneath.
+			ontop.Remove(NULL); // Destroy building beneath
 			UnitLost(ontop);
 			UnitClearOrders(ontop);
-			ontop->Release();
+			ontop.Release();
 		}
 	}
 
@@ -303,25 +305,25 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	// Make sure the bulding doesn't cancel itself out right away.
 	build->Data.Built.Progress = 0;//FIXME ? 100 : 0
 	build->Variable[HP_INDEX].Value = 1;
-	UpdateConstructionFrame(build);
+	UpdateConstructionFrame(*build);
 
 	// We need somebody to work on it.
 	if (!type->BuilderOutside) {
 		//FIXME: cancel buld gen crash
 		// Place the builder inside the building
-		build->Data.Built.Worker = unit;
+		build->Data.Built.Worker = &unit;
 		// HACK: allows the unit to be removed
 		build->CurrentSightRange = 1;
 		//HACK: reset anim
-		UnitShowAnimation(unit, unit->Type->Animations->Still);
-		unit->Remove(build);
+		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		unit.Remove(build);
 		build->CurrentSightRange = 0;
-		unit->tilePos = pos;
+		unit.tilePos = pos;
 		order->Action = UnitActionBuild;
-		unit->Data.Build.Cycles = 0;
-		unit->SubAction = 40;
+		unit.Data.Build.Cycles = 0;
+		unit.SubAction = 40;
 		order->SetGoal(build);
-		if (unit->Selected) {
+		if (unit.Selected) {
 			SelectedUnitChanged();
 		}
 	} else {
@@ -330,14 +332,14 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 		order->SetGoal(build);
 		order->goalPos.x = order->goalPos.y = -1;
 		// FIXME: Should have a BuildRange?
-		order->Range = unit->Type->RepairRange;
-		unit->SubAction = 0;
-		unit->Direction = DirectionToHeading(pos - unit->tilePos);
+		order->Range = unit.Type->RepairRange;
+		unit.SubAction = 0;
+		unit.Direction = DirectionToHeading(pos - unit.tilePos);
 		UnitUpdateHeading(unit);
 		// Mark the new building seen.
-		MapMarkUnitSight(build);
+		MapMarkUnitSight(*build);
 	}
-	UpdateConstructionFrame(build);
+	UpdateConstructionFrame(*build);
 }
 
 /**
@@ -345,36 +347,36 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 **
 **  @param unit  worker which build.
 */
-static void BuildBuilding(CUnit *unit)
+static void BuildBuilding(CUnit &unit)
 {
 
-	UnitShowAnimation(unit, unit->Type->Animations->Build);
-	unit->Data.Build.Cycles++;
-	if (unit->Anim.Unbreakable) {
+	UnitShowAnimation(unit, unit.Type->Animations->Build);
+	unit.Data.Build.Cycles++;
+	if (unit.Anim.Unbreakable) {
 		return ;
 	}
 
 	//
 	// Calculate the length of the attack (repair) anim.
 	//
-	//int animlength = unit->Data.Build.Cycles;
-	unit->Data.Build.Cycles = 0;
+	//int animlength = unit.Data.Build.Cycles;
+	unit.Data.Build.Cycles = 0;
 #if 0
 	CUnit *goal;
 	int hp;
 
 	//goal hp are mod by HandleActionBuilt
 	//and outsid builder use repair now.
-	goal = unit->CurrentOrder()->GetGoal();
+	goal = unit.CurrentOrder()->GetGoal();
 	//Assert(goal);
 	if(!goal) {
 		return;
 	}
 
 	if (goal->CurrentAction() == UnitActionDie) {
-		unit->CurrentOrder()->ClearGoal();
-		unit->State = 0;
-		unit->ClearAction();
+		unit.CurrentOrder()->ClearGoal();
+		unit.State = 0;
+		unit.ClearAction();
 		return;
 	}
 
@@ -383,7 +385,7 @@ static void BuildBuilding(CUnit *unit)
 		(goal->Stats->Costs[TimeCost] * 600) - goal->Variable[HP_INDEX].Value;
 
 	// FIXME: implement this below:
-	// unit->Data.Built.Worker->Type->BuilderSpeedFactor;
+	// unit.Data.Built.Worker->Type->BuilderSpeedFactor;
 	goal->Data.Built.Progress += 100 * animlength * SpeedBuild;
 	// Keep the same level of damage while increasing HP.
 	goal->Variable[HP_INDEX].Value = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) /
@@ -396,9 +398,9 @@ static void BuildBuilding(CUnit *unit)
 	// Building is gone or finished
 	//
 	if (goal->Variable[HP_INDEX].Value == goal->Variable[HP_INDEX].Max) {
-		unit->CurrentOrder()->ClearGoal();
-		unit->State = 0;
-		unit->ClearAction();
+		unit.CurrentOrder()->ClearGoal();
+		unit.State = 0;
+		unit.ClearAction();
 	}
 #endif
 }
@@ -408,19 +410,19 @@ static void BuildBuilding(CUnit *unit)
 **
 **  @param unit  Unit that builds a building
 */
-void HandleActionBuild(CUnit *unit)
+void HandleActionBuild(CUnit &unit)
 {
 	CUnit *ontop;
 
-	if (unit->SubAction <= 10) {
+	if (unit.SubAction <= 10) {
 		MoveToLocation(unit);
 	}
-	if (20 <= unit->SubAction && unit->SubAction <= 30) {
+	if (20 <= unit.SubAction && unit.SubAction <= 30) {
 		if ((ontop = CheckCanBuild(unit))) {
-			StartBuilding(unit, ontop);
+			StartBuilding(unit, *ontop);
 		}
 	}
-	if (unit->SubAction == 40) {
+	if (unit.SubAction == 40) {
 		BuildBuilding(unit);
 	}
 }
@@ -430,65 +432,65 @@ void HandleActionBuild(CUnit *unit)
 **
 **  @param unit  Unit that is being built
 */
-void HandleActionBuilt(CUnit *unit)
+void HandleActionBuilt(CUnit &unit)
 {
 	CUnit *worker;
 	CUnitType *type;
 	int n, mod;
 	int progress;
 
-	type = unit->Type;
+	type = unit.Type;
 
 	// mod is use for round to upper
-	mod = (unit->Stats->Costs[TimeCost] * 600) - unit->Variable[HP_INDEX].Value;
+	mod = (unit.Stats->Costs[TimeCost] * 600) - unit.Variable[HP_INDEX].Value;
 
 	// n is the current damage taken by the unit.
-	n = (unit->Data.Built.Progress * unit->Variable[HP_INDEX].Max + (mod - 1)) / mod;
+	n = (unit.Data.Built.Progress * unit.Variable[HP_INDEX].Max + (mod - 1)) / mod;
 
 	// This below is most often 0
 	if (type->BuilderOutside) {
-		progress = unit->Type->AutoBuildRate;
+		progress = unit.Type->AutoBuildRate;
 	} else {
 		progress = 100;
 		// FIXME: implement this below:
-		// unit->Data.Built.Worker->Type->BuilderSpeedFactor;
+		// unit.Data.Built.Worker->Type->BuilderSpeedFactor;
 	}
 	// Building speeds increase or decrease.
 	progress *= SpeedBuild;
-	unit->Data.Built.Progress += progress;
+	unit.Data.Built.Progress += progress;
 	// mod is use for round to upper and use it as cache
-	mod = type->Stats[unit->Player->Index].Costs[TimeCost] * 600;
+	mod = type->Stats[unit.Player->Index].Costs[TimeCost] * 600;
 
 	// Keep the same level of damage while increasing HP.
-	unit->Variable[HP_INDEX].Value =
-	 (unit->Data.Built.Progress * unit->Variable[HP_INDEX].Max + (mod - n - 1)) /
+	unit.Variable[HP_INDEX].Value =
+	 (unit.Data.Built.Progress * unit.Variable[HP_INDEX].Max + (mod - n - 1)) /
 		(mod - n);
-	if (unit->Variable[HP_INDEX].Value > unit->Stats->Variables[HP_INDEX].Max) {
-		unit->Variable[HP_INDEX].Value = unit->Stats->Variables[HP_INDEX].Max;
+	if (unit.Variable[HP_INDEX].Value > unit.Stats->Variables[HP_INDEX].Max) {
+		unit.Variable[HP_INDEX].Value = unit.Stats->Variables[HP_INDEX].Max;
 	}
 
 	//
 	// Check if construction should be canceled...
 	//
-	if (unit->Data.Built.Cancel || unit->Data.Built.Progress < 0) {
-		DebugPrint("%d: %s canceled.\n" _C_ unit->Player->Index
-				_C_ unit->Type->Name.c_str());
+	if (unit.Data.Built.Cancel || unit.Data.Built.Progress < 0) {
+		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index
+				_C_ unit.Type->Name.c_str());
 		// Drop out unit
-		if ((worker = unit->Data.Built.Worker)) {
+		if ((worker = unit.Data.Built.Worker)) {
 
 			worker->CurrentOrder()->ClearGoal();
 			worker->ClearAction();
 			//worker->State = 0;
 
-			unit->Data.Built.Worker = NoUnitP;
+			unit.Data.Built.Worker = NoUnitP;
 			// HACK: make sure the sight is updated correctly
-			unit->CurrentSightRange = 1;
-			DropOutOnSide(worker, LookingW, type->TileWidth, type->TileHeight);
-			unit->CurrentSightRange = 0;
+			unit.CurrentSightRange = 1;
+			DropOutOnSide(*worker, LookingW, type->TileWidth, type->TileHeight);
+			unit.CurrentSightRange = 0;
 		}
 
 		// Player gets back 75% of the original cost for a building.
-		unit->Player->AddCostsFactor(unit->Stats->Costs, CancelBuildingCostsFactor);
+		unit.Player->AddCostsFactor(unit.Stats->Costs, CancelBuildingCostsFactor);
 		// Cancel building
 		LetUnitDie(unit);
 		return;
@@ -497,37 +499,37 @@ void HandleActionBuilt(CUnit *unit)
 	//
 	// Check if building ready. Note we can both build and repair.
 	//
-	//if (unit->Data.Built.Progress >= unit->Stats->Costs[TimeCost] * 600 ||
-	if (unit->Data.Built.Progress >= mod ||
-			unit->Variable[HP_INDEX].Value >= unit->Stats->Variables[HP_INDEX].Max) {
-		DebugPrint("%d: Building %s(%s) ready.\n" _C_ unit->Player->Index
-		_C_ unit->Type->Ident.c_str() _C_ unit->Type->Name.c_str() );
-		if (unit->Variable[HP_INDEX].Value > unit->Stats->Variables[HP_INDEX].Max) {
-			unit->Variable[HP_INDEX].Value = unit->Stats->Variables[HP_INDEX].Max;
+	//if (unit.Data.Built.Progress >= unit.Stats->Costs[TimeCost] * 600 ||
+	if (unit.Data.Built.Progress >= mod ||
+			unit.Variable[HP_INDEX].Value >= unit.Stats->Variables[HP_INDEX].Max) {
+		DebugPrint("%d: Building %s(%s) ready.\n" _C_ unit.Player->Index
+		_C_ unit.Type->Ident.c_str() _C_ unit.Type->Name.c_str() );
+		if (unit.Variable[HP_INDEX].Value > unit.Stats->Variables[HP_INDEX].Max) {
+			unit.Variable[HP_INDEX].Value = unit.Stats->Variables[HP_INDEX].Max;
 		}
-		unit->ClearAction();
+		unit.ClearAction();
 		// HACK: the building is ready now
-		unit->Player->UnitTypesCount[type->Slot]++;
-		unit->Constructed = 0;
-		if (unit->Frame < 0) {
-			unit->Frame = -1;
+		unit.Player->UnitTypesCount[type->Slot]++;
+		unit.Constructed = 0;
+		if (unit.Frame < 0) {
+			unit.Frame = -1;
 		} else {
-			unit->Frame = 0;
+			unit.Frame = 0;
 		}
 
-		if ((worker = unit->Data.Built.Worker)) {
+		if ((worker = unit.Data.Built.Worker)) {
 			// Bye bye worker.
 			if (type->BuilderLost) {
 				// FIXME: enough?
-				LetUnitDie(worker);
+				LetUnitDie(*worker);
 				worker = NULL;
 			// Drop out the worker.
 			} else {
 				worker->ClearAction();
 				worker->SubAction = 0;//may be 40
 				// HACK: make sure the sight is updated correctly
-				unit->CurrentSightRange = 1;
-				DropOutOnSide(worker, LookingW, type->TileWidth, type->TileHeight);
+				unit.CurrentSightRange = 1;
+				DropOutOnSide(*worker, LookingW, type->TileWidth, type->TileHeight);
 
 				worker->CurrentOrder()->ClearGoal();
 
@@ -535,33 +537,33 @@ void HandleActionBuilt(CUnit *unit)
 				// If we can harvest from the new building, do it.
 				//
 				if (worker->Type->ResInfo[type->GivesResource]) {
-					CommandResource(worker, unit, 0);
+					CommandResource(*worker, unit, 0);
 				}
 			}
 		}
 
 		if (type->GivesResource) {
 			// Set to Zero as it's part of a union
-			memset(&unit->Data, 0, sizeof(unit->Data));
+			memset(&unit.Data, 0, sizeof(unit.Data));
 			// Has StartingResources, Use those
 			if (type->StartingResources) {
-				unit->ResourcesHeld = type->StartingResources;
+				unit.ResourcesHeld = type->StartingResources;
 			}
 		}
 
-		unit->Player->Notify(NotifyGreen, unit->tilePos.x, unit->tilePos.y,
+		unit.Player->Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
 			_("New %s done"), type->Name.c_str());
-		if (unit->Player == ThisPlayer) {
-			if (unit->Type->Sound.Ready.Sound) {
+		if (unit.Player == ThisPlayer) {
+			if (unit.Type->Sound.Ready.Sound) {
 				PlayUnitSound(unit, VoiceReady);
 			} else if (worker) {
-				PlayUnitSound(worker, VoiceWorkCompleted);
+				PlayUnitSound(*worker, VoiceWorkCompleted);
 			} else {
 				PlayUnitSound(unit, VoiceBuilding);
 			}
 		}
 
-		if (unit->Player->AiEnabled) {
+		if (unit.Player->AiEnabled) {
 			/* Worker can be NULL */
 			AiWorkComplete(worker, unit);
 		}
@@ -569,28 +571,28 @@ void HandleActionBuilt(CUnit *unit)
 		// FIXME: Vladi: this is just a hack to test wall fixing,
 		// FIXME:  also not sure if the right place...
 		// FIXME: Johns: hardcoded unit-type wall / more races!
-		if (unit->Type == UnitTypeOrcWall ||
-				unit->Type == UnitTypeHumanWall) {
-			Map.SetWall(unit->tilePos.x, unit->tilePos.y, unit->Type == UnitTypeHumanWall);
-			unit->Remove(NULL);
+		if (unit.Type == UnitTypeOrcWall ||
+				unit.Type == UnitTypeHumanWall) {
+			Map.SetWall(unit.tilePos.x, unit.tilePos.y, unit.Type == UnitTypeHumanWall);
+			unit.Remove(NULL);
 			UnitLost(unit);
 			UnitClearOrders(unit);
-			unit->Release();
+			unit.Release();
 			return;
 		}
 
 		UpdateForNewUnit(unit, 0);
 
 		// Set the direction of the building if it supports them
-		if (unit->Type->NumDirections > 1) {
-			unit->Direction = (MyRand() >> 8) & 0xFF; // random heading
+		if (unit.Type->NumDirections > 1) {
+			unit.Direction = (MyRand() >> 8) & 0xFF; // random heading
 			UnitUpdateHeading(unit);
 		}
 
-		if (IsOnlySelected(unit) || unit->Player == ThisPlayer) {
+		if (IsOnlySelected(unit) || unit.Player == ThisPlayer) {
 			SelectedUnitChanged();
 		}
-		unit->CurrentSightRange = unit->Stats->Variables[SIGHTRANGE_INDEX].Max;
+		unit.CurrentSightRange = unit.Stats->Variables[SIGHTRANGE_INDEX].Max;
 		MapMarkUnitSight(unit);
 		return;
 	}

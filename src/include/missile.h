@@ -602,7 +602,7 @@ inline Missile *MakeLocalMissile(MissileType *mtype, int sx, int sy, int dx, int
 }
 
 	/// fire a missile
-extern void FireMissile(CUnit *unit);
+extern void FireMissile(CUnit &unit);
 
 extern int FindAndSortMissiles(const CViewport *vp,
 	Missile *table[], const int tablesize);

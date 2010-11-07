@@ -281,7 +281,7 @@ public:
 	virtual ~CContentType() { delete Condition; }
 
 		/// Tell how show the variable Index.
-	virtual void Draw(const CUnit *unit, CFont *defaultfont) const = 0;
+	virtual void Draw(const CUnit &unit, CFont *defaultfont) const = 0;
 
 	int PosX;             /// X coordinate where to display.
 	int PosY;             /// Y coordinate where to display.
@@ -301,7 +301,7 @@ public:
 		delete Text;
 	}
 
-	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
+	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
 
 	StringDesc *Text;            /// Text to display.
 	CFont *Font;                 /// Font to use.
@@ -321,7 +321,7 @@ public:
 		Index(-1), Component(VariableValue) {}
 	virtual ~CContentTypeFormattedText() {}
 
-	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
+	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
 
 	std::string Format;          /// Text to display
 	CFont *Font;                 /// Font to use.
@@ -339,7 +339,7 @@ public:
 		Index1(-1), Component1(VariableValue), Index2(-1), Component2(VariableValue) {}
 	virtual ~CContentTypeFormattedText2() {}
 
-	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
+	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
 
 	std::string Format;          /// Text to display
 	CFont *Font;                 /// Font to use.
@@ -355,7 +355,7 @@ public:
 */
 class CContentTypeIcon : public CContentType {
 public:
-	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
+	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
 
 	EnumUnit UnitRef;           /// Which unit icon to display.(itself, container, ...)
 };
@@ -367,7 +367,7 @@ class CContentTypeLifeBar : public CContentType {
 public:
 	CContentTypeLifeBar() : Index(-1), Width(0), Height(0) {}
 
-	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
+	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
 
 	int Index;           /// Index of the variable to show, -1 if not.
 	int Width;           /// Width of the bar.
@@ -385,7 +385,7 @@ class CContentTypeCompleteBar : public CContentType {
 public:
 	CContentTypeCompleteBar() : Index(-1), Width(0), Height(0), Border(0) {}
 
-	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
+	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
 
 	int Index;           /// Index of the variable to show, -1 if not.
 	int Width;           /// Width of the bar.

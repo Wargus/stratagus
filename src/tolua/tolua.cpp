@@ -15077,12 +15077,12 @@ static int tolua_stratagus_CPlayer_IsEnemy01(lua_State* tolua_S)
  else
  {
   const CPlayer* self = (const CPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const CUnit* x = ((const CUnit*)  tolua_tousertype(tolua_S,2,0));
+  const CUnit& x = *((const CUnit*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsEnemy'",NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->IsEnemy(x);
+   bool tolua_ret = (bool) self->IsEnemy(x);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -15140,7 +15140,7 @@ static int tolua_stratagus_CPlayer_IsAllied01(lua_State* tolua_S)
  else
  {
   const CPlayer* self = (const CPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const CUnit* x = ((const CUnit*)  tolua_tousertype(tolua_S,2,0));
+  const CUnit& x = *((const CUnit*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsAllied'",NULL);
 #endif
@@ -15203,7 +15203,7 @@ static int tolua_stratagus_CPlayer_IsSharedVision01(lua_State* tolua_S)
  else
  {
   const CPlayer* self = (const CPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const CUnit* x = ((const CUnit*)  tolua_tousertype(tolua_S,2,0));
+  const CUnit& x = *((const CUnit*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsSharedVision'",NULL);
 #endif
@@ -15266,7 +15266,7 @@ static int tolua_stratagus_CPlayer_IsBothSharedVision01(lua_State* tolua_S)
  else
  {
   const CPlayer* self = (const CPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const CUnit* x = ((const CUnit*)  tolua_tousertype(tolua_S,2,0));
+  const CUnit& x = *((const CUnit*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsBothSharedVision'",NULL);
 #endif
@@ -15329,7 +15329,7 @@ static int tolua_stratagus_CPlayer_IsTeamed01(lua_State* tolua_S)
  else
  {
   const CPlayer* self = (const CPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const CUnit* x = ((const CUnit*)  tolua_tousertype(tolua_S,2,0));
+  const CUnit& x = *((const CUnit*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsTeamed'",NULL);
 #endif

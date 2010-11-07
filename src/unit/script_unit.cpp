@@ -256,7 +256,7 @@ void CclParseOrder(lua_State *l, COrderPtr order)
 		} else if (!strcmp(value, "patrol")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
-			CclGetPos(l, &order->Arg1.Patrol.X , &order->Arg1.Patrol.Y);
+			CclGetPos(l, &order->Arg1.Patrol.x , &order->Arg1.Patrol.y);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "spell")) {
 			++j;
@@ -277,8 +277,8 @@ void CclParseOrder(lua_State *l, COrderPtr order)
 		} else if (!strcmp(value, "resource-pos")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
-			CclGetPos(l, &order->Arg1.Resource.Pos.X ,
-								&order->Arg1.Resource.Pos.Y);
+			CclGetPos(l, &order->Arg1.Resource.Pos.x ,
+								&order->Arg1.Resource.Pos.y);
 			lua_pop(l, 1);
 
 			//FIXME: hardcoded wood
@@ -310,8 +310,8 @@ void CclParseOrder(lua_State *l, COrderPtr order)
 				order->CurrentResource = pos;
 			} else {
 				order->CurrentResource = WoodCost;
-				order->Arg1.Resource.Pos.X = mx;
-				order->Arg1.Resource.Pos.Y = my;
+				order->Arg1.Resource.Pos.x = mx;
+				order->Arg1.Resource.Pos.y = my;
 			}
 		} else {
 		   // This leaves a half initialized unit
@@ -837,7 +837,7 @@ static int CclUnit(lua_State *l)
 				lua_rawgeti(l, j + 1, k + 1);
 				CUnit *u = CclGetUnitFromRef(l);
 				lua_pop(l, 1);
-				u->AddInContainer(unit);
+				u->AddInContainer(*unit);
 			}
 		} else if (!strcmp(value, "order-count")) {
 			unit->OrderCount = LuaToNumber(l, j + 1);
@@ -917,12 +917,12 @@ static int CclUnit(lua_State *l)
 	// they were just created.
 	if (!unit->Player) {
 		unit->AssignToPlayer(player);
-		UpdateForNewUnit(unit, 0);
+		UpdateForNewUnit(*unit, 0);
 	}
 
 	//  Revealers are units that can see while removed
 	if (unit->Removed && unit->Type->Revealer) {
-		MapMarkUnitSight(unit);
+		MapMarkUnitSight(*unit);
 	}
 
 	// Fix Colors for rescued units.
@@ -961,12 +961,12 @@ static int CclMoveUnit(lua_State *l)
 	lua_pop(l, 1);
 
 	heading = SyncRand() % 256;
-	if (UnitCanBeAt(unit, ix, iy)) {
+	if (UnitCanBeAt(*unit, ix, iy)) {
 		unit->Place(ix, iy);
 	} else {
 		unit->tilePos.x = ix;
 		unit->tilePos.y = iy;
-		DropOutOnSide(unit, heading, 1, 1);
+		DropOutOnSide(*unit, heading, 1, 1);
 	}
 
 //	PlaceUnit(unit, ix, iy);
@@ -1025,15 +1025,15 @@ static int CclCreateUnit(lua_State *l)
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
-		if (UnitCanBeAt(unit, ix, iy) ||
+		if (UnitCanBeAt(*unit, ix, iy) ||
 				(unit->Type->Building && CanBuildUnitType(NULL, unit->Type, ix, iy, 0))) {
 			unit->Place(ix, iy);
 		} else {
 			unit->tilePos.x = ix;
 			unit->tilePos.y = iy;
-			DropOutOnSide(unit, heading, 1, 1);
+			DropOutOnSide(*unit, heading, 1, 1);
 		}
-		UpdateForNewUnit(unit, 0);
+		UpdateForNewUnit(*unit, 0);
 
 		lua_pushnumber(l, unit->Slot);
 		return 1;
@@ -1085,7 +1085,6 @@ static int CclOrderUnit(lua_State *l)
 	int dy2;
 	const CUnitType *unittype;
 	CUnit *table[UnitMax];
-	CUnit *unit;
 	int an;
 	int j;
 	const char *order;
@@ -1142,12 +1141,12 @@ static int CclOrderUnit(lua_State *l)
 
 	an = Map.Select(x1, y1, x2 + 1, y2 + 1, table);
 	for (j = 0; j < an; ++j) {
-		unit = table[j];
+		CUnit &unit = *table[j];
 		if (unittype == ANY_UNIT ||
-				(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
-				(unittype == ALL_BUILDINGS && unit->Type->Building) ||
-				unittype == unit->Type) {
-			if (plynr == -1 || plynr == unit->Player->Index) {
+				(unittype == ALL_FOODUNITS && !unit.Type->Building) ||
+				(unittype == ALL_BUILDINGS && unit.Type->Building) ||
+				unittype == unit.Type) {
+			if (plynr == -1 || plynr == unit.Player->Index) {
 				if (!strcmp(order,"move")) {
 					CommandMove(unit, (dx1 + dx2) / 2, (dy1 + dy2) / 2, 1);
 				} else if (!strcmp(order, "attack")) {
@@ -1202,7 +1201,7 @@ static int CclKillUnit(lua_State *l)
 				(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
 				(unittype == ALL_BUILDINGS && unit->Type->Building) ||
 				unittype == unit->Type) {
-			LetUnitDie(unit);
+			LetUnitDie(*unit);
 			lua_pushboolean(l, 1);
 			return 1;
 		}
@@ -1267,7 +1266,7 @@ static int CclKillUnitAt(lua_State *l)
 				(unittype == ALL_BUILDINGS && unit->Type->Building) ||
 				unittype==unit->Type) {
 			if (plynr == -1 || plynr == unit->Player->Index) {
-				LetUnitDie(unit);
+				LetUnitDie(*unit);
 				++s;
 			}
 		}

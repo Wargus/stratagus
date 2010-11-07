@@ -167,18 +167,17 @@ CUnit *UnitOnMapTile(int tx, int ty, unsigned int type)
 **
 **  @return        Returns ideal target on map tile.
 */
-CUnit *TargetOnMap(const CUnit *source, int x1, int y1, int x2, int y2)
+CUnit *TargetOnMap(const CUnit &source, int x1, int y1, int x2, int y2)
 {
 	CUnit *table[UnitMax];
 	CUnit *unit;
 	CUnit *best = NoUnitP;
 	const CUnitType *type;
-	int i = 0;
 
 	int n = Map.Select(x1, y1, x2, y2, table);
-	for (; i < n; ++i) {
+	for (int i = 0; i < n; ++i) {
 		unit = table[i];
-		if (!unit->IsVisibleAsGoal(source->Player)) {
+		if (!unit->IsVisibleAsGoal(source.Player)) {
 			continue;
 		}
 		type = unit->Type;
@@ -186,7 +185,7 @@ CUnit *TargetOnMap(const CUnit *source, int x1, int y1, int x2, int y2)
 				y2 < unit->tilePos.y || y1 >= unit->tilePos.y + type->TileHeight) {
 			continue;
 		}
-		if (!CanTarget(source->Type, unit->Type)) {
+		if (!CanTarget(source.Type, unit->Type)) {
 			continue;
 		}
 
@@ -243,13 +242,13 @@ struct BestTargetFinder {
 	CUnit *best_unit;
 	int best_cost;
 
-	BestTargetFinder(const CUnit *a, int r): attacker(a), range(r),
+	BestTargetFinder(const CUnit &a, int r) : attacker(&a), range(r),
 		 best_unit(0), best_cost(INT_MAX) {};
 
 	inline void operator() (CUnit *const dest) {
 		const CPlayer *const player = attacker->Player;
 
-		if (!player->IsEnemy(dest)) { // a friend or neutral
+		if (!player->IsEnemy(*dest)) { // a friend or neutral
 			return;
 		}
 
@@ -266,7 +265,7 @@ struct BestTargetFinder {
 		//
 		// Unit in attack range?
 		//
-		int d = attacker->MapDistanceTo(dest);
+		int d = attacker->MapDistanceTo(*dest);
 
 		// Use Circle, not square :)
 		if (d > range) {
@@ -307,7 +306,7 @@ struct BestTargetFinder {
 		// Take this target?
 		//
 		if (cost < best_cost && (d <= attackrange ||
-				UnitReachable(attacker, dest, attackrange))) {
+				UnitReachable(*attacker, *dest, attackrange))) {
 			best_unit = dest;
 			best_cost = cost;
 		}
@@ -351,7 +350,7 @@ struct BestRangeTargetFinder {
 	**  @param range  Distance range to look.
 	**
 	*/
-	BestRangeTargetFinder(const CUnit *a, const int r) : attacker(a), range(r),
+	BestRangeTargetFinder(const CUnit &a, const int r) : attacker(&a), range(r),
 		 best_unit(0), best_cost(INT_MIN) {
 		memset(good, 0 , sizeof(int) * 32 * 32);
 		memset(bad, 0 , sizeof(int) * 32 * 32);
@@ -364,8 +363,8 @@ struct BestRangeTargetFinder {
 		int *good;
 		int *bad;
 
-		FillBadGood(const CUnit *a, int r, int *g, int *b):
-			attacker(a), range(r),
+		FillBadGood(const CUnit &a, int r, int *g, int *b):
+			attacker(&a), range(r),
 			enemy_count(0), good(g), bad(b) {
 		}
 
@@ -396,7 +395,7 @@ struct BestRangeTargetFinder {
 				attacker->Stats->Variables[BASICDAMAGE_INDEX].Value
 						+ attacker->Stats->Variables[PIERCINGDAMAGE_INDEX].Value;
 
-			if (!player->IsEnemy(dest)) { // a friend or neutral
+			if (!player->IsEnemy(*dest)) { // a friend or neutral
 				dest->CacheLock = 1;
 
 				// Calc a negative cost
@@ -468,15 +467,15 @@ struct BestRangeTargetFinder {
 				//
 				int d;
 				if (attacker->Removed) {
-					d = attacker->Container->MapDistanceTo(dest);
+					d = attacker->Container->MapDistanceTo(*dest);
 				} else {
-					d = attacker->MapDistanceTo(dest);
+					d = attacker->MapDistanceTo(*dest);
 				}
 
 				int attackrange =
 					attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
 				if (d <= attackrange ||
-					(d <= range && UnitReachable(attacker, dest, attackrange))) {
+					(d <= range && UnitReachable(*attacker, *dest, attackrange))) {
 					++enemy_count;
 				} else {
 					dest->CacheLock = 1;
@@ -591,7 +590,7 @@ struct BestRangeTargetFinder {
 
 
 	inline CUnit *Find(	CUnit* table[], const int table_size) {
-		FillBadGood(attacker, range, good, bad).Fill(table, table_size);
+		FillBadGood(*attacker, range, good, bad).Fill(table, table_size);
 		for (int i = 0; i < table_size; ++i) {
 			this->operator() (table[i]);
 		}
@@ -599,7 +598,7 @@ struct BestRangeTargetFinder {
 	}
 
 	inline CUnit *Find(CUnitCache &cache) {
-		FillBadGood(attacker, range, good, bad).Fill(cache);
+		FillBadGood(*attacker, range, good, bad).Fill(cache);
 		cache.for_each(*this);
 		return best_unit;
 	}
@@ -608,11 +607,11 @@ struct BestRangeTargetFinder {
 
 struct CompareUnitDistance {
 	const CUnit *referenceunit;
-	CompareUnitDistance(const CUnit *unit): referenceunit(unit) {}
+	CompareUnitDistance(const CUnit &unit): referenceunit(&unit) {}
 	bool operator() (const CUnit*c1, const CUnit*c2)
 	{
-		int d1 = c1->MapDistanceTo(referenceunit);
-		int d2 = c2->MapDistanceTo(referenceunit);
+		int d1 = c1->MapDistanceTo(*referenceunit);
+		int d2 = c2->MapDistanceTo(*referenceunit);
 		if (d1 == d2) {
 			return c1->Slot < c2->Slot;
 		} else {
@@ -634,18 +633,18 @@ struct CompareUnitDistance {
 **  @return       Unit to be attacked.
 **
 */
-CUnit *AutoAttackUnitsInDistance(const CUnit *unit, int range,
+CUnit *AutoAttackUnitsInDistance(const CUnit &unit, int range,
 		CUnitCache &autotargets)
 {
 	// if necessary, take possible damage on allied units into account...
-	if (unit->Type->Missile.Missile->Range > 1 &&
-			(range + unit->Type->Missile.Missile->Range < 15)) {
+	if (unit.Type->Missile.Missile->Range > 1 &&
+			(range + unit.Type->Missile.Missile->Range < 15)) {
 		return BestRangeTargetFinder(unit, range).Find(autotargets);
 	} else {
 		//
 		// Find the best unit to auto attack
 		//
-		return BestTargetFinder	(unit, range).Find(autotargets);
+		return BestTargetFinder(unit, range).Find(autotargets);
 	}
 }
 
@@ -661,35 +660,35 @@ CUnit *AutoAttackUnitsInDistance(const CUnit *unit, int range,
 **  @return       Unit to be attacked.
 **
 */
-CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
+CUnit *AttackUnitsInDistance(const CUnit &unit, int range)
 {
 	CUnit *table[UnitMax];
 	int n;
 	// if necessary, take possible damage on allied units into account...
-	if (unit->Type->Missile.Missile->Range > 1 &&
-			(range + unit->Type->Missile.Missile->Range < 15)) {
+	if (unit.Type->Missile.Missile->Range > 1 &&
+			(range + unit.Type->Missile.Missile->Range < 15)) {
 
 		//  If catapult, count units near the target...
 		//   FIXME : make it configurable
 		//
 
-		int missile_range = unit->Type->Missile.Missile->Range + range - 1;
+		int missile_range = unit.Type->Missile.Missile->Range + range - 1;
 
 		Assert(2 * missile_range + 1 < 32);
 		//
 		// If unit is removed, use containers x and y
-		if (unit->Removed) {
-			int x = unit->Container->tilePos.x;
-			int y = unit->Container->tilePos.y;
+		if (unit.Removed) {
+			int x = unit.Container->tilePos.x;
+			int y = unit.Container->tilePos.y;
 			n = Map.Select(x - missile_range, y - missile_range,
-				x + missile_range + unit->Container->Type->TileWidth,
-				y + missile_range + unit->Container->Type->TileHeight, table);
+				x + missile_range + unit.Container->Type->TileWidth,
+				y + missile_range + unit.Container->Type->TileHeight, table);
 		} else {
-			int x = unit->tilePos.x;
-			int y = unit->tilePos.y;
+			int x = unit.tilePos.x;
+			int y = unit.tilePos.y;
 			n = Map.Select(x - missile_range, y - missile_range,
-				x + missile_range + unit->Type->TileWidth,
-				y + missile_range + unit->Type->TileHeight, table);
+				x + missile_range + unit.Type->TileWidth,
+				y + missile_range + unit.Type->TileHeight, table);
 		}
 
 		if (n) {
@@ -698,9 +697,9 @@ CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 		return NoUnitP;
 
 	} else {
-		n = Map.Select(unit->tilePos.x - range, unit->tilePos.y - range,
-			unit->tilePos.x + range + unit->Type->TileWidth,
-			unit->tilePos.y + range + unit->Type->TileHeight, table);
+		n = Map.Select(unit.tilePos.x - range, unit.tilePos.y - range,
+			unit.tilePos.x + range + unit.Type->TileWidth,
+			unit.tilePos.y + range + unit.Type->TileHeight, table);
 
 		if (range > 25 && n > 9) {
 			std::sort(table, table + n, CompareUnitDistance(unit));
@@ -720,10 +719,10 @@ CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 **
 **  @return      Pointer to unit which should be attacked.
 */
-CUnit *AttackUnitsInRange(const CUnit *unit)
+CUnit *AttackUnitsInRange(const CUnit &unit)
 {
-	Assert(unit->Type->CanAttack);
-	return AttackUnitsInDistance(unit, unit->Stats->Variables[ATTACKRANGE_INDEX].Max);
+	Assert(unit.Type->CanAttack);
+	return AttackUnitsInDistance(unit, unit.Stats->Variables[ATTACKRANGE_INDEX].Max);
 }
 
 /**
@@ -733,10 +732,10 @@ CUnit *AttackUnitsInRange(const CUnit *unit)
 **
 **  @return      Pointer to unit which should be attacked.
 */
-CUnit *AttackUnitsInReactRange(const CUnit *unit)
+CUnit *AttackUnitsInReactRange(const CUnit &unit)
 {
-	Assert(unit->Type->CanAttack);
-	return AttackUnitsInDistance(unit, unit->GetReactRange());
+	Assert(unit.Type->CanAttack);
+	return AttackUnitsInDistance(unit, unit.GetReactRange());
 }
 
 //@}

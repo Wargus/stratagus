@@ -74,29 +74,25 @@ extern void AiAttackWithForce(unsigned int force);
 --------------------------------------------------------*/
 
 	/// Called if AI unit is attacked
-extern void AiHelpMe(const CUnit *attacker, CUnit *defender);
+extern void AiHelpMe(const CUnit *attacker, CUnit &defender);
 	/// Called if AI unit is killed
-extern void AiUnitKilled(CUnit *unit);
+extern void AiUnitKilled(CUnit &unit);
 	/// Called if AI needs more farms
-extern void AiNeedMoreSupply(const CUnit *unit,
-	const CUnitType *what);
+extern void AiNeedMoreSupply(const CUnit &unit, const CUnitType *what);
 	/// Called if AI unit has completed work
-extern void AiWorkComplete(CUnit *unit, CUnit *what);
+extern void AiWorkComplete(CUnit *unit, CUnit &what);
 	/// Called if AI unit can't build
-extern void AiCanNotBuild(CUnit *unit,
-	const CUnitType *what);
+extern void AiCanNotBuild(CUnit &unit, const CUnitType *what);
 	/// Called if AI unit can't reach building place
-extern void AiCanNotReach(CUnit *unit,
-	const CUnitType *what);
+extern void AiCanNotReach(CUnit &unit, const CUnitType *what);
 	/// Called if an AI unit can't move
-extern void AiCanNotMove(CUnit *unit);
+extern void AiCanNotMove(CUnit &unit);
 	/// Called if AI unit has completed training
-extern void AiTrainingComplete(CUnit *unit, CUnit *what);
+extern void AiTrainingComplete(CUnit &unit, CUnit &what);
 	/// Called if AI unit has completed upgrade to
-extern void AiUpgradeToComplete(CUnit *unit,
-	const CUnitType *what);
+extern void AiUpgradeToComplete(CUnit &unit, const CUnitType *what);
 	/// Called if AI unit has completed research
-extern void AiResearchComplete(CUnit *unit, const CUpgrade *what);
+extern void AiResearchComplete(CUnit &unit, const CUpgrade *what);
 
 //@}
 

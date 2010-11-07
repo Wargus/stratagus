@@ -52,15 +52,15 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static inline unsigned char 
+static inline unsigned char
 IsTileRadarVisible(const CPlayer *const pradar,
-		const CPlayer *const punit, 
+		const CPlayer *const punit,
 		const CMapField *const mf)
 {
 	if (mf->RadarJammer[punit->Index]) {
 		return 0;
 	}
-	
+
 	int p = pradar->Index;
 	if (pradar->SharedVision) {
 		const unsigned char *const radar = mf->Radar;
@@ -83,7 +83,7 @@ IsTileRadarVisible(const CPlayer *const pradar,
 		// Can't exit until the end, as we might be jammed
 		return (radarvision | mf->Radar[p]);
 	}
-	
+
 	return mf->Radar[p];
 }
 
@@ -118,7 +118,7 @@ bool CUnit::IsVisibleOnRadar(const CPlayer *pradar) const
 **  @param x       the X tile to mark.
 **  @param y       the Y tile to mark.
 */
-void MapMarkTileRadar(const CPlayer *player, 
+void MapMarkTileRadar(const CPlayer *player,
 	const unsigned int index)
 {
 	Assert(Map.Field(index)->Radar[player->Index] != 255);
@@ -127,8 +127,7 @@ void MapMarkTileRadar(const CPlayer *player,
 
 void MapMarkTileRadar(const CPlayer *player, int x, int y)
 {
-	Assert(0 <= x && x < Map.Info.MapWidth);
-	Assert(0 <= y && y < Map.Info.MapHeight);
+	Assert(Map.Info.IsPointOnMap(x, y));
 	MapMarkTileRadar(player, Map.getIndex(x, y));
 }
 
@@ -151,8 +150,7 @@ void MapUnmarkTileRadar(const CPlayer *player, const unsigned int index)
 
 void MapUnmarkTileRadar(const CPlayer *player, int x, int y)
 {
-	Assert(0 <= x && x < Map.Info.MapWidth);
-	Assert(0 <= y && y < Map.Info.MapHeight);
+	Assert(Map.Info.IsPointOnMap(x, y));
 	MapUnmarkTileRadar(player, Map.getIndex(x, y));
 }
 
@@ -172,8 +170,7 @@ void MapMarkTileRadarJammer(const CPlayer *player, const unsigned int index)
 
 void MapMarkTileRadarJammer(const CPlayer *player, int x, int y)
 {
-	Assert(0 <= x && x < Map.Info.MapWidth);
-	Assert(0 <= y && y < Map.Info.MapHeight);
+	Assert(Map.Info.IsPointOnMap(x, y));
 	MapMarkTileRadarJammer(player, Map.getIndex(x, y));
 }
 
@@ -184,7 +181,7 @@ void MapMarkTileRadarJammer(const CPlayer *player, int x, int y)
 **  @param x       the X tile to mark.
 **  @param y       the Y tile to mark.
 */
-void MapUnmarkTileRadarJammer(const CPlayer *player, 
+void MapUnmarkTileRadarJammer(const CPlayer *player,
 	const unsigned int index)
 {
 	// Reduce radar coverage if it exists.
@@ -196,8 +193,7 @@ void MapUnmarkTileRadarJammer(const CPlayer *player,
 
 void MapUnmarkTileRadarJammer(const CPlayer *player, int x, int y)
 {
-	Assert(0 <= x && x < Map.Info.MapWidth);
-	Assert(0 <= y && y < Map.Info.MapHeight);
+	Assert(Map.Info.IsPointOnMap(x, y));
 	MapUnmarkTileRadarJammer(player, Map.getIndex(x, y));
 }
 

@@ -218,7 +218,7 @@ static void UiAddGroupToSelection(unsigned group)
 
 	while (n--) {
 		if (!(units[n]->Removed || units[n]->Type->Building)) {
-			SelectUnit(units[n]);
+			SelectUnit(*units[n]);
 		}
 	}
 
@@ -234,7 +234,7 @@ static void UiDefineGroup(unsigned group)
 {
 	for (int i= 0; i < NumSelected; ++i) {
 		if (Selected[i]->GroupId) {
-			RemoveUnitFromGroups(Selected[i]);
+			RemoveUnitFromGroups(*Selected[i]);
 		}
 	}
 	SetGroup(Selected, NumSelected, group);
@@ -446,11 +446,11 @@ static void UiFindIdleWorker(void)
 	unit = FindIdleWorker(ThisPlayer, LastIdleWorker);
 	if (unit != NoUnitP) {
 		LastIdleWorker = unit;
-		SelectSingleUnit(unit);
+		SelectSingleUnit(*unit);
 		UI.StatusLine.Clear();
 		ClearCosts();
 		CurrentButtonLevel = 0;
-		PlayUnitSound(Selected[0], VoiceSelected);
+		PlayUnitSound(*Selected[0], VoiceSelected);
 		SelectionChanged();
 		UI.SelectedViewport->Center(unit->tilePos.x, unit->tilePos.y, TileSizeX / 2, TileSizeY / 2);
 	}
@@ -726,7 +726,7 @@ static bool CommandKey(int key)
 }
 
 #if defined(DEBUG) || defined(PROF)
-extern void MapUnmarkUnitGuard(CUnit *unit);
+extern void MapUnmarkUnitGuard(CUnit &unit);
 #endif
 
 /**
@@ -759,7 +759,7 @@ int HandleCheats(const std::string &input)
 					guard->CurrentAction() == UnitActionStandGround;
 				if ((stand_ground || guard->IsIdle()) &&
 							 !guard->IsUnusable()) {
-					MapUnmarkUnitGuard(guard);
+					MapUnmarkUnitGuard(*guard);
 					guard->SubAction = 0;
 				}
 			}

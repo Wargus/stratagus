@@ -48,24 +48,20 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern bool AutoRepair(CUnit *unit);
-extern bool AutoCast(CUnit *unit);
+extern bool AutoRepair(CUnit &unit);
+extern bool AutoCast(CUnit &unit);
 
 /**
 **  Swap the patrol points.
 */
-static void SwapPatrolPoints(CUnit *unit)
+static void SwapPatrolPoints(CUnit &unit)
 {
-	int tmp;
-	COrderPtr order = unit->CurrentOrder();
-	tmp = order->Arg1.Patrol.X;
-	order->Arg1.Patrol.X = order->goalPos.x;
-	order->goalPos.x = tmp;
-	tmp = order->Arg1.Patrol.Y;
-	order->Arg1.Patrol.Y = order->goalPos.y;
-	order->goalPos.y = tmp;
+	COrderPtr order = unit.CurrentOrder();
 
-	unit->Data.Move.Cycles = 0; //moving counter
+	std::swap(order->Arg1.Patrol.x, order->goalPos.x);
+	std::swap(order->Arg1.Patrol.y, order->goalPos.y);
+
+	unit.Data.Move.Cycles = 0; //moving counter
 	NewResetPath(unit);
 }
 
@@ -80,67 +76,67 @@ static void SwapPatrolPoints(CUnit *unit)
 **
 **  @param unit  Patroling unit pointer.
 */
-void HandleActionPatrol(CUnit *unit)
+void HandleActionPatrol(CUnit &unit)
 {
-	if (unit->Wait) {
-		unit->Wait--;
+	if (unit.Wait) {
+		unit.Wait--;
 		return;
 	}
 
-	if (!unit->SubAction) { // first entry.
-		unit->Data.Move.Cycles = 0; //moving counter
+	if (!unit.SubAction) { // first entry.
+		unit.Data.Move.Cycles = 0; //moving counter
 		NewResetPath(unit);
-		unit->SubAction = 1;
+		unit.SubAction = 1;
 	}
 
 	switch (DoActionMove(unit)) {
 		case PF_FAILED:
-			unit->SubAction = 1;
+			unit.SubAction = 1;
 			break;
 		case PF_UNREACHABLE:
 			// Increase range and try again
-			unit->SubAction = 1;
-			if (unit->CurrentOrder()->CheckRange()) {
-				unit->CurrentOrder()->Range++;
+			unit.SubAction = 1;
+			if (unit.CurrentOrder()->CheckRange()) {
+				unit.CurrentOrder()->Range++;
 				break;
 			}
 			// FALL THROUGH
 		case PF_REACHED:
-			unit->SubAction = 1;
-			unit->CurrentOrder()->Range = 0;
+			unit.SubAction = 1;
+			unit.CurrentOrder()->Range = 0;
 			SwapPatrolPoints(unit);
 			break;
 		case PF_WAIT:
 			// Wait for a while then give up
-			unit->SubAction++;
-			if (unit->SubAction == 5) {
-				unit->SubAction = 1;
-				unit->CurrentOrder()->Range = 0;
+			unit.SubAction++;
+			if (unit.SubAction == 5) {
+				unit.SubAction = 1;
+				unit.CurrentOrder()->Range = 0;
 				SwapPatrolPoints(unit);
 			}
 			break;
 		default: // moving
-			unit->SubAction = 1;
+			unit.SubAction = 1;
 			break;
 	}
 
-	if (!unit->Anim.Unbreakable) {
+	if (!unit.Anim.Unbreakable) {
 		//
 		// Attack any enemy in reaction range.
 		//  If don't set the goal, the unit can then choose a
 		//  better goal if moving nearer to enemy.
 		//
-		if (unit->Type->CanAttack) {
+		if (unit.Type->CanAttack) {
 			const CUnit *goal = AttackUnitsInReactRange(unit);
 			if (goal) {
 				// Save current command to come back.
 				//FIXME: rb - will this work? Since Command* clean saved orders
-				unit->SavedOrder = *unit->CurrentOrder();
+				unit.SavedOrder = *unit.CurrentOrder();
 
-				unit->ClearAction();
-				unit->CurrentOrder()->ClearGoal();
+				unit.ClearAction();
+				unit.CurrentOrder()->ClearGoal();
 
-				DebugPrint("Patrol attack %d\n" _C_ UnitNumber(goal));
+				DebugPrint("Patrol attack %d\n" _C_ UnitNumber(*goal));
 				CommandAttack(unit, goal->tilePos.x, goal->tilePos.y, NULL, FlushCommands);
 				return;
 			}

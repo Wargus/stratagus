@@ -671,7 +671,7 @@ static void FreeNCQ(CNetworkCommandQueue *ncq)
 **
 **  @warning  Destination and unit-type shares the same network slot.
 */
-void NetworkSendCommand(int command, const CUnit *unit, int x, int y,
+void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
 	const CUnit *dest, const CUnitType *type, int status)
 {
 	CNetworkCommandQueue *ncq;
@@ -681,7 +681,7 @@ void NetworkSendCommand(int command, const CUnit *unit, int x, int y,
 	for (it = CommandsIn.begin(); it != CommandsIn.end(); ++it) {
 		ncq = *it;
 		if ((ncq->Type & 0x7F) == command &&
-				ncq->Data.Unit == htons(unit->Slot) &&
+				ncq->Data.Unit == htons(unit.Slot) &&
 				ncq->Data.X == htons(x) &&
 				ncq->Data.Y == htons(y)) {
 			if (dest && ncq->Data.Dest == htons(dest->Slot)) {
@@ -702,7 +702,7 @@ void NetworkSendCommand(int command, const CUnit *unit, int x, int y,
 	if (status) {
 		ncq->Type |= 0x80;
 	}
-	ncq->Data.Unit = htons(unit->Slot);
+	ncq->Data.Unit = htons(unit.Slot);
 	ncq->Data.X = htons(x);
 	ncq->Data.Y = htons(y);
 	Assert (!dest || !type); // Both together isn't allowed
@@ -798,7 +798,7 @@ void NetworkSendSelection(CUnit **units, int count)
 			header->Type[i] = MessageSelection;
 			selection = (CNetworkSelection *)&packet.Command[i];
 			for (ref = 0; ref < 4 && unitcount < count; ++ref, ++unitcount) {
-				selection->Unit[ref] = htons(UnitNumber(units[unitcount]));
+				selection->Unit[ref] = htons(UnitNumber(*units[unitcount]));
 				++nosent;
 			}
 		}
@@ -1054,7 +1054,7 @@ void NetworkEvent(void)
 
 				if (slot < UnitSlotFree &&
 						(UnitSlots[slot]->Player->Index == player ||
-							Players[player].IsTeamed(UnitSlots[slot]))) {
+							Players[player].IsTeamed(*UnitSlots[slot]))) {
 					validCommand = true;
 				} else {
 					validCommand = false;

@@ -64,10 +64,10 @@ struct AiForceEnemyFinder {
 	{
 		if(IN_REACT_RANGE) {
 			if (unit->Type->CanAttack)
-				enemy = AttackUnitsInReactRange(unit);
+				enemy = AttackUnitsInReactRange(*unit);
 		} else {
 			if (unit->Type->CanAttack)
-				enemy = AttackUnitsInDistance(unit, MaxMapWidth);
+				enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
 		}
 		return enemy == NULL;
 	}
@@ -95,11 +95,11 @@ struct AiForceAttackSender {
 			unit->Wait = delta;
 			++delta;
 			if (unit->Type->CanTransport() && unit->BoardCount > 0) {
-				CommandUnload(unit, goalX, goalY, NULL, FlushCommands);
+				CommandUnload(*unit, goalX, goalY, NULL, FlushCommands);
 			} else if (unit->Type->CanAttack) {
-				CommandAttack(unit, goalX, goalY, NULL, FlushCommands);
+				CommandAttack(*unit, goalX, goalY, NULL, FlushCommands);
 			} else /*if (force->State == 2) */{
-				CommandMove(unit, goalX, goalY, FlushCommands);
+				CommandMove(*unit, goalX, goalY, FlushCommands);
 			}
 		}
 	}
@@ -418,7 +418,7 @@ void AiForceManager::Clean(void)
 **
 **  @param unit  Unit to assign to force.
 */
-bool AiForceManager::Assign(CUnit *unit)
+bool AiForceManager::Assign(CUnit &unit)
 {
 	//
 	// Check to which force it belongs
@@ -430,9 +430,9 @@ bool AiForceManager::Assign(CUnit *unit)
 		if (force->IsAttacking()) {
 			continue;
 		}
-		if (unit->GroupId == 0 && force->IsBelongsTo(unit->Type)) {
+		if (unit.GroupId == 0 && force->IsBelongsTo(unit.Type)) {
 			force->Insert(unit);
-			unit->GroupId = i + 1;
+			unit.GroupId = i + 1;
 			return true;
 		}
 	}
@@ -490,7 +490,7 @@ void AiForceManager::CheckUnits(int *counter)
 /**
 **  Cleanup units in forces.
 */
-void AiCleanForces(void)
+void AiCleanForces()
 {
 	AiPlayer->Force.Clean();
 }
@@ -500,7 +500,7 @@ void AiCleanForces(void)
 **
 **  @param unit  Unit to assign to force.
 */
-bool AiAssignToForce(CUnit *unit)
+bool AiAssignToForce(CUnit &unit)
 {
 	return AiPlayer->Force.Assign(unit);
 }
@@ -508,17 +508,16 @@ bool AiAssignToForce(CUnit *unit)
 /**
 **  Assign free units to force.
 */
-void AiAssignFreeUnitsToForce(void)
+void AiAssignFreeUnitsToForce()
 {
-	int i = 0;
-	int n = AiPlayer->Player->TotalNumUnits;
+	const int n = AiPlayer->Player->TotalNumUnits;
 	CUnit **table = AiPlayer->Player->Units;
 	AiCleanForces();
-	for (; i < n; ++i) {
-		CUnit *unit = table[i];
-		if(unit->Active && unit->GroupId == 0)
+	for (int i = 0; i < n; ++i) {
+		CUnit &unit = *table[i];
+		if (unit.Active && unit.GroupId == 0)
 		{
-			AiPlayer->Force.Assign(table[i]);
+			AiPlayer->Force.Assign(unit);
 		}
 	}
 }
@@ -653,10 +652,10 @@ static void AiGroupAttackerForTransport(AiForce *aiForce)
 		return ;
 	}
 	for (unsigned int i = 0; i < aiForce->Size(); ++i) {
-		const CUnit *unit = aiForce->Units[i];
-		const CUnit *transporter = aiForce->Units[transporterIndex];
+		const CUnit &unit = *aiForce->Units[i];
+		const CUnit &transporter = *aiForce->Units[transporterIndex];
 
-		if (CanTransport(transporter, unit) && unit->Container == NULL) {
+		if (CanTransport(transporter, unit) && unit.Container == NULL) {
 			goNext = false;
 		}
 	}
@@ -665,21 +664,21 @@ static void AiGroupAttackerForTransport(AiForce *aiForce)
 		return ;
 	}
 	for (unsigned int i = 0; i < aiForce->Size(); ++i) {
-		CUnit *unit = aiForce->Units[i];
-		CUnit *transporter = aiForce->Units[transporterIndex];
+		CUnit &unit = *aiForce->Units[i];
+		CUnit &transporter = *aiForce->Units[transporterIndex];
 
-		if (transporter->IsIdle() && unit->CurrentOrder()->GetGoal() == transporter) {
+		if (transporter.IsIdle() && unit.CurrentOrder()->GetGoal() == &transporter) {
 			CommandFollow(transporter, unit, 0);
 		}
-		if (CanTransport(transporter, unit) && unit->IsIdle() && unit->Container == NULL) {
+		if (CanTransport(transporter, unit) && unit.IsIdle() && unit.Container == NULL) {
 			CommandBoard(unit, transporter, FlushCommands);
 			CommandFollow(transporter, unit, 0);
 			if (--nbToTransport == 0) { // full : nxt transporter.
 				for (++transporterIndex; transporterIndex < aiForce->Size(); ++transporterIndex) {
-					const CUnit *transporter = aiForce->Units[transporterIndex];
+					const CUnit &nextTransporter = *aiForce->Units[transporterIndex];
 
-					if (transporter->Type->CanTransport()) {
-						nbToTransport = transporter->Type->MaxOnBoard - transporter->BoardCount;
+					if (nextTransporter.Type->CanTransport()) {
+						nbToTransport = nextTransporter.Type->MaxOnBoard - nextTransporter.BoardCount;
 						break ;
 					}
 				}
@@ -696,7 +695,7 @@ static void AiGroupAttackerForTransport(AiForce *aiForce)
 **
 ** @param force Force pointer.
 */
-void AiForce::Update(void)
+void AiForce::Update()
 {
 	CUnit *aiunit;
 	int x;
@@ -788,13 +787,13 @@ void AiForce::Update(void)
 				continue;
 			}
 			if (aiunit->Type->CanAttack) {
-				CommandAttack(aiunit, x, y, NULL, FlushCommands);
+				CommandAttack(*aiunit, x, y, NULL, FlushCommands);
 			} else if (aiunit->Type->CanTransport()) {
 				// FIXME : Retrieve unit blocked (transport previously full)
-				CommandMove(aiunit, aiunit->Player->StartX,
+				CommandMove(*aiunit, aiunit->Player->StartX,
 					 aiunit->Player->StartY, FlushCommands);
 			} else {
-				CommandMove(aiunit, x, y, FlushCommands);
+				CommandMove(*aiunit, x, y, FlushCommands);
 			}
 		}
 	} else { // Everyone is idle, find a new target

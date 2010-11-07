@@ -227,8 +227,8 @@ static void SaveViewports(CFile *file, const CUserInterface *ui)
 	file->printf("DefineViewports(\"mode\", %d", ui->ViewportMode);
 	for (i = 0; i < ui->NumViewports; ++i) {
 		vp = &ui->Viewports[i];
-		file->printf(",\n  \"viewport\", {%d, %d, %d}", vp->MapX, vp->MapY, 
-			vp->Unit ? UnitNumber(vp->Unit) : -1);
+		file->printf(",\n  \"viewport\", {%d, %d, %d}", vp->MapX, vp->MapY,
+			vp->Unit ? UnitNumber(*vp->Unit) : -1);
 	}
 	file->printf(")\n\n");
 }

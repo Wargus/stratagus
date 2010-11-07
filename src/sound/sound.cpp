@@ -162,21 +162,21 @@ static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 **
 **  @return        Sound identifier
 */
-static CSound *ChooseUnitVoiceSound(const CUnit *unit, UnitVoiceGroup voice)
+static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 {
 	switch (voice) {
 		case VoiceAcknowledging:
-			return unit->Type->Sound.Acknowledgement.Sound;
+			return unit.Type->Sound.Acknowledgement.Sound;
 		case VoiceAttack:
-			return unit->Type->Sound.Attack.Sound;
+			return unit.Type->Sound.Attack.Sound;
 		case VoiceReady:
-			return unit->Type->Sound.Ready.Sound;
+			return unit.Type->Sound.Ready.Sound;
 		case VoiceSelected:
-			return unit->Type->Sound.Selected.Sound;
+			return unit.Type->Sound.Selected.Sound;
 		case VoiceHelpMe:
-			return unit->Type->Sound.Help.Sound;
+			return unit.Type->Sound.Help.Sound;
 		case VoiceDying:
-			return unit->Type->Sound.Dead.Sound;
+			return unit.Type->Sound.Dead.Sound;
 		case VoiceWorkCompleted:
 			return GameSounds.WorkComplete[ThisPlayer->Race].Sound;
 		case VoiceBuilding:
@@ -184,9 +184,9 @@ static CSound *ChooseUnitVoiceSound(const CUnit *unit, UnitVoiceGroup voice)
 		case VoiceDocking:
 			return GameSounds.Docking.Sound;
 		case VoiceRepairing:
-			return unit->Type->Sound.Repair.Sound;
+			return unit.Type->Sound.Repair.Sound;
 		case VoiceHarvesting:
-			return unit->Type->Sound.Harvest[unit->CurrentResource].Sound;
+			return unit.Type->Sound.Harvest[unit.CurrentResource].Sound;
 	}
 
 	return NO_SOUND;
@@ -230,8 +230,7 @@ static unsigned char VolumeForDistance(unsigned short d, unsigned char range)
 **  Calculate the volume associated with a request, either by clipping the
 **  range parameter of this request, or by mapping this range to a volume.
 */
-static unsigned char CalculateVolume(bool isVolume, int power,
-	unsigned char range)
+static unsigned char CalculateVolume(bool isVolume, int power, unsigned char range)
 {
 	if (isVolume) {
 		if (power > MaxVolume) {
@@ -248,12 +247,12 @@ static unsigned char CalculateVolume(bool isVolume, int power,
 /**
 **  Calculate the stereo value for a unit
 */
-static char CalculateStereo(const CUnit *unit)
+static char CalculateStereo(const CUnit &unit)
 {
 	int stereo;
 
-	stereo = ((unit->tilePos.x * TileSizeX + unit->Type->TileWidth * TileSizeX / 2 +
-		unit->IX - UI.SelectedViewport->MapX * TileSizeX) * 256 /
+	stereo = ((unit.tilePos.x * TileSizeX + unit.Type->TileWidth * TileSizeX / 2 +
+		unit.IX - UI.SelectedViewport->MapX * TileSizeX) * 256 /
 		((UI.SelectedViewport->MapWidth - 1) * TileSizeX)) - 128;
 	if (stereo < -128) {
 		stereo = -128;
@@ -272,7 +271,7 @@ static char CalculateStereo(const CUnit *unit)
 **  @param unit   Sound initiator, unit speaking
 **  @param voice  Type of sound wanted (Ready,Die,Yes,...)
 */
-void PlayUnitSound(const CUnit *unit, UnitVoiceGroup voice)
+void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 {
 	CSound *sound = ChooseUnitVoiceSound(unit, voice);
 	if (!sound) {
@@ -280,7 +279,7 @@ void PlayUnitSound(const CUnit *unit, UnitVoiceGroup voice)
 	}
 
 	bool selection = (voice == VoiceSelected || voice == VoiceBuilding);
-	Origin source = {unit, unit->Slot};
+	Origin source = {&unit, unit.Slot};
 
 	int channel = PlaySample(ChooseSample(sound, selection, source));
 	if (channel == -1) {
@@ -298,9 +297,9 @@ void PlayUnitSound(const CUnit *unit, UnitVoiceGroup voice)
 **  @param unit   Sound initiator, unit speaking
 **  @param sound  Sound to be generated
 */
-void PlayUnitSound(const CUnit *unit, CSound *sound)
+void PlayUnitSound(const CUnit &unit, CSound *sound)
 {
-	Origin source = {unit, unit->Slot};
+	Origin source = {&unit, unit.Slot};
 	int channel = PlaySample(ChooseSample(sound, false, source));
 	if (channel == -1) {
 		return;

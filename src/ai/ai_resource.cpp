@@ -220,7 +220,7 @@ int AiEnemyUnitsInDistance(const CPlayer *player,
 			continue;
 		}
 
-		if (!player->IsEnemy(dest)) { // a friend or neutral
+		if (!player->IsEnemy(*dest)) { // a friend or neutral
 			continue;
 		}
 		//
@@ -242,10 +242,10 @@ int AiEnemyUnitsInDistance(const CPlayer *player,
 **
 **  @return       Number of enemy units.
 */
-int AiEnemyUnitsInDistance(const CUnit *unit, unsigned range)
+int AiEnemyUnitsInDistance(const CUnit &unit, unsigned range)
 {
-	return AiEnemyUnitsInDistance(unit->Player,
-						unit->Type, unit->tilePos.x, unit->tilePos.y, range);
+	return AiEnemyUnitsInDistance(unit.Player,
+						unit.Type, unit.tilePos.x, unit.tilePos.y, range);
 }
 
 /**
@@ -262,34 +262,28 @@ static int AiBuildBuilding(const CUnitType *type, CUnitType *building,
 			 int near_x, int near_y)
 {
 	CUnit *table[UnitMax];
-	CUnit *unit;
-	int nunits;
-	int i;
-	int num;
-	int x;
-	int y;
+	int num = 0;
 
-#ifdef DEBUG
-	unit = NoUnitP;
-#endif
 	//
 	// Remove all workers on the way building something
 	//
-	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
-	for (num = i = 0; i < nunits; ++i) {
-		unit = table[i];
-		for (x = 0; x < unit->OrderCount; ++x) {
-			int action = unit->Orders[x]->Action;
+	const int nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
+	for (int i = 0; i < nunits; ++i) {
+		CUnit& unit = *table[i];
+		int j;
+
+		for (j = 0; j < unit.OrderCount; ++j) {
+			int action = unit.Orders[j]->Action;
 			if (action == UnitActionBuild ||
 				action == UnitActionRepair ||
 				action == UnitActionReturnGoods ||
 				(action == UnitActionResource &&
-					 unit->SubAction > 55) /* SUB_START_GATHERING */) {
+					 unit.SubAction > 55) /* SUB_START_GATHERING */) {
 				break;
 			}
 		}
-		if (x == unit->OrderCount) {
-			table[num++] = unit;
+		if (j == unit.OrderCount) {
+			table[num++] = &unit;
 		}
 	}
 
@@ -298,31 +292,26 @@ static int AiBuildBuilding(const CUnitType *type, CUnitType *building,
 		return 0;
 	}
 
-	if(num == 1) {
-		unit = table[0];
-	} else {
-		// Try one worker at random to save cpu
-		unit = table[SyncRand() % num];
-    }
+	CUnit& unit = (num == 1) ? *table[0] : *table[SyncRand() % num];
 
+	Vec2i pos;
 	// Find a place to build.
-	if (AiFindBuildingPlace(unit, building, near_x, near_y, &x, &y)) {
-		CommandBuildBuilding(unit, x, y, building, FlushCommands);
+	if (AiFindBuildingPlace(unit, building, near_x, near_y, &pos)) {
+		CommandBuildBuilding(unit, pos.x, pos.y, building, FlushCommands);
 		return 1;
-	}
-	else
+	} else {
 		//when first worker can't build then rest also won't be able (save CPU)
 		if (near_x != -1 && near_y != -1) {
 			//Crush CPU !!!!!
-			for (i = 0; i < num && unit != table[i]; ++i) {
+			for (int i = 0; i < num && table[i] != &unit; ++i) {
 				// Find a place to build.
-				if (AiFindBuildingPlace(table[i], building, near_x, near_y ,&x, &y)) {
-					CommandBuildBuilding(table[i], x, y, building, FlushCommands);
+				if (AiFindBuildingPlace(*table[i], building, near_x, near_y, &pos)) {
+					CommandBuildBuilding(*table[i], pos.x, pos.y, building, FlushCommands);
 					return 1;
 				}
 			}
 		}
-
+	}
 	return 0;
 }
 
@@ -374,7 +363,7 @@ extern CUnit *FindDepositNearLoc(CPlayer *p,
 				int x, int y, int range, int resource);
 
 
-void AiNewDepotRequest(CUnit *worker) {
+void AiNewDepotRequest(CUnit &worker) {
 /*
 	DebugPrint("%d: Worker %d report: Resource [%d] too far from depot, returning time [%d].\n"
 				_C_ worker->Player->Index _C_ worker->Slot
@@ -390,26 +379,22 @@ void AiNewDepotRequest(CUnit *worker) {
 	int cost, best_cost = 0;
 	//int best_mask = 0, needmask;
 
-	int PosX = -1;
-	int PosY = -1;
+	Vec2i pos = {-1, -1};
 
-	ResourceInfo *resinfo =
-					worker->Type->ResInfo[worker->CurrentResource];
+	ResourceInfo *resinfo = worker.Type->ResInfo[worker.CurrentResource];
 
 	if(resinfo->TerrainHarvester) {
-		PosX = worker->CurrentOrder()->Arg1.Resource.Pos.X;
-		PosY = worker->CurrentOrder()->Arg1.Resource.Pos.Y;
+		pos = worker.CurrentOrder()->Arg1.Resource.Pos;
 	} else {
-		CUnit *mine = worker->CurrentOrder()->Arg1.Resource.Mine;
-		if(mine) {
-			PosX = mine->tilePos.x;
-			PosY = mine->tilePos.y;
+		CUnit *mine = worker.CurrentOrder()->Arg1.Resource.Mine;
+		if (mine) {
+			pos = mine->tilePos;
 		}
 	}
 
 
-	if (PosX != -1 && NULL != FindDepositNearLoc(worker->Player,
-				PosX, PosY, 10, worker->CurrentResource)) {
+	if (pos.x != -1 && NULL != FindDepositNearLoc(worker.Player,
+				pos.x, pos.y, 10, worker.CurrentResource)) {
 		/*
 		 * New Depot has just be finished and worker just return to old depot
 		 * (far away) from new Deopt.
@@ -421,18 +406,18 @@ void AiNewDepotRequest(CUnit *worker) {
 	//
 	// Count the already made build requests.
 	//
-	AiGetBuildRequestsCount(worker->Player->Ai, counter);
+	AiGetBuildRequestsCount(worker.Player->Ai, counter);
 
-	n = AiHelpers.Depots[worker->CurrentResource - 1].size();
+	n = AiHelpers.Depots[worker.CurrentResource - 1].size();
 
 	for (i = 0; i < n; ++i) {
-		type = AiHelpers.Depots[worker->CurrentResource - 1][i];
+		type = AiHelpers.Depots[worker.CurrentResource - 1][i];
 
 		if (counter[type->Slot]) { // Already ordered.
 			return;
 		}
 
-		if (!AiRequestedTypeAllowed(worker->Player, type)) {
+		if (!AiRequestedTypeAllowed(worker.Player, type)) {
 			continue;
 		}
 
@@ -443,7 +428,7 @@ void AiNewDepotRequest(CUnit *worker) {
 
 		cost = 0;
 		for (c = 1; c < MaxCosts; ++c) {
-			cost += type->Stats[worker->Player->Index].Costs[c];
+			cost += type->Stats[worker.Player->Index].Costs[c];
 		}
 
 		if(best_type == NULL || (cost < best_cost)) {
@@ -455,20 +440,20 @@ void AiNewDepotRequest(CUnit *worker) {
 	}
 
 	if(best_type) {
-		//if(!best_mask)	{
+		//if(!best_mask) {
 
 			AiBuildQueue queue;
 
 			queue.Type = best_type;
 			queue.Want = 1;
 			queue.Made = 0;
-			queue.X = PosX;
-			queue.Y = PosY;
+			queue.X = pos.x;
+			queue.Y = pos.y;
 
-			worker->Player->Ai->UnitTypeBuilt.push_back(queue);
+			worker.Player->Ai->UnitTypeBuilt.push_back(queue);
 
 			DebugPrint("%d: Worker %d report: Requesting new depot near [%d,%d].\n"
-				_C_ worker->Player->Index _C_ worker->Slot
+				_C_ worker.Player->Index _C_ worker.Slot
 				_C_ queue.X _C_ queue.Y
 				);
 
@@ -484,7 +469,7 @@ void AiNewDepotRequest(CUnit *worker) {
 /**
 **  Build new units to reduce the food shortage.
 */
-static bool AiRequestSupply(void)
+static bool AiRequestSupply()
 {
 	int i;
 	int n;
@@ -613,34 +598,25 @@ static bool AiRequestSupply(void)
 static int AiTrainUnit(const CUnitType *type, CUnitType *what)
 {
 	CUnit *table[UnitMax];
-	CUnit *unit;
-	int nunits;
-	int i;
-	int num;
-
-#ifdef DEBUG
-	unit = NoUnitP;
-#endif
+	int num = 0;
 
 	//
 	// Remove all units already doing something.
 	//
-	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
-	for (num = i = 0; i < nunits; ++i) {
-		unit = table[i];
+	const int nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
+	for (int i = 0; i < nunits; ++i) {
+		CUnit *unit = table[i];
+
 		if (unit->IsIdle()) {
 			table[num++] = unit;
 		}
 	}
-
-	for (i = 0; i < num; ++i) {
-		unit = table[i];
+	for (int i = 0; i < num; ++i) {
+		CUnit &unit = *table[i];
 
 		CommandTrainUnit(unit, what, FlushCommands);
-
 		return 1;
 	}
-
 	return 0;
 }
 
@@ -781,32 +757,25 @@ static int AiMakeUnit(CUnitType *type, int near_x, int near_y)
 static int AiResearchUpgrade(const CUnitType *type, CUpgrade *what)
 {
 	CUnit *table[UnitMax];
-	CUnit *unit;
-	int nunits;
-	int i;
-	int num;
+	int num = 0;
 
-#ifdef DEBUG
-	unit = NoUnitP;
-#endif
 	// Remove all units already doing something.
-	//
-	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
-	for (num = i = 0; i < nunits; ++i) {
-		unit = table[i];
-		if (unit->IsIdle()) {
-			table[num++] = unit;
+
+	const int nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
+	for (int i = 0; i < nunits; ++i) {
+		CUnit &unit = *table[i];
+
+		if (unit.IsIdle()) {
+			table[num++] = &unit;
 		}
 	}
 
-	for (i = 0; i < num; ++i) {
-		unit = table[i];
+	for (int i = 0; i < num; ++i) {
+		CUnit &unit = *table[i];
 
 		CommandResearch(unit, what, FlushCommands);
-
 		return 1;
 	}
-
 	return 0;
 }
 
@@ -876,32 +845,24 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 static int AiUpgradeTo(const CUnitType *type, CUnitType *what)
 {
 	CUnit *table[UnitMax];
-	CUnit *unit;
-	int nunits;
-	int i;
-	int num;
+	int num = 0;
 
-#ifdef DEBUG
-	unit = NoUnitP;
-#endif
 	// Remove all units already doing something.
-	//
-	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
-	for (num = i = 0; i < nunits; ++i) {
-		unit = table[i];
+	const int nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
+	for (int i = 0; i < nunits; ++i) {
+		CUnit *unit = table[i];
+
 		if (unit->IsIdle()) {
 			table[num++] = unit;
 		}
 	}
 
-	for (i = 0; i < num; ++i) {
-		unit = table[i];
+	for (int i = 0; i < num; ++i) {
+		CUnit &unit = *table[i];
 
 		CommandUpgradeTo(unit, what, FlushCommands);
-
 		return 1;
 	}
-
 	return 0;
 }
 
@@ -1039,51 +1000,50 @@ static void AiCheckingWork(void)
 **
 **  @return          1 if the worker was assigned, 0 otherwise.
 */
-static int AiAssignHarvester(CUnit *unit, int resource)
+static int AiAssignHarvester(CUnit &unit, int resource)
 {
 	ResourceInfo *resinfo;
 
 	// It can't.
-	if (unit->Removed) {
+	if (unit.Removed) {
 		return 0;
 	}
 
-	resinfo = unit->Type->ResInfo[resource];
+	resinfo = unit.Type->ResInfo[resource];
 	Assert(resinfo);
 	if (resinfo->TerrainHarvester) {
-		// These will hold the coordinates of the forest.
-		int forestx, foresty;
+		Vec2i forestPos;
 
 		//
 		// Code for terrain harvesters. Search for piece of terrain to mine.
 		//
-		if (FindTerrainType(unit->Type->MovementMask, MapFieldForest, 0, 1000,
-				unit->Player, unit->tilePos.x, unit->tilePos.y, &forestx, &foresty)) {
-			CommandResourceLoc(unit, forestx, foresty, FlushCommands);
+		if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 1000,
+				unit.Player, unit.tilePos.x, unit.tilePos.y, &forestPos)) {
+			CommandResourceLoc(unit, forestPos.x, forestPos.y, FlushCommands);
 			return 1;
 		}
 		// Ask the AI to explore...
-		AiExplore(unit->tilePos.x, unit->tilePos.y, MapFieldLandUnit);
+		AiExplore(unit.tilePos.x, unit.tilePos.y, MapFieldLandUnit);
 	} else {
 		int exploremask = 0;
 		//
 		// Find a resource to harvest from.
 		//
 		CUnit *dest = UnitFindResource(unit,
-				unit->tilePos.x, unit->tilePos.y, 1000, resource, true);
+				unit.tilePos.x, unit.tilePos.y, 1000, resource, true);
 
 		if (dest) {
 			//FIXME: rb - when workers can speedup building then such assign may be ok.
 			//if(dest->CurrentAction() == UnitActionBuilt)
 				//CommandBuildBuilding(unit, dest->X, dest->Y, dest->Type, FlushCommands);
 			//else
-				CommandResource(unit, dest, FlushCommands);
+				CommandResource(unit, *dest, FlushCommands);
 			return 1;
 		}
 #if 0
 		//may this code touch needmask which will be reseted before next cycle
 		if (resinfo->RefineryHarvester &&
-			 (dest = UnitFindMiningArea(unit, unit->X, unit->Y, 1000, resource))) {
+			 (dest = UnitFindMiningArea(unit, unit.X, unit.Y, 1000, resource))) {
 			int needmask;
 			//int counter[UnitTypeMax];
 
@@ -1143,7 +1103,7 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 			}
 		}
 		// Ask the AI to explore
-		AiExplore(unit->tilePos.x, unit->tilePos.y, exploremask);
+		AiExplore(unit.tilePos.x, unit.tilePos.y, exploremask);
 	}
 
 	// Failed.
@@ -1163,7 +1123,7 @@ static int CmpWorkers(const void *w0,const void *w1) {
 **  If we have a shortage of a resource, let many workers collecting this.
 **  If no shortage, split workers to all resources.
 */
-static void AiCollectResources(void)
+static void AiCollectResources()
 {
 	CUnit *units_with_resource[MaxCosts][UnitMax]; // Worker with resource
 	CUnit *units_assigned[MaxCosts][UnitMax]; // Worker assigned to resource
@@ -1178,7 +1138,6 @@ static void AiCollectResources(void)
 	int k;
 	int n;
 	CUnit **units;
-	CUnit *unit;
 	int percent[MaxCosts];
 	int percent_total;
 
@@ -1199,19 +1158,19 @@ static void AiCollectResources(void)
 	n = AiPlayer->Player->TotalNumUnits;
 	units = AiPlayer->Player->Units;
 	for (i = 0; i < n; ++i) {
-		unit = units[i];
-		if (!unit->Type->Harvester) {
+		CUnit &unit = *units[i];
+		if (!unit.Type->Harvester) {
 			continue;
 		}
 
-		c = unit->CurrentResource;
+		c = unit.CurrentResource;
 
 		//
 		// See if it's assigned already
 		//
-		if (c && unit->OrderCount == 1 &&
-			unit->CurrentAction() == UnitActionResource) {
-			units_assigned[c][num_units_assigned[c]++] = unit;
+		if (c && unit.OrderCount == 1 &&
+			unit.CurrentAction() == UnitActionResource) {
+			units_assigned[c][num_units_assigned[c]++] = &unit;
 			total_harvester++;
 			continue;
 		}
@@ -1219,15 +1178,15 @@ static void AiCollectResources(void)
 		//
 		// Ignore busy units. ( building, fighting, ... )
 		//
-		if (!unit->IsIdle()) {
+		if (!unit.IsIdle()) {
 			continue;
 		}
 
 		//
 		// Send workers with resources back home.
 		//
-		if (unit->ResourcesHeld && c) {
-			units_with_resource[c][num_units_with_resource[c]++] = unit;
+		if (unit.ResourcesHeld && c) {
+			units_with_resource[c][num_units_with_resource[c]++] = &unit;
 			CommandReturnGoods(unit, 0, FlushCommands);
 			total_harvester++;
 			continue;
@@ -1237,8 +1196,8 @@ static void AiCollectResources(void)
 		// Look what the unit can do
 		//
 		for (c = 1; c < MaxCosts; ++c) {
-			if (unit->Type->ResInfo[c]) {
-				units_unassigned[c][num_units_unassigned[c]++] = unit;
+			if (unit.Type->ResInfo[c]) {
+				units_unassigned[c][num_units_unassigned[c]++] = &unit;
 			}
 		}
 		++total_harvester;
@@ -1287,6 +1246,7 @@ static void AiCollectResources(void)
 		}
 
 	}
+	CUnit* unit;
 	do {
 		//
 		// sort resources by priority
@@ -1303,11 +1263,11 @@ static void AiCollectResources(void)
 				}
 			}
 		}
-
+		unit = NoUnitP;
 		//
 		// Try to complete each ressource in the priority order
 		//
-		unit = NoUnitP;
+
 		for (i = 0; i < MaxCosts; ++i) {
 			c = priority_resource[i];
 
@@ -1317,7 +1277,7 @@ static void AiCollectResources(void)
 			if (num_units_unassigned[c]) {
 				// Take the unit.
 				j = 0;
-				while (j < num_units_unassigned[c] && !AiAssignHarvester(units_unassigned[c][j], c)) {
+				while (j < num_units_unassigned[c] && !AiAssignHarvester(*units_unassigned[c][j], c)) {
 					// can't assign to c => remove from units_unassigned !
 					units_unassigned[c][j] = units_unassigned[c][--num_units_unassigned[c]];
 				}
@@ -1367,7 +1327,7 @@ static void AiCollectResources(void)
 						}
 
 						// unit can't harvest : next one
-						if (!unit->Type->ResInfo[c] || !AiAssignHarvester(unit, c)) {
+						if (!unit->Type->ResInfo[c] || !AiAssignHarvester(*unit, c)) {
 							unit = NoUnitP;
 							continue;
 						}
@@ -1413,10 +1373,9 @@ static void AiCollectResources(void)
 **
 **  @return          True if can repair, false if can't repair..
 */
-static int AiRepairBuilding(const CUnitType *type, CUnit *building)
+static int AiRepairBuilding(const CUnitType *type, CUnit &building)
 {
 	CUnit *table[UnitMax];
-	CUnit *unit;
 	CUnit *unit_temp;
 	int distance[UnitMax];
 	int rX;
@@ -1429,10 +1388,6 @@ static int AiRepairBuilding(const CUnitType *type, CUnit *building)
 	int k;
 	int num;
 
-#ifdef DEBUG
-	unit = NoUnitP;
-#endif
-	//
 	// Remove all workers not mining. on the way building something
 	// FIXME: It is not clever to use workers with gold
 	// Idea: Antonis: Put the rest of the workers in a table in case
@@ -1444,22 +1399,24 @@ static int AiRepairBuilding(const CUnitType *type, CUnit *building)
 	// Selection of mining workers.
 	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
 	for (num = i = 0; i < nunits; ++i) {
-		unit = table[i];
-		if (unit->Type->RepairRange && unit->OrderCount == 1 &&
-			((unit->CurrentAction() == UnitActionResource && unit->SubAction <= 55) /* SUB_START_GATHERING */ ||
-				unit->CurrentAction() == UnitActionStill)) {
-			table[num++] = unit;
+		CUnit &unit = *table[i];
+
+		if (unit.Type->RepairRange && unit.OrderCount == 1 &&
+			((unit.CurrentAction() == UnitActionResource && unit.SubAction <= 55) /* SUB_START_GATHERING */ ||
+				unit.CurrentAction() == UnitActionStill)) {
+			table[num++] = &unit;
 		}
 	}
 
 	// Sort by distance loops -Antonis-
 	for (i = 0; i < num; ++i) {
-		unit = table[i];
+		CUnit &unit = *table[i];
+
 		// FIXME: Probably calculated from top left corner of building
-		if ((rX = unit->tilePos.x - building->tilePos.x) < 0) {
+		if ((rX = unit.tilePos.x - building.tilePos.x) < 0) {
 			rX = -rX;
 		}
-		if ((rY = unit->tilePos.y - building->tilePos.y) < 0) {
+		if ((rY = unit.tilePos.y - building.tilePos.y) < 0) {
 			rY = -rY;
 		}
 		if (rX < rY) {
@@ -1494,10 +1451,10 @@ static int AiRepairBuilding(const CUnitType *type, CUnit *building)
 
 	for (k = i = j; i < num && i < j + 3; ++i) {
 
-		unit = table[i];
+		CUnit &unit = *table[i];
 
-		if (UnitReachable(unit, building, unit->Type->RepairRange)) {
-			CommandRepair(unit, 0, 0, building, FlushCommands);
+		if (UnitReachable(unit, building, unit.Type->RepairRange)) {
+			CommandRepair(unit, 0, 0, &building, FlushCommands);
 			return 1;
 		}
 		k = i;
@@ -1513,7 +1470,7 @@ static int AiRepairBuilding(const CUnitType *type, CUnit *building)
 **
 **  @return      True if made, false if can't be made.
 */
-static int AiRepairUnit(CUnit *unit)
+static int AiRepairUnit(CUnit &unit)
 {
 	int i;
 	int n;
@@ -1524,7 +1481,7 @@ static int AiRepairUnit(CUnit *unit)
 
 	n = AiHelpers.Repair.size();
 	tablep = &AiHelpers.Repair;
-	type = unit->Type;
+	type = unit.Type;
 	if (type->Slot > n) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit I: Nothing known about `%s'\n"
 			_C_ AiPlayer->Player->Index _C_ type->Ident.c_str());
@@ -1555,52 +1512,51 @@ static int AiRepairUnit(CUnit *unit)
 /**
 **  Check if there's a unit that should be repaired.
 */
-static void AiCheckRepair(void)
+static void AiCheckRepair()
 {
 	int i;
 	int j;
 	int k;
 	int n;
 	bool repair_flag;
-	CUnit *unit;
 
 	n = AiPlayer->Player->TotalNumUnits;
 	k = 0;
 	// Selector for next unit
 	for (i = n - 1; i >= 0; --i) {
-		unit = AiPlayer->Player->Units[i];
-		if (unit && UnitNumber(unit) == AiPlayer->LastRepairBuilding) {
+		CUnit *unit = AiPlayer->Player->Units[i];
+		if (unit && UnitNumber(*unit) == AiPlayer->LastRepairBuilding) {
 			k = i + 1;
 		}
 	}
 
 	for (i = k; i < n; ++i) {
-		unit = AiPlayer->Player->Units[i];
+		CUnit &unit = *AiPlayer->Player->Units[i];
 		repair_flag = true;
 
-		if (!unit->IsAliveOnMap()) {
+		if (!unit.IsAliveOnMap()) {
 			continue;
 		}
 
 		// Unit damaged?
 		// Don't repair attacked unit (wait 5 sec before repairing)
-		if (unit->Type->RepairHP &&
-				unit->CurrentAction() != UnitActionBuilt &&
-				unit->CurrentAction() != UnitActionUpgradeTo &&
-				unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max &&
-				unit->Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
+		if (unit.Type->RepairHP &&
+				unit.CurrentAction() != UnitActionBuilt &&
+				unit.CurrentAction() != UnitActionUpgradeTo &&
+				unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max &&
+				unit.Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
 
 			//
 			// FIXME: Repair only units under control
 			//
-			if (AiEnemyUnitsInDistance(unit, unit->Stats->Variables[SIGHTRANGE_INDEX].Max)) {
+			if (AiEnemyUnitsInDistance(unit, unit.Stats->Variables[SIGHTRANGE_INDEX].Max)) {
 				continue;
 			}
 			//
 			// Must check, if there are enough resources
 			//
 			for (j = 1; j < MaxCosts; ++j) {
-				if (unit->Stats->Costs[j] &&
+				if (unit.Stats->Costs[j] &&
 						AiPlayer->Player->Resources[j] < 99) {
 					repair_flag = false;
 					break;
@@ -1617,11 +1573,11 @@ static void AiCheckRepair(void)
 			}
 		}
 		// Building under construction but no worker
-		if (unit->CurrentAction() == UnitActionBuilt) {
+		if (unit.CurrentAction() == UnitActionBuilt) {
 			int j;
 			for (j = 0; j < AiPlayer->Player->TotalNumUnits; ++j) {
 				COrderPtr order = AiPlayer->Player->Units[j]->CurrentOrder();
-				if (order->Action == UnitActionRepair && order->GetGoal() == unit) {
+				if (order->Action == UnitActionRepair && order->GetGoal() == &unit) {
 					break;
 				}
 			}
@@ -1629,7 +1585,7 @@ static void AiCheckRepair(void)
 				// Make sure we have enough resources first
 				for (j = 0; j < MaxCosts; ++j) {
 					// FIXME: the resources don't necessarily have to be in storage
-					if (AiPlayer->Player->Resources[j] < unit->Stats->Costs[j]) {
+					if (AiPlayer->Player->Resources[j] < unit.Stats->Costs[j]) {
 						break;
 					}
 				}
@@ -1685,7 +1641,7 @@ void AiExplore(int x, int y, int mask)
 /**
 **  Entry point of resource manager, periodically called.
 */
-void AiResourceManager(void)
+void AiResourceManager()
 {
 	//
 	// Check if something needs to be build / trained.

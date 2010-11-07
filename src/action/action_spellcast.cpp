@@ -68,14 +68,14 @@
 **
 **  @param unit  Unit, for that spell cast/attack animation is played.
 */
-void AnimateActionSpellCast(CUnit *unit)
+void AnimateActionSpellCast(CUnit &unit)
 {
 	int flags;
 
-	if (unit->Type->Animations) {
-		Assert(unit->Type->Animations->Attack);
+	if (unit.Type->Animations) {
+		Assert(unit.Type->Animations->Attack);
 
-		flags = UnitShowAnimation(unit, unit->Type->Animations->Attack);
+		flags = UnitShowAnimation(unit, unit.Type->Animations->Attack);
 
 		if (flags & AnimationMissile) { // FIXME: should cast spell ?
 			FireMissile(unit);          // we should not get here ??
@@ -90,48 +90,48 @@ void AnimateActionSpellCast(CUnit *unit)
 **
 **  @param unit  Unit, for that the spell cast is handled.
 */
-static void SpellMoveToTarget(CUnit *unit)
+static void SpellMoveToTarget(CUnit &unit)
 {
 	CUnit *goal;
 	int err;
 
 	// Unit can't move
 	err = 1;
-	if (unit->CanMove()) {
+	if (unit.CanMove()) {
 		err = DoActionMove(unit);
-		if (unit->Anim.Unbreakable) {
+		if (unit.Anim.Unbreakable) {
 			return;
 		}
 	}
 
 	// when reached DoActionMove changes unit action
 	// FIXME: use return codes from pathfinder
-	COrderPtr order = unit->CurrentOrder();
+	COrderPtr order = unit.CurrentOrder();
 	goal = order->GetGoal();
 
-	if (goal && unit->MapDistanceTo(goal) <= order->Range) {
+	if (goal && unit.MapDistanceTo(*goal) <= order->Range) {
 
 		// there is goal and it is in range
-		unit->State = 0;
-		UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit->tilePos);
-		unit->SubAction++; // cast the spell
+		unit.State = 0;
+		UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos);
+		unit.SubAction++; // cast the spell
 		return;
-	} else if (!goal && unit->MapDistanceTo(order->goalPos.x, order->goalPos.y) <= order->Range) {
+	} else if (!goal && unit.MapDistanceTo(order->goalPos.x, order->goalPos.y) <= order->Range) {
 		// there is no goal and target spot is in range
 		const Vec2i diag = {order->Arg1.Spell->Range, order->Arg1.Spell->Range};
 
-		UnitHeadingFromDeltaXY(unit, order->goalPos + diag - unit->tilePos);
-		unit->SubAction++; // cast the spell
+		UnitHeadingFromDeltaXY(unit, order->goalPos + diag - unit.tilePos);
+		unit.SubAction++; // cast the spell
 		return;
 	} else if (err == PF_UNREACHABLE) {
 		//
 		// goal/spot unreachable and out of range -- give up
 		//
-		unit->ClearAction();
-		unit->State = 0;
+		unit.ClearAction();
+		unit.State = 0;
 		order->ClearGoal(); // Release references
 	}
-	Assert(!unit->Type->Vanishes && !unit->Destroyed);
+	Assert(!unit.Type->Vanishes && !unit.Destroyed);
 }
 
 /**
@@ -139,15 +139,15 @@ static void SpellMoveToTarget(CUnit *unit)
 **
 **  @param unit  Unit, for that the spell cast is handled.
 */
-void HandleActionSpellCast(CUnit *unit)
+void HandleActionSpellCast(CUnit &unit)
 {
-	if (unit->Wait) {
-		unit->Wait--;
+	if (unit.Wait) {
+		unit.Wait--;
 		return;
 	}
-	COrderPtr order = unit->CurrentOrder();
+	COrderPtr order = unit.CurrentOrder();
 	const SpellType *spell = order->Arg1.Spell;
-	switch (unit->SubAction) {
+	switch (unit.SubAction) {
 		case 0:
 			//
 			// Check if we can cast the spell.
@@ -157,20 +157,20 @@ void HandleActionSpellCast(CUnit *unit)
 				//
 				// Notify player about this problem
 				//
-				if (unit->Variable[MANA_INDEX].Value < spell->ManaCost) {
-					unit->Player->Notify(NotifyYellow, unit->tilePos.x, unit->tilePos.y,
+				if (unit.Variable[MANA_INDEX].Value < spell->ManaCost) {
+					unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
 						_("%s: not enough mana for spell: %s"),
-						unit->Type->Name.c_str(), spell->Name.c_str());
+						unit.Type->Name.c_str(), spell->Name.c_str());
 				} else {
-					unit->Player->Notify(NotifyYellow, unit->tilePos.x, unit->tilePos.y,
+					unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
 						_("%s: can't cast spell: %s"),
-						unit->Type->Name.c_str(), spell->Name.c_str());
+						unit.Type->Name.c_str(), spell->Name.c_str());
 				}
 
-				if (unit->Player->AiEnabled) {
+				if (unit.Player->AiEnabled) {
 					DebugPrint("FIXME: do we need an AI callback?\n");
 				}
-				unit->ClearAction();
+				unit.ClearAction();
 				order->ClearGoal(); // Release references
 				return;
 			}
@@ -178,41 +178,41 @@ void HandleActionSpellCast(CUnit *unit)
 			if (!spell->IsCasterOnly()) {
 				NewResetPath(unit);
 			}
-			unit->ReCast = 0; // repeat spell on next pass? (defaults to `no')
-			unit->SubAction = 1;
+			unit.ReCast = 0; // repeat spell on next pass? (defaults to `no')
+			unit.SubAction = 1;
 			// FALL THROUGH
 		case 1:                         // Move to the target.
 			if (spell->Range && spell->Range != INFINITE_RANGE) {
 				SpellMoveToTarget(unit);
 				break;
 			} else {
-				unit->SubAction = 2;
+				unit.SubAction = 2;
 			}
 			// FALL THROUGH
 		case 2:                         // Cast spell on the target.
 			// FIXME: should use AnimateActionSpellCast here
-			if (unit->Type->Animations->Attack && !spell->IsCasterOnly()) {
-				UnitShowAnimation(unit, unit->Type->Animations->Attack);
-				if (unit->Anim.Unbreakable) { // end of animation
+			if (unit.Type->Animations->Attack && !spell->IsCasterOnly()) {
+				UnitShowAnimation(unit, unit.Type->Animations->Attack);
+				if (unit.Anim.Unbreakable) { // end of animation
 					return;
 				}
 			} else {
 				// FIXME: what todo, if unit/goal is removed?
 				CUnit *goal = order->GetGoal();
-				if (goal && goal != unit && !goal->IsVisibleAsGoal(unit->Player)) {
-					unit->ReCast = 0;
+				if (goal && goal != &unit && !goal->IsVisibleAsGoal(unit.Player)) {
+					unit.ReCast = 0;
 				} else {
-					unit->ReCast = SpellCast(unit, spell, goal, order->goalPos.x, order->goalPos.y);
+					unit.ReCast = SpellCast(unit, spell, goal, order->goalPos.x, order->goalPos.y);
 				}
 			}
-			if (!unit->ReCast && unit->CurrentAction() != UnitActionDie) {
-				unit->ClearAction();
+			if (!unit.ReCast && unit.CurrentAction() != UnitActionDie) {
+				unit.ClearAction();
 				order->ClearGoal(); // Release references
 			}
 			break;
 
 		default:
-			unit->SubAction = 0; // Reset path, than move to target
+			unit.SubAction = 0; // Reset path, than move to target
 			break;
 	}
 }

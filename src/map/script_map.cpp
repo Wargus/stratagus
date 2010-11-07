@@ -299,7 +299,7 @@ static int CclShowMapLocation(lua_State *l)
 		target->tilePos.y = LuaToNumber(l, 2);
 		target->TTL = GameCycle + LuaToNumber(l, 4);
 		target->CurrentSightRange = LuaToNumber(l, 3);
-		MapMarkUnitSight(target);
+		MapMarkUnitSight(*target);
 	} else {
 		DebugPrint("Unable to allocate Unit");
 	}
@@ -450,12 +450,8 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 */
 void SetTile(int tile, int w, int h, int value)
 {
-	if (w < 0 || w >= Map.Info.MapWidth) {
-		fprintf(stderr, "Invalid map width: %d\n", w);
-		return;
-	}
-	if (h < 0 || h >= Map.Info.MapHeight) {
-		fprintf(stderr, "Invalid map height: %d\n", h);
+	if (!Map.Info.IsPointOnMap(w, h)) {
+		fprintf(stderr, "Invalid map coordonate : (%d, %d)\n", w, h);
 		return;
 	}
 	if (tile < 0 || tile >= Map.Tileset.NumTiles) {

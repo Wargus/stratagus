@@ -59,7 +59,7 @@
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckTrue(const CUnit *, const ButtonAction *)
+bool ButtonCheckTrue(const CUnit &, const ButtonAction *)
 {
 	return true;
 }
@@ -73,7 +73,7 @@ bool ButtonCheckTrue(const CUnit *, const ButtonAction *)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckFalse(const CUnit *, const ButtonAction *)
+bool ButtonCheckFalse(const CUnit &, const ButtonAction *)
 {
 	return false;
 }
@@ -86,9 +86,9 @@ bool ButtonCheckFalse(const CUnit *, const ButtonAction *)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckUpgrade(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction *button)
 {
-	return UpgradeIdentAllowed(unit->Player, button->AllowStr) == 'R';
+	return UpgradeIdentAllowed(unit.Player, button->AllowStr) == 'R';
 }
 
 /**
@@ -99,12 +99,12 @@ bool ButtonCheckUpgrade(const CUnit *unit, const ButtonAction *button)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckUnitsOr(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckUnitsOr(const CUnit &unit, const ButtonAction *button)
 {
 	char *buf;
 	CPlayer *player;
 
-	player = unit->Player;
+	player = unit.Player;
 	buf = new_strdup(button->AllowStr.c_str());
 	for (const char *s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
 		if (player->HaveUnitTypeByIdent(s)) {
@@ -124,12 +124,12 @@ bool ButtonCheckUnitsOr(const CUnit *unit, const ButtonAction *button)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckUnitsAnd(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckUnitsAnd(const CUnit &unit, const ButtonAction *button)
 {
 	char *buf;
 	CPlayer *player;
 
-	player = unit->Player;
+	player = unit.Player;
 	buf = new_strdup(button->AllowStr.c_str());
 	for (const char *s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
 		if (!player->HaveUnitTypeByIdent(s)) {
@@ -151,7 +151,7 @@ bool ButtonCheckUnitsAnd(const CUnit *unit, const ButtonAction *button)
 **
 **  @note: this check could also be moved into intialisation.
 */
-bool ButtonCheckNetwork(const CUnit *, const ButtonAction *)
+bool ButtonCheckNetwork(const CUnit &, const ButtonAction *)
 {
 	return IsNetworkGame();
 }
@@ -166,7 +166,7 @@ bool ButtonCheckNetwork(const CUnit *, const ButtonAction *)
 **
 **  @note: this check could also be moved into intialisation.
 */
-bool ButtonCheckNoNetwork(const CUnit *, const ButtonAction *)
+bool ButtonCheckNoNetwork(const CUnit &, const ButtonAction *)
 {
 	return !IsNetworkGame();
 }
@@ -180,9 +180,9 @@ bool ButtonCheckNoNetwork(const CUnit *, const ButtonAction *)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckNoWork(const CUnit *unit, const ButtonAction *)
+bool ButtonCheckNoWork(const CUnit &unit, const ButtonAction *)
 {
-	int action = unit->CurrentAction(); 
+	int action = unit.CurrentAction();
 	return action != UnitActionTrain &&
 		action != UnitActionUpgradeTo &&
 		action != UnitActionResearch;
@@ -196,9 +196,9 @@ bool ButtonCheckNoWork(const CUnit *unit, const ButtonAction *)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckNoResearch(const CUnit *unit, const ButtonAction *)
+bool ButtonCheckNoResearch(const CUnit &unit, const ButtonAction *)
 {
-	int action = unit->CurrentAction();
+	int action = unit.CurrentAction();
 	return action != UnitActionUpgradeTo &&
 		action != UnitActionResearch;
 }
@@ -212,12 +212,12 @@ bool ButtonCheckNoResearch(const CUnit *unit, const ButtonAction *)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckUpgradeTo(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckUpgradeTo(const CUnit &unit, const ButtonAction *button)
 {
-	if (unit->CurrentAction() != UnitActionStill) {
+	if (unit.CurrentAction() != UnitActionStill) {
 		return false;
 	}
-	return CheckDependByIdent(unit->Player, button->ValueStr);
+	return CheckDependByIdent(unit.Player, button->ValueStr);
 }
 
 /**
@@ -228,9 +228,9 @@ bool ButtonCheckUpgradeTo(const CUnit *unit, const ButtonAction *button)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckAttack(const CUnit *unit, const ButtonAction *)
+bool ButtonCheckAttack(const CUnit &unit, const ButtonAction *)
 {
-	return unit->Type->CanAttack;
+	return unit.Type->CanAttack;
 }
 
 /**
@@ -241,7 +241,7 @@ bool ButtonCheckAttack(const CUnit *unit, const ButtonAction *)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckResearch(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckResearch(const CUnit &unit, const ButtonAction *button)
 {
 	// don't show any if working
 	if (!ButtonCheckNoWork(unit, button)) {
@@ -249,11 +249,11 @@ bool ButtonCheckResearch(const CUnit *unit, const ButtonAction *button)
 	}
 
 	// check if allowed
-	if (!CheckDependByIdent(unit->Player, button->ValueStr)) {
+	if (!CheckDependByIdent(unit.Player, button->ValueStr)) {
 		return false;
 	}
 	if (!strncmp(button->ValueStr.c_str(), "upgrade-", 8) &&
-			UpgradeIdentAllowed(unit->Player, button->ValueStr) != 'A') {
+			UpgradeIdentAllowed(unit.Player, button->ValueStr) != 'A') {
 		return false;
 	}
 	return true;
@@ -268,11 +268,10 @@ bool ButtonCheckResearch(const CUnit *unit, const ButtonAction *button)
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckSingleResearch(const CUnit *unit,
-	const ButtonAction *button)
+bool ButtonCheckSingleResearch(const CUnit &unit, const ButtonAction *button)
 {
 	if (ButtonCheckResearch(unit, button)) {
-		if (!unit->Player->UpgradeTimers.Upgrades[
+		if (!unit.Player->UpgradeTimers.Upgrades[
 				UpgradeIdByIdent(button->ValueStr)]) {
 			return true;
 		}

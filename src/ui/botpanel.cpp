@@ -723,11 +723,10 @@ void UpdateStatusLineForButton(const ButtonAction *button)
 **  @todo FIXME: better check. (dependancy, resource, ...)
 **  @todo FIXME: make difference with impossible and not yet researched.
 */
-static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
+static bool IsButtonAllowed(const CUnit &unit, const ButtonAction *buttonaction)
 {
 	bool res;
 
-	Assert(unit);
 	Assert(buttonaction);
 
 	if (buttonaction->Allowed) {
@@ -746,24 +745,24 @@ static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 			res = true;
 			break;
 		case ButtonRepair:
-			res = unit->Type->RepairRange > 0;
+			res = unit.Type->RepairRange > 0;
 			break;
 		case ButtonPatrol:
-			res = unit->CanMove();
+			res = unit.CanMove();
 			break;
 		case ButtonHarvest:
-			if (!unit->CurrentResource ||
-					!(unit->ResourcesHeld > 0 && !unit->Type->ResInfo[unit->CurrentResource]->LoseResources) ||
-					(unit->ResourcesHeld != unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity &&
-						unit->Type->ResInfo[unit->CurrentResource]->LoseResources)) {
+			if (!unit.CurrentResource ||
+					!(unit.ResourcesHeld > 0 && !unit.Type->ResInfo[unit.CurrentResource]->LoseResources) ||
+					(unit.ResourcesHeld != unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity &&
+						unit.Type->ResInfo[unit.CurrentResource]->LoseResources)) {
 				res = true;
 			}
 			break;
 		case ButtonReturn:
-			if (!(!unit->CurrentResource ||
-					!(unit->ResourcesHeld > 0 && !unit->Type->ResInfo[unit->CurrentResource]->LoseResources) ||
-					(unit->ResourcesHeld != unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity &&
-						unit->Type->ResInfo[unit->CurrentResource]->LoseResources))) {
+			if (!(!unit.CurrentResource ||
+					!(unit.ResourcesHeld > 0 && !unit.Type->ResInfo[unit.CurrentResource]->LoseResources) ||
+					(unit.ResourcesHeld != unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity &&
+						unit.Type->ResInfo[unit.CurrentResource]->LoseResources))) {
 				res = true;
 			}
 			break;
@@ -771,27 +770,27 @@ static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 			res = ButtonCheckAttack(unit, buttonaction);
 			break;
 		case ButtonAttackGround:
-			if (unit->Type->GroundAttack) {
+			if (unit.Type->GroundAttack) {
 				res = true;
 			}
 			break;
 		case ButtonTrain:
 			// Check if building queue is enabled
 			if (!EnableTrainingQueue &&
-					unit->CurrentAction() == UnitActionTrain) {
+					unit.CurrentAction() == UnitActionTrain) {
 				break;
 			}
 			// FALL THROUGH
 		case ButtonUpgradeTo:
 		case ButtonResearch:
 		case ButtonBuild:
-			res = CheckDependByIdent(unit->Player, buttonaction->ValueStr);
+			res = CheckDependByIdent(unit.Player, buttonaction->ValueStr);
 			if (res && !strncmp(buttonaction->ValueStr.c_str(), "upgrade-", 8)) {
-				res = UpgradeIdentAllowed(unit->Player, buttonaction->ValueStr) == 'A';
+				res = UpgradeIdentAllowed(unit.Player, buttonaction->ValueStr) == 'A';
 			}
 			break;
 		case ButtonSpellCast:
-			res = SpellIsAvailable(unit->Player, buttonaction->Value);
+			res = SpellIsAvailable(unit.Player, buttonaction->Value);
 			break;
 		case ButtonUnload:
 			res = (Selected[0]->Type->CanTransport() && Selected[0]->BoardCount);
@@ -800,14 +799,14 @@ static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 			res = true;
 			break;
 		case ButtonCancelUpgrade:
-			res = unit->CurrentAction() == UnitActionUpgradeTo ||
-				unit->CurrentAction() == UnitActionResearch;
+			res = unit.CurrentAction() == UnitActionUpgradeTo ||
+				unit.CurrentAction() == UnitActionResearch;
 			break;
 		case ButtonCancelTrain:
-			res = unit->CurrentAction() == UnitActionTrain;
+			res = unit.CurrentAction() == UnitActionTrain;
 			break;
 		case ButtonCancelBuild:
-			res = unit->CurrentAction() == UnitActionBuilt;
+			res = unit.CurrentAction() == UnitActionBuilt;
 			break;
 	}
 #if 0
@@ -854,7 +853,7 @@ static ButtonAction *UpdateButtonPanelMultipleUnits(void)
 		}
 		allow = true;
 		for (int i = 0; i < NumSelected; i++) {
-			if (!IsButtonAllowed(Selected[i], UnitButtonTable[z])) {
+			if (!IsButtonAllowed(*Selected[i], UnitButtonTable[z])) {
 				allow = false;
 				break;
 			}
@@ -881,38 +880,35 @@ static ButtonAction *UpdateButtonPanelMultipleUnits(void)
 **
 **  @todo FIXME : Remove Hack for cancel button.
 */
-static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit *unit)
+static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit &unit)
 {
 	int allow;
 	char unit_ident[128];
 	ButtonAction *buttonaction;
 	ButtonAction *res;
-	int z;
-
-	Assert(unit);
 
 	res = new ButtonAction[UI.ButtonPanel.Buttons.size()];
-	for (z = 0; z < (int)UI.ButtonPanel.Buttons.size(); ++z) {
+	for (unsigned int z = 0; z < UI.ButtonPanel.Buttons.size(); ++z) {
 		res[z].Pos = -1;
 	}
 
 	//
 	//  FIXME: johns: some hacks for cancel buttons
 	//
-	if (unit->CurrentAction() == UnitActionBuilt) {
+	if (unit.CurrentAction() == UnitActionBuilt) {
 		// Trick 17 to get the cancel-build button
 		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-build,");
-	} else if (unit->CurrentAction() == UnitActionUpgradeTo) {
+	} else if (unit.CurrentAction() == UnitActionUpgradeTo) {
 		// Trick 17 to get the cancel-upgrade button
 		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-upgrade,");
-	} else if (unit->CurrentAction() == UnitActionResearch) {
+	} else if (unit.CurrentAction() == UnitActionResearch) {
 		// Trick 17 to get the cancel-upgrade button
 		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-upgrade,");
 	} else {
-		sprintf(unit_ident, ",%s,", unit->Type->Ident.c_str());
+		sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
 	}
 
-	for (z = 0; z < (int)UnitButtonTable.size(); ++z) {
+	for (unsigned int z = 0; z < UnitButtonTable.size(); ++z) {
 		int pos; // keep position, modified if alt-buttons required
 
 		buttonaction = UnitButtonTable[z];
@@ -946,9 +942,8 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit *unit)
 **
 **  @internal Affect CurrentButtons with buttons to show.
 */
-void CButtonPanel::Update(void)
+void CButtonPanel::Update()
 {
-	CUnit *unit;
 	bool sameType;
 
 
@@ -957,9 +952,9 @@ void CButtonPanel::Update(void)
 		return;
 	}
 
-	unit = Selected[0];
+	CUnit &unit = *Selected[0];
 	// foreign unit
-	if (unit->Player != ThisPlayer && !ThisPlayer->IsTeamed(unit)) {
+	if (unit.Player != ThisPlayer && !ThisPlayer->IsTeamed(unit)) {
 		CurrentButtons.Reset();
 		return;
 	}
@@ -967,7 +962,7 @@ void CButtonPanel::Update(void)
 	sameType = true;
 	// multiple selected
 	for (int i = 1; i < NumSelected; ++i) {
-		if (Selected[i]->Type != unit->Type) {
+		if (Selected[i]->Type != unit.Type) {
 			sameType = false;
 			break;
 		}
@@ -1003,7 +998,7 @@ void CButtonPanel::DoClicked(int button)
 	//  or Not Teamed
 	//
 	if (CurrentButtons[button].Pos == -1 ||
-			!ThisPlayer->IsTeamed(Selected[0])) {
+			!ThisPlayer->IsTeamed(*Selected[0])) {
 		return;
 	}
 
@@ -1020,7 +1015,7 @@ void CButtonPanel::DoClicked(int button)
 			//
 			if ((NumSelected == 1 && Selected[0]->CurrentAction() == UnitActionStill &&
 					Map.CoastOnMap(Selected[0]->tilePos.x, Selected[0]->tilePos.y)) || !Selected[0]->CanMove()) {
-				SendCommandUnload(Selected[0],
+				SendCommandUnload(*Selected[0],
 					Selected[0]->tilePos.x, Selected[0]->tilePos.y, NoUnitP,
 					!(KeyModifiers & ModifierShift));
 				break;
@@ -1056,18 +1051,16 @@ void CButtonPanel::DoClicked(int button)
 				}
 				for (i = 0; i < NumSelected; ++i) {
 					if (Selected[i]->AutoCastSpell[spellId] != autocast) {
-						SendCommandAutoSpellCast(Selected[i],
-							spellId, autocast);
+						SendCommandAutoSpellCast(*Selected[i], spellId, autocast);
 					}
 				}
 				break;
 			}
 			if(SpellTypeTable[spellId]->IsCasterOnly()) {
-				CUnit *unit;
 				for (i = 0; i < NumSelected; ++i) {
-					unit = Selected[i];
+					CUnit &unit = *Selected[i];
 					// CursorValue here holds the spell type id
-					SendCommandSpellCast(unit, unit->tilePos.x, unit->tilePos.y, unit, spellId,
+					SendCommandSpellCast(unit, unit.tilePos.x, unit.tilePos.y, &unit, spellId,
 										!(KeyModifiers & ModifierShift));
 				}
 				break;
@@ -1089,7 +1082,7 @@ void CButtonPanel::DoClicked(int button)
 				}
 				for (i = 0; i < NumSelected; ++i) {
 					if (Selected[i]->AutoRepair != autorepair) {
-						SendCommandAutoRepair(Selected[i], autorepair);
+						SendCommandAutoRepair(*Selected[i], autorepair);
 					}
 				}
 				break;
@@ -1111,18 +1104,18 @@ void CButtonPanel::DoClicked(int button)
 			break;
 		case ButtonReturn:
 			for (i = 0; i < NumSelected; ++i) {
-				SendCommandReturnGoods(Selected[i], NoUnitP,
+				SendCommandReturnGoods(*Selected[i], NoUnitP,
 					!(KeyModifiers & ModifierShift));
 			}
 			break;
 		case ButtonStop:
 			for (i = 0; i < NumSelected; ++i) {
-				SendCommandStopUnit(Selected[i]);
+				SendCommandStopUnit(*Selected[i]);
 			}
 			break;
 		case ButtonStandGround:
 			for (i = 0; i < NumSelected; ++i) {
-				SendCommandStandGround(Selected[i],
+				SendCommandStandGround(*Selected[i],
 					!(KeyModifiers & ModifierShift));
 			}
 			break;
@@ -1136,10 +1129,10 @@ void CButtonPanel::DoClicked(int button)
 			if (NumSelected == 1) {
 				switch(Selected[0]->CurrentAction()) {
 					case UnitActionUpgradeTo:
-						SendCommandCancelUpgradeTo(Selected[0]);
+						SendCommandCancelUpgradeTo(*Selected[0]);
 					break;
 					case UnitActionResearch:
-						SendCommandCancelResearch(Selected[0]);
+						SendCommandCancelResearch(*Selected[0]);
 					break;
 					default:
 					break;
@@ -1156,7 +1149,7 @@ void CButtonPanel::DoClicked(int button)
 
 		case ButtonCancelTrain:
 			Assert(Selected[0]->CurrentAction() == UnitActionTrain);
-			SendCommandCancelTraining(Selected[0], -1, NULL);
+			SendCommandCancelTraining(*Selected[0], -1, NULL);
 			UI.StatusLine.Clear();
 			ClearCosts();
 			break;
@@ -1165,7 +1158,7 @@ void CButtonPanel::DoClicked(int button)
 			// FIXME: johns is this not sure, only building should have this?
 			Assert(Selected[0]->CurrentAction() == UnitActionBuilt);
 			if (NumSelected == 1) {
-				SendCommandDismiss(Selected[0]);
+				SendCommandDismiss(*Selected[0]);
 			}
 			UI.StatusLine.Clear();
 			ClearCosts();
@@ -1198,12 +1191,12 @@ void CButtonPanel::DoClicked(int button)
 			} else if (Selected[0]->Player->CheckLimits(type) >= 0 &&
 					!Selected[0]->Player->CheckUnitType(type)) {
 				//PlayerSubUnitType(player,type);
-				SendCommandTrainUnit(Selected[0], type,
+				SendCommandTrainUnit(*Selected[0], type,
 					!(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();
 				ClearCosts();
 			} else if (Selected[0]->Player->CheckLimits(type) == -3)
-				if (GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound) 
+				if (GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound)
 					PlayGameSound(GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound,
 								MaxSampleVolume);
 			break;
@@ -1213,7 +1206,7 @@ void CButtonPanel::DoClicked(int button)
 			type = UnitTypes[CurrentButtons[button].Value];
 			if (!Selected[0]->Player->CheckUnitType(type)) {
 				//PlayerSubUnitType(player,type);
-				SendCommandUpgradeTo(Selected[0],type,
+				SendCommandUpgradeTo(*Selected[0], type,
 					!(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();
 				ClearCosts();
@@ -1223,7 +1216,7 @@ void CButtonPanel::DoClicked(int button)
 			i = CurrentButtons[button].Value;
 			if (!Selected[0]->Player->CheckCosts(AllUpgrades[i]->Costs)) {
 				//PlayerSubCosts(player,Upgrades[i].Costs);
-				SendCommandResearch(Selected[0], AllUpgrades[i],
+				SendCommandResearch(*Selected[0], AllUpgrades[i],
 					!(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();
 				ClearCosts();

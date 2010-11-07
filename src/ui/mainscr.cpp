@@ -115,16 +115,16 @@ void DrawMenuButtonArea(void)
 **  @param x     Screen X postion of icon
 **  @param y     Screen Y postion of icon
 */
-static void UiDrawLifeBar(const CUnit *unit, int x, int y)
+static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 {
 	// FIXME: add icon borders
-	y += unit->Type->Icon.Icon->G->Height;
+	y += unit.Type->Icon.Icon->G->Height;
 	Video.FillRectangleClip(ColorBlack, x, y,
-		unit->Type->Icon.Icon->G->Width, 7);
+		unit.Type->Icon.Icon->G->Width, 7);
 
-	if (unit->Variable[HP_INDEX].Value) {
+	if (unit.Variable[HP_INDEX].Value) {
 		Uint32 color;
-		int f = (100 * unit->Variable[HP_INDEX].Value) / unit->Variable[HP_INDEX].Max;
+		int f = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
 
 		if (f > 75) {
 			color = ColorDarkGreen;
@@ -136,7 +136,7 @@ static void UiDrawLifeBar(const CUnit *unit, int x, int y)
 			color = ColorRed;
 		}
 
-		f = (f * (unit->Type->Icon.Icon->G->Width)) / 100;
+		f = (f * (unit.Type->Icon.Icon->G->Width)) / 100;
 		Video.FillRectangleClip(color, x + 1, y + 1, f, 5);
 	}
 }
@@ -149,16 +149,16 @@ static void UiDrawLifeBar(const CUnit *unit, int x, int y)
 **  @param x     Screen X postion of icon
 **  @param y     Screen Y postion of icon
 */
-static void UiDrawManaBar(const CUnit *unit, int x, int y)
+static void UiDrawManaBar(const CUnit &unit, int x, int y)
 {
 	// FIXME: add icon borders
-	y += unit->Type->Icon.Icon->G->Height;
+	y += unit.Type->Icon.Icon->G->Height;
 	Video.FillRectangleClip(ColorBlack, x, y + 3,
-		unit->Type->Icon.Icon->G->Width, 4);
+		unit.Type->Icon.Icon->G->Width, 4);
 
-	if (unit->Stats->Variables[MANA_INDEX].Max) {
-		int f = (100 * unit->Variable[MANA_INDEX].Value) / unit->Variable[MANA_INDEX].Max;
-		f = (f * (unit->Type->Icon.Icon->G->Width)) / 100;
+	if (unit.Stats->Variables[MANA_INDEX].Max) {
+		int f = (100 * unit.Variable[MANA_INDEX].Value) / unit.Variable[MANA_INDEX].Max;
+		f = (f * (unit.Type->Icon.Icon->G->Width)) / 100;
 		Video.FillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2);
 	}
 }
@@ -172,26 +172,25 @@ static void UiDrawManaBar(const CUnit *unit, int x, int y)
 **
 **  @return            0 if we can't show the content, else 1.
 */
-static bool CanShowContent(const ConditionPanel *condition, const CUnit *unit)
+static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 {
-	Assert(unit);
 	if (!condition) {
 		return true;
 	}
-	if ((condition->ShowOnlySelected && !unit->Selected) ||
-			(unit->Player->Type == PlayerNeutral && condition->HideNeutral) ||
+	if ((condition->ShowOnlySelected && !unit.Selected) ||
+			(unit.Player->Type == PlayerNeutral && condition->HideNeutral) ||
 			(ThisPlayer->IsEnemy(unit) && !condition->ShowOpponent) ||
-			(ThisPlayer->IsAllied(unit) && (unit->Player != ThisPlayer) && condition->HideAllied)) {
+			(ThisPlayer->IsAllied(unit) && (unit.Player != ThisPlayer) && condition->HideAllied)) {
 		return false;
 	}
-	if (condition->BoolFlags && !unit->Type->CheckUserBoolFlags(condition->BoolFlags)) {
+	if (condition->BoolFlags && !unit.Type->CheckUserBoolFlags(condition->BoolFlags)) {
 		return false;
 	}
 
 	if (condition->Variables) {
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
-				if ((condition->Variables[i] == CONDITION_ONLY) ^ unit->Variable[i].Enable) {
+				if ((condition->Variables[i] == CONDITION_ONLY) ^ unit.Variable[i].Enable) {
 					return false;
 				}
 			}
@@ -218,27 +217,26 @@ typedef struct {
 **
 **  @return       Value corresponding
 */
-UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t)
+UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 {
 	UStrInt val;
 	CVariable *var;
 
-	Assert(unit);
 	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
 
 	switch (t) {
 		case 0: // Unit:
-			var = &unit->Variable[index];
+			var = &unit.Variable[index];
 			break;
 		case 1: // Type:
-			var = &unit->Type->Variable[index];
+			var = &unit.Type->Variable[index];
 			break;
 		case 2: // Stats:
-			var = &unit->Stats->Variables[index];
+			var = &unit.Stats->Variables[index];
 			break;
 		default:
 			DebugPrint("Bad value for GetComponent: t = %d" _C_ t);
-			var = &unit->Variable[index];
+			var = &unit.Variable[index];
 			break;
 	}
 
@@ -260,17 +258,17 @@ UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t)
 			val.i = var->Max - var->Value;
 			break;
 		case VariablePercent:
-			Assert(unit->Variable[index].Max != 0);
+			Assert(unit.Variable[index].Max != 0);
 			val.type = USTRINT_INT;
 			val.i = 100 * var->Value / var->Max;
 			break;
 		case VariableName:
 			if (index == GIVERESOURCE_INDEX) {
 				val.type = USTRINT_STR;
-				val.s = DefaultResourceNames[unit->Type->GivesResource].c_str();
+				val.s = DefaultResourceNames[unit.Type->GivesResource].c_str();
 			} else if (index == CARRYRESOURCE_INDEX) {
 				val.type = USTRINT_STR;
-				val.s = DefaultResourceNames[unit->CurrentResource].c_str();
+				val.s = DefaultResourceNames[unit.CurrentResource].c_str();
 			} else {
 				val.type = USTRINT_STR;
 				val.s = UnitTypeVar.VariableNameLookup[index];
@@ -288,24 +286,23 @@ UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t)
 **
 **  @return      The desired unit.
 */
-const CUnit *GetUnitRef(const CUnit *unit, EnumUnit e)
+const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 {
-	Assert(unit);
 	switch (e) {
 		case UnitRefItSelf:
-			return unit;
+			return &unit;
 		case UnitRefInside:
-			return unit->UnitInside;
+			return unit.UnitInside;
 		case UnitRefContainer:
-			return unit->Container;
+			return unit.Container;
 		case UnitRefWorker :
-			if (unit->CurrentAction() == UnitActionBuilt) {
-				return unit->Data.Built.Worker;
+			if (unit.CurrentAction() == UnitActionBuilt) {
+				return unit.Data.Built.Worker;
 			} else {
 				return NoUnitP;
 			}
 		case UnitRefGoal:
-			return unit->Goal;
+			return unit.Goal;
 		default:
 			Assert(0);
 	}
@@ -319,7 +316,7 @@ const CUnit *GetUnitRef(const CUnit *unit, EnumUnit e)
 **  @param unit         unit with variable to show.
 **  @param defaultfont  default font if no specific font in extra data.
 */
-void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
+void CContentTypeText::Draw(const CUnit &unit, CFont *defaultfont) const
 {
 	std::string text;       // Optional text to display.
 	CFont *font;            // Font to use.
@@ -329,9 +326,8 @@ void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 	x = this->PosX;
 	y = this->PosY;
 	font = this->Font ? this->Font : defaultfont;
-	Assert(font);
 
-	Assert(unit || this->Index == -1);
+	Assert(font);
 	Assert(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.GetNumberVariable()));
 
 	CLabel label(font);
@@ -346,7 +342,7 @@ void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 	}
 
 	if (this->ShowName) {
-		label.DrawCentered(x, y, unit->Type->Name);
+		label.DrawCentered(x, y, unit.Type->Name);
 		return;
 	}
 
@@ -368,8 +364,8 @@ void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 					Assert(0);
 			}
 		} else {
-			int value = unit->Type->Variable[this->Index].Value;
-			int diff = unit->Stats->Variables[this->Index].Value - value;
+			int value = unit.Type->Variable[this->Index].Value;
+			int diff = unit.Stats->Variables[this->Index].Value - value;
 
 			if (!diff) {
 				label.Draw(x, y, value);
@@ -392,13 +388,12 @@ void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 **  @note text must have exactly 1 %d.
 **  @bug if text format is incorrect.
 */
-void CContentTypeFormattedText::Draw(const CUnit *unit, CFont *defaultfont) const
+void CContentTypeFormattedText::Draw(const CUnit &unit, CFont *defaultfont) const
 {
 	CFont *font;
 	char buf[256];
 	UStrInt usi1;
 
-	Assert(unit);
 	font = this->Font ? this->Font : defaultfont;
 	Assert(font);
 
@@ -429,13 +424,12 @@ void CContentTypeFormattedText::Draw(const CUnit *unit, CFont *defaultfont) cons
 **  @note text must have exactly 2 %d.
 **  @bug if text format is incorrect.
 */
-void CContentTypeFormattedText2::Draw(const CUnit *unit, CFont *defaultfont) const
+void CContentTypeFormattedText2::Draw(const CUnit &unit, CFont *defaultfont) const
 {
 	CFont *font;
 	char buf[256];
 	UStrInt usi1, usi2;
 
-	Assert(unit);
 	font = this->Font ? this->Font : defaultfont;
 	Assert(font);
 	CLabel label(font);
@@ -468,12 +462,12 @@ void CContentTypeFormattedText2::Draw(const CUnit *unit, CFont *defaultfont) con
 **  @param unit         unit with icon to show.
 **  @param defaultfont  unused.
 */
-void CContentTypeIcon::Draw(const CUnit *unit, CFont *) const
+void CContentTypeIcon::Draw(const CUnit &unit, CFont *) const
 {
-	Assert(unit);
-	unit = GetUnitRef(unit, this->UnitRef);
-	if (unit && unit->Type->Icon.Icon) {
-		unit->Type->Icon.Icon->DrawIcon(unit->Player, this->PosX, this->PosY);
+	const CUnit* unitToDraw = GetUnitRef(unit, this->UnitRef);
+
+	if (unitToDraw && unitToDraw->Type->Icon.Icon) {
+		unitToDraw->Type->Icon.Icon->DrawIcon(unitToDraw->Player, this->PosX, this->PosY);
 	}
 }
 
@@ -486,16 +480,15 @@ void CContentTypeIcon::Draw(const CUnit *unit, CFont *) const
 **
 **  @todo Color and percent value Parametrisation.
 */
-void CContentTypeLifeBar::Draw(const CUnit *unit, CFont *) const
+void CContentTypeLifeBar::Draw(const CUnit &unit, CFont *) const
 {
-	Assert(unit);
 	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
-	if (!unit->Variable[this->Index].Max) {
+	if (!unit.Variable[this->Index].Max) {
 		return;
 	}
 
 	Uint32 color;
-	int f = (100 * unit->Variable[this->Index].Value) / unit->Variable[this->Index].Max;
+	int f = (100 * unit.Variable[this->Index].Value) / unit.Variable[this->Index].Max;
 
 	if (f > 75) {
 		color = ColorDarkGreen;
@@ -524,11 +517,10 @@ void CContentTypeLifeBar::Draw(const CUnit *unit, CFont *) const
 **
 **  @todo Color and percent value Parametrisation.
 */
-void CContentTypeCompleteBar::Draw(const CUnit *unit, CFont *) const
+void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
 {
-	Assert(unit);
 	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
-	if (!unit->Variable[this->Index].Max) {
+	if (!unit.Variable[this->Index].Max) {
 		return;
 	}
 
@@ -540,7 +532,7 @@ void CContentTypeCompleteBar::Draw(const CUnit *unit, CFont *) const
 	Assert(w > 0);
 	Assert(h > 4);
 
-	int f = (100 * unit->Variable[this->Index].Value) / unit->Variable[this->Index].Max;
+	int f = (100 * unit.Variable[this->Index].Value) / unit.Variable[this->Index].Max;
 
 	if (!this->Border) {
 		Video.FillRectangleClip(UI.CompletedBarColor, x, y, f * w / 100, h);
@@ -567,7 +559,7 @@ void CContentTypeCompleteBar::Draw(const CUnit *unit, CFont *) const
 **
 **  @param unit  Pointer to unit.
 */
-static void DrawUnitInfo(CUnit *unit)
+static void DrawUnitInfo(CUnit &unit)
 {
 	int i;
 	CUnitType *type;
@@ -577,7 +569,6 @@ static void DrawUnitInfo(CUnit *unit)
 	CUnit *uins;
 	CLabel label(GameFont);
 
-	Assert(unit);
 	if (CPU_NUM == 1) {
 		UpdateUnitVariables(unit);
 	}
@@ -592,8 +583,8 @@ static void DrawUnitInfo(CUnit *unit)
 		}
 	}
 
-	type = unit->Type;
-	stats = unit->Stats;
+	type = unit.Type;
+	stats = unit.Stats;
 	Assert(type);
 	Assert(stats);
 
@@ -618,13 +609,13 @@ static void DrawUnitInfo(CUnit *unit)
 	if (UI.SingleSelectedButton) {
 		x = UI.SingleSelectedButton->X;
 		y = UI.SingleSelectedButton->Y;
-		type->Icon.Icon->DrawUnitIcon(unit->Player, UI.SingleSelectedButton->Style,
+		type->Icon.Icon->DrawUnitIcon(unit.Player, UI.SingleSelectedButton->Style,
 			(ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
 				(IconActive | (MouseButtons & LeftButton)) : 0,
 			x, y, "");
 	}
 
-	if (unit->Player != ThisPlayer && !ThisPlayer->IsAllied(unit->Player) )
+	if (unit.Player != ThisPlayer && !ThisPlayer->IsAllied(unit.Player) )
 	{
 		return;
 	}
@@ -635,21 +626,21 @@ static void DrawUnitInfo(CUnit *unit)
 	//
 	//  Show progress if they are selected.
 	//
-	if (NumSelected == 1 && Selected[0] == unit) {
-		switch(unit->CurrentAction()) {
+	if (NumSelected == 1 && Selected[0] == &unit) {
+		switch(unit.CurrentAction()) {
 
 			//
 			//  Building training units.
 			//
 			case UnitActionTrain:
-				if (unit->OrderCount == 1 || unit->Orders[1]->Action != UnitActionTrain) {
+				if (unit.OrderCount == 1 || unit.Orders[1]->Action != UnitActionTrain) {
 					if (!UI.SingleTrainingText.empty()) {
 						label.SetFont(UI.SingleTrainingFont);
 						label.Draw(UI.SingleTrainingTextX, UI.SingleTrainingTextY,
 							UI.SingleTrainingText);
 					}
 					if (UI.SingleTrainingButton) {
-						unit->CurrentOrder()->Arg1.Type->Icon.Icon->DrawUnitIcon(unit->Player,
+						unit.CurrentOrder()->Arg1.Type->Icon.Icon->DrawUnitIcon(unit.Player,
 							UI.SingleTrainingButton->Style,
 							(ButtonAreaUnderCursor == ButtonAreaTraining &&
 								ButtonUnderCursor == 0) ?
@@ -663,10 +654,10 @@ static void DrawUnitInfo(CUnit *unit)
 							UI.TrainingText);
 					}
 					if (!UI.TrainingButtons.empty()) {
-						for (i = 0; i < unit->OrderCount &&
+						for (i = 0; i < unit.OrderCount &&
 								i < (int)UI.TrainingButtons.size(); ++i) {
-							if (unit->Orders[i]->Action == UnitActionTrain) {
-								unit->Orders[i]->Arg1.Type->Icon.Icon->DrawUnitIcon(unit->Player,
+							if (unit.Orders[i]->Action == UnitActionTrain) {
+								unit.Orders[i]->Arg1.Type->Icon.Icon->DrawUnitIcon(unit.Player,
 									 UI.TrainingButtons[i].Style,
 									(ButtonAreaUnderCursor == ButtonAreaTraining &&
 										ButtonUnderCursor == i) ?
@@ -683,7 +674,7 @@ static void DrawUnitInfo(CUnit *unit)
 			//
 			case UnitActionUpgradeTo:
 				if (UI.UpgradingButton) {
-					unit->CurrentOrder()->Arg1.Type->Icon.Icon->DrawUnitIcon(unit->Player,
+					unit.CurrentOrder()->Arg1.Type->Icon.Icon->DrawUnitIcon(unit.Player,
 						UI.UpgradingButton->Style,
 						(ButtonAreaUnderCursor == ButtonAreaUpgrading &&
 							ButtonUnderCursor == 0) ?
@@ -697,7 +688,7 @@ static void DrawUnitInfo(CUnit *unit)
 			//
 			case UnitActionResearch:
 				if (UI.ResearchingButton) {
-					unit->Data.Research.Upgrade->Icon->DrawUnitIcon(unit->Player,
+					unit.Data.Research.Upgrade->Icon->DrawUnitIcon(unit.Player,
 						UI.ResearchingButton->Style,
 						(ButtonAreaUnderCursor == ButtonAreaResearching &&
 							ButtonUnderCursor == 0) ?
@@ -713,19 +704,19 @@ static void DrawUnitInfo(CUnit *unit)
 	//
 	//  Transporting units.
 	//
-	if (type->CanTransport() && unit->BoardCount) {
+	if (type->CanTransport() && unit.BoardCount) {
 		int j;
 
-		uins = unit->UnitInside;
-		for (i = j = 0; i < unit->InsideCount; ++i, uins = uins->NextContained) {
+		uins = unit.UnitInside;
+		for (i = j = 0; i < unit.InsideCount; ++i, uins = uins->NextContained) {
 			if (uins->Boarded && j < (int)UI.TransportingButtons.size()) {
-				uins->Type->Icon.Icon->DrawUnitIcon(unit->Player, UI.TransportingButtons[j].Style,
+				uins->Type->Icon.Icon->DrawUnitIcon(unit.Player, UI.TransportingButtons[j].Style,
 					(ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == j) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
 					UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y, "");
-				UiDrawLifeBar(uins, UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
+				UiDrawLifeBar(*uins, UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 				if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
-					UiDrawManaBar(uins, UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
+					UiDrawManaBar(*uins, UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 				}
 				if (ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == j) {
 					UI.StatusLine.Set(uins->Type->Name);
@@ -1467,7 +1458,7 @@ static void DrawInfoPanelMultipleSelected()
 		Selected[i]->Type->Icon.Icon->DrawUnitIcon(ThisPlayer, button->Style,
 			mouseOver ? (IconActive | (MouseButtons & LeftButton)) : 0,
 			button->X, button->Y, "");
-		UiDrawLifeBar(Selected[i], button->X, button->Y);
+		UiDrawLifeBar(*Selected[i], button->X, button->Y);
 
 		if (mouseOver) {
 			UI.StatusLine.Set(Selected[i]->Type->Name);
@@ -1489,7 +1480,7 @@ static void DrawInfoPanelMultipleSelected()
 */
 static void DrawInfoPanelSingleSelected()
 {
-	DrawUnitInfo(Selected[0]);
+	DrawUnitInfo(*Selected[0]);
 	if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
 		UI.StatusLine.Set(Selected[0]->Type->Name);
 	}
@@ -1503,7 +1494,7 @@ static void DrawInfoPanelNoneSelected()
 	CUnitPtr lock(UnitUnderCursor);
 	// Check if a unit is under the cursor
 	if (lock != NULL && lock->IsVisible(ThisPlayer)) {
-		DrawUnitInfo(lock);
+		DrawUnitInfo(*lock);
 		return;
 	}
 

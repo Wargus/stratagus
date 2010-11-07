@@ -341,8 +341,8 @@ static int CalculateDamage(const CUnit &attacker, const CUnit &goal)
 	}
 	Assert(Damage);
 
-	UpdateUnitVariables(const_cast<CUnit *>(&attacker));
-	UpdateUnitVariables(const_cast<CUnit *>(&goal));
+	UpdateUnitVariables(const_cast<CUnit &>(attacker));
+	UpdateUnitVariables(const_cast<CUnit &>(goal));
 	TriggerData.Attacker = const_cast<CUnit *>(&attacker);
 	TriggerData.Defender = const_cast<CUnit *>(&goal);
 	const int res = EvalNumber(Damage);
@@ -356,13 +356,13 @@ static int CalculateDamage(const CUnit &attacker, const CUnit &goal)
 **
 **  @param unit  Unit that fires the missile.
 */
-void FireMissile(CUnit *unit)
+void FireMissile(CUnit &unit)
 {
 	int x;
 	int y;
 	int dx;
 	int dy;
-	CUnit *goal = unit->CurrentOrder()->GetGoal();
+	CUnit *goal = unit.CurrentOrder()->GetGoal();
 
 	//
 	// Goal dead?
@@ -386,20 +386,20 @@ void FireMissile(CUnit *unit)
 	//
 	// No missile hits immediately!
 	//
-	if (unit->Type->Missile.Missile->Class == MissileClassNone) {
+	if (unit.Type->Missile.Missile->Class == MissileClassNone) {
 		// No goal, take target coordinates
 		if (!goal) {
-			dx = unit->CurrentOrder()->goalPos.x;
-			dy = unit->CurrentOrder()->goalPos.y;
+			dx = unit.CurrentOrder()->goalPos.x;
+			dy = unit.CurrentOrder()->goalPos.y;
 			if (Map.WallOnMap(dx, dy)) {
 				if (Map.HumanWallOnMap(dx, dy)) {
 					Map.HitWall(dx, dy,
-						CalculateDamageStats(*unit->Stats,
-							*UnitTypeHumanWall->Stats, unit->Variable[BLOODLUST_INDEX].Value));
+						CalculateDamageStats(*unit.Stats,
+							*UnitTypeHumanWall->Stats, unit.Variable[BLOODLUST_INDEX].Value));
 				} else {
 					Map.HitWall(dx, dy,
-						CalculateDamageStats(*unit->Stats,
-							*UnitTypeOrcWall->Stats, unit->Variable[BLOODLUST_INDEX].Value));
+						CalculateDamageStats(*unit.Stats,
+							*UnitTypeOrcWall->Stats, unit.Variable[BLOODLUST_INDEX].Value));
 				}
 				return;
 			}
@@ -407,18 +407,18 @@ void FireMissile(CUnit *unit)
 			DebugPrint("Missile-none hits no unit, shouldn't happen!\n");
 			return;
 		}
-		HitUnit(unit, goal, CalculateDamage(*unit, *goal));
+		HitUnit(&unit, *goal, CalculateDamage(unit, *goal));
 
 		return;
 	}
 
 	// If Firing from inside a Bunker
-	if (unit->Container) {
-		x = unit->Container->tilePos.x * TileSizeX + TileSizeX / 2;  // missile starts in tile middle
-		y = unit->Container->tilePos.y * TileSizeY + TileSizeY / 2;
+	if (unit.Container) {
+		x = unit.Container->tilePos.x * TileSizeX + TileSizeX / 2;  // missile starts in tile middle
+		y = unit.Container->tilePos.y * TileSizeY + TileSizeY / 2;
 	} else {
-		x = unit->tilePos.x * TileSizeX + TileSizeX / 2;  // missile starts in tile middle
-		y = unit->tilePos.y * TileSizeY + TileSizeY / 2;
+		x = unit.tilePos.x * TileSizeX + TileSizeX / 2;  // missile starts in tile middle
+		y = unit.tilePos.y * TileSizeY + TileSizeY / 2;
 	}
 
 	if (goal) {
@@ -426,29 +426,29 @@ void FireMissile(CUnit *unit)
 		//
 		// Moved out of attack range?
 		//
-		if (unit->MapDistanceTo(goal) < unit->Type->MinAttackRange) {
+		if (unit.MapDistanceTo(*goal) < unit.Type->MinAttackRange) {
 			DebugPrint("Missile target too near %d,%d\n" _C_
-				unit->MapDistanceTo(goal) _C_ unit->Type->MinAttackRange);
+				unit.MapDistanceTo(*goal) _C_ unit.Type->MinAttackRange);
 			// FIXME: do something other?
 			return;
 		}
 		// Fire to nearest point of the unit!
 		// If Firing from inside a Bunker
-		if (unit->Container) {
-			NearestOfUnit(goal, unit->Container->tilePos.x, unit->Container->tilePos.y, &dx, &dy);
+		if (unit.Container) {
+			NearestOfUnit(*goal, unit.Container->tilePos.x, unit.Container->tilePos.y, &dx, &dy);
 		} else {
-			NearestOfUnit(goal, unit->tilePos.x, unit->tilePos.y, &dx, &dy);
+			NearestOfUnit(*goal, unit.tilePos.x, unit.tilePos.y, &dx, &dy);
 		}
 	} else {
-		dx = unit->CurrentOrder()->goalPos.x;
-		dy = unit->CurrentOrder()->goalPos.y;
+		dx = unit.CurrentOrder()->goalPos.x;
+		dy = unit.CurrentOrder()->goalPos.y;
 		// FIXME: Can this be too near??
 	}
 
 	// Fire to the tile center of the destination.
 	dx = dx * TileSizeX + TileSizeX / 2;
 	dy = dy * TileSizeY + TileSizeY / 2;
-	Missile *missile = MakeMissile(unit->Type->Missile.Missile, x, y, dx, dy);
+	Missile *missile = MakeMissile(unit.Type->Missile.Missile, x, y, dx, dy);
 	//
 	// Damage of missile
 	//
@@ -456,8 +456,8 @@ void FireMissile(CUnit *unit)
 		missile->TargetUnit = goal;
 		goal->RefsIncrease();
 	}
-	missile->SourceUnit = unit;
-	unit->RefsIncrease();
+	missile->SourceUnit = &unit;
+	unit.RefsIncrease();
 }
 
 /**
@@ -820,19 +820,19 @@ static int ParabolicMissile(Missile &missile)
 **  @param goal     Goal of the missile.
 **  @param splash   Splash damage divisor.
 */
-static void MissileHitsGoal(const Missile &missile, CUnit *goal, int splash)
+static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 {
-	if (!missile.Type->CanHitOwner && goal == missile.SourceUnit) {
+	if (!missile.Type->CanHitOwner && &goal == missile.SourceUnit) {
 		return;
 	}
 
-	if (goal->CurrentAction() != UnitActionDie) {
+	if (goal.CurrentAction() != UnitActionDie) {
 		if (missile.Damage) {  // direct damage, spells mostly
 			HitUnit(missile.SourceUnit, goal, missile.Damage / splash);
 		} else {
 			Assert(missile.SourceUnit != NULL);
 			HitUnit(missile.SourceUnit, goal,
-				CalculateDamage(*missile.SourceUnit, *goal) / splash);
+				CalculateDamage(*missile.SourceUnit, goal) / splash);
 		}
 	}
 }
@@ -900,7 +900,7 @@ void MissileHit(Missile *missile)
 	pos.x /= TileSizeX;
 	pos.y /= TileSizeY;
 
-	if (pos.x < 0 || pos.y < 0 || pos.x >= Map.Info.MapWidth || pos.y >= Map.Info.MapHeight) {
+	if (!Map.Info.IsPointOnMap(pos.x, pos.y)) {
 		// FIXME: this should handled by caller?
 		DebugPrint("Missile gone outside of map!\n");
 		return;  // outside the map.
@@ -920,7 +920,7 @@ void MissileHit(Missile *missile)
 				missile->TargetUnit = NoUnitP;
 				return;
 			}
-			MissileHitsGoal(*missile, &goal, 1);
+			MissileHitsGoal(*missile, goal, 1);
 			return;
 		}
 		MissileHitsWall(*missile, pos, 1);
@@ -948,7 +948,7 @@ void MissileHit(Missile *missile)
 				} else {
 					splash = 1;
 				}
-				MissileHitsGoal(*missile, &goal, splash);
+				MissileHitsGoal(*missile, goal, splash);
 			}
 		}
 	}
@@ -962,7 +962,7 @@ void MissileHit(Missile *missile)
 		for (int j = missile->Type->Range * 2; --j;) {
 			const Vec2i posIt = {pos.x + i, pos.y + j};
 
-			if (posIt.x >= 0 && posIt.x < Map.Info.MapWidth && posIt.y >= 0 && posIt.y < Map.Info.MapHeight) {
+			if (Map.Info.IsPointOnMap(posIt.x, posIt.y)) {
 				int d = MapDistance(pos.x + missile->Type->Range, pos.y + missile->Type->Range, posIt.x, posIt.y);
 				d *= missile->Type->SplashFactor;
 				if (d == 0) {
@@ -1170,10 +1170,10 @@ void Missile::SaveMissile(CFile *file) const
 		this->SpriteFrame, this->State, this->AnimWait, this->Wait, this->Delay);
 
 	if (this->SourceUnit) {
-		file->printf(" \"source\", \"%s\",", UnitReference(this->SourceUnit).c_str());
+		file->printf(" \"source\", \"%s\",", UnitReference(*this->SourceUnit).c_str());
 	}
 	if (this->TargetUnit) {
-		file->printf(" \"target\", \"%s\",", UnitReference(this->TargetUnit).c_str());
+		file->printf(" \"target\", \"%s\",", UnitReference(*this->TargetUnit).c_str());
 	}
 
 	file->printf(" \"damage\", %d,", this->Damage);
@@ -1561,7 +1561,7 @@ void MissileFlameShield::Action()
 			continue;
 		}
 		if (table[i]->CurrentAction() != UnitActionDie) {
-			HitUnit(this->SourceUnit, table[i], this->Damage);
+			HitUnit(this->SourceUnit, *table[i], this->Damage);
 		}
 	}
 }
@@ -1683,7 +1683,7 @@ void MissileWhirlwind::Action()
 			// find new destination in the map
 			nx = center.x + SyncRand() % 5 - 2;
 			ny = center.y + SyncRand() % 5 - 2;
-		} while (nx < 0 && ny < 0 && nx >= Map.Info.MapWidth && ny >= Map.Info.MapHeight);
+		} while (!Map.Info.IsPointOnMap(nx, ny));
 		this->destination.x = nx * TileSizeX + TileSizeX / 2;
 		this->destination.y = ny * TileSizeY + TileSizeY / 2;
 		this->source = this->position;
@@ -1714,7 +1714,7 @@ void MissileDeathCoil::Action()
 		//
 		if (this->TargetUnit && !this->TargetUnit->Destroyed &&
 			this->TargetUnit->CurrentAction() == UnitActionDie)  {
-			HitUnit(&source, this->TargetUnit, this->Damage);
+			HitUnit(&source, *this->TargetUnit, this->Damage);
 			if (source.CurrentAction() != UnitActionDie) {
 				source.Variable[HP_INDEX].Value += this->Damage;
 				if (source.Variable[HP_INDEX].Value > source.Variable[HP_INDEX].Max) {
@@ -1736,16 +1736,16 @@ void MissileDeathCoil::Action()
 			}
 			// calculate organic enemy count
 			for (int i = 0; i < n; ++i) {
-				ec += (source.IsEnemy(table[i])
+				ec += (source.IsEnemy(*table[i])
 				/*&& table[i]->Type->Organic != 0*/);
 			}
 			if (ec > 0)  {
 				// yes organic enemies found
 				for (int i = 0; i < n; ++i) {
-					if (source.IsEnemy(table[i])/* && table[i]->Type->Organic != 0*/) {
+					if (source.IsEnemy(*table[i])/* && table[i]->Type->Organic != 0*/) {
 						// disperse damage between them
 						// NOTE: 1 is the minimal damage
-						HitUnit(&source, table[i], this->Damage / ec);
+						HitUnit(&source, *table[i], this->Damage / ec);
 					}
 				}
 				if (source.CurrentAction() != UnitActionDie) {

@@ -1852,10 +1852,10 @@ static int CclDefineDecorations(lua_State *l)
 /**
 **  Update unit variables which are not user defined.
 */
-void UpdateUnitVariables(const CUnit *unit)
+void UpdateUnitVariables(const CUnit &unit)
 {
 	int i;
-	CUnitType *type = unit->Type;
+	CUnitType *type = unit.Type;
 
 	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
@@ -1864,112 +1864,112 @@ void UpdateUnitVariables(const CUnit *unit)
 			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == HP_INDEX) {
 			continue;
 		}
-		unit->Variable[i].Value = 0;
-		unit->Variable[i].Max = 0;
-		unit->Variable[i].Enable = 1;
+		unit.Variable[i].Value = 0;
+		unit.Variable[i].Max = 0;
+		unit.Variable[i].Enable = 1;
 	}
 
 	// Transport
-	unit->Variable[TRANSPORT_INDEX].Value = unit->BoardCount;
-	unit->Variable[TRANSPORT_INDEX].Max = unit->Type->MaxOnBoard;
+	unit.Variable[TRANSPORT_INDEX].Value = unit.BoardCount;
+	unit.Variable[TRANSPORT_INDEX].Max = unit.Type->MaxOnBoard;
 
-	switch(unit->CurrentAction()) {
+	switch(unit.CurrentAction()) {
 		// Build
 		case UnitActionBuilt:
-			unit->Variable[BUILD_INDEX].Value = unit->Data.Built.Progress;
-			unit->Variable[BUILD_INDEX].Max = type->Stats[unit->Player->Index].Costs[TimeCost] * 600;
+			unit.Variable[BUILD_INDEX].Value = unit.Data.Built.Progress;
+			unit.Variable[BUILD_INDEX].Max = type->Stats[unit.Player->Index].Costs[TimeCost] * 600;
 
 			// This should happen when building unit with several peons
 			// Maybe also with only one.
 			// FIXME : Should be better to fix it in action_{build,repair}.c ?
-			if (unit->Variable[BUILD_INDEX].Value > unit->Variable[BUILD_INDEX].Max) {
+			if (unit.Variable[BUILD_INDEX].Value > unit.Variable[BUILD_INDEX].Max) {
 				// assume value is wrong.
-				unit->Variable[BUILD_INDEX].Value = unit->Variable[BUILD_INDEX].Max;
+				unit.Variable[BUILD_INDEX].Value = unit.Variable[BUILD_INDEX].Max;
 			}
 		break;
 		// Research.
 		case UnitActionResearch:
-			unit->Variable[RESEARCH_INDEX].Value =
-				unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade->ID];
-			unit->Variable[RESEARCH_INDEX].Max = unit->Data.Research.Upgrade->Costs[TimeCost];
+			unit.Variable[RESEARCH_INDEX].Value =
+				unit.Player->UpgradeTimers.Upgrades[unit.Data.Research.Upgrade->ID];
+			unit.Variable[RESEARCH_INDEX].Max = unit.Data.Research.Upgrade->Costs[TimeCost];
 		break;
 		// Training
 		case UnitActionTrain:
-			unit->Variable[TRAINING_INDEX].Value = unit->Data.Train.Ticks;
-			unit->Variable[TRAINING_INDEX].Max =
-				unit->CurrentOrder()->Arg1.Type->Stats[unit->Player->Index].Costs[TimeCost];
+			unit.Variable[TRAINING_INDEX].Value = unit.Data.Train.Ticks;
+			unit.Variable[TRAINING_INDEX].Max =
+				unit.CurrentOrder()->Arg1.Type->Stats[unit.Player->Index].Costs[TimeCost];
 		break;
 		// UpgradeTo
 		case UnitActionUpgradeTo:
-			unit->Variable[UPGRADINGTO_INDEX].Value = unit->Data.UpgradeTo.Ticks;
-			unit->Variable[UPGRADINGTO_INDEX].Max =
-				unit->CurrentOrder()->Arg1.Type->Stats[unit->Player->Index].Costs[TimeCost];
+			unit.Variable[UPGRADINGTO_INDEX].Value = unit.Data.UpgradeTo.Ticks;
+			unit.Variable[UPGRADINGTO_INDEX].Max =
+				unit.CurrentOrder()->Arg1.Type->Stats[unit.Player->Index].Costs[TimeCost];
 		break;
 		default:
 		break;
 	}
 
 	// Resources.
-	if (unit->Type->GivesResource) {
-		unit->Variable[GIVERESOURCE_INDEX].Value = unit->ResourcesHeld;
-		unit->Variable[GIVERESOURCE_INDEX].Max = 0x7FFFFFFF;
+	if (unit.Type->GivesResource) {
+		unit.Variable[GIVERESOURCE_INDEX].Value = unit.ResourcesHeld;
+		unit.Variable[GIVERESOURCE_INDEX].Max = 0x7FFFFFFF;
 	}
-	if (unit->Type->Harvester && unit->CurrentResource) {
-		unit->Variable[CARRYRESOURCE_INDEX].Value = unit->ResourcesHeld;
-		unit->Variable[CARRYRESOURCE_INDEX].Max = unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity;
+	if (unit.Type->Harvester && unit.CurrentResource) {
+		unit.Variable[CARRYRESOURCE_INDEX].Value = unit.ResourcesHeld;
+		unit.Variable[CARRYRESOURCE_INDEX].Max = unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity;
 	}
 
 	// Supply
-	unit->Variable[SUPPLY_INDEX].Value = unit->Type->Supply;
-	unit->Variable[SUPPLY_INDEX].Max = unit->Player->Supply;
-	if (unit->Player->Supply < unit->Type->Supply) { // Come with 1st supply building.
-		unit->Variable[SUPPLY_INDEX].Value = unit->Variable[SUPPLY_INDEX].Max;
+	unit.Variable[SUPPLY_INDEX].Value = unit.Type->Supply;
+	unit.Variable[SUPPLY_INDEX].Max = unit.Player->Supply;
+	if (unit.Player->Supply < unit.Type->Supply) { // Come with 1st supply building.
+		unit.Variable[SUPPLY_INDEX].Value = unit.Variable[SUPPLY_INDEX].Max;
 	}
-	unit->Variable[SUPPLY_INDEX].Enable = unit->Type->Supply > 0;
+	unit.Variable[SUPPLY_INDEX].Enable = unit.Type->Supply > 0;
 
 	// Demand
-	unit->Variable[DEMAND_INDEX].Value = unit->Type->Demand;
-	unit->Variable[DEMAND_INDEX].Max = unit->Player->Demand;
-	unit->Variable[DEMAND_INDEX].Enable = unit->Type->Demand > 0;
+	unit.Variable[DEMAND_INDEX].Value = unit.Type->Demand;
+	unit.Variable[DEMAND_INDEX].Max = unit.Player->Demand;
+	unit.Variable[DEMAND_INDEX].Enable = unit.Type->Demand > 0;
 
 	// SightRange
-	unit->Variable[SIGHTRANGE_INDEX].Value = type->Variable[SIGHTRANGE_INDEX].Value;
-	unit->Variable[SIGHTRANGE_INDEX].Max = unit->Stats->Variables[SIGHTRANGE_INDEX].Max;
+	unit.Variable[SIGHTRANGE_INDEX].Value = type->Variable[SIGHTRANGE_INDEX].Value;
+	unit.Variable[SIGHTRANGE_INDEX].Max = unit.Stats->Variables[SIGHTRANGE_INDEX].Max;
 
 	// AttackRange
-	unit->Variable[ATTACKRANGE_INDEX].Value = type->Variable[ATTACKRANGE_INDEX].Max;
-	unit->Variable[ATTACKRANGE_INDEX].Max = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
+	unit.Variable[ATTACKRANGE_INDEX].Value = type->Variable[ATTACKRANGE_INDEX].Max;
+	unit.Variable[ATTACKRANGE_INDEX].Max = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 
 	// Position
-	unit->Variable[POSX_INDEX].Value = unit->tilePos.x;
-	unit->Variable[POSX_INDEX].Max = Map.Info.MapWidth;
-	unit->Variable[POSY_INDEX].Value = unit->tilePos.y;
-	unit->Variable[POSY_INDEX].Max = Map.Info.MapHeight;
+	unit.Variable[POSX_INDEX].Value = unit.tilePos.x;
+	unit.Variable[POSX_INDEX].Max = Map.Info.MapWidth;
+	unit.Variable[POSY_INDEX].Value = unit.tilePos.y;
+	unit.Variable[POSY_INDEX].Max = Map.Info.MapHeight;
 
 	// RadarRange
-	unit->Variable[RADAR_INDEX].Value = unit->Stats->Variables[RADAR_INDEX].Value;
-	unit->Variable[RADAR_INDEX].Max = unit->Stats->Variables[RADAR_INDEX].Value;
+	unit.Variable[RADAR_INDEX].Value = unit.Stats->Variables[RADAR_INDEX].Value;
+	unit.Variable[RADAR_INDEX].Max = unit.Stats->Variables[RADAR_INDEX].Value;
 
 	// RadarJammerRange
-	unit->Variable[RADARJAMMER_INDEX].Value = unit->Stats->Variables[RADARJAMMER_INDEX].Value;
-	unit->Variable[RADARJAMMER_INDEX].Max = unit->Stats->Variables[RADARJAMMER_INDEX].Value;
+	unit.Variable[RADARJAMMER_INDEX].Value = unit.Stats->Variables[RADARJAMMER_INDEX].Value;
+	unit.Variable[RADARJAMMER_INDEX].Max = unit.Stats->Variables[RADARJAMMER_INDEX].Value;
 
 	// SlotNumber
-	unit->Variable[SLOT_INDEX].Value = unit->Slot;
-	unit->Variable[SLOT_INDEX].Max = UnitSlotFree - 1;
+	unit.Variable[SLOT_INDEX].Value = unit.Slot;
+	unit.Variable[SLOT_INDEX].Max = UnitSlotFree - 1;
 
 	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
-		unit->Variable[i].Enable &= unit->Variable[i].Max > 0;
+		unit.Variable[i].Enable &= unit.Variable[i].Max > 0;
 #ifdef DEBUG
-		if (unit->Variable[i].Value > unit->Variable[i].Max) {
+		if (unit.Variable[i].Value > unit.Variable[i].Max) {
 			DebugPrint("Value out of range: '%s'(%d), for variable '%s',"
 						" value = %d, max = %d\n"
-						_C_ type->Ident.c_str() _C_ unit->Slot _C_ UnitTypeVar.VariableNameLookup[i]
-						_C_ unit->Variable[i].Value _C_ unit->Variable[i].Max);
-			unit->Variable[i].Value = unit->Variable[i].Max;
+						_C_ type->Ident.c_str() _C_ unit.Slot _C_ UnitTypeVar.VariableNameLookup[i]
+						_C_ unit.Variable[i].Value _C_ unit.Variable[i].Max);
+			unit.Variable[i].Value = unit.Variable[i].Max;
 		} else
 #endif
-		Assert(unit->Variable[i].Value <= unit->Variable[i].Max);
+		Assert(unit.Variable[i].Value <= unit.Variable[i].Max);
 	}
 
 	// BoolFlag

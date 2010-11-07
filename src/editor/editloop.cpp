@@ -234,7 +234,7 @@ void EditTile(int x, int y, int tile)
 {
 	CMapField *mf;
 
-	Assert(x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight);
+	Assert(Map.Info.IsPointOnMap(x, y));
 
 	ChangeTile(x, y, GetTileNumber(tile, TileToolRandom, TileToolDecoration));
 
@@ -342,21 +342,18 @@ void EditTiles(int x, int y, int tile, int size)
 */
 static void EditorActionPlaceUnit(int x, int y, CUnitType *type, CPlayer *player)
 {
-	CUnit *unit;
-	CBuildRestrictionOnTop *b;
-
 	if (type->Neutral) {
 		player = &Players[PlayerNumNeutral];
 	}
 
 	// FIXME: vladi: should check place when mirror editing is enabled...?
-	unit = MakeUnitAndPlace(x, y, type, player);
+	CUnit *unit = MakeUnitAndPlace(x, y, type, player);
 	if (unit == NoUnitP) {
 		DebugPrint("Unable to allocate Unit");
 		return;
 	}
 
-	b = OnTopDetails(unit, NULL);
+	CBuildRestrictionOnTop *b = OnTopDetails(*unit, NULL);
 	if (b && b->ReplaceOnBuild) {
 		int n;
 		CUnit *table[UnitMax];
@@ -367,8 +364,8 @@ static void EditorActionPlaceUnit(int x, int y, CUnitType *type, CPlayer *player
 			if (table[n]->Type == b->Parent) {
 				unit->ResourcesHeld = table[n]->ResourcesHeld; // We capture the value of what is beneath.
 				table[n]->Remove(NULL); // Destroy building beneath
-				UnitLost(table[n]);
-				UnitClearOrders(table[n]);
+				UnitLost(*table[n]);
+				UnitClearOrders(*table[n]);
 				table[n]->Release();
 				break;
 			}
@@ -409,12 +406,12 @@ static void EditorPlaceUnit(int x, int y, CUnitType *type, CPlayer *player)
 /**
 **  Remove a unit
 */
-static void EditorActionRemoveUnit(CUnit *unit)
+static void EditorActionRemoveUnit(CUnit &unit)
 {
-	unit->Remove(NULL);
+	unit.Remove(NULL);
 	UnitLost(unit);
 	UnitClearOrders(unit);
-	unit->Release();
+	unit.Release();
 	UI.StatusLine.Set(_("Unit deleted"));
 	UpdateMinimap = true;
 }
@@ -422,14 +419,14 @@ static void EditorActionRemoveUnit(CUnit *unit)
 /**
 **  Remove a unit
 */
-static void EditorRemoveUnit(CUnit *unit)
+static void EditorRemoveUnit(CUnit &unit)
 {
 	EditorAction editorAction;
 	editorAction.Type = EditorActionTypeRemoveUnit;
-	editorAction.X = unit->tilePos.x;
-	editorAction.Y = unit->tilePos.y;
-	editorAction.UnitType = unit->Type;
-	editorAction.Player = unit->Player;
+	editorAction.X = unit.tilePos.x;
+	editorAction.Y = unit.tilePos.y;
+	editorAction.UnitType = unit.Type;
+	editorAction.Player = unit.Player;
 
 	EditorActionRemoveUnit(unit);
 	EditorAddUndoAction(editorAction);
@@ -453,7 +450,7 @@ static void EditorUndoAction()
 		case EditorActionTypePlaceUnit:
 		{
 			CUnit *unit = UnitOnMapTile(action.X, action.Y, action.UnitType->UnitType);
-			EditorActionRemoveUnit(unit);
+			EditorActionRemoveUnit(*unit);
 			break;
 		}
 
@@ -483,7 +480,7 @@ static void EditorRedoAction()
 		case EditorActionTypeRemoveUnit:
 		{
 			CUnit *unit = UnitOnMapTile(action.X, action.Y, action.UnitType->UnitType);
-			EditorActionRemoveUnit(unit);
+			EditorActionRemoveUnit(*unit);
 			break;
 		}
 	}
@@ -1096,16 +1093,16 @@ static void DrawEditorInfo(void)
 **
 **  @param unit  Unit pointer.
 */
-static void ShowUnitInfo(const CUnit *unit)
+static void ShowUnitInfo(const CUnit &unit)
 {
 	char buf[256];
 	int i;
 
 	i = sprintf(buf, "#%d '%s' Player:#%d %s", UnitNumber(unit),
-		unit->Type->Name.c_str(), unit->Player->Index,
-		unit->Active ? "active" : "passive");
-	if (unit->Type->GivesResource) {
-		sprintf(buf + i," Amount %d", unit->ResourcesHeld);
+		unit.Type->Name.c_str(), unit.Player->Index,
+		unit.Active ? "active" : "passive");
+	if (unit.Type->GivesResource) {
+		sprintf(buf + i," Amount %d", unit.ResourcesHeld);
 	}
 	UI.StatusLine.Set(buf);
 }
@@ -1113,7 +1110,7 @@ static void ShowUnitInfo(const CUnit *unit)
 /**
 **  Update editor display.
 */
-void EditorUpdateDisplay(void)
+void EditorUpdateDisplay()
 {
 	DrawMapArea(); // draw the map area
 
@@ -1496,7 +1493,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case SDLK_BACKSPACE:
 		case SDLK_DELETE: // Delete
 			if (UnitUnderCursor != NULL) {
-				EditorRemoveUnit(UnitUnderCursor);
+				EditorRemoveUnit(*UnitUnderCursor);
 			}
 			break;
 
@@ -1952,7 +1949,7 @@ static void EditorCallbackMouse(int x, int y)
 			CursorY - UI.MouseViewport->Y +
 				UI.MouseViewport->MapY * TileSizeY + UI.MouseViewport->OffsetY);
 		if (UnitUnderCursor != NULL) {
-			ShowUnitInfo(UnitUnderCursor);
+			ShowUnitInfo(*UnitUnderCursor);
 			return;
 		}
 	}

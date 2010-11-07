@@ -435,7 +435,7 @@ void CMinimap::UpdateXY(int tx, int ty)
 /**
 **  Draw a unit on the minimap.
 */
-static void DrawUnitOn(CUnit *unit, int red_phase)
+static void DrawUnitOn(CUnit &unit, int red_phase)
 {
 	CUnitType *type;
 	int mx;
@@ -447,37 +447,37 @@ static void DrawUnitOn(CUnit *unit, int red_phase)
 	SDL_Color c;
 	int bpp;
 
-	if (Editor.Running || ReplayRevealMap || unit->IsVisible(ThisPlayer)) {
-		type = unit->Type;
+	if (Editor.Running || ReplayRevealMap || unit.IsVisible(ThisPlayer)) {
+		type = unit.Type;
 	} else {
-		type = unit->Seen.Type;
+		type = unit.Seen.Type;
 		// This will happen for radar if the unit has not been seen and we
 		// have it on radar.
 		if (!type) {
-			type = unit->Type;
+			type = unit.Type;
 		}
 	}
 
-	if (unit->Player->Index == PlayerNumNeutral) {
+	if (unit.Player->Index == PlayerNumNeutral) {
 		color = Video.MapRGB(TheScreen->format,
 			type->NeutralMinimapColorRGB.r,
 			type->NeutralMinimapColorRGB.g,
 			type->NeutralMinimapColorRGB.b);
-	} else if (unit->Player == ThisPlayer && !Editor.Running) {
-		if (unit->Attacked && unit->Attacked + ATTACK_BLINK_DURATION > GameCycle &&
-				(red_phase || unit->Attacked + ATTACK_RED_DURATION > GameCycle)) {
+	} else if (unit.Player == ThisPlayer && !Editor.Running) {
+		if (unit.Attacked && unit.Attacked + ATTACK_BLINK_DURATION > GameCycle &&
+				(red_phase || unit.Attacked + ATTACK_RED_DURATION > GameCycle)) {
 			color = ColorRed;
-		} else if (UI.Minimap.ShowSelected && unit->Selected) {
+		} else if (UI.Minimap.ShowSelected && unit.Selected) {
 			color = ColorWhite;
 		} else {
 			color = ColorGreen;
 		}
 	} else {
-		color = unit->Player->Color;
+		color = unit.Player->Color;
 	}
 
-	mx = 1 + UI.Minimap.XOffset + Map2MinimapX[unit->tilePos.x];
-	my = 1 + UI.Minimap.YOffset + Map2MinimapY[unit->tilePos.y];
+	mx = 1 + UI.Minimap.XOffset + Map2MinimapX[unit.tilePos.x];
+	my = 1 + UI.Minimap.YOffset + Map2MinimapY[unit.tilePos.y];
 	w = Map2MinimapX[type->TileWidth];
 	if (mx + w >= UI.Minimap.W) { // clip right side
 		w = UI.Minimap.W - mx;
@@ -593,7 +593,7 @@ void CMinimap::Update(void)
 	//
 	for (n = 0; n < NumUnits; ++n) {
 		if (Units[n]->IsVisibleOnMinimap()) {
-			DrawUnitOn(Units[n], red_phase);
+			DrawUnitOn(*Units[n], red_phase);
 		}
 	}
 

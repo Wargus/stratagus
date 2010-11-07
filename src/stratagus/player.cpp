@@ -295,13 +295,13 @@ void SavePlayers(CFile *file)
 			CUnitCache &autoatacktargets = p->AutoAttackTargets;
 			for(unsigned int k = 0; k < autoatacktargets.size();)
 			{
-				CUnit *aatarget = autoatacktargets[k];
+				CUnit &aatarget = *autoatacktargets[k];
 
 				//Additional security
-				if(!aatarget->IsAliveOnMap() ||
-					Map.Field(aatarget->tilePos.x, aatarget->tilePos.y)->Guard[i] == 0) {
+				if (!aatarget.IsAliveOnMap() ||
+					Map.Field(aatarget.tilePos.x, aatarget.tilePos.y)->Guard[i] == 0) {
 					autoatacktargets.Units.erase(autoatacktargets.Units.begin() + k);
-					aatarget->RefsDecrease();
+					aatarget.RefsDecrease();
 					continue;
 				}
 				if (k) {
@@ -312,7 +312,6 @@ void SavePlayers(CFile *file)
 			}
 			file->printf("}");
 		}
-
 		file->printf(")\n\n");
 	}
 
@@ -637,11 +636,11 @@ int CPlayer::CheckCosts(const int *costs) const
 
 			err |= 1 << i;
 			if (i==1)
-				if (GameSounds.NotEnough1[this->Race].Sound) 
+				if (GameSounds.NotEnough1[this->Race].Sound)
 					PlayGameSound(GameSounds.NotEnough1[this->Race].Sound,
 								MaxSampleVolume);
 			if (i==2)
-				if (GameSounds.NotEnough2[this->Race].Sound) 
+				if (GameSounds.NotEnough2[this->Race].Sound)
 					PlayGameSound(GameSounds.NotEnough2[this->Race].Sound,
 								MaxSampleVolume);
 		}
@@ -792,12 +791,11 @@ void PlayersEachCycle(void)
 			}
 			if(autoatacktargets.size() > 0) {
 				for (int j = 0; j < p->TotalNumUnits; ++j) {
-					CUnit *guard = p->Units[j];
-					bool stand_ground =
-						guard->CurrentAction() == UnitActionStandGround;
-					if (guard->Type->CanAttack &&
-								(stand_ground || guard->IsIdle()) &&
-								 !guard->IsUnusable()) {
+					CUnit &guard = *p->Units[j];
+					bool stand_ground = guard.CurrentAction() == UnitActionStandGround;
+					if (guard.Type->CanAttack &&
+								(stand_ground || guard.IsIdle()) &&
+								 !guard.IsUnusable()) {
 						AutoAttack(guard, autoatacktargets, stand_ground);
 					}
 				}
@@ -953,9 +951,9 @@ bool CPlayer::IsEnemy(const CPlayer *x) const
 /**
 **  Check if the unit is an enemy
 */
-bool CPlayer::IsEnemy(const CUnit *x) const
+bool CPlayer::IsEnemy(const CUnit &unit) const
 {
-	return IsEnemy(x->Player);
+	return IsEnemy(unit.Player);
 }
 
 /**
@@ -969,9 +967,9 @@ bool CPlayer::IsAllied(const CPlayer *x) const
 /**
 **  Check if the unit is an ally
 */
-bool CPlayer::IsAllied(const CUnit *x) const
+bool CPlayer::IsAllied(const CUnit &unit) const
 {
-	return IsAllied(x->Player);
+	return IsAllied(unit.Player);
 }
 
 /**
@@ -985,9 +983,9 @@ bool CPlayer::IsSharedVision(const CPlayer *x) const
 /**
 **  Check if the player shares vision with the unit
 */
-bool CPlayer::IsSharedVision(const CUnit *x) const
+bool CPlayer::IsSharedVision(const CUnit &unit) const
 {
-	return IsSharedVision(x->Player);
+	return IsSharedVision(unit.Player);
 }
 
 /**
@@ -1002,9 +1000,9 @@ bool CPlayer::IsBothSharedVision(const CPlayer *x) const
 /**
 **  Check if the player and the unit share vision
 */
-bool CPlayer::IsBothSharedVision(const CUnit *x) const
+bool CPlayer::IsBothSharedVision(const CUnit &unit) const
 {
-	return IsBothSharedVision(x->Player);
+	return IsBothSharedVision(unit.Player);
 }
 
 /**
@@ -1018,9 +1016,9 @@ bool CPlayer::IsTeamed(const CPlayer *x) const
 /**
 **  Check if the unit is teamed
 */
-bool CPlayer::IsTeamed(const CUnit *x) const
+bool CPlayer::IsTeamed(const CUnit &unit) const
 {
-	return IsTeamed(x->Player);
+	return IsTeamed(unit.Player);
 }
 
 //@}

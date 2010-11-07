@@ -54,54 +54,54 @@
 **
 **  @param unit  The unit which dies.
 */
-void HandleActionDie(CUnit *unit)
+void HandleActionDie(CUnit &unit)
 {
 	//
 	// Show death animation
 	//
-	if (unit->Type->Animations && unit->Type->Animations->Death) {
-		UnitShowAnimation(unit, unit->Type->Animations->Death);
+	if (unit.Type->Animations && unit.Type->Animations->Death) {
+		UnitShowAnimation(unit, unit.Type->Animations->Death);
 	} else {
 		// some units has no death animation
-		unit->Anim.Unbreakable = 0;
+		unit.Anim.Unbreakable = 0;
 	}
 
 	//
 	// Die sequence terminated, generate corpse.
 	//
-	if (!unit->Anim.Unbreakable) {
-		if (!unit->Type->CorpseType) {
+	if (!unit.Anim.Unbreakable) {
+		if (!unit.Type->CorpseType) {
 			// We may be in the cache if we just finished out death animation
 			// even though there is no corpse.
-			// (unit->Type->Animations && unit->Type->Animations->Death)
+			// (unit.Type->Animations && unit.Type->Animations->Death)
 			// Remove us from the map to be safe
-			unit->Remove(NULL);
-			unit->Release();
+			unit.Remove(NULL);
+			unit.Release();
 			return;
 		}
 
-		Assert(unit->Type->TileWidth == unit->Type->CorpseType->TileWidth &&
-			unit->Type->TileHeight == unit->Type->CorpseType->TileHeight);
+		Assert(unit.Type->TileWidth == unit.Type->CorpseType->TileWidth &&
+			unit.Type->TileHeight == unit.Type->CorpseType->TileHeight);
 
 		// Update sight for new corpse
 		// We have to unmark BEFORE changing the type.
 		// Always do that, since types can have different vision properties.
 		MapUnmarkUnitGuard(unit);
 		MapUnmarkUnitSight(unit);
-		unit->Type = unit->Type->CorpseType;
-		unit->CurrentSightRange = 
-			unit->Type->Stats[unit->Player->Index].Variables[SIGHTRANGE_INDEX].Max;
+		unit.Type = unit.Type->CorpseType;
+		unit.CurrentSightRange =
+			unit.Type->Stats[unit.Player->Index].Variables[SIGHTRANGE_INDEX].Max;
 		MapMarkUnitSight(unit);
 
 		// We must be dead to get here, it we aren't we need to know why
 		// This assert replaces and old DEBUG message "Reset to die is really needed"
-		Assert(unit->CurrentAction() == UnitActionDie);
+		Assert(unit.CurrentAction() == UnitActionDie);
 
-		unit->SubAction = 0;
-		unit->Frame = 0;
+		unit.SubAction = 0;
+		unit.Frame = 0;
 		UnitUpdateHeading(unit);
-		if (unit->Type->Animations && unit->Type->Animations->Death) {
-			UnitShowAnimation(unit, unit->Type->Animations->Death);
+		if (unit.Type->Animations && unit.Type->Animations->Death) {
+			UnitShowAnimation(unit, unit.Type->Animations->Death);
 		}
 	}
 }

@@ -176,7 +176,7 @@ public:
 	{
 		return x + y * this->Info.MapWidth;
 	}
-	
+
 	inline CMapField *Field(unsigned int index) const {
 		return &this->Fields[index];
 	}
@@ -243,42 +243,42 @@ public:
 	bool IsFieldExplored(const CPlayer *const player,
 					 const unsigned int index) const
 	{
-		//return IsTileVisible(player, index) > 0;	
-#if 1	
+		//return IsTileVisible(player, index) > 0;
+#if 1
 		return this->Fields[index].IsExplored(player->Index);
 #else
 		if(!this->Fields[index].Visible[player->Index])
 			return IsTileVisible(player, index) > 0;
-		return true;	
+		return true;
 #endif
 	};
 
 	/// Check if a field for the user is visible.
-	bool IsFieldVisible(const CPlayer *const player, 
+	bool IsFieldVisible(const CPlayer *const player,
 			const unsigned int index) const
 	{
 		return IsTileVisible(player, index) > 1;
 	};
-	
-	
+
+
 	unsigned short IsTileVisible(const CPlayer *const player,
 			int x, int y) const
 	{
 		return IsTileVisible(player, getIndex(x,y));
 	};
-	
+
 	/// Check if a field for the user is explored.
 	bool IsFieldExplored(const CPlayer *const player, int x, int y) const
 	{
 	 	return IsFieldExplored(player, getIndex(x,y));
 	}
-	
+
 	/// Check if a field for the user is visible.
 	bool IsFieldVisible(const CPlayer *const player, int x, int y) const
 	{
 		return IsTileVisible(player, getIndex(x,y)) > 1;
 	}
-	
+
 	/// Mark a tile as seen by the player.
 	void MarkSeenTile(const unsigned int index);
 
@@ -339,13 +339,13 @@ public:
 		Assert(Info.IsPointOnMap(tx, ty));
 		return WaterOnMap(getIndex(tx,ty));
 	};
-	
+
 	/// Returns true, if coast on the map tile field
 	bool CoastOnMap(const unsigned int index) const
 	{
 		return CheckMask(index, MapFieldCoastAllowed);
 	};
-	
+
 	/**
 	**  Coast on map tile.
 	**
@@ -363,7 +363,7 @@ public:
 	/// Returns true, if forest on the map tile field
 	bool ForestOnMap(const unsigned int index) const
 	{
-		return CheckMask(index, MapFieldForest);	
+		return CheckMask(index, MapFieldForest);
 	};
 
 	/**
@@ -384,7 +384,7 @@ public:
 	/// Returns true, if rock on the map tile field
 	bool RockOnMap(const unsigned int index) const
 	{
-		return CheckMask(index, MapFieldRocks);	
+		return CheckMask(index, MapFieldRocks);
 	};
 
 	/**
@@ -434,7 +434,7 @@ public:
 
 
 	// Select units on map tile. - helper funtion. don't use directly
-	int Select(int x, int y, CUnit *table[], 
+	int Select(int x, int y, CUnit *table[],
 				const int tablesize = UnitMax);
 
 
@@ -529,23 +529,23 @@ extern void FreeVisionTable(void);
 //
 
 	/// Check if a tile is visible on radar
-extern unsigned char 
+extern unsigned char
 IsTileRadarVisible(const CPlayer *pradar, const CPlayer *punit, int x, int y);
 	/// Mark a tile as radar visible, or incrase radar vision
 extern void MapMarkTileRadar(const CPlayer *player, int x, int y);
-extern void 
+extern void
 MapMarkTileRadar(const CPlayer *player, const unsigned int index);
 	/// Unmark a tile as radar visible, decrease is visible by other radar
 extern void MapUnmarkTileRadar(const CPlayer *player, int x, int y);
-extern void 
+extern void
 MapUnmarkTileRadar(const CPlayer *player, const unsigned int index);
 	/// Mark a tile as radar jammed, or incrase radar jamming'ness
 extern void MapMarkTileRadarJammer(const CPlayer *player, int x, int y);
-extern void 
+extern void
 MapMarkTileRadarJammer(const CPlayer *player, const unsigned int index);
 	/// Unmark a tile as jammed, decrease is jamming'ness
 extern void MapUnmarkTileRadarJammer(const CPlayer *player, int x, int y);
-extern void 
+extern void
 MapUnmarkTileRadarJammer(const CPlayer *player, const unsigned int index);
 
 //
@@ -583,7 +583,7 @@ extern bool CheckedCanMoveToMask(int x, int y, int mask);
 	/// Returns true, if the unit-type can enter the field
 extern bool UnitTypeCanBeAt(const CUnitType *type, int x, int y);
 	/// Returns true, if the unit can enter the field
-extern bool UnitCanBeAt(const CUnit *unit, int x, int y);
+extern bool UnitCanBeAt(const CUnit &unit, int x, int y);
 
 	/// Preprocess map, for internal use.
 extern void PreprocessMap(void);
@@ -591,9 +591,9 @@ extern void PreprocessMap(void);
 // in unit.c
 
 /// Mark on vision table the Sight of the unit.
-void MapMarkUnitSight(CUnit *unit);
+void MapMarkUnitSight(CUnit &unit);
 /// Unmark on vision table the Sight of the unit.
-void MapUnmarkUnitSight(CUnit *unit);
+void MapUnmarkUnitSight(CUnit &unit);
 
 /*----------------------------------------------------------------------------
 --  Defines

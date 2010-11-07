@@ -141,22 +141,22 @@ void UnSelectAll(void)
 **
 **  @param unit  suicide unit.
 */
-static void HandleSuicideClick(CUnit *unit)
+static void HandleSuicideClick(CUnit &unit)
 {
 	static int NumClicks = 0;
 
-	Assert(unit->Type->ClicksToExplode);
+	Assert(unit.Type->ClicksToExplode);
 	if (GameObserve) {
 		return;
 	}
 
-	if (NumSelected == 1 && Selected[0] == unit) {
+	if (NumSelected == 1 && Selected[0] == &unit) {
 		NumClicks++;
 	} else {
 		NumClicks = 1;
 	}
 
-	if (NumClicks == unit->Type->ClicksToExplode) {
+	if (NumClicks == unit.Type->ClicksToExplode) {
 		SendCommandDismiss(unit);
 		NumClicks = 0;
 	}
@@ -168,9 +168,8 @@ static void HandleSuicideClick(CUnit *unit)
 **  @param units  Array of units to be selected.
 **  @param count  Number of units in array to be selected.
 */
-void ChangeSelectedUnits(CUnit **units,int count)
+void ChangeSelectedUnits(CUnit **units, int count)
 {
-	CUnit *unit;
 	int i;
 	int n;
 
@@ -178,7 +177,7 @@ void ChangeSelectedUnits(CUnit **units,int count)
 
 	if (count == 1 && units[0]->Type->ClicksToExplode &&
 		!units[0]->Type->IsNotSelectable) {
-		HandleSuicideClick(units[0]);
+		HandleSuicideClick(*units[0]);
 		if (units[0]->CurrentAction() == UnitActionDie) {
 			NetworkSendSelection(units, count);
 			return ;
@@ -187,12 +186,12 @@ void ChangeSelectedUnits(CUnit **units,int count)
 	UnSelectAll();
 	NetworkSendSelection(units, count);
 	for (n = i = 0; i < count; ++i) {
-		unit = (CUnit*)units[i];
-		if (!unit->Removed && !unit->TeamSelected && !unit->Type->IsNotSelectable) {
-			Selected[n++] = unit;
-			unit->Selected = 1;
+		CUnit &unit = *units[i];
+		if (!unit.Removed && !unit.TeamSelected && !unit.Type->IsNotSelectable) {
+			Selected[n++] = &unit;
+			unit.Selected = 1;
 			if (count > 1) {
-				unit->LastGroup = GroupId;
+				unit.LastGroup = GroupId;
 			}
 		}
 	}
@@ -257,14 +256,14 @@ void ChangeTeamSelectedUnits(CPlayer *player, CUnit **units, int adjust, int cou
 **               (if NumSelected == MaxSelectable or
 **                unit is already selected or unselectable)
 */
-int SelectUnit(CUnit *unit)
+int SelectUnit(CUnit &unit)
 {
-	if (unit->Type->Revealer) { // Revealers cannot be selected
+	if (unit.Type->Revealer) { // Revealers cannot be selected
 		DebugPrint("Selecting revealer?\n");
 		return 0;
 	}
 
-	if (unit->Removed) { // Removed cannot be selected
+	if (unit.Removed) { // Removed cannot be selected
 		DebugPrint("Selecting removed?\n");
 		return 0;
 	}
@@ -273,18 +272,18 @@ int SelectUnit(CUnit *unit)
 		return 0;
 	}
 
-	if (unit->Selected) {
+	if (unit.Selected) {
 		return 0;
 	}
 
-	if (unit->Type->IsNotSelectable && GameRunning) {
+	if (unit.Type->IsNotSelectable && GameRunning) {
 		return 0;
 	}
 
-	Selected[NumSelected++] = unit;
-	unit->Selected = 1;
+	Selected[NumSelected++] = &unit;
+	unit.Selected = 1;
 	if (NumSelected > 1) {
-		Selected[0]->LastGroup = unit->LastGroup = GroupId;
+		Selected[0]->LastGroup = unit.LastGroup = GroupId;
 	}
 	return 1;
 }
@@ -294,9 +293,11 @@ int SelectUnit(CUnit *unit)
 **
 **  @param unit  Pointer to unit to be selected.
 */
-void SelectSingleUnit(CUnit *unit)
+void SelectSingleUnit(CUnit &unit)
 {
-	ChangeSelectedUnits(&unit, 1);
+	CUnit *unitPtr = &unit;
+
+	ChangeSelectedUnits(&unitPtr, 1);
 }
 
 /**
@@ -304,15 +305,15 @@ void SelectSingleUnit(CUnit *unit)
 **
 **  @param unit  Pointer to unit to be unselected.
 */
-void UnSelectUnit(CUnit *unit)
+void UnSelectUnit(CUnit &unit)
 {
 	int i;
 	int j;
 
-	if (unit->TeamSelected) {
+	if (unit.TeamSelected) {
 		for (i = 0; i < PlayerMax; ++i) {
-			if (unit->TeamSelected & (1 << i)) {
-				for (j = 0; TeamSelected[i][j] != unit; ++i) {
+			if (unit.TeamSelected & (1 << i)) {
+				for (j = 0; TeamSelected[i][j] != &unit; ++i) {
 					;
 				}
 				Assert(j < TeamNumSelected[i]);
@@ -321,15 +322,15 @@ void UnSelectUnit(CUnit *unit)
 
 					TeamSelected[i][j] = TeamSelected[i][TeamNumSelected[i]];
 				}
-				unit->TeamSelected &= ~(1 << i);
+				unit.TeamSelected &= ~(1 << i);
 			}
 		}
 	}
-	if (!unit->Selected) {
+	if (!unit.Selected) {
 		return;
 	}
 
-	for (i = 0; Selected[i] != unit; ++i) {
+	for (i = 0; Selected[i] != &unit; ++i) {
 		;
 	}
 	Assert(i < NumSelected);
@@ -347,7 +348,7 @@ void UnSelectUnit(CUnit *unit)
 	}
 
 	Selected[NumSelected] = NoUnitP; // FIXME: only needed for old code
-	unit->Selected = 0;
+	unit.Selected = 0;
 }
 
 /**
@@ -356,9 +357,9 @@ void UnSelectUnit(CUnit *unit)
 **  @param unit  Pointer to unit to be toggled.
 **  @return      0 if unselected, 1 otherwise
 */
-int ToggleSelectUnit(CUnit *unit)
+int ToggleSelectUnit(CUnit &unit)
 {
-	if (unit->Selected) {
+	if (unit.Selected) {
 		UnSelectUnit(unit);
 		return 0;
 	}
@@ -380,10 +381,10 @@ int ToggleSelectUnit(CUnit *unit)
 **
 **  FIXME: should always select the nearest 9 units to the base!
 */
-int SelectUnitsByType(CUnit *base)
+int SelectUnitsByType(CUnit &base)
 {
 	CUnit *unit;
-	const CUnitType *type = base->Type;
+	const CUnitType *type = base.Type;
 	int r;
 	int i;
 	const CViewport *vp = UI.MouseViewport;
@@ -396,25 +397,25 @@ int SelectUnitsByType(CUnit *base)
 
 	// if unit is a cadaver or hidden (not on map)
 	// no unit can be selected.
-	if (base->Removed || base->CurrentAction() == UnitActionDie) {
+	if (base.Removed || base.CurrentAction() == UnitActionDie) {
 		return 0;
 	}
 
 	if (type->IsNotSelectable && GameRunning) {
 		return 0;
 	}
-	if (base->TeamSelected) { // Somebody else onteam has this unit
+	if (base.TeamSelected) { // Somebody else onteam has this unit
 		return 0;
 	}
 
 	UnSelectAll();
-	Selected[0] = base;
-	base->Selected = 1;
+	Selected[0] = &base;
+	base.Selected = 1;
 	NumSelected = 1;
 
 	// if unit isn't belonging to the player or allied player, or is a static unit
 	// (like a building), only 1 unit can be selected at the same time.
-	if (!CanSelectMultipleUnits(base->Player) || !type->SelectableByRectangle) {
+	if (!CanSelectMultipleUnits(base.Player) || !type->SelectableByRectangle) {
 		return NumSelected;
 	}
 
@@ -440,7 +441,7 @@ int SelectUnitsByType(CUnit *base)
 		if (unit->IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit == base) {  // no need to have the same unit twice :)
+		if (unit == &base) {  // no need to have the same unit twice :)
 			continue;
 		}
 		if (unit->TeamSelected) { // Somebody else onteam has this unit
@@ -476,20 +477,19 @@ int SelectUnitsByType(CUnit *base)
 **  FIXME: toggle not written
 **  FIXME: should always select the nearest 9 units to the base!
 */
-int ToggleUnitsByType(CUnit *base)
+int ToggleUnitsByType(CUnit &base)
 {
-	CUnit *unit;
-	const CUnitType *type = base->Type;
+	const CUnitType *type = base.Type;
 	int i;
 
 	// if unit is a cadaver or hidden (not on map)
 	// no unit can be selected.
-	if (base->Removed || base->CurrentAction() == UnitActionDie) {
+	if (base.Removed || base.CurrentAction() == UnitActionDie) {
 		return 0;
 	}
 	// if unit isn't belonging to the player, or is a static unit
 	// (like a building), only 1 unit can be selected at the same time.
-	if (!CanSelectMultipleUnits(base->Player) || !type->SelectableByRectangle) {
+	if (!CanSelectMultipleUnits(base.Player) || !type->SelectableByRectangle) {
 		return 0;
 	}
 
@@ -514,17 +514,18 @@ int ToggleUnitsByType(CUnit *base)
 	// FIXME: peon/peasant with gold/wood & co are considered from
 	// different type... idem for tankers
 	for (i = 0; i < r; ++i) {
-		unit = table[i];
-		if (!CanSelectMultipleUnits(unit->Player) || unit->Type != type) {
+		CUnit &unit = *table[i];
+
+		if (!CanSelectMultipleUnits(unit.Player) || unit.Type != type) {
 			continue;
 		}
-		if (unit->IsUnusable()) { // guess SelectUnits doesn't check this
+		if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit == base) { // no need to have the same unit twice
+		if (&unit == &base) { // no need to have the same unit twice
 			continue;
 		}
-		if (unit->TeamSelected) { // Somebody else onteam has this unit
+		if (unit.TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
 		if (!SelectUnit(unit)) { // add unit to selection
@@ -579,18 +580,18 @@ int SelectGroup(int group_number, GroupSelectionMode mode)
 **  @return      0 if the unit doesn't belong to a group,
 **               or the number of units in the group.
 */
-int AddGroupFromUnitToSelection(CUnit *unit)
+int AddGroupFromUnitToSelection(CUnit &unit)
 {
 	int i;
 	int group;
 
-	if (!(group = unit->LastGroup)) { // belongs to no group
+	if (!(group = unit.LastGroup)) { // belongs to no group
 		return 0;
 	}
 
 	for (i = 0; i < NumUnits; ++i) {
 		if (Units[i]->LastGroup == group && !Units[i]->Removed) {
-			SelectUnit(Units[i]);
+			SelectUnit(*Units[i]);
 			if (NumSelected == MaxSelectable) {
 				return NumSelected;
 			}
@@ -609,9 +610,9 @@ int AddGroupFromUnitToSelection(CUnit *unit)
 **  @return      0 if the unit doesn't belong to a group,
 **               or the number of units in the group.
 */
-int SelectGroupFromUnit(CUnit *unit)
+int SelectGroupFromUnit(CUnit &unit)
 {
-	if (!unit->LastGroup) { // belongs to no group
+	if (!unit.LastGroup) { // belongs to no group
 		return 0;
 	}
 
@@ -707,7 +708,6 @@ static int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
 static int DoSelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1,
 CUnit**table, int num_units = UnitMax)
 {
-	CUnit *unit;
 	CUnitType *type;
 	int r;
 	int n;
@@ -738,12 +738,12 @@ CUnit**table, int num_units = UnitMax)
 	// 2) If no unit found, try a player's unit not selectable by rectangle
 	//
 	for (i = 0; i < r; ++i) {
-		unit = (CUnit*)table[i];
-		if (!CanSelectMultipleUnits(unit->Player)) {
+		CUnit &unit = *table[i];
+		if (!CanSelectMultipleUnits(unit.Player)) {
 			continue;
 		}
 		// FIXME: Can we get this?
-		if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
+		if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
 			SelectSingleUnit(unit);
 			return 1;
 		}
@@ -753,17 +753,17 @@ CUnit**table, int num_units = UnitMax)
 	// 3) If no unit found, try a resource or a neutral critter
 	//
 	for (i = 0; i < r; ++i) {
-		unit = (CUnit*)table[i];
+		CUnit &unit = *table[i];
 		// Unit visible FIXME: write function UnitSelectable
-		if (!unit->IsVisibleInViewport(UI.SelectedViewport)) {
+		if (!unit.IsVisibleInViewport(UI.SelectedViewport)) {
 			continue;
 		}
-		type = unit->Type;
+		type = unit.Type;
 		// Buildings are visible but not selectable
-		if (type->Building && !unit->IsVisibleOnMap(ThisPlayer)) {
+		if (type->Building && !unit.IsVisibleOnMap(ThisPlayer)) {
 			continue;
 		}
-		if ((type->GivesResource && !unit->Removed)) { // no built resources.
+		if ((type->GivesResource && !unit.Removed)) { // no built resources.
 			SelectSingleUnit(unit);
 			return 1;
 		}
@@ -773,16 +773,16 @@ CUnit**table, int num_units = UnitMax)
 	// 4) If no unit found, select an enemy unit (first found)
 	//
 	for (i = 0; i < r; ++i) {
-		unit = (CUnit*)table[i];
+		CUnit &unit = *table[i];
 		// Unit visible FIXME: write function UnitSelectable
-		if (!unit->IsVisibleInViewport(UI.SelectedViewport)) {
+		if (!unit.IsVisibleInViewport(UI.SelectedViewport)) {
 			continue;
 		}
 		// Buildings are visible but not selectable
-		if (unit->Type->Building && !unit->IsVisibleOnMap(ThisPlayer)) {
+		if (unit.Type->Building && !unit.IsVisibleOnMap(ThisPlayer)) {
 			continue;
 		}
-		if (unit->IsAliveOnMap()) {
+		if (unit.IsAliveOnMap()) {
 			SelectSingleUnit(unit);
 			return 1;
 		}
@@ -863,7 +863,7 @@ int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 	}
 
 	for (i = 0; i < n && NumSelected < MaxSelectable; ++i) {
-		SelectUnit(table[i]);
+		SelectUnit(*table[i]);
 	}
 	return NumSelected;
 }
@@ -871,7 +871,6 @@ int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 static int DoSelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1,
 CUnit**table, int num_units = UnitMax)
 {
-	CUnit *unit;
 	int r;
 	int n;
 	int i;
@@ -889,20 +888,20 @@ CUnit**table, int num_units = UnitMax)
 	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
 
 	for (n = i = 0; i < r; ++i) {
-		unit = (CUnit*)table[i];
-		if (!CanSelectMultipleUnits(unit->Player) || !unit->Type->SelectableByRectangle) {
+		CUnit &unit = *table[i];
+		if (!CanSelectMultipleUnits(unit.Player) || !unit.Type->SelectableByRectangle) {
 			continue;
 		}
-		if (unit->IsUnusable()) {  // guess SelectUnits doesn't check this
+		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit->Type->UnitType == UnitTypeFly) {
+		if (unit.Type->UnitType == UnitTypeFly) {
 			continue;
 		}
-		if (unit->TeamSelected) { // Somebody else onteam has this unit
+		if (unit.TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
-		table[n++] = unit;
+		table[n++] = &unit;
 		if (n == MaxSelectable) {
 			break;
 		}
@@ -929,10 +928,8 @@ int SelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	return DoSelectGroundUnitsInRectangle(sx0, sy0, sx1, sy1, table);
 }
 
-int DoSelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1,
-CUnit**table)
+int DoSelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1, CUnit**table)
 {
-	CUnit *unit;
 	int r;
 	int n;
 	int i;
@@ -950,20 +947,20 @@ CUnit**table)
 	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
 
 	for (n = i = 0; i < r; ++i) {
-		unit = (CUnit*)table[i];
-		if (!CanSelectMultipleUnits(unit->Player) || !unit->Type->SelectableByRectangle) {
+		CUnit &unit = *table[i];
+		if (!CanSelectMultipleUnits(unit.Player) || !unit.Type->SelectableByRectangle) {
 			continue;
 		}
-		if (unit->IsUnusable()) {  // guess SelectUnits doesn't check this
+		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit->Type->UnitType != UnitTypeFly) {
+		if (unit.Type->UnitType != UnitTypeFly) {
 			continue;
 		}
-		if (unit->TeamSelected) { // Somebody else onteam has this unit
+		if (unit.TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
-		table[n++] = unit;
+		table[n++] = &unit;
 		if (n == MaxSelectable) {
 			break;
 		}
@@ -1002,7 +999,6 @@ int SelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 */
 int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
-	CUnit *unit;
 	int r;
 	int n;
 	int i;
@@ -1036,21 +1032,21 @@ int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
 
 	for (n = i = 0; i < r; ++i) {
-		unit = table[i];
-		if (!CanSelectMultipleUnits(unit->Player) ||
-			!unit->Type->SelectableByRectangle) {
+			CUnit &unit = *table[i];
+		if (!CanSelectMultipleUnits(unit.Player) ||
+			!unit.Type->SelectableByRectangle) {
 			continue;
 		}
-		if (unit->IsUnusable()) {  // guess SelectUnits doesn't check this
+		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit->Type->UnitType == UnitTypeFly) {
+		if (unit.Type->UnitType == UnitTypeFly) {
 			continue;
 		}
-		if (unit->TeamSelected) { // Somebody else onteam has this unit
+		if (unit.TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
-		table[n++] = unit;
+		table[n++] = &unit;
 		if (n == MaxSelectable) {
 			break;
 		}
@@ -1060,7 +1056,7 @@ int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	// Add the units to selected.
 	//
 	for (i = 0; i < n && NumSelected < MaxSelectable; ++i) {
-		SelectUnit(table[i]);
+		SelectUnit(*table[i]);
 	}
 	return NumSelected;
 }
@@ -1077,7 +1073,6 @@ int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 */
 int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
-	CUnit *unit;
 	int r;
 	int n;
 	int i;
@@ -1111,21 +1106,21 @@ int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
 
 	for (n = i = 0; i < r; ++i) {
-		unit = table[i];
-		if (!CanSelectMultipleUnits(unit->Player) ||
-			!unit->Type->SelectableByRectangle) {
+		CUnit &unit = *table[i];
+		if (!CanSelectMultipleUnits(unit.Player) ||
+			!unit.Type->SelectableByRectangle) {
 			continue;
 		}
-		if (unit->IsUnusable()) {  // guess SelectUnits doesn't check this
+		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit->Type->UnitType != UnitTypeFly) {
+		if (unit.Type->UnitType != UnitTypeFly) {
 			continue;
 		}
-		if (unit->TeamSelected) { // Somebody else onteam has this unit
+		if (unit.TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
-		table[n++] = unit;
+		table[n++] = &unit;
 		if (n == MaxSelectable) {
 			break;
 		}
@@ -1135,7 +1130,7 @@ int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	// Add the units to selected.
 	//
 	for (i = 0; i < n && NumSelected < MaxSelectable; ++i) {
-		SelectUnit(table[i]);
+		SelectUnit(*table[i]);
 	}
 	return NumSelected;
 }
@@ -1171,7 +1166,7 @@ void SaveSelections(CFile *file)
 	file->printf("SetGroupId(%d)\n", GroupId);
 	file->printf("Selection(%d, {", NumSelected);
 	for (int i = 0; i < NumSelected; ++i) {
-		file->printf("\"%s\", ", UnitReference(Selected[i]).c_str());
+		file->printf("\"%s\", ", UnitReference(*Selected[i]).c_str());
 	}
 	file->printf("})\n");
 }

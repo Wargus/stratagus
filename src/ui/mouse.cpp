@@ -156,7 +156,7 @@ void DoRightButton(int sx, int sy)
 				dest->ResourcesHeld < dest->Type->ResInfo[res]->ResourceCapacity &&
 				unit->Type->CanHarvest) {
 			unit->Blink = 4;
-			SendCommandResource(dest, unit, flush);
+			SendCommandResource(*dest, *unit, flush);
 			return;
 		}
 		return;
@@ -164,7 +164,7 @@ void DoRightButton(int sx, int sy)
 
 	if (dest != NULL && dest->Type->CanTransport()) {
 		for (i = 0; i < NumSelected; i++) {
-			if (CanTransport(dest, Selected[i])) {
+			if (CanTransport(*dest, *Selected[i])) {
 				// We are clicking on a transporter. We have to:
 				// 1) Flush the transporters orders.
 				// 2) Tell the transporter to follow the units. We have to queue all
@@ -172,7 +172,7 @@ void DoRightButton(int sx, int sy)
 				// 3) Tell all selected land units to go board the transporter.
 
 				// Here we flush the order queue
-				SendCommandStopUnit(dest);
+				SendCommandStopUnit(*dest);
 				break;
 			}
 		}
@@ -195,10 +195,10 @@ void DoRightButton(int sx, int sy)
 		if ((KeyModifiers & ModifierControl) && dest) {
 			dest->Blink = 4;
 			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAcknowledging);
+				PlayUnitSound(*unit, VoiceAcknowledging);
 				acknowledged = 1;
 			}
-			SendCommandFollow(unit, dest, flush);
+			SendCommandFollow(*unit, *dest, flush);
 			continue;
 		}
 
@@ -209,39 +209,39 @@ void DoRightButton(int sx, int sy)
 			// dest is the transporter
 			if (dest->Type->CanTransport()) {
 				// Let the transporter move to the unit. And QUEUE!!!
-				if (dest->CanMove() && CanTransport(dest, unit)) {
+				if (dest->CanMove() && CanTransport(*dest, *unit)) {
 					DebugPrint("Send command follow\n");
 					// is flush value correct ?
 					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAcknowledging);
+						PlayUnitSound(*unit, VoiceAcknowledging);
 						acknowledged = 1;
 					}
-					SendCommandFollow(dest, unit, 0);
+					SendCommandFollow(*dest, *unit, 0);
 				}
 				// FIXME : manage correctly production units.
-				if (!unit->CanMove() || CanTransport(dest, unit)) {
+				if (!unit->CanMove() || CanTransport(*dest, *unit)) {
 					dest->Blink = 4;
 					DebugPrint("Board transporter\n");
 					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAcknowledging);
+						PlayUnitSound(*unit, VoiceAcknowledging);
 						acknowledged = 1;
 					}
-					SendCommandBoard(unit, -1, -1, dest, flush);
+					SendCommandBoard(*unit, -1, -1, *dest, flush);
 					continue;
 				}
 			}
 			//  unit is the transporter
 			//  FIXME : Make it more configurable ? NumSelect == 1, lua option
-			if (CanTransport(unit, dest)) {
+			if (CanTransport(*unit, *dest)) {
 				// Let the transporter move to the unit. And QUEUE!!!
 				if (unit->CanMove()) {
 					DebugPrint("Send command follow\n");
 					// is flush value correct ?
 					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAcknowledging);
+						PlayUnitSound(*unit, VoiceAcknowledging);
 						acknowledged = 1;
 					}
-					SendCommandFollow(unit, dest, 0);
+					SendCommandFollow(*unit, *dest, 0);
 				} else if (!dest->CanMove()) {
 					DebugPrint("Want to transport but no unit can move\n");
 					continue;
@@ -249,10 +249,10 @@ void DoRightButton(int sx, int sy)
 				dest->Blink = 4;
 				DebugPrint("Board transporter\n");
 				if (!acknowledged) {
-					PlayUnitSound(unit, VoiceAcknowledging);
+					PlayUnitSound(*unit, VoiceAcknowledging);
 					acknowledged = 1;
 				}
-				SendCommandBoard(dest, -1, -1, unit, flush);
+				SendCommandBoard(*dest, -1, -1, *unit, flush);
 				continue;
 			}
 		}
@@ -265,13 +265,13 @@ void DoRightButton(int sx, int sy)
 			if (type->RepairRange && dest != NULL &&
 					dest->Type->RepairHP &&
 					dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max &&
-					(dest->Player == unit->Player || unit->IsAllied(dest))) {
+					(dest->Player == unit->Player || unit->IsAllied(*dest))) {
 				dest->Blink = 4;
 				if (!acknowledged) {
-					PlayUnitSound(unit, VoiceAcknowledging);
+					PlayUnitSound(*unit, VoiceAcknowledging);
 					acknowledged = 1;
 				}
-				SendCommandRepair(unit, x, y, dest, flush);
+				SendCommandRepair(*unit, x, y, dest, flush);
 				continue;
 			}
 			// Harvest
@@ -283,10 +283,10 @@ void DoRightButton(int sx, int sy)
 							dest->Player == unit->Player) {
 						dest->Blink = 4;
 						if (!acknowledged) {
-							PlayUnitSound(unit, VoiceAcknowledging);
+							PlayUnitSound(*unit, VoiceAcknowledging);
 							acknowledged = 1;
 						}
-						SendCommandReturnGoods(unit, dest, flush);
+						SendCommandReturnGoods(*unit, dest, flush);
 						continue;
 					}
 					// Go and harvest from a unit
@@ -298,10 +298,10 @@ void DoRightButton(int sx, int sy)
 								(dest->Player->Index == PlayerNumNeutral))) {
 						dest->Blink = 4;
 						if (!acknowledged) {
-							PlayUnitSound(unit, VoiceAcknowledging);
+							PlayUnitSound(*unit, VoiceAcknowledging);
 							acknowledged = 1;
 						}
-						SendCommandResource(unit, dest, flush);
+						SendCommandResource(*unit, *dest, flush);
 						continue;
 					}
 				} else {
@@ -314,10 +314,10 @@ void DoRightButton(int sx, int sy)
 								((unit->CurrentResource != res) ||
 									(unit->ResourcesHeld < type->ResInfo[res]->ResourceCapacity))) {
 							if (!acknowledged) {
-								PlayUnitSound(unit, VoiceAcknowledging);
+								PlayUnitSound(*unit, VoiceAcknowledging);
 								acknowledged = 1;
 							}
-							SendCommandResourceLoc(unit, x, y, flush);
+							SendCommandResourceLoc(*unit, x, y, flush);
 							break;
 						}
 					}
@@ -328,21 +328,21 @@ void DoRightButton(int sx, int sy)
 			}
 			// Follow another unit
 			if (UnitUnderCursor != NULL && dest != NULL && dest != unit &&
-					(dest->Player == unit->Player || unit->IsAllied(dest))) {
+					(dest->Player == unit->Player || unit->IsAllied(*dest))) {
 				dest->Blink = 4;
 				if (!acknowledged) {
-					PlayUnitSound(unit, VoiceAcknowledging);
+					PlayUnitSound(*unit, VoiceAcknowledging);
 					acknowledged = 1;
 				}
-				SendCommandFollow(unit, dest, flush);
+				SendCommandFollow(*unit, *dest, flush);
 				continue;
 			}
 			// Move
 			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAcknowledging);
+				PlayUnitSound(*unit, VoiceAcknowledging);
 				acknowledged = 1;
 			}
-			SendCommandMove(unit, x, y, flush);
+			SendCommandMove(*unit, x, y, flush);
 			continue;
 		}
 
@@ -351,10 +351,10 @@ void DoRightButton(int sx, int sy)
 		//
 		if (action == MouseActionSpellCast || action == MouseActionAttack) {
 			if (dest != NULL && unit->CurrentAction() != UnitActionBuilt) {
-				if (unit->IsEnemy(dest)) {
+				if (unit->IsEnemy(*dest)) {
 					dest->Blink = 4;
 					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAttack);
+						PlayUnitSound(*unit, VoiceAttack);
 						acknowledged = 1;
 					}
 					if (action == MouseActionSpellCast) {
@@ -362,68 +362,68 @@ void DoRightButton(int sx, int sy)
 						Assert(unit->Type->CanCastSpell);
 						for (spellnum = 0; !type->CanCastSpell[spellnum] &&
 								spellnum < SpellTypeTable.size() ; spellnum++) ;
-						SendCommandSpellCast(unit, x, y, dest, spellnum, flush);
+						SendCommandSpellCast(*unit, x, y, dest, spellnum, flush);
 					} else {
 						if (CanTarget(type, dest->Type)) {
-							SendCommandAttack(unit, x, y, dest, flush);
+							SendCommandAttack(*unit, x, y, dest, flush);
 						} else { // No valid target
-							SendCommandAttack(unit, x, y, NoUnitP, flush);
+							SendCommandAttack(*unit, x, y, NoUnitP, flush);
 						}
 					}
 					continue;
 				}
-				if ((dest->Player == unit->Player || unit->IsAllied(dest)) &&
+				if ((dest->Player == unit->Player || unit->IsAllied(*dest)) &&
 						dest != unit) {
 					dest->Blink = 4;
 					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAcknowledging);
+						PlayUnitSound(*unit, VoiceAcknowledging);
 						acknowledged = 1;
 					}
-					SendCommandFollow(unit, dest, flush);
+					SendCommandFollow(*unit, *dest, flush);
 					continue;
 				}
 			}
 			if (Map.WallOnMap(x, y)) {
 				if (unit->Player->Race == PlayerRaceHuman &&
 						Map.OrcWallOnMap(x, y)) {
-					SendCommandAttack(unit, x, y, NoUnitP, flush);
+					SendCommandAttack(*unit, x, y, NoUnitP, flush);
 					continue;
 				}
 				if (unit->Player->Race == PlayerRaceOrc &&
 						Map.HumanWallOnMap(x, y)) {
-					SendCommandAttack(unit, x, y, NoUnitP, flush);
+					SendCommandAttack(*unit, x, y, NoUnitP, flush);
 					continue;
 				}
 			}
 			// empty space
 			if ((KeyModifiers & ModifierControl)) {
 				if (RightButtonAttacks) {
-					SendCommandMove(unit, x, y, flush);
+					SendCommandMove(*unit, x, y, flush);
 					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAcknowledging);
+						PlayUnitSound(*unit, VoiceAcknowledging);
 						acknowledged = 1;
 					}
 				} else {
 					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAttack);
+						PlayUnitSound(*unit, VoiceAttack);
 						acknowledged = 1;
 					}
-					SendCommandAttack(unit, x, y, NoUnitP, flush);
+					SendCommandAttack(*unit, x, y, NoUnitP, flush);
 				}
 			} else {
 				if (RightButtonAttacks) {
 					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAttack);
+						PlayUnitSound(*unit, VoiceAttack);
 						acknowledged = 1;
 					}
-					SendCommandAttack(unit, x, y, NoUnitP, flush);
+					SendCommandAttack(*unit, x, y, NoUnitP, flush);
 				} else {
 					// Note: move is correct here, right default is move
 					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAcknowledging);
+						PlayUnitSound(*unit, VoiceAcknowledging);
 						acknowledged = 1;
 					}
-					SendCommandMove(unit, x, y, flush);
+					SendCommandMove(*unit, x, y, flush);
 				}
 			}
 			// FIXME: ALT-RIGHT-CLICK, move but fight back if attacked.
@@ -433,13 +433,13 @@ void DoRightButton(int sx, int sy)
 		// FIXME: attack/follow/board ...
 		if ((action == MouseActionMove || action == MouseActionSail) &&
 				(dest && dest != unit) &&
-				(dest->Player == unit->Player || unit->IsAllied(dest))) {
+				(dest->Player == unit->Player || unit->IsAllied(*dest))) {
 			dest->Blink = 4;
 			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAcknowledging);
+				PlayUnitSound(*unit, VoiceAcknowledging);
 				acknowledged = 1;
 			}
-			SendCommandFollow(unit, dest, flush);
+			SendCommandFollow(*unit, *dest, flush);
 			continue;
 		}
 
@@ -450,9 +450,9 @@ void DoRightButton(int sx, int sy)
 					type->CanStore[dest->CurrentResource] &&
 					dest->Player == unit->Player) {
 				dest->Blink = 4;
-				SendCommandReturnGoods(dest, unit, flush);
+				SendCommandReturnGoods(*dest, unit, flush);
 				if (!acknowledged) {
-					PlayUnitSound(unit, VoiceAcknowledging);
+					PlayUnitSound(*unit, VoiceAcknowledging);
 					acknowledged = 1;
 				}
 				continue;
@@ -464,7 +464,7 @@ void DoRightButton(int sx, int sy)
 					type->CanHarvest &&
 					dest->Player == unit->Player) {
 				unit->Blink = 4;
-				SendCommandResource(dest, unit, flush);
+				SendCommandResource(*dest, *unit, flush);
 				continue;
 			}
 		}
@@ -476,28 +476,28 @@ void DoRightButton(int sx, int sy)
 					(dest->Player == unit->Player || dest->Player->Index == PlayerNumNeutral)) {
 				dest->Blink = 4;
 				if (!acknowledged) {
-					PlayUnitSound(unit, VoiceAcknowledging);
+					PlayUnitSound(*unit, VoiceAcknowledging);
 					acknowledged = 1;
 				}
-				SendCommandResource(unit, dest, flush);
+				SendCommandResource(*unit, *dest, flush);
 				continue;
 			}
 			// FIXME: support harvesting more types of terrain.
 			if (Map.IsFieldExplored(unit->Player, x, y) && Map.ForestOnMap(x, y)) {
 				if (!acknowledged) {
-					PlayUnitSound(unit, VoiceAcknowledging);
+					PlayUnitSound(*unit, VoiceAcknowledging);
 					acknowledged = 1;
 				}
-				SendCommandResourceLoc(unit, x, y, flush);
+				SendCommandResourceLoc(*unit, x, y, flush);
 				break;
 			}
 		}
 		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
+			PlayUnitSound(*unit, VoiceAcknowledging);
 			acknowledged = 1;
 		}
 
-		SendCommandMove(unit, x, y, flush);
+		SendCommandMove(*unit, x, y, flush);
 	}
 	ShowOrdersCount = GameCycle + Preference.ShowOrders * CYCLES_PER_SECOND;
 }
@@ -920,7 +920,7 @@ void UIHandleMouseMove(int x, int y)
 			GameCursor = UI.YellowHair.Cursor;
 			if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->Decoration) {
 				if (UnitUnderCursor->Player == ThisPlayer ||
-						ThisPlayer->IsAllied(UnitUnderCursor)) {
+						ThisPlayer->IsAllied(*UnitUnderCursor)) {
 					GameCursor = UI.GreenHair.Cursor;
 				} else if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
 					GameCursor = UI.RedHair.Cursor;
@@ -977,17 +977,17 @@ void UIHandleMouseMove(int x, int y)
 */
 static int SendRepair(int sx, int sy)
 {
-	CUnit *dest;
+	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
 
 	// Check if the dest is repairable!
-	if ((dest = UnitUnderCursor) && dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max &&
+	if (dest && dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max &&
 			dest->Type->RepairHP &&
-			(dest->Player == ThisPlayer || ThisPlayer->IsAllied(dest))) {
+			(dest->Player == ThisPlayer || ThisPlayer->IsAllied(*dest))) {
 		for (int i = 0; i < NumSelected; ++i) {
 			CUnit *unit = Selected[i];
 			if (unit->Type->RepairRange) {
-				SendCommandRepair(unit, sx / TileSizeX, sy / TileSizeY, dest,
+				SendCommandRepair(*unit, sx / TileSizeX, sy / TileSizeY, dest,
 					!(KeyModifiers & ModifierShift));
 				ret = 1;
 			} else {
@@ -1019,8 +1019,8 @@ static int SendMove(int sx, int sy)
 	// Move to a transporter.
 	if ((transporter = UnitUnderCursor) && transporter->Type->CanTransport()) {
 		for (i = 0; i < NumSelected; ++i) {
-			if (CanTransport(transporter, Selected[i])) {
-				SendCommandStopUnit(transporter);
+			if (CanTransport(*transporter, *Selected[i])) {
+				SendCommandStopUnit(*transporter);
 				ret = 1;
 				break;
 			}
@@ -1036,13 +1036,13 @@ static int SendMove(int sx, int sy)
 
 	for (i = 0; i < NumSelected; ++i) {
 		unit = Selected[i];
-		if (transporter && CanTransport(transporter, unit)) {
+		if (transporter && CanTransport(*transporter, *unit)) {
 			transporter->Blink = 4;
-			SendCommandFollow(transporter, unit, 0);
-			SendCommandBoard(unit, -1, -1, transporter, flush);
+			SendCommandFollow(*transporter, *unit, 0);
+			SendCommandBoard(*unit, -1, -1, *transporter, flush);
 			ret = 1;
 		} else {
-			SendCommandMove(unit, sx / TileSizeX, sy / TileSizeY, flush);
+			SendCommandMove(*unit, sx / TileSizeX, sy / TileSizeY, flush);
 			ret = 1;
 		}
 	}
@@ -1067,8 +1067,6 @@ static int SendMove(int sx, int sy)
 */
 static int SendAttack(int sx, int sy)
 {
-	int i;
-	CUnit *unit;  // selected unit.
 	CUnit *dest;  // unit under cursor if any.
 	int ret;
 
@@ -1077,10 +1075,11 @@ static int SendAttack(int sx, int sy)
 	if (dest && dest->Type->Decoration) {
 		dest = NULL;
 	}
-	for (i = 0; i < NumSelected; ++i) {
-		unit = Selected[i];
-		if (unit->Type->CanAttack) {
-			if (!dest || (dest != unit && CanTarget(unit->Type, dest->Type))) {
+	for (int i = 0; i < NumSelected; ++i) {
+		CUnit &unit = *Selected[i];
+
+		if (unit.Type->CanAttack) {
+			if (!dest || (dest != &unit && CanTarget(unit.Type, dest->Type))) {
 				if (dest) {
 					dest->Blink = 4;
 				}
@@ -1089,7 +1088,7 @@ static int SendAttack(int sx, int sy)
 				ret = 1;
 			}
 		} else {
-			if (unit->CanMove()) {
+			if (unit.CanMove()) {
 				SendCommandMove(unit, sx / TileSizeX, sy / TileSizeY,
 					!(KeyModifiers & ModifierShift));
 				ret = 1;
@@ -1110,8 +1109,8 @@ static int SendAttackGround(int sx, int sy)
 	int ret = 0;
 
 	for (int i = 0; i < NumSelected; ++i) {
-		CUnit *unit = Selected[i];
-		if (unit->Type->CanAttack) {
+		CUnit &unit = *Selected[i];
+		if (unit.Type->CanAttack) {
 			SendCommandAttackGround(unit, sx / TileSizeX, sy / TileSizeY,
 				!(KeyModifiers & ModifierShift));
 			ret = 1;
@@ -1135,7 +1134,7 @@ static int SendPatrol(int sx, int sy)
 	int ret = 0;
 
 	for (int i = 0; i < NumSelected; ++i) {
-		CUnit *unit = Selected[i];
+		CUnit &unit = *Selected[i];
 		SendCommandPatrol(unit, sx / TileSizeX, sy / TileSizeY,
 			!(KeyModifiers & ModifierShift));
 		ret = 1;
@@ -1153,11 +1152,9 @@ static int SendPatrol(int sx, int sy)
 */
 static int SendResource(int sx, int sy)
 {
-	int i;
 	int x;
 	int y;
 	int res;
-	CUnit *unit;
 	CUnit *dest;
 	int ret;
 
@@ -1166,29 +1163,30 @@ static int SendResource(int sx, int sy)
 	x = sx / TileSizeX;
 	y = sy / TileSizeY;
 
-	for (i = 0; i < NumSelected; ++i) {
-		unit = Selected[i];
-		if (unit->Type->Harvester) {
+	for (int i = 0; i < NumSelected; ++i) {
+		CUnit &unit = *Selected[i];
+
+		if (unit.Type->Harvester) {
 			if (dest &&
 					(res = dest->Type->GivesResource) &&
-					unit->Type->ResInfo[res] &&
-					unit->ResourcesHeld < unit->Type->ResInfo[res]->ResourceCapacity &&
+					unit.Type->ResInfo[res] &&
+					unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity &&
 					dest->Type->CanHarvest &&
-					(dest->Player == unit->Player ||
+					(dest->Player == unit.Player ||
 						(dest->Player->Index == PlayerMax - 1))) {
 				dest->Blink = 4;
-				SendCommandResource(Selected[i],dest, !(KeyModifiers & ModifierShift));
+				SendCommandResource(*Selected[i], *dest, !(KeyModifiers & ModifierShift));
 				ret = 1;
 				continue;
 			} else {
 				for (res = 0; res < MaxCosts; ++res) {
-					if (unit->Type->ResInfo[res] &&
-							unit->Type->ResInfo[res]->TerrainHarvester &&
-							Map.IsFieldExplored(unit->Player, x, y) &&
+					if (unit.Type->ResInfo[res] &&
+							unit.Type->ResInfo[res]->TerrainHarvester &&
+							Map.IsFieldExplored(unit.Player, x, y) &&
 							Map.ForestOnMap(x, y) &&
-							Selected[i]->ResourcesHeld < unit->Type->ResInfo[res]->ResourceCapacity &&
-							((unit->CurrentResource != res) ||
-								(unit->ResourcesHeld < unit->Type->ResInfo[res]->ResourceCapacity))) {
+							Selected[i]->ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity &&
+							((unit.CurrentResource != res) ||
+								(unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity))) {
 						SendCommandResourceLoc(unit, x, y,
 							!(KeyModifiers & ModifierShift));
 						ret = 1;
@@ -1200,14 +1198,14 @@ static int SendResource(int sx, int sy)
 				}
 			}
 		}
-		if (!unit->CanMove()) {
+		if (!unit.CanMove()) {
 			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest) {
 				dest->Blink = 4;
-				SendCommandResource(unit, dest, !(KeyModifiers & ModifierShift));
+				SendCommandResource(unit, *dest, !(KeyModifiers & ModifierShift));
 				ret = 1;
 				continue;
 			}
-			if (Map.IsFieldExplored(unit->Player, x, y) && Map.ForestOnMap(x, y)) {
+			if (Map.IsFieldExplored(unit.Player, x, y) && Map.ForestOnMap(x, y)) {
 				SendCommandResourceLoc(unit, x, y, !(KeyModifiers & ModifierShift));
 				ret = 1;
 				continue;
@@ -1232,7 +1230,7 @@ static int SendUnload(int sx, int sy)
 
 	for (int i = 0; i < NumSelected; ++i) {
 		// FIXME: not only transporter selected?
-		SendCommandUnload(Selected[i], sx / TileSizeX, sy / TileSizeY, NoUnitP,
+		SendCommandUnload(*Selected[i], sx / TileSizeX, sy / TileSizeY, NoUnitP,
 			!(KeyModifiers & ModifierShift));
 		ret = 1;
 	}
@@ -1264,14 +1262,14 @@ static int SendSpellCast(int sx, int sy)
 	   function which will cancel function if cannot be executed
 	 */
 	for (int i = 0; i < NumSelected; ++i) {
-		CUnit *unit = Selected[i];
-		if (!unit->Type->CanCastSpell) {
+		CUnit &unit = *Selected[i];
+		if (!unit.Type->CanCastSpell) {
 			DebugPrint("but unit %d(%s) can't cast spells?\n" _C_
-				unit->Slot _C_ unit->Type->Name.c_str());
+				unit.Slot _C_ unit.Type->Name.c_str());
 			// this unit cannot cast spell
 			continue;
 		}
-		if (dest && unit == dest) {
+		if (dest && &unit == dest) {
 			// no unit can cast spell on himself
 			// n0b0dy: why not?
 			continue;
@@ -1332,14 +1330,14 @@ static void SendCommand(int sx, int sy)
 		for (int i = 0; i < NumSelected; ++i) {
 			if (ret==ButtonAttack || ret==ButtonAttackGround || ret==ButtonSpellCast) {
 				if (Selected[i]->Type->Sound.Attack.Sound) {
-					PlayUnitSound(Selected[i], VoiceAttack);
+					PlayUnitSound(*Selected[i], VoiceAttack);
 					break;
 				} else if (Selected[i]->Type->Sound.Acknowledgement.Sound) {
-					PlayUnitSound(Selected[i], VoiceAcknowledging);
+					PlayUnitSound(*Selected[i], VoiceAcknowledging);
 					break;
 				}
 			} else if (Selected[i]->Type->Sound.Acknowledgement.Sound) {
-				PlayUnitSound(Selected[i], VoiceAcknowledging);
+				PlayUnitSound(*Selected[i], VoiceAcknowledging);
 				break;
 			}
 		}
@@ -1365,7 +1363,7 @@ static void DoSelectionButtons(int num, unsigned)
 		return;
 	}
 
-	CUnit *unit = Selected[num];
+	CUnit &unit = *Selected[num];
 
 	if ((KeyModifiers & ModifierControl) ||
 			(MouseButtons & (LeftButton << MouseDoubleShift))) {
@@ -1597,7 +1595,7 @@ void UIHandleButtonDown(unsigned button)
 					PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound,
 						MaxSampleVolume);
 					for (int i = 0; i < NumSelected; ++i) {
-						SendCommandBuildBuilding(Selected[i], x, y, CursorBuilding,
+						SendCommandBuildBuilding(*Selected[i], x, y, CursorBuilding,
 							!(KeyModifiers & ModifierShift));
 					}
 					if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
@@ -1728,13 +1726,13 @@ void UIHandleButtonDown(unsigned button)
 			//
 			} else if (ButtonAreaUnderCursor == ButtonAreaTraining) {
 				if (!GameObserve && !GamePaused &&
-						ThisPlayer->IsTeamed(Selected[0])) {
+						ThisPlayer->IsTeamed(*Selected[0])) {
 					if (ButtonUnderCursor < Selected[0]->OrderCount &&
 						Selected[0]->Orders[ButtonUnderCursor]->Action == UnitActionTrain) {
 						DebugPrint("Cancel slot %d %s\n" _C_
 							ButtonUnderCursor _C_
 							Selected[0]->Orders[ButtonUnderCursor]->Arg1.Type->Ident.c_str());
-						SendCommandCancelTraining(Selected[0],
+						SendCommandCancelTraining(*Selected[0],
 							ButtonUnderCursor,
 							Selected[0]->Orders[ButtonUnderCursor]->Arg1.Type);
 					}
@@ -1744,11 +1742,11 @@ void UIHandleButtonDown(unsigned button)
 			//
 			} else if (ButtonAreaUnderCursor == ButtonAreaUpgrading) {
 				if (!GameObserve && !GamePaused &&
-						ThisPlayer->IsTeamed(Selected[0])) {
+						ThisPlayer->IsTeamed(*Selected[0])) {
 					if (ButtonUnderCursor == 0 && NumSelected == 1) {
 						DebugPrint("Cancel upgrade %s\n" _C_
 							Selected[0]->Type->Ident.c_str());
-						SendCommandCancelUpgradeTo(Selected[0]);
+						SendCommandCancelUpgradeTo(*Selected[0]);
 					}
 				}
 			//
@@ -1756,11 +1754,11 @@ void UIHandleButtonDown(unsigned button)
 			//
 			} else if (ButtonAreaUnderCursor == ButtonAreaResearching) {
 				if (!GameObserve && !GamePaused &&
-						ThisPlayer->IsTeamed(Selected[0])) {
+						ThisPlayer->IsTeamed(*Selected[0])) {
 					if (ButtonUnderCursor == 0 && NumSelected == 1) {
 						DebugPrint("Cancel research %s\n" _C_
 							Selected[0]->Type->Ident.c_str());
-						SendCommandCancelResearch(Selected[0]);
+						SendCommandCancelResearch(*Selected[0]);
 					}
 				}
 			//
@@ -1771,7 +1769,7 @@ void UIHandleButtonDown(unsigned button)
 				//  for transporter
 				//
 				if (!GameObserve && !GamePaused &&
-						ThisPlayer->IsTeamed(Selected[0])) {
+						ThisPlayer->IsTeamed(*Selected[0])) {
 					if (Selected[0]->BoardCount >= ButtonUnderCursor) {
 						uins = Selected[0]->UnitInside;
 						for (i = ButtonUnderCursor; i; uins = uins->NextContained) {
@@ -1780,14 +1778,14 @@ void UIHandleButtonDown(unsigned button)
 							}
 						}
 						Assert(uins->Boarded);
-						SendCommandUnload(Selected[0],
+						SendCommandUnload(*Selected[0],
 							Selected[0]->tilePos.x, Selected[0]->tilePos.y, uins,
 							!(KeyModifiers & ModifierShift));
 					}
 				}
 			} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
 				if (!GameObserve && !GamePaused &&
-						ThisPlayer->IsTeamed(Selected[0])) {
+						ThisPlayer->IsTeamed(*Selected[0])) {
 					UI.ButtonPanel.DoClicked(ButtonUnderCursor);
 				}
 			}
@@ -1963,31 +1961,31 @@ void UIHandleButtonUp(unsigned button)
 				if ((KeyModifiers & ModifierControl)
 						|| (button & (1 << MouseDoubleShift))) {
 					if (KeyModifiers & ModifierShift) {
-						num = ToggleUnitsByType(unit);
+						num = ToggleUnitsByType(*unit);
 					} else {
-						num = SelectUnitsByType(unit);
+						num = SelectUnitsByType(*unit);
 					}
 				} else if ((KeyModifiers & ModifierAlt) && unit->LastGroup) {
 					if (KeyModifiers & ModifierShift) {
-						num = AddGroupFromUnitToSelection(unit);
+						num = AddGroupFromUnitToSelection(*unit);
 					} else {
-						num = SelectGroupFromUnit(unit);
+						num = SelectGroupFromUnit(*unit);
 					}
 
 					// Don't allow to select own and enemy units.
 					// Don't allow mixing buildings
 				} else if (KeyModifiers & ModifierShift &&
-						(unit->Player == ThisPlayer || ThisPlayer->IsTeamed(unit)) &&
+						(unit->Player == ThisPlayer || ThisPlayer->IsTeamed(*unit)) &&
 						!unit->Type->Building &&
 						(NumSelected != 1 || !Selected[0]->Type->Building) &&
 						(NumSelected != 1 || Selected[0]->Player == ThisPlayer ||
-						ThisPlayer->IsTeamed(Selected[0]))) {
-					num = ToggleSelectUnit(unit);
+						ThisPlayer->IsTeamed(*Selected[0]))) {
+					num = ToggleSelectUnit(*unit);
 					if (!num) {
 						SelectionChanged();
 					}
 				} else {
-					SelectSingleUnit(unit);
+					SelectSingleUnit(*unit);
 					num = 1;
 				}
 			} else {
@@ -2009,13 +2007,13 @@ void UIHandleButtonUp(unsigned button)
 			//
 			if (NumSelected == 1) {
 				if (Selected[0]->CurrentAction() == UnitActionBuilt) {
-					PlayUnitSound(Selected[0], VoiceBuilding);
+					PlayUnitSound(*Selected[0], VoiceBuilding);
 				} else if (Selected[0]->Burning) {
 					// FIXME: use GameSounds.Burning
 					PlayGameSound(SoundForName("burning"), MaxSampleVolume);
-				} else if (Selected[0]->Player == ThisPlayer || ThisPlayer->IsTeamed(Selected[0]) ||
+				} else if (Selected[0]->Player == ThisPlayer || ThisPlayer->IsTeamed(*Selected[0]) ||
 						Selected[0]->Player->Type == PlayerNeutral) {
-					PlayUnitSound(Selected[0], VoiceSelected);
+					PlayUnitSound(*Selected[0], VoiceSelected);
 				} else {
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 				}

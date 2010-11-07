@@ -60,31 +60,30 @@
 **
 **  @return 0 on error, 1 if nothing happens, 2 else.
 */
-int TransformUnitIntoType(CUnit *unit, CUnitType *newtype)
+int TransformUnitIntoType(CUnit &unit, CUnitType *newtype)
 {
-	Assert(unit);
 	Assert(newtype);
 
-	CUnitType *oldtype = unit->Type;
+	CUnitType *oldtype = unit.Type;
 	if (oldtype == newtype) { // nothing to do
 		return 1;
 	}
-	Vec2i pos = unit->tilePos + oldtype->GetHalfTileSize() - newtype->GetHalfTileSize();
-	CUnit *container = unit->Container;
+	Vec2i pos = unit.tilePos + oldtype->GetHalfTileSize() - newtype->GetHalfTileSize();
+	CUnit *container = unit.Container;
 
 	if (container) {
 		MapUnmarkUnitSight(unit);
 	} else {
 		SaveSelection();
-		unit->Remove(NULL);
+		unit.Remove(NULL);
 		if (!UnitTypeCanBeAt(newtype, pos.x, pos.y)) {
-			unit->Place(unit->tilePos.x, unit->tilePos.y);
+			unit.Place(unit.tilePos.x, unit.tilePos.y);
 			RestoreSelection();
 			// FIXME unit is not modified, try later ?
 			return 0;
 		}
 	}
-	CPlayer *player = unit->Player;
+	CPlayer *player = unit.Player;
 	player->UnitTypesCount[oldtype->Slot]--;
 	player->UnitTypesCount[newtype->Slot]++;
 
@@ -95,30 +94,30 @@ int TransformUnitIntoType(CUnit *unit, CUnitType *newtype)
 	const CUnitStats *newstats = &newtype->Stats[player->Index];
 
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
-		if (unit->Variable[i].Max) {
-			unit->Variable[i].Value = newstats->Variables[i].Max *
-				unit->Variable[i].Value / unit->Variable[i].Max;
+		if (unit.Variable[i].Max) {
+			unit.Variable[i].Value = newstats->Variables[i].Max *
+				unit.Variable[i].Value / unit.Variable[i].Max;
 		} else {
-			unit->Variable[i].Value = newstats->Variables[i].Value;
+			unit.Variable[i].Value = newstats->Variables[i].Value;
 		}
-		unit->Variable[i].Max = newstats->Variables[i].Max;
-		unit->Variable[i].Increase = newstats->Variables[i].Increase;
-		unit->Variable[i].Enable = newstats->Variables[i].Enable;
+		unit.Variable[i].Max = newstats->Variables[i].Max;
+		unit.Variable[i].Increase = newstats->Variables[i].Increase;
+		unit.Variable[i].Enable = newstats->Variables[i].Enable;
 	}
 
-	unit->Type = newtype;
-	unit->Stats = &newtype->Stats[player->Index];
+	unit.Type = newtype;
+	unit.Stats = &newtype->Stats[player->Index];
 
-	if (newtype->CanCastSpell && !unit->AutoCastSpell) {
-		unit->AutoCastSpell = new char[SpellTypeTable.size()];
-		memset(unit->AutoCastSpell, 0, SpellTypeTable.size() * sizeof(char));
+	if (newtype->CanCastSpell && !unit.AutoCastSpell) {
+		unit.AutoCastSpell = new char[SpellTypeTable.size()];
+		memset(unit.AutoCastSpell, 0, SpellTypeTable.size() * sizeof(char));
 	}
 
 	UpdateForNewUnit(unit, 1);
 	//  Update Possible sight range change
 	UpdateUnitSightRange(unit);
 	if (!container) {
-		unit->Place(pos.x, pos.y);
+		unit.Place(pos.x, pos.y);
 		RestoreSelection();
 	} else {
 		MapMarkUnitSight(unit);
@@ -126,7 +125,7 @@ int TransformUnitIntoType(CUnit *unit, CUnitType *newtype)
 	//
 	// Update possible changed buttons.
 	//
-	if (IsOnlySelected(unit) || unit->Player == ThisPlayer) {
+	if (IsOnlySelected(unit) || unit.Player == ThisPlayer) {
 		// could affect the buttons of any selected unit
 		SelectedUnitChanged();
 	}
@@ -138,11 +137,11 @@ int TransformUnitIntoType(CUnit *unit, CUnitType *newtype)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionTransformInto(CUnit *unit)
+void HandleActionTransformInto(CUnit &unit)
 {
 	// What to do if an error occurs ?
-	TransformUnitIntoType(unit, unit->CriticalOrder.Arg1.Type);
-	unit->CriticalOrder.Action = UnitActionStill;
+	TransformUnitIntoType(unit, unit.CriticalOrder.Arg1.Type);
+	unit.CriticalOrder.Action = UnitActionStill;
 }
 
 /**
@@ -150,44 +149,42 @@ void HandleActionTransformInto(CUnit *unit)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionUpgradeTo(CUnit *unit)
+void HandleActionUpgradeTo(CUnit &unit)
 {
 	CPlayer *player;
 	CUnitType *newtype;
 	const CUnitStats *newstats;
 
-	Assert(unit);
-
-	if (!unit->SubAction) { // first entry
-		unit->Data.UpgradeTo.Ticks = 0;
-		unit->SubAction = 1;
+	if (!unit.SubAction) { // first entry
+		unit.Data.UpgradeTo.Ticks = 0;
+		unit.SubAction = 1;
 	}
 
-	unit->Type->Animations->Upgrade ?
-		UnitShowAnimation(unit, unit->Type->Animations->Upgrade) :
-		UnitShowAnimation(unit, unit->Type->Animations->Still);
+	unit.Type->Animations->Upgrade ?
+		UnitShowAnimation(unit, unit.Type->Animations->Upgrade) :
+		UnitShowAnimation(unit, unit.Type->Animations->Still);
 
-	if (unit->Wait) {
-		unit->Wait--;
+	if (unit.Wait) {
+		unit.Wait--;
 		return;
 	}
 
-	player = unit->Player;
-	newtype = unit->CurrentOrder()->Arg1.Type;
+	player = unit.Player;
+	newtype = unit.CurrentOrder()->Arg1.Type;
 	newstats = &newtype->Stats[player->Index];
 
 	// FIXME: Should count down here
-	unit->Data.UpgradeTo.Ticks += SpeedUpgrade;
-	if (unit->Data.UpgradeTo.Ticks < newstats->Costs[TimeCost]) {
-		unit->Wait = CYCLES_PER_SECOND / 6;
+	unit.Data.UpgradeTo.Ticks += SpeedUpgrade;
+	if (unit.Data.UpgradeTo.Ticks < newstats->Costs[TimeCost]) {
+		unit.Wait = CYCLES_PER_SECOND / 6;
 		return;
 	}
 
-	unit->ClearAction();
-	unit->State = 0;
+	unit.ClearAction();
+	unit.State = 0;
 
 	if (TransformUnitIntoType(unit, newtype) == 0) {
-		player->Notify(NotifyGreen, unit->tilePos.x, unit->tilePos.y,
+		player->Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
 			_("Upgrade to %s canceled"), newtype->Name.c_str());
 		return ;
 	}
@@ -195,8 +192,8 @@ void HandleActionUpgradeTo(CUnit *unit)
 	if (player->AiEnabled) {
 		AiUpgradeToComplete(unit, newtype);
 	}
-	player->Notify(NotifyGreen, unit->tilePos.x, unit->tilePos.y,
-		_("Upgrade to %s complete"), unit->Type->Name.c_str());
+	player->Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
+		_("Upgrade to %s complete"), unit.Type->Name.c_str());
 }
 
 //@}

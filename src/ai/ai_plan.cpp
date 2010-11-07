@@ -57,8 +57,8 @@
 struct _EnemyOnMapTile {
 	CUnit *best;
 	const CUnit *const source;
-	const int x,y;
-	_EnemyOnMapTile(const CUnit *unit, int _x, int _y): best(0), source(unit) , x(_x), y(_y) {}
+	const Vec2i pos;
+	_EnemyOnMapTile(const CUnit &unit, const Vec2i _pos) : best(0), source(&unit) , pos(_pos) {}
 	inline void operator() (CUnit *const unit) {
 		const CUnitType *const type = unit->Type;
 		// unusable unit ?
@@ -70,14 +70,14 @@ struct _EnemyOnMapTile {
 				unit->CurrentAction() == UnitActionDie) {
 			return;
 		}
-		if (x < unit->tilePos.x || x >= unit->tilePos.x + type->TileWidth ||
-				y < unit->tilePos.y || y >= unit->tilePos.y + type->TileHeight) {
+		if (pos.x < unit->tilePos.x || pos.x >= unit->tilePos.x + type->TileWidth ||
+				pos.y < unit->tilePos.y || pos.y >= unit->tilePos.y + type->TileHeight) {
 			return;
 		}
 		if (!CanTarget(source->Type, type)) {
 			return;
 		}
-		if (!source->Player->IsEnemy(unit)) { // a friend or neutral
+		if (!source->Player->IsEnemy(*unit)) { // a friend or neutral
 			return;
 		}
 		//
@@ -94,15 +94,14 @@ struct _EnemyOnMapTile {
 **  Choose enemy on map tile.
 **
 **  @param source  Unit which want to attack.
-**  @param tx      X position on map, tile-based.
-**  @param ty      Y position on map, tile-based.
+**  @param pos     position on map, tile-based.
 **
 **  @return        Returns ideal target on map tile.
 */
-static CUnit *EnemyOnMapTile(const CUnit *source, int tx, int ty)
+static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i& pos)
 {
-	_EnemyOnMapTile filter(source, tx, ty);
-	Map.Field(tx,ty)->UnitCache.for_each(filter);
+	_EnemyOnMapTile filter(source, pos);
+	Map.Field(pos.x, pos.y)->UnitCache.for_each(filter);
 	return filter.best;
 }
 
@@ -114,7 +113,7 @@ static CUnit *EnemyOnMapTile(const CUnit *source, int tx, int ty)
 **
 **  @note only works for water transporters!
 */
-static void AiMarkWaterTransporter(const CUnit *unit, unsigned char *matrix)
+static void AiMarkWaterTransporter(const CUnit &unit, unsigned char *matrix)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
@@ -135,8 +134,8 @@ static void AiMarkWaterTransporter(const CUnit *unit, unsigned char *matrix)
 	int w;
 	unsigned char *m;
 
-	x = unit->tilePos.x;
-	y = unit->tilePos.y;
+	x = unit.tilePos.x;
+	y = unit.tilePos.y;
 	w = Map.Info.MapWidth + 2;
 	matrix += w + w + 2;
 	if (matrix[x + y * w]) { // already marked
@@ -150,7 +149,7 @@ static void AiMarkWaterTransporter(const CUnit *unit, unsigned char *matrix)
 	//
 	// Make movement matrix.
 	//
-	mask = unit->Type->MovementMask;
+	mask = unit.Type->MovementMask;
 	// Ignore all possible mobile units.
 	mask &= ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
 
@@ -211,27 +210,22 @@ static void AiMarkWaterTransporter(const CUnit *unit, unsigned char *matrix)
 **
 **  @param unit    Attack.
 **  @param matrix  Water matrix.
-**  @param dx      Attack point X.
-**  @param dy      Attack point Y.
+**  @param dpos    Attack point.
 **  @param ds      Attack state.
 **
 **  @return        True if target found.
 */
-static bool AiFindTarget(const CUnit *unit,
-	 unsigned char *matrix, int *dx, int *dy, int *ds)
+static bool AiFindTarget(const CUnit &unit,
+	 unsigned char *matrix, Vec2i *dpos, int *ds)
 {
-	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
-	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
+	const Vec2i offset[] = {{0, -1}, {-1, 0}, {1, 0}, {0, 1}, {-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
 	struct p {
-		unsigned short X;
-		unsigned short Y;
+		Vec2i pos;
 		unsigned char State;
 	} *points;
 	int size;
-	int x;
-	int y;
-	int rx;
-	int ry;
+	Vec2i pos;
+	Vec2i rpos;
 	int mask;
 	int wp;
 	int rp;
@@ -249,20 +243,18 @@ static bool AiFindTarget(const CUnit *unit,
 	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
 	points = new p[size];
 
-	x = unit->tilePos.x;
-	y = unit->tilePos.y;
+	pos = unit.tilePos;
 
 	w = Map.Info.MapWidth + 2;
-	mask = unit->Type->MovementMask;
+	mask = unit.Type->MovementMask;
 	// Ignore all possible mobile units.
 	mask &= ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
 
-	points[0].X = x;
-	points[0].Y = y;
+	points[0].pos = pos;
 	points[0].State = OnLand;
 	matrix += w + w + 2;
 	rp = 0;
-	matrix[x + y * w] = 1; // mark start point
+	matrix[pos.x + pos.y * w] = 1; // mark start point
 	ep = wp = 1; // start with one point
 
 	//
@@ -270,21 +262,18 @@ static bool AiFindTarget(const CUnit *unit,
 	//
 	for (;;) {
 		while (rp != ep) {
-			rx = points[rp].X;
-			ry = points[rp].Y;
+			rpos = points[rp].pos;
 			state = points[rp].State;
 			for (i = 0; i < 8; ++i) { // mark all neighbors
-				x = rx + xoffset[i];
-				y = ry + yoffset[i];
-				m = matrix + x + y * w;
+				pos = rpos + offset[i];
+				m = matrix + pos.x + pos.y * w;
 
 				if (state != OnWater) {
 					if (*m) { // already checked
 						if (state == OnLand && *m == 66) { // tansporter?
 							DebugPrint("->Water\n");
 							*m = 6;
-							points[wp].X = x; // push the point
-							points[wp].Y = y;
+							points[wp].pos = pos; // push the point
 							points[wp].State = OnWater;
 							if (++wp >= size) { // round about
 								wp = 0;
@@ -295,20 +284,18 @@ static bool AiFindTarget(const CUnit *unit,
 					// Check targets on tile?
 					// FIXME: the move code didn't likes a shore building as
 					//  target
-					if (EnemyOnMapTile(unit, x, y)) {
-						DebugPrint("Target found %d,%d-%d\n" _C_ x _C_ y _C_ state);
-						*dx = x;
-						*dy = y;
+					if (EnemyOnMapTile(unit, pos)) {
+						DebugPrint("Target found %d,%d-%d\n" _C_ pos.x _C_ pos.y _C_ state);
+						*dpos = pos;
 						*ds = state;
 						delete[] points;
 						return 1;
 					}
 
-					if (CanMoveToMask(x, y, mask)) { // reachable
+					if (CanMoveToMask(pos.x, pos.y, mask)) { // reachable
 
 						*m = 1;
-						points[wp].X = x; // push the point
-						points[wp].Y = y;
+						points[wp].pos = pos; // push the point
 						points[wp].State = state;
 						if (++wp >= size) { // round about
 							wp = 0;
@@ -320,8 +307,7 @@ static bool AiFindTarget(const CUnit *unit,
 					if (*m) { // already checked
 						if (*m == 66) { // tansporter?
 							*m = 6;
-							points[wp].X = x; // push the point
-							points[wp].Y = y;
+							points[wp].pos = pos; // push the point
 							points[wp].State = OnWater;
 							if (++wp >= size) { // round about
 								wp = 0;
@@ -329,11 +315,10 @@ static bool AiFindTarget(const CUnit *unit,
 						}
 						continue;
 					}
-					if (CanMoveToMask(x, y, mask)) { // reachable
+					if (CanMoveToMask(pos.x, pos.y, mask)) { // reachable
 						DebugPrint("->Land\n");
 						*m = 1;
-						points[wp].X = x; // push the point
-						points[wp].Y = y;
+						points[wp].pos = pos; // push the point
 						points[wp].State = OnIsle;
 						if (++wp >= size) { // round about
 							wp = 0;
@@ -385,20 +370,18 @@ int AiFindWall(AiForce *force)
 	int wp;
 	int rp;
 	int ep;
-	int i;
 	int w;
 	unsigned char *m;
 	unsigned char *matrix;
 	int destx;
 	int desty;
-	CUnit *aiunit;
 	CUnit *unit;
 
 	// Find a unit to use.  Best choice is a land unit with range 1.
 	// Next best choice is any land unit.  Otherwise just use the first.
 	unit = force->Units[0];
-	for (i = 0; i < (int)force->Units.size(); ++i) {
-		aiunit = force->Units[i];
+	for (unsigned int i = 0; i < force->Units.size(); ++i) {
+		CUnit *aiunit = force->Units[i];
 		if (aiunit->Type->UnitType == UnitTypeLand) {
 			unit = aiunit;
 			if (aiunit->Type->Missile.Missile->Range == 1) {
@@ -434,7 +417,7 @@ int AiFindWall(AiForce *force)
 		while (rp != ep && destx == -1) {
 			rx = points[rp].X;
 			ry = points[rp].Y;
-			for (i = 0; i < 8; ++i) { // mark all neighbors
+			for (int i = 0; i < 8; ++i) { // mark all neighbors
 				x = rx + xoffset[i];
 				y = ry + yoffset[i];
 				m = matrix + x + y * w;
@@ -479,9 +462,9 @@ int AiFindWall(AiForce *force)
 
 	if (destx != -1) {
 		force->State = AI_FORCE_STATE_WAITING;
-		for (i = 0; i < (int)force->Units.size(); ++i) {
-			aiunit = force->Units[i];
-			if (aiunit->Type->CanAttack) {
+		for (unsigned int i = 0; i < force->Units.size(); ++i) {
+			CUnit &aiunit = *force->Units[i];
+			if (aiunit.Type->CanAttack) {
 				CommandAttack(aiunit, destx, desty, NULL, FlushCommands);
 			} else {
 				CommandMove(aiunit, destx, desty, FlushCommands);
@@ -509,9 +492,6 @@ int AiFindWall(AiForce *force)
 int AiForce::PlanAttack(void)
 {
 	unsigned char *watermatrix;
-	const CUnit *aiunit = NULL;
-	int x;
-	int y;
 	int state;
 	CUnit *transporter;
 
@@ -526,10 +506,10 @@ int AiForce::PlanAttack(void)
 	//
 	state = 1;
 	for (unsigned int i = 0; i < Size(); ++i) {
-		aiunit = Units[i];
-		if (aiunit->Type->CanTransport()) {
-			DebugPrint("%d: Transporter #%d\n" _C_ AiPlayer->Player->Index
-			 _C_ UnitNumber(aiunit));
+		const CUnit &aiunit = *Units[i];
+
+		if (aiunit.Type->CanTransport()) {
+			DebugPrint("%d: Transporter #%d\n" _C_ AiPlayer->Player->Index _C_ UnitNumber(aiunit));
 			AiMarkWaterTransporter(aiunit, watermatrix);
 			state = 0;
 		}
@@ -541,13 +521,13 @@ int AiForce::PlanAttack(void)
 	transporter = NULL;
 	if (state) {
 		for (int i = 0; i < AiPlayer->Player->TotalNumUnits; ++i) {
-			CUnit *unit = AiPlayer->Player->Units[i];
+			CUnit &unit = *AiPlayer->Player->Units[i];
 
-			if (unit->Type->CanTransport() && unit->IsIdle()) {
+			if (unit.Type->CanTransport() && unit.IsIdle()) {
 				DebugPrint("%d: Assign any transporter\n" _C_ AiPlayer->Player->Index);
 				AiMarkWaterTransporter(unit, watermatrix);
 				// FIXME: can be the wrong transporter.
-				transporter = unit;
+				transporter = &unit;
 				state = 0;
 			}
 		}
@@ -563,21 +543,22 @@ int AiForce::PlanAttack(void)
 	// Find a land unit of the force.
 	// FIXME: if force is split over different places -> broken
 	//
-	if(CUnitTypeFinder(UnitTypeLand).Find(Units) == NULL) {
+	CUnit* landUnit = CUnitTypeFinder(UnitTypeLand).Find(Units);
+	if (landUnit == NULL) {
 		DebugPrint("%d: No land unit in force\n" _C_ AiPlayer->Player->Index);
 		return 0;
 	}
 
-	x = GoalX;
-	y = GoalY;
-	if (AiFindTarget(aiunit, watermatrix, &x, &y, &state)) {
+	Vec2i pos = {GoalX, GoalY};
+
+	if (AiFindTarget(*landUnit, watermatrix, &pos, &state)) {
 		if (state != 1) { // Need transporter.
 			if (transporter) {
 				DebugPrint("%d: Assign any transporter\n" _C_ AiPlayer->Player->Index);
 				if (transporter->GroupId) {
-					transporter->Player->Ai->Force[transporter->GroupId - 1].Remove(transporter);
+					transporter->Player->Ai->Force[transporter->GroupId - 1].Remove(*transporter);
 				}
-				Insert(transporter);
+				Insert(*transporter);
 				transporter->GroupId = transporter->Player->Ai->Force.getIndex(this) + 1;
 			}
 			int totalBoardCapacity = 0;
@@ -586,33 +567,33 @@ int AiForce::PlanAttack(void)
 			// Verify we have enough transporter.
 			// @note: Minimal check for unitType (flyers...)
 			for (unsigned int i = 0; i < Size(); ++i) {
-				CUnit *aiunit = Units[i];
+				CUnit &aiunit = *Units[i];
 
-				if (aiunit->Type->CanTransport()) {
-					totalBoardCapacity += aiunit->Type->MaxOnBoard - aiunit->BoardCount;
-					transporter = aiunit;
+				if (aiunit.Type->CanTransport()) {
+					totalBoardCapacity += aiunit.Type->MaxOnBoard - aiunit.BoardCount;
+					transporter = &aiunit;
 				}
 			}
 			for (unsigned int i = 0; i < Size(); ++i) {
-				CUnit *aiunit = Units[i];
+				CUnit &aiunit = *Units[i];
 
-				if (CanTransport(transporter, aiunit)) {
+				if (CanTransport(*transporter, aiunit)) {
 					totalBoardCapacity--;
 				}
 			}
 			if (totalBoardCapacity < 0) { // Not enough transporter.
 				// Add all other idle transporter.
 				for (int i = 0; i < AiPlayer->Player->TotalNumUnits; ++i) {
-					CUnit *aiunit = AiPlayer->Player->Units[i];
+					CUnit &aiunit = *AiPlayer->Player->Units[i];
 
-					if (transporterAdded != aiunit && aiunit->Type->CanTransport() && aiunit->IsIdle()) {
+					if (transporterAdded != &aiunit && aiunit.Type->CanTransport() && aiunit.IsIdle()) {
 						DebugPrint("%d: Assign another transporter.\n"_C_ AiPlayer->Player->Index);
-						if (aiunit->GroupId) {
-							aiunit->Player->Ai->Force[aiunit->GroupId - 1].Remove(aiunit);
+						if (aiunit.GroupId) {
+							aiunit.Player->Ai->Force[aiunit.GroupId - 1].Remove(aiunit);
 						}
 						Insert(aiunit);
-						aiunit->GroupId = aiunit->Player->Ai->Force.getIndex(this) + 1;
-						totalBoardCapacity += aiunit->Type->MaxOnBoard - aiunit->BoardCount;
+						aiunit.GroupId = aiunit.Player->Ai->Force.getIndex(this) + 1;
+						totalBoardCapacity += aiunit.Type->MaxOnBoard - aiunit.BoardCount;
 						if (totalBoardCapacity >= 0) {
 							break;
 						}
@@ -621,8 +602,8 @@ int AiForce::PlanAttack(void)
 			}
 		}
 		DebugPrint("%d: Can attack\n" _C_ AiPlayer->Player->Index);
-		GoalX = x;
-		GoalY = y;
+		GoalX = pos.x;
+		GoalY = pos.y;
 		MustTransport = state == 2;
 
 		State = AI_FORCE_STATE_BOARDING;
@@ -685,7 +666,7 @@ void AiSendExplorers(void)
 			x = centerx + SyncRand() % (2 * ray + 1) - ray;
 			y = centery + SyncRand() % (2 * ray + 1) - ray;
 
-			if (x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight) {
+			if (Map.Info.IsPointOnMap(x, y)) {
 				targetok = !Map.IsFieldExplored(AiPlayer->Player, x, y);
 			}
 
@@ -745,7 +726,7 @@ void AiSendExplorers(void)
 	} while (outtrycount <= 4 && !bestunit);
 
 	if (bestunit) {
-		CommandMove(bestunit, x, y, FlushCommands);
+		CommandMove(*bestunit, x, y, FlushCommands);
 		AiPlayer->LastExplorationGameCycle = GameCycle;
 	}
 

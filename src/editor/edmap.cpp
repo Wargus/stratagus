@@ -418,7 +418,7 @@ void ChangeTile(int x, int y, int tile)
 {
 	CMapField *mf;
 
-	Assert(x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight);
+	Assert(Map.Info.IsPointOnMap(x, y));
 	Assert(tile >= 0 && tile < Map.Tileset.NumTiles);
 
 	mf = Map.Field(x, y);
@@ -442,7 +442,7 @@ static void EditorChangeTile(int x, int y, int tile, int d)
 {
 	CMapField *mf;
 
-	Assert(x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight);
+	Assert(Map.Info.IsPointOnMap(x, y));
 
 	ChangeTile(x, y, tile);
 
@@ -715,23 +715,22 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 /**
 **  Destroy all units
 */
-static void EditorDestroyAllUnits(void)
+static void EditorDestroyAllUnits()
 {
-	CUnit *unit;
-
 	while (NumUnits != 0) {
-		unit = Units[0];
-		unit->Remove(NULL);
+		CUnit &unit = *Units[0];
+
+		unit.Remove(NULL);
 		UnitLost(unit);
 		UnitClearOrders(unit);
-		unit->Release();
+		unit.Release();
 	}
 }
 
 /**
 **  Create a random map
 */
-void CEditor::CreateRandomMap(void) const
+void CEditor::CreateRandomMap() const
 {
 	int mz;
 

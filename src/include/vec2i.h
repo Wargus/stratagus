@@ -33,11 +33,11 @@
 
 //@{
 
-struct Vec2i
+class Vec2i
 {
 public:
-	int x;
-	int y;
+	short int x;
+	short int y;
 };
 
 

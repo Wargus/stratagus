@@ -410,15 +410,15 @@ public:
 	}
 
 	bool IsEnemy(const CPlayer *x) const;
-	bool IsEnemy(const CUnit *x) const;
+	bool IsEnemy(const CUnit &unit) const;
 	bool IsAllied(const CPlayer *x) const;
-	bool IsAllied(const CUnit *x) const;
+	bool IsAllied(const CUnit &unit) const;
 	bool IsSharedVision(const CPlayer *x) const;
-	bool IsSharedVision(const CUnit *x) const;
+	bool IsSharedVision(const CUnit &unit) const;
 	bool IsBothSharedVision(const CPlayer *x) const;
-	bool IsBothSharedVision(const CUnit *x) const;
+	bool IsBothSharedVision(const CUnit &unit) const;
 	bool IsTeamed(const CPlayer *x) const;
-	bool IsTeamed(const CUnit *x) const;
+	bool IsTeamed(const CUnit &unit) const;
 };
 
 /**

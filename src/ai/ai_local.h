@@ -116,10 +116,10 @@ class AiForce {
 	friend class AiForceManager;
 
 	bool IsBelongsTo(const CUnitType *type);
-	void Insert(CUnit *unit)
+	void Insert(CUnit &unit)
 	{
-		Units.Insert(unit);
-		unit->RefsIncrease();
+		Units.Insert(&unit);
+		unit.RefsIncrease();
 	}
 
 	void Update(void);
@@ -128,11 +128,11 @@ public:
 		Role(0), State(AI_FORCE_STATE_FREE), GoalX(0), GoalY(0),
 		MustTransport(false) {}
 
-	void Remove(CUnit *unit)
+	void Remove(CUnit &unit)
 	{
-		if (Units.Remove(unit)) {
-			unit->GroupId = 0;
-			unit->RefsDecrease();
+		if (Units.Remove(&unit)) {
+			unit.GroupId = 0;
+			unit.RefsDecrease();
 		}
 	}
 
@@ -200,7 +200,7 @@ class AiForceManager {
 public:
 	AiForceManager();
 
-	inline size_t Size(void) const
+	inline size_t Size() const
 	{
 		return forces.size();
 	}
@@ -224,9 +224,9 @@ public:
 		return script[index];
 	}
 
-	void Clean(void);
-	bool Assign(CUnit *unit);
-	void Update(void);
+	void Clean();
+	bool Assign(CUnit &unit);
+	void Update();
 	unsigned int FindFreeForce(int role = AiForceRoleAttack);
 	void CheckUnits(int *counter);
 };
@@ -415,14 +415,14 @@ extern int AiFindAvailableUnitTypeEquiv(const CUnitType *i,
 	int *result);
 extern int AiGetBuildRequestsCount(PlayerAi*,int counter[UnitTypeMax]);
 
-extern void AiNewDepotRequest(CUnit *worker);
+extern void AiNewDepotRequest(CUnit &worker);
 
 //
 // Buildings
 //
 	/// Find nice building place
-extern int AiFindBuildingPlace(const CUnit *worker,
-	const CUnitType *type, int nx, int ny, int *dx, int *dy);
+extern int AiFindBuildingPlace(const CUnit &worker,
+	const CUnitType *type, int nx, int ny, Vec2i *dpos);
 
 //
 // Forces
@@ -430,7 +430,7 @@ extern int AiFindBuildingPlace(const CUnit *worker,
 	/// Cleanup units in force
 extern void AiCleanForces(void);
 	/// Assign a new unit to a force
-extern bool AiAssignToForce(CUnit *unit);
+extern bool AiAssignToForce(CUnit &unit);
 	/// Assign a free units to a force
 extern void AiAssignFreeUnitsToForce(void);
 	/// Attack with force at position

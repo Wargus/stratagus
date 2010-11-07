@@ -551,25 +551,9 @@ public:
 		Vec2i goalPos;          /// or tile coordinate of destination
 
 		union {
-			struct {
-#if defined(__x86_64__) && defined(__LP64__)//pointers and long are 64bits but int is still 32bits
-				int X;                    /// X position for patroling.
-				int Y;                    /// Y position for patroling.
-#else
-				short int X;                    /// X position for patroling.
-				short int Y;                    /// Y position for patroling.
-#endif
-			} Patrol;                     /// position.
+			Vec2i Patrol; /// position for patroling.
 			union {
-				struct {
-#if defined(__x86_64__) && defined(__LP64__)//pointers and long are 64bits but int is still 32bits
-					int X;                    /// X position for terrain resource.
-					int Y;                    /// Y position for terrain resource.
-#else
-					short int X;                    /// X position for terrain resource.
-					short int Y;                    /// Y position for terrain resource.
-#endif
-				} Pos;                     /// position.
+				Vec2i Pos; /// position for terrain resource.
 				CUnit *Mine;
 			} Resource;
 			SpellType *Spell;             /// spell when casting.
@@ -870,24 +854,24 @@ public:
 	/// Move unit to tile(x, y). (Do special stuff : vision, cachelist, pathfinding)
 	void MoveToXY(int x, int y);
 	/// Add a unit inside a container. Only deal with list stuff.
-	void AddInContainer(CUnit *host);
+	void AddInContainer(CUnit &host);
 	/// Change owner of unit
 	void ChangeOwner(CPlayer *newplayer);
 
 	/// Remove unit from map/groups/...
 	void Remove(CUnit *host);
 
-	void AssignWorkerToMine(CUnit *mine);
-	void DeAssignWorkerFromMine(CUnit *mine);
+	void AssignWorkerToMine(CUnit &mine);
+	void DeAssignWorkerFromMine(CUnit &mine);
 
 	/// Release a unit
 	void Release(bool final = false);
 
-	bool RestoreOrder(void);
-	bool StoreOrder(void);
+	bool RestoreOrder();
+	bool StoreOrder();
 
 	// Cowards and invisible units don't attack unless ordered.
-	bool IsAgressive(void) const
+	bool IsAgressive() const
 	{
 		return (Type->CanAttack && !Type->Coward &&
 			Variable[INVISIBLE_INDEX].Value == 0);
@@ -976,15 +960,15 @@ public:
 	void GetMapArea(int *sx, int *sy, int *ex, int *ey) const;
 
 	bool IsEnemy(const CPlayer *x) const;
-	bool IsEnemy(const CUnit *x) const;
+	bool IsEnemy(const CUnit &unit) const;
 	bool IsAllied(const CPlayer *x) const;
-	bool IsAllied(const CUnit *x) const;
+	bool IsAllied(const CUnit &unit) const;
 	bool IsSharedVision(const CPlayer *x) const;
-	bool IsSharedVision(const CUnit *x) const;
+	bool IsSharedVision(const CUnit &unit) const;
 	bool IsBothSharedVision(const CPlayer *x) const;
-	bool IsBothSharedVision(const CUnit *x) const;
+	bool IsBothSharedVision(const CUnit &unit) const;
 	bool IsTeamed(const CPlayer *x) const;
-	bool IsTeamed(const CUnit *x) const;
+	bool IsTeamed(const CUnit &unit) const;
 
 	bool IsUnusable(bool ignore_built_state = false) const;
 
@@ -995,10 +979,10 @@ public:
 	 **
 	 **  @return     The distance between in tiles.
 	 */
-	int MapDistanceTo(const CUnit *const dst) const
+	int MapDistanceTo(const CUnit &dst) const
 	{
 		return MapDistanceBetweenTypes(Type, tilePos.x, tilePos.y,
-			dst->Type, dst->tilePos.x, dst->tilePos.y);
+			dst.Type, dst.tilePos.x, dst.tilePos.y);
 	}
 
 	/**
@@ -1021,12 +1005,12 @@ public:
 	**
 	**  @return 0 if unit cannot move.
 	*/
-	bool CanMove(void) const
+	bool CanMove() const
 	{
 		return Type->CanMove();
 	}
 
-	int GetDrawLevel(void) const
+	int GetDrawLevel() const
 	{
 		return ((Type->CorpseType && CurrentAction() == UnitActionDie) ?
 					Type->CorpseType->DrawLevel : Type->DrawLevel);
@@ -1040,20 +1024,20 @@ class CUnitPtr {
 	CUnit *unit;
 public:
 
-	void Reset(void) {
+	void Reset() {
 		if (unit) {
 			unit->RefsDecrease();
 		}
 		unit = NULL;
 	}
 
-	CUnitPtr(): unit(NULL) {}
-	CUnitPtr(CUnit *u): unit(u) {
+	CUnitPtr() : unit(NULL) {}
+	CUnitPtr(CUnit *u) : unit(u) {
 		if (unit) {
 			unit->RefsIncrease();
 		}
 	}
-	CUnitPtr(const CUnitPtr &u): unit(u.unit) {
+	CUnitPtr(const CUnitPtr &u) : unit(u.unit) {
 		if (unit) {
 			unit->RefsIncrease();
 		}
@@ -1061,7 +1045,6 @@ public:
 	~CUnitPtr() {
 		Reset();
 	}
-
 
 	operator CUnit *() {
 		return unit;
@@ -1203,7 +1186,7 @@ struct CResourceDepositFinder {
 /**
 **  Returns unit number (unique to this unit)
 */
-#define UnitNumber(unit) ((unit)->Slot)
+#define UnitNumber(unit) ((unit).Slot)
 
 /**
 **  How many groups supported
@@ -1240,7 +1223,7 @@ extern bool EnableTrainingQueue;        /// Config: training queues enabled
 extern bool EnableBuildingCapture;      /// Config: building capture enabled
 extern bool RevealAttacker;             /// Config: reveal attacker enabled
 extern const CViewport *CurrentViewport; /// CurrentViewport
-extern void DrawUnitSelection(const CViewport *vp,const CUnit *);
+extern void DrawUnitSelection(const CViewport *vp,const CUnit &unit);
 extern void (*DrawSelection)(Uint32, int, int, int, int);
 extern int MaxSelectable;                  /// How many units could be selected
 
@@ -1254,28 +1237,28 @@ extern int     TeamNumSelected[PlayerMax];  /// Number of Units a team member ha
 ----------------------------------------------------------------------------*/
 
 	/// Mark the field with the FieldFlags.
-void MarkUnitFieldFlags(const CUnit *unit);
+void MarkUnitFieldFlags(const CUnit &unit);
 	/// Unmark the field with the FieldFlags.
-void UnmarkUnitFieldFlags(const CUnit *unit);
+void UnmarkUnitFieldFlags(const CUnit &unit);
 	/// Update unit->CurrentSightRange.
-void UpdateUnitSightRange(CUnit *unit);
+void UpdateUnitSightRange(CUnit &unit);
 	/// Create a new unit
 extern CUnit *MakeUnit(CUnitType *type, CPlayer *player);
 	/// Create a new unit and place on map
 extern CUnit *MakeUnitAndPlace(int x, int y, CUnitType *type, CPlayer *player);
 	/// Handle the loss of a unit (food,...)
-extern void UnitLost(CUnit *unit);
+extern void UnitLost(CUnit &unit);
 	/// Remove the Orders of a Unit
-extern void UnitClearOrders(CUnit *unit);
+extern void UnitClearOrders(CUnit &unit);
 	/// @todo more docu
-extern void UpdateForNewUnit(const CUnit *unit, int upgrade);
+extern void UpdateForNewUnit(const CUnit &unit, int upgrade);
 	/// @todo more docu
-extern void NearestOfUnit(const CUnit *unit, int tx, int ty, int *dx, int *dy);
+extern void NearestOfUnit(const CUnit &unit, int tx, int ty, int *dx, int *dy);
 
 	/// Call when an Unit goes under fog.
-extern void UnitGoesUnderFog(CUnit *unit, const CPlayer *player);
+extern void UnitGoesUnderFog(CUnit &unit, const CPlayer *player);
 	/// Call when an Unit goes out of fog.
-extern void UnitGoesOutOfFog(CUnit *unit, const CPlayer *player);
+extern void UnitGoesOutOfFog(CUnit &unit, const CPlayer *player);
 	/// Marks a unit as seen
 extern void UnitsOnTileMarkSeen(const CPlayer *player, int x, int y, int p);
 extern void
@@ -1287,7 +1270,7 @@ extern void
 UnitsOnTileUnmarkSeen(const CPlayer *player, const unsigned int index, int p);
 
 	/// Does a recount for VisCount
-extern void UnitCountSeen(CUnit *unit);
+extern void UnitCountSeen(CUnit &unit);
 
 	/// Check for rescue each second
 extern void RescueUnits();
@@ -1296,21 +1279,21 @@ extern void RescueUnits();
 extern int DirectionToHeading(const Vec2i &dir);
 
 	/// Update frame from heading
-extern void UnitUpdateHeading(CUnit *unit);
+extern void UnitUpdateHeading(CUnit &unit);
 	/// Heading and frame from delta direction
-extern void UnitHeadingFromDeltaXY(CUnit *unit, const Vec2i &delta);
+extern void UnitHeadingFromDeltaXY(CUnit &unit, const Vec2i &delta);
 
 
 	/// @todo more docu
-extern void DropOutOnSide(CUnit *unit, int heading, int addx, int addy);
+extern void DropOutOnSide(CUnit &unit, int heading, int addx, int addy);
 	/// @todo more docu
-extern void DropOutNearest(CUnit *unit, const Vec2i &goalPos, int addx, int addy);
+extern void DropOutNearest(CUnit &unit, const Vec2i &goalPos, int addx, int addy);
 
 	/// Drop out all units in the unit
-extern void DropOutAll(const CUnit *unit);
+extern void DropOutAll(const CUnit &unit);
 
 	/// Return the rule used to build this building.
-extern CBuildRestrictionOnTop *OnTopDetails(const CUnit *unit, const CUnitType *parent);
+extern CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent);
 	/// @todo more docu
 extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y);
 	/// @todo more docu
@@ -1319,47 +1302,46 @@ extern bool CanBuildOn(int x, int y, int mask);
 extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, int real);
 
 	/// Find resource
-extern CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range,
+extern CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range,
 		 int resource, bool check_usage = false, const CUnit *destu = NULL);
-extern CUnit *UnitFindMiningArea(const CUnit *unit, int x, int y,
-		 int range, int resource);
+extern CUnit *UnitFindMiningArea(const CUnit &unit, int x, int y,  int range, int resource);
 	/// Find nearest deposit
-extern CUnit *FindDeposit(const CUnit *unit, int range, int resource);
+extern CUnit *FindDeposit(const CUnit &unit, int range, int resource);
 	/// Find the next idle worker
 extern CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last);
 
 	/// Find the neareast piece of terrain with specific flags.
 extern int FindTerrainType(int movemask, int resmask, int rvresult, int range,
-		const CPlayer *player, int x, int y, int *px, int *py);
+		const CPlayer *player, int x, int y, Vec2i *pos);
 	/// Find the nearest piece of wood in sight range
-extern int FindWoodInSight(const CUnit *unit, int *x, int *y);
+extern int FindWoodInSight(const CUnit &unit, Vec2i *pos);
 
 	/// @todo more docu
 extern CUnit *UnitOnScreen(CUnit *unit, int x, int y);
 
 	/// Let a unit die
-extern void LetUnitDie(CUnit *unit);
+extern void LetUnitDie(CUnit &unit);
 	/// Destory all units inside another unit
-extern void DestroyAllInside(CUnit *source);
+extern void DestroyAllInside(CUnit &source);
 	/// Hit unit with damage, if destroyed give attacker the points
-extern void HitUnit(CUnit *attacker, CUnit *target, int damage);
+extern void HitUnit(CUnit *attacker, CUnit &target, int damage);
 
 	/// Calculate the distance from current view point to coordinate
 extern int ViewPointDistance(int x, int y);
 	/// Calculate the distance from current view point to unit
-extern int ViewPointDistanceToUnit(const CUnit *dest);
+extern int ViewPointDistanceToUnit(const CUnit &dest);
 
 	/// Can this unit-type attack the other (destination)
 extern int CanTarget(const CUnitType *type, const CUnitType *dest);
 	/// Can transporter transport the other unit
-extern int CanTransport(const CUnit *transporter, const CUnit *unit);
+extern int CanTransport(const CUnit &transporter, const CUnit &unit);
 
 	/// Generate a unit reference, a printable unique string for unit
-extern std::string UnitReference(const CUnit *unit);
+extern std::string UnitReference(const CUnit &unit);
 	/// Save an order
 extern void SaveOrder(const COrderPtr order, CFile *file);
 	/// save unit-structure
-extern void SaveUnit(const CUnit *unit, CFile *file);
+extern void SaveUnit(const CUnit &unit, CFile *file);
 	/// save all units
 extern void SaveUnits(CFile *file);
 
@@ -1391,13 +1373,12 @@ extern void LoadDecorations();
 extern void CleanDecorations();
 
 	/// Draw unit's shadow
-extern void DrawShadow(const CUnitType *type,
-	int frame, int x, int y);
+extern void DrawShadow(const CUnitType *type, int frame, int x, int y);
 	/// Draw all units visible on map in viewport
 extern int FindAndSortUnits(const CViewport *vp, CUnit *table[]);
 extern int FindAndSortUnits(const CViewport *vp, CUnitDrawProxy table[]);
 	/// Show a unit's orders.
-extern void ShowOrder(const CUnit *unit);
+extern void ShowOrder(const CUnit &unit);
 
 // in unit_find.cpp
 	/// Find all units of this type
@@ -1407,24 +1388,22 @@ extern int FindPlayerUnitsByType(const CPlayer *, const CUnitType *, CUnit **);
 	/// Return any unit on that map tile
 extern CUnit *UnitOnMapTile(int tx, int ty, unsigned int type);// = -1);
 	/// Return possible attack target on that map area
-extern CUnit *TargetOnMap(const CUnit *unit, int x1, int y1, int x2, int y2);
+extern CUnit *TargetOnMap(const CUnit &unit, int x1, int y1, int x2, int y2);
 
 	/// Return resource, if on map tile
-extern CUnit *ResourceOnMap(int tx, int ty, int resource,
-		bool mine_on_top = true);
+extern CUnit *ResourceOnMap(int tx, int ty, int resource, bool mine_on_top = true);
 	/// Return resource deposit, if on map tile
 extern CUnit *ResourceDepositOnMap(int tx, int ty, int resource);
 
 	/// Find best enemy in numeric range to attack
-extern CUnit *AttackUnitsInDistance(const CUnit *unit, int range);
+extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range);
 	/// Find best enemy in attack range to attack
-extern CUnit *AttackUnitsInRange(const CUnit *unit);
+extern CUnit *AttackUnitsInRange(const CUnit &unit);
 	/// Find best enemy in reaction range to attack
-extern CUnit *AttackUnitsInReactRange(const CUnit *unit);
+extern CUnit *AttackUnitsInReactRange(const CUnit &unit);
 
 extern CUnit *
-AutoAttackUnitsInDistance(const CUnit *unit, int range,
-		CUnitCache &autotargets);
+AutoAttackUnitsInDistance(const CUnit &unit, int range, CUnitCache &autotargets);
 
 // in groups.c
 
@@ -1448,17 +1427,17 @@ extern void AddToGroup(CUnit **units, int nunits, int num);
 	/// Set the contents of a particular group with an array of units
 extern void SetGroup(CUnit **units, int nunits, int num);
 	/// Remove a unit from a group
-extern void RemoveUnitFromGroups(CUnit *unit);
+extern void RemoveUnitFromGroups(CUnit &unit);
 	/// Register CCL group features
 extern void GroupCclRegister();
 	/// ask group members for help
-extern void GroupHelpMe(CUnit *attacker, CUnit *defender);
+extern void GroupHelpMe(CUnit *attacker, CUnit &defender);
 extern int IsGroupTainted(int num);
 
 // in selection.c
 
 	/// Check if unit is the currently only selected
-#define IsOnlySelected(unit) (NumSelected == 1 && Selected[0] == (unit))
+#define IsOnlySelected(unit) (NumSelected == 1 && Selected[0] == &(unit))
 
 	///  Save selection to restore after.
 extern void SaveSelection();
@@ -1471,23 +1450,23 @@ extern void ChangeSelectedUnits(CUnit **units, int num_units);
 	/// Changed TeamUnit Selection
 extern void ChangeTeamSelectedUnits(CPlayer *player, CUnit **units, int adjust, int count);
 	/// Add a unit to selection
-extern int SelectUnit(CUnit *unit);
+extern int SelectUnit(CUnit &unit);
 	/// Select one unit as selection
-extern void SelectSingleUnit(CUnit *unit);
+extern void SelectSingleUnit(CUnit &unit);
 	/// Remove a unit from selection
-extern void UnSelectUnit(CUnit *unit);
+extern void UnSelectUnit(CUnit &unit);
 	/// Add a unit to selected if not already selected, remove it otherwise
-extern int ToggleSelectUnit(CUnit *unit);
+extern int ToggleSelectUnit(CUnit &unit);
 	/// Select units from the same type (if selectable by rectangle)
-extern int SelectUnitsByType(CUnit *base);
+extern int SelectUnitsByType(CUnit &base);
 	/// Toggle units from the same type (if selectable by rectangle)
-extern int ToggleUnitsByType(CUnit *base);
+extern int ToggleUnitsByType(CUnit &base);
 	/// Select the units belonging to a particular group
 extern int SelectGroup(int group_number, GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY);
 	/// Add the units from the same group as the one in parameter
-extern int AddGroupFromUnitToSelection(CUnit *unit);
+extern int AddGroupFromUnitToSelection(CUnit &unit);
 	/// Select the units from the same group as the one in parameter
-extern int SelectGroupFromUnit(CUnit *unit);
+extern int SelectGroupFromUnit(CUnit &unit);
 	/// Select the units in the selection rectangle
 extern int SelectUnitsInRectangle(int tx, int ty, int w, int h);
 	/// Select ground units in the selection rectangle

@@ -68,7 +68,7 @@
 **  @return      >0 remaining path length, 0 wait for path, -1
 **               reached goal, -2 can't reach the goal.
 */
-int DoActionMove(CUnit *unit)
+int DoActionMove(CUnit &unit)
 {
 	Vec2i posd; // movement in tile.
 	int d;
@@ -77,13 +77,13 @@ int DoActionMove(CUnit *unit)
 	int move;
 	int off;
 
-	Assert(unit->CanMove());
-	if (!unit->Moving &&
-			(unit->Type->Animations->Move != unit->Anim.CurrAnim || !unit->Anim.Wait)) {
-		Assert(!unit->Anim.Unbreakable);
+	Assert(unit.CanMove());
+	if (!unit.Moving &&
+			(unit.Type->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
+		Assert(!unit.Anim.Unbreakable);
 
 		// FIXME: So units flying up and down are not affected.
-		unit->IX = unit->IY = 0;
+		unit.IX = unit.IY = 0;
 
 		MapUnmarkUnitGuard(unit);
 		UnmarkUnitFieldFlags(unit);
@@ -91,46 +91,46 @@ int DoActionMove(CUnit *unit)
 		MarkUnitFieldFlags(unit);
 		switch (d) {
 			case PF_UNREACHABLE: // Can't reach, stop
-				if (unit->Player->AiEnabled) {
+				if (unit.Player->AiEnabled) {
 					AiCanNotMove(unit);
 				}
-				unit->Moving = 0;
+				unit.Moving = 0;
 				return d;
 			case PF_REACHED: // Reached goal, stop
-				unit->Moving = 0;
+				unit.Moving = 0;
 				return d;
 			case PF_WAIT: // No path, wait
 				// Reset frame to still frame while we wait
 				// FIXME: Unit doesn't animate.
-				unit->Frame = unit->Type->StillFrame;
+				unit.Frame = unit.Type->StillFrame;
 				UnitUpdateHeading(unit);
-				unit->Wait = 10;
+				unit.Wait = 10;
 
-				unit->Moving = 0;
+				unit.Moving = 0;
 				return d;
 			default: // On the way moving
-				unit->Moving = 1;
+				unit.Moving = 1;
 				break;
 		}
-		x = unit->tilePos.x;
-		y = unit->tilePos.y;
-		off = unit->Offset;
+		x = unit.tilePos.x;
+		y = unit.tilePos.y;
+		off = unit.Offset;
 		//
 		// Transporter (un)docking?
 		//
 		// FIXME: This is an ugly hack
-		if (unit->Type->CanTransport() &&
+		if (unit.Type->CanTransport() &&
 				((Map.WaterOnMap(off) && Map.CoastOnMap(x + posd.x, y + posd.y)) ||
 				(Map.CoastOnMap(off) && Map.WaterOnMap(x + posd.x, y + posd.y)))) {
 			PlayUnitSound(unit, VoiceDocking);
 		}
 
-		x = unit->tilePos.x + posd.x;
-		y = unit->tilePos.y + posd.y;
-		unit->MoveToXY(x, y);
+		x = unit.tilePos.x + posd.x;
+		y = unit.tilePos.y + posd.y;
+		unit.MoveToXY(x, y);
 
 		// Remove unit from the current selection
-		if (unit->Selected && !Map.IsFieldVisible(ThisPlayer, x, y)) {
+		if (unit.Selected && !Map.IsFieldVisible(ThisPlayer, x, y)) {
 			if (NumSelected == 1) { //  Remove building cursor
 				CancelBuildingMode();
 			}
@@ -140,28 +140,28 @@ int DoActionMove(CUnit *unit)
 			}
 		}
 
-		unit->IX = -posd.x * TileSizeX;
-		unit->IY = -posd.y * TileSizeY;
-		unit->Frame = unit->Type->StillFrame;
+		unit.IX = -posd.x * TileSizeX;
+		unit.IY = -posd.y * TileSizeY;
+		unit.Frame = unit.Type->StillFrame;
 		UnitHeadingFromDeltaXY(unit, posd);
 	} else {
-		posd.x = Heading2X[unit->Direction / NextDirection];
-		posd.y = Heading2Y[unit->Direction / NextDirection];
-		d = unit->Data.Move.Length + 1;
+		posd.x = Heading2X[unit.Direction / NextDirection];
+		posd.y = Heading2Y[unit.Direction / NextDirection];
+		d = unit.Data.Move.Length + 1;
 	}
 
-	unit->Data.Move.Cycles++;//reset have to be manualy controled by caller.
-	move = UnitShowAnimationScaled(unit, unit->Type->Animations->Move,
-			Map.Field(unit->Offset)->Cost);
+	unit.Data.Move.Cycles++;//reset have to be manualy controled by caller.
+	move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move,
+			Map.Field(unit.Offset)->Cost);
 
-	unit->IX += posd.x * move;
-	unit->IY += posd.y * move;
+	unit.IX += posd.x * move;
+	unit.IY += posd.y * move;
 
 	// Finished move animation, set Moving to 0 so we recalculate the path
 	// next frame
 	// FIXME: this is broken for subtile movement
-	if (!unit->Anim.Unbreakable && !unit->IX && !unit->IY) {
-		unit->Moving = 0;
+	if (!unit.Anim.Unbreakable && !unit.IX && !unit.IY) {
+		unit.Moving = 0;
 	}
 	return d;
 }
@@ -176,23 +176,22 @@ int DoActionMove(CUnit *unit)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionMove(CUnit *unit)
+void HandleActionMove(CUnit &unit)
 {
 	CUnit *goal;
 
-	Assert(unit);
-	Assert(unit->CanMove());
+	Assert(unit.CanMove());
 
-	if (unit->Wait) {
-		unit->Wait--;
+	if (unit.Wait) {
+		unit.Wait--;
 		return;
 	}
 
-	if (!unit->SubAction) { // first entry
-		unit->SubAction = 1;
+	if (!unit.SubAction) { // first entry
+		unit.SubAction = 1;
 		NewResetPath(unit);
-		unit->Data.Move.Cycles = 0;
-		Assert(unit->State == 0);
+		unit.Data.Move.Cycles = 0;
+		Assert(unit.State == 0);
 	}
 
 	// FIXME: (mr-russ) Make a reachable goal here with GoalReachable ...
@@ -202,15 +201,15 @@ void HandleActionMove(CUnit *unit)
 			//
 			// Some tries to reach the goal
 			//
-			if (unit->CurrentOrder()->CheckRange()) {
-				unit->CurrentOrder()->Range++;
+			if (unit.CurrentOrder()->CheckRange()) {
+				unit.CurrentOrder()->Range++;
 				break;
 			}
 			// FALL THROUGH
 		case PF_REACHED:
 			// Release target, if any.
-			unit->CurrentOrder()->ClearGoal();
-			unit->ClearAction();
+			unit.CurrentOrder()->ClearGoal();
+			unit.ClearAction();
 			return;
 
 		default:
@@ -220,11 +219,11 @@ void HandleActionMove(CUnit *unit)
 	//
 	// Target destroyed?
 	//
-	goal = unit->CurrentOrder()->GetGoal();
+	goal = unit.CurrentOrder()->GetGoal();
 	if (goal && goal->Destroyed) {
 		DebugPrint("Goal dead\n");
-		unit->CurrentOrder()->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
-		unit->CurrentOrder()->ClearGoal();
+		unit.CurrentOrder()->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
+		unit.CurrentOrder()->ClearGoal();
 		NewResetPath(unit);
 	}
 }

@@ -56,23 +56,18 @@
 */
 void AiCheckMagic(void)
 {
-	int i;
-	unsigned int j;
-	int n;
-	CUnit **units;
-	CUnit *unit;
-	const CPlayer *player;
+	const int n = AiPlayer->Player->TotalNumUnits;
+	CUnit **units = AiPlayer->Player->Units;
+	const CPlayer *player = AiPlayer->Player; /*units[0]->Player */
 
-	n = AiPlayer->Player->TotalNumUnits;
-	units = AiPlayer->Player->Units;
-	player = AiPlayer->Player; /*units[0]->Player */
-	for (i = 0; i < n; ++i) {
-		unit = units[i];
+	for (int i = 0; i < n; ++i) {
+		CUnit &unit = *units[i];
+
 		// Check only magic units
-		if (unit->Type->CanCastSpell) {
-			for (j = 0; j < SpellTypeTable.size(); ++j) {
+		if (unit.Type->CanCastSpell) {
+			for (unsigned int j = 0; j < SpellTypeTable.size(); ++j) {
 				// Check if we can cast this spell. SpellIsAvailable checks for upgrades.
-				if (unit->Type->CanCastSpell[j] && SpellIsAvailable(player, j) &&
+				if (unit.Type->CanCastSpell[j] && SpellIsAvailable(player, j) &&
 					(SpellTypeTable[j]->AutoCast || SpellTypeTable[j]->AICast)) {
 						AutoCastSpell(unit, SpellTypeTable[j]);
 				}

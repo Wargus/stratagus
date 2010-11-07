@@ -68,7 +68,7 @@
 **
 **  @note            Can be faster written.
 */
-static int AiCheckSurrounding(const CUnit *worker,
+static int AiCheckSurrounding(const CUnit &worker,
 		 const CUnitType *type, int x, int y, bool &backupok)
 {
 	static int dirs[4][3] = {{1,0,0},{0,1,Map.Info.MapWidth},
@@ -87,16 +87,14 @@ static int AiCheckSurrounding(const CUnit *worker,
 	x1 = x0 + type->TileWidth + 1;
 	y1 = y0 + type->TileWidth + 1;
 
-
 	x = x0;
 	y = y0;
 	y_offset = y * Map.Info.MapWidth;
 	dir = -1;
 	surroundingnb = 0;
 	while (dir < 4) {
-		if ((unsigned)x < (unsigned)Map.Info.MapWidth &&
-						 (unsigned)y < (unsigned)Map.Info.MapHeight) {
-			if (worker && x == worker->tilePos.x && y == worker->tilePos.y) {
+		if (Map.Info.IsPointOnMap(x, y)) {
+			if (x == worker.tilePos.x && y == worker.tilePos.y) {
 				surrounding[surroundingnb++] = 1;
 			} else if (	Map.CheckMask(x + y_offset,
 						(MapFieldUnpassable | MapFieldWall | MapFieldRocks |
@@ -152,20 +150,16 @@ static int AiCheckSurrounding(const CUnit *worker,
 **  @param type    Type of building.
 **  @param ox      Original X position to try building
 **  @param oy      Original Y position to try building
-**  @param dx      Pointer for X position returned.
-**  @param dy      Pointer for Y position returned.
+**  @param dpos    Pointer for position returned.
 **
 **  @return        True if place found, false if no found.
 */
-static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
-	int ox, int oy, int *dx, int *dy)
+static int AiFindBuildingPlace2(const CUnit &worker, const CUnitType *type,
+	int ox, int oy, Vec2i *dpos)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
-	struct p {
-		unsigned short X;
-		unsigned short Y;
-	} *points;
+	Vec2i *points;
 	int size;
 	int x;
 	int y;
@@ -186,11 +180,11 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 	//
 	// Look if we can build at current place.
 	//
-	if (CanBuildUnitType(worker, type, x, y, 1) &&
-		!AiEnemyUnitsInDistance(worker->Player, NULL, x, y, 8)) {
+	if (CanBuildUnitType(&worker, type, x, y, 1) &&
+		!AiEnemyUnitsInDistance(worker.Player, NULL, x, y, 8)) {
 		if (AiCheckSurrounding(worker, type, x, y, backupok)) {
-			*dx = x;
-			*dy = y;
+			dpos->x = x;
+			dpos->y = y;
 			return 1;
 		} else if (backupok) {
 			backupx = x;
@@ -199,7 +193,7 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 	}
 
 	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
-	points = new p[size];
+	points = new Vec2i[size];
 
 	//
 	//  Make movement matrix.
@@ -207,18 +201,18 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 	unsigned char *matrix = CreateMatrix();
 	const int w = Map.Info.MapWidth + 2;
 
-	mask = worker->Type->MovementMask;
+	mask = worker.Type->MovementMask;
 	// Ignore all possible mobile units.
 	mask &= ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
 
-	points[0].X = x;
-	points[0].Y = y;
+	points[0].x = x;
+	points[0].y = y;
 	// also use the bottom right
 	if ((type->TileWidth > 1 || type->TileHeight > 1) &&
 			x + type->TileWidth - 1 < Map.Info.MapWidth &&
 			y + type->TileHeight - 1 < Map.Info.MapHeight) {
-		points[1].X = x + type->TileWidth - 1;
-		points[1].Y = y + type->TileHeight - 1;
+		points[1].x = x + type->TileWidth - 1;
+		points[1].y = y + type->TileHeight - 1;
 		ep = wp = 2; // start with two points
 	} else {
 		ep = wp = 1; // start with one point
@@ -232,8 +226,8 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 	//
 	for (;;) {
 		while (rp != ep) {
-			rx = points[rp].X;
-			ry = points[rp].Y;
+			rx = points[rp].x;
+			ry = points[rp].y;
 			for (i = 0; i < 8; ++i) { // mark all neighbors
 				x = rx + xoffset[i];
 				y = ry + yoffset[i];
@@ -245,11 +239,11 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 				//
 				// Look if we can build here and no enemies nearby.
 				//
-				if (CanBuildUnitType(worker, type, x, y, 1) &&
-						!AiEnemyUnitsInDistance(worker->Player, NULL, x, y, 8)) {
+				if (CanBuildUnitType(&worker, type, x, y, 1) &&
+						!AiEnemyUnitsInDistance(worker.Player, NULL, x, y, 8)) {
 					if (AiCheckSurrounding(worker, type, x, y, backupok)) {
-						*dx = x;
-						*dy = y;
+						dpos->x = x;
+						dpos->y = y;
 						delete[] points;
 						return 1;
 					} else if (backupok && backupx == -1) {
@@ -260,8 +254,8 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 
 				if (CanMoveToMask(x, y, mask)) { // reachable
 					*m = 1;
-					points[wp].X = x; // push the point
-					points[wp].Y = y;
+					points[wp].x = x; // push the point
+					points[wp].y = y;
 					if (++wp >= size) { // round about
 						wp = 0;
 					}
@@ -287,8 +281,8 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 	delete[] points;
 
 	if (backupx != -1) {
-		*dx = backupx;
-		*dy = backupy;
+		dpos->x = backupx;
+		dpos->y = backupy;
 		return 1;
 	}
 	return 0;
@@ -308,27 +302,23 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 **  @param worker  Worker to build building.
 **  @param type    Type of building.
 **  @param nx      Start search X position (if == -1 then unit X pos used).
-**  @param ny      Start search X position (if == -1 then unit X pos used).
-**  @param dx      Pointer for X position returned.
-**  @param dy      Pointer for Y position returned.
+**  @param ny      Start search Y position (if == -1 then unit Y pos used).
+**  @param dpos    Pointer for position returned.
 **
 **  @return        True if place found, false if not found.
 **
 **  @todo          FIXME: This is slow really slow, using
 **                 two flood fills, is not a perfect solution.
 */
-static int AiFindHallPlace(const CUnit *worker,
+static int AiFindHallPlace(const CUnit &worker,
 						 const CUnitType *type,
 						 int nx, int ny,
-						 int *dx, int *dy,
+						 Vec2i *dpos,
 						 int resource = GoldCost)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
-	struct p {
-		unsigned short X;
-		unsigned short Y;
-	} *points;
+	Vec2i *points;
 	int size;
 	int x;
 	int y;
@@ -345,10 +335,10 @@ static int AiFindHallPlace(const CUnit *worker,
 	unsigned char *matrix;
 	CUnit *mine;
 
-	x = (nx != -1 ? nx : worker->tilePos.x);
-	y = (ny != -1 ? ny : worker->tilePos.y);
+	x = (nx != -1 ? nx : worker.tilePos.x);
+	y = (ny != -1 ? ny : worker.tilePos.y);
 	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
-	points = new p[size];
+	points = new Vec2i[size];
 
 	//
 	// Make movement matrix. FIXME: can create smaller matrix.
@@ -357,21 +347,21 @@ static int AiFindHallPlace(const CUnit *worker,
 	w = Map.Info.MapWidth + 2;
 	matrix = morg + w + w + 2;
 
-	points[0].X = x;
-	points[0].Y = y;
+	points[0].x = x;
+	points[0].y = y;
 	rp = 0;
 	matrix[x + y * w] = 1; // mark start point
 	ep = wp = 1; // start with one point
 
-	mask = worker->Type->MovementMask;
+	mask = worker.Type->MovementMask;
 
 	//
 	// Pop a point from stack, push all neighbors which could be entered.
 	//
 	for (;;) {
 		while (rp != ep) {
-			rx = points[rp].X;
-			ry = points[rp].Y;
+			rx = points[rp].x;
+			ry = points[rp].y;
 			for (i = 0; i < 8; ++i) { // mark all neighbors
 				x = rx + xoffset[i];
 				y = ry + yoffset[i];
@@ -424,7 +414,7 @@ static int AiFindHallPlace(const CUnit *worker,
 						}
 					}
 					if (j == nunits) {
-						if (AiFindBuildingPlace2(worker, type, x, y, dx, dy)) {
+						if (AiFindBuildingPlace2(worker, type, x, y, dpos)) {
 							delete[] morg;
 							delete[] points;
 							return 1;
@@ -434,8 +424,8 @@ static int AiFindHallPlace(const CUnit *worker,
 
 				if (CanMoveToMask(x, y, mask)) { // reachable
 					*m = 1;
-					points[wp].X = x; // push the point
-					points[wp].Y = y;
+					points[wp].x = x; // push the point
+					points[wp].y = y;
 					if (++wp >= size) { // round about
 						wp = 0;
 					}
@@ -469,23 +459,19 @@ static int AiFindHallPlace(const CUnit *worker,
 **  @param type    Type of building.
 **  @param nx      Start search X position (if == -1 then unit X pos used).
 **  @param ny      Start search X position (if == -1 then unit X pos used).
-**  @param dx      Pointer for X position returned.
-**  @param dy      Pointer for Y position returned.
+**  @param dpos    Pointer for position returned.
 **
 **  @return        True if place found, false if not found.
 **
 **  @todo          FIXME: This is slow really slow, using two flood
 **                 fills, is not a perfect solution.
 */
-static int AiFindLumberMillPlace(const CUnit *worker, const CUnitType *type,
-	int nx,int ny, int *dx, int *dy)
+static int AiFindLumberMillPlace(const CUnit &worker, const CUnitType *type,
+	int nx,int ny, Vec2i *dpos)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
-	struct p {
-		unsigned short X;
-		unsigned short Y;
-	} *points;
+	Vec2i *points;
 	int size;
 	int x;
 	int y;
@@ -501,10 +487,10 @@ static int AiFindLumberMillPlace(const CUnit *worker, const CUnitType *type,
 	unsigned char *morg;
 	unsigned char *matrix;
 
-	x = nx != -1 ? nx : worker->tilePos.x;
-	y = ny != -1 ? ny : worker->tilePos.y;
+	x = nx != -1 ? nx : worker.tilePos.x;
+	y = ny != -1 ? ny : worker.tilePos.y;
 	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
-	points = new p[size];
+	points = new Vec2i[size];
 
 	//
 	// Make movement matrix.
@@ -513,21 +499,21 @@ static int AiFindLumberMillPlace(const CUnit *worker, const CUnitType *type,
 	w = Map.Info.MapWidth + 2;
 	matrix = morg + w + w + 2;
 
-	points[0].X = x;
-	points[0].Y = y;
+	points[0].x = x;
+	points[0].y = y;
 	rp = 0;
 	matrix[x + y * w] = 1; // mark start point
 	ep = wp = 1; // start with one point
 
-	mask = worker->Type->MovementMask;
+	mask = worker.Type->MovementMask;
 
 	//
 	// Pop a point from stack, push all neightbors which could be entered.
 	//
 	for (;;) {
 		while (rp != ep) {
-			rx = points[rp].X;
-			ry = points[rp].Y;
+			rx = points[rp].x;
+			ry = points[rp].y;
 			for (i = 0; i < 8; ++i) { // mark all neighbors
 				x = rx + xoffset[i];
 				y = ry + yoffset[i];
@@ -539,7 +525,7 @@ static int AiFindLumberMillPlace(const CUnit *worker, const CUnitType *type,
 				// Look if there is wood
 				//
 				if (Map.ForestOnMap(x, y)) {
-					if (AiFindBuildingPlace2(worker, type, x, y, dx, dy)) {
+					if (AiFindBuildingPlace2(worker, type, x, y, dpos)) {
 						delete[] morg;
 						delete[] points;
 						return 1;
@@ -548,8 +534,8 @@ static int AiFindLumberMillPlace(const CUnit *worker, const CUnitType *type,
 
 				if (CanMoveToMask(x, y, mask)) { // reachable
 					*m = 1;
-					points[wp].X = x; // push the point
-					points[wp].Y = y;
+					points[wp].x = x; // push the point
+					points[wp].y = y;
 					if (++wp >= size) { // round about
 						wp = 0;
 					}
@@ -577,18 +563,15 @@ static int AiFindLumberMillPlace(const CUnit *worker, const CUnitType *type,
 	return 0;
 }
 
-static int AiFindMiningPlace(const CUnit *worker,
+static int AiFindMiningPlace(const CUnit &worker,
 						 const CUnitType *type,
 						 int nx, int ny,
-						 int *dx, int *dy,
+						 Vec2i *dpos,
 						 int resource)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
-	struct p {
-		unsigned short X;
-		unsigned short Y;
-	} *points;
+	Vec2i *points;
 	int size;
 	int x;
 	int y;
@@ -605,10 +588,10 @@ static int AiFindMiningPlace(const CUnit *worker,
 	unsigned char *matrix;
 	CUnit *mine;
 
-	x = (nx != -1 ? nx : worker->tilePos.x);
-	y = (ny != -1 ? ny : worker->tilePos.y);
+	x = (nx != -1 ? nx : worker.tilePos.x);
+	y = (ny != -1 ? ny : worker.tilePos.y);
 	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
-	points = new p[size];
+	points = new Vec2i[size];
 
 	//
 	// Make movement matrix. FIXME: can create smaller matrix.
@@ -617,22 +600,22 @@ static int AiFindMiningPlace(const CUnit *worker,
 	w = Map.Info.MapWidth + 2;
 	matrix = morg + w + w + 2;
 
-	points[0].X = x;
-	points[0].Y = y;
+	points[0].x = x;
+	points[0].y = y;
 	rp = 0;
 	//if(worker->X == x && worker->Y == y)
 		matrix[x + y * w] = 1; // mark start point
 	ep = wp = 1; // start with one point
 
-	mask = worker->Type->MovementMask;
+	mask = worker.Type->MovementMask;
 
 	//
 	// Pop a point from stack, push all neighbors which could be entered.
 	//
 	for (;;) {
 		while (rp != ep) {
-			rx = points[rp].X;
-			ry = points[rp].Y;
+			rx = points[rp].x;
+			ry = points[rp].y;
 			for (i = 0; i < 8; ++i) { // mark all neighbors
 				x = rx + xoffset[i];
 				y = ry + yoffset[i];
@@ -644,7 +627,7 @@ static int AiFindMiningPlace(const CUnit *worker,
 				// Look if there is a mine area
 				//
 				if ((mine = ResourceOnMap(x, y, resource, false)) &&
-						 AiFindBuildingPlace2(worker, type, mine->tilePos.x, mine->tilePos.y, dx, dy)) {
+						 AiFindBuildingPlace2(worker, type, mine->tilePos.x, mine->tilePos.y, dpos)) {
 							delete[] morg;
 							delete[] points;
 							return 1;
@@ -652,8 +635,8 @@ static int AiFindMiningPlace(const CUnit *worker,
 
 				if (CanMoveToMask(x, y, mask)) { // reachable
 					*m = 1;
-					points[wp].X = x; // push the point
-					points[wp].Y = y;
+					points[wp].x = x; // push the point
+					points[wp].y = y;
 					if (++wp >= size) { // round about
 						wp = 0;
 					}
@@ -689,16 +672,15 @@ static int AiFindMiningPlace(const CUnit *worker,
 **  @param type    Type of building.
 **  @param nx      Start search near X position (or worker->X if nx == -1).
 **  @param ny      Start search near Y position (or worker->Y if ny == -1).
-**  @param dx      Pointer for X position returned.
-**  @param dy      Pointer for Y position returned.
+**  @param dpos    Pointer for position returned.
 **
 **  @return        True if place found, false if no found.
 **
 **  @todo          Better and faster way to find building place of oil
 **                 platforms Special routines for special buildings.
 */
-int AiFindBuildingPlace(const CUnit *worker, const CUnitType *type,
-		int nx, int ny, int *dx, int *dy)
+int AiFindBuildingPlace(const CUnit &worker, const CUnitType *type,
+		int nx, int ny, Vec2i *dpos)
 {
 	//
 	// Find a good place for a new hall
@@ -708,31 +690,31 @@ int AiFindBuildingPlace(const CUnit *worker, const CUnitType *type,
 
 	//Mines and Depots
 	for (int i = 0; i < MaxCosts; ++i) {
-		ResourceInfo *resinfo= worker->Type->ResInfo[i];
+		ResourceInfo *resinfo= worker.Type->ResInfo[i];
 		//Depots
 		if(type->CanStore[i]) {
 			if (resinfo && resinfo->TerrainHarvester) {
-				return AiFindLumberMillPlace(worker, type, 	nx, ny,dx, dy);
+				return AiFindLumberMillPlace(worker, type, 	nx, ny, dpos);
 			} else {
-				return AiFindHallPlace(worker, type, nx, ny, dx, dy, i);
+				return AiFindHallPlace(worker, type, nx, ny, dpos, i);
 			}
 		} else
 			//mines
 			if(type->GivesResource == i) {
 				if (resinfo && resinfo->RefineryHarvester) {
 					//Mine have to be build ONTOP resources
-					return AiFindMiningPlace(worker, type, nx, ny,  dx, dy, i);
+					return AiFindMiningPlace(worker, type, nx, ny,  dpos, i);
 				} else {
 					//Mine can be build without resource restrictions: solar panels, etc
 					return AiFindBuildingPlace2(worker, type,
-							(nx != -1 ? nx : worker->tilePos.x),
-							(ny != -1 ? ny : worker->tilePos.y), dx, dy);
+							(nx != -1 ? nx : worker.tilePos.x),
+							(ny != -1 ? ny : worker.tilePos.y), dpos);
 				}
 			}
 	}
 
 	return AiFindBuildingPlace2(worker, type,
-			(nx != -1 ? nx : worker->tilePos.x), (ny != -1 ? ny : worker->tilePos.y), dx, dy);
+			(nx != -1 ? nx : worker.tilePos.x), (ny != -1 ? ny : worker.tilePos.y), dpos);
 }
 
 //@}

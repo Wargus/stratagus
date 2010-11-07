@@ -55,68 +55,54 @@ class CUpgrade;
 */
 
 	/// Send stop command
-extern void SendCommandStopUnit(CUnit *unit);
+extern void SendCommandStopUnit(CUnit &unit);
 	/// Send stand ground command
-extern void SendCommandStandGround(CUnit *unit, int flush);
+extern void SendCommandStandGround(CUnit &unit, int flush);
 	/// Send follow command
-extern void SendCommandFollow(CUnit *unit, CUnit *dest,
-	int flush);
+extern void SendCommandFollow(CUnit &unit, CUnit &dest, int flush);
 	/// Send move command
-extern void SendCommandMove(CUnit *unit, int x, int y, int flush);
+extern void SendCommandMove(CUnit &unit, int x, int y, int flush);
 	/// Send repair command
-extern void SendCommandRepair(CUnit *unit, int x, int y,
-	CUnit *dest, int flush);
+extern void SendCommandRepair(CUnit &unit, int x, int y, CUnit *dest, int flush);
 	/// Send auto repair command
-extern void SendCommandAutoRepair(CUnit *unit, int on);
+extern void SendCommandAutoRepair(CUnit &unit, int on);
 	/// Send attack command
-extern void SendCommandAttack(CUnit *unit, int x, int y,
-	CUnit *dest, int flush);
+extern void SendCommandAttack(CUnit &unit, int x, int y, CUnit *dest, int flush);
 	/// Send attack ground command
-extern void SendCommandAttackGround(CUnit *unit, int x, int y,
-	int flush);
+extern void SendCommandAttackGround(CUnit &unit, int x, int y, int flush);
 	/// Send patrol command
-extern void SendCommandPatrol(CUnit *unit, int x, int y, int flush);
+extern void SendCommandPatrol(CUnit &unit, int x, int y, int flush);
 	/// Send board command
-extern void SendCommandBoard(CUnit *unit, int x, int y,
-	CUnit *dest, int flush);
+extern void SendCommandBoard(CUnit &unit, int x, int y, CUnit &dest, int flush);
 	/// Send unload command
-extern void SendCommandUnload(CUnit *unit, int x, int y,
-	CUnit *what, int flush);
+extern void SendCommandUnload(CUnit &unit, int x, int y, CUnit *what, int flush);
 	/// Send build building command
-extern void SendCommandBuildBuilding(CUnit *unit, int x, int y,
-	CUnitType *what, int flush);
+extern void SendCommandBuildBuilding(CUnit &unit, int x, int y, CUnitType *what, int flush);
 	/// Send cancel building command
-extern void SendCommandDismiss(CUnit *unit);
+extern void SendCommandDismiss(CUnit &unit);
 	/// Send harvest location command
-extern void SendCommandResourceLoc(CUnit *unit, int x, int y,
+extern void SendCommandResourceLoc(CUnit &unit, int x, int y,
 	int flush);
 	/// Send harvest command
-extern void SendCommandResource(CUnit *unit, CUnit *dest,
-	int flush);
+extern void SendCommandResource(CUnit &unit, CUnit &dest, int flush);
 	/// Send return goods command
-extern void SendCommandReturnGoods(CUnit *unit, CUnit *dest,
-	int flush);
+extern void SendCommandReturnGoods(CUnit &unit, CUnit *dest, int flush);
 	/// Send train command
-extern void SendCommandTrainUnit(CUnit *unit,
-	CUnitType *what, int flush);
+extern void SendCommandTrainUnit(CUnit &unit, CUnitType *what, int flush);
 	/// Send cancel training command
-extern void SendCommandCancelTraining(CUnit *unit, int slot,
-	const CUnitType *type);
+extern void SendCommandCancelTraining(CUnit &unit, int slot, const CUnitType *type);
 	/// Send upgrade to command
-extern void SendCommandUpgradeTo(CUnit *unit,
-	CUnitType *what, int flush);
+extern void SendCommandUpgradeTo(CUnit &unit, CUnitType *what, int flush);
 	/// Send cancel upgrade to command
-extern void SendCommandCancelUpgradeTo(CUnit *unit);
+extern void SendCommandCancelUpgradeTo(CUnit &unit);
 	/// Send research command
-extern void SendCommandResearch(CUnit *unit, CUpgrade *what, int flush);
+extern void SendCommandResearch(CUnit &unit, CUpgrade *what, int flush);
 	/// Send cancel research command
-extern void SendCommandCancelResearch(CUnit *unit);
+extern void SendCommandCancelResearch(CUnit &unit);
 	/// Send spell cast command
-extern void SendCommandSpellCast(CUnit *unit, int x, int y,
-	CUnit *dest, int spellid, int flush);
+extern void SendCommandSpellCast(CUnit &unit, int x, int y, CUnit *dest, int spellid, int flush);
 	/// Send auto spell cast command
-extern void SendCommandAutoSpellCast(CUnit *unit, int spellid,
-	int on);
+extern void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on);
 	/// Send diplomacy command
 extern void SendCommandDiplomacy(int player, int state, int opponent);
 	/// Send shared vision command

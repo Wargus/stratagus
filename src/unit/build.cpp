@@ -52,13 +52,13 @@
 **
 **  @return        the BuildingRestrictionDetails
 */
-CBuildRestrictionOnTop *OnTopDetails(const CUnit *unit, const CUnitType *parent)
+CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent)
 {
 	CBuildRestrictionAnd *andb;
 	CBuildRestrictionOnTop *ontopb;
 
-	for (std::vector<CBuildRestriction *>::iterator i = unit->Type->BuildingRules.begin();
-			i != unit->Type->BuildingRules.end(); ++i) {
+	for (std::vector<CBuildRestriction *>::iterator i = unit.Type->BuildingRules.begin();
+			i != unit.Type->BuildingRules.end(); ++i) {
 		if ((ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*i))) {
 			if (!parent) {
 				// Guess this is right
@@ -363,7 +363,7 @@ CUnit *CanBuildUnitType(const CUnit *unit,
 	//
 	j = 0;
 	if (unit) {
-		UnmarkUnitFieldFlags(unit);
+		UnmarkUnitFieldFlags(*unit);
 	}
 
 	player = NULL;
@@ -404,7 +404,7 @@ CUnit *CanBuildUnitType(const CUnit *unit,
 		index += Map.Info.MapWidth;
 	}
 	if (unit) {
-		MarkUnitFieldFlags(unit);
+		MarkUnitFieldFlags(*unit);
 	}
 
 	//

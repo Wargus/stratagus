@@ -125,7 +125,7 @@ public:
 	SpellActionType(int mod = 0) : ModifyManaCaster(mod) {};
 	virtual ~SpellActionType() {};
 
-	virtual int Cast(CUnit *caster, const SpellType *spell,
+	virtual int Cast(CUnit &caster, const SpellType *spell,
 		CUnit *target, int x, int y) = 0;
 
 	const int ModifyManaCaster;
@@ -139,7 +139,7 @@ class AreaAdjustVitals : public SpellActionType
 {
 public:
 	AreaAdjustVitals() : HP(0), Mana(0) {};
-	virtual int Cast(CUnit *caster, const SpellType *spell,
+	virtual int Cast(CUnit &caster, const SpellType *spell,
 		CUnit *target, int x, int y);
 
 	int HP;         /// Target HP gain.(can be negative)
@@ -150,7 +150,7 @@ class SpawnMissile : public SpellActionType {
 public:
 	SpawnMissile() : Damage(0), TTL(-1), Delay(0),
 		StartPoint(LocBaseCaster), EndPoint(LocBaseTarget), Missile(0) {};
-	virtual int Cast(CUnit *caster, const SpellType *spell,
+	virtual int Cast(CUnit &caster, const SpellType *spell,
 		CUnit *target, int x, int y);
 
 	int Damage;                             /// Missile damage.
@@ -164,7 +164,7 @@ public:
 class Demolish : public SpellActionType {
 public:
 	Demolish() : Damage(0), Range(0) {};
-	virtual int Cast(CUnit *caster, const SpellType *spell,
+	virtual int Cast(CUnit &caster, const SpellType *spell,
 		CUnit *target, int x, int y);
 
 	int Damage; /// Damage for every unit in range.
@@ -175,7 +175,7 @@ class AreaBombardment : public SpellActionType {
 public:
 	AreaBombardment() : Fields(0), Shards(0), Damage(0),
 		StartOffsetX(0), StartOffsetY(0), Missile(NULL) {};
-	virtual int Cast(CUnit *caster, const SpellType *spell,
+	virtual int Cast(CUnit &caster, const SpellType *spell,
 		CUnit *target, int x, int y);
 
 	int Fields;             /// The size of the affected square.
@@ -189,7 +189,7 @@ public:
 class SpawnPortal : public SpellActionType {
 public:
 	SpawnPortal() : PortalType(0) {};
-	virtual int Cast(CUnit *caster, const SpellType *spell,
+	virtual int Cast(CUnit &caster, const SpellType *spell,
 		CUnit *target, int x, int y);
 
 	CUnitType *PortalType;   /// The unit type spawned
@@ -199,7 +199,7 @@ class AdjustVariable : public SpellActionType {
 public:
 	AdjustVariable() : Var (NULL) {};
 	~AdjustVariable() { delete [] (this->Var); };
-	virtual int Cast(CUnit *caster, const SpellType *spell,
+	virtual int Cast(CUnit &caster, const SpellType *spell,
 		CUnit *target, int x, int y);
 
 	SpellActionTypeAdjustVariable *Var;
@@ -208,7 +208,7 @@ public:
 class AdjustVitals : public SpellActionType {
 public:
 	AdjustVitals() : SpellActionType(1), HP(0), Mana(0), MaxMultiCast(0) {};
-	virtual int Cast(CUnit *caster, const SpellType *spell,
+	virtual int Cast(CUnit &caster, const SpellType *spell,
 		CUnit *target, int x, int y);
 
 	int HP;         /// Target HP gain.(can be negative)
@@ -221,7 +221,7 @@ public:
 class Polymorph : public SpellActionType {
 public:
 	Polymorph() : SpellActionType(1), NewForm(NULL), PlayerNeutral(0) {};
-	virtual int Cast(CUnit *caster, const SpellType *spell,
+	virtual int Cast(CUnit &caster, const SpellType *spell,
 		CUnit *target, int x, int y);
 
 	CUnitType *NewForm;         /// The new form
@@ -232,7 +232,7 @@ public:
 class Summon : public SpellActionType {
 public:
 	Summon() : SpellActionType(1), UnitType(NULL), TTL(0), RequireCorpse(0) {};
-	virtual int Cast(CUnit *caster, const SpellType *spell,
+	virtual int Cast(CUnit &caster, const SpellType *spell,
 		CUnit *target, int x, int y);
 
 	CUnitType *UnitType;    /// Type of unit to be summoned.
@@ -243,7 +243,7 @@ public:
 class Capture : public SpellActionType {
 public:
 	Capture() : SacrificeEnable(0), Damage(0), DamagePercent(0) {};
-	virtual int Cast(CUnit *caster, const SpellType *spell,
+	virtual int Cast(CUnit &caster, const SpellType *spell,
 		CUnit *target, int x, int y);
 
 	char SacrificeEnable; /// true if the caster dies after casting.
@@ -376,12 +376,12 @@ public:
 
 	// Graphics and sounds. Add something else here?
 	SoundConfig SoundWhenCast;  /// Sound played if cast
-	
+
 	bool IsCasterOnly() const
 	{
 		return !Range && Target == TargetSelf;
 	}
-	
+
 };
 
 /*----------------------------------------------------------------------------
@@ -411,15 +411,15 @@ extern void CleanSpells(void);
 extern bool SpellIsAvailable(const CPlayer *player, int SpellId);
 
 	/// returns true if spell can be casted (enough mana, valid target)
-extern bool CanCastSpell(const CUnit *caster, const SpellType *spell,
+extern bool CanCastSpell(const CUnit &caster, const SpellType *spell,
 	const CUnit *target, int x, int y);
 
 	/// cast spell on target unit or place at x,y
-extern int SpellCast(CUnit *caster, const SpellType *spell,
+extern int SpellCast(CUnit &caster, const SpellType *spell,
 	CUnit *target, int x, int y);
 
 	/// auto cast the spell if possible
-extern int AutoCastSpell(CUnit *caster, const SpellType *spell);
+extern int AutoCastSpell(CUnit &caster, const SpellType *spell);
 
 	/// return spell type by ident string
 extern SpellType *SpellTypeByIdent(const std::string &ident);

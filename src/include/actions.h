@@ -36,6 +36,8 @@
 #include "unit_cache.h"
 #endif
 
+//#include "vec2i.h"
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -52,6 +54,7 @@ class CUnitType;
 class CUpgrade;
 class SpellType;
 class CAnimation;
+class Vec2i;
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -75,145 +78,135 @@ extern unsigned SyncHash;  /// Hash calculated to find sync failures
 	/// Prepare command quit
 extern void CommandQuit(int player);
 	/// Prepare command stop
-extern void CommandStopUnit(CUnit *unit);
+extern void CommandStopUnit(CUnit &unit);
 	/// Prepare command stand ground
-extern void CommandStandGround(CUnit *unit, int flush);
+extern void CommandStandGround(CUnit &unit, int flush);
 	/// Prepare command follow
-extern void CommandFollow(CUnit *unit, CUnit *dest,
-	int flush);
+extern void CommandFollow(CUnit &unit, CUnit &dest, int flush);
 	/// Prepare command move
-extern void CommandMove(CUnit *unit, int x, int y, int flush);
+extern void CommandMove(CUnit &unit, int x, int y, int flush);
 	/// Prepare command repair
-extern void CommandRepair(CUnit *unit, int x, int y,
-	CUnit *dest, int flush);
+extern void CommandRepair(CUnit &unit, int x, int y, CUnit *dest, int flush);
 	/// Send auto repair command
-extern void CommandAutoRepair(CUnit *unit, int on);
+extern void CommandAutoRepair(CUnit &unit, int on);
 	/// Prepare command attack
-extern void CommandAttack(CUnit *unit, int x, int y,
-	CUnit *dest, int flush);
+extern void CommandAttack(CUnit &unit, int x, int y, CUnit *dest, int flush);
 	/// Prepare command attack ground
-extern void CommandAttackGround(CUnit *unit, int x, int y, int flush);
+extern void CommandAttackGround(CUnit &unit, int x, int y, int flush);
 	/// Prepare command patrol
-extern void CommandPatrolUnit(CUnit *unit, int x, int y, int flush);
+extern void CommandPatrolUnit(CUnit &unit, int x, int y, int flush);
 	/// Prepare command board
-extern void CommandBoard(CUnit *unit, CUnit *dest, int flush);
+extern void CommandBoard(CUnit &unit, CUnit &dest, int flush);
 	/// Prepare command unload
-extern void CommandUnload(CUnit *unit, int x, int y,
-	CUnit *what, int flush);
+extern void CommandUnload(CUnit &unit, int x, int y, CUnit *what, int flush);
 	/// Prepare command build
-extern void CommandBuildBuilding(CUnit *, int x, int y,
-	CUnitType *, int);
+extern void CommandBuildBuilding(CUnit &unit, int x, int y, CUnitType *, int flush);
 	/// Prepare command dismiss
-extern void CommandDismiss(CUnit *unit);
+extern void CommandDismiss(CUnit &unit);
 	/// Prepare command resource location
-extern void CommandResourceLoc(CUnit *unit, int x, int y, int flush);
+extern void CommandResourceLoc(CUnit &unit, int x, int y, int flush);
 	/// Prepare command resource
-extern void CommandResource(CUnit *unit, CUnit *dest,
-	int flush);
+extern void CommandResource(CUnit &unit, CUnit &dest, int flush);
 	/// Prepare command return
-extern void CommandReturnGoods(CUnit *unit, CUnit *goal,
-	int flush);
+extern void CommandReturnGoods(CUnit &unit, CUnit *goal, int flush);
 	/// Prepare command train
-extern void CommandTrainUnit(CUnit *unit, CUnitType *what,
-	int flush);
+extern void CommandTrainUnit(CUnit &unit, CUnitType *what, int flush);
 	/// Prepare command cancel training
-extern void CommandCancelTraining(CUnit *unit, int slot,
-	const CUnitType *type);
+extern void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type);
 	/// Prepare command upgrade to
-extern void CommandUpgradeTo(CUnit *unit, CUnitType *what,
-	int flush);
+extern void CommandUpgradeTo(CUnit &unit, CUnitType *what, int flush);
 	/// immediate transforming into type.
-extern void CommandTransformIntoType(CUnit *unit, CUnitType *type);
+extern void CommandTransformIntoType(CUnit &unit, CUnitType *type);
 	/// Prepare command cancel upgrade to
-extern void CommandCancelUpgradeTo(CUnit *unit);
+extern void CommandCancelUpgradeTo(CUnit &unit);
 	/// Prepare command research
-extern void CommandResearch(CUnit *unit, CUpgrade *what, int flush);
+extern void CommandResearch(CUnit &unit, CUpgrade *what, int flush);
 	/// Prepare command cancel research
-extern void CommandCancelResearch(CUnit *unit);
+extern void CommandCancelResearch(CUnit &unit);
 	/// Prepare command spellcast
-extern void CommandSpellCast(CUnit *unit, int x, int y,
+extern void CommandSpellCast(CUnit &unit, int x, int y,
 	CUnit *dest, SpellType *spell, int flush);
 	/// Prepare command auto spellcast
-extern void CommandAutoSpellCast(CUnit *unit, int spellid, int on);
+extern void CommandAutoSpellCast(CUnit &unit, int spellid, int on);
 	/// Prepare diplomacy command
 extern void CommandDiplomacy(int player, int state, int opponent);
 	/// Prepare shared vision command
 extern void CommandSharedVision(int player, bool state, int opponent);
 	/// Send any command
-//extern void CommandAnyOrder(CUnit *unit, COrder *order, int flush);
+//extern void CommandAnyOrder(CUnit &unit, COrder *order, int flush);
 	/// Move an order in command queue
-extern void CommandMoveOrder(CUnit *unit, int src, int dst);
+extern void CommandMoveOrder(CUnit &unit, int src, int dst);
 
 /*----------------------------------------------------------------------------
 --  Actions: in action_<name>.c
 ----------------------------------------------------------------------------*/
 
-extern void DropResource(CUnit *unit);
-extern void ResourceGiveUp(CUnit *unit);
-extern int GetNumWaitingWorkers(const CUnit *mine);
-extern void AutoAttack(CUnit *unit, CUnitCache &targets, bool stand_ground);
-extern void MapUnmarkUnitGuard(CUnit *unit);
-extern void UnHideUnit(CUnit *unit);
+extern void DropResource(CUnit &unit);
+extern void ResourceGiveUp(CUnit &unit);
+extern int GetNumWaitingWorkers(const CUnit &mine);
+extern void AutoAttack(CUnit &unit, CUnitCache &targets, bool stand_ground);
+extern void MapUnmarkUnitGuard(CUnit &unit);
+extern void UnHideUnit(CUnit &unit);
 
 	/// Generic still action
-extern void ActionStillGeneric(CUnit *unit, bool stand_ground);
+extern void ActionStillGeneric(CUnit &unit, bool stand_ground);
 	/// Handle command still
-extern void HandleActionStill(CUnit *unit);
+extern void HandleActionStill(CUnit &unit);
 	/// Handle command stand ground
-extern void HandleActionStandGround(CUnit *unit);
+extern void HandleActionStandGround(CUnit &unit);
 	/// Handle command follow
-extern void HandleActionFollow(CUnit *unit);
+extern void HandleActionFollow(CUnit &unit);
 	/// Generic move action
-extern int DoActionMove(CUnit *unit);
+extern int DoActionMove(CUnit &unit);
 	/// Handle command move
-extern void HandleActionMove(CUnit *unit);
+extern void HandleActionMove(CUnit &unit);
 	/// Handle command repair
-extern void HandleActionRepair(CUnit *unit);
+extern void HandleActionRepair(CUnit &unit);
 	/// Handle command patrol
-extern void HandleActionPatrol(CUnit *unit);
+extern void HandleActionPatrol(CUnit &unit);
 	/// Show attack animation
-extern void AnimateActionAttack(CUnit *unit);
+extern void AnimateActionAttack(CUnit &unit);
 	/// Handle command attack
-extern void HandleActionAttack(CUnit *unit);
+extern void HandleActionAttack(CUnit &unit);
 	/// Handle command board
-extern void HandleActionBoard(CUnit *unit);
+extern void HandleActionBoard(CUnit &unit);
 	/// Handle command unload
-extern void HandleActionUnload(CUnit *unit);
+extern void HandleActionUnload(CUnit &unit);
 	/// Handle command resource
-extern void HandleActionResource(CUnit *unit);
+extern void HandleActionResource(CUnit &unit);
 	/// Handle command return
-extern void HandleActionReturnGoods(CUnit *unit);
+extern void HandleActionReturnGoods(CUnit &unit);
 	/// Handle command die
-extern void HandleActionDie(CUnit *unit);
+extern void HandleActionDie(CUnit &unit);
 	/// Handle command build
-extern void HandleActionBuild(CUnit *unit);
+extern void HandleActionBuild(CUnit &unit);
 	/// Handle command built
-extern void HandleActionBuilt(CUnit *unit);
+extern void HandleActionBuilt(CUnit &unit);
 	/// Handle command train
-extern void HandleActionTrain(CUnit *unit);
+extern void HandleActionTrain(CUnit &unit);
 	/// Handle command upgrade to
-extern void HandleActionUpgradeTo(CUnit *unit);
+extern void HandleActionUpgradeTo(CUnit &unit);
 	/// Handle command transform into
-extern void HandleActionTransformInto(CUnit *unit);
+extern void HandleActionTransformInto(CUnit &unit);
 	/// Handle command upgrade
-extern void HandleActionUpgrade(CUnit *unit);
+extern void HandleActionUpgrade(CUnit &unit);
 	/// Handle command research
-extern void HandleActionResearch(CUnit *unit);
+extern void HandleActionResearch(CUnit &unit);
 	/// Handle command spellcast
-extern void HandleActionSpellCast(CUnit *unit);
+extern void HandleActionSpellCast(CUnit &unit);
 
 /*----------------------------------------------------------------------------
 --  Actions: actions.c
 ----------------------------------------------------------------------------*/
 
 	/// Handle the animation of a unit
-extern int UnitShowAnimationScaled(CUnit *unit, const CAnimation *anim, int scale);
+extern int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale);
 	/// Handle the animation of a unit
-extern int UnitShowAnimation(CUnit *unit, const CAnimation *anim);
+extern int UnitShowAnimation(CUnit &unit, const CAnimation *anim);
 	/// Handle the actions of all units each game cycle
-extern void UnitActions(void);
+extern void UnitActions();
 	/// Unload a unit.
-extern int UnloadUnit(CUnit *unit);
+extern int UnloadUnit(CUnit &unit);
 //@}
 
 #endif // !__ACTIONS_H__

@@ -72,7 +72,7 @@ enum _move_return_ {
 **  To remove pathfinder internals. Called if path destination changed.
 */
 #define NewResetPath(unit) \
-	do { unit->Data.Move.Fast = 1; unit->Data.Move.Length = 0; } while (0)
+	do { (unit).Data.Move.Fast = 1; (unit).Data.Move.Length = 0; } while (0)
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -108,13 +108,13 @@ extern unsigned char *CreateMatrix(void);
 	/// Allocate a new matrix and initialize
 extern unsigned char *MakeMatrix(void);
 	/// Get next element of the way to goal.
-extern int NewPath(CUnit *unit);
+extern int NewPath(CUnit &unit);
 	/// Returns the next element of the path
-extern int NextPathElement(CUnit *unit, int *xdp, int *ydp);
+extern int NextPathElement(CUnit &unit, short int *xdp, short int *ydp);
 	/// Return distance to unit.
-extern int UnitReachable(const CUnit *unit, const CUnit *dst, int range);
+extern int UnitReachable(const CUnit &unit, const CUnit &dst, int range);
 	/// Can the unit 'src' reach the place x,y
-extern int PlaceReachable(const CUnit *src, int x, int y, int w, int h,
+extern int PlaceReachable(const CUnit &src, int x, int y, int w, int h,
 	int minrange, int maxrange);
 
 //

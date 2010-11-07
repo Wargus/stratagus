@@ -113,7 +113,7 @@ bool CanAccessFile(const char *filename)
 
 CUnit *GetUnitUnderCursor(void)
 {
-	return (CUnit *)UnitUnderCursor;
+	return UnitUnderCursor;
 }
 
 /// Usefull for getComponent.
@@ -125,7 +125,7 @@ typedef struct {
 	UStrIntType type;
 } UStrInt;
 /// Get component for unit variable.
-extern UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t);
+extern UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t);
 
 /**
 **  FIXME: docu
@@ -190,7 +190,7 @@ static int report(int status, bool exitOnError)
 	return status;
 }
 
-static int luatraceback(lua_State *L) 
+static int luatraceback(lua_State *L)
 {
 	lua_pushliteral(L, "debug");
 	lua_gettable(L, LUA_GLOBALSINDEX);
@@ -1052,7 +1052,7 @@ int EvalNumber(const NumberDesc *number)
 		case ENumber_UnitStat : // property of unit.
 			unit = EvalUnit(number->D.UnitStat.Unit);
 			if (unit != NULL) {
-				return GetComponent(unit, number->D.UnitStat.Index,
+				return GetComponent(*unit, number->D.UnitStat.Index,
 					number->D.UnitStat.Component, number->D.UnitStat.Loc).i;
 			} else { // ERROR.
 				return 0;
@@ -1886,7 +1886,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 		if(!GameName.empty()) {
 			dir += GameName;
 			dir += "/";
-		}		
+		}
 		snprintf(directory, sizeof(directory), "%s/%s", dir.c_str(), userdir);
 	} else {
 		snprintf(directory, sizeof(directory), "%s/%s", StratagusLibPath.c_str(), userdir);
@@ -1947,7 +1947,7 @@ static int CclSetGameName(lua_State *l)
 	if (args == 1 && !lua_isnil(l, 1)) {
 		GameName = lua_tostring(l, 1);
 	}
-	
+
 	if(!GameName.empty()) {
 		std::string path = UserDirectory + "/" + GameName;
 		makedir(path.c_str(), 0777);
@@ -2677,15 +2677,15 @@ void CreateUserDirectories(void)
 		UserDirectory = s + "/";
 	}
 #endif
-	
+
 	UserDirectory += STRATAGUS_HOME_PATH;
 	UserDirectory += "/";
 
 	//DebugPrint("Creating User Directories: %s\n" _C_ UserDirectory.c_str());
-	
+
 
 	makedir(UserDirectory.c_str(), 0777);
-	
+
 	// Create specific subdirectories
 	//directory = UserDirectory + "patches/";
 	//makedir(directory.c_str(), 0777);

@@ -152,8 +152,7 @@ void MapMarkTileSight(const CPlayer *player,
 
 void MapMarkTileSight(const CPlayer *player, int x, int y)
 {
-	Assert(0 <= x && x < Map.Info.MapWidth);
-	Assert(0 <= y && y < Map.Info.MapHeight);
+	Assert(Map.Info.IsPointOnMap(x, y));
 #ifdef MARKER_ON_INDEX
 	MapMarkTileSight(player, Map.getIndex(x,y));
 #else
@@ -210,8 +209,7 @@ void MapUnmarkTileSight(const CPlayer *player, const unsigned int index)
 
 void MapUnmarkTileSight(const CPlayer *player, int x, int y)
 {
-	Assert(0 <= x && x < Map.Info.MapWidth);
-	Assert(0 <= y && y < Map.Info.MapHeight);
+	Assert(Map.Info.IsPointOnMap(x, y));
 #ifdef MARKER_ON_INDEX
 	MapUnmarkTileSight(player, Map.getIndex(x,y));
 #else
@@ -457,7 +455,7 @@ void UpdateFogOfWarChange(void)
 	//  Global seen recount.
 	//
 	for (int x = 0; x < NumUnits; ++x) {
-		UnitCountSeen(Units[x]);
+		UnitCountSeen(*Units[x]);
 	}
 }
 

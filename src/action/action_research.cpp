@@ -60,12 +60,12 @@
 **
 **  @param unit  Pointer of researching unit.
 */
-void HandleActionResearch(CUnit *unit)
+void HandleActionResearch(CUnit &unit)
 {
 	const CUpgrade *upgrade;
 
-	if (!unit->SubAction) { // first entry
-		upgrade = unit->Data.Research.Upgrade = unit->CurrentOrder()->Arg1.Upgrade;
+	if (!unit.SubAction) { // first entry
+		upgrade = unit.Data.Research.Upgrade = unit.CurrentOrder()->Arg1.Upgrade;
 #if 0
 		// FIXME: I want to support both, but with network we need this check
 		//  but if want combined upgrades this is worse
@@ -73,49 +73,49 @@ void HandleActionResearch(CUnit *unit)
 		//
 		// Check if an other building has already started?
 		//
-		if (unit->Player->UpgradeTimers.Upgrades[upgrade - Upgrades]) {
+		if (unit.Player->UpgradeTimers.Upgrades[upgrade - Upgrades]) {
 			DebugPrint("Two researches running\n");
-			PlayerAddCosts(unit->Player, upgrade->Costs);
+			PlayerAddCosts(unit.Player, upgrade->Costs);
 
-			unit->ClearAction();
+			unit.ClearAction();
 			return;
 		}
 #endif
-		unit->SubAction = 1;
+		unit.SubAction = 1;
 	} else {
-		upgrade = unit->Data.Research.Upgrade;
+		upgrade = unit.Data.Research.Upgrade;
 	}
 
-	unit->Type->Animations->Research ?
-		UnitShowAnimation(unit, unit->Type->Animations->Research) :
-		UnitShowAnimation(unit, unit->Type->Animations->Still);
-	if (unit->Wait) {
-		unit->Wait--;
+	unit.Type->Animations->Research ?
+		UnitShowAnimation(unit, unit.Type->Animations->Research) :
+		UnitShowAnimation(unit, unit.Type->Animations->Still);
+	if (unit.Wait) {
+		unit.Wait--;
 		return;
 	}
 
-	unit->Player->UpgradeTimers.Upgrades[upgrade->ID] += SpeedResearch;
-	if (unit->Player->UpgradeTimers.Upgrades[upgrade->ID] >=
+	unit.Player->UpgradeTimers.Upgrades[upgrade->ID] += SpeedResearch;
+	if (unit.Player->UpgradeTimers.Upgrades[upgrade->ID] >=
 			upgrade->Costs[TimeCost]) {
 
-		unit->Player->Notify(NotifyGreen, unit->tilePos.x, unit->tilePos.y,
-			_("%s: complete"), unit->Type->Name.c_str());
-		if (unit->Player == ThisPlayer) {
-			if (GameSounds.ResearchComplete[unit->Player->Race].Sound) 
-				PlayGameSound(GameSounds.ResearchComplete[unit->Player->Race].Sound,
+		unit.Player->Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
+			_("%s: complete"), unit.Type->Name.c_str());
+		if (unit.Player == ThisPlayer) {
+			if (GameSounds.ResearchComplete[unit.Player->Race].Sound)
+				PlayGameSound(GameSounds.ResearchComplete[unit.Player->Race].Sound,
 							MaxSampleVolume);
 		}
-		if (unit->Player->AiEnabled) {
+		if (unit.Player->AiEnabled) {
 			AiResearchComplete(unit, upgrade);
 		}
-		UpgradeAcquire(unit->Player, upgrade);
+		UpgradeAcquire(unit.Player, upgrade);
 
-		unit->ClearAction();
+		unit.ClearAction();
 
 		return;
 	}
 
-	unit->Wait = CYCLES_PER_SECOND / 6;
+	unit.Wait = CYCLES_PER_SECOND / 6;
 }
 
 //@}

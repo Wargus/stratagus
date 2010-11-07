@@ -169,12 +169,12 @@ void CMap::Reveal(void)
 			for (p = 0; p < PlayerMax; ++p) {
 				if (Players[p].Type != PlayerNobody &&
 						(!(Units[x]->Seen.ByPlayer & (1 << p)))) {
-					UnitGoesOutOfFog(Units[x], Players + p);
-					UnitGoesUnderFog(Units[x], Players + p);
+					UnitGoesOutOfFog(*Units[x], Players + p);
+					UnitGoesUnderFog(*Units[x], Players + p);
 				}
 			}
 		}
-		UnitCountSeen(Units[x]);
+		UnitCountSeen(*Units[x]);
 	}
 }
 
@@ -192,7 +192,7 @@ void CMap::Reveal(void)
 */
 bool CMap::WallOnMap(int tx, int ty) const
 {
-	Assert(tx >= 0 && ty >= 0 && tx < Info.MapWidth && ty < Info.MapHeight);
+	Assert(Map.Info.IsPointOnMap(tx, ty));
 	return (Fields[tx + ty * Info.MapWidth].Flags & MapFieldWall) != 0;
 
 }
@@ -207,7 +207,7 @@ bool CMap::WallOnMap(int tx, int ty) const
 */
 bool CMap::HumanWallOnMap(int tx, int ty) const
 {
-	Assert(tx >= 0 && ty >= 0 && tx < Info.MapWidth && ty < Info.MapHeight);
+	Assert(Map.Info.IsPointOnMap(tx, ty));
 	return (Fields[tx + ty * Info.MapWidth].Flags &
 		(MapFieldWall | MapFieldHuman)) == (MapFieldWall | MapFieldHuman);
 }
@@ -222,7 +222,7 @@ bool CMap::HumanWallOnMap(int tx, int ty) const
 */
 bool CMap::OrcWallOnMap(int tx, int ty) const
 {
-	Assert(tx >= 0 && ty >= 0 && tx < Info.MapWidth && ty < Info.MapHeight);
+	Assert(Map.Info.IsPointOnMap(tx, ty));
 	return (Fields[tx + ty * Info.MapWidth].Flags &
 		(MapFieldWall | MapFieldHuman)) == MapFieldWall;
 }
@@ -270,7 +270,7 @@ bool UnitTypeCanBeAt(const CUnitType *type, int x, int y)
 	unsigned int index = y * Map.Info.MapWidth;
 	for (addy = 0; addy < type->TileHeight; ++addy) {
 		for (addx = 0; addx < type->TileWidth; ++addx) {
-			if(!(Map.Info.IsPointOnMap(x + addx,y + addy) && 
+			if(!(Map.Info.IsPointOnMap(x + addx,y + addy) &&
 				!Map.CheckMask(x + addx + index, mask))) {
 				return false;
 			}
@@ -290,21 +290,20 @@ bool UnitTypeCanBeAt(const CUnitType *type, int x, int y)
 **
 **  @return      True if could be placeded, false otherwise.
 */
-bool UnitCanBeAt(const CUnit *unit, int x, int y)
+bool UnitCanBeAt(const CUnit &unit, int x, int y)
 {
-	Assert(unit);
-	return UnitTypeCanBeAt(unit->Type, x, y);
+	return UnitTypeCanBeAt(unit.Type, x, y);
 }
 
 /**
 **  Fixes initially the wood and seen tiles.
 */
-void PreprocessMap(void)
+void PreprocessMap()
 {
 	int ix;
 	int iy;
 	CMapField *mf;
-	
+
 #ifdef _MSC_VER
 	for (ix = 0; ix < Map.Info.MapWidth; ++ix) {
 		for (iy = 0; iy < Map.Info.MapHeight; ++iy) {
@@ -327,7 +326,7 @@ void PreprocessMap(void)
 			case 2:			mf->SeenTile = mf->Tile;++mf;
 			case 1:			mf->SeenTile = mf->Tile;++mf;
 				} while ( --n > 0 );
-		}		
+		}
 	}
 #endif
 
@@ -437,7 +436,7 @@ void CMap::FixTile(unsigned short type, int seen, int x, int y)
 	{
 		return;
 	}
-	
+
 	index = getIndex(x,y);
 	mf = this->Field(index);
 
@@ -644,7 +643,7 @@ void CMap::ClearTile(unsigned short type, unsigned x, unsigned y)
 **
 **  @param mapname  map filename
 */
-void LoadStratagusMapInfo(const std::string &mapname) 
+void LoadStratagusMapInfo(const std::string &mapname)
 {
 	// Set the default map setup by replacing .smp with .sms
 	size_t loc = mapname.find(".smp");
@@ -652,7 +651,7 @@ void LoadStratagusMapInfo(const std::string &mapname)
 		Map.Info.Filename = mapname;
 		Map.Info.Filename.replace(loc, 4, ".sms");
 	}
-	
+
 	LuaLoadFile(mapname);
 }
 

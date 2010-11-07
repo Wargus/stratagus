@@ -56,40 +56,40 @@
 **
 **  @todo  FIXME: move this into action_resource?
 */
-void HandleActionReturnGoods(CUnit *unit)
+void HandleActionReturnGoods(CUnit &unit)
 {
-	Assert(unit->Type->Harvester);
+	Assert(unit.Type->Harvester);
 
 	// Select target to return goods.
-	if (!unit->CurrentResource || unit->ResourcesHeld == 0 ||
-			(unit->ResourcesHeld != unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity &&
-				unit->Type->ResInfo[unit->CurrentResource]->LoseResources)) {
+	if (!unit.CurrentResource || unit.ResourcesHeld == 0 ||
+			(unit.ResourcesHeld != unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity &&
+				unit.Type->ResInfo[unit.CurrentResource]->LoseResources)) {
 		DebugPrint("Unit can't return resources, it doesn't carry any.\n");
-		unit->Player->Notify(NotifyYellow, unit->tilePos.x, unit->tilePos.y, _("No Resources to Return."));
+		unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y, _("No Resources to Return."));
 
 		ResourceGiveUp(unit);
 		return;
 	}
 
 	// If depot was destroyed search for another one.
-	if (!unit->CurrentOrder()->HasGoal()) {
+	if (!unit.CurrentOrder()->HasGoal()) {
 		CUnit *destu;
 
-		if (!(destu = FindDeposit(unit, 1000, unit->CurrentResource))) {
+		if (!(destu = FindDeposit(unit, 1000, unit.CurrentResource))) {
 			ResourceGiveUp(unit);
 			return;
 		}
-		unit->CurrentOrder()->SetGoal(destu);
+		unit.CurrentOrder()->SetGoal(destu);
 	}
 
-	unit->CurrentOrder()->Action = UnitActionResource;
+	unit.CurrentOrder()->Action = UnitActionResource;
 	// Somewhere on the way the loaded worker could have change Arg1
 	// Bummer, go get the closest resource to the depot
 	//FIXME!!!!!!!!!!!!!!!!!!!!
-	//unit->CurrentOrder()->Arg1.ResourcePos = -1;
+	//unit.CurrentOrder()->Arg1.ResourcePos = -1;
 
 	NewResetPath(unit);
-	unit->SubAction = 70; // FIXME : Define value.
+	unit.SubAction = 70; // FIXME : Define value.
 }
 
 //@}

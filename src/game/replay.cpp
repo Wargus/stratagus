@@ -469,7 +469,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	//
 	log->GameCycle = GameCycle;
 
-	log->UnitNumber = (unit ? UnitNumber(unit) : -1);
+	log->UnitNumber = (unit ? UnitNumber(*unit) : -1);
 	log->UnitIdent = (unit ? unit->Type->Ident.c_str() : "");
 
 	log->Action = action;
@@ -484,7 +484,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	//
 	// Destination given.
 	//
-	log->DestUnitNumber = (dest ? UnitNumber(dest) : -1);
+	log->DestUnitNumber = (dest ? UnitNumber(*dest) : -1);
 
 	//
 	// Value given.
@@ -832,53 +832,53 @@ static void DoNextReplay(void)
 	}
 
 	if (!strcmp(action, "stop")) {
-		SendCommandStopUnit(UnitSlots[unit]);
+		SendCommandStopUnit(*UnitSlots[unit]);
 	} else if (!strcmp(action, "stand-ground")) {
-		SendCommandStandGround(UnitSlots[unit], flags);
+		SendCommandStandGround(*UnitSlots[unit], flags);
 	} else if (!strcmp(action, "follow")) {
-		SendCommandFollow(UnitSlots[unit], dunit, flags);
+		SendCommandFollow(*UnitSlots[unit], *dunit, flags);
 	} else if (!strcmp(action, "move")) {
-		SendCommandMove(UnitSlots[unit], posx, posy, flags);
+		SendCommandMove(*UnitSlots[unit], posx, posy, flags);
 	} else if (!strcmp(action, "repair")) {
-		SendCommandRepair(UnitSlots[unit], posx, posy, dunit, flags);
+		SendCommandRepair(*UnitSlots[unit], posx, posy, dunit, flags);
 	} else if (!strcmp(action, "auto-repair")) {
-		SendCommandAutoRepair(UnitSlots[unit], posx);
+		SendCommandAutoRepair(*UnitSlots[unit], posx);
 	} else if (!strcmp(action, "attack")) {
-		SendCommandAttack(UnitSlots[unit], posx, posy, dunit, flags);
+		SendCommandAttack(*UnitSlots[unit], posx, posy, dunit, flags);
 	} else if (!strcmp(action, "attack-ground")) {
-		SendCommandAttackGround(UnitSlots[unit], posx, posy, flags);
+		SendCommandAttackGround(*UnitSlots[unit], posx, posy, flags);
 	} else if (!strcmp(action, "patrol")) {
-		SendCommandPatrol(UnitSlots[unit], posx, posy, flags);
+		SendCommandPatrol(*UnitSlots[unit], posx, posy, flags);
 	} else if (!strcmp(action, "board")) {
-		SendCommandBoard(UnitSlots[unit], posx, posy, dunit, flags);
+		SendCommandBoard(*UnitSlots[unit], posx, posy, *dunit, flags);
 	} else if (!strcmp(action, "unload")) {
-		SendCommandUnload(UnitSlots[unit], posx, posy, dunit, flags);
+		SendCommandUnload(*UnitSlots[unit], posx, posy, dunit, flags);
 	} else if (!strcmp(action, "build")) {
-		SendCommandBuildBuilding(UnitSlots[unit], posx, posy, UnitTypeByIdent(val), flags);
+		SendCommandBuildBuilding(*UnitSlots[unit], posx, posy, UnitTypeByIdent(val), flags);
 	} else if (!strcmp(action, "dismiss")) {
-		SendCommandDismiss(UnitSlots[unit]);
+		SendCommandDismiss(*UnitSlots[unit]);
 	} else if (!strcmp(action, "resource-loc")) {
-		SendCommandResourceLoc(UnitSlots[unit], posx, posy, flags);
+		SendCommandResourceLoc(*UnitSlots[unit], posx, posy, flags);
 	} else if (!strcmp(action, "resource")) {
-		SendCommandResource(UnitSlots[unit], dunit, flags);
+		SendCommandResource(*UnitSlots[unit], *dunit, flags);
 	} else if (!strcmp(action, "return")) {
-		SendCommandReturnGoods(UnitSlots[unit], dunit, flags);
+		SendCommandReturnGoods(*UnitSlots[unit], dunit, flags);
 	} else if (!strcmp(action, "train")) {
-		SendCommandTrainUnit(UnitSlots[unit], UnitTypeByIdent(val), flags);
+		SendCommandTrainUnit(*UnitSlots[unit], UnitTypeByIdent(val), flags);
 	} else if (!strcmp(action, "cancel-train")) {
-		SendCommandCancelTraining(UnitSlots[unit], num, (val && *val) ? UnitTypeByIdent(val) : NULL);
+		SendCommandCancelTraining(*UnitSlots[unit], num, (val && *val) ? UnitTypeByIdent(val) : NULL);
 	} else if (!strcmp(action, "upgrade-to")) {
-		SendCommandUpgradeTo(UnitSlots[unit], UnitTypeByIdent(val), flags);
+		SendCommandUpgradeTo(*UnitSlots[unit], UnitTypeByIdent(val), flags);
 	} else if (!strcmp(action, "cancel-upgrade-to")) {
-		SendCommandCancelUpgradeTo(UnitSlots[unit]);
+		SendCommandCancelUpgradeTo(*UnitSlots[unit]);
 	} else if (!strcmp(action, "research")) {
-		SendCommandResearch(UnitSlots[unit], CUpgrade::Get(val), flags);
+		SendCommandResearch(*UnitSlots[unit], CUpgrade::Get(val), flags);
 	} else if (!strcmp(action, "cancel-research")) {
-		SendCommandCancelResearch(UnitSlots[unit]);
+		SendCommandCancelResearch(*UnitSlots[unit]);
 	} else if (!strcmp(action, "spell-cast")) {
-		SendCommandSpellCast(UnitSlots[unit], posx, posy, dunit, num, flags);
+		SendCommandSpellCast(*UnitSlots[unit], posx, posy, dunit, num, flags);
 	} else if (!strcmp(action, "auto-spell-cast")) {
-		SendCommandAutoSpellCast(UnitSlots[unit], num, posx);
+		SendCommandAutoSpellCast(*UnitSlots[unit], num, posx);
 	} else if (!strcmp(action, "diplomacy")) {
 		int state;
 		if (!strcmp(val, "neutral")) {

@@ -150,9 +150,9 @@ extern int DistanceSilent;
 ----------------------------------------------------------------------------*/
 
 	/// Play a unit sound
-extern void PlayUnitSound(const CUnit *unit, UnitVoiceGroup unit_voice_group);
+extern void PlayUnitSound(const CUnit &unit, UnitVoiceGroup unit_voice_group);
 	/// Play a unit sound
-extern void PlayUnitSound(const CUnit *unit, CSound *sound);
+extern void PlayUnitSound(const CUnit &unit, CSound *sound);
 	/// Play a missile sound
 extern void PlayMissileSound(const Missile *missile, CSound *sound);
 	/// Play a game sound

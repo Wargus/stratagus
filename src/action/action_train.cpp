@@ -64,24 +64,24 @@
 **
 **  @return  1 if the the unit can do it, 0 otherwise.
 */
-static int CanHandleOrder(CUnit *unit, COrderPtr order)
+static int CanHandleOrder(CUnit &unit, COrderPtr order)
 {
 	if (order->Action == UnitActionResource) {
 		//  Check if new unit can harvest.
-		if (!unit->Type->Harvester) {
+		if (!unit.Type->Harvester) {
 			return 0;
 		}
 		//  Also check if new unit can harvest this specific resource.
 		CUnit *goal = order->GetGoal();
-		if (goal && !unit->Type->ResInfo[goal->Type->GivesResource]) {
+		if (goal && !unit.Type->ResInfo[goal->Type->GivesResource]) {
 			return 0;
 		}
 		return 1;
 	}
-	if (order->Action == UnitActionAttack && !unit->Type->CanAttack) {
+	if (order->Action == UnitActionAttack && !unit.Type->CanAttack) {
 		return 0;
 	}
-	if (order->Action == UnitActionBoard && unit->Type->UnitType != UnitTypeLand) {
+	if (order->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand) {
 		return 0;
 	}
 	return 1;
@@ -92,7 +92,7 @@ static int CanHandleOrder(CUnit *unit, COrderPtr order)
 **
 **  @param unit  Unit that trains.
 */
-void HandleActionTrain(CUnit *unit)
+void HandleActionTrain(CUnit &unit)
 {
 	CUnit *nunit;
 	CUnitType *ntype;
@@ -102,35 +102,35 @@ void HandleActionTrain(CUnit *unit)
 	//
 	// First entry
 	//
-	if (!unit->SubAction) {
-		unit->Data.Train.Ticks = 0;
-		unit->SubAction = 1;
+	if (!unit.SubAction) {
+		unit.Data.Train.Ticks = 0;
+		unit.SubAction = 1;
 	}
 
-	unit->Type->Animations->Train ?
-		UnitShowAnimation(unit, unit->Type->Animations->Train) :
-		UnitShowAnimation(unit, unit->Type->Animations->Still);
+	unit.Type->Animations->Train ?
+		UnitShowAnimation(unit, unit.Type->Animations->Train) :
+		UnitShowAnimation(unit, unit.Type->Animations->Still);
 
-	if (unit->Wait) {
-		unit->Wait--;
+	if (unit.Wait) {
+		unit.Wait--;
 		return;
 	}
 
-	player = unit->Player;
-	ntype = unit->CurrentOrder()->Arg1.Type;
+	player = unit.Player;
+	ntype = unit.CurrentOrder()->Arg1.Type;
 	cost = ntype->Stats[player->Index].Costs[TimeCost];
 
-	unit->Data.Train.Ticks += SpeedTrain;
+	unit.Data.Train.Ticks += SpeedTrain;
 	// FIXME: Should count down
-	if (unit->Data.Train.Ticks >= cost) {
+	if (unit.Data.Train.Ticks >= cost) {
 
-		unit->Data.Train.Ticks = cost;
+		unit.Data.Train.Ticks = cost;
 
 		//
 		// Check if there are still unit slots.
 		//
 		if (NumUnits >= UnitMax) {
-			unit->Wait = CYCLES_PER_SECOND / 6;
+			unit.Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
 
@@ -139,38 +139,38 @@ void HandleActionTrain(CUnit *unit)
 		//
 		food = player->CheckLimits(ntype);
 		if (food < 0) {
-			if (food == -3 && unit->Player->AiEnabled) {
+			if (food == -3 && unit.Player->AiEnabled) {
 				AiNeedMoreSupply(unit, ntype);
 			}
 
-			unit->Data.Train.Ticks = cost;
-			unit->Wait = CYCLES_PER_SECOND / 6;
+			unit.Data.Train.Ticks = cost;
+			unit.Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
 
 		nunit = MakeUnit(ntype, player);
 		if (nunit != NoUnitP) {
-			const CUnitType *type = unit->Type;
-			nunit->tilePos = unit->tilePos;
+			const CUnitType *type = unit.Type;
+			nunit->tilePos = unit.tilePos;
 
 			// DropOutOnSide set unit to belong to the building
 			// training it. This was an ugly hack, setting X and Y is enough,
 			// no need to add the unit only to be removed.
-			nunit->tilePos = unit->tilePos;
+			nunit->tilePos = unit.tilePos;
 
 			// New unit might supply food
-			UpdateForNewUnit(nunit, 0);
+			UpdateForNewUnit(*nunit, 0);
 
 			/* Auto Group Add */
-			if (!unit->Player->AiEnabled && unit->GroupId) {
+			if (!unit.Player->AiEnabled && unit.GroupId) {
 				int num = 0;
-				while(!(unit->GroupId & (1 << num))) {
+				while(!(unit.GroupId & (1 << num))) {
 					++num;
 				}
 				AddToGroup(&nunit, 1, num);
 			}
 
-			DropOutOnSide(nunit, LookingW, type->TileWidth, type->TileHeight);
+			DropOutOnSide(*nunit, LookingW, type->TileWidth, type->TileHeight);
 
 			// Set life span
 			if (type->DecayRate) {
@@ -180,37 +180,37 @@ void HandleActionTrain(CUnit *unit)
 			player->Notify(NotifyYellow, nunit->tilePos.x, nunit->tilePos.y,
 				_("New %s ready"), nunit->Type->Name.c_str());
 			if (player == ThisPlayer) {
-				PlayUnitSound(nunit, VoiceReady);
+				PlayUnitSound(*nunit, VoiceReady);
 			}
-			if (unit->Player->AiEnabled) {
-				AiTrainingComplete(unit, nunit);
+			if (unit.Player->AiEnabled) {
+				AiTrainingComplete(unit, *nunit);
 			}
 
-			if (unit->OrderCount == 1) {
-				unit->ClearAction();
+			if (unit.OrderCount == 1) {
+				unit.ClearAction();
 			} else {
-				unit->OrderFlush = 1;
-				unit->SubAction = 0;
+				unit.OrderFlush = 1;
+				unit.SubAction = 0;
 			}
 
-			if (!CanHandleOrder(nunit, &unit->NewOrder)) {
+			if (!CanHandleOrder(*nunit, &unit.NewOrder)) {
 				DebugPrint("Wrong order for unit\n");
 
 				// Tell the unit to move instead of trying any funny stuff.
-				*(nunit->CurrentOrder()) = unit->NewOrder;
+				*(nunit->CurrentOrder()) = unit.NewOrder;
 				nunit->CurrentOrder()->Action = UnitActionMove;
 				nunit->CurrentOrder()->ClearGoal();
 			} else {
-				if (unit->NewOrder.HasGoal()) {
-					if (unit->NewOrder.GetGoal()->Destroyed) {
+				if (unit.NewOrder.HasGoal()) {
+					if (unit.NewOrder.GetGoal()->Destroyed) {
 						// FIXME: perhaps we should use another goal?
 						DebugPrint("Destroyed unit in train unit\n");
-						unit->NewOrder.ClearGoal();
-						unit->NewOrder.Action = UnitActionStill;
+						unit.NewOrder.ClearGoal();
+						unit.NewOrder.Action = UnitActionStill;
 					}
 				}
 
-				*(nunit->CurrentOrder()) = unit->NewOrder;
+				*(nunit->CurrentOrder()) = unit.NewOrder;
 			}
 
 			if (IsOnlySelected(unit)) {
@@ -218,12 +218,12 @@ void HandleActionTrain(CUnit *unit)
 			}
 			return;
 		} else {
-			player->Notify(NotifyYellow, unit->tilePos.x, unit->tilePos.y,
+			player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
 				_("Unable to train %s"), ntype->Name.c_str());
 		}
 	}
 
-	unit->Wait = CYCLES_PER_SECOND / 6;
+	unit.Wait = CYCLES_PER_SECOND / 6;
 }
 
 //@}

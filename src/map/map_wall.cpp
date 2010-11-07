@@ -100,7 +100,7 @@ void MapFixSeenWallTile(int x, int y)
 	CMapField *mf;
 
 	//  Outside of map or no wall.
-	if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
+	if (!Map.Info.IsPointOnMap(x, y)) {
 		return;
 	}
 	mf = Map.Field(x, y);
@@ -194,7 +194,7 @@ void MapFixWallTile(int x, int y)
 	int t;
 
 	//  Outside of map or no wall.
-	if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
+	if (!Map.Info.IsPointOnMap(x, y)) {
 		return;
 	}
 	mf = Map.Field(x, y);
