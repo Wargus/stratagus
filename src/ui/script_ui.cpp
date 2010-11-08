@@ -269,6 +269,8 @@ static int CclSetTitleScreens(lua_State *l)
 				TitleScreens[j]->Timeout = LuaToNumber(l, -1);
 			} else if (!strcmp(value, "Iterations")) {
 				TitleScreens[j]->Iterations = LuaToNumber(l, -1);
+			} else if (!strcmp(value, "Editor")) {
+				TitleScreens[j]->Editor = LuaToNumber(l, -1);
 			} else if (!strcmp(value, "Labels")) {
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument");

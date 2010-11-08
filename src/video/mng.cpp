@@ -58,7 +58,7 @@ static mng_ptr MNG_DECL my_alloc(mng_size_t len)
 	return (mng_ptr)ptr;
 }
 
-static void MNG_DECL my_free(mng_ptr ptr, mng_size_t len)
+static void MNG_DECL my_free(mng_ptr ptr, mng_size_t)
 {
 	delete[] static_cast<char*>(ptr);
 }
@@ -162,8 +162,8 @@ static mng_ptr MNG_DECL my_getcanvasline(mng_handle handle, mng_uint32 linenr)
 	return mng->buffer + linenr * mng->surface->w * 3;
 }
 
-static mng_bool MNG_DECL my_refresh(mng_handle handle, mng_uint32 x, mng_uint32 y,
-	mng_uint32 width, mng_uint32 height)
+static mng_bool MNG_DECL my_refresh(mng_handle handle, mng_uint32, mng_uint32,
+	mng_uint32, mng_uint32)
 {
 	Mng *mng;
 	int i;
@@ -184,7 +184,7 @@ static mng_bool MNG_DECL my_refresh(mng_handle handle, mng_uint32 x, mng_uint32 
 	return MNG_TRUE;
 }
 
-static mng_uint32 MNG_DECL my_gettickcount(mng_handle handle)
+static mng_uint32 MNG_DECL my_gettickcount(mng_handle)
 {
 	return GetTicks();
 }
@@ -200,7 +200,7 @@ static mng_bool MNG_DECL my_settimer(mng_handle handle, mng_uint32 msecs)
 }
 
 static mng_bool MNG_DECL my_processmend(mng_handle handle, mng_uint32 iterationsdone,
-	mng_uint32 iterationsleft)
+	mng_uint32)
 {
 	Mng *mng;
 
@@ -210,9 +210,8 @@ static mng_bool MNG_DECL my_processmend(mng_handle handle, mng_uint32 iterations
 	return MNG_TRUE;
 }
 
-static mng_bool MNG_DECL my_errorproc(mng_handle handle, mng_int32 errorcode,
-	mng_int8 severity, mng_chunkid chunkname, mng_uint32 chunkseq,
-	mng_int32 extra1, mng_int32 extra2, mng_pchar errortext)
+static mng_bool MNG_DECL my_errorproc(mng_handle handle, mng_int32,
+	mng_int8, mng_chunkid, mng_uint32, mng_int32, mng_int32, mng_pchar errortext)
 {
 	Mng *mng;
 

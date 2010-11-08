@@ -1,10 +1,10 @@
-.TH STRATAGUS 6 "Jul 2004" "Stratagus v2.1"
+.TH STRATAGUS 6 "Nov 2010" "Stratagus v2.2.5"
 .SH NAME
-stratagus \- Realtime strategy game
+stratagus \- Strategy Gaming Engine
 .SH SYNOPSIS
 .B stratagus
-.I "[-c file.ccl] [-d datapath] [-D depth] [-e] [-f factor] [-F] [-l logfile] [-L lag] [-n [localport:]host[:port]]
-.I [-N name] [-p\ nplayers] [-h] [map.pud|map.pud.gz|map.cm|map.cm.gz]"
+.I [-c file.lua] [-d datapath] [-D depth] [-e] [-F|-W] [-h] [-I addr] [-l logfile] [-L lag] [-n server]
+.I [-N name] [-o|-O] [-P port] [-s sleep] [-S speed] [-U update] [-v mode] [map.smp|map.smp.gz]
 .SH "DESCRIPTION"
 This manual page documents briefly the flags that you can give to
 .BR stratagus
@@ -15,11 +15,8 @@ is a powerful game engine for building realtime strategy games, a la AoE or Warc
 .SH OPTIONS
 A summary of options is included below.
 .TP
-.B \-h
-Show summary of all options.
-.TP
-.B \-c file.ccl
-Choose a different clone config file.
+.B \-c file.lua
+Choose a different stratagus config file.
 .TP
 .B \-d datapath
 Choose a different directory to use for game data files.
@@ -28,32 +25,36 @@ Choose a different directory to use for game data files.
 Set the video mode depth, often called 'bpp' or 'bits per pixel'. This
 option is only valid for Win32/NT.
 .TP
-.B \- e
+.B \-e
 Start the editor included in Stratagus.
 .TP
-.B \-f factor
-With this parameter you will set up the relative cost for the computer's units.
-Default is 100. If you set this to a higher value, computer will have to spend
-more resources for creating units, and viceversa.
-.TP
 .B \-F
-With this option you can start Stratagus in full screen video mode. This
-option is only supported if you have compiled stratagus with SDL support.
+With this option you can start Stratagus in full screen video mode.
 .TP
 .B \-h
-This flag shows the online help.
+Show summary of all options.
+.TP
+.B \-I addr
+With this option you can specify the network address for network play.
 .TP
 .B \-l file
 With this option you can log stratagus messages into \fBfile\fR.
+If no file is specified log messages will be disabled.
 .TP
 .B \-L lag
 This sets the network lag in number of frames (default 10 = 333 ms).
 .TP
-.B \-n [localport:]host[:port]
-With this option you can specify the network arguments for network play.
+.B \-n server
+With this option you can specify the network server host for network play.
 .TP
 .B \-N name
 The name of the player (will appear in network games).
+.TP
+.B \-O
+Use OpenGL or OpenGL ES 1.1.
+.TP
+.B \-o
+Do not use OpenGL or OpenGL ES 1.1.
 .TP
 .B \-P port
 With this option you can set the network port to use in network games.
@@ -63,15 +64,24 @@ The default value is port udp/6660.
 Number of frames before AI awakes. This is useful if the AI is beating
 you hard, and you want to make it sweet like a cat. The higher, the easier
 will be the game against the AI. Default is to sleep 0 time frames.
+.TP
+.B \-S number
+Sync speed (100 = 30 frames/s).
+.TP
+.B \-U update
+With this option you can specify the network update rate in # frames (default 5=6x per s).
+.TP
+.B \-v mode
+With this option you can specify video mode resolution. Run \fBstratagus -h\fR for supported modes.
+.TP
+.B \-W
+With this option you can start Stratagus in windowed video mode.
 .SH "FILES"
 .TP
 .B /usr/share/games/stratagus/default
 Default directory for Stratagus data files
 .TP
-.B /usr/share/games/stratagus/default/default.pud.gz
-Default PUD.
-.TP
-.B /usr/share/games/stratagus/default/ccl/clone.ccl
+.B /usr/share/games/stratagus/default/scripts/stratagus.lua
 Default start file.
 .SH "SEE ALSO"
 More complete documentation is available in /usr/share/doc/stratagus.
@@ -82,8 +92,9 @@ in the Warcraft II CD, thanks to the Wargus dataset.
 .PP
 Warcraft II is a registered trademark of Blizzard Entertainment.
 .SH AUTHOR
-Stratagus is written by Nehal Mistry, Russell Smith and others.
+Stratagus is written by Nehal Mistry, Russell Smith Pali Rohár and others.
 .PP
-This manual page was written by Anthony Towns <ajt@debian.org> and
-David Mart�nez Moreno <ender@debian.org> for the Debian GNU/Linux
+This manual page was written by Anthony Towns <ajt@debian.org> ,
+David Martínez Moreno <ender@debian.org> and
+Pali Rohár <pali.rohar@gmail.com> for the Debian GNU/Linux
 system (but may be used by others).

@@ -34,6 +34,7 @@
 #include "movie.h"
 #include "font.h"
 #include "sound_server.h"
+#include "editor.h"
 
 
 TitleScreen **TitleScreens;          /// Title screens to show at startup
@@ -172,6 +173,10 @@ void ShowTitleScreens()
 	SetVideoSync();
 
 	for (int i = 0; TitleScreens[i]; ++i) {
+		if ((Editor.Running && !TitleScreens[i]->Editor) || (!Editor.Running && TitleScreens[i]->Editor)) {
+			continue;
+		}
+
 		if (!TitleScreens[i]->Music.empty()) {
 			if (TitleScreens[i]->Music == "none" ||
 					PlayMusic(TitleScreens[i]->Music) == -1) {
