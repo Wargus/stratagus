@@ -47,37 +47,10 @@ function RegisterAi(internal_name, name, fun, initfun)
   AiList[name] = {internal_name, name, fun, initfun}
 end
 
-DefineAiHelper(
-  --
-  -- Unit can build which buildings.
-  --
-  {"build", "unit-engineer",
-   "unit-msilo", "unit-aircraftfactory", "unit-magmapump", "unit-camp",
-   "unit-powerplant", "unit-hosp", "unit-vfac", "unit-vault", "unit-gturret",
-   "unit-cam", "unit-cannon", "unit-nukepowerplant", "unit-radar"},
-  --
-  -- Building can train which units.
-  --
-  {"train", "unit-vault", "unit-engineer"},
-  {"train", "unit-camp", "unit-engineer", "unit-assault", "unit-bazoo",
-   "unit-grenadier"},
-  {"train", "unit-hosp", "unit-medic"},
-  {"train", "unit-vfac", "unit-apcs", "unit-harvester", "unit-artil",
-   "unit-buggy", "unit-rtank", "unit-tank"},
-  {"train", "unit-aircraftfactory", "unit-jet", "unit-bomber", "unit-chopper",
-   "unit-heli"},
-  --
-  -- Unit can repair which units.
-  --
-  {"repair", "unit-engineer",
-   "unit-msilo", "unit-aircraftfactory", "unit-magmapump", "unit-camp", 
-   "unit-apcs", "unit-biggunturret", "unit-cannon", 
-   "unit-powerplant", "unit-hosp", "unit-vfac", "unit-vault", "unit-gturret",
-   "unit-nukepowerplant", "unit-radar"},
-  --
-  -- Reduce unit limits.
-  --
-  {"unit-limit", "unit-magmapump", "food"})
+-- This call examines the buttons that were defined with DefineButton
+-- and figures out which types of units can build/train/repair others.
+-- We don't currently have any "unit-equiv" information to provide here.
+DefineAiHelper()
 
 -- Execute all AI init scripts
 function InitAiScripts()
