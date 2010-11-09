@@ -53,7 +53,7 @@ Everything around the control of the Bos Wars AI.
 <p>
 Warning: The AI documentation is slightly outdated. This documentation hasn't 
 been fully converted to the lua API yet.
-<p>
+</p>
 
 <h2>How does it work</h2>
 
@@ -98,7 +98,7 @@ This is also used in the "ai-name" parameter of
 <a href="game.html#Player">Player</a>.
 </dd>
 <dt>script</dt>
-<dd>A lua function.<p>
+<dd>A lua function.
 </dd>
 </dl>
 
@@ -120,64 +120,93 @@ and what they can build and many other things that the AI must know.
 <dl>
 <dt>list</dt>
 <dd>A list of features:
- <ul>
- <li><code>{"build", "builder", "building-1", ... "building-n"}</code>
   <dl>
-  <dt>builder</dt>
-  <dd>Name of the unit-type that can build.
-  </dd>
-  <dt>building-1</dt>
-  <dt>building-n</dt>
-  <dd>Names of the unit-types that can be builded by the builder.
-  </dd>
+    <dt><code>{"build", <var>builder-type</var>, <var>building-type-1</var>, ... <var>building-type-n</var>}</code></dt>
+    <dd>
+      <em>Obsolete since r8101 (2006-06-21):
+	Ignored.  The AI instead gets this information from
+	<a href="ui.html#DefineButton">DefineButton</a> calls
+	that have Action = "build".</em>
+      <dl>
+	<dt>builder-type</dt>
+	<dd>Name of the unit-type that can build.
+	</dd>
+	<dt>building-type-1</dt>
+	<dt>building-type-n</dt>
+	<dd>Names of the unit-types that can be built by the builder.
+	</dd>
+      </dl>
+      <b>Note:</b> If more units can build the same buildings
+      you need the same list for all units.
+    </dd>
+    <dt><code>{"train", <var>trainer-type</var>, <var>unit-type-1</var>, ... <var>unit-type-n</var>}</code></dt>
+    <dd>
+      <em>Obsolete since r8101 (2006-06-21):
+	Ignored.  The AI instead gets this information from
+	<a href="ui.html#DefineButton">DefineButton</a> calls
+	that have Action = "train".</em>
+      <dl>
+	  <dt>trainer-type</dt>
+	  <dd>Name of the unit-type that can train the units.
+	  </dd>
+	  <dt>unit-type-1</dt>
+	  <dt>unit-type-n</dt>
+	  <dd>Names of the unit-types that can be trained by the trainer.
+	  </dd>
+      </dl>
+      <b>Note:</b> If more units can train the same unit
+      you need the same list for all units.
+    </dd>
+    <dt><code>{"repair", <var>worker-type</var>, <var>unit-type-1</var>, ... <var>unit-type-n</var>}</code></dt>
+    <dd>
+      <em>Obsolete since r8101 (2006-06-21):
+	Ignored.  The AI instead gets this information from
+	<a href="ui.html#DefineButton">DefineButton</a> calls
+	that have Action = "repair".</em>
+      <dl>
+	<dt>worker-type</dt>
+	<dd>Name of the unit-type that can repair other units.
+	</dd>
+	<dt>unit-type-1</dt>
+	<dt>unit-type-n</dt>
+	<dd>Names of the unit-types that can be repaired by the worker.
+	</dd>
+      </dl>
+      <b>Note:</b> If more units can repair the same units
+      you need the same list for all units.
+    </dd>
+    <dt><code>{"unit-equiv", <var>unit-type</var>, <var>unit-type-1</var>, ... <var>unit-type-n</var>}</code></dt>
+    <dd>Declares unit types as equivalent for AI purposes.
+      When <a href="#AiForce">AiForce</a> is asked to train
+      any of them, it instead trains the best one it can;
+      "best" here is controlled by the Priority setting in
+      <a href="unittype.html#DefineUnitType">DefineUnitType</a>.
+      <dl>
+	<dt>unit-type</dt>
+	<dd>Name of the unit-type that have equivalent units.
+	</dd>
+	<dt>unit-type-1</dt>
+	<dt>unit-type-n</dt>
+	<dd>Names of the unit-types that can be used by the AI equivalent.
+	</dd>
+      </dl>
+    </dd>
+    <dt><code>{"unit-limit", <var>unit-type</var>, <var>resource</var>}</code></dt>
+    <dd>
+      <em>Obsolete since r8101 (2006-06-21) and r8658 (2007-04-01):
+	Ignored.  The engine no longer limits the number of units
+	according to resources.</em>
+      <dl>
+	<dt>unit-type</dt>
+	<dd>Name of the unit-type that must be produced to increase the unit limit.
+	</dd>
+	<dt>resource</dt>
+	<dd>Name of the resource producing the shortage.
+	</dd>
+      </dl>
+      <i>I think we should swap the arguments: "resource", "unit-type".</i>
+    </dd>
   </dl>
-  <b>Note:</b> If more units can build the same buildings you need the same list
-	for all units.
- <li><code>{"train", "trainer", "unit-1", ... "unit-n"}</code>
-  <dl>
-  <dt>trainer</dt>
-  <dd>Name of the unit-type that can train the units.
-  </dd>
-  <dt>unit-1</dt>
-  <dt>unit-n</dt>
-  <dd>Names of the unit-types that can be trained by the trainer.
-  </dd>
-  </dl>
-  <b>Note:</b> If more units can train the same unit you need the same list
-	for all units.
- <li><code>{"repair", "worker", "unit-1", ... "unit-n"}</code>
-  <dl>
-  <dt>worker</dt>
-  <dd>Name of the unit-type that can repair other units.
-  </dd>
-  <dt>unit-1</dt>
-  <dt>unit-n</dt>
-  <dd>Names of the unit-types that can be repaired by the worker.
-  </dd>
-  </dl>
-  <b>Note:</b> If more units can repair the same units you need the same list
-	for all units.
- <li><code>{"unit-equiv", "unit", "unit-1", ... "unit-n"}</code>
-  <dl>
-  <dt>unit</dt>
-  <dd>Name of the unit-type that have equilvalent units.
-  </dd>
-  <dt>unit-1</dt>
-  <dt>unit-n</dt>
-  <dd>Names of the unit-types that can be uses by the AI equivalent.
-  </dd>
-  </dl>
- <li><code>{"unit-limit", "unit", "resource"}</code>
-  <dl>
-  <dt>unit</dt>
-  <dd>Name of the unit-type that must be produced to reduce the unit limit.
-  </dd>
-  <dt>resource</dt>
-  <dd>Name of the resource producing the shortage.
-  </dd>
-  </dl>
-  <i>I think we should swap the arguments: "resource" "unit".</i>
- </ul>
 </dd>
 </dl>
 
