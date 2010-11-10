@@ -244,7 +244,13 @@ void UpdateStats(int reset)
 */
 CAnimations *AnimationsByIdent(const std::string &ident)
 {
-	return AnimationMap[ident];
+	std::map<std::string, CAnimations *>::const_iterator found
+		= AnimationMap.find(ident);
+	if (found != AnimationMap.end()) {
+		return found->second;
+	} else {
+		return NULL;
+	}
 }
 
 /**
@@ -256,7 +262,13 @@ CAnimations *AnimationsByIdent(const std::string &ident)
 */
 CUnitType *UnitTypeByIdent(const std::string &ident)
 {
-	return UnitTypeMap[ident];
+	std::map<std::string, CUnitType *>::const_iterator found
+		= UnitTypeMap.find(ident);
+	if (found != UnitTypeMap.end()) {
+		return found->second;
+	} else {
+		return NULL;
+	}
 }
 
 /**
