@@ -134,8 +134,6 @@ static std::vector<CUnitType *> getReparableUnits()
 */
 static void InitAiHelper(AiHelper &aiHelper)
 {
-	extern std::vector<ButtonAction *> UnitButtonTable;
-
 	std::vector<CUnitType *> reparableUnits = getReparableUnits();
 
 	for (int i = 0; i < (int)UnitButtonTable.size(); ++i)
