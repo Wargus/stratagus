@@ -34,6 +34,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+#include <vector>
 #include "icons.h"
 
 /*----------------------------------------------------------------------------
@@ -221,6 +222,9 @@ extern int DoubleClickDelay;
 	/// Time to detect hold clicks
 extern int HoldClickDelay;
 
+	/// All buttons for units
+extern std::vector<ButtonAction *> UnitButtonTable;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -347,6 +351,8 @@ extern void DrawTimer(void);
 extern void UpdateTimer(void);
 	/// Update the status line with hints from the button
 extern void UpdateStatusLineForButton(const ButtonAction *button);
+	/// Check if the button is allowed for the unit.
+extern bool IsButtonAllowed(const CUnit *, const ButtonAction *);
 	/// Draw the Pie Menu
 extern void DrawPieMenu(void);
 

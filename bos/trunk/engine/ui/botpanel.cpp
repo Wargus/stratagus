@@ -508,7 +508,7 @@ void UpdateStatusLineForButton(const ButtonAction *button)
 **
 **  @todo FIXME: better check. (dependancy, resource, ...)
 */
-static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
+bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 {
 	bool res;
 

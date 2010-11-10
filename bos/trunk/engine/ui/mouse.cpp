@@ -95,6 +95,70 @@ void CancelBuildingMode(void)
 }
 
 /**
+**  Check whether ButtonAction::UnitMask includes the specified unit
+**  type.  If not, the user cannot click that button to give an order
+**  to units of that type.
+**
+**  Even if this function returns true, the button may still be
+**  disabled for other reasons; call ::IsButtonAllowed to check those.
+*/
+static bool IsButtonAllowedForUnitType(const CUnitType *type, const ButtonAction *button)
+{
+	return button->UnitMask == "*"
+		|| button->UnitMask.find(',' + type->Ident + ',') != std::string::npos;
+}
+
+/**
+**  Find the unit type that @a builder could build on top of @a base.
+**
+**  @param builder  The unit who would like to build something.
+**  @param base     The building would go on top of this unit.
+**
+**  If nothing can be built there, or is not clear which type of unit
+**  should be built, this function returns NULL.
+*/
+static CUnitType *CanBuildSomethingOnTop(const CUnit *builder, const CUnit *base)
+{
+	// This check should in principle be in DoRightButton,
+	// but doing it here is easier.
+	if (base == NULL)
+	{
+		return NULL;
+	}
+
+	CUnitType *foundType = NULL;
+	for (std::vector<ButtonAction *>::const_iterator
+		     iterator = UnitButtonTable.begin();
+	     iterator != UnitButtonTable.end(); ++iterator) {
+		const ButtonAction *const button = *iterator;
+		if (button->Action == ButtonBuild
+		    && IsButtonAllowedForUnitType(builder->Type, button)
+		    && IsButtonAllowed(builder, button))
+		{
+			// Which type of unit the player could build
+			// by clicking this button.
+			CUnitType *const buildingType = UnitTypes.at(button->Value);
+			if (CanBuildHere(builder, buildingType, base->X, base->Y) == base)
+			{
+				// buildingType can be built on top of base.
+				// But is it unambiguous?
+				if (foundType != NULL && buildingType != foundType)
+				{
+					// Oops, we already found a different
+					// type that could be built here.
+					// Better return neither.
+					return NULL;
+				}
+			
+				foundType = buildingType;
+			}
+		}
+	}
+	
+	return foundType;
+}
+
+/**
 **  Called when right button is pressed
 **
 **  @param sx  X map position in pixels.
@@ -261,6 +325,12 @@ void DoRightButton(int sx, int sy)
 					(dest->Player == unit->Player || unit->IsAllied(dest))) {
 				dest->Blink = 4;
 				SendCommandFollow(unit, dest, flush);
+				continue;
+			}
+			// Build on top of the clicked unit
+			CUnitType *buildingType = CanBuildSomethingOnTop(unit, dest);
+			if (buildingType != NULL) {
+				SendCommandBuildBuilding(unit, dest->X, dest->Y, buildingType, flush);
 				continue;
 			}
 			// Move
