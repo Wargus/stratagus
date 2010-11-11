@@ -27,39 +27,65 @@
 
 <body>
 
-<h1>ChangeLog: Stratagus Version 2.2.4</h1>
+<h1>ChangeLog: Stratagus Version 2.2.5.4</h1>
 <hr>
 
 
-<ul>
-<p><li>2.2.6 UNRELEASED<p>
+<p><li>2.2.5.4 Released<p>
 	<ul>
-	<li>Ported stratagus to Maemo systems - Nokia N900 (from Pali Rohar)
-	<li>Ported OpenGL engine to OpenGL ES 1.1 for Maemo systems (from Pali Rohar)
-	<li>Fixed minimap (from upstream svn boswars)
-	<li>Fixed OpenGL textures (from upstream svn boswars)
-	<li>Fixed cross compile MinGW 32/64 (from Pali Rohar)
-	<li>Fixed compilation in Debug mode (from Pali Rohar and sourceforge tracker)
-	<li>Fixed saving campaign game - multiline lua strings and lua triggers (from Pali Rohar)
-	<li>Fixed function CursorByIdent in src/video/cursor.cpp (from Pali Rohar)
+	<li>Fixed bug #616486 - Fixed function CursorByIdent in src/video/cursor.cpp (from Pali Rohar)
+	<li>Added Lua function SetMenuRace which set race of cursor in main menu (from Pali Rohar)
 	<li>Fixed deleting OpenGL textures (from boswars upstream)
+	<li>Fixed bug #633863 - Do not show waypoints for enemy units (when SHIFT key is down) (from Pali Rohar)
+	<li>Fixed autoconf/automake scripts (form Pali Rohar)
 	<li>Fixed a lot of gcc warnings while also extending the warnings flags (from Martin Gerhardy)
-	<li>Added option print debug output to console on Windows (from Pali Rohar)
-	<li>Added function PlayMovie to LUA scripts - play movies from game (from Pali Rohar)
-	<li>Added function SetFullGameName to LUA scripts - use name for WM icon and title (from Pali Rohar)
-	<li>Added function IsMusicPlaying to LUA scripts - check if music is playing (from Pali Rohar)
-	<li>Added function SetFogOfWarColor to LUA scripts - Configurable Fog of War color (from sourceforge tracker)
+	</ul>
+
+<p><li>2.2.5.3 Released<p>
+	<ul>
+	<li>Fixed Debian control files for Maemo (from Pali Rohar)
+	<li>Added LUA function IsMusicPlaying - check if music is playing (from Pali Rohar)
+	<li>Added LUA function SetFogOfWarColor - Configurable Fog of War color (from sourceforge tracker)
+	<li>Added command line params -I for setting the address when binding the sockets (from sourceforge tracker)
+	<li>Compile fix using VC2008 (from sourceforge tracker)
 	<li>Added function GetStratagusVersion to LUA scripts (from Pali Rohar)
 	<li>Added function GetStratagusHomepage to LUA scripts (from Pali Rohar)
-	<li>Added command line params -O and -o for force using OpenGL (from Pali Rohar)
-	<li>Added command line params -I for setting the address when binding the sockets (from sourceforge tracker)
-	<li>Added support for 64bit Windows version (from Pali Rohar)
-	<li>Added new NSIS Installer for Windows (from Pali Rohar)
-	<li>Added support for more graphics resolutions (from Pali Rohar)
-	<li>Added support for playing movies when OpenGL mode is active (from Pali Rohar)
 	<li>Added support for playing music in menu (from Pali Rohar)
-	<li>Added Lua function SetMenuRace which set race of cursor in main menu (from Pali Rohar)
-	<li>Do not show waypoints for enemy units (when SHIFT key is down) (from Pali Rohar)
+	<li>Fixed Windows NSIS Installer (use relative jumps, do not allow start instaler twice, register games, ...) (from Pali Rohar)
+	<li>
+	</ul>
+
+<p><li>2.2.5.2 Released<p>
+	<ul>
+	<li>Fixed Debian scripts for Maemo (from Pali Rohar)
+	<li>Fixed OpenGL textures (from upstream svn boswars)
+	<li>Rewrited Windows NSIS Installer again (from Pali Rohar)
+	<li>Ported OpenGL engine to OpenGL ES 1.1 for Maemo systems (from Pali Rohar)
+	<li>Fixed saving campaign game - multiline lua strings and lua triggers (from Pali Rohar)
+	<li>Fixed compilation in Debug mode (from Pali Rohar and sourceforge tracker)
+	<li>Added LUA function SetUseOpenGL for setting OpenGL state from scripts at startup (insted changing variable UseOpenGL) (from Pali Rohar)
+	<li>Added command line params -O and -o for force using OpenGL (from Pali Rohar)
+	<li>Added LUA function SetFullGameName - use name for WM icon and title (from Pali Rohar)
+	<li>Keep backlight alive on Maemo using libosso (from Pali Rohar)
+	<li>Added support for playing movies when OpenGL mode is active (from Pali Rohar)
+	</ul>
+
+<p><li>2.2.5.1 Released<p>
+	<ul>
+	<li>Fixed playing movies (from Pali Rohar)
+	<li>Fixed minimap (from upstream svn boswars)
+	<li>Added support patches for Maemo (from Bundyo N8x0 stratagus code)
+	<li>Fixed Debian scripts/configs (from Pali Rohar)
+	<li>Added support for cross compile (from Pali Rohar)
+	<li>Use WINAPI_AttachConsole for stdout/stderr output messages to windows cmd console instead temp. files (from Pali Rohar)
+	<li>Fixed compilation and automake/autoconf scripts (from Pali Rohar)
+	<li>Added support for 64bit Windows version (from Pali Rohar)
+	<li>Rewrited new Windows NSIS Installer (from Pali Rohar)
+	<li>Added info for Hildon Application Manager for Maemo (from Pali Rohar)
+	<li>Added support for more graphics resolutions (from Pali Rohar)
+	<li>Added function PlayMovie to LUA scripts - play movies from game (from Pali Rohar)
+	<li>Clean SDL video output before strating movie file (from Pali Rohar)
+	<li>Ported stratagus to Maemo systems - Nokia N900 (from Pali Rohar)
 	</ul>
 
 <p><li>2.2.5 Released<p>
