@@ -3,7 +3,7 @@
 ** Written by Waldemar Celes
 ** TeCGraf/PUC-Rio
 ** Apr 2003
-** $Id$
+** $Id: $
 */
 
 /* This code is free software; you can redistribute it and/or modify it.
@@ -17,7 +17,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-TOLUA_API double tolua_tonumber (lua_State* L, int narg, double def)
+TOLUA_API lua_Number tolua_tonumber (lua_State* L, int narg, lua_Number def)
 {
  return lua_gettop(L)<abs(narg) ? def : lua_tonumber(L,narg);
 }
@@ -71,7 +71,7 @@ TOLUA_API int tolua_toboolean (lua_State* L, int narg, int def)
  return lua_gettop(L)<abs(narg) ?  def : lua_toboolean(L,narg);
 }
 
-TOLUA_API double tolua_tofieldnumber (lua_State* L, int lo, int index, double def)
+TOLUA_API lua_Number tolua_tofieldnumber (lua_State* L, int lo, int index, lua_Number def)
 {
  double v;
  lua_pushnumber(L,index);
@@ -122,7 +122,7 @@ TOLUA_API int tolua_tofieldvalue (lua_State* L, int lo, int index, int def)
  return v;
 }
 
-TOLUA_API int tolua_getfieldboolean (lua_State* L, int lo, int index, int)
+TOLUA_API int tolua_getfieldboolean (lua_State* L, int lo, int index, int def)
 {
  int v;
  lua_pushnumber(L,index);

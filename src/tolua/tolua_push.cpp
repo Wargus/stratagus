@@ -3,7 +3,7 @@
 ** Written by Waldemar Celes
 ** TeCGraf/PUC-Rio
 ** Apr 2003
-** $Id$
+** $Id: $
 */
 
 /* This code is free software; you can redistribute it and/or modify it.
@@ -27,7 +27,7 @@ TOLUA_API void tolua_pushboolean (lua_State* L, int value)
  lua_pushboolean(L,value);
 }
 
-TOLUA_API void tolua_pushnumber (lua_State* L, double value)
+TOLUA_API void tolua_pushnumber (lua_State* L, lua_Number value)
 {
  lua_pushnumber(L,value);
 }
@@ -133,7 +133,7 @@ TOLUA_API void tolua_pushfieldboolean (lua_State* L, int lo, int index, int v)
 }
 
 
-TOLUA_API void tolua_pushfieldnumber (lua_State* L, int lo, int index, double v)
+TOLUA_API void tolua_pushfieldnumber (lua_State* L, int lo, int index, lua_Number v)
 {
  lua_pushnumber(L,index);
  tolua_pushnumber(L,v);

@@ -3,7 +3,7 @@
 ** Written by Waldemar Celes
 ** TeCGraf/PUC-Rio
 ** Apr 2003
-** $Id$
+** $Id: $
 */
 
 /* This code is free software; you can redistribute it and/or modify it.
@@ -25,7 +25,7 @@
 /* Create metatable
 	* Create and register new metatable
 */
-static int tolua_newmetatable (lua_State* L, const char* name)
+static int tolua_newmetatable (lua_State* L, char* name)
 {
 	int r = luaL_newmetatable(L,name);
 
@@ -115,7 +115,7 @@ static void set_ubox(lua_State* L) {
 		lua_rawset(L,-4);
 	};
 
-}
+};
 
 /* Map inheritance
 	* It sets 'name' as derived from 'base' by setting 'base' as metatable of 'name'
@@ -247,7 +247,7 @@ static int tolua_bnd_inherit (lua_State* L) {
 	/* l_obj[".c_instance"] = c_obj */
 
 	return 0;
-}
+};
 
 #ifdef LUA_VERSION_NUM /* lua 5.1 */
 static int tolua_bnd_setpeer(lua_State* L) {
@@ -257,7 +257,7 @@ static int tolua_bnd_setpeer(lua_State* L) {
 		lua_pushstring(L, "Invalid argument #1 to setpeer: userdata expected.");
 		lua_error(L);
 	};
-
+	
 	if (lua_isnil(L, -1)) {
 
 		lua_pop(L, 1);
@@ -266,7 +266,7 @@ static int tolua_bnd_setpeer(lua_State* L) {
 	lua_setfenv(L, -2);
 
 	return 0;
-}
+};
 
 static int tolua_bnd_getpeer(lua_State* L) {
 
@@ -277,7 +277,7 @@ static int tolua_bnd_getpeer(lua_State* L) {
 		lua_pushnil(L);
 	};
 	return 1;
-}
+};
 #endif
 
 /* static int class_gc_event (lua_State* L); */
@@ -513,7 +513,7 @@ static void push_collector(lua_State* L, const char* type, lua_CFunction col) {
 
 	lua_rawset(L,-3);
 	lua_pop(L, 1);
-}
+};
 
 /* Map C class
 	* It maps a C class, setting the appropriate inheritance and super classes.
@@ -532,7 +532,7 @@ TOLUA_API void tolua_cclass (lua_State* L, const char* lname, const char* name, 
 	mapsuper(L,name,base);
 
 	lua_pushstring(L,lname);
-
+	
 	push_collector(L, name, col);
 	/*
 	luaL_getmetatable(L,name);
@@ -541,7 +541,7 @@ TOLUA_API void tolua_cclass (lua_State* L, const char* lname, const char* name, 
 
 	lua_rawset(L,-3);
 	*/
-
+	
 	luaL_getmetatable(L,name);
 	lua_rawset(L,-3);              /* assign class metatable to module */
 
@@ -555,7 +555,7 @@ TOLUA_API void tolua_cclass (lua_State* L, const char* lname, const char* name, 
 	lua_rawset(L,-3);
 	lua_pop(L,1);
 	*/
-
+	
 
 }
 
@@ -600,7 +600,7 @@ TOLUA_API void tolua_set_call_event(lua_State* L, lua_CFunction func, char* type
 /* Map constant number
 	* It assigns a constant number into the current module (or class)
 */
-TOLUA_API void tolua_constant (lua_State* L, const char* name, double value)
+TOLUA_API void tolua_constant (lua_State* L, const char* name, lua_Number value)
 {
 	lua_pushstring(L,name);
 	tolua_pushnumber(L,value);
@@ -700,5 +700,5 @@ TOLUA_API void tolua_dobuffer(lua_State* L, char* B, unsigned int size, const ch
  #else
  lua_dobuffer(L, B, size, name);
  #endif
-}
+};
 
