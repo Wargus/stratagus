@@ -448,10 +448,12 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 **  @param h      Y coordinate
 **  @param value  Value of the tile
 */
-void SetTile(int tile, int w, int h, int value)
+void SetTile(int tile, int x, int y, int value)
 {
-	if (!Map.Info.IsPointOnMap(w, h)) {
-		fprintf(stderr, "Invalid map coordonate : (%d, %d)\n", w, h);
+	const Vec2i pos = {x, y};
+
+	if (!Map.Info.IsPointOnMap(pos)) {
+		fprintf(stderr, "Invalid map coordonate : (%d, %d)\n", pos.x, pos.y);
 		return;
 	}
 	if (tile < 0 || tile >= Map.Tileset.NumTiles) {
@@ -464,14 +466,14 @@ void SetTile(int tile, int w, int h, int value)
 	}
 
 	if (Map.Fields) {
-		unsigned int index = w + h * Map.Info.MapWidth;
-		Map.Fields[index].Tile = Map.Tileset.Table[tile];
-		Map.Fields[index].Value = value;
-		Map.Fields[index].Flags = Map.Tileset.FlagsTable[tile];
-		Map.Fields[index].Cost =
-			1 << (Map.Tileset.FlagsTable[tile] & MapFieldSpeedMask);
+		CMapField &mf = *Map.Field(pos);
+
+		mf.Tile = Map.Tileset.Table[tile];
+		mf.Value = value;
+		mf.Flags = Map.Tileset.FlagsTable[tile];
+		mf.Cost = 1 << (Map.Tileset.FlagsTable[tile] & MapFieldSpeedMask);
 #ifdef DEBUG
-		Map.Fields[index].TilesetTile = tile;
+		mf.TilesetTile = tile;
 #endif
 	}
 }

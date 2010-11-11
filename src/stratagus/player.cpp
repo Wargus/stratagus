@@ -299,7 +299,7 @@ void SavePlayers(CFile *file)
 
 				//Additional security
 				if (!aatarget.IsAliveOnMap() ||
-					Map.Field(aatarget.tilePos.x, aatarget.tilePos.y)->Guard[i] == 0) {
+					Map.Field(aatarget.tilePos)->Guard[i] == 0) {
 					autoatacktargets.Units.erase(autoatacktargets.Units.begin() + k);
 					aatarget.RefsDecrease();
 					continue;

@@ -386,8 +386,9 @@ void CommandAutoRepair(CUnit &unit, int on)
 void CommandAttack(CUnit &unit, int x, int y, CUnit *attack, int flush)
 {
 	COrderPtr order;
+	const Vec2i pos = {x, y};
 
-	Assert(Map.Info.IsPointOnMap(x, y));
+	Assert(Map.Info.IsPointOnMap(pos));
 
 	//
 	// Check if unit is still valid? (NETWORK!)
@@ -417,15 +418,13 @@ void CommandAttack(CUnit &unit, int x, int y, CUnit *attack, int flush)
 				order->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 				order->MinRange = unit.Type->MinAttackRange;
 			}
-		} else if (Map.WallOnMap(x,y)) {
+		} else if (Map.WallOnMap(pos)) {
 			// FIXME: look into action_attack.c about this ugly problem
-			order->goalPos.x = x;
-			order->goalPos.y = y;
+			order->goalPos = pos;
 			order->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 			order->MinRange = unit.Type->MinAttackRange;
 		} else {
-			order->goalPos.x = x;
-			order->goalPos.y = y;
+			order->goalPos = pos;
 		}
 	}
 	ClearSavedAction(unit);

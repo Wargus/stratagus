@@ -101,7 +101,7 @@ struct _EnemyOnMapTile {
 static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i& pos)
 {
 	_EnemyOnMapTile filter(source, pos);
-	Map.Field(pos.x, pos.y)->UnitCache.for_each(filter);
+	Map.Field(pos)->UnitCache.for_each(filter);
 	return filter.best;
 }
 
@@ -115,17 +115,11 @@ static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i& pos)
 */
 static void AiMarkWaterTransporter(const CUnit &unit, unsigned char *matrix)
 {
-	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
-	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
-	struct p {
-		unsigned short X;
-		unsigned short Y;
-	} *points;
+	const Vec2i offset[] = {{0, -1}, {-1, 0}, {1, 0}, {0, 1}, {-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
+	Vec2i *points;
 	int size;
-	int x;
-	int y;
-	int rx;
-	int ry;
+	Vec2i pos;
+	Vec2i rpos;
 	int mask;
 	int wp;
 	int rp;
@@ -134,17 +128,16 @@ static void AiMarkWaterTransporter(const CUnit &unit, unsigned char *matrix)
 	int w;
 	unsigned char *m;
 
-	x = unit.tilePos.x;
-	y = unit.tilePos.y;
+	pos = unit.tilePos;
 	w = Map.Info.MapWidth + 2;
 	matrix += w + w + 2;
-	if (matrix[x + y * w]) { // already marked
+	if (matrix[pos.x + pos.y * w]) { // already marked
 		DebugPrint("Done\n");
 		return;
 	}
 
 	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
-	points = new p[size];
+	points = new Vec2i[size];
 
 	//
 	// Make movement matrix.
@@ -153,10 +146,9 @@ static void AiMarkWaterTransporter(const CUnit &unit, unsigned char *matrix)
 	// Ignore all possible mobile units.
 	mask &= ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
 
-	points[0].X = x;
-	points[0].Y = y;
+	points[0] = pos;
 	rp = 0;
-	matrix[x + y * w] = 66; // mark start point
+	matrix[pos.x + pos.y * w] = 66; // mark start point
 	ep = wp = 1; // start with one point
 
 	//
@@ -164,20 +156,17 @@ static void AiMarkWaterTransporter(const CUnit &unit, unsigned char *matrix)
 	//
 	for (;;) {
 		while (rp != ep) {
-			rx = points[rp].X;
-			ry = points[rp].Y;
+			rpos = points[rp];
 			for (i = 0; i < 8; ++i) { // mark all neighbors
-				x = rx + xoffset[i];
-				y = ry + yoffset[i];
-				m = matrix + x + y * w;
+				pos = rpos + offset[i];
+				m = matrix + pos.x + pos.y * w;
 				if (*m) { // already checked
 					continue;
 				}
 
-				if (CanMoveToMask(x, y, mask)) { // reachable
+				if (CanMoveToMask(pos, mask)) { // reachable
 					*m = 66;
-					points[wp].X = x; // push the point
-					points[wp].Y = y;
+					points[wp] = pos; // push the point
 					if (++wp >= size) { // round about
 						wp = 0;
 					}
@@ -292,7 +281,7 @@ static bool AiFindTarget(const CUnit &unit,
 						return 1;
 					}
 
-					if (CanMoveToMask(pos.x, pos.y, mask)) { // reachable
+					if (CanMoveToMask(pos, mask)) { // reachable
 
 						*m = 1;
 						points[wp].pos = pos; // push the point
@@ -315,7 +304,7 @@ static bool AiFindTarget(const CUnit &unit,
 						}
 						continue;
 					}
-					if (CanMoveToMask(pos.x, pos.y, mask)) { // reachable
+					if (CanMoveToMask(pos, mask)) { // reachable
 						DebugPrint("->Land\n");
 						*m = 1;
 						points[wp].pos = pos; // push the point
@@ -355,17 +344,11 @@ static bool AiFindTarget(const CUnit &unit,
 */
 int AiFindWall(AiForce *force)
 {
-	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
-	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
-	struct p {
-		unsigned short X;
-		unsigned short Y;
-	} *points;
+	const Vec2i offset[] = {{0, -1}, {-1, 1}, {1, 0}, {0, 1}, {-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
+	Vec2i *points;
 	int size;
-	int x;
-	int y;
-	int rx;
-	int ry;
+	Vec2i pos;
+	Vec2i rpos;
 	int mask;
 	int wp;
 	int rp;
@@ -373,8 +356,7 @@ int AiFindWall(AiForce *force)
 	int w;
 	unsigned char *m;
 	unsigned char *matrix;
-	int destx;
-	int desty;
+	Vec2i dest = {-1, -1};
 	CUnit *unit;
 
 	// Find a unit to use.  Best choice is a land unit with range 1.
@@ -390,22 +372,17 @@ int AiFindWall(AiForce *force)
 		}
 	}
 
-	x = unit->tilePos.x;
-	y = unit->tilePos.y;
+	pos = unit->tilePos;
 	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
-	points = new p[size];
-
-	destx = -1;
-	desty = -1;
+	points = new Vec2i[size];
 
 	matrix = CreateMatrix();
 	w = Map.Info.MapWidth + 2;
 	matrix += w + w + 2;
 
-	points[0].X = x;
-	points[0].Y = y;
+	points[0] = pos;
 	rp = 0;
-	matrix[x + y * w] = 1; // mark start point
+	matrix[pos.x + pos.y * w] = 1; // mark start point
 	ep = wp = 1; // start with one point
 
 	mask = unit->Type->MovementMask;
@@ -413,31 +390,27 @@ int AiFindWall(AiForce *force)
 	//
 	// Pop a point from stack, push all neighbors which could be entered.
 	//
-	for (; destx == -1;) {
-		while (rp != ep && destx == -1) {
-			rx = points[rp].X;
-			ry = points[rp].Y;
+	for (; dest.x == -1;) {
+		while (rp != ep && dest.x == -1) {
+			rpos = points[rp];
 			for (int i = 0; i < 8; ++i) { // mark all neighbors
-				x = rx + xoffset[i];
-				y = ry + yoffset[i];
-				m = matrix + x + y * w;
+				pos = rpos + offset[i];
+				m = matrix + pos.x + pos.y * w;
 				if (*m) {
 					continue;
 				}
 				//
 				// Check for a wall
 				//
-				if (Map.WallOnMap(x, y)) {
-					DebugPrint("Wall found %d,%d\n" _C_ x _C_ y);
-					destx = x;
-					desty = y;
+				if (Map.WallOnMap(pos)) {
+					DebugPrint("Wall found %d,%d\n" _C_ pos.x _C_ pos.y);
+					dest = pos;
 					break;
 				}
 
-				if (CanMoveToMask(x, y, mask)) { // reachable
+				if (CanMoveToMask(pos, mask)) { // reachable
 					*m = 1;
-					points[wp].X = x; // push the point
-					points[wp].Y = y;
+					points[wp] = pos; // push the point
 					if (++wp >= size) { // round about
 						wp = 0;
 					}
@@ -460,19 +433,18 @@ int AiFindWall(AiForce *force)
 	}
 	delete[] points;
 
-	if (destx != -1) {
+	if (dest.x != -1) {
 		force->State = AI_FORCE_STATE_WAITING;
 		for (unsigned int i = 0; i < force->Units.size(); ++i) {
 			CUnit &aiunit = *force->Units[i];
 			if (aiunit.Type->CanAttack) {
-				CommandAttack(aiunit, destx, desty, NULL, FlushCommands);
+				CommandAttack(aiunit, dest.x, dest.y, NULL, FlushCommands);
 			} else {
-				CommandMove(aiunit, destx, desty, FlushCommands);
+				CommandMove(aiunit, dest.x, dest.y, FlushCommands);
 			}
 		}
 		return 1;
 	}
-
 	return 0;
 }
 

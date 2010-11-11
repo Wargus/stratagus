@@ -471,13 +471,14 @@ static void EditorChangeTile(int x, int y, int tile, int d)
 */
 static void EditorTileChanged2(int x, int y, int d)
 {
+	const Vec2i pos = {x, y};
 	unsigned quad;
 	unsigned q2;
 	unsigned u;
 	int tile;
 	CMapField *mf;
 
-	quad = QuadFromTile(x, y);
+	quad = QuadFromTile(pos.x, pos.y);
 
 	//
 	// Change the surrounding
@@ -486,9 +487,9 @@ static void EditorTileChanged2(int x, int y, int d)
 	//
 	// Special case 1) Walls.
 	//
-	mf = Map.Field(x, y);
+	mf = Map.Field(pos);
 	if (mf->Flags & MapFieldWall) {
-		Map.SetWall(x, y, mf->Flags & MapFieldHuman);
+		Map.SetWall(pos, mf->Flags & MapFieldHuman);
 		return;
 	}
 
@@ -498,48 +499,48 @@ static void EditorTileChanged2(int x, int y, int d)
 	//  check if the margin matches. otherwise, call
 	//  EditorChangeTile again.
 	//
-	if (d & DIR_UP && y) {
+	if (d & DIR_UP && pos.y) {
 		//
 		// Insert into the bottom the new tile.
 		//
-		q2 = QuadFromTile(x, y - 1);
+		q2 = QuadFromTile(pos.x, pos.y - 1);
 		u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
 		if (u != q2) {
 			tile = TileFromQuad(u & BH_QUAD_M, u);
-			EditorChangeTile(x, y - 1, tile, d&~DIR_DOWN);
+			EditorChangeTile(pos.x, pos.y - 1, tile, d & ~DIR_DOWN);
 		}
 	}
-	if (d & DIR_DOWN && y < Map.Info.MapHeight - 1) {
+	if (d & DIR_DOWN && pos.y < Map.Info.MapHeight - 1) {
 		//
 		// Insert into the top the new tile.
 		//
-		q2 = QuadFromTile(x, y + 1);
+		q2 = QuadFromTile(pos.x, pos.y + 1);
 		u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
 		if (u != q2) {
 			tile = TileFromQuad(u & TH_QUAD_M, u);
-			EditorChangeTile(x, y + 1, tile, d&~DIR_UP);
+			EditorChangeTile(pos.x, pos.y + 1, tile, d & ~DIR_UP);
 		}
 	}
-	if (d & DIR_LEFT && x) {
+	if (d & DIR_LEFT && pos.x) {
 		//
 		// Insert into the left the new tile.
 		//
-		q2 = QuadFromTile(x - 1, y);
+		q2 = QuadFromTile(pos.x - 1, pos.y);
 		u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
 		if (u != q2) {
 			tile = TileFromQuad(u & RH_QUAD_M, u);
-			EditorChangeTile(x - 1, y, tile, d&~DIR_RIGHT);
+			EditorChangeTile(pos.x - 1, pos.y, tile, d & ~DIR_RIGHT);
 		}
 	}
-	if (d & DIR_RIGHT && x < Map.Info.MapWidth - 1) {
+	if (d & DIR_RIGHT && pos.x < Map.Info.MapWidth - 1) {
 		//
 		// Insert into the right the new tile.
 		//
-		q2 = QuadFromTile(x + 1, y);
+		q2 = QuadFromTile(pos.x + 1, pos.y);
 		u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
 		if (u != q2) {
 			tile = TileFromQuad(u & LH_QUAD_M, u);
-			EditorChangeTile(x + 1, y, tile, d&~DIR_LEFT);
+			EditorChangeTile(pos.x + 1, pos.y, tile, d & ~DIR_LEFT);
 		}
 	}
 }

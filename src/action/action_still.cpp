@@ -165,7 +165,7 @@ static bool MoveRandomly(CUnit &unit)
 		// move if possible
 		if (pos != unit.tilePos) {
 			UnmarkUnitFieldFlags(unit);
-			if (UnitCanBeAt(unit, pos.x, pos.y)) {
+			if (UnitCanBeAt(unit, pos)) {
 				COrderPtr order = unit.CurrentOrder();
 				// FIXME: Don't use pathfinder for this, costs too much cpu.
 				order->Action = UnitActionMove;

@@ -73,15 +73,14 @@ char CurrentMapPath[1024];       /// Path of the current map
 */
 void CMap::MarkSeenTile(const unsigned int index)
 {
-	int tile;
-	int seentile;
-	CMapField *mf;
+	CMapField *mf = this->Field(index);
+	int tile = mf->Tile;
+	int seentile = mf->SeenTile;
 
-	mf = this->Field(index);
 	//
 	//  Nothing changed? Seeing already the correct tile.
 	//
-	if ((tile = mf->Tile) == (seentile = mf->SeenTile)) {
+	if (tile == seentile) {
 		return;
 	}
 	mf->SeenTile = tile;
@@ -90,6 +89,7 @@ void CMap::MarkSeenTile(const unsigned int index)
 	//rb - GRRRRRRRRRRRR
 	int y = index / Info.MapWidth;
 	int x = index - (y * Info.MapWidth);
+	const Vec2i pos = {x, y}
 #endif
 
 	if (this->Tileset.TileTypeTable) {
@@ -97,42 +97,39 @@ void CMap::MarkSeenTile(const unsigned int index)
 		//rb - GRRRRRRRRRRRR
 		int y = index / Info.MapWidth;
 		int x = index - (y * Info.MapWidth);
+		const Vec2i pos = {x, y};
 #endif
 
 		//  Handle wood changes. FIXME: check if for growing wood correct?
-		if (seentile != this->Tileset.RemovedTree &&
-				tile == this->Tileset.RemovedTree) {
-			FixNeighbors(MapFieldForest, 1, x, y);
-		} else if (seentile == this->Tileset.RemovedTree &&
-				tile != this->Tileset.RemovedTree) {
-			FixTile(MapFieldForest, 1, x, y);
+		if (seentile != this->Tileset.RemovedTree && tile == this->Tileset.RemovedTree) {
+			FixNeighbors(MapFieldForest, 1, pos);
+		} else if (seentile == this->Tileset.RemovedTree && tile != this->Tileset.RemovedTree) {
+			FixTile(MapFieldForest, 1, pos);
 		} else if (ForestOnMap(index)) {
-			FixTile(MapFieldForest, 1, x, y);
-			FixNeighbors(MapFieldForest, 1, x, y);
+			FixTile(MapFieldForest, 1, pos);
+			FixNeighbors(MapFieldForest, 1, pos);
 
 		// Handle rock changes.
-		} else if (seentile != this->Tileset.RemovedRock &&
-				tile == Map.Tileset.RemovedRock) {
-			FixNeighbors(MapFieldRocks, 1, x, y);
-		} else if (seentile == this->Tileset.RemovedRock &&
-				tile != Map.Tileset.RemovedRock) {
-			FixTile(MapFieldRocks, 1, x, y);
+		} else if (seentile != this->Tileset.RemovedRock && tile == Map.Tileset.RemovedRock) {
+			FixNeighbors(MapFieldRocks, 1, pos);
+		} else if (seentile == this->Tileset.RemovedRock && tile != Map.Tileset.RemovedRock) {
+			FixTile(MapFieldRocks, 1, pos);
 		} else if (RockOnMap(index)) {
-			FixTile(MapFieldRocks, 1, x, y);
-			FixNeighbors(MapFieldRocks, 1, x, y);
+			FixTile(MapFieldRocks, 1, pos);
+			FixNeighbors(MapFieldRocks, 1, pos);
 
 		//  Handle Walls changes.
 		} else if (this->Tileset.TileTypeTable[tile] == TileTypeHumanWall ||
 				this->Tileset.TileTypeTable[tile] == TileTypeOrcWall ||
 				this->Tileset.TileTypeTable[seentile] == TileTypeHumanWall ||
 				this->Tileset.TileTypeTable[seentile] == TileTypeOrcWall) {
-			MapFixSeenWallTile(x, y);
-			MapFixSeenWallNeighbors(x, y);
+			MapFixSeenWallTile(pos);
+			MapFixSeenWallNeighbors(pos);
 		}
 	}
 
 #ifdef MINIMAP_UPDATE
-	UI.Minimap.UpdateXY(x, y);
+	UI.Minimap.UpdateXY(pos.x, pos.y);
 #endif
 }
 
@@ -184,46 +181,41 @@ void CMap::Reveal()
 /**
 **  Wall on map tile.
 **
-**  @param tx  X map tile position.
-**  @param ty  Y map tile position.
+**  @param pos  map tile position.
 **
 **  @return    True if wall, false otherwise.
 */
-bool CMap::WallOnMap(int tx, int ty) const
+bool CMap::WallOnMap(const Vec2i &pos) const
 {
-	Assert(Map.Info.IsPointOnMap(tx, ty));
-	return (Fields[tx + ty * Info.MapWidth].Flags & MapFieldWall) != 0;
+	Assert(Map.Info.IsPointOnMap(pos));
+	return (Field(pos)->Flags & MapFieldWall) != 0;
 
 }
 
 /**
 **  Human wall on map tile.
 **
-**  @param tx  X map tile position.
-**  @param ty  Y map tile position.
+**  @param pos  map tile position.
 **
 **  @return    True if human wall, false otherwise.
 */
-bool CMap::HumanWallOnMap(int tx, int ty) const
+bool CMap::HumanWallOnMap(const Vec2i &pos) const
 {
-	Assert(Map.Info.IsPointOnMap(tx, ty));
-	return (Fields[tx + ty * Info.MapWidth].Flags &
-		(MapFieldWall | MapFieldHuman)) == (MapFieldWall | MapFieldHuman);
+	Assert(Map.Info.IsPointOnMap(pos));
+	return (Field(pos)->Flags & (MapFieldWall | MapFieldHuman)) == (MapFieldWall | MapFieldHuman);
 }
 
 /**
 **  Orc wall on map tile.
 **
-**  @param tx  X map tile position.
-**  @param ty  Y map tile position.
+**  @param pos  map tile position.
 **
 **  @return    True if orcish wall, false otherwise.
 */
-bool CMap::OrcWallOnMap(int tx, int ty) const
+bool CMap::OrcWallOnMap(const Vec2i &pos) const
 {
-	Assert(Map.Info.IsPointOnMap(tx, ty));
-	return (Fields[tx + ty * Info.MapWidth].Flags &
-		(MapFieldWall | MapFieldHuman)) == MapFieldWall;
+	Assert(Map.Info.IsPointOnMap(pos));
+	return (Field(pos)->Flags & (MapFieldWall | MapFieldHuman)) == MapFieldWall;
 }
 
 /**
@@ -243,12 +235,11 @@ bool CheckedCanMoveToMask(const Vec2i &pos, int mask)
 **  Can a unit of unit-type be placed at this point.
 **
 **  @param type  unit-type to be checked.
-**  @param x     X map tile position.
-**  @param y     Y map tile position.
+**  @param pos   map tile position.
 **
 **  @return      True if could be entered, false otherwise.
 */
-bool UnitTypeCanBeAt(const CUnitType *type, int x, int y)
+bool UnitTypeCanBeAt(const CUnitType *type, const Vec2i &pos)
 {
 	int addx;  // iterator
 	int addy;  // iterator
@@ -256,11 +247,11 @@ bool UnitTypeCanBeAt(const CUnitType *type, int x, int y)
 
 	Assert(type);
 	mask = type->MovementMask;
-	unsigned int index = y * Map.Info.MapWidth;
+	unsigned int index = pos.y * Map.Info.MapWidth;
 	for (addy = 0; addy < type->TileHeight; ++addy) {
 		for (addx = 0; addx < type->TileWidth; ++addx) {
-			if (!(Map.Info.IsPointOnMap(x + addx, y + addy) &&
-				!Map.CheckMask(x + addx + index, mask))) {
+			if (!(Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy) &&
+				!Map.CheckMask(pos.x + addx + index, mask))) {
 				return false;
 			}
 		}
@@ -273,14 +264,13 @@ bool UnitTypeCanBeAt(const CUnitType *type, int x, int y)
 **  Can a unit be placed to this point.
 **
 **  @param unit  unit to be checked.
-**  @param x     X map tile position.
-**  @param y     Y map tile position.
+**  @param pos   map tile position.
 **
 **  @return      True if could be placeded, false otherwise.
 */
-bool UnitCanBeAt(const CUnit &unit, int x, int y)
+bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos)
 {
-	return UnitTypeCanBeAt(unit.Type, x, y);
+	return UnitTypeCanBeAt(unit.Type, pos);
 }
 
 /**
@@ -288,13 +278,11 @@ bool UnitCanBeAt(const CUnit &unit, int x, int y)
 */
 void PreprocessMap()
 {
-	int ix;
-	int iy;
 	CMapField *mf;
 
 #ifdef _MSC_VER
-	for (ix = 0; ix < Map.Info.MapWidth; ++ix) {
-		for (iy = 0; iy < Map.Info.MapHeight; ++iy) {
+	for (int ix = 0; ix < Map.Info.MapWidth; ++ix) {
+		for (int iy = 0; iy < Map.Info.MapHeight; ++iy) {
 			mf = Map.Field(ix, iy);
 			mf->SeenTile = mf->Tile;
 		}
@@ -320,10 +308,11 @@ void PreprocessMap()
 
 	// it is required for fixing the wood that all tiles are marked as seen!
 	if (Map.Tileset.TileTypeTable) {
-		for (ix = 0; ix < Map.Info.MapWidth; ++ix) {
-			for (iy = 0; iy < Map.Info.MapHeight; ++iy) {
-				MapFixWallTile(ix, iy);
-				MapFixSeenWallTile(ix, iy);
+		Vec2i pos;
+		for (pos.x = 0; pos.x < Map.Info.MapWidth; ++pos.x) {
+			for (pos.y = 0; pos.y < Map.Info.MapHeight; ++pos.y) {
+				MapFixWallTile(pos);
+				MapFixSeenWallTile(pos);
 			}
 		}
 	}
@@ -388,28 +377,14 @@ void CMap::Clean(void)
 ----------------------------------------------------------------------------*/
 
 /**
-**  Check if the seen tile-type is wood or rock.
-**
-**  @param type  Tile type
-**  @param x     Map X tile-position.
-**  @param y     Map Y tile-position.
-*/
-bool CMap::IsSeenTile(unsigned short type, int x, int y) const
-{
-	return this->Tileset.IsSeenTile(type, Map.Field(x,y)->SeenTile);
-}
-
-/**
 **  Correct the seen wood field, depending on the surrounding.
 **
 **  @param type  type fo tile to update
 **  @param seen  1 if updating seen value, 0 for real
-**  @param x     Map X tile-position.
-**  @param y     Map Y tile-position.
+**  @param pos   Map tile-position.
 */
-void CMap::FixTile(unsigned short type, int seen, int x, int y)
+void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 {
-	const Vec2i pos = {x, y};
 	int tile;
 	int ttup;
 	int ttdown;
@@ -537,7 +512,7 @@ void CMap::FixTile(unsigned short type, int seen, int x, int y)
 	if (tile == -1) { // No valid wood remove it.
 		if (seen) {
 			mf->SeenTile = removedtile;
-			this->FixNeighbors(type, seen, pos.x, pos.y);
+			this->FixNeighbors(type, seen, pos);
 		} else {
 			mf->Tile = removedtile;
 			mf->Flags &= ~flags;
@@ -569,19 +544,16 @@ void CMap::FixTile(unsigned short type, int seen, int x, int y)
 **
 **  @param type  Tiletype of tile to adjust
 **  @param seen  1 if updating seen value, 0 for real
-**  @param x     Map X tile-position.
-**  @param y     Map Y tile-position.
+**  @param pos   Map tile-position.
 */
-void CMap::FixNeighbors(unsigned short type, int seen, int x, int y)
+void CMap::FixNeighbors(unsigned short type, int seen, const Vec2i &pos)
 {
-	FixTile(type, seen, x + 1, y); // side neighbors
-	FixTile(type, seen, x - 1, y);
-	FixTile(type, seen, x, y + 1);
-	FixTile(type, seen, x, y - 1);
-	FixTile(type, seen, x + 1, y - 1); // side neighbors
-	FixTile(type, seen, x - 1, y - 1);
-	FixTile(type, seen, x - 1, y + 1);
-	FixTile(type, seen, x + 1, y + 1);
+	const Vec2i offset[] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
+
+	for (unsigned int i = 0; i < sizeof (offset) / sizeof (*offset); ++i)
+	{
+		FixTile(type, seen, pos + offset[i]);
+	}
 }
 
 /**
@@ -617,7 +589,7 @@ void CMap::ClearTile(unsigned short type, const Vec2i &pos)
 	mf->Value = 0;
 
 	UI.Minimap.UpdateXY(pos.x, pos.y);
-	FixNeighbors(type, 0, pos.x, pos.y);
+	FixNeighbors(type, 0, pos);
 
 	//maybe isExplored
 	if (IsTileVisible(ThisPlayer, index) > 0) {

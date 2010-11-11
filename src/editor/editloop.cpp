@@ -342,12 +342,13 @@ void EditTiles(int x, int y, int tile, int size)
 */
 static void EditorActionPlaceUnit(int x, int y, CUnitType *type, CPlayer *player)
 {
+	const Vec2i pos = {x, y};
 	if (type->Neutral) {
 		player = &Players[PlayerNumNeutral];
 	}
 
 	// FIXME: vladi: should check place when mirror editing is enabled...?
-	CUnit *unit = MakeUnitAndPlace(x, y, type, player);
+	CUnit *unit = MakeUnitAndPlace(pos.x, pos.y, type, player);
 	if (unit == NoUnitP) {
 		DebugPrint("Unable to allocate Unit");
 		return;
@@ -355,11 +356,10 @@ static void EditorActionPlaceUnit(int x, int y, CUnitType *type, CPlayer *player
 
 	CBuildRestrictionOnTop *b = OnTopDetails(*unit, NULL);
 	if (b && b->ReplaceOnBuild) {
-		int n;
 		CUnit *table[UnitMax];
 
 		//FIXME: rb: use tile functor find here.
-		n = Map.Select(x, y, table);
+		int n = Map.Select(pos, table);
 		while (n--) {
 			if (table[n]->Type == b->Parent) {
 				unit->ResourcesHeld = table[n]->ResourcesHeld; // We capture the value of what is beneath.

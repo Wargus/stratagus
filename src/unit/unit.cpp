@@ -777,15 +777,17 @@ static void UnitInXY(CUnit &unit, int x, int y)
 */
 void CUnit::MoveToXY(int x, int y)
 {
+	const Vec2i pos = {x, y};
+
 	MapUnmarkUnitSight(*this);
-	Map.Remove(this);
+	Map.Remove(*this);
 	UnmarkUnitFieldFlags(*this);
 
-	Assert(UnitCanBeAt(*this, x, y));
+	Assert(UnitCanBeAt(*this, pos));
 	// Move the unit.
-	UnitInXY(*this, x, y);
+	UnitInXY(*this, pos.x, pos.y);
 
-	Map.Insert(this);
+	Map.Insert(*this);
 	MarkUnitFieldFlags(*this);
 	//  Recalculate the seen count.
 	UnitCountSeen(*this);
@@ -815,7 +817,7 @@ void CUnit::Place(int x, int y)
 	// Pathfinding info.
 	MarkUnitFieldFlags(*this);
 	// Tha cache list.
-	Map.Insert(this);
+	Map.Insert(*this);
 	//  Calculate the seen count.
 	UnitCountSeen(*this);
 	// Vision
@@ -859,7 +861,7 @@ void CUnit::Remove(CUnit *host)
 		return;
 	}
 
-	Map.Remove(this);
+	Map.Remove(*this);
 	MapUnmarkUnitSight(*this);
 	UnmarkUnitFieldFlags(*this);
 	MapUnmarkUnitGuard(*this);
@@ -1866,28 +1868,28 @@ void DropOutOnSide(CUnit &unit, int heading, int addx, int addy)
 	for (;;) {
 startw:
 		for (i = addy; i--; ++pos.y) {
-			if (UnitCanBeAt(unit, pos.x, pos.y)) {
+			if (UnitCanBeAt(unit, pos)) {
 				goto found;
 			}
 		}
 		++addx;
 starts:
 		for (i = addx; i--; ++pos.x) {
-			if (UnitCanBeAt(unit, pos.x, pos.y)) {
+			if (UnitCanBeAt(unit, pos)) {
 				goto found;
 			}
 		}
 		++addy;
 starte:
 		for (i = addy; i--; --pos.y) {
-			if (UnitCanBeAt(unit, pos.x, pos.y)) {
+			if (UnitCanBeAt(unit, pos)) {
 				goto found;
 			}
 		}
 		++addx;
 startn:
 		for (i = addx; i--; --pos.x) {
-			if (UnitCanBeAt(unit, pos.x, pos.y)) {
+			if (UnitCanBeAt(unit, pos)) {
 				goto found;
 			}
 		}
@@ -1924,7 +1926,7 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, int addx, int addy)
 	--pos.x;
 	for (;;) {
 		for (int i = addy; i--; ++pos.y) { // go down
-			if (UnitCanBeAt(unit, pos.x, pos.y)) {
+			if (UnitCanBeAt(unit, pos)) {
 				const int n = MapDistance(goalPos.x, goalPos.y, pos.x, pos.y);
 
 				if (n < bestd) {
@@ -1935,7 +1937,7 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, int addx, int addy)
 		}
 		++addx;
 		for (int i = addx; i--; ++pos.x) { // go right
-			if (UnitCanBeAt(unit, pos.x, pos.y)) {
+			if (UnitCanBeAt(unit, pos)) {
 				const int n = MapDistance(goalPos.x, goalPos.y, pos.x, pos.y);
 
 				if (n < bestd) {
@@ -1946,7 +1948,7 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, int addx, int addy)
 		}
 		++addy;
 		for (int i = addy; i--; --pos.y) { // go up
-			if (UnitCanBeAt(unit, pos.x, pos.y)) {
+			if (UnitCanBeAt(unit, pos)) {
 				const int n = MapDistance(goalPos.x, goalPos.y, pos.x, pos.y);
 
 				if (n < bestd) {
@@ -1957,7 +1959,7 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, int addx, int addy)
 		}
 		++addx;
 		for (int i = addx; i--; --pos.x) { // go left
-			if (UnitCanBeAt(unit, pos.x, pos.y)) {
+			if (UnitCanBeAt(unit, pos)) {
 				const int n = MapDistance(goalPos.x, goalPos.y, pos.x, pos.y);
 
 				if (n < bestd) {
@@ -2088,13 +2090,13 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 					continue;
 				}
 				// Look if found what was required.
-				bool can_move_to = CanMoveToMask(pos.x, pos.y, resmask);
+				bool can_move_to = CanMoveToMask(pos, resmask);
 				if ((rvresult ? can_move_to : !can_move_to)) {
 					*terrainPos = pos;
 					delete[] points;
 					return 1;
 				}
-				if (CanMoveToMask(pos.x, pos.y, movemask)) { // reachable
+				if (CanMoveToMask(pos, movemask)) { // reachable
 					*m = 1;
 					points[wp] = pos; // push the point
 					if (++wp >= size) { // round about
@@ -2424,7 +2426,7 @@ CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range, int resource
 					}
 				}
 
-				if (CanMoveToMask(pos.x, pos.y, mask)) { // reachable
+				if (CanMoveToMask(pos, mask)) { // reachable
 					*m = 1;
 					points[wp] = pos; // push the point
 					if (++wp >= size) { // round about
@@ -2563,7 +2565,7 @@ CUnit *UnitFindMiningArea(const CUnit &unit, int x, int y,  int range, int resou
 					}
 				}
 
-				if (CanMoveToMask(pos.x, pos.y, mask)) { // reachable
+				if (CanMoveToMask(pos, mask)) { // reachable
 					*m = 1;
 					points[wp] = pos; // push the point
 					if (++wp >= size) { // round about
@@ -2859,7 +2861,7 @@ void LetUnitDie(CUnit &unit)
 	// This enables us to be tracked.  Possibly for spells (eg raise dead)
 	if (type->CorpseType || (type->Animations && type->Animations->Death)) {
 		unit.Removed = 0;
-		Map.Insert(&unit);
+		Map.Insert(unit);
 
 		// FIXME: rb: Maybe we need this here because corpse of cloaked units
 		//	may crash Sign code

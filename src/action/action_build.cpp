@@ -182,7 +182,7 @@ static CUnit *CheckCanBuild(CUnit &unit)
 		 *	ebabled/disable via game lua scripting
 		 */
 		if ((ontop =
-			AlreadyBuildingFinder(unit, type).Find(Map.Field(pos.x, pos.y))
+			AlreadyBuildingFinder(unit, type).Find(Map.Field(pos))
 			) != NULL) {
 			DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
 					_C_ unit.Player->Index _C_ unit.Slot
@@ -571,9 +571,8 @@ void HandleActionBuilt(CUnit &unit)
 		// FIXME: Vladi: this is just a hack to test wall fixing,
 		// FIXME:  also not sure if the right place...
 		// FIXME: Johns: hardcoded unit-type wall / more races!
-		if (unit.Type == UnitTypeOrcWall ||
-				unit.Type == UnitTypeHumanWall) {
-			Map.SetWall(unit.tilePos.x, unit.tilePos.y, unit.Type == UnitTypeHumanWall);
+		if (unit.Type == UnitTypeOrcWall || unit.Type == UnitTypeHumanWall) {
+			Map.SetWall(unit.tilePos, unit.Type == UnitTypeHumanWall);
 			unit.Remove(NULL);
 			UnitLost(unit);
 			UnitClearOrders(unit);

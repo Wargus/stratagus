@@ -380,14 +380,12 @@ void DoRightButton(int sx, int sy)
 					continue;
 				}
 			}
-			if (Map.WallOnMap(pos.x, pos.y)) {
-				if (unit->Player->Race == PlayerRaceHuman &&
-						Map.OrcWallOnMap(pos.x, pos.y)) {
+			if (Map.WallOnMap(pos)) {
+				if (unit->Player->Race == PlayerRaceHuman && Map.OrcWallOnMap(pos)) {
 					SendCommandAttack(*unit, pos.x, pos.y, NoUnitP, flush);
 					continue;
 				}
-				if (unit->Player->Race == PlayerRaceOrc &&
-						Map.HumanWallOnMap(pos.x, pos.y)) {
+				if (unit->Player->Race == PlayerRaceOrc && Map.HumanWallOnMap(pos)) {
 					SendCommandAttack(*unit, pos.x, pos.y, NoUnitP, flush);
 					continue;
 				}
@@ -1880,31 +1878,18 @@ void UIHandleButtonUp(unsigned button)
 		//
 		if (CursorStartX < CursorX - 1 || CursorStartX > CursorX + 1 ||
 				CursorStartY < CursorY - 1 || CursorStartY > CursorY + 1) {
-			int x0;
-			int y0;
-			int x1;
-			int y1;
-
-			x0 = CursorStartScrMapX;
-			y0 = CursorStartScrMapY;
-			x1 = CursorX - UI.MouseViewport->X +
+			int x0 = CursorStartScrMapX;
+			int y0 = CursorStartScrMapY;
+			int x1 = CursorX - UI.MouseViewport->X +
 				UI.MouseViewport->MapX * TileSizeX + UI.MouseViewport->OffsetX;
-			y1 = CursorY - UI.MouseViewport->Y +
+			int y1 = CursorY - UI.MouseViewport->Y +
 				UI.MouseViewport->MapY * TileSizeY + UI.MouseViewport->OffsetY;
 
 			if (x0 > x1) {
-				int swap;
-
-				swap = x0;
-				x0 = x1;
-				x1 = swap;
+				std::swap(x0, x1);
 			}
 			if (y0 > y1) {
-				int swap;
-
-				swap = y0;
-				y0 = y1;
-				y1 = swap;
+				std::swap(y0, y1);
 			}
 			if (KeyModifiers & ModifierShift) {
 				if (KeyModifiers & ModifierAlt) {

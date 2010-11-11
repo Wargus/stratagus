@@ -239,7 +239,7 @@ static int AiFindBuildingPlace2(const CUnit &worker, const CUnitType *type,
 					}
 				}
 
-				if (CanMoveToMask(pos.x, pos.y, mask)) { // reachable
+				if (CanMoveToMask(pos, mask)) { // reachable
 					*m = 1;
 					points[wp] = pos; // push the point
 					if (++wp >= size) { // round about
@@ -353,10 +353,6 @@ static int AiFindHallPlace(const CUnit &worker,
 				if ((mine = ResourceOnMap(pos.x, pos.y, resource))) {
 					int buildings;
 					int j;
-					int minx;
-					int maxx;
-					int miny;
-					int maxy;
 					int nunits;
 					CUnit *units[UnitMax];
 
@@ -365,12 +361,11 @@ static int AiFindHallPlace(const CUnit &worker,
 					//
 					// Check units around mine
 					//
-					minx = mine->tilePos.x - 5;
-					miny = mine->tilePos.y - 5;
-					maxx = mine->tilePos.x + mine->Type->TileWidth + 5;
-					maxy = mine->tilePos.y + mine->Type->TileHeight + 5;
-					Map.FixSelectionArea(minx, miny, maxx, maxy);
-					nunits = Map.SelectFixed(minx, miny, maxx, maxy, units);
+					Vec2i minpos = {mine->tilePos.x - 5, mine->tilePos.y - 5};
+					Vec2i maxpos = {mine->tilePos.x + mine->Type->TileWidth + 5,
+									mine->tilePos.y + mine->Type->TileHeight + 5};
+					Map.FixSelectionArea(minpos, maxpos);
+					nunits = Map.SelectFixed(minpos, maxpos, units);
 					for (j = 0; j < nunits; ++j) {
 						// Enemy near mine
 						if (AiPlayer->Player->Enemy &
@@ -400,7 +395,7 @@ static int AiFindHallPlace(const CUnit &worker,
 					}
 				}
 
-				if (CanMoveToMask(pos.x, pos.y, mask)) { // reachable
+				if (CanMoveToMask(pos, mask)) { // reachable
 					*m = 1;
 					points[wp] = pos; // push the point
 					if (++wp >= size) { // round about
@@ -503,7 +498,7 @@ static int AiFindLumberMillPlace(const CUnit &worker, const CUnitType *type,
 					}
 				}
 
-				if (CanMoveToMask(pos.x, pos.y, mask)) { // reachable
+				if (CanMoveToMask(pos, mask)) { // reachable
 					*m = 1;
 					points[wp] = pos; // push the point
 					if (++wp >= size) { // round about
@@ -597,7 +592,7 @@ static int AiFindMiningPlace(const CUnit &worker,
 							return 1;
 				}
 
-				if (CanMoveToMask(pos.x, pos.y, mask)) { // reachable
+				if (CanMoveToMask(pos, mask)) { // reachable
 					*m = 1;
 					points[wp] = pos; // push the point
 					if (++wp >= size) { // round about

@@ -195,11 +195,11 @@ public:
 	/// Alocate and initialise map table.
 	void Create();
 	/// Build tables for map
-	void Init(void);
+	void Init();
 	/// Clean the map
 	void Clean();
 	/// Cleanup memory for fog of war tables
-	void CleanFogOfWar(void);
+	void CleanFogOfWar();
 	/// Remove wood/rock from the map.
 	void ClearTile(unsigned short type, const Vec2i &pos);
 
@@ -319,18 +319,18 @@ public:
 // Wall
 //
 	/// Wall is hit.
-	void HitWall(unsigned x, unsigned y, unsigned damage);
+	void HitWall(const Vec2i &pos, unsigned damage);
 	/// Set wall on field.
-	void RemoveWall(unsigned x, unsigned y);
+	void RemoveWall(const Vec2i &pos);
 	/// Set wall on field.
-	void SetWall(unsigned x, unsigned y, int humanwall);
+	void SetWall(const Vec2i &pos, int humanwall);
 
 	/// Returns true, if wall on the map tile field
-	bool WallOnMap(int x, int y) const;
+	bool WallOnMap(const Vec2i &pos) const;
 	/// Returns true, if human wall on the map tile field
-	bool HumanWallOnMap(int x, int y) const;
+	bool HumanWallOnMap(const Vec2i &pos) const;
 	/// Returns true, if orc wall on the map tile field
-	bool OrcWallOnMap(int x, int y) const;
+	bool OrcWallOnMap(const Vec2i &pos) const;
 
 
 //
@@ -418,50 +418,40 @@ public:
 //UnitCache
 
 		/// Insert new unit into cache
-	void Insert(CUnit *unit);
+	void Insert(CUnit &unit);
 
 	/// Remove unit from cache
-	void Remove(CUnit *unit);
+	void Remove(CUnit &unit);
 
 	//Warning: we expect typical usage as xmin = x - range
-	void FixSelectionArea(int &xmin, int &ymin, int &xmax, int &ymax)
+	void FixSelectionArea(Vec2i &minpos, Vec2i &maxpos)
 	{
-		if (xmin < 0) {
-			xmin = 0;
-		}
-		if (xmax > Info.MapWidth - 1) {
-			xmax = Info.MapWidth - 1;
-		}
-		if (ymin < 0) {
-			ymin = 0;
-		}
-		if (ymax > Info.MapHeight - 1) {
-			ymax = Info.MapHeight - 1;
-		}
+		minpos.x = std::max<short>(0, minpos.x);
+		minpos.y = std::max<short>(0, minpos.y);
+
+		maxpos.x = std::min<short>(maxpos.x, Info.MapWidth - 1);
+		maxpos.y = std::min<short>(maxpos.y, Info.MapHeight - 1);
 	}
 
 	/// Select units in rectange range
 	int Select(int x1, int y1, int x2, int y2, CUnit *table[],
 		 const int tablesize = UnitMax);
-	int SelectFixed(int x1, int y1, int x2, int y2, CUnit*table[],
+	int SelectFixed(const Vec2i &ltpos, const Vec2i &rbpos, CUnit*table[],
 		 const int tablesize = UnitMax);
 
 
 	// Select units on map tile. - helper funtion. don't use directly
-	int Select(int x, int y, CUnit *table[],
-				const int tablesize = UnitMax);
+	int Select(const Vec2i &pos, CUnit *table[], const int tablesize = UnitMax);
 
 
 private:
 	/// Build tables for fog of war
-	void InitFogOfWar(void);
+	void InitFogOfWar();
 
-	/// Check if the seen tile-type is wood
-	bool IsSeenTile(unsigned short type, int x, int y) const;
 	/// Correct the surrounding seen wood fields
-	void FixNeighbors(unsigned short type, int seen, int x, int y);
+	void FixNeighbors(unsigned short type, int seen, const Vec2i &pos);
 	/// Correct the seen wood field, depending on the surrounding
-	void FixTile(unsigned short type, int seen, int x, int y);
+	void FixTile(unsigned short type, int seen, const Vec2i &pos);
 
 public:
 	CMapField *Fields;              /// fields on map
@@ -509,13 +499,13 @@ extern int ReplayRevealMap;
 //
 /// Function to (un)mark the vision table.
 #ifndef MARKER_ON_INDEX
-typedef void MapMarkerFunc(const CPlayer *player, int x, int y);
+typedef void MapMarkerFunc(const CPlayer *player, const Vec2i &pos);
 #else
 typedef void MapMarkerFunc(const CPlayer *player, const unsigned int index);
 #endif
 
 	/// Filter map flags through fog
-extern int MapFogFilterFlags(CPlayer *player, int x, int y, int mask);
+extern int MapFogFilterFlags(CPlayer *player, const Vec2i &pos, int mask);
 	/// Mark a tile for normal sight
 extern MapMarkerFunc MapMarkTileSight;
 	/// Unmark a tile for normal sight
@@ -528,57 +518,48 @@ extern MapMarkerFunc MapUnmarkTileDetectCloak;
 	/// Mark sight changes
 extern void MapSight(const CPlayer *player, int x, int y, int w,
 	int h, int range, MapMarkerFunc *marker);
-	/// Mark tiles with fog of war to be redrawn
-extern void MapUpdateFogOfWar(int x, int y);
 	/// Update fog of war
-extern void UpdateFogOfWarChange(void);
+extern void UpdateFogOfWarChange();
 
 	/// Builds Vision and Goal Tables
-extern void InitVisionTable(void);
+extern void InitVisionTable();
 	/// Cleans up Vision and Goal Tables
-extern void FreeVisionTable(void);
+extern void FreeVisionTable();
 
 //
 // in map_radar.c
 //
 
-	/// Check if a tile is visible on radar
-extern unsigned char
-IsTileRadarVisible(const CPlayer *pradar, const CPlayer *punit, int x, int y);
 	/// Mark a tile as radar visible, or incrase radar vision
-extern void MapMarkTileRadar(const CPlayer *player, int x, int y);
-extern void
-MapMarkTileRadar(const CPlayer *player, const unsigned int index);
+extern MapMarkerFunc MapMarkTileRadar;
+
 	/// Unmark a tile as radar visible, decrease is visible by other radar
-extern void MapUnmarkTileRadar(const CPlayer *player, int x, int y);
-extern void
-MapUnmarkTileRadar(const CPlayer *player, const unsigned int index);
+extern MapMarkerFunc MapUnmarkTileRadar;
+
 	/// Mark a tile as radar jammed, or incrase radar jamming'ness
-extern void MapMarkTileRadarJammer(const CPlayer *player, int x, int y);
-extern void
-MapMarkTileRadarJammer(const CPlayer *player, const unsigned int index);
+extern MapMarkerFunc MapMarkTileRadarJammer;
+
 	/// Unmark a tile as jammed, decrease is jamming'ness
-extern void MapUnmarkTileRadarJammer(const CPlayer *player, int x, int y);
-extern void
-MapUnmarkTileRadarJammer(const CPlayer *player, const unsigned int index);
+extern MapMarkerFunc MapUnmarkTileRadarJammer;
+
 
 //
 // in map_wall.c
 //
 	/// Correct the seen wall field, depending on the surrounding
-extern void MapFixSeenWallTile(int x, int y);
+extern void MapFixSeenWallTile(const Vec2i &pos);
 	/// Correct the surrounding seen wall fields
-extern void MapFixSeenWallNeighbors(int x, int y);
+extern void MapFixSeenWallNeighbors(const Vec2i &pos);
 	/// Correct the real wall field, depending on the surrounding
-extern void MapFixWallTile(int x, int y);
+extern void MapFixWallTile(const Vec2i &pos);
 
 //
 // in script_map.c
 //
 	/// Set a tile
-extern void SetTile(int tile, int w, int h, int value = 0);
+extern void SetTile(int tile, int x, int y, int value = 0);
 	/// register ccl features
-extern void MapCclRegister(void);
+extern void MapCclRegister();
 
 //
 // mixed sources
@@ -595,12 +576,12 @@ extern void FreeMapInfo(CMapInfo *info);
 	/// Returns true, if the unit-type(mask can enter field with bounds check
 extern bool CheckedCanMoveToMask(const Vec2i &pos, int mask);
 	/// Returns true, if the unit-type can enter the field
-extern bool UnitTypeCanBeAt(const CUnitType *type, int x, int y);
+extern bool UnitTypeCanBeAt(const CUnitType *type, const Vec2i &pos);
 	/// Returns true, if the unit can enter the field
-extern bool UnitCanBeAt(const CUnit &unit, int x, int y);
+extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos);
 
 	/// Preprocess map, for internal use.
-extern void PreprocessMap(void);
+extern void PreprocessMap();
 
 // in unit.c
 
@@ -614,8 +595,7 @@ void MapUnmarkUnitSight(CUnit &unit);
 ----------------------------------------------------------------------------*/
 
 	/// Can a unit with 'mask' enter the field
-inline bool CanMoveToMask(int x, int y, int mask) {
-	const Vec2i pos = {x, y};
+inline bool CanMoveToMask(const Vec2i &pos, int mask) {
 	return !Map.CheckMask(pos, mask);
 }
 
