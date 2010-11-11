@@ -1923,7 +1923,10 @@ void UIHandleButtonUp(unsigned button)
 			const Vec2i cursorTilePos = {UI.MouseViewport->Viewport2MapX(CursorX),
 										UI.MouseViewport->Viewport2MapY(CursorY)};
 			if (Map.IsFieldVisible(ThisPlayer, cursorTilePos) || ReplayRevealMap) {
-				unit = UnitOnScreen(unit, cursorTilePos.x, cursorTilePos.y);
+				int pixelposx = CursorX - UI.MouseViewport->X + UI.MouseViewport->MapX * TileSizeX + UI.MouseViewport->OffsetX;
+				int pixelposy = CursorY - UI.MouseViewport->Y + UI.MouseViewport->MapY * TileSizeY + UI.MouseViewport->OffsetY;
+
+				unit = UnitOnScreen(unit, pixelposx, pixelposy);
 			}
 			if (unit) {
 				// FIXME: Not nice coded, button number hardcoded!
