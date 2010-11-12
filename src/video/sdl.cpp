@@ -118,6 +118,7 @@ static int FrameFraction; /// Frame fractional term
 const EventCallback *Callbacks;
 
 static bool RegenerateScreen = false;
+bool IsVisible = true;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -771,8 +772,7 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 				}
 				InMainWindow = (event->active.gain != 0);
 			}
-			if (event->active.state & SDL_APPACTIVE) {
-				static bool IsVisible = true;
+			if (event->active.state & SDL_APPACTIVE || SDL_GetAppState() & SDL_APPACTIVE) {
 				static bool DoTogglePause = false;
 
 				if (IsVisible && !event->active.gain) {

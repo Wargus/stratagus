@@ -357,6 +357,14 @@ static	int RealVideoSyncSpeed;
 
 static void DisplayLoop(void)
 {
+#ifdef USE_MAEMO
+	if (!IsVisible) {
+		// On Maemo do not redraw/update screen when SDL window is not visible
+		// This stop draining battery power on Nokia N900
+		return;
+	}
+#endif
+
 	if (UseOpenGL) {
 		/* update only if screen changed */
 		ValidateOpenGLScreen();
