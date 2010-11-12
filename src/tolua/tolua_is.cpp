@@ -3,7 +3,7 @@
 ** Written by Waldemar Celes
 ** TeCGraf/PUC-Rio
 ** Apr 2003
-** $Id$
+** $Id: $
 */
 
 /* This code is free software; you can redistribute it and/or modify it.
@@ -158,7 +158,7 @@ int push_table_instance(lua_State* L, int lo) {
 	};
 
 	return 0;
-}
+};
 
 /* the equivalent of lua_is* for usertype */
 static int lua_isusertype (lua_State* L, int lo, const char* type)
@@ -211,15 +211,6 @@ TOLUA_API int tolua_isnoobj (lua_State* L, int lo, tolua_Error* err)
 	err->array = 0;
 	err->type = "[no object]";
  return 0;
-}
-TOLUA_API int tolua_isvalue (lua_State* L, int lo, int def, tolua_Error* err)
-{
-	if (def || abs(lo)<=lua_gettop(L))  /* any valid index */
-		return 1;
-	err->index = lo;
-	err->array = 0;
-	err->type = "value";
-	return 0;
 }
 
 TOLUA_API int tolua_isboolean (lua_State* L, int lo, int def, tolua_Error* err)
@@ -295,6 +286,29 @@ TOLUA_API int tolua_isuserdata (lua_State* L, int lo, int def, tolua_Error* err)
 	return 0;
 }
 
+TOLUA_API int tolua_isvaluenil (lua_State* L, int lo, tolua_Error* err) {
+
+	if (lua_gettop(L)<abs(lo))
+		return 0; /* somebody else should chack this */
+	if (!lua_isnil(L, lo))
+		return 0;
+
+	err->index = lo;
+	err->array = 0;
+	err->type = "value";
+	return 1;
+};
+
+TOLUA_API int tolua_isvalue (lua_State* L, int lo, int def, tolua_Error* err)
+{
+	if (def || abs(lo)<=lua_gettop(L))  /* any valid index */
+		return 1;
+	err->index = lo;
+	err->array = 0;
+	err->type = "value";
+	return 0;
+}
+
 TOLUA_API int tolua_isusertype (lua_State* L, int lo, const char* type, int def, tolua_Error* err)
 {
 	if (def && lua_gettop(L)<abs(lo))
@@ -308,7 +322,7 @@ TOLUA_API int tolua_isusertype (lua_State* L, int lo, const char* type, int def,
 }
 
 TOLUA_API int tolua_isvaluearray
- (lua_State* L, int lo, int, int def, tolua_Error* err)
+ (lua_State* L, int lo, int dim, int def, tolua_Error* err)
 {
 	if (!tolua_istable(L,lo,def,err))
 		return 0;

@@ -151,7 +151,7 @@ static int CheckForTargetInRange(CUnit &unit)
 	//
 	if (!order->HasGoal() &&
 		order->Action != UnitActionAttackGround &&
-		!Map.WallOnMap(order->goalPos.x, order->goalPos.y)) {
+		!Map.WallOnMap(order->goalPos)) {
 		CUnit *goal = AttackUnitsInReactRange(unit);
 		if (goal) {
 #ifdef DEBUG
@@ -243,7 +243,7 @@ static void MoveToTarget(CUnit &unit)
 		//
 		// Attacking wall or ground.
 		//
-		if (!goal && (Map.WallOnMap(order->goalPos.x, order->goalPos.y) ||
+		if (!goal && (Map.WallOnMap(order->goalPos) ||
 					order->Action == UnitActionAttackGround) &&
 				unit.MapDistanceTo(order->goalPos.x, order->goalPos.y) <=
 					unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
@@ -301,8 +301,7 @@ static void AttackTarget(CUnit &unit)
 	// Goal is "weak" or a wall.
 	//
 	COrderPtr order = unit.CurrentOrder();
-	if (!order->HasGoal() && (order->Action == UnitActionAttackGround ||
-								Map.WallOnMap(order->goalPos.x, order->goalPos.y))) {
+	if (!order->HasGoal() && (order->Action == UnitActionAttackGround || Map.WallOnMap(order->goalPos))) {
 		return;
 	}
 

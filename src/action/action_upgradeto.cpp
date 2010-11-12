@@ -68,7 +68,7 @@ int TransformUnitIntoType(CUnit &unit, CUnitType *newtype)
 	if (oldtype == newtype) { // nothing to do
 		return 1;
 	}
-	Vec2i pos = unit.tilePos + oldtype->GetHalfTileSize() - newtype->GetHalfTileSize();
+	const Vec2i pos = unit.tilePos + oldtype->GetHalfTileSize() - newtype->GetHalfTileSize();
 	CUnit *container = unit.Container;
 
 	if (container) {
@@ -76,7 +76,7 @@ int TransformUnitIntoType(CUnit &unit, CUnitType *newtype)
 	} else {
 		SaveSelection();
 		unit.Remove(NULL);
-		if (!UnitTypeCanBeAt(newtype, pos.x, pos.y)) {
+		if (!UnitTypeCanBeAt(newtype, pos)) {
 			unit.Place(unit.tilePos.x, unit.tilePos.y);
 			RestoreSelection();
 			// FIXME unit is not modified, try later ?

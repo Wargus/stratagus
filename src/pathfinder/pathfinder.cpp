@@ -329,9 +329,10 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 
 	*pxd = Heading2X[(int)unit.Data.Move.Path[(int)unit.Data.Move.Length - 1]];
 	*pyd = Heading2Y[(int)unit.Data.Move.Path[(int)unit.Data.Move.Length - 1]];
+	const Vec2i dir = {*pxd, *pyd};
 	result = unit.Data.Move.Length;
 	unit.Data.Move.Length--;
-	if (!UnitCanBeAt(unit, *pxd + unit.tilePos.x, *pyd + unit.tilePos.y)) {
+	if (!UnitCanBeAt(unit, unit.tilePos + dir)) {
 		// If obstructing unit is moving, wait for a bit.
 		if (unit.Data.Move.Fast) {
 			unit.Data.Move.Fast--;
@@ -348,7 +349,7 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 			if (result > 0) {
 				*pxd = Heading2X[(int)unit.Data.Move.Path[(int)unit.Data.Move.Length - 1]];
 				*pyd = Heading2Y[(int)unit.Data.Move.Path[(int)unit.Data.Move.Length - 1]];
-				if (!UnitCanBeAt(unit, *pxd + unit.tilePos.x, *pyd + unit.tilePos.y)) {
+				if (!UnitCanBeAt(unit, unit.tilePos + dir)) {
 					// There may be unit in the way, Astar may allow you to walk onto it.
 					result = PF_UNREACHABLE;
 					*pxd = 0;

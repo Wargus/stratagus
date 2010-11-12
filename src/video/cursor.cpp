@@ -268,7 +268,7 @@ static void DrawBuildingCursor(void)
 		while (w--) {
 			const Vec2i posIt = {mpos.x + w, mpos.y + h};
 			if (f && (ontop ||
-					CanBuildOn(posIt, MapFogFilterFlags(ThisPlayer, posIt.x, posIt.y,
+					CanBuildOn(posIt, MapFogFilterFlags(ThisPlayer, posIt,
 						mask & ((NumSelected && Selected[0]->tilePos == posIt) ?
 								~(MapFieldLandUnit | MapFieldSeaUnit) : -1)))) &&
 					Map.IsFieldExplored(ThisPlayer, posIt))  {

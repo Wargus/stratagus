@@ -1,7 +1,7 @@
 class Vec2i
 {
-	int x;
-	int y;
+	short int x;
+	short int y;
 };
 
 

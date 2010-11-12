@@ -944,8 +944,7 @@ static int CclMoveUnit(lua_State *l)
 {
 	CUnit *unit;
 	int heading;
-	int ix;
-	int iy;
+	Vec2i ipos;
 
 	LuaCheckArgs(l, 2);
 
@@ -954,22 +953,20 @@ static int CclMoveUnit(lua_State *l)
 	lua_pop(l, 1);
 
 	lua_rawgeti(l, 2, 1);
-	ix = LuaToNumber(l, -1);
+	ipos.x = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 	lua_rawgeti(l, 2, 2);
-	iy = LuaToNumber(l, -1);
+	ipos.y = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 
 	heading = SyncRand() % 256;
-	if (UnitCanBeAt(*unit, ix, iy)) {
-		unit->Place(ix, iy);
+	if (UnitCanBeAt(*unit, ipos)) {
+		unit->Place(ipos.x, ipos.y);
 	} else {
-		unit->tilePos.x = ix;
-		unit->tilePos.y = iy;
+		unit->tilePos = ipos;
 		DropOutOnSide(*unit, heading, 1, 1);
 	}
-
-//	PlaceUnit(unit, ix, iy);
+//	PlaceUnit(unit, ipos.x, ipos.y);
 	lua_pushvalue(l, 1);
 	return 1;
 }
@@ -987,8 +984,7 @@ static int CclCreateUnit(lua_State *l)
 	CUnit *unit;
 	int heading;
 	int playerno;
-	int ix;
-	int iy;
+	Vec2i ipos;
 
 	LuaCheckArgs(l, 3);
 
@@ -999,10 +995,10 @@ static int CclCreateUnit(lua_State *l)
 		LuaError(l, "incorrect argument !!");
 	}
 	lua_rawgeti(l, 3, 1);
-	ix = LuaToNumber(l, -1);
+	ipos.x = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 	lua_rawgeti(l, 3, 2);
-	iy = LuaToNumber(l, -1);
+	ipos.y = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 
 	heading = SyncRand() % 256;
@@ -1025,12 +1021,11 @@ static int CclCreateUnit(lua_State *l)
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
-		if (UnitCanBeAt(*unit, ix, iy) ||
-				(unit->Type->Building && CanBuildUnitType(NULL, unit->Type, ix, iy, 0))) {
-			unit->Place(ix, iy);
+		if (UnitCanBeAt(*unit, ipos) ||
+				(unit->Type->Building && CanBuildUnitType(NULL, unit->Type, ipos.x, ipos.y, 0))) {
+			unit->Place(ipos.x, ipos.y);
 		} else {
-			unit->tilePos.x = ix;
-			unit->tilePos.y = iy;
+			unit->tilePos = ipos;
 			DropOutOnSide(*unit, heading, 1, 1);
 		}
 		UpdateForNewUnit(*unit, 0);

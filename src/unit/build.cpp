@@ -218,16 +218,14 @@ inline bool CBuildRestrictionOnTop::functor::operator() (CUnit *const unit)
 bool CBuildRestrictionOnTop::Check(const CUnitType *, int x, int y, CUnit *&ontoptarget) const
 {
 	CUnit *table[UnitMax];
-	int n;
-	int i;
+	const Vec2i pos = {x, y};
 
 	ontoptarget = NULL;
-	n = Map.Select(x, y, table, UnitMax);
-	for (i = 0; i < n; ++i) {
-		if (table[i]->tilePos.x == x && table[i]->tilePos.y == y && !table[i]->Destroyed &&
+	int n = Map.Select(pos, table, UnitMax);
+	for (int i = 0; i < n; ++i) {
+		if (table[i]->tilePos == pos && !table[i]->Destroyed &&
 				table[i]->CurrentAction() != UnitActionDie) {
-			if (table[i]->Type == this->Parent &&
-					table[i]->CurrentAction() != UnitActionBuilt) {
+			if (table[i]->Type == this->Parent && table[i]->CurrentAction() != UnitActionBuilt) {
 				// Available to build on
 				ontoptarget = table[i];
 			}

@@ -114,11 +114,11 @@ int MapFogFilterFlags(CPlayer *player, const unsigned int index, int mask)
 
 }
 
-int MapFogFilterFlags(CPlayer *player, int x, int y, int mask)
+int MapFogFilterFlags(CPlayer *player, const Vec2i &pos, int mask)
 {
-	if(Map.Info.IsPointOnMap(x,y))
+	if (Map.Info.IsPointOnMap(pos))
 	{
-		return MapFogFilterFlags(player, Map.getIndex(x,y), mask);
+		return MapFogFilterFlags(player, Map.getIndex(pos), mask);
 	}
 	return mask;
 }
@@ -149,10 +149,10 @@ void MapMarkTileSight(const CPlayer *player, const unsigned int index)
 	++*v;
 }
 
-void MapMarkTileSight(const CPlayer *player, int x, int y)
+void MapMarkTileSight(const CPlayer *player, const Vec2i &pos)
 {
-	Assert(Map.Info.IsPointOnMap(x, y));
-	MapMarkTileSight(player, Map.getIndex(x,y));
+	Assert(Map.Info.IsPointOnMap(pos));
+	MapMarkTileSight(player, Map.getIndex(pos));
 }
 
 
@@ -187,9 +187,8 @@ void MapUnmarkTileSight(const CPlayer *player, const unsigned int index)
 	}
 }
 
-void MapUnmarkTileSight(const CPlayer *player, int x, int y)
+void MapUnmarkTileSight(const CPlayer *player, const Vec2i &pos)
 {
-	const Vec2i pos = {x, y};
 	Assert(Map.Info.IsPointOnMap(pos));
 	MapUnmarkTileSight(player, Map.getIndex(pos));
 }
@@ -212,9 +211,9 @@ void MapMarkTileDetectCloak(const CPlayer *player, const unsigned int index)
 	++*v;
 }
 
-void MapMarkTileDetectCloak(const CPlayer *player, int x, int y)
+void MapMarkTileDetectCloak(const CPlayer *player, const Vec2i &pos)
 {
-	MapMarkTileDetectCloak(player, Map.getIndex(x,y));
+	MapMarkTileDetectCloak(player, Map.getIndex(pos));
 }
 
 
@@ -236,9 +235,9 @@ MapUnmarkTileDetectCloak(const CPlayer *player, const unsigned int index)
 	--*v;
 }
 
-void MapUnmarkTileDetectCloak(const CPlayer *player, int x, int y)
+void MapUnmarkTileDetectCloak(const CPlayer *player, const Vec2i &pos)
 {
-	MapUnmarkTileDetectCloak(player, Map.getIndex(x,y));
+	MapUnmarkTileDetectCloak(player, Map.getIndex(pos));
 }
 
 /**
@@ -252,13 +251,10 @@ void MapUnmarkTileDetectCloak(const CPlayer *player, int x, int y)
 **  @param range   Radius to mark.
 **  @param marker  Function to mark or unmark sight
 */
-void MapSight(const CPlayer *player, int x, int y, int w, int h, int range,
-	MapMarkerFunc *marker)
+void MapSight(const CPlayer *player, int x, int y, int w, int h, int range, MapMarkerFunc *marker)
 {
-	int mx;
-	int my;
-	int cx[4];
-	int cy[4];
+	Vec2i mpos;
+	Vec2i c[4];
 	int steps;
 	int cycle;
 
@@ -270,13 +266,13 @@ void MapSight(const CPlayer *player, int x, int y, int w, int h, int range,
 #ifdef MARKER_ON_INDEX
 	unsigned int index = y * Map.Info.MapWidth;
 #endif
-	for (my = y; my < y + h; ++my) {
-		for (mx = x - range; mx < x + range + w; ++mx) {
-			if (mx >= 0 && mx < Map.Info.MapWidth) {
+	for (mpos.y = y; mpos.y < y + h; ++mpos.y) {
+		for (mpos.x = x - range; mpos.x < x + range + w; ++mpos.x) {
+			if (mpos.x >= 0 && mpos.x < Map.Info.MapWidth) {
 #ifdef MARKER_ON_INDEX
-				marker(player, mx + index);
+				marker(player, mpos.x + index);
 #else
-				marker(player, mx, my);
+				marker(player, mpos);
 #endif
 			}
 		}
@@ -289,13 +285,13 @@ void MapSight(const CPlayer *player, int x, int y, int w, int h, int range,
 #ifdef MARKER_ON_INDEX
 	index = (y - range) * Map.Info.MapWidth;
 #endif
-	for (my = y - range; my < y; ++my) {
-		if (my >= 0 && my < Map.Info.MapHeight) {
-			for (mx = x; mx < x + w; ++mx) {
+	for (mpos.y = y - range; mpos.y < y; ++mpos.y) {
+		if (mpos.y >= 0 && mpos.y < Map.Info.MapHeight) {
+			for (mpos.x = x; mpos.x < x + w; ++mpos.x) {
 #ifdef MARKER_ON_INDEX
-				marker(player, mx + index);
+				marker(player, mpos.x + index);
 #else
-				marker(player, mx, my);
+				marker(player, mpos);
 #endif
 			}
 		}
@@ -308,13 +304,13 @@ void MapSight(const CPlayer *player, int x, int y, int w, int h, int range,
 #ifdef MARKER_ON_INDEX
 	index = (y + h) * Map.Info.MapWidth;
 #endif
-	for (my = y + h; my < y + range + h; ++my) {
-		if (my >= 0 && my < Map.Info.MapHeight) {
-			for (mx = x; mx < x + w; ++mx) {
+	for (mpos.y = y + h; mpos.y < y + range + h; ++mpos.y) {
+		if (mpos.y >= 0 && mpos.y < Map.Info.MapHeight) {
+			for (mpos.x = x; mpos.x < x + w; ++mpos.x) {
 #ifdef MARKER_ON_INDEX
-				marker(player, mx + index);
+				marker(player, mpos.x + index);
 #else
-				marker(player, mx, my);
+				marker(player, mpos);
 #endif
 			}
 		}
@@ -327,57 +323,57 @@ void MapSight(const CPlayer *player, int x, int y, int w, int h, int range,
 	steps = 0;
 	while (VisionTable[0][steps] <= range) {
 		// 0 - Top right Quadrant
-		cx[0] = x + w - 1;
-		cy[0] = y - VisionTable[0][steps];
+		c[0].x = x + w - 1;
+		c[0].y = y - VisionTable[0][steps];
 		// 1 - Top left Quadrant
-		cx[1] = x;
-		cy[1] = y - VisionTable[0][steps];
+		c[1].x = x;
+		c[1].y = y - VisionTable[0][steps];
 		// 2 - Bottom Left Quadrant
-		cx[2] = x;
-		cy[2] = y + VisionTable[0][steps] + h - 1;
+		c[2].x = x;
+		c[2].y = y + VisionTable[0][steps] + h - 1;
 		// 3 - Bottom Right Quadrant
-		cx[3] = x + w - 1;
-		cy[3] = y + VisionTable[0][steps] + h - 1;
+		c[3].x = x + w - 1;
+		c[3].y = y + VisionTable[0][steps] + h - 1;
 		// loop for steps
 		++steps;  // Increment past info pointer
 		while (VisionTable[1][steps] != 0 || VisionTable[2][steps] != 0) {
 			// Loop through for repeat cycle
 			cycle = 0;
 			while (cycle++ < VisionTable[0][steps]) {
-				cx[0] += VisionTable[1][steps];
-				cy[0] += VisionTable[2][steps];
-				cx[1] -= VisionTable[1][steps];
-				cy[1] += VisionTable[2][steps];
-				cx[2] -= VisionTable[1][steps];
-				cy[2] -= VisionTable[2][steps];
-				cx[3] += VisionTable[1][steps];
-				cy[3] -= VisionTable[2][steps];
-				if (cx[0] < Map.Info.MapWidth && cy[0] >= 0) {
+				c[0].x += VisionTable[1][steps];
+				c[0].y += VisionTable[2][steps];
+				c[1].x -= VisionTable[1][steps];
+				c[1].y += VisionTable[2][steps];
+				c[2].x -= VisionTable[1][steps];
+				c[2].y -= VisionTable[2][steps];
+				c[3].x += VisionTable[1][steps];
+				c[3].y -= VisionTable[2][steps];
+				if (c[0].x < Map.Info.MapWidth && c[0].y >= 0) {
 #ifdef MARKER_ON_INDEX
-					marker(player, Map.getIndex(cx[0], cy[0]));
+					marker(player, Map.getIndex(c[0]));
 #else
-					marker(player, cx[0], cy[0]);
+					marker(player, c[0]);
 #endif
 				}
-				if (cx[1] >= 0 && cy[1] >= 0) {
+				if (c[1].x >= 0 && c[1].y >= 0) {
 #ifdef MARKER_ON_INDEX
-					marker(player, Map.getIndex(cx[1], cy[1]));
+					marker(player, Map.getIndex(c[1]));
 #else
-					marker(player, cx[1], cy[1]);
+					marker(player, c[1]);
 #endif
 				}
-				if (cx[2] >= 0 && cy[2] < Map.Info.MapHeight) {
+				if (c[2].x >= 0 && c[2].y < Map.Info.MapHeight) {
 #ifdef MARKER_ON_INDEX
-					marker(player, Map.getIndex(cx[2], cy[2]));
+					marker(player, Map.getIndex(c[2]));
 #else
-					marker(player, cx[2], cy[2]);
+					marker(player, c[2]);
 #endif
 				}
-				if (cx[3] < Map.Info.MapWidth && cy[3] < Map.Info.MapHeight) {
+				if (c[3].x < Map.Info.MapWidth && c[3].y < Map.Info.MapHeight) {
 #ifdef MARKER_ON_INDEX
-					marker(player, Map.getIndex(cx[3], cy[3]));
+					marker(player, Map.getIndex(c[3]));
 #else
-					marker(player, cx[3], cy[3]);
+					marker(player, c[3]);
 #endif
 				}
 			}

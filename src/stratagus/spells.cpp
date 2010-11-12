@@ -93,33 +93,24 @@ std::vector<SpellType*> SpellTypeTable;
 */
 int Demolish::Cast(CUnit &caster, const SpellType *, CUnit *, int x, int y)
 {
-	int xmin;
-	int ymin;
-	int xmax;
-	int ymax;
-
-	//
 	// Allow error margins. (Lame, I know)
-	//
-	xmin = x - this->Range - 2;
-	ymin = y - this->Range - 2;
-	xmax = x + this->Range + 2;
-	ymax = y + this->Range + 2;
+	Vec2i minpos = {x - this->Range - 2, y - this->Range - 2};
+	Vec2i maxpos = {x + this->Range + 2, y + this->Range + 2};
 
-	Map.FixSelectionArea(xmin, ymin, xmax, ymax);
+	Map.FixSelectionArea(minpos, maxpos);
 
 	//
 	// Terrain effect of the explosion
 	//
 	Vec2i ipos;
-	for (ipos.x = xmin; ipos.x <= xmax; ++ipos.x) {
-		for (ipos.y = ymin; ipos.y <= ymax; ++ipos.y) {
+	for (ipos.x = minpos.x; ipos.x <= maxpos.x; ++ipos.x) {
+		for (ipos.y = minpos.y; ipos.y <= maxpos.y; ++ipos.y) {
 			const int flag = Map.Field(ipos)->Flags;
 			if (MapDistance(ipos.x, ipos.y, x, y) > this->Range) {
 				// Not in circle range
 				continue;
 			} else if (flag & MapFieldWall) {
-				Map.RemoveWall(ipos.x, ipos.y);
+				Map.RemoveWall(ipos);
 			} else if (flag & MapFieldRocks) {
 				Map.ClearTile(MapFieldRocks, ipos);
 			} else if (flag & MapFieldForest) {
@@ -133,7 +124,7 @@ int Demolish::Cast(CUnit &caster, const SpellType *, CUnit *, int x, int y)
 	//
 	if (this->Damage) {
 		CUnit* table[UnitMax];
-		const int n = Map.SelectFixed(xmin, ymin, xmax + 1, ymax + 1, table);
+		const int n = Map.SelectFixed(minpos, maxpos, table);
 		for (int i = 0; i < n; ++i) {
 			CUnit &unit = *table[i];
 			if (unit.Type->UnitType != UnitTypeFly && unit.IsAlive() &&
@@ -526,19 +517,15 @@ int AdjustVitals::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int
 */
 int Polymorph::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int x, int y)
 {
-	int i;
-	int j;
-	CUnitType *type;
-
 	if (!target) {
 		return 0;
 	}
 
-	type = this->NewForm;
+	CUnitType *type = this->NewForm;
 
 	x = x - type->TileWidth / 2;
 	y = y - type->TileHeight / 2;
-
+	const Vec2i pos = {x, y};
 	caster.Player->Score += target->Type->Points;
 	if (caster.IsEnemy(*target)) {
 		if (target->Type->Building) {
@@ -559,9 +546,10 @@ int Polymorph::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int x,
 
 	// as said somewhere else -- no corpses :)
 	target->Remove(NULL);
-	for (i = 0; i < type->TileWidth; ++i) {
-		for (j = 0; j < type->TileHeight; ++j) {
-			if (!UnitTypeCanBeAt(type, x + i, y + j)) {
+	Vec2i offset;
+	for (offset.x = 0; offset.x < type->TileWidth; ++offset.x) {
+		for (offset.y = 0; offset.y < type->TileHeight; ++offset.y) {
+			if (!UnitTypeCanBeAt(type, pos + offset)) {
 				target->Place(target->tilePos.x, target->tilePos.y);
 				return 0;
 			}
@@ -569,9 +557,9 @@ int Polymorph::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int x,
 	}
 	caster.Variable[MANA_INDEX].Value -= spell->ManaCost;
 	if (this->PlayerNeutral) {
-		MakeUnitAndPlace(x, y, type, Players + PlayerNumNeutral);
+		MakeUnitAndPlace(pos.x, pos.y, type, Players + PlayerNumNeutral);
 	} else {
-		MakeUnitAndPlace(x, y, type, target->Player);
+		MakeUnitAndPlace(pos.x, pos.y, type, target->Player);
 	}
 	UnitLost(*target);
 	UnitClearOrders(*target);

@@ -3,7 +3,7 @@
 ** Written by Waldemar Celes
 ** TeCGraf/PUC-Rio
 ** Apr 2003
-** $Id$
+** $Id: $
 */
 
 /* This code is free software; you can redistribute it and/or modify it.
@@ -312,7 +312,7 @@ static int class_call_event(lua_State* L) {
 	};
 	tolua_error(L,"Attempt to call a non-callable object.",NULL);
 	return 0;
-}
+};
 
 static int do_operator (lua_State* L, const char* op)
 {
@@ -371,7 +371,30 @@ static int class_le_event (lua_State* L)
 
 static int class_eq_event (lua_State* L)
 {
-	return do_operator(L,".eq");
+	/* copying code from do_operator here to return false when no operator is found */
+	if (lua_isuserdata(L,1))
+	{
+		/* Try metatables */
+		lua_pushvalue(L,1);                     /* stack: op1 op2 */
+		while (lua_getmetatable(L,-1))
+		{                                       /* stack: op1 op2 op1 mt */
+			lua_remove(L,-2);                      /* stack: op1 op2 mt */
+			lua_pushstring(L,".eq");                  /* stack: op1 op2 mt key */
+			lua_rawget(L,-2);                      /* stack: obj key mt func */
+			if (lua_isfunction(L,-1))
+			{
+				lua_pushvalue(L,1);
+				lua_pushvalue(L,2);
+				lua_call(L,2,1);
+				return 1;
+			}
+			lua_settop(L,3);
+		}
+	}
+
+	lua_settop(L, 3);
+	lua_pushboolean(L, 0);
+	return 1;
 }
 
 /*
