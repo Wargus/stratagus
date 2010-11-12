@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -93,14 +93,14 @@ namespace gcn
          * Destructor.
          */
         virtual ~Window();
-    
+
         /**
          * Sets the Window caption.
          *
          * @param caption the Window caption.
          */
         virtual void setCaption(const std::string& caption);
-        
+
         /**
          * Gets the Window caption.
          *
@@ -121,7 +121,7 @@ namespace gcn
          * @return alignment of caption.
          */
         virtual unsigned int getAlignment() const;
-        
+
         /**
          * Sets the content Widget.
          *
@@ -155,7 +155,7 @@ namespace gcn
          * Sets the title bar height.
          *
          * @param height the title height value.
-         */      
+         */
         virtual void setTitleBarHeight(unsigned int height);
 
         /**
@@ -169,14 +169,14 @@ namespace gcn
          * Sets the Window to be moveble.
          *
          * @param movable true or false.
-         */    
+         */
         virtual void setMovable(bool movable);
 
         /**
          * Check if the window is movable.
          *
          * @return true or false.
-         */    
+         */
         virtual bool isMovable() const;
 
         /**
@@ -198,7 +198,7 @@ namespace gcn
          * @return true or false.
          */
         virtual bool isOpaque();
-        
+
         /**
          * Draws the content of the Window. This functions uses the
          * getContentDimension to determin where to draw the content.
@@ -206,8 +206,8 @@ namespace gcn
          * @param graphics a Graphics object to draw with.
          */
         virtual void drawContent(Graphics* graphics);
-        
-        
+
+
         // Inherited from BasicContainer
 
         virtual void moveToTop(Widget* widget);
@@ -216,32 +216,32 @@ namespace gcn
 
         virtual void getDrawSize(int& width, int& height, Widget* widget);
 
-        virtual void _announceDeath(Widget *widget);      
-    
-    
+        virtual void _announceDeath(Widget *widget);
+
+
         // Inherited from Widget
-        
+
         virtual void draw(Graphics* graphics);
 
-        virtual void drawBorder(Graphics* graphics);            
+        virtual void drawBorder(Graphics* graphics);
 
         virtual void logic();
-        
+
         virtual void _mouseInputMessage(const MouseInput &mouseInput);
-    
+
         virtual void _mouseOutMessage();
-    
+
         virtual void _setFocusHandler(FocusHandler* focusHandler);
-        
-    
-        // Inherited from MouseListener     
+
+
+        // Inherited from MouseListener
 
         virtual void mousePress(int x, int y, int button);
 
         virtual void mouseRelease(int x, int y, int button);
 
         virtual void mouseMotion(int x, int y);
-    
+
         virtual void setDirty(bool dirty);
         virtual bool getDirty() const;
 
@@ -256,7 +256,7 @@ namespace gcn
          * Gets the area in the window that the content occupies.
          */
         virtual Rectangle getContentDimension();
-    
+
         std::string mCaption;
         unsigned int mAlignment;
         Widget* mContent;
@@ -266,8 +266,8 @@ namespace gcn
         int mMouseXOffset;
         int mMouseYOffset;
         bool mMovable;
-        bool mOpaque;    
-    };  
+        bool mOpaque;
+    };
 }
 
 #endif // end GCN_WINDOW_HPP

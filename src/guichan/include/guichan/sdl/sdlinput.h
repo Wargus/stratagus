@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -86,7 +86,7 @@ namespace gcn
          * @param event an event from SDL.
          */
         virtual void pushInput(SDL_Event event);
-    
+
         /**
          * Polls all input. It exists for input driver compatibility. If you
          * only use SDL and plan sticking with SDL you can safely ignore this
@@ -96,7 +96,7 @@ namespace gcn
 
 
         // Inherited from Input
-        
+
         virtual bool isKeyQueueEmpty();
 
         virtual KeyInput dequeueKeyInput();
@@ -121,7 +121,7 @@ namespace gcn
          * representation.
          *
          * @param button an SDL mouse button.
-         * @return a Guichan button.     
+         * @return a Guichan button.
          */
         int convertMouseButton(int button);
 
@@ -132,7 +132,7 @@ namespace gcn
         bool mMouseInWindow;
 		Key mLastKey;
 		bool mIsRepeating;
-	};  
+	};
 }
 
 #endif // end GCN_SDLINPUT_HPP

@@ -286,7 +286,7 @@ static void InitOpenGL(void)
 #else
 	glClearDepth(1.0f);
 #endif
-	
+
 	glShadeModel(GL_FLAT);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
@@ -443,22 +443,22 @@ static Uint32 OssoKeepBacklightAlive(Uint32 interval, void *param)
 {
 	if (!osso)
 		return interval;
-	
+
 	osso_display_state_on(osso);
 	osso_display_blanking_pause(osso);
-	
+
 	return interval;
 }
 
 void OssoInitialize()
 {
 	char * application;
-	
+
 	if (FullGameName.empty())
 		application = (char *)"org.stratagus";
 	else
 		application = (char *)std::string("org.stratagus." + FullGameName).c_str();
-	
+
 	if (strlen(application) > 14)
 		application[14] = tolower(application[14]);
 
@@ -528,7 +528,7 @@ void InitVideoSdl(void)
 		// Make sure, that we not create OpenGL textures (and do not call OpenGL functions), when creating icon surface
 		bool UseOpenGL_orig = UseOpenGL;
 		UseOpenGL = false;
-		
+
 		SDL_Surface * icon = NULL;
 		CGraphic * g = NULL;
 		struct stat st;
@@ -600,10 +600,10 @@ void InitVideoSdl(void)
 			fprintf(stderr, "Couldn't initialize SDL_GLES: %s\n", SDL_GetError());
 			exit(1);
 		}
-		
+
 		// Clean up GLES on exit
 		atexit(SDL_GLES_Quit);
-		
+
 		flags |= SDL_SWSURFACE;
 #else
 		flags |= SDL_OPENGL;
@@ -873,7 +873,7 @@ void WaitEventsOneFrame()
 
 	interrupts = 0;
 
-	for (;;) {
+	for () {
 		//
 		// Time of frame over? This makes the CPU happy. :(
 		//

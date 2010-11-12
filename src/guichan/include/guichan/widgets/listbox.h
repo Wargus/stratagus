@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -64,7 +64,7 @@
 namespace gcn
 {
     /**
-     * A ListBox displaying a list in which elemets can be selected. Only one     
+     * A ListBox displaying a list in which elemets can be selected. Only one
      * element can be selected at time. ListBox uses a ListModel to handle the
      * list. To be able to use ListBox you must give ListBox an implemented
      * ListModel which represents your list.
@@ -91,14 +91,14 @@ namespace gcn
          * Destructor.
          */
         virtual ~ListBox() { }
-                
+
         /**
          * Gets the ListModel index of the selected element.
          *
          * @return the ListModel index of the selected element.
          */
         virtual int getSelected();
-    
+
         /**
          * Sets the ListModel index of the selected element.
          *
@@ -131,7 +131,7 @@ namespace gcn
         virtual void draw(Graphics* graphics);
 
         virtual void drawBorder(Graphics* graphics);
-        
+
         virtual void logic();
 
 
@@ -146,8 +146,8 @@ namespace gcn
 
     protected:
         ListModel *mListModel;
-        int mSelected;    
-    };  
+        int mSelected;
+    };
 }
 
 #endif // end GCN_LISTBOX_HPP

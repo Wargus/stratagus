@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -53,7 +53,7 @@
  */
 
 /*
- * For comments regarding functions please see the header file. 
+ * For comments regarding functions please see the header file.
  */
 
 #include <sstream>
@@ -73,22 +73,22 @@ namespace gcn
         }
 
         ImageLoader* imageLoader = Image::_getImageLoader();
-        mFilename = filename;                
+        mFilename = filename;
         Image::_getImageLoader()->prepare(filename);
         Color separator = Image::_getImageLoader()->getPixel(0, 0);
 
         int i = 0;
         for (i=0; separator == imageLoader->getPixel(i, 0)
                  && i < imageLoader->getWidth(); ++i)
-        {         
+        {
         }
-        
+
         if (i >= imageLoader->getWidth())
         {
         	assert(!"Corrupt image.");
             //throw GCN_EXCEPTION("Corrupt image.");
         }
-        
+
         int j = 0;
         for (j = 0; j < imageLoader->getHeight(); ++j)
         {
@@ -96,25 +96,25 @@ namespace gcn
             {
                 break;
             }
-        }                       
+        }
 
         mHeight = j;
         int x = 0, y = 0;
         unsigned char k;
 
-        for (i=0; i < (int)glyphs.size(); ++i) 
+        for (i=0; i < (int)glyphs.size(); ++i)
         {
             k = glyphs.at(i);
             addGlyph(k, x, y, separator);
         }
-    
+
         int w = imageLoader->getWidth();
         int h = imageLoader->getHeight();
         void* data = imageLoader->finalize();
-    
+
         mImage = new Image(data, w, h);
         mRowSpacing = 0;
-        mGlyphSpacing = 0;        
+        mGlyphSpacing = 0;
     }
 
     ImageFont::ImageFont(const std::string& filename, unsigned char glyphsFrom, unsigned char glyphsTo)
@@ -126,22 +126,22 @@ namespace gcn
         }
 
         ImageLoader* imageLoader = Image::_getImageLoader();
-        mFilename = filename;                
+        mFilename = filename;
         Image::_getImageLoader()->prepare(filename);
         Color separator = Image::_getImageLoader()->getPixel(0, 0);
 
         int i = 0;
         for (i=0; separator == imageLoader->getPixel(i, 0)
                  && i < imageLoader->getWidth(); ++i)
-        {         
+        {
         }
-        
+
         if (i >= imageLoader->getWidth())
         {
-        	assert(!"Corrupt image.");        
+        	assert(!"Corrupt image.");
             //throw GCN_EXCEPTION("Corrupt image.");
         }
-        
+
         int j = 0;
         for (j = 0; j < imageLoader->getHeight(); ++j)
         {
@@ -149,38 +149,38 @@ namespace gcn
             {
                 break;
             }
-        }                       
+        }
 
         mHeight = j;
         int x = 0, y = 0;
-        
+
         for (i=glyphsFrom; i<glyphsTo+1; i++)
         {
-            addGlyph(i, x, y, separator); 
+            addGlyph(i, x, y, separator);
         }
 
         int w = imageLoader->getWidth();
         int h = imageLoader->getHeight();
         void* data = imageLoader->finalize();
-        
+
         mImage = new Image(data, w, h);
         mRowSpacing = 0;
-        mGlyphSpacing = 0;        
+        mGlyphSpacing = 0;
     }
 
     ImageFont::~ImageFont()
     {
         Image::_getImageLoader()->free(mImage);
-        delete mImage;        
+        delete mImage;
     }
-  
+
     int ImageFont::getWidth(unsigned char glyph) const
     {
         if (mGlyph[glyph].width == 0)
-        {         
+        {
             return mGlyph[(int)(' ')].width + mGlyphSpacing;
         }
-    
+
         return mGlyph[glyph].width + mGlyphSpacing;
     }
 
@@ -193,30 +193,30 @@ namespace gcn
     {
         // This is needed for drawing the Glyph in the middle if we have spacing
         int yoffset = getRowSpacing() >> 1;
-        
+
         if (mGlyph[glyph].width == 0)
         {
             graphics->drawRectangle(Rectangle(x, y + 1 + yoffset, mGlyph[(int)(' ')].width - 1,
                                               mGlyph[(int)(' ')].height - 2));
-      
+
             return mGlyph[(int)(' ')].width + mGlyphSpacing;
         }
-    
+
         graphics->drawImage(mImage, mGlyph[glyph].x, mGlyph[glyph].y, x,
                             y + yoffset, mGlyph[glyph].width, mGlyph[glyph].height);
-        
+
         return mGlyph[glyph].width + mGlyphSpacing;
     }
 
     void ImageFont::drawString(Graphics* graphics, const std::string& text, int x, int y)
     {
         unsigned int i;
-    
+
         for (i = 0; i< text.size(); ++i)
         {
             drawGlyph(graphics, text.at(i), x, y);
-            x += getWidth(text.at(i));      
-        }    
+            x += getWidth(text.at(i));
+        }
     }
 
     void ImageFont::setRowSpacing(int spacing)
@@ -228,12 +228,12 @@ namespace gcn
     {
         return mRowSpacing;
     }
-    
+
     void ImageFont::setGlyphSpacing(int spacing)
     {
         mGlyphSpacing = spacing;
     }
-    
+
     int ImageFont::getGlyphSpacing()
     {
         return mGlyphSpacing;
@@ -243,7 +243,7 @@ namespace gcn
                              int &y, const Color& separator)
     {
         ImageLoader* il = Image::_getImageLoader();
-        
+
         Color color;
         do
         {
@@ -266,14 +266,14 @@ namespace gcn
                     //throw GCN_EXCEPTION(os.str());
                     assert(0);
                 }
-            }            
+            }
 
             color = il->getPixel(x, y);
 
         } while (color == separator);
-        
+
         int w = 0;
-        
+
         do
         {
             ++w;
@@ -289,45 +289,45 @@ namespace gcn
                 os << "'";
                 //throw GCN_EXCEPTION(os.str());
                 assert(0);
-            }            
-            
+            }
+
             color = il->getPixel(x + w, y);
-            
+
         } while (color != separator);
-        
+
         mGlyph[c] = Rectangle(x, y, w, mHeight);
-        
-        x += w;        
+
+        x += w;
     }
 
     int ImageFont::getWidth(const std::string& text) const
     {
         unsigned int i;
         int size = 0;
-    
+
         for (i = 0; i < text.size(); ++i)
         {
             size += getWidth(text.at(i));
         }
-    
-        return size;    
+
+        return size;
     }
-    
+
     int ImageFont::getStringIndexAt(const std::string& text, int x)
     {
         unsigned int i;
         int size = 0;
-    
+
         for (i = 0; i < text.size(); ++i)
         {
             size += getWidth(text.at(i));
-      
+
             if (size > x)
             {
                 return i;
             }
         }
-    
-        return text.size();    
+
+        return text.size();
     }
 }

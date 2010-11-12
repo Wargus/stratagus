@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -86,14 +86,14 @@ namespace gcn
          * @param caption the caption of the Button.
          */
         Button(const std::string& caption);
-      
+
         /**
          * Sets the Button caption.
          *
          * @param caption the Button caption.
          */
         virtual void setCaption(const std::string& caption);
-        
+
         /**
          * Gets the Button caption.
          *
@@ -115,9 +115,9 @@ namespace gcn
          * @return alignment of caption.
          */
         virtual unsigned int getAlignment() const;
-        
+
         /**
-         * Adjusts the buttons size to fit the content.     
+         * Adjusts the buttons size to fit the content.
          */
         virtual void adjustSize();
 
@@ -128,20 +128,20 @@ namespace gcn
          */
         virtual bool isPressed() const;
 
-        
+
         //Inherited from Widget
-        
+
         virtual void draw(Graphics* graphics);
 
         virtual void drawBorder(Graphics* graphics);
-            
+
         virtual void lostFocus();
-        
+
 		virtual void hotKeyPress();
 		virtual void hotKeyRelease();
-    
+
         // Inherited from MouseListener
-        
+
         virtual void mouseClick(int x, int y, int button, int count);
 
         virtual void mousePress(int x, int y, int button);
@@ -152,14 +152,14 @@ namespace gcn
         // Inherited from KeyListener
 
         virtual bool keyPress(const Key& key);
-    
+
         virtual bool keyRelease(const Key& key);
 
     protected:
         std::string mCaption;
         bool mMouseDown, mKeyDown, mHotKeyDown;
-        unsigned int mAlignment;        
-    };  
+        unsigned int mAlignment;
+    };
 }
 
 #endif // end GCN_BUTTON_HPP

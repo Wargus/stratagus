@@ -29,18 +29,18 @@ TOLUA_API const char* tolua_tostring (lua_State* L, int narg, const char* def)
 
 TOLUA_API void* tolua_touserdata (lua_State* L, int narg, void* def)
 {
-	
+
 	/* return lua_gettop(L)<abs(narg) ? def : lua_touserdata(L,narg); */
 
 	if (lua_gettop(L)<abs(narg)) {
  		return def;
 	};
-	 
+
 	if (lua_islightuserdata(L, narg)) {
-	
+
 		return lua_touserdata(L,narg);
 	};
-	
+
 	return tolua_tousertype(L, narg, def);
 }
 

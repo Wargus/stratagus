@@ -1124,10 +1124,10 @@ public:
 			DataKey k;
 			k.key = key;
 			k.keylen = strlen(key);
-		   	const DataKey* p = std::lower_bound(buildin, buildin + SIZE,
-		   		k, DataKey::key_pred);
-		   	if ((p != buildin + SIZE) && p->keylen == k.keylen &&
-		   		0 == strcmp(p->key, key)) {
+			const DataKey* p = std::lower_bound(buildin, buildin + SIZE,
+				k, DataKey::key_pred);
+			if ((p != buildin + SIZE) && p->keylen == k.keylen &&
+				0 == strcmp(p->key, key)) {
 				return p->offset;
 			} else {
 				std::map<std::string, int>::iterator

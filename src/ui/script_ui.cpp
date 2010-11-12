@@ -549,7 +549,7 @@ static ConditionPanel *ParseConditionPanel(lua_State *l)
 					condition->BoolFlags = new char[new_bool_size];
 					memset(condition->BoolFlags, 0, new_bool_size * sizeof(char));
 				}
-				condition->BoolFlags[index] = Ccl2Condition(l, LuaToString(l, -1));	
+				condition->BoolFlags[index] = Ccl2Condition(l, LuaToString(l, -1));
 				continue;
 			}
 			index = UnitTypeVar.VariableNameLookup[key];
@@ -683,7 +683,7 @@ static CContentType *CclParseContent(lua_State *l)
 						contentformattedtext2->Component1 = Str2EnumVariable(l, LuaToString(l, -1));
 					} else if (!strcmp(key, "Variable2")) {
 						const char *const name = LuaToString(l, -1);
-						contentformattedtext2->Index2 = UnitTypeVar.VariableNameLookup[name];					
+						contentformattedtext2->Index2 = UnitTypeVar.VariableNameLookup[name];
 						if (contentformattedtext2->Index2 == -1) {
 							LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 						}
@@ -715,7 +715,7 @@ static CContentType *CclParseContent(lua_State *l)
 					key = LuaToString(l, -2);
 					if (!strcmp(key, "Variable")) {
 						const char *const name = LuaToString(l, -1);
-						contentlifebar->Index = UnitTypeVar.VariableNameLookup[name];					
+						contentlifebar->Index = UnitTypeVar.VariableNameLookup[name];
 						if (contentlifebar->Index == -1) {
 							LuaError(l, "unknown variable '%s'" _C_ name);
 						}
@@ -745,7 +745,7 @@ static CContentType *CclParseContent(lua_State *l)
 					key = LuaToString(l, -2);
 					if (!strcmp(key, "Variable")) {
 						const char *const name = LuaToString(l, -1);
-						contenttypecompletebar->Index = UnitTypeVar.VariableNameLookup[name];					
+						contenttypecompletebar->Index = UnitTypeVar.VariableNameLookup[name];
 						if (contenttypecompletebar->Index == -1) {
 							LuaError(l, "unknown variable '%s'" _C_ name);
 						}

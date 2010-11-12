@@ -298,7 +298,7 @@ class CRenderer : public CPrimitives {
 			dst1 += ((src1 - dst1) * A >> 8);
 			dst1 &= 0x00FF00FF00FF00FF;
 
-			*p = dst0 | (dst1 << 8);;
+			*p = dst0 | (dst1 << 8)
 #else
 				Uint32 *p = (((Uint32 *)pixels) + index);
 			    /*
@@ -371,7 +371,7 @@ class CRenderer : public CPrimitives {
 			/* blend two 16 bit pixels at 50% */
 			#define BLEND2x16_50(d, s, mask)					     \
 				(((s & (mask | mask << 16)) >> 1) + ((d & (mask | mask << 16)) >> 1) \
-	 				+ (s & d & (~(mask | mask << 16))))
+					+ (s & d & (~(mask | mask << 16))))
 
 			Uint32 *p = (Uint32 *)(((Uint16 *)pixels) + index);
 			Uint32 d = *p;

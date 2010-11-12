@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -53,7 +53,7 @@
  */
 
 /*
- * For comments regarding functions please see the header file. 
+ * For comments regarding functions please see the header file.
  */
 
 #include "guichan/color.h"
@@ -73,9 +73,9 @@ namespace gcn
         a = 255;
         r = (color >> 16) & 0xFF;
         g = (color >> 8) & 0xFF;
-        b = color & 0xFF;    
+        b = color & 0xFF;
     }
-    
+
     Color::Color(int r, int g, int b, int a)
     {
         this->r = r;
@@ -98,7 +98,7 @@ namespace gcn
 
         return result;
     }
-  
+
     Color Color::operator-(const Color& color) const
     {
         Color result;
@@ -126,7 +126,7 @@ namespace gcn
         result.g = (result.g>255?255:(result.g<0?0:result.g));
         result.b = (result.b>255?255:(result.b<0?0:result.b));
 
-        return result;    
+        return result;
     }
 
     bool Color::operator==(const Color& color) const

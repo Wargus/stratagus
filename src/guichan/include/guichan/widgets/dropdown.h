@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -92,9 +92,9 @@ namespace gcn
          *
          * @param listModel the ListModel to use.
          * @see ListModel.
-         */         
+         */
         DropDown(ListModel *listModel);
-        
+
         /**
          * Contructor.
          *
@@ -102,7 +102,7 @@ namespace gcn
          * @param scrollArea the ScrollArea to use.
          * @param listBox the listBox to use.
          * @see ListModel, ScrollArea, ListBox.
-         */         
+         */
         DropDown(ListModel *listModel,
                  ScrollArea *scrollArea,
                  ListBox *listBox);
@@ -111,7 +111,7 @@ namespace gcn
          * Destructor.
          */
         virtual ~DropDown();
-    
+
         /**
          * Gets the index int the ListModel of the selected element.
          *
@@ -175,15 +175,15 @@ namespace gcn
 
 
         // Inherited from Widget
-        
+
         virtual void draw(Graphics* graphics);
 
         virtual void drawBorder(Graphics* graphics);
-        
+
         virtual bool _keyInputMessage(const KeyInput& keyInput);
-        
+
         virtual void logic();
-        
+
         virtual void _mouseInputMessage(const MouseInput &mouseInput);
 
         virtual void lostFocus();
@@ -194,7 +194,7 @@ namespace gcn
 
         virtual void setForegroundColor(const Color& color);
 
-        
+
         // Inherited from BasicContainer
 
         virtual void moveToTop(Widget* widget);
@@ -207,20 +207,20 @@ namespace gcn
 
 
         // Inherited from ActionListener
-        
+
         virtual void action(const std::string& eventId);
 
 
         // Inherited from KeyListener
-        
+
         virtual bool keyPress(const Key& key);
 
 
         // Inherited from MouseListener
-        
+
         virtual void mousePress(int x, int y, int button);
-    
-        virtual void mouseRelease(int x, int y, int button);    
+
+        virtual void mouseRelease(int x, int y, int button);
 
         virtual void setFont(Font *font);
 
@@ -243,7 +243,7 @@ namespace gcn
          * Sets the DropDown Widget to folded-up mode.
          */
         virtual void foldUp();
-    
+
         bool mDroppedDown;
         bool mPushed;
         int mOldH;
@@ -251,8 +251,8 @@ namespace gcn
         ListBox* mListBox;
         ScrollArea* mDefaultScrollArea;
         ListBox* mDefaultListBox;
-        FocusHandler mFocusHandler;    
-    };  
+        FocusHandler mFocusHandler;
+    };
 }
 
 #endif // end GCN_DROPDOWN_HPP

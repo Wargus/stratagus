@@ -77,16 +77,16 @@ static void MapMarkUnitGuard(CUnit &unit)
 		if (!unit.Removed) {
 			unit.GuardLock = 1;
 			MapSight(unit.Player, unit.tilePos.x, unit.tilePos.y,
-			 	unit.Type->TileWidth, unit.Type->TileHeight,
-			 	unit.GetReactRange(),
-			 	MapMarkTileGuard);
+				unit.Type->TileWidth, unit.Type->TileHeight,
+				unit.GetReactRange(),
+				MapMarkTileGuard);
 		} else {
 			CUnit *c = unit.Container;
 			if (c && c->Type->AttackFromTransporter) {
 				unit.GuardLock = 1;
 				MapSight(unit.Player, c->tilePos.x, c->tilePos.y,
-			 		c->Type->TileWidth, c->Type->TileHeight,
-			 		unit.GetReactRange(), MapMarkTileGuard);
+					c->Type->TileWidth, c->Type->TileHeight,
+					unit.GetReactRange(), MapMarkTileGuard);
 			}
 		}
 	}
@@ -98,15 +98,15 @@ void MapUnmarkUnitGuard(CUnit &unit)
 		if (!unit.Removed) {
 			unit.GuardLock = 0;
 			MapSight(unit.Player, unit.tilePos.x, unit.tilePos.y,
-			 	unit.Type->TileWidth, unit.Type->TileHeight,
-			 	unit.GetReactRange(), MapUnmarkTileGuard);
+				unit.Type->TileWidth, unit.Type->TileHeight,
+				unit.GetReactRange(), MapUnmarkTileGuard);
 		} else {
 			CUnit *c = unit.Container;
 			if (c && c->Type->AttackFromTransporter) {
 				unit.GuardLock = 0;
 				MapSight(unit.Player, c->tilePos.x, c->tilePos.y,
-			 		c->Type->TileWidth, c->Type->TileHeight,
-			 		unit.GetReactRange(), MapUnmarkTileGuard);
+					c->Type->TileWidth, c->Type->TileHeight,
+					unit.GetReactRange(), MapUnmarkTileGuard);
 			}
 		}
 	}
@@ -311,7 +311,7 @@ void AutoAttack(CUnit &unit, CUnitCache &targets, bool stand_ground)
 		// Normal units react in reaction range.
 		if (!stand_ground && !unit.Removed && unit.CanMove()) {
 			if ((goal = AutoAttackUnitsInDistance(unit,
-			   	 unit.GetReactRange(), targets))) {
+				 unit.GetReactRange(), targets))) {
 				// Weak goal, can choose other unit, come back after attack
 				CommandAttack(unit, goal->tilePos.x, goal->tilePos.y, NULL, FlushCommands);
 				Assert(unit.SavedOrder.Action == UnitActionStill);

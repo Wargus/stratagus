@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -77,7 +77,7 @@ namespace gcn
 
         /**
          * Gets the width of a string. The width of a string is not necesserily
-         * the sum of all the widths of it's glyphs. 
+         * the sum of all the widths of it's glyphs.
          *
          * @param text the string to return the width of.
          * @return the width of a string.
@@ -101,10 +101,10 @@ namespace gcn
          * @return a string index in a string providing an x coordinate.
          */
         virtual int getStringIndexAt(const std::string& text, int x);
-        
+
         /**
          * Draws a string.
-         * 
+         *
          * NOTE: You normally won't use this function to draw text since
          *       Graphics contains better functions for drawing text.
          *
@@ -113,8 +113,8 @@ namespace gcn
          * @param x the x coordinate where to draw the string.
          * @param y the y coordinate where to draw the string.
          */
-        virtual void drawString(Graphics* graphics, const std::string& text, int x, int y) = 0;    
-    };  
+        virtual void drawString(Graphics* graphics, const std::string& text, int x, int y) = 0;
+    };
 }
 
 #endif // end GCN_FONT_HPP

@@ -1256,7 +1256,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				return;
 			case UnitButton:
 				Editor.State = EditorEditUnit;
-		 		if (VisibleUnitIcons < (int)Editor.ShownUnitTypes.size()) {
+				if (VisibleUnitIcons < (int)Editor.ShownUnitTypes.size()) {
 					editorUnitSlider->setVisible(true);
 				}
 				editorSlider->setVisible(false);
@@ -1266,7 +1266,7 @@ static void EditorCallbackButtonDown(unsigned button)
 					Editor.State = EditorEditTile;
 				}
 				editorUnitSlider->setVisible(false);
-		 		if (VisibleTileIcons < (int)Editor.ShownTileTypes.size()) {
+				if (VisibleTileIcons < (int)Editor.ShownTileTypes.size()) {
 					editorSlider->setVisible(true);
 				}
 				return;
@@ -1358,9 +1358,9 @@ static void EditorCallbackButtonDown(unsigned button)
 				 return;
 			} else if (Editor.State == EditorEditTile &&
 					 Editor.SelectedTileIndex != -1) {
-				 	Editor.SelectedTileIndex = -1;
-				 	CursorBuilding = NULL;
-				 	return;
+					Editor.SelectedTileIndex = -1;
+					CursorBuilding = NULL;
+					return;
 				}
 		}
 

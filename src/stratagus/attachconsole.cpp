@@ -67,7 +67,7 @@ bool WINAPI_AttachConsole() {
 	int osIn = _open_osfhandle((intptr_t) hIn, O_TEXT);
 	int osOut = _open_osfhandle((intptr_t) hOut, O_TEXT);
 	int osErr = _open_osfhandle((intptr_t) hErr, O_TEXT);
-				
+
 	if ( osIn == -1 || osOut == -1 || osErr == -1 )
 		return false;
 

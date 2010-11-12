@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -53,7 +53,7 @@
  */
 
 /*
- * For comments regarding functions please see the header file. 
+ * For comments regarding functions please see the header file.
  */
 
 #include "guichan/widgets/slider.h"
@@ -68,14 +68,14 @@ namespace gcn
 
         mScaleStart = 0;
         mScaleEnd = scaleEnd;
-        
+
         setFocusable(true);
         setBorderSize(1);
         setOrientation(HORIZONTAL);
         setValue(0);
         setStepLength(scaleEnd / 10);
         setMarkerLength(10);
-    
+
         addMouseListener(this);
         addKeyListener(this);
     }
@@ -83,17 +83,17 @@ namespace gcn
     Slider::Slider(double scaleStart, double scaleEnd)
     {
         mMouseDrag = false;
-        
+
         mScaleStart = scaleStart;
         mScaleEnd = scaleEnd;
-        
+
         setFocusable(true);
         setBorderSize(1);
         setOrientation(HORIZONTAL);
         setValue(scaleStart);
         setStepLength((scaleEnd  - scaleStart)/ 10);
         setMarkerLength(10);
-    
+
         addMouseListener(this);
         addKeyListener(this);
     }
@@ -127,12 +127,12 @@ namespace gcn
     void Slider::draw(gcn::Graphics* graphics)
     {
         Color shadowColor = getBaseColor() - 0x101010;
-        int alpha = getBaseColor().a;        
+        int alpha = getBaseColor().a;
          shadowColor.a = alpha;
-                
+
         graphics->setColor(shadowColor);
         graphics->fillRectangle(gcn::Rectangle(0,0,getWidth(),getHeight()));
-    
+
         drawMarker(graphics);
     }
 
@@ -147,7 +147,7 @@ namespace gcn
         highlightColor.a = alpha;
         shadowColor = faceColor - 0x303030;
         shadowColor.a = alpha;
-        
+
         unsigned int i;
         for (i = 0; i < getBorderSize(); ++i)
         {
@@ -155,11 +155,11 @@ namespace gcn
             graphics->drawLine(i,i, width - i, i);
             graphics->drawLine(i,i + 1, i, height - i - 1);
             graphics->setColor(highlightColor);
-            graphics->drawLine(width - i,i + 1, width - i, height - i); 
+            graphics->drawLine(width - i,i + 1, width - i, height - i);
             graphics->drawLine(i,height - i, width - i - 1, height - i);
         }
     }
-    
+
     void Slider::drawMarker(gcn::Graphics* graphics)
     {
         gcn::Color faceColor = getBaseColor();
@@ -168,9 +168,9 @@ namespace gcn
         highlightColor = faceColor + 0x303030;
         highlightColor.a = alpha;
         shadowColor = faceColor - 0x303030;
-        shadowColor.a = alpha;        
-        
-        graphics->setColor(faceColor);    
+        shadowColor.a = alpha;
+
+        graphics->setColor(faceColor);
 
         if (getOrientation() == HORIZONTAL)
         {
@@ -187,7 +187,7 @@ namespace gcn
             {
                 graphics->setColor(getForegroundColor());
                 graphics->drawRectangle(Rectangle(v + 2, 2, getMarkerLength() - 4, getHeight() - 4));
-            }    
+            }
         }
         else
         {
@@ -204,10 +204,10 @@ namespace gcn
             {
                 graphics->setColor(getForegroundColor());
                 graphics->drawRectangle(Rectangle(2, v + 2, getWidth() - 4, getMarkerLength() - 4));
-            }    
+            }
         }
     }
-    
+
     void Slider::mousePress(int x, int y, int button)
     {
         if (button == gcn::MouseInput::LEFT
@@ -222,7 +222,7 @@ namespace gcn
             {
                 setValue(markerPositionToValue(getHeight() - y - getMarkerLength() / 2));
             }
-      
+
             mMouseDrag = true;
             generateAction();
         }
@@ -231,17 +231,17 @@ namespace gcn
             mMouseDrag = false;
         }
     }
-    
+
     void Slider::mouseRelease(int, int, int)
     {
         mMouseDrag = false;
     }
-    
+
     void Slider::lostFocus()
     {
         mMouseDrag = false;
     }
-    
+
     void Slider::mouseMotion(int x, int y)
     {
         if (mMouseDrag)
@@ -259,7 +259,7 @@ namespace gcn
             setDirty(true);
         }
     }
-    
+
     void Slider::setValue(double value)
     {
         if (value > getScaleEnd())
@@ -276,7 +276,7 @@ namespace gcn
 
         mValue = value;
     }
-    
+
     double Slider::getValue() const
     {
         return mValue;
@@ -331,7 +331,7 @@ namespace gcn
 
     void Slider::setOrientation(unsigned int orientation)
     {
-        mOrientation = orientation;    
+        mOrientation = orientation;
     }
 
     unsigned int Slider::getOrientation() const
@@ -350,12 +350,12 @@ namespace gcn
         {
             w = getHeight();
         }
-    
+
         double pos = v / ((double)w - getMarkerLength());
         return (1.0 - pos) * getScaleStart() + pos * getScaleEnd();
-    
+
     }
-  
+
     int Slider::valueToMarkerPosition(double value) const
     {
         int v;
@@ -371,17 +371,17 @@ namespace gcn
         int w =  (int)((v - getMarkerLength())
                        * (value  - getScaleStart())
                        / (getScaleEnd() - getScaleStart()));
-    
+
         if (w < 0)
         {
             return 0;
         }
-      
+
         if (w > v - getMarkerLength())
         {
             return v - getMarkerLength();
         }
-      
+
         return w;
     }
 
@@ -398,5 +398,5 @@ namespace gcn
     int Slider::getMarkerPosition() const
     {
         return valueToMarkerPosition(getValue());
-    }    
+    }
 }

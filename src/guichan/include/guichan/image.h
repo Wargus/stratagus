@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -81,7 +81,7 @@ namespace gcn
          * Constructor.
          *
          * @param data the data of the image.
-         * @param width the width of the image.     
+         * @param width the width of the image.
          * @param height the height of the image.
          */
         Image(void* data, int width, int height);
@@ -99,7 +99,7 @@ namespace gcn
          * if it was loaded with it.
          */
         virtual ~Image();
-    
+
         /**
          * Gets the width of the Image.
          *
@@ -119,7 +119,7 @@ namespace gcn
          * depending on what ImageLoader you use. If you for instance use the
          * SDLImageLoader then an SDL_Surface will be returned.
          *
-         * @return a void pointer to the Image data. 
+         * @return a void pointer to the Image data.
          * @see SDLImageLoader, AllegroImageLoader
          */
         virtual void* _getData() const;
@@ -131,7 +131,7 @@ namespace gcn
          * @see SDLImageLoader, AllegroImageLoader
          */
         static ImageLoader* _getImageLoader();
-        
+
         /**
          * Sets the ImageLoader to be used for loading images.
          *
@@ -142,19 +142,19 @@ namespace gcn
          * @see SDLImageLoader, AllegroImageLoader
          */
         static void setImageLoader(ImageLoader* imageLoader);
-        
+
     protected:
         /**
          * Default constructor. It is protected so you can inherit
          * from this class.
          */
-        Image();       
+        Image();
         void* mData;
         int mWidth;
         int mHeight;
         bool mLoadedWithImageLoader;
-        static ImageLoader* mImageLoader;        
-    };  
+        static ImageLoader* mImageLoader;
+    };
 }
 
 #endif // end GCN_IMAGE_HPP

@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -123,7 +123,7 @@ namespace gcn
          * @see remove
          */
         virtual void add(Widget* widget, int x, int y);
-    
+
         /**
          * Removes a Widget from the Container.
          *
@@ -143,13 +143,13 @@ namespace gcn
 
 
         // Inherited from Widget
-        
+
         virtual void draw(Graphics* graphics);
 
         virtual void drawBorder(Graphics* graphics);
-        
+
         virtual void logic();
-        
+
         virtual void _setFocusHandler(FocusHandler* focusHandler);
 
         virtual void _mouseInputMessage(const MouseInput &mouseInput);
@@ -179,21 +179,21 @@ namespace gcn
          * @param graphics the Graphics object to draw with.
          */
         virtual void drawChildren(Graphics* graphics);
-    
+
         /**
          * Calls the logic function for all children of Container. The Widgets
          * logic function will be called in the order the Widgets were added
-         * to the Container.        
+         * to the Container.
          */
         virtual void logicChildren();
-      
+
         Widget* mWidgetWithMouse;
         typedef std::list<Widget*> WidgetList;
         typedef WidgetList::iterator WidgetIterator;
         typedef WidgetList::const_iterator WidgetConstIterator;
         WidgetList mWidgets;
-        bool mOpaque;    
-    };  
+        bool mOpaque;
+    };
 }
 
 #endif // end GCN_CONTAINER_HPP

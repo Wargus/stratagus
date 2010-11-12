@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -87,7 +87,7 @@ namespace gcn
          * Constructor.
          *
          * @param content the content of the ScrollArea.
-         */    
+         */
         ScrollArea(Widget *content);
 
         /**
@@ -98,26 +98,26 @@ namespace gcn
          *                policies.
          * @param vPolicy the policy for the vertical scrollbar. See enum with
          *                policies.
-         */    
+         */
         ScrollArea(Widget *content, unsigned int hPolicy, unsigned int vPolicy);
-        
+
         /**
          * Destructor.
-         */    
+         */
         virtual ~ScrollArea();
 
         /**
          * Sets the content.
          *
          * @param widget the content of the ScrollArea.
-         */    
+         */
         virtual void setContent(Widget* widget);
 
         /**
          * Gets the content.
          *
          * @return the content of the ScrollArea.
-         */    
+         */
         virtual Widget* getContent();
 
         /**
@@ -125,7 +125,7 @@ namespace gcn
          *
          * @param hPolicy the policy for the horizontal scrollbar. See enum with
          *                policies.
-         */    
+         */
         virtual void setHorizontalScrollPolicy(unsigned int hPolicy);
 
         /**
@@ -133,7 +133,7 @@ namespace gcn
          *
          * @return the policy for the horizontal scrollbar policy. See enum with
          *         policies.
-         */    
+         */
         virtual unsigned int getHorizontalScrollPolicy();
 
         /**
@@ -141,7 +141,7 @@ namespace gcn
          *
          * @param vPolicy the policy for the vertical scrollbar. See enum with
          *                policies.
-         */    
+         */
         virtual void setVerticalScrollPolicy(unsigned int vPolicy);
 
         /**
@@ -149,7 +149,7 @@ namespace gcn
          *
          * @return the policy for the vertical scrollbar. See enum with
          *         policies.
-         */    
+         */
         virtual unsigned int getVerticalScrollPolicy();
 
         /**
@@ -159,34 +159,34 @@ namespace gcn
          *                policies.
          * @param vPolicy the policy for the vertical scrollbar. See enum with
          *                policies.
-         */    
+         */
         virtual void setScrollPolicy(unsigned int hPolicy, unsigned int vPolicy);
 
         /**
          * Sets the amount to scroll verticaly.
          *
          * @param vScroll the amount to scroll.
-         */    
+         */
         virtual void setVerticalScrollAmount(int vScroll);
 
         /**
          * Gets the amount that is scrolled verticaly.
          * @return the scroll amount on vertical scroll.
-         */    
+         */
         virtual int getVerticalScrollAmount();
 
         /**
          * Sets the amount to scroll horizontaly.
          *
          * @param hScroll the amount to scroll.
-         */    
+         */
         virtual void setHorizontalScrollAmount(int hScroll);
 
         /**
          * Gets the amount that is scrolled horizontaly.
          *
          * @return the scroll amount on horizontal scroll.
-         */    
+         */
         virtual int getHorizontalScrollAmount();
 
         /**
@@ -194,21 +194,21 @@ namespace gcn
          *
          * @param hScroll the amount to scroll on horizontal scroll.
          * @param vScroll the amount to scroll on vertical scroll.
-         */    
+         */
         virtual void setScrollAmount(int hScroll, int vScroll);
 
         /**
          * Gets the maximum amount of horizontal scroll.
          *
          * @return the horizontal max scroll.
-         */    
+         */
         virtual int getHorizontalMaxScroll();
 
         /**
          * Gets the maximum amount of vertical scroll.
          *
          * @return the vertical max scroll.
-         */    
+         */
         virtual int getVerticalMaxScroll();
 
         /**
@@ -220,7 +220,7 @@ namespace gcn
 
         /**
          * Gets the width.
-         
+
          * @return the width of the ScrollBar.
          */
         virtual int getScrollbarWidth();
@@ -236,17 +236,17 @@ namespace gcn
 
 
         // Inherited from Widget
-        
+
         virtual void draw(Graphics *graphics);
 
         virtual void drawBorder(Graphics* graphics);
-        
+
         virtual void logic();
-        
+
         virtual void _mouseInputMessage(const MouseInput &mouseInput);
 
         virtual void _mouseOutMessage();
-        
+
         virtual void _setFocusHandler(FocusHandler* focusHandler);
 
 
@@ -255,23 +255,23 @@ namespace gcn
         virtual void _announceDeath(Widget *widget);
 
         virtual void getDrawSize(int& width, int& height, Widget* widget);
-        
+
         virtual void moveToBottom(Widget* widget);
-        
-        virtual void moveToTop(Widget* widget);               
+
+        virtual void moveToTop(Widget* widget);
 
 
         // Inherited from MouseListener
 
         virtual void mousePress(int x, int y, int button);
-    
+
         virtual void mouseRelease(int x, int y, int button);
-    
+
         virtual void mouseMotion(int x, int y);
 
         virtual void mouseWheelUp(int x, int y);
 
-        virtual void mouseWheelDown(int x, int y);   
+        virtual void mouseWheelDown(int x, int y);
 
 
         /**
@@ -283,13 +283,13 @@ namespace gcn
          * SHOW_AUTO   - Show the scrollbars only when needed. That is if the
          *               content grows larger then the ScrollArea.
          */
-        enum 
+        enum
         {
             SHOW_ALWAYS,
             SHOW_NEVER,
             SHOW_AUTO
         };
-        
+
     protected:
         /**
          * Draws the up button.
@@ -297,7 +297,7 @@ namespace gcn
          * @param graphics a Graphics object to draw with.
          */
         virtual void drawUpButton(Graphics *graphics);
-    
+
         /**
          * Draws the down button.
          *
@@ -311,7 +311,7 @@ namespace gcn
          * @param graphics a Graphics object to draw with.
          */
         virtual void drawLeftButton(Graphics *graphics);
-         
+
         /**
          * Draws the right button.
          *
@@ -328,28 +328,28 @@ namespace gcn
 
         /**
          * Draws the vertical scrollbar.
-         * 
+         *
          * @param graphics a Graphics object to draw with.
          */
         virtual void drawVBar(Graphics* graphics);
 
         /**
          * Draws the horizontal scrollbar.
-         * 
+         *
          * @param graphics a Graphics object to draw with.
          */
         virtual void drawHBar(Graphics* graphics);
 
         /**
          * Draws the vertical marker.
-         * 
+         *
          * @param graphics a Graphics object to draw with.
          */
         virtual void drawVMarker(Graphics* graphics);
 
         /**
          * Draws the horizontal marker.
-         * 
+         *
          * @param graphics a Graphics object to draw with.
          */
         virtual void drawHMarker(Graphics* graphics);
@@ -414,14 +414,14 @@ namespace gcn
          * @return the dimension of the vertical marker.
          */
         virtual Rectangle getVerticalMarkerDimension();
-    
+
         /**
          * Gets the horizontal marker dimension.
          *
          * @return the dimension of the horizontal marker.
          */
         virtual Rectangle getHorizontalMarkerDimension();
-        
+
         Widget *mContent;
         int mVScroll;
         int mHScroll;

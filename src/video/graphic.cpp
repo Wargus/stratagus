@@ -200,8 +200,8 @@ void CGraphic::DoDrawFrameClip(GLuint *textures,
 
 	DrawTexture(this, textures, frame_map[frame].x + ox,
 								frame_map[frame].y + oy,
-	 							frame_map[frame].x + ox + w,
-	 							frame_map[frame].y + oy + h, x, y, 0);
+								frame_map[frame].x + ox + w,
+								frame_map[frame].y + oy + h, x, y, 0);
 }
 
 /**
@@ -320,8 +320,8 @@ void CGraphic::DoDrawFrameClipX(GLuint *textures, unsigned frame,
 
 	DrawTexture(this, textures, frame_map[frame].x + ox,
 								frame_map[frame].y + oy,
-	 							frame_map[frame].x + ox + w,
-	 							frame_map[frame].y + oy + h, x, y, 1);
+								frame_map[frame].x + ox + w,
+								frame_map[frame].y + oy + h, x, y, 1);
 }
 
 /**

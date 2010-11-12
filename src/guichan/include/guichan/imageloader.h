@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -63,7 +63,7 @@
 namespace gcn
 {
     class Image;
-  
+
     /**
      * ImageLoaders base class. Contains basic image loading functions every
      * image loader should have. Image loaders should inherit from this
@@ -72,7 +72,7 @@ namespace gcn
     class GCN_CORE_DECLSPEC ImageLoader
     {
     public:
-    
+
         /**
          * Destructor.
          */
@@ -107,7 +107,7 @@ namespace gcn
          * @return a pointer to the raw image data.
          */
         virtual void* getRawData() = 0;
-    
+
         /**
          * Finalizes an image meaning it will return the image data. If the
          * image contains pixels with "magic pink" (0xff00ff) they will be
@@ -124,7 +124,7 @@ namespace gcn
          * @throws Exception when no image has been prepared.
          */
         virtual void discard() = 0;
-    
+
         /**
          * Gets the height if the image.
          *
@@ -157,8 +157,8 @@ namespace gcn
          * @param y the y coordinate.
          * @param color the color of the pixel to put.
          */
-        virtual void putPixel(int x, int y, const Color& color) = 0;    
-    };  
+        virtual void putPixel(int x, int y, const Color& color) = 0;
+    };
 }
 
 #endif // end GCN_IMAGELOADER_HPP

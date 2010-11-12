@@ -777,9 +777,9 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 			// FIXME ad support for help from Coward type units
 			if (aiunit->IsAgressive() && (aiunit->IsIdle() ||
 				!(aiunit->CurrentAction() == UnitActionAttack &&
-			 	aiunit->CurrentOrder()->HasGoal() &&
-			 	aiunit->CurrentOrder()->GetGoal()->IsAgressive()))
-			 	&& CanTarget(aiunit->Type, attacker->Type)) {
+				aiunit->CurrentOrder()->HasGoal() &&
+				aiunit->CurrentOrder()->GetGoal()->IsAgressive()))
+				&& CanTarget(aiunit->Type, attacker->Type)) {
 
 				if (aiunit->SavedOrder.Action == UnitActionStill) {
 					// FIXME: should rewrite command handling

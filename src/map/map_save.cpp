@@ -68,7 +68,7 @@ void CMap::Save(CFile *file) const
 	file->printf("--- MODULE: map $Id$\n");
 
 	file->printf("LoadTileModels(\"%s\")\n\n", this->TileModelsFileName);
-	
+
 	file->printf("StratagusMap(\n");
 
 	file->printf("  \"version\", \"" StratagusFormatString "\",\n",

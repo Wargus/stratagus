@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -53,14 +53,14 @@
  */
 
 /*
- * For comments regarding functions please see the header file. 
+ * For comments regarding functions please see the header file.
  */
 
 #include "guichan/defaultfont.h"
 #include "guichan/rectangle.h"
 
 namespace gcn
-{  
+{
     int DefaultFont::getHeight() const
     {
         return 8;
@@ -74,19 +74,19 @@ namespace gcn
     int DefaultFont::drawGlyph(Graphics* graphics, unsigned char, int x, int y)
     {
         graphics->drawRectangle( Rectangle(x, y, 8, 8));
-     
-        return 8;         
+
+        return 8;
     }
-    
+
     void DefaultFont::drawString(Graphics* graphics, const std::string& text, int x, int y)
     {
         unsigned int i;
-    
+
         for (i = 0; i< text.size(); ++i)
         {
             drawGlyph(graphics, text.at(i), x, y);
-            x += getWidth(text);      
-        }    
+            x += getWidth(text);
+        }
     }
 
     int DefaultFont::getStringIndexAt(const std::string& text, int x)
@@ -95,7 +95,7 @@ namespace gcn
         {
             return text.size();
         }
-        
+
         return x / 8;
-    }    
+    }
 }

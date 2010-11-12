@@ -162,7 +162,7 @@ static void AiMarkWaterTransporter(const CUnit &unit, unsigned char *matrix)
 	//
 	// Pop a point from stack, push all neightbors which could be entered.
 	//
-	for (;;) {
+	for () {
 		while (rp != ep) {
 			rx = points[rp].X;
 			ry = points[rp].Y;
@@ -260,7 +260,7 @@ static bool AiFindTarget(const CUnit &unit,
 	//
 	// Pop a point from stack, push all neightbors which could be entered.
 	//
-	for (;;) {
+	for () {
 		while (rp != ep) {
 			rpos = points[rp].pos;
 			state = points[rp].State;

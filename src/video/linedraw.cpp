@@ -995,10 +995,10 @@ void DrawPixel(Uint32 color, int x, int y)
 	};
 
 	glEnableClientState(GL_VERTEX_ARRAY);
-	
+
 	glVertexPointer(2, GL_FLOAT, 0, vertex);
 	glDrawArrays(GL_POINTS, 0, 1);
-	
+
 	glDisableClientState(GL_VERTEX_ARRAY);
 #else
 	glBegin(GL_POINTS);
@@ -1081,10 +1081,10 @@ void DrawHLine(Uint32 color, int x, int y, int width)
 	};
 
 	glEnableClientState(GL_VERTEX_ARRAY);
-	
+
 	glVertexPointer(2, GL_FLOAT, 0, vertex);
 	glDrawArrays(GL_LINES, 0, 2);
-	
+
 	glDisableClientState(GL_VERTEX_ARRAY);
 #else
 	glBegin(GL_LINES);
@@ -1185,10 +1185,10 @@ void DrawVLine(Uint32 color, int x, int y, int height)
 	};
 
 	glEnableClientState(GL_VERTEX_ARRAY);
-	
+
 	glVertexPointer(2, GL_FLOAT, 0, vertex);
 	glDrawArrays(GL_LINES, 0, 2);
-	
+
 	glDisableClientState(GL_VERTEX_ARRAY);
 #else
 	glBegin(GL_LINES);
@@ -1307,10 +1307,10 @@ void DrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 	};
 
 	glEnableClientState(GL_VERTEX_ARRAY);
-	
+
 	glVertexPointer(2, GL_FLOAT, 0, vertex);
 	glDrawArrays(GL_LINES, 0, 2);
-	
+
 	glDisableClientState(GL_VERTEX_ARRAY);
 #else
 	glBegin(GL_LINES);
@@ -1482,10 +1482,10 @@ void DrawRectangle(Uint32 color, int x, int y, int w, int h)
 	};
 
 	glEnableClientState(GL_VERTEX_ARRAY);
-	
+
 	glVertexPointer(2, GL_FLOAT, 0, vertex);
 	glDrawArrays(GL_LINES, 0, 8);
-	
+
 	glDisableClientState(GL_VERTEX_ARRAY);
 #else
 	glBegin(GL_LINES);
@@ -1656,10 +1656,10 @@ void FillRectangle(Uint32 color, int x, int y,
 	};
 
 	glEnableClientState(GL_VERTEX_ARRAY);
-	
+
 	glVertexPointer(2, GL_FLOAT, 0, vertex);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	
+
 	glDisableClientState(GL_VERTEX_ARRAY);
 #else
 	glBegin(GL_TRIANGLE_STRIP);
@@ -1859,7 +1859,7 @@ void DrawTransCircle(Uint32 color, int x, int y, int radius,
 	unsigned char alpha)
 {
 	GLubyte r, g, b;
-	
+
 	Video.GetRGB(color, NULL, &r, &g, &b);
 	color = Video.MapRGBA(0, r, g, b, alpha);
 	DrawCircle(color, x, y, radius);
@@ -1878,7 +1878,7 @@ void DrawTransCircleClip(Uint32 color, int x, int y, int radius,
 	unsigned char alpha)
 {
 	GLubyte r, g, b;
-	
+
 	Video.GetRGB(color, NULL, &r, &g, &b);
 	color = Video.MapRGBA(0, r, g, b, alpha);
 	DrawCircleClip(color, x, y, radius);
@@ -1939,7 +1939,7 @@ void FillTransCircle(Uint32 color, int x, int y,
 	int radius, unsigned char alpha)
 {
 	GLubyte r, g, b;
-	
+
 	Video.GetRGB(color, NULL, &r, &g, &b);
 	color = Video.MapRGBA(0, r, g, b, alpha);
 	FillCircle(color, x, y, radius);
@@ -2003,7 +2003,7 @@ void FillTransCircleClip(Uint32 color, int x, int y,
 	int radius, unsigned char alpha)
 {
 	GLubyte r, g, b;
-	
+
 	Video.GetRGB(color, NULL, &r, &g, &b);
 	color = Video.MapRGBA(0, r, g, b, alpha);
 	FillCircleClip(color, x, y, radius);

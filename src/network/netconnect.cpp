@@ -220,7 +220,7 @@ unsigned char *CInitMessage::Serialize() const
 				memcpy(p, x, CNetworkHost::Size());
 				p += CNetworkHost::Size();
 				delete[] x;
-			}			
+			}
 			break;
 		case ICMMap:
 			memcpy(p, this->u.MapPath, sizeof(this->u.MapPath));
@@ -470,7 +470,7 @@ void NetworkInitServerConnect(int openslots)
 
 	// preset the server (initially always slot 0)
 	memcpy(Hosts[0].PlyName, LocalPlayerName.c_str(), sizeof(Hosts[0].PlyName) - 1);
-	
+
 	ServerSetupState.Clear();
 	LocalSetupState.Clear();
 	for (i = openslots; i < PlayerMax - 1; ++i) {
@@ -1260,7 +1260,7 @@ static void ClientParseConnecting(const CInitMessage *msg)
 **
 ** @return  true if the map name looks safe.
 */
-static bool IsSafeMapName(const char *mapname) 
+static bool IsSafeMapName(const char *mapname)
 {
 	char buf[256];
 	const char *ch;
@@ -1274,7 +1274,7 @@ static bool IsSafeMapName(const char *mapname)
 	if (strstr(buf, "//")) {
 		return false;
 	}
-	if (buf[0] == '\0') {	
+	if (buf[0] == '\0') {
 		return false;
 	}
 	ch = buf;

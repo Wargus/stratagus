@@ -609,9 +609,9 @@ static void DrawDecoration(const CUnit &unit, const CUnitType *type, int x, int 
 	//
 	if (unit.Selected && unit.GroupId != 0
 #ifndef DEBUG
-	 	&& unit.Player == ThisPlayer
+		&& unit.Player == ThisPlayer
 #endif
-	 	) {
+		) {
 		int groupId = 0;
 		for (groupId = 0; !(unit.GroupId & (1 << groupId)); ++groupId)
 			;

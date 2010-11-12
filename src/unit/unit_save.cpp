@@ -413,7 +413,7 @@ void SaveUnit(const CUnit &unit, CFile *file)
 					if (unit.Data.Resource.Workers) {
 						if (unit.Data.Resource.Workers->Destroyed) {
 							/* this unit is destroyed so it's not in the global unit
-				 			* array - this means it won't be saved!!! */
+							* array - this means it won't be saved!!! */
 							printf ("FIXME: storing destroyed Worker - loading will fail.\n");
 						}
 						file->printf(", \"first-worker\", \"%s\"",

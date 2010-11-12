@@ -348,7 +348,7 @@ static int CclPlayer(lua_State *l)
 				CclGetUnitFromRef(l);
 				player->AutoAttackTargets.Insert(CclGetUnitFromRef(l));
 				lua_pop(l, 1);
-			}					
+			}
 		} else {
 		   LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -761,7 +761,7 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "Resources")) {
 		LuaCheckArgs(l, 3);
 
-		const std::string res = LuaToString(l, 3);;
+		const std::string res = LuaToString(l, 3)
 		unsigned int i;
 
 		for (i = 0; i < MaxCosts; ++i) {

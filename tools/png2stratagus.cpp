@@ -1,9 +1,9 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //   Utility for Stratagus - A free fantasy real time strategy game engine
@@ -35,9 +35,9 @@
    1) You create a RGBA image in Gimp
 
    2) You convert it to indexed with 227 colors
-   
+
    [Generate Optimal Palette # Colors 227] (MAX_COLORS - 1)
-   
+
    3) You run png2stratagus on the image
 
    4) The final images will be written to out.png in the current
@@ -66,9 +66,9 @@ public:
   {
   }
 
-  Color (int r, int g, int b) 
+  Color (int r, int g, int b)
     : red (r), green (g), blue (b)
-  {    
+  {
   }
 };
 
@@ -80,10 +80,10 @@ private:
   int m_transcol;
   std::vector<int> m_image;
   std::vector<Color> m_palette;
-  
+
 public:
   /** Load an image from a given png source */
-  Image (const std::string& filename) 
+  Image (const std::string& filename)
   {
     FILE* fp;
     png_structp png_ptr;
@@ -114,7 +114,7 @@ public:
       row_pointers[i] = new png_byte[row_bytes];
 
     png_read_image(png_ptr, row_pointers);
-    
+
     if (color_type != PNG_COLOR_TYPE_PALETTE)
 	{
 	  std::cout << "Unsupported color type" << std::endl;
@@ -148,7 +148,7 @@ public:
 
     for (int i = 0; i < num_trans; i++)
       std::cout << "transcolor: " << int(trans[i]) << std::endl;
-    
+
     m_width = pwidth;
     m_height = pheight;
 
@@ -169,7 +169,7 @@ public:
       {
 	std::cout << "WARNING: Image has more than " << MAX_COLORS
 		  << " colors (" << num_colors << ")" << std::endl;
-	std::cout << "Assuming colors > " << MAX_COLORS 
+	std::cout << "Assuming colors > " << MAX_COLORS
 		  << " are unused" << std::endl;
 	num_colors = MAX_COLORS;
       }
@@ -185,12 +185,12 @@ public:
     png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
     fclose (fp);
   }
-  
-  ~Image () 
+
+  ~Image ()
   {
   }
 
-  void write_png (std::string filename) 
+  void write_png (std::string filename)
   {
     FILE* fp;
     png_structp png_ptr;
@@ -223,7 +223,7 @@ public:
        palette[i].green = m_palette[i].green;
        palette[i].blue  = m_palette[i].blue;
      }
-   
+
    /** insert palette converter here */
    png_set_PLTE(png_ptr, info_ptr, palette, PNG_MAX_PALETTE_LENGTH);
 
@@ -233,7 +233,7 @@ public:
    png_uint_32 height = m_height, width = m_width;
    png_byte image[height * width /* *bytes_per_pixel */];
    png_bytep row_pointers[height];
-   
+
    // fill the image with data
    for (unsigned int i = 0; i < m_image.size (); ++i)
      {
@@ -253,7 +253,7 @@ public:
   }
 
   /** swaps color a and color b in both the palette and the image */
-  void swap_colors (int a, int b) 
+  void swap_colors (int a, int b)
   {
     std::swap (m_palette[a], m_palette[b]);
 
@@ -273,7 +273,7 @@ public:
   int get_transcolor () {
     return m_transcol;
   }
-  
+
   int num_colors () {
     return m_palette.size ();
   }
@@ -281,7 +281,7 @@ public:
   int get_width () {
     return m_width;
   }
-  
+
   int get_height () {
     return m_height;
   }
@@ -313,7 +313,7 @@ int main (int argc, char* argv[])
         #240-244    color cycle
 
 	#253        general editors color (should NEVER be used in any image, RGB = 255,50,255)
-	
+
 	#255        general transparency color (RGB, 255,255,255)
       */
 
@@ -344,7 +344,7 @@ int main (int argc, char* argv[])
       mypng.swap_colors (242, 231);
       mypng.swap_colors (243, 230);
       mypng.swap_colors (244, 229);
-      
+
       // This are in a range which shouldn't get touched, so changing
       //them might not be needed
       //mypng.swap_colors (253, 250);

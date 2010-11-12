@@ -303,9 +303,9 @@ void GroupHelpMe(CUnit *attacker, CUnit &defender)
 					// can attack our attacker then ask for help
 					if (gunit.IsAgressive() && (gunit.IsIdle() ||
 						!(gunit.CurrentAction() == UnitActionAttack &&
-					 	gunit.CurrentOrder()->HasGoal() &&
-					 	gunit.CurrentOrder()->GetGoal()->IsAgressive()))
-					 	&& CanTarget(gunit.Type, attacker->Type)) {
+						gunit.CurrentOrder()->HasGoal() &&
+						gunit.CurrentOrder()->GetGoal()->IsAgressive()))
+						&& CanTarget(gunit.Type, attacker->Type)) {
 
 						if (gunit.SavedOrder.Action == UnitActionStill) {
 							// FIXME: should rewrite command handling

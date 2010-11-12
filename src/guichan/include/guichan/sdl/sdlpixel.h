@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -77,19 +77,19 @@ namespace gcn
         SDL_LockSurface(surface);
 
         Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
-    
+
         unsigned int color = 0;
-    
+
         switch(bpp)
         {
           case 1:
               color = *p;
               break;
-        
+
           case 2:
               color = *(Uint16 *)p;
               break;
-        
+
           case 3:
               if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
               {
@@ -100,15 +100,15 @@ namespace gcn
                   color = p[0] | p[1] << 8 | p[2] << 16;
               }
               break;
-        
+
           case 4:
               color = *(Uint32 *)p;
               break;
-        
+
         }
 
         Uint8 r,g,b,a;
-    
+
         SDL_GetRGBA(color, surface->format, &r, &g, &b, &a);
         SDL_UnlockSurface(surface);
 
@@ -126,11 +126,11 @@ namespace gcn
     inline void SDLputPixel(SDL_Surface* surface, int x, int y, const Color& color)
     {
         int bpp = surface->format->BytesPerPixel;
-        
+
         SDL_LockSurface(surface);
 
         Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
-    
+
         Uint32 pixel = SDL_MapRGB(surface->format, color.r, color.g, color.b);
 
         switch(bpp)
@@ -138,11 +138,11 @@ namespace gcn
           case 1:
               *p = pixel;
               break;
-        
+
           case 2:
               *(Uint16 *)p = pixel;
               break;
-        
+
           case 3:
               if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
               {
@@ -157,12 +157,12 @@ namespace gcn
                   p[2] = (pixel >> 16) & 0xff;
               }
               break;
-        
+
           case 4:
               *(Uint32 *)p = pixel;
               break;
         }
-    
+
         SDL_UnlockSurface(surface);
     }
 
@@ -183,7 +183,7 @@ namespace gcn
 		dst = ((((dst - src) * a) >> 5) + src) & 0x07E0F81F;
 		return (dst >> 16) | dst;
     }
-    
+
     /**
      * Blends two 32 bit colors together.
      *
@@ -205,7 +205,7 @@ namespace gcn
 		dst2 = ((((dst2 - src2) * a) >> 8) + src2) & 0x00FF00FF;
 		return dst | (dst2 << 8);
     }
-    
+
     /**
      * Puts a pixel on an SDL_Surface with alpha
      *
@@ -217,11 +217,11 @@ namespace gcn
     inline void SDLputPixelAlpha(SDL_Surface* surface, int x, int y, const Color& color)
     {
         int bpp = surface->format->BytesPerPixel;
-        
+
         SDL_LockSurface(surface);
 
         Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
-    
+
         Uint32 pixel = SDL_MapRGB(surface->format, color.r, color.g, color.b);
 
         switch(bpp)
@@ -229,11 +229,11 @@ namespace gcn
           case 1:
               *p = pixel;
               break;
-        
+
           case 2:
               *(Uint16 *)p = SDLAlpha16(pixel, *(Uint16 *)p, color.a);
               break;
-        
+
           case 3:
               if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
               {
@@ -248,12 +248,12 @@ namespace gcn
                   p[2] = (pixel >> 16) & 0xff;
               }
               break;
-        
+
           case 4:
               *(Uint32 *)p = SDLAlpha32(pixel, *(Uint32 *)p, color.a);
               break;
         }
-    
+
         SDL_UnlockSurface(surface);
     }
 }

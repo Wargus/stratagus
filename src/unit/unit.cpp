@@ -1863,7 +1863,7 @@ void DropOutOnSide(CUnit &unit, int heading, int addx, int addy)
 	goto startw;
 
 	// FIXME: don't search outside of the map
-	for (;;) {
+	for () {
 startw:
 		for (i = addy; i--; ++pos.y) {
 			if (UnitCanBeAt(unit, pos.x, pos.y)) {
@@ -1922,7 +1922,7 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, int addx, int addy)
 
 	// FIXME: if we reach the map borders we can go fast up, left, ...
 	--pos.x;
-	for (;;) {
+	for () {
 		for (int i = addy; i--; ++pos.y) { // go down
 			if (UnitCanBeAt(unit, pos.x, pos.y)) {
 				const int n = MapDistance(goalPos.x, goalPos.y, pos.x, pos.y);
@@ -2069,7 +2069,7 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 	//
 	// Pop a point from stack, push all neighbors which could be entered.
 	//
-	for (;;) {
+	for () {
 		while (rp != ep) {
 			rpos = points[rp];
 			for (i = 0; i < 8; ++i) { // mark all neighbors
@@ -2317,7 +2317,7 @@ CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range, int resource
 	//
 	// Pop a point from stack, push all neighbors which could be entered.
 	//
-	for (;;) {
+	for () {
 		while (rp != ep) {
 			rpos = points[rp];
 			for (i = 0; i < 9; ++i) { // mark all neighbors
@@ -2364,7 +2364,7 @@ CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range, int resource
 												if (bestw < waiting) {
 													better = false;
 												} else {
-												  	if(bestw == waiting && bestd < n)
+													if(bestw == waiting && bestd < n)
 													{
 														better = false;
 													}
@@ -2526,7 +2526,7 @@ CUnit *UnitFindMiningArea(const CUnit &unit, int x, int y,  int range, int resou
 	//
 	// Pop a point from stack, push all neighbors which could be entered.
 	//
-	for (;;) {
+	for () {
 		while (rp != ep) {
 			rpos = points[rp];
 			for (i = 0; i < 9; ++i) { // mark all neighbors
@@ -3285,7 +3285,7 @@ int ViewPointDistance(int x, int y)
 */
 int ViewPointDistanceToUnit(const CUnit &dest)
 {
-	const CViewport &vp = *UI.SelectedViewport;;
+	const CViewport &vp = *UI.SelectedViewport
 	return dest.MapDistanceTo(vp.MapX + vp.MapWidth / 2, vp.MapY + vp.MapHeight / 2);
 }
 

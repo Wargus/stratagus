@@ -80,7 +80,7 @@
 #ifdef __GNUC__
 #ifdef USE_WIN32
 #define makedir(dir, permissions) mkdir(dir)
-#else 
+#else
 #define makedir(dir, permissions) mkdir(dir, permissions)
 #endif
 #endif

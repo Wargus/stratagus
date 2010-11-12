@@ -96,7 +96,7 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 	//
 	if (!text.empty()) {
 		std::string oldnc;
-		std::string oldrc;	
+		std::string oldrc;
 		GetDefaultTextColors(oldnc, oldrc);
 		CLabel label(style->Font,
 			(!p->TextNormalColor.empty() ? p->TextNormalColor :

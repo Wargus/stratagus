@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -53,7 +53,7 @@
  */
 
 /*
- * For comments regarding functions please see the header file. 
+ * For comments regarding functions please see the header file.
  */
 #include <assert.h>
 #include "guichan/sdl/sdlinput.h"
@@ -67,26 +67,26 @@ namespace gcn
 		mMouseDown = false;
 		mIsRepeating = false;
     }
-    
+
     bool SDLInput::isKeyQueueEmpty()
     {
         return mKeyInputQueue.empty();
     }
-  
+
     KeyInput SDLInput::dequeueKeyInput()
     {
         KeyInput keyInput;
-    
+
         if (mKeyInputQueue.empty())
         {
         	assert(!"The queue is empty.");
             //throw GCN_EXCEPTION("The queue is empty.");
         }
-    
+
         keyInput = mKeyInputQueue.front();
         mKeyInputQueue.pop();
 
-        return keyInput;    
+        return keyInput;
     }
 
     bool SDLInput::isMouseQueueEmpty()
@@ -97,17 +97,17 @@ namespace gcn
     MouseInput SDLInput::dequeueMouseInput()
     {
         MouseInput mouseInput;
-    
+
         if (mMouseInputQueue.empty())
         {
         	assert(!"The queue is empty.");
             //throw GCN_EXCEPTION("The queue is empty.");
         }
-    
+
         mouseInput = mMouseInputQueue.front();
         mMouseInputQueue.pop();
 
-        return mouseInput;    
+        return mouseInput;
     }
 
 	void SDLInput::processKeyRepeat()
@@ -116,7 +116,7 @@ namespace gcn
 
 		if (mIsRepeating) {
 			keyInput.setKey(mLastKey);
-			keyInput.setType(KeyInput::PRESS);        
+			keyInput.setType(KeyInput::PRESS);
 			mKeyInputQueue.push(keyInput);
 		}
 	}
@@ -125,14 +125,14 @@ namespace gcn
     {
         KeyInput keyInput;
         MouseInput mouseInput;
-    
+
         switch (event.type)
         {
           case SDL_KEYDOWN:
 			  mLastKey = convertKeyCharacter(event.key.keysym);
 			  mIsRepeating = true;
               keyInput.setKey(mLastKey);
-              keyInput.setType(KeyInput::PRESS);        
+              keyInput.setType(KeyInput::PRESS);
               mKeyInputQueue.push(keyInput);
               break;
 
@@ -154,7 +154,7 @@ namespace gcn
               break;
 
           case SDL_MOUSEBUTTONUP:
-              mMouseDown = false;        
+              mMouseDown = false;
               mouseInput.x = event.button.x;
               mouseInput.y = event.button.y;
               mouseInput.setButton(convertMouseButton(event.button.button));
@@ -162,7 +162,7 @@ namespace gcn
               mouseInput.setTimeStamp(SDL_GetTicks());
               mMouseInputQueue.push(mouseInput);
               break;
-        
+
           case SDL_MOUSEMOTION:
               mouseInput.x = event.button.x;
               mouseInput.y = event.button.y;
@@ -171,9 +171,9 @@ namespace gcn
               mouseInput.setTimeStamp(SDL_GetTicks());
               mMouseInputQueue.push(mouseInput);
               break;
-        
+
           case SDL_ACTIVEEVENT:
-              /* 
+              /*
                * This occurs when the mouse leaves the window and the Gui-chan
                * application loses its mousefocus.
                */
@@ -181,7 +181,7 @@ namespace gcn
                   && !event.active.gain)
               {
                   mMouseInWindow = false;
-          
+
                   if (!mMouseDown)
                   {
                       mouseInput.x = -1;
@@ -198,10 +198,10 @@ namespace gcn
                   mMouseInWindow = true;
               }
               break;
-        
+
         } // end switch
     }
-  
+
     int SDLInput::convertMouseButton(int button)
     {
         switch (button)
@@ -221,7 +221,7 @@ namespace gcn
           case SDL_BUTTON_WHEELDOWN:
               return MouseInput::WHEEL_DOWN;
               break;
-        } 
+        }
 
 #ifdef DEBUG
     	fprintf(stderr,"Unknown SDL mouse button.\n");
@@ -232,9 +232,9 @@ namespace gcn
 
     Key SDLInput::convertKeyCharacter(SDL_keysym keysym)
     {
-        int value = 0; 
+        int value = 0;
         Key key;
-    
+
         if (keysym.unicode < 255)
         {
 			if (keysym.unicode == 0)
@@ -428,10 +428,10 @@ namespace gcn
                   break;
               case SDLK_KP9:
                   value = Key::K_PAGE_UP;
-                  break;          
+                  break;
               default:
                   break;
-            } 
+            }
         }
 
         key.setValue(value);
@@ -444,7 +444,7 @@ namespace gcn
         {
             key.setNumericPad(true);
         }
-    
-        return key;    
+
+        return key;
     }
 }

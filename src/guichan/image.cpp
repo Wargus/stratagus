@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -53,7 +53,7 @@
  */
 
 /*
- * For comments regarding functions please see the header file. 
+ * For comments regarding functions please see the header file.
  */
 #include <assert.h>
 #include "guichan/image.h"
@@ -68,7 +68,7 @@ namespace gcn
     {
         mLoadedWithImageLoader = false;
     }
-    
+
     Image::Image(void* data, int width, int height)
     {
         mData = data;
@@ -76,7 +76,7 @@ namespace gcn
         mHeight = height;
         mLoadedWithImageLoader = false;
     }
-  
+
     Image::Image(const std::string& filename)
     {
         if (mImageLoader == NULL)
@@ -86,7 +86,7 @@ namespace gcn
         }
 
         mLoadedWithImageLoader = true;
-        mImageLoader->prepare(filename);    
+        mImageLoader->prepare(filename);
         mWidth = mImageLoader->getWidth();
         mHeight = mImageLoader->getHeight();
         mData = mImageLoader->finalize();
@@ -99,7 +99,7 @@ namespace gcn
             mImageLoader->free(this);
         }
     }
-  
+
     int Image::getWidth() const
     {
         return mWidth;
@@ -114,14 +114,14 @@ namespace gcn
     {
         return mData;
     }
-  
+
     void Image::setImageLoader(ImageLoader* imageLoader)
-    { 
+    {
         mImageLoader = imageLoader;
     }
 
     ImageLoader* Image::_getImageLoader()
     {
         return mImageLoader;
-    }    
+    }
 }

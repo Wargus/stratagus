@@ -306,7 +306,7 @@ static int DefineTilesetParseSolid(lua_State *l, CTileset *tileset, int index)
 	int basic_name;
 	int j = 0;
 	int pud;
-	
+
 	ExtendTilesetTables(tileset, index, 16);
 
 	if (!lua_istable(l, -1)) {
@@ -341,22 +341,22 @@ static int DefineTilesetParseSolid(lua_State *l, CTileset *tileset, int index)
 			tileset->FlagsTable[index + j] = tile_flag;
 			continue;
 		}
-		
+
 		pud = LuaToNumber(l, -1);
 		lua_pop(l, 1);
-		
+
 		// ugly hack for sc tilesets, remove when fixed
 		if (j > 15) {
 			ExtendTilesetTables(tileset, index, j);
 		}
-		
+
 		tileset->Table[index + j] = pud;
 		tileset->FlagsTable[index + j] = f;
 		tileset->Tiles[index + j].BaseTerrain = basic_name;
 		tileset->Tiles[index + j].MixTerrain = 0;
 	}
 	lua_pop(l, 1);
-	
+
 	i = j;
 	while (i < 16) {
 		tileset->Table[index + i] = 0;
@@ -390,7 +390,7 @@ static int DefineTilesetParseMixed(lua_State *l, CTileset *tileset, int index)
 	int j;
 	int args;
 	int pud;
-	
+
 	new_index = index + 256;
 	ExtendTilesetTables(tileset, index, 256);
 

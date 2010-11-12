@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -80,7 +80,7 @@ namespace gcn
          * @param height the Rectangle height.
          */
         Rectangle(int x, int y, int width, int height);
-    
+
         /**
          * Sets the dimension of a rectangle.
          *
@@ -100,9 +100,9 @@ namespace gcn
         bool intersect(const Rectangle& rectangle) const
         {
  			return !(rectangle.x > x + width ||
-		 			rectangle.y > y + height ||
-		 			x > rectangle.x + rectangle.width ||
-		 			y > rectangle.y + rectangle.height);	
+					rectangle.y > y + height ||
+					x > rectangle.x + rectangle.width ||
+					y > rectangle.y + rectangle.height);
         }
 
         /**
@@ -112,12 +112,12 @@ namespace gcn
          * @param y the point y coordinate
          */
         bool isPointInRect(int x, int y) const;
-    
+
         int x;
         int y;
         int width;
-        int height;    
-    };  
+        int height;
+    };
 }
 
 #endif // end GCN_RECTANGEL_HPP

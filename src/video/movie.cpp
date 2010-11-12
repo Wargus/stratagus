@@ -291,7 +291,7 @@ int PlayMovie(const std::string &name)
 			OutputTheora(&data, yuv_overlay, &rect);
 			need_data = 1;
 		}
-		
+
 		WaitEventsOneFrame();
 	}
 

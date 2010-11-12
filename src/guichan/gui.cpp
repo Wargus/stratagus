@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -53,7 +53,7 @@
  */
 
 /*
- * For comments regarding functions please see the header file. 
+ * For comments regarding functions please see the header file.
  */
 #include <assert.h>
 #include "guichan/exception.h"
@@ -80,10 +80,10 @@ namespace gcn
         {
             setTop(NULL);
         }
-        
+
         delete mFocusHandler;
     }
-  
+
     void Gui::setTop(Widget* top)
     {
         if (mTop)
@@ -95,7 +95,7 @@ namespace gcn
             top->_setFocusHandler(mFocusHandler);
             top->setDirty(true);
         }
-    
+
         mTop = top;
     }
 
@@ -118,7 +118,7 @@ namespace gcn
     {
         mInput = input;
     }
-  
+
     Input* Gui::getInput() const
     {
         return mInput;
@@ -157,7 +157,7 @@ namespace gcn
                 else if (mTop->hasMouse())
                 {
                     mTop->_mouseOutMessage();
-                }                
+                }
 
                 Widget* f = mFocusHandler->getFocused();
                 Widget* d = mFocusHandler->getDragged();
@@ -168,11 +168,11 @@ namespace gcn
                 {
                     int xOffset, yOffset;
                     f->getAbsolutePosition(xOffset, yOffset);
-                    
+
                     MouseInput mio = mi;
                     mio.x -= xOffset;
                     mio.y -= yOffset;
-                    
+
                     f->_mouseInputMessage(mio);
                 }
 
@@ -182,19 +182,19 @@ namespace gcn
                 {
                     int xOffset, yOffset;
                     d->getAbsolutePosition(xOffset, yOffset);
-                    
+
                     MouseInput mio = mi;
                     mio.x -= xOffset;
                     mio.y -= yOffset;
-                    
-                    d->_mouseInputMessage(mio);                    
+
+                    d->_mouseInputMessage(mio);
                 }
-                
+
                 mFocusHandler->applyChanges();
-                
+
             } // end while
-            
-            while (!mInput->isKeyQueueEmpty())        
+
+            while (!mInput->isKeyQueueEmpty())
             {
                 KeyInput ki = mInput->dequeueKeyInput();
 
@@ -216,7 +216,7 @@ namespace gcn
                     bool keyProcessed = false;
 
                     // Send key inputs to the focused widgets
-                    if (mFocusHandler->getFocused())                        
+                    if (mFocusHandler->getFocused())
                     {
                         if (mFocusHandler->getFocused()->isFocusable())
                         {
@@ -233,14 +233,14 @@ namespace gcn
                         mFocusHandler->checkHotKey(ki);
                     }
                 }
-                
+
                 mFocusHandler->applyChanges();
 
             } // end while
-            
+
         } // end if
-    
-        mTop->logic();        
+
+        mTop->logic();
     }
 
     void Gui::draw(Widget* top)
@@ -268,21 +268,21 @@ namespace gcn
                 rec.x -= top->getBorderSize();
                 rec.y -= top->getBorderSize();
                 rec.width += 2 * top->getBorderSize();
-                rec.height += 2 * top->getBorderSize();                    
+                rec.height += 2 * top->getBorderSize();
                 mGraphics->pushClipArea(rec);
                 top->drawBorder(mGraphics);
                 mGraphics->popClipArea();
             }
 
-            mGraphics->pushClipArea(top->getDimension());    
+            mGraphics->pushClipArea(top->getDimension());
             top->draw(mGraphics);
             top->setDirty(false);
             mGraphics->popClipArea();
 
-            mGraphics->_endDraw();    
+            mGraphics->_endDraw();
         }
     }
-    
+
     void Gui::draw()
     {
         draw(mTop);
@@ -297,7 +297,7 @@ namespace gcn
     {
         mTabbing = tabbing;
     }
-    
+
     bool Gui::isTabbingEnabled()
     {
         return mTabbing;

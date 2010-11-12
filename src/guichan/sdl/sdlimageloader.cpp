@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -53,7 +53,7 @@
  */
 
 /*
- * For comments regarding functions please see the header file. 
+ * For comments regarding functions please see the header file.
  */
 #ifdef USE_SDL_IMAGE
 #include <SDL/SDL_image.h>
@@ -67,9 +67,9 @@ namespace gcn
 
     SDLImageLoader::SDLImageLoader()
     {
-        mCurrentImage = NULL;    
+        mCurrentImage = NULL;
     }
-  
+
     void SDLImageLoader::prepare(const std::string& filename)
     {
         if (mCurrentImage != NULL)
@@ -96,27 +96,27 @@ namespace gcn
         bmask = 0x00ff0000;
         amask = 0xff000000;
 #endif
-    
+
         mCurrentImage = SDL_CreateRGBSurface(SDL_SWSURFACE, 0, 0, 32,
                                              rmask, gmask, bmask, amask);
-    
+
         if (mCurrentImage == NULL)
         {
             throw GCN_EXCEPTION(std::string("Not enough memory to load: ")+filename);
         }
-    
+
         SDL_Surface* tmp2 = SDL_ConvertSurface(tmp, mCurrentImage->format, SDL_SWSURFACE);
         SDL_FreeSurface(tmp);
         SDL_FreeSurface(mCurrentImage);
 
-        mCurrentImage = tmp2;    
+        mCurrentImage = tmp2;
     }
 
     void* SDLImageLoader::getRawData()
     {
         return mCurrentImage->pixels;
     }
-  
+
     void* SDLImageLoader::finalize()
     {
         if (mCurrentImage == NULL)
@@ -127,7 +127,7 @@ namespace gcn
         int i;
         bool hasPink = false;
         bool hasAlpha = false;
-    
+
         for (i = 0; i < mCurrentImage->w * mCurrentImage->h; ++i)
         {
             if (((unsigned int*)mCurrentImage->pixels)[i] == SDL_MapRGB(mCurrentImage->format,255,0,255))
@@ -136,11 +136,11 @@ namespace gcn
                 break;
             }
         }
-    
+
         for (i = 0; i < mCurrentImage->w * mCurrentImage->h; ++i)
         {
             Uint8 r, g, b, a;
-      
+
             SDL_GetRGBA(((unsigned int*)mCurrentImage->pixels)[i], mCurrentImage->format,
                         &r, &g, &b, &a);
 
@@ -148,7 +148,7 @@ namespace gcn
             {
                 hasAlpha = true;
                 break;
-            }      
+            }
         }
 
         // Don't convert 32bpp images with alpha, it will destroy the
@@ -165,7 +165,7 @@ namespace gcn
             SDL_FreeSurface(mCurrentImage);
             mCurrentImage = NULL;
         }
-    
+
         if (hasPink)
         {
             SDL_SetColorKey(temp, SDL_SRCCOLORKEY,
@@ -175,39 +175,39 @@ namespace gcn
         {
             SDL_SetAlpha(temp, SDL_SRCALPHA, 255);
         }
-    
-        return temp;    
+
+        return temp;
     }
-  
+
     void SDLImageLoader::discard()
     {
         if (mCurrentImage == NULL)
         {
             throw GCN_EXCEPTION("No image prepared.");
         }
-    
+
         SDL_FreeSurface(mCurrentImage);
-    
-        mCurrentImage = NULL;    
+
+        mCurrentImage = NULL;
     }
-  
+
     void SDLImageLoader::free(Image* image)
     {
         if (image->_getData() == NULL)
         {
             throw GCN_EXCEPTION("Image data points to null.");
         }
-    
-        SDL_FreeSurface((SDL_Surface*)image->_getData());    
+
+        SDL_FreeSurface((SDL_Surface*)image->_getData());
     }
-  
+
     int SDLImageLoader::getWidth() const
     {
         if (mCurrentImage == NULL)
         {
             throw GCN_EXCEPTION("No image prepared.");
         }
-    
+
         return mCurrentImage->w;
     }
 
@@ -217,7 +217,7 @@ namespace gcn
         {
             throw GCN_EXCEPTION("No image prepared.");
         }
-    
+
         return mCurrentImage->h;
     }
 
@@ -233,7 +233,7 @@ namespace gcn
             throw GCN_EXCEPTION("x and y out of image bound.");
         }
 
-        return SDLgetPixel(mCurrentImage, x, y);    
+        return SDLgetPixel(mCurrentImage, x, y);
     }
 
     void SDLImageLoader::putPixel(int x, int y, const Color& color)
@@ -247,8 +247,8 @@ namespace gcn
         {
             throw GCN_EXCEPTION("x and y out of image bound.");
         }
-    
-        SDLputPixel(mCurrentImage, x, y, color);    
+
+        SDLputPixel(mCurrentImage, x, y, color);
     }
 }
 #endif

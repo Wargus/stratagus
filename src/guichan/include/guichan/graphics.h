@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -66,7 +66,7 @@
 namespace gcn
 {
     class Font;
-  
+
     /**
      * Used for drawing graphics. It contains all vital functions for drawing.
      * We include implemented Graphics classes for some common platforms like the
@@ -82,23 +82,23 @@ namespace gcn
      * by container widgets when their child widgets are drawn.
      *
      * IMPORTANT: Remember to pop each clip area that you pushed on the stack
-     * after you are done with it. 
+     * after you are done with it.
      *
      * If you feel that Graphics is to restrictive for your needs, there is
      * no one stopping you from using your own code for drawing in Widgets.
      * You could for instance use pure SDL in the drawing of Widgets bypassing
      * Graphics. This might however hurt portability of your application.
-     *   
+     *
      * If you implement a Graphics class not present in Guichan we would be very
      * happy to add it to Guichan.
      *
      * @see AllegroGraphics, OpenGLGraphics, SDLGraphics, Image
-     */  
+     */
     class GCN_CORE_DECLSPEC Graphics
     {
     public:
         Graphics();
-    
+
         virtual ~Graphics() { }
 
         /**
@@ -107,7 +107,7 @@ namespace gcn
          * preparations before drawing. An example of such an implementation
          * would be OpenGLGraphics.
          *
-         * NOTE: You will never need to call this function yourself. 
+         * NOTE: You will never need to call this function yourself.
          *       Gui will do it for you.
          *
          * @see _endDraw, Gui::draw
@@ -124,7 +124,7 @@ namespace gcn
          * @see _beginDraw, Gui::draw
          */
         virtual void _endDraw() { }
-        
+
         /**
          * Pushes a clip area onto the stack. The x and y coordinates in the
          * Rectangle will be relative to the last pushed clip area.
@@ -152,16 +152,16 @@ namespace gcn
          * @return the current ClipArea.
          */
         virtual const ClipRectangle& getCurrentClipArea();
-        
+
         /**
          * Draws a part of an Image.
-         * 
+         *
          * NOTE: Width and height arguments will not scale the Image but
          *       specifies the size of the part to be drawn. If you want
          *       to draw the whole Image there is a simplified version of
          *       this function.
          *
-         * EXAMPLE: @code drawImage(myImage, 10, 10, 20, 20, 40, 40); @endcode       
+         * EXAMPLE: @code drawImage(myImage, 10, 10, 20, 20, 40, 40); @endcode
          *          Will draw a rectangular piece of myImage starting at coordinate
          *          (10, 10) in myImage, with width and height 40. The piece will be
          *          drawn with it's top left corner at coordinate (20, 20).
@@ -184,7 +184,7 @@ namespace gcn
          * @code drawImage(myImage, 0, 0, dstX, dstY, image->getWidth(), image->getHeight()); @endcode
          */
         virtual void drawImage(const Image* image, int dstX, int dstY);
-    
+
         /**
          * Draws a single point/pixel.
          *
@@ -202,7 +202,7 @@ namespace gcn
          * @param y2 the second y coordinate.
          */
         virtual void drawLine(int x1, int y1, int x2, int y2) = 0;
-    
+
         /**
          * Draws a simple, non-filled, Rectangle with one pixel width.
          *
@@ -237,13 +237,13 @@ namespace gcn
          * @param font the Font to use when drawing.
          */
         virtual void setFont(Font* font);
-        
+
         /**
          * Draws text.
          *
          * @param text the text to draw.
          * @param x the x coordinate where to draw the text.
-         * @param y the y coordinate where to draw the text.         
+         * @param y the y coordinate where to draw the text.
          * @param alignment Graphics::LEFT, Graphics::CENTER or Graphics::RIGHT.
          * @throws Exception when no Font is set.
          */
@@ -258,11 +258,11 @@ namespace gcn
             CENTER,
             RIGHT
         };
-        
+
     protected:
         std::stack<ClipRectangle> mClipStack;
-        Font* mFont;    
-    };  
+        Font* mFont;
+    };
 }
 
 #endif // end GCN_GRAPHICS_HPP
@@ -272,4 +272,4 @@ namespace gcn
  * finalman - "skall jag skriva det?"
  * yakslem - "ja, varfor inte?"
  */
- 
+

@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -53,7 +53,7 @@
  */
 
 /*
- * For comments regarding functions please see the header file. 
+ * For comments regarding functions please see the header file.
  */
 #include <assert.h>
 #include "guichan/widgets/label.h"
@@ -65,21 +65,21 @@ namespace gcn
     {
         mAlignment = Graphics::LEFT;
     }
-    
+
     Label::Label(const std::string& caption)
     {
         mCaption = caption;
         mAlignment = Graphics::LEFT;
-        
+
         setWidth(getFont()->getWidth(caption));
-        setHeight(getFont()->getHeight());        
+        setHeight(getFont()->getHeight());
     }
 
     const std::string &Label::getCaption() const
     {
         return mCaption;
     }
-    
+
     void Label::setCaption(const std::string& caption)
     {
         mCaption = caption;
@@ -95,12 +95,12 @@ namespace gcn
     {
         return mAlignment;
     }
-    
+
     void Label::draw(Graphics* graphics)
     {
         int textX;
         int textY = getHeight() / 2 - getFont()->getHeight() / 2;
-        
+
         switch (getAlignment())
         {
           case Graphics::LEFT:
@@ -121,7 +121,7 @@ namespace gcn
         graphics->setColor(getForegroundColor());
         graphics->drawText(getCaption(), textX, textY, getAlignment());
     }
-    
+
     void Label::drawBorder(Graphics* graphics)
     {
         Color faceColor = getBaseColor();
@@ -133,7 +133,7 @@ namespace gcn
         highlightColor.a = alpha;
         shadowColor = faceColor - 0x303030;
         shadowColor.a = alpha;
-        
+
         unsigned int i;
         for (i = 0; i < getBorderSize(); ++i)
         {
@@ -141,8 +141,8 @@ namespace gcn
             graphics->drawLine(i,i, width - i, i);
             graphics->drawLine(i,i + 1, i, height - i - 1);
             graphics->setColor(highlightColor);
-            graphics->drawLine(width - i,i + 1, width - i, height - i); 
-            graphics->drawLine(i,height - i, width - i - 1, height - i); 
+            graphics->drawLine(width - i,i + 1, width - i, height - i);
+            graphics->drawLine(i,height - i, width - i - 1, height - i);
         }
     }
 
@@ -150,5 +150,5 @@ namespace gcn
     {
         setWidth(getFont()->getWidth(getCaption()));
         setHeight(getFont()->getHeight());
-    } 
+    }
 }

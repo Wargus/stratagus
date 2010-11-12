@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -53,7 +53,7 @@
  */
 
 /*
- * For comments regarding functions please see the header file. 
+ * For comments regarding functions please see the header file.
  */
 #include <assert.h>
 #include "guichan/exception.h"
@@ -65,19 +65,19 @@ namespace gcn
     Container::Container()
     {
         mWidgetWithMouse = NULL;
-        mOpaque = true;        
+        mOpaque = true;
     }
 
     Container::~Container()
     {
-        clear();        
+        clear();
     }
-    
+
     void Container::logic()
     {
         logicChildren();
     }
-   
+
     void Container::draw(Graphics* graphics)
     {
         if (isOpaque())
@@ -85,7 +85,7 @@ namespace gcn
             graphics->setColor(getBaseColor());
             graphics->fillRectangle(Rectangle(0, 0, getWidth(), getHeight()));
         }
-    
+
         drawChildren(graphics);
     }
 
@@ -100,7 +100,7 @@ namespace gcn
         highlightColor.a = alpha;
         shadowColor = faceColor - 0x303030;
         shadowColor.a = alpha;
-        
+
         unsigned int i;
         for (i = 0; i < getBorderSize(); ++i)
         {
@@ -108,11 +108,11 @@ namespace gcn
             graphics->drawLine(i,i, width - i, i);
             graphics->drawLine(i,i + 1, i, height - i - 1);
             graphics->setColor(highlightColor);
-            graphics->drawLine(width - i,i + 1, width - i, height - i); 
-            graphics->drawLine(i,height - i, width - i - 1, height - i); 
+            graphics->drawLine(width - i,i + 1, width - i, height - i);
+            graphics->drawLine(i,height - i, width - i - 1, height - i);
         }
     }
-    
+
     void Container::logicChildren()
     {
         WidgetIterator iter;
@@ -121,7 +121,7 @@ namespace gcn
             (*iter)->logic();
         }
     }
-  
+
     void Container::drawChildren(Graphics* graphics)
     {
         WidgetIterator iter;
@@ -137,12 +137,12 @@ namespace gcn
                     rec.x -= (*iter)->getBorderSize();
                     rec.y -= (*iter)->getBorderSize();
                     rec.width += 2 * (*iter)->getBorderSize();
-                    rec.height += 2 * (*iter)->getBorderSize();                    
+                    rec.height += 2 * (*iter)->getBorderSize();
                     graphics->pushClipArea(rec);
                     (*iter)->drawBorder(graphics);
                     graphics->popClipArea();
                 }
-                
+
                 graphics->pushClipArea((*iter)->getDimension());
                 (*iter)->draw(graphics);
                 graphics->popClipArea();
@@ -198,7 +198,7 @@ namespace gcn
         {
             mWidgetWithMouse = NULL;
         }
-          
+
         WidgetIterator iter;
         for (iter = mWidgets.begin(); iter != mWidgets.end(); iter++)
         {
@@ -211,7 +211,7 @@ namespace gcn
 		assert(!"There is no such widget in this container.");
         //throw GCN_EXCEPTION("There is no such widget in this container.");
     }
-    
+
     void Container::getDrawSize(int& width, int& height, Widget* widget)
     {
         WidgetIterator iter;
@@ -225,7 +225,7 @@ namespace gcn
                 break;
             }
         }
-    
+
         if (contains)
         {
             Rectangle widgetDim = widget->getDimension();
@@ -268,9 +268,9 @@ namespace gcn
         {
         	assert(!"Widget not in container.");
             //throw GCN_EXCEPTION("Widget not in container.");
-        }    
+        }
     }
-  
+
     void Container::add(Widget* widget)
     {
         mWidgets.push_back(widget);
@@ -290,7 +290,7 @@ namespace gcn
         {
             mWidgetWithMouse = NULL;
         }
-    
+
         WidgetIterator iter;
         for (iter = mWidgets.begin(); iter != mWidgets.end(); iter++)
         {
@@ -307,36 +307,36 @@ namespace gcn
     }
 
     void Container::clear()
-    { 
+    {
         mWidgetWithMouse = NULL;
-    
+
         WidgetIterator iter;
 
         for (iter = mWidgets.begin(); iter != mWidgets.end(); iter++)
-        {      
+        {
             (*iter)->_setFocusHandler(NULL);
             (*iter)->_setParent(NULL);
         }
-    
+
         mWidgets.clear();
     }
 
     void Container::_setFocusHandler(FocusHandler* focusHandler)
     {
         Widget::_setFocusHandler(focusHandler);
-    
+
         WidgetIterator iter;
         for (iter = mWidgets.begin(); iter != mWidgets.end(); iter++)
         {
             (*iter)->_setFocusHandler(focusHandler);
-        }   
+        }
     }
-  
+
     void Container::_mouseInputMessage(const MouseInput &mouseInput)
-    {        
+    {
         Widget* tempWidgetWithMouse = NULL;
-        
-        WidgetIterator iter;    
+
+        WidgetIterator iter;
         for (iter = mWidgets.begin(); iter != mWidgets.end(); iter++)
         {
             if ((*iter)->getDimension().isPointInRect(mouseInput.x, mouseInput.y)
@@ -360,19 +360,19 @@ namespace gcn
 
             mWidgetWithMouse = tempWidgetWithMouse;
         }
-    
+
         if (mWidgetWithMouse != NULL)
         {
             MouseInput mi = mouseInput;
             mi.x -= mWidgetWithMouse->getX();
-            mi.y -= mWidgetWithMouse->getY();      
+            mi.y -= mWidgetWithMouse->getY();
             mWidgetWithMouse->_mouseInputMessage(mi);
         }
 
          if (mWidgetWithMouse == NULL)
          {
              BasicContainer::_mouseInputMessage(mouseInput);
-         }        
+         }
     }
 
     void Container::_mouseOutMessage()
