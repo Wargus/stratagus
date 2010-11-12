@@ -34,12 +34,12 @@ TOLUA_API void* tolua_touserdata (lua_State* L, int narg, void* def)
 
 	if (lua_gettop(L)<abs(narg)) {
  		return def;
-	};
+	}
 
 	if (lua_islightuserdata(L, narg)) {
 
 		return lua_touserdata(L,narg);
-	};
+	}
 
 	return tolua_tousertype(L, narg, def);
 }
@@ -55,7 +55,7 @@ TOLUA_API void* tolua_tousertype (lua_State* L, int narg, void* def)
   void* u;
   if (!lua_isuserdata(L, narg)) {
 	  if (!push_table_instance(L, narg)) return NULL;
-  };
+  }
   u = lua_touserdata(L,narg);
   return (u==NULL) ? NULL : *((void**)u); /* nil represents NULL */
  }
@@ -122,7 +122,7 @@ TOLUA_API int tolua_tofieldvalue (lua_State* L, int lo, int index, int def)
  return v;
 }
 
-TOLUA_API int tolua_getfieldboolean (lua_State* L, int lo, int index, int def)
+TOLUA_API int tolua_getfieldboolean (lua_State* L, int lo, int index, int /*def*/)
 {
  int v;
  lua_pushnumber(L,index);

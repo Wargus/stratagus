@@ -32,7 +32,7 @@ TOLUA_API int tolua_fast_isa(lua_State *L, int mt_indexa, int mt_indexb, int sup
 		} else {
 			lua_pushliteral(L,"tolua_super");
 			lua_rawget(L,LUA_REGISTRYINDEX);  /* stack: super */
-		};
+		}
 		lua_pushvalue(L,mt_indexa);       /* stack: super mta */
 		lua_rawget(L,-2);                 /* stack: super super[mta] */
 		lua_pushvalue(L,mt_indexb);       /* stack: super super[mta] mtb */
@@ -152,13 +152,13 @@ int push_table_instance(lua_State* L, int lo) {
 
 			lua_pop(L, 1);
 			return 0;
-		};
+		}
 	} else {
 		return 0;
-	};
+	}
 
 	return 0;
-};
+}
 
 /* the equivalent of lua_is* for usertype */
 static int lua_isusertype (lua_State* L, int lo, const char* type)
@@ -166,8 +166,8 @@ static int lua_isusertype (lua_State* L, int lo, const char* type)
 	if (!lua_isuserdata(L,lo)) {
 		if (!push_table_instance(L, lo)) {
 			return 0;
-		};
-	};
+		}
+	}
 	{
 		/* check if it is of the same type */
 		int r;
@@ -297,7 +297,7 @@ TOLUA_API int tolua_isvaluenil (lua_State* L, int lo, tolua_Error* err) {
 	err->array = 0;
 	err->type = "value";
 	return 1;
-};
+}
 
 TOLUA_API int tolua_isvalue (lua_State* L, int lo, int def, tolua_Error* err)
 {
@@ -322,7 +322,7 @@ TOLUA_API int tolua_isusertype (lua_State* L, int lo, const char* type, int def,
 }
 
 TOLUA_API int tolua_isvaluearray
- (lua_State* L, int lo, int dim, int def, tolua_Error* err)
+ (lua_State* L, int lo, int /*dim*/, int def, tolua_Error* err)
 {
 	if (!tolua_istable(L,lo,def,err))
 		return 0;

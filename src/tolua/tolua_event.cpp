@@ -29,7 +29,7 @@ static void storeatubox (lua_State* L, int lo)
 			lua_newtable(L);
 			lua_pushvalue(L, -1);
 			lua_setfenv(L, lo);	/* stack: k,v,table  */
-		};
+		}
 		lua_insert(L, -3);
 		lua_settable(L, -3); /* on lua 5.1, we trade the "tolua_peers" lookup for a settable call */
 		lua_pop(L, 1);
@@ -147,7 +147,7 @@ static int class_index_event (lua_State* L)
 			lua_gettable(L, -2); /* on lua 5.1, we trade the "tolua_peers" lookup for a gettable call */
 			if (!lua_isnil(L, -1))
 				return 1;
-		};
+		}
 		#else
 		lua_pushstring(L,"tolua_peers");
 		lua_rawget(L,LUA_REGISTRYINDEX);        /* stack: obj key ubox */
@@ -308,11 +308,11 @@ static int class_call_event(lua_State* L) {
 			lua_call(L, lua_gettop(L)-1, 1);
 
 			return 1;
-		};
-	};
+		}
+	}
 	tolua_error(L,"Attempt to call a non-callable object.",NULL);
 	return 0;
-};
+}
 
 static int do_operator (lua_State* L, const char* op)
 {
