@@ -847,7 +847,7 @@ int main(int argc, char **argv)
 	//
 	//  Parse commandline
 	//
-	for () {
+	for (;;) {
 #ifdef USE_MAEMO
 		switch (getopt(argc, argv, "c:d:ef:hln:I:P:s:t:v:wD:N:E:S:U:OL:o?")) {
 #else

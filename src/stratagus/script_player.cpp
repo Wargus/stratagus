@@ -761,7 +761,7 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "Resources")) {
 		LuaCheckArgs(l, 3);
 
-		const std::string res = LuaToString(l, 3)
+		const std::string res = LuaToString(l, 3);
 		unsigned int i;
 
 		for (i = 0; i < MaxCosts; ++i) {

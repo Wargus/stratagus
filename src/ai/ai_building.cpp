@@ -215,7 +215,7 @@ static int AiFindBuildingPlace2(const CUnit &worker, const CUnitType *type,
 	//
 	// Pop a point from stack, push all neighbours which could be entered.
 	//
-	for () {
+	for (;;) {
 		while (rp != ep) {
 			rpos = points[rp];
 			for (i = 0; i < 8; ++i) { // mark all neighbors
@@ -338,7 +338,7 @@ static int AiFindHallPlace(const CUnit &worker,
 	//
 	// Pop a point from stack, push all neighbors which could be entered.
 	//
-	for () {
+	for (;;) {
 		while (rp != ep) {
 			rpos = points[rp];
 			for (i = 0; i < 8; ++i) { // mark all neighbors
@@ -483,7 +483,7 @@ static int AiFindLumberMillPlace(const CUnit &worker, const CUnitType *type,
 	//
 	// Pop a point from stack, push all neightbors which could be entered.
 	//
-	for () {
+	for (;;) {
 		while (rp != ep) {
 			rpos = points[rp];
 			for (i = 0; i < 8; ++i) { // mark all neighbors
@@ -578,7 +578,7 @@ static int AiFindMiningPlace(const CUnit &worker,
 	//
 	// Pop a point from stack, push all neighbors which could be entered.
 	//
-	for () {
+	for (;;) {
 		while (rp != ep) {
 			rpos = points[rp];
 			for (i = 0; i < 8; ++i) { // mark all neighbors

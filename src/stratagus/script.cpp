@@ -262,7 +262,7 @@ static void LuaLoadBuffer(const std::string &file, std::string &buffer)
 		ExitFatal(-1);
 	}
 	location = 0;
-	for () {
+	for (;;) {
 		read = fp.read(&buf[location], size - location);
 		if (read != size - location) {
 			location += read;

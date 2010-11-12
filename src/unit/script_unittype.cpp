@@ -1762,7 +1762,7 @@ static int CclDefineDecorations(lua_State *l)
 						} else if (!strcmp(key, "Width")) {
 							decovarbar->Width = LuaToNumber(l, -1);
 						} else if (!strcmp(key, "Orientation")) {
-							key = LuaToString(l, -1)
+							key = LuaToString(l, -1);
 							if (!strcmp(key, "horizontal")) {
 								decovarbar->IsVertical = 0;
 							} else if (!strcmp(key, "vertical")) {

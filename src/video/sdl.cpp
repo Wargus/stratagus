@@ -873,7 +873,7 @@ void WaitEventsOneFrame()
 
 	interrupts = 0;
 
-	for () {
+	for (;;) {
 		//
 		// Time of frame over? This makes the CPU happy. :(
 		//

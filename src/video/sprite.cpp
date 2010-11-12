@@ -99,8 +99,8 @@ void DrawTexture(const CGraphic *g, GLuint *textures,
 	Assert(gx_end <= g->GraphicWidth);
 	Assert(gy_end <= g->GraphicHeight);
 
-	for (int tex_gy_beg = gy_beg / GLMaxTextureSize * GLMaxTextureSize
-	     tex_gy_beg += GLMaxTextureSize) {
+	for (int tex_gy_beg = gy_beg / GLMaxTextureSize * GLMaxTextureSize;;
+			tex_gy_beg += GLMaxTextureSize) {
 		int tex_gy_end = tex_gy_beg + GLMaxTextureSize;
 		int clip_gy_beg = std::max<int>(gy_beg, tex_gy_beg);
 		int clip_gy_end = std::min<int>(gy_end, tex_gy_end);
@@ -133,9 +133,8 @@ void DrawTexture(const CGraphic *g, GLuint *textures,
 		Assert(clip_ty_beg < clip_ty_end);
 		Assert(clip_ty_end <= 1.0f);
 
-		for (int tex_gx_beg = gx_beg / GLMaxTextureSize
-			     * GLMaxTextureSize
-		     tex_gx_beg += GLMaxTextureSize) {
+		for (int tex_gx_beg = gx_beg / GLMaxTextureSize * GLMaxTextureSize;;
+				tex_gx_beg += GLMaxTextureSize) {
 			int tex_gx_end = tex_gx_beg + GLMaxTextureSize;
 			int clip_gx_beg = std::max<int>(gx_beg, tex_gx_beg);
 			int clip_gx_end = std::min<int>(gx_end, tex_gx_end);

@@ -929,7 +929,7 @@ void HandleActionResource(CUnit &unit)
 	if (unit.SubAction == SUB_STOP_GATHERING) {
 		if (StopGathering(unit)) {
 			unit.SubAction = SUB_MOVE_TO_DEPOT;
-			unit.Data.Move.Cycles = 0 //moving counter
+			unit.Data.Move.Cycles = 0; //moving counter
 		} else
 			return;
 	}
