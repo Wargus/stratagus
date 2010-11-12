@@ -169,6 +169,17 @@ void DoScrollArea(int state, bool fast)
 		stepy = 0;
 	}
 
+#ifdef USE_MAEMO
+	// Decrease scrolling speed on Maemo, it is too high
+	if (state & ScrollUp || state & ScrollDown) {
+		stepy /= 4;
+	}
+
+	if (state & ScrollLeft || state & ScrollRight) {
+		stepx /= 4;
+	}
+#endif
+
 	if (state & ScrollUp) {
 		stepy = -stepy;
 	}
