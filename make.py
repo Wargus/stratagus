@@ -339,12 +339,13 @@ def mingw(builddir='fbuild/mingw', cc='i486-mingw32-g++', **kwargs):
 def clean():
     autoclean()
 
+# Keep this equivalent to languages/genpot.sh.
 def pot():
     luas = find('.', '*.lua')
     luas.sort()
     run('xgettext','-d','bos','-k_','-o','languages/bos.pot', luas)
     s = sorted(sources)
-    run('xgettext','-d','engine','-k_','-o','languages/engine.pot', s)
+    run('xgettext','-d','engine','-C','-k_','--add-comments=TRANSLATORS','-o','languages/engine.pot', s)
 
 def all(**kwargs):
     release(**kwargs)

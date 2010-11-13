@@ -1,3 +1,4 @@
+# Keep this equivalent to pot() in ../make.py.
 cd ..
 xgettext -d bos -k_ -o languages/bos.pot `find -name "*.lua" | sort`
 cd engine
