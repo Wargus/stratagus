@@ -244,14 +244,13 @@ void MapUnmarkTileDetectCloak(const CPlayer *player, const Vec2i &pos)
 **  Mark the sight of unit. (Explore and make visible.)
 **
 **  @param player  player to mark the sight for (not unit owner)
-**  @param x       x location to mark
-**  @param y       y location to mark
+**  @param pos     location to mark
 **  @param w       width to mark, in square
 **  @param h       height to mark, in square
 **  @param range   Radius to mark.
 **  @param marker  Function to mark or unmark sight
 */
-void MapSight(const CPlayer *player, int x, int y, int w, int h, int range, MapMarkerFunc *marker)
+void MapSight(const CPlayer *player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker)
 {
 	Vec2i mpos;
 	Vec2i c[4];
@@ -264,10 +263,10 @@ void MapSight(const CPlayer *player, int x, int y, int w, int h, int range, MapM
 	}
 
 #ifdef MARKER_ON_INDEX
-	unsigned int index = y * Map.Info.MapWidth;
+	unsigned int index = pos.y * Map.Info.MapWidth;
 #endif
-	for (mpos.y = y; mpos.y < y + h; ++mpos.y) {
-		for (mpos.x = x - range; mpos.x < x + range + w; ++mpos.x) {
+	for (mpos.y = pos.y; mpos.y < pos.y + h; ++mpos.y) {
+		for (mpos.x = pos.x - range; mpos.x < pos.x + range + w; ++mpos.x) {
 			if (mpos.x >= 0 && mpos.x < Map.Info.MapWidth) {
 #ifdef MARKER_ON_INDEX
 				marker(player, mpos.x + index);
@@ -283,11 +282,11 @@ void MapSight(const CPlayer *player, int x, int y, int w, int h, int range, MapM
 
 	// Mark vertical sight for unit (don't remark self) (above unit)
 #ifdef MARKER_ON_INDEX
-	index = (y - range) * Map.Info.MapWidth;
+	index = (pos.y - range) * Map.Info.MapWidth;
 #endif
-	for (mpos.y = y - range; mpos.y < y; ++mpos.y) {
+	for (mpos.y = pos.y - range; mpos.y < pos.y; ++mpos.y) {
 		if (mpos.y >= 0 && mpos.y < Map.Info.MapHeight) {
-			for (mpos.x = x; mpos.x < x + w; ++mpos.x) {
+			for (mpos.x = pos.x; mpos.x < pos.x + w; ++mpos.x) {
 #ifdef MARKER_ON_INDEX
 				marker(player, mpos.x + index);
 #else
@@ -302,11 +301,11 @@ void MapSight(const CPlayer *player, int x, int y, int w, int h, int range, MapM
 
 	// Mark vertical sight for unit (don't remark self) (below unit)
 #ifdef MARKER_ON_INDEX
-	index = (y + h) * Map.Info.MapWidth;
+	index = (pos.y + h) * Map.Info.MapWidth;
 #endif
-	for (mpos.y = y + h; mpos.y < y + range + h; ++mpos.y) {
+	for (mpos.y = pos.y + h; mpos.y < pos.y + range + h; ++mpos.y) {
 		if (mpos.y >= 0 && mpos.y < Map.Info.MapHeight) {
-			for (mpos.x = x; mpos.x < x + w; ++mpos.x) {
+			for (mpos.x = pos.x; mpos.x < pos.x + w; ++mpos.x) {
 #ifdef MARKER_ON_INDEX
 				marker(player, mpos.x + index);
 #else
@@ -323,17 +322,17 @@ void MapSight(const CPlayer *player, int x, int y, int w, int h, int range, MapM
 	steps = 0;
 	while (VisionTable[0][steps] <= range) {
 		// 0 - Top right Quadrant
-		c[0].x = x + w - 1;
-		c[0].y = y - VisionTable[0][steps];
+		c[0].x = pos.x + w - 1;
+		c[0].y = pos.y - VisionTable[0][steps];
 		// 1 - Top left Quadrant
-		c[1].x = x;
-		c[1].y = y - VisionTable[0][steps];
+		c[1].x = pos.x;
+		c[1].y = pos.y - VisionTable[0][steps];
 		// 2 - Bottom Left Quadrant
-		c[2].x = x;
-		c[2].y = y + VisionTable[0][steps] + h - 1;
+		c[2].x = pos.x;
+		c[2].y = pos.y + VisionTable[0][steps] + h - 1;
 		// 3 - Bottom Right Quadrant
-		c[3].x = x + w - 1;
-		c[3].y = y + VisionTable[0][steps] + h - 1;
+		c[3].x = pos.x + w - 1;
+		c[3].y = pos.y + VisionTable[0][steps] + h - 1;
 		// loop for steps
 		++steps;  // Increment past info pointer
 		while (VisionTable[1][steps] != 0 || VisionTable[2][steps] != 0) {

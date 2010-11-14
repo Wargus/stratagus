@@ -114,8 +114,7 @@ enum EditorActionType
 struct EditorAction
 {
 	EditorActionType Type;
-	int X;
-	int Y;
+	Vec2i tilePos;
 	CUnitType *UnitType;
 	CPlayer *Player;
 };
@@ -226,103 +225,82 @@ static int GetTileNumber(int basic, int random, int filler)
 /**
 **  Edit tile.
 **
-**  @param x     X map tile coordinate.
-**  @param y     Y map tile coordinate.
+**  @param pos   map tile coordinate.
 **  @param tile  Tile type to edit.
 */
-void EditTile(int x, int y, int tile)
+void EditTile(const Vec2i &pos, int tile)
 {
-	CMapField *mf;
+	Assert(Map.Info.IsPointOnMap(pos));
 
-	Assert(Map.Info.IsPointOnMap(x, y));
-
-	ChangeTile(x, y, GetTileNumber(tile, TileToolRandom, TileToolDecoration));
+	ChangeTile(pos, GetTileNumber(tile, TileToolRandom, TileToolDecoration));
 
 	//
 	// Change the flags
 	//
-	mf = Map.Field(x, y);
+	CMapField *mf = Map.Field(pos);
 	mf->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
 		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 		MapFieldWall | MapFieldRocks | MapFieldForest);
 
 	mf->Flags |= Map.Tileset.FlagsTable[GetTileNumber(tile, 0, 0)];
 
-	UI.Minimap.UpdateSeenXY(x, y);
-	UI.Minimap.UpdateXY(x, y);
+	UI.Minimap.UpdateSeenXY(pos.x, pos.y);
+	UI.Minimap.UpdateXY(pos.x, pos.y);
 
-	EditorTileChanged(x, y);
+	EditorTileChanged(pos);
 	UpdateMinimap = true;
 }
 
 /**
 **  Edit tiles (internal, used by EditTiles()).
 **
-**  @param x     X map tile coordinate.
-**  @param y     Y map tile coordinate.
+**  @param pos   map tile coordinate.
 **  @param tile  Tile type to edit.
 **  @param size  Size of rectangle
 **
 **  @bug  This function does not support mirror editing!
 */
-void EditTilesInternal(int x, int y, int tile, int size)
+static void EditTilesInternal(const Vec2i &pos, int tile, int size)
 {
-	int ex;
-	int ey;
-	int i;
+	Vec2i minPos = pos;
+	Vec2i maxPos = {pos.x + size, pos.y + size};
 
-	ex = x + size;
-	if (x < 0) {
-		x = 0;
-	}
-	if (ex > Map.Info.MapWidth) {
-		ex = Map.Info.MapWidth;
-	}
-	ey = y + size;
-	if (y < 0) {
-		y = 0;
-	}
-	if (ey > Map.Info.MapHeight) {
-		ey = Map.Info.MapHeight;
-	}
-	while (y < ey) {
-		for (i = x; i < ex; ++i) {
-			EditTile(i, y, tile);
+	Map.FixSelectionArea(minPos, maxPos);
+
+	Vec2i itPos;
+	for (itPos.y = minPos.y; itPos.y <= maxPos.y; ++itPos.y) {
+		for (itPos.x = minPos.x; itPos.x <= maxPos.x; ++itPos.x) {
+			EditTile(itPos, tile);
 		}
-		++y;
 	}
 }
 
 /**
 **  Edit tiles
 **
-**  @param x     X map tile coordinate.
-**  @param y     Y map tile coordinate.
+**  @param pos   map tile coordinate.
 **  @param tile  Tile type to edit.
 **  @param size  Size of rectangle
 */
-void EditTiles(int x, int y, int tile, int size)
+void EditTiles(const Vec2i &pos, int tile, int size)
 {
-	int mx;
-	int my;
-
-	mx = Map.Info.MapWidth;
-	my = Map.Info.MapHeight;
-
-	EditTilesInternal(x, y, tile, size);
+	EditTilesInternal(pos, tile, size);
 
 	if (!MirrorEdit) {
 		return;
 	}
+	const Vec2i mpos = {Map.Info.MapWidth - size, Map.Info.MapHeight - size};
+	const Vec2i mirror = mpos - pos;
+	const Vec2i mirrorv = {mirror.x, pos.y};
 
-	EditTilesInternal(mx - x - size, y, tile, size);
-
+	EditTilesInternal(mirrorv, tile, size);
 	if (MirrorEdit == 1) {
 		return;
 	}
+	const Vec2i mirrorh = {pos.x, mirror.y};
 
-	EditTilesInternal(x, my - y - size, tile, size);
-	EditTilesInternal(mx - x - size, my - y - size, tile, size);
+	EditTilesInternal(mirrorh, tile, size);
+	EditTilesInternal(mirror, tile, size);
 }
 
 /*----------------------------------------------------------------------------
@@ -332,17 +310,15 @@ void EditTiles(int x, int y, int tile, int size)
 /**
 **  Place unit.
 **
-**  @param x       X map tile coordinate.
-**  @param y       Y map tile coordinate.
+**  @param pos     map tile coordinate.
 **  @param type    Unit type to edit.
 **  @param player  Player owning the unit.
 **
 **  @todo  FIXME: Check if the player has already a start-point.
 **  @bug   This function does not support mirror editing!
 */
-static void EditorActionPlaceUnit(int x, int y, CUnitType *type, CPlayer *player)
+static void EditorActionPlaceUnit(const Vec2i &pos, CUnitType *type, CPlayer *player)
 {
-	const Vec2i pos = {x, y};
 	if (type->Neutral) {
 		player = &Players[PlayerNumNeutral];
 	}
@@ -385,21 +361,19 @@ static void EditorActionPlaceUnit(int x, int y, CUnitType *type, CPlayer *player
 /**
 **  Edit unit.
 **
-**  @param x       X map tile coordinate.
-**  @param y       Y map tile coordinate.
+**  @param pos     map tile coordinate.
 **  @param type    Unit type to edit.
 **  @param player  Player owning the unit.
 */
-static void EditorPlaceUnit(int x, int y, CUnitType *type, CPlayer *player)
+static void EditorPlaceUnit(const Vec2i &pos, CUnitType *type, CPlayer *player)
 {
 	EditorAction editorAction;
 	editorAction.Type = EditorActionTypePlaceUnit;
-	editorAction.X = x;
-	editorAction.Y = y;
+	editorAction.tilePos = pos;
 	editorAction.UnitType = type;
 	editorAction.Player = player;
 
-	EditorActionPlaceUnit(x, y, type, player);
+	EditorActionPlaceUnit(pos, type, player);
 	EditorAddUndoAction(editorAction);
 }
 
@@ -423,8 +397,7 @@ static void EditorRemoveUnit(CUnit &unit)
 {
 	EditorAction editorAction;
 	editorAction.Type = EditorActionTypeRemoveUnit;
-	editorAction.X = unit.tilePos.x;
-	editorAction.Y = unit.tilePos.y;
+	editorAction.tilePos = unit.tilePos;
 	editorAction.UnitType = unit.Type;
 	editorAction.Player = unit.Player;
 
@@ -449,13 +422,13 @@ static void EditorUndoAction()
 	{
 		case EditorActionTypePlaceUnit:
 		{
-			CUnit *unit = UnitOnMapTile(action.X, action.Y, action.UnitType->UnitType);
+			CUnit *unit = UnitOnMapTile(action.tilePos, action.UnitType->UnitType);
 			EditorActionRemoveUnit(*unit);
 			break;
 		}
 
 		case EditorActionTypeRemoveUnit:
-			EditorActionPlaceUnit(action.X, action.Y, action.UnitType, action.Player);
+			EditorActionPlaceUnit(action.tilePos, action.UnitType, action.Player);
 			break;
 	}
 
@@ -474,12 +447,12 @@ static void EditorRedoAction()
 	switch (action.Type)
 	{
 		case EditorActionTypePlaceUnit:
-			EditorActionPlaceUnit(action.X, action.Y, action.UnitType, action.Player);
+			EditorActionPlaceUnit(action.tilePos, action.UnitType, action.Player);
 			break;
 
 		case EditorActionTypeRemoveUnit:
 		{
-			CUnit *unit = UnitOnMapTile(action.X, action.Y, action.UnitType->UnitType);
+			CUnit *unit = UnitOnMapTile(action.tilePos, action.UnitType->UnitType);
 			EditorActionRemoveUnit(*unit);
 			break;
 		}
@@ -1369,22 +1342,17 @@ static void EditorCallbackButtonDown(unsigned button)
 		}
 
 		if (MouseButtons & LeftButton) {
-			int tileX = UI.MouseViewport->Viewport2MapX(CursorX);
-			int tileY = UI.MouseViewport->Viewport2MapY(CursorY);
+			const Vec2i tilePos = { UI.MouseViewport->Viewport2MapX(CursorX), UI.MouseViewport->Viewport2MapY(CursorY)};
 
 			if (Editor.State == EditorEditTile &&
 				Editor.SelectedTileIndex != -1) {
-				EditTiles(tileX, tileY,
-					Editor.ShownTileTypes[Editor.SelectedTileIndex],
-					TileCursorSize);
+				EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
 			} else if (Editor.State == EditorEditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
-					if (CanBuildUnitType(NULL, CursorBuilding,
-							tileX, tileY, 1)) {
+					if (CanBuildUnitType(NULL, CursorBuilding, tilePos, 1)) {
 						PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound,
 							MaxSampleVolume);
-						EditorPlaceUnit(tileX, tileY,
-							CursorBuilding, Players + Editor.SelectedPlayer);
+						EditorPlaceUnit(tilePos, CursorBuilding, Players + Editor.SelectedPlayer);
 						UnitPlacedThisPress = true;
 						UI.StatusLine.Clear();
 					} else {
@@ -1394,8 +1362,8 @@ static void EditorCallbackButtonDown(unsigned button)
 					}
 				}
 			} else if (Editor.State == EditorSetStartLocation) {
-				Players[Editor.SelectedPlayer].StartX = tileX;
-				Players[Editor.SelectedPlayer].StartY = tileY;
+				Players[Editor.SelectedPlayer].StartX = tilePos.x;
+				Players[Editor.SelectedPlayer].StartY = tilePos.y;
 			}
 		} else if (MouseButtons & MiddleButton) {
 			// enter move map mode
@@ -1687,18 +1655,14 @@ static void EditorCallbackMouse(int x, int y)
 		//
 		RestrictCursorToViewport();
 
-		int tileX = UI.SelectedViewport->Viewport2MapX(CursorX);
-		int tileY = UI.SelectedViewport->Viewport2MapY(CursorY);
+		const Vec2i tilePos = {UI.SelectedViewport->Viewport2MapX(CursorX), UI.SelectedViewport->Viewport2MapY(CursorY)};
 
 		if (Editor.State == EditorEditTile) {
-			EditTiles(tileX, tileY,
-				Editor.ShownTileTypes[Editor.SelectedTileIndex],
-				TileCursorSize);
+			EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
 		} else if (Editor.State == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
-				if (CanBuildUnitType(NULL, CursorBuilding, tileX, tileY, 1)) {
-					EditorPlaceUnit(tileX, tileY, CursorBuilding,
-					Players + Editor.SelectedPlayer);
+				if (CanBuildUnitType(NULL, CursorBuilding, tilePos, 1)) {
+					EditorPlaceUnit(tilePos, CursorBuilding, Players + Editor.SelectedPlayer);
 					UnitPlacedThisPress = true;
 					UI.StatusLine.Clear();
 				}

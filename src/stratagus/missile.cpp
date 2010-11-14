@@ -897,7 +897,7 @@ void MissileHit(Missile *missile)
 	pos.x /= TileSizeX;
 	pos.y /= TileSizeY;
 
-	if (!Map.Info.IsPointOnMap(pos.x, pos.y)) {
+	if (!Map.Info.IsPointOnMap(pos)) {
 		// FIXME: this should handled by caller?
 		DebugPrint("Missile gone outside of map!\n");
 		return;  // outside the map.
@@ -959,7 +959,7 @@ void MissileHit(Missile *missile)
 		for (int j = missile->Type->Range * 2; --j;) {
 			const Vec2i posIt = {pos.x + i, pos.y + j};
 
-			if (Map.Info.IsPointOnMap(posIt.x, posIt.y)) {
+			if (Map.Info.IsPointOnMap(posIt)) {
 				int d = MapDistance(pos.x + missile->Type->Range, pos.y + missile->Type->Range, posIt.x, posIt.y);
 				d *= missile->Type->SplashFactor;
 				if (d == 0) {

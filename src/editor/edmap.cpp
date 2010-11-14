@@ -58,7 +58,7 @@
 #define RH_QUAD_M 0x00FF00FF /// Right half quad mask
 
 	/// Callback for changed tile (with direction mask)
-static void EditorTileChanged2(int x, int y, int d);
+static void EditorTileChanged2(const Vec2i &pos, int d);
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -83,24 +83,20 @@ static void EditorTileChanged2(int x, int y, int d);
 **  If the tile is 3/4 light grass and dark grass in upper left corner
 **    the value is 0x6555.
 **
-**  @param x  X map tile position
-**  @param y  Y map tile position
+**  @param pos  map tile position
 **
 **  @return   the 'quad' of the tile.
 **
 **  @todo     Make a lookup table to speed up the things.
 */
-static unsigned QuadFromTile(int x, int y)
+static unsigned QuadFromTile(const Vec2i &pos)
 {
-	int tile;
 	int i;
-	unsigned base;
-	unsigned mix;
 
 	//
 	// find the abstact tile number
 	//
-	tile = Map.Fields[y * Map.Info.MapWidth + x].Tile;
+	const int tile = Map.Field(pos)->Tile;
 	for (i = 0; i < Map.Tileset.NumTiles; ++i) {
 		if (tile == Map.Tileset.Table[i]) {
 			break;
@@ -108,8 +104,8 @@ static unsigned QuadFromTile(int x, int y)
 	}
 	Assert(i != Map.Tileset.NumTiles);
 
-	base = Map.Tileset.Tiles[i].BaseTerrain;
-	mix = Map.Tileset.Tiles[i].MixTerrain;
+	unsigned base = Map.Tileset.Tiles[i].BaseTerrain;
+	unsigned mix = Map.Tileset.Tiles[i].MixTerrain;
 
 	if (!mix) { // a solid tile
 		return base | (base << 8) | (base << 16) | (base << 24);
@@ -164,16 +160,12 @@ static unsigned QuadFromTile(int x, int y)
 */
 static int FindTilePath(int base, int goal, int length, char *marks, int *tile)
 {
-	int i;
-	int l;
-	int j;
 	int n;
-
 	//
 	// Find any mixed tile
 	//
-	l = INT_MAX;
-	for (i = 0; i < Map.Tileset.NumTiles;) {
+	int l = INT_MAX;
+	for (int i = 0; i < Map.Tileset.NumTiles;) {
 		// goal found.
 		if (base == Map.Tileset.Tiles[i].BaseTerrain &&
 				goal == Map.Tileset.Tiles[i].MixTerrain) {
@@ -190,7 +182,7 @@ static int FindTilePath(int base, int goal, int length, char *marks, int *tile)
 		// possible path found
 		if (base == Map.Tileset.Tiles[i].BaseTerrain &&
 				Map.Tileset.Tiles[i].MixTerrain) {
-			j = Map.Tileset.Tiles[i].MixTerrain;
+			const int j = Map.Tileset.Tiles[i].MixTerrain;
 			if (!marks[j]) {
 				marks[j] = j;
 				n = FindTilePath(j, goal, length + 1, marks, &n);
@@ -203,7 +195,7 @@ static int FindTilePath(int base, int goal, int length, char *marks, int *tile)
 		// possible path found
 		} else if (Map.Tileset.Tiles[i].BaseTerrain &&
 				base == Map.Tileset.Tiles[i].MixTerrain) {
-			j = Map.Tileset.Tiles[i].BaseTerrain;
+			const int j = Map.Tileset.Tiles[i].BaseTerrain;
 			if (!marks[j]) {
 				marks[j] = j;
 				n = FindTilePath(j, goal, length + 1, marks, &n);
@@ -236,10 +228,6 @@ static int TileFromQuad(unsigned fixed, unsigned quad)
 	int i;
 	unsigned type1;
 	unsigned type2;
-	int base;
-	int direction;
-	// 0  1  2  3   4  5  6  7   8  9  A   B  C   D  E  F
-	char table[16] = { 0, 7, 3, 11, 1, 9, 5, 13, 0, 8, 4, 12, 2, 10, 6, 0 };
 
 	//
 	// Get tile type from fixed.
@@ -283,9 +271,8 @@ find_solid:
 			return i;
 		}
 	} else {
-		char *marks;
+		char *marks = new char[Map.Tileset.NumTerrainTypes];
 
-		marks = new char[Map.Tileset.NumTerrainTypes];
 		memset(marks, 0, Map.Tileset.NumTerrainTypes);
 		marks[type1] = type1;
 		marks[type2] = type2;
@@ -363,12 +350,10 @@ find_solid:
 	}
 
 	if (i >= Map.Tileset.NumTiles) {
-		char *marks;
-
 		//
 		// Find the best tile path.
 		//
-		marks = new char[Map.Tileset.NumTerrainTypes];
+		char *marks = new char[Map.Tileset.NumTerrainTypes];
 		memset(marks, 0, Map.Tileset.NumTerrainTypes);
 		marks[type1] = type1;
 		if (FindTilePath(type1, type2, 0, marks, &i) == INT_MAX) {
@@ -386,9 +371,9 @@ find_solid:
 		delete[] marks;
 	}
 
-	base = i;
+	int base = i;
 
-	direction = 0;
+	int direction = 0;
 	if (((quad >> 24) & 0xFF) == type1) {
 		direction |= 8;
 	}
@@ -401,27 +386,25 @@ find_solid:
 	if (((quad >> 0) & 0xFF) == type1) {
 		direction |= 1;
 	}
-
+						  // 0  1  2  3   4  5  6  7   8  9  A   B  C   D  E  F
+	const char table[16] = { 0, 7, 3, 11, 1, 9, 5, 13, 0, 8, 4, 12, 2, 10, 6, 0 };
 	return base | (table[direction] << 4);
 }
 
 /**
 **  Change tile from abstract tile-type.
 **
-**  @param x     X map tile coordinate.
-**  @param y     Y map tile coordinate.
+**  @param pos   map tile coordinate.
 **  @param tile  Abstract tile type to edit.
 **
 **  @note  this is a rather dumb function, doesn't do any tile fixing.
 */
-void ChangeTile(int x, int y, int tile)
+void ChangeTile(const Vec2i &pos, int tile)
 {
-	CMapField *mf;
-
-	Assert(Map.Info.IsPointOnMap(x, y));
+	Assert(Map.Info.IsPointOnMap(pos));
 	Assert(tile >= 0 && tile < Map.Tileset.NumTiles);
 
-	mf = Map.Field(x, y);
+	CMapField *mf = Map.Field(pos);
 	mf->Tile = mf->SeenTile = Map.Tileset.Table[tile];
 }
 
@@ -433,52 +416,48 @@ void ChangeTile(int x, int y, int tile)
 /**
 **  Editor change tile.
 **
-**  @param x     X map tile coordinate.
-**  @param y     Y map tile coordinate.
+**  @param pos   map tile coordinate.
 **  @param tile  Tile type to edit.
 **  @param d     Fix direction flag 8 up, 4 down, 2 left, 1 right.
 */
-static void EditorChangeTile(int x, int y, int tile, int d)
+static void EditorChangeTile(const Vec2i &pos, int tile, int d)
 {
-	CMapField *mf;
+	Assert(Map.Info.IsPointOnMap(pos));
 
-	Assert(Map.Info.IsPointOnMap(x, y));
-
-	ChangeTile(x, y, tile);
+	ChangeTile(pos, tile);
 
 	//
 	// Change the flags
 	//
-	mf = Map.Field(x, y);
+	CMapField *mf = Map.Field(pos);
 	mf->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
 		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 		MapFieldWall | MapFieldRocks | MapFieldForest);
 
 	mf->Flags |= Map.Tileset.FlagsTable[tile];
 
-	UI.Minimap.UpdateSeenXY(x, y);
-	UI.Minimap.UpdateXY(x, y);
+	UI.Minimap.UpdateSeenXY(pos.x, pos.y);
+	UI.Minimap.UpdateXY(pos.x, pos.y);
 
-	EditorTileChanged2(x, y, d);
+	EditorTileChanged2(pos, d);
 }
 
 /**
 **  Update surroundings for tile changes.
 **
-**  @param x  Map X tile position of change.
+**  @param pos  Map X tile position of change.
 **  @param y  Map Y tile position of change.
 **  @param d  Fix direction flag 8 up, 4 down, 2 left, 1 right.
 */
-static void EditorTileChanged2(int x, int y, int d)
+static void EditorTileChanged2(const Vec2i &pos, int d)
 {
-	const Vec2i pos = {x, y};
 	unsigned quad;
 	unsigned q2;
 	unsigned u;
 	int tile;
 	CMapField *mf;
 
-	quad = QuadFromTile(pos.x, pos.y);
+	quad = QuadFromTile(pos);
 
 	//
 	// Change the surrounding
@@ -500,47 +479,51 @@ static void EditorTileChanged2(int x, int y, int d)
 	//  EditorChangeTile again.
 	//
 	if (d & DIR_UP && pos.y) {
-		//
+		const Vec2i offset = {0, -1};
+	//
 		// Insert into the bottom the new tile.
 		//
-		q2 = QuadFromTile(pos.x, pos.y - 1);
+		q2 = QuadFromTile(pos + offset);
 		u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
 		if (u != q2) {
 			tile = TileFromQuad(u & BH_QUAD_M, u);
-			EditorChangeTile(pos.x, pos.y - 1, tile, d & ~DIR_DOWN);
+			EditorChangeTile(pos + offset, tile, d & ~DIR_DOWN);
 		}
 	}
 	if (d & DIR_DOWN && pos.y < Map.Info.MapHeight - 1) {
+		const Vec2i offset = {0, 1};
 		//
 		// Insert into the top the new tile.
 		//
-		q2 = QuadFromTile(pos.x, pos.y + 1);
+		q2 = QuadFromTile(pos + offset);
 		u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
 		if (u != q2) {
 			tile = TileFromQuad(u & TH_QUAD_M, u);
-			EditorChangeTile(pos.x, pos.y + 1, tile, d & ~DIR_UP);
+			EditorChangeTile(pos + offset, tile, d & ~DIR_UP);
 		}
 	}
 	if (d & DIR_LEFT && pos.x) {
+		const Vec2i offset = {-1, 0};
 		//
 		// Insert into the left the new tile.
 		//
-		q2 = QuadFromTile(pos.x - 1, pos.y);
+		q2 = QuadFromTile(pos + offset);
 		u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
 		if (u != q2) {
 			tile = TileFromQuad(u & RH_QUAD_M, u);
-			EditorChangeTile(pos.x - 1, pos.y, tile, d & ~DIR_RIGHT);
+			EditorChangeTile(pos + offset, tile, d & ~DIR_RIGHT);
 		}
 	}
 	if (d & DIR_RIGHT && pos.x < Map.Info.MapWidth - 1) {
+		const Vec2i offset = {1, 0};
 		//
 		// Insert into the right the new tile.
 		//
-		q2 = QuadFromTile(pos.x + 1, pos.y);
+		q2 = QuadFromTile(pos + offset);
 		u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
 		if (u != q2) {
 			tile = TileFromQuad(u & LH_QUAD_M, u);
-			EditorChangeTile(pos.x + 1, pos.y, tile, d & ~DIR_LEFT);
+			EditorChangeTile(pos + offset, tile, d & ~DIR_LEFT);
 		}
 	}
 }
@@ -548,12 +531,11 @@ static void EditorTileChanged2(int x, int y, int d)
 /**
 **  Update surroundings for tile changes.
 **
-**  @param x  Map X tile position of change.
-**  @param y  Map Y tile position of change.
+**  @param pos  Map tile position of change.
 */
-void EditorTileChanged(int x, int y)
+void EditorTileChanged(const Vec2i &pos)
 {
-	EditorTileChanged2(x, y, 0xF);
+	EditorTileChanged2(pos, 0xF);
 }
 
 /**
@@ -564,7 +546,7 @@ void EditorTileChanged(int x, int y)
 /**
 **  TileFill
 **
-**  @param x     X map tile coordinate for area center.
+**  @param pos   map tile coordinate for area center.
 **  @param y     Y map tile coordinate for area center.
 **  @param tile  Tile type to edit.
 **  @param size  Size of surrounding rectangle.
@@ -572,35 +554,18 @@ void EditorTileChanged(int x, int y)
 **  TileFill(centerx, centery, tile_type_water, map_width)
 **  will fill map with water...
 */
-static void TileFill(int x, int y, int tile, int size)
+static void TileFill(const Vec2i &pos, int tile, int size)
 {
-	int ix;
-	int ax;
-	int iy;
-	int ay;
+	const Vec2i diag = {size / 2, size / 2};
+	Vec2i ipos = pos - diag;
+	Vec2i apos = pos + diag;
 
+	Map.FixSelectionArea(ipos, apos);
 
-	ix = x - size / 2;
-	ax = x + size / 2;
-	iy = y - size / 2;
-	ay = y + size / 2;
-
-	if (ix < 0) {
-		ix = 0;
-	}
-	if (ax >= Map.Info.MapWidth) {
-		ax = Map.Info.MapWidth - 1;
-	}
-	if (iy < 0) {
-		iy = 0;
-	}
-	if (ay >= Map.Info.MapHeight) {
-		ay = Map.Info.MapHeight - 1;
-	}
-
-	for (x = ix; x <= ax; ++x) {
-		for (y = iy; y <= ay; ++y) {
-			EditorChangeTile(x, y, tile, 15);
+	Vec2i itPos;
+	for (itPos.x = ipos.x; itPos.x <= apos.x; ++itPos.x) {
+		for (itPos.y = ipos.y; itPos.y <= apos.y; ++itPos.y) {
+			EditorChangeTile(itPos, tile, 15);
 		}
 	}
 }
@@ -620,25 +585,19 @@ static void TileFill(int x, int y, int tile, int size)
 */
 static void EditorRandomizeTile(int tile, int count, int max_size)
 {
-	int mx;
-	int my;
-	int i;
-	int rx;
-	int ry;
-	int rz;
+	const Vec2i mpos = { Map.Info.MapWidth - 1, Map.Info.MapHeight - 1};
 
-	mx = Map.Info.MapWidth;
-	my = Map.Info.MapHeight;
+	for (int i = 0; i < count; ++i) {
+		const Vec2i rpos = {rand() % ((1 + mpos.x) / 2), rand() % ((1 + mpos.y) / 2)};
+		const Vec2i mirror = mpos - rpos;
+		const Vec2i mirrorh = {rpos.x, mirror.y};
+		const Vec2i mirrorv = {mirror.x, rpos.y};
+		const int rz = rand() % max_size + 1;
 
-	for (i = 0; i < count; ++i) {
-		rx = rand() % (mx / 2);
-		ry = rand() % (my / 2);
-		rz = rand() % max_size + 1;
-
-		TileFill(rx, ry, tile, rz);
-		TileFill(mx - rx - 1, ry, tile, rz);
-		TileFill(rx, my - ry - 1, tile, rz);
-		TileFill(mx - rx - 1, mx - ry - 1, tile, rz);
+		TileFill(rpos, tile, rz);
+		TileFill(mirrorh, tile, rz);
+		TileFill(mirrorv, tile, rz);
+		TileFill(mirror, tile, rz);
 	}
 }
 
@@ -651,60 +610,51 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 */
 static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 {
-	int mx;
-	int my;
-	int i;
-	int rx;
-	int ry;
-	int tile;
-	int z;
-	int tw;
-	int th;
-	CUnitType *type;
-	CUnit *unit;
+	const Vec2i mpos = {Map.Info.MapWidth, Map.Info.MapHeight};
+	CUnitType *type = UnitTypeByIdent(unit_type);
+	const Vec2i tpos = {type->TileWidth, type->TileHeight};
 
-	mx = Map.Info.MapWidth;
-	my = Map.Info.MapHeight;
-	type = UnitTypeByIdent(unit_type);
-	tw = type->TileWidth;
-	th = type->TileHeight;
-
-	for (i = 0; i < count; ++i) {
-		rx = rand() % (mx / 2 - tw + 1);
-		ry = rand() % (my / 2 - th + 1);
-		tile = GRASS_TILE;
-		z = type->TileHeight;
+	for (int i = 0; i < count; ++i) {
+		const Vec2i rpos = {rand() % (mpos.x / 2 - tpos.x + 1), rand() % (mpos.y / 2 - tpos.y + 1)};
+		const Vec2i mirror = {mpos.x - rpos.x - 1, mpos.y - rpos.y - 1};
+		const Vec2i mirrorh = {rpos.x, mirror.y};
+		const Vec2i mirrorv = {mirror.x, rpos.y};
+		const Vec2i tmirror = {mpos.x - rpos.x - tpos.x, mpos.y - rpos.y - tpos.y};
+		const Vec2i tmirrorh = {rpos.x, tmirror.y};
+		const Vec2i tmirrorv = {tmirror.x, rpos.y};
+		int tile = GRASS_TILE;
+		const int z = type->TileHeight;
 
 		// FIXME: vladi: the idea is simple: make proper land for unit(s) :)
 		// FIXME: handle units larger than 1 square
-		TileFill(rx, ry, tile, z * 2);
-		TileFill(mx - rx - 1, ry, tile, z * 2);
-		TileFill(rx, my - ry - 1, tile, z * 2);
-		TileFill(mx - rx - 1, mx - ry - 1, tile, z * 2);
+		TileFill(rpos, tile, z * 2);
+		TileFill(mirrorh, tile, z * 2);
+		TileFill(mirrorv, tile, z * 2);
+		TileFill(mirror, tile, z * 2);
 
 		// FIXME: can overlap units
-		unit = MakeUnitAndPlace(rx, ry , type, &Players[PlayerNumNeutral]);
+		CUnit *unit = MakeUnitAndPlace(rpos.x, rpos.y, type, &Players[PlayerNumNeutral]);
 		if (unit != NoUnitP) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
 			unit->ResourcesHeld = value;
 		}
 
-		unit = MakeUnitAndPlace(mx - rx - tw, ry, type, &Players[PlayerNumNeutral]);
+		unit = MakeUnitAndPlace(tmirrorh.x, tmirror.y, type, &Players[PlayerNumNeutral]);
 		if (unit != NoUnitP) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
 			unit->ResourcesHeld = value;
 		}
 
-		unit = MakeUnitAndPlace(rx, my - ry - th, type, &Players[PlayerNumNeutral]);
+		unit = MakeUnitAndPlace(tmirrorv.x, tmirrorv.y, type, &Players[PlayerNumNeutral]);
 		if (unit != NoUnitP) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
 			unit->ResourcesHeld = value;
 		}
 
-		unit = MakeUnitAndPlace(mx - rx - tw, mx - ry - th, type, &Players[PlayerNumNeutral]);
+		unit = MakeUnitAndPlace(tmirror.x, tmirror.y, type, &Players[PlayerNumNeutral]);
 		if (unit != NoUnitP) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
@@ -738,7 +688,8 @@ void CEditor::CreateRandomMap() const
 	mz = Map.Info.MapWidth > Map.Info.MapHeight ? Map.Info.MapWidth : Map.Info.MapHeight;
 
 	// make water-base
-	TileFill(0, 0, WATER_TILE, mz * 3);
+	const Vec2i zeros = {0, 0};
+	TileFill(zeros, WATER_TILE, mz * 3);
 	// remove all units
 	EditorDestroyAllUnits();
 

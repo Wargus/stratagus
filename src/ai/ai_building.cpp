@@ -174,7 +174,7 @@ static int AiFindBuildingPlace2(const CUnit &worker, const CUnitType *type,
 	//
 	// Look if we can build at current place.
 	//
-	if (CanBuildUnitType(&worker, type, pos.x, pos.y, 1) &&
+	if (CanBuildUnitType(&worker, type, pos, 1) &&
 		!AiEnemyUnitsInDistance(worker.Player, NULL, pos.x, pos.y, 8)) {
 		if (AiCheckSurrounding(worker, type, pos.x, pos.y, backupok)) {
 			*dpos = pos;
@@ -228,7 +228,7 @@ static int AiFindBuildingPlace2(const CUnit &worker, const CUnitType *type,
 				//
 				// Look if we can build here and no enemies nearby.
 				//
-				if (CanBuildUnitType(&worker, type, pos.x, pos.y, 1) &&
+				if (CanBuildUnitType(&worker, type, pos, 1) &&
 						!AiEnemyUnitsInDistance(worker.Player, NULL, pos.x, pos.y, 8)) {
 					if (AiCheckSurrounding(worker, type, pos.x, pos.y, backupok)) {
 						*dpos = pos;
@@ -350,7 +350,7 @@ static int AiFindHallPlace(const CUnit &worker,
 				//
 				// Look if there is a mine
 				//
-				if ((mine = ResourceOnMap(pos.x, pos.y, resource))) {
+				if ((mine = ResourceOnMap(pos, resource))) {
 					int buildings;
 					int j;
 					int nunits;
@@ -585,7 +585,7 @@ static int AiFindMiningPlace(const CUnit &worker,
 				//
 				// Look if there is a mine area
 				//
-				if ((mine = ResourceOnMap(pos.x, pos.y, resource, false)) &&
+				if ((mine = ResourceOnMap(pos, resource, false)) &&
 						 AiFindBuildingPlace2(worker, type, mine->tilePos.x, mine->tilePos.y, dpos)) {
 							delete[] morg;
 							delete[] points;

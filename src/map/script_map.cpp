@@ -444,14 +444,11 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 **  Set a tile
 **
 **  @param tile   Tile number
-**  @param w      X coordinate
-**  @param h      Y coordinate
+**  @param pos    coordinate
 **  @param value  Value of the tile
 */
-void SetTile(int tile, int x, int y, int value)
+void SetTile(int tile, const Vec2i &pos, int value)
 {
-	const Vec2i pos = {x, y};
-
 	if (!Map.Info.IsPointOnMap(pos)) {
 		fprintf(stderr, "Invalid map coordonate : (%d, %d)\n", pos.x, pos.y);
 		return;

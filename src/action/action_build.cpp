@@ -176,7 +176,7 @@ static CUnit *CheckCanBuild(CUnit &unit)
 	//
 	// Check if the building could be built there.
 	//
-	if ((ontop = CanBuildUnitType(&unit, type, pos.x, pos.y, 1)) == NULL) {
+	if ((ontop = CanBuildUnitType(&unit, type, pos, 1)) == NULL) {
 		/*
 		 *	FIXME: rb - CheckAlreadyBuilding should be somehow
 		 *	ebabled/disable via game lua scripting

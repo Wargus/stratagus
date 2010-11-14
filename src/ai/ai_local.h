@@ -125,8 +125,11 @@ class AiForce {
 	void Update(void);
 public:
 	AiForce() : Completed(false), Defending(false), Attacking(false),
-		Role(0), State(AI_FORCE_STATE_FREE), GoalX(0), GoalY(0),
-		MustTransport(false) {}
+		Role(0), State(AI_FORCE_STATE_FREE),
+		MustTransport(false)
+	{
+		GoalPos.x = GoalPos.y = 0;
+	}
 
 	void Remove(CUnit &unit)
 	{
@@ -150,7 +153,7 @@ public:
 			State = AI_FORCE_STATE_WAITING;
 		}
 		Units.clear();
-		GoalX = GoalY = 0;
+		GoalPos.x = GoalPos.y = 0;
 		MustTransport = false;
 	}
 	inline size_t Size(void)
@@ -177,11 +180,10 @@ public:
 	// If attacking
 	//
 	int State;/// Attack state
-	int GoalX;         /// Attack point X tile map position
-	int GoalY;         /// Attack point Y tile map position
+	Vec2i GoalPos; /// Attack point tile map position
 	bool MustTransport;/// Flag must use transporter
 
-	void Attack(int goalX, int goalY);
+	void Attack(const Vec2i &pos);
 	void Clean(void);
 	int PlanAttack(void);
 };

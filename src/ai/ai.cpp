@@ -344,7 +344,7 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 				aiunit.Type->Ident.c_str());
 		}
 		file->printf("},\n    \"state\", %d, \"goalx\", %d, \"goaly\", %d, \"must-transport\", %d,",
-			ai->Force[i].State, ai->Force[i].GoalX, ai->Force[i].GoalY, ai->Force[i].MustTransport);
+			ai->Force[i].State, ai->Force[i].GoalPos.x, ai->Force[i].GoalPos.y, ai->Force[i].MustTransport);
 		file->printf("},\n");
 	}
 
@@ -814,7 +814,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 			(aiForce->Role == AiForceRoleAttack && !aiForce->Attacking &&
 			!aiForce->State))) {  // none attacking
 			aiForce->Defending = true;
-			aiForce->Attack(pos.x, pos.y);
+			aiForce->Attack(pos);
 		}
 	}
 }
@@ -994,7 +994,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 			const Vec2i pos = blocker.tilePos + dirs[i];
 
 			// Out of the map => no !
-			if (!Map.Info.IsPointOnMap(pos.x, pos.y)) {
+			if (!Map.Info.IsPointOnMap(pos)) {
 				continue;
 			}
 			// move to blocker ? => no !

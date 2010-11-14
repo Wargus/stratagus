@@ -521,7 +521,7 @@ int AiForce::PlanAttack(void)
 		return 0;
 	}
 
-	Vec2i pos = {GoalX, GoalY};
+	Vec2i pos = this->GoalPos;
 
 	if (AiFindTarget(*landUnit, watermatrix, &pos, &state)) {
 		if (state != 1) { // Need transporter.
@@ -574,8 +574,7 @@ int AiForce::PlanAttack(void)
 			}
 		}
 		DebugPrint("%d: Can attack\n" _C_ AiPlayer->Player->Index);
-		GoalX = pos.x;
-		GoalY = pos.y;
+		GoalPos = pos;
 		MustTransport = state == 2;
 
 		State = AI_FORCE_STATE_BOARDING;

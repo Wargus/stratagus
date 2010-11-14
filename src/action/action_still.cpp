@@ -76,7 +76,7 @@ static void MapMarkUnitGuard(CUnit &unit)
 	if (unit.IsAgressive() && !unit.GuardLock) {
 		if (!unit.Removed) {
 			unit.GuardLock = 1;
-			MapSight(unit.Player, unit.tilePos.x, unit.tilePos.y,
+			MapSight(unit.Player, unit.tilePos,
 				unit.Type->TileWidth, unit.Type->TileHeight,
 				unit.GetReactRange(),
 				MapMarkTileGuard);
@@ -84,7 +84,7 @@ static void MapMarkUnitGuard(CUnit &unit)
 			CUnit *c = unit.Container;
 			if (c && c->Type->AttackFromTransporter) {
 				unit.GuardLock = 1;
-				MapSight(unit.Player, c->tilePos.x, c->tilePos.y,
+				MapSight(unit.Player, c->tilePos,
 					c->Type->TileWidth, c->Type->TileHeight,
 					unit.GetReactRange(), MapMarkTileGuard);
 			}
@@ -97,14 +97,14 @@ void MapUnmarkUnitGuard(CUnit &unit)
 	if (unit.IsAgressive() && unit.GuardLock) {
 		if (!unit.Removed) {
 			unit.GuardLock = 0;
-			MapSight(unit.Player, unit.tilePos.x, unit.tilePos.y,
+			MapSight(unit.Player, unit.tilePos,
 				unit.Type->TileWidth, unit.Type->TileHeight,
 				unit.GetReactRange(), MapUnmarkTileGuard);
 		} else {
 			CUnit *c = unit.Container;
 			if (c && c->Type->AttackFromTransporter) {
 				unit.GuardLock = 0;
-				MapSight(unit.Player, c->tilePos.x, c->tilePos.y,
+				MapSight(unit.Player, c->tilePos,
 					c->Type->TileWidth, c->Type->TileHeight,
 					unit.GetReactRange(), MapUnmarkTileGuard);
 			}

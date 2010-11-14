@@ -181,8 +181,8 @@ static int ClosestFreeCoast(const Vec2i &startPos, Vec2i *resPos)
 	n = 20;
 	while (n--) {
 		for (i = addy; i--; ++pos.y) {
-			if (Map.Info.IsPointOnMap(pos.x, pos.y) &&
-					Map.CoastOnMap(pos) && !UnitOnMapTile(pos.x, pos.y, -1) &&
+			if (Map.Info.IsPointOnMap(pos) &&
+					Map.CoastOnMap(pos) && !UnitOnMapTile(pos, -1) &&
 					FindUnloadPosition(pos, &nullpos, LandUnitMask)) {
 				*resPos = pos;
 				return 1;
@@ -190,8 +190,8 @@ static int ClosestFreeCoast(const Vec2i &startPos, Vec2i *resPos)
 		}
 		++addx;
 		for (i = addx; i--; ++pos.x) {
-			if (Map.Info.IsPointOnMap(pos.x, pos.y) &&
-					Map.CoastOnMap(pos) && !UnitOnMapTile(pos.x, pos.y, -1) &&
+			if (Map.Info.IsPointOnMap(pos) &&
+					Map.CoastOnMap(pos) && !UnitOnMapTile(pos, -1) &&
 					FindUnloadPosition(pos, &nullpos, LandUnitMask)) {
 				*resPos = pos;
 				return 1;
@@ -199,8 +199,8 @@ static int ClosestFreeCoast(const Vec2i &startPos, Vec2i *resPos)
 		}
 		++addy;
 		for (i = addy; i--; --pos.y) {
-			if (Map.Info.IsPointOnMap(pos.x, pos.y) &&
-					Map.CoastOnMap(pos) && !UnitOnMapTile(pos.x, pos.y, -1) &&
+			if (Map.Info.IsPointOnMap(pos) &&
+					Map.CoastOnMap(pos) && !UnitOnMapTile(pos, -1) &&
 					FindUnloadPosition(pos, &nullpos, LandUnitMask)) {
 				*resPos = pos;
 				return 1;
@@ -208,8 +208,8 @@ static int ClosestFreeCoast(const Vec2i &startPos, Vec2i *resPos)
 		}
 		++addx;
 		for (i = addx; i--; --pos.x) {
-			if (Map.Info.IsPointOnMap(pos.x, pos.y) &&
-					Map.CoastOnMap(pos) && !UnitOnMapTile(pos.x, pos.y, -1) &&
+			if (Map.Info.IsPointOnMap(pos) &&
+					Map.CoastOnMap(pos) && !UnitOnMapTile(pos, -1) &&
 					FindUnloadPosition(pos, &nullpos, LandUnitMask)) {
 				*resPos = pos;
 				return 1;

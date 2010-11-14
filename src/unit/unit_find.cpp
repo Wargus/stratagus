@@ -144,15 +144,14 @@ CUnit *UnitOnMapTile(const unsigned int index, unsigned int type)
 /**
 **  Unit on map tile.
 **
-**  @param tx    X position on map, tile-based.
-**  @param ty    Y position on map, tile-based.
+**  @param pos   position on map, tile-based.
 **  @param type  UnitTypeType, (unsigned)-1 for any type.
 **
 **  @return      Returns first found unit on tile.
 */
-CUnit *UnitOnMapTile(int tx, int ty, unsigned int type)
+CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type)
 {
-	return UnitOnMapTile(Map.getIndex(tx, ty), type);
+	return UnitOnMapTile(Map.getIndex(pos), type);
 }
 
 
@@ -206,30 +205,28 @@ CUnit *TargetOnMap(const CUnit &source, int x1, int y1, int x2, int y2)
 /**
 **  Resource on map tile
 **
-**  @param tx        X position on map, tile-based.
-**  @param ty        Y position on map, tile-based.
+**  @param pos       position on map, tile-based.
 **  @param resource  resource type.
-**  @param  mine_on_top  return mine or mining area.
+**  @param mine_on_top  return mine or mining area.
 **
 **  @return          Returns the deposit if found, or NoUnitP.
 */
-CUnit *ResourceOnMap(int tx, int ty, int resource, bool mine_on_top)
+CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top)
 {
-	return CResourceFinder(resource, mine_on_top).Find(Map.Field(tx,ty));
+	return CResourceFinder(resource, mine_on_top).Find(Map.Field(pos));
 }
 
 /**
 **  Resource deposit on map tile
 **
-**  @param tx        X position on map, tile-based.
-**  @param ty        Y position on map, tile-based.
+**  @param pos       position on map, tile-based.
 **  @param resource  resource type.
 **
 **  @return          Returns the deposit if found, or NoUnitP.
 */
-CUnit *ResourceDepositOnMap(int tx, int ty, int resource)
+CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource)
 {
-	return CResourceDepositFinder(resource).Find(Map.Field(tx,ty));
+	return CResourceDepositFinder(resource).Find(Map.Field(pos));
 }
 
 /*----------------------------------------------------------------------------

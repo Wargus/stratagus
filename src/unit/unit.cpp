@@ -477,28 +477,27 @@ CUnit *MakeUnit(CUnitType *type, CPlayer *player)
 **  (and units inside for transporter (recursively))
 **
 **  @param unit    Unit to (un)mark.
-**  @param x       X coord of first container of unit.
-**  @param y       Y coord of first container of unit.
+**  @param pos     coord of first container of unit.
 **  @param width   Width of the first container of unit.
 **  @param height  Height of the first container of unit.
 **  @param f       Function to (un)mark for normal vision.
 **  @param f2        Function to (un)mark for cloaking vision.
 */
-static void MapMarkUnitSightRec(const CUnit &unit, int x, int y, int width, int height,
+static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, int height,
 	MapMarkerFunc *f, MapMarkerFunc *f2)
 {
 	Assert(f);
-	MapSight(unit.Player, x, y, width, height,
+	MapSight(unit.Player, pos, width, height,
 		unit.Container ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f);
 
 	if (unit.Type && unit.Type->DetectCloak && f2) {
-		MapSight(unit.Player, x, y, width, height,
+		MapSight(unit.Player, pos, width, height,
 			unit.Container ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f2);
 	}
 
 	CUnit *unit_inside = unit.UnitInside;
 	for (int i = unit.InsideCount; i--; unit_inside = unit_inside->NextContained) {
-		MapMarkUnitSightRec(*unit_inside, x, y, width, height, f, f2);
+		MapMarkUnitSightRec(*unit_inside, pos, width, height, f, f2);
 	}
 }
 
@@ -533,18 +532,17 @@ void MapMarkUnitSight(CUnit &unit)
 	container = GetFirstContainer(unit);
 	Assert(container->Type);
 
-	MapMarkUnitSightRec(unit,
-		container->tilePos.x, container->tilePos.y, container->Type->TileWidth, container->Type->TileHeight,
+	MapMarkUnitSightRec(unit, container->tilePos, container->Type->TileWidth, container->Type->TileHeight,
 		MapMarkTileSight, MapMarkTileDetectCloak);
 
 	// Never mark radar, except if the top unit, and unit is usable
 	if (&unit == container && !unit.IsUnusable()) {
 		if (unit.Stats->Variables[RADAR_INDEX].Value) {
-			MapMarkRadar(unit.Player, unit.tilePos.x, unit.tilePos.y, unit.Type->TileWidth,
+			MapMarkRadar(unit.Player, unit.tilePos, unit.Type->TileWidth,
 				unit.Type->TileHeight, unit.Stats->Variables[RADAR_INDEX].Value);
 		}
 		if (unit.Stats->Variables[RADARJAMMER_INDEX].Value) {
-			MapMarkRadarJammer(unit.Player, unit.tilePos.x, unit.tilePos.y, unit.Type->TileWidth,
+			MapMarkRadarJammer(unit.Player, unit.tilePos, unit.Type->TileWidth,
 				unit.Type->TileHeight, unit.Stats->Variables[RADARJAMMER_INDEX].Value);
 		}
 	}
@@ -566,17 +564,17 @@ void MapUnmarkUnitSight(CUnit &unit)
 	container = GetFirstContainer(unit);
 	Assert(container->Type);
 	MapMarkUnitSightRec(unit,
-		container->tilePos.x, container->tilePos.y, container->Type->TileWidth, container->Type->TileHeight,
+		container->tilePos, container->Type->TileWidth, container->Type->TileHeight,
 		MapUnmarkTileSight, MapUnmarkTileDetectCloak);
 
 	// Never mark radar, except if the top unit?
 	if (&unit == container && !unit.IsUnusable()) {
 		if (unit.Stats->Variables[RADAR_INDEX].Value) {
-			MapUnmarkRadar(unit.Player, unit.tilePos.x, unit.tilePos.y, unit.Type->TileWidth,
+			MapUnmarkRadar(unit.Player, unit.tilePos, unit.Type->TileWidth,
 				unit.Type->TileHeight, unit.Stats->Variables[RADAR_INDEX].Value);
 		}
 		if (unit.Stats->Variables[RADARJAMMER_INDEX].Value) {
-			MapUnmarkRadarJammer(unit.Player, unit.tilePos.x, unit.tilePos.y, unit.Type->TileWidth,
+			MapUnmarkRadarJammer(unit.Player, unit.tilePos, unit.Type->TileWidth,
 				unit.Type->TileHeight, unit.Stats->Variables[RADARJAMMER_INDEX].Value);
 		}
 	}
@@ -2551,7 +2549,7 @@ CUnit *UnitFindMiningArea(const CUnit &unit, int x, int y,  int range, int resou
 				//
 				// Look if there is a mine area
 				//
-				if ((mine = ResourceOnMap(pos.x, pos.y, resource, false))) {
+				if ((mine = ResourceOnMap(pos, resource, false))) {
 					if (destu) {
 						n = std::max<int>(MyAbs(dest.x - pos.x), MyAbs(dest.y - pos.y));
 						if (n < bestd) {
