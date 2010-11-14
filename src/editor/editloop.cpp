@@ -536,17 +536,14 @@ static int CalculateVisibleIcons(bool tiles = false)
 **  Calculate the max height and the max width of icons,
 **  and assign them to IconHeight and IconWidth
 */
-static void CalculateMaxIconSize(void)
+static void CalculateMaxIconSize()
 {
-	const CUnitType *type;
-	const CIcon *icon;
-
 	IconWidth = 0;
 	IconHeight = 0;
-	for (int i = 0; i < (int)Editor.UnitTypes.size(); ++i) {
-		type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
+	for (unsigned int i = 0; i < Editor.UnitTypes.size(); ++i) {
+		const CUnitType *type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
 		Assert(type && type->Icon.Icon);
-		icon = type->Icon.Icon;
+		const CIcon *icon = type->Icon.Icon;
 		if (IconWidth < icon->G->Width) {
 			IconWidth = icon->G->Width;
 		}
@@ -2041,11 +2038,14 @@ void CEditor::Init(void)
 		Map.Visible[0] = new unsigned[Map.Info.MapWidth * Map.Info.MapHeight / 2];
 		memset(Map.Visible[0], 0, Map.Info.MapWidth * Map.Info.MapHeight / 2 * sizeof(unsigned));
 
+		// Hard coded
+		const int defaultTile = 0x50;
+
 		for (i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
 			Map.Fields[i].Tile = Map.Fields[i].SeenTile = 0;
 			Map.Fields[i].Tile = Map.Fields[i].SeenTile =
-				Map.Tileset.Table[0x50];
-			Map.Fields[i].Flags = Map.Tileset.FlagsTable[0x50];
+				Map.Tileset.Table[defaultTile];
+			Map.Fields[i].Flags = Map.Tileset.FlagsTable[defaultTile];
 		}
 		GameSettings.Resources = SettingsPresetMapDefault;
 		CreateGame("", &Map);

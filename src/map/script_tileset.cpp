@@ -56,10 +56,7 @@
 */
 static void ExtendTilesetTables(CTileset *tileset, unsigned int oldtiles, unsigned int newtiles)
 {
-	unsigned short *newtable;
-	TileInfo *newtileinfo;
-
-	newtable = new unsigned short[oldtiles + newtiles];
+	unsigned short *newtable = new unsigned short[oldtiles + newtiles];
 	if (!newtable) {
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
@@ -77,7 +74,7 @@ static void ExtendTilesetTables(CTileset *tileset, unsigned int oldtiles, unsign
 	delete[] tileset->FlagsTable;
 	tileset->FlagsTable = newtable;
 
-	newtileinfo = new TileInfo[oldtiles + newtiles];
+	TileInfo *newtileinfo = new TileInfo[oldtiles + newtiles];
 	if (!newtileinfo) {
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
@@ -95,10 +92,9 @@ static void ExtendTilesetTables(CTileset *tileset, unsigned int oldtiles, unsign
 */
 static int TilesetParseName(lua_State *l, CTileset *tileset)
 {
-	const char *ident;
 	unsigned int i;
 
-	ident = LuaToString(l, -1);
+	const char *ident = LuaToString(l, -1);
 	for (i = 0; i < tileset->NumTerrainTypes; ++i) {
 		if (!strcmp(ident, tileset->SolidTerrainTypes[i].TerrainName.c_str())) {
 			return i;
@@ -127,7 +123,6 @@ static int TilesetParseName(lua_State *l, CTileset *tileset)
 */
 static void ParseTilesetTileFlags(lua_State *l, int *back, int *j)
 {
-	const char *value;
 	int flags = 3;
 	//
 	//  Parse the list: flags of the slot
@@ -139,7 +134,7 @@ static void ParseTilesetTileFlags(lua_State *l, int *back, int *j)
 			break;
 		}
 		++(*j);
-		value = LuaToString(l, -1);
+		const char *value = LuaToString(l, -1);
 		lua_pop(l, 1);
 
 		//
@@ -196,22 +191,17 @@ static void ParseTilesetTileFlags(lua_State *l, int *back, int *j)
 */
 static void DefineTilesetParseSpecial(lua_State *l, CTileset *tileset)
 {
-	const char *value;
-	int i;
-	int args;
-	int j;
-
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	args = lua_objlen(l, -1);
+	const int args = lua_objlen(l, -1);
 
 	//
 	//  Parse the list: (still everything could be changed!)
 	//
-	for (j = 0; j < args; ++j) {
+	for (int j = 0; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
+		const char *value = LuaToString(l, -1);
 		lua_pop(l, 1);
 
 		//
@@ -252,7 +242,7 @@ static void DefineTilesetParseSpecial(lua_State *l, CTileset *tileset)
 			if (lua_objlen(l, -1) != 2) {
 				LuaError(l, "growing-tree: Wrong table length");
 			}
-			for (i = 0; i < 2; ++i) {
+			for (int i = 0; i < 2; ++i) {
 				lua_rawgeti(l, -1, i + 1);
 				tileset->GrowingTree[i] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
@@ -300,12 +290,8 @@ static void DefineTilesetParseSpecial(lua_State *l, CTileset *tileset)
 */
 static int DefineTilesetParseSolid(lua_State *l, CTileset *tileset, int index)
 {
-	int i;
 	int f = 0;
-	int len;
-	int basic_name;
 	int j = 0;
-	int pud;
 
 	ExtendTilesetTables(tileset, index, 16);
 
@@ -315,7 +301,7 @@ static int DefineTilesetParseSolid(lua_State *l, CTileset *tileset, int index)
 
 	lua_rawgeti(l, -1, j + 1);
 	++j;
-	basic_name = TilesetParseName(l, tileset);
+	const int basic_name = TilesetParseName(l, tileset);
 	lua_pop(l, 1);
 
 	ParseTilesetTileFlags(l, &f, &j);
@@ -327,9 +313,10 @@ static int DefineTilesetParseSolid(lua_State *l, CTileset *tileset, int index)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	len = lua_objlen(l, -1);
+	const int len = lua_objlen(l, -1);
 
-	for (i = 0,j = 0; i < len; ++i,++j) {
+	j = 0;
+	for (int i = 0; i < len; ++i, ++j) {
 
 		lua_rawgeti(l, -1, i + 1);
 		if (lua_istable(l, -1)) {
@@ -342,7 +329,7 @@ static int DefineTilesetParseSolid(lua_State *l, CTileset *tileset, int index)
 			continue;
 		}
 
-		pud = LuaToNumber(l, -1);
+		const int pud = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 
 		// ugly hack for sc tilesets, remove when fixed
@@ -357,13 +344,11 @@ static int DefineTilesetParseSolid(lua_State *l, CTileset *tileset, int index)
 	}
 	lua_pop(l, 1);
 
-	i = j;
-	while (i < 16) {
+	for (int i = j; i < 16; ++i) {
 		tileset->Table[index + i] = 0;
 		tileset->FlagsTable[index + i] = 0;
 		tileset->Tiles[index + i].BaseTerrain = 0;
 		tileset->Tiles[index + i].MixTerrain = 0;
-		++i;
 	}
 
 	if (j < 16) {
@@ -381,31 +366,22 @@ static int DefineTilesetParseSolid(lua_State *l, CTileset *tileset, int index)
 */
 static int DefineTilesetParseMixed(lua_State *l, CTileset *tileset, int index)
 {
-	int i;
-	int len;
 	int f = 0;
-	int basic_name;
-	int mixed_name;
-	int new_index;
-	int j;
-	int args;
-	int pud;
-
-	new_index = index + 256;
+	const int new_index = index + 256;
 	ExtendTilesetTables(tileset, index, 256);
 
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	j = 0;
-	args = lua_objlen(l, -1);
+	int j = 0;
+	const int args = lua_objlen(l, -1);
 	lua_rawgeti(l, -1, j + 1);
 	++j;
-	basic_name = TilesetParseName(l, tileset);
+	const int basic_name = TilesetParseName(l, tileset);
 	lua_pop(l, 1);
 	lua_rawgeti(l, -1, j + 1);
 	++j;
-	mixed_name = TilesetParseName(l, tileset);
+	const int mixed_name = TilesetParseName(l, tileset);
 	lua_pop(l, 1);
 
 	ParseTilesetTileFlags(l, &f, &j);
@@ -418,10 +394,10 @@ static int DefineTilesetParseMixed(lua_State *l, CTileset *tileset, int index)
 		//
 		//  Vector: the tiles.
 		//
-		len = lua_objlen(l, -1);
-		for (i = 0; i < len; ++i) {
+		const int len = lua_objlen(l, -1);
+		for (int i = 0; i < len; ++i) {
 			lua_rawgeti(l, -1, i + 1);
-			pud = LuaToNumber(l, -1);
+			const int pud = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			tileset->Table[index + i] = pud;
 			tileset->FlagsTable[index + i] = f;
@@ -429,17 +405,15 @@ static int DefineTilesetParseMixed(lua_State *l, CTileset *tileset, int index)
 			tileset->Tiles[index + i].MixTerrain = mixed_name;
 		}
 		// Fill missing slots
-		while (i < 16) {
+		for (int i = len; i < 16; ++i) {
 			tileset->Table[index + i] = 0;
 			tileset->FlagsTable[index + i] = 0;
 			tileset->Tiles[index + i].BaseTerrain = 0;
 			tileset->Tiles[index + i].MixTerrain = 0;
-			++i;
 		}
 		index += 16;
 		lua_pop(l, 1);
 	}
-
 	while (index < new_index) {
 		tileset->Table[index] = 0;
 		tileset->FlagsTable[index] = 0;
@@ -447,7 +421,6 @@ static int DefineTilesetParseMixed(lua_State *l, CTileset *tileset, int index)
 		tileset->Tiles[index].MixTerrain = 0;
 		++index;
 	}
-
 	return new_index;
 }
 
@@ -460,42 +433,20 @@ static int DefineTilesetParseMixed(lua_State *l, CTileset *tileset, int index)
 */
 static void DefineTilesetParseSlot(lua_State *l, CTileset *tileset, int t)
 {
-	const char *value;
-	int index;
-	int args;
-	int j;
+	int index = 0;
 
-	index = 0;
 	tileset->Table = new unsigned short[16];
-	if (!tileset->Table) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
 	tileset->FlagsTable = new unsigned short[16];
-	if (!tileset->FlagsTable) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
 	tileset->Tiles = new TileInfo[16];
-	if (!tileset->Tiles) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
 	tileset->SolidTerrainTypes = new SolidTerrainInfo[1];
-	if (!tileset->SolidTerrainTypes) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
 	tileset->SolidTerrainTypes[0].TerrainName = "unused";
 	tileset->NumTerrainTypes = 1;
 
-	//
 	//  Parse the list: (still everything could be changed!)
-	//
-	args = lua_objlen(l, t);
-	for (j = 0; j < args; ++j) {
+	const int args = lua_objlen(l, t);
+	for (int j = 0; j < args; ++j) {
 		lua_rawgeti(l, t, j + 1);
-		value = LuaToString(l, -1);
+		const char *value = LuaToString(l, -1);
 		lua_pop(l, 1);
 		++j;
 
@@ -534,10 +485,6 @@ static void DefineTilesetParseSlot(lua_State *l, CTileset *tileset, int t)
 */
 static int CclDefineTileset(lua_State *l)
 {
-	const char *value;
-	int args;
-	int j;
-
 	Map.Tileset.Clear();
 
 	Map.Tileset.TileSizeX = 32;
@@ -546,9 +493,9 @@ static int CclDefineTileset(lua_State *l)
 	//
 	//  Parse the list: (still everything could be changed!)
 	//
-	args = lua_gettop(l);
-	for (j = 1; j < args; ++j) {
-		value = LuaToString(l, j);
+	const int args = lua_gettop(l);
+	for (int j = 1; j < args; ++j) {
+		const char *value = LuaToString(l, j);
 		++j;
 
 		if (!strcmp(value, "name")) {
