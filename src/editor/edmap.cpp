@@ -451,13 +451,7 @@ static void EditorChangeTile(const Vec2i &pos, int tile, int d)
 */
 static void EditorTileChanged2(const Vec2i &pos, int d)
 {
-	unsigned quad;
-	unsigned q2;
-	unsigned u;
-	int tile;
-	CMapField *mf;
-
-	quad = QuadFromTile(pos);
+	unsigned quad = QuadFromTile(pos);
 
 	//
 	// Change the surrounding
@@ -466,7 +460,7 @@ static void EditorTileChanged2(const Vec2i &pos, int d)
 	//
 	// Special case 1) Walls.
 	//
-	mf = Map.Field(pos);
+	CMapField *mf = Map.Field(pos);
 	if (mf->Flags & MapFieldWall) {
 		Map.SetWall(pos, mf->Flags & MapFieldHuman);
 		return;
@@ -480,13 +474,13 @@ static void EditorTileChanged2(const Vec2i &pos, int d)
 	//
 	if (d & DIR_UP && pos.y) {
 		const Vec2i offset = {0, -1};
-	//
+		//
 		// Insert into the bottom the new tile.
 		//
-		q2 = QuadFromTile(pos + offset);
-		u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
+		unsigned q2 = QuadFromTile(pos + offset);
+		unsigned u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
 		if (u != q2) {
-			tile = TileFromQuad(u & BH_QUAD_M, u);
+			int tile = TileFromQuad(u & BH_QUAD_M, u);
 			EditorChangeTile(pos + offset, tile, d & ~DIR_DOWN);
 		}
 	}
@@ -495,10 +489,10 @@ static void EditorTileChanged2(const Vec2i &pos, int d)
 		//
 		// Insert into the top the new tile.
 		//
-		q2 = QuadFromTile(pos + offset);
-		u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
+		unsigned q2 = QuadFromTile(pos + offset);
+		unsigned u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
 		if (u != q2) {
-			tile = TileFromQuad(u & TH_QUAD_M, u);
+			int tile = TileFromQuad(u & TH_QUAD_M, u);
 			EditorChangeTile(pos + offset, tile, d & ~DIR_UP);
 		}
 	}
@@ -507,10 +501,10 @@ static void EditorTileChanged2(const Vec2i &pos, int d)
 		//
 		// Insert into the left the new tile.
 		//
-		q2 = QuadFromTile(pos + offset);
-		u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
+		unsigned q2 = QuadFromTile(pos + offset);
+		unsigned u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
 		if (u != q2) {
-			tile = TileFromQuad(u & RH_QUAD_M, u);
+			int tile = TileFromQuad(u & RH_QUAD_M, u);
 			EditorChangeTile(pos + offset, tile, d & ~DIR_RIGHT);
 		}
 	}
@@ -519,10 +513,10 @@ static void EditorTileChanged2(const Vec2i &pos, int d)
 		//
 		// Insert into the right the new tile.
 		//
-		q2 = QuadFromTile(pos + offset);
-		u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
+		unsigned q2 = QuadFromTile(pos + offset);
+		unsigned u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
 		if (u != q2) {
-			tile = TileFromQuad(u & LH_QUAD_M, u);
+			int tile = TileFromQuad(u & LH_QUAD_M, u);
 			EditorChangeTile(pos + offset, tile, d & ~DIR_LEFT);
 		}
 	}
