@@ -1295,11 +1295,11 @@ extern void DropOutAll(const CUnit &unit);
 	/// Return the rule used to build this building.
 extern CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent);
 	/// @todo more docu
-extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y);
+extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, const Vec2i &pos);
 	/// @todo more docu
 extern bool CanBuildOn(const Vec2i &pos, int mask);
 	/// FIXME: more docu
-extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, int real);
+extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, const Vec2i &pos, int real);
 
 	/// Find resource
 extern CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range,
@@ -1386,14 +1386,14 @@ extern int FindUnitsByType(const CUnitType *type, CUnit **table);
 	/// Find all units of this type of the player
 extern int FindPlayerUnitsByType(const CPlayer *, const CUnitType *, CUnit **);
 	/// Return any unit on that map tile
-extern CUnit *UnitOnMapTile(int tx, int ty, unsigned int type);// = -1);
+extern CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type);// = -1);
 	/// Return possible attack target on that map area
 extern CUnit *TargetOnMap(const CUnit &unit, int x1, int y1, int x2, int y2);
 
 	/// Return resource, if on map tile
-extern CUnit *ResourceOnMap(int tx, int ty, int resource, bool mine_on_top = true);
+extern CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top = true);
 	/// Return resource deposit, if on map tile
-extern CUnit *ResourceDepositOnMap(int tx, int ty, int resource);
+extern CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource);
 
 	/// Find best enemy in numeric range to attack
 extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range);

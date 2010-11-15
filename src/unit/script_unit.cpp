@@ -296,22 +296,20 @@ void CclParseOrder(lua_State *l, COrderPtr order)
 			pos = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 
-			int mx = pos >> 16;
-			int my = pos & 0xFFFF;
+			const Vec2i mpos = {pos >> 16, pos & 0xFFFF};
 			CUnit *mine = NULL;
 			pos = 0;
 			do {
 				pos++;
-				mine = ResourceOnMap(mx, my, pos, true);
-			} while(!mine && pos < MaxCosts);
-			if(mine) {
+				mine = ResourceOnMap(mpos, pos, true);
+			} while (!mine && pos < MaxCosts);
+			if (mine) {
 				mine->RefsIncrease();
 				order->Arg1.Resource.Mine = mine;
 				order->CurrentResource = pos;
 			} else {
 				order->CurrentResource = WoodCost;
-				order->Arg1.Resource.Pos.x = mx;
-				order->Arg1.Resource.Pos.y = my;
+				order->Arg1.Resource.Pos = mpos;
 			}
 		} else {
 		   // This leaves a half initialized unit
@@ -678,19 +676,18 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "refs")) {
 			unit->Refs = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "host-info")) {
-			int x;
-			int y;
 			int w;
 			int h;
 
 			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 4) {
 				LuaError(l, "incorrect argument");
 			}
+			Vec2i pos;
 			lua_rawgeti(l, j + 1, 1);
-			x = LuaToNumber(l, -1);
+			pos.x = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, j + 1, 2);
-			y = LuaToNumber(l, -1);
+			pos.y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, j + 1, 3);
 			w = LuaToNumber(l, -1);
@@ -698,10 +695,10 @@ static int CclUnit(lua_State *l)
 			lua_rawgeti(l, j + 1, 4);
 			h = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-			MapSight(player, x, y, w, h, unit->CurrentSightRange, MapMarkTileSight);
+			MapSight(player, pos, w, h, unit->CurrentSightRange, MapMarkTileSight);
 			// Detectcloak works in container
 			if (unit->Type->DetectCloak) {
-				MapSight(player, x, y, w, h, unit->CurrentSightRange, MapMarkTileDetectCloak);
+				MapSight(player, pos, w, h, unit->CurrentSightRange, MapMarkTileDetectCloak);
 			}
 			// Radar(Jammer) not.
 
@@ -1022,7 +1019,7 @@ static int CclCreateUnit(lua_State *l)
 		return 0;
 	} else {
 		if (UnitCanBeAt(*unit, ipos) ||
-				(unit->Type->Building && CanBuildUnitType(NULL, unit->Type, ipos.x, ipos.y, 0))) {
+				(unit->Type->Building && CanBuildUnitType(NULL, unit->Type, ipos, 0))) {
 			unit->Place(ipos.x, ipos.y);
 		} else {
 			unit->tilePos = ipos;

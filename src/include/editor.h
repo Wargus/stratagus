@@ -43,6 +43,7 @@
 ----------------------------------------------------------------------------*/
 
 class CUnitType;
+class Vec2i;
 
 enum EditorRunningType {
 	EditorNotRunning = 0,    /// Not Running
@@ -123,25 +124,25 @@ extern const char *EditorStartFile;  /// Editor CCL start file
 extern void StartEditor(const char *filename);
 
 	/// Editor main event loop
-extern void EditorMainLoop(void);
+extern void EditorMainLoop();
 	/// Update editor display
-extern void EditorUpdateDisplay(void);
+extern void EditorUpdateDisplay();
 
 	/// Save a map from editor
 extern int EditorSaveMap(const std::string &file);
 
 	/// Register ccl features
-extern void EditorCclRegister(void);
+extern void EditorCclRegister();
 
 	/// Edit tile
-extern void EditTile(int x, int y, int tile);
+extern void EditTile(const Vec2i &pos, int tile);
 	/// Edit tiles
-extern void EditTiles(int x, int y, int tile, int size);
+extern void EditTiles(const Vec2i &pos, int tile, int size);
 
 	/// Change the view of a tile
-extern void ChangeTile(int x, int y, int tile);
+extern void ChangeTile(const Vec2i &pos, int tile);
 	/// Update surroundings for tile changes
-extern void EditorTileChanged(int x, int y);
+extern void EditorTileChanged(const Vec2i &pos);
 
 
 //@}

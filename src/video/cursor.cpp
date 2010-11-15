@@ -242,12 +242,12 @@ static void DrawBuildingCursor(void)
 	if (NumSelected) {
 		f = 1;
 		for (i = 0; f && i < NumSelected; ++i) {
-			f = ((ontop = CanBuildHere(Selected[i], CursorBuilding, mpos.x, mpos.y)) != NULL);
+			f = ((ontop = CanBuildHere(Selected[i], CursorBuilding, mpos)) != NULL);
 			// Assign ontop or NULL
 			ontop = (ontop == Selected[i] ? NULL : ontop);
 		}
 	} else {
-		f = ((ontop = CanBuildHere(NoUnitP, CursorBuilding, mpos.x, mpos.y)) != NULL);
+		f = ((ontop = CanBuildHere(NoUnitP, CursorBuilding, mpos)) != NULL);
 		if (!Editor.Running || (Editor.Running && ontop == (CUnit *)1)) {
 			ontop = NULL;
 		}

@@ -184,7 +184,7 @@ void ShowTitleScreens()
 			}
 		}
 
-		if (PlayMovie(TitleScreens[i]->File)) {
+		if (!TitleScreens[i]->File.empty() && PlayMovie(TitleScreens[i]->File)) {
 			ShowTitleImage(TitleScreens[i]);
 		}
 

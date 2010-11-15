@@ -896,7 +896,7 @@ void UIHandleMouseMove(int x, int y)
 		const Vec2i tilePos = {UI.Minimap.Screen2MapX(x), UI.Minimap.Screen2MapY(y)};
 
 		if (Map.IsFieldExplored(ThisPlayer, tilePos) || ReplayRevealMap) {
-			UnitUnderCursor = UnitOnMapTile(tilePos.x, tilePos.y, -1);
+			UnitUnderCursor = UnitOnMapTile(tilePos, -1);
 		}
 	}
 
@@ -1578,7 +1578,7 @@ void UIHandleButtonDown(unsigned button)
 					}
 				}
 				// 0 Test build, don't really build
-				if (CanBuildUnitType(Selected[0], CursorBuilding, tilePos.x, tilePos.y, 0) &&
+				if (CanBuildUnitType(Selected[0], CursorBuilding, tilePos, 0) &&
 						(explored || ReplayRevealMap)) {
 					PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound,
 						MaxSampleVolume);
@@ -1620,7 +1620,7 @@ void UIHandleButtonDown(unsigned button)
 				const Vec2i tilePos = {UI.MouseViewport->Viewport2MapX(CursorX),
 										UI.MouseViewport->Viewport2MapY(CursorY)};
 
-				if (UnitUnderCursor != NULL && (unit = UnitOnMapTile(tilePos.x, tilePos.y,-1)) &&
+				if (UnitUnderCursor != NULL && (unit = UnitOnMapTile(tilePos, -1)) &&
 						!UnitUnderCursor->Type->Decoration) {
 					unit->Blink = 4;                // if right click on building -- blink
 				} else { // if not not click on building -- green cross

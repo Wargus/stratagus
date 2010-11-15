@@ -500,12 +500,11 @@ void InitSoundClient(void)
 		}
 	}
 
-	if (!GameSounds.Click.Sound) {
+	if (!GameSounds.Click.Sound && !GameSounds.Click.Name.empty()) {
 		GameSounds.Click.Sound = SoundForName(GameSounds.Click.Name);
 	}
-	if (!GameSounds.Docking.Sound) {
-		GameSounds.Docking.Sound =
-			SoundForName(GameSounds.Docking.Name);
+	if (!GameSounds.Docking.Sound && !GameSounds.Docking.Name.empty()) {
+		GameSounds.Docking.Sound = SoundForName(GameSounds.Docking.Name);
 	}
 
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {

@@ -238,27 +238,26 @@ bool CBuildRestrictionOnTop::Check(const CUnitType *, int x, int y, CUnit *&onto
 
 /**
 **  Can build unit here.
-**  Hall to near to goldmine.
-**  Refinery or shipyard to near to oil patch.
+**  Hall too near to goldmine.
+**  Refinery or shipyard too near to oil patch.
 **
 **  @param unit  Unit doing the building
 **  @param type  unit-type to be checked.
-**  @param x     Map X position.
-**  @param y     Map Y position.
+**  @param pos   Map position.
 **
 **  @return      OnTop, parent unit, builder on true or 1 if unit==NULL, NULL false.
 */
-CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
+CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, const Vec2i &pos)
 {
 	CUnit *ontoptarget;
 
 	//
 	//  Can't build outside the map
 	//
-	if (x + type->TileWidth > Map.Info.MapWidth) {
+	if (pos.x + type->TileWidth > Map.Info.MapWidth) {
 		return NULL;
 	}
-	if (y + type->TileHeight > Map.Info.MapHeight) {
+	if (pos.y + type->TileHeight > Map.Info.MapHeight) {
 		return NULL;
 	}
 
@@ -270,12 +269,12 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 		CMapField *mf;
 
 		// Need at least one coast tile
-		unsigned int index = Map.getIndex(x, y);
+		unsigned int index = Map.getIndex(pos);
 		do {
 			mf = Map.Field(index);
 			w = width;
 			do {
-				//if (Map.CoastOnMap(x ,y)) {
+				//if (Map.CoastOnMap(pos)) {
 				if((mf->Flags & MapFieldCoastAllowed) == MapFieldCoastAllowed) {
 					success = true;
 				}
@@ -294,7 +293,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 		for(unsigned int i = 0; i < count; ++i) {
 			CBuildRestriction *rule = type->BuildingRules[i];
 			// All checks processed, did we really have success
-			if (rule->Check(type, x, y, ontoptarget)) {
+			if (rule->Check(type, pos.x, pos.y, ontoptarget)) {
 				// We passed a full ruleset return
 				if (unit == NULL) {
 					return ontoptarget ? ontoptarget : (CUnit *)1;
@@ -329,15 +328,13 @@ MapFogFilterFlags(CPlayer *player, const unsigned int index, int mask);
 **
 **  @param unit  Worker that want to build the building or NULL.
 **  @param type  Building unit-type.
-**  @param x     X tile map position.
-**  @param y     Y tile map position.
+**  @param pos   tile map position.
 **  @param real  Really build, or just placement
 **
 **  @return      OnTop, parent unit, builder on true, NULL false.
 **
 */
-CUnit *CanBuildUnitType(const CUnit *unit,
-	 const CUnitType *type, int x, int y, int real)
+CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, const Vec2i &pos, int real)
 {
 	int w;
 	int h;
@@ -347,7 +344,7 @@ CUnit *CanBuildUnitType(const CUnit *unit,
 	CUnit *ontop;
 
 	// Terrain Flags don't matter if building on top of a unit.
-	ontop = CanBuildHere(unit, type, x, y);
+	ontop = CanBuildHere(unit, type, pos);
 	if (ontop == NULL) {
 		return NULL;
 	}
@@ -369,11 +366,11 @@ CUnit *CanBuildUnitType(const CUnit *unit,
 		player = unit->Player;
 	}
 
-	unsigned int index = y * Map.Info.MapWidth;
+	unsigned int index = pos.y * Map.Info.MapWidth;
 	for (h = 0; h < type->TileHeight; ++h) {
 		for (w = type->TileWidth; w--;) {
 			/* first part of if (!CanBuildOn(x + w, y + h, testmask)) */
-			if(!Map.Info.IsPointOnMap(x + w, y + h)) {
+			if(!Map.Info.IsPointOnMap(pos.x + w, pos.y + h)) {
 				h = type->TileHeight;
 				ontop = NULL;
 				break;
@@ -381,18 +378,18 @@ CUnit *CanBuildUnitType(const CUnit *unit,
 			if (player && !real) {
 				//testmask = MapFogFilterFlags(player, x + w, y + h, type->MovementMask);
 				testmask = MapFogFilterFlags(player,
-						index + x + w, type->MovementMask);
+						index + pos.x + w, type->MovementMask);
 			} else {
 				testmask = type->MovementMask;
 			}
 			/*secound part of if (!CanBuildOn(x + w, y + h, testmask)) */
-			if(Map.CheckMask(index + x + w,testmask))
+			if(Map.CheckMask(index + pos.x + w,testmask))
 			{
 				h = type->TileHeight;
 				ontop = NULL;
 				break;
 			}
-			if (player && !Map.IsFieldExplored(player, index + x + w)) {
+			if (player && !Map.IsFieldExplored(player, index + pos.x + w)) {
 				h = type->TileHeight;
 				ontop = NULL;
 				break;

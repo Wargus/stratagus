@@ -345,27 +345,26 @@ void AiForce::Clean(void) {
 
 }
 
-void AiForce::Attack(int goalX, int goalY)
+void AiForce::Attack(const Vec2i &pos)
 {
+	Vec2i goalPos(pos);
 	Clean();
 
 	Attacking = false;
 	if (Units.size() > 0) {
 		Attacking = true;
 
-		if(goalX == -1 || goalY == -1) {
+		if (goalPos.x == -1 || goalPos.y == -1) {
 			/* Search in entire map */
 			const CUnit *enemy = AiForceEnemyFinder<false>(this).enemy;
 			if (enemy) {
-				goalX = enemy->tilePos.x;
-				goalY = enemy->tilePos.x;
+				goalPos = enemy->tilePos;
 			}
 		}
 
-		GoalX = goalX;
-		GoalY = goalY;
+		this->GoalPos = goalPos;
 
-		if(goalX == -1 || goalY == -1) {
+		if (goalPos.x == -1 || goalPos.y == -1) {
 			DebugPrint("%d: Need to plan an attack with transporter\n" _C_ AiPlayer->Player->Index);
 			if (State == AI_FORCE_STATE_WAITING && !PlanAttack()) {
 				DebugPrint("%d: Can't transport\n" _C_ AiPlayer->Player->Index);
@@ -377,7 +376,7 @@ void AiForce::Attack(int goalX, int goalY)
 		//
 		//  Send all units in the force to enemy.
 		//
-		AiForceAttackSender(this, goalX, goalY);
+		AiForceAttackSender(this, goalPos.x, goalPos.y);
 	}
 
 }
@@ -525,7 +524,7 @@ void AiAssignFreeUnitsToForce()
 /**
 **
 */
-static void AiAttack(unsigned int &force, int goalX, int goalY)
+static void AiAttack(unsigned int &force, const Vec2i &pos)
 {
 	// Move the force to a free position so it can be used for a new
 	// attacking party
@@ -540,7 +539,7 @@ static void AiAttack(unsigned int &force, int goalX, int goalY)
 		force = f;
 	}
 
-	AiPlayer->Force[force].Attack(goalX, goalY);
+	AiPlayer->Force[force].Attack(pos);
 }
 
 /**
@@ -552,17 +551,19 @@ static void AiAttack(unsigned int &force, int goalX, int goalY)
 */
 void AiAttackWithForceAt(unsigned int force, int x, int y)
 {
+	const Vec2i pos = {x, y};
+
 	if (!(force < AI_MAX_FORCES)) {
 		DebugPrint("Force out of range: %d" _C_ force);
 		return ;
 	}
 
-	if (!Map.Info.IsPointOnMap(x,y)) {
-		DebugPrint("(%d, %d) not in the map(%d, %d)" _C_ x _C_ y
+	if (!Map.Info.IsPointOnMap(pos)) {
+		DebugPrint("(%d, %d) not in the map(%d, %d)" _C_ pos.x _C_ pos.y
 			_C_ Map.Info.MapWidth _C_ Map.Info.MapHeight);
 		return ;
 	}
-	AiAttack(force, x, y);
+	AiAttack(force, pos);
 }
 
 /**
@@ -576,7 +577,8 @@ void AiAttackWithForce(unsigned int force)
 		DebugPrint("Force out of range: %d" _C_ force);
 		return ;
 	}
-	AiAttack(force, -1, -1);
+	const Vec2i invalidPos = {-1, -1};
+	AiAttack(force, invalidPos);
 }
 
 /**
@@ -588,6 +590,7 @@ void AiAttackWithForce(unsigned int force)
 */
 void AiAttackWithForces(int *forces)
 {
+	const Vec2i invalidPos = {-1, -1};
 	bool found = false;
 	unsigned int f = AiPlayer->Force.FindFreeForce();
 
@@ -614,12 +617,12 @@ void AiAttackWithForces(int *forces)
 
 			AiPlayer->Force[force].Reset();
 		} else {
-			AiPlayer->Force[force].Attack(-1,-1);
+			AiPlayer->Force[force].Attack(invalidPos);
 		}
 	}
 
 	if (found) {
-		AiPlayer->Force[f].Attack(-1, -1);
+		AiPlayer->Force[f].Attack(invalidPos);
 	} else {
 		AiPlayer->Force[f].Reset(true);
 	}
@@ -697,11 +700,7 @@ static void AiGroupAttackerForTransport(AiForce *aiForce)
 */
 void AiForce::Update()
 {
-	CUnit *aiunit;
-	int x;
-	int y;
 	const CUnit *unit = NULL;
-	unsigned int i;
 
 	if (Size() == 0) {
 		Attacking = false;
@@ -714,8 +713,8 @@ void AiForce::Update()
 	}
 
 	Attacking = false;
-	for (i = 0; i < Size(); ++i) {
-		aiunit = Units[i];
+	for (unsigned int i = 0; i < Size(); ++i) {
+		CUnit *aiunit = Units[i];
 		if (aiunit->Type->CanAttack) {
 			Attacking = true;
 			break;
@@ -752,8 +751,8 @@ void AiForce::Update()
 	// Find a unit that isn't idle
 	unit = NoUnitP;
 	if (State == AI_FORCE_STATE_ATTACKING) {
-		for (i = 0; i < Size(); ++i) {
-			aiunit = Units[i];
+		for (unsigned int i = 0; i < Size(); ++i) {
+			CUnit *aiunit = Units[i];
 			if (!aiunit->IsIdle()) {
 				// Found an idle unit, use it if we find nothing better
 				if (unit == NoUnitP) {
@@ -771,39 +770,38 @@ void AiForce::Update()
 		// Give idle units a new goal
 		// FIXME: may not be a good goal
 		COrderPtr order = unit->CurrentOrder();
+		Vec2i pos;
 		if (order->HasGoal()) {
-			x = order->GetGoal()->tilePos.x;
-			y = order->GetGoal()->tilePos.y;
+			pos = order->GetGoal()->tilePos;
 		} else if (order->goalPos.x != -1 && order->goalPos.y != -1) {
-			x = order->goalPos.x;
-			y = order->goalPos.y;
+			pos = order->goalPos;
 		} else {
-			x = GoalX;
-			y = GoalY;
+			pos = this->GoalPos;
 		}
-		for (i = 0; i < Size(); ++i) {
-			aiunit = Units[i];
+		for (unsigned int i = 0; i < Size(); ++i) {
+			CUnit *aiunit = Units[i];
 			if (!aiunit->IsIdle()) {
 				continue;
 			}
 			if (aiunit->Type->CanAttack) {
-				CommandAttack(*aiunit, x, y, NULL, FlushCommands);
+				CommandAttack(*aiunit, pos.x, pos.y, NULL, FlushCommands);
 			} else if (aiunit->Type->CanTransport()) {
 				// FIXME : Retrieve unit blocked (transport previously full)
 				CommandMove(*aiunit, aiunit->Player->StartX,
 					 aiunit->Player->StartY, FlushCommands);
 			} else {
-				CommandMove(*aiunit, x, y, FlushCommands);
+				CommandMove(*aiunit, pos.x, pos.y, FlushCommands);
 			}
 		}
 	} else { // Everyone is idle, find a new target
+		Vec2i pos;
 //FIXME: rb - I don't know if AI can use transport now
 #if 0
 		if (State == AI_FORCE_STATE_ATTACKING) {
 			unit = NULL;
 
-			for (i = 0; i < Units.size(); ++i) {
-				aiunit = Units[i];
+			for (unsigned int i = 0; i < Units.size(); ++i) {
+				CUnit *aiunit = Units[i];
 				if (aiunit->Type->CanAttack) {
 					unit = AttackUnitsInDistance(aiunit, MaxMapWidth);
 					break;
@@ -816,21 +814,19 @@ void AiForce::Update()
 				Attacking = false;
 				return;
 			}
-			x = unit->tilePos.x;
-			y = unit->tilePos.y;
+			pos = unit->tilePos;
 		} else {
-			x = GoalX;
-			y = GoalY;
+			pos = this->GoalPos;
 		}
-		for (i = 0; i < Units.size(); ++i) {
-			aiunit = Units[i];
+		for (unsigned int i = 0; i < Units.size(); ++i) {
+			CUnit *aiunit = Units[i];
 
 			if (aiunit->Type->CanTransport() && aiunit->BoardCount > 0) {
-				CommandUnload(aiunit, x, y, NULL, FlushCommands);
+				CommandUnload(aiunit, pos.x, pos.y, NULL, FlushCommands);
 			} else if (aiunit->Type->CanAttack) {
-				CommandAttack(aiunit, x, y, NULL, FlushCommands);
+				CommandAttack(aiunit, pos.x, pos.y, NULL, FlushCommands);
 			} else if (force->State == 2) {
-				CommandMove(aiunit, x, y, FlushCommands);
+				CommandMove(aiunit, pos.x, pos.y, FlushCommands);
 			}
 		}
 		force->State = 3;
@@ -847,13 +843,11 @@ void AiForce::Update()
 				Attacking = false;
 				return;
 			}
-			x = unit->tilePos.x;
-			y = unit->tilePos.y;
+			pos = unit->tilePos;
 		} else {
-			x = GoalX;
-			y = GoalY;
+			pos = this->GoalPos;
 		}
-		AiForceAttackSender(this, x, y);
+		AiForceAttackSender(this, pos.x, pos.y);
 #endif
 	}
 }

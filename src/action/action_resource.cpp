@@ -712,8 +712,7 @@ static int WaitInDepot(CUnit &unit)
 {
 	Vec2i pos;
 	ResourceInfo *resinfo = unit.Type->ResInfo[unit.CurrentResource];
-	const CUnit *depot =
-				ResourceDepositOnMap(unit.tilePos.x, unit.tilePos.y, resinfo->ResourceId);
+	const CUnit *depot = ResourceDepositOnMap(unit.tilePos, resinfo->ResourceId);
 
 	//Assert(depot);
 

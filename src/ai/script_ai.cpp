@@ -1425,11 +1425,11 @@ static int CclDefineAiPlayer(lua_State *l)
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "goalx")) {
 					lua_rawgeti(l, j + 1, k + 1);
-					ai->Force[i].GoalX = LuaToNumber(l, -1);
+					ai->Force[i].GoalPos.x = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "goaly")) {
 					lua_rawgeti(l, j + 1, k + 1);
-					ai->Force[i].GoalY = LuaToNumber(l, -1);
+					ai->Force[i].GoalPos.y = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "must-transport")) {
 					lua_rawgeti(l, j + 1, k + 1);

@@ -564,7 +564,9 @@ int CLabel::DoDrawText(int x, int y,
 
 
 CLabel::CLabel(const CFont *f):
-	 normal(DefaultTextColor),reverse(ReverseTextColor),font(f)
+	normal(DefaultTextColor),
+	reverse(ReverseTextColor),
+	font(f)
 {}
 
 	/// Draw text/number unclipped
@@ -660,13 +662,10 @@ static int FormatNumber(int number, char *buf)
 {
 	const char sep = ',';
 	char bufs[sizeof(int) * 10 + 2];
-	int sl;
-	int s;
-	int d;
+	int s = 0;
+	int d = 0;
+	const int sl = snprintf(bufs, sizeof (bufs), "%d", number);
 
-	sl = s = d = 0;
-	sl = snprintf(bufs, sizeof (bufs), "%d", number);
-	//sl = strlen(bufs);
 	do {
 		if (s > 0 && s < sl && (s - (sl % 3)) % 3 == 0) {
 			buf[d++] = sep;
@@ -688,13 +687,11 @@ static int FormatNumber(int number, char *buf)
 */
 static int strchrlen(const std::string& s, char c, unsigned int maxlen, CFont *font)
 {
-	int res;
-
 	if (s.empty()) {
 		return 0;
 	}
-	res = s.find(c);
-	res = (res == -1) ? s.size() : res -1;
+	int res = s.find(c);
+	res = (res == -1) ? s.size() : res - 1;
 
 	if (!maxlen || (!font && (unsigned int) res < maxlen) || (font && (unsigned int) font->Width(s.substr(0, res)) < maxlen)) {
 		return res;
@@ -756,33 +753,29 @@ std::string GetLineFont(unsigned int line, const std::string &s, unsigned int ma
 */
 void CFont::MeasureWidths()
 {
-	const unsigned char *sp;
-	const unsigned char *lp;
-	const unsigned char *gp;
-	Uint32 ckey;
-	int ipr;  // images per row
+	const int maxy = G->GraphicWidth / G->Width * G->GraphicHeight / G->Height;
 
-	int maxy = G->GraphicWidth / G->Width * G->GraphicHeight / G->Height;
 	delete[] CharWidth;
 	CharWidth = new char[maxy];
 	memset(CharWidth, 0, maxy);
 	CharWidth[0] = G->Width / 2;  // a reasonable value for SPACE
-	ckey = G->Surface->format->colorkey;
-	ipr = G->Surface->w / G->Width;
+	const Uint32 ckey = G->Surface->format->colorkey;
+	const int ipr = G->Surface->w / G->Width; // images per row
 
 	SDL_LockSurface(G->Surface);
 	for (int y = 1; y < maxy; ++y) {
-		sp = (const unsigned char *)G->Surface->pixels +
+		const unsigned char *sp = (const unsigned char *)G->Surface->pixels +
 			(y / ipr) * G->Surface->pitch * G->Height +
 			(y % ipr) * G->Width - 1;
-		gp = sp + G->Surface->pitch * G->Height;
+		const unsigned char *gp = sp + G->Surface->pitch * G->Height;
 		// Bail out if no letters left
 		if (gp >= ((const unsigned char *)G->Surface->pixels +
 				G->Surface->pitch * G->GraphicHeight)) {
 			break;
 		}
 		while (sp < gp) {
-			lp = sp + G->Width;
+			const unsigned char *lp = sp + G->Width;
+
 			for (; sp < lp; --lp) {
 				if (*lp != ckey && *lp != 7) {
 					if (lp - sp > CharWidth[y]) {  // max width
@@ -792,7 +785,6 @@ void CFont::MeasureWidths()
 			}
 			sp += G->Surface->pitch;
 		}
-
 	}
 	SDL_UnlockSurface(G->Surface);
 }
@@ -804,20 +796,17 @@ void CFont::MeasureWidths()
 */
 void MakeFontColorTextures(const CFont *font)
 {
-	SDL_Surface *s;
-	CGraphic *g;
-	CGraphic *newg;
-
 	if (!FontColorGraphics[font].empty()) {
 		// already loaded
 		return;
 	}
 
-	g = font->G;
-	s = g->Surface;
-	for (int i = 0; i < (int)AllFontColors.size(); ++i) {
+	const CGraphic *g = font->G;
+	SDL_Surface *s = g->Surface;
+	for (unsigned int i = 0; i < AllFontColors.size(); ++i) {
 		CFontColor *fc = AllFontColors[i];
-		newg = FontColorGraphics[font][fc] = new CGraphic;
+		CGraphic *newg = FontColorGraphics[font][fc] = new CGraphic;
+
 		newg->Width = g->Width;
 		newg->Height = g->Height;
 		newg->NumFrames = g->NumFrames;
@@ -830,7 +819,6 @@ void MakeFontColorTextures(const CFont *font)
 			s->format->palette->colors[j] = fc->Colors[j];
 		}
 		SDL_UnlockSurface(s);
-
 		MakeTexture(newg);
 	}
 }
@@ -840,10 +828,10 @@ void MakeFontColorTextures(const CFont *font)
 */
 void LoadFonts()
 {
-	CGraphic *g;
+	for (unsigned int i = 0; i < AllFonts.size(); ++i) {
+		CGraphic *g = AllFonts[i]->G;
 
-	for (int i = 0; i < (int)AllFonts.size(); ++i) {
-		if ((g = AllFonts[i]->G)) {
+		if (g) {
 			ShowLoadProgress("Fonts %s", g->File.c_str());
 			g->Load();
 			AllFonts[i]->MeasureWidths();
@@ -866,10 +854,10 @@ void LoadFonts()
 */
 void FreeOpenGLFonts()
 {
-	for (int i = 0; i < (int)AllFonts.size(); ++i) {
+	for (unsigned int i = 0; i < AllFonts.size(); ++i) {
 		CFont *font = AllFonts[i];
 		if (font->G) {
-			for (int j = 0; j < (int)AllFontColors.size(); ++j) {
+			for (unsigned int j = 0; j < AllFontColors.size(); ++j) {
 				CGraphic *g = FontColorGraphics[font][AllFontColors[j]];
 				glDeleteTextures(g->NumTextures, g->Textures);
 			}
@@ -882,10 +870,11 @@ void FreeOpenGLFonts()
 */
 void ReloadFonts()
 {
-	for (int i = 0; i < (int)AllFonts.size(); ++i) {
+	for (unsigned int i = 0; i < AllFonts.size(); ++i) {
 		const CFont *font = AllFonts[i];
+
 		if (font->G) {
-			for (int j = 0; j < (int)AllFontColors.size(); ++j) {
+			for (unsigned int j = 0; j < AllFontColors.size(); ++j) {
 				//CGraphic::Free(FontColorGraphics[font][AllFontColors[j]]);
 				CGraphic *g = FontColorGraphics[font][AllFontColors[j]];
 				delete[] g->Textures;
@@ -933,7 +922,7 @@ CFont *CFont::Get(const std::string &ident)
 {
 	CFont *font = Fonts[ident];
 	if (!font) {
-		DebugPrint("font not found: %s" _C_ ident.c_str());
+		DebugPrint("font not found: %s\n" _C_ ident.c_str());
 	}
 	return font;
 }
@@ -985,7 +974,7 @@ CFontColor *CFontColor::Get(const std::string &ident)
 {
 	CFontColor *fc = FontColors[ident];
 	if (!fc) {
-		DebugPrint("font color not found: %s" _C_ ident.c_str());
+		DebugPrint("font color not found: %s\n" _C_ ident.c_str());
 	}
 	return fc;
 }
@@ -993,11 +982,9 @@ CFontColor *CFontColor::Get(const std::string &ident)
 /**
 **  Clean up the font module.
 */
-void CleanFonts(void)
+void CleanFonts()
 {
-	int i;
-
-	for (i = 0; i < (int)AllFonts.size(); ++i) {
+	for (unsigned int i = 0; i < AllFonts.size(); ++i) {
 		const CFont *font = AllFonts[i];
 
 		if (UseOpenGL) {
@@ -1020,7 +1007,7 @@ void CleanFonts(void)
 	AllFonts.clear();
 	Fonts.clear();
 
-	for (i = 0; i < (int)AllFontColors.size(); ++i) {
+	for (unsigned int i = 0; i < AllFontColors.size(); ++i) {
 		delete AllFontColors[i];
 	}
 	AllFontColors.clear();
