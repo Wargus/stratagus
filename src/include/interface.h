@@ -199,7 +199,7 @@ extern bool GodMode;
 	/// Whether the map is the only thing displayed or not
 extern char BigMapMode;
 	/// Flag telling if the SDL window is visible
-extern bool IsVisible;
+extern bool IsSDLWindowVisible;
 
 	/// pressed mouse buttons (normal,double,dragged,long)
 extern int MouseButtons;
