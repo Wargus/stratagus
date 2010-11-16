@@ -263,7 +263,7 @@ void EditTile(const Vec2i &pos, int tile)
 static void EditTilesInternal(const Vec2i &pos, int tile, int size)
 {
 	Vec2i minPos = pos;
-	Vec2i maxPos = {pos.x + size, pos.y + size};
+	Vec2i maxPos = {pos.x + size - 1, pos.y + size - 1};
 
 	Map.FixSelectionArea(minPos, maxPos);
 
