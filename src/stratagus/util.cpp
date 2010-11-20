@@ -519,7 +519,7 @@ unsigned long WINAPI CThread::threadFun (void *pThread)
 		ptr->Run ();
 	}
 	return 0;
-};
+}
 #else
 void* CThread::threadFun (void *pThread)
 {
