@@ -436,8 +436,8 @@ static void EditorChangeTile(const Vec2i &pos, int tile, int d)
 
 	mf->Flags |= Map.Tileset.FlagsTable[tile];
 
-	UI.Minimap.UpdateSeenXY(pos.x, pos.y);
-	UI.Minimap.UpdateXY(pos.x, pos.y);
+	UI.Minimap.UpdateSeenXY(pos);
+	UI.Minimap.UpdateXY(pos);
 
 	EditorTileChanged2(pos, d);
 }
