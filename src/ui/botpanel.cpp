@@ -1008,16 +1008,15 @@ void CButtonPanel::DoClicked(int button)
 	//  Handle action on button.
 	//
 	switch (CurrentButtons[button].Action) {
-		case ButtonUnload:
+		case ButtonUnload: {
+			const int flush = !(KeyModifiers & ModifierShift);
 			//
 			//  Unload on coast, transporter standing, unload all units right now.
 			//  That or a bunker.
 			//
 			if ((NumSelected == 1 && Selected[0]->CurrentAction() == UnitActionStill &&
 					Map.CoastOnMap(Selected[0]->tilePos)) || !Selected[0]->CanMove()) {
-				SendCommandUnload(*Selected[0],
-					Selected[0]->tilePos.x, Selected[0]->tilePos.y, NoUnitP,
-					!(KeyModifiers & ModifierShift));
+				SendCommandUnload(*Selected[0], Selected[0]->tilePos, NoUnitP, flush);
 				break;
 			}
 			CursorState = CursorStateSelect;
@@ -1028,6 +1027,7 @@ void CButtonPanel::DoClicked(int button)
 			UI.ButtonPanel.Update();
 			UI.StatusLine.Set(_("Select Target"));
 			break;
+		}
 		case ButtonSpellCast:
 		{
 			int spellId = CurrentButtons[button].Value;
@@ -1056,12 +1056,13 @@ void CButtonPanel::DoClicked(int button)
 				}
 				break;
 			}
-			if(SpellTypeTable[spellId]->IsCasterOnly()) {
+			if (SpellTypeTable[spellId]->IsCasterOnly()) {
+				const int flush = !(KeyModifiers & ModifierShift);
+
 				for (i = 0; i < NumSelected; ++i) {
 					CUnit &unit = *Selected[i];
 					// CursorValue here holds the spell type id
-					SendCommandSpellCast(unit, unit.tilePos.x, unit.tilePos.y, &unit, spellId,
-										!(KeyModifiers & ModifierShift));
+					SendCommandSpellCast(unit, unit.tilePos, &unit, spellId, flush);
 				}
 				break;
 			}

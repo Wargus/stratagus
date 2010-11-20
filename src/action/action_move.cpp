@@ -124,7 +124,7 @@ int DoActionMove(CUnit &unit)
 		}
 
 		pos = unit.tilePos + posd;
-		unit.MoveToXY(pos.x, pos.y);
+		unit.MoveToXY(pos);
 
 		// Remove unit from the current selection
 		if (unit.Selected && !Map.IsFieldVisible(ThisPlayer, pos)) {

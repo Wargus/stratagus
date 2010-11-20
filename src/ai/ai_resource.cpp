@@ -297,7 +297,7 @@ static int AiBuildBuilding(const CUnitType *type, CUnitType *building,
 	Vec2i pos;
 	// Find a place to build.
 	if (AiFindBuildingPlace(unit, building, near_x, near_y, &pos)) {
-		CommandBuildBuilding(unit, pos.x, pos.y, building, FlushCommands);
+		CommandBuildBuilding(unit, pos, building, FlushCommands);
 		return 1;
 	} else {
 		//when first worker can't build then rest also won't be able (save CPU)
@@ -306,7 +306,7 @@ static int AiBuildBuilding(const CUnitType *type, CUnitType *building,
 			for (int i = 0; i < num && table[i] != &unit; ++i) {
 				// Find a place to build.
 				if (AiFindBuildingPlace(*table[i], building, near_x, near_y, &pos)) {
-					CommandBuildBuilding(*table[i], pos.x, pos.y, building, FlushCommands);
+					CommandBuildBuilding(*table[i], pos, building, FlushCommands);
 					return 1;
 				}
 			}
@@ -1018,12 +1018,12 @@ static int AiAssignHarvester(CUnit &unit, int resource)
 		// Code for terrain harvesters. Search for piece of terrain to mine.
 		//
 		if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 1000,
-				unit.Player, unit.tilePos.x, unit.tilePos.y, &forestPos)) {
-			CommandResourceLoc(unit, forestPos.x, forestPos.y, FlushCommands);
+				unit.Player, unit.tilePos, &forestPos)) {
+			CommandResourceLoc(unit, forestPos, FlushCommands);
 			return 1;
 		}
 		// Ask the AI to explore...
-		AiExplore(unit.tilePos.x, unit.tilePos.y, MapFieldLandUnit);
+		AiExplore(unit.tilePos, MapFieldLandUnit);
 	} else {
 		int exploremask = 0;
 		//
@@ -1035,7 +1035,7 @@ static int AiAssignHarvester(CUnit &unit, int resource)
 		if (dest) {
 			//FIXME: rb - when workers can speedup building then such assign may be ok.
 			//if(dest->CurrentAction() == UnitActionBuilt)
-				//CommandBuildBuilding(unit, dest->X, dest->Y, dest->Type, FlushCommands);
+				//CommandBuildBuilding(unit, dest->tilePos, dest->Type, FlushCommands);
 			//else
 				CommandResource(unit, *dest, FlushCommands);
 			return 1;
@@ -1103,7 +1103,7 @@ static int AiAssignHarvester(CUnit &unit, int resource)
 			}
 		}
 		// Ask the AI to explore
-		AiExplore(unit.tilePos.x, unit.tilePos.y, exploremask);
+		AiExplore(unit.tilePos, exploremask);
 	}
 
 	// Failed.
@@ -1454,7 +1454,8 @@ static int AiRepairBuilding(const CUnitType *type, CUnit &building)
 		CUnit &unit = *table[i];
 
 		if (UnitReachable(unit, building, unit.Type->RepairRange)) {
-			CommandRepair(unit, 0, 0, &building, FlushCommands);
+			const Vec2i invalidPos = {-1, -1};
+			CommandRepair(unit, invalidPos, &building, FlushCommands);
 			return 1;
 		}
 		k = i;
@@ -1621,19 +1622,14 @@ void AiAddUnitTypeRequest(CUnitType *type, int count)
 /**
 **  Mark that a zone is requiring exploration.
 **
-**  @param x     X pos of the zone
-**  @param y     Y pos of the zone
+**  @param pos   Pos of the zone
 **  @param mask  Mask to explore ( land/sea/air )
 */
-void AiExplore(int x, int y, int mask)
+void AiExplore(const Vec2i &pos, int mask)
 {
-	AiExplorationRequest req;
+	AiExplorationRequest req(pos, mask);
 
 	// Link into the exploration requests list
-	req.X = x;
-	req.Y = y;
-	req.Mask = mask;
-
 	AiPlayer->FirstExplorationRequest.insert(
 		AiPlayer->FirstExplorationRequest.begin(), req);
 }

@@ -151,6 +151,7 @@ int Demolish::Cast(CUnit &caster, const SpellType *, CUnit *, int x, int y)
 */
 int SpawnPortal::Cast(CUnit &caster, const SpellType *, CUnit *, int x, int y)
 {
+	const Vec2i pos = {x, y};
 	// FIXME: vladi: cop should be placed only on explored land
 	CUnit *portal;
 	CUnitType *ptype;
@@ -160,9 +161,9 @@ int SpawnPortal::Cast(CUnit &caster, const SpellType *, CUnit *, int x, int y)
 	DebugPrint("Spawning a portal exit.\n");
 	portal = caster.Goal;
 	if (portal) {
-		portal->MoveToXY(x, y);
+		portal->MoveToXY(pos);
 	} else {
-		portal = MakeUnitAndPlace(x, y, ptype, &Players[PlayerNumNeutral]);
+		portal = MakeUnitAndPlace(pos, ptype, &Players[PlayerNumNeutral]);
 	}
 	//  Goal is used to link to destination circle of power
 	caster.Goal = portal;
@@ -550,16 +551,16 @@ int Polymorph::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int x,
 	for (offset.x = 0; offset.x < type->TileWidth; ++offset.x) {
 		for (offset.y = 0; offset.y < type->TileHeight; ++offset.y) {
 			if (!UnitTypeCanBeAt(type, pos + offset)) {
-				target->Place(target->tilePos.x, target->tilePos.y);
+				target->Place(target->tilePos);
 				return 0;
 			}
 		}
 	}
 	caster.Variable[MANA_INDEX].Value -= spell->ManaCost;
 	if (this->PlayerNeutral) {
-		MakeUnitAndPlace(pos.x, pos.y, type, Players + PlayerNumNeutral);
+		MakeUnitAndPlace(pos, type, Players + PlayerNumNeutral);
 	} else {
-		MakeUnitAndPlace(pos.x, pos.y, type, target->Player);
+		MakeUnitAndPlace(pos, type, target->Player);
 	}
 	UnitLost(*target);
 	UnitClearOrders(*target);
@@ -712,23 +713,8 @@ int Summon::Cast(CUnit &caster, const SpellType *spell,
 */
 static Target *NewTargetUnit(CUnit &unit)
 {
-	return new Target(TargetUnit, &unit, 0, 0);
+	return new Target(TargetUnit, &unit, unit.tilePos);
 }
-
-#if 0
-/**
-**  Target constructor for position.
-**
-**  @param x  X position.
-**  @param y  Y position.
-**
-**  @return the new target.
-*/
-static Target *NewTargetPosition(int x, int y)
-{
-	return new Target(TargetPosition, NULL, x, y);
-}
-#endif
 
 // ****************************************************************************
 // Main local functions
@@ -1042,7 +1028,7 @@ int AutoCastSpell(CUnit &caster, const SpellType *spell)
 	} else {
 		// Must move before ?
 		// FIXME: SpellType* of CommandSpellCast must be const.
-		CommandSpellCast(caster, target->X, target->Y, target->Unit,
+		CommandSpellCast(caster, target->targetPos, target->Unit,
 			const_cast<SpellType *>(spell), FlushCommands);
 		delete target;
 	}

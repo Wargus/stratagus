@@ -39,6 +39,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "unitsound.h"
+#include "vec2i.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -260,13 +261,12 @@ public:
 
 class Target {
 public:
-	Target(TargetType type, CUnit *unit, int x, int y) :
-		Type(type), Unit(unit), X(x), Y(y) {}
+	Target(TargetType type, CUnit *unit, const Vec2i &pos) :
+		Type(type), Unit(unit), targetPos(pos) {}
 
 	TargetType Type;                  /// type of target.
 	CUnit *Unit;                      /// Unit target.
-	int X;                            /// x coord.
-	int Y;                            /// y coord.
+	Vec2i targetPos;
 };
 
 /*

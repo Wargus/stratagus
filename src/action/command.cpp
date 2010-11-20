@@ -282,16 +282,14 @@ void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 **  Move unit to new position
 **
 **  @param unit   pointer to unit.
-**  @param x      X map position to move to.
-**  @param y      Y map position to move to.
+**  @param pos    map position to move to.
 **  @param flush  if true, flush command queue.
 */
-void CommandMove(CUnit &unit, int x, int y, int flush)
+void CommandMove(CUnit &unit, const Vec2i &pos, int flush)
 {
 	COrderPtr order;
 
-	Assert(Map.Info.IsPointOnMap(x, y));
-	const Vec2i pos = {x, y};
+	Assert(Map.Info.IsPointOnMap(pos));
 
 	//
 	//  Check if unit is still valid? (NETWORK!)
@@ -315,12 +313,11 @@ void CommandMove(CUnit &unit, int x, int y, int flush)
 **  Repair unit
 **
 **  @param unit   pointer to unit.
-**  @param x      X map position to repair.
-**  @param y      Y map position to repair.
+**  @param pos    map position to repair.
 **  @param dest   or unit to be repaired. FIXME: not supported
 **  @param flush  if true, flush command queue.
 */
-void CommandRepair(CUnit &unit, int x, int y, CUnit *dest, int flush)
+void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
 {
 	COrderPtr order;
 
@@ -351,8 +348,7 @@ void CommandRepair(CUnit &unit, int x, int y, CUnit *dest, int flush)
 				order->Range = unit.Type->RepairRange;
 			}
 		} else {
-			order->goalPos.x = x;
-			order->goalPos.y = y;
+			order->goalPos = pos;
 		}
 	}
 	ClearSavedAction(unit);
@@ -378,15 +374,13 @@ void CommandAutoRepair(CUnit &unit, int on)
 **  Attack with unit at new position
 **
 **  @param unit    pointer to unit.
-**  @param x       X map position to attack.
-**  @param y       Y map position to attack.
+**  @param pos     map position to attack.
 **  @param attack  or unit to be attacked.
 **  @param flush   if true, flush command queue.
 */
-void CommandAttack(CUnit &unit, int x, int y, CUnit *attack, int flush)
+void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *attack, int flush)
 {
 	COrderPtr order;
-	const Vec2i pos = {x, y};
 
 	Assert(Map.Info.IsPointOnMap(pos));
 
@@ -434,15 +428,14 @@ void CommandAttack(CUnit &unit, int x, int y, CUnit *attack, int flush)
 **  Attack ground with unit.
 **
 **  @param unit   pointer to unit.
-**  @param x      X map position to fire on.
-**  @param y      Y map position to fire on.
+**  @param pos    map position to fire on.
 **  @param flush  if true, flush command queue.
 */
-void CommandAttackGround(CUnit &unit, int x, int y, int flush)
+void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
 {
 	COrderPtr order;
 
-	Assert(Map.Info.IsPointOnMap(x, y));
+	Assert(Map.Info.IsPointOnMap(pos));
 
 	//
 	// Check if unit is still valid? (NETWORK!)
@@ -458,8 +451,7 @@ void CommandAttackGround(CUnit &unit, int x, int y, int flush)
 		order->Init();
 
 		order->Action = UnitActionAttackGround;
-		order->goalPos.x = x;
-		order->goalPos.y = y;
+		order->goalPos = pos;
 		order->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 		order->MinRange = unit.Type->MinAttackRange;
 
@@ -474,15 +466,14 @@ void CommandAttackGround(CUnit &unit, int x, int y, int flush)
 **  FIXME: want to support patroling between units.
 **
 **  @param unit   pointer to unit.
-**  @param x      X map position to patrol between.
-**  @param y      Y map position to patrol between.
+**  @param pos    map position to patrol between.
 **  @param flush  if true, flush command queue.
 */
-void CommandPatrolUnit(CUnit &unit, int x, int y, int flush)
+void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush)
 {
 	COrderPtr order;
 
-	Assert(Map.Info.IsPointOnMap(x, y));
+	Assert(Map.Info.IsPointOnMap(pos));
 
 	//
 	// Check if unit is still valid? (NETWORK!)
@@ -498,8 +489,7 @@ void CommandPatrolUnit(CUnit &unit, int x, int y, int flush)
 		order->Init();
 
 		order->Action = UnitActionPatrol;
-		order->goalPos.x = x;
-		order->goalPos.y = y;
+		order->goalPos = pos;
 		Assert(!(unit.tilePos.x & ~0xFFFF) && !(unit.tilePos.y & ~0xFFFF));
 		order->Arg1.Patrol = unit.tilePos;
 	}
@@ -550,12 +540,11 @@ void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 **  Unload a transporter.
 **
 **  @param unit   pointer to unit.
-**  @param x      X map position to unload.
-**  @param y      Y map position to unload.
+**  @param pos    map position to unload.
 **  @param what   unit to be unloaded, NoUnitP all.
 **  @param flush  if true, flush command queue.
 */
-void CommandUnload(CUnit &unit, int x, int y, CUnit *what, int flush)
+void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
 {
 	COrderPtr order;
 
@@ -569,8 +558,7 @@ void CommandUnload(CUnit &unit, int x, int y, CUnit *what, int flush)
 		order->Init();
 
 		order->Action = UnitActionUnload;
-		order->goalPos.x = x;
-		order->goalPos.y = y;
+		order->goalPos = pos;
 		//
 		// Destination could be killed.
 		// Should be handled in action, but is not possible!
@@ -587,12 +575,11 @@ void CommandUnload(CUnit &unit, int x, int y, CUnit *what, int flush)
 **  Send a unit building
 **
 **  @param unit   pointer to unit.
-**  @param x      X map position to build.
-**  @param y      Y map position to build.
+**  @param pos    map position to build.
 **  @param what   Unit type to build.
 **  @param flush  if true, flush command queue.
 */
-void CommandBuildBuilding(CUnit &unit, int x, int y, CUnitType *what, int flush)
+void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType *what, int flush)
 {
 	COrderPtr order;
 
@@ -610,8 +597,7 @@ void CommandBuildBuilding(CUnit &unit, int x, int y, CUnitType *what, int flush)
 		order->Init();
 
 		order->Action = UnitActionBuild;
-		order->goalPos.x = x;
-		order->goalPos.y = y;
+		order->goalPos = pos;
 		order->Width = what->TileWidth;
 		order->Height = what->TileHeight;
 		if (what->BuilderOutside) {
@@ -654,11 +640,10 @@ void CommandDismiss(CUnit &unit)
 **  Send unit harvest a location
 **
 **  @param unit   pointer to unit.
-**  @param x      X map position for harvest.
-**  @param y      Y map position for harvest.
+**  @param pos    map position for harvest.
 **  @param flush  if true, flush command queue.
 */
-void CommandResourceLoc(CUnit &unit, int x, int y, int flush)
+void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
 {
 	COrderPtr order;
 	Vec2i ressourceLoc;
@@ -679,21 +664,18 @@ void CommandResourceLoc(CUnit &unit, int x, int y, int flush)
 		order->Action = UnitActionResource;
 
 		//  Find the closest piece of wood next to a tile where the unit can move
-		if (!FindTerrainType(0, (unit.Type->MovementMask), 1, 20,
-				unit.Player, x, y, &ressourceLoc)) {
+		if (!FindTerrainType(0, (unit.Type->MovementMask), 1, 20, unit.Player, pos, &ressourceLoc)) {
 			DebugPrint("FIXME: Give up???\n");
 		}
 
 		// Max Value > 1
-		if ((MyAbs(ressourceLoc.x - x) | MyAbs(ressourceLoc.y - y)) > 1) {
-			if (!FindTerrainType(0, MapFieldForest, 0, 20, unit.Player,
-					ressourceLoc.x, ressourceLoc.y, &ressourceLoc)) {
+		if ((MyAbs(ressourceLoc.x - pos.x) | MyAbs(ressourceLoc.y - pos.y)) > 1) {
+			if (!FindTerrainType(0, MapFieldForest, 0, 20, unit.Player, ressourceLoc, &ressourceLoc)) {
 				DebugPrint("FIXME: Give up???\n");
 			}
 		} else {
 			// The destination is next to a reachable tile.
-			ressourceLoc.x = x;
-			ressourceLoc.y = y;
+			ressourceLoc = pos;
 		}
 		order->goalPos = ressourceLoc;
 		order->Range = 1;
@@ -1052,20 +1034,19 @@ void CommandCancelResearch(CUnit &unit)
 **  Cast a spell at position or unit.
 **
 **  @param unit   Pointer to unit.
-**  @param x      X map position to spell cast on.
-**  @param y      Y map position to spell cast on.
+**  @param pos    map position to spell cast on.
 **  @param dest   Spell cast on unit (if exist).
 **  @param spell  Spell type pointer.
 **  @param flush  If true, flush command queue.
 */
-void CommandSpellCast(CUnit &unit, int x, int y, CUnit *dest, SpellType *spell, int flush)
+void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, SpellType *spell, int flush)
 {
 	COrderPtr order;
 
-	Assert(Map.Info.IsPointOnMap(x, y));
+	Assert(Map.Info.IsPointOnMap(pos));
 
 	DebugPrint(": %d casts %s at %d %d on %d\n" _C_
-		UnitNumber(unit) _C_ spell->Ident.c_str() _C_ x _C_ y _C_ dest ? UnitNumber(*dest) : 0);
+		UnitNumber(unit) _C_ spell->Ident.c_str() _C_ pos.x _C_ pos.y _C_ dest ? UnitNumber(*dest) : 0);
 	Assert(unit.Type->CanCastSpell[spell->Slot]);
 
 	//
@@ -1098,8 +1079,7 @@ void CommandSpellCast(CUnit &unit, int x, int y, CUnit *dest, SpellType *spell, 
 			}
 		} else {
 			order->Range = 1;
-			order->goalPos.x = x;
-			order->goalPos.y = y;
+			order->goalPos = pos;
 		}
 		order->Arg1.Spell = spell;
 	}

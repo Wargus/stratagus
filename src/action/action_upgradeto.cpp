@@ -77,7 +77,7 @@ int TransformUnitIntoType(CUnit &unit, CUnitType *newtype)
 		SaveSelection();
 		unit.Remove(NULL);
 		if (!UnitTypeCanBeAt(newtype, pos)) {
-			unit.Place(unit.tilePos.x, unit.tilePos.y);
+			unit.Place(unit.tilePos);
 			RestoreSelection();
 			// FIXME unit is not modified, try later ?
 			return 0;
@@ -117,7 +117,7 @@ int TransformUnitIntoType(CUnit &unit, CUnitType *newtype)
 	//  Update Possible sight range change
 	UpdateUnitSightRange(unit);
 	if (!container) {
-		unit.Place(pos.x, pos.y);
+		unit.Place(pos);
 		RestoreSelection();
 	} else {
 		MapMarkUnitSight(unit);

@@ -217,7 +217,7 @@ void HandleActionFollow(CUnit &unit)
 					goal->CurrentAction() == UnitActionStill)) {
 			goal = AttackUnitsInReactRange(unit);
 			if (goal) {
-				CommandAttack(unit, goal->tilePos.x, goal->tilePos.y, NULL, FlushCommands);
+				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
 				// Save current command to come back.
 				unit.SavedOrder = *(unit.CurrentOrder());
 				// This stops the follow command and the attack is executed

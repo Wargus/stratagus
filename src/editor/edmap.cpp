@@ -627,28 +627,28 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 		TileFill(mirror, tile, z * 2);
 
 		// FIXME: can overlap units
-		CUnit *unit = MakeUnitAndPlace(rpos.x, rpos.y, type, &Players[PlayerNumNeutral]);
+		CUnit *unit = MakeUnitAndPlace(rpos, type, &Players[PlayerNumNeutral]);
 		if (unit != NoUnitP) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
 			unit->ResourcesHeld = value;
 		}
 
-		unit = MakeUnitAndPlace(tmirrorh.x, tmirror.y, type, &Players[PlayerNumNeutral]);
+		unit = MakeUnitAndPlace(tmirrorh, type, &Players[PlayerNumNeutral]);
 		if (unit != NoUnitP) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
 			unit->ResourcesHeld = value;
 		}
 
-		unit = MakeUnitAndPlace(tmirrorv.x, tmirrorv.y, type, &Players[PlayerNumNeutral]);
+		unit = MakeUnitAndPlace(tmirrorv, type, &Players[PlayerNumNeutral]);
 		if (unit != NoUnitP) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
 			unit->ResourcesHeld = value;
 		}
 
-		unit = MakeUnitAndPlace(tmirror.x, tmirror.y, type, &Players[PlayerNumNeutral]);
+		unit = MakeUnitAndPlace(tmirror, type, &Players[PlayerNumNeutral]);
 		if (unit != NoUnitP) {
 			DebugPrint("Unable to allocate Unit");
 		} else {

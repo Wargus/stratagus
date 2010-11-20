@@ -958,7 +958,7 @@ static int CclMoveUnit(lua_State *l)
 
 	heading = SyncRand() % 256;
 	if (UnitCanBeAt(*unit, ipos)) {
-		unit->Place(ipos.x, ipos.y);
+		unit->Place(ipos);
 	} else {
 		unit->tilePos = ipos;
 		DropOutOnSide(*unit, heading, 1, 1);
@@ -1020,7 +1020,7 @@ static int CclCreateUnit(lua_State *l)
 	} else {
 		if (UnitCanBeAt(*unit, ipos) ||
 				(unit->Type->Building && CanBuildUnitType(NULL, unit->Type, ipos, 0))) {
-			unit->Place(ipos.x, ipos.y);
+			unit->Place(ipos);
 		} else {
 			unit->tilePos = ipos;
 			DropOutOnSide(*unit, heading, 1, 1);
@@ -1066,38 +1066,25 @@ static int CclSetResourcesHeld(lua_State *l)
 */
 static int CclOrderUnit(lua_State *l)
 {
-	int plynr;
-	int x1;
-	int y1;
-	int x2;
-	int y2;
-	int dx1;
-	int dy1;
-	int dx2;
-	int dy2;
-	const CUnitType *unittype;
-	CUnit *table[UnitMax];
-	int an;
-	int j;
-	const char *order;
-
 	LuaCheckArgs(l, 5);
 
 	lua_pushvalue(l, 1);
-	plynr = TriggerGetPlayer(l);
+	const int plynr = TriggerGetPlayer(l);
 	lua_pop(l, 1);
 	lua_pushvalue(l, 2);
-	unittype = TriggerGetUnitType(l);
+	const CUnitType *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 	if (!lua_istable(l, 3)) {
 		LuaError(l, "incorrect argument");
 	}
 	lua_rawgeti(l, 3, 1);
-	x1 = LuaToNumber(l, -1);
+	int x1 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 	lua_rawgeti(l, 3, 2);
-	y1 = LuaToNumber(l, -1);
+	int y1 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
+	int x2;
+	int y2;
 	if (lua_objlen(l, 3) == 4) {
 		lua_rawgeti(l, 3, 3);
 		x2 = LuaToNumber(l, -1);
@@ -1112,49 +1099,50 @@ static int CclOrderUnit(lua_State *l)
 	if (!lua_istable(l, 4)) {
 		LuaError(l, "incorrect argument");
 	}
+	Vec2i dpos1;
+	Vec2i dpos2;
 	lua_rawgeti(l, 4, 1);
-	dx1 = LuaToNumber(l, -1);
+	dpos1.x = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 	lua_rawgeti(l, 4, 2);
-	dy1 = LuaToNumber(l, -1);
+	dpos1.y = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 	if (lua_objlen(l, 4) == 4) {
 		lua_rawgeti(l, 4, 3);
-		dx2 = LuaToNumber(l, -1);
+		dpos2.x = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 		lua_rawgeti(l, 4, 4);
-		dy2 = LuaToNumber(l, -1);
+		dpos2.y = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 	} else {
-		dx2 = dx1;
-		dy2 = dy1;
+		dpos2 = dpos1;
 	}
-	order = LuaToString(l, 5);
+	const char *order = LuaToString(l, 5);
+	CUnit *table[UnitMax];
+	const int an = Map.Select(x1, y1, x2 + 1, y2 + 1, table);
+	for (int i = 0; i < an; ++i) {
+		CUnit &unit = *table[i];
 
-	an = Map.Select(x1, y1, x2 + 1, y2 + 1, table);
-	for (j = 0; j < an; ++j) {
-		CUnit &unit = *table[j];
 		if (unittype == ANY_UNIT ||
 				(unittype == ALL_FOODUNITS && !unit.Type->Building) ||
 				(unittype == ALL_BUILDINGS && unit.Type->Building) ||
 				unittype == unit.Type) {
 			if (plynr == -1 || plynr == unit.Player->Index) {
 				if (!strcmp(order,"move")) {
-					CommandMove(unit, (dx1 + dx2) / 2, (dy1 + dy2) / 2, 1);
+					CommandMove(unit, (dpos1 + dpos2) / 2, 1);
 				} else if (!strcmp(order, "attack")) {
 					CUnit *attack;
 
-					attack = TargetOnMap(unit, dx1, dy1, dx2 + 1, dy2 + 1);
-					CommandAttack(unit, (dx1 + dx2) / 2, (dy1 + dy2) / 2, attack, 1);
+					attack = TargetOnMap(unit, dpos1.x, dpos1.y, dpos2.x + 1, dpos2.y + 1);
+					CommandAttack(unit, (dpos1 + dpos2) / 2, attack, 1);
 				} else if (!strcmp(order, "patrol")) {
-					CommandPatrolUnit(unit, (dx1 + dx2) / 2, (dy1 + dy2) / 2, 1);
+					CommandPatrolUnit(unit, (dpos1 + dpos2) / 2, 1);
 				} else {
 					LuaError(l, "Unsupported order: %s" _C_ order);
 				}
 			}
 		}
 	}
-
 	return 0;
 }
 

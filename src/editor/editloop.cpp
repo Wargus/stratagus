@@ -324,7 +324,7 @@ static void EditorActionPlaceUnit(const Vec2i &pos, CUnitType *type, CPlayer *pl
 	}
 
 	// FIXME: vladi: should check place when mirror editing is enabled...?
-	CUnit *unit = MakeUnitAndPlace(pos.x, pos.y, type, player);
+	CUnit *unit = MakeUnitAndPlace(pos, type, player);
 	if (unit == NoUnitP) {
 		DebugPrint("Unable to allocate Unit");
 		return;

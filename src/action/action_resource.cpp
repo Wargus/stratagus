@@ -83,7 +83,7 @@ static int MoveToResource(CUnit &unit)
 		// Wood gone, look somewhere else.
 		if ((!Map.ForestOnMap(pos)) && (!unit.IX) && (!unit.IY)) {
 			if (!FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 16,
-					unit.Player, unit.CurrentOrder()->goalPos.x, unit.CurrentOrder()->goalPos.y, &pos)) {
+					unit.Player, unit.CurrentOrder()->goalPos, &pos)) {
 				// no wood in range
 				return -1;
 			} else {
@@ -95,7 +95,7 @@ static int MoveToResource(CUnit &unit)
 			case PF_UNREACHABLE:
 				unit.Wait = 10;
 				if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 9999,
-						unit.Player, unit.tilePos.x, unit.tilePos.y, &pos)) {
+						unit.Player, unit.tilePos, &pos)) {
 					unit.CurrentOrder()->goalPos = pos;
 					NewResetPath(unit);
 					DebugPrint("Found a better place to harvest %d,%d\n" _C_ pos.x _C_ pos.y);
@@ -720,8 +720,7 @@ static int WaitInDepot(CUnit &unit)
 	if (resinfo->TerrainHarvester) {
 		pos = unit.CurrentOrder()->Arg1.Resource.Pos;
 
-		if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 10,
-				unit.Player, pos.x, pos.y, &pos)) {
+		if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 10, unit.Player, pos, &pos)) {
 			if(depot)
 				DropOutNearest(unit, pos, depot->Type->TileWidth,
 						 depot->Type->TileHeight);

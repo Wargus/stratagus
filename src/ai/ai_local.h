@@ -255,10 +255,9 @@ public:
 */
 class AiExplorationRequest {
 public:
-	AiExplorationRequest() : X(0), Y(0), Mask(0) {}
+	AiExplorationRequest(const Vec2i& pos, int mask) : pos(pos), Mask(mask) { }
 
-	int X;              /// x pos on map
-	int Y;              /// y pos on map
+	Vec2i pos;          /// pos on map
 	int Mask;           /// mask ( ex: MapFieldLandUnit )
 };
 
@@ -404,8 +403,8 @@ extern void AiAddUpgradeToRequest(CUnitType *type);
 extern void AiAddResearchRequest(CUpgrade *upgrade);
 	/// Periodic called resource manager handler
 extern void AiResourceManager(void);
-	/// Ask the ai to explore around x,y
-extern void AiExplore(int x, int y, int exploreMask);
+	/// Ask the ai to explore around pos
+extern void AiExplore(const Vec2i &pos, int exploreMask);
 	/// Make two unittypes be considered equals
 extern void AiNewUnitTypeEquiv(CUnitType *a, CUnitType *b);
 	/// Remove any equivalence between unittypes
@@ -413,8 +412,7 @@ extern void AiResetUnitTypeEquiv(void);
 	/// Finds all equivalents units to a given one
 extern int AiFindUnitTypeEquiv(const CUnitType *i, int *result);
 	/// Finds all available equivalents units to a given one, in the prefered order
-extern int AiFindAvailableUnitTypeEquiv(const CUnitType *i,
-	int *result);
+extern int AiFindAvailableUnitTypeEquiv(const CUnitType *i, int *result);
 extern int AiGetBuildRequestsCount(PlayerAi*,int counter[UnitTypeMax]);
 
 extern void AiNewDepotRequest(CUnit &worker);

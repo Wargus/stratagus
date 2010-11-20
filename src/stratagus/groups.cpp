@@ -309,10 +309,10 @@ void GroupHelpMe(CUnit *attacker, CUnit &defender)
 
 						if (gunit.SavedOrder.Action == UnitActionStill) {
 							// FIXME: should rewrite command handling
-							CommandAttack(gunit, gunit.tilePos.x, gunit.tilePos.y, NoUnitP, FlushCommands);
+							CommandAttack(gunit, gunit.tilePos, NoUnitP, FlushCommands);
 							gunit.SavedOrder = *gunit.Orders[1];
 						}
-						CommandAttack(gunit, attacker->tilePos.x, attacker->tilePos.y, attacker, FlushCommands);
+						CommandAttack(gunit, attacker->tilePos, attacker, FlushCommands);
 					}
 				}
 				if (!(defender.GroupId & ~mask)) {
