@@ -3,5 +3,5 @@
 -- File licensed under the GNU GPL version 2 or later.
 
 DefinePlayerTypes("person", "person", "person", "person")
-PresentMap("They struggled to make their big guns, and now they're in clover.", 4, 80, 80, 4)
+PresentMap("They struggled to make their big guns, and now they're in clover.", 4, 80, 80, 14)
 DefineMapSetup(GetCurrentLuaPath().."/setup.sms")
