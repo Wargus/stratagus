@@ -43,7 +43,6 @@ DefineUnitType("unit-tree04", {
     Icon = "icon-tree",
     EnergyValue = 5000,
     Construction = "construction-tree",
-    Speed = 0,
     HitPoints = 50,
     DrawLevel = 25,
     TileSize = {1, 1},

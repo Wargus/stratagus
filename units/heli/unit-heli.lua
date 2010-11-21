@@ -64,7 +64,6 @@ DefineUnitType("unit-heli", {
     Icon = "icon-heli",
     EnergyValue = 5500,
     MagmaValue = 2000,
-    Speed = 40,
     HitPoints = 40,
     DrawLevel = 125,
     TileSize = {1, 1},

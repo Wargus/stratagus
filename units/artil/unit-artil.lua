@@ -73,7 +73,6 @@ DefineUnitType("unit-artil", {
     EnergyValue = 10000,
     MagmaValue = 10000,
     RepairHp = 1,
-    Speed = 10,
     HitPoints = 250,
     DrawLevel = 25,
     TileSize = {1, 1},

@@ -52,7 +52,6 @@ DefineUnitType("unit-weakhotspot", {
     Animations = "animations-weakhotspot",
     Icon = "icon-weakhotspot",
     Construction = "construction-weakhotspot",
-    Speed = 0,
     HitPoints = 1,
     Indestructible = 1,
     DrawLevel = 2,

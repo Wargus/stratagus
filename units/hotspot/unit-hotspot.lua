@@ -52,7 +52,6 @@ DefineUnitType("unit-hotspot", {
     Animations = "animations-hotspot",
     Icon = "icon-hotspot",
     Construction = "construction-hotspot",
-    Speed = 0,
     HitPoints = 1,
     Indestructible = 1,
     DrawLevel = 2,

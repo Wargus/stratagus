@@ -65,7 +65,6 @@ DefineUnitType("unit-chopper", {
     Icon = "icon-chopper",
     EnergyValue = 7000,
     MagmaValue = 3000,
-    Speed = 40,
     HitPoints = 50,
     DrawLevel = 125,
     TileSize = {1, 1},

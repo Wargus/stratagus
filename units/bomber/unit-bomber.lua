@@ -66,7 +66,6 @@ DefineUnitType("unit-bomber", {
     Icon = "icon-bomber",
     EnergyValue = 10000,
     MagmaValue = 7000,
-    Speed = 20,
     HitPoints = 50,
     DrawLevel = 125,
     TileSize = {2, 2},

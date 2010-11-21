@@ -67,7 +67,6 @@ DefineUnitType("unit-bazoo", {
     Flip = true,
     EnergyValue = 1500,
     MagmaValue = 1000,
-    Speed = 8,
     HitPoints = 50,
     DrawLevel = 25,
     TileSize = {1, 1},

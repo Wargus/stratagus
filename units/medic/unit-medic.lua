@@ -104,7 +104,6 @@ DefineUnitType("unit-medic", {
   Flip = true,
   EnergyValue = 2500,
   MagmaValue = 2000,
-  Speed = 15,
   HitPoints = 25,
   MaxMana = 100,
   CanCastSpell = {"spell-healing"},
