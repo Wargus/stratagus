@@ -65,7 +65,6 @@ DefineUnitType("unit-jet", {
     Icon = "icon-jet",
     EnergyValue = 8000,
     MagmaValue = 3000,
-    Speed = 60,
     HitPoints = 50,
     DrawLevel = 125,
     TileSize = {3, 3},

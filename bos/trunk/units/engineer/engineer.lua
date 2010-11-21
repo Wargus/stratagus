@@ -72,7 +72,6 @@ DefineUnitType("unit-engineer", {
     MagmaValue = 800,
     MaxEnergyUtilizationRate = 40,
     MaxMagmaUtilizationRate = 20,
-    Speed = 8,
     HitPoints = 30,
     DrawLevel = 25,
     TileSize = {1, 1},

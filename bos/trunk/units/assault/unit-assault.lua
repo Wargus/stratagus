@@ -70,7 +70,6 @@ DefineUnitType("unit-assault", {
     Flip = true,
     EnergyValue = 1000,
     MagmaValue = 250,
-    Speed = 10,
     HitPoints = 30,
     DrawLevel = 25,
     TileSize = {1, 1},

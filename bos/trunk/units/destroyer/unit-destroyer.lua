@@ -58,7 +58,6 @@ DefineUnitType("unit-destroyer", {
     EnergyValue = 600,
     MagmaValue = 300,
     RepairHp = 1,
-    Speed = 20,
     HitPoints = 40,
     DrawLevel = 25,
     TileSize = {2, 2},

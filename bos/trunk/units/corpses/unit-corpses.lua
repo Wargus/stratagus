@@ -38,7 +38,6 @@ DefineUnitType("build-dead-body2", {
     Image = {"file", "units/corpses/build-dead-2.png", "size", {64, 64}},
     Animations = "animations-elitebuild2",
     Icon = "icon-cancel",
-    Speed = 0,
     HitPoints = 999,
     DrawLevel = 10,
     TileSize = {2, 2},

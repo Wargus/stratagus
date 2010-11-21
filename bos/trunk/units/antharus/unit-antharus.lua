@@ -49,7 +49,6 @@ DefineUnitType("unit-antharus", {
     Animations = "animations-antharus",
     Icon = "icon-antharus",
     Construction = "construction-antharus",
-    Speed = 0,
     HitPoints = 50,
     DrawLevel = 25,
     EnergyValue = 5000,

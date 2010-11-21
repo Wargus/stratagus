@@ -67,7 +67,6 @@ DefineUnitType("unit-grenadier", {
     Flip = true,
     EnergyValue = 1600,
     MagmaValue = 1350,
-    Speed = 10,
     HitPoints = 50,
     DrawLevel = 25,
     TileSize = {1, 1},

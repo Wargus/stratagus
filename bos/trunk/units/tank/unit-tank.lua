@@ -63,7 +63,6 @@ DefineUnitType("unit-tank", {
     EnergyValue = 8000,
     MagmaValue = 5000,
     RepairHp = 1,
-    Speed = 12,
     HitPoints = 200,
     DrawLevel = 25,
     TileSize = {1, 1},

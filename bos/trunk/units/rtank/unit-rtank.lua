@@ -63,7 +63,6 @@ DefineUnitType("unit-rtank", {
     EnergyValue = 6000,
     MagmaValue = 3000,
     RepairHp = 1,
-    Speed = 20,
     HitPoints = 50,
     DrawLevel = 25,
     TileSize = {1, 1},

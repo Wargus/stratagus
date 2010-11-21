@@ -65,7 +65,6 @@ DefineUnitType("unit-shipyard", {
     MagmaValue = 6000,
     RepairHp = 2,
     Construction = "construction-shipyard",
-    Speed = 0,
     HitPoints = 550,
     DrawLevel = 25,
     TileSize = {6, 5},

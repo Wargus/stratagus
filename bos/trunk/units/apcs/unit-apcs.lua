@@ -67,7 +67,6 @@ DefineUnitType("unit-apcs", {
     Flip = true,
     EnergyValue = 4000,
     MagmaValue = 2000,
-    Speed = 15,
     HitPoints = 200,
     DrawLevel = 25,
     TileSize = {1, 1},

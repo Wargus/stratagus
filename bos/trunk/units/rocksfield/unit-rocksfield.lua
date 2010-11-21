@@ -52,7 +52,6 @@ DefineUnitType("unit-rocksfield", {
     TileSize = {4, 4},
     BoxSize = {96, 96},
     SightRange = 1,
-    Speed = 0,
     HitPoints = 25500,
     Priority = 0,
     Armor = 20,

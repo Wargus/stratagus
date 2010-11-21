@@ -79,7 +79,6 @@ DefineUnitType("unit-harvester", {
     MaxMagmaUtilizationRate = 20,
     RepairHp = 2,
     ExplodeWhenKilled = "missile-160x128-explosion",
-    Speed = 10,
     HitPoints = 200,
     DrawLevel = 25,
     TileSize = {1, 1},
