@@ -7,15 +7,19 @@
 --       A futuristic real-time strategy game.
 --          This file is part of Bos Wars.
 --
---	rush.lua		-	Define the AI.
+--      rush.lua
+--      Define the AI that has the following philosophy: 
+--      constantly train and attack with as many units as possible,
+--      no emphasis on expanding or building defenses. There could be multiple
+--      rush AIs that try to attack with different units.
 --
---	(c) Copyright 2000-2007 by Lutz Sammer and Jimmy Salmon
+--      (c) Copyright 2000-2010 by Lutz Sammer and Jimmy Salmon
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
 --      the Free Software Foundation; either version 2 of the License, or
 --      (at your option) any later version.
---  
+--
 --      This program is distributed in the hope that it will be useful,
 --      but WITHOUT ANY WARRANTY; without even the implied warranty of
 --      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -25,7 +29,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 --
---	$Id: rush.lua 626 2006-11-25 18:10:03Z feb $
+--      $Id: rush.lua 626 2006-11-25 18:10:03Z feb $
 --
 
 local player
