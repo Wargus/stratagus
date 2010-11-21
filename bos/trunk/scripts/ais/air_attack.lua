@@ -7,7 +7,7 @@
 --       A futuristic real-time strategy game.
 --          This file is part of Bos Wars.
 --
---	air_attack.lua	- Define a AI that needs many resources and,
+--      air_attack.lua	- Define a AI that needs many resources
 --      and attacks through the air.
 --
 --	(c) Copyright 2010 by Michiel van der Wulp
@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 --
---	$Id: air_attack.lua  $
+--      $Id: air_attack.lua  $
 --
 
 local player
