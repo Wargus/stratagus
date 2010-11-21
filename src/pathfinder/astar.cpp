@@ -440,7 +440,7 @@ static void CostMoveToCacheCleanUp(void)
 	int *ptr = CostMoveToCache;
 #ifdef __x86_64__
 	union {
-		long long int d;
+		intptr_t d;
 		int i[2];
 	} conv;
 	conv.i[0] = CacheNotSet;
@@ -453,8 +453,8 @@ static void CostMoveToCacheCleanUp(void)
 #endif
 	while (AStarMapMax > 3) {
 #ifdef __x86_64__
-		*((long long int*)ptr) = conv.d;
-		*((long long int*)(ptr + 2)) = conv.d;
+		*((intptr_t*)ptr) = conv.d;
+		*((intptr_t*)(ptr + 2)) = conv.d;
 		ptr += 4;
 #else
 		*ptr++ = CacheNotSet;
