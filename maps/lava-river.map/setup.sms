@@ -1,9 +1,5 @@
 -- File licensed under the GNU GPL version 2 or later.
 
--- Load specific AI
-Load(GetCurrentLuaPath() .. "/air_attack.lua")
-InitAiScripts_air_attack()
-
 -- player configuration
 Players[0]:SetStartView(31, 31)
 Players[0].EnergyStored = 1000
