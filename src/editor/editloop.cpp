@@ -637,34 +637,21 @@ static void DrawPopup(void) {
 /**
 **  Draw unit icons.
 */
-static void DrawUnitIcons(void)
+static void DrawUnitIcons()
 {
-	int x;
-	int y;
-	int i;
-	CIcon *icon;
+	const int maxx = UI.ButtonPanel.X + ButtonPanelWidth - IconWidth;
+	const int maxy = UI.ButtonPanel.Y + ButtonPanelHeight - IconHeight;
+	int i = Editor.UnitIndex;
 
-	//
-	// Draw the unit selection buttons.
-	//
-	x = UI.InfoPanel.X + 10;
-	y = UI.InfoPanel.Y + 140;
-
-	//
-	//  Draw the unit icons.
-	//
-	y = UI.ButtonPanel.Y + 24;
-	i = Editor.UnitIndex;
-	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - IconHeight) {
-		if (i >= (int)Editor.ShownUnitTypes.size()) {
-			break;
+	for (int y = UI.ButtonPanel.Y + 24; y < maxy; y += IconHeight + 2) {
+		if (i >= (int) Editor.ShownUnitTypes.size()) {
+			return;
 		}
-		x = UI.ButtonPanel.X + 10;
-		while (x < UI.ButtonPanel.X + ButtonPanelWidth - IconWidth) {
+		for (int x = UI.ButtonPanel.X + 10; x < maxx; x += IconWidth + 8) {
 			if (i >= (int) Editor.ShownUnitTypes.size()) {
-				break;
+				return;
 			}
-			icon = Editor.ShownUnitTypes[i]->Icon.Icon;
+			CIcon *icon = Editor.ShownUnitTypes[i]->Icon.Icon;
 			icon->DrawIcon(Players + Editor.SelectedPlayer, x, y);
 
 			Video.DrawRectangleClip(ColorGray, x, y, icon->G->Width, icon->G->Height);
@@ -678,11 +665,8 @@ static void DrawUnitIcons(void)
 				Editor.PopUpX = x;
 				Editor.PopUpY = y;
 			}
-
-			x += IconWidth + 8;
 			++i;
 		}
-		y += IconHeight + 2;
 	}
 }
 
@@ -917,30 +901,22 @@ static void DrawMapCursor(void)
 		y = UI.MouseViewport->Viewport2MapY(CursorY);
 		x = UI.MouseViewport->Map2ViewportX(x);
 		y = UI.MouseViewport->Map2ViewportY(y);
-		if (Editor.State == EditorEditTile) {
-			int i;
-			int j;
-
+		if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
 			PushClipping();
 			SetClipping(UI.MouseViewport->X, UI.MouseViewport->Y,
 				UI.MouseViewport->EndX, UI.MouseViewport->EndY);
-			for (j = 0; j < TileCursorSize; ++j) {
-				int ty;
-
-				ty = y + j * TileSizeY;
+			for (int j = 0; j < TileCursorSize; ++j) {
+				const int ty = y + j * TileSizeY;
 				if (ty >= UI.MouseViewport->EndY) {
 					break;
 				}
-				for (i = 0; i < TileCursorSize; ++i) {
-					int tx;
-
-					tx = x + i * TileSizeX;
+				for (int i = 0; i < TileCursorSize; ++i) {
+					const int tx = x + i * TileSizeX;
 					if (tx >= UI.MouseViewport->EndX) {
 						break;
 					}
 					Map.TileGraphic->DrawFrameClip(
-						Map.Tileset.Table[Editor.ShownTileTypes[Editor.SelectedTileIndex]]
-						, tx, ty);
+						Map.Tileset.Table[Editor.ShownTileTypes[Editor.SelectedTileIndex]], tx, ty);
 				}
 			}
 			Video.DrawRectangleClip(ColorWhite, x, y, TileSizeX * TileCursorSize,
@@ -1657,7 +1633,7 @@ static void EditorCallbackMouse(int x, int y)
 
 		const Vec2i tilePos = {UI.SelectedViewport->Viewport2MapX(CursorX), UI.SelectedViewport->Viewport2MapY(CursorY)};
 
-		if (Editor.State == EditorEditTile) {
+		if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
 			EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
 		} else if (Editor.State == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
@@ -1745,7 +1721,7 @@ static void EditorCallbackMouse(int x, int y)
 				break;
 			}
 			bx = UI.ButtonPanel.X + 10;
-			while (bx < UI.ButtonPanel.X + 146) {
+			while (bx < UI.ButtonPanel.X + ButtonPanelWidth - IconWidth) {
 				if (i >= (int)Editor.ShownUnitTypes.size()) {
 					break;
 				}
