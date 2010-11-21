@@ -33,6 +33,7 @@
 
 !define ICON "contrib/stratagus.ico"
 !define STRATAGUS "stratagus.exe"
+!define STRATAGUSDBG "stratagus-dbg.exe"
 !define UNINSTALL "uninstall.exe"
 !define INSTALLER "${NAME}-${VERSION}.exe"
 !define INSTALLDIR "$PROGRAMFILES\${NAME}\"
@@ -177,6 +178,7 @@ Section "${NAME}"
 
 	SetOutPath $INSTDIR
 	File "${STRATAGUS}"
+	File "${STRATAGUSDBG}"
 	WriteRegStr HKLM "${REGKEY}" "DisplayName" "${NAME}"
 	WriteRegStr HKLM "${REGKEY}" "UninstallString" "$\"$INSTDIR\${UNINSTALL}$\""
 	WriteRegStr HKLM "${REGKEY}" "QuietUninstallString" "$\"$INSTDIR\${UNINSTALL}$\" /S"
@@ -202,6 +204,7 @@ Section "un.${NAME}" Executable
 	SectionIn RO
 
 	Delete "$INSTDIR\${STRATAGUS}"
+	Delete "$INSTDIR\${STRATAGUSDBG}"
 	Delete "$INSTDIR\${UNINSTALL}"
 	RMDir "$INSTDIR"
 	DeleteRegKey /ifempty HKLM "${REGKEY}"
