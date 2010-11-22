@@ -440,7 +440,7 @@ static void InitKey2Str()
 osso_context_t * osso = NULL;
 SDL_TimerID timer;
 
-static Uint32 OssoKeepBacklightAlive(Uint32 interval, void *param)
+static Uint32 OssoKeepBacklightAlive(Uint32 interval, void *)
 {
 	if (!osso)
 		return interval;
