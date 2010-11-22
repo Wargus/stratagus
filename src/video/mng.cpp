@@ -123,8 +123,8 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 		mng->texture_height = (float)height / h;
 		glGenTextures(1, &mng->texture_name);
 		glBindTexture(GL_TEXTURE_2D, mng->texture_name);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
@@ -271,6 +271,31 @@ void Mng::Draw(int x, int y)
 		GLint sy = y;
 		GLint ey = sy + surface->h;
 
+#ifdef USE_GLES
+		float texCoord[] = {
+			0.0f, 0.0f,
+			texture_width, 0.0f,
+			0.0f, texture_height,
+			texture_width, texture_height
+		};
+
+		float vertex[] = {
+			2.0f/(GLfloat)Video.Width*sx-1.0f, -2.0f/(GLfloat)Video.Height*sy+1.0f,
+			2.0f/(GLfloat)Video.Width*ex-1.0f, -2.0f/(GLfloat)Video.Height*sy+1.0f,
+			2.0f/(GLfloat)Video.Width*sx-1.0f, -2.0f/(GLfloat)Video.Height*ey+1.0f,
+			2.0f/(GLfloat)Video.Width*ex-1.0f, -2.0f/(GLfloat)Video.Height*ey+1.0f
+		};
+
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glEnableClientState(GL_VERTEX_ARRAY);
+
+		glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
+		glVertexPointer(2, GL_FLOAT, 0, vertex);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		glDisableClientState(GL_VERTEX_ARRAY);
+#else
 		glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 0.0f);
 		glVertex2i(sx, sy);
@@ -281,6 +306,7 @@ void Mng::Draw(int x, int y)
 		glTexCoord2f(texture_width, 0.0f);
 		glVertex2i(ex, sy);
 		glEnd();
+#endif
 	}
 }
 
