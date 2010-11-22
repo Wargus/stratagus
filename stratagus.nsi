@@ -23,7 +23,7 @@
 ;--------------------------------
 
 !define NAME "Stratagus"
-!define VERSION "2.2.5.4"
+!define VERSION "2.2.5.5"
 !define VIVERSION "${VERSION}"
 !define HOMEPAGE "https://launchpad.net/stratagus"
 !define LICENSE "GPL v2"
