@@ -20,11 +20,12 @@
 
 include /usr/share/cdbs/1/rules/debhelper.mk
 
-DEB_DH_GENCONTROL_ARGS_stratagus := -- -c$(CURDIR)/debian/control.new
-
 clean::
 	$(MAKE) distclean
-	$(RM) stratagus-dbg $(CURDIR)/debian/control.new
+	$(RM) stratagus-dbg
+	if [ -f $(CURDIR)/debian/control.orig ]; then \
+		mv $(CURDIR)/debian/control.orig $(CURDIR)/debian/control; \
+	fi
 
 build:
 	./autogen.sh
@@ -55,15 +56,15 @@ binary-fixup/stratagus::
 	fi
 
 binary-predeb/stratagus::
-	cp $(CURDIR)/debian/control $(CURDIR)/debian/control.new
 	if [ -f /etc/maemo_version ]; then \
-		sed -n -e "1,/^Depends:.*$$/p" $(CURDIR)/debian/control > $(CURDIR)/debian/control.new; \
-		sed "s/Section: .*/Section: user\/games/" -i $(CURDIR)/debian/control.new; \
-		echo "XSBC-Bugtracker: https://bugs.launchpad.net/stratagus" >> $(CURDIR)/debian/control.new; \
-		echo "XB-Maemo-Display-Name: Stratagus" >> $(CURDIR)/debian/control.new; \
-		echo "XB-Maemo-Icon-26:" >> $(CURDIR)/debian/control.new; \
+		cp $(CURDIR)/debian/control $(CURDIR)/debian/control.orig; \
+		sed -n -e "1,/^Depends:.*$$/p" $(CURDIR)/debian/control.orig > $(CURDIR)/debian/control; \
+		sed "/^Package: stratagus$$/a\Section: user\/games" -i $(CURDIR)/debian/control; \
+		echo "XSBC-Bugtracker: https://bugs.launchpad.net/stratagus" >> $(CURDIR)/debian/control; \
+		echo "XB-Maemo-Display-Name: Stratagus" >> $(CURDIR)/debian/control; \
+		echo "XB-Maemo-Icon-26:" >> $(CURDIR)/debian/control; \
 		for line in $(shell convert $(CURDIR)/contrib/stratagus.ico -resize 48x48 png:- | uuencode -m - | tail -n +2 | head -n -1); do \
-			echo " $$line" >> $(CURDIR)/debian/control.new; \
+			echo " $$line" >> $(CURDIR)/debian/control; \
 		done; \
-		sed -n -e "/^Depends:.*$$/,\$$p" $(CURDIR)/debian/control | tail -n +2 >> $(CURDIR)/debian/control.new; \
+		sed -n -e "/^Depends:.*$$/,\$$p" $(CURDIR)/debian/control.orig | tail -n +2 >> $(CURDIR)/debian/control; \
 	fi
