@@ -223,7 +223,7 @@ void DoRightButton(int sx, int sy)
 						PlayUnitSound(*unit, VoiceAcknowledging);
 						acknowledged = 1;
 					}
-					SendCommandBoard(*unit, -1, -1, *dest, flush);
+					SendCommandBoard(*unit, *dest, flush);
 					continue;
 				}
 			}
@@ -249,7 +249,7 @@ void DoRightButton(int sx, int sy)
 					PlayUnitSound(*unit, VoiceAcknowledging);
 					acknowledged = 1;
 				}
-				SendCommandBoard(*dest, -1, -1, *unit, flush);
+				SendCommandBoard(*dest, *unit, flush);
 				continue;
 			}
 		}
@@ -268,7 +268,7 @@ void DoRightButton(int sx, int sy)
 					PlayUnitSound(*unit, VoiceAcknowledging);
 					acknowledged = 1;
 				}
-				SendCommandRepair(*unit, pos.x, pos.y, dest, flush);
+				SendCommandRepair(*unit, pos, dest, flush);
 				continue;
 			}
 			// Harvest
@@ -314,7 +314,7 @@ void DoRightButton(int sx, int sy)
 								PlayUnitSound(*unit, VoiceAcknowledging);
 								acknowledged = 1;
 							}
-							SendCommandResourceLoc(*unit, pos.x, pos.y, flush);
+							SendCommandResourceLoc(*unit, pos, flush);
 							break;
 						}
 					}
@@ -339,7 +339,7 @@ void DoRightButton(int sx, int sy)
 				PlayUnitSound(*unit, VoiceAcknowledging);
 				acknowledged = 1;
 			}
-			SendCommandMove(*unit, pos.x, pos.y, flush);
+			SendCommandMove(*unit, pos, flush);
 			continue;
 		}
 
@@ -359,12 +359,12 @@ void DoRightButton(int sx, int sy)
 						Assert(unit->Type->CanCastSpell);
 						for (spellnum = 0; !type->CanCastSpell[spellnum] &&
 								spellnum < SpellTypeTable.size() ; spellnum++) ;
-						SendCommandSpellCast(*unit, pos.x, pos.y, dest, spellnum, flush);
+						SendCommandSpellCast(*unit, pos, dest, spellnum, flush);
 					} else {
 						if (CanTarget(type, dest->Type)) {
-							SendCommandAttack(*unit, pos.x, pos.y, dest, flush);
+							SendCommandAttack(*unit, pos, dest, flush);
 						} else { // No valid target
-							SendCommandAttack(*unit, pos.x, pos.y, NoUnitP, flush);
+							SendCommandAttack(*unit, pos, NoUnitP, flush);
 						}
 					}
 					continue;
@@ -382,18 +382,18 @@ void DoRightButton(int sx, int sy)
 			}
 			if (Map.WallOnMap(pos)) {
 				if (unit->Player->Race == PlayerRaceHuman && Map.OrcWallOnMap(pos)) {
-					SendCommandAttack(*unit, pos.x, pos.y, NoUnitP, flush);
+					SendCommandAttack(*unit, pos, NoUnitP, flush);
 					continue;
 				}
 				if (unit->Player->Race == PlayerRaceOrc && Map.HumanWallOnMap(pos)) {
-					SendCommandAttack(*unit, pos.x, pos.y, NoUnitP, flush);
+					SendCommandAttack(*unit, pos, NoUnitP, flush);
 					continue;
 				}
 			}
 			// empty space
 			if ((KeyModifiers & ModifierControl)) {
 				if (RightButtonAttacks) {
-					SendCommandMove(*unit, pos.x, pos.y, flush);
+					SendCommandMove(*unit, pos, flush);
 					if (!acknowledged) {
 						PlayUnitSound(*unit, VoiceAcknowledging);
 						acknowledged = 1;
@@ -403,7 +403,7 @@ void DoRightButton(int sx, int sy)
 						PlayUnitSound(*unit, VoiceAttack);
 						acknowledged = 1;
 					}
-					SendCommandAttack(*unit, pos.x, pos.y, NoUnitP, flush);
+					SendCommandAttack(*unit, pos, NoUnitP, flush);
 				}
 			} else {
 				if (RightButtonAttacks) {
@@ -411,14 +411,14 @@ void DoRightButton(int sx, int sy)
 						PlayUnitSound(*unit, VoiceAttack);
 						acknowledged = 1;
 					}
-					SendCommandAttack(*unit, pos.x, pos.y, NoUnitP, flush);
+					SendCommandAttack(*unit, pos, NoUnitP, flush);
 				} else {
 					// Note: move is correct here, right default is move
 					if (!acknowledged) {
 						PlayUnitSound(*unit, VoiceAcknowledging);
 						acknowledged = 1;
 					}
-					SendCommandMove(*unit, pos.x, pos.y, flush);
+					SendCommandMove(*unit, pos, flush);
 				}
 			}
 			// FIXME: ALT-RIGHT-CLICK, move but fight back if attacked.
@@ -483,7 +483,7 @@ void DoRightButton(int sx, int sy)
 					PlayUnitSound(*unit, VoiceAcknowledging);
 					acknowledged = 1;
 				}
-				SendCommandResourceLoc(*unit, pos.x, pos.y, flush);
+				SendCommandResourceLoc(*unit, pos, flush);
 				break;
 			}
 		}
@@ -492,7 +492,7 @@ void DoRightButton(int sx, int sy)
 			acknowledged = 1;
 		}
 
-		SendCommandMove(*unit, pos.x, pos.y, flush);
+		SendCommandMove(*unit, pos, flush);
 	}
 	ShowOrdersCount = GameCycle + Preference.ShowOrders * CYCLES_PER_SECOND;
 }
@@ -980,9 +980,12 @@ static int SendRepair(int sx, int sy)
 			(dest->Player == ThisPlayer || ThisPlayer->IsAllied(*dest))) {
 		for (int i = 0; i < NumSelected; ++i) {
 			CUnit *unit = Selected[i];
+
 			if (unit->Type->RepairRange) {
-				SendCommandRepair(*unit, sx / TileSizeX, sy / TileSizeY, dest,
-					!(KeyModifiers & ModifierShift));
+				const Vec2i tilePos = {sx / TileSizeX, sy / TileSizeY};
+				const int flush = !(KeyModifiers & ModifierShift);
+
+				SendCommandRepair(*unit, tilePos, dest, flush);
 				ret = 1;
 			} else {
 				DebugPrint("Non-worker repairs\n");
@@ -1003,15 +1006,12 @@ static int SendRepair(int sx, int sy)
 */
 static int SendMove(int sx, int sy)
 {
-	int i;
-	int flush;
-	CUnit *unit;
 	CUnit *transporter;
-	int ret;
+	int ret = 0;
 
-	ret = 0;
 	// Move to a transporter.
 	if ((transporter = UnitUnderCursor) && transporter->Type->CanTransport()) {
+		int i;
 		for (i = 0; i < NumSelected; ++i) {
 			if (CanTransport(*transporter, *Selected[i])) {
 				SendCommandStopUnit(*transporter);
@@ -1026,17 +1026,19 @@ static int SendMove(int sx, int sy)
 		transporter = NULL;
 	}
 
-	flush = !(KeyModifiers & ModifierShift);
+	const Vec2i tilePos = {sx / TileSizeX, sy / TileSizeY};
+	const int flush = !(KeyModifiers & ModifierShift);
 
-	for (i = 0; i < NumSelected; ++i) {
-		unit = Selected[i];
+	for (int i = 0; i < NumSelected; ++i) {
+		CUnit *unit = Selected[i];
+
 		if (transporter && CanTransport(*transporter, *unit)) {
 			transporter->Blink = 4;
 			SendCommandFollow(*transporter, *unit, 0);
-			SendCommandBoard(*unit, -1, -1, *transporter, flush);
+			SendCommandBoard(*unit, *transporter, flush);
 			ret = 1;
 		} else {
-			SendCommandMove(*unit, sx / TileSizeX, sy / TileSizeY, flush);
+			SendCommandMove(*unit, tilePos, flush);
 			ret = 1;
 		}
 	}
@@ -1061,11 +1063,11 @@ static int SendMove(int sx, int sy)
 */
 static int SendAttack(int sx, int sy)
 {
-	CUnit *dest;  // unit under cursor if any.
-	int ret;
+	const Vec2i tilePos = {sx / TileSizeX, sy / TileSizeY};
+	const int flush = !(KeyModifiers & ModifierShift);
+	CUnit *dest = UnitUnderCursor;
+	int ret = 0;
 
-	ret = 0;
-	dest = UnitUnderCursor;
 	if (dest && dest->Type->Decoration) {
 		dest = NULL;
 	}
@@ -1077,14 +1079,12 @@ static int SendAttack(int sx, int sy)
 				if (dest) {
 					dest->Blink = 4;
 				}
-				SendCommandAttack(unit, sx / TileSizeX, sy / TileSizeY, dest,
-					!(KeyModifiers & ModifierShift));
+				SendCommandAttack(unit, tilePos, dest, flush);
 				ret = 1;
 			}
 		} else {
 			if (unit.CanMove()) {
-				SendCommandMove(unit, sx / TileSizeX, sy / TileSizeY,
-					!(KeyModifiers & ModifierShift));
+				SendCommandMove(unit, tilePos, flush);
 				ret = 1;
 			}
 		}
@@ -1100,17 +1100,17 @@ static int SendAttack(int sx, int sy)
 */
 static int SendAttackGround(int sx, int sy)
 {
+	const Vec2i tilePos = {sx / TileSizeX, sy / TileSizeY};
+	const int flush = !(KeyModifiers & ModifierShift);
 	int ret = 0;
 
 	for (int i = 0; i < NumSelected; ++i) {
 		CUnit &unit = *Selected[i];
 		if (unit.Type->CanAttack) {
-			SendCommandAttackGround(unit, sx / TileSizeX, sy / TileSizeY,
-				!(KeyModifiers & ModifierShift));
+			SendCommandAttackGround(unit, tilePos, flush);
 			ret = 1;
 		} else {
-			SendCommandMove(unit, sx / TileSizeX, sy / TileSizeY,
-				!(KeyModifiers & ModifierShift));
+			SendCommandMove(unit, tilePos, flush);
 			ret = 1;
 		}
 	}
@@ -1125,12 +1125,14 @@ static int SendAttackGround(int sx, int sy)
 */
 static int SendPatrol(int sx, int sy)
 {
+	const Vec2i tilePos = {sx / TileSizeX, sy / TileSizeY};
+	const int flush = !(KeyModifiers & ModifierShift);
+
 	int ret = 0;
 
 	for (int i = 0; i < NumSelected; ++i) {
 		CUnit &unit = *Selected[i];
-		SendCommandPatrol(unit, sx / TileSizeX, sy / TileSizeY,
-			!(KeyModifiers & ModifierShift));
+		SendCommandPatrol(unit, tilePos, flush);
 		ret = 1;
 	}
 	return ret;
@@ -1150,6 +1152,7 @@ static int SendResource(int sx, int sy)
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
 	const Vec2i pos = {sx / TileSizeX, sy / TileSizeY};
+	const int flush = !(KeyModifiers & ModifierShift);
 
 	for (int i = 0; i < NumSelected; ++i) {
 		CUnit &unit = *Selected[i];
@@ -1163,7 +1166,7 @@ static int SendResource(int sx, int sy)
 					(dest->Player == unit.Player ||
 						(dest->Player->Index == PlayerMax - 1))) {
 				dest->Blink = 4;
-				SendCommandResource(*Selected[i], *dest, !(KeyModifiers & ModifierShift));
+				SendCommandResource(*Selected[i], *dest, flush);
 				ret = 1;
 				continue;
 			} else {
@@ -1175,8 +1178,7 @@ static int SendResource(int sx, int sy)
 							Selected[i]->ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity &&
 							((unit.CurrentResource != res) ||
 								(unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity))) {
-						SendCommandResourceLoc(unit, pos.x, pos.y,
-							!(KeyModifiers & ModifierShift));
+						SendCommandResourceLoc(unit, pos, flush);
 						ret = 1;
 						break;
 					}
@@ -1189,16 +1191,16 @@ static int SendResource(int sx, int sy)
 		if (!unit.CanMove()) {
 			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest) {
 				dest->Blink = 4;
-				SendCommandResource(unit, *dest, !(KeyModifiers & ModifierShift));
+				SendCommandResource(unit, *dest, flush);
 				ret = 1;
 				continue;
 			}
 			if (Map.IsFieldExplored(unit.Player, pos) && Map.ForestOnMap(pos)) {
-				SendCommandResourceLoc(unit, pos.x, pos.y, !(KeyModifiers & ModifierShift));
+				SendCommandResourceLoc(unit, pos, flush);
 				ret = 1;
 				continue;
 			}
-			SendCommandMove(unit, pos.x, pos.y, !(KeyModifiers & ModifierShift));
+			SendCommandMove(unit, pos, flush);
 			ret = 1;
 			continue;
 		}
@@ -1214,12 +1216,13 @@ static int SendResource(int sx, int sy)
 */
 static int SendUnload(int sx, int sy)
 {
+	const Vec2i tilePos = {sx / TileSizeX, sy / TileSizeY};
+	const int flush = !(KeyModifiers & ModifierShift);
 	int ret = 0;
 
 	for (int i = 0; i < NumSelected; ++i) {
 		// FIXME: not only transporter selected?
-		SendCommandUnload(*Selected[i], sx / TileSizeX, sy / TileSizeY, NoUnitP,
-			!(KeyModifiers & ModifierShift));
+		SendCommandUnload(*Selected[i], tilePos, NoUnitP, flush);
 		ret = 1;
 	}
 	return ret;
@@ -1239,10 +1242,10 @@ static int SendUnload(int sx, int sy)
 */
 static int SendSpellCast(int sx, int sy)
 {
-	CUnit *dest;
+	const Vec2i tilePos = {sx / TileSizeX, sy / TileSizeY};
+	const int flush = !(KeyModifiers & ModifierShift);
+	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
-
-	dest = UnitUnderCursor;
 
 	/* NOTE: Vladi:
 	   This is a high-level function, it sends target spot and unit
@@ -1263,8 +1266,7 @@ static int SendSpellCast(int sx, int sy)
 			continue;
 		}
 		// CursorValue here holds the spell type id
-		SendCommandSpellCast(unit, sx / TileSizeX, sy / TileSizeY, dest,
-			CursorValue, !(KeyModifiers & ModifierShift));
+		SendCommandSpellCast(unit, tilePos, dest, CursorValue, flush);
 		ret = 1;
 	}
 	return ret;
@@ -1580,11 +1582,10 @@ void UIHandleButtonDown(unsigned button)
 				// 0 Test build, don't really build
 				if (CanBuildUnitType(Selected[0], CursorBuilding, tilePos, 0) &&
 						(explored || ReplayRevealMap)) {
-					PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound,
-						MaxSampleVolume);
+					const int flush = !(KeyModifiers & ModifierShift);
+					PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound, MaxSampleVolume);
 					for (int i = 0; i < NumSelected; ++i) {
-						SendCommandBuildBuilding(*Selected[i], tilePos.x, tilePos.y, CursorBuilding,
-							!(KeyModifiers & ModifierShift));
+						SendCommandBuildBuilding(*Selected[i], tilePos, CursorBuilding, flush);
 					}
 					if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
 						CancelBuildingMode();
@@ -1762,9 +1763,8 @@ void UIHandleButtonDown(unsigned button)
 							}
 						}
 						Assert(uins->Boarded);
-						SendCommandUnload(*Selected[0],
-							Selected[0]->tilePos.x, Selected[0]->tilePos.y, uins,
-							!(KeyModifiers & ModifierShift));
+						const int flush = !(KeyModifiers & ModifierShift);
+						SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
 					}
 				}
 			} else if (ButtonAreaUnderCursor == ButtonAreaButton) {

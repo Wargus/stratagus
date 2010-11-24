@@ -390,8 +390,8 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 		file->printf("  \"exploration\", {");
 		s = (int)ai->FirstExplorationRequest.size();
 		for (i = 0; i < s; ++i) {
-			AiExplorationRequest *ptr = &ai->FirstExplorationRequest[i];
-			file->printf("{%d, %d, %d}, ", ptr->X, ptr->Y, ptr->Mask);
+			const AiExplorationRequest &ptr = ai->FirstExplorationRequest[i];
+			file->printf("{%d, %d, %d}, ", ptr.pos.x, ptr.pos.y, ptr.Mask);
 		}
 		file->printf("},\n");
 	}
@@ -783,10 +783,10 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 
 				if (aiunit->SavedOrder.Action == UnitActionStill) {
 					// FIXME: should rewrite command handling
-					CommandAttack(*aiunit, aiunit->tilePos.x, aiunit->tilePos.y, NoUnitP, FlushCommands);
+					CommandAttack(*aiunit, aiunit->tilePos, NoUnitP, FlushCommands);
 					aiunit->SavedOrder = *aiunit->Orders[1];
 				}
-				CommandAttack(*aiunit, attacker->tilePos.x, attacker->tilePos.y, const_cast<CUnit*>(attacker), FlushCommands);
+				CommandAttack(*aiunit, attacker->tilePos, const_cast<CUnit*>(attacker), FlushCommands);
 			}
 		}
 
@@ -1016,7 +1016,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 	// Don't move more than 1 unit.
 	if (movablenb) {
 		int index = SyncRand() % movablenb;
-		CommandMove(*movableunits[index], movablepos[index].x, movablepos[index].y, FlushCommands);
+		CommandMove(*movableunits[index], movablepos[index], FlushCommands);
 		AiPlayer->LastCanNotMoveGameCycle = GameCycle;
 	}
 }

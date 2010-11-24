@@ -83,9 +83,6 @@ struct AiForceEnemyFinder {
 };
 
 struct AiForceAttackSender {
-	int goalX;
-	int goalY;
-	int delta;
 
 	inline void operator() (CUnit *const unit) {
 	// this may be problem if units are in bunker and we want sent
@@ -95,11 +92,11 @@ struct AiForceAttackSender {
 			unit->Wait = delta;
 			++delta;
 			if (unit->Type->CanTransport() && unit->BoardCount > 0) {
-				CommandUnload(*unit, goalX, goalY, NULL, FlushCommands);
+				CommandUnload(*unit, goalPos, NULL, FlushCommands);
 			} else if (unit->Type->CanAttack) {
-				CommandAttack(*unit, goalX, goalY, NULL, FlushCommands);
+				CommandAttack(*unit, goalPos,  NULL, FlushCommands);
 			} else /*if (force->State == 2) */{
-				CommandMove(*unit, goalX, goalY, FlushCommands);
+				CommandMove(*unit, goalPos, FlushCommands);
 			}
 		}
 	}
@@ -107,7 +104,7 @@ struct AiForceAttackSender {
 	//
 	//  Send all units in the force to enemy at x,y.
 	//
-	AiForceAttackSender(int force, int x, int y): goalX(x), goalY(y), delta(0) {
+	AiForceAttackSender(int force, const Vec2i &pos) : goalPos(pos), delta(0) {
 		DebugPrint("%d: Attacking with force #%d\n" _C_ AiPlayer->Player->Index _C_ force);
 		AiForce *fptr = &AiPlayer->Force[force];
 		fptr->Attacking = true;
@@ -115,9 +112,8 @@ struct AiForceAttackSender {
 		fptr->Units.for_each(*this);
 	}
 
-	AiForceAttackSender(AiForce *force, int x, int y):
-		 goalX(x), goalY(y), delta(0) {
-
+	AiForceAttackSender(AiForce *force, const Vec2i &pos) :
+		 goalPos(pos), delta(0) {
 		DebugPrint("%d: Attacking with force #%lu\n" _C_ AiPlayer->Player->Index
 			 _C_ (long unsigned int)(force  - &(AiPlayer->Force[0])));
 		force->Attacking = true;
@@ -125,6 +121,8 @@ struct AiForceAttackSender {
 		force->Units.for_each(*this);
 	}
 
+	Vec2i goalPos;
+	int delta;
 };
 
 
@@ -376,7 +374,7 @@ void AiForce::Attack(const Vec2i &pos)
 		//
 		//  Send all units in the force to enemy.
 		//
-		AiForceAttackSender(this, goalPos.x, goalPos.y);
+		AiForceAttackSender(this, goalPos);
 	}
 
 }
@@ -784,13 +782,13 @@ void AiForce::Update()
 				continue;
 			}
 			if (aiunit->Type->CanAttack) {
-				CommandAttack(*aiunit, pos.x, pos.y, NULL, FlushCommands);
+				CommandAttack(*aiunit, pos, NULL, FlushCommands);
 			} else if (aiunit->Type->CanTransport()) {
+				const Vec2i startPos = {aiunit->Player->StartX, aiunit->Player->StartY};
 				// FIXME : Retrieve unit blocked (transport previously full)
-				CommandMove(*aiunit, aiunit->Player->StartX,
-					 aiunit->Player->StartY, FlushCommands);
+				CommandMove(*aiunit, startPos, FlushCommands);
 			} else {
-				CommandMove(*aiunit, pos.x, pos.y, FlushCommands);
+				CommandMove(*aiunit, pos, FlushCommands);
 			}
 		}
 	} else { // Everyone is idle, find a new target
@@ -822,11 +820,11 @@ void AiForce::Update()
 			CUnit *aiunit = Units[i];
 
 			if (aiunit->Type->CanTransport() && aiunit->BoardCount > 0) {
-				CommandUnload(aiunit, pos.x, pos.y, NULL, FlushCommands);
+				CommandUnload(aiunit, pos, NULL, FlushCommands);
 			} else if (aiunit->Type->CanAttack) {
-				CommandAttack(aiunit, pos.x, pos.y, NULL, FlushCommands);
+				CommandAttack(aiunit, pos, NULL, FlushCommands);
 			} else if (force->State == 2) {
-				CommandMove(aiunit, pos.x, pos.y, FlushCommands);
+				CommandMove(aiunit, pos, FlushCommands);
 			}
 		}
 		force->State = 3;
@@ -847,7 +845,7 @@ void AiForce::Update()
 		} else {
 			pos = this->GoalPos;
 		}
-		AiForceAttackSender(this, pos.x, pos.y);
+		AiForceAttackSender(this, pos);
 #endif
 	}
 }

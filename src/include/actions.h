@@ -84,27 +84,27 @@ extern void CommandStandGround(CUnit &unit, int flush);
 	/// Prepare command follow
 extern void CommandFollow(CUnit &unit, CUnit &dest, int flush);
 	/// Prepare command move
-extern void CommandMove(CUnit &unit, int x, int y, int flush);
+extern void CommandMove(CUnit &unit, const Vec2i &pos, int flush);
 	/// Prepare command repair
-extern void CommandRepair(CUnit &unit, int x, int y, CUnit *dest, int flush);
+extern void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
 	/// Send auto repair command
 extern void CommandAutoRepair(CUnit &unit, int on);
 	/// Prepare command attack
-extern void CommandAttack(CUnit &unit, int x, int y, CUnit *dest, int flush);
+extern void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
 	/// Prepare command attack ground
-extern void CommandAttackGround(CUnit &unit, int x, int y, int flush);
+extern void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush);
 	/// Prepare command patrol
-extern void CommandPatrolUnit(CUnit &unit, int x, int y, int flush);
+extern void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush);
 	/// Prepare command board
 extern void CommandBoard(CUnit &unit, CUnit &dest, int flush);
 	/// Prepare command unload
-extern void CommandUnload(CUnit &unit, int x, int y, CUnit *what, int flush);
+extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush);
 	/// Prepare command build
-extern void CommandBuildBuilding(CUnit &unit, int x, int y, CUnitType *, int flush);
+extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType *, int flush);
 	/// Prepare command dismiss
 extern void CommandDismiss(CUnit &unit);
 	/// Prepare command resource location
-extern void CommandResourceLoc(CUnit &unit, int x, int y, int flush);
+extern void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush);
 	/// Prepare command resource
 extern void CommandResource(CUnit &unit, CUnit &dest, int flush);
 	/// Prepare command return
@@ -124,8 +124,7 @@ extern void CommandResearch(CUnit &unit, CUpgrade *what, int flush);
 	/// Prepare command cancel research
 extern void CommandCancelResearch(CUnit &unit);
 	/// Prepare command spellcast
-extern void CommandSpellCast(CUnit &unit, int x, int y,
-	CUnit *dest, SpellType *spell, int flush);
+extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, SpellType *spell, int flush);
 	/// Prepare command auto spellcast
 extern void CommandAutoSpellCast(CUnit &unit, int spellid, int on);
 	/// Prepare diplomacy command

@@ -148,7 +148,7 @@ int UnloadUnit(CUnit &unit)
 		return 0;
 	}
 	unit.Boarded = 0;
-	unit.Place(pos.x, pos.y);
+	unit.Place(pos);
 	return 1;
 }
 

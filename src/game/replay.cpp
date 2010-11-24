@@ -779,17 +779,8 @@ void CleanReplayLog(void)
 /**
 **  Do next replay
 */
-static void DoNextReplay(void)
+static void DoNextReplay()
 {
-	int unit;
-	const char *action;
-	int flags;
-	int posx;
-	int posy;
-	const char *val;
-	int num;
-	CUnit *dunit;
-
 	Assert(ReplayStep != 0);
 
 	NextLogCycle = ReplayStep->GameCycle;
@@ -798,14 +789,15 @@ static void DoNextReplay(void)
 		return;
 	}
 
-	unit = ReplayStep->UnitNumber;
-	action = ReplayStep->Action.c_str();
-	flags = ReplayStep->Flush;
-	posx = ReplayStep->PosX;
-	posy = ReplayStep->PosY;
-	dunit = (ReplayStep->DestUnitNumber != -1 ? UnitSlots[ReplayStep->DestUnitNumber] : NoUnitP);
-	val = ReplayStep->Value.c_str();
-	num = ReplayStep->Num;
+	const int unit = ReplayStep->UnitNumber;
+	const char *action = ReplayStep->Action.c_str();
+	const int flags = ReplayStep->Flush;
+	const Vec2i pos = { ReplayStep->PosX, ReplayStep->PosY};
+	const int arg1 = ReplayStep->PosX;
+	const int arg2 = ReplayStep->PosY;
+	CUnit *dunit = (ReplayStep->DestUnitNumber != -1 ? UnitSlots[ReplayStep->DestUnitNumber] : NoUnitP);
+	const char *val = ReplayStep->Value.c_str();
+	const int num = ReplayStep->Num;
 
 	Assert(unit == -1 || ReplayStep->UnitIdent == UnitSlots[unit]->Type->Ident);
 
@@ -838,27 +830,27 @@ static void DoNextReplay(void)
 	} else if (!strcmp(action, "follow")) {
 		SendCommandFollow(*UnitSlots[unit], *dunit, flags);
 	} else if (!strcmp(action, "move")) {
-		SendCommandMove(*UnitSlots[unit], posx, posy, flags);
+		SendCommandMove(*UnitSlots[unit], pos, flags);
 	} else if (!strcmp(action, "repair")) {
-		SendCommandRepair(*UnitSlots[unit], posx, posy, dunit, flags);
+		SendCommandRepair(*UnitSlots[unit], pos, dunit, flags);
 	} else if (!strcmp(action, "auto-repair")) {
-		SendCommandAutoRepair(*UnitSlots[unit], posx);
+		SendCommandAutoRepair(*UnitSlots[unit], arg1);
 	} else if (!strcmp(action, "attack")) {
-		SendCommandAttack(*UnitSlots[unit], posx, posy, dunit, flags);
+		SendCommandAttack(*UnitSlots[unit], pos, dunit, flags);
 	} else if (!strcmp(action, "attack-ground")) {
-		SendCommandAttackGround(*UnitSlots[unit], posx, posy, flags);
+		SendCommandAttackGround(*UnitSlots[unit], pos, flags);
 	} else if (!strcmp(action, "patrol")) {
-		SendCommandPatrol(*UnitSlots[unit], posx, posy, flags);
+		SendCommandPatrol(*UnitSlots[unit], pos, flags);
 	} else if (!strcmp(action, "board")) {
-		SendCommandBoard(*UnitSlots[unit], posx, posy, *dunit, flags);
+		SendCommandBoard(*UnitSlots[unit], *dunit, flags);
 	} else if (!strcmp(action, "unload")) {
-		SendCommandUnload(*UnitSlots[unit], posx, posy, dunit, flags);
+		SendCommandUnload(*UnitSlots[unit], pos, dunit, flags);
 	} else if (!strcmp(action, "build")) {
-		SendCommandBuildBuilding(*UnitSlots[unit], posx, posy, UnitTypeByIdent(val), flags);
+		SendCommandBuildBuilding(*UnitSlots[unit], pos, UnitTypeByIdent(val), flags);
 	} else if (!strcmp(action, "dismiss")) {
 		SendCommandDismiss(*UnitSlots[unit]);
 	} else if (!strcmp(action, "resource-loc")) {
-		SendCommandResourceLoc(*UnitSlots[unit], posx, posy, flags);
+		SendCommandResourceLoc(*UnitSlots[unit], pos, flags);
 	} else if (!strcmp(action, "resource")) {
 		SendCommandResource(*UnitSlots[unit], *dunit, flags);
 	} else if (!strcmp(action, "return")) {
@@ -876,9 +868,9 @@ static void DoNextReplay(void)
 	} else if (!strcmp(action, "cancel-research")) {
 		SendCommandCancelResearch(*UnitSlots[unit]);
 	} else if (!strcmp(action, "spell-cast")) {
-		SendCommandSpellCast(*UnitSlots[unit], posx, posy, dunit, num, flags);
+		SendCommandSpellCast(*UnitSlots[unit], pos, dunit, num, flags);
 	} else if (!strcmp(action, "auto-spell-cast")) {
-		SendCommandAutoSpellCast(*UnitSlots[unit], num, posx);
+		SendCommandAutoSpellCast(*UnitSlots[unit], num, arg1);
 	} else if (!strcmp(action, "diplomacy")) {
 		int state;
 		if (!strcmp(val, "neutral")) {
@@ -893,11 +885,11 @@ static void DoNextReplay(void)
 			DebugPrint("Invalid diplomacy command: %s" _C_ val);
 			state = -1;
 		}
-		SendCommandDiplomacy(posx, state, posy);
+		SendCommandDiplomacy(arg1, state, arg2);
 	} else if (!strcmp(action, "shared-vision")) {
 		bool state;
 		state = atoi(val) ? true : false;
-		SendCommandSharedVision(posx, state, posy);
+		SendCommandSharedVision(arg1, state, arg2);
 	} else if (!strcmp(action, "input")) {
 		if (val[0] == '-') {
 			CclCommand(val + 1, false);
@@ -905,7 +897,7 @@ static void DoNextReplay(void)
 			HandleCheats(val);
 		}
 	} else if (!strcmp(action, "quit")) {
-		CommandQuit(posx);
+		CommandQuit(arg1);
 	} else {
 		DebugPrint("Invalid action: %s" _C_ action);
 	}

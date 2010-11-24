@@ -734,20 +734,18 @@ static void RemoveUnitFromContainer(CUnit &unit)
 **  Affect Tile coord of a unit (with units inside) to tile (x, y).
 **
 **  @param unit  unit to move.
-**  @param x     X map tile position.
-**  @param y     Y map tile position.
+**  @param pos   map tile position.
 **
 **  @internal before use it, Map.Remove(unit), MapUnmarkUnitSight(unit)
 **  and after Map.Insert(unit), MapMarkUnitSight(unit)
 **  are often necessary. Check Flag also for Pathfinder.
 */
-static void UnitInXY(CUnit &unit, int x, int y)
+static void UnitInXY(CUnit &unit, const Vec2i &pos)
 {
 	CUnit *unit_inside = unit.UnitInside;
 
-	unit.tilePos.x = x;
-	unit.tilePos.y = y;
-	unit.Offset = Map.getIndex(x, y);
+	unit.tilePos = pos;
+	unit.Offset = Map.getIndex(pos);
 
 	if (!unit.Container) {
 		//Only Top Units
@@ -761,29 +759,26 @@ static void UnitInXY(CUnit &unit, int x, int y)
 		}
 	}
 	for (int i = unit.InsideCount; i--; unit_inside = unit_inside->NextContained) {
-		UnitInXY(*unit_inside, x, y);
+		UnitInXY(*unit_inside, pos);
 	}
 }
 
 /**
-**  Move a unit (with units inside) to tile (x, y).
+**  Move a unit (with units inside) to tile (pos).
 **  (Do stuff with vision, cachelist and pathfinding).
 **
-**  @param x  X map tile position.
-**  @param y  Y map tile position.
+**  @param pos  map tile position.
 **
 */
-void CUnit::MoveToXY(int x, int y)
+void CUnit::MoveToXY(const Vec2i &pos)
 {
-	const Vec2i pos = {x, y};
-
 	MapUnmarkUnitSight(*this);
 	Map.Remove(*this);
 	UnmarkUnitFieldFlags(*this);
 
 	Assert(UnitCanBeAt(*this, pos));
 	// Move the unit.
-	UnitInXY(*this, pos.x, pos.y);
+	UnitInXY(*this, pos);
 
 	Map.Insert(*this);
 	MarkUnitFieldFlags(*this);
@@ -795,10 +790,9 @@ void CUnit::MoveToXY(int x, int y)
 /**
 **  Place unit on map.
 **
-**  @param x  X map tile position.
-**  @param y  Y map tile position.
+**  @param pos  map tile position.
 */
-void CUnit::Place(int x, int y)
+void CUnit::Place(const Vec2i &pos)
 {
 	Assert(Removed);
 
@@ -811,7 +805,7 @@ void CUnit::Place(int x, int y)
 		UpdateUnitSightRange(*this);
 	}
 	Removed = 0;
-	UnitInXY(*this, x, y);
+	UnitInXY(*this, pos);
 	// Pathfinding info.
 	MarkUnitFieldFlags(*this);
 	// Tha cache list.
@@ -825,19 +819,18 @@ void CUnit::Place(int x, int y)
 /**
 **  Create new unit and place on map.
 **
-**  @param x       X map tile position.
-**  @param y       Y map tile position.
+**  @param pos     map tile position.
 **  @param type    Pointer to unit-type.
 **  @param player  Pointer to owning player.
 **
 **  @return        Pointer to created unit.
 */
-CUnit *MakeUnitAndPlace(int x, int y, CUnitType *type, CPlayer *player)
+CUnit *MakeUnitAndPlace(const Vec2i &pos, CUnitType *type, CPlayer *player)
 {
 	CUnit *unit = MakeUnit(type, player);
 
 	if (unit != NoUnitP) {
-		unit->Place(x, y);
+		unit->Place(pos);
 	}
 	return unit;
 }
@@ -867,7 +860,7 @@ void CUnit::Remove(CUnit *host)
 	if (host) {
 		AddInContainer(*host);
 		UpdateUnitSightRange(*this);
-		UnitInXY(*this, host->tilePos.x, host->tilePos.y);
+		UnitInXY(*this, host->tilePos);
 		MapMarkUnitSight(*this);
 	}
 
@@ -995,7 +988,7 @@ void UnitLost(CUnit &unit)
 	// Destroy resource-platform, must re-make resource patch.
 	if ((b = OnTopDetails(unit, NULL)) != NULL) {
 		if (b->ReplaceOnDie && (unit.Type->GivesResource && unit.ResourcesHeld != 0)) {
-			temp = MakeUnitAndPlace(unit.tilePos.x, unit.tilePos.y, b->Parent, &Players[PlayerNumNeutral]);
+			temp = MakeUnitAndPlace(unit.tilePos, b->Parent, &Players[PlayerNumNeutral]);
 			if (temp == NoUnitP) {
 				DebugPrint("Unable to allocate Unit");
 			} else {
@@ -1895,7 +1888,7 @@ startn:
 	}
 
 found:
-	unit.Place(pos.x, pos.y);
+	unit.Place(pos);
 }
 
 /**
@@ -1967,7 +1960,7 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, int addx, int addy)
 			}
 		}
 		if (bestd != 99999) {
-			unit.Place(bestPos.x, bestPos.y);
+			unit.Place(bestPos);
 			return;
 		}
 		++addy;
@@ -2009,7 +2002,7 @@ void DropOutAll(const CUnit &source)
 int FindWoodInSight(const CUnit &unit, Vec2i *pos)
 {
 	return FindTerrainType(unit.Type->MovementMask, 0, MapFieldForest, 9999,
-		unit.Player, unit.tilePos.x, unit.tilePos.y, pos);
+		unit.Player, unit.tilePos, pos);
 }
 
 /**
@@ -2020,8 +2013,7 @@ int FindWoodInSight(const CUnit &unit, Vec2i *pos)
 **  @param rvresult    Return a tile that doesn't match.
 **  @param range       Maximum distance for the search.
 **  @param player      Only search fields explored by player
-**  @param x           Map X start position for the search.
-**  @param y           Map Y start position for the search.
+**  @param startPos    Map start position for the search.
 **
 **  @param pos         OUT: Map position of tile.
 **
@@ -2035,7 +2027,7 @@ int FindWoodInSight(const CUnit &unit, Vec2i *pos)
 **  @return            True if wood was found.
 */
 int FindTerrainType(int movemask, int resmask, int rvresult, int range,
-	const CPlayer *player, int x, int y, Vec2i *terrainPos)
+	const CPlayer *player, const Vec2i &startPos, Vec2i *terrainPos)
 {
 	const Vec2i offset[] = {{0, -1}, {-1, 0}, {1, 0}, {0, 1}, {-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
 	Vec2i *points;
@@ -2049,7 +2041,7 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 	unsigned char *m;
 	unsigned char *matrix;
 	int cdist;
-	Vec2i pos = {x, y};
+	Vec2i pos(startPos);
 
 	Vec2i dest = pos;
 
@@ -3131,11 +3123,10 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 			if (goal) {
 				if (target.SavedOrder.Action == UnitActionStill) {
 					// FIXME: should rewrite command handling
-					CommandAttack(target, target.tilePos.x, target.tilePos.y, NoUnitP,
-						FlushCommands);
+					CommandAttack(target, target.tilePos, NoUnitP, FlushCommands);
 					target.SavedOrder = *target.Orders[1];
 				}
-				CommandAttack(target, goal->tilePos.x, goal->tilePos.y, NoUnitP, FlushCommands);
+				CommandAttack(target, goal->tilePos, NoUnitP, FlushCommands);
 				return;
 			}
 	}
@@ -3170,7 +3161,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 			pos.y = Map.Info.MapHeight - 1;
 		}
 		CommandStopUnit(target);
-		CommandMove(target, pos.x, pos.y, 0);
+		CommandMove(target, pos, 0);
 	}
 }
 
@@ -3181,37 +3172,27 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 /**
 **  Returns the map distance between two points with unit type.
 **
-**  @param x1    X map tile position.
-**  @param y1    Y map tile position.
+**  @param pos1  map tile position.
 **  @param type  Unit type to take into account.
-**  @param x2    X map tile position.
-**  @param y2    Y map tile position.
+**  @param pos2  map tile position.
 **
 **  @return      The distance between in tiles.
 */
-int MapDistanceToType(int x1, int y1, const CUnitType *type, int x2, int y2)
+int MapDistanceToType(const Vec2i &pos1, const CUnitType *type, const Vec2i &pos2)
 {
 	int dx;
 	int dy;
 
-	if (x1 <= x2) {
-		dx = x2 - x1;
+	if (pos1.x <= pos2.x) {
+		dx = pos2.x - pos1.x;
 	} else {
-		dx = x1 - x2 - type->TileWidth + 1;
-		if (dx < 0) {
-			dx = 0;
-		}
+		dx = std::max(0, pos1.x - pos2.x - type->TileWidth + 1);
 	}
-
-	if (y1 <= y2) {
-		dy = y2 - y1;
+	if (pos1.y <= pos2.y) {
+		dy = pos2.y - pos1.y;
 	} else {
-		dy = y1 - y2 - type->TileHeight + 1;
-		if (dy < 0) {
-			dy = 0;
-		}
+		dy = std::max(0, pos1.y - pos2.y - type->TileHeight + 1);
 	}
-
 	return isqrt(dy * dy + dx * dx);
 }
 

@@ -53,13 +53,13 @@ public:
 		WithTerrain(false), ShowSelected(false),
 		Transparent(false), UpdateCache(false) {}
 
-	void UpdateXY(int tx, int ty);
-	void UpdateSeenXY(int, int) {}
-	void Update(void);
-	void Create(void);
-	void FreeOpenGL(void);
-	void Reload(void);
-	void Destroy(void);
+	void UpdateXY(const Vec2i &pos);
+	void UpdateSeenXY(const Vec2i &pos) {}
+	void Update();
+	void Create();
+	void FreeOpenGL();
+	void Reload();
+	void Destroy();
 	void Draw(int vx, int vy);
 	void DrawCursor(int vx, int vy);
 	void AddEvent(int x, int y);

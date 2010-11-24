@@ -438,9 +438,9 @@ int AiFindWall(AiForce *force)
 		for (unsigned int i = 0; i < force->Units.size(); ++i) {
 			CUnit &aiunit = *force->Units[i];
 			if (aiunit.Type->CanAttack) {
-				CommandAttack(aiunit, dest.x, dest.y, NULL, FlushCommands);
+				CommandAttack(aiunit, dest, NULL, FlushCommands);
 			} else {
-				CommandMove(aiunit, dest.x, dest.y, FlushCommands);
+				CommandMove(aiunit, dest, FlushCommands);
 			}
 		}
 		return 1;
@@ -622,7 +622,7 @@ void AiSendExplorers()
 		request = &AiPlayer->FirstExplorationRequest[requestid];
 
 		// Choose a target, "near"
-		const Vec2i center = { request->X, request->Y };
+		const Vec2i& center = request->pos;
 		ray = 3;
 		trycount = 0;
 
@@ -692,7 +692,7 @@ void AiSendExplorers()
 	} while (outtrycount <= 4 && !bestunit);
 
 	if (bestunit) {
-		CommandMove(*bestunit, pos.x, pos.y, FlushCommands);
+		CommandMove(*bestunit, pos, FlushCommands);
 		AiPlayer->LastExplorationGameCycle = GameCycle;
 	}
 

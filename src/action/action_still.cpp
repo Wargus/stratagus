@@ -246,7 +246,8 @@ bool AutoRepair(CUnit &unit)
 		if (repairedUnit != NoUnitP) {
 			CUnit::COrder order = *unit.CurrentOrder();
 			//Command* will clear unit.SavedOrder
-			CommandRepair(unit, -1, -1, repairedUnit, FlushCommands);
+			const Vec2i invalidPos = {-1, -1};
+			CommandRepair(unit, invalidPos, repairedUnit, FlushCommands);
 			unit.SavedOrder = order;
 			return true;
 		}
@@ -267,7 +268,7 @@ static bool AutoAttack(CUnit &unit, bool stand_ground)
 		if (!stand_ground && !unit.Removed && unit.CanMove()) {
 			if ((goal = AttackUnitsInReactRange(unit))) {
 				// Weak goal, can choose other unit, come back after attack
-				CommandAttack(unit, goal->tilePos.x, goal->tilePos.y, NULL, FlushCommands);
+				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
 				Assert(unit.SavedOrder.Action == UnitActionStill);
 				Assert(!unit.SavedOrder.HasGoal());
 				unit.SavedOrder.Action = UnitActionAttack;
@@ -313,7 +314,7 @@ void AutoAttack(CUnit &unit, CUnitCache &targets, bool stand_ground)
 			if ((goal = AutoAttackUnitsInDistance(unit,
 				 unit.GetReactRange(), targets))) {
 				// Weak goal, can choose other unit, come back after attack
-				CommandAttack(unit, goal->tilePos.x, goal->tilePos.y, NULL, FlushCommands);
+				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
 				Assert(unit.SavedOrder.Action == UnitActionStill);
 				Assert(!unit.SavedOrder.HasGoal());
 				unit.SavedOrder.Action = UnitActionAttack;

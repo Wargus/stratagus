@@ -292,7 +292,7 @@ static void StartBuilding(CUnit &unit, CUnit &ontop)
 	build->CurrentOrder()->Action = UnitActionBuilt;
 
 	// Must place after previous for map flags
-	build->Place(pos.x, pos.y);
+	build->Place(pos);
 	if (!type->BuilderOutside) {
 		build->CurrentSightRange = 1;
 	}

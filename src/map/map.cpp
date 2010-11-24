@@ -129,7 +129,7 @@ void CMap::MarkSeenTile(const unsigned int index)
 	}
 
 #ifdef MINIMAP_UPDATE
-	UI.Minimap.UpdateXY(pos.x, pos.y);
+	UI.Minimap.UpdateXY(pos);
 #endif
 }
 
@@ -517,7 +517,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 			mf->Tile = removedtile;
 			mf->Flags &= ~flags;
 			mf->Value = 0;
-			UI.Minimap.UpdateXY(pos.x, pos.y);
+			UI.Minimap.UpdateXY(pos);
 		}
 	} else if (seen && this->Tileset.MixedLookupTable[mf->SeenTile] ==
 				this->Tileset.MixedLookupTable[tile]) { //Same Type
@@ -532,7 +532,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 
 	//maybe isExplored
 	if (IsTileVisible(ThisPlayer, index) > 0) {
-		UI.Minimap.UpdateSeenXY(pos.x, pos.y);
+		UI.Minimap.UpdateSeenXY(pos);
 		if (!seen) {
 			MarkSeenTile(pos);
 		}
@@ -588,12 +588,12 @@ void CMap::ClearTile(unsigned short type, const Vec2i &pos)
 	mf->Flags &= ~flags;
 	mf->Value = 0;
 
-	UI.Minimap.UpdateXY(pos.x, pos.y);
+	UI.Minimap.UpdateXY(pos);
 	FixNeighbors(type, 0, pos);
 
 	//maybe isExplored
 	if (IsTileVisible(ThisPlayer, index) > 0) {
-		UI.Minimap.UpdateSeenXY(pos.x, pos.y);
+		UI.Minimap.UpdateSeenXY(pos);
 		MarkSeenTile(pos);
 	}
 }

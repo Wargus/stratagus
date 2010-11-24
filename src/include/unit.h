@@ -410,8 +410,7 @@ static inline int MapDistance(int x1, int y1, int x2, int y2)
 }
 
 	/// Returns the map distance between two points with unit-type
-extern int MapDistanceToType(int x1, int y1,
-	const CUnitType *type, int x2, int y2);
+extern int MapDistanceToType(const Vec2i &pos1, const CUnitType *type, const Vec2i &pos2);
 
 	/// Returns the map diestance between to unittype as locations
 extern int MapDistanceBetweenTypes(const CUnitType *src, int x1, int y1,
@@ -849,10 +848,10 @@ public:
 	/// Draw a single unit
 	void Draw(const CViewport *vp) const;
 	/// Place a unit on map
-	void Place(int x, int y);
+	void Place(const Vec2i &pos);
 
-	/// Move unit to tile(x, y). (Do special stuff : vision, cachelist, pathfinding)
-	void MoveToXY(int x, int y);
+	/// Move unit to tile(pos). (Do special stuff : vision, cachelist, pathfinding)
+	void MoveToXY(const Vec2i &pos);
 	/// Add a unit inside a container. Only deal with list stuff.
 	void AddInContainer(CUnit &host);
 	/// Change owner of unit
@@ -996,7 +995,8 @@ public:
 	 */
 	int MapDistanceTo(int x, int y) const
 	{
-		return MapDistanceToType(x, y, Type, this->tilePos.x, this->tilePos.y);
+		const Vec2i pos = {x, y};
+		return MapDistanceToType(pos, Type, this->tilePos);
 	}
 
 	/**
@@ -1245,7 +1245,7 @@ void UpdateUnitSightRange(CUnit &unit);
 	/// Create a new unit
 extern CUnit *MakeUnit(CUnitType *type, CPlayer *player);
 	/// Create a new unit and place on map
-extern CUnit *MakeUnitAndPlace(int x, int y, CUnitType *type, CPlayer *player);
+extern CUnit *MakeUnitAndPlace(const Vec2i &pos, CUnitType *type, CPlayer *player);
 	/// Handle the loss of a unit (food,...)
 extern void UnitLost(CUnit &unit);
 	/// Remove the Orders of a Unit
@@ -1312,7 +1312,7 @@ extern CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last);
 
 	/// Find the neareast piece of terrain with specific flags.
 extern int FindTerrainType(int movemask, int resmask, int rvresult, int range,
-		const CPlayer *player, int x, int y, Vec2i *pos);
+		const CPlayer *player, const Vec2i &startPos, Vec2i *pos);
 	/// Find the nearest piece of wood in sight range
 extern int FindWoodInSight(const CUnit &unit, Vec2i *pos);
 

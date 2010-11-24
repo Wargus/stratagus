@@ -1533,28 +1533,23 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
-				int x;
-				int y;
-				int mask;
-				AiExplorationRequest queue;
+				Vec2i pos;
 
 				lua_rawgeti(l, j + 1, k + 1);
 				if (!lua_istable(l, -1) || lua_objlen(l, -1) != 3) {
 					LuaError(l, "incorrect argument");
 				}
 				lua_rawgeti(l, -1, 1);
-				x = LuaToNumber(l, -1);
+				pos.x = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 				lua_rawgeti(l, -1, 2);
-				y = LuaToNumber(l, -1);
+				pos.y = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 				lua_rawgeti(l, -1, 3);
-				mask = LuaToNumber(l, -1);
+				const int mask = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 				lua_pop(l, 1);
-				queue.X = x;
-				queue.Y = y;
-				queue.Mask = mask;
+				AiExplorationRequest queue(pos, mask);
 				ai->FirstExplorationRequest.push_back(queue);
 			}
 		} else if (!strcmp(value, "last-exploration-cycle")) {

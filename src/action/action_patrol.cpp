@@ -137,7 +137,7 @@ void HandleActionPatrol(CUnit &unit)
 				unit.CurrentOrder()->ClearGoal();
 
 				DebugPrint("Patrol attack %d\n" _C_ UnitNumber(*goal));
-				CommandAttack(unit, goal->tilePos.x, goal->tilePos.y, NULL, FlushCommands);
+				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
 				return;
 			}
 		}
