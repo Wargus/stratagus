@@ -1071,7 +1071,9 @@ void AStarFreeStats(StatsNode *stats)
 void SetAStarFixedUnitCrossingCost(int cost) {
 	if (cost <= 3) {
 		fprintf(stderr, "AStarFixedUnitCrossingCost must be greater than 3\n");
+		return;
 	}
+	AStarFixedUnitCrossingCost = cost;
 }
 int GetAStarFixedUnitCrossingCost() {
 	return AStarFixedUnitCrossingCost;
@@ -1081,7 +1083,9 @@ int GetAStarFixedUnitCrossingCost() {
 void SetAStarMovingUnitCrossingCost(int cost) {
 	if (cost <= 3) {
 		fprintf(stderr, "AStarMovingUnitCrossingCost must be greater than 3\n");
+		return;
 	}
+	AStarMovingUnitCrossingCost = cost;
 }
 int GetAStarMovingUnitCrossingCost() {
 	return AStarMovingUnitCrossingCost;
