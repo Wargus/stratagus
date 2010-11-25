@@ -17,15 +17,20 @@ class CEditor
 	void TileSelectedPatch();
 };
 
-extern void SetEditorSelectIcon(const std::string &icon);
-extern void SetEditorUnitsIcon(const std::string &icon);
-extern void SetEditorPatchIcon(const std::string &icon);
-extern void SetEditorStartUnit(const std::string &name);
+// The C++ functions may have const std::string & parameters, but
+// don't tell tolua++ about the references, because it would ignore
+// the const and generate code to copy the modified strings to
+// additional Lua return values.
+
+extern void SetEditorSelectIcon(std::string icon);
+extern void SetEditorUnitsIcon(std::string icon);
+extern void SetEditorPatchIcon(std::string icon);
+extern void SetEditorStartUnit(std::string name);
 
 extern CEditor Editor;
 
-void StartEditor(const std::string &filename);
-int EditorSaveMap(const std::string &file);
+void StartEditor(std::string filename);
+int EditorSaveMap(std::string file);
 
-void StartPatchEditor(const std::string &patchName);
+void StartPatchEditor(std::string patchName);
 
