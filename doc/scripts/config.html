@@ -29,7 +29,10 @@
 <a href="game.html">NEXT</a>
 <a href="index.html">LUA Index</a>
 <hr>
-<a href="#AStar">AStar</a>
+<a href="#AStarFixedUnitCrossingCost">AStarFixedUnitCrossingCost</a>
+<a href="#AStarKnowUnseenTerrain">AStarKnowUnseenTerrain</a>
+<a href="#AStarMovingUnitCrossingCost">AStarMovingUnitCrossingCost</a>
+<a href="#AStarUnknownTerrainCost">AStarUnknownTerrainCost</a>
 <a href="#DefineDecorations">DefineDecorations</a>
 <a href="#DefineDefaultResourceNames">DefineDefaultResourceNames</a>
 <a href="#DefineSprites">DefineSprites</a>
@@ -92,44 +95,6 @@
 General configurations.
 
 <h2>Functions</h2>
-<a name="AStar"></a>
-<h3>AStar(tag, value, ...)</h3>
-
-Sets variables about the pathfinder.
-What the movement cost for unseen terrian is and whether units are aware of what's under unseen terrain.
-Items can be turned on and off to give desired behaviour, however dont-know-unseen-terrain will increase
-the amount the pathfinder is used at the start of a game while the map is being discovered.  If you need
-the performance, turn it off.
-<p>
-The Cost of a move is 1 if moving straight, or 2 if moving diagonal.
-
-<dl>
-  <dt>"fixed-unit-cost", number</dt>
-  <dd>cost to move over a unit that is standing still. (must be greater than 3)
-  </dd>
-  <dt>"moving-unit-cost", number</dt>
-  <dd>cost to move over a unit that is moving to somewhere. (must be greater than 3)
-  </dd>
-  <dt>"unseen-terrain", number</dt>
-  <dd>Whether the pathfinder treats unknown terrain as visible when calculating paths or not. &lt;'dont-know-unseen-terrain|'know-unseen-terrain&gt;
-  </dd>
-  <dt>"unseen-terrain-cost", number</dt>
-  <dd>Extra cost to move on unseen terrain, makes units tend towards know areas when finding paths.
-  </dd>
-  <dt>"know-unseen-terrain"</dt>
-  <dd>consider (FIXME ? AI and human ?) know(s) all the terrain.</dd>
-  <dt>"dont-know-unseen-terrain"</dt>
-  <dd>consider (FIXME ? AI and human ?) do(es)n't know all the terrain.</dd>
-  <dt><i>RETURNS</i></dt>
-  <dd>Nothing</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-AStar("fixed-unit-cost", 1000, "moving-unit-cost", 20, "know-unseen-terrain", "unseen-terrain-cost", 2)
-</pre>
-
 <a name="DefineDefaultResourceNames"></a>
 <h3>DefineDefaultResourceNames("name", ...)</h3>
 
@@ -859,6 +824,40 @@ For french azerty, use :
 </pre>
 
 <h2>Variables</h2>
+
+<a name="AStarFixedUnitCrossingCost"></a>
+<h3>AStarFixedUnitCrossingCost = integer</h3>
+
+<p>Cost to move over a unit that is standing still.
+(Must be greater than 3.)</p>
+
+<p>The pathfinder generally computes the total cost of each movement
+step (whether straight or diagonal) in this way: 1 + (either
+AStarUnknownTerrainCost or the cost from the map patch) + (possibly
+AStarFixedUnitCrossingCost or AStarMovingUnitCrossingCost).  However,
+there are exceptions for flying units, and for units that span
+multiple map fields.</p>
+
+<a name="AStarKnowUnseenTerrain"></a>
+<h3>AStarKnowUnseenTerrain = boolean</h3>
+
+<p>Whether the pathfinder treats unknown terrain as visible when
+calculating paths or not.  Setting AStarKnowUnseenTerrain = false will
+increase the amount the pathfinder is used at the start of a game
+while the map is being discovered.  If you need the performance, set
+it true.</p>
+
+<a name="AStarMovingUnitCrossingCost"></a>
+<h3>AStarMovingUnitCrossingCost = integer</h3>
+
+<p>Cost to move over a unit that is moving to somewhere.
+(Must be greater than 3.)</p>
+
+<a name="AStarUnknownTerrainCost"></a>
+<h3>AStarUnknownTerrainCost = integer</h3>
+
+<p>Extra cost to move on unseen terrain, makes units tend towards
+known areas when finding paths.</p>
 
 <a name="Preferences"></a>
 <h3>Preferences</h3>
