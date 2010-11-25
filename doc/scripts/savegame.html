@@ -29,6 +29,7 @@
 <a href="sound.html">NEXT</a> 
 <a href="index.html">LUA Index</a>
 <hr>
+<a href="#Missile">Missile</a>
 <a href="#SaveGame">SaveGame</a>
 <a href="#SlotUsage">SlotUsage</a>
 <hr>
@@ -36,7 +37,102 @@
 
 Everything around save games. All of the functions below are primarily used
 in the creation and loading of saved games.
+The engine generates calls to these functions when it saves a game.
+When the saved game is loaded back, those calls restore its state.
+
 <h2>Functions</h2>
+
+<a name="Missile"></a>
+<h3>Missile(<var>tag</var>, <var>value</var>, <var>tag</var>, <var>value</var>, ...)</h3>
+
+<p>Adds a missile on the map.</p>
+
+<p>The function supports these tag-value pairs:</p>
+
+<dl>
+  <dt>"type", <var>missile-type-name</var></dt>
+  <dd>The type of the missile. Declared with
+    <a href="magic.html#DefineMissileType">DefineMissileType</a>.</dd>
+  <dt>"local"</dt>
+  <dd>This missile is marked as local, and it's visible only to the player.
+    This is used for instance for cursor marks on the map.
+    The "local" tag is unusual in that no value follows it.
+    Either "local" or "global" must be specified.</dd>
+  <dt>"global"</dt>
+  <dd>This missile is marked as global, and it's visible to all players.
+    The "global" tag is unusual in that no value follows it.
+    Either "local" or "global" must be specified.</dd>
+  <dt>"pos", {<var>x</var>, <var>y</var>}</dt>
+  <dd>The current position of the missile.
+    Coordinates are in pixels, not tiles.
+    For example: "pos", {4500, 3450}</dd>
+  <dt>"origin-pos", {<var>x</var>, <var>y</var>}</dt>
+  <dd>The starting position of the missile.
+    Coordinates are in pixels, not tiles.
+    For example: "origin-pos", {4505, 3455}</dd>
+  <dt>"goal", {<var>x</var>, <var>y</var>}</dt>
+  <dd>The position of the missile's destination.
+    Coordinates are in pixels, not tiles.
+    For example: "goal", {4510, 3460}</dd>
+  <dt>"frame", <var>integer</var></dt>
+  <dd>Current sprite frame of the missile; complicated behavior.
+    A negative <var>integer</var> generally means the actual
+    frame number is -1 - <var>integer</var> and the sprite
+    should be mirrored in the X direction; but the effect depends
+    on <a href="magic.html#DefineMissileType.Flip">the Flip parameter
+      of DefineMissileType</a>.</dd>
+  <dt>"state", <var>integer</var></dt>
+  <dd>Current state of the missile.  Used for a simple state machine,
+    dependand on the missile class.</dd>
+  <dt>"anim-wait", <var>integer</var></dt>
+  <dd>FIXME: Document this.</dd>
+  <dt>"wait", <var>integer</var></dt>
+  <dd>Wait this number of game cycles until the next state or animation
+    of this missile is handled. This counts down from
+    <a href="magic.html#DefineMissileType.Sleep">the Sleep parameter
+      of DefineMissileType</a> to 0.</dd>
+  <dt>"delay", <var>integer</var></dt>
+  <dd>Number of game cycles left until the missile is first shown on the map.
+    Please see <a href="magic.html#DefineMissileType.Delay">Delay in DefineMissileType</a>.</dd>
+  <dt>"source", <var>unit-reference-string</var></dt>
+  <dd>Number of the owner of the missile. Normally the one who fired the missile.
+    Used to check units, to prevent hitting the owner. Also used for kill and
+    experience points, and for giving the owning player score.</dd>
+  <dt>"target", <var>unit-reference-string</var></dt>
+  <dd>Number of the missile's target. Normally the unit which should be
+    hit by the missile.</dd>
+  <dt>"damage", <var>integer</var></dt>
+  <dd>Damage done by missile. Units next to it can receive some reduced splash
+    damage, this is the full damage.</dd>
+  <dt>"ttl", <var>integer</var></dt>
+  <dd>Time to live in game cycles of the missile, if it reaches zero
+    the missile is automatically removed from the map. If -1 the
+    missile lives for ever and the lifetime is handled by other means.</dd>
+  <dt>"hidden"</dt>
+  <dd>This marks the missile as hidden, until the
+    <a href="magic.html#DefineMissileType.Class">missile class</a>
+    decides to show it again.
+    The "hidden" tag is unusual in that no value follows it.</dd>
+  <dt>"step", {<var>current-step-integer</var>, <var>total-step-integer</var>}</dt>
+  <dd>The progress of the missile along its movement path.
+    Generally, <var>current-step-integer</var> starts
+    from zero when the missile is launched, and it then
+    increases until it reaches <var>total-step-integer</var>,
+    at which point the missile hits its target.
+    <a href="magic.html#DefineMissileType.Speed">The Speed parameter
+      of DefineMissileType</a> is the rate of increase,
+    and the value of <var>total-step-integer</var> is the distance
+    between the source and the target.
+    However, some missile classes may use these values differently.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+Missile("type", "missile-small-fire", "global", "pos", {1168, 1960}, "origin-pos", {1168, 1960}, "goal", {-16, -24},
+  "frame", 0, "state", 0, "anim-wait", 0, "wait", 8, "delay", 0,
+  "source", "U003B", "damage", 0, "ttl", -1, "step", {0, 0})
+</pre>
 
 <a name="SaveGame"></a>
 <h3>SaveGame({SyncHash = x, SyncRandSeed = y, SaveFile = "file"})</h3>
