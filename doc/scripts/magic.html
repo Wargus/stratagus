@@ -50,7 +50,7 @@ This is the function to define a missile type.
 </dl>
 Possible tags:
 <dl>
-<dt>File = "file-path"</dt>
+<dt id="DefineMissileType.File">File = "file-path"</dt>
 <dd>This is followed by the path of the file with the missile graphics.
 </dd>
 <dt>Size = {x, y}</dt>
@@ -112,24 +112,14 @@ supported missile classes:
     <dt>"missile-class-fire" </dt>
     <dd>Missile is used for fire. More documentation?
     </dd>
+    <dt>"missile-class-hit" </dt>
+    <dd>The missile does not use a graphics <a href="#DefineMissileType.File">File</a>
+      but instead shows the number of hit points lost by a unit.
+      For use with <a href="config.html#SetDamageMissile">SetDamageMissile</a>.
+    </dd>
     <dt>"missile-class-parabolic"</dt>
     <dd>Missile flies to destination with a parabolic path. It used the same
     animation as cycle-once
-    </dd>
-    <dt>"missile-class-land-mine"</dt>
-    <dd>Missile is a landmine, it will sit quietly and wait for someone to step
-    on it. You can use time-to-live as a timeout.<b>FIXME more configurable</b>
-    </dd>
-    <dt>"missile-class-whirlwind" </dt>
-    <dd>Missile for the whirlwind effect <b>FIXME more configurable</b>
-    </dd>
-    <dt>"missile-class-flame-shield" </dt>
-    <dd>Missile rotates around target unit and damages everything it touches
-    <b>FIXME more configurable</b>
-    </dd>
-    <dt>"missile-class-death-coil"</dt>
-    <dd>Missile is death coil, will drain health from target or enemy units
-    in the area and feed it to the caster.<b>FIXME more configurable</b>
     </dd>
 </dl>
 </dd>
