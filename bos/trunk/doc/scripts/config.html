@@ -35,6 +35,7 @@
 <a href="#DefineSprites">DefineSprites</a>
 <a href="#GetVideoFullScreen">GetVideoFullScreen</a>
 <a href="#GetVideoResolution">GetVideoResolution</a>
+<a href="#Preferences">Preferences</a>
 <a href="#RevealMap">RevealMap</a>
 <a href="#RightButtonAttacks">RightButtonAttacks</a>
 <a href="#RightButtonMoves">RightButtonMoves</a>
@@ -63,11 +64,7 @@
 <a href="#SetMouseScroll">SetMouseScroll</a>
 <a href="#SetMouseScrollSpeedControl">SetMouseScrollSpeedControl</a>
 <a href="#SetMouseScrollSpeedDefault">SetMouseScrollSpeedDefault</a>
-<a href="#SetShowAttackRange">SetShowAttackRange</a>
 <a href="#SetShowCommandKey">SetShowCommandKey</a>
-<a href="#SetShowOrders">SetShowOrders</a>
-<a href="#SetShowReactionRange">SetShowReactionRange</a>
-<a href="#SetShowSightRange">SetShowSightRange</a>
 <a href="#SetSpeedBuild">SetSpeedBuild</a>
 <a href="#SetSpeedTrain">SetSpeedTrain</a>
 <a href="#SetSpeeds">SetSpeeds</a>
@@ -661,57 +658,10 @@ Sets the speed of the mouse scrolling while the middle mouse button is pressed.
     SetMouseScrollSpeedDefault(5)
 </pre>
 
-<a name="SetShowAttackRange"></a>
-<h3>SetShowAttackRange(boolean)</h3>
-
-Enable/disable display of attack range of the selected unit on map.
-
 <a name="SetShowCommandKey"></a>
 <h3>SetShowCommandKey(boolean)</h3>
 
 enable/disable the display of the command keys in buttons.
-
-<a name="SetShowOrders"></a>
-<h3>SetShowOrders(boolean or number)</h3>
-
-Enable/disable display of the orders of the selected unit on map.
-
-<dl>
-  <dt>true</dt>
-  <dd>to always show unit orders</dd>
-  <dt>false</dt>
-  <dd>to never show orders.</dd>
-  <dt>number</dt>
-  <dd>the number of seconds an order should be shown.</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-  -- show orders for 2 seconds
-  SetShowOrders(2)
-</pre>
-
-<a name="SetShowReactionRange"></a>
-<h3>SetShowReactionRange(boolean)</h3>
-
-Enable/disable display of reaction range of the selected unit on map.
-
-<a name="SetShowSightRange"></a>
-<h3>SetShowSightRange(tag)</h3>
-
-How the sight range of the selected unit is shown on map.
-
-<dl>
-  <dt>false</dt>
-    <dd>None</dd>
-  <dt>"rectangle"</dt>
-    <dd>Alpha rectangle around unit</dd>
-  <dt>"circle"</dt>
-    <dd>Alpha circle around unit</dd>
-  <dt>true</dt>
-    <dd>Rectangle around unit</dd>
-</dl>
 
 <a name="SetSpeedBuild"></a>
 <h3>SetSpeedBuild(number)</h3>
@@ -907,6 +857,38 @@ For french azerty, use :
 <pre>
 	(set-group-keys "&#xe0;&amp;&#xe9;\"'(-&#xe8;_&#xe7;&#xb2;")
 </pre>
+
+<h2>Variables</h2>
+
+<a name="Preferences"></a>
+<h3>Preferences</h3>
+
+<p>This variable refers to an object that has the following properties:</p>
+
+<dl>
+  <dt id="Preferences.ShowAttackRange">Preferences.ShowAttackRange = <var>boolean</var></dt>
+  <dd>Whether to show the attack range of the selected unit as a red circle.
+    See the <a href="unittype.html#variable.AttackRange">AttackRange</a> variable.</dd>
+  <dt id="Preferences.ShowReactionRange">Preferences.ShowReactionRange = <var>boolean</var></dt>
+  <dd>Whether to show the reaction range of the selected unit as a blue circle.
+    See the <a href="unittype.html#DefineUnitType.ComputerReactionRange">ComputerReactionRange</a>
+    and <a href="unittype.html#DefineUnitType.PersonReactionRange">PersonReactionRange</a>
+    parameters of DefineUnitType.</dd>
+  <dt id="Preferences.ShowSightRange">Preferences.ShowSightRange = <var>boolean</var></dt>
+  <dd>Whether to show the sight range of the selected unit as a green circle.
+    See the <a href="unittype.html#variable.SightRange">SightRange</a> variable.</dd>
+  <dt>Preferences.ShowOrders = <var>integer</var></dt>
+  <dd>How long to show the orders of selected units on the map,
+    after the player gives an order.  Measured in seconds.
+    If this is negative, or the player presses the Shift key,
+    then the engine shows the orders no matter how old they are.</dd>
+</dl>
+
+<p>Even if the ShowSightRange, ShowReactionRange, and ShowAttackRange
+properties are false, the player can display the ranges by holding the
+left mouse button for a moment.  In any case, the game never shows
+ranges if the player has selected more than one unit.</p>
+
 <hr>
 All trademarks and copyrights on this page are owned by their respective owners.
 <address>(c) 2002-2007 by <a href="http://boswars.org">
