@@ -32,11 +32,9 @@
 <a href="#AStar">AStar</a>
 <a href="#DefineDecorations">DefineDecorations</a>
 <a href="#DefineDefaultResourceNames">DefineDefaultResourceNames</a>
-<a href="#DefineSprites">DefinesSprites</a>
+<a href="#DefineSprites">DefineSprites</a>
 <a href="#GetVideoFullScreen">GetVideoFullScreen</a>
 <a href="#GetVideoResolution">GetVideoResolution</a>
-<a href="#HealthSprite">HealthSprite</a>
-<a href="#ManaSprite">ManaSprite</a>
 <a href="#RevealMap">RevealMap</a>
 <a href="#RightButtonAttacks">RightButtonAttacks</a>
 <a href="#RightButtonMoves">RightButtonMoves</a>
@@ -187,9 +185,6 @@ Define sprite to be shown for variables.
 
 <h4>Example</h4>
 <pre>
--- It is equivalent to :
--- HealthSprite("graphics/ui/health2.png", 0, -4, 31, 4)
--- ManaSprite("graphics/ui/mana2.png", 0, -1, 31, 4)
 DefineSprites({Name = "sprite-health", File = "graphics/ui/health2.png", Offset = {0, -4}, Size = {31, 4}},
     {Name = "sprite-mana", File = "graphics/ui/mana2.png", Offset = {0, -1}, Size = {31, 4}})
 </pre>
@@ -227,51 +222,6 @@ Get the video resolution.
     -- Get the video resolution
     w,h = GetVideoResolution()
 </pre>
-
-<a name="HealthSprite"></a>
-<h3>HealthSprite(file, hotx, hoty, width, height)</h3>
-
-Define health-sprite.
-
-<dl>
-  <dt>"file"</dt>
-  <dd>file where is the image.</dd>
-  <dt>hotx, hoty</dt>
-  <dd>offset from the sprite when it is drawn.</dd>
-  <dt>width, height</dt>
-  <dd>Size of the health sprite image.</dd>
-</dl>
-
-<h4>Example</h4>
-<pre>
-    HealthSprite("graphics/ui/health2.png", 0, -4, 31, 4)
-</pre>
-
-<h4>Note</h4>
-Use <a href="#DefineSprites">DefineSprites</a> instead with Name="sprite-health".
-
-<a name="ManaSprite"></a>
-<h3>ManaSprite(file, hotx, hoty, width, height)</h3>
-
-Define mana-sprite.
-
-<dl>
-  <dt>"file"</dt>
-  <dd>file where is the image.</dd>
-  <dt>hotx, hoty</dt>
-  <dd>offset from teh sprite when it is drawn.</dd>
-  <dt>width, height</dt>
-  <dd>Size of the image.</dd>
-  <dt><i>RETURNS</i></dt>
-  <dd>Nothing</dd>
-</dl>
-<h4>Example</h4>
-<pre>
-ManaSprite("graphics/ui/mana2.png", 0, -1, 31, 4)
-</pre>
-
-<h4>Note</h4>
-Use <a href="#DefineSprites">DefineSprites</a> instead with Name="sprite-mana".
 
 <a name="DefineDecorations"></a>
 <h3>DefineDecorations({tag = value, ...}, ...)</h3>
