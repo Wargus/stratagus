@@ -46,7 +46,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static int FogOfWarOpacity = 128;                 /// Fog of war Opacity.
+static const int FogOfWarOpacity = 128;           /// Fog of war Opacity.
 CGraphic *CMap::FogGraphic;
 
 /**
