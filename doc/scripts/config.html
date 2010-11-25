@@ -31,7 +31,6 @@
 <hr>
 <a href="#AStar">AStar</a>
 <a href="#DefineDecorations">DefineDecorations</a>
-<a href="#DefineDefaultActions">DefineDefaultActions</a>
 <a href="#DefineDefaultIncomes">DefineDefaultIncomes</a>
 <a href="#DefineDefaultResourceNames">DefineDefaultResourceNames</a>
 <a href="#DefineSprites">DefinesSprites</a>
@@ -145,25 +144,6 @@ The Cost of a move is 1 if moving straight, or 2 if moving diagonal.
 
 <pre>
 AStar("fixed-unit-cost", 1000, "moving-unit-cost", 20, "know-unseen-terrain", "unseen-terrain-cost", 2)
-</pre>
-
-<a name="DefineDefaultActions"></a>
-<h3>DefineDefaultActions("name", ...)</h3>
-
-Defines the names of the actions used to harvest/get resources. eg mine gold, or drill oil.
-
-<dl>
-<dt>"name"</dt>
-<dd>The name to give to the action associated with the resource.</dd>
-<dt><i>RETURNS</i></dt>
-<dd>Nothing</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    -- In the same order as resources are defined.
-    DefineDefaultActions("stop", "mine", "chop", "drill", "mine", "mine", "mine")
 </pre>
 
 <a name="DefineDefaultIncomes"></a>
