@@ -729,8 +729,12 @@ to unselect all groups ( on the left of the 1 key )
 
 <h4>Example</h4>
 For french azerty, use :
+<!-- Use &quot; rather than a plain double-quotation mark so that
+     font-lock of GNU Emacs 23 won't think that the string ends
+     there and that a new string begins at the real end.
+     To browsers, it makes no difference.  -->
 <pre>
-	(set-group-keys "&#xe0;&amp;&#xe9;\"'(-&#xe8;_&#xe7;&#xb2;")
+	(set-group-keys "&#xe0;&amp;&#xe9;\&quot;'(-&#xe8;_&#xe7;&#xb2;")
 </pre>
 
 <h2>Variables</h2>
