@@ -29,6 +29,8 @@
 <a href="unittype.html">NEXT</a>
 <a href="index.html">LUA Index</a>
 <hr>
+<a href="#CColor">CColor</a>
+<a href="#CFontColor">CFontColor</a>
 <a href="#DefineButton">DefineButton</a>
 <a href="#DefineButtonStyle">DefineButtonStyle</a>
 <a href="#DefineCheckboxStyle">DefineCheckboxStyle</a>
@@ -39,13 +41,50 @@
 <a href="#DefinePanelContents">DefinePanelContents</a>
 <a href="#DefineUI">DefineUI</a>
 <a href="#DefineViewports">DefineViewports</a>
+<a href="#MaxFontColors">MaxFontColors</a>
 <a href="#SetGameCursor">SetGameCursor</a>
+<a href="#text_formatting">text formatting</a>
 <a href="#UI">UI</a>
 <hr>
 <h2>Intro - Introduction to UI functions and variables</h2>
 
 Everything around the user interface.
+
+<h2>Conceptual</h2>
+
+<a name="text_formatting"></a>
+<h3>Text formatting</h3>
+
+<p>When the engine displays text on the screen, it recognizes the
+following format codes.</p>
+
+<dl>
+  <dt>"~~"</dt>
+  <dd>Displays a single "~" character.</dd>
+  <dt>"~!"</dt>
+  <dd>Marks the following character as a hot key
+    and draws it in a different color,
+    usually <a href="#UI.ReverseFontColor">UI.ReverseFontColor</a>.
+    Highlighting works even in those widgets that do not support hot
+    keys.</dd>
+  <dt>"~&lt;" and "~&gt;"</dt>
+  <dd>Marks the text between these strings as a hot key and draws it
+    in a different color.  Use this if the name of the hot key is
+    multiple characters long, e.g. "Cancel (~&lt;Esc~&gt;)"
+    or "Help (~&lt;F1~&gt;)".  If a translation to another language
+    changes the name of the Esc key, then the engine will recognize
+    both the "Esc" name and the translated name as referring to that
+    key.</dd>
+  <dt>"~<var>color</var>~" and "~&gt;"</dt>
+  <dd>Displays the text between these strings with the specified
+    color, if such a color name has been defined with 
+    <a href="#CFontColor.New">CFontColor:New</a>.
+    For example, "the ~red~original~&gt; sin" would display
+    "the original sin", where "original" would be red.</dd>
+</dl>
+
 <h2>Functions</h2>
+
 <a name="DefineButton"></a>
 <h3>DefineButton({tag1 = value1, tag2 value2, ...})</h3>
 
@@ -135,11 +174,10 @@ Need Value = "spell-name"</dd>
 <dt>AllowArg = {"arg1", ...}</dt>
 <dd>Optional argument used by the allowed function.
 </dd>
-<dt>Key = "char"</dt>
-<dd>Shortcut key for the button. (FE "c" for key 'c' or "\27" for Escape)
-</dd>
 <dt>Hint = "string"</dt>
-<dd>Hint to be displayed for the button.
+<dd>Hint to be displayed for the button.  To define a shortcut key
+for the button, use the "~!", "~&lt;", and "~&gt;" format codes
+described in <a href="#text_formatting">Text formatting</a>.
 </dd>
 <dt>ForUnit = {"unit-name1", ...} or {"*"} </dt>
 <dd>List of units the button applies to, or {"*"} for all units.
@@ -151,7 +189,7 @@ Need Value = "spell-name"</dd>
 DefineButton( { Pos = 8, Level = 0, Icon = "icon-build-advanced",
   Action = "button", Value = 2,
   Allowed = "check-units-or", AllowArg = {"unit-elven-lumber-mill", "unit-keep"},
-  Key = "v", Hint = "BUILD AD~!VANCED STRUCTURE",
+  Hint = "BUILD AD~!VANCED STRUCTURE",
   ForUnit = {"unit-peasant"} } )
 </pre>
 
@@ -1218,7 +1256,84 @@ SetGameCursor("cursor-point")
 <dl>
   <dt>UI.ButtonPanel.ShowCommandKey = boolean</dt>
   <dd>Enable/disable the display of the command keys in buttons.</dd>
+  <dt id="UI.ReverseFontColor">UI.ReverseFontColor = string</dt>
+  <dd>The name of the font color generally used for highlighting
+    in <a href="#text_formatting">text formatting</a>.
+    The font color must be defined with
+    <a href="#CFontColor.New">CFontColor:New</a>.</dd>
 </dl>
+
+<p>Do not change the UI variable itself from Lua, even though the
+engine may allow that.</p>
+
+<h2>Types</h2>
+
+<a name="CColor"></a>
+<h3>CColor</h3>
+
+<p>The CColor type represents an RGBA color.</p>
+
+<p>In the following subsections, <var>color</var> denotes an object of
+type CColor.</p>
+
+<h4>CColor([r], [g], [b], [a])</h4>
+
+<p>Constructs a <a href="#CColor">CColor</a> object with the
+specified Red, Green, Blue, and Alpha component values.
+All arguments are optional.</p>
+
+<h4><var>color</var>:R</h4>
+
+<p>The red component, between 0 and 255.</p>
+
+<h4><var>color</var>:G</h4>
+
+<p>The green component, between 0 and 255.</p>
+
+<h4><var>color</var>:B</h4>
+
+<p>The blue component, between 0 and 255.</p>
+
+<h4><var>color</var>:A</h4>
+
+<p>The alpha component, between 0 and 255.
+FIXME: Is this premultiplied?</p>
+
+<a name="CFontColor"></a>
+<h3>CFontColor</h3>
+
+<p>Each CFontColor object represents a named set of colors for use
+in <a href="#text_formatting">text formatting</a>.</p>
+
+<p>In the following subsections, <var>fontColor</var> denotes an
+object of type CFontColor.</p>
+
+<h4 id="CFontColor.Colors"><var>fontColor</var>:Colors</h4>
+
+<p>An array of <a href="#CColor">CColor</a> objects.
+There are <a href="#MaxFontColors">MaxFontColors</a> elements in the array.</p>
+
+<h4 id="CFontColor.Get">CFontColor:Get("name")</h4>
+
+<p>Finds a font color by name.
+Returns a <a href="#CFontColor">CFontColor</a> object if found.
+If no such font color has been defined, which indicates a bug,
+then this function returns nil instead.</p>
+
+<h4 id="CFontColor.New">CFontColor:New("name")</h4>
+
+<p>Finds a font color by name, or allocates a new one.
+Returns a <a href="#CFontColor">CFontColor</a> object.
+If it is a new one, then its <a href="#CFontColor.Colors">Colors</a>
+array is all black, so you should set that before you use the
+font color in <a href="#text_formatting">text formatting</a>.</p>
+
+<a name="MaxFontColors"></a>
+<h4>MaxFontColors</h4>
+
+<p>This constant integer is the number of elements in the
+<a href="#CFontColor.Colors">Colors</a> array in CFontColor
+objects.</p>
 
 <hr>
 All trademarks and copyrights on this page are owned by their respective owners.
