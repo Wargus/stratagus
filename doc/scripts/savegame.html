@@ -29,6 +29,7 @@
 <a href="sound.html">NEXT</a> 
 <a href="index.html">LUA Index</a>
 <hr>
+<a href="#DefineAiPlayer">DefineAiPlayer</a>
 <a href="#Missile">Missile</a>
 <a href="#SaveGame">SaveGame</a>
 <a href="#SlotUsage">SlotUsage</a>
@@ -41,6 +42,154 @@ The engine generates calls to these functions when it saves a game.
 When the saved game is loaded back, those calls restore its state.
 
 <h2>Functions</h2>
+
+<a name="DefineAiPlayer"></a>
+<h3>DefineAiPlayer(player-number, properties)</h3>
+
+<p>Define an AI player. Saved games use this function;
+map setup files should not.</p>
+
+<dl>
+  <dt>player-number</dt>
+  <dd>
+    Number of the player, counting from 0.
+  </dd>
+  <dt>properties</dt>
+  <dd>
+    Properties of the AI player.
+    This list consists of tags and associated values.
+    These tags are available:
+    <dl>
+      <dt>"ai-type", string</dt>
+      <dd>
+	Name of the AI type.  Matches the name (not class) parameter
+	of <a href="#DefineAi">DefineAi</a>.
+      </dd>
+      <dt>"script", string</dt>
+      <dd>
+	Name of the AI script function in the "_ai_scripts_" Lua table.
+	<a href="#DefineAi">DefineAi</a> generates this name.
+      </dd>
+      <dt>"script-debug", boolean</dt>
+      <dd>
+	<em>Obsolete since r5923 (2004-01-01):
+	  The debug flag no longer affects the engine,
+	  and scripts cannot read it.</em><br>
+
+	Whether to display the executed AI script commands.
+	The <a href="#AiDebug">AiDebug</a>
+	and <a href="#AiDebugPlayer">AiDebugPlayer</a>
+	functions also control this flag.
+      </dd>
+      <dt>"sleep-cycles", integer</dt>
+      <dd>
+	The number of the game cycle on which the AI will wake up
+	from <a href="#AiSleep">AiSleep</a>, or 0 if not sleeping.
+      </dd>
+      <dt>"force", {force, properties}</dt>
+      <dd>
+	Defines a group of units that should attack or defend together,
+	to overwhelm the enemy.
+	The value must be a list that contains two elements:
+	<dl>
+	  <dt>force</dt>
+	  <dd>
+	    Number of the force.  0 - 9 is currently supported.
+	  </dd>
+	  <dt>properties</dt>
+	  <dd>
+	    Properties of the force.
+	    This list consists of subtags and possibly values.
+	    Some subtags do not allow a value and the others require a value.
+	    These subtags are available:
+	    <dl>
+	      <dt>"complete"</dt>
+	      <dd>
+		The force does not need more units.
+		This is the opposite of "recruit".
+	      </dd>
+	      <dt>"recruit"</dt>
+	      <dd>
+		The force needs more units.
+		This is the opposite of "complete".
+	      </dd>
+	      <dt>"attack"</dt>
+	      <dd>
+		The force is attacking.
+	      </dd>
+	      <dt>"defend"</dt>
+	      <dd>
+		The force is defending a unit that was attacked.
+		After the enemies are dead, the force should return home.
+	      </dd>
+	      <dt>"role", string</dt>
+	      <dd>
+		<em>Obsolete since r5923 (2004-01-01):
+		  Roles of forces no longer affect the engine,
+		  and scripts cannot read them.</em><br>
+		The role of the force, as set with
+		<a href="#AiForceRole">AiForceRole</a>.
+	      </dd>
+	      <dt>"types", {[count, unit-type-name]...}</dt>
+	      <dd>
+		How many of each unit type should be in the force.
+		This is set with <a href="#AiForce">AiForce</a>.
+	      </dd>
+	      <dt>"units", {[unit-number, unit-type-name]...}</dt>
+	      <dd>
+		List of units currently in the force.
+		The type names are ignored on load.
+	      </dd>
+	      <dt>"state", integer</dt>
+	      <dd>
+		Attack state.
+	      </dd>
+	      <dt>"goalx", integer</dt>
+	      <dd>
+		Attack point X tile map position.
+	      </dd>
+	      <dt>"goaly", integer</dt>
+	      <dd>
+		Attack point Y tile map position.
+	      </dd>
+	    </dl>
+	  </dd>
+	</dl>
+      <dt>"needed", {[resource-type-name, amount]...}</dt>
+      <dd>
+	FIXME
+      </dd>
+      <dt>"need-mask", {resource-type-name...}</dt>
+      <dd>
+	FIXME
+      </dd>
+      <dt>"last-can-not-move-cycle", integer</dt>
+      <dd>
+	FIXME
+      </dd>
+      <dt>"unit-type", {[unit-type-name, count]...}</dt>
+      <dd>
+	FIXME
+      </dd>
+      <dt>"building", {[unit-type-name, made, want]...}</dt>
+      <dd>
+	FIXME
+      </dd>
+      <dt>"repair-building", integer</dt>
+      <dd>
+	FIXME
+      </dd>
+      <dt>"repair-workers", {[building-unit-number, count]...}</dt>
+      <dd>	
+	Number of workers that failed trying to repair a building.
+      </dd>
+    </dl>
+  </dd>
+</dl>
+
+<p>For an example of DefineAiPlayer, please look in any save file.
+No example is provided in this document because Lua scripts for maps
+should not call DefineAiPlayer.</p>
 
 <a name="Missile"></a>
 <h3>Missile(<var>tag</var>, <var>value</var>, <var>tag</var>, <var>value</var>, ...)</h3>
