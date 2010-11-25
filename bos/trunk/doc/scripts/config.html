@@ -44,7 +44,6 @@
 <a href="#SetAllPlayersTotalUnitLimit">SetAllPlayersTotalUnitLimit</a>
 <a href="#SetBuildingCapture">SetBuildingCapture</a>
 <a href="#SetClickMissile">SetClickMissile</a>
-<a href="#SetCurrentChapter">SetCurrentChapter</a>
 <a href="#SetCurrentTip">SetCurrentTip</a>
 <a href="#SetDamageMissile">SetDamageMissile</a>
 <a href="#SetDoubleClickDelay">SetDoubleClickDelay</a>
@@ -447,26 +446,6 @@ Sets the missile to use for displaying when a player clicks on a location on the
 <h4>Example</h4>
 <pre>
     SetClickMissile("missile-green-cross")
-</pre>
-
-<a name="SetCurrentChapter"></a>
-<h3>SetCurrentChapter(number)</h3>
-
-Sets the current chapter in a campaign.  A campaign can have any number of chapters.
-If too large a number is specified, it will default to the last chapter.
-
-<dl>
-<dt>number</dt>
-<dd>The number of the chapter to skip too as define in the campaign definition</dd>
-<dt><i>RETURNS</i></dt>
-<dd>Nothing</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    -- Set to chapter 2
-	SetCurrentChapter(2)
 </pre>
 
 <a name="SetCurrentTip"></a>
