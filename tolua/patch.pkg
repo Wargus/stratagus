@@ -22,10 +22,14 @@ class CPatch
 	int getY() const;
 };
 
+// The C++ functions may have const std::string & parameters, but
+// don't tell tolua++ about the references, because it would ignore
+// the const and generate code to copy the modified strings to
+// additional Lua return values.
 
 class CPatchManager
 {
-	CPatch *add(const std::string &typeName, int x, int y);
+	CPatch *add(std::string typeName, int x, int y);
 
 	void moveToTop(CPatch *patch);
 	void moveToBottom(CPatch *patch);
@@ -35,8 +39,8 @@ class CPatchManager
 	vector<string> getPatchTypeNames() const;
 	vector<string> getPatchTypeNamesUsingGraphic(std::string graphicFile) const;
 
-	CPatchType *newPatchType(const std::string &name, const std::string &file,
-		int width, int height, int flags[width*height], const std::string &theme);
+	CPatchType *newPatchType(std::string name, std::string file,
+		int width, int height, int flags[width*height], std::string theme);
 	bool computePatchSize(std::string graphicFile,
 		int *width = 0, int *height = 0) const;
 };

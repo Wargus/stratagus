@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 07/01/10 20:01:13.
+** Generated automatically by tolua++-1.0.92 on Tue Nov 23 22:03:42 2010.
 */
 
 #ifndef __cplusplus
@@ -16274,13 +16274,12 @@ static int tolua_stratagus_SetEditorSelectIcon00(lua_State* tolua_S)
  else
 #endif
  {
-  const std::string icon = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
+  std::string icon = ((std::string)  tolua_tocppstring(tolua_S,1,0));
   {
    SetEditorSelectIcon(icon);
-   tolua_pushcppstring(tolua_S,(const char*)icon);
   }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SetEditorSelectIcon'.",&tolua_err);
@@ -16303,13 +16302,12 @@ static int tolua_stratagus_SetEditorUnitsIcon00(lua_State* tolua_S)
  else
 #endif
  {
-  const std::string icon = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
+  std::string icon = ((std::string)  tolua_tocppstring(tolua_S,1,0));
   {
    SetEditorUnitsIcon(icon);
-   tolua_pushcppstring(tolua_S,(const char*)icon);
   }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SetEditorUnitsIcon'.",&tolua_err);
@@ -16332,13 +16330,12 @@ static int tolua_stratagus_SetEditorPatchIcon00(lua_State* tolua_S)
  else
 #endif
  {
-  const std::string icon = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
+  std::string icon = ((std::string)  tolua_tocppstring(tolua_S,1,0));
   {
    SetEditorPatchIcon(icon);
-   tolua_pushcppstring(tolua_S,(const char*)icon);
   }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SetEditorPatchIcon'.",&tolua_err);
@@ -16361,13 +16358,12 @@ static int tolua_stratagus_SetEditorStartUnit00(lua_State* tolua_S)
  else
 #endif
  {
-  const std::string name = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
+  std::string name = ((std::string)  tolua_tocppstring(tolua_S,1,0));
   {
    SetEditorStartUnit(name);
-   tolua_pushcppstring(tolua_S,(const char*)name);
   }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SetEditorStartUnit'.",&tolua_err);
@@ -16414,13 +16410,12 @@ static int tolua_stratagus_StartEditor00(lua_State* tolua_S)
  else
 #endif
  {
-  const std::string filename = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
+  std::string filename = ((std::string)  tolua_tocppstring(tolua_S,1,0));
   {
    StartEditor(filename);
-   tolua_pushcppstring(tolua_S,(const char*)filename);
   }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'StartEditor'.",&tolua_err);
@@ -16443,14 +16438,13 @@ static int tolua_stratagus_EditorSaveMap00(lua_State* tolua_S)
  else
 #endif
  {
-  const std::string file = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
+  std::string file = ((std::string)  tolua_tocppstring(tolua_S,1,0));
   {
    int tolua_ret = (int)  EditorSaveMap(file);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-   tolua_pushcppstring(tolua_S,(const char*)file);
   }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'EditorSaveMap'.",&tolua_err);
@@ -16473,13 +16467,12 @@ static int tolua_stratagus_StartPatchEditor00(lua_State* tolua_S)
  else
 #endif
  {
-  const std::string patchName = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
+  std::string patchName = ((std::string)  tolua_tocppstring(tolua_S,1,0));
   {
    StartPatchEditor(patchName);
-   tolua_pushcppstring(tolua_S,(const char*)patchName);
   }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'StartPatchEditor'.",&tolua_err);
@@ -17983,7 +17976,7 @@ static int tolua_stratagus_CPatchManager_add00(lua_State* tolua_S)
 #endif
  {
   CPatchManager* self = (CPatchManager*)  tolua_tousertype(tolua_S,1,0);
-  const std::string typeName = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+  std::string typeName = ((std::string)  tolua_tocppstring(tolua_S,2,0));
   int x = ((int)  tolua_tonumber(tolua_S,3,0));
   int y = ((int)  tolua_tonumber(tolua_S,4,0));
 #ifndef TOLUA_RELEASE
@@ -17992,10 +17985,9 @@ static int tolua_stratagus_CPatchManager_add00(lua_State* tolua_S)
   {
    CPatch* tolua_ret = (CPatch*)  self->add(typeName,x,y);
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"CPatch");
-   tolua_pushcppstring(tolua_S,(const char*)typeName);
   }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'add'.",&tolua_err);
@@ -18213,8 +18205,8 @@ static int tolua_stratagus_CPatchManager_newPatchType00(lua_State* tolua_S)
 #endif
  {
   CPatchManager* self = (CPatchManager*)  tolua_tousertype(tolua_S,1,0);
-  const std::string name = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
-  const std::string file = ((const std::string)  tolua_tocppstring(tolua_S,3,0));
+  std::string name = ((std::string)  tolua_tocppstring(tolua_S,2,0));
+  std::string file = ((std::string)  tolua_tocppstring(tolua_S,3,0));
   int width = ((int)  tolua_tonumber(tolua_S,4,0));
   int height = ((int)  tolua_tonumber(tolua_S,5,0));
 #ifdef __cplusplus
@@ -18222,7 +18214,7 @@ static int tolua_stratagus_CPatchManager_newPatchType00(lua_State* tolua_S)
 #else
   int* flags = (int*) malloc((width*height)*sizeof(int));
 #endif
-  const std::string theme = ((const std::string)  tolua_tocppstring(tolua_S,7,0));
+  std::string theme = ((std::string)  tolua_tocppstring(tolua_S,7,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'newPatchType'", NULL);
 #endif
@@ -18241,9 +18233,6 @@ static int tolua_stratagus_CPatchManager_newPatchType00(lua_State* tolua_S)
   {
    CPatchType* tolua_ret = (CPatchType*)  self->newPatchType(name,file,width,height,flags,theme);
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"CPatchType");
-   tolua_pushcppstring(tolua_S,(const char*)name);
-   tolua_pushcppstring(tolua_S,(const char*)file);
-   tolua_pushcppstring(tolua_S,(const char*)theme);
   }
   {
    int i;
@@ -18256,7 +18245,7 @@ static int tolua_stratagus_CPatchManager_newPatchType00(lua_State* tolua_S)
   free(flags);
 #endif
  }
- return 4;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'newPatchType'.",&tolua_err);
