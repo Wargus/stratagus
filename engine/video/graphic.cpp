@@ -807,6 +807,8 @@ void ReloadGraphics()
 void CGraphic::Flip()
 {
 	if (UseOpenGL) {
+		// OpenGL mode does not use SurfaceFlip; instead,
+		// it swaps the texture coordinates when drawing.
 		return;
 	}
 
