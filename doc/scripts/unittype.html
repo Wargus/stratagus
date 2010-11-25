@@ -148,13 +148,15 @@ The predefined values are :
   <dt id="variable.Armor">Armor</dt>
   <dd>Basic armor of the unit.</dd>
   <dt id="variable.SightRange">SightRange</dt>
-  <dd>Sight range (in tiles) of the unit.</dd>
+  <dd>Sight range (in tiles) of the unit.
+    See also <a href="config.html#Preferences.ShowSightRange">Preferences.ShowSightRange</a>.</dd>
   <dt id="variable.RadarRange">RadarRange</dt>
   <dd>Radar range of the unit.</dd>
   <dt id="variable.RadarJammerRange">RadarJammerRange</dt>
   <dd>Radar Jamming range of the unit.</dd>
   <dt id="variable.AttackRange">AttackRange</dt>
-  <dd>Attack range of the unit.</dd>
+  <dd>Attack range of the unit.
+    See also <a href="config.html#Preferences.ShowAttackRange">Preferences.ShowAttackRange</a>.</dd>
   <dt id="variable.PiercingDamage">PiercingDamage</dt>
   <dd>piercing damage of the unit. FIXME calculations?</dd>
   <dt id="variable.BasicDamage">BasicDamage</dt>
@@ -562,11 +564,15 @@ and always enable autocast if possible.
 repaired if this value is non-zero.
 F.E.: RepairHp = 4.
 </dd>
-<dt>ComputerReactionRange = number</dt>
-<dd>This is supposed to be the reaction range for AI units, but it is not used.
+<dt id="DefineUnitType.ComputerReactionRange">ComputerReactionRange = number</dt>
+<dd>The reaction range for units of AI players.  Each unit can
+automatically attack enemy units that enter its reaction range.
+See also <a href="config.html#Preferences.ShowReactionRange">Preferences.ShowReactionRange</a>.
 </dd>
-<dt>PersonReactionRange = number</dt>
-<dd>This is supposed to be the reaction range for human player units, but it is not used.
+<dt id="DefineUnitType.PersonReactionRange">PersonReactionRange = number</dt>
+<dd>The reaction range for units of human players.  Each unit can
+automatically attack enemy units that enter its reaction range.
+See also <a href="config.html#Preferences.ShowReactionRange">Preferences.ShowReactionRange</a>.
 </dd>
 <dt>Priority = number</dt>
 <dd>This is the ai priority level. High damage low-hp units for instancce should have
