@@ -44,7 +44,6 @@
 <a href="#SetAllPlayersTotalUnitLimit">SetAllPlayersTotalUnitLimit</a>
 <a href="#SetBuildingCapture">SetBuildingCapture</a>
 <a href="#SetClickMissile">SetClickMissile</a>
-<a href="#SetCurrentTip">SetCurrentTip</a>
 <a href="#SetDamageMissile">SetDamageMissile</a>
 <a href="#SetDoubleClickDelay">SetDoubleClickDelay</a>
 <a href="#SetEditorSelectIcon">SetEditorSelectIcon</a>
@@ -75,7 +74,6 @@
 <a href="#SetShowOrders">SetShowOrders</a>
 <a href="#SetShowReactionRange">SetShowReactionRange</a>
 <a href="#SetShowSightRange">SetShowSightRange</a>
-<a href="#SetShowTips">SetShowTips</a>
 <a href="#SetSpeedBuild">SetSpeedBuild</a>
 <a href="#SetSpeedTrain">SetSpeedTrain</a>
 <a href="#SetSpeeds">SetSpeeds</a>
@@ -448,26 +446,6 @@ Sets the missile to use for displaying when a player clicks on a location on the
     SetClickMissile("missile-green-cross")
 </pre>
 
-<a name="SetCurrentTip"></a>
-<h3>SetCurrentTip(number)</h3>
-
-Sets the number of the tip to display next. If larger than the number of tips or not tips
-are defined, it defaults to Tip 0.
-
-<dl>
-<dt>number</dt>
-<dd>The tip number to use, defaults to 0 on error</dd>
-<dt><i>RETURNS</i></dt>
-<dd>The old tip number that was set</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    -- Set Tip to No 10
-    SetCurrentTip(10)
-</pre>
-
 <a name="SetDamageMissile"></a>
 <h3>SetDamageMissile("missile-type")</h3>
 
@@ -814,12 +792,6 @@ How the sight range of the selected unit is shown on map.
   <dt>true</dt>
     <dd>Rectangle around unit</dd>
 </dl>
-
-<a name="SetShowTips"></a>
-<h3>SetShowTips(boolean)</h3>
-
-enable/disable show tips at the start of a level
-
 
 <a name="SetSpeedBuild"></a>
 <h3>SetSpeedBuild(number)</h3>
