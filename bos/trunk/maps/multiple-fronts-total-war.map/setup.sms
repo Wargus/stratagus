@@ -1,10 +1,6 @@
 -- Boswars Map Setup.
 -- File licensed under the GNU GPL version 2.
 
--- Load specific AI
-Load(GetCurrentLuaPath() .. "/attackdefense.lua")
-InitAiScripts_attackdefense()
-
 -- player configuration
 Players[0]:SetStartView(30, 9)
 Players[0].EnergyStored = 1000
@@ -40,24 +36,23 @@ Players[7].MagmaStored = 0
 Players[7].AiName = "ai-passive"
 
 -- patches
-Load(GetCurrentLuaPath() .. "/patch.lua")
 
-patch("terrain", 0, 0)
-patch("terrain", 30, 0)
-patch("terrain", 60, 0)
-patch("terrain", 90, 0)
-patch("terrain", 0, 20)
-patch("terrain", 30, 20)
-patch("terrain", 60, 20)
-patch("terrain", 90, 20)
-patch("terrain", 0, 40)
-patch("terrain", 30, 40)
-patch("terrain", 60, 40)
-patch("terrain", 90, 40)
-patch("terrain", 0, 60)
-patch("terrain", 30, 60)
-patch("terrain", 60, 60)
-patch("terrain", 90, 60)
+patch("brown-mud", 0, 0)
+patch("brown-mud", 30, 0)
+patch("brown-mud", 60, 0)
+patch("brown-mud", 90, 0)
+patch("brown-mud", 0, 20)
+patch("brown-mud", 30, 20)
+patch("brown-mud", 60, 20)
+patch("brown-mud", 90, 20)
+patch("brown-mud", 0, 40)
+patch("brown-mud", 30, 40)
+patch("brown-mud", 60, 40)
+patch("brown-mud", 90, 40)
+patch("brown-mud", 0, 60)
+patch("brown-mud", 30, 60)
+patch("brown-mud", 60, 60)
+patch("brown-mud", 90, 60)
 
 -- place units
 CreateUnit("unit-vault", 0, {22, 2})
