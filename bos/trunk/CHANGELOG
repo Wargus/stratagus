@@ -2,8 +2,12 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
-- Add goshgeom patches (Michiel van der Wulp)
-- Add Lithuanian translation (Vytautas Raškevičius)
+- Updated the development documentation (Kalle Olavi Niemitalo)
+- Added maps: zombies, cannons, smalland, the small ring (Michiel van der Wulp)
+- Improved the clover map (Michiel van der Wulp)
+- Added 5 maps from the overpopulation series (Michiel van der Wulp)
+- Added goshgeom patches (Michiel van der Wulp)
+- Added Lithuanian translation (Vytautas Raškevičius)
 - Fixed bug "uncontrollable with Wacom tablet when in full-screen mode"
   as reported at http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=559615 
   (Kalle Olavi Niemitalo)
