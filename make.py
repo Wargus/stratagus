@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/bin/sh -e
 # -*- coding: utf-8 -*-
 #
 #  Build script for the Bos Wars engine.
@@ -18,6 +18,23 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+# This script is currently compatible with Python 2, not Python 3.
+# Feb uses an operating system where "python" is Python 3 and
+# "python2" is Python 2.  However, the #! line of this script must not
+# specify "python2" because the official Python 2.7 sources do not
+# install such a binary and e.g. Debian squeeze doesn't have one.
+# Instead, the #! line specifies /bin/sh, and the following embedded
+# shell script then tries to find a suitable version of Python.
+""":"
+if python2 --version > /dev/null 2>&1
+then
+    exec python2 "$0" "$@"
+else
+    exec python "$0" "$@"
+fi
+exit 1  # Should never get this far.
+":"""
 
 import os
 import glob
