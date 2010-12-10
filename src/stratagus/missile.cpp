@@ -759,8 +759,8 @@ static int PointToPointMissile(Missile &missile)
 	Assert(missile.Type != NULL);
 	Assert(missile.TotalStep != 0);
 
-	const Vec2i step = (missile.destination - missile.source) * 1024 / missile.TotalStep;
-	missile.position = missile.source + step * missile.CurrentStep / 1024;
+	const Vec2i diff = (missile.destination - missile.source);
+	missile.position = missile.source + diff * missile.CurrentStep / missile.TotalStep;
 
 	if (missile.Type->SmokeMissile && missile.CurrentStep) {
 		const Vec2i position =  missile.position + missile.Type->size / 2;
