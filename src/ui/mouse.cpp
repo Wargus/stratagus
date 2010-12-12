@@ -1580,12 +1580,12 @@ void UIHandleButtonDown(unsigned button)
 					}
 				}
 				// 0 Test build, don't really build
-				if (CanBuildUnitType(Selected[0], CursorBuilding, tilePos, 0) &&
+				if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) &&
 						(explored || ReplayRevealMap)) {
 					const int flush = !(KeyModifiers & ModifierShift);
 					PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound, MaxSampleVolume);
 					for (int i = 0; i < NumSelected; ++i) {
-						SendCommandBuildBuilding(*Selected[i], tilePos, CursorBuilding, flush);
+						SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush);
 					}
 					if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
 						CancelBuildingMode();

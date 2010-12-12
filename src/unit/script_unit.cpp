@@ -664,7 +664,7 @@ static int CclUnit(lua_State *l)
 			// until we parsed at least Unit::Orders[].
 			Assert(type);
 			unit = UnitSlots[slot];
-			unit->Init(type);
+			unit->Init(*type);
 			unit->Seen.Type = seentype;
 			unit->Active = 0;
 			unit->Removed = 0;
@@ -1013,13 +1013,13 @@ static int CclCreateUnit(lua_State *l)
 		return 0;
 	}
 
-	unit = MakeUnit(unittype, &Players[playerno]);
+	unit = MakeUnit(*unittype, &Players[playerno]);
 	if (unit == NoUnitP) {
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
 		if (UnitCanBeAt(*unit, ipos) ||
-				(unit->Type->Building && CanBuildUnitType(NULL, unit->Type, ipos, 0))) {
+				(unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, ipos, 0))) {
 			unit->Place(ipos);
 		} else {
 			unit->tilePos = ipos;

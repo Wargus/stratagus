@@ -255,10 +255,8 @@ void CUnit::Release(bool final)
 **
 **  @param type    Unit-type
 */
-void CUnit::Init(CUnitType *type)
+void CUnit::Init(CUnitType &type)
 {
-	Assert(type);
-
 	//  Set refs to 1. This is the "I am alive ref", lost in ReleaseUnit.
 	Refs = 1;
 
@@ -271,11 +269,11 @@ void CUnit::Init(CUnitType *type)
 	//
 	//  Initialise unit structure (must be zero filled!)
 	//
-	Type = type;
+	Type = &type;
 
 	Seen.Frame = UnitNotSeen; // Unit isn't yet seen
 
-	Frame = type->StillFrame;
+	Frame = type.StillFrame;
 
 	if (UnitTypeVar.GetNumberVariable()) {
 		Assert(!Variable);
@@ -289,12 +287,12 @@ void CUnit::Init(CUnitType *type)
 	// Set a heading for the unit if it Handles Directions
 	// Don't set a building heading, as only 1 construction direction
 	//   is allowed.
-	if (type->NumDirections > 1 && type->Sprite && !type->Building) {
+	if (type.NumDirections > 1 && type.Sprite && !type.Building) {
 		Direction = (MyRand() >> 8) & 0xFF; // random heading
 		UnitUpdateHeading(*this);
 	}
 
-	if (type->CanCastSpell) {
+	if (type.CanCastSpell) {
 		AutoCastSpell = new char[SpellTypeTable.size()];
 		if (Type->AutoCastActive) {
 			memcpy(AutoCastSpell, Type->AutoCastActive, SpellTypeTable.size());
@@ -303,7 +301,6 @@ void CUnit::Init(CUnitType *type)
 		}
 	}
 	Active = 1;
-
 	Removed = 1;
 
 	Assert(Orders.empty());
@@ -445,30 +442,23 @@ void CUnit::AssignToPlayer(CPlayer *player)
 **
 **  @return          Pointer to created unit.
 */
-CUnit *MakeUnit(CUnitType *type, CPlayer *player)
+CUnit *MakeUnit(CUnitType &type, CPlayer *player)
 {
-	CUnit *unit;
-
-	//
 	// Game unit limit reached.
-	//
 	if (NumUnits >= UnitMax) {
 		DebugPrint("Over all unit limit (%d) reached.\n" _C_ UnitMax);
 		return NoUnitP;
 	}
 
-	unit = UnitManager.AllocUnit();
+	CUnit *unit = UnitManager.AllocUnit();
 	if (unit == NoUnitP) {
 		return NoUnitP;
 	}
-
 	unit->Init(type);
-
 	// Only Assign if a Player was specified
 	if (player) {
 		unit->AssignToPlayer(player);
 	}
-
 	return unit;
 }
 
@@ -825,7 +815,7 @@ void CUnit::Place(const Vec2i &pos)
 **
 **  @return        Pointer to created unit.
 */
-CUnit *MakeUnitAndPlace(const Vec2i &pos, CUnitType *type, CPlayer *player)
+CUnit *MakeUnitAndPlace(const Vec2i &pos, CUnitType &type, CPlayer *player)
 {
 	CUnit *unit = MakeUnit(type, player);
 
@@ -988,7 +978,7 @@ void UnitLost(CUnit &unit)
 	// Destroy resource-platform, must re-make resource patch.
 	if ((b = OnTopDetails(unit, NULL)) != NULL) {
 		if (b->ReplaceOnDie && (unit.Type->GivesResource && unit.ResourcesHeld != 0)) {
-			temp = MakeUnitAndPlace(unit.tilePos, b->Parent, &Players[PlayerNumNeutral]);
+			temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, &Players[PlayerNumNeutral]);
 			if (temp == NoUnitP) {
 				DebugPrint("Unable to allocate Unit");
 			} else {
@@ -1918,7 +1908,7 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, int addx, int addy)
 	for (;;) {
 		for (int i = addy; i--; ++pos.y) { // go down
 			if (UnitCanBeAt(unit, pos)) {
-				const int n = MapDistance(goalPos.x, goalPos.y, pos.x, pos.y);
+				const int n = MapDistance(goalPos, pos);
 
 				if (n < bestd) {
 					bestd = n;
@@ -1929,7 +1919,7 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, int addx, int addy)
 		++addx;
 		for (int i = addx; i--; ++pos.x) { // go right
 			if (UnitCanBeAt(unit, pos)) {
-				const int n = MapDistance(goalPos.x, goalPos.y, pos.x, pos.y);
+				const int n = MapDistance(goalPos, pos);
 
 				if (n < bestd) {
 					bestd = n;
@@ -1940,7 +1930,7 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, int addx, int addy)
 		++addy;
 		for (int i = addy; i--; --pos.y) { // go up
 			if (UnitCanBeAt(unit, pos)) {
-				const int n = MapDistance(goalPos.x, goalPos.y, pos.x, pos.y);
+				const int n = MapDistance(goalPos, pos);
 
 				if (n < bestd) {
 					bestd = n;
@@ -1951,7 +1941,7 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, int addx, int addy)
 		++addx;
 		for (int i = addx; i--; --pos.x) { // go left
 			if (UnitCanBeAt(unit, pos)) {
-				const int n = MapDistance(goalPos.x, goalPos.y, pos.x, pos.y);
+				const int n = MapDistance(goalPos, pos);
 
 				if (n < bestd) {
 					bestd = n;
@@ -3178,7 +3168,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 **
 **  @return      The distance between in tiles.
 */
-int MapDistanceToType(const Vec2i &pos1, const CUnitType *type, const Vec2i &pos2)
+int MapDistanceToType(const Vec2i &pos1, const CUnitType &type, const Vec2i &pos2)
 {
 	int dx;
 	int dy;
@@ -3186,12 +3176,12 @@ int MapDistanceToType(const Vec2i &pos1, const CUnitType *type, const Vec2i &pos
 	if (pos1.x <= pos2.x) {
 		dx = pos2.x - pos1.x;
 	} else {
-		dx = std::max(0, pos1.x - pos2.x - type->TileWidth + 1);
+		dx = std::max(0, pos1.x - pos2.x - type.TileWidth + 1);
 	}
 	if (pos1.y <= pos2.y) {
 		dy = pos2.y - pos1.y;
 	} else {
-		dy = std::max(0, pos1.y - pos2.y - type->TileHeight + 1);
+		dy = std::max(0, pos1.y - pos2.y - type.TileHeight + 1);
 	}
 	return isqrt(dy * dy + dx * dx);
 }
@@ -3200,61 +3190,43 @@ int MapDistanceToType(const Vec2i &pos1, const CUnitType *type, const Vec2i &pos
 **  Returns the map distance between two points with unit type.
 **
 **  @param src  src unittype
-**  @param x1   X map tile position of src (upperleft).
-**  @param y1   Y map tile position of src.
+**  @param pos1 map tile position of src (upperleft).
 **  @param dst  Unit type to take into account.
-**  @param x2   X map tile position of dst.
-**  @param y2   Y map tile position of dst.
+**  @param pos2 map tile position of dst.
 **
 **  @return     The distance between the types.
 */
-int MapDistanceBetweenTypes(const CUnitType *src, int x1, int y1, const CUnitType *dst, int x2, int y2)
+int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1, const CUnitType &dst, const Vec2i &pos2)
 {
 	int dx;
 	int dy;
 
-	if (x1 + src->TileWidth <= x2) {
-		dx = x2 - x1 - src->TileWidth + 1;
-		if (dx < 0) {
-			dx = 0;
-		}
+	if (pos1.x + src.TileWidth <= pos2.x) {
+		dx = std::max(0, pos2.x - pos1.x - src.TileWidth + 1);
 	} else {
-		dx = x1 - x2 - dst->TileWidth + 1;
-		if (dx < 0) {
-			dx = 0;
-		}
+		dx = std::max(0, pos1.x - pos2.x - dst.TileWidth + 1);
 	}
-
-	if (y1 + src->TileHeight <= y2) {
-		dy = y2 - y1 - src->TileHeight + 1;
+	if (pos1.y + src.TileHeight <= pos2.y) {
+		dy = pos2.y - pos1.y - src.TileHeight + 1;
 	} else {
-		dy = y1 - y2 - dst->TileHeight + 1;
-		if (dy < 0) {
-			dy = 0;
-		}
+		dy = std::max(0, pos1.y - pos2.y - dst.TileHeight + 1);
 	}
-
 	return isqrt(dy * dy + dx * dx);
 }
 
 /**
 **  Compute the distance from the view point to a given point.
 **
-**  @param x  X map tile position.
-**  @param y  Y map tile position.
+**  @param pos  map tile position.
 **
 **  @todo FIXME: is it the correct place to put this function in?
 */
-int ViewPointDistance(int x, int y)
+int ViewPointDistance(const Vec2i &pos)
 {
-	const CViewport *vp;
+	const CViewport &vp = *UI.SelectedViewport;
+	const Vec2i middle = {vp.MapX + vp.MapWidth / 2, vp.MapY + vp.MapHeight / 2};
 
-	// first compute the view point coordinate
-	vp = UI.SelectedViewport;
-
-	// then use MapDistance
-	return MapDistance(vp->MapX + vp->MapWidth / 2,
-		vp->MapY + vp->MapHeight / 2, x, y);
+	return MapDistance(middle, pos);
 }
 
 /**

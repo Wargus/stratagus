@@ -195,26 +195,14 @@ static void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 /**
 **  Draw cursor for selecting building position.
 */
-static void DrawBuildingCursor(void)
+static void DrawBuildingCursor()
 {
-	int i;
-	int x;
-	int y;
-	Uint32 color;
-	int f;
-	int w;
-	int w0;
-	int h;
-	int mask;
-	const CViewport *vp;
-	CUnit *ontop;
-
 	// Align to grid
-	vp = UI.MouseViewport;
-	x = CursorX - (CursorX - vp->X + vp->OffsetX) % TileSizeX;
-	y = CursorY - (CursorY - vp->Y + vp->OffsetY) % TileSizeY;
+	const CViewport *vp = UI.MouseViewport;
+	int x = CursorX - (CursorX - vp->X + vp->OffsetX) % TileSizeX;
+	int y = CursorY - (CursorY - vp->Y + vp->OffsetY) % TileSizeY;
 	const Vec2i mpos = {vp->Viewport2MapX(x), vp->Viewport2MapY(y)};
-	ontop = NULL;
+	CUnit *ontop = NULL;
 
 	//
 	//  Draw building
@@ -226,8 +214,8 @@ static void DrawBuildingCursor(void)
 #endif
 	PushClipping();
 	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
-	DrawShadow(CursorBuilding, CursorBuilding->StillFrame, x, y);
-	DrawUnitType(CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
+	DrawShadow(*CursorBuilding, CursorBuilding->StillFrame, x, y);
+	DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
 		CursorBuilding->StillFrame, x, y);
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value>0){
 		Video.DrawCircleClip(ColorRed,
@@ -239,39 +227,42 @@ static void DrawBuildingCursor(void)
 	//
 	//  Draw the allow overlay
 	//
+	int f;
 	if (NumSelected) {
 		f = 1;
-		for (i = 0; f && i < NumSelected; ++i) {
-			f = ((ontop = CanBuildHere(Selected[i], CursorBuilding, mpos)) != NULL);
+		for (int i = 0; f && i < NumSelected; ++i) {
+			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos)) != NULL);
 			// Assign ontop or NULL
 			ontop = (ontop == Selected[i] ? NULL : ontop);
 		}
 	} else {
-		f = ((ontop = CanBuildHere(NoUnitP, CursorBuilding, mpos)) != NULL);
+		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos)) != NULL);
 		if (!Editor.Running || (Editor.Running && ontop == (CUnit *)1)) {
 			ontop = NULL;
 		}
 	}
 
-	mask = CursorBuilding->MovementMask;
-	h = CursorBuilding->TileHeight;
+	const int mask = CursorBuilding->MovementMask;
+	int h = CursorBuilding->TileHeight;
 	// reduce to view limits
 	if (mpos.y + h > vp->MapY + vp->MapHeight) {
 		h = vp->MapY + vp->MapHeight - mpos.y;
 	}
-	w0 = CursorBuilding->TileWidth;
+	int w0 = CursorBuilding->TileWidth;
 	if (mpos.x + w0 > vp->MapX + vp->MapWidth) {
 		w0 = vp->MapX + vp->MapWidth - mpos.x;
 	}
 	while (h--) {
-		w = w0;
+		int w = w0;
 		while (w--) {
 			const Vec2i posIt = {mpos.x + w, mpos.y + h};
+			Uint32 color;
+
 			if (f && (ontop ||
 					CanBuildOn(posIt, MapFogFilterFlags(ThisPlayer, posIt,
 						mask & ((NumSelected && Selected[0]->tilePos == posIt) ?
 								~(MapFieldLandUnit | MapFieldSeaUnit) : -1)))) &&
-					Map.IsFieldExplored(ThisPlayer, posIt))  {
+					Map.IsFieldExplored(ThisPlayer, posIt)) {
 				color = ColorGreen;
 			} else {
 				color = ColorRed;
@@ -287,7 +278,7 @@ static void DrawBuildingCursor(void)
 /**
 **  Draw the cursor.
 */
-void DrawCursor(void)
+void DrawCursor()
 {
 	// Selecting rectangle
 	if (CursorState == CursorStateRectangle &&

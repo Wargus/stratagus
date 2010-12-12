@@ -94,14 +94,7 @@ static int CanHandleOrder(CUnit &unit, COrderPtr order)
 */
 void HandleActionTrain(CUnit &unit)
 {
-	CUnit *nunit;
-	CUnitType *ntype;
-	CPlayer *player;
-	int food, cost;
-
-	//
 	// First entry
-	//
 	if (!unit.SubAction) {
 		unit.Data.Train.Ticks = 0;
 		unit.SubAction = 1;
@@ -116,10 +109,9 @@ void HandleActionTrain(CUnit &unit)
 		return;
 	}
 
-	player = unit.Player;
-	ntype = unit.CurrentOrder()->Arg1.Type;
-	cost = ntype->Stats[player->Index].Costs[TimeCost];
-
+	CPlayer *player = unit.Player;
+	CUnitType &ntype = *unit.CurrentOrder()->Arg1.Type;
+	const int cost = ntype.Stats[player->Index].Costs[TimeCost];
 	unit.Data.Train.Ticks += SpeedTrain;
 	// FIXME: Should count down
 	if (unit.Data.Train.Ticks >= cost) {
@@ -137,10 +129,10 @@ void HandleActionTrain(CUnit &unit)
 		//
 		// Check if enough supply available.
 		//
-		food = player->CheckLimits(ntype);
+		const int food = player->CheckLimits(ntype);
 		if (food < 0) {
 			if (food == -3 && unit.Player->AiEnabled) {
-				AiNeedMoreSupply(unit, ntype);
+				AiNeedMoreSupply(*unit.Player);
 			}
 
 			unit.Data.Train.Ticks = cost;
@@ -148,7 +140,7 @@ void HandleActionTrain(CUnit &unit)
 			return;
 		}
 
-		nunit = MakeUnit(ntype, player);
+		CUnit *nunit = MakeUnit(ntype, player);
 		if (nunit != NoUnitP) {
 			const CUnitType *type = unit.Type;
 			nunit->tilePos = unit.tilePos;
@@ -209,20 +201,17 @@ void HandleActionTrain(CUnit &unit)
 						unit.NewOrder.Action = UnitActionStill;
 					}
 				}
-
 				*(nunit->CurrentOrder()) = unit.NewOrder;
 			}
-
 			if (IsOnlySelected(unit)) {
 				UI.ButtonPanel.Update();
 			}
 			return;
 		} else {
 			player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
-				_("Unable to train %s"), ntype->Name.c_str());
+				_("Unable to train %s"), ntype.Name.c_str());
 		}
 	}
-
 	unit.Wait = CYCLES_PER_SECOND / 6;
 }
 

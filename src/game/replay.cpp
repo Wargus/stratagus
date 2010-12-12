@@ -846,7 +846,7 @@ static void DoNextReplay()
 	} else if (!strcmp(action, "unload")) {
 		SendCommandUnload(*UnitSlots[unit], pos, dunit, flags);
 	} else if (!strcmp(action, "build")) {
-		SendCommandBuildBuilding(*UnitSlots[unit], pos, UnitTypeByIdent(val), flags);
+		SendCommandBuildBuilding(*UnitSlots[unit], pos, *UnitTypeByIdent(val), flags);
 	} else if (!strcmp(action, "dismiss")) {
 		SendCommandDismiss(*UnitSlots[unit]);
 	} else if (!strcmp(action, "resource-loc")) {
@@ -856,11 +856,11 @@ static void DoNextReplay()
 	} else if (!strcmp(action, "return")) {
 		SendCommandReturnGoods(*UnitSlots[unit], dunit, flags);
 	} else if (!strcmp(action, "train")) {
-		SendCommandTrainUnit(*UnitSlots[unit], UnitTypeByIdent(val), flags);
+		SendCommandTrainUnit(*UnitSlots[unit], *UnitTypeByIdent(val), flags);
 	} else if (!strcmp(action, "cancel-train")) {
 		SendCommandCancelTraining(*UnitSlots[unit], num, (val && *val) ? UnitTypeByIdent(val) : NULL);
 	} else if (!strcmp(action, "upgrade-to")) {
-		SendCommandUpgradeTo(*UnitSlots[unit], UnitTypeByIdent(val), flags);
+		SendCommandUpgradeTo(*UnitSlots[unit], *UnitTypeByIdent(val), flags);
 	} else if (!strcmp(action, "cancel-upgrade-to")) {
 		SendCommandCancelUpgradeTo(*UnitSlots[unit]);
 	} else if (!strcmp(action, "research")) {

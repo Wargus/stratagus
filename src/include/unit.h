@@ -392,29 +392,29 @@ class CViewport;
 class CAnimation;
 
 	/// Called whenever the selected unit was updated
-extern void SelectedUnitChanged(void);
+extern void SelectedUnitChanged();
 
 /**
 **  Returns the map distance between two points.
 **
-**  @param x1  X map tile position.
-**  @param y1  Y map tile position.
-**  @param x2  X map tile position.
-**  @param y2  Y map tile position.
+**  @param pos1  map tile position.
+**  @param pos2  map tile position.
 **
 **  @return    The distance between in tiles.
 */
-static inline int MapDistance(int x1, int y1, int x2, int y2)
+static inline int MapDistance(const Vec2i& pos1, const Vec2i &pos2)
 {
-	return isqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+	const Vec2i diff = pos2 - pos1;
+
+	return isqrt(diff.x * diff.x + diff.y * diff.y);
 }
 
 	/// Returns the map distance between two points with unit-type
-extern int MapDistanceToType(const Vec2i &pos1, const CUnitType *type, const Vec2i &pos2);
+extern int MapDistanceToType(const Vec2i &pos1, const CUnitType &type, const Vec2i &pos2);
 
 	/// Returns the map diestance between to unittype as locations
-extern int MapDistanceBetweenTypes(const CUnitType *src, int x1, int y1,
-	 const CUnitType *dst, int x2, int y2);
+extern int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1,
+	 const CUnitType &dst, const Vec2i &pos2);
 
 
 /**
@@ -841,7 +841,7 @@ public:
 	void RefsDecrease();
 
 	/// Initialize unit structure with default values
-	void Init(CUnitType *type);
+	void Init(CUnitType &type);
 	/// Assign unit to player
 	void AssignToPlayer(CPlayer *player);
 
@@ -980,8 +980,7 @@ public:
 	 */
 	int MapDistanceTo(const CUnit &dst) const
 	{
-		return MapDistanceBetweenTypes(Type, tilePos.x, tilePos.y,
-			dst.Type, dst.tilePos.x, dst.tilePos.y);
+		return MapDistanceBetweenTypes(*Type, tilePos, *dst.Type, dst.tilePos);
 	}
 
 	/**
@@ -996,7 +995,7 @@ public:
 	int MapDistanceTo(int x, int y) const
 	{
 		const Vec2i pos = {x, y};
-		return MapDistanceToType(pos, Type, this->tilePos);
+		return MapDistanceToType(pos, *Type, this->tilePos);
 	}
 
 	/**
@@ -1243,9 +1242,9 @@ void UnmarkUnitFieldFlags(const CUnit &unit);
 	/// Update unit->CurrentSightRange.
 void UpdateUnitSightRange(CUnit &unit);
 	/// Create a new unit
-extern CUnit *MakeUnit(CUnitType *type, CPlayer *player);
+extern CUnit *MakeUnit(CUnitType &type, CPlayer *player);
 	/// Create a new unit and place on map
-extern CUnit *MakeUnitAndPlace(const Vec2i &pos, CUnitType *type, CPlayer *player);
+extern CUnit *MakeUnitAndPlace(const Vec2i &pos, CUnitType &type, CPlayer *player);
 	/// Handle the loss of a unit (food,...)
 extern void UnitLost(CUnit &unit);
 	/// Remove the Orders of a Unit
@@ -1295,11 +1294,11 @@ extern void DropOutAll(const CUnit &unit);
 	/// Return the rule used to build this building.
 extern CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent);
 	/// @todo more docu
-extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, const Vec2i &pos);
+extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos);
 	/// @todo more docu
 extern bool CanBuildOn(const Vec2i &pos, int mask);
 	/// FIXME: more docu
-extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, const Vec2i &pos, int real);
+extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real);
 
 	/// Find resource
 extern CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range,
@@ -1327,7 +1326,7 @@ extern void DestroyAllInside(CUnit &source);
 extern void HitUnit(CUnit *attacker, CUnit &target, int damage);
 
 	/// Calculate the distance from current view point to coordinate
-extern int ViewPointDistance(int x, int y);
+extern int ViewPointDistance(const Vec2i &pos);
 	/// Calculate the distance from current view point to unit
 extern int ViewPointDistanceToUnit(const CUnit &dest);
 
@@ -1373,7 +1372,7 @@ extern void LoadDecorations();
 extern void CleanDecorations();
 
 	/// Draw unit's shadow
-extern void DrawShadow(const CUnitType *type, int frame, int x, int y);
+extern void DrawShadow(const CUnitType &type, int frame, int x, int y);
 	/// Draw all units visible on map in viewport
 extern int FindAndSortUnits(const CViewport *vp, CUnit *table[]);
 extern int FindAndSortUnits(const CViewport *vp, CUnitDrawProxy table[]);
@@ -1382,9 +1381,9 @@ extern void ShowOrder(const CUnit &unit);
 
 // in unit_find.cpp
 	/// Find all units of this type
-extern int FindUnitsByType(const CUnitType *type, CUnit **table);
+extern int FindUnitsByType(const CUnitType &type, CUnit **table);
 	/// Find all units of this type of the player
-extern int FindPlayerUnitsByType(const CPlayer *, const CUnitType *, CUnit **);
+extern int FindPlayerUnitsByType(const CPlayer *, const CUnitType &, CUnit **);
 	/// Return any unit on that map tile
 extern CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type);// = -1);
 	/// Return possible attack target on that map area

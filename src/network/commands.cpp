@@ -242,13 +242,13 @@ void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
 ** @param what    pointer to unit-type of the building.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType *what, int flush)
+void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("build",& unit, flush, pos.x, pos.y, NoUnitP, what->Ident.c_str(), -1);
+		CommandLog("build",& unit, flush, pos.x, pos.y, NoUnitP, what.Ident.c_str(), -1);
 		CommandBuildBuilding(unit, pos, what, flush);
 	} else {
-		NetworkSendCommand(MessageCommandBuild, unit, pos.x, pos.y, NoUnitP, what, flush);
+		NetworkSendCommand(MessageCommandBuild, unit, pos.x, pos.y, NoUnitP, &what, flush);
 	}
 }
 
@@ -326,13 +326,13 @@ void SendCommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
 ** @param what    pointer to unit-type of the unit to be trained.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandTrainUnit(CUnit &unit, CUnitType *what, int flush)
+void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("train", &unit, flush, -1, -1, NoUnitP, what->Ident.c_str(), -1);
+		CommandLog("train", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
 		CommandTrainUnit(unit, what, flush);
 	} else {
-		NetworkSendCommand(MessageCommandTrain, unit, 0, 0, NoUnitP, what, flush);
+		NetworkSendCommand(MessageCommandTrain, unit, 0, 0, NoUnitP, &what, flush);
 	}
 }
 
@@ -362,13 +362,13 @@ void SendCommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 ** @param what     pointer to unit-type of the unit upgrade.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandUpgradeTo(CUnit &unit, CUnitType *what, int flush)
+void SendCommandUpgradeTo(CUnit &unit, CUnitType &what, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("upgrade-to", &unit, flush, -1, -1, NoUnitP, what->Ident.c_str(), -1);
+		CommandLog("upgrade-to", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
 		CommandUpgradeTo(unit, what, flush);
 	} else {
-		NetworkSendCommand(MessageCommandUpgrade, unit, 0, 0, NoUnitP, what, flush);
+		NetworkSendCommand(MessageCommandUpgrade, unit, 0, 0, NoUnitP, &what, flush);
 	}
 }
 
@@ -643,7 +643,7 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 		}
 		case MessageCommandBuild:
 			CommandLog("build", &unit, status, pos.x, pos.y, NoUnitP, UnitTypes[dstnr]->Ident.c_str(), -1);
-			CommandBuildBuilding(unit, pos, UnitTypes[dstnr], status);
+			CommandBuildBuilding(unit, pos, *UnitTypes[dstnr], status);
 			break;
 		case MessageCommandDismiss:
 			CommandLog("dismiss", &unit, FlushCommands, -1, -1, NULL, NULL, -1);
@@ -676,7 +676,7 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandTrain:
 			CommandLog("train", &unit, status, -1, -1, NoUnitP,
 				UnitTypes[dstnr]->Ident.c_str(), -1);
-			CommandTrainUnit(unit, UnitTypes[dstnr], status);
+			CommandTrainUnit(unit, *UnitTypes[dstnr], status);
 			break;
 		case MessageCommandCancelTrain:
 			// We need (short)x for the last slot -1
@@ -693,7 +693,7 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandUpgrade:
 			CommandLog("upgrade-to", &unit, status, -1, -1, NoUnitP,
 				UnitTypes[dstnr]->Ident.c_str(), -1);
-			CommandUpgradeTo(unit, UnitTypes[dstnr], status);
+			CommandUpgradeTo(unit, *UnitTypes[dstnr], status);
 			break;
 		case MessageCommandCancelUpgrade:
 			CommandLog("cancel-upgrade-to", &unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);

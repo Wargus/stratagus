@@ -281,25 +281,23 @@ static int CclIfNearUnit(lua_State *l)
 	int q;
 	int n;
 	int i;
-	const CUnitType *unittype;
-	const CUnitType *ut2;
 	const char *op;
 	CUnit *table[UnitMax];
-	CompareFunction compare;
 
 	LuaCheckArgs(l, 5);
-
 	lua_pushvalue(l, 1);
 	plynr = TriggerGetPlayer(l);
 	lua_pop(l, 1);
 	op = LuaToString(l, 2);
 	q = LuaToNumber(l, 3);
 	lua_pushvalue(l, 4);
-	unittype = TriggerGetUnitType(l);
+	const CUnitType *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
-	ut2 = CclGetUnitType(l);
-
-	compare = GetCompareFunction(op);
+	const CUnitType *ut2 = CclGetUnitType(l);
+	if (!unittype || !ut2) {
+		LuaError(l, "CclIfNearUnit: not a unit-type valid");
+	}
+	CompareFunction compare = GetCompareFunction(op);
 	if (!compare) {
 		LuaError(l, "Illegal comparison operation in if-near-unit: %s" _C_ op);
 	}
@@ -307,7 +305,7 @@ static int CclIfNearUnit(lua_State *l)
 	//
 	// Get all unit types 'near'.
 	//
-	n = FindUnitsByType(ut2, table);
+	n = FindUnitsByType(*ut2, table);
 	for (i = 0; i < n; ++i) {
 		CUnit *unit;
 		CUnit *around[UnitMax];
@@ -362,13 +360,8 @@ static int CclIfRescuedNearUnit(lua_State *l)
 {
 	int plynr;
 	int q;
-	int n;
-	int i;
-	const CUnitType *unittype;
-	const CUnitType *ut2;
 	const char *op;
 	CUnit *table[UnitMax];
-	CompareFunction compare;
 
 	LuaCheckArgs(l, 5);
 
@@ -378,11 +371,14 @@ static int CclIfRescuedNearUnit(lua_State *l)
 	op = LuaToString(l, 2);
 	q = LuaToNumber(l, 3);
 	lua_pushvalue(l, 4);
-	unittype = TriggerGetUnitType(l);
+	const CUnitType *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
-	ut2 = CclGetUnitType(l);
+	const CUnitType *ut2 = CclGetUnitType(l);
+	if (!unittype || !ut2) {
+		LuaError(l, "CclIfRescuedNearUnit: not a unit-type valid");
+	}
 
-	compare = GetCompareFunction(op);
+	CompareFunction compare = GetCompareFunction(op);
 	if (!compare) {
 		LuaError(l, "Illegal comparison operation in if-rescued-near-unit: %s" _C_ op);
 	}
@@ -390,8 +386,8 @@ static int CclIfRescuedNearUnit(lua_State *l)
 	//
 	// Get all unit types 'near'.
 	//
-	n = FindUnitsByType(ut2, table);
-	for (i = 0; i < n; ++i) {
+	int n = FindUnitsByType(*ut2, table);
+	for (int i = 0; i < n; ++i) {
 		CUnit *unit;
 		CUnit *around[UnitMax];
 		int an;

@@ -239,17 +239,13 @@ bool CheckedCanMoveToMask(const Vec2i &pos, int mask)
 **
 **  @return      True if could be entered, false otherwise.
 */
-bool UnitTypeCanBeAt(const CUnitType *type, const Vec2i &pos)
+bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos)
 {
-	int addx;  // iterator
-	int addy;  // iterator
-	int mask;  // movement mask of the unit.
-
-	Assert(type);
-	mask = type->MovementMask;
+	const int mask = type.MovementMask;
 	unsigned int index = pos.y * Map.Info.MapWidth;
-	for (addy = 0; addy < type->TileHeight; ++addy) {
-		for (addx = 0; addx < type->TileWidth; ++addx) {
+
+	for (int addy = 0; addy < type.TileHeight; ++addy) {
+		for (int addx = 0; addx < type.TileWidth; ++addx) {
 			if (!(Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy) &&
 				!Map.CheckMask(pos.x + addx + index, mask))) {
 				return false;
@@ -270,7 +266,9 @@ bool UnitTypeCanBeAt(const CUnitType *type, const Vec2i &pos)
 */
 bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos)
 {
-	return UnitTypeCanBeAt(unit.Type, pos);
+	Assert(unit.Type);
+
+	return UnitTypeCanBeAt(*unit.Type, pos);
 }
 
 /**

@@ -88,10 +88,9 @@ CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent)
 /**
 **  Check And Restriction
 */
-bool CBuildRestrictionAnd::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const
+bool CBuildRestrictionAnd::Check(const CUnitType &type, int x, int y, CUnit *&ontoptarget) const
 {
-	for (std::vector<CBuildRestriction*>::const_iterator i = _or_list.begin();
-		i != _or_list.end(); ++i) {
+	for (std::vector<CBuildRestriction*>::const_iterator i = _or_list.begin(); i != _or_list.end(); ++i) {
 		if (!(*i)->Check(type, x, y, ontoptarget)) {
 			return false;
 		}
@@ -102,11 +101,9 @@ bool CBuildRestrictionAnd::Check(const CUnitType *type, int x, int y, CUnit *&on
 /**
 **  Check Distance Restriction
 */
-bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit *&) const
+bool CBuildRestrictionDistance::Check(const CUnitType &type, int x, int y, CUnit *&) const
 {
-	CUnit *table[UnitMax];
-	int n;
-	int i;
+	const Vec2i pos = {x, y};
 	int x1 = 0;
 	int x2 = 0;
 	int y1 = 0;
@@ -119,50 +116,51 @@ bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit
 			this->DistanceType == NotEqual) {
 		x1 = std::max<int>(x - this->Distance, 0);
 		y1 = std::max<int>(y - this->Distance, 0);
-		x2 = std::min<int>(x + type->TileWidth + this->Distance, Map.Info.MapWidth);
-		y2 = std::min<int>(y + type->TileHeight + this->Distance, Map.Info.MapHeight);
+		x2 = std::min<int>(x + type.TileWidth + this->Distance, Map.Info.MapWidth);
+		y2 = std::min<int>(y + type.TileHeight + this->Distance, Map.Info.MapHeight);
 		distance = this->Distance;
 	} else if (this->DistanceType == LessThan ||
 			this->DistanceType == GreaterThanEqual) {
 		x1 = std::max<int>(x - this->Distance - 1, 0);
 		y1 = std::max<int>(y - this->Distance - 1, 0);
-		x2 = std::min<int>(x + type->TileWidth + this->Distance + 1, Map.Info.MapWidth);
-		y2 = std::min<int>(y + type->TileHeight + this->Distance + 1, Map.Info.MapHeight);
+		x2 = std::min<int>(x + type.TileWidth + this->Distance + 1, Map.Info.MapWidth);
+		y2 = std::min<int>(y + type.TileHeight + this->Distance + 1, Map.Info.MapHeight);
 		distance = this->Distance - 1;
 	}
-	n = Map.Select(x1, y1, x2, y2, table);
+	CUnit *table[UnitMax];
+	int n = Map.Select(x1, y1, x2, y2, table);
 
 	switch (this->DistanceType) {
 		case GreaterThan :
 		case GreaterThanEqual :
-			for (i = 0; i < n; ++i) {
+			for (int i = 0; i < n; ++i) {
 				if (this->RestrictType == table[i]->Type &&
-					MapDistanceBetweenTypes(type, x, y, table[i]->Type, table[i]->tilePos.x, table[i]->tilePos.y) <= distance) {
+					MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
 					return false;
 				}
 			}
 			return true;
 		case LessThan :
 		case LessThanEqual :
-			for (i = 0; i < n; ++i) {
+			for (int i = 0; i < n; ++i) {
 				if (this->RestrictType == table[i]->Type &&
-					MapDistanceBetweenTypes(type, x, y, table[i]->Type, table[i]->tilePos.x, table[i]->tilePos.y) <= distance) {
+					MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
 					return true;
 				}
 			}
 			return false;
 		case Equal :
-			for (i = 0; i < n; ++i) {
+			for (int i = 0; i < n; ++i) {
 				if (this->RestrictType == table[i]->Type &&
-					MapDistanceBetweenTypes(type, x, y, table[i]->Type, table[i]->tilePos.x, table[i]->tilePos.y) == distance) {
+					MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
 					return true;
 				}
 			}
 			return false;
 		case NotEqual :
-			for (i = 0; i < n; ++i) {
+			for (int i = 0; i < n; ++i) {
 				if (this->RestrictType == table[i]->Type &&
-					MapDistanceBetweenTypes(type, x, y, table[i]->Type, table[i]->tilePos.x, table[i]->tilePos.y) == distance) {
+					MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
 					return false;
 				}
 			}
@@ -179,7 +177,7 @@ inline bool CBuildRestrictionAddOn::functor::operator() (const CUnit *const unit
 /**
 **  Check AddOn Restriction
 */
-bool CBuildRestrictionAddOn::Check(const CUnitType *, int x, int y, CUnit *&) const
+bool CBuildRestrictionAddOn::Check(const CUnitType &, int x, int y, CUnit *&) const
 {
 	int x1;
 	int y1;
@@ -215,7 +213,7 @@ inline bool CBuildRestrictionOnTop::functor::operator() (CUnit *const unit)
 	return true;
 }
 
-bool CBuildRestrictionOnTop::Check(const CUnitType *, int x, int y, CUnit *&ontoptarget) const
+bool CBuildRestrictionOnTop::Check(const CUnitType &, int x, int y, CUnit *&ontoptarget) const
 {
 	CUnit *table[UnitMax];
 	const Vec2i pos = {x, y};
@@ -247,32 +245,31 @@ bool CBuildRestrictionOnTop::Check(const CUnitType *, int x, int y, CUnit *&onto
 **
 **  @return      OnTop, parent unit, builder on true or 1 if unit==NULL, NULL false.
 */
-CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, const Vec2i &pos)
+CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 {
 	CUnit *ontoptarget;
 
 	//
 	//  Can't build outside the map
 	//
-	if (pos.x + type->TileWidth > Map.Info.MapWidth) {
+	if (pos.x + type.TileWidth > Map.Info.MapWidth) {
 		return NULL;
 	}
-	if (pos.y + type->TileHeight > Map.Info.MapHeight) {
+	if (pos.y + type.TileHeight > Map.Info.MapHeight) {
 		return NULL;
 	}
 
 	// Must be checked before oil!
-	if (type->ShoreBuilding) {
-		const int width = type->TileWidth;
-		int w, h = type->TileHeight;
+	if (type.ShoreBuilding) {
+		const int width = type.TileWidth;
+		int h = type.TileHeight;
 		bool success = false;
-		CMapField *mf;
 
 		// Need at least one coast tile
 		unsigned int index = Map.getIndex(pos);
 		do {
-			mf = Map.Field(index);
-			w = width;
+			CMapField *mf = Map.Field(index);
+			int w = width;
 			do {
 				//if (Map.CoastOnMap(pos)) {
 				if((mf->Flags & MapFieldCoastAllowed) == MapFieldCoastAllowed) {
@@ -287,11 +284,11 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, const Vec2i &pos)
 		}
 	}
 
-	size_t count = type->BuildingRules.size();
+	size_t count = type.BuildingRules.size();
 	if (count > 0) {
 		ontoptarget = NULL;
 		for(unsigned int i = 0; i < count; ++i) {
-			CBuildRestriction *rule = type->BuildingRules[i];
+			CBuildRestriction *rule = type.BuildingRules[i];
 			// All checks processed, did we really have success
 			if (rule->Check(type, pos.x, pos.y, ontoptarget)) {
 				// We passed a full ruleset return
@@ -334,17 +331,10 @@ MapFogFilterFlags(CPlayer *player, const unsigned int index, int mask);
 **  @return      OnTop, parent unit, builder on true, NULL false.
 **
 */
-CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, const Vec2i &pos, int real)
+CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real)
 {
-	int w;
-	int h;
-	int j;
-	int testmask;
-	CPlayer *player;
-	CUnit *ontop;
-
 	// Terrain Flags don't matter if building on top of a unit.
-	ontop = CanBuildHere(unit, type, pos);
+	CUnit *ontop = CanBuildHere(unit, type, pos);
 	if (ontop == NULL) {
 		return NULL;
 	}
@@ -352,45 +342,42 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, const Vec2i &p
 		return ontop;
 	}
 
-	//
 	//  Remove unit that is building!
-	//
-	j = 0;
 	if (unit) {
 		UnmarkUnitFieldFlags(*unit);
 	}
 
-	player = NULL;
+	CPlayer *player = NULL;
 
 	if (unit && unit->Player->Type == PlayerPerson) {
 		player = unit->Player;
 	}
-
+	int testmask;
 	unsigned int index = pos.y * Map.Info.MapWidth;
-	for (h = 0; h < type->TileHeight; ++h) {
-		for (w = type->TileWidth; w--;) {
+	for (int h = 0; h < type.TileHeight; ++h) {
+		for (int w = type.TileWidth; w--;) {
 			/* first part of if (!CanBuildOn(x + w, y + h, testmask)) */
-			if(!Map.Info.IsPointOnMap(pos.x + w, pos.y + h)) {
-				h = type->TileHeight;
+			if (!Map.Info.IsPointOnMap(pos.x + w, pos.y + h)) {
+				h = type.TileHeight;
 				ontop = NULL;
 				break;
 			}
 			if (player && !real) {
-				//testmask = MapFogFilterFlags(player, x + w, y + h, type->MovementMask);
+				//testmask = MapFogFilterFlags(player, x + w, y + h, type.MovementMask);
 				testmask = MapFogFilterFlags(player,
-						index + pos.x + w, type->MovementMask);
+						index + pos.x + w, type.MovementMask);
 			} else {
-				testmask = type->MovementMask;
+				testmask = type.MovementMask;
 			}
 			/*secound part of if (!CanBuildOn(x + w, y + h, testmask)) */
-			if(Map.CheckMask(index + pos.x + w,testmask))
+			if (Map.CheckMask(index + pos.x + w, testmask))
 			{
-				h = type->TileHeight;
+				h = type.TileHeight;
 				ontop = NULL;
 				break;
 			}
 			if (player && !Map.IsFieldExplored(player, index + pos.x + w)) {
-				h = type->TileHeight;
+				h = type.TileHeight;
 				ontop = NULL;
 				break;
 			}
@@ -400,10 +387,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, const Vec2i &p
 	if (unit) {
 		MarkUnitFieldFlags(*unit);
 	}
-
-	//
 	// We can build here: check distance to gold mine/oil patch!
-	//
 	return ontop;
 }
 

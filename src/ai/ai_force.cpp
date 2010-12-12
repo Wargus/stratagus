@@ -186,23 +186,18 @@ void AiNewUnitTypeEquiv(CUnitType *a, CUnitType *b)
 **
 **  @return          the number of unittype found
 */
-int AiFindUnitTypeEquiv(const CUnitType *unittype, int *result)
+int AiFindUnitTypeEquiv(const CUnitType &unittype, int *result)
 {
-	int i;
-	int search;
-	int count;
+	const int search = UnitTypeEquivs[unittype.Slot];
+	int count = 0;
 
-	search = UnitTypeEquivs[unittype->Slot];
-	count = 0;
-
-	for (i = 0; i < UnitTypeMax + 1; ++i) {
+	for (int i = 0; i < UnitTypeMax + 1; ++i) {
 		if (UnitTypeEquivs[i] == search) {
 			// Found one
 			result[count] = i;
 			count++;
 		}
 	}
-
 	return count;
 }
 
@@ -215,20 +210,13 @@ int AiFindUnitTypeEquiv(const CUnitType *unittype, int *result)
 **
 **  @return             the number of unittype found
 */
-int AiFindAvailableUnitTypeEquiv(const CUnitType *unittype, int *usableTypes)
+int AiFindAvailableUnitTypeEquiv(const CUnitType &unittype, int *usableTypes)
 {
-	int usableTypesCount;
-	int i;
-	int j;
-	int tmp;
-	int bestlevel;
-	int curlevel;
-
 	// 1 - Find equivalents
-	usableTypesCount = AiFindUnitTypeEquiv(unittype,  usableTypes);
+	int usableTypesCount = AiFindUnitTypeEquiv(unittype, usableTypes);
 
 	// 2 - Remove unavailable unittypes
-	for (i = 0; i < usableTypesCount; ) {
+	for (int i = 0; i < usableTypesCount; ) {
 		if (!CheckDependByIdent(AiPlayer->Player, UnitTypes[usableTypes[i]]->Ident)) {
 			// Not available, remove it
 			usableTypes[i] = usableTypes[usableTypesCount - 1];
@@ -240,22 +228,17 @@ int AiFindAvailableUnitTypeEquiv(const CUnitType *unittype, int *usableTypes)
 
 	// 3 - Sort by level
 	// We won't have usableTypesCount>4, so simple sort should do it
-	for (i = 0; i < usableTypesCount - 1; ++i) {
-		bestlevel = UnitTypes[usableTypes[i]]->Priority;
-		for (j = i + 1; j < usableTypesCount; ++j) {
-			curlevel = UnitTypes[usableTypes[j]]->Priority;
+	for (int i = 0; i < usableTypesCount - 1; ++i) {
+		int bestlevel = UnitTypes[usableTypes[i]]->Priority;
+		for (int j = i + 1; j < usableTypesCount; ++j) {
+			const int curlevel = UnitTypes[usableTypes[j]]->Priority;
 
 			if (curlevel > bestlevel) {
-				// Swap
-				tmp = usableTypes[j];
-				usableTypes[j] = usableTypes[i];
-				usableTypes[i] = tmp;
-
+				std::swap(usableTypes[j], usableTypes[i]);
 				bestlevel = curlevel;
 			}
 		}
 	}
-
 	return usableTypesCount;
 }
 
@@ -439,44 +422,41 @@ bool AiForceManager::Assign(CUnit &unit)
 void AiForceManager::CheckUnits(int *counter)
 {
 	int attacking[UnitTypeMax];
-	unsigned int i,j;
 	const int *unit_types_count = AiPlayer->Player->UnitTypesCount;
 
 	memset(attacking, 0, sizeof(attacking));
 
-	//
 	// Look through the forces what is missing.
-	//
-	for(i = 0; i < forces.size(); ++i)
+	for (unsigned int i = 0; i < forces.size(); ++i)
 	{
 		AiForce *force = &forces[i];
+
 		if (force->State > AI_FORCE_STATE_FREE && force->IsAttacking()) {
-			for (j = 0; j < forces[i].Size(); ++j) {
+			for (unsigned int j = 0; j < forces[i].Size(); ++j) {
 				const CUnit *unit = forces[i].Units[j];
 				attacking[unit->Type->Slot]++;
 			}
 		}
 	}
 
-	//
 	// create missing units
-	//
-	for(i = 0; i < forces.size(); ++i)
+	for (unsigned int i = 0; i < forces.size(); ++i)
 	{
 		AiForce *force = &forces[i];
+
 		// No troops for attacking force
 		if (force->State == AI_FORCE_STATE_FREE || force->IsAttacking()) {
 			continue;
 		}
-
-		for (j = 0; j < force->UnitTypes.size(); ++j) {
+		for (unsigned int j = 0; j < force->UnitTypes.size(); ++j) {
 			const AiUnitType *aiut = &force->UnitTypes[j];
-			int t = aiut->Type->Slot;
-			int x = aiut->Want;
-			if (x > unit_types_count[t] + counter[t] - attacking[t]) {    // Request it.
-				AiAddUnitTypeRequest(aiut->Type,
-					x - (unit_types_count[t] + counter[t] - attacking[t]));
-				counter[t] += x - (unit_types_count[t] + counter[t] - attacking[t]);
+			const int t = aiut->Type->Slot;
+			const int x = aiut->Want;
+			const int requested = x - (unit_types_count[t] + counter[t] - attacking[t]);
+
+			if (requested > 0) {  // Request it.
+				AiAddUnitTypeRequest(*aiut->Type, requested);
+				counter[t] += requested;
 				force->Completed = false;
 			}
 			counter[t] -= x;

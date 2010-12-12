@@ -120,7 +120,7 @@ static void MoveToLocation(CUnit &unit)
 			unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
 				_("You cannot reach building place"));
 			if (unit.Player->AiEnabled) {
-				AiCanNotReach(unit, unit.CurrentOrder()->Arg1.Type);
+				AiCanNotReach(unit, *unit.CurrentOrder()->Arg1.Type);
 			}
 
 			unit.ClearAction();
@@ -171,7 +171,7 @@ static CUnit *CheckCanBuild(CUnit &unit)
 
 	COrderPtr order = unit.CurrentOrder();
 	const Vec2i pos = order->goalPos;
-	CUnitType *type = order->Arg1.Type;
+	CUnitType &type = *order->Arg1.Type;
 
 	//
 	// Check if the building could be built there.
@@ -182,7 +182,7 @@ static CUnit *CheckCanBuild(CUnit &unit)
 		 *	ebabled/disable via game lua scripting
 		 */
 		if ((ontop =
-			AlreadyBuildingFinder(unit, type).Find(Map.Field(pos))
+			AlreadyBuildingFinder(unit, &type).Find(Map.Field(pos))
 			) != NULL) {
 			DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
 					_C_ unit.Player->Index _C_ unit.Slot
@@ -207,7 +207,7 @@ static CUnit *CheckCanBuild(CUnit &unit)
 		}
 
 		unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
-			_("You cannot build %s here"), type->Name.c_str());
+			_("You cannot build %s here"), type.Name.c_str());
 		if (unit.Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
@@ -221,7 +221,7 @@ static CUnit *CheckCanBuild(CUnit &unit)
 	if (unit.Player->CheckUnitType(type)) {
 		// FIXME: Better tell what is missing?
 		unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
-			_("Not enough resources to build %s"), type->Name.c_str());
+			_("Not enough resources to build %s"), type.Name.c_str());
 		if (unit.Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
@@ -234,7 +234,7 @@ static CUnit *CheckCanBuild(CUnit &unit)
 	//
 	if (unit.Player->CheckLimits(type) < 0) {
 		unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
-			_("Can't build more units %s"), type->Name.c_str());
+			_("Can't build more units %s"), type.Name.c_str());
 		if (unit.Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
@@ -252,7 +252,7 @@ static void StartBuilding(CUnit &unit, CUnit &ontop)
 	const CUnitStats *stats;
 	COrderPtr order = unit.CurrentOrder();
 	const Vec2i pos = order->goalPos;
-	CUnitType *type = order->Arg1.Type;
+	CUnitType &type = *order->Arg1.Type;
 
 	unit.Player->SubUnitType(type);
 
@@ -262,7 +262,7 @@ static void StartBuilding(CUnit &unit, CUnit &ontop)
 	if (build == NoUnitP) {
 		// FIXME: Should we retry this?
 		unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
-			_("Unable to create building %s"), type->Name.c_str());
+			_("Unable to create building %s"), type.Name.c_str());
 		if (unit.Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
@@ -293,12 +293,12 @@ static void StartBuilding(CUnit &unit, CUnit &ontop)
 
 	// Must place after previous for map flags
 	build->Place(pos);
-	if (!type->BuilderOutside) {
+	if (!type.BuilderOutside) {
 		build->CurrentSightRange = 1;
 	}
 
 	// HACK: the building is not ready yet
-	build->Player->UnitTypesCount[type->Slot]--;
+	build->Player->UnitTypesCount[type.Slot]--;
 
 	stats = build->Stats;
 
@@ -308,7 +308,7 @@ static void StartBuilding(CUnit &unit, CUnit &ontop)
 	UpdateConstructionFrame(*build);
 
 	// We need somebody to work on it.
-	if (!type->BuilderOutside) {
+	if (!type.BuilderOutside) {
 		//FIXME: cancel buld gen crash
 		// Place the builder inside the building
 		build->Data.Built.Worker = &unit;

@@ -59,7 +59,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static int AiMakeUnit(CUnitType *type, int near_x, int near_y);
+static int AiMakeUnit(CUnitType &type, int near_x, int near_y);
 
 /**
 **  Check if the costs are available for the AI.
@@ -130,36 +130,26 @@ static int AiCheckCosts(const int *costs)
 **  @todo  The number of food currently trained can be stored global
 **         for faster use.
 */
-static int AiCheckSupply(const PlayerAi *pai, const CUnitType *type)
+static int AiCheckSupply(const PlayerAi *pai, const CUnitType &type)
 {
-	int remaining;
-	const AiBuildQueue *queue;
-	int i;
-
-	//
 	// Count food supplies under construction.
-	//
-	remaining = 0;
-	for (i = 0; i < (int)pai->UnitTypeBuilt.size(); ++i) {
-		queue = &pai->UnitTypeBuilt[i];
-		if (queue->Type->Supply) {
-			remaining += queue->Made * queue->Type->Supply;
+	int remaining = 0;
+	for (unsigned int i = 0; i < pai->UnitTypeBuilt.size(); ++i) {
+		const AiBuildQueue &queue = pai->UnitTypeBuilt[i];
+		if (queue.Type->Supply) {
+			remaining += queue.Made * queue.Type->Supply;
 		}
 	}
 
-	//
 	// We are already out of food.
-	//
-	remaining += pai->Player->Supply - pai->Player->Demand - type->Demand;
+	remaining += pai->Player->Supply - pai->Player->Demand - type.Demand;
 	if (remaining < 0) {
 		return 0;
 	}
-	//
 	// Count what we train.
-	//
-	for (i = 0; i < (int)pai->UnitTypeBuilt.size(); ++i) {
-		queue = &pai->UnitTypeBuilt[i];
-		if ((remaining -= queue->Made * queue->Type->Demand) < 0) {
+	for (unsigned int i = 0; i < pai->UnitTypeBuilt.size(); ++i) {
+		const AiBuildQueue &queue = pai->UnitTypeBuilt[i];
+		if ((remaining -= queue.Made * queue.Type->Demand) < 0) {
 			return 0;
 		}
 	}
@@ -175,9 +165,9 @@ static int AiCheckSupply(const PlayerAi *pai, const CUnitType *type)
 **
 **  @return      A bit field of the missing costs.
 */
-static int AiCheckUnitTypeCosts(const CUnitType *type)
+static int AiCheckUnitTypeCosts(const CUnitType &type)
 {
-	return AiCheckCosts(type->Stats[AiPlayer->Player->Index].Costs);
+	return AiCheckCosts(type.Stats[AiPlayer->Player->Index].Costs);
 }
 
 /**
@@ -185,52 +175,37 @@ static int AiCheckUnitTypeCosts(const CUnitType *type)
 **
 **  @param player  Find enemies of this player
 **  @param type    Optional unit type to check if enemy can target this
-**  @param x       X location
-**  @param y       Y location
+**  @param pos     location
 **  @param range   Distance range to look.
 **
 **  @return       Number of enemy units.
 */
 int AiEnemyUnitsInDistance(const CPlayer *player,
-		const CUnitType *type, int x, int y, unsigned range)
+		const CUnitType *type, const Vec2i &pos, unsigned range)
 {
-	const CUnit *dest;
-	CUnit *table[UnitMax];
-	unsigned int n;
-	unsigned int i;
-	int e;
-
-	//
 	// Select all units in range.
-	//
-	n = Map.Select(x - range, y - range,
-		x + range + (type ? type->TileWidth :0),
-		y + range + (type ? type->TileHeight:0), table);
+	CUnit *table[UnitMax];
+	const unsigned int n = Map.Select(pos.x - range, pos.y - range,
+		pos.x + range + (type ? type->TileWidth :0),
+		pos.y + range + (type ? type->TileHeight:0), table);
 
-	//
 	// Find the enemy units which can attack
-	//
-	for (e = i = 0; i < n; ++i) {
-		dest = table[i];
-		//
+	int e = 0;
+	for (unsigned int i = 0; i < n; ++i) {
+		const CUnit *dest = table[i];
 		// Those can't attack anyway.
-		//
 		if (dest->Removed || dest->Variable[INVISIBLE_INDEX].Value ||
 			dest->CurrentAction() == UnitActionDie) {
 			continue;
 		}
-
 		if (!player->IsEnemy(*dest)) { // a friend or neutral
 			continue;
 		}
-		//
 		// Unit can attack back?
-		//
 		if (!type || CanTarget(dest->Type, type)) {
 			++e;
 		}
 	}
-
 	return e;
 }
 
@@ -244,8 +219,7 @@ int AiEnemyUnitsInDistance(const CPlayer *player,
 */
 int AiEnemyUnitsInDistance(const CUnit &unit, unsigned range)
 {
-	return AiEnemyUnitsInDistance(unit.Player,
-						unit.Type, unit.tilePos.x, unit.tilePos.y, range);
+	return AiEnemyUnitsInDistance(unit.Player, unit.Type, unit.tilePos, range);
 }
 
 /**
@@ -258,8 +232,7 @@ int AiEnemyUnitsInDistance(const CUnit &unit, unsigned range)
 **
 **  @note            We must check if the dependencies are fulfilled.
 */
-static int AiBuildBuilding(const CUnitType *type, CUnitType *building,
-			 int near_x, int near_y)
+static int AiBuildBuilding(const CUnitType &type, CUnitType &building, int near_x, int near_y)
 {
 	CUnit *table[UnitMax];
 	int num = 0;
@@ -315,12 +288,11 @@ static int AiBuildBuilding(const CUnitType *type, CUnitType *building,
 	return 0;
 }
 
-static bool
-AiRequestedTypeAllowed(const CPlayer *player, const CUnitType *type)
+static bool AiRequestedTypeAllowed(const CPlayer *player, const CUnitType &type)
 {
-	const int size = AiHelpers.Build[type->Slot].size();
-	for(int i = 0; i<size; ++i) {
-		CUnitType *builder = AiHelpers.Build[type->Slot][i];
+	const int size = AiHelpers.Build[type.Slot].size();
+	for(int i = 0; i < size; ++i) {
+		CUnitType *builder = AiHelpers.Build[type.Slot][i];
 		if(player->UnitTypesCount[builder->Slot] > 0 &&
 			CheckDependByType(player, type))
 		{
@@ -371,19 +343,11 @@ void AiNewDepotRequest(CUnit &worker) {
 				_C_ worker->Data.Move.Cycles
 				);
 	*/
-	int i;
-	int n;
-	int c;
-	CUnitType *type;
-	CUnitType *best_type = NULL;
-	int cost, best_cost = 0;
-	//int best_mask = 0, needmask;
 
 	Vec2i pos = {-1, -1};
-
 	ResourceInfo *resinfo = worker.Type->ResInfo[worker.CurrentResource];
 
-	if(resinfo->TerrainHarvester) {
+	if (resinfo->TerrainHarvester) {
 		pos = worker.CurrentOrder()->Arg1.Resource.Pos;
 	} else {
 		CUnit *mine = worker.CurrentOrder()->Arg1.Resource.Mine;
@@ -391,7 +355,6 @@ void AiNewDepotRequest(CUnit &worker) {
 			pos = mine->tilePos;
 		}
 	}
-
 
 	if (pos.x != -1 && NULL != FindDepositNearLoc(worker.Player,
 				pos.x, pos.y, 10, worker.CurrentResource)) {
@@ -401,47 +364,43 @@ void AiNewDepotRequest(CUnit &worker) {
 		 */
 		return;
 	}
-
-	int counter[UnitTypeMax];
-	//
+	CUnitType *best_type = NULL;
+	int best_cost = 0;
+	//int best_mask = 0;
 	// Count the already made build requests.
-	//
+	int counter[UnitTypeMax];
+
 	AiGetBuildRequestsCount(worker.Player->Ai, counter);
 
-	n = AiHelpers.Depots[worker.CurrentResource - 1].size();
+	const int n = AiHelpers.Depots[worker.CurrentResource - 1].size();
 
-	for (i = 0; i < n; ++i) {
-		type = AiHelpers.Depots[worker.CurrentResource - 1][i];
+	for (int i = 0; i < n; ++i) {
+		CUnitType &type = *AiHelpers.Depots[worker.CurrentResource - 1][i];
 
-		if (counter[type->Slot]) { // Already ordered.
+		if (counter[type.Slot]) { // Already ordered.
 			return;
 		}
-
 		if (!AiRequestedTypeAllowed(worker.Player, type)) {
 			continue;
 		}
 
-		//
 		// Check if resources available.
-		//
-		//needmask = AiCheckUnitTypeCosts(type);
-
-		cost = 0;
-		for (c = 1; c < MaxCosts; ++c) {
-			cost += type->Stats[worker.Player->Index].Costs[c];
+		//int needmask = AiCheckUnitTypeCosts(type);
+		int cost = 0;
+		for (int c = 1; c < MaxCosts; ++c) {
+			cost += type.Stats[worker.Player->Index].Costs[c];
 		}
 
-		if(best_type == NULL || (cost < best_cost)) {
-			best_type = type;
+		if (best_type == NULL || (cost < best_cost)) {
+			best_type = &type;
 			best_cost = cost;
 			//best_mask = needmask;
 		}
 
 	}
 
-	if(best_type) {
+	if (best_type) {
 		//if(!best_mask) {
-
 			AiBuildQueue queue;
 
 			queue.Type = best_type;
@@ -456,14 +415,12 @@ void AiNewDepotRequest(CUnit &worker) {
 				_C_ worker.Player->Index _C_ worker.Slot
 				_C_ queue.X _C_ queue.Y
 				);
-
 			/*
 		} else {
 			AiPlayer->NeededMask |= best_mask;
 		}
 		*/
 	}
-
 }
 
 /**
@@ -471,40 +428,31 @@ void AiNewDepotRequest(CUnit &worker) {
 */
 static bool AiRequestSupply()
 {
-	int i;
-	int n;
-	int c;
-	CUnitType *type;
-
-	//
 	// Don't request supply if we're sleeping.  When the script starts it may
 	// request a better unit than the one we pick here.  If we only have enough
 	// resources for one unit we don't want to build the wrong one.
-	//
 	if (AiPlayer->SleepCycles != 0) {
-		/* we still need spply */
+		/* we still need supply */
 		return true;
 	}
+
+	// Count the already made build requests.
 	int counter[UnitTypeMax];
 
-	//
-	// Count the already made build requests.
-	//
 	AiGetBuildRequestsCount(AiPlayer, counter);
 	struct cnode cache[16];
-	int j;
 
 	memset(cache, 0, sizeof(cache));
 
 	//
 	// Check if we can build this?
 	//
-	j = 0;
-	n = AiHelpers.UnitLimit[0].size();
+	int j = 0;
+	const int n = AiHelpers.UnitLimit[0].size();
 
-	for (i = 0; i < n; ++i) {
-		type = AiHelpers.UnitLimit[0][i];
-		if (counter[type->Slot]) { // Already ordered.
+	for (int i = 0; i < n; ++i) {
+		CUnitType &type = *AiHelpers.UnitLimit[0][i];
+		if (counter[type.Slot]) { // Already ordered.
 #if defined(DEBUG) && defined(DebugRequestSupply)
 			DebugPrint("%d: AiRequestSupply: Supply already build in %s\n"
 				_C_ AiPlayer->Player->Index _C_ type->Name.c_str());
@@ -521,24 +469,24 @@ static bool AiRequestSupply()
 		//
 		cache[j].needmask = AiCheckUnitTypeCosts(type);
 
-		for (c = 1; c < MaxCosts; ++c) {
-			cache[j].unit_cost += type->Stats[AiPlayer->Player->Index].Costs[c];
+		for (int c = 1; c < MaxCosts; ++c) {
+			cache[j].unit_cost += type.Stats[AiPlayer->Player->Index].Costs[c];
 		}
-		cache[j].unit_cost += type->Supply - 1;
-		cache[j].unit_cost /= type->Supply;
-		cache[j++].type = type;
+		cache[j].unit_cost += type.Supply - 1;
+		cache[j].unit_cost /= type.Supply;
+		cache[j++].type = &type;
 		Assert(j < 16);
 	}
 
-	if(j > 1)
-		qsort(&cache, j, sizeof(struct cnode), cnode_cmp);
+	if (j > 1)
+		qsort(&cache, j, sizeof (struct cnode), cnode_cmp);
 
-	if(j) {
-		if(!cache[0].needmask) {
-			type = cache[0].type;
+	if (j) {
+		if (!cache[0].needmask) {
+			CUnitType &type = *cache[0].type;
 			if (AiMakeUnit(type, -1, -1)) {
 				AiBuildQueue newqueue;
-				newqueue.Type = type;
+				newqueue.Type = &type;
 				newqueue.Want = 1;
 				newqueue.Made = 1;
 				AiPlayer->UnitTypeBuilt.insert(
@@ -556,11 +504,11 @@ static bool AiRequestSupply()
 
 #if defined( DEBUG) && defined( DebugRequestSupply )
 	std::string needed("");
-	for (i = 1; i < MaxCosts; ++i) {
-		if(cache[0].needmask & (1<<i))
+	for (int i = 1; i < MaxCosts; ++i) {
+		if (cache[0].needmask & (1 << i))
 		{
 			needed += ":";
-			switch(i)
+			switch (i)
 			{
 				case GoldCost:
 					needed += "Gold<";
@@ -595,7 +543,7 @@ static bool AiRequestSupply()
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiTrainUnit(const CUnitType *type, CUnitType *what)
+static int AiTrainUnit(const CUnitType &type, CUnitType &what)
 {
 	CUnit *table[UnitMax];
 	int num = 0;
@@ -681,60 +629,51 @@ int AiCountUnitBuilders(CUnitType *type)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiMakeUnit(CUnitType *type, int near_x, int near_y)
+static int AiMakeUnit(CUnitType &typeToMake, int near_x, int near_y)
 {
-	int i;
-	int n;
-	const int *unit_count;
-	std::vector<std::vector<CUnitType *> > *tablep;
-	std::vector<CUnitType *> *table;
-
-	int usableTypes[UnitTypeMax + 1];
-	int usableTypesCount;
-	int currentType;
-
 	// Find equivalents unittypes.
-	usableTypesCount = AiFindAvailableUnitTypeEquiv(type, usableTypes);
+	int usableTypes[UnitTypeMax + 1];
+	const int usableTypesCount = AiFindAvailableUnitTypeEquiv(typeToMake, usableTypes);
 
 	// Iterate them
-	for (currentType = 0; currentType < usableTypesCount; ++currentType) {
-
-		type = UnitTypes[usableTypes[currentType]];
-
+	for (int currentType = 0; currentType < usableTypesCount; ++currentType) {
+		CUnitType &type = *UnitTypes[usableTypes[currentType]];
+		int n;
+		std::vector<std::vector<CUnitType *> > *tablep;
 		//
 		// Check if we have a place for building or a unit to build.
 		//
-		if (type->Building) {
+		if (type.Building) {
 			n = AiHelpers.Build.size();
 			tablep = &AiHelpers.Build;
 		} else {
 			n = AiHelpers.Train.size();
 			tablep = &AiHelpers.Train;
 		}
-		if (type->Slot > n) { // Oops not known.
+		if (type.Slot > n) { // Oops not known.
 			DebugPrint("%d: AiMakeUnit I: Nothing known about `%s'\n"
-				_C_ AiPlayer->Player->Index _C_ type->Ident.c_str());
+				_C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 			continue;
 		}
-		table = &(*tablep)[type->Slot];
-		if (!table->size()) { // Oops not known.
+		std::vector<CUnitType *> &table = (*tablep)[type.Slot];
+		if (!table.size()) { // Oops not known.
 			DebugPrint("%d: AiMakeUnit II: Nothing known about `%s'\n"
-				_C_ AiPlayer->Player->Index _C_ type->Ident.c_str());
+				_C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 			continue;
 		}
 
-		unit_count = AiPlayer->Player->UnitTypesCount;
-		for (i = 0; i < (int)table->size(); ++i) {
+		const int *unit_count = AiPlayer->Player->UnitTypesCount;
+		for (unsigned int i = 0; i < table.size(); ++i) {
 			//
 			// The type for builder/trainer is available
 			//
-			if (unit_count[(*table)[i]->Slot]) {
-				if (type->Building) {
-					if (AiBuildBuilding((*table)[i], type, near_x, near_y)) {
+			if (unit_count[table[i]->Slot]) {
+				if (type.Building) {
+					if (AiBuildBuilding(*table[i], type, near_x, near_y)) {
 						return 1;
 					}
 				} else {
-					if (AiTrainUnit((*table)[i], type)) {
+					if (AiTrainUnit(*table[i], type)) {
 						return 1;
 					}
 				}
@@ -754,7 +693,7 @@ static int AiMakeUnit(CUnitType *type, int near_x, int near_y)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiResearchUpgrade(const CUnitType *type, CUpgrade *what)
+static int AiResearchUpgrade(const CUnitType &type, CUpgrade *what)
 {
 	CUnit *table[UnitMax];
 	int num = 0;
@@ -786,50 +725,40 @@ static int AiResearchUpgrade(const CUnitType *type, CUpgrade *what)
 */
 void AiAddResearchRequest(CUpgrade *upgrade)
 {
-	int i;
-	int n;
-	const int *unit_count;
-	std::vector<std::vector<CUnitType *> > *tablep;
-	std::vector<CUnitType *> *table;
-
-	//
 	// Check if resources are available.
-	//
-	if ((i = AiCheckCosts(upgrade->Costs))) {
-		AiPlayer->NeededMask |= i;
+	const int costNeeded = AiCheckCosts(upgrade->Costs);
+
+	if (costNeeded) {
+		AiPlayer->NeededMask |= costNeeded;
 		return;
 	}
 	//
 	// Check if we have a place for the upgrade to research
 	//
-	n = AiHelpers.Research.size();
-	tablep = &AiHelpers.Research;
+	const int n = AiHelpers.Research.size();
+	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Research;
 
 	if (upgrade->ID > n) { // Oops not known.
 		DebugPrint("%d: AiAddResearchRequest I: Nothing known about `%s'\n"
 			_C_ AiPlayer->Player->Index _C_ upgrade->Ident.c_str());
 		return;
 	}
-	table = &(*tablep)[upgrade->ID];
-	if (!table->size()) { // Oops not known.
+	std::vector<CUnitType *> &table = tablep[upgrade->ID];
+	if (!table.size()) { // Oops not known.
 		DebugPrint("%d: AiAddResearchRequest II: Nothing known about `%s'\n"
 			_C_ AiPlayer->Player->Index _C_ upgrade->Ident.c_str());
 		return;
 	}
 
-	unit_count = AiPlayer->Player->UnitTypesCount;
-	for (i = 0; i < (int)table->size(); ++i) {
-		//
+	const int *unit_count = AiPlayer->Player->UnitTypesCount;
+	for (unsigned int i = 0; i < table.size(); ++i) {
 		// The type is available
-		//
-		if (unit_count[(*table)[i]->Slot]) {
-			if (AiResearchUpgrade((*table)[i], upgrade)) {
+		if (unit_count[table[i]->Slot]) {
+			if (AiResearchUpgrade(*table[i], upgrade)) {
 				return;
 			}
 		}
 	}
-
-	return;
 }
 
 /**
@@ -842,7 +771,7 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiUpgradeTo(const CUnitType *type, CUnitType *what)
+static int AiUpgradeTo(const CUnitType &type, CUnitType &what)
 {
 	CUnit *table[UnitMax];
 	int num = 0;
@@ -871,63 +800,50 @@ static int AiUpgradeTo(const CUnitType *type, CUnitType *what)
 **
 **  @param type  FIXME: docu
 */
-void AiAddUpgradeToRequest(CUnitType *type)
+void AiAddUpgradeToRequest(CUnitType &type)
 {
-	int i;
-	int n;
-	const int *unit_count;
-	std::vector<std::vector<CUnitType *> > *tablep;
-	std::vector<CUnitType *> *table;
-
-	//
 	// Check if resources are available.
-	//
-	if ((i = AiCheckUnitTypeCosts(type))) {
-		AiPlayer->NeededMask |= i;
+	const int resourceNeeded = AiCheckUnitTypeCosts(type);
+	if (resourceNeeded) {
+		AiPlayer->NeededMask |= resourceNeeded;
 		return;
 	}
 	//
 	// Check if we have a place for the upgrade to.
 	//
-	n = AiHelpers.Upgrade.size();
-	tablep = &AiHelpers.Upgrade;
+	const int n = AiHelpers.Upgrade.size();
+	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Upgrade;
 
-	if (type->Slot > n) { // Oops not known.
+	if (type.Slot > n) { // Oops not known.
 		DebugPrint("%d: AiAddUpgradeToRequest I: Nothing known about `%s'\n"
-			_C_ AiPlayer->Player->Index _C_ type->Ident.c_str());
+			_C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 		return;
 	}
-	table = &(*tablep)[type->Slot];
-	if (!table->size()) { // Oops not known.
+	std::vector<CUnitType *> &table = tablep[type.Slot];
+	if (!table.size()) { // Oops not known.
 		DebugPrint("%d: AiAddUpgradeToRequest II: Nothing known about `%s'\n"
-			_C_ AiPlayer->Player->Index _C_ type->Ident.c_str());
+			_C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 		return;
 	}
 
-	unit_count = AiPlayer->Player->UnitTypesCount;
-	for (i = 0; i < (int)table->size(); ++i) {
+	const int *unit_count = AiPlayer->Player->UnitTypesCount;
+	for (unsigned int i = 0; i < table.size(); ++i) {
 		//
 		// The type is available
 		//
-		if (unit_count[(*table)[i]->Slot]) {
-			if (AiUpgradeTo((*table)[i], type)) {
+		if (unit_count[table[i]->Slot]) {
+			if (AiUpgradeTo(*table[i], type)) {
 				return;
 			}
 		}
 	}
-
-	return;
 }
 
 /**
 **  Check what must be built / trained.
 */
-static void AiCheckingWork(void)
+static void AiCheckingWork()
 {
-	int c;
-	CUnitType *type;
-	AiBuildQueue *queue;
-
 	// Suppy has the highest priority
 	if (AiPlayer->NeedSupply) {
 		if (!(!AiPlayer->UnitTypeBuilt.empty() &&
@@ -936,52 +852,43 @@ static void AiCheckingWork(void)
 			AiRequestSupply();
 		}
 	}
-	//
 	// Look to the build requests, what can be done.
-	//
-	int sz = AiPlayer->UnitTypeBuilt.size();
+	const int sz = AiPlayer->UnitTypeBuilt.size();
 	for (int i = 0; i < sz; ++i) {
-		queue = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
-		type = queue->Type;
+		AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
+		CUnitType &type = *queue.Type;
 
-		//
 		// FIXME: must check if requirements are fulfilled.
 		// Buildings can be destroyed.
 
-		//
 		// Check if we have enough food.
-		//
-		if (type->Demand && !AiCheckSupply(AiPlayer, type)) {
+		if (type.Demand && !AiCheckSupply(AiPlayer, type)) {
 			AiPlayer->NeedSupply = true;
 			AiRequestSupply();
 		}
-		//
 		// Check limits, AI should be broken if reached.
-		//
-		if (queue->Want > queue->Made && AiPlayer->Player->CheckLimits(type) < 0) {
+		if (queue.Want > queue.Made && AiPlayer->Player->CheckLimits(type) < 0) {
 			continue;
 		}
-		//
 		// Check if resources available.
-		//
-		if ((c = AiCheckUnitTypeCosts(type))) {
+		const int c = AiCheckUnitTypeCosts(type);
+		if (c) {
 			AiPlayer->NeededMask |= c;
-			//
 			// NOTE: we can continue and build things with lesser
 			//  resource or other resource need!
 			continue;
-		} else if (queue->Want > queue->Made && queue->Wait <= GameCycle) {
-			if (AiMakeUnit(type, queue->X, queue->Y)) {
+		} else if (queue.Want > queue.Made && queue.Wait <= GameCycle) {
+			if (AiMakeUnit(type, queue.X, queue.Y)) {
 				// AiRequestSupply can change UnitTypeBuilt so recalculate queue
-				queue = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
-				++queue->Made;
-				queue->Wait = 0;
-			} else if (queue->Type->Building) {
+				AiBuildQueue &queue2 = AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
+				++queue2.Made;
+				queue2.Wait = 0;
+			} else if (queue.Type->Building) {
 				// Finding a building place is costly, don't try again for a while
-				if (queue->Wait == 0) {
-					queue->Wait = GameCycle + 150;
+				if (queue.Wait == 0) {
+					queue.Wait = GameCycle + 150;
 				} else {
-					queue->Wait = GameCycle + 450;
+					queue.Wait = GameCycle + 450;
 				}
 			}
 		}
@@ -1373,21 +1280,8 @@ static void AiCollectResources()
 **
 **  @return          True if can repair, false if can't repair..
 */
-static int AiRepairBuilding(const CUnitType *type, CUnit &building)
+static int AiRepairBuilding(const CUnitType &type, CUnit &building)
 {
-	CUnit *table[UnitMax];
-	CUnit *unit_temp;
-	int distance[UnitMax];
-	int rX;
-	int rY;
-	int r_temp;
-	int index_temp;
-	int nunits;
-	int i;
-	int j;
-	int k;
-	int num;
-
 	// Remove all workers not mining. on the way building something
 	// FIXME: It is not clever to use workers with gold
 	// Idea: Antonis: Put the rest of the workers in a table in case
@@ -1397,8 +1291,10 @@ static int AiRepairBuilding(const CUnitType *type, CUnit &building)
 	// FIXME: too many workers repair the same building!
 
 	// Selection of mining workers.
-	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
-	for (num = i = 0; i < nunits; ++i) {
+	CUnit *table[UnitMax];
+	int nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
+	int num = 0;
+	for (int i = 0; i < nunits; ++i) {
 		CUnit &unit = *table[i];
 
 		if (unit.Type->RepairRange && unit.OrderCount == 1 &&
@@ -1409,47 +1305,41 @@ static int AiRepairBuilding(const CUnitType *type, CUnit &building)
 	}
 
 	// Sort by distance loops -Antonis-
-	for (i = 0; i < num; ++i) {
+	int distance[UnitMax];
+	for (int i = 0; i < num; ++i) {
 		CUnit &unit = *table[i];
+		int rX = unit.tilePos.x - building.tilePos.x;
+		int rY = unit.tilePos.y - building.tilePos.y;
 
 		// FIXME: Probably calculated from top left corner of building
-		if ((rX = unit.tilePos.x - building.tilePos.x) < 0) {
-			rX = -rX;
-		}
-		if ((rY = unit.tilePos.y - building.tilePos.y) < 0) {
-			rY = -rY;
-		}
-		if (rX < rY) {
-			distance[i] = rX;
-		} else {
-			distance[i] = rY;
-		}
+		rX = std::max(rX, -rX);
+		rY = std::max(rY, -rY);
+		distance[i] = std::min(rX, rY);
 	}
-	for (i = 0; i < num; ++i) {
-		r_temp = distance[i];
-		index_temp = i;
-		for (j = i; j < num; ++j) {
+	for (int i = 0; i < num; ++i) {
+		int r_temp = distance[i];
+		int index_temp = i;
+		for (int j = i; j < num; ++j) {
 			if (distance[j] < r_temp) {
 				r_temp = distance[j];
 				index_temp = j;
 			}
 		}
 		if (index_temp > i) {
-			unit_temp = table[index_temp];
-			table[index_temp] = table[i];
-			distance[index_temp] = distance[i];
-			table[i] = unit_temp;
-			distance[i] = r_temp; // May be omitted, here for completence
+			std::swap(distance[i], distance[index_temp]);
+			std::swap(table[i], table[index_temp]);
 		}
 	}
 
 	// Check if building is reachable and try next trio of workers
 
-	if ((j = AiPlayer->TriedRepairWorkers[UnitNumber(building)]) > num) {
-		j = AiPlayer->TriedRepairWorkers[UnitNumber(building)] = 0;
+	int nbworker = AiPlayer->TriedRepairWorkers[UnitNumber(building)];
+	if (nbworker > num) {
+		nbworker = AiPlayer->TriedRepairWorkers[UnitNumber(building)] = 0;
 	}
 
-	for (k = i = j; i < num && i < j + 3; ++i) {
+	int k = nbworker;
+	for (int i = nbworker; i < num && i < nbworker + 3; ++i) {
 
 		CUnit &unit = *table[i];
 
@@ -1473,35 +1363,28 @@ static int AiRepairBuilding(const CUnitType *type, CUnit &building)
 */
 static int AiRepairUnit(CUnit &unit)
 {
-	int i;
-	int n;
-	const CUnitType *type;
-	const int *unit_count;
-	std::vector<std::vector<CUnitType *> > *tablep;
-	std::vector<CUnitType *> *table;
-
-	n = AiHelpers.Repair.size();
-	tablep = &AiHelpers.Repair;
-	type = unit.Type;
-	if (type->Slot > n) { // Oops not known.
+	int n = AiHelpers.Repair.size();
+	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Repair;
+	const CUnitType &type = *unit.Type;
+	if (type.Slot > n) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit I: Nothing known about `%s'\n"
-			_C_ AiPlayer->Player->Index _C_ type->Ident.c_str());
+			_C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 		return 0;
 	}
-	table = &(*tablep)[type->Slot];
-	if (!table->size()) { // Oops not known.
+	std::vector<CUnitType *> &table = tablep[type.Slot];
+	if (!table.size()) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit II: Nothing known about `%s'\n"
-			_C_ AiPlayer->Player->Index _C_ type->Ident.c_str());
+			_C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 		return 0;
 	}
 
-	unit_count = AiPlayer->Player->UnitTypesCount;
-	for (i = 0; i < (int)table->size(); ++i) {
+	const int *unit_count = AiPlayer->Player->UnitTypesCount;
+	for (unsigned int i = 0; i < table.size(); ++i) {
 		//
 		// The type is available
 		//
-		if (unit_count[(*table)[i]->Slot]) {
-			if (AiRepairBuilding((*table)[i], unit)) {
+		if (unit_count[table[i]->Slot]) {
+			if (AiRepairBuilding(*table[i], unit)) {
 				return 1;
 			}
 		}
@@ -1609,11 +1492,11 @@ static void AiCheckRepair()
 **
 **  @todo         FIXME: should store the end of list and not search it.
 */
-void AiAddUnitTypeRequest(CUnitType *type, int count)
+void AiAddUnitTypeRequest(CUnitType &type, int count)
 {
 	AiBuildQueue queue;
 
-	queue.Type = type;
+	queue.Type = &type;
 	queue.Want = count;
 	queue.Made = 0;
 	AiPlayer->UnitTypeBuilt.push_back(queue);

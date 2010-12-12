@@ -373,28 +373,28 @@ public:
 	void SetResource(int resource, int value);
 
 	/// Check if the unit-type didn't break any unit limits and supply/demand
-	int CheckLimits(const CUnitType *type) const;
+	int CheckLimits(const CUnitType &type) const;
 
 	/// Check if enough resources are available for costs
 	int CheckCosts(const int *costs) const;
 	/// Check if enough resources are available for a new unit-type
-	int CheckUnitType(const CUnitType *type) const;
+	int CheckUnitType(const CUnitType &type) const;
 
 	/// Add costs to the resources
 	void AddCosts(const int *costs);
 	/// Add costs for an unit-type to the resources
-	void AddUnitType(const CUnitType *type);
+	void AddUnitType(const CUnitType &type);
 	/// Add a factor of costs to the resources
 	void AddCostsFactor(const int *costs, int factor);
 	/// Remove costs from the resources
 	void SubCosts(const int *costs);
 	/// Remove costs for an unit-type from the resources
-	void SubUnitType(const CUnitType *type);
+	void SubUnitType(const CUnitType &type);
 	/// Remove a factor of costs from the resources
 	void SubCostsFactor(const int *costs, int factor);
 
 	/// Does the player have units of that type
-	int HaveUnitTypeByType(const CUnitType *type) const;
+	int HaveUnitTypeByType(const CUnitType &type) const;
 	/// Does the player have units of that type
 	int HaveUnitTypeByIdent(const std::string &ident) const;
 
@@ -527,11 +527,11 @@ extern int PlayerColorIndexCount;
 ----------------------------------------------------------------------------*/
 
 	/// Init players
-extern void InitPlayers(void);
+extern void InitPlayers();
 	/// Clean up players
-extern void CleanPlayers(void);
+extern void CleanPlayers();
 	/// Clean up races
-extern void CleanRaces(void);
+extern void CleanRaces();
 	/// Save players
 extern void SavePlayers(CFile *file);
 
@@ -540,9 +540,9 @@ extern void CreatePlayer(int type);
 
 
 	/// Initialize the computer opponent AI
-extern void PlayersInitAi(void);
+extern void PlayersInitAi();
 	/// Called each game cycle for player handlers (AI)
-extern void PlayersEachCycle(void);
+extern void PlayersEachCycle();
 	/// Called each second for a given player handler (AI)
 extern void PlayersEachSecond(int player);
 
@@ -550,14 +550,14 @@ extern void PlayersEachSecond(int player);
 extern void GraphicPlayerPixels(CPlayer *player, const CGraphic *sprite);
 
 	/// Output debug informations for players
-extern void DebugPlayers(void);
+extern void DebugPlayers();
 
 #ifdef DEBUG
-void FreePlayerColors(void);
+void FreePlayerColors();
 #endif
 
 	/// register ccl features
-extern void PlayerCclRegister(void);
+extern void PlayerCclRegister();
 
 	/// Allowed to select multiple units, maybe not mine
 #define CanSelectMultipleUnits(player) \

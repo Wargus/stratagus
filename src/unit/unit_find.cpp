@@ -83,15 +83,14 @@
 **
 **  @return       Returns the number of units found.
 */
-int FindUnitsByType(const CUnitType *type, CUnit **table)
+int FindUnitsByType(const CUnitType &type, CUnit **table)
 {
-	CUnit *unit;
-	int i = 0;
 	int num = 0;
 
-	for (; i < NumUnits; ++i) {
-		unit = Units[i];
-		if (unit->Type == type && !unit->IsUnusable()) {
+	for (int i = 0; i < NumUnits; ++i) {
+		CUnit *unit = Units[i];
+
+		if (unit->Type == &type && !unit->IsUnusable()) {
 			table[num++] = unit;
 		}
 	}
@@ -107,18 +106,16 @@ int FindUnitsByType(const CUnitType *type, CUnit **table)
 **
 **  @return        Returns the number of units found.
 */
-int FindPlayerUnitsByType(const CPlayer *player, const CUnitType *type,
-	CUnit **table)
+int FindPlayerUnitsByType(const CPlayer *player, const CUnitType &type, CUnit **table)
 {
-	CUnit *unit;
-	int nunits = player->TotalNumUnits;
-	int typecount = player->UnitTypesCount[type->Slot];
+	const int nunits = player->TotalNumUnits;
+	int typecount = player->UnitTypesCount[type.Slot];
 	int num = 0;
-	int i = 0;
 
-	for (; i < nunits && typecount; ++i) {
-		unit = player->Units[i];
-		if (unit->Type == type) {
+	for (int i = 0; i < nunits && typecount; ++i) {
+		CUnit *unit = player->Units[i];
+
+		if (unit->Type == &type) {
 			if (!unit->IsUnusable()) {
 				table[num++] = unit;
 			}

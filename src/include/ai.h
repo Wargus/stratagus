@@ -56,13 +56,13 @@ extern int AiSleepCycles;  /// Ai sleeps # cycles
 extern void AiEachCycle(CPlayer *player);   /// Called each game cycle
 extern void AiEachSecond(CPlayer *player);  /// Called each second
 
-extern void InitAiModule(void);       /// Init AI global structures
+extern void InitAiModule();       /// Init AI global structures
 extern void AiInit(CPlayer *player);   /// Init AI for this player
-extern void CleanAi(void);            /// Cleanup the AI module
-extern void FreeAi(void);            /// Free the AI resources
+extern void CleanAi();            /// Cleanup the AI module
+extern void FreeAi();            /// Free the AI resources
 extern void SaveAi(CFile *file);     /// Save the AI state
 
-extern void AiCclRegister(void);      /// Register ccl features
+extern void AiCclRegister();      /// Register ccl features
 
 	/// Attack with force at position
 extern void AiAttackWithForceAt(unsigned int force, int x, int y);
@@ -78,19 +78,19 @@ extern void AiHelpMe(const CUnit *attacker, CUnit &defender);
 	/// Called if AI unit is killed
 extern void AiUnitKilled(CUnit &unit);
 	/// Called if AI needs more farms
-extern void AiNeedMoreSupply(const CUnit &unit, const CUnitType *what);
+extern void AiNeedMoreSupply(const CPlayer &player);
 	/// Called if AI unit has completed work
 extern void AiWorkComplete(CUnit *unit, CUnit &what);
 	/// Called if AI unit can't build
-extern void AiCanNotBuild(CUnit &unit, const CUnitType *what);
+extern void AiCanNotBuild(CUnit &unit, const CUnitType &what);
 	/// Called if AI unit can't reach building place
-extern void AiCanNotReach(CUnit &unit, const CUnitType *what);
+extern void AiCanNotReach(CUnit &unit, const CUnitType &what);
 	/// Called if an AI unit can't move
 extern void AiCanNotMove(CUnit &unit);
 	/// Called if AI unit has completed training
 extern void AiTrainingComplete(CUnit &unit, CUnit &what);
 	/// Called if AI unit has completed upgrade to
-extern void AiUpgradeToComplete(CUnit &unit, const CUnitType *what);
+extern void AiUpgradeToComplete(CUnit &unit, const CUnitType &what);
 	/// Called if AI unit has completed research
 extern void AiResearchComplete(CUnit &unit, const CUpgrade *what);
 

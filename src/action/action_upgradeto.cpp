@@ -60,15 +60,13 @@
 **
 **  @return 0 on error, 1 if nothing happens, 2 else.
 */
-int TransformUnitIntoType(CUnit &unit, CUnitType *newtype)
+static int TransformUnitIntoType(CUnit &unit, CUnitType &newtype)
 {
-	Assert(newtype);
-
 	CUnitType *oldtype = unit.Type;
-	if (oldtype == newtype) { // nothing to do
+	if (oldtype == &newtype) { // nothing to do
 		return 1;
 	}
-	const Vec2i pos = unit.tilePos + oldtype->GetHalfTileSize() - newtype->GetHalfTileSize();
+	const Vec2i pos = unit.tilePos + oldtype->GetHalfTileSize() - newtype.GetHalfTileSize();
 	CUnit *container = unit.Container;
 
 	if (container) {
@@ -85,30 +83,30 @@ int TransformUnitIntoType(CUnit &unit, CUnitType *newtype)
 	}
 	CPlayer *player = unit.Player;
 	player->UnitTypesCount[oldtype->Slot]--;
-	player->UnitTypesCount[newtype->Slot]++;
+	player->UnitTypesCount[newtype.Slot]++;
 
-	player->Demand += newtype->Demand - oldtype->Demand;
-	player->Supply += newtype->Supply - oldtype->Supply;
+	player->Demand += newtype.Demand - oldtype->Demand;
+	player->Supply += newtype.Supply - oldtype->Supply;
 
 	//  adjust Variables with percent.
-	const CUnitStats *newstats = &newtype->Stats[player->Index];
+	const CUnitStats &newstats = newtype.Stats[player->Index];
 
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		if (unit.Variable[i].Max) {
-			unit.Variable[i].Value = newstats->Variables[i].Max *
+			unit.Variable[i].Value = newstats.Variables[i].Max *
 				unit.Variable[i].Value / unit.Variable[i].Max;
 		} else {
-			unit.Variable[i].Value = newstats->Variables[i].Value;
+			unit.Variable[i].Value = newstats.Variables[i].Value;
 		}
-		unit.Variable[i].Max = newstats->Variables[i].Max;
-		unit.Variable[i].Increase = newstats->Variables[i].Increase;
-		unit.Variable[i].Enable = newstats->Variables[i].Enable;
+		unit.Variable[i].Max = newstats.Variables[i].Max;
+		unit.Variable[i].Increase = newstats.Variables[i].Increase;
+		unit.Variable[i].Enable = newstats.Variables[i].Enable;
 	}
 
-	unit.Type = newtype;
-	unit.Stats = &newtype->Stats[player->Index];
+	unit.Type = &newtype;
+	unit.Stats = &newtype.Stats[player->Index];
 
-	if (newtype->CanCastSpell && !unit.AutoCastSpell) {
+	if (newtype.CanCastSpell && !unit.AutoCastSpell) {
 		unit.AutoCastSpell = new char[SpellTypeTable.size()];
 		memset(unit.AutoCastSpell, 0, SpellTypeTable.size() * sizeof(char));
 	}
@@ -140,7 +138,7 @@ int TransformUnitIntoType(CUnit &unit, CUnitType *newtype)
 void HandleActionTransformInto(CUnit &unit)
 {
 	// What to do if an error occurs ?
-	TransformUnitIntoType(unit, unit.CriticalOrder.Arg1.Type);
+	TransformUnitIntoType(unit, *unit.CriticalOrder.Arg1.Type);
 	unit.CriticalOrder.Action = UnitActionStill;
 }
 
@@ -151,27 +149,20 @@ void HandleActionTransformInto(CUnit &unit)
 */
 void HandleActionUpgradeTo(CUnit &unit)
 {
-	CPlayer *player;
-	CUnitType *newtype;
-	const CUnitStats *newstats;
-
 	if (!unit.SubAction) { // first entry
 		unit.Data.UpgradeTo.Ticks = 0;
 		unit.SubAction = 1;
 	}
-
 	unit.Type->Animations->Upgrade ?
 		UnitShowAnimation(unit, unit.Type->Animations->Upgrade) :
 		UnitShowAnimation(unit, unit.Type->Animations->Still);
-
 	if (unit.Wait) {
 		unit.Wait--;
 		return;
 	}
-
-	player = unit.Player;
-	newtype = unit.CurrentOrder()->Arg1.Type;
-	newstats = &newtype->Stats[player->Index];
+	CPlayer *player = unit.Player;
+	CUnitType &newtype = *unit.CurrentOrder()->Arg1.Type;
+	const CUnitStats *newstats = &newtype.Stats[player->Index];
 
 	// FIXME: Should count down here
 	unit.Data.UpgradeTo.Ticks += SpeedUpgrade;
@@ -185,7 +176,7 @@ void HandleActionUpgradeTo(CUnit &unit)
 
 	if (TransformUnitIntoType(unit, newtype) == 0) {
 		player->Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
-			_("Upgrade to %s canceled"), newtype->Name.c_str());
+			_("Upgrade to %s canceled"), newtype.Name.c_str());
 		return ;
 	}
 	//  Warn AI.

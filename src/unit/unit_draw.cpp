@@ -633,31 +633,31 @@ static void DrawDecoration(const CUnit &unit, const CUnitType *type, int x, int 
 **
 **  @todo FIXME: combine new shadow code with old shadow code.
 */
-void DrawShadow(const CUnitType *type, int frame,
-	int x, int y)
+void DrawShadow(const CUnitType &type, int frame, int x, int y)
 {
 	// Draw normal shadow sprite if available
-	if (type->ShadowSprite) {
-		x -= (type->ShadowWidth - type->TileWidth * TileSizeX) / 2;
-		y -= (type->ShadowHeight - type->TileHeight * TileSizeY) / 2;
-		x += type->OffsetX + type->ShadowOffsetX;
-		y += type->OffsetY + type->ShadowOffsetY;
+	if (!type.ShadowSprite) {
+		return;
+	}
+	x -= (type.ShadowWidth - type.TileWidth * TileSizeX) / 2;
+	y -= (type.ShadowHeight - type.TileHeight * TileSizeY) / 2;
+	x += type.OffsetX + type.ShadowOffsetX;
+	y += type.OffsetY + type.ShadowOffsetY;
 
-		if (type->Flip) {
-			if (frame < 0) {
-				type->ShadowSprite->DrawFrameClipX(-frame - 1, x, y);
-			} else {
-				type->ShadowSprite->DrawFrameClip(frame, x, y);
-			}
+	if (type.Flip) {
+		if (frame < 0) {
+			type.ShadowSprite->DrawFrameClipX(-frame - 1, x, y);
 		} else {
-			int row = type->NumDirections / 2 + 1;
-			if (frame < 0) {
-				frame = ((-frame - 1) / row) * type->NumDirections + type->NumDirections - (-frame - 1) % row;
-			} else {
-				frame = (frame / row) * type->NumDirections + frame % row;
-			}
-			type->ShadowSprite->DrawFrameClip(frame, x, y);
+			type.ShadowSprite->DrawFrameClip(frame, x, y);
 		}
+	} else {
+		int row = type.NumDirections / 2 + 1;
+		if (frame < 0) {
+			frame = ((-frame - 1) / row) * type.NumDirections + type.NumDirections - (-frame - 1) % row;
+		} else {
+			frame = (frame / row) * type.NumDirections + frame % row;
+		}
+		type.ShadowSprite->DrawFrameClip(frame, x, y);
 	}
 }
 
@@ -1012,34 +1012,31 @@ void DrawUnitPlayerColor(const CUnitType *type, CGraphic *sprite,
 **  @param x       X position.
 **  @param y       Y position.
 */
-static void DrawConstructionShadow(const CUnitType *type,
-	const CConstructionFrame *cframe,
+static void DrawConstructionShadow(const CUnitType &type, const CConstructionFrame *cframe,
 	int frame, int x, int y)
 {
 	if (cframe->File == ConstructionFileConstruction) {
-		if (type->Construction->ShadowSprite) {
-			x -= (type->Construction->Width - type->TileWidth * TileSizeX) / 2;
-			x += type->OffsetX;
-			y -= (type->Construction->Height - type->TileHeight * TileSizeY )/ 2;
-			y += type->OffsetY;
+		if (type.Construction->ShadowSprite) {
+			x -= (type.Construction->Width - type.TileWidth * TileSizeX) / 2;
+			x += type.OffsetX;
+			y -= (type.Construction->Height - type.TileHeight * TileSizeY )/ 2;
+			y += type.OffsetY;
 			if (frame < 0) {
-				type->Construction->ShadowSprite->DrawFrameClipX(
-					-frame - 1, x, y);
+				type.Construction->ShadowSprite->DrawFrameClipX(-frame - 1, x, y);
 			} else {
-				type->Construction->ShadowSprite->DrawFrameClip(
-					frame, x, y);
+				type.Construction->ShadowSprite->DrawFrameClip(frame, x, y);
 			}
 		}
 	} else {
-		if (type->ShadowSprite) {
-			x -= (type->ShadowWidth - type->TileWidth * TileSizeX) / 2;
-			x += type->ShadowOffsetX + type->OffsetX;
-			y -= (type->ShadowHeight - type->TileHeight * TileSizeY) / 2;
-			y += type->ShadowOffsetY + type->OffsetY;
+		if (type.ShadowSprite) {
+			x -= (type.ShadowWidth - type.TileWidth * TileSizeX) / 2;
+			x += type.ShadowOffsetX + type.OffsetX;
+			y -= (type.ShadowHeight - type.TileHeight * TileSizeY) / 2;
+			y += type.ShadowOffsetY + type.OffsetY;
 			if (frame < 0) {
-				type->ShadowSprite->DrawFrameClipX(-frame - 1, x, y);
+				type.ShadowSprite->DrawFrameClipX(-frame - 1, x, y);
 			} else {
-				type->ShadowSprite->DrawFrameClip(frame, x, y);
+				type.ShadowSprite->DrawFrameClip(frame, x, y);
 			}
 		}
 	}
@@ -1056,12 +1053,12 @@ static void DrawConstructionShadow(const CUnitType *type,
 **  @param y       Y position.
 */
 static void DrawConstruction(const int player, const CConstructionFrame *cframe,
-	const CUnitType *type, int frame, int x, int y)
+	const CUnitType &type, int frame, int x, int y)
 {
 	if (cframe->File == ConstructionFileConstruction) {
 		const CConstruction *construction;
 
-		construction = type->Construction;
+		construction = type.Construction;
 		x -= construction->Width / 2;
 		y -= construction->Height / 2;
 		if (frame < 0) {
@@ -1070,12 +1067,12 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 			construction->Sprite->DrawPlayerColorFrameClip(player, frame, x, y);
 		}
 	} else {
-		x += type->OffsetX - type->Width / 2;
-		y += type->OffsetY - type->Height / 2;
+		x += type.OffsetX - type.Width / 2;
+		y += type.OffsetY - type.Height / 2;
 		if (frame < 0) {
 			frame = -frame - 1;
 		}
-		type->Sprite->DrawPlayerColorFrameClip(player, frame, x, y);
+		type.Sprite->DrawPlayerColorFrameClip(player, frame, x, y);
 	}
 }
 
@@ -1158,10 +1155,10 @@ void CUnit::Draw(const CViewport *vp) const
 
 
 	if (state == 1 && constructed) {
-		DrawConstructionShadow(type, cframe, frame, x, y);
+		DrawConstructionShadow(*type, cframe, frame, x, y);
 	} else {
 		if (action != UnitActionDie) {
-			DrawShadow(type, frame, x, y);
+			DrawShadow(*type, frame, x, y);
 		}
 	}
 
@@ -1193,7 +1190,7 @@ void CUnit::Draw(const CViewport *vp) const
 	//
 	if (state == 1) {
 		if (constructed) {
-			DrawConstruction(player, cframe, type, frame,
+			DrawConstruction(player, cframe, *type, frame,
 				x + (type->TileWidth * TileSizeX) / 2,
 				y + (type->TileHeight * TileSizeY) / 2);
 		}
@@ -1202,9 +1199,9 @@ void CUnit::Draw(const CViewport *vp) const
 	//
 	} else if (state == 2) {
 		// FIXME: this frame is hardcoded!!!
-		DrawUnitType(type, sprite, player, frame < 0 ? /*-1*/ - 1 : 1, x, y);
+		DrawUnitType(*type, sprite, player, frame < 0 ? /*-1*/ - 1 : 1, x, y);
 	} else {
-		DrawUnitType(type, sprite, player, frame, x, y);
+		DrawUnitType(*type, sprite, player, frame, x, y);
 	}
 
 	// Unit's extras not fully supported.. need to be decorations themselves.
@@ -1400,24 +1397,22 @@ void CUnitDrawProxy::DrawSelectionAt(int x, int y) const
 
 void CUnitDrawProxy::Draw(const CViewport *vp) const
 {
-
-
 	int x = this->IX + vp->Map2ViewportX(this->X);
 	int y = this->IY + vp->Map2ViewportY(this->Y);
 
 	/* FIXME: check if we have to push real type here?*/
 	if (state == 1 && cframe) {
-		DrawConstructionShadow(Type, cframe, frame, x, y);
+		DrawConstructionShadow(*Type, cframe, frame, x, y);
 	} else {
 		if (IsAlive) {
-			DrawShadow(Type, frame, x, y);
+			DrawShadow(*Type, frame, x, y);
 		}
 	}
 
 	//
 	// Show that the unit is selected
 	//
-	DrawSelectionAt(x,y);
+	DrawSelectionAt(x, y);
 
 	//
 	// Adjust sprite for Harvesters.
@@ -1442,7 +1437,7 @@ void CUnitDrawProxy::Draw(const CViewport *vp) const
 	//
 	if (state == 1) {
 		if (cframe) {
-			DrawConstruction(Player->Index, cframe, Type, frame,
+			DrawConstruction(Player->Index, cframe, *Type, frame,
 				x + (Type->TileWidth * TileSizeX) / 2,
 				y + (Type->TileHeight * TileSizeY) / 2);
 		}
@@ -1451,9 +1446,9 @@ void CUnitDrawProxy::Draw(const CViewport *vp) const
 	//
 	} else if (state == 2) {
 		// FIXME: this frame is hardcoded!!!
-		DrawUnitType(Type, sprite, Player->Index, frame < 0 ? /*-1*/ - 1 : 1, x, y);
+		DrawUnitType(*Type, sprite, Player->Index, frame < 0 ? /*-1*/ - 1 : 1, x, y);
 	} else {
-		DrawUnitType(Type, sprite, Player->Index, frame, x, y);
+		DrawUnitType(*Type, sprite, Player->Index, frame, x, y);
 	}
 
 	// Unit's extras not fully supported.. need to be decorations themselves.
@@ -1472,13 +1467,10 @@ void CUnitDrawProxy::Draw(const CViewport *vp) const
 **  @param c2  Second Unit to compare (*Unit)
 **
 */
-static inline bool DrawLevelCompare(const CUnit*c1,
-	const CUnit*c2)
+static inline bool DrawLevelCompare(const CUnit*c1, const CUnit*c2)
 {
-
 	int drawlevel1 = c1->GetDrawLevel();
 	int drawlevel2 = c2->GetDrawLevel();
-
 
 	if (drawlevel1 == drawlevel2) {
 		// diffpos compares unit's Y positions (bottom of sprite) on the map

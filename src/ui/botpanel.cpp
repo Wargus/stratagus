@@ -985,9 +985,6 @@ void CButtonPanel::Update()
 */
 void CButtonPanel::DoClicked(int button)
 {
-	int i;
-	CUnitType *type;
-
 	Assert(0 <= button && button < (int)UI.ButtonPanel.Buttons.size());
 	// no buttons
 	if (!CurrentButtons.IsValid()) {
@@ -1043,13 +1040,13 @@ void CButtonPanel::DoClicked(int button)
 				//autocast = 0;
 				// If any selected unit doesn't have autocast on turn it on
 				// for everyone
-				for (i = 0; i < NumSelected; ++i) {
+				for (int i = 0; i < NumSelected; ++i) {
 					if (Selected[i]->AutoCastSpell[spellId] == 0) {
 						autocast = 1;
 						break;
 					}
 				}
-				for (i = 0; i < NumSelected; ++i) {
+				for (int i = 0; i < NumSelected; ++i) {
 					if (Selected[i]->AutoCastSpell[spellId] != autocast) {
 						SendCommandAutoSpellCast(*Selected[i], spellId, autocast);
 					}
@@ -1059,7 +1056,7 @@ void CButtonPanel::DoClicked(int button)
 			if (SpellTypeTable[spellId]->IsCasterOnly()) {
 				const int flush = !(KeyModifiers & ModifierShift);
 
-				for (i = 0; i < NumSelected; ++i) {
+				for (int i = 0; i < NumSelected; ++i) {
 					CUnit &unit = *Selected[i];
 					// CursorValue here holds the spell type id
 					SendCommandSpellCast(unit, unit.tilePos, &unit, spellId, flush);
@@ -1075,13 +1072,13 @@ void CButtonPanel::DoClicked(int button)
 				autorepair = 0;
 				// If any selected unit doesn't have autocast on turn it on
 				// for everyone
-				for (i = 0; i < NumSelected; ++i) {
+				for (int i = 0; i < NumSelected; ++i) {
 					if (Selected[i]->AutoRepair == 0) {
 						autorepair = 1;
 						break;
 					}
 				}
-				for (i = 0; i < NumSelected; ++i) {
+				for (int i = 0; i < NumSelected; ++i) {
 					if (Selected[i]->AutoRepair != autorepair) {
 						SendCommandAutoRepair(*Selected[i], autorepair);
 					}
@@ -1104,20 +1101,18 @@ void CButtonPanel::DoClicked(int button)
 			UI.StatusLine.Set(_("Select Target"));
 			break;
 		case ButtonReturn:
-			for (i = 0; i < NumSelected; ++i) {
-				SendCommandReturnGoods(*Selected[i], NoUnitP,
-					!(KeyModifiers & ModifierShift));
+			for (int i = 0; i < NumSelected; ++i) {
+				SendCommandReturnGoods(*Selected[i], NoUnitP, !(KeyModifiers & ModifierShift));
 			}
 			break;
 		case ButtonStop:
-			for (i = 0; i < NumSelected; ++i) {
+			for (int i = 0; i < NumSelected; ++i) {
 				SendCommandStopUnit(*Selected[i]);
 			}
 			break;
 		case ButtonStandGround:
-			for (i = 0; i < NumSelected; ++i) {
-				SendCommandStandGround(*Selected[i],
-					!(KeyModifiers & ModifierShift));
+			for (int i = 0; i < NumSelected; ++i) {
+				SendCommandStandGround(*Selected[i], !(KeyModifiers & ModifierShift));
 			}
 			break;
 		case ButtonButton:
@@ -1165,22 +1160,22 @@ void CButtonPanel::DoClicked(int button)
 			ClearCosts();
 			break;
 
-		case ButtonBuild:
+		case ButtonBuild: {
 			// FIXME: store pointer in button table!
-			type = UnitTypes[CurrentButtons[button].Value];
+			CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
 			if (!Selected[0]->Player->CheckUnitType(type)) {
 				UI.StatusLine.Set(_("Select Location"));
 				ClearCosts();
-				CursorBuilding = type;
+				CursorBuilding = &type;
 				// FIXME: check is this =9 necessary?
 				CurrentButtonLevel = 9; // level 9 is cancel-only
 				UI.ButtonPanel.Update();
 			}
 			break;
-
-		case ButtonTrain:
+		}
+		case ButtonTrain: {
 			// FIXME: store pointer in button table!
-			type = UnitTypes[CurrentButtons[button].Value];
+			CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
 			// FIXME: Johns: I want to place commands in queue, even if not
 			// FIXME:        enough resources are available.
 			// FIXME: training queue full check is not correct for network.
@@ -1192,8 +1187,7 @@ void CButtonPanel::DoClicked(int button)
 			} else if (Selected[0]->Player->CheckLimits(type) >= 0 &&
 					!Selected[0]->Player->CheckUnitType(type)) {
 				//PlayerSubUnitType(player,type);
-				SendCommandTrainUnit(*Selected[0], type,
-					!(KeyModifiers & ModifierShift));
+				SendCommandTrainUnit(*Selected[0], type, !(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();
 				ClearCosts();
 			} else if (Selected[0]->Player->CheckLimits(type) == -3)
@@ -1201,28 +1195,28 @@ void CButtonPanel::DoClicked(int button)
 					PlayGameSound(GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound,
 								MaxSampleVolume);
 			break;
-
-		case ButtonUpgradeTo:
+		}
+		case ButtonUpgradeTo: {
 			// FIXME: store pointer in button table!
-			type = UnitTypes[CurrentButtons[button].Value];
+			CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
 			if (!Selected[0]->Player->CheckUnitType(type)) {
 				//PlayerSubUnitType(player,type);
-				SendCommandUpgradeTo(*Selected[0], type,
-					!(KeyModifiers & ModifierShift));
+				SendCommandUpgradeTo(*Selected[0], type, !(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();
 				ClearCosts();
 			}
 			break;
-		case ButtonResearch:
-			i = CurrentButtons[button].Value;
-			if (!Selected[0]->Player->CheckCosts(AllUpgrades[i]->Costs)) {
+		}
+		case ButtonResearch: {
+			const int index = CurrentButtons[button].Value;
+			if (!Selected[0]->Player->CheckCosts(AllUpgrades[index]->Costs)) {
 				//PlayerSubCosts(player,Upgrades[i].Costs);
-				SendCommandResearch(*Selected[0], AllUpgrades[i],
-					!(KeyModifiers & ModifierShift));
+				SendCommandResearch(*Selected[0], AllUpgrades[index], !(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();
 				ClearCosts();
 			}
 			break;
+		}
 	}
 }
 

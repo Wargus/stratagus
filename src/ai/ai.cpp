@@ -191,94 +191,68 @@ static void AiExecuteScript()
 */
 static void AiCheckUnits()
 {
-	int counter[UnitTypeMax];
-	int attacking[UnitTypeMax];
-	const int *unit_types_count;
-	int i;
-	int j;
-	int n;
-	int t;
-	int x;
-	int e;
-
-	memset(attacking, 0, sizeof(attacking));
-
-	//
 	//  Count the already made build requests.
-	//
+	int counter[UnitTypeMax];
 	AiGetBuildRequestsCount(AiPlayer, counter);
 
-	//
 	//  Remove non active units.
-	//
-	n = AiPlayer->Player->TotalNumUnits;
-	for (i = 0; i < n; ++i) {
+	int n = AiPlayer->Player->TotalNumUnits;
+	for (int i = 0; i < n; ++i) {
 		if (!AiPlayer->Player->Units[i]->Active) {
 			counter[AiPlayer->Player->Units[i]->Type->Slot]--;
 		}
 	}
-	unit_types_count = AiPlayer->Player->UnitTypesCount;
+	const int *unit_types_count = AiPlayer->Player->UnitTypesCount;
 
-	//
 	//  Look if some unit-types are missing.
-	//
 	n = AiPlayer->UnitTypeRequests.size();
-	for (i = 0; i < n; ++i) {
-		t = AiPlayer->UnitTypeRequests[i].Type->Slot;
-		x = AiPlayer->UnitTypeRequests[i].Count;
+	for (int i = 0; i < n; ++i) {
+		const unsigned int t = AiPlayer->UnitTypeRequests[i].Type->Slot;
+		const int x = AiPlayer->UnitTypeRequests[i].Count;
 
-		//
 		// Add equivalent units
-		//
-		e = unit_types_count[t];
-		if (t < (int)AiHelpers.Equiv.size()) {
-			for (j = 0; j < (int)AiHelpers.Equiv[t].size(); ++j) {
+		int e = unit_types_count[t];
+		if (t < AiHelpers.Equiv.size()) {
+			for (unsigned int j = 0; j < AiHelpers.Equiv[t].size(); ++j) {
 				e += unit_types_count[AiHelpers.Equiv[t][j]->Slot];
 			}
 		}
-
-		if (x > e + counter[t]) {  // Request it.
-			AiAddUnitTypeRequest(AiPlayer->UnitTypeRequests[i].Type,
-				x - e - counter[t]);
-			counter[t] += x - e - counter[t];
+		const int requested = x - e - counter[t];
+		if (requested > 0) {  // Request it.
+			AiAddUnitTypeRequest(*AiPlayer->UnitTypeRequests[i].Type, requested);
+			counter[t] += requested;
 		}
 		counter[t] -= x;
 	}
 
 	AiPlayer->Force.CheckUnits(counter);
 
-	//
 	//  Look if some upgrade-to are missing.
-	//
 	n = AiPlayer->UpgradeToRequests.size();
-	for (i = 0; i < n; ++i) {
-		t = AiPlayer->UpgradeToRequests[i]->Slot;
-		x = 1;
+	for (int i = 0; i < n; ++i) {
+		const unsigned int t = AiPlayer->UpgradeToRequests[i]->Slot;
+		const int x = 1;
 
-		//
 		//  Add equivalent units
-		//
-		e = unit_types_count[t];
-		if (t < (int)AiHelpers.Equiv.size()) {
-			for (j = 0; j < (int)AiHelpers.Equiv[t].size(); ++j) {
+		int e = unit_types_count[t];
+		if (t < AiHelpers.Equiv.size()) {
+			for (unsigned int j = 0; j < AiHelpers.Equiv[t].size(); ++j) {
 				e += unit_types_count[AiHelpers.Equiv[t][j]->Slot];
 			}
 		}
 
-		if (x > e + counter[t]) {  // Request it.
-			AiAddUpgradeToRequest(AiPlayer->UpgradeToRequests[i]);
-			counter[t] += x - e - counter[t];
+		const int requested = x - e - counter[t];
+		if (requested > 0) {  // Request it.
+			AiAddUpgradeToRequest(*AiPlayer->UpgradeToRequests[i]);
+			counter[t] += requested;
 		}
 		counter[t] -= x;
 	}
 
-	//
 	//  Look if some researches are missing.
-	//
 	n = (int)AiPlayer->ResearchRequests.size();
-	for (i = 0; i < n; ++i) {
-		if (UpgradeIdAllowed(AiPlayer->Player,
-				AiPlayer->ResearchRequests[i]->ID) == 'A') {
+	for (int i = 0; i < n; ++i) {
+		if (UpgradeIdAllowed(AiPlayer->Player, AiPlayer->ResearchRequests[i]->ID) == 'A') {
 			AiAddResearchRequest(AiPlayer->ResearchRequests[i]);
 		}
 	}
@@ -619,13 +593,13 @@ void FreeAi()
 **  @param type  Unit-type which is now available.
 **  @return      True, if unit-type was found in list.
 */
-static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType *type)
+static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type)
 {
 	std::vector<AiBuildQueue>::iterator i;
 
 	for (i = pai->UnitTypeBuilt.begin(); i != pai->UnitTypeBuilt.end(); ++i) {
 		Assert((*i).Want);
-		if (type == (*i).Type && (*i).Made) {
+		if (&type == (*i).Type && (*i).Made) {
 			--(*i).Made;
 			if (!--(*i).Want) {
 				pai->UnitTypeBuilt.erase(i);
@@ -642,11 +616,8 @@ static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType *type)
 **  @param pai   Computer AI player.
 **  @param type  Unit-type which is now available.
 */
-static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType *type)
+static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type)
 {
-	int equivalents[UnitTypeMax + 1];
-	int equivalentsCount;
-
 	if (AiRemoveFromBuilt2(pai, type)) {
 		return;
 	}
@@ -654,19 +625,17 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType *type)
 	//
 	//  This could happen if an upgrade is ready, look for equivalent units.
 	//
-	equivalentsCount = AiFindUnitTypeEquiv(type, equivalents);
+	int equivalents[UnitTypeMax + 1];
+	int equivalentsCount = AiFindUnitTypeEquiv(type, equivalents);
 	for (int i = 0; i < equivalentsCount; ++i) {
-		if (AiRemoveFromBuilt2(pai, UnitTypes[equivalents[i]])) {
+		if (AiRemoveFromBuilt2(pai, *UnitTypes[equivalents[i]])) {
 			return;
 		}
 	}
-
 	if (pai->Player == ThisPlayer) {
-		DebugPrint
-			("My guess is that you built something under ai me. naughty boy!\n");
+		DebugPrint("My guess is that you built something under ai me. naughty boy!\n");
 		return;
 	}
-
 	Assert(0);
 }
 
@@ -677,12 +646,12 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType *type)
 **  @param type  Unit-type which is now available.
 **  @return      True if the unit-type could be reduced.
 */
-static int AiReduceMadeInBuilt2(PlayerAi *pai, const CUnitType *type)
+static int AiReduceMadeInBuilt2(PlayerAi *pai, const CUnitType &type)
 {
 	std::vector<AiBuildQueue>::iterator i;
 
 	for (i = pai->UnitTypeBuilt.begin(); i != pai->UnitTypeBuilt.end(); ++i) {
-		if (type == (*i).Type && (*i).Made) {
+		if (&type == (*i).Type && (*i).Made) {
 			(*i).Made--;
 			return 1;
 		}
@@ -696,31 +665,27 @@ static int AiReduceMadeInBuilt2(PlayerAi *pai, const CUnitType *type)
 **  @param pai   Computer AI player.
 **  @param type  Unit-type which is now available.
 */
-static void AiReduceMadeInBuilt(PlayerAi *pai, const CUnitType *type)
+static void AiReduceMadeInBuilt(PlayerAi *pai, const CUnitType &type)
 {
-	int equivs[UnitTypeMax + 1];
-	int equivnb;
-
 	if (AiReduceMadeInBuilt2(pai, type)) {
 		return;
 	}
 	//
 	//  This could happen if an upgrade is ready, look for equivalent units.
 	//
-	equivnb = AiFindUnitTypeEquiv(type, equivs);
+	int equivs[UnitTypeMax + 1];
+	unsigned int equivnb = AiFindUnitTypeEquiv(type, equivs);
 
-	for (int i = 0; i < (int)AiHelpers.Equiv[type->Slot].size(); ++i) {
-		if (AiReduceMadeInBuilt2(pai, UnitTypes[equivs[i]])) {
+	for (unsigned int i = 0; i < equivnb; ++i) {
+		if (AiReduceMadeInBuilt2(pai, *UnitTypes[equivs[i]])) {
 			return;
 		}
 	}
-
 	if (pai->Player == ThisPlayer) {
 		DebugPrint
 			("My guess is that you built something under ai me. naughty boy!\n");
 		return;
 	}
-
 	Assert(0);
 }
 
@@ -853,14 +818,14 @@ void AiUnitKilled(CUnit &unit)
 		case UnitActionBuilt:
 			DebugPrint("%d: %d(%s) killed, under construction!\n" _C_
 				unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
-			AiReduceMadeInBuilt(unit.Player->Ai, unit.Type);
+			AiReduceMadeInBuilt(unit.Player->Ai, *unit.Type);
 			break;
 		case UnitActionBuild:
 			DebugPrint("%d: %d(%s) killed, with order %s!\n" _C_
 				unit.Player->Index _C_ UnitNumber(unit) _C_
 				unit.Type->Ident.c_str() _C_ unit.CurrentOrder()->Arg1.Type->Ident.c_str());
 			if (!unit.CurrentOrder()->HasGoal()) {
-				AiReduceMadeInBuilt(unit.Player->Ai, unit.CurrentOrder()->Arg1.Type);
+				AiReduceMadeInBuilt(unit.Player->Ai, *unit.CurrentOrder()->Arg1.Type);
 			}
 			break;
 		default:
@@ -889,7 +854,7 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 	}
 
 	Assert(what.Player->Type != PlayerPerson);
-	AiRemoveFromBuilt(what.Player->Ai, what.Type);
+	AiRemoveFromBuilt(what.Player->Ai, *what.Type);
 }
 
 /**
@@ -898,11 +863,11 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 **  @param unit  Pointer to unit what builds the building.
 **  @param what  Pointer to unit-type.
 */
-void AiCanNotBuild(CUnit &unit, const CUnitType *what)
+void AiCanNotBuild(CUnit &unit, const CUnitType &what)
 {
 	DebugPrint("%d: %d(%s) Can't build %s at %d,%d\n" _C_
 		unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
-		what->Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
+		what.Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
 
 	Assert(unit.Player->Type != PlayerPerson);
 	AiReduceMadeInBuilt(unit.Player->Ai, what);
@@ -914,7 +879,7 @@ void AiCanNotBuild(CUnit &unit, const CUnitType *what)
 **  @param unit  Pointer to unit what builds the building.
 **  @param what  Pointer to unit-type.
 */
-void AiCanNotReach(CUnit &unit, const CUnitType *what)
+void AiCanNotReach(CUnit &unit, const CUnitType &what)
 {
 	Assert(unit.Player->Type != PlayerPerson);
 	AiReduceMadeInBuilt(unit.Player->Ai, what);
@@ -1060,13 +1025,12 @@ void AiCanNotMove(CUnit &unit)
 /**
 **  Called if the AI needs more farms.
 **
-**  @param unit  Point to unit.
-**  @param what  Pointer to unit-type.
+**  @param player  player which need supply.
 */
-void AiNeedMoreSupply(const CUnit &unit, const CUnitType *)
+void AiNeedMoreSupply(const CPlayer &player)
 {
-	Assert(unit.Player->Type != PlayerPerson);
-	unit.Player->Ai->NeedSupply = true;
+	Assert(player.Type != PlayerPerson);
+	player.Ai->NeedSupply = true;
 }
 
 /**
@@ -1083,7 +1047,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 
 	Assert(unit.Player->Type != PlayerPerson);
 
-	AiRemoveFromBuilt(unit.Player->Ai, what.Type);
+	AiRemoveFromBuilt(unit.Player->Ai, *what.Type);
 
 	unit.Player->Ai->Force.Clean();
 	unit.Player->Ai->Force.Assign(what);
@@ -1096,11 +1060,11 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 **  @param unit Pointer to unit working.
 **  @param what Pointer to the new unit-type.
 */
-void AiUpgradeToComplete(CUnit &unit, const CUnitType *what)
+void AiUpgradeToComplete(CUnit &unit, const CUnitType &what)
 {
 	DebugPrint("%d: %d(%s) upgrade-to %s at %d,%d completed\n" _C_
 		unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
-		what->Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
+		what.Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
 
 	Assert(unit.Player->Type != PlayerPerson);
 }

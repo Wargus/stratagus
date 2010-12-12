@@ -583,7 +583,7 @@ extern void FreeMapInfo(CMapInfo *info);
 	/// Returns true, if the unit-type(mask can enter field with bounds check
 extern bool CheckedCanMoveToMask(const Vec2i &pos, int mask);
 	/// Returns true, if the unit-type can enter the field
-extern bool UnitTypeCanBeAt(const CUnitType *type, const Vec2i &pos);
+extern bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos);
 	/// Returns true, if the unit can enter the field
 extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos);
 

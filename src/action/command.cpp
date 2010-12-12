@@ -579,7 +579,7 @@ void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
 **  @param what   Unit type to build.
 **  @param flush  if true, flush command queue.
 */
-void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType *what, int flush)
+void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush)
 {
 	COrderPtr order;
 
@@ -598,19 +598,19 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType *what, int fl
 
 		order->Action = UnitActionBuild;
 		order->goalPos = pos;
-		order->Width = what->TileWidth;
-		order->Height = what->TileHeight;
-		if (what->BuilderOutside) {
+		order->Width = what.TileWidth;
+		order->Height = what.TileHeight;
+		if (what.BuilderOutside) {
 			order->Range = unit.Type->RepairRange;
 		} else {
 			// If building inside, but be next to stop
-			if (what->ShoreBuilding && unit.Type->UnitType == UnitTypeLand) {
+			if (what.ShoreBuilding && unit.Type->UnitType == UnitTypeLand) {
 					// Peon won't dive :-)
 				order->Range = 1;
 			}
 		}
-		order->Arg1.Type = what;
-		if (what->BuilderOutside) {
+		order->Arg1.Type = &what;
+		if (what.BuilderOutside) {
 			order->MinRange = 1;
 		}
 	}
@@ -770,7 +770,7 @@ void CommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
 **  @param type   unit type to train.
 **  @param flush  if true, flush command queue.
 */
-void CommandTrainUnit(CUnit &unit, CUnitType *type, int)
+void CommandTrainUnit(CUnit &unit, CUnitType &type, int)
 {
 	COrderPtr order;
 
@@ -800,7 +800,7 @@ void CommandTrainUnit(CUnit &unit, CUnitType *type, int)
 		order->Init();
 
 		order->Action = UnitActionTrain;
-		order->Arg1.Type = type;
+		order->Arg1.Type = &type;
 		// FIXME: if you give quick an other order, the resources are lost!
 		unit.Player->SubUnitType(type);
 	}
@@ -878,7 +878,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 **  @param type   upgrade to type
 **  @param flush  if true, flush command queue.
 */
-void CommandUpgradeTo(CUnit &unit, CUnitType *type, int flush)
+void CommandUpgradeTo(CUnit &unit, CUnitType &type, int flush)
 {
 	COrderPtr order;
 
@@ -905,7 +905,7 @@ void CommandUpgradeTo(CUnit &unit, CUnitType *type, int flush)
 		unit.Player->SubUnitType(type);
 
 		order->Action = UnitActionUpgradeTo;
-		order->Arg1.Type = type;
+		order->Arg1.Type = &type;
 	}
 	ClearSavedAction(unit);
 }
@@ -916,7 +916,7 @@ void CommandUpgradeTo(CUnit &unit, CUnitType *type, int flush)
 **  @param unit   pointer to unit.
 **  @param type   upgrade to type
 */
-void CommandTransformIntoType(CUnit &unit, CUnitType *type)
+void CommandTransformIntoType(CUnit &unit, CUnitType &type)
 {
 	COrderPtr order;
 
@@ -925,7 +925,7 @@ void CommandTransformIntoType(CUnit &unit, CUnitType *type)
 	order->Init();
 
 	order->Action = UnitActionTransformInto;
-	order->Arg1.Type = type;
+	order->Arg1.Type = &type;
 }
 
 /**

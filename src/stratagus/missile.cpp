@@ -730,7 +730,7 @@ static int MissileInitMove(Missile &missile)
 			return 1;
 		}
 		// initialize
-		missile.TotalStep = MapDistance(missile.source.x, missile.source.y, missile.destination.x, missile.destination.y);
+		missile.TotalStep = MapDistance(missile.source, missile.destination);
 		missile.State++;
 		return 0;
 	}
@@ -950,17 +950,15 @@ void MissileHit(Missile *missile)
 		}
 	}
 
-	//
 	// Missile hits ground.
-	//
-	pos.x -= missile->Type->Range;
-	pos.y -= missile->Type->Range;
+	const Vec2i offset = { missile->Type->Range, missile->Type->Range};
+	const Vec2i posmin = pos - offset;
 	for (int i = missile->Type->Range * 2; --i;) {
 		for (int j = missile->Type->Range * 2; --j;) {
-			const Vec2i posIt = {pos.x + i, pos.y + j};
+			const Vec2i posIt = {posmin.x + i, posmin.y + j};
 
 			if (Map.Info.IsPointOnMap(posIt)) {
-				int d = MapDistance(pos.x + missile->Type->Range, pos.y + missile->Type->Range, posIt.x, posIt.y);
+				int d = MapDistance(pos, posIt);
 				d *= missile->Type->SplashFactor;
 				if (d == 0) {
 					d = 1;
@@ -1002,8 +1000,8 @@ static int NextMissileFrame(Missile &missile, char sign, char longAnimation)
 		int totalx;   // Total distance to cover.
 		int dx;       // Covered distance.
 
-		totalx = MapDistance(missile.destination.x, missile.destination.y, missile.source.x, missile.source.y);
-		dx = MapDistance(missile.position.x, missile.position.y, missile.source.x, missile.source.y);
+		totalx = MapDistance(missile.destination, missile.source);
+		dx = MapDistance(missile.position, missile.source);
 		totalf = missile.Type->SpriteFrames / numDirections;
 		df = missile.SpriteFrame / numDirections;
 		if ((sign == 1 && dx * totalf <= df * totalx) ||
@@ -1131,7 +1129,7 @@ int ViewPointDistanceToMissile(const Missile *missile)
 	const Vec2i pixelPos = missile->position + missile->Type->size / 2;
 	const Vec2i tilePos = { pixelPos.x / TileSizeX, pixelPos.y / TileSizeY };
 
-	return ViewPointDistance(tilePos.x, tilePos.y);
+	return ViewPointDistance(tilePos);
 }
 
 /**

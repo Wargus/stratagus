@@ -93,9 +93,10 @@ std::vector<SpellType*> SpellTypeTable;
 */
 int Demolish::Cast(CUnit &caster, const SpellType *, CUnit *, int x, int y)
 {
+	const Vec2i pos = {x, y};
 	// Allow error margins. (Lame, I know)
-	Vec2i minpos = {x - this->Range - 2, y - this->Range - 2};
-	Vec2i maxpos = {x + this->Range + 2, y + this->Range + 2};
+	Vec2i minpos = {pos.x - this->Range - 2, pos.y - this->Range - 2};
+	Vec2i maxpos = {pos.x + this->Range + 2, pos.y + this->Range + 2};
 
 	Map.FixSelectionArea(minpos, maxpos);
 
@@ -106,7 +107,7 @@ int Demolish::Cast(CUnit &caster, const SpellType *, CUnit *, int x, int y)
 	for (ipos.x = minpos.x; ipos.x <= maxpos.x; ++ipos.x) {
 		for (ipos.y = minpos.y; ipos.y <= maxpos.y; ++ipos.y) {
 			const int flag = Map.Field(ipos)->Flags;
-			if (MapDistance(ipos.x, ipos.y, x, y) > this->Range) {
+			if (MapDistance(ipos, pos) > this->Range) {
 				// Not in circle range
 				continue;
 			} else if (flag & MapFieldWall) {
@@ -153,17 +154,13 @@ int SpawnPortal::Cast(CUnit &caster, const SpellType *, CUnit *, int x, int y)
 {
 	const Vec2i pos = {x, y};
 	// FIXME: vladi: cop should be placed only on explored land
-	CUnit *portal;
-	CUnitType *ptype;
-
-	ptype = this->PortalType;
+	CUnit *portal = caster.Goal;
 
 	DebugPrint("Spawning a portal exit.\n");
-	portal = caster.Goal;
 	if (portal) {
 		portal->MoveToXY(pos);
 	} else {
-		portal = MakeUnitAndPlace(pos, ptype, &Players[PlayerNumNeutral]);
+		portal = MakeUnitAndPlace(pos, *this->PortalType, &Players[PlayerNumNeutral]);
 	}
 	//  Goal is used to link to destination circle of power
 	caster.Goal = portal;
@@ -522,10 +519,10 @@ int Polymorph::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int x,
 		return 0;
 	}
 
-	CUnitType *type = this->NewForm;
+	CUnitType &type = *this->NewForm;
 
-	x = x - type->TileWidth / 2;
-	y = y - type->TileHeight / 2;
+	x = x - type.TileWidth / 2;
+	y = y - type.TileHeight / 2;
 	const Vec2i pos = {x, y};
 	caster.Player->Score += target->Type->Points;
 	if (caster.IsEnemy(*target)) {
@@ -548,8 +545,8 @@ int Polymorph::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int x,
 	// as said somewhere else -- no corpses :)
 	target->Remove(NULL);
 	Vec2i offset;
-	for (offset.x = 0; offset.x < type->TileWidth; ++offset.x) {
-		for (offset.y = 0; offset.y < type->TileHeight; ++offset.y) {
+	for (offset.x = 0; offset.x < type.TileWidth; ++offset.x) {
+		for (offset.y = 0; offset.y < type.TileHeight; ++offset.y) {
 			if (!UnitTypeCanBeAt(type, pos + offset)) {
 				target->Place(target->tilePos);
 				return 0;
@@ -644,7 +641,7 @@ int Summon::Cast(CUnit &caster, const SpellType *spell,
 	CUnit *target, int x, int y)
 {
 	int cansummon;
-	CUnitType *unittype = this->UnitType;
+	CUnitType &unittype = *this->UnitType;
 	int ttl = this->TTL;
 
 	if (this->RequireCorpse) {
@@ -672,7 +669,7 @@ int Summon::Cast(CUnit &caster, const SpellType *spell,
 	}
 
 	if (cansummon) {
-		DebugPrint("Summoning a %s\n" _C_ unittype->Name.c_str());
+		DebugPrint("Summoning a %s\n" _C_ unittype.Name.c_str());
 
 		//
 		// Create units.

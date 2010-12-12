@@ -471,14 +471,14 @@ int UpgradeIdByIdent(const std::string &ident)
 **  @param src     From this unit-type.
 **  @param dst     To this unit-type.
 */
-static void ConvertUnitTypeTo(CPlayer *player, const CUnitType *src, CUnitType *dst)
+static void ConvertUnitTypeTo(CPlayer *player, const CUnitType &src, CUnitType &dst)
 {
 	for (int i = 0; i < player->TotalNumUnits; ++i) {
 		CUnit &unit = *player->Units[i];
 		//
 		//  Convert already existing units to this type.
 		//
-		if (unit.Type == src) {
+		if (unit.Type == &src) {
 			CommandTransformIntoType(unit, dst);
 		//
 		//  Convert trained units to this type.
@@ -487,15 +487,15 @@ static void ConvertUnitTypeTo(CPlayer *player, const CUnitType *src, CUnitType *
 		} else {
 			for (int j = 0; j < unit.OrderCount; ++j) {
 				if (unit.Orders[j]->Action == UnitActionTrain &&
-						unit.Orders[j]->Arg1.Type == src) {
+						unit.Orders[j]->Arg1.Type == &src) {
 						if (j == 0) {
 							// Must Adjust Ticks to the fraction that was trained
 							unit.Data.Train.Ticks =
 								unit.Data.Train.Ticks *
-								dst->Stats[player->Index].Costs[TimeCost] /
-								src->Stats[player->Index].Costs[TimeCost];
+								dst.Stats[player->Index].Costs[TimeCost] /
+								src.Stats[player->Index].Costs[TimeCost];
 						}
-					unit.Orders[j]->Arg1.Type = dst;
+					unit.Orders[j]->Arg1.Type = &dst;
 				}
 			}
 		}
@@ -556,7 +556,7 @@ static void ApplyUpgradeModifier(CPlayer *player, const CUpgradeModifier *um)
 			// If Sight range is upgraded, we need to change EVERY unit
 			// to the new range, otherwise the counters get confused.
 			if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
-				numunits = FindUnitsByType(UnitTypes[z], unitupgrade);
+				numunits = FindUnitsByType(*UnitTypes[z], unitupgrade);
 				for (numunits--; numunits >= 0; --numunits) {
 					CUnit &unit = *unitupgrade[numunits];
 					if (unit.Player->Index == pn && !unit.Removed) {
@@ -593,7 +593,7 @@ static void ApplyUpgradeModifier(CPlayer *player, const CUpgradeModifier *um)
 
 			// And now modify ingame units
 			if (varModified) {
-				numunits = FindUnitsByType(UnitTypes[z], unitupgrade);
+				numunits = FindUnitsByType(*UnitTypes[z], unitupgrade);
 				numunits--; // Change to 0 Start not 1 start
 				for (; numunits >= 0; --numunits) {
 					CUnit &unit = *unitupgrade[numunits];
@@ -617,7 +617,7 @@ static void ApplyUpgradeModifier(CPlayer *player, const CUpgradeModifier *um)
 				}
 			}
 			if (um->ConvertTo) {
-				ConvertUnitTypeTo(player,UnitTypes[z], um->ConvertTo);
+				ConvertUnitTypeTo(player, *UnitTypes[z], *um->ConvertTo);
 			}
 		}
 	}

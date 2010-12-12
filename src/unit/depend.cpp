@@ -191,21 +191,15 @@ static void AddDependency(const std::string &target, const std::string required,
 **
 **  @return        True if available, false otherwise.
 */
-static bool CheckDependByRule(const CPlayer *player, DependRule *rule)
+static bool CheckDependByRule(const CPlayer *player, DependRule &rule)
 {
 	const DependRule *node;
-	const DependRule *temp;
-	int i;
 
-	//
 	//  Find rule
-	//
-
-	i = (int)((intptr_t)rule->Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
+	int i = (int)((intptr_t)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
 
 	if ((node = DependHash[i])) {  // find correct entry
-		while (node->Type != rule->Type ||
-				node->Kind.Upgrade != rule->Kind.Upgrade) {
+		while (node->Type != rule.Type || node->Kind.Upgrade != rule.Kind.Upgrade) {
 			if (!node->Next) {  // end of list
 				return true;
 			}
@@ -221,11 +215,11 @@ static bool CheckDependByRule(const CPlayer *player, DependRule *rule)
 	node = node->Rule;
 
 	while (node) {
-		temp = node;
+		const DependRule *temp = node;
 		while (temp) {
 			switch (temp->Type) {
 				case DependRuleUnitType:
-					i = player->HaveUnitTypeByType(temp->Kind.UnitType);
+					i = player->HaveUnitTypeByType(*temp->Kind.UnitType);
 					if (temp->Count ? i < temp->Count : i) {
 						goto try_or;
 					}
@@ -244,7 +238,6 @@ static bool CheckDependByRule(const CPlayer *player, DependRule *rule)
 try_or:
 		node = node->Next;
 	}
-
 	return false;  // no rule matches
 }
 
@@ -282,7 +275,7 @@ bool CheckDependByIdent(const CPlayer *player, const std::string &target)
 		return false;
 	}
 
-	return CheckDependByRule(player, &rule);
+	return CheckDependByRule(player, rule);
 }
 
 
@@ -294,31 +287,30 @@ bool CheckDependByIdent(const CPlayer *player, const std::string &target)
 **
 **  @return        True if available, false otherwise.
 */
-bool CheckDependByType(const CPlayer *player, const CUnitType *type)
+bool CheckDependByType(const CPlayer *player, const CUnitType &type)
 {
-	if (UnitIdAllowed(player, type->Slot) == 0) {
+	if (UnitIdAllowed(player, type.Slot) == 0) {
 		return false;
 	}
-
 	DependRule rule;
 
-	rule.Kind.UnitType = (CUnitType *)type;
+	rule.Kind.UnitType = const_cast<CUnitType *>(&type);
 	rule.Type = DependRuleUnitType;
-	return CheckDependByRule(player, &rule);
+	return CheckDependByRule(player, rule);
 }
 
 
 /**
 **  Initialize unit and upgrade dependencies.
 */
-void InitDependencies(void)
+void InitDependencies()
 {
 }
 
 /**
 **  Clean up unit and upgrade dependencies.
 */
-void CleanDependencies(void)
+void CleanDependencies()
 {
 	unsigned u;
 	DependRule *node;

@@ -100,7 +100,7 @@ extern void CommandBoard(CUnit &unit, CUnit &dest, int flush);
 	/// Prepare command unload
 extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush);
 	/// Prepare command build
-extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType *, int flush);
+extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush);
 	/// Prepare command dismiss
 extern void CommandDismiss(CUnit &unit);
 	/// Prepare command resource location
@@ -110,13 +110,13 @@ extern void CommandResource(CUnit &unit, CUnit &dest, int flush);
 	/// Prepare command return
 extern void CommandReturnGoods(CUnit &unit, CUnit *goal, int flush);
 	/// Prepare command train
-extern void CommandTrainUnit(CUnit &unit, CUnitType *what, int flush);
+extern void CommandTrainUnit(CUnit &unit, CUnitType &what, int flush);
 	/// Prepare command cancel training
 extern void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type);
 	/// Prepare command upgrade to
-extern void CommandUpgradeTo(CUnit &unit, CUnitType *what, int flush);
+extern void CommandUpgradeTo(CUnit &unit, CUnitType &what, int flush);
 	/// immediate transforming into type.
-extern void CommandTransformIntoType(CUnit &unit, CUnitType *type);
+extern void CommandTransformIntoType(CUnit &unit, CUnitType &type);
 	/// Prepare command cancel upgrade to
 extern void CommandCancelUpgradeTo(CUnit &unit);
 	/// Prepare command research

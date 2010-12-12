@@ -413,16 +413,15 @@ CUnitType *NewUnitTypeSlot(const std::string &ident)
 **  @todo  Do screen position caculation in high level.
 **         Better way to handle in x mirrored sprites.
 */
-void DrawUnitType(const CUnitType *type, CPlayerColorGraphic *sprite, int player, int frame,
-	int x, int y)
+void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, int x, int y)
 {
 	// FIXME: move this calculation to high level.
-	x -= (type->Width - type->TileWidth * TileSizeX) / 2;
-	y -= (type->Height - type->TileHeight * TileSizeY) / 2;
-	x += type->OffsetX;
-	y += type->OffsetY;
+	x -= (type.Width - type.TileWidth * TileSizeX) / 2;
+	y -= (type.Height - type.TileHeight * TileSizeY) / 2;
+	x += type.OffsetX;
+	y += type.OffsetY;
 
-	if (type->Flip) {
+	if (type.Flip) {
 		if (frame < 0) {
 			sprite->DrawPlayerColorFrameClipX(player, -frame - 1, x, y);
 		} else {
@@ -431,11 +430,11 @@ void DrawUnitType(const CUnitType *type, CPlayerColorGraphic *sprite, int player
 	} else {
 		int row;
 
-		row = type->NumDirections / 2 + 1;
+		row = type.NumDirections / 2 + 1;
 		if (frame < 0) {
-			frame = ((-frame - 1) / row) * type->NumDirections + type->NumDirections - (-frame - 1) % row;
+			frame = ((-frame - 1) / row) * type.NumDirections + type.NumDirections - (-frame - 1) % row;
 		} else {
-			frame = (frame / row) * type->NumDirections + frame % row;
+			frame = (frame / row) * type.NumDirections + frame % row;
 		}
 		sprite->DrawPlayerColorFrameClip(player, frame, x, y);
 	}
@@ -500,61 +499,59 @@ void InitUnitTypes(int reset_player_stats)
 **
 **  @param type  type of unit to load
 */
-void LoadUnitTypeSprite(CUnitType *type)
+void LoadUnitTypeSprite(CUnitType &type)
 {
-	ResourceInfo *resinfo;
-	int i;
-
-	if (!type->ShadowFile.empty()) {
-		type->ShadowSprite = CGraphic::ForceNew(type->ShadowFile, type->ShadowWidth,
-			type->ShadowHeight);
-		type->ShadowSprite->Load();
-		if (type->Flip) {
-			type->ShadowSprite->Flip();
+	if (!type.ShadowFile.empty()) {
+		type.ShadowSprite = CGraphic::ForceNew(type.ShadowFile, type.ShadowWidth, type.ShadowHeight);
+		type.ShadowSprite->Load();
+		if (type.Flip) {
+			type.ShadowSprite->Flip();
 		}
-		type->ShadowSprite->MakeShadow();
+		type.ShadowSprite->MakeShadow();
 	}
 
-	if (type->Harvester) {
-		for (i = 0; i < MaxCosts; ++i) {
-			if ((resinfo = type->ResInfo[i])) {
-				if (!resinfo->FileWhenLoaded.empty()) {
-					resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->FileWhenLoaded,
-						type->Width, type->Height);
-					resinfo->SpriteWhenLoaded->Load();
-					if (type->Flip) {
-						resinfo->SpriteWhenLoaded->Flip();
-					}
+	if (type.Harvester) {
+		for (int i = 0; i < MaxCosts; ++i) {
+			ResourceInfo *resinfo = type.ResInfo[i];
+			if (!resinfo) {
+				continue;
+			}
+			if (!resinfo->FileWhenLoaded.empty()) {
+				resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->FileWhenLoaded,
+					type.Width, type.Height);
+				resinfo->SpriteWhenLoaded->Load();
+				if (type.Flip) {
+					resinfo->SpriteWhenLoaded->Flip();
 				}
-				if (!resinfo->FileWhenEmpty.empty()) {
-					resinfo->SpriteWhenEmpty = CPlayerColorGraphic::New(resinfo->FileWhenEmpty,
-						type->Width, type->Height);
-					resinfo->SpriteWhenEmpty->Load();
-					if (type->Flip) {
-						resinfo->SpriteWhenEmpty->Flip();
-					}
+			}
+			if (!resinfo->FileWhenEmpty.empty()) {
+				resinfo->SpriteWhenEmpty = CPlayerColorGraphic::New(resinfo->FileWhenEmpty,
+					type.Width, type.Height);
+				resinfo->SpriteWhenEmpty->Load();
+				if (type.Flip) {
+					resinfo->SpriteWhenEmpty->Flip();
 				}
 			}
 		}
 	}
 
-	if (!type->File.empty()) {
-		type->Sprite = CPlayerColorGraphic::New(type->File, type->Width, type->Height);
-		type->Sprite->Load();
-		if (type->Flip) {
-			type->Sprite->Flip();
+	if (!type.File.empty()) {
+		type.Sprite = CPlayerColorGraphic::New(type.File, type.Width, type.Height);
+		type.Sprite->Load();
+		if (type.Flip) {
+			type.Sprite->Flip();
 		}
 	}
 
 #ifdef USE_MNG
-	if (type->Portrait.Num) {
-		for (i = 0; i < type->Portrait.Num; ++i) {
-			type->Portrait.Mngs[i] = new Mng;
-			type->Portrait.Mngs[i]->Load(type->Portrait.Files[i]);
+	if (type.Portrait.Num) {
+		for (int i = 0; i < type.Portrait.Num; ++i) {
+			type.Portrait.Mngs[i] = new Mng;
+			type.Portrait.Mngs[i]->Load(type.Portrait.Files[i]);
 		}
 		// FIXME: should be configurable
-		type->Portrait.CurrMng = 0;
-		type->Portrait.NumIterations = SyncRand() % 16 + 1;
+		type.Portrait.CurrMng = 0;
+		type.Portrait.NumIterations = SyncRand() % 16 + 1;
 	}
 #endif
 }
@@ -562,37 +559,26 @@ void LoadUnitTypeSprite(CUnitType *type)
 /**
 ** Load the graphics for the unit-types.
 */
-void LoadUnitTypes(void)
+void LoadUnitTypes()
 {
-	CUnitType *type;
-
 	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		type = UnitTypes[i];
+		CUnitType &type = *UnitTypes[i];
 
-		//
 		// Lookup icons.
-		//
-		type->Icon.Load();
-		//
+		type.Icon.Load();
 		// Lookup missiles.
-		//
-		type->Missile.Missile = MissileTypeByIdent(type->Missile.Name);
-		if (!type->Explosion.Name.empty()) {
-			type->Explosion.Missile = MissileTypeByIdent(type->Explosion.Name);
+		type.Missile.Missile = MissileTypeByIdent(type.Missile.Name);
+		if (!type.Explosion.Name.empty()) {
+			type.Explosion.Missile = MissileTypeByIdent(type.Explosion.Name);
 		}
-		//
 		// Lookup corpse.
-		//
-		if (!type->CorpseName.empty()) {
-			type->CorpseType = UnitTypeByIdent(type->CorpseName);
+		if (!type.CorpseName.empty()) {
+			type.CorpseType = UnitTypeByIdent(type.CorpseName);
 		}
-
-		//
-		// Load Sprite
-		//
 #ifndef DYNAMIC_LOAD
-		if (!type->Sprite) {
-			ShowLoadProgress("Unit \"%s\"", type->Name.c_str());
+		// Load Sprite
+		if (!type.Sprite) {
+			ShowLoadProgress("Unit \"%s\"", type.Name.c_str());
 			LoadUnitTypeSprite(type);
 		}
 #endif

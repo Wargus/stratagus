@@ -283,15 +283,17 @@ static int CclSetStartView(lua_State *l)
 */
 static int CclShowMapLocation(lua_State *l)
 {
-	CUnit *target;
-	const char *unitname;
-
 	// Put a unit on map, use its properties, except for
 	// what is listed below
 
 	LuaCheckArgs(l, 4);
-	unitname = LuaToString(l, 5);
-	target = MakeUnit(UnitTypeByIdent(unitname), ThisPlayer);
+	const char *unitname = LuaToString(l, 5);
+	CUnitType* unitType = UnitTypeByIdent(unitname);
+	if (!unitType) {
+		DebugPrint("Unable to find UnitType '%s'" _C_ unitname);
+		return 0;
+	}
+	CUnit *target = MakeUnit(*unitType, ThisPlayer);
 	if (target != NoUnitP) {
 		target->CurrentOrder()->Action = UnitActionStill;
 		target->Variable[HP_INDEX].Value = 0;
@@ -303,7 +305,6 @@ static int CclShowMapLocation(lua_State *l)
 	} else {
 		DebugPrint("Unable to allocate Unit");
 	}
-
 	return 0;
 }
 

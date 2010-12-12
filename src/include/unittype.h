@@ -504,7 +504,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "SDL.h"
+#include <SDL.h>
 #include <vector>
 #include <algorithm>
 
@@ -786,7 +786,7 @@ public:
 
 	virtual ~CBuildRestriction() {} ;
 	virtual void Init() {};
-	virtual bool Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const = 0;
+	virtual bool Check(const CUnitType &type, int x, int y, CUnit *&ontoptarget) const = 0;
 };
 
 
@@ -806,7 +806,7 @@ public:
 			(*i)->Init();
 		}
 	};
-	virtual bool Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnitType &type, int x, int y, CUnit *&ontoptarget) const;
 
 	void push_back(CBuildRestriction *restriction) {
 		_or_list.push_back(restriction);
@@ -828,7 +828,7 @@ public:
 	CBuildRestrictionAddOn() : OffsetX(0), OffsetY(0), Parent(NULL) {};
 	virtual ~CBuildRestrictionAddOn() {};
 	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
-	virtual bool Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnitType &type, int x, int y, CUnit *&ontoptarget) const;
 
 	int OffsetX;         /// offset from the main building to place this
 	int OffsetY;         /// offset from the main building to place this
@@ -848,7 +848,7 @@ public:
 	CBuildRestrictionOnTop() : Parent(NULL), ReplaceOnDie(0), ReplaceOnBuild(0) {};
 	virtual ~CBuildRestrictionOnTop() {};
 	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
-	virtual bool Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnitType &type, int x, int y, CUnit *&ontoptarget) const;
 
 	std::string ParentName;  /// building that is unit is an addon too.
 	CUnitType *Parent;   /// building that is unit is an addon too.
@@ -861,7 +861,7 @@ public:
 	CBuildRestrictionDistance() : Distance(0), RestrictType(NULL) {};
 	virtual ~CBuildRestrictionDistance() {};
 	virtual void Init() {this->RestrictType = UnitTypeByIdent(this->RestrictTypeName);};
-	virtual bool Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnitType &type, int x, int y, CUnit *&ontoptarget) const;
 
 	int Distance;        /// distance to build (circle)
 	DistanceTypeType DistanceType;
@@ -1172,16 +1172,13 @@ public:
 	std::vector<CVariable> Variable;	/// Array of user defined variables (default value for unittype).
 	std::vector<CDecoVar *> DecoVar;    /// Array to describe how showing variable.
 
-	unsigned int GetNumberBoolFlag(void) {
+	unsigned int GetNumberBoolFlag() const {
 		return BoolFlagNameLookup.TotalKeys;
 	}
 
-	unsigned int GetNumberVariable(void) {
+	unsigned int GetNumberVariable() const {
 		return VariableNameLookup.TotalKeys;
 	}
-
-
-
 };
 
 extern CUnitTypeVar UnitTypeVar;
@@ -1191,7 +1188,7 @@ extern CUnitTypeVar UnitTypeVar;
 ----------------------------------------------------------------------------*/
 
 extern CUnitType *CclGetUnitType(lua_State *l);      /// Access unit-type object
-extern void UnitTypeCclRegister(void);               /// Register ccl features
+extern void UnitTypeCclRegister();               /// Register ccl features
 
 extern void UpdateStats(int reset_to_default);       /// Update unit stats
 extern CUnitType *UnitTypeByIdent(const std::string &ident);/// Get unit-type by ident
@@ -1199,13 +1196,13 @@ extern CUnitType *UnitTypeByIdent(const std::string &ident);/// Get unit-type by
 extern void SaveUnitTypes(CFile *file);              /// Save the unit-type table
 extern CUnitType *NewUnitTypeSlot(const std::string &ident);/// Allocate an empty unit-type slot
 	/// Draw the sprite frame of unit-type
-extern void DrawUnitType(const CUnitType *type, CPlayerColorGraphic *sprite,
+extern void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite,
 	int player, int frame, int x, int y);
 
 extern void InitUnitTypes(int reset_player_stats);   /// Init unit-type table
-extern void LoadUnitTypeSprite(CUnitType *unittype); /// Load the sprite for a unittype
-extern void LoadUnitTypes(void);                     /// Load the unit-type data
-extern void CleanUnitTypes(void);                    /// Cleanup unit-type module
+extern void LoadUnitTypeSprite(CUnitType &unittype); /// Load the sprite for a unittype
+extern void LoadUnitTypes();                     /// Load the unit-type data
+extern void CleanUnitTypes();                    /// Cleanup unit-type module
 
 // in script_unittype.c
 

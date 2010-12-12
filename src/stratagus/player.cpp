@@ -580,21 +580,21 @@ void CPlayer::SetResource(int resource, int value)
 **
 **  @note The return values of the PlayerCheck functions are inconsistent.
 */
-int CPlayer::CheckLimits(const CUnitType *type) const
+int CPlayer::CheckLimits(const CUnitType &type) const
 {
 	//
 	//  Check game limits.
 	//
 	if (NumUnits < UnitMax) {
-		if (type->Building && NumBuildings >= BuildingLimit) {
+		if (type.Building && NumBuildings >= BuildingLimit) {
 			Notify(NotifyYellow, -1, -1, _("Building Limit Reached"));
 			return -1;
 		}
-		if (!type->Building && (TotalNumUnits - NumBuildings) >= UnitLimit) {
+		if (!type.Building && (TotalNumUnits - NumBuildings) >= UnitLimit) {
 			Notify(NotifyYellow, -1, -1, _("Unit Limit Reached"));
 			return -2;
 		}
-		if (this->Demand + type->Demand > this->Supply && type->Demand) {
+		if (this->Demand + type.Demand > this->Supply && type.Demand) {
 			Notify(NotifyYellow, -1, -1, _("Insufficient Supply, increase Supply."));
 			return -3;
 		}
@@ -602,9 +602,9 @@ int CPlayer::CheckLimits(const CUnitType *type) const
 			Notify(NotifyYellow, -1, -1, _("Total Unit Limit Reached"));
 			return -4;
 		}
-		if (UnitTypesCount[type->Slot] >=  Allow.Units[type->Slot]) {
+		if (UnitTypesCount[type.Slot] >=  Allow.Units[type.Slot]) {
 			Notify(NotifyYellow, -1, -1, _("Limit of %d reached for this unit type"),
-				Allow.Units[type->Slot]);
+				Allow.Units[type.Slot]);
 			return -6;
 		}
 		return 1;
@@ -655,9 +655,9 @@ int CPlayer::CheckCosts(const int *costs) const
 **
 **  @return        False if all enough, otherwise a bit mask.
 */
-int CPlayer::CheckUnitType(const CUnitType *type) const
+int CPlayer::CheckUnitType(const CUnitType &type) const
 {
-	return this->CheckCosts(type->Stats[this->Index].Costs);
+	return this->CheckCosts(type.Stats[this->Index].Costs);
 }
 
 /**
@@ -677,10 +677,10 @@ void CPlayer::AddCosts(const int *costs)
 **
 **  @param type    Type of unit.
 */
-void CPlayer::AddUnitType(const CUnitType *type)
+void CPlayer::AddUnitType(const CUnitType &type)
 {
 	// FIXME: a player could make money by upgrading and than cancel
-	AddCosts(type->Stats[this->Index].Costs);
+	AddCosts(type.Stats[this->Index].Costs);
 }
 
 /**
@@ -713,9 +713,9 @@ void CPlayer::SubCosts(const int *costs)
 **
 **  @param type    Type of unit.
 */
-void CPlayer::SubUnitType(const CUnitType *type)
+void CPlayer::SubUnitType(const CUnitType &type)
 {
-	this->SubCosts(type->Stats[this->Index].Costs);
+	this->SubCosts(type.Stats[this->Index].Costs);
 }
 
 /**
@@ -738,9 +738,9 @@ void CPlayer::SubCostsFactor(const int *costs, int factor)
 **
 **  @return        How many exists, false otherwise.
 */
-int CPlayer::HaveUnitTypeByType(const CUnitType *type) const
+int CPlayer::HaveUnitTypeByType(const CUnitType &type) const
 {
-	return UnitTypesCount[type->Slot];
+	return UnitTypesCount[type.Slot];
 }
 
 /**
@@ -760,7 +760,7 @@ int CPlayer::HaveUnitTypeByIdent(const std::string &ident) const
 /**
 **  Initialize the Ai for all players.
 */
-void PlayersInitAi(void)
+void PlayersInitAi()
 {
 	for (int player = 0; player < NumPlayers; ++player) {
 		if (Players[player].AiEnabled) {
@@ -772,16 +772,16 @@ void PlayersInitAi(void)
 /**
 **  Handle AI of all players each game cycle.
 */
-void PlayersEachCycle(void)
+void PlayersEachCycle()
 {
 	for (int player = 0; player < NumPlayers; ++player) {
 		CPlayer *p = &Players[player];
-		if(p->AutoAttackTargets.size() > 0) {
+		if (p->AutoAttackTargets.size() > 0) {
 			CUnitCache &autoatacktargets = p->AutoAttackTargets;
 			/* both loops can not be connected !!!! */
-			for(unsigned int i = 0; i < autoatacktargets.size();) {
+			for (unsigned int i = 0; i < autoatacktargets.size();) {
 				CUnit *aatarget = autoatacktargets[i];
-				if(!aatarget->IsAliveOnMap() ||
+				if (!aatarget->IsAliveOnMap() ||
 					Map.Field(aatarget->Offset)->Guard[player] == 0) {
 					autoatacktargets.Units.erase(autoatacktargets.Units.begin() + i);
 					aatarget->RefsDecrease();
@@ -789,7 +789,7 @@ void PlayersEachCycle(void)
 				}
 				++i;
 			}
-			if(autoatacktargets.size() > 0) {
+			if (autoatacktargets.size() > 0) {
 				for (int j = 0; j < p->TotalNumUnits; ++j) {
 					CUnit &guard = *p->Units[j];
 					bool stand_ground = guard.CurrentAction() == UnitActionStandGround;
@@ -856,7 +856,7 @@ void GraphicPlayerPixels(CPlayer *player, const CGraphic *sprite)
 **
 **  @todo  FIXME: could be called before PixelsXX is setup.
 */
-void SetPlayersPalette(void)
+void SetPlayersPalette()
 {
 	for (int i = 0; i < PlayerMax; ++i) {
 		delete[] Players[i].UnitColors.Colors;
@@ -869,18 +869,17 @@ void SetPlayersPalette(void)
 /**
 **  Output debug informations for players.
 */
-void DebugPlayers(void)
+void DebugPlayers()
 {
 #ifdef DEBUG
-	int i;
-	const char *playertype;
-
 	DebugPrint("Nr   Color   I Name     Type         Race    Ai\n");
 	DebugPrint("--  -------- - -------- ------------ ------- -----\n");
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		if (Players[i].Type == PlayerNobody) {
 			continue;
 		}
+		const char *playertype;
+
 		switch (Players[i].Type) {
 			case 0: playertype = "Don't know 0"; break;
 			case 1: playertype = "Don't know 1"; break;

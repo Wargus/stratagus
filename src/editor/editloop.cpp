@@ -317,9 +317,9 @@ void EditTiles(const Vec2i &pos, int tile, int size)
 **  @todo  FIXME: Check if the player has already a start-point.
 **  @bug   This function does not support mirror editing!
 */
-static void EditorActionPlaceUnit(const Vec2i &pos, CUnitType *type, CPlayer *player)
+static void EditorActionPlaceUnit(const Vec2i &pos, CUnitType &type, CPlayer *player)
 {
-	if (type->Neutral) {
+	if (type.Neutral) {
 		player = &Players[PlayerNumNeutral];
 	}
 
@@ -349,8 +349,8 @@ static void EditorActionPlaceUnit(const Vec2i &pos, CUnitType *type, CPlayer *pl
 
 	}
 	if (unit != NoUnitP) {
-		if (type->GivesResource) {
-			unit->ResourcesHeld = DefaultResourceAmounts[type->GivesResource];
+		if (type.GivesResource) {
+			unit->ResourcesHeld = DefaultResourceAmounts[type.GivesResource];
 		}
 	} else {
 		DebugPrint("Unable to allocate Unit");
@@ -365,12 +365,12 @@ static void EditorActionPlaceUnit(const Vec2i &pos, CUnitType *type, CPlayer *pl
 **  @param type    Unit type to edit.
 **  @param player  Player owning the unit.
 */
-static void EditorPlaceUnit(const Vec2i &pos, CUnitType *type, CPlayer *player)
+static void EditorPlaceUnit(const Vec2i &pos, CUnitType &type, CPlayer *player)
 {
 	EditorAction editorAction;
 	editorAction.Type = EditorActionTypePlaceUnit;
 	editorAction.tilePos = pos;
-	editorAction.UnitType = type;
+	editorAction.UnitType = &type;
 	editorAction.Player = player;
 
 	EditorActionPlaceUnit(pos, type, player);
@@ -428,7 +428,7 @@ static void EditorUndoAction()
 		}
 
 		case EditorActionTypeRemoveUnit:
-			EditorActionPlaceUnit(action.tilePos, action.UnitType, action.Player);
+			EditorActionPlaceUnit(action.tilePos, *action.UnitType, action.Player);
 			break;
 	}
 
@@ -447,7 +447,7 @@ static void EditorRedoAction()
 	switch (action.Type)
 	{
 		case EditorActionTypePlaceUnit:
-			EditorActionPlaceUnit(action.tilePos, action.UnitType, action.Player);
+			EditorActionPlaceUnit(action.tilePos, *action.UnitType, action.Player);
 			break;
 
 		case EditorActionTypeRemoveUnit:
@@ -941,7 +941,7 @@ static void DrawMapCursor(void)
 /**
 **  Draw the start locations of all active players on the map
 */
-static void DrawStartLocations(void)
+static void DrawStartLocations()
 {
 	const CUnitType *type = Editor.StartUnit;
 	for (const CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
@@ -954,7 +954,7 @@ static void DrawStartLocations(void)
 				int y = vp->Map2ViewportY(Players[i].StartY);
 
 				if (type) {
-					DrawUnitType(type, type->Sprite, i, 0, x, y);
+					DrawUnitType(*type, type->Sprite, i, 0, x, y);
 				} else {
 					Video.DrawLineClip(PlayerColors[i][0], x, y, x + TileSizeX, y + TileSizeY);
 					Video.DrawLineClip(PlayerColors[i][0], x, y + TileSizeY, x + TileSizeX, y);
@@ -1325,10 +1325,10 @@ static void EditorCallbackButtonDown(unsigned button)
 				EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
 			} else if (Editor.State == EditorEditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
-					if (CanBuildUnitType(NULL, CursorBuilding, tilePos, 1)) {
+					if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1)) {
 						PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound,
 							MaxSampleVolume);
-						EditorPlaceUnit(tilePos, CursorBuilding, Players + Editor.SelectedPlayer);
+						EditorPlaceUnit(tilePos, *CursorBuilding, Players + Editor.SelectedPlayer);
 						UnitPlacedThisPress = true;
 						UI.StatusLine.Clear();
 					} else {
@@ -1637,8 +1637,8 @@ static void EditorCallbackMouse(int x, int y)
 			EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
 		} else if (Editor.State == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
-				if (CanBuildUnitType(NULL, CursorBuilding, tilePos, 1)) {
-					EditorPlaceUnit(tilePos, CursorBuilding, Players + Editor.SelectedPlayer);
+				if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1)) {
+					EditorPlaceUnit(tilePos, *CursorBuilding, Players + Editor.SelectedPlayer);
 					UnitPlacedThisPress = true;
 					UI.StatusLine.Clear();
 				}

@@ -396,23 +396,23 @@ extern PlayerAi *AiPlayer; /// Current AI player
 // Resource manager
 //
 	/// Add unit-type request to resource manager
-extern void AiAddUnitTypeRequest(CUnitType *type, int count);
+extern void AiAddUnitTypeRequest(CUnitType &type, int count);
 	/// Add upgrade-to request to resource manager
-extern void AiAddUpgradeToRequest(CUnitType *type);
+extern void AiAddUpgradeToRequest(CUnitType &type);
 	/// Add research request to resource manager
 extern void AiAddResearchRequest(CUpgrade *upgrade);
 	/// Periodic called resource manager handler
-extern void AiResourceManager(void);
+extern void AiResourceManager();
 	/// Ask the ai to explore around pos
 extern void AiExplore(const Vec2i &pos, int exploreMask);
 	/// Make two unittypes be considered equals
 extern void AiNewUnitTypeEquiv(CUnitType *a, CUnitType *b);
 	/// Remove any equivalence between unittypes
-extern void AiResetUnitTypeEquiv(void);
+extern void AiResetUnitTypeEquiv();
 	/// Finds all equivalents units to a given one
-extern int AiFindUnitTypeEquiv(const CUnitType *i, int *result);
+extern int AiFindUnitTypeEquiv(const CUnitType &type, int *result);
 	/// Finds all available equivalents units to a given one, in the prefered order
-extern int AiFindAvailableUnitTypeEquiv(const CUnitType *i, int *result);
+extern int AiFindAvailableUnitTypeEquiv(const CUnitType &type, int *result);
 extern int AiGetBuildRequestsCount(PlayerAi*,int counter[UnitTypeMax]);
 
 extern void AiNewDepotRequest(CUnit &worker);
@@ -422,7 +422,7 @@ extern void AiNewDepotRequest(CUnit &worker);
 //
 	/// Find nice building place
 extern int AiFindBuildingPlace(const CUnit &worker,
-	const CUnitType *type, int nx, int ny, Vec2i *dpos);
+	const CUnitType &type, int nx, int ny, Vec2i *dpos);
 
 //
 // Forces
@@ -453,7 +453,7 @@ extern int AiFindWall(AiForce *force);
 extern void AiSendExplorers(void);
 	/// Enemy units in distance
 extern int AiEnemyUnitsInDistance(const CPlayer *player, const CUnitType *type,
-	int x, int y, unsigned range);
+	const Vec2i& pos, unsigned range);
 
 //
 // Magic
