@@ -231,15 +231,17 @@ DefineAiHelper(
 <a name="AiAttackWithForce"></a>
 <h3>AiAttackWithForce(force)</h3>
  
-Attack the opponent with the given force. The place is choosen by the AI. If there 	 
-are flyers, ships and land units in the force they could attack different 	 
-goals.
+<p>Attack the opponent with the given force. The place is choosen by the AI. If there 	 
+are flyers, ships and land units in the force they could attack different
+goals.</p>
 
 <dl> 	 
 <dt>force</dt>
 <dd>ID of the force to which the attacking units belong. The force ids 0 to 9
 are currently supported.
 </dd>
+<dt>returns</dt>
+<dd>False.</dd>
 </dl>
  
 <i>The force isn't moved as a single unit: faster units attacks first, than later the
@@ -261,23 +263,25 @@ slower units will attack.</i>
 <a name="AiCheckForce"></a>
 <h3>AiCheckForce(force)</h3>
 
-Check if a force is ready.
-
+<p>Check if a force is complete.</p>
 
 <dl>
 <dt>force</dt>
 <dd>Number of the force to which the units should belong. 0 - 9 is currently
 supported.
 </dd>
+<dt>returns</dt>
+<dd>True if the force is complete, false if not yet.</dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    -- Force 0 is build with one footman. When the force is ready, sleep for
-    -- 500 frames.
-    AiForce(0, "unit-footman", 1)
-    if (AiCheckForce(0)) then AiSleep(500) end
+    -- Force 0 is build with one assault. 
+    AiForce(0, "unit-assault", 1)
+    ...
+    -- If the force is ready, use it to attack.
+    if (AiCheckForce(0)) then AiAttackWithForce(0) end
 </pre>
 
 <a name="AiDebug"></a>
@@ -323,7 +327,7 @@ Parameters are player number, or "self", for thisplayer.<br>
 <a name="AiForce"></a>
 <h3>AiForce(force, unit-type-1, count-1, ... ,unit-type-N, count-N)</h3>
 
-Define a force, what and how many units should belong to a force. Up to 10
+<p>Define a force, what and how many units should belong to a force. Up to 10
 forces are currently supported.
 <br>
 Force 0 is currently fixed to be the defence force. Send to a building or
@@ -333,7 +337,7 @@ If there are any unassigned units of the requested unit-type, than they are
 assigned to the force.
 <br>
 Note: The low-level didn't support the reduce of a force.
-
+</p>
 
 <dl>
 <dt>force</dt>
@@ -349,6 +353,8 @@ are allowed.
 <dt>count-N</dt>
 <dd>How many of this units should be in the force.
 </dd>
+<dt>returns</dt>
+<dd>False.</dd>
 </dl>
 
 <i>The unit-types should be build in a fixed order. From left to right? or from
@@ -357,10 +363,10 @@ each unit-type one after the other?</i>
 <h4>Example</h4>
 
 <pre>
-    -- First the force 0 is filled up with 4 footmans and 5 bowmans, after this
-    -- force 1 is filled with 3 footmans and 2 bowmans.
-    AiForce(0, "unit-footman", 4, "unit-bowman", 5)
-    AiForce(1, "unit-footman", 3, "unit-bowman", 2)
+    -- First the force 0 is filled up with 4 assaults and 5 bazoos, after this
+    -- force 1 is filled with 3 assaults and 2 bazoos.
+    AiForce(0, "unit-assault", 4, "unit-bazoo", 5)
+    AiForce(1, "unit-assault", 3, "unit-bazoo", 2)
 </pre>
 
 <a name="AiForceRole"></a>
@@ -405,27 +411,33 @@ additional could be requested.
 <dt>unit-type</dt>
 <dd>Name of the unit-type required.
 </dd>
+<dt>returns</dt>
+<dd>False.</dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    -- The great hall must be build before a barrack.
-  AiNeed("unit-great-hall")
-  AiNeed("unit-barrack")
+  -- The magmapump must be build before a powerplant.
+  AiNeed("unit-magmapump")
+  AiNeed("unit-powerplant")
 </pre>
 
 <a name="AiPlayer"></a>
 <h3>AiPlayer()</h3>
 
-Return the player of the running AI.
+Return the player number of the running AI.
 
 
 <h4>Example</h4>
 
 <pre>
-    -- Returns the player of the running AI.
+    -- If the player of the running AI has insufficient magma
+    -- then build a magmapump:
     player = AiPlayer()
+    if (Players[player].MagmaStored &lt; 300) then
+      AiNeed("unit-magmapump")
+    end
 </pre>
 
 <a name="AiSet"></a>
@@ -446,8 +458,10 @@ modifies the last request to the new number.
 <dd>Name of the unit-type(s) required.
 </dd>
 <dt>count</dt>
-<dd>Number of unit-types(s) required.
+<dd>Number of unit-types(s) required. Zero is not allowed.
 </dd>
+<dt>returns</dt>
+<dd>False.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -460,13 +474,23 @@ modifies the last request to the new number.
 <a name="AiSleep"></a>
 <h3>AiSleep(frames)</h3>
 
-Wait some frames, to let the opponent (you) recover.
+<p>Wait some frames, to let the opponent (you) recover.</p>
+
+<p>The first time this function is called, 
+the frames value is stored, and "true" is returned. The next times, 
+also "true" is returned, until the timeout is over: 
+then "false" is returned.</p>
+
+<p>The frames parameter is ignored except during the first call.</p>
 
 
 <dl>
 <dt>frames</dt>
 <dd>How many frames (~1/30s) the AI shouldn't proceed with the script.
 </dd>
+<dt>returns</dt>
+<dd>True if we need to wait longer.</dd>
+<dd>False if the waiting period is over.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -486,23 +510,32 @@ Don't forget to request a unit-type, before you wait on it.
 
 <dl>
 <dt>type</dt>
-<dd>Wait for this unit type.
+<dd>The unit type name string.
 </dd>
+<dt>returns</dt>
+<dd>True if this unit type is not yet available.</dd>
+<dd>False if at least one instance of this unit-type exists.</dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    -- Proceed only if a peasant is ready.
-    AiNeed("unit-engineer")
-    AiWait("unit-engineer")
+    {
+      -- Proceed only if an engineer is ready:
+      function() return AiNeed("unit-engineer") end,
+      function() return AiWait("unit-engineer") end,
+      -- Proceed only if two magmapumps are ready:
+      function() return AiSet("unit-magmapump", 2) end,
+      function() return AiWait("unit-magmapump") end,
+    }
 </pre>
 
 <a name="AiWaitForce"></a>
 <h3>AiWaitForce(force)</h3>
 
-Wait until a force is complete, the forces are build in force number order.
-First 0, than 1, last 9.
+<p>Check if a force is complete.</p>
+
+<p>The forces are build in force number order. First 0, than 1, last 9.</p>
 
 
 <dl>
@@ -510,6 +543,8 @@ First 0, than 1, last 9.
 <dd>Number of the force to which the units should belong. 0 - 9 is currently
 supported.
 </dd>
+<dt>returns</dt>
+<dd>False if the force is complete, true if not yet.</dd>
 </dl>
 
 <h4>Example</h4>
