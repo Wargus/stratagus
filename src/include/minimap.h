@@ -54,7 +54,7 @@ public:
 		Transparent(false), UpdateCache(false) {}
 
 	void UpdateXY(const Vec2i &pos);
-	void UpdateSeenXY(const Vec2i &pos) {}
+	void UpdateSeenXY(const Vec2i &) {}
 	void Update();
 	void Create();
 	void FreeOpenGL();
