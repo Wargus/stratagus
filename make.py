@@ -204,7 +204,7 @@ def detectAlwaysDynamic(b):
        b.define('HAVE_STRNLEN')
     if (Check(b, header='X11/Xlib.h') and 
         Check(b, header='X11/Xatom.h') and 
-        Check(b, 'X11')):
+        CheckLib(b, 'X11')):
        b.define('HAVE_X')
     for i in incpaths:
        b.incpath(i)
