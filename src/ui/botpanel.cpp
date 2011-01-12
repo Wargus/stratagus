@@ -784,13 +784,13 @@ static bool IsButtonAllowed(const CUnit &unit, const ButtonAction *buttonaction)
 		case ButtonUpgradeTo:
 		case ButtonResearch:
 		case ButtonBuild:
-			res = CheckDependByIdent(unit.Player, buttonaction->ValueStr);
+			res = CheckDependByIdent(*unit.Player, buttonaction->ValueStr);
 			if (res && !strncmp(buttonaction->ValueStr.c_str(), "upgrade-", 8)) {
-				res = UpgradeIdentAllowed(unit.Player, buttonaction->ValueStr) == 'A';
+				res = UpgradeIdentAllowed(*unit.Player, buttonaction->ValueStr) == 'A';
 			}
 			break;
 		case ButtonSpellCast:
-			res = SpellIsAvailable(unit.Player, buttonaction->Value);
+			res = SpellIsAvailable(*unit.Player, buttonaction->Value);
 			break;
 		case ButtonUnload:
 			res = (Selected[0]->Type->CanTransport() && Selected[0]->BoardCount);

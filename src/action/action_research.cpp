@@ -108,7 +108,7 @@ void HandleActionResearch(CUnit &unit)
 		if (unit.Player->AiEnabled) {
 			AiResearchComplete(unit, upgrade);
 		}
-		UpgradeAcquire(unit.Player, upgrade);
+		UpgradeAcquire(*unit.Player, upgrade);
 
 		unit.ClearAction();
 

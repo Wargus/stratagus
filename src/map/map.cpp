@@ -138,15 +138,11 @@ void CMap::MarkSeenTile(const unsigned int index)
 */
 void CMap::Reveal()
 {
-	int p;  // iterator on player.
-
-	//
 	//  Mark every explored tile as visible. 1 turns into 2.
-	//
 	Vec2i pos;
 	for (pos.x = 0; pos.x < this->Info.MapWidth; ++pos.x) {
 		for (pos.y = 0; pos.y < this->Info.MapHeight; ++pos.y) {
-			for (p = 0; p < PlayerMax; ++p) {
+			for (int p = 0; p < PlayerMax; ++p) {
 				if (!this->Field(pos)->Visible[p]) {
 					this->Field(pos)->Visible[p] = 1;
 				}
@@ -154,19 +150,15 @@ void CMap::Reveal()
 			MarkSeenTile(pos);
 		}
 	}
-	//
 	//  Global seen recount. Simple and effective.
-	//
 	for (int i = 0; i < NumUnits; ++i) {
-		//
 		//  Reveal neutral buildings. Gold mines:)
-		//
 		if (Units[i]->Player->Type == PlayerNeutral) {
-			for (p = 0; p < PlayerMax; ++p) {
+			for (int p = 0; p < PlayerMax; ++p) {
 				if (Players[p].Type != PlayerNobody &&
 						(!(Units[i]->Seen.ByPlayer & (1 << p)))) {
-					UnitGoesOutOfFog(*Units[i], Players + p);
-					UnitGoesUnderFog(*Units[i], Players + p);
+					UnitGoesOutOfFog(*Units[i], Players[p]);
+					UnitGoesUnderFog(*Units[i], Players[p]);
 				}
 			}
 		}

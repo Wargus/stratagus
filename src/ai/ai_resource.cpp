@@ -240,7 +240,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, int near_
 	//
 	// Remove all workers on the way building something
 	//
-	const int nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
+	const int nunits = FindPlayerUnitsByType(*AiPlayer->Player, type, table);
 	for (int i = 0; i < nunits; ++i) {
 		CUnit& unit = *table[i];
 		int j;
@@ -288,12 +288,12 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, int near_
 	return 0;
 }
 
-static bool AiRequestedTypeAllowed(const CPlayer *player, const CUnitType &type)
+static bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type)
 {
 	const int size = AiHelpers.Build[type.Slot].size();
 	for(int i = 0; i < size; ++i) {
 		CUnitType *builder = AiHelpers.Build[type.Slot][i];
-		if(player->UnitTypesCount[builder->Slot] > 0 &&
+		if (player.UnitTypesCount[builder->Slot] > 0 &&
 			CheckDependByType(player, type))
 		{
 			return true;
@@ -331,8 +331,7 @@ AiGetBuildRequestsCount(PlayerAi *pai, int counter[UnitTypeMax])
 	return size;
 }
 
-extern CUnit *FindDepositNearLoc(CPlayer *p,
-				int x, int y, int range, int resource);
+extern CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource);
 
 
 void AiNewDepotRequest(CUnit &worker) {
@@ -356,8 +355,7 @@ void AiNewDepotRequest(CUnit &worker) {
 		}
 	}
 
-	if (pos.x != -1 && NULL != FindDepositNearLoc(worker.Player,
-				pos.x, pos.y, 10, worker.CurrentResource)) {
+	if (pos.x != -1 && NULL != FindDepositNearLoc(*worker.Player, pos, 10, worker.CurrentResource)) {
 		/*
 		 * New Depot has just be finished and worker just return to old depot
 		 * (far away) from new Deopt.
@@ -380,7 +378,7 @@ void AiNewDepotRequest(CUnit &worker) {
 		if (counter[type.Slot]) { // Already ordered.
 			return;
 		}
-		if (!AiRequestedTypeAllowed(worker.Player, type)) {
+		if (!AiRequestedTypeAllowed(*worker.Player, type)) {
 			continue;
 		}
 
@@ -460,7 +458,7 @@ static bool AiRequestSupply()
 			return false;
 		}
 
-		if (!AiRequestedTypeAllowed(AiPlayer->Player, type)) {
+		if (!AiRequestedTypeAllowed(*AiPlayer->Player, type)) {
 			continue;
 		}
 
@@ -551,7 +549,7 @@ static int AiTrainUnit(const CUnitType &type, CUnitType &what)
 	//
 	// Remove all units already doing something.
 	//
-	const int nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
+	const int nunits = FindPlayerUnitsByType(*AiPlayer->Player, type, table);
 	for (int i = 0; i < nunits; ++i) {
 		CUnit *unit = table[i];
 
@@ -566,58 +564,6 @@ static int AiTrainUnit(const CUnitType &type, CUnitType &what)
 		return 1;
 	}
 	return 0;
-}
-
-/**
-**  Return the number of unit which can produce the given unittype.
-**
-**  @param type  The unittype we wan't to build
-*/
-int AiCountUnitBuilders(CUnitType *type)
-{
-	int result;
-	int i;
-	int n;
-	const int *unit_count;
-	std::vector<std::vector<CUnitType *> > *tablep;
-	const std::vector<CUnitType *> *table;
-
-	if (UnitIdAllowed(AiPlayer->Player, type->Slot) == 0) {
-		DebugPrint("%d: Can't build `%s' now\n" _C_ AiPlayer->Player->Index
-			_C_ type->Ident.c_str());
-		return 0;
-	}
-	//
-	// Check if we have a place for building or a unit to build.
-	//
-	if (type->Building) {
-		n = AiHelpers.Build.size();
-		tablep = &AiHelpers.Build;
-	} else {
-		n = AiHelpers.Train.size();
-		tablep = &AiHelpers.Train;
-	}
-	if (type->Slot > n) { // Oops not known.
-		DebugPrint("%d: AiCountUnitBuilders I: Nothing known about `%s'\n" _C_ AiPlayer->Player->Index
-			_C_ type->Ident.c_str());
-		return 0;
-	}
-	table = &(*tablep)[type->Slot];
-	if (!table->size()) { // Oops not known.
-		DebugPrint("%d: AiCountUnitBuilders II: Nothing known about `%s'\n" _C_ AiPlayer->Player->Index
-			_C_ type->Ident.c_str());
-		return 0;
-	}
-
-	unit_count = AiPlayer->Player->UnitTypesCount;
-	result = 0;
-	for (i = 0; i < (int)table->size(); ++i) {
-		//
-		// The type for builder/trainer is available
-		//
-		result += unit_count[(*table)[i]->Slot];
-	}
-	return result;
 }
 
 /**
@@ -700,7 +646,7 @@ static int AiResearchUpgrade(const CUnitType &type, CUpgrade *what)
 
 	// Remove all units already doing something.
 
-	const int nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
+	const int nunits = FindPlayerUnitsByType(*AiPlayer->Player, type, table);
 	for (int i = 0; i < nunits; ++i) {
 		CUnit &unit = *table[i];
 
@@ -777,7 +723,7 @@ static int AiUpgradeTo(const CUnitType &type, CUnitType &what)
 	int num = 0;
 
 	// Remove all units already doing something.
-	const int nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
+	const int nunits = FindPlayerUnitsByType(*AiPlayer->Player, type, table);
 	for (int i = 0; i < nunits; ++i) {
 		CUnit *unit = table[i];
 
@@ -1292,7 +1238,7 @@ static int AiRepairBuilding(const CUnitType &type, CUnit &building)
 
 	// Selection of mining workers.
 	CUnit *table[UnitMax];
-	int nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
+	int nunits = FindPlayerUnitsByType(*AiPlayer->Player, type, table);
 	int num = 0;
 	for (int i = 0; i < nunits; ++i) {
 		CUnit &unit = *table[i];

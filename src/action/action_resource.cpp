@@ -121,7 +121,7 @@ static int MoveToResource(CUnit &unit)
 			default:
 				// Goal gone or something.
 				if (unit.Anim.Unbreakable ||
-						goal->IsVisibleAsGoal(unit.Player)) {
+						goal->IsVisibleAsGoal(*unit.Player)) {
 					return 0;
 				}
 				break;
@@ -185,7 +185,7 @@ static int StartGathering(CUnit &unit)
 	//
 	// Target is dead, stop getting resources.
 	//
-	if (!goal->IsVisibleAsGoal(unit.Player)) {
+	if (!goal->IsVisibleAsGoal(*unit.Player)) {
 		// Find an alternative, but don't look too far.
 		unit.CurrentOrder()->goalPos.x = unit.CurrentOrder()->goalPos.y = -1;
 		if ((goal = UnitFindResource(unit, unit.tilePos.x, unit.tilePos.y,
@@ -404,7 +404,7 @@ static int GatherResource(CUnit &unit)
 
 			Assert(source);
 			Assert(source->ResourcesHeld <= 655350);
-			bool is_visible = source->IsVisibleAsGoal(unit.Player);
+			bool is_visible = source->IsVisibleAsGoal(*unit.Player);
 			//
 			// Target is not dead, getting resources.
 			//
@@ -628,7 +628,7 @@ static int MoveToDepot(CUnit &unit)
 		case PF_REACHED:
 			break;
 		default:
-			if (unit.Anim.Unbreakable || goal->IsVisibleAsGoal(unit.Player)) {
+			if (unit.Anim.Unbreakable || goal->IsVisibleAsGoal(*unit.Player)) {
 				return 0;
 			}
 			break;
@@ -637,7 +637,7 @@ static int MoveToDepot(CUnit &unit)
 	//
 	// Target is dead, stop getting resources.
 	//
-	if (!goal->IsVisibleAsGoal(unit.Player)) {
+	if (!goal->IsVisibleAsGoal(*unit.Player)) {
 		DebugPrint("%d: Worker %d report: Destroyed depot\n"
 			_C_ unit.Player->Index _C_ unit.Slot);
 

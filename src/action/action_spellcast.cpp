@@ -199,7 +199,7 @@ void HandleActionSpellCast(CUnit &unit)
 			} else {
 				// FIXME: what todo, if unit/goal is removed?
 				CUnit *goal = order->GetGoal();
-				if (goal && goal != &unit && !goal->IsVisibleAsGoal(unit.Player)) {
+				if (goal && goal != &unit && !goal->IsVisibleAsGoal(*unit.Player)) {
 					unit.ReCast = 0;
 				} else {
 					unit.ReCast = SpellCast(unit, spell, goal, order->goalPos.x, order->goalPos.y);

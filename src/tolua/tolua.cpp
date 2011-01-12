@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 11/11/10 22:26:36.
+** Generated automatically by tolua++-1.0.92 on 12/16/10 17:26:53.
 */
 
 #ifndef __cplusplus
@@ -15062,7 +15062,7 @@ static int tolua_stratagus_CPlayer_IsEnemy00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"const CPlayer",0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,2,"const CPlayer",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const CPlayer",0,&tolua_err)) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
@@ -15070,12 +15070,12 @@ static int tolua_stratagus_CPlayer_IsEnemy00(lua_State* tolua_S)
 #endif
  {
   const CPlayer* self = (const CPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const CPlayer* x = ((const CPlayer*)  tolua_tousertype(tolua_S,2,0));
+  const CPlayer* player = ((const CPlayer*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsEnemy'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->IsEnemy(x);
+   bool tolua_ret = (bool)  self->IsEnemy(*player);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -15102,12 +15102,12 @@ static int tolua_stratagus_CPlayer_IsEnemy01(lua_State* tolua_S)
  else
  {
   const CPlayer* self = (const CPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const CUnit* x = ((const CUnit*)  tolua_tousertype(tolua_S,2,0));
+  const CUnit* unit = ((const CUnit*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsEnemy'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->IsEnemy(*x);
+   bool tolua_ret = (bool)  self->IsEnemy(*unit);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -15125,7 +15125,7 @@ static int tolua_stratagus_CPlayer_IsAllied00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"const CPlayer",0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,2,"const CPlayer",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const CPlayer",0,&tolua_err)) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
@@ -15133,12 +15133,12 @@ static int tolua_stratagus_CPlayer_IsAllied00(lua_State* tolua_S)
 #endif
  {
   const CPlayer* self = (const CPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const CPlayer* x = ((const CPlayer*)  tolua_tousertype(tolua_S,2,0));
+  const CPlayer* player = ((const CPlayer*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsAllied'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->IsAllied(x);
+   bool tolua_ret = (bool)  self->IsAllied(*player);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -15165,12 +15165,12 @@ static int tolua_stratagus_CPlayer_IsAllied01(lua_State* tolua_S)
  else
  {
   const CPlayer* self = (const CPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const CUnit* x = ((const CUnit*)  tolua_tousertype(tolua_S,2,0));
+  const CUnit* unit = ((const CUnit*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsAllied'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->IsAllied(*x);
+   bool tolua_ret = (bool)  self->IsAllied(*unit);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -15188,7 +15188,7 @@ static int tolua_stratagus_CPlayer_IsSharedVision00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"const CPlayer",0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,2,"const CPlayer",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const CPlayer",0,&tolua_err)) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
@@ -15196,12 +15196,12 @@ static int tolua_stratagus_CPlayer_IsSharedVision00(lua_State* tolua_S)
 #endif
  {
   const CPlayer* self = (const CPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const CPlayer* x = ((const CPlayer*)  tolua_tousertype(tolua_S,2,0));
+  const CPlayer* player = ((const CPlayer*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsSharedVision'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->IsSharedVision(x);
+   bool tolua_ret = (bool)  self->IsSharedVision(*player);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -15228,12 +15228,12 @@ static int tolua_stratagus_CPlayer_IsSharedVision01(lua_State* tolua_S)
  else
  {
   const CPlayer* self = (const CPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const CUnit* x = ((const CUnit*)  tolua_tousertype(tolua_S,2,0));
+  const CUnit* unit = ((const CUnit*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsSharedVision'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->IsSharedVision(*x);
+   bool tolua_ret = (bool)  self->IsSharedVision(*unit);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -15251,7 +15251,7 @@ static int tolua_stratagus_CPlayer_IsBothSharedVision00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"const CPlayer",0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,2,"const CPlayer",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const CPlayer",0,&tolua_err)) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
@@ -15259,12 +15259,12 @@ static int tolua_stratagus_CPlayer_IsBothSharedVision00(lua_State* tolua_S)
 #endif
  {
   const CPlayer* self = (const CPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const CPlayer* x = ((const CPlayer*)  tolua_tousertype(tolua_S,2,0));
+  const CPlayer* player = ((const CPlayer*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsBothSharedVision'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->IsBothSharedVision(x);
+   bool tolua_ret = (bool)  self->IsBothSharedVision(*player);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -15291,12 +15291,12 @@ static int tolua_stratagus_CPlayer_IsBothSharedVision01(lua_State* tolua_S)
  else
  {
   const CPlayer* self = (const CPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const CUnit* x = ((const CUnit*)  tolua_tousertype(tolua_S,2,0));
+  const CUnit* unit = ((const CUnit*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsBothSharedVision'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->IsBothSharedVision(*x);
+   bool tolua_ret = (bool)  self->IsBothSharedVision(*unit);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -15314,7 +15314,7 @@ static int tolua_stratagus_CPlayer_IsTeamed00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"const CPlayer",0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,2,"const CPlayer",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const CPlayer",0,&tolua_err)) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
@@ -15322,12 +15322,12 @@ static int tolua_stratagus_CPlayer_IsTeamed00(lua_State* tolua_S)
 #endif
  {
   const CPlayer* self = (const CPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const CPlayer* x = ((const CPlayer*)  tolua_tousertype(tolua_S,2,0));
+  const CPlayer* player = ((const CPlayer*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsTeamed'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->IsTeamed(x);
+   bool tolua_ret = (bool)  self->IsTeamed(*player);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -15354,12 +15354,12 @@ static int tolua_stratagus_CPlayer_IsTeamed01(lua_State* tolua_S)
  else
  {
   const CPlayer* self = (const CPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const CUnit* x = ((const CUnit*)  tolua_tousertype(tolua_S,2,0));
+  const CUnit* unit = ((const CUnit*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsTeamed'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->IsTeamed(*x);
+   bool tolua_ret = (bool)  self->IsTeamed(*unit);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -20415,6 +20415,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
 #if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 501
  TOLUA_API int luaopen_stratagus (lua_State* tolua_S) {
  return tolua_stratagus_open(tolua_S);
-}
+};
 #endif
 

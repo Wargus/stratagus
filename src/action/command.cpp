@@ -1142,30 +1142,24 @@ void CommandDiplomacy(int player, int state, int opponent)
 */
 void CommandSharedVision(int player, bool state, int opponent)
 {
-	//
 	// Do a real hardcore seen recount. First we unmark EVERYTHING.
-	//
 	for (int i = 0; i < NumUnits; ++i) {
 		if (!Units[i]->Destroyed) {
 			MapUnmarkUnitSight(*Units[i]);
 		}
 	}
 
-	//
 	// Compute Before and after.
-	//
-	const int before = Players[player].IsBothSharedVision(&Players[opponent]);
+	const int before = Players[player].IsBothSharedVision(Players[opponent]);
 	if (state == false) {
 		Players[player].SharedVision &= ~(1 << opponent);
 	} else {
 		Players[player].SharedVision |= (1 << opponent);
 	}
-	const int after = Players[player].IsBothSharedVision(&Players[opponent]);
+	const int after = Players[player].IsBothSharedVision(Players[opponent]);
 
 	if (before && !after) {
-		//
 		// Don't share vision anymore. Give each other explored terrain for good-bye.
-		//
 		Vec2i pos;
 		for (pos.x = 0; pos.x < Map.Info.MapWidth; ++pos.x) {
 			for (pos.y = 0; pos.y < Map.Info.MapHeight; ++pos.y) {
@@ -1187,9 +1181,7 @@ void CommandSharedVision(int player, bool state, int opponent)
 		}
 	}
 
-	//
 	// Do a real hardcore seen recount. Now we remark EVERYTHING
-	//
 	for (int i = 0; i < NumUnits; ++i) {
 		if (!Units[i]->Destroyed) {
 			MapMarkUnitSight(*Units[i]);
@@ -1204,12 +1196,10 @@ void CommandSharedVision(int player, bool state, int opponent)
 */
 void CommandQuit(int player)
 {
-	int i;
-
 	// Set player to neutral, remove allied/enemy/shared vision status
 	// If the player doesn't have any units then this is pointless?
 	Players[player].Type = PlayerNeutral;
-	for (i = 0; i < NumPlayers; ++i) {
+	for (int i = 0; i < NumPlayers; ++i) {
 		if (i != player && Players[i].Team != Players[player].Team) {
 			Players[i].Allied &= ~(1 << player);
 			Players[i].Enemy &= ~(1 << player);
@@ -1220,7 +1210,7 @@ void CommandQuit(int player)
 			CommandSharedVision(i, 0, player);
 			CommandSharedVision(player, 0, i);
 			// Remove Selection from Quit Player
-			ChangeTeamSelectedUnits(&Players[player], NULL, 0, 0);
+			ChangeTeamSelectedUnits(Players[player], NULL, 0, 0);
 		}
 	}
 

@@ -499,13 +499,14 @@ extern int ReplayRevealMap;
 //
 /// Function to (un)mark the vision table.
 #ifndef MARKER_ON_INDEX
-typedef void MapMarkerFunc(const CPlayer *player, const Vec2i &pos);
+typedef void MapMarkerFunc(const CPlayer &player, const Vec2i &pos);
 #else
-typedef void MapMarkerFunc(const CPlayer *player, const unsigned int index);
+typedef void MapMarkerFunc(const CPlayer &player, const unsigned int index);
 #endif
 
 	/// Filter map flags through fog
-extern int MapFogFilterFlags(CPlayer *player, const Vec2i &pos, int mask);
+extern int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask);
+extern int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask);
 	/// Mark a tile for normal sight
 extern MapMarkerFunc MapMarkTileSight;
 	/// Unmark a tile for normal sight
@@ -516,7 +517,7 @@ extern MapMarkerFunc MapMarkTileDetectCloak;
 extern MapMarkerFunc MapUnmarkTileDetectCloak;
 
 	/// Mark sight changes
-extern void MapSight(const CPlayer *player, const Vec2i &pos, int w,
+extern void MapSight(const CPlayer &player, const Vec2i &pos, int w,
 	int h, int range, MapMarkerFunc *marker);
 	/// Update fog of war
 extern void UpdateFogOfWarChange();
@@ -607,17 +608,17 @@ inline bool CanMoveToMask(const Vec2i &pos, int mask) {
 }
 
 	/// Handle Marking and Unmarking of radar vision
-inline void MapMarkRadar(const CPlayer *player, const Vec2i &pos, int w, int h, int range) {
+inline void MapMarkRadar(const CPlayer &player, const Vec2i &pos, int w, int h, int range) {
 	MapSight(player, pos, w, h, range, MapMarkTileRadar);
 }
-inline void MapUnmarkRadar(const CPlayer *player, const Vec2i &pos, int w, int h, int range) {
+inline void MapUnmarkRadar(const CPlayer &player, const Vec2i &pos, int w, int h, int range) {
 	MapSight(player, pos, w, h, range, MapUnmarkTileRadar);
 }
 	/// Handle Marking and Unmarking of radar vision
-inline void MapMarkRadarJammer(const CPlayer *player, const Vec2i &pos, int w, int h, int range) {
+inline void MapMarkRadarJammer(const CPlayer &player, const Vec2i &pos, int w, int h, int range) {
 	MapSight(player, pos, w, h, range, MapMarkTileRadarJammer);
 }
-inline void MapUnmarkRadarJammer(const CPlayer *player, const Vec2i &pos, int w, int h, int range) {
+inline void MapUnmarkRadarJammer(const CPlayer &player, const Vec2i &pos, int w, int h, int range) {
 	MapSight(player, pos, w, h, range, MapUnmarkTileRadarJammer);
 }
 

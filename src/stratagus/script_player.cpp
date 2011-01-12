@@ -402,7 +402,7 @@ static int CclChangeUnitsOwner(lua_State *l)
 	newp = LuaToNumber(l, 4);
 	while (n) {
 		if (table[n - 1]->Player->Index == oldp) {
-			table[n - 1]->ChangeOwner(&Players[newp]);
+			table[n - 1]->ChangeOwner(Players[newp]);
 		}
 		--n;
 	}

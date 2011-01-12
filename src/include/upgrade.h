@@ -50,14 +50,14 @@ class CUpgrade;
 ----------------------------------------------------------------------------*/
 
 	/// init upgrade/allow structures
-extern void InitUpgrades(void);
+extern void InitUpgrades();
 	/// save the upgrades
 extern void SaveUpgrades(CFile *file);
 	/// cleanup upgrade module
-extern void CleanUpgrades(void);
+extern void CleanUpgrades();
 
 	/// Register CCL features for upgrades
-extern void UpgradesCclRegister(void);
+extern void UpgradesCclRegister();
 
 /*----------------------------------------------------------------------------
 --  General/Map functions
@@ -74,13 +74,13 @@ extern int UpgradeIdByIdent(const std::string &sid);
 ----------------------------------------------------------------------------*/
 
 	/// Upgrade will be acquired
-extern void UpgradeAcquire(CPlayer *player, const CUpgrade *upgrade);
+extern void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade);
 
 /// for now it will be empty?
 /// perhaps acquired upgrade can be lost if (for example) a building is lost
 /// (lumber mill? stronghold?)
 /// this function will apply all modifiers in reverse way
-extern void UpgradeLost(CPlayer *player, int id);
+extern void UpgradeLost(CPlayer &player, int id);
 
 /*----------------------------------------------------------------------------
 --  Allow(s)
@@ -89,13 +89,13 @@ extern void UpgradeLost(CPlayer *player, int id);
 // all the following functions are just map handlers, no specific notes
 // id -- unit type id, af -- `A'llow/`F'orbid
 
-extern int UnitIdAllowed(const CPlayer *player, int id);
+extern int UnitIdAllowed(const CPlayer &player, int id);
 
-extern char UpgradeIdAllowed(const CPlayer *player, int id);
-extern char UpgradeIdentAllowed(const CPlayer *player, const std::string &ident);
+extern char UpgradeIdAllowed(const CPlayer &player, int id);
+extern char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident);
 
 	/// Check if the upgrade is researched.
-extern int UpgradeIdentAvailable(const CPlayer *player, const std::string &ident);
+extern int UpgradeIdentAvailable(const CPlayer &player, const std::string &ident);
 
 //@}
 

@@ -97,7 +97,7 @@ static int WaitForTransporter(CUnit &unit)
 		return 0;
 	}
 
-	if (!trans->IsVisibleAsGoal(unit.Player)) {
+	if (!trans->IsVisibleAsGoal(*unit.Player)) {
 		DebugPrint("Transporter Gone\n");
 		unit.CurrentOrder()->ClearGoal();
 		unit.Wait = 6;
@@ -138,7 +138,7 @@ static void EnterTransporter(CUnit &unit)
 	unit.ClearAction();
 
 	transporter = unit.CurrentOrder()->GetGoal();
-	if (!transporter->IsVisibleAsGoal(unit.Player)) {
+	if (!transporter->IsVisibleAsGoal(*unit.Player)) {
 		DebugPrint("Transporter gone\n");
 		unit.CurrentOrder()->ClearGoal();
 		return;

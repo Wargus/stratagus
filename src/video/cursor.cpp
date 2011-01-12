@@ -259,7 +259,7 @@ static void DrawBuildingCursor()
 			Uint32 color;
 
 			if (f && (ontop ||
-					CanBuildOn(posIt, MapFogFilterFlags(ThisPlayer, posIt,
+					CanBuildOn(posIt, MapFogFilterFlags(*ThisPlayer, posIt,
 						mask & ((NumSelected && Selected[0]->tilePos == posIt) ?
 								~(MapFieldLandUnit | MapFieldSeaUnit) : -1)))) &&
 					Map.IsFieldExplored(ThisPlayer, posIt)) {

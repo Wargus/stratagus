@@ -437,13 +437,13 @@ static void UiToggleTerrain(void)
 /**
 **  Find the next idle worker, select it, and center on it
 */
-static void UiFindIdleWorker(void)
+static void UiFindIdleWorker()
 {
-	CUnit *unit;
 	// FIXME: static variable, is not needed.
 	static CUnit *LastIdleWorker = NoUnitP;
 
-	unit = FindIdleWorker(ThisPlayer, LastIdleWorker);
+	CUnit *unit = FindIdleWorker(*ThisPlayer, LastIdleWorker);
+
 	if (unit != NoUnitP) {
 		LastIdleWorker = unit;
 		SelectSingleUnit(*unit);

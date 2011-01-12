@@ -317,9 +317,6 @@ bool CanBuildOn(const Vec2i &pos, int mask)
 	return (Map.Info.IsPointOnMap(pos) && !Map.CheckMask(pos, mask));
 }
 
-extern int
-MapFogFilterFlags(CPlayer *player, const unsigned int index, int mask);
-
 /**
 **  Can build unit-type at this point.
 **
@@ -364,7 +361,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 			}
 			if (player && !real) {
 				//testmask = MapFogFilterFlags(player, x + w, y + h, type.MovementMask);
-				testmask = MapFogFilterFlags(player,
+				testmask = MapFogFilterFlags(*player,
 						index + pos.x + w, type.MovementMask);
 			} else {
 				testmask = type.MovementMask;

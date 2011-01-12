@@ -855,7 +855,7 @@ public:
 	/// Add a unit inside a container. Only deal with list stuff.
 	void AddInContainer(CUnit &host);
 	/// Change owner of unit
-	void ChangeOwner(CPlayer *newplayer);
+	void ChangeOwner(CPlayer &newplayer);
 
 	/// Remove unit from map/groups/...
 	void Remove(CUnit *host);
@@ -877,12 +877,12 @@ public:
 	}
 
 	/// Returns true, if unit is directly seen by an allied unit.
-	bool IsVisible(const CPlayer *player) const;
+	bool IsVisible(const CPlayer &player) const;
 
-	inline bool IsInvisibile(const CPlayer *const player) const
+	inline bool IsInvisibile(const CPlayer &player) const
 	{
-		return ((player != Player) && !!Variable[INVISIBLE_INDEX].Value &&
-				(!player->IsBothSharedVision(Player)));
+		return ((&player != Player) && !!Variable[INVISIBLE_INDEX].Value &&
+				(!player.IsBothSharedVision(*Player)));
 	}
 
 	/**
@@ -914,19 +914,19 @@ public:
 	**
 	**  @return        True if visible, false otherwise.
 	*/
-	inline bool IsVisibleAsGoal(const CPlayer *const player) const
+	inline bool IsVisibleAsGoal(const CPlayer &player) const
 	{
 		// Invisibility
 		if (IsInvisibile(player)) {
 			return false;
 		}
-		if ((player->Type == PlayerComputer && !this->Type->PermanentCloak)
+		if ((player.Type == PlayerComputer && !this->Type->PermanentCloak)
 			|| IsVisible(player) || IsVisibleOnRadar(player)) {
 			return IsAliveOnMap();
 		} else {
 			return Type->VisibleUnderFog &&
-				(Seen.ByPlayer & (1 << player->Index)) &&
-				!(Seen.Destroyed & (1 << player->Index));
+				(Seen.ByPlayer & (1 << player.Index)) &&
+				!(Seen.Destroyed & (1 << player.Index));
 		}
 	}
 
@@ -938,7 +938,7 @@ public:
 	**
 	**  @return        True if visible, false otherwise.
 	*/
-	inline bool IsVisibleOnMap(const CPlayer *player) const
+	inline bool IsVisibleOnMap(const CPlayer &player) const
 	{
 		return IsAliveOnMap() && !IsInvisibile(player) && IsVisible(player);
 	}
@@ -947,7 +947,7 @@ public:
 	bool IsVisibleOnMinimap() const;
 
 	// Returns true if unit is visible under radar (By player, or by shared vision)
-	bool IsVisibleOnRadar(const CPlayer *pradar) const;
+	bool IsVisibleOnRadar(const CPlayer &pradar) const;
 
 	/// Returns true if unit is visible in an viewport. Only for ThisPlayer.
 	bool IsVisibleInViewport(const CViewport *vp) const;
@@ -958,15 +958,15 @@ public:
 	/// @todo more docu
 	void GetMapArea(int *sx, int *sy, int *ex, int *ey) const;
 
-	bool IsEnemy(const CPlayer *x) const;
+	bool IsEnemy(const CPlayer &player) const;
 	bool IsEnemy(const CUnit &unit) const;
-	bool IsAllied(const CPlayer *x) const;
+	bool IsAllied(const CPlayer &player) const;
 	bool IsAllied(const CUnit &unit) const;
-	bool IsSharedVision(const CPlayer *x) const;
+	bool IsSharedVision(const CPlayer &player) const;
 	bool IsSharedVision(const CUnit &unit) const;
-	bool IsBothSharedVision(const CPlayer *x) const;
+	bool IsBothSharedVision(const CPlayer &player) const;
 	bool IsBothSharedVision(const CUnit &unit) const;
-	bool IsTeamed(const CPlayer *x) const;
+	bool IsTeamed(const CPlayer &player) const;
 	bool IsTeamed(const CUnit &unit) const;
 
 	bool IsUnusable(bool ignore_built_state = false) const;
@@ -1252,21 +1252,19 @@ extern void UnitClearOrders(CUnit &unit);
 	/// @todo more docu
 extern void UpdateForNewUnit(const CUnit &unit, int upgrade);
 	/// @todo more docu
-extern void NearestOfUnit(const CUnit &unit, int tx, int ty, Vec2i *dpos);
+extern void NearestOfUnit(const CUnit &unit, const Vec2i& pos, Vec2i *dpos);
 
 	/// Call when an Unit goes under fog.
-extern void UnitGoesUnderFog(CUnit &unit, const CPlayer *player);
+extern void UnitGoesUnderFog(CUnit &unit, const CPlayer &player);
 	/// Call when an Unit goes out of fog.
-extern void UnitGoesOutOfFog(CUnit &unit, const CPlayer *player);
+extern void UnitGoesOutOfFog(CUnit &unit, const CPlayer &player);
 	/// Marks a unit as seen
-extern void UnitsOnTileMarkSeen(const CPlayer *player, int x, int y, int p);
-extern void
-UnitsOnTileMarkSeen(const CPlayer *player, 	const unsigned int index, int p);
+extern void UnitsOnTileMarkSeen(const CPlayer &player, int x, int y, int p);
+extern void UnitsOnTileMarkSeen(const CPlayer &player, unsigned int index, int p);
 
 	/// Unmarks a unit as seen
-extern void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y, int p);
-extern void
-UnitsOnTileUnmarkSeen(const CPlayer *player, const unsigned int index, int p);
+extern void UnitsOnTileUnmarkSeen(const CPlayer &player, int x, int y, int p);
+extern void UnitsOnTileUnmarkSeen(const CPlayer &player, unsigned int index, int p);
 
 	/// Does a recount for VisCount
 extern void UnitCountSeen(CUnit &unit);
@@ -1307,7 +1305,7 @@ extern CUnit *UnitFindMiningArea(const CUnit &unit, int x, int y,  int range, in
 	/// Find nearest deposit
 extern CUnit *FindDeposit(const CUnit &unit, int range, int resource);
 	/// Find the next idle worker
-extern CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last);
+extern CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last);
 
 	/// Find the neareast piece of terrain with specific flags.
 extern int FindTerrainType(int movemask, int resmask, int rvresult, int range,
@@ -1383,7 +1381,7 @@ extern void ShowOrder(const CUnit &unit);
 	/// Find all units of this type
 extern int FindUnitsByType(const CUnitType &type, CUnit **table);
 	/// Find all units of this type of the player
-extern int FindPlayerUnitsByType(const CPlayer *, const CUnitType &, CUnit **);
+extern int FindPlayerUnitsByType(const CPlayer &, const CUnitType &, CUnit **);
 	/// Return any unit on that map tile
 extern CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type);// = -1);
 	/// Return possible attack target on that map area
@@ -1447,7 +1445,7 @@ extern void UnSelectAll();
 	/// Select group as selection
 extern void ChangeSelectedUnits(CUnit **units, int num_units);
 	/// Changed TeamUnit Selection
-extern void ChangeTeamSelectedUnits(CPlayer *player, CUnit **units, int adjust, int count);
+extern void ChangeTeamSelectedUnits(CPlayer &player, CUnit **units, int adjust, int count);
 	/// Add a unit to selection
 extern int SelectUnit(CUnit &unit);
 	/// Select one unit as selection

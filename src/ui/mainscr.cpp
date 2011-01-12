@@ -467,7 +467,7 @@ void CContentTypeIcon::Draw(const CUnit &unit, CFont *) const
 	const CUnit* unitToDraw = GetUnitRef(unit, this->UnitRef);
 
 	if (unitToDraw && unitToDraw->Type->Icon.Icon) {
-		unitToDraw->Type->Icon.Icon->DrawIcon(unitToDraw->Player, this->PosX, this->PosY);
+		unitToDraw->Type->Icon.Icon->DrawIcon(*unitToDraw->Player, this->PosX, this->PosY);
 	}
 }
 
@@ -615,7 +615,7 @@ static void DrawUnitInfo(CUnit &unit)
 			x, y, "");
 	}
 
-	if (unit.Player != ThisPlayer && !ThisPlayer->IsAllied(unit.Player) )
+	if (unit.Player != ThisPlayer && !ThisPlayer->IsAllied(*unit.Player) )
 	{
 		return;
 	}
@@ -1493,7 +1493,7 @@ static void DrawInfoPanelNoneSelected()
 {
 	CUnitPtr lock(UnitUnderCursor);
 	// Check if a unit is under the cursor
-	if (lock != NULL && lock->IsVisible(ThisPlayer)) {
+	if (lock != NULL && lock->IsVisible(*ThisPlayer)) {
 		DrawUnitInfo(*lock);
 		return;
 	}

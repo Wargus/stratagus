@@ -129,9 +129,9 @@ extern void InitDependencies();
 extern void CleanDependencies();
 
 	/// Check a dependency by identifier
-extern bool CheckDependByIdent(const CPlayer *player, const std::string &target);
+extern bool CheckDependByIdent(const CPlayer &player, const std::string &target);
 	/// Check a dependency by unit type
-extern bool CheckDependByType(const CPlayer *player, const CUnitType &type);
+extern bool CheckDependByType(const CPlayer &player, const CUnitType &type);
 //@}
 
 #endif // !__DEPEND_H__

@@ -173,7 +173,7 @@ void HandleActionRepair(CUnit &unit)
 				//
 				// Check if goal is correct unit.
 				if (goal) {
-					if (!goal->IsVisibleAsGoal(unit.Player)) {
+					if (!goal->IsVisibleAsGoal(*unit.Player)) {
 						DebugPrint("repair target gone.\n");
 						unit.CurrentOrder()->goalPos = goal->tilePos;
 						// FIXME: should I clear this here?
@@ -225,7 +225,7 @@ void HandleActionRepair(CUnit &unit)
 				// Check if goal is correct unit.
 				// FIXME: should I do a function for this?
 				if (goal) {
-					if (!goal->IsVisibleAsGoal(unit.Player)) {
+					if (!goal->IsVisibleAsGoal(*unit.Player)) {
 						DebugPrint("repair goal is gone\n");
 						unit.CurrentOrder()->goalPos = goal->tilePos;
 						// FIXME: should I clear this here?

@@ -423,16 +423,11 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 static void DrawUnitOn(CUnit &unit, int red_phase)
 {
 	CUnitType *type;
-	int mx;
-	int my;
-	int w;
-	int h;
-	int h0;
 	Uint32 color;
 	SDL_Color c;
 	int bpp;
 
-	if (Editor.Running || ReplayRevealMap || unit.IsVisible(ThisPlayer)) {
+	if (Editor.Running || ReplayRevealMap || unit.IsVisible(*ThisPlayer)) {
 		type = unit.Type;
 	} else {
 		type = unit.Seen.Type;
@@ -461,13 +456,13 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 		color = unit.Player->Color;
 	}
 
-	mx = 1 + UI.Minimap.XOffset + Map2MinimapX[unit.tilePos.x];
-	my = 1 + UI.Minimap.YOffset + Map2MinimapY[unit.tilePos.y];
-	w = Map2MinimapX[type->TileWidth];
+	int mx = 1 + UI.Minimap.XOffset + Map2MinimapX[unit.tilePos.x];
+	int my = 1 + UI.Minimap.YOffset + Map2MinimapY[unit.tilePos.y];
+	int w = Map2MinimapX[type->TileWidth];
 	if (mx + w >= UI.Minimap.W) { // clip right side
 		w = UI.Minimap.W - mx;
 	}
-	h0 = Map2MinimapY[type->TileHeight];
+	int h0 = Map2MinimapY[type->TileHeight];
 	if (my + h0 >= UI.Minimap.H) { // clip bottom side
 		h0 = UI.Minimap.H - my;
 	}
@@ -476,7 +471,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 		SDL_GetRGB(color, TheScreen->format, &c.r, &c.g, &c.b);
 	}
 	while (w-- >= 0) {
-		h = h0;
+		int h = h0;
 		while (h-- >= 0) {
 			if (!UseOpenGL) {
 				if (bpp == 2) {
@@ -496,7 +491,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 /**
 **  Update the minimap with the current game information
 */
-void CMinimap::Update(void)
+void CMinimap::Update()
 {
 	static int red_phase;
 	int red_phase_changed;

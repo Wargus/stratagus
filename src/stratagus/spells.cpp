@@ -613,7 +613,7 @@ int Capture::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int, int
 		caster.Variable[KILL_INDEX].Max++;
 		caster.Variable[KILL_INDEX].Enable = 1;
 	}
-	target->ChangeOwner(caster.Player);
+	target->ChangeOwner(*caster.Player);
 	if (this->SacrificeEnable) {
 		// No corpse.
 		caster.Remove(NULL);
@@ -973,7 +973,7 @@ SpellType *SpellTypeByIdent(const std::string &ident)
 **
 **  @return          0 if spell is not available, else no null.
 */
-bool SpellIsAvailable(const CPlayer *player, int spellid)
+bool SpellIsAvailable(const CPlayer &player, int spellid)
 {
 	int dependencyId;
 	dependencyId = SpellTypeTable[spellid]->DependencyId;
@@ -1015,7 +1015,7 @@ int AutoCastSpell(CUnit &caster, const SpellType *spell)
 	Target *target;
 
 	//  Check for mana, trivial optimization.
-	if (!SpellIsAvailable(caster.Player, spell->Slot)
+	if (!SpellIsAvailable(*caster.Player, spell->Slot)
 		|| caster.Variable[MANA_INDEX].Value < spell->ManaCost) {
 		return 0;
 	}

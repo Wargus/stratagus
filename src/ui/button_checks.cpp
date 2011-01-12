@@ -88,7 +88,7 @@ bool ButtonCheckFalse(const CUnit &, const ButtonAction *)
 */
 bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction *button)
 {
-	return UpgradeIdentAllowed(unit.Player, button->AllowStr) == 'R';
+	return UpgradeIdentAllowed(*unit.Player, button->AllowStr) == 'R';
 }
 
 /**
@@ -217,7 +217,7 @@ bool ButtonCheckUpgradeTo(const CUnit &unit, const ButtonAction *button)
 	if (unit.CurrentAction() != UnitActionStill) {
 		return false;
 	}
-	return CheckDependByIdent(unit.Player, button->ValueStr);
+	return CheckDependByIdent(*unit.Player, button->ValueStr);
 }
 
 /**
@@ -249,11 +249,11 @@ bool ButtonCheckResearch(const CUnit &unit, const ButtonAction *button)
 	}
 
 	// check if allowed
-	if (!CheckDependByIdent(unit.Player, button->ValueStr)) {
+	if (!CheckDependByIdent(*unit.Player, button->ValueStr)) {
 		return false;
 	}
 	if (!strncmp(button->ValueStr.c_str(), "upgrade-", 8) &&
-			UpgradeIdentAllowed(unit.Player, button->ValueStr) != 'A') {
+			UpgradeIdentAllowed(*unit.Player, button->ValueStr) != 'A') {
 		return false;
 	}
 	return true;

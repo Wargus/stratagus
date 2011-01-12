@@ -432,9 +432,9 @@ void FireMissile(CUnit &unit)
 		// Fire to nearest point of the unit!
 		// If Firing from inside a Bunker
 		if (unit.Container) {
-			NearestOfUnit(*goal, unit.Container->tilePos.x, unit.Container->tilePos.y, &dpos);
+			NearestOfUnit(*goal, unit.Container->tilePos, &dpos);
 		} else {
-			NearestOfUnit(*goal, unit.tilePos.x, unit.tilePos.y, &dpos);
+			NearestOfUnit(*goal, unit.tilePos, &dpos);
 		}
 	} else {
 		dpos = unit.CurrentOrder()->goalPos;

@@ -54,11 +54,11 @@
 **  Check what computer units can do with magic.
 **  In fact, turn on autocast for AI.
 */
-void AiCheckMagic(void)
+void AiCheckMagic()
 {
 	const int n = AiPlayer->Player->TotalNumUnits;
 	CUnit **units = AiPlayer->Player->Units;
-	const CPlayer *player = AiPlayer->Player; /*units[0]->Player */
+	const CPlayer &player = *AiPlayer->Player; /*units[0]->Player */
 
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = *units[i];

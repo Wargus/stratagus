@@ -252,7 +252,7 @@ static void AiCheckUnits()
 	//  Look if some researches are missing.
 	n = (int)AiPlayer->ResearchRequests.size();
 	for (int i = 0; i < n; ++i) {
-		if (UpgradeIdAllowed(AiPlayer->Player, AiPlayer->ResearchRequests[i]->ID) == 'A') {
+		if (UpgradeIdAllowed(*AiPlayer->Player, AiPlayer->ResearchRequests[i]->ID) == 'A') {
 			AiAddResearchRequest(AiPlayer->ResearchRequests[i]);
 		}
 	}

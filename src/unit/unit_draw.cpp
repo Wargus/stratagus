@@ -938,7 +938,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType *type, int x, in
 	}
 
 	// FIXME: johns: ugly check here, should be removed!
-	if (unit.CurrentAction() != UnitActionDie && unit.IsVisible(ThisPlayer)) {
+	if (unit.CurrentAction() != UnitActionDie && unit.IsVisible(*ThisPlayer)) {
 		DrawDecoration(unit, type, x, y);
 	}
 }
@@ -1106,7 +1106,7 @@ void CUnit::Draw(const CViewport *vp) const
 		return;
 	}
 
-	bool IsVisible = this->IsVisible(ThisPlayer);
+	bool IsVisible = this->IsVisible(*ThisPlayer);
 
 	// Those should have been filtered. Check doesn't make sense with ReplayRevealMap
 	Assert(ReplayRevealMap || this->Type->VisibleUnderFog || IsVisible);
@@ -1211,7 +1211,7 @@ void CUnit::Draw(const CViewport *vp) const
 void CUnitDrawProxy::operator=(const CUnit *unit)
 {
 	int action = unit->CurrentAction();
-	bool IsVisible = unit->IsVisible(ThisPlayer);
+	bool IsVisible = unit->IsVisible(*ThisPlayer);
 
 	IsAlive = action != UnitActionDie;
 	Player = unit->RescuedFrom ? unit->RescuedFrom : unit->Player;
@@ -1321,8 +1321,8 @@ void CUnitDrawProxy::DrawDecorationAt(int x, int y) const
 					(!var->ShowIfNotEnable && !Variable[i].Enable) ||
 					(var->ShowOnlySelected && !Selected) ||
 					((Player != ThisPlayer) && ((Player->Type == PlayerNeutral && var->HideNeutral) ||
-					(ThisPlayer->IsEnemy(Player) && !var->ShowOpponent) ||
-					(ThisPlayer->IsAllied(Player) && var->HideAllied))) ||
+					(ThisPlayer->IsEnemy(*Player) && !var->ShowOpponent) ||
+					(ThisPlayer->IsAllied(*Player) && var->HideAllied))) ||
 					max == 0)) {
 				var->Draw(
 					x + var->OffsetX + var->OffsetXPercent * Type->TileWidth * TileSizeX / 100,
@@ -1360,9 +1360,9 @@ void CUnitDrawProxy::DrawSelectionAt(int x, int y) const
 			color = ColorYellow;
 		} else if ((Selected || (Blink & 1)) &&
 				(Player == ThisPlayer ||
-					ThisPlayer->IsTeamed(Player))) {
+					ThisPlayer->IsTeamed(*Player))) {
 			color = ColorGreen;
-		} else if (ThisPlayer->IsEnemy(Player)) {
+		} else if (ThisPlayer->IsEnemy(*Player)) {
 			color = ColorRed;
 		} else {
 			int i;
@@ -1379,7 +1379,7 @@ void CUnitDrawProxy::DrawSelectionAt(int x, int y) const
 			}
 		}
 	} else if (CursorBuilding && Type->Building &&	IsAlive &&
-		(Player == ThisPlayer || ThisPlayer->IsTeamed(Player))) {
+		(Player == ThisPlayer || ThisPlayer->IsTeamed(*Player))) {
 		// If building mark all own buildings
 		color = ColorGray;
 	} else {

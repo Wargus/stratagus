@@ -652,7 +652,7 @@ static void DrawUnitIcons()
 				return;
 			}
 			CIcon *icon = Editor.ShownUnitTypes[i]->Icon.Icon;
-			icon->DrawIcon(Players + Editor.SelectedPlayer, x, y);
+			icon->DrawIcon(Players[Editor.SelectedPlayer], x, y);
 
 			Video.DrawRectangleClip(ColorGray, x, y, icon->G->Width, icon->G->Height);
 			if (i == Editor.SelectedUnitIndex) {
@@ -1456,7 +1456,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			break;
 		case '0':
 			if (UnitUnderCursor != NULL) {
-				UnitUnderCursor->ChangeOwner(&Players[PlayerNumNeutral]);
+				UnitUnderCursor->ChangeOwner(Players[PlayerNumNeutral]);
 				UI.StatusLine.Set(_("Unit owner modified"));
 			}
 			break;
@@ -1465,7 +1465,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case '6': case '7': case '8':
 		case '9':
 			if (UnitUnderCursor != NULL && Map.Info.PlayerType[(int) key - '1'] != PlayerNobody) {
-				UnitUnderCursor->ChangeOwner(&Players[(int) key - '1']);
+				UnitUnderCursor->ChangeOwner(Players[(int) key - '1']);
 				UI.StatusLine.Set(_("Unit owner modified"));
 				UpdateMinimap = true;
 			}

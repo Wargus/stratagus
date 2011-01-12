@@ -399,16 +399,16 @@ extern std::vector<SpellType *> SpellTypeTable;
 ----------------------------------------------------------------------------*/
 
 	/// register fonction.
-extern void SpellCclRegister(void);
+extern void SpellCclRegister();
 
 	/// init spell tables
-extern void InitSpells(void);
+extern void InitSpells();
 
 	/// done spell tables
-extern void CleanSpells(void);
+extern void CleanSpells();
 
 	/// return 1 if spell is availible, 0 if not (must upgrade)
-extern bool SpellIsAvailable(const CPlayer *player, int SpellId);
+extern bool SpellIsAvailable(const CPlayer &player, int SpellId);
 
 	/// returns true if spell can be casted (enough mana, valid target)
 extern bool CanCastSpell(const CUnit &caster, const SpellType *spell,

@@ -88,9 +88,9 @@ static CGraphic *AlphaFogG;
 struct _filter_flags {
 	const CPlayer *player;
 	int fogmask;
-	_filter_flags(const CPlayer *p, int m) : player(p), fogmask(m) {}
+	_filter_flags(const CPlayer &p, int m) : player(&p), fogmask(m) {}
 	inline void operator() (const CUnit *const unit) {
-		if (!unit->IsVisibleAsGoal(player)) {
+		if (!unit->IsVisibleAsGoal(*player)) {
 			fogmask &= ~unit->Type->FieldFlags;
 		}
 	}
@@ -106,7 +106,7 @@ struct _filter_flags {
 **
 **  @return        Filtered mask after taking fog into account
 */
-int MapFogFilterFlags(CPlayer *player, const unsigned int index, int mask)
+int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask)
 {
 	_filter_flags filter(player, -1);
 	Map.Field(index)->UnitCache.for_each(filter);
@@ -114,7 +114,7 @@ int MapFogFilterFlags(CPlayer *player, const unsigned int index, int mask)
 
 }
 
-int MapFogFilterFlags(CPlayer *player, const Vec2i &pos, int mask)
+int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask)
 {
 	if (Map.Info.IsPointOnMap(pos))
 	{
@@ -130,10 +130,10 @@ int MapFogFilterFlags(CPlayer *player, const Vec2i &pos, int mask)
 **  @param x       X tile to mark.
 **  @param y       Y tile to mark.
 */
-void MapMarkTileSight(const CPlayer *player, const unsigned int index)
+void MapMarkTileSight(const CPlayer &player, const unsigned int index)
 {
-	//v = &Map.Field(x, y)->Visible[player->Index];
-	unsigned short *v = &(Map.Field(index)->Visible[player->Index]);
+	//v = &Map.Field(x, y)->Visible[player.Index];
+	unsigned short *v = &(Map.Field(index)->Visible[player.Index]);
 	if (*v == 0 || *v == 1) { // Unexplored or unseen
 		// When there is no fog only unexplored tiles are marked.
 		if (!Map.NoFogOfWar || *v == 0) {
@@ -149,7 +149,7 @@ void MapMarkTileSight(const CPlayer *player, const unsigned int index)
 	++*v;
 }
 
-void MapMarkTileSight(const CPlayer *player, const Vec2i &pos)
+void MapMarkTileSight(const CPlayer &player, const Vec2i &pos)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 	MapMarkTileSight(player, Map.getIndex(pos));
@@ -163,9 +163,9 @@ void MapMarkTileSight(const CPlayer *player, const Vec2i &pos)
 **  @param x       X tile to mark.
 **  @param y       Y tile to mark.
 */
-void MapUnmarkTileSight(const CPlayer *player, const unsigned int index)
+void MapUnmarkTileSight(const CPlayer &player, const unsigned int index)
 {
-	unsigned short *v = &(Map.Field(index)->Visible[player->Index]);
+	unsigned short *v = &(Map.Field(index)->Visible[player.Index]);
 	switch (*v) {
 		case 0:  // Unexplored
 		case 1:
@@ -187,7 +187,7 @@ void MapUnmarkTileSight(const CPlayer *player, const unsigned int index)
 	}
 }
 
-void MapUnmarkTileSight(const CPlayer *player, const Vec2i &pos)
+void MapUnmarkTileSight(const CPlayer &player, const Vec2i &pos)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 	MapUnmarkTileSight(player, Map.getIndex(pos));
@@ -201,9 +201,9 @@ void MapUnmarkTileSight(const CPlayer *player, const Vec2i &pos)
 **  @param x       X tile to mark.
 **  @param y       Y tile to mark.
 */
-void MapMarkTileDetectCloak(const CPlayer *player, const unsigned int index)
+void MapMarkTileDetectCloak(const CPlayer &player, const unsigned int index)
 {
-	unsigned char *v = &(Map.Field(index)->VisCloak[player->Index]);
+	unsigned char *v = &(Map.Field(index)->VisCloak[player.Index]);
 	if (*v == 0) {
 		UnitsOnTileMarkSeen(player, index, 1);
 	}
@@ -211,7 +211,7 @@ void MapMarkTileDetectCloak(const CPlayer *player, const unsigned int index)
 	++*v;
 }
 
-void MapMarkTileDetectCloak(const CPlayer *player, const Vec2i &pos)
+void MapMarkTileDetectCloak(const CPlayer &player, const Vec2i &pos)
 {
 	MapMarkTileDetectCloak(player, Map.getIndex(pos));
 }
@@ -225,9 +225,9 @@ void MapMarkTileDetectCloak(const CPlayer *player, const Vec2i &pos)
 **  @param y       Y tile to mark.
 */
 void
-MapUnmarkTileDetectCloak(const CPlayer *player, const unsigned int index)
+MapUnmarkTileDetectCloak(const CPlayer &player, const unsigned int index)
 {
-	unsigned char *v = &(Map.Field(index)->VisCloak[player->Index]);
+	unsigned char *v = &(Map.Field(index)->VisCloak[player.Index]);
 	Assert(*v != 0);
 	if (*v == 1) {
 		UnitsOnTileUnmarkSeen(player, index, 1);
@@ -235,7 +235,7 @@ MapUnmarkTileDetectCloak(const CPlayer *player, const unsigned int index)
 	--*v;
 }
 
-void MapUnmarkTileDetectCloak(const CPlayer *player, const Vec2i &pos)
+void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos)
 {
 	MapUnmarkTileDetectCloak(player, Map.getIndex(pos));
 }
@@ -250,7 +250,7 @@ void MapUnmarkTileDetectCloak(const CPlayer *player, const Vec2i &pos)
 **  @param range   Radius to mark.
 **  @param marker  Function to mark or unmark sight
 */
-void MapSight(const CPlayer *player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker)
+void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker)
 {
 	Vec2i mpos;
 	Vec2i c[4];
@@ -384,7 +384,7 @@ void MapSight(const CPlayer *player, const Vec2i &pos, int w, int h, int range, 
 /**
 **  Update fog of war.
 */
-void UpdateFogOfWarChange(void)
+void UpdateFogOfWarChange()
 {
 
 	DebugPrint("::UpdateFogOfWarChange\n");

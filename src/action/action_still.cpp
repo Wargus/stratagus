@@ -57,18 +57,16 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static void MapMarkTileGuard(const CPlayer *player,
-	 const unsigned int index)
+static void MapMarkTileGuard(const CPlayer &player, const unsigned int index)
 {
-	++Map.Field(index)->Guard[player->Index];
+	++Map.Field(index)->Guard[player.Index];
 }
 
 
-static void MapUnmarkTileGuard(const CPlayer *player,
-	 const unsigned int index)
+static void MapUnmarkTileGuard(const CPlayer &player, const unsigned int index)
 {
-	Assert(Map.Field(index)->Guard[player->Index] > 0);
-	--Map.Field(index)->Guard[player->Index];
+	Assert(Map.Field(index)->Guard[player.Index] > 0);
+	--Map.Field(index)->Guard[player.Index];
 }
 
 static void MapMarkUnitGuard(CUnit &unit)
@@ -76,7 +74,7 @@ static void MapMarkUnitGuard(CUnit &unit)
 	if (unit.IsAgressive() && !unit.GuardLock) {
 		if (!unit.Removed) {
 			unit.GuardLock = 1;
-			MapSight(unit.Player, unit.tilePos,
+			MapSight(*unit.Player, unit.tilePos,
 				unit.Type->TileWidth, unit.Type->TileHeight,
 				unit.GetReactRange(),
 				MapMarkTileGuard);
@@ -84,7 +82,7 @@ static void MapMarkUnitGuard(CUnit &unit)
 			CUnit *c = unit.Container;
 			if (c && c->Type->AttackFromTransporter) {
 				unit.GuardLock = 1;
-				MapSight(unit.Player, c->tilePos,
+				MapSight(*unit.Player, c->tilePos,
 					c->Type->TileWidth, c->Type->TileHeight,
 					unit.GetReactRange(), MapMarkTileGuard);
 			}
@@ -97,14 +95,14 @@ void MapUnmarkUnitGuard(CUnit &unit)
 	if (unit.IsAgressive() && unit.GuardLock) {
 		if (!unit.Removed) {
 			unit.GuardLock = 0;
-			MapSight(unit.Player, unit.tilePos,
+			MapSight(*unit.Player, unit.tilePos,
 				unit.Type->TileWidth, unit.Type->TileHeight,
 				unit.GetReactRange(), MapUnmarkTileGuard);
 		} else {
 			CUnit *c = unit.Container;
 			if (c && c->Type->AttackFromTransporter) {
 				unit.GuardLock = 0;
-				MapSight(unit.Player, c->tilePos,
+				MapSight(*unit.Player, c->tilePos,
 					c->Type->TileWidth, c->Type->TileHeight,
 					unit.GetReactRange(), MapUnmarkTileGuard);
 			}
@@ -226,7 +224,7 @@ static CUnit *UnitToRepairInRange(CUnit &unit, int range)
 		if (candidate.IsTeamed(unit) &&
 				candidate.Type->RepairHP &&
 				candidate.Variable[HP_INDEX].Value < candidate.Variable[HP_INDEX].Max &&
-				candidate.IsVisibleAsGoal(unit.Player)) {
+				candidate.IsVisibleAsGoal(*unit.Player)) {
 			return &candidate;
 		}
 	}

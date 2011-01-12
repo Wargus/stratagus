@@ -178,11 +178,11 @@ void CleanIcons(void)
 **  @param x       X display pixel position
 **  @param y       Y display pixel position
 */
-void CIcon::DrawIcon(const CPlayer *player, int x, int y) const
+void CIcon::DrawIcon(const CPlayer &player, int x, int y) const
 {
 	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(this->G);
 	if (g) {
-		g->DrawPlayerColorFrameClip(player->Index, this->Frame, x, y);
+		g->DrawPlayerColorFrameClip(player.Index, this->Frame, x, y);
 	} else {
 		this->G->DrawFrameClip(this->Frame, x, y);
 	}

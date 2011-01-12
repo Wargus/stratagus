@@ -75,7 +75,7 @@ void HandleActionFollow(CUnit &unit)
 		COrderPtr order = unit.CurrentOrder();
 		goal = order->GetGoal();
 
-		if (!goal || !goal->IsVisibleAsGoal(unit.Player)) {
+		if (!goal || !goal->IsVisibleAsGoal(*unit.Player)) {
 			DebugPrint("Goal gone\n");
 			order->ClearGoal();
 			unit.ClearAction();
@@ -197,7 +197,7 @@ void HandleActionFollow(CUnit &unit)
 	// Target destroyed?
 	//
 	goal = unit.CurrentOrder()->GetGoal();
-	if (goal && !goal->IsVisibleAsGoal(unit.Player)) {
+	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		DebugPrint("Goal gone\n");
 		unit.CurrentOrder()->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
 		unit.CurrentOrder()->ClearGoal();

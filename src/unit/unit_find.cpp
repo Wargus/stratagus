@@ -106,14 +106,14 @@ int FindUnitsByType(const CUnitType &type, CUnit **table)
 **
 **  @return        Returns the number of units found.
 */
-int FindPlayerUnitsByType(const CPlayer *player, const CUnitType &type, CUnit **table)
+int FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, CUnit **table)
 {
-	const int nunits = player->TotalNumUnits;
-	int typecount = player->UnitTypesCount[type.Slot];
+	const int nunits = player.TotalNumUnits;
+	int typecount = player.UnitTypesCount[type.Slot];
 	int num = 0;
 
 	for (int i = 0; i < nunits && typecount; ++i) {
-		CUnit *unit = player->Units[i];
+		CUnit *unit = player.Units[i];
 
 		if (unit->Type == &type) {
 			if (!unit->IsUnusable()) {
@@ -173,7 +173,7 @@ CUnit *TargetOnMap(const CUnit &source, int x1, int y1, int x2, int y2)
 	int n = Map.Select(x1, y1, x2, y2, table);
 	for (int i = 0; i < n; ++i) {
 		unit = table[i];
-		if (!unit->IsVisibleAsGoal(source.Player)) {
+		if (!unit->IsVisibleAsGoal(*source.Player)) {
 			continue;
 		}
 		type = unit->Type;
@@ -240,9 +240,9 @@ struct BestTargetFinder {
 		 best_unit(0), best_cost(INT_MAX) {};
 
 	inline void operator() (CUnit *const dest) {
-		const CPlayer *const player = attacker->Player;
+		const CPlayer &player = *attacker->Player;
 
-		if (!player->IsEnemy(*dest)) { // a friend or neutral
+		if (!player.IsEnemy(*dest)) { // a friend or neutral
 			return;
 		}
 
@@ -364,7 +364,7 @@ struct BestRangeTargetFinder {
 
 		inline void operator() (CUnit *const dest)
 		{
-			const CPlayer *const player = attacker->Player;
+			const CPlayer &player = *attacker->Player;
 
 			if (!dest->IsVisibleAsGoal(player)) {
 				dest->CacheLock = 1;
@@ -389,7 +389,7 @@ struct BestRangeTargetFinder {
 				attacker->Stats->Variables[BASICDAMAGE_INDEX].Value
 						+ attacker->Stats->Variables[PIERCINGDAMAGE_INDEX].Value;
 
-			if (!player->IsEnemy(*dest)) { // a friend or neutral
+			if (!player.IsEnemy(*dest)) { // a friend or neutral
 				dest->CacheLock = 1;
 
 				// Calc a negative cost

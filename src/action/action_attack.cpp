@@ -104,7 +104,7 @@ static int CheckForDeadGoal(CUnit &unit)
 	CUnit *goal = order->GetGoal();
 
 	// Position or valid target, it is ok.
-	if (!goal || goal->IsVisibleAsGoal(unit.Player)) {
+	if (!goal || goal->IsVisibleAsGoal(*unit.Player)) {
 		return 0;
 	}
 

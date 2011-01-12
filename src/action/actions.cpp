@@ -154,12 +154,12 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 				break;
 
 			case AnimationSound:
-				if (unit.IsVisible(ThisPlayer) || ReplayRevealMap) {
+				if (unit.IsVisible(*ThisPlayer) || ReplayRevealMap) {
 					PlayUnitSound(unit, unit.Anim.Anim->D.Sound.Sound);
 				}
 				break;
 			case AnimationRandomSound:
-				if (unit.IsVisible(ThisPlayer) || ReplayRevealMap) {
+				if (unit.IsVisible(*ThisPlayer) || ReplayRevealMap) {
 					int sound;
 					sound = SyncRand() % unit.Anim.Anim->D.RandomSound.NumSounds;
 					PlayUnitSound(unit, unit.Anim.Anim->D.RandomSound.Sound[sound]);
@@ -169,7 +169,7 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 			case AnimationAttack:
 				if (unit.CurrentAction() == UnitActionSpellCast) {
 					CUnit *goal = unit.CurrentOrder()->GetGoal();
-					if (goal &&	!goal->IsVisibleAsGoal(unit.Player)) {
+					if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 						unit.ReCast = 0;
 					} else {
 						COrderPtr order = unit.CurrentOrder();

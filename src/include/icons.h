@@ -113,7 +113,7 @@ public:
 	static CIcon *Get(const std::string &ident);
 
 	/// Draw icon
-	void DrawIcon(const CPlayer *player, int x, int y) const;
+	void DrawIcon(const CPlayer &player, int x, int y) const;
 	/// Draw icon of a unit
 	void DrawUnitIcon(const CPlayer *player, ButtonStyle *style,
 		unsigned flags, int x, int y, const std::string &text) const;

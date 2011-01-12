@@ -359,7 +359,7 @@ public:
 	// Upgrades/Allows:
 	CAllow Allow;                 /// Allowed for player
 	CUpgradeTimers UpgradeTimers; /// Timer for the upgrades
-	CUnitCache	AutoAttackTargets; /// Current know autoattack targets
+	CUnitCache AutoAttackTargets; /// Current know autoattack targets
 
 	/// Change player side
 	void SetSide(int side);
@@ -409,15 +409,15 @@ public:
 		return (Index != index && (Enemy & (1 << index)) != 0);
 	}
 
-	bool IsEnemy(const CPlayer *x) const;
+	bool IsEnemy(const CPlayer &player) const;
 	bool IsEnemy(const CUnit &unit) const;
-	bool IsAllied(const CPlayer *x) const;
+	bool IsAllied(const CPlayer &player) const;
 	bool IsAllied(const CUnit &unit) const;
-	bool IsSharedVision(const CPlayer *x) const;
+	bool IsSharedVision(const CPlayer &player) const;
 	bool IsSharedVision(const CUnit &unit) const;
-	bool IsBothSharedVision(const CPlayer *x) const;
+	bool IsBothSharedVision(const CPlayer &player) const;
 	bool IsBothSharedVision(const CUnit &unit) const;
-	bool IsTeamed(const CPlayer *x) const;
+	bool IsTeamed(const CPlayer &player) const;
 	bool IsTeamed(const CUnit &unit) const;
 };
 
@@ -547,7 +547,7 @@ extern void PlayersEachCycle();
 extern void PlayersEachSecond(int player);
 
 	/// Change current color set to new player of the sprite
-extern void GraphicPlayerPixels(CPlayer *player, const CGraphic *sprite);
+extern void GraphicPlayerPixels(CPlayer &player, const CGraphic *sprite);
 
 	/// Output debug informations for players
 extern void DebugPlayers();
@@ -561,7 +561,7 @@ extern void PlayerCclRegister();
 
 	/// Allowed to select multiple units, maybe not mine
 #define CanSelectMultipleUnits(player) \
-	((player) == ThisPlayer || ThisPlayer->IsTeamed((player)))
+	(&(player) == ThisPlayer || ThisPlayer->IsTeamed(player))
 
 //@}
 

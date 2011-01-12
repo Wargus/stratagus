@@ -140,10 +140,10 @@ void DoRightButton(int sx, int sy)
 	//  You can't select your own units + foreign unit(s)
 	//  except if it is neutral and it is a resource.
 	//
-	if (!CanSelectMultipleUnits(Selected[0]->Player)) {
+	if (!CanSelectMultipleUnits(*Selected[0]->Player)) {
 		unit = Selected[0];
 		if (unit->Player->Index != PlayerNumNeutral || dest == NULL ||
-			!(dest->Player == ThisPlayer || dest->IsTeamed(ThisPlayer))) {
+			!(dest->Player == ThisPlayer || dest->IsTeamed(*ThisPlayer))) {
 			return ;
 		}
 		// tell to go and harvest from a unit
@@ -901,7 +901,7 @@ void UIHandleMouseMove(int x, int y)
 	}
 
 	// NOTE: If unit is not selectable as a goal, you can't get a cursor hint
-	if (UnitUnderCursor != NULL && !UnitUnderCursor->IsVisibleAsGoal(ThisPlayer) &&
+	if (UnitUnderCursor != NULL && !UnitUnderCursor->IsVisibleAsGoal(*ThisPlayer) &&
 			!ReplayRevealMap) {
 		UnitUnderCursor.Reset();
 	}
@@ -941,7 +941,7 @@ void UIHandleMouseMove(int x, int y)
 		//  Map
 		//
 		if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->Decoration &&
-				(UnitUnderCursor->IsVisible(ThisPlayer) || ReplayRevealMap)) {
+				(UnitUnderCursor->IsVisible(*ThisPlayer) || ReplayRevealMap)) {
 			GameCursor = UI.Glass.Cursor;
 		}
 
@@ -2033,11 +2033,8 @@ static int GetPieUnderCursor(void)
 /**
 **  Draw Pie Menu
 */
-void DrawPieMenu(void)
+void DrawPieMenu()
 {
-	int i;
-	CViewport *vp;
-	CPlayer *player;
 	char buf[2] = "?";
 
 	if (CursorState != CursorStatePieMenu)
@@ -2048,9 +2045,8 @@ void DrawPieMenu(void)
 		return;
 	}
 	ButtonActionProxy buttons(CurrentButtons);
-
 	CLabel label(GameFont);
-	vp = UI.SelectedViewport;
+	CViewport *vp = UI.SelectedViewport;
 	PushClipping();
 	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
 
@@ -2060,15 +2056,13 @@ void DrawPieMenu(void)
 			CursorStartX - UI.PieMenu.G->Width / 2,
 			CursorStartY - UI.PieMenu.G->Height / 2);
 	}
-	player = Selected[0]->Player;
+	CPlayer &player = *Selected[0]->Player;
 
-	for (i = 0; i < (int)UI.ButtonPanel.Buttons.size() && i < 8; ++i) {
+	for (int i = 0; i < (int)UI.ButtonPanel.Buttons.size() && i < 8; ++i) {
 		if (buttons[i].Pos != -1) {
-			int x;
-			int y;
+			int x = CursorStartX - ICON_SIZE_X / 2 + UI.PieMenu.X[i];
+			int y = CursorStartY - ICON_SIZE_Y / 2 + UI.PieMenu.Y[i];
 
-			x = CursorStartX - ICON_SIZE_X / 2 + UI.PieMenu.X[i];
-			y = CursorStartY - ICON_SIZE_Y / 2 + UI.PieMenu.Y[i];
 			// Draw icon
 			buttons[i].Icon.Icon->DrawIcon(player, x, y);
 
@@ -2089,7 +2083,7 @@ void DrawPieMenu(void)
 
 	PopClipping();
 
-	i = GetPieUnderCursor();
+	int i = GetPieUnderCursor();
 	if (i != -1 && KeyState != KeyStateInput && buttons[i].Pos != -1) {
 		UpdateStatusLineForButton(&buttons[i]);
 	}
@@ -2098,7 +2092,7 @@ void DrawPieMenu(void)
 /**
 **  Handle pie menu mouse selection
 */
-static void HandlePieMenuMouseSelection(void)
+static void HandlePieMenuMouseSelection()
 {
 	if (!CurrentButtons.IsValid()) {  // no buttons
 		return;

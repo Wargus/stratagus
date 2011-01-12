@@ -695,10 +695,10 @@ static int CclUnit(lua_State *l)
 			lua_rawgeti(l, j + 1, 4);
 			h = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-			MapSight(player, pos, w, h, unit->CurrentSightRange, MapMarkTileSight);
+			MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileSight);
 			// Detectcloak works in container
 			if (unit->Type->DetectCloak) {
-				MapSight(player, pos, w, h, unit->CurrentSightRange, MapMarkTileDetectCloak);
+				MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileDetectCloak);
 			}
 			// Radar(Jammer) not.
 

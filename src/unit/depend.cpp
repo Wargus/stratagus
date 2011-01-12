@@ -191,7 +191,7 @@ static void AddDependency(const std::string &target, const std::string required,
 **
 **  @return        True if available, false otherwise.
 */
-static bool CheckDependByRule(const CPlayer *player, DependRule &rule)
+static bool CheckDependByRule(const CPlayer &player, DependRule &rule)
 {
 	const DependRule *node;
 
@@ -219,7 +219,7 @@ static bool CheckDependByRule(const CPlayer *player, DependRule &rule)
 		while (temp) {
 			switch (temp->Type) {
 				case DependRuleUnitType:
-					i = player->HaveUnitTypeByType(*temp->Kind.UnitType);
+					i = player.HaveUnitTypeByType(*temp->Kind.UnitType);
 					if (temp->Count ? i < temp->Count : i) {
 						goto try_or;
 					}
@@ -249,7 +249,7 @@ try_or:
 **
 **  @return        True if available, false otherwise.
 */
-bool CheckDependByIdent(const CPlayer *player, const std::string &target)
+bool CheckDependByIdent(const CPlayer &player, const std::string &target)
 {
 	DependRule rule;
 
@@ -287,7 +287,7 @@ bool CheckDependByIdent(const CPlayer *player, const std::string &target)
 **
 **  @return        True if available, false otherwise.
 */
-bool CheckDependByType(const CPlayer *player, const CUnitType &type)
+bool CheckDependByType(const CPlayer &player, const CUnitType &type)
 {
 	if (UnitIdAllowed(player, type.Slot) == 0) {
 		return false;
