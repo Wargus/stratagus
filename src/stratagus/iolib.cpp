@@ -566,6 +566,10 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 	// Support for graphics in default graphics dir.
 	// They could be anywhere now, but check if they haven't
 	// got full paths.
+	sprintf(buffer, "graphics/%s", file);
+	if (FindFileWithExtension(buffer, buffersize)) {
+		return buffer;
+	}
 	sprintf(buffer, "%s/graphics/%s", StratagusLibPath.c_str(), file);
 	if (FindFileWithExtension(buffer, buffersize)) {
 		return buffer;
@@ -574,6 +578,10 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 	// Support for sounds in default sounds dir.
 	// They could be anywhere now, but check if they haven't
 	// got full paths.
+	sprintf(buffer, "sounds/%s", file);
+	if (FindFileWithExtension(buffer, buffersize)) {
+		return buffer;
+	}
 	sprintf(buffer, "%s/sounds/%s", StratagusLibPath.c_str(), file);
 	if (FindFileWithExtension(buffer, buffersize)) {
 		return buffer;
