@@ -194,7 +194,6 @@ Section "${NAME}"
 
 	System::Call "msvcrt.dll::_chmod(t $\"$INSTDIR$\", i 0x01c0) i .s"
 
-
 SectionEnd
 
 ;--------------------------------
