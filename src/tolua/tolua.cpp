@@ -20415,6 +20415,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
 #if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 501
  TOLUA_API int luaopen_stratagus (lua_State* tolua_S) {
  return tolua_stratagus_open(tolua_S);
-};
+}
 #endif
 
