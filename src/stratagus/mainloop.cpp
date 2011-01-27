@@ -327,7 +327,8 @@ static void GameLogicLoop(void)
 				break;
 			case 4:
 				break;
-			case 5:
+			case 5: // forest grow
+				Map.RegenerateForest();
 				break;
 			case 6: // overtaking units
 				RescueUnits();

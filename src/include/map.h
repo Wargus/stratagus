@@ -301,6 +301,8 @@ public:
 	}
 
 
+	/// Regenerate the forest.
+	void RegenerateForest(void);
 	/// Reveal the complete map, make everything known.
 	void Reveal(void);
 	/// Save the map.
@@ -452,6 +454,10 @@ private:
 	void FixNeighbors(unsigned short type, int seen, const Vec2i &pos);
 	/// Correct the seen wood field, depending on the surrounding
 	void FixTile(unsigned short type, int seen, const Vec2i &pos);
+
+	/// Regenerate the forest.
+	void RegenerateForestTile(int x, int y);
+
 
 public:
 	CMapField *Fields;              /// fields on map
