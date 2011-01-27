@@ -713,6 +713,11 @@ public:
 	unsigned CacheLock : 1;        /// Unit is on lock by unitcache operations.
 	unsigned GuardLock : 1;        /// Unit is on lock by guard operations.
 
+	/** set to random 1..100 when MakeUnit()
+	** used for fancy buildings
+	*/
+	unsigned Rs : 8;
+
 	unsigned TeamSelected;  /// unit is selected by a team member.
 	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
 							     /// NULL if the unit was not rescued.

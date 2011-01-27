@@ -369,6 +369,7 @@ void SaveUnit(const CUnit &unit, CFile *file)
 			UnitReference(*unit.NextWorker).c_str());
 	}
 
+	file->printf(" \"rs\", %d,", unit->Rs);
 	file->printf(" \"units-boarded-count\", %d,", unit.BoardCount);
 
 	if (unit.UnitInside) {

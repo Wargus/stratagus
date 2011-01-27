@@ -303,6 +303,8 @@ void CUnit::Init(CUnitType &type)
 	Active = 1;
 	Removed = 1;
 
+	Rs = MyRand() % 100; // used for fancy buildings and others
+
 	Assert(Orders.empty());
 
 	Orders.push_back(new COrder);
@@ -459,6 +461,16 @@ CUnit *MakeUnit(CUnitType &type, CPlayer *player)
 	if (player) {
 		unit->AssignToPlayer(player);
 	}
+
+	if (type->Building) {
+		//
+		//  fancy buildings: mirror buildings (but shadows not correct)
+		//
+		if (FancyBuildings && unit->Rs > 50) {
+			unit->Frame = -unit->Frame - 1;
+		}
+	}
+
 	return unit;
 }
 
@@ -3438,6 +3450,7 @@ void CleanUnits()
 
 	UnitManager.Init();
 
+	FancyBuildings = false;
 	HelpMeLastCycle = 0;
 }
 
