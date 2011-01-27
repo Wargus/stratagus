@@ -462,7 +462,7 @@ CUnit *MakeUnit(CUnitType &type, CPlayer *player)
 		unit->AssignToPlayer(player);
 	}
 
-	if (type->Building) {
+	if (type.Building) {
 		//
 		//  fancy buildings: mirror buildings (but shadows not correct)
 		//
