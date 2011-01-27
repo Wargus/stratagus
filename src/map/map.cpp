@@ -628,11 +628,15 @@ void CMap::RegenerateForestTile(int x, int y)
 				mf->Tile = this->Tileset.BotOneTree;
 				mf->Value = 0;
 				mf->Flags |= MapFieldForest | MapFieldUnpassable;
-				if (Map.IsFieldVisible(ThisPlayer, x, y)) {
-					MarkSeenTile(x, y);
+				Vec2i pos;
+				pos.x = x;
+				pos.y = y;
+				if (Map.IsFieldVisible(ThisPlayer, pos)) {
+					MarkSeenTile(pos);
 				}
-				if (Map.IsFieldVisible(ThisPlayer, x, y - 1)) {
-					MarkSeenTile(x, y - 1);
+				pos.y = y - 1;
+				if (Map.IsFieldVisible(ThisPlayer, pos)) {
+					MarkSeenTile(pos);
 				}
 			}
 		}
