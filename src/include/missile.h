@@ -383,10 +383,10 @@ public:
 
 	/// load the graphics for a missile type
 	void LoadMissileSprite();
-	void Init(void);
-	void DrawMissileType(int frame, const Vec2i &pos) const;
+	void Init();
+	void DrawMissileType(int frame, const PixelPos &pos) const;
 	void DrawMissileType(int frame, int x, int y) const {
-		Vec2i pos = {x, y};
+		PixelPos pos = {x, y};
 
 		DrawMissileType(frame, pos);
 	}
@@ -396,7 +396,7 @@ public:
 
 	std::string Ident;         /// missile name
 	int Transparency;          /// missile transparency
-	Vec2i size;                /// missile size in pixels
+	PixelSize size;            /// missile size in pixels
 	int DrawLevel;             /// Level to draw missile at
 	int SpriteFrames;          /// number of sprite frames in graphic
 	int NumDirections;         /// number of directions missile can face
@@ -439,10 +439,10 @@ protected:
 public:
 	virtual ~Missile() {};
 
-	static Missile *Init(MissileType *mtype, const Vec2i &startPos, const Vec2i &destPos);
+	static Missile *Init(MissileType *mtype, const PixelPos &startPos, const PixelPos &destPos);
 	static Missile *Init(MissileType *mtype, int sx, int sy, int dx, int dy) {
-		Vec2i startPos = {sx, sy};
-		Vec2i destPos = {dx, dy};
+		PixelPos startPos = {sx, sy};
+		PixelPos destPos = {dx, dy};
 
 		return Init(mtype, startPos, destPos);
 	}
@@ -452,9 +452,9 @@ public:
 	void DrawMissile(const CViewport *vp) const;
 	void SaveMissile(CFile *file) const;
 
-	Vec2i source; /// Missile source position
-	Vec2i position;   /// missile pixel position
-	Vec2i destination;  /// missile pixel destination
+	PixelPos source; /// Missile source position
+	PixelPos position;   /// missile pixel position
+	PixelPos destination;  /// missile pixel destination
 	MissileType *Type;  /// missile-type pointer
 	int SpriteFrame;  /// sprite frame counter
 	int State;        /// state
@@ -585,18 +585,18 @@ extern MissileType *NewMissileTypeSlot(const std::string& ident);
 	/// Get missile-type by ident
 extern MissileType *MissileTypeByIdent(const std::string& ident);
 	/// create a missile
-extern Missile *MakeMissile(MissileType *mtype, const Vec2i &startPos, const Vec2i &destPos);
+extern Missile *MakeMissile(MissileType *mtype, const PixelPos &startPos, const PixelPos &destPos);
 inline Missile *MakeMissile(MissileType *mtype, int sx, int sy, int dx, int dy) {
-	const Vec2i startPos = {sx, sy};
-	const Vec2i destPos = {dx, dy};
+	const PixelPos startPos = {sx, sy};
+	const PixelPos destPos = {dx, dy};
 
 	return MakeMissile(mtype, startPos, destPos);
 }
 	/// create a local missile
-extern Missile *MakeLocalMissile(MissileType *mtype, const Vec2i &startPos, const Vec2i &destPos);
+extern Missile *MakeLocalMissile(MissileType *mtype, const PixelPos &startPos, const PixelPos &destPos);
 inline Missile *MakeLocalMissile(MissileType *mtype, int sx, int sy, int dx, int dy) {
-	const Vec2i startPos = {sx, sy};
-	const Vec2i destPos = {dx, dy};
+	const PixelPos startPos = {sx, sy};
+	const PixelPos destPos = {dx, dy};
 
 	return MakeLocalMissile(mtype, startPos, destPos);
 }

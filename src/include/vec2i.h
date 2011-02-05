@@ -33,93 +33,108 @@
 
 //@{
 
-class Vec2i
+template <typename T>
+class Vec2T
 {
 public:
-	short int x;
-	short int y;
+	T x;
+	T y;
 };
 
 
-inline bool operator == (const Vec2i &lhs, const Vec2i & rhs)
+template <typename T>
+inline bool operator == (const Vec2T<T> &lhs, const Vec2T<T> &rhs)
 {
 	return lhs.x == rhs.x && lhs.y == rhs.y;
 }
 
-inline bool operator != (const Vec2i &lhs, const Vec2i & rhs)
+template <typename T>
+inline bool operator != (const Vec2T<T> &lhs, const Vec2T<T> &rhs)
 {
 	return !(lhs == rhs);
 }
 
-inline const Vec2i& operator += (Vec2i &lhs, const Vec2i& rhs)
+template <typename T>
+inline const Vec2T<T>& operator += (Vec2T<T> &lhs, const Vec2T<T>& rhs)
 {
 	lhs.x += rhs.x;
 	lhs.y += rhs.y;
 	return lhs;
 }
 
-inline const Vec2i& operator -= (Vec2i &lhs, const Vec2i& rhs)
+template <typename T>
+inline const Vec2T<T>& operator -= (Vec2T<T> &lhs, const Vec2T<T> &rhs)
 {
 	lhs.x -= rhs.x;
 	lhs.y -= rhs.y;
 	return lhs;
 }
 
-inline const Vec2i& operator *= (Vec2i &lhs, int rhs)
+template <typename T>
+inline const Vec2T<T>& operator *= (Vec2T<T> &lhs, int rhs)
 {
 	lhs.x *= rhs;
 	lhs.y *= rhs;
 	return lhs;
 }
 
-inline const Vec2i& operator /= (Vec2i &lhs, int rhs)
+template <typename T>
+inline const Vec2T<T>& operator /= (Vec2T<T> &lhs, int rhs)
 {
 	lhs.x /= rhs;
 	lhs.y /= rhs;
 	return lhs;
 }
 
-inline Vec2i operator + (const Vec2i &lhs, const Vec2i& rhs)
+template <typename T>
+inline Vec2T<T> operator + (const Vec2T<T> &lhs, const Vec2T<T>& rhs)
 {
-	Vec2i res(lhs);
+	Vec2T<T> res(lhs);
 
 	res += rhs;
 	return res;
 }
 
-inline Vec2i operator - (const Vec2i &lhs, const Vec2i& rhs)
+template <typename T>
+inline Vec2T<T> operator - (const Vec2T<T> &lhs, const Vec2T<T>& rhs)
 {
-	Vec2i res(lhs);
+	Vec2T<T> res(lhs);
 
 	res -= rhs;
 	return res;
 }
 
-inline Vec2i operator * (const Vec2i &lhs, int rhs)
+template <typename T>
+inline Vec2T<T> operator * (const Vec2T<T> &lhs, int rhs)
 {
-	Vec2i res(lhs);
+	Vec2T<T> res(lhs);
 
 	res *= rhs;
 	return res;
 }
 
-inline Vec2i operator * (int lhs, const Vec2i &rhs)
+template <typename T>
+inline Vec2T<T> operator * (int lhs, const Vec2T<T> &rhs)
 {
-	Vec2i res(rhs);
+	Vec2T<T> res(rhs);
 
 	res *= lhs;
 	return res;
 }
 
-
-inline Vec2i operator / (const Vec2i &lhs, int rhs)
+template <typename T>
+inline Vec2T<T> operator / (const Vec2T<T> &lhs, int rhs)
 {
-	Vec2i res(lhs);
+	Vec2T<T> res(lhs);
 
 	res /= rhs;
 	return res;
 }
 
+typedef Vec2T<short int> Vec2i;
+typedef Vec2T<int> PixelPos;
+typedef Vec2T<int> PixelDiff;
+typedef Vec2T<int> PixelSize;
 
 //@}
 

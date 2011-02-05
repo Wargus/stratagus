@@ -36,6 +36,10 @@
 #include "unit_cache.h"
 #endif
 
+#ifndef __VEC2I_H__
+#include "vec2i.h"
+#endif
+
 //#include "vec2i.h"
 
 /*----------------------------------------------------------------------------
@@ -54,7 +58,7 @@ class CUnitType;
 class CUpgrade;
 class SpellType;
 class CAnimation;
-class Vec2i;
+
 
 /*----------------------------------------------------------------------------
 --  Variables

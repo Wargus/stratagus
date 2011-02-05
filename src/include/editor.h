@@ -37,13 +37,15 @@
 #include <string>
 #include "player.h"
 #include "icons.h"
-
+#ifndef __VEC2I_H__
+#include "vec2i.h"
+#endif
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
 class CUnitType;
-class Vec2i;
+
 
 enum EditorRunningType {
 	EditorNotRunning = 0,    /// Not Running

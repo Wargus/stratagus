@@ -170,7 +170,7 @@ Missile::Missile() :
 **
 **  @return       created missile.
 */
-Missile *Missile::Init(MissileType *mtype, const Vec2i &startPos, const Vec2i &destPos)
+Missile *Missile::Init(MissileType *mtype, const PixelPos &startPos, const PixelPos &destPos)
 {
 	Missile *missile = NULL;
 
@@ -218,7 +218,7 @@ Missile *Missile::Init(MissileType *mtype, const Vec2i &startPos, const Vec2i &d
 			missile = new MissileDeathCoil;
 			break;
 	}
-	const Vec2i halfSize = mtype->size / 2;
+	const PixelPos halfSize = mtype->size / 2;
 	missile->position = startPos - halfSize;
 	missile->destination = destPos - halfSize;
 	missile->source = missile->position;
@@ -238,7 +238,7 @@ Missile *Missile::Init(MissileType *mtype, const Vec2i &startPos, const Vec2i &d
 **
 **  @return       created missile.
 */
-Missile *MakeMissile(MissileType *mtype, const Vec2i &startPos, const Vec2i &destPos)
+Missile *MakeMissile(MissileType *mtype, const PixelPos &startPos, const PixelPos &destPos)
 {
 	Missile *missile = Missile::Init(mtype, startPos, destPos);
 
@@ -255,7 +255,7 @@ Missile *MakeMissile(MissileType *mtype, const Vec2i &startPos, const Vec2i &des
 **
 **  @return       created missile.
 */
-Missile *MakeLocalMissile(MissileType *mtype, const Vec2i &startPos, const Vec2i &destPos)
+Missile *MakeLocalMissile(MissileType *mtype, const PixelPos &startPos, const PixelPos &destPos)
 {
 	Missile *missile = Missile::Init(mtype, startPos, destPos);
 
@@ -513,7 +513,7 @@ static int MissileVisibleInViewport(const CViewport *vp, const Missile *missile)
 **  @param frame  Animation frame
 **  @param pos    Screen pixel position
 */
-void MissileType::DrawMissileType(int frame, const Vec2i &pos) const
+void MissileType::DrawMissileType(int frame, const PixelPos &pos) const
 {
 #ifdef DYNAMIC_LOAD
 	if (!this->G->IsLoaded()) {
@@ -683,7 +683,7 @@ int FindAndSortMissiles(const CViewport *vp,
 **
 **  @internal We have : SpriteFrame / (2 * (Numdirection - 1)) == DirectionToHeading / 256.
 */
-static void MissileNewHeadingFromXY(Missile &missile, const Vec2i &delta)
+static void MissileNewHeadingFromXY(Missile &missile, const PixelPos &delta)
 {
 	int neg;
 
@@ -720,7 +720,7 @@ static void MissileNewHeadingFromXY(Missile &missile, const Vec2i &delta)
 */
 static int MissileInitMove(Missile &missile)
 {
-	const Vec2i heading = missile.destination - missile.position;
+	const PixelPos heading = missile.destination - missile.position;
 
 	MissileNewHeadingFromXY(missile, heading);
 	if (!(missile.State & 1)) {
@@ -759,11 +759,11 @@ static int PointToPointMissile(Missile &missile)
 	Assert(missile.Type != NULL);
 	Assert(missile.TotalStep != 0);
 
-	const Vec2i diff = (missile.destination - missile.source);
+	const PixelPos diff = (missile.destination - missile.source);
 	missile.position = missile.source + diff * missile.CurrentStep / missile.TotalStep;
 
 	if (missile.Type->SmokeMissile && missile.CurrentStep) {
-		const Vec2i position =  missile.position + missile.Type->size / 2;
+		const PixelPos position =  missile.position + missile.Type->size / 2;
 		MakeMissile(missile.Type->SmokeMissile, position, position);
 	}
 	return 0;
@@ -792,10 +792,10 @@ static int ParabolicMissile(Missile &missile)
 		return 1;
 	}
 	Assert(missile.Type != NULL);
-	const Vec2i orig_pos = missile.position;
+	const PixelPos orig_pos = missile.position;
 	Assert(missile.TotalStep != 0);
-	const Vec2i step = (missile.destination - missile.source) * 1000 / missile.TotalStep;
-	missile.position = missile.source + step * missile.CurrentStep / 1000;
+	const PixelPos diff = (missile.destination - missile.source);
+	missile.position = missile.source + diff * missile.CurrentStep / missile.TotalStep;
 
 	Assert(k != 0);
 	z = missile.CurrentStep * (missile.TotalStep - missile.CurrentStep) / k;
@@ -804,7 +804,7 @@ static int ParabolicMissile(Missile &missile)
 	missile.position.y += z * zprojToY / 64;
 	MissileNewHeadingFromXY(missile, missile.position - orig_pos);
 	if (missile.Type->SmokeMissile && missile.CurrentStep) {
-		const Vec2i position = missile.position + missile.Type->size / 2;
+		const PixelPos position = missile.position + missile.Type->size / 2;
 		MakeMissile(missile.Type->SmokeMissile, position, position);
 	}
 	return 0;
@@ -875,18 +875,18 @@ void MissileHit(Missile *missile)
 	if (missile->Type->ImpactSound.Sound) {
 		PlayMissileSound(missile, missile->Type->ImpactSound.Sound);
 	}
-	Vec2i pos = missile->position + missile->Type->size / 2;
+	const PixelPos pixelPos = missile->position + missile->Type->size / 2;
 
 	//
 	// The impact generates a new missile.
 	//
 	if (missile->Type->ImpactMissile) {
-		MakeMissile(missile->Type->ImpactMissile, pos.x, pos.y, pos.x, pos.y);
+		MakeMissile(missile->Type->ImpactMissile, pixelPos, pixelPos);
 	}
 	if (missile->Type->ImpactParticle) {
 		missile->Type->ImpactParticle->pushPreamble();
-		missile->Type->ImpactParticle->pushInteger(pos.x);
-		missile->Type->ImpactParticle->pushInteger(pos.y);
+		missile->Type->ImpactParticle->pushInteger(pixelPos.x);
+		missile->Type->ImpactParticle->pushInteger(pixelPos.y);
 		missile->Type->ImpactParticle->run();
 	}
 
@@ -894,8 +894,7 @@ void MissileHit(Missile *missile)
 		return;
 	}
 
-	pos.x /= TileSizeX;
-	pos.y /= TileSizeY;
+	const Vec2i pos = {pixelPos.x / TileSizeX, pixelPos.y / TileSizeY};
 
 	if (!Map.Info.IsPointOnMap(pos)) {
 		// FIXME: this should handled by caller?
@@ -1126,7 +1125,7 @@ void MissileActions()
 */
 int ViewPointDistanceToMissile(const Missile *missile)
 {
-	const Vec2i pixelPos = missile->position + missile->Type->size / 2;
+	const PixelPos pixelPos = missile->position + missile->Type->size / 2;
 	const Vec2i tilePos = { pixelPos.x / TileSizeX, pixelPos.y / TileSizeY };
 
 	return ViewPointDistance(tilePos);
@@ -1400,9 +1399,9 @@ void MissilePointToPointBounce::Action()
 	this->Wait = this->Type->Sleep;
 	if (PointToPointMissile(*this)) {
 		if (this->State < 2 * this->Type->NumBounces - 1 && this->TotalStep) {
-			const Vec2i step = (this->destination - this->source) * 1024 / this->TotalStep;
+			const PixelPos step = (this->destination - this->source);
 
-			this->destination += step * ((TileSizeX + TileSizeY) * 3) / 4 / 1024;
+			this->destination += step * ((TileSizeX + TileSizeY) * 3) / 4 / this->TotalStep;
 			this->State++; // !(State & 1) to initialise
 			this->source = this->position;
 			PointToPointMissile(*this);
@@ -1625,7 +1624,7 @@ void MissileWhirlwind::Action()
 	//
 	// Center of the tornado
 	//
-	Vec2i center = this->position + this->Type->size / 2;
+	PixelPos center = this->position + this->Type->size / 2;
 	center.x = (center.x + TileSizeX / 2) / TileSizeX;
 	center.y = (center.y + TileSizeY) / TileSizeY;
 

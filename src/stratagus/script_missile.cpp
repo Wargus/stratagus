@@ -197,9 +197,9 @@ static int CclDefineMissileType(lua_State *l)
 static int CclMissile(lua_State *l)
 {
 	MissileType *type = NULL;
-	Vec2i position = {-1, -1};
-	Vec2i destination = {-1, -1};
-	Vec2i source = {-1, -1};
+	PixelPos position = {-1, -1};
+	PixelPos destination = {-1, -1};
+	PixelPos source = {-1, -1};
 	Missile *missile = NULL;
 
 	DebugPrint("FIXME: not finished\n");

@@ -1745,6 +1745,20 @@ int DirectionToHeading(const Vec2i& delta)
 }
 
 /**
+**  Convert direction to heading.
+**
+**  @param delta  Delta.
+**
+**  @return         Angle (0..255)
+*/
+int DirectionToHeading(const PixelDiff& delta)
+{
+	// code is identic for Vec2i and PixelDiff
+	Vec2i delta2 = {delta.x, delta.y};
+	return DirectionToHeading(delta2);
+}
+
+/**
 **  Update sprite frame for new heading.
 */
 void UnitUpdateHeading(CUnit &unit)

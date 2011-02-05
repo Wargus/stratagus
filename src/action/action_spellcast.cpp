@@ -110,7 +110,6 @@ static void SpellMoveToTarget(CUnit &unit)
 	goal = order->GetGoal();
 
 	if (goal && unit.MapDistanceTo(*goal) <= order->Range) {
-
 		// there is goal and it is in range
 		unit.State = 0;
 		UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos);
@@ -118,9 +117,7 @@ static void SpellMoveToTarget(CUnit &unit)
 		return;
 	} else if (!goal && unit.MapDistanceTo(order->goalPos.x, order->goalPos.y) <= order->Range) {
 		// there is no goal and target spot is in range
-		const Vec2i diag = {order->Arg1.Spell->Range, order->Arg1.Spell->Range};
-
-		UnitHeadingFromDeltaXY(unit, order->goalPos + diag - unit.tilePos);
+		UnitHeadingFromDeltaXY(unit, order->goalPos - unit.tilePos);
 		unit.SubAction++; // cast the spell
 		return;
 	} else if (err == PF_UNREACHABLE) {

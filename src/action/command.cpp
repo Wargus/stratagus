@@ -1078,7 +1078,6 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, SpellType *spe
 				order->SetGoal(dest);
 			}
 		} else {
-			order->Range = 1;
 			order->goalPos = pos;
 		}
 		order->Arg1.Spell = spell;
