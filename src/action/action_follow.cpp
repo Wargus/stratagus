@@ -139,10 +139,10 @@ void HandleActionFollow(CUnit &unit)
 				PlayGameSound(SoundForName("invisibility"), MaxSampleVolume);
 				// FIXME: MissileTypeByIdent() should be called once
 				MakeMissile(MissileTypeByIdent("missile-normal-spell"),
-					unit.tilePos.x * TileSizeX + TileSizeX / 2,
-					unit.tilePos.y * TileSizeY + TileSizeY / 2,
-					unit.tilePos.x * TileSizeX + TileSizeX / 2,
-					unit.tilePos.y * TileSizeY + TileSizeY / 2);
+					unit.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2,
+					unit.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2,
+					unit.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2,
+					unit.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2);
 #endif
 				unit.ClearAction();
 

@@ -487,8 +487,8 @@ static int CclDefineTileset(lua_State *l)
 {
 	Map.Tileset.Clear();
 
-	Map.Tileset.TileSizeX = 32;
-	Map.Tileset.TileSizeY = 32;
+	Map.Tileset.PixelTileSize.x = 32;
+	Map.Tileset.PixelTileSize.y = 32;
 
 	//
 	//  Parse the list: (still everything could be changed!)
@@ -507,10 +507,10 @@ static int CclDefineTileset(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j, 1);
-			Map.Tileset.TileSizeX = LuaToNumber(l, -1);
+			Map.Tileset.PixelTileSize.x = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, j, 2);
-			Map.Tileset.TileSizeY = LuaToNumber(l, -1);
+			Map.Tileset.PixelTileSize.y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "slots")) {
 			if (!lua_istable(l, j)) {

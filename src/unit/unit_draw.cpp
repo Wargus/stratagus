@@ -174,10 +174,10 @@ void DrawUnitSelection(const CViewport *vp, const CUnit &unit)
 
 	const CUnitType *type = unit.Type;
 	int x = vp->Map2ViewportX(unit.tilePos.x) + unit.IX +
-		type->TileWidth * TileSizeX / 2 - type->BoxWidth / 2 -
+		type->TileWidth * PixelTileSize.x / 2 - type->BoxWidth / 2 -
 		(type->Width - type->Sprite->Width) / 2;
 	int y = vp->Map2ViewportY(unit.tilePos.y) + unit.IY +
-		type->TileHeight * TileSizeY / 2 - type->BoxHeight / 2 -
+		type->TileHeight * PixelTileSize.y / 2 - type->BoxHeight / 2 -
 		(type->Height - type->Sprite->Height) / 2;
 
 	DrawSelection(color, x, y, x + type->BoxWidth, y + type->BoxHeight);
@@ -598,8 +598,8 @@ static void DrawDecoration(const CUnit &unit, const CUnitType *type, int x, int 
 				(ThisPlayer->IsAllied(unit) && (unit.Player != ThisPlayer) && var->HideAllied) ||
 				max == 0)) {
 			var->Draw(
-				x + var->OffsetX + var->OffsetXPercent * unit.Type->TileWidth * TileSizeX / 100,
-				y + var->OffsetY + var->OffsetYPercent * unit.Type->TileHeight * TileSizeY / 100,
+				x + var->OffsetX + var->OffsetXPercent * unit.Type->TileWidth * PixelTileSize.x / 100,
+				y + var->OffsetY + var->OffsetYPercent * unit.Type->TileHeight * PixelTileSize.y / 100,
 				type, unit.Variable[var->Index]);
 		}
 	}
@@ -616,9 +616,9 @@ static void DrawDecoration(const CUnit &unit, const CUnitType *type, int x, int 
 		for (groupId = 0; !(unit.GroupId & (1 << groupId)); ++groupId)
 			;
 		int width = GameFont->Width(groupId);
-		x += (unit.Type->TileWidth * TileSizeX + unit.Type->BoxWidth) / 2 - width;
+		x += (unit.Type->TileWidth * PixelTileSize.x + unit.Type->BoxWidth) / 2 - width;
 		width = GameFont->Height();
-		y += (unit.Type->TileHeight * TileSizeY + unit.Type->BoxHeight) / 2 - width;
+		y += (unit.Type->TileHeight * PixelTileSize.y + unit.Type->BoxHeight) / 2 - width;
 		CLabel(GameFont).DrawClip(x, y, groupId);
 	}
 }
@@ -639,8 +639,8 @@ void DrawShadow(const CUnitType &type, int frame, int x, int y)
 	if (!type.ShadowSprite) {
 		return;
 	}
-	x -= (type.ShadowWidth - type.TileWidth * TileSizeX) / 2;
-	y -= (type.ShadowHeight - type.TileHeight * TileSizeY) / 2;
+	x -= (type.ShadowWidth - type.TileWidth * PixelTileSize.x) / 2;
+	y -= (type.ShadowHeight - type.TileHeight * PixelTileSize.y) / 2;
 	x += type.OffsetX + type.ShadowOffsetX;
 	y += type.OffsetY + type.ShadowOffsetY;
 
@@ -677,25 +677,25 @@ static void GetOrderPosition(const CUnit &unit, const COrderPtr order, int *x, i
 	if ((goal = order->GetGoal()) && (!goal->Removed)) {
 		// Order has a goal, get it's location.
 		*x = CurrentViewport->Map2ViewportX(goal->tilePos.x) + goal->IX +
-			goal->Type->TileWidth * TileSizeX / 2;
+			goal->Type->TileWidth * PixelTileSize.x / 2;
 		*y = CurrentViewport->Map2ViewportY(goal->tilePos.y) + goal->IY +
-			goal->Type->TileHeight * TileSizeY / 2;
+			goal->Type->TileHeight * PixelTileSize.y / 2;
 	} else {
 		if (order->goalPos.x >= 0 && order->goalPos.y >= 0) {
 			// Order is for a location, show that.
-			*x = CurrentViewport->Map2ViewportX(order->goalPos.x) + TileSizeX / 2;
-			*y = CurrentViewport->Map2ViewportY(order->goalPos.y) + TileSizeY / 2;
+			*x = CurrentViewport->Map2ViewportX(order->goalPos.x) + PixelTileSize.x / 2;
+			*y = CurrentViewport->Map2ViewportY(order->goalPos.y) + PixelTileSize.y / 2;
 		} else {
 			// Some orders ignore x,y (like StandStill).
 			// Use the unit's position instead.
 			*x = CurrentViewport->Map2ViewportX(unit.tilePos.x) + unit.IX +
-				unit.Type->TileWidth * TileSizeX / 2;
+				unit.Type->TileWidth * PixelTileSize.x / 2;
 			*y = CurrentViewport->Map2ViewportY(unit.tilePos.y) + unit.IY +
-				unit.Type->TileHeight * TileSizeY / 2;
+				unit.Type->TileHeight * PixelTileSize.y / 2;
 		}
 		if (order->Action == UnitActionBuild) {
-			*x += (order->Arg1.Type->TileWidth - 1) * TileSizeX / 2;
-			*y += (order->Arg1.Type->TileHeight - 1) * TileSizeY / 2;
+			*x += (order->Arg1.Type->TileWidth - 1) * PixelTileSize.x / 2;
+			*y += (order->Arg1.Type->TileHeight - 1) * PixelTileSize.y / 2;
 		}
 	}
 }
@@ -741,8 +741,8 @@ static void ShowSingleOrder(const CUnit &unit, int x1, int y1, const COrderPtr o
 		case UnitActionPatrol:
 			Video.DrawLineClip(ColorGreen, x1, y1, x2, y2);
 			e_color = color = ColorBlue;
-			x1 = CurrentViewport->Map2ViewportX(order->Arg1.Patrol.x) + TileSizeX / 2;
-			y1 = CurrentViewport->Map2ViewportY(order->Arg1.Patrol.y) + TileSizeY / 2;
+			x1 = CurrentViewport->Map2ViewportX(order->Arg1.Patrol.x) + PixelTileSize.x / 2;
+			y1 = CurrentViewport->Map2ViewportY(order->Arg1.Patrol.y) + PixelTileSize.y / 2;
 			dest = true;
 			break;
 
@@ -752,8 +752,8 @@ static void ShowSingleOrder(const CUnit &unit, int x1, int y1, const COrderPtr o
 			break;
 
 		case UnitActionAttackGround:
-			x2 = CurrentViewport->Map2ViewportX(order->goalPos.x) + TileSizeX / 2;
-			y2 = CurrentViewport->Map2ViewportY(order->goalPos.y) + TileSizeY / 2;
+			x2 = CurrentViewport->Map2ViewportX(order->goalPos.x) + PixelTileSize.x / 2;
+			y2 = CurrentViewport->Map2ViewportY(order->goalPos.y) + PixelTileSize.y / 2;
 			// FALL THROUGH
 		case UnitActionAttack:
 			if (unit.SubAction & 2) { // Show weak targets.
@@ -855,9 +855,9 @@ void ShowOrder(const CUnit &unit)
 
 	// Get current position
 	x1 = CurrentViewport->Map2ViewportX(
-		unit.tilePos.x) + unit.IX + unit.Type->TileWidth * TileSizeX / 2;
+		unit.tilePos.x) + unit.IX + unit.Type->TileWidth * PixelTileSize.x / 2;
 	y1 = CurrentViewport->Map2ViewportY(
-		unit.tilePos.y) + unit.IY + unit.Type->TileHeight * TileSizeY / 2;
+		unit.tilePos.y) + unit.IY + unit.Type->TileHeight * PixelTileSize.y / 2;
 
 	// If the current order is cancelled show the next one
 	if (unit.OrderCount > 1 && unit.OrderFlush) {
@@ -912,9 +912,9 @@ static void DrawInformations(const CUnit &unit, const CUnitType *type, int x, in
 		if (Preference.ShowSightRange) {
 			// Radius -1 so you can see all ranges
 			Video.DrawCircleClip(ColorGreen,
-				x + type->TileWidth * TileSizeX / 2,
-				y + type->TileHeight * TileSizeY / 2,
-				((stats->Variables[SIGHTRANGE_INDEX].Max + (type->TileWidth - 1)) * TileSizeX) - 1);
+				x + type->TileWidth * PixelTileSize.x / 2,
+				y + type->TileHeight * PixelTileSize.y / 2,
+				((stats->Variables[SIGHTRANGE_INDEX].Max + (type->TileWidth - 1)) * PixelTileSize.x) - 1);
 		}
 		if (type->CanAttack) {
 			if (Preference.ShowReactionRange) {
@@ -922,17 +922,17 @@ static void DrawInformations(const CUnit &unit, const CUnitType *type, int x, in
 					type->ReactRangePerson : type->ReactRangeComputer;
 				if (r) {
 					Video.DrawCircleClip(ColorBlue,
-						x + type->TileWidth * TileSizeX / 2,
-						y + type->TileHeight * TileSizeY / 2,
-						(r + (type->TileWidth - 1)) * TileSizeX);
+						x + type->TileWidth * PixelTileSize.x / 2,
+						y + type->TileHeight * PixelTileSize.y / 2,
+						(r + (type->TileWidth - 1)) * PixelTileSize.x);
 				}
 			}
 			if (Preference.ShowAttackRange && stats->Variables[ATTACKRANGE_INDEX].Max) {
 				// Radius + 1 so you can see all ranges
 				Video.DrawCircleClip(ColorRed,
-					x + type->TileWidth * TileSizeX / 2,
-					y + type->TileHeight * TileSizeY / 2,
-					(stats->Variables[ATTACKRANGE_INDEX].Max + (type->TileWidth - 1)) * TileSizeX + 1);
+					x + type->TileWidth * PixelTileSize.x / 2,
+					y + type->TileHeight * PixelTileSize.y / 2,
+					(stats->Variables[ATTACKRANGE_INDEX].Max + (type->TileWidth - 1)) * PixelTileSize.x + 1);
 			}
 		}
 	}
@@ -980,8 +980,8 @@ void DrawUnitPlayerColor(const CUnitType *type, CGraphic *sprite,
 	}
 
 	// FIXME: move this calculation to high level.
-	x -= (type->Width - type->TileWidth * TileSizeX) / 2;
-	y -= (type->Height - type->TileHeight * TileSizeY) / 2;
+	x -= (type->Width - type->TileWidth * PixelTileSize.x) / 2;
+	y -= (type->Height - type->TileHeight * PixelTileSize.y) / 2;
 
 	if (type->Flip) {
 		if (frame < 0) {
@@ -1017,9 +1017,9 @@ static void DrawConstructionShadow(const CUnitType &type, const CConstructionFra
 {
 	if (cframe->File == ConstructionFileConstruction) {
 		if (type.Construction->ShadowSprite) {
-			x -= (type.Construction->Width - type.TileWidth * TileSizeX) / 2;
+			x -= (type.Construction->Width - type.TileWidth * PixelTileSize.x) / 2;
 			x += type.OffsetX;
-			y -= (type.Construction->Height - type.TileHeight * TileSizeY )/ 2;
+			y -= (type.Construction->Height - type.TileHeight * PixelTileSize.y )/ 2;
 			y += type.OffsetY;
 			if (frame < 0) {
 				type.Construction->ShadowSprite->DrawFrameClipX(-frame - 1, x, y);
@@ -1029,9 +1029,9 @@ static void DrawConstructionShadow(const CUnitType &type, const CConstructionFra
 		}
 	} else {
 		if (type.ShadowSprite) {
-			x -= (type.ShadowWidth - type.TileWidth * TileSizeX) / 2;
+			x -= (type.ShadowWidth - type.TileWidth * PixelTileSize.x) / 2;
 			x += type.ShadowOffsetX + type.OffsetX;
-			y -= (type.ShadowHeight - type.TileHeight * TileSizeY) / 2;
+			y -= (type.ShadowHeight - type.TileHeight * PixelTileSize.y) / 2;
 			y += type.ShadowOffsetY + type.OffsetY;
 			if (frame < 0) {
 				type.ShadowSprite->DrawFrameClipX(-frame - 1, x, y);
@@ -1191,8 +1191,8 @@ void CUnit::Draw(const CViewport *vp) const
 	if (state == 1) {
 		if (constructed) {
 			DrawConstruction(player, cframe, *type, frame,
-				x + (type->TileWidth * TileSizeX) / 2,
-				y + (type->TileHeight * TileSizeY) / 2);
+				x + (type->TileWidth * PixelTileSize.x) / 2,
+				y + (type->TileHeight * PixelTileSize.y) / 2);
 		}
 	//
 	// Draw the future unit type, if upgrading to it.
@@ -1325,8 +1325,8 @@ void CUnitDrawProxy::DrawDecorationAt(int x, int y) const
 					(ThisPlayer->IsAllied(*Player) && var->HideAllied))) ||
 					max == 0)) {
 				var->Draw(
-					x + var->OffsetX + var->OffsetXPercent * Type->TileWidth * TileSizeX / 100,
-					y + var->OffsetY + var->OffsetYPercent * Type->TileHeight * TileSizeY / 100,
+					x + var->OffsetX + var->OffsetXPercent * Type->TileWidth * PixelTileSize.x / 100,
+					y + var->OffsetY + var->OffsetYPercent * Type->TileHeight * PixelTileSize.y / 100,
 					Type, Variable[i]);
 			}
 		}
@@ -1341,9 +1341,9 @@ void CUnitDrawProxy::DrawDecorationAt(int x, int y) const
 #endif
 	 ) {
 		int width = GameFont->Width(GroupId - 1);
-		x += (Type->TileWidth * TileSizeX + Type->BoxWidth) / 2 - width;
+		x += (Type->TileWidth * PixelTileSize.x + Type->BoxWidth) / 2 - width;
 		width = GameFont->Height();
-		y += (Type->TileHeight * TileSizeY + Type->BoxHeight) / 2 - width;
+		y += (Type->TileHeight * PixelTileSize.y + Type->BoxHeight) / 2 - width;
 		CLabel(GameFont).DrawClip(x, y, GroupId - 1);
 	}
 }
@@ -1386,9 +1386,9 @@ void CUnitDrawProxy::DrawSelectionAt(int x, int y) const
 		return;
 	}
 
-	int xx = x + Type->TileWidth * TileSizeX / 2 - Type->BoxWidth / 2 -
+	int xx = x + Type->TileWidth * PixelTileSize.x / 2 - Type->BoxWidth / 2 -
 		(Type->Width - Type->Sprite->Width) / 2;
-	int yy = y + Type->TileHeight * TileSizeY / 2 - Type->BoxHeight / 2 -
+	int yy = y + Type->TileHeight * PixelTileSize.y / 2 - Type->BoxHeight / 2 -
 		(Type->Height - Type->Sprite->Height) / 2;
 
 	DrawSelection(color, xx, yy, xx + Type->BoxWidth, yy + Type->BoxHeight);
@@ -1438,8 +1438,8 @@ void CUnitDrawProxy::Draw(const CViewport *vp) const
 	if (state == 1) {
 		if (cframe) {
 			DrawConstruction(Player->Index, cframe, *Type, frame,
-				x + (Type->TileWidth * TileSizeX) / 2,
-				y + (Type->TileHeight * TileSizeY) / 2);
+				x + (Type->TileWidth * PixelTileSize.x) / 2,
+				y + (Type->TileHeight * PixelTileSize.y) / 2);
 		}
 	//
 	// Draw the future unit type, if upgrading to it.
@@ -1476,8 +1476,8 @@ static inline bool DrawLevelCompare(const CUnit*c1, const CUnit*c2)
 		// diffpos compares unit's Y positions (bottom of sprite) on the map
 		// and uses X position in case Y positions are equal.
 		// FIXME: Use BoxHeight?
-		const int pos1 = (c1->tilePos.y * TileSizeY + c1->IY + c1->Type->Height);
-		const int pos2 = (c2->tilePos.y * TileSizeY + c2->IY + c2->Type->Height);
+		const int pos1 = (c1->tilePos.y * PixelTileSize.y + c1->IY + c1->Type->Height);
+		const int pos2 = (c2->tilePos.y * PixelTileSize.y + c2->IY + c2->Type->Height);
 		return pos1 == pos2 ?
 			(c1->tilePos.x - c2->tilePos.x ? c1->tilePos.x < c2->tilePos.x : c1->Slot < c2->Slot) : pos1 < pos2;
 	} else {

@@ -120,7 +120,7 @@ void DoRightButton(int sx, int sy)
 		return;
 	}
 
-	const Vec2i pos = {sx / TileSizeX, sy / TileSizeY};
+	const Vec2i pos = {sx / PixelTileSize.x, sy / PixelTileSize.y};
 
 	//
 	//  Right mouse with SHIFT appends command to old commands.
@@ -868,10 +868,10 @@ void UIHandleMouseMove(int x, int y)
 	// Restrict mouse to minimap when dragging
 	if (OldCursorOn == CursorOnMinimap && CursorOn != CursorOnMinimap &&
 			(MouseButtons & LeftButton)) {
+		const Vec2i cursorPos = {UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY)};
+
 		RestrictCursorToMinimap();
-		UI.SelectedViewport->Center(
-			UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY),
-			TileSizeX / 2, TileSizeY / 2);
+		UI.SelectedViewport->Center(cursorPos, PixelTileSize / 2);
 		return;
 	}
 
@@ -889,8 +889,8 @@ void UIHandleMouseMove(int x, int y)
 		const Vec2i tilePos = {vp->Viewport2MapX(x), vp->Viewport2MapY(y)};
 
 		if (Map.IsFieldExplored(ThisPlayer, tilePos) || ReplayRevealMap) {
-			UnitUnderCursor = UnitOnScreen(NULL, x - vp->X + vp->MapX * TileSizeX + vp->OffsetX,
-				y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY);
+			UnitUnderCursor = UnitOnScreen(NULL, x - vp->X + vp->MapX * PixelTileSize.x + vp->OffsetX,
+				y - vp->Y + vp->MapY * PixelTileSize.y + vp->OffsetY);
 		}
 	} else if (CursorOn == CursorOnMinimap) {
 		const Vec2i tilePos = {UI.Minimap.Screen2MapX(x), UI.Minimap.Screen2MapY(y)};
@@ -921,12 +921,11 @@ void UIHandleMouseMove(int x, int y)
 				}
 			}
 			if (CursorOn == CursorOnMinimap && (MouseButtons & RightButton)) {
+				const Vec2i cursorPos = {UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY)};
 				//
 				//  Minimap move viewpoint
 				//
-				UI.SelectedViewport->Center(
-					UI.Minimap.Screen2MapX(CursorX),
-					UI.Minimap.Screen2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
+				UI.SelectedViewport->Center(cursorPos, PixelTileSize / 2);
 			}
 		}
 		// FIXME: must move minimap if right button is down !
@@ -952,9 +951,9 @@ void UIHandleMouseMove(int x, int y)
 		//
 		//  Minimap move viewpoint
 		//
-		UI.SelectedViewport->Center(
-			UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY),
-			TileSizeX / 2, TileSizeY / 2);
+		const Vec2i cursorPos = {UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY)};
+
+		UI.SelectedViewport->Center(cursorPos, PixelTileSize / 2);
 		CursorStartX = CursorX;
 		CursorStartY = CursorY;
 		return;
@@ -982,7 +981,7 @@ static int SendRepair(int sx, int sy)
 			CUnit *unit = Selected[i];
 
 			if (unit->Type->RepairRange) {
-				const Vec2i tilePos = {sx / TileSizeX, sy / TileSizeY};
+				const Vec2i tilePos = {sx / PixelTileSize.x, sy / PixelTileSize.y};
 				const int flush = !(KeyModifiers & ModifierShift);
 
 				SendCommandRepair(*unit, tilePos, dest, flush);
@@ -1026,7 +1025,7 @@ static int SendMove(int sx, int sy)
 		transporter = NULL;
 	}
 
-	const Vec2i tilePos = {sx / TileSizeX, sy / TileSizeY};
+	const Vec2i tilePos = {sx / PixelTileSize.x, sy / PixelTileSize.y};
 	const int flush = !(KeyModifiers & ModifierShift);
 
 	for (int i = 0; i < NumSelected; ++i) {
@@ -1063,7 +1062,7 @@ static int SendMove(int sx, int sy)
 */
 static int SendAttack(int sx, int sy)
 {
-	const Vec2i tilePos = {sx / TileSizeX, sy / TileSizeY};
+	const Vec2i tilePos = {sx / PixelTileSize.x, sy / PixelTileSize.y};
 	const int flush = !(KeyModifiers & ModifierShift);
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
@@ -1100,7 +1099,7 @@ static int SendAttack(int sx, int sy)
 */
 static int SendAttackGround(int sx, int sy)
 {
-	const Vec2i tilePos = {sx / TileSizeX, sy / TileSizeY};
+	const Vec2i tilePos = {sx / PixelTileSize.x, sy / PixelTileSize.y};
 	const int flush = !(KeyModifiers & ModifierShift);
 	int ret = 0;
 
@@ -1125,7 +1124,7 @@ static int SendAttackGround(int sx, int sy)
 */
 static int SendPatrol(int sx, int sy)
 {
-	const Vec2i tilePos = {sx / TileSizeX, sy / TileSizeY};
+	const Vec2i tilePos = {sx / PixelTileSize.x, sy / PixelTileSize.y};
 	const int flush = !(KeyModifiers & ModifierShift);
 
 	int ret = 0;
@@ -1151,7 +1150,7 @@ static int SendResource(int sx, int sy)
 	int res;
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
-	const Vec2i pos = {sx / TileSizeX, sy / TileSizeY};
+	const Vec2i pos = {sx / PixelTileSize.x, sy / PixelTileSize.y};
 	const int flush = !(KeyModifiers & ModifierShift);
 
 	for (int i = 0; i < NumSelected; ++i) {
@@ -1216,7 +1215,7 @@ static int SendResource(int sx, int sy)
 */
 static int SendUnload(int sx, int sy)
 {
-	const Vec2i tilePos = {sx / TileSizeX, sy / TileSizeY};
+	const Vec2i tilePos = {sx / PixelTileSize.x, sy / PixelTileSize.y};
 	const int flush = !(KeyModifiers & ModifierShift);
 	int ret = 0;
 
@@ -1242,7 +1241,7 @@ static int SendUnload(int sx, int sy)
 */
 static int SendSpellCast(int sx, int sy)
 {
-	const Vec2i tilePos = {sx / TileSizeX, sy / TileSizeY};
+	const Vec2i tilePos = {sx / PixelTileSize.x, sy / PixelTileSize.y};
 	const int flush = !(KeyModifiers & ModifierShift);
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
@@ -1409,13 +1408,13 @@ static void UISelectStateButtonDown(unsigned)
 		if (MouseButtons & LeftButton) {
 			const CViewport *vp = UI.MouseViewport;
 			if (!ClickMissile.empty()) {
-				int mx = vp->MapX * TileSizeX + CursorX - vp->X + vp->OffsetX;
-				int my = vp->MapY * TileSizeY + CursorY - vp->Y + vp->OffsetY;
+				int mx = vp->MapX * PixelTileSize.x + CursorX - vp->X + vp->OffsetX;
+				int my = vp->MapY * PixelTileSize.y + CursorY - vp->Y + vp->OffsetY;
 				MakeLocalMissile(MissileTypeByIdent(ClickMissile),
 					mx, my, mx, my);
 			}
-			int sx = CursorX - vp->X + TileSizeX * vp->MapX + vp->OffsetX;
-			int sy = CursorY - vp->Y + TileSizeY * vp->MapY + vp->OffsetY;
+			int sx = CursorX - vp->X + PixelTileSize.x * vp->MapX + vp->OffsetX;
+			int sy = CursorY - vp->Y + PixelTileSize.y * vp->MapY + vp->OffsetY;
 			SendCommand(sx, sy);
 		}
 		return;
@@ -1429,8 +1428,8 @@ static void UISelectStateButtonDown(unsigned)
 		int my = UI.Minimap.Screen2MapY(CursorY);
 
 		if (MouseButtons & LeftButton) {
-			int sx = mx * TileSizeX;
-			int sy = my * TileSizeY;
+			int sx = mx * PixelTileSize.x;
+			int sy = my * PixelTileSize.y;
 			UI.StatusLine.Clear();
 			ClearCosts();
 			CursorState = CursorStatePoint;
@@ -1439,11 +1438,13 @@ static void UISelectStateButtonDown(unsigned)
 			UI.ButtonPanel.Update();
 			if (!ClickMissile.empty()) {
 				MakeLocalMissile(MissileTypeByIdent(ClickMissile),
-					sx + TileSizeX / 2, sy + TileSizeY / 2, 0, 0);
+					sx + PixelTileSize.x / 2, sy + PixelTileSize.y / 2, 0, 0);
 			}
 			SendCommand(sx, sy);
 		} else {
-			UI.SelectedViewport->Center(mx, my, TileSizeX / 2, TileSizeY / 2);
+			const Vec2i cursorPos = {mx, my};
+
+			UI.SelectedViewport->Center(cursorPos, PixelTileSize / 2);
 		}
 		return;
 	}
@@ -1627,21 +1628,21 @@ void UIHandleButtonDown(unsigned button)
 				} else { // if not not click on building -- green cross
 					if (!ClickMissile.empty()) {
 						MakeLocalMissile(MissileTypeByIdent(ClickMissile),
-							UI.MouseViewport->MapX * TileSizeX +
+							UI.MouseViewport->MapX * PixelTileSize.x +
 								CursorX - UI.MouseViewport->X + UI.MouseViewport->OffsetX,
-							UI.MouseViewport->MapY * TileSizeY +
+							UI.MouseViewport->MapY * PixelTileSize.y +
 								CursorY - UI.MouseViewport->Y + UI.MouseViewport->OffsetY, 0, 0);
 					}
 				}
-				DoRightButton(tilePos.x * TileSizeX, tilePos.y * TileSizeY);
+				DoRightButton(tilePos.x * PixelTileSize.x, tilePos.y * PixelTileSize.y);
 			}
 		} else if (MouseButtons & LeftButton) { // enter select mode
 			CursorStartX = CursorX;
 			CursorStartY = CursorY;
 			CursorStartScrMapX = CursorStartX - UI.MouseViewport->X +
-				TileSizeX * UI.MouseViewport->MapX + UI.MouseViewport->OffsetX;
+				PixelTileSize.x * UI.MouseViewport->MapX + UI.MouseViewport->OffsetX;
 			CursorStartScrMapY = CursorStartY - UI.MouseViewport->Y +
-				TileSizeY * UI.MouseViewport->MapY + UI.MouseViewport->OffsetY;
+				PixelTileSize.y * UI.MouseViewport->MapY + UI.MouseViewport->OffsetY;
 			GameCursor = UI.Cross.Cursor;
 			CursorState = CursorStateRectangle;
 		} else if (MouseButtons & MiddleButton) {// enter move map mode
@@ -1654,19 +1655,19 @@ void UIHandleButtonDown(unsigned button)
 	//
 	} else if (CursorOn == CursorOnMinimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
-			UI.SelectedViewport->Center(
-				UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY),
-				TileSizeX / 2, TileSizeY / 2);
+			const Vec2i cursorPos = {UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY)};
+
+			UI.SelectedViewport->Center(cursorPos, PixelTileSize / 2);
 		} else if (MouseButtons & RightButton) {
 			if (!GameObserve && !GamePaused) {
 				if (!ClickMissile.empty()) {
 					MakeLocalMissile(MissileTypeByIdent(ClickMissile),
-						UI.Minimap.Screen2MapX(CursorX) * TileSizeX + TileSizeX / 2,
-						UI.Minimap.Screen2MapY(CursorY) * TileSizeY + TileSizeY / 2, 0, 0);
+						UI.Minimap.Screen2MapX(CursorX) * PixelTileSize.x + PixelTileSize.x / 2,
+						UI.Minimap.Screen2MapY(CursorY) * PixelTileSize.y + PixelTileSize.y / 2, 0, 0);
 				}
 				// DoRightButton() takes screen map coordinates
-				DoRightButton(UI.Minimap.Screen2MapX(CursorX) * TileSizeX,
-					UI.Minimap.Screen2MapY(CursorY) * TileSizeY);
+				DoRightButton(UI.Minimap.Screen2MapX(CursorX) * PixelTileSize.x,
+					UI.Minimap.Screen2MapY(CursorY) * PixelTileSize.y);
 			}
 		}
 	//
@@ -1701,10 +1702,11 @@ void UIHandleButtonDown(unsigned button)
 				//  clicked on single unit shown
 				//
 				if (ButtonUnderCursor == 0 && NumSelected == 1) {
+					const PixelPos offset = {Selected[0]->IX + PixelTileSize.x / 2,
+						Selected[0]->IY + PixelTileSize.y / 2};
+
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-					UI.SelectedViewport->Center(Selected[0]->tilePos.x,
-						Selected[0]->tilePos.y, Selected[0]->IX + TileSizeX / 2,
-						Selected[0]->IY + TileSizeY / 2);
+					UI.SelectedViewport->Center(Selected[0]->tilePos, offset);
 				}
 			//
 			//  clicked on training button
@@ -1881,9 +1883,9 @@ void UIHandleButtonUp(unsigned button)
 			int x0 = CursorStartScrMapX;
 			int y0 = CursorStartScrMapY;
 			int x1 = CursorX - UI.MouseViewport->X +
-				UI.MouseViewport->MapX * TileSizeX + UI.MouseViewport->OffsetX;
+				UI.MouseViewport->MapX * PixelTileSize.x + UI.MouseViewport->OffsetX;
 			int y1 = CursorY - UI.MouseViewport->Y +
-				UI.MouseViewport->MapY * TileSizeY + UI.MouseViewport->OffsetY;
+				UI.MouseViewport->MapY * PixelTileSize.y + UI.MouseViewport->OffsetY;
 
 			if (x0 > x1) {
 				std::swap(x0, x1);
@@ -1923,8 +1925,8 @@ void UIHandleButtonUp(unsigned button)
 			const Vec2i cursorTilePos = {UI.MouseViewport->Viewport2MapX(CursorX),
 										UI.MouseViewport->Viewport2MapY(CursorY)};
 			if (Map.IsFieldVisible(ThisPlayer, cursorTilePos) || ReplayRevealMap) {
-				int pixelposx = CursorX - UI.MouseViewport->X + UI.MouseViewport->MapX * TileSizeX + UI.MouseViewport->OffsetX;
-				int pixelposy = CursorY - UI.MouseViewport->Y + UI.MouseViewport->MapY * TileSizeY + UI.MouseViewport->OffsetY;
+				int pixelposx = CursorX - UI.MouseViewport->X + UI.MouseViewport->MapX * PixelTileSize.x + UI.MouseViewport->OffsetX;
+				int pixelposy = CursorY - UI.MouseViewport->Y + UI.MouseViewport->MapY * PixelTileSize.y + UI.MouseViewport->OffsetY;
 
 				unit = UnitOnScreen(unit, pixelposx, pixelposy);
 			}

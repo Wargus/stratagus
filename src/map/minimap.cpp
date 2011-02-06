@@ -242,7 +242,7 @@ void CMinimap::UpdateTerrain(void)
 		}
 	}
 
-	tilepitch = Map.TileGraphic->Surface->w / TileSizeX;
+	tilepitch = Map.TileGraphic->Surface->w / PixelTileSize.x;
 
 	if (!UseOpenGL) {
 		SDL_LockSurface(MinimapTerrainSurface);
@@ -260,8 +260,8 @@ void CMinimap::UpdateTerrain(void)
 
 			tile = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].Tile;
 
-			xofs = TileSizeX * (tile % tilepitch);
-			yofs = TileSizeY * (tile / tilepitch);
+			xofs = PixelTileSize.x * (tile % tilepitch);
+			yofs = PixelTileSize.y * (tile / tilepitch);
 
 			if (!UseOpenGL) {
 				if (bpp == 1) {
@@ -334,7 +334,7 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 		scaley = 1;
 	}
 
-	const int tilepitch = Map.TileGraphic->Surface->w / TileSizeX;
+	const int tilepitch = Map.TileGraphic->Surface->w / PixelTileSize.x;
 	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
 
 	//
@@ -371,8 +371,8 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 				tile = Map.Fields[x + y].Tile;
 			}
 
-			const int xofs = TileSizeX * (tile % tilepitch);
-			const int yofs = TileSizeY * (tile / tilepitch);
+			const int xofs = PixelTileSize.x * (tile % tilepitch);
+			const int yofs = PixelTileSize.y * (tile / tilepitch);
 
 			if (!UseOpenGL) {
 				if (bpp == 1) {

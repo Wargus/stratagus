@@ -177,7 +177,7 @@ static void UiCenterOnGroup(unsigned group, GroupSelectionMode mode = SELECTABLE
 			}
 		}
 		if (pos.x != -1) {
-			UI.SelectedViewport->Center(pos.x, pos.y, TileSizeX / 2, TileSizeY / 2);
+			UI.SelectedViewport->Center(pos, PixelTileSize / 2);
 		}
 	}
 }
@@ -395,7 +395,7 @@ static void UiCenterOnSelected(void)
 		while (n--) {
 			pos += (Selected[n]->tilePos - pos) / 2;
 		}
-		UI.SelectedViewport->Center(pos.x, pos.y, TileSizeX / 2, TileSizeY / 2);
+		UI.SelectedViewport->Center(pos, PixelTileSize / 2);
 	}
 }
 
@@ -418,7 +418,7 @@ static void UiSaveMapPosition(unsigned position)
 static void UiRecallMapPosition(unsigned position)
 {
 	UI.SelectedViewport->Set(
-		SavedMapPositionX[position], SavedMapPositionY[position], TileSizeX / 2, TileSizeY / 2);
+		SavedMapPositionX[position], SavedMapPositionY[position], PixelTileSize.x / 2, PixelTileSize.y / 2);
 }
 
 /**
@@ -452,7 +452,7 @@ static void UiFindIdleWorker()
 		CurrentButtonLevel = 0;
 		PlayUnitSound(*Selected[0], VoiceSelected);
 		SelectionChanged();
-		UI.SelectedViewport->Center(unit->tilePos.x, unit->tilePos.y, TileSizeX / 2, TileSizeY / 2);
+		UI.SelectedViewport->Center(unit->tilePos, PixelTileSize / 2);
 	}
 }
 

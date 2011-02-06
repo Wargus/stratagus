@@ -1417,13 +1417,13 @@ bool CUnit::IsVisibleInViewport(const CViewport *vp) const
 	//
 	// Check if the graphic is inside the viewport.
 	//
-	int x = tilePos.x * TileSizeX + IX - (Type->Width - Type->TileWidth * TileSizeX) / 2 + Type->OffsetX;
-	int y = tilePos.y * TileSizeY + IY - (Type->Height - Type->TileHeight * TileSizeY) / 2 + Type->OffsetY;
+	int x = tilePos.x * PixelTileSize.x + IX - (Type->Width - Type->TileWidth * PixelTileSize.x) / 2 + Type->OffsetX;
+	int y = tilePos.y * PixelTileSize.y + IY - (Type->Height - Type->TileHeight * PixelTileSize.y) / 2 + Type->OffsetY;
 
-	if (x + Type->Width < vp->MapX * TileSizeX + vp->OffsetX ||
-			x > vp->MapX * TileSizeX + vp->OffsetX + (vp->EndX - vp->X) ||
-			y + Type->Height < vp->MapY * TileSizeY + vp->OffsetY ||
-			y > vp->MapY * TileSizeY + vp->OffsetY + (vp->EndY - vp->Y))
+	if (x + Type->Width < vp->MapX * PixelTileSize.x + vp->OffsetX ||
+			x > vp->MapX * PixelTileSize.x + vp->OffsetX + (vp->EndX - vp->X) ||
+			y + Type->Height < vp->MapY * PixelTileSize.y + vp->OffsetY ||
+			y > vp->MapY * PixelTileSize.y + vp->OffsetY + (vp->EndY - vp->Y))
 	{
 		return false;
 	}
@@ -2687,10 +2687,10 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 		//
 		// Check if mouse is over the unit.
 		//
-		gx = unit->tilePos.x * TileSizeX + unit->IX;
+		gx = unit->tilePos.x * PixelTileSize.x + unit->IX;
 
 		{
-			const int local_width = type->TileWidth * TileSizeX;
+			const int local_width = type->TileWidth * PixelTileSize.x;
 			if (x + (type->BoxWidth - local_width) / 2 < gx) {
 				continue;
 			}
@@ -2699,9 +2699,9 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 			}
 		}
 
-		gy = unit->tilePos.y * TileSizeY + unit->IY;
+		gy = unit->tilePos.y * PixelTileSize.y + unit->IY;
 		{
-			const int local_height = type->TileHeight * TileSizeY;
+			const int local_height = type->TileHeight * PixelTileSize.y;
 			if (y + (type->BoxHeight - local_height) / 2 < gy) {
 				continue;
 			}
@@ -2758,16 +2758,16 @@ void LetUnitDie(CUnit &unit)
 	//
 	if (type->ExplodeWhenKilled) {
 		MakeMissile(type->Explosion.Missile,
-			unit.tilePos.x * TileSizeX + type->TileWidth * TileSizeX / 2,
-			unit.tilePos.y * TileSizeY + type->TileHeight * TileSizeY / 2,
+			unit.tilePos.x * PixelTileSize.x + type->TileWidth * PixelTileSize.x / 2,
+			unit.tilePos.y * PixelTileSize.y + type->TileHeight * PixelTileSize.y / 2,
 			0, 0);
 	}
 	if (type->DeathExplosion) {
 		type->DeathExplosion->pushPreamble();
-		type->DeathExplosion->pushInteger(unit.tilePos.x * TileSizeX +
-				type->TileWidth * TileSizeX / 2);
-		type->DeathExplosion->pushInteger(unit.tilePos.y * TileSizeY +
-				type->TileHeight * TileSizeY / 2);
+		type->DeathExplosion->pushInteger(unit.tilePos.x * PixelTileSize.x +
+				type->TileWidth * PixelTileSize.x / 2);
+		type->DeathExplosion->pushInteger(unit.tilePos.y * PixelTileSize.y +
+				type->TileHeight * PixelTileSize.y / 2);
 		type->DeathExplosion->run();
 	}
 	// Handle Teleporter Destination Removal
@@ -2991,10 +2991,10 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 
 	if ((target.IsVisibleOnMap(*ThisPlayer) || ReplayRevealMap) && !DamageMissile.empty()) {
 		MakeLocalMissile(MissileTypeByIdent(DamageMissile),
-				target.tilePos.x * TileSizeX + target.Type->TileWidth * TileSizeX / 2,
-				target.tilePos.y * TileSizeY + target.Type->TileHeight * TileSizeY / 2,
-				target.tilePos.x * TileSizeX + target.Type->TileWidth * TileSizeX / 2 + 3,
-				target.tilePos.y * TileSizeY + target.Type->TileHeight * TileSizeY / 2 -
+				target.tilePos.x * PixelTileSize.x + target.Type->TileWidth * PixelTileSize.x / 2,
+				target.tilePos.y * PixelTileSize.y + target.Type->TileHeight * PixelTileSize.y / 2,
+				target.tilePos.x * PixelTileSize.x + target.Type->TileWidth * PixelTileSize.x / 2 + 3,
+				target.tilePos.y * PixelTileSize.y + target.Type->TileHeight * PixelTileSize.y / 2 -
 					MissileTypeByIdent(DamageMissile)->Range)->Damage = -damage;
 	}
 
@@ -3002,13 +3002,13 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 	// FIXME: want to show hits.
 	if (type.Organic) {
 		MakeMissile(MissileBlood,
-			target.tilePos.x * TileSizeX + TileSizeX / 2,
-			target.tilePos.y * TileSizeY + TileSizeY / 2, 0, 0);
+			target.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2,
+			target.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2, 0, 0);
 	}
 	if (type.Building) {
 		MakeMissile(MissileSmallFire,
-			target.tilePos.x * TileSizeX + (type->TileWidth * TileSizeX) / 2,
-			target.tilePos.y * TileSizeY + (type->TileHeight * TileSizeY) / 2, 0, 0);
+			target.tilePos.x * PixelTileSize.x + (type->TileWidth * PixelTileSize.x) / 2,
+			target.tilePos.y * PixelTileSize.y + (type->TileHeight * PixelTileSize.y) / 2, 0, 0);
 	}
 #endif
 
@@ -3021,8 +3021,8 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		fire = MissileBurningBuilding(f);
 		if (fire) {
 			missile = MakeMissile(fire,
-				target.tilePos.x * TileSizeX + (type->TileWidth * TileSizeX) / 2,
-				target.tilePos.y * TileSizeY + (type->TileHeight * TileSizeY) / 2 - TileSizeY,
+				target.tilePos.x * PixelTileSize.x + (type->TileWidth * PixelTileSize.x) / 2,
+				target.tilePos.y * PixelTileSize.y + (type->TileHeight * PixelTileSize.y) / 2 - PixelTileSize.y,
 				0, 0);
 			missile->SourceUnit = &target;
 			target.Burning = 1;

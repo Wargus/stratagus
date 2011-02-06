@@ -202,9 +202,10 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+#include "vec2i.h"
 
-extern int TileSizeX; /// Size of a tile in X
-extern int TileSizeY; /// Size of a tile in Y
+
+extern PixelSize PixelTileSize; /// Size of a tile in pixels
 
 /**
 **  These are used for lookup tiles types
@@ -246,8 +247,7 @@ public:
 		Name.clear();
 		ImageFile.clear();
 		NumTiles = 0;
-		TileSizeX = 0;
-		TileSizeY = 0;
+		PixelTileSize.x = PixelTileSize.y = 0;
 		delete[] Table;
 		Table = NULL;
 		delete[] FlagsTable;
@@ -279,8 +279,7 @@ public:
 	std::string ImageFile;      /// File containing image data
 
 	int NumTiles;               /// Number of tiles in the tables
-	int TileSizeX;              /// Size of a tile in X
-	int TileSizeY;              /// Size of a tile in Y
+	PixelSize PixelTileSize;    /// Size of a tile in pixel
 	unsigned short *Table;      /// Pud to Internal conversion table
 	unsigned short *FlagsTable; /// Flag table for editor
 

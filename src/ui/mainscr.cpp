@@ -1181,14 +1181,13 @@ void CenterOnMessage(void)
 	if (MessagesEventCount == 0) {
 		return;
 	}
-	UI.SelectedViewport->Center(
-		MessagesEventX[MessagesEventIndex], MessagesEventY[MessagesEventIndex],
-		TileSizeX / 2, TileSizeY / 2);
+	const Vec2i pos = {MessagesEventX[MessagesEventIndex], MessagesEventY[MessagesEventIndex]};
+	UI.SelectedViewport->Center(pos, PixelTileSize / 2);
 	SetMessage(_("~<Event: %s~>"), MessagesEvent[MessagesEventIndex]);
 	++MessagesEventIndex;
 }
 
-void ToggleShowMessages(void) {
+void ToggleShowMessages() {
 	allmessages.ToggleShowMessages();
 }
 

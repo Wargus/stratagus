@@ -137,12 +137,12 @@ void DoScrollArea(int state, bool fast)
 	vp = UI.SelectedViewport;
 
 	if (fast) {
-		stepx = vp->MapWidth / 2 * TileSizeX * FRAMES_PER_SECOND;
-		stepy = vp->MapHeight / 2 * TileSizeY * FRAMES_PER_SECOND;
+		stepx = vp->MapWidth / 2 * PixelTileSize.x * FRAMES_PER_SECOND;
+		stepy = vp->MapHeight / 2 * PixelTileSize.y * FRAMES_PER_SECOND;
 	} else {// dynamic: let these variables increase upto fast..
 		// FIXME: pixels per second should be configurable
-		stepx = TileSizeX * FRAMES_PER_SECOND;
-		stepy = TileSizeY * FRAMES_PER_SECOND;
+		stepx = PixelTileSize.x * FRAMES_PER_SECOND;
+		stepy = PixelTileSize.y * FRAMES_PER_SECOND;
 	}
 	if ((state & (ScrollLeft | ScrollRight)) &&
 			(state & (ScrollLeft | ScrollRight)) != (ScrollLeft | ScrollRight)) {
@@ -205,11 +205,11 @@ void DrawMapArea(void)
 					vp->Unit->CurrentAction() == UnitActionDie) {
 				vp->Unit = NoUnitP;
 			} else {
-				vp->Center(vp->Unit->tilePos.x, vp->Unit->tilePos.y,
-					vp->Unit->IX + TileSizeX / 2, vp->Unit->IY + TileSizeY / 2);
+				const PixelSize offset = {vp->Unit->IX + PixelTileSize.x / 2, vp->Unit->IY + PixelTileSize.y / 2};
+
+				vp->Center(vp->Unit->tilePos, offset);
 			}
 		}
-
 		vp->Draw();
 	}
 }

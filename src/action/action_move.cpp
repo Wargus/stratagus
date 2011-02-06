@@ -137,8 +137,8 @@ int DoActionMove(CUnit &unit)
 			}
 		}
 
-		unit.IX = -posd.x * TileSizeX;
-		unit.IY = -posd.y * TileSizeY;
+		unit.IX = -posd.x * PixelTileSize.x;
+		unit.IY = -posd.y * PixelTileSize.y;
 		unit.Frame = unit.Type->StillFrame;
 		UnitHeadingFromDeltaXY(unit, posd);
 	} else {

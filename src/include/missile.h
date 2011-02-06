@@ -207,17 +207,17 @@
 **  Missile::position
 **
 **    Missile current map position in pixels.  To convert a map tile
-**    position to pixel position use: (mapx * ::TileSizeX + ::TileSizeX / 2)
-**    and (mapy * ::TileSizeY + ::TileSizeY / 2)
-**    @note ::TileSizeX % 2 == 0 && ::TileSizeY % 2 == 0
+**    position to pixel position use: (mapx * ::PixelTileSize.x + ::PixelTileSize.x / 2)
+**    and (mapy * ::PixelTileSize.y + ::PixelTileSize.y / 2)
+**    @note ::PixelTileSize.x % 2 == 0 && ::PixelTileSize.y % 2 == 0
 **
 **  Missile::source
 **
 **    Missile original map position in pixels.  To convert a map tile
-**    position to pixel position use: (mapx*::TileSizeX+::TileSizeX/2)
-**    and (mapy*::TileSizeY+::TileSizeY/2)
-**    @note ::TileSizeX%2==0 && ::TileSizeY%2==0 and ::TileSizeX,
-**    ::TileSizeY are currently fixed 32 pixels.
+**    position to pixel position use: (mapx*::PixelTileSize.x+::PixelTileSize.x/2)
+**    and (mapy*::PixelTileSize.y+::PixelTileSize.y/2)
+**    @note ::PixelTileSize.x%2==0 && ::PixelTileSize.y%2==0 and ::PixelTileSize.x,
+**    ::PixelTileSize.y are currently fixed 32 pixels.
 **
 **  Missile::destination
 **

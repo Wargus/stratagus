@@ -186,7 +186,7 @@ public:
 	/// Set the current map view to x,y(upper,left corner)
 	void Set(int x, int y, int offsetx, int offsety);
 	/// Center map on point in viewport
-	void Center(int x, int y, int offsetx, int offsety);
+	void Center(const Vec2i& pos, const PixelPos &offset);
 protected:
 	/// Draw the map background
 	void DrawMapBackgroundInViewport() const;

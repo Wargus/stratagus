@@ -444,7 +444,7 @@ void VideoDrawOnlyFog(int x, int y)
 		SDL_BlitSurface(OnlyFogSurface, &srect, TheScreen, &drect);
 	} else {
 		Video.FillRectangleClip(Video.MapRGBA(0, 0, 0, 0, FogOfWarOpacity),
-			x, y, TileSizeX, TileSizeY);
+			x, y, PixelTileSize.x, PixelTileSize.y);
 	}
 }
 
@@ -643,13 +643,13 @@ void CViewport::DrawMapFogOfWar() const
 			if (VisibleTable[sx]) {
 				DrawFogOfWarTile(sx, sy, dx, dy);
 			} else {
-				Video.FillRectangleClip(FogOfWarColorSDL, dx, dy, TileSizeX, TileSizeY);
+				Video.FillRectangleClip(FogOfWarColorSDL, dx, dy, PixelTileSize.x, PixelTileSize.y);
 			}
 			++sx;
-			dx += TileSizeX;
+			dx += PixelTileSize.x;
 		}
 		sy += Map.Info.MapWidth;
-		dy += TileSizeY;
+		dy += PixelTileSize.y;
 	}
 }
 
@@ -672,7 +672,7 @@ void CMap::InitFogOfWar(void)
 		//
 		// Generate Only Fog surface.
 		//
-		s = SDL_CreateRGBSurface(SDL_SWSURFACE, TileSizeX, TileSizeY,
+		s = SDL_CreateRGBSurface(SDL_SWSURFACE, PixelTileSize.x, PixelTileSize.y,
 			32, RMASK, GMASK, BMASK, AMASK);
 
 		SDL_GetRGB(FogOfWarColorSDL, TheScreen->format, &r, &g, &b);
@@ -698,7 +698,7 @@ void CMap::InitFogOfWar(void)
 
 			// Copy the top row to a new surface
 			f = FogGraphic->Surface->format;
-			s = SDL_CreateRGBSurface(SDL_SWSURFACE, FogGraphic->Surface->w, TileSizeY,
+			s = SDL_CreateRGBSurface(SDL_SWSURFACE, FogGraphic->Surface->w, PixelTileSize.y,
 				f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
 			SDL_LockSurface(s);
 			SDL_LockSurface(FogGraphic->Surface);
@@ -727,8 +727,8 @@ void CMap::InitFogOfWar(void)
 		}
 		AlphaFogG = CGraphic::New("");
 		AlphaFogG->Surface = s;
-		AlphaFogG->Width = TileSizeX;
-		AlphaFogG->Height = TileSizeY;
+		AlphaFogG->Width = PixelTileSize.x;
+		AlphaFogG->Height = PixelTileSize.y;
 		AlphaFogG->GraphicWidth = s->w;
 		AlphaFogG->GraphicHeight = s->h;
 		AlphaFogG->NumFrames = 16;//1;

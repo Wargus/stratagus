@@ -416,8 +416,8 @@ CUnitType *NewUnitTypeSlot(const std::string &ident)
 void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, int x, int y)
 {
 	// FIXME: move this calculation to high level.
-	x -= (type.Width - type.TileWidth * TileSizeX) / 2;
-	y -= (type.Height - type.TileHeight * TileSizeY) / 2;
+	x -= (type.Width - type.TileWidth * PixelTileSize.x) / 2;
+	y -= (type.Height - type.TileHeight * PixelTileSize.y) / 2;
 	x += type.OffsetX;
 	y += type.OffsetY;
 

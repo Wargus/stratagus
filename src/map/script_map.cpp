@@ -253,9 +253,9 @@ static int CclRevealMap(lua_State *l)
 static int CclCenterMap(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
-	UI.SelectedViewport->Center(
-		LuaToNumber(l, 1), LuaToNumber(l, 2), TileSizeX / 2, TileSizeY / 2);
+	const Vec2i pos = {LuaToNumber(l, 1), LuaToNumber(l, 2)};
 
+	UI.SelectedViewport->Center(pos, PixelTileSize);
 	return 0;
 }
 
@@ -436,7 +436,7 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 	if (CMap::FogGraphic) {
 		CGraphic::Free(CMap::FogGraphic);
 	}
-	CMap::FogGraphic = CGraphic::New(FogGraphicFile, TileSizeX, TileSizeY);
+	CMap::FogGraphic = CGraphic::New(FogGraphicFile, PixelTileSize.x, PixelTileSize.y);
 
 	return 0;
 }

@@ -127,11 +127,11 @@ void InitUserInterface(void)
 	// Calculations
 	//
 	if (Map.Info.MapWidth) {
-		if (UI.MapArea.EndX > Map.Info.MapWidth * TileSizeX - 1) {
-			UI.MapArea.EndX = Map.Info.MapWidth * TileSizeX - 1;
+		if (UI.MapArea.EndX > Map.Info.MapWidth * PixelTileSize.x - 1) {
+			UI.MapArea.EndX = Map.Info.MapWidth * PixelTileSize.x - 1;
 		}
-		if (UI.MapArea.EndY > Map.Info.MapHeight * TileSizeY - 1) {
-			UI.MapArea.EndY = Map.Info.MapHeight * TileSizeY - 1;
+		if (UI.MapArea.EndY > Map.Info.MapHeight * PixelTileSize.y - 1) {
+			UI.MapArea.EndY = Map.Info.MapHeight * PixelTileSize.y - 1;
 		}
 	}
 
@@ -368,8 +368,8 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 			new_vps[i].MapY = 0;
 			vp = GetViewport(new_vps[i].X, new_vps[i].Y);
 			if (vp) {
-				new_vps[i].OffsetX = new_vps[i].X - vp->X + vp->MapX * TileSizeX + vp->OffsetX;
-				new_vps[i].OffsetY = new_vps[i].Y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY;
+				new_vps[i].OffsetX = new_vps[i].X - vp->X + vp->MapX * PixelTileSize.x + vp->OffsetX;
+				new_vps[i].OffsetY = new_vps[i].Y - vp->Y + vp->MapY * PixelTileSize.y + vp->OffsetY;
 			} else {
 				new_vps[i].OffsetX = 0;
 				new_vps[i].OffsetY = 0;
@@ -425,8 +425,8 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 static void ClipViewport(CViewport *vp, int ClipX, int ClipY)
 {
 	// begin with maximum possible viewport size
-	vp->EndX = vp->X + Map.Info.MapWidth * TileSizeX - 1;
-	vp->EndY = vp->Y + Map.Info.MapHeight * TileSizeY - 1;
+	vp->EndX = vp->X + Map.Info.MapWidth * PixelTileSize.x - 1;
+	vp->EndY = vp->Y + Map.Info.MapHeight * PixelTileSize.y - 1;
 
 	// first clip it to MapArea size if necessary
 	if (vp->EndX > ClipX) {

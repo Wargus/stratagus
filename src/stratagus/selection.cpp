@@ -659,11 +659,11 @@ static int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
 		CUnit* unit = (CUnit*)table[i];
 		const CUnitType *type = unit->Type;
 
-		sprite_x = unit->tilePos.x * TileSizeX + unit->IX;
-		sprite_x -= (type->BoxWidth - TileSizeX * type->TileWidth) / 2;
+		sprite_x = unit->tilePos.x * PixelTileSize.x + unit->IX;
+		sprite_x -= (type->BoxWidth - PixelTileSize.x * type->TileWidth) / 2;
 		sprite_x += type->OffsetX;
-		sprite_y = unit->tilePos.y * TileSizeY + unit->IY;
-		sprite_y -= (type->BoxHeight - TileSizeY * type->TileHeight) / 2;
+		sprite_y = unit->tilePos.y * PixelTileSize.y + unit->IY;
+		sprite_y -= (type->BoxHeight - PixelTileSize.y * type->TileHeight) / 2;
 		sprite_y += type->OffsetY;
 		if (sprite_x + type->BoxWidth < sx0) {
 			continue;
@@ -685,10 +685,10 @@ static int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
 static int DoSelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1,
 CUnit**table, int num_units = UnitMax)
 {
-	const int tx0 = sx0 / TileSizeX;
-	const int ty0 = sy0 / TileSizeY;
-	const int tx1 = sx1 / TileSizeX;
-	const int ty1 = sy1 / TileSizeY;
+	const int tx0 = sx0 / PixelTileSize.x;
+	const int ty0 = sy0 / PixelTileSize.y;
+	const int tx1 = sx1 / PixelTileSize.x;
+	const int ty1 = sy1 / PixelTileSize.y;
 	int r = Map.Select(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table, num_units);
 	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
 
@@ -802,8 +802,8 @@ int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 	}
 
 	// If no unit in rectangle area... do nothing
-	toggle_num = Map.Select((x0 / TileSizeX) - 2, (y0 / TileSizeY) - 2,
-		(x1 / TileSizeX) + 2 + 1, (y1 / TileSizeX) + 2 + 1, table);
+	toggle_num = Map.Select((x0 / PixelTileSize.x) - 2, (y0 / PixelTileSize.y) - 2,
+		(x1 / PixelTileSize.x) + 2 + 1, (y1 / PixelTileSize.y) + 2 + 1, table);
 	if (!toggle_num) {
 		return NumSelected;
 	}
@@ -835,10 +835,10 @@ CUnit**table, int num_units = UnitMax)
 	int tx1;
 	int ty1;
 
-	tx0 = sx0 / TileSizeX;
-	ty0 = sy0 / TileSizeY;
-	tx1 = sx1 / TileSizeX;
-	ty1 = sy1 / TileSizeY;
+	tx0 = sx0 / PixelTileSize.x;
+	ty0 = sy0 / PixelTileSize.y;
+	tx1 = sx1 / PixelTileSize.x;
+	ty1 = sy1 / PixelTileSize.y;
 
 	r = Map.Select(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table, num_units);
 	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
@@ -886,10 +886,10 @@ int SelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 
 int DoSelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1, CUnit**table)
 {
-	const int tx0 = sx0 / TileSizeX;
-	const int ty0 = sy0 / TileSizeY;
-	const int tx1 = sx1 / TileSizeX;
-	const int ty1 = sy1 / TileSizeY;
+	const int tx0 = sx0 / PixelTileSize.x;
+	const int ty0 = sy0 / PixelTileSize.y;
+	const int tx1 = sx1 / PixelTileSize.x;
+	const int ty1 = sy1 / PixelTileSize.y;
 
 	int r = Map.Select(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
 	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
@@ -963,10 +963,10 @@ int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 		return DoSelectGroundUnitsInRectangle(sx0, sy0, sx1, sy1, table);
 	}
 
-	const int tx0 = sx0 / TileSizeX;
-	const int ty0 = sy0 / TileSizeY;
-	const int tx1 = sx1 / TileSizeX;
-	const int ty1 = sy1 / TileSizeY;
+	const int tx0 = sx0 / PixelTileSize.x;
+	const int ty0 = sy0 / PixelTileSize.y;
+	const int tx1 = sx1 / PixelTileSize.x;
+	const int ty1 = sy1 / PixelTileSize.y;
 	int r = Map.Select(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
 	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
 
@@ -1029,10 +1029,10 @@ int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 		return DoSelectAirUnitsInRectangle(sx0, sy0, sx1, sy1, table);
 	}
 
-	const int tx0 = sx0 / TileSizeX;
-	const int ty0 = sy0 / TileSizeY;
-	const int tx1 = sx1 / TileSizeX;
-	const int ty1 = sy1 / TileSizeY;
+	const int tx0 = sx0 / PixelTileSize.x;
+	const int ty0 = sy0 / PixelTileSize.y;
+	const int tx1 = sx1 / PixelTileSize.x;
+	const int ty1 = sy1 / PixelTileSize.y;
 
 	int r = Map.Select(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
 	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);

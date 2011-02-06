@@ -50,14 +50,10 @@
 ----------------------------------------------------------------------------*/
 
 /**
-** Size of a tile in X
+** Size of a tile in pixel
 */
-int TileSizeX = 32;
+PixelSize PixelTileSize = {32, 32};
 
-/**
-** Size of a tile in Y
-*/
-int TileSizeY = 32;
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -68,15 +64,14 @@ int TileSizeY = 32;
 **
 ** @see Map @see Map.Tileset.
 */
-void LoadTileset(void)
+void LoadTileset()
 {
 	//  Load and prepare the tileset
-	TileSizeX = Map.Tileset.TileSizeX;
-	TileSizeY = Map.Tileset.TileSizeY;
+	PixelTileSize = Map.Tileset.PixelTileSize;
 
 	ShowLoadProgress("Tileset `%s'", Map.Tileset.ImageFile.c_str());
 	//Map.TileGraphic = CGraphic::New(Map.Tileset.ImageFile);
-	Map.TileGraphic = CGraphic::New(Map.Tileset.ImageFile, TileSizeX, TileSizeY);
+	Map.TileGraphic = CGraphic::New(Map.Tileset.ImageFile, PixelTileSize.x, PixelTileSize.y);
 	Map.TileGraphic->Load();
 }
 
@@ -86,7 +81,7 @@ void LoadTileset(void)
 **
 ** @note this didn't frees the configuration memory.
 */
-void CleanTilesets(void)
+void CleanTilesets()
 {
 	Map.Tileset.Clear();
 

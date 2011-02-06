@@ -82,18 +82,18 @@ bool CViewport::IsInsideMapArea(int x, int y) const
 	int tilex;
 	int tiley;
 
-	tilex = x - this->X + this->MapX * TileSizeX + this->OffsetX;
+	tilex = x - this->X + this->MapX * PixelTileSize.x + this->OffsetX;
 	if (tilex < 0) {
-		tilex = (tilex - TileSizeX + 1) / TileSizeX;
+		tilex = (tilex - PixelTileSize.x + 1) / PixelTileSize.x;
 	} else {
-		tilex /= TileSizeX;
+		tilex /= PixelTileSize.x;
 	}
 
-	tiley = y - this->Y + this->MapY * TileSizeY + this->OffsetY;
+	tiley = y - this->Y + this->MapY * PixelTileSize.y + this->OffsetY;
 	if (tiley < 0) {
-		tiley = (tiley - TileSizeY + 1) / TileSizeY;
+		tiley = (tiley - PixelTileSize.y + 1) / PixelTileSize.y;
 	} else {
-		tiley /= TileSizeY;
+		tiley /= PixelTileSize.y;
 	}
 
 	return (tilex >= 0 && tiley >= 0 && tilex < Map.Info.MapWidth && tiley < Map.Info.MapHeight);
@@ -110,7 +110,7 @@ bool CViewport::IsInsideMapArea(int x, int y) const
 */
 int CViewport::Viewport2MapX(int x) const
 {
-	int r = (x - this->X + this->MapX * TileSizeX + this->OffsetX) / TileSizeX;
+	int r = (x - this->X + this->MapX * PixelTileSize.x + this->OffsetX) / PixelTileSize.x;
 	return std::min<int>(r, Map.Info.MapWidth - 1);
 }
 
@@ -125,7 +125,7 @@ int CViewport::Viewport2MapX(int x) const
 */
 int CViewport::Viewport2MapY(int y) const
 {
-	int r = (y - this->Y + this->MapY * TileSizeY + this->OffsetY) / TileSizeY;
+	int r = (y - this->Y + this->MapY * PixelTileSize.y + this->OffsetY) / PixelTileSize.y;
 	return std::min<int>(r, Map.Info.MapHeight - 1);
 }
 
@@ -139,7 +139,7 @@ int CViewport::Viewport2MapY(int y) const
 */
 int CViewport::Map2ViewportX(int x) const
 {
-	return this->X + (x - this->MapX) * TileSizeX - this->OffsetX;
+	return this->X + (x - this->MapX) * PixelTileSize.x - this->OffsetX;
 }
 
 /**
@@ -152,7 +152,7 @@ int CViewport::Map2ViewportX(int x) const
 */
 int CViewport::Map2ViewportY(int y) const
 {
-	return this->Y + (y - this->MapY) * TileSizeY - this->OffsetY;
+	return this->Y + (y - this->MapY) * PixelTileSize.y - this->OffsetY;
 }
 
 /**
@@ -160,8 +160,8 @@ int CViewport::Map2ViewportY(int y) const
 */
 void CViewport::MapPixel2Viewport(int &x, int &y) const
 {
-	x = x + this->X - (this->MapX * TileSizeX + this->OffsetX);
-	y = y + this->Y - (this->MapY * TileSizeY + this->OffsetY);
+	x = x + this->X - (this->MapX * PixelTileSize.x + this->OffsetX);
+	y = y + this->Y - (this->MapY * PixelTileSize.y + this->OffsetY);
 }
 
 /**
@@ -174,8 +174,8 @@ void CViewport::MapPixel2Viewport(int &x, int &y) const
 */
 void CViewport::Set(int x, int y, int offsetx, int offsety)
 {
-	x = x * TileSizeX + offsetx;
-	y = y * TileSizeY + offsety;
+	x = x * PixelTileSize.x + offsetx;
+	y = y * PixelTileSize.y + offsety;
 
 	if (x < -UI.MapArea.ScrollPaddingLeft) {
 		x = -UI.MapArea.ScrollPaddingLeft;
@@ -183,46 +183,44 @@ void CViewport::Set(int x, int y, int offsetx, int offsety)
 	if (y < -UI.MapArea.ScrollPaddingTop) {
 		y = -UI.MapArea.ScrollPaddingTop;
 	}
-	if (x > Map.Info.MapWidth * TileSizeX - (this->EndX - this->X) - 1 + UI.MapArea.ScrollPaddingRight) {
-		x = Map.Info.MapWidth * TileSizeX - (this->EndX - this->X) - 1 + UI.MapArea.ScrollPaddingRight;
+	if (x > Map.Info.MapWidth * PixelTileSize.x - (this->EndX - this->X) - 1 + UI.MapArea.ScrollPaddingRight) {
+		x = Map.Info.MapWidth * PixelTileSize.x- (this->EndX - this->X) - 1 + UI.MapArea.ScrollPaddingRight;
 	}
-	if (y > Map.Info.MapHeight * TileSizeY - (this->EndY - this->Y) - 1 + UI.MapArea.ScrollPaddingBottom) {
-		y = Map.Info.MapHeight * TileSizeY - (this->EndY - this->Y) - 1 + UI.MapArea.ScrollPaddingBottom;
+	if (y > Map.Info.MapHeight * PixelTileSize.y- (this->EndY - this->Y) - 1 + UI.MapArea.ScrollPaddingBottom) {
+		y = Map.Info.MapHeight * PixelTileSize.y- (this->EndY - this->Y) - 1 + UI.MapArea.ScrollPaddingBottom;
 	}
 
-	this->MapX = x / TileSizeX;
-	if (x < 0 && x % TileSizeX) {
+	this->MapX = x / PixelTileSize.x;
+	if (x < 0 && x % PixelTileSize.x) {
 		this->MapX--;
 	}
-	this->MapY = y / TileSizeY;
-	if (y < 0 && y % TileSizeY) {
+	this->MapY = y / PixelTileSize.y;
+	if (y < 0 && y % PixelTileSize.y) {
 		this->MapY--;
 	}
-	this->OffsetX = x % TileSizeX;
+	this->OffsetX = x % PixelTileSize.x;
 	if (this->OffsetX < 0) {
-		this->OffsetX += TileSizeX;
+		this->OffsetX += PixelTileSize.x;
 	}
-	this->OffsetY = y % TileSizeY;
+	this->OffsetY = y % PixelTileSize.y;
 	if (this->OffsetY < 0) {
-		this->OffsetY += TileSizeY;
+		this->OffsetY += PixelTileSize.y;
 	}
-	this->MapWidth = ((this->EndX - this->X) + this->OffsetX - 1) / TileSizeX + 1;
-	this->MapHeight = ((this->EndY - this->Y) + this->OffsetY - 1) / TileSizeY + 1;
+	this->MapWidth = ((this->EndX - this->X) + this->OffsetX - 1) / PixelTileSize.x + 1;
+	this->MapHeight = ((this->EndY - this->Y) + this->OffsetY - 1) / PixelTileSize.y + 1;
 }
 
 /**
-**  Center map viewport v on map tile (x,y).
+**  Center map viewport v on map tile (pos).
 **
-**  @param x   X map tile position.
-**  @param y   Y map tile position.
-**  @param offsetx  X offset in tile.
-**  @param offsety  Y offset in tile.
+**  @param pos     map tile position.
+**  @param offset  offset in tile.
 */
-void CViewport::Center(int x, int y, int offsetx, int offsety)
+void CViewport::Center(const Vec2i &pos, const PixelDiff &offset)
 {
-	x = x * TileSizeX + offsetx - (this->EndX - this->X) / 2;
-	y = y * TileSizeY + offsety - (this->EndY - this->Y) / 2;
-	this->Set(x / TileSizeX, y / TileSizeY, x % TileSizeX, y % TileSizeY);
+	int x = pos.x * PixelTileSize.x + offset.x - (this->EndX - this->X) / 2;
+	int y = pos.y * PixelTileSize.y + offset.y - (this->EndY - this->Y) / 2;
+	this->Set(x / PixelTileSize.x, y / PixelTileSize.y, x % PixelTileSize.x, y % PixelTileSize.y);
 }
 
 /**
@@ -261,7 +259,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 
 	while (sy  < 0) {
 		sy++;
-		dy += TileSizeY;
+		dy += PixelTileSize.y;
 	}
 	sy *=  Map.Info.MapWidth;
 
@@ -270,7 +268,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 	/*
 		if (sy / Map.Info.MapWidth < 0) {
 			sy += Map.Info.MapWidth;
-			dy += TileSizeY;
+			dy += PixelTileSize.y;
 			continue;
 		}
 */
@@ -279,7 +277,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 		while (dx <= ex && (sx - sy < Map.Info.MapWidth)) {
 			if (sx - sy < 0) {
 				++sx;
-				dx += TileSizeX;
+				dx += PixelTileSize.x;
 				continue;
 			}
 
@@ -315,8 +313,8 @@ void CViewport::DrawMapBackgroundInViewport() const
 				break;
 			}
 
-			Video.DrawHLineClip(color, dx, dy, TileSizeX);
-			Video.DrawVLineClip(color, dx, dy, TileSizeY);
+			Video.DrawHLineClip(color, dx, dy, PixelTileSize.x);
+			Video.DrawVLineClip(color, dx, dy, PixelTileSize.y);
 			if ( 0 && my_mask ) {
 				CLabel label(SmallFont);
 				label.Draw(dx + 2, dy +2, tile);
@@ -326,10 +324,10 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 #endif
 			++sx;
-			dx += TileSizeX;
+			dx += PixelTileSize.x;
 		}
 		sy += Map.Info.MapWidth;
-		dy += TileSizeY;
+		dy += PixelTileSize.y;
 	}
 }
 

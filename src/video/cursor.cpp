@@ -193,8 +193,8 @@ static void DrawBuildingCursor()
 {
 	// Align to grid
 	const CViewport &vp = *UI.MouseViewport;
-	int x = CursorX - (CursorX - vp.X + vp.OffsetX) % TileSizeX;
-	int y = CursorY - (CursorY - vp.Y + vp.OffsetY) % TileSizeY;
+	int x = CursorX - (CursorX - vp.X + vp.OffsetX) % PixelTileSize.x;
+	int y = CursorY - (CursorY - vp.Y + vp.OffsetY) % PixelTileSize.y;
 	const Vec2i mpos = {vp.Viewport2MapX(x), vp.Viewport2MapY(y)};
 	CUnit *ontop = NULL;
 
@@ -213,9 +213,9 @@ static void DrawBuildingCursor()
 		CursorBuilding->StillFrame, x, y);
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value>0){
 		Video.DrawCircleClip(ColorRed,
-					x + CursorBuilding->TileWidth * TileSizeX / 2,
-					y + CursorBuilding->TileHeight * TileSizeY / 2,
-					(CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileWidth - 1)) * TileSizeX + 1);
+					x + CursorBuilding->TileWidth * PixelTileSize.x / 2,
+					y + CursorBuilding->TileHeight * PixelTileSize.y / 2,
+					(CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileWidth - 1)) * PixelTileSize.x + 1);
 	}
 
 	//
@@ -261,8 +261,8 @@ static void DrawBuildingCursor()
 			} else {
 				color = ColorRed;
 			}
-			Video.FillTransRectangleClip(color, x + w * TileSizeX, y + h *
-				TileSizeY, TileSizeX, TileSizeY, 95);
+			Video.FillTransRectangleClip(color, x + w * PixelTileSize.x, y + h *
+				PixelTileSize.y, PixelTileSize.x, PixelTileSize.y, 95);
 		}
 	}
 	PopClipping();
@@ -278,8 +278,8 @@ void DrawCursor()
 	if (CursorState == CursorStateRectangle &&
 			(CursorStartX != CursorX || CursorStartY != CursorY)) {
 		DrawVisibleRectangleCursor(
-			CursorStartScrMapX + UI.MouseViewport->X - TileSizeX * UI.MouseViewport->MapX - UI.MouseViewport->OffsetX,
-			CursorStartScrMapY + UI.MouseViewport->Y - TileSizeY * UI.MouseViewport->MapY - UI.MouseViewport->OffsetY,
+			CursorStartScrMapX + UI.MouseViewport->X - PixelTileSize.x * UI.MouseViewport->MapX - UI.MouseViewport->OffsetX,
+			CursorStartScrMapY + UI.MouseViewport->Y - PixelTileSize.y * UI.MouseViewport->MapY - UI.MouseViewport->OffsetY,
 			CursorX, CursorY);
 	} else if (CursorBuilding && CursorOn == CursorOnMap) {
 		// Selecting position for building

@@ -265,14 +265,14 @@ int AreaBombardment::Cast(CUnit &caster, const SpellType *, CUnit *, int x, int 
 		} while (!Map.Info.IsPointOnMap(dx, dy));
 		for (i = 0; i < shards; ++i) {
 			mis = MakeMissile(missile,
-				dx * TileSizeX + TileSizeX / 2 + offsetx,
-				dy * TileSizeY + TileSizeY / 2 + offsety,
-				dx * TileSizeX + TileSizeX / 2,
-				dy * TileSizeY + TileSizeY / 2);
+				dx * PixelTileSize.x + PixelTileSize.x / 2 + offsetx,
+				dy * PixelTileSize.y + PixelTileSize.y / 2 + offsety,
+				dx * PixelTileSize.x + PixelTileSize.x / 2,
+				dy * PixelTileSize.y + PixelTileSize.y / 2);
 			//  FIXME: This is just patched up, it works, but I have no idea why.
 			//  FIXME: What is the reasoning behind all this?
 			if (mis->Type->Speed) {
-				mis->Delay = i * mis->Type->Sleep * 2 * TileSizeX / mis->Type->Speed;
+				mis->Delay = i * mis->Type->Sleep * 2 * PixelTileSize.x / mis->Type->Speed;
 			} else {
 				mis->Delay = i * mis->Type->Sleep * mis->Type->G->NumFrames;
 			}
@@ -301,15 +301,15 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation *location,
 	CUnit &caster, CUnit *target, int x, int y, int *resx, int *resy)
 {
 	if (location->Base == LocBaseCaster) {
-		*resx = caster.tilePos.x * TileSizeX + TileSizeX / 2;
-		*resy = caster.tilePos.y * TileSizeY + TileSizeY / 2;
+		*resx = caster.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2;
+		*resy = caster.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2;
 	} else {
 		if (target) {
-			*resx = target->tilePos.x * TileSizeX + TileSizeX / 2;
-			*resy = target->tilePos.y * TileSizeY + TileSizeY / 2;
+			*resx = target->tilePos.x * PixelTileSize.x + PixelTileSize.x / 2;
+			*resy = target->tilePos.y * PixelTileSize.y + PixelTileSize.y / 2;
 		} else {
-			*resx = x * TileSizeX + TileSizeX / 2;
-			*resy = y * TileSizeY + TileSizeY / 2;
+			*resx = x * PixelTileSize.x + PixelTileSize.x / 2;
+			*resy = y * PixelTileSize.y + PixelTileSize.y / 2;
 		}
 	}
 	*resx += location->AddX;

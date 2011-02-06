@@ -766,8 +766,8 @@ void CreateGame(const std::string &filename, CMap *map)
 		UI.SelectedViewport = UI.Viewports;
 	}
 #endif
-	UI.SelectedViewport->Center(
-		ThisPlayer->StartX, ThisPlayer->StartY, TileSizeX / 2, TileSizeY / 2);
+	const Vec2i start = {ThisPlayer->StartX, ThisPlayer->StartY};
+	UI.SelectedViewport->Center(start, PixelTileSize / 2);
 
 	//
 	// Various hacks wich must be done after the map is loaded.

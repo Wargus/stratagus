@@ -410,11 +410,11 @@ void FireMissile(CUnit &unit)
 
 	// If Firing from inside a Bunker
 	if (unit.Container) {
-		x = unit.Container->tilePos.x * TileSizeX + TileSizeX / 2;  // missile starts in tile middle
-		y = unit.Container->tilePos.y * TileSizeY + TileSizeY / 2;
+		x = unit.Container->tilePos.x * PixelTileSize.x + PixelTileSize.x / 2;  // missile starts in tile middle
+		y = unit.Container->tilePos.y * PixelTileSize.y + PixelTileSize.y / 2;
 	} else {
-		x = unit.tilePos.x * TileSizeX + TileSizeX / 2;  // missile starts in tile middle
-		y = unit.tilePos.y * TileSizeY + TileSizeY / 2;
+		x = unit.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2;  // missile starts in tile middle
+		y = unit.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2;
 	}
 
 	Vec2i dpos;
@@ -442,8 +442,8 @@ void FireMissile(CUnit &unit)
 	}
 
 	// Fire to the tile center of the destination.
-	dpos.x = dpos.x * TileSizeX + TileSizeX / 2;
-	dpos.y = dpos.y * TileSizeY + TileSizeY / 2;
+	dpos.x = dpos.x * PixelTileSize.x + PixelTileSize.x / 2;
+	dpos.y = dpos.y * PixelTileSize.y + PixelTileSize.y / 2;
 	Missile *missile = MakeMissile(unit.Type->Missile.Missile, x, y, dpos.x, dpos.y);
 	//
 	// Damage of missile
@@ -470,10 +470,10 @@ static void GetMissileMapArea(const Missile *missile, Vec2i& boxMin, Vec2i &boxM
 #define BoundX(x) std::min<int>(std::max<int>(0, x), Map.Info.MapWidth - 1)
 #define BoundY(y) std::min<int>(std::max<int>(0, y), Map.Info.MapHeight - 1)
 
-	boxMin.x = BoundX(missile->position.x / TileSizeX);
-	boxMin.y = BoundY(missile->position.y / TileSizeY);
-	boxMax.x = BoundX((missile->position.x + missile->Type->Width() + TileSizeX - 1) / TileSizeX);
-	boxMax.y = BoundY((missile->position.y + missile->Type->Height() + TileSizeY - 1) / TileSizeY);
+	boxMin.x = BoundX(missile->position.x / PixelTileSize.x);
+	boxMin.y = BoundY(missile->position.y / PixelTileSize.y);
+	boxMax.x = BoundX((missile->position.x + missile->Type->Width() + PixelTileSize.x - 1) / PixelTileSize.x);
+	boxMax.y = BoundY((missile->position.y + missile->Type->Height() + PixelTileSize.y - 1) / PixelTileSize.y);
 
 #undef BoundX
 #undef BoundY
@@ -553,8 +553,8 @@ void MissileType::DrawMissileType(int frame, const PixelPos &pos) const
 
 void MissileDrawProxy::DrawMissile(const CViewport *vp) const
 {
-	const int x = this->X - vp->MapX * TileSizeX + vp->X - vp->OffsetX;
-	const int y = this->Y - vp->MapY * TileSizeY + vp->Y - vp->OffsetY;
+	const int x = this->X - vp->MapX * PixelTileSize.x + vp->X - vp->OffsetX;
+	const int y = this->Y - vp->MapY * PixelTileSize.y + vp->Y - vp->OffsetY;
 	switch (this->Type->Class) {
 		case MissileClassHit:
 			CLabel(GameFont).DrawClip(x,y, this->data.Damage);
@@ -592,8 +592,8 @@ void Missile::DrawMissile(const CViewport *vp) const
 		}
 #endif
 	}
-	const int x = this->position.x - vp->MapX * TileSizeX + vp->X - vp->OffsetX;
-	const int y = this->position.y - vp->MapY * TileSizeY + vp->Y - vp->OffsetY;
+	const int x = this->position.x - vp->MapX * PixelTileSize.x + vp->X - vp->OffsetX;
+	const int y = this->position.y - vp->MapY * PixelTileSize.y + vp->Y - vp->OffsetY;
 	switch (this->Type->Class) {
 		case MissileClassHit:
 			CLabel(GameFont).DrawClip(x, y, this->Damage);
@@ -894,7 +894,7 @@ void MissileHit(Missile *missile)
 		return;
 	}
 
-	const Vec2i pos = {pixelPos.x / TileSizeX, pixelPos.y / TileSizeY};
+	const Vec2i pos = {pixelPos.x / PixelTileSize.x, pixelPos.y / PixelTileSize.y};
 
 	if (!Map.Info.IsPointOnMap(pos)) {
 		// FIXME: this should handled by caller?
@@ -1126,7 +1126,7 @@ void MissileActions()
 int ViewPointDistanceToMissile(const Missile *missile)
 {
 	const PixelPos pixelPos = missile->position + missile->Type->size / 2;
-	const Vec2i tilePos = { pixelPos.x / TileSizeX, pixelPos.y / TileSizeY };
+	const Vec2i tilePos = { pixelPos.x / PixelTileSize.x, pixelPos.y / PixelTileSize.y };
 
 	return ViewPointDistance(tilePos);
 }
@@ -1401,7 +1401,7 @@ void MissilePointToPointBounce::Action()
 		if (this->State < 2 * this->Type->NumBounces - 1 && this->TotalStep) {
 			const PixelPos step = (this->destination - this->source);
 
-			this->destination += step * ((TileSizeX + TileSizeY) * 3) / 4 / this->TotalStep;
+			this->destination += step * ((PixelTileSize.x + PixelTileSize.y) * 3) / 4 / this->TotalStep;
 			this->State++; // !(State & 1) to initialise
 			this->source = this->position;
 			PointToPointMissile(*this);
@@ -1529,8 +1529,8 @@ void MissileFlameShield::Action()
 	const int iy = unit->IY;
 	const int uw = unit->Type->TileWidth;
 	const int uh = unit->Type->TileHeight;
-	this->position.x = upos.x * TileSizeX + ix + uw * TileSizeX / 2 + dx - 16;
-	this->position.y = upos.y * TileSizeY + iy + uh * TileSizeY / 2 + dy - 32;
+	this->position.x = upos.x * PixelTileSize.x + ix + uw * PixelTileSize.x / 2 + dx - 16;
+	this->position.y = upos.y * PixelTileSize.y + iy + uh * PixelTileSize.y / 2 + dy - 32;
 	if (unit->CurrentAction() == UnitActionDie) {
 		this->TTL = index;
 	}
@@ -1586,12 +1586,11 @@ struct LandMineTargetFinder {
 */
 void MissileLandMine::Action()
 {
-	const int x = this->position.x / TileSizeX;
-	const int y = this->position.y / TileSizeY;
+	const Vec2i pos = {this->position.x / PixelTileSize.x, this->position.y / PixelTileSize.y};
 
 	if(LandMineTargetFinder(this->SourceUnit,
-		 this->Type->CanHitOwner).FindOnTile(Map.Field(x, y)) != NULL) {
-		DebugPrint("Landmine explosion at %d,%d.\n" _C_ x _C_ y);
+		 this->Type->CanHitOwner).FindOnTile(Map.Field(pos)) != NULL) {
+		DebugPrint("Landmine explosion at %d,%d.\n" _C_ pos.x _C_ pos.y);
 		MissileHit(this);
 		this->TTL = 0;
 		return;
@@ -1625,8 +1624,8 @@ void MissileWhirlwind::Action()
 	// Center of the tornado
 	//
 	PixelPos center = this->position + this->Type->size / 2;
-	center.x = (center.x + TileSizeX / 2) / TileSizeX;
-	center.y = (center.y + TileSizeY) / TileSizeY;
+	center.x = (center.x + PixelTileSize.x / 2) / PixelTileSize.x;
+	center.y = (center.y + PixelTileSize.y) / PixelTileSize.y;
 
 #if 0
 	CUnit *table[UnitMax];
@@ -1678,8 +1677,8 @@ void MissileWhirlwind::Action()
 			nx = center.x + SyncRand() % 5 - 2;
 			ny = center.y + SyncRand() % 5 - 2;
 		} while (!Map.Info.IsPointOnMap(nx, ny));
-		this->destination.x = nx * TileSizeX + TileSizeX / 2;
-		this->destination.y = ny * TileSizeY + TileSizeY / 2;
+		this->destination.x = nx * PixelTileSize.x + PixelTileSize.x / 2;
+		this->destination.y = ny * PixelTileSize.y + PixelTileSize.y / 2;
 		this->source = this->position;
 		this->State = 0;
 		DebugPrint("Whirlwind new direction: %d, %d, TTL: %d\n" _C_
@@ -1721,8 +1720,8 @@ void MissileDeathCoil::Action()
 			//
 			int ec = 0;  // enemy count
 			CUnit* table[UnitMax];
-			const int x = this->destination.x / TileSizeX;
-			const int y = this->destination.y / TileSizeY;
+			const int x = this->destination.x / PixelTileSize.x;
+			const int y = this->destination.y / PixelTileSize.y;
 			const int n = Map.Select(x - 2, y - 2, x + 2 + 1, y + 2 + 1, table);
 
 			if (n == 0) {

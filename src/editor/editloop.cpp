@@ -483,8 +483,8 @@ static int CalculateVisibleIcons(bool tiles = false)
 	int count;
 
 	if (tiles) {
-		w = TileSizeX;//+2,
-		h = TileSizeY;//+2
+		w = PixelTileSize.x;//+2,
+		h = PixelTileSize.y;//+2
 	} else {
 		w = IconWidth;
 		h = IconHeight;
@@ -684,19 +684,19 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 
 	color = (flags & IconActive) ? ColorGray : ColorBlack;
 
-	Video.DrawRectangleClip(color, x, y, TileSizeX + 7, TileSizeY + 7);
-	Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, TileSizeX + 5, TileSizeY + 5);
+	Video.DrawRectangleClip(color, x, y, PixelTileSize.x + 7, PixelTileSize.y+ 7);
+	Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, PixelTileSize.x + 5, PixelTileSize.y + 5);
 
-	Video.DrawVLine(ColorGray, x + TileSizeX + 4, y + 5, TileSizeY - 1); // _|
-	Video.DrawVLine(ColorGray, x + TileSizeX + 5, y + 5, TileSizeY - 1);
-	Video.DrawHLine(ColorGray, x + 5, y + TileSizeY + 4, TileSizeX + 1);
-	Video.DrawHLine(ColorGray, x + 5, y + TileSizeY + 5, TileSizeX + 1);
+	Video.DrawVLine(ColorGray, x + PixelTileSize.x + 4, y + 5, PixelTileSize.y - 1); // _|
+	Video.DrawVLine(ColorGray, x + PixelTileSize.x + 5, y + 5, PixelTileSize.y - 1);
+	Video.DrawHLine(ColorGray, x + 5, y + PixelTileSize.y + 4, PixelTileSize.x + 1);
+	Video.DrawHLine(ColorGray, x + 5, y + PixelTileSize.y + 5, PixelTileSize.x + 1);
 
 	color = (flags & IconClicked) ? ColorGray : ColorWhite;
-	Video.DrawHLine(color, x + 5, y + 3, TileSizeX + 1);
-	Video.DrawHLine(color, x + 5, y + 4, TileSizeX + 1);
-	Video.DrawVLine(color, x + 3, y + 3, TileSizeY + 3);
-	Video.DrawVLine(color, x + 4, y + 3, TileSizeY + 3);
+	Video.DrawHLine(color, x + 5, y + 3, PixelTileSize.x + 1);
+	Video.DrawHLine(color, x + 5, y + 4, PixelTileSize.x + 1);
+	Video.DrawVLine(color, x + 3, y + 3, PixelTileSize.y + 3);
+	Video.DrawVLine(color, x + 4, y + 3, PixelTileSize.y + 3);
 
 	if (flags & IconClicked) {
 		++x;
@@ -708,7 +708,7 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 	Map.TileGraphic->DrawFrameClip(Map.Tileset.Table[tilenum], x, y);
 
 	if (flags & IconSelected) {
-		Video.DrawRectangleClip(ColorGreen, x, y, TileSizeX, TileSizeY);
+		Video.DrawRectangleClip(ColorGreen, x, y, PixelTileSize.x, PixelTileSize.y);
 	}
 }
 
@@ -755,35 +755,35 @@ static void DrawTileIcons(void)
 	i = Editor.TileIndex;
 	Assert(Editor.TileIndex != -1);
 	y = UI.ButtonPanel.Y + 24;
-	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - TileSizeY) {
+	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - PixelTileSize.y) {
 		if (i >= (int)Editor.ShownTileTypes.size()) {
 			break;
 		}
 		x = UI.ButtonPanel.X + 10;
-		while (x < UI.ButtonPanel.X + ButtonPanelWidth - TileSizeX) {
+		while (x < UI.ButtonPanel.X + ButtonPanelWidth - PixelTileSize.x) {
 			if (i >= (int) Editor.ShownTileTypes.size()) {
 				break;
 			}
 			tile = Editor.ShownTileTypes[i];
 
 			Map.TileGraphic->DrawFrameClip(Map.Tileset.Table[tile], x, y);
-			Video.DrawRectangleClip(ColorGray, x, y, TileSizeX, TileSizeY);
+			Video.DrawRectangleClip(ColorGray, x, y, PixelTileSize.x, PixelTileSize.y);
 
 			if (i == Editor.SelectedTileIndex) {
 				Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
-					TileSizeX-2, TileSizeY-2);
+					PixelTileSize.x - 2, PixelTileSize.y - 2);
 			}
 			if (i == Editor.CursorTileIndex) {
 				Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
-					TileSizeX+2, TileSizeY+2);
+					PixelTileSize.x + 2, PixelTileSize.y + 2);
 				Editor.PopUpX = x;
 				Editor.PopUpY = y;
 			}
 
-			x += TileSizeX + 8;
+			x += PixelTileSize.x + 8;
 			++i;
 		}
-		y += TileSizeY + 2;
+		y += PixelTileSize.y + 2;
 	}
 }
 
@@ -906,12 +906,12 @@ static void DrawMapCursor(void)
 			SetClipping(UI.MouseViewport->X, UI.MouseViewport->Y,
 				UI.MouseViewport->EndX, UI.MouseViewport->EndY);
 			for (int j = 0; j < TileCursorSize; ++j) {
-				const int ty = y + j * TileSizeY;
+				const int ty = y + j * PixelTileSize.y;
 				if (ty >= UI.MouseViewport->EndY) {
 					break;
 				}
 				for (int i = 0; i < TileCursorSize; ++i) {
-					const int tx = x + i * TileSizeX;
+					const int tx = x + i * PixelTileSize.x;
 					if (tx >= UI.MouseViewport->EndX) {
 						break;
 					}
@@ -919,8 +919,7 @@ static void DrawMapCursor(void)
 						Map.Tileset.Table[Editor.ShownTileTypes[Editor.SelectedTileIndex]], tx, ty);
 				}
 			}
-			Video.DrawRectangleClip(ColorWhite, x, y, TileSizeX * TileCursorSize,
-				TileSizeY * TileCursorSize);
+			Video.DrawRectangleClip(ColorWhite, x, y, PixelTileSize.x * TileCursorSize, PixelTileSize.y * TileCursorSize);
 			PopClipping();
 		} else {
 			//
@@ -931,7 +930,7 @@ static void DrawMapCursor(void)
 				PushClipping();
 				SetClipping(UI.MouseViewport->X, UI.MouseViewport->Y,
 					UI.MouseViewport->EndX, UI.MouseViewport->EndY);
-				Video.DrawRectangleClip(ColorWhite, x, y, TileSizeX, TileSizeY);
+				Video.DrawRectangleClip(ColorWhite, x, y, PixelTileSize.x, PixelTileSize.y);
 				PopClipping();
 			}
 		}
@@ -956,8 +955,8 @@ static void DrawStartLocations()
 				if (type) {
 					DrawUnitType(*type, type->Sprite, i, 0, x, y);
 				} else {
-					Video.DrawLineClip(PlayerColors[i][0], x, y, x + TileSizeX, y + TileSizeY);
-					Video.DrawLineClip(PlayerColors[i][0], x, y + TileSizeY, x + TileSizeX, y);
+					Video.DrawLineClip(PlayerColors[i][0], x, y, x + PixelTileSize.x, y + PixelTileSize.y);
+					Video.DrawLineClip(PlayerColors[i][0], x, y + PixelTileSize.y, x + PixelTileSize.x, y);
 				}
 			}
 		}
@@ -971,7 +970,7 @@ static void DrawStartLocations()
 **
 **  If cursor is on map or minimap show information about the current tile.
 */
-static void DrawEditorInfo(void)
+static void DrawEditorInfo()
 {
 #if 0
 	int tile;
@@ -1185,7 +1184,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				UI.Minimap.Screen2MapX(CursorX) -
 					UI.SelectedViewport->MapWidth / 2,
 				UI.Minimap.Screen2MapY(CursorY) -
-					UI.SelectedViewport->MapHeight / 2, TileSizeX / 2, TileSizeY / 2);
+					UI.SelectedViewport->MapHeight / 2, PixelTileSize.x / 2, PixelTileSize.y / 2);
 		}
 		return;
 	}
@@ -1585,7 +1584,7 @@ static void EditorCallbackMouse(int x, int y)
 		}
 		UI.MouseWarpX = CursorStartX;
 		UI.MouseWarpY = CursorStartY;
-		UI.MouseViewport->Set(xo, yo, TileSizeX / 2, TileSizeY / 2);
+		UI.MouseViewport->Set(xo, yo, PixelTileSize.x / 2, PixelTileSize.y / 2);
 		return;
 	}
 
@@ -1608,21 +1607,21 @@ static void EditorCallbackMouse(int x, int y)
 		if (CursorX <= UI.SelectedViewport->X) {
 			UI.SelectedViewport->Set(
 				UI.SelectedViewport->MapX - 1,
-				UI.SelectedViewport->MapY, TileSizeX / 2, TileSizeY / 2);
+				UI.SelectedViewport->MapY, PixelTileSize.x / 2, PixelTileSize.y / 2);
 		} else if (CursorX >= UI.SelectedViewport->EndX) {
 			UI.SelectedViewport->Set(
 				UI.SelectedViewport->MapX + 1,
-				UI.SelectedViewport->MapY, TileSizeX / 2, TileSizeY / 2);
+				UI.SelectedViewport->MapY, PixelTileSize.x / 2, PixelTileSize.y / 2);
 		}
 
 		if (CursorY <= UI.SelectedViewport->Y) {
 			UI.SelectedViewport->Set(
 				UI.SelectedViewport->MapX,
-				UI.SelectedViewport->MapY - 1, TileSizeX / 2, TileSizeY / 2);
+				UI.SelectedViewport->MapY - 1, PixelTileSize.x / 2, PixelTileSize.y / 2);
 		} else if (CursorY >= UI.SelectedViewport->EndY) {
 			UI.SelectedViewport->Set(
 				UI.SelectedViewport->MapX,
-				UI.SelectedViewport->MapY + 1, TileSizeX / 2, TileSizeY / 2);
+				UI.SelectedViewport->MapY + 1, PixelTileSize.x / 2, PixelTileSize.y / 2);
 
 		}
 
@@ -1765,27 +1764,27 @@ static void EditorCallbackMouse(int x, int y)
 
 		i = Editor.TileIndex;
 		by = UI.ButtonPanel.Y + 24;
-		while (by < UI.ButtonPanel.Y + ButtonPanelHeight - TileSizeY) {
+		while (by < UI.ButtonPanel.Y + ButtonPanelHeight - PixelTileSize.y) {
 			if (i >= (int)Editor.ShownTileTypes.size()) {
 				break;
 			}
 			bx = UI.ButtonPanel.X + 10;
-			while (bx < UI.ButtonPanel.X + ButtonPanelWidth - TileSizeX) {
+			while (bx < UI.ButtonPanel.X + ButtonPanelWidth - PixelTileSize.x) {
 			//while (bx < UI.ButtonPanel.X + 144) {
 				if (i >= (int)Editor.ShownTileTypes.size()) {
 					break;
 				}
-				if (bx < x && x < bx + TileSizeX &&
-						by < y && y < by + TileSizeY) {
+				if (bx < x && x < bx + PixelTileSize.x &&
+						by < y && y < by + PixelTileSize.y) {
 					int base = Map.Tileset.Tiles[Editor.ShownTileTypes[i]].BaseTerrain;
 					UI.StatusLine.Set(Map.Tileset.SolidTerrainTypes[base].TerrainName);
 					Editor.CursorTileIndex = i;
 					return;
 				}
-				bx += TileSizeX + 8;
+				bx += PixelTileSize.x + 8;
 				i++;
 			}
-			by += TileSizeY + 2;
+			by += PixelTileSize.y + 2;
 		}
 	}
 
@@ -1815,9 +1814,9 @@ static void EditorCallbackMouse(int x, int y)
 	}
 	if (Editor.TerrainEditable) {
 		if (UI.InfoPanel.X + 4 + TILE_ICON_X < CursorX &&
-				CursorX < UI.InfoPanel.X + 4 + TILE_ICON_X + TileSizeX + 7 &&
+				CursorX < UI.InfoPanel.X + 4 + TILE_ICON_X + PixelTileSize.x + 7 &&
 				UI.InfoPanel.Y + 4 + TILE_ICON_Y < CursorY &&
-				CursorY < UI.InfoPanel.Y + 4 + TILE_ICON_Y + TileSizeY + 7) {
+				CursorY < UI.InfoPanel.Y + 4 + TILE_ICON_Y + PixelTileSize.y + 7) {
 			ButtonAreaUnderCursor = -1;
 			ButtonUnderCursor = TileButton;
 			CursorOn = CursorOnButton;
@@ -1827,9 +1826,9 @@ static void EditorCallbackMouse(int x, int y)
 	}
 
 	int StartUnitWidth = Editor.StartUnit ?
-			Editor.StartUnit->Icon.Icon->G->Width : TileSizeX + 7;
+			Editor.StartUnit->Icon.Icon->G->Width : PixelTileSize.x + 7;
 	int StartUnitHeight = Editor.StartUnit ?
-			Editor.StartUnit->Icon.Icon->G->Height : TileSizeY + 7;
+			Editor.StartUnit->Icon.Icon->G->Height : PixelTileSize.y + 7;
 	if (UI.InfoPanel.X + 4 + START_ICON_X < CursorX &&
 			CursorX < UI.InfoPanel.X + 4 + START_ICON_X + StartUnitWidth &&
 			UI.InfoPanel.Y + 4 + START_ICON_Y < CursorY &&
@@ -1882,9 +1881,9 @@ static void EditorCallbackMouse(int x, int y)
 		//
 		UnitUnderCursor = UnitOnScreen(NULL,
 			CursorX - UI.MouseViewport->X +
-				UI.MouseViewport->MapX * TileSizeX + UI.MouseViewport->OffsetX,
+				UI.MouseViewport->MapX * PixelTileSize.x + UI.MouseViewport->OffsetX,
 			CursorY - UI.MouseViewport->Y +
-				UI.MouseViewport->MapY * TileSizeY + UI.MouseViewport->OffsetY);
+				UI.MouseViewport->MapY * PixelTileSize.y + UI.MouseViewport->OffsetY);
 		if (UnitUnderCursor != NULL) {
 			ShowUnitInfo(*UnitUnderCursor);
 			return;
