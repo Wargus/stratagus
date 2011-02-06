@@ -75,9 +75,6 @@ int CursorY;                 /// cursor position on screen Y
 int CursorStartX;            /// rectangle started on screen X
 int CursorStartY;            /// rectangle started on screen Y
 
-int SubScrollX;              /// pixels the mouse moved while scrolling
-int SubScrollY;              /// pixels the mouse moved while scrolling
-
 	/// X position of starting point of selection rectangle, in screen pixels.
 int CursorStartScrMapX;
 	/// Y position of starting point of selection rectangle, in screen pixels.
@@ -103,20 +100,18 @@ static SDL_Surface *HiddenSurface;
 */
 void LoadCursors(const std::string &race)
 {
-	std::vector<CCursor>::iterator i;
+	for (std::vector<CCursor>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
+		CCursor& cursor = *i;
 
-	for (i = AllCursors.begin(); i != AllCursors.end(); ++i) {
-		//
 		//  Only load cursors of this race or universal cursors.
-		//
-		if (!(*i).Race.empty() && (*i).Race != race) {
+		if (!cursor.Race.empty() && cursor.Race != race) {
 			continue;
 		}
 
-		if ((*i).G && !(*i).G->IsLoaded()) {
-			ShowLoadProgress("Cursor %s", (*i).G->File.c_str());
-			(*i).G->Load();
-			(*i).G->UseDisplayFormat();
+		if (cursor.G && !cursor.G->IsLoaded()) {
+			ShowLoadProgress("Cursor %s", cursor.G->File.c_str());
+			cursor.G->Load();
+			cursor.G->UseDisplayFormat();
 		}
 	}
 }
@@ -132,13 +127,13 @@ void LoadCursors(const std::string &race)
 */
 CCursor *CursorByIdent(const std::string &ident)
 {
-	std::vector<CCursor>::iterator i;
+	for (std::vector<CCursor>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
+		CCursor& cursor = *i;
 
-	for (i = AllCursors.begin(); i != AllCursors.end(); ++i) {
-		if ((*i).Ident != ident || ! (*i).G->IsLoaded())
+		if (cursor.Ident != ident || !cursor.G->IsLoaded())
 			continue;
-		if ((*i).Race.empty() || ! ThisPlayer || (*i).Race == PlayerRaces.Name[ThisPlayer->Race])
-			return &(*i);
+		if (cursor.Race.empty() || !ThisPlayer || cursor.Race == PlayerRaces.Name[ThisPlayer->Race])
+			return &cursor;
 	}
 	DebugPrint("Cursor `%s' not found, please check your code.\n" _C_ ident.c_str());
 	return NULL;
@@ -156,22 +151,21 @@ static void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 {
 	int w;
 	int h;
-	const CViewport *vp;
+	const CViewport &vp = *UI.SelectedViewport;
 
 	//
 	//  Clip to map window.
 	//  FIXME: should re-use CLIP_RECTANGLE in some way from linedraw.c ?
 	//
-	vp = UI.SelectedViewport;
-	if (x1 < vp->X) {
-		x1 = vp->X;
-	} else if (x1 > vp->EndX) {
-		x1 = vp->EndX;
+	if (x1 < vp.X) {
+		x1 = vp.X;
+	} else if (x1 > vp.EndX) {
+		x1 = vp.EndX;
 	}
-	if (y1 < vp->Y) {
-		y1 = vp->Y;
-	} else if (y1 > vp->EndY) {
-		y1 = vp->EndY;
+	if (y1 < vp.Y) {
+		y1 = vp.Y;
+	} else if (y1 > vp.EndY) {
+		y1 = vp.EndY;
 	}
 
 	if (x > x1) {
@@ -198,10 +192,10 @@ static void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 static void DrawBuildingCursor()
 {
 	// Align to grid
-	const CViewport *vp = UI.MouseViewport;
-	int x = CursorX - (CursorX - vp->X + vp->OffsetX) % TileSizeX;
-	int y = CursorY - (CursorY - vp->Y + vp->OffsetY) % TileSizeY;
-	const Vec2i mpos = {vp->Viewport2MapX(x), vp->Viewport2MapY(y)};
+	const CViewport &vp = *UI.MouseViewport;
+	int x = CursorX - (CursorX - vp.X + vp.OffsetX) % TileSizeX;
+	int y = CursorY - (CursorY - vp.Y + vp.OffsetY) % TileSizeY;
+	const Vec2i mpos = {vp.Viewport2MapX(x), vp.Viewport2MapY(y)};
 	CUnit *ontop = NULL;
 
 	//
@@ -213,7 +207,7 @@ static void DrawBuildingCursor()
 	}
 #endif
 	PushClipping();
-	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
+	SetClipping(vp.X, vp.Y, vp.EndX, vp.EndY);
 	DrawShadow(*CursorBuilding, CursorBuilding->StillFrame, x, y);
 	DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
 		CursorBuilding->StillFrame, x, y);
@@ -245,12 +239,12 @@ static void DrawBuildingCursor()
 	const int mask = CursorBuilding->MovementMask;
 	int h = CursorBuilding->TileHeight;
 	// reduce to view limits
-	if (mpos.y + h > vp->MapY + vp->MapHeight) {
-		h = vp->MapY + vp->MapHeight - mpos.y;
+	if (mpos.y + h > vp.MapY + vp.MapHeight) {
+		h = vp.MapY + vp.MapHeight - mpos.y;
 	}
 	int w0 = CursorBuilding->TileWidth;
-	if (mpos.x + w0 > vp->MapX + vp->MapWidth) {
-		w0 = vp->MapX + vp->MapWidth - mpos.x;
+	if (mpos.x + w0 > vp.MapX + vp.MapWidth) {
+		w0 = vp.MapX + vp.MapWidth - mpos.x;
 	}
 	while (h--) {
 		int w = w0;
@@ -334,14 +328,12 @@ void DrawCursor()
 /**
 **  Hide the cursor
 */
-void HideCursor(void)
+void HideCursor()
 {
 	if (!UseOpenGL && !GameRunning && !Editor.Running && GameCursor) {
 		SDL_Rect dstRect = {
-			CursorX - GameCursor->HotX,
-			CursorY - GameCursor->HotY,
-			0,
-			0
+			CursorX - GameCursor->HotX, CursorY - GameCursor->HotY,
+			0, 0
 		};
  		SDL_BlitSurface(HiddenSurface, NULL, TheScreen, &dstRect);
 	}
@@ -371,18 +363,16 @@ void CursorAnimate(unsigned ticks)
 /**
 **  Setup the cursor part.
 */
-void InitVideoCursors(void)
+void InitVideoCursors()
 {
 }
 
 /**
 **  Cleanup cursor module
 */
-void CleanCursors(void)
+void CleanCursors()
 {
-	std::vector<CCursor>::iterator i;
-
-	for (i = AllCursors.begin(); i != AllCursors.end(); ++i) {
+	for (std::vector<CCursor>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
 		CGraphic::Free((*i).G);
 	}
 	AllCursors.clear();

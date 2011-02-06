@@ -189,16 +189,16 @@ extern void LoadCursors(const std::string &racename);
 extern CCursor *CursorByIdent(const std::string &ident);
 
 	/// Draw any cursor
-extern void DrawCursor(void);
+extern void DrawCursor();
 	/// Hide the cursor
-extern void HideCursor(void);
+extern void HideCursor();
 	/// Animate the cursor
 extern void CursorAnimate(unsigned ticks);
 
 	/// Initialize the cursor module
-extern void InitVideoCursors(void);
+extern void InitVideoCursors();
 	/// Cleanup the cursor module
-extern void CleanCursors(void);
+extern void CleanCursors();
 
 //@}
 
