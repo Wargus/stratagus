@@ -104,11 +104,10 @@ static void WINAPI_AttachConsole(void) {
 
 /// This section set that WINAPI_AttachConsole() will be called at application startup before main()
 #ifdef _MSC_VER
-static void __cdecl initialize(void); __declspec(allocate(".CRT$XCU")) void (__cdecl*initialize_)(void) = initialize;
-static void __cdecl initialize(void) { WINAPI_AttachConsole(); }
+#pragma section(".CRT$XCU", long, read)
+__declspec(allocate(".CRT$XCU")) void (*initialize)(void) = WINAPI_AttachConsole;
 #else
-static void initialize(void) __attribute__((constructor));
-static void initialize(void) { WINAPI_AttachConsole(); }
+__attribute__((constructor)) static void initialize(void) { WINAPI_AttachConsole(); }
 #endif
 
 #endif
