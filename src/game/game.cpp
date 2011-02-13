@@ -437,16 +437,12 @@ int GetGameSpeed()
 /**
 **  Free for all
 */
-static void GameTypeFreeForAll(void)
+static void GameTypeFreeForAll()
 {
-	int i;
-	int j;
-
-	for (i = 0; i < PlayerMax - 1; ++i) {
-		for (j = 0; j < PlayerMax - 1; ++j) {
-			if (i != j) {
-				CommandDiplomacy(i, DiplomacyEnemy, j);
-			}
+	for (int i = 0; i < PlayerMax - 1; ++i) {
+		for (int j = i + 1; j < PlayerMax - 1; ++j) {
+			CommandDiplomacy(i, DiplomacyEnemy, j);
+			CommandDiplomacy(j, DiplomacyEnemy, i);
 		}
 	}
 }
@@ -454,25 +450,24 @@ static void GameTypeFreeForAll(void)
 /**
 **  Top vs Bottom
 */
-static void GameTypeTopVsBottom(void)
+static void GameTypeTopVsBottom()
 {
-	int i;
-	int j;
-	int top;
-	int middle;
+	const int middle = Map.Info.MapHeight / 2;
 
-	middle = Map.Info.MapHeight / 2;
-	for (i = 0; i < PlayerMax - 1; ++i) {
-		top = Players[i].StartY <= middle;
-		for (j = 0; j < PlayerMax - 1; ++j) {
-			if (i != j) {
-				if ((top && Players[j].StartY <= middle) ||
-						(!top && Players[j].StartY > middle)) {
-					CommandDiplomacy(i, DiplomacyAllied, j);
-					Players[i].SharedVision |= (1 << j);
-				} else {
-					CommandDiplomacy(i, DiplomacyEnemy, j);
-				}
+	for (int i = 0; i < PlayerMax - 1; ++i) {
+		const bool top_i = Players[i].StartY <= middle;
+
+		for (int j = i + 1; j < PlayerMax - 1; ++j) {
+			const bool top_j = Players[j].StartY <= middle;
+
+			if (top_i == top_j) {
+				CommandDiplomacy(i, DiplomacyAllied, j);
+				Players[i].SharedVision |= (1 << j);
+				CommandDiplomacy(j, DiplomacyAllied, i);
+				Players[j].SharedVision |= (1 << i);
+			} else {
+				CommandDiplomacy(i, DiplomacyEnemy, j);
+				CommandDiplomacy(j, DiplomacyEnemy, i);
 			}
 		}
 	}
@@ -481,25 +476,24 @@ static void GameTypeTopVsBottom(void)
 /**
 **  Left vs Right
 */
-static void GameTypeLeftVsRight(void)
+static void GameTypeLeftVsRight()
 {
-	int i;
-	int j;
-	int left;
-	int middle;
+	const int middle = Map.Info.MapWidth / 2;
 
-	middle = Map.Info.MapWidth / 2;
-	for (i = 0; i < PlayerMax - 1; ++i) {
-		left = Players[i].StartX <= middle;
-		for (j = 0; j < PlayerMax - 1; ++j) {
-			if (i != j) {
-				if ((left && Players[j].StartX <= middle) ||
-						(!left && Players[j].StartX > middle)) {
-					CommandDiplomacy(i, DiplomacyAllied, j);
-					Players[i].SharedVision |= (1 << j);
-				} else {
-					CommandDiplomacy(i, DiplomacyEnemy, j);
-				}
+	for (int i = 0; i < PlayerMax - 1; ++i) {
+		const bool left_i = Players[i].StartX <= middle;
+
+		for (int j = i + 1; j < PlayerMax - 1; ++j) {
+			const bool left_j = Players[j].StartX <= middle;
+
+			if (left_i ==left_j) {
+				CommandDiplomacy(i, DiplomacyAllied, j);
+				Players[i].SharedVision |= (1 << j);
+				CommandDiplomacy(j, DiplomacyAllied, i);
+				Players[j].SharedVision |= (1 << i);
+			} else {
+				CommandDiplomacy(i, DiplomacyEnemy, j);
+				CommandDiplomacy(j, DiplomacyEnemy, i);
 			}
 		}
 	}
@@ -508,23 +502,24 @@ static void GameTypeLeftVsRight(void)
 /**
 **  Man vs Machine
 */
-static void GameTypeManVsMachine(void)
+static void GameTypeManVsMachine()
 {
-	int i;
-	int j;
-
-	for (i = 0; i < PlayerMax - 1; ++i) {
+	for (int i = 0; i < PlayerMax - 1; ++i) {
 		if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer) {
 			continue;
 		}
-		for (j = 0; j < PlayerMax - 1; ++j) {
-			if (i != j) {
-				if (Players[i].Type == Players[j].Type) {
-					CommandDiplomacy(i, DiplomacyAllied, j);
-					Players[i].SharedVision |= (1 << j);
-				} else {
-					CommandDiplomacy(i, DiplomacyEnemy, j);
-				}
+		for (int j = i + 1; j < PlayerMax - 1; ++j) {
+			if (Players[j].Type != PlayerPerson && Players[j].Type != PlayerComputer) {
+				continue;
+			}
+			if (Players[i].Type == Players[j].Type) {
+				CommandDiplomacy(i, DiplomacyAllied, j);
+				Players[i].SharedVision |= (1 << j);
+				CommandDiplomacy(j, DiplomacyAllied, i);
+				Players[j].SharedVision |= (1 << i);
+			} else {
+				CommandDiplomacy(i, DiplomacyEnemy, j);
+				CommandDiplomacy(j, DiplomacyEnemy, i);
 			}
 		}
 	}
@@ -533,16 +528,13 @@ static void GameTypeManVsMachine(void)
 /**
 **  Man vs Machine whith Humans on a Team
 */
-static void GameTypeManTeamVsMachine(void)
+static void GameTypeManTeamVsMachine()
 {
-	int i;
-	int j;
-
-	for (i = 0; i < PlayerMax - 1; ++i) {
+	for (int i = 0; i < PlayerMax - 1; ++i) {
 		if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer) {
 			continue;
 		}
-		for (j = 0; j < PlayerMax - 1; ++j) {
+		for (int j = 0; j < PlayerMax - 1; ++j) {
 			if (i != j) {
 				if (Players[i].Type == Players[j].Type) {
 					CommandDiplomacy(i, DiplomacyAllied, j);
@@ -799,7 +791,7 @@ void CreateGame(const std::string &filename, CMap *map)
 **
 **  @todo  FIXME: this should not be executed for restart levels!
 */
-void InitSettings(void)
+void InitSettings()
 {
 	for (int i = 0; i < PlayerMax; ++i) {
 		GameSettings.Presets[i].Race = SettingsPresetMapDefault;

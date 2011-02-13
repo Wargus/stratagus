@@ -58,7 +58,7 @@
 
 bool RightButtonAttacks;                   /// right button attacks
 
-static	ViewportModeType NewViewportMode = VIEWPORT_SINGLE;
+static ViewportModeType NewViewportMode = VIEWPORT_SINGLE;
 
 bool FancyBuildings;                       /// Mirror buildings 1 yes, 0 now.
 
@@ -114,7 +114,7 @@ CUserInterface::CUserInterface() :
 /**
 **  Initialize the user interface.
 */
-void InitUserInterface(void)
+void InitUserInterface()
 {
 #ifdef USE_MAEMO
 	UI.Offset640X = (Video.Width - 800) / 2;
@@ -127,12 +127,8 @@ void InitUserInterface(void)
 	// Calculations
 	//
 	if (Map.Info.MapWidth) {
-		if (UI.MapArea.EndX > Map.Info.MapWidth * PixelTileSize.x - 1) {
-			UI.MapArea.EndX = Map.Info.MapWidth * PixelTileSize.x - 1;
-		}
-		if (UI.MapArea.EndY > Map.Info.MapHeight * PixelTileSize.y - 1) {
-			UI.MapArea.EndY = Map.Info.MapHeight * PixelTileSize.y - 1;
-		}
+		UI.MapArea.EndX = std::min(UI.MapArea.EndX, Map.Info.MapWidth * PixelTileSize.x - 1);
+		UI.MapArea.EndY = std::min(UI.MapArea.EndY, Map.Info.MapHeight * PixelTileSize.y - 1);
 	}
 
 	UI.SelectedViewport = UI.Viewports;
@@ -153,27 +149,24 @@ void CursorConfig::Load()
 {
 	Assert(!Name.empty());
 	Cursor = CursorByIdent(Name);
+	if (Cursor == NULL) {
+		return ;
+	}
 	Assert(Name == Cursor->Ident);
 }
 
 /**
 **  Load the user interface graphics.
 */
-void CUserInterface::Load(void)
+void CUserInterface::Load()
 {
-	int i;
-
-	//
 	//  Load graphics
-	//
-	int size = (int)Fillers.size();
-	for (i = 0; i < size; ++i) {
+	const int size = (int)Fillers.size();
+	for (int i = 0; i < size; ++i) {
 		Fillers[i].Load();
-		//Fillers[i].G->Load();
-		//Fillers[i].G->UseDisplayFormat();
 	}
 
-	for (i = 0; i <= ScoreCost; ++i) {
+	for (int i = 0; i <= ScoreCost; ++i) {
 		if (Resources[i].G) {
 			Resources[i].G->Load();
 			Resources[i].G->UseDisplayFormat();
@@ -193,9 +186,7 @@ void CUserInterface::Load(void)
 		PieMenu.G->UseDisplayFormat();
 	}
 
-	//
 	//  Resolve cursors
-	//
 	Point.Load();
 	Glass.Load();
 	Cross.Load();
@@ -220,19 +211,16 @@ void CUserInterface::Load(void)
 **  @param file  Save file handle
 **  @param ui    User interface to save
 */
-static void SaveViewports(CFile *file, const CUserInterface *ui)
+static void SaveViewports(CFile &file, const CUserInterface &ui)
 {
-	int i;
-	const CViewport *vp;
-
 	// FIXME: don't save the number
-	file->printf("DefineViewports(\"mode\", %d", ui->ViewportMode);
-	for (i = 0; i < ui->NumViewports; ++i) {
-		vp = &ui->Viewports[i];
-		file->printf(",\n  \"viewport\", {%d, %d, %d}", vp->MapX, vp->MapY,
-			vp->Unit ? UnitNumber(*vp->Unit) : -1);
+	file.printf("DefineViewports(\"mode\", %d", ui.ViewportMode);
+	for (int i = 0; i < ui.NumViewports; ++i) {
+		const CViewport &vp = ui.Viewports[i];
+		file.printf(",\n  \"viewport\", {%d, %d, %d}", vp.MapX, vp.MapY,
+			vp.Unit ? UnitNumber(*vp.Unit) : -1);
 	}
-	file->printf(")\n\n");
+	file.printf(")\n\n");
 }
 
 /**
@@ -242,7 +230,7 @@ static void SaveViewports(CFile *file, const CUserInterface *ui)
 */
 void SaveUserInterface(CFile *file)
 {
-	SaveViewports(file, &UI);
+	SaveViewports(*file, UI);
 }
 
 /**
@@ -255,18 +243,16 @@ CUserInterface::~CUserInterface()
 /**
 **  Clean up the user interface module.
 */
-void CleanUserInterface(void)
+void CleanUserInterface()
 {
-	int i;
-
 	// Filler
-	for (i = 0; i < (int)UI.Fillers.size(); ++i) {
+	for (int i = 0; i < (int)UI.Fillers.size(); ++i) {
 		CGraphic::Free(UI.Fillers[i].G);
 	}
 	UI.Fillers.clear();
 
 	// Resource Icons
-	for (i = 0; i <= ScoreCost; ++i) {
+	for (int i = 0; i <= ScoreCost; ++i) {
 		CGraphic::Free(UI.Resources[i].G);
 	}
 
@@ -300,7 +286,7 @@ void CleanUserInterface(void)
 
 	// Title Screens
 	if (TitleScreens) {
-		for (i = 0; TitleScreens[i]; ++i) {
+		for (int i = 0; TitleScreens[i]; ++i) {
 			delete TitleScreens[i];
 		}
 		delete[] TitleScreens;
@@ -334,9 +320,7 @@ void FreeButtonStyles()
 */
 CViewport *GetViewport(int x, int y)
 {
-	CViewport *vp;
-
-	for (vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
+	for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
 		if (x >= vp->X && x <= vp->EndX && y >= vp->Y && y <= vp->EndY) {
 			return vp;
 		}
@@ -357,16 +341,12 @@ CViewport *GetViewport(int x, int y)
 */
 static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 {
-	int i;
-
 	if (UI.NumViewports < num_vps) {
 		//  Compute location of the viewport using oldviewport
-		for (i = 0; i < num_vps; ++i) {
-			const CViewport *vp;
-
+		for (int i = 0; i < num_vps; ++i) {
 			new_vps[i].MapX = 0;
 			new_vps[i].MapY = 0;
-			vp = GetViewport(new_vps[i].X, new_vps[i].Y);
+			const CViewport *vp = GetViewport(new_vps[i].X, new_vps[i].Y);
 			if (vp) {
 				new_vps[i].OffsetX = new_vps[i].X - vp->X + vp->MapX * PixelTileSize.x + vp->OffsetX;
 				new_vps[i].OffsetY = new_vps[i].Y - vp->Y + vp->MapY * PixelTileSize.y + vp->OffsetY;
@@ -376,7 +356,7 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 			}
 		}
 	} else {
-		for (i = 0; i < num_vps; ++i) {
+		for (int i = 0; i < num_vps; ++i) {
 			new_vps[i].MapX = UI.Viewports[i].MapX;
 			new_vps[i].MapY = UI.Viewports[i].MapY;
 			new_vps[i].OffsetX = UI.Viewports[i].OffsetX;
@@ -385,10 +365,9 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 	}
 
 	// Affect the old viewport.
-	for (i = 0; i < num_vps; ++i) {
-		CViewport *vp;
+	for (int i = 0; i < num_vps; ++i) {
+		CViewport *vp = UI.Viewports + i;
 
-		vp = UI.Viewports + i;
 		vp->X = new_vps[i].X;
 		vp->EndX = new_vps[i].EndX;
 		vp->Y = new_vps[i].Y;
@@ -422,24 +401,18 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 **  However, they can be smaller according to the place
 **  the viewport vp takes in context of current ViewportMode.
 */
-static void ClipViewport(CViewport *vp, int ClipX, int ClipY)
+static void ClipViewport(CViewport &vp, int ClipX, int ClipY)
 {
 	// begin with maximum possible viewport size
-	vp->EndX = vp->X + Map.Info.MapWidth * PixelTileSize.x - 1;
-	vp->EndY = vp->Y + Map.Info.MapHeight * PixelTileSize.y - 1;
+	vp.EndX = vp.X + Map.Info.MapWidth * PixelTileSize.x - 1;
+	vp.EndY = vp.Y + Map.Info.MapHeight * PixelTileSize.y - 1;
 
 	// first clip it to MapArea size if necessary
-	if (vp->EndX > ClipX) {
-		vp->EndX = ClipX;
-	}
+	vp.EndX = std::min(vp.EndX, ClipX);
+	vp.EndY = std::min(vp.EndY, ClipY);
 
-	// the same for y
-	if (vp->EndY > ClipY) {
-		vp->EndY = ClipY;
-	}
-
-	Assert(vp->EndX <= UI.MapArea.EndX);
-	Assert(vp->EndY <= UI.MapArea.EndY);
+	Assert(vp.EndX <= UI.MapArea.EndX);
+	Assert(vp.EndY <= UI.MapArea.EndY);
 }
 
 /**
@@ -450,7 +423,7 @@ static void ClipViewport(CViewport *vp, int ClipX, int ClipY)
 **  origin, and the corresponding map parameters expressed in map
 **  tiles with origin at map origin (map tile (0,0)).
 */
-static void SetViewportModeSingle(void)
+static void SetViewportModeSingle()
 {
 	CViewport new_vps[MAX_NUM_VIEWPORTS];
 
@@ -458,7 +431,7 @@ static void SetViewportModeSingle(void)
 
 	new_vps[0].X = UI.MapArea.X;
 	new_vps[0].Y = UI.MapArea.Y;
-	ClipViewport(new_vps, UI.MapArea.EndX, UI.MapArea.EndY);
+	ClipViewport(new_vps[0], UI.MapArea.EndX, UI.MapArea.EndY);
 
 	FinishViewportModeConfiguration(new_vps, 1);
 }
@@ -473,7 +446,7 @@ static void SetViewportModeSingle(void)
 **  origin, and the corresponding map parameters expressed in map
 **  tiles with origin at map origin (map tile (0,0)).
 */
-static void SetViewportModeSplitHoriz(void)
+static void SetViewportModeSplitHoriz()
 {
 	CViewport new_vps[MAX_NUM_VIEWPORTS];
 
@@ -481,12 +454,12 @@ static void SetViewportModeSplitHoriz(void)
 
 	new_vps[0].X = UI.MapArea.X;
 	new_vps[0].Y = UI.MapArea.Y;
-	ClipViewport(new_vps, UI.MapArea.EndX,
+	ClipViewport(new_vps[0], UI.MapArea.EndX,
 		UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
 
 	new_vps[1].X = UI.MapArea.X;
 	new_vps[1].Y = new_vps[0].EndY + 1;
-	ClipViewport(new_vps + 1, UI.MapArea.EndX, UI.MapArea.EndY);
+	ClipViewport(new_vps[1], UI.MapArea.EndX, UI.MapArea.EndY);
 
 	FinishViewportModeConfiguration(new_vps, 2);
 }
@@ -502,7 +475,7 @@ static void SetViewportModeSplitHoriz(void)
 **  origin, and the corresponding map parameters expressed in map
 **  tiles with origin at map origin (map tile (0,0)).
 */
-static void SetViewportModeSplitHoriz3(void)
+static void SetViewportModeSplitHoriz3()
 {
 	CViewport new_vps[MAX_NUM_VIEWPORTS];
 
@@ -510,18 +483,18 @@ static void SetViewportModeSplitHoriz3(void)
 
 	new_vps[0].X = UI.MapArea.X;
 	new_vps[0].Y = UI.MapArea.Y;
-	ClipViewport(new_vps, UI.MapArea.EndX,
+	ClipViewport(new_vps[0], UI.MapArea.EndX,
 		UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
 
 	new_vps[1].X = UI.MapArea.X;
 	new_vps[1].Y = new_vps[0].EndY + 1;
-	ClipViewport(new_vps + 1,
+	ClipViewport(new_vps[1],
 		UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
 		UI.MapArea.EndY);
 
 	new_vps[2].X = new_vps[1].EndX + 1;
 	new_vps[2].Y = new_vps[0].EndY + 1;
-	ClipViewport(new_vps + 2, UI.MapArea.EndX, UI.MapArea.EndY);
+	ClipViewport(new_vps[2], UI.MapArea.EndX, UI.MapArea.EndY);
 
 	FinishViewportModeConfiguration(new_vps, 3);
 }
@@ -536,7 +509,7 @@ static void SetViewportModeSplitHoriz3(void)
 **  origin, and the corresponding map parameters expressed in map
 **  tiles with origin at map origin (map tile (0,0)).
 */
-static void SetViewportModeSplitVert(void)
+static void SetViewportModeSplitVert()
 {
 	CViewport new_vps[MAX_NUM_VIEWPORTS];
 
@@ -544,13 +517,13 @@ static void SetViewportModeSplitVert(void)
 
 	new_vps[0].X = UI.MapArea.X;
 	new_vps[0].Y = UI.MapArea.Y;
-	ClipViewport(new_vps,
+	ClipViewport(new_vps[0],
 		UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
 		UI.MapArea.EndY);
 
 	new_vps[1].X = new_vps[0].EndX + 1;
 	new_vps[1].Y = UI.MapArea.Y;
-	ClipViewport(new_vps + 1, UI.MapArea.EndX, UI.MapArea.EndY);
+	ClipViewport(new_vps[1], UI.MapArea.EndX, UI.MapArea.EndY);
 
 	FinishViewportModeConfiguration(new_vps, 2);
 }
@@ -565,7 +538,7 @@ static void SetViewportModeSplitVert(void)
 **  origin, and the corresponding map parameters expressed in map
 **  tiles with origin at map origin (map tile (0,0)).
 */
-static void SetViewportModeQuad(void)
+static void SetViewportModeQuad()
 {
 	CViewport new_vps[MAX_NUM_VIEWPORTS];
 
@@ -573,25 +546,25 @@ static void SetViewportModeQuad(void)
 
 	new_vps[0].X = UI.MapArea.X;
 	new_vps[0].Y = UI.MapArea.Y;
-	ClipViewport(new_vps,
+	ClipViewport(new_vps[0],
 		UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
 		UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
 
 	new_vps[1].X = new_vps[0].EndX + 1;
 	new_vps[1].Y = UI.MapArea.Y;
-	ClipViewport(new_vps + 1,
+	ClipViewport(new_vps[1],
 		UI.MapArea.EndX,
 		UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
 
 	new_vps[2].X = UI.MapArea.X;
 	new_vps[2].Y = new_vps[0].EndY + 1;
-	ClipViewport(new_vps + 2,
+	ClipViewport(new_vps[2],
 		UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
 		UI.MapArea.EndY);
 
 	new_vps[3].X = new_vps[1].X;
 	new_vps[3].Y = new_vps[2].Y;
-	ClipViewport(new_vps + 3, UI.MapArea.EndX, UI.MapArea.EndY);
+	ClipViewport(new_vps[3], UI.MapArea.EndX, UI.MapArea.EndY);
 
 	FinishViewportModeConfiguration(new_vps, 4);
 }
@@ -644,26 +617,24 @@ void CycleViewportMode(int step)
 	}
 }
 
-void CheckViewportMode(void)
+void CheckViewportMode()
 {
 	if (NewViewportMode != UI.ViewportMode) {
 		SetViewportMode(NewViewportMode);
 	}
 }
 
-void UpdateViewports(void)
+void UpdateViewports()
 {
-	CViewport *vp;
-	for (vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
+	for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
 		vp->UpdateUnits();
 	}
-	return;
 }
 
 /**
 **  Check if mouse scrolling is enabled
 */
-bool GetMouseScroll(void)
+bool GetMouseScroll()
 {
 	return UI.MouseScroll;
 }
@@ -699,7 +670,7 @@ void SetKeyScroll(bool enabled)
 /**
 **  Check if mouse grabbing is enabled
 */
-bool GetGrabMouse(void)
+bool GetGrabMouse()
 {
 	return SdlGetGrabMouse();
 }
@@ -717,7 +688,7 @@ void SetGrabMouse(bool enabled)
 /**
 **  Check if scrolling stops when leaving the window
 */
-bool GetLeaveStops(void)
+bool GetLeaveStops()
 {
 	return LeaveStops;
 }
