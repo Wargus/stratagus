@@ -242,7 +242,7 @@ inline void ProfilePrint()
 ----------------------------------------------------------------------------*/
 
 // FIXME: this is duplicated from map_fog.cpp
-static void ASInitVisionTable(void)
+static void ASInitVisionTable()
 {
 	ProfileBegin("InitVisionTable");
 
@@ -381,7 +381,7 @@ void InitAStar(int mapWidth, int mapHeight,
 /**
 **  Free A* data structure
 */
-void FreeAStar(void)
+void FreeAStar()
 {
 	delete[] AStarMatrix;
 	AStarMatrix = NULL;
@@ -409,7 +409,7 @@ void FreeAStar(void)
 /**
 **  Prepare pathfinder.
 */
-static void AStarPrepare(void)
+static void AStarPrepare()
 {
 	memset(AStarMatrix, 0, AStarMatrixSize);
 }
@@ -432,7 +432,7 @@ static void AStarCleanUp()
 	ProfileEnd("AStarCleanUp");
 }
 
-static void CostMoveToCacheCleanUp(void)
+static void CostMoveToCacheCleanUp()
 {
 	ProfileBegin("CostMoveToCacheCleanUp");
 	int AStarMapMax =  AStarMapWidth * AStarMapHeight;

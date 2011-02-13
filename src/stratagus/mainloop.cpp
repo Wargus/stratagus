@@ -195,7 +195,7 @@ void DoScrollArea(int state, bool fast)
 /**
 **  Draw map area
 */
-void DrawMapArea(void)
+void DrawMapArea()
 {
 	// Draw all of the viewports
 	for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
@@ -220,7 +220,7 @@ void DrawMapArea(void)
 **  This functions updates everything on screen. The map, the gui, the
 **  cursors.
 */
-void UpdateDisplay(void)
+void UpdateDisplay()
 {
 	if (GameRunning || Editor.Running == EditorEditing) {
 		DrawMapArea();
@@ -267,7 +267,7 @@ void UpdateDisplay(void)
 	Invalidate();
 }
 
-static void InitGameCallbacks(void)
+static void InitGameCallbacks()
 {
 	GameCallbacks.ButtonPressed = HandleButtonDown;
 	GameCallbacks.ButtonReleased = HandleButtonUp;
@@ -279,7 +279,7 @@ static void InitGameCallbacks(void)
 	GameCallbacks.NetworkEvent = NetworkEvent;
 }
 
-static void GameLogicLoop(void)
+static void GameLogicLoop()
 {
 	int player;
 
@@ -367,7 +367,7 @@ static void GameLogicLoop(void)
 static	int RealVideoSyncSpeed;
 #endif
 
-static void DisplayLoop(void)
+static void DisplayLoop()
 {
 #ifdef USE_MAEMO
 	if (!IsSDLWindowVisible) {
@@ -432,7 +432,7 @@ static void DisplayLoop(void)
 	}
 }
 
-static void SingleGameLoop(void)
+static void SingleGameLoop()
 {
 	while (GameRunning) {
 		DisplayLoop();
@@ -441,7 +441,7 @@ static void SingleGameLoop(void)
 }
 
 struct GameLogic: public CThread {
-	void Run(void)
+	void Run()
 	{
 		while (GameRunning) {
 			GameLogicLoop();
@@ -460,7 +460,7 @@ struct GameLogic: public CThread {
 **  Display update.
 **  Input/Network/Sound.
 */
-void GameMainLoop(void)
+void GameMainLoop()
 {
 #ifdef DEBUG  // removes the setjmp warnings
 	static bool showtip;

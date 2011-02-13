@@ -145,7 +145,7 @@ PFNGLGETCOMPRESSEDTEXIMAGEARBPROC   glGetCompressedTexImageARB;
 **
 **  @see VideoSyncSpeed @see SkipFrames @see FrameTicks @see FrameRemainder
 */
-void SetVideoSync(void)
+void SetVideoSync()
 {
 	int ms;
 
@@ -255,7 +255,7 @@ static void InitOpenGLExtensions()
 /**
 **  Initialize OpenGL
 */
-static void InitOpenGL(void)
+static void InitOpenGL()
 {
 
 	InitOpenGLExtensions();
@@ -489,7 +489,7 @@ void OssoDeinitialize()
 /**
 **  Initialize the video part for SDL.
 */
-void InitVideoSdl(void)
+void InitVideoSdl()
 {
 	Uint32 flags;
 
@@ -716,7 +716,7 @@ void InvalidateArea(int x, int y, int w, int h)
 /**
 **  Invalidate whole window
 */
-void Invalidate(void)
+void Invalidate()
 {
 	if (!UseOpenGL) {
 		Rects[0].x = 0;
@@ -814,7 +814,7 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 	}
 }
 
-void ValidateOpenGLScreen(void)
+void ValidateOpenGLScreen()
 {
 	if (RegenerateScreen) {
 		Video.ResizeScreen(Video.Width, Video.Height);
@@ -956,7 +956,7 @@ void WaitEventsOneFrame()
 /**
 **  Realize video memory.
 */
-void RealizeVideoMemory(void)
+void RealizeVideoMemory()
 {
 	if (UseOpenGL) {
 #ifdef USE_GLES
@@ -977,7 +977,7 @@ void RealizeVideoMemory(void)
 /**
 **  Lock the screen for write access.
 */
-void SdlLockScreen(void)
+void SdlLockScreen()
 {
 	if (!UseOpenGL) {
 		if (SDL_MUSTLOCK(TheScreen)) {
@@ -989,7 +989,7 @@ void SdlLockScreen(void)
 /**
 **  Unlock the screen for write access.
 */
-void SdlUnlockScreen(void)
+void SdlUnlockScreen()
 {
 	if (!UseOpenGL) {
 		if (SDL_MUSTLOCK(TheScreen)) {
@@ -1031,7 +1031,7 @@ int Str2SdlKey(const char *str)
 /**
 **  Check if the mouse is grabbed
 */
-bool SdlGetGrabMouse(void)
+bool SdlGetGrabMouse()
 {
 	return SDL_WM_GrabInput(SDL_GRAB_QUERY) == SDL_GRAB_ON;
 }
@@ -1055,7 +1055,7 @@ void ToggleGrabMouse(int mode)
 /**
 **  Toggle full screen mode.
 */
-void ToggleFullScreen(void)
+void ToggleFullScreen()
 {
 #ifdef USE_MAEMO
 	// On Maemo is only supported fullscreen mode

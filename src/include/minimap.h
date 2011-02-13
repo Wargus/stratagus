@@ -43,7 +43,7 @@ class CMinimap
 	void UpdateMapTerrain(void *const mpixels, const int mpitch,
 		 const void *const tpixels, const int tpitch);
 
-	void UpdateTerrain(void);
+	void UpdateTerrain();
 
 	template <const int BPP>
 	void UpdateSeen(void *const pixels, const int pitch);

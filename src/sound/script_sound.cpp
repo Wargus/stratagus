@@ -516,7 +516,7 @@ static int CclSetSoundRange(lua_State *l) {
 /**
 **  Register CCL features for sound.
 */
-void SoundCclRegister(void)
+void SoundCclRegister()
 {
 	lua_register(Lua, "SetGlobalSoundRange", CclSetGlobalSoundRange);
 	lua_register(Lua, "DefineGameSounds", CclDefineGameSounds);

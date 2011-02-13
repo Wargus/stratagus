@@ -1349,7 +1349,7 @@ static int CclDefineButton(lua_State *l)
 /**
 **  Run the set-selection-changed-hook.
 */
-void SelectionChanged(void)
+void SelectionChanged()
 {
 	// We Changed out selection, anything pending buttonwise must be cleared
 	UI.StatusLine.Clear();
@@ -1365,7 +1365,7 @@ void SelectionChanged(void)
 /**
 **  The selected unit has been altered.
 */
-void SelectedUnitChanged(void)
+void SelectedUnitChanged()
 {
 	UI.ButtonPanel.Update();
 }
@@ -1460,7 +1460,7 @@ static int CclDefineMapSetup(lua_State *l)
 /**
 **  Register CCL features for UI.
 */
-void UserInterfaceCclRegister(void)
+void UserInterfaceCclRegister()
 {
 	lua_register(Lua, "AddMessage", CclAddMessage);
 

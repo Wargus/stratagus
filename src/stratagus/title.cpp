@@ -88,7 +88,7 @@ static void WaitCallbackMouse(int, int)
 /**
 **  Callback for exit.
 */
-static void WaitCallbackExit(void)
+static void WaitCallbackExit()
 {
 }
 

@@ -215,7 +215,6 @@ public:
 
 	CUnit *Unit;                /// Bound to this unit
 	CDrawProxy *Proxy;
-
 };
 
 /**
@@ -453,7 +452,7 @@ class CFiller
 public:
 	CFiller() : G(NULL), X(0), Y(0) {}
 
-	void Load(void);
+	void Load();
 
 	bool OnGraphic(int x, int y) {
 		x -= X;
@@ -726,7 +725,7 @@ class ButtonActionProxy {
         return *this;
     }
 
-    friend void CButtonPanel::Update(void);
+    friend void CButtonPanel::Update();
 public:
 
   	ButtonActionProxy (): ptr(0), count(0) {}
@@ -755,7 +754,7 @@ public:
 		return ptr[index];
 	}
 
-    bool IsValid(void)
+    bool IsValid()
     {
     	return ptr != NULL;
     }
@@ -787,16 +786,16 @@ extern bool FancyBuildings;             /// Mirror buildings 1 yes, 0 now.
 ----------------------------------------------------------------------------*/
 
 	/// Initialize the ui
-extern void InitUserInterface(void);
+extern void InitUserInterface();
 	/// Save the ui state
 extern void SaveUserInterface(CFile *file);
 	/// Clean up the ui module
-extern void CleanUserInterface(void);
+extern void CleanUserInterface();
 #ifdef DEBUG
 extern void FreeButtonStyles();
 #endif
 	/// Register ccl features
-extern void UserInterfaceCclRegister(void);
+extern void UserInterfaceCclRegister();
 
 	/// Find a button style
 extern ButtonStyle *FindButtonStyle(const std::string &style);
@@ -809,9 +808,9 @@ extern void UIHandleButtonDown(unsigned button);
 extern void UIHandleButtonUp(unsigned button);
 
 	/// Restrict mouse cursor to viewport
-extern void RestrictCursorToViewport(void);
+extern void RestrictCursorToViewport();
 	/// Restrict mouse cursor to minimap
-extern void RestrictCursorToMinimap(void);
+extern void RestrictCursorToMinimap();
 
 	/// Get viewport for screen pixel position
 extern CViewport *GetViewport(int x, int y);
@@ -819,25 +818,25 @@ extern CViewport *GetViewport(int x, int y);
 extern void CycleViewportMode(int);
 	/// Select viewport mode
 extern void SetViewportMode(ViewportModeType mode);
-extern void CheckViewportMode(void);
-extern void UpdateViewports(void);
+extern void CheckViewportMode();
+extern void UpdateViewports();
 
 	/// Use the mouse to scroll the map
 extern void MouseScrollMap(int x, int y);
 	/// Check if mouse scrolling is enabled
-extern bool GetMouseScroll(void);
+extern bool GetMouseScroll();
 	/// Enable/disable scrolling with the mouse
 extern void SetMouseScroll(bool enabled);
 	/// Check if keyboard scrolling is enabled
-extern bool GetKeyScroll(void);
+extern bool GetKeyScroll();
 	/// Enable/disable scrolling with the keyboard
 extern void SetKeyScroll(bool enabled);
 	/// Check if mouse grabbing is enabled
-extern bool GetGrabMouse(void);
+extern bool GetGrabMouse();
 	/// Enable/disable grabbing the mouse
 extern void SetGrabMouse(bool enabled);
 	/// Check if scrolling stops when leaving the window
-extern bool GetLeaveStops(void);
+extern bool GetLeaveStops();
 	/// Enable/disable leaving the window stops scrolling
 extern void SetLeaveStops(bool enabled);
 

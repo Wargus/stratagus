@@ -82,7 +82,7 @@ ButtonActionProxy CurrentButtons;
 /**
 **  Initialize the buttons.
 */
-void InitButtons(void)
+void InitButtons()
 {
 	// Resolve the icon names.
 	for (int z = 0; z < (int)UnitButtonTable.size(); ++z) {
@@ -173,7 +173,7 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 /**
 **  Cleanup buttons.
 */
-void CleanButtons(void)
+void CleanButtons()
 {
 	// Free the allocated buttons.
 	for (int z = 0; z < (int)UnitButtonTable.size(); ++z) {
@@ -613,7 +613,7 @@ static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 **
 **  Draw all action buttons.
 */
-void CButtonPanel::Draw(void)
+void CButtonPanel::Draw()
 {
 	CPlayer *player;
 	char buf[8];
@@ -826,7 +826,7 @@ static bool IsButtonAllowed(const CUnit &unit, const ButtonAction *buttonaction)
 **  @todo FIXME : make UpdateButtonPanelMultipleUnits more configurable.
 **  @todo show all possible buttons or just same button...
 */
-static ButtonAction *UpdateButtonPanelMultipleUnits(void)
+static ButtonAction *UpdateButtonPanelMultipleUnits()
 {
 	char unit_ident[128];
 	int z;

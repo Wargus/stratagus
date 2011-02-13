@@ -171,7 +171,7 @@ extern CSound *RegisterSound(const char *files[], unsigned int number);
 extern CSound *RegisterTwoGroups(CSound *first, CSound *second);
 
 	/// Initialize client side of the sound layer.
-extern void InitSoundClient(void);
+extern void InitSoundClient();
 
 
 // music.cpp
@@ -180,7 +180,7 @@ extern void InitSoundClient(void);
 extern void CheckMusicFinished(bool force = false);
 
 	/// Initialize music
-extern void InitMusic(void);
+extern void InitMusic();
 
 	/// Turn music stopped callback on
 #define CallbackMusicOn() \
@@ -208,7 +208,7 @@ extern void FreeSounds();
 // script_sound.cpp
 
 	/// register ccl features
-extern void SoundCclRegister(void);
+extern void SoundCclRegister();
 
 
 //@}

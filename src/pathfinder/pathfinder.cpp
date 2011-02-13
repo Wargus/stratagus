@@ -48,7 +48,7 @@ extern void InitAStar(int mapWidth, int mapHeight,
 	 int (STDCALL *costMoveTo)(unsigned int index, void *data));
 
 /// free the a* data structures
-extern void FreeAStar(void);
+extern void FreeAStar();
 
 /// Find and a* path for a unit
 extern int AStarFindPath(int sx, int sy, int gx, int gy, int gw, int gh,
@@ -126,7 +126,7 @@ static void InitMatrix(unsigned char *matrix)
 /**
 **  Create empty movement matrix.
 */
-unsigned char *CreateMatrix(void)
+unsigned char *CreateMatrix()
 {
 	InitMatrix(Matrix);
 	return Matrix;
@@ -135,7 +135,7 @@ unsigned char *CreateMatrix(void)
 /**
 **  Allocate a new matrix and initialize
 */
-unsigned char *MakeMatrix(void)
+unsigned char *MakeMatrix()
 {
 	unsigned char *matrix;
 

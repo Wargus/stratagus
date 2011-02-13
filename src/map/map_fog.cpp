@@ -657,7 +657,7 @@ void CViewport::DrawMapFogOfWar() const
 **  Initialize the fog of war.
 **  Build tables, setup functions.
 */
-void CMap::InitFogOfWar(void)
+void CMap::InitFogOfWar()
 {
 	//calculate this once from the settings and store it
 	FogOfWarColorSDL = Video.MapRGB(TheScreen->format, FogOfWarColor[0], FogOfWarColor[1], FogOfWarColor[2]);
@@ -743,7 +743,7 @@ void CMap::InitFogOfWar(void)
 /**
 **  Cleanup the fog of war.
 */
-void CMap::CleanFogOfWar(void)
+void CMap::CleanFogOfWar()
 {
 	delete[] VisibleTable;
 	VisibleTable = NULL;
@@ -764,7 +764,7 @@ void CMap::CleanFogOfWar(void)
 /**
 **  Initialize Vision and Goal Tables.
 */
-void InitVisionTable(void)
+void InitVisionTable()
 {
 	int *visionlist;
 	int maxsize;
@@ -905,7 +905,7 @@ void InitVisionTable(void)
 /**
 **  Clean Up Generated Vision and Goal Tables.
 */
-void FreeVisionTable(void)
+void FreeVisionTable()
 {
 	// Free Vision Data
 	delete[] VisionTable[0];

@@ -302,9 +302,9 @@ public:
 
 
 	/// Regenerate the forest.
-	void RegenerateForest(void);
+	void RegenerateForest();
 	/// Reveal the complete map, make everything known.
-	void Reveal(void);
+	void Reveal();
 	/// Save the map.
 	void Save(CFile *file) const;
 

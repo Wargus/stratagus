@@ -743,7 +743,7 @@ void CGraphic::Free(CGraphic *g)
 /**
 **  Free OpenGL graphics
 */
-void FreeOpenGLGraphics(void)
+void FreeOpenGLGraphics()
 {
 	DisplayAutoLocker autolock;
 	std::list<CGraphic *>::iterator i;
@@ -765,7 +765,7 @@ void FreeOpenGLGraphics(void)
 /**
 **  Reload OpenGL graphics
 */
-void ReloadGraphics(void)
+void ReloadGraphics()
 {
 	std::list<CGraphic *>::iterator i;
 	for (i = Graphics.begin(); i != Graphics.end(); ++i) {
@@ -1498,7 +1498,7 @@ void CFiller::bits_map::Init(CGraphic *g)
 	SDL_UnlockSurface(s);
 }
 
-void CFiller::Load(void) {
+void CFiller::Load() {
 	if(G) {
 		G->Load();
 		map.Init(G);

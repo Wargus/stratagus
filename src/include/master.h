@@ -55,8 +55,8 @@ extern int MetaServerInUse;
 extern std::string MasterHost;
 extern int MasterPort;
 
-extern int MetaInit(void);
-extern int MetaClose(void);
+extern int MetaInit();
+extern int MetaClose();
 extern int MetaServerOK(char *reply);
 extern int SendMetaCommand(const char *command, const char *format, ...);
 extern int RecvMetaReply(char **reply);

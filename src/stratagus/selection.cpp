@@ -1176,7 +1176,7 @@ static int CclSelection(lua_State *l)
 /**
 **  Register CCL features for selections.
 */
-void SelectionCclRegister(void)
+void SelectionCclRegister()
 {
 	lua_register(Lua, "SetGroupId", CclSetGroupId);
 	lua_register(Lua, "Selection", CclSelection);

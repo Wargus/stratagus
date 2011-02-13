@@ -131,8 +131,8 @@ public:
 	int NumTextures;           /// Number of textures
 
 	friend void MakeFontColorTextures(const CFont *font);
-	friend void CleanFonts(void);
-	friend void ReloadFonts(void);
+	friend void CleanFonts();
+	friend void ReloadFonts();
 };
 
 class CPlayerColorGraphic : public CGraphic
@@ -216,7 +216,7 @@ typedef struct _event_callback_ {
 		/// Callback for mouse move
 	void (*MouseMoved)(int x, int y);
 		/// Callback for mouse exit of game window
-	void (*MouseExit)(void);
+	void (*MouseExit)();
 
 		/// Callback for key press
 	void (*KeyPressed)(unsigned keycode, unsigned keychar);
@@ -226,7 +226,7 @@ typedef struct _event_callback_ {
 	void (*KeyRepeated)(unsigned keycode, unsigned keychar);
 
 		/// Callback for network event
-	void (*NetworkEvent)(void);
+	void (*NetworkEvent)();
 
 } EventCallback;
 
@@ -367,7 +367,7 @@ extern int SlowFrameCounter;
 
 	/// Initialize Pixels[] for all players.
 	/// (bring Players[] in sync with Pixels[])
-extern void SetPlayersPalette(void);
+extern void SetPlayersPalette();
 
 	/// The SDL screen
 extern SDL_Surface *TheScreen;
@@ -382,7 +382,7 @@ extern bool GLTextureCompressionSupported;
 extern bool UseGLTextureCompression;
 
 	/// initialize the video part
-extern void InitVideo(void);
+extern void InitVideo();
 
 	/// Check if a resolution is valid
 extern int VideoValidResolution(int w, int h);
@@ -396,7 +396,7 @@ extern void MakeTexture(CGraphic *graphic);
 extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player);
 
 	/// Regenerate Window screen if needed
-extern void ValidateOpenGLScreen(void);
+extern void ValidateOpenGLScreen();
 
 	/// Free OpenGL graphics
 extern void FreeOpenGLGraphics();
@@ -406,13 +406,13 @@ extern void ReloadGraphics();
 extern void ReloadOpenGL();
 
 	/// Initializes video synchronization.
-extern void SetVideoSync(void);
+extern void SetVideoSync();
 
 	/// Init line draw
-extern void InitLineDraw(void);
+extern void InitLineDraw();
 
 	/// Simply invalidates whole window or screen.
-extern void Invalidate(void);
+extern void Invalidate();
 
 	/// Invalidates selected area on window or screen. Use for accurate
 	/// redrawing. in so
@@ -423,7 +423,7 @@ extern void InvalidateArea(int x, int y, int w, int h);
 extern void SetClipping(int left, int top, int right, int bottom);
 
 	/// Realize video memory.
-extern void RealizeVideoMemory(void);
+extern void RealizeVideoMemory();
 
 	/// Save a screenshot to a PNG file
 extern void SaveScreenshotPNG(const char *name);
@@ -437,22 +437,22 @@ extern const EventCallback *GetCallbacks();
 extern void WaitEventsOneFrame();
 
 	/// Toggle full screen mode
-extern void ToggleFullScreen(void);
+extern void ToggleFullScreen();
 
 	/// Push current clipping.
-extern void PushClipping(void);
+extern void PushClipping();
 
 	/// Pop current clipping.
-extern void PopClipping(void);
+extern void PopClipping();
 
 	/// Returns the ticks in ms since start
-extern unsigned long GetTicks(void);
+extern unsigned long GetTicks();
 
 	/// Convert a SDLKey to a string
 extern const char *SdlKey2Str(int key);
 
 	/// Check if the mouse is grabbed
-extern bool SdlGetGrabMouse(void);
+extern bool SdlGetGrabMouse();
 	/// Toggle mouse grab mode
 extern void ToggleGrabMouse(int mode);
 

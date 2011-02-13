@@ -164,16 +164,16 @@ public:
 ----------------------------------------------------------------------------*/
 
 	/// Initialize the constructions module
-extern void InitConstructions(void);
+extern void InitConstructions();
 	/// Load the graphics for constructions
-extern void LoadConstructions(void);
+extern void LoadConstructions();
 	/// Clean up the constructions module
-extern void CleanConstructions(void);
+extern void CleanConstructions();
 	/// Get construction by identifier
 extern CConstruction *ConstructionByIdent(const std::string &ident);
 
 	/// Register ccl features
-extern void ConstructionCclRegister(void);
+extern void ConstructionCclRegister();
 
 //@}
 

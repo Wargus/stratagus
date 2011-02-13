@@ -161,7 +161,7 @@ static void AppendLog(LogEntry *log, CFile *dest);
 **
 ** @return A new FullReplay structure
 */
-static FullReplay *StartReplay(void)
+static FullReplay *StartReplay()
 {
 	FullReplay *replay;
 	char *s;
@@ -220,7 +220,7 @@ static FullReplay *StartReplay(void)
 /**
 **  Applies settings the game used at the start of the replay
 */
-static void ApplyReplaySettings(void)
+static void ApplyReplaySettings()
 {
 	if (CurrentReplay->Type == ReplayMultiPlayer) {
 		ExitNetwork1();
@@ -742,7 +742,7 @@ int LoadReplay(const std::string &name)
 /**
 **  End logging
 */
-void EndReplayLog(void)
+void EndReplayLog()
 {
 	if (LogFile) {
 		LogFile->close();
@@ -759,7 +759,7 @@ void EndReplayLog(void)
 /**
 **  Clean replay log
 */
-void CleanReplayLog(void)
+void CleanReplayLog()
 {
 	if (CurrentReplay) {
 		DeleteReplay(CurrentReplay);
@@ -909,7 +909,7 @@ static void DoNextReplay()
 /**
 **  Replay user commands from log each cycle
 */
-static void ReplayEachCycle(void)
+static void ReplayEachCycle()
 {
 	if (!CurrentReplay) {
 		return;
@@ -948,7 +948,7 @@ static void ReplayEachCycle(void)
 /**
 **  Replay user commands from log each cycle, single player games
 */
-void SinglePlayerReplayEachCycle(void)
+void SinglePlayerReplayEachCycle()
 {
 	if (ReplayGameType == ReplaySinglePlayer) {
 		ReplayEachCycle();
@@ -958,7 +958,7 @@ void SinglePlayerReplayEachCycle(void)
 /**
 **  Replay user commands from log each cycle, multiplayer games
 */
-void MultiPlayerReplayEachCycle(void)
+void MultiPlayerReplayEachCycle()
 {
 	if (ReplayGameType == ReplayMultiPlayer) {
 		ReplayEachCycle();
@@ -968,7 +968,7 @@ void MultiPlayerReplayEachCycle(void)
 /**
 **  Register Ccl functions with lua
 */
-void ReplayCclRegister(void)
+void ReplayCclRegister()
 {
 	lua_register(Lua, "Log", CclLog);
 	lua_register(Lua, "ReplayLog", CclReplayLog);

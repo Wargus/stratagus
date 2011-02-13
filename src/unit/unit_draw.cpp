@@ -369,7 +369,7 @@ static int CclDefineSprites(lua_State *l)
 /**
 **  Register CCL features for decorations.
 */
-void DecorationCclRegister(void)
+void DecorationCclRegister()
 {
 	DecoSprite.Name.clear();
 	DecoSprite.SpriteArray.clear();
@@ -380,7 +380,7 @@ void DecorationCclRegister(void)
 /**
 **  Load decoration.
 */
-void LoadDecorations(void)
+void LoadDecorations()
 {
 	std::vector<Decoration>::iterator i;
 	for (i = DecoSprite.SpriteArray.begin(); i != DecoSprite.SpriteArray.end(); ++i) {
@@ -393,7 +393,7 @@ void LoadDecorations(void)
 /**
 **  Clean decorations.
 */
-void CleanDecorations(void)
+void CleanDecorations()
 {
 	for (unsigned int i = 0; i < DecoSprite.SpriteArray.size(); ++i) {
 		CGraphic::Free(DecoSprite.SpriteArray[i].Sprite);

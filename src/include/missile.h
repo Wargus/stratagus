@@ -574,7 +574,7 @@ extern std::vector<BurningBuildingFrame *> BurningBuildingFrames;  /// Burning b
 // In ccl_missile.c
 
 	/// register ccl features
-extern void MissileCclRegister(void);
+extern void MissileCclRegister();
 
 // In missile.c
 

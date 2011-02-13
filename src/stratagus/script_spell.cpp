@@ -759,7 +759,7 @@ static int CclDefineSpell(lua_State *l)
 /**
 ** Register CCL features for Spell.
 */
-void SpellCclRegister(void)
+void SpellCclRegister()
 {
 	lua_register(Lua, "DefineSpell", CclDefineSpell);
 }

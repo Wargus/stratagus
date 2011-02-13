@@ -72,7 +72,7 @@
 /**
 **  Draw menu button area.
 */
-void DrawMenuButtonArea(void)
+void DrawMenuButtonArea()
 {
 	if (!IsNetworkGame()) {
 		if (UI.MenuButton.X != -1) {
@@ -737,7 +737,7 @@ static void DrawUnitInfo(CUnit &unit)
 **
 **  @todo FIXME : make DrawResources more configurable (format, font).
 */
-void DrawResources(void)
+void DrawResources()
 {
 	int i;
 	int v;
@@ -1124,7 +1124,7 @@ void SetMessage(const char *fmt, ...)
 /**
 **  Shift messages events array by one.
 */
-void ShiftMessagesEvent(void)
+void ShiftMessagesEvent()
 {
 	if (MessagesEventCount) {
 		--MessagesEventCount;
@@ -1173,7 +1173,7 @@ void SetMessageEvent(int x, int y, const char *fmt, ...)
 /**
 **  Goto message origin.
 */
-void CenterOnMessage(void)
+void CenterOnMessage()
 {
 	if (MessagesEventIndex >= MessagesEventCount) {
 		MessagesEventIndex = 0;
@@ -1192,7 +1192,7 @@ void ToggleShowMessages() {
 }
 
 #ifdef DEBUG
-void ToggleShowBuilListMessages(void) {
+void ToggleShowBuilListMessages() {
 	allmessages.ToggleShowBuilListMessages();
 }
 #endif
@@ -1204,7 +1204,7 @@ void ToggleShowBuilListMessages(void) {
 /**
 **  Draw status line.
 */
-void CStatusLine::Draw(void)
+void CStatusLine::Draw()
 {
 	if (!this->StatusLine.empty()) {
 		PushClipping();
@@ -1230,7 +1230,7 @@ void CStatusLine::Set(const std::string &status)
 /**
 **  Clear status line.
 */
-void CStatusLine::Clear(void)
+void CStatusLine::Clear()
 {
 	if (KeyState != KeyStateInput) {
 		this->StatusLine.clear();
@@ -1253,7 +1253,7 @@ static int Costs[MaxCosts + 1];          /// costs to display in status line
 **
 **  @internal MaxCost == FoodCost.
 */
-void DrawCosts(void)
+void DrawCosts()
 {
 	int x = UI.StatusLine.TextX + 268;
 	CLabel label(GameFont);
@@ -1302,7 +1302,7 @@ void SetCosts(int mana, int food, const int *costs)
 /**
 **  Clear costs in status line.
 */
-void ClearCosts(void)
+void ClearCosts()
 {
 	SetCosts(0, 0, NULL);
 }
@@ -1334,7 +1334,7 @@ static void DrawInfoPanelBackground(unsigned frame)
 **    magic unit   - magic units
 **    construction - under construction
 */
-void CInfoPanel::Draw(void)
+void CInfoPanel::Draw()
 {
 	int i;
 
@@ -1542,7 +1542,7 @@ static void DrawInfoPanelNoneSelected()
 /**
 **  Draw info panel.
 */
-void CInfoPanel::Draw(void)
+void CInfoPanel::Draw()
 {
 	if (NumSelected > 1) {
 		DrawInfoPanelMultipleSelected();
@@ -1563,7 +1563,7 @@ void CInfoPanel::Draw(void)
 **
 **  @todo FIXME : make DrawTimer more configurable (Pos, format).
 */
-void DrawTimer(void)
+void DrawTimer()
 {
 	if (!GameTimer.Init) {
 		return;
@@ -1585,7 +1585,7 @@ void DrawTimer(void)
 /**
 **  Update the timer
 */
-void UpdateTimer(void)
+void UpdateTimer()
 {
 	if (GameTimer.Running) {
 		if (GameTimer.Increasing) {

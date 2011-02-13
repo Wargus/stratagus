@@ -412,17 +412,15 @@ int NetworkSetupServerAddress(const std::string &serveraddr)
 /**
 ** Setup Network connect state machine for clients
 */
-void NetworkInitClientConnect(void)
+void NetworkInitClientConnect()
 {
-	int i;
-
 	NetConnectRunning = 2;
 	NetLastPacketSent = GetTicks();
 	NetLocalState = ccs_connecting;
 	NetStateMsgCnt = 0;
 	NetworkServerPort = NetworkPort;
 	LastStateMsgType = ICMServerQuit;
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		Hosts[i].Host = 0;
 		Hosts[i].Port = 0;
 		Hosts[i].PlyNr = 0;
@@ -435,7 +433,7 @@ void NetworkInitClientConnect(void)
 /**
 ** Terminate Network connect state machine for clients
 */
-void NetworkExitClientConnect(void)
+void NetworkExitClientConnect()
 {
 	NetConnectRunning = 0;
 	NetPlayers = 0; // Make single player menus work again!
@@ -444,7 +442,7 @@ void NetworkExitClientConnect(void)
 /**
 ** Terminate and detach Network connect state machine for the client
 */
-void NetworkDetachFromServer(void)
+void NetworkDetachFromServer()
 {
 	NetLocalState = ccs_detaching;
 	NetStateMsgCnt = 0;
@@ -455,12 +453,10 @@ void NetworkDetachFromServer(void)
 */
 void NetworkInitServerConnect(int openslots)
 {
-	int i;
-
 	NetConnectRunning = 1;
 
 	// Cannot use NetPlayers here, as map change might modify the number!!
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		NetStates[i].State = ccs_unused;
 		Hosts[i].Host = 0;
 		Hosts[i].Port = 0;
@@ -473,7 +469,7 @@ void NetworkInitServerConnect(int openslots)
 
 	ServerSetupState.Clear();
 	LocalSetupState.Clear();
-	for (i = openslots; i < PlayerMax - 1; ++i) {
+	for (int i = openslots; i < PlayerMax - 1; ++i) {
 		ServerSetupState.CompOpt[i] = 1;
 	}
 }
@@ -481,21 +477,18 @@ void NetworkInitServerConnect(int openslots)
 /**
 ** Terminate Network connect state machine for the server
 */
-void NetworkExitServerConnect(void)
+void NetworkExitServerConnect()
 {
-	int h;
-	int i;
-	int n;
 	CInitMessage message;
 
 	message.Type = MessageInitReply;
 	message.SubType = ICMServerQuit;
-	for (h = 1; h < PlayerMax - 1; ++h) {
+	for (int h = 1; h < PlayerMax - 1; ++h) {
 		// Spew out 5 and trust in God that they arrive
 		// Clients will time out otherwise anyway
 		if (Hosts[h].PlyNr) {
-			for (i = 0; i < 5; ++i) {
-				n = NetworkSendICMessage(Hosts[h].Host, Hosts[h].Port, &message);
+			for (int i = 0; i < 5; ++i) {
+				const int n = NetworkSendICMessage(Hosts[h].Host, Hosts[h].Port, &message);
 				DebugPrint("Sending InitReply Message ServerQuit: (%d) to %d.%d.%d.%d:%d\n" _C_
 					n _C_ NIPQUAD(ntohl(Hosts[h].Host)) _C_ ntohs(Hosts[h].Port));
 			}
@@ -503,19 +496,16 @@ void NetworkExitServerConnect(void)
 	}
 
 	NetworkInitServerConnect(0); // Reset Hosts slots
-
 	NetConnectRunning = 0;
 }
 
 /**
 ** Notify state change by menu user to connected clients
 */
-void NetworkServerResyncClients(void)
+void NetworkServerResyncClients()
 {
-	int i;
-
 	if (NetConnectRunning) {
-		for (i = 1; i < PlayerMax - 1; ++i) {
+		for (int i = 1; i < PlayerMax - 1; ++i) {
 			if (Hosts[i].PlyNr && NetStates[i].State == ccs_synced) {
 				NetStates[i].State = ccs_async;
 			}
@@ -526,7 +516,7 @@ void NetworkServerResyncClients(void)
 /**
 ** Server user has finally hit the start game button
 */
-void NetworkServerStartGame(void)
+void NetworkServerStartGame()
 {
 	int h;
 	int i;
@@ -834,7 +824,7 @@ breakout:
 /**
 ** Multiplayer network game final race an player type setup.
 */
-void NetworkGamePrepareGameSettings(void)
+void NetworkGamePrepareGameSettings()
 {
 	int c;
 	int h;
@@ -918,7 +908,7 @@ void NetworkGamePrepareGameSettings(void)
 /**
 ** Assign player slots and names in a network game..
 */
-void NetworkConnectSetupGame(void)
+void NetworkConnectSetupGame()
 {
 	ThisPlayer->SetName(LocalPlayerName);
 	for (int i = 0; i < HostsCount; ++i) {
@@ -931,7 +921,7 @@ void NetworkConnectSetupGame(void)
 ** Compare local state with server's information
 ** and force update when changes have occured.
 */
-void NetClientCheckLocalState(void)
+void NetClientCheckLocalState()
 {
 	if (LocalSetupState.Ready[NetLocalHostsSlot] != ServerSetupState.Ready[NetLocalHostsSlot]) {
 		NetLocalState = ccs_changed;
@@ -947,10 +937,9 @@ void NetClientCheckLocalState(void)
 /**
 ** Client Menu Loop: Send out client request messages
 */
-void NetworkProcessClientRequest(void)
+void NetworkProcessClientRequest()
 {
 	CInitMessage message;
-	int i;
 
 	memset(&message, 0, sizeof(message));
 changed:
@@ -959,7 +948,7 @@ changed:
 			message.Type = MessageInitHello;
 			message.SubType = ICMSeeYou;
 			// Spew out 5 and trust in God that they arrive
-			for (i = 0; i < 5; ++i) {
+			for (int i = 0; i < 5; ++i) {
 				NetworkSendICMessage(NetworkServerIP, htons(NetworkServerPort), &message);
 			}
 			NetLocalState = ccs_usercanceled;
@@ -1089,8 +1078,6 @@ changed:
 */
 static void KickDeadClient(int c)
 {
-	int n;
-
 	DebugPrint("kicking client %d\n" _C_ Hosts[c].PlyNr);
 	NetStates[c].State = ccs_unused;
 	Hosts[c].Host = 0;
@@ -1102,7 +1089,7 @@ static void KickDeadClient(int c)
 	ServerSetupState.LastFrame[c] = 0L;
 
 	// Resync other clients
-	for (n = 1; n < PlayerMax - 1; ++n) {
+	for (int n = 1; n < PlayerMax - 1; ++n) {
 		if (n != c && Hosts[n].PlyNr) {
 			NetStates[n].State = ccs_async;
 		}
@@ -1112,11 +1099,8 @@ static void KickDeadClient(int c)
 /**
 ** Server Menu Loop: Send out server request messages
 */
-void NetworkProcessServerRequest(void)
+void NetworkProcessServerRequest()
 {
-	int i;
-	int n;
-	unsigned long fcd;
 	CInitMessage message;
 
 	if (GameRunning) {
@@ -1124,9 +1108,9 @@ void NetworkProcessServerRequest(void)
 		// Game already started...
 	}
 
-	for (i = 1; i < PlayerMax - 1; ++i) {
+	for (int i = 1; i < PlayerMax - 1; ++i) {
 		if (Hosts[i].PlyNr && Hosts[i].Host && Hosts[i].Port) {
-			fcd = FrameCounter - ServerSetupState.LastFrame[i];
+			const unsigned long fcd = FrameCounter - ServerSetupState.LastFrame[i];
 			if (fcd >= CLIENT_LIVE_BEAT) {
 				if (fcd > CLIENT_IS_DEAD) {
 					KickDeadClient(i);
@@ -1134,7 +1118,7 @@ void NetworkProcessServerRequest(void)
 					message.Type = MessageInitReply;
 					message.SubType = ICMAYT; // Probe for the client
 					message.MapUID = 0L;
-					n = NetworkSendICMessage(Hosts[i].Host, Hosts[i].Port, &message);
+					const int n = NetworkSendICMessage(Hosts[i].Host, Hosts[i].Port, &message);
 					DebugPrint("Sending InitReply Message AreYouThere: (%d) to %d.%d.%d.%d:%d (%ld:%ld)\n" _C_
 						n _C_ NIPQUAD(ntohl(Hosts[i].Host)) _C_ ntohs(Hosts[i].Port) _C_
 						FrameCounter _C_ (unsigned long)ServerSetupState.LastFrame[i]);
@@ -1184,8 +1168,6 @@ static void ClientParseDetaching(const CInitMessage *msg)
 */
 static void ClientParseConnecting(const CInitMessage *msg)
 {
-	int i;
-
 	switch(msg->SubType) {
 
 		case ICMEngineMismatch: // Stratagus engine version doesn't match
@@ -1229,7 +1211,7 @@ static void ClientParseConnecting(const CInitMessage *msg)
 
 			Hosts[0].Host = NetworkServerIP;
 			Hosts[0].Port = htons(NetworkServerPort);
-			for (i = 1; i < PlayerMax; ++i) {
+			for (int i = 1; i < PlayerMax; ++i) {
 				if (i != NetLocalHostsSlot) {
 					Hosts[i].Host = msg->u.Hosts[i].Host;
 					Hosts[i].Port = msg->u.Hosts[i].Port;
@@ -1357,8 +1339,6 @@ static void ClientParseMapInfo(const CInitMessage *msg)
 */
 static void ClientParseSynced(const CInitMessage *msg)
 {
-	int i;
-
 	switch(msg->SubType) {
 
 		case ICMState: // Server has sent us new state info
@@ -1371,7 +1351,7 @@ static void ClientParseSynced(const CInitMessage *msg)
 		case ICMConfig: // Server gives the go ahead.. - start game
 			DebugPrint("ccs_synced: Config subtype %d received - starting\n" _C_ msg->SubType);
 			HostsCount = 0;
-			for (i = 0; i < msg->HostsCount - 1; ++i) {
+			for (int i = 0; i < msg->HostsCount - 1; ++i) {
 				if (msg->u.Hosts[i].Host || msg->u.Hosts[i].Port) {
 					Hosts[HostsCount].Host = msg->u.Hosts[i].Host;
 					Hosts[HostsCount].Port = msg->u.Hosts[i].Port;
@@ -1421,13 +1401,11 @@ static void ClientParseSynced(const CInitMessage *msg)
 */
 static void ClientParseAsync(const CInitMessage *msg)
 {
-	int i;
-
 	switch(msg->SubType) {
 
 		case ICMResync: // Server has resynced with us and sends resync data
 			DebugPrint("ccs_async: ICMResync\n");
-			for (i = 1; i < PlayerMax - 1; ++i) {
+			for (int i = 1; i < PlayerMax - 1; ++i) {
 				if (i != NetLocalHostsSlot) {
 					Hosts[i].Host = msg->u.Hosts[i].Host;
 					Hosts[i].Port = msg->u.Hosts[i].Port;
@@ -1516,13 +1494,12 @@ static void ClientParseAreYouThere(const CInitMessage *)
 */
 static void ClientParseBadMap(const CInitMessage *)
 {
-	int i;
 	CInitMessage message;
 
 	message.Type = MessageInitHello;
 	message.SubType = ICMSeeYou;
 	// Spew out 5 and trust in God that they arrive
-	for (i = 0; i < 5; ++i) {
+	for (int i = 0; i < 5; ++i) {
 		NetworkSendICMessage(NetworkServerIP, htons(NetworkServerPort), &message);
 	}
 	NetConnectRunning = 0; // End the menu..

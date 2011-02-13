@@ -143,12 +143,12 @@ extern std::map<std::string, CIcon *> Icons;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void InitIcons(void);   /// Init icons
-extern void LoadIcons(void);   /// Load icons
-extern void CleanIcons(void);  /// Cleanup icons
+extern void InitIcons();   /// Init icons
+extern void LoadIcons();   /// Load icons
+extern void CleanIcons();  /// Cleanup icons
 
 	/// Register CCL features
-extern void IconCclRegister(void);
+extern void IconCclRegister();
 
 //@}
 

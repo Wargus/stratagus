@@ -535,9 +535,9 @@ public:
 		COrder(const COrder &ths);
 		~COrder() { Release(); }
 
-		void Release(void);
+		void Release();
 		COrder& operator=(const COrder &rhs);
-		bool CheckRange(void);
+		bool CheckRange();
 
 		void Init() {
 			Assert(Action != UnitActionResource ||
@@ -575,12 +575,12 @@ public:
 			CUnitType *Type;        /// Unit-type argument used mostly for traning/building, etc.
 		} Arg1;             /// Extra command argument.
 
-		inline bool HasGoal(void) const
+		inline bool HasGoal() const
 		{
 			return Goal != NULL;
 		};
 
-		inline CUnit * GetGoal(void) const
+		inline CUnit * GetGoal() const
 		{
 			return Goal;
 		};
@@ -597,7 +597,7 @@ public:
 			Goal = new_goal;
 		};
 
-		inline void ClearGoal(void)
+		inline void ClearGoal()
 		{
 			if (Goal) {
 				Goal->RefsDecrease();
@@ -819,7 +819,7 @@ public:
 
 	CUnit *Goal; /// Generic/Teleporter goal pointer
 
-	inline COrder * CreateOrder(void) {
+	inline COrder * CreateOrder() {
 		Orders.push_back(new COrder);
 		return Orders[(int)OrderCount++];
 	}

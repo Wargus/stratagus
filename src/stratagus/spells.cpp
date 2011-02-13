@@ -1131,7 +1131,7 @@ SpellType::~SpellType()
 /**
 ** Cleanup the spell subsystem.
 */
-void CleanSpells(void)
+void CleanSpells()
 {
 	DebugPrint("Cleaning spells.\n");
 	for (std::vector<SpellType *>::iterator i = SpellTypeTable.begin(); i < SpellTypeTable.end(); ++i) {

@@ -1395,7 +1395,7 @@ static int CclSlotUsage(lua_State *l)
 /**
 **  Register CCL features for unit.
 */
-void UnitCclRegister(void)
+void UnitCclRegister()
 {
 	lua_register(Lua, "SetTrainingQueue", CclSetTrainingQueue);
 	lua_register(Lua, "SetBuildingCapture", CclSetBuildingCapture);

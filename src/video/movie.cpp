@@ -98,7 +98,7 @@ static void MovieCallbackMouseMove(int, int)
 {
 }
 
-static void MovieCallbackMouseExit(void)
+static void MovieCallbackMouseExit()
 {
 }
 

@@ -1207,7 +1207,7 @@ void SaveMissiles(CFile *file)
 /**
 **  Initialize missile type.
 */
-void MissileType::Init(void)
+void MissileType::Init()
 {
 	//
 	// Resolve impact missiles and sounds.
@@ -1225,7 +1225,7 @@ void MissileType::Init(void)
 /**
 **  Initialize missile-types.
 */
-void InitMissileTypes(void)
+void InitMissileTypes()
 {
 #if 0
 	// Rehash.

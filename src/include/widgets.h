@@ -40,7 +40,7 @@
 
 extern bool GuichanActive;
 
-void initGuichan(void);
+void initGuichan();
 void freeGuichan();
 void handleInput(const SDL_Event *event);
 

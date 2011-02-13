@@ -103,37 +103,37 @@ extern int PlaySoundFile(const std::string &name);
 	/// Set effects volume
 extern void SetEffectsVolume(int volume);
 	/// Get effects volume
-extern int GetEffectsVolume(void);
+extern int GetEffectsVolume();
 	/// Set effects enabled
 extern void SetEffectsEnabled(bool enabled);
 	/// Check if effects are enabled
-extern bool IsEffectsEnabled(void);
+extern bool IsEffectsEnabled();
 
 	/// Set the music finished callback
-void SetMusicFinishedCallback(void (*callback)(void));
+void SetMusicFinishedCallback(void (*callback)());
 	/// Play a music file
 extern int PlayMusic(CSample *sample);
 	/// Play a music file
 extern int PlayMusic(const std::string &file);
 	/// Stop music playing
-extern void StopMusic(void);
+extern void StopMusic();
 	/// Set music volume
 extern void SetMusicVolume(int volume);
 	/// Get music volume
-extern int GetMusicVolume(void);
+extern int GetMusicVolume();
 	/// Set music enabled
 extern void SetMusicEnabled(bool enabled);
 	/// Check if music is enabled
-extern bool IsMusicEnabled(void);
+extern bool IsMusicEnabled();
 	/// Check if music is playing
-extern bool IsMusicPlaying(void);
+extern bool IsMusicPlaying();
 
 	/// Check if sound is enabled
-extern bool SoundEnabled(void);
+extern bool SoundEnabled();
 	/// Initialize the sound card.
-extern int InitSound(void);
+extern int InitSound();
 	///  Cleanup sound.
-extern void QuitSound(void);
+extern void QuitSound();
 
 //@}
 

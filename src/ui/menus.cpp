@@ -63,7 +63,7 @@ static int EditorCancelled;
 ** Compare local state with server's information
 ** and force update when changes have occured.
 */
-void NetClientCheckLocalState(void)
+void NetClientCheckLocalState()
 {
 	if (LocalSetupState.Ready[NetLocalHostsSlot] != ServerSetupState.Ready[NetLocalHostsSlot]) {
 		NetLocalState = ccs_changed;
@@ -81,7 +81,7 @@ void NetClientCheckLocalState(void)
 /**
 **  Cancel button of network connect menu pressed.
 */
-static void NetConnectingCancel(void)
+static void NetConnectingCancel()
 {
 	NetworkExitClientConnect();
 	// Trigger TerminateNetConnect() to call us again and end the menu
@@ -94,7 +94,7 @@ static void NetConnectingCancel(void)
 /**
 **  Call back from menu loop, if network state has changed.
 */
-static void TerminateNetConnect(void)
+static void TerminateNetConnect()
 {
 	switch (NetLocalState) {
 		case ccs_unreachable:
@@ -228,7 +228,7 @@ static void MultiGameSetupInit(Menu *menu)
 /**
 **  Cancel button of server multi player menu pressed.
 */
-static void MultiGameCancel(void)
+static void MultiGameCancel()
 {
 	NetworkExitServerConnect();
 
@@ -247,7 +247,7 @@ static void MultiGameCancel(void)
 /**
 ** Editor main load map menu
 */
-static void EditorMainLoadMap(void)
+static void EditorMainLoadMap()
 {
 	char *p;
 	char *s;
@@ -282,7 +282,7 @@ static void EditorMainLoadMap(void)
 /**
 ** Editor main load ok button
 */
-static void EditorMainLoadOk(void)
+static void EditorMainLoadOk()
 {
 	Menu *menu;
 	Menuitem *mi;
@@ -307,7 +307,7 @@ static void EditorMainLoadOk(void)
 /**
 **  Editor load map menu
 */
-void EditorLoadMenu(void)
+void EditorLoadMenu()
 {
 	char *p;
 	char *s;
@@ -343,7 +343,7 @@ void EditorLoadMenu(void)
 /**
 ** Editor main load ok button
 */
-static void EditorLoadOk(void)
+static void EditorLoadOk()
 {
 	Menu *menu;
 	Menuitem *mi;
@@ -373,7 +373,7 @@ static void EditorLoadOk(void)
 ** Start process network game setup menu (server).
 ** Internet game, register with meta server
 */
-static void CreateInternetGameMenu(void)
+static void CreateInternetGameMenu()
 {
 	GuiGameStarted = 0;
 	AddGameServer();
@@ -389,7 +389,7 @@ static void CreateInternetGameMenu(void)
 /**
 ** Process Internet game menu
 */
-static void MultiPlayerInternetGame(void)
+static void MultiPlayerInternetGame()
 {
 	//Connect to Meta Server
 	if (MetaInit() == -1 ) {
@@ -409,7 +409,7 @@ static void MultiPlayerInternetGame(void)
 /**
 **  FIXME: docu
 */
-static void MultiGameMasterReport(void)
+static void MultiGameMasterReport()
 {
 // CloseMenu();
 
@@ -425,7 +425,7 @@ static void MultiGameMasterReport(void)
 /**
 **  Menu for Mater Server Game list.
 */
-static void ShowMetaServerList(void)
+static void ShowMetaServerList()
 {
 	//CloseMenu();
 
@@ -618,7 +618,7 @@ static void SelectGameServer(Menuitem *mi)
 /**
 **  Action to add a game server on the meta-server.
 */
-static void AddGameServer(void)
+static void AddGameServer()
 {
 	// send message to meta server. meta server will detect IP address.
 	// Meta-server will return "BUSY" if the list of online games is busy.
@@ -634,7 +634,7 @@ static void AddGameServer(void)
 /**
 **  Action to add a game server on the meta-server.
 */
-static void ChangeGameServer(void)
+static void ChangeGameServer()
 {
 	int i;
 	int freespots;
@@ -664,7 +664,7 @@ static void ChangeGameServer(void)
 /**
 **  FIXME: docu
 */
-static int MetaServerConnectError(void)
+static int MetaServerConnectError()
 {
 	Invalidate();
 	NetErrorMenu("Cannot Connect to Meta-Server");
@@ -676,7 +676,7 @@ static int MetaServerConnectError(void)
 /**
 **  Close MetaServer connection
 */
-static void MultiMetaServerClose(void)
+static void MultiMetaServerClose()
 {
 	MetaClose();
 	MetaServerInUse = 0;

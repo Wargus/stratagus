@@ -109,7 +109,7 @@ static int CclAStar(lua_State *l)
 /**
 **  Register CCL features for pathfinder.
 */
-void PathfinderCclRegister(void)
+void PathfinderCclRegister()
 {
 	lua_register(Lua, "AStar", CclAStar);
 }

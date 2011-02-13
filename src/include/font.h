@@ -158,13 +158,13 @@ extern std::string GetLineFont(unsigned int line, const std::string &s, unsigned
 extern int GetHotKey(const std::string &text);
 
 	/// Load and initialize the fonts
-extern void LoadFonts(void);
+extern void LoadFonts();
 	/// Free OpenGL fonts
-extern void FreeOpenGLFonts(void);
+extern void FreeOpenGLFonts();
 	/// Reload OpenGL fonts
-extern void ReloadFonts(void);
+extern void ReloadFonts();
 	/// Cleanup the font module
-extern void CleanFonts(void);
+extern void CleanFonts();
 
 class CLabel {
 	const CFontColor *normal;
@@ -182,7 +182,7 @@ public:
 	}
 	CLabel(const CFont *f);
 
-	int Height(void) const
+	int Height() const
 	{
 		return font->Height();
 	}

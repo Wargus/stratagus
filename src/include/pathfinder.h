@@ -104,9 +104,9 @@ extern void InitPathfinder();
 extern void FreePathfinder();
 
 	/// Create a matrix for the old pathfinder
-extern unsigned char *CreateMatrix(void);
+extern unsigned char *CreateMatrix();
 	/// Allocate a new matrix and initialize
-extern unsigned char *MakeMatrix(void);
+extern unsigned char *MakeMatrix();
 	/// Get next element of the way to goal.
 extern int NewPath(CUnit &unit);
 	/// Returns the next element of the path
@@ -130,7 +130,7 @@ extern int GetAStarMovingUnitCrossingCost();
 extern void SetAStarUnknownTerrainCost(int cost);
 extern int GetAStarUnknownTerrainCost();
 
-extern void PathfinderCclRegister(void);
+extern void PathfinderCclRegister();
 
 //@}
 

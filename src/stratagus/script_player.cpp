@@ -963,7 +963,7 @@ static int CclSetAiType(lua_State *l)
 /**
 **  Register CCL features for players.
 */
-void PlayerCclRegister(void)
+void PlayerCclRegister()
 {
 	lua_register(Lua, "Player", CclPlayer);
 	lua_register(Lua, "ChangeUnitsOwner", CclChangeUnitsOwner);

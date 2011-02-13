@@ -87,7 +87,7 @@ static int CclSetEditorStartUnit(lua_State *l)
 /**
 **  Register CCL features for the editor.
 */
-void EditorCclRegister(void)
+void EditorCclRegister()
 {
 	lua_register(Lua, "SetEditorSelectIcon", CclSetEditorSelectIcon);
 	lua_register(Lua, "SetEditorUnitsIcon", CclSetEditorUnitsIcon);

@@ -111,7 +111,7 @@ bool CanAccessFile(const char *filename)
 	return false;
 }
 
-CUnit *GetUnitUnderCursor(void)
+CUnit *GetUnitUnderCursor()
 {
 	return UnitUnderCursor;
 }
@@ -2414,7 +2414,7 @@ static void InitLua()
 /**
 **  Initialize ccl and load the config file(s).
 */
-void InitCcl(void)
+void InitCcl()
 {
 	InitLua();
 
@@ -2665,7 +2665,7 @@ std::string SaveGlobal(lua_State *l, bool is_root)
 **
 **  More specifically: logs, saved games, preferences
 */
-void CreateUserDirectories(void)
+void CreateUserDirectories()
 {
 	std::string directory;
 	UserDirectory = "";
@@ -2694,7 +2694,7 @@ void CreateUserDirectories(void)
 /**
 **  Save user preferences
 */
-void SavePreferences(void)
+void SavePreferences()
 {
 	FILE *fd;
 	std::string path;
@@ -2724,7 +2724,7 @@ void SavePreferences(void)
 /**
 **  Load stratagus config file.
 */
-void LoadCcl(void)
+void LoadCcl()
 {
 	char buf[PATH_MAX];
 

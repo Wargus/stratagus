@@ -137,14 +137,14 @@ void IconConfig::Load()
 **
 **  Add the short name and icon aliases to hash table.
 */
-void InitIcons(void)
+void InitIcons()
 {
 }
 
 /**
 **  Load the graphics for the icons.
 */
-void LoadIcons(void)
+void LoadIcons()
 {
 	for (std::vector<CIcon *>::size_type i = 0; i < AllIcons.size(); ++i) {
 		CIcon *icon = AllIcons[i];
@@ -161,7 +161,7 @@ void LoadIcons(void)
 /**
 **  Clean up memory used by the icons.
 */
-void CleanIcons(void)
+void CleanIcons()
 {
 	std::vector<CIcon *>::iterator i;
 	for (i = AllIcons.begin(); i != AllIcons.end(); ++i) {
@@ -216,7 +216,7 @@ void CIcon::DrawUnitIcon(const CPlayer *, ButtonStyle *style,
 /**
 **  Register CCL features for icons.
 */
-void IconCclRegister(void)
+void IconCclRegister()
 {
 }
 

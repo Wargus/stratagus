@@ -598,7 +598,7 @@ void SetEffectsVolume(int volume)
 /**
 **  Get effects volume
 */
-int GetEffectsVolume(void)
+int GetEffectsVolume()
 {
 	return EffectsVolume;
 }
@@ -614,7 +614,7 @@ void SetEffectsEnabled(bool enabled)
 /**
 **  Check if effects are enabled
 */
-bool IsEffectsEnabled(void)
+bool IsEffectsEnabled()
 {
 	return EffectsEnabled;
 }
@@ -626,7 +626,7 @@ bool IsEffectsEnabled(void)
 /**
 **  Set the music finished callback
 */
-void SetMusicFinishedCallback(void (*callback)(void))
+void SetMusicFinishedCallback(void (*callback)())
 {
 	MusicChannel.FinishedCallback = callback;
 }
@@ -698,7 +698,7 @@ int PlayMusic(const std::string &file)
 /**
 **  Stop the current playing music.
 */
-void StopMusic(void)
+void StopMusic()
 {
 	if (MusicPlaying) {
 		MusicPlaying = false;
@@ -730,7 +730,7 @@ void SetMusicVolume(int volume)
 /**
 **  Get music volume
 */
-int GetMusicVolume(void)
+int GetMusicVolume()
 {
 	return MusicVolume;
 }
@@ -751,7 +751,7 @@ void SetMusicEnabled(bool enabled)
 /**
 **  Check if music is enabled
 */
-bool IsMusicEnabled(void)
+bool IsMusicEnabled()
 {
 	return MusicEnabled;
 }
@@ -759,7 +759,7 @@ bool IsMusicEnabled(void)
 /**
 **  Check if music is playing
 */
-bool IsMusicPlaying(void)
+bool IsMusicPlaying()
 {
 	return MusicPlaying;
 }
@@ -771,7 +771,7 @@ bool IsMusicPlaying(void)
 /**
 **  Check if sound is enabled
 */
-bool SoundEnabled(void)
+bool SoundEnabled()
 {
 	return SoundInitialized;
 }
@@ -817,7 +817,7 @@ static int InitSdlSound(int freq, int size)
 **
 **  @return  True if failure, false if everything ok.
 */
-int InitSound(void)
+int InitSound()
 {
 	//
 	// Open sound device, 8bit samples, stereo.
@@ -841,7 +841,7 @@ int InitSound(void)
 /**
 **  Cleanup sound server.
 */
-void QuitSound(void)
+void QuitSound()
 {
 	SDL_CloseAudio();
 	SoundInitialized = false;

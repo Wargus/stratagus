@@ -118,10 +118,10 @@ struct Clip {
 --  Externals
 ----------------------------------------------------------------------------*/
 
-extern void InitVideoSdl(void);         /// Init SDL video hardware driver
+extern void InitVideoSdl();         /// Init SDL video hardware driver
 
-extern void SdlLockScreen(void);        /// Do SDL hardware lock
-extern void SdlUnlockScreen(void);      /// Do SDL hardware unlock
+extern void SdlLockScreen();        /// Do SDL hardware lock
+extern void SdlUnlockScreen();      /// Do SDL hardware unlock
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -186,7 +186,7 @@ void SetClipping(int left, int top, int right, int bottom)
 /**
 **  Push current clipping.
 */
-void PushClipping(void)
+void PushClipping()
 {
 	Clip clip = {ClipX1, ClipY1, ClipX2, ClipY2};
 	Clips.push_back(clip);
@@ -195,7 +195,7 @@ void PushClipping(void)
 /**
 **  Pop current clipping.
 */
-void PopClipping(void)
+void PopClipping()
 {
 	Clip clip = Clips.back();
 	ClipX1 = clip.X1;
@@ -212,7 +212,7 @@ void PopClipping(void)
 /**
 **  Lock the screen for write access.
 */
-void CVideo::LockScreen(void)
+void CVideo::LockScreen()
 {
 	SdlLockScreen();
 }
@@ -220,7 +220,7 @@ void CVideo::LockScreen(void)
 /**
 **  Unlock the screen for write access.
 */
-void CVideo::UnlockScreen(void)
+void CVideo::UnlockScreen()
 {
 	SdlUnlockScreen();
 }
@@ -228,7 +228,7 @@ void CVideo::UnlockScreen(void)
 /**
 **  Clear the video screen.
 */
-void CVideo::ClearScreen(void)
+void CVideo::ClearScreen()
 {
 	FillRectangle(ColorBlack, 0, 0, Video.Width, Video.Height);
 }
@@ -262,7 +262,7 @@ bool CVideo::ResizeScreen(int w, int h)
 /**
 **  Return ticks in ms since start.
 */
-unsigned long GetTicks(void)
+unsigned long GetTicks()
 {
 	return SDL_GetTicks();
 }
@@ -270,7 +270,7 @@ unsigned long GetTicks(void)
 /**
 **  Video initialize.
 */
-void InitVideo(void)
+void InitVideo()
 {
 	InitVideoSdl();
 	InitLineDraw();

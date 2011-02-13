@@ -912,7 +912,7 @@ static int CclSetTileFlags(lua_State *l)
 /**
 **  Register CCL features for tileset.
 */
-void TilesetCclRegister(void)
+void TilesetCclRegister()
 {
 	lua_register(Lua, "DefineTileset", CclDefineTileset);
 	lua_register(Lua, "SetTileFlags", CclSetTileFlags);

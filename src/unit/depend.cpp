@@ -446,7 +446,7 @@ static int CclCheckDependency(lua_State *l)
 /**
 **  Register CCL features for dependencies.
 */
-void DependenciesCclRegister(void)
+void DependenciesCclRegister()
 {
 	lua_register(Lua, "DefineDependency", CclDefineDependency);
 	lua_register(Lua, "GetDependency", CclGetDependency);

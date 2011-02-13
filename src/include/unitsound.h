@@ -90,13 +90,13 @@ public:
 **  Loads sounds defined in unitsound.c. Should be replaced by ccl loading of
 **  sounds.
 */
-extern void LoadUnitSounds(void);
+extern void LoadUnitSounds();
 
 /**
 **  Performs the mapping between sound names and CSound* for each unit type.
 **  Set ranges for some sounds (infinite range for acknowledge and help sounds).
 */
-extern void MapUnitSounds(void);
+extern void MapUnitSounds();
 
 //@}
 

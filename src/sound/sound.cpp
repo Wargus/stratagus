@@ -476,7 +476,7 @@ CSound *RegisterTwoGroups(CSound *first, CSound *second)
 /**
 **  Lookup the sound id's for the game sounds.
 */
-void InitSoundClient(void)
+void InitSoundClient()
 {
 	if (!SoundEnabled()) { // No sound enabled
 		return;

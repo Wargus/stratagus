@@ -122,7 +122,7 @@ class AiForce {
 		unit.RefsIncrease();
 	}
 
-	void Update(void);
+	void Update();
 public:
 	AiForce() : Completed(false), Defending(false), Attacking(false),
 		Role(0), State(AI_FORCE_STATE_FREE),
@@ -156,12 +156,12 @@ public:
 		GoalPos.x = GoalPos.y = 0;
 		MustTransport = false;
 	}
-	inline size_t Size(void)
+	inline size_t Size() const
 	{
 		return Units.size();
 	}
 
-	inline bool IsAttacking(void) const
+	inline bool IsAttacking() const
 	{
 		return (!Defending && Attacking);
 	}
@@ -184,8 +184,8 @@ public:
 	bool MustTransport;/// Flag must use transporter
 
 	void Attack(const Vec2i &pos);
-	void Clean(void);
-	int PlanAttack(void);
+	void Clean();
+	int PlanAttack();
 };
 
 	// forces
@@ -428,11 +428,11 @@ extern int AiFindBuildingPlace(const CUnit &worker,
 // Forces
 //
 	/// Cleanup units in force
-extern void AiCleanForces(void);
+extern void AiCleanForces();
 	/// Assign a new unit to a force
 extern bool AiAssignToForce(CUnit &unit);
 	/// Assign a free units to a force
-extern void AiAssignFreeUnitsToForce(void);
+extern void AiAssignFreeUnitsToForce();
 	/// Attack with force at position
 extern void AiAttackWithForceAt(unsigned int force, int x, int y);
 	/// Attack with force
@@ -441,7 +441,7 @@ extern void AiAttackWithForce(unsigned int force);
 extern void AiAttackWithForces(int *forces);
 
 	/// Periodic called force manager handler
-extern void AiForceManager(void);
+extern void AiForceManager();
 
 //
 // Plans
@@ -450,7 +450,7 @@ extern void AiForceManager(void);
 extern int AiFindWall(AiForce *force);
 	/// Plan the an attack
 	/// Send explorers around the map
-extern void AiSendExplorers(void);
+extern void AiSendExplorers();
 	/// Enemy units in distance
 extern int AiEnemyUnitsInDistance(const CPlayer *player, const CUnitType *type,
 	const Vec2i& pos, unsigned range);
@@ -459,7 +459,7 @@ extern int AiEnemyUnitsInDistance(const CPlayer *player, const CUnitType *type,
 // Magic
 //
 	/// Check for magic
-extern void AiCheckMagic(void);
+extern void AiCheckMagic();
 
 //@}
 

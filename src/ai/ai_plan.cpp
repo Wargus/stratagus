@@ -452,8 +452,6 @@ int AiFindWall(AiForce *force)
 **  Plan an attack with a force.
 **  We know, that we must use a transporter.
 **
-**  @param force  Pointer on the force.
-**
 **  @return       True if target found, false otherwise.
 **
 **  @todo         Perfect planning.
@@ -461,7 +459,7 @@ int AiFindWall(AiForce *force)
 **  @todo transporter are more selective now (flag with unittypeland).
 **         We must manage it.
 */
-int AiForce::PlanAttack(void)
+int AiForce::PlanAttack()
 {
 	unsigned char *watermatrix;
 	int state;

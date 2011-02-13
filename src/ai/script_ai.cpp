@@ -1663,7 +1663,7 @@ static int CclDefineAiPlayer(lua_State *l)
 /**
 **  Register CCL features for unit-type.
 */
-void AiCclRegister(void)
+void AiCclRegister()
 {
 	// FIXME: Need to save memory here.
 	// Loading all into memory isn't necessary.

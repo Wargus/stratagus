@@ -340,7 +340,7 @@ void CMap::Create()
 /**
 **  Cleanup the map module.
 */
-void CMap::Clean(void)
+void CMap::Clean()
 {
 	delete[] this->Fields;
 	delete[] this->Visible[0];
@@ -646,7 +646,7 @@ void CMap::RegenerateForestTile(int x, int y)
 /**
 **  Regenerate forest.
 */
-void CMap::RegenerateForest(void)
+void CMap::RegenerateForest()
 {
 	int x;
 	int y;

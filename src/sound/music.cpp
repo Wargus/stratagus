@@ -69,7 +69,7 @@ bool CallbackMusic;                       /// flag true callback ccl if stops
 **  Callback for when music has finished
 **  Note: we are in the sdl audio thread
 */
-static void MusicFinishedCallback(void)
+static void MusicFinishedCallback()
 {
 	SDL_LockMutex(MusicFinishedMutex);
 	MusicFinished = true;
@@ -103,7 +103,7 @@ void CheckMusicFinished(bool force)
 /**
 **  Init music
 */
-void InitMusic(void)
+void InitMusic()
 {
 	MusicFinished = false;
 	MusicFinishedMutex = SDL_CreateMutex();

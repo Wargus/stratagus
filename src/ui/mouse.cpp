@@ -83,12 +83,12 @@ enum _cursor_on_ CursorOn = CursorOnUnknown; /// Cursor on field
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-static void HandlePieMenuMouseSelection(void);
+static void HandlePieMenuMouseSelection();
 
 /**
 **  Cancel building cursor mode.
 */
-void CancelBuildingMode(void)
+void CancelBuildingMode()
 {
 	CursorBuilding = NULL;
 	UI.StatusLine.Clear();
@@ -709,7 +709,7 @@ static void HandleMouseOn(int x, int y)
 **         Game should run (for network play), but not react on or show
 **         interactive events.
 */
-void HandleMouseExit(void)
+void HandleMouseExit()
 {
 	// Disabled
 	if (!LeaveStops) {
@@ -731,7 +731,7 @@ void HandleMouseExit(void)
 /**
 **  Restrict mouse cursor to viewport.
 */
-void RestrictCursorToViewport(void)
+void RestrictCursorToViewport()
 {
 	if (CursorX < UI.SelectedViewport->X) {
 		CursorStartX = UI.SelectedViewport->X;
@@ -757,7 +757,7 @@ void RestrictCursorToViewport(void)
 /**
 **  Restrict mouse cursor to minimap
 */
-void RestrictCursorToMinimap(void)
+void RestrictCursorToMinimap()
 {
 	if (CursorX < UI.Minimap.X) {
 		CursorStartX = UI.Minimap.X;
@@ -2019,7 +2019,7 @@ void UIHandleButtonUp(unsigned button)
 **
 **  @return  Index of the pie menu under the cursor or -1 for none
 */
-static int GetPieUnderCursor(void)
+static int GetPieUnderCursor()
 {
 	int x = CursorX - (CursorStartX - ICON_SIZE_X / 2);
 	int y = CursorY - (CursorStartY - ICON_SIZE_Y / 2);

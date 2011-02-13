@@ -194,7 +194,7 @@ CAnimations *AnimationsByIdent(const std::string &ident)
 	return NULL;
 }
 
-void FreeAnimations(void)
+void FreeAnimations()
 {
 	std::map<std::string, CAnimations *>::iterator i;
 	for (i = AnimationMap.begin(); i != AnimationMap.end(); ++i) {
@@ -2005,7 +2005,7 @@ void UpdateUnitVariables(const CUnit &unit)
 /**
 **  Register CCL features for unit-type.
 */
-void UnitTypeCclRegister(void)
+void UnitTypeCclRegister()
 {
 	lua_register(Lua, "DefineUnitType", CclDefineUnitType);
 	lua_register(Lua, "DefineUnitStats", CclDefineUnitStats);

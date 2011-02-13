@@ -56,7 +56,7 @@ template <const bool IN_REACT_RANGE>
 struct AiForceEnemyFinder {
 	const CUnit *enemy;
 
-	inline bool found(void) {
+	inline bool found() const {
 		return enemy != NULL;
 	}
 
@@ -140,7 +140,7 @@ int UnitTypeEquivs[UnitTypeMax + 1]; /// equivalence between unittypes
 /**
 **  Remove any equivalence between unittypes
 */
-void AiResetUnitTypeEquiv(void)
+void AiResetUnitTypeEquiv()
 {
 	for (int i = 0; i <= UnitTypeMax; ++i) {
 		UnitTypeEquivs[i] = i;
@@ -306,7 +306,7 @@ bool AiForce::IsBelongsTo(const CUnitType *type)
 **  Ai clean units in a force.
 **
 */
-void AiForce::Clean(void) {
+void AiForce::Clean() {
 
 	CUnit *aiunit;
 	unsigned int i = 0;
@@ -385,7 +385,7 @@ unsigned int AiForceManager::FindFreeForce(int role)
 /**
 **  Cleanup units in forces.
 */
-void AiForceManager::Clean(void)
+void AiForceManager::Clean()
 {
 	for(unsigned int i = 0; i < forces.size(); ++i)
 	{
@@ -830,7 +830,7 @@ void AiForce::Update()
 	}
 }
 
-void AiForceManager::Update(void)
+void AiForceManager::Update()
 {
 	for(unsigned int f = 0; f < forces.size(); ++f)
 	{
@@ -861,7 +861,7 @@ void AiForceManager::Update(void)
 **
 ** @todo FIXME: is this really needed anymore
 */
-void AiForceManager(void)
+void AiForceManager()
 {
 	AiPlayer->Force.Update();
 	AiAssignFreeUnitsToForce();

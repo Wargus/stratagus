@@ -1025,11 +1025,11 @@ public:
 	/* API */
 
 	bool CheckUserBoolFlags(char *BoolFlags);
-	bool CanTransport(void)  const
+	bool CanTransport()  const
 	{
 		return MaxOnBoard > 0 && !GivesResource;
 	}
-	bool CanMove(void) const
+	bool CanMove() const
 	{
 		return Animations && Animations->Move;
 	}

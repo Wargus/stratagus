@@ -240,15 +240,15 @@ extern int HoldClickDelay;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern CUnit *GetUnitUnderCursor(void);
+extern CUnit *GetUnitUnderCursor();
 
 //
 // in botpanel.cpp
 //
 	/// Generate all buttons
-extern void InitButtons(void);
+extern void InitButtons();
 	/// Free memory for buttons
-extern void CleanButtons(void);
+extern void CleanButtons();
 	/// Make a new button
 extern int AddButton(int pos, int level, const std::string &IconIdent,
 	ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
@@ -266,7 +266,7 @@ extern void HandleCursorMove(int *x, int *y);
 	/// Called if the mouse is moved
 extern void HandleMouseMove(int x, int y);
 	/// Called if the mouse exits the game window (only for some videomodes)
-extern void HandleMouseExit(void);
+extern void HandleMouseExit();
 
 	/// Update KeyModifiers if a key is pressed
 extern int HandleKeyModifiersDown(unsigned keycode, unsigned keychar);
@@ -310,16 +310,16 @@ extern void InputKeyTimeout(const struct _event_callback_ *callbacks,
 	unsigned ticks);
 
 	/// Get double click delay
-extern int GetDoubleClickDelay(void);
+extern int GetDoubleClickDelay();
 	/// Set double click delay
 extern void SetDoubleClickDelay(int delay);
 	/// Get hold click delay
-extern int GetHoldClickDelay(void);
+extern int GetHoldClickDelay();
 	/// Set hold click delay
 extern void SetHoldClickDelay(int delay);
 
 	/// Toggle pause mode
-extern void UiTogglePause(void);
+extern void UiTogglePause();
 	/// Handle cheats
 extern int HandleCheats(const std::string &input);
 
@@ -332,42 +332,42 @@ bool HandleCommandKey(int key);
 	/// Called if right mouse button is pressed
 extern void DoRightButton(int tx, int ty);
 	/// Cancel the building input mode
-extern void CancelBuildingMode(void);
+extern void CancelBuildingMode();
 
 	/// Draw menu button area
-extern void DrawMenuButtonArea(void);
+extern void DrawMenuButtonArea();
 	/// Update messages
-extern void UpdateMessages(void);
+extern void UpdateMessages();
 	/// Draw messages as overlay over of the map
-extern void DrawMessages(void);
+extern void DrawMessages();
 	/// Draw the player resource in resource line
-extern void DrawResources(void);
+extern void DrawResources();
 	/// Set message to display
 extern void SetMessage(const char *fmt, ...);
 	/// Set message to display with event point
 extern void SetMessageEvent(int x, int y, const char *fmt, ...);
 	/// Center view-point on last event message
-extern void CenterOnMessage(void);
+extern void CenterOnMessage();
 	/// Cleanup all messages
-extern void CleanMessages(void);
+extern void CleanMessages();
 	/// show/hide messages
-extern void ToggleShowMessages(void);
+extern void ToggleShowMessages();
 
 	/// Draw costs in status line
-extern void DrawCosts(void);
+extern void DrawCosts();
 	/// Set costs to be displayed in status line
 extern void SetCosts(int mana, int food, const int *costs);
 	/// Clear the costs displayed in status line (undisplay!)
-extern void ClearCosts(void);
+extern void ClearCosts();
 
 	/// Draw the timer
-extern void DrawTimer(void);
+extern void DrawTimer();
 	/// Update the timer
-extern void UpdateTimer(void);
+extern void UpdateTimer();
 	/// Update the status line with hints from the button
 extern void UpdateStatusLineForButton(const ButtonAction *button);
 	/// Draw the Pie Menu
-extern void DrawPieMenu(void);
+extern void DrawPieMenu();
 
 	/// Handle the mouse in scroll area
 extern int HandleMouseScrollArea(int x, int y);
@@ -406,9 +406,9 @@ extern bool ButtonCheckSingleResearch(const CUnit &unit, const ButtonAction *but
 // in ccl_ui.c
 //
 	/// Called whenever the units selection is altered
-extern void SelectionChanged(void);
+extern void SelectionChanged();
 	/// Called whenever the selected unit was updated
-extern void SelectedUnitChanged(void);
+extern void SelectedUnitChanged();
 
 //
 // in game.cpp

@@ -51,7 +51,7 @@ unsigned SyncRandSeed;               /// sync random seed value.
 /**
 **  Inititalize sync rand seed.
 */
-void InitSyncRand(void)
+void InitSyncRand()
 {
 	SyncRandSeed = 0x87654321;
 }
@@ -62,7 +62,7 @@ void InitSyncRand(void)
 **  @note This random value must be same on all machines in network game.
 **  Very simple random generations, enough for us.
 */
-int SyncRand(void)
+int SyncRand()
 {
 	int val;
 

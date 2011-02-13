@@ -78,7 +78,7 @@
 **
 **  Call each module to clean up.
 */
-void CleanModules(void)
+void CleanModules()
 {
 	EndReplayLog();
 	CleanMessages();
@@ -119,7 +119,7 @@ void CleanModules(void)
 **
 **  Call each module to initialize.
 */
-void InitModules(void)
+void InitModules()
 {
 	GameCycle = 0;
 	FastForwardCycle = 0;
@@ -158,7 +158,7 @@ void InitModules(void)
 **
 **  Call each module to load additional files (graphics,sounds).
 */
-void LoadModules(void)
+void LoadModules()
 {
 	LoadFonts();
 	LoadIcons();

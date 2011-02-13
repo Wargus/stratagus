@@ -66,7 +66,7 @@
 /**
 **  Load all sounds for units.
 */
-void LoadUnitSounds(void)
+void LoadUnitSounds()
 {
 }
 
@@ -118,7 +118,7 @@ static void MapAnimSounds(CUnitType *type)
 **  And overwrite the sound ranges. @todo the sound ranges should be
 **  configurable by user with CCL.
 */
-void MapUnitSounds(void)
+void MapUnitSounds()
 {
 	CUnitType *type;
 	int j;

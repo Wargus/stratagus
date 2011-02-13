@@ -127,7 +127,7 @@ extern void ShowStats();
 	/// Create a game
 extern void CreateGame(const std::string &filename, CMap *map);
 	/// Init Setting to default values
-extern void InitSettings(void);
+extern void InitSettings();
 
 //@}
 

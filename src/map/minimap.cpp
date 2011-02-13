@@ -103,7 +103,7 @@ int NumMinimapEvents;
 /**
 **  Create the minimap texture
 */
-static void CreateMinimapTexture(void)
+static void CreateMinimapTexture()
 {
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glGenTextures(1, &MinimapTexture);
@@ -122,7 +122,7 @@ static void CreateMinimapTexture(void)
 **
 **  @todo Scaling and scrolling the minmap is currently not supported.
 */
-void CMinimap::Create(void)
+void CMinimap::Create()
 {
 	int n;
 
@@ -189,7 +189,7 @@ void CMinimap::Create(void)
 /**
 **  Free OpenGL minimap
 */
-void CMinimap::FreeOpenGL(void)
+void CMinimap::FreeOpenGL()
 {
 	glDeleteTextures(1, &MinimapTexture);
 }
@@ -197,7 +197,7 @@ void CMinimap::FreeOpenGL(void)
 /**
 **  Reload OpenGL minimap
 */
-void CMinimap::Reload(void)
+void CMinimap::Reload()
 {
 	CreateMinimapTexture();
 }
@@ -216,7 +216,7 @@ static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int
 /**
 **  Update a mini-map from the tiles of the map.
 */
-void CMinimap::UpdateTerrain(void)
+void CMinimap::UpdateTerrain()
 {
 	int mx;
 	int my;
@@ -586,7 +586,7 @@ void CMinimap::Update()
 /**
 **  Draw the minimap events
 */
-static void DrawEvents(void)
+static void DrawEvents()
 {
 	for (int i = 0; i < NumMinimapEvents; ++i) {
 		Video.DrawTransCircleClip(ColorWhite,
@@ -694,7 +694,7 @@ int CMinimap::Screen2MapY(int y)
 /**
 **  Destroy mini-map.
 */
-void CMinimap::Destroy(void)
+void CMinimap::Destroy()
 {
 	if (!UseOpenGL) {
 		SDL_FreeSurface(MinimapTerrainSurface);

@@ -61,7 +61,7 @@ static std::vector<CConstruction *> Constructions;
 /**
 **  Initialize  the constructions.
 */
-void InitConstructions(void)
+void InitConstructions()
 {
 }
 
@@ -71,7 +71,7 @@ void InitConstructions(void)
 **  HELPME: who make this better terrain depended and extendable
 **  HELPME: filename constuction.
 */
-void LoadConstructions(void)
+void LoadConstructions()
 {
 	std::vector<CConstruction *>::iterator i;
 
@@ -106,7 +106,7 @@ void LoadConstructions(void)
 /**
 **  Cleanup the constructions.
 */
-void CleanConstructions(void)
+void CleanConstructions()
 {
 	CConstructionFrame *cframe;
 	CConstructionFrame *tmp;
@@ -299,7 +299,7 @@ static int CclDefineConstruction(lua_State *l)
 /**
 **  Register CCL features for construction.
 */
-void ConstructionCclRegister(void)
+void ConstructionCclRegister()
 {
 	lua_register(Lua, "DefineConstruction", CclDefineConstruction);
 }

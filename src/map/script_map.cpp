@@ -545,7 +545,7 @@ static int CclLoadTileModels(lua_State *l)
 /**
 **  Register CCL features for map.
 */
-void MapCclRegister(void)
+void MapCclRegister()
 {
 	lua_register(Lua, "StratagusMap", CclStratagusMap);
 	lua_register(Lua, "RevealMap", CclRevealMap);

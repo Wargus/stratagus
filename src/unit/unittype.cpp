@@ -607,12 +607,12 @@ void CUnitTypeVar::Clear()
 	DecoVar.clear();
 }
 
-extern void FreeAnimations(void);
+extern void FreeAnimations();
 
 /**
 **  Cleanup the unit-type module.
 */
-void CleanUnitTypes(void)
+void CleanUnitTypes()
 {
 
 	DebugPrint("FIXME: icon, sounds not freed.\n");

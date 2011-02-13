@@ -54,7 +54,7 @@
 #include <pthread.h>
 #endif
 
-inline int get_cpu_count(void) {
+inline int get_cpu_count() {
 #ifndef __unix
   SYSTEM_INFO info;
   GetSystemInfo(&info);
@@ -177,8 +177,8 @@ public:
 
 extern unsigned SyncRandSeed;               /// Sync random seed value
 
-extern void InitSyncRand(void);             /// Initialize the syncron rand
-extern int SyncRand(void);                  /// Syncron rand
+extern void InitSyncRand();             /// Initialize the syncron rand
+extern int SyncRand();                  /// Syncron rand
 extern int SyncRand(int max);               /// Syncron rand
 
 /*----------------------------------------------------------------------------

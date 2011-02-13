@@ -955,7 +955,7 @@ void FillTransCircleClip(Uint32 color, int x, int y,
 /**
 **  Initialize line draw
 */
-void InitLineDraw(void)
+void InitLineDraw()
 {
 	switch (Video.Depth) {
 		case 16:
@@ -2012,7 +2012,7 @@ void FillTransCircleClip(Uint32 color, int x, int y,
 /**
 **  Initialize line draw
 */
-void InitLineDraw(void)
+void InitLineDraw()
 {
 }
 
@@ -2266,7 +2266,7 @@ void CVideo::FillTransCircleClip(Uint32 color, int x, int y, int r, unsigned cha
 	}
 }
 
-void InitLineDraw(void)
+void InitLineDraw()
 {
 	if (UseOpenGL) {
 		linedraw_gl::InitLineDraw();

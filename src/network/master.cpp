@@ -92,7 +92,7 @@ int CclSetMetaServer(lua_State *l)
 **  @return  -1 fail, 0 success.
 **  @todo Make a dynamic port allocation.
 */
-int MetaInit(void)
+int MetaInit()
 {
 	int i;
 	char *reply;
@@ -139,7 +139,7 @@ int MetaInit(void)
 **
 **  @return  nothing
 */
-int MetaClose(void)
+int MetaClose()
 {
 	NetCloseTCP(MetaServerFildes);
 	return 0;

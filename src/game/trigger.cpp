@@ -657,7 +657,7 @@ static void TriggerRemoveTrigger(int trig)
 /**
 **  Check trigger each game cycle.
 */
-void TriggersEachCycle(void)
+void TriggersEachCycle()
 {
 	int triggers;
 	int base = lua_gettop(Lua);
@@ -703,7 +703,7 @@ void TriggersEachCycle(void)
 /**
 **  Register CCL features for triggers.
 */
-void TriggerCclRegister(void)
+void TriggerCclRegister()
 {
 	lua_register(Lua, "AddTrigger", CclAddTrigger);
 	lua_register(Lua, "SetActiveTriggers", CclSetActiveTriggers);
@@ -764,7 +764,7 @@ void SaveTriggers(CFile *file)
 /**
 **  Initialize the trigger module.
 */
-void InitTriggers(void)
+void InitTriggers()
 {
 	//
 	// Setup default triggers
@@ -784,7 +784,7 @@ void InitTriggers(void)
 /**
 **  Clean up the trigger module.
 */
-void CleanTriggers(void)
+void CleanTriggers()
 {
 	lua_pushstring(Lua, "_triggers_");
 	lua_pushnil(Lua);

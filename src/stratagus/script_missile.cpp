@@ -367,7 +367,7 @@ static int CclDefineBurningBuilding(lua_State *l)
 /**
 **  Register CCL features for missile-type.
 */
-void MissileCclRegister(void)
+void MissileCclRegister()
 {
 	lua_register(Lua, "DefineMissileType", CclDefineMissileType);
 	lua_register(Lua, "Missile", CclMissile);

@@ -103,7 +103,7 @@ enum _key_state_ KeyState;           /// current key state
 /**
 **  Show input.
 */
-static void ShowInput(void)
+static void ShowInput()
 {
 	char *input;
 
@@ -122,7 +122,7 @@ static void ShowInput(void)
 /**
 **  Begin input.
 */
-static void UiBeginInput(void)
+static void UiBeginInput()
 {
 	KeyState = KeyStateInput;
 	Input[0] = '\0';
@@ -138,7 +138,7 @@ static void UiBeginInput(void)
 /**
 **  Unselect all currently selected units.
 */
-static void UiUnselectAll(void)
+static void UiUnselectAll()
 {
 	UnSelectAll();
 	NetworkSendSelection((CUnit **)NULL, 0);
@@ -253,7 +253,7 @@ static void UiAddToGroup(unsigned group)
 /**
 **  Toggle sound on / off.
 */
-static void UiToggleSound(void)
+static void UiToggleSound()
 {
 	if (SoundEnabled()) {
 		if (IsEffectsEnabled()) {
@@ -278,7 +278,7 @@ static void UiToggleSound(void)
 /**
 **  Toggle music on / off.
 */
-static void UiToggleMusic(void)
+static void UiToggleMusic()
 {
 	static int vol;
 	if (SoundEnabled()) {
@@ -296,7 +296,7 @@ static void UiToggleMusic(void)
 /**
 **  Toggle pause on / off.
 */
-void UiTogglePause(void)
+void UiTogglePause()
 {
 	if (!IsNetworkGame()) {
 		GamePaused = !GamePaused;
@@ -313,7 +313,7 @@ void UiTogglePause(void)
 **
 **  @todo FIXME: We should try to keep the same view, if possible
 */
-static void UiToggleBigMap(void)
+static void UiToggleBigMap()
 {
 	static int mapx;
 	static int mapy;
@@ -350,7 +350,7 @@ static void UiToggleBigMap(void)
 /**
 **  Increase game speed.
 */
-static void UiIncreaseGameSpeed(void)
+static void UiIncreaseGameSpeed()
 {
 	if (FastForwardCycle >= GameCycle) {
 		return;
@@ -363,7 +363,7 @@ static void UiIncreaseGameSpeed(void)
 /**
 **  Decrease game speed.
 */
-static void UiDecreaseGameSpeed(void)
+static void UiDecreaseGameSpeed()
 {
 	if (FastForwardCycle >= GameCycle) {
 		return;
@@ -385,11 +385,11 @@ static void UiDecreaseGameSpeed(void)
 **  @todo Improve this function, try to show all selected units
 **        or the most possible units.
 */
-static void UiCenterOnSelected(void)
+static void UiCenterOnSelected()
 {
-	int n;
+	int n = NumSelected;
 
-	if ((n = NumSelected)) {
+	if (n) {
 		Vec2i pos = Selected[--n]->tilePos;
 
 		while (n--) {
@@ -424,7 +424,7 @@ static void UiRecallMapPosition(unsigned position)
 /**
 **  Toggle terrain display on/off.
 */
-static void UiToggleTerrain(void)
+static void UiToggleTerrain()
 {
 	UI.Minimap.WithTerrain ^= 1;
 	if (UI.Minimap.WithTerrain) {
@@ -459,7 +459,7 @@ static void UiFindIdleWorker()
 /**
 **  Toggle grab mouse on/off.
 */
-static void UiToggleGrabMouse(void)
+static void UiToggleGrabMouse()
 {
 	DebugPrint("%x\n" _C_ KeyModifiers);
 	ToggleGrabMouse(0);
@@ -469,7 +469,7 @@ static void UiToggleGrabMouse(void)
 /**
 **  Track unit, the viewport follows the unit.
 */
-static void UiTrackUnit(void)
+static void UiTrackUnit()
 {
 	if (UI.SelectedViewport->Unit == Selected[0]) {
 		UI.SelectedViewport->Unit = NULL;
@@ -508,7 +508,7 @@ bool HandleCommandKey(int key)
 }
 
 #ifdef DEBUG
-extern void ToggleShowBuilListMessages(void);
+extern void ToggleShowBuilListMessages();
 #endif
 
 /**
@@ -934,7 +934,7 @@ static int InputKey(int key)
 /**
 **  Save a screenshot.
 */
-static void Screenshot(void)
+static void Screenshot()
 {
 	CFile fd;
 	char filename[30];
@@ -1489,7 +1489,7 @@ void InputKeyTimeout(const EventCallback *callbacks, unsigned ticks)
 /**
 **  Get double click delay
 */
-int GetDoubleClickDelay(void)
+int GetDoubleClickDelay()
 {
 	return DoubleClickDelay;
 }
@@ -1507,7 +1507,7 @@ void SetDoubleClickDelay(int delay)
 /**
 **  Get hold click delay
 */
-int GetHoldClickDelay(void)
+int GetHoldClickDelay()
 {
 	return HoldClickDelay;
 }

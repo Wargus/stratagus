@@ -530,7 +530,7 @@ static void CalculateMaxIconSize()
 /**
 **  Recalculate the shown units.
 */
-static void RecalculateShownUnits(void)
+static void RecalculateShownUnits()
 {
 	const CUnitType *type;
 
@@ -558,7 +558,7 @@ static void RecalculateShownUnits(void)
 /**
 **  Draw a table with the players
 */
-static void DrawPlayers(void)
+static void DrawPlayers()
 {
 	int i;
 	char buf[256];
@@ -622,7 +622,7 @@ extern void DrawPopupUnitInfo(const CUnitType *type,
 		int player_index, CFont *font,
 		Uint32 backgroundColor, int buttonX, int buttonY);
 
-static void DrawPopup(void) {
+static void DrawPopup() {
 	if (Editor.State == EditorEditUnit && Editor.CursorUnitIndex != -1) {
 		std::string nc, rc;
 		GetDefaultTextColors(nc, rc);
@@ -719,7 +719,7 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 **        If we have more solid tiles, than they fit into the panel, we need
 **        some new ideas.
 */
-static void DrawTileIcons(void)
+static void DrawTileIcons()
 {
 	int i;
 	CLabel label(GameFont);
@@ -790,7 +790,7 @@ static void DrawTileIcons(void)
 /**
 **  Draw the editor panels.
 */
-static void DrawEditorPanel(void)
+static void DrawEditorPanel()
 {
 	int x;
 	int y;
@@ -866,7 +866,7 @@ static void DrawEditorPanel(void)
 **
 **  @todo support for bigger cursors (2x2, 3x3 ...)
 */
-static void DrawMapCursor(void)
+static void DrawMapCursor()
 {
 	int x;
 	int y;
@@ -1904,14 +1904,14 @@ static void EditorCallbackMouse(int x, int y)
 /**
 **  Callback for exit.
 */
-static void EditorCallbackExit(void)
+static void EditorCallbackExit()
 {
 }
 
 /**
 **  Create the tile icons
 */
-static void CreateTileIcons(void)
+static void CreateTileIcons()
 {
 	for(int i = 0; 0x10 + i < Map.Tileset.NumTiles; i+=16) {
 		TileInfo *info = &Map.Tileset.Tiles[0x10 + i];
@@ -1924,7 +1924,7 @@ static void CreateTileIcons(void)
 /**
 **  Clean up the tile icons
 */
-static void CleanTileIcons(void)
+static void CleanTileIcons()
 {
 	Editor.ShownTileTypes.clear();
 }
@@ -1932,7 +1932,7 @@ static void CleanTileIcons(void)
 /**
 **  Create editor.
 */
-void CEditor::Init(void)
+void CEditor::Init()
 {
 	int i;
 	char *file;
@@ -2071,7 +2071,7 @@ int EditorSaveMap(const std::string &file)
 /**
 **  Editor main event loop.
 */
-void EditorMainLoop(void)
+void EditorMainLoop()
 {
 	bool OldCommandLogDisabled = CommandLogDisabled;
 	const EventCallback *old_callbacks = GetCallbacks();

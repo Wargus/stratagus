@@ -56,7 +56,7 @@
 **
 ** Manage the inititialse and cleanup of the AI players.
 **
-** ::InitAiModule(void)
+** ::InitAiModule()
 **
 ** Initialise all global varaibles and structures.
 ** Called before AiInit, or before game loading.
@@ -67,7 +67,7 @@
 ** Player::Aiin the player structure. It can use Player::AiName to
 ** select different AI's.
 **
-** ::CleanAi(void)
+** ::CleanAi()
 **
 ** Called to release all the memory for all AI structures.
 ** Must handle self which players contains AI structures.
