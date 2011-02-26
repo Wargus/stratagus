@@ -163,7 +163,7 @@ enum CursorStates {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern std::vector<CCursor> AllCursors;/// cursor-types description
+extern std::vector<CCursor*> AllCursors;/// cursor-types description
 
 extern CursorStates CursorState;  /// current cursor state (point,...)
 extern int CursorAction;          /// action for selection

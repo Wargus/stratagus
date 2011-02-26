@@ -68,12 +68,16 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 class CGraphic;
+class CFontColor;
 
 	/// Font definition
 class CFont : public gcn::Font {
 private:
-	CFont(const std::string &ident) : Ident(ident), CharWidth(NULL),
-		G(NULL) {}
+	CFont(const std::string &ident) :
+		Ident(ident),
+		CharWidth(NULL),
+		G(NULL)
+	{}
 
 public:
 	virtual ~CFont();
@@ -92,8 +96,25 @@ public:
 	virtual void drawString(gcn::Graphics *graphics, const std::string &text,
 		int x, int y);
 
+
+	void Load();
+	void Reload() const;
+	void FreeOpenGL();
+	void Clean();
+
+	CGraphic *GetFontColorGraphic(const CFontColor *fontColor) const;
+
+	template<bool CLIP>
+	unsigned int DrawChar(CGraphic *g, int utf8, int x, int y, const CFontColor *fc) const;
+
+
+	void DynamicLoad() const;
+
+private:
+	void MakeFontColorTextures() const;
 	void MeasureWidths();
 
+private:
 	std::string Ident;    /// Ident of the font.
 	char *CharWidth;      /// Real font width (starting with ' ')
 	CGraphic *G;          /// Graphic object used to draw
@@ -141,7 +162,6 @@ extern CFont *SmallFont;       /// Small font used in stats
 extern CFont *GameFont;        /// Normal font used in game
 extern CFont *LargeFont;       /// Large font used in menus
 extern CFont *SmallTitleFont;  /// Small font used in episoden titles
-extern CFont *LargeTitleFont;  /// Large font used in episoden titles
 
 /*----------------------------------------------------------------------------
 --  Functions

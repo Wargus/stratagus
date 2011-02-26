@@ -352,8 +352,6 @@ static int CclDefineCursor(lua_State *l)
 	int w;
 	int h;
 	int rate;
-	int i;
-	CCursor *ct;
 
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
@@ -406,29 +404,24 @@ static int CclDefineCursor(lua_State *l)
 	//
 	//  Look if this kind of cursor already exists.
 	//
-	ct = NULL;
-	i = 0;
-	if (AllCursors.size()) {
-		for (; i < (int)AllCursors.size(); ++i) {
-			//
-			//  Race not same, not found.
-			//
-			if (AllCursors[i].Race != race) {
-				continue;
-			}
-			if (AllCursors[i].Ident == name) {
-				ct = &AllCursors[i];
-				break;
-			}
+	CCursor *ct = NULL;
+	for (int i = 0; i < (int)AllCursors.size(); ++i) {
+		//  Race not same, not found.
+		if (AllCursors[i]->Race != race) {
+			continue;
+		}
+		if (AllCursors[i]->Ident == name) {
+			ct = AllCursors[i];
+			break;
 		}
 	}
+
 	//
 	//  Not found, make a new slot.
 	//
 	if (!ct) {
-		CCursor c;
-		AllCursors.push_back(c);
-		ct = &AllCursors.back();
+		ct = new CCursor();
+		AllCursors.push_back(ct);
 		ct->Ident = name;
 		ct->Race = race;
 	}

@@ -95,3 +95,4 @@ void Exit(int err);
 
 $extern std::string CliMapName;
 extern std::string CliMapName;
+extern std::string StratagusLibPath;

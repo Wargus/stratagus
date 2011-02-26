@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 12/16/10 17:26:53.
+** Generated automatically by tolua++-1.0.92 on 02/19/11 21:17:58.
 */
 
 #ifndef __cplusplus
@@ -19198,6 +19198,30 @@ static int tolua_set_CliMapName(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: StratagusLibPath */
+#ifndef TOLUA_DISABLE_tolua_get_StratagusLibPath
+static int tolua_get_StratagusLibPath(lua_State* tolua_S)
+{
+  tolua_pushcppstring(tolua_S,(const char*)StratagusLibPath);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: StratagusLibPath */
+#ifndef TOLUA_DISABLE_tolua_set_StratagusLibPath
+static int tolua_set_StratagusLibPath(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  StratagusLibPath = ((std::string)  tolua_tocppstring(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* Open function */
 TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
 {
@@ -20407,6 +20431,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"CanAccessFile",tolua_stratagus_CanAccessFile00);
   tolua_function(tolua_S,"Exit",tolua_stratagus_Exit00);
   tolua_variable(tolua_S,"CliMapName",tolua_get_CliMapName,tolua_set_CliMapName);
+  tolua_variable(tolua_S,"StratagusLibPath",tolua_get_StratagusLibPath,tolua_set_StratagusLibPath);
  tolua_endmodule(tolua_S);
  return 1;
 }
@@ -20415,6 +20440,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
 #if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 501
  TOLUA_API int luaopen_stratagus (lua_State* tolua_S) {
  return tolua_stratagus_open(tolua_S);
-}
+};
 #endif
 

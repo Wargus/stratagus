@@ -79,7 +79,6 @@ CFont *SmallFont;       /// Small font used in stats
 CFont *GameFont;        /// Normal font used in game
 CFont *LargeFont;       /// Large font used in menus
 CFont *SmallTitleFont;  /// Small font used in episoden titles
-CFont *LargeTitleFont;  /// Large font used in episoden titles
 
 static int FormatNumber(int number, char *buf);
 
@@ -87,9 +86,9 @@ static int FormatNumber(int number, char *buf);
 --  Guichan Functions
 ----------------------------------------------------------------------------*/
 
-void CFont::drawString(gcn::Graphics *graphics, const std::string &txt,
-	int x, int y)
+void CFont::drawString(gcn::Graphics *graphics, const std::string &txt, int x, int y)
 {
+	DynamicLoad();
 	const gcn::ClipRectangle &r = graphics->getCurrentClipArea();
 	int right = std::min<int>(r.x + r.width - 1, Video.Width - 1);
 	int bottom = std::min<int>(r.y + r.height - 1, Video.Height - 1);
@@ -264,8 +263,16 @@ static inline bool GetUTF8(const char text[], const size_t len, size_t &pos, int
 }
 
 
-int CFont::Height() const { return G->Height; }
-bool CFont::IsLoaded() const { return G && G->IsLoaded(); }
+int CFont::Height() const
+{
+	DynamicLoad();
+	return G->Height;
+}
+
+bool CFont::IsLoaded() const
+{
+	return G && G->IsLoaded();
+}
 
 /**
 **  Returns the pixel width of text.
@@ -283,6 +290,7 @@ int CFont::Width(const int number) const
 	char text[ sizeof(int) * 10 + 2];
 	const int len = FormatNumber(number, text);
 
+	DynamicLoad();
 	while (GetUTF8(text, len, pos, utf8)) {
 #if 0
 		if (utf8 == '~') {
@@ -327,6 +335,7 @@ int CFont::Width(const std::string &text) const
 	int utf8;
 	size_t pos = 0;
 
+	DynamicLoad();
 	while (GetUTF8(text, pos, utf8)) {
 		if (utf8 == '~') {
 			if (pos >= text.size()) {  // bad formatted string
@@ -426,6 +435,40 @@ static void VideoDrawCharClip(const CGraphic *g, int gx, int gy, int w, int h,
 	VideoDrawChar(g, gx + ox, gy + oy, w, h, x, y, fc);
 }
 
+
+template<bool CLIP>
+unsigned int CFont::DrawChar(CGraphic *g, int utf8, int x, int y, const CFontColor *fc) const
+{
+	const CFont* font = this;
+	int c = utf8 - 32;
+	Assert(c >= 0);
+	const int ipr = font->G->GraphicWidth / font->G->Width;
+
+	if (c < 0 || ipr * font->G->GraphicHeight / font->G->Height <= c) {
+		c = 0;
+	}
+	const int w = font->CharWidth[c];
+	const int gx = (c % ipr) * font->G->Width;
+	const int gy = (c / ipr) * font->G->Height;
+
+	if (CLIP) {
+		VideoDrawCharClip(g, gx, gy, w, font->G->Height, x , y, fc);
+	} else {
+		VideoDrawChar(g, gx, gy, w, font->G->Height, x, y, fc);
+	}
+	return w + 1;
+}
+
+CGraphic *CFont::GetFontColorGraphic(const CFontColor *fontColor) const
+{
+	if (!UseOpenGL) {
+		return this->G;
+	} else {
+		return FontColorGraphics[this][FontColor];
+	}
+}
+
+
 /**
 **  Draw text with font at x,y clipped/unclipped.
 **
@@ -447,18 +490,13 @@ template <const bool CLIP>
 int CLabel::DoDrawText(int x, int y,
 	const char*const text, const size_t len, const CFontColor *fc) const
 {
-	int w,widths = 0;
+	int widths = 0;
 	std::string color;
 	int utf8;
 	size_t pos = 0;
 	const CFontColor *backup = fc;
-	CGraphic *g;
-
-	if (!UseOpenGL) {
-		g = font->G;
-	} else {
-		g = FontColorGraphics[font][FontColor];
-	}
+	font->DynamicLoad();
+	CGraphic *g = font->GetFontColorGraphic(FontColor);
 
 	while (GetUTF8(text, len, pos, utf8)) {
 		if (utf8 == '~') {
@@ -470,32 +508,26 @@ int CLabel::DoDrawText(int x, int y,
 					++pos;
 					break;
 				case '!':
-					if(fc != reverse) {
+					if (fc != reverse) {
 						fc = reverse;
-						if (UseOpenGL) {
-							g = FontColorGraphics[font][fc];
-						}
+						g = font->GetFontColorGraphic(fc);
 					}
 					++pos;
 					continue;
 				case '<':
 					LastTextColor = (CFontColor *)fc;
-					if(fc != reverse) {
+					if (fc != reverse) {
 						fc = reverse;
-						if (UseOpenGL) {
-							g = FontColorGraphics[font][fc];
-						}
+						g = font->GetFontColorGraphic(fc);
 					}
 					++pos;
 					continue;
 				case '>':
-					if(fc != LastTextColor) {
+					if (fc != LastTextColor) {
 						const CFontColor *rev = LastTextColor;  // swap last and current color
 						LastTextColor = (CFontColor *)fc;
 						fc = rev;
-						if (UseOpenGL) {
-							g = FontColorGraphics[font][fc];
-						}
+						g = font->GetFontColorGraphic(fc);
 					}
 					++pos;
 					continue;
@@ -517,40 +549,15 @@ int CLabel::DoDrawText(int x, int y,
 					const CFontColor *fc_tmp = CFontColor::Get(color);
 					if (fc_tmp) {
 						fc = fc_tmp;
-						if (UseOpenGL) {
-							g = FontColorGraphics[font][fc];
-						}
+						g = font->GetFontColorGraphic(fc);
 					}
 					continue;
 				}
 			}
 		}
 
-		int c = utf8 - 32;
-		Assert(c >= 0);
+		widths += font->DrawChar<CLIP>(g, utf8, x + widths, y, fc);
 
-		int ipr = font->G->GraphicWidth / font->G->Width;
-		if (c >= 0 && c < ipr * font->G->GraphicHeight / font->G->Height) {
-			w = font->CharWidth[c];
-			if (CLIP) {
-				VideoDrawCharClip(g, (c % ipr) * font->G->Width,
-									(c / ipr) * font->G->Height,
-								w, font->G->Height, x + widths, y,fc);
-
-			} else {
-				VideoDrawChar(g, (c % ipr) * font->G->Width,
-									(c / ipr) * font->G->Height,
-								w, font->G->Height, x + widths, y,fc);
-			}
-		} else {
-			w = font->CharWidth[0];
-			if (CLIP) {
-				VideoDrawCharClip(g, 0, 0, w, font->G->Height, x + widths, y,fc);
-			} else {
-				VideoDrawChar(g, 0, 0, w, font->G->Height, x + widths, y,fc);
-			}
-		}
-		widths += w + 1;
 		if (fc != backup) {
 			fc = backup;
 			if (UseOpenGL) {
@@ -563,11 +570,12 @@ int CLabel::DoDrawText(int x, int y,
 }
 
 
-CLabel::CLabel(const CFont *f):
+CLabel::CLabel(const CFont *f) :
 	normal(DefaultTextColor),
 	reverse(ReverseTextColor),
 	font(f)
-{}
+{
+}
 
 	/// Draw text/number unclipped
 int CLabel::Draw(int x, int y, const char*const text) const
@@ -791,21 +799,19 @@ void CFont::MeasureWidths()
 
 /**
 **  Make font bitmap.
-**
-**  @param font  Font number
 */
-void MakeFontColorTextures(const CFont *font)
+void CFont::MakeFontColorTextures() const
 {
-	if (!FontColorGraphics[font].empty()) {
+	if (!FontColorGraphics[this].empty()) {
 		// already loaded
 		return;
 	}
-
-	const CGraphic *g = font->G;
+	const CGraphic *g = this->G;
 	SDL_Surface *s = g->Surface;
+
 	for (unsigned int i = 0; i < AllFontColors.size(); ++i) {
 		CFontColor *fc = AllFontColors[i];
-		CGraphic *newg = FontColorGraphics[font][fc] = new CGraphic;
+		CGraphic *newg = FontColorGraphics[this][fc] = new CGraphic;
 
 		newg->Width = g->Width;
 		newg->Height = g->Height;
@@ -823,22 +829,38 @@ void MakeFontColorTextures(const CFont *font)
 	}
 }
 
+void CFont::Load()
+{
+	if (this->IsLoaded())
+		return;
+
+	if (this->G) {
+//		ShowLoadProgress("Fonts %s", this->G->File.c_str());
+		this->G->Load();
+		this->MeasureWidths();
+
+		if (UseOpenGL) {
+			this->MakeFontColorTextures();
+		}
+	}
+}
+
+void CFont::DynamicLoad() const
+{
+	const_cast<CFont*>(this)->Load();
+	if (this->CharWidth == 0) {
+		const_cast<CFont*>(this)->MeasureWidths();
+	}
+}
+
+
 /**
 **  Load all fonts.
 */
 void LoadFonts()
 {
 	for (unsigned int i = 0; i < AllFonts.size(); ++i) {
-		CGraphic *g = AllFonts[i]->G;
-
-		if (g) {
-			ShowLoadProgress("Fonts %s", g->File.c_str());
-			g->Load();
-			AllFonts[i]->MeasureWidths();
-			if (UseOpenGL) {
-				MakeFontColorTextures(AllFonts[i]);
-			}
-		}
+		AllFonts[i]->Load();
 	}
 
 	// TODO: remove this
@@ -846,7 +868,16 @@ void LoadFonts()
 	GameFont = CFont::Get("game");
 	LargeFont = CFont::Get("large");
 	SmallTitleFont = CFont::Get("small-title");
-	LargeTitleFont = CFont::Get("large-title");
+}
+
+void CFont::FreeOpenGL()
+{
+	if (this->G) {
+		for (unsigned int j = 0; j < AllFontColors.size(); ++j) {
+			CGraphic *g = FontColorGraphics[this][AllFontColors[j]];
+			glDeleteTextures(g->NumTextures, g->Textures);
+		}
+	}
 }
 
 /**
@@ -856,14 +887,26 @@ void FreeOpenGLFonts()
 {
 	for (unsigned int i = 0; i < AllFonts.size(); ++i) {
 		CFont *font = AllFonts[i];
-		if (font->G) {
-			for (unsigned int j = 0; j < AllFontColors.size(); ++j) {
-				CGraphic *g = FontColorGraphics[font][AllFontColors[j]];
-				glDeleteTextures(g->NumTextures, g->Textures);
-			}
-		}
+
+		font->FreeOpenGL();
 	}
 }
+
+
+void CFont::Reload() const
+{
+	if (this->G) {
+		for (unsigned int j = 0; j < AllFontColors.size(); ++j) {
+			//CGraphic::Free(FontColorGraphics[this][AllFontColors[j]]);
+			CGraphic *g = FontColorGraphics[this][AllFontColors[j]];
+			delete[] g->Textures;
+			delete g;
+		}
+		FontColorGraphics[this].clear();
+		this->MakeFontColorTextures();
+	}
+}
+
 
 /**
 **  Reload OpenGL fonts
@@ -873,16 +916,7 @@ void ReloadFonts()
 	for (unsigned int i = 0; i < AllFonts.size(); ++i) {
 		const CFont *font = AllFonts[i];
 
-		if (font->G) {
-			for (unsigned int j = 0; j < AllFontColors.size(); ++j) {
-				//CGraphic::Free(FontColorGraphics[font][AllFontColors[j]]);
-				CGraphic *g = FontColorGraphics[font][AllFontColors[j]];
-				delete[] g->Textures;
-				delete g;
-			}
-			FontColorGraphics[font].clear();
-			MakeFontColorTextures(font);
-		}
+		font->Reload();
 	}
 }
 
@@ -979,26 +1013,33 @@ CFontColor *CFontColor::Get(const std::string &ident)
 	return fc;
 }
 
+void CFont::Clean()
+{
+	CFont* font = this;
+
+	if (UseOpenGL) {
+		if (!FontColorGraphics[font].empty()) {
+			for (int j = 0; j < (int)AllFontColors.size(); ++j) {
+				CGraphic *g = FontColorGraphics[font][AllFontColors[j]];
+				glDeleteTextures(g->NumTextures, g->Textures);
+				delete[] g->Textures;
+				delete g;
+			}
+			FontColorGraphics[font].clear();
+		}
+	}
+}
+
+
 /**
 **  Clean up the font module.
 */
 void CleanFonts()
 {
 	for (unsigned int i = 0; i < AllFonts.size(); ++i) {
-		const CFont *font = AllFonts[i];
+		CFont *font = AllFonts[i];
 
-		if (UseOpenGL) {
-			if (!FontColorGraphics[font].empty()) {
-				for (int j = 0; j < (int)AllFontColors.size(); ++j) {
-					CGraphic *g = FontColorGraphics[font][AllFontColors[j]];
-					glDeleteTextures(g->NumTextures, g->Textures);
-					delete[] g->Textures;
-					delete g;
-				}
-				FontColorGraphics[font].clear();
-			}
-		}
-
+		font->Clean();
 		delete font;
 	}
 	if (UseOpenGL) {
@@ -1017,7 +1058,6 @@ void CleanFonts()
 	GameFont = NULL;
 	LargeFont = NULL;
 	SmallTitleFont = NULL;
-	LargeTitleFont = NULL;
 }
 
 //@}

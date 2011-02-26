@@ -130,9 +130,7 @@ public:
 	GLuint *Textures;          /// Texture names
 	int NumTextures;           /// Number of textures
 
-	friend void MakeFontColorTextures(const CFont *font);
-	friend void CleanFonts();
-	friend void ReloadFonts();
+	friend class CFont;
 };
 
 class CPlayerColorGraphic : public CGraphic

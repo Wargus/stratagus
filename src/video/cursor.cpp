@@ -62,7 +62,7 @@
 **
 **  @todo FIXME: Should this be move to ui part?
 */
-std::vector<CCursor> AllCursors;
+std::vector<CCursor*> AllCursors;
 
 CursorStates CursorState;    /// current cursor state (point,...)
 int CursorAction;            /// action for selection
@@ -100,8 +100,8 @@ static SDL_Surface *HiddenSurface;
 */
 void LoadCursors(const std::string &race)
 {
-	for (std::vector<CCursor>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
-		CCursor& cursor = *i;
+	for (std::vector<CCursor*>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
+		CCursor& cursor = **i;
 
 		//  Only load cursors of this race or universal cursors.
 		if (!cursor.Race.empty() && cursor.Race != race) {
@@ -127,8 +127,8 @@ void LoadCursors(const std::string &race)
 */
 CCursor *CursorByIdent(const std::string &ident)
 {
-	for (std::vector<CCursor>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
-		CCursor& cursor = *i;
+	for (std::vector<CCursor*>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
+		CCursor& cursor = **i;
 
 		if (cursor.Ident != ident || !cursor.G->IsLoaded())
 			continue;
@@ -320,6 +320,9 @@ void DrawCursor()
 	//  draw it if it exists
 	//
 	if (GameCursor) {
+		if (!GameCursor->G->IsLoaded()) {
+			GameCursor->G->Load();
+		}
 		GameCursor->G->DrawFrameClip(GameCursor->SpriteFrame,
 			CursorX - GameCursor->HotX, CursorY - GameCursor->HotY);
 	}
@@ -372,8 +375,9 @@ void InitVideoCursors()
 */
 void CleanCursors()
 {
-	for (std::vector<CCursor>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
-		CGraphic::Free((*i).G);
+	for (std::vector<CCursor*>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
+		CGraphic::Free((**i).G);
+		free(*i);
 	}
 	AllCursors.clear();
 
