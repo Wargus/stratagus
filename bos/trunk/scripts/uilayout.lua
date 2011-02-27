@@ -78,15 +78,20 @@ end
 UI.Fillers:clear()
 AddFiller("graphics/ui/ui_minimap.png", Video.Width - 200, 24 - 8)
 if (Editor.Running == EditorNotRunning) then
-  local w = Video.Width
-  -- FIXME: remove this when we have images for these resolutions
-  if (w == 1440 or w == 1680 or w == 1920) then
-    w = 1600
-  elseif (w == 1280) then
-    w = 1024
+  local h = Video.Height
+  local bpanel
+  if (h <= 480) then -- 640x480
+    bpanel = "graphics/ui/ui_640_bpanel.png" -- 200x144
+  elseif (h <= 600) then -- 800x600 or 1024x600
+    bpanel = "graphics/ui/ui_800_bpanel.png" -- 200x264
+  elseif (h <= 768) then -- 1280x720, 1024x768, or 1366x768
+    bpanel = "graphics/ui/ui_1024_bpanel.png" -- 200x432
+  elseif (h <= 960) then -- 1440x900
+    bpanel = "graphics/ui/ui_1280_bpanel.png" -- 200x624
+  else -- 1280x1024, 1680x1050, 1920x1080, 1600x1200, or 1920x1200
+    bpanel = "graphics/ui/ui_1600_bpanel.png" -- 200x864
   end
-  AddFiller("graphics/ui/ui_" .. w .. "_bpanel.png",
-    Video.Width - 200, 336 - 8 - 8)
+  AddFiller(bpanel, Video.Width - 200, 336 - 8 - 8)
 end
 
 b = CFiller:new_local()
