@@ -33,12 +33,10 @@
 <a href="#AddMessage">AddMessage</a>
 <a href="#AddObjective">AddObjective</a>
 <a href="#AddTip">AddTip</a>
-<a href="#Briefing">Briefing</a>
 <a href="#CenterMap">CenterMap</a>
 <a href="#ChangeUnitsOwner">ChangeUnitsOwner</a>
 <a href="#CreateUnit">CreateUnit</a>
 <a href="#DefineBurningBuilding">DefineBurningBuilding</a>
-<a href="#DefineCampaign">DefineCampaign</a>
 <a href="#DefineConstruction">DefineConstruction</a>
 <a href="#DefineEditorUnitTypes">DefineEditorUnitTypes</a>
 <a href="#DefinePlayerColorIndex">DefinePlayerColorIndex</a>
@@ -164,27 +162,6 @@ Adds a tip.  Tips are shown at the start of a level.
     AddTip("You can demolish trees and rocks.")
 </pre>
 
-<a name="Briefing"></a>
-<h3>Briefing</h3>
-
-Set the briefing.
-
-Type must be "sc" or "wc2". Background and text tags are required.
-
-
-<h4>Example</h4>
-
-<pre>
-Briefing("type", "wazoogame",
-  "title", "sc",
-  "objective", "Kill all aliens on the map.",
-  "background", "campaigns/human/interface/introscreen3.png",
-  "text", "campaigns/human/level07h.txt",
-  "voice", "campaigns/human/level07h-intro1.wav",
-  "voice", "campaigns/human/level07h-intro2.wav"
-)
-</pre>
-
 <a name="CenterMap"></a>
 <h3>CenterMap(x, y)</h3>
 
@@ -290,30 +267,6 @@ Define the burning animation for buildings. The animation will be laid over the 
         {"percent", 50, "missile", "missile-small-fire"},
         {"percent", 75}) -- no missile
 
-</pre>
-
-<a name="DefineCampaign"></a>
-<h3>DefineCampaign(ident, "name", campaign-name, [campaign-data])</h3>
-
-Define the campaign.
-
-
-<dl>
-<dt>ident</dt>
-<dd>name identifying the campaign in the scripts.
-</dd>
-<dt>campaign-name</dt>
-<dd>name of the campaigned displayed to players.
-</dd>
-<dt>campaign-data</dt>
-<dd>TODO.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    DefineCampaign()
 </pre>
 
 <a name="DefineConstruction"></a>
