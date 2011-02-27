@@ -75,12 +75,28 @@ static std::string DefaultReverseColorIndex;    /// Default reverse color index
 static std::map< const CFont *, std::map<const CFontColor *, CGraphic *> > FontColorGraphics;
 
 // FIXME: remove these
-CFont *SmallFont;       /// Small font used in stats
-CFont *GameFont;        /// Normal font used in game
-CFont *LargeFont;       /// Large font used in menus
-CFont *SmallTitleFont;  /// Small font used in episoden titles
+static CFont *SmallFont;       /// Small font used in stats
+static CFont *GameFont;        /// Normal font used in game
 
 static int FormatNumber(int number, char *buf);
+
+
+CFont *GetSmallFont()
+{
+	if (!SmallFont) {
+		SmallFont = CFont::Get("small");
+	}
+	return SmallFont;
+}
+
+CFont *GetGameFont()
+{
+	if (!GameFont) {
+		GameFont = CFont::Get("game");
+	}
+	return GameFont;
+}
+
 
 /*----------------------------------------------------------------------------
 --  Guichan Functions
@@ -866,8 +882,6 @@ void LoadFonts()
 	// TODO: remove this
 	SmallFont = CFont::Get("small");
 	GameFont = CFont::Get("game");
-	LargeFont = CFont::Get("large");
-	SmallTitleFont = CFont::Get("small-title");
 }
 
 void CFont::FreeOpenGL()
@@ -1056,8 +1070,6 @@ void CleanFonts()
 
 	SmallFont = NULL;
 	GameFont = NULL;
-	LargeFont = NULL;
-	SmallTitleFont = NULL;
 }
 
 //@}

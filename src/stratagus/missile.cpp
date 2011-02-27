@@ -557,8 +557,8 @@ void MissileDrawProxy::DrawMissile(const CViewport *vp) const
 	const int y = this->Y - vp->MapY * PixelTileSize.y + vp->Y - vp->OffsetY;
 	switch (this->Type->Class) {
 		case MissileClassHit:
-			CLabel(GameFont).DrawClip(x,y, this->data.Damage);
-			//VideoDrawNumberClip(x, y, GameFont, this->data.Damage);
+			CLabel(GetGameFont()).DrawClip(x,y, this->data.Damage);
+			//VideoDrawNumberClip(x, y, GetGameFont(), this->data.Damage);
 			break;
 		default:
 			this->Type->DrawMissileType(this->data.SpriteFrame, x, y);
@@ -596,7 +596,7 @@ void Missile::DrawMissile(const CViewport *vp) const
 	const int y = this->position.y - vp->MapY * PixelTileSize.y + vp->Y - vp->OffsetY;
 	switch (this->Type->Class) {
 		case MissileClassHit:
-			CLabel(GameFont).DrawClip(x, y, this->Damage);
+			CLabel(GetGameFont()).DrawClip(x, y, this->Damage);
 			break;
 		default:
 			this->Type->DrawMissileType(this->SpriteFrame, x, y);

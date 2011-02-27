@@ -158,10 +158,8 @@ public:
 **  Font selector for the font functions.
 **  FIXME: should be moved to lua
 */
-extern CFont *SmallFont;       /// Small font used in stats
-extern CFont *GameFont;        /// Normal font used in game
-extern CFont *LargeFont;       /// Large font used in menus
-extern CFont *SmallTitleFont;  /// Small font used in episoden titles
+extern CFont *GetSmallFont();       /// Small font used in stats
+extern CFont *GetGameFont();        /// Normal font used in game
 
 /*----------------------------------------------------------------------------
 --  Functions

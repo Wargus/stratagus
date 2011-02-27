@@ -316,9 +316,9 @@ void CViewport::DrawMapBackgroundInViewport() const
 			Video.DrawHLineClip(color, dx, dy, PixelTileSize.x);
 			Video.DrawVLineClip(color, dx, dy, PixelTileSize.y);
 			if ( 0 && my_mask ) {
-				CLabel label(SmallFont);
+				CLabel label(GetSmallFont());
 				label.Draw(dx + 2, dy +2, tile);
-				label.Draw(dx + 2, dy + SmallFont->Height() + 4,
+				label.Draw(dx + 2, dy + GetSmallFont()->Height() + 4,
 					 Map.Fields[sx].TilesetTile );
 
 			}

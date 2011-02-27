@@ -486,7 +486,7 @@ void CDecoVarText::Draw(int x, int y,
 	const CUnitType *, const CVariable &Variable) const
 {
 	if (this->IsCenteredInX) {
-		x -= 2; // GameFont->Width(buf) / 2, with buf = str(Value)
+		x -= 2; // GetGameFont()->Width(buf) / 2, with buf = str(Value)
 	}
 	if (this->IsCenteredInY) {
 		y -= this->Font->Height() / 2;
@@ -575,7 +575,7 @@ static void DrawDecoration(const CUnit &unit, const CUnitType *type, int x, int 
 	//
 	// Show the number of references.
 	//
-	VideoDrawNumberClip(x + 1, y + 1, GameFont, unit.Refs);
+	VideoDrawNumberClip(x + 1, y + 1, GetGameFont(), unit.Refs);
 #endif
 
 	UpdateUnitVariables(unit);
@@ -615,11 +615,11 @@ static void DrawDecoration(const CUnit &unit, const CUnitType *type, int x, int 
 		int groupId = 0;
 		for (groupId = 0; !(unit.GroupId & (1 << groupId)); ++groupId)
 			;
-		int width = GameFont->Width(groupId);
+		int width = GetGameFont()->Width(groupId);
 		x += (unit.Type->TileWidth * PixelTileSize.x + unit.Type->BoxWidth) / 2 - width;
-		width = GameFont->Height();
+		width = GetGameFont()->Height();
 		y += (unit.Type->TileHeight * PixelTileSize.y + unit.Type->BoxHeight) / 2 - width;
-		CLabel(GameFont).DrawClip(x, y, groupId);
+		CLabel(GetGameFont()).DrawClip(x, y, groupId);
 	}
 }
 
@@ -1340,11 +1340,11 @@ void CUnitDrawProxy::DrawDecorationAt(int x, int y) const
 	 && Player == ThisPlayer
 #endif
 	 ) {
-		int width = GameFont->Width(GroupId - 1);
+		int width = GetGameFont()->Width(GroupId - 1);
 		x += (Type->TileWidth * PixelTileSize.x + Type->BoxWidth) / 2 - width;
-		width = GameFont->Height();
+		width = GetGameFont()->Height();
 		y += (Type->TileHeight * PixelTileSize.y + Type->BoxHeight) / 2 - width;
-		CLabel(GameFont).DrawClip(x, y, GroupId - 1);
+		CLabel(GetGameFont()).DrawClip(x, y, GroupId - 1);
 	}
 }
 

@@ -289,7 +289,7 @@ void ShowLoadProgress(const char *fmt, ...)
 	temp[sizeof(temp) - 1] = '\0';
 	va_end(va);
 
-	if (Video.Depth && GameFont && GameFont->IsLoaded()) {
+	if (Video.Depth && GetGameFont() && GetGameFont()->IsLoaded()) {
 		DisplayAutoLocker autolock;
 		// Remove non printable chars
 		for (char *s = temp; *s; ++s) {
@@ -298,7 +298,7 @@ void ShowLoadProgress(const char *fmt, ...)
 			}
 		}
 		Video.FillRectangle(ColorBlack, 5, Video.Height - 18, Video.Width - 10, 18);
-		CLabel(GameFont).DrawCentered(Video.Width / 2, Video.Height - 16, temp);
+		CLabel(GetGameFont()).DrawCentered(Video.Width / 2, Video.Height - 16, temp);
 		InvalidateArea(5, Video.Height - 18, Video.Width - 10, 18);
 		RealizeVideoMemory();
 	} else {

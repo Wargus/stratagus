@@ -2047,7 +2047,7 @@ void DrawPieMenu()
 		return;
 	}
 	ButtonActionProxy buttons(CurrentButtons);
-	CLabel label(GameFont);
+	CLabel label(GetGameFont());
 	CViewport *vp = UI.SelectedViewport;
 	PushClipping();
 	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);

@@ -479,7 +479,7 @@ static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 	//Uint32 backgroundColor = Video.MapRGB(TheScreen->format, 255, 255, 200);
 	//Uint32 backgroundColor = Video.MapRGB(TheScreen->format, 255, 255, 255);
 	Uint32 backgroundColor = Video.MapRGB(TheScreen->format, 38, 38, 78);
-	CFont *font = SmallFont;
+	CFont *font = GetSmallFont();
 	const int font_height = font->Height();
 
 	int start_x, x, popupWidth;

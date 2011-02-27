@@ -567,7 +567,7 @@ static void DrawUnitInfo(CUnit &unit)
 	int x;
 	int y;
 	CUnit *uins;
-	CLabel label(GameFont);
+	CLabel label(GetGameFont());
 
 	if (CPU_NUM == 1) {
 		UpdateUnitVariables(unit);
@@ -741,7 +741,7 @@ void DrawResources()
 {
 	int i;
 	int v;
-	CLabel label(GameFont);
+	CLabel label(GetGameFont());
 
 	// Draw all icons of resource.
 	for (i = 0; i <= ScoreCost; ++i) {
@@ -753,7 +753,7 @@ void DrawResources()
 	for (i = 0; i < MaxCosts; ++i) {
 		if (UI.Resources[i].TextX != -1) {
 			v = ThisPlayer->Resources[i];
-			label.SetFont(v > 99999 ? SmallFont : GameFont);
+			label.SetFont(v > 99999 ? GetSmallFont() : GetGameFont());
 			label.Draw(UI.Resources[i].TextX,
 				UI.Resources[i].TextY + (v > 99999) * 3, v);
 		}
@@ -761,7 +761,7 @@ void DrawResources()
 	if (UI.Resources[FoodCost].TextX != -1) {
 		char tmp[128];
 		snprintf(tmp,sizeof(tmp), "%d/%d", ThisPlayer->Demand, ThisPlayer->Supply);
-		label.SetFont(GameFont);
+		label.SetFont(GetGameFont());
 		if (ThisPlayer->Supply < ThisPlayer->Demand) {
 			label.DrawReverse(UI.Resources[FoodCost].TextX,
 				UI.Resources[FoodCost].TextY, tmp);
@@ -772,7 +772,7 @@ void DrawResources()
 	}
 	if (UI.Resources[ScoreCost].TextX != -1) {
 		v = ThisPlayer->Score;
-		label.SetFont(v > 99999 ? SmallFont : GameFont);
+		label.SetFont(v > 99999 ? GetSmallFont() : GetGameFont());
 		label.Draw(UI.Resources[ScoreCost].TextX,
 				UI.Resources[ScoreCost].TextY + (v > 99999) * 3, v);
 	}
@@ -1256,7 +1256,7 @@ static int Costs[MaxCosts + 1];          /// costs to display in status line
 void DrawCosts()
 {
 	int x = UI.StatusLine.TextX + 268;
-	CLabel label(GameFont);
+	CLabel label(GetGameFont());
 	if (CostsMana) {
 		// FIXME: hardcoded image!!!
 		UI.Resources[GoldCost].G->DrawFrameClip(3, x, UI.StatusLine.TextY);
@@ -1411,11 +1411,11 @@ void CInfoPanel::Draw()
 		x = UI.InfoPanel.X + 16;
 		y = UI.InfoPanel.Y + 8;
 
-		VideoDrawTextClip(x, y, GameFont, "Stratagus");
+		VideoDrawTextClip(x, y, GetGameFont(), "Stratagus");
 		y += 16;
-		VideoDrawTextClip(x, y, GameFont, "Cycle:");
-		VideoDrawNumberClip(x + 48, y, GameFont, GameCycle);
-		VideoDrawNumberClip(x + 110, y, GameFont,
+		VideoDrawTextClip(x, y, GetGameFont(), "Cycle:");
+		VideoDrawNumberClip(x + 48, y, GetGameFont(), GameCycle);
+		VideoDrawNumberClip(x + 110, y, GetGameFont(),
 			CYCLES_PER_SECOND * VideoSyncSpeed / 100);
 		y += 20;
 
@@ -1430,13 +1430,13 @@ void CInfoPanel::Draw()
 					SetDefaultTextColors(nc, rc);
 				}
 
-				VideoDrawNumberClip(x + 15, y, GameFont, i);
+				VideoDrawNumberClip(x + 15, y, GetGameFont(), i);
 
 				Video.DrawRectangleClip(ColorWhite,x, y, 12, 12);
 				Video.FillRectangleClip(Players[i].Color, x + 1, y + 1, 10, 10);
 
-				VideoDrawTextClip(x + 27, y, GameFont,Players[i].Name);
-				VideoDrawNumberClip(x + 117, y, GameFont,Players[i].Score);
+				VideoDrawTextClip(x + 27, y, GetGameFont(),Players[i].Name);
+				VideoDrawNumberClip(x + 117, y, GetGameFont(),Players[i].Score);
 				y += 14;
 			}
 		}
@@ -1501,7 +1501,7 @@ static void DrawInfoPanelNoneSelected()
 	std::string rc;
 	int x = UI.InfoPanel.X + 16;
 	int y = UI.InfoPanel.Y + 8;
-	CLabel label(GameFont);
+	CLabel label(GetGameFont());
 
 	label.Draw(x,y, "Stratagus");
 	y += 16;
@@ -1510,7 +1510,7 @@ static void DrawInfoPanelNoneSelected()
 	label.Draw(x + 110, y, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
 	y += 20;
 
-	if( y + PlayerMax * GameFont->Height() > Video.Height )
+	if( y + PlayerMax * GetGameFont()->Height() > Video.Height )
 	{
 		x = 16;
 		y = 30;

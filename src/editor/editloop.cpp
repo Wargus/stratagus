@@ -562,7 +562,7 @@ static void DrawPlayers()
 {
 	int i;
 	char buf[256];
-	CLabel label(SmallFont);
+	CLabel label(GetSmallFont());
 
 	int x = UI.InfoPanel.X + 8;
 	int y = UI.InfoPanel.Y + 4 + IconHeight + 10;
@@ -613,7 +613,7 @@ static void DrawPlayers()
 				strcat_s(buf, sizeof(buf), "Computer");
 				break;
 		}
-		label.SetFont(GameFont);
+		label.SetFont(GetGameFont());
 		label.Draw(x, y, buf);
 	}
 }
@@ -627,7 +627,7 @@ static void DrawPopup() {
 		std::string nc, rc;
 		GetDefaultTextColors(nc, rc);
 		DrawPopupUnitInfo(Editor.ShownUnitTypes[Editor.CursorUnitIndex],
-				Editor.SelectedPlayer, SmallFont,
+				Editor.SelectedPlayer, GetSmallFont(),
 				Video.MapRGB(TheScreen->format, 38, 38, 78),
 				Editor.PopUpX, Editor.PopUpY);
 		SetDefaultTextColors(nc, rc);
@@ -722,7 +722,7 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 static void DrawTileIcons()
 {
 	int i;
-	CLabel label(GameFont);
+	CLabel label(GetGameFont());
 	int x = UI.InfoPanel.X + 46;
 	int y = UI.InfoPanel.Y + 4 + IconHeight + 11;
 
@@ -987,7 +987,7 @@ static void DrawEditorInfo()
 	}
 
 	snprintf(buf, sizeof(buf),"Editor (%d %d)", x, y);
-	VideoDrawText(UI.ResourceX + 2, UI.ResourceY + 2, GameFont, buf);
+	VideoDrawText(UI.ResourceX + 2, UI.ResourceY + 2, GetGameFont(), buf);
 	CMapField *mf = Map.Field(x, y);
 	//
 	// Flags info
@@ -1008,7 +1008,7 @@ static void DrawEditorInfo()
 		flags & MapFieldAirUnit      ? 'a' : '-',
 		flags & MapFieldSeaUnit      ? 's' : '-',
 		flags & MapFieldBuilding     ? 'b' : '-');
-	VideoDrawText(UI.ResourceX + 118, UI.ResourceY + 2, GameFont, buf);
+	VideoDrawText(UI.ResourceX + 118, UI.ResourceY + 2, GetGameFont(), buf);
 
 	//
 	// Tile info
@@ -1029,7 +1029,7 @@ static void DrawEditorInfo()
 			? Map.Tileset.SolidTerrainTypes[Map.Tileset.Tiles[i].MixTerrain].TerrainName
 			: "");
 
-	VideoDrawText(UI.ResourceX + 252, UI.ResourceY + 2, GameFont, buf);
+	VideoDrawText(UI.ResourceX + 252, UI.ResourceY + 2, GetGameFont(), buf);
 #endif
 }
 

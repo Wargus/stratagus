@@ -133,7 +133,7 @@ static void ShowTitleImage(TitleScreen *t)
 		timeout = -1;
 	}
 
-	CLabel label(GameFont);
+	CLabel label(GetGameFont());
 	DisplayAutoLocker autolock;
 	while (timeout-- && WaitNoEvent) {
 		g->DrawClip((Video.Width - g->Width) / 2, (Video.Height - g->Height) / 2);
