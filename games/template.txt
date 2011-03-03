@@ -1,0 +1,14 @@
+-- Template to add a game. the resulting file should have .lua extension
+
+local oldStratagusLibPath = StratagusLibPath
+
+-- Customize next line
+StratagusLibPath = "/path/to/my/game/"
+
+Load(StratagusLibPath .. "scripts/stratagus.lua")
+Load(StratagusLibPath .. "scripts/guichan.lua")
+StratagusLibPath = oldStratagusLibPath
+Load("../scripts/stratagus.lua")
+
+
+
