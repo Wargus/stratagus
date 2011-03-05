@@ -185,7 +185,7 @@ Center the current viewport at a certain location.
 </pre>
 
 <a name="ChangeUnitsOwner"></a>
-<h3>ChangeUnitsOwner({x1, y1}, {x2, y2}, oldplayer, newplayer)</h3>
+<h3>ChangeUnitsOwner({x1, y1}, {x2, y2}, oldplayer, newplayer [,unittype])</h3>
 
 Changes the owner of a group of units from one player to another.
 
@@ -198,10 +198,22 @@ Changes the owner of a group of units from one player to another.
 <dd>Lower right location for tilebox to check for units within.
 </dd>
 <dt>oldplayer</dt>
-<dd>The player that currently owns the units
+<dd>The player that currently owns the units.
 </dd>
 <dt>newplayer</dt>
-<dd>The player that the units should now be owned by
+<dd>The player that the units should now be owned by.
+</dd>
+<dt>unittype</dt>
+<dd>Optional; change only units of this type.
+<pre>
+"unit-name"  Unit type of this name
+"any"        Matches any unit type (default if omitted)
+"all"        All units (sum of units and buildings)
+"units"      All non building units
+"building"   All building units
+</pre>
+If you want some other set of unit types, then you just need to
+call this function once for each unit type.
 </dd>
 </dl>
 
@@ -211,6 +223,9 @@ Changes the owner of a group of units from one player to another.
     -- Changes the owner to player 2 for all units owned by player 3,
     -- that are located in the area (0,0)-(10,10).
     ChangeUnitsOwner({0, 0}, {10, 10}, 3, 2)
+
+    -- As above, but affects rocket tanks only.
+    ChangeUnitsOwner({0, 0}, {10, 10}, 3, 2, "unit-rtank")
 </pre>
 
 <a name="CreateUnit"></a>
