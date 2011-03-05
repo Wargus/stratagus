@@ -863,10 +863,7 @@ static int CclOrderUnit(lua_State *l)
 		if (unit->Destroyed || unit->Orders[0]->Action == UnitActionDie) {
 			continue;
 		}
-		if (unittype == ANY_UNIT ||
-				(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
-				(unittype == ALL_BUILDINGS && unit->Type->Building) ||
-				unittype == unit->Type) {
+		if (TriggerMatchUnitType(unit, unittype)) {
 			if (plynr == -1 || plynr == unit->Player->Index) {
 				if (!strcmp(order,"move")) {
 					CommandMove(unit, (dx1 + dx2) / 2, (dy1 + dy2) / 2, 1);
@@ -918,10 +915,7 @@ static int CclKillUnit(lua_State *l)
 
 	for (; j >= 0; --j) {
 		unit = table[j];
-		if (unittype == ANY_UNIT ||
-				(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
-				(unittype == ALL_BUILDINGS && unit->Type->Building) ||
-				unittype == unit->Type) {
+		if (TriggerMatchUnitType(unit, unittype)) {
 			LetUnitDie(unit);
 			lua_pushboolean(l, 1);
 			return 1;
@@ -986,10 +980,7 @@ static int CclKillUnitAt(lua_State *l)
 			continue;
 		}
 
-		if (unittype == ANY_UNIT ||
-			(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
-			(unittype == ALL_BUILDINGS && unit->Type->Building) ||
-			unittype==unit->Type)
+		if (TriggerMatchUnitType(unit, unittype))
 		{
 			if (plynr == -1 || plynr == unit->Player->Index) {
 				LetUnitDie(unit);
