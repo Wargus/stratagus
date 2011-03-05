@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Added support for 1024x600 and 1366x768 video modes (Kalle Olavi Niemitalo)
 - Updated the development documentation (Kalle Olavi Niemitalo)
 - Added maps: zombies, cannons, smalland, the small ring (Michiel van der Wulp)
 - Improved the clover map (Michiel van der Wulp)
