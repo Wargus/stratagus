@@ -177,7 +177,7 @@ function BuildVideoOptionsMenu(menu)
   local b
   local x1 = (Video.Width / 3) - 100
   local x2 = (Video.Width / 3) * 2 - 100
-  local offy = (Video.Height - 352) / 2
+  local offy = (Video.Height - 388) / 2
 
   local modes = {
      -- 4:3, 5:4 aspect ratio modes
