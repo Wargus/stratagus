@@ -81,15 +81,15 @@ if (Editor.Running == EditorNotRunning) then
   local h = Video.Height
   local bpanel
   if (h <= 480) then -- 640x480
-    bpanel = "graphics/ui/ui_640_bpanel.png" -- 200x144
+    bpanel = "graphics/ui/ui_bpanel_200x144.png"
   elseif (h <= 600) then -- 800x600 or 1024x600
-    bpanel = "graphics/ui/ui_800_bpanel.png" -- 200x264
+    bpanel = "graphics/ui/ui_bpanel_200x264.png"
   elseif (h <= 768) then -- 1280x720, 1024x768, or 1366x768
-    bpanel = "graphics/ui/ui_1024_bpanel.png" -- 200x432
+    bpanel = "graphics/ui/ui_bpanel_200x432.png"
   elseif (h <= 960) then -- 1440x900
-    bpanel = "graphics/ui/ui_1280_bpanel.png" -- 200x624
+    bpanel = "graphics/ui/ui_bpanel_200x624.png"
   else -- 1280x1024, 1680x1050, 1920x1080, 1600x1200, or 1920x1200
-    bpanel = "graphics/ui/ui_1600_bpanel.png" -- 200x864
+    bpanel = "graphics/ui/ui_bpanel_200x864.png"
   end
   AddFiller(bpanel, Video.Width - 200, 336 - 8 - 8)
 end
