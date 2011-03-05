@@ -42,11 +42,11 @@ got upon request.
 
 As a special exception the sources are not required for the following files:
   graphics/missiles/nuke.png
-  graphics/ui/ui_1024_bpanel.png
-  graphics/ui/ui_1280_bpanel.png
-  graphics/ui/ui_1600_bpanel.png
-  graphics/ui/ui_640_bpanel.png
-  graphics/ui/ui_800_bpanel.png
+  graphics/ui/ui_bpanel_200x144.png
+  graphics/ui/ui_bpanel_200x264.png
+  graphics/ui/ui_bpanel_200x432.png
+  graphics/ui/ui_bpanel_200x624.png
+  graphics/ui/ui_bpanel_200x864.png
   graphics/ui/ui_info.png
   graphics/ui/ui_minimap.png
   graphics/missiles/green_cross.png
