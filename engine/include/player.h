@@ -245,6 +245,9 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+typedef int lua_Object; // from tolua++.h
+struct lua_State;
+
 class CUnit;
 class CUnitType;
 class PlayerAi;
@@ -481,6 +484,14 @@ extern void DebugPlayers(void);
 
 	/// register ccl features
 extern void PlayerCclRegister(void);
+
+extern void CclChangeUnitsOwner(
+	const int topLeft[2],
+	const int bottomRight[2],
+	int oldPlayer,
+	int newPlayer,
+	lua_Object unitTypeLua,
+	lua_State *l);
 
 	/// Allowed to select multiple units, maybe not mine
 #define CanSelectMultipleUnits(player) \

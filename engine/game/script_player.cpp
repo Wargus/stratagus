@@ -44,6 +44,8 @@
 #include "ai.h"
 #include "actions.h"
 #include "commands.h"
+#include "tolua++.h"
+#include "trigger.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -246,37 +248,56 @@ static int CclPlayer(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclChangeUnitsOwner(lua_State *l)
+void CclChangeUnitsOwner(
+	const int topLeft[2],
+	const int bottomRight[2],
+	int oldPlayer,
+	int newPlayer,
+	lua_Object unitTypeLua,
+	lua_State *l)
 {
-	CUnit *table[UnitMax];
+	const CUnitType *triggerUnitType;
+
+	if (oldPlayer < 0 || oldPlayer >= PlayerMax) {
+		LuaError(l, "Player number is out of range: %d" _C_ oldPlayer);
+	}
+
+	if (newPlayer < 0 || newPlayer >= PlayerMax) {
+		LuaError(l, "Player number is out of range: %d" _C_ newPlayer);
+	}
+
+	// tolua++ 1.0.93 claims to define TOLUA_NIL, but doesn't,
+	// so we use 0 instead.
+	//
+	// If the argument is nil, behave as if it had been omitted.
+	// This feature is not documented in game.html because
+	// script authors should use "any" rather than nil.
+	if (unitTypeLua == 0 /* TOLUA_NIL */ || lua_isnil(l, unitTypeLua)) {
+		triggerUnitType = ANY_UNIT;
+	} else {
+		lua_pushvalue(l, unitTypeLua);
+		triggerUnitType = TriggerGetUnitType(l);
+		lua_pop(l, 1);
+	}
+	
+	// Okay, now Lua won't longjmp any more.
+
+	CUnit *units[UnitMax];
 	int n;
-	int oldp;
-	int newp;
-	int x1;
-	int y1;
-	int x2;
-	int y2;
+	const int x1 = topLeft[0];
+	const int y1 = topLeft[1];
+	const int x2 = bottomRight[0];
+	const int y2 = bottomRight[1];
 
-	LuaCheckArgs(l, 4);
-	LuaCheckTableSize(l, 1, 2);
-	x1 = LuaToNumber(l, 1, 1);
-	y1 = LuaToNumber(l, 1, 2);
-
-	LuaCheckTableSize(l, 2, 2);
-	x2 = LuaToNumber(l, 2, 1);
-	y2 = LuaToNumber(l, 2, 2);
-
-	n = UnitCache.Select(x1, y1, x2 + 1, y2 + 1, table, UnitMax);
-	oldp = LuaToNumber(l, 3);
-	newp = LuaToNumber(l, 4);
+	n = UnitCache.Select(x1, y1, x2 + 1, y2 + 1, units, UnitMax);
 	while (n) {
-		if (table[n - 1]->Player->Index == oldp) {
-			table[n - 1]->ChangeOwner(&Players[newp]);
+		CUnit *const unit = units[n - 1];
+		if (unit->Player->Index == oldPlayer
+		    && TriggerMatchUnitType(unit, triggerUnitType)) {
+			unit->ChangeOwner(&Players[newPlayer]);
 		}
 		--n;
 	}
-
-	return 0;
 }
 
 /**
@@ -505,7 +526,6 @@ static int CclDefinePlayerColorIndex(lua_State *l)
 void PlayerCclRegister(void)
 {
 	lua_register(Lua, "Player", CclPlayer);
-	lua_register(Lua, "ChangeUnitsOwner", CclChangeUnitsOwner);
 
 	lua_register(Lua, "SetMaxSelectable", CclSetMaxSelectable);
 

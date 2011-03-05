@@ -1,3 +1,5 @@
+$#include "player.h"
+
 enum PlayerTypes {
 	PlayerNeutral = 2,
 	PlayerNobody  = 3,
@@ -61,3 +63,16 @@ class CPlayer
 extern CPlayer Players[PlayerMax];
 extern CPlayer *ThisPlayer;
 
+// tolua++ 1.0.93 claims to define TOLUA_NIL, but doesn't,
+// so we use 0 instead.
+//
+// tolua++ 1.0.93 generates code that copies the contents
+// of the arrays from the wrong Lua stack indexes if the
+// lua_State * parameter is the first one, so put it last.
+void CclChangeUnitsOwner @ ChangeUnitsOwner(
+	int topLeft[2],
+	int bottomRight[2],
+	int oldPlayer,
+	int newPlayer,
+	lua_Object unitType = 0 /* TOLUA_NIL */,
+	lua_State *l);
