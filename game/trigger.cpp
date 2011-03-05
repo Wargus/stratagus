@@ -127,6 +127,32 @@ const CUnitType *TriggerGetUnitType(lua_State *l)
 	return CclGetUnitType(l);
 }
 
+/**
+**  Check whether a unit is of the specified type or in the specified
+**  category.
+**
+**  @param unit             Unit to examine; must not be NULL.
+**  @param triggerUnitType  As returned by TriggerGetUnitType.
+**
+**  @return   true if the unit matches the type or category, else false.
+*/
+bool TriggerMatchUnitType(const CUnit *unit, const CUnitType *triggerUnitType)
+{
+	if (triggerUnitType == ANY_UNIT) {
+		return true;
+	} else if (triggerUnitType == ALL_UNITS) {
+		// FIXME: ALL_UNITS should be "sum of units and buildings",
+		// but that currently means just ANY_UNIT.
+		return true;
+	} else if (triggerUnitType == ALL_FOODUNITS) {
+		return !unit->Type->Building;
+	} else if (triggerUnitType == ALL_BUILDINGS) {
+		return unit->Type->Building;
+	} else {
+		return unit->Type == triggerUnitType;
+	}
+}
+
 /*--------------------------------------------------------------------------
 --  Conditions
 --------------------------------------------------------------------------*/
@@ -231,11 +257,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 		//
 		// Check unit type
 		//
-		// FIXME: ALL_UNITS
-		if (unittype == ANY_UNIT ||
-				(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
-				(unittype == ALL_BUILDINGS && unit->Type->Building) ||
-				(unittype == unit->Type && !unit->Constructed)) {
+		if (TriggerMatchUnitType(unit, unittype) && !unit->Constructed) {
 			//
 			// Check the player
 			//
@@ -310,11 +332,7 @@ static int CclIfNearUnit(lua_State *l)
 			//
 			// Check unit type
 			//
-			// FIXME: ALL_UNITS
-			if (unittype == ANY_UNIT ||
-					(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
-					(unittype == ALL_BUILDINGS && unit->Type->Building) ||
-					(unittype == unit->Type)) {
+			if (TriggerMatchUnitType(unit, unittype)) {
 				//
 				// Check the player
 				//
@@ -402,11 +420,7 @@ static int CclIfRescuedNearUnit(lua_State *l)
 				//
 				// Check unit type
 				//
-				// FIXME: ALL_UNITS
-				if (unittype == ANY_UNIT ||
-						(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
-						(unittype == ALL_BUILDINGS && unit->Type->Building) ||
-						(unittype == unit->Type)) {
+				if (TriggerMatchUnitType(unit, unittype)) {
 					//
 					// Check the player
 					//
