@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on Tue Nov 23 22:03:42 2010.
+** Generated automatically by tolua++-1.0.92 on Sat Mar  5 15:52:42 2011.
 */
 
 #ifndef __cplusplus
@@ -37,6 +37,7 @@ int GetNetworkState() {return (int)NetLocalState;}
 extern string NetworkMapName;
 void NetworkGamePrepareGameSettings(void);
 extern void InitVideo();
+#include "player.h"
 #include "editor.h"
 bool IsReplayGame();
 void StartMap(const string &str, bool clean = true);
@@ -15047,6 +15048,76 @@ static int tolua_set_ThisPlayer_ptr(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: CclChangeUnitsOwner */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ChangeUnitsOwner00
+static int tolua_stratagus_ChangeUnitsOwner00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_istable(tolua_S,1,0,&tolua_err) ||
+     !tolua_istable(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  int topLeft[2];
+  int bottomRight[2];
+  int oldPlayer = ((int)  tolua_tonumber(tolua_S,3,0));
+  int newPlayer = ((int)  tolua_tonumber(tolua_S,4,0));
+  lua_Object unitType = ((lua_Object)  tolua_tovalue(tolua_S,5,0));
+  lua_State* l =  tolua_S;
+  {
+#ifndef TOLUA_RELEASE
+   if (!tolua_isnumberarray(tolua_S,1,2,0,&tolua_err))
+    goto tolua_lerror;
+   else
+#endif
+   {
+    int i;
+    for(i=0; i<2;i++)
+    topLeft[i] = ((int)  tolua_tofieldnumber(tolua_S,1,i+1,0));
+   }
+  }
+  {
+#ifndef TOLUA_RELEASE
+   if (!tolua_isnumberarray(tolua_S,2,2,0,&tolua_err))
+    goto tolua_lerror;
+   else
+#endif
+   {
+    int i;
+    for(i=0; i<2;i++)
+    bottomRight[i] = ((int)  tolua_tofieldnumber(tolua_S,2,i+1,0));
+   }
+  }
+  {
+   CclChangeUnitsOwner(topLeft,bottomRight,oldPlayer,newPlayer,unitType,l);
+  }
+  {
+   int i;
+   for(i=0; i<2;i++)
+    tolua_pushfieldnumber(tolua_S,1,i+1,(lua_Number) topLeft[i]);
+  }
+  {
+   int i;
+   for(i=0; i<2;i++)
+    tolua_pushfieldnumber(tolua_S,2,i+1,(lua_Number) bottomRight[i]);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ChangeUnitsOwner'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: Ident of class  CUnitType */
 #ifndef TOLUA_DISABLE_tolua_get_CUnitType_Ident
 static int tolua_get_CUnitType_Ident(lua_State* tolua_S)
@@ -20429,6 +20500,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_array(tolua_S,"Players",tolua_get_stratagus_Players,tolua_set_stratagus_Players);
   tolua_variable(tolua_S,"ThisPlayer",tolua_get_ThisPlayer_ptr,tolua_set_ThisPlayer_ptr);
+  tolua_function(tolua_S,"ChangeUnitsOwner",tolua_stratagus_ChangeUnitsOwner00);
   tolua_cclass(tolua_S,"CUnitType","CUnitType","",NULL);
   tolua_beginmodule(tolua_S,"CUnitType");
    tolua_variable(tolua_S,"Ident",tolua_get_CUnitType_Ident,tolua_set_CUnitType_Ident);
