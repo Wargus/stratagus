@@ -490,6 +490,7 @@ int SaveReplay(const std::string &filename)
 	std::ostringstream logfile;
 	std::string destination;
 	struct stat sb;
+	size_t size;
 
 	if (filename.find_first_of("\\/") != std::string::npos) {
 		fprintf(stderr, "\\ or / not allowed in SaveReplay filename\n");
@@ -515,7 +516,7 @@ int SaveReplay(const std::string &filename)
 		delete[] buf;
 		return -1;
 	}
-	(void)fread(buf, sb.st_size, 1, fd);
+	size = fread(buf, sb.st_size, 1, fd);
 	fclose(fd);
 
 	fd = fopen(destination.c_str(), "wb");
@@ -524,7 +525,7 @@ int SaveReplay(const std::string &filename)
 		delete[] buf;
 		return -1;
 	}
-	fwrite(buf, sb.st_size, 1, fd);
+	fwrite(buf, size, 1, fd);
 	fclose(fd);
 
 	delete[] buf;
