@@ -253,7 +253,7 @@ extern void NetworkRecover(void);   /// Recover network
 extern void NetworkCommands(void);  /// Get all network commands
 extern void NetworkChatMessage(const std::string &msg);  /// Send chat message
 	/// Send network command.
-extern void NetworkSendCommand(int command, const CUnit *unit, int x,
+extern void NetworkSendCommand(int command, const CUnit &unit, int x,
 	int y, const CUnit *dest, const CUnitType *type, int status);
 	/// Send extended network command.
 extern void NetworkSendExtendedCommand(int command, int arg1, int arg2,
