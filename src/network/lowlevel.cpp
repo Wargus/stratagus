@@ -88,7 +88,7 @@ unsigned long NetLocalAddrs[MAX_LOC_IP]; /// Local IP-Addrs of this host (net fo
 /**
 **  Hardware dependend network init.
 */
-int NetInit(void)
+int NetInit()
 {
 	WSADATA wsaData;
 
@@ -103,7 +103,7 @@ int NetInit(void)
 /**
 **  Hardware dependend network exit.
 */
-void NetExit(void)
+void NetExit()
 {
 	// Clean up windows networking
 	if (WSACleanup() == SOCKET_ERROR) {
@@ -141,7 +141,7 @@ void NetCloseTCP(Socket sockfd)
 /**
 **  Hardware dependend network init.
 */
-int NetInit(void)
+int NetInit()
 {
 	return 0;
 }
@@ -149,7 +149,7 @@ int NetInit(void)
 /**
 **  Hardware dependend network exit.
 */
-void NetExit(void)
+void NetExit()
 {
 }
 

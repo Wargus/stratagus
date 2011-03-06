@@ -243,14 +243,14 @@ extern int NoRandomPlacementMultiplayer;        /// Removes randomization of pla
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void InitNetwork1(void);  /// Initialise network part 1 (ports)
-extern void InitNetwork2(void);  /// Initialise network part 2
-extern void ExitNetwork1(void);  /// Cleanup network part 1 (ports)
-extern void NetworkEvent(void);  /// Handle network events
-extern void NetworkSync(void);   /// Hold in sync
-extern void NetworkQuit(void);   /// Quit game
-extern void NetworkRecover(void);   /// Recover network
-extern void NetworkCommands(void);  /// Get all network commands
+extern void InitNetwork1();  /// Initialise network part 1 (ports)
+extern void InitNetwork2();  /// Initialise network part 2
+extern void ExitNetwork1();  /// Cleanup network part 1 (ports)
+extern void NetworkEvent();  /// Handle network events
+extern void NetworkSync();   /// Hold in sync
+extern void NetworkQuit();   /// Quit game
+extern void NetworkRecover();   /// Recover network
+extern void NetworkCommands();  /// Get all network commands
 extern void NetworkChatMessage(const std::string &msg);  /// Send chat message
 	/// Send network command.
 extern void NetworkSendCommand(int command, const CUnit &unit, int x,

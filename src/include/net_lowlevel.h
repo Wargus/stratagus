@@ -127,9 +127,9 @@ extern unsigned long NetLocalAddrs[];  /// Local IP-Addrs of this host (net form
 ----------------------------------------------------------------------------*/
 
 	/// Hardware dependend network init.
-extern int NetInit(void);
+extern int NetInit();
 	/// Hardware dependend network exit.
-extern void NetExit(void);
+extern void NetExit();
 	/// Resolve host in name or or colon dot notation.
 extern unsigned long NetResolveHost(const std::string &host);
 	/// Get local IP from network file descriptor

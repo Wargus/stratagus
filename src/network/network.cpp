@@ -497,7 +497,7 @@ static void NetworkSendPacket(const CNetworkCommandQueue *ncq)
 /**
 **  Initialize network part 1.
 */
-void InitNetwork1(void)
+void InitNetwork1()
 {
 	int i;
 	int port;
@@ -572,7 +572,7 @@ void InitNetwork1(void)
 /**
 **  Cleanup network part 1. (to be called _AFTER_ part 2 :)
 */
-void ExitNetwork1(void)
+void ExitNetwork1()
 {
 	if (!IsNetworkGame()) { // No network running
 		return;
@@ -598,7 +598,7 @@ void ExitNetwork1(void)
 /**
 **  Initialize network part 2.
 */
-void InitNetwork2(void)
+void InitNetwork2()
 {
 	NetworkConnectSetupGame();
 
@@ -634,7 +634,7 @@ void InitNetwork2(void)
 **
 **  @return  CNetworkCommandQueue
 */
-static CNetworkCommandQueue *AllocNCQ(void)
+static CNetworkCommandQueue *AllocNCQ()
 {
 	Assert(NumNCQs != MAX_NCQS);
 	CNetworkCommandQueue *ncq = &NCQs[NumNCQs++];
@@ -894,7 +894,7 @@ static void NetworkRemovePlayer(int player)
 **  NetworkReceivedEarly NetworkReceivedLate NetworkReceivedDups
 **  Must be calculated.
 */
-void NetworkEvent(void)
+void NetworkEvent()
 {
 	unsigned char buf[1024];
 	CNetworkPacket packet;
@@ -1097,7 +1097,7 @@ void NetworkEvent(void)
 /**
 **  Quit the game.
 */
-void NetworkQuit(void)
+void NetworkQuit()
 {
 	if (!ThisPlayer) {
 		return;
@@ -1221,7 +1221,7 @@ static void ParseNetworkCommand(const CNetworkCommandQueue *ncq)
 **  @todo
 **  We need only send to the clients, that have not delivered the packet.
 */
-static void NetworkResendCommands(void)
+static void NetworkResendCommands()
 {
 	CNetworkPacket packet;
 
@@ -1243,7 +1243,7 @@ static void NetworkResendCommands(void)
 /**
 **  Network send commands.
 */
-static void NetworkSendCommands(void)
+static void NetworkSendCommands()
 {
 	CNetworkCommandQueue *incommand;
 	CNetworkCommandQueue *ncq;
@@ -1302,7 +1302,7 @@ static void NetworkSendCommands(void)
 /**
 **  Network excecute commands.
 */
-static void NetworkExecCommands(void)
+static void NetworkExecCommands()
 {
 	CNetworkCommandQueue *ncq;
 
@@ -1335,7 +1335,7 @@ static void NetworkExecCommands(void)
 /**
 **  Network synchronize commands.
 */
-static void NetworkSyncCommands(void)
+static void NetworkSyncCommands()
 {
 	const CNetworkCommandQueue *ncq;
 	unsigned long n;
@@ -1359,7 +1359,7 @@ static void NetworkSyncCommands(void)
 /**
 **  Handle network commands.
 */
-void NetworkCommands(void)
+void NetworkCommands()
 {
 	if (IsNetworkGame()) {
 		if (!(GameCycle % NetworkUpdates)) {
@@ -1375,7 +1375,7 @@ void NetworkCommands(void)
 /**
 **  Recover network.
 */
-void NetworkRecover(void)
+void NetworkRecover()
 {
 	if (HostsCount == 0) {
 		NetworkInSync = 1;
