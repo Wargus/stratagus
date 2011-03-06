@@ -110,6 +110,7 @@ public:
 	Uint8  MapRichness;           /// Map richness option
 	Uint8  CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
 	Uint8  Ready[PlayerMax];      /// Client ready state
+	Uint8  Race[PlayerMax];       /// Client race selection
 	Uint32 LastFrame[PlayerMax];  /// Last message received
 	// Fill in here...
 };

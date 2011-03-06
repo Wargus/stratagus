@@ -147,6 +147,9 @@ unsigned char *CServerSetup::Serialize() const
 		*p++ = this->Ready[i];
 	}
 	for (i = 0; i < PlayerMax; ++i) {
+		*p++ = this->Race[i];
+	}
+	for (i = 0; i < PlayerMax; ++i) {
 		*(Uint32 *)p = this->LastFrame[i];
 		p += 4;
 	}
@@ -171,6 +174,9 @@ void CServerSetup::Deserialize(const unsigned char *p)
 	}
 	for (i = 0; i < PlayerMax; ++i) {
 		this->Ready[i] = *p++;
+	}
+	for (i = 0; i < PlayerMax; ++i) {
+		this->Race[i] = *p++;
 	}
 	for (i = 0; i < PlayerMax; ++i) {
 		this->LastFrame[i] = *(Uint32 *)p;
@@ -566,7 +572,7 @@ void NetworkServerStartGame(void)
 #if 0
 	printf("INITIAL ServerSetupState:\n");
 	for (i = 0; i < PlayerMax - 1; ++i) {
-		printf("%02d: CO: %d   Host: ", i, ServerSetupState.CompOpt[i]);
+		printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
 		if (ServerSetupState.CompOpt[i] == 0) {
 			printf(" %d.%d.%d.%d:%d %s", NIPQUAD(ntohl(Hosts[i].Host)),
 				 ntohs(Hosts[i].Port), Hosts[i].PlyName);
@@ -611,6 +617,9 @@ void NetworkServerStartGame(void)
 					n = LocalSetupState.CompOpt[i];
 					LocalSetupState.CompOpt[i] = LocalSetupState.CompOpt[j];
 					LocalSetupState.CompOpt[j] = n;
+					n = LocalSetupState.Race[i];
+					LocalSetupState.Race[i] = LocalSetupState.Race[j];
+					LocalSetupState.Race[j] = n;
 					n = LocalSetupState.LastFrame[i];
 					LocalSetupState.LastFrame[i] = LocalSetupState.LastFrame[j];
 					LocalSetupState.LastFrame[j] = n;
@@ -676,6 +685,7 @@ void NetworkServerStartGame(void)
 		num[i] = 1;
 		n = org[i];
 		ServerSetupState.CompOpt[n] = LocalSetupState.CompOpt[i];
+		ServerSetupState.Race[n] = LocalSetupState.Race[i];
 		ServerSetupState.LastFrame[n] = LocalSetupState.LastFrame[i];
 	}
 
@@ -819,7 +829,7 @@ breakout:
 }
 
 /**
-** Multiplayer network game final player type setup.
+** Multiplayer network game final race an player type setup.
 */
 void NetworkGamePrepareGameSettings(void)
 {
@@ -828,6 +838,7 @@ void NetworkGamePrepareGameSettings(void)
 	int i;
 	int num[PlayerMax];
 	int comp[PlayerMax];
+	int v;
 
 	DebugPrint("NetPlayers = %d\n" _C_ NetPlayers);
 
@@ -835,7 +846,7 @@ void NetworkGamePrepareGameSettings(void)
 
 #ifdef DEBUG
 	for (i = 0; i < PlayerMax-1; i++) {
-		printf("%02d: CO: %d   Host: ", i, ServerSetupState.CompOpt[i]);
+		printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
 		if (ServerSetupState.CompOpt[i] == 0) {
 			for (h = 0; h < NetPlayers; h++) {
 				if (Hosts[h].PlyNr == i) {
@@ -860,6 +871,23 @@ void NetworkGamePrepareGameSettings(void)
 		switch(ServerSetupState.CompOpt[num[i]]) {
 			case 0:
 				GameSettings.Presets[num[i]].Type = PlayerPerson;
+				v = ServerSetupState.Race[num[i]];
+				if (v != 0) {
+					int n;
+					int x;
+
+					for (n = 0, x = 0; n < PlayerRaces.Count; ++n) {
+						if (PlayerRaces.Visible[n]) {
+							if (x + 1 == v) {
+								break;
+							}
+							++x;
+						}
+					}
+					GameSettings.Presets[num[i]].Race = x;
+				} else {
+					GameSettings.Presets[num[i]].Race = SettingsPresetMapDefault;
+				}
 				break;
 			case 1:
 				GameSettings.Presets[num[i]].Type = PlayerComputer;
@@ -904,6 +932,10 @@ void NetworkConnectSetupGame(void)
 void NetClientCheckLocalState(void)
 {
 	if (LocalSetupState.Ready[NetLocalHostsSlot] != ServerSetupState.Ready[NetLocalHostsSlot]) {
+		NetLocalState = ccs_changed;
+		return;
+	}
+	if (LocalSetupState.Race[NetLocalHostsSlot] != ServerSetupState.Race[NetLocalHostsSlot]) {
 		NetLocalState = ccs_changed;
 		return;
 	}
@@ -1063,6 +1095,7 @@ static void KickDeadClient(int c)
 	Hosts[c].PlyNr = 0;
 	memset(Hosts[c].PlyName, 0, sizeof(Hosts[c].PlyName));
 	ServerSetupState.Ready[c] = 0;
+	ServerSetupState.Race[c] = 0;
 	ServerSetupState.LastFrame[c] = 0L;
 
 	// Resync other clients
@@ -1761,6 +1794,7 @@ static void ServerParseState(const int h, const CInitMessage *msg)
 			NetStates[h].MsgCnt = 0;
 			// Use information supplied by the client:
 			ServerSetupState.Ready[h] = msg->u.State.Ready[h];
+			ServerSetupState.Race[h] = msg->u.State.Race[h];
 			// Add additional info usage here!
 
 			// Resync other clients (and us..)
