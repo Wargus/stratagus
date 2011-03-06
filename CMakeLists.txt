@@ -167,7 +167,6 @@ set(stratagusmain_SRCS
 )
 
 set(tolua_SRCS
-#	src/tolua/tolua.cpp
 	src/tolua/tolua_event.cpp
 	src/tolua/tolua_is.cpp
 	src/tolua/tolua_map.cpp
@@ -218,8 +217,8 @@ set(video_SRCS
 )
 
 set(win32_SRCS
-	src/stratagus/attachconsole.cpp
-	src/stratagus.rc
+	src/win32/attachconsole.cpp
+	src/win32/stratagus.rc
 )
 
 set(tolua_cpp_DEPS
