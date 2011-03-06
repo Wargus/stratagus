@@ -1,16 +1,15 @@
-//       _________ __                 __
-//      /   _____//  |_____________ _/  |______     ____  __ __  ______
-//      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
-//     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/
-//  ______________________                           ______________________
-//                        T H E   W A R   B E G I N S
-//         Stratagus - A free fantasy real time strategy game engine
+//     ____                _       __               
+//    / __ )____  _____   | |     / /___ ___________
+//   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
+//  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  ) 
+// /_____/\____/____/     |__/|__/\__,_/_/  /____/  
+//                                              
+//       A futuristic real-time strategy game.
+//          This file is part of Bos Wars.
 //
 /**@name net_lowlevel.h - The network low level header file. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -25,8 +24,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
-//      $Id$
 
 #ifndef __NET_LOWLEVEL_H
 #define __NET_LOWLEVEL_H
@@ -94,7 +91,7 @@ typedef struct _OLD_INTERFACE_INFO
 	(int)(((ad) >> 24) & 0xff), (int)(((ad) >> 16) & 0xff), \
 	(int)(((ad) >> 8) & 0xff), (int)((ad) & 0xff)
 
-#ifdef USE_WINSOCK
+#ifdef USE_WIN32
 typedef SOCKET Socket;
 #else
 typedef int Socket;
@@ -129,17 +126,17 @@ extern unsigned long NetLocalAddrs[];  /// Local IP-Addrs of this host (net form
 ----------------------------------------------------------------------------*/
 
 	/// Hardware dependend network init.
-extern int NetInit();
+extern int NetInit(void);
 	/// Hardware dependend network exit.
-extern void NetExit();
+extern void NetExit(void);
 	/// Resolve host in name or or colon dot notation.
 extern unsigned long NetResolveHost(const std::string &host);
 	/// Get local IP from network file descriptor
 extern int NetSocketAddr(const Socket sock);
 	/// Open a UDP Socket port.
-extern Socket NetOpenUDP(char* addr, int port);
+extern Socket NetOpenUDP(int port);
 	/// Open a TCP Socket port.
-extern Socket NetOpenTCP(char* addr, int port);
+extern Socket NetOpenTCP(int port);
 	/// Close a UDP socket port.
 extern void NetCloseUDP(Socket sockfd);
 	/// Close a TCP socket port.

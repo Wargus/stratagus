@@ -1,16 +1,15 @@
-//       _________ __                 __
-//      /   _____//  |_____________ _/  |______     ____  __ __  ______
-//      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
-//     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/
-//  ______________________                           ______________________
-//                        T H E   W A R   B E G I N S
-//         Stratagus - A free fantasy real time strategy game engine
+//     ____                _       __               
+//    / __ )____  _____   | |     / /___ ___________
+//   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
+//  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  ) 
+// /_____/\____/____/     |__/|__/\__,_/_/  /____/  
+//                                              
+//       A futuristic real-time strategy game.
+//          This file is part of Bos Wars.
 //
 /**@name netconnect.cpp - The network high level connection code. */
 //
-//      (c) Copyright 2001-2006 by Lutz Sammer, Andreas Arens
+//      (c) Copyright 2001-2008 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +25,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//      $Id$
 
 //@{
 
@@ -35,7 +33,6 @@
 //----------------------------------------------------------------------------
 
 #include <stdio.h>
-
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
@@ -50,7 +47,7 @@
 #include "interface.h"
 #include "menus.h"
 #include "settings.h"
-#include "util.h"
+#include "version.h"
 
 
 //----------------------------------------------------------------------------
@@ -67,7 +64,6 @@
 
 std::string NetworkArg;                /// Network command line argument
 int NetPlayers;                        /// How many network players
-char* NetworkAddr = NULL;              /// Local network address to use
 int NetworkPort = NetworkDefaultPort;  /// Local network port to use
 
 #ifdef DEBUG
@@ -139,7 +135,6 @@ unsigned char *CServerSetup::Serialize() const
 	*p++ = this->UnitsOption;
 	*p++ = this->FogOfWar;
 	*p++ = this->RevealMap;
-	*p++ = this->TilesetSelection;
 	*p++ = this->GameTypeOption;
 	*p++ = this->Difficulty;
 	*p++ = this->MapRichness;
@@ -148,9 +143,6 @@ unsigned char *CServerSetup::Serialize() const
 	}
 	for (i = 0; i < PlayerMax; ++i) {
 		*p++ = this->Ready[i];
-	}
-	for (i = 0; i < PlayerMax; ++i) {
-		*p++ = this->Race[i];
 	}
 	for (i = 0; i < PlayerMax; ++i) {
 		*(Uint32 *)p = this->LastFrame[i];
@@ -168,7 +160,6 @@ void CServerSetup::Deserialize(const unsigned char *p)
 	this->UnitsOption = *p++;
 	this->FogOfWar = *p++;
 	this->RevealMap = *p++;
-	this->TilesetSelection = *p++;
 	this->GameTypeOption = *p++;
 	this->Difficulty = *p++;
 	this->MapRichness = *p++;
@@ -177,9 +168,6 @@ void CServerSetup::Deserialize(const unsigned char *p)
 	}
 	for (i = 0; i < PlayerMax; ++i) {
 		this->Ready[i] = *p++;
-	}
-	for (i = 0; i < PlayerMax; ++i) {
-		this->Race[i] = *p++;
 	}
 	for (i = 0; i < PlayerMax; ++i) {
 		this->LastFrame[i] = *(Uint32 *)p;
@@ -412,15 +400,17 @@ int NetworkSetupServerAddress(const std::string &serveraddr)
 /**
 ** Setup Network connect state machine for clients
 */
-void NetworkInitClientConnect()
+void NetworkInitClientConnect(void)
 {
+	int i;
+
 	NetConnectRunning = 2;
 	NetLastPacketSent = GetTicks();
 	NetLocalState = ccs_connecting;
 	NetStateMsgCnt = 0;
 	NetworkServerPort = NetworkPort;
 	LastStateMsgType = ICMServerQuit;
-	for (int i = 0; i < PlayerMax; ++i) {
+	for (i = 0; i < PlayerMax; ++i) {
 		Hosts[i].Host = 0;
 		Hosts[i].Port = 0;
 		Hosts[i].PlyNr = 0;
@@ -433,7 +423,7 @@ void NetworkInitClientConnect()
 /**
 ** Terminate Network connect state machine for clients
 */
-void NetworkExitClientConnect()
+void NetworkExitClientConnect(void)
 {
 	NetConnectRunning = 0;
 	NetPlayers = 0; // Make single player menus work again!
@@ -442,7 +432,7 @@ void NetworkExitClientConnect()
 /**
 ** Terminate and detach Network connect state machine for the client
 */
-void NetworkDetachFromServer()
+void NetworkDetachFromServer(void)
 {
 	NetLocalState = ccs_detaching;
 	NetStateMsgCnt = 0;
@@ -453,10 +443,12 @@ void NetworkDetachFromServer()
 */
 void NetworkInitServerConnect(int openslots)
 {
+	int i;
+
 	NetConnectRunning = 1;
 
 	// Cannot use NetPlayers here, as map change might modify the number!!
-	for (int i = 0; i < PlayerMax; ++i) {
+	for (i = 0; i < PlayerMax; ++i) {
 		NetStates[i].State = ccs_unused;
 		Hosts[i].Host = 0;
 		Hosts[i].Port = 0;
@@ -466,10 +458,10 @@ void NetworkInitServerConnect(int openslots)
 
 	// preset the server (initially always slot 0)
 	memcpy(Hosts[0].PlyName, LocalPlayerName.c_str(), sizeof(Hosts[0].PlyName) - 1);
-
+	
 	ServerSetupState.Clear();
 	LocalSetupState.Clear();
-	for (int i = openslots; i < PlayerMax - 1; ++i) {
+	for (i = openslots; i < PlayerMax - 1; ++i) {
 		ServerSetupState.CompOpt[i] = 1;
 	}
 }
@@ -477,18 +469,21 @@ void NetworkInitServerConnect(int openslots)
 /**
 ** Terminate Network connect state machine for the server
 */
-void NetworkExitServerConnect()
+void NetworkExitServerConnect(void)
 {
+	int h;
+	int i;
+	int n;
 	CInitMessage message;
 
 	message.Type = MessageInitReply;
 	message.SubType = ICMServerQuit;
-	for (int h = 1; h < PlayerMax - 1; ++h) {
+	for (h = 1; h < PlayerMax - 1; ++h) {
 		// Spew out 5 and trust in God that they arrive
 		// Clients will time out otherwise anyway
 		if (Hosts[h].PlyNr) {
-			for (int i = 0; i < 5; ++i) {
-				const int n = NetworkSendICMessage(Hosts[h].Host, Hosts[h].Port, &message);
+			for (i = 0; i < 5; ++i) {
+				n = NetworkSendICMessage(Hosts[h].Host, Hosts[h].Port, &message);
 				DebugPrint("Sending InitReply Message ServerQuit: (%d) to %d.%d.%d.%d:%d\n" _C_
 					n _C_ NIPQUAD(ntohl(Hosts[h].Host)) _C_ ntohs(Hosts[h].Port));
 			}
@@ -496,16 +491,19 @@ void NetworkExitServerConnect()
 	}
 
 	NetworkInitServerConnect(0); // Reset Hosts slots
+
 	NetConnectRunning = 0;
 }
 
 /**
 ** Notify state change by menu user to connected clients
 */
-void NetworkServerResyncClients()
+void NetworkServerResyncClients(void)
 {
+	int i;
+
 	if (NetConnectRunning) {
-		for (int i = 1; i < PlayerMax - 1; ++i) {
+		for (i = 1; i < PlayerMax - 1; ++i) {
 			if (Hosts[i].PlyNr && NetStates[i].State == ccs_synced) {
 				NetStates[i].State = ccs_async;
 			}
@@ -516,7 +514,7 @@ void NetworkServerResyncClients()
 /**
 ** Server user has finally hit the start game button
 */
-void NetworkServerStartGame()
+void NetworkServerStartGame(void)
 {
 	int h;
 	int i;
@@ -565,7 +563,7 @@ void NetworkServerStartGame()
 #if 0
 	printf("INITIAL ServerSetupState:\n");
 	for (i = 0; i < PlayerMax - 1; ++i) {
-		printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
+		printf("%02d: CO: %d   Host: ", i, ServerSetupState.CompOpt[i]);
 		if (ServerSetupState.CompOpt[i] == 0) {
 			printf(" %d.%d.%d.%d:%d %s", NIPQUAD(ntohl(Hosts[i].Host)),
 				 ntohs(Hosts[i].Port), Hosts[i].PlyName);
@@ -610,9 +608,6 @@ void NetworkServerStartGame()
 					n = LocalSetupState.CompOpt[i];
 					LocalSetupState.CompOpt[i] = LocalSetupState.CompOpt[j];
 					LocalSetupState.CompOpt[j] = n;
-					n = LocalSetupState.Race[i];
-					LocalSetupState.Race[i] = LocalSetupState.Race[j];
-					LocalSetupState.Race[j] = n;
 					n = LocalSetupState.LastFrame[i];
 					LocalSetupState.LastFrame[i] = LocalSetupState.LastFrame[j];
 					LocalSetupState.LastFrame[j] = n;
@@ -678,7 +673,6 @@ void NetworkServerStartGame()
 		num[i] = 1;
 		n = org[i];
 		ServerSetupState.CompOpt[n] = LocalSetupState.CompOpt[i];
-		ServerSetupState.Race[n] = LocalSetupState.Race[i];
 		ServerSetupState.LastFrame[n] = LocalSetupState.LastFrame[i];
 	}
 
@@ -822,16 +816,15 @@ breakout:
 }
 
 /**
-** Multiplayer network game final race an player type setup.
+** Multiplayer network game final player type setup.
 */
-void NetworkGamePrepareGameSettings()
+void NetworkGamePrepareGameSettings(void)
 {
 	int c;
 	int h;
 	int i;
 	int num[PlayerMax];
 	int comp[PlayerMax];
-	int v;
 
 	DebugPrint("NetPlayers = %d\n" _C_ NetPlayers);
 
@@ -839,7 +832,7 @@ void NetworkGamePrepareGameSettings()
 
 #ifdef DEBUG
 	for (i = 0; i < PlayerMax-1; i++) {
-		printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
+		printf("%02d: CO: %d   Host: ", i, ServerSetupState.CompOpt[i]);
 		if (ServerSetupState.CompOpt[i] == 0) {
 			for (h = 0; h < NetPlayers; h++) {
 				if (Hosts[h].PlyNr == i) {
@@ -864,22 +857,6 @@ void NetworkGamePrepareGameSettings()
 		switch(ServerSetupState.CompOpt[num[i]]) {
 			case 0:
 				GameSettings.Presets[num[i]].Type = PlayerPerson;
-				v = ServerSetupState.Race[num[i]];
-				if (v != 0) {
-					int x = 0;
-
-					for (unsigned int n = 0; n < PlayerRaces.Count; ++n) {
-						if (PlayerRaces.Visible[n]) {
-							if (x + 1 == v) {
-								break;
-							}
-							++x;
-						}
-					}
-					GameSettings.Presets[num[i]].Race = x;
-				} else {
-					GameSettings.Presets[num[i]].Race = SettingsPresetMapDefault;
-				}
 				break;
 			case 1:
 				GameSettings.Presets[num[i]].Type = PlayerComputer;
@@ -908,7 +885,7 @@ void NetworkGamePrepareGameSettings()
 /**
 ** Assign player slots and names in a network game..
 */
-void NetworkConnectSetupGame()
+void NetworkConnectSetupGame(void)
 {
 	ThisPlayer->SetName(LocalPlayerName);
 	for (int i = 0; i < HostsCount; ++i) {
@@ -921,25 +898,21 @@ void NetworkConnectSetupGame()
 ** Compare local state with server's information
 ** and force update when changes have occured.
 */
-void NetClientCheckLocalState()
+void NetClientCheckLocalState(void)
 {
 	if (LocalSetupState.Ready[NetLocalHostsSlot] != ServerSetupState.Ready[NetLocalHostsSlot]) {
 		NetLocalState = ccs_changed;
 		return;
 	}
-	if (LocalSetupState.Race[NetLocalHostsSlot] != ServerSetupState.Race[NetLocalHostsSlot]) {
-		NetLocalState = ccs_changed;
-		return;
-	}
-	/* ADD HERE */
 }
 
 /**
 ** Client Menu Loop: Send out client request messages
 */
-void NetworkProcessClientRequest()
+void NetworkProcessClientRequest(void)
 {
 	CInitMessage message;
+	int i;
 
 	memset(&message, 0, sizeof(message));
 changed:
@@ -948,7 +921,7 @@ changed:
 			message.Type = MessageInitHello;
 			message.SubType = ICMSeeYou;
 			// Spew out 5 and trust in God that they arrive
-			for (int i = 0; i < 5; ++i) {
+			for (i = 0; i < 5; ++i) {
 				NetworkSendICMessage(NetworkServerIP, htons(NetworkServerPort), &message);
 			}
 			NetLocalState = ccs_usercanceled;
@@ -1078,6 +1051,8 @@ changed:
 */
 static void KickDeadClient(int c)
 {
+	int n;
+
 	DebugPrint("kicking client %d\n" _C_ Hosts[c].PlyNr);
 	NetStates[c].State = ccs_unused;
 	Hosts[c].Host = 0;
@@ -1085,11 +1060,10 @@ static void KickDeadClient(int c)
 	Hosts[c].PlyNr = 0;
 	memset(Hosts[c].PlyName, 0, sizeof(Hosts[c].PlyName));
 	ServerSetupState.Ready[c] = 0;
-	ServerSetupState.Race[c] = 0;
 	ServerSetupState.LastFrame[c] = 0L;
 
 	// Resync other clients
-	for (int n = 1; n < PlayerMax - 1; ++n) {
+	for (n = 1; n < PlayerMax - 1; ++n) {
 		if (n != c && Hosts[n].PlyNr) {
 			NetStates[n].State = ccs_async;
 		}
@@ -1099,8 +1073,11 @@ static void KickDeadClient(int c)
 /**
 ** Server Menu Loop: Send out server request messages
 */
-void NetworkProcessServerRequest()
+void NetworkProcessServerRequest(void)
 {
+	int i;
+	int n;
+	unsigned long fcd;
 	CInitMessage message;
 
 	if (GameRunning) {
@@ -1108,9 +1085,9 @@ void NetworkProcessServerRequest()
 		// Game already started...
 	}
 
-	for (int i = 1; i < PlayerMax - 1; ++i) {
+	for (i = 1; i < PlayerMax - 1; ++i) {
 		if (Hosts[i].PlyNr && Hosts[i].Host && Hosts[i].Port) {
-			const unsigned long fcd = FrameCounter - ServerSetupState.LastFrame[i];
+			fcd = FrameCounter - ServerSetupState.LastFrame[i];
 			if (fcd >= CLIENT_LIVE_BEAT) {
 				if (fcd > CLIENT_IS_DEAD) {
 					KickDeadClient(i);
@@ -1118,7 +1095,7 @@ void NetworkProcessServerRequest()
 					message.Type = MessageInitReply;
 					message.SubType = ICMAYT; // Probe for the client
 					message.MapUID = 0L;
-					const int n = NetworkSendICMessage(Hosts[i].Host, Hosts[i].Port, &message);
+					n = NetworkSendICMessage(Hosts[i].Host, Hosts[i].Port, &message);
 					DebugPrint("Sending InitReply Message AreYouThere: (%d) to %d.%d.%d.%d:%d (%ld:%ld)\n" _C_
 						n _C_ NIPQUAD(ntohl(Hosts[i].Host)) _C_ ntohs(Hosts[i].Port) _C_
 						FrameCounter _C_ (unsigned long)ServerSetupState.LastFrame[i]);
@@ -1168,10 +1145,12 @@ static void ClientParseDetaching(const CInitMessage *msg)
 */
 static void ClientParseConnecting(const CInitMessage *msg)
 {
+	int i;
+
 	switch(msg->SubType) {
 
 		case ICMEngineMismatch: // Stratagus engine version doesn't match
-			fprintf(stderr, "Incompatible Stratagus version "
+			fprintf(stderr, "Incompatible Bos Wars version "
 				StratagusFormatString " <-> "
 				StratagusFormatString "\n"
 				"from %d.%d.%d.%d:%d\n",
@@ -1211,7 +1190,7 @@ static void ClientParseConnecting(const CInitMessage *msg)
 
 			Hosts[0].Host = NetworkServerIP;
 			Hosts[0].Port = htons(NetworkServerPort);
-			for (int i = 1; i < PlayerMax; ++i) {
+			for (i = 1; i < PlayerMax; ++i) {
 				if (i != NetLocalHostsSlot) {
 					Hosts[i].Host = msg->u.Hosts[i].Host;
 					Hosts[i].Port = msg->u.Hosts[i].Port;
@@ -1242,7 +1221,7 @@ static void ClientParseConnecting(const CInitMessage *msg)
 **
 ** @return  true if the map name looks safe.
 */
-static bool IsSafeMapName(const char *mapname)
+static bool IsSafeMapName(const char *mapname) 
 {
 	char buf[256];
 	const char *ch;
@@ -1256,7 +1235,7 @@ static bool IsSafeMapName(const char *mapname)
 	if (strstr(buf, "//")) {
 		return false;
 	}
-	if (buf[0] == '\0') {
+	if (buf[0] == '\0') {	
 		return false;
 	}
 	ch = buf;
@@ -1403,11 +1382,13 @@ static void ClientParseSynced(const CInitMessage *msg)
 */
 static void ClientParseAsync(const CInitMessage *msg)
 {
+	int i;
+
 	switch(msg->SubType) {
 
 		case ICMResync: // Server has resynced with us and sends resync data
 			DebugPrint("ccs_async: ICMResync\n");
-			for (int i = 1; i < PlayerMax - 1; ++i) {
+			for (i = 1; i < PlayerMax - 1; ++i) {
 				if (i != NetLocalHostsSlot) {
 					Hosts[i].Host = msg->u.Hosts[i].Host;
 					Hosts[i].Port = msg->u.Hosts[i].Port;
@@ -1480,7 +1461,7 @@ static void ClientParseStarted(const CInitMessage *msg)
 **
 ** @param msg message received
 */
-static void ClientParseAreYouThere(const CInitMessage *)
+static void ClientParseAreYouThere(const CInitMessage *msg)
 {
 	CInitMessage message;
 
@@ -1494,14 +1475,15 @@ static void ClientParseAreYouThere(const CInitMessage *)
 **
 ** @param msg message received
 */
-static void ClientParseBadMap(const CInitMessage *)
+static void ClientParseBadMap(const CInitMessage *msg)
 {
+	int i;
 	CInitMessage message;
 
 	message.Type = MessageInitHello;
 	message.SubType = ICMSeeYou;
 	// Spew out 5 and trust in God that they arrive
-	for (int i = 0; i < 5; ++i) {
+	for (i = 0; i < 5; ++i) {
 		NetworkSendICMessage(NetworkServerIP, htons(NetworkServerPort), &message);
 	}
 	NetConnectRunning = 0; // End the menu..
@@ -1776,7 +1758,6 @@ static void ServerParseState(const int h, const CInitMessage *msg)
 			NetStates[h].MsgCnt = 0;
 			// Use information supplied by the client:
 			ServerSetupState.Ready[h] = msg->u.State.Ready[h];
-			ServerSetupState.Race[h] = msg->u.State.Race[h];
 			// Add additional info usage here!
 
 			// Resync other clients (and us..)
@@ -1886,7 +1867,7 @@ static int CheckVersions(const CInitMessage *msg)
 	CInitMessage message;
 
 	if (ntohl(msg->Stratagus) != StratagusVersion) {
-		fprintf(stderr, "Incompatible Stratagus version "
+		fprintf(stderr, "Incompatible Bos Wars version "
 			StratagusFormatString " <-> "
 			StratagusFormatString "\n"
 			"from %d.%d.%d.%d:%d\n",

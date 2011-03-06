@@ -1,16 +1,15 @@
-//       _________ __                 __
-//      /   _____//  |_____________ _/  |______     ____  __ __  ______
-//      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
-//     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/
-//  ______________________                           ______________________
-//                        T H E   W A R   B E G I N S
-//         Stratagus - A free fantasy real time strategy game engine
+//     ____                _       __               
+//    / __ )____  _____   | |     / /___ ___________
+//   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
+//  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  ) 
+// /_____/\____/____/     |__/|__/\__,_/_/  /____/  
+//                                              
+//       A futuristic real-time strategy game.
+//          This file is part of Bos Wars.
 //
 /**@name network.cpp - The network. */
 //
-//      (c) Copyright 2000-2006 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
+//      (c) Copyright 2000-2008 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +25,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//      $Id$
 
 //@{
 
@@ -212,13 +210,13 @@
 //  Includes
 //----------------------------------------------------------------------------
 
+#include "stratagus.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
 #include <list>
-
-#include "stratagus.h"
 
 #include "net_lowlevel.h"
 #include "unit.h"
@@ -233,8 +231,8 @@
 #include "replay.h"
 #include "interface.h"
 #include "results.h"
-#include "master.h"
 #include "sound.h"
+
 
 //----------------------------------------------------------------------------
 //  Declaration
@@ -497,7 +495,7 @@ static void NetworkSendPacket(const CNetworkCommandQueue *ncq)
 /**
 **  Initialize network part 1.
 */
-void InitNetwork1()
+void InitNetwork1(void)
 {
 	int i;
 	int port;
@@ -521,7 +519,7 @@ void InitNetwork1()
 	// Our communication port
 	port = NetworkPort;
 	for (i = 0; i < 10; ++i) {
-		NetworkFildes = NetOpenUDP(NetworkAddr, port + i);
+		NetworkFildes = NetOpenUDP(port + i);
 		if (NetworkFildes != (Socket)-1) {
 			break;
 		}
@@ -572,7 +570,7 @@ void InitNetwork1()
 /**
 **  Cleanup network part 1. (to be called _AFTER_ part 2 :)
 */
-void ExitNetwork1()
+void ExitNetwork1(void)
 {
 	if (!IsNetworkGame()) { // No network running
 		return;
@@ -598,7 +596,7 @@ void ExitNetwork1()
 /**
 **  Initialize network part 2.
 */
-void InitNetwork2()
+void InitNetwork2(void)
 {
 	NetworkConnectSetupGame();
 
@@ -634,7 +632,7 @@ void InitNetwork2()
 **
 **  @return  CNetworkCommandQueue
 */
-static CNetworkCommandQueue *AllocNCQ()
+static CNetworkCommandQueue *AllocNCQ(void)
 {
 	Assert(NumNCQs != MAX_NCQS);
 	CNetworkCommandQueue *ncq = &NCQs[NumNCQs++];
@@ -671,7 +669,7 @@ static void FreeNCQ(CNetworkCommandQueue *ncq)
 **
 **  @warning  Destination and unit-type shares the same network slot.
 */
-void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
+void NetworkSendCommand(int command, const CUnit *unit, int x, int y,
 	const CUnit *dest, const CUnitType *type, int status)
 {
 	CNetworkCommandQueue *ncq;
@@ -681,7 +679,7 @@ void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
 	for (it = CommandsIn.begin(); it != CommandsIn.end(); ++it) {
 		ncq = *it;
 		if ((ncq->Type & 0x7F) == command &&
-				ncq->Data.Unit == htons(unit.Slot) &&
+				ncq->Data.Unit == htons(unit->Slot) &&
 				ncq->Data.X == htons(x) &&
 				ncq->Data.Y == htons(y)) {
 			if (dest && ncq->Data.Dest == htons(dest->Slot)) {
@@ -702,7 +700,7 @@ void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
 	if (status) {
 		ncq->Type |= 0x80;
 	}
-	ncq->Data.Unit = htons(unit.Slot);
+	ncq->Data.Unit = htons(unit->Slot);
 	ncq->Data.X = htons(x);
 	ncq->Data.Y = htons(y);
 	Assert (!dest || !type); // Both together isn't allowed
@@ -798,7 +796,7 @@ void NetworkSendSelection(CUnit **units, int count)
 			header->Type[i] = MessageSelection;
 			selection = (CNetworkSelection *)&packet.Command[i];
 			for (ref = 0; ref < 4 && unitcount < count; ++ref, ++unitcount) {
-				selection->Unit[ref] = htons(UnitNumber(*units[unitcount]));
+				selection->Unit[ref] = htons(UnitNumber(units[unitcount]));
 				++nosent;
 			}
 		}
@@ -813,7 +811,7 @@ void NetworkSendSelection(CUnit **units, int count)
 		for (; i < MaxNetworkCommands; ++i) {
 			packet.Header.Type[i] = MessageNone;
 		}
-
+		
 
 		//
 		// Send the Constructed packet to team members
@@ -824,8 +822,8 @@ void NetworkSendSelection(CUnit **units, int count)
 		for (i = 0; i < numteammates; ++i) {
 			ref = NetSendUDP(NetworkFildes, Hosts[teammates[i]].Host, Hosts[teammates[i]].Port,
 				buf, CNetworkPacketHeader::Size() + CNetworkSelection::Size() * numcommands);
+		}
 	}
-}
 
 }
 /**
@@ -859,7 +857,7 @@ static void NetworkProcessSelection(CNetworkPacket *packet, int player)
 	}
 	Assert(count == unitcount);
 
-	ChangeTeamSelectedUnits(Players[player], units, adjust, count);
+	ChangeTeamSelectedUnits(&Players[player], units, adjust, count);
 }
 
 /**
@@ -894,7 +892,7 @@ static void NetworkRemovePlayer(int player)
 **  NetworkReceivedEarly NetworkReceivedLate NetworkReceivedDups
 **  Must be calculated.
 */
-void NetworkEvent()
+void NetworkEvent(void)
 {
 	unsigned char buf[1024];
 	CNetworkPacket packet;
@@ -1052,9 +1050,9 @@ void NetworkEvent()
 			{
 				unsigned int slot = ntohs(nc->Unit);
 
-				if (slot < UnitSlotFree &&
+				if (slot >= 0 && slot < UnitSlotFree &&
 						(UnitSlots[slot]->Player->Index == player ||
-							Players[player].IsTeamed(*UnitSlots[slot]))) {
+							Players[player].IsTeamed(UnitSlots[slot]))) {
 					validCommand = true;
 				} else {
 					validCommand = false;
@@ -1069,8 +1067,8 @@ void NetworkEvent()
 			NetworkIn[packet.Header.Cycle][player][i].Data = *nc;
 		} else {
 			SetMessage(_("%s sent bad command"), Players[player].Name.c_str());
-			DebugPrint("%s sent bad command: 0x%x\n" _C_
-				Players[player].Name.c_str() _C_
+			DebugPrint("%s sent bad command: 0x%x\n" _C_ 
+				Players[player].Name.c_str() _C_ 
 				packet.Header.Type[i] & 0x7F);
 		}
 	}
@@ -1097,7 +1095,7 @@ void NetworkEvent()
 /**
 **  Quit the game.
 */
-void NetworkQuit()
+void NetworkQuit(void)
 {
 	if (!ThisPlayer) {
 		return;
@@ -1221,7 +1219,7 @@ static void ParseNetworkCommand(const CNetworkCommandQueue *ncq)
 **  @todo
 **  We need only send to the clients, that have not delivered the packet.
 */
-static void NetworkResendCommands()
+static void NetworkResendCommands(void)
 {
 	CNetworkPacket packet;
 
@@ -1243,7 +1241,7 @@ static void NetworkResendCommands()
 /**
 **  Network send commands.
 */
-static void NetworkSendCommands()
+static void NetworkSendCommands(void)
 {
 	CNetworkCommandQueue *incommand;
 	CNetworkCommandQueue *ncq;
@@ -1302,7 +1300,7 @@ static void NetworkSendCommands()
 /**
 **  Network excecute commands.
 */
-static void NetworkExecCommands()
+static void NetworkExecCommands(void)
 {
 	CNetworkCommandQueue *ncq;
 
@@ -1335,7 +1333,7 @@ static void NetworkExecCommands()
 /**
 **  Network synchronize commands.
 */
-static void NetworkSyncCommands()
+static void NetworkSyncCommands(void)
 {
 	const CNetworkCommandQueue *ncq;
 	unsigned long n;
@@ -1359,7 +1357,7 @@ static void NetworkSyncCommands()
 /**
 **  Handle network commands.
 */
-void NetworkCommands()
+void NetworkCommands(void)
 {
 	if (IsNetworkGame()) {
 		if (!(GameCycle % NetworkUpdates)) {
@@ -1375,7 +1373,7 @@ void NetworkCommands()
 /**
 **  Recover network.
 */
-void NetworkRecover()
+void NetworkRecover(void)
 {
 	if (HostsCount == 0) {
 		NetworkInSync = 1;

@@ -1,16 +1,15 @@
-//       _________ __                 __
-//      /   _____//  |_____________ _/  |______     ____  __ __  ______
-//      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
-//     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/
-//  ______________________                           ______________________
-//                        T H E   W A R   B E G I N S
-//         Stratagus - A free fantasy real time strategy game engine
+//     ____                _       __               
+//    / __ )____  _____   | |     / /___ ___________
+//   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
+//  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  ) 
+// /_____/\____/____/     |__/|__/\__,_/_/  /____/  
+//                                              
+//       A futuristic real-time strategy game.
+//          This file is part of Bos Wars.
 //
 /**@name lowlevel.cpp - The network lowlevel. */
 //
-//      (c) Copyright 2000-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2000-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +25,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//      $Id$
 
 //@{
 
@@ -89,7 +87,7 @@ unsigned long NetLocalAddrs[MAX_LOC_IP]; /// Local IP-Addrs of this host (net fo
 /**
 **  Hardware dependend network init.
 */
-int NetInit()
+int NetInit(void)
 {
 	WSADATA wsaData;
 
@@ -104,7 +102,7 @@ int NetInit()
 /**
 **  Hardware dependend network exit.
 */
-void NetExit()
+void NetExit(void)
 {
 	// Clean up windows networking
 	if (WSACleanup() == SOCKET_ERROR) {
@@ -142,7 +140,7 @@ void NetCloseTCP(Socket sockfd)
 /**
 **  Hardware dependend network init.
 */
-int NetInit()
+int NetInit(void)
 {
 	return 0;
 }
@@ -150,7 +148,7 @@ int NetInit()
 /**
 **  Hardware dependend network exit.
 */
-void NetExit()
+void NetExit(void)
 {
 }
 
@@ -377,7 +375,7 @@ int NetSocketAddr(const Socket sock)
 **
 **  @return If success the socket fildes, -1 otherwise.
 */
-Socket NetOpenUDP(char* addr, int port)
+Socket NetOpenUDP(int port)
 {
 	Socket sockfd;
 
@@ -392,10 +390,7 @@ Socket NetOpenUDP(char* addr, int port)
 
 		memset(&sock_addr, 0, sizeof(sock_addr));
 		sock_addr.sin_family = AF_INET;
-		if (addr)
-			sock_addr.sin_addr.s_addr = inet_addr(addr);
-		else
-			sock_addr.sin_addr.s_addr = INADDR_ANY;
+		sock_addr.sin_addr.s_addr = INADDR_ANY;
 		sock_addr.sin_port = htons(port);
 		// Bind the socket for listening
 		if (bind(sockfd, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0) {
@@ -416,7 +411,7 @@ Socket NetOpenUDP(char* addr, int port)
 **
 **  @return If success the socket fildes, -1 otherwise
 */
-Socket NetOpenTCP(char* addr, int port)
+Socket NetOpenTCP(int port)
 {
 	Socket sockfd;
 
@@ -431,10 +426,7 @@ Socket NetOpenTCP(char* addr, int port)
 
 		memset(&sock_addr, 0, sizeof(sock_addr));
 		sock_addr.sin_family = AF_INET;
-		if (addr)
-			sock_addr.sin_addr.s_addr = inet_addr(addr);
-		else
-			sock_addr.sin_addr.s_addr = INADDR_ANY;
+		sock_addr.sin_addr.s_addr = INADDR_ANY;
 		sock_addr.sin_port = htons(port);
 
 		opt = 1;

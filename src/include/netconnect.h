@@ -1,16 +1,15 @@
-//       _________ __                 __
-//      /   _____//  |_____________ _/  |______     ____  __ __  ______
-//      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
-//     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/
-//  ______________________                           ______________________
-//                        T H E   W A R   B E G I N S
-//         Stratagus - A free fantasy real time strategy game engine
+//     ____                _       __               
+//    / __ )____  _____   | |     / /___ ___________
+//   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
+//  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  ) 
+// /_____/\____/____/     |__/|__/\__,_/_/  /____/  
+//                                              
+//       A futuristic real-time strategy game.
+//          This file is part of Bos Wars.
 //
 /**@name netconnect.h - The network connection setup header file. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Andreas Arens
+//      (c) Copyright 1998-2008 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -25,13 +24,12 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
-//      $Id$
 
 #ifndef __NETCONNECT_H__
 #define __NETCONNECT_H__
 
 //@{
+
 #include <string>
 #include "SDL.h"
 
@@ -92,7 +90,7 @@ class CServerSetup {
 public:
 	unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 4+4+4+4+4+4+4+4+ 4*PlayerMax + 4*PlayerMax + 4*PlayerMax + 4*PlayerMax; }
+	static size_t Size() { return 1+1+1+1+1+1+1+ 1*PlayerMax + 1*PlayerMax + 4*PlayerMax; }
 	void Clear() {
 		ResourcesOption = UnitsOption = FogOfWar = RevealMap =
 			GameTypeOption = Difficulty = MapRichness = 0;
@@ -101,18 +99,16 @@ public:
 		memset(LastFrame, 0, sizeof(LastFrame));
 	}
 
-	Uint32  ResourcesOption;       /// Resources option
-	Uint32  UnitsOption;           /// Unit # option
-	Uint32  FogOfWar;              /// Fog of war option
-	Uint32  RevealMap;             /// Reveal all the map
-	Uint32  TilesetSelection;      /// Tileset select option
-	Uint32  GameTypeOption;        /// Game type option
-	Uint32  Difficulty;            /// Difficulty option
-	Uint32  MapRichness;           /// Map richness option
-	Uint32  CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
-	Uint32  Ready[PlayerMax];      /// Client ready state
-	Uint32  Race[PlayerMax];       /// Client race selection
-	Uint32  LastFrame[PlayerMax];  /// Last message received
+	Uint8  ResourcesOption;       /// Resources option
+	Uint8  UnitsOption;           /// Unit # option
+	Uint8  FogOfWar;              /// Fog of war option
+	Uint8  RevealMap;             /// Reveal all the map
+	Uint8  GameTypeOption;        /// Game type option
+	Uint8  Difficulty;            /// Difficulty option
+	Uint8  MapRichness;           /// Map richness option
+	Uint8  CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
+	Uint8  Ready[PlayerMax];      /// Client ready state
+	Uint32 LastFrame[PlayerMax];  /// Last message received
 	// Fill in here...
 };
 
@@ -126,7 +122,7 @@ class CInitMessage {
 public:
 	unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 1+1+4+4+4+4+4+4+1+256 + CNetworkHost::Size()*PlayerMax + CServerSetup::Size(); }
+	static size_t Size() { return 1+1+4+4+4+4+4+4+1+256; }
 
 	Uint8  Type;        /// Init message type
 	Uint8  SubType;     /// Init message subtype
@@ -172,7 +168,7 @@ enum _ic_message_subtype_ {
 	ICMGo,                  /// Client is ready to run
 
 	ICMAYT,                 /// Server asks are you there
-	ICMIAH                  /// Client answers I am here
+	ICMIAH,                 /// Client answers I am here
 };
 
 /**
@@ -196,7 +192,7 @@ enum _net_client_con_state_ {
 	ccs_goahead,              /// Server wants to start game
 	ccs_started,              /// Server has started game
 	ccs_incompatibleengine,   /// Incompatible engine version
-	ccs_incompatiblenetwork   /// Incompatible netowrk version
+	ccs_incompatiblenetwork,  /// Incompatible netowrk version
 };
 
 /*----------------------------------------------------------------------------
@@ -205,7 +201,6 @@ enum _net_client_con_state_ {
 
 extern std::string NetworkArg;        /// Network command line argument
 extern int NetPlayers;                /// Network players
-extern char* NetworkAddr;             /// Local network address to use
 extern int NetworkPort;               /// Local network port to use
 
 extern std::string LocalPlayerName;   /// Name of local player
@@ -226,20 +221,20 @@ extern CServerSetup LocalSetupState;       /// Network menu: Multiplayer Client 
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void NetworkServerStartGame();       /// Server user has finally hit the start game button
-extern void NetworkGamePrepareGameSettings();
-extern void NetworkConnectSetupGame();      /// Assign Player slot, evaluate Setup state..
+extern void NetworkServerStartGame(void);       /// Server user has finally hit the start game button
+extern void NetworkGamePrepareGameSettings(void);
+extern void NetworkConnectSetupGame(void);      /// Assign Player slot, evaluate Setup state..
 
-extern void NetworkInitClientConnect();     /// Setup network connect state machine for clients
-extern void NetworkExitClientConnect();     /// Terminate network connect state machine for clients
+extern void NetworkInitClientConnect(void);     /// Setup network connect state machine for clients
+extern void NetworkExitClientConnect(void);     /// Terminate network connect state machine for clients
 extern void NetworkInitServerConnect(int openslots); /// Setup network connect state machine for the server
-extern void NetworkExitServerConnect();     /// Terminate network connect state machine for the server
+extern void NetworkExitServerConnect(void);     /// Terminate network connect state machine for the server
 extern int NetworkParseSetupEvent(const unsigned char *buf, int size);  /// Parse a network connect event
 extern int NetworkSetupServerAddress(const std::string &serveraddr);  /// Menu: Setup the server IP
-extern void NetworkProcessClientRequest();  /// Menu Loop: Send out client request messages
-extern void NetworkProcessServerRequest();  /// Menu Loop: Send out server request messages
-extern void NetworkServerResyncClients();   /// Menu Loop: Server: Mark clients state to send stateinfo message
-extern void NetworkDetachFromServer();      /// Menu Loop: Client: Send GoodBye to the server and detach
+extern void NetworkProcessClientRequest(void);  /// Menu Loop: Send out client request messages
+extern void NetworkProcessServerRequest(void);  /// Menu Loop: Send out server request messages
+extern void NetworkServerResyncClients(void);   /// Menu Loop: Server: Mark clients state to send stateinfo message
+extern void NetworkDetachFromServer(void);      /// Menu Loop: Client: Send GoodBye to the server and detach
 
 //@}
 

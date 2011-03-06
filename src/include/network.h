@@ -1,16 +1,15 @@
-//       _________ __                 __
-//      /   _____//  |_____________ _/  |______     ____  __ __  ______
-//      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
-//     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/
-//  ______________________                           ______________________
-//                        T H E   W A R   B E G I N S
-//         Stratagus - A free fantasy real time strategy game engine
+//     ____                _       __               
+//    / __ )____  _____   | |     / /___ ___________
+//   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
+//  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  ) 
+// /_____/\____/____/     |__/|__/\__,_/_/  /____/  
+//                                              
+//       A futuristic real-time strategy game.
+//          This file is part of Bos Wars.
 //
 /**@name network.h - The network header file. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Russell Smith, and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer, Russell Smith, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -25,8 +24,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
-//      $Id$
 
 #ifndef __NETWORK_H__
 #define __NETWORK_H__
@@ -37,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <SDL_stdinc.h>
+#include "unit.h"
 #include "net_lowlevel.h"
 
 /*----------------------------------------------------------------------------
@@ -88,15 +85,10 @@ enum _message_type_ {
 	MessageCommandUnload,          /// Unit command unload
 	MessageCommandBuild,           /// Unit command build building
 	MessageCommandDismiss,         /// Unit command dismiss unit
-	MessageCommandResourceLoc,     /// Unit command resource location
 	MessageCommandResource,        /// Unit command resource
 	MessageCommandReturn,          /// Unit command return goods
 	MessageCommandTrain,           /// Unit command train
 	MessageCommandCancelTrain,     /// Unit command cancel training
-	MessageCommandUpgrade,         /// Unit command upgrade
-	MessageCommandCancelUpgrade,   /// Unit command cancel upgrade
-	MessageCommandResearch,        /// Unit command research
-	MessageCommandCancelResearch,  /// Unit command cancel research
 
 	MessageExtendedCommand,        /// Command is the next byte
 
@@ -109,7 +101,7 @@ enum _message_type_ {
 */
 enum _extended_message_type_ {
 	ExtendedMessageDiplomacy,     /// Change diplomacy
-	ExtendedMessageSharedVision   /// Change shared vision
+	ExtendedMessageSharedVision,  /// Change shared vision
 };
 
 /**
@@ -245,25 +237,24 @@ extern int NoRandomPlacementMultiplayer;        /// Removes randomization of pla
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void InitNetwork1();  /// Initialise network part 1 (ports)
-extern void InitNetwork2();  /// Initialise network part 2
-extern void ExitNetwork1();  /// Cleanup network part 1 (ports)
-extern void NetworkEvent();  /// Handle network events
-extern void NetworkSync();   /// Hold in sync
-extern void NetworkQuit();   /// Quit game
-extern void NetworkRecover();   /// Recover network
-extern void NetworkCommands();  /// Get all network commands
+extern void InitNetwork1(void);  /// Initialise network part 1 (ports)
+extern void InitNetwork2(void);  /// Initialise network part 2
+extern void ExitNetwork1(void);  /// Cleanup network part 1 (ports)
+extern void NetworkEvent(void);  /// Handle network events
+extern void NetworkSync(void);   /// Hold in sync
+extern void NetworkQuit(void);   /// Quit game
+extern void NetworkRecover(void);   /// Recover network
+extern void NetworkCommands(void);  /// Get all network commands
 extern void NetworkChatMessage(const std::string &msg);  /// Send chat message
 	/// Send network command.
-extern void NetworkSendCommand(int command, const CUnit &unit, int x,
+extern void NetworkSendCommand(int command, const CUnit *unit, int x,
 	int y, const CUnit *dest, const CUnitType *type, int status);
 	/// Send extended network command.
 extern void NetworkSendExtendedCommand(int command, int arg1, int arg2,
 	int arg3, int arg4, int status);
 	/// Send Selections to Team
 extern void NetworkSendSelection(CUnit **units, int count);
-	/// Register ccl functions related to network
-//extern void NetworkCclRegister();
+
 //@}
 
 #endif // !__NETWORK_H__

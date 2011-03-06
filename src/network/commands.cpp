@@ -1,16 +1,15 @@
-//       _________ __                 __
-//      /   _____//  |_____________ _/  |______     ____  __ __  ______
-//      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
-//     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/
-//  ______________________                           ______________________
-//                        T H E   W A R   B E G I N S
-//         Stratagus - A free fantasy real time strategy game engine
+//     ____                _       __               
+//    / __ )____  _____   | |     / /___ ___________
+//   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
+//  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  ) 
+// /_____/\____/____/     |__/|__/\__,_/_/  /____/  
+//                                              
+//       A futuristic real-time strategy game.
+//          This file is part of Bos Wars.
 //
 /**@name commands.cpp - Global command handler - network support. */
 //
-//      (c) Copyright 2000-2006 by Lutz Sammer, Andreas Arens, and Jimmy Salmon.
+//      (c) Copyright 2000-2007 by Lutz Sammer, Andreas Arens, and Jimmy Salmon.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,13 +25,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//      $Id$
 
 //@{
 
-//----------------------------------------------------------------------------
-// Includes
-//----------------------------------------------------------------------------
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
 #include "commands.h"
@@ -53,10 +51,10 @@
 **
 ** @param unit pointer to unit.
 */
-void SendCommandStopUnit(CUnit &unit)
+void SendCommandStopUnit(CUnit *unit)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("stop", &unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
+		CommandLog("stop", unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
 		CommandStopUnit(unit);
 	} else {
 		NetworkSendCommand(MessageCommandStop, unit, 0, 0, NoUnitP, 0, FlushCommands);
@@ -69,10 +67,10 @@ void SendCommandStopUnit(CUnit &unit)
 ** @param unit     pointer to unit.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandStandGround(CUnit &unit, int flush)
+void SendCommandStandGround(CUnit *unit, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("stand-ground", &unit, flush, -1, -1, NoUnitP, NULL, -1);
+		CommandLog("stand-ground", unit, flush, -1, -1, NoUnitP, NULL, -1);
 		CommandStandGround(unit, flush);
 	} else {
 		NetworkSendCommand(MessageCommandStand, unit, 0, 0, NoUnitP, 0, flush);
@@ -86,13 +84,13 @@ void SendCommandStandGround(CUnit &unit, int flush)
 ** @param dest    follow this unit.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandFollow(CUnit &unit, CUnit &dest, int flush)
+void SendCommandFollow(CUnit *unit, CUnit *dest, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("follow", &unit, flush, -1, -1, &dest, NULL, -1);
+		CommandLog("follow", unit, flush, -1, -1, dest, NULL, -1);
 		CommandFollow(unit, dest, flush);
 	} else {
-		NetworkSendCommand(MessageCommandFollow, unit, 0, 0, &dest, 0, flush);
+		NetworkSendCommand(MessageCommandFollow, unit, 0, 0, dest, 0, flush);
 	}
 }
 
@@ -100,16 +98,17 @@ void SendCommandFollow(CUnit &unit, CUnit &dest, int flush)
 ** Send command: Move unit to position.
 **
 ** @param unit    pointer to unit.
-** @param pos     map tile position to move to.
+** @param x       X map tile position to move to.
+** @param y       Y map tile position to move to.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush)
+void SendCommandMove(CUnit *unit, int x, int y, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("move", &unit, flush, pos.x, pos.y, NoUnitP, NULL, -1);
-		CommandMove(unit, pos, flush);
+		CommandLog("move", unit, flush, x, y, NoUnitP, NULL, -1);
+		CommandMove(unit, x, y, flush);
 	} else {
-		NetworkSendCommand(MessageCommandMove, unit, pos.x, pos.y, NoUnitP, 0, flush);
+		NetworkSendCommand(MessageCommandMove, unit, x, y, NoUnitP, 0, flush);
 	}
 }
 
@@ -117,17 +116,18 @@ void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush)
 ** Send command: Unit repair.
 **
 ** @param unit    Pointer to unit.
-** @param pos     map tile position to repair.
+** @param x       X map tile position to repair.
+** @param y       Y map tile position to repair.
 ** @param dest    Unit to be repaired.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
+void SendCommandRepair(CUnit *unit, int x, int y, CUnit *dest, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("repair", &unit, flush, pos.x, pos.y, dest, NULL, -1);
-		CommandRepair(unit, pos, dest, flush);
+		CommandLog("repair", unit, flush, x, y, dest, NULL, -1);
+		CommandRepair(unit, x, y, dest, flush);
 	} else {
-		NetworkSendCommand(MessageCommandRepair, unit, pos.x, pos.y, dest, 0, flush);
+		NetworkSendCommand(MessageCommandRepair, unit, x, y, dest, 0, flush);
 	}
 }
 
@@ -137,13 +137,15 @@ void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
 ** @param unit      pointer to unit.
 ** @param on        1 for auto repair on, 0 for off.
 */
-void SendCommandAutoRepair(CUnit &unit, int on)
+void SendCommandAutoRepair(CUnit *unit, int on)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("auto-repair", &unit, FlushCommands, on, -1, NoUnitP, NULL, 0);
+		CommandLog("auto-repair", unit, FlushCommands, on, -1, NoUnitP,
+			NULL, 0);
 		CommandAutoRepair(unit, on);
 	} else {
-		NetworkSendCommand(MessageCommandAutoRepair, unit, on, -1, NoUnitP, NULL, FlushCommands);
+		NetworkSendCommand(MessageCommandAutoRepair,
+			unit, on, -1, NoUnitP, NULL, FlushCommands);
 	}
 }
 
@@ -151,17 +153,18 @@ void SendCommandAutoRepair(CUnit &unit, int on)
 ** Send command: Unit attack unit or at position.
 **
 ** @param unit     pointer to unit.
-** @param pos      map tile position to attack.
+** @param x        X map tile position to attack.
+** @param y        Y map tile position to attack.
 ** @param attack   or !=NoUnitP unit to be attacked.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *attack, int flush)
+void SendCommandAttack(CUnit *unit, int x, int y, CUnit *attack, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("attack", &unit, flush, pos.x, pos.y, attack, NULL, -1);
-		CommandAttack(unit, pos, attack, flush);
+		CommandLog("attack", unit, flush, x, y, attack, NULL, -1);
+		CommandAttack(unit, x, y, attack, flush);
 	} else {
-		NetworkSendCommand(MessageCommandAttack, unit, pos.x, pos.y, attack, 0, flush);
+		NetworkSendCommand(MessageCommandAttack, unit, x, y, attack, 0, flush);
 	}
 }
 
@@ -169,16 +172,17 @@ void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *attack, int flush)
 ** Send command: Unit attack ground.
 **
 ** @param unit     pointer to unit.
-** @param pos      map tile position to fire on.
+** @param x        X map tile position to fire on.
+** @param y        Y map tile position to fire on.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
+void SendCommandAttackGround(CUnit *unit, int x, int y, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("attack-ground", &unit, flush, pos.x, pos.y, NoUnitP, NULL, -1);
-		CommandAttackGround(unit, pos, flush);
+		CommandLog("attack-ground", unit, flush, x, y, NoUnitP, NULL, -1);
+		CommandAttackGround(unit, x, y, flush);
 	} else {
-		NetworkSendCommand(MessageCommandGround, unit, pos.x, pos.y, NoUnitP, 0, flush);
+		NetworkSendCommand(MessageCommandGround, unit, x, y, NoUnitP, 0, flush);
 	}
 }
 
@@ -186,16 +190,17 @@ void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
 ** Send command: Unit patrol between current and position.
 **
 ** @param unit     pointer to unit.
-** @param pos      map tile position to patrol between.
+** @param x        X map tile position to patrol between.
+** @param y        Y map tile position to patrol between.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandPatrol(CUnit &unit, const Vec2i &pos, int flush)
+void SendCommandPatrol(CUnit *unit, int x, int y, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("patrol", &unit, flush, pos.x, pos.y, NoUnitP, NULL, -1);
-		CommandPatrolUnit(unit, pos, flush);
+		CommandLog("patrol", unit, flush, x, y, NoUnitP, NULL, -1);
+		CommandPatrolUnit(unit, x, y, flush);
 	} else {
-		NetworkSendCommand(MessageCommandPatrol, unit, pos.x, pos.y, NoUnitP, 0, flush);
+		NetworkSendCommand(MessageCommandPatrol, unit, x, y, NoUnitP, 0, flush);
 	}
 }
 
@@ -203,16 +208,18 @@ void SendCommandPatrol(CUnit &unit, const Vec2i &pos, int flush)
 ** Send command: Unit board unit.
 **
 ** @param unit     pointer to unit.
+** @param x        X map tile position (unused).
+** @param y        Y map tile position (unused).
 ** @param dest     Destination to be boarded.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandBoard(CUnit &unit, CUnit &dest, int flush)
+void SendCommandBoard(CUnit *unit, int x, int y, CUnit *dest, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("board", &unit, flush, -1, -1, &dest, NULL, -1);
+		CommandLog("board", unit, flush, x, y, dest, NULL, -1);
 		CommandBoard(unit, dest, flush);
 	} else {
-		NetworkSendCommand(MessageCommandBoard, unit, -1, -1, &dest, 0, flush);
+		NetworkSendCommand(MessageCommandBoard, unit, x, y, dest, 0, flush);
 	}
 }
 
@@ -220,17 +227,18 @@ void SendCommandBoard(CUnit &unit, CUnit &dest, int flush)
 ** Send command: Unit unload unit.
 **
 ** @param unit    pointer to unit.
-** @param pos     map tile position of unload.
+** @param x       X map tile position of unload.
+** @param y       Y map tile position of unload.
 ** @param what    Passagier to be unloaded.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
+void SendCommandUnload(CUnit *unit, int x, int y, CUnit *what, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("unload", &unit, flush, pos.x, pos.y, what, NULL, -1);
-		CommandUnload(unit, pos, what, flush);
+		CommandLog("unload", unit, flush, x, y, what, NULL, -1);
+		CommandUnload(unit, x, y, what, flush);
 	} else {
-		NetworkSendCommand(MessageCommandUnload, unit, pos.x, pos.y, what, 0, flush);
+		NetworkSendCommand(MessageCommandUnload, unit, x, y, what, 0, flush);
 	}
 }
 
@@ -238,17 +246,19 @@ void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
 ** Send command: Unit builds building at position.
 **
 ** @param unit    pointer to unit.
-** @param pos     map tile position of construction.
+** @param x       X map tile position of construction.
+** @param y       Y map tile position of construction.
 ** @param what    pointer to unit-type of the building.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush)
+void SendCommandBuildBuilding(CUnit *unit, int x, int y,
+	CUnitType *what, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("build",& unit, flush, pos.x, pos.y, NoUnitP, what.Ident.c_str(), -1);
-		CommandBuildBuilding(unit, pos, what, flush);
+		CommandLog("build", unit, flush, x, y, NoUnitP, what->Ident.c_str(), -1);
+		CommandBuildBuilding(unit, x, y, what, flush);
 	} else {
-		NetworkSendCommand(MessageCommandBuild, unit, pos.x, pos.y, NoUnitP, &what, flush);
+		NetworkSendCommand(MessageCommandBuild, unit, x, y, NoUnitP, what, flush);
 	}
 }
 
@@ -257,31 +267,15 @@ void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, in
 **
 **  @param unit  pointer to unit.
 */
-void SendCommandDismiss(CUnit &unit)
+void SendCommandDismiss(CUnit *unit)
 {
 	// FIXME: currently unit and worker are same?
 	if (!IsNetworkGame()) {
-		CommandLog("dismiss", &unit, FlushCommands, -1, -1, NULL, NULL, -1);
+		CommandLog("dismiss", unit, FlushCommands, -1, -1, NULL, NULL, -1);
 		CommandDismiss(unit);
 	} else {
-		NetworkSendCommand(MessageCommandDismiss, unit, 0, 0, NULL, 0, FlushCommands);
-	}
-}
-
-/**
-**  Send command: Unit harvests a location (wood for now).
-**
-** @param unit     pointer to unit.
-** @param pos      map tile position where to harvest.
-** @param flush    Flag flush all pending commands.
-*/
-void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
-{
-	if (!IsNetworkGame()) {
-		CommandLog("resource-loc", &unit, flush, pos.x, pos.y, NoUnitP, NULL, -1);
-		CommandResourceLoc(unit, pos, flush);
-	} else {
-		NetworkSendCommand(MessageCommandResourceLoc, unit, pos.x, pos.y, NoUnitP, 0, flush);
+		NetworkSendCommand(MessageCommandDismiss, unit, 0, 0, NULL, 0,
+			FlushCommands);
 	}
 }
 
@@ -292,30 +286,13 @@ void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
 ** @param dest    pointer to destination (oil-platform,gold mine).
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandResource(CUnit &unit, CUnit &dest, int flush)
+void SendCommandResource(CUnit *unit, CUnit *dest, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("resource", &unit, flush, -1, -1, &dest, NULL, -1);
+		CommandLog("resource", unit, flush, -1, -1, dest, NULL, -1);
 		CommandResource(unit, dest, flush);
 	} else {
-		NetworkSendCommand(MessageCommandResource, unit, 0, 0, &dest, 0, flush);
-	}
-}
-
-/**
-** Send command: Unit return goods.
-**
-** @param unit    pointer to unit.
-** @param goal    pointer to destination of the goods. (NULL=search best)
-** @param flush   Flag flush all pending commands.
-*/
-void SendCommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
-{
-	if (!IsNetworkGame()) {
-		CommandLog("return", &unit, flush, -1, -1, goal, NULL, -1);
-		CommandReturnGoods(unit, goal, flush);
-	} else {
-		NetworkSendCommand(MessageCommandReturn, unit, 0, 0, goal, 0, flush);
+		NetworkSendCommand(MessageCommandResource, unit, 0, 0, dest, 0, flush);
 	}
 }
 
@@ -326,13 +303,13 @@ void SendCommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
 ** @param what    pointer to unit-type of the unit to be trained.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int flush)
+void SendCommandTrainUnit(CUnit *unit, CUnitType *what, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("train", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
+		CommandLog("train", unit, flush, -1, -1, NoUnitP, what->Ident.c_str(), -1);
 		CommandTrainUnit(unit, what, flush);
 	} else {
-		NetworkSendCommand(MessageCommandTrain, unit, 0, 0, NoUnitP, &what, flush);
+		NetworkSendCommand(MessageCommandTrain, unit, 0, 0, NoUnitP, what, flush);
 	}
 }
 
@@ -343,10 +320,10 @@ void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int flush)
 ** @param slot    Slot of training queue to cancel.
 ** @param type    Unit-type of unit to cancel.
 */
-void SendCommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
+void SendCommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("cancel-train", &unit, FlushCommands, -1, -1, NoUnitP,
+		CommandLog("cancel-train", unit, FlushCommands, -1, -1, NoUnitP,
 				type ? type->Ident.c_str() : NULL, slot);
 		CommandCancelTraining(unit, slot, type);
 	} else {
@@ -356,89 +333,24 @@ void SendCommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 }
 
 /**
-** Send command: Building starts upgrading to.
-**
-** @param unit     pointer to unit.
-** @param what     pointer to unit-type of the unit upgrade.
-** @param flush    Flag flush all pending commands.
-*/
-void SendCommandUpgradeTo(CUnit &unit, CUnitType &what, int flush)
-{
-	if (!IsNetworkGame()) {
-		CommandLog("upgrade-to", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
-		CommandUpgradeTo(unit, what, flush);
-	} else {
-		NetworkSendCommand(MessageCommandUpgrade, unit, 0, 0, NoUnitP, &what, flush);
-	}
-}
-
-/**
-** Send command: Cancel building upgrading to.
-**
-** @param unit  Pointer to unit.
-*/
-void SendCommandCancelUpgradeTo(CUnit &unit)
-{
-	if (!IsNetworkGame()) {
-		CommandLog("cancel-upgrade-to", &unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
-		CommandCancelUpgradeTo(unit);
-	} else {
-		NetworkSendCommand(MessageCommandCancelUpgrade, unit,
-			0, 0, NoUnitP, NULL, FlushCommands);
-	}
-}
-
-/**
-** Send command: Building/unit research.
-**
-** @param unit     pointer to unit.
-** @param what     research-type of the research.
-** @param flush    Flag flush all pending commands.
-*/
-void SendCommandResearch(CUnit &unit, CUpgrade *what, int flush)
-{
-	if (!IsNetworkGame()) {
-		CommandLog("research", &unit, flush, -1, -1, NoUnitP, what->Ident.c_str(), -1);
-		CommandResearch(unit, what, flush);
-	} else {
-		NetworkSendCommand(MessageCommandResearch, unit,
-			what->ID, 0, NoUnitP, NULL, flush);
-	}
-}
-
-/**
-** Send command: Cancel Building/unit research.
-**
-** @param unit pointer to unit.
-*/
-void SendCommandCancelResearch(CUnit &unit)
-{
-	if (!IsNetworkGame()) {
-		CommandLog("cancel-research", &unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
-		CommandCancelResearch(unit);
-	} else {
-		NetworkSendCommand(MessageCommandCancelResearch, unit,
-			0, 0, NoUnitP, NULL, FlushCommands);
-	}
-}
-
-/**
 ** Send command: Unit spell cast on position/unit.
 **
 ** @param unit      pointer to unit.
-** @param pos       map tile position where to cast spell.
+** @param x         X map tile position where to cast spell.
+** @param y         Y map tile position where to cast spell.
 ** @param dest      Cast spell on unit (if exist).
 ** @param spellid   Spell type id.
 ** @param flush     Flag flush all pending commands.
 */
-void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, int flush)
+void SendCommandSpellCast(CUnit *unit, int x, int y, CUnit *dest, int spellid,
+	int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("spell-cast", &unit, flush, pos.x, pos.y, dest, NULL, spellid);
-		CommandSpellCast(unit, pos, dest, SpellTypeTable[spellid], flush);
+		CommandLog("spell-cast", unit, flush, x, y, dest, NULL, spellid);
+		CommandSpellCast(unit, x, y, dest, SpellTypeTable[spellid], flush);
 	} else {
 		NetworkSendCommand(MessageCommandSpellCast + spellid,
-			unit, pos.x, pos.y, dest, NULL, flush);
+			unit, x, y, dest, NULL, flush);
 	}
 }
 
@@ -449,10 +361,11 @@ void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spelli
 ** @param spellid   Spell type id.
 ** @param on        1 for auto cast on, 0 for off.
 */
-void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on)
+void SendCommandAutoSpellCast(CUnit *unit, int spellid, int on)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("auto-spell-cast", &unit, FlushCommands, on, -1, NoUnitP, NULL, spellid);
+		CommandLog("auto-spell-cast", unit, FlushCommands, on, -1, NoUnitP,
+			NULL, spellid);
 		CommandAutoSpellCast(unit, spellid, on);
 	} else {
 		NetworkSendCommand(MessageCommandSpellCast + spellid,
@@ -540,23 +453,27 @@ void SendCommandSharedVision(int player, bool state, int opponent)
 void ParseCommand(unsigned char msgnr, UnitRef unum,
 	unsigned short x, unsigned short y, UnitRef dstnr)
 {
-	Assert(unum < UnitSlotFree);
-	Assert(UnitSlots[unum]);
+	CUnit *unit;
+	CUnit *dest;
+	int id;
+	int status;
 
-	CUnit &unit = *UnitSlots[unum];
-	const Vec2i pos = {x, y};
-	const int arg1 = x;
-	const int arg2 = y;
+	Assert(unum < UnitSlotFree);
+	unit = UnitSlots[unum];
+	Assert(unit);
+
 	//
 	// Check if unit is already killed?
 	//
-	if (unit.Destroyed) {
+	if (unit->Destroyed) {
 		DebugPrint(" destroyed unit skipping %d\n" _C_ UnitNumber(unit));
 		return;
 	}
-	Assert(unit.Type);
 
-	const int status = (msgnr & 0x80) >> 7;
+	Assert(unit->Type);
+
+	status = (msgnr & 0x80) >> 7;
+
 	// Note: destroyed destination unit is handled by the action routines.
 
 	switch (msgnr & 0x7F) {
@@ -568,162 +485,124 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 			return;
 
 		case MessageCommandStop:
-			CommandLog("stop", &unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
+			CommandLog("stop", unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
 			CommandStopUnit(unit);
 			break;
 		case MessageCommandStand:
-			CommandLog("stand-ground", &unit, status, -1, -1, NoUnitP, NULL, -1);
+			CommandLog("stand-ground", unit, status, -1, -1, NoUnitP, NULL, -1);
 			CommandStandGround(unit, status);
 			break;
-		case MessageCommandFollow: {
-			CUnit *dest = NoUnitP;
+		case MessageCommandFollow:
+			dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = UnitSlots[dstnr];
 				Assert(dest && dest->Type);
-				CommandLog("follow", &unit, status, -1, -1, dest, NULL, -1);
-				CommandFollow(unit, *dest, status);
 			}
+			CommandLog("follow", unit, status, -1, -1, dest, NULL, -1);
+			CommandFollow(unit, dest, status);
 			break;
-		}
 		case MessageCommandMove:
-			CommandLog("move", &unit, status, pos.x, pos.y, NoUnitP, NULL, -1);
-			CommandMove(unit, pos, status);
+			CommandLog("move", unit, status, x, y, NoUnitP, NULL, -1);
+			CommandMove(unit, x, y, status);
 			break;
-		case MessageCommandRepair: {
-			CUnit *dest = NoUnitP;
+		case MessageCommandRepair:
+			dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = UnitSlots[dstnr];
 				Assert(dest && dest->Type);
 			}
-			CommandLog("repair", &unit, status, pos.x, pos.y, dest, NULL, -1);
-			CommandRepair(unit, pos, dest, status);
+			CommandLog("repair", unit, status, x, y, dest, NULL, -1);
+			CommandRepair(unit, x, y, dest, status);
 			break;
-		}
 		case MessageCommandAutoRepair:
-			CommandLog("auto-repair", &unit, status, arg1, arg2, NoUnitP, NULL, 0);
-			CommandAutoRepair(unit, arg1);
+			CommandLog("auto-repair", unit, status, x, y, NoUnitP, NULL, 0);
+			CommandAutoRepair(unit, x);
 			break;
-		case MessageCommandAttack: {
-			CUnit *dest = NoUnitP;
+		case MessageCommandAttack:
+			dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = UnitSlots[dstnr];
 				Assert(dest && dest->Type);
 			}
-			CommandLog("attack", &unit, status, pos.x, pos.y, dest, NULL, -1);
-			CommandAttack(unit, pos, dest, status);
+			CommandLog("attack", unit, status, x, y, dest, NULL, -1);
+			CommandAttack(unit, x, y, dest, status);
 			break;
-		}
 		case MessageCommandGround:
-			CommandLog("attack-ground", &unit, status, pos.x, pos.y, NoUnitP, NULL, -1);
-			CommandAttackGround(unit, pos, status);
+			CommandLog("attack-ground", unit, status, x, y, NoUnitP, NULL, -1);
+			CommandAttackGround(unit, x, y, status);
 			break;
 		case MessageCommandPatrol:
-			CommandLog("patrol", &unit, status, pos.x, pos.y, NoUnitP, NULL, -1);
-			CommandPatrolUnit(unit, pos, status);
+			CommandLog("patrol", unit, status, x, y, NoUnitP, NULL, -1);
+			CommandPatrolUnit(unit, x, y, status);
 			break;
-		case MessageCommandBoard: {
-			CUnit *dest = NoUnitP;
-			if (dstnr != (unsigned short)0xFFFF) {
-				dest = UnitSlots[dstnr];
-				Assert(dest && dest->Type);
-				CommandLog("board", &unit, status, arg1, arg2, dest, NULL, -1);
-				CommandBoard(unit, *dest, status);
-			}
-			break;
-		}
-		case MessageCommandUnload: {
-			CUnit *dest = NoUnitP;
+		case MessageCommandBoard:
+			dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = UnitSlots[dstnr];
 				Assert(dest && dest->Type);
 			}
-			CommandLog("unload", &unit, status, pos.x, pos.y, dest, NULL, -1);
-			CommandUnload(unit, pos, dest, status);
+			CommandLog("board", unit, status, x, y, dest, NULL, -1);
+			CommandBoard(unit, dest, status);
 			break;
-		}
+		case MessageCommandUnload:
+			dest = NoUnitP;
+			if (dstnr != (unsigned short)0xFFFF) {
+				dest = UnitSlots[dstnr];
+				Assert(dest && dest->Type);
+			}
+			CommandLog("unload", unit, status, x, y, dest, NULL, -1);
+			CommandUnload(unit, x, y, dest, status);
+			break;
 		case MessageCommandBuild:
-			CommandLog("build", &unit, status, pos.x, pos.y, NoUnitP, UnitTypes[dstnr]->Ident.c_str(), -1);
-			CommandBuildBuilding(unit, pos, *UnitTypes[dstnr], status);
+			CommandLog("build", unit, status, x, y, NoUnitP, UnitTypes[dstnr]->Ident.c_str(),
+				-1);
+			CommandBuildBuilding(unit, x, y, UnitTypes[dstnr], status);
 			break;
 		case MessageCommandDismiss:
-			CommandLog("dismiss", &unit, FlushCommands, -1, -1, NULL, NULL, -1);
+			CommandLog("dismiss", unit, FlushCommands, -1, -1, NULL, NULL, -1);
 			CommandDismiss(unit);
 			break;
-		case MessageCommandResourceLoc:
-			CommandLog("resource-loc", &unit, status, pos.x, pos.y, NoUnitP, NULL, -1);
-			CommandResourceLoc(unit, pos, status);
-			break;
-		case MessageCommandResource: {
-			CUnit *dest = NoUnitP;
+		case MessageCommandResource:
+			dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = UnitSlots[dstnr];
 				Assert(dest && dest->Type);
-				CommandLog("resource", &unit, status, -1, -1, dest, NULL, -1);
-				CommandResource(unit, *dest, status);
 			}
+			CommandLog("resource", unit, status, -1, -1, dest, NULL, -1);
+			CommandResource(unit, dest, status);
 			break;
-		}
-		case MessageCommandReturn: {
-			CUnit *dest = NoUnitP;
-			if (dstnr != (unsigned short)0xFFFF) {
-				dest = UnitSlots[dstnr];
-				Assert(dest && dest->Type);
-				CommandLog("return", &unit, status, -1, -1, dest, NULL, -1);
-				CommandReturnGoods(unit, dest, status);
-			}
-			break;
-		}
 		case MessageCommandTrain:
-			CommandLog("train", &unit, status, -1, -1, NoUnitP,
+			CommandLog("train", unit, status, -1, -1, NoUnitP,
 				UnitTypes[dstnr]->Ident.c_str(), -1);
-			CommandTrainUnit(unit, *UnitTypes[dstnr], status);
+			CommandTrainUnit(unit, UnitTypes[dstnr], status);
 			break;
 		case MessageCommandCancelTrain:
 			// We need (short)x for the last slot -1
 			if (dstnr != (unsigned short)0xFFFF) {
-				CommandLog("cancel-train", &unit, FlushCommands, -1, -1, NoUnitP,
+				CommandLog("cancel-train", unit, FlushCommands, -1, -1, NoUnitP,
 					UnitTypes[dstnr]->Ident.c_str(), (short)x);
 				CommandCancelTraining(unit, (short)x, UnitTypes[dstnr]);
 			} else {
-				CommandLog("cancel-train", &unit, FlushCommands, -1, -1, NoUnitP,
+				CommandLog("cancel-train", unit, FlushCommands, -1, -1, NoUnitP,
 					NULL, (short)x);
 				CommandCancelTraining(unit, (short)x, NULL);
 			}
 			break;
-		case MessageCommandUpgrade:
-			CommandLog("upgrade-to", &unit, status, -1, -1, NoUnitP,
-				UnitTypes[dstnr]->Ident.c_str(), -1);
-			CommandUpgradeTo(unit, *UnitTypes[dstnr], status);
-			break;
-		case MessageCommandCancelUpgrade:
-			CommandLog("cancel-upgrade-to", &unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
-			CommandCancelUpgradeTo(unit);
-			break;
-		case MessageCommandResearch:
-			CommandLog("research", &unit, status, -1, -1, NoUnitP,
-				AllUpgrades[arg1]->Ident.c_str(), -1);
-			CommandResearch(unit, AllUpgrades[arg1], status);
-			break;
-		case MessageCommandCancelResearch:
-			CommandLog("cancel-research", &unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
-			CommandCancelResearch(unit);
-			break;
-		default: {
-			int id = (msgnr&0x7f) - MessageCommandSpellCast;
-			if (arg2 != (unsigned short)0xFFFF) {
-				CUnit *dest = NoUnitP;
+		default:
+			id = (msgnr&0x7f) - MessageCommandSpellCast;
+			if (y != (unsigned short)0xFFFF) {
+				dest = NoUnitP;
 				if (dstnr != (unsigned short)0xFFFF) {
 					dest = UnitSlots[dstnr];
 					Assert(dest && dest->Type);
 				}
-				CommandLog("spell-cast", &unit, status, pos.x, pos.y, dest, NULL, id);
-				CommandSpellCast(unit, pos, dest, SpellTypeTable[id], status);
+				CommandLog("spell-cast", unit, status, x, y, dest, NULL, id);
+				CommandSpellCast(unit, x, y, dest, SpellTypeTable[id], status);
 			} else {
-				CommandLog("auto-spell-cast", &unit, status, arg1, -1, NoUnitP, NULL, id);
-				CommandAutoSpellCast(unit, id, arg1);
+				CommandLog("auto-spell-cast", unit, status, x, -1, NoUnitP, NULL, id);
+				CommandAutoSpellCast(unit, id, x);
 			}
 			break;
-		}
 	}
 }
 
