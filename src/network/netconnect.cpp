@@ -1152,7 +1152,7 @@ static void ClientParseConnecting(const CInitMessage *msg)
 	switch(msg->SubType) {
 
 		case ICMEngineMismatch: // Stratagus engine version doesn't match
-			fprintf(stderr, "Incompatible Bos Wars version "
+			fprintf(stderr, "Incompatible Stratagus version "
 				StratagusFormatString " <-> "
 				StratagusFormatString "\n"
 				"from %d.%d.%d.%d:%d\n",
@@ -1273,7 +1273,7 @@ static void ClientParseConnected(const CInitMessage *msg)
 			LoadStratagusMapInfo(mappath);
 			if (ntohl(msg->MapUID) != Map.Info.MapUID) {
 				NetLocalState = ccs_badmap;
-				fprintf(stderr, "Maps do not match (0x%08x) <-> (0x%08x)\n",
+				fprintf(stderr, "Stratagus maps do not match (0x%08x) <-> (0x%08x)\n",
 					(unsigned int)Map.Info.MapUID,
 					(unsigned int)ntohl(msg->MapUID));
 				break;
@@ -1869,7 +1869,7 @@ static int CheckVersions(const CInitMessage *msg)
 	CInitMessage message;
 
 	if (ntohl(msg->Stratagus) != StratagusVersion) {
-		fprintf(stderr, "Incompatible Bos Wars version "
+		fprintf(stderr, "Incompatible Stratagus version "
 			StratagusFormatString " <-> "
 			StratagusFormatString "\n"
 			"from %d.%d.%d.%d:%d\n",
