@@ -233,6 +233,7 @@
 #include "interface.h"
 #include "results.h"
 #include "sound.h"
+#include "master.h"
 
 
 //----------------------------------------------------------------------------
