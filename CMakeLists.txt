@@ -306,13 +306,15 @@ find_package(SDL_gles)
 find_package(Sqlite)
 
 include(CheckFunctionExists)
-include(CMakeDetermineRCCompiler)
 
-enable_language(RC)
+if(WIN32)
+	enable_language(RC)
+	include(CMakeDetermineRCCompiler)
 
-if(WIN32 AND MINGW)
-	set(CMAKE_RC_COMPILER_INIT windres)
-	set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <FLAGS> -O coff <DEFINES> -i <SOURCE> -o <OBJECT>")
+	if(MINGW)
+		set(CMAKE_RC_COMPILER_INIT windres)
+		set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <FLAGS> -O coff <DEFINES> -i <SOURCE> -o <OBJECT>")
+	endif()
 endif()
 
 # Options for compiling
