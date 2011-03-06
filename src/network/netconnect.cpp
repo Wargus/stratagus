@@ -1337,6 +1337,8 @@ static void ClientParseMapInfo(const CInitMessage *msg)
 */
 static void ClientParseSynced(const CInitMessage *msg)
 {
+	int i;
+
 	switch(msg->SubType) {
 
 		case ICMState: // Server has sent us new state info
@@ -1349,7 +1351,7 @@ static void ClientParseSynced(const CInitMessage *msg)
 		case ICMConfig: // Server gives the go ahead.. - start game
 			DebugPrint("ccs_synced: Config subtype %d received - starting\n" _C_ msg->SubType);
 			HostsCount = 0;
-			for (int i = 0; i < msg->HostsCount - 1; ++i) {
+			for (i = 0; i < msg->HostsCount - 1; ++i) {
 				if (msg->u.Hosts[i].Host || msg->u.Hosts[i].Port) {
 					Hosts[HostsCount].Host = msg->u.Hosts[i].Host;
 					Hosts[HostsCount].Port = msg->u.Hosts[i].Port;
