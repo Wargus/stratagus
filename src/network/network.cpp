@@ -521,7 +521,7 @@ void InitNetwork1(void)
 	// Our communication port
 	port = NetworkPort;
 	for (i = 0; i < 10; ++i) {
-		NetworkFildes = NetOpenUDP(port + i);
+		NetworkFildes = NetOpenUDP(NetworkAddr, port + i);
 		if (NetworkFildes != (Socket)-1) {
 			break;
 		}

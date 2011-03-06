@@ -65,6 +65,7 @@
 
 std::string NetworkArg;                /// Network command line argument
 int NetPlayers;                        /// How many network players
+char* NetworkAddr = NULL;              /// Local network address to use
 int NetworkPort = NetworkDefaultPort;  /// Local network port to use
 
 #ifdef DEBUG
