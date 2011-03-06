@@ -91,7 +91,7 @@ class CServerSetup {
 public:
 	unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 1+1+1+1+1+1+1+1+ 1*PlayerMax + 1*PlayerMax + 4*PlayerMax; }
+	static size_t Size() { return 4+4+4+4+4+4+4+4+ 4*PlayerMax + 4*PlayerMax + 4*PlayerMax + 4*PlayerMax; }
 	void Clear() {
 		ResourcesOption = UnitsOption = FogOfWar = RevealMap = TilesetSelection =
 			GameTypeOption = Difficulty = MapRichness = 0;
@@ -100,18 +100,18 @@ public:
 		memset(LastFrame, 0, sizeof(LastFrame));
 	}
 
-	Uint8  ResourcesOption;       /// Resources option
-	Uint8  UnitsOption;           /// Unit # option
-	Uint8  FogOfWar;              /// Fog of war option
-	Uint8  RevealMap;             /// Reveal all the map
-	Uint8  TilesetSelection;      /// Tileset select option
-	Uint8  GameTypeOption;        /// Game type option
-	Uint8  Difficulty;            /// Difficulty option
-	Uint8  MapRichness;           /// Map richness option
-	Uint8  CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
-	Uint8  Ready[PlayerMax];      /// Client ready state
-	Uint8  Race[PlayerMax];       /// Client race selection
-	Uint32 LastFrame[PlayerMax];  /// Last message received
+	Uint32  ResourcesOption;       /// Resources option
+	Uint32  UnitsOption;           /// Unit # option
+	Uint32  FogOfWar;              /// Fog of war option
+	Uint32  RevealMap;             /// Reveal all the map
+	Uint32  TilesetSelection;      /// Tileset select option
+	Uint32  GameTypeOption;        /// Game type option
+	Uint32  Difficulty;            /// Difficulty option
+	Uint32  MapRichness;           /// Map richness option
+	Uint32  CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
+	Uint32  Ready[PlayerMax];      /// Client ready state
+	Uint32  Race[PlayerMax];       /// Client race selection
+	Uint32  LastFrame[PlayerMax];  /// Last message received
 	// Fill in here...
 };
 
@@ -125,7 +125,7 @@ class CInitMessage {
 public:
 	unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 1+1+4+4+4+4+4+4+1+256; }
+	static size_t Size() { return 1+1+4+4+4+4+4+4+1+256 + CNetworkHost::Size()*PlayerMax + CServerSetup::Size(); }
 
 	Uint8  Type;        /// Init message type
 	Uint8  SubType;     /// Init message subtype
