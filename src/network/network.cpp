@@ -859,7 +859,7 @@ static void NetworkProcessSelection(CNetworkPacket *packet, int player)
 	}
 	Assert(count == unitcount);
 
-	ChangeTeamSelectedUnits(&Players[player], units, adjust, count);
+	ChangeTeamSelectedUnits(Players[player], units, adjust, count);
 }
 
 /**
