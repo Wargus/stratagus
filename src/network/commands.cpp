@@ -281,6 +281,24 @@ void SendCommandDismiss(CUnit *unit)
 }
 
 /**
+**  Send command: Unit harvests a location (wood for now).
+**
+** @param unit     pointer to unit.
+** @param x        X map tile position where to harvest.
+** @param y        Y map tile position where to harvest.
+** @param flush    Flag flush all pending commands.
+*/
+void SendCommandResourceLoc(CUnit *unit, int x, int y, int flush)
+{
+	if (!IsNetworkGame()) {
+		CommandLog("resource-loc", unit, flush, x, y, NoUnitP, NULL, -1);
+		CommandResourceLoc(unit, x, y, flush);
+	} else {
+		NetworkSendCommand(MessageCommandResourceLoc, unit, x, y, NoUnitP, 0, flush);
+	}
+}
+
+/**
 ** Send command: Unit harvest resources
 **
 ** @param unit    pointer to unit.
@@ -647,6 +665,10 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandDismiss:
 			CommandLog("dismiss", unit, FlushCommands, -1, -1, NULL, NULL, -1);
 			CommandDismiss(unit);
+			break;
+		case MessageCommandResourceLoc:
+			CommandLog("resource-loc", unit, status, x, y, NoUnitP, NULL, -1);
+			CommandResourceLoc(unit, x, y, status);
 			break;
 		case MessageCommandResource:
 			dest = NoUnitP;
