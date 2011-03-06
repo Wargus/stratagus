@@ -243,7 +243,42 @@ set(tolua_cpp_DEPS
 	src/tolua/video.pkg
 )
 
+set(stratagus_SRCS
+	${action_SRCS}
+	${ai_SRCS}
+	${editor_SRCS}
+	${game_SRCS}
+	${guichan_SRCS}
+	${map_SRCS}
+	${network_SRCS}
+	${particle_SRCS}
+	${pathfinder_SRCS}
+	${sound_SRCS}
+	${stratagusmain_SRCS}
+	${tolua_SRCS}
+	${ui_SRCS}
+	${unit_SRCS}
+	${video_SRCS}
+	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
+)
+
+# Additional platform checks
+
+if(UNIX AND CMAKE_SYSTEM_NAME MATCHES BSD)
+	set(BSD true)
+endif()
+
+if(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux AND EXISTS /etc/maemo_version)
+	set(MAEMO true)
+endif()
+
 # Find all libraries
+
+option(ENABLE_STATIC "Compile Stratagus as static executable" OFF)
+
+if(ENABLE_STATIC)
+	set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib;.a")
+endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
@@ -252,6 +287,10 @@ find_package(PNG REQUIRED)
 find_package(SDL REQUIRED)
 find_package(Tolua++ REQUIRED)
 find_package(ZLIB REQUIRED)
+
+if(MAEMO)
+	find_package(LibOSSO REQUIRED)
+endif()
 
 find_package(BZip2)
 find_package(Mikmod)
@@ -266,52 +305,15 @@ find_package(SDL_gles)
 
 find_package(Sqlite)
 
-# Additional platform checks
+include(CheckFunctionExists)
+include(CMakeDetermineRCCompiler)
 
-if(UNIX AND CMAKE_SYSTEM_NAME MATCHES BSD)
-	set(BSD true)
+enable_language(RC)
+
+if(WIN32 AND MINGW)
+	set(CMAKE_RC_COMPILER_INIT windres)
+	set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <FLAGS> -O coff <DEFINES> -i <SOURCE> -o <OBJECT>")
 endif()
-
-if(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux AND EXISTS /etc/maemo_version)
-	set(MAEMO true)
-endif()
-
-# Platform definitions
-
-if(WIN32)
-	add_definitions(-DUSE_WIN32)
-endif()
-
-if(APPLE)
-	add_definitions(-DUSE_MAC)
-endif()
-
-if(BSD)
-	add_definitions(-DBSD)
-endif()
-
-if(BEOS)
-	add_definitions(-DUSE_BEOS)
-endif()
-
-if(MAEMO)
-	add_definitions(-DUSE_MAEMO)
-	find_package(LibOSSO REQUIRED)
-endif()
-
-check_function_exists("strcasestr" HAVE_STRCASESTR)
-check_function_exists("strnlen" HAVE_STRNLEN)
-
-if(HAVE_STRCASESTR)
-	add_definitions(-DHAVE_STRCASESTR)
-endif()
-
-if(HAVE_STRNLEN)
-	add_definitions(-DHAVE_STRNLEN)
-endif()
-
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 
 # Options for compiling
 
@@ -334,7 +336,7 @@ option(WITH_OPENGLES "Compile Stratagus with OpenGL ES 1.1 rendering support ins
 # Stratagus definitions
 
 add_definitions(${PNG_DEFINITIONS} -DUSE_ZLIB)
-include_directories(${LUA_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
+include_directories(${LUA_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
 set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES} ${PNG_LIBRARIES} ${SDL_LIBRARY} ${ZLIB_LIBRARIES})
 
 if(WIN32 AND NOT ENABLE_STDIO_REDIRECT)
@@ -367,7 +369,7 @@ endif()
 if(WITH_OGGVORBIS AND OGGVORBIS_FOUND)
 	add_definitions(-DUSE_VORBIS)
 	include_directories(${OGGVORBIS_INCLUDE_DIR})
-	set(stratagus_LIBS ${stratagus_LIBS} ${OGGVORBIS_LIBRARIES})
+	set(stratagus_LIBS ${stratagus_LIBS} ${OGG_LIBRARY} ${VORBIS_LIBRARY})
 endif()
 
 if(WITH_THEORA AND THEORA_FOUND)
@@ -397,36 +399,54 @@ if(WITH_OPENGLES AND OPENGLES_FOUND AND SDLGLES_FOUND)
 	set(stratagus_LIBS ${stratagus_LIBS} ${OPENGLES_LIBRARIES} ${SDLGLES_LIBRARY})
 endif()
 
-set(stratagus_SRCS
-	${action_SRCS}
-	${ai_SRCS}
-	${editor_SRCS}
-	${game_SRCS}
-	${guichan_SRCS}
-	${map_SRCS}
-	${network_SRCS}
-	${particle_SRCS}
-	${pathfinder_SRCS}
-	${sound_SRCS}
-	${stratagusmain_SRCS}
-	${tolua_SRCS}
-	${ui_SRCS}
-	${unit_SRCS}
-	${video_SRCS}
-	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
-)
+# Platform definitions
 
 if(WIN32)
+	add_definitions(-DUSE_WIN32)
 	set(stratagus_SRCS ${stratagus_SRCS} ${win32_SRCS})
+	set(stratagus_LIBS ${stratagus_LIBS} dsound dxguid winmm ws2_32)
+endif()
+
+if(APPLE)
+	add_definitions(-DUSE_MAC)
+endif()
+
+if(BSD)
+	add_definitions(-DBSD)
 endif()
 
 if(BEOS)
+	add_definitions(-DUSE_BEOS)
 	set(stratagus_SRCS ${stratagus_SRCS} ${beos_SRCS})
 endif()
 
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp COMMAND ${TOLUA++} -L stratagus.lua -o ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp stratagus.pkg DEPENDS ${tolua_cpp_DEPS} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/tolua)
+if(MAEMO)
+	add_definitions(-DUSE_MAEMO)
+endif()
+
+check_function_exists("strcasestr" HAVE_STRCASESTR)
+check_function_exists("strnlen" HAVE_STRNLEN)
+
+if(HAVE_STRCASESTR)
+	add_definitions(-DHAVE_STRCASESTR)
+endif()
+
+if(HAVE_STRNLEN)
+	add_definitions(-DHAVE_STRNLEN)
+endif()
+
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
+
+# Compile Stratagus
+
+add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp COMMAND ${TOLUA++_APP} -L stratagus.lua -o ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp stratagus.pkg DEPENDS ${tolua_cpp_DEPS} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/tolua)
 add_executable(stratagus WIN32 ${stratagus_SRCS})
 target_link_libraries(stratagus ${stratagus_LIBS})
+
+if(ENABLE_STATIC AND WIN32 AND MINGW)
+	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc")
+endif()
 
 ########### next target ###############
 
@@ -442,6 +462,10 @@ set(metaserver_SRCS
 if(SQLITE_FOUND)
 	add_executable(metaserver ${metaserver_SRCS})
 	target_link_libraries(metaserver ${SDL_LIBRARY} ${SQLITE_LIBRARIES})
+
+	if(ENABLE_STATIC AND WIN32 AND MINGW)
+		set_target_properties(metaserver PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc")
+	endif()
 endif()
 
 ########### next target ###############
@@ -451,7 +475,11 @@ set(png2stratagus_SRCS
 )
 
 add_executable(png2stratagus ${png2stratagus_SRCS})
-target_link_libraries(png2stratagus ${PNG_LIBRARY})
+target_link_libraries(png2stratagus ${PNG_LIBRARY} ${ZLIB_LIBRARIES})
+
+if(ENABLE_STATIC AND WIN32 AND MINGW)
+	set_target_properties(png2stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc")
+endif()
 
 ########### install files ###############
 
