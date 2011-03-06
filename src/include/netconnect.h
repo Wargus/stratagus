@@ -171,7 +171,7 @@ enum _ic_message_subtype_ {
 	ICMGo,                  /// Client is ready to run
 
 	ICMAYT,                 /// Server asks are you there
-	ICMIAH,                 /// Client answers I am here
+	ICMIAH                  /// Client answers I am here
 };
 
 /**
@@ -195,7 +195,7 @@ enum _net_client_con_state_ {
 	ccs_goahead,              /// Server wants to start game
 	ccs_started,              /// Server has started game
 	ccs_incompatibleengine,   /// Incompatible engine version
-	ccs_incompatiblenetwork,  /// Incompatible netowrk version
+	ccs_incompatiblenetwork   /// Incompatible netowrk version
 };
 
 /*----------------------------------------------------------------------------
