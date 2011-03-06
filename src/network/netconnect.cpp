@@ -1498,7 +1498,7 @@ static void ClientParseStarted(const CInitMessage *msg)
 **
 ** @param msg message received
 */
-static void ClientParseAreYouThere(const CInitMessage *msg)
+static void ClientParseAreYouThere(const CInitMessage *)
 {
 	CInitMessage message;
 
@@ -1512,7 +1512,7 @@ static void ClientParseAreYouThere(const CInitMessage *msg)
 **
 ** @param msg message received
 */
-static void ClientParseBadMap(const CInitMessage *msg)
+static void ClientParseBadMap(const CInitMessage *)
 {
 	int i;
 	CInitMessage message;
