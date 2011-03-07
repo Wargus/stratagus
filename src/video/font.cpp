@@ -480,7 +480,7 @@ CGraphic *CFont::GetFontColorGraphic(const CFontColor *fontColor) const
 	if (!UseOpenGL) {
 		return this->G;
 	} else {
-		return FontColorGraphics[this][FontColor];
+		return FontColorGraphics[this][fontColor];
 	}
 }
 

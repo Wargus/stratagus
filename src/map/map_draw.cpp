@@ -331,8 +331,8 @@ void CViewport::DrawMapBackgroundInViewport() const
 	}
 }
 
-struct CDrawProxy {
-
+class CDrawProxy {
+public:
 	CDrawProxy(): nunits(0), nmissiles(0) {}
 
 	CMutex lock;
