@@ -44,7 +44,6 @@
 #include "ai.h"
 #include "actions.h"
 #include "commands.h"
-#include "tolua++.h"
 #include "trigger.h"
 
 /*----------------------------------------------------------------------------
