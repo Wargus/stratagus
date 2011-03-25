@@ -1,6 +1,9 @@
 build
+build-dbg
 debian/*.debhelper
 debian/files
 debian/*.log
 debian/*.substvars
 debian/stratagus
+debian/stratagus-dbg
+debian/stratagus-doc
