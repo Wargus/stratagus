@@ -1,5 +1,5 @@
 project(stratagus)
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.6)
 
 # Stratagus sources
 
@@ -342,6 +342,11 @@ set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES} ${PNG_LIBRARIES} ${SDL_LIB
 
 if(WIN32 AND NOT ENABLE_STDIO_REDIRECT)
 	add_definitions(-DNO_STDIO_REDIRECT)
+endif()
+
+# OpenGL ES 1.1 Maemo hack
+if(MAEMO)
+	set(WITH_OPENGLES ON)
 endif()
 
 # TODO: Add support for touchscreen input (not only for MAEMO)
