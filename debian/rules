@@ -21,26 +21,24 @@
 include /usr/share/cdbs/1/rules/debhelper.mk
 
 clean::
-	$(MAKE) distclean
-	$(RM) stratagus-dbg
-	if [ -f $(CURDIR)/debian/control.orig ]; then \
-		mv $(CURDIR)/debian/control.orig $(CURDIR)/debian/control; \
+	rm -rf $(CURDIR)/build $(CURDIR)/build-dbg
+	if [ -f /etc/maemo_version ]; then \
+		[ -f $(CURDIR)/debian/control.orig ] && mv $(CURDIR)/debian/control.orig $(CURDIR)/debian/control; \
 	fi
 
 build:
-	./autogen.sh
-	./configure --prefix=/usr --datadir=/usr/share/games/stratagus/default
-	$(MAKE) OUTFILE=stratagus
-	$(MAKE) clean
-	./configure --prefix=/usr --datadir=/usr/share/games/stratagus/default --enable-debug
-	$(MAKE) OUTFILE=stratagus-dbg
+	mkdir -p $(CURDIR)/build $(CURDIR)/build-dbg
+	cd $(CURDIR)/build && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release ..
+	cd $(CURDIR)/build-dbg && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug ..
+	$(MAKE) -C $(CURDIR)/build
+	$(MAKE) -C $(CURDIR)/build-dbg
 
 install/stratagus::
-	install -m0755 stratagus $(CURDIR)/debian/stratagus/usr/games/
+	install -m0755 $(CURDIR)/build/stratagus $(CURDIR)/debian/stratagus/usr/games/
 	convert $(CURDIR)/contrib/stratagus.ico $(CURDIR)/debian/stratagus/usr/share/pixmaps/stratagus.png
 
 install/stratagus-dbg::
-	install -m0755 stratagus-dbg $(CURDIR)/debian/stratagus-dbg/usr/games/
+	install -m0755 $(CURDIR)/build-dbg/stratagus $(CURDIR)/debian/stratagus-dbg/usr/games/stratagus-dbg
 
 binary-fixup/stratagus::
 	if [ -f /etc/maemo_version ]; then \
