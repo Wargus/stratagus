@@ -26,7 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//      $Id$
 
 //@{
 
@@ -171,7 +170,7 @@ void CleanUpgrades()
 void SaveUpgrades(CFile *file)
 {
 	file->printf("\n-- -----------------------------------------\n");
-	file->printf("-- MODULE: upgrades $Id$\n\n");
+	file->printf("-- MODULE: upgrades\n\n");
 
 	//
 	//  Save the allow

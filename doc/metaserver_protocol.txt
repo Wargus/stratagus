@@ -6,8 +6,6 @@ the metaserver.
 
 Distributed under the GNU General Public License
 
-$Id$
-
 
 ----------------------------------------------------------------------
 LOGIN

@@ -26,7 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//      $Id$
 
 #ifndef __TRANSLATE_H__
 #define __TRANSLATE_H__

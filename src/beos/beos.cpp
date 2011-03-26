@@ -12,7 +12,6 @@
 //
 //      (c) Copyright 2000-2004 by Kenneth Sanislo
 //
-//      $Id$
 
 //@{
 

@@ -26,7 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//      $Id$
 
 //@{
 
@@ -65,7 +64,7 @@ void CMap::Save(CFile *file) const
 	int i;
 
 	file->printf("\n--- -----------------------------------------\n");
-	file->printf("--- MODULE: map $Id$\n");
+	file->printf("--- MODULE: map\n");
 
 	file->printf("LoadTileModels(\"%s\")\n\n", this->TileModelsFileName);
 

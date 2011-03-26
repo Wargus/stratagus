@@ -27,7 +27,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//      $Id$
 
 #ifndef __UNITSOUND_H__
 #define __UNITSOUND_H__

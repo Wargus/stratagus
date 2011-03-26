@@ -26,7 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//      $Id: results.h 7561 2006-09-23 21:23:56Z feber $
 
 #ifndef __RESULTS_H__
 #define __RESULTS_H__
