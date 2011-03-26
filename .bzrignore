@@ -7,3 +7,4 @@ debian/*.substvars
 debian/stratagus
 debian/stratagus-dbg
 debian/stratagus-doc
+doc/doxygen

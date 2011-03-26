@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 #
 #    debian/rules
-#    Copyright (C) 2010  Pali Rohár <pali.rohar@gmail.com>
+#    Copyright (C) 2010-2011  Pali Rohár <pali.rohar@gmail.com>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,13 +29,13 @@ clean::
 build:
 	mkdir -p $(CURDIR)/build $(CURDIR)/build-dbg
 	cd $(CURDIR)/build && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release ..
-	cd $(CURDIR)/build-dbg && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug ..
+	cd $(CURDIR)/build-dbg && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug -DENABLE_DOC=OFF ..
 	$(MAKE) -C $(CURDIR)/build
 	$(MAKE) -C $(CURDIR)/build-dbg
 
 install/stratagus::
 	install -m0755 $(CURDIR)/build/stratagus $(CURDIR)/debian/stratagus/usr/games/
-	convert $(CURDIR)/contrib/stratagus.ico $(CURDIR)/debian/stratagus/usr/share/pixmaps/stratagus.png
+	convert $(CURDIR)/src/win32/stratagus.ico $(CURDIR)/debian/stratagus/usr/share/pixmaps/stratagus.png
 
 install/stratagus-dbg::
 	install -m0755 $(CURDIR)/build-dbg/stratagus $(CURDIR)/debian/stratagus-dbg/usr/games/stratagus-dbg
@@ -61,7 +61,7 @@ binary-predeb/stratagus::
 		echo "XSBC-Bugtracker: https://bugs.launchpad.net/stratagus" >> $(CURDIR)/debian/control; \
 		echo "XB-Maemo-Display-Name: Stratagus" >> $(CURDIR)/debian/control; \
 		echo "XB-Maemo-Icon-26:" >> $(CURDIR)/debian/control; \
-		for line in $(shell convert $(CURDIR)/contrib/stratagus.ico -resize 48x48 png:- | uuencode -m - | tail -n +2 | head -n -1); do \
+		for line in $(shell convert $(CURDIR)/src/win32/stratagus.ico -resize 48x48 png:- | uuencode -m - | tail -n +2 | head -n -1); do \
 			echo " $$line" >> $(CURDIR)/debian/control; \
 		done; \
 		sed -n -e "/^Depends:.*$$/,\$$p" $(CURDIR)/debian/control.orig | tail -n +2 >> $(CURDIR)/debian/control; \
