@@ -31,7 +31,7 @@
 
 ;--------------------------------
 
-!define ICON "contrib/stratagus.ico"
+!define ICON "stratagus.ico"
 !define STRATAGUS "stratagus.exe"
 !define STRATAGUSDBG "stratagus-dbg.exe"
 !define UNINSTALL "uninstall.exe"
