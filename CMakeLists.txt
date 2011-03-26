@@ -294,6 +294,7 @@ find_package(OpenGLES)
 find_package(SDL_gles)
 
 find_package(Sqlite)
+find_package(Doxygen)
 
 include(CheckFunctionExists)
 
@@ -324,6 +325,8 @@ option(WITH_THEORA "Compile Stratagus with Theroa video library" ON)
 option(WITH_X "Compile Stratagus with X Window System clipboard pasting support" ON)
 #option(WITH_OPENGL "Use OpenGL for rendering" ON)
 option(WITH_OPENGLES "Compile Stratagus with OpenGL ES 1.1 rendering support instead OpenGL" OFF)
+
+option(ENABLE_DOC "Generate Stratagus source code documentation with Doxygen" ON)
 
 # Stratagus definitions
 
@@ -476,6 +479,19 @@ target_link_libraries(png2stratagus ${PNG_LIBRARY} ${ZLIB_LIBRARIES})
 
 if(ENABLE_STATIC AND WIN32 AND MINGW)
 	set_target_properties(png2stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc")
+endif()
+
+########### next target ###############
+
+if(DOXYGEN_FOUND AND ENABLE_DOC)
+	add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/index.html
+		COMMAND ${DOXYGEN_EXECUTABLE} ARGS ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen.cfg
+		DEPENDS ${CMAKE_SOURCE_DIR}/doc/doxygen*.cfg stratagus
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		COMMENT "Generating Stratagus souce code documentation with Doxygen" VERBATIM
+	)
+	add_custom_target(doc ALL DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/index.html)
+	set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/)
 endif()
 
 ########### install files ###############
