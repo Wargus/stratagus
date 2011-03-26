@@ -412,7 +412,7 @@ if(APPLE)
 endif()
 
 if(BSD)
-	add_definitions(-DBSD)
+	add_definitions(-DUSE_BSD)
 endif()
 
 if(BEOS)

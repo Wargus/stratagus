@@ -782,14 +782,28 @@ int main(int argc, char **argv)
 #ifdef USE_MNG
 		"MNG "
 #endif
-#ifdef USE_MAEMO
-		"MAEMO "
+#ifdef USE_OPENGL
+		"OPENGL "
 #endif
 #ifdef USE_GLES
 		"GLES "
 #endif
-		""
-	;
+#ifdef USE_WIN32
+		"WIN32 "
+#endif
+#ifdef USE_BSD
+		"BSD "
+#endif
+#ifdef USE_BEOS
+		"BEOS "
+#endif
+#ifdef USE_MAC
+		"MAC "
+#endif
+#ifdef USE_MAEMO
+		"MAEMO "
+#endif
+		"";
 
 #ifdef USE_BEOS
 	//

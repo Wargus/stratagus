@@ -10,7 +10,7 @@
 //
 /**@name myendian.h - The endian-specific headerfile. */
 //
-//      (c) Copyright 2000-2004 by Lutz Sammer
+//      (c) Copyright 2000-2011 by Lutz Sammer and Pali Rohár
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -142,11 +142,11 @@ extern unsigned inline _FetchLE32(unsigned char **pp) {
 ----------------------------------------------------------------------------*/
 
 #if !defined(__CYGWIN__) && !defined(__MINGW32__) && !defined(_MSC_VER)
-#if defined(BSD)
+#if defined(USE_BSD)
 #include <sys/types.h>
 #else
 #include <endian.h>
-#endif // BSD
+#endif // USE_BSD
 
 #if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN
 #include <byteswap.h>
