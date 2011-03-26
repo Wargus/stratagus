@@ -166,14 +166,6 @@ set(stratagusmain_SRCS
 	src/stratagus/util.cpp
 )
 
-set(tolua_SRCS
-	src/tolua/tolua_event.cpp
-	src/tolua/tolua_is.cpp
-	src/tolua/tolua_map.cpp
-	src/tolua/tolua_push.cpp
-	src/tolua/tolua_to.cpp
-)
-
 set(ui_SRCS
 	src/ui/botpanel.cpp
 	src/ui/button_checks.cpp
@@ -221,7 +213,7 @@ set(win32_SRCS
 	src/win32/stratagus.rc
 )
 
-set(tolua_cpp_DEPS
+set(tolua_DEPS
 	src/tolua/ai.pkg
 	src/tolua/editor.pkg
 	src/tolua/font.pkg
@@ -254,7 +246,6 @@ set(stratagus_SRCS
 	${pathfinder_SRCS}
 	${sound_SRCS}
 	${stratagusmain_SRCS}
-	${tolua_SRCS}
 	${ui_SRCS}
 	${unit_SRCS}
 	${video_SRCS}
@@ -338,7 +329,7 @@ option(WITH_OPENGLES "Compile Stratagus with OpenGL ES 1.1 rendering support ins
 
 add_definitions(${PNG_DEFINITIONS} -DUSE_ZLIB)
 include_directories(${LUA_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
-set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES} ${PNG_LIBRARIES} ${SDL_LIBRARY} ${ZLIB_LIBRARIES})
+set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES} ${PNG_LIBRARIES} ${SDL_LIBRARY} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES})
 
 if(WIN32 AND NOT ENABLE_STDIO_REDIRECT)
 	add_definitions(-DNO_STDIO_REDIRECT)
@@ -446,7 +437,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 
 # Compile Stratagus
 
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp COMMAND ${TOLUA++_APP} -L stratagus.lua -o ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp stratagus.pkg DEPENDS ${tolua_cpp_DEPS} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/tolua)
+add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp COMMAND ${TOLUA++_APP} -L stratagus.lua -o ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp stratagus.pkg DEPENDS ${tolua_DEPS} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/tolua)
 add_executable(stratagus WIN32 ${stratagus_SRCS})
 target_link_libraries(stratagus ${stratagus_LIBS})
 
