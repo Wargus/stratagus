@@ -1,6 +1,15 @@
+;       _________ __                 __
+;      /   _____//  |_____________ _/  |______     ____  __ __  ______
+;      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
+;      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
+;     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
+;             \/                  \/          \//_____/            \/
+;  ______________________                           ______________________
+;                        T H E   W A R   B E G I N S
+;         Stratagus - A free fantasy real time strategy game engine
 ;
 ;    stratagus.nsi - Windows NSIS Installer for Stratagus
-;    Copyright (C) 2010  Pali Rohár <pali.rohar@gmail.com>
+;    Copyright (C) 2010-2011  Pali Rohár <pali.rohar@gmail.com>
 ;
 ;    This program is free software: you can redistribute it and/or modify
 ;    it under the terms of the GNU General Public License as published by
@@ -17,35 +26,53 @@
 ;
 ;
 
+;--------------------------------
+
+!ifdef QUIET
+!verbose 2
+!endif
+
+!define redefine "!insertmacro redefine"
+!macro redefine symbol value
+!undef ${symbol}
+!define ${symbol} "${value}"
+!macroend
+
 !include "MUI2.nsh"
 !include "FileFunc.nsh"
 
 ;--------------------------------
 
 !define NAME "Stratagus"
+!define DESCRIPTION "Strategy Gaming Engine"
 !define VERSION "2.2.5.5"
 !define VIVERSION "${VERSION}"
 !define HOMEPAGE "https://launchpad.net/stratagus"
 !define LICENSE "GPL v2"
-!define COPYRIGHT "Copyright (c) 1998-2010 by The Stratagus Project and Pali Rohar"
+!define COPYRIGHT "Copyright (c) 1998-2011 by The Stratagus Project"
 
 ;--------------------------------
 
 !define ICON "stratagus.ico"
-!define STRATAGUS "stratagus.exe"
-!define STRATAGUSDBG "stratagus-dbg.exe"
+!define EXE "stratagus.exe"
 !define UNINSTALL "uninstall.exe"
 !define INSTALLER "${NAME}-${VERSION}.exe"
 !define INSTALLDIR "$PROGRAMFILES\${NAME}\"
 !define LANGUAGE "English"
 
-!ifdef AMD64
-!undef INSTALLER
-!define INSTALLER "${NAME}-${VERSION}-x86_64.exe"
-!undef INSTALLDIR
-!define INSTALLDIR "$PROGRAMFILES64\${NAME}\"
-!undef NAME
-!define NAME "Stratagus (64 bit)"
+!ifdef DBG
+${redefine} INSTALLER "${NAME}-${VERSION}-debug.exe"
+${redefine} EXE "stratagus-dbg.exe"
+!endif
+
+!ifdef x86_64
+!ifdef DBG
+${redefine} INSTALLER "${NAME}-${VERSION}-debug-x86_64.exe"
+!else
+${redefine} INSTALLER "${NAME}-${VERSION}-x86_64.exe"
+!endif
+${redefine} INSTALLDIR "$PROGRAMFILES64\${NAME}\"
+${redefine} NAME "Stratagus (64 bit)"
 !endif
 
 !define REGKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}"
@@ -59,8 +86,8 @@ LangString REMOVECONFIGURATION ${LANG_ENGLISH} "Removing configuration files:"
 LangString DESC_REMOVEEXE ${LANG_ENGLISH} "Remove ${NAME} executable"
 LangString DESC_REMOVECONF ${LANG_ENGLISH} "Remove all other configuration files and directories in ${NAME} install directory created by user or ${NAME}"
 
-!ifdef AMD64
-LangString AMD64ONLY ${LANG_ENGLISH} "This version is for 64 bits computers only."
+!ifdef x86_64
+LangString x86_64_ONLY ${LANG_ENGLISH} "This version is for 64 bits computers only."
 !endif
 
 ;--------------------------------
@@ -95,7 +122,7 @@ OutFile "${INSTALLER}"
 InstallDir "${INSTALLDIR}"
 InstallDirRegKey HKLM "${REGKEY}" "InstallLocation"
 
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${NAME} Installer - Strategy Gaming Engine"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${NAME} Installer - ${DESCRIPTION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${VERSION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "InternalName" "${NAME} Installer"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "${COPYRIGHT}"
@@ -106,7 +133,7 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${NAME} Installer"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VERSION}"
 VIProductVersion "${VIVERSION}"
 
-BrandingText "${NAME} - ${VERSION}  ${HOMEPAGE}"
+BrandingText "${NAME} - ${DESCRIPTION}, version ${VERSION}  ${HOMEPAGE}"
 ShowInstDetails Show
 ShowUnInstDetails Show
 XPStyle on
@@ -123,13 +150,13 @@ Function .onInit
 	MessageBox MB_OK|MB_ICONEXCLAMATION "$(INSTALLER_RUNNING)"
 	Abort
 
-!ifdef AMD64
+!ifdef x86_64
 
 	System::Call "kernel32::GetCurrentProcess() i .s"
 	System::Call "kernel32::IsWow64Process(i s, *i .r0)"
 	IntCmp $0 0 0 0 +3
 
-	MessageBox MB_OK|MB_ICONSTOP "$(AMD64ONLY)"
+	MessageBox MB_OK|MB_ICONSTOP "$(x86_64_ONLY)"
 	Abort
 
 !endif
@@ -177,13 +204,12 @@ Section "${NAME}"
 	SectionIn RO
 
 	SetOutPath $INSTDIR
-	File "${STRATAGUS}"
-	File "${STRATAGUSDBG}"
+	File "${EXE}"
 	WriteRegStr HKLM "${REGKEY}" "DisplayName" "${NAME}"
 	WriteRegStr HKLM "${REGKEY}" "UninstallString" "$\"$INSTDIR\${UNINSTALL}$\""
 	WriteRegStr HKLM "${REGKEY}" "QuietUninstallString" "$\"$INSTDIR\${UNINSTALL}$\" /S"
 	WriteRegStr HKLM "${REGKEY}" "InstallLocation" "$INSTDIR"
-	WriteRegStr HKLM "${REGKEY}" "DisplayIcon" "$\"$INSTDIR\${STRATAGUS}$\",0"
+	WriteRegStr HKLM "${REGKEY}" "DisplayIcon" "$\"$INSTDIR\${EXE}$\",0"
 	WriteRegStr HKLM "${REGKEY}" "DisplayVersion" "${VERSION}"
 	WriteRegStr HKLM "${REGKEY}" "HelpLink" "${HOMEPAGE}"
 	WriteRegStr HKLM "${REGKEY}" "URLUpdateInfo" "${HOMEPAGE}"
@@ -202,8 +228,7 @@ Section "un.${NAME}" Executable
 
 	SectionIn RO
 
-	Delete "$INSTDIR\${STRATAGUS}"
-	Delete "$INSTDIR\${STRATAGUSDBG}"
+	Delete "$INSTDIR\${EXE}"
 	Delete "$INSTDIR\${UNINSTALL}"
 	RMDir "$INSTDIR"
 	DeleteRegKey /ifempty HKLM "${REGKEY}"
@@ -224,8 +249,22 @@ SectionEnd
 
 ;--------------------------------
 
-!packhdr "exehead.tmp" "upx -9 exehead.tmp"
+!ifdef UPX
+
+!ifndef UPX_FLAGS
+!define UPX_FLAGS "-9"
+!else
+${redefine} UPX_FLAGS "${UPX_FLAGS} -9"
+!endif
+
+!ifdef QUIET
+${redefine} UPX_FLAGS "${UPX_FLAGS} -q"
+!endif
+
+!packhdr "exehead.tmp" "${UPX} ${UPX_FLAGS} exehead.tmp"
+
+!endif
+
 ;!finalize "gpg --armor --sign --detach-sig %1"
 
 ;--------------------------------
-

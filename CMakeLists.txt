@@ -1,5 +1,34 @@
+#       _________ __                 __
+#      /   _____//  |_____________ _/  |______     ____  __ __  ______
+#      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
+#      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
+#     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
+#             \/                  \/          \//_____/            \/
+#  ______________________                           ______________________
+#                        T H E   W A R   B E G I N S
+#         Stratagus - A free fantasy real time strategy game engine
+#
+#    CMakeLists.txt
+#    Copyright (C) 2011  Pali Rohár <pali.rohar@gmail.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#
+	
 project(stratagus)
 cmake_minimum_required(VERSION 2.6)
+set(STRATAGUS_VERSION 2.2.5.5)
 
 # Stratagus sources
 
@@ -213,27 +242,6 @@ set(win32_SRCS
 	src/win32/stratagus.rc
 )
 
-set(tolua_DEPS
-	src/tolua/ai.pkg
-	src/tolua/editor.pkg
-	src/tolua/font.pkg
-	src/tolua/game.pkg
-	src/tolua/map.pkg
-	src/tolua/minimap.pkg
-	src/tolua/network.pkg
-	src/tolua/particle.pkg
-	src/tolua/pathfinder.pkg
-	src/tolua/player.pkg
-	src/tolua/sound.pkg
-	src/tolua/stratagus.pkg
-	src/tolua/trigger.pkg
-	src/tolua/ui.pkg
-	src/tolua/unit.pkg
-	src/tolua/unittype.pkg
-	src/tolua/upgrade.pkg
-	src/tolua/video.pkg
-)
-
 set(stratagus_SRCS
 	${action_SRCS}
 	${ai_SRCS}
@@ -295,6 +303,8 @@ find_package(SDL_gles)
 
 find_package(Sqlite)
 find_package(Doxygen)
+find_package(MakeNSIS)
+find_package(SelfPackers)
 
 include(CheckFunctionExists)
 
@@ -312,6 +322,7 @@ endif()
 
 if(WIN32)
 	option(ENABLE_STDIO_REDIRECT "Redirect Stratagus console output to files on Windows" OFF)
+	option(ENABLE_NSIS "Create Stratagus Window NSIS Installer" ON)
 endif()
 
 #option(ENABLE_TOUCHSCREEN "Use touchscreen input" ON)
@@ -323,10 +334,11 @@ option(WITH_OGGVORBIS "Compile Stratagus with OGG/Vorbis sound library" ON)
 option(WITH_THEORA "Compile Stratagus with Theroa video library" ON)
 
 option(WITH_X "Compile Stratagus with X Window System clipboard pasting support" ON)
-#option(WITH_OPENGL "Use OpenGL for rendering" ON)
+#option(WITH_OPENGL "Compile Stratagus with OpenGL rendering support" ON)
 option(WITH_OPENGLES "Compile Stratagus with OpenGL ES 1.1 rendering support instead OpenGL" OFF)
 
 option(ENABLE_DOC "Generate Stratagus source code documentation with Doxygen" ON)
+option(ENABLE_UPX "Compress Stratagus executable binary with UPX packer" OFF)
 
 # Stratagus definitions
 
@@ -440,9 +452,18 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 
 # Compile Stratagus
 
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp COMMAND ${TOLUA++_APP} -L stratagus.lua -o ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp stratagus.pkg DEPENDS ${tolua_DEPS} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/tolua)
+add_custom_command(OUTPUT tolua.cpp
+	COMMAND ${TOLUA++_APP} ARGS -L stratagus.lua -o ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp stratagus.pkg
+	DEPENDS src/tolua/*.pkg
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/tolua
+)
+
 add_executable(stratagus WIN32 ${stratagus_SRCS})
 target_link_libraries(stratagus ${stratagus_LIBS})
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	set_target_properties(stratagus PROPERTIES OUTPUT_NAME stratagus-dbg)
+endif()
 
 if(ENABLE_STATIC AND WIN32 AND MINGW)
 	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc")
@@ -483,17 +504,56 @@ endif()
 
 ########### next target ###############
 
-if(DOXYGEN_FOUND AND ENABLE_DOC)
+if(ENABLE_DOC AND DOXYGEN_FOUND)
 	add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/index.html
 		COMMAND ${DOXYGEN_EXECUTABLE} ARGS ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen.cfg
-		DEPENDS ${CMAKE_SOURCE_DIR}/doc/doxygen*.cfg stratagus
+		DEPENDS doc/doxygen*.cfg ${stratagus_SRCS}
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		COMMENT "Generating Stratagus souce code documentation with Doxygen" VERBATIM
 	)
-	add_custom_target(doc ALL DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/index.html)
+	add_custom_target(doc ALL DEPENDS doc/doxygen/index.html)
 	set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/)
+endif()
+
+########### next target ###############
+
+macro(self_packer PACKER_TARGET)
+	get_target_property(PACKER_NAME ${PACKER_TARGET} OUTPUT_NAME)
+	if(NOT PACKER_NAME)
+		set(PACKER_NAME ${PACKER_TARGET})
+	endif()
+	add_custom_command(TARGET ${PACKER_TARGET} POST_BUILD
+		COMMAND ${SELF_PACKER_FOR_EXECUTABLE}
+		ARGS ${SELF_PACKER_FOR_EXECUTABLE_FLAGS} ${PACKER_NAME}${CMAKE_EXECUTABLE_SUFFIX}
+	)
+endmacro()
+
+if(ENABLE_UPX AND SELF_PACKER_FOR_EXECUTABLE)
+	self_packer(stratagus)
+	self_packer(png2stratagus)
+	if(SQLITE_FOUND)
+		self_packer(metaserver)
+	endif()
+endif()
+
+########### next target ###############
+
+if(WIN32 AND ENABLE_NSIS AND MAKENSIS_FOUND)
+	file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/COPYING DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+	file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/stratagus.ico DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+	add_custom_command(OUTPUT Stratagus-${STRATAGUS_VERSION}${MAKENSIS_SUFFIX}
+		COMMAND ${MAKENSIS} ARGS ${MAKENSIS_FLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/stratagus.nsi
+		DEPENDS src/win32/stratagus.nsi stratagus COPYING
+		COMMENT "Generating Stratagus Windows NSIS Installer" VERBATIM
+	)
+	add_custom_target(nsis ALL DEPENDS Stratagus-${STRATAGUS_VERSION}${MAKENSIS_SUFFIX})
 endif()
 
 ########### install files ###############
 
 install(TARGETS stratagus DESTINATION games)
+install(TARGETS png2stratagus DESTINATION bin)
+
+if(SQLITE_FOUND)
+	install(TARGETS metaserver DESTINATION sbin)
+endif()

@@ -1,4 +1,13 @@
 #!/usr/bin/make -f
+#       _________ __                 __
+#      /   _____//  |_____________ _/  |______     ____  __ __  ______
+#      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
+#      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
+#     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
+#             \/                  \/          \//_____/            \/
+#  ______________________                           ______________________
+#                        T H E   W A R   B E G I N S
+#         Stratagus - A free fantasy real time strategy game engine
 #
 #    debian/rules
 #    Copyright (C) 2010-2011  Pali Rohár <pali.rohar@gmail.com>
@@ -38,7 +47,7 @@ install/stratagus::
 	convert $(CURDIR)/src/win32/stratagus.ico $(CURDIR)/debian/stratagus/usr/share/pixmaps/stratagus.png
 
 install/stratagus-dbg::
-	install -m0755 $(CURDIR)/build-dbg/stratagus $(CURDIR)/debian/stratagus-dbg/usr/games/stratagus-dbg
+	install -m0755 $(CURDIR)/build-dbg/stratagus-dbg $(CURDIR)/debian/stratagus-dbg/usr/games/
 
 binary-fixup/stratagus::
 	if [ -f /etc/maemo_version ]; then \
