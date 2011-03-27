@@ -266,8 +266,14 @@ if(UNIX AND CMAKE_SYSTEM_NAME MATCHES BSD)
 	set(BSD true)
 endif()
 
-if(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux AND EXISTS /etc/maemo_version)
-	set(MAEMO true)
+find_package(PkgConfig QUIET REQUIRED)
+
+# Check if platform is Maemo
+if(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux)
+	pkg_check_modules(MAEMO_VERSION maemo-version)
+	if(MAEMO_VERSION_FOUND)
+		set(MAEMO true)
+	endif()
 endif()
 
 # Find all libraries
@@ -287,7 +293,9 @@ find_package(Tolua++ REQUIRED)
 find_package(ZLIB REQUIRED)
 
 if(MAEMO)
-	find_package(LibOSSO REQUIRED)
+	pkg_check_modules(LIBOSSO REQUIRED libosso)
+else()
+	pkg_check_modules(LIBOSSO libosso)
 endif()
 
 find_package(BZip2)
@@ -343,8 +351,8 @@ option(ENABLE_UPX "Compress Stratagus executable binary with UPX packer" OFF)
 # Stratagus definitions
 
 add_definitions(${PNG_DEFINITIONS} -DUSE_ZLIB)
-include_directories(${LUA_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
-set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES} ${PNG_LIBRARIES} ${SDL_LIBRARY} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES})
+include_directories(${LIBOSSO_INCLUDE_DIRS} ${LUA_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
+set(stratagus_LIBS ${LIBOSSO_LIBRARIES} ${stratagus_LIBS} ${LUA_LIBRARIES} ${PNG_LIBRARIES} ${SDL_LIBRARY} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES})
 
 if(WIN32 AND NOT ENABLE_STDIO_REDIRECT)
 	add_definitions(-DNO_STDIO_REDIRECT)
