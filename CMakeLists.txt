@@ -458,6 +458,97 @@ endif()
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 
+# Print compile info
+
+message("==================================")
+
+macro(log_package PACKAGE_NAME PACKAGE)
+	if(NOT ${PACKAGE}_FOUND)
+		message("${PACKAGE_NAME}: Not Found")
+	elseif(WITH_${PACKAGE} AND ${PACKAGE}_FOUND)
+		message("${PACKAGE_NAME}: Yes")
+	else()
+		message("${PACKAGE_NAME}: Disabled")
+	endif()
+endmacro()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	message("Debug mode: YES")
+else()
+	message("Debug mode: NO")
+endif()
+
+if(ENABLE_STATIC)
+	message("Static linking: Yes")
+else()
+	message("Static linking: No")
+endif()
+
+if(WIN32)
+	message("Platform: Window")
+elseif(APPLE)
+	message("Platform: Mac")
+elseif(BSD)
+	message("Platform: BSD")
+elseif(BEOS)
+	message("Platform: BEOS")
+elseif(MAEMO)
+	message("Platform: Maemo")
+else()
+	message("Platform: Other")
+endif()
+
+if(ENABLE_STDIO_REDIRECT)
+	message("Stdio redirect: Yes")
+else()
+	message("Stdio redirect: No")
+endif()
+
+if(ENABLE_DOC AND DOXYGEN_FOUND)
+	message("Doxygen documentation: Yes")
+else()
+	message("Doxygen documentation: No")
+endif()
+
+if(ENABLE_UPX AND SELF_PACKER_FOR_EXECUTABLE)
+	message("Upx packer: Yes")
+else()
+	message("Upx packer: No")
+endif()
+
+if(ENABLE_NSIS AND MAKENSIS_FOUND)
+	message("NSIS Installer: Yes")
+else()
+	message("NSIS Installer: No")
+endif()
+
+log_package("Bzip2" "BZIP2")
+log_package("MikMod" "MIKMOD")
+log_package("Mng" "MNG")
+log_package("Ogg/Vorbis" "OGGVORBIS")
+log_package("Theora" "THEORA")
+log_package("LibOSSO" "LIBOSSO")
+
+if(NOT X11_FOUND)
+	message("X11 support: Not Found")
+elseif(WITH_X AND X11_FOUND)
+	message("X11 support: Yes")
+else()
+	message("X11 support: Disabled")
+endif()
+
+log_package("OpenGL" "OPENGL")
+
+if(NOT OPENGLES_FOUND OR NOT SDLGLES_FOUND)
+	message("OpenGL ES 1.1: Not Found")
+elseif(WITH_OPENGLES AND OPENGLES_FOUND AND SDLGLES_FOUND)
+	message("OpenGL ES 1.1: YES")
+else()
+	message("OpenGL ES 1.1: Disabled")
+endif()
+
+message("==================================")
+
 # Compile Stratagus
 
 add_custom_command(OUTPUT tolua.cpp
