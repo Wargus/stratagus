@@ -10,8 +10,8 @@
 //
 /**@name video.h - The video headerfile. */
 //
-//      (c) Copyright 1999-2006 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
-//      (c) Copyright 2010      by Pali Rohár
+//      (c) Copyright 1999-2011 by Lutz Sammer, Nehal Mistry, Jimmy Salmon and
+//                                 Pali Rohár
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

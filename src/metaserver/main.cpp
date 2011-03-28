@@ -10,8 +10,7 @@
 //
 /**@name main.cpp - Primary functionality. */
 //
-//      (c) Copyright 2005 by Edward Haase
-//      (c) Copyright 2010 by Pali Rohár
+//      (c) Copyright 2005-2011 by Edward Haase and Pali Rohár
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

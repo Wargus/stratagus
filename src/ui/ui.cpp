@@ -10,9 +10,8 @@
 //
 /**@name ui.cpp - The user interface globals. */
 //
-//      (c) Copyright 1999-2005 by Lutz Sammer, Andreas Arens, and
-//                                 Jimmy Salmon
-//      (c) Copyright 2010      by Pali Rohár
+//      (c) Copyright 1999-2011 by Lutz Sammer, Andreas Arens,
+//                                 Jimmy Salmon and Pali Rohár
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

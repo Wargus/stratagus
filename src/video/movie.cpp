@@ -10,8 +10,7 @@
 //
 /**@name movie.cpp - Movie playback functions. */
 //
-//      (c) Copyright 2005 by Nehal Mistry and Jimmy Salmon
-//      (c) Copyright 2010 by Pali Rohár
+//      (c) Copyright 2005-2011 by Nehal Mistry, Jimmy Salmon and Pali Rohár
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

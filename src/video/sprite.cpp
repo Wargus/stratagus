@@ -10,9 +10,8 @@
 //
 /**@name sprite.cpp - The general sprite functions. */
 //
-//      (c) Copyright 2000-2008 by Lutz Sammer, Stephan Rasenberg,
-//                                 Nehal Mistry, and Jimmy Salmon
-//      (c) Copyright 2010      by Pali Rohár
+//      (c) Copyright 2000-2011 by Lutz Sammer, Stephan Rasenberg,
+//                                 Nehal Mistry, Jimmy Salmon and Pali Rohár
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
