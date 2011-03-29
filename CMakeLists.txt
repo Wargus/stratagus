@@ -473,9 +473,9 @@ macro(log_package PACKAGE_NAME PACKAGE)
 endmacro()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-	message("Debug mode: YES")
+	message("Debug mode: Yes")
 else()
-	message("Debug mode: NO")
+	message("Debug mode: No")
 endif()
 
 if(ENABLE_STATIC)
@@ -571,11 +571,11 @@ endif()
 ########### next target ###############
 
 set(metaserver_SRCS
-	src/metaserver/cmd.cpp
-	src/metaserver/db.cpp
-	src/metaserver/games.cpp
-	src/metaserver/main.cpp
-	src/metaserver/netdriver.cpp
+	metaserver/cmd.cpp
+	metaserver/db.cpp
+	metaserver/games.cpp
+	metaserver/main.cpp
+	metaserver/netdriver.cpp
 	src/network/lowlevel.cpp
 )
 
