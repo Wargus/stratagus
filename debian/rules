@@ -29,9 +29,11 @@
 
 include /usr/share/cdbs/1/rules/debhelper.mk
 
+DEB_INSTALL_DOCS_ALL =
+
 clean::
 	rm -rf $(CURDIR)/build $(CURDIR)/build-dbg
-	if [ -f /etc/maemo_version ]; then \
+	if pkg-config maemo-version; then \
 		[ -f $(CURDIR)/debian/control.orig ] && mv $(CURDIR)/debian/control.orig $(CURDIR)/debian/control; \
 	fi
 
@@ -50,20 +52,31 @@ install/stratagus-dbg::
 	install -m0755 $(CURDIR)/build-dbg/stratagus-dbg $(CURDIR)/debian/stratagus-dbg/usr/games/
 
 binary-fixup/stratagus::
-	if [ -f /etc/maemo_version ]; then \
+	if pkg-config maemo-version; then \
 		mkdir -p $(CURDIR)/debian/stratagus/opt/stratagus/bin; \
-		mkdir -p $(CURDIR)/debian/stratagus/opt/stratagus/share/doc; \
 		mkdir -p $(CURDIR)/debian/stratagus/opt/man/man6; \
 		mv $(CURDIR)/debian/stratagus/usr/games/stratagus $(CURDIR)/debian/stratagus/opt/stratagus/bin/; \
-		mv $(CURDIR)/debian/stratagus/usr/share/doc/stratagus $(CURDIR)/debian/stratagus/opt/stratagus/share/doc/; \
 		mv $(CURDIR)/debian/stratagus/usr/share/man/man6/stratagus.6.gz $(CURDIR)/debian/stratagus/opt/man/man6/; \
 		ln -s /opt/stratagus/bin/stratagus $(CURDIR)/debian/stratagus/usr/games/stratagus; \
-		ln -s /opt/stratagus/share/doc/stratagus/ $(CURDIR)/debian/stratagus/usr/share/doc/stratagus; \
 		ln -s /opt/man/man6/stratagus.6.gz $(CURDIR)/debian/stratagus/usr/share/man/man6/stratagus.6.gz; \
 	fi
 
+binary-fixup/stratagus-dbg::
+	if pkg-config maemo-version; then \
+		mkdir -p $(CURDIR)/debian/stratagus-dbg/opt/stratagus/bin; \
+		mv $(CURDIR)/debian/stratagus-dbg/usr/games/stratagus-dbg $(CURDIR)/debian/stratagus-dbg/opt/stratagus/bin/; \
+		ln -s /opt/stratagus/bin/stratagus-dbg $(CURDIR)/debian/stratagus-dbg/usr/games/stratagus-dbg; \
+	fi
+
+binary-fixup/stratagus-doc::
+	if pkg-config maemo-version; then \
+		mkdir -p $(CURDIR)/debian/stratagus-doc/opt/stratagus; \
+		mv $(CURDIR)/debian/stratagus-doc/usr/share/doc/stratagus-doc $(CURDIR)/debian/stratagus-doc/opt/stratagus/doc; \
+		ln -s $(CURDIR)/debian/stratagus-doc/opt/stratagus/doc $(CURDIR)/debian/stratagus-doc/usr/share/doc/stratagus-doc; \
+	fi
+
 binary-predeb/stratagus::
-	if [ -f /etc/maemo_version ]; then \
+	if pkg-config maemo-version; then \
 		cp $(CURDIR)/debian/control $(CURDIR)/debian/control.orig; \
 		sed -n -e "1,/^Depends:.*$$/p" $(CURDIR)/debian/control.orig > $(CURDIR)/debian/control; \
 		sed "/^Package: stratagus$$/a\Section: user\/games" -i $(CURDIR)/debian/control; \
