@@ -59,6 +59,7 @@ set(action_SRCS
 	src/action/action_upgradeto.cpp
 	src/action/command.cpp
 )
+source_group(action FILES ${action_SRCS})
 
 set(ai_SRCS
 	src/ai/ai_building.cpp
@@ -69,10 +70,12 @@ set(ai_SRCS
 	src/ai/ai_resource.cpp
 	src/ai/script_ai.cpp
 )
+source_group(ai FILES ${ai_SRCS})
 
 set(beos_SRCS
 	src/beos/beos.cpp
 )
+source_group(beos FILES ${beos_SRCS})
 
 set(editor_SRCS
 	src/editor/editloop.cpp
@@ -80,6 +83,7 @@ set(editor_SRCS
 	src/editor/edmap.cpp
 	src/editor/script_editor.cpp
 )
+source_group(editor FILES ${editor_SRCS})
 
 set(game_SRCS
 	src/game/game.cpp
@@ -88,6 +92,7 @@ set(game_SRCS
 	src/game/savegame.cpp
 	src/game/trigger.cpp
 )
+source_group(game FILES ${game_SRCS})
 
 set(guichan_SRCS
 	src/guichan/cliprectangle.cpp
@@ -127,6 +132,7 @@ set(guichan_SRCS
 	src/guichan/widgets/textfield.cpp
 	src/guichan/widgets/window.cpp
 )
+source_group(guichan FILES ${guichan_SRCS})
 
 set(map_SRCS
 	src/map/map.cpp
@@ -140,6 +146,7 @@ set(map_SRCS
 	src/map/script_tileset.cpp
 	src/map/tileset.cpp
 )
+source_group(map FILES ${map_SRCS})
 
 set(network_SRCS
 	src/network/commands.cpp
@@ -148,6 +155,7 @@ set(network_SRCS
 	src/network/netconnect.cpp
 	src/network/network.cpp
 )
+source_group(network FILES ${network_SRCS})
 
 set(particle_SRCS
 	src/particle/graphicanimation.cpp
@@ -156,12 +164,14 @@ set(particle_SRCS
 	src/particle/smokeparticle.cpp
 	src/particle/staticparticle.cpp
 )
+source_group(particle FILES ${particle_SRCS})
 
 set(pathfinder_SRCS
 	src/pathfinder/astar.cpp
 	src/pathfinder/pathfinder.cpp
 	src/pathfinder/script_pathfinder.cpp
 )
+source_group(pathfinder FILES ${pathfinder_SRCS})
 
 set(sound_SRCS
 	src/sound/mikmod.cpp
@@ -174,6 +184,7 @@ set(sound_SRCS
 	src/sound/unitsound.cpp
 	src/sound/wav.cpp
 )
+source_group(sound FILES ${sound_SRCS})
 
 set(stratagusmain_SRCS
 	src/stratagus/construct.cpp
@@ -194,6 +205,7 @@ set(stratagusmain_SRCS
 	src/stratagus/translate.cpp
 	src/stratagus/util.cpp
 )
+source_group(stratagusmain FILES ${stratagus_SRCS})
 
 set(ui_SRCS
 	src/ui/botpanel.cpp
@@ -208,6 +220,7 @@ set(ui_SRCS
 	src/ui/ui.cpp
 	src/ui/widgets.cpp
 )
+source_group(ui FILES ${ui_SRCS})
 
 set(unit_SRCS
 	src/unit/build.cpp
@@ -223,6 +236,7 @@ set(unit_SRCS
 	src/unit/unittype.cpp
 	src/unit/upgrade.cpp
 )
+source_group(unit FILES ${unit_SRCS})
 
 set(video_SRCS
 	src/video/cursor.cpp
@@ -236,11 +250,13 @@ set(video_SRCS
 	src/video/sprite.cpp
 	src/video/video.cpp
 )
+source_group(video FILES ${video_SRCS})
 
 set(win32_SRCS
 	src/win32/attachconsole.cpp
 	src/win32/stratagus.rc
 )
+source_group(win32 FILES ${win32_SRCS})
 
 set(stratagus_SRCS
 	${action_SRCS}
@@ -259,6 +275,112 @@ set(stratagus_SRCS
 	${video_SRCS}
 	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
 )
+
+set(stratagus_HDRS
+	src/ai/ai_local.h
+	src/video/intern_video.h
+	src/video/renderer.h
+	src/include/actions.h
+	src/include/ai.h
+	src/include/animation.h
+	src/include/commands.h
+	src/include/construct.h
+	src/include/cursor.h
+	src/include/depend.h
+	src/include/editor.h
+	src/include/font.h
+	src/include/icons.h
+	src/include/interface.h
+	src/include/iocompat.h
+	src/include/iolib.h
+	src/include/luacallback.h
+	src/include/map.h
+	src/include/master.h
+	src/include/menus.h
+	src/include/minimap.h
+	src/include/missile.h
+	src/include/movie.h
+	src/include/myendian.h
+	src/include/netconnect.h
+	src/include/net_lowlevel.h
+	src/include/network.h
+	src/include/particle.h
+	src/include/pathfinder.h
+	src/include/player.h
+	src/include/replay.h
+	src/include/results.h
+	src/include/script.h
+	src/include/script_sound.h
+	src/include/settings.h
+	src/include/sound.h
+	src/include/sound_server.h
+	src/include/spells.h
+	src/include/stratagus.h
+	src/include/tile.h
+	src/include/tileset.h
+	src/include/title.h
+	src/include/translate.h
+	src/include/trigger.h
+	src/include/ui.h
+	src/include/unit_cache.h
+	src/include/unit.h
+	src/include/unit_manager.h
+	src/include/unitsound.h
+	src/include/unittype.h
+	src/include/upgrade.h
+	src/include/upgrade_structs.h
+	src/include/util.h
+	src/include/vec2i.h
+	src/include/version.h
+	src/include/video.h
+	src/include/wav.h
+	src/include/widgets.h
+	src/guichan/include/guichan/actionlistener.h
+	src/guichan/include/guichan/allegro.h
+	src/guichan/include/guichan/basiccontainer.h
+	src/guichan/include/guichan/cliprectangle.h
+	src/guichan/include/guichan/color.h
+	src/guichan/include/guichan/defaultfont.h
+	src/guichan/include/guichan/exception.h
+	src/guichan/include/guichan/focushandler.h
+	src/guichan/include/guichan/font.h
+	src/guichan/include/guichan/graphics.h
+	src/guichan/include/guichan/gsdl.h
+	src/guichan/include/guichan/gui.h
+	src/guichan/include/guichan.h
+	src/guichan/include/guichan/imagefont.h
+	src/guichan/include/guichan/image.h
+	src/guichan/include/guichan/imageloader.h
+	src/guichan/include/guichan/input.h
+	src/guichan/include/guichan/key.h
+	src/guichan/include/guichan/keyinput.h
+	src/guichan/include/guichan/keylistener.h
+	src/guichan/include/guichan/listmodel.h
+	src/guichan/include/guichan/mouseinput.h
+	src/guichan/include/guichan/mouselistener.h
+	src/guichan/include/guichan/platform.h
+	src/guichan/include/guichan/rectangle.h
+	src/guichan/include/guichan/sdl/sdlgraphics.h
+	src/guichan/include/guichan/sdl/sdlimageloader.h
+	src/guichan/include/guichan/sdl/sdlinput.h
+	src/guichan/include/guichan/sdl/sdlpixel.h
+	src/guichan/include/guichan/widget.h
+	src/guichan/include/guichan/widgets/button.h
+	src/guichan/include/guichan/widgets/container.h
+	src/guichan/include/guichan/widgets/dropdown.h
+	src/guichan/include/guichan/widgets/checkbox.h
+	src/guichan/include/guichan/widgets/icon.h
+	src/guichan/include/guichan/widgets/label.h
+	src/guichan/include/guichan/widgets/listbox.h
+	src/guichan/include/guichan/widgets/radiobutton.h
+	src/guichan/include/guichan/widgets/scrollarea.h
+	src/guichan/include/guichan/widgets/slider.h
+	src/guichan/include/guichan/widgets/textbox.h
+	src/guichan/include/guichan/widgets/textfield.h
+	src/guichan/include/guichan/widgets/window.h
+	src/guichan/include/guichan/x.h
+)
+source_group(include FILES ${stratagus_HDRS})
 
 # Additional platform checks
 
@@ -557,7 +679,7 @@ add_custom_command(OUTPUT tolua.cpp
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/tolua
 )
 
-add_executable(stratagus WIN32 ${stratagus_SRCS})
+add_executable(stratagus WIN32 ${stratagus_SRCS} ${stratagus_HDRS})
 target_link_libraries(stratagus ${stratagus_LIBS})
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -579,8 +701,17 @@ set(metaserver_SRCS
 	src/network/lowlevel.cpp
 )
 
+set(metaserver_HDRS
+	metaserver/cmd.h
+	metaserver/db.h
+	metaserver/games.h
+	metaserver/netdriver.h
+)
+
+source_group(metaserver FILES ${metaserver_SRCS} ${metaserver_HDRS})
+
 if(SQLITE_FOUND)
-	add_executable(metaserver ${metaserver_SRCS})
+	add_executable(metaserver ${metaserver_SRCS} ${metaserver_HDRS})
 	target_link_libraries(metaserver ${SDL_LIBRARY} ${SQLITE_LIBRARIES})
 
 	if(ENABLE_STATIC AND WIN32 AND MINGW)
@@ -593,6 +724,7 @@ endif()
 set(png2stratagus_SRCS
 	tools/png2stratagus.cpp
 )
+source_group(png2stratagus FILES ${png2stratagus_SRCS})
 
 add_executable(png2stratagus ${png2stratagus_SRCS})
 target_link_libraries(png2stratagus ${PNG_LIBRARY} ${ZLIB_LIBRARIES})
