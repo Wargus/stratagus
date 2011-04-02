@@ -22,7 +22,8 @@ else()
 		message(STATUS "Found MakeNSIS: ${MAKENSIS}")
 	else()
 		set(MAKENSIS_FOUND false)
-		message(FATAL_ERROR "Could not find program MakeNSIS")
+#		message(FATAL_ERROR "Could not find program MakeNSIS") # TODO: This fail if REQUIRED is not used too!
+		message(STATUS "Could not find program MakeNSIS")
 	endif()
 
 	if(NOT CMAKE_VERBOSE_MAKEFILE)

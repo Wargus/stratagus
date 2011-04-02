@@ -420,6 +420,10 @@ else()
 	pkg_check_modules(LIBOSSO libosso)
 endif()
 
+if(WIN32)
+	find_package(MakeNSIS)
+endif()
+
 find_package(BZip2)
 find_package(Mikmod)
 find_package(MNG)
@@ -433,10 +437,11 @@ find_package(SDL_gles)
 
 find_package(Sqlite)
 find_package(Doxygen)
-find_package(MakeNSIS)
 find_package(SelfPackers)
 
 include(CheckFunctionExists)
+
+# Windows RC compiler definitions
 
 if(WIN32)
 	enable_language(RC)
