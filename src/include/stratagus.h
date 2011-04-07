@@ -52,6 +52,8 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOUSER
 
+#define NOMINMAX // do not use min, max as macro
+
 #define inline __inline
 #define alloca _alloca
 
