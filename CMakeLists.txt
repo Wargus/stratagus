@@ -554,6 +554,11 @@ if(WIN32)
 	set(stratagus_LIBS ${stratagus_LIBS} dsound dxguid winmm ws2_32)
 endif()
 
+if (MSVC)
+	# Avoid some warnings
+	add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE=1)
+endif()
+
 if(APPLE)
 	add_definitions(-DUSE_MAC)
 endif()
