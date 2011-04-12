@@ -864,10 +864,9 @@ void NetworkGamePrepareGameSettings()
 				GameSettings.Presets[num[i]].Type = PlayerPerson;
 				v = ServerSetupState.Race[num[i]];
 				if (v != 0) {
-					int n;
-					int x;
+					int x = 0;
 
-					for (n = 0, x = 0; n < PlayerRaces.Count; ++n) {
+					for (unsigned int n = 0; n < PlayerRaces.Count; ++n) {
 						if (PlayerRaces.Visible[n]) {
 							if (x + 1 == v) {
 								break;
@@ -1240,7 +1239,7 @@ static void ClientParseConnecting(const CInitMessage *msg)
 **
 ** @return  true if the map name looks safe.
 */
-static bool IsSafeMapName(const char *mapname) 
+static bool IsSafeMapName(const char *mapname)
 {
 	char buf[256];
 	const char *ch;
@@ -1254,7 +1253,7 @@ static bool IsSafeMapName(const char *mapname)
 	if (strstr(buf, "//")) {
 		return false;
 	}
-	if (buf[0] == '\0') {	
+	if (buf[0] == '\0') {
 		return false;
 	}
 	ch = buf;
