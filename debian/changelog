@@ -1,30 +1,87 @@
 stratagus (2.2.5.5-1) unstable; urgency=low
 
-  * New upstream release
+  * Fixed crashing in OpenGL mode (from Pali Rohar)
+  * Fixed crashing when unknown button input was pressed (from Pali Rohar)
+  * Fixed bug #645194 - oil tanker disappears when it builds a oil platform (from Pali Rohar)
+  * Fixed problem with building oil platform (from Pali Rohar)
+  * Do not drop goods after unit stop working (from Pali Rohar)
+  * Fixed bug #622210 - Fixed memmory corruption in multiplayer network mode (from Pali Rohar)
+  * Added support for more game sound parts (from cybermind)
+  * Fixed bug #621815 - Fixed input problem with stylus on Nokia N900 (from Pali Rohar)
+  * Revert back mng support (from Pali Rohar)
+  * Updated manpages (from Pali Rohar)
+  * Added tag Editor to TitleScreen in LUA (from Pali Rohar)
+  * Fixed Debian scripts on Maemo (from Pali Rohar)
+  * Fixed bug #621820 - Fixed draining battery poer on Nokia N900 (from Pali Rohar)
+  * Fixed bug #650987 - Decrease scrolling speed on Maemo (from Pali Rohar)
+  * Include debug version of stratagus to debian package and Windows NSIS Installer (from Pali Rohar)
 
  -- Pali Rohár <pali.rohar@gmail.com>  Mon, 22 Nov 2010 22:50:21 +0100
 
 stratagus (2.2.5.4-1) unstable; urgency=low
 
-  * New upstream release
+  * Fixed bug #616486 - Fixed function CursorByIdent in src/video/cursor.cpp (from Pali Rohar)
+  * Added Lua function SetMenuRace which set race of cursor in main menu (from Pali Rohar)
+  * Fixed deleting OpenGL textures (from boswars upstream)
+  * Fixed bug #633863 - Do not show waypoints for enemy units (when SHIFT key is down) (from Pali Rohar)
+  * Fixed autoconf/automake scripts (form Pali Rohar)
+  * Fixed a lot of gcc warnings while also extending the warnings flags (from Martin Gerhardy)
 
  -- Pali Rohár <pali.rohar@gmail.com>  Mon, 20 Sep 2010 15:24:31 +0200
 
 stratagus (2.2.5.3-1) unstable; urgency=low
 
-  * New upstream release
+  * Fixed Debian control files for Maemo (from Pali Rohar)
+  * Added LUA function IsMusicPlaying - check if music is playing (from Pali Rohar)
+  * Added LUA function SetFogOfWarColor - Configurable Fog of War color (from sourceforge tracker)
+  * Added command line params -I for setting the address when binding the sockets (from sourceforge tracker)
+  * Compile fix using VC2008 (from sourceforge tracker)
+  * Added function GetStratagusVersion to LUA scripts (from Pali Rohar)
+  * Added function GetStratagusHomepage to LUA scripts (from Pali Rohar)
+  * Added support for playing music in menu (from Pali Rohar)
+  * Fixed Windows NSIS Installer (use relative jumps, do not allow start instaler twice, register games, ...) (from Pali Rohar)
 
  -- Pali Rohár <pali.rohar@gmail.com>  Wed, 11 Aug 2010 11:00:43 +0200
 
-stratagus (2.2.5.2) unstable; urgency=low
+stratagus (2.2.5.2-1) unstable; urgency=low
 
-  * New upstream release
+  * Fixed Debian scripts for Maemo (from Pali Rohar)
+  * Fixed OpenGL textures (from upstream svn boswars)
+  * Rewrited Windows NSIS Installer again (from Pali Rohar)
+  * Ported OpenGL engine to OpenGL ES 1.1 for Maemo systems (from Pali Rohar)
+  * Fixed saving campaign game - multiline lua strings and lua triggers (from Pali Rohar)
+  * Fixed compilation in Debug mode (from Pali Rohar and sourceforge tracker)
+  * Added LUA function SetUseOpenGL for setting OpenGL state from scripts at startup (insted changing variable UseOpenGL) (from Pali Rohar)
+  * Added command line params -O and -o for force using OpenGL (from Pali Rohar)
+  * Added LUA function SetFullGameName - use name for WM icon and title (from Pali Rohar)
+  * Keep backlight alive on Maemo using libosso (from Pali Rohar)
+  * Added support for playing movies when OpenGL mode is active (from Pali Rohar)
 
  -- Pali Rohár <pali.rohar@gmail.com>  Tue, 27 Jul 2010 10:51:27 +0200
 
+stratagus (2.2.5.1-1) unstable; urgency=low
+
+  * Fixed playing movies (from Pali Rohar)
+  * Fixed minimap (from upstream svn boswars)
+  * Added support patches for Maemo (from Bundyo N8x0 stratagus code)
+  * Fixed Debian scripts/configs (from Pali Rohar)
+  * Added support for cross compile (from Pali Rohar)
+  * Use WINAPI_AttachConsole for stdout/stderr output messages to windows cmd console instead temp. files (from Pali Rohar)
+  * Fixed compilation and automake/autoconf scripts (from Pali Rohar)
+  * Added support for 64bit Windows version (from Pali Rohar)
+  * Rewrited new Windows NSIS Installer (from Pali Rohar)
+  * Added info for Hildon Application Manager for Maemo (from Pali Rohar)
+  * Added support for more graphics resolutions (from Pali Rohar)
+  * Added function PlayMovie to LUA scripts - play movies from game (from Pali Rohar)
+  * Clean SDL video output before strating movie file (from Pali Rohar)
+  * Ported stratagus to Maemo systems - Nokia N900 (from Pali Rohar)
+
+ -- Pali Rohár <pali.rohar@gmail.com>  Wed, 23 Jun 2010 15:25 +0200
+
 stratagus (2.2.5-1) unstable; urgency=low
 
-  * New upstream release
+  * Fixed attack range off by 1 bug (from Jimmy Salmon)
+  * Fixed bug releasing the same resource twice (from Jimmy Salmon)
 
  -- M. Gerhardy <tlh2000@users.sf.net>  Sat, 23 May 2009 10:51:08 +0200
 

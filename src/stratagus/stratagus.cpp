@@ -10,9 +10,8 @@
 //
 /**@name stratagus.cpp - The main file. */
 //
-//      (c) Copyright 1998-2008 by Lutz Sammer, Francois Beerten, and
-//                                 Jimmy Salmon
-//      (c) Copyright 2010      by Pali Rohár
+//      (c) Copyright 1998-2011 by Lutz Sammer, Francois Beerten,
+//                                 Jimmy Salmon and Pali Rohár
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,7 +27,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//      $Id$
 
 //@{
 
@@ -38,8 +36,7 @@
 ** @section Introduction Introduction
 **
 ** Welcome to the source code documentation of the Stratagus engine.
-** Extract the source documentation with doxygen (http://www.doxygen.org)
-** or doc++ (http://www.zib.de/Visual/software/doc++/index.html) tools.
+** Extract the source documentation with doxygen (http://www.doxygen.org) tool.
 **
 ** Any help to improve this documention is welcome. If you didn't
 ** understand something or you found an error or a wrong spelling
@@ -48,7 +45,7 @@
 ** @section Informations Informations
 **
 ** Visit the https://launchpad.net/stratagus web page for the latest news and
-** ../doc/readme.html for other documentations.
+** <A HREF="../index.html">Stratagus Info</A> for other documentations.
 **
 ** @section Modules Modules
 **
@@ -784,14 +781,28 @@ int main(int argc, char **argv)
 #ifdef USE_MNG
 		"MNG "
 #endif
-#ifdef USE_MAEMO
-		"MAEMO "
+#ifdef USE_OPENGL
+		"OPENGL "
 #endif
 #ifdef USE_GLES
 		"GLES "
 #endif
-		""
-	;
+#ifdef USE_WIN32
+		"WIN32 "
+#endif
+#ifdef USE_BSD
+		"BSD "
+#endif
+#ifdef USE_BEOS
+		"BEOS "
+#endif
+#ifdef USE_MAC
+		"MAC "
+#endif
+#ifdef USE_MAEMO
+		"MAEMO "
+#endif
+		"";
 
 #ifdef USE_BEOS
 	//

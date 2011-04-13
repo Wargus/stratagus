@@ -26,7 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//      $Id$
 
 //@{
 
@@ -341,7 +340,7 @@ void SaveUnitTypes(CFile *file)
 	int j;
 
 	file->printf("\n--- -----------------------------------------\n");
-	file->printf("--- MODULE: unittypes $Id$\n\n");
+	file->printf("--- MODULE: unittypes\n\n");
 
 	// Save all stats
 	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {

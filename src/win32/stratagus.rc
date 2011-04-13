@@ -1,0 +1,38 @@
+#include "../include/version.h"
+
+#define ICO "stratagus.ico"
+#define EXE "stratagus.exe"
+
+1 ICON ICO
+1 VERSIONINFO
+FILEVERSION	StratagusMajorVersion,StratagusMinorVersion,StratagusPatchLevel,StratagusPatchLevel2
+PRODUCTVERSION	StratagusMajorVersion,StratagusMinorVersion,StratagusPatchLevel,StratagusPatchLevel2
+FILEOS		4
+FILETYPE	1
+
+#ifdef DEBUG
+FILEFLAGS	0
+#endif
+
+BEGIN
+	BLOCK "StringFileInfo"
+	BEGIN
+		BLOCK "040904E4"
+		BEGIN
+			VALUE "FileDescription",	DESCRIPTION
+			VALUE "FileVersion",		VERSION
+			VALUE "InternalName",		NAME
+			VALUE "LegalCopyright",		COPYRIGHT
+			VALUE "License",		LICENSE
+			VALUE "Homepage",		HOMEPAGE
+			VALUE "OriginalFilename",	EXE
+			VALUE "ProductName",		NAME
+			VALUE "ProductVersion",		VERSION
+		END
+	END
+
+	BLOCK "VarFileInfo"
+	BEGIN
+		VALUE "Translation", 0x409, 1252
+	END
+END

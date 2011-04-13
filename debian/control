@@ -2,12 +2,12 @@ Source: stratagus
 Section: games
 Priority: optional
 Maintainer: Pali Rohár <pali.rohar@gmail.com>
-Build-Depends: debhelper (>> 5), cdbs, automake, pkg-config,
- imagemagick, sharutils, liblua5.1-dev | liblua5.1-0-dev,
+Build-Depends: debhelper (>> 5), cdbs, cmake (>= 2.6), doxygen,
+ imagemagick, sharutils, liblua5.1-dev | liblua5.1-0-dev, libtolua++5.1-dev,
  zlib1g-dev, libbz2-dev, libpng12-dev (>= 1.2.5), libmng-dev,
- libsdl1.2-dev (>> 1.2.2), libpthread-stubs0-dev, libosso-dev,
- libgl-dev | libgles1-sgx-img-dev, libgl-dev | libsdl-gles1.2-dev,
- libmikmod2-dev, libogg-dev, libvorbis-dev, libtheora-dev
+ libmikmod2-dev, libogg-dev, libvorbis-dev, libtheora-dev,
+ libsdl1.2-dev (>> 1.2.2), libosso-dev, libx11-dev, libsqlite3-dev,
+ libgl-dev | libgles1-sgx-img-dev, libgl-dev | libsdl-gles1.2-dev
 Standards-Version: 3.8.4
 Homepage: https://launchpad.net/stratagus
 Vcs-Browser: https://code.launchpad.net/stratagus

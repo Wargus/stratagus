@@ -39,4 +39,4 @@
 #define LICENSE "GPL v2"
 
 /// Copyright
-#define COPYRIGHT "Copyright (c) 1998-2010 by The Stratagus Project and Pali Rohar"
+#define COPYRIGHT "Copyright (c) 1998-2011 by The Stratagus Project and Pali Rohar"

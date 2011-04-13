@@ -26,16 +26,11 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//      $Id$
 
 #ifndef __STRATAGUS_H__
 #define __STRATAGUS_H__
 
 //@{
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
 
 /*============================================================================
 ==  Config definitions
@@ -52,6 +47,8 @@
 
 #define WIN32_LEAN_AND_MEAN
 #define NOUSER
+
+#define NOMINMAX // do not use min, max as macro
 
 #define inline __inline
 #define alloca _alloca

@@ -10,9 +10,8 @@
 //
 /**@name linedraw.cpp - The general linedraw functions. */
 //
-//      (c) Copyright 2000-2006 by Lutz Sammer, Stephan Rasenberg,
-//                                 Jimmy Salmon, and Nehal Mistry
-//      (c) Copyright 2010      by Pali Rohár
+//      (c) Copyright 2000-2011 by Lutz Sammer, Stephan Rasenberg,
+//                                 Jimmy Salmon, Nehal Mistry and Pali Rohár
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,7 +27,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//      $Id$
 
 //@{
 
