@@ -416,8 +416,6 @@ find_package(ZLIB REQUIRED)
 
 if(MAEMO)
 	pkg_check_modules(LIBOSSO REQUIRED libosso)
-else()
-	pkg_check_modules(LIBOSSO libosso)
 endif()
 
 if(WIN32)
@@ -486,8 +484,8 @@ endif()
 # Stratagus definitions
 
 add_definitions(${PNG_DEFINITIONS} -DUSE_ZLIB)
-include_directories(${LIBOSSO_INCLUDE_DIRS} ${LUA_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
-set(stratagus_LIBS ${LIBOSSO_LIBRARIES} ${stratagus_LIBS} ${LUA_LIBRARIES} ${PNG_LIBRARIES} ${SDL_LIBRARY} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES})
+include_directories(${LUA_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
+set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES} ${PNG_LIBRARIES} ${SDL_LIBRARY} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES})
 
 if(WIN32 AND NOT ENABLE_STDIO_REDIRECT)
 	add_definitions(-DNO_STDIO_REDIRECT)
@@ -575,7 +573,9 @@ if(BEOS)
 endif()
 
 if(MAEMO)
-	add_definitions(-DUSE_MAEMO)
+	add_definitions(-DUSE_MAEMO ${LIBOSSO_CFLAGS})
+	include_directories(${LIBOSSO_INCLUDE_DIRS})
+	set(stratagus_LIBS ${LIBOSSO_LIBRARIES})
 endif()
 
 check_function_exists("strcasestr" HAVE_STRCASESTR)
@@ -663,7 +663,6 @@ log_package("MikMod" "MIKMOD")
 log_package("Mng" "MNG")
 log_package("Ogg/Vorbis" "OGGVORBIS")
 log_package("Theora" "THEORA")
-log_package("LibOSSO" "LIBOSSO")
 log_package("X11" "X11")
 
 if(WITH_RENDERER STREQUAL "OpenGL" AND OPENGL_FOUND)
