@@ -61,18 +61,26 @@
 !define LANGUAGE "English"
 
 !ifdef DBG
-${redefine} INSTALLER "${NAME}-${VERSION}-debug.exe"
+
 ${redefine} EXE "stratagus-dbg.exe"
+!ifdef x86_64
+${redefine} INSTALLER "${NAME}-${VERSION}-debug-x86_64.exe"
+${redefine} INSTALLDIR "$PROGRAMFILES64\${NAME}-dbg\"
+${redefine} NAME "Stratagus (debug 64 bit)"
+!else
+${redefine} INSTALLER "${NAME}-${VERSION}-debug.exe"
+${redefine} INSTALLDIR "$PROGRAMFILES\${NAME}-dbg\"
+${redefine} NAME "Stratagus (debug)"
 !endif
 
-!ifdef x86_64
-!ifdef DBG
-${redefine} INSTALLER "${NAME}-${VERSION}-debug-x86_64.exe"
 !else
+
+!ifdef x86_64
 ${redefine} INSTALLER "${NAME}-${VERSION}-x86_64.exe"
-!endif
 ${redefine} INSTALLDIR "$PROGRAMFILES64\${NAME}\"
 ${redefine} NAME "Stratagus (64 bit)"
+!endif
+
 !endif
 
 !define REGKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}"
