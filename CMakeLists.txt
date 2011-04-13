@@ -469,11 +469,19 @@ option(WITH_OGGVORBIS "Compile Stratagus with OGG/Vorbis sound library" ON)
 option(WITH_THEORA "Compile Stratagus with Theroa video library" ON)
 
 option(WITH_X11 "Compile Stratagus with X11 clipboard pasting support" ON)
-#option(WITH_OPENGL "Compile Stratagus with OpenGL rendering support" ON)
-option(WITH_OPENGLES "Compile Stratagus with OpenGL ES 1.1 rendering support instead OpenGL" OFF)
 
 option(ENABLE_DOC "Generate Stratagus source code documentation with Doxygen" ON)
 option(ENABLE_UPX "Compress Stratagus executable binary with UPX packer" OFF)
+
+if(NOT WITH_RENDERER)
+	if(OPENGL_FOUND)
+		set(WITH_RENDERER "OpenGL")
+	elseif(OPENGLES_FOUND AND SDLGLES_FOUND)
+		set(WITH_RENDERER "OpenGLES")
+	else()
+		set(WITH_RENDERER "NativeSDL")
+	endif()
+endif()
 
 # Stratagus definitions
 
@@ -483,11 +491,6 @@ set(stratagus_LIBS ${LIBOSSO_LIBRARIES} ${stratagus_LIBS} ${LUA_LIBRARIES} ${PNG
 
 if(WIN32 AND NOT ENABLE_STDIO_REDIRECT)
 	add_definitions(-DNO_STDIO_REDIRECT)
-endif()
-
-# OpenGL ES 1.1 Maemo hack
-if(MAEMO)
-	set(WITH_OPENGLES ON)
 endif()
 
 # TODO: Add support for touchscreen input (not only for MAEMO)
@@ -531,19 +534,18 @@ if(WITH_X11 AND X11_FOUND)
 	set(stratagus_LIBS ${stratagus_LIBS} ${X11_X11_LIB})
 endif()
 
-# TODO: Add OpenGL support optional
-#if(WITH_OPENGL AND OPENGL_FOUND)
-if(NOT WITH_OPENGLES)
-#	add_definitions(-DUSE_OPENGL)
+if(WITH_RENDERER STREQUAL "OpenGL" AND OPENGL_FOUND)
+	add_definitions(-DUSE_OPENGL)
 	include_directories(${OPENGL_INCLUDE_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${OPENGL_LIBRARIES})
-endif()
-
-# TODO: Add OpenGL ES 1.1 support together with OpengL
-if(WITH_OPENGLES AND OPENGLES_FOUND AND SDLGLES_FOUND)
+elseif(WITH_RENDERER STREQUAL "OpenGLES" AND OPENGLES_FOUND AND SDLGLES_FOUND)
 	add_definitions(-DUSE_GLES)
 	include_directories(${OPENGLES_INCLUDE_DIR} ${SDLGLES_INCLUDE_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${OPENGLES_LIBRARIES} ${SDLGLES_LIBRARY})
+elseif(WITH_RENDERER STREQUAL "NativeSDL")
+	message(FATAL_ERROR "Compile Stratagus without OpenGL or OpenGL ES 1.1 rendering is not supported yet")
+else()
+	message(FATAL_ERROR "Specified rendering support was not found in system. Choose: NativeSDL OpenGL OpenGLES")
 endif()
 
 # Platform definitions
@@ -663,14 +665,13 @@ log_package("Ogg/Vorbis" "OGGVORBIS")
 log_package("Theora" "THEORA")
 log_package("LibOSSO" "LIBOSSO")
 log_package("X11" "X11")
-#log_package("OpenGL" "OPENGL")
 
-if(NOT WITH_OPENGLES)
-	message("OpenGL ES 1.1 (instead OpenGL): Disabled (Enable by param -DWITH_OPENGLES=ON)")
-elseif(WITH_OPENGLES AND OPENGLES_FOUND AND SDLGLES_FOUND)
-	message("OpenGL ES 1.1 (instead OpenGL): Found")
+if(WITH_RENDERER STREQUAL "OpenGL" AND OPENGL_FOUND)
+	message("Renderer: OpenGL")
+elseif(WITH_RENDERER STREQUAL "OpenGLES" AND OPENGLES_FOUND AND SDLGLES_FOUND)
+	message("Renderer: OpenGL ES 1.1")
 else()
-	message("OpenGL ES 1.1 (instead OpenGL): Not Found")
+	message("Renderer: Native SDL")
 endif()
 
 message("==================================")
