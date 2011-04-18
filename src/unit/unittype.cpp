@@ -94,6 +94,11 @@ std::string DefaultResourceNames[MaxCosts];
 */
 int DefaultResourceAmounts[MaxCosts];
 
+/**
+**  Default names for the resources.
+*/
+std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -111,7 +116,7 @@ CUnitType::CUnitType() :
 	AutoBuildRate(0), RandomMovementProbability(0), ClicksToExplode(0),
 	MaxOnBoard(0), StartingResources(0),
 	UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0),
-	MouseAction(0), Points(0), CanTarget(0),
+	MouseAction(0), CanTarget(0),
 	Flip(0), Revealer(0), LandUnit(0), AirUnit(0), SeaUnit(0),
 	ExplodeWhenKilled(0), Building(0), VisibleUnderFog(0),
 	PermanentCloak(0), DetectCloak(0),
@@ -119,7 +124,7 @@ CUnitType::CUnitType() :
 	Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
 	BuilderOutside(0), BuilderLost(0), CanHarvest(0), Harvester(0),
 	Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
-	Indestructible(0), Teleporter(0), Variable(NULL),
+	Indestructible(0), Teleporter(0), ShieldPiercing(0), SaveCargo(0), Variable(NULL),
 	GivesResource(0), Supply(0), Demand(0), FieldFlags(0), MovementMask(0),
 	Sprite(NULL), ShadowSprite(NULL)
 {
@@ -193,7 +198,6 @@ bool CUnitType::CheckUserBoolFlags(char *BoolFlags) {
 	}
 	return true;
 }
-
 
 /**
 **  Update the player stats for changed unit types.
@@ -446,7 +450,7 @@ static int GetStillFrame(CUnitType *type)
 {
 	CAnimation *anim;
 
-	anim = type->Animations->Still;
+	anim = type->Animations->Still[99];
 	while (anim) {
 		if (anim->Type == AnimationFrame) {
 			// Use the frame facing down
@@ -489,8 +493,8 @@ void InitUnitTypes(int reset_player_stats)
 	//
 	// Setup hardcoded unit types. FIXME: should be moved to some configs.
 	//
-	UnitTypeHumanWall = UnitTypeByIdent("unit-human-wall");
-	UnitTypeOrcWall = UnitTypeByIdent("unit-orc-wall");
+	UnitTypeHumanWall = UnitTypeByIdent("unit-uac-wall");
+	UnitTypeOrcWall = UnitTypeByIdent("unit-hell-wall");
 }
 
 /**

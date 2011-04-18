@@ -185,16 +185,16 @@ extern const char NameLine[];
 #endif
 #endif
 
-#define MAGIC_FOR_NEW_UNITS  33         /// How many percent of max mana for new units
+#define MAGIC_FOR_NEW_UNITS  0         /// How many percent of max mana for new units
 
 /*----------------------------------------------------------------------------
 --  Some limits
 ----------------------------------------------------------------------------*/
 
 #define PlayerMax    16                 /// How many players are supported
-#define UnitTypeMax  257                /// How many unit types supported
-#define UpgradeMax   256                /// How many upgrades supported
-#define UnitMax      2048               /// How many units supported
+#define UnitTypeMax  2048                /// How many unit types supported
+#define UpgradeMax   2048                /// How many upgrades supported
+#define UnitMax      65536               /// How many units supported
 
 /*----------------------------------------------------------------------------
 --  Screen
@@ -234,6 +234,7 @@ extern int SpeedResearch;                   /// Speed factor for researching
 extern bool UseHPForXp;                     /// true if gain XP by dealing damage, false if by killing.
 
 extern unsigned long GameCycle;             /// Game simulation cycle counter
+extern unsigned long ResultGameCycle;       /// Used in game result
 extern unsigned long FastForwardCycle;      /// Game Replay Fast Forward Counter
 
 extern void LoadGame(const std::string &filename); /// Load saved game

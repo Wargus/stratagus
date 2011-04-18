@@ -103,6 +103,7 @@ int UnitShowAnimation(CUnit &unit, const CAnimation *anim)
 int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 {
 	int move;
+	int x,y;
 
 	// Changing animations
 	if (anim && unit.Anim.CurrAnim != anim) {
@@ -179,6 +180,12 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 					FireMissile(unit);
 				}
 				UnHideUnit(unit); // unit is invisible until attacks
+				break;
+
+			case AnimationSpawnMissile:
+				x = unit.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2;  
+				y = unit.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2;
+				MakeMissile(MissileTypeByIdent(unit.Anim.Anim->D.SpawnMissile.Missile),x,y,x,y);
 				break;
 
 			case AnimationRotate:
@@ -434,6 +441,9 @@ static void HandleBuffs(CUnit &unit, int amount)
 	unit.Variable[INVISIBLE_INDEX].Increase = -amount;
 	unit.Variable[UNHOLYARMOR_INDEX].Increase = -amount;
 
+
+	unit.Variable[SHIELD_INDEX].Increase = 1;
+
 	// User defined variables
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
 		if (unit.Variable[i].Enable && unit.Variable[i].Increase) {
@@ -515,7 +525,7 @@ static void HandleUnitAction(CUnit &unit)
 				}
 			}
 #endif
-
+			DropResource(unit);
 			//
 			// Shift queue with structure assignment.
 			//

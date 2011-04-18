@@ -136,12 +136,12 @@ void DoScrollArea(int state, bool fast)
 	vp = UI.SelectedViewport;
 
 	if (fast) {
-		stepx = vp->MapWidth / 2 * PixelTileSize.x * FRAMES_PER_SECOND;
-		stepy = vp->MapHeight / 2 * PixelTileSize.y * FRAMES_PER_SECOND;
+		stepx = (int)((UI.MouseScrollSpeed / 8) * vp->MapWidth / 2 * PixelTileSize.x * FRAMES_PER_SECOND);
+		stepy = (int)((UI.MouseScrollSpeed / 8) * vp->MapHeight / 2 * PixelTileSize.y * FRAMES_PER_SECOND);
 	} else {// dynamic: let these variables increase upto fast..
 		// FIXME: pixels per second should be configurable
-		stepx = PixelTileSize.x * FRAMES_PER_SECOND;
-		stepy = PixelTileSize.y * FRAMES_PER_SECOND;
+		stepx = (int)((UI.MouseScrollSpeed / 8) * PixelTileSize.x * FRAMES_PER_SECOND);
+		stepy = (int)((UI.MouseScrollSpeed / 8) * PixelTileSize.y * FRAMES_PER_SECOND);
 	}
 	if ((state & (ScrollLeft | ScrollRight)) &&
 			(state & (ScrollLeft | ScrollRight)) != (ScrollLeft | ScrollRight)) {
@@ -228,6 +228,9 @@ void UpdateDisplay()
 		if (CursorState == CursorStateRectangle) {
 			DrawCursor();
 		}
+
+		if (Preference.BigScreen && !BigMapMode || !Preference.BigScreen && BigMapMode)
+			UiToggleBigMap();
 
 		if (!BigMapMode) {
 			for (int i = 0; i < (int)UI.Fillers.size(); ++i) {

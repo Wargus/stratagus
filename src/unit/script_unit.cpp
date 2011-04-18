@@ -1307,11 +1307,18 @@ static int CclGetUnitVariable(lua_State *l)
 	lua_pop(l, 1);
 
 	const char *const value = LuaToString(l, 2);
-	index = UnitTypeVar.VariableNameLookup[value];// User variables
-	if (index == -1) {
-		LuaError(l, "Bad variable name '%s'\n" _C_ value);
+	if (!strcmp(value, "RegenerationRate"))
+		lua_pushnumber(l, unit->Variable[HP_INDEX].Increase);
+	else if (!strcmp(value, "Player"))
+		lua_pushnumber(l, unit->Player->Index);
+	else
+	{
+		index = UnitTypeVar.VariableNameLookup[value];// User variables
+		if (index == -1) {
+			LuaError(l, "Bad variable name '%s'\n" _C_ value);
+		}
+		lua_pushnumber(l, unit->Variable[index].Value);
 	}
-	lua_pushnumber(l, unit->Variable[index].Value);
 	return 1;
 }
 
@@ -1334,15 +1341,26 @@ static int CclSetUnitVariable(lua_State *l)
 	unit = CclGetUnit(l);
 	lua_pop(l, 1);
 	const char *const name = LuaToString(l, 2);
-	index = UnitTypeVar.VariableNameLookup[name];// User variables
-	if (index == -1) {
-		LuaError(l, "Bad variable name '%s'\n" _C_ name);
+	if (!strcmp(name, "RegenerationRate"))
+	{
+		value = LuaToNumber(l, 3);
+		if (value > unit->Variable[HP_INDEX].Max) 
+			unit->Stats->Variables[HP_INDEX].Increase = unit->Variable[HP_INDEX].Max;
+		else 
+			unit->Stats->Variables[HP_INDEX].Increase = value;
 	}
-	value = LuaToNumber(l, 3);
-	if (value > unit->Variable[index].Max) {
-		unit->Variable[index].Value = unit->Variable[index].Max;
-	} else {
-		unit->Variable[index].Value = value;
+	else
+	{
+		index = UnitTypeVar.VariableNameLookup[name];// User variables
+		if (index == -1) {
+			LuaError(l, "Bad variable name '%s'\n" _C_ name);
+		}
+		value = LuaToNumber(l, 3);
+		if (value > unit->Variable[index].Max) {
+			unit->Variable[index].Value = unit->Variable[index].Max;
+		} else {
+			unit->Variable[index].Value = value;
+		}
 	}
 	lua_pushnumber(l, value);
 	return 1;

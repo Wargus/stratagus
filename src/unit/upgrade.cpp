@@ -233,7 +233,7 @@ static int CclDefineModifier(lua_State *l)
 		lua_rawgeti(l, j + 1, 1);
 		key = LuaToString(l, -1);
 		lua_pop(l, 1);
-#if 1 // To be removed. must modify lua file.
+#if 0 // To be removed. must modify lua file.
 		if (!strcmp(key, "attack-range")) {
 			key = "AttackRange";
 		} else if (!strcmp(key, "sight-range")) {

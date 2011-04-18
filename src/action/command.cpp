@@ -1132,6 +1132,18 @@ void CommandDiplomacy(int player, int state, int opponent)
 }
 
 /**
+**  Set new resources count for player.
+**
+**  @param player    Player which changes his state.
+**  @param resource     Resource index
+**  @param value  New value
+*/
+void CommandSetResource(int player, int resource, int value)
+{
+	Players[player].Resources[resource] = value;
+}
+
+/**
 **  Shared vision changed.
 **
 **  @param player    Player which changes his state.

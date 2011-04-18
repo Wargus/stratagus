@@ -2305,6 +2305,25 @@ static int CclDefineDefaultResourceAmounts(lua_State *l)
 }
 
 /**
+**  Define default extra death types.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineExtraDeathTypes(lua_State *l)
+{
+	unsigned int args;
+
+	for (unsigned int i = 0; i < ANIMATIONS_DEATHTYPES; ++i) {
+		ExtraDeathTypes[i].clear();
+	}
+	args = lua_gettop(l);
+	for (unsigned int i = 0; i < ANIMATIONS_DEATHTYPES && i < args; ++i) {
+		ExtraDeathTypes[i] = LuaToString(l, i + 1);
+	}
+	return 0;
+}
+
+/**
 **  Compiled with sound.
 **
 **  @param l  Lua state.
@@ -2446,6 +2465,7 @@ void InitCcl()
 	lua_register(Lua, "DefineDefaultActions", CclDefineDefaultActions);
 	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
 	lua_register(Lua, "DefineDefaultResourceAmounts", CclDefineDefaultResourceAmounts);
+	lua_register(Lua, "DefineExtraDeathTypes", CclDefineExtraDeathTypes);
 	lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);
 
 	lua_register(Lua, "SetMetaServer", CclSetMetaServer);
@@ -2699,29 +2719,8 @@ void SavePreferences()
 	std::string path;
 	std::string tableName;
 
-	if (!GameName.empty()) {
-		lua_pushstring(Lua, GameName.c_str());
-		lua_gettable(Lua, LUA_GLOBALSINDEX);
-		if (lua_type(Lua, -1) == LUA_TTABLE) {
-			tableName = GameName;
-			tableName += ".";
-			tableName += "preferences";
-			lua_pushstring(Lua, "preferences");
-			lua_gettable(Lua, -2);
-		}
-		else
-		{
-			lua_pushstring(Lua, "preferences");
-			lua_gettable(Lua, LUA_GLOBALSINDEX);
-			tableName = "preferences";
-		}
-	}
-	else
-	{
-		tableName = "preferences";
-		lua_pushstring(Lua, "preferences");
-		lua_gettable(Lua, LUA_GLOBALSINDEX);
-	}
+	lua_pushstring(Lua, "preferences");
+	lua_gettable(Lua, LUA_GLOBALSINDEX);
 	if (lua_type(Lua, -1) == LUA_TTABLE) {
 		path = UserDirectory;
 		if (!GameName.empty()) {
@@ -2736,10 +2735,7 @@ void SavePreferences()
 		}
 
 		std::string s = SaveGlobal(Lua, false);
-		if (!GameName.empty()) {
-			fprintf(fd, "if (%s == nil) then %s = {} end\n", GameName.c_str(), GameName.c_str());
-		}
-		fprintf(fd, "%s = {\n%s}\n", tableName.c_str(), s.c_str());
+		fprintf(fd, "preferences = {\n%s}\n", s.c_str());
 		fclose(fd);
 	}
 }

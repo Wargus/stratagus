@@ -523,7 +523,7 @@ int Polymorph::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int x,
 	x = x - type.TileWidth / 2;
 	y = y - type.TileHeight / 2;
 	const Vec2i pos = {x, y};
-	caster.Player->Score += target->Type->Points;
+	caster.Player->Score += target->Variable[POINTS_INDEX].Value;
 	if (caster.IsEnemy(*target)) {
 		if (target->Type->Building) {
 			caster.Player->TotalRazings++;
@@ -533,7 +533,7 @@ int Polymorph::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int x,
 		if (UseHPForXp) {
 			caster.Variable[XP_INDEX].Max += target->Variable[HP_INDEX].Value;
 		} else {
-			caster.Variable[XP_INDEX].Max += target->Type->Points;
+			caster.Variable[XP_INDEX].Max += target->Variable[POINTS_INDEX].Value;
 		}
 		caster.Variable[XP_INDEX].Value = caster.Variable[XP_INDEX].Max;
 		caster.Variable[KILL_INDEX].Value++;
@@ -595,7 +595,7 @@ int Capture::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int, int
 				return 1;
 			}
 		}
-	caster.Player->Score += target->Type->Points;
+	caster.Player->Score += target->Variable[POINTS_INDEX].Value;
 	if (caster.IsEnemy(*target)) {
 		if (target->Type->Building) {
 			caster.Player->TotalRazings++;
@@ -605,7 +605,7 @@ int Capture::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int, int
 		if (UseHPForXp) {
 			caster.Variable[XP_INDEX].Max += target->Variable[HP_INDEX].Value;
 		} else {
-			caster.Variable[XP_INDEX].Max += target->Type->Points;
+			caster.Variable[XP_INDEX].Max += target->Variable[POINTS_INDEX].Value;
 		}
 		caster.Variable[XP_INDEX].Value = caster.Variable[XP_INDEX].Max;
 		caster.Variable[KILL_INDEX].Value++;

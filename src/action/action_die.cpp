@@ -58,8 +58,11 @@ void HandleActionDie(CUnit &unit)
 	//
 	// Show death animation
 	//
-	if (unit.Type->Animations && unit.Type->Animations->Death) {
-		UnitShowAnimation(unit, unit.Type->Animations->Death);
+	if (unit.Type->Animations && unit.Type->Animations->Death[unit.DamagedType]) {
+		UnitShowAnimation(unit, unit.Type->Animations->Death[unit.DamagedType]);
+	}
+	else if (unit.Type->Animations && unit.Type->Animations->Death[ANIMATIONS_DEATHTYPES]) {
+		UnitShowAnimation(unit, unit.Type->Animations->Death[ANIMATIONS_DEATHTYPES]);
 	} else {
 		// some units has no death animation
 		unit.Anim.Unbreakable = 0;
@@ -99,8 +102,8 @@ void HandleActionDie(CUnit &unit)
 		unit.SubAction = 0;
 		unit.Frame = 0;
 		UnitUpdateHeading(unit);
-		if (unit.Type->Animations && unit.Type->Animations->Death) {
-			UnitShowAnimation(unit, unit.Type->Animations->Death);
+		if (unit.Type->Animations && unit.Type->Animations->Death[ANIMATIONS_DEATHTYPES]) {
+			UnitShowAnimation(unit, unit.Type->Animations->Death[ANIMATIONS_DEATHTYPES]);
 		}
 	}
 }

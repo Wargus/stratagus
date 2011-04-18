@@ -124,6 +124,7 @@ void UnSelectAll()
 		Selected[NumSelected] = NoUnitP; // FIXME: only needed for old code
 		unit->Selected = 0;
 	}
+	UI.SelectedViewport->Unit = NULL;
 
 }
 
@@ -330,6 +331,9 @@ void UnSelectUnit(CUnit &unit)
 	}
 	Selected[NumSelected] = NoUnitP; // FIXME: only needed for old code
 	unit.Selected = 0;
+
+	//Turn track unit mode off
+	UI.SelectedViewport->Unit = NULL;
 }
 
 /**

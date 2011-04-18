@@ -265,6 +265,7 @@ int SpeedResearch = 1;               /// speed factor for researching
 ============================================================================*/
 
 unsigned long GameCycle;             /// Game simulation cycle counter
+unsigned long ResultGameCycle;             /// Used in game result
 unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
 
 /*============================================================================

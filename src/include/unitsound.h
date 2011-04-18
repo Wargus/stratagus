@@ -41,6 +41,7 @@
 #include "upgrade_structs.h"
 #endif
 
+#define ANIMATIONS_DEATHTYPES 40
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -74,7 +75,7 @@ public:
 	SoundConfig Repair;             /// unit repairing
 	SoundConfig Harvest[MaxCosts];  /// unit harvesting
 	SoundConfig Help;               /// unit is attacked
-	SoundConfig Dead;               /// unit is killed
+	SoundConfig Dead[ANIMATIONS_DEATHTYPES+1];               /// unit is killed
 };
 
 /*----------------------------------------------------------------------------

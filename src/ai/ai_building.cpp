@@ -151,7 +151,7 @@ static int AiCheckSurrounding(const CUnit &worker,
 **
 **  @return        True if place found, false if no found.
 */
-static int AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, int ox, int oy, Vec2i *dpos)
+static int AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, int ox, int oy, Vec2i *dpos, int surround)
 {
 	const Vec2i offset[] = {{0, -1}, {-1, 0}, {1, 0}, {0, 1}, {-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
 	Vec2i *points;
@@ -171,7 +171,7 @@ static int AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, int 
 	//
 	if (CanBuildUnitType(&worker, type, pos, 1) &&
 		!AiEnemyUnitsInDistance(worker.Player, NULL, pos, 8)) {
-		if (AiCheckSurrounding(worker, type, pos.x, pos.y, backupok)) {
+		if (AiCheckSurrounding(worker, type, pos.x, pos.y, backupok) && surround) {
 			*dpos = pos;
 			return 1;
 		} else if (backupok) {
@@ -225,7 +225,7 @@ static int AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, int 
 				//
 				if (CanBuildUnitType(&worker, type, pos, 1) &&
 						!AiEnemyUnitsInDistance(worker.Player, NULL, pos, 8)) {
-					if (AiCheckSurrounding(worker, type, pos.x, pos.y, backupok)) {
+					if (AiCheckSurrounding(worker, type, pos.x, pos.y, backupok) && surround) {
 						*dpos = pos;
 						delete[] points;
 						return 1;
@@ -381,7 +381,7 @@ static int AiFindHallPlace(const CUnit &worker,
 						}
 					}
 					if (j == nunits) {
-						if (AiFindBuildingPlace2(worker, type, pos.x, pos.y, dpos)) {
+						if (AiFindBuildingPlace2(worker, type, pos.x, pos.y, dpos,1)) {
 							delete[] morg;
 							delete[] points;
 							return 1;
@@ -485,7 +485,7 @@ static int AiFindLumberMillPlace(const CUnit &worker, const CUnitType &type,
 				// Look if there is wood
 				//
 				if (Map.ForestOnMap(pos)) {
-					if (AiFindBuildingPlace2(worker, type, pos.x, pos.y, dpos)) {
+					if (AiFindBuildingPlace2(worker, type, pos.x, pos.y, dpos,1)) {
 						delete[] morg;
 						delete[] points;
 						return 1;
@@ -572,7 +572,7 @@ static int AiFindMiningPlace(const CUnit &worker,
 				// Look if there is a mine area
 				//
 				if ((mine = ResourceOnMap(pos, resource, false)) &&
-						 AiFindBuildingPlace2(worker, type, mine->tilePos.x, mine->tilePos.y, dpos)) {
+						 AiFindBuildingPlace2(worker, type, mine->tilePos.x, mine->tilePos.y, dpos,0)) {
 							delete[] morg;
 							delete[] points;
 							return 1;
@@ -651,13 +651,13 @@ int AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, int nx, int 
 					//Mine can be build without resource restrictions: solar panels, etc
 					return AiFindBuildingPlace2(worker, type,
 							(nx != -1 ? nx : worker.tilePos.x),
-							(ny != -1 ? ny : worker.tilePos.y), dpos);
+							(ny != -1 ? ny : worker.tilePos.y), dpos,1);
 				}
 			}
 	}
 
 	return AiFindBuildingPlace2(worker, type,
-			(nx != -1 ? nx : worker.tilePos.x), (ny != -1 ? ny : worker.tilePos.y), dpos);
+			(nx != -1 ? nx : worker.tilePos.x), (ny != -1 ? ny : worker.tilePos.y), dpos,1);
 }
 
 //@}

@@ -87,7 +87,7 @@ void HandleActionResearch(CUnit &unit)
 
 	unit.Type->Animations->Research ?
 		UnitShowAnimation(unit, unit.Type->Animations->Research) :
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		UnitShowAnimation(unit, unit.Type->Animations->Still[GetAnimationDamagedState(unit,1)]);
 	if (unit.Wait) {
 		unit.Wait--;
 		return;
@@ -98,7 +98,7 @@ void HandleActionResearch(CUnit &unit)
 			upgrade->Costs[TimeCost]) {
 
 		unit.Player->Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
-			_("%s: complete"), unit.Type->Name.c_str());
+			_("%s: research complete"), unit.Type->Name.c_str());
 		if (unit.Player == ThisPlayer) {
 			if (GameSounds.ResearchComplete[unit.Player->Race].Sound)
 				PlayGameSound(GameSounds.ResearchComplete[unit.Player->Race].Sound,

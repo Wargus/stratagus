@@ -89,6 +89,7 @@ struct MinimapEvent {
 	int X;
 	int Y;
 	int Size;
+	Uint32 Color;
 } MinimapEvents[MAX_MINIMAP_EVENTS];
 int NumMinimapEvents;
 
@@ -587,7 +588,8 @@ void CMinimap::Update()
 static void DrawEvents()
 {
 	for (int i = 0; i < NumMinimapEvents; ++i) {
-		Video.DrawTransCircleClip(ColorWhite,
+
+		Video.DrawTransCircleClip(MinimapEvents[i].Color,
 			MinimapEvents[i].X, MinimapEvents[i].Y,
 			MinimapEvents[i].Size, 192);
 		MinimapEvents[i].Size -= 1;
@@ -743,7 +745,7 @@ void CMinimap::DrawCursor(int vx, int vy)
 **  @param x  Map X tile position
 **  @param y  Map Y tile position
 */
-void CMinimap::AddEvent(int x, int y)
+void CMinimap::AddEvent(int x, int y, Uint32 color)
 {
 	if (NumMinimapEvents == MAX_MINIMAP_EVENTS) {
 		return;
@@ -752,7 +754,7 @@ void CMinimap::AddEvent(int x, int y)
 	MinimapEvents[NumMinimapEvents].X = X + XOffset + (x * MinimapScaleX) / MINIMAP_FAC;
 	MinimapEvents[NumMinimapEvents].Y = Y + YOffset + (y * MinimapScaleY) / MINIMAP_FAC;
 	MinimapEvents[NumMinimapEvents].Size = (W < H) ? W / 3 : H / 3;
-
+	MinimapEvents[NumMinimapEvents].Color = color;
 	++NumMinimapEvents;
 }
 
