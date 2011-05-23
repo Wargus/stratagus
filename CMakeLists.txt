@@ -468,7 +468,7 @@ option(WITH_THEORA "Compile Stratagus with Theroa video library" ON)
 
 option(WITH_X11 "Compile Stratagus with X11 clipboard pasting support" ON)
 
-option(ENABLE_DOC "Generate Stratagus source code documentation with Doxygen" ON)
+option(ENABLE_DOC "Generate Stratagus source code documentation with Doxygen" OFF)
 option(ENABLE_UPX "Compress Stratagus executable binary with UPX packer" OFF)
 
 if(NOT WITH_RENDERER)

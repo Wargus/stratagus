@@ -36,8 +36,8 @@ clean::
 
 build:
 	mkdir -p build build-dbg
-	cd build && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release ..
-	cd build-dbg && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug -DENABLE_DOC=OFF ..
+	cd build && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DENABLE_DOC=ON ..
+	cd build-dbg && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug ..
 	$(MAKE) -C build
 	$(MAKE) -C build-dbg
 
