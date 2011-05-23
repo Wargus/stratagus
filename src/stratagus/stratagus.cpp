@@ -660,46 +660,26 @@ static void Usage(void)
 	PrintHeader();
 	printf(
 "\n\nUsage: stratagus [OPTIONS] [map.smp|map.smp.gz]\n\
-\t-c file.lua\tconfiguration start file (default stratagus.lua)\n\
-\t-d datapath\tpath to stratagus data\n\
-\t-e\t\tStart editor\n\
-\t-h\t\tHelp shows this page\n\
-\t-l\t\tDisable command log\n\
-\t-I addr\t\tNetwork address to use\n\
-\t-P port\t\tNetwork port to use\n\
-\t-n server\tNetwork server host preset\n\
-\t-L lag\t\tNetwork lag in # frames (default 10 = 333ms)\n\
-\t-U update\tNetwork update rate in # frames (default 5=6x per s)\n\
-\t-N name\t\tName of the player\n\
-\t-s sleep\tNumber of frames for the AI to sleep before it starts\n\
-\t-S\t\tSync speed (100 = 30 frames/s)\n\
-\t-D\t\tVideo mode depth = pixel per point (for Win32/TNT)\n\
-"
-#ifdef USE_GLES
-"\
-\t-O\t\tUse OpenGL ES 1.1\n\
-\t-o\t\tDo not use OpenGL ES 1.1\n\
-"
-#else
-"\
-\t-O\t\tUse OpenGL\n\
-\t-o\t\tDo not use OpenGL\n\
-"
-#endif
-#ifdef USE_MAEMO
-"\
-\t-v mode\t\tVideo mode (0=default,1=800x480)\n\
-"
-#else
-"\
-\t-v mode\t\tVideo mode (0=default,1=640x480,2=800x480,\n\
-\t\t\t\t3=800x600,4=1024x768,5=1280x800,6=1280x960,\n\
-\t\t\t\t7=1280x1024,8=1400x1050,9=1680x1050,10=1600x1200)\n\
+\t-c file.lua\tConfiguration start file (default stratagus.lua)\n\
+\t-d datapath\tPath to stratagus data\n\
+\t-D depth\tVideo mode depth = pixel per point (for Win32/TNT)\n\
+\t-e\t\tStart editor (instead of game)\n\
+\t-E file.lua\tEditor configuration start file (default editor.lua)\n\
 \t-F\t\tFull screen video mode\n\
+\t-h\t\tHelp shows this page\n\
+\t-I addr\t\tNetwork address to use\n\
+\t-l\t\tDisable command log\n\
+\t-L lag\t\tNetwork lag in # frames (default 10 = 333ms)\n\
+\t-n server\tNetwork server host preset\n\
+\t-N name\t\tName of the player\n\
+\t-o\t\tDo not use OpenGL or OpenGL ES 1.1\n\
+\t-O\t\tUse OpenGL or OpenGL ES 1.1\n\
+\t-P port\t\tNetwork port to use\n\
+\t-s sleep\tNumber of frames for the AI to sleep before it starts\n\
+\t-S speed\tSync speed (100 = 30 frames/s)\n\
+\t-U update\tNetwork update rate in # frames (default 5=6x per s)\n\
+\t-v mode\t\tVideo mode resolution in format <xres>x<yres>\n\
 \t-W\t\tWindowed video mode\n\
-"
-#endif
-"\
 map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n\
 ");
 }
@@ -854,11 +834,7 @@ int main(int argc, char **argv)
 	//  Parse commandline
 	//
 	for (;;) {
-#ifdef USE_MAEMO
-		switch (getopt(argc, argv, "c:d:ef:hln:I:P:s:t:v:wD:N:E:S:U:OL:o?")) {
-#else
-		switch (getopt(argc, argv, "c:d:ef:hln:I:P:s:t:v:wD:N:E:FL:S:U:W?OL:o?")) {
-#endif
+		switch (getopt(argc, argv, "c:d:D:eE:FhI:lL:n:N:oOP:s:S:U:v:W?")) {
 			case 'c':
 				CclStartFile = optarg;
 				continue;
@@ -871,20 +847,32 @@ int main(int argc, char **argv)
 				}
 				continue;
 			}
+			case 'D':
+				Video.Depth = atoi(optarg);
+				continue;
 			case 'e':
 				Editor.Running = EditorCommandLine;
 				continue;
 			case 'E':
 				EditorStartFile = optarg;
 				continue;
-			case 'l':
-				CommandLogDisabled = true;
+			case 'F':
+				VideoForceFullScreen = 1;
+				Video.FullScreen = 1;
 				continue;
 			case 'I':
 				NetworkAddr = optarg;
 				continue;
-			case 'P':
-				NetworkPort = atoi(optarg);
+			case 'l':
+				CommandLogDisabled = true;
+				continue;
+			case 'L':
+				NetworkLag = atoi(optarg);
+				if (!NetworkLag) {
+					fprintf(stderr, "%s: zero lag not supported\n", argv[0]);
+					Usage();
+					ExitFatal(-1);
+				}
 				continue;
 			case 'n':
 				NetworkArg = optarg;
@@ -892,102 +880,48 @@ int main(int argc, char **argv)
 			case 'N':
 				LocalPlayerName = optarg;
 				continue;
-			case 's':
-				AiSleepCycles = atoi(optarg);
-				continue;
-			case 'v':
-				switch (atoi(optarg)) {
-					case 0:
-						continue;
-#ifdef USE_MAEMO
-					case 1:
-						Video.Width = 800;
-						Video.Height = 480;
-						continue;
-#else
-					case 1:
-						Video.Width = 640;
-						Video.Height = 480;
-						continue;
-					case 2:
-						Video.Width = 800;
-						Video.Height = 480;
-						continue;
-					case 3:
-						Video.Width = 800;
-						Video.Height = 600;
-						continue;
-					case 4:
-						Video.Width = 1024;
-						Video.Height = 768;
-						continue;
-					case 5:
-						Video.Width = 1280;
-						Video.Height = 800;
-						continue;
-					case 6:
-						Video.Width = 1280;
-						Video.Height = 960;
-						continue;
-					case 7:
-						Video.Width = 1280;
-						Video.Height = 1024;
-						continue;
-					case 8:
-						Video.Width = 1400;
-						Video.Height = 1050;
-						continue;
-					case 9:
-						Video.Width = 1600;
-						Video.Height = 1200;
-						continue;
-					case 10:
-						Video.Width = 1680;
-						Video.Height = 1050;
-						continue;
-#endif
-					default:
-						Usage();
-						ExitFatal(-1);
-				}
-				continue;
-
-			case 'L':
-				NetworkLag = atoi(optarg);
-				if (!NetworkLag) {
-					fprintf(stderr, "FIXME: zero lag not supported\n");
-					Usage();
-					ExitFatal(-1);
-				}
-				continue;
-			case 'U':
-				NetworkUpdates = atoi(optarg);
-				continue;
-#ifndef USE_MAEMO
-			case 'F':
-				VideoForceFullScreen = 1;
-				Video.FullScreen = 1;
-				continue;
-			case 'W':
-				VideoForceFullScreen = 1;
-				Video.FullScreen = 0;
-				continue;
-#endif
-			case 'O':
-				ForceUseOpenGL = 1;
-				UseOpenGL = 1;
-				continue;
 			case 'o':
 				ForceUseOpenGL = 1;
 				UseOpenGL = 0;
 				continue;
-			case 'D':
-				Video.Depth = atoi(optarg);
+			case 'O':
+				ForceUseOpenGL = 1;
+				UseOpenGL = 1;
+				continue;
+			case 'P':
+				NetworkPort = atoi(optarg);
+				continue;
+			case 's':
+				AiSleepCycles = atoi(optarg);
 				continue;
 			case 'S':
 				VideoSyncSpeed = atoi(optarg);
 				continue;
-
+			case 'U':
+				NetworkUpdates = atoi(optarg);
+				continue;
+			case 'v':
+			{
+				char * sep = strchr(optarg, 'x');
+				if (!sep || !*(sep+1)) {
+					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%s'\n", argv[0], optarg);
+					Usage();
+					ExitFatal(-1);
+				}
+				Video.Height = atoi(sep+1);
+				*sep = 0;
+				Video.Width = atoi(optarg);
+				if (!Video.Height || !Video.Width) {
+					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%sx%s'\n", argv[0], optarg, sep+1);
+					Usage();
+					ExitFatal(-1);
+				}
+				continue;
+			}
+			case 'W':
+				VideoForceFullScreen = 1;
+				Video.FullScreen = 0;
+				continue;
 			case -1:
 				break;
 			case '?':
