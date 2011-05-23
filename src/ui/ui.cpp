@@ -114,11 +114,7 @@ CUserInterface::CUserInterface() :
 */
 void InitUserInterface()
 {
-#ifdef USE_MAEMO
-	UI.Offset640X = (Video.Width - 800) / 2;
-#else
 	UI.Offset640X = (Video.Width - 640) / 2;
-#endif
 	UI.Offset480Y = (Video.Height - 480) / 2;
 
 	//
