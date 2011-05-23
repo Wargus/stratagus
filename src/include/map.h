@@ -460,7 +460,6 @@ private:
 
 public:
 	CMapField *Fields;              /// fields on map
-	unsigned *Visible[PlayerMax];  /// visible bit-field
 
 	bool NoFogOfWar;           /// fog of war disabled
 

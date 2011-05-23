@@ -332,8 +332,6 @@ void CMap::Create()
 	Assert(!this->Fields);
 
 	this->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
-	this->Visible[0] = new unsigned[this->Info.MapWidth * this->Info.MapHeight / 2];
-	memset(this->Visible[0], 0, this->Info.MapWidth * this->Info.MapHeight / 2 * sizeof(unsigned));
 }
 
 /**
@@ -342,13 +340,11 @@ void CMap::Create()
 void CMap::Clean()
 {
 	delete[] this->Fields;
-	delete[] this->Visible[0];
 
 	// Tileset freed by Tileset?
 
 	FreeMapInfo(&this->Info);
 	this->Fields = NULL;
-	memset(this->Visible, 0, sizeof(this->Visible));
 	this->NoFogOfWar = false;
 	this->Tileset.Clear();
 	memset(this->TileModelsFileName, 0, sizeof(this->TileModelsFileName));
