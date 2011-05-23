@@ -114,8 +114,6 @@ static int CclStratagusMap(lua_State *l)
 
 					delete[] Map.Fields;
 					Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
-					Map.Visible[0] = new unsigned[Map.Info.MapWidth * Map.Info.MapHeight / 2];
-					memset(Map.Visible[0], 0, Map.Info.MapWidth * Map.Info.MapHeight / 2 * sizeof(unsigned));
 					// FIXME: this should be CreateMap or InitMap?
 				} else if (!strcmp(value, "fog-of-war")) {
 					Map.NoFogOfWar = false;
