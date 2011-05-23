@@ -58,7 +58,7 @@ static SDL_TimerID timer = NULL;
 static Uint32 OssoKeepBacklightAlive(Uint32 interval, void *)
 {
 	if (!osso)
-		return interval;
+		return 0;
 
 	osso_display_state_on(osso);
 	osso_display_blanking_pause(osso);
@@ -74,13 +74,14 @@ static void OssoInitialize()
 {
 	char * application;
 
-	if (FullGameName.empty())
-		application = (char *)"org.stratagus";
-	else
-		application = (char *)std::string("org.stratagus." + FullGameName).c_str();
-
-	if (strlen(application) > 14)
-		application[14] = tolower(application[14]);
+	if (FullGameName.empty()) {
+		application = strdup("org.stratagus");
+	} else {
+		application = calloc(FullGameName.size() + 15, sizeof(char));
+		strcpy(application, "org.stratagus.");
+		for (int i = 0; i < FullGameName.size(); i++)
+			application[i+14] = tolower(FullGameName[i]);
+	}
 
 	osso = osso_initialize(application, VERSION, TRUE, NULL);
 
