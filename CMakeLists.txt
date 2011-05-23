@@ -458,7 +458,7 @@ if(WIN32)
 	option(ENABLE_NSIS "Create Stratagus Window NSIS Installer" OFF)
 endif()
 
-#option(ENABLE_TOUCHSCREEN "Use touchscreen input" ON)
+option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
 
 option(WITH_BZIP2 "Compile Stratagus with BZip2 compression support" ON)
 option(WITH_MIKMOD "Compile Stratagus with Mikmod sound library" ON)
@@ -491,10 +491,9 @@ if(WIN32 AND NOT ENABLE_STDIO_REDIRECT)
 	add_definitions(-DNO_STDIO_REDIRECT)
 endif()
 
-# TODO: Add support for touchscreen input (not only for MAEMO)
-#if(ENABLE_TOUCHSCREEN)
-#
-#endif()
+if(ENABLE_TOUCHSCREEN)
+	add_definitions(-DUSE_TOUCHSCREEN)
+endif()
 
 if(WITH_BZIP2 AND BZIP2_FOUND)
 	add_definitions(-DUSE_BZ2LIB ${BZIP2_DEFINITIONS})
@@ -575,6 +574,8 @@ if(MAEMO)
 	add_definitions(-DUSE_MAEMO ${LIBOSSO_CFLAGS})
 	include_directories(${LIBOSSO_INCLUDE_DIRS})
 	set(stratagus_LIBS ${LIBOSSO_LIBRARIES})
+	# Hack/Bug: On Maemo is not possible to disable touch screen input
+	set(ENABLE_TOUCHSCREEN ON)
 endif()
 
 check_function_exists("strcasestr" HAVE_STRCASESTR)
@@ -641,6 +642,12 @@ elseif(NOT WIN32)
 	message("Redirect stdio: Unsupported on this platform")
 else()
 	message("Redirect stdio: No (Enable by param -DENABLE_STDIO_REDIRECT=ON)")
+endif()
+
+if(ENABLE_TOUCHSCREEN)
+	message("Touchscreen input: Yes (Disable by param -DENABLE_TOUCHSCREEN=OFF)")
+else()
+	message("Touchscreen input: No (Enable by param -DENABLE_TOUCHSCREEN=ON)")
 endif()
 
 if(ENABLE_DOC AND DOXYGEN_FOUND)

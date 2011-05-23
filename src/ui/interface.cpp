@@ -1256,7 +1256,7 @@ void HandleButtonUp(unsigned button)
 --  Lowlevel input functions
 ----------------------------------------------------------------------------*/
 
-#ifdef USE_MAEMO
+#ifdef USE_TOUCHSCREEN
 int DoubleClickDelay = 1000;             /// Time to detect double clicks.
 int HoldClickDelay = 2000;              /// Time to detect hold clicks.
 #else
@@ -1362,7 +1362,7 @@ void InputMouseMove(const EventCallback *callbacks,
 	unsigned ticks, int x, int y)
 {
 	// Don't reset the mouse state unless we really moved
-#ifdef USE_MAEMO
+#ifdef USE_TOUCHSCREEN
 #define buff 32
 	if (((x - buff) <= MouseX && MouseX <= (x + buff)) == 0 ||
 			((y - buff) <= MouseY && MouseY <= (y + buff)) == 0) {

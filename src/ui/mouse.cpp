@@ -1483,8 +1483,8 @@ void UIHandleButtonDown(unsigned button)
  **/
 #define DoubleLeftButton (MouseButtons & (LeftButton << MouseDoubleShift))
 
-#ifdef USE_MAEMO
-	// If we are moving with stylus, left button on Maemo is still clicked
+#ifdef USE_TOUCHSCREEN
+	// If we are moving with stylus/finger, left button on touch screen devices is still clicked
 	// Ignore handle if left button is long cliked
 	if (LongLeftButton)
 		return;
@@ -1555,8 +1555,8 @@ void UIHandleButtonDown(unsigned button)
 
 		// to redraw the cursor immediately (and avoid up to 1 sec delay
 		if (CursorBuilding) {
-#ifdef USE_MAEMO
-			// On Maemo building is started with double left click
+#ifdef USE_TOUCHSCREEN
+			// On touch screen is building started with double left click
 			if (!DoubleLeftButton)
 				return;
 #endif
@@ -1609,7 +1609,7 @@ void UIHandleButtonDown(unsigned button)
 					CursorState == CursorStatePoint) {
 				CursorState = CursorStatePieMenu;
 			}
-#ifdef USE_MAEMO
+#ifdef USE_TOUCHSCREEN
 		} else if (DoubleLeftButton) {
 #else
 		} else if (MouseButtons & RightButton) {
@@ -1909,8 +1909,8 @@ void UIHandleButtonUp(unsigned button)
 					num = SelectUnitsInRectangle(x0, y0, x1, y1);
 				}
 			}
-#ifdef USE_MAEMO
-		// On Maemo select single unit only when long click is detected
+#ifdef USE_TOUCHSCREEN
+		// On touch screen select single unit only when long click is detected
 		// This fix problem with emulating right mouse button as long left click on touch screens
 		} else if (button==0x1000001) {
 #else

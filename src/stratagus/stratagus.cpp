@@ -782,6 +782,9 @@ int main(int argc, char **argv)
 #ifdef USE_MAEMO
 		"MAEMO "
 #endif
+#ifdef USE_TOUCHSCREEN
+		"TOUCHSCREEN "
+#endif
 		"";
 
 #ifdef USE_BEOS

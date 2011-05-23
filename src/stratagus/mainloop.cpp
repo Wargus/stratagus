@@ -168,8 +168,8 @@ void DoScrollArea(int state, bool fast)
 		stepy = 0;
 	}
 
-#ifdef USE_MAEMO
-	// Decrease scrolling speed on Maemo, it is too high
+#ifdef USE_TOUCHSCREEN
+	// Decrease scrolling speed on touch screen, it is too high
 	if (state & ScrollUp || state & ScrollDown) {
 		stepy /= 4;
 	}
