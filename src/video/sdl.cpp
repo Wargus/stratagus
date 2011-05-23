@@ -583,14 +583,16 @@ void InitVideoSdl()
 
 	// Initialize the display
 
-	flags = 0;
-	// Sam said: better for windows.
-	/* SDL_HWSURFACE|SDL_HWPALETTE | */
 #ifdef USE_MAEMO
+	// TODO: Support window mode and portrait mode resolution on Maemo - Nokia N900
 	Video.FullScreen = 1;
 	Video.Width = 800;
 	Video.Height = 480;
 #endif
+
+	flags = 0;
+	// Sam said: better for windows.
+	/* SDL_HWSURFACE|SDL_HWPALETTE | */
 	if (Video.FullScreen) {
 		flags |= SDL_FULLSCREEN;
 	}
@@ -611,11 +613,7 @@ void InitVideoSdl()
 	}
 
 	if (!Video.Width || !Video.Height) {
-#ifdef USE_MAEMO
-		Video.Width = 800;
-#else
 		Video.Width = 640;
-#endif
 		Video.Height = 480;
 	}
 
