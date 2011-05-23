@@ -134,6 +134,10 @@ set(guichan_SRCS
 )
 source_group(guichan FILES ${guichan_SRCS})
 
+set(maemo_SRCS
+	src/maemo/maemo.cpp
+)
+
 set(map_SRCS
 	src/map/map.cpp
 	src/map/map_draw.cpp
@@ -294,6 +298,7 @@ set(stratagus_HDRS
 	src/include/iocompat.h
 	src/include/iolib.h
 	src/include/luacallback.h
+	src/include/maemo.h
 	src/include/map.h
 	src/include/master.h
 	src/include/menus.h
@@ -573,6 +578,7 @@ endif()
 if(MAEMO)
 	add_definitions(-DUSE_MAEMO ${LIBOSSO_CFLAGS})
 	include_directories(${LIBOSSO_INCLUDE_DIRS})
+	set(stratagus_SRCS ${stratagus_SRCS} ${maemo_SRCS})
 	set(stratagus_LIBS ${LIBOSSO_LIBRARIES})
 	# Hack/Bug: On Maemo is not possible to disable touch screen input
 	set(ENABLE_TOUCHSCREEN ON)

@@ -75,7 +75,7 @@
 #endif
 
 #ifdef USE_MAEMO
-#include <libosso.h>
+#include "maemo.h"
 #endif
 
 #include "video.h"
@@ -435,56 +435,6 @@ static void InitKey2Str()
 	Key2Str[SDLK_UNDO] = "undo";
 }
 
-#ifdef USE_MAEMO
-osso_context_t * osso = NULL;
-SDL_TimerID timer;
-
-static Uint32 OssoKeepBacklightAlive(Uint32 interval, void *)
-{
-	if (!osso)
-		return interval;
-
-	osso_display_state_on(osso);
-	osso_display_blanking_pause(osso);
-
-	return interval;
-}
-
-void OssoInitialize()
-{
-	char * application;
-
-	if (FullGameName.empty())
-		application = (char *)"org.stratagus";
-	else
-		application = (char *)std::string("org.stratagus." + FullGameName).c_str();
-
-	if (strlen(application) > 14)
-		application[14] = tolower(application[14]);
-
-	osso = osso_initialize(application, VERSION, TRUE, NULL);
-
-	if (!osso) {
-		fprintf(stderr, "Couldn't initialize OSSO\n");
-		exit(OSSO_ERROR);
-	}
-
-	timer = SDL_AddTimer(50000, OssoKeepBacklightAlive, NULL);
-
-	if (!timer) {
-		fprintf(stderr, "Couldn't initialize SDL_AddTimer: %s\n", SDL_GetError());
-		exit(1);
-	}
-}
-
-void OssoDeinitialize()
-{
-	SDL_RemoveTimer(timer);
-	osso_deinitialize(osso);
-
-}
-#endif
-
 /**
 **  Initialize the video part for SDL.
 */
@@ -509,8 +459,11 @@ void InitVideoSdl()
 		}
 
 		// Clean up on exit
-
 		atexit(SDL_Quit);
+
+#ifdef USE_MAEMO
+		maemo_init();
+#endif
 
 		// If debug is enabled, Stratagus disable SDL Parachute.
 		// So we need gracefully handle segfaults and aborts.
@@ -653,11 +606,6 @@ void InitVideoSdl()
 #endif
 		InitOpenGL();
 	}
-
-#ifdef USE_MAEMO
-	OssoInitialize();
-	atexit(OssoDeinitialize);
-#endif
 
 	InitKey2Str();
 
