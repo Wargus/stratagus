@@ -330,15 +330,9 @@ void CViewport::DrawMapBackgroundInViewport() const
 	}
 }
 
-struct CDrawProxy {
-
+class CDrawProxy {
+public:
 	CDrawProxy(): nunits(0), nmissiles(0) {}
-
-	CMutex lock;
-	CUnitDrawProxy unittable[UnitMax];
-	MissileDrawProxy missiletable[MAX_MISSILES * 9];
-	int nunits;
-	int nmissiles;
 
 	void Update(const CViewport *const vp)
 	{
@@ -373,8 +367,12 @@ struct CDrawProxy {
 		}
 		lock.UnLock();
 	}
-
-
+private:
+	CMutex lock;
+	CUnitDrawProxy unittable[UnitMax];
+	MissileDrawProxy missiletable[MAX_MISSILES * 9];
+	int nunits;
+	int nmissiles;
 };
 
 void CViewport::UpdateUnits()
