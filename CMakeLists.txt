@@ -137,6 +137,7 @@ source_group(guichan FILES ${guichan_SRCS})
 set(maemo_SRCS
 	src/maemo/maemo.cpp
 )
+source_group(maemo FILES ${maemo_SRCS})
 
 set(map_SRCS
 	src/map/map.cpp

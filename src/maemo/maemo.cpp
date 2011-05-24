@@ -52,8 +52,8 @@ static SDL_TimerID timer = NULL;
 ----------------------------------------------------------------------------*/
 
 /**
- * Callback function for SDL_AddTimer
- * Tell OSSO to keep display on and prevent suspending device for 60s
+ * Callback function for SDL_AddTimer.
+ * Tell OSSO to keep display on and prevent suspending device for 60s.
  **/
 static Uint32 OssoKeepBacklightAlive(Uint32 interval, void *)
 {
@@ -67,8 +67,8 @@ static Uint32 OssoKeepBacklightAlive(Uint32 interval, void *)
 }
 
 /**
- * Initialize OSSO context, needed for calling OSSO functions
- * Create SDL timer for calling @see OssoKeepBacklightAlive every 50s
+ * Initialize OSSO context, needed for calling OSSO functions.
+ * Create SDL timer for calling OssoKeepBacklightAlive every 50s.
  **/
 static void OssoInitialize()
 {
