@@ -7,6 +7,6 @@ Abstract: This manual describes what Stratagus is
 Section: games
 
 Format: HTML
-Index: /usr/share/doc/stratagus-doc/index.html
-Files: /usr/share/doc/stratagus-doc/*.html
+Index: /usr/share/doc/stratagus/index.html
+Files: /usr/share/doc/stratagus/*.html
 

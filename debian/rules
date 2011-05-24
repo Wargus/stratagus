@@ -71,8 +71,8 @@ binary-fixup/stratagus-dbg::
 
 binary-fixup/stratagus-doc::
 	mkdir -p debian/stratagus-doc/opt/stratagus
-	mv debian/stratagus-doc/usr/share/doc/stratagus-doc debian/stratagus-doc/opt/stratagus/doc
-	ln -s /opt/stratagus/doc debian/stratagus-doc/usr/share/doc/stratagus-doc
+	mv debian/stratagus-doc/usr/share/doc/stratagus debian/stratagus-doc/opt/stratagus/doc
+	ln -s /opt/stratagus/doc debian/stratagus-doc/usr/share/doc/stratagus
 
 binary-predeb/stratagus::
 	if test -f debian/control.orig; then mv debian/control.orig debian/control; fi

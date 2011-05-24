@@ -758,14 +758,14 @@ endif()
 ########### next target ###############
 
 if(ENABLE_DOC AND DOXYGEN_FOUND)
-	add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/index.html
-		COMMAND ${DOXYGEN_EXECUTABLE} ARGS ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen.cfg
-		DEPENDS doc/doxygen*.cfg ${stratagus_SRCS}
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+	add_custom_command(OUTPUT doxygen/index.html
+		COMMAND ${DOXYGEN_EXECUTABLE}
+		DEPENDS doc/Doxyfile* ${stratagus_SRCS} ${stratagus_HDRS} ${metaserver_SRCS} ${metaserver_HDRS}
 		COMMENT "Generating Stratagus souce code documentation with Doxygen" VERBATIM
 	)
-	add_custom_target(doc ALL DEPENDS doc/doxygen/index.html)
-	set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/)
+	add_custom_target(doc ALL DEPENDS doxygen/index.html)
+	set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES doxygen)
 endif()
 
 ########### next target ###############
@@ -810,3 +810,21 @@ install(TARGETS png2stratagus DESTINATION bin)
 if(SQLITE_FOUND)
 	install(TARGETS metaserver DESTINATION sbin)
 endif()
+
+if(ENABLE_DOC AND DOXYGEN_FOUND)
+	install(FILES doc/stratagus.6 DESTINATION share/man/man6)
+	install(FILES
+		doc/development.html
+		doc/faq.html
+		doc/gpl.html
+		doc/guichan-copyright.txt
+		doc/ChangeLog.html
+		doc/index.html
+		doc/install.html
+		doc/media.html
+		doc/metaserver_protocol.txt
+		doc/README-SDL.txt
+		DESTINATION share/doc/stratagus
+	)
+	install(DIRECTORY doc/graphics doc/scripts ${CMAKE_CURRENT_BINARY_DIR}/doxygen DESTINATION share/doc/stratagus)
+endif(ENABLE_DOC AND DOXYGEN_FOUND)
