@@ -46,7 +46,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static char *dbfile = "metaserver.db";
+static const char *dbfile = "metaserver.db";
 static sqlite3 *DB;
 
 #define SQLCreatePlayersTable \
