@@ -311,7 +311,7 @@ void UiTogglePause()
 **
 **  @todo FIXME: We should try to keep the same view, if possible
 */
-static void UiToggleBigMap()
+void UiToggleBigMap()
 {
 	static int mapx;
 	static int mapy;
@@ -375,6 +375,19 @@ static void UiDecreaseGameSpeed()
 	}
 	SetVideoSync();
 	UI.StatusLine.Set(_("Slower"));
+}
+
+/**
+**  Set default game speed.
+*/
+static void UiSetDefaultGameSpeed()
+{
+	if (FastForwardCycle >= GameCycle) {
+		return;
+	}
+	VideoSyncSpeed = 100;
+	SetVideoSync();
+	UI.StatusLine.Set(_("Set default game speed"));
 }
 
 /**
@@ -469,6 +482,12 @@ static void UiToggleGrabMouse()
 */
 static void UiTrackUnit()
 {
+	//Check if player has selected at least 1 unit
+	if (!Selected[0])
+	{
+		UI.SelectedViewport->Unit = NULL;
+		return;
+	}
 	if (UI.SelectedViewport->Unit == Selected[0]) {
 		UI.SelectedViewport->Unit = NULL;
 	} else {
@@ -599,6 +618,9 @@ static bool CommandKey(int key)
 		case SDLK_MINUS: // - Slower
 		case SDLK_KP_MINUS:
 			UiDecreaseGameSpeed();
+			break;
+		case SDLK_KP_MULTIPLY:
+			UiSetDefaultGameSpeed();
 			break;
 
 		case 'b': // ALT+B, CTRL+B Toggle big map

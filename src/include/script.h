@@ -279,6 +279,8 @@ extern void SaveCcl(CFile *file);     /// Save CCL module
 extern void SavePreferences();        /// Save user preferences
 extern int CclCommand(const std::string &command, bool exitOnError = true);
 
+extern NumberDesc *Damage;  /// Damage calculation for missile.
+
 /// transform string in corresponding index.
 extern EnumVariable Str2EnumVariable(lua_State *l, const char *s);
 extern NumberDesc *CclParseNumberDesc(lua_State *l); /// Parse a number description.

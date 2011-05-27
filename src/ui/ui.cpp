@@ -70,7 +70,7 @@ CUserInterface UI;
 ----------------------------------------------------------------------------*/
 
 CUserInterface::CUserInterface() :
-	MouseScroll(false), KeyScroll(false),
+	MouseScroll(false), KeyScroll(false), MouseScrollSpeed(0),
 	MouseScrollSpeedDefault(0), MouseScrollSpeedControl(0),
 	MouseWarpX(0), MouseWarpY(0),
 	SingleSelectedButton(NULL),
@@ -121,8 +121,8 @@ void InitUserInterface()
 	// Calculations
 	//
 	if (Map.Info.MapWidth) {
-		UI.MapArea.EndX = std::min(UI.MapArea.EndX, Map.Info.MapWidth * PixelTileSize.x - 1);
-		UI.MapArea.EndY = std::min(UI.MapArea.EndY, Map.Info.MapHeight * PixelTileSize.y - 1);
+		UI.MapArea.EndX = std::min<int>(UI.MapArea.EndX, Map.Info.MapWidth * PixelTileSize.x - 1);
+		UI.MapArea.EndY = std::min<int>(UI.MapArea.EndY, Map.Info.MapHeight * PixelTileSize.y - 1);
 	}
 
 	UI.SelectedViewport = UI.Viewports;
@@ -402,8 +402,8 @@ static void ClipViewport(CViewport &vp, int ClipX, int ClipY)
 	vp.EndY = vp.Y + Map.Info.MapHeight * PixelTileSize.y - 1;
 
 	// first clip it to MapArea size if necessary
-	vp.EndX = std::min(vp.EndX, ClipX);
-	vp.EndY = std::min(vp.EndY, ClipY);
+	vp.EndX = std::min<int>(vp.EndX, ClipX);
+	vp.EndY = std::min<int>(vp.EndY, ClipY);
 
 	Assert(vp.EndX <= UI.MapArea.EndX);
 	Assert(vp.EndY <= UI.MapArea.EndY);

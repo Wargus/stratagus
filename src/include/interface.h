@@ -97,7 +97,10 @@ public:
 	std::string UnitMask;    /// for which units is it available
 	IconConfig  Icon;        /// icon to display
 	int Key;                 /// alternative on keyboard
-	std::string Hint;        /// tip text
+	std::string Hint;        /// tip textz
+	std::string Description;        /// description shown on status bar (optional)
+	SoundConfig CommentSound; ///Sound comment used when you press the button
+	std::string ButtonCursor; ///Custom cursor for button action (for example, to set spell target)
 };
 
 	/// Button area under cursor
@@ -184,6 +187,7 @@ enum _cursor_on_ {
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
+extern std::vector<ButtonAction *> UnitButtonTable;
 
 	/// Flag telling if the game is running
 extern bool GameRunning;
@@ -251,7 +255,8 @@ extern void CleanButtons();
 	/// Make a new button
 extern int AddButton(int pos, int level, const std::string &IconIdent,
 	ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
-	const std::string &arg, const std::string &hint, const std::string &umask);
+	const std::string &arg, const std::string &hint, const std::string &descr, 
+	const std::string &sound, const std::string &cursor, const std::string &umask);
 
 //
 // in mouse.cpp
@@ -319,6 +324,8 @@ extern void SetHoldClickDelay(int delay);
 
 	/// Toggle pause mode
 extern void UiTogglePause();
+	/// Toggle big map
+extern void UiToggleBigMap();
 	/// Handle cheats
 extern int HandleCheats(const std::string &input);
 

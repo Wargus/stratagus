@@ -35,9 +35,17 @@
 #include <string>
 #include <map>
 
+#define ANIMATIONS_MAXANIM 1024
+#define ANIMATIONS_DEATHTYPES 40
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
+
+/**
+**  Default names for the extra death types.
+*/
+extern std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 
 enum AnimationType {
 	AnimationNone,
@@ -54,7 +62,8 @@ enum AnimationType {
 	AnimationUnbreakable,
 	AnimationLabel,
 	AnimationGoto,
-	AnimationRandomGoto
+	AnimationRandomGoto,
+	AnimationSpawnMissile
 };
 
 class CAnimation {
@@ -64,9 +73,11 @@ public:
 	}
 
 	~CAnimation() {
-		if (Type == AnimationSound) {
+		if (Type == AnimationSound) 
 			delete[] D.Sound.Name;
-		} else if (Type == AnimationRandomSound) {
+		else if (Type == AnimationSpawnMissile) 
+			delete[] D.SpawnMissile.Missile;
+		else if (Type == AnimationRandomSound) {
 			for (unsigned int i = 0; i < D.RandomSound.NumSounds; ++i) {
 				delete[] D.RandomSound.Name[i];
 			}
@@ -112,25 +123,28 @@ public:
 			int Random;
 			CAnimation *Goto;
 		} RandomGoto;
+		struct {
+			const char *Missile;
+		} SpawnMissile;
 	} D;
 	CAnimation *Next;
 };
 
 class CAnimations {
 public:
-	CAnimations() : Start(NULL), Still(NULL), Death(NULL), Attack(NULL),
-		Move(NULL), Repair(NULL), Train(NULL), Research(NULL),
+	CAnimations() : Start(NULL),
+		Repair(NULL), Train(NULL), Research(NULL),
 		Upgrade(NULL), Build(NULL)
 	{
+		memset(Still, 0, sizeof(Still));
+		memset(Move, 0, sizeof(Move));
+		memset(Attack, 0, sizeof(Attack));
 		memset(Harvest, 0, sizeof(Harvest));
+		memset(Death, 0, sizeof(Death));
 	}
 
 	~CAnimations() {
 		delete[] Start;
-		delete[] Still;
-		delete[] Death;
-		delete[] Attack;
-		delete[] Move;
 		delete[] Repair;
 		delete[] Train;
 		delete[] Research;
@@ -139,13 +153,22 @@ public:
 		for ( int i = 0; i< MaxCosts; ++i) {
 			delete[] Harvest[i];
 		}
+		for ( int i = 0; i< ANIMATIONS_DEATHTYPES+1; ++i) {
+			delete[] Death[i];
+		}
+		for ( int i = 0; i< 100; ++i) {
+			delete[] Still[i];
+			delete[] Move[i];
+			delete[] Attack[i];
+		}
+
 	}
 
 	CAnimation *Start;
-	CAnimation *Still;
-	CAnimation *Death;
-	CAnimation *Attack;
-	CAnimation *Move;
+	CAnimation *Still[100];
+	CAnimation *Death[ANIMATIONS_DEATHTYPES+1];
+	CAnimation *Attack[100];
+	CAnimation *Move[100];
 	CAnimation *Repair;
 	CAnimation *Train;
 	CAnimation *Research;
@@ -155,7 +178,7 @@ public:
 };
 
 
-#define ANIMATIONS_MAXANIM 1024
+
 
 extern CAnimation *AnimationsArray[ANIMATIONS_MAXANIM];
 extern int NumAnimations;

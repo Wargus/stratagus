@@ -891,7 +891,7 @@ static int CclSetPlayerData(lua_State *l)
 		if (i == MaxCosts) {
 			LuaError(l, "Invalid resource \"%s\"" _C_ res.c_str());
 		}
-		p->Resources[i] = LuaToNumber(l, 4);
+		SendCommandSetResource(p->Index,i,LuaToNumber(l, 4));
 // } else if (!strcmp(data, "UnitTypesCount")) {
 // } else if (!strcmp(data, "AiEnabled")) {
 // } else if (!strcmp(data, "TotalNumUnits")) {

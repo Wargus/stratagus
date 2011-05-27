@@ -185,7 +185,7 @@ void HandleActionBoard(CUnit &unit)
 			if (WaitForTransporter(unit)) {
 				unit.SubAction = 202;
 			} else {
-				UnitShowAnimation(unit, unit.Type->Animations->Still);
+				UnitShowAnimation(unit, unit.Type->Animations->Still[GetAnimationDamagedState(unit,1)]);
 			}
 			break;
 		//

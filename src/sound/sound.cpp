@@ -175,7 +175,10 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 		case VoiceHelpMe:
 			return unit.Type->Sound.Help.Sound;
 		case VoiceDying:
-			return unit.Type->Sound.Dead.Sound;
+			if (unit.Type->Sound.Dead[unit.DamagedType].Sound)
+				return unit.Type->Sound.Dead[unit.DamagedType].Sound;
+			else
+				return unit.Type->Sound.Dead[ANIMATIONS_DEATHTYPES].Sound;
 		case VoiceWorkCompleted:
 			return GameSounds.WorkComplete[ThisPlayer->Race].Sound;
 		case VoiceBuilding:

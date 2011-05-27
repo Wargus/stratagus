@@ -90,6 +90,8 @@ static int HelpMeLastY;                   /// Last Y coordinate HelpMe sound pla
 
 static void RemoveUnitFromContainer(CUnit &unit);
 
+extern int ExtraDeathIndex(const char *death);
+
 /**
 **  Increase a unit's reference count.
 */
@@ -2788,11 +2790,12 @@ void LetUnitDie(CUnit &unit)
 		unit.ResourcesHeld = unit.Data.Built.Worker->ResourcesHeld;
 	}
 
-	// Transporters lose their units and building their workers
-	if (unit.UnitInside) {
-		// FIXME: destroy or unload : do a flag.
+	// Transporters lose or save their units and building their workers
+	if (unit.UnitInside && unit.Type->SaveCargo) 
+		DropOutAll(unit);
+	else if (unit.UnitInside)
 		DestroyAllInside(unit);
-	}
+
 	unit.Remove(NULL);
 	UnitLost(unit);
 	UnitClearOrders(unit);
@@ -2905,6 +2908,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 	type = target.Type;
 	lastattack = target.Attacked;
 	target.Attacked = GameCycle ? GameCycle : 1;
+	target.DamagedType = ExtraDeathIndex(attacker->Type->DamageType.c_str());
 
 	if (!lastattack || lastattack + 2 * CYCLES_PER_SECOND < GameCycle) {
 		// NOTE: perhaps this should also be moved into the notify?
@@ -2935,11 +2939,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		if (!target.Type->Building) {
 			if (target.Player->AiEnabled) {
 				AiHelpMe(attacker, target);
-			} else {
-				if (target.GroupId) {
-					GroupHelpMe(attacker, target);
-				}
-			}
+			} 
 		}
 	}
 
@@ -2947,11 +2947,12 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		AiHelpMe(attacker, target);
 	}
 
-	if (target.Variable[HP_INDEX].Value <= damage) { // unit is killed or destroyed
+	if (target.Variable[HP_INDEX].Value <= damage && attacker->Type->ShieldPiercing || 
+		target.Variable[HP_INDEX].Value <= damage - target.Variable[SHIELD_INDEX].Value) { // unit is killed or destroyed
 		//  increase scores of the attacker, but not if attacking it's own units.
 		//  prevents cheating by killing your own units.
 		if (attacker && target.IsEnemy(*attacker)) {
-			attacker->Player->Score += target.Type->Points;
+			attacker->Player->Score += target.Variable[POINTS_INDEX].Value;
 			if (type->Building) {
 				attacker->Player->TotalRazings++;
 			} else {
@@ -2960,7 +2961,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 			if (UseHPForXp) {
 				attacker->Variable[XP_INDEX].Max += target.Variable[HP_INDEX].Value;
 			} else {
-				attacker->Variable[XP_INDEX].Max += target.Type->Points;
+				attacker->Variable[XP_INDEX].Max += target.Variable[POINTS_INDEX].Value;
 			}
 			attacker->Variable[XP_INDEX].Value = attacker->Variable[XP_INDEX].Max;
 			attacker->Variable[KILL_INDEX].Value++;
@@ -2970,7 +2971,15 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		LetUnitDie(target);
 		return;
 	}
-	target.Variable[HP_INDEX].Value -= damage;
+	if (attacker->Type->ShieldPiercing)
+		target.Variable[HP_INDEX].Value -= damage;
+	else if (target.Variable[SHIELD_INDEX].Value >= damage)
+		target.Variable[SHIELD_INDEX].Value -= damage;
+	else
+	{
+		target.Variable[HP_INDEX].Value -= damage - target.Variable[SHIELD_INDEX].Value;
+		target.Variable[SHIELD_INDEX].Value = 0;
+	}
 	if (UseHPForXp && attacker && target.IsEnemy(*attacker)) {
 		attacker->Variable[XP_INDEX].Value += damage;
 		attacker->Variable[XP_INDEX].Max += damage;
@@ -3079,6 +3088,8 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 	// Attack units in range (which or the attacker?)
 	//
 	if (attacker && target.IsAgressive() && target.CanMove()) {
+			if (target.CurrentAction() != UnitActionStill && !target.Player->AiEnabled)
+					return;
 			if (RevealAttacker && CanTarget(target.Type, attacker->Type)) {
 				// Reveal Unit that is attacking
 				goal = attacker;
@@ -3090,8 +3101,6 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 					goal = AttackUnitsInReactRange(target);
 				}
 			}
-			if (target.CurrentAction() != UnitActionStill && !target.Player->AiEnabled)
-					return;
 			if (goal) {
 				if (target.SavedOrder.Action == UnitActionStill) {
 					// FIXME: should rewrite command handling
@@ -3113,7 +3122,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 	//
 	// Can't attack run away.
 	//
-	if (target.CanMove()) {
+	if (target.CanMove() && target.CurrentAction() == UnitActionStill) {
 		Vec2i pos = target.tilePos - attacker->tilePos;
 		int d = isqrt(pos.x * pos.x + pos.y * pos.y);
 
@@ -3158,12 +3167,12 @@ int MapDistanceToType(const Vec2i &pos1, const CUnitType &type, const Vec2i &pos
 	if (pos1.x <= pos2.x) {
 		dx = pos2.x - pos1.x;
 	} else {
-		dx = std::max(0, pos1.x - pos2.x - type.TileWidth + 1);
+		dx = std::max<int>(0, pos1.x - pos2.x - type.TileWidth + 1);
 	}
 	if (pos1.y <= pos2.y) {
 		dy = pos2.y - pos1.y;
 	} else {
-		dy = std::max(0, pos1.y - pos2.y - type.TileHeight + 1);
+		dy = std::max<int>(0, pos1.y - pos2.y - type.TileHeight + 1);
 	}
 	return isqrt(dy * dy + dx * dx);
 }
@@ -3184,14 +3193,14 @@ int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1, const CUnit
 	int dy;
 
 	if (pos1.x + src.TileWidth <= pos2.x) {
-		dx = std::max(0, pos2.x - pos1.x - src.TileWidth + 1);
+		dx = std::max<int>(0, pos2.x - pos1.x - src.TileWidth + 1);
 	} else {
-		dx = std::max(0, pos1.x - pos2.x - dst.TileWidth + 1);
+		dx = std::max<int>(0, pos1.x - pos2.x - dst.TileWidth + 1);
 	}
 	if (pos1.y + src.TileHeight <= pos2.y) {
 		dy = pos2.y - pos1.y - src.TileHeight + 1;
 	} else {
-		dy = std::max(0, pos1.y - pos2.y - dst.TileHeight + 1);
+		dy = std::max<int>(0, pos1.y - pos2.y - dst.TileHeight + 1);
 	}
 	return isqrt(dy * dy + dx * dx);
 }
@@ -3297,6 +3306,35 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 		}
 	}
 	return 1;
+}
+
+/**
+**  Get the suitable animation frame when unit is damaged.
+*/
+int GetAnimationDamagedState(CUnit &unit, int anim)
+{
+	if (unit.Variable[HP_INDEX].Max==0)
+		return 99;
+	int health = unit.Variable[HP_INDEX].Value * 100 / unit.Variable[HP_INDEX].Max;
+	if (health==0)
+		return 99;
+	for (int i = health - 1; i<=99; ++i)
+		switch (anim)
+		{
+		case 1:
+			if (unit.Type->Animations->Still[i])
+				return i;
+			break;
+		case 2:
+			if (unit.Type->Animations->Move[i])
+				return i;
+			break;
+		case 3:
+			if (unit.Type->Animations->Attack[i])
+				return i;
+			break;
+		}
+	return 99;
 }
 
 /**

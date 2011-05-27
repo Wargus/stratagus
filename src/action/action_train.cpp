@@ -101,7 +101,7 @@ void HandleActionTrain(CUnit &unit)
 
 	unit.Type->Animations->Train ?
 		UnitShowAnimation(unit, unit.Type->Animations->Train) :
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		UnitShowAnimation(unit, unit.Type->Animations->Still[GetAnimationDamagedState(unit,1)]);
 
 	if (unit.Wait) {
 		unit.Wait--;

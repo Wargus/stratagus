@@ -104,6 +104,8 @@ static const char ISNOTSELECTABLE_KEY[] = "IsNotSelectable";
 static const char DECORATION_KEY[] = "Decoration";
 static const char INDESTRUCTIBLE_KEY[] = "Indestructible";
 static const char TELEPORTER_KEY[] = "Teleporter";
+static const char SHIELDPIERCE_KEY[] = "ShieldPiercing";
+static const char SAVECARGO_KEY[] = "LoseCargo";
 // names of the variable.
 static const char HITPOINTS_KEY[] = "HitPoints";
 static const char BUILD_KEY[] = "Build";
@@ -134,6 +136,9 @@ static const char SLOW_KEY[] = "Slow";
 static const char INVISIBLE_KEY[] = "Invisible";
 static const char UNHOLYARMOR_KEY[] = "UnholyArmor";
 static const char SLOT_KEY[] = "Slot";
+static const char SHIELD_KEY[] = "ShieldPoints";
+static const char POINTS_KEY[] = "Points";
+static const char MAXHARVESTERS_KEY[] = "MaxHarvesters";
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -147,7 +152,8 @@ CUnitTypeVar::CBoolKeys::CBoolKeys() {
 		ATTACKFROMTRANSPORTER_KEY,VANISHES_KEY,GROUNDATTACK_KEY,
 		SHOREBUILDING_KEY, CANATTACK_KEY,BUILDEROUTSIDE_KEY,
 		BUILDERLOST_KEY,CANHARVEST_KEY,HARVESTER_KEY,SELECTABLEBYRECTANGLE_KEY,
-		ISNOTSELECTABLE_KEY,DECORATION_KEY,INDESTRUCTIBLE_KEY,TELEPORTER_KEY};
+		ISNOTSELECTABLE_KEY,DECORATION_KEY,INDESTRUCTIBLE_KEY,TELEPORTER_KEY,SHIELDPIERCE_KEY,
+		SAVECARGO_KEY};
 
 	for (int i = 0; i < NBARALREADYDEFINED; ++i) {
 		buildin[i].offset = i;
@@ -165,7 +171,8 @@ CUnitTypeVar::CVariableKeys::CVariableKeys() {
 		SIGHTRANGE_KEY, ATTACKRANGE_KEY,PIERCINGDAMAGE_KEY,
 		BASICDAMAGE_KEY,POSX_KEY,POSY_KEY,RADARRANGE_KEY,
 		RADARJAMMERRANGE_KEY,AUTOREPAIRRANGE_KEY,BLOODLUST_KEY,HASTE_KEY,
-		SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY};
+		SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY, SHIELD_KEY, POINTS_KEY, 
+		MAXHARVESTERS_KEY};
 
 	for (int i = 0; i < NVARALREADYDEFINED; ++i) {
 		buildin[i].offset = i;
@@ -223,6 +230,33 @@ unsigned CclGetResourceByName(lua_State *l)
 	}
 	LuaError(l, "GetResourceByName: Unsupported resource tag: %s" _C_ value.c_str());
 	return 0xABCDEF;
+}
+
+/**
+**  Find the index of a resource
+*/
+static int ResourceIndex(lua_State *l, const char *resource)
+{
+	for (unsigned int res = 0; res < MaxCosts; ++res) {
+		if (!strcmp(resource, DefaultResourceNames[res].c_str())) {
+			return res;
+		}
+	}
+	LuaError(l, "Resource not found: %s" _C_ resource);
+	return 0;
+}
+
+/**
+**  Find the index of a extra death type
+*/
+int ExtraDeathIndex(const char *death)
+{
+	for (unsigned int det = 0; det < ANIMATIONS_DEATHTYPES; ++det) {
+		if (!strcmp(death, ExtraDeathTypes[det].c_str())) {
+			return det;
+		}
+	}
+	return ANIMATIONS_DEATHTYPES;
 }
 
 /**
@@ -534,6 +568,11 @@ static int CclDefineUnitType(lua_State *l)
 			type->Variable[MANA_INDEX].Value = (type->Variable[MANA_INDEX].Max * MAGIC_FOR_NEW_UNITS) / 100;
 			type->Variable[MANA_INDEX].Increase = 1;
 			type->Variable[MANA_INDEX].Enable = 1;
+		} else if (!strcmp(value, "ShieldPoints")) {
+			type->Variable[SHIELD_INDEX].Max = LuaToNumber(l, -1);
+			type->Variable[SHIELD_INDEX].Value = 0;
+			type->Variable[SHIELD_INDEX].Increase = 1;
+			type->Variable[SHIELD_INDEX].Enable = 1;
 		} else if (!strcmp(value, "TileSize")) {
 			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
@@ -585,14 +624,15 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "MaxAttackRange")) {
 			type->Variable[ATTACKRANGE_INDEX].Value = LuaToNumber(l, -1);
 			type->Variable[ATTACKRANGE_INDEX].Max = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "MaxHarvesters")) {
+			type->Variable[MAXHARVESTERS_INDEX].Value = LuaToNumber(l, -1);
+			type->Variable[MAXHARVESTERS_INDEX].Max = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Priority")) {
 			type->Priority = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "AnnoyComputerFactor")) {
 			type->AnnoyComputerFactor = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DecayRate")) {
 			type->DecayRate = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Points")) {
-			type->Points = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Demand")) {
 			type->Demand = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Supply")) {
@@ -600,6 +640,10 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Corpse")) {
 			type->CorpseName = LuaToString(l, -1);
 			type->CorpseType = NULL;
+		} else if (!strcmp(value, "DamageType")) {
+			value = LuaToString(l, -1);
+			int check = ExtraDeathIndex(value);
+			type->DamageType = value;
 		} else if (!strcmp(value, "ExplodeWhenKilled")) {
 			type->ExplodeWhenKilled = 1;
 			type->Explosion.Name = LuaToString(l, -1);
@@ -740,7 +784,6 @@ static int CclDefineUnitType(lua_State *l)
 				type->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
 			}
 
-			// FIXME : add flag for kill/unload units inside.
 			subargs = lua_objlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
@@ -950,6 +993,10 @@ static int CclDefineUnitType(lua_State *l)
 			type->SelectableByRectangle = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Teleporter")) {
 			type->Teleporter = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "ShieldPiercing")) {
+			type->ShieldPiercing = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "SaveCargo")) {
+			type->SaveCargo = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Sounds")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1004,9 +1051,26 @@ static int CclDefineUnitType(lua_State *l)
 					type->Sound.Help.Name = LuaToString(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "dead")) {
+					int death;
+
 					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Dead.Name = LuaToString(l, -1);
+					const std::string name = LuaToString(l, -1);
 					lua_pop(l, 1);
+					for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
+						if (name == ExtraDeathTypes[death]) {
+							++k;
+							break;
+						}
+					}
+					if (death == ANIMATIONS_DEATHTYPES) {
+						type->Sound.Dead[ANIMATIONS_DEATHTYPES].Name = name;
+					}
+					else
+					{
+						lua_rawgeti(l, -1, k + 1);
+						type->Sound.Dead[death].Name = LuaToString(l, -1);
+						lua_pop(l, 1);		
+					}
 				} else {
 					LuaError(l, "Unsupported sound tag: %s" _C_ value);
 				}
@@ -1394,6 +1458,9 @@ static void ParseAnimationFrame(lua_State *l, const char *str,
 		anim->D.RandomSound.Sound = new CSound *[count];
 	} else if (op1 == "attack") {
 		anim->Type = AnimationAttack;
+	} else if (op1 == "spawn-missile") {
+		anim->Type = AnimationSpawnMissile;
+		anim->D.SpawnMissile.Missile = new_strdup(op2);
 	} else if (op1 == "rotate") {
 		anim->Type = AnimationRotate;
 		anim->D.Rotate.Rotate = atoi(op2);
@@ -1488,20 +1555,6 @@ static void AddAnimationToArray(CAnimation *anim)
 }
 
 /**
-**  Find the index of a resource
-*/
-static int ResourceIndex(lua_State *l, const char *resource)
-{
-	for (unsigned int res = 0; res < MaxCosts; ++res) {
-		if (!strcmp(resource, DefaultResourceNames[res].c_str())) {
-			return res;
-		}
-	}
-	LuaError(l, "Resource not found: %s" _C_ resource);
-	return 0;
-}
-
-/**
 **  Define a unit-type animation set.
 **
 **  @param l  Lua state.
@@ -1510,8 +1563,11 @@ static int CclDefineAnimations(lua_State *l)
 {
 	const char *name;
 	const char *value;
+	char *end;
 	CAnimations *anims;
 	int res = -1;
+	int death = ANIMATIONS_DEATHTYPES;
+	long still = 99, move = 99, attack = 99;
 
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -1531,14 +1587,48 @@ static int CclDefineAnimations(lua_State *l)
 
 		if (!strcmp(value, "Start")) {
 			anims->Start = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "Still")) {
-			anims->Still = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "Death")) {
-			anims->Death = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "Attack")) {
-			anims->Attack = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "Move")) {
-			anims->Move = ParseAnimation(l, -1);
+		} else if (!strncmp(value, "Still", 5)) {
+			if (strlen(value)>5)
+			{
+				still = strtol(value + 6,&end, 10);
+				if (still>99 || still < 1)
+					LuaError(l,"Damaged percent must be between 1 and 99 : %s" _C_ value + 6);
+				anims->Still[still-1] = ParseAnimation(l, -1);
+			}
+			else
+				anims->Still[99] = ParseAnimation(l, -1);
+		} else if (!strncmp(value, "Death", 5)) {
+			if (strlen(value)>5)
+			{
+				death = ExtraDeathIndex(value + 6);
+				if (death==ANIMATIONS_DEATHTYPES)
+					anims->Death[ANIMATIONS_DEATHTYPES] = ParseAnimation(l, -1);
+				else
+					anims->Death[death] = ParseAnimation(l, -1);
+			}
+			else
+				anims->Death[ANIMATIONS_DEATHTYPES] = ParseAnimation(l, -1);
+		} else if (!strncmp(value, "Attack", 6)) {
+			if (strlen(value)>6)
+			{
+				attack = strtol(value + 7,&end, 10);
+				if (attack>99 || attack < 1)
+					LuaError(l,"Damaged percent must be between 1 and 99 : %s" _C_ value + 7);
+				anims->Attack[attack-1] = ParseAnimation(l, -1);
+			}
+			else
+				anims->Attack[99] = ParseAnimation(l, -1);
+		
+		} else if (!strncmp(value, "Move", 4)) {
+			if (strlen(value)>4)
+			{
+				move = strtol(value + 5,&end, 10);
+				if (move>99 || move < 1)
+					LuaError(l,"Damaged percent must be between 1 and 99 : %s" _C_ value + 5);
+				anims->Move[move-1] = ParseAnimation(l, -1);
+			}
+			else
+				anims->Move[99] = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Repair")) {
 			anims->Repair = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Train")) {
@@ -1559,15 +1649,14 @@ static int CclDefineAnimations(lua_State *l)
 	}
 	// Must add to array in a fixed order for save games
 	AddAnimationToArray(anims->Start);
-	AddAnimationToArray(anims->Still);
-	AddAnimationToArray(anims->Death);
-	AddAnimationToArray(anims->Attack);
-	AddAnimationToArray(anims->Move);
+	AddAnimationToArray(anims->Still[still]);
+	AddAnimationToArray(anims->Death[death]);
+	AddAnimationToArray(anims->Attack[attack]);
+	AddAnimationToArray(anims->Move[move]);
 	AddAnimationToArray(anims->Repair);
 	AddAnimationToArray(anims->Train);
 	if(res != -1)
 		AddAnimationToArray(anims->Harvest[res]);
-
 	return 0;
 }
 
@@ -1819,7 +1908,7 @@ static int CclDefineDecorations(lua_State *l)
 				}
 				lua_pop(l, 2); // MethodName and data
 			} else { // Error
-				LuaError(l, "invalid key '%s' for DefineDecorations" _C_ key);
+				LuaError(l, "invalid key '%s' for DefineDecorations" _C_ key); 
 			}
 			lua_pop(l, 1); // Pop the value
 		}
@@ -1860,7 +1949,8 @@ void UpdateUnitVariables(const CUnit &unit)
 		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
 			|| i == MANA_INDEX || i == KILL_INDEX || i == XP_INDEX
 			|| i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
-			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == HP_INDEX) {
+			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == HP_INDEX 
+			|| i == SHIELD_INDEX || i == POINTS_INDEX || i == MAXHARVESTERS_INDEX) {
 			continue;
 		}
 		unit.Variable[i].Value = 0;
@@ -1916,7 +2006,7 @@ void UpdateUnitVariables(const CUnit &unit)
 	if (unit.Type->Harvester && unit.CurrentResource) {
 		unit.Variable[CARRYRESOURCE_INDEX].Value = unit.ResourcesHeld;
 		unit.Variable[CARRYRESOURCE_INDEX].Max = unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity;
-	}
+	}	
 
 	// Supply
 	unit.Variable[SUPPLY_INDEX].Value = unit.Type->Supply;
@@ -1997,6 +2087,8 @@ void UpdateUnitVariables(const CUnit &unit)
 	type->BoolFlag[DECORATION_INDEX].value            = type->Decoration;
 	type->BoolFlag[INDESTRUCTIBLE_INDEX].value        = type->Indestructible;
 	type->BoolFlag[TELEPORTER_INDEX].value            = type->Teleporter;
+	type->BoolFlag[SHIELDPIERCE_INDEX].value            = type->ShieldPiercing;
+	type->BoolFlag[SAVECARGO_INDEX].value            = type->SaveCargo;
 
 }
 

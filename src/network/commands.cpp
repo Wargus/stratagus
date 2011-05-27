@@ -495,6 +495,25 @@ void SendCommandDiplomacy(int player, int state, int opponent)
 }
 
 /**
+** Send command: Diplomacy changed.
+**
+** @param player     Player which changes his state.
+** @param state      New diplomacy state.
+** @param opponent   Opponent.
+*/
+void SendCommandSetResource(int player, int resource, int value)
+{
+	if (!IsNetworkGame()) {
+		CommandLog("set-resource", NoUnitP, 0, player, value,
+					NoUnitP, NULL, resource);
+		CommandSetResource(player, resource, value);
+	} else {
+		NetworkSendExtendedCommand(ExtendedMessageSetResource,
+			-1, player, resource, value, 0);
+	}
+}
+
+/**
 ** Send command: Shared vision changed.
 **
 ** @param player     Player which changes his state.
@@ -763,6 +782,11 @@ void ParseExtendedCommand(unsigned char type, int status,
 					break;
 			}
 			CommandDiplomacy(arg2, arg3, arg4);
+			break;
+		case ExtendedMessageSetResource:
+			CommandLog("set-resource", NoUnitP, 0, arg2, arg4,
+						NoUnitP, NULL, arg3);
+			CommandSetResource(arg2, arg3, arg4);
 			break;
 		case ExtendedMessageSharedVision:
 			if (arg3 == 0) {

@@ -1257,9 +1257,9 @@ static int AiRepairBuilding(const CUnitType &type, CUnit &building)
 		int rY = unit.tilePos.y - building.tilePos.y;
 
 		// FIXME: Probably calculated from top left corner of building
-		rX = std::max(rX, -rX);
-		rY = std::max(rY, -rY);
-		distance[i] = std::min(rX, rY);
+		rX = std::max<int>(rX, -rX);
+		rY = std::max<int>(rY, -rY);
+		distance[i] = std::min<int>(rX, rY);
 	}
 	for (int i = 0; i < num; ++i) {
 		int r_temp = distance[i];

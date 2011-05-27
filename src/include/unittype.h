@@ -292,6 +292,9 @@
 **  CUnitType::StartingResources
 **    Amount of Resources a unit has when It's Built
 **
+**  CUnitType::DamageType
+**    Unit's missile damage type (used for extra death animations)
+**
 **  CUnitType::GivesResource
 **
 **    This equals to the resource Id of the resource given
@@ -370,6 +373,14 @@
 **    CUnitType::Teleporter
 **
 **    Can teleport other units.
+**
+**    CUnitType::ShieldPiercing
+**
+**    Can directly damage shield-protected units, without shield damaging.
+**
+**    CUnitType::SaveCargo
+**
+**    Unit unloads his passengers after death.
 **
 **  CUnitType::Sound
 **
@@ -632,6 +643,8 @@ enum {
 	DECORATION_INDEX,
 	INDESTRUCTIBLE_INDEX,
 	TELEPORTER_INDEX,
+	SHIELDPIERCE_INDEX,
+	SAVECARGO_INDEX,
 	NBARALREADYDEFINED
 };
 
@@ -666,6 +679,9 @@ enum {
 	INVISIBLE_INDEX,
 	UNHOLYARMOR_INDEX,
 	SLOT_INDEX,
+	SHIELD_INDEX,
+	POINTS_INDEX,
+	MAXHARVESTERS_INDEX,
 	NVARALREADYDEFINED
 };
 
@@ -683,7 +699,8 @@ class CDecoVar {
 public:
 
 	CDecoVar() {};
-	virtual ~CDecoVar() {};
+	virtual ~CDecoVar() {
+	};
 
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y, const CUnitType *Type, const CVariable &var) const = 0;
@@ -915,6 +932,8 @@ public:
 
 	LuaCallback *DeathExplosion;
 
+	std::string DamageType;               /// DamageType (used for extra death animations)
+
 	std::string CorpseName;         /// Corpse type name
 	CUnitType *CorpseType;          /// Corpse unit-type
 
@@ -955,7 +974,6 @@ public:
 #define MouseActionHarvest   3      /// Harvest resources
 #define MouseActionSpellCast 5      /// Cast the first spell known
 #define MouseActionSail      6      /// Sail
-	int Points;                     /// How many points you get for unit
 	int CanTarget;                  /// Which units can it attack
 #define CanTargetLand 1             /// Can attack land units
 #define CanTargetSea  2             /// Can attack sea units
@@ -988,6 +1006,8 @@ public:
 	unsigned Decoration : 1;            /// Unit is a decoration (act as tile).
 	unsigned Indestructible : 1;        /// Unit is indestructible (take no damage).
 	unsigned Teleporter : 1;            /// Can teleport other units.
+	unsigned ShieldPiercing : 1;            /// Can directly damage shield-protected units, without shield damaging.
+	unsigned SaveCargo : 1;            /// Unit unloads his passengers after death.
 
 	CVariable *Variable;            /// Array of user defined variables.
 	struct BoolFlags {
@@ -1030,7 +1050,7 @@ public:
 	}
 	bool CanMove() const
 	{
-		return Animations && Animations->Move;
+		return Animations && Animations->Move[99];
 	}
 
 	bool CanSelect(GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY) const
@@ -1052,7 +1072,7 @@ public:
 
 	/// @todo ARI: should be dynamic (lua..).
 	/// How many unit-types are currently supported
-#define UnitTypeMax 257
+#define UnitTypeMax 2048
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -1185,7 +1205,6 @@ extern CUnitTypeVar UnitTypeVar;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
 extern CUnitType *CclGetUnitType(lua_State *l);      /// Access unit-type object
 extern void UnitTypeCclRegister();               /// Register ccl features
 

@@ -910,13 +910,22 @@ void UIHandleMouseMove(int x, int y)
 	//
 	if (CursorState == CursorStateSelect) {
 		if (CursorOn == CursorOnMap || CursorOn == CursorOnMinimap) {
-			GameCursor = UI.YellowHair.Cursor;
+			if (CustomCursor.length() && CursorByIdent(CustomCursor))
+				GameCursor = CursorByIdent(CustomCursor);
+			else
+				GameCursor = UI.YellowHair.Cursor;
 			if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->Decoration) {
 				if (UnitUnderCursor->Player == ThisPlayer ||
 						ThisPlayer->IsAllied(*UnitUnderCursor)) {
-					GameCursor = UI.GreenHair.Cursor;
+					if (CustomCursor.length() && CursorByIdent(CustomCursor))
+						GameCursor = CursorByIdent(CustomCursor);
+					else
+						GameCursor = UI.YellowHair.Cursor;
 				} else if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
-					GameCursor = UI.RedHair.Cursor;
+					if (CustomCursor.length() && CursorByIdent(CustomCursor))
+						GameCursor = CursorByIdent(CustomCursor);
+					else
+						GameCursor = UI.YellowHair.Cursor;
 				}
 			}
 			if (CursorOn == CursorOnMinimap && (MouseButtons & RightButton)) {
@@ -1324,6 +1333,9 @@ static void SendCommand(int sx, int sy)
 					PlayUnitSound(*Selected[i], VoiceAcknowledging);
 					break;
 				}
+			} else if (ret==ButtonRepair && Selected[i]->Type->Sound.Repair.Sound) {
+				PlayUnitSound(*Selected[i], VoiceRepairing);
+				break;
 			} else if (Selected[i]->Type->Sound.Acknowledgement.Sound) {
 				PlayUnitSound(*Selected[i], VoiceAcknowledging);
 				break;
@@ -1401,6 +1413,7 @@ static void UISelectStateButtonDown(unsigned)
 		ClearCosts();
 		CursorState = CursorStatePoint;
 		GameCursor = UI.Point.Cursor;
+		CustomCursor.clear();
 		CurrentButtonLevel = 0;
 		UI.ButtonPanel.Update();
 
@@ -1433,6 +1446,7 @@ static void UISelectStateButtonDown(unsigned)
 			ClearCosts();
 			CursorState = CursorStatePoint;
 			GameCursor = UI.Point.Cursor;
+			CustomCursor.clear();
 			CurrentButtonLevel = 0;
 			UI.ButtonPanel.Update();
 			if (!ClickMissile.empty()) {
@@ -1459,7 +1473,10 @@ static void UISelectStateButtonDown(unsigned)
 	UI.StatusLine.Clear();
 	ClearCosts();
 	CursorState = CursorStatePoint;
-	GameCursor = UI.Point.Cursor;
+	if (CustomCursor.length() && CursorByIdent(CustomCursor))
+				GameCursor = CursorByIdent(CustomCursor);
+			else
+				GameCursor = UI.YellowHair.Cursor;
 	CurrentButtonLevel = 0;
 	UI.ButtonPanel.Update();
 }

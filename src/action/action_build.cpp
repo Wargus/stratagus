@@ -304,6 +304,8 @@ static void StartBuilding(CUnit &unit, CUnit &ontop)
 	// Make sure the bulding doesn't cancel itself out right away.
 	build->Data.Built.Progress = 0;//FIXME ? 100 : 0
 	build->Variable[HP_INDEX].Value = 1;
+	if (build->Variable[SHIELD_INDEX].Max)
+		build->Variable[SHIELD_INDEX].Value = 1;
 	UpdateConstructionFrame(*build);
 
 	// We need somebody to work on it.
@@ -314,7 +316,7 @@ static void StartBuilding(CUnit &unit, CUnit &ontop)
 		// HACK: allows the unit to be removed
 		build->CurrentSightRange = 1;
 		//HACK: reset anim
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		UnitShowAnimation(unit, unit.Type->Animations->Still[GetAnimationDamagedState(unit,1)]);
 		unit.Remove(build);
 		build->CurrentSightRange = 0;
 		unit.tilePos = pos;
@@ -436,15 +438,19 @@ void HandleActionBuilt(CUnit &unit)
 	CUnit *worker;
 	CUnitType *type;
 	int n, mod;
-	int progress;
+	int progress, oldprogress;
+	//For shields
+	int sn, smod;
 
 	type = unit.Type;
 
 	// mod is use for round to upper
 	mod = (unit.Stats->Costs[TimeCost] * 600) - unit.Variable[HP_INDEX].Value;
+	smod = (unit.Stats->Costs[TimeCost] * 600) - unit.Variable[SHIELD_INDEX].Value;
 
 	// n is the current damage taken by the unit.
 	n = (unit.Data.Built.Progress * unit.Variable[HP_INDEX].Max + (mod - 1)) / mod;
+	sn = (unit.Data.Built.Progress * unit.Variable[SHIELD_INDEX].Max + (smod - 1)) / smod;
 
 	// This below is most often 0
 	if (type->BuilderOutside) {
@@ -456,16 +462,26 @@ void HandleActionBuilt(CUnit &unit)
 	}
 	// Building speeds increase or decrease.
 	progress *= SpeedBuild;
+	oldprogress = unit.Data.Built.Progress;
 	unit.Data.Built.Progress += progress;
 	// mod is use for round to upper and use it as cache
 	mod = type->Stats[unit.Player->Index].Costs[TimeCost] * 600;
 
 	// Keep the same level of damage while increasing HP.
-	unit.Variable[HP_INDEX].Value =
-	 (unit.Data.Built.Progress * unit.Variable[HP_INDEX].Max + (mod - n - 1)) /
-		(mod - n);
+	unit.Variable[HP_INDEX].Value +=
+	 (unit.Data.Built.Progress * unit.Variable[HP_INDEX].Max + (mod - n - 1)) / (mod - n) -
+	  (oldprogress * unit.Variable[HP_INDEX].Max + (mod - n - 1)) / (mod - n);
 	if (unit.Variable[HP_INDEX].Value > unit.Stats->Variables[HP_INDEX].Max) {
 		unit.Variable[HP_INDEX].Value = unit.Stats->Variables[HP_INDEX].Max;
+	}
+	if (unit.Variable[SHIELD_INDEX].Max > 0)
+	{
+		unit.Variable[SHIELD_INDEX].Value +=
+		 (unit.Data.Built.Progress * unit.Variable[SHIELD_INDEX].Max + (mod - sn - 1)) / (mod - sn) -
+		  (oldprogress * unit.Variable[SHIELD_INDEX].Max + (mod - sn - 1)) / (mod - sn);
+		if (unit.Variable[SHIELD_INDEX].Value > unit.Stats->Variables[SHIELD_INDEX].Max) {
+			unit.Variable[SHIELD_INDEX].Value = unit.Stats->Variables[SHIELD_INDEX].Max;
+		}
 	}
 
 	//

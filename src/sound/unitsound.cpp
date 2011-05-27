@@ -98,10 +98,14 @@ static void MapAnimSounds(CUnitType *type)
 	}
 
 	MapAnimSounds2(type->Animations->Start);
-	MapAnimSounds2(type->Animations->Still);
-	MapAnimSounds2(type->Animations->Death);
-	MapAnimSounds2(type->Animations->Attack);
-	MapAnimSounds2(type->Animations->Move);
+	for (i = 0; i < 100; ++i) {
+		MapAnimSounds2(type->Animations->Still[i]);
+		MapAnimSounds2(type->Animations->Move[i]);
+		MapAnimSounds2(type->Animations->Attack[i]);
+	}
+	for (i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
+		MapAnimSounds2(type->Animations->Death[i]);
+	}
 	MapAnimSounds2(type->Animations->Repair);
 	MapAnimSounds2(type->Animations->Train);
 	MapAnimSounds2(type->Animations->Research);
@@ -172,9 +176,11 @@ void MapUnitSounds()
 				SetSoundRange(type->Sound.Help.Sound,
 					INFINITE_SOUND_RANGE);
 			}
-			if (!type->Sound.Dead.Name.empty()) {
-				type->Sound.Dead.Sound =
-					SoundForName(type->Sound.Dead.Name);
+			for (j = 0; j <= ANIMATIONS_DEATHTYPES; ++j) {
+				if (!type->Sound.Dead[j].Name.empty()) {
+					type->Sound.Dead[j].Sound =
+						SoundForName(type->Sound.Dead[j].Name);
+				}
 			}
 		}
 	}

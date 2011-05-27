@@ -61,7 +61,7 @@ public:
 	void Destroy();
 	void Draw(int vx, int vy);
 	void DrawCursor(int vx, int vy);
-	void AddEvent(int x, int y);
+	void AddEvent(int x, int y, Uint32 color);
 
 	int Screen2MapX(int x);
 	int Screen2MapY(int y);

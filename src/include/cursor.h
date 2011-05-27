@@ -168,6 +168,7 @@ extern CursorStates CursorState;  /// current cursor state (point,...)
 extern int CursorAction;          /// action for selection
 extern int CursorValue;           /// value for action (spell type f.e.)
 extern CUnitType *CursorBuilding; /// building cursor
+extern std::string CustomCursor;             /// custom cursor for button
 
 extern CCursor *GameCursor;     /// cursor-type
 extern int CursorX;             /// cursor position on screen X

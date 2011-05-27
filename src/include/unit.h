@@ -487,7 +487,8 @@ enum UnitVoiceGroup {
 	VoiceDocking,           /// only for transport reaching coast
 	VoiceRepairing,         /// repairing
 	VoiceHarvesting,        /// harvesting
-	VoiceAttack             /// Attack command
+	VoiceAttack,             /// Attack command
+	VoiceExtraDying             /// extra deaths
 };
 
 /**
@@ -633,6 +634,7 @@ public:
 		IY = 0;
 		Frame = 0;
 		Direction = 0;
+		DamagedType = ANIMATIONS_DEATHTYPES;
 		Attacked = 0;
 		Burning = 0;
 		Destroyed = 0;
@@ -707,6 +709,8 @@ public:
 	unsigned char CurrentResource;
 	int ResourcesHeld;      /// Resources Held by a unit
 
+
+	unsigned char DamagedType;   /// Index of damage type of unit which damaged this unit
 	unsigned long Attacked; /// gamecycle unit was last attacked
 	unsigned SubAction : 8; /// sub-action of unit
 	unsigned State : 8;     /// action state
@@ -1217,11 +1221,15 @@ struct CResourceDepositFinder {
 class CPreference {
 public:
 	CPreference() : ShowSightRange(false), ShowReactionRange(false),
-		ShowAttackRange(false), ShowOrders(0) {};
+		ShowAttackRange(false), ShowMessages(false), 
+		BigScreen(false),ShowOrders(0) {};
 
-	bool ShowSightRange;     /// Show right range.
+	bool ShowSightRange;     /// Show sight range.
 	bool ShowReactionRange;  /// Show reaction range.
 	bool ShowAttackRange;    /// Show attack range.
+	bool ShowMessages;		 /// Show messages.
+	bool BigScreen;			 /// If true, shows the big screen(without panels)
+
 	int  ShowOrders;         /// How many second show orders of unit on map.
 };
 
@@ -1318,6 +1326,8 @@ extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i
 extern bool CanBuildOn(const Vec2i &pos, int mask);
 	/// FIXME: more docu
 extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real);
+	/// Get the suitable animation frame when unit is damaged.
+extern int GetAnimationDamagedState(CUnit &unit, int anim);
 
 	/// Find resource
 extern CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range,

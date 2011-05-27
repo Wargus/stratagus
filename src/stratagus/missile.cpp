@@ -522,14 +522,14 @@ void MissileType::DrawMissileType(int frame, const PixelPos &pos) const
 
 	if (this->Flip) {
 		if (frame < 0) {
-			if (this->Transparency == 50) {
-				this->G->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, 128);
+			if (this->Transparency > 0) {
+				this->G->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256-2.56*Transparency));
 			} else {
 				this->G->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 			}
 		} else {
-			if (this->Transparency == 50) {
-				this->G->DrawFrameClipTrans(frame, pos.x, pos.y, 128);
+			if (this->Transparency > 0) {
+				this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256-2.56*Transparency));
 			} else {
 				this->G->DrawFrameClip(frame, pos.x, pos.y);
 			}
@@ -542,8 +542,8 @@ void MissileType::DrawMissileType(int frame, const PixelPos &pos) const
 		} else {
 			frame = (frame / row) * this->NumDirections + frame % row;
 		}
-		if (this->Transparency == 50) {
-			this->G->DrawFrameClipTrans(frame, pos.x, pos.y, 128);
+		if (this->Transparency > 0) {
+			this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256-2.56*Transparency));
 		} else {
 			this->G->DrawFrameClip(frame, pos.x, pos.y);
 		}

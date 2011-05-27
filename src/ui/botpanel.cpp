@@ -72,7 +72,7 @@ int CurrentButtonLevel;
 	/// All buttons for units
 std::vector<ButtonAction *> UnitButtonTable;
 	/// Pointer to current buttons
-ButtonActionProxy CurrentButtons;
+ButtonActionProxy CurrentButtons;           
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -99,7 +99,8 @@ void InitButtons()
 */
 int AddButton(int pos, int level, const std::string &icon_ident,
 	ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
-	const std::string &allow, const std::string &hint, const std::string &umask)
+	const std::string &allow, const std::string &hint, const std::string &descr, 
+	const std::string &sound, const std::string &cursor, const std::string &umask)
 {
 	char buf[2048];
 	ButtonAction *ba;
@@ -154,6 +155,13 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 	}
 	ba->Key = key;
 	ba->Hint = hint;
+	ba->Description = descr;
+	ba->CommentSound.Name = sound;
+	if (!ba->CommentSound.Name.empty()) {
+				ba->CommentSound.Sound =
+					SoundForName(ba->CommentSound.Name);
+			}
+	ba->ButtonCursor = cursor;
 	// FIXME: here should be added costs to the hint
 	// FIXME: johns: show should be nice done?
 	if (umask[0] == '*') {
@@ -683,30 +691,36 @@ void CButtonPanel::Draw()
 void UpdateStatusLineForButton(const ButtonAction *button)
 {
 	const CUnitStats *stats;
-
 	Assert(button);
-	UI.StatusLine.Set(button->Hint);
+	if (button->Description.length())
+	{
+		UI.StatusLine.Set(button->Description);
+		ClearCosts();
+	}
+	else
+	{
+		UI.StatusLine.Set(button->Hint);
+		switch (button->Action) {
+			case ButtonBuild:
+			case ButtonTrain:
+			case ButtonUpgradeTo:
+				// FIXME: store pointer in button table!
+				stats = &UnitTypes[button->Value]->Stats[ThisPlayer->Index];
+				SetCosts(0, UnitTypes[button->Value]->Demand, stats->Costs);
+				break;
+			case ButtonResearch:
+				SetCosts(0, 0, AllUpgrades[button->Value]->Costs);
+				break;
+			case ButtonSpellCast:
+				SetCosts(SpellTypeTable[button->Value]->ManaCost, 0, NULL);
+				break;
+			default:
+				ClearCosts();
+				break;
 
-	switch (button->Action) {
-		case ButtonBuild:
-		case ButtonTrain:
-		case ButtonUpgradeTo:
-			// FIXME: store pointer in button table!
-			stats = &UnitTypes[button->Value]->Stats[ThisPlayer->Index];
-			SetCosts(0, UnitTypes[button->Value]->Demand, stats->Costs);
-			break;
-		case ButtonResearch:
-			SetCosts(0, 0, AllUpgrades[button->Value]->Costs);
-			break;
-		case ButtonSpellCast:
-			SetCosts(SpellTypeTable[button->Value]->ManaCost, 0, NULL);
-			break;
-		default:
-			ClearCosts();
-			break;
+		}
 	}
 }
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -997,8 +1011,9 @@ void CButtonPanel::DoClicked(int button)
 			!ThisPlayer->IsTeamed(*Selected[0])) {
 		return;
 	}
-
 	PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+	if (CurrentButtons[button].CommentSound.Sound)
+		PlayGameSound(CurrentButtons[button].CommentSound.Sound, MaxSampleVolume);
 
 	//
 	//  Handle action on button.
@@ -1016,7 +1031,13 @@ void CButtonPanel::DoClicked(int button)
 				break;
 			}
 			CursorState = CursorStateSelect;
-			GameCursor = UI.YellowHair.Cursor;
+			if (CurrentButtons[button].ButtonCursor.length() && CursorByIdent(CurrentButtons[button].ButtonCursor))
+			{
+				GameCursor = CursorByIdent(CurrentButtons[button].ButtonCursor);
+				CustomCursor = CurrentButtons[button].ButtonCursor;
+			}
+			else
+				GameCursor = UI.YellowHair.Cursor;
 			CursorAction = CurrentButtons[button].Action;
 			CursorValue = CurrentButtons[button].Value;
 			CurrentButtonLevel = 9; // level 9 is cancel-only
@@ -1092,7 +1113,13 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonAttackGround:
 			// Select target.
 			CursorState = CursorStateSelect;
-			GameCursor = UI.YellowHair.Cursor;
+			if (CurrentButtons[button].ButtonCursor.length() && CursorByIdent(CurrentButtons[button].ButtonCursor))
+			{
+				GameCursor = CursorByIdent(CurrentButtons[button].ButtonCursor);
+				CustomCursor = CurrentButtons[button].ButtonCursor;
+			}
+			else
+				GameCursor = UI.YellowHair.Cursor;
 			CursorAction = CurrentButtons[button].Action;
 			CursorValue = CurrentButtons[button].Value;
 			CurrentButtonLevel = 9; // level 9 is cancel-only

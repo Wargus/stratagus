@@ -892,12 +892,12 @@ void DebugPlayers()
 **  @param fmt     Message format
 **  @param ...     Message varargs
 **
-**  @note The parameter type, isn't yet used.
 **  @todo FIXME: We must also notfiy allied players.
 */
-void CPlayer::Notify(int, int x, int y, const char *fmt, ...) const
+void CPlayer::Notify(int type, int x, int y, const char *fmt, ...) const
 {
 	char temp[128];
+	Uint32 color;
 	va_list va;
 
 	// Notify me, and my TEAM members
@@ -909,9 +909,22 @@ void CPlayer::Notify(int, int x, int y, const char *fmt, ...) const
 	temp[sizeof(temp) - 1] = '\0';
 	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
 	va_end(va);
+	switch (type)
+	{
+		case NotifyRed:
+			color = ColorRed;
+			break;
+		case NotifyYellow:
+			color = ColorYellow;
+			break;
+		case NotifyGreen:
+			color = ColorGreen;
+			break;
+		default: ColorWhite;
+	}
 
 	if (x != -1) {
-		UI.Minimap.AddEvent(x, y);
+		UI.Minimap.AddEvent(x, y, color);
 	}
 	if (this == ThisPlayer) {
 		SetMessageEvent(x, y, "%s", temp);

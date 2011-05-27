@@ -76,6 +76,19 @@ CPreference Preference;
 --  Functions
 ----------------------------------------------------------------------------*/
 
+
+/**
+**  Set speed of mouse scroll
+**
+**  @param l  Lua state.
+*/
+static int CclSetMouseScrollSpeed(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	UI.MouseScrollSpeed = LuaToNumber(l, 1);
+	return 0;
+}
+
 /**
 **  Set speed of middle-mouse scroll
 **
@@ -747,6 +760,29 @@ static CContentType *CclParseContent(lua_State *l)
 						contenttypecompletebar->Width = LuaToNumber(l, -1);
 					} else if (!strcmp(key, "Border")) {
 						contenttypecompletebar->Border = LuaToBoolean(l, -1);
+					} else if (!strcmp(key, "Color")) {
+						//FIXME: need more general way
+						const char *const color = LuaToString(l, -1);
+						if (!strcmp(color, "red"))
+							contenttypecompletebar->Color = 1;
+						else if (!strcmp(color, "yellow"))
+							contenttypecompletebar->Color = 2;
+						else if (!strcmp(color, "green"))
+							contenttypecompletebar->Color = 3;
+						else if (!strcmp(color, "gray"))
+							contenttypecompletebar->Color = 4;
+						else if (!strcmp(color, "white"))
+							contenttypecompletebar->Color = 5;
+						else if (!strcmp(color, "orange"))
+							contenttypecompletebar->Color = 6;
+						else if (!strcmp(color, "blue"))
+							contenttypecompletebar->Color = 7;
+						else if (!strcmp(color, "dark-green"))
+							contenttypecompletebar->Color = 8;
+						else if (!strcmp(color, "black"))
+							contenttypecompletebar->Color = 9;
+						else
+							LuaError(l, "incorrect color: '%s' " _C_ color);
 					} else {
 						LuaError(l, "'%s' invalid for method 'CompleteBar' in DefinePanels" _C_ key);
 					}
@@ -1310,6 +1346,12 @@ static int CclDefineButton(lua_State *l)
 			ba.Key = *LuaToString(l, -1);
 		} else if (!strcmp(value, "Hint")) {
 			ba.Hint = LuaToString(l, -1);
+		} else if (!strcmp(value, "Description")) {
+			ba.Description = LuaToString(l, -1);
+		} else if (!strcmp(value, "CommentSound")) {
+			ba.CommentSound.Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "ButtonCursor")) {
+			ba.ButtonCursor = LuaToString(l, -1);
 		} else if (!strcmp(value, "ForUnit")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1334,7 +1376,8 @@ static int CclDefineButton(lua_State *l)
 		lua_pop(l, 1);
 	}
 	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr,
-		ba.Allowed, ba.AllowStr, /*ba.Key,*/ ba.Hint, ba.UnitMask);
+		ba.Allowed, ba.AllowStr, /*ba.Key,*/ ba.Hint, ba.Description, ba.CommentSound.Name,
+		ba.ButtonCursor, ba.UnitMask);
 	return 0;
 }
 
@@ -1456,6 +1499,7 @@ void UserInterfaceCclRegister()
 {
 	lua_register(Lua, "AddMessage", CclAddMessage);
 
+	lua_register(Lua, "SetMouseScrollSpeed", CclSetMouseScrollSpeed);
 	lua_register(Lua, "SetMouseScrollSpeedDefault", CclSetMouseScrollSpeedDefault);
 	lua_register(Lua, "SetMouseScrollSpeedControl", CclSetMouseScrollSpeedControl);
 

@@ -381,7 +381,7 @@ public:
 */
 class CContentTypeCompleteBar : public CContentType {
 public:
-	CContentTypeCompleteBar() : Index(-1), Width(0), Height(0), Border(0) {}
+	CContentTypeCompleteBar() : Index(-1), Width(0), Height(0), Border(0), Color(0) {}
 
 	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
 
@@ -389,10 +389,7 @@ public:
 	int Width;           /// Width of the bar.
 	int Height;          /// Height of the bar.
 	char Border;         /// True for additional border.
-#if 0 // FIXME : something for color parametrisations (not implemented)
-// take UI.CompletedBar color for the moment.
-	Color colors;        /// Color to show (depend of value)
-#endif
+	char Color;          /// Color to show
 };
 
 /**
@@ -583,6 +580,8 @@ public:
 
 	bool MouseScroll;                   /// Enable mouse scrolling
 	bool KeyScroll;                     /// Enable keyboard scrolling
+		/// Mouse Scroll Speed (screenpixels per mousepixel)
+	int MouseScrollSpeed;
 		/// Middle-Mouse Scroll Speed (screenpixels per mousepixel)
 	int MouseScrollSpeedDefault;
 		/// Middle-Mouse Scroll Speed with Control pressed

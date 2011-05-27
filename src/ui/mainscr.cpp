@@ -518,6 +518,7 @@ void CContentTypeLifeBar::Draw(const CUnit &unit, CFont *) const
 */
 void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
 {
+	Uint32 color;
 	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
 	if (!unit.Variable[this->Index].Max) {
 		return;
@@ -531,10 +532,44 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
 	Assert(w > 0);
 	Assert(h > 4);
 
-	int f = (100 * unit.Variable[this->Index].Value) / unit.Variable[this->Index].Max;
+	//FIXME: ugly
+	switch (this->Color)
+		{
+			case 1: 
+				color = ColorRed;
+				break;
+			case 2: 
+				color = ColorYellow;
+				break;
+			case 3: 
+				color = ColorGreen;
+				break;
+			case 4: 
+				color = ColorGray;
+				break;
+			case 5: 
+				color = ColorWhite;
+				break;
+			case 6: 
+				color = ColorOrange;
+				break;
+			case 7: 
+				color = ColorBlue;
+				break;
+			case 8: 
+				color = ColorDarkGreen;
+				break;
+			case 9: 
+				color = ColorBlack;
+				break;
+			default:
+				color = UI.CompletedBarColor;
+				break;
+		}
 
+	int f = (100 * unit.Variable[this->Index].Value) / unit.Variable[this->Index].Max;
 	if (!this->Border) {
-		Video.FillRectangleClip(UI.CompletedBarColor, x, y, f * w / 100, h);
+			Video.FillRectangleClip(color, x, y, f * w / 100, h);
 		if (UI.CompletedBarShadow) {
 			// Shadow
 			Video.DrawVLine(ColorGray, x + f * w / 100, y, h);
@@ -547,7 +582,7 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
 	} else {
 		Video.DrawRectangleClip(ColorGray, x,     y,     w + 4, h );
 		Video.DrawRectangleClip(ColorBlack,x + 1, y + 1, w + 2, h - 2);
-		Video.FillRectangleClip(ColorBlue, x + 2, y + 2, f * w / 100, h - 4);
+		Video.FillRectangleClip(color, x + 2, y + 2, f * w / 100, h - 4);
 	}
 }
 
@@ -874,7 +909,7 @@ void MessagesDisplay::UpdateMessages()
 */
 void MessagesDisplay::DrawMessages()
 {
-	if (show) {
+	if (show && Preference.ShowMessages) {
 		CLabel label(UI.MessageFont);
 #ifdef DEBUG
 		if (showBuilList && ThisPlayer->Ai) {

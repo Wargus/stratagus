@@ -66,6 +66,7 @@ std::vector<CCursor*> AllCursors;
 CursorStates CursorState;    /// current cursor state (point,...)
 int CursorAction;            /// action for selection
 int CursorValue;             /// value for CursorAction (spell type f.e.)
+std::string CustomCursor;             /// custom cursor for button
 
 	// Event changed mouse position, can alter at any moment
 int CursorX;                 /// cursor position on screen X

@@ -434,7 +434,8 @@ void CViewport::Draw() const
 	// Drawn here so that they are shown even when the unit is out of the screen.
 	//
 	//FIXME: This is still unsecure during parallel
-	if (Preference.ShowOrders < 0 ||
+	if (!Preference.ShowOrders){}
+	else if (Preference.ShowOrders < 0 ||
 		(ShowOrdersCount >= GameCycle) || (KeyModifiers & ModifierShift)) {
 		for (int i = 0; i < NumSelected; ++i) {
 			ShowOrder(*Selected[i]);
