@@ -716,7 +716,7 @@ public:
 		file = fopen(filename.c_str(), "wb");
 		if (!file) {
 			fprintf(stderr,"Can't open file '%s' for writing\n", filename.c_str());
-			//throw FileException();
+			throw FileException();
 		}
 	}
 
@@ -739,7 +739,7 @@ public:
 		file = gzopen(filename.c_str(), "wb9");
 		if (!file) {
 			fprintf(stderr,"Can't open file '%s' for writing\n", filename.c_str());
-			//throw FileException();
+			throw FileException();
 		}
 	}
 
