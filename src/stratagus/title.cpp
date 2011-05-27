@@ -40,6 +40,7 @@
 
 TitleScreen **TitleScreens;          /// Title screens to show at startup
 static bool WaitNoEvent;             /// Flag got an event
+extern std::string CliMapName;
 
 
 /**
@@ -167,7 +168,7 @@ static void ShowTitleImage(TitleScreen *t)
 */
 void ShowTitleScreens()
 {
-	if (!TitleScreens) {
+	if (!TitleScreens || !CliMapName.empty()) {
 		return;
 	}
 
