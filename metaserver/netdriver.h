@@ -140,7 +140,7 @@ extern SessionPool *Pool;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void Send(Session *session, char *msg);
+extern void Send(Session *session, const char *msg);
 
 extern int ServerInit(int port);
 extern void ServerQuit(void);

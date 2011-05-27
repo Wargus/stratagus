@@ -106,7 +106,7 @@ ServerStruct Server;
 **  @param session  Session to send the message to
 **  @param msg      Message to send
 */
-void Send(Session *session, char *msg)
+void Send(Session *session, const char *msg)
 {
 	NetSendTCP(session->Sock, msg, strlen(msg));
 }
