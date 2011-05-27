@@ -95,10 +95,11 @@ static std::string GetSaveDir()
 **  Save a game to file.
 **
 **  @param filename  File name to be stored.
+**  @return  -1 if saving failed, 0 if all OK
 **
 **  @note  Later we want to store in a more compact binary format.
 */
-void SaveGame(const std::string &filename)
+int SaveGame(const std::string &filename)
 {
 	time_t now;
 	CFile file;
@@ -108,7 +109,7 @@ void SaveGame(const std::string &filename)
 	fullpath += filename;
 	if (file.open(fullpath.c_str(), CL_WRITE_GZ | CL_OPEN_WRITE) == -1) {
 		fprintf(stderr, "Can't save to `%s'\n", filename.c_str());
-		return;
+		return -1;
 	}
 
 	time(&now);
@@ -158,6 +159,7 @@ void SaveGame(const std::string &filename)
 	}
 	SaveTriggers(&file); //Triggers are saved in SaveGlobal, so load it after Global
 	file.close();
+	return 0;
 }
 
 /**

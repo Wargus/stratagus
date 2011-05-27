@@ -237,7 +237,7 @@ extern unsigned long GameCycle;             /// Game simulation cycle counter
 extern unsigned long FastForwardCycle;      /// Game Replay Fast Forward Counter
 
 extern void LoadGame(const std::string &filename); /// Load saved game
-extern void SaveGame(const std::string &filename); /// Save game
+extern int SaveGame(const std::string &filename); /// Save game
 extern void DeleteSaveGame(const std::string &filename); /// Delete save game
 extern bool SaveGameLoading;                 /// Save game is in progress of loading
 struct lua_State;
