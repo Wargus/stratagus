@@ -1,9 +1,9 @@
-.TH STRATAGUS 6 "Nov 2010" "Stratagus v2.2.5"
+.TH STRATAGUS 6 "May 2011" "Stratagus v2.2.6"
 .SH NAME
 stratagus \- Strategy Gaming Engine
 .SH SYNOPSIS
 .B stratagus
-.I [-c file.lua] [-d datapath] [-D depth] [-e] [-F|-W] [-h] [-I addr] [-l logfile] [-L lag] [-n server]
+.I [-c file.lua] [-d datapath] [-D depth] [-e] [-E file.lua] [-F|-W] [-h] [-I addr] [-l] [-L lag] [-n server]
 .I [-N name] [-o|-O] [-P port] [-s sleep] [-S speed] [-U update] [-v mode] [map.smp|map.smp.gz]
 .SH "DESCRIPTION"
 This manual page documents briefly the flags that you can give to
@@ -28,6 +28,9 @@ option is only valid for Win32/NT.
 .B \-e
 Start the editor included in Stratagus.
 .TP
+.B \-E
+Choose a different editor config file.
+.TP
 .B \-F
 With this option you can start Stratagus in full screen video mode.
 .TP
@@ -37,9 +40,8 @@ Show summary of all options.
 .B \-I addr
 With this option you can specify the network address for network play.
 .TP
-.B \-l file
-With this option you can log stratagus messages into \fBfile\fR.
-If no file is specified log messages will be disabled.
+.B \-l
+Disable command log messages.
 .TP
 .B \-L lag
 This sets the network lag in number of frames (default 10 = 333 ms).
@@ -72,7 +74,7 @@ Sync speed (100 = 30 frames/s).
 With this option you can specify the network update rate in # frames (default 5=6x per s).
 .TP
 .B \-v mode
-With this option you can specify video mode resolution. Run \fBstratagus -h\fR for supported modes.
+With this option you can specify video mode resolution in format \fB<xres>\fRx\fB<yres>\fR
 .TP
 .B \-W
 With this option you can start Stratagus in windowed video mode.
@@ -83,6 +85,9 @@ Default directory for Stratagus data files
 .TP
 .B /usr/share/games/stratagus/default/scripts/stratagus.lua
 Default start file.
+.TP
+.B /usr/share/games/stratagus/default/scripts/editor.lua
+Default editor file.
 .SH "SEE ALSO"
 More complete documentation is available in /usr/share/doc/stratagus.
 .SH NOTES
