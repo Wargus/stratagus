@@ -1934,21 +1934,20 @@ static void CleanTileIcons()
 void CEditor::Init()
 {
 	int i;
-	char *file;
 	char buf[PATH_MAX];
-	CFile clf;
 
 	//
 	// Load and evaluate the editor configuration file
-	// FIXME: the CLopen is very slow and repeats the work of LibraryFileName.
 	//
-	file = LibraryFileName(EditorStartFile, buf, sizeof(buf));
-	if (clf.open(file, CL_OPEN_READ) != -1) {
-		clf.close();
-		ShowLoadProgress("Script %s", file);
-		LuaLoadFile(file);
-		CclGarbageCollect(0); // Cleanup memory after load
+	LibraryFileName(EditorStartFile, buf, sizeof(buf));
+	if (access(buf, R_OK)) {
+		fprintf(stderr, "Editor configuration file '%s' was not found\nSpecify another with '-E file.lua'\n", EditorStartFile);
+		ExitFatal(-1);
 	}
+
+	ShowLoadProgress("Script %s", buf);
+	LuaLoadFile(buf);
+	CclGarbageCollect(0); // Cleanup memory after load
 
 	ThisPlayer = &Players[0];
 
