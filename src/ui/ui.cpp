@@ -70,7 +70,7 @@ CUserInterface UI;
 ----------------------------------------------------------------------------*/
 
 CUserInterface::CUserInterface() :
-	MouseScroll(false), KeyScroll(false), MouseScrollSpeed(0),
+	MouseScroll(false), KeyScroll(false), MouseScrollSpeed(8),
 	MouseScrollSpeedDefault(0), MouseScrollSpeedControl(0),
 	MouseWarpX(0), MouseWarpY(0),
 	SingleSelectedButton(NULL),
