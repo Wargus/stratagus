@@ -249,6 +249,8 @@ std::string CompileOptions;          /// Compile options.
 static std::vector<gcn::Container *> Containers;
 std::string MenuRace;
 
+const char * app;
+
 /*----------------------------------------------------------------------------
 --  Speedups FIXME: Move to some other more logic place
 ----------------------------------------------------------------------------*/
@@ -660,7 +662,7 @@ static void Usage(void)
 {
 	PrintHeader();
 	printf(
-"\n\nUsage: stratagus [OPTIONS] [map.smp|map.smp.gz]\n\
+"\n\nUsage: %s [OPTIONS] [map.smp|map.smp.gz]\n\
 \t-c file.lua\tConfiguration start file (default stratagus.lua)\n\
 \t-d datapath\tPath to stratagus data\n\
 \t-D depth\tVideo mode depth = pixel per point (for Win32/TNT)\n\
@@ -682,7 +684,7 @@ static void Usage(void)
 \t-v mode\t\tVideo mode resolution in format <xres>x<yres>\n\
 \t-W\t\tWindowed video mode\n\
 map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n\
-");
+", app);
 }
 
 #ifdef REDIRECT_OUTPUT
@@ -816,6 +818,8 @@ int main(int argc, char **argv)
 #endif
 	CclStartFile = "scripts/stratagus.lua";
 	EditorStartFile = "scripts/editor.lua";
+
+	app = argv[0];
 
 	//  Default player name to username on unix systems.
 	LocalPlayerName.clear();
