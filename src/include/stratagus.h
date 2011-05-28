@@ -95,7 +95,7 @@
 
 	/// Print function in debug macros
 #define PrintFunction() \
-	do { fprintf(stdout, "%s:%d: ", __FILE__, __LINE__); } while (0)
+	do { fprintf(stdout, "%s:%d: %s: ", __FILE__, __LINE__, __func__); } while (0)
 
 
 #ifdef DEBUG  // {
@@ -104,7 +104,7 @@
 	**  Assert a condition. If cond is not true abort with file,line.
 	*/
 #define Assert(cond)  do { if (!(cond)) { \
-	fprintf(stderr, "Assertion failed at %s:%d: %s\n", __FILE__, __LINE__, #cond); \
+	fprintf(stderr, "Assertion failed at %s:%d: %s: %s\n", __FILE__, __LINE__, __func__, #cond); \
 	abort(); }} while (0)
 
 	/**
@@ -126,7 +126,7 @@
 	**  Assert a condition for references
 	*/
 #define RefsAssert(cond)  do { if (!(cond)) { \
-	fprintf(stderr, "Assertion failed at %s:%d\n", __FILE__, __LINE__); \
+	fprintf(stderr, "Assertion failed at %s:%d: %s\n", __FILE__, __LINE__, __func__); \
 	abort(); } } while (0)
 
 #else  // }{ REFS_DEBUG

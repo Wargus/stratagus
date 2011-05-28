@@ -71,7 +71,7 @@ extern int LuaCall(int narg, int clear, bool exitOnError = true);
 
 #define LuaError(l, args) \
 	do { \
-		fprintf(stdout, "%s:%d: ", __FILE__, __LINE__); \
+		fprintf(stdout, "%s:%d: %s: ", __FILE__, __LINE__, __func__); \
 		fprintf(stdout, args); \
 		fprintf(stdout, "\n"); \
 		lua_pushfstring(l, args); lua_error(l); \
