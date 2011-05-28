@@ -344,6 +344,10 @@ static int GatherResource(CUnit &unit)
 	int i;
 	int addload;
 
+	if (!resinfo->HarvestFromOutside && unit.Container != NULL) {
+		unit.Container->SubAction = SUB_GATHER_RESOURCE;
+		UnitShowAnimation(*unit.Container, unit.Container->Type->Animations->Harvest[unit.CurrentResource]);
+	}
 
 	if (resinfo->HarvestFromOutside || resinfo->TerrainHarvester) {
 		AnimateActionHarvest(unit);
@@ -533,6 +537,9 @@ static int StopGathering(CUnit &unit)
 		}
 		source->Data.Resource.Active--;
 		Assert(source->Data.Resource.Active >= 0);
+
+		if (!resinfo->HarvestFromOutside && source->Data.Resource.Active == 0)
+			source->SubAction = 1;
 
 		//Store resource position.
 		//source->RefsIncrease();
