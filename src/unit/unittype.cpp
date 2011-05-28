@@ -492,9 +492,10 @@ void InitUnitTypes(int reset_player_stats)
 
 	//
 	// Setup hardcoded unit types. FIXME: should be moved to some configs.
+	// Temporary fix: UnitTypeHumanWall and UnitTypeOrcWall are exported to lua
 	//
-	UnitTypeHumanWall = UnitTypeByIdent("unit-uac-wall");
-	UnitTypeOrcWall = UnitTypeByIdent("unit-hell-wall");
+	//UnitTypeHumanWall = UnitTypeByIdent("unit-human-wall");
+	//UnitTypeOrcWall = UnitTypeByIdent("unit-orc-wall");
 }
 
 /**
