@@ -112,7 +112,8 @@ static sqlite3 *DB;
 static int DBMaxIDCallback(void *password, int argc, char **argv, char **colname)
 {
 	Assert(argc == 1);
-	GameID = atoi(argv[0]);
+	if (argv[0])
+		GameID = atoi(argv[0]);
 	return 0;
 }
 
