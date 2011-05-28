@@ -2346,6 +2346,26 @@ static int CclGetCompileFeature(lua_State *l)
 	return 1;
 }
 
+/**
+**  Print debug message with info about current script name, line number and function.
+**
+**  @see DebugPrint
+**
+**  @param l  Lua state.
+*/
+static int CclDebugPrint(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+
+#ifdef DEBUG
+	lua_Debug ar;
+	lua_getstack(l, 1, &ar);
+	lua_getinfo(l, "nSl", &ar);
+	fprintf(stdout, "%s:%d: %s: %s", ar.source, ar.currentline, ar.what, LuaToString(l, 1));
+#endif
+
+	return 1;
+}
 
 /*............................................................................
 ..  Tables
@@ -2479,6 +2499,8 @@ void InitCcl()
 
 	lua_register(Lua, "GetStratagusVersion", CclGetStratagusVersion);
 	lua_register(Lua, "GetStratagusHomepage", CclGetStratagusHomepage);
+
+	lua_register(Lua, "DebugPrint", CclDebugPrint);
 
 	AliasRegister();
 	ReplayCclRegister();

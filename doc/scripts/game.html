@@ -51,6 +51,7 @@
 <a href="#CenterMap">CenterMap</a>
 <a href="#ChangeUnitsOwner">ChangeUnitsOwner</a>
 <a href="#CreateUnit">CreateUnit</a>
+<a href="#DebugPrint">DebugPrint</a>
 <a href="#DefineBurningBuilding">DefineBurningBuilding</a>
 <a href="#DefineCampaign">DefineCampaign</a>
 <a href="#DefineConstruction">DefineConstruction</a>
@@ -288,6 +289,22 @@ placed in the closest available spot.
 <pre>
     -- Creates a footman for player 2 at location 31x34.
     CreateUnit("unit-footman", 2, {31, 34})
+</pre>
+
+<a name="DebugPrint"></a>
+<h3>DebugPrint(str)</h3>
+
+Print debug message with info about current script name, line number and function name.
+
+<dl>
+<dt>str</dt>
+<dd>String to display</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    DebugPrint("Loading config file...")
 </pre>
 
 <a name="DefineBurningBuilding"></a>
