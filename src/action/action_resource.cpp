@@ -463,7 +463,7 @@ static int GatherResource(CUnit &unit)
 							next = worker->NextWorker;
 							worker->NextWorker = NULL;
 					}
-					Assert(source->Data.Resource.Assigned == 0);
+					//Assert(source->Data.Resource.Assigned == 0);
 					source->Data.Resource.Workers = NULL;
 				}
 

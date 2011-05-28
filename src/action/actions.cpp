@@ -525,7 +525,6 @@ static void HandleUnitAction(CUnit &unit)
 				}
 			}
 #endif
-			DropResource(unit);
 			//
 			// Shift queue with structure assignment.
 			//
