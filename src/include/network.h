@@ -10,7 +10,7 @@
 //
 /**@name network.h - The network header file. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Russell Smith, and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer, Russell Smith, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #ifndef __NETWORK_H__
 #define __NETWORK_H__
@@ -108,8 +107,7 @@ enum _message_type_ {
 */
 enum _extended_message_type_ {
 	ExtendedMessageDiplomacy,     /// Change diplomacy
-	ExtendedMessageSharedVision,   /// Change shared vision
-	ExtendedMessageSetResource     /// Change resource count
+	ExtendedMessageSharedVision   /// Change shared vision
 };
 
 /**
@@ -262,8 +260,7 @@ extern void NetworkSendExtendedCommand(int command, int arg1, int arg2,
 	int arg3, int arg4, int status);
 	/// Send Selections to Team
 extern void NetworkSendSelection(CUnit **units, int count);
-	/// Register ccl functions related to network
-//extern void NetworkCclRegister();
+
 //@}
 
 #endif // !__NETWORK_H__

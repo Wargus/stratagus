@@ -10,7 +10,7 @@
 //
 /**@name network.cpp - The network. */
 //
-//      (c) Copyright 2000-2006 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
+//      (c) Copyright 2000-2008 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -211,13 +211,13 @@
 //  Includes
 //----------------------------------------------------------------------------
 
+#include "stratagus.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
 #include <list>
-
-#include "stratagus.h"
 
 #include "net_lowlevel.h"
 #include "unit.h"
@@ -232,8 +232,9 @@
 #include "replay.h"
 #include "interface.h"
 #include "results.h"
-#include "master.h"
 #include "sound.h"
+#include "master.h"
+
 
 //----------------------------------------------------------------------------
 //  Declaration
@@ -823,8 +824,8 @@ void NetworkSendSelection(CUnit **units, int count)
 		for (i = 0; i < numteammates; ++i) {
 			ref = NetSendUDP(NetworkFildes, Hosts[teammates[i]].Host, Hosts[teammates[i]].Port,
 				buf, CNetworkPacketHeader::Size() + CNetworkSelection::Size() * numcommands);
+		}
 	}
-}
 
 }
 /**

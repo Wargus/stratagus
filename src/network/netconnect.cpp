@@ -10,7 +10,7 @@
 //
 /**@name netconnect.cpp - The network high level connection code. */
 //
-//      (c) Copyright 2001-2006 by Lutz Sammer, Andreas Arens
+//      (c) Copyright 2001-2007 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@
 //----------------------------------------------------------------------------
 
 #include <stdio.h>
-
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
@@ -49,7 +48,7 @@
 #include "interface.h"
 #include "menus.h"
 #include "settings.h"
-#include "util.h"
+#include "version.h"
 
 
 //----------------------------------------------------------------------------
@@ -465,7 +464,7 @@ void NetworkInitServerConnect(int openslots)
 
 	// preset the server (initially always slot 0)
 	memcpy(Hosts[0].PlyName, LocalPlayerName.c_str(), sizeof(Hosts[0].PlyName) - 1);
-
+	
 	ServerSetupState.Clear();
 	LocalSetupState.Clear();
 	for (int i = openslots; i < PlayerMax - 1; ++i) {
@@ -930,7 +929,6 @@ void NetClientCheckLocalState()
 		NetLocalState = ccs_changed;
 		return;
 	}
-	/* ADD HERE */
 }
 
 /**
@@ -1291,7 +1289,7 @@ static void ClientParseConnected(const CInitMessage *msg)
 			LoadStratagusMapInfo(mappath);
 			if (ntohl(msg->MapUID) != Map.Info.MapUID) {
 				NetLocalState = ccs_badmap;
-				fprintf(stderr, "Maps do not match (0x%08x) <-> (0x%08x)\n",
+				fprintf(stderr, "Stratagus maps do not match (0x%08x) <-> (0x%08x)\n",
 					(unsigned int)Map.Info.MapUID,
 					(unsigned int)ntohl(msg->MapUID));
 				break;

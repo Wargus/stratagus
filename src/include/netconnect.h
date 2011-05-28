@@ -10,7 +10,7 @@
 //
 /**@name netconnect.h - The network connection setup header file. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Andreas Arens
+//      (c) Copyright 1998-2008 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -25,12 +25,12 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
 
 #ifndef __NETCONNECT_H__
 #define __NETCONNECT_H__
 
 //@{
+
 #include <string>
 #include "SDL.h"
 
@@ -93,7 +93,7 @@ public:
 	void Deserialize(const unsigned char *p);
 	static size_t Size() { return 4+4+4+4+4+4+4+4+ 4*PlayerMax + 4*PlayerMax + 4*PlayerMax + 4*PlayerMax; }
 	void Clear() {
-		ResourcesOption = UnitsOption = FogOfWar = RevealMap =
+		ResourcesOption = UnitsOption = FogOfWar = RevealMap = TilesetSelection =
 			GameTypeOption = Difficulty = MapRichness = 0;
 		memset(CompOpt, 0, sizeof(CompOpt));
 		memset(Ready, 0, sizeof(Ready));
