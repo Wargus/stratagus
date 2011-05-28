@@ -223,19 +223,18 @@ static int StartGathering(CUnit &unit)
 		return 0;
 	}
 
-
 	//
 	// Place unit inside the resource
 	//
-	if (!resinfo->HarvestFromOutside && goal->Variable[MAXHARVESTERS_INDEX].Value > goal->InsideCount) {
-		unit.CurrentOrder()->ClearGoal();
-		unit.Remove(goal);
-	}
-	else if (goal->Variable[MAXHARVESTERS_INDEX].Value == goal->InsideCount)
-	{
-		//Resource is full, wait
-		unit.Wait = 10;
-		return 0;
+	if (!resinfo->HarvestFromOutside) {
+		if (goal->Variable[MAXHARVESTERS_INDEX].Value == 0 || goal->Variable[MAXHARVESTERS_INDEX].Value > goal->InsideCount) {
+			unit.CurrentOrder()->ClearGoal();
+			unit.Remove(goal);
+		} else if (goal->Variable[MAXHARVESTERS_INDEX].Value <= goal->InsideCount) {
+			//Resource is full, wait
+			unit.Wait = 10;
+			return 0;
+		}
 	}
 
 	// Activate the resource
