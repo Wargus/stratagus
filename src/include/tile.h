@@ -176,19 +176,9 @@ public:
 
 	/// Check if a field for the user is explored.
 	bool IsExplored(const unsigned int player_index) const
-	//bool IsExplored(const CPlayer *const player, bool NoFogOfWar = false) const
 	{
-		//return IsTileVisible(player, index) > 0;
-#if 1
-		//return !!Visible[player->Index];
 		return !!Visible[player_index];
-#else
-		if(!Visible[player->Index])
-			return !!IsVisible(player, NoFogOfWar);
-		return true;
-#endif
 	};
-
 
 };
 
