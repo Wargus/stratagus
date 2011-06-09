@@ -2741,8 +2741,29 @@ void SavePreferences()
 	std::string path;
 	std::string tableName;
 
-	lua_pushstring(Lua, "preferences");
-	lua_gettable(Lua, LUA_GLOBALSINDEX);
+	if (!GameName.empty()) {
+		lua_pushstring(Lua, GameName.c_str());
+		lua_gettable(Lua, LUA_GLOBALSINDEX);
+		if (lua_type(Lua, -1) == LUA_TTABLE) {
+			tableName = GameName;
+			tableName += ".";
+			tableName += "preferences";
+			lua_pushstring(Lua, "preferences");
+			lua_gettable(Lua, -2);
+		}
+		else
+		{
+			lua_pushstring(Lua, "preferences");
+			lua_gettable(Lua, LUA_GLOBALSINDEX);
+			tableName = "preferences";
+		}
+	}
+	else
+	{
+		tableName = "preferences";
+		lua_pushstring(Lua, "preferences");
+		lua_gettable(Lua, LUA_GLOBALSINDEX);
+	}
 	if (lua_type(Lua, -1) == LUA_TTABLE) {
 		path = UserDirectory;
 		if (!GameName.empty()) {
@@ -2757,7 +2778,10 @@ void SavePreferences()
 		}
 
 		std::string s = SaveGlobal(Lua, false);
-		fprintf(fd, "preferences = {\n%s}\n", s.c_str());
+		if (!GameName.empty()) {
+			fprintf(fd, "if (%s == nil) then %s = {} end\n", GameName.c_str(), GameName.c_str());
+		}
+		fprintf(fd, "%s = {\n%s}\n", tableName.c_str(), s.c_str());
 		fclose(fd);
 	}
 }
