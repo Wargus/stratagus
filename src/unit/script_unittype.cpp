@@ -171,7 +171,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys() {
 		SIGHTRANGE_KEY, ATTACKRANGE_KEY,PIERCINGDAMAGE_KEY,
 		BASICDAMAGE_KEY,POSX_KEY,POSY_KEY,RADARRANGE_KEY,
 		RADARJAMMERRANGE_KEY,AUTOREPAIRRANGE_KEY,BLOODLUST_KEY,HASTE_KEY,
-		SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY, SHIELD_KEY, POINTS_KEY, 
+		SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY, SHIELD_KEY, POINTS_KEY,
 		MAXHARVESTERS_KEY};
 
 	for (int i = 0; i < NVARALREADYDEFINED; ++i) {
@@ -642,7 +642,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->CorpseType = NULL;
 		} else if (!strcmp(value, "DamageType")) {
 			value = LuaToString(l, -1);
-			int check = ExtraDeathIndex(value);
+//			int check = ExtraDeathIndex(value);
 			type->DamageType = value;
 		} else if (!strcmp(value, "ExplodeWhenKilled")) {
 			type->ExplodeWhenKilled = 1;
@@ -1069,7 +1069,7 @@ static int CclDefineUnitType(lua_State *l)
 					{
 						lua_rawgeti(l, -1, k + 1);
 						type->Sound.Dead[death].Name = LuaToString(l, -1);
-						lua_pop(l, 1);		
+						lua_pop(l, 1);
 					}
 				} else {
 					LuaError(l, "Unsupported sound tag: %s" _C_ value);
@@ -1618,7 +1618,7 @@ static int CclDefineAnimations(lua_State *l)
 			}
 			else
 				anims->Attack[99] = ParseAnimation(l, -1);
-		
+
 		} else if (!strncmp(value, "Move", 4)) {
 			if (strlen(value)>4)
 			{
@@ -1908,7 +1908,7 @@ static int CclDefineDecorations(lua_State *l)
 				}
 				lua_pop(l, 2); // MethodName and data
 			} else { // Error
-				LuaError(l, "invalid key '%s' for DefineDecorations" _C_ key); 
+				LuaError(l, "invalid key '%s' for DefineDecorations" _C_ key);
 			}
 			lua_pop(l, 1); // Pop the value
 		}
@@ -1949,7 +1949,7 @@ void UpdateUnitVariables(const CUnit &unit)
 		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
 			|| i == MANA_INDEX || i == KILL_INDEX || i == XP_INDEX
 			|| i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
-			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == HP_INDEX 
+			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == HP_INDEX
 			|| i == SHIELD_INDEX || i == POINTS_INDEX || i == MAXHARVESTERS_INDEX) {
 			continue;
 		}
@@ -2006,7 +2006,7 @@ void UpdateUnitVariables(const CUnit &unit)
 	if (unit.Type->Harvester && unit.CurrentResource) {
 		unit.Variable[CARRYRESOURCE_INDEX].Value = unit.ResourcesHeld;
 		unit.Variable[CARRYRESOURCE_INDEX].Max = unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity;
-	}	
+	}
 
 	// Supply
 	unit.Variable[SUPPLY_INDEX].Value = unit.Type->Supply;

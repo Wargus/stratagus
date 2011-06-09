@@ -69,6 +69,12 @@ extern lua_State *Lua;
 extern int LuaLoadFile(const std::string &file);
 extern int LuaCall(int narg, int clear, bool exitOnError = true);
 
+#ifdef _MSC_VER
+#ifndef __func__
+#define __func__ __FUNCTION__
+#endif
+#endif
+
 #define LuaError(l, args) \
 	do { \
 		fprintf(stdout, "%s:%d: %s: ", __FILE__, __LINE__, __func__); \

@@ -920,7 +920,7 @@ void CPlayer::Notify(int type, int x, int y, const char *fmt, ...) const
 		case NotifyGreen:
 			color = ColorGreen;
 			break;
-		default: ColorWhite;
+		default: color = ColorWhite;
 	}
 
 	if (x != -1) {

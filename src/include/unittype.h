@@ -1070,10 +1070,6 @@ public:
 
 };
 
-	/// @todo ARI: should be dynamic (lua..).
-	/// How many unit-types are currently supported
-#define UnitTypeMax 2048
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/

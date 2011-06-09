@@ -229,7 +229,7 @@ void UpdateDisplay()
 			DrawCursor();
 		}
 
-		if (Preference.BigScreen && !BigMapMode || !Preference.BigScreen && BigMapMode)
+		if ((Preference.BigScreen && !BigMapMode) || (!Preference.BigScreen && BigMapMode))
 			UiToggleBigMap();
 
 		if (!BigMapMode) {

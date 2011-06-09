@@ -2791,7 +2791,7 @@ void LetUnitDie(CUnit &unit)
 	}
 
 	// Transporters lose or save their units and building their workers
-	if (unit.UnitInside && unit.Type->SaveCargo) 
+	if (unit.UnitInside && unit.Type->SaveCargo)
 		DropOutAll(unit);
 	else if (unit.UnitInside)
 		DestroyAllInside(unit);
@@ -2939,7 +2939,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		if (!target.Type->Building) {
 			if (target.Player->AiEnabled) {
 				AiHelpMe(attacker, target);
-			} 
+			}
 		}
 	}
 
@@ -2947,8 +2947,8 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		AiHelpMe(attacker, target);
 	}
 
-	if (target.Variable[HP_INDEX].Value <= damage && attacker->Type->ShieldPiercing || 
-		target.Variable[HP_INDEX].Value <= damage - target.Variable[SHIELD_INDEX].Value) { // unit is killed or destroyed
+	if ((target.Variable[HP_INDEX].Value <= damage && attacker->Type->ShieldPiercing) ||
+		(target.Variable[HP_INDEX].Value <= damage - target.Variable[SHIELD_INDEX].Value)) { // unit is killed or destroyed
 		//  increase scores of the attacker, but not if attacking it's own units.
 		//  prevents cheating by killing your own units.
 		if (attacker && target.IsEnemy(*attacker)) {

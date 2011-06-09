@@ -72,6 +72,10 @@
 #include <direct.h>
 #define makedir(dir, permissions) _mkdir(dir)
 
+#ifndef __func__
+#define __func__ __FUNCTION__
+#endif
+
 #endif  // } _MSC_VER
 
 #ifdef __GNUC__
