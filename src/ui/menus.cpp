@@ -235,7 +235,7 @@ static void MultiGameCancel()
 		SendMetaCommand("AbandonGame", "");
 	}
 
-	FreeMapInfo(&Map.Info);
+	Map.Info.Clear();
 
 	NetPlayers = 0; // Make single player menus work again!
 	GameCancel();

@@ -39,15 +39,10 @@
 #include <string.h>
 
 #include "stratagus.h"
-#include "unittype.h"
 #include "map.h"
 #include "tileset.h"
 #include "minimap.h"
-#include "player.h"
-#include "unit.h"
-#include "pathfinder.h"
 #include "ui.h"
-#include "editor.h"
 #include "script.h"
 
 /*----------------------------------------------------------------------------
@@ -72,9 +67,9 @@ char CurrentMapPath[1024];       /// Path of the current map
 */
 void CMap::MarkSeenTile(const unsigned int index)
 {
-	CMapField *mf = this->Field(index);
-	int tile = mf->Tile;
-	int seentile = mf->SeenTile;
+	CMapField &mf = *this->Field(index);
+	const int tile = mf.Tile;
+	const int seentile = mf.SeenTile;
 
 	//
 	//  Nothing changed? Seeing already the correct tile.
@@ -82,20 +77,20 @@ void CMap::MarkSeenTile(const unsigned int index)
 	if (tile == seentile) {
 		return;
 	}
-	mf->SeenTile = tile;
+	mf.SeenTile = tile;
 
 #ifdef MINIMAP_UPDATE
 	//rb - GRRRRRRRRRRRR
-	int y = index / Info.MapWidth;
-	int x = index - (y * Info.MapWidth);
+	const int y = index / Info.MapWidth;
+	const int x = index - (y * Info.MapWidth);
 	const Vec2i pos = {x, y}
 #endif
 
 	if (this->Tileset.TileTypeTable) {
 #ifndef MINIMAP_UPDATE
 		//rb - GRRRRRRRRRRRR
-		int y = index / Info.MapWidth;
-		int x = index - (y * Info.MapWidth);
+		const int y = index / Info.MapWidth;
+		const int x = index - (y * Info.MapWidth);
 		const Vec2i pos = {x, y};
 #endif
 
@@ -267,31 +262,28 @@ bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos)
 */
 void PreprocessMap()
 {
-	CMapField *mf;
-
 #ifdef _MSC_VER
 	for (int ix = 0; ix < Map.Info.MapWidth; ++ix) {
 		for (int iy = 0; iy < Map.Info.MapHeight; ++iy) {
-			mf = Map.Field(ix, iy);
+			CMapField *mf = Map.Field(ix, iy);
 			mf->SeenTile = mf->Tile;
 		}
 	}
 #else
-	{
-		const int width = Map.Info.MapHeight * Map.Info.MapWidth;
-		int n = (width+7)/8;
-		mf = Map.Fields;
-		switch (width & 7) {
-			case 0: do {	mf->SeenTile = mf->Tile;++mf;
-			case 7:			mf->SeenTile = mf->Tile;++mf;
-			case 6:			mf->SeenTile = mf->Tile;++mf;
-			case 5:			mf->SeenTile = mf->Tile;++mf;
-			case 4:			mf->SeenTile = mf->Tile;++mf;
-			case 3:			mf->SeenTile = mf->Tile;++mf;
-			case 2:			mf->SeenTile = mf->Tile;++mf;
-			case 1:			mf->SeenTile = mf->Tile;++mf;
-				} while ( --n > 0 );
-		}
+	const int width = Map.Info.MapHeight * Map.Info.MapWidth;
+	int n = (width + 7) / 8;
+	CMapField *mf = Map.Fields;
+
+	switch (width & 7) {
+		case 0: do {	mf->SeenTile = mf->Tile; ++mf;
+		case 7:			mf->SeenTile = mf->Tile; ++mf;
+		case 6:			mf->SeenTile = mf->Tile; ++mf;
+		case 5:			mf->SeenTile = mf->Tile; ++mf;
+		case 4:			mf->SeenTile = mf->Tile; ++mf;
+		case 3:			mf->SeenTile = mf->Tile; ++mf;
+		case 2:			mf->SeenTile = mf->Tile; ++mf;
+		case 1:			mf->SeenTile = mf->Tile; ++mf;
+			} while (--n > 0);
 	}
 #endif
 
@@ -308,20 +300,16 @@ void PreprocessMap()
 }
 
 /**
-**  Release info about a map.
-**
-**  @param info  CMapInfo pointer.
+**  Clear CMapInfo.
 */
-void FreeMapInfo(CMapInfo *info)
+void CMapInfo::Clear()
 {
-	if (info) {
-		info->Description.clear();
-		info->Filename.clear();
-		info->MapWidth = info->MapHeight = 0;
-		memset(info->PlayerSide, 0, sizeof(info->PlayerSide));
-		memset(info->PlayerType, 0, sizeof(info->PlayerType));
-		info->MapUID = 0;
-	}
+	this->Description.clear();
+	this->Filename.clear();
+	this->MapWidth = this->MapHeight = 0;
+	memset(this->PlayerSide, 0, sizeof(this->PlayerSide));
+	memset(this->PlayerType, 0, sizeof(this->PlayerType));
+	this->MapUID = 0;
 }
 
 /**
@@ -343,7 +331,7 @@ void CMap::Clean()
 
 	// Tileset freed by Tileset?
 
-	FreeMapInfo(&this->Info);
+	this->Info.Clear();
 	this->Fields = NULL;
 	this->NoFogOfWar = false;
 	this->Tileset.Clear();
@@ -370,24 +358,13 @@ void CMap::Clean()
 */
 void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 {
-	int tile;
-	int ttup;
-	int ttdown;
-	int ttleft;
-	int ttright;
-	int *lookuptable;
-	int removedtile;
-	int flags;
-	CMapField *mf;
-	unsigned int index;
 	//  Outside of map or no wood.
 	if (!Info.IsPointOnMap(pos))
 	{
 		return;
 	}
-
-	index = getIndex(pos);
-	mf = this->Field(index);
+	unsigned int index = getIndex(pos);
+	CMapField *mf = this->Field(index);
 
 	if (seen && !Tileset.IsSeenTile(type, mf->SeenTile)) {
 		return;
@@ -396,6 +373,9 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	}
 
 	// Select Table to lookup
+	int *lookuptable;
+	int removedtile;
+	int flags;
 	switch (type) {
 		case MapFieldForest:
 			lookuptable = this->Tileset.WoodTable;
@@ -415,7 +395,12 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	//
 	//  Find out what each tile has with respect to wood, or grass.
 	//
-	tile = 0;
+	int tile = 0;
+	int ttup;
+	int ttdown;
+	int ttleft;
+	int ttright;
+
 	if (pos.y - 1 < 0) {
 		ttup = 15; //Assign trees in all directions
 	} else {
@@ -553,7 +538,7 @@ void CMap::ClearTile(unsigned short type, const Vec2i &pos)
 	int flags;
 
 	unsigned int index = getIndex(pos);
-	CMapField *mf = this->Field(index);
+	CMapField &mf = *this->Field(index);
 
 	// Select Table to lookup
 	switch (type) {
@@ -568,10 +553,9 @@ void CMap::ClearTile(unsigned short type, const Vec2i &pos)
 		default:
 			removedtile = flags = 0;
 	}
-	//
-	mf->Tile = removedtile;
-	mf->Flags &= ~flags;
-	mf->Value = 0;
+	mf.Tile = removedtile;
+	mf.Flags &= ~flags;
+	mf.Value = 0;
 
 	UI.Minimap.UpdateXY(pos);
 	FixNeighbors(type, 0, pos);
@@ -591,10 +575,8 @@ void CMap::ClearTile(unsigned short type, const Vec2i &pos)
 */
 void CMap::RegenerateForestTile(int x, int y)
 {
-	CMapField *mf;
-	CMapField *tmp;
+	CMapField *mf = this->Field(x, y);
 
-	mf = this->Fields + x + y * this->Info.MapWidth;
 	if (mf->Tile != this->Tileset.RemovedTree) {
 		return;
 	}
@@ -606,15 +588,13 @@ void CMap::RegenerateForestTile(int x, int y)
 	//    Allow general updates to any tiletype that regrows
 	//
 
-	if (mf->Value >= ForestRegeneration ||
-			++mf->Value == ForestRegeneration) {
-		if (y && !(mf->Flags & (MapFieldWall | MapFieldUnpassable |
-				  MapFieldLandUnit | MapFieldBuilding))) {
-			tmp = mf - this->Info.MapWidth;
+	const unsigned int occupedFlag = (MapFieldWall | MapFieldUnpassable | MapFieldLandUnit | MapFieldBuilding);
+	if (mf->Value >= ForestRegeneration || ++mf->Value == ForestRegeneration) {
+		if (y && !(mf->Flags & occupedFlag)) {
+			CMapField *tmp = mf - this->Info.MapWidth;
 			if (tmp->Tile == this->Tileset.RemovedTree &&
 					tmp->Value >= ForestRegeneration &&
-					!(tmp->Flags & (MapFieldWall | MapFieldUnpassable |
-						  MapFieldLandUnit | MapFieldBuilding))) {
+					!(tmp->Flags & occupedFlag)) {
 				DebugPrint("Real place wood\n");
 				tmp->Tile = this->Tileset.TopOneTree;
 				tmp->Value = 0;
@@ -643,15 +623,12 @@ void CMap::RegenerateForestTile(int x, int y)
 */
 void CMap::RegenerateForest()
 {
-	int x;
-	int y;
-
 	if (!ForestRegeneration) {
 		return;
 	}
 
-	for (y = 0; y < Info.MapHeight; ++y) {
-		for (x = 0; x < Info.MapWidth; ++x) {
+	for (int y = 0; y < Info.MapHeight; ++y) {
+		for (int x = 0; x < Info.MapWidth; ++x) {
 			RegenerateForestTile(x, y);
 		}
 	}

@@ -167,6 +167,9 @@ public:
 	{
 		return IsPointOnMap(pos.x, pos.y);
 	}
+
+	void Clear();
+
 };
 
 /*----------------------------------------------------------------------------
@@ -582,8 +585,6 @@ extern int SaveStratagusMap(const std::string &filename, CMap *map, int writeTer
 
 	/// Load map presentation
 extern void LoadStratagusMapInfo(const std::string &mapname);
-	/// Release info for a map
-extern void FreeMapInfo(CMapInfo *info);
 
 	/// Returns true, if the unit-type(mask can enter field with bounds check
 extern bool CheckedCanMoveToMask(const Vec2i &pos, int mask);

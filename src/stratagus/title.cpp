@@ -94,15 +94,40 @@ static void WaitCallbackExit()
 {
 }
 
+
+void TitleScreen::ShowLabels()
+{
+	TitleScreenLabel **labels = this->Labels;
+
+	if (!labels) {
+		return ;
+	}
+
+	for (int i = 0; labels[i]; ++i) {
+		if (!labels[i]->Font) {
+			continue;
+		}
+		// offsets are for 640x480, scale up to actual resolution
+		const int x = labels[i]->Xofs * Video.Width / 640;
+		const int y = labels[i]->Yofs * Video.Height / 480;
+		CLabel label(labels[i]->Font);
+
+		if (labels[i]->Flags & TitleFlagCenter) {
+			label.DrawCentered(x, y, labels[i]->Text);
+		} else {
+			label.Draw(x, y, labels[i]->Text);
+		}
+	}
+}
+
+
 /**
 **  Show a title image
 */
-static void ShowTitleImage(TitleScreen *t)
+void TitleScreen::ShowTitleImage()
 {
-	const EventCallback *old_callbacks;
+	const EventCallback *old_callbacks = GetCallbacks();
 	EventCallback callbacks;
-	CGraphic *g;
-	int x, y;
 
 	WaitNoEvent = true;
 
@@ -116,43 +141,20 @@ static void ShowTitleImage(TitleScreen *t)
 	//callbacks.NetworkEvent = NetworkEvent;
 	callbacks.NetworkEvent = NULL;
 
-	old_callbacks = GetCallbacks();
 	SetCallbacks(&callbacks);
 
-	g = CGraphic::New(t->File);
+	CGraphic *g = CGraphic::New(this->File);
 	g->Load();
-	if (t->StretchImage) {
-		x = 0;
-		y = 0;
+	if (this->StretchImage) {
 		g->Resize(Video.Width, Video.Height);
-	} else {
-		x = (Video.Width - g->Width) / 2;
-		y = (Video.Height - g->Height) / 2;
 	}
 
-	int timeout = t->Timeout * CYCLES_PER_SECOND;
-	if (!timeout) {
-		timeout = -1;
-	}
-
-	CLabel label(GetGameFont());
+	int timeout = this->Timeout ? this->Timeout * CYCLES_PER_SECOND : -1;
 	DisplayAutoLocker autolock;
+
 	while (timeout-- && WaitNoEvent) {
 		g->DrawClip((Video.Width - g->Width) / 2, (Video.Height - g->Height) / 2);
-		TitleScreenLabel **labels = t->Labels;
-		if (labels && labels[0] && labels[0]->Font &&
-				labels[0]->Font->IsLoaded()) {
-			for (int j = 0; labels[j]; ++j) {
-				// offsets are for 640x480, scale up to actual resolution
-				int x = labels[j]->Xofs * Video.Width / 640;
-				int y = labels[j]->Yofs * Video.Width / 640;
-				if (labels[j]->Flags & TitleFlagCenter) {
-					x -= labels[j]->Font->Width(labels[j]->Text) / 2;
-				}
-				label.SetFont(labels[j]->Font);
-				label.Draw(x,y,labels[j]->Text);
-			}
-		}
+		this->ShowLabels();
 
 		Invalidate();
 		RealizeVideoMemory();
@@ -187,12 +189,23 @@ void ShowTitleScreens()
 		}
 
 		if (!TitleScreens[i]->File.empty() && PlayMovie(TitleScreens[i]->File)) {
-			ShowTitleImage(TitleScreens[i]);
+			TitleScreens[i]->ShowTitleImage();
 		}
 
 		Video.ClearScreen();
 	}
 	Invalidate();
+}
+
+
+void ShowFullImage(const std::string &filename, unsigned int timeOutInSecond)
+{
+	TitleScreen titleScreen;
+
+	titleScreen.File = filename;
+	titleScreen.Timeout = timeOutInSecond;
+
+	titleScreen.ShowTitleImage();
 }
 
 //@}

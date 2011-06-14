@@ -63,6 +63,11 @@ public:
 		}
 	}
 
+	void ShowTitleImage();
+
+private:
+	void ShowLabels();
+public:
 	std::string File;
 	std::string Music;
 	bool StretchImage;
