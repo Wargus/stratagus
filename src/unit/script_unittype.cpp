@@ -563,11 +563,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->BurnPercent = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "BurnDamageRate")) {
 			type->BurnDamageRate = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "MaxMana")) {
-			type->Variable[MANA_INDEX].Max = LuaToNumber(l, -1);
-			type->Variable[MANA_INDEX].Value = (type->Variable[MANA_INDEX].Max * MAGIC_FOR_NEW_UNITS) / 100;
-			type->Variable[MANA_INDEX].Increase = 1;
-			type->Variable[MANA_INDEX].Enable = 1;
 		} else if (!strcmp(value, "ShieldPoints")) {
 			type->Variable[SHIELD_INDEX].Max = LuaToNumber(l, -1);
 			type->Variable[SHIELD_INDEX].Value = 0;

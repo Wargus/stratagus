@@ -189,8 +189,6 @@ extern const char NameLine[];
 #endif
 #endif
 
-#define MAGIC_FOR_NEW_UNITS  0         /// How many percent of max mana for new units
-
 /*----------------------------------------------------------------------------
 --  Some limits
 ----------------------------------------------------------------------------*/
