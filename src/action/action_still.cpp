@@ -68,7 +68,7 @@ static void MapUnmarkTileGuard(const CPlayer &player, const unsigned int index)
 	--Map.Field(index)->Guard[player.Index];
 }
 
-static void MapMarkUnitGuard(CUnit &unit)
+void MapMarkUnitGuard(CUnit &unit)
 {
 	if (unit.IsAgressive() && !unit.GuardLock) {
 		if (!unit.Removed) {

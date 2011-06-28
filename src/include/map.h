@@ -179,7 +179,6 @@ public:
 	/// Describes the world map
 class CMap {
 public:
-
 	inline unsigned int getIndex(int x, int y) const
 	{
 		return x + y * this->Info.MapWidth;
@@ -189,7 +188,6 @@ public:
 	{
 		return getIndex(pos.x, pos.y);
 	}
-
 	inline CMapField *Field(unsigned int index) const {
 		return &this->Fields[index];
 	}
@@ -481,11 +479,6 @@ public:
 extern CMap Map;  /// The current map
 extern char CurrentMapPath[1024]; /// Path to the current map
 
-	/// Vision Table to see where to locate goals and vision
-extern unsigned char *VisionTable[3];
-	/// Companion table for fast lookups
-extern int *VisionLookup;
-
 	/// Contrast of fog of war
 extern int FogOfWarOpacity;
 	/// RGB triplet (0-255) of fog of war color
@@ -528,11 +521,6 @@ extern void MapSight(const CPlayer &player, const Vec2i &pos, int w,
 	int h, int range, MapMarkerFunc *marker);
 	/// Update fog of war
 extern void UpdateFogOfWarChange();
-
-	/// Builds Vision and Goal Tables
-extern void InitVisionTable();
-	/// Cleans up Vision and Goal Tables
-extern void FreeVisionTable();
 
 //
 // in map_radar.c
@@ -602,6 +590,9 @@ extern void PreprocessMap();
 void MapMarkUnitSight(CUnit &unit);
 /// Unmark on vision table the Sight of the unit.
 void MapUnmarkUnitSight(CUnit &unit);
+
+void MapMarkUnitGuard(CUnit &unit);
+void MapUnmarkUnitGuard(CUnit &unit);
 
 /*----------------------------------------------------------------------------
 --  Defines

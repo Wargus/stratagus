@@ -472,13 +472,4 @@ CViewport::~CViewport() {
 	}
 }
 
-/**
-**  Initialize the fog of war.
-**  Build tables, setup functions.
-*/
-void CMap::Init()
-{
-	InitFogOfWar();
-}
-
 //@}

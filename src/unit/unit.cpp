@@ -1526,9 +1526,11 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	*PlayerSlot = this;
 
 	MapUnmarkUnitSight(*this);
+	MapUnmarkUnitGuard(*this);
 	Player = &newplayer;
 	Stats = &Type->Stats[newplayer.Index];
 	UpdateUnitSightRange(*this);
+	MapMarkUnitGuard(*this);
 	MapMarkUnitSight(*this);
 
 	//  Must change food/gold and other.

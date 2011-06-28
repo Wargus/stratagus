@@ -323,6 +323,16 @@ void CMap::Create()
 }
 
 /**
+**  Initialize the fog of war.
+**  Build tables, setup functions.
+*/
+void CMap::Init()
+{
+	InitFogOfWar();
+}
+
+
+/**
 **  Cleanup the map module.
 */
 void CMap::Clean()

@@ -71,9 +71,6 @@ static const int FogTable[16] = {
 	 0,11,10, 2,  13, 6, 14, 3,  12, 15, 4, 1,  8, 9, 7, 0,
 };
 
-unsigned char *VisionTable[3];
-int *VisionLookup;
-
 static unsigned short *VisibleTable;
 
 static SDL_Surface *OnlyFogSurface;
@@ -239,6 +236,11 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos)
 	MapUnmarkTileDetectCloak(player, Map.getIndex(pos));
 }
 
+inline int square(int v)
+{
+	return v * v;
+}
+
 /**
 **  Mark the sight of unit. (Explore and make visible.)
 **
@@ -251,131 +253,56 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos)
 */
 void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker)
 {
-	Vec2i mpos;
-	Vec2i c[4];
-	int steps;
-	int cycle;
-
 	// Units under construction have no sight range.
 	if (!range) {
 		return;
 	}
+// Up hemi-cyle
+	const int miny = std::max(-range, 0 - pos.y);
+	for (int offsety = miny; offsety != 0; ++offsety) {
+		const int offsetx = isqrt(square(range + 1) - square(-offsety) - 1);
+		const int minx = std::max(0, pos.x - offsetx);
+		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + offsetx);
+		Vec2i mpos = {minx, pos.y + offsety};
+		const unsigned int index = mpos.y * Map.Info.MapWidth;
 
-#ifdef MARKER_ON_INDEX
-	unsigned int index = pos.y * Map.Info.MapWidth;
-#endif
-	for (mpos.y = pos.y; mpos.y < pos.y + h; ++mpos.y) {
-		for (mpos.x = pos.x - range; mpos.x < pos.x + range + w; ++mpos.x) {
-			if (mpos.x >= 0 && mpos.x < Map.Info.MapWidth) {
+		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
 #ifdef MARKER_ON_INDEX
 				marker(player, mpos.x + index);
 #else
 				marker(player, mpos);
 #endif
-			}
 		}
-#ifdef MARKER_ON_INDEX
-	index += Map.Info.MapWidth;
-#endif
 	}
+	for (int offsety = 0; offsety < h; ++offsety) {
+		const int minx = std::max(0, pos.x - range);
+		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + range);
+		Vec2i mpos = {minx, pos.y + offsety};
+		const unsigned int index = mpos.y * Map.Info.MapWidth;
 
-	// Mark vertical sight for unit (don't remark self) (above unit)
-#ifdef MARKER_ON_INDEX
-	index = (pos.y - range) * Map.Info.MapWidth;
-#endif
-	for (mpos.y = pos.y - range; mpos.y < pos.y; ++mpos.y) {
-		if (mpos.y >= 0 && mpos.y < Map.Info.MapHeight) {
-			for (mpos.x = pos.x; mpos.x < pos.x + w; ++mpos.x) {
+		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
 #ifdef MARKER_ON_INDEX
 				marker(player, mpos.x + index);
 #else
 				marker(player, mpos);
 #endif
-			}
 		}
-#ifdef MARKER_ON_INDEX
-		index += Map.Info.MapWidth;
-#endif
 	}
+// bottom hemi-cycle
+	const int maxy = std::min(range, Map.Info.MapHeight - pos.y - h);
+	for (int offsety = 0; offsety < maxy; ++offsety) {
+		const int offsetx = isqrt(square(range + 1) - square(offsety) - 1);
+		const int minx = std::max(0, pos.x - offsetx);
+		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + offsetx);
+		Vec2i mpos = {minx, pos.y + h + offsety};
+		const unsigned int index = mpos.y * Map.Info.MapWidth;
 
-	// Mark vertical sight for unit (don't remark self) (below unit)
-#ifdef MARKER_ON_INDEX
-	index = (pos.y + h) * Map.Info.MapWidth;
-#endif
-	for (mpos.y = pos.y + h; mpos.y < pos.y + range + h; ++mpos.y) {
-		if (mpos.y >= 0 && mpos.y < Map.Info.MapHeight) {
-			for (mpos.x = pos.x; mpos.x < pos.x + w; ++mpos.x) {
+		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
 #ifdef MARKER_ON_INDEX
 				marker(player, mpos.x + index);
 #else
 				marker(player, mpos);
 #endif
-			}
-		}
-#ifdef MARKER_ON_INDEX
-		index += Map.Info.MapWidth;
-#endif
-	}
-
-	// Now the cross has been marked, need to use loop to mark in circle
-	steps = 0;
-	while (VisionTable[0][steps] <= range) {
-		// 0 - Top right Quadrant
-		c[0].x = pos.x + w - 1;
-		c[0].y = pos.y - VisionTable[0][steps];
-		// 1 - Top left Quadrant
-		c[1].x = pos.x;
-		c[1].y = pos.y - VisionTable[0][steps];
-		// 2 - Bottom Left Quadrant
-		c[2].x = pos.x;
-		c[2].y = pos.y + VisionTable[0][steps] + h - 1;
-		// 3 - Bottom Right Quadrant
-		c[3].x = pos.x + w - 1;
-		c[3].y = pos.y + VisionTable[0][steps] + h - 1;
-		// loop for steps
-		++steps;  // Increment past info pointer
-		while (VisionTable[1][steps] != 0 || VisionTable[2][steps] != 0) {
-			// Loop through for repeat cycle
-			cycle = 0;
-			while (cycle++ < VisionTable[0][steps]) {
-				c[0].x += VisionTable[1][steps];
-				c[0].y += VisionTable[2][steps];
-				c[1].x -= VisionTable[1][steps];
-				c[1].y += VisionTable[2][steps];
-				c[2].x -= VisionTable[1][steps];
-				c[2].y -= VisionTable[2][steps];
-				c[3].x += VisionTable[1][steps];
-				c[3].y -= VisionTable[2][steps];
-				if (c[0].x < Map.Info.MapWidth && c[0].y >= 0) {
-#ifdef MARKER_ON_INDEX
-					marker(player, Map.getIndex(c[0]));
-#else
-					marker(player, c[0]);
-#endif
-				}
-				if (c[1].x >= 0 && c[1].y >= 0) {
-#ifdef MARKER_ON_INDEX
-					marker(player, Map.getIndex(c[1]));
-#else
-					marker(player, c[1]);
-#endif
-				}
-				if (c[2].x >= 0 && c[2].y < Map.Info.MapHeight) {
-#ifdef MARKER_ON_INDEX
-					marker(player, Map.getIndex(c[2]));
-#else
-					marker(player, c[2]);
-#endif
-				}
-				if (c[3].x < Map.Info.MapWidth && c[3].y < Map.Info.MapHeight) {
-#ifdef MARKER_ON_INDEX
-					marker(player, Map.getIndex(c[3]));
-#else
-					marker(player, c[3]);
-#endif
-				}
-			}
-			++steps;
 		}
 	}
 }
@@ -760,160 +687,4 @@ void CMap::CleanFogOfWar()
 	}
 }
 
-/**
-**  Initialize Vision and Goal Tables.
-*/
-void InitVisionTable()
-{
-	int *visionlist;
-	int maxsize;
-	int sizex;
-	int sizey;
-	int maxsearchsize;
-	int i;
-	int VisionTablePosition;
-	int marker;
-	int direction;
-	int right;
-	int up;
-	int repeat;
-
-	// Initialize Visiontable to large size, can't be more entries than tiles.
-	VisionTable[0] = new unsigned char[MaxMapWidth * MaxMapWidth];
-	VisionTable[1] = new unsigned char[MaxMapWidth * MaxMapWidth];
-	VisionTable[2] = new unsigned char[MaxMapWidth * MaxMapWidth];
-
-	VisionLookup = new int[MaxMapWidth + 2];
-#ifndef SQUAREVISION
-	visionlist = new int[MaxMapWidth * MaxMapWidth];
-	//*2 as diagonal distance is longer
-
-	maxsize = MaxMapWidth;
-	maxsearchsize = MaxMapWidth;
-	// Fill in table of map size
-	for (sizex = 0; sizex < maxsize; ++sizex) {
-		for (sizey = 0; sizey < maxsize; ++sizey) {
-			visionlist[sizey * maxsize + sizex] = isqrt(sizex * sizex + sizey * sizey);
-		}
-	}
-
-	VisionLookup[0] = 0;
-	i = 1;
-	VisionTablePosition = 0;
-	while (i < maxsearchsize) {
-		// Set Lookup Table
-		VisionLookup[i] = VisionTablePosition;
-		// Put in Null Marker
-		VisionTable[0][VisionTablePosition] = i;
-		VisionTable[1][VisionTablePosition] = 0;
-		VisionTable[2][VisionTablePosition] = 0;
-		++VisionTablePosition;
-
-
-		// find i in left column
-		marker = maxsize * i;
-		direction = 0;
-		right = 0;
-		up = 0;
-
-		// If not on top row, continue
-		do {
-			repeat = 0;
-			do {
-				// search for repeating
-				// Test Right
-				if ((repeat == 0 || direction == 1) && visionlist[marker + 1] == i) {
-					right = 1;
-					up = 0;
-					++repeat;
-					direction = 1;
-					++marker;
-				} else if ((repeat == 0 || direction == 2) && visionlist[marker - maxsize] == i) {
-					up = 1;
-					right = 0;
-					++repeat;
-					direction = 2;
-					marker = marker - maxsize;
-				} else if ((repeat == 0 || direction == 3) && visionlist[marker + 1 - maxsize] == i &&
-						visionlist[marker - maxsize] != i && visionlist[marker + 1] != i) {
-					up = 1;
-					right = 1;
-					++repeat;
-					direction = 3;
-					marker = marker + 1 - maxsize;
-				} else {
-					direction = 0;
-					break;
-				}
-
-			   // search right
-			   // search up - store as down.
-			   // search diagonal
-			}  while (direction && marker > (maxsize * 2));
-			if (right || up) {
-				VisionTable[0][VisionTablePosition] = repeat;
-				VisionTable[1][VisionTablePosition] = right;
-				VisionTable[2][VisionTablePosition] = up;
-				++VisionTablePosition;
-			}
-		} while (marker > (maxsize * 2));
-		++i;
-	}
-
-	delete[] visionlist;
-#else
-	// Find maximum distance in corner of map.
-	maxsize = MaxMapWidth;
-	maxsearchsize = isqrt(MaxMapWidth / 2);
-	// Mark 1, It's a special case
-	// Only Horizontal is marked
-	VisionTable[0][0] = 1;
-	VisionTable[1][0] = 0;
-	VisionTable[2][0] = 0;
-	VisionTable[0][1] = 1;
-	VisionTable[1][1] = 1;
-	VisionTable[2][1] = 0;
-
-	// Mark VisionLookup
-	VisionLookup[0] = 0;
-	VisionLookup[1] = 0;
-	i = 2;
-	VisionTablePosition = 1;
-	while (i <= maxsearchsize) {
-		++VisionTablePosition;
-		VisionLookup[i] = VisionTablePosition;
-		// Setup Vision Start
-		VisionTable[0][VisionTablePosition] = i;
-		VisionTable[1][VisionTablePosition] = 0;
-		VisionTable[2][VisionTablePosition] = 0;
-		// Do Horizontal
-		++VisionTablePosition;
-		VisionTable[0][VisionTablePosition] = i;
-		VisionTable[1][VisionTablePosition] = 1;
-		VisionTable[2][VisionTablePosition] = 0;
-		// Do Vertical
-		++VisionTablePosition;
-		VisionTable[0][VisionTablePosition] = i - 1;
-		VisionTable[1][VisionTablePosition] = 0;
-		VisionTable[2][VisionTablePosition] = 1;
-		i++;
-	}
-#endif
-}
-
-/**
-**  Clean Up Generated Vision and Goal Tables.
-*/
-void FreeVisionTable()
-{
-	// Free Vision Data
-	delete[] VisionTable[0];
-	VisionTable[0] = NULL;
-	delete[] VisionTable[1];
-	VisionTable[1] = NULL;
-	delete[] VisionTable[2];
-	VisionTable[2] = NULL;
-	delete[] VisionLookup;
-	VisionLookup = NULL;
-}
 //@}

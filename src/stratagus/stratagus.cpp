@@ -386,7 +386,6 @@ void CleanGame(void)
 	CleanTilesets();
 	Map.Clean();
 	CleanReplayLog();
-	FreeVisionTable();
 	FreePathfinder();
 	CursorBuilding = NULL;
 	UnitUnderCursor.Reset();

@@ -107,7 +107,6 @@ void CleanModules()
 	CParticleManager::exit();
 	CleanReplayLog();
 	CleanSpells();
-	FreeVisionTable();
 	FreePathfinder();
 
 	UnitTypeVar.Init(); // internal script. should be to a better place, don't find for restart.
@@ -213,7 +212,6 @@ void LoadGame(const std::string &filename)
 	LoadFonts();
 
 	CclGarbageCollect(0);
-	InitVisionTable();
 	InitUnitTypes(1);
 	LuaLoadFile(filename);
 	CclGarbageCollect(0);

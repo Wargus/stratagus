@@ -568,7 +568,6 @@ void CreateGame(const std::string &filename, CMap *map)
 		return;
 	}
 
-	InitVisionTable(); // build vision table for fog of war
 	InitPlayers();
 
 	if (Map.Info.Filename.empty() && !filename.empty()) {
