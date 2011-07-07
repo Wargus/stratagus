@@ -1420,7 +1420,7 @@ static int CclDefineAiPlayer(lua_State *l)
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "state")) {
 					lua_rawgeti(l, j + 1, k + 1);
-					ai->Force[i].State = LuaToNumber(l, -1);
+					ai->Force[i].State = AiForceAttackingState(LuaToNumber(l, -1));
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "goalx")) {
 					lua_rawgeti(l, j + 1, k + 1);
@@ -1431,9 +1431,7 @@ static int CclDefineAiPlayer(lua_State *l)
 					ai->Force[i].GoalPos.y = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "must-transport")) {
-					lua_rawgeti(l, j + 1, k + 1);
-					ai->Force[i].MustTransport = LuaToNumber(l, -1) ? true : false;
-					lua_pop(l, 1);
+					// Keep for backward compatibility
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}

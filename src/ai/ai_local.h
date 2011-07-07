@@ -60,14 +60,7 @@ public:
 	std::string Name;     /// Name of this ai
 	std::string Race;     /// for this race
 	std::string Class;    /// class of this ai
-
-#if 0
-	// nice flags
-	unsigned char AllExplored : 1; /// Ai sees unexplored area
-	unsigned char AllVisbile : 1;  /// Ai sees invisibile area
-#endif
-
-	std::string Script;       /// Main script
+	std::string Script;   /// Main script
 };
 
 /**
@@ -89,7 +82,7 @@ public:
 	AiUnitType() : Want(0), Type(NULL) {}
 
 	unsigned int Want; /// number of this unit-type wanted
-	CUnitType *Type; /// unit-type self
+	CUnitType *Type;   /// unit-type self
 };
 
 /**
@@ -100,11 +93,13 @@ enum AiForceRole {
 	AiForceRoleDefend      /// Force should defend
 };
 
-#define AI_FORCE_STATE_FREE			-1
-#define AI_FORCE_STATE_WAITING		0
-#define AI_FORCE_STATE_BOARDING 	1
-//#define AI_FORCE_STATE_OERATIONAL 	2
-#define AI_FORCE_STATE_ATTACKING	3
+enum AiForceAttackingState
+{
+	AiForceAttackingState_Free = -1,
+	AiForceAttackingState_Waiting = 0,
+	AiForceAttackingState_Boarding,
+	AiForceAttackingState_Attacking,
+};
 
 /**
 **  Define an AI force.
@@ -113,19 +108,10 @@ enum AiForceRole {
 */
 class AiForce {
 	friend class AiForceManager;
-
-	bool IsBelongsTo(const CUnitType *type);
-	void Insert(CUnit &unit)
-	{
-		Units.Insert(&unit);
-		unit.RefsIncrease();
-	}
-
-	void Update();
 public:
-	AiForce() : Completed(false), Defending(false), Attacking(false),
-		Role(0), State(AI_FORCE_STATE_FREE),
-		MustTransport(false)
+	AiForce() :
+		Completed(false), Defending(false), Attacking(false),
+		Role(0), State(AiForceAttackingState_Free)
 	{
 		GoalPos.x = GoalPos.y = 0;
 	}
@@ -133,8 +119,7 @@ public:
 	void Remove(CUnit &unit)
 	{
 		if (Units.Remove(&unit)) {
-			unit.GroupId = 0;
-			unit.RefsDecrease();
+			InternalRemoveUnit(&unit);
 		}
 	}
 
@@ -147,13 +132,13 @@ public:
 		Attacking = false;
 		if (types) {
 			UnitTypes.clear();
-			State = AI_FORCE_STATE_FREE;
+			State = AiForceAttackingState_Free;
 		} else {
-			State = AI_FORCE_STATE_WAITING;
+			State = AiForceAttackingState_Waiting;
 		}
+		Units.for_each(InternalRemoveUnit);
 		Units.clear();
 		GoalPos.x = GoalPos.y = 0;
-		MustTransport = false;
 	}
 	inline size_t Size() const
 	{
@@ -165,39 +150,51 @@ public:
 		return (!Defending && Attacking);
 	}
 
-	void CountTypes(unsigned int *counter, const size_t len);
+	void Attack(const Vec2i &pos);
+	void Clean();
+	int PlanAttack();
 
+private:
+	void CountTypes(unsigned int *counter, const size_t len);
+	bool IsBelongsTo(const CUnitType *type);
+	void Insert(CUnit &unit)
+	{
+		Units.Insert(&unit);
+		unit.RefsIncrease();
+	}
+
+	void Update();
+
+	static void InternalRemoveUnit(CUnit *unit) {
+		unit->GroupId = 0;
+		unit->RefsDecrease();
+	}
+
+public:
 	bool Completed;     /// Flag saying force is complete build
 	bool Defending;     /// Flag saying force is defending
 	bool Attacking;     /// Flag saying force is attacking
 	char Role;          /// Role of the force
 
 	std::vector<AiUnitType> UnitTypes; /// Count and types of unit-type
-	CUnitCache Units;						/// Units in the force
+	CUnitCache Units;   /// Units in the force
 
 	//
 	// If attacking
 	//
-	int State;/// Attack state
+	AiForceAttackingState State; /// Attack state
 	Vec2i GoalPos; /// Attack point tile map position
-	bool MustTransport;/// Flag must use transporter
-
-	void Attack(const Vec2i &pos);
-	void Clean();
-	int PlanAttack();
 };
 
 	// forces
 #define AI_MAX_FORCES 10                    /// How many forces are supported
-//#define AI_MAX_ATTACKING_FORCES 30          /// Attacking forces (max supported 32)
+
 /**
 **  AI force manager.
 **
 **  A Forces container for the force manager to handle
 */
 class AiForceManager {
-	std::vector<AiForce> forces;
-	char script[AI_MAX_FORCES];
 public:
 	AiForceManager();
 
@@ -217,7 +214,6 @@ public:
 		return -1;
 	}
 
-
 	inline unsigned int getScriptForce(unsigned int index) {
 		if (script[index] == -1) {
 			script[index] = FindFreeForce();
@@ -230,6 +226,9 @@ public:
 	void Update();
 	unsigned int FindFreeForce(int role = AiForceRoleAttack);
 	void CheckUnits(int *counter);
+private:
+	std::vector<AiForce> forces;
+	char script[AI_MAX_FORCES];
 };
 
 /**
@@ -241,12 +240,13 @@ class AiBuildQueue {
 public:
 	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0), X(-1), Y(-1)  {}
 
+public:
 	unsigned int Want;  /// requested number
 	unsigned int Made;  /// built number
 	CUnitType *Type;    /// unit-type
 	unsigned long Wait; /// wait until this cycle
-	short int X;              /// build near x pos on map
-	short int Y;              /// build near y pos on map
+	short int X;        /// build near x pos on map
+	short int Y;        /// build near y pos on map
 };
 
 /**
@@ -256,6 +256,7 @@ class AiExplorationRequest {
 public:
 	AiExplorationRequest(const Vec2i& pos, int mask) : pos(pos), Mask(mask) { }
 
+public:
 	Vec2i pos;          /// pos on map
 	int Mask;           /// mask ( ex: MapFieldLandUnit )
 };
@@ -267,6 +268,7 @@ class AiTransportRequest {
 public:
 	AiTransportRequest() : Unit(NULL) {}
 
+public:
 	CUnit *Unit;
 	CUnit::COrder Order;
 };
@@ -279,7 +281,7 @@ public:
 	PlayerAi() : Player(NULL), AiType(NULL),
 		SleepCycles(0), NeededMask(0), NeedSupply(false),
 		ScriptDebug(false), LastExplorationGameCycle(0),
-		LastCanNotMoveGameCycle(0),	LastRepairBuilding(0)
+		LastCanNotMoveGameCycle(0), LastRepairBuilding(0)
 	{
 		memset(Reserve, 0, sizeof(Reserve));
 		memset(Used, 0, sizeof(Used));
@@ -288,13 +290,14 @@ public:
 		memset(TriedRepairWorkers, 0, sizeof(TriedRepairWorkers));
 	}
 
+public:
 	CPlayer *Player;               /// Engine player structure
 	CAiType *AiType;               /// AI type of this player AI
 	// controller
 	std::string Script;            /// Script executed
 	unsigned long SleepCycles;     /// Cycles to sleep
 
-	AiForceManager	Force;		/// Forces controlled by AI
+	AiForceManager Force;  /// Forces controlled by AI
 
 	// resource manager
 	int Reserve[MaxCosts]; /// Resources to keep in reserve
@@ -314,7 +317,7 @@ public:
 	std::vector<CUpgrade *> ResearchRequests;       /// Upgrades requested and priority list
 	std::vector<AiBuildQueue> UnitTypeBuilt;        /// What the resource manager should build
 	int LastRepairBuilding;                         /// Last building checked for repair in this turn
-	unsigned int TriedRepairWorkers[UnitMax];           /// No. workers that failed trying to repair a building
+	unsigned int TriedRepairWorkers[UnitMax];       /// No. workers that failed trying to repair a building
 };
 
 /**
@@ -373,8 +376,6 @@ public:
 	** units/buildings/mines which can store this resource.
 	*/
 	std::vector<std::vector<CUnitType *> > Depots;
-
-
 };
 
 /*----------------------------------------------------------------------------

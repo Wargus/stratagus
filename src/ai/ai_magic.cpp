@@ -33,17 +33,11 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "stratagus.h"
 #include "unittype.h"
 #include "unit.h"
 #include "spells.h"
-#include "actions.h"
-#include "map.h"
 #include "ai_local.h"
-#include "player.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -55,9 +49,9 @@
 */
 void AiCheckMagic()
 {
-	const int n = AiPlayer->Player->TotalNumUnits;
-	CUnit **units = AiPlayer->Player->Units;
-	const CPlayer &player = *AiPlayer->Player; /*units[0]->Player */
+	CPlayer &player = *AiPlayer->Player;
+	const int n = player.TotalNumUnits;
+	CUnit **units = player.Units;
 
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = *units[i];

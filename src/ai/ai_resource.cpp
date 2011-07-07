@@ -977,21 +977,13 @@ static int CmpWorkers(const void *w0,const void *w1) {
 */
 static void AiCollectResources()
 {
-	CUnit *units_with_resource[MaxCosts][UnitMax]; // Worker with resource
 	CUnit *units_assigned[MaxCosts][UnitMax]; // Worker assigned to resource
 	CUnit *units_unassigned[MaxCosts][UnitMax]; // Unassigned workers
 	int num_units_with_resource[MaxCosts];
 	int num_units_assigned[MaxCosts];
 	int num_units_unassigned[MaxCosts];
-	int c;
-	int src_c;
-	int i;
-	int j;
-	int k;
-	int n;
 	CUnit **units;
 	int percent[MaxCosts];
-	int percent_total;
 
 	int priority_resource[MaxCosts];
 	int priority_needed[MaxCosts];
@@ -1007,19 +999,17 @@ static void AiCollectResources()
 	//
 	total_harvester = 0;
 
-	n = AiPlayer->Player->TotalNumUnits;
+	const int n = AiPlayer->Player->TotalNumUnits;
 	units = AiPlayer->Player->Units;
-	for (i = 0; i < n; ++i) {
+	for (int i = 0; i < n; ++i) {
 		CUnit &unit = *units[i];
 		if (!unit.Type->Harvester) {
 			continue;
 		}
 
-		c = unit.CurrentResource;
+		const int c = unit.CurrentResource;
 
-		//
 		// See if it's assigned already
-		//
 		if (c && unit.OrderCount == 1 &&
 			unit.CurrentAction() == UnitActionResource) {
 			units_assigned[c][num_units_assigned[c]++] = &unit;
@@ -1027,27 +1017,21 @@ static void AiCollectResources()
 			continue;
 		}
 
-		//
 		// Ignore busy units. ( building, fighting, ... )
-		//
 		if (!unit.IsIdle()) {
 			continue;
 		}
 
-		//
 		// Send workers with resources back home.
-		//
 		if (unit.ResourcesHeld && c) {
-			units_with_resource[c][num_units_with_resource[c]++] = &unit;
+			num_units_with_resource[c]++;
 			CommandReturnGoods(unit, 0, FlushCommands);
 			total_harvester++;
 			continue;
 		}
 
-		//
 		// Look what the unit can do
-		//
-		for (c = 1; c < MaxCosts; ++c) {
+		for (int c = 1; c < MaxCosts; ++c) {
 			if (unit.Type->ResInfo[c]) {
 				units_unassigned[c][num_units_unassigned[c]++] = &unit;
 			}
@@ -1055,14 +1039,14 @@ static void AiCollectResources()
 		++total_harvester;
 	}
 
-	if(!total_harvester) {
+	if (!total_harvester) {
 		return;
 	}
 
 	memset(wanted, 0, sizeof(wanted));
 
-	percent_total = 100;
-	for (c = 1; c < MaxCosts; ++c) {
+	int percent_total = 100;
+	for (int c = 1; c < MaxCosts; ++c) {
 		percent[c] = AiPlayer->Collect[c];
 		if ((AiPlayer->NeededMask & (1 << c))) { // Double percent if needed
 			percent_total += percent[c];
@@ -1070,11 +1054,9 @@ static void AiCollectResources()
 		}
 	}
 
-	//
 	// Turn percent values into harvester numbers.
-	//
-	for (c = 1; c < MaxCosts; ++c ) {
-		if(percent[c]) {
+	for (int c = 1; c < MaxCosts; ++c ) {
+		if (percent[c]) {
 			// Wanted needs to be representative.
 			if (total_harvester < 5) {
 				wanted[c] = 1 + (percent[c] * 5) / percent_total;
@@ -1084,67 +1066,55 @@ static void AiCollectResources()
 		}
 	}
 
-	//
 	// Initialise priority & mapping
-	//
-	for (c = 0; c < MaxCosts; ++c) {
+	for (int c = 0; c < MaxCosts; ++c) {
 		priority_resource[c] = c;
 		priority_needed[c] = wanted[c] - num_units_assigned[c] - num_units_with_resource[c];
 
 		if (c && num_units_assigned[c] > 1) {
 			//first should go workers with lower ResourcesHeld value
-			qsort(units_assigned[c], num_units_assigned[c],
-							 sizeof(CUnit*), CmpWorkers);
+			qsort(units_assigned[c], num_units_assigned[c], sizeof(CUnit*), CmpWorkers);
 		}
 
 	}
 	CUnit* unit;
 	do {
-		//
 		// sort resources by priority
-		//
-		for (i = 0; i < MaxCosts; ++i) {
-			for (j = i + 1; j < MaxCosts; ++j) {
+		for (int i = 0; i < MaxCosts; ++i) {
+			for (int j = i + 1; j < MaxCosts; ++j) {
 				if (priority_needed[j] > priority_needed[i]) {
-					c = priority_needed[j];
-					priority_needed[j] = priority_needed[i];
-					priority_needed[i] = c;
-					c = priority_resource[j];
-					priority_resource[j] = priority_resource[i];
-					priority_resource[i] = c;
+					std::swap(priority_needed[i], priority_needed[j]);
+					std::swap(priority_resource[i], priority_resource[j]);
 				}
 			}
 		}
 		unit = NoUnitP;
-		//
-		// Try to complete each ressource in the priority order
-		//
 
-		for (i = 0; i < MaxCosts; ++i) {
-			c = priority_resource[i];
+		// Try to complete each ressource in the priority order
+		for (int i = 0; i < MaxCosts; ++i) {
+			int c = priority_resource[i];
 
 			//
 			// If there is a free worker for c, take it.
 			//
 			if (num_units_unassigned[c]) {
 				// Take the unit.
-				j = 0;
-				while (j < num_units_unassigned[c] && !AiAssignHarvester(*units_unassigned[c][j], c)) {
+				while (0 < num_units_unassigned[c] && !AiAssignHarvester(*units_unassigned[c][0], c)) {
 					// can't assign to c => remove from units_unassigned !
-					units_unassigned[c][j] = units_unassigned[c][--num_units_unassigned[c]];
+					units_unassigned[c][0] = units_unassigned[c][--num_units_unassigned[c]];
 				}
 
 				// unit is assigned
-				if (j < num_units_unassigned[c]) {
-					unit = units_unassigned[c][j];
-					units_unassigned[c][j] = units_unassigned[c][--num_units_unassigned[c]];
+				if (0 < num_units_unassigned[c]) {
+					unit = units_unassigned[c][0];
+					units_unassigned[c][0] = units_unassigned[c][--num_units_unassigned[c]];
 
 					// remove it from other ressources
-					for (j = 0; j < MaxCosts; ++j) {
+					for (int j = 0; j < MaxCosts; ++j) {
 						if (j == c || !unit->Type->ResInfo[j]) {
 							continue;
 						}
-						for (k = 0; k < num_units_unassigned[j]; ++k) {
+						for (int k = 0; k < num_units_unassigned[j]; ++k) {
 							if (units_unassigned[j][k] == unit) {
 								units_unassigned[j][k] = units_unassigned[j][--num_units_unassigned[j]];
 								break;
@@ -1159,9 +1129,9 @@ static void AiCollectResources()
 			//
 			if (!unit) {
 				// Take from lower priority only (i+1).
-				for (j = i + 1; j < MaxCosts && !unit; ++j) {
+				for (int j = i + 1; j < MaxCosts && !unit; ++j) {
 					// Try to move worker from src_c to c
-					src_c = priority_resource[j];
+					const int src_c = priority_resource[j];
 
 					// Don't complete with lower priority ones...
 					if (wanted[src_c] > wanted[c] ||
@@ -1170,7 +1140,7 @@ static void AiCollectResources()
 						continue;
 					}
 
-					for (k = num_units_assigned[src_c] - 1; k >= 0 && !unit; --k) {
+					for (int k = num_units_assigned[src_c] - 1; k >= 0 && !unit; --k) {
 						unit = units_assigned[src_c][k];
 
 						if (unit->SubAction >= 65 /* SUB_STOP_GATHERING */ ) {
@@ -1334,7 +1304,6 @@ static int AiRepairUnit(CUnit &unit)
 			}
 		}
 	}
-
 	return 0;
 }
 
@@ -1343,25 +1312,20 @@ static int AiRepairUnit(CUnit &unit)
 */
 static void AiCheckRepair()
 {
-	int i;
-	int j;
-	int k;
-	int n;
-	bool repair_flag;
+	const int n = AiPlayer->Player->TotalNumUnits;
+	int k = 0;
 
-	n = AiPlayer->Player->TotalNumUnits;
-	k = 0;
 	// Selector for next unit
-	for (i = n - 1; i >= 0; --i) {
+	for (int i = n - 1; i >= 0; --i) {
 		CUnit *unit = AiPlayer->Player->Units[i];
 		if (unit && UnitNumber(*unit) == AiPlayer->LastRepairBuilding) {
 			k = i + 1;
 		}
 	}
 
-	for (i = k; i < n; ++i) {
+	for (int i = k; i < n; ++i) {
 		CUnit &unit = *AiPlayer->Player->Units[i];
-		repair_flag = true;
+		bool repair_flag = true;
 
 		if (!unit.IsAliveOnMap()) {
 			continue;
@@ -1374,7 +1338,6 @@ static void AiCheckRepair()
 				unit.CurrentAction() != UnitActionUpgradeTo &&
 				unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max &&
 				unit.Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
-
 			//
 			// FIXME: Repair only units under control
 			//
@@ -1384,7 +1347,7 @@ static void AiCheckRepair()
 			//
 			// Must check, if there are enough resources
 			//
-			for (j = 1; j < MaxCosts; ++j) {
+			for (int j = 1; j < MaxCosts; ++j) {
 				if (unit.Stats->Costs[j] &&
 						AiPlayer->Player->Resources[j] < 99) {
 					repair_flag = false;

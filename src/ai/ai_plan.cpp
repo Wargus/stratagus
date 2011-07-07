@@ -43,7 +43,6 @@
 #include "pathfinder.h"
 #include "actions.h"
 #include "ai_local.h"
-#include "player.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -433,7 +432,7 @@ int AiFindWall(AiForce *force)
 	delete[] points;
 
 	if (dest.x != -1) {
-		force->State = AI_FORCE_STATE_WAITING;
+		force->State = AiForceAttackingState_Waiting;
 		for (unsigned int i = 0; i < force->Units.size(); ++i) {
 			CUnit &aiunit = *force->Units[i];
 			if (aiunit.Type->CanAttack) {
@@ -460,20 +459,16 @@ int AiFindWall(AiForce *force)
 */
 int AiForce::PlanAttack()
 {
-	unsigned char *watermatrix;
-	int state;
-	CUnit *transporter;
-
 	DebugPrint("%d: Planning for force #%lu of player #%d\n"_C_ AiPlayer->Player->Index
 	 _C_ (long unsigned int)(this - &(AiPlayer->Force[0])) _C_ AiPlayer->Player->Index);
 
-	watermatrix = CreateMatrix();
+	unsigned char *watermatrix = CreateMatrix();
 
 	//
 	// Transporter must be already assigned to the force.
-	// NOTE: finding free transportes was too much work for me.
+	// NOTE: finding free transporters was too much work for me.
 	//
-	state = 1;
+	int state = 1;
 	for (unsigned int i = 0; i < Size(); ++i) {
 		const CUnit &aiunit = *Units[i];
 
@@ -487,7 +482,7 @@ int AiForce::PlanAttack()
 	//
 	// No transport that belongs to the force.
 	//
-	transporter = NULL;
+	CUnit *transporter = NULL;
 	if (state) {
 		for (int i = 0; i < AiPlayer->Player->TotalNumUnits; ++i) {
 			CUnit &unit = *AiPlayer->Player->Units[i];
@@ -572,9 +567,7 @@ int AiForce::PlanAttack()
 		}
 		DebugPrint("%d: Can attack\n" _C_ AiPlayer->Player->Index);
 		GoalPos = pos;
-		MustTransport = state == 2;
-
-		State = AI_FORCE_STATE_BOARDING;
+		State = AiForceAttackingState_Boarding;
 		return 1;
 	}
 	return 0;

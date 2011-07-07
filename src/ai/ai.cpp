@@ -316,8 +316,8 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 			file->printf(" %d, \"%s\",", UnitNumber(aiunit),
 				aiunit.Type->Ident.c_str());
 		}
-		file->printf("},\n    \"state\", %d, \"goalx\", %d, \"goaly\", %d, \"must-transport\", %d,",
-			ai->Force[i].State, ai->Force[i].GoalPos.x, ai->Force[i].GoalPos.y, ai->Force[i].MustTransport);
+		file->printf("},\n    \"state\", %d, \"goalx\", %d, \"goaly\", %d,",
+			ai->Force[i].State, ai->Force[i].GoalPos.x, ai->Force[i].GoalPos.y);
 		file->printf("},\n");
 	}
 
