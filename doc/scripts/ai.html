@@ -79,22 +79,20 @@ between defend and attack for an AI player.<br>
 
 <h2>Functions</h2>
 <a name="DefineAi"></a>
-<h3>DefineAi(name, class, script)</h3>
+<h3>DefineAi(name, script)</h3>
 
 This defines how a special AI works. Each level can use his own AI definition.
 
 <dl>
 <dt>name</dt>
 <dd>
-Unique name of this AI definitions.  The "ai-type" parameter
-of <a href="savegame.html#DefineAiPlayer">DefineAiPlayer</a> refers to this.
-</dd>
-<dt>class</dt>
-<dd>Class name of this definition. Used to choose the AI for computer players.
+Unique, language-independent name of this AI definition.
+By convention, each name should begin with "ai-".
 The map setup file sets e.g. <code>Players[1].AiName = "ai-blitz"</code>
-and the engine then finds the AI type whose class name is that string.
-This is also used in the "ai-name" parameter of
-<a href="savegame.html#Player">Player</a>.
+and the engine then finds the AI definition whose name is that string.
+In saved games, these names are used in
+the "ai-type" parameter of <a href="savegame.html#DefineAiPlayer">DefineAiPlayer</a>
+and the "ai-name" parameter of <a href="savegame.html#Player">Player</a>.
 </dd>
 <dt>script</dt>
 <dd>A lua function.
@@ -105,7 +103,7 @@ This is also used in the "ai-name" parameter of
 
 <pre>
     -- Defines the passive computer AI, which does nothing.
-DefineAi("passive-ai", "passive", function() AiSleep(10000) end)
+DefineAi("ai-passive", function() AiSleep(10000) end)
 </pre>
 
 <a name="DefineAiHelper"></a>

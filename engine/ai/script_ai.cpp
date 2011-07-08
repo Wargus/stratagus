@@ -284,8 +284,8 @@ static int CclDefineAi(lua_State *l)
 	const CAiType *ait;
 #endif
 
-	LuaCheckArgs(l, 3);
-	if (!lua_isfunction(l, 3))
+	LuaCheckArgs(l, 2);
+	if (!lua_isfunction(l, 2))
 	{
 		LuaError(l, "incorrect argument");
 	}
@@ -310,11 +310,6 @@ static int CclDefineAi(lua_State *l)
 #endif
 
 	//
-	// AI Class
-	//
-	aitype->Class = LuaToString(l, 2);
-
-	//
 	// AI Script
 	//
 	lua_pushstring(l, "_ai_scripts_");
@@ -328,10 +323,9 @@ static int CclDefineAi(lua_State *l)
 		lua_pushstring(l, "_ai_scripts_");
 		lua_gettable(l, LUA_GLOBALSINDEX);
 	}
-	aitype->Script = aitype->Name + aitype->Class;
-	lua_pushstring(l, aitype->Script.c_str());
-	lua_pushvalue(l, 3);
-	lua_rawset(l, 4);
+	lua_pushstring(l, aitype->Name.c_str());
+	lua_pushvalue(l, 2);
+	lua_rawset(l, -3);
 	lua_pop(l, 1);
 
 	return 0;
@@ -881,11 +875,11 @@ static int CclDefineAiPlayer(lua_State *l)
 				lua_pushfstring(l, "ai-type not found: %s", value);
 			}
 			ai->AiType = ait;
-			ai->Script = ait->Script;
 		}
 		else if (!strcmp(value, "script"))
 		{
-			ai->Script = LuaToString(l, j + 1);
+			// Ignore, for compatibility with games saved
+			// by earlier versions.
 		}
 		else if (!strcmp(value, "script-debug"))
 		{
