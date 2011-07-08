@@ -38,12 +38,12 @@ end
 
 -- Function to register an AI to BOS
 -- Parameters:
--- internal_name : Internal name of the Ai (without leading "ai-"
+-- internal_name : Internal name of the Ai (without leading "ai-")
 -- name          : Name of the AI the Player sees and which gets translated
 -- fun           : main AI function
--- initfun       : initialization function, can be obmitted
+-- initfun       : initialization function, can be omitted
 function RegisterAi(internal_name, name, fun, initfun)
-  DefineAi("ai-" .. internal_name, "ai-" .. internal_name, fun)
+  DefineAi("ai-" .. internal_name, fun)
   AiList[name] = {internal_name, name, fun, initfun}
 end
 

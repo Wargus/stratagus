@@ -154,11 +154,11 @@ PlayerAi *AiPlayer;             /// Current AI player
 */
 static void AiExecuteScript()
 {
-	if (!AiPlayer->Script.empty())
+	if (AiPlayer->AiType != NULL)
 	{
 		lua_pushstring(Lua, "_ai_scripts_");
 		lua_gettable(Lua, LUA_GLOBALSINDEX);
-		lua_pushstring(Lua, AiPlayer->Script.c_str());
+		lua_pushstring(Lua, AiPlayer->AiType->Name.c_str());
 		lua_rawget(Lua, -2);
 		LuaCall(0, 1);
 		lua_pop(Lua, 1);
@@ -278,7 +278,6 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 	file->printf("DefineAiPlayer(%d,\n", plynr);
 	file->printf("  \"ai-type\", \"%s\",\n", ai->AiType->Name.c_str());
 
-	file->printf("  \"script\", \"%s\",\n", ai->Script.c_str());
 	file->printf("  \"script-debug\", %s,\n", ai->ScriptDebug ? "true" : "false");
 	file->printf("  \"sleep-cycles\", %lu,\n", ai->SleepCycles);
 
@@ -428,9 +427,10 @@ void AiInit(CPlayer *player)
 	pai->Player = player;
 	ait = NULL;
 
-	DebugPrint("%d - %p - looking for class %s\n" _C_
-		player->Index _C_ player _C_ player->AiName.c_str());
-	//MAPTODO print the player name (player->Name) instead of the pointer
+	DebugPrint("Player %d (%s) looking for \"%s\"\n" _C_
+		   player->Index _C_
+		   player->Name.c_str() _C_
+		   player->AiName.c_str());
 
 	//
 	//  Search correct AI type.
@@ -444,7 +444,7 @@ void AiInit(CPlayer *player)
 	for (i = 0; i < AiTypes.size(); ++i)
 	{
 		ait = AiTypes[i];
-		if (!player->AiName.empty() && ait->Class != player->AiName)
+		if (!player->AiName.empty() && ait->Name != player->AiName)
 		{
 			continue;
 		}
@@ -461,11 +461,9 @@ void AiInit(CPlayer *player)
 		DebugPrint("AI: not found!!!!!!!!!!\n");
 		DebugPrint("AI: Using fallback:\n");
 	}
-	DebugPrint("AI: %s:%s\n" _C_ player->AiName.c_str() _C_ ait->Class.c_str());
+	DebugPrint("AI: %s\n" _C_ ait->Name.c_str());
 
 	pai->AiType = ait;
-	pai->Script = ait->Script;
-
 	player->Ai = pai;
 }
 

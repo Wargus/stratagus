@@ -56,9 +56,6 @@ public:
 	CAiType() {}
 
 	std::string Name;     /// Name of this ai
-	std::string Class;    /// class of this ai
-
-	std::string Script;       /// Main script
 };
 
 /**
@@ -183,7 +180,6 @@ public:
 	CPlayer *Player;               /// Engine player structure
 	CAiType *AiType;               /// AI type of this player AI
 	// controller
-	std::string Script;            /// Script executed
 	bool ScriptDebug;              /// Flag script debuging on/off
 	unsigned long SleepCycles;     /// Cycles to sleep
 
