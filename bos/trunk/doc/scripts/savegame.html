@@ -31,6 +31,7 @@
 <hr>
 <a href="#DefineAiPlayer">DefineAiPlayer</a>
 <a href="#Missile">Missile</a>
+<a href="#Player">Player</a>
 <a href="#SaveGame">SaveGame</a>
 <a href="#SlotUsage">SlotUsage</a>
 <hr>
@@ -281,6 +282,47 @@ should not call DefineAiPlayer.</p>
 Missile("type", "missile-small-fire", "global", "pos", {1168, 1960}, "origin-pos", {1168, 1960}, "goal", {-16, -24},
   "frame", 0, "state", 0, "anim-wait", 0, "wait", 8, "delay", 0,
   "source", "U003B", "damage", 0, "ttl", -1, "step", {0, 0})
+</pre>
+
+<a name="Player"></a>
+<h3>Player()</h3>
+
+Used when loading games.
+
+
+<h4>Example</h4>
+
+<pre>
+Player(0,
+  "name", "feb",
+  "type", "person", "race", "elites", "ai", 0,
+  "team", 2, "enemy", "_X______________", "allied", "________________", 
+  "shared-vision", "________________",
+  "start", {0, 0},
+  "resources", {"time", 0, "titanium", 2100, "crystal", 1000,},
+  "last-resources", {"time", 0, "titanium", 2100, "crystal", 1000,},
+  "incomes", {"time", 0, "titanium", 100, "crystal", 100,},
+  "revenue", {"time", 0, "titanium", 0, "crystal", 0,},
+  "ai-disabled",
+ "supply", 1575, "unit-limit", 200, "building-limit", 200, "total-unit-limit", 400,
+  "score", 0,
+  "total-units", 16,
+  "total-buildings", 16,
+  "total-resources", {0, 100, 0, 0, 0, 0, 0,},
+  "total-razings", 0,
+  "total-kills", 0,
+  "color", { 160, 0, 0 },
+  "timers", {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,}
+)
 </pre>
 
 <a name="SaveGame"></a>
