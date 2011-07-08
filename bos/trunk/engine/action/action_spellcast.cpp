@@ -145,7 +145,6 @@ static void SpellMoveToTarget(CUnit *unit)
 */
 void HandleActionSpellCast(CUnit *unit)
 {
-	int flags;
 	const SpellType *spell;
 
 	if (unit->Wait) {
@@ -201,7 +200,7 @@ void HandleActionSpellCast(CUnit *unit)
 		case 2:                         // Cast spell on the target.
 			// FIXME: should use AnimateActionSpellCast here
 			if (unit->Type->Animations->Attack) {
-				flags = UnitShowAnimation(unit, unit->Type->Animations->Attack);
+				UnitShowAnimation(unit, unit->Type->Animations->Attack);
 				if (unit->Anim.Unbreakable) { // end of animation
 					return;
 				}
