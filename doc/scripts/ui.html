@@ -397,7 +397,16 @@ All arguments are optional.</p>
 <h4><var>color</var>:A</h4>
 
 <p>The alpha component, between 0 and 255.
-FIXME: Is this premultiplied?</p>
+Not premultiplied.</p>
+
+<p>Currently, the engine ignores the alpha component
+of all CColor objects that Lua code can access:</p>
+
+<ul>
+  <li><a href="#CFontColor.Colors"><var>fontColor</var>:Colors</a></li>
+  <li>UI:ButtonPanel:AutoCastBorderColorRGB</li>
+  <li>UI:CompletedBarColorRGB</li>
+</ul>
 
 <a name="CFontColor"></a>
 <h3>CFontColor</h3>
@@ -411,7 +420,8 @@ object of type CFontColor.</p>
 <h4 id="CFontColor.Colors"><var>fontColor</var>:Colors</h4>
 
 <p>An array of <a href="#CColor">CColor</a> objects.
-There are <a href="#MaxFontColors">MaxFontColors</a> elements in the array.</p>
+There are <a href="#MaxFontColors">MaxFontColors</a> elements in the array.
+The engine ignores the alpha component of these CColor objects.</p>
 
 <h4 id="CFontColor.Get">CFontColor:Get("name")</h4>
 
