@@ -28,41 +28,6 @@
 --
 
 
-function DefineElitePanels(info_panel_x, info_panel_y) 
-   DefinePanelContents(
--- Default presentation. ------------------------
--- All own unit -----------------
-  {
-  Ident = "panel-all-unit-contents",
-  Pos = {info_panel_x, info_panel_y},
-  DefaultFont = "game",
-  Condition = {ShowOpponent = false, HideNeutral = true, Build = "false"},
-  Contents = {
--- Construction
-	{ Pos = {12, 153}, Condition = {Build = "only"},
-		More = {"CompleteBar", {Variable = "Build", Width = 152, Height = 12}}
-	},
-	{ Pos = {50, 154}, Condition = {Build = "only"}, More = {"Text", "% Complete"}},
-	{ Pos = {107, 78}, Condition = {Build = "only"}, More = {"Icon", {Unit = "Worker"}}},
--- Training
-	{ Pos = {14, 141}, Condition = {Training = "only"},
-		More = {"CompleteBar", {Variable = "Training", Width = 136, Height = 12}}
-	},
-	{ Pos = {44, 141}, Condition = {Training = "only"}, More = {"Text", "% Complete"}},
--- Mana
-	{ Pos = {16, 141}, Condition = {Mana = "only"},
-		More = {"CompleteBar", {Variable = "Mana", Height = 16, Width = 140, Border = true}}
-	},
-	{ Pos = {86, 141}, More = {"Text", {Variable = "Mana"}}, Condition = {Mana = "only"} },
-
-  } }
-  )
-end
-
-
---DefineElitePanels(Video.Width - 200, 152)
-
-
 UI.NormalFontColor = "light-blue"
 UI.ReverseFontColor = "yellow"
 
