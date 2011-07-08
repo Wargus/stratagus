@@ -64,12 +64,12 @@ map setup files should not.</p>
       <dt>"ai-type", string</dt>
       <dd>
 	Name of the AI type.  Matches the name (not class) parameter
-	of <a href="#DefineAi">DefineAi</a>.
+	of <a href="ai.html#DefineAi">DefineAi</a>.
       </dd>
       <dt>"script", string</dt>
       <dd>
 	Name of the AI script function in the "_ai_scripts_" Lua table.
-	<a href="#DefineAi">DefineAi</a> generates this name.
+	<a href="ai.html#DefineAi">DefineAi</a> generates this name.
       </dd>
       <dt>"script-debug", boolean</dt>
       <dd>
@@ -78,14 +78,14 @@ map setup files should not.</p>
 	  and scripts cannot read it.</em><br>
 
 	Whether to display the executed AI script commands.
-	The <a href="#AiDebug">AiDebug</a>
-	and <a href="#AiDebugPlayer">AiDebugPlayer</a>
+	The <a href="ai.html#AiDebug">AiDebug</a>
+	and <a href="ai.html#AiDebugPlayer">AiDebugPlayer</a>
 	functions also control this flag.
       </dd>
       <dt>"sleep-cycles", integer</dt>
       <dd>
 	The number of the game cycle on which the AI will wake up
-	from <a href="#AiSleep">AiSleep</a>, or 0 if not sleeping.
+	from <a href="ai.html#AiSleep">AiSleep</a>, or 0 if not sleeping.
       </dd>
       <dt>"force", {force, properties}</dt>
       <dd>
@@ -129,12 +129,12 @@ map setup files should not.</p>
 		  Roles of forces no longer affect the engine,
 		  and scripts cannot read them.</em><br>
 		The role of the force, as set with
-		<a href="#AiForceRole">AiForceRole</a>.
+		<a href="ai.html#AiForceRole">AiForceRole</a>.
 	      </dd>
 	      <dt>"types", {[count, unit-type-name]...}</dt>
 	      <dd>
 		How many of each unit type should be in the force.
-		This is set with <a href="#AiForce">AiForce</a>.
+		This is set with <a href="ai.html#AiForce">AiForce</a>.
 	      </dd>
 	      <dt>"units", {[unit-number, unit-type-name]...}</dt>
 	      <dd>
