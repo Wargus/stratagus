@@ -970,11 +970,10 @@ static int CclDefineAiPlayer(lua_State *l)
 					for (subk = 0; subk < subsubargs; ++subk)
 					{
 						int num;
-						const char *ident;
 
 						num = LuaToNumber(l, -1, subk + 1);
 						++subk;
-						ident = LuaToString(l, -1, subk + 1);
+						LuaToString(l, -1, subk + 1);
 						ai->Force[i].Units.push_back(UnitSlots[num]);
 					}
 					lua_pop(l, 1);

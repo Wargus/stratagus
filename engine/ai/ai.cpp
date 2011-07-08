@@ -628,7 +628,7 @@ static void AiReduceMadeInBuilt(PlayerAi *pai, const CUnitType *type)
 	//
 	equivnb = AiFindUnitTypeEquiv(type, equivs);
 
-	for (size_t i = 0; i < AiHelpers.Equiv[type->Slot].size(); ++i)
+	for (size_t i = 0; i < (size_t)equivnb; ++i)
 	{
 		if (AiReduceMadeInBuilt2(pai, UnitTypes[equivs[i]]))
 		{

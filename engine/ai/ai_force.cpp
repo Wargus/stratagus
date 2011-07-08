@@ -143,7 +143,6 @@ int AiFindUnitTypeEquiv(const CUnitType *unittype, int *result)
 int AiFindAvailableUnitTypeEquiv(const CUnitType *unittype, int *usableTypes)
 {
 	int usableTypesCount;
-	int playerid;
 	int bestlevel;
 	int curlevel;
 
@@ -151,8 +150,6 @@ int AiFindAvailableUnitTypeEquiv(const CUnitType *unittype, int *usableTypes)
 	usableTypesCount = AiFindUnitTypeEquiv(unittype,  usableTypes);
 
 	// 2 - Sort by level
-	playerid = AiPlayer->Player->Index;
-
 	// We won't have usableTypesCount>4, so simple sort should do it
 	for (int i = 0; i < usableTypesCount - 1; ++i)
 	{
@@ -496,11 +493,11 @@ void AiAttackWithForce(int force)
 			aiunit->Wait = i;
 			if (aiunit->Type->CanAttack)
 			{
-				CommandAttack(aiunit, enemy->X, enemy->Y, NULL, FlushCommands);
+				CommandAttack(aiunit, x, y, NULL, FlushCommands);
 			}
 			else
 			{
-				CommandMove(aiunit, enemy->X, enemy->Y, FlushCommands);
+				CommandMove(aiunit, x, y, FlushCommands);
 			}
 		}
 	}
