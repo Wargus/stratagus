@@ -32,10 +32,151 @@
 <a href="#DefineAnimations">DefineAnimations</a>
 <a href="#DefineVariables">DefineVariables</a>
 <a href="#DefineUnitType">DefineUnitType</a>
+<a href="#frame_numbers">frame numbers</a>
 <hr>
 <h2>Intro - Introduction to unit-type functions and variables</h2>
 
 Everything around the C UnitType structure.
+
+<h2>Conceptual</h2>
+
+<a name="frame_numbers"></a>
+<h3>Frame numbers and flipping</h3>
+
+<p>The engine draws units and missiles using frames that it loads from
+graphic files.  The frames within a file all have the same size and
+are numbered from zero up.  When a unit or a missile moves, the engine
+tries to automatically choose a frame that faces the correct direction.</p>
+
+<table border="1">
+  <caption>Example: Flip = false, NumDirections = 8, Frames = 24</caption>
+  <colgroup span="1">
+  <colgroup span="8">
+  <tr>
+    <th></th>
+    <th colspan="8">All frames are in the graphic file.</th>
+  </tr>
+  <tr>
+    <th></th>
+    <th>N</th>
+    <th>NE</th>
+    <th>E</th>
+    <th>SE</th>
+    <th>S</th>
+    <th>SW</th>
+    <th>W</th>
+    <th>NW</th>
+  </tr>
+  <tr>
+    <th>still</th>
+    <td>frame 0</td>
+    <td>frame 1</td>
+    <td>frame 2</td>
+    <td>frame 3</td>
+    <td>frame 4</td>
+    <td>frame 5</td>
+    <td>frame 6</td>
+    <td>frame 7</td>
+  </tr>
+  <tr>
+    <th>death step 1</th>
+    <td>frame 8</td>
+    <td>frame 9</td>
+    <td>frame 10</td>
+    <td>frame 11</td>
+    <td>frame 12</td>
+    <td>frame 13</td>
+    <td>frame 14</td>
+    <td>frame 15</td>
+  </tr>
+  <tr>
+    <th>death step 2</th>
+    <td>frame 16</td>
+    <td>frame 17</td>
+    <td>frame 18</td>
+    <td>frame 19</td>
+    <td>frame 20</td>
+    <td>frame 21</td>
+    <td>frame 22</td>
+    <td>frame 23</td>
+  </tr>
+</table>
+
+<blockquote><pre><a href="#DefineAnimations">DefineAnimations</a>("animations-example", {
+    Still = {"frame 0", &hellip;},
+    Death = {&hellip;, "frame 8", &hellip;, "frame 16", &hellip;}})</pre></blockquote>
+
+<p>To save effort and memory, the frames that face the west can be
+omitted from the graphic file.  The engine will then generate them
+on demand by flipping the corresponding frames that face the east.
+To enable this feature, set <code>Flip = true</code>
+in <a href="#DefineUnitType">DefineUnitType</a>
+or <a href="magic.html#DefineMissileType">DefineMissileType</a>.</p>
+
+<p>Flipping changes the numbers of frames.  Only the frames that
+are left in the graphic file have contiguous nonnegative numbers.
+Each flipped frame has a negative number that the engine computes as
+(-1 - <var>original number</var>).</p>
+
+<table border="1">
+  <caption>Example: Flip = true, NumDirections = 8, Frames = 15</caption>
+  <colgroup span="1">
+  <colgroup span="5">
+  <colgroup span="3" style="background: #eee">
+  <tr>
+    <th></th>
+    <th colspan="5">These frames are in the graphic file.</th>
+    <th colspan="3">Not in the file.  Flipped at run time.</th>
+  </tr>
+  <tr>
+    <th></th>
+    <th>N</th>
+    <th>NE</th>
+    <th>E</th>
+    <th>SE</th>
+    <th>S</th>
+    <th>SW</th>
+    <th>W</th>
+    <th>NW</th>
+  </tr>
+  <tr>
+    <th>still</th>
+    <td>frame 0</td>
+    <td>frame 1</td>
+    <td>frame 2</td>
+    <td>frame 3</td>
+    <td>frame 4</td>
+    <td>frame -4 flipped from 3</td>
+    <td>frame -3 flipped from 2</td>
+    <td>frame -2 flipped from 1</td>
+  </tr>
+  <tr>
+    <th>death step 1</th>
+    <td>frame 5</td>
+    <td>frame 6</td>
+    <td>frame 7</td>
+    <td>frame 8</td>
+    <td>frame 9</td>
+    <td>frame -9 flipped from 8</td>
+    <td>frame -8 flipped from 7</td>
+    <td>frame -7 flipped from 6</td>
+  </tr>
+  <tr>
+    <th>death step 2</th>
+    <td>frame 10</td>
+    <td>frame 11</td>
+    <td>frame 12</td>
+    <td>frame 13</td>
+    <td>frame 14</td>
+    <td>frame -14 flipped from 13</td>
+    <td>frame -13 flipped from 12</td>
+    <td>frame -12 flipped from 11</td>
+  </tr>
+</table>
+
+<blockquote><pre><a href="#DefineAnimations">DefineAnimations</a>("animations-example", {
+    Still = {"frame 0", &hellip;},
+    Death = {&hellip;, "frame 5", &hellip;, "frame 10", &hellip;}})</pre></blockquote>
 
 <h2>Functions</h2>
 <a name="DefineAnimations"></a>
@@ -64,7 +205,7 @@ animation.</dd>
 <dd>
 	A script is a list of operations. Supported operations:
 	<ul>
-	<li>"frame X": Display this frame plus the direction offset</li>
+	<li>"frame X": Display this frame (see <a href="#frame_numbers">Frame numbers and flipping</a>) plus the direction offset</li>
 	<li>"exact-frame X": Display this exact frame</li>
 	<li>"wait X": Wait this number of cycles</li>
 	<li>"random-wait X Y": Wait a random number of cycles between X and Y</li>
@@ -217,10 +358,12 @@ for all directions.  The graphic file defined with the
 <a href="#DefineUnitType.Image">Image</a> tag must thus have
 <a href="#DefineUnitType.NumDirections">NumDirections</a> frames
 for each animation posture.</dd>
-<dd>Flip = true means the frames facing left are not included in the
-graphic file because they are mirror images of the frames facing right.
+<dd>Flip = true means the frames facing west are not included in the
+graphic file because they are mirror images of the frames facing east.
 The file must then have only <var>NumDirections</var> / 2 + 1 frames
-for each animation posture.</dd>
+for each animation posture.
+Please see <a href="#frame_numbers">Frame numbers and flipping</a>
+for details.</dd>
 <dt>DrawLevel = number</dt>
 <dd>This is used when sorting units and missiles for drawing. Units with a higher draw
 order will always be on top of units with lower draw order. Units are also sorted from
@@ -242,7 +385,9 @@ of a terrain tile, for an almost perfect fit.
 </dd>
 <dt id="DefineUnitType.NumDirections">NumDirections = number</dt>
 <dd>Define the number of directions a unit can face.  Default 1 for buildings and 8
-for units.  Can be adjusted from the default.  Useful for rotating buildings
+for units.  Can be adjusted from the default.
+Useful for cannons or turrets that are considered buildings but must
+aim towards the enemy.
 </dd>
 <dt>IsNotSelectable = boolean</dt>
 <dd>set whether the unit is able to be selected or not.</dd>
