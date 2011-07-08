@@ -1559,7 +1559,6 @@ static void EditorCallbackMouse(int x, int y)
 	int bx, by;
 	static int LastMapX = 0;
 	static int LastMapY = 0;
-	enum _cursor_on_ OldCursorOn;
 	int cursorMapX, cursorMapY;
 
 	HandleCursorMove(&x, &y); // Reduce to screen
@@ -1649,7 +1648,6 @@ static void EditorCallbackMouse(int x, int y)
 		return;
 	}
 
-	OldCursorOn = CursorOn;
 
 	MouseScrollState = ScrollNone;
 	GameCursor = UI.Point.Cursor;

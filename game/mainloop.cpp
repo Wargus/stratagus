@@ -252,11 +252,6 @@ static void InitGameCallbacks(void)
 */
 void GameMainLoop(void)
 {
-#ifdef DEBUG  // removes the setjmp warnings
-	static bool showtip;
-#else
-	bool showtip;
-#endif
 	int player;
 	const EventCallback *old_callbacks;
 
@@ -270,8 +265,6 @@ void GameMainLoop(void)
 	GameRunning = true;
 
 	CParticleManager::init();
-
-	showtip = false;
 
 	MultiPlayerReplayEachCycle();
 
