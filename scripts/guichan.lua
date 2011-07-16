@@ -440,7 +440,7 @@ function RunMap(map, objectives, fow, revealmap)
   else
     SetObjectives(objectives)
   end
-  loop = true
+  local loop = true
   while (loop) do
     InitGameVariables()
     if fow ~= nil then
@@ -639,7 +639,7 @@ function RunLoadGameMenu(s)
   function startgamebutton(s)
       DebugPrint("Starting saved game")
       currentCampaign = nil
-      loop = true
+      local loop = true
       while (loop) do
         InitGameVariables()
         SavedGame = true
