@@ -121,10 +121,8 @@ local function CheckPower()
   return "unit-powerplant"
 end
 
-local order = {}
-
 local function GetBuildOrder()
---  local order = {}
+  local order = {}
 
   if (not HotSpotExists()) then
     order[1] = CheckPower()
@@ -143,19 +141,20 @@ end
 local ai_funcs = {
   -- Build magma pump or power plant first depending on resources
   function()
-    order = GetBuildOrder()
+    local order = GetBuildOrder()
     return AiNeed(order[1])
   end,
   function()
+    -- local order = GetBuildOrder()
     -- print("Player" .. AiPlayer() .. " waits for " .. order[1]);
     return false
   end,
   function()
-  --  order = GetBuildOrder()
+    local order = GetBuildOrder()
     return AiWait(order[1])
   end,
   function()
-   -- order = GetBuildOrder()
+    local order = GetBuildOrder()
     if (order[2] ~= nil) then
       return AiNeed(order[2])
     else
@@ -163,13 +162,14 @@ local ai_funcs = {
     end
   end,
   function()
+    local order = GetBuildOrder()
     if (order[2] ~= nil) then    
       -- print("Player" .. AiPlayer() .. " waits for " .. order[2]);
     end
     return false
   end,
   function()
-   -- order = GetBuildOrder()
+    local order = GetBuildOrder()
     if (order[2] ~= nil) then
       return AiWait(order[2])
     else
