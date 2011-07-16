@@ -96,15 +96,15 @@ local ai_funcs = {
 
   -- Build magma pump or power plant first depending on resources
   function()
-    order = GetBuildOrder()
+    local order = GetBuildOrder()
     return AiNeed(order[1])
   end,
   function()
-    order = GetBuildOrder()
+    local order = GetBuildOrder()
     return AiWait(order[1])
   end,
   function()
-    order = GetBuildOrder()
+    local order = GetBuildOrder()
     if (order[2] ~= nil) then
       return AiNeed(order[2])
     else
@@ -112,7 +112,7 @@ local ai_funcs = {
     end
   end,
   function()
-    order = GetBuildOrder()
+    local order = GetBuildOrder()
     if (order[2] ~= nil) then
       return AiWait(order[2])
     else
