@@ -29,7 +29,6 @@
 <a href="magic.html">NEXT</a> 
 <a href="index.html">LUA Index</a>
 <hr>
-<a href="#AddKeystrokeHelp">AddKeystrokeHelp</a>
 <a href="#AddMessage">AddMessage</a>
 <a href="#AddObjective">AddObjective</a>
 <a href="#AddTip">AddTip</a>
@@ -57,7 +56,6 @@
 <a href="#MoveUnit">MoveUnit</a>
 <a href="#RemoveObjective">RemoveObjective</a>
 <a href="#ReplayLog">ReplayLog</a>
-<a href="#ResetKeystrokeHelp">ResetKeystrokeHelp</a>
 <a href="#Selection">Selection</a>
 <a href="#SetDefaultMap">SetDefaultMap</a>
 <a href="#SetDiplomacy">SetDiplomacy</a>
@@ -77,29 +75,6 @@
 
 Everything around the game.
 <h2>Functions</h2>
-<a name="AddKeystrokeHelp"></a>
-<h3>AddKeystrokeHelp("key", "help")</h3>
-
-Add help text in the keystroke help menu.
-
-
-<dl>
-<dt>key</dt>
-<dd>Name of the key stroke.
-</dd>
-<dt>help</dt>
-<dd>Descriptive text telling what the keystroke does.
-</dd>
-</dl>
-
-<h4>Examples</h4>
-
-<pre>
-    AddKeystrokeHelp("+", "- increase game speed")
-    AddKeystrokeHelp("Ctrl-T", "- track unit")
-    AddKeystrokeHelp("F5", "- game options")
-    AddKeystrokeHelp("F10", "- game menu")
-</pre>
 
 <a name="AddMessage"></a>
 <h3>AddMessage(message)</h3>
@@ -874,18 +849,6 @@ ReplayLog( {
   Engine = { 2, 1, 0 },
   Network = { 0, 9, 2 }
 } )
-</pre>
-
-<a name="ResetKeystrokeHelp"></a>
-<h3>ResetKeystrokeHelp()</h3>
-
-Clear all keystroke help menu.
-
-
-<h4>Example</h4>
-
-<pre>
-    ResetKeystrokeHelp()
 </pre>
 
 <a name="Selection"></a>
