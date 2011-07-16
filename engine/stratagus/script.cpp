@@ -955,10 +955,51 @@ static bool IsBlacklistedGlobal(const char *key)
 		!strcmp(key, "io") ||
 		!strcmp(key, "debug") ||
 		!strcmp(key, "coroutine") ||
-		!strcmp(key, "Icons") ||
-		!strcmp(key, "Upgrades") ||
-		!strcmp(key, "Fonts") ||
-		!strcmp(key, "FontColors"));
+		!strcmp(key, "AllowAll") ||			    // Lua const
+		!strcmp(key, "DownButton") ||			    // #define
+		!strcmp(key, "EditorCommandLine") ||		    // enum
+		!strcmp(key, "EditorEditing") ||		    // enum
+		!strcmp(key, "EditorNotRunning") ||		    // enum
+		!strcmp(key, "EditorStarted") ||		    // enum
+		!strcmp(key, "EnergyCost") ||			    // #define
+		!strcmp(key, "FontColors") ||			    // has meta
+		!strcmp(key, "Fonts") ||			    // has meta
+		!strcmp(key, "ForbidAll") ||			    // Lua const
+		!strcmp(key, "GameDefeat") ||			    // enum
+		!strcmp(key, "GameDraw") ||			    // enum
+		!strcmp(key, "GameNoResult") ||			    // enum
+		!strcmp(key, "GameQuitToMenu") ||		    // enum
+		!strcmp(key, "GameRestart") ||			    // enum
+		!strcmp(key, "GameVictory") ||			    // enum
+		!strcmp(key, "Icons") ||			    // has meta
+		!strcmp(key, "LeftButton") ||			    // #define
+		!strcmp(key, "MagmaCost") ||			    // #define
+		!strcmp(key, "MaxCosts") ||			    // #define
+		!strcmp(key, "MaxFontColors") ||		    // #define
+		!strcmp(key, "MiddleButton") ||			    // #define
+		!strcmp(key, "NoButton") ||			    // #define
+		!strcmp(key, "PlayerComputer") ||		    // enum
+		!strcmp(key, "PlayerMax") ||			    // #define
+		!strcmp(key, "PlayerNeutral") ||		    // enum
+		!strcmp(key, "PlayerNobody") ||			    // enum
+		!strcmp(key, "PlayerNumNeutral") ||		    // #define
+		!strcmp(key, "PlayerPerson") ||			    // enum
+		!strcmp(key, "PlayerRescueActive") ||		    // enum
+		!strcmp(key, "PlayerRescuePassive") ||		    // enum
+		!strcmp(key, "RightButton") ||			    // #define
+		!strcmp(key, "SettingsGameTypeFreeForAll") ||	    // enum
+		!strcmp(key, "SettingsGameTypeLeftVsRight") ||	    // enum
+		!strcmp(key, "SettingsGameTypeManTeamVsMachine") || // enum
+		!strcmp(key, "SettingsGameTypeManVsMachine") ||	    // enum
+		!strcmp(key, "SettingsGameTypeMapDefault") ||	    // enum
+		!strcmp(key, "SettingsGameTypeMelee") ||	    // enum
+		!strcmp(key, "SettingsGameTypeTopVsBottom") ||	    // enum
+		!strcmp(key, "SettingsPresetMapDefault") ||	    // enum
+		!strcmp(key, "UnitMax") ||			    // #define
+		!strcmp(key, "UpButton") ||			    // #define
+		!strcmp(key, "default_objectives") ||		    // per-lang
+		!strcmp(key, "playlist") ||			    // per-user
+		!strcmp(key, "preferences"));			    // per-user
 	// other string to protected ?
 }
 
