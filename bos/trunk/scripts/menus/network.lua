@@ -115,7 +115,7 @@ function addPlayersList(menu, numplayers)
 end
 
 
-joincounter = 0
+local joincounter = 0
 
 function RunJoiningMapMenu(s)
   local menu
