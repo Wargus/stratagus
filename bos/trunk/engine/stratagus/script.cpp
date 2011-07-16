@@ -909,6 +909,60 @@ static char *LuaEscape(const char *str)
 }
 
 /**
+**  Check whether a global Lua variable is blacklisted from being saved.
+**
+**  @param key      name of the variable in the global environment.
+**
+**  @return  true if the variable is blacklisted and must not be saved.
+**           false if the variable may be saved.
+*/
+static bool IsBlacklistedGlobal(const char *key)
+{
+	return (!strcmp(key, "assert") ||
+		!strcmp(key, "gcinfo") ||
+		!strcmp(key, "getfenv") ||
+		!strcmp(key, "unpack") ||
+		!strcmp(key, "tostring") ||
+		!strcmp(key, "tonumber") ||
+		!strcmp(key, "setmetatable") ||
+		!strcmp(key, "require") ||
+		!strcmp(key, "pcall") ||
+		!strcmp(key, "rawequal") ||
+		!strcmp(key, "collectgarbage") ||
+		!strcmp(key, "type") ||
+		!strcmp(key, "getmetatable") ||
+		!strcmp(key, "next") ||
+		!strcmp(key, "print") ||
+		!strcmp(key, "xpcall") ||
+		!strcmp(key, "rawset") ||
+		!strcmp(key, "setfenv") ||
+		!strcmp(key, "rawget") ||
+		!strcmp(key, "newproxy") ||
+		!strcmp(key, "ipairs") ||
+		!strcmp(key, "loadstring") ||
+		!strcmp(key, "dofile") ||
+		!strcmp(key, "_TRACEBACK") ||
+		!strcmp(key, "_VERSION") ||
+		!strcmp(key, "pairs") ||
+		!strcmp(key, "__pow") ||
+		!strcmp(key, "error") ||
+		!strcmp(key, "loadfile") ||
+		!strcmp(key, "arg") ||
+		!strcmp(key, "_LOADED") ||
+		!strcmp(key, "loadlib") ||
+		!strcmp(key, "string") ||
+		!strcmp(key, "os") ||
+		!strcmp(key, "io") ||
+		!strcmp(key, "debug") ||
+		!strcmp(key, "coroutine") ||
+		!strcmp(key, "Icons") ||
+		!strcmp(key, "Upgrades") ||
+		!strcmp(key, "Fonts") ||
+		!strcmp(key, "FontColors"));
+	// other string to protected ?
+}
+
+/**
 **  For saving lua state (table, number, string, bool, not function).
 **
 **  @param l        lua_State to save.
@@ -944,23 +998,7 @@ char *SaveGlobal(lua_State *l, bool is_root)
 		type_key = lua_type(l, -2);
 		type_value = lua_type(l, -1);
 		key = (type_key == LUA_TSTRING) ? lua_tostring(l, -2) : "";
-		if (!strcmp(key, "_G") || (is_root &&
-				(!strcmp(key, "assert") || !strcmp(key, "gcinfo") || !strcmp(key, "getfenv") ||
-				!strcmp(key, "unpack") || !strcmp(key, "tostring") || !strcmp(key, "tonumber") ||
-				!strcmp(key, "setmetatable") || !strcmp(key, "require") || !strcmp(key, "pcall") ||
-				!strcmp(key, "rawequal") || !strcmp(key, "collectgarbage") || !strcmp(key, "type") ||
-				!strcmp(key, "getmetatable") || !strcmp(key, "next") || !strcmp(key, "print") ||
-				!strcmp(key, "xpcall") || !strcmp(key, "rawset") || !strcmp(key, "setfenv") ||
-				!strcmp(key, "rawget") || !strcmp(key, "newproxy") || !strcmp(key, "ipairs") ||
-				!strcmp(key, "loadstring") || !strcmp(key, "dofile") || !strcmp(key, "_TRACEBACK") ||
-				!strcmp(key, "_VERSION") || !strcmp(key, "pairs") || !strcmp(key, "__pow") ||
-				!strcmp(key, "error") || !strcmp(key, "loadfile") || !strcmp(key, "arg") ||
-				!strcmp(key, "_LOADED") || !strcmp(key, "loadlib") || !strcmp(key, "string") ||
-				!strcmp(key, "os") || !strcmp(key, "io") || !strcmp(key, "debug") ||
-				!strcmp(key, "coroutine") || !strcmp(key, "Icons") || !strcmp(key, "Upgrades") ||
-				!strcmp(key, "Fonts") || !strcmp(key, "FontColors")
-				// other string to protected ?
-				))) {
+		if (!strcmp(key, "_G") || (is_root && IsBlacklistedGlobal(key))) {
 			lua_pop(l, 1); // pop the value
 			continue;
 		}
