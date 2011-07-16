@@ -57,14 +57,14 @@ patch("greenMountain", 48, 48)
 
 --allow
 -- place units
-unit= CreateUnit("unit-rtank", 1, {54, 6})
-unit= CreateUnit("unit-rtank", 1, {56, 8})
-unit= CreateUnit("unit-rtank", 1, {55, 10})
-unit= CreateUnit("unit-rtank", 0, {6, 58})
-unit= CreateUnit("unit-rtank", 0, {6, 56})
-unit= CreateUnit("unit-rtank", 0, {7, 59})
-unit= CreateUnit("unit-buggy", 1, {46, 43})
-unit= CreateUnit("unit-buggy", 0, {21, 27})
+CreateUnit("unit-rtank", 1, {54, 6})
+CreateUnit("unit-rtank", 1, {56, 8})
+CreateUnit("unit-rtank", 1, {55, 10})
+CreateUnit("unit-rtank", 0, {6, 58})
+CreateUnit("unit-rtank", 0, {6, 56})
+CreateUnit("unit-rtank", 0, {7, 59})
+CreateUnit("unit-buggy", 1, {46, 43})
+CreateUnit("unit-buggy", 0, {21, 27})
 
 
 
