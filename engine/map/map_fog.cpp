@@ -225,14 +225,11 @@ void MapSight(const CPlayer *player, int x, int y, int w, int h, int range,
 	int cy[4];
 	int steps;
 	int cycle;
-	int p;
 
 	// Units under construction have no sight range.
 	if (!range) {
 		return;
 	}
-
-	p = player->Index;
 
 	// Mark Horizontal sight for unit
 	for (mx = x - range; mx < x + range + w; ++mx) {
@@ -500,14 +497,12 @@ void CViewport::DrawMapFogOfWar() const
 	int sx, sy;
 	int dx, dy;
 	int ex, ey;
-	int p;
 	int mx, my;
 
 	// flags must redraw or not
 	if (ReplayRevealMap) {
 		return;
 	}
-	p = ThisPlayer->Index;
 
     sx = std::max(MapX - 1, 0);
     ex = std::min(MapX + MapWidth + 1, Map.Info.MapWidth);

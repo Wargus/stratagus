@@ -347,7 +347,6 @@ bool CanBuildOn(int x, int y, int mask)
 */
 CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, int real)
 {
-	int j;
 	int testmask;
 	CPlayer *player;
 	CUnit *ontop;
@@ -364,7 +363,6 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, 
 	//
 	//  Remove unit that is building!
 	//
-	j = 0;
 	if (unit) {
 		UnmarkUnitFieldFlags(unit);
 	}

@@ -1758,13 +1758,9 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 	unsigned char *matrix;
 	CUnit *res;
 	CUnit *bestres;
-	int destx;
-	int desty;
 	int bestd;
 	int cdist;
 
-	destx = x;
-	desty = y;
 	size = std::min(Map.Info.MapWidth * Map.Info.MapHeight / 4, range * range * 5);
 	points = new p[size];
 
