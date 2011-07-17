@@ -605,7 +605,6 @@ static void MissileNewHeadingFromXY(Missile *missile, int dx, int dy)
 {
 	int dir;
 	int nextdir;
-	int neg;
 
 	// If the heading cannot be changed, return right away.
 	if (missile->Type->NumDirections == 1 || (dx == 0 && dy == 0)) {
@@ -616,9 +615,6 @@ static void MissileNewHeadingFromXY(Missile *missile, int dx, int dy)
 	// animation step, discarding the previous heading.
 	if (missile->SpriteFrame < 0) {
 		missile->SpriteFrame = -missile->SpriteFrame - 1;
-		neg = 1;
-	} else {
-		neg = 0;
 	}
 	missile->SpriteFrame /= missile->Type->NumDirections / 2 + 1;
 	missile->SpriteFrame *= missile->Type->NumDirections / 2 + 1;
