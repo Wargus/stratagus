@@ -58,8 +58,10 @@ Possible tags:
 F.E. 'size '(32 32)
 </dd>
 <dt id="DefineMissileType.Frames">Frames = number</dt>
-<dd>This is the number of frames in the file, i.e. not including
-<a href="#DefineMissileType.Flip">flipped frames</a>.
+<dd>The number of animation steps, multiplied with
+(<a href="#DefineMissileType.NumDirections">NumDirections</a> / 2 + 1).
+Thus, if <a href="#DefineMissileType.Flip">Flip</a> = true,
+then Frames is the number of frames in the graphic file.
 Missiles lack complicated animation scripts and just have a bunch
 of frames with equal duration.
 </dd>
@@ -67,7 +69,7 @@ of frames with equal duration.
 <dd>Please see <a href="unittype.html#frame_numbers">Frame numbers and flipping</a>.
 The default is true, unlike in <a href="unittype.html#DefineUnitType">DefineUnitType</a>.
 </dd>
-<dt>NumDirections = number</dt>
+<dt id="DefineMissileType.NumDirections">NumDirections = number</dt>
 <dd>Define the number of directions a missile can face.
 If <a href="#DefineMissileType.Flip">Flip</a> = true,
 not all of these directions are actually in the graphic file.

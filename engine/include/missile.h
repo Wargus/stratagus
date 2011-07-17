@@ -64,11 +64,12 @@
 **
 **  MissileType::SpriteFrames
 **
-**    Total number of sprite frames in the graphic image.
+**    The number of animation steps, multiplied with
+**    (MissileType::NumDirections / 2 - 1).  Thus, if
+**    MissileType::Flip == true, then MissileType::SpriteFrames is the
+**    total number of sprite frames in the graphic image.
 **    @note If the image is smaller than the number of directions,
 **    width/height and/or framecount suggest the engine crashes.
-**    @note There is currently a limit of 127 sprite frames, which
-**    can be lifted if needed.
 **
 **  MissileType::NumDirections
 **
@@ -230,9 +231,16 @@
 **
 **  Missile::SpriteFrame
 **
-**    Current sprite frame of the missile.  The range is from 0
-**    to MissileType::SpriteFrames-1.  The topmost bit (128) is
-**    used as flag to mirror the sprites in X direction.
+**    Current sprite frame of the missile.  The range is from
+**    -MissileType::SpriteFrames to MissileType::SpriteFrames-1.
+**    When MissileType::Flip is true (as usual), negative values
+**    of Missile::SpriteFrame mean mirror the sprite in X direction;
+**    the real frame number is then -Missile::SpriteFrame - 1.
+**    When MissileType::Flip is false, Missile::SpriteFrame still
+**    uses the same numbers as if MissileType::Flip were true,
+**    and the engine maps these numbers to the real frame numbers
+**    when it draws each missile.
+**
 **    Animation scripts aren't currently supported for missiles,
 **    everything is handled by MissileType::Class
 **    @note If wanted, we can add animation scripts support to the
