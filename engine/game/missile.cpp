@@ -594,6 +594,7 @@ int FindAndSortMissiles(const CViewport *vp, Missile **table, int tablesize)
 
 /**
 **  Change missile heading from x,y.
+**  Do not change the animation step.
 **
 **  @param missile  Missile pointer.
 **  @param dx       Delta in x.
@@ -606,10 +607,13 @@ static void MissileNewHeadingFromXY(Missile *missile, int dx, int dy)
 	int nextdir;
 	int neg;
 
+	// If the heading cannot be changed, return right away.
 	if (missile->Type->NumDirections == 1 || (dx == 0 && dy == 0)) {
 		return;
 	}
 
+	// Compute the number of the first frame of the current
+	// animation step, discarding the previous heading.
 	if (missile->SpriteFrame < 0) {
 		missile->SpriteFrame = -missile->SpriteFrame - 1;
 		neg = 1;
@@ -619,9 +623,19 @@ static void MissileNewHeadingFromXY(Missile *missile, int dx, int dy)
 	missile->SpriteFrame /= missile->Type->NumDirections / 2 + 1;
 	missile->SpriteFrame *= missile->Type->NumDirections / 2 + 1;
 
+	// How many heading units there are per frame.
+	// This assumes NumDirections is a power of 2; otherwise,
+	// nextdir is truncated and dir can get out of range.
 	nextdir = 256 / missile->Type->NumDirections;
 	Assert(nextdir != 0);
+
+	// Compute the frame number relative to the current animation
+	// step, as if flipping were not used.  Add nextdir/2 so the
+	// quotient is rounded, not truncated.
 	dir = ((DirectionToHeading(10 * dx, 10 * dy) + nextdir / 2) & 0xFF) / nextdir;
+
+	// Compute the absolute frame number, with both the animation
+	// step and the heading.
 	if (dir <= LookingS / nextdir) { // north->east->south
 		missile->SpriteFrame += dir;
 	} else {
