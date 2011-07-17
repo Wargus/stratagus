@@ -423,12 +423,6 @@ namespace gcn
         graphics->setColor(getBackgroundColor());
         graphics->fillRectangle(getContentDimension());
       
-        int alpha = getBaseColor().a;
-        Color highlightColor = getBaseColor() + 0x303030;
-        highlightColor.a = alpha;    
-        Color shadowColor = getBaseColor() - 0x303030;      
-        shadowColor.a = alpha;
-      
         if (mVBarVisible)
         {
             drawUpButton(graphics);

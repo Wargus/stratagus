@@ -272,8 +272,6 @@ static CUnit *FindRangeAttack(const CUnit *u, int range)
 	const CPlayer *player;
 	int xx;
 	int yy;
-	int best_x;
-	int best_y;
 	int best_cost;
 	int i;
 	int sbad;
@@ -450,8 +448,6 @@ static CUnit *FindRangeAttack(const CUnit *u, int range)
 
 	// Find the best area...
 	// The target which provide the best bad/good ratio is choosen...
-	best_x = -1;
-	best_y = -1;
 	best_cost = -1;
 	best = NoUnitP;
 	for (i = 0; i < n; ++i) {
