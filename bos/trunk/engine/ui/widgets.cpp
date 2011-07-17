@@ -1399,13 +1399,9 @@ StatBoxWidget::StatBoxWidget(int width, int height) : percent(100)
 */
 void StatBoxWidget::draw(gcn::Graphics *graphics)
 {
-	int x;
-	int y;
 	int width;
 	int height;
 
-	x = getX();
-	y = getY();
 	width = getWidth();
 	height = getHeight();
 

@@ -293,7 +293,6 @@ static int CclDefineUnitType(lua_State *l)
 	CUnitType *type;
 	const char *str;
 	int i;
-	int redefine;
 	int subargs;
 	int k;
 
@@ -303,11 +302,8 @@ static int CclDefineUnitType(lua_State *l)
 	// Slot identifier
 	str = LuaToString(l, 1);
 	type = UnitTypeByIdent(str);
-	if (type) {
-		redefine = 1;
-	} else {
+	if (!type) {
 		type = NewUnitTypeSlot(str);
-		redefine = 0;
 	}
 
 	type->NumDirections = 0;
