@@ -161,7 +161,7 @@ void HandleActionTrain(CUnit &unit)
 				AddToGroup(&nunit, 1, num);
 			}
 
-			DropOutOnSide(*nunit, LookingW, type->TileWidth, type->TileHeight);
+			DropOutOnSide(*nunit, LookingW, &unit);
 
 			// Set life span
 			if (type->DecayRate) {

@@ -500,7 +500,7 @@ void HandleActionBuilt(CUnit &unit)
 			unit.Data.Built.Worker = NoUnitP;
 			// HACK: make sure the sight is updated correctly
 			unit.CurrentSightRange = 1;
-			DropOutOnSide(*worker, LookingW, type->TileWidth, type->TileHeight);
+			DropOutOnSide(*worker, LookingW, &unit);
 			unit.CurrentSightRange = 0;
 		}
 
@@ -544,7 +544,7 @@ void HandleActionBuilt(CUnit &unit)
 				worker->SubAction = 0;//may be 40
 				// HACK: make sure the sight is updated correctly
 				unit.CurrentSightRange = 1;
-				DropOutOnSide(*worker, LookingW, type->TileWidth, type->TileHeight);
+				DropOutOnSide(*worker, LookingW, &unit);
 
 				worker->CurrentOrder()->ClearGoal();
 

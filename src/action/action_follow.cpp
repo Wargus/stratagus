@@ -132,7 +132,7 @@ void HandleActionFollow(CUnit &unit)
 				// Teleport the unit
 				unit.Remove(NULL);
 				unit.tilePos = goal->Goal->tilePos;
-				DropOutOnSide(unit, unit.Direction, 1, 1);
+				DropOutOnSide(unit, unit.Direction, NULL);
 #if 0
 				// FIXME: SoundForName() should be called once
 				PlayGameSound(SoundForName("invisibility"), MaxSampleVolume);

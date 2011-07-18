@@ -98,6 +98,7 @@ enum AiForceAttackingState
 	AiForceAttackingState_Free = -1,
 	AiForceAttackingState_Waiting = 0,
 	AiForceAttackingState_Boarding,
+	AiForceAttackingState_AttackingWithTransporter,
 	AiForceAttackingState_Attacking,
 };
 

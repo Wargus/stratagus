@@ -676,10 +676,9 @@ int Summon::Cast(CUnit &caster, const SpellType *spell,
 		//
 		target = MakeUnit(unittype, caster.Player);
 		if (target != NoUnitP) {
-			// This is a hack to walk around behaviour of DropOutOnSide
-			target->tilePos.x = x + 1;
+			target->tilePos.x = x;
 			target->tilePos.y = y;
-			DropOutOnSide(*target, LookingW, 0, 0); // FIXME : 0,0) : good parameter ?
+			DropOutOnSide(*target, LookingW, NULL);
 			//
 			//  set life span. ttl=0 results in a permanent unit.
 			//

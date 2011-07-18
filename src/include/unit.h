@@ -1221,7 +1221,7 @@ struct CResourceDepositFinder {
 class CPreference {
 public:
 	CPreference() : ShowSightRange(false), ShowReactionRange(false),
-		ShowAttackRange(false), ShowMessages(false), 
+		ShowAttackRange(false), ShowMessages(false),
 		BigScreen(false),ShowOrders(0) {};
 
 	bool ShowSightRange;     /// Show sight range.
@@ -1311,9 +1311,9 @@ extern void UnitHeadingFromDeltaXY(CUnit &unit, const Vec2i &delta);
 
 
 	/// @todo more docu
-extern void DropOutOnSide(CUnit &unit, int heading, int addx, int addy);
+extern void DropOutOnSide(CUnit &unit, int heading, const CUnit *container);
 	/// @todo more docu
-extern void DropOutNearest(CUnit &unit, const Vec2i &goalPos, int addx, int addy);
+extern void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container);
 
 	/// Drop out all units in the unit
 extern void DropOutAll(const CUnit &unit);

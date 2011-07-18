@@ -275,7 +275,7 @@ static void LoseResource(CUnit &unit, const CUnit &source)
 	CUnit *depot;
 	ResourceInfo *resinfo = unit.Type->ResInfo[unit.CurrentResource];
 
-	Assert((unit.Container && !resinfo->HarvestFromOutside) ||
+	Assert((unit.Container == &source && !resinfo->HarvestFromOutside) ||
 		(!unit.Container && resinfo->HarvestFromOutside));
 
 	if (resinfo->HarvestFromOutside) {
@@ -287,8 +287,7 @@ static void LoseResource(CUnit &unit, const CUnit &source)
 	//
 	if (unit.ResourcesHeld && (depot = FindDeposit(unit, 1000, unit.CurrentResource))) {
 		if (unit.Container) {
-			DropOutNearest(unit, depot->tilePos + depot->Type->GetHalfTileSize(),
-				source.Type->TileWidth, source.Type->TileHeight);
+			DropOutNearest(unit, depot->tilePos + depot->Type->GetHalfTileSize(), &source);
 		}
 		//
 		// Remember were it mined, so it can look around for another resource.
@@ -306,8 +305,7 @@ static void LoseResource(CUnit &unit, const CUnit &source)
 	//
 	if (unit.Container) {
 		Assert(!resinfo->HarvestFromOutside);
-		DropOutOnSide(unit, LookingW, source.Type->TileWidth,
-			source.Type->TileHeight);
+		DropOutOnSide(unit, LookingW, &source);
 	}
 	unit.CurrentOrder()->goalPos.x = unit.CurrentOrder()->goalPos.y = -1;
 	//use depot as goal
@@ -593,8 +591,7 @@ static int StopGathering(CUnit &unit)
 			!unit.ResourcesHeld) {
 		if (!(resinfo->HarvestFromOutside || resinfo->TerrainHarvester)) {
 			Assert(unit.Container);
-			DropOutOnSide(unit, LookingW, source->Type->TileWidth,
-				source->Type->TileHeight);
+			DropOutOnSide(unit, LookingW, source);
 		}
 		DebugPrint("%d: Worker %d report: Can't find a resource [%d] deposit.\n"
 				_C_ unit.Player->Index _C_ unit.Slot _C_ unit.CurrentResource);
@@ -605,8 +602,7 @@ static int StopGathering(CUnit &unit)
 	} else {
 		if (!(resinfo->HarvestFromOutside || resinfo->TerrainHarvester)) {
 			Assert(unit.Container);
-			DropOutNearest(unit, depot->tilePos + depot->Type->GetHalfTileSize(),
-				source->Type->TileWidth, source->Type->TileHeight);
+			DropOutNearest(unit, depot->tilePos + depot->Type->GetHalfTileSize(), source);
 		}
 		UnitGotoGoal(unit, depot, SUB_MOVE_TO_DEPOT);
 	}
@@ -733,14 +729,14 @@ static int WaitInDepot(CUnit &unit)
 		pos = unit.CurrentOrder()->Arg1.Resource.Pos;
 
 		if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 10, unit.Player, pos, &pos)) {
-			if(depot)
-				DropOutNearest(unit, pos, depot->Type->TileWidth,
-						 depot->Type->TileHeight);
+			if (depot) {
+				DropOutNearest(unit, pos, depot);
+			}
 			unit.CurrentOrder()->goalPos = pos;
 		} else {
-			if(depot)
-				DropOutOnSide(unit, LookingW, depot->Type->TileWidth,
-						depot->Type->TileHeight);
+			if (depot) {
+				DropOutOnSide(unit, LookingW, depot);
+			}
 			unit.ClearAction();
 		}
 	} else {
@@ -752,12 +748,12 @@ static int WaitInDepot(CUnit &unit)
 		goal = UnitFindResource(unit, pos.x, pos.y, range,
 					unit.CurrentResource, unit.Player->AiEnabled, depot);
 		if (goal) {
-			if(depot)
-				DropOutNearest(unit, goal->tilePos + goal->Type->GetHalfTileSize(),
-					depot->Type->TileWidth, depot->Type->TileHeight);
+			if (depot) {
+				DropOutNearest(unit, goal->tilePos + goal->Type->GetHalfTileSize(), depot);
+			}
 
-			if(goal != mine) {
-				if(mine) {
+			if (goal != mine) {
+				if (mine) {
 					unit.DeAssignWorkerFromMine(*mine);
 					mine->RefsDecrease();
 				}
@@ -774,20 +770,17 @@ static int WaitInDepot(CUnit &unit)
 				_C_ unit.Player->Index _C_ unit.Slot
 				_C_ unit.tilePos.x _C_ unit.tilePos.y
 				_C_ pos.x _C_ pos.y _C_ range);
-			if(depot)
-				DropOutOnSide(unit,
-					LookingW, depot->Type->TileWidth, depot->Type->TileHeight);
-
-			if(mine) {
+			if (depot) {
+				DropOutOnSide(unit, LookingW, depot);
+			}
+			if (mine) {
 				unit.DeAssignWorkerFromMine(*mine);
 				mine->RefsDecrease();
 				unit.CurrentOrder()->Arg1.Resource.Mine = NULL;
 			}
-
 			unit.ClearAction();
 		}
 	}
-
 	return unit.CurrentAction() != UnitActionStill;
 }
 

@@ -49,84 +49,64 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-
-// Flag for searching a valid tileset for unloading
-#define LandUnitMask ( \
-	MapFieldLandUnit | \
-	MapFieldBuilding | \
-	MapFieldWall | \
-	MapFieldRocks | \
-	MapFieldForest | \
-	MapFieldCoastAllowed | \
-	MapFieldWaterAllowed | \
-	MapFieldUnpassable)
-
-#define NavalUnitMask ( \
-	MapFieldLandUnit | \
-	MapFieldBuilding | \
-	MapFieldWall | \
-	MapFieldRocks | \
-	MapFieldForest | \
-	MapFieldCoastAllowed | \
-	MapFieldLandAllowed | \
-	MapFieldUnpassable)
-
-
 /**
 **  Find a free position close to startPos
 **
+**  @param transporter
+**  @param unit         Unit to unload.
 **  @param startPos     Original search position
-**  @param res  Unload position.
-**  @param mask  Movement mask for the unit to be droped.
+**  @param maxrange     maximal range to unload.
+**  @param res          Unload position.
 **
 **  @return      True if a position was found, False otherwise.
-**  @note        resx and resy are undefined if a position is not found.
+**  @note        res is undefined if a position is not found.
 **
 **  @bug         FIXME: Place unit only on fields reachable from the transporter
-**  @bug         FIXME: This function fails for units larger than 1x1.
 */
-static int FindUnloadPosition(const Vec2i startPos, Vec2i *res, int mask)
+static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, const Vec2i startPos, int maxRange, Vec2i *res)
 {
-	int i;
-	int n;
-	int addx;
-	int addy;
 	Vec2i pos = startPos;
-	addx = addy = 1;
+
+	pos.x -= unit.Type->TileWidth - 1;
+	pos.y -= unit.Type->TileHeight - 1;
+	int addx = transporter.Type->TileWidth + unit.Type->TileWidth - 1;
+	int addy = transporter.Type->TileHeight + unit.Type->TileHeight - 1;
+
 	--pos.x;
-	for (n = 0; n < 2; ++n) {
-		// Nobody: There was some code here to check for unloading units that can
-		// only go on even tiles. It's useless, since we can only unload land units.
-		for (i = addy; i--; ++pos.y) {
-			if (CheckedCanMoveToMask(pos, mask)) {
+	for (int range = 0; range < maxRange; ++range) {
+		for (int i = addy; i--; ++pos.y) {
+			if (UnitCanBeAt(unit, pos)) {
 				*res = pos;
-				return 1;
+				return true;
 			}
 		}
 		++addx;
-		for (i = addx; i--; ++pos.x) {
-			if (CheckedCanMoveToMask(pos, mask)) {
+
+		for (int i = addx; i--; ++pos.x) {
+			if (UnitCanBeAt(unit, pos)) {
 				*res = pos;
-				return 1;
+				return true;
 			}
 		}
 		++addy;
-		for (i = addy; i--; --pos.y) {
-			if (CheckedCanMoveToMask(pos, mask)) {
+
+		for (int i = addy; i--; --pos.y) {
+			if (UnitCanBeAt(unit, pos)) {
 				*res = pos;
-				return 1;
+				return true;
 			}
 		}
 		++addx;
-		for (i = addx; i--; --pos.x) {
-			if (CheckedCanMoveToMask(pos, mask)) {
+
+		for (int i = addx; i--; --pos.x) {
+			if (UnitCanBeAt(unit, pos)) {
 				*res = pos;
-				return 1;
+				return true;
 			}
 		}
 		++addy;
 	}
-	return 0;
+	return false;
 }
 
 /**
@@ -138,12 +118,13 @@ static int FindUnloadPosition(const Vec2i startPos, Vec2i *res, int mask)
 **
 **  @bug         FIXME: Place unit only on fields reachable from the transporter
 */
-int UnloadUnit(CUnit &unit)
+static int UnloadUnit(CUnit &transporter, CUnit &unit)
 {
+	const int maxRange = 1;
 	Vec2i pos;
 
 	Assert(unit.Removed);
-	if (!FindUnloadPosition(unit.tilePos, &pos, unit.Type->MovementMask)) {
+	if (!FindUnloadPosition(transporter, unit, transporter.tilePos, maxRange, &pos)) {
 		return 0;
 	}
 	unit.Boarded = 0;
@@ -152,72 +133,80 @@ int UnloadUnit(CUnit &unit)
 }
 
 /**
-**  Find the closest piece of coast you can unload units on
+**  Return true is possition is a correct place to drop out units.
 **
-**  @param  x     start location for the search
-**  @param  y     start location for the search
-**  @param  resPos  coast position
-**
-**  @return       1 if a location was found, 0 otherwise
+**  @param transporter  Transporter unit.
+**  @param pos          position to drop out units.
 */
-static int ClosestFreeCoast(const Vec2i &startPos, Vec2i *resPos)
+static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos)
 {
-	int i;
-	int addx;
-	int addy;
-	Vec2i nullpos;
-	Vec2i pos = startPos;
-	int n;
+	const int maxUnloadRange = 1;
 
-	addx = addy = 1;
-	if (Map.CoastOnMap(pos) &&
-			FindUnloadPosition(pos, &nullpos, LandUnitMask)) {
-		*resPos = pos;
-		return 1;
+	if (!UnitCanBeAt(transporter, pos)) {
+		return false;
 	}
-	--pos.x;
-	// The maximum distance to the coast. We have to stop somewhere...
-	n = 20;
-	while (n--) {
-		for (i = addy; i--; ++pos.y) {
-			if (Map.Info.IsPointOnMap(pos) &&
-					Map.CoastOnMap(pos) && !UnitOnMapTile(pos, -1) &&
-					FindUnloadPosition(pos, &nullpos, LandUnitMask)) {
+	Vec2i dummyPos;
+	CUnit* unit = transporter.UnitInside;
+	for (int i = 0; i < transporter.InsideCount; ++i, unit = unit->NextContained) {
+		if (FindUnloadPosition(transporter, *unit, pos, maxUnloadRange, &dummyPos)) {
+			return true;
+		}
+	}
+	// Check unit can be droped from here.
+	return false;
+}
+
+
+/**
+**  Find the closest available drop zone for a transporter.
+**  Fail if transporter don't transport any unit..
+**
+**  @param  transporter  the transporter
+**  @param  startPos     start location for the search
+**	@param  maxRange     The maximum distance from initial position to search...
+**  @param  resPos       drop zone position
+**
+**  @return              true if a location was found, false otherwise
+**  @note to be called only from ClosestFreeDropZone.
+*/
+static bool ClosestFreeDropZone_internal(const CUnit &transporter, const Vec2i &startPos, int maxRange, Vec2i *resPos)
+{
+	int addx = 0;
+	int addy = 1;
+	Vec2i pos = startPos;
+
+	for (int range = 0; range < maxRange; ++range) {
+		for (int i = addy; i--; ++pos.y) {
+			if (IsDropZonePossible(transporter, pos)) {
 				*resPos = pos;
-				return 1;
+				return true;
 			}
 		}
 		++addx;
-		for (i = addx; i--; ++pos.x) {
-			if (Map.Info.IsPointOnMap(pos) &&
-					Map.CoastOnMap(pos) && !UnitOnMapTile(pos, -1) &&
-					FindUnloadPosition(pos, &nullpos, LandUnitMask)) {
+		for (int i = addx; i--; ++pos.x) {
+			if (IsDropZonePossible(transporter, pos)) {
 				*resPos = pos;
-				return 1;
+				return true;
 			}
 		}
 		++addy;
-		for (i = addy; i--; --pos.y) {
-			if (Map.Info.IsPointOnMap(pos) &&
-					Map.CoastOnMap(pos) && !UnitOnMapTile(pos, -1) &&
-					FindUnloadPosition(pos, &nullpos, LandUnitMask)) {
+		for (int i = addy; i--; --pos.y) {
+			if (IsDropZonePossible(transporter, pos)) {
 				*resPos = pos;
-				return 1;
+				return true;
 			}
 		}
 		++addx;
-		for (i = addx; i--; --pos.x) {
-			if (Map.Info.IsPointOnMap(pos) &&
-					Map.CoastOnMap(pos) && !UnitOnMapTile(pos, -1) &&
-					FindUnloadPosition(pos, &nullpos, LandUnitMask)) {
+		for (int i = addx; i--; --pos.x) {
+			if (IsDropZonePossible(transporter, pos)) {
 				*resPos = pos;
-				return 1;
+				return true;
 			}
 		}
 		++addy;
 	}
 	DebugPrint("Try clicking closer to an actual coast.\n");
-	return 0;
+	return false;
 }
 
 /**
@@ -226,51 +215,30 @@ static int ClosestFreeCoast(const Vec2i &startPos, Vec2i *resPos)
 **
 **  @param  transporter  the transporter
 **  @param  startPos     start location for the search
-**  @param  resPos       coast position
+**	@param  maxRange     The maximum distance from initial position to search...
+**  @param  resPos       drop zone position
 **
 **  @return              1 if a location was found, 0 otherwise
-**
 */
-static int ClosestFreeDropZone(CUnit &transporter, const Vec2i& startPos, Vec2i *resPos)
+static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int maxRange, Vec2i *resPos)
 {
-	// Type (land/fly/naval) of the transporter
-	int transporterType;
-	// Type (land/fly/naval) of the units to unload
-	int loadedType;
-
 	// Check there are units onboard
 	if (!transporter.UnitInside) {
 		return 0;
 	}
+	const bool isTransporterRemoved = transporter.Removed;
 
-	transporterType = transporter.Type->UnitType;
-	// Take the type of the onboard unit
-	loadedType = transporter.UnitInside->Type->UnitType;
-
-	// Don't move in thoses cases
-	if ((transporterType == loadedType) || (loadedType == UnitTypeFly)) {
-		*resPos = startPos;
-		return 1;
+	if (!isTransporterRemoved) {
+		// Remove transporter to avoid "collision" with itself.
+		transporter.Remove(NULL);
 	}
-
-	switch (transporterType) {
-		case UnitTypeLand:
-			// in this case, loadedType == UnitTypeSea
-			return ClosestFreeCoast(startPos, resPos);
-		case UnitTypeNaval:
-			// Same ( but reversed... )
-			return ClosestFreeCoast(startPos, resPos);
-		case UnitTypeFly:
-			// Here we have loadedType in [ UnitTypeLand,UnitTypeNaval ]
-			if (loadedType == UnitTypeLand) {
-				return FindUnloadPosition(startPos, resPos, LandUnitMask);
-			} else {
-				return FindUnloadPosition(startPos, resPos, NavalUnitMask);
-			}
+	const bool res = ClosestFreeDropZone_internal(transporter, startPos, maxRange, resPos);
+	if (!isTransporterRemoved) {
+		transporter.Place(transporter.tilePos);
 	}
-	// Just to avoid a warning
-	return 0;
+	return res;
 }
+
 
 /**
 **  Move to dropzone.
@@ -299,14 +267,10 @@ static int MoveToDropZone(CUnit &unit)
 **
 **  @param unit  Pointer to unit.
 */
-static void LeaveTransporter(CUnit &unit)
+static void LeaveTransporter(CUnit &transporter)
 {
-	int i;
-	int stillonboard;
-	CUnit *goal;
-
-	stillonboard = 0;
-	goal = unit.CurrentOrder()->GetGoal();
+	int stillonboard = 0;
+	CUnit *goal = transporter.CurrentOrder()->GetGoal();
 	//
 	// Goal is the specific unit unit that you want to unload.
 	// This can be NULL, in case you want to unload everything.
@@ -314,30 +278,30 @@ static void LeaveTransporter(CUnit &unit)
 	if (goal) {
 		if (goal->Destroyed) {
 			DebugPrint("destroyed unit unloading?\n");
-			unit.CurrentOrder()->ClearGoal();
+			transporter.CurrentOrder()->ClearGoal();
 			return;
 		}
-		unit.CurrentOrder()->ClearGoal();
-		goal->tilePos = unit.tilePos;
+		transporter.CurrentOrder()->ClearGoal();
+		goal->tilePos = transporter.tilePos;
 		// Try to unload the unit. If it doesn't work there is no problem.
-		if (UnloadUnit(*goal)) {
-			unit.BoardCount--;
+		if (UnloadUnit(transporter, *goal)) {
+			transporter.BoardCount--;
 		}
 	} else {
 		// Unload all units.
-		goal = unit.UnitInside;
-		for (i = unit.InsideCount; i; --i, goal = goal->NextContained) {
+		goal = transporter.UnitInside;
+		for (int i = transporter.InsideCount; i; --i, goal = goal->NextContained) {
 			if (goal->Boarded) {
-				goal->tilePos = unit.tilePos;
-				if (!UnloadUnit(*goal)) {
+				goal->tilePos = transporter.tilePos;
+				if (!UnloadUnit(transporter, *goal)) {
 					++stillonboard;
 				} else {
-					unit.BoardCount--;
+					transporter.BoardCount--;
 				}
 			}
 		}
 	}
-	if (IsOnlySelected(unit)) {
+	if (IsOnlySelected(transporter)) {
 		SelectedUnitChanged();
 	}
 
@@ -345,12 +309,12 @@ static void LeaveTransporter(CUnit &unit)
 	if (stillonboard) {
 		// We tell it to unload at it's current position. This can't be done,
 		// so it will search for a piece of free coast nearby.
-		unit.CurrentOrder()->Action = UnitActionUnload;
-		unit.CurrentOrder()->ClearGoal();
-		unit.CurrentOrder()->goalPos = unit.tilePos;
-		unit.SubAction = 0;
+		transporter.CurrentOrder()->Action = UnitActionUnload;
+		transporter.CurrentOrder()->ClearGoal();
+		transporter.CurrentOrder()->goalPos = transporter.tilePos;
+		transporter.SubAction = 0;
 	} else {
-		unit.ClearAction();
+		transporter.ClearAction();
 	}
 }
 
@@ -361,19 +325,17 @@ static void LeaveTransporter(CUnit &unit)
 */
 void HandleActionUnload(CUnit &unit)
 {
-	int i;
-	Vec2i pos;
+	const int maxSearchRange = 20;
 
 	if (!unit.CanMove()) {
 		unit.SubAction = 2;
 	}
 	switch (unit.SubAction) {
-		//
-		// Move the transporter
-		//
-		case 0:
+		case 0: // Choose destination
 			if (!unit.CurrentOrder()->HasGoal()) {
-				if (!ClosestFreeDropZone(unit, unit.CurrentOrder()->goalPos, &pos)) {
+				Vec2i pos;
+
+				if (!ClosestFreeDropZone(unit, unit.CurrentOrder()->goalPos, maxSearchRange, &pos)) {
 					// Sorry... I give up.
 					unit.ClearAction();
 					return;
@@ -383,12 +345,15 @@ void HandleActionUnload(CUnit &unit)
 
 			NewResetPath(unit);
 			unit.SubAction = 1;
-		case 1:
+			// follow on next case
+		case 1: // Move unit to destination
 			// The Goal is the unit that we have to unload.
 			if (!unit.CurrentOrder()->HasGoal()) {
+				const int moveResult = MoveToDropZone(unit);
+
 				// We have to unload everything
-				if ((i = MoveToDropZone(unit))) {
-					if (i == PF_REACHED) {
+				if (moveResult) {
+					if (moveResult == PF_REACHED) {
 						if (++unit.SubAction == 1) {
 							unit.ClearAction();
 						}
@@ -398,10 +363,7 @@ void HandleActionUnload(CUnit &unit)
 				}
 				break;
 			}
-		//
-		// Leave the transporter
-		//
-		case 2:
+		case 2: // Leave the transporter
 			// FIXME: show still animations ?
 			LeaveTransporter(unit);
 			if (unit.CanMove() && unit.CurrentAction() != UnitActionStill) {

@@ -940,14 +940,12 @@ static int CclUnit(lua_State *l)
 */
 static int CclMoveUnit(lua_State *l)
 {
-	CUnit *unit;
-	int heading;
 	Vec2i ipos;
 
 	LuaCheckArgs(l, 2);
 
 	lua_pushvalue(l, 1);
-	unit = CclGetUnit(l);
+	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
 
 	lua_rawgeti(l, 2, 1);
@@ -957,14 +955,14 @@ static int CclMoveUnit(lua_State *l)
 	ipos.y = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 
-	heading = SyncRand() % 256;
 	if (UnitCanBeAt(*unit, ipos)) {
 		unit->Place(ipos);
 	} else {
+		const int heading = SyncRand() % 256;
+
 		unit->tilePos = ipos;
-		DropOutOnSide(*unit, heading, 1, 1);
+		DropOutOnSide(*unit, heading, NULL);
 	}
-//	PlaceUnit(unit, ipos.x, ipos.y);
 	lua_pushvalue(l, 1);
 	return 1;
 }
@@ -980,7 +978,6 @@ static int CclCreateUnit(lua_State *l)
 {
 	CUnitType *unittype;
 	CUnit *unit;
-	int heading;
 	int playerno;
 	Vec2i ipos;
 
@@ -999,7 +996,6 @@ static int CclCreateUnit(lua_State *l)
 	ipos.y = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 
-	heading = SyncRand() % 256;
 	lua_pushvalue(l, 2);
 	playerno = TriggerGetPlayer(l);
 	lua_pop(l, 1);
@@ -1023,8 +1019,10 @@ static int CclCreateUnit(lua_State *l)
 				(unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, ipos, 0))) {
 			unit->Place(ipos);
 		} else {
+			const int heading = SyncRand() % 256;
+
 			unit->tilePos = ipos;
-			DropOutOnSide(*unit, heading, 1, 1);
+			DropOutOnSide(*unit, heading, NULL);
 		}
 		UpdateForNewUnit(*unit, 0);
 
@@ -1344,9 +1342,9 @@ static int CclSetUnitVariable(lua_State *l)
 	if (!strcmp(name, "RegenerationRate"))
 	{
 		value = LuaToNumber(l, 3);
-		if (value > unit->Variable[HP_INDEX].Max) 
+		if (value > unit->Variable[HP_INDEX].Max)
 			unit->Stats->Variables[HP_INDEX].Increase = unit->Variable[HP_INDEX].Max;
-		else 
+		else
 			unit->Stats->Variables[HP_INDEX].Increase = value;
 	}
 	else

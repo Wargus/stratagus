@@ -634,6 +634,10 @@ void MarkUnitFieldFlags(const CUnit &unit)
 	int w, h = unit.Type->TileHeight;          // Tile height of the unit.
 	const int width = unit.Type->TileWidth;          // Tile width of the unit.
 	unsigned int index = unit.Offset;
+
+	if (unit.Type->Vanishes) {
+		return ;
+	}
 	do {
 		mf = Map.Field(index);
 		w = width;
@@ -670,6 +674,10 @@ void UnmarkUnitFieldFlags(const CUnit &unit)
 	int w, h = unit.Type->TileHeight;          // Tile height of the unit.
 	const int width = unit.Type->TileWidth;          // Tile width of the unit.
 	unsigned int index = unit.Offset;
+
+	if (unit.Type->Vanishes) {
+		return ;
+	}
 
 	_UnmarkUnitFieldFlags funct(unit);
 
@@ -1814,62 +1822,74 @@ void UnitHeadingFromDeltaXY(CUnit &unit, const Vec2i &delta)
 **
 **  @param unit       Unit to drop out.
 **  @param heading    Direction in which the unit should appear.
-**  @param addx       Tile width of unit it's dropping out of.
-**  @param addy       Tile height of unit it's dropping out of.
+**  @param container  Unit "containing" unit to drop (may be different of unit.Container).
 */
-void DropOutOnSide(CUnit &unit, int heading, int addx, int addy)
+void DropOutOnSide(CUnit &unit, int heading, const CUnit *container)
 {
 	Vec2i pos;
-	int i;
+	int addx = 0;
+	int addy = 0;
 
-	if (unit.Container) {
-		pos = unit.Container->tilePos;
+	if (container) {
+		pos = container->tilePos;
+		pos.x -= unit.Type->TileWidth - 1;
+		pos.y -= unit.Type->TileHeight - 1;
+		addx = container->Type->TileWidth + unit.Type->TileWidth - 1;
+		addy = container->Type->TileHeight + unit.Type->TileHeight - 1;
+
+		if (heading < LookingNE || heading > LookingNW) {
+			pos.x += addx - 1;
+			--pos.y;
+			goto startn;
+		} else if (heading < LookingSE) {
+			pos.x += addx;
+			pos.y += addy - 1;
+			goto starte;
+		} else if (heading < LookingSW) {
+			pos.y += addy;
+			goto starts;
+		} else {
+			--pos.x;
+			goto startw;
+		}
 	} else {
 		pos = unit.tilePos;
-	}
 
-	if (heading < LookingNE || heading > LookingNW) {
-		pos.x += addx - 1;
-		--pos.y;
-		goto startn;
+		if (heading < LookingNE || heading > LookingNW) {
+			goto starts;
+		} else if (heading < LookingSE) {
+			goto startw;
+		} else if (heading < LookingSW) {
+			goto startn;
+		} else {
+			goto starte;
+		}
 	}
-	if (heading < LookingSE) {
-		pos.x += addx;
-		pos.y += addy - 1;
-		goto starte;
-	}
-	if (heading < LookingSW) {
-		pos.y += addy;
-		goto starts;
-	}
-	--pos.x;
-	goto startw;
-
 	// FIXME: don't search outside of the map
 	for (;;) {
 startw:
-		for (i = addy; i--; ++pos.y) {
+		for (int i = addy; i--; ++pos.y) {
 			if (UnitCanBeAt(unit, pos)) {
 				goto found;
 			}
 		}
 		++addx;
 starts:
-		for (i = addx; i--; ++pos.x) {
+		for (int i = addx; i--; ++pos.x) {
 			if (UnitCanBeAt(unit, pos)) {
 				goto found;
 			}
 		}
 		++addy;
 starte:
-		for (i = addy; i--; --pos.y) {
+		for (int i = addy; i--; --pos.y) {
 			if (UnitCanBeAt(unit, pos)) {
 				goto found;
 			}
 		}
 		++addx;
 startn:
-		for (i = addx; i--; --pos.x) {
+		for (int i = addx; i--; --pos.x) {
 			if (UnitCanBeAt(unit, pos)) {
 				goto found;
 			}
@@ -1882,29 +1902,34 @@ found:
 }
 
 /**
-**  Place a unit on the map nearest to x, y.
+**  Place a unit on the map nearest to goalPos.
 **
 **  @param unit  Unit to drop out.
 **  @param goalPos Goal map tile position.
 **  @param addx  Tile width of unit it's dropping out of.
 **  @param addy  Tile height of unit it's dropping out of.
 */
-void DropOutNearest(CUnit &unit, const Vec2i &goalPos, int addx, int addy)
+void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 {
 	Vec2i pos;
 	Vec2i bestPos = {0, 0};
 	int bestd = 99999;
-
+	int addx = 0;
+	int addy = 0;
 	Assert(unit.Removed);
 
-	if (unit.Container) {
-		pos = unit.Container->tilePos;
+	if (container) {
+		pos = container->tilePos;
+		pos.x -= unit.Type->TileWidth - 1;
+		pos.y -= unit.Type->TileHeight - 1;
+		addx = container->Type->TileWidth + unit.Type->TileWidth - 1;
+		addy = container->Type->TileHeight + unit.Type->TileHeight - 1;
+		--pos.x;
 	} else {
 		pos = unit.tilePos;
 	}
-
 	// FIXME: if we reach the map borders we can go fast up, left, ...
-	--pos.x;
+
 	for (;;) {
 		for (int i = addy; i--; ++pos.y) { // go down
 			if (UnitCanBeAt(unit, pos)) {
@@ -1964,18 +1989,14 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, int addx, int addy)
 */
 void DropOutAll(const CUnit &source)
 {
-	CUnit *unit;
-	int i;
+	CUnit *unit = source.UnitInside;
 
-	unit = source.UnitInside;
-	for (i = source.InsideCount; i; --i, unit = unit->NextContained) {
-		DropOutOnSide(*unit, LookingW,
-			source.Type->TileWidth, source.Type->TileHeight);
+	for (int i = source.InsideCount; i; --i, unit = unit->NextContained) {
+		DropOutOnSide(*unit, LookingW, &source);
 		Assert(!unit->CurrentOrder()->HasGoal());
 		unit->CurrentOrder()->Action = UnitActionStill;
 		unit->SubAction = 0;
 	}
-	DebugPrint("Drop out %d of %d\n" _C_ i _C_ source.Data.Resource.Active);
 }
 
 

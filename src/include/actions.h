@@ -208,8 +208,7 @@ extern int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scal
 extern int UnitShowAnimation(CUnit &unit, const CAnimation *anim);
 	/// Handle the actions of all units each game cycle
 extern void UnitActions();
-	/// Unload a unit.
-extern int UnloadUnit(CUnit &unit);
+
 //@}
 
 #endif // !__ACTIONS_H__

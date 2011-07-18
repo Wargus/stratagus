@@ -616,7 +616,7 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 		}
 	}
 	if (transporterIndex == aiForce.Size()) {
-		aiForce.State = AiForceAttackingState_Attacking;
+		aiForce.State = AiForceAttackingState_AttackingWithTransporter;
 		return ;
 	}
 	for (unsigned int i = 0; i < aiForce.Size(); ++i) {
@@ -628,7 +628,7 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 		}
 	}
 	if (goNext == true) {
-		aiForce.State = AiForceAttackingState_Attacking;
+		aiForce.State = AiForceAttackingState_AttackingWithTransporter;
 		return ;
 	}
 	for (unsigned int i = 0; i < aiForce.Size(); ++i) {
