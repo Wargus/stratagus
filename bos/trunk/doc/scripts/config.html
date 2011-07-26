@@ -33,11 +33,16 @@
 <a href="#AStarKnowUnseenTerrain">AStarKnowUnseenTerrain</a>
 <a href="#AStarMovingUnitCrossingCost">AStarMovingUnitCrossingCost</a>
 <a href="#AStarUnknownTerrainCost">AStarUnknownTerrainCost</a>
+<a href="#AlliedUnitRecyclingEfficiency">AlliedUnitRecyclingEfficiency</a>
 <a href="#DefineDecorations">DefineDecorations</a>
 <a href="#DefineDefaultResourceNames">DefineDefaultResourceNames</a>
 <a href="#DefineSprites">DefineSprites</a>
+<a href="#EnemyUnitRecyclingEfficiency">EnemyUnitRecyclingEfficiency</a>
+<a href="#EnergyCost">EnergyCost</a>
 <a href="#GetVideoFullScreen">GetVideoFullScreen</a>
 <a href="#GetVideoResolution">GetVideoResolution</a>
+<a href="#MagmaCost">MagmaCost</a>
+<a href="#MaxCosts">MaxCosts</a>
 <a href="#Preferences">Preferences</a>
 <a href="#RevealMap">RevealMap</a>
 <a href="#RightButtonAttacks">RightButtonAttacks</a>
@@ -79,15 +84,43 @@
 
 General configurations.
 
+<h2>Constants</h2>
+
+<h3 id="resource_type_identifiers">Resource type identifiers</h3>
+
+These integer constants identify types of resources.
+They are used as indices in the
+<a href="#AlliedUnitRecyclingEfficiency">AlliedUnitRecyclingEfficiency</a>,
+<a href="#EnemyUnitRecyclingEfficiency">EnemyUnitRecyclingEfficiency</a>,
+and <a href="ui.html#UI.Resources">UI.Resources</a> tables.
+
+<dl>
+  <dt><a name="EnergyCost">EnergyCost</a></dt>
+  <dd>The energy resource type.</dd>
+  <dt><a name="MagmaCost">MagmaCost</a></dt>
+  <dd>The magma resource type.</dd>
+  <dt><a name="MaxCosts">MaxCosts</a></dt>
+  <dd>The total number of different resource types.</dd>
+</dl>
+
 <h2>Functions</h2>
 <a name="DefineDefaultResourceNames"></a>
 <h3>DefineDefaultResourceNames("name", ...)</h3>
 
-Names the resources in a given order.
+<p>Names the resources in a given order.
+  The engine does not display these names to the user;
+  it uses them in save files only.
+  Consequently, these names should not be localized.</p>
+
+<p>(Although this function is called DefineDefaultResourceNames,
+  there is no mechanism for overriding these "default" names with
+  others.)</p>
 
 <dl>
 <dt>name</dt>
-<dd>Name to give to the resource
+<dd>Name to give to the resource.  There should be two names:
+  first one for <a href="#EnergyCost">EnergyCost</a>,
+  and then one for <a href="#MagmaCost">MagmaCost</a>.</dd>
 <dt><i>RETURNS</i></dt>
 <dd>Nothing</dd>
 </dl>
@@ -97,7 +130,7 @@ Names the resources in a given order.
 <pre>
     -- Define Resource names
     DefineDefaultResourceNames(
-        "time", "gold", "wood", "oil", "ore", "stone", "coal")
+        "energy", "magma")
 </pre>
 
 
@@ -777,6 +810,35 @@ it true.</p>
 
 <p>Extra cost to move on unseen terrain, makes units tend towards
 known areas when finding paths.</p>
+
+<a name="AlliedUnitRecyclingEfficiency"></a>
+<h3>AlliedUnitRecyclingEfficiency</h3>
+
+<p>What percentage of resources you get back
+when recycling your buildings or other
+<a href="unittype.html#DefineUnitType.CanHarvestFrom">harvestable</a>
+units of allied players.</p>
+
+<p>The value of this variable is a table.
+The indices of the table are resource type identifiers,
+i.e. integers between 0 and <a href="#MaxCosts">MaxCosts</a>-1
+(even though indices typically start from 1 in Lua).
+The values of the table are the percentages.</p>
+
+<h4>Example</h4>
+
+<pre>
+    AlliedUnitRecyclingEfficiency[MagmaCost] = 42
+</pre>
+
+<a name="EnemyUnitRecyclingEfficiency"></a>
+<h3>EnemyUnitRecyclingEfficiency</h3>
+
+<p>What percentage of resources you get when recycling enemy
+buildings.</p>
+
+<p>The value of this variable is a table in the same format as
+<a href="#AlliedUnitRecyclingEfficiency">AlliedUnitRecyclingEfficiency</a>.</p>
 
 <a name="Preferences"></a>
 <h3>Preferences</h3>

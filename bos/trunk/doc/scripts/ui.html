@@ -31,6 +31,8 @@
 <hr>
 <a href="#CColor">CColor</a>
 <a href="#CFontColor">CFontColor</a>
+<a href="#CGraphic">CGraphic</a>
+<a href="#CResourceInfo">CResourceInfo</a>
 <a href="#DefineButton">DefineButton</a>
 <a href="#DefineButtonStyle">DefineButtonStyle</a>
 <a href="#DefineCursor">DefineCursor</a>
@@ -361,6 +363,13 @@ SetGameCursor("cursor-point")
     in <a href="#text_formatting">text formatting</a>.
     The font color must be defined with
     <a href="#CFontColor.New">CFontColor:New</a>.</dd>
+  <dt id="UI.Resources">UI.Resources = table</dt>
+  <dd>How the engine displays the resource costs of a command.
+    This table contains a <a href="#CCResourceInfo">CResourceInfo</a>
+    instance for each type of resource.
+    The indices of the table are resource type identifiers,
+    i.e. integers between 0 and <a href="#MaxCosts">MaxCosts</a>-1
+    (even though indices typically start from 1 in Lua).</dd>
 </dl>
 
 <p>Do not change the UI variable itself from Lua, even though the
@@ -373,67 +382,67 @@ engine may allow that.</p>
 
 <p>The CColor type represents an RGBA color.</p>
 
-<p>In the following subsections, <var>color</var> denotes an object of
-type CColor.</p>
+<p>In the following subsections, <var>color</var> denotes
+a CColor instance.</p>
 
 <h4>CColor([r], [g], [b], [a])</h4>
 
-<p>Constructs a <a href="#CColor">CColor</a> object with the
+<p>Constructs a <a href="#CColor">CColor</a> instance with the
 specified Red, Green, Blue, and Alpha component values.
 All arguments are optional.</p>
 
-<h4><var>color</var>:R</h4>
+<h4><var>color</var>.R</h4>
 
 <p>The red component, between 0 and 255.</p>
 
-<h4><var>color</var>:G</h4>
+<h4><var>color</var>.G</h4>
 
 <p>The green component, between 0 and 255.</p>
 
-<h4><var>color</var>:B</h4>
+<h4><var>color</var>.B</h4>
 
 <p>The blue component, between 0 and 255.</p>
 
-<h4><var>color</var>:A</h4>
+<h4><var>color</var>.A</h4>
 
 <p>The alpha component, between 0 and 255.
 Not premultiplied.</p>
 
 <p>Currently, the engine ignores the alpha component
-of all CColor objects that Lua code can access:</p>
+of all CColor instances that Lua code can access:</p>
 
 <ul>
-  <li><a href="#CFontColor.Colors"><var>fontColor</var>:Colors</a></li>
-  <li>UI:ButtonPanel:AutoCastBorderColorRGB</li>
-  <li>UI:CompletedBarColorRGB</li>
+  <li><a href="#CFontColor.Colors"><var>fontColor</var>.Colors</a></li>
+  <li>UI.ButtonPanel.AutoCastBorderColorRGB</li>
+  <li>UI.CompletedBarColorRGB</li>
 </ul>
 
 <a name="CFontColor"></a>
 <h3>CFontColor</h3>
 
-<p>Each CFontColor object represents a named set of colors for use
+<p>Each CFontColor instance represents a named set of colors for use
 in <a href="#text_formatting">text formatting</a>.</p>
 
-<p>In the following subsections, <var>fontColor</var> denotes an
-object of type CFontColor.</p>
+<p>In the following subsections, <var>fontColor</var> denotes
+a CFontColor instance.</p>
 
-<h4 id="CFontColor.Colors"><var>fontColor</var>:Colors</h4>
+<h4 id="CFontColor.Colors"><var>fontColor</var>.Colors</h4>
 
-<p>An array of <a href="#CColor">CColor</a> objects.
+<p>An array of <a href="#CColor">CColor</a> instances.
 There are <a href="#MaxFontColors">MaxFontColors</a> elements in the array.
-The engine ignores the alpha component of these CColor objects.</p>
+The engine ignores the alpha component of these CColor instances.</p>
 
 <h4 id="CFontColor.Get">CFontColor:Get("name")</h4>
 
 <p>Finds a font color by name.
-Returns a <a href="#CFontColor">CFontColor</a> object if found.
+Returns a <a href="#CFontColor">CFontColor</a> instance if found.
 If no such font color has been defined, which indicates a bug,
 then this function returns nil instead.</p>
 
 <h4 id="CFontColor.New">CFontColor:New("name")</h4>
 
 <p>Finds a font color by name, or allocates a new one.
-Returns a <a href="#CFontColor">CFontColor</a> object.
+Returns a <a href="#CFontColor">CFontColor</a> instance.
 If it is a new one, then its <a href="#CFontColor.Colors">Colors</a>
 array is all black, so you should set that before you use the
 font color in <a href="#text_formatting">text formatting</a>.</p>
@@ -443,7 +452,131 @@ font color in <a href="#text_formatting">text formatting</a>.</p>
 
 <p>This constant integer is the number of elements in the
 <a href="#CFontColor.Colors">Colors</a> array in CFontColor
-objects.</p>
+instances.</p>
+
+<a name="CResourceInfo"></a>
+<h3>CResourceInfo</h3>
+
+<p>In the <a href="#UI.Resources">UI.Resources</a> table,
+  there is one CResourceInfo instance for each type of resource.
+  These objects control how the engine displays the resource costs of
+  a command.  Each CResourceInfo instance has the following properties:</p>
+
+<dl>
+  <dt>G</dt>
+  <dd>The <a href="#CGraphic">CGraphic</a> instance
+    that contains the resource icon.</dd>
+  <dt>IconFrame</dt>
+  <dd>The frame number of the resource icon within the graphic.
+    See <a href="unittype.html#frame_numbers">Frame numbers and flipping</a>.</dd>
+  <dt>IconX</dt>
+  <dd><em>Obsolete since r8638 (2007-03-28):
+      The coordinates are hardcoded.</em>
+    The X coordinate of the resource icon on the screen,
+    for resources held by the player.</dd>
+  <dt>IconY</dt>
+  <dd><em>Obsolete since r8638 (2007-03-28):
+      The coordinates are hardcoded.</em>
+    The Y coordinate of the resource icon on the screen,
+    for resources held by the player.</dd>
+  <dt>TextX</dt>
+  <dd><em>Obsolete since r8638 (2007-03-28):
+      The coordinates are hardcoded.</em>
+    The X coordinate of the text that describes the amount
+    of resource held by the player.</dd>
+  <dt>TextY</dt>
+  <dd><em>Obsolete since r8638 (2007-03-28):
+      The coordinates are hardcoded.</em>
+    The Y coordinate of the text that describes the amount
+    of resource held by the player.</dd>
+</dl>
+
+<p>These properties can be accessed with expressions like
+  <code>UI.Resources[EnergyCost].G</code>.</p>
+
+<a name="CGraphic"></a>
+<h3>CGraphic</h3>
+
+<p>A CGraphic instance is a graphic image that can be loaded from a
+  file and then displayed on the screen.</p>
+
+<p>In the following subsections, <var>graphic</var> denotes
+  a CGraphic instance.</p>
+
+<h4 id="CGraphic.New">CGraphic:New("filename", [width], [height])</h4>
+
+<p>Creates a CGraphic instance that refers to the specified image file,
+  unless one exists already.</p>
+
+<dl>
+  <dt>"filename"</dt>
+  <dd>The name of the file from which
+    <a href="#CGraphic.Load">CGraphic::Load</a> will load the graphic.</dd>
+  <dt>width</dt>
+  <dd>The width of each frame in the graphic,
+    or 0 (default) to use the whole graphic as just one frame.</dd>
+  <dt>height</dt>
+  <dd>The height of each frame in the graphic,
+    or 0 (default) to use the whole graphic as just one frame.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>A CGraphic instance that refers to the specified image file.
+    If one had already been created, then CGraphic::New returns that
+    and increments its reference count; otherwise, CGraphic::New
+    creates a new CGraphic instance.
+    In either case, <a href="#CGraphic.Free">CGraphic:Free</a>
+    will have to be called.</dd>
+</dl>
+
+<h4 id="CGraphic.Free">CGraphic:Free(graphic)</h4>
+
+<p>Decrements the reference count of a CGraphic instance,
+  and frees it if the reference count becomes zero.</p>
+
+<p>The reference counts of CGraphic instances are not currently
+  connected to Lua garbage collection.  CGraphic:Free must be
+  called explicitly.  If a CGraphic instance is used after it
+  has been freed, the engine will probably crash.</p>
+
+<dl>
+  <dt>graphic</dt>
+  <dd>The CGraphic instance that the method should free.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Nothing.</dd>
+</dl>
+
+<h4 id="CGraphic.Load"><var>graphic</var>:Load()</h4>
+
+<p>Loads the graphic from the image file whose name was given
+  to <a href="#CGraphic.New">CGraphic:New</a>, unless it has
+  already been loaded.</p>
+
+<dl>
+  <dt>graphic</dt>
+  <dd>The CGraphic instance that the method should load.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Nothing.</dd>
+</dl>
+
+<h4 id="CGraphic.Resize"><var>graphic</var>:Resize(width, height)</h4>
+
+<p>Resizes the graphic to the specified size.
+  Because <a href="#CGraphic.New">CGraphic:New</a> returns
+  the same CGraphic instance when given the same file name,
+  resizing can affect other uses of the same graphic.
+  To prevent such problems, you should use this method
+  only on graphics that are displayed in one place at a time
+  and are always resized before use.</p>
+
+<dl>
+  <dt>graphic</dt>
+  <dd>The CGraphic instance that the method should resize.</dd>
+  <dt>width</dt>
+  <dd>The new width of the graphic, in pixels.</dd>
+  <dt>height</dt>
+  <dd>The new height of the graphic, in pixels.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Nothing.</dd>
+</dl>
 
 <hr>
 All trademarks and copyrights on this page are owned by their respective owners.
