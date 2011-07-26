@@ -696,14 +696,19 @@ Sets the video to full screen or windowed mode
 <a name="SetVideoResolution"></a>
 <h3>SetVideoResolution(x, y)</h3>
 
-Sets the resolution of the video display, valid options are 640x480, 800x600, 1024x768,
-1280x960 and 1600x1200.
+<p>Sets the resolution of the video display (in full-screen mode)
+or the size of the game window (in windowed mode).</p>
+
+<p>The engine tries to support whatever resolution you specify.
+However, at resolutions smaller than 640x480, some things might not
+fit on the screen; and at resolutions greater than 1920x1200,
+background images might not cover everything they should.</p>
 
 <dl>
 <dt>x</dt>
-<dd>Resolution in x from the 640,800,1024,1280,1600 list. Must match y</dd>
+<dd>Resolution in x.</dd>
 <dt>y</dt>
-<dd>Resolution in y from the 480,600,768,960,1200 list. Must match x</dd>
+<dd>Resolution in y.</dd>
 <dt><i>RETURNS</i></dt>
 <dd>Nothing</dd>
 </dl>
