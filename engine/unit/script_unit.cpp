@@ -60,9 +60,6 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	/// Get resource by name
-extern unsigned CclGetResourceByName(lua_State *l);
-
 /**
 **  Set capture buildings
 **

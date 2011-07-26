@@ -90,27 +90,6 @@ static std::vector<LabelsLaterStruct> LabelsLater;
 extern int GetSpriteIndex(const std::string &spriteName);
 
 /**
-**  Get the resource ID from a SCM object.
-**
-**  @param l  Lua state.
-**
-**  @return   the resource id
-*/
-unsigned CclGetResourceByName(lua_State *l)
-{
-	const char *value;
-
-	value = LuaToString(l, -1);
-	for (int i = 0; i < MaxCosts; ++i) {
-		if (value == DefaultResourceNames[i]) {
-			return i;
-		}
-	}
-	LuaError(l, "Unsupported resource tag: %s" _C_ value);
-	return 0xABCDEF;
-}
-
-/**
 **  Parse a "terrain" build restriction.
 **
 **  @param l  Lua state where the value at the top of the stack
