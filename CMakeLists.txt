@@ -25,7 +25,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #
-	
+
 project(stratagus)
 cmake_minimum_required(VERSION 2.6)
 set(STRATAGUS_VERSION 2.2.5.5)
@@ -565,6 +565,7 @@ endif()
 
 if(APPLE)
 	add_definitions(-DUSE_MAC)
+	add_definitions(-D__unix)
 endif()
 
 if(BSD)

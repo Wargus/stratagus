@@ -41,8 +41,7 @@ else()
 
 	elseif(APPLE)
 
-		create_search_paths(/Developer/Platforms)
-		findpkg_framework(OpenGLES)
+		
 		set(OPENGLES_GL_LIBRARY "-framework OpenGLES")
 		# TODO: EGL
 
