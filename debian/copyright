@@ -1,32 +1,43 @@
-This package was firstly debianized by David Martínez Moreno <ender@debian.org> on
-Thu, 14 Feb 2004 21:43:26 +0100.
+This work was packaged for Debian by:
 
-It was downloaded from https://launchpad.net/stratagus
+    David Martínez Moreno <ender@debian.org> on Thu, 14 Feb 2004 21:43:26 +0100.
+    Pali Rohár <pali.rohar@gmail.com> on Mon, 08 Aug 2011 20:56:26 +0200
 
-Upstream Authors: Jimmy Salmon <jsalmon3@users.sourceforge.net>
-		  Russel Smith <mr-russ@users.sourceforge.net>
-		  Nehal Mistry <nehalmistry@users.sourceforge.net>
-		  Pali Rohár <pali.rohar@gmail.com>
+It was downloaded from:
 
-Copyright: (C) 1998-2005 by The Stratagus Project.
-	   (C) 2010      by Pali Rohár
+    https://launchpad.net/stratagus
+
+Upstream Author(s):
+
+    Jimmy Salmon <jsalmon3@users.sourceforge.net>
+    Russel Smith <mr-russ@users.sourceforge.net>
+    Nehal Mistry <nehalmistry@users.sourceforge.net>
+    Pali Rohár <pali.rohar@gmail.com>
+
+Copyright:
+
+    (C) 1998-2011 by The Stratagus Project and Pali Rohár
 
 License:
 
-   This package is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; version 2 dated June, 1991.
+    This package is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
-   This package is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+    This package is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this package; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-   02111-1307, USA.
+    You should have received a copy of the GNU General Public License along
+    with this package; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-On Debian GNU/Linux systems, the complete text of the GNU General
-Public License can be found in `/usr/share/common-licenses/GPL'.
+The Debian packaging is:
 
+    Copyright (C) 2004 David Martínez Moreno <ender@debian.org>
+    Copyright (C) 2010-2011 Pali Rohár <pali.rohar@gmail.com>
+
+and is licensed under the GPL version 2,
+see "/usr/share/common-licenses/GPL-2".

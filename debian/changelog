@@ -1,3 +1,9 @@
+stratagus (2.2.6-1) unstable; urgency=low
+
+  * UNRELEASED
+
+ -- Pali Rohár <pali.rohar@gmail.com>  Mon, 08 Aug 2011 22:00:45 +0200
+
 stratagus (2.2.5.5-1) unstable; urgency=low
 
   * Fixed crashing in OpenGL mode (from Pali Rohar)
@@ -76,7 +82,7 @@ stratagus (2.2.5.1-1) unstable; urgency=low
   * Clean SDL video output before strating movie file (from Pali Rohar)
   * Ported stratagus to Maemo systems - Nokia N900 (from Pali Rohar)
 
- -- Pali Rohár <pali.rohar@gmail.com>  Wed, 23 Jun 2010 15:25 +0200
+ -- Pali Rohár <pali.rohar@gmail.com>  Wed, 23 Jun 2010 15:25:00 +0200
 
 stratagus (2.2.5-1) unstable; urgency=low
 
@@ -585,5 +591,3 @@ ale-clone (1.14.990122-1) unstable; urgency=low
   * Initial Release.
 
  -- Anthony Towns <ajt@debian.org>  Tue,  7 Sep 1999 16:36:50 +1000
-
-  vim:ai:et:sts=2:sw=2:tw=78:

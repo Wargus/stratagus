@@ -47,6 +47,8 @@ Description: Strategy Gaming Engine
  The sound options will depend on your personal election on SDL packages.
 
 Package: stratagus-dbg
+Section: debug
+Priority: extra
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Suggests: stratagus
@@ -81,6 +83,7 @@ Description: Strategy Gaming Engine (debugging symbols)
  This package contains Stratagus binary with debugging symbols.
 
 Package: stratagus-doc
+Section: doc
 Architecture: all
 Suggests: stratagus
 Description: Strategy Gaming Engine (documentation)
