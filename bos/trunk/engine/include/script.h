@@ -112,6 +112,7 @@ extern const char *LuaToString(lua_State *l, int tableIndex, int stringIndex);
 extern int LuaToNumber(lua_State *l, int index);
 extern int LuaToNumber(lua_State *l, int tableIndex, int numberIndex);
 extern bool LuaToBoolean(lua_State *l, int index);
+extern int luatraceback(lua_State *L);
 
 extern void CclGarbageCollect(int fast);    /// Perform garbage collection
 extern void InitCcl(void);                  /// Initialise ccl

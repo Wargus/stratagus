@@ -36,9 +36,16 @@ struct lua_State;
 class LuaCallback
 {
 	lua_State *luastate;
+
+	// Integer key of the callback function in the Lua registry.
 	int luaref;
+
+	// Number of arguments pushed for the function.
 	int arguments;
+
+	// The top of the Lua stack before pushPreamble().
 	int base;
+
 public:
 	LuaCallback(lua_State *lua, lua_Object luaref);
 	virtual ~LuaCallback();

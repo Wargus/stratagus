@@ -58,8 +58,8 @@ LuaCallback::LuaCallback(lua_State *l, lua_Object f) :
 void LuaCallback::pushPreamble() 
 {
 	base = lua_gettop(luastate);
-	lua_getglobal(luastate, "_TRACEBACK");
-	lua_rawgeti(luastate, LUA_REGISTRYINDEX, luaref);
+	lua_pushcfunction(Lua, luatraceback);		  // at base+1
+	lua_rawgeti(luastate, LUA_REGISTRYINDEX, luaref); // at base+2
 	arguments = 0;
 }
 
@@ -98,7 +98,7 @@ void LuaCallback::run()
 	int status;
 
 	 //FIXME call error reporting function
-	status = lua_pcall(luastate, arguments, 0, base);
+	status = lua_pcall(luastate, arguments, 0, base + 1);
 	if (status) {
 		const char *msg;
 		msg = lua_tostring(luastate, -1);
