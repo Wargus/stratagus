@@ -475,6 +475,7 @@ option(WITH_THEORA "Compile Stratagus with Theroa video library" ON)
 option(WITH_X11 "Compile Stratagus with X11 clipboard pasting support" ON)
 
 option(ENABLE_DOC "Generate Stratagus source code documentation with Doxygen" OFF)
+option(ENABLE_DEV "Install Stratagus game development headers files" OFF)
 option(ENABLE_UPX "Compress Stratagus executable binary with UPX packer" OFF)
 
 if(NOT WITH_RENDERER)
@@ -757,6 +758,16 @@ if(WIN32 AND MINGW AND ENABLE_STATIC)
 	set_target_properties(png2stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc")
 endif()
 
+
+########### next target ###############
+
+set(gameheaders_HDRS
+	gameheaders/stratagus-game-installer.nsi
+	gameheaders/stratagus-game-launcher.h
+	gameheaders/stratagus-maemo-extract.h
+)
+source_group(gameheaders FILES ${gameheaders_HDRS})
+
 ########### next target ###############
 
 if(ENABLE_DOC AND DOXYGEN_FOUND)
@@ -830,3 +841,7 @@ if(ENABLE_DOC AND DOXYGEN_FOUND)
 	)
 	install(DIRECTORY doc/graphics doc/scripts ${CMAKE_CURRENT_BINARY_DIR}/doxygen DESTINATION share/doc/stratagus)
 endif(ENABLE_DOC AND DOXYGEN_FOUND)
+
+if(ENABLE_DEV)
+	install(FILES ${gameheaders_HDRS} DESTINATION include)
+endif()
