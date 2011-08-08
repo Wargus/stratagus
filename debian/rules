@@ -36,14 +36,16 @@ clean::
 
 build:
 	mkdir -p build build-dbg
-	cd build && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DENABLE_DOC=ON ..
+	cd build && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DENABLE_DOC=ON -DENABLE_DEV=ON ..
 	cd build-dbg && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug ..
 	$(MAKE) -C build
 	$(MAKE) -C build-dbg
 
+common-binary-indep::
+	$(MAKE) -C build DESTDIR=$(CURDIR)/debian/tmp install
+
 install/stratagus::
-	$(MAKE) -C build DESTDIR=$(CURDIR)/debian/stratagus install
-	convert src/win32/stratagus.ico $(CURDIR)/debian/stratagus/usr/share/pixmaps/stratagus.png
+	convert src/win32/stratagus.ico debian/stratagus/usr/share/pixmaps/stratagus.png
 
 install/stratagus-dbg::
 	$(MAKE) -C build-dbg DESTDIR=$(CURDIR)/debian/stratagus-dbg install
