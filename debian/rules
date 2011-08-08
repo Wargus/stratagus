@@ -27,66 +27,55 @@
 #
 #
 
-include /usr/share/cdbs/1/rules/debhelper.mk
+MAEMO := $(shell if pkg-config maemo-version 1>/dev/null 2>&1 || test -f "/etc/maemo_version" || osso-product-info -q OSSO_PRODUCT_INFO_RELEASE_NAME 2>/dev/null | grep -q -i maemo; then echo YES; fi)
 
-DEB_INSTALL_DOCS_ALL =
+%:
+	dh $@
 
-clean::
-	rm -rf build build-dbg
+override_dh_auto_clean:
+	dh_auto_clean
+	dh_auto_clean --builddirectory=obj-$(DEB_BUILD_GNU_TYPE)-dbg
 
-build:
-	mkdir -p build build-dbg
-	cd build && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DENABLE_DOC=ON -DENABLE_DEV=ON ..
-	cd build-dbg && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug ..
-	$(MAKE) -C build
-	$(MAKE) -C build-dbg
+override_dh_auto_configure:
+	dh_auto_configure -- -DENABLE_DOC=ON -DENABLE_DEV=ON
+	dh_auto_configure --builddirectory=obj-$(DEB_BUILD_GNU_TYPE)-dbg -- -DCMAKE_BUILD_TYPE=Debug
 
-common-binary-indep::
-	$(MAKE) -C build DESTDIR=$(CURDIR)/debian/tmp install
+override_dh_auto_build:
+	dh_auto_build
+	dh_auto_build --builddirectory=obj-$(DEB_BUILD_GNU_TYPE)-dbg
 
-install/stratagus::
+override_dh_install:
+	dh_install
+	dh_auto_install --builddirectory=obj-$(DEB_BUILD_GNU_TYPE)-dbg --destdir=debian/stratagus-dbg
+	rm -f debian/stratagus-dbg/usr/bin/png2stratagus debian/stratagus-dbg/usr/sbin/metaserver
 	convert src/win32/stratagus.ico debian/stratagus/usr/share/pixmaps/stratagus.png
 
-install/stratagus-dbg::
-	$(MAKE) -C build-dbg DESTDIR=$(CURDIR)/debian/stratagus-dbg install
-	rm -f debian/stratagus-dbg/usr/bin/png2stratagus debian/stratagus-dbg/usr/sbin/metaserver
-
-MAEMO := $(shell if pkg-config maemo-version 1>/dev/null 2>&1 || test -f "/etc/maemo_version" || osso-product-info -q OSSO_PRODUCT_INFO_RELEASE_NAME 2>/dev/null | grep -q -i maemo; then echo YES; fi)
+override_dh_strip:
+	dh_strip --dbg-package=stratagus-dbg
 
 ifdef MAEMO
 
-clean::
-	if test -f debian/control.orig; then mv debian/control.orig debian/control; fi
-
-binary-fixup/stratagus::
+override_dh_fixperms:
 	mkdir -p debian/stratagus/opt/stratagus/bin
 	mkdir -p debian/stratagus/opt/man/man6
 	mv debian/stratagus/usr/games/stratagus debian/stratagus/opt/stratagus/bin/
 	mv debian/stratagus/usr/share/man/man6/stratagus.6.gz debian/stratagus/opt/man/man6/
 	ln -s /opt/stratagus/bin/stratagus debian/stratagus/usr/games/stratagus
 	ln -s /opt/man/man6/stratagus.6.gz debian/stratagus/usr/share/man/man6/stratagus.6.gz
+	dh_fixperms
 
-binary-fixup/stratagus-dbg::
-	mkdir -p debian/stratagus-dbg/opt/stratagus/bin
-	mv debian/stratagus-dbg/usr/games/stratagus-dbg debian/stratagus-dbg/opt/stratagus/bin/
-	ln -s /opt/stratagus/bin/stratagus-dbg debian/stratagus-dbg/usr/games/stratagus-dbg
-
-binary-fixup/stratagus-doc::
-	mkdir -p debian/stratagus-doc/opt/stratagus
-	mv debian/stratagus-doc/usr/share/doc/stratagus debian/stratagus-doc/opt/stratagus/doc
-	ln -s /opt/stratagus/doc debian/stratagus-doc/usr/share/doc/stratagus
-
-binary-predeb/stratagus::
-	if test -f debian/control.orig; then mv debian/control.orig debian/control; fi
-	cp debian/control debian/control.orig
-	sed -n -e "1,/^Depends:.*$$/p" debian/control.orig > debian/control
-	sed "/^Package: stratagus$$/a\Section: user\/games" -i debian/control
-	echo "XSBC-Bugtracker: https://bugs.launchpad.net/stratagus" >> debian/control
-	echo "XB-Maemo-Display-Name: Stratagus" >> debian/control
-	echo "XB-Maemo-Icon-26:" >> debian/control
+override_dh_gencontrol:
+	dh_gencontrol
+	cp debian/stratagus/DEBIAN/control debian/stratagus/DEBIAN/control.orig
+	sed -n -e "1,/^Depends:.*$$/p" -i debian/stratagus/DEBIAN/control
+	echo "Bugtracker: https://bugs.launchpad.net/stratagus" >> debian/stratagus/DEBIAN/control
+	echo "Maemo-Display-Name: Stratagus" >> debian/stratagus/DEBIAN/control
+	echo "Maemo-Icon-26:" >> debian/stratagus/DEBIAN/control
 	for line in $(shell convert src/win32/stratagus.ico -resize 48x48 png:- | uuencode -m - | tail -n +2 | head -n -1); do \
-		echo " $$line" >> debian/control; \
+		echo " $$line" >> debian/stratagus/DEBIAN/control; \
 	done
-	sed -n -e "/^Depends:.*$$/,\$$p" debian/control.orig | tail -n +2 >> debian/control
+	sed -n -e "/^Depends:.*$$/,\$$p" debian/stratagus/DEBIAN/control.orig | tail -n +2 >> debian/stratagus/DEBIAN/control
+	sed "s/Section: .*/Section: user\/games/" -i debian/stratagus/DEBIAN/control
+	rm -f debian/stratagus/DEBIAN/control.orig
 
 endif
