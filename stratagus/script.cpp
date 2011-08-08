@@ -142,7 +142,7 @@ static int report(int status, bool exitOnError)
 	return status;
 }
 
-static int luatraceback(lua_State *L) 
+int luatraceback(lua_State *L)
 {
 	lua_pushliteral(L, "debug");
 	lua_gettable(L, LUA_GLOBALSINDEX);
@@ -941,7 +941,6 @@ static bool IsBlacklistedGlobal(const char *key)
 		!strcmp(key, "ipairs") ||
 		!strcmp(key, "loadstring") ||
 		!strcmp(key, "dofile") ||
-		!strcmp(key, "_TRACEBACK") ||
 		!strcmp(key, "_VERSION") ||
 		!strcmp(key, "pairs") ||
 		!strcmp(key, "__pow") ||
