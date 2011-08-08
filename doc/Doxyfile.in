@@ -570,7 +570,7 @@ WARN_LOGFILE           =
 
 INPUT                  = ${CMAKE_CURRENT_SOURCE_DIR}/metaserver \
                          ${CMAKE_CURRENT_SOURCE_DIR}/src \
-                         ${CMAKE_CURRENT_SOURCE_DIR)/gameheaders \
+                         ${CMAKE_CURRENT_SOURCE_DIR}/gameheaders \
                          ${CMAKE_CURRENT_SOURCE_DIR}/tools
 
 # This tag can be used to specify the character encoding of the source files

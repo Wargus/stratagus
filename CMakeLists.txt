@@ -665,6 +665,12 @@ else()
 	message("Doxygen documentation: No (Enable by param -DENABLE_DOC=ON)")
 endif()
 
+if(ENABLE_DEV)
+	message("Game development files: Yes (Disable by param -DENABLE_DEV=OFF)")
+else()
+	message("Game development files: No (Enable by param -DENABLE_DEV=ON)")
+endif()
+
 if(ENABLE_UPX AND SELF_PACKER_FOR_EXECUTABLE)
 	message("Upx packer: Yes (Disable by param -DENABLE_UPX=OFF)")
 else()
