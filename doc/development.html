@@ -76,7 +76,7 @@ the directory and type 'bzr pull'.<p>
 You can find instructions for compiling Stratagus at 
 <a href="install.html">install.html</a>.<br>
 Since you already have a copy of the source, you may skip 
-ahead to step 2.
+ahead to Installation Step 2.
 
 <h2>Source code documentation</h2>
 
@@ -85,9 +85,20 @@ documentation for Stratagus.<p>
 
 You need 
 <a href="http://www.doxygen.org">DoxyGen</a>
-to generate source code documentation. Documentation is generated
-when Stratagus is compiling. After compilation is availabe
-<a href="doxygen/index.html">here</a>
+to generate source code documentation.<p>
+
+Having DoxyGen installed, compile Stratagus with option ENABLE_DOC=ON<br> 
+(e.g, inside build directory, run 'cmake -DENABLE_DOC=ON .. &amp;&amp; make').<p>
+
+Source documents are initially generated inside the build directory, as done for binaries.<p>
+
+After installing stratagus (using 'make install') you can find all these html files in<br>
+<u>share/doc/stratagus</u> directory.<p>
+
+When installing Stratagus html these files are copied into <u>PREFIX/share/stratagus/doc</u>.<br>
+Doxygen documentation is copied into <u>PREFIX/share/stratagus/doc/doxygen</u>.<p>
+
+If you are viewing installed stratagus documentation, Doxygen documentation is here: <a href="doxygen/index.html">doxygen/index.html</a>
 
 <h3>Tags used in source code</h3>
 
