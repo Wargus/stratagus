@@ -837,7 +837,7 @@ if(ENABLE_DOC AND DOXYGEN_FOUND)
 		doc/faq.html
 		doc/gpl.html
 		doc/guichan-copyright.txt
-		doc/ChangeLog.html
+		doc/changelog.html
 		doc/index.html
 		doc/install.html
 		doc/media.html
