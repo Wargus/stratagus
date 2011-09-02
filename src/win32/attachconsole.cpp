@@ -31,74 +31,134 @@
 #include <iostream>
 #endif
 
+static int fixmode = 0;
+
+/// Check if HANDLE is attached to console
+static int WINAPI_CheckIfConsoleHandle(HANDLE handle) {
+
+	wchar_t filename[MAX_PATH];
+	unsigned long int length;
+
+	// Try to get filename of HANDLE
+	NtQueryObject(handle, ObjectNameInformation, filename, MAX_PATH, &length);
+
+	// Filename start at position 8
+	if ( length > 8 )
+		return 0;
+	else
+		return 1;
+
+}
+
+/// Try to reopen FILE* from WINAPI HANDLE
+static void WINAPI_ReopenFileFromHandle(HANDLE handle, FILE * file, const char * mode) {
+
+	int fd;
+	FILE * newfile;
+
+	if ( ! handle || handle == INVALID_HANDLE_VALUE )
+		return;
+
+	// Get file descriptor from HANDLE
+	fd = _open_osfhandle((intptr_t)handle, O_TEXT);
+
+	if ( fd < 0 )
+		return;
+
+	// Get C structure FILE* from file descriptior
+	newfile = _fdopen(fd, mode);
+
+	if ( ! newfile )
+		return;
+
+	// Close current file
+	fclose(file);
+
+	// Set new file from HANDLE
+	*file = *newfile;
+
+	setvbuf(file, NULL, _IONBF, 0);
+
+	// If stdout/stderr write 2 empty lines to cmd console
+	if ( ! fixmode && strcmp(mode, "w") == 0 ) {
+
+		printf("\n\n");
+		fixmode = 1;
+
+	}
+
+}
+
+/// Try to set std HANDLE from FILE*
+static void WINAPI_SetStdHandleFromFile(int type, FILE * file) {
+
+	int fd;
+	HANDLE handle;
+
+	fd = fileno(file);
+
+	if ( fd < 0 )
+		return;
+
+	handle = (HANDLE)_get_osfhandle(fd);
+
+	if ( ! handle || handle == INVALID_HANDLE_VALUE )
+		return;
+
+	SetStdHandle(type, handle);
+
+}
+
 /// Try attach console of parent process for std input/output in Windows NT, 2000, XP or new
 static void WINAPI_AttachConsole(void) {
 
 	OSVERSIONINFO osvi;
-	WCHAR ptr[MAX_PATH];
-	ULONG length;
+	int hasVersion;
+	int version;
+	int attached;
+	int reopen_stdin;
+	int reopen_stdout;
+	int reopen_stderr;
 
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
-	int hasVersion = GetVersionEx(&osvi);
+	hasVersion = GetVersionEx(&osvi);
 
 	if ( ! hasVersion )
 		return;
 
-	int version = 0;
+	version = 0;
 	version |= osvi.dwMinorVersion;
 	version |= osvi.dwMajorVersion << 8;
 
 	if ( version < 0x0500 )
 		return;
 
-	/// Ignore attach console if output is redirected to file
-	NtQueryObject(GetStdHandle(STD_OUTPUT_HANDLE), ObjectNameInformation, ptr, MAX_PATH, &length);
+	// Ignore if HANDLE is not attached console
+	reopen_stdin = WINAPI_CheckIfConsoleHandle(GetStdHandle(STD_INPUT_HANDLE));
+	reopen_stdout = WINAPI_CheckIfConsoleHandle(GetStdHandle(STD_OUTPUT_HANDLE));
+	reopen_stderr = WINAPI_CheckIfConsoleHandle(GetStdHandle(STD_ERROR_HANDLE));
 
-	if ( length >= 8 )
-		return;
-
-	int attached = AttachConsole(ATTACH_PARENT_PROCESS);
+	attached = AttachConsole(ATTACH_PARENT_PROCESS);
 
 	if ( ! attached )
 		return;
 
-	HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
-	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	HANDLE hErr = GetStdHandle(STD_ERROR_HANDLE);
+	if ( reopen_stdin )
+		WINAPI_ReopenFileFromHandle(GetStdHandle(STD_INPUT_HANDLE), stdin, "r");
+	else
+		WINAPI_SetStdHandleFromFile(STD_INPUT_HANDLE, stdin);
 
-	if ( hIn == NULL || hOut == NULL || hErr == NULL )
-		return;
+	if ( reopen_stdout )
+		WINAPI_ReopenFileFromHandle(GetStdHandle(STD_OUTPUT_HANDLE), stdout, "w");
+	else
+		WINAPI_SetStdHandleFromFile(STD_OUTPUT_HANDLE, stdout);
 
-	if ( hIn == INVALID_HANDLE_VALUE || hOut == INVALID_HANDLE_VALUE || hErr == INVALID_HANDLE_VALUE )
-		return;
-
-	int osIn = _open_osfhandle((intptr_t) hIn, O_TEXT);
-	int osOut = _open_osfhandle((intptr_t) hOut, O_TEXT);
-	int osErr = _open_osfhandle((intptr_t) hErr, O_TEXT);
-
-	if ( osIn == -1 || osOut == -1 || osErr == -1 )
-		return;
-
-	FILE * fpIn = _fdopen(osIn, "r");
-	FILE * fpOut = _fdopen(osOut, "w");
-	FILE * fpErr = _fdopen(osErr, "w");
-
-	if ( ! fpIn || ! fpOut || ! fpErr )
-		return;
-
-	fclose(stdin);
-	fclose(stdout);
-	fclose(stderr);
-
-	*stdin = *fpIn;
-	*stdout = *fpOut;
-	*stderr = *fpErr;
-
-	setvbuf(stdin, NULL, _IONBF, 0);
-	setvbuf(stdout, NULL, _IONBF, 0);
-	setvbuf(stderr, NULL, _IONBF, 0);
+	if ( reopen_stderr )
+		WINAPI_ReopenFileFromHandle(GetStdHandle(STD_ERROR_HANDLE), stderr, "w");
+	else
+		WINAPI_SetStdHandleFromFile(STD_ERROR_HANDLE, stderr);
 
 #ifdef __cplusplus
 	std::cin.clear();
@@ -106,8 +166,6 @@ static void WINAPI_AttachConsole(void) {
 	std::cerr.clear();
 	std::ios::sync_with_stdio();
 #endif
-
-	printf("\n\n");
 
 }
 
