@@ -21,6 +21,7 @@
 
 #define WINVER 0x0501
 #include <windows.h>
+#include <winternl.h>
 #include <wincon.h>
 #include <io.h>
 #include <fcntl.h>
@@ -34,6 +35,8 @@
 static void WINAPI_AttachConsole(void) {
 
 	OSVERSIONINFO osvi;
+	WCHAR ptr[MAX_PATH];
+	ULONG length;
 
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -48,6 +51,12 @@ static void WINAPI_AttachConsole(void) {
 	version |= osvi.dwMajorVersion << 8;
 
 	if ( version < 0x0500 )
+		return;
+
+	/// Ignore attach console if output is redirected to file
+	NtQueryObject(GetStdHandle(STD_OUTPUT_HANDLE), ObjectNameInformation, ptr, MAX_PATH, &length);
+
+	if ( length >= 8 )
 		return;
 
 	int attached = AttachConsole(ATTACH_PARENT_PROCESS);
