@@ -94,6 +94,7 @@
 #include "ui.h"
 #include "cursor.h"
 #include "iolib.h"
+#include "map.h"
 
 #include "intern_video.h"
 
@@ -113,6 +114,32 @@ struct Clip {
 	int Y2;                             /// pushed clipping bottom right
 };
 
+class ColorIndexRange
+{
+public:
+	ColorIndexRange(unsigned int begin, unsigned int end) :
+		begin(begin), end(end)
+	{}
+public:
+	unsigned int begin;
+	unsigned int end;
+};
+
+class CColorCycling
+{
+public:
+	CColorCycling() : ColorCycleAll(false)
+	{}
+
+public:
+	std::vector<SDL_Surface*> PaletteList;         /// List of all used palettes.
+	std::vector<ColorIndexRange> ColorIndexRanges; /// List of range of color index for cycling.
+	bool ColorCycleAll;                            /// Flag Color Cycle with all palettes
+};
+
+
+
+
 /*----------------------------------------------------------------------------
 --  Externals
 ----------------------------------------------------------------------------*/
@@ -127,6 +154,7 @@ extern void SdlUnlockScreen();      /// Do SDL hardware unlock
 ----------------------------------------------------------------------------*/
 
 CVideo Video;
+static CColorCycling *ColorCycling = NULL;
 
 char ForceUseOpenGL;
 bool UseOpenGL;                      /// Use OpenGL
@@ -273,6 +301,103 @@ void InitVideo()
 {
 	InitVideoSdl();
 	InitLineDraw();
+	ColorCycling = new CColorCycling;
 }
+
+void DeInitVideo()
+{
+	delete ColorCycling;
+	ColorCycling = NULL;
+}
+
+#if 1 // color cycling
+
+
+/**
+**  Add a surface to the palette list, used for color cycling
+**
+**  @param surface  The SDL surface to add to the list to cycle.
+*/
+void VideoPaletteListAdd(SDL_Surface* surface)
+{
+	std::vector<SDL_Surface*>::iterator it = std::find(ColorCycling->PaletteList.begin(), ColorCycling->PaletteList.end(), surface);
+
+	if (it != ColorCycling->PaletteList.end()) {
+		return ;
+	}
+	ColorCycling->PaletteList.push_back(surface);
+}
+
+/**
+**  Remove a surface to the palette list, used for color cycling
+**
+**  @param surface  The SDL surface to add to the list to cycle.
+*/
+void VideoPaletteListRemove(SDL_Surface* surface)
+{
+	std::vector<SDL_Surface*>::iterator it = std::find(ColorCycling->PaletteList.begin(), ColorCycling->PaletteList.end(), surface);
+
+	if (it != ColorCycling->PaletteList.end()) {
+		ColorCycling->PaletteList.erase(it);
+	}
+}
+
+void ClearAllColorCyclingRange()
+{
+	ColorCycling->ColorIndexRanges.clear();
+}
+
+void AddColorCyclingRange(unsigned int begin, unsigned int end)
+{
+	ColorCycling->ColorIndexRanges.push_back(ColorIndexRange(begin, end));
+}
+
+void SetColorCycleAll(bool value)
+{
+	ColorCycling->ColorCycleAll = value;
+}
+
+/**
+**  Color Cycle for particular surface
+*/
+static void ColorCycleSurface(SDL_Surface &surface)
+{
+	SDL_Color *palcolors = surface.format->palette->colors;
+	SDL_Color colors[256];
+
+	memcpy(colors, palcolors, sizeof (colors));
+	for (std::vector<ColorIndexRange>::const_iterator it = ColorCycling->ColorIndexRanges.begin(); it != ColorCycling->ColorIndexRanges.end(); ++it) {
+		const ColorIndexRange &range = *it;
+
+		memcpy(colors + range.begin, palcolors + range.begin + 1, (range.end - range.begin) * sizeof(SDL_Color));
+		colors[range.end] = palcolors[range.begin];
+	}
+	SDL_SetPalette(&surface, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
+}
+
+/**
+**  Color cycle.
+*/
+// FIXME: cpu intensive to go through the whole PaletteList
+void ColorCycle()
+{
+	/// MACRO defines speed of colorcycling FIXME: should be made configurable
+#define COLOR_CYCLE_SPEED  (CYCLES_PER_SECOND / 4)
+	if ((FrameCounter % COLOR_CYCLE_SPEED) != 0) {
+		return;
+	}
+
+	if (ColorCycling->ColorCycleAll) {
+		for (std::vector<SDL_Surface*>::iterator it = ColorCycling->PaletteList.begin(); it != ColorCycling->PaletteList.end(); ++it) {
+			SDL_Surface *surface = (*it);
+
+			ColorCycleSurface(*surface);
+		}
+	} else if (Map.TileGraphic->Surface->format->BytesPerPixel == 1) {
+		ColorCycleSurface(*Map.TileGraphic->Surface);
+	}
+}
+
+#endif
 
 //@}

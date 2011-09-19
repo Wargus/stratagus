@@ -635,6 +635,10 @@ void CGraphic::Load()
 		ExitFatal(-1);
 	}
 
+	if (Surface->format->BytesPerPixel == 1) {
+		VideoPaletteListAdd(Surface);
+	}
+
 	if (!Width) {
 		Width = GraphicWidth;
 	}
@@ -671,7 +675,9 @@ static void FreeSurface(SDL_Surface **surface)
 	if (!*surface) {
 		return;
 	}
-
+	if ((*surface)->format->BytesPerPixel == 1) {
+		VideoPaletteListRemove(*surface);
+	}
 	unsigned char *pixels = NULL;
 
 	if ((*surface)->flags & SDL_PREALLOC) {
@@ -791,35 +797,34 @@ void ReloadGraphics()
 */
 void CGraphic::Flip()
 {
-	if (UseOpenGL) 	return;
-	int i;
-	int j;
-	SDL_Surface *s;
-
+	if (UseOpenGL) {
+		return;
+	}
 	if (SurfaceFlip) {
 		return;
 	}
 
-	s = SurfaceFlip = SDL_ConvertSurface(Surface, Surface->format, SDL_SWSURFACE);
+	SDL_Surface *s = SurfaceFlip = SDL_ConvertSurface(Surface, Surface->format, SDL_SWSURFACE);
 	if (Surface->flags & SDL_SRCCOLORKEY) {
-		SDL_SetColorKey(SurfaceFlip, SDL_SRCCOLORKEY | SDL_RLEACCEL,
-			Surface->format->colorkey);
+		SDL_SetColorKey(SurfaceFlip, SDL_SRCCOLORKEY | SDL_RLEACCEL, Surface->format->colorkey);
 	}
-
+	if (SurfaceFlip->format->BytesPerPixel == 1) {
+		VideoPaletteListAdd(SurfaceFlip);
+	}
 	SDL_LockSurface(Surface);
 	SDL_LockSurface(s);
 	switch (s->format->BytesPerPixel) {
 		case 1:
-			for (i = 0; i < s->h; ++i) {
-				for (j = 0; j < s->w; ++j) {
+			for (int i = 0; i < s->h; ++i) {
+				for (int j = 0; j < s->w; ++j) {
 					((char *)s->pixels)[j + i * s->pitch] =
 						((char *)Surface->pixels)[s->w - j - 1 + i * Surface->pitch];
 				}
 			}
 			break;
 		case 3:
-			for (i = 0; i < s->h; ++i) {
-				for (j = 0; j < s->w; ++j) {
+			for (int i = 0; i < s->h; ++i) {
+				for (int j = 0; j < s->w; ++j) {
 					memcpy(&((char *)s->pixels)[j + i * s->pitch],
 						&((char *)Surface->pixels)[(s->w - j - 1) * 3 + i * Surface->pitch], 3);
 				}
@@ -829,13 +834,13 @@ void CGraphic::Flip()
 		{
 			unsigned int p0 = s->pitch;
 			unsigned int p1 = Surface->pitch;
-			const int width =  s->w;
+			const int width = s->w;
 #ifndef _MSC_VER
-			j = 0;
+			int j = 0;
 #endif
-			for (i = 0; i < s->h; ++i) {
+			for (int i = 0; i < s->h; ++i) {
 #ifdef _MSC_VER
-				for (j = 0; j < width; ++j) {
+				for (int j = 0; j < width; ++j) {
 					*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
 						*(Uint32 *)&((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
 				}
@@ -1227,10 +1232,16 @@ void CGraphic::Resize(int w, int h)
 		}
 
 		SDL_UnlockSurface(Surface);
+		if (Surface->format->BytesPerPixel == 1) {
+			VideoPaletteListRemove(Surface);
+		}
 		memcpy(pal, Surface->format->palette->colors, sizeof(SDL_Color) * 256);
 		SDL_FreeSurface(Surface);
 
 		Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8, w, 0, 0, 0, 0);
+		if (Surface->format->BytesPerPixel == 1) {
+			VideoPaletteListAdd(Surface);
+		}
 		SDL_SetPalette(Surface, SDL_LOGPAL | SDL_PHYSPAL, pal, 0, 256);
 	} else {
 		int ix, iy;

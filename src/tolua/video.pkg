@@ -45,3 +45,6 @@ class CColor {
 	unsigned char A;
 };
 
+void SetColorCycleAll(bool value);
+void ClearAllColorCyclingRange();
+void AddColorCyclingRange(unsigned int startColorIndex, unsigned int endColorIndex);

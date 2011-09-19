@@ -381,6 +381,9 @@ extern bool UseGLTextureCompression;
 	/// initialize the video part
 extern void InitVideo();
 
+	/// deinitliaize the video part
+void DeInitVideo();
+
 	/// Check if a resolution is valid
 extern int VideoValidResolution(int w, int h);
 
@@ -484,6 +487,19 @@ extern PFNGLCOMPRESSEDTEXSUBIMAGE2DARBPROC glCompressedTexSubImage2DARB;
 extern PFNGLCOMPRESSEDTEXSUBIMAGE1DARBPROC glCompressedTexSubImage1DARB;
 extern PFNGLGETCOMPRESSEDTEXIMAGEARBPROC   glGetCompressedTexImageARB;
 #endif
+
+//
+//  Color Cycling stuff
+//
+
+extern void VideoPaletteListAdd(SDL_Surface* surface);
+extern void VideoPaletteListRemove(SDL_Surface* surface);
+extern void ClearAllColorCyclingRange();
+extern void AddColorCyclingRange(unsigned int begin, unsigned int end);
+extern void SetColorCycleAll(bool value);
+
+/// Does ColorCycling..
+extern void ColorCycle();
 
 //@}
 
