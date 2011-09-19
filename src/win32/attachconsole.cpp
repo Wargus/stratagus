@@ -19,10 +19,7 @@
 
 #if ( defined(WIN32) || defined(_MSC_VER) ) && ( defined(NO_STDIO_REDIRECT) || ! defined(REDIRECT_OUTPUT) )
 
-#define WINVER 0x0501
 #include <windows.h>
-#include <winternl.h>
-#include <wincon.h>
 #include <io.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -33,14 +30,21 @@
 
 static int fixmode = 0;
 
+static HINSTANCE lib_kernel32 = NULL;
+static HINSTANCE lib_ntdll = NULL;
+
+static int (*func_AttachConsole)(int) = NULL;
+static int (*func_NtQueryObject)(HANDLE, int, void *, unsigned long int, unsigned long int *) = NULL;
+
 /// Check if HANDLE is attached to console
 static int WINAPI_CheckIfConsoleHandle(HANDLE handle) {
 
 	wchar_t filename[MAX_PATH];
-	unsigned long int length;
+	unsigned long int length = 0;
 
 	// Try to get filename of HANDLE
-	NtQueryObject(handle, ObjectNameInformation, filename, MAX_PATH, &length);
+	if ( func_NtQueryObject )
+		func_NtQueryObject(handle, 1, filename, MAX_PATH, &length);
 
 	// Filename start at position 8
 	if ( length > 8 )
@@ -82,7 +86,7 @@ static void WINAPI_ReopenFileFromHandle(HANDLE handle, FILE * file, const char *
 	// If stdout/stderr write 2 empty lines to cmd console
 	if ( ! fixmode && strcmp(mode, "w") == 0 ) {
 
-		printf("\n\n");
+		fprintf(file, "\n\n");
 		fixmode = 1;
 
 	}
@@ -128,19 +132,33 @@ static void WINAPI_AttachConsole(void) {
 	if ( ! hasVersion )
 		return;
 
-	version = 0;
-	version |= osvi.dwMinorVersion;
-	version |= osvi.dwMajorVersion << 8;
+	version = ( osvi.dwMajorVersion << 8 ) | osvi.dwMinorVersion;
 
+	// We need Windows 2000 or new
 	if ( version < 0x0500 )
 		return;
+
+	lib_kernel32 = LoadLibrary("kernel32.dll");
+
+	if ( ! lib_kernel32 )
+		return;
+
+	func_AttachConsole = (int(*)(int))GetProcAddress(lib_kernel32, "AttachConsole");
+
+	if ( ! func_AttachConsole )
+		return;
+
+	lib_ntdll = LoadLibrary("ntdll.dll");
+
+	if ( lib_ntdll )
+		func_NtQueryObject = (int(*)(HANDLE, int, void *, unsigned long int, unsigned long int *))GetProcAddress(lib_ntdll, "NtQueryObject");
 
 	// Ignore if HANDLE is not attached console
 	reopen_stdin = WINAPI_CheckIfConsoleHandle(GetStdHandle(STD_INPUT_HANDLE));
 	reopen_stdout = WINAPI_CheckIfConsoleHandle(GetStdHandle(STD_OUTPUT_HANDLE));
 	reopen_stderr = WINAPI_CheckIfConsoleHandle(GetStdHandle(STD_ERROR_HANDLE));
 
-	attached = AttachConsole(ATTACH_PARENT_PROCESS);
+	attached = func_AttachConsole((int)-1);
 
 	if ( ! attached )
 		return;
