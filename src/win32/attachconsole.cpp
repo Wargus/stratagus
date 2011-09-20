@@ -33,8 +33,11 @@ static int fixmode = 0;
 static HINSTANCE lib_kernel32 = NULL;
 static HINSTANCE lib_ntdll = NULL;
 
-static int (*func_AttachConsole)(int) = NULL;
-static int (*func_NtQueryObject)(HANDLE, int, void *, unsigned long int, unsigned long int *) = NULL;
+typedef int FAR WINAPI AttachConsole_Proto(int);
+typedef int FAR WINAPI NtQueryObject_Proto(HANDLE, int, void *, unsigned long int, unsigned long int *);
+
+static AttachConsole_Proto* func_AttachConsole = NULL;
+static NtQueryObject_Proto* func_NtQueryObject = NULL;
 
 /// Check if HANDLE is attached to console
 static int WINAPI_CheckIfConsoleHandle(HANDLE handle) {
@@ -99,7 +102,7 @@ static void WINAPI_SetStdHandleFromFile(int type, FILE * file) {
 	int fd;
 	HANDLE handle;
 
-	fd = fileno(file);
+	fd = _fileno(file);
 
 	if ( fd < 0 )
 		return;
@@ -143,7 +146,7 @@ static void WINAPI_AttachConsole(void) {
 	if ( ! lib_kernel32 )
 		return;
 
-	func_AttachConsole = (int(*)(int))GetProcAddress(lib_kernel32, "AttachConsole");
+	func_AttachConsole = reinterpret_cast<AttachConsole_Proto*>(GetProcAddress(lib_kernel32, "AttachConsole"));
 
 	if ( ! func_AttachConsole )
 		return;
@@ -151,7 +154,7 @@ static void WINAPI_AttachConsole(void) {
 	lib_ntdll = LoadLibrary("ntdll.dll");
 
 	if ( lib_ntdll )
-		func_NtQueryObject = (int(*)(HANDLE, int, void *, unsigned long int, unsigned long int *))GetProcAddress(lib_ntdll, "NtQueryObject");
+		func_NtQueryObject = reinterpret_cast<NtQueryObject_Proto*>(GetProcAddress(lib_ntdll, "NtQueryObject"));
 
 	// Ignore if HANDLE is not attached console
 	reopen_stdin = WINAPI_CheckIfConsoleHandle(GetStdHandle(STD_INPUT_HANDLE));
