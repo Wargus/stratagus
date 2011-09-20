@@ -127,14 +127,27 @@ public:
 
 class CColorCycling
 {
-public:
+private:
 	CColorCycling() : ColorCycleAll(false)
 	{}
 
+	static void CreateInstanceIfNeeded()
+	{
+		if (s_instance == NULL)
+			s_instance = new CColorCycling;
+	}
+
+public:
+	static CColorCycling& GetInstance() { CreateInstanceIfNeeded(); return *s_instance; }
+
+	static void ReleaseInstance() { delete s_instance; s_instance = NULL; }
 public:
 	std::vector<SDL_Surface*> PaletteList;         /// List of all used palettes.
 	std::vector<ColorIndexRange> ColorIndexRanges; /// List of range of color index for cycling.
 	bool ColorCycleAll;                            /// Flag Color Cycle with all palettes
+
+private:
+	static CColorCycling* s_instance;
 };
 
 
@@ -154,7 +167,7 @@ extern void SdlUnlockScreen();      /// Do SDL hardware unlock
 ----------------------------------------------------------------------------*/
 
 CVideo Video;
-static CColorCycling *ColorCycling = NULL;
+/*static*/ CColorCycling *CColorCycling::s_instance = NULL;
 
 char ForceUseOpenGL;
 bool UseOpenGL;                      /// Use OpenGL
@@ -301,13 +314,11 @@ void InitVideo()
 {
 	InitVideoSdl();
 	InitLineDraw();
-	ColorCycling = new CColorCycling;
 }
 
 void DeInitVideo()
 {
-	delete ColorCycling;
-	ColorCycling = NULL;
+	CColorCycling::ReleaseInstance();
 }
 
 #if 1 // color cycling
@@ -320,12 +331,13 @@ void DeInitVideo()
 */
 void VideoPaletteListAdd(SDL_Surface* surface)
 {
-	std::vector<SDL_Surface*>::iterator it = std::find(ColorCycling->PaletteList.begin(), ColorCycling->PaletteList.end(), surface);
+	CColorCycling &colorCycling = CColorCycling::GetInstance();
+	std::vector<SDL_Surface*>::iterator it = std::find(colorCycling.PaletteList.begin(), colorCycling.PaletteList.end(), surface);
 
-	if (it != ColorCycling->PaletteList.end()) {
+	if (it != colorCycling.PaletteList.end()) {
 		return ;
 	}
-	ColorCycling->PaletteList.push_back(surface);
+	colorCycling.PaletteList.push_back(surface);
 }
 
 /**
@@ -335,26 +347,27 @@ void VideoPaletteListAdd(SDL_Surface* surface)
 */
 void VideoPaletteListRemove(SDL_Surface* surface)
 {
-	std::vector<SDL_Surface*>::iterator it = std::find(ColorCycling->PaletteList.begin(), ColorCycling->PaletteList.end(), surface);
+	CColorCycling &colorCycling = CColorCycling::GetInstance();
+	std::vector<SDL_Surface*>::iterator it = std::find(colorCycling.PaletteList.begin(), colorCycling.PaletteList.end(), surface);
 
-	if (it != ColorCycling->PaletteList.end()) {
-		ColorCycling->PaletteList.erase(it);
+	if (it != colorCycling.PaletteList.end()) {
+		colorCycling.PaletteList.erase(it);
 	}
 }
 
 void ClearAllColorCyclingRange()
 {
-	ColorCycling->ColorIndexRanges.clear();
+	CColorCycling::GetInstance().ColorIndexRanges.clear();
 }
 
 void AddColorCyclingRange(unsigned int begin, unsigned int end)
 {
-	ColorCycling->ColorIndexRanges.push_back(ColorIndexRange(begin, end));
+	CColorCycling::GetInstance().ColorIndexRanges.push_back(ColorIndexRange(begin, end));
 }
 
 void SetColorCycleAll(bool value)
 {
-	ColorCycling->ColorCycleAll = value;
+	CColorCycling::GetInstance().ColorCycleAll = value;
 }
 
 /**
@@ -364,9 +377,10 @@ static void ColorCycleSurface(SDL_Surface &surface)
 {
 	SDL_Color *palcolors = surface.format->palette->colors;
 	SDL_Color colors[256];
+	CColorCycling &colorCycling = CColorCycling::GetInstance();
 
 	memcpy(colors, palcolors, sizeof (colors));
-	for (std::vector<ColorIndexRange>::const_iterator it = ColorCycling->ColorIndexRanges.begin(); it != ColorCycling->ColorIndexRanges.end(); ++it) {
+	for (std::vector<ColorIndexRange>::const_iterator it = colorCycling.ColorIndexRanges.begin(); it != colorCycling.ColorIndexRanges.end(); ++it) {
 		const ColorIndexRange &range = *it;
 
 		memcpy(colors + range.begin, palcolors + range.begin + 1, (range.end - range.begin) * sizeof(SDL_Color));
@@ -386,9 +400,9 @@ void ColorCycle()
 	if ((FrameCounter % COLOR_CYCLE_SPEED) != 0) {
 		return;
 	}
-
-	if (ColorCycling->ColorCycleAll) {
-		for (std::vector<SDL_Surface*>::iterator it = ColorCycling->PaletteList.begin(); it != ColorCycling->PaletteList.end(); ++it) {
+	CColorCycling &colorCycling = CColorCycling::GetInstance();
+	if (colorCycling.ColorCycleAll) {
+		for (std::vector<SDL_Surface*>::iterator it = colorCycling.PaletteList.begin(); it != colorCycling.PaletteList.end(); ++it) {
 			SDL_Surface *surface = (*it);
 
 			ColorCycleSurface(*surface);
