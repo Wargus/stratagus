@@ -415,6 +415,7 @@ void AiInit(CPlayer *player)
 {
 	PlayerAi *pai;
 	CAiType *ait;
+	CAiType *passive = NULL;
 	size_t i;
 
 	pai = new PlayerAi;
@@ -437,31 +438,44 @@ void AiInit(CPlayer *player)
 	//
 	if (AiTypes.empty())
 	{
-		DebugPrint("AI: Got no scripts at all! You need at least one dummy fallback script.\n");
-		DebugPrint("AI: Look at the DefineAi() documentation.\n");
-		Exit(0);
+		fprintf(stderr, "AI: Got no scripts at all! You need at least the \"ai-passive\" fallback script.\n");
+		fprintf(stderr, "AI: Look at the DefineAi() documentation.\n");
+		Exit(1);
 	}
 	for (i = 0; i < AiTypes.size(); ++i)
 	{
 		ait = AiTypes[i];
-		if (!player->AiName.empty() && ait->Name != player->AiName)
+		if (player->AiName.empty() || ait->Name == player->AiName)
 		{
-			continue;
+			break;
 		}
-		break;
+
+		if (ait->Name == "ai-passive")
+		{
+			passive = ait;
+		}
 	}
 	if (i == AiTypes.size())
 	{
-		DebugPrint("AI: Found no matching ai scripts at all!\n");
-		// FIXME: surely we can do something better than exit
-		exit(0);
+		DebugPrint("AI: Script \"%s\" not found!\n" _C_
+			   player->AiName.c_str());
+
+		// Fall back to the passive script only, because it
+		// does not require any kind of saved AI state.
+		// Furthermore, it does not alter the existing AI
+		// state, so the game can be saved with this fallback
+		// and then loaded into a build that does support the
+		// correct script.
+		if (passive == NULL)
+		{
+			fprintf(stderr, "AI: Script \"ai-passive\" not found either!  Cannot continue.\n");
+			Exit(1);
+		}
+
+		ait = passive;
+		DebugPrint("AI: Using fallback \"%s\".\n" _C_
+			   ait->Name.c_str());
 	}
-	if (player->AiName.empty())
-	{
-		DebugPrint("AI: not found!!!!!!!!!!\n");
-		DebugPrint("AI: Using fallback:\n");
-	}
-	DebugPrint("AI: %s\n" _C_ ait->Name.c_str());
 
 	pai->AiType = ait;
 	player->Ai = pai;

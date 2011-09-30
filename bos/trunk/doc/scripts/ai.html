@@ -89,7 +89,8 @@ This defines how a special AI works. Each level can use his own AI definition.
 Unique, language-independent name of this AI definition.
 By convention, each name should begin with "ai-".
 The map setup file sets e.g. <code>Players[1].AiName = "ai-blitz"</code>
-and the engine then finds the AI definition whose name is that string.
+and the engine then finds the AI definition whose name is that string;
+or if no such AI definition exists, the engine falls back to "ai-passive".
 In saved games, these names are used in
 the "ai-type" parameter of <a href="savegame.html#DefineAiPlayer">DefineAiPlayer</a>
 and the "ai-name" parameter of <a href="savegame.html#Player">Player</a>.
