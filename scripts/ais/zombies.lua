@@ -156,5 +156,5 @@ function AiZombies()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("zombies", "zombies", AiZombies, InitAiScripts_zombies)
+RegisterAi("zombies", _("Zombies"), AiZombies, InitAiScripts_zombies)
 

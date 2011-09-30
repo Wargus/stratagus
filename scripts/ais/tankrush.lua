@@ -154,5 +154,5 @@ function AiTankRush()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("tankrush", "tankrush", AiTankRush, InitAiScripts_tankrush)
+RegisterAi("tankrush", _("Tank rush"), AiTankRush, InitAiScripts_tankrush)
 

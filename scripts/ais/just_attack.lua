@@ -100,6 +100,6 @@ function AiJustAttack()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("just_attack", "just_attack", AiJustAttack,
+RegisterAi("just_attack", _("Just attack"), AiJustAttack,
            InitAiScripts_just_attack)
 

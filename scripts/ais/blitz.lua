@@ -195,7 +195,7 @@ function AiBlitz()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("blitz", "blitz", AiBlitz, InitAiScripts_blitz)
+RegisterAi("blitz", _("Blitz"), AiBlitz, InitAiScripts_blitz)
 
 
 

@@ -158,5 +158,5 @@ function AiRush()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("rush", "rush", AiRush, InitAiScripts_rush)
+RegisterAi("rush", _("Rush"), AiRush, InitAiScripts_rush)
 
