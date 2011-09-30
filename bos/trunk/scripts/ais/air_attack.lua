@@ -95,6 +95,6 @@ function AiAirAttack()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("air_attack", "air_attack", AiAirAttack, 
+RegisterAi("air_attack", _("Air attack"), AiAirAttack, 
            InitAiScripts_air_attack)
 

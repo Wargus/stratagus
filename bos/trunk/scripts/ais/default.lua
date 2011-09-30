@@ -186,5 +186,5 @@ function AiDefault()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("default", "default", AiDefault, InitAiScripts_default)
+RegisterAi("default", _("Default"), AiDefault, InitAiScripts_default)
 

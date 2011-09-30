@@ -137,6 +137,6 @@ function AiNaval()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("naval", "naval", AiNaval,
+RegisterAi("naval", _("Naval"), AiNaval,
            InitAiScripts_naval)
 

@@ -283,5 +283,5 @@ function AiBroke()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("broke", "broke", AiBroke, InitAiScripts_broke)
+RegisterAi("broke", _("Broke"), AiBroke, InitAiScripts_broke)
 

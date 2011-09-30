@@ -31,5 +31,5 @@
 function AiPassive()
 end
 
-RegisterAi("passive", "passive", AiPassive)
+RegisterAi("passive", _("Passive"), AiPassive)
 
