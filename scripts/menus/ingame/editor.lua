@@ -203,15 +203,14 @@ function RunEditorPlayerPropertiesMenu()
   l:adjustSize()
   menu:add(l, 210, 40 + (22 * 0))
 
-  local aiiname
-  local types = {}
-  local itypes = {}
-  local ainametonum = {}
+  local types = {}		-- key >= 1; value = name
+  local itypes = {}		-- key >= 0; value = internal_name
+  local ainametonum = {}	-- key = internal_name; value >= 0
   local i = 1
   local ailist = GetAiList()
   for aiiname,x in pairs(ailist) do
-    types[i] = ailist[aiiname][1]
-    ainametonum["ai-" .. aiiname] = i - 1
+    types[i] = ailist[aiiname][2]
+    ainametonum[aiiname] = i - 1
     itypes[i - 1] = aiiname
     i = i + 1
   end
@@ -267,7 +266,7 @@ function RunEditorPlayerPropertiesMenu()
 
       for i=0,7 do
         Map.Info.PlayerType[i] = pt2[typeWidgets[i]:getSelected()]
-        Players[i].AiName = "ai-" .. itypes[aiWidgets[i]:getSelected()]
+        Players[i].AiName = itypes[aiWidgets[i]:getSelected()]
         Players[i].EnergyStored = tonumber(energyWidgets[i]:getText())
         Players[i].MagmaStored = tonumber(magmaWidgets[i]:getText())
       end
