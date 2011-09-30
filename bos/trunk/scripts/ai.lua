@@ -30,6 +30,7 @@
 -- The list of registered AIs in BOS
 -- Every AI has an entry name: {internal_name, name, fun, initfun}
 -- See at RegisterAi() for a description what these are
+-- internal_name is also the key of the entry in AiList.
 local AiList = {}
 
 function GetAiList()
@@ -43,8 +44,9 @@ end
 -- fun           : main AI function
 -- initfun       : initialization function, can be omitted
 function RegisterAi(internal_name, name, fun, initfun)
-  DefineAi("ai-" .. internal_name, fun)
-  AiList[name] = {internal_name, name, fun, initfun}
+  internal_name = "ai-" .. internal_name
+  DefineAi(internal_name, fun)
+  AiList[internal_name] = {internal_name, name, fun, initfun}
 end
 
 -- This call examines the buttons that were defined with DefineButton
