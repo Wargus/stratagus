@@ -172,7 +172,9 @@ function RunEditorPlayerPropertiesMenu()
 
   menu:addLabel(_("Player Properties"), 500 / 2, 11)
 
-  for i=0,7 do
+  local LastEditablePlayer = 7
+
+  for i=0,LastEditablePlayer do
     local l = Label(tostring(i))
     l:setFont(Fonts["game"])
     l:adjustSize()
@@ -189,7 +191,7 @@ function RunEditorPlayerPropertiesMenu()
   local pt =  { 5, 4, 5, 1, 0, 2, 3 }; pt[0] = 5
   local pt2 = { 4, 6, 7, 2, 3 }; pt2[0] = 5
   local typeWidgets = {}
-  for i=0,7 do
+  for i=0,LastEditablePlayer do
     local d = menu:addDropDown(types, 50, 40 + (22 * (i + 1)),
       function() end)
     d:getListBox():setWidth(150)
@@ -214,8 +216,22 @@ function RunEditorPlayerPropertiesMenu()
     itypes[i - 1] = aiiname
     i = i + 1
   end
+
+  -- If any players have AI types that this version does not support,
+  -- then add them to the list, so that the editor will at least
+  -- display them and save them back as they were.
+  for i=0,LastEditablePlayer do
+    local internal_name = Players[i].AiName
+    if ainametonum[internal_name] == nil then
+      local name = internal_name .. _(" (unsupported)")
+      types[#types + 1] = name
+      itypes[#itypes + 1] = internal_name
+      ainametonum[internal_name] = #itypes
+    end
+  end
+
   local aiWidgets = {}
-  for i=0,7 do
+  for i=0,LastEditablePlayer do
     local d = menu:addDropDown(types, 210, 40 + (22 * (i + 1)),
       function(dd) end)
     d:setSelected(ainametonum[Players[i].AiName])
@@ -230,7 +246,7 @@ function RunEditorPlayerPropertiesMenu()
   menu:add(l, 340, 40 + (22 * 0))
 
   local energyWidgets = {}
-  for i=0,7 do
+  for i=0,LastEditablePlayer do
     local d = menu:addTextInputField("" .. Players[i].EnergyStored,
       340, 40 + (22 * (i + 1)), 60)
     energyWidgets[i] = d
@@ -242,7 +258,7 @@ function RunEditorPlayerPropertiesMenu()
   menu:add(l, 410, 40 + (22 * 0))
 
   local magmaWidgets = {}
-  for i=0,7 do
+  for i=0,LastEditablePlayer do
     local d = menu:addTextInputField("" .. Players[i].MagmaStored,
       410, 40 + (22 * (i + 1)), 60)
     magmaWidgets[i] = d
@@ -252,7 +268,7 @@ function RunEditorPlayerPropertiesMenu()
     function()
       -- Check for at least 1 Person player type
       local foundPlayer = false
-      for i=0,7 do
+      for i=0,LastEditablePlayer do
         if (pt2[typeWidgets[i]:getSelected()] == 5) then
           foundPlayer = true
           break
@@ -264,7 +280,7 @@ function RunEditorPlayerPropertiesMenu()
         return
       end
 
-      for i=0,7 do
+      for i=0,LastEditablePlayer do
         Map.Info.PlayerType[i] = pt2[typeWidgets[i]:getSelected()]
         Players[i].AiName = itypes[aiWidgets[i]:getSelected()]
         Players[i].EnergyStored = tonumber(energyWidgets[i]:getText())
