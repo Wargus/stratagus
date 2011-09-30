@@ -91,10 +91,10 @@ local ai_funcs = {
   function() return AiSleep((SyncRand(60)+40)*GameSettings.Difficulty) end, 
 }
 
-function AiAttackDefense()
+function AiAirAttack()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("air_attack", "air_attack", AiAttackDefense, 
+RegisterAi("air_attack", "air_attack", AiAirAttack, 
            InitAiScripts_air_attack)
 
