@@ -56,6 +56,7 @@
  * For comments regarding functions please see the header file. 
  */
 
+#include <limits>
 #include "guichan/keyinput.h"
 #include "guichan/mouseinput.h"
 #include "guichan/widgets/textfield.h"
@@ -69,6 +70,7 @@ namespace gcn
         mCaretPosition = 0;
         mXScroll = 0;
         mSelectStart = 0;
+        mMaxLengthBytes = std::numeric_limits<int>::max();
 
         setFocusable(true);
 
@@ -83,8 +85,11 @@ namespace gcn
         mCaretPosition = 0;
         mXScroll = 0;
         mSelectStart = 0;
+        mMaxLengthBytes = std::numeric_limits<int>::max();
 
         mText = text;
+        // std::string::max_size() might exceed std::numeric_limits<int>::max().
+        truncateToMaxLength();
         adjustSize();
         setBorderSize(1);
         
@@ -96,14 +101,10 @@ namespace gcn
 
     void TextField::setText(const std::string& text)
     {
-        if ((int)text.size() < mCaretPosition )
-        {
-            mCaretPosition = text.size();
-        }
-    
+        mText = text;
+        truncateToMaxLength();
         mSelectStart = mCaretPosition;
-
-        mText = text;    
+        setDirty(true);
     }
   
     void TextField::draw(Graphics* graphics)
@@ -191,9 +192,10 @@ namespace gcn
         {
             std::string str;
             if (GetClipboard(str) >= 0) {
-                for (size_t i = 0; i < str.size(); ++i) {
-                    keyPress(Key(str[i]));
-                }
+                // GetClipboard ensures that the string does not
+                // contain control characters.
+                insertAtCaret(str);
+                fixScroll();
             }
         }
     }
@@ -319,36 +321,20 @@ namespace gcn
         {
             std::string str;
 
-            if (selLen > 0) {
-                mText.erase(selFirst, selLen);
-                mCaretPosition = selFirst;
-                mSelectStart = selFirst;
-            }
-
             if (GetClipboard(str) >= 0) {
-                for (size_t i = 0; i < str.size(); ++i) {
-                    keyPress(Key(str[i]));
-                }
+                // GetClipboard ensures that the string does not
+                // contain control characters.
+                insertAtCaret(str);
             }
 
+            // Even if GetClipboard failed, we did recognize the key
+            // and the caller should not treat it as a hot key.
             ret = true;
         }
 
         else if (key.isCharacter())
         {
-            if (selLen > 0) {
-                mText.erase(selFirst, selLen);
-                mCaretPosition = selFirst;
-                mSelectStart = selFirst;
-            }
-
-            mText.insert(mCaretPosition,key.toString());
-            int newpos = UTF8GetNext(mText, mCaretPosition);
-            if (newpos > (int)mText.size()) {
-                throw GCN_EXCEPTION("Invalid UTF8.");
-            }
-            mCaretPosition = newpos;
-            mSelectStart = newpos;
+            insertAtCaret(key.toString());
             ret = true;
         }
 
@@ -433,5 +419,132 @@ namespace gcn
     void TextField::fontChanged()
     {
         fixScroll();
+    }
+
+    int TextField::getMaxLengthBytes() const
+    {
+        return mMaxLengthBytes;
+    }
+
+    void TextField::setMaxLengthBytes(int maxLengthBytes)
+    {
+        if (maxLengthBytes < 0)
+        {
+            maxLengthBytes = 0;
+        }
+
+        mMaxLengthBytes = maxLengthBytes;
+        truncateToMaxLength();
+    }
+
+    void TextField::truncateToMaxLength()
+    {
+        bool changedSomething = false;
+
+        // Because we never let mMaxLengthBytes become negative,
+        // the following static_cast cannot wrap around.
+        if (mText.size() > static_cast<unsigned int>(mMaxLengthBytes))
+        {
+            int newLength = UTF8LastCharacterBoundary(mText, mMaxLengthBytes);
+            mText.resize(newLength);
+            changedSomething = true;
+        }
+
+        // Because of mMaxLengthBytes, the following static_casts
+        // cannot overflow.
+        if (mCaretPosition > static_cast<int>(mText.size()))
+        {
+            mCaretPosition = mText.size();
+            changedSomething = true;
+        }
+        if (mSelectStart > static_cast<int>(mText.size()))
+        {
+            mSelectStart = mText.size();
+            changedSomething = true;
+        }
+
+        if (changedSomething)
+        {
+            fixScroll();
+            setDirty(true);
+        }
+    }
+
+    int TextField::UTF8LastCharacterBoundary(const std::string &str,
+                                             int maxBytes)
+    {
+        if (maxBytes < 0)
+        {
+            // A bug in the caller.
+            maxBytes = 0;
+        }
+
+        // The following static_cast cannot wrap around because
+        // maxBytes cannot be negative at this point.
+        if (str.size() < static_cast<unsigned int>(maxBytes))
+        {
+            // The following static_cast cannot overflow because
+            // str.size() is less than int maxBytes.
+            maxBytes = static_cast<int>(str.size());
+        }
+
+        if (maxBytes == 0)
+        {
+            // There is no space for any character.
+            return 0;
+        }
+
+        // The following would be easy to implement as:
+        //   return UTF8GetPrev(str, maxBytes + 1);
+        // but maxBytes + 1 might overflow, so don't do that.
+
+        // Find the previous character boundary.
+        int prev = UTF8GetPrev(str, maxBytes);
+        // Assert(prev < maxBytes);
+
+        // If maxBytes already is at a character
+        // boundary, then that character will fit.
+        int next = UTF8GetNext(str, prev);
+        if (next == maxBytes)
+        {
+            return maxBytes;
+        }
+        else
+        {
+            return prev;
+        }
+    }
+
+    void TextField::insertAtCaret(const std::string& str)
+    {
+        int bytesFree = mMaxLengthBytes - mText.size();
+        if (bytesFree < 0)
+        {
+            bytesFree = 0;
+        }
+
+        int bytesToCopy;
+        if (str.size() > static_cast<unsigned int>(bytesFree))
+        {
+            bytesToCopy = UTF8LastCharacterBoundary(str, bytesFree);
+        }
+        else
+        {
+            bytesToCopy = static_cast<int>(str.size());
+        }
+
+        unsigned int selFirst;
+        unsigned int selLen;
+        getTextSelectionPositions(&selFirst, &selLen);
+        if (selLen > 0) {
+            mText.erase(selFirst, selLen);
+            mCaretPosition = selFirst;
+            mSelectStart = selFirst;
+        }
+
+        mText.insert(mCaretPosition, str, 0, bytesToCopy);
+        mCaretPosition += bytesToCopy;
+        mSelectStart = mCaretPosition;
+        setDirty(true);
     }
 }
