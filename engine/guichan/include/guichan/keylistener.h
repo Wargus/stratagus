@@ -86,6 +86,9 @@ namespace gcn
          * presses.
          *
          * @param key the key pressed.
+         *
+         * @return true if this function handled the message; false if
+         * the caller should try FocusHandler::checkHotKey instead.
          */
         virtual bool keyPress(const Key& key) { return false; }
 
@@ -93,6 +96,9 @@ namespace gcn
          * Called if a key is released when the widget has keyboard focus.
          *
          * @param key the key released.
+         *
+         * @return true if this function handled the message; false if
+         * the caller should try FocusHandler::checkHotKey instead.
          */
         virtual bool keyRelease(const Key& key) { return false; }
 
