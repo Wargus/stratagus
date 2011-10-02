@@ -218,10 +218,11 @@ namespace gcn
         if (key.getValue() == Key::LEFT)
         {
             if (mCaretPosition > 0) {
-                mCaretPosition = UTF8GetPrev(mText, mCaretPosition);
-                if (mCaretPosition < 0) {
+                int newpos = UTF8GetPrev(mText, mCaretPosition);
+                if (newpos < 0) {
                     throw GCN_EXCEPTION("Invalid UTF8.");
                 }
+                mCaretPosition = newpos;
             }
             if (!key.isShiftPressed()) {
                 mSelectStart = mCaretPosition;
@@ -233,10 +234,11 @@ namespace gcn
         else if (key.getValue() == Key::RIGHT)
         {
             if (mCaretPosition < (int)mText.size()) {
-                mCaretPosition = UTF8GetNext(mText, mCaretPosition);
-                if (mCaretPosition > (int)mText.size()) {
+                int newpos = UTF8GetNext(mText, mCaretPosition);
+                if (newpos > (int)mText.size()) {
                     throw GCN_EXCEPTION("Invalid UTF8.");
                 }
+                mCaretPosition = newpos;
             }
             if (!key.isShiftPressed()) {
                 mSelectStart = mCaretPosition;
@@ -253,7 +255,7 @@ namespace gcn
                 mSelectStart = selFirst;
             } else if (mCaretPosition < (int)mText.size()) {
                 int newpos = UTF8GetNext(mText, mCaretPosition);
-                if (mCaretPosition > (int)mText.size()) {
+                if (newpos > (int)mText.size()) {
                     throw GCN_EXCEPTION("Invalid UTF8.");
                 }
                 mText.erase(mCaretPosition, newpos - mCaretPosition);
@@ -269,7 +271,7 @@ namespace gcn
                 mSelectStart = selFirst;
             } else if (mCaretPosition > 0) {
                 int newpos = UTF8GetPrev(mText, mCaretPosition);
-                if (mCaretPosition < 0) {
+                if (newpos < 0) {
                     throw GCN_EXCEPTION("Invalid UTF8.");
                 }
                 mText.erase(newpos, mCaretPosition - newpos);
@@ -338,11 +340,12 @@ namespace gcn
             }
 
             mText.insert(mCaretPosition,key.toString());
-            mCaretPosition = UTF8GetNext(mText, mCaretPosition);
-            if (mCaretPosition > (int)mText.size()) {
+            int newpos = UTF8GetNext(mText, mCaretPosition);
+            if (newpos > (int)mText.size()) {
                 throw GCN_EXCEPTION("Invalid UTF8.");
             }
-            mSelectStart = mCaretPosition;
+            mCaretPosition = newpos;
+            mSelectStart = newpos;
             ret = true;
         }
 
