@@ -391,6 +391,9 @@ namespace gcn
          *          you are doing.
          *
          * @param keyInput the KeyInput message.
+         *
+         * @return true if this function handled the message; false if
+         * the caller should try FocusHandler::checkHotKey instead.
          */
         virtual bool _keyInputMessage(const KeyInput& keyInput);
 
