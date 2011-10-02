@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.93 on Sun Oct  2 03:06:13 2011.
+** Generated automatically by tolua++-1.0.93 on Sun Oct  2 03:18:19 2011.
 */
 
 #ifndef __cplusplus
@@ -12769,6 +12769,15 @@ static int tolua_set_NetLocalHostsSlot(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: NetPlayerNameSize */
+#ifndef TOLUA_DISABLE_tolua_get_NetPlayerNameSize
+static int tolua_get_NetPlayerNameSize(lua_State* tolua_S)
+{
+  tolua_pushnumber(tolua_S,(lua_Number)NetPlayerNameSize);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: Host of class  CNetworkHost */
 #ifndef TOLUA_DISABLE_tolua_get_CNetworkHost_unsigned_Host
 static int tolua_get_CNetworkHost_unsigned_Host(lua_State* tolua_S)
@@ -12884,7 +12893,7 @@ static int tolua_set_CNetworkHost_PlyName(lua_State* tolua_S)
    tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
  strncpy((char*)
-self->PlyName,(const char*)tolua_tostring(tolua_S,2,0),16-1);
+self->PlyName,(const char*)tolua_tostring(tolua_S,2,0),NetPlayerNameSize-1);
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -20441,6 +20450,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"LocalSetupState",tolua_get_LocalSetupState,tolua_set_LocalSetupState);
   tolua_variable(tolua_S,"ServerSetupState",tolua_get_ServerSetupState,tolua_set_ServerSetupState);
   tolua_variable(tolua_S,"NetLocalHostsSlot",tolua_get_NetLocalHostsSlot,tolua_set_NetLocalHostsSlot);
+  tolua_variable(tolua_S,"NetPlayerNameSize",tolua_get_NetPlayerNameSize,NULL);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"CNetworkHost","CNetworkHost","",tolua_collect_CNetworkHost);
   #else
