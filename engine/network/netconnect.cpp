@@ -1345,12 +1345,15 @@ static void ClientParseSynced(const CInitMessage *msg)
 					Hosts[HostsCount].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
 					memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[i].PlyName, sizeof(Hosts[HostsCount].PlyName) - 1);
 					HostsCount++;
-					DebugPrint("Client %d = %d.%d.%d.%d:%d [%s]\n" _C_
+					DebugPrint("Client %d = %d.%d.%d.%d:%d [%.*s]\n" _C_
 						ntohs(ntohs(msg->u.Hosts[i].PlyNr)) _C_ NIPQUAD(ntohl(msg->u.Hosts[i].Host)) _C_
-						ntohs(msg->u.Hosts[i].Port) _C_ msg->u.Hosts[i].PlyName);
+						ntohs(msg->u.Hosts[i].Port) _C_
+						static_cast<int>(sizeof(msg->u.Hosts[i].PlyName)) _C_
+						msg->u.Hosts[i].PlyName);
 				} else { // Own client
 					NetLocalPlayerNumber = ntohs(msg->u.Hosts[i].PlyNr);
-					DebugPrint("SELF %d [%s]\n" _C_ ntohs(msg->u.Hosts[i].PlyNr) _C_
+					DebugPrint("SELF %d [%.*s]\n" _C_ ntohs(msg->u.Hosts[i].PlyNr) _C_
+						static_cast<int>(sizeof(msg->u.Hosts[i].PlyName)) _C_
 						msg->u.Hosts[i].PlyName);
 				}
 			}
@@ -1361,9 +1364,11 @@ static void ClientParseSynced(const CInitMessage *msg)
 			memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[i].PlyName, sizeof(Hosts[HostsCount].PlyName) - 1);
 			++HostsCount;
 			NetPlayers = HostsCount + 1;
-			DebugPrint("Server %d = %d.%d.%d.%d:%d [%s]\n" _C_
+			DebugPrint("Server %d = %d.%d.%d.%d:%d [%.*s]\n" _C_
 				ntohs(msg->u.Hosts[i].PlyNr) _C_ NIPQUAD(ntohl(NetLastHost)) _C_
-				ntohs(NetLastPort) _C_ msg->u.Hosts[i].PlyName);
+				ntohs(NetLastPort) _C_
+				static_cast<int>(sizeof(msg->u.Hosts[i].PlyName)) _C_
+				msg->u.Hosts[i].PlyName);
 
 			// put ourselves to the end, like on the server..
 			Hosts[HostsCount].Host = 0;
