@@ -98,6 +98,37 @@ namespace gcn
         virtual const std::string& getText() const;
 
         /**
+         * Sets the maximum number of bytes that the user can type in
+         * the TextField.  Because TextField uses the UTF-8 encoding,
+         * each character may require several bytes.
+         *
+         * If the text in the field is already too long, this function
+         * truncates it immediately.
+         *
+         * @param maxLengthBytes The new maximum length, in bytes.
+         * Must not be negative.
+         *
+         * In addition to this UTF-8 byte limit, we could also
+         * implement limits on the number of code points, the number
+         * of UTF-16 code units, the number of grapheme clusters, or
+         * the width of the string in a given font.  However, there
+         * haven't been any use cases for those so far.
+         *
+         * @seealso #getMaxLengthBytes
+         */
+        void setMaxLengthBytes(int maxLengthBytes);
+
+        /**
+         * Gets the maximum number of bytes that the user can type in
+         * the TextField.
+         *
+         * @return The current maximum length, in bytes.
+         *
+         * @seealso #setMaxLengthBytes
+         */
+        int getMaxLengthBytes() const;
+
+        /**
          * Draws the caret (the little marker in the text that shows where the
          * letters you type will appear). Easily overloaded if you want to
          * change the style of the caret.
@@ -163,10 +194,49 @@ namespace gcn
          */
         void fixScroll();
 
+        /**
+         * Truncates #mText to #mMaxLengthBytes, and #mCaretPosition
+         * and #mSelectStart to the length of #mText.  Marks the
+         * widget dirty if it changes anything.
+         */
+        void truncateToMaxLength();
+
+        /**
+         * Inserts a string at the caret, replacing the selection if any.
+         *
+         * This function also marks the widget dirty.  However, it
+         * does not call #fixScroll because that is somewhat
+         * expensive and should not be called redundantly.  Therefore,
+         * the caller must do that.
+         *
+         * @param text The text to insert.
+         */
+        void insertAtCaret(const std::string& str);
+
+        /**
+         * Finds the last UTF-8 character boundary in the first
+         * @a maxBytes bytes of @a str.
+         *
+         * @param str UTF-8 string.
+         *
+         * @param maxBytes How many bytes to consider at the beginning
+         * of @a str.  Must not be negative.
+         *
+         * @return The position of the last character boundary.  Always
+         * <= @a maxBytes.
+         */
+        static int UTF8LastCharacterBoundary(const std::string &str, int maxBytes);
+
         std::string mText;
         int mCaretPosition;
         int mXScroll;
 		int mSelectStart;
+
+        /**
+         * The maximum length of #mText, in bytes.  Might be zero but
+         * never negative.
+         */
+        int mMaxLengthBytes;
     };
 }
 

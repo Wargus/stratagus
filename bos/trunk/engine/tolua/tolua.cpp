@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on Sat Jul 16 22:41:54 2011.
+** Generated automatically by tolua++-1.0.93 on Sun Oct  2 03:06:13 2011.
 */
 
 #ifndef __cplusplus
@@ -9825,6 +9825,71 @@ static int tolua_stratagus_TextField_getText00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'getText'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setMaxLengthBytes of class  TextField */
+#ifndef TOLUA_DISABLE_tolua_stratagus_TextField_setMaxLengthBytes00
+static int tolua_stratagus_TextField_setMaxLengthBytes00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"TextField",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  TextField* self = (TextField*)  tolua_tousertype(tolua_S,1,0);
+  int maxLengthBytes = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setMaxLengthBytes'", NULL);
+#endif
+  {
+   self->setMaxLengthBytes(maxLengthBytes);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setMaxLengthBytes'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getMaxLengthBytes of class  TextField */
+#ifndef TOLUA_DISABLE_tolua_stratagus_TextField_getMaxLengthBytes00
+static int tolua_stratagus_TextField_getMaxLengthBytes00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const TextField",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const TextField* self = (const TextField*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getMaxLengthBytes'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->getMaxLengthBytes();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getMaxLengthBytes'.",&tolua_err);
  return 0;
 #endif
 }
@@ -20179,6 +20244,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_function(tolua_S,".call",tolua_stratagus_TextField_new00_local);
    tolua_function(tolua_S,"setText",tolua_stratagus_TextField_setText00);
    tolua_function(tolua_S,"getText",tolua_stratagus_TextField_getText00);
+   tolua_function(tolua_S,"setMaxLengthBytes",tolua_stratagus_TextField_setMaxLengthBytes00);
+   tolua_function(tolua_S,"getMaxLengthBytes",tolua_stratagus_TextField_getMaxLengthBytes00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"ListBox","ListBox","Widget",NULL);
   tolua_beginmodule(tolua_S,"ListBox");
