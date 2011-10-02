@@ -457,7 +457,8 @@ void NetworkInitServerConnect(int openslots)
 	}
 
 	// preset the server (initially always slot 0)
-	memcpy(Hosts[0].PlyName, LocalPlayerName.c_str(), sizeof(Hosts[0].PlyName) - 1);
+	strncpy_s(Hosts[0].PlyName, sizeof(Hosts[0].PlyName),
+		  LocalPlayerName.c_str(), _TRUNCATE);
 	
 	ServerSetupState.Clear();
 	LocalSetupState.Clear();
@@ -943,7 +944,9 @@ changed:
 			if (NetStateMsgCnt < 48) { // 48 retries = 24 seconds
 				message.Type = MessageInitHello;
 				message.SubType = ICMHello;
-				memcpy(message.u.Hosts[0].PlyName, LocalPlayerName.c_str(), sizeof(message.u.Hosts[0].PlyName) - 1);
+				strncpy_s(message.u.Hosts[0].PlyName,
+					  sizeof(message.u.Hosts[0].PlyName),
+					  LocalPlayerName.c_str(), _TRUNCATE);
 				message.MapUID = 0L;
 				NetworkSendRateLimitedClientMessage(&message, 500);
 			} else {
@@ -1200,7 +1203,10 @@ static void ClientParseConnecting(const CInitMessage *msg)
 					}
 				} else {
 					Hosts[i].PlyNr = i;
-					memcpy(Hosts[i].PlyName, LocalPlayerName.c_str(), sizeof(Hosts[i].PlyName) - 1);
+					strncpy_s(Hosts[i].PlyName,
+						  sizeof(Hosts[i].PlyName),
+						  LocalPlayerName.c_str(),
+						  _TRUNCATE);
 				}
 			}
 			break;
@@ -1363,7 +1369,9 @@ static void ClientParseSynced(const CInitMessage *msg)
 			Hosts[HostsCount].Host = 0;
 			Hosts[HostsCount].Port = 0;
 			Hosts[HostsCount].PlyNr = NetLocalPlayerNumber;
-			memcpy(Hosts[HostsCount].PlyName, LocalPlayerName.c_str(), sizeof(Hosts[HostsCount].PlyName) - 1);
+			strncpy_s(Hosts[HostsCount].PlyName,
+				  sizeof(Hosts[HostsCount].PlyName),
+				  LocalPlayerName.c_str(), _TRUNCATE);
 
 			NetLocalState = ccs_goahead;
 			NetStateMsgCnt = 0;
@@ -1398,7 +1406,10 @@ static void ClientParseAsync(const CInitMessage *msg)
 					}
 				} else {
 					Hosts[i].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
-					memcpy(Hosts[i].PlyName, LocalPlayerName.c_str(), sizeof(Hosts[i].PlyName) - 1);
+					strncpy_s(Hosts[i].PlyName,
+						  sizeof(Hosts[i].PlyName),
+						  LocalPlayerName.c_str(),
+						  _TRUNCATE);
 				}
 			}
 			NetLocalState = ccs_synced;
@@ -1535,7 +1546,8 @@ static void ServerParseHello(int h, const CInitMessage *msg)
 	message.Type = MessageInitReply;
 	message.SubType = ICMWelcome; // Acknowledge: Client is welcome
 	message.u.Hosts[0].PlyNr = htons(h); // Host array slot number
-	memcpy(message.u.Hosts[0].PlyName, LocalPlayerName.c_str(), sizeof(message.u.Hosts[0].PlyName) - 1); // Name of server player
+	strncpy_s(message.u.Hosts[0].PlyName, sizeof(message.u.Hosts[0].PlyName),
+		  LocalPlayerName.c_str(), _TRUNCATE); // Name of server player
 	message.MapUID = 0L;
 	for (i = 1; i < PlayerMax - 1; ++i) { // Info about other clients
 		if (i != h) {
