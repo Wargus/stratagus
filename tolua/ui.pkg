@@ -442,6 +442,8 @@ class TextField : public Widget
 	TextField(const std::string text);
 	virtual void setText(const std::string text);
 	virtual std::string &getText();
+	void setMaxLengthBytes(int maxLengthBytes);
+	int getMaxLengthBytes() const;
 };
 
 class ListBox : public Widget
