@@ -259,8 +259,9 @@ namespace gcn
                     throw GCN_EXCEPTION("Invalid UTF8.");
                 }
                 mText.erase(mCaretPosition, newpos - mCaretPosition);
-                ret = true;
             }
+
+            ret = true;
         }
 
         else if (key.getValue() == Key::BACKSPACE || key.getValue() == 'h' - 'a' + 1)
@@ -277,8 +278,9 @@ namespace gcn
                 mText.erase(newpos, mCaretPosition - newpos);
                 mCaretPosition = newpos;
                 mSelectStart = newpos;
-                ret = true;
             }
+
+            ret = true;
         }
 
         else if (key.getValue() == Key::ENTER)
@@ -327,8 +329,9 @@ namespace gcn
                 for (size_t i = 0; i < str.size(); ++i) {
                     keyPress(Key(str[i]));
                 }
-                ret = true;
             }
+
+            ret = true;
         }
 
         else if (key.isCharacter())
