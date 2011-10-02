@@ -123,7 +123,6 @@ namespace gcn
     protected:
         Key mKey;
         int mType;
-        int mButton;
     };
 }
 
