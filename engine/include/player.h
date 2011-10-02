@@ -43,23 +43,28 @@
 **
 **  The player structure members:
 **
-**  CPlayer::Player
+**  CPlayer::Index
 **
 **    This is the unique slot number. It is not possible that two
 **    players have the same slot number at the same time. The slot
 **    numbers are reused in the future. This means if a player is
 **    defeated, a new player can join using this slot. Currently
-**    #PlayerMax (16) players are supported. This member is used to
+**    #PlayerMax players are supported. This member is used to
 **    access bit fields.
-**    Slot #PlayerNumNeutral (15) is reserved for the neutral units
+**    Slot #PlayerNumNeutral is reserved for the neutral units
 **    like gold-mines or critters.
 **
 **    @note Should call this member Slot?
 **
 **  CPlayer::Name
 **
-**    Name of the player used for displays and network game.
-**    It is restricted to 15 characters plus final zero.
+**    Name of the player, encoded in UTF-8.
+**    In local games, the name is used for displays, and there is no
+**    strict restriction on the length, although there is limited
+**    space on the screen.
+**    In network games, the name is also used for chatting,
+**    and it is restricted to NetPlayerNameSize bytes, including
+**    the final zero.
 **
 **  CPlayer::Type
 **
@@ -73,7 +78,8 @@
 **
 **    AI name for computer. This field is setup
 **    from the map. Used to select the AI for the computer
-**    player.
+**    player. Might differ from CAiType::Name of the AI
+**    that was actually selected.
 **
 **  CPlayer::Team
 **
@@ -84,7 +90,7 @@
 **  CPlayer::Enemy
 **
 **    A bit field which contains the enemies of this player.
-**    If CPlayer::Enemy & (1<<CPlayer::Player) != 0 its an enemy.
+**    If CPlayer::Enemy & (1<<CPlayer::Index) != 0 its an enemy.
 **    Setup during startup using the CPlayer::Team, can later be
 **    changed with diplomacy. CPlayer::Enemy and CPlayer::Allied
 **    are combined, if none bit is set, the player is neutral.
@@ -93,7 +99,7 @@
 **  CPlayer::Allied
 **
 **    A bit field which contains the allies of this player.
-**    If CPlayer::Allied & (1<<CPlayer::Player) != 0 its an allied.
+**    If CPlayer::Allied & (1<<CPlayer::Index) != 0 its an allied.
 **    Setup during startup using the Player:Team, can later be
 **    changed with diplomacy. CPlayer::Enemy and CPlayer::Allied
 **    are combined, if none bit is set, the player is neutral.
@@ -109,8 +115,9 @@
 **    The tile map coordinates of the player start position. 0,0 is
 **    the upper left on the map. This members are setup from the
 **    map and only important for the game start.
-**    Ignored if game starts with level settings. Used to place
-**    the initial workers if you play with 1 or 3 workers.
+**    They control which part of the map is initially scrolled to the view,
+**    and in some game types (e.g. ::SettingsGameTypeTopVsBottom),
+**    they also control which players are initially allied.
 **
 **  CPlayer::UnitTypesCount[::UnitTypeMax]
 **
@@ -143,42 +150,31 @@
 **    Total number of units (incl. buildings) in the CPlayer::Units
 **    table.
 **
-**  CPlayer::Demand
-**
-**    Total unit demand, used to demand limit.
-**    A player can only build up to CPlayer::Food units and not more
-**    than CPlayer::FoodUnitLimit units.
-**
-**    @note that CPlayer::NumFoodUnits > CPlayer::Food, when enough
-**    farms are destroyed.
-**
 **  CPlayer::NumBuildings
 **
-**    Total number buildings, units that don't need food.
+**    Total number of buildings in the CPlayer::Units table.
 **
-**  CPlayer::Food
+**  CPlayer::UnitLimit
 **
-**    Number of food available/produced. Player can't train more
-**    CPlayer::NumFoodUnits than this.
-**    @note that all limits are always checked.
-**
-**  CPlayer::FoodUnitLimit
-**
-**    Number of food units allowed. Player can't train more
-**    CPlayer::NumFoodUnits than this.
+**    Number of non-building units allowed.
+**    When CPlayer::TotalNumUnit - CPlayer::NumBuildings >= CPlayer::UnitLimit,
+**    the player cannot train any more non-building units;
+**    but may still be able to build buildings.
 **    @note that all limits are always checked.
 **
 **  CPlayer::BuildingLimit
 **
-**    Number of buildings allowed.  Player can't build more
-**    CPlayer::NumBuildings than this.
+**    Number of buildings allowed.
+**    When CPlayer::NumBuildings >= CPlayer::BuildingLimit,
+**    the player cannot build any more buildings;
+**    but may still be able to train other units.
 **    @note that all limits are always checked.
 **
 **  CPlayer::TotalUnitLimit
 **
-**    Number of total units allowed. Player can't have more
-**    CPlayer::NumFoodUnits+CPlayer::NumBuildings=CPlayer::TotalNumUnits
-**    this.
+**    Number of total units allowed.
+**    When CPlayer::TotalNumUnits >= CPlayer::TotalUnitLimit,
+**    the player cannot train or build any more units of any kind.
 **    @note that all limits are always checked.
 **
 **  CPlayer::Score
@@ -188,15 +184,22 @@
 **
 **  CPlayer::TotalUnits
 **
-**    Total number of units made.
+**    Total number of non-building units made or captured
+**    by the player, including any that have since been killed.
+**    This counter never decreases during a game.
 **
 **  CPlayer::TotalBuildings
 **
-**    Total number of buildings made.
+**    Total number of buildings made or captured by the player,
+**    including any that have since been razed.
+**    This counter never decreases during a game.
 **
 **  CPlayer::TotalResources[::MaxCosts]
 **
 **    Total number of resources collected.
+**    This counter never decreases during a game, unless some
+**    unit type has been strangely configured with a negative
+**    CUnitType::ProductionRate.
 **
 **  CPlayer::TotalRazings
 **
