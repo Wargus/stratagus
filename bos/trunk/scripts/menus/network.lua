@@ -468,6 +468,7 @@ function RunMultiPlayerMenu(s)
 
   menu:writeText(_("Nickname :"), x, Video.Height*8/20)
   nick = menu:addTextInputField(GetLocalPlayerName(), x + 90, Video.Height*8/20 + 4)
+  nick:setMaxLengthBytes(NetPlayerNameSize - 1)
 
   ResetMapOptions()
   InitNetwork1()

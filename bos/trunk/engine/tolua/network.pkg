@@ -30,11 +30,12 @@ class CServerSetup {
 extern CServerSetup LocalSetupState;
 extern CServerSetup ServerSetupState;
 extern int NetLocalHostsSlot;
+tolua_readonly int NetPlayerNameSize;
 struct CNetworkHost {
 	unsigned long  Host;         /// Host address
 	unsigned short Port;         /// Port on host
 	unsigned short PlyNr;        /// Player nummer
-	char           PlyName[16];  /// Name of player
+	char           PlyName[NetPlayerNameSize];  /// Name of player
 };
 extern CNetworkHost Hosts[PlayerMax];
 
