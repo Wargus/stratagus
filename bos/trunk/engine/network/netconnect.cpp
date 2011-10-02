@@ -1630,6 +1630,10 @@ static void ServerParseWaiting(const int h)
 	int n;
 	CInitMessage message;
 
+	// Don't leave uninitialized data at the end of message.u.MapPath,
+	// in case it might contain passwords or similar.
+	memset(&message, 0, sizeof(message));
+
 	ServerSetupState.LastFrame[h] = FrameCounter;
 
 	switch (NetStates[h].State) {
