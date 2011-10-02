@@ -102,9 +102,6 @@ namespace gcn
          */
         virtual bool keyRelease(const Key& key) { return false; }
 
-		virtual void hotKeyPress(const Key& key) { }
-		virtual void hotKeyRelease(const Key& key) { }
-
     protected:
         /**
          * Constructor.
