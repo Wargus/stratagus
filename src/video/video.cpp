@@ -331,6 +331,10 @@ void DeInitVideo()
 */
 void VideoPaletteListAdd(SDL_Surface* surface)
 {
+	if (surface == NULL || surface->format == NULL || surface->format->BytesPerPixel != 1) {
+		return;
+	}
+
 	CColorCycling &colorCycling = CColorCycling::GetInstance();
 	std::vector<SDL_Surface*>::iterator it = std::find(colorCycling.PaletteList.begin(), colorCycling.PaletteList.end(), surface);
 

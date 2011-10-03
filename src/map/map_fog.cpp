@@ -607,6 +607,7 @@ void CMap::InitFogOfWar()
 		SDL_FillRect(s, NULL, color);
 		OnlyFogSurface = SDL_DisplayFormat(s);
 		SDL_SetAlpha(OnlyFogSurface, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
+		VideoPaletteListRemove(s);
 		SDL_FreeSurface(s);
 
 		//
@@ -679,6 +680,7 @@ void CMap::CleanFogOfWar()
 
 	if (!UseOpenGL) {
 		if (OnlyFogSurface) {
+			VideoPaletteListRemove(OnlyFogSurface);
 			SDL_FreeSurface(OnlyFogSurface);
 			OnlyFogSurface = NULL;
 		}

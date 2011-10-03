@@ -292,6 +292,7 @@ void DrawCursor()
 			HiddenSurface->h != GameCursor->G->getHeight())
 		{
 			if (HiddenSurface) {
+				VideoPaletteListRemove(HiddenSurface);
 				SDL_FreeSurface(HiddenSurface);
 			}
 

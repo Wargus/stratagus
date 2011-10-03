@@ -697,6 +697,7 @@ int CMinimap::Screen2MapY(int y)
 void CMinimap::Destroy()
 {
 	if (!UseOpenGL) {
+		VideoPaletteListRemove(MinimapTerrainSurface);
 		SDL_FreeSurface(MinimapTerrainSurface);
 		MinimapTerrainSurface = NULL;
 	} else {
@@ -705,6 +706,7 @@ void CMinimap::Destroy()
 	}
 	if (!UseOpenGL) {
 		if (MinimapSurface) {
+			VideoPaletteListRemove(MinimapSurface);
 			SDL_FreeSurface(MinimapSurface);
 			MinimapSurface = NULL;
 		}

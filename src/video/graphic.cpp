@@ -675,9 +675,8 @@ static void FreeSurface(SDL_Surface **surface)
 	if (!*surface) {
 		return;
 	}
-	if ((*surface)->format->BytesPerPixel == 1) {
-		VideoPaletteListRemove(*surface);
-	}
+	VideoPaletteListRemove(*surface);
+
 	unsigned char *pixels = NULL;
 
 	if ((*surface)->flags & SDL_PREALLOC) {
@@ -917,6 +916,7 @@ void CGraphic::UseDisplayFormat()
 	} else {
 		Surface = SDL_DisplayFormat(s);
 	}
+	VideoPaletteListRemove(s);
 	SDL_FreeSurface(s);
 
 	if (SurfaceFlip) {
@@ -926,6 +926,7 @@ void CGraphic::UseDisplayFormat()
 		} else {
 			SurfaceFlip = SDL_DisplayFormat(s);
 		}
+		VideoPaletteListRemove(s);
 		SDL_FreeSurface(s);
 	}
 }
@@ -1232,9 +1233,8 @@ void CGraphic::Resize(int w, int h)
 		}
 
 		SDL_UnlockSurface(Surface);
-		if (Surface->format->BytesPerPixel == 1) {
-			VideoPaletteListRemove(Surface);
-		}
+		VideoPaletteListRemove(Surface);
+
 		memcpy(pal, Surface->format->palette->colors, sizeof(SDL_Color) * 256);
 		SDL_FreeSurface(Surface);
 
@@ -1303,6 +1303,7 @@ void CGraphic::Resize(int w, int h)
 		int Amask = Surface->format->Amask;
 
 		SDL_UnlockSurface(Surface);
+		VideoPaletteListRemove(Surface);
 		SDL_FreeSurface(Surface);
 
 		Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8 * bpp, w * bpp,

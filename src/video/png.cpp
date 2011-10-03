@@ -258,6 +258,7 @@ int LoadGraphicPNG(CGraphic *g)
 	row_pointers = new png_bytep[height];
 	if (row_pointers == NULL) {
 		fprintf(stderr, "Out of memory");
+		VideoPaletteListRemove(surface);
 		SDL_FreeSurface(surface);
 		surface = NULL;
 		goto done;
