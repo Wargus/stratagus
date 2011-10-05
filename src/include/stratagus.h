@@ -175,20 +175,6 @@ inline char *new_strdup(const char *str)
 	/// Text string: Name, Version, Copyright
 extern const char NameLine[];
 
-#ifndef STRATAGUS_LIB_PATH
-#define STRATAGUS_LIB_PATH  "."      /// Where to find the data files
-#endif
-
-#ifndef STRATAGUS_HOME_PATH
-#ifdef __APPLE__
-#define STRATAGUS_HOME_PATH "Library/Stratagus"
-#else
- #define _VERSION_STRING1(m,n,p) m "-" #n "." #p
- #define _VERSION_STRING(m,n,p) _VERSION_STRING1(m,n,p)
- #define STRATAGUS_HOME_PATH _VERSION_STRING(".stratagus",StratagusMajorVersion,StratagusMinorVersion)
-#endif
-#endif
-
 /*----------------------------------------------------------------------------
 --  Some limits
 ----------------------------------------------------------------------------*/

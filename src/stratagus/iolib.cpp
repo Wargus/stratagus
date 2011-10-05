@@ -536,25 +536,13 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 		}
 	}
 
-#ifdef USE_WIN32
-	//  In user home directory
+	// In user home directory
 	if (!GameName.empty()) {
-		sprintf(buffer, "%s/%s/%s", STRATAGUS_HOME_PATH, GameName.c_str(), file);
+		sprintf(buffer, "%s/%s/%s", UserDirectory.c_str(), GameName.c_str(), file);
 		if (FindFileWithExtension(buffer, buffersize)) {
 			return buffer;
 		}
 	}
-#endif
-
-#ifndef USE_WIN32
-	//  In user home directory
-	if ((s = getenv("HOME")) && !GameName.empty()) {
-		sprintf(buffer, "%s/%s/%s/%s", s, STRATAGUS_HOME_PATH, GameName.c_str(), file);
-		if (FindFileWithExtension(buffer, buffersize)) {
-			return buffer;
-		}
-	}
-#endif
 
 	// In global shared directory
 	sprintf(buffer, "%s/%s", StratagusLibPath.c_str(), file);

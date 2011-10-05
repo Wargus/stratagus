@@ -2708,28 +2708,28 @@ std::string SaveGlobal(lua_State *l, bool is_root)
 */
 void CreateUserDirectories()
 {
-	std::string directory;
-	UserDirectory = "";
-
-#ifndef USE_WIN32
 	std::string s;
+
+#ifdef USE_WIN32
+	s = getenv("APPDATA");
+#else
 	s = getenv("HOME");
-	if (!s.empty()) {
-		UserDirectory = s + "/";
-	}
 #endif
 
-	UserDirectory += STRATAGUS_HOME_PATH;
-	UserDirectory += "/";
+	UserDirectory = "";
 
-	//DebugPrint("Creating User Directories: %s\n" _C_ UserDirectory.c_str());
+	if (!s.empty())
+		UserDirectory = s + "/";
 
+#ifdef USE_WIN32
+	UserDirectory += "Stratagus";
+#elif defined(USE_MAC)
+	UserDirectory += "Library/Stratagus";
+#else
+	UserDirectory += ".stratagus";
+#endif
 
 	makedir(UserDirectory.c_str(), 0777);
-
-	// Create specific subdirectories
-	//directory = UserDirectory + "patches/";
-	//makedir(directory.c_str(), 0777);
 }
 
 /**

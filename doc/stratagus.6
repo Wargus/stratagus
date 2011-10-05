@@ -1,4 +1,4 @@
-.TH STRATAGUS 6 "May 2011" "Stratagus v2.2.6"
+.TH STRATAGUS 6 "Oct 2011" "Stratagus v2.2.6"
 .SH NAME
 stratagus \- Strategy Gaming Engine
 .SH SYNOPSIS
@@ -16,7 +16,7 @@ is a powerful game engine for building realtime strategy games, a la AoE or Warc
 A summary of options is included below.
 .TP
 .B \-c file.lua
-Choose a different stratagus config file.
+Choose a different stratagus start config file.
 .TP
 .B \-d datapath
 Choose a different directory to use for game data files.
@@ -80,14 +80,26 @@ With this option you can specify video mode resolution in format \fB<xres>\fRx\f
 With this option you can start Stratagus in windowed video mode.
 .SH "FILES"
 .TP
-.B /usr/share/games/stratagus/default
+.B ./
 Default directory for Stratagus data files
 .TP
-.B /usr/share/games/stratagus/default/scripts/stratagus.lua
-Default start file.
+.B ./scripts/stratagus.lua
+Default start config file.
 .TP
-.B /usr/share/games/stratagus/default/scripts/editor.lua
+.B ./scripts/editor.lua
 Default editor file.
+.TP
+.B ./scripts/guichan.lua
+Default menu file.
+.TP
+.B ~/.stratagus/<data>/preferences.lua
+User preferences configuration file for <data>
+.TP
+.B ~/.stratagus/<data>/logs/
+User directory with replays/logs for <data>
+.TP
+.B ~/.stratagus/<data>/save/
+User directory with saved games for <data>
 .SH "SEE ALSO"
 More complete documentation is available in /usr/share/doc/stratagus.
 .SH NOTES
@@ -97,9 +109,9 @@ in the Warcraft II CD, thanks to the Wargus dataset.
 .PP
 Warcraft II is a registered trademark of Blizzard Entertainment.
 .SH AUTHOR
-Stratagus is written by Nehal Mistry, Russell Smith Pali Rohár and others.
+Stratagus is written by Nehal Mistry, Russell Smith, Pali Rohár and others.
 .PP
-This manual page was written by Anthony Towns <ajt@debian.org> ,
+This manual page was written by Anthony Towns <ajt@debian.org>,
 David Martínez Moreno <ender@debian.org> and
 Pali Rohár <pali.rohar@gmail.com> for the Debian GNU/Linux
 system (but may be used by others).
