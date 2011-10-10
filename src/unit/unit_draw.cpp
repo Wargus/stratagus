@@ -899,7 +899,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType *type, int x, in
 		unit.Seen.ByPlayer & (1 << ThisPlayer->Index) ? 'Y' : 'N',
 		unit.Seen.Destroyed & (1 << ThisPlayer->Index) ? 'Y' : 'N',
 		unit.Refs);
-	VideoDrawTextClip(x + 10, y + 10, 1, buf);
+	CLabel(GetSmallFont()).Draw(x + 10, y + 10, buf);
 #endif
 
 	stats = unit.Stats;

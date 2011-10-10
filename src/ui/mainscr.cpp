@@ -1397,8 +1397,7 @@ void CInfoPanel::Draw()
 				char buf[5];
 
 				sprintf(buf, "+%u", static_cast<unsigned int> (NumSelected - UI.SelectedButtons.size()));
-				VideoDrawText(UI.MaxSelectedTextX, UI.MaxSelectedTextY,
-					UI.MaxSelectedFont, buf);
+				CLabel(UI.MaxSelectedFont).Draw(UI.MaxSelectedTextX, UI.MaxSelectedTextY, buf);
 			}
 			return;
 		} else {
@@ -1445,9 +1444,9 @@ void CInfoPanel::Draw()
 		x = UI.InfoPanel.X + 16;
 		y = UI.InfoPanel.Y + 8;
 
-		VideoDrawTextClip(x, y, GetGameFont(), "Stratagus");
+		CLabel(GetGameFont()).Draw(x, y, "Stratagus");
 		y += 16;
-		VideoDrawTextClip(x, y, GetGameFont(), "Cycle:");
+		CLabel(GetGameFont()).Draw(x, y,  "Cycle:");
 		VideoDrawNumberClip(x + 48, y, GetGameFont(), GameCycle);
 		VideoDrawNumberClip(x + 110, y, GetGameFont(),
 			CYCLES_PER_SECOND * VideoSyncSpeed / 100);
@@ -1469,7 +1468,7 @@ void CInfoPanel::Draw()
 				Video.DrawRectangleClip(ColorWhite,x, y, 12, 12);
 				Video.FillRectangleClip(Players[i].Color, x + 1, y + 1, 10, 10);
 
-				VideoDrawTextClip(x + 27, y, GetGameFont(),Players[i].Name);
+				CLabel(GetGameFont()).Draw(x + 27, y, Players[i].Name);
 				VideoDrawNumberClip(x + 117, y, GetGameFont(),Players[i].Score);
 				y += 14;
 			}
