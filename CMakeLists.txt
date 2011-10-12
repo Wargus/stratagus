@@ -219,7 +219,6 @@ set(ui_SRCS
 	src/ui/interface.cpp
 	src/ui/mainscr.cpp
 	src/ui/menu_proc.cpp
-	src/ui/menus.cpp
 	src/ui/mouse.cpp
 	src/ui/script_ui.cpp
 	src/ui/ui.cpp
