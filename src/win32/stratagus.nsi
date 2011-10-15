@@ -95,7 +95,7 @@ LangString DESC_REMOVEEXE ${LANG_ENGLISH} "Remove ${NAME} executable"
 LangString DESC_REMOVECONF ${LANG_ENGLISH} "Remove all other configuration files and directories in ${NAME} install directory created by user or ${NAME}"
 
 !ifdef x86_64
-LangString x86_64_ONLY ${LANG_ENGLISH} "This version is for 64 bits computers only."
+LangString x86_64_ONLY ${LANG_ENGLISH} "This version is for 64 bits computers only"
 !endif
 
 ;--------------------------------
@@ -225,8 +225,6 @@ Section "${NAME}"
 	WriteRegDWORD HKLM "${REGKEY}" "NoModify" 1
 	WriteRegDWORD HKLM "${REGKEY}" "NoRepair" 1
 	WriteUninstaller "$INSTDIR\${UNINSTALL}"
-
-	System::Call "msvcrt.dll::_chmod(t $\"$INSTDIR$\", i 0x01c0) i .s"
 
 SectionEnd
 
