@@ -570,6 +570,10 @@ void InitVideoSdl()
 		Video.Height = 480;
 	}
 
+	if (!Video.Depth) {
+		Video.Depth = 32;
+	}
+
 	TheScreen = SDL_SetVideoMode(Video.Width, Video.Height, Video.Depth, flags);
 	if (TheScreen && (TheScreen->format->BitsPerPixel != 16 &&
 			TheScreen->format->BitsPerPixel != 32)) {
