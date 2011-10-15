@@ -1883,8 +1883,8 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 		++userdir;
 		std::string dir(UserDirectory);
 		if(!GameName.empty()) {
-			dir += GameName;
 			dir += "/";
+			dir += GameName;
 		}
 		snprintf(directory, sizeof(directory), "%s/%s", dir.c_str(), userdir);
 	} else {
@@ -2767,13 +2767,14 @@ void SavePreferences()
 	if (lua_type(Lua, -1) == LUA_TTABLE) {
 		path = UserDirectory;
 		if (!GameName.empty()) {
-			path += GameName;
 			path += "/";
+			path += GameName;
 		}
-		path += "preferences.lua";
+		path += "/preferences.lua";
 
 		fd = fopen(path.c_str(), "w");
 		if (!fd) {
+			DebugPrint("Cannot open file %s for writing\n" _C_ path.c_str());
 			return;
 		}
 

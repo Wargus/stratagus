@@ -396,10 +396,10 @@ static void ExpandPath(std::string &newpath, const std::string &path)
 	if (path[0] == '~') {
 		newpath = UserDirectory;
 		if(!GameName.empty()) {
-			newpath += GameName;
 			newpath += "/";
+			newpath += GameName;
 		}
-		newpath += path.substr(1);
+		newpath += "/" + path.substr(1);
 	} else {
 		newpath = StratagusLibPath + "/" + path;
 	}
@@ -496,9 +496,9 @@ int SaveReplay(const std::string &filename)
 		return -1;
 	}
 
-	destination = UserDirectory + "logs/" + filename;
+	destination = UserDirectory + "/logs/" + filename;
 
-	logfile << UserDirectory << "logs/log_of_stratagus_" << ThisPlayer->Index << ".log";
+	logfile << UserDirectory << "/logs/log_of_stratagus_" << ThisPlayer->Index << ".log";
 
 	if (stat(logfile.str().c_str(), &sb)) {
 		fprintf(stderr, "stat failed\n");

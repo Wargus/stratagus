@@ -80,14 +80,13 @@ static std::string GetSaveDir()
 	struct stat tmp;
 	std::string dir(UserDirectory);
 	if(!GameName.empty()) {
-		dir += GameName;
 		dir += "/";
+		dir += GameName;
 	}
-	dir += "save";
+	dir += "/save";
 	if(stat(dir.c_str(), &tmp) < 0) {
 		makedir(dir.c_str(), 0777);
 	}
-	dir += "/";
 	return dir;
 }
 
@@ -106,6 +105,7 @@ int SaveGame(const std::string &filename)
 	std::string s;
 	std::string fullpath(GetSaveDir());
 
+	fullpath += "/";
 	fullpath += filename;
 	if (file.open(fullpath.c_str(), CL_WRITE_GZ | CL_OPEN_WRITE) == -1) {
 		fprintf(stderr, "Can't save to `%s'\n", filename.c_str());
@@ -174,7 +174,7 @@ void DeleteSaveGame(const std::string &filename)
 		return;
 	}
 
-	std::string fullpath = GetSaveDir() + filename;
+	std::string fullpath = GetSaveDir() + "/" + filename;
 	if (unlink(fullpath.c_str()) == -1) {
 		fprintf(stderr, "delete failed for %s", fullpath.c_str());
 	}

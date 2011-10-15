@@ -423,10 +423,10 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 		char buf[16];
 		std::string path(UserDirectory);
 		if(!GameName.empty()) {
-			path += GameName;
 			path += "/";
+			path += GameName;
 		}
-		path += "logs";
+		path += "/logs";
 
 		if(stat(path.c_str(), &tmp) < 0) {
 			makedir(path.c_str(), 0777);
