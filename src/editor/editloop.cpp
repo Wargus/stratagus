@@ -986,7 +986,7 @@ static void DrawEditorInfo()
 	}
 
 	snprintf(buf, sizeof(buf),"Editor (%d %d)", x, y);
-	VideoDrawText(UI.ResourceX + 2, UI.ResourceY + 2, GetGameFont(), buf);
+	CLabel(GetGameFont()).Draw(UI.ResourceX + 2, UI.ResourceY + 2, buf);
 	CMapField *mf = Map.Field(x, y);
 	//
 	// Flags info
@@ -1007,7 +1007,7 @@ static void DrawEditorInfo()
 		flags & MapFieldAirUnit      ? 'a' : '-',
 		flags & MapFieldSeaUnit      ? 's' : '-',
 		flags & MapFieldBuilding     ? 'b' : '-');
-	VideoDrawText(UI.ResourceX + 118, UI.ResourceY + 2, GetGameFont(), buf);
+	CLabel(GetGameFont()).Draw(UI.ResourceX + 118, UI.ResourceY + 2, buf);
 
 	//
 	// Tile info
@@ -1028,7 +1028,7 @@ static void DrawEditorInfo()
 			? Map.Tileset.SolidTerrainTypes[Map.Tileset.Tiles[i].MixTerrain].TerrainName
 			: "");
 
-	VideoDrawText(UI.ResourceX + 252, UI.ResourceY + 2, GetGameFont(), buf);
+	CLabel(GetGameFont()).Draw(UI.ResourceX + 252, UI.ResourceY + 2, buf);
 #endif
 }
 
