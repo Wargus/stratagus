@@ -2054,7 +2054,7 @@ int EditorSaveMap(const std::string &file)
 {
 	std::string fullName;
 	fullName = StratagusLibPath + "/" + file;
-	if (SaveStratagusMap(fullName, &Map, Editor.TerrainEditable) == -1) {
+	if (SaveStratagusMap(fullName, Map, Editor.TerrainEditable) == -1) {
 		fprintf(stderr, "Cannot save map\n");
 		return -1;
 	}
