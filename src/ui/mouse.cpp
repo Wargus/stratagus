@@ -305,7 +305,7 @@ void DoRightButton(int sx, int sy)
 					for (res = 0; res < MaxCosts; ++res) {
 						if (type->ResInfo[res] &&
 								type->ResInfo[res]->TerrainHarvester &&
-								Map.IsFieldExplored(unit->Player, pos) &&
+								Map.IsFieldExplored(*unit->Player, pos) &&
 								Map.ForestOnMap(pos) &&
 								((unit->CurrentResource != res) ||
 									(unit->ResourcesHeld < type->ResInfo[res]->ResourceCapacity))) {
@@ -477,7 +477,7 @@ void DoRightButton(int sx, int sy)
 				continue;
 			}
 			// FIXME: support harvesting more types of terrain.
-			if (Map.IsFieldExplored(unit->Player, pos) && Map.ForestOnMap(pos)) {
+			if (Map.IsFieldExplored(*unit->Player, pos) && Map.ForestOnMap(pos)) {
 				if (!acknowledged) {
 					PlayUnitSound(*unit, VoiceAcknowledging);
 					acknowledged = 1;
@@ -887,14 +887,14 @@ void UIHandleMouseMove(int x, int y)
 		const CViewport *vp = UI.MouseViewport;
 		const Vec2i tilePos = {vp->Viewport2MapX(x), vp->Viewport2MapY(y)};
 
-		if (Map.IsFieldExplored(ThisPlayer, tilePos) || ReplayRevealMap) {
+		if (Map.IsFieldExplored(*ThisPlayer, tilePos) || ReplayRevealMap) {
 			UnitUnderCursor = UnitOnScreen(NULL, x - vp->X + vp->MapX * PixelTileSize.x + vp->OffsetX,
 				y - vp->Y + vp->MapY * PixelTileSize.y + vp->OffsetY);
 		}
 	} else if (CursorOn == CursorOnMinimap) {
 		const Vec2i tilePos = {UI.Minimap.Screen2MapX(x), UI.Minimap.Screen2MapY(y)};
 
-		if (Map.IsFieldExplored(ThisPlayer, tilePos) || ReplayRevealMap) {
+		if (Map.IsFieldExplored(*ThisPlayer, tilePos) || ReplayRevealMap) {
 			UnitUnderCursor = UnitOnMapTile(tilePos, -1);
 		}
 	}
@@ -1180,7 +1180,7 @@ static int SendResource(int sx, int sy)
 				for (res = 0; res < MaxCosts; ++res) {
 					if (unit.Type->ResInfo[res] &&
 							unit.Type->ResInfo[res]->TerrainHarvester &&
-							Map.IsFieldExplored(unit.Player, pos) &&
+							Map.IsFieldExplored(*unit.Player, pos) &&
 							Map.ForestOnMap(pos) &&
 							Selected[i]->ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity &&
 							((unit.CurrentResource != res) ||
@@ -1202,7 +1202,7 @@ static int SendResource(int sx, int sy)
 				ret = 1;
 				continue;
 			}
-			if (Map.IsFieldExplored(unit.Player, pos) && Map.ForestOnMap(pos)) {
+			if (Map.IsFieldExplored(*unit.Player, pos) && Map.ForestOnMap(pos)) {
 				SendCommandResourceLoc(unit, pos, flush);
 				ret = 1;
 				continue;
@@ -1590,7 +1590,7 @@ void UIHandleButtonDown(unsigned button)
 				for (int j = 0; explored && j < Selected[0]->Type->TileHeight; ++j) {
 					for (int i = 0; i < Selected[0]->Type->TileWidth; ++i) {
 						const Vec2i tempPos = {i, j};
-						if (!Map.IsFieldExplored(ThisPlayer, tilePos + tempPos)) {
+						if (!Map.IsFieldExplored(*ThisPlayer, tilePos + tempPos)) {
 							explored = 0;
 							break;
 						}
@@ -1940,7 +1940,7 @@ void UIHandleButtonUp(unsigned button)
 			// FIXME: johns: only complete invisibile units
 			const Vec2i cursorTilePos = {UI.MouseViewport->Viewport2MapX(CursorX),
 										UI.MouseViewport->Viewport2MapY(CursorY)};
-			if (Map.IsFieldVisible(ThisPlayer, cursorTilePos) || ReplayRevealMap) {
+			if (Map.IsFieldVisible(*ThisPlayer, cursorTilePos) || ReplayRevealMap) {
 				int pixelposx = CursorX - UI.MouseViewport->X + UI.MouseViewport->MapX * PixelTileSize.x + UI.MouseViewport->OffsetX;
 				int pixelposy = CursorY - UI.MouseViewport->Y + UI.MouseViewport->MapY * PixelTileSize.y + UI.MouseViewport->OffsetY;
 

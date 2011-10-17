@@ -262,31 +262,12 @@ bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos)
 */
 void PreprocessMap()
 {
-#ifdef _MSC_VER
 	for (int ix = 0; ix < Map.Info.MapWidth; ++ix) {
 		for (int iy = 0; iy < Map.Info.MapHeight; ++iy) {
 			CMapField *mf = Map.Field(ix, iy);
 			mf->SeenTile = mf->Tile;
 		}
 	}
-#else
-	const int width = Map.Info.MapHeight * Map.Info.MapWidth;
-	int n = (width + 7) / 8;
-	CMapField *mf = Map.Fields;
-
-	switch (width & 7) {
-		case 0: do {	mf->SeenTile = mf->Tile; ++mf;
-		case 7:			mf->SeenTile = mf->Tile; ++mf;
-		case 6:			mf->SeenTile = mf->Tile; ++mf;
-		case 5:			mf->SeenTile = mf->Tile; ++mf;
-		case 4:			mf->SeenTile = mf->Tile; ++mf;
-		case 3:			mf->SeenTile = mf->Tile; ++mf;
-		case 2:			mf->SeenTile = mf->Tile; ++mf;
-		case 1:			mf->SeenTile = mf->Tile; ++mf;
-			} while (--n > 0);
-	}
-#endif
-
 	// it is required for fixing the wood that all tiles are marked as seen!
 	if (Map.Tileset.TileTypeTable) {
 		Vec2i pos;
@@ -511,7 +492,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	}
 
 	//maybe isExplored
-	if (IsTileVisible(ThisPlayer, index) > 0) {
+	if (IsTileVisible(*ThisPlayer, index) > 0) {
 		UI.Minimap.UpdateSeenXY(pos);
 		if (!seen) {
 			MarkSeenTile(pos);
@@ -571,7 +552,7 @@ void CMap::ClearTile(unsigned short type, const Vec2i &pos)
 	FixNeighbors(type, 0, pos);
 
 	//maybe isExplored
-	if (IsTileVisible(ThisPlayer, index) > 0) {
+	if (IsTileVisible(*ThisPlayer, index) > 0) {
 		UI.Minimap.UpdateSeenXY(pos);
 		MarkSeenTile(pos);
 	}
@@ -616,11 +597,11 @@ void CMap::RegenerateForestTile(int x, int y)
 				Vec2i pos;
 				pos.x = x;
 				pos.y = y;
-				if (Map.IsFieldVisible(ThisPlayer, pos)) {
+				if (Map.IsFieldVisible(*ThisPlayer, pos)) {
 					MarkSeenTile(pos);
 				}
 				pos.y = y - 1;
-				if (Map.IsFieldVisible(ThisPlayer, pos)) {
+				if (Map.IsFieldVisible(*ThisPlayer, pos)) {
 					MarkSeenTile(pos);
 				}
 			}

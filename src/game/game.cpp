@@ -89,7 +89,7 @@ GameResults GameResult;                      /// Outcome of the game
 **  @param mapname  map filename
 **  @param map      map loaded
 */
-static void LoadStratagusMap(const std::string &smpname, const std::string &mapname, CMap *)
+static void LoadStratagusMap(const std::string &smpname, const std::string &mapname)
 {
 	char mapfull[PATH_MAX];
 	CFile file;
@@ -162,7 +162,7 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 
 
 // Write the map presentation file
-static int WriteMapPresentation(const std::string &mapname, CMap *map, char *)
+static int WriteMapPresentation(const std::string &mapname, CMap &map, char *)
 {
 	FileWriter *f = NULL;
 	int i;
@@ -183,20 +183,20 @@ static int WriteMapPresentation(const std::string &mapname, CMap *map, char *)
 		f->printf("-- File licensed under the GNU GPL version 2.\n\n");
 
 		f->printf("DefinePlayerTypes(");
-		while (topplayer > 0 && map->Info.PlayerType[topplayer] == PlayerNobody) {
+		while (topplayer > 0 && map.Info.PlayerType[topplayer] == PlayerNobody) {
 			--topplayer;
 		}
 		for (i = 0; i <= topplayer; ++i) {
-			f->printf("%s\"%s\"", (i ? ", " : ""), type[map->Info.PlayerType[i]]);
-			if (map->Info.PlayerType[i] == PlayerPerson) {
+			f->printf("%s\"%s\"", (i ? ", " : ""), type[map.Info.PlayerType[i]]);
+			if (map.Info.PlayerType[i] == PlayerPerson) {
 				++numplayers;
 			}
 		}
 		f->printf(")\n");
 
 		f->printf("PresentMap(\"%s\", %d, %d, %d, %d)\n",
-			map->Info.Description.c_str(), numplayers, map->Info.MapWidth, map->Info.MapHeight,
-			map->Info.MapUID + 1);
+			map.Info.Description.c_str(), numplayers, map.Info.MapWidth, map.Info.MapHeight,
+			map.Info.MapUID + 1);
 
 //		mapsetupname = strrchr(mapsetup, '/');
 //		if (!mapsetupname) {
@@ -221,7 +221,7 @@ static int WriteMapPresentation(const std::string &mapname, CMap *map, char *)
 **  @param map           map to save
 **  @param writeTerrain  write the tiles map in the .sms
 */
-int WriteMapSetup(const char *mapSetup, CMap *map, int writeTerrain)
+int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 {
 	FileWriter *f = NULL;
 	int i, j;
@@ -257,19 +257,19 @@ int WriteMapSetup(const char *mapSetup, CMap *map, int writeTerrain)
 		f->printf("\n");
 
 		f->printf("-- load tilesets\n");
-		f->printf("LoadTileModels(\"%s\")\n\n", map->TileModelsFileName);
+		f->printf("LoadTileModels(\"%s\")\n\n", map.TileModelsFileName);
 
 		if (writeTerrain) {
 			f->printf("-- Tiles Map\n");
-			for (i = 0; i < map->Info.MapHeight; ++i) {
-				for (j = 0; j < map->Info.MapWidth; ++j) {
+			for (i = 0; i < map.Info.MapHeight; ++i) {
+				for (j = 0; j < map.Info.MapWidth; ++j) {
 					int tile;
 					int n;
 
-					tile = map->Fields[j + i * map->Info.MapWidth].Tile;
-					for (n = 0; n < map->Tileset.NumTiles && tile != map->Tileset.Table[n]; ++n) {
+					tile = map.Fields[j + i * map.Info.MapWidth].Tile;
+					for (n = 0; n < map.Tileset.NumTiles && tile != map.Tileset.Table[n]; ++n) {
 					}
-					const int value = map->Fields[j + i * map->Info.MapWidth].Value;
+					const int value = map.Fields[j + i * map.Info.MapWidth].Value;
 					f->printf("SetTile(%3d, %d, %d, %d)\n", n, j, i, value);
 				}
 			}
@@ -305,12 +305,12 @@ int WriteMapSetup(const char *mapSetup, CMap *map, int writeTerrain)
 **  @param map       map to save
 **  @param writeTerrain   write the tiles map in the .sms
 */
-int SaveStratagusMap(const std::string &mapName, CMap *map, int writeTerrain)
+int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain)
 {
 	char mapSetup[PATH_MAX];
 	char *extension;
 
-	if (!map->Info.MapWidth || !map->Info.MapHeight) {
+	if (!map.Info.MapWidth || !map.Info.MapHeight) {
 		fprintf(stderr, "%s: invalid Stratagus map\n", mapName.c_str());
 		ExitFatal(-1);
 	}
@@ -336,7 +336,7 @@ int SaveStratagusMap(const std::string &mapName, CMap *map, int writeTerrain)
 **  @param filename  map filename
 **  @param map       map loaded
 */
-static void LoadMap(const std::string &filename, CMap *map)
+static void LoadMap(const std::string &filename, CMap &map)
 {
 	const char *tmp;
 	const char *name = filename.c_str();
@@ -363,13 +363,13 @@ static void LoadMap(const std::string &filename, CMap *map)
 				|| !strcmp(tmp, ".smp.bz2")
 #endif
 		) {
-			if (map->Info.Filename.empty()) {
+			if (map.Info.Filename.empty()) {
 				// The map info hasn't been loaded yet => do it now
 				LoadStratagusMapInfo(filename);
 			}
-			Assert(!map->Info.Filename.empty());
-			map->Create();
-			LoadStratagusMap(filename, map->Info.Filename.c_str(), map);
+			Assert(!map.Info.Filename.empty());
+			map.Create();
+			LoadStratagusMap(filename, map.Info.Filename.c_str());
 			return;
 		}
 	}
@@ -597,7 +597,7 @@ void CreateGame(const std::string &filename, CMap *map)
 		// Load the map.
 		//
 		InitUnitTypes(1);
-		LoadMap(filename, map);
+		LoadMap(filename, *map);
 	}
 	CclCommand("if (MapLoaded ~= nil) then MapLoaded() end");
 

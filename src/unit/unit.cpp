@@ -2087,7 +2087,7 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 				 *	AI players (our exploration code is too week for real
 				 *	competition with human players)
 				 */
-				if (*m || (player && !player->AiEnabled &&!Map.IsFieldExplored(player, pos))) {
+				if (*m || (player && !player->AiEnabled &&!Map.IsFieldExplored(*player, pos))) {
 					continue;
 				}
 				// Look if found what was required.
@@ -2334,7 +2334,7 @@ CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range, int resource
 				 *	competition with human players.
 				 */
 				if (!unit.Player->AiEnabled &&
-					 !Map.IsFieldExplored(unit.Player, pos)) { // Unknown.
+					 !Map.IsFieldExplored(*unit.Player, pos)) { // Unknown.
 					continue;
 				}
 
@@ -2543,7 +2543,7 @@ CUnit *UnitFindMiningArea(const CUnit &unit, int x, int y,  int range, int resou
 				 *	competition with human players.
 				 */
 				if (!unit.Player->AiEnabled &&
-					 !Map.IsFieldExplored(unit.Player, pos)) { // Unknown.
+					 !Map.IsFieldExplored(*unit.Player, pos)) { // Unknown.
 					continue;
 				}
 

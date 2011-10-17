@@ -160,7 +160,7 @@ void MapFixSeenWallTile(const Vec2i &pos)
 		mf->SeenTile = tile;
 
 		// FIXME: can this only happen if seen?
-		if (Map.IsFieldVisible(ThisPlayer, pos)) {
+		if (Map.IsFieldVisible(*ThisPlayer, pos)) {
 			UI.Minimap.UpdateSeenXY(pos);
 		}
 	}
@@ -255,7 +255,7 @@ void MapFixWallTile(const Vec2i &pos)
 		mf->Tile = tile;
 		UI.Minimap.UpdateXY(pos);
 
-		if (Map.IsFieldVisible(ThisPlayer, pos)) {
+		if (Map.IsFieldVisible(*ThisPlayer, pos)) {
 			UI.Minimap.UpdateSeenXY(pos);
 			Map.MarkSeenTile(pos);
 		}
@@ -294,7 +294,7 @@ void CMap::RemoveWall(const Vec2i &pos)
 	MapFixWallTile(pos);
 	MapFixWallNeighbors(pos);
 
-	if (Map.IsFieldVisible(ThisPlayer, pos)) {
+	if (Map.IsFieldVisible(*ThisPlayer, pos)) {
 		UI.Minimap.UpdateSeenXY(pos);
 		this->MarkSeenTile(pos);
 	}
@@ -329,7 +329,7 @@ void CMap::SetWall(const Vec2i &pos, int humanwall)
 	MapFixWallTile(pos);
 	MapFixWallNeighbors(pos);
 
-	if (Map.IsFieldVisible(ThisPlayer, pos)) {
+	if (Map.IsFieldVisible(*ThisPlayer, pos)) {
 		UI.Minimap.UpdateSeenXY(pos);
 		this->MarkSeenTile(pos);
 	}

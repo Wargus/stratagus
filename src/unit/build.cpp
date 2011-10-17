@@ -373,7 +373,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 				ontop = NULL;
 				break;
 			}
-			if (player && !Map.IsFieldExplored(player, index + pos.x + w)) {
+			if (player && !Map.IsFieldExplored(*player, index + pos.x + w)) {
 				h = type.TileHeight;
 				ontop = NULL;
 				break;

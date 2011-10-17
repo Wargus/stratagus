@@ -623,7 +623,7 @@ void AiSendExplorers()
 			pos.y = center.y + SyncRand() % (2 * ray + 1) - ray;
 
 			if (Map.Info.IsPointOnMap(pos)) {
-				targetok = !Map.IsFieldExplored(AiPlayer->Player, pos);
+				targetok = !Map.IsFieldExplored(*AiPlayer->Player, pos);
 			}
 
 			ray = 3 * ray / 2;

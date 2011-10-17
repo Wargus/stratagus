@@ -212,19 +212,18 @@ public:
 	**
 	**  @return        0 unexplored, 1 explored, > 1 visible.
 	*/
-	unsigned short IsTileVisible(const CPlayer *const player,
-				 const unsigned int index) const
+	unsigned short IsTileVisible(const CPlayer &player, const unsigned int index) const
 	{
 		const CMapField *const mf = &this->Fields[index];
-		unsigned short visiontype = mf->Visible[player->Index];
+		unsigned short visiontype = mf->Visible[player.Index];
 
 		if (visiontype > 1) {
 			return visiontype;
 		}
-		if (player->SharedVision) {
+		if (player.SharedVision) {
 			for (int i = 0; i < PlayerMax ; ++i) {
-				if (player->SharedVision & (1 << i) &&
-						(Players[i].SharedVision & (1 << player->Index))) {
+				if (player.SharedVision & (1 << i) &&
+						(Players[i].SharedVision & (1 << player.Index))) {
 					if (mf->Visible[i] > 1) {
 						return 2;
 					}
@@ -232,7 +231,6 @@ public:
 				}
 			}
 		}
-
 		if (visiontype) {
 			return visiontype + (NoFogOfWar ? 1 : 0);
 		}
@@ -251,32 +249,24 @@ public:
 	}
 
 	/// Check if a field for the user is explored.
-	bool IsFieldExplored(const CPlayer *const player,
-					 const unsigned int index) const
+	bool IsFieldExplored(const CPlayer &player, const unsigned int index) const
 	{
-		//return IsTileVisible(player, index) > 0;
-#if 1
-		return this->Fields[index].IsExplored(player->Index);
-#else
-		if(!this->Fields[index].Visible[player->Index])
-			return IsTileVisible(player, index) > 0;
-		return true;
-#endif
-	};
+		return this->Fields[index].IsExplored(player.Index);
+	}
 
 	/// Check if a field for the user is visible.
-	bool IsFieldVisible(const CPlayer *const player, const unsigned int index) const
+	bool IsFieldVisible(const CPlayer &player, const unsigned int index) const
 	{
 		return IsTileVisible(player, index) > 1;
 	}
 
-	unsigned short IsTileVisible(const CPlayer *const player, const Vec2i &pos) const
+	unsigned short IsTileVisible(const CPlayer &player, const Vec2i &pos) const
 	{
 		return IsTileVisible(player, getIndex(pos));
 	}
 
 	/// Check if a field for the user is explored.
-	bool IsFieldExplored(const CPlayer *const player, const Vec2i &pos)
+	bool IsFieldExplored(const CPlayer &player, const Vec2i &pos)
 	{
 		Assert(Info.IsPointOnMap(pos));
 		return IsFieldExplored(player, getIndex(pos));
@@ -284,7 +274,7 @@ public:
 
 
 	/// Check if a field for the user is visible.
-	bool IsFieldVisible(const CPlayer *const player, const Vec2i &pos)
+	bool IsFieldVisible(const CPlayer &player, const Vec2i &pos)
 	{
 		return IsTileVisible(player, getIndex(pos)) > 1;
 	}
@@ -568,7 +558,7 @@ extern void MapCclRegister();
 // mixed sources
 //
 	/// Save a stratagus map (smp format)
-extern int SaveStratagusMap(const std::string &filename, CMap *map, int writeTerrain);
+extern int SaveStratagusMap(const std::string &filename, CMap &map, int writeTerrain);
 
 
 	/// Load map presentation
