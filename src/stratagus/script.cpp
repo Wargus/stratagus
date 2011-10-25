@@ -79,8 +79,6 @@
 
 lua_State *Lua;                       /// Structure to work with lua files.
 
-std::string CclStartFile;             /// CCL start file
-std::string UserDirectory;
 std::string GameName;
 std::string FullGameName;
 int CclInConfigFile;                  /// True while config file parsing
@@ -1881,7 +1879,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 
 	if (pathtype == 1) {
 		++userdir;
-		std::string dir(UserDirectory);
+		std::string dir(Parameters::Instance.GetUserDirectory());
 		if(!GameName.empty()) {
 			dir += "/";
 			dir += GameName;
@@ -1948,7 +1946,7 @@ static int CclSetGameName(lua_State *l)
 	}
 
 	if(!GameName.empty()) {
-		std::string path = UserDirectory + "/" + GameName;
+		std::string path = Parameters::Instance.GetUserDirectory() + "/" + GameName;
 		makedir(path.c_str(), 0777);
 	}
 
@@ -1990,7 +1988,7 @@ static int CclSetVideoSyncSpeed(lua_State *l)
 static int CclSetLocalPlayerName(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	LocalPlayerName = LuaToString(l, 1);
+	Parameters::Instance.LocalPlayerName = LuaToString(l, 1);
 	return 0;
 }
 
@@ -2002,7 +2000,7 @@ static int CclSetLocalPlayerName(lua_State *l)
 static int CclGetLocalPlayerName(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	lua_pushstring(l, LocalPlayerName.c_str());
+	lua_pushstring(l, Parameters::Instance.LocalPlayerName.c_str());
 	return 1;
 }
 
@@ -2324,29 +2322,6 @@ static int CclDefineExtraDeathTypes(lua_State *l)
 }
 
 /**
-**  Compiled with sound.
-**
-**  @param l  Lua state.
-*/
-static int CclGetCompileFeature(lua_State *l)
-{
-	const char *str;
-
-	LuaCheckArgs(l, 1);
-
-	str = LuaToString(l, 1);
-	if (CompileOptions.find(str) != std::string::npos) {
-		DebugPrint("I have %s\n" _C_ str);
-		lua_pushboolean(l, 1);
-	} else {
-		DebugPrint("I don't have %s\n" _C_ str);
-		lua_pushboolean(l, 0);
-	}
-
-	return 1;
-}
-
-/**
 **  Print debug message with info about current script name, line number and function.
 **
 **  @see DebugPrint
@@ -2450,13 +2425,12 @@ static void InitLua()
 }
 
 /**
-**  Initialize ccl and load the config file(s).
+**  Register some lua function.
 */
 void InitCcl()
 {
 	InitLua();
 
-	lua_register(Lua, "CompileFeature", CclGetCompileFeature);
 	lua_register(Lua, "LibraryPath", CclStratagusLibraryPath);
 	lua_register(Lua, "ListDirectory", CclListDirectory);
 	lua_register(Lua, "ListFilesInDirectory", CclListFilesInDirectory);
@@ -2702,37 +2676,6 @@ std::string SaveGlobal(lua_State *l, bool is_root)
 }
 
 /**
-**  Create directories containing user settings and data.
-**
-**  More specifically: logs, saved games, preferences
-*/
-void CreateUserDirectories()
-{
-	std::string s;
-
-#ifdef USE_WIN32
-	s = getenv("APPDATA");
-#else
-	s = getenv("HOME");
-#endif
-
-	UserDirectory = "";
-
-	if (!s.empty())
-		UserDirectory = s + "/";
-
-#ifdef USE_WIN32
-	UserDirectory += "Stratagus";
-#elif defined(USE_MAC)
-	UserDirectory += "Library/Stratagus";
-#else
-	UserDirectory += ".stratagus";
-#endif
-
-	makedir(UserDirectory.c_str(), 0777);
-}
-
-/**
 **  Save user preferences
 */
 void SavePreferences()
@@ -2765,7 +2708,7 @@ void SavePreferences()
 		lua_gettable(Lua, LUA_GLOBALSINDEX);
 	}
 	if (lua_type(Lua, -1) == LUA_TTABLE) {
-		path = UserDirectory;
+		path = Parameters::Instance.GetUserDirectory();
 		if (!GameName.empty()) {
 			path += "/";
 			path += GameName;
@@ -2790,15 +2733,13 @@ void SavePreferences()
 /**
 **  Load stratagus config file.
 */
-void LoadCcl()
+void LoadCcl(const std::string& filename)
 {
 	char buf[PATH_MAX];
 
-	//
 	//  Load and evaluate configuration file
-	//
 	CclInConfigFile = 1;
-	LibraryFileName(CclStartFile.c_str(), buf, sizeof(buf));
+	LibraryFileName(filename.c_str(), buf, sizeof(buf));
 	if (access(buf, R_OK)) {
 		fprintf(stderr, "Maybe you need to specify another gamepath with '-d /path/to/datadir'?\n");
 		ExitFatal(-1);

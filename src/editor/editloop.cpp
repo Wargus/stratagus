@@ -1942,9 +1942,11 @@ void CEditor::Init()
 	//
 	// Load and evaluate the editor configuration file
 	//
-	LibraryFileName(EditorStartFile, buf, sizeof(buf));
+	LibraryFileName(Parameters::Instance.luaEditorStartFilename.c_str(), buf, sizeof(buf));
 	if (access(buf, R_OK)) {
-		fprintf(stderr, "Editor configuration file '%s' was not found\nSpecify another with '-E file.lua'\n", EditorStartFile);
+		fprintf(stderr, "Editor configuration file '%s' was not found\n"
+			"Specify another with '-E file.lua'\n",
+			Parameters::Instance.luaEditorStartFilename.c_str());
 		ExitFatal(-1);
 	}
 
@@ -2164,7 +2166,7 @@ void EditorMainLoop()
 
 		CleanModules();
 
-		LoadCcl(); // Reload the main config file
+		LoadCcl(Parameters::Instance.luaStartFilename); // Reload the main config file
 
 		PreMenuSetup();
 

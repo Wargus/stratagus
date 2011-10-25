@@ -231,25 +231,51 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #define REDIRECT_OUTPUT
 #endif
 
-extern void CreateUserDirectories(void);
+
+void Parameters::SetDefaultValues()
+{
+	applicationName = "stratagus";
+	luaStartFilename = "scripts/stratagus.lua";
+	luaEditorStartFilename = "scripts/editor.lua";
+	SetUserDirectory();
+}
+
+void Parameters::SetUserDirectory()
+{
+#ifdef USE_WIN32
+	UserDirectory = getenv("APPDATA");
+#else
+	UserDirectory = getenv("HOME");
+#endif
+
+	if (!UserDirectory.empty())
+		UserDirectory += "/";
+
+#ifdef USE_WIN32
+	UserDirectory += "Stratagus";
+#elif defined(USE_MAC)
+	UserDirectory += "Library/Stratagus";
+#else
+	UserDirectory += ".stratagus";
+#endif
+}
+
+
+/* static */ Parameters Parameters::Instance;
+
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
 std::string StratagusLibPath;        /// Path for data directory
-std::string LocalPlayerName;         /// Name of local player
 
 	/// Name, Version, Copyright
-const char NameLine[] =
-	NAME " V" VERSION ", " COPYRIGHT;
+const char NameLine[] = NAME " V" VERSION ", " COPYRIGHT;
 
 std::string CliMapName;          /// Filename of the map given on the command line
-std::string CompileOptions;          /// Compile options.
 static std::vector<gcn::Container *> Containers;
 std::string MenuRace;
-
-const char * app;
 
 /*----------------------------------------------------------------------------
 --  Speedups FIXME: Move to some other more logic place
@@ -267,7 +293,7 @@ int SpeedResearch = 1;               /// speed factor for researching
 ============================================================================*/
 
 unsigned long GameCycle;             /// Game simulation cycle counter
-unsigned long ResultGameCycle;             /// Used in game result
+unsigned long ResultGameCycle;       /// Used in game result
 unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
 
 /*============================================================================
@@ -311,7 +337,7 @@ void ShowLoadProgress(const char *fmt, ...)
 /**
 **  Pre menu setup.
 */
-void PreMenuSetup(void)
+void PreMenuSetup()
 {
 	//
 	//  Initial menus require some gfx.
@@ -338,7 +364,7 @@ void PreMenuSetup(void)
 **
 **  @return          0 for success, else exit.
 */
-static int MenuLoop(void)
+static int MenuLoop()
 {
 	char buf[1024];
 	int status;
@@ -358,7 +384,6 @@ static int MenuLoop(void)
 	status = LuaLoadFile(buf);
 
 	// We clean up later in Exit
-
 	return status;
 }
 
@@ -372,7 +397,7 @@ extern void CleanTriggers();
 **  Contrary to CleanModules, maps can be restarted
 **  without reloading all lua files.
 */
-void CleanGame(void)
+void CleanGame()
 {
 	EndReplayLog();
 	CleanMessages();
@@ -394,7 +419,7 @@ void CleanGame(void)
 static void ExpandPath(std::string &newpath, const std::string &path)
 {
 	if (path[0] == '~') {
-		newpath = UserDirectory;
+		newpath = Parameters::Instance.GetUserDirectory();
 		if(!GameName.empty()) {
 			newpath += "/";
 			newpath += GameName;
@@ -496,9 +521,9 @@ int SaveReplay(const std::string &filename)
 		return -1;
 	}
 
-	destination = UserDirectory + "/logs/" + filename;
+	destination = Parameters::Instance.GetUserDirectory() + "/logs/" + filename;
 
-	logfile << UserDirectory << "/logs/log_of_stratagus_" << ThisPlayer->Index << ".log";
+	logfile << Parameters::Instance.GetUserDirectory() << "/logs/log_of_stratagus_" << ThisPlayer->Index << ".log";
 
 	if (stat(logfile.str().c_str(), &sb)) {
 		fprintf(stderr, "stat failed\n");
@@ -537,8 +562,56 @@ int SaveReplay(const std::string &filename)
 /**
 **  Print headerline, copyright, ...
 */
-static void PrintHeader(void)
+static void PrintHeader()
 {
+	std::string CompileOptions =
+#ifdef DEBUG
+		"DEBUG "
+#endif
+#ifdef USE_ZLIB
+		"ZLIB "
+#endif
+#ifdef USE_BZ2LIB
+		"BZ2LIB "
+#endif
+#ifdef USE_VORBIS
+		"VORBIS "
+#endif
+#ifdef USE_THEORA
+		"THEORA "
+#endif
+#ifdef USE_MIKMOD
+		"MIKMOD "
+#endif
+#ifdef USE_MNG
+		"MNG "
+#endif
+#ifdef USE_OPENGL
+		"OPENGL "
+#endif
+#ifdef USE_GLES
+		"GLES "
+#endif
+#ifdef USE_WIN32
+		"WIN32 "
+#endif
+#ifdef USE_BSD
+		"BSD "
+#endif
+#ifdef USE_BEOS
+		"BEOS "
+#endif
+#ifdef USE_MAC
+		"MAC "
+#endif
+#ifdef USE_MAEMO
+		"MAEMO "
+#endif
+#ifdef USE_TOUCHSCREEN
+		"TOUCHSCREEN "
+#endif
+		"";
+
 	fprintf(stdout,
 		"%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n"
 		"  Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon, Pali Rohar,\n"
@@ -548,61 +621,20 @@ static void PrintHeader(void)
 		NameLine, CompileOptions.c_str());
 }
 
-/**
-**  Main1, called from main.
-**
-**  @param argc  Number of arguments.
-**  @param argv  Vector of arguments.
-*/
-static int main1(int, char **)
+void PrintLicense()
 {
-	PrintHeader();
-	printf(
-	"\n"
-	"\n"
-	"Stratagus may be copied only under the terms of the GNU General Public License\n"
-	"which may be found in the Stratagus source kit.\n"
-	"\n"
-	"DISCLAIMER:\n"
-	"This software is provided as-is.  The author(s) can not be held liable for any\n"
-	"damage that might arise from the use of this software.\n"
-	"Use it at your own risk.\n"
-	"\n");
-
-	// Setup video display
-	InitVideo();
-
-	// Setup sound card
-	if (!InitSound()) {
-		InitMusic();
-	}
-
-#ifndef DEBUG           // For debug it's better not to have:
-	srand(time(NULL));  // Random counter = random each start
-#endif
-
-	//
-	//  Show title screens.
-	//
-	SetDefaultTextColors(FontYellow, FontWhite);
-	LoadFonts();
-	SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
-	Video.ClearScreen();
-	ShowTitleScreens();
-
-	// Init player data
-	ThisPlayer = NULL;
-	//Don't clear the Players strucure as it would erase the allowed units.
-	// memset(Players, 0, sizeof(Players));
-	NumPlayers = 0;
-
-	UnitManager.Init(); // Units memory management
-	PreMenuSetup();     // Load everything needed for menus
-
-	MenuLoop();
-
-	return 0;
+	printf("\n"
+			"\n"
+			"Stratagus may be copied only under the terms of the GNU General Public License\n"
+			"which may be found in the Stratagus source kit.\n"
+			"\n"
+			"DISCLAIMER:\n"
+			"This software is provided as-is.  The author(s) can not be held liable for any\n"
+			"damage that might arise from the use of this software.\n"
+			"Use it at your own risk.\n"
+			"\n");
 }
+
 
 /**
 **  Exit the game.
@@ -658,33 +690,33 @@ void ExitFatal(int err)
 /**
 **  Display the usage.
 */
-static void Usage(void)
+static void Usage()
 {
 	PrintHeader();
 	printf(
-"\n\nUsage: %s [OPTIONS] [map.smp|map.smp.gz]\n\
-\t-c file.lua\tConfiguration start file (default stratagus.lua)\n\
-\t-d datapath\tPath to stratagus data (default current directory)\n\
-\t-D depth\tVideo mode depth = pixel per point\n\
-\t-e\t\tStart editor (instead of game)\n\
-\t-E file.lua\tEditor configuration start file (default editor.lua)\n\
-\t-F\t\tFull screen video mode\n\
-\t-h\t\tHelp shows this page\n\
-\t-I addr\t\tNetwork address to use\n\
-\t-l\t\tDisable command log\n\
-\t-L lag\t\tNetwork lag in # frames (default 10 = 333ms)\n\
-\t-n server\tNetwork server host preset\n\
-\t-N name\t\tName of the player\n\
-\t-o\t\tDo not use OpenGL or OpenGL ES 1.1\n\
-\t-O\t\tUse OpenGL or OpenGL ES 1.1\n\
-\t-P port\t\tNetwork port to use\n\
-\t-s sleep\tNumber of frames for the AI to sleep before it starts\n\
-\t-S speed\tSync speed (100 = 30 frames/s)\n\
-\t-U update\tNetwork update rate in # frames (default 5=6x per s)\n\
-\t-v mode\t\tVideo mode resolution in format <xres>x<yres>\n\
-\t-W\t\tWindowed video mode\n\
-map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n\
-", app);
+		"\n\nUsage: %s [OPTIONS] [map.smp|map.smp.gz]\n"
+		"\t-c file.lua\tConfiguration start file (default stratagus.lua)\n"
+		"\t-d datapath\tPath to stratagus data (default current directory)\n"
+		"t-D depth\tVideo mode depth = pixel per point\n"
+		"\t-e\t\tStart editor (instead of game)\n"
+		"\t-E file.lua\tEditor configuration start file (default editor.lua)\n"
+		"\t-F\t\tFull screen video mode\n"
+		"\t-h\t\tHelp shows this page\n"
+		"\t-I addr\t\tNetwork address to use\n"
+		"\t-l\t\tDisable command log\n"
+		"\t-L lag\t\tNetwork lag in # frames (default 10 = 333ms)\n"
+		"\t-n server\tNetwork server host preset\n"
+		"\t-N name\t\tName of the player\n"
+		"\t-o\t\tDo not use OpenGL or OpenGL ES 1.1\n"
+		"\t-O\t\tUse OpenGL or OpenGL ES 1.1\n"
+		"\t-P port\t\tNetwork port to use\n"
+		"\t-s sleep\tNumber of frames for the AI to sleep before it starts\n"
+		"\t-S speed\tSync speed (100 = 30 frames/s)\n"
+		"\t-U update\tNetwork update rate in # frames (default 5=6x per s)\n"
+		"\t-v mode\t\tVideo mode resolution in format <xres>x<yres>\n"
+		"\t-W\t\tWindowed video mode\n"
+		"map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n",
+			Parameters::Instance.applicationName.c_str());
 }
 
 #ifdef REDIRECT_OUTPUT
@@ -730,121 +762,12 @@ static void RedirectOutput()
 }
 #endif
 
-/**
-**  The main program: initialise, parse options and arguments.
-**
-**  @param argc  Number of arguments.
-**  @param argv  Vector of arguments.
-*/
-int main(int argc, char **argv)
+void ParseCommandLine(int argc, char** argv, Parameters& parameters)
 {
-#ifdef REDIRECT_OUTPUT
-	RedirectOutput();
-#endif
-
-	CompileOptions =
-#ifdef DEBUG
-		"DEBUG "
-#endif
-#ifdef USE_ZLIB
-		"ZLIB "
-#endif
-#ifdef USE_BZ2LIB
-		"BZ2LIB "
-#endif
-#ifdef USE_VORBIS
-		"VORBIS "
-#endif
-#ifdef USE_THEORA
-		"THEORA "
-#endif
-#ifdef USE_MIKMOD
-		"MIKMOD "
-#endif
-#ifdef USE_MNG
-		"MNG "
-#endif
-#ifdef USE_OPENGL
-		"OPENGL "
-#endif
-#ifdef USE_GLES
-		"GLES "
-#endif
-#ifdef USE_WIN32
-		"WIN32 "
-#endif
-#ifdef USE_BSD
-		"BSD "
-#endif
-#ifdef USE_BEOS
-		"BEOS "
-#endif
-#ifdef USE_MAC
-		"MAC "
-#endif
-#ifdef USE_MAEMO
-		"MAEMO "
-#endif
-#ifdef USE_TOUCHSCREEN
-		"TOUCHSCREEN "
-#endif
-		"";
-
-#ifdef USE_BEOS
-	//
-	//  Parse arguments for BeOS
-	//
-	beos_init(argc, argv);
-#endif
-
-	//
-	//  Setup some defaults.
-	//
-#ifndef MAC_BUNDLE
-	StratagusLibPath = ".";
-#else
-	freopen("/tmp/stdout.txt", "w", stdout);
-	freopen("/tmp/stderr.txt", "w", stderr);
-	// Look for the specified data set inside the application bundle
-	// This should be a subdir of the Resources directory
-	CFURLRef pluginRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(),
-		CFSTR(MAC_BUNDLE_DATADIR), NULL, NULL);
-	CFStringRef macPath = CFURLCopyFileSystemPath(pluginRef,
-		 kCFURLPOSIXPathStyle);
-	const char *pathPtr = CFStringGetCStringPtr(macPath,
-		CFStringGetSystemEncoding());
-	Assert(pathPtr);
-	StratagusLibPath = pathPtr;
-#endif
-	CclStartFile = "scripts/stratagus.lua";
-	EditorStartFile = "scripts/editor.lua";
-
-	app = argv[0];
-
-	//  Default player name to username on unix systems.
-	LocalPlayerName.clear();
-#if defined(USE_WIN32) || defined(USE_MAEMO)
-	LocalPlayerName = "Anonymous";
-#else
-	{
-		const char *tmp_name = getenv("USER");
-		if (tmp_name) {
-			LocalPlayerName = tmp_name;
-		} else {
-			LocalPlayerName = "Anonymous";
-		}
-	}
-#endif
-
-	// FIXME: Parse options before or after scripts?
-
-	//
-	//  Parse commandline
-	//
 	for (;;) {
 		switch (getopt(argc, argv, "c:d:D:eE:FhI:lL:n:N:oOP:s:S:U:v:W?")) {
 			case 'c':
-				CclStartFile = optarg;
+				parameters.luaStartFilename = optarg;
 				continue;
 			case 'd':
 			{
@@ -862,7 +785,7 @@ int main(int argc, char **argv)
 				Editor.Running = EditorCommandLine;
 				continue;
 			case 'E':
-				EditorStartFile = optarg;
+				parameters.luaEditorStartFilename = optarg;
 				continue;
 			case 'F':
 				VideoForceFullScreen = 1;
@@ -886,7 +809,7 @@ int main(int argc, char **argv)
 				NetworkArg = optarg;
 				continue;
 			case 'N':
-				LocalPlayerName = optarg;
+				parameters.LocalPlayerName = optarg;
 				continue;
 			case 'o':
 				ForceUseOpenGL = 1;
@@ -955,21 +878,109 @@ int main(int argc, char **argv)
 		}
 		--argc;
 	}
+}
 
+std::string GetLocalPlayerNameFromEnv()
+{
+//  Default player name to username on unix systems.
+#if defined(USE_WIN32) || defined(USE_MAEMO)
+	return "Anonymous";
+#else
+	const char *userName = getenv("USER");
+
+	if (userName) {
+		return userName;
+	} else {
+		return "Anonymous";
+	}
+#endif
+}
+
+/**
+**  The main program: initialise, parse options and arguments.
+**
+**  @param argc  Number of arguments.
+**  @param argv  Vector of arguments.
+*/
+int main(int argc, char **argv)
+{
+#ifdef REDIRECT_OUTPUT
+	RedirectOutput();
+#endif
+
+#ifdef USE_BEOS
+	//  Parse arguments for BeOS
+	beos_init(argc, argv);
+#endif
+
+	//  Setup some defaults.
+#ifndef MAC_BUNDLE
+	StratagusLibPath = ".";
+#else
+	freopen("/tmp/stdout.txt", "w", stdout);
+	freopen("/tmp/stderr.txt", "w", stderr);
+	// Look for the specified data set inside the application bundle
+	// This should be a subdir of the Resources directory
+	CFURLRef pluginRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(),
+		CFSTR(MAC_BUNDLE_DATADIR), NULL, NULL);
+	CFStringRef macPath = CFURLCopyFileSystemPath(pluginRef,  kCFURLPOSIXPathStyle);
+	const char *pathPtr = CFStringGetCStringPtr(macPath, CFStringGetSystemEncoding());
+	Assert(pathPtr);
+	StratagusLibPath = pathPtr;
+#endif
+
+	Parameters& parameters = Parameters::Instance;
+	parameters.SetDefaultValues();
+	parameters.applicationName = argv[0];
+	parameters.LocalPlayerName = GetLocalPlayerNameFromEnv();
+
+	// FIXME: Parse options before or after scripts?
+	ParseCommandLine(argc, argv, parameters);
 	// Init the random number generator.
 	InitSyncRand();
 
-	CreateUserDirectories();
+	makedir(parameters.GetUserDirectory().c_str(), 0777);
 
-	// Init CCL and load configurations!
+	// Init Lua and register lua functions!
 	InitCcl();
 
 	// Initialise AI module
 	InitAiModule();
 
-	LoadCcl();
+	LoadCcl(parameters.luaStartFilename);
 
-	main1(argc, argv);
+	PrintHeader();
+	PrintLicense();
+
+	// Setup video display
+	InitVideo();
+
+	// Setup sound card
+	if (!InitSound()) {
+		InitMusic();
+	}
+
+#ifndef DEBUG           // For debug it's better not to have:
+	srand(time(NULL));  // Random counter = random each start
+#endif
+
+	//  Show title screens.
+	SetDefaultTextColors(FontYellow, FontWhite);
+	LoadFonts();
+	SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
+	Video.ClearScreen();
+	ShowTitleScreens();
+
+	// Init player data
+	ThisPlayer = NULL;
+	//Don't clear the Players strucure as it would erase the allowed units.
+	// memset(Players, 0, sizeof(Players));
+	NumPlayers = 0;
+
+	UnitManager.Init(); // Units memory management
+	PreMenuSetup();     // Load everything needed for menus
+
+	MenuLoop();
 
 	Exit(0);
 	return 0;

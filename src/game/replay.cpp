@@ -421,7 +421,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	if (!LogFile) {
 		struct stat tmp;
 		char buf[16];
-		std::string path(UserDirectory);
+		std::string path(Parameters::Instance.GetUserDirectory());
 		if(!GameName.empty()) {
 			path += "/";
 			path += GameName;

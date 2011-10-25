@@ -267,7 +267,6 @@ struct _StringDesc_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern std::string CclStartFile;   /// CCL start file
 extern int CclInConfigFile;        /// True while config file parsing
 
 /*----------------------------------------------------------------------------
@@ -280,7 +279,7 @@ extern bool LuaToBoolean(lua_State *l, int narg);
 
 extern void CclGarbageCollect(int fast);  /// Perform garbage collection
 extern void InitCcl();                /// Initialise ccl
-extern void LoadCcl();                /// Load ccl config file
+extern void LoadCcl(const std::string& filename);  /// Load ccl config file
 extern void SaveCcl(CFile *file);     /// Save CCL module
 extern void SavePreferences();        /// Save user preferences
 extern int CclCommand(const std::string &command, bool exitOnError = true);

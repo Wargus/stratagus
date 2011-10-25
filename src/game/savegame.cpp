@@ -78,7 +78,7 @@
 static std::string GetSaveDir()
 {
 	struct stat tmp;
-	std::string dir(UserDirectory);
+	std::string dir(Parameters::Instance.GetUserDirectory());
 	if(!GameName.empty()) {
 		dir += "/";
 		dir += GameName;

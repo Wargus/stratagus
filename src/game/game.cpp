@@ -610,8 +610,10 @@ void CreateGame(const std::string &filename, CMap *map)
 		DebugPrint("Client setup: Calling InitNetwork2\n");
 		InitNetwork2();
 	} else {
-		if (!LocalPlayerName.empty() && LocalPlayerName != "Anonymous") {
-			ThisPlayer->SetName(LocalPlayerName);
+		const std::string& localPlayerName = Parameters::Instance.LocalPlayerName;
+
+		if (!localPlayerName.empty() && localPlayerName != "Anonymous") {
+			ThisPlayer->SetName(localPlayerName);
 		}
 	}
 

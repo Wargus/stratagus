@@ -220,7 +220,7 @@ int SendMetaCommand(const char *command, const char *format, ...)
 	char *s;
 	va_list ap;
 
-	oldsize = size = GameName.size() + LocalPlayerName.size() +
+	oldsize = size = GameName.size() + Parameters::Instance.LocalPlayerName.size() +
 		strlen(command) + 100;
 	ret = -1;
 	if ((p = new char[size]) == NULL) {
@@ -235,7 +235,7 @@ int SendMetaCommand(const char *command, const char *format, ...)
 	// <Stratagus> if for Magnant Compatibility, it may be removed
 	// Player Name, Game Name, VERSION, Command, **Paramaters**
 	sprintf(s, "<Stratagus>\n%s\n%s\n%s\n%s\n",
-		LocalPlayerName.c_str(), GameName.c_str(), VERSION, command);
+		Parameters::Instance.LocalPlayerName.c_str(), GameName.c_str(), VERSION, command);
 
 	// Commands
 	// Login - password

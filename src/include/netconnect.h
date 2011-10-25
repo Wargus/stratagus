@@ -207,8 +207,6 @@ extern int NetPlayers;                /// Network players
 extern char* NetworkAddr;             /// Local network address to use
 extern int NetworkPort;               /// Local network port to use
 
-extern std::string LocalPlayerName;   /// Name of local player
-
 extern int HostsCount;                /// Number of hosts.
 extern CNetworkHost Hosts[PlayerMax]; /// Host, port, and number of all players.
 

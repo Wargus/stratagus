@@ -538,7 +538,7 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 
 	// In user home directory
 	if (!GameName.empty()) {
-		sprintf(buffer, "%s/%s/%s", UserDirectory.c_str(), GameName.c_str(), file);
+		sprintf(buffer, "%s/%s/%s", Parameters::Instance.GetUserDirectory().c_str(), GameName.c_str(), file);
 		if (FindFileWithExtension(buffer, buffersize)) {
 			return buffer;
 		}

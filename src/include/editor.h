@@ -115,8 +115,6 @@ public:
 
 extern CEditor Editor;
 
-extern const char *EditorStartFile;  /// Editor CCL start file
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/

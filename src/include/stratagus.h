@@ -206,7 +206,29 @@ extern const char NameLine[];
 --  stratagus.c
 ----------------------------------------------------------------------------*/
 
-extern std::string UserDirectory;           /// Directory containing user settings and data
+class Parameters
+{
+public:
+	void SetDefaultValues();
+
+	const std::string& GetUserDirectory() { return UserDirectory; }
+
+private:
+	void SetUserDirectory();
+
+public:
+	std::string applicationName;
+	std::string luaStartFilename;
+	std::string luaEditorStartFilename;
+	std::string LocalPlayerName;        /// Name of local player
+private:
+	std::string UserDirectory;          /// Directory containing user settings and data
+public:
+	static Parameters Instance;
+};
+
+
+
 extern std::string StratagusLibPath;        /// Location of stratagus data
 extern std::string GameName;                /// Name of the game
 extern std::string FullGameName;            /// Full Name of the game
@@ -235,12 +257,12 @@ extern std::string SaveGlobal(lua_State *l, bool is_root); /// For saving lua st
 extern void Exit(int err);                  /// Exit
 extern void ExitFatal(int err);             /// Exit with fatal error
 
-extern void UpdateDisplay(void);            /// Game display update
-extern void InitModules(void);              /// Initialize all modules
-extern void LoadModules(void);              /// Load all modules
-extern void CleanModules(void);             /// Cleanup all modules
-extern void DrawMapArea(void);              /// Draw the map area
-extern void GameMainLoop(void);             /// Game main loop
+extern void UpdateDisplay();            /// Game display update
+extern void InitModules();              /// Initialize all modules
+extern void LoadModules();              /// Load all modules
+extern void CleanModules();             /// Cleanup all modules
+extern void DrawMapArea();              /// Draw the map area
+extern void GameMainLoop();             /// Game main loop
 
 	/// Show load progress
 extern void ShowLoadProgress(const char *fmt, ...);
@@ -268,7 +290,6 @@ extern bool CanAccessFile(const char *filename);
 	/// How many resources the player gets back if canceling upgrade
 #define CancelUpgradeCostsFactor   100
 
-extern std::string CompileOptions;
 //@}
 
 #endif // !__STRATAGUS_H__
