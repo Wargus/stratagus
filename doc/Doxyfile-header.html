@@ -1,24 +1,62 @@
-<!-- This comment will put IE 6, 7 and 8 in quirks mode -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <title>$title</title>
-<link href="tabs.css" rel="stylesheet" type="text/css"/>
-<link href="search/search.css" rel="stylesheet" type="text/css"/>
-<script type="text/javaScript" src="search/search.js"></script>
-<link href="doxygen.css" rel="stylesheet" type="text/css"/>
+<link href="$relpath$tabs.css" rel="stylesheet" type="text/css"/>
+<link href="$relpath$doxygen.css" rel="stylesheet" type="text/css" />
+$treeview
+$search
+$mathjax
 </head>
-<body onload='searchBox.OnSelectItem(0);'>
+<body>
+<div id="top"><!-- do not remove this div! -->
+<!-- Disable default Doxygen header
+<!--BEGIN TITLEAREA-->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <!--BEGIN PROJECT_LOGO-->
+  <td id="projectlogo"><img alt="Logo" src="$relpath$$projectlogo"></td>
+  <!--END PROJECT_LOGO-->
+  <!--BEGIN PROJECT_NAME-->
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">$projectname
+   <!--BEGIN PROJECT_NUMBER-->&#160;<span id="projectnumber">$projectnumber</span><!--END PROJECT_NUMBER-->
+   </div>
+   <!--BEGIN PROJECT_BRIEF--><div id="projectbrief">$projectbrief</div><!--END PROJECT_BRIEF-->
+  </td>
+  <!--END PROJECT_NAME-->
+  <!--BEGIN !PROJECT_NAME-->
+   <!--BEGIN PROJECT_BRIEF-->
+    <td style="padding-left: 0.5em;">
+    <div id="projectbrief">$projectbrief</div>
+    </td>
+   <!--END PROJECT_BRIEF-->
+  <!--END !PROJECT_NAME-->
+  <!--BEGIN DISABLE_INDEX-->
+   <!--BEGIN SEARCHENGINE-->
+   <td>$searchbox</td>
+   <!--END SEARCHENGINE-->
+  <!--END DISABLE_INDEX-->
+ </tr>
+ </tbody>
+</table>
+</div>
+<!--END TITLEAREA-->
+-->
+<!-- Begin of Stratagus header -->
 <pre width="80">
-         _________ __                 __                               
+         _________ __                 __
         /   _____//  |_____________ _/  |______     ____  __ __  ______
         \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \
        /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-               \/                  \/          \//_____/            \/ 
+               \/                  \/          \//_____/            \/
     ______________________                           ______________________
-			  T H E   W A R   B E G I N S
-	   Stratagus - A free fantasy real time strategy game engine
+                          T H E   W A R   B E G I N S
+           Stratagus - A free fantasy real time strategy game engine
 </pre>
-<hr/>
+<hr />
+<!-- End of Stratagus header -->
