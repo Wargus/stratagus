@@ -610,10 +610,10 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = metaserver \
-                         src \
+INPUT                  = src \
                          ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp \
                          gameheaders \
+                         metaserver \
                          tools
 
 # This tag can be used to specify the character encoding of the source files
@@ -1465,7 +1465,8 @@ PREDEFINED             = USE_ZLIB \
                          USE_BEOS \
                          USE_MAC \
                          USE_MAEMO \
-                         DOXYGEN=
+                         WIN32 \
+                         DOXYGEN
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.

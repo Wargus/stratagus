@@ -111,6 +111,18 @@
  * Additional extract data game info
  **/
 
+/* Fake definitions for Doxygen */
+#ifdef DOXYGEN
+#define GAME_NAME
+#define GAME_CD
+#define GAME_CD_DIR
+#define GAME_CD_FILE
+#define GAME
+#define EXTRACT_BIN
+#define EXTRACT_COMMAND
+#define EXTRACT_INFO
+#endif
+
 #if ! defined (GAME_NAME) || ! defined (GAME_CD) || ! defined (GAME_CD_DIR) || ! defined (GAME_CD_FILE) || ! defined (GAME) || ! defined (EXTRACT_BIN) || ! defined (EXTRACT_COMMAND) || ! defined (EXTRACT_INFO)
 #error You need to define all Game macros, see stratagus-maemo-extract.h
 #endif
@@ -135,7 +147,7 @@
 #define DATA_DIR "/home/user/" GAME_CD_DIR
 #define EXTRACT_DIR "/home/user/MyDocs/stratagus/" GAME
 
-static inline void message(char * title, char * text, int error) {
+static void message(char * title, char * text, int error) {
 
 	GtkWidget * window = NULL;
 	GtkWidget * dialog = NULL;

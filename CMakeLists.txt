@@ -779,7 +779,7 @@ if(ENABLE_DOC AND DOXYGEN_FOUND)
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 	add_custom_command(OUTPUT doxygen/index.html
 		COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-		DEPENDS doc/Doxyfile* ${stratagus_SRCS} ${stratagus_HDRS} ${metaserver_SRCS} ${metaserver_HDRS}
+		DEPENDS doc/Doxyfile* ${stratagus_SRCS} ${stratagus_HDRS} ${metaserver_SRCS} ${metaserver_HDRS} ${gameheaders_HDRS} ${png2stratagus_SRCS}
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		COMMENT "Generating Stratagus souce code documentation with Doxygen" VERBATIM
 	)

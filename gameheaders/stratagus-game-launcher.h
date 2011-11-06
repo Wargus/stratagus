@@ -43,6 +43,17 @@
  *
  * ::GAME
  *
+ * On Non Windows system you need to specify also paths:
+ *
+ * ::DATA_PATH
+ *
+ * ::SCRIPTS_PATH
+ *
+ * ::STRATAGUS_BIN
+ *
+ * On Windows paths are reading from InstallLocation key in Uninstall section:
+ * Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Stratagus
+ *
  * Example use of code:
  *
  * @code
@@ -50,6 +61,13 @@
  * #define GAME_NAME "My Game Name"
  * #define GAME_CD "Original Game CD Name"
  * #define GAME "my_game"
+ *
+ * #ifndef WIN32
+ * #define DATA_PATH "/usr/share/games/stratagus/my_game"
+ * #define SCRIPTS_PATH "/usr/share/games/stratagus/my_game"
+ * #define STRATAGUS_BIN "/usr/games/stratagus"
+ * #endif
+ *
  * #include <stratagus-game-launcher.h>
  *
  * @endcode
@@ -70,11 +88,40 @@
  * Short name of game (lower ascii chars without space)
  **/
 
+/**
+ * \def DATA_PATH
+ * Path to game data directory
+ **/
+
+/**
+ * \def SCRIPTS_PATH
+ * Path to game scripts directory
+ **/
+
+/**
+ * \def STRATAGUS_BIN
+ * Path to stratagus executable binary
+ **/
+
+/* Fake definitions for Doxygen */
+#ifdef DOXYGEN
+#define GAME_NAME
+#define GAME_CD
+#define GAME
+#define DATA_PATH
+#define SCRIPTS_PATH
+#define STRATAGUS_BIN
+#endif
+
 #if ! defined (GAME_NAME) || ! defined (GAME_CD) || ! defined (GAME)
 #error You need to define all Game macros, see stratagus-game-launcher.h
 #endif
 
-#if defined (MAEMO_GTK) || defined (MAEMO_CHANGES)
+#if ! defined (DATA_PATH) || ! defined (SCRIPTS_PATH) || ! defined (STRATAGUS_BIN)
+#error You need to define paths, see stratagus-game-launcher.h
+#endif
+
+#if ( defined (MAEMO_GTK) || defined (MAEMO_CHANGES) ) && ! defined (MAEMO)
 #define MAEMO
 #endif
 
@@ -124,28 +171,6 @@
 #define REGKEY "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Stratagus"
 #endif
 
-#ifndef WIN32
-
-#ifdef MAEMO
-#define DATA_PATH "/home/user/MyDocs/stratagus/" GAME
-#define SCRIPTS_PATH "/opt/stratagus/share/" GAME
-#define STRATAGUS_BIN "/opt/stratagus/bin/stratagus"
-#endif
-
-#ifndef DATA_PATH
-#define DATA_PATH "/usr/share/games/stratagus/" GAME
-#endif
-
-#ifndef SCRIPTS_PATH
-#define SCRIPTS_PATH "/usr/share/games/stratagus/" GAME
-#endif
-
-#ifndef STRATAGUS_BIN
-#define STRATAGUS_BIN "/usr/games/stratagus"
-#endif
-
-#endif
-
 #define TITLE GAME_NAME
 #define STRATAGUS_NOT_FOUND "Stratagus is not installed.\nYou need Stratagus to run " GAME_NAME "!\nFirst install Stratagus from https://launchpad.net/stratagus"
 #define DATA_NOT_EXTRACTED GAME_NAME " data was not extracted yet.\nYou need extract data from original " GAME_CD " first!"
@@ -158,7 +183,7 @@
 int ConsoleMode = 0;
 #endif
 
-static inline void error(char * title, char * text) {
+static void error(char * title, char * text) {
 
 #ifdef WIN32
 	MessageBox(NULL, text, title, MB_OK | MB_ICONERROR);
