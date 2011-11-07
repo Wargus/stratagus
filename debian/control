@@ -118,7 +118,7 @@ Description: Strategy Gaming Engine (documentation)
 
 Package: stratagus-dev
 Architecture: all
-Suggests: stratagus
+Depends: stratagus
 Description: Strategy Gaming Engine (development files)
  Stratagus is a free cross-platform real-time strategy gaming engine.
  It includes support for playing over Internet/LAN, or playing vs.
