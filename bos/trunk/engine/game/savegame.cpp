@@ -134,7 +134,7 @@ void SaveGame(const std::string &filename)
 	// FIXME: find all state information which must be saved.
 	s = SaveGlobal(Lua, true);
 	if (s != NULL) {
-		file.printf("-- Lua state\n\n %s\n", s);
+		file.printf("-- Lua state\n\n%s\n", s);
 		delete[] s;
 	}
 	file.close();
