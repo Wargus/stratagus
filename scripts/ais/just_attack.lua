@@ -30,47 +30,34 @@
 --      $Id: just_attack.lua  $
 --
 
-local player
+-- What we registered in AiTypes.
+local this_ai_type
 
-local function AiLoop(loop_funcs, loop_pos)
-  local ret
+-- Same as AiState[AiPlayer()].  Valid only during AiLoop.
+local state
 
-  player = AiPlayer() + 1
+local function AiLoop(funcs)
+  state = AiState[AiPlayer()]
   while (true) do
-    ret = loop_funcs[loop_pos[player]]()
+    local ret = funcs[state.loop_pos]()
     if (ret) then
-        break
+      break
     end
-    loop_pos[player] = loop_pos[player] + 1
+    state.loop_pos = state.loop_pos + 1
   end
   return true
 end
 
-function InitAiScripts_just_attack()
-  ai_pos      = {1, 1, 1, 1, 1, 1, 1, 1}
-  ai_loop_pos = {1, 1, 1, 1, 1, 1, 1, 1}
+local function LocalDebugPrint(text)
+  -- DebugPrint(this_ai_type.Ident .. " player " .. AiPlayer() .. " " .. text)
 end
 
-
-local ai_loop_funcs = {
-  function() return AiForce(0, {"unit-assault", 200}) end,
-  function() return AiAttackWithForce(0) end,
-
-  function() return AiForce(2, {"unit-grenadier", 200}) end,
-  function() return AiSleep((SyncRand(70)+150)*GameSettings.Difficulty) end, 
-  function() return AiAttackWithForce(2) end,
-
-  function() return AiForce(1, {"unit-bazoo", 200}) end,
-  function() return AiSleep((SyncRand(70)+150)*GameSettings.Difficulty) end, 
-  function() return AiAttackWithForce(1) end,
-
-  function()
-    -- print("Ai " .. player .. " is looping");
-    ai_loop_pos[player] = 0;
-    return false
-  end,
-}
-
+local function InitAiScripts_just_attack()
+  AiState[AiPlayer()] = {
+    loop_pos = 1,
+    loop_start = nil,
+  }
+end
 
 local ai_funcs = {
   --function() AiDebug(false) return false end,
@@ -92,16 +79,42 @@ local ai_funcs = {
   function() return AiAttackWithForce(1) end,
 
   function() return AiSleep((SyncRand(70)+150)*GameSettings.Difficulty) end,
-  function() return AiLoop(ai_loop_funcs, ai_loop_pos) end,
+
+  -- ============================================================
+
+  function() 
+    LocalDebugPrint("is starting loop.");
+    state.loop_start = state.loop_pos;
+    return false
+  end,
+
+  function() return AiForce(0, {"unit-assault", 200}) end,
+  function() return AiAttackWithForce(0) end,
+
+  function() return AiForce(2, {"unit-grenadier", 200}) end,
+  function() return AiSleep((SyncRand(70)+150)*GameSettings.Difficulty) end, 
+  function() return AiAttackWithForce(2) end,
+
+  function() return AiForce(1, {"unit-bazoo", 200}) end,
+  function() return AiSleep((SyncRand(70)+150)*GameSettings.Difficulty) end, 
+  function() return AiAttackWithForce(1) end,
+
+  function()
+    LocalDebugPrint("Reached the end of AI script and will loop");
+    state.loop_pos = state.loop_start - 1; -- AiLoop will immediately increment it.
+    return false
+  end,
 }
 
-function AiJustAttack()
-    -- print("Just attack " .. AiPlayer() + 1 .. " position ".. ai_pos[AiPlayer() + 1]);
-    return AiLoop(ai_funcs, ai_pos)
+local function AiJustAttack()
+  LocalDebugPrint("Script position " .. AiState[AiPlayer()].loop_pos);
+  return AiLoop(ai_funcs)
 end
 
-DefineAiType({
-	Ident = "ai-just_attack",
-	Name = _("Just attack"),
-	Init = InitAiScripts_just_attack,
-	EachSecond = AiJustAttack })
+this_ai_type = {
+  Ident = "ai-just_attack",
+  Name = _("Just attack"),
+  Init = InitAiScripts_just_attack,
+  EachSecond = AiJustAttack,
+}
+DefineAiType(this_ai_type)

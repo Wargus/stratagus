@@ -141,8 +141,8 @@ DefinePlayerColors({
 })
 
 function InitGameVariables()
-   SetSpeeds(1)
-   InitAiScripts()
+  SetSpeeds(1)
+  ClearAiState()
 end
 
 --  Pathfinder

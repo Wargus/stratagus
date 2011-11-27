@@ -30,20 +30,46 @@
 -- Table of registered AI types in BOS.  See HTML documentation for details.
 AiTypes = {}
 
+-- AI state of each player.  See HTML documentation for details.
+-- Initialize to nil so we'll notice if ClearAiState is not called
+-- when it should.
+AiState = nil
+
 -- This call examines the buttons that were defined with DefineButton
 -- and figures out which types of units can build/train/repair others.
 -- We don't currently have any "unit-equiv" information to provide here.
 DefineAiHelper()
 
--- Execute all AI init scripts
--- FIXME: needs to be done per player; probably move to C++
-function InitAiScripts()
-  for ident,ai_type in next,AiTypes do
-    -- check if this AI actually has an init script
-    if (ai_type.Init ~= nil) then
-      ai_type.Init()
-    end
+-- Clear the AI state of each player.  This is called before starting
+-- a new game, and before loading a saved game.  This does not call AI
+-- initialization functions; the engine will do that after it has
+-- selected the AI type for each player.
+function ClearAiState()
+  AiState = {cache = {}}
+end
+
+-- Check if there is a hot spot on the map.
+--
+-- Returns:
+--   True if there is at least one hot spot on the map,
+--   False if there are no hot spots.
+--
+-- AiHotSpotExists detects even hot spots that are not visible to the
+-- current AI player.  This is not really a cheat because, if the AI
+-- could not access this information directly, then maps without hot
+-- spots would presumably select AI types that don't try to build
+-- magma pumps.
+--
+-- AiHotSpotExists does not care whether the hot spots already have
+-- magma pumps on them.
+function AiHotSpotExists()
+  local cache = AiState.cache
+  if (cache.hotspotexists == nil) then
+    local hotspot = UnitTypeByIdent("unit-hotspot")
+    local count = Players[PlayerNumNeutral].UnitTypesCount[hotspot.Slot]
+    cache.hotspotexists = (count ~= 0)
   end
+  return cache.hotspotexists
 end
 
 -- Find and load all Ais
