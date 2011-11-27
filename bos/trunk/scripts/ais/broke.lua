@@ -57,21 +57,8 @@ local function InitAiScripts_broke()
   AiState[AiPlayer()] = {
     loop_pos = 1,
     loop_start = nil,
-    hotspotexists = nil,
     build_order = nil,
   }
-end
-
-local function HotSpotExists()
-  if (state.hotspotexists == nil) then
-    local hotspot = UnitTypeByIdent("unit-hotspot")
-    local whotspot = UnitTypeByIdent("unit-weakhotspot")
-    local count = Players[PlayerNumNeutral].UnitTypesCount[hotspot.Slot]
-    local wcount = Players[PlayerNumNeutral].UnitTypesCount[whotspot.Slot]
-    LocalDebugPrint("This map has " .. count .. " hotspots and " .. wcount .. " weak hotspots.")
-    state.hotspotexists = ((count + wcount) ~= 0)
-  end
-  return state.hotspotexists
 end
 
 local function CheckPower()
@@ -86,7 +73,7 @@ end
 local function GetBuildOrder()
   local order = {}
 
-  if (not HotSpotExists()) then
+  if (not AiHotSpotExists()) then
     order[1] = CheckPower()
     order[2] = nil
   elseif (Players[AiPlayer()].MagmaStored < 300) then
@@ -145,7 +132,7 @@ local ai_funcs = {
   function() return AiSet("unit-engineer", 5) end,
 
   function() 
-    if (HotSpotExists()) then
+    if (AiHotSpotExists()) then
       return AiSet("unit-magmapump", 4)
     else
       return false -- do nothing
