@@ -873,39 +873,138 @@ void InitCcl(void)
 	SpellCclRegister();
 }
 
-static char *LuaEscape(const char *str)
+/**
+**  Serializes Lua objects to Lua source code.
+*/
+class CSerializeLua
+{
+public:
+	CSerializeLua(lua_State *l) : lstate(l), indent(0) {}
+
+	/** Whether a value was successfully serialized.  */ 
+	enum Result {
+		/** The value was serialized as requested.  */
+		OK,
+
+		/** The value contains something that cannot be
+		 ** serialized.  The caller should skip the global
+		 ** variable it is currently trying to serialize.
+		 */
+		SKIP,
+
+		/** Something went seriously wrong and the whole
+		 ** serialization should be aborted.
+		 */
+		FAIL
+	};
+
+	Result AppendLuaFields(int table_index, bool is_root);
+	char *StrDupOutput() const;
+
+private:
+	/** The Lua state from which we're serializing the values.  */
+	lua_State *const lstate;
+
+	/** The Lua source code being generated.
+	 **
+	 ** This is an std::vector rather than an std::string
+	 ** because appending characters to std::string gets slow
+	 ** in some implementations when the string is long.
+	 */
+	std::vector<char> output;
+
+	/** Current indentation level.  */ 
+	int indent;
+
+	inline void AppendChar(char c);
+	inline void AppendChars(const char *str, size_t len);
+	inline void AppendCString(const char *str);
+	inline void AppendIndent();
+	void AppendQuotedString(const char *str, size_t len);
+
+	static bool IsBlacklistedGlobal(const char *key);
+	static bool IsIdentifier(const char *key, size_t len);
+
+	Result AppendLuaTable(int table_index);
+	Result AppendLuaAsString(int index);
+	Result AppendLuaValue(int index);
+};
+
+/**
+**  Append a character to the Lua source code,
+**  without any kind of quoting or escaping.
+**
+**  @param c
+**      The character.
+*/
+inline void CSerializeLua::AppendChar(char c)
+{
+	this->output.push_back(c);
+}
+
+/**
+**  Append an array of characters to the Lua source code,
+**  without any kind of quoting or escaping.
+**
+**  @param str
+**      The address of the first character.
+**  @param str
+**      The length of the array, in bytes.
+*/
+inline void CSerializeLua::AppendChars(const char *str, size_t len)
+{
+	this->output.insert(this->output.end(), str, str + len);
+}
+
+/**
+**  Append a null-terminated string to the Lua source code,
+**  without any kind of quoting or escaping.
+**
+**  @param str
+**      The address of the first character of the string.
+*/
+inline void CSerializeLua::AppendCString(const char *str)
+{
+	this->AppendChars(str, strlen(str));
+}
+
+/**
+**  Append the current indentation to the Lua source code.
+*/
+inline void CSerializeLua::AppendIndent()
+{
+	this->output.insert(this->output.end(), this->indent, '\t');
+}
+
+/**
+**  Append a string literal to the Lua source code, with quotes
+**  around it, and any unusual bytes encoded as backslash escapes.
+**
+**  @param str
+**      The address of the first character of the string.
+**  @param len
+**      The length of the string, in bytes.
+*/
+void CSerializeLua::AppendQuotedString(const char *str, size_t len)
 {
 	const unsigned char *src;
-	char *dst;
-	char *escapedString;
-	int size = 0;
 
-	for (src = (const unsigned char *)str; *src; ++src) {
+	this->AppendChar('"');
+
+	for (src = (const unsigned char *)str; len > 0; ++src, --len) {
 		if (*src == '"' || *src == '\\') { // " -> \"
-			size += 2;
+			this->AppendChar('\\');
+			this->AppendChar(*src);
 		} else if (*src < 32 || *src > 127) { // 0xA -> \010
-			size += 4;
+			char esc[5];
+			sprintf_s(esc, 5, "\\%03d", *src);
+			this->AppendChars(esc, 4);
 		} else {
-			++size;
+			this->AppendChar(*src);
 		}
 	}
 
-	escapedString = new char[size + 1];
-	for (src = (const unsigned char *)str, dst = escapedString; *src; ++src) {
-		if (*src == '"' || *src == '\\') { // " -> \"
-			*dst++ = '\\';
-			*dst++ = *src;
-		} else if (*src < 32 || *src > 127) { // 0xA -> \010
-			*dst++ = '\\';
-			sprintf_s(dst, (size + 1) - (dst - escapedString), "%03d", *src);
-			dst += 3;
-		} else {
-			*dst++ = *src;
-		}
-	}
-	*dst = '\0';
-
-	return escapedString;
+	this->AppendChar('"');
 }
 
 /**
@@ -916,7 +1015,7 @@ static char *LuaEscape(const char *str)
 **  @return  true if the variable is blacklisted and must not be saved.
 **           false if the variable may be saved.
 */
-static bool IsBlacklistedGlobal(const char *key)
+bool CSerializeLua::IsBlacklistedGlobal(const char *key)
 {
 	return (!strcmp(key, "assert") ||
 		!strcmp(key, "gcinfo") ||
@@ -954,7 +1053,9 @@ static bool IsBlacklistedGlobal(const char *key)
 		!strcmp(key, "io") ||
 		!strcmp(key, "debug") ||
 		!strcmp(key, "coroutine") ||
+		!strcmp(key, "_G") ||
 		!strcmp(key, "AllowAll") ||			    // Lua const
+		!strcmp(key, "AllowedUnits") ||			    // data-dep
 		!strcmp(key, "DownButton") ||			    // #define
 		!strcmp(key, "EditorCommandLine") ||		    // enum
 		!strcmp(key, "EditorEditing") ||		    // enum
@@ -1003,145 +1104,324 @@ static bool IsBlacklistedGlobal(const char *key)
 }
 
 /**
+**  Check whether the given string is valid for a Lua identifier.
+**
+**  @param key
+**      The address of the first character of the string.
+**  @param len
+**      The length of the string, in bytes.
+**
+**  The @a len parameter exists so that strings containing
+**  embedded null characters can be passed to this function
+**  and properly detected as invalid identifiers.
+**
+**  @return
+**      true if the string is OK as a Lua identifier.
+**      false if the string cannot be used as a Lua identifier.
+*/
+bool CSerializeLua::IsIdentifier(const char *key, size_t len)
+{
+	if (len < 1) {
+		return false;
+	}
+
+	if (!isalpha(static_cast<unsigned char>(key[0]))
+	    && key[0] != '_') {
+		return false;
+	}
+
+	for (size_t i = 0; i < len; ++i) {
+		if (!isalnum(static_cast<unsigned char>(key[i]))
+		    && key[i] != '_') {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/**
+**  Append a Lua string or number value to the Lua source code.
+**
+**  @param index
+**      The index of the value in the Lua stack.
+**      This function does not modify the value in the stack.
+**
+**  @return
+**      CSerializeLua::OK or CSerializeLua::FAIL.
+**      This function never returns CSerializeLua::SKIP.
+*/
+CSerializeLua::Result CSerializeLua::AppendLuaAsString(int index)
+{
+	// Make a copy so that lua_tolstring won't replace the
+	// original number with a string.
+	lua_pushvalue(this->lstate, index);
+	size_t len;
+	const char *str = lua_tolstring(this->lstate, -1, &len);
+	if (str == NULL) {
+		lua_pop(this->lstate, 1);
+		return FAIL;
+	} else {
+		this->AppendChars(str, len);
+		lua_pop(this->lstate, 1);
+		return OK;
+	}
+}
+
+/**
+**  Append a Lua table to the Lua source code, with braces around it.
+**
+**  @param index
+**      The index of the table in the Lua stack.
+**      This function does not modify the value in the stack.
+**
+**  @return
+**      CSerializeLua::OK, CSerializeLua::FAIL, or CSerializeLua::SKIP.
+*/
+CSerializeLua::Result CSerializeLua::AppendLuaTable(int index)
+{
+	if (lua_getmetatable(this->lstate, index)) {
+		lua_pop(this->lstate, 1); // pop the metatable
+		return SKIP;
+	}
+	
+	this->AppendChar('{');
+	this->indent++;
+	Result result = this->AppendLuaFields(index, false);
+	this->indent--;
+	this->AppendChar('}');
+	return result;
+}
+
+/**
+**  Append a Lua value to the Lua source code.
+**
+**  @param index
+**      The index of the value in the Lua stack.
+**      This function does not modify the value in the stack.
+**
+**  @return
+**      CSerializeLua::OK, CSerializeLua::FAIL, or CSerializeLua::SKIP.
+*/
+CSerializeLua::Result CSerializeLua::AppendLuaValue(int index)
+{
+	int type = lua_type(this->lstate, index);
+	switch (type) {
+	case LUA_TNIL:
+		this->AppendCString("nil");
+		return OK;
+	case LUA_TNUMBER:
+		// Let Lua do the conversion.
+		return this->AppendLuaAsString(index);
+	case LUA_TBOOLEAN:
+		if (lua_toboolean(this->lstate, -1)) {
+			this->AppendCString("true");
+		} else {
+			this->AppendCString("false");
+		}
+		return OK;
+
+	case LUA_TSTRING:
+	{
+		size_t len;
+		const char *str = lua_tolstring(this->lstate, index, &len);
+		this->AppendQuotedString(str, len);
+		return OK;
+	}
+	case LUA_TTABLE:
+		return this->AppendLuaTable(index);
+	case LUA_TFUNCTION:
+		// Could be done with string.dump(function)
+		// and debug.getinfo(function).name (could be nil for anonymous function)
+		// But not useful yet.
+		return SKIP;
+	case LUA_TUSERDATA:
+	case LUA_TTHREAD:
+	case LUA_TLIGHTUSERDATA:
+	case LUA_TNONE:
+	default : // no other cases
+		return SKIP;
+	}
+}
+
+/**
+**  Append the fields (keys and values) of a Lua table to the Lua
+**  source code.
+**
+**  @param table_index
+**      The index of the table in the Lua stack.
+**  @param is_root
+**      True if the table is a global environment and this function
+**      should generate a series of assignment statements.
+**      False if the table is something else and this function should
+**      generate a fieldlist for a tableconstructor.
+**
+**  @return
+**      CSerializeLua::OK if it appended the fields as requested.
+**      CSerializeLua::FAIL if something went seriously wrong and the
+**      whole serialization should be aborted.
+**      CSerializeLua::SKIP if is_root is false and the table contains
+**      something that cannot be serialized.
+**
+** If is_root is true and the table contains a field that cannot be
+** serialized, then this function just skips that field and continues
+** serializing the rest of the table.  This is so that the global
+** environment can be serialized even though it contains functions.
+*/
+CSerializeLua::Result CSerializeLua::AppendLuaFields(int table_index,
+						     bool is_root)
+{
+	if (!lua_checkstack(this->lstate, 10))
+		return FAIL;
+	const int top_on_entry = lua_gettop(this->lstate);
+	Assert(lua_istable(this->lstate, table_index));
+
+	lua_Number seq = 1;
+	bool is_first = true;
+	lua_pushnil(this->lstate);
+	while (lua_next(this->lstate, table_index)) {
+		const int key_index = top_on_entry + 1;
+		const int value_index = top_on_entry + 2;
+		Result result;
+
+		// If there's any problem with the field, then we
+		// remove it from the output vector by truncating
+		// back to this size.
+		const size_t undo = this->output.size();
+
+		if (!is_root) {
+			if (is_first) {
+				this->AppendChar('\n');
+			} else {
+				this->AppendCString(",\n");
+			}
+			this->AppendIndent();
+		}
+
+		// Append the key and and equals sign, if necessary.
+		bool increment_seq = false;
+		const int key_type = lua_type(this->lstate, key_index);
+		if (is_root) {
+			if (key_type != LUA_TSTRING) {
+				goto skip_field;
+			}
+
+			size_t key_len;
+			const char *key_str = lua_tolstring(this->lstate,
+							    key_index,
+							    &key_len);
+			if (!IsIdentifier(key_str, key_len)
+			    || IsBlacklistedGlobal(key_str)) {
+				goto skip_field;
+			}
+
+			this->AppendChars(key_str, key_len);
+			this->AppendCString(" = ");
+		} else if (key_type == LUA_TSTRING) {
+			size_t key_len;
+			const char *key_str = lua_tolstring(this->lstate,
+							    key_index,
+							    &key_len);
+			if (IsIdentifier(key_str, key_len)) {
+				this->AppendChars(key_str, key_len);
+			} else {
+				this->AppendChar('[');
+				this->AppendQuotedString(key_str, key_len);
+				this->AppendChar(']');
+			}
+			this->AppendCString(" = ");
+		} else if (key_type == LUA_TNUMBER) {
+			if (lua_tonumber(this->lstate, key_index) == seq) {
+				// Increment seq only after the value
+				// has been successfully serialized.
+				increment_seq = true;
+			} else {
+				this->AppendChar('[');
+				result = this->AppendLuaAsString(key_index);
+				if (result != OK) {
+					return result;
+				}
+				this->AppendCString("] = ");
+			}
+		} else {
+			goto skip_field;
+		}
+
+		result = this->AppendLuaValue(value_index);
+		switch (result) {
+		case OK:
+			if (is_root) {
+				this->AppendCString(";\n");
+			}
+			is_first = false;
+			if (increment_seq)
+				++seq;
+			break;
+		case SKIP:
+		skip_field:
+			this->output.resize(undo);
+			if (!is_root) {
+				lua_settop(this->lstate, top_on_entry);
+				return SKIP;
+			}
+			break;
+		case FAIL:
+		default:
+			lua_settop(this->lstate, top_on_entry);
+			return result;
+		}
+
+		lua_pop(this->lstate, 1); // pop the value
+	}
+
+	if (!is_first && !is_root) {
+		this->AppendChar(' ');
+	}
+	
+	return OK;
+}
+
+/**
+**  Copy the Lua source code to a new string.
+**
+**  @return  The Lua source code as a string.
+**           The caller must eventually free it with delete[].    
+*/
+char *CSerializeLua::StrDupOutput() const
+{
+	const size_t size = this->output.size();
+	char *const str = new char[size + 1];
+	if (size > 0) {
+		memcpy(str, &this->output[0], size);
+	}
+	str[size] = '\0';
+	return str;
+}
+
+/**
 **  For saving lua state (table, number, string, bool, not function).
 **
 **  @param l        lua_State to save.
-**  @param is_root  true for the main call, 0 for recursif call.
+**  @param is_root  true to save global variables,
+**                  false to save and pop the table at top of stack.
 **
 **  @return  NULL if nothing could be saved.
 **           else a string that could be executed in lua to restore lua state
-**  @todo    do the output prettier (adjust indentation, newline)
 */
 char *SaveGlobal(lua_State *l, bool is_root)
 {
-	int type_key;
-	int type_value;
-	const char *sep;
-	const char *key;
-	char *value;
-	char *res;
-	bool first;
-	char *tmp;
-	int b;
-
-//	Assert(!is_root || !lua_gettop(l));
-	first = true;
-	res = NULL;
+	CSerializeLua serialize(l);
 	if (is_root) {
-		lua_pushstring(l, "_G");// global table in lua.
-		lua_gettable(l, LUA_GLOBALSINDEX);
+		lua_pushvalue(l, LUA_GLOBALSINDEX);
 	}
-	sep = is_root ? "" : ", ";
-	Assert(lua_istable(l, -1));
-	lua_pushnil(l);
-	while (lua_next(l, -2)) {
-		type_key = lua_type(l, -2);
-		type_value = lua_type(l, -1);
-		key = (type_key == LUA_TSTRING) ? lua_tostring(l, -2) : "";
-		if (!strcmp(key, "_G") || (is_root && IsBlacklistedGlobal(key))) {
-			lua_pop(l, 1); // pop the value
-			continue;
-		}
-		switch (type_value) {
-			case LUA_TNIL:
-				value = new_strdup("nil");
-				break;
-			case LUA_TNUMBER:
-				value = new_strdup(lua_tostring(l, -1)); // let lua do the conversion
-				break;
-			case LUA_TBOOLEAN:
-				b = lua_toboolean(l, -1);
-				value = new_strdup(b ? "true" : "false");
-				break;
-			case LUA_TSTRING:
-			{
-				char *escapedString = LuaEscape(lua_tostring(l, -1));
-				value = strdcat3("\"", escapedString, "\"");
-				delete[] escapedString;
-				break;
-			}
-			case LUA_TTABLE:
-				lua_pushvalue(l, -1);
-				tmp = SaveGlobal(l, false);
-				value = NULL;
-				if (tmp != NULL) {
-					value = strdcat3("{", tmp, "}");
-					delete[] tmp;
-				}
-				break;
-			case LUA_TFUNCTION:
-				// Could be done with string.dump(function)
-				// and debug.getinfo(function).name (coulb be nil for anonymous function)
-				// But not useful yet.
-				value = NULL;
-				break;
-			case LUA_TUSERDATA:
-			case LUA_TTHREAD:
-			case LUA_TLIGHTUSERDATA:
-			case LUA_TNONE:
-			default : // no other cases
-				value = NULL;
-				break;
-		}
-		lua_pop(l, 1); /* pop the value */
-
-		// Check the validity of the key (only [a-zA-z_])
-		if (type_key == LUA_TSTRING) {
-			for (int i = 0; key[i]; ++i) {
-				if (!isalnum(key[i]) && key[i] != '_') {
-					delete[] value;
-					value = NULL;
-					break;
-				}
-			}
-		}
-		if (value == NULL) {
-			if (!is_root) {
-				lua_pop(l, 2); // pop the key and the table
-				Assert(res == NULL);
-				delete[] res;
-				return NULL;
-			}
-			continue;
-		}
-		if (type_key == LUA_TSTRING && !strcmp(key, value)) {
-			continue;
-		}
-		if (first) {
-			first = false;
-			if (type_key == LUA_TSTRING) {
-				res = strdcat3(key, "=", value);
-				delete[] value;
-			} else {
-				res = value;
-			}
-		} else {
-			if (type_key == LUA_TSTRING) {
-				tmp = value;
-				value = strdcat3(key, "=", value);
-				delete[] tmp;
-				tmp = res;
-				res = strdcat3(res, sep, value);
-				delete[] tmp;
-				delete[] value;
-			} else {
-				tmp = res;
-				res = strdcat3(res, sep, value);
-				delete[] tmp;
-				delete[] value;
-			}
-		}
-		tmp = res;
-		res = strdcat3("", res, "\n");
-		delete[] tmp;
+	CSerializeLua::Result result
+		= serialize.AppendLuaFields(lua_gettop(l), is_root);
+	lua_pop(l, 1);
+	if (result == CSerializeLua::OK) {
+		return serialize.StrDupOutput();
+	} else {
+		return NULL;
 	}
-	lua_pop(l, 1); // pop the table
-//	Assert(!is_root || !lua_gettop(l));
-	if (!res) {
-		res = new char[1];
-		res[0] = '\0';
-	}
-	return res;
 }
 
 /**
@@ -1195,7 +1475,7 @@ void SavePreferences(void)
 		}
 
 		char *s = SaveGlobal(Lua, false);
-		fprintf(fd, "preferences = {\n%s}\n", s);
+		fprintf(fd, "preferences = {%s}\n", s);
 		delete[] s;
 
 		fclose(fd);
