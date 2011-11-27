@@ -156,5 +156,8 @@ function AiZombies()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("zombies", _("Zombies"), AiZombies, InitAiScripts_zombies)
-
+DefineAiType({
+	Ident = "ai-zombies",
+	Name = _("Zombies"),
+	Init = InitAiScripts_zombies,
+	EachSecond = AiZombies })

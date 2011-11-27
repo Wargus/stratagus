@@ -137,6 +137,8 @@ function AiNaval()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("naval", _("Naval"), AiNaval,
-           InitAiScripts_naval)
-
+DefineAiType({
+	Ident = "ai-naval",
+	Name = _("Naval"),
+	Init = InitAiScripts_naval,
+	EachSecond = AiNaval })

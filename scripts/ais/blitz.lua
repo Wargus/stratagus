@@ -195,7 +195,8 @@ function AiBlitz()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("blitz", _("Blitz"), AiBlitz, InitAiScripts_blitz)
-
-
-
+DefineAiType({
+	Ident = "ai-blitz",
+	Name = _("Blitz"),
+	Init = InitAiScripts_blitz,
+	EachSecond = AiBlitz })

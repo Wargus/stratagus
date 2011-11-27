@@ -186,5 +186,8 @@ function AiDefault()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("default", _("Default"), AiDefault, InitAiScripts_default)
-
+DefineAiType({
+	Ident = "ai-default",
+	Name = _("Default"),
+	Init = InitAiScripts_default,
+	EachSecond = AiDefault })

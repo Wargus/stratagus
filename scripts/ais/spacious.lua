@@ -221,5 +221,8 @@ function AiSpacious()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("spacious", _("Spacious"), AiSpacious, InitAiScripts_spacious)
-
+DefineAiType({
+	Ident = "ai-spacious",
+	Name = _("Spacious"),
+	Init = InitAiScripts_spacious,
+	EachSecond = AiSpacious })

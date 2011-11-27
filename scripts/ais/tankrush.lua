@@ -154,5 +154,8 @@ function AiTankRush()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("tankrush", _("Tank rush"), AiTankRush, InitAiScripts_tankrush)
-
+DefineAiType({
+	Ident = "ai-tankrush",
+	Name = _("Tank rush"),
+	Init = InitAiScripts_tankrush,
+	EachSecond = AiTankRush })

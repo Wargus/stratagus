@@ -63,16 +63,8 @@ map setup files should not.</p>
     <dl>
       <dt>"ai-type", string</dt>
       <dd>
-	Name of the AI definition.  Matches the name parameter
-	of <a href="ai.html#DefineAi">DefineAi</a>.
-      </dd>
-      <dt>"script", string</dt>
-      <dd>
-	<em>Obsolete since r10061 (2011-07-08):
-	  No longer used, because "ai-type" is already unique.</em><br>
-
-	Name of the AI script function in the "_ai_scripts_" Lua table.
-	<a href="ai.html#DefineAi">DefineAi</a> generates this name.
+	Identifier of the AI type.  Matches the Ident field of the
+	table parameter of <a href="ai.html#DefineAiType">DefineAiType</a>.
       </dd>
       <dt>"script-debug", boolean</dt>
       <dd>

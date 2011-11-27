@@ -140,7 +140,10 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CAiType *> AiTypes; /// List of all AI types.
+/** List of all AI types.
+ * DefineAiType keeps this in sync with the AiTypes Lua variable.  */
+std::vector<CAiType *> AiTypes;
+
 AiHelper AiHelpers;             /// AI helper variables
 
 PlayerAi *AiPlayer;             /// Current AI player
@@ -156,12 +159,11 @@ static void AiExecuteScript()
 {
 	if (AiPlayer->AiType != NULL)
 	{
-		lua_pushstring(Lua, "_ai_scripts_");
-		lua_gettable(Lua, LUA_GLOBALSINDEX);
-		lua_pushstring(Lua, AiPlayer->AiType->Name.c_str());
-		lua_rawget(Lua, -2);
-		LuaCall(0, 1);
-		lua_pop(Lua, 1);
+		lua_getfield(Lua, LUA_GLOBALSINDEX, "AiTypes");
+		lua_getfield(Lua, -1, AiPlayer->AiType->Name.c_str());
+		lua_getfield(Lua, -1, "EachSecond");
+		LuaCall(0, 1);	// removes the function from the stack
+		lua_pop(Lua, 2); // remove the tables too
 	}
 }
 

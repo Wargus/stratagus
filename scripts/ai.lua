@@ -27,27 +27,8 @@
 --
 --
 
--- The list of registered AIs in BOS
--- Every AI has an entry name: {internal_name, name, fun, initfun}
--- See at RegisterAi() for a description what these are
--- internal_name is also the key of the entry in AiList.
-local AiList = {}
-
-function GetAiList()
-  return AiList
-end
-
--- Function to register an AI to BOS
--- Parameters:
--- internal_name : Internal name of the Ai (without leading "ai-")
--- name          : Name of the AI the Player sees and which gets translated
--- fun           : main AI function
--- initfun       : initialization function, can be omitted
-function RegisterAi(internal_name, name, fun, initfun)
-  internal_name = "ai-" .. internal_name
-  DefineAi(internal_name, fun)
-  AiList[internal_name] = {internal_name, name, fun, initfun}
-end
+-- Table of registered AI types in BOS.  See HTML documentation for details.
+AiTypes = {}
 
 -- This call examines the buttons that were defined with DefineButton
 -- and figures out which types of units can build/train/repair others.
@@ -55,11 +36,12 @@ end
 DefineAiHelper()
 
 -- Execute all AI init scripts
+-- FIXME: needs to be done per player; probably move to C++
 function InitAiScripts()
-  for key,value in next,AiList do
+  for ident,ai_type in next,AiTypes do
     -- check if this AI actually has an init script
-    if (value[4] ~= nil) then
-      value[4]()
+    if (ai_type.Init ~= nil) then
+      ai_type.Init()
     end
   end
 end
@@ -76,4 +58,3 @@ for i,f in ipairs(list) do
     Load("scripts/ais/" .. f)
   end
 end
-

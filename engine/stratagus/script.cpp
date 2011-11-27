@@ -1054,6 +1054,7 @@ bool CSerializeLua::IsBlacklistedGlobal(const char *key)
 		!strcmp(key, "debug") ||
 		!strcmp(key, "coroutine") ||
 		!strcmp(key, "_G") ||
+		!strcmp(key, "AiTypes") ||			    // data-dep
 		!strcmp(key, "AllowAll") ||			    // Lua const
 		!strcmp(key, "AllowedUnits") ||			    // data-dep
 		!strcmp(key, "DownButton") ||			    // #define

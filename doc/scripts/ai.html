@@ -29,7 +29,8 @@
 <a href="config.html">NEXT</a> 
 <a href="index.html">LUA Index</a>
 <hr>
-<a href="#DefineAi">DefineAi</a>
+<a href="#AiTypes">AiTypes</a>
+<a href="#DefineAiType">DefineAiType</a>
 <a href="#DefineAiHelper">DefineAiHelper</a>
 <a href="#AiCheckForce">AiCheckForce</a>
 <a href="#AiDebug">AiDebug</a>
@@ -77,34 +78,77 @@ The main script is responsible for setting minimums for the forces 0 and 1. This
 between defend and attack for an AI player.<br>
 <br>
 
-<h2>Functions</h2>
-<a name="DefineAi"></a>
-<h3>DefineAi(name, script)</h3>
+<h2>Variables</h2>
 
-This defines how a special AI works. Each level can use his own AI definition.
+<a name="AiTypes"></a>
+<h3>AiTypes</h3>
+
+<p>This table lists all the AI types defined in Lua.  It is used by
+both the engine and the Lua code.  In AiTypes, every AI type has an
+entry that is a table with these keys:</p>
 
 <dl>
-<dt>name</dt>
-<dd>
-Unique, language-independent name of this AI definition.
-By convention, each name should begin with "ai-".
-The map setup file sets e.g. <code>Players[1].AiName = "ai-blitz"</code>
-and the engine then finds the AI definition whose name is that string;
-or if no such AI definition exists, the engine falls back to "ai-passive".
-In saved games, these names are used in
-the "ai-type" parameter of <a href="savegame.html#DefineAiPlayer">DefineAiPlayer</a>
-and the "ai-name" parameter of <a href="savegame.html#Player">Player</a>.
-</dd>
-<dt>script</dt>
-<dd>A lua function.
-</dd>
+  <dt>Ident = string</dt>
+  <dd>Unique, language-independent identifier of this AI type.
+    By convention, each identifier should begin with "ai-".
+    The Ident string is also the key of the entry within AiTypes.
+    The map setup file sets e.g. <code>Players[1].AiName = "ai-blitz"</code>
+    and the engine then finds the AI type whose identifier is that string;
+    or if no such AI type exists, the engine falls back to "ai-passive".
+    In saved games, these names are used in
+    the "ai-type" parameter of <a href="savegame.html#DefineAiPlayer">DefineAiPlayer</a>
+    and the "ai-name" parameter of <a href="savegame.html#Player">Player</a>.</dd>
+  <dt>Name = string</dt>
+  <dd>Name of the AI the Player sees and which gets translated.
+    The engine does not use this; only the Lua code does.</dd>
+  <dt>Init = function or nil</dt>
+  <dd>Initializes the AI state of the player to whatever the AI type
+    requires.  When starting a new game, the engine calls the Init
+    function for each player that is going to use this AI type.
+    <b>FIXME: not yet correctly implemented.</b></dd>
+  <dt>EachSecond = function</dt>
+  <dd>Decides AI actions: primarily, what to build.
+    The engine calls the EachSecond function once per second
+    (at the default game speed).</dd>
+  <dt>(other)</dt>
+  <dd>Lua code can add other keys in the table.
+    The engine will ignore them.
+    (Perhaps there should be a naming convention so that
+    Lua-specific and engine-specific keys won't clash.
+    Or we can just document all keys here.)</dd>
 </dl>
+
+<p>Lua code is free to read the AiTypes table but should not
+modify it or its elements directly.  Instead, it should call
+<a href="#DefineAiType">DefineAiType</a>, so that the engine
+knows to update its data structures accordingly.</p>
+
+<h2>Functions</h2>
+<a name="DefineAiType"></a>
+<h3>DefineAiType(table)</h3>
+
+<p>Defines an AI type and adds it to <a href="#AiTypes">AiTypes</a>.</p>
+
+<dl>
+  <dt>table</dt>
+  <dd>Describes the AI type, in the same format
+    as an element of <a href="#AiTypes">AiTypes</a>.</dd>
+</dl>
+
+<p><b>Note:</b> Individual maps should not call DefineAiType.
+Call it during global initialization instead.
+The engine does not provide any way to undefine an AI type
+and reacts poorly to redefinitions.</p>
 
 <h4>Example</h4>
 
 <pre>
     -- Defines the passive computer AI, which does nothing.
-DefineAi("ai-passive", function() AiSleep(10000) end)
+DefineAiType({
+	Ident = "ai-passive",
+	Name = _("Passive"),
+	Init = nil, -- which is the default anyway
+	EachSecond = function() end })
 </pre>
 
 <a name="DefineAiHelper"></a>
@@ -559,34 +603,6 @@ supported.
 
 The current AI script support is very limited, many new functions are needed.
 If you want to write this you know who to contact.
-
-<h2>Examples</h2>
-
-<pre>
-DefineAi("harsh-example", "land-attack",
- function()
-</pre><p style="margin-left:1cm;">
-This is the AI "harsh-example" usable for land-attack.
-</p><pre>
-     AiNeed("unit-vault")
-</pre><p style="margin-left:1cm;">
-The first need unit is the great-hall.
-</p><pre>
-     AiNeed("unit-engineer")
-</pre><p style="margin-left:1cm;">
-The next unit should be the peon.
-</p><pre>
-     AiWait("unit-vault")
-</pre><p style="margin-left:1cm;">
-Now wait until the vault is available. Could hang if no great vault can be
-build.
-</p><pre>
-     AiWait("unit-engineer")
-</pre><p style="margin-left:1cm;">
-Now wait unit we have a worker to build the next things.
-</p>
-
-FIXME: need some complex examples.
 
 <hr>
 All trademarks and copyrights on this page are owned by their respective owners.
