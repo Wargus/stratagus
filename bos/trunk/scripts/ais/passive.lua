@@ -31,5 +31,8 @@
 function AiPassive()
 end
 
-RegisterAi("passive", _("Passive"), AiPassive)
-
+DefineAiType({
+	Ident = "ai-passive",
+	Name = _("Passive"),
+	Init = nil,
+	EachSecond = AiPassive })

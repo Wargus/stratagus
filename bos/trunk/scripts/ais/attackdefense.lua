@@ -302,5 +302,8 @@ function AiAttackDefense()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("attackdefense", _("Attack/Defense"), AiAttackDefense, InitAiScripts_attackdefense)
-
+DefineAiType({
+	Ident = "ai-attackdefense",
+	Name = _("Attack/Defense"),
+	Init = InitAiScripts_attackdefense,
+	EachSecond = AiAttackDefense })

@@ -158,5 +158,8 @@ function AiRush()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("rush", _("Rush"), AiRush, InitAiScripts_rush)
-
+DefineAiType({
+	Ident = "ai-rush",
+	Name = _("Rush"),
+	Init = InitAiScripts_rush,
+	EachSecond = AiRush })

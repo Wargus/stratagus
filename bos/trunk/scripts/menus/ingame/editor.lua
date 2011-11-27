@@ -205,15 +205,14 @@ function RunEditorPlayerPropertiesMenu()
   l:adjustSize()
   menu:add(l, 210, 40 + (22 * 0))
 
-  local types = {}		-- key >= 1; value = name
-  local itypes = {}		-- key >= 0; value = internal_name
-  local ainametonum = {}	-- key = internal_name; value >= 0
+  local types = {}		-- key >= 1; value = .Name
+  local itypes = {}		-- key >= 0; value = .Ident
+  local ainametonum = {}	-- key = .Ident; value >= 0
   local i = 1
-  local ailist = GetAiList()
-  for aiiname,x in pairs(ailist) do
-    types[i] = ailist[aiiname][2]
-    ainametonum[aiiname] = i - 1
-    itypes[i - 1] = aiiname
+  for ai_ident,ai_type in pairs(AiTypes) do
+    types[i] = ai_type.Name
+    ainametonum[ai_ident] = i - 1
+    itypes[i - 1] = ai_ident
     i = i + 1
   end
 
@@ -221,12 +220,14 @@ function RunEditorPlayerPropertiesMenu()
   -- then add them to the list, so that the editor will at least
   -- display them and save them back as they were.
   for i=0,LastEditablePlayer do
-    local internal_name = Players[i].AiName
-    if ainametonum[internal_name] == nil then
-      local name = internal_name .. _(" (unsupported)")
+    local ident = Players[i].AiName
+    -- Check ainametonum[ident] rather than AiTypes[ident]
+    -- so we add each ident only once even if multiple players have it.
+    if ainametonum[ident] == nil then
+      local name = ident .. _(" (unsupported)")
       types[#types + 1] = name
-      itypes[#itypes + 1] = internal_name
-      ainametonum[internal_name] = #itypes
+      itypes[#itypes + 1] = ident
+      ainametonum[ident] = #itypes
     end
   end
 

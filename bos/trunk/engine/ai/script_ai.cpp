@@ -273,35 +273,63 @@ static int CclDefineAiHelper(lua_State *l)
 }
 
 /**
-**  Define an AI engine.
+**  Define an AI type.
 **
 **  @param l  Lua state.
+**
+**  @par Lua parameters;
+**  @b ai_type A table that describes the AI type.
+**  See the documentation of the AiTypes Lua variable for details.
 */
-static int CclDefineAi(lua_State *l)
+static int CclDefineAiType(lua_State *l)
 {
-	CAiType *aitype;
-#ifdef DEBUG
-	const CAiType *ait;
-#endif
+	// Index of the ai_type parameter from Lua.
+	const int aitype_index = 1;
 
-	LuaCheckArgs(l, 2);
-	if (!lua_isfunction(l, 2))
+	CAiType *aitype;
+
+	LuaCheckArgs(l, 1);
+	luaL_checktype(l, aitype_index, LUA_TTABLE);
+	// The following type checks do not use luaL_checktype because
+	// it is intended for arguments of functions only and generates
+	// error messages accordingly.
+
+	lua_getfield(l, aitype_index, "Ident");
+	const int ident_index = lua_gettop(l);
+	if (!lua_isstring(l, ident_index))
 	{
-		LuaError(l, "incorrect argument");
+		LuaError(l, "incorrect argument: Ident of ai_type must be a string");
 	}
+	size_t ident_length = 0;
+	const char *ident_ptr = lua_tolstring(l, ident_index, &ident_length);
+	// Leave it on the stack.
+
+	lua_getfield(l, aitype_index, "Init");
+	if (!lua_isfunction(l, -1) && !lua_isnil(l, -1))
+	{
+		LuaError(l, "incorrect argument: Init of ai_type must be a function or nil");
+	}
+	lua_pop(l, 1);
+
+	lua_getfield(l, aitype_index, "EachSecond");
+	if (!lua_isfunction(l, -1))
+	{
+		LuaError(l, "incorrect argument: EachSecond must be a function");
+	}
+	lua_pop(l, 1);
 
 	aitype = new CAiType;
-	AiTypes.insert(AiTypes.begin(), aitype);
+	AiTypes.push_back(aitype);
 
 	//
 	// AI Name
 	//
-	aitype->Name = LuaToString(l, 1);
+	aitype->Name.assign(ident_ptr, ident_ptr + ident_length);
 
 #ifdef DEBUG
-	for (int i = 1; i < (int)AiTypes.size(); ++i)
+	for (size_t i = 0; i < AiTypes.size() - 1; ++i)
 	{
-		ait = AiTypes[i];
+		const CAiType *ait = AiTypes[i];
 		if (aitype->Name == ait->Name)
 		{
 			DebugPrint("Warning two or more AI's with the same name '%s'\n" _C_ ait->Name.c_str());
@@ -310,24 +338,14 @@ static int CclDefineAi(lua_State *l)
 #endif
 
 	//
-	// AI Script
+	// Add to the AiTypes Lua variable.
 	//
-	lua_pushstring(l, "_ai_scripts_");
-	lua_gettable(l, LUA_GLOBALSINDEX);
-	if (lua_isnil(l, -1))
-	{
-		lua_pop(l, 1);
-		lua_pushstring(l, "_ai_scripts_");
-		lua_newtable(l);
-		lua_settable(l, LUA_GLOBALSINDEX);
-		lua_pushstring(l, "_ai_scripts_");
-		lua_gettable(l, LUA_GLOBALSINDEX);
-	}
-	lua_pushstring(l, aitype->Name.c_str());
-	lua_pushvalue(l, 2);
-	lua_rawset(l, -3);
-	lua_pop(l, 1);
+	lua_getfield(l, LUA_GLOBALSINDEX, "AiTypes");
+	lua_pushvalue(l, ident_index);
+	lua_pushvalue(l, aitype_index);
+	lua_settable(l, -3);
 
+	// Lua will discard the values we left on the stack.
 	return 0;
 }
 
@@ -1109,7 +1127,7 @@ void AiCclRegister()
 	// Loading all into memory isn't necessary.
 
 	lua_register(Lua, "DefineAiHelper", CclDefineAiHelper);
-	lua_register(Lua, "DefineAi", CclDefineAi);
+	lua_register(Lua, "DefineAiType", CclDefineAiType);
 
 	lua_register(Lua, "AiDebug", CclAiDebug);
 	lua_register(Lua, "AiDebugPlayer", CclAiDebugPlayer);

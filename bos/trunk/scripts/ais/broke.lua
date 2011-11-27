@@ -283,5 +283,8 @@ function AiBroke()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("broke", _("Broke"), AiBroke, InitAiScripts_broke)
-
+DefineAiType({
+	Ident = "ai-broke",
+	Name = _("Broke"),
+	Init = InitAiScripts_broke,
+	EachSecond = AiBroke })

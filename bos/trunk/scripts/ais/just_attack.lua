@@ -100,6 +100,8 @@ function AiJustAttack()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("just_attack", _("Just attack"), AiJustAttack,
-           InitAiScripts_just_attack)
-
+DefineAiType({
+	Ident = "ai-just_attack",
+	Name = _("Just attack"),
+	Init = InitAiScripts_just_attack,
+	EachSecond = AiJustAttack })

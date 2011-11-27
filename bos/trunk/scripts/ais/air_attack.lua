@@ -95,6 +95,8 @@ function AiAirAttack()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-RegisterAi("air_attack", _("Air attack"), AiAirAttack, 
-           InitAiScripts_air_attack)
-
+DefineAiType({
+	Ident = "ai-air_attack",
+	Name = _("Air attack"),
+	Init = InitAiScripts_air_attack,
+	EachSecond = AiAirAttack })
