@@ -138,7 +138,7 @@ knows to update its data structures accordingly.</p>
 <a name="AiState"></a>
 <h3>AiState</h3>
 
-<p>The AI state of each AI player.
+<p>The AI state of the map and each AI player.
 The AI scripts should write all persistent state into AiState,
 so that the engine will save and load it as part of the game,
 and so that the engine can easily clear the state when
@@ -152,6 +152,14 @@ starting a new game.</p>
     can then use the fields of the table as they please.
     If AiState[AiPlayer()] is nil, that means the engine has not
     called the Init function yet.</dd>
+
+  <dt>AiState.cache = table</dt>
+  <dd>Cached information shared by all AI players.
+    Lua scripts of individual AI types should not access this directly.
+    Instead, they should use shared functions.
+    <p><b>Not in engine:</b>
+      The engine does not know about AiState.cache.
+      Only the Lua code does.</p></dd>
 </dl>
 
 <p>The engine does not currently preserve object identity when saving
