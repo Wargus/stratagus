@@ -29,24 +29,32 @@
 --      $Id: air_attack.lua  $
 --
 
-local player
+-- What we registered in AiTypes.
+local this_ai_type
 
-local function AiLoop(loop_funcs, loop_pos)
-  local ret
+-- Same as AiState[AiPlayer()].  Valid only during AiLoop.
+local state
 
-  player = AiPlayer() + 1
+local function AiLoop(funcs)
+  state = AiState[AiPlayer()]
   while (true) do
-    ret = loop_funcs[loop_pos[player]]()
+    local ret = funcs[state.loop_pos]()
     if (ret) then
-        break
+      break
     end
-    loop_pos[player] = loop_pos[player] + 1
+    state.loop_pos = state.loop_pos + 1
   end
   return true
 end
 
-function InitAiScripts_air_attack()
-  ai_pos      = {1, 1, 1, 1, 1, 1, 1, 1}
+local function LocalDebugPrint(text)
+  -- DebugPrint(this_ai_type.Ident .. " player " .. AiPlayer() .. " " .. text)
+end
+
+local function InitAiScripts_air_attack()
+  AiState[AiPlayer()] = {
+    loop_pos = 1
+  }
 end
 
 local ai_funcs = {
@@ -89,14 +97,23 @@ local ai_funcs = {
   function() return AiNeed("unit-powerplant") end,
   function() return AiNeed("unit-magmapump") end,
   function() return AiSleep((SyncRand(60)+40)*GameSettings.Difficulty) end, 
+
+  function()
+    LocalDebugPrint("Reached the end of AI script and will loop");
+    state.loop_pos = 0;
+    return false
+  end,
 }
 
-function AiAirAttack()
-    return AiLoop(ai_funcs, ai_pos)
+local function AiAirAttack()
+  LocalDebugPrint("Script position " .. AiState[AiPlayer()].loop_pos);
+  return AiLoop(ai_funcs)
 end
 
-DefineAiType({
-	Ident = "ai-air_attack",
-	Name = _("Air attack"),
-	Init = InitAiScripts_air_attack,
-	EachSecond = AiAirAttack })
+this_ai_type = {
+  Ident = "ai-air_attack",
+  Name = _("Air attack"),
+  Init = InitAiScripts_air_attack,
+  EachSecond = AiAirAttack,
+}
+DefineAiType(this_ai_type)

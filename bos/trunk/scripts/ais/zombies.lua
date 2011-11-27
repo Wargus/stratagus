@@ -32,52 +32,40 @@
 --      $Id:  $
 --
 
-local player
+-- What we registered in AiTypes.
+local this_ai_type
 
-local function AiLoop(loop_funcs, loop_pos)
-  local ret
+-- Same as AiState[AiPlayer()].  Valid only during AiLoop.
+local state
 
-  player = AiPlayer() + 1
+local function AiLoop(funcs)
+  state = AiState[AiPlayer()]
   while (true) do
-    ret = loop_funcs[loop_pos[player]]()
+    local ret = funcs[state.loop_pos]()
     if (ret) then
-     break
+      break
     end
-    loop_pos[player] = loop_pos[player] + 1
+    state.loop_pos = state.loop_pos + 1
   end
   return true
 end
 
-function InitAiScripts_zombies()
-  ai_pos      = {1, 1, 1, 1, 1, 1, 1, 1}
-  ai_loop_pos = {1, 1, 1, 1, 1, 1, 1, 1}
-  hotspotexists = nil
+local function LocalDebugPrint(text)
+  -- DebugPrint(this_ai_type.Ident .. " player " .. AiPlayer() .. " " .. text)
 end
 
-local ai_loop_funcs = {
-  -- function() print("Looping !"); return false end,
-  function() return AiForce(1, {"unit-assault", SyncRand(20)+10, 
-                                "unit-grenadier", SyncRand(12)+1, 
-                                "unit-bazoo", SyncRand(12)+1}) end,
-  function() return AiWaitForce(1) end,  -- wait until attack party is completed
-  function() return AiSleep((SyncRand(200)+30)*GameSettings.Difficulty) end,
-  function() return AiAttackWithForce(1) end,
-  function() ai_loop_pos[player] = 0; return false end,
-}
-
-local function HotSpotExists()
-  if (hotspotexists == nil) then
-    local hotspot = UnitTypeByIdent("unit-hotspot")
-    local count = Players[PlayerNumNeutral].UnitTypesCount[hotspot.Slot]
-    hotspotexists = (count ~= 0)
-  end
-  return hotspotexists
+local function InitAiScripts_zombies()
+  AiState[AiPlayer()] = {
+    loop_pos = 1,
+    loop_start = nil,
+    build_order = nil,
+  }
 end
 
 local function GetBuildOrder()
   local order = {}
 
-  if (not HotSpotExists()) then
+  if (not AiHotSpotExists()) then
     order[1] = "unit-powerplant"
     order[2] = nil
   elseif (Players[AiPlayer()].MagmaStored < 300) then
@@ -94,25 +82,22 @@ end
 local ai_funcs = {
   -- Build magma pump or power plant first depending on resources
   function()
-    local order = GetBuildOrder()
-    return AiNeed(order[1])
+    state.build_order = GetBuildOrder()
+    return AiNeed(state.build_order[1])
   end,
   function()
-    local order = GetBuildOrder()
-    return AiWait(order[1])
+    return AiWait(state.build_order[1])
   end,
   function()
-    local order = GetBuildOrder()
-    if (order[2] ~= nil) then
-      return AiNeed(order[2])
+    if (state.build_order[2] ~= nil) then
+      return AiNeed(state.build_order[2])
     else
       return false
     end
   end,
   function()
-    local order = GetBuildOrder()
-    if (order[2] ~= nil) then
-      return AiWait(order[2])
+    if (state.build_order[2] ~= nil) then
+      return AiWait(state.build_order[2])
     else
       return false
     end
@@ -148,16 +133,37 @@ local ai_funcs = {
   function() return AiWaitForce(1) end, 
   function() return AiAttackWithForce(1) end,
 
-  function() return AiLoop(ai_loop_funcs, ai_loop_pos) end,
+  -- ============================================================
+
+  function() 
+    LocalDebugPrint("is starting loop.");
+    state.loop_start = state.loop_pos;
+    return false
+  end,
+
+  function() return AiForce(1, {"unit-assault", SyncRand(20)+10, 
+                                "unit-grenadier", SyncRand(12)+1, 
+                                "unit-bazoo", SyncRand(12)+1}) end,
+  function() return AiWaitForce(1) end,  -- wait until attack party is completed
+  function() return AiSleep((SyncRand(200)+30)*GameSettings.Difficulty) end,
+  function() return AiAttackWithForce(1) end,
+
+  function()
+    LocalDebugPrint("Reached the end of AI script and will loop");
+    state.loop_pos = state.loop_start - 1; -- AiLoop will immediately increment it.
+    return false
+  end,
 }
 
-function AiZombies()
---    print(AiPlayer() .. " position ".. ai_pos[AiPlayer() + 1]);
-    return AiLoop(ai_funcs, ai_pos)
+local function AiZombies()
+  LocalDebugPrint("Script position " .. AiState[AiPlayer()].loop_pos);
+  return AiLoop(ai_funcs)
 end
 
-DefineAiType({
-	Ident = "ai-zombies",
-	Name = _("Zombies"),
-	Init = InitAiScripts_zombies,
-	EachSecond = AiZombies })
+this_ai_type = {
+  Ident = "ai-zombies",
+  Name = _("Zombies"),
+  Init = InitAiScripts_zombies,
+  EachSecond = AiZombies,
+}
+DefineAiType(this_ai_type)

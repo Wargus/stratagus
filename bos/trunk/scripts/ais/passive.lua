@@ -28,11 +28,16 @@
 --	$Id: ai.lua 626 2006-11-25 18:10:03Z feb $
 --
 
-function AiPassive()
+-- What we registered in AiTypes.
+local this_ai_type
+
+local function AiPassive()
 end
 
-DefineAiType({
-	Ident = "ai-passive",
-	Name = _("Passive"),
-	Init = nil,
-	EachSecond = AiPassive })
+this_ai_type = {
+  Ident = "ai-passive",
+  Name = _("Passive"),
+  Init = nil,
+  EachSecond = AiPassive,
+}
+DefineAiType(this_ai_type)

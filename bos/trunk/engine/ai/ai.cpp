@@ -55,10 +55,11 @@
 ** Initialise all global varaibles and structures.
 ** Called before AiInit, or before game loading.
 **
-** ::AiInit(::Player)
+** ::AiInit(::CPlayer)
 **
 ** Called for each player, to setup the AI structures
-** Player::Aiin the player structure. It can use Player::AiName to
+** CPlayer::Ai in the player structure and possibly call
+** AI initialization scripts. It can use CPlayer::AiName to
 ** select different AI's.
 **
 ** ::CleanAi()
@@ -153,17 +154,24 @@ PlayerAi *AiPlayer;             /// Current AI player
 ----------------------------------------------------------------------------*/
 
 /**
-**  Execute the AI Script.
+**  Execute a Lua function of the AI type.
 */
-static void AiExecuteScript()
+static void AiExecuteFunction(const char *field)
 {
 	if (AiPlayer->AiType != NULL)
 	{
 		lua_getfield(Lua, LUA_GLOBALSINDEX, "AiTypes");
 		lua_getfield(Lua, -1, AiPlayer->AiType->Name.c_str());
-		lua_getfield(Lua, -1, "EachSecond");
-		LuaCall(0, 1);	// removes the function from the stack
-		lua_pop(Lua, 2); // remove the tables too
+		lua_getfield(Lua, -1, field);
+		if (!lua_isnil(Lua, -1))
+		{
+			LuaCall(0, 1);	// removes the function from the stack
+			lua_pop(Lua, 2); // remove the tables too
+		}
+		else
+		{
+			lua_pop(Lua, 3);
+		}
 	}
 }
 
@@ -481,6 +489,23 @@ void AiInit(CPlayer *player)
 
 	pai->AiType = ait;
 	player->Ai = pai;
+
+	// Initialize the AI state of the player if it has not been
+	// already initialized, i.e. we're not loading a saved game.
+	lua_getfield(Lua, LUA_GLOBALSINDEX, "AiState"); // stack: AiState
+	lua_pushnumber(Lua, player->Index);             // stack: AiState, player
+	lua_gettable(Lua, -2);                          // stack: AiState, AiState[player]
+	bool needs_init = lua_isnil(Lua, -1);
+	lua_pop(Lua, 2);
+	if (needs_init)
+	{
+		AiPlayer = pai;
+		AiExecuteFunction("Init");
+	}
+
+	// Cause a reproduceable crash if something expected us to
+	// preserve the value of AiPlayer.
+	AiPlayer = NULL;
 }
 
 /**
@@ -1048,7 +1073,7 @@ void AiEachSecond(CPlayer *player)
 	Assert(AiPlayer != NULL);
 
 	// Advance script
-	AiExecuteScript();
+	AiExecuteFunction("EachSecond");
 
 	// Look if everything is fine.
 	AiCheckUnits();

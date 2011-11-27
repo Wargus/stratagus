@@ -30,6 +30,7 @@
 <a href="index.html">LUA Index</a>
 <hr>
 <a href="#AiTypes">AiTypes</a>
+<a href="#AiState">AiState</a>
 <a href="#DefineAiType">DefineAiType</a>
 <a href="#DefineAiHelper">DefineAiHelper</a>
 <a href="#AiCheckForce">AiCheckForce</a>
@@ -101,12 +102,23 @@ entry that is a table with these keys:</p>
   <dt>Name = string</dt>
   <dd>Name of the AI the Player sees and which gets translated.
     The engine does not use this; only the Lua code does.</dd>
-  <dt>Init = function or nil</dt>
-  <dd>Initializes the AI state of the player to whatever the AI type
-    requires.  When starting a new game, the engine calls the Init
-    function for each player that is going to use this AI type.
-    <b>FIXME: not yet correctly implemented.</b></dd>
-  <dt>EachSecond = function</dt>
+  <dt id="AiTypes.Init">Init = function or nil</dt>
+  <dd>Initializes
+    <a href="#AiState">AiState</a>[<a href="#AiPlayer">AiPlayer()</a>]
+    to whatever the AI type requires.
+    When starting a new game, the engine calls the Init function
+    for each player that is going to use this AI type.
+    Typically, the Init function creates a table and writes it to
+    AiState[AiPlayer()], and the <a href="#AiTypes.EachSecond">EachSecond</a>
+    function will then maintain that table.
+    Even if the AI type does not use AiState for its own purposes,
+    the Init function must regardless write a non-nil value to
+    AiState[AiPlayer()], so that the engine will know the AI state
+    has been initialized and not call the Init function again
+    if the game is later saved and loaded.
+    (Of course, if the AI type has no Init function, then there
+    is no such requirement.)</dd>
+  <dt id="AiTypes.EachSecond">EachSecond = function</dt>
   <dd>Decides AI actions: primarily, what to build.
     The engine calls the EachSecond function once per second
     (at the default game speed).</dd>
@@ -122,6 +134,41 @@ entry that is a table with these keys:</p>
 modify it or its elements directly.  Instead, it should call
 <a href="#DefineAiType">DefineAiType</a>, so that the engine
 knows to update its data structures accordingly.</p>
+
+<a name="AiState"></a>
+<h3>AiState</h3>
+
+<p>The AI state of each AI player.
+The AI scripts should write all persistent state into AiState,
+so that the engine will save and load it as part of the game,
+and so that the engine can easily clear the state when
+starting a new game.</p>
+
+<dl>
+  <dt>AiState[<a href="#AiPlayer">AiPlayer()</a>] = table</dt>
+  <dd>AI state of a single AI player.
+    The <a href="#AiTypes.Init">Init</a> function of the AI type
+    creates this table, and the other functions of the AI type
+    can then use the fields of the table as they please.
+    If AiState[AiPlayer()] is nil, that means the engine has not
+    called the Init function yet.</dd>
+</dl>
+
+<p>The engine does not currently preserve object identity when saving
+and loading a game.  That means, if the AI script does</p>
+
+<pre>
+   local x = {}
+   AiState[AiPlayer()].first = x
+   AiState[AiPlayer()].second = x
+</pre>
+
+<p>then a comparison like
+<code>AiState[AiPlayer()].first == AiState[AiPlayer()].second</code>
+will initially return true, but if the game is saved and loaded, the
+comparison will start returning false because <code>first</code> and
+<code>second</code> now refer to different empty tables.
+However, scripts should not depend on this behavior.</p>
 
 <h2>Functions</h2>
 <a name="DefineAiType"></a>
@@ -470,7 +517,7 @@ additional could be requested.
 <h3>AiPlayer()</h3>
 
 Return the player number of the running AI.
-
+This is often used for indexing the <a href="#AiState">AiState</a> table.
 
 <h4>Example</h4>
 

@@ -29,48 +29,34 @@
 --      $Id: naval.lua  $
 --
 
-local player
+-- What we registered in AiTypes.
+local this_ai_type
 
-local function AiLoop(loop_funcs, loop_pos)
-  local ret
+-- Same as AiState[AiPlayer()].  Valid only during AiLoop.
+local state
 
-  player = AiPlayer() + 1
+local function AiLoop(funcs)
+  state = AiState[AiPlayer()]
   while (true) do
-    ret = loop_funcs[loop_pos[player]]()
+    local ret = funcs[state.loop_pos]()
     if (ret) then
-        break
+      break
     end
-    loop_pos[player] = loop_pos[player] + 1
+    state.loop_pos = state.loop_pos + 1
   end
   return true
 end
 
-function InitAiScripts_naval()
-  ai_pos      = {1, 1, 1, 1, 1, 1, 1, 1}
-  ai_loop_pos = {1, 1, 1, 1, 1, 1, 1, 1}
+local function LocalDebugPrint(text)
+  -- DebugPrint(this_ai_type.Ident .. " player " .. AiPlayer() .. " " .. text)
 end
 
-local ai_loop_funcs = {
-  function() return AiForce(0, {"unit-destroyer", 3}) end,
-  function() return AiWaitForce(0) end,
-  function() return AiAttackWithForce(0) end,
-
-  -- Always attack as soon as the 3 destroyers are finished:
-  --function()
-  --  if (AiCheckForce(0)) then
-  --    AiWaitForce(0);
-  --    return AiAttackWithForce(0)
-  --  end
-  --  return true
-  --end,
-
-  function()
-    -- print("Ai " .. player .. " is looping"); -- debug only
-    ai_loop_pos[player] = 0;
-    return false
-  end,
-}
-
+local function InitAiScripts_naval()
+  AiState[AiPlayer()] = {
+    loop_pos = 1,
+    loop_start = nil,
+  }
+end
 
 local ai_funcs = {
   -- Use all 4 engineers to help building a magnapump:
@@ -85,7 +71,7 @@ local ai_funcs = {
   -- This also does not work with the AiSet() function.
   function() return AiWait("unit-magmapump") end,
   function() -- debug only
-    print("Naval " .. AiPlayer() + 1 .. " Magnapump finished.");
+    LocalDebugPrint("Magnapump finished.");
     return false
   end,
 
@@ -93,7 +79,7 @@ local ai_funcs = {
   -- Do not start building anything else until we have the energy:
   function() return AiWait("unit-nukepowerplant") end,
   function() -- debug only
-    print("Naval " .. AiPlayer() + 1 .. " NukePowerplant finished.");
+    LocalDebugPrint("NukePowerplant finished.");
     return false
   end,
 
@@ -101,7 +87,7 @@ local ai_funcs = {
   -- function() return AiNeed("unit-vault") end,
   -- function() return AiWait("unit-vault") end,
   -- function() -- debug only
-  --   print("Naval " .. AiPlayer() + 1 .. " Vault finished.");
+  --   LocalDebugPrint("Vault finished.");
   --   return false
   -- end,
 
@@ -111,34 +97,61 @@ local ai_funcs = {
   function() return AiNeed("unit-gturret") end,
 
   function() return AiWait("unit-shipyard") end,
-  -- function() -- debug only
-  --  print("Naval " .. AiPlayer() + 1 .. " Shipyard finished.");
-  --  return false
-  -- end,
+  function() -- debug only
+    LocalDebugPrint("Shipyard finished.");
+    return false
+  end,
 
   function() return AiForce(0, {"unit-destroyer", 2}) end,
   function() return AiWaitForce(0) end,
   function() return AiAttackWithForce(0) end,
-  -- function() -- debug only
-  --  print(AiPlayer() + 1 .. " Attack force of 2 destroyers is ready - attacking.");
-  --  return false
-  --end,
+  function() -- debug only
+    LocalDebugPrint("Attack force of 2 destroyers is ready - attacking.");
+    return false
+  end,
 
   function() return AiSet("unit-magmapump",2) end,
   function() return AiSet("unit-nukepowerplant", 1) end,
   function() return AiSet("unit-engineer", 4) end,
   function() return AiSet("unit-gturret", 4) end,
 
-  function() return AiLoop(ai_loop_funcs, ai_loop_pos) end,
+  -- ============================================================
+
+  function() 
+    LocalDebugPrint("is starting loop.");
+    state.loop_start = state.loop_pos;
+    return false
+  end,
+
+  function() return AiForce(0, {"unit-destroyer", 3}) end,
+  function() return AiWaitForce(0) end,
+  function() return AiAttackWithForce(0) end,
+
+  -- Always attack as soon as the 3 destroyers are finished:
+  --function()
+  --  if (AiCheckForce(0)) then
+  --    AiWaitForce(0);
+  --    return AiAttackWithForce(0)
+  --  end
+  --  return true
+  --end,
+
+  function()
+    LocalDebugPrint("Reached the end of AI script and will loop");
+    state.loop_pos = state.loop_start - 1; -- AiLoop will immediately increment it.
+    return false
+  end,
 }
 
-function AiNaval()
-    -- print("Naval " .. AiPlayer() + 1 .. " position ".. ai_pos[AiPlayer() + 1]); -- debug only
-    return AiLoop(ai_funcs, ai_pos)
+local function AiNaval()
+  LocalDebugPrint("Script position " .. AiState[AiPlayer()].loop_pos);
+  return AiLoop(ai_funcs)
 end
 
-DefineAiType({
-	Ident = "ai-naval",
-	Name = _("Naval"),
-	Init = InitAiScripts_naval,
-	EachSecond = AiNaval })
+this_ai_type = {
+  Ident = "ai-naval",
+  Name = _("Naval"),
+  Init = InitAiScripts_naval,
+  EachSecond = AiNaval,
+}
+DefineAiType(this_ai_type)
