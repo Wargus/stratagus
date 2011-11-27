@@ -3,10 +3,6 @@
 -- File licensed under the GNU GPL version 2 or later.
 
 
--- Load specific AI
-Load(GetCurrentLuaPath() .. "/spacious.lua")
-InitAiScripts_spacious()
-
 -- player configuration
 Players[0]:SetStartView(19, 19)
 Players[0].EnergyStored = 2000
