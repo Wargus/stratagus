@@ -10,6 +10,7 @@
 --	ai.lua		-	Define the AI.
 --
 --	(c) Copyright 2000-2009 by Lutz Sammer, Frank Loeffler
+--      (c) Copyright 2011 by Michiel van der Wulp
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -51,7 +52,7 @@ end
 -- Check if there is a hot spot on the map.
 --
 -- Returns:
---   True if there is at least one hot spot on the map,
+--   True if there is at least one hot spot (weak or not) on the map,
 --   False if there are no hot spots.
 --
 -- AiHotSpotExists detects even hot spots that are not visible to the
@@ -66,8 +67,11 @@ function AiHotSpotExists()
   local cache = AiState.cache
   if (cache.hotspotexists == nil) then
     local hotspot = UnitTypeByIdent("unit-hotspot")
+    local whotspot = UnitTypeByIdent("unit-weakhotspot")
     local count = Players[PlayerNumNeutral].UnitTypesCount[hotspot.Slot]
-    cache.hotspotexists = (count ~= 0)
+    local wcount = Players[PlayerNumNeutral].UnitTypesCount[whotspot.Slot]
+    -- DebugPrint("This map has " .. count .. " hotspots and " .. wcount .. " weak hotspots.")
+    cache.hotspotexists = ((count + wcount) ~= 0)
   end
   return cache.hotspotexists
 end
