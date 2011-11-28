@@ -730,6 +730,7 @@ function RunEditorNewMenu()
     if (n == nil) then n = 64 end
     Map.Info.MapHeight = n
 
+    ClearAiState()
     StartEditor(nil)
     Load("scripts/uilayout.lua")
     HandleCommandKey = HandleIngameCommandKey
@@ -803,6 +804,7 @@ function RunEditorLoadMenu()
   browser:setActionCallback(selectMap)
 
   function starteditorbutton(s)
+    ClearAiState()
     StartEditor(browser:getSelectedMap())
     Load("scripts/uilayout.lua")
     HandleCommandKey = HandleIngameCommandKey
