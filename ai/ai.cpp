@@ -493,6 +493,7 @@ void AiInit(CPlayer *player)
 	// Initialize the AI state of the player if it has not been
 	// already initialized, i.e. we're not loading a saved game.
 	lua_getfield(Lua, LUA_GLOBALSINDEX, "AiState"); // stack: AiState
+	Assert(lua_istable(Lua, -1));
 	lua_pushnumber(Lua, player->Index);             // stack: AiState, player
 	lua_gettable(Lua, -2);                          // stack: AiState, AiState[player]
 	bool needs_init = lua_isnil(Lua, -1);
