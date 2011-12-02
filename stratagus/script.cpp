@@ -1215,7 +1215,7 @@ CSerializeLua::Result CSerializeLua::AppendLuaValue(int index)
 		// Let Lua do the conversion.
 		return this->AppendLuaAsString(index);
 	case LUA_TBOOLEAN:
-		if (lua_toboolean(this->lstate, -1)) {
+		if (lua_toboolean(this->lstate, index)) {
 			this->AppendCString("true");
 		} else {
 			this->AppendCString("false");
