@@ -84,8 +84,7 @@ namespace gcn
     
         for (i = 0; i< text.size(); ++i)
         {
-            drawGlyph(graphics, text.at(i), x, y);
-            x += getWidth(text);      
+            x += drawGlyph(graphics, text.at(i), x, y);
         }    
     }
 
