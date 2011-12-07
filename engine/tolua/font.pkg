@@ -5,6 +5,7 @@ class CFont
 
 	int Height();
 	int Width(const std::string text);
+	CFont *PlainText();
 };
 
 

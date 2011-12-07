@@ -34,7 +34,7 @@
 #include "SDL_opengl.h"
 #include "guichan/image.h"
 
-class CFont;
+class CFontFamily;
 
 extern bool UseOpenGL;
 
@@ -112,9 +112,7 @@ public:
 	GLuint *Textures;          /// Texture names
 	int NumTextures;           /// Number of textures
 
-	friend void MakeFontColorTextures(CFont *font);
-	friend void CleanFonts(void);
-	friend void ReloadFonts(void);
+	friend class CFontFamily;
 };
 
 class CPlayerColorGraphic : public CGraphic
