@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.93 on Sun Oct  2 03:18:19 2011.
+** Generated automatically by tolua++-1.0.93 on Wed Dec  7 01:31:03 2011.
 */
 
 #ifndef __cplusplus
@@ -13756,6 +13756,38 @@ static int tolua_stratagus_CFont_Width00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: PlainText of class  CFont */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CFont_PlainText00
+static int tolua_stratagus_CFont_PlainText00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"CFont",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  CFont* self = (CFont*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'PlainText'", NULL);
+#endif
+  {
+   CFont* tolua_ret = (CFont*)  self->PlainText();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"CFont");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'PlainText'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: New of class  CFontColor */
 #ifndef TOLUA_DISABLE_tolua_stratagus_CFontColor_New00
 static int tolua_stratagus_CFontColor_New00(lua_State* tolua_S)
@@ -20509,6 +20541,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_function(tolua_S,"Get",tolua_stratagus_CFont_Get00);
    tolua_function(tolua_S,"Height",tolua_stratagus_CFont_Height00);
    tolua_function(tolua_S,"Width",tolua_stratagus_CFont_Width00);
+   tolua_function(tolua_S,"PlainText",tolua_stratagus_CFont_PlainText00);
   tolua_endmodule(tolua_S);
   tolua_constant(tolua_S,"MaxFontColors",MaxFontColors);
   tolua_cclass(tolua_S,"CFontColor","CFontColor","",NULL);

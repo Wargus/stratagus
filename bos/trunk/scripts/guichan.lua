@@ -334,7 +334,7 @@ function AddMenuHelpers(menu)
   function menu:addTextInputField(text, x, y, w)
     local b = TextField(text)
     b:setActionCallback(function() end) --FIXME: remove this?
-    b:setFont(Fonts["game"])
+    b:setFont(Fonts["game"]:PlainText())
     b:setBaseColor(clear)
     b:setForegroundColor(clear)
     b:setBackgroundColor(dark)

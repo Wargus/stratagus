@@ -66,34 +66,39 @@
 ----------------------------------------------------------------------------*/
 
 class CGraphic;
+class CFontFamily;
 
 	/// Font definition
 class CFont : public gcn::Font {
-private:
-	CFont(const std::string &ident) : Ident(ident), CharWidth(NULL),
-		G(NULL) {}
+	friend class CFontFamily;
 
 public:
 	virtual ~CFont();
 
 	static CFont *New(const std::string &ident, CGraphic *g);
 	static CFont *Get(const std::string &ident);
+	CFont *PlainText();
 
 	int Height() const;
 	int Width(const std::string &text) const;
 	bool IsLoaded() const;
+	bool IsPlainText() const;
+	CFontFamily *FontFamily() { return this->Family; }
 
 	virtual int getHeight() const { return Height(); }
 	virtual int getWidth(const std::string &text) const
 		{ return Width(text); }
 	virtual void drawString(gcn::Graphics *graphics, const std::string &text, 
 		int x, int y);
-	
-	void MeasureWidths();
 
-	std::string Ident;    /// Ident of the font.
-	char *CharWidth;      /// Real font width (starting with ' ')
-	CGraphic *G;          /// Graphic object used to draw
+private:
+	CFont();
+
+	CFontFamily *Family;
+
+private: // undefined
+	CFont(const CFont &);
+	CFont &operator =(const CFont &);
 };
 
 #define MaxFontColors 9
