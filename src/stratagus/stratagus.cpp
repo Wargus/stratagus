@@ -697,7 +697,7 @@ static void Usage()
 		"\n\nUsage: %s [OPTIONS] [map.smp|map.smp.gz]\n"
 		"\t-c file.lua\tConfiguration start file (default stratagus.lua)\n"
 		"\t-d datapath\tPath to stratagus data (default current directory)\n"
-		"t-D depth\tVideo mode depth = pixel per point\n"
+		"\t-D depth\tVideo mode depth = pixel per point\n"
 		"\t-e\t\tStart editor (instead of game)\n"
 		"\t-E file.lua\tEditor configuration start file (default editor.lua)\n"
 		"\t-F\t\tFull screen video mode\n"
