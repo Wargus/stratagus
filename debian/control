@@ -2,14 +2,14 @@ Source: stratagus
 Section: games
 Priority: optional
 Maintainer: Pali Rohár <pali.rohar@gmail.com>
-Build-Depends: debhelper (>= 7), cdbs, cmake (>= 2.6), doxygen,
+Build-Depends: debhelper (>= 7), cmake (>= 2.6), doxygen,
  imagemagick, sharutils, liblua5.1-dev | liblua5.1-0-dev, libtolua++5.1-dev,
  zlib1g-dev, libbz2-dev, libpng12-dev (>= 1.2.5), libmng-dev,
  libmikmod2-dev, libogg-dev, libvorbis-dev, libtheora-dev,
  libsdl1.2-dev (>> 1.2.2), libosso-dev, libx11-dev, libsqlite3-dev,
- libgl-dev | libgles1-sgx-img-dev | libgles1-mesa-dev,
- libgl-dev | libsdl-gles1.2-dev
-Standards-Version: 3.8.4
+ libgl1-mesa-dev | libgl-dev | libgles1-sgx-img-dev | libgles1-mesa-dev,
+ libgl1-mesa-dev | libgl-dev | libsdl-gles1.2-dev
+Standards-Version: 3.9.2
 Homepage: https://launchpad.net/stratagus
 Vcs-Browser: https://code.launchpad.net/stratagus
 Vcs-Bzr: lp:stratagus
@@ -50,8 +50,7 @@ Package: stratagus-dbg
 Section: debug
 Priority: extra
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}
-Suggests: stratagus
+Depends: ${misc:Depends}, ${shlibs:Depends}, stratagus (= ${binary:Version})
 Description: Strategy Gaming Engine (debugging symbols)
  Stratagus is a free cross-platform real-time strategy gaming engine.
  It includes support for playing over Internet/LAN, or playing vs.
@@ -85,6 +84,7 @@ Description: Strategy Gaming Engine (debugging symbols)
 Package: stratagus-doc
 Section: doc
 Architecture: all
+Depends: ${misc:Depends}, ${shlibs:Depends}
 Suggests: stratagus
 Description: Strategy Gaming Engine (documentation)
  Stratagus is a free cross-platform real-time strategy gaming engine.
@@ -118,7 +118,7 @@ Description: Strategy Gaming Engine (documentation)
 
 Package: stratagus-dev
 Architecture: all
-Depends: stratagus
+Depends: ${misc:Depends}, ${shlibs:Depends}, stratagus (>= ${binary:Version})
 Description: Strategy Gaming Engine (development files)
  Stratagus is a free cross-platform real-time strategy gaming engine.
  It includes support for playing over Internet/LAN, or playing vs.
