@@ -476,6 +476,7 @@ option(WITH_X11 "Compile Stratagus with X11 clipboard pasting support" ON)
 option(ENABLE_DOC "Generate Stratagus source code documentation with Doxygen" OFF)
 option(ENABLE_DEV "Install Stratagus game development headers files" OFF)
 option(ENABLE_UPX "Compress Stratagus executable binary with UPX packer" OFF)
+option(ENABLE_STRIP "Strip all symbols from executables" OFF)
 
 if(NOT WITH_RENDERER)
 	if(OPENGL_FOUND)
@@ -600,6 +601,12 @@ endif()
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 
+if(ENABLE_STRIP)
+	set(CMAKE_EXE_LINKER_FLAGS "-s")
+else()
+	set(CMAKE_EXE_LINKER_FLAGS "")
+endif()
+
 # Print compile info
 
 message("==================================")
@@ -618,6 +625,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	message("Debug mode: Yes (Disable by param -DCMAKE_BUILD_TYPE=Release)")
 else()
 	message("Debug mode: No (Enable by param -DCMAKE_BUILD_TYPE=Debug)")
+endif()
+
+if(ENABLE_STRIP)
+	message("Strip executables: Yes (Disable by param -DENABLE_STRIP=OFF)")
+else()
+	message("Strip executables: No (Enable by param -DENABLE_STRIP=ON)")
 endif()
 
 if(ENABLE_STATIC)
