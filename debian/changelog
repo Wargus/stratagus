@@ -1,8 +1,26 @@
 stratagus (2.2.6-1) unstable; urgency=low
 
-  * UNRELEASED
+  * Changed directory structure for CMake, DoxyGen and platform code (from Pali Rohár)
+  * Rewrited Stratagus build system to CMake (from Pali Rohár)
+  * Updated debian scripts to CMake, better Maemo section (from Pali Rohár)
+  * Updated Stratagus DoxyGen documentation (from Pali Rohár)
+  * Removed tolua++ source code from Stratagus tree, instead use system library (from Pali Rohár)
+  * Fixed crashing if editor configuration script not exists (from Pali Rohár)
+  * Added support for touchscreen input method at compilation time (from Pali Rohár)
+  * Fixed bug #730283 - Fixed crashing when 2 workers enter the mine which have resources only for 1 worker (from Pali Rohár)
+  * Added support for animating resource container when harvesting (from Pali Rohár)
+  * Fixed crashing metaserver at first start (from Pali Rohár)
+  * Added Lua function DebugPrint (from Pali Rohár)
+  * Fixed bug #816573 - Fixed compilation on Mac (from ASDF)
+  * Created Game header files for Launcher and Maemo extractor (from Pali Rohár)
+  * Rewritten Debian control files to debhelper 7 (from Pali Rohár)
+  * Fixed bug #821210 - Fixed compilation with png 1.5 (from Thomas Klausner)
+  * Updated WinAPI AttachConsole, fixed for MSVC
+  * Reverted back Color Cycling support (from Joris Dauphin)
+  * On Windows moved Stratagus user save and logs directory to user profile directory
+  * Fixed bug #685144 - Added support for any resolution from command line (from Pali Rohár)
 
- -- Pali Rohár <pali.rohar@gmail.com>  Mon, 08 Aug 2011 22:00:45 +0200
+ -- Pali Rohár <pali.rohar@gmail.com>  Mon, 19 Dec 2011 13:35:02 +0100
 
 stratagus (2.2.5.5-1) unstable; urgency=low
 

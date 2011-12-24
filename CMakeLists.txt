@@ -28,7 +28,7 @@
 
 project(stratagus)
 cmake_minimum_required(VERSION 2.6)
-set(STRATAGUS_VERSION 2.2.5.5)
+set(STRATAGUS_VERSION 2.2.6)
 
 # Stratagus sources
 
