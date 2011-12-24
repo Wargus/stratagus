@@ -730,7 +730,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 if(WIN32 AND MINGW AND ENABLE_STATIC)
-	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc")
+	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc -Wl,--stack,10485760")
 endif()
 
 ########### next target ###############
