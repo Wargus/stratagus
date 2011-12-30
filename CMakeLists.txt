@@ -583,7 +583,7 @@ if(MAEMO)
 	add_definitions(-DUSE_MAEMO ${LIBOSSO_CFLAGS})
 	include_directories(${LIBOSSO_INCLUDE_DIRS})
 	set(stratagus_SRCS ${stratagus_SRCS} ${maemo_SRCS})
-	set(stratagus_LIBS ${LIBOSSO_LIBRARIES})
+	set(stratagus_LIBS ${stratagus_LIBS} ${LIBOSSO_LIBRARIES})
 	# Hack/Bug: On Maemo is not possible to disable touch screen input
 	set(ENABLE_TOUCHSCREEN ON)
 endif()

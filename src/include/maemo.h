@@ -34,7 +34,7 @@
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_MAEMO
-void maemo_init();
+void maemo_init(void);
 #endif
 
 //@}

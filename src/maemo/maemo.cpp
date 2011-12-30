@@ -70,20 +70,22 @@ static Uint32 OssoKeepBacklightAlive(Uint32 interval, void *)
  * Initialize OSSO context, needed for calling OSSO functions.
  * Create SDL timer for calling OssoKeepBacklightAlive every 50s.
  **/
-static void OssoInitialize()
+static void OssoInitialize(void)
 {
 	char * application;
 
 	if (FullGameName.empty()) {
 		application = strdup("org.stratagus");
 	} else {
-		application = calloc(FullGameName.size() + 15, sizeof(char));
+		application = (char *)calloc(FullGameName.size() + 15, 1);
 		strcpy(application, "org.stratagus.");
 		for (int i = 0; i < FullGameName.size(); i++)
 			application[i+14] = tolower(FullGameName[i]);
 	}
 
 	osso = osso_initialize(application, VERSION, TRUE, NULL);
+
+	free(application);
 
 	if (!osso) {
 		fprintf(stderr, "Couldn't initialize OSSO\n");
@@ -101,7 +103,7 @@ static void OssoInitialize()
 /**
  * Deinitialize OSSO context and remove registred SDL timer
  **/
-static void OssoDeinitialize()
+static void OssoDeinitialize(void)
 {
 	SDL_RemoveTimer(timer);
 	osso_deinitialize(osso);
@@ -110,7 +112,7 @@ static void OssoDeinitialize()
 /**
  * Main function which initialize Maemo platform code
  **/
-void maemo_init()
+void maemo_init(void)
 {
 	OssoInitialize();
 	atexit(OssoDeinitialize);
