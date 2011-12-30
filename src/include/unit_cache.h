@@ -132,7 +132,7 @@ struct CUnitCache {
 	 *  @p functor must not modify the order of the cache.
 	 */
 	template<typename _T>
-	inline void for_each(_T &functor)
+	inline void for_each(_T functor)
 	{
 		const size_t size = Units.size();
 #if __GNUC__ <  4

@@ -571,6 +571,7 @@ endif()
 
 if(BSD)
 	add_definitions(-DUSE_BSD)
+	add_definitions(-D__unix)
 endif()
 
 if(BEOS)

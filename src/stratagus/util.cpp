@@ -485,17 +485,19 @@ CMutex::CMutex ()
 #if !defined (__unix)
 	InitializeCriticalSection (&_mut);
 #else
-	if (pthread_mutexattr_init (&_attr) == 0) {
+  	if (pthread_mutexattr_init (&_attr) == 0) {
   #if defined (__linux)
-		if (pthread_mutexattr_settype (&_attr, PTHREAD_MUTEX_RECURSIVE_NP) == 0)
+  		if (pthread_mutexattr_settype (&_attr, PTHREAD_MUTEX_RECURSIVE_NP) == 0)
+  #elif defined (USE_BSD)
+  		if (pthread_mutexattr_settype (&_attr, PTHREAD_MUTEX_RECURSIVE) == 0)
   #else // HP & SUN
-    	if (pthread_mutexattr_settype (&_attr, PTHREAD_MUTEX_RECURSIVE) == 0 &&
-    		pthread_mutexattr_setpshared (&_attr, PTHREAD_PROCESS_PRIVATE) == 0)
+  		if (pthread_mutexattr_settype (&_attr, PTHREAD_MUTEX_RECURSIVE) == 0 &&
+  			pthread_mutexattr_setpshared (&_attr, PTHREAD_PROCESS_PRIVATE) == 0)
   #endif
   		{
   			pthread_mutex_init (&_mut, &_attr);
-    	}
-	}
+  		}
+  	}
 #endif
 }
 
