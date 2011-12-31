@@ -186,7 +186,7 @@ int main(int argc, char * argv[]) {
 		fgets(act_version, 20, file);
 		fclose(file);
 
-		file = popen(EXTRACTBIN " -V", "r");
+		file = popen(EXTRACT_BIN " -V", "r");
 
 		if ( file ) {
 
@@ -203,10 +203,10 @@ int main(int argc, char * argv[]) {
 
 	message(GAME_NAME, DATA_NEED_COPY, 0);
 
-	if ( stat(GAME_DIR "/" GAME_CD_FILE, &st) != 0 ) {
+	if ( stat(GAME_CD_DIR "/" GAME_CD_FILE, &st) != 0 ) {
 
 		char * buf = strdup(GAME_CD_FILE);
-		char * path = calloc(strlen(GAME_CD_FILE) + strlen(GAME_DIR) + 2, sizeof(char));
+		char * path = calloc(strlen(GAME_CD_FILE) + strlen(GAME_CD_DIR) + 2, sizeof(char));
 		char * ptr = buf;
 
 		while ( *ptr ) {
@@ -216,7 +216,7 @@ int main(int argc, char * argv[]) {
 
 		}
 
-		sprintf(path, GAME_DIR "/%s", buf);
+		sprintf(path, GAME_CD_DIR "/%s", buf);
 
 		if ( stat(path, &st) != 0 )
 			message(GAME_NAME, DATA_NOT_FOUND, 1);
@@ -237,7 +237,7 @@ int main(int argc, char * argv[]) {
 	int ret = system(EXTRACT_COMMAND);
 
 	if ( ret != 0 )
-		message(GAMENAME, EXTRACT_FAILED, ret);
+		message(GAME_NAME, EXTRACT_FAILED, ret);
 
 	message(GAME_NAME, EXTRACT_OK, 0);
 	return 0;
