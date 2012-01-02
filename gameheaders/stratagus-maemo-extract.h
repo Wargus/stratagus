@@ -203,10 +203,10 @@ int main(int argc, char * argv[]) {
 
 	message(GAME_NAME, DATA_NEED_COPY, 0);
 
-	if ( stat(GAME_CD_DIR "/" GAME_CD_FILE, &st) != 0 ) {
+	if ( stat(DATA_DIR "/" GAME_CD_FILE, &st) != 0 ) {
 
 		char * buf = strdup(GAME_CD_FILE);
-		char * path = calloc(strlen(GAME_CD_FILE) + strlen(GAME_CD_DIR) + 2, sizeof(char));
+		char * path = calloc(strlen(DATA_DIR) + strlen(GAME_CD_FILE) + 2, 1);
 		char * ptr = buf;
 
 		while ( *ptr ) {
@@ -216,7 +216,7 @@ int main(int argc, char * argv[]) {
 
 		}
 
-		sprintf(path, GAME_CD_DIR "/%s", buf);
+		sprintf(path, DATA_DIR "/%s", buf);
 
 		if ( stat(path, &st) != 0 )
 			message(GAME_NAME, DATA_NOT_FOUND, 1);
