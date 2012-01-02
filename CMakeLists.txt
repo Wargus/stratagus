@@ -498,10 +498,6 @@ if(WIN32 AND NOT ENABLE_STDIO_REDIRECT)
 	add_definitions(-DNO_STDIO_REDIRECT)
 endif()
 
-if(ENABLE_TOUCHSCREEN)
-	add_definitions(-DUSE_TOUCHSCREEN)
-endif()
-
 if(WITH_BZIP2 AND BZIP2_FOUND)
 	add_definitions(-DUSE_BZ2LIB ${BZIP2_DEFINITIONS})
 	include_directories(${BZIP2_INCLUDE_DIR})
@@ -606,6 +602,10 @@ if(ENABLE_STRIP)
 	set(CMAKE_EXE_LINKER_FLAGS "-s")
 else()
 	set(CMAKE_EXE_LINKER_FLAGS "")
+endif()
+
+if(ENABLE_TOUCHSCREEN)
+	add_definitions(-DUSE_TOUCHSCREEN)
 endif()
 
 # Print compile info
