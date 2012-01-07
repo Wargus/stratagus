@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#! /usr/bin/evn python
 # -*- coding: utf-8 -*-
 #
 #  Build script for the Bos Wars engine.
@@ -26,15 +26,6 @@
 # install such a binary and e.g. Debian squeeze doesn't have one.
 # Instead, the #! line specifies /bin/sh, and the following embedded
 # shell script then tries to find a suitable version of Python.
-""":"
-if python2 --version > /dev/null 2>&1
-then
-    exec python2 "$0" "$@"
-else
-    exec python "$0" "$@"
-fi
-exit 1  # Should never get this far.
-":"""
 
 import os
 import glob
