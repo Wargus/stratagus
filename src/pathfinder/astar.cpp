@@ -559,11 +559,13 @@ static inline int CostMoveTo(unsigned int index, void *data)
 						// moving unit are crossable
 						cost += AStarMovingUnitCrossingCost;
 					} else {
-						// for non moving unit Always Fail
-						// FIXME: Need support for moving a fixed unit to add cost
-						*c = -1;
-						return -1;
-						//cost += AStarFixedUnitCrossingCost;
+						// for non moving unit Always Fail unless goal is unit
+						if((CUnit *) data != goal) {
+							// FIXME: Need support for moving a fixed unit to add cost
+							*c = -1;
+							return -1;
+							//cost += AStarFixedUnitCrossingCost;
+						}
 					}
 				}
 				// Add cost of crossing unknown tiles if required
