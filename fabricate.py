@@ -90,18 +90,22 @@ except ImportError:
     try:
         import simplejson as json
     except ImportError:
-        import cPickle
+        try:
+            import cPickle as pickle
+        except ImportError:
+            import pickle
         # needed to ignore the indent= argument for pickle's dump()
         class PickleJson:
             def load(self, f):
-                return cPickle.load(f)
+                return pickle.load(f)
             def dump(self, obj, f, indent=None, sort_keys=None):
-                return cPickle.dump(obj, f)
+                return pickle.dump(obj, f)
         json = PickleJson()
 
 def printerr(message):
     """ Print given message to stderr with a line feed. """
-    print >>sys.stderr, message
+    sys.stderr.write(message)
+    sys.stderr.write('\n')
 
 class PathError(Exception): pass
 
@@ -115,10 +119,10 @@ def args_to_list(args):
     for arg in args:
         if arg is None:
             continue
-        if hasattr(arg, '__iter__'):
+        if not isinstance(arg, str) and hasattr(arg, '__iter__'):
             arglist.extend(args_to_list(arg))
         else:
-            if not isinstance(arg, basestring):
+            if not isinstance(arg, str):
                 arg = str(arg)
             arglist.append(arg)
     return arglist
@@ -351,7 +355,7 @@ class AtimesRunner(Runner):
         """ Call os.utime but ignore permission errors """
         try:
             os.utime(filename, (atime, mtime))
-        except OSError, e:
+        except OSError as e:
             # ignore permission errors -- we can't build with files
             # that we can't access anyway
             if e.errno != 1:
@@ -363,7 +367,7 @@ class AtimesRunner(Runner):
             and return a new dict of filetimes with the ages adjusted. """
         adjusted = {}
         now = time.time()
-        for filename, entry in filetimes.iteritems():
+        for filename, entry in filetimes.items():
             if now-entry[0] < FAT_atime_resolution or now-entry[1] < FAT_mtime_resolution:
                 entry = entry[0] - FAT_atime_resolution, entry[1] - FAT_mtime_resolution
                 self._utime(filename, entry[0], entry[1])
@@ -467,7 +471,7 @@ class StraceRunner(Runner):
             proc = subprocess.Popen(['strace', '-e', 'trace=stat64'], stderr=subprocess.PIPE)
             stdout, stderr = proc.communicate()
             proc.wait()
-            if 'invalid system call' in stderr:
+            if 'invalid system call' in str(stderr):
                 return 32
             else:
                 return 64
@@ -724,7 +728,7 @@ class Builder(object):
     def echo(self, message):
         """ Print message, but only if builder is not in quiet mode. """
         if not self.quiet:
-            print message
+            print(message)
 
     def echo_command(self, command):
         """ Show a command being executed. """
@@ -786,14 +790,14 @@ class Builder(object):
 
             This function is for compatiblity with memoize.py and is
             deprecated. Use run() instead. """
-        if isinstance(command, basestring):
+        if isinstance(command, str):
             args = shlex.split(command)
         else:
             args = args_to_list(command)
         try:
             self.run(args)
             return 0
-        except ExecutionError, exc:
+        except ExecutionError as exc:
             message, data, status = exc
             return status
 
@@ -838,7 +842,7 @@ class Builder(object):
         for output in outputs:
             try:
                 os.remove(output)
-            except OSError, e:
+            except OSError as e:
                 self.echo_delete(output, e)
             else:
                 self.echo_delete(output)
@@ -897,7 +901,7 @@ class Builder(object):
         try:
             self.runner = self._runner_map[runner](self)
         except KeyError:
-            if isinstance(runner, basestring):
+            if isinstance(runner, str):
                 # For backwards compatibility, allow runner to be the
                 # name of a method in a derived class:
                 self.runner = getattr(self, runner)
@@ -1020,7 +1024,7 @@ def main(globals_dict=None, build_dir=None, extra_options=None):
                 build_dir = os.path.dirname(build_file)
     if build_dir:
         if not options.quiet and os.path.abspath(build_dir) != original_path:
-            print "Entering directory '%s'" % build_dir
+            print("Entering directory '%s'" % build_dir)
         os.chdir(build_dir)
 
     status = 0
@@ -1036,12 +1040,12 @@ def main(globals_dict=None, build_dir=None, extra_options=None):
             else:
                 printerr('%r command not defined!' % action)
                 sys.exit(1)
-    except ExecutionError, exc:
+    except ExecutionError as exc:
         message, data, status = exc
         printerr('fabricate: ' + message)
     finally:
         if not options.quiet and os.path.abspath(build_dir) != original_path:
-            print "Leaving directory '%s' back to '%s'" % (build_dir, original_path)
+            print("Leaving directory '%s' back to '%s'" % (build_dir, original_path))
         os.chdir(original_path)
     sys.exit(status)
 
