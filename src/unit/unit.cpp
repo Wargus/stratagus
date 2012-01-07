@@ -2931,7 +2931,8 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 	type = target.Type;
 	lastattack = target.Attacked;
 	target.Attacked = GameCycle ? GameCycle : 1;
-	target.DamagedType = ExtraDeathIndex(attacker->Type->DamageType.c_str());
+	if(attacker)
+		target.DamagedType = ExtraDeathIndex(attacker->Type->DamageType.c_str());
 
 	if (!lastattack || lastattack + 2 * CYCLES_PER_SECOND < GameCycle) {
 		// NOTE: perhaps this should also be moved into the notify?
@@ -2959,18 +2960,18 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		target.Player->Notify(NotifyRed, target.tilePos.x, target.tilePos.y,
 			_("%s attacked"), target.Type->Name.c_str());
 
-		if (!target.Type->Building) {
+		if (attacker && !target.Type->Building) {
 			if (target.Player->AiEnabled) {
 				AiHelpMe(attacker, target);
 			}
 		}
 	}
 
-	if (target.Type->Building && target.Player->AiEnabled) {
+	if (attacker && target.Type->Building && target.Player->AiEnabled) {
 		AiHelpMe(attacker, target);
 	}
 
-	if ((target.Variable[HP_INDEX].Value <= damage && attacker->Type->ShieldPiercing) ||
+	if ((target.Variable[HP_INDEX].Value <= damage && attacker && attacker->Type->ShieldPiercing) ||
 		(target.Variable[HP_INDEX].Value <= damage - target.Variable[SHIELD_INDEX].Value)) { // unit is killed or destroyed
 		//  increase scores of the attacker, but not if attacking it's own units.
 		//  prevents cheating by killing your own units.
@@ -2994,7 +2995,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		LetUnitDie(target);
 		return;
 	}
-	if (attacker->Type->ShieldPiercing)
+	if (attacker && attacker->Type->ShieldPiercing)
 		target.Variable[HP_INDEX].Value -= damage;
 	else if (target.Variable[SHIELD_INDEX].Value >= damage)
 		target.Variable[SHIELD_INDEX].Value -= damage;
@@ -3145,7 +3146,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 	//
 	// Can't attack run away.
 	//
-	if (target.CanMove() && target.CurrentAction() == UnitActionStill) {
+	if (attacker && target.CanMove() && target.CurrentAction() == UnitActionStill) {
 		Vec2i pos = target.tilePos - attacker->tilePos;
 		int d = isqrt(pos.x * pos.x + pos.y * pos.y);
 
