@@ -515,8 +515,8 @@ void HandleActionBuilt(CUnit &unit)
 	// Check if building ready. Note we can both build and repair.
 	//
 	//if (unit.Data.Built.Progress >= unit.Stats->Costs[TimeCost] * 600 ||
-	if (unit.Data.Built.Progress >= mod ||
-			unit.Variable[HP_INDEX].Value >= unit.Stats->Variables[HP_INDEX].Max) {
+	if (!unit.Data.Built.Worker->Anim.Unbreakable && (unit.Data.Built.Progress >= mod ||
+			unit.Variable[HP_INDEX].Value >= unit.Stats->Variables[HP_INDEX].Max)) {
 		DebugPrint("%d: Building %s(%s) ready.\n" _C_ unit.Player->Index
 		_C_ unit.Type->Ident.c_str() _C_ unit.Type->Name.c_str() );
 		if (unit.Variable[HP_INDEX].Value > unit.Stats->Variables[HP_INDEX].Max) {
