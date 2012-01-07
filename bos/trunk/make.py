@@ -39,7 +39,10 @@ exit 1  # Should never get this far.
 import os
 import glob
 import sys
-import Queue
+try:
+   import Queue as queue
+except ImportError:
+   import queue
 import threading
 from fabricate import *
 
@@ -132,7 +135,7 @@ def Check(b, lib=None, header='', function='', name=''):
         t.lib(lib)
     try:
        run(*t.build(testname, [s]))
-    except ExecutionError, e:
+    except ExecutionError as e:
        return False
     return True
 
@@ -140,7 +143,7 @@ def pkgconfig(b, package):
     try:
         b.cflags += shell('pkg-config', '--cflags', package).strip().split()
         b.ldflags += shell('pkg-config', '--libs', package).strip().split()
-    except ExecutionError, e:
+    except ExecutionError as e:
         return False
     return True
 
@@ -224,7 +227,7 @@ def detect(b):
 
 def parallel_run(commands, jobs=2, builder=default_builder):
         """ The different commands must be independent. """
-        requests, results = Queue.Queue(), Queue.Queue()
+        requests, results = queue.Queue(), queue.Queue()
         for i in commands:
             c = builder.prepare(i)
             if builder.should_run(*c):
@@ -242,16 +245,16 @@ def parallel_run(commands, jobs=2, builder=default_builder):
                 try:
                      deps, outputs = builder.runner(*arglist)
                      results.put((command, deps, outputs))
-                except ExecutionError, e:
+                except ExecutionError as e:
                      results.put(e)
                      requests.active = True  # abort future requests
 
-        for i in xrange(jobs):
+        for i in range(jobs):
             t = threading.Thread(target=runQueuedCommands, args=(requests, results))
             t.daemon = True
             requests.put(None)
             t.start()
-        for _ in xrange(totalrequests):
+        for _ in range(totalrequests):
            r = results.get()
            if isinstance(r, ExecutionError): raise r
            command, deps, outputs = r
