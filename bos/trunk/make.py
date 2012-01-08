@@ -1,4 +1,4 @@
-#! /usr/bin/evn python
+#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 #  Build script for the Bos Wars engine.
