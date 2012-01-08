@@ -609,6 +609,10 @@ void ShowOrder(const CUnit *unit)
 	if (unit->Destroyed) {
 		return;
 	}
+	
+	if (unit->Player != ThisPlayer && !ThisPlayer->IsAllied(unit)) {
+        	return;
+	}
 
 	// Get current position
 	x1 = CurrentViewport->Map2ViewportX(
