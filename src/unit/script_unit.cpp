@@ -986,6 +986,10 @@ static int CclCreateUnit(lua_State *l)
 	lua_pushvalue(l, 1);
 	unittype = CclGetUnitType(l);
 	lua_pop(l, 1);
+	if (NULL == unittype) {
+		DebugPrint("Unknown unit type\n");
+		return 0;
+	}
 	if (!lua_istable(l, 3) || lua_objlen(l, 3) != 2) {
 		LuaError(l, "incorrect argument !!");
 	}

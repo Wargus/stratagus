@@ -513,7 +513,7 @@ endif()
 if(WITH_MNG AND MNG_FOUND)
 	add_definitions(-DUSE_MNG)
 	include_directories(${MNG_INCLUDE_DIR})
-	set(stratagus_LIBS ${stratagus_LIBS} ${MNG_LIBRARY})
+	set(stratagus_LIBS ${stratagus_LIBS} ${MNG_LIBRARY} /usr/local/lib/liblcms.so.2.0 /usr/local/lib/libjpeg.so.64.0)
 endif()
 
 if(WITH_OGGVORBIS AND OGGVORBIS_FOUND)

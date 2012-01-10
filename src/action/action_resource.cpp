@@ -341,10 +341,12 @@ static int GatherResource(CUnit &unit)
 	int i;
 	int addload;
 
-	if (!resinfo->HarvestFromOutside && unit.Container != NULL) {
+/*
+	if (!resinfo->HarvestFromOutside && unit.Container != NULL && unit.Container->Type->Animations->Harvest[unit.CurrentResource] != NULL) {
 		unit.Container->SubAction = SUB_GATHER_RESOURCE;
 		UnitShowAnimation(*unit.Container, unit.Container->Type->Animations->Harvest[unit.CurrentResource]);
 	}
+*/
 
 	if (resinfo->HarvestFromOutside || resinfo->TerrainHarvester) {
 		AnimateActionHarvest(unit);
