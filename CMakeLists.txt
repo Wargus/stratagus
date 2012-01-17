@@ -262,6 +262,29 @@ set(win32_SRCS
 )
 source_group(win32 FILES ${win32_SRCS})
 
+set(tolua_FILES
+	src/tolua/ai.pkg
+	src/tolua/editor.pkg
+	src/tolua/font.pkg
+	src/tolua/game.pkg
+	src/tolua/map.pkg
+	src/tolua/minimap.pkg
+	src/tolua/network.pkg
+	src/tolua/particle.pkg
+	src/tolua/pathfinder.pkg
+	src/tolua/player.pkg
+	src/tolua/sound.pkg
+	src/tolua/stratagus.pkg
+	src/tolua/trigger.pkg
+	src/tolua/ui.pkg
+	src/tolua/unit.pkg
+	src/tolua/unittype.pkg
+	src/tolua/upgrade.pkg
+	src/tolua/video.pkg
+	src/tolua/stratagus.lua
+)
+source_group(tolua FILES ${tolua_FILES})
+
 set(stratagus_SRCS
 	${action_SRCS}
 	${ai_SRCS}
@@ -719,7 +742,7 @@ message("==================================")
 
 add_custom_command(OUTPUT tolua.cpp
 	COMMAND ${TOLUA++_APP} ARGS -L stratagus.lua -o ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp stratagus.pkg
-	DEPENDS src/tolua/*.pkg
+	DEPENDS ${tolua_FILES}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/tolua
 )
 
@@ -789,11 +812,23 @@ source_group(gameheaders FILES ${gameheaders_HDRS})
 
 ########### next target ###############
 
+set(doxygen_FILES
+	${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+	doc/Doxyfile-footer.html
+	doc/Doxyfile-header.html
+	${stratagus_SRCS}
+	${stratagus_HDRS}
+	${metaserver_SRCS}
+	${metaserver_HDRS}
+	${gameheaders_HDRS}
+	${png2stratagus_SRCS}
+)
+
 if(ENABLE_DOC AND DOXYGEN_FOUND)
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 	add_custom_command(OUTPUT doxygen/index.html
 		COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-		DEPENDS doc/Doxyfile* ${stratagus_SRCS} ${stratagus_HDRS} ${metaserver_SRCS} ${metaserver_HDRS} ${gameheaders_HDRS} ${png2stratagus_SRCS}
+		DEPENDS ${doxygen_FILES}
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		COMMENT "Generating Stratagus souce code documentation with Doxygen" VERBATIM
 	)
