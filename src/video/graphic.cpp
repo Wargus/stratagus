@@ -196,7 +196,7 @@ void CGraphic::DoDrawFrameClip(GLuint *textures,
 	int h = Height;
 
 	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, skip);
-
+	UNUSED(skip);
 	DrawTexture(this, textures, frame_map[frame].x + ox,
 								frame_map[frame].y + oy,
 								frame_map[frame].x + ox + w,
@@ -308,6 +308,7 @@ void CGraphic::DoDrawFrameClipX(GLuint *textures, unsigned frame,
 	int w = Width;
 	int h = Height;
 	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, skip);
+	UNUSED(skip);
 
 	if (w < Width) {
 		if (ox == 0) {
@@ -958,7 +959,6 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	unsigned char *tex;
 	unsigned char *tp;
 	const unsigned char *sp;
-	int fl;
 	Uint32 ckey;
 	int useckey;
 	int bpp;
@@ -970,7 +970,6 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	int maxw;
 	int maxh;
 
-	fl = g->GraphicWidth / g->Width;
 	useckey = g->Surface->flags & SDL_SRCCOLORKEY;
 	f = g->Surface->format;
 	bpp = f->BytesPerPixel;

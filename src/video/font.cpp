@@ -447,6 +447,7 @@ static void VideoDrawCharClip(const CGraphic *g, int gx, int gy, int w, int h,
 	int oy;
 	int ex;
 	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, ex);
+	UNUSED(ex);
 	VideoDrawChar(g, gx + ox, gy + oy, w, h, x, y, fc);
 }
 

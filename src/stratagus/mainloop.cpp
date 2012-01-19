@@ -36,9 +36,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#if defined(DEBUG)
-#include <setjmp.h>
-#endif
 
 #include "stratagus.h"
 #include "video.h"
@@ -466,11 +463,6 @@ struct GameLogic: public CThread {
 */
 void GameMainLoop()
 {
-#ifdef DEBUG  // removes the setjmp warnings
-	static bool showtip;
-#else
-	bool showtip;
-#endif
 	const EventCallback *old_callbacks;
 
 	InitGameCallbacks();
@@ -484,7 +476,6 @@ void GameMainLoop()
 
 	CParticleManager::init();
 
-	showtip = false;
 #ifdef REALVIDEO
 	RealVideoSyncSpeed = VideoSyncSpeed;
 #endif

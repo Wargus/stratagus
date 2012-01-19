@@ -325,9 +325,6 @@ void SaveScreenshotPNG(const char *name)
 	png_infop info_ptr;
 	int i;
 	int j;
-	int bpp;
-
-	bpp = TheScreen->format->BytesPerPixel;
 
 	fp = fopen(name, "wb");
 	if (fp == NULL) {
@@ -398,11 +395,7 @@ void SaveScreenshotPNG(const char *name)
 					break;
 				}
 				case 24: {
-					Uint8 c;
-					for (j = 0; j < Video.Width; ++j) {
-						c = ((Uint8 *)TheScreen->pixels)[j * bpp + i * Video.Width * 3];
-						memcpy(row, (char *)TheScreen->pixels + i * Video.Width, Video.Width * 3);
-					}
+					memcpy(row, (char *)TheScreen->pixels + i * Video.Width, Video.Width * 3);
 					break;
 				}
 				case 32: {

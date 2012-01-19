@@ -213,15 +213,13 @@ int SendMetaCommand(const char *command, const char *format, ...)
 {
 	int n;
 	int size;
-	int oldsize;
 	int ret;
 	char *p;
 	char *newp;
 	char *s;
 	va_list ap;
 
-	oldsize = size = GameName.size() + Parameters::Instance.LocalPlayerName.size() +
-		strlen(command) + 100;
+	size = GameName.size() + Parameters::Instance.LocalPlayerName.size() + strlen(command) + 100;
 	ret = -1;
 	if ((p = new char[size]) == NULL) {
 		return -1;
@@ -272,7 +270,6 @@ int SendMetaCommand(const char *command, const char *format, ...)
 		memcpy(newp, p, size * sizeof(char));
 		delete[] p;
 		p = newp;
-		oldsize = size;
 	}
 	if ((newp = new char[strlen(s) + size + 2]) == NULL) {
 		delete[] s;

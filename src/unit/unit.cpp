@@ -2054,8 +2054,6 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 	int cdist;
 	Vec2i pos(startPos);
 
-	Vec2i dest = pos;
-
 	size = std::min<int>(Map.Info.MapWidth * Map.Info.MapHeight / 4, range * range * 5);
 	points = new Vec2i[size];
 

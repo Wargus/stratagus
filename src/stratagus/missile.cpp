@@ -684,17 +684,12 @@ int FindAndSortMissiles(const CViewport *vp,
 */
 static void MissileNewHeadingFromXY(Missile &missile, const PixelPos &delta)
 {
-	int neg;
-
 	if (missile.Type->NumDirections == 1 || (delta.x == 0 && delta.y == 0)) {
 		return;
 	}
 
 	if (missile.SpriteFrame < 0) {
 		missile.SpriteFrame = -missile.SpriteFrame - 1;
-		neg = 1;
-	} else {
-		neg = 0;
 	}
 	missile.SpriteFrame /= missile.Type->NumDirections / 2 + 1;
 	missile.SpriteFrame *= missile.Type->NumDirections / 2 + 1;

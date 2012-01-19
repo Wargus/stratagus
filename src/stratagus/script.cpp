@@ -2343,31 +2343,6 @@ static int CclDebugPrint(lua_State *l)
 }
 
 /*............................................................................
-..  Tables
-............................................................................*/
-
-/**
-**  Load a map. (Try in library path first)
-**
-**  @param l  Lua state.
-*/
-static int CclLoadMap(lua_State *l)
-{
-	const char *name;
-
-	LuaCheckArgs(l, 1);
-	name = LuaToString(l, 1);
-
-	// TODO Check if there a map has already been loaded.
-	//  If true, memory needs to be freed.
-
-	//MAPTODO load stratagus map !!!!!!!!!!!
-
-	LuaError(l, "unknown map format");
-	return 0;
-}
-
-/*............................................................................
 ..  Commands
 ............................................................................*/
 
@@ -2499,8 +2474,6 @@ void InitCcl()
 	SpellCclRegister();
 
 	EditorCclRegister();
-
-	lua_register(Lua, "LoadMap", CclLoadMap);
 }
 
 /*

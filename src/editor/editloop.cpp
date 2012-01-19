@@ -1545,7 +1545,6 @@ static void EditorCallbackMouse(int x, int y)
 	int by;
 	static int LastMapX;
 	static int LastMapY;
-	enum _cursor_on_ OldCursorOn;
 	char buf[256];
 
 	HandleCursorMove(&x, &y); // Reduce to screen
@@ -1661,8 +1660,6 @@ static void EditorCallbackMouse(int x, int y)
 				- UI.SelectedViewport->MapHeight / 2, 0, 0);
 		return;
 	}
-
-	OldCursorOn = CursorOn;
 
 	MouseScrollState = ScrollNone;
 	GameCursor = UI.Point.Cursor;

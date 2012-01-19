@@ -248,7 +248,6 @@ static CUnit *CheckCanBuild(CUnit &unit)
 */
 static void StartBuilding(CUnit &unit, CUnit &ontop)
 {
-	const CUnitStats *stats;
 	COrderPtr order = unit.CurrentOrder();
 	const Vec2i pos = order->goalPos;
 	CUnitType &type = *order->Arg1.Type;
@@ -298,8 +297,6 @@ static void StartBuilding(CUnit &unit, CUnit &ontop)
 
 	// HACK: the building is not ready yet
 	build->Player->UnitTypesCount[type.Slot]--;
-
-	stats = build->Stats;
 
 	// Make sure the bulding doesn't cancel itself out right away.
 	build->Data.Built.Progress = 0;//FIXME ? 100 : 0
