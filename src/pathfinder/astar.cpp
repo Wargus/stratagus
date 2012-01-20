@@ -614,6 +614,9 @@ static int AStarMarkGoal(int gx, int gy, int gw, int gh,
 		}
 	}
 
+	gw = std::max(gw, 1);
+	gh = std::max(gh, 1);
+
 	bool goal_reachable = false;
 
 	const Vec2i goal = {gx, gy};
