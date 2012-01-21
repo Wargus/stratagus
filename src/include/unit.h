@@ -1330,9 +1330,9 @@ extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const V
 extern int GetAnimationDamagedState(CUnit &unit, int anim);
 
 	/// Find resource
-extern CUnit *UnitFindResource(const CUnit &unit, int x, int y, int range,
+extern CUnit *UnitFindResource(const CUnit &unit, const Vec2i &startPos, int range,
 		 int resource, bool check_usage = false, const CUnit *destu = NULL);
-extern CUnit *UnitFindMiningArea(const CUnit &unit, int x, int y,  int range, int resource);
+
 	/// Find nearest deposit
 extern CUnit *FindDeposit(const CUnit &unit, int range, int resource);
 	/// Find the next idle worker

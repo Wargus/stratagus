@@ -881,8 +881,7 @@ static int AiAssignHarvester(CUnit &unit, int resource)
 		//
 		// Find a resource to harvest from.
 		//
-		CUnit *dest = UnitFindResource(unit,
-				unit.tilePos.x, unit.tilePos.y, 1000, resource, true);
+		CUnit *dest = UnitFindResource(unit, unit.tilePos, 1000, resource, true);
 
 		if (dest) {
 			//FIXME: rb - when workers can speedup building then such assign may be ok.
@@ -892,49 +891,6 @@ static int AiAssignHarvester(CUnit &unit, int resource)
 				CommandResource(unit, *dest, FlushCommands);
 			return 1;
 		}
-#if 0
-		//may this code touch needmask which will be reseted before next cycle
-		if (resinfo->RefineryHarvester &&
-			 (dest = UnitFindMiningArea(unit, unit.X, unit.Y, 1000, resource))) {
-			int needmask;
-			//int counter[UnitTypeMax];
-
-			//
-			// Count the already made build requests.
-			//
-			//AiGetBuildRequestsCount(counter);
-			int n = AiHelpers.Refinery[resource - 1].size();
-			for (int i = 0; i < n; ++i) {
-				CUnitType *type = AiHelpers.Refinery[resource - 1][i];
-				//if (counter[type->Slot]) { // Already ordered.
-				//	return 0;
-				//}
-
-				if (!AiRequestedTypeAllowed(AiPlayer->Player, type)) {
-					continue;
-				}
-
-				//
-				// Check if resources available.
-				//
-				needmask = AiCheckUnitTypeCosts(type);
-				if(!needmask && AiMakeUnit(type)) {
-					AiBuildQueue newqueue;
-					newqueue.Type = type;
-					newqueue.Want = 1;
-					newqueue.Made = 1;
-					newqueue.X = dest->X;
-					newqueue.Y = dest->Y;
-					AiPlayer->UnitTypeBuilt.insert(
-						AiPlayer->UnitTypeBuilt.begin(), newqueue);
-					return 0;
-				}
-
-			}
-
-			return 0;
-		}
-#endif
 
 		for (std::vector<CUnitType *>::iterator i = UnitTypes.begin();
 			 i != UnitTypes.end(); i++) {
