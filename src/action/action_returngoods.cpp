@@ -88,7 +88,7 @@ void HandleActionReturnGoods(CUnit &unit)
 	//unit.CurrentOrder()->Arg1.ResourcePos = -1;
 
 	NewResetPath(unit);
-	unit.SubAction = 70; // FIXME : Define value.
+	unit.SubAction = /* SUB_MOVE_TO_DEPOT */ 70; // FIXME : Define value.
 }
 
 //@}

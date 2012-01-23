@@ -67,66 +67,86 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**  Move unit to terrain.
+**
+**  @return      1 if reached, -1 if unreacheable, 0 if on the way.
+*/
+static int MoveToResource_Terrain(CUnit &unit)
+{
+	Vec2i pos = unit.CurrentOrder()->goalPos;
+
+	// Wood gone, look somewhere else.
+	if ((!Map.ForestOnMap(pos)) && (!unit.IX) && (!unit.IY)) {
+		if (!FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 16,
+				unit.Player, unit.CurrentOrder()->goalPos, &pos)) {
+			// no wood in range
+			return -1;
+		} else {
+			unit.CurrentOrder()->goalPos = pos;
+			NewResetPath(unit);
+		}
+	}
+	switch (DoActionMove(unit)) {
+		case PF_UNREACHABLE:
+			unit.Wait = 10;
+			if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 9999,
+					unit.Player, unit.tilePos, &pos)) {
+				unit.CurrentOrder()->goalPos = pos;
+				NewResetPath(unit);
+				DebugPrint("Found a better place to harvest %d,%d\n" _C_ pos.x _C_ pos.y);
+				// FIXME: can't this overflow? It really shouldn't, since
+				// x and y are really supossed to be reachable, checked thorugh a flood fill.
+				// I don't know, sometimes stuff happens.
+				return 0;
+			}
+			return -1;
+		case PF_REACHED:
+			return 1;
+		default:
+			return 0;
+	}
+}
+
+/**
+**  Move unit to unit resource.
+**
+**  @return      1 if reached, -1 if unreacheable, 0 if on the way.
+*/
+static int MoveToResource_Unit(CUnit &unit)
+{
+	const CUnit *goal = unit.CurrentOrder()->GetGoal();
+	Assert(goal);
+
+	switch (DoActionMove(unit)) { // reached end-point?
+		case PF_UNREACHABLE:
+			return -1;
+		case PF_REACHED:
+			break;
+		default:
+			// Goal gone or something.
+			if (unit.Anim.Unbreakable || goal->IsVisibleAsGoal(*unit.Player)) {
+				return 0;
+			}
+			break;
+	}
+	return 1;
+}
+
+/**
 **  Move unit to resource.
 **
 **  @param unit  Pointer to unit.
 **
-**  @return      TRUE if reached, otherwise FALSE.
+**  @return      1 if reached, -1 if unreacheable, 0 if on the way.
 */
 static int MoveToResource(CUnit &unit)
 {
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[unit.CurrentResource];
 
 	if (resinfo.TerrainHarvester) {
-		Vec2i pos = unit.CurrentOrder()->goalPos;
-
-		// Wood gone, look somewhere else.
-		if ((!Map.ForestOnMap(pos)) && (!unit.IX) && (!unit.IY)) {
-			if (!FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 16,
-					unit.Player, unit.CurrentOrder()->goalPos, &pos)) {
-				// no wood in range
-				return -1;
-			} else {
-				unit.CurrentOrder()->goalPos = pos;
-				NewResetPath(unit);
-			}
-		}
-		switch (DoActionMove(unit)) {
-			case PF_UNREACHABLE:
-				unit.Wait = 10;
-				if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 9999,
-						unit.Player, unit.tilePos, &pos)) {
-					unit.CurrentOrder()->goalPos = pos;
-					NewResetPath(unit);
-					DebugPrint("Found a better place to harvest %d,%d\n" _C_ pos.x _C_ pos.y);
-					// FIXME: can't this overflow? It really shouldn't, since
-					// x and y are really supossed to be reachable, checked thorugh a flood fill.
-					// I don't know, sometimes stuff happens.
-					return 0;
-				}
-				return -1;
-			case PF_REACHED:
-				return 1;
-			default:
-				return 0;
-		}
+		return MoveToResource_Terrain(unit);
 	} else {
-		CUnit *goal = unit.CurrentOrder()->GetGoal();
-		Assert(goal);
-		switch (DoActionMove(unit)) { // reached end-point?
-			case PF_UNREACHABLE:
-				return -1;
-			case PF_REACHED:
-				break;
-			default:
-				// Goal gone or something.
-				if (unit.Anim.Unbreakable ||
-						goal->IsVisibleAsGoal(*unit.Player)) {
-					return 0;
-				}
-				break;
-		}
-		return 1;
+		return MoveToResource_Unit(unit);
 	}
 }
 
@@ -324,6 +344,8 @@ static void LoseResource(CUnit &unit, const CUnit &source)
 	}
 }
 
+
+
 /**
 **  Gather the resource
 **
@@ -441,7 +463,6 @@ static int GatherResource(CUnit &unit)
 						LoseResource(*uins, *source);
 					}
 				}
-
 				if (source->Data.Resource.Workers) {
 					CUnit *next, *worker = source->Data.Resource.Workers;
 					for (; NULL != worker; worker = next)
@@ -462,7 +483,6 @@ static int GatherResource(CUnit &unit)
 					//Assert(source->Data.Resource.Assigned == 0);
 					source->Data.Resource.Workers = NULL;
 				}
-
 				// Don't destroy the resource twice.
 				// This only happens when it's empty.
 				if (!dead) {
@@ -517,7 +537,6 @@ int GetNumWaitingWorkers(const CUnit &mine)
 */
 static int StopGathering(CUnit &unit)
 {
-	CUnit *depot;
 	CUnit *source = 0;
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[unit.CurrentResource];
 
@@ -531,12 +550,15 @@ static int StopGathering(CUnit &unit)
 		source->Data.Resource.Active--;
 		Assert(source->Data.Resource.Active >= 0);
 
-		if (!resinfo.HarvestFromOutside && source->Data.Resource.Active == 0)
+		if (!resinfo.HarvestFromOutside && source->Data.Resource.Active == 0) {
 			source->SubAction = 1;
-
+		}
 		//Store resource position.
-		//source->RefsIncrease();
-		//unit.Orders[0]->Arg1.Resource.Mine = source;
+		if (unit.Orders[0]->Arg1.Resource.Mine) {
+			unit.Orders[0]->Arg1.Resource.Mine->RefsDecrease();
+		}
+		source->RefsIncrease();
+		unit.Orders[0]->Arg1.Resource.Mine = source;
 
 		if (source->Type->MaxOnBoard) {
 			int count = 0;
@@ -544,8 +566,7 @@ static int StopGathering(CUnit &unit)
 			CUnit *next = NULL;
 			for(; NULL != worker; worker = worker->NextWorker)
 			{
-				if (worker != &unit &&
-					worker->SubAction == SUB_START_GATHERING && worker->Wait) {
+				if (worker != &unit && worker->SubAction == SUB_START_GATHERING && worker->Wait) {
 					count++;
 					if (next) {
 						if (next->Wait > worker->Wait)
@@ -572,6 +593,7 @@ static int StopGathering(CUnit &unit)
 	} else {
 		// Store resource position.
 		unit.CurrentOrder()->Arg1.Resource.Pos = unit.tilePos;
+		Assert(unit.CurrentOrder()->Arg1.Resource.Mine == NULL);
 	}
 
 #ifdef DEBUG
@@ -581,17 +603,24 @@ static int StopGathering(CUnit &unit)
 #endif
 
 	// Find and send to resource deposit.
-	if (!(depot = FindDeposit(unit, 1000, unit.CurrentResource))
-		|| !unit.ResourcesHeld) {
+	CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
+	if (!depot || !unit.ResourcesHeld) {
 		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
 			Assert(unit.Container);
 			DropOutOnSide(unit, LookingW, source);
 		}
+		CUnit *mine = unit.Orders[0]->Arg1.Resource.Mine;
+
+		if (mine) {
+			unit.DeAssignWorkerFromMine(*mine);
+			mine->RefsDecrease();
+			unit.Orders[0]->Arg1.Resource.Mine = NULL;
+		}
+
 		DebugPrint("%d: Worker %d report: Can't find a resource [%d] deposit.\n"
 				_C_ unit.Player->Index _C_ unit.Slot _C_ unit.CurrentResource);
 		unit.CurrentOrder()->ClearGoal();
 		unit.ClearAction();
-		// should return 0, done below!
 		return 0;
 	} else {
 		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
@@ -638,8 +667,7 @@ static int MoveToDepot(CUnit &unit)
 	// Target is dead, stop getting resources.
 	//
 	if (!goal->IsVisibleAsGoal(*unit.Player)) {
-		DebugPrint("%d: Worker %d report: Destroyed depot\n"
-			_C_ unit.Player->Index _C_ unit.Slot);
+		DebugPrint("%d: Worker %d report: Destroyed depot\n" _C_ unit.Player->Index _C_ unit.Slot);
 
 		unit.CurrentOrder()->ClearGoal();
 
@@ -647,8 +675,7 @@ static int MoveToDepot(CUnit &unit)
 
 		if (depot) {
 			UnitGotoGoal(unit, depot, SUB_MOVE_TO_DEPOT);
-			DebugPrint("%d: Worker %d report: Going to new deposit.\n"
-				_C_ unit.Player->Index _C_ unit.Slot);
+			DebugPrint("%d: Worker %d report: Going to new deposit.\n" _C_ unit.Player->Index _C_ unit.Slot);
 		} else {
 			DebugPrint("%d: Worker %d report: Can't find a new resource deposit.\n"
 				_C_ unit.Player->Index _C_ unit.Slot);
@@ -666,7 +693,6 @@ static int MoveToDepot(CUnit &unit)
 	}
 
 	// If resource depot is still under construction, wait!
-	//
 	if (goal->CurrentOrder()->Action == UnitActionBuilt) {
 		unit.Wait = 10;
 		return 0;
@@ -675,17 +701,13 @@ static int MoveToDepot(CUnit &unit)
 	unit.CurrentOrder()->ClearGoal();
 	unit.Wait = resinfo.WaitAtDepot;
 
-	//
 	// Place unit inside the depot
-	//
 	if (unit.Wait) {
 		unit.Remove(goal);
 		unit.Anim.CurrAnim = NULL;
 	}
 
-	//
 	// Update resource.
-	//
 	unit.Player->Resources[resinfo.FinalResource] += (unit.ResourcesHeld * unit.Player->Incomes[resinfo.FinalResource]) / 100;
 	unit.Player->TotalResources[resinfo.FinalResource] += (unit.ResourcesHeld * unit.Player->Incomes[resinfo.FinalResource]) / 100;
 	unit.ResourcesHeld = 0;
@@ -708,7 +730,6 @@ static int MoveToDepot(CUnit &unit)
 */
 static int WaitInDepot(CUnit &unit)
 {
-	Vec2i pos;
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[unit.CurrentResource];
 	const CUnit *depot = ResourceDepositOnMap(unit.tilePos, resinfo.ResourceId);
 
@@ -716,7 +737,7 @@ static int WaitInDepot(CUnit &unit)
 
 	// Range hardcoded. don't stray too far though
 	if (resinfo.TerrainHarvester) {
-		pos = unit.CurrentOrder()->Arg1.Resource.Pos;
+		Vec2i pos = unit.CurrentOrder()->Arg1.Resource.Pos;
 
 		if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 10, unit.Player, pos, &pos)) {
 			if (depot) {
@@ -730,12 +751,11 @@ static int WaitInDepot(CUnit &unit)
 			unit.ClearAction();
 		}
 	} else {
-		CUnit *goal;
 		CUnit *mine = unit.CurrentOrder()->Arg1.Resource.Mine;
 		const int range = (mine ? 15 : 1000);
-		pos = mine ? mine->tilePos : unit.tilePos;
+		const Vec2i pos = mine ? mine->tilePos : unit.tilePos;
+		CUnit *goal = UnitFindResource(unit, pos, range, unit.CurrentResource, unit.Player->AiEnabled, depot);
 
-		goal = UnitFindResource(unit, pos, range, unit.CurrentResource, unit.Player->AiEnabled, depot);
 		if (goal) {
 			if (depot) {
 				DropOutNearest(unit, goal->tilePos + goal->Type->GetHalfTileSize(), depot);
@@ -750,7 +770,6 @@ static int WaitInDepot(CUnit &unit)
 				goal->RefsIncrease();
 				unit.CurrentOrder()->Arg1.Resource.Mine = goal;
 			}
-
 			unit.CurrentOrder()->SetGoal(goal);
 			unit.CurrentOrder()->Range = 1;
 			unit.CurrentOrder()->goalPos.x = unit.CurrentOrder()->goalPos.y = -1;
@@ -813,6 +832,53 @@ void ResourceGiveUp(CUnit &unit)
 }
 
 /**
+**  Initialize
+**
+**  return false if action is canceled, true otherwise.
+*/
+static bool ActionResourceInit(CUnit &unit)
+{
+	Assert(unit.SubAction == SUB_START_RESOURCE);
+
+	CUnit *const goal = unit.CurrentOrder()->GetGoal();
+	int newres;
+
+	if (goal) {
+		newres = goal->Type->GivesResource;
+	} else {
+		//FIXME: hardcoded wood
+		newres = WoodCost;
+	}
+	if (newres != unit.CurrentResource) {
+		DropResource(unit);
+	}
+	unit.CurrentResource = newres;
+	if (newres == 0) {
+		unit.ResourcesHeld = 0;
+		ResourceGiveUp(unit);
+		return false;
+	}
+	COrderPtr order = unit.CurrentOrder();
+	order->CurrentResource = newres;
+	if (goal && order->Arg1.Resource.Mine != goal) {
+		CUnit *mine = order->Arg1.Resource.Mine;
+
+		if (mine) {
+			unit.DeAssignWorkerFromMine(*mine);
+			mine->RefsDecrease();
+			order->Arg1.Resource.Mine = NULL;
+		}
+		if (goal->CurrentAction() != UnitActionBuilt) {
+			unit.AssignWorkerToMine(*goal);
+			goal->RefsIncrease();
+			order->Arg1.Resource.Mine = goal;
+		}
+	}
+	UnitGotoGoal(unit, goal, SUB_MOVE_TO_RESOURCE);
+	return true;
+}
+
+/**
 **  Control the unit action: getting a resource.
 **
 **  This the generic function for oil, gold, ...
@@ -821,9 +887,6 @@ void ResourceGiveUp(CUnit &unit)
 */
 void HandleActionResource(CUnit &unit)
 {
-	int ret;
-	int newres;
-
 	if (unit.Wait) {
 		// FIXME: show idle animation while we wait?
 		unit.Wait--;
@@ -832,61 +895,35 @@ void HandleActionResource(CUnit &unit)
 
 	// Let's start mining.
 	if (unit.SubAction == SUB_START_RESOURCE) {
-		CUnit *const goal = unit.CurrentOrder()->GetGoal();
-		if (goal) {
-			newres = goal->Type->GivesResource;
-		} else {
-			//FIXME: hardcoded wood
-			newres = WoodCost;
-		}
-		if (newres != unit.CurrentResource) {
-			DropResource(unit);
-		}
-		if ((unit.CurrentResource = newres))
-		{
-			COrderPtr order = unit.CurrentOrder();
-			order->CurrentResource = newres;
-			if (goal && order->Arg1.Resource.Mine != goal) {
-				CUnit *mine = order->Arg1.Resource.Mine;
-				if (mine) {
-					unit.DeAssignWorkerFromMine(*mine);
-					mine->RefsDecrease();
-					order->Arg1.Resource.Mine = NULL;
-				}
-				if (goal->CurrentAction() != UnitActionBuilt) {
-					unit.AssignWorkerToMine(*goal);
-					goal->RefsIncrease();
-					order->Arg1.Resource.Mine = goal;
-				}
-			}
-			UnitGotoGoal(unit, goal, SUB_MOVE_TO_RESOURCE);
-			//NewResetPath(unit);
-			//unit.SubAction = SUB_MOVE_TO_RESOURCE;
-			//unit.Data.Move.Cycles = 0;
-		} else {
-			unit.ResourcesHeld = 0;
-			ResourceGiveUp(unit);
+		if (ActionResourceInit(unit) == false) {
 			return;
 		}
 	}
 
 	// Move to the resource location.
-	if (unit.SubAction >= SUB_MOVE_TO_RESOURCE
-		&& unit.SubAction < SUB_UNREACHABLE_RESOURCE) {
-		// -1 failure, 0 not yet reached, 1 reached
-		if ((ret = MoveToResource(unit))) {
-			if (ret == -1) {
-				// Can't Reach
+	if (SUB_MOVE_TO_RESOURCE <= unit.SubAction && unit.SubAction < SUB_UNREACHABLE_RESOURCE) {
+		const int ret = MoveToResource(unit);
+
+		switch (ret)
+		{
+			case -1: // Can't Reach
+			{
 				unit.SubAction++;
 				unit.Wait = 5;
 				return;
-			} else {
-				// Reached
-				unit.SubAction = SUB_START_GATHERING;
 			}
-		} else {
-			// Move along.
-			return;
+			case 1: // Reached
+			{
+				unit.SubAction = SUB_START_GATHERING;
+				break;
+			}
+			case 0: // Move along.
+				return;
+			default:
+			{
+				Assert(0);
+				break;
+			}
 		}
 	}
 
@@ -924,19 +961,30 @@ void HandleActionResource(CUnit &unit)
 	}
 
 	// Move back home.
-	if (unit.SubAction >= SUB_MOVE_TO_DEPOT
-		&& unit.SubAction < SUB_UNREACHABLE_DEPOT) {
-		// -1 failure, 0 not yet reached, 1 reached
-		if ((ret = MoveToDepot(unit))) {
-			if (ret == -1) {
-				// Can't Reach
+	if (SUB_MOVE_TO_DEPOT <= unit.SubAction && unit.SubAction < SUB_UNREACHABLE_DEPOT) {
+		const int ret = MoveToDepot(unit);
+
+		switch (ret)
+		{
+			case -1: // Can't Reach
+			{
 				unit.SubAction++;
 				unit.Wait = 5;
-			} else {
+				return;
+			}
+			case 1: // Reached
+			{
 				unit.SubAction = SUB_RETURN_RESOURCE;
+				return;
+			}
+			case 0: // Move along.
+				return;
+			default:
+			{
+				Assert(0);
+				return;
 			}
 		}
-		return;
 	}
 
 	// Depot seems to be unreachable

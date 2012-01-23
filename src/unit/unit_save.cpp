@@ -183,19 +183,20 @@ void SaveOrder(const COrderPtr order, CFile *file)
 		case UnitActionResource :
 		case UnitActionReturnGoods :
 			if (order->CurrentResource) {
-				file->printf(", \"current-resource\", \"%s\",",
-					DefaultResourceNames[order->CurrentResource].c_str());
-				if(order->CurrentResource == WoodCost) {
-					file->printf(" \"resource-pos\", {%d, %d}",
-						order->Arg1.Resource.Pos.x, order->Arg1.Resource.Pos.y);
+				file->printf(", \"current-resource\", \"%s\",", DefaultResourceNames[order->CurrentResource].c_str());
+				const CUnit *mine = order->Arg1.Resource.Mine;
+
+				if (mine == NULL) {
+					const Vec2i &pos = order->Arg1.Resource.Pos;
+
+					file->printf(" \"resource-pos\", {%d, %d}", pos.x, pos.y);
 				} else {
-					if (order->Arg1.Resource.Mine->Destroyed) {
+					if (mine->Destroyed) {
 						/* this unit is destroyed so it's not in the global unit
 						 * array - this means it won't be saved!!! */
 						printf ("FIXME: storing destroyed Mine - loading will fail.\n");
 					}
-					file->printf(" \"resource-mine\", \"%s\"",
-						UnitReference(*order->Arg1.Resource.Mine).c_str());
+					file->printf(" \"resource-mine\", \"%s\"", UnitReference(*mine).c_str());
 				}
 			}
 			break;

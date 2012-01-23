@@ -126,9 +126,7 @@ void CUnit::COrder::Release() {
 		Goal->RefsDecrease();
 		Goal = NoUnitP;
 	}
-	//FIXME: Hardcoded wood
-	if (Action == UnitActionResource && CurrentResource != WoodCost &&
-		Arg1.Resource.Mine ) {
+	if (Action == UnitActionResource && Arg1.Resource.Mine) {
 		Arg1.Resource.Mine->RefsDecrease();
 		Arg1.Resource.Mine = NoUnitP;
 	}
@@ -145,22 +143,13 @@ CUnit::COrder::COrder(const CUnit::COrder &ths): Goal(ths.Goal), Range(ths.Range
 
 	memcpy(&Arg1, &ths.Arg1, sizeof(Arg1));
 
-	//FIXME: Hardcoded wood
-	if (Action == UnitActionResource &&
-		 CurrentResource != WoodCost && Arg1.Resource.Mine) {
-		 Arg1.Resource.Mine->RefsIncrease();
+	if (Action == UnitActionResource && Arg1.Resource.Mine) {
+		Arg1.Resource.Mine->RefsIncrease();
 	}
 }
 
 CUnit::COrder& CUnit::COrder::operator=(const CUnit::COrder &rhs) {
 	if (this != &rhs) {
-
-		//FIXME: Hardcoded wood
-		if (Action == UnitActionResource &&
-			 CurrentResource != WoodCost && Arg1.Resource.Mine) {
-			 Arg1.Resource.Mine->RefsDecrease();
-		}
-
 		Action = rhs.Action;
 		Range = rhs.Range;
 		MinRange = rhs.MinRange;
@@ -172,8 +161,7 @@ CUnit::COrder& CUnit::COrder::operator=(const CUnit::COrder &rhs) {
 		memcpy(&Arg1, &rhs.Arg1, sizeof(Arg1));
 
 		//FIXME: Hardcoded wood
-		if (Action == UnitActionResource &&
-			 CurrentResource != WoodCost && Arg1.Resource.Mine) {
+		if (Action == UnitActionResource && Arg1.Resource.Mine) {
 			 Arg1.Resource.Mine->RefsIncrease();
 		}
 	}
@@ -1555,8 +1543,26 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	UpdateForNewUnit(*this, 1);
 }
 
+#ifdef DEBUG
+
+static bool IsMineAssignedBy(const CUnit &mine, const CUnit &worker)
+{
+	for (CUnit* it = mine.Data.Resource.Workers; it; it = it->NextWorker) {
+		if (it == &worker) {
+			return true;
+		}
+	}
+	return false;
+}
+
+#endif
+
+
 void CUnit::AssignWorkerToMine(CUnit &mine)
 {
+	Assert(this->NextWorker == NULL);
+	Assert(IsMineAssignedBy(mine, *this) == false);
+
 	CUnit *head = mine.Data.Resource.Workers;
 /*
 	DebugPrint("%d: Worker [%d] is adding into %s [%d] on %d pos\n"
@@ -1573,6 +1579,7 @@ void CUnit::AssignWorkerToMine(CUnit &mine)
 
 void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 {
+	Assert(IsMineAssignedBy(mine, *this) == true);
 	CUnit *prev = NULL, *worker = mine.Data.Resource.Workers;
 /*
 	DebugPrint("%d: Worker [%d] is removing from %s [%d] left %d units assigned\n"
@@ -1581,10 +1588,11 @@ void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 					_C_ mine.Slot
 					_C_ mine.Data.Resource.Assigned);
 */
-	for(int i = 0; NULL != worker; worker = worker->NextWorker,++i)
+	for (int i = 0; NULL != worker; worker = worker->NextWorker, ++i)
 	{
 		if (worker == this) {
 			CUnit *next = worker->NextWorker;
+			worker->NextWorker = NULL;
 			if (prev) {
 				prev->NextWorker = next;
 			}
@@ -3357,9 +3365,12 @@ void CleanUnits()
 		int count = NumUnits;
 		do {
 			CUnit *unit = Units[count - 1];
+
+			if (unit == NULL) {
+				continue;
+			}
 			if (!unit->Destroyed) {
-				if (//unit->Type->Harvester &&
-					unit->CurrentAction() == UnitActionResource) {
+				if (unit->CurrentAction() == UnitActionResource) {
 					ResourceInfo *resinfo = unit->Type->ResInfo[unit->CurrentResource];
 					if (resinfo && !resinfo->TerrainHarvester) {
 						CUnit *mine = unit->CurrentOrder()->Arg1.Resource.Mine;
@@ -3371,7 +3382,7 @@ void CleanUnits()
 					}
 				}
 				unit->CurrentOrder()->ClearGoal();
-				if(!unit->Removed) {
+				if (!unit->Removed) {
 					unit->Remove(NULL);
 				}
 				UnitClearOrders(*unit);

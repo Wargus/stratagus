@@ -566,7 +566,7 @@ public:
 
 		union {
 			Vec2i Patrol; /// position for patroling.
-			union {
+			struct {
 				Vec2i Pos; /// position for terrain resource.
 				CUnit *Mine;
 			} Resource;

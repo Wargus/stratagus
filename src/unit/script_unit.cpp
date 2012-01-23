@@ -276,19 +276,19 @@ void CclParseOrder(lua_State *l, COrderPtr order)
 		} else if (!strcmp(value, "resource-pos")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
-			CclGetPos(l, &order->Arg1.Resource.Pos.x ,
-								&order->Arg1.Resource.Pos.y);
+			order->Arg1.Resource.Mine = NULL;
+			CclGetPos(l, &order->Arg1.Resource.Pos.x , &order->Arg1.Resource.Pos.y);
 			lua_pop(l, 1);
 
-			//FIXME: hardcoded wood
-			Assert(order->CurrentResource && order->CurrentResource == WoodCost);
+			Assert(order->CurrentResource);
 		} else if (!strcmp(value, "resource-mine")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
+			Vec2i invalidPos = {-1, -1};
+			order->Arg1.Resource.Pos = invalidPos;
 			order->Arg1.Resource.Mine = CclGetUnitFromRef(l);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "mine")) {
-			/* old save format */
+		} else if (!strcmp(value, "mine")) { /* old save format */
 			int pos;
 			++j;
 			lua_rawgeti(l, -1, j + 1);
@@ -303,11 +303,15 @@ void CclParseOrder(lua_State *l, COrderPtr order)
 				mine = ResourceOnMap(mpos, pos, true);
 			} while (!mine && pos < MaxCosts);
 			if (mine) {
+				Vec2i invalidPos = {-1, -1};
+				order->Arg1.Resource.Pos = invalidPos;
+
 				mine->RefsIncrease();
 				order->Arg1.Resource.Mine = mine;
 				order->CurrentResource = pos;
 			} else {
 				order->CurrentResource = WoodCost;
+				order->Arg1.Resource.Mine = NULL;
 				order->Arg1.Resource.Pos = mpos;
 			}
 		} else {

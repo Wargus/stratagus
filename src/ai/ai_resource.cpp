@@ -845,6 +845,75 @@ static void AiCheckingWork()
 ----------------------------------------------------------------------------*/
 
 /**
+**  Assign worker to gather a certain resource from terrain.
+**
+**  @param unit      pointer to the unit.
+**  @param resource  resource identification.
+**
+**  @return          1 if the worker was assigned, 0 otherwise.
+*/
+static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource)
+{
+	// TODO : hardcoded forest
+	Vec2i forestPos;
+
+	// Code for terrain harvesters. Search for piece of terrain to mine.
+	if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 1000, unit.Player, unit.tilePos, &forestPos)) {
+		CommandResourceLoc(unit, forestPos, FlushCommands);
+		return 1;
+	}
+	// Ask the AI to explore...
+	AiExplore(unit.tilePos, MapFieldLandUnit);
+
+	// Failed.
+	return 0;
+}
+
+/**
+**  Assign worker to gather a certain resource from Unit.
+**
+**  @param unit      pointer to the unit.
+**  @param resource  resource identification.
+**
+**  @return          1 if the worker was assigned, 0 otherwise.
+*/
+static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
+{
+	// Find a resource to harvest from.
+	CUnit *mine = UnitFindResource(unit, unit.tilePos, 1000, resource, true);
+
+	if (mine) {
+		CommandResource(unit, *mine, FlushCommands);
+		return 1;
+	}
+
+	int exploremask = 0;
+
+	for (size_t i = 0; i != UnitTypes.size(); ++i) {
+		const CUnitType* type = UnitTypes[i];
+
+		if (type && type->GivesResource == resource) {
+			switch (type->UnitType) {
+			case UnitTypeLand:
+				exploremask |= MapFieldLandUnit;
+				break;
+			case UnitTypeFly:
+				exploremask |= MapFieldAirUnit;
+				break;
+			case UnitTypeNaval:
+				exploremask |= MapFieldSeaUnit;
+				break;
+			default:
+				Assert(0);
+			}
+		}
+	}
+	// Ask the AI to explore
+	AiExplore(unit.tilePos, exploremask);
+	// Failed.
+	return 0;
+}
+/**
 **  Assign worker to gather a certain resource.
 **
 **  @param unit      pointer to the unit.
@@ -854,68 +923,19 @@ static void AiCheckingWork()
 */
 static int AiAssignHarvester(CUnit &unit, int resource)
 {
-	ResourceInfo *resinfo;
-
 	// It can't.
 	if (unit.Removed) {
 		return 0;
 	}
 
-	resinfo = unit.Type->ResInfo[resource];
-	Assert(resinfo);
-	if (resinfo->TerrainHarvester) {
-		Vec2i forestPos;
+	const ResourceInfo &resinfo = *unit.Type->ResInfo[resource];
+	Assert(&resinfo);
 
-		//
-		// Code for terrain harvesters. Search for piece of terrain to mine.
-		//
-		if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 1000,
-				unit.Player, unit.tilePos, &forestPos)) {
-			CommandResourceLoc(unit, forestPos, FlushCommands);
-			return 1;
-		}
-		// Ask the AI to explore...
-		AiExplore(unit.tilePos, MapFieldLandUnit);
+	if (resinfo.TerrainHarvester) {
+		return AiAssignHarvesterFromTerrain(unit, resource);
 	} else {
-		int exploremask = 0;
-		//
-		// Find a resource to harvest from.
-		//
-		CUnit *dest = UnitFindResource(unit, unit.tilePos, 1000, resource, true);
-
-		if (dest) {
-			//FIXME: rb - when workers can speedup building then such assign may be ok.
-			//if(dest->CurrentAction() == UnitActionBuilt)
-				//CommandBuildBuilding(unit, dest->tilePos, dest->Type, FlushCommands);
-			//else
-				CommandResource(unit, *dest, FlushCommands);
-			return 1;
-		}
-
-		for (std::vector<CUnitType *>::iterator i = UnitTypes.begin();
-			 i != UnitTypes.end(); i++) {
-			if (*i && (*i)->GivesResource == resource) {
-				switch ((*i)->UnitType) {
-				case UnitTypeLand:
-					exploremask |= MapFieldLandUnit;
-					break;
-				case UnitTypeFly:
-					exploremask |= MapFieldAirUnit;
-					break;
-				case UnitTypeNaval:
-					exploremask |= MapFieldSeaUnit;
-					break;
-				default:
-					Assert(0);
-				}
-			}
-		}
-		// Ask the AI to explore
-		AiExplore(unit.tilePos, exploremask);
+		return AiAssignHarvesterFromUnit(unit, resource);
 	}
-
-	// Failed.
-	return 0;
 }
 
 static int CmpWorkers(const void *w0,const void *w1) {
