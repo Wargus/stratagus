@@ -1405,16 +1405,16 @@ static int CclDefineAiPlayer(lua_State *l)
 					}
 					subsubargs = lua_objlen(l, -1);
 					for (subk = 0; subk < subsubargs; ++subk) {
-						int num;
-						const char *ident;
-
 						lua_rawgeti(l, -1, subk + 1);
-						num = LuaToNumber(l, -1);
+						const int num = LuaToNumber(l, -1);
 						lua_pop(l, 1);
 						++subk;
+#if 0
 						lua_rawgeti(l, -1, subk + 1);
-						ident = LuaToString(l, -1);
+						const char *ident = LuaToString(l, -1);
+						UNUSED(ident);
 						lua_pop(l, 1);
+#endif
 						ai->Force[i].Units.Insert(UnitSlots[num]);
 					}
 					lua_pop(l, 1);
