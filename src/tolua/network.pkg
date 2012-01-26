@@ -16,27 +16,26 @@ void NetworkServerResyncClients(void);
 void NetworkDetachFromServer(void);
 
 class CServerSetup {
-	unsigned int ResourcesOption;
-	unsigned int UnitsOption;
-	unsigned int FogOfWar;
-	unsigned int RevealMap;
-	unsigned int TilesetSelection;
-	unsigned int GameTypeOption;
-	unsigned int Difficulty;
-	unsigned int MapRichness;
+	unsigned char ResourcesOption;
+	unsigned char UnitsOption;
+	unsigned char FogOfWar;
+	unsigned char RevealMap;
+	unsigned char GameTypeOption;
+	unsigned char Difficulty;
+	unsigned char MapRichness;
 	unsigned CompOpt[PlayerMax];
 	unsigned Ready[PlayerMax];
-	unsigned Race[PlayerMax];
-	unsigned int LastFrame[PlayerMax];
+	unsigned long LastFrame[PlayerMax];
 };
 extern CServerSetup LocalSetupState;
 extern CServerSetup ServerSetupState;
 extern int NetLocalHostsSlot;
+tolua_readonly int NetPlayerNameSize;
 struct CNetworkHost {
 	unsigned long  Host;         /// Host address
 	unsigned short Port;         /// Port on host
 	unsigned short PlyNr;        /// Player nummer
-	char           PlyName[16];  /// Name of player
+	char           PlyName[NetPlayerNameSize];  /// Name of player
 };
 extern CNetworkHost Hosts[PlayerMax];
 

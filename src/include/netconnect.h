@@ -61,18 +61,24 @@
 ----------------------------------------------------------------------------*/
 
 /**
+ * Number of bytes in the name of a network player,
+ * including the terminating null character.
+ */
+#define NetPlayerNameSize 16
+
+/**
 **  Network systems active in current game.
 */
 class CNetworkHost {
 public:
 	unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 4+2+2+16; }
+	static size_t Size() { return 4+2+2+NetPlayerNameSize; }
 
 	Uint32 Host;         /// Host address
 	Uint16 Port;         /// Port on host
 	Uint16 PlyNr;        /// Player nummer
-	char   PlyName[16];  /// Name of player
+	char   PlyName[NetPlayerNameSize];  /// Name of player
 };
 
 /**
