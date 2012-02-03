@@ -731,7 +731,7 @@ static int AStarMarkGoal(int gx, int gy, int gw, int gh,
 	// bottom hemi-cycle
 	const int maxy = std::min(maxrange, Map.Info.MapHeight - goal.y - gh);
 	for (int offsety = minrange; offsety < maxy; ++offsety) {
-		const int offsetx = isqrt(square(maxrange + 1) - square(offsety) - 1);
+		const int offsetx = isqrt(square(maxrange + 1) - square(offsety + 1) - 1);
 		const int minx = std::max(0, goal.x - offsetx - extratilesize.x);
 		const int maxx = std::min(Map.Info.MapWidth, goal.x + gw + offsetx);
 		Vec2i mpos = {minx, goal.y + gh + offsety};
