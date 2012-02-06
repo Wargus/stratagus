@@ -132,6 +132,47 @@ void CUnit::COrder::Release() {
 	}
 }
 
+void CUnit::COrder::ReleaseRefs(CUnit &unit)
+{
+	// Release pending references.
+	if (this->Action == UnitActionResource) {
+		CUnit *mine = this->Arg1.Resource.Mine;
+
+		if (mine) {
+			unit.DeAssignWorkerFromMine(*mine);
+			mine->RefsDecrease();
+			this->Arg1.Resource.Mine = NULL;
+
+		}
+	}
+	if (this->HasGoal()) {
+		// If mining decrease the active count on the resource.
+		if (this->Action == UnitActionResource) {
+			if (unit.SubAction == 60 /* SUB_GATHER_RESOURCE */ ) {
+				CUnit *goal = this->GetGoal();
+
+				goal->CurrentOrder()->Data.Resource.Active--;
+				Assert(goal->CurrentOrder()->Data.Resource.Active >= 0);
+			}
+		}
+		// Still shouldn't have a reference unless attacking
+		Assert(!(this->Action == UnitActionStill && !unit.SubAction));
+		this->ClearGoal();
+	}
+#ifdef DEBUG
+	 else {
+		if (unit.CurrentResource &&
+			!unit.Type->ResInfo[unit.CurrentResource]->TerrainHarvester) {
+			Assert(this->Action != UnitActionResource);
+		}
+	}
+#endif
+}
+
+
+
+
+
 CUnit::COrder::COrder(const CUnit::COrder &ths): Goal(ths.Goal), Range(ths.Range),
 	 MinRange(ths.MinRange), Width(ths.Width), Height(ths.Height),
 	 Action(ths.Action), CurrentResource(ths.CurrentResource),
@@ -332,7 +373,7 @@ bool CUnit::RestoreOrder()
 
 		this->CurrentResource = this->SavedOrder.CurrentResource;
 
-		NewResetPath(*this);
+		NewResetPath(*this->CurrentOrder());
 
 		// This isn't supported
 		Assert(!this->SavedOrder.HasGoal());
@@ -976,7 +1017,7 @@ void UnitLost(CUnit &unit)
 	//  Handle research cancels.
 	//
 	if (unit.CurrentAction() == UnitActionResearch) {
-		unit.Player->UpgradeTimers.Upgrades[unit.Data.Research.Upgrade->ID] = 0;
+		unit.Player->UpgradeTimers.Upgrades[unit.CurrentOrder()->Data.Research.Upgrade->ID] = 0;
 	}
 
 	DebugPrint("%d: Lost %s(%d)\n"
@@ -1105,7 +1146,7 @@ static void UnitFillSeenValues(CUnit &unit)
 	unit.Seen.Type = unit.Type;
 	unit.Seen.Constructed = unit.Constructed;
 	if (unit.CurrentAction() == UnitActionBuilt) {
-		unit.Seen.CFrame = unit.Data.Built.Frame;
+		unit.Seen.CFrame = unit.CurrentOrder()->Data.Built.Frame;
 	} else {
 		unit.Seen.CFrame = NULL;
 	}
@@ -1547,7 +1588,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 
 static bool IsMineAssignedBy(const CUnit &mine, const CUnit &worker)
 {
-	for (CUnit* it = mine.Data.Resource.Workers; it; it = it->NextWorker) {
+	for (CUnit* it = mine.CurrentOrder()->Data.Resource.Workers; it; it = it->NextWorker) {
 		if (it == &worker) {
 			return true;
 		}
@@ -1563,7 +1604,7 @@ void CUnit::AssignWorkerToMine(CUnit &mine)
 	Assert(this->NextWorker == NULL);
 	Assert(IsMineAssignedBy(mine, *this) == false);
 
-	CUnit *head = mine.Data.Resource.Workers;
+	CUnit *head = mine.CurrentOrder()->Data.Resource.Workers;
 /*
 	DebugPrint("%d: Worker [%d] is adding into %s [%d] on %d pos\n"
 					_C_ this->Player->Index _C_ this->Slot
@@ -1573,20 +1614,20 @@ void CUnit::AssignWorkerToMine(CUnit &mine)
 */
 	this->RefsIncrease();
 	this->NextWorker = head;
-	mine.Data.Resource.Workers = this;
-	mine.Data.Resource.Assigned++;
+	mine.CurrentOrder()->Data.Resource.Workers = this;
+	mine.CurrentOrder()->Data.Resource.Assigned++;
 }
 
 void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 {
 	Assert(IsMineAssignedBy(mine, *this) == true);
-	CUnit *prev = NULL, *worker = mine.Data.Resource.Workers;
+	CUnit *prev = NULL, *worker = mine.CurrentOrder()->Data.Resource.Workers;
 /*
 	DebugPrint("%d: Worker [%d] is removing from %s [%d] left %d units assigned\n"
 					_C_ this->Player->Index _C_ this->Slot
 					_C_ mine.Type->Name.c_str()
 					_C_ mine.Slot
-					_C_ mine.Data.Resource.Assigned);
+					_C_ mine.CurrentOrder()->Data.Resource.Assigned);
 */
 	for (int i = 0; NULL != worker; worker = worker->NextWorker, ++i)
 	{
@@ -1596,17 +1637,17 @@ void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 			if (prev) {
 				prev->NextWorker = next;
 			}
-			if (worker == mine.Data.Resource.Workers) {
-				mine.Data.Resource.Workers = next;
+			if (worker == mine.CurrentOrder()->Data.Resource.Workers) {
+				mine.CurrentOrder()->Data.Resource.Workers = next;
 			}
 			worker->RefsDecrease();
 			break;
 		}
 		prev = worker;
-		Assert(i <= mine.Data.Resource.Assigned);
+		Assert(i <= mine.CurrentOrder()->Data.Resource.Assigned);
 	}
-	mine.Data.Resource.Assigned--;
-	Assert(mine.Data.Resource.Assigned >= 0);
+	mine.CurrentOrder()->Data.Resource.Assigned--;
+	Assert(mine.CurrentOrder()->Data.Resource.Assigned >= 0);
 }
 
 
@@ -2359,7 +2400,7 @@ CUnit *UnitFindResource(const CUnit &unit, const Vec2i &startPos, int range, int
 						if(better) {
 							n = std::max<int>(MyAbs(dest.x - pos.x), MyAbs(dest.y - pos.y));
 							if(check_usage && mine->Type->MaxOnBoard) {
-								int assign = mine->Data.Resource.Assigned -mine->Type->MaxOnBoard;
+								int assign = mine->CurrentOrder()->Data.Resource.Assigned - mine->Type->MaxOnBoard;
 								int waiting = (assign > 0 ? GetNumWaitingWorkers(*mine) : 0);
 								if (bestmine != NoUnitP) {
 									if (besta >= assign)
@@ -2410,10 +2451,8 @@ CUnit *UnitFindResource(const CUnit &unit, const Vec2i &startPos, int range, int
 							//Durring construction Data.Resource is corrupted
 								mine->CurrentAction() != UnitActionBuilt);
 							if (better) {
-								int assign = mine->Data.Resource.Assigned -
-														mine->Type->MaxOnBoard;
-								int waiting = (assign > 0 ?
-									GetNumWaitingWorkers(*mine) : 0);
+								int assign = mine->CurrentOrder()->Data.Resource.Assigned -mine->Type->MaxOnBoard;
+								int waiting = (assign > 0 ? GetNumWaitingWorkers(*mine) : 0);
 								if (assign < besta ||
 									(assign == besta && waiting < bestw)) {
 									bestd = n;
@@ -2674,9 +2713,9 @@ void LetUnitDie(CUnit &unit)
 	// outside.
 	if (type->GivesResource &&
 			unit.CurrentAction() == UnitActionBuilt &&
-			unit.Data.Built.Worker) {
+			unit.CurrentOrder()->Data.Built.Worker) {
 		// Restore value for oil-patch
-		unit.ResourcesHeld = unit.Data.Built.Worker->ResourcesHeld;
+		unit.ResourcesHeld = unit.CurrentOrder()->Data.Built.Worker->ResourcesHeld;
 	}
 
 	// Transporters lose or save their units and building their workers
@@ -2954,7 +2993,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 			if (target.SubAction > 55  &&
 				target.ResourcesHeld > 0) {
 				//escape to Depot with this what you have;
-				target.Data.ResWorker.DoneHarvesting = 1;
+				target.CurrentOrder()->Data.ResWorker.DoneHarvesting = 1;
 				return;
 			}
 		break;

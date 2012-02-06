@@ -1957,10 +1957,10 @@ void UpdateUnitVariables(const CUnit &unit)
 	unit.Variable[TRANSPORT_INDEX].Value = unit.BoardCount;
 	unit.Variable[TRANSPORT_INDEX].Max = unit.Type->MaxOnBoard;
 
-	switch(unit.CurrentAction()) {
+	switch (unit.CurrentAction()) {
 		// Build
 		case UnitActionBuilt:
-			unit.Variable[BUILD_INDEX].Value = unit.Data.Built.Progress;
+			unit.Variable[BUILD_INDEX].Value = unit.CurrentOrder()->Data.Built.Progress;
 			unit.Variable[BUILD_INDEX].Max = type->Stats[unit.Player->Index].Costs[TimeCost] * 600;
 
 			// This should happen when building unit with several peons
@@ -1974,18 +1974,18 @@ void UpdateUnitVariables(const CUnit &unit)
 		// Research.
 		case UnitActionResearch:
 			unit.Variable[RESEARCH_INDEX].Value =
-				unit.Player->UpgradeTimers.Upgrades[unit.Data.Research.Upgrade->ID];
-			unit.Variable[RESEARCH_INDEX].Max = unit.Data.Research.Upgrade->Costs[TimeCost];
+				unit.Player->UpgradeTimers.Upgrades[unit.CurrentOrder()->Data.Research.Upgrade->ID];
+			unit.Variable[RESEARCH_INDEX].Max = unit.CurrentOrder()->Data.Research.Upgrade->Costs[TimeCost];
 		break;
 		// Training
 		case UnitActionTrain:
-			unit.Variable[TRAINING_INDEX].Value = unit.Data.Train.Ticks;
+			unit.Variable[TRAINING_INDEX].Value = unit.CurrentOrder()->Data.Train.Ticks;
 			unit.Variable[TRAINING_INDEX].Max =
 				unit.CurrentOrder()->Arg1.Type->Stats[unit.Player->Index].Costs[TimeCost];
 		break;
 		// UpgradeTo
 		case UnitActionUpgradeTo:
-			unit.Variable[UPGRADINGTO_INDEX].Value = unit.Data.UpgradeTo.Ticks;
+			unit.Variable[UPGRADINGTO_INDEX].Value = unit.CurrentOrder()->Data.UpgradeTo.Ticks;
 			unit.Variable[UPGRADINGTO_INDEX].Max =
 				unit.CurrentOrder()->Arg1.Type->Stats[unit.Player->Index].Costs[TimeCost];
 		break;

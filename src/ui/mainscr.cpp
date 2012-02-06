@@ -296,7 +296,7 @@ const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 			return unit.Container;
 		case UnitRefWorker :
 			if (unit.CurrentAction() == UnitActionBuilt) {
-				return unit.Data.Built.Worker;
+				return unit.CurrentOrder()->Data.Built.Worker;
 			} else {
 				return NoUnitP;
 			}
@@ -722,7 +722,7 @@ static void DrawUnitInfo(CUnit &unit)
 			//
 			case UnitActionResearch:
 				if (UI.ResearchingButton) {
-					unit.Data.Research.Upgrade->Icon->DrawUnitIcon(unit.Player,
+					unit.CurrentOrder()->Data.Research.Upgrade->Icon->DrawUnitIcon(unit.Player,
 						UI.ResearchingButton->Style,
 						(ButtonAreaUnderCursor == ButtonAreaResearching &&
 							ButtonUnderCursor == 0) ?

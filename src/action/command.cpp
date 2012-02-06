@@ -627,7 +627,7 @@ void CommandDismiss(CUnit &unit)
 	// Check if building is still under construction? (NETWORK!)
 	//
 	if (unit.CurrentAction() == UnitActionBuilt) {
-		unit.Data.Built.Cancel = 1;
+		unit.CurrentOrder()->Data.Built.Cancel = 1;
 	} else {
 		DebugPrint("Suicide unit ... \n");
 		LetUnitDie(unit);
@@ -832,7 +832,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 				CancelTrainingCostsFactor);
 			RemoveOrder(unit, 0);
 		}
-		unit.Data.Train.Ticks = 0;
+		unit.CurrentOrder()->Data.Train.Ticks = 0;
 		if (unit.Player == ThisPlayer && unit.Selected) {
 			SelectedUnitChanged();
 		}
@@ -857,7 +857,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 
 
 		if (!slot) { // Canceled in work slot
-			unit.Data.Train.Ticks = 0;
+			unit.CurrentOrder()->Data.Train.Ticks = 0;
 		}
 		RemoveOrder(unit, slot);
 
@@ -980,7 +980,7 @@ void CommandResearch(CUnit &unit, CUpgrade *what, int flush)
 				const CUpgrade *upgrade;
 
 				// Cancel current research
-				upgrade = unit.Data.Research.Upgrade;
+				upgrade = unit.CurrentOrder()->Data.Research.Upgrade;
 				unit.Player->UpgradeTimers.Upgrades[upgrade->ID] = 0;
 				unit.Player->AddCostsFactor(upgrade->Costs,
 					CancelResearchCostsFactor);
@@ -1018,7 +1018,7 @@ void CommandCancelResearch(CUnit &unit)
 	if (unit.CurrentAction() == UnitActionResearch) {
 		const CUpgrade *upgrade;
 
-		upgrade = unit.Data.Research.Upgrade;
+		upgrade = unit.CurrentOrder()->Data.Research.Upgrade;
 		unit.Player->UpgradeTimers.Upgrades[upgrade->ID] = 0;
 
 		unit.Player->AddCostsFactor(upgrade->Costs,

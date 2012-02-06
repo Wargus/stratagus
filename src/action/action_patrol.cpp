@@ -60,8 +60,8 @@ static void SwapPatrolPoints(CUnit &unit)
 	std::swap(order->Arg1.Patrol.x, order->goalPos.x);
 	std::swap(order->Arg1.Patrol.y, order->goalPos.y);
 
-	unit.Data.Move.Cycles = 0; //moving counter
-	NewResetPath(unit);
+	unit.CurrentOrder()->Data.Move.Cycles = 0; //moving counter
+	NewResetPath(*unit.CurrentOrder());
 }
 
 /**
@@ -83,8 +83,8 @@ void HandleActionPatrol(CUnit &unit)
 	}
 
 	if (!unit.SubAction) { // first entry.
-		unit.Data.Move.Cycles = 0; //moving counter
-		NewResetPath(unit);
+		unit.CurrentOrder()->Data.Move.Cycles = 0; //moving counter
+		NewResetPath(*unit.CurrentOrder());
 		unit.SubAction = 1;
 	}
 

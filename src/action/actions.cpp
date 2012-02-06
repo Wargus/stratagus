@@ -500,43 +500,10 @@ static void HandleUnitAction(CUnit &unit)
 				return;
 			}
 			COrderPtr order = unit.CurrentOrder();
-			//
-			// Release pending references.
-			//
-			if (order->Action == UnitActionResource) {
-				CUnit *mine = order->Arg1.Resource.Mine;
 
-				if (mine) {
-					unit.DeAssignWorkerFromMine(*mine);
-					mine->RefsDecrease();
-					order->Arg1.Resource.Mine = NULL;
+			order->ReleaseRefs(unit);
 
-				}
-			}
-			if (order->HasGoal()) {
-				CUnit *goal = order->GetGoal();
-				// If mining decrease the active count on the resource.
-				if (order->Action == UnitActionResource) {
-					if (unit.SubAction == 60 /* SUB_GATHER_RESOURCE */ ) {
-						goal->Data.Resource.Active--;
-						Assert(goal->Data.Resource.Active >= 0);
-					}
-				}
-				// Still shouldn't have a reference unless attacking
-				Assert(!(order->Action == UnitActionStill && !unit.SubAction));
-				order->ClearGoal();
-			}
-#ifdef DEBUG
-			 else {
-				if (unit.CurrentResource &&
-					!unit.Type->ResInfo[unit.CurrentResource]->TerrainHarvester) {
-					Assert(order->Action != UnitActionResource);
-				}
-			}
-#endif
-			//
 			// Shift queue with structure assignment.
-			//
 			unit.OrderCount--;
 			unit.OrderFlush = 0;
 			delete unit.Orders[0];

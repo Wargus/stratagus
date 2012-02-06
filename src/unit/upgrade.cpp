@@ -489,8 +489,8 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 						unit.Orders[j]->Arg1.Type == &src) {
 						if (j == 0) {
 							// Must Adjust Ticks to the fraction that was trained
-							unit.Data.Train.Ticks =
-								unit.Data.Train.Ticks *
+							unit.CurrentOrder()->Data.Train.Ticks =
+								unit.CurrentOrder()->Data.Train.Ticks *
 								dst.Stats[player.Index].Costs[TimeCost] /
 								src.Stats[player.Index].Costs[TimeCost];
 						}

@@ -155,6 +155,264 @@ static void CclGetPos(lua_State *l, T *x , T *y, const int offset = -1)
 	lua_pop(l, 1);
 }
 
+/**
+**  Parse built
+**
+**  @param l     Lua state.
+**  @param order  Unit pointer which should be filled with the data.
+*/
+static void CclParseBuilt(lua_State *l, const CUnit &unit, COrderPtr order)
+{
+	const char *value;
+	int args;
+	int j;
+
+	if (!lua_istable(l, -1)) {
+		LuaError(l, "incorrect argument");
+	}
+	args = lua_objlen(l, -1);
+	for (j = 0; j < args; ++j) {
+		lua_rawgeti(l, -1, j + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++j;
+		if (!strcmp(value, "worker")) {
+			lua_rawgeti(l, -1, j + 1);
+			order->Data.Built.Worker = CclGetUnitFromRef(l);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "progress")) {
+			lua_rawgeti(l, -1, j + 1);
+			order->Data.Built.Progress = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "cancel")) {
+			order->Data.Built.Cancel = 1;
+			--j;
+		} else if (!strcmp(value, "frame")) {
+			lua_rawgeti(l, -1, j + 1);
+			int frame = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			CConstructionFrame *cframe = unit.Type->Construction->Frames;
+			while (frame--) {
+				cframe = cframe->Next;
+			}
+			order->Data.Built.Frame = cframe;
+		} else {
+			LuaError(l, "ParseBuilt: Unsupported tag: %s" _C_ value);
+		}
+	}
+}
+
+/**
+**  Parse Resource
+**
+**  @param l     Lua state.
+**  @param unit  Unit pointer which should be filled with the data.
+*/
+static void CclParseResource(lua_State *l, COrderPtr order)
+{
+	const char *value;
+
+	if (!lua_istable(l, -1)) {
+		LuaError(l, "incorrect argument");
+	}
+	int args = lua_objlen(l, -1);
+	for (int j = 0; j < args; ++j) {
+		lua_rawgeti(l, -1, j + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++j;
+		if (!strcmp(value, "first-worker")) {
+			lua_rawgeti(l, -1, j + 1);
+			order->Data.Resource.Workers = CclGetUnitFromRef(l);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "assigned")) {
+			lua_rawgeti(l, -1, j + 1);
+			order->Data.Resource.Assigned = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else {
+			LuaError(l, "ParseResource: Unsupported tag: %s" _C_ value);
+		}
+	}
+}
+
+/**
+**  Parse res worker data
+**
+**  @param l     Lua state.
+**  @param unit  Unit pointer which should be filled with the data.
+*/
+static void CclParseResWorker(lua_State *l, COrderPtr order)
+{
+	const char *value;
+	int args;
+	int j;
+
+	if (!lua_istable(l, -1)) {
+		LuaError(l, "incorrect argument");
+	}
+	args = lua_objlen(l, -1);
+	for (j = 0; j < args; ++j) {
+		lua_rawgeti(l, -1, j + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++j;
+		if (!strcmp(value, "time-to-harvest")) {
+			lua_rawgeti(l, -1, j + 1);
+			order->Data.ResWorker.TimeToHarvest = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "done-harvesting")) {
+			order->Data.ResWorker.DoneHarvesting = 1;
+			--j;
+		} else {
+			LuaError(l, "ParseResWorker: Unsupported tag: %s" _C_ value);
+		}
+	}
+}
+
+/**
+**  Parse research
+**
+**  @param l     Lua state.
+**  @param unit  Unit pointer which should be filled with the data.
+*/
+static void CclParseResearch(lua_State *l, COrderPtr order)
+{
+	const char *value;
+	int args;
+	int j;
+
+	if (!lua_istable(l, -1)) {
+		LuaError(l, "incorrect argument");
+	}
+	args = lua_objlen(l, -1);
+	for (j = 0; j < args; ++j) {
+		lua_rawgeti(l, -1, j + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++j;
+		if (!strcmp(value, "ident")) {
+			lua_rawgeti(l, -1, j + 1);
+			value = LuaToString(l, -1);
+			lua_pop(l, 1);
+			order->Data.Research.Upgrade = CUpgrade::Get(value);
+		} else {
+			LuaError(l, "ParseResearch: Unsupported tag: %s" _C_ value);
+		}
+	}
+}
+
+/**
+**  Parse upgrade to
+**
+**  @param l     Lua state.
+**  @param unit  Unit pointer which should be filled with the data.
+*/
+static void CclParseUpgradeTo(lua_State *l, COrderPtr order)
+{
+	const char *value;
+	int args;
+	int j;
+
+	if (!lua_istable(l, -1)) {
+		LuaError(l, "incorrect argument");
+	}
+	args = lua_objlen(l, -1);
+	for (j = 0; j < args; ++j) {
+		lua_rawgeti(l, -1, j + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++j;
+		if (!strcmp(value, "ticks")) {
+			lua_rawgeti(l, -1, j + 1);
+			order->Data.UpgradeTo.Ticks = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else {
+			LuaError(l, "ParseUpgradeTo: Unsupported tag: %s" _C_ value);
+		}
+	}
+}
+
+/**
+**  Parse stored data for train order
+**
+**  @param l     Lua state.
+**  @param unit  Unit pointer which should be filled with the data.
+*/
+static void CclParseTrain(lua_State *l, COrderPtr order)
+{
+	const char *value;
+	int args;
+	int j;
+
+	if (!lua_istable(l, -1)) {
+		LuaError(l, "incorrect argument");
+	}
+	args = lua_objlen(l, -1);
+	for (j = 0; j < args; ++j) {
+		lua_rawgeti(l, -1, j + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++j;
+		if (!strcmp(value, "ticks")) {
+			lua_rawgeti(l, -1, j + 1);
+			order->Data.Train.Ticks = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else {
+			LuaError(l, "ParseTrain: Unsupported tag: %s" _C_ value);
+		}
+	}
+}
+
+/**
+**  Parse stored data for move order
+**
+**  @param l     Lua state.
+**  @param unit  Unit pointer which should be filled with the data.
+*/
+static void CclParseMove(lua_State *l, COrderPtr order)
+{
+	const char *value;
+	int args;
+	int j;
+
+	if (!lua_istable(l, -1)) {
+		LuaError(l, "incorrect argument");
+	}
+	args = lua_objlen(l, -1);
+	for (j = 0; j < args; ++j) {
+		lua_rawgeti(l, -1, j + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++j;
+		if (!strcmp(value, "cycles")) {
+			lua_rawgeti(l, -1, j + 1);
+			order->Data.Move.Cycles = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "fast")) {
+			order->Data.Move.Fast = 1;
+			--j;
+		} else if (!strcmp(value, "path")) {
+			int subargs;
+			int k;
+
+			lua_rawgeti(l, -1, j + 1);
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			subargs = lua_objlen(l, -1);
+			for (k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, -1, k + 1);
+				order->Data.Move.Path[k] = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+			}
+			order->Data.Move.Length = subargs;
+			lua_pop(l, 1);
+		} else {
+			LuaError(l, "ParseMove: Unsupported tag: %s" _C_ value);
+		}
+	}
+}
+
 
 /**
 **  Parse order
@@ -162,17 +420,12 @@ static void CclGetPos(lua_State *l, T *x , T *y, const int offset = -1)
 **  @param l      Lua state.
 **  @param order  OUT: resulting order.
 */
-void CclParseOrder(lua_State *l, COrderPtr order)
+void CclParseOrder(lua_State *l, const CUnit &unit, COrderPtr order)
 {
-	const char *value;
-
-	//
-	// Parse the list: (still everything could be changed!)
-	//
 	const int args = lua_objlen(l, -1);
 	for (int j = 0; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
+		const char *value = LuaToString(l, -1);
 		lua_pop(l, 1);
 		if (!strcmp(value, "action-none")) {
 			order->Action = UnitActionNone;
@@ -288,6 +541,46 @@ void CclParseOrder(lua_State *l, COrderPtr order)
 			order->Arg1.Resource.Pos = invalidPos;
 			order->Arg1.Resource.Mine = CclGetUnitFromRef(l);
 			lua_pop(l, 1);
+		} else if (!strcmp(value, "resource-active")) {
+			++j;
+			lua_rawgeti(l, -1, j + 1);
+			order->Data.Resource.Active = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "data-built")) {
+			++j;
+			lua_rawgeti(l, -1, j + 1);
+			CclParseBuilt(l, unit, order);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "data-resource")) {
+			++j;
+			lua_rawgeti(l, -1, j + 1);
+			CclParseResource(l, order);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "data-res-worker")) {
+			++j;
+			lua_rawgeti(l, -1, j + 1);
+			CclParseResWorker(l, order);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "data-research")) {
+			++j;
+			lua_rawgeti(l, -1, j + 1);
+			CclParseResearch(l, order);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "data-upgrade-to")) {
+			++j;
+			lua_rawgeti(l, -1, j + 1);
+			CclParseUpgradeTo(l, order);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "data-train")) {
+			++j;
+			lua_rawgeti(l, -1, j + 1);
+			CclParseTrain(l, order);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "data-move")) {
+			++j;
+			lua_rawgeti(l, -1, j + 1);
+			CclParseMove(l, order);
+			lua_pop(l, 1);
 		} else if (!strcmp(value, "mine")) { /* old save format */
 			int pos;
 			++j;
@@ -327,284 +620,22 @@ void CclParseOrder(lua_State *l, COrderPtr order)
 **  @param l     Lua state.
 **  @param unit  Unit pointer which should get the orders.
 */
-static void CclParseOrders(lua_State *l, CUnit *unit)
+static void CclParseOrders(lua_State *l, CUnit &unit)
 {
-	COrderPtr order;
-	const int n = unit->OrderCount;
-	for (std::vector<COrderPtr>::iterator order = unit->Orders.begin();
-			order != unit->Orders.end();
+	for (std::vector<COrderPtr>::iterator order = unit.Orders.begin();
+			order != unit.Orders.end();
 			++order) {
 		delete *order;
 	}
-	unit->Orders.clear();
-	unit->OrderCount = 0;
+	unit.Orders.clear();
+	const int n = unit.OrderCount;
+	unit.OrderCount = 0;
 	for (int j = 0; j < n; ++j) {
 		lua_rawgeti(l, -1, j + 1);
-		order = unit->CreateOrder();
-		Assert(order == unit->Orders[j]);
-		CclParseOrder(l, order);
+		COrderPtr order = unit.CreateOrder();
+		Assert(order == unit.Orders[j]);
+		CclParseOrder(l, unit, order);
 		lua_pop(l, 1);
-	}
-}
-
-/**
-**  Parse built
-**
-**  @param l     Lua state.
-**  @param unit  Unit pointer which should be filled with the data.
-*/
-static void CclParseBuilt(lua_State *l, CUnit *unit)
-{
-	const char *value;
-	int args;
-	int j;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	args = lua_objlen(l, -1);
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++j;
-		if (!strcmp(value, "worker")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.Built.Worker = CclGetUnitFromRef(l);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "progress")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.Built.Progress = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "cancel")) {
-			unit->Data.Built.Cancel = 1;
-			--j;
-		} else if (!strcmp(value, "frame")) {
-			int frame;
-			CConstructionFrame *cframe;
-
-			lua_rawgeti(l, -1, j + 1);
-			frame = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			cframe = unit->Type->Construction->Frames;
-			while (frame--) {
-				cframe = cframe->Next;
-			}
-			unit->Data.Built.Frame = cframe;
-		} else {
-			LuaError(l, "ParseBuilt: Unsupported tag: %s" _C_ value);
-		}
-	}
-}
-
-/**
-**  Parse built
-**
-**  @param l     Lua state.
-**  @param unit  Unit pointer which should be filled with the data.
-*/
-static void CclParseResource(lua_State *l, CUnit *unit)
-{
-	const char *value;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	int args = lua_objlen(l, -1);
-	for (int j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++j;
-		if (!strcmp(value, "first-worker")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.Resource.Workers = CclGetUnitFromRef(l);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "assigned")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.Resource.Assigned = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else {
-			LuaError(l, "ParseResource: Unsupported tag: %s" _C_ value);
-		}
-	}
-}
-
-/**
-**  Parse res worker data
-**
-**  @param l     Lua state.
-**  @param unit  Unit pointer which should be filled with the data.
-*/
-static void CclParseResWorker(lua_State *l, CUnit *unit)
-{
-	const char *value;
-	int args;
-	int j;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	args = lua_objlen(l, -1);
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++j;
-		if (!strcmp(value, "time-to-harvest")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.ResWorker.TimeToHarvest = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "done-harvesting")) {
-			unit->Data.ResWorker.DoneHarvesting = 1;
-			--j;
-		} else {
-			LuaError(l, "ParseResWorker: Unsupported tag: %s" _C_ value);
-		}
-	}
-}
-
-/**
-**  Parse research
-**
-**  @param l     Lua state.
-**  @param unit  Unit pointer which should be filled with the data.
-*/
-static void CclParseResearch(lua_State *l, CUnit *unit)
-{
-	const char *value;
-	int args;
-	int j;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	args = lua_objlen(l, -1);
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++j;
-		if (!strcmp(value, "ident")) {
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
-			unit->Data.Research.Upgrade = CUpgrade::Get(value);
-		} else {
-			LuaError(l, "ParseResearch: Unsupported tag: %s" _C_ value);
-		}
-	}
-}
-
-/**
-**  Parse upgrade to
-**
-**  @param l     Lua state.
-**  @param unit  Unit pointer which should be filled with the data.
-*/
-static void CclParseUpgradeTo(lua_State *l, CUnit *unit)
-{
-	const char *value;
-	int args;
-	int j;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	args = lua_objlen(l, -1);
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++j;
-		if (!strcmp(value, "ticks")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.UpgradeTo.Ticks = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else {
-			LuaError(l, "ParseUpgradeTo: Unsupported tag: %s" _C_ value);
-		}
-	}
-}
-
-/**
-**  Parse stored data for train order
-**
-**  @param l     Lua state.
-**  @param unit  Unit pointer which should be filled with the data.
-*/
-static void CclParseTrain(lua_State *l, CUnit *unit)
-{
-	const char *value;
-	int args;
-	int j;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	args = lua_objlen(l, -1);
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++j;
-		if (!strcmp(value, "ticks")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.Train.Ticks = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else {
-			LuaError(l, "ParseTrain: Unsupported tag: %s" _C_ value);
-		}
-	}
-}
-
-/**
-**  Parse stored data for move order
-**
-**  @param l     Lua state.
-**  @param unit  Unit pointer which should be filled with the data.
-*/
-static void CclParseMove(lua_State *l, CUnit *unit)
-{
-	const char *value;
-	int args;
-	int j;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	args = lua_objlen(l, -1);
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++j;
-		if (!strcmp(value, "cycles")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.Move.Cycles = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "fast")) {
-			unit->Data.Move.Fast = 1;
-			--j;
-		} else if (!strcmp(value, "path")) {
-			int subargs;
-			int k;
-
-			lua_rawgeti(l, -1, j + 1);
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = lua_objlen(l, -1);
-			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, -1, k + 1);
-				unit->Data.Move.Path[k] = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-			}
-			unit->Data.Move.Length = subargs;
-			lua_pop(l, 1);
-		} else {
-			LuaError(l, "ParseMove: Unsupported tag: %s" _C_ value);
-		}
 	}
 }
 
@@ -774,12 +805,6 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "active")) {
 			unit->Active = 1;
 			--j;
-		} else if (!strcmp(value, "resource-active")) {
-			unit->Data.Resource.Active = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "data-resource")) {
-			lua_pushvalue(l, j + 1);
-			CclParseResource(l, unit);
-			lua_pop(l, 1);
 		} else if (!strcmp(value, "ttl")) {
 			// FIXME : unsigned long should be better handled
 			unit->TTL = LuaToNumber(l, j + 1);
@@ -847,7 +872,7 @@ static int CclUnit(lua_State *l)
 			unit->OrderFlush = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "orders")) {
 			lua_pushvalue(l, j + 1);
-			CclParseOrders(l, unit);
+			CclParseOrders(l, *unit);
 			lua_pop(l, 1);
 			// now we know unit's action so we can assign it to a player
 			unit->AssignToPlayer (player);
@@ -858,39 +883,15 @@ static int CclUnit(lua_State *l)
 			}
 		} else if (!strcmp(value, "critical-order")) {
 			lua_pushvalue(l, j + 1);
-			CclParseOrder(l, &unit->CriticalOrder);
+			CclParseOrder(l, *unit , &unit->CriticalOrder);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "saved-order")) {
 			lua_pushvalue(l, j + 1);
-			CclParseOrder(l, &unit->SavedOrder);
+			CclParseOrder(l, *unit, &unit->SavedOrder);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "new-order")) {
 			lua_pushvalue(l, j + 1);
-			CclParseOrder(l, &unit->NewOrder);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-built")) {
-			lua_pushvalue(l, j + 1);
-			CclParseBuilt(l, unit);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-res-worker")) {
-			lua_pushvalue(l, j + 1);
-			CclParseResWorker(l, unit);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-research")) {
-			lua_pushvalue(l, j + 1);
-			CclParseResearch(l, unit);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-upgrade-to")) {
-			lua_pushvalue(l, j + 1);
-			CclParseUpgradeTo(l, unit);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-train")) {
-			lua_pushvalue(l, j + 1);
-			CclParseTrain(l, unit);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-move")) {
-			lua_pushvalue(l, j + 1);
-			CclParseMove(l, unit);
+			CclParseOrder(l, *unit, &unit->NewOrder);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "goal")) {
 			unit->Goal = UnitSlots[(int)LuaToNumber(l, j + 1)];

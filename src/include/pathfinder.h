@@ -70,8 +70,8 @@ enum _move_return_ {
 /**
 **  To remove pathfinder internals. Called if path destination changed.
 */
-#define NewResetPath(unit) \
-	do { (unit).Data.Move.Fast = 1; (unit).Data.Move.Length = 0; } while (0)
+#define NewResetPath(order) \
+	do { (order).Data.Move.Fast = 1; (order).Data.Move.Length = 0; } while (0)
 
 /*----------------------------------------------------------------------------
 --  Variables

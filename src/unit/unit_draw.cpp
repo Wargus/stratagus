@@ -612,8 +612,13 @@ static void DrawDecoration(const CUnit &unit, const CUnitType *type, int x, int 
 #endif
 		) {
 		int groupId = 0;
-		for (groupId = 0; !(unit.GroupId & (1 << groupId)); ++groupId)
-			;
+
+		if (unit.Player->AiEnabled) {
+			groupId = unit.GroupId - 1;
+		} else {
+			for (groupId = 0; !(unit.GroupId & (1 << groupId)); ++groupId) {
+			}
+		}
 		int width = GetGameFont()->Width(groupId);
 		x += (unit.Type->TileWidth * PixelTileSize.x + unit.Type->BoxWidth) / 2 - width;
 		width = GetGameFont()->Height();
@@ -1127,7 +1132,7 @@ void CUnit::Draw(const CViewport *vp) const
 			type = this->CurrentOrder()->Arg1.Type;
 		}
 		// This is trash unless the unit is being built, and that's when we use it.
-		cframe = this->Data.Built.Frame;
+		cframe = this->CurrentOrder()->Data.Built.Frame;
 	} else {
 		y = this->Seen.IY;
 		x = this->Seen.IX;
@@ -1270,7 +1275,7 @@ void CUnitDrawProxy::operator=(const CUnit *unit)
 
 		if (unit->Constructed) {
 			// This is trash unless the unit is being built, and that's when we use it.
-			cframe = unit->Data.Built.Frame;
+			cframe = unit->CurrentOrder()->Data.Built.Frame;
 		}
 	} else {
 		IY = unit->Seen.IY;

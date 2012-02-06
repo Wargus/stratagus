@@ -143,10 +143,10 @@ int DoActionMove(CUnit &unit)
 	} else {
 		posd.x = Heading2X[unit.Direction / NextDirection];
 		posd.y = Heading2Y[unit.Direction / NextDirection];
-		d = unit.Data.Move.Length + 1;
+		d = unit.CurrentOrder()->Data.Move.Length + 1;
 	}
 
-	unit.Data.Move.Cycles++;//reset have to be manualy controled by caller.
+	unit.CurrentOrder()->Data.Move.Cycles++;//reset have to be manualy controled by caller.
 	move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move[GetAnimationDamagedState(unit,2)],
 			Map.Field(unit.Offset)->Cost);
 
@@ -185,8 +185,8 @@ void HandleActionMove(CUnit &unit)
 
 	if (!unit.SubAction) { // first entry
 		unit.SubAction = 1;
-		NewResetPath(unit);
-		unit.Data.Move.Cycles = 0;
+		NewResetPath(*unit.CurrentOrder());
+		unit.CurrentOrder()->Data.Move.Cycles = 0;
 		Assert(unit.State == 0);
 	}
 
@@ -220,7 +220,7 @@ void HandleActionMove(CUnit &unit)
 		DebugPrint("Goal dead\n");
 		unit.CurrentOrder()->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
 		unit.CurrentOrder()->ClearGoal();
-		NewResetPath(unit);
+		NewResetPath(*unit.CurrentOrder());
 	}
 }
 

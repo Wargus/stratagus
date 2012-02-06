@@ -65,16 +65,16 @@ std::string UnitReference(const CUnit &unit)
 **  Save an order.
 **
 **  @param order  Order who should be saved.
+**  @param unit   Order behave to this unit.
 **  @param file   Output file.
 */
-void SaveOrder(const COrderPtr order, CFile *file)
+void SaveOrder(const CUnit::COrder &order, const CUnit &unit, CFile *file)
 {
 	file->printf("{");
-	switch (order->Action) {
+	switch (order.Action) {
 		case UnitActionNone:
 			file->printf("\"action-none\",");
 			break;
-
 		case UnitActionStill:
 			file->printf("\"action-still\",");
 			break;
@@ -96,11 +96,9 @@ void SaveOrder(const COrderPtr order, CFile *file)
 		case UnitActionDie:
 			file->printf("\"action-die\",");
 			break;
-
 		case UnitActionSpellCast:
 			file->printf("\"action-spell-cast\",");
 			break;
-
 		case UnitActionTrain:
 			file->printf("\"action-train\",");
 			break;
@@ -113,7 +111,6 @@ void SaveOrder(const COrderPtr order, CFile *file)
 		case UnitActionBuilt:
 			file->printf("\"action-built\",");
 			break;
-
 		case UnitActionBoard:
 			file->printf("\"action-board\",");
 			break;
@@ -126,7 +123,6 @@ void SaveOrder(const COrderPtr order, CFile *file)
 		case UnitActionBuild:
 			file->printf("\"action-build\",");
 			break;
-
 		case UnitActionRepair:
 			file->printf("\"action-repair\",");
 			break;
@@ -143,12 +139,12 @@ void SaveOrder(const COrderPtr order, CFile *file)
 			DebugPrint("Unknown action in order\n");
 	}
 
-	file->printf(" \"range\", %d,", order->Range);
-	file->printf(" \"width\", %d,", order->Width);
-	file->printf(" \"height\", %d,", order->Height);
-	file->printf(" \"min-range\", %d,", order->MinRange);
-	if (order->HasGoal()) {
-		CUnit &goal = *order->GetGoal();
+	file->printf(" \"range\", %d,", order.Range);
+	file->printf(" \"width\", %d,", order.Width);
+	file->printf(" \"height\", %d,", order.Height);
+	file->printf(" \"min-range\", %d,", order.MinRange);
+	if (order.HasGoal()) {
+		CUnit &goal = *order.GetGoal();
 		if (goal.Destroyed) {
 			/* this unit is destroyed so it's not in the global unit
 			 * array - this means it won't be saved!!! */
@@ -156,38 +152,37 @@ void SaveOrder(const COrderPtr order, CFile *file)
 		}
 		file->printf(" \"goal\", \"%s\",", UnitReference(goal).c_str());
 	}
-	file->printf(" \"tile\", {%d, %d}", order->goalPos.x, order->goalPos.y);
+	file->printf(" \"tile\", {%d, %d}", order.goalPos.x, order.goalPos.y);
 
 	// Extra arg.
-	switch (order->Action) {
+	switch (order.Action) {
 		case UnitActionTrain:
 		case UnitActionUpgradeTo:
 		case UnitActionBuild:
 		case UnitActionTransformInto:
-			file->printf(", \"type\", \"%s\"", order->Arg1.Type->Ident.c_str());
+			file->printf(", \"type\", \"%s\"", order.Arg1.Type->Ident.c_str());
 		break;
 		case UnitActionPatrol:
-			file->printf(", \"patrol\", {%d, %d}",
-				order->Arg1.Patrol.x, order->Arg1.Patrol.y);
+			file->printf(", \"patrol\", {%d, %d}", order.Arg1.Patrol.x, order.Arg1.Patrol.y);
 			break;
 		case UnitActionSpellCast:
-			if (order->Arg1.Spell) {
-				file->printf(", \"spell\", \"%s\"", order->Arg1.Spell->Ident.c_str());
+			if (order.Arg1.Spell) {
+				file->printf(", \"spell\", \"%s\"", order.Arg1.Spell->Ident.c_str());
 			}
 			break;
 		case UnitActionResearch:
-			if (order->Arg1.Upgrade) {
-				file->printf(", \"upgrade\", \"%s\"", order->Arg1.Upgrade->Ident.c_str());
+			if (order.Arg1.Upgrade) {
+				file->printf(", \"upgrade\", \"%s\"", order.Arg1.Upgrade->Ident.c_str());
 			}
 			break;
 		case UnitActionResource :
 		case UnitActionReturnGoods :
-			if (order->CurrentResource) {
-				file->printf(", \"current-resource\", \"%s\",", DefaultResourceNames[order->CurrentResource].c_str());
-				const CUnit *mine = order->Arg1.Resource.Mine;
+			if (order.CurrentResource) {
+				file->printf(", \"current-resource\", \"%s\",", DefaultResourceNames[order.CurrentResource].c_str());
+				const CUnit *mine = order.Arg1.Resource.Mine;
 
 				if (mine == NULL) {
-					const Vec2i &pos = order->Arg1.Resource.Pos;
+					const Vec2i &pos = order.Arg1.Resource.Pos;
 
 					file->printf(" \"resource-pos\", {%d, %d}", pos.x, pos.y);
 				} else {
@@ -203,7 +198,92 @@ void SaveOrder(const COrderPtr order, CFile *file)
 		default:
 			break;
 	}
+	//
+	//  Order data part
+	//
+	switch (order.Action) {
+		case UnitActionStill:
+			// FIXME: support other resource types
+			if (unit.Type->GivesResource) {
+				file->printf(", \"resource-active\", %d", order.Data.Resource.Active);
+				if (unit.Type->CanHarvest) {
+					file->printf(", \"data-resource\", {\"assigned\", %d", order.Data.Resource.Assigned);
+					if (order.Data.Resource.Workers) {
+						if (order.Data.Resource.Workers->Destroyed) {
+							/* this unit is destroyed so it's not in the global unit
+							* array - this means it won't be saved!!! */
+							printf ("FIXME: storing destroyed Worker - loading will fail.\n");
+						}
+						file->printf(", \"first-worker\", \"%s\"",
+							UnitReference(*order.Data.Resource.Workers).c_str());
+					}
+					file->printf("}");
+				}
+			}
+			break;
+		case UnitActionResource:
+			file->printf(", \"data-res-worker\", {\"time-to-harvest\", %d", order.Data.ResWorker.TimeToHarvest);
+			if (order.Data.ResWorker.DoneHarvesting) {
+				file->printf(", \"done-harvesting\"");
+			}
+			file->printf("}");
+			break;
+		case UnitActionBuilt:
+		{
+			CConstructionFrame *cframe;
+			int frame;
 
+			cframe = unit.Type->Construction->Frames;
+			frame = 0;
+			while (cframe != order.Data.Built.Frame) {
+				cframe = cframe->Next;
+				++frame;
+			}
+			file->printf(",\n  \"data-built\", {");
+
+			if (order.Data.Built.Worker) {
+				file->printf("\"worker\", \"%s\", ", UnitReference(*order.Data.Built.Worker).c_str());
+			}
+			file->printf("\"progress\", %d, \"frame\", %d", order.Data.Built.Progress, frame);
+			if (order.Data.Built.Cancel) {
+				file->printf(", \"cancel\"");
+			}
+			file->printf("}");
+			break;
+		}
+		case UnitActionResearch:
+			file->printf(",\n  \"data-research\", {");
+			file->printf("\"ident\", \"%s\"", order.Data.Research.Upgrade->Ident.c_str());
+			file->printf("}");
+			break;
+		case UnitActionUpgradeTo:
+			file->printf(",\n  \"data-upgrade-to\", {");
+			file->printf("\"ticks\", %d", order.Data.UpgradeTo.Ticks);
+			file->printf("}");
+			break;
+		case UnitActionTrain:
+			file->printf(",\n  \"data-train\", {");
+			file->printf("\"ticks\", %d ", order.Data.Train.Ticks);
+			file->printf("}");
+			break;
+		default:
+			file->printf(",\n  \"data-move\", {");
+			if (order.Data.Move.Cycles) {
+				file->printf("\"cycles\", %d,", order.Data.Move.Cycles);
+			}
+			if (order.Data.Move.Fast) {
+				file->printf("\"fast\", ");
+			}
+			if (order.Data.Move.Length > 0) {
+				file->printf("\"path\", {");
+				for (int i = 0; i < order.Data.Move.Length; ++i) {
+					file->printf("%d, ", order.Data.Move.Path[i]);
+				}
+				file->printf("}");
+			}
+			file->printf("}");
+			break;
+	}
 	file->printf("}");
 }
 
@@ -390,106 +470,17 @@ void SaveUnit(const CUnit &unit, CFile *file)
 	file->printf("\"orders\", {");
 	for (i = 0; i < unit.OrderCount; ++i) {
 		file->printf("\n ");
-		SaveOrder(unit.Orders[i], file);
+		SaveOrder(*unit.Orders[i], unit, file);
 		if (i < unit.OrderCount - 1) {
 			file->printf(",");
 		}
 	}
 	file->printf("},\n  \"saved-order\", ");
-	SaveOrder((COrderPtr)(&unit.SavedOrder), file);
+	SaveOrder(unit.SavedOrder, unit, file);
 	file->printf(",\n  \"critical-order\", ");
-	SaveOrder((COrderPtr)(&unit.CriticalOrder), file);
+	SaveOrder(unit.CriticalOrder, unit, file);
 	file->printf(",\n  \"new-order\", ");
-	SaveOrder((COrderPtr)(&unit.NewOrder), file);
-
-	//
-	//  Order data part
-	//
-	switch (unit.CurrentAction()) {
-		case UnitActionStill:
-			// FIXME: support other resource types
-			if (unit.Type->GivesResource) {
-				file->printf(", \"resource-active\", %d", unit.Data.Resource.Active);
-				if (unit.Type->CanHarvest) {
-					file->printf(", \"data-resource\", {\"assigned\", %d", unit.Data.Resource.Assigned);
-					if (unit.Data.Resource.Workers) {
-						if (unit.Data.Resource.Workers->Destroyed) {
-							/* this unit is destroyed so it's not in the global unit
-							* array - this means it won't be saved!!! */
-							printf ("FIXME: storing destroyed Worker - loading will fail.\n");
-						}
-						file->printf(", \"first-worker\", \"%s\"",
-							UnitReference(*unit.Data.Resource.Workers).c_str());
-					}
-					file->printf("}");
-				}
-			}
-			break;
-		case UnitActionResource:
-			file->printf(", \"data-res-worker\", {\"time-to-harvest\", %d", unit.Data.ResWorker.TimeToHarvest);
-			if (unit.Data.ResWorker.DoneHarvesting) {
-				file->printf(", \"done-harvesting\"");
-			}
-			file->printf("}");
-			break;
-		case UnitActionBuilt:
-			{
-				CConstructionFrame *cframe;
-				int frame;
-
-				cframe = unit.Type->Construction->Frames;
-				frame = 0;
-				while (cframe != unit.Data.Built.Frame) {
-					cframe = cframe->Next;
-					++frame;
-				}
-				file->printf(",\n  \"data-built\", {");
-
-				if (unit.Data.Built.Worker) {
-					file->printf("\"worker\", \"%s\", ",
-						UnitReference(*unit.Data.Built.Worker).c_str());
-				}
-				file->printf("\"progress\", %d, \"frame\", %d",
-					unit.Data.Built.Progress, frame);
-				if (unit.Data.Built.Cancel) {
-					file->printf(", \"cancel\"");
-				}
-				file->printf("}");
-				break;
-			}
-		case UnitActionResearch:
-			file->printf(",\n  \"data-research\", {");
-			file->printf("\"ident\", \"%s\"", unit.Data.Research.Upgrade->Ident.c_str());
-			file->printf("}");
-			break;
-		case UnitActionUpgradeTo:
-			file->printf(",\n  \"data-upgrade-to\", {");
-			file->printf("\"ticks\", %d", unit.Data.UpgradeTo.Ticks);
-			file->printf("}");
-			break;
-		case UnitActionTrain:
-			file->printf(",\n  \"data-train\", {");
-			file->printf("\"ticks\", %d ", unit.Data.Train.Ticks);
-			file->printf("}");
-			break;
-		default:
-			file->printf(",\n  \"data-move\", {");
-			if (unit.Data.Move.Cycles) {
-				file->printf("\"cycles\", %d,", unit.Data.Move.Cycles);
-			}
-			if (unit.Data.Move.Fast) {
-				file->printf("\"fast\", ");
-			}
-			if (unit.Data.Move.Length > 0) {
-				file->printf("\"path\", {");
-				for (i = 0; i < unit.Data.Move.Length; ++i) {
-					file->printf("%d, ", unit.Data.Move.Path[i]);
-				}
-				file->printf("}");
-			}
-			file->printf("}");
-			break;
-	}
+	SaveOrder(unit.NewOrder, unit, file);
 
 	if (unit.Goal) {
 		file->printf(",\n  \"goal\", %d", UnitNumber(*unit.Goal));

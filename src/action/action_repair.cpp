@@ -107,20 +107,20 @@ static void RepairUnit(CUnit &unit, CUnit &goal)
 	} else {
 		int costs = goal.Stats->Costs[TimeCost] * 600;
 		// hp is the current damage taken by the unit.
-		hp = (goal.Data.Built.Progress * goal.Variable[HP_INDEX].Max) /
+		hp = (goal.CurrentOrder()->Data.Built.Progress * goal.Variable[HP_INDEX].Max) /
 			costs - goal.Variable[HP_INDEX].Value;
 		//
 		// Calculate the length of the attack (repair) anim.
 		//
-		animlength = unit.Data.Repair.Cycles;
-		unit.Data.Repair.Cycles = 0;
+		animlength = unit.CurrentOrder()->Data.Repair.Cycles;
+		unit.CurrentOrder()->Data.Repair.Cycles = 0;
 
 		// FIXME: implement this below:
 		//unit.Data.Built.Worker->Type->BuilderSpeedFactor;
-		goal.Data.Built.Progress += 100 * animlength * SpeedBuild;
+		goal.CurrentOrder()->Data.Built.Progress += 100 * animlength * SpeedBuild;
 		// Keep the same level of damage while increasing HP.
 		goal.Variable[HP_INDEX].Value =
-			(goal.Data.Built.Progress * goal.Stats->Variables[HP_INDEX].Max) /
+			(goal.CurrentOrder()->Data.Built.Progress * goal.Stats->Variables[HP_INDEX].Max) /
 			costs - hp;
 		if (goal.Variable[HP_INDEX].Value > goal.Variable[HP_INDEX].Max) {
 			goal.Variable[HP_INDEX].Value = goal.Variable[HP_INDEX].Max;
@@ -151,7 +151,7 @@ void HandleActionRepair(CUnit &unit)
 
 	switch (unit.SubAction) {
 		case 0:
-			NewResetPath(unit);
+			NewResetPath(*unit.CurrentOrder());
 			unit.SubAction = 1;
 			// FALL THROUGH
 		//
@@ -178,7 +178,7 @@ void HandleActionRepair(CUnit &unit)
 						// FIXME: should I clear this here?
 						unit.CurrentOrder()->ClearGoal();
 						goal = NULL;
-						NewResetPath(unit);
+						NewResetPath(*unit.CurrentOrder());
 					}
 				} else if (unit.Player->AiEnabled) {
 					// Ai players workers should stop if target is killed
@@ -192,7 +192,7 @@ void HandleActionRepair(CUnit &unit)
 						goal->Variable[HP_INDEX].Value < goal->Variable[HP_INDEX].Max) {
 					unit.State = 0;
 					unit.SubAction = 2;
-					unit.Data.Repair.Cycles = 0;
+					unit.CurrentOrder()->Data.Repair.Cycles = 0;
 					const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
 					UnitHeadingFromDeltaXY(unit, dir);
 				} else if (err < 0) {
@@ -214,7 +214,7 @@ void HandleActionRepair(CUnit &unit)
 		//
 		case 2:
 			AnimateActionRepair(unit);
-			unit.Data.Repair.Cycles++;
+			unit.CurrentOrder()->Data.Repair.Cycles++;
 			if (!unit.Anim.Unbreakable) {
 				goal = unit.CurrentOrder()->GetGoal();
 
@@ -230,7 +230,7 @@ void HandleActionRepair(CUnit &unit)
 						// FIXME: should I clear this here?
 						unit.CurrentOrder()->ClearGoal();
 						goal = NULL;
-						NewResetPath(unit);
+						NewResetPath(*unit.CurrentOrder());
 					} else {
 						int dist = unit.MapDistanceTo(*goal);
 						if (dist <= unit.Type->RepairRange) {

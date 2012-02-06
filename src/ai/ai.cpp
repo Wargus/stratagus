@@ -375,7 +375,7 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 		for (i = 0; i < s; ++i) {
 			AiTransportRequest *ptr = &ai->TransportRequests[i];
 			file->printf("{%d, ", UnitNumber(*ptr->Unit));
-			SaveOrder(&ptr->Order, file);
+			SaveOrder(ptr->Order, *ptr->Unit, file);
 			file->printf("}, ");
 		}
 		file->printf("},\n");

@@ -265,7 +265,7 @@ int NewPath(CUnit &unit)
 		gx = order->goalPos.x;
 		gy = order->goalPos.y;
 	}
-	path = unit.Data.Move.Path;
+	path = unit.CurrentOrder()->Data.Move.Path;
 	i = AStarFindPath(unit.tilePos.x, unit.tilePos.y, gx, gy, gw, gh,
 		unit.Type->TileWidth, unit.Type->TileHeight,
 		 minrange, maxrange, path, MAX_PATH_LENGTH, &unit);
@@ -278,12 +278,12 @@ int NewPath(CUnit &unit)
 
 	if (path != NULL) {
 		if (i >= MAX_PATH_LENGTH) {
-			unit.Data.Move.Length = MAX_PATH_LENGTH;
+			unit.CurrentOrder()->Data.Move.Length = MAX_PATH_LENGTH;
 		} else {
-			unit.Data.Move.Length = i;
+			unit.CurrentOrder()->Data.Move.Length = i;
 		}
-		if (unit.Data.Move.Length == 0) {
-			++unit.Data.Move.Length;
+		if (unit.CurrentOrder()->Data.Move.Length == 0) {
+			++unit.CurrentOrder()->Data.Move.Length;
 		}
 	}
 	return i;
@@ -310,12 +310,12 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 	*pyd = 0;
 
 	// Goal has moved, need to recalculate path or no cached path
-	if (unit.Data.Move.Length <= 0 ||
+	if (unit.CurrentOrder()->Data.Move.Length <= 0 ||
 		((goal = order->GetGoal()) && goal->tilePos != order->goalPos)) {
 		result = NewPath(unit);
 
 		if (result == PF_UNREACHABLE) {
-			unit.Data.Move.Length = 0;
+			unit.CurrentOrder()->Data.Move.Length = 0;
 			return result;
 		}
 		if (result == PF_REACHED) {
@@ -327,42 +327,42 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 		}
 	}
 
-	*pxd = Heading2X[(int)unit.Data.Move.Path[(int)unit.Data.Move.Length - 1]];
-	*pyd = Heading2Y[(int)unit.Data.Move.Path[(int)unit.Data.Move.Length - 1]];
+	*pxd = Heading2X[(int)unit.CurrentOrder()->Data.Move.Path[(int)unit.CurrentOrder()->Data.Move.Length - 1]];
+	*pyd = Heading2Y[(int)unit.CurrentOrder()->Data.Move.Path[(int)unit.CurrentOrder()->Data.Move.Length - 1]];
 	const Vec2i dir = {*pxd, *pyd};
-	result = unit.Data.Move.Length;
-	unit.Data.Move.Length--;
+	result = unit.CurrentOrder()->Data.Move.Length;
+	unit.CurrentOrder()->Data.Move.Length--;
 	if (!UnitCanBeAt(unit, unit.tilePos + dir)) {
 		// If obstructing unit is moving, wait for a bit.
-		if (unit.Data.Move.Fast) {
-			unit.Data.Move.Fast--;
+		if (unit.CurrentOrder()->Data.Move.Fast) {
+			unit.CurrentOrder()->Data.Move.Fast--;
 			AstarDebugPrint("WAIT at %d\n" _C_ unit.Data.Move.Fast);
 			result = PF_WAIT;
 		} else {
-			unit.Data.Move.Fast = 10;
+			unit.CurrentOrder()->Data.Move.Fast = 10;
 			AstarDebugPrint("SET WAIT to 10\n");
 			result = PF_WAIT;
 		}
-		if (unit.Data.Move.Fast == 0 && result != 0) {
+		if (unit.CurrentOrder()->Data.Move.Fast == 0 && result != 0) {
 			AstarDebugPrint("WAIT expired\n");
 			result = NewPath(unit);
 			if (result > 0) {
-				*pxd = Heading2X[(int)unit.Data.Move.Path[(int)unit.Data.Move.Length - 1]];
-				*pyd = Heading2Y[(int)unit.Data.Move.Path[(int)unit.Data.Move.Length - 1]];
+				*pxd = Heading2X[(int)unit.CurrentOrder()->Data.Move.Path[(int)unit.CurrentOrder()->Data.Move.Length - 1]];
+				*pyd = Heading2Y[(int)unit.CurrentOrder()->Data.Move.Path[(int)unit.CurrentOrder()->Data.Move.Length - 1]];
 				if (!UnitCanBeAt(unit, unit.tilePos + dir)) {
 					// There may be unit in the way, Astar may allow you to walk onto it.
 					result = PF_UNREACHABLE;
 					*pxd = 0;
 					*pyd = 0;
 				} else {
-					result = unit.Data.Move.Length;
-					unit.Data.Move.Length--;
+					result = unit.CurrentOrder()->Data.Move.Length;
+					unit.CurrentOrder()->Data.Move.Length--;
 				}
 			}
 		}
 	}
 	if (result != PF_WAIT) {
-		unit.Data.Move.Fast = 0;
+		unit.CurrentOrder()->Data.Move.Fast = 0;
 	}
 	return result;
 }

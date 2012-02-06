@@ -66,7 +66,7 @@ static int MoveToTransporter(CUnit &unit)
 	// We have to reset a lot, or else they will circle each other and stuff.
 	if (oldPos != unit.tilePos) {
 		unit.CurrentOrder()->Range = 1;
-		NewResetPath(unit);
+		NewResetPath(*unit.CurrentOrder());
 	}
 	// New code has this as default.
 	Assert(unit.CurrentAction() == UnitActionBoard);
@@ -202,7 +202,7 @@ void HandleActionBoard(CUnit &unit)
 				unit.Wait--;
 				return;
 			}
-			NewResetPath(unit);
+			NewResetPath(*unit.CurrentOrder());
 			unit.SubAction = 1;
 			// FALL THROUGH
 		default:

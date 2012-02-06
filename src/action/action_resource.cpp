@@ -83,7 +83,7 @@ static int MoveToResource_Terrain(CUnit &unit)
 			return -1;
 		} else {
 			unit.CurrentOrder()->goalPos = pos;
-			NewResetPath(unit);
+			NewResetPath(*unit.CurrentOrder());
 		}
 	}
 	switch (DoActionMove(unit)) {
@@ -92,7 +92,7 @@ static int MoveToResource_Terrain(CUnit &unit)
 			if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 9999,
 					unit.Player, unit.tilePos, &pos)) {
 				unit.CurrentOrder()->goalPos = pos;
-				NewResetPath(unit);
+				NewResetPath(*unit.CurrentOrder());
 				DebugPrint("Found a better place to harvest %d,%d\n" _C_ pos.x _C_ pos.y);
 				// FIXME: can't this overflow? It really shouldn't, since
 				// x and y are really supossed to be reachable, checked thorugh a flood fill.
@@ -164,8 +164,8 @@ static void UnitGotoGoal(CUnit &unit, CUnit *const goal, int mode)
 	unit.SubAction = mode;
 	unit.State = 0;
 	if (mode == SUB_MOVE_TO_DEPOT || mode == SUB_MOVE_TO_RESOURCE) {
-		unit.Data.Move.Cycles = 0; //moving counter
-		NewResetPath(unit);
+		unit.CurrentOrder()->Data.Move.Cycles = 0; //moving counter
+		NewResetPath(*unit.CurrentOrder());
 	}
 }
 
@@ -193,11 +193,11 @@ static int StartGathering(CUnit &unit)
 #endif
 		UnitHeadingFromDeltaXY(unit, unit.CurrentOrder()->goalPos - unit.tilePos);
 		if (resinfo.WaitAtResource) {
-			unit.Data.ResWorker.TimeToHarvest = resinfo.WaitAtResource / SpeedResourcesHarvest[resinfo.ResourceId];
+			unit.CurrentOrder()->Data.ResWorker.TimeToHarvest = resinfo.WaitAtResource / SpeedResourcesHarvest[resinfo.ResourceId];
 		} else {
-			unit.Data.ResWorker.TimeToHarvest = 1;
+			unit.CurrentOrder()->Data.ResWorker.TimeToHarvest = 1;
 		}
-		unit.Data.ResWorker.DoneHarvesting = 0;
+		unit.CurrentOrder()->Data.ResWorker.DoneHarvesting = 0;
 		return 1;
 	}
 
@@ -232,7 +232,7 @@ static int StartGathering(CUnit &unit)
 	// If resource is still under construction, wait!
 	//
 	if ((goal->Type->MaxOnBoard &&
-		 goal->Data.Resource.Active >= goal->Type->MaxOnBoard) ||
+		 goal->CurrentOrder()->Data.Resource.Active >= goal->Type->MaxOnBoard) ||
 			goal->CurrentAction() == UnitActionBuilt) {
 		// FIXME: Determine somehow when the resource will be free to use
 		// FIXME: Could we somehow find another resource? Think minerals
@@ -258,15 +258,15 @@ static int StartGathering(CUnit &unit)
 	}
 
 	// Activate the resource
-	goal->Data.Resource.Active++;
+	goal->CurrentOrder()->Data.Resource.Active++;
 
 	if (resinfo.WaitAtResource) {
-		unit.Data.ResWorker.TimeToHarvest = resinfo.WaitAtResource / SpeedResourcesHarvest[resinfo.ResourceId];
+		unit.CurrentOrder()->Data.ResWorker.TimeToHarvest = resinfo.WaitAtResource / SpeedResourcesHarvest[resinfo.ResourceId];
 	} else {
-		unit.Data.ResWorker.TimeToHarvest = 1;
+		unit.CurrentOrder()->Data.ResWorker.TimeToHarvest = 1;
 	}
 
-	unit.Data.ResWorker.DoneHarvesting = 0;
+	unit.CurrentOrder()->Data.ResWorker.DoneHarvesting = 0;
 
 	return 1;
 }
@@ -372,9 +372,9 @@ static int GatherResource(CUnit &unit)
 		unit.Anim.CurrAnim = NULL;
 	}
 
-	unit.Data.ResWorker.TimeToHarvest--;
+	unit.CurrentOrder()->Data.ResWorker.TimeToHarvest--;
 
-	if (unit.Data.ResWorker.DoneHarvesting) {
+	if (unit.CurrentOrder()->Data.ResWorker.DoneHarvesting) {
 		Assert(resinfo.HarvestFromOutside || resinfo.TerrainHarvester);
 		return !unit.Anim.Unbreakable;
 	}
@@ -392,13 +392,13 @@ static int GatherResource(CUnit &unit)
 		// No wood? Freeze!!!
 	}
 
-	while (!unit.Data.ResWorker.DoneHarvesting &&
-			unit.Data.ResWorker.TimeToHarvest < 0) {
+	while (!unit.CurrentOrder()->Data.ResWorker.DoneHarvesting &&
+			unit.CurrentOrder()->Data.ResWorker.TimeToHarvest < 0) {
 		//FIXME: rb - how should it look for WaitAtResource == 0
 		if (resinfo.WaitAtResource) {
-			unit.Data.ResWorker.TimeToHarvest += resinfo.WaitAtResource / SpeedResourcesHarvest[resinfo.ResourceId];
+			unit.CurrentOrder()->Data.ResWorker.TimeToHarvest += resinfo.WaitAtResource / SpeedResourcesHarvest[resinfo.ResourceId];
 		} else {
-			unit.Data.ResWorker.TimeToHarvest += 1;
+			unit.CurrentOrder()->Data.ResWorker.TimeToHarvest += 1;
 		}
 
 		//
@@ -463,12 +463,12 @@ static int GatherResource(CUnit &unit)
 						LoseResource(*uins, *source);
 					}
 				}
-				if (source->Data.Resource.Workers) {
-					CUnit *next, *worker = source->Data.Resource.Workers;
+				if (source->CurrentOrder()->Data.Resource.Workers) {
+					CUnit *next, *worker = source->CurrentOrder()->Data.Resource.Workers;
 					for (; NULL != worker; worker = next)
 					{
 							worker->RefsDecrease();
-							source->Data.Resource.Assigned--;
+							source->CurrentOrder()->Data.Resource.Assigned--;
 							/* next == mine */
 							next = worker->CurrentOrder()->Arg1.Resource.Mine;
 							if (next) {
@@ -481,7 +481,7 @@ static int GatherResource(CUnit &unit)
 							worker->NextWorker = NULL;
 					}
 					//Assert(source->Data.Resource.Assigned == 0);
-					source->Data.Resource.Workers = NULL;
+					source->CurrentOrder()->Data.Resource.Workers = NULL;
 				}
 				// Don't destroy the resource twice.
 				// This only happens when it's empty.
@@ -496,14 +496,14 @@ static int GatherResource(CUnit &unit)
 		if (resinfo.TerrainHarvester) {
 			if (unit.ResourcesHeld == resinfo.ResourceCapacity) {
 				// Mark as complete.
-				unit.Data.ResWorker.DoneHarvesting = 1;
+				unit.CurrentOrder()->Data.ResWorker.DoneHarvesting = 1;
 			}
 			return 0;
 		} else
 			if (resinfo.HarvestFromOutside) {
 				if ((unit.ResourcesHeld == resinfo.ResourceCapacity) || (source == NULL)) {
 					// Mark as complete.
-					unit.Data.ResWorker.DoneHarvesting = 1;
+					unit.CurrentOrder()->Data.ResWorker.DoneHarvesting = 1;
 				}
 				return 0;
 			} else {
@@ -516,14 +516,14 @@ static int GatherResource(CUnit &unit)
 int GetNumWaitingWorkers(const CUnit &mine)
 {
 	int ret = 0;
-	CUnit *worker = mine.Data.Resource.Workers;
+	CUnit *worker = mine.CurrentOrder()->Data.Resource.Workers;
 
 	for (int i = 0; NULL != worker; worker = worker->NextWorker, ++i)
 	{
 		if (worker->SubAction == SUB_START_GATHERING && worker->Wait) {
 			ret++;
 		}
-		Assert(i <= mine.Data.Resource.Assigned);
+		Assert(i <= mine.CurrentOrder()->Data.Resource.Assigned);
 	}
 	return ret;
 }
@@ -547,10 +547,10 @@ static int StopGathering(CUnit &unit)
 		} else {
 			source = unit.Container;
 		}
-		source->Data.Resource.Active--;
-		Assert(source->Data.Resource.Active >= 0);
+		source->CurrentOrder()->Data.Resource.Active--;
+		Assert(source->CurrentOrder()->Data.Resource.Active >= 0);
 
-		if (!resinfo.HarvestFromOutside && source->Data.Resource.Active == 0) {
+		if (!resinfo.HarvestFromOutside && source->CurrentOrder()->Data.Resource.Active == 0) {
 			source->SubAction = 1;
 		}
 		//Store resource position.
@@ -562,7 +562,7 @@ static int StopGathering(CUnit &unit)
 
 		if (source->Type->MaxOnBoard) {
 			int count = 0;
-			CUnit *worker = source->Data.Resource.Workers;
+			CUnit *worker = source->CurrentOrder()->Data.Resource.Workers;
 			CUnit *next = NULL;
 			for(; NULL != worker; worker = worker->NextWorker)
 			{
@@ -581,7 +581,7 @@ static int StopGathering(CUnit &unit)
 					DebugPrint("%d: Worker %d report: Unfreez resource gathering of %d <Wait %d> on %d [Assigned: %d Waiting %d].\n"
 						_C_ unit.Player->Index _C_ unit.Slot
 						_C_ next->Slot _C_ next->Wait
-						_C_ source->Slot _C_ source->Data.Resource.Assigned
+						_C_ source->Slot _C_ source->CurrentOrder()->Data.Resource.Assigned
 						_C_ count);
 				}
 				next->Wait = 0;
@@ -687,7 +687,7 @@ static int MoveToDepot(CUnit &unit)
 	}
 
 	// Not ready
-	if (unit.Player->AiEnabled && unit.Data.Move.Cycles > 300)
+	if (unit.Player->AiEnabled && unit.CurrentOrder()->Data.Move.Cycles > 300)
 	{
 		AiNewDepotRequest(unit);
 	}
@@ -955,7 +955,7 @@ void HandleActionResource(CUnit &unit)
 	if (unit.SubAction == SUB_STOP_GATHERING) {
 		if (StopGathering(unit)) {
 			unit.SubAction = SUB_MOVE_TO_DEPOT;
-			unit.Data.Move.Cycles = 0; //moving counter
+			unit.CurrentOrder()->Data.Move.Cycles = 0; //moving counter
 		} else
 			return;
 	}

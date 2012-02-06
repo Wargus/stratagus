@@ -65,7 +65,7 @@ static void UpdateConstructionFrame(CUnit &unit)
 	CConstructionFrame *tmp;
 	int percent;
 
-	percent = unit.Data.Built.Progress /
+	percent = unit.CurrentOrder()->Data.Built.Progress /
 		(unit.Type->Stats[unit.Player->Index].Costs[TimeCost] * 6);
 	cframe = tmp = unit.Type->Construction->Frames;
 	while (tmp) {
@@ -75,8 +75,8 @@ static void UpdateConstructionFrame(CUnit &unit)
 		cframe = tmp;
 		tmp = tmp->Next;
 	}
-	if (cframe != unit.Data.Built.Frame) {
-		unit.Data.Built.Frame = cframe;
+	if (cframe != unit.CurrentOrder()->Data.Built.Frame) {
+		unit.CurrentOrder()->Data.Built.Frame = cframe;
 		if (unit.Frame < 0) {
 			unit.Frame = -cframe->Frame - 1;
 		} else {
@@ -95,7 +95,7 @@ static void MoveToLocation(CUnit &unit)
 	// First entry
 	if (!unit.SubAction) {
 		unit.SubAction = 1;
-		NewResetPath(unit);
+		NewResetPath(*unit.CurrentOrder());
 	}
 
 	if (unit.Wait) {
@@ -299,7 +299,7 @@ static void StartBuilding(CUnit &unit, CUnit &ontop)
 	build->Player->UnitTypesCount[type.Slot]--;
 
 	// Make sure the bulding doesn't cancel itself out right away.
-	build->Data.Built.Progress = 0;//FIXME ? 100 : 0
+	build->CurrentOrder()->Data.Built.Progress = 0;//FIXME ? 100 : 0
 	build->Variable[HP_INDEX].Value = 1;
 	if (build->Variable[SHIELD_INDEX].Max)
 		build->Variable[SHIELD_INDEX].Value = 1;
@@ -309,7 +309,7 @@ static void StartBuilding(CUnit &unit, CUnit &ontop)
 	if (!type.BuilderOutside) {
 		//FIXME: cancel buld gen crash
 		// Place the builder inside the building
-		build->Data.Built.Worker = &unit;
+		build->CurrentOrder()->Data.Built.Worker = &unit;
 		// HACK: allows the unit to be removed
 		build->CurrentSightRange = 1;
 		//HACK: reset anim
@@ -318,7 +318,7 @@ static void StartBuilding(CUnit &unit, CUnit &ontop)
 		build->CurrentSightRange = 0;
 		unit.tilePos = pos;
 		order->Action = UnitActionBuild;
-		unit.Data.Build.Cycles = 0;
+		unit.CurrentOrder()->Data.Build.Cycles = 0;
 		unit.SubAction = 40;
 		order->SetGoal(build);
 		if (unit.Selected) {
@@ -349,7 +349,7 @@ static void BuildBuilding(CUnit &unit)
 {
 
 	UnitShowAnimation(unit, unit.Type->Animations->Build);
-	unit.Data.Build.Cycles++;
+	unit.CurrentOrder()->Data.Build.Cycles++;
 	if (unit.Anim.Unbreakable) {
 		return ;
 	}
@@ -358,7 +358,7 @@ static void BuildBuilding(CUnit &unit)
 	// Calculate the length of the attack (repair) anim.
 	//
 	//int animlength = unit.Data.Build.Cycles;
-	unit.Data.Build.Cycles = 0;
+	unit.CurrentOrder()->Data.Build.Cycles = 0;
 #if 0
 	CUnit *goal;
 	int hp;
@@ -379,12 +379,12 @@ static void BuildBuilding(CUnit &unit)
 	}
 
 	// hp is the current damage taken by the unit.
-	hp = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) /
+	hp = (goal->CurrentOrder()->Data.Built.Progress * goal->Variable[HP_INDEX].Max) /
 		(goal->Stats->Costs[TimeCost] * 600) - goal->Variable[HP_INDEX].Value;
 
 	// FIXME: implement this below:
-	// unit.Data.Built.Worker->Type->BuilderSpeedFactor;
-	goal->Data.Built.Progress += 100 * animlength * SpeedBuild;
+	// unit.CurrentOrder()->Data.Built.Worker->Type->BuilderSpeedFactor;
+	goal->CurrentOrder()->Data.Built.Progress += 100 * animlength * SpeedBuild;
 	// Keep the same level of damage while increasing HP.
 	goal->Variable[HP_INDEX].Value = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) /
 		(goal->Stats->Costs[TimeCost] * 600) - hp;
@@ -446,8 +446,8 @@ void HandleActionBuilt(CUnit &unit)
 	smod = (unit.Stats->Costs[TimeCost] * 600) - unit.Variable[SHIELD_INDEX].Value;
 
 	// n is the current damage taken by the unit.
-	n = (unit.Data.Built.Progress * unit.Variable[HP_INDEX].Max + (mod - 1)) / mod;
-	sn = (unit.Data.Built.Progress * unit.Variable[SHIELD_INDEX].Max + (smod - 1)) / smod;
+	n = (unit.CurrentOrder()->Data.Built.Progress * unit.Variable[HP_INDEX].Max + (mod - 1)) / mod;
+	sn = (unit.CurrentOrder()->Data.Built.Progress * unit.Variable[SHIELD_INDEX].Max + (smod - 1)) / smod;
 
 	// This below is most often 0
 	if (type->BuilderOutside) {
@@ -459,14 +459,14 @@ void HandleActionBuilt(CUnit &unit)
 	}
 	// Building speeds increase or decrease.
 	progress *= SpeedBuild;
-	oldprogress = unit.Data.Built.Progress;
-	unit.Data.Built.Progress += progress;
+	oldprogress = unit.CurrentOrder()->Data.Built.Progress;
+	unit.CurrentOrder()->Data.Built.Progress += progress;
 	// mod is use for round to upper and use it as cache
 	mod = type->Stats[unit.Player->Index].Costs[TimeCost] * 600;
 
 	// Keep the same level of damage while increasing HP.
 	unit.Variable[HP_INDEX].Value +=
-	 (unit.Data.Built.Progress * unit.Variable[HP_INDEX].Max + (mod - n - 1)) / (mod - n) -
+	 (unit.CurrentOrder()->Data.Built.Progress * unit.Variable[HP_INDEX].Max + (mod - n - 1)) / (mod - n) -
 	  (oldprogress * unit.Variable[HP_INDEX].Max + (mod - n - 1)) / (mod - n);
 	if (unit.Variable[HP_INDEX].Value > unit.Stats->Variables[HP_INDEX].Max) {
 		unit.Variable[HP_INDEX].Value = unit.Stats->Variables[HP_INDEX].Max;
@@ -474,7 +474,7 @@ void HandleActionBuilt(CUnit &unit)
 	if (unit.Variable[SHIELD_INDEX].Max > 0)
 	{
 		unit.Variable[SHIELD_INDEX].Value +=
-		 (unit.Data.Built.Progress * unit.Variable[SHIELD_INDEX].Max + (mod - sn - 1)) / (mod - sn) -
+		 (unit.CurrentOrder()->Data.Built.Progress * unit.Variable[SHIELD_INDEX].Max + (mod - sn - 1)) / (mod - sn) -
 		  (oldprogress * unit.Variable[SHIELD_INDEX].Max + (mod - sn - 1)) / (mod - sn);
 		if (unit.Variable[SHIELD_INDEX].Value > unit.Stats->Variables[SHIELD_INDEX].Max) {
 			unit.Variable[SHIELD_INDEX].Value = unit.Stats->Variables[SHIELD_INDEX].Max;
@@ -484,17 +484,17 @@ void HandleActionBuilt(CUnit &unit)
 	//
 	// Check if construction should be canceled...
 	//
-	if (unit.Data.Built.Cancel || unit.Data.Built.Progress < 0) {
+	if (unit.CurrentOrder()->Data.Built.Cancel || unit.CurrentOrder()->Data.Built.Progress < 0) {
 		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index
 				_C_ unit.Type->Name.c_str());
 		// Drop out unit
-		if ((worker = unit.Data.Built.Worker)) {
+		if ((worker = unit.CurrentOrder()->Data.Built.Worker)) {
 
 			worker->CurrentOrder()->ClearGoal();
 			worker->ClearAction();
 			//worker->State = 0;
 
-			unit.Data.Built.Worker = NoUnitP;
+			unit.CurrentOrder()->Data.Built.Worker = NoUnitP;
 			// HACK: make sure the sight is updated correctly
 			unit.CurrentSightRange = 1;
 			DropOutOnSide(*worker, LookingW, &unit);
@@ -511,8 +511,8 @@ void HandleActionBuilt(CUnit &unit)
 	//
 	// Check if building ready. Note we can both build and repair.
 	//
-	//if (unit.Data.Built.Progress >= unit.Stats->Costs[TimeCost] * 600 ||
-	if (!unit.Data.Built.Worker->Anim.Unbreakable && (unit.Data.Built.Progress >= mod ||
+	//if (unit.CurrentOrder()->Data.Built.Progress >= unit.Stats->Costs[TimeCost] * 600 ||
+	if (!unit.CurrentOrder()->Data.Built.Worker->Anim.Unbreakable && (unit.CurrentOrder()->Data.Built.Progress >= mod ||
 			unit.Variable[HP_INDEX].Value >= unit.Stats->Variables[HP_INDEX].Max)) {
 		DebugPrint("%d: Building %s(%s) ready.\n" _C_ unit.Player->Index
 		_C_ unit.Type->Ident.c_str() _C_ unit.Type->Name.c_str() );
@@ -529,7 +529,7 @@ void HandleActionBuilt(CUnit &unit)
 			unit.Frame = 0;
 		}
 
-		if ((worker = unit.Data.Built.Worker)) {
+		if ((worker = unit.CurrentOrder()->Data.Built.Worker)) {
 			// Bye bye worker.
 			if (type->BuilderLost) {
 				// FIXME: enough?
@@ -556,7 +556,7 @@ void HandleActionBuilt(CUnit &unit)
 
 		if (type->GivesResource) {
 			// Set to Zero as it's part of a union
-			memset(&unit.Data, 0, sizeof(unit.Data));
+			memset(&unit.CurrentOrder()->Data, 0, sizeof(unit.CurrentOrder()->Data));
 			// Has StartingResources, Use those
 			if (type->StartingResources) {
 				unit.ResourcesHeld = type->StartingResources;

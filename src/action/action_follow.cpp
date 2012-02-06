@@ -107,7 +107,7 @@ void HandleActionFollow(CUnit &unit)
 
 	if (!unit.SubAction) { // first entry
 		unit.SubAction = 1;
-		NewResetPath(unit);
+		NewResetPath(*unit.CurrentOrder());
 		Assert(unit.State == 0);
 	}
 
@@ -201,7 +201,7 @@ void HandleActionFollow(CUnit &unit)
 		unit.CurrentOrder()->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
 		unit.CurrentOrder()->ClearGoal();
 		goal = NoUnitP;
-		NewResetPath(unit);
+		NewResetPath(*unit.CurrentOrder());
 	}
 
 	if (!unit.Anim.Unbreakable) {

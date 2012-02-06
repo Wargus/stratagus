@@ -1569,7 +1569,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				lua_pop(l, 1);
 				queue.Unit = UnitSlots[unit];
 				lua_rawgeti(l, -1, 2);
-				CclParseOrder(l, &queue.Order);
+				CclParseOrder(l, *queue.Unit, &queue.Order);
 				lua_pop(l, 1);
 				lua_pop(l, 1);
 				ai->TransportRequests.push_back(queue);

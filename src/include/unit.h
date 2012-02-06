@@ -520,28 +520,28 @@ public:
 	/**
 	**  Unit order structure.
 	*/
-	class COrder {
-		friend void CclParseOrder(lua_State *l, COrder *order);
-		CUnit *Goal;            /// goal of the order (if any)
-
+	class COrder
+	{
 	public:
 		COrder() : Goal(NULL), Range(0), MinRange(0), Width(0),
-			Height(0),Action(UnitActionNone), CurrentResource(0)
+			Height(0), Action(UnitActionNone), CurrentResource(0)
 		{
 			goalPos.x = -1;
 			goalPos.y = -1;
-			memset(&Arg1, 0, sizeof(Arg1));
-		};
+			memset(&Arg1, 0, sizeof (Arg1));
+			memset(&Data, 0, sizeof (Data));
+		}
 		COrder(const COrder &ths);
 		~COrder() { Release(); }
 
 		void Release();
+		void ReleaseRefs(CUnit &owner);
 		COrder& operator=(const COrder &rhs);
 		bool CheckRange();
 
 		void Init() {
-			Assert(Action != UnitActionResource ||
-					(Action == UnitActionResource && Arg1.Resource.Mine == NULL));
+			Assert(Action != UnitActionResource
+					|| (Action == UnitActionResource && Arg1.Resource.Mine == NULL));
 			Action = UnitActionNone;
 			Range = 0;
 			MinRange = 0;
@@ -552,8 +552,37 @@ public:
 			goalPos.x = -1;
 			goalPos.y = -1;
 			memset(&Arg1, 0, sizeof(Arg1));
+			memset(&Data, 0, sizeof(Data));
 		};
 
+		bool HasGoal() const { return Goal != NULL; }
+
+		CUnit * GetGoal() const { return Goal; };
+
+		void SetGoal(CUnit *const new_goal)
+		{
+			if (new_goal) {
+				new_goal->RefsIncrease();
+			}
+			if (Goal) {
+				Goal->RefsDecrease();
+			}
+			Goal = new_goal;
+		}
+
+		void ClearGoal()
+		{
+			if (Goal) {
+				Goal->RefsDecrease();
+			}
+			Goal = NULL;
+		}
+
+	private:
+		friend void CclParseOrder(lua_State *l, const CUnit &unit, COrder* order);
+
+		CUnit *Goal;
+	public:
 		int Range;              /// How far away
 		unsigned int  MinRange; /// How far away minimum
 		unsigned char Width;    /// Goal Width (used when Goal is not)
@@ -575,36 +604,45 @@ public:
 			CUnitType *Type;        /// Unit-type argument used mostly for traning/building, etc.
 		} Arg1;             /// Extra command argument.
 
-		inline bool HasGoal() const
-		{
-			return Goal != NULL;
-		};
-
-		inline CUnit * GetGoal() const
-		{
-			return Goal;
-		};
-
-		inline void SetGoal(CUnit *const new_goal)
-		{
-			if (new_goal)
-			{
-				new_goal->RefsIncrease();
-			}
-			if (Goal) {
-				Goal->RefsDecrease();
-			}
-			Goal = new_goal;
-		};
-
-		inline void ClearGoal()
-		{
-			if (Goal) {
-				Goal->RefsDecrease();
-			}
-			Goal = NULL;
-		};
-
+		union _order_data_ {
+		struct _order_move_ {
+			unsigned short int Cycles;          /// how much Cycles we move.
+			char Fast;                  /// Flag fast move (one step)
+			char Length;                /// stored path length
+	#define MAX_PATH_LENGTH 28          /// max length of precalculated path
+			char Path[MAX_PATH_LENGTH]; /// directions of stored path
+		} Move; /// ActionMove,...
+		struct _order_built_ {
+			CUnit *Worker;              /// Worker building this unit
+			int Progress;               /// Progress counter, in 1/100 cycles.
+			int Cancel;                 /// Cancel construction
+			CConstructionFrame *Frame;   /// Construction frame
+		} Built; /// ActionBuilt,...
+		struct _order_build_ {
+			int Cycles;                 /// Cycles unit has been building for
+		} Build; /// ActionBuild
+		struct _order_resource_ {
+			CUnit *Workers; //pointer to first assigned worker to this resource.
+			int Assigned; /// how many units are assigned to harvesting from the resource.
+			int Active; /// how many units are harvesting from the resource.
+		} Resource; /// Resource still
+		struct _order_resource_worker_ {
+			int TimeToHarvest;          /// how much time until we harvest some more.
+			unsigned DoneHarvesting:1;  /// Harvesting done, wait for action to break.
+		} ResWorker; /// Worker harvesting
+		struct _order_repair_ {
+			int Cycles;                 /// Cycles unit has been repairing for
+		} Repair; /// Repairing unit
+		struct _order_research_ {
+			CUpgrade *Upgrade;          /// Upgrade researched
+		} Research; /// Research action
+		struct _order_upgradeto_ {
+			int Ticks; /// Ticks to complete
+		} UpgradeTo; /// Upgrade to action
+		struct _order_train_ {
+			int Ticks;                  /// Ticks to complete
+		} Train; /// Train units action
+		} Data; /// Storage room for different commands
 	};
 
 	CUnit() { Init(); }
@@ -670,7 +708,6 @@ public:
 		CriticalOrder.Init();
 		AutoCastSpell = NULL;
 		AutoRepair = 0;
-		memset(&Data, 0, sizeof(Data));
 		Goal = NULL;
 	}
 
@@ -779,46 +816,6 @@ public:
 	COrder NewOrder;             /// order for new trained units
 	COrder CriticalOrder;        /// order to do as possible in breakable animation.
 	char *AutoCastSpell;        /// spells to auto cast
-
-	union _order_data_ {
-	struct _order_move_ {
-		unsigned short int Cycles;          /// how much Cycles we move.
-		char Fast;                  /// Flag fast move (one step)
-		char Length;                /// stored path length
-#define MAX_PATH_LENGTH 28          /// max length of precalculated path
-		char Path[MAX_PATH_LENGTH]; /// directions of stored path
-	} Move; /// ActionMove,...
-	struct _order_built_ {
-		CUnit *Worker;              /// Worker building this unit
-		int Progress;               /// Progress counter, in 1/100 cycles.
-		int Cancel;                 /// Cancel construction
-		CConstructionFrame *Frame;   /// Construction frame
-	} Built; /// ActionBuilt,...
-	struct _order_build_ {
-		int Cycles;                 /// Cycles unit has been building for
-	} Build; /// ActionBuild
-	struct _order_resource_ {
-		CUnit *Workers; //pointer to first assigned worker to this resource.
-		int Assigned; /// how many units are assigned to harvesting from the resource.
-		int Active; /// how many units are harvesting from the resource.
-	} Resource; /// Resource still
-	struct _order_resource_worker_ {
-		int TimeToHarvest;          /// how much time until we harvest some more.
-		unsigned DoneHarvesting:1;  /// Harvesting done, wait for action to break.
-	} ResWorker; /// Worker harvesting
-	struct _order_repair_ {
-		int Cycles;                 /// Cycles unit has been repairing for
-	} Repair; /// Repairing unit
-	struct _order_research_ {
-		CUpgrade *Upgrade;          /// Upgrade researched
-	} Research; /// Research action
-	struct _order_upgradeto_ {
-		int Ticks; /// Ticks to complete
-	} UpgradeTo; /// Upgrade to action
-	struct _order_train_ {
-		int Ticks;                  /// Ticks to complete
-	} Train; /// Train units action
-	} Data; /// Storage room for different commands
 
 	CUnit *Goal; /// Generic/Teleporter goal pointer
 
@@ -1367,7 +1364,7 @@ extern int CanTransport(const CUnit &transporter, const CUnit &unit);
 	/// Generate a unit reference, a printable unique string for unit
 extern std::string UnitReference(const CUnit &unit);
 	/// Save an order
-extern void SaveOrder(const COrderPtr order, CFile *file);
+extern void SaveOrder(const CUnit::COrder &order, const CUnit &unit, CFile *file);
 	/// save unit-structure
 extern void SaveUnit(const CUnit &unit, CFile *file);
 	/// save all units
@@ -1520,7 +1517,7 @@ extern void SelectionCclRegister();
 // in ccl_unit.c
 
 	/// Parse order
-extern void CclParseOrder(lua_State *l, COrderPtr order);
+extern void CclParseOrder(lua_State *l, const CUnit &unit, COrderPtr order);
 	/// register CCL units features
 extern void UnitCclRegister();
 

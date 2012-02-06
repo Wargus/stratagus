@@ -95,7 +95,7 @@ void HandleActionTrain(CUnit &unit)
 {
 	// First entry
 	if (!unit.SubAction) {
-		unit.Data.Train.Ticks = 0;
+		unit.CurrentOrder()->Data.Train.Ticks = 0;
 		unit.SubAction = 1;
 	}
 
@@ -111,11 +111,11 @@ void HandleActionTrain(CUnit &unit)
 	CPlayer *player = unit.Player;
 	CUnitType &ntype = *unit.CurrentOrder()->Arg1.Type;
 	const int cost = ntype.Stats[player->Index].Costs[TimeCost];
-	unit.Data.Train.Ticks += SpeedTrain;
+	unit.CurrentOrder()->Data.Train.Ticks += SpeedTrain;
 	// FIXME: Should count down
-	if (unit.Data.Train.Ticks >= cost) {
+	if (unit.CurrentOrder()->Data.Train.Ticks >= cost) {
 
-		unit.Data.Train.Ticks = cost;
+		unit.CurrentOrder()->Data.Train.Ticks = cost;
 
 		//
 		// Check if there are still unit slots.
@@ -134,7 +134,7 @@ void HandleActionTrain(CUnit &unit)
 				AiNeedMoreSupply(*unit.Player);
 			}
 
-			unit.Data.Train.Ticks = cost;
+			unit.CurrentOrder()->Data.Train.Ticks = cost;
 			unit.Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}

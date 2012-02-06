@@ -149,7 +149,7 @@ void HandleActionTransformInto(CUnit &unit)
 void HandleActionUpgradeTo(CUnit &unit)
 {
 	if (!unit.SubAction) { // first entry
-		unit.Data.UpgradeTo.Ticks = 0;
+		unit.CurrentOrder()->Data.UpgradeTo.Ticks = 0;
 		unit.SubAction = 1;
 	}
 	unit.Type->Animations->Upgrade ?
@@ -164,8 +164,8 @@ void HandleActionUpgradeTo(CUnit &unit)
 	const CUnitStats *newstats = &newtype.Stats[player->Index];
 
 	// FIXME: Should count down here
-	unit.Data.UpgradeTo.Ticks += SpeedUpgrade;
-	if (unit.Data.UpgradeTo.Ticks < newstats->Costs[TimeCost]) {
+	unit.CurrentOrder()->Data.UpgradeTo.Ticks += SpeedUpgrade;
+	if (unit.CurrentOrder()->Data.UpgradeTo.Ticks < newstats->Costs[TimeCost]) {
 		unit.Wait = CYCLES_PER_SECOND / 6;
 		return;
 	}
