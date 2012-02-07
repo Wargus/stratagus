@@ -255,7 +255,7 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 **
 **  @param unit  Unit pointer for none action.
 */
-static void HandleActionNone(CUnit &unit)
+static void HandleActionNone(CUnit::COrder&, CUnit &unit)
 {
 	DebugPrint("FIXME: Should not happen!\n");
 	DebugPrint("FIXME: Unit (%d) %s has action none.!\n" _C_
@@ -267,7 +267,7 @@ static void HandleActionNone(CUnit &unit)
 **
 **  @param unit  Unit pointer for not written action.
 */
-static void HandleActionNotWritten(CUnit &unit)
+static void HandleActionNotWritten(CUnit::COrder&, CUnit &unit)
 {
 	DebugPrint("FIXME: Not written!\n");
 	DebugPrint("FIXME: Unit (%d) %s has action %d.!\n" _C_
@@ -279,7 +279,7 @@ static void HandleActionNotWritten(CUnit &unit)
 **
 **  @note can move function into unit structure.
 */
-static void (*HandleActionTable[256])(CUnit &) = {
+static void (*HandleActionTable[256])(CUnit::COrder&, CUnit &) = {
 	HandleActionNone,
 	HandleActionStill,
 	HandleActionStandGround,
@@ -465,9 +465,9 @@ static void HandleBuffs(CUnit &unit, int amount)
 	}
 }
 
-static void RunAction(unsigned char action, CUnit &unit)
+static void RunAction(CUnit::COrder &order, CUnit &unit)
 {
-	HandleActionTable[action](unit);
+	HandleActionTable[order.Action](order, unit);
 }
 
 
@@ -478,19 +478,16 @@ static void RunAction(unsigned char action, CUnit &unit)
 */
 static void HandleUnitAction(CUnit &unit)
 {
-	//
 	// If current action is breakable proceed with next one.
-	//
 	if (!unit.Anim.Unbreakable) {
-		if (unit.CriticalOrder.Action != UnitActionStill) {
-			HandleActionTable[unit.CriticalOrder.Action](unit);
-			unit.CriticalOrder.Action = UnitActionStill;
+		if (unit.CriticalOrder != NULL) {
+			RunAction(*unit.CriticalOrder, unit);
+			delete unit.CriticalOrder;
+			unit.CriticalOrder = NULL;
 		}
 
-		//
 		// o Look if we have a new order and old finished.
 		// o Or the order queue should be flushed.
-		//
 		if (unit.OrderCount > 1 &&
 				(unit.CurrentAction() == UnitActionStill || unit.OrderFlush)) {
 
@@ -524,10 +521,8 @@ static void HandleUnitAction(CUnit &unit)
 		}
 	}
 
-	//
 	// Select action.
-	//
-	RunAction(unit.CurrentAction(), unit);
+	RunAction(*unit.CurrentOrder(), unit);
 }
 
 /**
@@ -544,8 +539,7 @@ void UnitActions()
 	int i;
 	int tabsize;
 
-	buffsthiscycle = regenthiscycle = blinkthiscycle =
-		!(GameCycle % CYCLES_PER_SECOND);
+	buffsthiscycle = regenthiscycle = blinkthiscycle = !(GameCycle % CYCLES_PER_SECOND);
 
 	memcpy(table, Units, NumUnits * sizeof(CUnit *));
 	tabsize = NumUnits;

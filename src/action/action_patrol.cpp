@@ -75,7 +75,7 @@ static void SwapPatrolPoints(CUnit &unit)
 **
 **  @param unit  Patroling unit pointer.
 */
-void HandleActionPatrol(CUnit &unit)
+void HandleActionPatrol(CUnit::COrder& order, CUnit &unit)
 {
 	if (unit.Wait) {
 		unit.Wait--;
@@ -83,8 +83,8 @@ void HandleActionPatrol(CUnit &unit)
 	}
 
 	if (!unit.SubAction) { // first entry.
-		unit.CurrentOrder()->Data.Move.Cycles = 0; //moving counter
-		NewResetPath(*unit.CurrentOrder());
+		order.Data.Move.Cycles = 0; //moving counter
+		NewResetPath(order);
 		unit.SubAction = 1;
 	}
 
@@ -95,14 +95,14 @@ void HandleActionPatrol(CUnit &unit)
 		case PF_UNREACHABLE:
 			// Increase range and try again
 			unit.SubAction = 1;
-			if (unit.CurrentOrder()->CheckRange()) {
-				unit.CurrentOrder()->Range++;
+			if (order.CheckRange()) {
+				order.Range++;
 				break;
 			}
 			// FALL THROUGH
 		case PF_REACHED:
 			unit.SubAction = 1;
-			unit.CurrentOrder()->Range = 0;
+			order.Range = 0;
 			SwapPatrolPoints(unit);
 			break;
 		case PF_WAIT:
@@ -110,7 +110,7 @@ void HandleActionPatrol(CUnit &unit)
 			unit.SubAction++;
 			if (unit.SubAction == 5) {
 				unit.SubAction = 1;
-				unit.CurrentOrder()->Range = 0;
+				order.Range = 0;
 				SwapPatrolPoints(unit);
 			}
 			break;

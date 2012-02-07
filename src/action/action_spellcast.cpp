@@ -135,24 +135,18 @@ static void SpellMoveToTarget(CUnit &unit)
 **
 **  @param unit  Unit, for that the spell cast is handled.
 */
-void HandleActionSpellCast(CUnit &unit)
+void HandleActionSpellCast(CUnit::COrder& order, CUnit &unit)
 {
 	if (unit.Wait) {
 		unit.Wait--;
 		return;
 	}
-	COrderPtr order = unit.CurrentOrder();
-	const SpellType *spell = order->Arg1.Spell;
+	const SpellType *spell = order.Arg1.Spell;
 	switch (unit.SubAction) {
 		case 0:
-			//
 			// Check if we can cast the spell.
-			//
-			if (!CanCastSpell(unit, spell, order->GetGoal(), order->goalPos.x, order->goalPos.y)) {
-
-				//
+			if (!CanCastSpell(unit, spell, order.GetGoal(), order.goalPos.x, order.goalPos.y)) {
 				// Notify player about this problem
-				//
 				if (unit.Variable[MANA_INDEX].Value < spell->ManaCost) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
 						_("%s: not enough mana for spell: %s"),
@@ -166,8 +160,8 @@ void HandleActionSpellCast(CUnit &unit)
 				if (unit.Player->AiEnabled) {
 					DebugPrint("FIXME: do we need an AI callback?\n");
 				}
+				order.ClearGoal(); // Release references
 				unit.ClearAction();
-				order->ClearGoal(); // Release references
 				return;
 			}
 			// FIXME FIXME FIXME: Check if already in range and skip straight to 2(casting)
@@ -194,16 +188,16 @@ void HandleActionSpellCast(CUnit &unit)
 				}
 			} else {
 				// FIXME: what todo, if unit/goal is removed?
-				CUnit *goal = order->GetGoal();
+				CUnit *goal = order.GetGoal();
 				if (goal && goal != &unit && !goal->IsVisibleAsGoal(*unit.Player)) {
 					unit.ReCast = 0;
 				} else {
-					unit.ReCast = SpellCast(unit, spell, goal, order->goalPos.x, order->goalPos.y);
+					unit.ReCast = SpellCast(unit, spell, goal, order.goalPos.x, order.goalPos.y);
 				}
 			}
 			if (!unit.ReCast && unit.CurrentAction() != UnitActionDie) {
+				order.ClearGoal(); // Release references
 				unit.ClearAction();
-				order->ClearGoal(); // Release references
 			}
 			break;
 

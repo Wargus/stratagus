@@ -135,31 +135,21 @@ static int CheckForDeadGoal(CUnit &unit)
 */
 static int CheckForTargetInRange(CUnit &unit)
 {
-
-	//
 	// Target is dead?
-	//
 	if (CheckForDeadGoal(unit)) {
 		return 1;
 	}
-
 	COrderPtr order = unit.CurrentOrder();
 
-	//
 	// No goal: if meeting enemy attack it.
-	//
 	if (!order->HasGoal() &&
 		order->Action != UnitActionAttackGround &&
 		!Map.WallOnMap(order->goalPos)) {
 		CUnit *goal = AttackUnitsInReactRange(unit);
+
 		if (goal) {
-#ifdef DEBUG
-			if (unit.StoreOrder()) {
-				Assert(!order->HasGoal());
-			}
-#else
 			unit.StoreOrder();
-#endif
+
 			order->SetGoal(goal);
 			order->MinRange = unit.Type->MinAttackRange;
 			order->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
@@ -167,13 +157,11 @@ static int CheckForTargetInRange(CUnit &unit)
 			unit.SubAction |= WEAK_TARGET; // weak target
 			NewResetPath(*order);
 		}
-
-	//
 	// Have a weak target, try a better target.
-	//
 	} else if (order->HasGoal() && (unit.SubAction & WEAK_TARGET)) {
 		CUnit *goal = order->GetGoal();
 		CUnit *temp = AttackUnitsInReactRange(unit);
+
 		if (temp && temp->Type->Priority > goal->Type->Priority) {
 			unit.StoreOrder();
 			order->SetGoal(temp);
@@ -183,8 +171,7 @@ static int CheckForTargetInRange(CUnit &unit)
 	}
 
 	Assert(!unit.Type->Vanishes && !unit.Destroyed && !unit.Removed);
-	Assert(order->Action == UnitActionAttack ||
-		order->Action == UnitActionAttackGround);
+	Assert(order->Action == UnitActionAttack || order->Action == UnitActionAttackGround);
 
 	return 0;
 }
@@ -406,13 +393,10 @@ static void AttackTarget(CUnit &unit)
 **
 **  @param unit  Unit, for that the attack is handled.
 */
-void HandleActionAttack(CUnit &unit)
+void HandleActionAttack(CUnit::COrder& order, CUnit &unit)
 {
-
-	Assert(unit.CurrentAction() == UnitActionAttackGround ||
-		unit.CurrentAction() == UnitActionAttack);
-	Assert(unit.CurrentOrder()->HasGoal() ||
-		 (unit.CurrentOrder()->goalPos.x != -1 && unit.CurrentOrder()->goalPos.y != -1));
+	Assert(order.Action == UnitActionAttackGround || order.Action == UnitActionAttack);
+	Assert(order.HasGoal() || (order.goalPos.x != -1 && order.goalPos.y != -1));
 
 	if (unit.Wait) {
 		unit.Wait--;
@@ -429,8 +413,8 @@ void HandleActionAttack(CUnit &unit)
 				return;
 			}
 			// Can we already attack ?
-			if (unit.CurrentOrder()->HasGoal()) {
-				CUnit *goal = unit.CurrentOrder()->GetGoal();
+			if (order.HasGoal()) {
+				CUnit *goal = order.GetGoal();
 				 // dist between unit and unit.CurrentOrder()->Goal.
 				int dist = goal->MapDistanceTo(unit);
 				if (unit.Type->MinAttackRange < dist &&
@@ -444,7 +428,7 @@ void HandleActionAttack(CUnit &unit)
 				}
 			}
 			unit.SubAction = MOVE_TO_TARGET;
-			NewResetPath(*unit.CurrentOrder());
+			NewResetPath(order);
 			//
 			// FIXME: should use a reachable place to reduce pathfinder time.
 			//

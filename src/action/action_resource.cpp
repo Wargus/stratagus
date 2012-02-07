@@ -885,7 +885,7 @@ static bool ActionResourceInit(CUnit &unit)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionResource(CUnit &unit)
+void HandleActionResource(CUnit::COrder& order, CUnit &unit)
 {
 	if (unit.Wait) {
 		// FIXME: show idle animation while we wait?
@@ -997,15 +997,14 @@ void HandleActionResource(CUnit &unit)
 	if (unit.SubAction == SUB_RETURN_RESOURCE) {
 		if (WaitInDepot(unit)) {
 			unit.SubAction = SUB_START_RESOURCE;
-			//
+
 			// It's posible, though very rare that the unit's goal blows up
 			// this cycle, but after this unit. Thus, next frame the unit
 			// will start mining a destroyed site. If, on the otherhand we
 			// are already in SUB_MOVE_TO_RESOURCE then we can handle it.
 			// So, we pass through SUB_START_RESOURCE the very instant it
 			// goes out of the depot.
-			//
-			HandleActionResource(unit);
+			HandleActionResource(order, unit);
 		}
 		return;
 	}

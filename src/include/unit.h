@@ -537,7 +537,7 @@ public:
 		void Release();
 		void ReleaseRefs(CUnit &owner);
 		COrder& operator=(const COrder &rhs);
-		bool CheckRange();
+		bool CheckRange() const;
 
 		void Init() {
 			Assert(Action != UnitActionResource
@@ -645,7 +645,7 @@ public:
 		} Data; /// Storage room for different commands
 	};
 
-	CUnit() { Init(); }
+	CUnit() : NewOrder(NULL), CriticalOrder(NULL) { Init(); }
 
 	void Init() {
 		Refs = 0;
@@ -704,8 +704,10 @@ public:
 		OrderFlush = 0;
 		Orders.clear();
 		SavedOrder.Init();
-		NewOrder.Init();
-		CriticalOrder.Init();
+		delete NewOrder;
+		NewOrder = NULL;
+		delete CriticalOrder;
+		CriticalOrder = NULL;
 		AutoCastSpell = NULL;
 		AutoRepair = 0;
 		Goal = NULL;
@@ -812,34 +814,23 @@ public:
 	char OrderCount;            /// how many orders in queue
 	char OrderFlush;            /// cancel current order, take next
 	std::vector<COrder *> Orders; /// orders to process
-	COrder SavedOrder;           /// order to continue after current
-	COrder NewOrder;             /// order for new trained units
-	COrder CriticalOrder;        /// order to do as possible in breakable animation.
+	COrder SavedOrder;          /// order to continue after current
+	COrder *NewOrder;           /// order for new trained units
+	COrder *CriticalOrder;      /// order to do as possible in breakable animation.
 	char *AutoCastSpell;        /// spells to auto cast
 
 	CUnit *Goal; /// Generic/Teleporter goal pointer
 
-	inline COrder * CreateOrder() {
+	COrder * CreateOrder() {
 		Orders.push_back(new COrder);
 		return Orders[(int)OrderCount++];
 	}
 
-	inline COrder *CurrentOrder() const
-	{
-#if __GNUC__ <  4
-		return Orders[0];
-#else
-		return *(Orders.data());
-#endif
-	}
-	inline UnitAction CurrentAction() const
-	{
-		return (UnitAction)(CurrentOrder()->Action);
-	}
+	COrder *CurrentOrder() const { return Orders[0]; }
 
-	inline bool IsIdle() const {
-		return OrderCount == 1 && CurrentAction() == UnitActionStill;
-	}
+	UnitAction CurrentAction() const { return (UnitAction)(CurrentOrder()->Action); }
+
+	bool IsIdle() const { return OrderCount == 1 && CurrentAction() == UnitActionStill; }
 
 	inline void ClearAction() {
 		CurrentOrder()->Action = UnitActionStill;

@@ -55,7 +55,7 @@
 **
 **  @todo  FIXME: move this into action_resource?
 */
-void HandleActionReturnGoods(CUnit &unit)
+void HandleActionReturnGoods(CUnit::COrder& order, CUnit &unit)
 {
 	Assert(unit.Type->Harvester);
 
@@ -71,23 +71,23 @@ void HandleActionReturnGoods(CUnit &unit)
 	}
 
 	// If depot was destroyed search for another one.
-	if (!unit.CurrentOrder()->HasGoal()) {
+	if (!order.HasGoal()) {
 		CUnit *destu;
 
 		if (!(destu = FindDeposit(unit, 1000, unit.CurrentResource))) {
 			ResourceGiveUp(unit);
 			return;
 		}
-		unit.CurrentOrder()->SetGoal(destu);
+		order.SetGoal(destu);
 	}
 
-	unit.CurrentOrder()->Action = UnitActionResource;
+	order.Action = UnitActionResource;
 	// Somewhere on the way the loaded worker could have change Arg1
 	// Bummer, go get the closest resource to the depot
 	//FIXME!!!!!!!!!!!!!!!!!!!!
 	//unit.CurrentOrder()->Arg1.ResourcePos = -1;
 
-	NewResetPath(*unit.CurrentOrder());
+	NewResetPath(order);
 	unit.SubAction = /* SUB_MOVE_TO_DEPOT */ 70; // FIXME : Define value.
 }
 

@@ -61,29 +61,32 @@
 **  @param unit   Newly trained unit.
 **  @param order  New order for the unit.
 **
-**  @return  1 if the the unit can do it, 0 otherwise.
+**  @return  true if the the unit can do it, false otherwise.
 */
-static int CanHandleOrder(CUnit &unit, COrderPtr order)
+static bool CanHandleOrder(CUnit &unit, COrderPtr order)
 {
+	if (order == NULL) {
+		return false;
+	}
 	if (order->Action == UnitActionResource) {
 		//  Check if new unit can harvest.
 		if (!unit.Type->Harvester) {
-			return 0;
+			return false;
 		}
 		//  Also check if new unit can harvest this specific resource.
 		CUnit *goal = order->GetGoal();
 		if (goal && !unit.Type->ResInfo[goal->Type->GivesResource]) {
-			return 0;
+			return false;
 		}
-		return 1;
+		return true;
 	}
 	if (order->Action == UnitActionAttack && !unit.Type->CanAttack) {
-		return 0;
+		return false;
 	}
 	if (order->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand) {
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
 /**
@@ -91,11 +94,11 @@ static int CanHandleOrder(CUnit &unit, COrderPtr order)
 **
 **  @param unit  Unit that trains.
 */
-void HandleActionTrain(CUnit &unit)
+void HandleActionTrain(CUnit::COrder& order, CUnit &unit)
 {
 	// First entry
 	if (!unit.SubAction) {
-		unit.CurrentOrder()->Data.Train.Ticks = 0;
+		order.Data.Train.Ticks = 0;
 		unit.SubAction = 1;
 	}
 
@@ -109,32 +112,27 @@ void HandleActionTrain(CUnit &unit)
 	}
 
 	CPlayer *player = unit.Player;
-	CUnitType &ntype = *unit.CurrentOrder()->Arg1.Type;
+	CUnitType &ntype = *order.Arg1.Type;
 	const int cost = ntype.Stats[player->Index].Costs[TimeCost];
-	unit.CurrentOrder()->Data.Train.Ticks += SpeedTrain;
+	order.Data.Train.Ticks += SpeedTrain;
 	// FIXME: Should count down
-	if (unit.CurrentOrder()->Data.Train.Ticks >= cost) {
+	if (order.Data.Train.Ticks >= cost) {
+		order.Data.Train.Ticks = cost;
 
-		unit.CurrentOrder()->Data.Train.Ticks = cost;
-
-		//
 		// Check if there are still unit slots.
-		//
 		if (NumUnits >= UnitMax) {
 			unit.Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
 
-		//
 		// Check if enough supply available.
-		//
 		const int food = player->CheckLimits(ntype);
 		if (food < 0) {
 			if (food == -3 && unit.Player->AiEnabled) {
 				AiNeedMoreSupply(*unit.Player);
 			}
 
-			unit.CurrentOrder()->Data.Train.Ticks = cost;
+			order.Data.Train.Ticks = cost;
 			unit.Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
@@ -184,23 +182,24 @@ void HandleActionTrain(CUnit &unit)
 				unit.SubAction = 0;
 			}
 
-			if (!CanHandleOrder(*nunit, &unit.NewOrder)) {
-				DebugPrint("Wrong order for unit\n");
+			if (unit.NewOrder && unit.NewOrder->HasGoal()
+				&& unit.NewOrder->GetGoal()->Destroyed) {
+				// FIXME: perhaps we should use another goal?
+				DebugPrint("Destroyed unit in train unit\n");
 
+				delete unit.NewOrder;
+				unit.NewOrder = NULL;
+			}
+
+			if (CanHandleOrder(*nunit, unit.NewOrder) == true) {
+				*(nunit->CurrentOrder()) = *unit.NewOrder;
+#if 0
+			} else {
 				// Tell the unit to move instead of trying any funny stuff.
 				*(nunit->CurrentOrder()) = unit.NewOrder;
 				nunit->CurrentOrder()->Action = UnitActionMove;
 				nunit->CurrentOrder()->ClearGoal();
-			} else {
-				if (unit.NewOrder.HasGoal()) {
-					if (unit.NewOrder.GetGoal()->Destroyed) {
-						// FIXME: perhaps we should use another goal?
-						DebugPrint("Destroyed unit in train unit\n");
-						unit.NewOrder.ClearGoal();
-						unit.NewOrder.Action = UnitActionStill;
-					}
-				}
-				*(nunit->CurrentOrder()) = unit.NewOrder;
+#endif
 			}
 			if (IsOnlySelected(unit)) {
 				UI.ButtonPanel.Update();

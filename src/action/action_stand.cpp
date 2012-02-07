@@ -48,7 +48,7 @@
 **
 **  @param unit  Action handled for this unit pointer.
 */
-void HandleActionStandGround(CUnit &unit)
+void HandleActionStandGround(CUnit::COrder& /*order*/, CUnit &unit)
 {
 	ActionStillGeneric(unit, true);
 }

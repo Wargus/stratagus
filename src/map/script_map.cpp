@@ -292,7 +292,6 @@ static int CclShowMapLocation(lua_State *l)
 	}
 	CUnit *target = MakeUnit(*unitType, ThisPlayer);
 	if (target != NoUnitP) {
-		target->CurrentOrder()->Action = UnitActionStill;
 		target->Variable[HP_INDEX].Value = 0;
 		target->tilePos.x = LuaToNumber(l, 1);
 		target->tilePos.y = LuaToNumber(l, 2);

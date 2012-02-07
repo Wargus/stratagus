@@ -40,8 +40,8 @@
 #include "missile.h"
 #include "unittype.h"
 #include "animation.h"
-#include "actions.h"
 #include "unit.h"
+#include "actions.h"
 #include "tileset.h"
 #include "map.h"
 #include "pathfinder.h"
@@ -387,7 +387,7 @@ void ActionStillGeneric(CUnit &unit, bool stand_ground)
 **
 **  @param unit  Unit pointer for still action.
 */
-void HandleActionStill(CUnit &unit)
+void HandleActionStill(CUnit::COrder& /*order*/, CUnit &unit)
 {
 	ActionStillGeneric(unit, false);
 }

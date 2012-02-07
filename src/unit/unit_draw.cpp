@@ -878,8 +878,8 @@ void ShowOrder(const CUnit &unit)
 	}
 
 	// Show order for new trained units
-	if (!unit.CanMove()) {
-		ShowSingleOrder(unit, x1, y1, (COrderPtr)(&unit.NewOrder));
+	if (!unit.CanMove() && unit.NewOrder) {
+		ShowSingleOrder(unit, x1, y1, unit.NewOrder);
 	}
 }
 

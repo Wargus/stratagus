@@ -134,11 +134,10 @@ static int TransformUnitIntoType(CUnit &unit, CUnitType &newtype)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionTransformInto(CUnit &unit)
+void HandleActionTransformInto(CUnit::COrder& order, CUnit &unit)
 {
 	// What to do if an error occurs ?
-	TransformUnitIntoType(unit, *unit.CriticalOrder.Arg1.Type);
-	unit.CriticalOrder.Action = UnitActionStill;
+	TransformUnitIntoType(unit, *order.Arg1.Type);
 }
 
 /**
@@ -146,10 +145,10 @@ void HandleActionTransformInto(CUnit &unit)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionUpgradeTo(CUnit &unit)
+void HandleActionUpgradeTo(CUnit::COrder& order, CUnit &unit)
 {
 	if (!unit.SubAction) { // first entry
-		unit.CurrentOrder()->Data.UpgradeTo.Ticks = 0;
+		order.Data.UpgradeTo.Ticks = 0;
 		unit.SubAction = 1;
 	}
 	unit.Type->Animations->Upgrade ?
@@ -160,12 +159,12 @@ void HandleActionUpgradeTo(CUnit &unit)
 		return;
 	}
 	CPlayer *player = unit.Player;
-	CUnitType &newtype = *unit.CurrentOrder()->Arg1.Type;
+	CUnitType &newtype = *order.Arg1.Type;
 	const CUnitStats *newstats = &newtype.Stats[player->Index];
 
 	// FIXME: Should count down here
-	unit.CurrentOrder()->Data.UpgradeTo.Ticks += SpeedUpgrade;
-	if (unit.CurrentOrder()->Data.UpgradeTo.Ticks < newstats->Costs[TimeCost]) {
+	order.Data.UpgradeTo.Ticks += SpeedUpgrade;
+	if (order.Data.UpgradeTo.Ticks < newstats->Costs[TimeCost]) {
 		unit.Wait = CYCLES_PER_SECOND / 6;
 		return;
 	}

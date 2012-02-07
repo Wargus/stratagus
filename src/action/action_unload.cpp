@@ -323,7 +323,7 @@ static void LeaveTransporter(CUnit &transporter)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionUnload(CUnit &unit)
+void HandleActionUnload(CUnit::COrder& order, CUnit &unit)
 {
 	const int maxSearchRange = 20;
 
@@ -332,15 +332,15 @@ void HandleActionUnload(CUnit &unit)
 	}
 	switch (unit.SubAction) {
 		case 0: // Choose destination
-			if (!unit.CurrentOrder()->HasGoal()) {
+			if (!order.HasGoal()) {
 				Vec2i pos;
 
-				if (!ClosestFreeDropZone(unit, unit.CurrentOrder()->goalPos, maxSearchRange, &pos)) {
+				if (!ClosestFreeDropZone(unit, order.goalPos, maxSearchRange, &pos)) {
 					// Sorry... I give up.
 					unit.ClearAction();
 					return;
 				}
-				unit.CurrentOrder()->goalPos = pos;
+				order.goalPos = pos;
 			}
 
 			NewResetPath(*unit.CurrentOrder());
@@ -367,7 +367,7 @@ void HandleActionUnload(CUnit &unit)
 			// FIXME: show still animations ?
 			LeaveTransporter(unit);
 			if (unit.CanMove() && unit.CurrentAction() != UnitActionStill) {
-				HandleActionUnload(unit);
+				HandleActionUnload(*unit.CurrentOrder() , unit);
 			}
 			break;
 	}

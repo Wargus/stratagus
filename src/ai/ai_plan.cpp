@@ -41,6 +41,7 @@
 #include "unittype.h"
 #include "map.h"
 #include "pathfinder.h"
+#include "unit.h"
 #include "actions.h"
 #include "ai_local.h"
 

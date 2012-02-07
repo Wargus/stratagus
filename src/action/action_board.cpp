@@ -175,12 +175,10 @@ static void EnterTransporter(CUnit &unit)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionBoard(CUnit &unit)
+void HandleActionBoard(CUnit::COrder& order, CUnit &unit)
 {
 	switch (unit.SubAction) {
-		//
 		// Wait for transporter
-		//
 		case 201:
 			if (WaitForTransporter(unit)) {
 				unit.SubAction = 202;
@@ -188,21 +186,17 @@ void HandleActionBoard(CUnit &unit)
 				UnitShowAnimation(unit, unit.Type->Animations->Still[GetAnimationDamagedState(unit,1)]);
 			}
 			break;
-		//
 		// Enter transporter
-		//
 		case 202:
 			EnterTransporter(unit);
 			break;
-		//
 		// Move to transporter
-		//
 		case 0:
 			if (unit.Wait) {
 				unit.Wait--;
 				return;
 			}
-			NewResetPath(*unit.CurrentOrder());
+			NewResetPath(order);
 			unit.SubAction = 1;
 			// FALL THROUGH
 		default:
@@ -213,13 +207,13 @@ void HandleActionBoard(CUnit &unit)
 					if (i == PF_UNREACHABLE) {
 						if (++unit.SubAction == 200) {
 							unit.ClearAction();
-							unit.CurrentOrder()->ClearGoal();
+							order.ClearGoal();
 						} else {
 							//
 							// Try with a bigger range.
 							//
-							if (unit.CurrentOrder()->CheckRange()) {
-								unit.CurrentOrder()->Range++;
+							if (order.CheckRange()) {
+								order.Range++;
 								unit.SubAction--;
 							}
 						}

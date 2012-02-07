@@ -148,18 +148,16 @@ static void ClearSavedAction(CUnit &unit)
 */
 void CommandStopUnit(CUnit &unit)
 {
-	COrderPtr order;
-
 	// Ignore that the unit could be removed.
-
-	order = GetNextOrder(unit, FlushCommands); // Flush them.
+	COrderPtr order = GetNextOrder(unit, FlushCommands); // Flush them.
 	Assert(order);
 	order->Init();
 
 	order->Action = UnitActionStill;
 	unit.SavedOrder.Release();
-	unit.NewOrder.Release();
-	unit.SavedOrder = unit.NewOrder = *order;
+	unit.SavedOrder = *order;
+	delete unit.NewOrder;
+	unit.NewOrder = NULL;
 }
 
 /**
@@ -227,8 +225,9 @@ void CommandStandGround(CUnit &unit, int flush)
 
 	if (unit.Type->Building) {
 		// FIXME: should find a better way for pending orders.
-		order = &unit.NewOrder;
-		order->Release();
+		delete unit.NewOrder;
+		unit.NewOrder = new CUnit::COrder;
+		order = unit.NewOrder;
 	} else if (!(order = GetNextOrder(unit, flush))) {
 		return;
 	}
@@ -254,8 +253,9 @@ void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
 		if (!unit.CanMove()) {
 			// FIXME: should find a better way for pending orders.
-			order = &unit.NewOrder;
-			order->Release();
+			delete unit.NewOrder;
+			unit.NewOrder = new CUnit::COrder;
+			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -296,8 +296,9 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush)
 	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
 		if (!unit.CanMove()) {
 			// FIXME: should find a better way for pending orders.
-			order = &unit.NewOrder;
-			order->Release();
+			delete unit.NewOrder;
+			unit.NewOrder = new CUnit::COrder;
+			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -326,8 +327,9 @@ void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
 	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
 		if (unit.Type->Building) {
 			// FIXME: should find a better way for pending orders.
-			order = &unit.NewOrder;
-			order->Release();
+			delete unit.NewOrder;
+			unit.NewOrder = new CUnit::COrder;
+			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -389,8 +391,9 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *attack, int flush)
 	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
 		if (!unit.Type->CanAttack) {
 			// FIXME: should find a better way for pending orders.
-			order = &unit.NewOrder;
-			order->Release();
+			delete unit.NewOrder;
+			unit.NewOrder = new CUnit::COrder;
+			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -442,8 +445,9 @@ void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
 	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
 		if (unit.Type->Building) {
 			// FIXME: should find a better way for pending orders.
-			order = &unit.NewOrder;
-			order->Release();
+			delete unit.NewOrder;
+			unit.NewOrder = new CUnit::COrder;
+			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -480,8 +484,9 @@ void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush)
 	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
 		if (!unit.CanMove()) {
 			// FIXME: should find a better way for pending orders.
-			order = &unit.NewOrder;
-			order->Release();
+			delete unit.NewOrder;
+			unit.NewOrder = new CUnit::COrder;
+			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -521,8 +526,9 @@ void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 
 		if (unit.Type->Building) {
 			// FIXME: should find a better way for pending orders.
-			order = &unit.NewOrder;
-			order->Release();
+			delete unit.NewOrder;
+			unit.NewOrder = new CUnit::COrder;
+			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -588,8 +594,9 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int fl
 	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
 		if (unit.Type->Building) {
 			// FIXME: should find a better way for pending orders.
-			order = &unit.NewOrder;
-			order->Release();
+			delete unit.NewOrder;
+			unit.NewOrder = new CUnit::COrder;
+			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -653,8 +660,9 @@ void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
 	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
 		if (unit.Type->Building) {
 			// FIXME: should find a better way for pending orders.
-			order = &unit.NewOrder;
-			order->Release();
+			delete unit.NewOrder;
+			unit.NewOrder = new CUnit::COrder;
+			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -707,8 +715,9 @@ void CommandResource(CUnit &unit, CUnit &dest, int flush)
 
 		if (unit.Type->Building) {
 			// FIXME: should find a better way for pending orders.
-			order = &unit.NewOrder;
-			order->Release();
+			delete unit.NewOrder;
+			unit.NewOrder = new CUnit::COrder;
+			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -743,8 +752,9 @@ void CommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
 
 		if (unit.Type->Building) {
 			// FIXME: should find a better way for pending orders.
-			order = &unit.NewOrder;
-			order->Release();
+			delete unit.NewOrder;
+			unit.NewOrder = new CUnit::COrder;
+			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -917,14 +927,13 @@ void CommandUpgradeTo(CUnit &unit, CUnitType &type, int flush)
 */
 void CommandTransformIntoType(CUnit &unit, CUnitType &type)
 {
-	COrderPtr order;
+	COrderPtr order = new CUnit::COrder;
 
-	Assert(unit.CriticalOrder.Action == UnitActionStill);
-	order = &unit.CriticalOrder;
-	order->Init();
+	Assert(unit.CriticalOrder == NULL);
 
 	order->Action = UnitActionTransformInto;
 	order->Arg1.Type = &type;
+	unit.CriticalOrder = order;
 }
 
 /**

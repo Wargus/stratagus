@@ -144,59 +144,51 @@ static int AnimateActionRepair(CUnit &unit)
 **
 **  @param unit  Unit, for that the attack is handled.
 */
-void HandleActionRepair(CUnit &unit)
+void HandleActionRepair(CUnit::COrder& order, CUnit &unit)
 {
 	CUnit *goal;
 	int err;
 
 	switch (unit.SubAction) {
 		case 0:
-			NewResetPath(*unit.CurrentOrder());
+			NewResetPath(order);
 			unit.SubAction = 1;
 			// FALL THROUGH
-		//
-		// Move near to target.
-		//
-		case 1:
+		case 1:// Move near to target.
 			// FIXME: RESET FIRST!! Why? We move first and than check if
 			// something is in sight.
 			err = DoActionMove(unit);
 			if (!unit.Anim.Unbreakable) {
-				//
 				// No goal: if meeting damaged building repair it.
-				//
-				goal = unit.CurrentOrder()->GetGoal();
+				goal = order.GetGoal();
 
-				//
 				// Target is dead, choose new one.
 				//
 				// Check if goal is correct unit.
 				if (goal) {
 					if (!goal->IsVisibleAsGoal(*unit.Player)) {
 						DebugPrint("repair target gone.\n");
-						unit.CurrentOrder()->goalPos = goal->tilePos;
+						order.goalPos = goal->tilePos;
 						// FIXME: should I clear this here?
-						unit.CurrentOrder()->ClearGoal();
+						order.ClearGoal();
 						goal = NULL;
-						NewResetPath(*unit.CurrentOrder());
+						NewResetPath(order);
 					}
 				} else if (unit.Player->AiEnabled) {
 					// Ai players workers should stop if target is killed
 					err = -1;
 				}
 
-				//
 				// Have reached target? FIXME: could use return value
-				//
 				if (goal && unit.MapDistanceTo(*goal) <= unit.Type->RepairRange &&
 						goal->Variable[HP_INDEX].Value < goal->Variable[HP_INDEX].Max) {
 					unit.State = 0;
 					unit.SubAction = 2;
-					unit.CurrentOrder()->Data.Repair.Cycles = 0;
+					order.Data.Repair.Cycles = 0;
 					const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
 					UnitHeadingFromDeltaXY(unit, dir);
 				} else if (err < 0) {
-					unit.CurrentOrder()->ClearGoal();
+					order.ClearGoal();
 					if (!unit.RestoreOrder()) {
 						unit.ClearAction();
 						unit.State = 0;
@@ -209,16 +201,12 @@ void HandleActionRepair(CUnit &unit)
 			}
 			break;
 
-		//
-		// Repair the target.
-		//
-		case 2:
+		case 2:// Repair the target.
 			AnimateActionRepair(unit);
-			unit.CurrentOrder()->Data.Repair.Cycles++;
+			order.Data.Repair.Cycles++;
 			if (!unit.Anim.Unbreakable) {
 				goal = unit.CurrentOrder()->GetGoal();
 
-				//
 				// Target is dead, choose new one.
 				//
 				// Check if goal is correct unit.
@@ -226,16 +214,16 @@ void HandleActionRepair(CUnit &unit)
 				if (goal) {
 					if (!goal->IsVisibleAsGoal(*unit.Player)) {
 						DebugPrint("repair goal is gone\n");
-						unit.CurrentOrder()->goalPos = goal->tilePos;
+						order.goalPos = goal->tilePos;
 						// FIXME: should I clear this here?
-						unit.CurrentOrder()->ClearGoal();
+						order.ClearGoal();
 						goal = NULL;
-						NewResetPath(*unit.CurrentOrder());
+						NewResetPath(order);
 					} else {
 						int dist = unit.MapDistanceTo(*goal);
 						if (dist <= unit.Type->RepairRange) {
 							RepairUnit(unit, *goal);
-							goal = unit.CurrentOrder()->GetGoal();
+							goal = order.GetGoal();
 						} else if (dist > unit.Type->RepairRange) {
 							// If goal has move, chase after it
 							unit.State = 0;
@@ -244,20 +232,15 @@ void HandleActionRepair(CUnit &unit)
 					}
 				}
 
-
-				//
 				// Target is fine, choose new one.
-				//
-				if (!goal || goal->Variable[HP_INDEX].Value >=
-					 goal->Variable[HP_INDEX].Max) {
-					unit.CurrentOrder()->ClearGoal();
+				if (!goal || goal->Variable[HP_INDEX].Value >= goal->Variable[HP_INDEX].Max) {
+					order.ClearGoal();
 					if (!unit.RestoreOrder()) {
 						unit.ClearAction();
 						unit.State = 0;
 					}
 					return;
 				}
-
 				// FIXME: automatic repair
 			}
 			break;

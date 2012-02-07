@@ -477,10 +477,14 @@ void SaveUnit(const CUnit &unit, CFile *file)
 	}
 	file->printf("},\n  \"saved-order\", ");
 	SaveOrder(unit.SavedOrder, unit, file);
-	file->printf(",\n  \"critical-order\", ");
-	SaveOrder(unit.CriticalOrder, unit, file);
-	file->printf(",\n  \"new-order\", ");
-	SaveOrder(unit.NewOrder, unit, file);
+	if (unit.CriticalOrder) {
+		file->printf(",\n  \"critical-order\", ");
+		SaveOrder(*unit.CriticalOrder, unit, file);
+	}
+	if (unit.NewOrder) {
+		file->printf(",\n  \"new-order\", ");
+		SaveOrder(*unit.NewOrder, unit, file);
+	}
 
 	if (unit.Goal) {
 		file->printf(",\n  \"goal\", %d", UnitNumber(*unit.Goal));

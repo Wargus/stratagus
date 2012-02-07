@@ -53,8 +53,10 @@
 **
 **  @param unit  The unit which dies.
 */
-void HandleActionDie(CUnit &unit)
+void HandleActionDie(CUnit::COrder& order, CUnit &unit)
 {
+	Assert(order.Action == UnitActionDie);
+
 	// Show death animation
 	if (unit.Type->Animations && unit.Type->Animations->Death[unit.DamagedType]) {
 		UnitShowAnimation(unit, unit.Type->Animations->Death[unit.DamagedType]);
@@ -91,10 +93,6 @@ void HandleActionDie(CUnit &unit)
 	unit.Type = unit.Type->CorpseType;
 	unit.Stats = &unit.Type->Stats[unit.Player->Index];
 	unit.Place(unit.tilePos);
-
-	// We must be dead to get here, it we aren't we need to know why
-	// This assert replaces and old DEBUG message "Reset to die is really needed"
-	Assert(unit.CurrentAction() == UnitActionDie);
 
 	unit.SubAction = 0;
 	unit.Frame = 0;

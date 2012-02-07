@@ -37,7 +37,6 @@
 #include <stdlib.h>
 
 #include "stratagus.h"
-#include "video.h"
 #include "sound.h"
 #include "unitsound.h"
 #include "unittype.h"
@@ -47,7 +46,6 @@
 #include "actions.h"
 #include "upgrade_structs.h"
 #include "upgrade.h"
-#include "interface.h"
 #include "ai.h"
 
 /*----------------------------------------------------------------------------
@@ -59,19 +57,17 @@
 **
 **  @param unit  Pointer of researching unit.
 */
-void HandleActionResearch(CUnit &unit)
+void HandleActionResearch(CUnit::COrder& order, CUnit &unit)
 {
 	const CUpgrade *upgrade;
 
 	if (!unit.SubAction) { // first entry
-		upgrade = unit.CurrentOrder()->Data.Research.Upgrade = unit.CurrentOrder()->Arg1.Upgrade;
+		upgrade = order.Data.Research.Upgrade = order.Arg1.Upgrade;
 #if 0
 		// FIXME: I want to support both, but with network we need this check
 		//  but if want combined upgrades this is worse
 
-		//
 		// Check if an other building has already started?
-		//
 		if (unit.Player->UpgradeTimers.Upgrades[upgrade - Upgrades]) {
 			DebugPrint("Two researches running\n");
 			PlayerAddCosts(unit.Player, upgrade->Costs);
@@ -82,7 +78,7 @@ void HandleActionResearch(CUnit &unit)
 #endif
 		unit.SubAction = 1;
 	} else {
-		upgrade = unit.CurrentOrder()->Data.Research.Upgrade;
+		upgrade = order.Data.Research.Upgrade;
 	}
 
 	unit.Type->Animations->Research ?
@@ -94,8 +90,7 @@ void HandleActionResearch(CUnit &unit)
 	}
 
 	unit.Player->UpgradeTimers.Upgrades[upgrade->ID] += SpeedResearch;
-	if (unit.Player->UpgradeTimers.Upgrades[upgrade->ID] >=
-			upgrade->Costs[TimeCost]) {
+	if (unit.Player->UpgradeTimers.Upgrades[upgrade->ID] >= upgrade->Costs[TimeCost]) {
 
 		unit.Player->Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
 			_("%s: research complete"), unit.Type->Name.c_str());
@@ -108,12 +103,9 @@ void HandleActionResearch(CUnit &unit)
 			AiResearchComplete(unit, upgrade);
 		}
 		UpgradeAcquire(*unit.Player, upgrade);
-
 		unit.ClearAction();
-
 		return;
 	}
-
 	unit.Wait = CYCLES_PER_SECOND / 6;
 }
 

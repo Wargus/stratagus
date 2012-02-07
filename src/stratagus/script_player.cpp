@@ -42,6 +42,7 @@
 #include "player.h"
 #include "script.h"
 #include "ai.h"
+#include "unit.h"
 #include "actions.h"
 #include "commands.h"
 #include "map.h"

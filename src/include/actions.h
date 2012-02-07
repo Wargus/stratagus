@@ -151,52 +151,54 @@ extern int GetNumWaitingWorkers(const CUnit &mine);
 extern void AutoAttack(CUnit &unit, CUnitCache &targets, bool stand_ground);
 extern void UnHideUnit(CUnit &unit);
 
+typedef void HandleActionFunc(CUnit::COrder& order, CUnit &unit);
+
 	/// Generic still action
 extern void ActionStillGeneric(CUnit &unit, bool stand_ground);
 	/// Handle command still
-extern void HandleActionStill(CUnit &unit);
+extern HandleActionFunc HandleActionStill;
 	/// Handle command stand ground
-extern void HandleActionStandGround(CUnit &unit);
+extern HandleActionFunc HandleActionStandGround;
 	/// Handle command follow
-extern void HandleActionFollow(CUnit &unit);
+extern HandleActionFunc HandleActionFollow;
 	/// Generic move action
 extern int DoActionMove(CUnit &unit);
 	/// Handle command move
-extern void HandleActionMove(CUnit &unit);
+extern HandleActionFunc HandleActionMove;
 	/// Handle command repair
-extern void HandleActionRepair(CUnit &unit);
+extern HandleActionFunc HandleActionRepair;
 	/// Handle command patrol
-extern void HandleActionPatrol(CUnit &unit);
+extern HandleActionFunc HandleActionPatrol;
 	/// Show attack animation
 extern void AnimateActionAttack(CUnit &unit);
 	/// Handle command attack
-extern void HandleActionAttack(CUnit &unit);
+extern HandleActionFunc  HandleActionAttack;
 	/// Handle command board
-extern void HandleActionBoard(CUnit &unit);
+extern HandleActionFunc HandleActionBoard;
 	/// Handle command unload
-extern void HandleActionUnload(CUnit &unit);
+extern HandleActionFunc HandleActionUnload;
 	/// Handle command resource
-extern void HandleActionResource(CUnit &unit);
+extern HandleActionFunc HandleActionResource;
 	/// Handle command return
-extern void HandleActionReturnGoods(CUnit &unit);
+extern HandleActionFunc HandleActionReturnGoods;
 	/// Handle command die
-extern void HandleActionDie(CUnit &unit);
+extern HandleActionFunc HandleActionDie;
 	/// Handle command build
-extern void HandleActionBuild(CUnit &unit);
+extern HandleActionFunc HandleActionBuild;
 	/// Handle command built
-extern void HandleActionBuilt(CUnit &unit);
+extern HandleActionFunc HandleActionBuilt;
 	/// Handle command train
-extern void HandleActionTrain(CUnit &unit);
+extern HandleActionFunc HandleActionTrain;
 	/// Handle command upgrade to
-extern void HandleActionUpgradeTo(CUnit &unit);
+extern HandleActionFunc HandleActionUpgradeTo;
 	/// Handle command transform into
-extern void HandleActionTransformInto(CUnit &unit);
+extern HandleActionFunc HandleActionTransformInto;
 	/// Handle command upgrade
-extern void HandleActionUpgrade(CUnit &unit);
+extern HandleActionFunc HandleActionUpgrade;
 	/// Handle command research
-extern void HandleActionResearch(CUnit &unit);
+extern HandleActionFunc HandleActionResearch;
 	/// Handle command spellcast
-extern void HandleActionSpellCast(CUnit &unit);
+extern HandleActionFunc HandleActionSpellCast;
 
 /*----------------------------------------------------------------------------
 --  Actions: actions.c

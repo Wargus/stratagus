@@ -172,7 +172,7 @@ int DoActionMove(CUnit &unit)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionMove(CUnit &unit)
+void HandleActionMove(CUnit::COrder& order, CUnit &unit)
 {
 	CUnit *goal;
 
@@ -186,7 +186,7 @@ void HandleActionMove(CUnit &unit)
 	if (!unit.SubAction) { // first entry
 		unit.SubAction = 1;
 		NewResetPath(*unit.CurrentOrder());
-		unit.CurrentOrder()->Data.Move.Cycles = 0;
+		order.Data.Move.Cycles = 0;
 		Assert(unit.State == 0);
 	}
 
@@ -197,14 +197,14 @@ void HandleActionMove(CUnit &unit)
 			//
 			// Some tries to reach the goal
 			//
-			if (unit.CurrentOrder()->CheckRange()) {
-				unit.CurrentOrder()->Range++;
+			if (order.CheckRange()) {
+				order.Range++;
 				break;
 			}
 			// FALL THROUGH
 		case PF_REACHED:
 			// Release target, if any.
-			unit.CurrentOrder()->ClearGoal();
+			order.ClearGoal();
 			unit.ClearAction();
 			return;
 
@@ -215,12 +215,12 @@ void HandleActionMove(CUnit &unit)
 	//
 	// Target destroyed?
 	//
-	goal = unit.CurrentOrder()->GetGoal();
+	goal = order.GetGoal();
 	if (goal && goal->Destroyed) {
 		DebugPrint("Goal dead\n");
-		unit.CurrentOrder()->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
-		unit.CurrentOrder()->ClearGoal();
-		NewResetPath(*unit.CurrentOrder());
+		order.goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
+		order.ClearGoal();
+		NewResetPath(order);
 	}
 }
 

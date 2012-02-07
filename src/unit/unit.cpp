@@ -209,7 +209,7 @@ CUnit::COrder& CUnit::COrder::operator=(const CUnit::COrder &rhs) {
 	return *this;
 }
 
-bool CUnit::COrder::CheckRange()
+bool CUnit::COrder::CheckRange() const
 {
 	return (Range <= Map.Info.MapWidth || Range <= Map.Info.MapHeight);
 }
@@ -290,15 +290,11 @@ void CUnit::Init(CUnitType &type)
 	//  Set refs to 1. This is the "I am alive ref", lost in ReleaseUnit.
 	Refs = 1;
 
-	//
 	//  Build all unit table
-	//
 	UnitSlot = &Units[NumUnits]; // back pointer
 	Units[NumUnits++] = this;
 
-	//
 	//  Initialise unit structure (must be zero filled!)
-	//
 	Type = &type;
 
 	Seen.Frame = UnitNotSeen; // Unit isn't yet seen
@@ -343,15 +339,13 @@ void CUnit::Init(CUnitType &type)
 	CurrentOrder()->Action = UnitActionStill;
 	CurrentOrder()->goalPos.x = CurrentOrder()->goalPos.y = -1;
 	Assert(!CurrentOrder()->HasGoal());
-	NewOrder.Action = UnitActionStill;
-	NewOrder.goalPos.x = NewOrder.goalPos.y = -1;
-	Assert(!NewOrder.HasGoal());
+	Assert(NewOrder == NULL);
+	NewOrder = NULL;
 	SavedOrder.Action = UnitActionStill;
 	SavedOrder.goalPos.x = SavedOrder.goalPos.y = -1;
 	Assert(!SavedOrder.HasGoal());
-	CriticalOrder.Action = UnitActionStill;
-	CriticalOrder.goalPos.x = CriticalOrder.goalPos.y = -1;
-	Assert(!CriticalOrder.HasGoal());
+	Assert(CriticalOrder == NULL);
+	CriticalOrder = NULL;
 }
 
 /**
@@ -1048,22 +1042,13 @@ void UnitLost(CUnit &unit)
 */
 void UnitClearOrders(CUnit &unit)
 {
-	int i;
-
-	//
-	//  Release all references of the unit.
-	//
-	for (i = unit.OrderCount; i-- > 0;) {
-		if (i != 0) {
-			COrderPtr order = unit.Orders.back();
-			delete order;
-			unit.Orders.pop_back();
-		} else unit.Orders[0]->Release();
+	for (int i = 0; i != unit.OrderCount; ++i)
+	{
+		delete unit.Orders[i];
 	}
-	unit.OrderCount = 1;
-	unit.NewOrder.Release();
-	unit.SavedOrder.Release();
-	unit.CurrentOrder()->Action = UnitActionStill;
+	unit.Orders.clear();
+	unit.OrderCount = 0;
+	CommandStopUnit(unit);
 	unit.SubAction = unit.State = 0;
 }
 
@@ -3413,7 +3398,7 @@ void CleanUnits()
 					ResourceInfo *resinfo = unit->Type->ResInfo[unit->CurrentResource];
 					if (resinfo && !resinfo->TerrainHarvester) {
 						CUnit *mine = unit->CurrentOrder()->Arg1.Resource.Mine;
-						if (mine) {
+						if (mine && !mine->Destroyed) {
 							unit->DeAssignWorkerFromMine(*mine);
 							mine->RefsDecrease();
 							unit->CurrentOrder()->Arg1.Resource.Mine = NULL;

@@ -408,7 +408,7 @@ static void BuildBuilding(CUnit &unit)
 **
 **  @param unit  Unit that builds a building
 */
-void HandleActionBuild(CUnit &unit)
+void HandleActionBuild(CUnit::COrder& /*order*/, CUnit &unit)
 {
 	CUnit *ontop;
 
@@ -430,7 +430,7 @@ void HandleActionBuild(CUnit &unit)
 **
 **  @param unit  Unit that is being built
 */
-void HandleActionBuilt(CUnit &unit)
+void HandleActionBuilt(CUnit::COrder& order, CUnit &unit)
 {
 	CUnit *worker;
 	CUnitType *type;
@@ -446,8 +446,8 @@ void HandleActionBuilt(CUnit &unit)
 	smod = (unit.Stats->Costs[TimeCost] * 600) - unit.Variable[SHIELD_INDEX].Value;
 
 	// n is the current damage taken by the unit.
-	n = (unit.CurrentOrder()->Data.Built.Progress * unit.Variable[HP_INDEX].Max + (mod - 1)) / mod;
-	sn = (unit.CurrentOrder()->Data.Built.Progress * unit.Variable[SHIELD_INDEX].Max + (smod - 1)) / smod;
+	n = (order.Data.Built.Progress * unit.Variable[HP_INDEX].Max + (mod - 1)) / mod;
+	sn = (order.Data.Built.Progress * unit.Variable[SHIELD_INDEX].Max + (smod - 1)) / smod;
 
 	// This below is most often 0
 	if (type->BuilderOutside) {
@@ -459,14 +459,14 @@ void HandleActionBuilt(CUnit &unit)
 	}
 	// Building speeds increase or decrease.
 	progress *= SpeedBuild;
-	oldprogress = unit.CurrentOrder()->Data.Built.Progress;
-	unit.CurrentOrder()->Data.Built.Progress += progress;
+	oldprogress = order.Data.Built.Progress;
+	order.Data.Built.Progress += progress;
 	// mod is use for round to upper and use it as cache
 	mod = type->Stats[unit.Player->Index].Costs[TimeCost] * 600;
 
 	// Keep the same level of damage while increasing HP.
 	unit.Variable[HP_INDEX].Value +=
-	 (unit.CurrentOrder()->Data.Built.Progress * unit.Variable[HP_INDEX].Max + (mod - n - 1)) / (mod - n) -
+	 (order.Data.Built.Progress * unit.Variable[HP_INDEX].Max + (mod - n - 1)) / (mod - n) -
 	  (oldprogress * unit.Variable[HP_INDEX].Max + (mod - n - 1)) / (mod - n);
 	if (unit.Variable[HP_INDEX].Value > unit.Stats->Variables[HP_INDEX].Max) {
 		unit.Variable[HP_INDEX].Value = unit.Stats->Variables[HP_INDEX].Max;
@@ -474,21 +474,18 @@ void HandleActionBuilt(CUnit &unit)
 	if (unit.Variable[SHIELD_INDEX].Max > 0)
 	{
 		unit.Variable[SHIELD_INDEX].Value +=
-		 (unit.CurrentOrder()->Data.Built.Progress * unit.Variable[SHIELD_INDEX].Max + (mod - sn - 1)) / (mod - sn) -
+		 (order.Data.Built.Progress * unit.Variable[SHIELD_INDEX].Max + (mod - sn - 1)) / (mod - sn) -
 		  (oldprogress * unit.Variable[SHIELD_INDEX].Max + (mod - sn - 1)) / (mod - sn);
 		if (unit.Variable[SHIELD_INDEX].Value > unit.Stats->Variables[SHIELD_INDEX].Max) {
 			unit.Variable[SHIELD_INDEX].Value = unit.Stats->Variables[SHIELD_INDEX].Max;
 		}
 	}
 
-	//
 	// Check if construction should be canceled...
-	//
-	if (unit.CurrentOrder()->Data.Built.Cancel || unit.CurrentOrder()->Data.Built.Progress < 0) {
-		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index
-				_C_ unit.Type->Name.c_str());
+	if (order.Data.Built.Cancel || order.Data.Built.Progress < 0) {
+		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.Type->Name.c_str());
 		// Drop out unit
-		if ((worker = unit.CurrentOrder()->Data.Built.Worker)) {
+		if ((worker = order.Data.Built.Worker)) {
 
 			worker->CurrentOrder()->ClearGoal();
 			worker->ClearAction();
@@ -512,7 +509,7 @@ void HandleActionBuilt(CUnit &unit)
 	// Check if building ready. Note we can both build and repair.
 	//
 	//if (unit.CurrentOrder()->Data.Built.Progress >= unit.Stats->Costs[TimeCost] * 600 ||
-	if (!unit.CurrentOrder()->Data.Built.Worker->Anim.Unbreakable && (unit.CurrentOrder()->Data.Built.Progress >= mod ||
+	if (!order.Data.Built.Worker->Anim.Unbreakable && (order.Data.Built.Progress >= mod ||
 			unit.Variable[HP_INDEX].Value >= unit.Stats->Variables[HP_INDEX].Max)) {
 		DebugPrint("%d: Building %s(%s) ready.\n" _C_ unit.Player->Index
 		_C_ unit.Type->Ident.c_str() _C_ unit.Type->Name.c_str() );

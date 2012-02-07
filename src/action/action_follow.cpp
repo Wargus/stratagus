@@ -58,34 +58,28 @@
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionFollow(CUnit &unit)
+void HandleActionFollow(CUnit::COrder& order, CUnit &unit)
 {
-	CUnit *goal;
-
 	if (unit.Wait) {
 		unit.Wait--;
 		return;
 	}
+	CUnit *goal = order.GetGoal();
 
-	//
 	// Reached target
-	//
 	if (unit.SubAction == 128) {
-		COrderPtr order = unit.CurrentOrder();
-		goal = order->GetGoal();
 
 		if (!goal || !goal->IsVisibleAsGoal(*unit.Player)) {
 			DebugPrint("Goal gone\n");
-			order->ClearGoal();
+			order.ClearGoal();
 			unit.ClearAction();
 			return;
 		}
 
-		if (goal->tilePos == order->goalPos) {
-
+		if (goal->tilePos == order.goalPos) {
 			// Move to the next order
 			if (unit.OrderCount > 1) {
-				order->ClearGoal();
+				order.ClearGoal();
 				unit.ClearAction();
 				return;
 			}
@@ -95,40 +89,36 @@ void HandleActionFollow(CUnit &unit)
 			unit.Frame = unit.Type->StillFrame;
 			UnitUpdateHeading(unit);
 			unit.Wait = 10;
-			if (order->Range > 1) {
-				order->Range = 1;
+			if (order.Range > 1) {
+				order.Range = 1;
 				unit.SubAction = 0;
 			}
 			return;
 		}
-
 		unit.SubAction = 0;
 	}
-
 	if (!unit.SubAction) { // first entry
 		unit.SubAction = 1;
-		NewResetPath(*unit.CurrentOrder());
+		NewResetPath(order);
 		Assert(unit.State == 0);
 	}
-
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
-			//
 			// Some tries to reach the goal
-			//
-			if (unit.CurrentOrder()->CheckRange()) {
-				unit.CurrentOrder()->Range++;
+			if (order.CheckRange()) {
+				order.Range++;
 				break;
 			}
 			// FALL THROUGH
 		case PF_REACHED:
+		{
+			if (!goal) { // goal has died
+				unit.ClearAction();
+				return;
+			}
 			// Handle Teleporter Units
 			// FIXME: BAD HACK
-			if ((goal = unit.CurrentOrder()->GetGoal()) &&
-					goal->Type->Teleporter && goal->Goal &&
-					unit.MapDistanceTo(*goal) <= 1) {
-				CUnit *dest;
-
+			if (goal->Type->Teleporter && goal->Goal && unit.MapDistanceTo(*goal) <= 1) {
 				// Teleport the unit
 				unit.Remove(NULL);
 				unit.tilePos = goal->Goal->tilePos;
@@ -145,83 +135,63 @@ void HandleActionFollow(CUnit &unit)
 #endif
 				unit.ClearAction();
 
-				//
 				// FIXME: we must check if the units supports the new order.
-				//
-				dest = goal->Goal;
+				CUnit &dest = *goal->Goal;
 
-				if (dest) {
-					if ((dest->NewOrder.Action == UnitActionResource &&
-								!unit.Type->Harvester) ||
-							(dest->NewOrder.Action == UnitActionAttack &&
-								!unit.Type->CanAttack) ||
-							(dest->NewOrder.Action == UnitActionBoard &&
-								unit.Type->UnitType != UnitTypeLand)) {
-						DebugPrint("Wrong order for unit\n");
-						unit.ClearAction();
-						unit.CurrentOrder()->ClearGoal();
-					} else {
-						if (dest->NewOrder.HasGoal()) {
-							if (dest->NewOrder.GetGoal()->Destroyed) {
-								// FIXME: perhaps we should use another dest?
-								DebugPrint("Destroyed unit in teleport unit\n");
-								dest->RefsDecrease();///???????
-								dest->NewOrder.ClearGoal();
-								dest->NewOrder.Action = UnitActionStill;
-							}
+				if (dest.NewOrder == NULL
+					|| (dest.NewOrder->Action == UnitActionResource && !unit.Type->Harvester)
+					|| (dest.NewOrder->Action == UnitActionAttack && !unit.Type->CanAttack)
+					|| (dest.NewOrder->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand)) {
+					unit.ClearAction();
+					unit.CurrentOrder()->ClearGoal();
+				} else {
+					if (dest.NewOrder->HasGoal()) {
+						if (dest.NewOrder->GetGoal()->Destroyed) {
+							// FIXME: perhaps we should use another dest?
+							DebugPrint("Destroyed unit in teleport unit\n");
+							dest.NewOrder->ClearGoal();
+							dest.NewOrder->Action = UnitActionStill;
 						}
-
-						*(unit.CurrentOrder()) = dest->NewOrder;
-						unit.CurrentResource = dest->CurrentResource;
-
 					}
+
+					*(unit.CurrentOrder()) = *dest.NewOrder;
+					unit.CurrentResource = dest.CurrentResource;
 				}
 				return;
 			}
-
-			goal = unit.CurrentOrder()->GetGoal();
-			if (!goal) { // goal has died
-				unit.ClearAction();
-				return;
-			}
-			unit.CurrentOrder()->goalPos = goal->tilePos;
+			order.goalPos = goal->tilePos;
 			unit.SubAction = 128;
-
+		}
 			// FALL THROUGH
 		default:
 			break;
 	}
 
-	//
 	// Target destroyed?
-	//
-	goal = unit.CurrentOrder()->GetGoal();
 	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		DebugPrint("Goal gone\n");
-		unit.CurrentOrder()->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
-		unit.CurrentOrder()->ClearGoal();
+		order.goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
+		order.ClearGoal();
 		goal = NoUnitP;
-		NewResetPath(*unit.CurrentOrder());
+		NewResetPath(order);
 	}
 
 	if (!unit.Anim.Unbreakable) {
-		//
 		// If our leader is dead or stops or attacks:
 		// Attack any enemy in reaction range.
 		// If don't set the goal, the unit can than choose a
 		//  better goal if moving nearer to enemy.
-		//
-		if (unit.Type->CanAttack &&
-				(!goal || goal->CurrentAction() == UnitActionAttack ||
-					goal->CurrentAction() == UnitActionStill)) {
+		if (unit.Type->CanAttack
+			&& (!goal || goal->CurrentAction() == UnitActionAttack || goal->CurrentAction() == UnitActionStill)) {
 			goal = AttackUnitsInReactRange(unit);
 			if (goal) {
 				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
 				// Save current command to come back.
-				unit.SavedOrder = *(unit.CurrentOrder());
+
+				unit.SavedOrder = order;
 				// This stops the follow command and the attack is executed
+				order.ClearGoal();
 				unit.ClearAction();
-				unit.CurrentOrder()->ClearGoal();
 			}
 		}
 	}
