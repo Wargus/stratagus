@@ -307,15 +307,9 @@ struct cnode {
 	CUnitType *type;
 };
 
-static int cnode_cmp(const void*const t0,
-						 const void*const t1)
+static bool cnode_cmp(const cnode &lhs, const cnode &rhs)
 {
-	int s0 = ((struct cnode*)t0)->unit_cost;
-	int s1 = ((struct cnode*)t1)->unit_cost;
-	if(s0 == s1) {
-		return 0;
-	}
-	return s0 < s1 ? -1 : 1;
+	return lhs.unit_cost < rhs.unit_cost;
 }
 
 int
@@ -475,9 +469,9 @@ static bool AiRequestSupply()
 		Assert(j < 16);
 	}
 
-	if (j > 1)
-		qsort(&cache, j, sizeof (struct cnode), cnode_cmp);
-
+	if (j > 1) {
+		std::sort(&cache[0], &cache[j], cnode_cmp);
+	}
 	if (j) {
 		if (!cache[0].needmask) {
 			CUnitType &type = *cache[0].type;
@@ -938,11 +932,8 @@ static int AiAssignHarvester(CUnit &unit, int resource)
 	}
 }
 
-static int CmpWorkers(const void *w0,const void *w1) {
-	const CUnit*const worker0 = (const CUnit*const)w0;
-	const CUnit*const worker1 = (const CUnit*const)w1;
-
-	return worker0->ResourcesHeld < worker1->ResourcesHeld ? 1 : -1;
+static bool CmpWorkers(const CUnit *lhs, const CUnit *rhs) {
+	return lhs->ResourcesHeld < rhs->ResourcesHeld;
 }
 
 /**
@@ -953,42 +944,36 @@ static int CmpWorkers(const void *w0,const void *w1) {
 */
 static void AiCollectResources()
 {
-	CUnit *units_assigned[MaxCosts][UnitMax]; // Worker assigned to resource
-	CUnit *units_unassigned[MaxCosts][UnitMax]; // Unassigned workers
+	std::vector<CUnit *> units_assigned[MaxCosts]; // Worker assigned to resource
+	std::vector<CUnit *> units_unassigned[MaxCosts]; // Unassigned workers
 	int num_units_with_resource[MaxCosts];
 	int num_units_assigned[MaxCosts];
 	int num_units_unassigned[MaxCosts];
-	CUnit **units;
 	int percent[MaxCosts];
-
 	int priority_resource[MaxCosts];
 	int priority_needed[MaxCosts];
 	int wanted[MaxCosts];
-	int total_harvester;
+	int total_harvester = 0;
 
 	memset(num_units_with_resource, 0, sizeof(num_units_with_resource));
 	memset(num_units_unassigned, 0, sizeof(num_units_unassigned));
 	memset(num_units_assigned, 0, sizeof(num_units_assigned));
 
-	//
 	// Collect statistics about the current assignment
-	//
-	total_harvester = 0;
-
 	const int n = AiPlayer->Player->TotalNumUnits;
-	units = AiPlayer->Player->Units;
+	CUnit **units = AiPlayer->Player->Units;
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = *units[i];
 		if (!unit.Type->Harvester) {
 			continue;
 		}
-
 		const int c = unit.CurrentResource;
 
 		// See if it's assigned already
 		if (c && unit.OrderCount == 1 &&
 			unit.CurrentAction() == UnitActionResource) {
-			units_assigned[c][num_units_assigned[c]++] = &unit;
+			units_assigned[c].push_back(&unit);
+			num_units_assigned[c]++;
 			total_harvester++;
 			continue;
 		}
@@ -1009,7 +994,8 @@ static void AiCollectResources()
 		// Look what the unit can do
 		for (int c = 1; c < MaxCosts; ++c) {
 			if (unit.Type->ResInfo[c]) {
-				units_unassigned[c][num_units_unassigned[c]++] = &unit;
+				units_unassigned[c].push_back(&unit);
+				num_units_unassigned[c]++;
 			}
 		}
 		++total_harvester;
@@ -1049,9 +1035,8 @@ static void AiCollectResources()
 
 		if (c && num_units_assigned[c] > 1) {
 			//first should go workers with lower ResourcesHeld value
-			qsort(units_assigned[c], num_units_assigned[c], sizeof(CUnit*), CmpWorkers);
+			std::sort(units_assigned[c].begin(), units_assigned[c].end(), CmpWorkers);
 		}
-
 	}
 	CUnit* unit;
 	do {
@@ -1070,20 +1055,20 @@ static void AiCollectResources()
 		for (int i = 0; i < MaxCosts; ++i) {
 			int c = priority_resource[i];
 
-			//
 			// If there is a free worker for c, take it.
-			//
 			if (num_units_unassigned[c]) {
 				// Take the unit.
 				while (0 < num_units_unassigned[c] && !AiAssignHarvester(*units_unassigned[c][0], c)) {
 					// can't assign to c => remove from units_unassigned !
 					units_unassigned[c][0] = units_unassigned[c][--num_units_unassigned[c]];
+					units_unassigned[c].pop_back();
 				}
 
 				// unit is assigned
 				if (0 < num_units_unassigned[c]) {
 					unit = units_unassigned[c][0];
 					units_unassigned[c][0] = units_unassigned[c][--num_units_unassigned[c]];
+					units_unassigned[c].pop_back();
 
 					// remove it from other ressources
 					for (int j = 0; j < MaxCosts; ++j) {
@@ -1093,6 +1078,7 @@ static void AiCollectResources()
 						for (int k = 0; k < num_units_unassigned[j]; ++k) {
 							if (units_unassigned[j][k] == unit) {
 								units_unassigned[j][k] = units_unassigned[j][--num_units_unassigned[j]];
+								units_unassigned[j].pop_back();
 								break;
 							}
 						}
@@ -1100,9 +1086,7 @@ static void AiCollectResources()
 				}
 			}
 
-			//
 			// Else : Take from already assigned worker with lower priority.
-			//
 			if (!unit) {
 				// Take from lower priority only (i+1).
 				for (int j = i + 1; j < MaxCosts && !unit; ++j) {
@@ -1132,6 +1116,7 @@ static void AiCollectResources()
 
 						// Remove from src_c
 						units_assigned[src_c][k] = units_assigned[src_c][--num_units_assigned[src_c]];
+						units_assigned[src_c].pop_back();
 
 						// j need one more
 						priority_needed[j]++;
@@ -1139,15 +1124,14 @@ static void AiCollectResources()
 				}
 			}
 
-			//
 			// We just moved an unit. Adjust priority & retry
-			//
 			if (unit) {
 				// i got a new unit.
 				priority_needed[i]--;
 
 				// Add to the assigned
-				units_assigned[c][num_units_assigned[c]++] = unit;
+				units_assigned[c].push_back(unit);
+				num_units_assigned[c]++;
 
 				// Recompute priority now
 				break;
@@ -1423,7 +1407,6 @@ void AiResourceManager()
 			(unsigned long)AiPlayer->Player->Index % COLLECT_RESOURCES_INTERVAL) {
 		AiCollectResources();
 	}
-
 	//
 	// Check repair.
 	//
