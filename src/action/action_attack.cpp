@@ -121,7 +121,6 @@ static int CheckForDeadGoal(CUnit &unit)
 		//unit.ClearAction();
 		return 1;
 	}
-
 //	NewResetPath(unit); // Should be useless.
 	return 0;
 }
@@ -148,8 +147,18 @@ static int CheckForTargetInRange(CUnit &unit)
 		CUnit *goal = AttackUnitsInReactRange(unit);
 
 		if (goal) {
-			unit.StoreOrder();
+			CUnit::COrder *savedOrder = new CUnit::COrder();
 
+			savedOrder->Action = order->Action;
+
+			savedOrder->MinRange = 0;//order->MinRange;
+			savedOrder->Range = 0;//order->Range;
+			savedOrder->goalPos = order->goalPos;
+
+			if (unit.StoreOrder(savedOrder) == false) {
+				delete savedOrder;
+				savedOrder = NULL;
+			}
 			order->SetGoal(goal);
 			order->MinRange = unit.Type->MinAttackRange;
 			order->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
@@ -163,7 +172,12 @@ static int CheckForTargetInRange(CUnit &unit)
 		CUnit *temp = AttackUnitsInReactRange(unit);
 
 		if (temp && temp->Type->Priority > goal->Type->Priority) {
-			unit.StoreOrder();
+			CUnit::COrder *savedOrder = new CUnit::COrder(*order);
+
+			if (unit.StoreOrder(savedOrder) == false) {
+				delete savedOrder;
+				savedOrder = NULL;
+			}
 			order->SetGoal(temp);
 			order->goalPos.x = order->goalPos.y = -1;
 			NewResetPath(*order);
@@ -297,7 +311,6 @@ static void AttackTarget(CUnit &unit)
 	if (CheckForDeadGoal(unit)) {
 		return;
 	}
-	order = unit.CurrentOrder();
 	CUnit *goal = order->GetGoal();
 
 	//
@@ -306,9 +319,8 @@ static void AttackTarget(CUnit &unit)
 	if (!goal) {
 		unit.State = 0;
 		goal = AttackUnitsInReactRange(unit);
-		//
+
 		// No new goal, continue way to destination.
-		//
 		if (!goal) {
 			// Return to old task ?
 			if (unit.RestoreOrder()) {
@@ -317,18 +329,13 @@ static void AttackTarget(CUnit &unit)
 			unit.SubAction = MOVE_TO_TARGET;
 			return;
 		}
-
-		//
 		// Save current command to come back.
-		//
-#ifdef DEBUG
-		if(unit.StoreOrder()) {
-			Assert(!order->HasGoal());
-		}
-#else
-		unit.StoreOrder();
-#endif
+		CUnit::COrder *savedOrder = new CUnit::COrder(*order);
 
+		if (unit.StoreOrder(savedOrder) == false) {
+			delete savedOrder;
+			savedOrder = NULL;
+		}
 		order->SetGoal(goal);
 		order->goalPos.x = order->goalPos.y = -1;
 		order->MinRange = unit.Type->MinAttackRange;
@@ -344,7 +351,12 @@ static void AttackTarget(CUnit &unit)
 		if ((unit.SubAction & WEAK_TARGET)) {
 			CUnit *temp = AttackUnitsInReactRange(unit);
 			if (temp && temp->Type->Priority > goal->Type->Priority) {
-				unit.StoreOrder();
+				CUnit::COrder *savedOrder = new CUnit::COrder(*order);
+
+				if (unit.StoreOrder(savedOrder) == false) {
+					delete savedOrder;
+					savedOrder = NULL;
+				}
 				goal = temp;
 				order->SetGoal(temp);
 				order->goalPos.x = order->goalPos.y = -1;
@@ -360,7 +372,12 @@ static void AttackTarget(CUnit &unit)
 	//
 	int dist = unit.MapDistanceTo(*goal);
 	if (dist > unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-		unit.StoreOrder();
+		CUnit::COrder *savedOrder = new CUnit::COrder(*order);
+
+		if (unit.StoreOrder(savedOrder) == false) {
+			delete savedOrder;
+			savedOrder = NULL;
+		}
 		NewResetPath(*order);
 		unit.Frame = 0;
 		unit.State = 0;
@@ -396,7 +413,7 @@ static void AttackTarget(CUnit &unit)
 void HandleActionAttack(CUnit::COrder& order, CUnit &unit)
 {
 	Assert(order.Action == UnitActionAttackGround || order.Action == UnitActionAttack);
-	Assert(order.HasGoal() || (order.goalPos.x != -1 && order.goalPos.y != -1));
+	Assert(order.HasGoal() || Map.Info.IsPointOnMap(order.goalPos));
 
 	if (unit.Wait) {
 		unit.Wait--;
@@ -404,22 +421,20 @@ void HandleActionAttack(CUnit::COrder& order, CUnit &unit)
 	}
 
 	switch (unit.SubAction) {
-		//
-		// First entry
-		//
-		case 0:
+		case 0: // First entry
+		{
 			// did Order change ?
 			if (CheckForTargetInRange(unit)) {
 				return;
 			}
 			// Can we already attack ?
 			if (order.HasGoal()) {
-				CUnit *goal = order.GetGoal();
-				 // dist between unit and unit.CurrentOrder()->Goal.
-				int dist = goal->MapDistanceTo(unit);
+				CUnit &goal = *order.GetGoal();
+				const int dist = goal.MapDistanceTo(unit);
+
 				if (unit.Type->MinAttackRange < dist &&
 					 dist <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-					const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
+					const Vec2i dir = goal.tilePos + goal.Type->GetHalfTileSize() - unit.tilePos;
 
 					UnitHeadingFromDeltaXY(unit, dir);
 					unit.SubAction = ATTACK_TARGET;
@@ -429,14 +444,10 @@ void HandleActionAttack(CUnit::COrder& order, CUnit &unit)
 			}
 			unit.SubAction = MOVE_TO_TARGET;
 			NewResetPath(order);
-			//
 			// FIXME: should use a reachable place to reduce pathfinder time.
-			//
 			Assert(unit.State == 0);
-			// FALL THROUGH
-		//
-		// Move near to the target.
-		//
+		}
+		// FALL THROUGH
 		case MOVE_TO_TARGET:
 		case MOVE_TO_TARGET + WEAK_TARGET:
 			if (!unit.CanMove()) {

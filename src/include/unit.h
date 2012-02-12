@@ -337,10 +337,6 @@
 **  This is can be used to set the exit or gathering point of a
 **  building.
 **
-**  CUnit::Data
-**
-**  @todo continue documentation
-**
 **  CUnit::Goal
 **
 **  Generic goal pointer. Used by teleporters to point to circle of power.
@@ -532,9 +528,8 @@ public:
 			memset(&Data, 0, sizeof (Data));
 		}
 		COrder(const COrder &ths);
-		~COrder() { Release(); }
+		~COrder();
 
-		void Release();
 		void ReleaseRefs(CUnit &owner);
 		COrder& operator=(const COrder &rhs);
 		bool CheckRange() const;
@@ -645,7 +640,7 @@ public:
 		} Data; /// Storage room for different commands
 	};
 
-	CUnit() : NewOrder(NULL), CriticalOrder(NULL) { Init(); }
+	CUnit() : SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
 
 	void Init() {
 		Refs = 0;
@@ -703,7 +698,8 @@ public:
 		OrderCount = 0;
 		OrderFlush = 0;
 		Orders.clear();
-		SavedOrder.Init();
+		delete SavedOrder;
+		SavedOrder = NULL;
 		delete NewOrder;
 		NewOrder = NULL;
 		delete CriticalOrder;
@@ -814,7 +810,7 @@ public:
 	char OrderCount;            /// how many orders in queue
 	char OrderFlush;            /// cancel current order, take next
 	std::vector<COrder *> Orders; /// orders to process
-	COrder SavedOrder;          /// order to continue after current
+	COrder *SavedOrder;         /// order to continue after current
 	COrder *NewOrder;           /// order for new trained units
 	COrder *CriticalOrder;      /// order to do as possible in breakable animation.
 	char *AutoCastSpell;        /// spells to auto cast
@@ -878,7 +874,7 @@ public:
 	void Release(bool final = false);
 
 	bool RestoreOrder();
-	bool StoreOrder();
+	bool StoreOrder(CUnit::COrder* order);
 
 	// Cowards and invisible units don't attack unless ordered.
 	bool IsAgressive() const

@@ -129,9 +129,12 @@ void HandleActionPatrol(CUnit::COrder& order, CUnit &unit)
 			const CUnit *goal = AttackUnitsInReactRange(unit);
 			if (goal) {
 				// Save current command to come back.
-				//FIXME: rb - will this work? Since Command* clean saved orders
-				unit.SavedOrder = *unit.CurrentOrder();
+				CUnit::COrder *savedOrder = new CUnit::COrder(order);
 
+				if (unit.StoreOrder(savedOrder) == false) {
+					delete savedOrder;
+					savedOrder = NULL;
+				}
 				unit.ClearAction();
 				unit.CurrentOrder()->ClearGoal();
 

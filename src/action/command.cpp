@@ -132,9 +132,8 @@ static void RemoveOrder(CUnit &unit, int order)
 */
 static void ClearSavedAction(CUnit &unit)
 {
-	unit.SavedOrder.Release();
-	unit.SavedOrder.Init();
-	unit.SavedOrder.Action = UnitActionStill; // clear saved action
+	delete unit.SavedOrder;
+	unit.SavedOrder = NULL;
 }
 
 /*----------------------------------------------------------------------------
@@ -154,8 +153,7 @@ void CommandStopUnit(CUnit &unit)
 	order->Init();
 
 	order->Action = UnitActionStill;
-	unit.SavedOrder.Release();
-	unit.SavedOrder = *order;
+	ClearSavedAction(unit);
 	delete unit.NewOrder;
 	unit.NewOrder = NULL;
 }

@@ -305,13 +305,17 @@ void GroupHelpMe(CUnit *attacker, CUnit &defender)
 						gunit.CurrentOrder()->HasGoal() &&
 						gunit.CurrentOrder()->GetGoal()->IsAgressive()))
 						&& CanTarget(gunit.Type, attacker->Type)) {
-
-						if (gunit.SavedOrder.Action == UnitActionStill) {
-							// FIXME: should rewrite command handling
-							CommandAttack(gunit, gunit.tilePos, NoUnitP, FlushCommands);
-							gunit.SavedOrder = *gunit.Orders[1];
-						}
 						CommandAttack(gunit, attacker->tilePos, attacker, FlushCommands);
+						if (gunit.SavedOrder == NULL) {
+							CUnit::COrder *savedOrder = new CUnit::COrder;
+
+							savedOrder->Action = UnitActionAttack;
+							savedOrder->goalPos = gunit.tilePos;
+
+							if (gunit.StoreOrder(savedOrder) == false) {
+								delete savedOrder;
+							}
+						}
 					}
 				}
 				if (!(defender.GroupId & ~mask)) {

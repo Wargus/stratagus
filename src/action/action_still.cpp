@@ -237,15 +237,21 @@ static CUnit *UnitToRepairInRange(const CUnit &unit, int range)
 */
 bool AutoRepair(CUnit &unit)
 {
-	if (unit.AutoRepair && unit.Type->Variable[AUTOREPAIRRANGE_INDEX].Value) {
-		CUnit *repairedUnit = UnitToRepairInRange(unit,
-			unit.Type->Variable[AUTOREPAIRRANGE_INDEX].Value);
+	const int repairRange = unit.Type->Variable[AUTOREPAIRRANGE_INDEX].Value;
+
+	if (unit.AutoRepair && repairRange) {
+		CUnit *repairedUnit = UnitToRepairInRange(unit, repairRange);
+
 		if (repairedUnit != NoUnitP) {
-			CUnit::COrder order = *unit.CurrentOrder();
-			//Command* will clear unit.SavedOrder
 			const Vec2i invalidPos = {-1, -1};
+			CUnit::COrder *savedOrder = new CUnit::COrder(*unit.CurrentOrder());
+
+			//Command* will clear unit.SavedOrder
 			CommandRepair(unit, invalidPos, repairedUnit, FlushCommands);
-			unit.SavedOrder = order;
+			if (unit.StoreOrder(savedOrder) == false) {
+				delete savedOrder;
+				savedOrder = NULL;
+			}
 			return true;
 		}
 	}
@@ -266,12 +272,15 @@ static bool AutoAttack(CUnit &unit, bool stand_ground)
 			if ((goal = AttackUnitsInReactRange(unit))) {
 				// Weak goal, can choose other unit, come back after attack
 				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
-				Assert(unit.SavedOrder.Action == UnitActionStill);
-				Assert(!unit.SavedOrder.HasGoal());
-				unit.SavedOrder.Action = UnitActionAttack;
-				unit.SavedOrder.Range = 0;
-				unit.SavedOrder.goalPos = unit.tilePos;
-				unit.SavedOrder.ClearGoal();
+				CUnit::COrder *savedOrder = new CUnit::COrder;
+
+				savedOrder->Action = UnitActionAttack;
+				savedOrder->Range = 0;
+				savedOrder->goalPos = unit.tilePos;
+
+				if (unit.StoreOrder(savedOrder) == false) {
+					delete savedOrder;
+				}
 				return true;
 			}
 		// Removed units can only attack in AttackRange, from bunker
@@ -307,12 +316,15 @@ void AutoAttack(CUnit &unit, CUnitCache &targets, bool stand_ground)
 			if (goal) {
 				// Weak goal, can choose other unit, come back after attack
 				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
-				Assert(unit.SavedOrder.Action == UnitActionStill);
-				Assert(!unit.SavedOrder.HasGoal());
-				unit.SavedOrder.Action = UnitActionAttack;
-				unit.SavedOrder.Range = 0;
-				unit.SavedOrder.goalPos = unit.tilePos;
-				unit.SavedOrder.ClearGoal();
+				CUnit::COrder *savedOrder = new CUnit::COrder;
+
+				savedOrder->Action = UnitActionAttack;
+				savedOrder->Range = 0;
+				savedOrder->goalPos = unit.tilePos;
+
+				if (unit.StoreOrder(savedOrder) == false) {
+					delete savedOrder;
+				}
 			}
 		// Removed units can only attack in AttackRange, from bunker
 		} else {

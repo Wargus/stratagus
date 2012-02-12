@@ -185,12 +185,17 @@ void HandleActionFollow(CUnit::COrder& order, CUnit &unit)
 			&& (!goal || goal->CurrentAction() == UnitActionAttack || goal->CurrentAction() == UnitActionStill)) {
 			goal = AttackUnitsInReactRange(unit);
 			if (goal) {
-				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
 				// Save current command to come back.
+				CUnit::COrder *savedOrder = new CUnit::COrder(order);
 
-				unit.SavedOrder = order;
+				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
+
+				if (unit.StoreOrder(savedOrder) == false) {
+					delete savedOrder;
+					savedOrder = NULL;
+				}
 				// This stops the follow command and the attack is executed
-				order.ClearGoal();
+				unit.CurrentOrder()->ClearGoal();
 				unit.ClearAction();
 			}
 		}

@@ -121,7 +121,7 @@ void CUnit::RefsDecrease()
 	}
 }
 
-void CUnit::COrder::Release() {
+CUnit::COrder::~COrder() {
 	if (Goal) {
 		Goal->RefsDecrease();
 		Goal = NoUnitP;
@@ -173,17 +173,17 @@ void CUnit::COrder::ReleaseRefs(CUnit &unit)
 
 
 
-CUnit::COrder::COrder(const CUnit::COrder &ths): Goal(ths.Goal), Range(ths.Range),
-	 MinRange(ths.MinRange), Width(ths.Width), Height(ths.Height),
-	 Action(ths.Action), CurrentResource(ths.CurrentResource),
-	 goalPos(ths.goalPos)
+CUnit::COrder::COrder(const CUnit::COrder &rhs): Goal(rhs.Goal), Range(rhs.Range),
+	 MinRange(rhs.MinRange), Width(rhs.Width), Height(rhs.Height),
+	 Action(rhs.Action), CurrentResource(rhs.CurrentResource),
+	 goalPos(rhs.goalPos)
  {
 	if (Goal) {
 		Goal->RefsIncrease();
 	}
 
-	memcpy(&Arg1, &ths.Arg1, sizeof(Arg1));
-
+	memcpy(&Arg1, &rhs.Arg1, sizeof(Arg1));
+	memcpy(&Data, &rhs.Data, sizeof (Data));
 	if (Action == UnitActionResource && Arg1.Resource.Mine) {
 		Arg1.Resource.Mine->RefsIncrease();
 	}
@@ -200,10 +200,10 @@ CUnit::COrder& CUnit::COrder::operator=(const CUnit::COrder &rhs) {
 		SetGoal(rhs.Goal);
 		goalPos = rhs.goalPos;
 		memcpy(&Arg1, &rhs.Arg1, sizeof(Arg1));
-
+		memcpy(&Data, &rhs.Data, sizeof (Data));
 		//FIXME: Hardcoded wood
 		if (Action == UnitActionResource && Arg1.Resource.Mine) {
-			 Arg1.Resource.Mine->RefsIncrease();
+			Arg1.Resource.Mine->RefsIncrease();
 		}
 	}
 	return *this;
@@ -341,9 +341,8 @@ void CUnit::Init(CUnitType &type)
 	Assert(!CurrentOrder()->HasGoal());
 	Assert(NewOrder == NULL);
 	NewOrder = NULL;
-	SavedOrder.Action = UnitActionStill;
-	SavedOrder.goalPos.x = SavedOrder.goalPos.y = -1;
-	Assert(!SavedOrder.HasGoal());
+	Assert(SavedOrder == NULL);
+	SavedOrder = NULL;
 	Assert(CriticalOrder == NULL);
 	CriticalOrder = NULL;
 }
@@ -355,28 +354,25 @@ void CUnit::Init(CUnitType &type)
 */
 bool CUnit::RestoreOrder()
 {
-	if (this->SavedOrder.Action != UnitActionStill) {
-		// Restart order state.
-		this->State = 0;
-		this->SubAction = 0;
-
-		Assert(!this->CurrentOrder()->HasGoal());
-
-		//copy
-		*(this->CurrentOrder()) = this->SavedOrder;
-
-		this->CurrentResource = this->SavedOrder.CurrentResource;
-
-		NewResetPath(*this->CurrentOrder());
-
-		// This isn't supported
-		Assert(!this->SavedOrder.HasGoal());
-
-		this->SavedOrder.Action = UnitActionStill;
-		this->SavedOrder.ClearGoal();
-		return true;
+	if (this->SavedOrder == NULL) {
+		return false;
 	}
-	return false;
+
+	// Restart order state.
+	this->State = 0;
+	this->SubAction = 0;
+
+	// Cannot delete this->Orders[0] since it is generally that order
+	// which call this method.
+
+	//copy
+	this->Orders[0] = this->SavedOrder;
+	this->CurrentResource = this->SavedOrder->CurrentResource;
+
+	NewResetPath(*this->CurrentOrder());
+
+	this->SavedOrder = NULL;
+	return true;
 }
 
 /**
@@ -384,24 +380,17 @@ bool CUnit::RestoreOrder()
 **
 **  @return      True if the current order was saved
 */
-bool CUnit::StoreOrder()
+bool CUnit::StoreOrder(CUnit::COrder* order)
 {
-	if (this->SavedOrder.Action == UnitActionStill) {
-		// Save current order to come back or to continue it.
-		this->SavedOrder = *(this->CurrentOrder());
-		CUnit *temp = this->SavedOrder.GetGoal();
-		if (temp) {
-			DebugPrint("Have goal to come back %d\n" _C_ UnitNumber(*temp));
-			const Vec2i halfSize = {temp->Type->TileWidth / 2, temp->Type->TileHeight / 2};
+	Assert(order);
+	Assert(order->HasGoal() || Map.Info.IsPointOnMap(order->goalPos));
 
-			this->SavedOrder.goalPos = temp->tilePos + halfSize;
-			this->SavedOrder.MinRange = 0;
-			this->SavedOrder.Range = 0;
-			this->SavedOrder.ClearGoal();
-		}
-		return true;
+	if (this->SavedOrder != NULL) {
+		return false;
 	}
-	return false;
+	// Save current order to come back or to continue it.
+	this->SavedOrder = order;
+	return true;
 }
 
 /**
@@ -2785,10 +2774,6 @@ void DestroyAllInside(CUnit &source)
 */
 void HitUnit(CUnit *attacker, CUnit &target, int damage)
 {
-	CUnitType *type;
-	CUnit *goal;
-	unsigned long lastattack;
-
 	// Can now happen by splash damage
 	// Multiple places send x/y as damage, which may be zero
 	if (!damage) {
@@ -2817,13 +2802,12 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 			damage = 0;
 		}
 	}
-
-	type = target.Type;
-	lastattack = target.Attacked;
+	const CUnitType *type = target.Type;
+	const unsigned long lastattack = target.Attacked;
 	target.Attacked = GameCycle ? GameCycle : 1;
-	if(attacker)
+	if (attacker) {
 		target.DamagedType = ExtraDeathIndex(attacker->Type->DamageType.c_str());
-
+	}
 	if (!lastattack || lastattack + 2 * CYCLES_PER_SECOND < GameCycle) {
 		// NOTE: perhaps this should also be moved into the notify?
 		if (target.Player == ThisPlayer) {
@@ -2935,14 +2919,11 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 #endif
 
 	if (type->Building && !target.Burning) {
-		int f;
-		Missile *missile;
-		MissileType *fire;
+		const int f = (100 * target.Variable[HP_INDEX].Value) / target.Variable[HP_INDEX].Max;
+		MissileType *fire = MissileBurningBuilding(f);
 
-		f = (100 * target.Variable[HP_INDEX].Value) / target.Variable[HP_INDEX].Max;
-		fire = MissileBurningBuilding(f);
 		if (fire) {
-			missile = MakeMissile(fire,
+			Missile *missile = MakeMissile(fire,
 				target.tilePos.x * PixelTileSize.x + (type->TileWidth * PixelTileSize.x) / 2,
 				target.tilePos.y * PixelTileSize.y + (type->TileHeight * PixelTileSize.y) / 2 - PixelTileSize.y,
 				0, 0);
@@ -2954,76 +2935,87 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 
 	/* Target Reaction on Hit */
 	if (target.Player->AiEnabled){
-	switch (target.CurrentAction()) {
-		case UnitActionTrain:
-		case UnitActionUpgradeTo:
-		case UnitActionResearch:
-		case UnitActionBuilt:
-		case UnitActionBuild:
-		case UnitActionTransformInto:
-		case UnitActionBoard:
-		case UnitActionUnload:
-		case UnitActionReturnGoods:
-			//
-			// Unit is working?
-			// Maybe AI should cance action and save resources???
-			//
-			return;
-		case UnitActionResource:
-			if (target.SubAction >= 65)
-			{
-				//Normal return to depot
+		switch (target.CurrentAction()) {
+			case UnitActionTrain:
+			case UnitActionUpgradeTo:
+			case UnitActionResearch:
+			case UnitActionBuilt:
+			case UnitActionBuild:
+			case UnitActionTransformInto:
+			case UnitActionBoard:
+			case UnitActionUnload:
+			case UnitActionReturnGoods:
+				//
+				// Unit is working?
+				// Maybe AI should cance action and save resources???
+				//
 				return;
-			}
-			if (target.SubAction > 55  &&
-				target.ResourcesHeld > 0) {
-				//escape to Depot with this what you have;
-				target.CurrentOrder()->Data.ResWorker.DoneHarvesting = 1;
-				return;
-			}
-		break;
-		case UnitActionAttack:
-			goal = target.CurrentOrder()->GetGoal();
-			if (goal) {
-				if (goal == attacker ||
-					(goal->CurrentAction() == UnitActionAttack &&
-					goal->CurrentOrder()->GetGoal() == &target))
-				{
-					//we already fight with one of attackers;
+			case UnitActionResource:
+				if (target.SubAction >= 65) {
+					//Normal return to depot
 					return;
 				}
+				if (target.SubAction > 55  &&
+					target.ResourcesHeld > 0) {
+					//escape to Depot with this what you have;
+					target.CurrentOrder()->Data.ResWorker.DoneHarvesting = 1;
+					return;
+				}
+			break;
+			case UnitActionAttack:
+			{
+				CUnit *goal = target.CurrentOrder()->GetGoal();
+				if (goal) {
+					if (goal == attacker ||
+						(goal->CurrentAction() == UnitActionAttack &&
+						goal->CurrentOrder()->GetGoal() == &target))
+					{
+						//we already fight with one of attackers;
+						return;
+					}
+				}
 			}
-		default:
-		break;
-	}
+			default:
+			break;
+		}
 	}
 
 	//
 	// Attack units in range (which or the attacker?)
 	//
 	if (attacker && target.IsAgressive() && target.CanMove()) {
-			if (target.CurrentAction() != UnitActionStill && !target.Player->AiEnabled)
-					return;
-			if (RevealAttacker && CanTarget(target.Type, attacker->Type)) {
-				// Reveal Unit that is attacking
-				goal = attacker;
+		if (target.CurrentAction() != UnitActionStill && !target.Player->AiEnabled) {
+			return;
+		}
+		CUnit *goal;
+
+		if (RevealAttacker && CanTarget(target.Type, attacker->Type)) {
+			// Reveal Unit that is attacking
+			goal = attacker;
+		} else {
+			if (target.CurrentAction() == UnitActionStandGround) {
+				goal = AttackUnitsInRange(target);
 			} else {
-				if (target.CurrentAction() == UnitActionStandGround) {
-					goal = AttackUnitsInRange(target);
-				} else {
-					// Check for any other units in range
-					goal = AttackUnitsInReactRange(target);
+				// Check for any other units in range
+				goal = AttackUnitsInReactRange(target);
+			}
+		}
+		if (goal) {
+			if (target.SavedOrder == NULL) {
+				CUnit::COrder* savedOrder = new CUnit::COrder;
+
+				savedOrder->Action = UnitActionAttack;
+				savedOrder->goalPos = target.tilePos;
+				savedOrder->Range = target.Stats->Variables[ATTACKRANGE_INDEX].Max;
+				savedOrder->MinRange = target.Type->MinAttackRange;
+
+				if (target.StoreOrder(savedOrder) == false) {
+					delete savedOrder;
 				}
 			}
-			if (goal) {
-				if (target.SavedOrder.Action == UnitActionStill) {
-					// FIXME: should rewrite command handling
-					CommandAttack(target, target.tilePos, NoUnitP, FlushCommands);
-					target.SavedOrder = *target.Orders[1];
-				}
-				CommandAttack(target, goal->tilePos, NoUnitP, FlushCommands);
-				return;
-			}
+			CommandAttack(target, goal->tilePos, NoUnitP, FlushCommands);
+			return;
+		}
 	}
 
 	/*

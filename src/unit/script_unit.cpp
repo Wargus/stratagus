@@ -888,7 +888,8 @@ static int CclUnit(lua_State *l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "saved-order")) {
 			lua_pushvalue(l, j + 1);
-			CclParseOrder(l, *unit, &unit->SavedOrder);
+			unit->SavedOrder = new CUnit::COrder;
+			CclParseOrder(l, *unit, unit->SavedOrder);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "new-order")) {
 			lua_pushvalue(l, j + 1);

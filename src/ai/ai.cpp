@@ -744,13 +744,18 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				aiunit->CurrentOrder()->HasGoal() &&
 				aiunit->CurrentOrder()->GetGoal()->IsAgressive()))
 				&& CanTarget(aiunit->Type, attacker->Type)) {
-
-				if (aiunit->SavedOrder.Action == UnitActionStill) {
-					// FIXME: should rewrite command handling
-					CommandAttack(*aiunit, aiunit->tilePos, NoUnitP, FlushCommands);
-					aiunit->SavedOrder = *aiunit->Orders[1];
-				}
 				CommandAttack(*aiunit, attacker->tilePos, const_cast<CUnit*>(attacker), FlushCommands);
+				if (aiunit->SavedOrder == NULL) {
+					CUnit::COrder *savedOrder = new CUnit::COrder;
+
+					savedOrder->Action = UnitActionAttack;
+					savedOrder->Range = 0;
+					savedOrder->goalPos = aiunit->tilePos;
+
+					if (aiunit->StoreOrder(savedOrder) == false) {
+						delete savedOrder;
+					}
+				}
 			}
 		}
 
