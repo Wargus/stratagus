@@ -208,7 +208,6 @@ void CleanButtons()
 static int GetButtonStatus(const ButtonAction *button, int UnderCursor)
 {
 	int res = 0;
-	int action;
 	int i;
 
 	Assert(button);
@@ -228,7 +227,7 @@ static int GetButtonStatus(const ButtonAction *button, int UnderCursor)
 		}
 	}
 
-	action = UnitActionNone;
+	unsigned int action = UnitActionNone;
 	switch (button->Action) {
 		case ButtonStop:
 			action = UnitActionStill;
