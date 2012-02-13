@@ -378,7 +378,7 @@ void CleanCursors()
 {
 	for (std::vector<CCursor*>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
 		CGraphic::Free((**i).G);
-		free(*i);
+		delete *i;
 	}
 	AllCursors.clear();
 
