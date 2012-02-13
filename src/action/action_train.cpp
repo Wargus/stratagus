@@ -94,7 +94,7 @@ static bool CanHandleOrder(CUnit &unit, COrderPtr order)
 **
 **  @param unit  Unit that trains.
 */
-void HandleActionTrain(CUnit::COrder& order, CUnit &unit)
+void HandleActionTrain(COrder& order, CUnit &unit)
 {
 	// First entry
 	if (!unit.SubAction) {

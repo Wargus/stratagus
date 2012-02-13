@@ -39,12 +39,13 @@
 #include <time.h>
 
 #include "stratagus.h"
+
+#include "actions.h"
 #include "video.h"
 #include "unittype.h"
 #include "animation.h"
 #include "player.h"
 #include "unit.h"
-#include "actions.h"
 #include "missile.h"
 #include "interface.h"
 #include "map.h"
@@ -60,6 +61,120 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+COrder::~COrder() {
+	if (Goal) {
+		Goal->RefsDecrease();
+		Goal = NoUnitP;
+	}
+	if (Action == UnitActionResource && Arg1.Resource.Mine) {
+		Arg1.Resource.Mine->RefsDecrease();
+		Arg1.Resource.Mine = NoUnitP;
+	}
+}
+
+void COrder::ReleaseRefs(CUnit &unit)
+{
+	// Release pending references.
+	if (this->Action == UnitActionResource) {
+		CUnit *mine = this->Arg1.Resource.Mine;
+
+		if (mine) {
+			unit.DeAssignWorkerFromMine(*mine);
+			mine->RefsDecrease();
+			this->Arg1.Resource.Mine = NULL;
+
+		}
+	}
+	if (this->HasGoal()) {
+		// If mining decrease the active count on the resource.
+		if (this->Action == UnitActionResource) {
+			if (unit.SubAction == 60 /* SUB_GATHER_RESOURCE */ ) {
+				CUnit *goal = this->GetGoal();
+
+				goal->CurrentOrder()->Data.Resource.Active--;
+				Assert(goal->CurrentOrder()->Data.Resource.Active >= 0);
+			}
+		}
+		// Still shouldn't have a reference unless attacking
+		Assert(!(this->Action == UnitActionStill && !unit.SubAction));
+		this->ClearGoal();
+	}
+#ifdef DEBUG
+	 else {
+		if (unit.CurrentResource &&
+			!unit.Type->ResInfo[unit.CurrentResource]->TerrainHarvester) {
+			Assert(this->Action != UnitActionResource);
+		}
+	}
+#endif
+}
+
+
+
+
+
+COrder::COrder(const COrder &rhs): Goal(rhs.Goal), Range(rhs.Range),
+	 MinRange(rhs.MinRange), Width(rhs.Width), Height(rhs.Height),
+	 Action(rhs.Action), CurrentResource(rhs.CurrentResource),
+	 goalPos(rhs.goalPos)
+ {
+	if (Goal) {
+		Goal->RefsIncrease();
+	}
+
+	memcpy(&Arg1, &rhs.Arg1, sizeof(Arg1));
+	memcpy(&Data, &rhs.Data, sizeof (Data));
+	if (Action == UnitActionResource && Arg1.Resource.Mine) {
+		Arg1.Resource.Mine->RefsIncrease();
+	}
+}
+
+COrder& COrder::operator=(const COrder &rhs) {
+	if (this != &rhs) {
+		Action = rhs.Action;
+		Range = rhs.Range;
+		MinRange = rhs.MinRange;
+		Width = rhs.Width;
+		Height = rhs.Height;
+		CurrentResource = rhs.CurrentResource;
+		SetGoal(rhs.Goal);
+		goalPos = rhs.goalPos;
+		memcpy(&Arg1, &rhs.Arg1, sizeof(Arg1));
+		memcpy(&Data, &rhs.Data, sizeof (Data));
+		//FIXME: Hardcoded wood
+		if (Action == UnitActionResource && Arg1.Resource.Mine) {
+			Arg1.Resource.Mine->RefsIncrease();
+		}
+	}
+	return *this;
+}
+
+void COrder::SetGoal(CUnit *const new_goal)
+{
+	if (new_goal) {
+		new_goal->RefsIncrease();
+	}
+	if (Goal) {
+		Goal->RefsDecrease();
+	}
+	Goal = new_goal;
+}
+
+void COrder::ClearGoal()
+{
+	if (Goal) {
+		Goal->RefsDecrease();
+	}
+	Goal = NULL;
+}
+
+
+bool COrder::CheckRange() const
+{
+	return (Range <= Map.Info.MapWidth || Range <= Map.Info.MapHeight);
+}
+
 
 
 /*----------------------------------------------------------------------------
@@ -255,7 +370,7 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 **
 **  @param unit  Unit pointer for none action.
 */
-static void HandleActionNone(CUnit::COrder&, CUnit &unit)
+static void HandleActionNone(COrder&, CUnit &unit)
 {
 	DebugPrint("FIXME: Should not happen!\n");
 	DebugPrint("FIXME: Unit (%d) %s has action none.!\n" _C_
@@ -267,7 +382,7 @@ static void HandleActionNone(CUnit::COrder&, CUnit &unit)
 **
 **  @param unit  Unit pointer for not written action.
 */
-static void HandleActionNotWritten(CUnit::COrder&, CUnit &unit)
+static void HandleActionNotWritten(COrder&, CUnit &unit)
 {
 	DebugPrint("FIXME: Not written!\n");
 	DebugPrint("FIXME: Unit (%d) %s has action %d.!\n" _C_
@@ -279,7 +394,7 @@ static void HandleActionNotWritten(CUnit::COrder&, CUnit &unit)
 **
 **  @note can move function into unit structure.
 */
-static void (*HandleActionTable[256])(CUnit::COrder&, CUnit &) = {
+static void (*HandleActionTable[256])(COrder&, CUnit &) = {
 	HandleActionNone,
 	HandleActionStill,
 	HandleActionStandGround,
@@ -465,7 +580,7 @@ static void HandleBuffs(CUnit &unit, int amount)
 	}
 }
 
-static void RunAction(CUnit::COrder &order, CUnit &unit)
+static void RunAction(COrder &order, CUnit &unit)
 {
 	HandleActionTable[order.Action](order, unit);
 }

@@ -883,17 +883,17 @@ static int CclUnit(lua_State *l)
 			}
 		} else if (!strcmp(value, "critical-order")) {
 			lua_pushvalue(l, j + 1);
-			unit->CriticalOrder = new CUnit::COrder;
+			unit->CriticalOrder = new COrder;
 			CclParseOrder(l, *unit , unit->CriticalOrder);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "saved-order")) {
 			lua_pushvalue(l, j + 1);
-			unit->SavedOrder = new CUnit::COrder;
+			unit->SavedOrder = new COrder;
 			CclParseOrder(l, *unit, unit->SavedOrder);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "new-order")) {
 			lua_pushvalue(l, j + 1);
-			unit->NewOrder = new CUnit::COrder;
+			unit->NewOrder = new COrder;
 			CclParseOrder(l, *unit, unit->NewOrder);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "goal")) {

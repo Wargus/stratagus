@@ -408,7 +408,7 @@ static void BuildBuilding(CUnit &unit)
 **
 **  @param unit  Unit that builds a building
 */
-void HandleActionBuild(CUnit::COrder& /*order*/, CUnit &unit)
+void HandleActionBuild(COrder& /*order*/, CUnit &unit)
 {
 	CUnit *ontop;
 
@@ -430,7 +430,7 @@ void HandleActionBuild(CUnit::COrder& /*order*/, CUnit &unit)
 **
 **  @param unit  Unit that is being built
 */
-void HandleActionBuilt(CUnit::COrder& order, CUnit &unit)
+void HandleActionBuilt(COrder& order, CUnit &unit)
 {
 	CUnit *worker;
 	CUnitType *type;

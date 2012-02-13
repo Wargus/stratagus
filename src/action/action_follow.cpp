@@ -58,7 +58,7 @@
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionFollow(CUnit::COrder& order, CUnit &unit)
+void HandleActionFollow(COrder& order, CUnit &unit)
 {
 	if (unit.Wait) {
 		unit.Wait--;
@@ -186,7 +186,7 @@ void HandleActionFollow(CUnit::COrder& order, CUnit &unit)
 			goal = AttackUnitsInReactRange(unit);
 			if (goal) {
 				// Save current command to come back.
-				CUnit::COrder *savedOrder = new CUnit::COrder(order);
+				COrder *savedOrder = new COrder(order);
 
 				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
 

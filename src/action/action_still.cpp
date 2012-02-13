@@ -244,7 +244,7 @@ bool AutoRepair(CUnit &unit)
 
 		if (repairedUnit != NoUnitP) {
 			const Vec2i invalidPos = {-1, -1};
-			CUnit::COrder *savedOrder = new CUnit::COrder(*unit.CurrentOrder());
+			COrder *savedOrder = new COrder(*unit.CurrentOrder());
 
 			//Command* will clear unit.SavedOrder
 			CommandRepair(unit, invalidPos, repairedUnit, FlushCommands);
@@ -272,7 +272,7 @@ static bool AutoAttack(CUnit &unit, bool stand_ground)
 			if ((goal = AttackUnitsInReactRange(unit))) {
 				// Weak goal, can choose other unit, come back after attack
 				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
-				CUnit::COrder *savedOrder = new CUnit::COrder;
+				COrder *savedOrder = new COrder;
 
 				savedOrder->Action = UnitActionAttack;
 				savedOrder->Range = 0;
@@ -316,7 +316,7 @@ void AutoAttack(CUnit &unit, CUnitCache &targets, bool stand_ground)
 			if (goal) {
 				// Weak goal, can choose other unit, come back after attack
 				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
-				CUnit::COrder *savedOrder = new CUnit::COrder;
+				COrder *savedOrder = new COrder;
 
 				savedOrder->Action = UnitActionAttack;
 				savedOrder->Range = 0;
@@ -399,7 +399,7 @@ void ActionStillGeneric(CUnit &unit, bool stand_ground)
 **
 **  @param unit  Unit pointer for still action.
 */
-void HandleActionStill(CUnit::COrder& /*order*/, CUnit &unit)
+void HandleActionStill(COrder& /*order*/, CUnit &unit)
 {
 	ActionStillGeneric(unit, false);
 }

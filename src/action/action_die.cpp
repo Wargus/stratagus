@@ -53,7 +53,7 @@
 **
 **  @param unit  The unit which dies.
 */
-void HandleActionDie(CUnit::COrder& order, CUnit &unit)
+void HandleActionDie(COrder& order, CUnit &unit)
 {
 	Assert(order.Action == UnitActionDie);
 

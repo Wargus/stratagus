@@ -307,7 +307,7 @@ void GroupHelpMe(CUnit *attacker, CUnit &defender)
 						&& CanTarget(gunit.Type, attacker->Type)) {
 						CommandAttack(gunit, attacker->tilePos, attacker, FlushCommands);
 						if (gunit.SavedOrder == NULL) {
-							CUnit::COrder *savedOrder = new CUnit::COrder;
+							COrder *savedOrder = new COrder;
 
 							savedOrder->Action = UnitActionAttack;
 							savedOrder->goalPos = gunit.tilePos;

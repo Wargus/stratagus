@@ -323,7 +323,7 @@ static void LeaveTransporter(CUnit &transporter)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionUnload(CUnit::COrder& order, CUnit &unit)
+void HandleActionUnload(COrder& order, CUnit &unit)
 {
 	const int maxSearchRange = 20;
 

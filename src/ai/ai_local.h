@@ -271,7 +271,7 @@ public:
 
 public:
 	CUnit *Unit;
-	CUnit::COrder Order;
+	COrder Order;
 };
 
 /**

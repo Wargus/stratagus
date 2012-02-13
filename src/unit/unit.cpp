@@ -121,97 +121,72 @@ void CUnit::RefsDecrease()
 	}
 }
 
-CUnit::COrder::~COrder() {
-	if (Goal) {
-		Goal->RefsDecrease();
-		Goal = NoUnitP;
-	}
-	if (Action == UnitActionResource && Arg1.Resource.Mine) {
-		Arg1.Resource.Mine->RefsDecrease();
-		Arg1.Resource.Mine = NoUnitP;
-	}
-}
-
-void CUnit::COrder::ReleaseRefs(CUnit &unit)
+void CUnit::Init()
 {
-	// Release pending references.
-	if (this->Action == UnitActionResource) {
-		CUnit *mine = this->Arg1.Resource.Mine;
-
-		if (mine) {
-			unit.DeAssignWorkerFromMine(*mine);
-			mine->RefsDecrease();
-			this->Arg1.Resource.Mine = NULL;
-
-		}
-	}
-	if (this->HasGoal()) {
-		// If mining decrease the active count on the resource.
-		if (this->Action == UnitActionResource) {
-			if (unit.SubAction == 60 /* SUB_GATHER_RESOURCE */ ) {
-				CUnit *goal = this->GetGoal();
-
-				goal->CurrentOrder()->Data.Resource.Active--;
-				Assert(goal->CurrentOrder()->Data.Resource.Active >= 0);
-			}
-		}
-		// Still shouldn't have a reference unless attacking
-		Assert(!(this->Action == UnitActionStill && !unit.SubAction));
-		this->ClearGoal();
-	}
-#ifdef DEBUG
-	 else {
-		if (unit.CurrentResource &&
-			!unit.Type->ResInfo[unit.CurrentResource]->TerrainHarvester) {
-			Assert(this->Action != UnitActionResource);
-		}
-	}
-#endif
-}
-
-
-
-
-
-CUnit::COrder::COrder(const CUnit::COrder &rhs): Goal(rhs.Goal), Range(rhs.Range),
-	 MinRange(rhs.MinRange), Width(rhs.Width), Height(rhs.Height),
-	 Action(rhs.Action), CurrentResource(rhs.CurrentResource),
-	 goalPos(rhs.goalPos)
- {
-	if (Goal) {
-		Goal->RefsIncrease();
-	}
-
-	memcpy(&Arg1, &rhs.Arg1, sizeof(Arg1));
-	memcpy(&Data, &rhs.Data, sizeof (Data));
-	if (Action == UnitActionResource && Arg1.Resource.Mine) {
-		Arg1.Resource.Mine->RefsIncrease();
-	}
-}
-
-CUnit::COrder& CUnit::COrder::operator=(const CUnit::COrder &rhs) {
-	if (this != &rhs) {
-		Action = rhs.Action;
-		Range = rhs.Range;
-		MinRange = rhs.MinRange;
-		Width = rhs.Width;
-		Height = rhs.Height;
-		CurrentResource = rhs.CurrentResource;
-		SetGoal(rhs.Goal);
-		goalPos = rhs.goalPos;
-		memcpy(&Arg1, &rhs.Arg1, sizeof(Arg1));
-		memcpy(&Data, &rhs.Data, sizeof (Data));
-		//FIXME: Hardcoded wood
-		if (Action == UnitActionResource && Arg1.Resource.Mine) {
-			Arg1.Resource.Mine->RefsIncrease();
-		}
-	}
-	return *this;
-}
-
-bool CUnit::COrder::CheckRange() const
-{
-	return (Range <= Map.Info.MapWidth || Range <= Map.Info.MapHeight);
+	Refs = 0;
+	Slot = 0;
+	UnitSlot = NULL;
+	PlayerSlot = NULL;
+	Next = NULL;
+	InsideCount = 0;
+	BoardCount = 0;
+	UnitInside = NULL;
+	Container = NULL;
+	NextContained = NULL;
+	PrevContained = NULL;
+	NextWorker = NULL;
+	tilePos.x = 0;
+	tilePos.y = 0;
+	Offset = 0;
+	Type = NULL;
+	Player = NULL;
+	Stats = NULL;
+	CurrentSightRange = 0;
+	Colors = NULL;
+	IX = 0;
+	IY = 0;
+	Frame = 0;
+	Direction = 0;
+	DamagedType = ANIMATIONS_DEATHTYPES;
+	Attacked = 0;
+	Burning = 0;
+	Destroyed = 0;
+	Removed = 0;
+	Selected = 0;
+	TeamSelected = 0;
+	Constructed = 0;
+	Active = 0;
+	Boarded = 0;
+	RescuedFrom = NULL;
+	memset(VisCount, 0, sizeof(VisCount));
+	memset(&Seen, 0, sizeof(Seen));
+	Variable = NULL;
+	TTL = 0;
+	GroupId = 0;
+	LastGroup = 0;
+	ResourcesHeld = 0;
+	SubAction = 0;
+	Wait = 0;
+	State = 0;
+	Blink = 0;
+	Moving = 0;
+	ReCast = 0;
+	CacheLock = 0;
+	GuardLock = 0;
+	memset(&Anim, 0, sizeof(Anim));
+	CurrentResource = 0;
+	OrderCount = 0;
+	OrderFlush = 0;
+	Orders.clear();
+	delete SavedOrder;
+	SavedOrder = NULL;
+	delete NewOrder;
+	NewOrder = NULL;
+	delete CriticalOrder;
+	CriticalOrder = NULL;
+	AutoCastSpell = NULL;
+	AutoRepair = 0;
+	Goal = NULL;
 }
 
 
@@ -279,6 +254,46 @@ void CUnit::Release(bool final)
 
 	UnitManager.ReleaseUnit(this);
 }
+
+
+COrder *CUnit::CreateOrder()
+{
+	Orders.push_back(new COrder);
+	return Orders[(int)OrderCount++];
+}
+
+unsigned int CUnit::CurrentAction() const
+{
+	return (CurrentOrder()->Action);
+}
+
+void CUnit::ClearAction()
+{
+	CurrentOrder()->Action = UnitActionStill;
+	SubAction = 0;
+	if (Selected) {
+		SelectedUnitChanged();
+	}
+}
+
+
+bool CUnit::IsIdle() const
+{
+	return OrderCount == 1 && CurrentAction() == UnitActionStill;
+}
+
+bool CUnit::IsAlive() const
+{
+	return !Destroyed && CurrentAction() != UnitActionDie;
+}
+
+int CUnit::GetDrawLevel() const
+{
+	return ((Type->CorpseType && CurrentAction() == UnitActionDie) ?
+				Type->CorpseType->DrawLevel : Type->DrawLevel);
+}
+
+
 
 /**
 **  Initialize the unit slot with default values.
@@ -380,7 +395,7 @@ bool CUnit::RestoreOrder()
 **
 **  @return      True if the current order was saved
 */
-bool CUnit::StoreOrder(CUnit::COrder* order)
+bool CUnit::StoreOrder(COrder* order)
 {
 	Assert(order);
 	Assert(order->HasGoal() || Map.Info.IsPointOnMap(order->goalPos));
@@ -3002,7 +3017,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		}
 		if (goal) {
 			if (target.SavedOrder == NULL) {
-				CUnit::COrder* savedOrder = new CUnit::COrder;
+				COrder* savedOrder = new COrder;
 
 				savedOrder->Action = UnitActionAttack;
 				savedOrder->goalPos = target.tilePos;

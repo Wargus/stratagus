@@ -172,7 +172,7 @@ int DoActionMove(CUnit &unit)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionMove(CUnit::COrder& order, CUnit &unit)
+void HandleActionMove(COrder& order, CUnit &unit)
 {
 	CUnit *goal;
 

@@ -68,7 +68,7 @@ std::string UnitReference(const CUnit &unit)
 **  @param unit   Order behave to this unit.
 **  @param file   Output file.
 */
-void SaveOrder(const CUnit::COrder &order, const CUnit &unit, CFile *file)
+void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 {
 	file->printf("{");
 	switch (order.Action) {

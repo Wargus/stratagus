@@ -135,7 +135,7 @@ static void SpellMoveToTarget(CUnit &unit)
 **
 **  @param unit  Unit, for that the spell cast is handled.
 */
-void HandleActionSpellCast(CUnit::COrder& order, CUnit &unit)
+void HandleActionSpellCast(COrder& order, CUnit &unit)
 {
 	if (unit.Wait) {
 		unit.Wait--;

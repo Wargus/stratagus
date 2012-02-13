@@ -57,7 +57,7 @@
 **
 **  @param unit  Pointer of researching unit.
 */
-void HandleActionResearch(CUnit::COrder& order, CUnit &unit)
+void HandleActionResearch(COrder& order, CUnit &unit)
 {
 	const CUpgrade *upgrade;
 

@@ -224,7 +224,7 @@ void CommandStandGround(CUnit &unit, int flush)
 	if (unit.Type->Building) {
 		// FIXME: should find a better way for pending orders.
 		delete unit.NewOrder;
-		unit.NewOrder = new CUnit::COrder;
+		unit.NewOrder = new COrder;
 		order = unit.NewOrder;
 	} else if (!(order = GetNextOrder(unit, flush))) {
 		return;
@@ -252,7 +252,7 @@ void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 		if (!unit.CanMove()) {
 			// FIXME: should find a better way for pending orders.
 			delete unit.NewOrder;
-			unit.NewOrder = new CUnit::COrder;
+			unit.NewOrder = new COrder;
 			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
@@ -295,7 +295,7 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush)
 		if (!unit.CanMove()) {
 			// FIXME: should find a better way for pending orders.
 			delete unit.NewOrder;
-			unit.NewOrder = new CUnit::COrder;
+			unit.NewOrder = new COrder;
 			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
@@ -326,7 +326,7 @@ void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
 		if (unit.Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			delete unit.NewOrder;
-			unit.NewOrder = new CUnit::COrder;
+			unit.NewOrder = new COrder;
 			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
@@ -390,7 +390,7 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *attack, int flush)
 		if (!unit.Type->CanAttack) {
 			// FIXME: should find a better way for pending orders.
 			delete unit.NewOrder;
-			unit.NewOrder = new CUnit::COrder;
+			unit.NewOrder = new COrder;
 			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
@@ -444,7 +444,7 @@ void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
 		if (unit.Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			delete unit.NewOrder;
-			unit.NewOrder = new CUnit::COrder;
+			unit.NewOrder = new COrder;
 			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
@@ -483,7 +483,7 @@ void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush)
 		if (!unit.CanMove()) {
 			// FIXME: should find a better way for pending orders.
 			delete unit.NewOrder;
-			unit.NewOrder = new CUnit::COrder;
+			unit.NewOrder = new COrder;
 			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
@@ -525,7 +525,7 @@ void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 		if (unit.Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			delete unit.NewOrder;
-			unit.NewOrder = new CUnit::COrder;
+			unit.NewOrder = new COrder;
 			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
@@ -593,7 +593,7 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int fl
 		if (unit.Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			delete unit.NewOrder;
-			unit.NewOrder = new CUnit::COrder;
+			unit.NewOrder = new COrder;
 			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
@@ -659,7 +659,7 @@ void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
 		if (unit.Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			delete unit.NewOrder;
-			unit.NewOrder = new CUnit::COrder;
+			unit.NewOrder = new COrder;
 			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
@@ -714,7 +714,7 @@ void CommandResource(CUnit &unit, CUnit &dest, int flush)
 		if (unit.Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			delete unit.NewOrder;
-			unit.NewOrder = new CUnit::COrder;
+			unit.NewOrder = new COrder;
 			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
@@ -751,7 +751,7 @@ void CommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
 		if (unit.Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			delete unit.NewOrder;
-			unit.NewOrder = new CUnit::COrder;
+			unit.NewOrder = new COrder;
 			order = unit.NewOrder;
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
@@ -925,7 +925,7 @@ void CommandUpgradeTo(CUnit &unit, CUnitType &type, int flush)
 */
 void CommandTransformIntoType(CUnit &unit, CUnitType &type)
 {
-	COrderPtr order = new CUnit::COrder;
+	COrderPtr order = new COrder;
 
 	Assert(unit.CriticalOrder == NULL);
 

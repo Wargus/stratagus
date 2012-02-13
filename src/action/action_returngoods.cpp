@@ -55,7 +55,7 @@
 **
 **  @todo  FIXME: move this into action_resource?
 */
-void HandleActionReturnGoods(CUnit::COrder& order, CUnit &unit)
+void HandleActionReturnGoods(COrder& order, CUnit &unit)
 {
 	Assert(unit.Type->Harvester);
 

@@ -175,7 +175,7 @@ static void EnterTransporter(CUnit &unit)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionBoard(CUnit::COrder& order, CUnit &unit)
+void HandleActionBoard(COrder& order, CUnit &unit)
 {
 	switch (unit.SubAction) {
 		// Wait for transporter

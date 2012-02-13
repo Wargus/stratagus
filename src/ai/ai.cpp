@@ -746,7 +746,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				&& CanTarget(aiunit->Type, attacker->Type)) {
 				CommandAttack(*aiunit, attacker->tilePos, const_cast<CUnit*>(attacker), FlushCommands);
 				if (aiunit->SavedOrder == NULL) {
-					CUnit::COrder *savedOrder = new CUnit::COrder;
+					COrder *savedOrder = new COrder;
 
 					savedOrder->Action = UnitActionAttack;
 					savedOrder->Range = 0;

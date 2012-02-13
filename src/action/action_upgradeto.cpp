@@ -134,7 +134,7 @@ static int TransformUnitIntoType(CUnit &unit, CUnitType &newtype)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionTransformInto(CUnit::COrder& order, CUnit &unit)
+void HandleActionTransformInto(COrder& order, CUnit &unit)
 {
 	// What to do if an error occurs ?
 	TransformUnitIntoType(unit, *order.Arg1.Type);
@@ -145,7 +145,7 @@ void HandleActionTransformInto(CUnit::COrder& order, CUnit &unit)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionUpgradeTo(CUnit::COrder& order, CUnit &unit)
+void HandleActionUpgradeTo(COrder& order, CUnit &unit)
 {
 	if (!unit.SubAction) { // first entry
 		order.Data.UpgradeTo.Ticks = 0;

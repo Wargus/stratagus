@@ -147,7 +147,7 @@ static int CheckForTargetInRange(CUnit &unit)
 		CUnit *goal = AttackUnitsInReactRange(unit);
 
 		if (goal) {
-			CUnit::COrder *savedOrder = new CUnit::COrder();
+			COrder *savedOrder = new COrder();
 
 			savedOrder->Action = order->Action;
 
@@ -172,7 +172,7 @@ static int CheckForTargetInRange(CUnit &unit)
 		CUnit *temp = AttackUnitsInReactRange(unit);
 
 		if (temp && temp->Type->Priority > goal->Type->Priority) {
-			CUnit::COrder *savedOrder = new CUnit::COrder(*order);
+			COrder *savedOrder = new COrder(*order);
 
 			if (unit.StoreOrder(savedOrder) == false) {
 				delete savedOrder;
@@ -330,7 +330,7 @@ static void AttackTarget(CUnit &unit)
 			return;
 		}
 		// Save current command to come back.
-		CUnit::COrder *savedOrder = new CUnit::COrder(*order);
+		COrder *savedOrder = new COrder(*order);
 
 		if (unit.StoreOrder(savedOrder) == false) {
 			delete savedOrder;
@@ -351,7 +351,7 @@ static void AttackTarget(CUnit &unit)
 		if ((unit.SubAction & WEAK_TARGET)) {
 			CUnit *temp = AttackUnitsInReactRange(unit);
 			if (temp && temp->Type->Priority > goal->Type->Priority) {
-				CUnit::COrder *savedOrder = new CUnit::COrder(*order);
+				COrder *savedOrder = new COrder(*order);
 
 				if (unit.StoreOrder(savedOrder) == false) {
 					delete savedOrder;
@@ -372,7 +372,7 @@ static void AttackTarget(CUnit &unit)
 	//
 	int dist = unit.MapDistanceTo(*goal);
 	if (dist > unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-		CUnit::COrder *savedOrder = new CUnit::COrder(*order);
+		COrder *savedOrder = new COrder(*order);
 
 		if (unit.StoreOrder(savedOrder) == false) {
 			delete savedOrder;
@@ -410,7 +410,7 @@ static void AttackTarget(CUnit &unit)
 **
 **  @param unit  Unit, for that the attack is handled.
 */
-void HandleActionAttack(CUnit::COrder& order, CUnit &unit)
+void HandleActionAttack(COrder& order, CUnit &unit)
 {
 	Assert(order.Action == UnitActionAttackGround || order.Action == UnitActionAttack);
 	Assert(order.HasGoal() || Map.Info.IsPointOnMap(order.goalPos));

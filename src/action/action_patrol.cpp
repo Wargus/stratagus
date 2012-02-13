@@ -75,7 +75,7 @@ static void SwapPatrolPoints(CUnit &unit)
 **
 **  @param unit  Patroling unit pointer.
 */
-void HandleActionPatrol(CUnit::COrder& order, CUnit &unit)
+void HandleActionPatrol(COrder& order, CUnit &unit)
 {
 	if (unit.Wait) {
 		unit.Wait--;
@@ -129,7 +129,7 @@ void HandleActionPatrol(CUnit::COrder& order, CUnit &unit)
 			const CUnit *goal = AttackUnitsInReactRange(unit);
 			if (goal) {
 				// Save current command to come back.
-				CUnit::COrder *savedOrder = new CUnit::COrder(order);
+				COrder *savedOrder = new COrder(order);
 
 				if (unit.StoreOrder(savedOrder) == false) {
 					delete savedOrder;

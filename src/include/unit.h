@@ -365,12 +365,15 @@
 #include "player.h"
 #endif
 
+#include "actions.h"
+
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class COrder;
 class CUnit;
 class CUnitType;
 class CUnitStats;
@@ -433,43 +436,6 @@ extern int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1,
 typedef unsigned short UnitRef;
 
 /**
-**  All possible unit actions.
-**
-**  @note  Always change the table ::HandleActionTable
-**
-**  @see HandleActionTable
-*/
-typedef enum _unit_action_ {
-	UnitActionNone,         /// No valid action
-
-	UnitActionStill,        /// unit stand still, does nothing
-	UnitActionStandGround,  /// unit stands ground
-	UnitActionFollow,       /// unit follows units
-	UnitActionMove,         /// unit moves to position/unit
-	UnitActionAttack,       /// unit attacks position/unit
-	UnitActionAttackGround, /// unit attacks ground
-	UnitActionDie,          /// unit dies
-
-	UnitActionSpellCast,    /// unit casts spell
-
-	UnitActionTrain,        /// building is training
-	UnitActionUpgradeTo,    /// building is upgrading itself
-	UnitActionResearch,     /// building is researching spell
-	UnitActionBuilt,      /// building is under construction
-
-// Compound actions
-	UnitActionBoard,        /// unit entering transporter
-	UnitActionUnload,       /// unit leaving transporter
-	UnitActionPatrol,       /// unit paroling area
-	UnitActionBuild,        /// unit builds building
-
-	UnitActionRepair,       /// unit repairing
-	UnitActionResource,     /// unit harvesting resources
-	UnitActionReturnGoods,  /// unit returning any resource
-	UnitActionTransformInto /// unit transform into type.
-} UnitAction;
-
-/**
 **  Voice groups for a unit
 */
 enum UnitVoiceGroup {
@@ -512,203 +478,9 @@ enum _directions_ {
 	/// The big unit structure
 class CUnit {
 public:
-
-	/**
-	**  Unit order structure.
-	*/
-	class COrder
-	{
-	public:
-		COrder() : Goal(NULL), Range(0), MinRange(0), Width(0),
-			Height(0), Action(UnitActionNone), CurrentResource(0)
-		{
-			goalPos.x = -1;
-			goalPos.y = -1;
-			memset(&Arg1, 0, sizeof (Arg1));
-			memset(&Data, 0, sizeof (Data));
-		}
-		COrder(const COrder &ths);
-		~COrder();
-
-		void ReleaseRefs(CUnit &owner);
-		COrder& operator=(const COrder &rhs);
-		bool CheckRange() const;
-
-		void Init() {
-			Assert(Action != UnitActionResource
-					|| (Action == UnitActionResource && Arg1.Resource.Mine == NULL));
-			Action = UnitActionNone;
-			Range = 0;
-			MinRange = 0;
-			Width = 0;
-			Height = 0;
-			CurrentResource = 0;
-			Assert(!Goal);
-			goalPos.x = -1;
-			goalPos.y = -1;
-			memset(&Arg1, 0, sizeof(Arg1));
-			memset(&Data, 0, sizeof(Data));
-		};
-
-		bool HasGoal() const { return Goal != NULL; }
-
-		CUnit * GetGoal() const { return Goal; };
-
-		void SetGoal(CUnit *const new_goal)
-		{
-			if (new_goal) {
-				new_goal->RefsIncrease();
-			}
-			if (Goal) {
-				Goal->RefsDecrease();
-			}
-			Goal = new_goal;
-		}
-
-		void ClearGoal()
-		{
-			if (Goal) {
-				Goal->RefsDecrease();
-			}
-			Goal = NULL;
-		}
-
-	private:
-		friend void CclParseOrder(lua_State *l, const CUnit &unit, COrder* order);
-
-		CUnit *Goal;
-	public:
-		int Range;              /// How far away
-		unsigned int  MinRange; /// How far away minimum
-		unsigned char Width;    /// Goal Width (used when Goal is not)
-		unsigned char Height;   /// Goal Height (used when Goal is not)
-		unsigned char Action;   /// global action
-		unsigned char CurrentResource;	 //used in 	UnitActionResource and
-											//UnitActionReturnGoods
-
-		Vec2i goalPos;          /// or tile coordinate of destination
-
-		union {
-			Vec2i Patrol; /// position for patroling.
-			struct {
-				Vec2i Pos; /// position for terrain resource.
-				CUnit *Mine;
-			} Resource;
-			SpellType *Spell;             /// spell when casting.
-			CUpgrade *Upgrade;            /// upgrade.
-			CUnitType *Type;        /// Unit-type argument used mostly for traning/building, etc.
-		} Arg1;             /// Extra command argument.
-
-		union _order_data_ {
-		struct _order_move_ {
-			unsigned short int Cycles;          /// how much Cycles we move.
-			char Fast;                  /// Flag fast move (one step)
-			char Length;                /// stored path length
-	#define MAX_PATH_LENGTH 28          /// max length of precalculated path
-			char Path[MAX_PATH_LENGTH]; /// directions of stored path
-		} Move; /// ActionMove,...
-		struct _order_built_ {
-			CUnit *Worker;              /// Worker building this unit
-			int Progress;               /// Progress counter, in 1/100 cycles.
-			int Cancel;                 /// Cancel construction
-			CConstructionFrame *Frame;   /// Construction frame
-		} Built; /// ActionBuilt,...
-		struct _order_build_ {
-			int Cycles;                 /// Cycles unit has been building for
-		} Build; /// ActionBuild
-		struct _order_resource_ {
-			CUnit *Workers; //pointer to first assigned worker to this resource.
-			int Assigned; /// how many units are assigned to harvesting from the resource.
-			int Active; /// how many units are harvesting from the resource.
-		} Resource; /// Resource still
-		struct _order_resource_worker_ {
-			int TimeToHarvest;          /// how much time until we harvest some more.
-			unsigned DoneHarvesting:1;  /// Harvesting done, wait for action to break.
-		} ResWorker; /// Worker harvesting
-		struct _order_repair_ {
-			int Cycles;                 /// Cycles unit has been repairing for
-		} Repair; /// Repairing unit
-		struct _order_research_ {
-			CUpgrade *Upgrade;          /// Upgrade researched
-		} Research; /// Research action
-		struct _order_upgradeto_ {
-			int Ticks; /// Ticks to complete
-		} UpgradeTo; /// Upgrade to action
-		struct _order_train_ {
-			int Ticks;                  /// Ticks to complete
-		} Train; /// Train units action
-		} Data; /// Storage room for different commands
-	};
-
 	CUnit() : SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
 
-	void Init() {
-		Refs = 0;
-		Slot = 0;
-		UnitSlot = NULL;
-		PlayerSlot = NULL;
-		Next = NULL;
-		InsideCount = 0;
-		BoardCount = 0;
-		UnitInside = NULL;
-		Container = NULL;
-		NextContained = NULL;
-		PrevContained = NULL;
-		NextWorker = NULL;
-		tilePos.x = 0;
-		tilePos.y = 0;
-		Offset = 0;
-		Type = NULL;
-		Player = NULL;
-		Stats = NULL;
-		CurrentSightRange = 0;
-		Colors = NULL;
-		IX = 0;
-		IY = 0;
-		Frame = 0;
-		Direction = 0;
-		DamagedType = ANIMATIONS_DEATHTYPES;
-		Attacked = 0;
-		Burning = 0;
-		Destroyed = 0;
-		Removed = 0;
-		Selected = 0;
-		TeamSelected = 0;
-		Constructed = 0;
-		Active = 0;
-		Boarded = 0;
-		RescuedFrom = NULL;
-		memset(VisCount, 0, sizeof(VisCount));
-		memset(&Seen, 0, sizeof(Seen));
-		Variable = NULL;
-		TTL = 0;
-		GroupId = 0;
-		LastGroup = 0;
-		ResourcesHeld = 0;
-		SubAction = 0;
-		Wait = 0;
-		State = 0;
-		Blink = 0;
-		Moving = 0;
-		ReCast = 0;
-		CacheLock = 0;
-		GuardLock = 0;
-		memset(&Anim, 0, sizeof(Anim));
-		CurrentResource = 0;
-		OrderCount = 0;
-		OrderFlush = 0;
-		Orders.clear();
-		delete SavedOrder;
-		SavedOrder = NULL;
-		delete NewOrder;
-		NewOrder = NULL;
-		delete CriticalOrder;
-		CriticalOrder = NULL;
-		AutoCastSpell = NULL;
-		AutoRepair = 0;
-		Goal = NULL;
-	}
-
+	void Init();
 	// @note int is faster than shorts
 	unsigned int     Refs;         /// Reference counter
 	int     Slot;         /// Assigned slot number
@@ -817,24 +589,15 @@ public:
 
 	CUnit *Goal; /// Generic/Teleporter goal pointer
 
-	COrder * CreateOrder() {
-		Orders.push_back(new COrder);
-		return Orders[(int)OrderCount++];
-	}
+	COrder *CreateOrder();
 
 	COrder *CurrentOrder() const { return Orders[0]; }
 
-	UnitAction CurrentAction() const { return (UnitAction)(CurrentOrder()->Action); }
+	unsigned int CurrentAction() const;
 
-	bool IsIdle() const { return OrderCount == 1 && CurrentAction() == UnitActionStill; }
+	bool IsIdle() const;
 
-	inline void ClearAction() {
-		CurrentOrder()->Action = UnitActionStill;
-		SubAction = 0;
-		if (Selected) {
-			SelectedUnitChanged();
-		}
-	}
+	void ClearAction();
 
 	inline int GetReactRange() const
 	{
@@ -874,7 +637,7 @@ public:
 	void Release(bool final = false);
 
 	bool RestoreOrder();
-	bool StoreOrder(CUnit::COrder* order);
+	bool StoreOrder(COrder* order);
 
 	// Cowards and invisible units don't attack unless ordered.
 	bool IsAgressive() const
@@ -898,10 +661,7 @@ public:
 	**
 	**  @return        True if alive, false otherwise.
 	*/
-	inline bool IsAlive() const
-	{
-		return !Destroyed && CurrentAction() != UnitActionDie;
-	}
+	bool IsAlive() const;
 
 	/**
 	**  Returns true if unit is alive and on the map.
@@ -1009,22 +769,14 @@ public:
 	**  Test if unit can move.
 	**  For the moment only check for move animation.
 	**
-	**  @return 0 if unit cannot move.
+	**  @return true if unit cann move.
 	*/
-	bool CanMove() const
-	{
-		return Type->CanMove();
-	}
+	bool CanMove() const { return Type->CanMove(); }
 
-	int GetDrawLevel() const
-	{
-		return ((Type->CorpseType && CurrentAction() == UnitActionDie) ?
-					Type->CorpseType->DrawLevel : Type->DrawLevel);
-	}
-
+	int GetDrawLevel() const;
 };
 
-typedef CUnit::COrder* COrderPtr;
+typedef COrder* COrderPtr;
 
 class CUnitPtr {
 	CUnit *unit;
@@ -1351,7 +1103,7 @@ extern int CanTransport(const CUnit &transporter, const CUnit &unit);
 	/// Generate a unit reference, a printable unique string for unit
 extern std::string UnitReference(const CUnit &unit);
 	/// Save an order
-extern void SaveOrder(const CUnit::COrder &order, const CUnit &unit, CFile *file);
+extern void SaveOrder(const COrder &order, const CUnit &unit, CFile *file);
 	/// save unit-structure
 extern void SaveUnit(const CUnit &unit, CFile *file);
 	/// save all units

@@ -885,7 +885,7 @@ static bool ActionResourceInit(CUnit &unit)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionResource(CUnit::COrder& order, CUnit &unit)
+void HandleActionResource(COrder& order, CUnit &unit)
 {
 	if (unit.Wait) {
 		// FIXME: show idle animation while we wait?

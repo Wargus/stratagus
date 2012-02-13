@@ -144,7 +144,7 @@ static int AnimateActionRepair(CUnit &unit)
 **
 **  @param unit  Unit, for that the attack is handled.
 */
-void HandleActionRepair(CUnit::COrder& order, CUnit &unit)
+void HandleActionRepair(COrder& order, CUnit &unit)
 {
 	CUnit *goal;
 	int err;
