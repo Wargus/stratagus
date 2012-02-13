@@ -204,18 +204,22 @@ public:
 		return forces.size();
 	}
 
+	const AiForce &operator[](unsigned int index) const {
+		return forces[index];
+	}
+
 	AiForce &operator[](unsigned int index) {
 		return forces[index];
 	}
 
-	int getIndex(AiForce *force) {
+	int getIndex(AiForce *force) const {
 		for (unsigned int i = 0; i < forces.size(); ++i) {
 			if (force == &forces[i]) return i;
 		}
 		return -1;
 	}
 
-	inline unsigned int getScriptForce(unsigned int index) {
+	unsigned int getScriptForce(unsigned int index) {
 		if (script[index] == -1) {
 			script[index] = FindFreeForce();
 		}
@@ -263,18 +267,6 @@ public:
 };
 
 /**
-**  AI transport request
-*/
-class AiTransportRequest {
-public:
-	AiTransportRequest() : Unit(NULL) {}
-
-public:
-	CUnit *Unit;
-	COrder Order;
-};
-
-/**
 **  AI variables.
 */
 class PlayerAi {
@@ -311,7 +303,6 @@ public:
 
 	std::vector<AiExplorationRequest> FirstExplorationRequest;/// Requests for exploration
 	unsigned long LastExplorationGameCycle;         /// When did the last explore occur?
-	std::vector<AiTransportRequest> TransportRequests;/// Requests for transport
 	unsigned long LastCanNotMoveGameCycle;          /// Last can not move cycle
 	std::vector<AiRequestType> UnitTypeRequests;    /// unit-types to build/train request,priority list
 	std::vector<CUnitType *> UpgradeToRequests;     /// Upgrade to unit-type requested and priority list
