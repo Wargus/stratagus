@@ -151,7 +151,7 @@ void HandleActionRepair(COrder& order, CUnit &unit)
 
 	switch (unit.SubAction) {
 		case 0:
-			NewResetPath(order);
+			order.NewResetPath();
 			unit.SubAction = 1;
 			// FALL THROUGH
 		case 1:// Move near to target.
@@ -172,7 +172,7 @@ void HandleActionRepair(COrder& order, CUnit &unit)
 						// FIXME: should I clear this here?
 						order.ClearGoal();
 						goal = NULL;
-						NewResetPath(order);
+						order.NewResetPath();
 					}
 				} else if (unit.Player->AiEnabled) {
 					// Ai players workers should stop if target is killed
@@ -218,7 +218,7 @@ void HandleActionRepair(COrder& order, CUnit &unit)
 						// FIXME: should I clear this here?
 						order.ClearGoal();
 						goal = NULL;
-						NewResetPath(order);
+						order.NewResetPath();
 					} else {
 						int dist = unit.MapDistanceTo(*goal);
 						if (dist <= unit.Type->RepairRange) {

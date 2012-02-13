@@ -95,7 +95,7 @@ static void MoveToLocation(CUnit &unit)
 	// First entry
 	if (!unit.SubAction) {
 		unit.SubAction = 1;
-		NewResetPath(*unit.CurrentOrder());
+		unit.CurrentOrder()->NewResetPath();
 	}
 
 	if (unit.Wait) {

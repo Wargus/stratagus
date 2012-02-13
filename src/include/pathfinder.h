@@ -67,12 +67,6 @@ enum _move_return_ {
 	PF_MOVE = 1           /// On the way moving
 };
 
-/**
-**  To remove pathfinder internals. Called if path destination changed.
-*/
-#define NewResetPath(order) \
-	do { (order).Data.Move.Fast = 1; (order).Data.Move.Length = 0; } while (0)
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/

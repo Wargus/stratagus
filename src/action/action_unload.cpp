@@ -343,7 +343,7 @@ void HandleActionUnload(COrder& order, CUnit &unit)
 				order.goalPos = pos;
 			}
 
-			NewResetPath(*unit.CurrentOrder());
+			unit.CurrentOrder()->NewResetPath();
 			unit.SubAction = 1;
 			// follow on next case
 		case 1: // Move unit to destination

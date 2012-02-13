@@ -166,7 +166,7 @@ void HandleActionSpellCast(COrder& order, CUnit &unit)
 			}
 			// FIXME FIXME FIXME: Check if already in range and skip straight to 2(casting)
 			if (!spell->IsCasterOnly()) {
-				NewResetPath(*unit.CurrentOrder());
+				unit.CurrentOrder()->NewResetPath();
 			}
 			unit.ReCast = 0; // repeat spell on next pass? (defaults to `no')
 			unit.SubAction = 1;

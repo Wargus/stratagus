@@ -83,7 +83,7 @@ static int MoveToResource_Terrain(CUnit &unit)
 			return -1;
 		} else {
 			unit.CurrentOrder()->goalPos = pos;
-			NewResetPath(*unit.CurrentOrder());
+			unit.CurrentOrder()->NewResetPath();
 		}
 	}
 	switch (DoActionMove(unit)) {
@@ -92,7 +92,7 @@ static int MoveToResource_Terrain(CUnit &unit)
 			if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 9999,
 					unit.Player, unit.tilePos, &pos)) {
 				unit.CurrentOrder()->goalPos = pos;
-				NewResetPath(*unit.CurrentOrder());
+				unit.CurrentOrder()->NewResetPath();
 				DebugPrint("Found a better place to harvest %d,%d\n" _C_ pos.x _C_ pos.y);
 				// FIXME: can't this overflow? It really shouldn't, since
 				// x and y are really supossed to be reachable, checked thorugh a flood fill.
@@ -165,7 +165,7 @@ static void UnitGotoGoal(CUnit &unit, CUnit *const goal, int mode)
 	unit.State = 0;
 	if (mode == SUB_MOVE_TO_DEPOT || mode == SUB_MOVE_TO_RESOURCE) {
 		unit.CurrentOrder()->Data.Move.Cycles = 0; //moving counter
-		NewResetPath(*unit.CurrentOrder());
+		unit.CurrentOrder()->NewResetPath();
 	}
 }
 

@@ -384,7 +384,7 @@ bool CUnit::RestoreOrder()
 	this->Orders[0] = this->SavedOrder;
 	this->CurrentResource = this->SavedOrder->CurrentResource;
 
-	NewResetPath(*this->CurrentOrder());
+	this->CurrentOrder()->NewResetPath();
 
 	this->SavedOrder = NULL;
 	return true;

@@ -185,7 +185,7 @@ void HandleActionMove(COrder& order, CUnit &unit)
 
 	if (!unit.SubAction) { // first entry
 		unit.SubAction = 1;
-		NewResetPath(*unit.CurrentOrder());
+		unit.CurrentOrder()->NewResetPath();
 		order.Data.Move.Cycles = 0;
 		Assert(unit.State == 0);
 	}
@@ -220,7 +220,7 @@ void HandleActionMove(COrder& order, CUnit &unit)
 		DebugPrint("Goal dead\n");
 		order.goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
 		order.ClearGoal();
-		NewResetPath(order);
+		order.NewResetPath();
 	}
 }
 

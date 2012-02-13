@@ -138,6 +138,12 @@ public:
 	void SetGoal(CUnit *const new_goal);
 	void ClearGoal();
 
+	/**
+	**  To remove pathfinder internals. Called if path destination changed.
+	*/
+	void NewResetPath() { Data.Move.Fast = 1; Data.Move.Length = 0; }
+
+
 private:
 	friend void CclParseOrder(lua_State *l, const CUnit &unit, COrder* order);
 

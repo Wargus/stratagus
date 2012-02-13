@@ -164,7 +164,7 @@ static int CheckForTargetInRange(CUnit &unit)
 			order->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 			order->goalPos.x = order->goalPos.y = -1;
 			unit.SubAction |= WEAK_TARGET; // weak target
-			NewResetPath(*order);
+			order->NewResetPath();
 		}
 	// Have a weak target, try a better target.
 	} else if (order->HasGoal() && (unit.SubAction & WEAK_TARGET)) {
@@ -180,7 +180,7 @@ static int CheckForTargetInRange(CUnit &unit)
 			}
 			order->SetGoal(temp);
 			order->goalPos.x = order->goalPos.y = -1;
-			NewResetPath(*order);
+			order->NewResetPath();
 		}
 	}
 
@@ -340,7 +340,7 @@ static void AttackTarget(CUnit &unit)
 		order->goalPos.x = order->goalPos.y = -1;
 		order->MinRange = unit.Type->MinAttackRange;
 		order->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
-		NewResetPath(*order);
+		order->NewResetPath();
 		unit.SubAction |= WEAK_TARGET;
 
 	//
@@ -362,7 +362,7 @@ static void AttackTarget(CUnit &unit)
 				order->goalPos.x = order->goalPos.y = -1;
 				order->MinRange = unit.Type->MinAttackRange;
 				unit.SubAction = MOVE_TO_TARGET;
-				NewResetPath(*order);
+				order->NewResetPath();
 			}
 		}
 	}
@@ -378,7 +378,7 @@ static void AttackTarget(CUnit &unit)
 			delete savedOrder;
 			savedOrder = NULL;
 		}
-		NewResetPath(*order);
+		order->NewResetPath();
 		unit.Frame = 0;
 		unit.State = 0;
 		unit.SubAction &= WEAK_TARGET;
@@ -443,7 +443,7 @@ void HandleActionAttack(COrder& order, CUnit &unit)
 				}
 			}
 			unit.SubAction = MOVE_TO_TARGET;
-			NewResetPath(order);
+			order.NewResetPath();
 			// FIXME: should use a reachable place to reduce pathfinder time.
 			Assert(unit.State == 0);
 		}
