@@ -144,6 +144,12 @@ public:
 	void NewResetPath() { Data.Move.Fast = 1; Data.Move.Length = 0; }
 
 
+	void FillSeenValues(CUnit &unit) const;
+
+	bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
+	void AiUnitKilled(CUnit &unit);
+
+	void OnAnimationAttack(CUnit &unit);
 private:
 	friend void CclParseOrder(lua_State *l, const CUnit &unit, COrder* order);
 

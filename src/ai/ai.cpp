@@ -620,17 +620,17 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type)
 **  @param type  Unit-type which is now available.
 **  @return      True if the unit-type could be reduced.
 */
-static int AiReduceMadeInBuilt2(PlayerAi *pai, const CUnitType &type)
+static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type)
 {
 	std::vector<AiBuildQueue>::iterator i;
 
-	for (i = pai->UnitTypeBuilt.begin(); i != pai->UnitTypeBuilt.end(); ++i) {
+	for (i = pai.UnitTypeBuilt.begin(); i != pai.UnitTypeBuilt.end(); ++i) {
 		if (&type == (*i).Type && (*i).Made) {
 			(*i).Made--;
-			return 1;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
 
 /**
@@ -639,7 +639,7 @@ static int AiReduceMadeInBuilt2(PlayerAi *pai, const CUnitType &type)
 **  @param pai   Computer AI player.
 **  @param type  Unit-type which is now available.
 */
-static void AiReduceMadeInBuilt(PlayerAi *pai, const CUnitType &type)
+void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type)
 {
 	if (AiReduceMadeInBuilt2(pai, type)) {
 		return;
@@ -653,7 +653,7 @@ static void AiReduceMadeInBuilt(PlayerAi *pai, const CUnitType &type)
 			return;
 		}
 	}
-	if (pai->Player == ThisPlayer) {
+	if (pai.Player == ThisPlayer) {
 		DebugPrint
 			("My guess is that you built something under ai me. naughty boy!\n");
 		return;
@@ -722,6 +722,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 
 					if (aiunit.StoreOrder(savedOrder) == false) {
 						delete savedOrder;
+						savedOrder = NULL;
 					}
 				}
 			}
@@ -779,31 +780,7 @@ void AiUnitKilled(CUnit &unit)
 		}
 	}
 
-	// FIXME: must handle all orders...
-	switch (unit.CurrentAction()) {
-		case UnitActionStill:
-		case UnitActionAttack:
-		case UnitActionMove:
-			break;
-		case UnitActionBuilt:
-			DebugPrint("%d: %d(%s) killed, under construction!\n" _C_
-				unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
-			AiReduceMadeInBuilt(unit.Player->Ai, *unit.Type);
-			break;
-		case UnitActionBuild:
-			DebugPrint("%d: %d(%s) killed, with order %s!\n" _C_
-				unit.Player->Index _C_ UnitNumber(unit) _C_
-				unit.Type->Ident.c_str() _C_ unit.CurrentOrder()->Arg1.Type->Ident.c_str());
-			if (!unit.CurrentOrder()->HasGoal()) {
-				AiReduceMadeInBuilt(unit.Player->Ai, *unit.CurrentOrder()->Arg1.Type);
-			}
-			break;
-		default:
-			DebugPrint("FIXME: %d: %d(%s) killed, with order %d!\n" _C_
-				unit.Player->Index _C_ UnitNumber(unit) _C_
-				unit.Type->Ident.c_str() _C_ unit.CurrentAction());
-			break;
-	}
+	unit.CurrentOrder()->AiUnitKilled(unit);
 }
 
 /**
@@ -840,7 +817,7 @@ void AiCanNotBuild(CUnit &unit, const CUnitType &what)
 		what.Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
 
 	Assert(unit.Player->Type != PlayerPerson);
-	AiReduceMadeInBuilt(unit.Player->Ai, what);
+	AiReduceMadeInBuilt(*unit.Player->Ai, what);
 }
 
 /**
@@ -852,7 +829,7 @@ void AiCanNotBuild(CUnit &unit, const CUnitType &what)
 void AiCanNotReach(CUnit &unit, const CUnitType &what)
 {
 	Assert(unit.Player->Type != PlayerPerson);
-	AiReduceMadeInBuilt(unit.Player->Ai, what);
+	AiReduceMadeInBuilt(*unit.Player->Ai, what);
 }
 
 /**

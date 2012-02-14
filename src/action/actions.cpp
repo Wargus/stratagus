@@ -58,11 +58,52 @@
 
 unsigned SyncHash; /// Hash calculated to find sync failures
 
+
+extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
+
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-COrder::~COrder() {
+COrder::COrder(const COrder &rhs): Goal(rhs.Goal), Range(rhs.Range),
+	 MinRange(rhs.MinRange), Width(rhs.Width), Height(rhs.Height),
+	 Action(rhs.Action), CurrentResource(rhs.CurrentResource),
+	 goalPos(rhs.goalPos)
+ {
+	if (Goal) {
+		Goal->RefsIncrease();
+	}
+
+	memcpy(&Arg1, &rhs.Arg1, sizeof(Arg1));
+	memcpy(&Data, &rhs.Data, sizeof (Data));
+	if (Action == UnitActionResource && Arg1.Resource.Mine) {
+		Arg1.Resource.Mine->RefsIncrease();
+	}
+}
+
+COrder& COrder::operator=(const COrder &rhs) {
+	if (this != &rhs) {
+		Action = rhs.Action;
+		Range = rhs.Range;
+		MinRange = rhs.MinRange;
+		Width = rhs.Width;
+		Height = rhs.Height;
+		CurrentResource = rhs.CurrentResource;
+		SetGoal(rhs.Goal);
+		goalPos = rhs.goalPos;
+		memcpy(&Arg1, &rhs.Arg1, sizeof(Arg1));
+		memcpy(&Data, &rhs.Data, sizeof (Data));
+		//FIXME: Hardcoded wood
+		if (Action == UnitActionResource && Arg1.Resource.Mine) {
+			Arg1.Resource.Mine->RefsIncrease();
+		}
+	}
+	return *this;
+}
+
+COrder::~COrder()
+{
 	if (Goal) {
 		Goal->RefsDecrease();
 		Goal = NoUnitP;
@@ -110,46 +151,6 @@ void COrder::ReleaseRefs(CUnit &unit)
 #endif
 }
 
-
-
-
-
-COrder::COrder(const COrder &rhs): Goal(rhs.Goal), Range(rhs.Range),
-	 MinRange(rhs.MinRange), Width(rhs.Width), Height(rhs.Height),
-	 Action(rhs.Action), CurrentResource(rhs.CurrentResource),
-	 goalPos(rhs.goalPos)
- {
-	if (Goal) {
-		Goal->RefsIncrease();
-	}
-
-	memcpy(&Arg1, &rhs.Arg1, sizeof(Arg1));
-	memcpy(&Data, &rhs.Data, sizeof (Data));
-	if (Action == UnitActionResource && Arg1.Resource.Mine) {
-		Arg1.Resource.Mine->RefsIncrease();
-	}
-}
-
-COrder& COrder::operator=(const COrder &rhs) {
-	if (this != &rhs) {
-		Action = rhs.Action;
-		Range = rhs.Range;
-		MinRange = rhs.MinRange;
-		Width = rhs.Width;
-		Height = rhs.Height;
-		CurrentResource = rhs.CurrentResource;
-		SetGoal(rhs.Goal);
-		goalPos = rhs.goalPos;
-		memcpy(&Arg1, &rhs.Arg1, sizeof(Arg1));
-		memcpy(&Data, &rhs.Data, sizeof (Data));
-		//FIXME: Hardcoded wood
-		if (Action == UnitActionResource && Arg1.Resource.Mine) {
-			Arg1.Resource.Mine->RefsIncrease();
-		}
-	}
-	return *this;
-}
-
 void COrder::SetGoal(CUnit *const new_goal)
 {
 	if (new_goal) {
@@ -175,6 +176,118 @@ bool COrder::CheckRange() const
 	return (Range <= Map.Info.MapWidth || Range <= Map.Info.MapHeight);
 }
 
+void COrder::FillSeenValues(CUnit &unit) const
+{
+	unit.Seen.State = (Action == UnitActionBuilt) | ((Action == UnitActionUpgradeTo) << 1);
+	if (unit.CurrentAction() == UnitActionDie) {
+		unit.Seen.State = 3;
+	}
+	if (Action == UnitActionBuilt) {
+		unit.Seen.CFrame = Data.Built.Frame;
+	} else {
+		unit.Seen.CFrame = NULL;
+	}
+}
+
+bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
+{
+	Assert(unit.CurrentOrder() == this);
+
+	switch (Action) {
+		case UnitActionTrain:
+		case UnitActionUpgradeTo:
+		case UnitActionResearch:
+		case UnitActionBuilt:
+		case UnitActionBuild:
+		case UnitActionTransformInto:
+		case UnitActionBoard:
+		case UnitActionUnload:
+		case UnitActionReturnGoods:
+			// Unit is working ?
+			// Maybe AI should cancel action and save resources ???
+			return true;
+		case UnitActionResource:
+			if (unit.SubAction >= 65) {
+				//Normal return to depot
+				return true;
+			}
+			if (unit.SubAction > 55  &&
+				unit.ResourcesHeld > 0) {
+				//escape to Depot with this what you have;
+				Data.ResWorker.DoneHarvesting = 1;
+				return true;
+			}
+		break;
+		case UnitActionAttack:
+		{
+			CUnit *goal = GetGoal();
+			if (goal) {
+				if (goal == attacker ||
+					(goal->CurrentAction() == UnitActionAttack &&
+					goal->CurrentOrder()->GetGoal() == &unit))
+				{
+					//we already fight with one of attackers;
+					return true;
+				}
+			}
+		}
+		default:
+		break;
+	}
+	return false;
+}
+
+
+/** Called when unit is killed.
+**  warn the AI module.
+*/
+void COrder::AiUnitKilled(CUnit& unit)
+{
+	switch (Action) {
+		case UnitActionStill:
+		case UnitActionAttack:
+		case UnitActionMove:
+			break;
+		case UnitActionBuilt:
+			DebugPrint("%d: %d(%s) killed, under construction!\n" _C_
+				unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
+			AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type);
+			break;
+		case UnitActionBuild:
+			DebugPrint("%d: %d(%s) killed, with order %s!\n" _C_
+				unit.Player->Index _C_ UnitNumber(unit) _C_
+				unit.Type->Ident.c_str() _C_ Arg1.Type->Ident.c_str());
+			if (!HasGoal()) {
+				AiReduceMadeInBuilt(*unit.Player->Ai, *Arg1.Type);
+			}
+			break;
+		default:
+			DebugPrint("FIXME: %d: %d(%s) killed, with order %d!\n" _C_
+				unit.Player->Index _C_ UnitNumber(unit) _C_
+				unit.Type->Ident.c_str() _C_ Action);
+			break;
+	}
+}
+
+/**
+**  Call when animation step is "attack"
+*/
+void COrder::OnAnimationAttack(CUnit &unit)
+{
+	Assert(unit.CurrentOrder() == this);
+
+	if (Action == UnitActionSpellCast) {
+		CUnit *goal = GetGoal();
+		if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
+			unit.ReCast = 0;
+		} else {
+			unit.ReCast = SpellCast(unit, Arg1.Spell, goal, goalPos.x, goalPos.y);
+		}
+	} else {
+		FireMissile(unit);
+	}
+	UnHideUnit(unit); // unit is invisible until attacks
+}
 
 
 /*----------------------------------------------------------------------------
@@ -282,21 +395,10 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 				break;
 
 			case AnimationAttack:
-				if (unit.CurrentAction() == UnitActionSpellCast) {
-					CUnit *goal = unit.CurrentOrder()->GetGoal();
-					if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
-						unit.ReCast = 0;
-					} else {
-						COrderPtr order = unit.CurrentOrder();
-						unit.ReCast = SpellCast(unit, order->Arg1.Spell,
-											goal, order->goalPos.x, order->goalPos.y);
-					}
-				} else {
-					FireMissile(unit);
-				}
-				UnHideUnit(unit); // unit is invisible until attacks
+			{
+				unit.CurrentOrder()->OnAnimationAttack(unit);
 				break;
-
+			}
 			case AnimationSpawnMissile:
 				x = unit.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2;  
 				y = unit.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2;

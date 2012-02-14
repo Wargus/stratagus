@@ -1127,18 +1127,10 @@ static void UnitFillSeenValues(CUnit &unit)
 	unit.Seen.IY = unit.IY;
 	unit.Seen.IX = unit.IX;
 	unit.Seen.Frame = unit.Frame;
-	unit.Seen.State = (unit.CurrentAction() == UnitActionBuilt) |
-			((unit.CurrentAction() == UnitActionUpgradeTo) << 1);
-	if (unit.CurrentAction() == UnitActionDie) {
-		unit.Seen.State = 3;
-	}
 	unit.Seen.Type = unit.Type;
 	unit.Seen.Constructed = unit.Constructed;
-	if (unit.CurrentAction() == UnitActionBuilt) {
-		unit.Seen.CFrame = unit.CurrentOrder()->Data.Built.Frame;
-	} else {
-		unit.Seen.CFrame = NULL;
-	}
+
+	unit.CurrentOrder()->FillSeenValues(unit);
 }
 
 /**
@@ -2949,55 +2941,13 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 	}
 
 	/* Target Reaction on Hit */
-	if (target.Player->AiEnabled){
-		switch (target.CurrentAction()) {
-			case UnitActionTrain:
-			case UnitActionUpgradeTo:
-			case UnitActionResearch:
-			case UnitActionBuilt:
-			case UnitActionBuild:
-			case UnitActionTransformInto:
-			case UnitActionBoard:
-			case UnitActionUnload:
-			case UnitActionReturnGoods:
-				//
-				// Unit is working?
-				// Maybe AI should cance action and save resources???
-				//
-				return;
-			case UnitActionResource:
-				if (target.SubAction >= 65) {
-					//Normal return to depot
-					return;
-				}
-				if (target.SubAction > 55  &&
-					target.ResourcesHeld > 0) {
-					//escape to Depot with this what you have;
-					target.CurrentOrder()->Data.ResWorker.DoneHarvesting = 1;
-					return;
-				}
-			break;
-			case UnitActionAttack:
-			{
-				CUnit *goal = target.CurrentOrder()->GetGoal();
-				if (goal) {
-					if (goal == attacker ||
-						(goal->CurrentAction() == UnitActionAttack &&
-						goal->CurrentOrder()->GetGoal() == &target))
-					{
-						//we already fight with one of attackers;
-						return;
-					}
-				}
-			}
-			default:
-			break;
+	if (target.Player->AiEnabled) {
+		if (target.CurrentOrder()->OnAiHitUnit(target, attacker, damage)) {
+			return;
 		}
 	}
 
-	//
 	// Attack units in range (which or the attacker?)
-	//
 	if (attacker && target.IsAgressive() && target.CanMove()) {
 		if (target.CurrentAction() != UnitActionStill && !target.Player->AiEnabled) {
 			return;
