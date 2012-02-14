@@ -98,8 +98,7 @@ public:
 	exit (EXIT_FAILURE);
       }
 
-    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
-				     NULL, NULL, NULL);
+    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     info_ptr = png_create_info_struct(png_ptr);
     png_init_io(png_ptr, fp);
     png_read_info(png_ptr, info_ptr);
@@ -109,11 +108,12 @@ public:
     row_bytes = png_get_rowbytes(png_ptr, info_ptr);
 
     // Create the 'data' array
-    png_bytep row_pointers[pheight];
+	std::vector<png_bytep> row_pointers;
+	row_pointers.resize(pheight);
     for (unsigned int i = 0; i < pheight; i++)
       row_pointers[i] = new png_byte[row_bytes];
 
-    png_read_image(png_ptr, row_pointers);
+    png_read_image(png_ptr, &row_pointers[0]);
 
     if (color_type != PNG_COLOR_TYPE_PALETTE)
 	{
@@ -132,10 +132,6 @@ public:
     png_get_tRNS(png_ptr, info_ptr, &trans, &num_trans, &trans_values);
 
     // not sure what trans_values stand for
-
-    //for (int i = 0; i < num_trans; ++i)
-    //std::cout <<  "transcolors: " << trans_values[i] << std::endl;
-
     if (num_trans > 1)
       {
 	std::cout << "Multiple transcolors not supported" << std::endl;
@@ -202,8 +198,7 @@ public:
    if (fp == NULL)
      assert (false);
 
-   png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
-				    NULL, NULL, NULL);
+   png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
    png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
    info_ptr = png_create_info_struct(png_ptr);
@@ -230,9 +225,11 @@ public:
    png_write_info(png_ptr, info_ptr);
 
 
-   png_uint_32 height = m_height, width = m_width;
-   png_byte image[height * width /* *bytes_per_pixel */];
-   png_bytep row_pointers[height];
+   const png_uint_32 height = m_height, width = m_width;
+    std::vector<png_byte> image;
+    image.resize(height * width /* *bytes_per_pixel */);
+	std::vector<png_bytep> row_pointers;
+	row_pointers.resize(height);
 
    // fill the image with data
    for (unsigned int i = 0; i < m_image.size (); ++i)
@@ -240,10 +237,10 @@ public:
        image[i] = m_image[i];
      }
 
-   for (unsigned int k = 0; k < height; k++)
-     row_pointers[k] = image + k * width /* * bytes_per_pixel*/;
+	for (unsigned int k = 0; k < height; k++)
+		row_pointers[k] = &image[k * width /* * bytes_per_pixel*/];
 
-   png_write_image(png_ptr, row_pointers);
+	png_write_image(png_ptr, &row_pointers[0]);
 
    png_write_end(png_ptr, info_ptr);
    png_free(png_ptr, palette);
