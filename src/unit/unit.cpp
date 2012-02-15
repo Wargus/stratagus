@@ -135,6 +135,11 @@ void CUnit::Init()
 	NextContained = NULL;
 	PrevContained = NULL;
 	NextWorker = NULL;
+
+	Resource.Workers = NULL;
+	Resource.Assigned = 0;
+	Resource.Active = 0;
+
 	tilePos.x = 0;
 	tilePos.y = 0;
 	Offset = 0;
@@ -1565,11 +1570,9 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	UpdateForNewUnit(*this, 1);
 }
 
-#ifdef DEBUG
-
 static bool IsMineAssignedBy(const CUnit &mine, const CUnit &worker)
 {
-	for (CUnit* it = mine.CurrentOrder()->Data.Resource.Workers; it; it = it->NextWorker) {
+	for (CUnit* it = mine.Resource.Workers; it; it = it->NextWorker) {
 		if (it == &worker) {
 			return true;
 		}
@@ -1577,15 +1580,15 @@ static bool IsMineAssignedBy(const CUnit &mine, const CUnit &worker)
 	return false;
 }
 
-#endif
-
 
 void CUnit::AssignWorkerToMine(CUnit &mine)
 {
+	if (IsMineAssignedBy(mine, *this) == true) {
+		return;
+	}
 	Assert(this->NextWorker == NULL);
-	Assert(IsMineAssignedBy(mine, *this) == false);
 
-	CUnit *head = mine.CurrentOrder()->Data.Resource.Workers;
+	CUnit *head = mine.Resource.Workers;
 /*
 	DebugPrint("%d: Worker [%d] is adding into %s [%d] on %d pos\n"
 					_C_ this->Player->Index _C_ this->Slot
@@ -1595,14 +1598,16 @@ void CUnit::AssignWorkerToMine(CUnit &mine)
 */
 	this->RefsIncrease();
 	this->NextWorker = head;
-	mine.CurrentOrder()->Data.Resource.Workers = this;
-	mine.CurrentOrder()->Data.Resource.Assigned++;
+	mine.Resource.Workers = this;
+	mine.Resource.Assigned++;
 }
 
 void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 {
-	Assert(IsMineAssignedBy(mine, *this) == true);
-	CUnit *prev = NULL, *worker = mine.CurrentOrder()->Data.Resource.Workers;
+	if (IsMineAssignedBy(mine, *this) == false) {
+		return ;
+	}
+	CUnit *prev = NULL, *worker = mine.Resource.Workers;
 /*
 	DebugPrint("%d: Worker [%d] is removing from %s [%d] left %d units assigned\n"
 					_C_ this->Player->Index _C_ this->Slot
@@ -1618,17 +1623,17 @@ void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 			if (prev) {
 				prev->NextWorker = next;
 			}
-			if (worker == mine.CurrentOrder()->Data.Resource.Workers) {
-				mine.CurrentOrder()->Data.Resource.Workers = next;
+			if (worker == mine.Resource.Workers) {
+				mine.Resource.Workers = next;
 			}
 			worker->RefsDecrease();
 			break;
 		}
 		prev = worker;
-		Assert(i <= mine.CurrentOrder()->Data.Resource.Assigned);
+		Assert(i <= mine.Resource.Assigned);
 	}
-	mine.CurrentOrder()->Data.Resource.Assigned--;
-	Assert(mine.CurrentOrder()->Data.Resource.Assigned >= 0);
+	mine.Resource.Assigned--;
+	Assert(mine.Resource.Assigned >= 0);
 }
 
 
@@ -2381,7 +2386,7 @@ CUnit *UnitFindResource(const CUnit &unit, const Vec2i &startPos, int range, int
 						if(better) {
 							n = std::max<int>(MyAbs(dest.x - pos.x), MyAbs(dest.y - pos.y));
 							if(check_usage && mine->Type->MaxOnBoard) {
-								int assign = mine->CurrentOrder()->Data.Resource.Assigned - mine->Type->MaxOnBoard;
+								int assign = mine->Resource.Assigned - mine->Type->MaxOnBoard;
 								int waiting = (assign > 0 ? GetNumWaitingWorkers(*mine) : 0);
 								if (bestmine != NoUnitP) {
 									if (besta >= assign)
@@ -2432,7 +2437,7 @@ CUnit *UnitFindResource(const CUnit &unit, const Vec2i &startPos, int range, int
 							//Durring construction Data.Resource is corrupted
 								mine->CurrentAction() != UnitActionBuilt);
 							if (better) {
-								int assign = mine->CurrentOrder()->Data.Resource.Assigned -mine->Type->MaxOnBoard;
+								int assign = mine->Resource.Assigned - mine->Type->MaxOnBoard;
 								int waiting = (assign > 0 ? GetNumWaitingWorkers(*mine) : 0);
 								if (assign < besta ||
 									(assign == besta && waiting < bestw)) {
@@ -2651,6 +2656,10 @@ void LetUnitDie(CUnit &unit)
 	unit.Anim.Unbreakable = 0;
 
 	CUnitType *type = unit.Type;
+
+	while (unit.Resource.Workers) {
+		unit.Resource.Workers->DeAssignWorkerFromMine(unit);
+	}
 
 	// removed units,  just remove.
 	if (unit.Removed) {

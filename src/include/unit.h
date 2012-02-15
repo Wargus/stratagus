@@ -495,7 +495,15 @@ public:
 	CUnit *Container;     /// Pointer to the unit containing it (or 0)
 	CUnit *NextContained; /// Next unit in the container.
 	CUnit *PrevContained; /// Previous unit in the container.
+
 	CUnit *NextWorker; //pointer to next assigned worker to "Goal" resource.
+	struct {
+		CUnit *Workers; /// pointer to first assigned worker to this resource.
+		int Assigned; /// how many units are assigned to harvesting from the resource.
+		int Active; /// how many units are harvesting from the resource.
+	} Resource; /// Resource still
+
+
 
 	Vec2i tilePos; /// Map position X
 

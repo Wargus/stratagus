@@ -203,39 +203,6 @@ static void CclParseBuilt(lua_State *l, const CUnit &unit, COrderPtr order)
 }
 
 /**
-**  Parse Resource
-**
-**  @param l     Lua state.
-**  @param unit  Unit pointer which should be filled with the data.
-*/
-static void CclParseResource(lua_State *l, COrderPtr order)
-{
-	const char *value;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	int args = lua_objlen(l, -1);
-	for (int j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++j;
-		if (!strcmp(value, "first-worker")) {
-			lua_rawgeti(l, -1, j + 1);
-			order->Data.Resource.Workers = CclGetUnitFromRef(l);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "assigned")) {
-			lua_rawgeti(l, -1, j + 1);
-			order->Data.Resource.Assigned = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else {
-			LuaError(l, "ParseResource: Unsupported tag: %s" _C_ value);
-		}
-	}
-}
-
-/**
 **  Parse res worker data
 **
 **  @param l     Lua state.
@@ -541,20 +508,10 @@ void CclParseOrder(lua_State *l, const CUnit &unit, COrderPtr order)
 			order->Arg1.Resource.Pos = invalidPos;
 			order->Arg1.Resource.Mine = CclGetUnitFromRef(l);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "resource-active")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->Data.Resource.Active = LuaToNumber(l, -1);
-			lua_pop(l, 1);
 		} else if (!strcmp(value, "data-built")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
 			CclParseBuilt(l, unit, order);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-resource")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			CclParseResource(l, order);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "data-res-worker")) {
 			++j;
@@ -847,6 +804,18 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "next-worker")) {
 			lua_pushvalue(l, j + 1);
 			unit->NextWorker = CclGetUnitFromRef(l);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "resource-workers")) {
+			lua_pushvalue(l, j + 1);
+			unit->Resource.Workers = CclGetUnitFromRef(l);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "resource-assigned")) {
+			lua_pushvalue(l, j + 1);
+			unit->Resource.Assigned = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "resource-active")) {
+			lua_pushvalue(l, j + 1);
+			unit->Resource.Active = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "rs")) {
 			unit->Rs = LuaToNumber(l, j + 1);

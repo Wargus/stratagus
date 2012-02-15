@@ -193,11 +193,6 @@ public:
 	struct _order_build_ {
 		int Cycles;                 /// Cycles unit has been building for
 	} Build; /// ActionBuild
-	struct _order_resource_ {
-		CUnit *Workers; //pointer to first assigned worker to this resource.
-		int Assigned; /// how many units are assigned to harvesting from the resource.
-		int Active; /// how many units are harvesting from the resource.
-	} Resource; /// Resource still
 	struct _order_resource_worker_ {
 		int TimeToHarvest;          /// how much time until we harvest some more.
 		unsigned DoneHarvesting:1;  /// Harvesting done, wait for action to break.

@@ -133,8 +133,8 @@ void COrder::ReleaseRefs(CUnit &unit)
 			if (unit.SubAction == 60 /* SUB_GATHER_RESOURCE */ ) {
 				CUnit *goal = this->GetGoal();
 
-				goal->CurrentOrder()->Data.Resource.Active--;
-				Assert(goal->CurrentOrder()->Data.Resource.Active >= 0);
+				goal->Resource.Active--;
+				Assert(goal->Resource.Active >= 0);
 			}
 		}
 		// Still shouldn't have a reference unless attacking

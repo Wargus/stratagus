@@ -204,22 +204,6 @@ void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 	switch (order.Action) {
 		case UnitActionStill:
 			// FIXME: support other resource types
-			if (unit.Type->GivesResource) {
-				file->printf(", \"resource-active\", %d", order.Data.Resource.Active);
-				if (unit.Type->CanHarvest) {
-					file->printf(", \"data-resource\", {\"assigned\", %d", order.Data.Resource.Assigned);
-					if (order.Data.Resource.Workers) {
-						if (order.Data.Resource.Workers->Destroyed) {
-							/* this unit is destroyed so it's not in the global unit
-							* array - this means it won't be saved!!! */
-							printf ("FIXME: storing destroyed Worker - loading will fail.\n");
-						}
-						file->printf(", \"first-worker\", \"%s\"",
-							UnitReference(*order.Data.Resource.Workers).c_str());
-					}
-					file->printf("}");
-				}
-			}
 			break;
 		case UnitActionResource:
 			file->printf(", \"data-res-worker\", {\"time-to-harvest\", %d", order.Data.ResWorker.TimeToHarvest);
@@ -446,10 +430,14 @@ void SaveUnit(const CUnit &unit, CFile *file)
 			 * array - this means it won't be saved!!! */
 			printf ("FIXME: storing destroyed Worker - loading will fail.\n");
 		}
-		file->printf(" \"next-worker\", \"%s\",",
-			UnitReference(*unit.NextWorker).c_str());
+		file->printf(" \"next-worker\", \"%s\",", UnitReference(*unit.NextWorker).c_str());
 	}
 
+	if (unit.Resource.Workers != NULL) {
+		file->printf(" \"resource-active\", %d,", unit.Resource.Active);
+		file->printf(" \"resource-assigned\", %d,", unit.Resource.Assigned);
+		file->printf(" \"resource-workers\", \"%s\",", UnitReference(*unit.Resource.Workers).c_str());
+	}
 	file->printf(" \"rs\", %d,", unit.Rs);
 	file->printf(" \"units-boarded-count\", %d,", unit.BoardCount);
 
