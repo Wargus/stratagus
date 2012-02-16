@@ -44,83 +44,52 @@
 ----------------------------------------------------------------------------*/
 
 class CUnit;
-
+class CMap;
 /**
 **  Unit cache
 */
-struct CUnitCache {
-	std::vector<CUnit *> Units;
+class CUnitCache
+{
+public:
+	typedef std::vector<CUnit *>::iterator iterator;
+	typedef std::vector<CUnit *>::const_iterator const_iterator;
 
-	CUnitCache() : Units() { Units.clear();}
+public:
+	CUnitCache() : Units()
+	{
+	}
 
-	inline size_t size() const
-	{
-		return Units.size();
-	}
-	inline void clear()
-	{
-		Units.clear();
-	}
-	inline CUnit * operator[] (const unsigned int index) const
+	size_t size() const { return Units.size(); }
+
+	void clear() { Units.clear(); }
+
+	const_iterator begin() const { return Units.begin(); }
+	iterator begin() { return Units.begin(); }
+	const_iterator end() const { return Units.end(); }
+	iterator end() { return Units.end(); }
+
+	CUnit * operator[] (const unsigned int index) const
 	{
 		//Assert(index < Units.size());
 		return Units[index];
 	}
-	inline CUnit * operator[] (const unsigned int index) {
+	CUnit * operator[] (const unsigned int index) {
 		//Assert(index < Units.size());
 		return Units[index];
 	}
 
 	/**
-	 *  @brief Find the first unit in a tile chache for which a predicate is true.
+	 *  @brief Find the first unit in a tile cache for which a predicate is true.
 	 *  @param  pred   A predicate object vith bool operator()(const CUnit *).
-	 *  @return   The first unit i in the cache
-	 *  such that @p pred(*i) is true, or NULL if no such iterator exists.
+	 *  @return   The first unit u in the cache
+	 *  such that @p pred(u) is true, or NULL if no such unit exists.
 	 */
 	template<typename _T>
-	inline CUnit *find(const _T &pred) const
+	CUnit *find(const _T &pred) const
 	{
-#if __GNUC__ <  4
-		if(Units.size()) {
-			std::vector<CUnit *>::const_iterator beg(Units.begin()), end(Units.end());
-			std::vector<CUnit *>::const_iterator ret = std::find_if(beg, end, pred);
-			return ret != end ? (*ret) : NULL;
-		}
-		return NULL;
-#else
-		//GCC version only since std::vector::data() is not in STL
-		const size_t size = Units.size();
-		if(size) {
-			const CUnit *unit;
-			int n = (size+3)/4;
-			const CUnit **cache = (const CUnit **)Units.data();
-			switch (size & 3) {
-				case 0:
-				do {
-					unit = *cache;
-					if(pred(unit))
-						return (CUnit *)unit;
-					cache++;
-				case 3:
-					unit = *cache;
-					if(pred(unit))
-						return (CUnit *)unit;
-					cache++;
-				case 2:
-					unit = *cache;
-					if(pred(unit))
-						return (CUnit *)unit;
-					cache++;
-				case 1:
-					unit = *cache;
-					if(pred(unit))
-						return (CUnit *)unit;
-					cache++;
-				} while ( --n > 0 );
-			}
-		}
-		return NULL;
-#endif
+		std::vector<CUnit *>::const_iterator ret = std::find_if(Units.begin(), Units.end(), pred);
+
+		return ret != Units.end() ? (*ret) : NULL;
 	}
 
 	/**
@@ -132,27 +101,13 @@ struct CUnitCache {
 	 *  @p functor must not modify the order of the cache.
 	 */
 	template<typename _T>
-	inline void for_each(_T functor)
+	void for_each(const _T &functor)
 	{
 		const size_t size = Units.size();
-#if __GNUC__ <  4
-		for(unsigned int i = 0; i < size; ++i)
+
+		for (size_t i = 0; i != size; ++i) {
 			functor(Units[i]);
-#else
-		//GCC version only since std::vector::data() is not in STL
-		if(size) {
-			int n = (size+3)/4;
-			CUnit **cache = (CUnit **)Units.data();
-			switch (size & 3) {
-				case 0: do {
-								functor(*cache++);
-				case 3:			functor(*cache++);
-				case 2:			functor(*cache++);
-				case 1:			functor(*cache++);
-					} while ( --n > 0 );
-			}
 		}
-#endif
 	}
 
 	/**
@@ -165,38 +120,16 @@ struct CUnitCache {
 	 *  If @p functor return false then loop is exited.
 	 */
 	template<typename _T>
-	inline int for_each_if(_T &functor)
+	int for_each_if(const _T &functor)
 	{
 		const size_t size = Units.size();
-		size_t count = 0;
-#ifdef _MSC_VER
-		while(size && functor(Units[count]) && ++count < size);
-#else
-		if(size) {
-			int n = (size+3)/4;
-			switch (size & 3) {
-				case 0:
-				do {
-					if(!functor(Units[count]))
-						return count;
-					count++;
-				case 3:
-					if(!functor(Units[count]))
-						return count;
-					count++;
-				case 2:
-					if(!functor(Units[count]))
-						return count;
-					count++;
-				case 1:
-					if(!functor(Units[count]))
-						return count ;
-					count++;
-					} while ( --n > 0 );
+
+		for (size_t count = 0; count != size; ++count) {
+			if (functor(Units[count]) == false) {
+				return count;
 			}
 		}
-#endif
-		return count;
+		return size;
 	}
 
 
@@ -206,12 +139,12 @@ struct CUnitCache {
 	**  @param index  Unit index to remove from container.
 	**  @return pointer to removed element.
 	*/
-	inline CUnit * Remove(const unsigned int index)
+	CUnit *Remove(const unsigned int index)
 	{
 		const size_t size = Units.size();
 		Assert(index < size);
 		CUnit *tmp = Units[index];
-		if(size > 1) {
+		if (size > 1) {
 			Units[index] = Units[size - 1];
 		}
 		Units.pop_back();
@@ -223,15 +156,15 @@ struct CUnitCache {
 	**
 	**  @param unit  Unit pointer to remove from container.
 	*/
-	inline bool Remove(CUnit *const unit)
+	bool Remove(CUnit *const unit)
 	{
 #ifndef SECURE_UNIT_REMOVING
 		const size_t size = Units.size();
-		if(size == 1 && unit == Units[0]) {
+		if (size == 1 && unit == Units[0]) {
 			Units.pop_back();
 			return true;
 		} else {
-			for(unsigned int i = 0; i < size; ++i) {
+			for (unsigned int i = 0; i < size; ++i) {
 				// Do we care on unit sequence in tile cache ?
 				if (Units[i] == unit) {
 					Units[i] = Units[size - 1];
@@ -241,8 +174,7 @@ struct CUnitCache {
 			}
 		}
 #else
-		for(std::vector<CUnit *>::iterator i(Units.begin()), end(Units.end());
-			 i != end; ++i) {
+		for (std::vector<CUnit *>::iterator i(Units.begin()), end(Units.end()); i != end; ++i) {
 			if ((*i) == unit) {
 				Units.erase(i);
 				return true;
@@ -257,10 +189,9 @@ struct CUnitCache {
 	**
 	**  @param unit  Unit pointer to remove from container.
 	*/
-	inline void RemoveS(CUnit *const unit)
+	void RemoveS(CUnit *const unit)
 	{
-		for(std::vector<CUnit *>::iterator i(Units.begin()), end(Units.end());
-			 i != end; ++i) {
+		for (std::vector<CUnit *>::iterator i(Units.begin()), end(Units.end()); i != end; ++i) {
 			if ((*i) == unit) {
 				Units.erase(i);
 				return;
@@ -270,12 +201,12 @@ struct CUnitCache {
 
 	/**
 	**  Insert new unit into tile cache.
-	**	Sorted version for binary searching.
+	**  Sorted version for binary searching.
 	**
 	**  @param unit  Unit pointer to place in cache.
 	**  @return false if unit is already in cache and nothing is added.
 	*/
-	inline bool InsertS(CUnit *unit) {
+	bool InsertS(CUnit *unit) {
 		if (!binary_search(Units.begin(), Units.end(), unit))
 		{
   			Units.insert(std::lower_bound(Units.begin(), Units.end(), unit), unit);
@@ -284,15 +215,17 @@ struct CUnitCache {
 		return false;
 	}
 
-
 	/**
 	**  Insert new unit into tile cache.
 	**
 	**  @param unit  Unit pointer to place in cache.
 	*/
-	inline void Insert(CUnit *unit) {
+	void Insert(CUnit *unit) {
 		Units.push_back(unit);
 	}
+
+public:
+	std::vector<CUnit *> Units;
 };
 
 

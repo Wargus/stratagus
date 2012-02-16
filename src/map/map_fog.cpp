@@ -81,15 +81,22 @@ static CGraphic *AlphaFogG;
 ----------------------------------------------------------------------------*/
 
 
-struct _filter_flags {
-	const CPlayer *player;
-	int fogmask;
-	_filter_flags(const CPlayer &p, int m) : player(&p), fogmask(m) {}
-	inline void operator() (const CUnit *const unit) {
+class _filter_flags
+{
+public:
+	_filter_flags(const CPlayer &p, int *fogmask) : player(&p), fogmask(fogmask)
+	{
+		Assert(fogmask != NULL);
+	}
+
+	void operator() (const CUnit *const unit) const {
 		if (!unit->IsVisibleAsGoal(*player)) {
-			fogmask &= ~unit->Type->FieldFlags;
+			*fogmask &= ~unit->Type->FieldFlags;
 		}
 	}
+private:
+	const CPlayer *player;
+	int *fogmask;
 };
 
 /**
@@ -104,10 +111,11 @@ struct _filter_flags {
 */
 int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask)
 {
-	_filter_flags filter(player, -1);
-	Map.Field(index)->UnitCache.for_each(filter);
-	return mask & filter.fogmask;
+	int fogMask = mask;
 
+	_filter_flags filter(player, &fogMask);
+	Map.Field(index)->UnitCache.for_each(filter);
+	return fogMask;
 }
 
 int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask)

@@ -681,16 +681,21 @@ void MarkUnitFieldFlags(const CUnit &unit)
 	} while (--h);
 }
 
-struct _UnmarkUnitFieldFlags {
-	const CUnit *const main;
-	CMapField *mf;
-	_UnmarkUnitFieldFlags(const CUnit &unit)
-		 : main(&unit) {}
-	inline void operator () (CUnit *const unit) {
+class _UnmarkUnitFieldFlags
+{
+public:
+	_UnmarkUnitFieldFlags(const CUnit &unit, CMapField *mf) : main(&unit), mf(mf)
+	{}
+
+	void operator () (CUnit *const unit) const
+	{
 		if (main != unit && unit->CurrentAction() != UnitActionDie) {
 			mf->Flags |= unit->Type->FieldFlags;
 		}
 	}
+private:
+	const CUnit *const main;
+	CMapField *mf;
 };
 
 
@@ -701,24 +706,22 @@ struct _UnmarkUnitFieldFlags {
 */
 void UnmarkUnitFieldFlags(const CUnit &unit)
 {
-	CMapField *mf;
-	const unsigned int flags = ~unit.Type->FieldFlags; //
-	int w, h = unit.Type->TileHeight;          // Tile height of the unit.
-	const int width = unit.Type->TileWidth;          // Tile width of the unit.
+	const unsigned int flags = ~unit.Type->FieldFlags;
+	const int width = unit.Type->TileWidth;
+	int h = unit.Type->TileHeight;
 	unsigned int index = unit.Offset;
 
 	if (unit.Type->Vanishes) {
 		return ;
 	}
-
-	_UnmarkUnitFieldFlags funct(unit);
-
 	do {
-		mf = Map.Field(index);
-		w = width;
+		CMapField *mf = Map.Field(index);
+
+		int w = width;
 		do {
 			mf->Flags &= flags;//clean flags
-			funct.mf = mf;
+			_UnmarkUnitFieldFlags funct(unit, mf);
+
 			mf->UnitCache.for_each(funct);
 			++mf;
 		} while(--w);
@@ -1201,64 +1204,63 @@ void UnitGoesOutOfFog(CUnit &unit, const CPlayer &player)
 }
 
 template<const bool MARK>
-struct _TileSeen {
-	const CPlayer *player;
-	int cloak;
+class _TileSeen
+{
+public:
+	_TileSeen(const CPlayer &p , int c) : player(&p), cloak(c)
+	{}
 
-	_TileSeen(const CPlayer &p , int c): player(&p), cloak(c) {}
-
-	inline void operator() ( CUnit *const unit) {
-		if (cloak == (int)unit->Type->PermanentCloak) {
-			const int p = player->Index;
-			if(MARK) {
-				//
-				//  If the unit goes out of fog, this can happen for any player that
-				//  this player shares vision with, and can't YET see the unit.
-				//  It will be able to see the unit after the Unit->VisCount ++
-				//
-				if (!unit->VisCount[p]) {
-					for (int pi = 0; pi < PlayerMax; ++pi) {
-						if ((pi == p /*player->Index*/) ||
-								player->IsBothSharedVision(Players[pi])) {
-							if (!unit->IsVisible(Players[pi])) {
-								UnitGoesOutOfFog(*unit, Players[pi]);
-							}
+	void operator() (CUnit *const unit) const {
+		if (cloak != (int)unit->Type->PermanentCloak) {
+			return ;
+		}
+		const int p = player->Index;
+		if (MARK) {
+			//  If the unit goes out of fog, this can happen for any player that
+			//  this player shares vision with, and can't YET see the unit.
+			//  It will be able to see the unit after the Unit->VisCount ++
+			if (!unit->VisCount[p]) {
+				for (int pi = 0; pi < PlayerMax; ++pi) {
+					if ((pi == p /*player->Index*/)
+						|| player->IsBothSharedVision(Players[pi])) {
+						if (!unit->IsVisible(Players[pi])) {
+							UnitGoesOutOfFog(*unit, Players[pi]);
 						}
 					}
 				}
-				unit->VisCount[p/*player->Index*/]++;
-			} else {
-				/*
-				 * HACK: UGLY !!!
-				 * There is bug in Seen code conneded with
-				 * UnitActionDie and Cloacked units.
-				 */
-				if(!unit->VisCount[p] && unit->CurrentAction() == UnitActionDie)
-				{
-					return;
-				}
+			}
+			unit->VisCount[p/*player->Index*/]++;
+		} else {
+			/*
+			 * HACK: UGLY !!!
+			 * There is bug in Seen code conneded with
+			 * UnitActionDie and Cloacked units.
+			 */
+			if (!unit->VisCount[p] && unit->CurrentAction() == UnitActionDie) {
+				return;
+			}
 
-				Assert(unit->VisCount[p]);
-				unit->VisCount[p]--;
-				//
-				//  If the unit goes under of fog, this can happen for any player that
-				//  this player shares vision to. First of all, before unmarking,
-				//  every player that this player shares vision to can see the unit.
-				//  Now we have to check who can't see the unit anymore.
-				//
-				if (!unit->VisCount[p]) {
-					for (int pi = 0; pi < PlayerMax; ++pi) {
-						if (pi == p/*player->Index*/ ||
-							player->IsBothSharedVision(Players[pi])) {
-							if (!unit->IsVisible(Players[pi])) {
-								UnitGoesUnderFog(*unit, Players[pi]);
-							}
+			Assert(unit->VisCount[p]);
+			unit->VisCount[p]--;
+			//  If the unit goes under of fog, this can happen for any player that
+			//  this player shares vision to. First of all, before unmarking,
+			//  every player that this player shares vision to can see the unit.
+			//  Now we have to check who can't see the unit anymore.
+			if (!unit->VisCount[p]) {
+				for (int pi = 0; pi < PlayerMax; ++pi) {
+					if (pi == p/*player->Index*/ ||
+						player->IsBothSharedVision(Players[pi])) {
+						if (!unit->IsVisible(Players[pi])) {
+							UnitGoesUnderFog(*unit, Players[pi]);
 						}
 					}
 				}
 			}
 		}
 	}
+private:
+	const CPlayer *player;
+	int cloak;
 };
 
 /**

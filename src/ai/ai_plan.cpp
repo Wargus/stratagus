@@ -53,40 +53,45 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-struct _EnemyOnMapTile {
-	CUnit *best;
-	const CUnit *const source;
-	const Vec2i pos;
-	_EnemyOnMapTile(const CUnit &unit, const Vec2i _pos) : best(0), source(&unit) , pos(_pos) {}
-	inline void operator() (CUnit *const unit) {
-		const CUnitType *const type = unit->Type;
+class _EnemyOnMapTile
+{
+public:
+	_EnemyOnMapTile(const CUnit &unit, const Vec2i _pos, CUnit **enemy) :
+		source(&unit) , pos(_pos), best(enemy)
+	{
+	}
+
+	void operator() (CUnit *const unit) const {
+		const CUnitType &type = *unit->Type;
 		// unusable unit ?
 		// if (unit->IsUnusable()) can't attack constructions
 		// FIXME: did SelectUnitsOnTile already filter this?
 		// Invisible and not Visible
-		if (unit->Removed || unit->Variable[INVISIBLE_INDEX].Value ||
-				//(!UnitVisible(unit, source->Player)) ||
-				unit->CurrentAction() == UnitActionDie) {
+		if (unit->Removed || unit->Variable[INVISIBLE_INDEX].Value
+			// || (!UnitVisible(unit, source->Player))
+			|| unit->CurrentAction() == UnitActionDie) {
 			return;
 		}
-		if (pos.x < unit->tilePos.x || pos.x >= unit->tilePos.x + type->TileWidth ||
-				pos.y < unit->tilePos.y || pos.y >= unit->tilePos.y + type->TileHeight) {
+		if (pos.x < unit->tilePos.x || pos.x >= unit->tilePos.x + type.TileWidth
+			|| pos.y < unit->tilePos.y || pos.y >= unit->tilePos.y + type.TileHeight) {
 			return;
 		}
-		if (!CanTarget(source->Type, type)) {
+		if (!CanTarget(source->Type, &type)) {
 			return;
 		}
 		if (!source->Player->IsEnemy(*unit)) { // a friend or neutral
 			return;
 		}
-		//
 		// Choose the best target.
-		//
-		if (!best || best->Type->Priority < type->Priority) {
-			best = unit;
+		if (!*best || (*best)->Type->Priority < type.Priority) {
+			*best = unit;
 		}
-		return;
 	}
+
+private:
+	const CUnit *const source;
+	const Vec2i pos;
+	CUnit **best;
 };
 
 /**
@@ -99,9 +104,11 @@ struct _EnemyOnMapTile {
 */
 static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i& pos)
 {
-	_EnemyOnMapTile filter(source, pos);
+	CUnit* enemy = NULL;
+
+	_EnemyOnMapTile filter(source, pos, &enemy);
 	Map.Field(pos)->UnitCache.for_each(filter);
-	return filter.best;
+	return enemy;
 }
 
 /**

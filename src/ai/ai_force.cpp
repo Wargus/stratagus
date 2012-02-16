@@ -50,40 +50,43 @@
 ----------------------------------------------------------------------------*/
 
 template <const bool IN_REACT_RANGE>
-struct AiForceEnemyFinder {
-	const CUnit *enemy;
-
-	inline bool found() const
+class AiForceEnemyFinder
+{
+public:
+	AiForceEnemyFinder(int force, const CUnit** enemy) : enemy(enemy)
 	{
-		return enemy != NULL;
-	}
-
-	inline bool operator() (const CUnit *const unit)
-	{
-		if (IN_REACT_RANGE) {
-			if (unit->Type->CanAttack) {
-				enemy = AttackUnitsInReactRange(*unit);
-			}
-		} else {
-			if (unit->Type->CanAttack) {
-				enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
-			}
-		}
-		return enemy == NULL;
-	}
-
-	AiForceEnemyFinder(int force) : enemy(NULL)
-	{
+		Assert(enemy != NULL);
+		*enemy = NULL;
 		AiPlayer->Force[force].Units.for_each_if(*this);
 	}
 
-	AiForceEnemyFinder(AiForce *force) : enemy(NULL)
+	AiForceEnemyFinder(AiForce &force, const CUnit** enemy) : enemy(enemy)
 	{
-		force->Units.for_each_if(*this);
+		Assert(enemy != NULL);
+		*enemy = NULL;
+		force.Units.for_each_if(*this);
 	}
+
+	bool found() const { return *enemy != NULL; }
+
+	bool operator() (const CUnit *const unit) const
+	{
+		if (unit->Type->CanAttack == false) {
+			return *enemy == NULL;
+		}
+		if (IN_REACT_RANGE) {
+			*enemy = AttackUnitsInReactRange(*unit);
+		} else {
+			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
+		}
+		return *enemy == NULL;
+	}
+private:
+	const CUnit **enemy;
 };
 
-class AiForceAttackSender {
+class AiForceAttackSender
+{
 public:
 	//  Send all units in the force to enemy at pos.
 	AiForceAttackSender(int force, const Vec2i &pos) : goalPos(pos), delta(0)
@@ -106,7 +109,7 @@ public:
 		force->Units.for_each(*this);
 	}
 
-	void operator() (CUnit *const unit)
+	void operator() (CUnit *const unit) const
 	{
 		// this may be problem if units are in bunker and we want sent
 		// them to attack
@@ -126,7 +129,7 @@ public:
 
 private:
 	Vec2i goalPos;
-	int delta;
+	mutable int delta;
 };
 
 
@@ -246,7 +249,7 @@ public:
 		memset(data, 0, len);
 		units.for_each(*this);
 	}
-	inline void operator() (CUnit *const unit) {
+	inline void operator() (const CUnit *const unit) const {
 		data[UnitTypeEquivs[unit->Type->Slot]]++;
 	}
 private:
@@ -324,7 +327,8 @@ void AiForce::Attack(const Vec2i &pos)
 
 	if (goalPos.x == -1 || goalPos.y == -1) {
 		/* Search in entire map */
-		const CUnit *enemy = AiForceEnemyFinder<false>(this).enemy;
+		const CUnit *enemy = NULL;
+		AiForceEnemyFinder<false>(*this, &enemy);
 		if (enemy) {
 			goalPos = enemy->tilePos;
 		}
@@ -733,7 +737,7 @@ void AiForce::Update()
 		Vec2i pos;
 
 		if (State == AiForceAttackingState_Attacking) {
-			unit = AiForceEnemyFinder<false>(this).enemy;
+			AiForceEnemyFinder<false>(*this, &unit);
 
 			if (!unit) {
 				// No enemy found, give up
@@ -761,7 +765,8 @@ void AiForceManager::Update()
 		if (force.Defending) {
 			force.Clean();
 			//  Look if still enemies in attack range.
-			if(!AiForceEnemyFinder<true>(&force).found()) {
+			const CUnit *dummy = NULL;
+			if(!AiForceEnemyFinder<true>(force, &dummy).found()) {
 				DebugPrint("%d:FIXME: not written, should send force #%d home\n"
 					_C_ AiPlayer->Player->Index _C_ f);
 				force.Defending = false;
