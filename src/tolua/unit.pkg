@@ -22,6 +22,9 @@ class CPreference
 	bool ShowSightRange;
 	bool ShowReactionRange;
 	bool ShowAttackRange;
+	bool ShowMessages;
+	bool BigScreen;
+
 	unsigned int ShowOrders;
 };
 

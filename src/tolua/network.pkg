@@ -16,15 +16,16 @@ void NetworkServerResyncClients(void);
 void NetworkDetachFromServer(void);
 
 class CServerSetup {
-	unsigned char ResourcesOption;
-	unsigned char UnitsOption;
-	unsigned char FogOfWar;
-	unsigned char RevealMap;
-	unsigned char GameTypeOption;
-	unsigned char Difficulty;
-	unsigned char MapRichness;
+	unsigned int ResourcesOption;
+	unsigned int UnitsOption;
+	unsigned int FogOfWar;
+	unsigned int RevealMap;
+	unsigned int GameTypeOption;
+	unsigned int Difficulty;
+	unsigned int MapRichness;
 	unsigned CompOpt[PlayerMax];
 	unsigned Ready[PlayerMax];
+	unsigned Race[PlayerMax];
 	unsigned long LastFrame[PlayerMax];
 };
 extern CServerSetup LocalSetupState;

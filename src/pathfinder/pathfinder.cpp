@@ -336,7 +336,7 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 		// If obstructing unit is moving, wait for a bit.
 		if (unit.CurrentOrder()->Data.Move.Fast) {
 			unit.CurrentOrder()->Data.Move.Fast--;
-			AstarDebugPrint("WAIT at %d\n" _C_ unit.Data.Move.Fast);
+			AstarDebugPrint("WAIT at %d\n" _C_ unit.CurrentOrder()->Data.Move.Fast);
 			result = PF_WAIT;
 		} else {
 			unit.CurrentOrder()->Data.Move.Fast = 10;
