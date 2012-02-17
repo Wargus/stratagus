@@ -199,6 +199,29 @@ static int CclPlayer(lua_State *l)
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 			}
+		} else if (!strcmp(value, "max-resources")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			subargs = lua_objlen(l, j + 1);
+			for (k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, j + 1, k + 1);
+				value = LuaToString(l, -1);
+				lua_pop(l, 1);
+				++k;
+
+				for (i = 0; i < MaxCosts; ++i) {
+					if (!strcmp(value, DefaultResourceNames[i].c_str())) {
+						lua_rawgeti(l, j + 1, k + 1);
+						player->MaxResources[i] = LuaToNumber(l, -1);
+						lua_pop(l, 1);
+						break;
+					}
+				}
+				if (i == MaxCosts) {
+					LuaError(l, "Unsupported tag: %s" _C_ value);
+				}
+			}
 		} else if (!strcmp(value, "last-resources")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -350,10 +373,13 @@ static int CclPlayer(lua_State *l)
 				lua_pop(l, 1);
 			}
 		} else {
-		   LuaError(l, "Unsupported tag: %s" _C_ value);
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
-
+	// Manage max
+	for (int i = 0; i < MaxCosts; ++i) {
+		player->SetResource(i, player->Resources[i]);
+	}
 	return 0;
 }
 
@@ -762,6 +788,18 @@ static int CclGetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 3);
 
 		const std::string res = LuaToString(l, 3);
+
+		for (int i = 0; i < MaxCosts; ++i) {
+			if (res == DefaultResourceNames[i]) {
+				lua_pushnumber(l, p->Resources[i]);
+				return 1;
+			}
+		}
+		LuaError(l, "Invalid resource \"%s\"" _C_ res.c_str());
+	} else if (!strcmp(data, "MaxResources")) {
+		LuaCheckArgs(l, 3);
+
+		const std::string res = LuaToString(l, 3);
 		unsigned int i;
 
 		for (i = 0; i < MaxCosts; ++i) {
@@ -772,7 +810,7 @@ static int CclGetPlayerData(lua_State *l)
 		if (i == MaxCosts) {
 			LuaError(l, "Invalid resource \"%s\"" _C_ res.c_str());
 		}
-		lua_pushnumber(l, p->Resources[i]);
+		lua_pushnumber(l, p->MaxResources[i]);
 		return 1;
 	} else if (!strcmp(data, "UnitTypesCount")) {
 		CUnitType *type;

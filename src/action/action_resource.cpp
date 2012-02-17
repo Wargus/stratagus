@@ -628,7 +628,7 @@ static int MoveToDepot(CUnit &unit)
 {
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[unit.CurrentResource];
 	CUnit *goal = unit.CurrentOrder()->GetGoal();
-
+	CPlayer& player = *unit.Player;
 	Assert(goal);
 
 	switch (DoActionMove(unit)) { // reached end-point?
@@ -637,7 +637,7 @@ static int MoveToDepot(CUnit &unit)
 		case PF_REACHED:
 			break;
 		default:
-			if (unit.Anim.Unbreakable || goal->IsVisibleAsGoal(*unit.Player)) {
+			if (unit.Anim.Unbreakable || goal->IsVisibleAsGoal(player)) {
 				return 0;
 			}
 			break;
@@ -646,8 +646,8 @@ static int MoveToDepot(CUnit &unit)
 	//
 	// Target is dead, stop getting resources.
 	//
-	if (!goal->IsVisibleAsGoal(*unit.Player)) {
-		DebugPrint("%d: Worker %d report: Destroyed depot\n" _C_ unit.Player->Index _C_ unit.Slot);
+	if (!goal->IsVisibleAsGoal(player)) {
+		DebugPrint("%d: Worker %d report: Destroyed depot\n" _C_ player.Index _C_ unit.Slot);
 
 		unit.CurrentOrder()->ClearGoal();
 
@@ -655,10 +655,10 @@ static int MoveToDepot(CUnit &unit)
 
 		if (depot) {
 			UnitGotoGoal(unit, depot, SUB_MOVE_TO_DEPOT);
-			DebugPrint("%d: Worker %d report: Going to new deposit.\n" _C_ unit.Player->Index _C_ unit.Slot);
+			DebugPrint("%d: Worker %d report: Going to new deposit.\n" _C_ player.Index _C_ unit.Slot);
 		} else {
 			DebugPrint("%d: Worker %d report: Can't find a new resource deposit.\n"
-				_C_ unit.Player->Index _C_ unit.Slot);
+				_C_ player.Index _C_ unit.Slot);
 
 			// FIXME: perhaps we should choose an alternative
 			unit.ClearAction();
@@ -667,8 +667,7 @@ static int MoveToDepot(CUnit &unit)
 	}
 
 	// Not ready
-	if (unit.Player->AiEnabled && unit.CurrentOrder()->Data.Move.Cycles > 300)
-	{
+	if (player.AiEnabled && unit.CurrentOrder()->Data.Move.Cycles > 300) {
 		AiNewDepotRequest(unit);
 	}
 
@@ -688,9 +687,13 @@ static int MoveToDepot(CUnit &unit)
 	}
 
 	// Update resource.
-	unit.Player->Resources[resinfo.FinalResource] += (unit.ResourcesHeld * unit.Player->Incomes[resinfo.FinalResource]) / 100;
-	unit.Player->TotalResources[resinfo.FinalResource] += (unit.ResourcesHeld * unit.Player->Incomes[resinfo.FinalResource]) / 100;
-	unit.ResourcesHeld = 0;
+	const int rindex = resinfo.FinalResource;
+	player.Resources[rindex] += (unit.ResourcesHeld * player.Incomes[rindex]) / 100;
+	if (player.MaxResources[rindex] != -1) {
+		player.Resources[rindex] = std::min(player.Resources[rindex], player.MaxResources[rindex]);
+	}
+	player.TotalResources[rindex] += (unit.ResourcesHeld * player.Incomes[rindex]) / 100;
+	unit.ResourcesHeld = 0; 
 
 	if (unit.Wait) {
 		unit.Wait /= SpeedResourcesReturn[resinfo.ResourceId];

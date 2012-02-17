@@ -532,6 +532,20 @@ static int CclDefineUnitType(lua_State *l)
 				type->_Costs[res] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			}
+		} else if (!strcmp(value, "Storing")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			subargs = lua_objlen(l, -1);
+			for (k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, -1, k + 1);
+				const int res = CclGetResourceByName(l);
+				lua_pop(l, 1);
+				++k;
+				lua_rawgeti(l, -1, k + 1);
+				type->_Storing[res] = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+			}
 		} else if (!strcmp(value, "ImproveProduction")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -656,7 +670,6 @@ static int CclDefineUnitType(lua_State *l)
 			} else {
 				LuaError(l, "Unsupported Type: %s" _C_ value);
 			}
-
 		} else if (!strcmp(value, "RightMouseAction")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "none")) {

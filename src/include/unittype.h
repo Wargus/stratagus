@@ -940,6 +940,7 @@ public:
 	CConstruction *Construction;    /// What is shown in construction phase
 
 	int _Costs[MaxCosts];           /// How many resources needed
+	int _Storing[MaxCosts];         /// How many resources the unit can store 
 	int RepairHP;                   /// Amount of HP per repair
 	int RepairCosts[MaxCosts];      /// How much it costs to repair
 

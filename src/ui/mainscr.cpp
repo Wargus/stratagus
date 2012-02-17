@@ -535,31 +535,31 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
 	//FIXME: ugly
 	switch (this->Color)
 		{
-			case 1: 
+			case 1:
 				color = ColorRed;
 				break;
-			case 2: 
+			case 2:
 				color = ColorYellow;
 				break;
-			case 3: 
+			case 3:
 				color = ColorGreen;
 				break;
-			case 4: 
+			case 4:
 				color = ColorGray;
 				break;
-			case 5: 
+			case 5:
 				color = ColorWhite;
 				break;
-			case 6: 
+			case 6:
 				color = ColorOrange;
 				break;
-			case 7: 
+			case 7:
 				color = ColorBlue;
 				break;
-			case 8: 
+			case 8:
 				color = ColorDarkGreen;
 				break;
-			case 9: 
+			case 9:
 				color = ColorBlack;
 				break;
 			default:
@@ -773,23 +773,30 @@ static void DrawUnitInfo(CUnit &unit)
 */
 void DrawResources()
 {
-	int i;
-	int v;
 	CLabel label(GetGameFont());
 
 	// Draw all icons of resource.
-	for (i = 0; i <= ScoreCost; ++i) {
+	for (int i = 0; i <= ScoreCost; ++i) {
 		if (UI.Resources[i].G) {
 			UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame,
 				UI.Resources[i].IconX, UI.Resources[i].IconY);
 		}
 	}
-	for (i = 0; i < MaxCosts; ++i) {
+	for (int i = 0; i < MaxCosts; ++i) {
 		if (UI.Resources[i].TextX != -1) {
-			v = ThisPlayer->Resources[i];
-			label.SetFont(v > 99999 ? GetSmallFont() : GetGameFont());
-			label.Draw(UI.Resources[i].TextX,
-				UI.Resources[i].TextY + (v > 99999) * 3, v);
+			const int resourceAmount = ThisPlayer->Resources[i];
+
+			if (ThisPlayer->MaxResources[i] != -1) {
+				char tmp[128];
+				snprintf(tmp, sizeof(tmp), "%d/%d", resourceAmount, ThisPlayer->MaxResources[i]);
+				label.SetFont(GetSmallFont());
+
+				label.Draw(UI.Resources[i].TextX, UI.Resources[i].TextY + 3, tmp);
+			} else {
+				label.SetFont(resourceAmount > 99999 ? GetSmallFont() : GetGameFont());
+
+				label.Draw(UI.Resources[i].TextX, UI.Resources[i].TextY + (resourceAmount > 99999) * 3, resourceAmount);
+			}
 		}
 	}
 	if (UI.Resources[FoodCost].TextX != -1) {
@@ -797,18 +804,16 @@ void DrawResources()
 		snprintf(tmp,sizeof(tmp), "%d/%d", ThisPlayer->Demand, ThisPlayer->Supply);
 		label.SetFont(GetGameFont());
 		if (ThisPlayer->Supply < ThisPlayer->Demand) {
-			label.DrawReverse(UI.Resources[FoodCost].TextX,
-				UI.Resources[FoodCost].TextY, tmp);
+			label.DrawReverse(UI.Resources[FoodCost].TextX, UI.Resources[FoodCost].TextY, tmp);
 		} else {
-			label.Draw(UI.Resources[FoodCost].TextX,
-				UI.Resources[FoodCost].TextY, tmp);
+			label.Draw(UI.Resources[FoodCost].TextX, UI.Resources[FoodCost].TextY, tmp);
 		}
 	}
 	if (UI.Resources[ScoreCost].TextX != -1) {
-		v = ThisPlayer->Score;
-		label.SetFont(v > 99999 ? GetSmallFont() : GetGameFont());
-		label.Draw(UI.Resources[ScoreCost].TextX,
-				UI.Resources[ScoreCost].TextY + (v > 99999) * 3, v);
+		const int score = ThisPlayer->Score;
+
+		label.SetFont(score > 99999 ? GetSmallFont() : GetGameFont());
+		label.Draw(UI.Resources[ScoreCost].TextX, UI.Resources[ScoreCost].TextY + (score > 99999) * 3, score);
 	}
 }
 

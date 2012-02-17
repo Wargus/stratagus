@@ -133,6 +133,10 @@
 **    units and structures.
 **    @see _costs_, TimeCost, GoldCost, WoodCost, OilCost, MaxCosts.
 **
+**  CPlayer::MaxResources[::MaxCosts]
+**
+**    How many resources the player can store at the moment. 
+**
 **  CPlayer::Incomes[::MaxCosts]
 **
 **    Income of the resources, when they are delivered at a store.
@@ -324,6 +328,7 @@ public:
 	inline void SetStartView(int x, int y) { StartX = x; StartY = y; }
 
 	int Resources[MaxCosts];      /// resources in store
+	int MaxResources[MaxCosts];   /// max resources can be stored
 	int LastResources[MaxCosts];  /// last values for revenue
 	int Incomes[MaxCosts];        /// income of the resources
 	int Revenue[MaxCosts];        /// income rate of the resources

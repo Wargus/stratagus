@@ -2303,6 +2303,23 @@ static int CclDefineDefaultResourceAmounts(lua_State *l)
 }
 
 /**
+**  Define max amounts for the resources.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineDefaultResourceMaxAmounts(lua_State *l)
+{
+	int args = std::min<int>(lua_gettop(l), MaxCosts);
+
+	for (int i = 0; i < args; ++i) {
+		DefaultResourceMaxAmounts[i] = LuaToNumber(l, i + 1);
+	}
+	for (int i = args; i < MaxCosts; ++i)
+		DefaultResourceMaxAmounts[i] = -1;
+	return 0;
+}
+
+/**
 **  Define default extra death types.
 **
 **  @param l  Lua state.
@@ -2434,6 +2451,7 @@ void InitCcl()
 	lua_register(Lua, "DefineDefaultActions", CclDefineDefaultActions);
 	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
 	lua_register(Lua, "DefineDefaultResourceAmounts", CclDefineDefaultResourceAmounts);
+	lua_register(Lua, "DefineDefaultResourceMaxAmounts", CclDefineDefaultResourceMaxAmounts);
 	lua_register(Lua, "DefineExtraDeathTypes", CclDefineExtraDeathTypes);
 	lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);
 

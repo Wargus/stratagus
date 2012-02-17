@@ -852,7 +852,7 @@ void CommandDiplomacy(int player, int state, int opponent)
 */
 void CommandSetResource(int player, int resource, int value)
 {
-	Players[player].Resources[resource] = value;
+	Players[player].SetResource(resource, value);
 }
 
 /**

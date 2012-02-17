@@ -488,6 +488,13 @@ CUnit *MakeUnit(CUnitType &type, CPlayer *player)
 		unit->AssignToPlayer(player);
 	}
 
+	// Increase the max resources limit
+	for (int i = 0; i < MaxCosts; ++i) {
+		if (type._Storing[i] && unit->Player->MaxResources[i] != -1) {
+			unit->Player->MaxResources[i] += type._Storing[i];
+		}
+	}
+
 	if (type.Building) {
 		//
 		//  fancy buildings: mirror buildings (but shadows not correct)
@@ -936,10 +943,8 @@ void UnitLost(CUnit &unit)
 	CUnit *temp;
 	CBuildRestrictionOnTop *b;
 	const CUnitType *type;
-	CPlayer *player;
-	int i;
+	CPlayer *player = unit.Player;
 
-	player = unit.Player;
 	Assert(player);  // Next code didn't support no player!
 
 	//
@@ -990,13 +995,21 @@ void UnitLost(CUnit &unit)
 	//
 	if (unit.CurrentAction() != UnitActionBuilt) {
 		player->Supply -= type->Supply;
+		// Decrease resource limit
+		for (int i = 0; i < MaxCosts; ++i) {
+			if (unit.Player->MaxResources[i] != -1 && type->_Storing[i]) {
+				const int newMaxValue = unit.Player->MaxResources[i] - type->_Storing[i];
 
+				unit.Player->MaxResources[i] = std::max(0, newMaxValue);
+				unit.Player->SetResource(i, unit.Player->Resources[i]);
+			}
+		}
 		//
 		//  Handle income improvements, look if a player loses a building
 		//  which have given him a better income, find the next best
 		//  income.
 		//
-		for (i = 1; i < MaxCosts; ++i) {
+		for (int i = 1; i < MaxCosts; ++i) {
 			if (player->Incomes[i] && type->ImproveIncomes[i] == player->Incomes[i]) {
 				int m;
 				int j;
@@ -1069,11 +1082,16 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 	CPlayer *player = unit.Player;
 
 	//
-	// Handle unit supply. (Currently only food supported.)
+	// Handle unit supply and max resources.
 	// Note an upgraded unit can't give more supply.
 	//
 	if (!upgrade) {
 		player->Supply += type->Supply;
+		for (int i = 0; i < MaxCosts; ++i) {
+			if (unit.Player->MaxResources[i] != -1 && type->_Storing[i]) {
+				unit.Player->MaxResources[i] += type->_Storing[i];
+			}
+		}
 	}
 
 	//
@@ -1557,6 +1575,12 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	}
 	newplayer.Demand += Type->Demand;
 	newplayer.Supply += Type->Supply;
+	// Increase resource limit
+	for (int i = 0; i < MaxCosts; ++i) {
+		if (newplayer.MaxResources[i] != -1 && Type->_Storing[i]) {
+			newplayer.MaxResources[i] += Type->_Storing[i];
+		}
+	}
 	if (Type->Building) {
 		newplayer.NumBuildings++;
 	}
@@ -2392,10 +2416,9 @@ CUnit *UnitFindResource(const CUnit &unit, const Vec2i &startPos, int range, int
 												if (bestw < waiting) {
 													better = false;
 												} else {
-													if (bestw == waiting && bestd < n)
-													{
-														better = false;
-													}
+													if (bestw == waiting && bestd < n) {
+ 														better = false;
+ 													}
 												}
 											}
 										} else {
@@ -2415,8 +2438,7 @@ CUnit *UnitFindResource(const CUnit &unit, const Vec2i &startPos, int range, int
 									bestw = waiting;
 								}
 							} else {
-								if (bestmine != NoUnitP && bestd < n)
-								{
+								if (bestmine != NoUnitP && bestd < n) {
 									better = false;
 								}
 							}
@@ -3341,7 +3363,7 @@ void CleanUnits()
 	//
 	//  Free memory for all units in unit table.
 	//
-	while(NumUnits) {
+	while (NumUnits) {
 		int count = NumUnits;
 		do {
 			CUnit *unit = Units[count - 1];

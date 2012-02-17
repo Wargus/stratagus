@@ -95,6 +95,11 @@ std::string DefaultResourceNames[MaxCosts];
 int DefaultResourceAmounts[MaxCosts];
 
 /**
+**  Default max amounts for the resources.
+*/
+int DefaultResourceMaxAmounts[MaxCosts];
+
+/**
 **  Default names for the resources.
 */
 std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
@@ -132,6 +137,7 @@ CUnitType::CUnitType() :
 	memset(&Portrait, 0, sizeof(Portrait));
 #endif
 	memset(_Costs, 0, sizeof(_Costs));
+	memset(_Storing, 0, sizeof(_Storing));
 	memset(RepairCosts, 0, sizeof(RepairCosts));
 	memset(CanStore, 0, sizeof(CanStore));
 	memset(ResInfo, 0, sizeof(ResInfo));

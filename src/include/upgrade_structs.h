@@ -123,6 +123,11 @@ extern std::string DefaultResourceNames[MaxCosts];
 extern int DefaultResourceAmounts[MaxCosts];
 
 /**
+**  Default max amounts for the resources.
+*/
+extern int DefaultResourceMaxAmounts[MaxCosts];
+
+/**
 **  These are the current stats of a unit. Upgraded or downgraded.
 */
 class CUnitStats {

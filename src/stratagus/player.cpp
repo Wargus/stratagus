@@ -198,6 +198,18 @@ void SavePlayers(CFile *file)
 			}
 			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), p.Resources[j]);
 		}
+		// Max Resources
+		file->printf("  \"max-resources\", {");
+		for (int j = 0; j < MaxCosts; ++j) {
+			if (j) {
+				if (j == MaxCosts / 2) {
+					file->printf("\n ");
+				} else {
+					file->printf(" ");
+				}
+			}
+			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), p.MaxResources[j]);
+		}
 		// Last Resources
 		file->printf("},\n  \"last-resources\", {");
 		for (int j = 0; j < MaxCosts; ++j) {
@@ -450,6 +462,13 @@ void CreatePlayer(int type)
 		player.Incomes[i] = DefaultIncomes[i];
 	}
 
+	//
+	//  Initial max resource amounts.
+	//
+	for (int i = 0; i < MaxCosts; ++i) {
+		player.MaxResources[i] = DefaultResourceMaxAmounts[i];
+	}
+
 	memset(player.UnitTypesCount, 0, sizeof (player.UnitTypesCount));
 
 	player.Supply = 0;
@@ -512,6 +531,7 @@ void CPlayer::Clear()
 	StartX = 0;
 	StartY = 0;
 	memset(Resources, 0, sizeof(Resources));
+	memset(MaxResources, 0, sizeof(MaxResources));
 	memset(LastResources, 0, sizeof(LastResources));
 	memset(Incomes, 0, sizeof(Incomes));
 	memset(Revenue, 0, sizeof(Revenue));
@@ -550,7 +570,11 @@ void CPlayer::Clear()
 */
 void CPlayer::SetResource(int resource, int value)
 {
-	this->Resources[resource] = value;
+	if (this->MaxResources[resource] != -1) {
+		this->Resources[resource] = std::min(value, this->MaxResources[resource]);
+	} else {
+		this->Resources[resource] = value;
+	}
 }
 
 /**
@@ -650,7 +674,7 @@ int CPlayer::CheckUnitType(const CUnitType &type) const
 void CPlayer::AddCosts(const int *costs)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
-		this->Resources[i] += costs[i];
+		SetResource(i, Resources[i] + costs[i]);
 	}
 }
 
@@ -674,7 +698,7 @@ void CPlayer::AddUnitType(const CUnitType &type)
 void CPlayer::AddCostsFactor(const int *costs, int factor)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
-		this->Resources[i] += costs[i] * factor / 100;
+		SetResource(i, this->Resources[i] + costs[i] * factor / 100);
 	}
 }
 
@@ -686,7 +710,7 @@ void CPlayer::AddCostsFactor(const int *costs, int factor)
 void CPlayer::SubCosts(const int *costs)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
-		this->Resources[i] -= costs[i];
+		SetResource(i, this->Resources[i] - costs[i]);
 	}
 }
 
@@ -709,7 +733,7 @@ void CPlayer::SubUnitType(const CUnitType &type)
 void CPlayer::SubCostsFactor(const int *costs, int factor)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
-		this->Resources[i] -= costs[i] * 100 / factor;
+		SetResource(i, this->Resources[i] - costs[i] * 100 / factor);
 	}
 }
 
