@@ -147,13 +147,7 @@ static int CheckForTargetInRange(CUnit &unit)
 		CUnit *goal = AttackUnitsInReactRange(unit);
 
 		if (goal) {
-			COrder *savedOrder = new COrder();
-
-			savedOrder->Action = order->Action;
-
-			savedOrder->MinRange = 0;//order->MinRange;
-			savedOrder->Range = 0;//order->Range;
-			savedOrder->goalPos = order->goalPos;
+			COrder *savedOrder = COrder::NewActionAttack(unit, order->goalPos);
 
 			if (unit.StoreOrder(savedOrder) == false) {
 				delete savedOrder;

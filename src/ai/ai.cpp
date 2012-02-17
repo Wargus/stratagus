@@ -714,11 +714,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				&& CanTarget(aiunit.Type, attacker->Type)) {
 				CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit*>(attacker), FlushCommands);
 				if (aiunit.SavedOrder == NULL) {
-					COrder *savedOrder = new COrder;
-
-					savedOrder->Action = UnitActionAttack;
-					savedOrder->Range = 0;
-					savedOrder->goalPos = aiunit.tilePos;
+					COrder *savedOrder = COrder::NewActionAttack(aiunit, aiunit.tilePos);
 
 					if (aiunit.StoreOrder(savedOrder) == false) {
 						delete savedOrder;

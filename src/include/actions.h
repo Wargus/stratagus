@@ -10,7 +10,7 @@
 //
 /**@name actions.h - The actions headerfile. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -150,6 +150,31 @@ public:
 	void AiUnitKilled(CUnit &unit);
 
 	void OnAnimationAttack(CUnit &unit);
+
+	static COrder* NewActionAttack(const CUnit &attacker, CUnit &target);
+	static COrder* NewActionAttack(const CUnit &attacker, const Vec2i &dest);
+	static COrder* NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
+	static COrder* NewActionBoard(CUnit &unit);
+	static COrder* NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
+	static COrder* NewActionBuilt();
+	static COrder* NewActionDie();
+	static COrder* NewActionFollow(CUnit &dest);
+	static COrder* NewActionMove(const Vec2i &pos);
+	static COrder* NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
+	static COrder* NewActionRepair(CUnit &unit, CUnit &target);
+	static COrder* NewActionRepair(const Vec2i &pos);
+	static COrder* NewActionResearch(CUnit &unit, CUpgrade &upgrade);
+	static COrder* NewActionResource(CUnit &harvester, const Vec2i &pos);
+	static COrder* NewActionResource(CUnit &mine);
+	static COrder* NewActionReturnGoods(CUnit *depot);
+	static COrder* NewActionSpellCast(SpellType &spell, const Vec2i &pos, CUnit *target);
+	static COrder* NewActionStandGround();
+	static COrder* NewActionStill();
+	static COrder* NewActionTrain(CUnit &trainer, CUnitType &type);
+	static COrder* NewActionTransformInto(CUnitType &type);
+	static COrder* NewActionUnload(const Vec2i &pos, CUnit *what);
+	static COrder* NewActionUpgradeTo(CUnit &unit, CUnitType &type);
+
 private:
 	friend void CclParseOrder(lua_State *l, const CUnit &unit, COrder* order);
 
@@ -160,8 +185,7 @@ public:
 	unsigned char Width;    /// Goal Width (used when Goal is not)
 	unsigned char Height;   /// Goal Height (used when Goal is not)
 	unsigned char Action;   /// global action
-	unsigned char CurrentResource;	 //used in 	UnitActionResource and
-										//UnitActionReturnGoods
+	unsigned char CurrentResource; ///used in UnitActionResource and UnitActionReturnGoods
 
 	Vec2i goalPos;          /// or tile coordinate of destination
 
@@ -292,10 +316,6 @@ extern void CommandDiplomacy(int player, int state, int opponent);
 extern void CommandSetResource(int player, int resource, int value);
 	/// Prepare shared vision command
 extern void CommandSharedVision(int player, bool state, int opponent);
-	/// Send any command
-//extern void CommandAnyOrder(CUnit &unit, COrder *order, int flush);
-	/// Move an order in command queue
-extern void CommandMoveOrder(CUnit &unit, int src, int dst);
 
 /*----------------------------------------------------------------------------
 --  Actions: in action_<name>.c
@@ -328,7 +348,7 @@ extern HandleActionFunc HandleActionPatrol;
 	/// Show attack animation
 extern void AnimateActionAttack(CUnit &unit);
 	/// Handle command attack
-extern HandleActionFunc  HandleActionAttack;
+extern HandleActionFunc HandleActionAttack;
 	/// Handle command board
 extern HandleActionFunc HandleActionBoard;
 	/// Handle command unload

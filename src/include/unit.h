@@ -597,8 +597,6 @@ public:
 
 	CUnit *Goal; /// Generic/Teleporter goal pointer
 
-	COrder *CreateOrder();
-
 	COrder *CurrentOrder() const { return Orders[0]; }
 
 	unsigned int CurrentAction() const;

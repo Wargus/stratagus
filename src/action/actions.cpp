@@ -82,6 +82,345 @@ COrder::COrder(const COrder &rhs): Goal(rhs.Goal), Range(rhs.Range),
 	}
 }
 
+
+
+/* static */ COrder* COrder::NewActionAttack(const CUnit &attacker, CUnit &target)
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionAttack;
+
+	if (target.Destroyed) {
+		order->goalPos = target.tilePos + target.Type->GetHalfTileSize();
+	} else {
+		// Removed, Dying handled by action routine.
+		order->SetGoal(&target);
+		order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
+		order->MinRange = attacker.Type->MinAttackRange;
+	}
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest)
+{
+	Assert(Map.Info.IsPointOnMap(dest));
+
+	COrder *order = new COrder;
+
+	order->Action = UnitActionAttack;
+
+	if (Map.WallOnMap(dest) && Map.IsFieldExplored(*attacker.Player, dest)) {
+		// FIXME: look into action_attack.cpp about this ugly problem
+		order->goalPos = dest;
+		order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
+		order->MinRange = attacker.Type->MinAttackRange;
+	} else {
+		order->goalPos = dest;
+	}
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest)
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionAttackGround;
+	order->goalPos = dest;
+	order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
+	order->MinRange = attacker.Type->MinAttackRange;
+
+	return order;
+}
+
+
+/* static */ COrder* COrder::NewActionBoard(CUnit &unit)
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionBoard;
+	order->SetGoal(&unit);
+	order->Range = 1;
+
+	return order;
+}
+
+
+/* static */ COrder* COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building)
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionBuild;
+
+	order->goalPos = pos;
+	order->Width = building.TileWidth;
+	order->Height = building.TileHeight;
+	if (building.BuilderOutside) {
+		order->Range = builder.Type->RepairRange;
+	} else {
+		// If building inside, but be next to stop
+		if (building.ShoreBuilding && builder.Type->UnitType == UnitTypeLand) {
+				// Peon won't dive :-)
+			order->Range = 1;
+		}
+	}
+	order->Arg1.Type = &building;
+	if (building.BuilderOutside) {
+		order->MinRange = 1;
+	}
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionBuilt()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionBuilt;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionDie()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionDie;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionFollow(CUnit &dest)
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionFollow;
+	// Destination could be killed.
+	// Should be handled in action, but is not possible!
+	// Unit::Refs is used as timeout counter.
+	if (dest.Destroyed) {
+		order->goalPos = dest.tilePos + dest.Type->GetHalfTileSize();
+	} else {
+		order->SetGoal(&dest);
+		order->Range = 1;
+	}
+
+	return order;
+}
+
+
+/* static */ COrder* COrder::NewActionMove(const Vec2i &pos)
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionMove;
+	order->goalPos = pos;
+
+	return order;
+}
+
+
+/* static */ COrder* COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest)
+{
+	Assert(Map.Info.IsPointOnMap(currentPos));
+	Assert(Map.Info.IsPointOnMap(dest));
+
+	COrder *order = new COrder;
+
+	order->Action = UnitActionPatrol;
+	order->goalPos = dest;
+	order->Arg1.Patrol = currentPos;
+
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionRepair(CUnit &unit, CUnit &target)
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionRepair;
+	if (target.Destroyed) {
+		order->goalPos = target.tilePos + target.Type->GetHalfTileSize();
+	} else {
+		order->SetGoal(&target);
+		order->Range = unit.Type->RepairRange;
+	}
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionRepair(const Vec2i &pos)
+{
+	Assert(Map.Info.IsPointOnMap(pos));
+
+	COrder *order = new COrder;
+
+	order->Action = UnitActionRepair;
+	order->goalPos = pos;
+	return order;
+}
+
+
+
+/* static */ COrder* COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade)
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionResearch;
+
+	// FIXME: if you give quick an other order, the resources are lost!
+	unit.Player->SubCosts(upgrade.Costs);
+
+	order->Arg1.Upgrade = &upgrade;
+
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionResource(CUnit &harvester, const Vec2i &pos)
+{
+	COrder *order = new COrder;
+	Vec2i ressourceLoc;
+
+	order->Action = UnitActionResource;
+
+	//  Find the closest piece of wood next to a tile where the unit can move
+	if (!FindTerrainType(0, (harvester.Type->MovementMask), 1, 20, harvester.Player, pos, &ressourceLoc)) {
+		DebugPrint("FIXME: Give up???\n");
+	}
+	// Max Value > 1
+	if ((MyAbs(ressourceLoc.x - pos.x) | MyAbs(ressourceLoc.y - pos.y)) > 1) {
+		if (!FindTerrainType(0, MapFieldForest, 0, 20, harvester.Player, ressourceLoc, &ressourceLoc)) {
+			DebugPrint("FIXME: Give up???\n");
+		}
+	} else {
+		// The destination is next to a reachable tile.
+		ressourceLoc = pos;
+	}
+	order->goalPos = ressourceLoc;
+	order->Range = 1;
+
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionResource(CUnit &mine)
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionResource;
+	order->SetGoal(&mine);
+	order->Range = 1;
+
+	return order;
+}
+
+
+
+/* static */ COrder* COrder::NewActionReturnGoods(CUnit *depot)
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionReturnGoods;
+	// Destination could be killed. NETWORK!
+	if (depot && !depot->Destroyed) {
+		order->SetGoal(depot);
+	}
+	order->Range = 1;
+
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionSpellCast(SpellType &spell, const Vec2i &pos, CUnit *target)
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionSpellCast;
+
+	order->Range = spell.Range;
+	if (target) {
+		// Destination could be killed.
+		// Should be handled in action, but is not possible!
+		// Unit::Refs is used as timeout counter.
+		if (target->Destroyed) {
+			// FIXME: where check if spell needs a unit as destination?
+			// FIXME: target->Type is now set to 0. maybe we shouldn't bother.
+			const Vec2i diag = {order->Range, order->Range};
+			order->goalPos = target->tilePos /* + target->Type->GetHalfTileSize() */ - diag;
+			order->Range <<= 1;
+		} else {
+			order->SetGoal(target);
+		}
+	} else {
+		order->goalPos = pos;
+	}
+	order->Arg1.Spell = &spell;
+
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionStandGround()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionStandGround;
+	return order;
+}
+
+
+/* static */ COrder* COrder::NewActionStill()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionStill;
+	return order;
+}
+
+
+
+
+/* static */ COrder* COrder::NewActionTrain(CUnit &trainer, CUnitType &type)
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionTrain;
+	order->Arg1.Type = &type;
+	// FIXME: if you give quick an other order, the resources are lost!
+	trainer.Player->SubUnitType(type);
+
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionTransformInto(CUnitType &type)
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionTransformInto;
+
+	order->Arg1.Type = &type;
+
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionUnload(const Vec2i &pos, CUnit *what)
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionUnload;
+	order->goalPos = pos;
+	if (what && !what->Destroyed) {
+		order->SetGoal(what);
+	}
+
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type)
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionUpgradeTo;
+
+	// FIXME: if you give quick an other order, the resources are lost!
+	unit.Player->SubUnitType(type);
+	order->Arg1.Type = &type;
+
+	return order;
+}
+
 COrder& COrder::operator=(const COrder &rhs) {
 	if (this != &rhs) {
 		Action = rhs.Action;

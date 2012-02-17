@@ -272,11 +272,7 @@ static bool AutoAttack(CUnit &unit, bool stand_ground)
 			if ((goal = AttackUnitsInReactRange(unit))) {
 				// Weak goal, can choose other unit, come back after attack
 				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
-				COrder *savedOrder = new COrder;
-
-				savedOrder->Action = UnitActionAttack;
-				savedOrder->Range = 0;
-				savedOrder->goalPos = unit.tilePos;
+				COrder *savedOrder = COrder::NewActionAttack(unit, unit.tilePos);
 
 				if (unit.StoreOrder(savedOrder) == false) {
 					delete savedOrder;
@@ -316,11 +312,7 @@ void AutoAttack(CUnit &unit, CUnitCache &targets, bool stand_ground)
 			if (goal) {
 				// Weak goal, can choose other unit, come back after attack
 				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
-				COrder *savedOrder = new COrder;
-
-				savedOrder->Action = UnitActionAttack;
-				savedOrder->Range = 0;
-				savedOrder->goalPos = unit.tilePos;
+				COrder *savedOrder = COrder::NewActionAttack(unit, unit.tilePos);
 
 				if (unit.StoreOrder(savedOrder) == false) {
 					delete savedOrder;

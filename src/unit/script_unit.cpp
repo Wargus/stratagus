@@ -589,9 +589,12 @@ static void CclParseOrders(lua_State *l, CUnit &unit)
 	unit.OrderCount = 0;
 	for (int j = 0; j < n; ++j) {
 		lua_rawgeti(l, -1, j + 1);
-		COrderPtr order = unit.CreateOrder();
-		Assert(order == unit.Orders[j]);
-		CclParseOrder(l, unit, order);
+
+		unit.Orders.push_back(new COrder);
+		COrderPtr* order = &unit.Orders[(int)unit.OrderCount++];
+
+		Assert(order == &unit.Orders[j]);
+		CclParseOrder(l, unit, *order);
 		lua_pop(l, 1);
 	}
 }

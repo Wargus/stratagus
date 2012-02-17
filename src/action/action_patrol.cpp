@@ -131,15 +131,14 @@ void HandleActionPatrol(COrder& order, CUnit &unit)
 				// Save current command to come back.
 				COrder *savedOrder = new COrder(order);
 
+				DebugPrint("Patrol attack %d\n" _C_ UnitNumber(*goal));
+				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
+
 				if (unit.StoreOrder(savedOrder) == false) {
 					delete savedOrder;
 					savedOrder = NULL;
 				}
 				unit.ClearAction();
-				unit.CurrentOrder()->ClearGoal();
-
-				DebugPrint("Patrol attack %d\n" _C_ UnitNumber(*goal));
-				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
 				return;
 			}
 		}

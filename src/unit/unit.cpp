@@ -260,13 +260,6 @@ void CUnit::Release(bool final)
 	UnitManager.ReleaseUnit(this);
 }
 
-
-COrder *CUnit::CreateOrder()
-{
-	Orders.push_back(new COrder);
-	return Orders[(int)OrderCount++];
-}
-
 unsigned int CUnit::CurrentAction() const
 {
 	return (CurrentOrder()->Action);
@@ -1059,8 +1052,8 @@ void UnitClearOrders(CUnit &unit)
 		delete unit.Orders[i];
 	}
 	unit.Orders.clear();
-	unit.OrderCount = 0;
-	CommandStopUnit(unit);
+	unit.OrderCount = 1;
+	unit.Orders.push_back(COrder::NewActionStill());
 	unit.SubAction = unit.State = 0;
 }
 
@@ -2720,14 +2713,15 @@ void LetUnitDie(CUnit &unit)
 	UnitLost(unit);
 	UnitClearOrders(unit);
 
-	//
+
+
 	// Unit has death animation.
-	//
 
 	// Not good: UnitUpdateHeading(unit);
 	unit.SubAction = 0;
 	unit.State = 0;
-	unit.CurrentOrder()->Action = UnitActionDie;
+	delete unit.Orders[0];
+	unit.Orders[0] = COrder::NewActionDie();
 	if (type->CorpseType) {
 #ifdef DYNAMIC_LOAD
 		if (!type->Sprite) {
@@ -2977,19 +2971,13 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 			}
 		}
 		if (goal) {
-			if (target.SavedOrder == NULL) {
-				COrder* savedOrder = new COrder;
+			COrder *savedOrder = new COrder(*target.CurrentOrder());
 
-				savedOrder->Action = UnitActionAttack;
-				savedOrder->goalPos = target.tilePos;
-				savedOrder->Range = target.Stats->Variables[ATTACKRANGE_INDEX].Max;
-				savedOrder->MinRange = target.Type->MinAttackRange;
-
-				if (target.StoreOrder(savedOrder) == false) {
-					delete savedOrder;
-				}
-			}
 			CommandAttack(target, goal->tilePos, NoUnitP, FlushCommands);
+			if (target.StoreOrder(savedOrder) == false) {
+				delete savedOrder;
+				savedOrder = NULL;
+			}
 			return;
 		}
 	}

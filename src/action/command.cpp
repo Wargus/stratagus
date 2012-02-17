@@ -61,15 +61,14 @@
 */
 static void ReleaseOrders(CUnit &unit)
 {
-	int n = unit.OrderCount;
+	Assert(static_cast<size_t>(unit.OrderCount) == unit.Orders.size());
+	Assert(unit.Orders.size() >= 1);
 
-	if (n > 1) {
-		while (--n) {
-			delete unit.Orders[n];
-			unit.Orders.pop_back();
-		}
-		unit.OrderCount = 1;
+	for (size_t i = 1; i != unit.Orders.size(); ++i) {
+		delete unit.Orders[i];
 	}
+	unit.Orders.resize(1);
+	unit.OrderCount = 1;
 	unit.OrderFlush = 1;
 	// Order 0 must be stopped in the action loop.
 }
@@ -82,7 +81,7 @@ static void ReleaseOrders(CUnit &unit)
 **
 **  @return       Pointer to next free order slot.
 */
-static COrderPtr GetNextOrder(CUnit &unit, int flush)
+static COrderPtr *GetNextOrder(CUnit &unit, int flush)
 {
 	if (flush) {
 		// empty command queue
@@ -91,7 +90,9 @@ static COrderPtr GetNextOrder(CUnit &unit, int flush)
 	if (unit.OrderCount == 0x7F) {
 		return NULL;
 	}
-	return unit.CreateOrder();
+	unit.Orders.push_back(NULL);
+	unit.OrderCount++;
+	return &unit.Orders.back();
 }
 
 /**
@@ -104,22 +105,21 @@ static void RemoveOrder(CUnit &unit, int order)
 {
 	Assert(0 <= order && order < unit.OrderCount);
 
-	if (order != 0) {
-		delete unit.Orders[order];
+	delete unit.Orders[order];
+	unit.Orders.erase(unit.Orders.begin() + order);
+	--unit.OrderCount;
+	if (order == 0) {
+		unit.SubAction = 0;
 	}
-	for (int i = order; i < unit.OrderCount - 1; ++i) {
-		unit.Orders[i] = unit.Orders[i + 1];
+	if (unit.Orders.empty()) {
+		unit.Orders.push_back(COrder::NewActionStill());
 	}
-	if (unit.OrderCount > 1) {
-		unit.Orders.pop_back();
-		--unit.OrderCount;
-		if (order == 0) {
-			unit.SubAction = 0;
-		}
-	} else {
-		unit.CurrentOrder()->Init();
-		unit.ClearAction();
-	}
+}
+
+static void ClearNewAction(CUnit &unit)
+{
+	delete unit.NewOrder;
+	unit.NewOrder = NULL;
 }
 
 /**
@@ -136,6 +136,12 @@ static void ClearSavedAction(CUnit &unit)
 	unit.SavedOrder = NULL;
 }
 
+static bool IsUnitValidForNetwork(const CUnit &unit)
+{
+	return !unit.Removed && unit.CurrentAction() != UnitActionDie;
+}
+
+
 /*----------------------------------------------------------------------------
 --  Commands
 ----------------------------------------------------------------------------*/
@@ -148,65 +154,13 @@ static void ClearSavedAction(CUnit &unit)
 void CommandStopUnit(CUnit &unit)
 {
 	// Ignore that the unit could be removed.
-	COrderPtr order = GetNextOrder(unit, FlushCommands); // Flush them.
+	COrderPtr *order = GetNextOrder(unit, FlushCommands); // Flush them.
 	Assert(order);
-	order->Init();
+	Assert(*order == NULL);
+	*order = COrder::NewActionStill();
 
-	order->Action = UnitActionStill;
 	ClearSavedAction(unit);
-	delete unit.NewOrder;
-	unit.NewOrder = NULL;
-}
-
-/**
-**  Order an already formed Order structure
-**
-**  @param unit      pointer to unit
-**  @param cpyorder  pointer to valid order
-**  @param flush     if true, flush command queue.
-*/
-void CommandAnyOrder(CUnit &unit, COrderPtr cpyorder, int flush)
-{
-	COrderPtr order;
-
-	if (!(order = GetNextOrder(unit, flush))) {
-		return;
-	}
-
-	*order = *cpyorder;
-	ClearSavedAction(unit);
-}
-
-/**
-**  Move an order in the order queue.
-**  ( Cannot move the order 0 ! )
-**
-**  @param unit  pointer to unit
-**  @param src   the order to move
-**  @param dst   the new position of the order
-*/
-void CommandMoveOrder(CUnit &unit, int src, int dst)
-{
-	Assert(src != 0 && dst != 0 && src < unit.OrderCount && dst < unit.OrderCount);
-
-	if (src == dst) {
-		return;
-	}
-	if (src < dst) {
-		COrderPtr tmp = unit.Orders[src];
-
-		for (int i = src; i < dst; ++i) {
-			unit.Orders[i] = unit.Orders[i+1];
-		}
-		unit.Orders[dst] = tmp;
-	} else { // dst < src
-		COrderPtr tmp = unit.Orders[src];
-
-		for (int i = src - 1 ; i >= dst; --i) {
-			unit.Orders[i + 1] = unit.Orders[i];
-		}
-		unit.Orders[dst] = tmp;
-	}
+	ClearNewAction(unit);
 }
 
 /**
@@ -217,20 +171,18 @@ void CommandMoveOrder(CUnit &unit, int src, int dst)
 */
 void CommandStandGround(CUnit &unit, int flush)
 {
-	COrderPtr order;
-
-	// Ignore that the unit could be removed.
+	COrderPtr* order;
 
 	if (unit.Type->Building) {
-		// FIXME: should find a better way for pending orders.
-		delete unit.NewOrder;
-		unit.NewOrder = new COrder;
-		order = unit.NewOrder;
-	} else if (!(order = GetNextOrder(unit, flush))) {
-		return;
+		ClearNewAction(unit);
+		order = &unit.NewOrder;
+	} else {
+		order = GetNextOrder(unit, flush);
+		if (order == NULL) {
+			return;
+		}
 	}
-	order->Init();
-	order->Action = UnitActionStandGround;
+	*order = COrder::NewActionStandGround();
 	ClearSavedAction(unit);
 }
 
@@ -243,35 +195,21 @@ void CommandStandGround(CUnit &unit, int flush)
 */
 void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 {
-	COrderPtr order;
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
+	COrderPtr *order;
 
-	//
-	// Check if unit is still valid? (NETWORK!)
-	//
-	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
-		if (!unit.CanMove()) {
-			// FIXME: should find a better way for pending orders.
-			delete unit.NewOrder;
-			unit.NewOrder = new COrder;
-			order = unit.NewOrder;
-		} else if (!(order = GetNextOrder(unit, flush))) {
+	if (!unit.CanMove()) {
+		ClearNewAction(unit);
+		order = &unit.NewOrder;
+	} else {
+		order = GetNextOrder(unit, flush);
+		if (order == NULL) {
 			return;
 		}
-		order->Init();
-
-		order->Action = UnitActionFollow;
-		//
-		// Destination could be killed.
-		// Should be handled in action, but is not possible!
-		// Unit::Refs is used as timeout counter.
-		//
-		if (dest.Destroyed) {
-			order->goalPos = dest.tilePos + dest.Type->GetHalfTileSize();
-		} else {
-			order->SetGoal(&dest);
-			order->Range = 1;
-		}
 	}
+	*order = COrder::NewActionFollow(dest);
 	ClearSavedAction(unit);
 }
 
@@ -284,26 +222,23 @@ void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 */
 void CommandMove(CUnit &unit, const Vec2i &pos, int flush)
 {
-	COrderPtr order;
-
 	Assert(Map.Info.IsPointOnMap(pos));
 
-	//
-	//  Check if unit is still valid? (NETWORK!)
-	//
-	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
-		if (!unit.CanMove()) {
-			// FIXME: should find a better way for pending orders.
-			delete unit.NewOrder;
-			unit.NewOrder = new COrder;
-			order = unit.NewOrder;
-		} else if (!(order = GetNextOrder(unit, flush))) {
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
+	COrderPtr *order;
+
+	if (!unit.CanMove()) {
+		ClearNewAction(unit);
+		order = &unit.NewOrder;
+	} else {
+		order = GetNextOrder(unit, flush);
+		if (order == NULL) {
 			return;
 		}
-		order->Init();
-		order->Action = UnitActionMove;
-		order->goalPos = pos;
 	}
+	*order = COrder::NewActionMove(pos);
 	ClearSavedAction(unit);
 }
 
@@ -317,38 +252,24 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush)
 */
 void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
 {
-	COrderPtr order;
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
+	COrderPtr *order;
 
-	//
-	//  Check if unit is still valid? (NETWORK!)
-	//
-	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
-		if (unit.Type->Building) {
-			// FIXME: should find a better way for pending orders.
-			delete unit.NewOrder;
-			unit.NewOrder = new COrder;
-			order = unit.NewOrder;
-		} else if (!(order = GetNextOrder(unit, flush))) {
+	if (unit.Type->Building) {
+		ClearNewAction(unit);
+		order = &unit.NewOrder;
+	} else {
+		order = GetNextOrder(unit, flush);
+		if (order == NULL) {
 			return;
 		}
-		order->Init();
-
-		order->Action = UnitActionRepair;
-		//
-		//  Destination could be killed.
-		//  Should be handled in action, but is not possible!
-		//  Unit::Refs is used as timeout counter.
-		//
-		if (dest) {
-			if (dest->Destroyed) {
-				order->goalPos = dest->tilePos + dest->Type->GetHalfTileSize();
-			} else {
-				order->SetGoal(dest);
-				order->Range = unit.Type->RepairRange;
-			}
-		} else {
-			order->goalPos = pos;
-		}
+	}
+	if (dest) {
+		*order = COrder::NewActionRepair(unit, *dest);
+	} else {
+		*order = COrder::NewActionRepair(pos);
 	}
 	ClearSavedAction(unit);
 }
@@ -361,12 +282,10 @@ void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
 */
 void CommandAutoRepair(CUnit &unit, int on)
 {
-	//
-	// Check if unit is still valid? (NETWORK!)
-	//
-	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
-		unit.AutoRepair = on;
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
 	}
+	unit.AutoRepair = on;
 }
 
 /**
@@ -374,52 +293,31 @@ void CommandAutoRepair(CUnit &unit, int on)
 **
 **  @param unit    pointer to unit.
 **  @param pos     map position to attack.
-**  @param attack  or unit to be attacked.
+**  @param target  or unit to be attacked.
 **  @param flush   if true, flush command queue.
 */
-void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *attack, int flush)
+void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush)
 {
-	COrderPtr order;
-
 	Assert(Map.Info.IsPointOnMap(pos));
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
 
-	//
-	// Check if unit is still valid? (NETWORK!)
-	//
-	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
-		if (!unit.Type->CanAttack) {
-			// FIXME: should find a better way for pending orders.
-			delete unit.NewOrder;
-			unit.NewOrder = new COrder;
-			order = unit.NewOrder;
-		} else if (!(order = GetNextOrder(unit, flush))) {
+	COrderPtr *order;
+
+	if (!unit.Type->CanAttack) {
+		ClearNewAction(unit);
+		order = &unit.NewOrder;
+	} else {
+		order = GetNextOrder(unit, flush);
+		if (order == NULL) {
 			return;
 		}
-		order->Init();
-
-		order->Action = UnitActionAttack;
-		if (attack) {
-			//
-			// Destination could be killed.
-			// Should be handled in action, but is not possible!
-			// Unit::Refs is used as timeout counter.
-			//
-			if (attack->Destroyed) {
-				order->goalPos = attack->tilePos + attack->Type->GetHalfTileSize();
-			} else {
-				// Removed, Dying handled by action routine.
-				order->SetGoal(attack);
-				order->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
-				order->MinRange = unit.Type->MinAttackRange;
-			}
-		} else if (Map.WallOnMap(pos)) {
-			// FIXME: look into action_attack.c about this ugly problem
-			order->goalPos = pos;
-			order->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
-			order->MinRange = unit.Type->MinAttackRange;
-		} else {
-			order->goalPos = pos;
-		}
+	}
+	if (target) {
+		*order = COrder::NewActionAttack(unit, *target);
+	} else {
+		*order = COrder::NewActionAttack(unit, pos);
 	}
 	ClearSavedAction(unit);
 }
@@ -433,31 +331,23 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *attack, int flush)
 */
 void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
 {
-	COrderPtr order;
-
 	Assert(Map.Info.IsPointOnMap(pos));
 
-	//
-	// Check if unit is still valid? (NETWORK!)
-	//
-	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
-		if (unit.Type->Building) {
-			// FIXME: should find a better way for pending orders.
-			delete unit.NewOrder;
-			unit.NewOrder = new COrder;
-			order = unit.NewOrder;
-		} else if (!(order = GetNextOrder(unit, flush))) {
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
+	COrderPtr *order;
+
+	if (unit.Type->CanAttack) {
+		ClearNewAction(unit);
+		order = &unit.NewOrder;
+	} else {
+		order = GetNextOrder(unit, flush);
+		if (order == NULL) {
 			return;
 		}
-		order->Init();
-
-		order->Action = UnitActionAttackGround;
-		order->goalPos = pos;
-		order->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
-		order->MinRange = unit.Type->MinAttackRange;
-
-		DebugPrint("FIXME this next\n");
 	}
+	*order = COrder::NewActionAttackGround(unit, pos);
 	ClearSavedAction(unit);
 }
 
@@ -472,29 +362,24 @@ void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
 */
 void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush)
 {
-	COrderPtr order;
-
 	Assert(Map.Info.IsPointOnMap(pos));
 
-	//
-	// Check if unit is still valid? (NETWORK!)
-	//
-	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
-		if (!unit.CanMove()) {
-			// FIXME: should find a better way for pending orders.
-			delete unit.NewOrder;
-			unit.NewOrder = new COrder;
-			order = unit.NewOrder;
-		} else if (!(order = GetNextOrder(unit, flush))) {
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
+	COrderPtr *order;
+
+	if (!unit.CanMove()) {
+		ClearNewAction(unit);
+		order = &unit.NewOrder;
+	} else {
+		order = GetNextOrder(unit, flush);
+		if (order == NULL) {
 			return;
 		}
-		order->Init();
-
-		order->Action = UnitActionPatrol;
-		order->goalPos = pos;
-		Assert(!(unit.tilePos.x & ~0xFFFF) && !(unit.tilePos.y & ~0xFFFF));
-		order->Arg1.Patrol = unit.tilePos;
 	}
+	*order = COrder::NewActionPatrol(unit.tilePos, pos);
+
 	ClearSavedAction(unit);
 }
 
@@ -507,35 +392,24 @@ void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush)
 */
 void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 {
-	COrderPtr order;
-
-	//
-	// Check if unit is still valid? (NETWORK!)
-	//
-	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
-		//
-		// Destination could be killed.
-		// Should be handled in action, but is not possible!
-		// Unit::Refs is used as timeout counter.
-		//
-		if (dest.Destroyed) {
-			return;
-		}
-
-		if (unit.Type->Building) {
-			// FIXME: should find a better way for pending orders.
-			delete unit.NewOrder;
-			unit.NewOrder = new COrder;
-			order = unit.NewOrder;
-		} else if (!(order = GetNextOrder(unit, flush))) {
-			return;
-		}
-		order->Init();
-
-		order->Action = UnitActionBoard;
-		order->SetGoal(&dest);
-		order->Range = 1;
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
 	}
+	if (dest.Destroyed) {
+		return ;
+	}
+	COrderPtr *order;
+
+	if (unit.Type->Building) {
+		ClearNewAction(unit);
+		order = &unit.NewOrder;
+	} else {
+		order = GetNextOrder(unit, flush);
+		if (order == NULL) {
+			return;
+		}
+	}
+	*order = COrder::NewActionBoard(dest);
 	ClearSavedAction(unit);
 }
 
@@ -549,28 +423,15 @@ void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 */
 void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
 {
-	COrderPtr order;
-
-	//
-	// Check if unit is still valid? (NETWORK!)
-	//
-	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
-		if (!(order = GetNextOrder(unit, flush))) {
-			return;
-		}
-		order->Init();
-
-		order->Action = UnitActionUnload;
-		order->goalPos = pos;
-		//
-		// Destination could be killed.
-		// Should be handled in action, but is not possible!
-		// Unit::Refs is used as timeout counter.
-		//
-		if (what && !what->Destroyed) {
-			order->SetGoal(what);
-		}
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
 	}
+	COrderPtr *order = GetNextOrder(unit, flush);
+
+	if (order == NULL) {
+		return;
+	}
+	*order = COrder::NewActionUnload(pos, what);
 	ClearSavedAction(unit);
 }
 
@@ -584,40 +445,21 @@ void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
 */
 void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush)
 {
-	COrderPtr order;
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
+	COrderPtr *order;
 
-	//
-	// Check if unit is still valid? (NETWORK!)
-	//
-	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
-		if (unit.Type->Building) {
-			// FIXME: should find a better way for pending orders.
-			delete unit.NewOrder;
-			unit.NewOrder = new COrder;
-			order = unit.NewOrder;
-		} else if (!(order = GetNextOrder(unit, flush))) {
+	if (unit.Type->Building) {
+		ClearNewAction(unit);
+		order = &unit.NewOrder;
+	} else {
+		order = GetNextOrder(unit, flush);
+		if (order == NULL) {
 			return;
 		}
-		order->Init();
-
-		order->Action = UnitActionBuild;
-		order->goalPos = pos;
-		order->Width = what.TileWidth;
-		order->Height = what.TileHeight;
-		if (what.BuilderOutside) {
-			order->Range = unit.Type->RepairRange;
-		} else {
-			// If building inside, but be next to stop
-			if (what.ShoreBuilding && unit.Type->UnitType == UnitTypeLand) {
-					// Peon won't dive :-)
-				order->Range = 1;
-			}
-		}
-		order->Arg1.Type = &what;
-		if (what.BuilderOutside) {
-			order->MinRange = 1;
-		}
 	}
+	*order = COrder::NewActionBuild(unit, pos, what);
 	ClearSavedAction(unit);
 }
 
@@ -628,9 +470,7 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int fl
 */
 void CommandDismiss(CUnit &unit)
 {
-	//
 	// Check if building is still under construction? (NETWORK!)
-	//
 	if (unit.CurrentAction() == UnitActionBuilt) {
 		unit.CurrentOrder()->Data.Built.Cancel = 1;
 	} else {
@@ -649,42 +489,25 @@ void CommandDismiss(CUnit &unit)
 */
 void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
 {
-	COrderPtr order;
-	Vec2i ressourceLoc;
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
+	if (!unit.Type->Building && !unit.Type->Harvester) {
+		ClearSavedAction(unit);
+		return ;
+	}
+	COrderPtr *order;
 
-	//
-	// Check if unit is still valid? (NETWORK!)
-	//
-	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
-		if (unit.Type->Building) {
-			// FIXME: should find a better way for pending orders.
-			delete unit.NewOrder;
-			unit.NewOrder = new COrder;
-			order = unit.NewOrder;
-		} else if (!(order = GetNextOrder(unit, flush))) {
+	if (unit.Type->Building) {
+		ClearNewAction(unit);
+		order = &unit.NewOrder;
+	} else {
+		order = GetNextOrder(unit, flush);
+		if (order == NULL) {
 			return;
 		}
-		order->Init();
-
-		order->Action = UnitActionResource;
-
-		//  Find the closest piece of wood next to a tile where the unit can move
-		if (!FindTerrainType(0, (unit.Type->MovementMask), 1, 20, unit.Player, pos, &ressourceLoc)) {
-			DebugPrint("FIXME: Give up???\n");
-		}
-
-		// Max Value > 1
-		if ((MyAbs(ressourceLoc.x - pos.x) | MyAbs(ressourceLoc.y - pos.y)) > 1) {
-			if (!FindTerrainType(0, MapFieldForest, 0, 20, unit.Player, ressourceLoc, &ressourceLoc)) {
-				DebugPrint("FIXME: Give up???\n");
-			}
-		} else {
-			// The destination is next to a reachable tile.
-			ressourceLoc = pos;
-		}
-		order->goalPos = ressourceLoc;
-		order->Range = 1;
 	}
+	*order = COrder::NewActionResource(unit, pos);
 	ClearSavedAction(unit);
 }
 
@@ -697,33 +520,28 @@ void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
 */
 void CommandResource(CUnit &unit, CUnit &dest, int flush)
 {
-	COrderPtr order;
-
-	//
-	// Check if unit is still valid and Goal still alive? (NETWORK!)
-	//
-	if (!unit.Removed && unit.CurrentAction() != UnitActionDie && !dest.Destroyed) {
-		// FIXME: more races, could happen with many orders in queue.
-		if (!unit.Type->Building && !unit.Type->Harvester) {
-			ClearSavedAction(unit);
-			return;
-		}
-
-		// FIXME: if low-level supports searching, pass NoUnitP down.
-
-		if (unit.Type->Building) {
-			// FIXME: should find a better way for pending orders.
-			delete unit.NewOrder;
-			unit.NewOrder = new COrder;
-			order = unit.NewOrder;
-		} else if (!(order = GetNextOrder(unit, flush))) {
-			return;
-		}
-		order->Init();
-		order->Action = UnitActionResource;
-		order->SetGoal(&dest);
-		order->Range = 1;
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
 	}
+	if (dest.Destroyed) {
+		return ;
+	}
+	if (!unit.Type->Building && !unit.Type->Harvester) {
+		ClearSavedAction(unit);
+		return ;
+	}
+	COrderPtr *order;
+
+	if (unit.Type->Building) {
+		ClearNewAction(unit);
+		order = &unit.NewOrder;
+	} else {
+		order = GetNextOrder(unit, flush);
+		if (order == NULL) {
+			return;
+		}
+	}
+	*order = COrder::NewActionResource(dest);
 	ClearSavedAction(unit);
 }
 
@@ -736,37 +554,26 @@ void CommandResource(CUnit &unit, CUnit &dest, int flush)
 */
 void CommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
 {
-	COrderPtr order;
-
-	//
-	// Check if unit is still valid and Goal still alive? (NETWORK!)
-	//
-	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
-		// FIXME: more races, could happen with many orders in queue.
-		if (!unit.Type->Building && !unit.Type->Harvester && !unit.ResourcesHeld) {
-			ClearSavedAction(unit);
-			return;
-		}
-
-		if (unit.Type->Building) {
-			// FIXME: should find a better way for pending orders.
-			delete unit.NewOrder;
-			unit.NewOrder = new COrder;
-			order = unit.NewOrder;
-		} else if (!(order = GetNextOrder(unit, flush))) {
-			return;
-		}
-		order->Init();
-
-		order->Action = UnitActionReturnGoods;
-		//
-		// Destination could be killed. NETWORK!
-		//
-		if (goal && !goal->Destroyed) {
-			order->SetGoal(goal);
-		}
-		order->Range = 1;
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
 	}
+	if ((unit.Type->Harvester && unit.ResourcesHeld == 0)
+		|| (!unit.Type->Building && !unit.Type->Harvester)) {
+		ClearSavedAction(unit);
+		return ;
+	}
+	COrderPtr *order;
+
+	if (unit.Type->Building) {
+		ClearNewAction(unit);
+		order = &unit.NewOrder;
+	} else {
+		order = GetNextOrder(unit, flush);
+		if (order == NULL) {
+			return;
+		}
+	}
+	*order = COrder::NewActionReturnGoods(goal);
 	ClearSavedAction(unit);
 }
 
@@ -779,38 +586,28 @@ void CommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
 */
 void CommandTrainUnit(CUnit &unit, CUnitType &type, int)
 {
-	COrderPtr order;
-
-	//
-	// Check if unit is still valid? (NETWORK!)
-	//
-	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
-		//
-		// Check if enough resources remains? (NETWORK!)
-		// FIXME: wrong if append to message queue!!!
-		//
-		if (unit.Player->CheckLimits(type) < 0 ||
-				unit.Player->CheckUnitType(type)) {
-			return;
-		}
-
-		//
-		// Not already training?
-		//
-		if (!EnableTrainingQueue && unit.CurrentAction() == UnitActionTrain) {
-			DebugPrint("Unit queue full!\n");
-			return;
-		}
-		if (!(order = GetNextOrder(unit, 0))) {
-			return;
-		}
-		order->Init();
-
-		order->Action = UnitActionTrain;
-		order->Arg1.Type = &type;
-		// FIXME: if you give quick an other order, the resources are lost!
-		unit.Player->SubUnitType(type);
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
 	}
+	// Check if enough resources remains? (NETWORK!)
+	// FIXME: wrong if append to message queue!!!
+	if (unit.Player->CheckLimits(type) < 0
+		|| unit.Player->CheckUnitType(type)) {
+		return;
+	}
+	// Not already training?
+	if (!EnableTrainingQueue && unit.CurrentAction() == UnitActionTrain) {
+		DebugPrint("Unit queue disabled!\n");
+		return;
+	}
+
+	const int noFlushCommands = 0;
+	COrderPtr *order = GetNextOrder(unit, noFlushCommands);
+
+	if (order == NULL) {
+		return;
+	}
+	*order = COrder::NewActionTrain(unit, type);
 	ClearSavedAction(unit);
 }
 
@@ -828,10 +625,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 
 	ClearSavedAction(unit);
 
-	//
 	// Check if unit is still training 'slot'? (NETWORK!)
-	//
-
 	if (slot == -1) {
 		// Cancel All training
 		while (unit.CurrentAction() == UnitActionTrain) {
@@ -840,7 +634,6 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 				CancelTrainingCostsFactor);
 			RemoveOrder(unit, 0);
 		}
-		unit.CurrentOrder()->Data.Train.Ticks = 0;
 		if (unit.Player == ThisPlayer && unit.Selected) {
 			SelectedUnitChanged();
 		}
@@ -856,22 +649,14 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 			// Different unit being trained
 			return;
 		}
-
 		DebugPrint("Cancel training\n");
 
 		unit.Player->AddCostsFactor(
 			unit.Orders[slot]->Arg1.Type->Stats[unit.Player->Index].Costs,
 			CancelTrainingCostsFactor);
-
-
-		if (!slot) { // Canceled in work slot
-			unit.CurrentOrder()->Data.Train.Ticks = 0;
-		}
 		RemoveOrder(unit, slot);
 
-		//
 		// Update interface.
-		//
 		if (unit.Player == ThisPlayer && unit.Selected) {
 			SelectedUnitChanged();
 		}
@@ -887,33 +672,21 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 */
 void CommandUpgradeTo(CUnit &unit, CUnitType &type, int flush)
 {
-	COrderPtr order;
-
-	//
-	// Check if unit is still valid and Goal still alive? (NETWORK!)
-	//
-	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
-		//
-		// Check if enough resources remains? (NETWORK!)
-		//
-		if (unit.Player->CheckUnitType(type)) {
-			return;
-		}
-
-		if (!flush) {
-			DebugPrint("FIXME: must support order queing!!");
-		}
-		if (!(order = GetNextOrder(unit, flush))) {
-			return;
-		}
-		order->Init();
-
-		// FIXME: if you give quick an other order, the resources are lost!
-		unit.Player->SubUnitType(type);
-
-		order->Action = UnitActionUpgradeTo;
-		order->Arg1.Type = &type;
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
 	}
+
+	// Check if enough resources remains? (NETWORK!)
+	if (unit.Player->CheckUnitType(type)) {
+		return;
+	}
+
+	COrderPtr *order = GetNextOrder(unit, flush);
+
+	if (order == NULL) {
+		return;
+	}
+	*order = COrder::NewActionUpgradeTo(unit, type);
 	ClearSavedAction(unit);
 }
 
@@ -925,13 +698,9 @@ void CommandUpgradeTo(CUnit &unit, CUnitType &type, int flush)
 */
 void CommandTransformIntoType(CUnit &unit, CUnitType &type)
 {
-	COrderPtr order = new COrder;
-
 	Assert(unit.CriticalOrder == NULL);
 
-	order->Action = UnitActionTransformInto;
-	order->Arg1.Type = &type;
-	unit.CriticalOrder = order;
+	unit.CriticalOrder = COrder::NewActionTransformInto(type);
 }
 
 /**
@@ -941,19 +710,16 @@ void CommandTransformIntoType(CUnit &unit, CUnitType &type)
 */
 void CommandCancelUpgradeTo(CUnit &unit)
 {
-	ReleaseOrders(unit); // empty command queue
-
-	//
 	// Check if unit is still upgrading? (NETWORK!)
-	//
 	if (unit.CurrentAction() == UnitActionUpgradeTo) {
-
 		unit.Player->AddCostsFactor(
 			unit.CurrentOrder()->Arg1.Type->Stats[unit.Player->Index].Costs,
 			CancelUpgradeCostsFactor);
 
-		unit.CurrentOrder()->Init();
-		unit.ClearAction();
+		RemoveOrder(unit, 0);
+		if (Selected) {
+			SelectedUnitChanged();
+		}
 	}
 	ClearSavedAction(unit);
 }
@@ -967,46 +733,18 @@ void CommandCancelUpgradeTo(CUnit &unit)
 */
 void CommandResearch(CUnit &unit, CUpgrade *what, int flush)
 {
-	COrderPtr order;
-
-	//
-	// Check if unit is still valid and Goal still alive? (NETWORK!)
-	//
-	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
-		//
-		// Check if enough resources remains? (NETWORK!)
-		//
-		if (unit.Player->CheckCosts(what->Costs)) {
-			return;
-		}
-
-		if (!flush) {
-			DebugPrint("FIXME: must support order queing!!");
-		} else {
-			if (unit.CurrentAction() == UnitActionResearch) {
-				const CUpgrade *upgrade;
-
-				// Cancel current research
-				upgrade = unit.CurrentOrder()->Data.Research.Upgrade;
-				unit.Player->UpgradeTimers.Upgrades[upgrade->ID] = 0;
-				unit.Player->AddCostsFactor(upgrade->Costs,
-					CancelResearchCostsFactor);
-				unit.SubAction = 0;
-			}
-		}
-
-		if (!(order = GetNextOrder(unit, flush))) {
-			return;
-		}
-		order->Init();
-
-		// FIXME: if you give quick an other order, the resources are lost!
-		unit.Player->SubCosts(what->Costs);
-
-		order->Action = UnitActionResearch;
-		order->goalPos.x = order->goalPos.y = -1;
-		order->Arg1.Upgrade = what;
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
 	}
+	// Check if enough resources remains? (NETWORK!)
+	if (unit.Player->CheckCosts(what->Costs)) {
+		return;
+	}
+	COrderPtr *order = GetNextOrder(unit, flush);
+	if (order == NULL) {
+		return;
+	}
+	*order = COrder::NewActionResearch(unit, *what);
 	ClearSavedAction(unit);
 }
 
@@ -1017,21 +755,16 @@ void CommandResearch(CUnit &unit, CUpgrade *what, int flush)
 */
 void CommandCancelResearch(CUnit &unit)
 {
-	ReleaseOrders(unit); // empty command queue
-
-	//
 	// Check if unit is still researching? (NETWORK!)
-	//
 	if (unit.CurrentAction() == UnitActionResearch) {
-		const CUpgrade *upgrade;
+		const CUpgrade &upgrade = *unit.CurrentOrder()->Data.Research.Upgrade;
+		unit.Player->UpgradeTimers.Upgrades[upgrade.ID] = 0;
 
-		upgrade = unit.CurrentOrder()->Data.Research.Upgrade;
-		unit.Player->UpgradeTimers.Upgrades[upgrade->ID] = 0;
-
-		unit.Player->AddCostsFactor(upgrade->Costs,
-			CancelResearchCostsFactor);
-		unit.CurrentOrder()->Init();
-		unit.ClearAction();
+		unit.Player->AddCostsFactor(upgrade.Costs, CancelResearchCostsFactor);
+		RemoveOrder(unit, 0);
+		if (Selected) {
+			SelectedUnitChanged();
+		}
 	}
 	ClearSavedAction(unit);
 }
@@ -1047,47 +780,21 @@ void CommandCancelResearch(CUnit &unit)
 */
 void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, SpellType *spell, int flush)
 {
-	COrderPtr order;
-
-	Assert(Map.Info.IsPointOnMap(pos));
-
 	DebugPrint(": %d casts %s at %d %d on %d\n" _C_
 		UnitNumber(unit) _C_ spell->Ident.c_str() _C_ pos.x _C_ pos.y _C_ dest ? UnitNumber(*dest) : 0);
 	Assert(unit.Type->CanCastSpell[spell->Slot]);
+	Assert(Map.Info.IsPointOnMap(pos));
 
-	//
-	// Check if unit is still valid? (NETWORK!)
-	//
-	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
-		// FIXME: should I check here, if there is still enough mana?
-
-		if (!(order = GetNextOrder(unit, flush))) {
-			return;
-		}
-		order->Init();
-
-		order->Action = UnitActionSpellCast;
-		order->Range = spell->Range;
-		if (dest) {
-			//
-			// Destination could be killed.
-			// Should be handled in action, but is not possible!
-			// Unit::Refs is used as timeout counter.
-			//
-			if (dest->Destroyed) {
-				// FIXME: where check if spell needs a unit as destination?
-				// FIXME: dest->Type is now set to 0. maybe we shouldn't bother.
-				const Vec2i diag = {order->Range, order->Range};
-				order->goalPos = dest->tilePos /* + dest->Type->GetHalfTileSize() */ - diag;
-				order->Range <<= 1;
-			} else {
-				order->SetGoal(dest);
-			}
-		} else {
-			order->goalPos = pos;
-		}
-		order->Arg1.Spell = spell;
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
 	}
+	COrderPtr *order = GetNextOrder(unit, flush);
+
+	if (order == NULL) {
+		return;
+	}
+
+	*order = COrder::NewActionSpellCast(*spell, pos, dest);
 	ClearSavedAction(unit);
 }
 
@@ -1100,12 +807,10 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, SpellType *spe
 */
 void CommandAutoSpellCast(CUnit &unit, int spellid, int on)
 {
-	//
-	// Check if unit is still valid? (NETWORK!)
-	//
-	if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
-		unit.AutoCastSpell[spellid] = on;
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
 	}
+	unit.AutoCastSpell[spellid] = on;
 }
 
 /**
