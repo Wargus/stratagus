@@ -78,7 +78,7 @@
 **
 **  MissileType::Transparency
 **
-**    Set a missile transparency. Current supported value is 50 only.
+**    Set a missile transparency.
 **
 **  MissileType::FiredSound
 **
@@ -371,13 +371,17 @@ enum _missile_class_ {
 	/// Missile surround x,y
 	MissileClassFlameShield,
 	/// Missile is death coil.
-	MissileClassDeathCoil
+	MissileClassDeathCoil,
+	/// Missile seeks towards to target unit
+	MissileClassTracer,
+	/// Missile remains clipped to target's current goal and plays his animation once
+	MissileClassClipToTarget
 };
 
 	/// Base structure of missile-types
 class MissileType {
 public:
-	MissileType(const std::string &ident);
+	explicit MissileType(const std::string &ident);
 	~MissileType();
 
 	/// load the graphics for a missile type
@@ -404,6 +408,7 @@ public:
 	SoundConfig FiredSound;    /// fired sound
 	SoundConfig ImpactSound;   /// impact sound for this missile-type
 
+	bool CorrectSphashDamage;  /// restricts the radius damage depending on land, air, naval
 	bool Flip;                 /// flip image when facing left
 	bool CanHitOwner;          /// missile can hit the owner
 	bool FriendlyFire;         /// missile can't hit own units
@@ -548,6 +553,16 @@ public:
 	virtual void Action();
 };
 class MissileDeathCoil : public Missile {
+public:
+	virtual void Action();
+};
+
+class MissileTracer : public Missile {
+public:
+	virtual void Action();
+};
+
+class MissileClipToTarget : public Missile {
 public:
 	virtual void Action();
 };

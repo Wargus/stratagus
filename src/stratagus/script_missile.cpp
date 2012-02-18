@@ -71,6 +71,8 @@ static const char *MissileClassNames[] = {
 	"missile-class-whirlwind",
 	"missile-class-flame-shield",
 	"missile-class-death-coil",
+	"missile-class-tracer",
+	"missile-class-clip-to-target",
 	NULL
 };
 
@@ -135,7 +137,7 @@ static int CclDefineMissileType(lua_State *l)
 			mtype->Flip = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NumDirections")) {
 			mtype->NumDirections = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "transparency")) {
+		} else if (!strcmp(value, "Transparency")) {
 			mtype->Transparency = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "FiredSound")) {
 			mtype->FiredSound.Name = LuaToString(l, -1);
@@ -176,6 +178,8 @@ static int CclDefineMissileType(lua_State *l)
 			mtype->FriendlyFire = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SplashFactor")) {
 			mtype->SplashFactor = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "CorrectSphashDamage")) {
+			mtype->CorrectSphashDamage = LuaToBoolean(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
