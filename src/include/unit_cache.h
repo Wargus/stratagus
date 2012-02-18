@@ -101,7 +101,7 @@ public:
 	 *  @p functor must not modify the order of the cache.
 	 */
 	template<typename _T>
-	void for_each(const _T &functor)
+	void for_each(const _T functor)
 	{
 		const size_t size = Units.size();
 
