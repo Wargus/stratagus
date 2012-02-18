@@ -302,7 +302,36 @@ static void LoseResource(CUnit &unit, const CUnit &source)
 	}
 
 	//
-	// If we are loaded first search for a depot.
+	// Continue to harvest if we aren't fully loaded
+	//
+	if (resinfo.HarvestFromOutside && unit.ResourcesHeld < resinfo.ResourceCapacity){
+		if (unit.Container) {
+			DropOutOnSide(unit, LookingW, &source);
+		}
+		const Vec2i pos = unit.tilePos;
+		CUnit *goal = UnitFindResource(unit, pos, 15, unit.CurrentResource, 1);
+
+		if (goal) {
+			CUnit *mine = unit.CurrentOrder()->Arg1.Resource.Mine;
+
+			if (mine) {
+				unit.DeAssignWorkerFromMine(*mine);
+				mine->RefsDecrease();
+			}
+			unit.AssignWorkerToMine(*goal);
+			unit.CurrentOrder()->SetGoal(goal);
+			goal->RefsIncrease();
+			unit.CurrentOrder()->Arg1.Resource.Mine = goal;
+			unit.CurrentOrder()->Range = 1;
+			unit.CurrentOrder()->goalPos = goal->tilePos;
+			unit.SubAction = SUB_MOVE_TO_RESOURCE;
+			unit.State = 0;
+			return;
+		}
+	}
+
+	//
+	// If we are fully loaded first search for a depot.
 	//
 	if (unit.ResourcesHeld && (depot = FindDeposit(unit, 1000, unit.CurrentResource))) {
 		if (unit.Container) {
