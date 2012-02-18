@@ -80,15 +80,23 @@ static int TransformUnitIntoType(CUnit &unit, CUnitType &newtype)
 			return 0;
 		}
 	}
-	CPlayer *player = unit.Player;
-	player->UnitTypesCount[oldtype->Slot]--;
-	player->UnitTypesCount[newtype.Slot]++;
+	CPlayer &player = *unit.Player;
+	player.UnitTypesCount[oldtype->Slot]--;
+	player.UnitTypesCount[newtype.Slot]++;
 
-	player->Demand += newtype.Demand - oldtype->Demand;
-	player->Supply += newtype.Supply - oldtype->Supply;
+	player.Demand += newtype.Demand - oldtype->Demand;
+	player.Supply += newtype.Supply - oldtype->Supply;
+
+	// Change resource limit
+	for (int i = 0; i < MaxCosts; ++i) {
+		if (player.MaxResources[i] != -1) {
+			player.MaxResources[i] += newtype._Storing[i] - oldtype->_Storing[i];
+			player.SetResource(i, player.Resources[i]);
+		}
+	}
 
 	//  adjust Variables with percent.
-	const CUnitStats &newstats = newtype.Stats[player->Index];
+	const CUnitStats &newstats = newtype.Stats[player.Index];
 
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		if (unit.Variable[i].Max) {
@@ -103,7 +111,7 @@ static int TransformUnitIntoType(CUnit &unit, CUnitType &newtype)
 	}
 
 	unit.Type = &newtype;
-	unit.Stats = &newtype.Stats[player->Index];
+	unit.Stats = &newtype.Stats[player.Index];
 
 	if (newtype.CanCastSpell && !unit.AutoCastSpell) {
 		unit.AutoCastSpell = new char[SpellTypeTable.size()];
@@ -122,7 +130,7 @@ static int TransformUnitIntoType(CUnit &unit, CUnitType &newtype)
 	//
 	// Update possible changed buttons.
 	//
-	if (IsOnlySelected(unit) || unit.Player == ThisPlayer) {
+	if (IsOnlySelected(unit) || &player == ThisPlayer) {
 		// could affect the buttons of any selected unit
 		SelectedUnitChanged();
 	}
