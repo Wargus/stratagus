@@ -645,6 +645,7 @@ enum {
 	TELEPORTER_INDEX,
 	SHIELDPIERCE_INDEX,
 	SAVECARGO_INDEX,
+	WALL_INDEX,
 	NBARALREADYDEFINED
 };
 
@@ -1007,8 +1008,9 @@ public:
 	unsigned Decoration : 1;            /// Unit is a decoration (act as tile).
 	unsigned Indestructible : 1;        /// Unit is indestructible (take no damage).
 	unsigned Teleporter : 1;            /// Can teleport other units.
-	unsigned ShieldPiercing : 1;            /// Can directly damage shield-protected units, without shield damaging.
-	unsigned SaveCargo : 1;            /// Unit unloads his passengers after death.
+	unsigned ShieldPiercing : 1;        /// Can directly damage shield-protected units, without shield damaging.
+	unsigned SaveCargo : 1;             /// Unit unloads his passengers after death.
+	unsigned Wall : 1;                  /// Use special logic for Direction field.
 
 	CVariable *Variable;            /// Array of user defined variables.
 	struct BoolFlags {

@@ -593,7 +593,12 @@ void HandleActionBuilt(COrder& order, CUnit &unit)
 
 		// Set the direction of the building if it supports them
 		if (unit.Type->NumDirections > 1) {
-			unit.Direction = (MyRand() >> 8) & 0xFF; // random heading
+			if (unit.Type->Wall) { // Special logic for walls
+				CorrectWallDirections(unit);
+				CorrectWallNeighBours(unit);
+			} else {
+				unit.Direction = (MyRand() >> 8) & 0xFF; // random heading
+			}
 			UnitUpdateHeading(unit);
 		}
 

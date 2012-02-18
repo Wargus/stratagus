@@ -113,7 +113,7 @@ CUnitType::CUnitType() :
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	Animations(NULL), StillFrame(0),
 	DeathExplosion(NULL), CorpseType(NULL),
-	Construction(NULL),  RepairHP(0), TileWidth(0), TileHeight(0),
+	Construction(NULL), RepairHP(0), TileWidth(0), TileHeight(0),
 	BoxWidth(0), BoxHeight(0), NumDirections(0), MinAttackRange(0),
 	ReactRangeComputer(0), ReactRangePerson(0), Priority(0),
 	BurnPercent(0), BurnDamageRate(0), RepairRange(0),
@@ -129,7 +129,8 @@ CUnitType::CUnitType() :
 	Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
 	BuilderOutside(0), BuilderLost(0), CanHarvest(0), Harvester(0),
 	Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
-	Indestructible(0), Teleporter(0), ShieldPiercing(0), SaveCargo(0), Variable(NULL),
+	Indestructible(0), Teleporter(0), ShieldPiercing(0), SaveCargo(0),
+	Wall(0), Variable(NULL),
 	GivesResource(0), Supply(0), Demand(0), FieldFlags(0), MovementMask(0),
 	Sprite(NULL), ShadowSprite(NULL)
 {

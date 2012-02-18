@@ -428,7 +428,7 @@ void CUnit::AssignToPlayer(CPlayer *player)
 			// don't count again
 			if (type->Building) {
 				// FIXME: support more races
-				if (type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
+				if (!type->Wall && type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
 					player->TotalBuildings++;
 				}
 			} else {
@@ -445,7 +445,7 @@ void CUnit::AssignToPlayer(CPlayer *player)
 	// Don't Add the building if it's dieing, used to load a save game
 	if (type->Building && CurrentAction() != UnitActionDie) {
 		// FIXME: support more races
-		if (type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
+		if (!type->Wall && type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
 			player->NumBuildings++;
 		}
 	}
@@ -860,6 +860,12 @@ void CUnit::Place(const Vec2i &pos)
 	UnitCountSeen(*this);
 	// Vision
 	MapMarkUnitSight(*this);
+	// Correct directions for wall units
+	if (this->Type->Wall && this->CurrentAction() != UnitActionBuilt){
+		CorrectWallDirections(*this);
+		UnitUpdateHeading(*this);
+		CorrectWallNeighBours(*this);
+	}
 }
 
 /**
@@ -911,6 +917,11 @@ void CUnit::Remove(CUnit *host)
 	}
 
 	Removed = 1;
+
+	// Correct surrounding walls directions
+	if (this->Type->Wall){
+		CorrectWallNeighBours(*this);
+	}
 
 	//  Remove unit from the current selection
 	if (Selected) {
@@ -974,7 +985,7 @@ void UnitLost(CUnit &unit)
 
 		if (unit.Type->Building) {
 			// FIXME: support more races
-			if (type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
+			if (!type->Wall && type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
 				player->NumBuildings--;
 			}
 		}
@@ -1150,6 +1161,97 @@ static void UnitFillSeenValues(CUnit &unit)
 	unit.Seen.Constructed = unit.Constructed;
 
 	unit.CurrentOrder()->FillSeenValues(unit);
+}
+
+class SamePlayerAndTypeAs
+{
+public:
+	explicit SamePlayerAndTypeAs(const CUnit &unit) :
+		player(unit.Player), type(unit.Type)
+	{}
+
+	bool operator() (const CUnit *unit) const
+	{
+		return (unit->Player == player && unit->Type == type);
+	}
+
+private:
+	const CPlayer *player;
+	const CUnitType *type;
+};
+
+// Wall unit positions
+enum {
+	W_NORTH = 0x10,
+	W_WEST = 0x20,
+	W_SOUTH = 0x40,
+	W_EAST = 0x80
+};
+
+/**
+**  Correct direction for placed wall.
+**
+**  @param unit    The wall unit.
+*/
+void CorrectWallDirections(CUnit &unit)
+{
+	Assert(unit.Type->Wall);
+	Assert(unit.Type->NumDirections == 16);
+	Assert(!unit.Type->Flip);
+
+	if (!Map.Info.IsPointOnMap(unit.tilePos)) {
+		return ;
+	}
+	const struct {
+		Vec2i offset;
+		const int dirFlag;
+	} configs[] = {{{0, -1}, W_NORTH}, {{1, 0}, W_EAST},
+		{{0, 1}, W_SOUTH}, {{-1, 0}, W_WEST}};
+	int flags = 0;
+
+	for (int i = 0; i != sizeof (configs) / sizeof (*configs); ++i) {
+		const Vec2i pos = unit.tilePos + configs[i].offset;
+		const int dirFlag = configs[i].dirFlag;
+
+		if (Map.Info.IsPointOnMap(pos) == false) {
+			flags |= dirFlag;
+		} else {
+			const CUnitCache &unitCache = Map.Field(pos)->UnitCache;
+			const CUnit *neighboor = unitCache.find(SamePlayerAndTypeAs(unit));
+
+			if (neighboor != NULL) {
+				flags |= dirFlag;
+			}
+		}
+	}
+	unit.Direction = flags;
+}
+
+/**
+** Correct the surrounding walls.
+**
+** @param unit The wall unit.
+*/
+void CorrectWallNeighBours(CUnit &unit)
+{
+	Assert(unit.Type->Wall);
+
+	const Vec2i offset[] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+
+	for (unsigned int i = 0; i < sizeof (offset) / sizeof (*offset); ++i) {
+		const Vec2i pos = unit.tilePos + offset[i];
+
+		if (Map.Info.IsPointOnMap(pos) == false) {
+			continue;
+		}
+		CUnitCache &unitCache = Map.Field(pos)->UnitCache;
+		CUnit *neighboor = unitCache.find(SamePlayerAndTypeAs(unit));
+
+		if (neighboor != NULL) {
+			CorrectWallDirections(*neighboor);
+			UnitUpdateHeading(*neighboor);
+		}
+	}
 }
 
 /**
@@ -1554,9 +1656,10 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 
 	PlayerSlot = newplayer.Units + newplayer.TotalNumUnits++;
 	if (Type->Building) {
-		newplayer.TotalBuildings++;
-	}
-	else {
+		if (!Type->Wall) {
+			newplayer.TotalBuildings++;
+		}
+	} else {
 		newplayer.TotalUnits++;
 	}
 	*PlayerSlot = this;
@@ -1581,7 +1684,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 			newplayer.MaxResources[i] += Type->_Storing[i];
 		}
 	}
-	if (Type->Building) {
+	if (Type->Building && !Type->Wall) {
 		newplayer.NumBuildings++;
 	}
 	newplayer.UnitTypesCount[Type->Slot]++;
@@ -2842,7 +2945,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 	if (attacker) {
 		target.DamagedType = ExtraDeathIndex(attacker->Type->DamageType.c_str());
 	}
-	if (!lastattack || lastattack + 2 * CYCLES_PER_SECOND < GameCycle) {
+	if (!target.Type->Wall && (!lastattack || lastattack + 2 * CYCLES_PER_SECOND < GameCycle)) {
 		// NOTE: perhaps this should also be moved into the notify?
 		if (target.Player == ThisPlayer) {
 			// FIXME: Problem with load+save.
@@ -2875,7 +2978,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		}
 	}
 
-	if (attacker && target.Type->Building && target.Player->AiEnabled) {
+	if (attacker && !target.Type->Wall && target.Type->Building && target.Player->AiEnabled) {
 		AiHelpMe(attacker, target);
 	}
 

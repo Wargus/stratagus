@@ -106,6 +106,7 @@ static const char INDESTRUCTIBLE_KEY[] = "Indestructible";
 static const char TELEPORTER_KEY[] = "Teleporter";
 static const char SHIELDPIERCE_KEY[] = "ShieldPiercing";
 static const char SAVECARGO_KEY[] = "LoseCargo";
+static const char WALL_KEY[] = "Wall";
 // names of the variable.
 static const char HITPOINTS_KEY[] = "HitPoints";
 static const char BUILD_KEY[] = "Build";
@@ -153,7 +154,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys() {
 		SHOREBUILDING_KEY, CANATTACK_KEY,BUILDEROUTSIDE_KEY,
 		BUILDERLOST_KEY,CANHARVEST_KEY,HARVESTER_KEY,SELECTABLEBYRECTANGLE_KEY,
 		ISNOTSELECTABLE_KEY,DECORATION_KEY,INDESTRUCTIBLE_KEY,TELEPORTER_KEY,SHIELDPIERCE_KEY,
-		SAVECARGO_KEY};
+		SAVECARGO_KEY, WALL_KEY};
 
 	for (int i = 0; i < NBARALREADYDEFINED; ++i) {
 		buildin[i].offset = i;
@@ -1005,6 +1006,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->ShieldPiercing = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SaveCargo")) {
 			type->SaveCargo = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Wall")) {
+			type->Wall = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Sounds")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -2095,9 +2098,9 @@ void UpdateUnitVariables(const CUnit &unit)
 	type->BoolFlag[DECORATION_INDEX].value            = type->Decoration;
 	type->BoolFlag[INDESTRUCTIBLE_INDEX].value        = type->Indestructible;
 	type->BoolFlag[TELEPORTER_INDEX].value            = type->Teleporter;
-	type->BoolFlag[SHIELDPIERCE_INDEX].value            = type->ShieldPiercing;
-	type->BoolFlag[SAVECARGO_INDEX].value            = type->SaveCargo;
-
+	type->BoolFlag[SHIELDPIERCE_INDEX].value          = type->ShieldPiercing;
+	type->BoolFlag[SAVECARGO_INDEX].value             = type->SaveCargo;
+	type->BoolFlag[WALL_INDEX].value                  = type->Wall;
 }
 
 
