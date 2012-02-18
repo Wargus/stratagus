@@ -607,6 +607,12 @@ if(MAEMO)
 	set(ENABLE_TOUCHSCREEN ON)
 endif()
 
+# Stratagus needs to have char by default signed
+# No idea how to tell this to other compilers
+if(CMAKE_COMPILER_IS_GNUCC)
+	add_definitions(-fsigned-char)
+endif()
+
 check_function_exists("strcasestr" HAVE_STRCASESTR)
 check_function_exists("strnlen" HAVE_STRNLEN)
 
