@@ -148,14 +148,15 @@ public:
 
 class SpawnMissile : public SpellActionType {
 public:
-	SpawnMissile() : Damage(0), TTL(-1), Delay(0),
-		StartPoint(LocBaseCaster), EndPoint(LocBaseTarget), Missile(0) {};
+	SpawnMissile() : Damage(0), TTL(-1), Delay(0), UseUnitVar(false),
+		StartPoint(LocBaseCaster), EndPoint(LocBaseTarget), Missile(0) {}
 	virtual int Cast(CUnit &caster, const SpellType *spell,
 		CUnit *target, int x, int y);
 
 	int Damage;                             /// Missile damage.
 	int TTL;                                /// Missile TTL.
 	int Delay;                              /// Missile original delay.
+	bool UseUnitVar;                        /// Use the caster's damage parameters
 	SpellActionMissileLocation StartPoint;  /// Start point description.
 	SpellActionMissileLocation EndPoint;    /// Start point description.
 	MissileType *Missile;                   /// Missile fired on cast
@@ -225,7 +226,7 @@ public:
 		CUnit *target, int x, int y);
 
 	CUnitType *NewForm;         /// The new form
-	int PlayerNeutral;          /// Convert the unit to the neutral player.
+	int PlayerNeutral;          /// Convert the unit to the neutral player, or to the caster's player.
 	// TODO: temporary polymorphs would be awesome, but hard to implement
 };
 

@@ -144,6 +144,9 @@ static SpellActionType *CclSpellAction(lua_State *l)
 				lua_rawgeti(l, -1, j + 1);
 				spellaction->Damage = LuaToNumber(l, -1);
 				lua_pop(l, 1);
+			} else if (!strcmp(value, "use-unit-var")) {
+				spellaction->UseUnitVar = true;
+				--j;
 			} else if (!strcmp(value, "delay")) {
 				lua_rawgeti(l, -1, j + 1);
 				spellaction->Delay = LuaToNumber(l, -1);
@@ -424,6 +427,9 @@ static SpellActionType *CclSpellAction(lua_State *l)
 				// FIXME: temp polymorphs? hard to do.
 			} else if (!strcmp(value, "player-neutral")) {
 				spellaction->PlayerNeutral = 1;
+				--j;
+			} else if (!strcmp(value, "player-caster")) {
+				spellaction->PlayerNeutral = 2;
 				--j;
 			} else {
 				LuaError(l, "Unsupported polymorph tag: %s" _C_ value);

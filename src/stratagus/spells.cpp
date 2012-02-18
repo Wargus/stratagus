@@ -349,7 +349,11 @@ int SpawnMissile::Cast(CUnit &caster, const SpellType *, CUnit *target, int x, i
 	missile->TTL = this->TTL;
 	missile->Delay = this->Delay;
 	missile->Damage = this->Damage;
-	if (missile->Damage != 0) {
+	if (this->UseUnitVar) {
+		missile->Damage = 0;
+		missile->SourceUnit = &caster;
+		caster.RefsIncrease();
+	} else if (missile->Damage != 0) {
 		missile->SourceUnit = &caster;
 		caster.RefsIncrease();
 	}
@@ -553,8 +557,10 @@ int Polymorph::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int x,
 		}
 	}
 	caster.Variable[MANA_INDEX].Value -= spell->ManaCost;
-	if (this->PlayerNeutral) {
+	if (this->PlayerNeutral == 1) {
 		MakeUnitAndPlace(pos, type, Players + PlayerNumNeutral);
+	} else if (this->PlayerNeutral == 2) {
+		MakeUnitAndPlace(pos, type, caster.Player);
 	} else {
 		MakeUnitAndPlace(pos, type, target->Player);
 	}
