@@ -63,7 +63,12 @@ enum AnimationType {
 	AnimationLabel,
 	AnimationGoto,
 	AnimationRandomGoto,
-	AnimationSpawnMissile
+	AnimationSpawnMissile,
+	AnimationSpawnUnit,
+	AnimationIfVar,
+	AnimationSetVar,
+	AnimationSetPlayerVar,	
+	AnimationDie
 };
 
 class CAnimation {
@@ -73,10 +78,58 @@ public:
 	}
 
 	~CAnimation() {
-		if (Type == AnimationSound) 
+		if (Type == AnimationFrame || Type == AnimationExactFrame) 
+			delete[] D.Frame.Frame;
+		else if (Type == AnimationWait) 
+			delete[] D.Wait.Wait;
+		else if (Type == AnimationRandomWait) {
+			delete[] D.RandomWait.MinWait;
+			delete[] D.RandomWait.MaxWait;
+		}
+		else if (Type == AnimationRotate || Type == AnimationRandomRotate) 
+			delete[] D.Rotate.Rotate;
+		else if (Type == AnimationMove) 
+			delete[] D.Move.Move;
+		else if (Type == AnimationSound) 
 			delete[] D.Sound.Name;
 		else if (Type == AnimationSpawnMissile) 
+		{
 			delete[] D.SpawnMissile.Missile;
+			delete[] D.SpawnMissile.StartX;
+			delete[] D.SpawnMissile.StartY;
+			delete[] D.SpawnMissile.DestX;
+			delete[] D.SpawnMissile.DestY;
+			delete[] D.SpawnMissile.Flags;
+		}
+		else if (Type == AnimationSpawnUnit) 
+		{
+			delete[] D.SpawnUnit.Unit;
+			delete[] D.SpawnUnit.OffX;
+			delete[] D.SpawnUnit.OffY;
+			delete[] D.SpawnUnit.Range;
+			delete[] D.SpawnUnit.Player;
+		}
+		else if (Type == AnimationIfVar) 
+		{
+			delete[] D.IfVar.LeftVar;
+			delete[] D.IfVar.RightVar;
+		}
+		else if (Type == AnimationSetVar)
+		{
+			delete[] D.SetVar.Var;
+			delete[] D.SetVar.Value;
+		}
+		else if (Type == AnimationSetPlayerVar)
+		{
+			delete[] D.SetPlayerVar.Player;
+			delete[] D.SetPlayerVar.Var;
+			delete[] D.SetPlayerVar.Arg;
+			delete[] D.SetPlayerVar.Value;
+		}
+		else if (Type == AnimationDie) 
+		{
+			delete[] D.Die.DeathType;
+		}
 		else if (Type == AnimationRandomSound) {
 			for (unsigned int i = 0; i < D.RandomSound.NumSounds; ++i) {
 				delete[] D.RandomSound.Name[i];
@@ -89,14 +142,14 @@ public:
 	AnimationType Type;
 	union {
 		struct {
-			int Frame;
+			const char *Frame;
 		} Frame;
 		struct {
-			int Wait;
+			const char *Wait;
 		} Wait;
 		struct {
-			int MinWait;
-			int MaxWait;
+			const char *MinWait;
+			const char *MaxWait;
 		} RandomWait;
 		struct {
 			const char *Name;
@@ -108,10 +161,10 @@ public:
 			unsigned int NumSounds;
 		} RandomSound;
 		struct {
-			int Rotate;
+			const char *Rotate;
 		} Rotate;
 		struct {
-			int Move;
+			const char *Move;
 		} Move;
 		struct {
 			int Begin;
@@ -120,61 +173,90 @@ public:
 			CAnimation *Goto;
 		} Goto;
 		struct {
-			int Random;
+			const char *Random;
 			CAnimation *Goto;
 		} RandomGoto;
 		struct {
 			const char *Missile;
+			const char *StartX;
+			const char *StartY;
+			const char *DestX;
+			const char *DestY;
+			const char *Flags;
 		} SpawnMissile;
+		struct {
+			const char *Unit;
+			const char *OffX;
+			const char *OffY;
+			const char *Range;
+			const char *Player;
+		} SpawnUnit;
+		struct {
+			const char *LeftVar;
+			const char *RightVar;
+			int Type;
+			CAnimation *Goto;
+		} IfVar;
+		struct {
+			int Mod;
+			const char *Var;
+			const char *Value;
+		} SetVar;
+		struct {
+			int Mod;
+			const char *Player;
+			const char *Var;
+			const char *Arg;
+			const char *Value;
+		} SetPlayerVar;
+		struct {
+			const char *DeathType;
+		} Die;
 	} D;
 	CAnimation *Next;
 };
 
 class CAnimations {
 public:
-	CAnimations() : Start(NULL),
-		Repair(NULL), Train(NULL), Research(NULL),
-		Upgrade(NULL), Build(NULL)
+	CAnimations() : Attack(NULL), Build(NULL), Move(NULL), Repair(NULL),
+		Research(NULL), SpellCast(NULL), Start(NULL), Still(NULL),
+		Train(NULL), Upgrade(NULL)
 	{
-		memset(Still, 0, sizeof(Still));
-		memset(Move, 0, sizeof(Move));
-		memset(Attack, 0, sizeof(Attack));
-		memset(Harvest, 0, sizeof(Harvest));
-		memset(Death, 0, sizeof(Death));
+		memset(Death, 0, sizeof (Death));
+		memset(Harvest, 0, sizeof (Harvest));
 	}
 
 	~CAnimations() {
-		delete[] Start;
-		delete[] Repair;
-		delete[] Train;
-		delete[] Research;
-		delete[] Upgrade;
+		delete[] Attack;
 		delete[] Build;
-		for ( int i = 0; i< MaxCosts; ++i) {
-			delete[] Harvest[i];
-		}
-		for ( int i = 0; i< ANIMATIONS_DEATHTYPES+1; ++i) {
+		for ( int i = 0; i < ANIMATIONS_DEATHTYPES + 1; ++i) {
 			delete[] Death[i];
 		}
-		for ( int i = 0; i< 100; ++i) {
-			delete[] Still[i];
-			delete[] Move[i];
-			delete[] Attack[i];
+		for (int i = 0; i < MaxCosts; ++i) {
+			delete[] Harvest[i];
 		}
-
+		delete[] Move;
+		delete[] Repair;
+		delete[] Research;
+		delete[] SpellCast;
+		delete[] Start;
+		delete[] Still;
+		delete[] Train;
+		delete[] Upgrade;
 	}
 
-	CAnimation *Start;
-	CAnimation *Still[100];
-	CAnimation *Death[ANIMATIONS_DEATHTYPES+1];
-	CAnimation *Attack[100];
-	CAnimation *Move[100];
-	CAnimation *Repair;
-	CAnimation *Train;
-	CAnimation *Research;
-	CAnimation *Upgrade;
+	CAnimation *Attack;
 	CAnimation *Build;
+	CAnimation *Death[ANIMATIONS_DEATHTYPES + 1];
 	CAnimation *Harvest[MaxCosts];
+	CAnimation *Move;
+	CAnimation *Repair;
+	CAnimation *Research;
+	CAnimation *SpellCast;
+	CAnimation *Start;
+	CAnimation *Still;
+	CAnimation *Train;
+	CAnimation *Upgrade;
 };
 
 

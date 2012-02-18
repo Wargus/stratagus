@@ -77,7 +77,7 @@ int DoActionMove(CUnit &unit)
 
 	Assert(unit.CanMove());
 	if (!unit.Moving &&
-			(unit.Type->Animations->Move[GetAnimationDamagedState(unit,2)] != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
+			(unit.Type->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
 		Assert(!unit.Anim.Unbreakable);
 
 		// FIXME: So units flying up and down are not affected.
@@ -147,7 +147,7 @@ int DoActionMove(CUnit &unit)
 	}
 
 	unit.CurrentOrder()->Data.Move.Cycles++;//reset have to be manualy controled by caller.
-	move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move[GetAnimationDamagedState(unit,2)],
+	move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move,
 			Map.Field(unit.Offset)->Cost);
 
 	unit.IX += posd.x * move;

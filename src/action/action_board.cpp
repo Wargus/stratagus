@@ -183,7 +183,7 @@ void HandleActionBoard(COrder& order, CUnit &unit)
 			if (WaitForTransporter(unit)) {
 				unit.SubAction = 202;
 			} else {
-				UnitShowAnimation(unit, unit.Type->Animations->Still[GetAnimationDamagedState(unit,1)]);
+				UnitShowAnimation(unit, unit.Type->Animations->Still);
 			}
 			break;
 		// Enter transporter

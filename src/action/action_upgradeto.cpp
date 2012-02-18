@@ -161,7 +161,7 @@ void HandleActionUpgradeTo(COrder& order, CUnit &unit)
 	}
 	unit.Type->Animations->Upgrade ?
 		UnitShowAnimation(unit, unit.Type->Animations->Upgrade) :
-		UnitShowAnimation(unit, unit.Type->Animations->Still[GetAnimationDamagedState(unit,1)]);
+		UnitShowAnimation(unit, unit.Type->Animations->Still);
 	if (unit.Wait) {
 		unit.Wait--;
 		return;

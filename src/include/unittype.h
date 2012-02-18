@@ -1053,7 +1053,7 @@ public:
 	}
 	bool CanMove() const
 	{
-		return Animations && Animations->Move[99];
+		return Animations && Animations->Move;
 	}
 
 	bool CanSelect(GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY) const

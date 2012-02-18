@@ -108,6 +108,9 @@ std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 --  Functions
 ----------------------------------------------------------------------------*/
 
+	/// Parse integer in animation frame.
+extern int ParseAnimInt(CUnit *unit, const char *parseint);
+
 CUnitType::CUnitType() :
 	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
@@ -455,15 +458,14 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 */
 static int GetStillFrame(CUnitType *type)
 {
-	CAnimation *anim;
+	CAnimation *anim = type->Animations->Still;
 
-	anim = type->Animations->Still[99];
 	while (anim) {
 		if (anim->Type == AnimationFrame) {
 			// Use the frame facing down
-			return anim->D.Frame.Frame + type->NumDirections / 2;
+			return ParseAnimInt(NoUnitP, anim->D.Frame.Frame) + type->NumDirections / 2;
 		} else if (anim->Type == AnimationExactFrame) {
-			return anim->D.Frame.Frame;
+			return ParseAnimInt(NoUnitP, anim->D.Frame.Frame);
 		}
 		anim = anim->Next;
 	}

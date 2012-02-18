@@ -860,8 +860,9 @@ void CUnit::Place(const Vec2i &pos)
 	UnitCountSeen(*this);
 	// Vision
 	MapMarkUnitSight(*this);
+
 	// Correct directions for wall units
-	if (this->Type->Wall && this->CurrentAction() != UnitActionBuilt){
+	if (this->Type->Wall && this->CurrentAction() != UnitActionBuilt) {
 		CorrectWallDirections(*this);
 		UnitUpdateHeading(*this);
 		CorrectWallNeighBours(*this);
@@ -2156,7 +2157,6 @@ void DropOutAll(const CUnit &source)
 	}
 }
 
-
 /*----------------------------------------------------------------------------
   -- Finding units
   ----------------------------------------------------------------------------*/
@@ -3301,35 +3301,6 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 		}
 	}
 	return 1;
-}
-
-/**
-**  Get the suitable animation frame when unit is damaged.
-*/
-int GetAnimationDamagedState(CUnit &unit, int anim)
-{
-	if (unit.Variable[HP_INDEX].Max==0)
-		return 99;
-	int health = unit.Variable[HP_INDEX].Value * 100 / unit.Variable[HP_INDEX].Max;
-	if (health==0)
-		return 99;
-	for (int i = health - 1; i<=99; ++i)
-		switch (anim)
-		{
-		case 1:
-			if (unit.Type->Animations->Still[i])
-				return i;
-			break;
-		case 2:
-			if (unit.Type->Animations->Move[i])
-				return i;
-			break;
-		case 3:
-			if (unit.Type->Animations->Attack[i])
-				return i;
-			break;
-		}
-	return 99;
 }
 
 /**

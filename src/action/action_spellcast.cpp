@@ -60,29 +60,31 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-#if 0
-
 /**
-**  Animate unit spell cast (it is attack really)!
+**  Animate unit spell cast 
 **
 **  @param unit  Unit, for that spell cast/attack animation is played.
 */
 void AnimateActionSpellCast(CUnit &unit)
 {
-	int flags;
-
-	if (unit.Type->Animations) {
-		Assert(unit.Type->Animations->Attack);
-
-		flags = UnitShowAnimation(unit, unit.Type->Animations->Attack);
-
-		if (flags & AnimationMissile) { // FIXME: should cast spell ?
-			FireMissile(unit);          // we should not get here ??
+	//if don't have animations just cast spell
+	if (!unit.Type->Animations || (!unit.Type->Animations->Attack && !unit.Type->Animations->SpellCast)) {
+		CUnit *goal = unit.CurrentOrder()->GetGoal();
+		if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
+			unit.ReCast = 0;
+		} else {
+			COrderPtr order = unit.CurrentOrder();
+			unit.ReCast = SpellCast(unit, order->Arg1.Spell,
+								goal, order->goalPos.x, order->goalPos.y);
 		}
+		UnHideUnit(unit);// unit is invisible until casts spell
+		return;
 	}
+	if (unit.Type->Animations->SpellCast)
+		UnitShowAnimation(unit, unit.Type->Animations->SpellCast);
+	else
+		UnitShowAnimation(unit, unit.Type->Animations->Attack);
 }
-
-#endif
 
 /**
 **  Handle moving to the target.
@@ -180,10 +182,9 @@ void HandleActionSpellCast(COrder& order, CUnit &unit)
 			}
 			// FALL THROUGH
 		case 2:                         // Cast spell on the target.
-			// FIXME: should use AnimateActionSpellCast here
-			if (unit.Type->Animations->Attack[GetAnimationDamagedState(unit,3)] && !spell->IsCasterOnly()) {
-				UnitShowAnimation(unit, unit.Type->Animations->Attack[GetAnimationDamagedState(unit,3)]);
-				if (unit.Anim.Unbreakable) { // end of animation
+			if (!spell->IsCasterOnly()) {
+				AnimateActionSpellCast(unit);
+				if (unit.Anim.Unbreakable) {
 					return;
 				}
 			} else {

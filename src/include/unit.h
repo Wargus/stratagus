@@ -1073,8 +1073,8 @@ extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i
 extern bool CanBuildOn(const Vec2i &pos, int mask);
 	/// FIXME: more docu
 extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real);
-	/// Get the suitable animation frame when unit is damaged.
-extern int GetAnimationDamagedState(CUnit &unit, int anim);
+	/// Get the suitable animation frame depends of unit's damaged type.
+extern int ExtraDeathIndex(const char *death);
 
 	/// Find resource
 extern CUnit *UnitFindResource(const CUnit &unit, const Vec2i &startPos, int range,

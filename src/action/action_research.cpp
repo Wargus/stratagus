@@ -83,7 +83,7 @@ void HandleActionResearch(COrder& order, CUnit &unit)
 
 	unit.Type->Animations->Research ?
 		UnitShowAnimation(unit, unit.Type->Animations->Research) :
-		UnitShowAnimation(unit, unit.Type->Animations->Still[GetAnimationDamagedState(unit,1)]);
+		UnitShowAnimation(unit, unit.Type->Animations->Still);
 	if (unit.Wait) {
 		unit.Wait--;
 		return;

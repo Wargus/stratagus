@@ -367,7 +367,7 @@ void ActionStillGeneric(CUnit &unit, bool stand_ground)
 			unit.SubAction = SUB_STILL_STANDBY;
 			// no break : follow
 		case SUB_STILL_STANDBY:
-			UnitShowAnimation(unit, unit.Type->Animations->Still[GetAnimationDamagedState(unit, 1)]);
+			UnitShowAnimation(unit, unit.Type->Animations->Still);
 		break;
 		case SUB_STILL_ATTACK: // attacking unit in attack range.
 			AnimateActionAttack(unit);

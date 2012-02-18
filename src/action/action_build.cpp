@@ -313,7 +313,7 @@ static void StartBuilding(CUnit &unit, CUnit &ontop)
 		// HACK: allows the unit to be removed
 		build->CurrentSightRange = 1;
 		//HACK: reset anim
-		UnitShowAnimation(unit, unit.Type->Animations->Still[GetAnimationDamagedState(unit,1)]);
+		UnitShowAnimation(unit, unit.Type->Animations->Still);
 		unit.Remove(build);
 		build->CurrentSightRange = 0;
 		unit.tilePos = pos;

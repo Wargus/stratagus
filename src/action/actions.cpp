@@ -51,6 +51,30 @@
 #include "map.h"
 #include "sound.h"
 #include "spells.h"
+#include "commands.h"
+
+//SpawnMissile flags
+#define ANIM_SM_DAMAGE 1
+#define ANIM_SM_TOTARGET 2
+#define ANIM_SM_PIXEL 4
+#define ANIM_SM_RELTARGET 8
+#define ANIM_SM_RANGED 16
+
+//IfVar compare types
+#define IF_GREATER_EQUAL 1
+#define IF_GREATER 2
+#define IF_LESS_EQUAL 3
+#define IF_LESS 4
+#define IF_EQUAL 5
+#define IF_NOT_EQUAL 6
+
+//Modify types
+#define MOD_ADD 1
+#define MOD_SUB 2
+#define MOD_MUL 3
+#define MOD_DIV 4
+#define MOD_MOD 5
+
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -628,7 +652,6 @@ void COrder::OnAnimationAttack(CUnit &unit)
 	UnHideUnit(unit); // unit is invisible until attacks
 }
 
-
 /*----------------------------------------------------------------------------
 --  Animation
 ----------------------------------------------------------------------------*/
@@ -659,6 +682,324 @@ int UnitShowAnimation(CUnit &unit, const CAnimation *anim)
 }
 
 /**
+**  Sets the player data.
+*/
+static void SetPlayerData(int player, const char *prop, const char *arg, int value)
+{
+	if (!strcmp(prop, "RaceName")) {
+		Players[player].Race = value;
+	} else if (!strcmp(prop, "Resources")) {
+		const std::string res(arg);
+
+		for (int i = 0; i < MaxCosts; ++i) {
+			if (res == DefaultResourceNames[i]) {
+				SendCommandSetResource(Players[player].Index, i, value);
+				return ;
+			}
+		}
+		fprintf(stderr, "Invalid resource \"%s\"" _C_ res.c_str());
+		Exit(1);
+	} else if (!strcmp(prop, "UnitLimit")) {
+		Players[player].UnitLimit = value;
+	} else if (!strcmp(prop, "BuildingLimit")) {
+		Players[player].BuildingLimit = value;
+	} else if (!strcmp(prop, "TotalUnitLimit")) {
+		Players[player].TotalUnitLimit = value;
+	} else if (!strcmp(prop, "Score")) {
+		Players[player].Score = value;
+	} else if (!strcmp(prop, "TotalUnits")) {
+		Players[player].TotalUnits = value;
+	} else if (!strcmp(prop, "TotalBuildings")) {
+		Players[player].TotalBuildings = value;
+	} else if (!strcmp(prop, "TotalResources")) {
+		const std::string res(arg);
+
+		for (int i = 0; i < MaxCosts; ++i) {
+			if (res == DefaultResourceNames[i]) {
+				Players[player].TotalResources[i] = value;
+				return ;
+			}
+		}
+		fprintf(stderr, "Invalid resource \"%s\"" _C_ res.c_str());
+		Exit(1);
+	} else if (!strcmp(prop, "TotalRazings")) {
+		Players[player].TotalRazings = value;
+	} else if (!strcmp(prop, "TotalKills")) {
+		Players[player].TotalKills = value;
+	} else {
+		fprintf(stderr, "Invalid field: %s" _C_ prop);
+		Exit(1);
+	}
+}
+
+/**
+**  Gets the player data.
+**
+**  @param player  Player number.
+**  @param prop    Player's property.
+**  @param arg     Additional argument (for resource and unit).
+**
+**  @return  Returning value (only integer).
+*/
+static int GetPlayerData(int player, const char *prop, const char *arg)
+{
+	if (!strcmp(prop, "RaceName")) {
+		return Players[player].Race;
+	} else if (!strcmp(prop, "Resources")) {
+		const std::string resource(arg);
+
+		for (int i = 0; i < MaxCosts; ++i) {
+			if (resource == DefaultResourceNames[i]) {
+				return Players[player].Resources[i];
+			}
+		}
+		fprintf(stderr, "Invalid resource \"%s\"", resource.c_str());
+		Exit(1);
+	} else if (!strcmp(prop, "MaxResources")) {
+		const std::string resource(arg);
+
+		for (int i = 0; i < MaxCosts; ++i) {
+			if (resource == DefaultResourceNames[i]) {
+				return Players[player].MaxResources[i];
+			}
+		}
+		fprintf(stderr, "Invalid resource \"%s\"", resource.c_str());
+		Exit(1);
+	} else if (!strcmp(prop, "UnitTypesCount")) {
+		const std::string unit(arg);
+		CUnitType *type = UnitTypeByIdent(unit);
+		return Players[player].UnitTypesCount[type->Slot];
+	} else if (!strcmp(prop, "AiEnabled")) {
+		return Players[player].AiEnabled;
+	} else if (!strcmp(prop, "TotalNumUnits")) {
+		return Players[player].TotalNumUnits;
+	} else if (!strcmp(prop, "NumBuildings")) {
+		return Players[player].NumBuildings;
+	} else if (!strcmp(prop, "Supply")) {
+		return Players[player].Supply;
+	} else if (!strcmp(prop, "Demand")) {
+		return Players[player].Demand;
+	} else if (!strcmp(prop, "UnitLimit")) {
+		return Players[player].UnitLimit;
+	} else if (!strcmp(prop, "BuildingLimit")) {
+		return Players[player].BuildingLimit;
+	} else if (!strcmp(prop, "TotalUnitLimit")) {
+		return Players[player].TotalUnitLimit;
+	} else if (!strcmp(prop, "Score")) {
+		return Players[player].Score;
+	} else if (!strcmp(prop, "TotalUnits")) {
+		return Players[player].TotalUnits;
+	} else if (!strcmp(prop, "TotalBuildings")) {
+		return Players[player].TotalBuildings;
+	} else if (!strcmp(prop, "TotalResources")) {
+		const std::string resource(arg);
+
+		for (int i = 0; i < MaxCosts; ++i) {
+			if (resource == DefaultResourceNames[i]) {
+				return Players[player].TotalResources[i];
+			}
+		}
+		fprintf(stderr, "Invalid resource \"%s\"", resource.c_str());
+		Exit(1);
+	} else if (!strcmp(prop, "TotalRazings")) {
+		return Players[player].TotalRazings;
+	} else if (!strcmp(prop, "TotalKills")) {
+		return Players[player].TotalKills;
+	} else {
+		fprintf(stderr, "Invalid field: %s" _C_ prop);
+		Exit(1);
+	}
+	return 0;
+}
+
+/**
+**  Parse player number in animation frame
+**
+**  @param unit      Unit of the animation.
+**  @param parseint  Integer to parse.
+**
+**  @return  The parsed value.
+*/
+
+static int ParseAnimPlayer(CUnit &unit, const char *parseint){
+	if (!strcmp(parseint, "this")) {
+		return unit.Player->Index;
+	}
+	return atoi(parseint);
+}
+
+/**
+**  Parse flags list in animation frame.
+**
+**  @param unit       Unit of the animation.
+**  @param parseflag  Flag list to parse.
+**
+**  @return The parsed value.
+*/
+int ParseAnimFlags(CUnit &unit, const char *parseflag)
+{
+	char s[100];
+	int flags = 0;
+
+	strcpy(s, parseflag);
+	char* cur = s;
+	char* next = s;
+	while (next){
+		next = strchr(cur, '.');
+		if (next){
+			*next = '\0';
+			++next;
+		}
+		if (unit.Anim.Anim->Type == AnimationSpawnMissile) {
+			if (!strcmp(cur, "damage")) {
+				flags |= ANIM_SM_DAMAGE;
+			} else if (!strcmp(cur, "totarget")) {
+				flags |= ANIM_SM_TOTARGET;
+			} else if (!strcmp(cur, "pixel")) {
+				flags |= ANIM_SM_PIXEL;
+			} else if (!strcmp(cur, "reltarget")) {
+				flags |= ANIM_SM_RELTARGET;
+			} else if (!strcmp(cur, "ranged")) {
+				flags |= ANIM_SM_RANGED;
+			}
+		}
+		cur = next;
+	}
+	return flags;
+}
+
+/**
+**  Parse integer in animation frame.
+**
+**  @param unit      Unit of the animation.
+**  @param parseint  Integer to parse.
+**
+**  @return  The parsed value.
+*/
+
+int ParseAnimInt(CUnit *unit, const char *parseint)
+{
+	char s[100];
+	const CUnit* goal = unit;
+
+	strncpy(s, parseint, strlen(parseint) + 1);
+	char* cur = &s[2];
+	if ((s[0] == 'v' || s[0] == 't') && unit != NULL) { //unit variable detected
+		if (s[0] == 't') {
+			if (unit->CurrentOrder()->HasGoal()) {
+				goal = unit->CurrentOrder()->GetGoal();
+			} else {
+				return 0;
+			}
+		}
+		char* next = strchr(cur, '.');
+		if (next == NULL) {
+			fprintf(stderr, "Need also specify the variable '%s' tag \n", cur);
+			Exit(1);
+		} else {
+			*next = '\0';
+		}
+		const int index = UnitTypeVar.VariableNameLookup[cur];// User variables
+		if (index == -1) {
+			if (!strcmp(cur, "ResourcesHeld")) {
+				return goal->ResourcesHeld;
+			}
+			fprintf(stderr, "Bad variable name '%s'\n", cur);
+			Exit(1);
+		}
+		if (!strcmp(next + 1,"Value")) {
+			return goal->Variable[index].Value;
+		} else if (!strcmp(next + 1, "Max")) {
+			return goal->Variable[index].Max;
+		} else if (!strcmp(next + 1, "Increase")) {
+			return goal->Variable[index].Increase;
+		} else if (!strcmp(next + 1, "Enable")) {
+			return goal->Variable[index].Enable;
+		} else if (!strcmp(next + 1, "Percent")) {
+			return goal->Variable[index].Value * 100 / goal->Variable[index].Max;
+		}
+		return 0;
+	} else if (s[0] == 'p' && unit != NULL) { //player variable detected
+		char* next = strchr(cur, '.');
+		if (next == NULL) {
+			fprintf(stderr, "Need also specify the %s player's property\n", cur);
+			Exit(1);
+		} else {
+			*next='\0';
+		}
+		char *arg = strchr(next + 1, '.');
+		if (arg != NULL) {
+			*arg = '\0';
+		}
+		return GetPlayerData(ParseAnimPlayer(*unit, cur), next + 1, arg + 1);
+	} else if (s[0] == 'r') { //random value
+		return SyncRand(atoi(cur));
+	}
+	return atoi(parseint);
+}
+
+/**
+**  Find the nearest position at which unit can be placed.
+**
+**  @param type     Type of the dropped unit.
+**  @param goalPos  Goal map tile position.
+**  @param resPos   Holds the nearest point.
+**  @param heading  preferense side to drop out of.
+*/
+static void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading)
+{
+	int addx = 0;
+	int addy = 0;
+	Vec2i pos = goalPos;
+
+	if (heading < LookingNE || heading > LookingNW) {
+		goto starts;
+	} else if (heading < LookingSE) {
+		goto startw;
+	} else if (heading < LookingSW) {
+		goto startn;
+	} else {
+		goto starte;
+	}
+
+	// FIXME: don't search outside of the map
+	for (;;) {
+startw:
+		for (int i = addy; i--; ++pos.y) {
+			if (UnitTypeCanBeAt(type, pos)) {
+				goto found;
+			}
+		}
+		++addx;
+starts:
+		for (int i = addx; i--; ++pos.x) {
+			if (UnitTypeCanBeAt(type, pos)) {
+				goto found;
+			}
+		}
+		++addy;
+starte:
+		for (int i = addy; i--; --pos.y) {
+			if (UnitTypeCanBeAt(type, pos)) {
+				goto found;
+			}
+		}
+		++addx;
+startn:
+		for (int i = addx; i--; --pos.x) {
+			if (UnitTypeCanBeAt(type, pos)) {
+				goto found;
+			}
+		}
+		++addy;
+	}
+
+found:
+	resPos = pos;
+}
+
+
+/**
 **  Show unit animation.
 **
 **  @param unit   Unit of the animation.
@@ -669,9 +1010,6 @@ int UnitShowAnimation(CUnit &unit, const CAnimation *anim)
 */
 int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 {
-	int move;
-	int x,y;
-
 	// Changing animations
 	if (anim && unit.Anim.CurrAnim != anim) {
 	// Assert fails when transforming unit (upgrade-to).
@@ -692,20 +1030,20 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 		}
 		return 0;
 	}
-
-	move = 0;
+	int move = 0;
 	while (!unit.Anim.Wait) {
 		switch (unit.Anim.Anim->Type) {
 			case AnimationFrame:
-				unit.Frame = unit.Anim.Anim->D.Frame.Frame;
+				unit.Frame = ParseAnimInt(&unit, unit.Anim.Anim->D.Frame.Frame);
 				UnitUpdateHeading(unit);
 				break;
+
 			case AnimationExactFrame:
-				unit.Frame = unit.Anim.Anim->D.Frame.Frame;
+				unit.Frame = ParseAnimInt(&unit, unit.Anim.Anim->D.Frame.Frame);
 				break;
 
 			case AnimationWait:
-				unit.Anim.Wait = unit.Anim.Anim->D.Wait.Wait << scale >> 8;
+				unit.Anim.Wait = ParseAnimInt(&unit, unit.Anim.Anim->D.Wait.Wait) << scale >> 8;
 				if (unit.Variable[SLOW_INDEX].Value) { // unit is slowed down
 					unit.Anim.Wait <<= 1;
 				}
@@ -716,10 +1054,13 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 					unit.Anim.Wait = 1;
 				break;
 			case AnimationRandomWait:
-				unit.Anim.Wait = unit.Anim.Anim->D.RandomWait.MinWait +
-					SyncRand() % (unit.Anim.Anim->D.RandomWait.MaxWait - unit.Anim.Anim->D.RandomWait.MinWait + 1);
-				break;
+			{
+				const int arg1 = ParseAnimInt(&unit, unit.Anim.Anim->D.RandomWait.MinWait);
+				const int arg2 = ParseAnimInt(&unit, unit.Anim.Anim->D.RandomWait.MaxWait);
 
+				unit.Anim.Wait = arg1 + SyncRand() % (arg2 - arg1 + 1);
+				break;
+			}
 			case AnimationSound:
 				if (unit.IsVisible(*ThisPlayer) || ReplayRevealMap) {
 					PlayUnitSound(unit, unit.Anim.Anim->D.Sound.Sound);
@@ -727,8 +1068,7 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 				break;
 			case AnimationRandomSound:
 				if (unit.IsVisible(*ThisPlayer) || ReplayRevealMap) {
-					int sound;
-					sound = SyncRand() % unit.Anim.Anim->D.RandomSound.NumSounds;
+					const int sound = SyncRand() % unit.Anim.Anim->D.RandomSound.NumSounds;
 					PlayUnitSound(unit, unit.Anim.Anim->D.RandomSound.Sound[sound]);
 				}
 				break;
@@ -739,25 +1079,256 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 				break;
 			}
 			case AnimationSpawnMissile:
-				x = unit.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2;  
-				y = unit.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2;
-				MakeMissile(MissileTypeByIdent(unit.Anim.Anim->D.SpawnMissile.Missile),x,y,x,y);
+			{
+				const int startx = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.StartX);
+				const int starty = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.StartY);
+				const int destx = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.DestX);
+				const int desty = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.DestY);
+				const int flags = ParseAnimFlags(unit, unit.Anim.Anim->D.SpawnMissile.Flags);
+				CUnit *goal;
+				int x, y, dx, dy;
+
+				if ((flags & ANIM_SM_RELTARGET) && unit.CurrentOrder()->HasGoal()) {
+					goal = unit.CurrentOrder()->GetGoal();
+				} else {
+					goal = &unit;
+				}
+				if ((flags & ANIM_SM_PIXEL)) {
+					x = goal->tilePos.x * PixelTileSize.x + goal->IX + startx;
+					y = goal->tilePos.y * PixelTileSize.y + goal->IY + starty;
+				} else {
+					x = (goal->tilePos.x + startx) * PixelTileSize.x + PixelTileSize.x / 2;
+					y = (goal->tilePos.y + starty) * PixelTileSize.y + PixelTileSize.y / 2;
+				}
+				if ((flags & ANIM_SM_TOTARGET) && goal->CurrentOrder()->HasGoal()) {
+					CUnit &target = *goal->CurrentOrder()->GetGoal();
+
+					if (flags & ANIM_SM_PIXEL) {
+						dx = target.tilePos.x * PixelTileSize.x + target.IX;
+						dy = target.tilePos.y * PixelTileSize.y + target.IY;
+					} else {
+						dx = target.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2;
+						dy = target.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2;
+					}
+				} else {
+					if ((flags & ANIM_SM_PIXEL)) {
+						dx = goal->tilePos.x * PixelTileSize.x + goal->IX + destx;
+						dy = goal->tilePos.y * PixelTileSize.y + goal->IY + desty;
+					} else {
+						dx = (unit.tilePos.x + destx) * PixelTileSize.x + PixelTileSize.x / 2;
+						dy = (unit.tilePos.y + desty) * PixelTileSize.y + PixelTileSize.y / 2;
+					}
+				}
+				const int dist = goal->MapDistanceTo(dx, dy);
+				if ((flags & ANIM_SM_RANGED) && !(flags & ANIM_SM_PIXEL)
+					&& dist > goal->Stats->Variables[ATTACKRANGE_INDEX].Max
+					&& dist < goal->Type->MinAttackRange) {
+				} else {
+					Missile *missile = MakeMissile(MissileTypeByIdent(unit.Anim.Anim->D.SpawnMissile.Missile), x, y, dx, dy);
+					if (flags & ANIM_SM_DAMAGE) {
+						missile->SourceUnit = &unit;
+					}
+					if ((flags & ANIM_SM_TOTARGET) && unit.CurrentOrder()->HasGoal()) {
+						missile->TargetUnit = goal->CurrentOrder()->GetGoal();
+					} else {
+						missile->TargetUnit = goal;
+					}
+				}
 				break;
+			}
+			case AnimationSpawnUnit:
+			{
+				const int offX = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.OffX);
+				const int offY = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.OffY);
+				const int range = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.Range);
+				const int playerId = ParseAnimPlayer(unit, unit.Anim.Anim->D.SpawnUnit.Player);
+				CPlayer &player = Players[playerId];
+				const Vec2i pos = { unit.tilePos.x + offX, unit.tilePos.y + offY};
+				CUnitType *type = UnitTypeByIdent(unit.Anim.Anim->D.SpawnUnit.Unit);
+				Vec2i resPos;
+				//DebugPrint("Creating a %s\n" _C_ unittype.Name.c_str());
+				FindNearestDrop(*type, pos, resPos, LookingW);
+				if (MapDistance(pos, resPos) <= range) {
+					CUnit *target = MakeUnit(*type, &player);
+					if (target != NoUnitP) {
+						target->tilePos = pos;
+						target->Place(resPos);
+						//DropOutOnSide(*target, LookingW, NULL);
+					} else {
+						DebugPrint("Unable to allocate Unit");
+					}
+				}
+				break;
+			}
+			case AnimationIfVar:
+			{
+				const int lop = ParseAnimInt(&unit, unit.Anim.Anim->D.IfVar.LeftVar);
+				const int rop = ParseAnimInt(&unit, unit.Anim.Anim->D.IfVar.RightVar);
+				bool go = false;
+
+				switch (unit.Anim.Anim->D.IfVar.Type) {
+					case IF_GREATER_EQUAL:
+						go = (lop >= rop);
+						break;
+					case IF_GREATER:
+						go = (lop > rop);
+						break;
+					case IF_LESS_EQUAL:
+						go = (lop <= rop);
+						break;
+					case IF_LESS:
+						go = (lop < rop);
+						break;
+					case IF_EQUAL:
+						go = (lop == rop);
+						break;
+					case IF_NOT_EQUAL:
+						go = (lop != rop);
+					break;
+				}
+				if (go) {
+					unit.Anim.Anim = unit.Anim.Anim->D.IfVar.Goto;
+				}
+				break;
+			}
+			case AnimationSetVar:
+			{
+				char arg1[128];
+
+				strcpy(arg1, unit.Anim.Anim->D.SetVar.Var);
+				const int rop = ParseAnimInt(&unit, unit.Anim.Anim->D.SetVar.Value);
+
+				char *next = strchr(arg1, '.');
+				if (next == NULL) {
+					fprintf(stderr, "Need also specify the variable '%s' tag \n" _C_ arg1);
+					Exit(1);
+				} else {
+					*next ='\0';
+				}
+				const int index = UnitTypeVar.VariableNameLookup[arg1];// User variables
+				if (index == -1) {
+					fprintf(stderr, "Bad variable name '%s'\n" _C_ arg1);
+					Exit(1);
+				}
+				int value = 0;
+				if (!strcmp(next + 1, "Value")) {
+					value = unit.Variable[index].Value;
+				} else if (!strcmp(next + 1, "Max")) {
+					value = unit.Variable[index].Max;
+				} else if (!strcmp(next + 1,"Increase")) {
+					value = unit.Variable[index].Increase;
+				} else if (!strcmp(next + 1, "Enable")) {
+					value = unit.Variable[index].Enable;
+				}
+				switch (unit.Anim.Anim->D.SetVar.Mod) {
+					case MOD_ADD:
+						value += rop;
+						break;
+					case MOD_SUB:
+						value -= rop;
+						break;
+					case MOD_MUL:
+						value *= rop;
+						break;
+					case MOD_DIV:
+						if (!rop) {
+							fprintf(stderr, "Division by zero in AnimationSetVar\n");
+							Exit(1);
+							return 0;
+						}
+						value /= rop;
+						break;
+					case MOD_MOD:
+						if (!rop) {
+							fprintf(stderr, "Division by zero in AnimationSetVar\n");
+							Exit(1);
+							return 0;
+						}
+						value %= rop;
+						break;
+					default:
+						value = rop;
+				}
+				if (!strcmp(next + 1, "Value")) {
+					unit.Variable[index].Value = value;
+				} else if (!strcmp(next + 1, "Max")) {
+					unit.Variable[index].Max = value;
+				} else if (!strcmp(next + 1, "Increase")) {
+					unit.Variable[index].Increase = value;
+				} else if (!strcmp(next + 1, "Enable")) {
+					unit.Variable[index].Enable = value;
+				}
+				break;
+			}
+			case AnimationSetPlayerVar:
+			{
+				const char *var = unit.Anim.Anim->D.SetPlayerVar.Var;
+				const char *arg = unit.Anim.Anim->D.SetPlayerVar.Arg;
+				int playerId = ParseAnimPlayer(unit, unit.Anim.Anim->D.SetPlayerVar.Player);
+				int rop = ParseAnimInt(&unit, unit.Anim.Anim->D.SetPlayerVar.Value);
+				int data = GetPlayerData(playerId, var, arg);
+
+				switch (unit.Anim.Anim->D.SetPlayerVar.Mod) {
+					case MOD_ADD:
+						data += rop;
+						break;
+					case MOD_SUB:
+						data -= rop;
+						break;
+					case MOD_MUL:
+						data *= rop;
+						break;
+					case MOD_DIV:
+						if (!rop) {
+							fprintf(stderr, "Division by zero in AnimationSetPlayerVar\n");
+							Exit(1);
+							return 0;
+						}
+						data /= rop;
+						break;
+					case MOD_MOD:
+						if (!rop) {
+							fprintf(stderr, "Division by zero in AnimationSetPlayerVar\n");
+							Exit(1);
+							return 0;
+						}
+						data %= rop;
+						break;
+					default:
+						data = rop;
+				}
+				rop = data;
+				SetPlayerData(playerId, var, arg, rop);
+				break;
+			}
+			case AnimationDie:
+				if (unit.Anim.Anim->D.Die.DeathType[0] != '\0') {
+					unit.DamagedType = ExtraDeathIndex(unit.Anim.Anim->D.Die.DeathType);
+				}
+				LetUnitDie(unit);
+				return 0;
 
 			case AnimationRotate:
-				UnitRotate(unit, unit.Anim.Anim->D.Rotate.Rotate);
+				if (!strcmp(unit.Anim.Anim->D.Rotate.Rotate, "target") && unit.CurrentOrder()->HasGoal()) {
+					const CUnit &target = *unit.CurrentOrder()->GetGoal();
+					const Vec2i pos = target.tilePos + target.Type->GetHalfTileSize() - unit.tilePos;
+					UnitHeadingFromDeltaXY(unit, pos);
+				} else {
+					UnitRotate(unit, ParseAnimPlayer(unit, unit.Anim.Anim->D.Rotate.Rotate));
+				}
 				break;
+
 			case AnimationRandomRotate:
 				if ((SyncRand() >> 8) & 1) {
-					UnitRotate(unit, -unit.Anim.Anim->D.Rotate.Rotate);
+					UnitRotate(unit, -ParseAnimPlayer(unit, unit.Anim.Anim->D.Rotate.Rotate));
 				} else {
-					UnitRotate(unit, unit.Anim.Anim->D.Rotate.Rotate);
+					UnitRotate(unit, ParseAnimPlayer(unit, unit.Anim.Anim->D.Rotate.Rotate));
 				}
 				break;
 
 			case AnimationMove:
 				Assert(!move);
-				move = unit.Anim.Anim->D.Move.Move;
+				move = ParseAnimPlayer(unit, unit.Anim.Anim->D.Move.Move);
 				break;
 
 			case AnimationUnbreakable:
@@ -776,7 +1347,7 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 				unit.Anim.Anim = unit.Anim.Anim->D.Goto.Goto;
 				break;
 			case AnimationRandomGoto:
-				if (SyncRand() % 100 < unit.Anim.Anim->D.RandomGoto.Random) {
+				if (SyncRand() % 100 < ParseAnimPlayer(unit, unit.Anim.Anim->D.RandomGoto.Random)) {
 					unit.Anim.Anim = unit.Anim.Anim->D.RandomGoto.Goto;
 				}
 				break;
@@ -996,7 +1567,6 @@ static void HandleBuffs(CUnit &unit, int amount)
 	unit.Variable[SLOW_INDEX].Increase = -amount;
 	unit.Variable[INVISIBLE_INDEX].Increase = -amount;
 	unit.Variable[UNHOLYARMOR_INDEX].Increase = -amount;
-
 
 	unit.Variable[SHIELD_INDEX].Increase = 1;
 

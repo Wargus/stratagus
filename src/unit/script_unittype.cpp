@@ -1413,6 +1413,7 @@ static void ParseAnimationFrame(lua_State *l, const char *str,
 	std::string all2;
 	char* op2;
 	int index;
+	char *next;
 
 	index = op1.find(' ');
 
@@ -1428,27 +1429,32 @@ static void ParseAnimationFrame(lua_State *l, const char *str,
 	}
 	if (op1 == "frame") {
 		anim->Type = AnimationFrame;
-		anim->D.Frame.Frame = atoi(op2);
+		anim->D.Frame.Frame = new_strdup(op2);
 	} else if (op1 == "exact-frame") {
 		anim->Type = AnimationExactFrame;
-		anim->D.Frame.Frame = atoi(op2);
+		anim->D.Frame.Frame = new_strdup(op2);
 	} else if (op1 == "wait") {
 		anim->Type = AnimationWait;
-		anim->D.Wait.Wait = atoi(op2);
+		anim->D.Wait.Wait = new_strdup(op2);
 	} else if (op1 == "random-wait") {
 		anim->Type = AnimationRandomWait;
-		anim->D.RandomWait.MinWait = atoi(op2);
-		op2 = strchr(op2, ' ');
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.RandomWait.MinWait = new_strdup(op2);
+		op2 = next;
 		while (*op2 == ' ') {
 			++op2;
 		}
-		anim->D.RandomWait.MaxWait = atoi(op2);
+		anim->D.RandomWait.MaxWait = new_strdup(op2);
 	} else if (op1 == "sound") {
 		anim->Type = AnimationSound;
 		anim->D.Sound.Name = new_strdup(op2);
 	} else if (op1 == "random-sound") {
 		int count;
-		char *next;
 
 		anim->Type = AnimationRandomSound;
 		count = 0;
@@ -1471,16 +1477,195 @@ static void ParseAnimationFrame(lua_State *l, const char *str,
 		anim->Type = AnimationAttack;
 	} else if (op1 == "spawn-missile") {
 		anim->Type = AnimationSpawnMissile;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
 		anim->D.SpawnMissile.Missile = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SpawnMissile.StartX = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			anim->D.SpawnMissile.StartY = new_strdup(op2);
+			}
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+				anim->D.SpawnMissile.DestX = new_strdup(op2);
+			}
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+				anim->D.SpawnMissile.DestY = new_strdup(op2);
+			}
+		op2 = next;
+		if (next) {
+			while (*op2 == ' ') {
+				++op2;
+			}
+			anim->D.SpawnMissile.Flags = new_strdup(op2);
+		}
+	} else if (op1 == "spawn-unit") {
+		anim->Type = AnimationSpawnUnit;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SpawnUnit.Unit = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SpawnUnit.OffX = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SpawnUnit.OffY = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SpawnUnit.Range = new_strdup(op2);
+		op2 = next;
+		while (*op2 == ' ') {
+			++op2;
+		}
+		anim->D.SpawnUnit.Player = new_strdup(op2);
+	} else if (op1 == "if-var") {
+		anim->Type = AnimationIfVar;		
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.IfVar.LeftVar = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.IfVar.RightVar = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.IfVar.Type = atoi(op2);
+		op2 = next;
+		while (*op2 == ' ') {
+			++op2;
+		}
+		FindLabelLater(l, &anim->D.IfVar.Goto, op2);
+	} else if (op1 == "set-var") {
+		anim->Type = AnimationSetVar;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SetVar.Var = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SetVar.Mod = atoi(op2);
+		op2 = next;
+		while (*op2 == ' ') {
+			++op2;
+		}
+		anim->D.SetVar.Value = new_strdup(op2);
+	} else if (op1 == "set-player-var") {
+		anim->Type = AnimationSetPlayerVar;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SetPlayerVar.Player = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SetPlayerVar.Var = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SetPlayerVar.Mod = atoi(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SetPlayerVar.Value = new_strdup(op2);
+		op2 = next;
+		while (*op2 == ' ') {
+			++op2;
+		}
+		anim->D.SetPlayerVar.Arg = new_strdup(op2);
+	} else if (op1 == "die") {
+		anim->Type = AnimationDie;
+		if (op2!='\0')
+			anim->D.Die.DeathType = new_strdup(op2);
+		else
+			anim->D.Die.DeathType = "\0";
 	} else if (op1 == "rotate") {
 		anim->Type = AnimationRotate;
-		anim->D.Rotate.Rotate = atoi(op2);
+		anim->D.Rotate.Rotate = new_strdup(op2);
 	} else if (op1 == "random-rotate") {
 		anim->Type = AnimationRandomRotate;
-		anim->D.Rotate.Rotate = atoi(op2);
+		anim->D.Rotate.Rotate = new_strdup(op2);
 	} else if (op1 == "move") {
 		anim->Type = AnimationMove;
-		anim->D.Move.Move = atoi(op2);
+		anim->D.Move.Move = new_strdup(op2);
 	} else if (op1 == "unbreakable") {
 		anim->Type = AnimationUnbreakable;
 		if (!strcmp(op2, "begin")) {
@@ -1508,7 +1693,7 @@ static void ParseAnimationFrame(lua_State *l, const char *str,
 				*label++ = '\0';
 			}
 		}
-		anim->D.RandomGoto.Random = atoi(op2);
+		anim->D.RandomGoto.Random = new_strdup(op2);
 		FindLabelLater(l, &anim->D.RandomGoto.Goto, label);
 	} else {
 		LuaError(l, "Unknown animation: %s" _C_ op1.c_str());
@@ -1574,11 +1759,9 @@ static int CclDefineAnimations(lua_State *l)
 {
 	const char *name;
 	const char *value;
-	char *end;
 	CAnimations *anims;
 	int res = -1;
 	int death = ANIMATIONS_DEATHTYPES;
-	long still = 99, move = 99, attack = 99;
 
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -1599,15 +1782,7 @@ static int CclDefineAnimations(lua_State *l)
 		if (!strcmp(value, "Start")) {
 			anims->Start = ParseAnimation(l, -1);
 		} else if (!strncmp(value, "Still", 5)) {
-			if (strlen(value)>5)
-			{
-				still = strtol(value + 6,&end, 10);
-				if (still>99 || still < 1)
-					LuaError(l,"Damaged percent must be between 1 and 99 : %s" _C_ value + 6);
-				anims->Still[still-1] = ParseAnimation(l, -1);
-			}
-			else
-				anims->Still[99] = ParseAnimation(l, -1);
+			anims->Still = ParseAnimation(l, -1);
 		} else if (!strncmp(value, "Death", 5)) {
 			if (strlen(value)>5)
 			{
@@ -1619,27 +1794,12 @@ static int CclDefineAnimations(lua_State *l)
 			}
 			else
 				anims->Death[ANIMATIONS_DEATHTYPES] = ParseAnimation(l, -1);
-		} else if (!strncmp(value, "Attack", 6)) {
-			if (strlen(value)>6)
-			{
-				attack = strtol(value + 7,&end, 10);
-				if (attack>99 || attack < 1)
-					LuaError(l,"Damaged percent must be between 1 and 99 : %s" _C_ value + 7);
-				anims->Attack[attack-1] = ParseAnimation(l, -1);
-			}
-			else
-				anims->Attack[99] = ParseAnimation(l, -1);
-
-		} else if (!strncmp(value, "Move", 4)) {
-			if (strlen(value)>4)
-			{
-				move = strtol(value + 5,&end, 10);
-				if (move>99 || move < 1)
-					LuaError(l,"Damaged percent must be between 1 and 99 : %s" _C_ value + 5);
-				anims->Move[move-1] = ParseAnimation(l, -1);
-			}
-			else
-				anims->Move[99] = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "Attack")) {
+			anims->Attack = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "SpellCast")) {
+			anims->SpellCast = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "Move")) {
+			anims->Move = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Repair")) {
 			anims->Repair = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Train")) {
@@ -1660,10 +1820,11 @@ static int CclDefineAnimations(lua_State *l)
 	}
 	// Must add to array in a fixed order for save games
 	AddAnimationToArray(anims->Start);
-	AddAnimationToArray(anims->Still[still]);
+	AddAnimationToArray(anims->Still);
 	AddAnimationToArray(anims->Death[death]);
-	AddAnimationToArray(anims->Attack[attack]);
-	AddAnimationToArray(anims->Move[move]);
+	AddAnimationToArray(anims->Attack);
+	AddAnimationToArray(anims->SpellCast);
+	AddAnimationToArray(anims->Move);
 	AddAnimationToArray(anims->Repair);
 	AddAnimationToArray(anims->Train);
 	if(res != -1)

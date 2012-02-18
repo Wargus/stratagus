@@ -347,6 +347,8 @@ extern HandleActionFunc HandleActionRepair;
 extern HandleActionFunc HandleActionPatrol;
 	/// Show attack animation
 extern void AnimateActionAttack(CUnit &unit);
+	/// Show spell cast animation
+extern void AnimateActionSpellCast(CUnit &unit);
 	/// Handle command attack
 extern HandleActionFunc HandleActionAttack;
 	/// Handle command board

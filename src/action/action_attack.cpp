@@ -77,12 +77,12 @@ void AnimateActionAttack(CUnit &unit)
 	//  No animation.
 	//  So direct fire missile.
 	//  FIXME : wait a little.
-	if (!unit.Type->Animations || !unit.Type->Animations->Attack[GetAnimationDamagedState(unit,3)]) {
+	if (!unit.Type->Animations || !unit.Type->Animations->Attack) {
 		FireMissile(unit);
 		UnHideUnit(unit);// unit is invisible until attacks
 		return;
 	}
-	UnitShowAnimation(unit, unit.Type->Animations->Attack[GetAnimationDamagedState(unit,3)]);
+	UnitShowAnimation(unit, unit.Type->Animations->Attack);
 }
 
 /**
