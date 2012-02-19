@@ -693,7 +693,7 @@ static void SetPlayerData(int player, const char *prop, const char *arg, int val
 
 		for (int i = 0; i < MaxCosts; ++i) {
 			if (res == DefaultResourceNames[i]) {
-				SendCommandSetResource(Players[player].Index, i, value);
+				Players[player].SetResource(i,value);
 				return ;
 			}
 		}

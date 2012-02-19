@@ -107,8 +107,7 @@ enum _message_type_ {
 */
 enum _extended_message_type_ {
 	ExtendedMessageDiplomacy,     /// Change diplomacy
-	ExtendedMessageSharedVision,   /// Change shared vision
-	ExtendedMessageSetResource     /// Change resource count
+	ExtendedMessageSharedVision   /// Change shared vision
 };
 
 /**

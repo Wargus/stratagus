@@ -101,8 +101,6 @@ extern void SendCommandCancelResearch(CUnit &unit);
 extern void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, int flush);
 	/// Send auto spell cast command
 extern void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on);
-	/// Send set resource command
-extern void SendCommandSetResource(int player, int resource, int value);
 	/// Send diplomacy command
 extern void SendCommandDiplomacy(int player, int state, int opponent);
 	/// Send shared vision command

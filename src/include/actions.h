@@ -312,8 +312,6 @@ extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, SpellTy
 extern void CommandAutoSpellCast(CUnit &unit, int spellid, int on);
 	/// Prepare diplomacy command
 extern void CommandDiplomacy(int player, int state, int opponent);
-	/// Prepare set resources command
-extern void CommandSetResource(int player, int resource, int value);
 	/// Prepare shared vision command
 extern void CommandSharedVision(int player, bool state, int opponent);
 

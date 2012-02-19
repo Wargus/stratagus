@@ -886,8 +886,6 @@ static void DoNextReplay()
 			state = -1;
 		}
 		SendCommandDiplomacy(arg1, state, arg2);
-	} else if (!strcmp(action, "set-resource")) {
-		SendCommandSetResource(arg1, num, arg2);
 	} else if (!strcmp(action, "shared-vision")) {
 		bool state;
 		state = atoi(val) ? true : false;
