@@ -209,7 +209,7 @@ static void MoveToTarget(CUnit &unit)
 	COrderPtr order = unit.CurrentOrder();
 	if (err == 0 && !order->HasGoal()) {
 		// Check if we're in range when attacking a location and we are waiting
-		if (unit.MapDistanceTo(order->goalPos.x, order->goalPos.y) <
+		if (unit.MapDistanceTo(order->goalPos.x, order->goalPos.y) <=
 				unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 			err = PF_REACHED;
 		}

@@ -342,6 +342,9 @@ void CUnit::Init(CUnitType &type)
 	Active = 1;
 	Removed = 1;
 
+	// Has StartingResources, Use those
+	this->ResourcesHeld = type.StartingResources;
+
 	Rs = MyRand() % 100; // used for fancy buildings and others
 
 	Assert(Orders.empty());
@@ -962,14 +965,16 @@ void UnitLost(CUnit &unit)
 	//
 	//  Call back to AI, for killed or lost units.
 	//
-	if (player && player->AiEnabled) {
-		AiUnitKilled(unit);
-	} else {
-		//
-		//  Remove unit from its groups
-		//
-		if (unit.GroupId) {
-			RemoveUnitFromGroups(unit);
+	if (Editor.Running == EditorNotRunning){
+		if (player && player->AiEnabled) {
+			AiUnitKilled(unit);
+		} else {
+			//
+			//  Remove unit from its groups
+			//
+			if (unit.GroupId) {
+				RemoveUnitFromGroups(unit);
+			}
 		}
 	}
 
@@ -2496,7 +2501,7 @@ CUnit *UnitFindResource(const CUnit &unit, const Vec2i &startPos, int range, int
 				// Look if there is a mine
 				//
 				if ((mine = res_finder.Find(Map.Field(pos))) &&
-						mine->Type->CanHarvest &&
+					mine->Type->CanHarvest && mine->ResourcesHeld &&
 						(resinfo.HarvestFromOutside ||
 							mine->Player->Index == PlayerMax - 1 ||
 							mine->Player == unit.Player ||

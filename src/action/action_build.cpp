@@ -555,9 +555,7 @@ void HandleActionBuilt(COrder& order, CUnit &unit)
 			// Set to Zero as it's part of a union
 			memset(&unit.CurrentOrder()->Data, 0, sizeof(unit.CurrentOrder()->Data));
 			// Has StartingResources, Use those
-			if (type->StartingResources) {
-				unit.ResourcesHeld = type->StartingResources;
-			}
+			unit.ResourcesHeld = type->StartingResources;
 		}
 
 		unit.Player->Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
