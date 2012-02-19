@@ -180,7 +180,6 @@ void CUnit::Init()
 	GuardLock = 0;
 	memset(&Anim, 0, sizeof(Anim));
 	CurrentResource = 0;
-	OrderCount = 0;
 	OrderFlush = 0;
 	Orders.clear();
 	delete SavedOrder;
@@ -205,7 +204,7 @@ void CUnit::Release(bool final)
 	CUnit *temp;
 
 	Assert(Type); // already free.
-	Assert(OrderCount == 1);
+	Assert(Orders.size() == 1);
 	Assert(!CurrentOrder()->HasGoal());
 	// Must be removed before here
 	Assert(Removed);
@@ -277,7 +276,7 @@ void CUnit::ClearAction()
 
 bool CUnit::IsIdle() const
 {
-	return OrderCount == 1 && CurrentAction() == UnitActionStill;
+	return Orders.size() == 1 && CurrentAction() == UnitActionStill;
 }
 
 bool CUnit::IsAlive() const
@@ -349,12 +348,8 @@ void CUnit::Init(CUnitType &type)
 
 	Assert(Orders.empty());
 
-	Orders.push_back(new COrder);
+	Orders.push_back(COrder::NewActionStill());
 
-	OrderCount = 1; // No orders
-	CurrentOrder()->Action = UnitActionStill;
-	CurrentOrder()->goalPos.x = CurrentOrder()->goalPos.y = -1;
-	Assert(!CurrentOrder()->HasGoal());
 	Assert(NewOrder == NULL);
 	NewOrder = NULL;
 	Assert(SavedOrder == NULL);
@@ -1077,12 +1072,11 @@ void UnitLost(CUnit &unit)
 */
 void UnitClearOrders(CUnit &unit)
 {
-	for (int i = 0; i != unit.OrderCount; ++i)
+	for (size_t i = 0; i != unit.Orders.size(); ++i)
 	{
 		delete unit.Orders[i];
 	}
 	unit.Orders.clear();
-	unit.OrderCount = 1;
 	unit.Orders.push_back(COrder::NewActionStill());
 	unit.SubAction = unit.State = 0;
 }

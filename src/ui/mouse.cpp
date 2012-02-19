@@ -595,7 +595,7 @@ static void HandleMouseOn(int x, int y)
 		}
 		if (NumSelected == 1) {
 			if (Selected[0]->CurrentAction() == UnitActionTrain) {
-				if (Selected[0]->OrderCount == 1) {
+				if (Selected[0]->Orders.size() == 1) {
 					if (OnButton(x, y, UI.SingleTrainingButton)) {
 						ButtonAreaUnderCursor = ButtonAreaTraining;
 						ButtonUnderCursor = 0;
@@ -604,8 +604,8 @@ static void HandleMouseOn(int x, int y)
 					}
 				} else {
 					size = UI.TrainingButtons.size();
-					i = Selected[0]->OrderCount < (int)size ?
-						Selected[0]->OrderCount - 1 : size - 1;
+					i = Selected[0]->Orders.size() < size ?
+						Selected[0]->Orders.size() - 1 : size - 1;
 					for (; i >= 0; --i) {
 						if (Selected[0]->Orders[i]->Action == UnitActionTrain &&
 								OnButton(x, y, &UI.TrainingButtons[i])) {
@@ -1730,7 +1730,7 @@ void UIHandleButtonDown(unsigned button)
 			} else if (ButtonAreaUnderCursor == ButtonAreaTraining) {
 				if (!GameObserve && !GamePaused &&
 						ThisPlayer->IsTeamed(*Selected[0])) {
-					if (ButtonUnderCursor < Selected[0]->OrderCount &&
+					if (static_cast<size_t>(ButtonUnderCursor) < Selected[0]->Orders.size() &&
 						Selected[0]->Orders[ButtonUnderCursor]->Action == UnitActionTrain) {
 						DebugPrint("Cancel slot %d %s\n" _C_
 							ButtonUnderCursor _C_

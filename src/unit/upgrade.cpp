@@ -484,9 +484,9 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 		//  FIXME: what about buildings?
 		//
 		} else {
-			for (int j = 0; j < unit.OrderCount; ++j) {
-				if (unit.Orders[j]->Action == UnitActionTrain &&
-						unit.Orders[j]->Arg1.Type == &src) {
+			for (size_t j = 0; j < unit.Orders.size(); ++j) {
+				if (unit.Orders[j]->Action == UnitActionTrain
+					&& unit.Orders[j]->Arg1.Type == &src) {
 						if (j == 0) {
 							// Must Adjust Ticks to the fraction that was trained
 							unit.CurrentOrder()->Data.Train.Ticks =

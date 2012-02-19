@@ -71,48 +71,36 @@ static int AiMakeUnit(CUnitType &type, int near_x, int near_y);
 */
 static int AiCheckCosts(const int *costs)
 {
-	int i;
-	int j;
-	int k;
-	int err;
-	const int *resources;
-	const int *reserve;
-	int *used;
-	int nunits;
-	CUnit **units;
-	const int *building_costs;
-
-
 	// FIXME: the used costs shouldn't be calculated here
-	used = AiPlayer->Used;
-	for (j = 1; j < MaxCosts; ++j) {
-		used[j] = 0;
+	int *used = AiPlayer->Used;
+
+	for (int i = 1; i < MaxCosts; ++i) {
+		used[i] = 0;
 	}
 
-	nunits = AiPlayer->Player->TotalNumUnits;
-	units = AiPlayer->Player->Units;
-	for (i = 0; i < nunits; ++i) {
-		for (k = 0; k < units[i]->OrderCount; ++k) {
-			if (units[i]->Orders[k]->Action == UnitActionBuild) {
-				building_costs =
-					units[i]->Orders[k]->Arg1.Type->Stats[AiPlayer->Player->Index].Costs;
-				for (j = 1; j < MaxCosts; ++j) {
+	const int nunits = AiPlayer->Player->TotalNumUnits;
+	CUnit **units = AiPlayer->Player->Units;
+	for (int i = 0; i < nunits; ++i) {
+		for (size_t k = 0; k < units[i]->Orders.size(); ++k) {
+			COrder &order = *units[i]->Orders[k];
+
+			if (order.Action == UnitActionBuild) {
+				const int *building_costs = order.Arg1.Type->Stats[AiPlayer->Player->Index].Costs;
+				for (int j = 1; j < MaxCosts; ++j) {
 					used[j] += building_costs[j];
 				}
 			}
 		}
 	}
 
-
-	err = 0;
-	resources = AiPlayer->Player->Resources;
-	reserve = AiPlayer->Reserve;
-	for (i = 1; i < MaxCosts; ++i) {
+	int err = 0;
+	const int *resources = AiPlayer->Player->Resources;
+	const int *reserve = AiPlayer->Reserve;
+	for (int i = 1; i < MaxCosts; ++i) {
 		if (resources[i] - used[i] < costs[i] - reserve[i]) {
 			err |= 1 << i;
 		}
 	}
-
 	return err;
 }
 
@@ -242,9 +230,9 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, int near_
 	const int nunits = FindPlayerUnitsByType(*AiPlayer->Player, type, table);
 	for (int i = 0; i < nunits; ++i) {
 		CUnit& unit = *table[i];
-		int j;
+		size_t j;
 
-		for (j = 0; j < unit.OrderCount; ++j) {
+		for (j = 0; j < unit.Orders.size(); ++j) {
 			int action = unit.Orders[j]->Action;
 			if (action == UnitActionBuild ||
 				action == UnitActionRepair ||
@@ -254,7 +242,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, int near_
 				break;
 			}
 		}
-		if (j == unit.OrderCount) {
+		if (j == unit.Orders.size()) {
 			table[num++] = &unit;
 		}
 	}
@@ -970,7 +958,7 @@ static void AiCollectResources()
 		const int c = unit.CurrentResource;
 
 		// See if it's assigned already
-		if (c && unit.OrderCount == 1 &&
+		if (c && unit.Orders.size() == 1 &&
 			unit.CurrentAction() == UnitActionResource) {
 			units_assigned[c].push_back(&unit);
 			num_units_assigned[c]++;
@@ -1172,7 +1160,7 @@ static int AiRepairBuilding(const CUnitType &type, CUnit &building)
 	for (int i = 0; i < nunits; ++i) {
 		CUnit &unit = *table[i];
 
-		if (unit.Type->RepairRange && unit.OrderCount == 1 &&
+		if (unit.Type->RepairRange && unit.Orders.size() == 1 &&
 			((unit.CurrentAction() == UnitActionResource && unit.SubAction <= 55) /* SUB_START_GATHERING */ ||
 				unit.CurrentAction() == UnitActionStill)) {
 			table[num++] = &unit;

@@ -595,18 +595,10 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
 */
 static void DrawUnitInfo(CUnit &unit)
 {
-	int i;
-	CUnitType *type;
-	const CUnitStats *stats;
-	int x;
-	int y;
-	CUnit *uins;
-	CLabel label(GetGameFont());
-
 	if (CPU_NUM == 1) {
 		UpdateUnitVariables(unit);
 	}
-	for (i = 0; i < (int)UI.InfoPanelContents.size(); ++i) {
+	for (size_t i = 0; i < UI.InfoPanelContents.size(); ++i) {
 		if (CanShowContent(UI.InfoPanelContents[i]->Condition, unit)) {
 			for (std::vector<CContentType *>::const_iterator content = UI.InfoPanelContents[i]->Contents.begin();
 					content != UI.InfoPanelContents[i]->Contents.end(); ++content) {
@@ -617,57 +609,54 @@ static void DrawUnitInfo(CUnit &unit)
 		}
 	}
 
-	type = unit.Type;
-	stats = unit.Stats;
-	Assert(type);
-	Assert(stats);
+
+	CUnitType &type = *unit.Type;
+	Assert(&type);
 
 	// Draw IconUnit
 #ifdef USE_MNG
-	if (type->Portrait.Num) {
-		type->Portrait.Mngs[type->Portrait.CurrMng]->Draw(
+	if (type.Portrait.Num) {
+		type.Portrait.Mngs[type.Portrait.CurrMng]->Draw(
 			UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
-		if (type->Portrait.Mngs[type->Portrait.CurrMng]->iteration == type->Portrait.NumIterations) {
-			type->Portrait.Mngs[type->Portrait.CurrMng]->Reset();
+		if (type.Portrait.Mngs[type.Portrait.CurrMng]->iteration == type.Portrait.NumIterations) {
+			type.Portrait.Mngs[type.Portrait.CurrMng]->Reset();
 			// FIXME: should be configurable
-			if (type->Portrait.CurrMng == 0) {
-				type->Portrait.CurrMng = (SyncRand() % (type->Portrait.Num - 1)) + 1;
-				type->Portrait.NumIterations = 1;
+			if (type.Portrait.CurrMng == 0) {
+				type.Portrait.CurrMng = (SyncRand() % (type.Portrait.Num - 1)) + 1;
+				type.Portrait.NumIterations = 1;
 			} else {
-				type->Portrait.CurrMng = 0;
-				type->Portrait.NumIterations = SyncRand() % 16 + 1;
+				type.Portrait.CurrMng = 0;
+				type.Portrait.NumIterations = SyncRand() % 16 + 1;
 			}
 		}
 	} else
 #endif
 	if (UI.SingleSelectedButton) {
-		x = UI.SingleSelectedButton->X;
-		y = UI.SingleSelectedButton->Y;
-		type->Icon.Icon->DrawUnitIcon(unit.Player, UI.SingleSelectedButton->Style,
-			(ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
-				(IconActive | (MouseButtons & LeftButton)) : 0,
-			x, y, "");
+		const int x = UI.SingleSelectedButton->X;
+		const int y = UI.SingleSelectedButton->Y;
+		const int flag = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
+				(IconActive | (MouseButtons & LeftButton)) : 0;
+
+		type.Icon.Icon->DrawUnitIcon(unit.Player, UI.SingleSelectedButton->Style, flag, x, y, "");
 	}
 
 	if (unit.Player != ThisPlayer && !ThisPlayer->IsAllied(*unit.Player) )
 	{
 		return;
 	}
-
-	x = UI.InfoPanel.X;
-	y = UI.InfoPanel.Y;
+	CLabel label(GetGameFont());
 
 	//
 	//  Show progress if they are selected.
 	//
 	if (NumSelected == 1 && Selected[0] == &unit) {
-		switch(unit.CurrentAction()) {
+		switch (unit.CurrentAction()) {
 
 			//
 			//  Building training units.
 			//
 			case UnitActionTrain:
-				if (unit.OrderCount == 1 || unit.Orders[1]->Action != UnitActionTrain) {
+				if (unit.Orders.size() == 1 || unit.Orders[1]->Action != UnitActionTrain) {
 					if (!UI.SingleTrainingText.empty()) {
 						label.SetFont(UI.SingleTrainingFont);
 						label.Draw(UI.SingleTrainingTextX, UI.SingleTrainingTextY,
@@ -688,14 +677,15 @@ static void DrawUnitInfo(CUnit &unit)
 							UI.TrainingText);
 					}
 					if (!UI.TrainingButtons.empty()) {
-						for (i = 0; i < unit.OrderCount &&
-								i < (int)UI.TrainingButtons.size(); ++i) {
+						for (size_t i = 0; i < unit.Orders.size()
+							&& i < UI.TrainingButtons.size(); ++i) {
 							if (unit.Orders[i]->Action == UnitActionTrain) {
+								const int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
+										&& static_cast<size_t>(ButtonUnderCursor) == i) ?
+										(IconActive | (MouseButtons & LeftButton)) : 0;
+
 								unit.Orders[i]->Arg1.Type->Icon.Icon->DrawUnitIcon(unit.Player,
-									 UI.TrainingButtons[i].Style,
-									(ButtonAreaUnderCursor == ButtonAreaTraining &&
-										ButtonUnderCursor == i) ?
-										(IconActive | (MouseButtons & LeftButton)) : 0,
+									 UI.TrainingButtons[i].Style, flag,
 									UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y, "");
 							}
 						}
@@ -738,21 +728,21 @@ static void DrawUnitInfo(CUnit &unit)
 	//
 	//  Transporting units.
 	//
-	if (type->CanTransport() && unit.BoardCount) {
-		int j;
+	if (type.CanTransport() && unit.BoardCount) {
+		CUnit *uins = unit.UnitInside;
+		size_t j = 0;
 
-		uins = unit.UnitInside;
-		for (i = j = 0; i < unit.InsideCount; ++i, uins = uins->NextContained) {
-			if (uins->Boarded && j < (int)UI.TransportingButtons.size()) {
+		for (int i = 0; i < unit.InsideCount; ++i, uins = uins->NextContained) {
+			if (uins->Boarded && j < UI.TransportingButtons.size()) {
 				uins->Type->Icon.Icon->DrawUnitIcon(unit.Player, UI.TransportingButtons[j].Style,
-					(ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == j) ?
+					(ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
 					UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y, "");
 				UiDrawLifeBar(*uins, UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 				if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
 					UiDrawManaBar(*uins, UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 				}
-				if (ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == j) {
+				if (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) {
 					UI.StatusLine.Set(uins->Type->Name);
 				}
 				++j;

@@ -452,16 +452,13 @@ void SaveUnit(const CUnit &unit, CFile *file)
 		}
 		file->printf("},\n  ");
 	}
-	Assert((unsigned int)unit.OrderCount == unit.Orders.size());
-	file->printf("\"order-count\", %d,\n  ", unit.OrderCount);
 	file->printf("\"order-flush\", %d,\n  ", unit.OrderFlush);
-	file->printf("\"orders\", {");
-	for (i = 0; i < unit.OrderCount; ++i) {
-		file->printf("\n ");
+	file->printf("\"orders\", {\n");
+	Assert(unit.Orders.empty() == false);
+	SaveOrder(*unit.Orders[0], unit, file);
+	for (size_t i = 1; i != unit.Orders.size(); ++i) {
+		file->printf(",\n ");
 		SaveOrder(*unit.Orders[i], unit, file);
-		if (i < unit.OrderCount - 1) {
-			file->printf(",");
-		}
 	}
 	file->printf("}");
 	if (unit.SavedOrder) {

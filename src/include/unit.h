@@ -301,22 +301,11 @@
 **  Pointer to the original owner of a unit. It will be NULL if
 **  the unit was not rescued.
 **
-**  CUnit::OrderCount
-**
-**  The number of the orders unit to process. An unit has atleast
-**  one order. CUnit::OrderCount should be a number at least 1.
-**  The orders are in CUnit::Orders[].
 **
 **  CUnit::OrderFlush
 **
 **  A flag, which tells the unit to stop with the current order
 **  and immediately start with the next order.
-**
-**  CUnit::TotalOrders
-**
-**  The number of Orders allocated for this unit to use.
-**  Default is 4, but is dynamically updated if more orders are
-**  given.
 **
 **  CUnit::Orders
 **
@@ -587,7 +576,6 @@ public:
 	} Anim;
 
 
-	char OrderCount;            /// how many orders in queue
 	char OrderFlush;            /// cancel current order, take next
 	std::vector<COrder *> Orders; /// orders to process
 	COrder *SavedOrder;         /// order to continue after current

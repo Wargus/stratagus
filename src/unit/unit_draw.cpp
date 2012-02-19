@@ -864,7 +864,7 @@ void ShowOrder(const CUnit &unit)
 		unit.tilePos.y) + unit.IY + unit.Type->TileHeight * PixelTileSize.y / 2;
 
 	// If the current order is cancelled show the next one
-	if (unit.OrderCount > 1 && unit.OrderFlush) {
+	if (unit.Orders.size() > 1 && unit.OrderFlush) {
 		order = unit.Orders[1];
 	} else {
 		order = unit.Orders[0];
@@ -872,7 +872,7 @@ void ShowOrder(const CUnit &unit)
 	ShowSingleOrder(unit, x1, y1, order);
 
 	// Show the rest of the orders
-	for (int i = 1 + (unit.OrderFlush ? 1 : 0); i < unit.OrderCount; ++i) {
+	for (size_t i = 1 + (unit.OrderFlush ? 1 : 0); i < unit.Orders.size(); ++i) {
 		GetOrderPosition(unit, unit.Orders[i - 1], &x1, &y1);
 		ShowSingleOrder(unit, x1, y1, unit.Orders[i]);
 	}

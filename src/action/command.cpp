@@ -61,16 +61,14 @@
 */
 static void ReleaseOrders(CUnit &unit)
 {
-	Assert(static_cast<size_t>(unit.OrderCount) == unit.Orders.size());
-	Assert(unit.Orders.size() >= 1);
+	Assert(unit.Orders.empty() == false);
 
+	// Order 0 must be stopped in the action loop.
 	for (size_t i = 1; i != unit.Orders.size(); ++i) {
 		delete unit.Orders[i];
 	}
 	unit.Orders.resize(1);
-	unit.OrderCount = 1;
 	unit.OrderFlush = 1;
-	// Order 0 must be stopped in the action loop.
 }
 
 /**
@@ -87,11 +85,13 @@ static COrderPtr *GetNextOrder(CUnit &unit, int flush)
 		// empty command queue
 		ReleaseOrders(unit);
 	}
-	if (unit.OrderCount == 0x7F) {
+	// FIXME : Remove Hardcoded value.
+	const unsigned int maxOrderCount = 0x7F;
+
+	if (unit.Orders.size() == maxOrderCount) {
 		return NULL;
 	}
 	unit.Orders.push_back(NULL);
-	unit.OrderCount++;
 	return &unit.Orders.back();
 }
 
@@ -101,13 +101,12 @@ static COrderPtr *GetNextOrder(CUnit &unit, int flush)
 **  @param unit   pointer to unit
 **  @param order  number of the order to remove
 */
-static void RemoveOrder(CUnit &unit, int order)
+static void RemoveOrder(CUnit &unit, unsigned int order)
 {
-	Assert(0 <= order && order < unit.OrderCount);
+	Assert(order < unit.Orders.size());
 
 	delete unit.Orders[order];
 	unit.Orders.erase(unit.Orders.begin() + order);
-	--unit.OrderCount;
 	if (order == 0) {
 		unit.SubAction = 0;
 	}
@@ -637,7 +636,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 		if (unit.Player == ThisPlayer && unit.Selected) {
 			SelectedUnitChanged();
 		}
-	} else if (unit.OrderCount <= slot) {
+	} else if (unit.Orders.size() <= static_cast<size_t>(slot)) {
 		// Order has moved
 		return;
 	} else if (unit.Orders[slot]->Action != UnitActionTrain) {

@@ -585,15 +585,14 @@ static void CclParseOrders(lua_State *l, CUnit &unit)
 		delete *order;
 	}
 	unit.Orders.clear();
-	const int n = unit.OrderCount;
-	unit.OrderCount = 0;
+	const int n = lua_objlen(l, -1);
+
 	for (int j = 0; j < n; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 
 		unit.Orders.push_back(new COrder);
-		COrderPtr* order = &unit.Orders[(int)unit.OrderCount++];
+		COrderPtr* order = &unit.Orders.back();
 
-		Assert(order == &unit.Orders[j]);
 		CclParseOrder(l, unit, *order);
 		lua_pop(l, 1);
 	}
@@ -838,8 +837,6 @@ static int CclUnit(lua_State *l)
 				lua_pop(l, 1);
 				u->AddInContainer(*unit);
 			}
-		} else if (!strcmp(value, "order-count")) {
-			unit->OrderCount = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "order-flush")) {
 			unit->OrderFlush = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "orders")) {

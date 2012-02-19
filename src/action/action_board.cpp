@@ -155,9 +155,7 @@ static void EnterTransporter(CUnit &unit)
 		unit.Boarded = 1;
 		if (!unit.Player->AiEnabled) {
 			// Don't make anything funny after going out of the transporter.
-			// FIXME: This is probably wrong, but it works for me (n0b0dy)
-			unit.OrderCount = 1;
-			unit.ClearAction();
+			CommandStopUnit(unit);
 		}
 
 		if (IsOnlySelected(*transporter)) {

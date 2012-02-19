@@ -175,7 +175,7 @@ void HandleActionTrain(COrder& order, CUnit &unit)
 				AiTrainingComplete(unit, *nunit);
 			}
 
-			if (unit.OrderCount == 1) {
+			if (unit.Orders.size() == 1) {
 				unit.ClearAction();
 			} else {
 				unit.OrderFlush = 1;

@@ -1614,8 +1614,8 @@ static void HandleUnitAction(CUnit &unit)
 
 		// o Look if we have a new order and old finished.
 		// o Or the order queue should be flushed.
-		if (unit.OrderCount > 1 &&
-				(unit.CurrentAction() == UnitActionStill || unit.OrderFlush)) {
+		if (unit.Orders.size() > 1
+			&& (unit.CurrentAction() == UnitActionStill || unit.OrderFlush)) {
 
 			if (unit.Removed) { // FIXME: johns I see this as an error
 				DebugPrint("Flushing removed unit\n");
@@ -1626,14 +1626,9 @@ static void HandleUnitAction(CUnit &unit)
 
 			order->ReleaseRefs(unit);
 
-			// Shift queue with structure assignment.
-			unit.OrderCount--;
 			unit.OrderFlush = 0;
 			delete unit.Orders[0];
-			for (int z = 0; z < unit.OrderCount; ++z) {
-				unit.Orders[z] = unit.Orders[z + 1];
-			}
-			unit.Orders.pop_back();
+			unit.Orders.erase(unit.Orders.begin());
 
 			//
 			// Note subaction 0 should reset.

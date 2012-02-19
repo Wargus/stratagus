@@ -78,7 +78,7 @@ void HandleActionFollow(COrder& order, CUnit &unit)
 
 		if (goal->tilePos == order.goalPos) {
 			// Move to the next order
-			if (unit.OrderCount > 1) {
+			if (unit.Orders.size() > 1) {
 				order.ClearGoal();
 				unit.ClearAction();
 				return;
