@@ -645,6 +645,7 @@ enum {
 	TELEPORTER_INDEX,
 	SHIELDPIERCE_INDEX,
 	SAVECARGO_INDEX,
+	NONSOLID_INDEX,
 	WALL_INDEX,
 	NBARALREADYDEFINED
 };
@@ -1011,6 +1012,7 @@ public:
 	unsigned Teleporter : 1;            /// Can teleport other units.
 	unsigned ShieldPiercing : 1;        /// Can directly damage shield-protected units, without shield damaging.
 	unsigned SaveCargo : 1;             /// Unit unloads his passengers after death.
+	unsigned NonSolid : 1;              /// Unit can be entered by other units.
 	unsigned Wall : 1;                  /// Use special logic for Direction field.
 
 	CVariable *Variable;            /// Array of user defined variables.

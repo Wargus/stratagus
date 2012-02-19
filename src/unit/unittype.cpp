@@ -133,7 +133,7 @@ CUnitType::CUnitType() :
 	BuilderOutside(0), BuilderLost(0), CanHarvest(0), Harvester(0),
 	Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
 	Indestructible(0), Teleporter(0), ShieldPiercing(0), SaveCargo(0),
-	Wall(0), Variable(NULL),
+	NonSolid(0), Wall(0), Variable(NULL),
 	GivesResource(0), Supply(0), Demand(0), FieldFlags(0), MovementMask(0),
 	Sprite(NULL), ShadowSprite(NULL)
 {
@@ -289,13 +289,13 @@ void UpdateStats(int reset)
 			}
 			type->MovementMask |= MapFieldNoBuilding;
 			//
-			// A little chaos, buildings without HP can be entered.
+			// A little chaos, buildings without HP or with special flag can be entered.
 			// The oil-patch is a very special case.
 			//
-			if (type->Variable[HP_INDEX].Max) {
-				type->FieldFlags = MapFieldBuilding;
-			} else {
+			if (type->NonSolid || !type->Variable[HP_INDEX].Max) {
 				type->FieldFlags = MapFieldNoBuilding;
+			} else {
+				type->FieldFlags = MapFieldBuilding;
 			}
 		} else switch (type->UnitType) {
 			case UnitTypeLand: // on land
