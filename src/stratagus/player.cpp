@@ -189,38 +189,17 @@ void SavePlayers(CFile *file)
 		// Resources
 		file->printf("  \"resources\", {");
 		for (int j = 0; j < MaxCosts; ++j) {
-			if (j) {
-				if (j == MaxCosts / 2) {
-					file->printf("\n ");
-				} else {
-					file->printf(" ");
-				}
-			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), p.Resources[j]);
+			file->printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.Resources[j]);
 		}
 		// Max Resources
-		file->printf("  \"max-resources\", {");
+		file->printf("},\n  \"max-resources\", {");
 		for (int j = 0; j < MaxCosts; ++j) {
-			if (j) {
-				if (j == MaxCosts / 2) {
-					file->printf("\n ");
-				} else {
-					file->printf(" ");
-				}
-			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), p.MaxResources[j]);
+			file->printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.MaxResources[j]);
 		}
 		// Last Resources
 		file->printf("},\n  \"last-resources\", {");
 		for (int j = 0; j < MaxCosts; ++j) {
-			if (j) {
-				if (j == MaxCosts / 2) {
-					file->printf("\n ");
-				} else {
-					file->printf(" ");
-				}
-			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), p.LastResources[j]);
+			file->printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.LastResources[j]);
 		}
 		// Incomes
 		file->printf("},\n  \"incomes\", {");
