@@ -3046,19 +3046,21 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 					MissileTypeByIdent(DamageMissile)->Range)->Damage = -damage;
 	}
 
-#if 0
-	// FIXME: want to show hits.
-	if (type.Organic) {
-		MakeMissile(MissileBlood,
+	// Show impact missiles
+	if (target.Variable[SHIELD_INDEX].Value > 0
+		&& !target.Type->Impact[ANIMATIONS_DEATHTYPES+1].Name.empty()) { // shield impact
+		MakeMissile(target.Type->Impact[ANIMATIONS_DEATHTYPES+1].Missile,
+			target.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2,
+			target.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2, 0, 0);
+	} else if (target.DamagedType && !target.Type->Impact[target.DamagedType].Name.empty()) { // specific to damage type impact
+		MakeMissile(target.Type->Impact[target.DamagedType].Missile,
+			target.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2,
+			target.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2, 0, 0);
+	} else if (!target.Type->Impact[ANIMATIONS_DEATHTYPES].Name.empty()) { // generic impact
+		MakeMissile(target.Type->Impact[ANIMATIONS_DEATHTYPES].Missile,
 			target.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2,
 			target.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2, 0, 0);
 	}
-	if (type.Building) {
-		MakeMissile(MissileSmallFire,
-			target.tilePos.x * PixelTileSize.x + (type->TileWidth * PixelTileSize.x) / 2,
-			target.tilePos.y * PixelTileSize.y + (type->TileHeight * PixelTileSize.y) / 2, 0, 0);
-	}
-#endif
 
 	if (type->Building && !target.Burning) {
 		const int f = (100 * target.Variable[HP_INDEX].Value) / target.Variable[HP_INDEX].Max;

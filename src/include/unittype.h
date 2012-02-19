@@ -928,12 +928,13 @@ public:
 		int NumIterations;
 	} Portrait;
 #endif
-	MissileConfig Missile;          /// Missile weapon
-	MissileConfig Explosion;        /// Missile for unit explosion
+	MissileConfig Missile;                           /// Missile weapon
+	MissileConfig Explosion;                         /// Missile for unit explosion
+	MissileConfig Impact[ANIMATIONS_DEATHTYPES + 2]; /// Missiles spawned if unit is hit(+shield)
 
 	LuaCallback *DeathExplosion;
 
-	std::string DamageType;               /// DamageType (used for extra death animations)
+	std::string DamageType;         /// DamageType (used for extra death animations and impacts)
 
 	std::string CorpseName;         /// Corpse type name
 	CUnitType *CorpseType;          /// Corpse unit-type

@@ -584,6 +584,12 @@ void LoadUnitTypes()
 		if (!type.Explosion.Name.empty()) {
 			type.Explosion.Missile = MissileTypeByIdent(type.Explosion.Name);
 		}
+		// Lookup impacts
+		for (int i = 0; i < ANIMATIONS_DEATHTYPES + 2; ++i) {
+			if (!type.Impact[i].Name.empty()) {
+				type.Impact[i].Missile = MissileTypeByIdent(type.Impact[i].Name);
+			}
+		}
 		// Lookup corpse.
 		if (!type.CorpseName.empty()) {
 			type.CorpseType = UnitTypeByIdent(type.CorpseName);

@@ -671,6 +671,49 @@ static int CclDefineUnitType(lua_State *l)
 			} else {
 				LuaError(l, "Unsupported Type: %s" _C_ value);
 			}
+		} else if (!strcmp(value, "Impact")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			subargs = lua_objlen(l, -1);
+			for (k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, -1, k + 1);
+				value = LuaToString(l, -1);
+				lua_pop(l, 1);
+				++k;
+
+				if (!strcmp(value, "general")) {
+					lua_rawgeti(l, -1, k + 1);
+					type->Impact[ANIMATIONS_DEATHTYPES].Name = LuaToString(l, -1);
+					type->Impact[ANIMATIONS_DEATHTYPES].Missile = NULL;
+					lua_pop(l, 1);
+				} else if (!strcmp(value, "shield")) {
+					lua_rawgeti(l, -1, k + 1);
+					type->Impact[ANIMATIONS_DEATHTYPES + 1].Name = LuaToString(l, -1);
+					type->Impact[ANIMATIONS_DEATHTYPES + 1].Missile = NULL;
+					lua_pop(l, 1);
+				} else {
+					int num;
+
+					lua_rawgeti(l, -1, k + 1);
+					const std::string name = LuaToString(l, -1);
+					lua_pop(l, 1);
+					for (num = 0; num < ANIMATIONS_DEATHTYPES; ++num) {
+						if (name == ExtraDeathTypes[num]) {
+							++k;
+							break;
+						}
+					}
+					if (num == ANIMATIONS_DEATHTYPES) {
+						LuaError(l, "Death type not found: %s" _C_ name.c_str());
+					} else {
+						lua_rawgeti(l, -1, k + 1);
+						type->Impact[num].Name = LuaToString(l, -1);
+						type->Impact[num].Missile = NULL;
+						lua_pop(l, 1);
+					}
+				}
+			}
 		} else if (!strcmp(value, "RightMouseAction")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "none")) {
