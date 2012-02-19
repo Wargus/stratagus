@@ -768,6 +768,8 @@ public:
 	bool CanMove() const { return Type->CanMove(); }
 
 	int GetDrawLevel() const;
+
+	PixelPos GetMapPixelPosCenter() const;
 };
 
 typedef COrder* COrderPtr;
@@ -1010,6 +1012,8 @@ extern void UnitClearOrders(CUnit &unit);
 extern void UpdateForNewUnit(const CUnit &unit, int upgrade);
 	/// @todo more docu
 extern void NearestOfUnit(const CUnit &unit, const Vec2i& pos, Vec2i *dpos);
+
+extern CUnit *GetFirstContainer(const CUnit &unit);
 
 	/// Call when an Unit goes under fog.
 extern void UnitGoesUnderFog(CUnit &unit, const CPlayer &player);

@@ -541,7 +541,7 @@ static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, 
 **
 **  @return      Container of container of ... of unit. It is not null.
 */
-static CUnit *GetFirstContainer(const CUnit &unit)
+CUnit *GetFirstContainer(const CUnit &unit)
 {
 	const CUnit *container = &unit;
 
@@ -2763,6 +2763,13 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 	return nunit;
 }
 
+PixelPos CUnit::GetMapPixelPosCenter() const
+{
+	const PixelPos center = { tilePos.x * PixelTileSize.x + Type->TileWidth * PixelTileSize.x / 2,
+							tilePos.y * PixelTileSize.y + Type->TileHeight * PixelTileSize.y / 2};
+	return center;
+}
+
 /**
 **  Let an unit die.
 **
@@ -2795,17 +2802,16 @@ void LetUnitDie(CUnit &unit)
 	// Catapults,... explodes.
 	//
 	if (type->ExplodeWhenKilled) {
-		MakeMissile(type->Explosion.Missile,
-			unit.tilePos.x * PixelTileSize.x + type->TileWidth * PixelTileSize.x / 2,
-			unit.tilePos.y * PixelTileSize.y + type->TileHeight * PixelTileSize.y / 2,
-			0, 0);
+		const PixelPos pixelPos = unit.GetMapPixelPosCenter();
+
+		MakeMissile(*type->Explosion.Missile, pixelPos, pixelPos);
 	}
 	if (type->DeathExplosion) {
+		const PixelPos pixelPos = unit.GetMapPixelPosCenter();
+
 		type->DeathExplosion->pushPreamble();
-		type->DeathExplosion->pushInteger(unit.tilePos.x * PixelTileSize.x +
-				type->TileWidth * PixelTileSize.x / 2);
-		type->DeathExplosion->pushInteger(unit.tilePos.y * PixelTileSize.y +
-				type->TileHeight * PixelTileSize.y / 2);
+		type->DeathExplosion->pushInteger(pixelPos.x);
+		type->DeathExplosion->pushInteger(pixelPos.y);
 		type->DeathExplosion->run();
 	}
 	// Handle Teleporter Destination Removal
@@ -3031,29 +3037,23 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		CommandStopUnit(*attacker); // Attacker shouldn't continue attack!
 	}
 
+	const PixelPos targetPixelCenter = target.GetMapPixelPosCenter();
+
 	if ((target.IsVisibleOnMap(*ThisPlayer) || ReplayRevealMap) && !DamageMissile.empty()) {
-		MakeLocalMissile(MissileTypeByIdent(DamageMissile),
-				target.tilePos.x * PixelTileSize.x + target.Type->TileWidth * PixelTileSize.x / 2,
-				target.tilePos.y * PixelTileSize.y + target.Type->TileHeight * PixelTileSize.y / 2,
-				target.tilePos.x * PixelTileSize.x + target.Type->TileWidth * PixelTileSize.x / 2 + 3,
-				target.tilePos.y * PixelTileSize.y + target.Type->TileHeight * PixelTileSize.y / 2 -
-					MissileTypeByIdent(DamageMissile)->Range)->Damage = -damage;
+		MissileType *mtype = MissileTypeByIdent(DamageMissile);
+		const PixelDiff offset = {3, -mtype->Range};
+
+		MakeLocalMissile(*mtype, targetPixelCenter, targetPixelCenter + offset)->Damage = -damage;
 	}
 
 	// Show impact missiles
 	if (target.Variable[SHIELD_INDEX].Value > 0
-		&& !target.Type->Impact[ANIMATIONS_DEATHTYPES+1].Name.empty()) { // shield impact
-		MakeMissile(target.Type->Impact[ANIMATIONS_DEATHTYPES+1].Missile,
-			target.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2,
-			target.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2, 0, 0);
+		&& !target.Type->Impact[ANIMATIONS_DEATHTYPES + 1].Name.empty()) { // shield impact
+		MakeMissile(*target.Type->Impact[ANIMATIONS_DEATHTYPES + 1].Missile, targetPixelCenter, targetPixelCenter);
 	} else if (target.DamagedType && !target.Type->Impact[target.DamagedType].Name.empty()) { // specific to damage type impact
-		MakeMissile(target.Type->Impact[target.DamagedType].Missile,
-			target.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2,
-			target.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2, 0, 0);
+		MakeMissile(*target.Type->Impact[target.DamagedType].Missile, targetPixelCenter, targetPixelCenter);
 	} else if (!target.Type->Impact[ANIMATIONS_DEATHTYPES].Name.empty()) { // generic impact
-		MakeMissile(target.Type->Impact[ANIMATIONS_DEATHTYPES].Missile,
-			target.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2,
-			target.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2, 0, 0);
+		MakeMissile(*target.Type->Impact[ANIMATIONS_DEATHTYPES].Missile, targetPixelCenter, targetPixelCenter);
 	}
 
 	if (type->Building && !target.Burning) {
@@ -3061,13 +3061,12 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		MissileType *fire = MissileBurningBuilding(f);
 
 		if (fire) {
-			Missile *missile = MakeMissile(fire,
-				target.tilePos.x * PixelTileSize.x + (type->TileWidth * PixelTileSize.x) / 2,
-				target.tilePos.y * PixelTileSize.y + (type->TileHeight * PixelTileSize.y) / 2 - PixelTileSize.y,
-				0, 0);
+			const PixelDiff offset = {0, -PixelTileSize.y};
+			Missile *missile = MakeMissile(*fire, targetPixelCenter - offset, targetPixelCenter - offset);
+
+			target.RefsIncrease();
 			missile->SourceUnit = &target;
 			target.Burning = 1;
-			target.RefsIncrease();
 		}
 	}
 

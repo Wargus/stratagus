@@ -150,7 +150,7 @@ int SaveGame(const std::string &filename)
 	SaveAi(&file);
 	SaveSelections(&file);
 	SaveGroups(&file);
-	SaveMissiles(&file);
+	SaveMissiles(file);
 	SaveReplayList(&file);
 	// FIXME: find all state information which must be saved.
 	s = SaveGlobal(Lua, true);

@@ -1418,16 +1418,14 @@ static void UISelectStateButtonDown(unsigned)
 		UI.ButtonPanel.Update();
 
 		if (MouseButtons & LeftButton) {
-			const CViewport *vp = UI.MouseViewport;
+			const CViewport &vp = *UI.MouseViewport;
+			const PixelPos screenPixelPos = {CursorX, CursorY};
+			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(screenPixelPos);
+
 			if (!ClickMissile.empty()) {
-				int mx = vp->MapX * PixelTileSize.x + CursorX - vp->X + vp->OffsetX;
-				int my = vp->MapY * PixelTileSize.y + CursorY - vp->Y + vp->OffsetY;
-				MakeLocalMissile(MissileTypeByIdent(ClickMissile),
-					mx, my, mx, my);
+				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
 			}
-			int sx = CursorX - vp->X + PixelTileSize.x * vp->MapX + vp->OffsetX;
-			int sy = CursorY - vp->Y + PixelTileSize.y * vp->MapY + vp->OffsetY;
-			SendCommand(sx, sy);
+			SendCommand(mapPixelPos.x, mapPixelPos.y);
 		}
 		return;
 	}
@@ -1438,10 +1436,13 @@ static void UISelectStateButtonDown(unsigned)
 	if (CursorOn == CursorOnMinimap) {
 		int mx = UI.Minimap.Screen2MapX(CursorX);
 		int my = UI.Minimap.Screen2MapY(CursorY);
+		const Vec2i cursorTilePos = {mx, my};
 
 		if (MouseButtons & LeftButton) {
-			int sx = mx * PixelTileSize.x;
-			int sy = my * PixelTileSize.y;
+			const int sx = cursorTilePos.x * PixelTileSize.x + PixelTileSize.x / 2;
+			const int sy = cursorTilePos.y * PixelTileSize.y + PixelTileSize.y / 2;
+			const PixelPos mapPixelPos = {sx, sy};
+
 			UI.StatusLine.Clear();
 			ClearCosts();
 			CursorState = CursorStatePoint;
@@ -1450,14 +1451,11 @@ static void UISelectStateButtonDown(unsigned)
 			CurrentButtonLevel = 0;
 			UI.ButtonPanel.Update();
 			if (!ClickMissile.empty()) {
-				MakeLocalMissile(MissileTypeByIdent(ClickMissile),
-					sx + PixelTileSize.x / 2, sy + PixelTileSize.y / 2, 0, 0);
+				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
 			}
-			SendCommand(sx, sy);
+			SendCommand(mapPixelPos.x, mapPixelPos.y);
 		} else {
-			const Vec2i cursorPos = {mx, my};
-
-			UI.SelectedViewport->Center(cursorPos, PixelTileSize / 2);
+			UI.SelectedViewport->Center(cursorTilePos, PixelTileSize / 2);
 		}
 		return;
 	}
@@ -1643,11 +1641,10 @@ void UIHandleButtonDown(unsigned button)
 					unit->Blink = 4;                // if right click on building -- blink
 				} else { // if not not click on building -- green cross
 					if (!ClickMissile.empty()) {
-						MakeLocalMissile(MissileTypeByIdent(ClickMissile),
-							UI.MouseViewport->MapX * PixelTileSize.x +
-								CursorX - UI.MouseViewport->X + UI.MouseViewport->OffsetX,
-							UI.MouseViewport->MapY * PixelTileSize.y +
-								CursorY - UI.MouseViewport->Y + UI.MouseViewport->OffsetY, 0, 0);
+						const PixelPos screenPos = {CursorX, CursorY};
+						const PixelPos mapPixelPos = UI.MouseViewport->ScreenToMapPixelPos(screenPos);
+
+						MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
 					}
 				}
 				DoRightButton(tilePos.x * PixelTileSize.x, tilePos.y * PixelTileSize.y);
@@ -1670,20 +1667,18 @@ void UIHandleButtonDown(unsigned button)
 	//  Cursor is on the minimap area
 	//
 	} else if (CursorOn == CursorOnMinimap) {
-		if (MouseButtons & LeftButton) { // enter move mini-mode
-			const Vec2i cursorPos = {UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY)};
+		const Vec2i cursorTilePos = {UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY)};
 
-			UI.SelectedViewport->Center(cursorPos, PixelTileSize / 2);
+		if (MouseButtons & LeftButton) { // enter move mini-mode
+			UI.SelectedViewport->Center(cursorTilePos, PixelTileSize / 2);
 		} else if (MouseButtons & RightButton) {
 			if (!GameObserve && !GamePaused) {
+				PixelPos mapPixelPos = { cursorTilePos.x * PixelTileSize.x + PixelTileSize.x / 2,
+										cursorTilePos.y * PixelTileSize.y + PixelTileSize.y / 2};
 				if (!ClickMissile.empty()) {
-					MakeLocalMissile(MissileTypeByIdent(ClickMissile),
-						UI.Minimap.Screen2MapX(CursorX) * PixelTileSize.x + PixelTileSize.x / 2,
-						UI.Minimap.Screen2MapY(CursorY) * PixelTileSize.y + PixelTileSize.y / 2, 0, 0);
+					MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
 				}
-				// DoRightButton() takes screen map coordinates
-				DoRightButton(UI.Minimap.Screen2MapX(CursorX) * PixelTileSize.x,
-					UI.Minimap.Screen2MapY(CursorY) * PixelTileSize.y);
+				DoRightButton(mapPixelPos.x, mapPixelPos.y);
 			}
 		}
 	//

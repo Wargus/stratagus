@@ -87,21 +87,14 @@ static const char *MissileClassNames[] = {
 */
 static int CclDefineMissileType(lua_State *l)
 {
-	const char *value;
-	const char *str;
-	MissileType *mtype;
-	unsigned i;
-	std::string file;
-
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
 
 	// Slot identifier
-
-	str = LuaToString(l, 1);
-	mtype = MissileTypeByIdent(str);
+	const char *str = LuaToString(l, 1);
+	MissileType *mtype = MissileTypeByIdent(str);
 
 	if (mtype) {
 		DebugPrint("Redefining missile-type `%s'\n" _C_ str);
@@ -114,11 +107,11 @@ static int CclDefineMissileType(lua_State *l)
 	// Ensure we don't divide by zero.
 	mtype->SplashFactor = 100;
 
-	//
 	// Parse the arguments
-	//
+	std::string file;
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
-		value = LuaToString(l, -2);
+		const char *value = LuaToString(l, -2);
+
 		if (!strcmp(value, "File")) {
 			file = LuaToString(l, -1);
 		} else if (!strcmp(value, "Size")) {
@@ -144,9 +137,10 @@ static int CclDefineMissileType(lua_State *l)
 		} else if (!strcmp(value, "ImpactSound")) {
 			mtype->ImpactSound.Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Class")) {
-			value = LuaToString(l, -1);
-			for (i = 0; MissileClassNames[i]; ++i) {
-				if (!strcmp(value, MissileClassNames[i])) {
+			const char* className = LuaToString(l, -1);
+			unsigned int i = 0;
+			for (; MissileClassNames[i]; ++i) {
+				if (!strcmp(className, MissileClassNames[i])) {
 					mtype->Class = i;
 					break;
 				}
@@ -246,12 +240,12 @@ static int CclMissile(lua_State *l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "local")) {
 			Assert(type);
-			missile = MakeLocalMissile(type, position, destination);
+			missile = MakeLocalMissile(*type, position, destination);
 			missile->Local = 1;
 			--j;
 		} else if (!strcmp(value, "global")) {
 			Assert(type);
-			missile = MakeMissile(type, position, destination);
+			missile = MakeMissile(*type, position, destination);
 			missile->position = position;
 			missile->source = source;
 			missile->destination = destination;
@@ -325,30 +319,23 @@ static int CclMissile(lua_State *l)
 */
 static int CclDefineBurningBuilding(lua_State *l)
 {
-	const char *value;
-	BurningBuildingFrame *ptr;
-	int args;
-	int j;
-	int subargs;
-	int k;
-
 	for (std::vector<BurningBuildingFrame *>::iterator i = BurningBuildingFrames.begin();
 			i != BurningBuildingFrames.end(); ++i) {
 		delete *i;
 	}
 	BurningBuildingFrames.clear();
 
-	args = lua_gettop(l);
-	for (j = 0; j < args; ++j) {
+	const int args = lua_gettop(l);
+	for (int j = 0; j < args; ++j) {
 		if (!lua_istable(l, j + 1)) {
 			LuaError(l, "incorrect argument");
 		}
+		BurningBuildingFrame *ptr = new BurningBuildingFrame;
+		const int subargs = lua_objlen(l, j + 1);
 
-		ptr = new BurningBuildingFrame;
-		subargs = lua_objlen(l, j + 1);
-		for (k = 0; k < subargs; ++k) {
+		for (int k = 0; k < subargs; ++k) {
 			lua_rawgeti(l, j + 1, k + 1);
-			value = LuaToString(l, -1);
+			const char *value = LuaToString(l, -1);
 			lua_pop(l, 1);
 			++k;
 

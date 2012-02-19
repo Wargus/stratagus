@@ -102,7 +102,7 @@
 **
 **    Class of the missile-type, defines the basic effects of the
 **    missile. Look at the different class identifiers for more
-**    informations (::_missile_class_, ::MissileClassNone, ...).
+**    informations (::MissileClassNone, ...).
 **
 **  MissileType::NumBounces
 **
@@ -335,47 +335,26 @@ class LuaCallback;
 #define MAX_LOCAL_MISSILES 4096  /// maximum number of local missiles
 
 /**
-**  Missile-type-class typedef
-*/
-typedef int MissileClass;
-
-/**
 **  Missile-class this defines how a missile-type reacts.
 **
 */
-enum _missile_class_ {
-	/// Missile does nothing
-	MissileClassNone,
-	/// Missile flies from x,y to x1,y1
-	MissileClassPointToPoint,
-	/// Missile flies from x,y to x1,y1 than shows hit animation.
-	MissileClassPointToPointWithHit,
-	/// Missile flies from x,y to x1,y1 and animates ONCE from start to finish and back
-	MissileClassPointToPointCycleOnce,
-	/// Missile flies from x,y to x1,y1 than bounces three times.
-	MissileClassPointToPointBounce,
-	/// Missile appears at x,y, does it's anim and vanishes.
-	MissileClassStay,
-	/// Missile appears at x,y, then cycle through the frames once.
-	MissileClassCycleOnce,
-	/// Missile doesn't move, than checks the source unit for HP.
-	MissileClassFire,
-	/// Missile shows the hit points.
-	MissileClassHit,
-	/// Missile flies from x,y to x1,y1 using a parabolic path
-	MissileClassParabolic,
-	/// Missile wait on x,y until a non-air unit comes by, the explodes.
-	MissileClassLandMine,
-	/// Missile appears at x,y, is whirlwind
-	MissileClassWhirlwind,
-	/// Missile surround x,y
-	MissileClassFlameShield,
-	/// Missile is death coil.
-	MissileClassDeathCoil,
-	/// Missile seeks towards to target unit
-	MissileClassTracer,
-	/// Missile remains clipped to target's current goal and plays his animation once
-	MissileClassClipToTarget
+enum {
+	MissileClassNone, /// Missile does nothing
+	MissileClassPointToPoint, /// Missile flies from x,y to x1,y1
+	MissileClassPointToPointWithHit, /// Missile flies from x,y to x1,y1 than shows hit animation.
+	MissileClassPointToPointCycleOnce, /// Missile flies from x,y to x1,y1 and animates ONCE from start to finish and back
+	MissileClassPointToPointBounce, /// Missile flies from x,y to x1,y1 than bounces three times.
+	MissileClassStay, /// Missile appears at x,y, does it's anim and vanishes.
+	MissileClassCycleOnce, /// Missile appears at x,y, then cycle through the frames once.
+	MissileClassFire, /// Missile doesn't move, than checks the source unit for HP.
+	MissileClassHit, /// Missile shows the hit points.
+	MissileClassParabolic, /// Missile flies from x,y to x1,y1 using a parabolic path
+	MissileClassLandMine, /// Missile wait on x,y until a non-air unit comes by, the explodes.
+	MissileClassWhirlwind, /// Missile appears at x,y, is whirlwind
+	MissileClassFlameShield, /// Missile surround x,y
+	MissileClassDeathCoil, /// Missile is death coil.
+	MissileClassTracer, /// Missile seeks towards to target unit
+	MissileClassClipToTarget /// Missile remains clipped to target's current goal and plays his animation once
 };
 
 	/// Base structure of missile-types
@@ -388,15 +367,11 @@ public:
 	void LoadMissileSprite();
 	void Init();
 	void DrawMissileType(int frame, const PixelPos &pos) const;
-	void DrawMissileType(int frame, int x, int y) const {
-		PixelPos pos = {x, y};
-
-		DrawMissileType(frame, pos);
-	}
 
 	int Width() const { return size.x; }
 	int Height() const { return size.y; }
 
+//private:
 	std::string Ident;         /// missile name
 	int Transparency;          /// missile transparency
 	PixelSize size;            /// missile size in pixels
@@ -413,7 +388,7 @@ public:
 	bool CanHitOwner;          /// missile can hit the owner
 	bool FriendlyFire;         /// missile can't hit own units
 
-	MissileClass Class;        /// missile class
+	int Class;                 /// missile class
 	int NumBounces;            /// number of bounces
 	int StartDelay;            /// missile start delay
 	int Sleep;                 /// missile sleep
@@ -436,30 +411,25 @@ public:
 ----------------------------------------------------------------------------*/
 
 	/// Missile on the map
-class Missile {
+class Missile
+{
 protected:
 	Missile();
 
 public:
 	virtual ~Missile() {};
 
-	static Missile *Init(MissileType *mtype, const PixelPos &startPos, const PixelPos &destPos);
-	static Missile *Init(MissileType *mtype, int sx, int sy, int dx, int dy) {
-		PixelPos startPos = {sx, sy};
-		PixelPos destPos = {dx, dy};
-
-		return Init(mtype, startPos, destPos);
-	}
+	static Missile *Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
 
 	virtual void Action() = 0;
 
-	void DrawMissile(const CViewport *vp) const;
-	void SaveMissile(CFile *file) const;
+	void DrawMissile(const CViewport &vp) const;
+	void SaveMissile(CFile &file) const;
 
 	PixelPos source; /// Missile source position
 	PixelPos position;   /// missile pixel position
 	PixelPos destination;  /// missile pixel destination
-	MissileType *Type;  /// missile-type pointer
+	const MissileType *Type;  /// missile-type pointer
 	int SpriteFrame;  /// sprite frame counter
 	int State;        /// state
 	int AnimWait;     /// Animation wait.
@@ -484,20 +454,19 @@ public:
 	static unsigned int Count; /// slot number generator.
 };
 
-struct MissileDrawProxy
+class MissileDrawProxy
 {
-	MissileType *Type;  /// missile-type pointer
+public:
+	void DrawMissile(const CViewport &vp) const;
+
+	void operator=(const Missile* missile);
+public:
+	const MissileType *Type;  /// missile-type pointer
 	union {
 		int Damage;  /// direct damage that missile applies
 		int SpriteFrame; /// sprite frame counter
 	} data;
-	short X;
-	short Y;
-
-	void DrawMissile(const CViewport *vp) const;
-
-	void operator=(const Missile* missile);
-
+	PixelPos pixelPos;
 };
 
 class MissileNone : public Missile {
@@ -599,40 +568,26 @@ extern MissileType *NewMissileTypeSlot(const std::string& ident);
 	/// Get missile-type by ident
 extern MissileType *MissileTypeByIdent(const std::string& ident);
 	/// create a missile
-extern Missile *MakeMissile(MissileType *mtype, const PixelPos &startPos, const PixelPos &destPos);
-inline Missile *MakeMissile(MissileType *mtype, int sx, int sy, int dx, int dy) {
-	const PixelPos startPos = {sx, sy};
-	const PixelPos destPos = {dx, dy};
-
-	return MakeMissile(mtype, startPos, destPos);
-}
+extern Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
 	/// create a local missile
-extern Missile *MakeLocalMissile(MissileType *mtype, const PixelPos &startPos, const PixelPos &destPos);
-inline Missile *MakeLocalMissile(MissileType *mtype, int sx, int sy, int dx, int dy) {
-	const PixelPos startPos = {sx, sy};
-	const PixelPos destPos = {dx, dy};
-
-	return MakeLocalMissile(mtype, startPos, destPos);
-}
+extern Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
 
 	/// fire a missile
 extern void FireMissile(CUnit &unit);
 
-extern int FindAndSortMissiles(const CViewport *vp,
-	Missile *table[], const int tablesize);
-extern int FindAndSortMissiles(const CViewport *vp,
-	 MissileDrawProxy table[], const int tablesize);
+extern int FindAndSortMissiles(const CViewport &vp, Missile *table[], const int tablesize);
+extern int FindAndSortMissiles(const CViewport &vp, MissileDrawProxy table[], const int tablesize);
 
 	/// handle all missiles
 extern void MissileActions();
 	/// distance from view point to missile
-extern int ViewPointDistanceToMissile(const Missile *missile);
+extern int ViewPointDistanceToMissile(const Missile &missile);
 
 	/// Get the burning building missile based on hp percent
 extern MissileType *MissileBurningBuilding(int percent);
 
 	/// Save missiles
-extern void SaveMissiles(CFile *file);
+extern void SaveMissiles(CFile &file);
 
 	/// Initialize missile-types
 extern void InitMissileTypes();

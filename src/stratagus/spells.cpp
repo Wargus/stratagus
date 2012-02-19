@@ -236,38 +236,28 @@ int AreaAdjustVitals::Cast(CUnit &caster, const SpellType *spell, CUnit *target,
 */
 int AreaBombardment::Cast(CUnit &caster, const SpellType *, CUnit *, int x, int y)
 {
-	int fields;
-	int shards;
-	int damage;
-	::Missile *mis;
-	int offsetx;
-	int offsety;
-	int dx;
-	int dy;
-	int i;
-	MissileType *missile;
+	int fields = this->Fields;
+	const int shards = this->Shards;
+	const int damage = this->Damage;
+	const PixelDiff offset = { this->StartOffsetX, this->StartOffsetY};
+	const MissileType *missile = this->Missile;
 
-	mis = NULL;
-
-	fields = this->Fields;
-	shards = this->Shards;
-	damage = this->Damage;
-	offsetx = this->StartOffsetX;
-	offsety = this->StartOffsetY;
-	missile = this->Missile;
 	while (fields--) {
-			// FIXME: radius configurable...
+		int dx;
+		int dy;
+
+		// FIXME: radius configurable...
 		do {
 			// find new destination in the map
 			dx = x + SyncRand() % 5 - 2;
 			dy = y + SyncRand() % 5 - 2;
 		} while (!Map.Info.IsPointOnMap(dx, dy));
-		for (i = 0; i < shards; ++i) {
-			mis = MakeMissile(missile,
-				dx * PixelTileSize.x + PixelTileSize.x / 2 + offsetx,
-				dy * PixelTileSize.y + PixelTileSize.y / 2 + offsety,
-				dx * PixelTileSize.x + PixelTileSize.x / 2,
-				dy * PixelTileSize.y + PixelTileSize.y / 2);
+
+		const PixelPos dest = { dx * PixelTileSize.x + PixelTileSize.x / 2,
+								dy * PixelTileSize.y + PixelTileSize.y / 2};
+		const PixelPos start = dest + offset;
+		for (int i = 0; i < shards; ++i) {
+			::Missile *mis = MakeMissile(*missile, start, dest);
 			//  FIXME: This is just patched up, it works, but I have no idea why.
 			//  FIXME: What is the reasoning behind all this?
 			if (mis->Type->Speed) {
@@ -334,18 +324,15 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation *location,
 */
 int SpawnMissile::Cast(CUnit &caster, const SpellType *, CUnit *target, int x, int y)
 {
-	::Missile *missile;
-	int sx;
-	int sy;
-	int dx;
-	int dy;
+	PixelPos startPos;
+	PixelPos endPos;
 
 	EvaluateMissileLocation(&this->StartPoint,
-		caster, target, x, y, &sx, &sy);
+		caster, target, x, y, &startPos.x, &startPos.y);
 	EvaluateMissileLocation(&this->EndPoint,
-		caster, target, x, y, &dx, &dy);
+		caster, target, x, y, &endPos.x, &endPos.y);
 
-	missile = MakeMissile(this->Missile, sx, sy, dx, dy);
+	::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
 	missile->TTL = this->TTL;
 	missile->Delay = this->Delay;
 	missile->Damage = this->Damage;

@@ -334,7 +334,7 @@ void PlayMissileSound(const Missile *missile, CSound *sound)
 	if (channel == -1) {
 		return;
 	}
-	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->Range));
+	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToMissile(*missile), sound->Range));
 	SetChannelStereo(channel, stereo);
 }
 

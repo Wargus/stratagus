@@ -163,6 +163,27 @@ void CViewport::MapPixel2Viewport(int &x, int &y) const
 	y = y + this->Y - (this->MapY * PixelTileSize.y + this->OffsetY);
 }
 
+// Convert viewport coordinates into map pixel coordinates
+PixelPos CViewport::ScreenToMapPixelPos(const PixelPos &screenPixelPos) const
+{
+	const int x = (screenPixelPos.x - this->X + this->MapX * PixelTileSize.x + this->OffsetX);
+	const int y = (screenPixelPos.y - this->Y + this->MapY * PixelTileSize.y + this->OffsetY);
+	const PixelPos mapPixelPos = {x, y};
+
+	return mapPixelPos;
+}
+
+// Convert map pixel coordinates into viewport coordinates
+PixelPos CViewport::MapToScreenPixelPos(const PixelPos &mapPixelPos) const
+{
+	PixelPos screenPixelPos = {
+		mapPixelPos.x + this->X - (this->MapX * PixelTileSize.x + this->OffsetX),
+		mapPixelPos.y + this->Y - (this->MapY * PixelTileSize.y + this->OffsetY)
+	};
+	return screenPixelPos;
+
+}
+
 /**
 **  Change viewpoint of map viewport v to x,y.
 **
@@ -341,7 +362,7 @@ public:
 		//
 		if (lock.TryLock()) {
 			nunits = FindAndSortUnits(vp, unittable);
-			nmissiles = FindAndSortMissiles(vp, missiletable, MAX_MISSILES * 9);
+			nmissiles = FindAndSortMissiles(*vp, missiletable, MAX_MISSILES * 9);
 			lock.UnLock();
 		}
 	}
@@ -355,7 +376,7 @@ public:
 				unittable[i].Draw(vp);
 				++i;
 			} else {
-				missiletable[j].DrawMissile(vp);
+				missiletable[j].DrawMissile(*vp);
 				++j;
 			}
 		}
@@ -363,7 +384,7 @@ public:
 			unittable[i].Draw(vp);
 		}
 		for (; j < nmissiles; ++j) {
-			missiletable[j].DrawMissile(vp);
+			missiletable[j].DrawMissile(*vp);
 		}
 		lock.UnLock();
 	}
@@ -406,7 +427,7 @@ void CViewport::Draw() const
 		// We find and sort units after draw level.
 		//
 		int nunits = FindAndSortUnits(this, unittable);
-		int nmissiles = FindAndSortMissiles(this, missiletable, MAX_MISSILES * 9);
+		int nmissiles = FindAndSortMissiles(*this, missiletable, MAX_MISSILES * 9);
 		int i = 0;
 		int j = 0;
 
@@ -415,7 +436,7 @@ void CViewport::Draw() const
 				unittable[i]->Draw(this);
 				++i;
 			} else {
-				missiletable[j]->DrawMissile(this);
+				missiletable[j]->DrawMissile(*this);
 				++j;
 			}
 		}
@@ -423,7 +444,7 @@ void CViewport::Draw() const
 			unittable[i]->Draw(this);
 		}
 		for (; j < nmissiles; ++j) {
-			missiletable[j]->DrawMissile(this);
+			missiletable[j]->DrawMissile(*this);
 		}
 	}
 

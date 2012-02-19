@@ -169,11 +169,11 @@ Missile::Missile() :
 **
 **  @return       created missile.
 */
-Missile *Missile::Init(MissileType *mtype, const PixelPos &startPos, const PixelPos &destPos)
+/* static */ Missile *Missile::Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos)
 {
 	Missile *missile = NULL;
 
-	switch (mtype->Class) {
+	switch (mtype.Class) {
 		case MissileClassNone :
 			missile = new MissileNone;
 			break;
@@ -223,13 +223,13 @@ Missile *Missile::Init(MissileType *mtype, const PixelPos &startPos, const Pixel
 			missile = new MissileClipToTarget;
 			break;
 	}
-	const PixelPos halfSize = mtype->size / 2;
+	const PixelPos halfSize = mtype.size / 2;
 	missile->position = startPos - halfSize;
 	missile->destination = destPos - halfSize;
 	missile->source = missile->position;
-	missile->Type = mtype;
-	missile->Wait = mtype->Sleep;
-	missile->Delay = mtype->StartDelay;
+	missile->Type = &mtype;
+	missile->Wait = mtype.Sleep;
+	missile->Delay = mtype.StartDelay;
 
 	return missile;
 }
@@ -243,7 +243,7 @@ Missile *Missile::Init(MissileType *mtype, const PixelPos &startPos, const Pixel
 **
 **  @return       created missile.
 */
-Missile *MakeMissile(MissileType *mtype, const PixelPos &startPos, const PixelPos &destPos)
+Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos)
 {
 	Missile *missile = Missile::Init(mtype, startPos, destPos);
 
@@ -260,7 +260,7 @@ Missile *MakeMissile(MissileType *mtype, const PixelPos &startPos, const PixelPo
 **
 **  @return       created missile.
 */
-Missile *MakeLocalMissile(MissileType *mtype, const PixelPos &startPos, const PixelPos &destPos)
+Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos)
 {
 	Missile *missile = Missile::Init(mtype, startPos, destPos);
 
@@ -356,6 +356,19 @@ static int CalculateDamage(const CUnit &attacker, const CUnit &goal)
 	return res;
 }
 
+
+/**
+**  Get pixel position of the center of the specified tilePos.
+*/
+static PixelPos GetPixelPosFromCenterTile(const Vec2i& tilePos)
+{
+	PixelPos pixelPos = {tilePos.x * PixelTileSize.x + PixelTileSize.x / 2,
+						tilePos.y * PixelTileSize.y + PixelTileSize.y / 2};
+
+	return pixelPos;
+}
+
+
 /**
 **  Fire missile.
 **
@@ -363,17 +376,11 @@ static int CalculateDamage(const CUnit &attacker, const CUnit &goal)
 */
 void FireMissile(CUnit &unit)
 {
-	int x;
-	int y;
 	CUnit *goal = unit.CurrentOrder()->GetGoal();
 
-	//
 	// Goal dead?
-	//
 	if (goal) {
-
 		// Better let the caller/action handle this.
-
 		if (goal->Destroyed) {
 			DebugPrint("destroyed unit\n");
 			return;
@@ -381,14 +388,11 @@ void FireMissile(CUnit &unit)
 		if (goal->Removed || goal->CurrentAction() == UnitActionDie) {
 			return;
 		}
-
 		// FIXME: Some missile hit the field of the target and all units on it.
 		// FIXME: goal is already dead, but missile could hit others?
 	}
 
-	//
 	// No missile hits immediately!
-	//
 	if (unit.Type->Missile.Missile->Class == MissileClassNone) {
 		// No goal, take target coordinates
 		if (!goal) {
@@ -414,20 +418,14 @@ void FireMissile(CUnit &unit)
 	}
 
 	// If Firing from inside a Bunker
-	if (unit.Container) {
-		x = unit.Container->tilePos.x * PixelTileSize.x + PixelTileSize.x / 2;  // missile starts in tile middle
-		y = unit.Container->tilePos.y * PixelTileSize.y + PixelTileSize.y / 2;
-	} else {
-		x = unit.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2;  // missile starts in tile middle
-		y = unit.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2;
-	}
+	CUnit* from = GetFirstContainer(unit);
+	const PixelPos startPixelPos = GetPixelPosFromCenterTile(from->tilePos);
 
 	Vec2i dpos;
 	if (goal) {
 		Assert(goal->Type);  // Target invalid?
-		//
 		// Moved out of attack range?
-		//
+
 		if (unit.MapDistanceTo(*goal) < unit.Type->MinAttackRange) {
 			DebugPrint("Missile target too near %d,%d\n" _C_
 				unit.MapDistanceTo(*goal) _C_ unit.Type->MinAttackRange);
@@ -436,20 +434,14 @@ void FireMissile(CUnit &unit)
 		}
 		// Fire to nearest point of the unit!
 		// If Firing from inside a Bunker
-		if (unit.Container) {
-			NearestOfUnit(*goal, unit.Container->tilePos, &dpos);
-		} else {
-			NearestOfUnit(*goal, unit.tilePos, &dpos);
-		}
+		NearestOfUnit(*goal, GetFirstContainer(unit)->tilePos, &dpos);
 	} else {
 		dpos = unit.CurrentOrder()->goalPos;
 		// FIXME: Can this be too near??
 	}
 
-	// Fire to the tile center of the destination.
-	dpos.x = dpos.x * PixelTileSize.x + PixelTileSize.x / 2;
-	dpos.y = dpos.y * PixelTileSize.y + PixelTileSize.y / 2;
-	Missile *missile = MakeMissile(unit.Type->Missile.Missile, x, y, dpos.x, dpos.y);
+	const PixelPos destPixelPos = GetPixelPosFromCenterTile(dpos);
+	Missile *missile = MakeMissile(*unit.Type->Missile.Missile, startPixelPos, destPixelPos);
 	//
 	// Damage of missile
 	//
@@ -556,25 +548,23 @@ void MissileType::DrawMissileType(int frame, const PixelPos &pos) const
 	}
 }
 
-void MissileDrawProxy::DrawMissile(const CViewport *vp) const
+void MissileDrawProxy::DrawMissile(const CViewport &vp) const
 {
-	const int x = this->X - vp->MapX * PixelTileSize.x + vp->X - vp->OffsetX;
-	const int y = this->Y - vp->MapY * PixelTileSize.y + vp->Y - vp->OffsetY;
+	const PixelPos sceenPixelPos = vp.MapToScreenPixelPos(this->pixelPos);
+
 	switch (this->Type->Class) {
 		case MissileClassHit:
-			CLabel(GetGameFont()).DrawClip(x,y, this->data.Damage);
-			//VideoDrawNumberClip(x, y, GetGameFont(), this->data.Damage);
+			CLabel(GetGameFont()).DrawClip(sceenPixelPos.x, sceenPixelPos.y, this->data.Damage);
 			break;
 		default:
-			this->Type->DrawMissileType(this->data.SpriteFrame, x, y);
+			this->Type->DrawMissileType(this->data.SpriteFrame, sceenPixelPos);
 			break;
 	}
 }
 
 void MissileDrawProxy::operator=(const Missile* missile) {
 	this->Type = missile->Type;
-	this->X = missile->position.x;
-	this->Y = missile->position.y;
+	this->pixelPos = missile->position;
 	if (missile->Type->Class == MissileClassHit) {
 		this->data.Damage = missile->Damage;
 	} else {
@@ -585,7 +575,7 @@ void MissileDrawProxy::operator=(const Missile* missile) {
 /**
 **  Draw missile.
 */
-void Missile::DrawMissile(const CViewport *vp) const
+void Missile::DrawMissile(const CViewport &vp) const
 {
 	Assert(this->Type);
 
@@ -597,20 +587,19 @@ void Missile::DrawMissile(const CViewport *vp) const
 		}
 #endif
 	}
-	const int x = this->position.x - vp->MapX * PixelTileSize.x + vp->X - vp->OffsetX;
-	const int y = this->position.y - vp->MapY * PixelTileSize.y + vp->Y - vp->OffsetY;
+	const PixelPos screenPixelPos = vp.MapToScreenPixelPos(this->position);
+
 	switch (this->Type->Class) {
 		case MissileClassHit:
-			CLabel(GetGameFont()).DrawClip(x, y, this->Damage);
+			CLabel(GetGameFont()).DrawClip(screenPixelPos.x, screenPixelPos.y, this->Damage);
 			break;
 		default:
-			this->Type->DrawMissileType(this->SpriteFrame, x, y);
+			this->Type->DrawMissileType(this->SpriteFrame, screenPixelPos);
 			break;
 	}
 }
 
-static bool MissileDrawLevelCompare(const Missile*const l,
-					const Missile*const r)
+static bool MissileDrawLevelCompare(const Missile*const l, const Missile*const r)
 {
 	if (l->Type->DrawLevel == r->Type->DrawLevel) {
 		return l->Slot < r->Slot;
@@ -628,22 +617,19 @@ static bool MissileDrawLevelCompare(const Missile*const l,
 **
 **  @return           number of missiles returned in table
 */
-int FindAndSortMissiles(const CViewport *vp,
-	Missile *table[], const int tablesize)
+int FindAndSortMissiles(const CViewport &vp, Missile *table[], const int tablesize)
 {
 	int nmissiles = 0;
 	std::vector<Missile *>::const_iterator i;
 
-	//
 	// Loop through global missiles, then through locals.
-	//
 	for (i = GlobalMissiles.begin(); i != GlobalMissiles.end() && nmissiles < tablesize; ++i) {
 		Missile &missile = *(*i);
 		if (missile.Delay || missile.Hidden) {
 			continue;  // delayed or hidden -> aren't shown
 		}
 		// Draw only visible missiles
-		if (MissileVisibleInViewport(*vp, missile)) {
+		if (MissileVisibleInViewport(vp, missile)) {
 			table[nmissiles++] = &missile;
 		}
 	}
@@ -662,19 +648,15 @@ int FindAndSortMissiles(const CViewport *vp,
 	return nmissiles;
 }
 
-int FindAndSortMissiles(const CViewport *vp,
-	MissileDrawProxy table[], const int tablesize)
+int FindAndSortMissiles(const CViewport &vp, MissileDrawProxy table[], const int tablesize)
 {
 	Assert(tablesize <= MAX_MISSILES * 9);
 
 	Missile *buffer[MAX_MISSILES * 9];
-	int n = FindAndSortMissiles(vp, buffer, MAX_MISSILES * 9);
+	const int n = FindAndSortMissiles(vp, buffer, MAX_MISSILES * 9);
 
-	if (n > 0) {
-		table[0] = buffer[0];
-		for (int i = 1; i < n; ++i) {
-			table[i] = buffer[i];
-		}
+	for (int i = 0; i < n; ++i) {
+		table[i] = buffer[i];
 	}
 	return n;
 }
@@ -764,7 +746,7 @@ static int PointToPointMissile(Missile &missile)
 
 	if (missile.Type->SmokeMissile && missile.CurrentStep) {
 		const PixelPos position =  missile.position + missile.Type->size / 2;
-		MakeMissile(missile.Type->SmokeMissile, position, position);
+		MakeMissile(*missile.Type->SmokeMissile, position, position);
 	}
 	return 0;
 }
@@ -794,7 +776,7 @@ static int TracerMissile(Missile &missile)
 
 	if (missile.Type->SmokeMissile && missile.CurrentStep) {
 		const PixelPos position =  missile.position + missile.Type->size / 2;
-		MakeMissile(missile.Type->SmokeMissile, position, position);
+		MakeMissile(*missile.Type->SmokeMissile, position, position);
 	}
 	return 0;
 }
@@ -835,7 +817,7 @@ static int ParabolicMissile(Missile &missile)
 	MissileNewHeadingFromXY(missile, missile.position - orig_pos);
 	if (missile.Type->SmokeMissile && missile.CurrentStep) {
 		const PixelPos position = missile.position + missile.Type->size / 2;
-		MakeMissile(missile.Type->SmokeMissile, position, position);
+		MakeMissile(*missile.Type->SmokeMissile, position, position);
 	}
 	return 0;
 }
@@ -913,7 +895,7 @@ static void MissileHit(Missile &missile)
 	// The impact generates a new missile.
 	//
 	if (mtype.ImpactMissile) {
-		MakeMissile(mtype.ImpactMissile, pixelPos, pixelPos);
+		MakeMissile(*mtype.ImpactMissile, pixelPos, pixelPos);
 	}
 	if (mtype.ImpactParticle) {
 		mtype.ImpactParticle->pushPreamble();
@@ -1162,9 +1144,9 @@ void MissileActions()
 **
 **  @return the computed value.
 */
-int ViewPointDistanceToMissile(const Missile *missile)
+int ViewPointDistanceToMissile(const Missile &missile)
 {
-	const PixelPos pixelPos = missile->position + missile->Type->size / 2;
+	const PixelPos pixelPos = missile.position + missile.Type->size / 2;
 	const Vec2i tilePos = { pixelPos.x / PixelTileSize.x, pixelPos.y / PixelTileSize.y };
 
 	return ViewPointDistance(tilePos);
@@ -1189,38 +1171,46 @@ MissileType *MissileBurningBuilding(int percent)
 }
 
 /**
+**  Save a specific pos.
+*/
+static void SavePixelPos(CFile &file, const PixelPos &pos)
+{
+	file.printf("{%d, %d}", pos.x, pos.y);
+}
+
+
+/**
 **  Save the state of a missile to file.
 **
 **  @param file  Output file.
 */
-void Missile::SaveMissile(CFile *file) const
+void Missile::SaveMissile(CFile &file) const
 {
-	file->printf("Missile(\"type\", \"%s\",", this->Type->Ident.c_str());
-	file->printf(" \"%s\",", this->Local ? "local" : "global");
-	file->printf(" \"pos\", {%d, %d}, \"origin-pos\", {%d, %d}, \"goal\", {%d, %d},",
-		this->position.x, this->position.y, this->source.x, this->source.y, this->destination.x, this->destination.y);
-	file->printf("\n  \"frame\", %d, \"state\", %d, \"anim-wait\", %d, \"wait\", %d, \"delay\", %d,\n ",
+	file.printf("Missile(\"type\", \"%s\",", this->Type->Ident.c_str());
+	file.printf(" \"%s\",", this->Local ? "local" : "global");
+	file.printf(" \"pos\", ");
+	SavePixelPos(file, this->position);
+	file.printf(", \"origin-pos\", ");
+	SavePixelPos(file, this->source);
+	file.printf(", \"goal\", ");
+	SavePixelPos(file, this->destination);
+	file.printf(",\n  \"frame\", %d, \"state\", %d, \"anim-wait\", %d, \"wait\", %d, \"delay\", %d,\n ",
 		this->SpriteFrame, this->State, this->AnimWait, this->Wait, this->Delay);
-
 	if (this->SourceUnit) {
-		file->printf(" \"source\", \"%s\",", UnitReference(*this->SourceUnit).c_str());
+		file.printf(" \"source\", \"%s\",", UnitReference(*this->SourceUnit).c_str());
 	}
 	if (this->TargetUnit) {
-		file->printf(" \"target\", \"%s\",", UnitReference(*this->TargetUnit).c_str());
+		file.printf(" \"target\", \"%s\",", UnitReference(*this->TargetUnit).c_str());
 	}
-
-	file->printf(" \"damage\", %d,", this->Damage);
-
-	file->printf(" \"ttl\", %d,", this->TTL);
+	file.printf(" \"damage\", %d,", this->Damage);
+	file.printf(" \"ttl\", %d,", this->TTL);
 	if (this->Hidden) {
-		file->printf(" \"hidden\", ");
+		file.printf(" \"hidden\", ");
 	}
-
-	file->printf(" \"step\", {%d, %d}", this->CurrentStep, this->TotalStep);
+	file.printf(" \"step\", {%d, %d}", this->CurrentStep, this->TotalStep);
 
 	// Slot filled in during init
-
-	file->printf(")\n");
+	file.printf(")\n");
 }
 
 /**
@@ -1228,12 +1218,12 @@ void Missile::SaveMissile(CFile *file) const
 **
 **  @param file  Output file.
 */
-void SaveMissiles(CFile *file)
+void SaveMissiles(CFile &file)
 {
 	std::vector<Missile *>::const_iterator i;
 
-	file->printf("\n--- -----------------------------------------\n");
-	file->printf("--- MODULE: missiles\n\n");
+	file.printf("\n--- -----------------------------------------\n");
+	file.printf("--- MODULE: missiles\n\n");
 
 	for (i = GlobalMissiles.begin(); i != GlobalMissiles.end(); ++i) {
 		(*i)->SaveMissile(file);
@@ -1248,9 +1238,7 @@ void SaveMissiles(CFile *file)
 */
 void MissileType::Init()
 {
-	//
 	// Resolve impact missiles and sounds.
-	//
 	if (!this->FiredSound.Name.empty()) {
 		this->FiredSound.Sound = SoundForName(this->FiredSound.Name);
 	}
@@ -1274,7 +1262,6 @@ void InitMissileTypes()
 #endif
 	for (std::vector<MissileType*>::iterator i = MissileTypes.begin(); i != MissileTypes.end(); ++i) {
 		(*i)->Init();
-
 	}
 }
 

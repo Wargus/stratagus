@@ -182,6 +182,11 @@ public:
 	/// Convert map pixel coordinates into viewport coordinates
 	void MapPixel2Viewport(int &x, int &y) const;
 
+	// Convert screen coordinates into map pixel coordinates
+	PixelPos ScreenToMapPixelPos(const PixelPos& screenPixelPos) const;
+	// Convert map pixel coordinates into screen coordinates
+	PixelPos MapToScreenPixelPos(const PixelPos& mapPixelPos) const;
+
 	/// Set the current map view to x,y(upper,left corner)
 	void Set(int x, int y, int offsetx, int offsety);
 	/// Center map on point in viewport

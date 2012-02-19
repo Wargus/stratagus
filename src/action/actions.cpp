@@ -1086,7 +1086,8 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 				const int desty = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.DestY);
 				const int flags = ParseAnimFlags(unit, unit.Anim.Anim->D.SpawnMissile.Flags);
 				CUnit *goal;
-				int x, y, dx, dy;
+				PixelPos start;
+				PixelPos dest;
 
 				if ((flags & ANIM_SM_RELTARGET) && unit.CurrentOrder()->HasGoal()) {
 					goal = unit.CurrentOrder()->GetGoal();
@@ -1094,37 +1095,37 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 					goal = &unit;
 				}
 				if ((flags & ANIM_SM_PIXEL)) {
-					x = goal->tilePos.x * PixelTileSize.x + goal->IX + startx;
-					y = goal->tilePos.y * PixelTileSize.y + goal->IY + starty;
+					start.x = goal->tilePos.x * PixelTileSize.x + goal->IX + startx;
+					start.y = goal->tilePos.y * PixelTileSize.y + goal->IY + starty;
 				} else {
-					x = (goal->tilePos.x + startx) * PixelTileSize.x + PixelTileSize.x / 2;
-					y = (goal->tilePos.y + starty) * PixelTileSize.y + PixelTileSize.y / 2;
+					start.x = (goal->tilePos.x + startx) * PixelTileSize.x + PixelTileSize.x / 2;
+					start.y = (goal->tilePos.y + starty) * PixelTileSize.y + PixelTileSize.y / 2;
 				}
 				if ((flags & ANIM_SM_TOTARGET) && goal->CurrentOrder()->HasGoal()) {
 					CUnit &target = *goal->CurrentOrder()->GetGoal();
 
 					if (flags & ANIM_SM_PIXEL) {
-						dx = target.tilePos.x * PixelTileSize.x + target.IX;
-						dy = target.tilePos.y * PixelTileSize.y + target.IY;
+						dest.x = target.tilePos.x * PixelTileSize.x + target.IX;
+						dest.y = target.tilePos.y * PixelTileSize.y + target.IY;
 					} else {
-						dx = target.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2;
-						dy = target.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2;
+						dest.x = target.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2;
+						dest.y = target.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2;
 					}
 				} else {
 					if ((flags & ANIM_SM_PIXEL)) {
-						dx = goal->tilePos.x * PixelTileSize.x + goal->IX + destx;
-						dy = goal->tilePos.y * PixelTileSize.y + goal->IY + desty;
+						dest.x = goal->tilePos.x * PixelTileSize.x + goal->IX + destx;
+						dest.y = goal->tilePos.y * PixelTileSize.y + goal->IY + desty;
 					} else {
-						dx = (unit.tilePos.x + destx) * PixelTileSize.x + PixelTileSize.x / 2;
-						dy = (unit.tilePos.y + desty) * PixelTileSize.y + PixelTileSize.y / 2;
+						dest.x = (unit.tilePos.x + destx) * PixelTileSize.x + PixelTileSize.x / 2;
+						dest.y = (unit.tilePos.y + desty) * PixelTileSize.y + PixelTileSize.y / 2;
 					}
 				}
-				const int dist = goal->MapDistanceTo(dx, dy);
+				const int dist = goal->MapDistanceTo(dest.x, dest.y);
 				if ((flags & ANIM_SM_RANGED) && !(flags & ANIM_SM_PIXEL)
 					&& dist > goal->Stats->Variables[ATTACKRANGE_INDEX].Max
 					&& dist < goal->Type->MinAttackRange) {
 				} else {
-					Missile *missile = MakeMissile(MissileTypeByIdent(unit.Anim.Anim->D.SpawnMissile.Missile), x, y, dx, dy);
+					Missile *missile = MakeMissile(*MissileTypeByIdent(unit.Anim.Anim->D.SpawnMissile.Missile), start, dest);
 					if (flags & ANIM_SM_DAMAGE) {
 						missile->SourceUnit = &unit;
 					}
