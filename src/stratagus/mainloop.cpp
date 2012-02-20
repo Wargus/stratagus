@@ -182,7 +182,10 @@ void DoScrollArea(int state, bool fast)
 	if (state & ScrollLeft) {
 		stepx = -stepx;
 	}
-	vp->Set(vp->MapX, vp->MapY, vp->OffsetX + stepx, vp->OffsetY + stepy);
+	const Vec2i vpTilePos = {vp->MapX, vp->MapY};
+	const PixelDiff offset = {vp->OffsetX + stepx, vp->OffsetY + stepy};
+
+	vp->Set(vpTilePos, offset);
 
 	// This recalulates some values
 	HandleMouseMove(CursorX, CursorY);

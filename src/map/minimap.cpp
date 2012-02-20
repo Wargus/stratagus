@@ -662,7 +662,7 @@ void CMinimap::Draw(int, int)
 **
 **  @return   Tile X coordinate.
 */
-int CMinimap::Screen2MapX(int x)
+int CMinimap::Screen2MapX(int x) const
 {
 	int tx;
 
@@ -680,7 +680,7 @@ int CMinimap::Screen2MapX(int x)
 **
 **  @return   Tile Y coordinate.
 */
-int CMinimap::Screen2MapY(int y)
+int CMinimap::Screen2MapY(int y) const
 {
 	int ty;
 
@@ -689,6 +689,13 @@ int CMinimap::Screen2MapY(int y)
 		return 0;
 	}
 	return std::min<int>(ty, Map.Info.MapHeight - 1);
+}
+
+Vec2i CMinimap::ScreenToTilePos(const PixelPos& screenPos) const
+{
+	const Vec2i tilePos = {Screen2MapX(screenPos.x), Screen2MapY(screenPos.y)};
+
+	return tilePos;
 }
 
 /**

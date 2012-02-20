@@ -42,8 +42,6 @@ class CMapArea
 
 class CViewport
 {
-	int Viewport2MapX(int x);
-	int Viewport2MapY(int y);
 };
 
 class CFiller

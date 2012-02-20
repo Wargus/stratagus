@@ -2765,8 +2765,8 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 
 PixelPos CUnit::GetMapPixelPosCenter() const
 {
-	const PixelPos center = { tilePos.x * PixelTileSize.x + Type->TileWidth * PixelTileSize.x / 2,
-							tilePos.y * PixelTileSize.y + Type->TileHeight * PixelTileSize.y / 2};
+	const PixelPos center = { tilePos.x * PixelTileSize.x + IX + Type->TileWidth * PixelTileSize.x / 2,
+							tilePos.y * PixelTileSize.y + IY + Type->TileHeight * PixelTileSize.y / 2};
 	return center;
 }
 

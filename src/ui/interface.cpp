@@ -428,8 +428,9 @@ static void UiSaveMapPosition(unsigned position)
 */
 static void UiRecallMapPosition(unsigned position)
 {
-	UI.SelectedViewport->Set(
-		SavedMapPositionX[position], SavedMapPositionY[position], PixelTileSize.x / 2, PixelTileSize.y / 2);
+	const Vec2i savedTilePos = {SavedMapPositionX[position], SavedMapPositionY[position]};
+
+	UI.SelectedViewport->Set(savedTilePos, PixelTileSize / 2);
 }
 
 /**

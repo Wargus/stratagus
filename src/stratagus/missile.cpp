@@ -490,7 +490,7 @@ static int MissileVisibleInViewport(const CViewport &vp, const Missile &missile)
 	Vec2i boxmax;
 
 	GetMissileMapArea(missile, boxmin, boxmax);
-	if (!vp.AnyMapAreaVisibleInViewport(boxmin.x, boxmin.y, boxmax.x, boxmax.y)) {
+	if (!vp.AnyMapAreaVisibleInViewport(boxmin, boxmax)) {
 		return 0;
 	}
 	Vec2i pos;

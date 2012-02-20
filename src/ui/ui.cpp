@@ -360,13 +360,15 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 
 	// Affect the old viewport.
 	for (int i = 0; i < num_vps; ++i) {
-		CViewport *vp = UI.Viewports + i;
+		CViewport &vp = UI.Viewports[i];
 
-		vp->X = new_vps[i].X;
-		vp->EndX = new_vps[i].EndX;
-		vp->Y = new_vps[i].Y;
-		vp->EndY = new_vps[i].EndY;
-		vp->Set(new_vps[i].MapX, new_vps[i].MapY, new_vps[i].OffsetX, new_vps[i].OffsetY);
+		vp.X = new_vps[i].X;
+		vp.EndX = new_vps[i].EndX;
+		vp.Y = new_vps[i].Y;
+		vp.EndY = new_vps[i].EndY;
+		const Vec2i vpTilePos = {new_vps[i].MapX, new_vps[i].MapY};
+		const PixelDiff offset = {new_vps[i].OffsetX, new_vps[i].OffsetY};
+		vp.Set(vpTilePos, offset);
 	}
 	UI.NumViewports = num_vps;
 

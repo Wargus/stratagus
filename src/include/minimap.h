@@ -63,8 +63,9 @@ public:
 	void DrawCursor(int vx, int vy);
 	void AddEvent(int x, int y, Uint32 color);
 
-	int Screen2MapX(int x);
-	int Screen2MapY(int y);
+	Vec2i ScreenToTilePos(const PixelPos& screenPos) const;
+	int Screen2MapX(int x) const;
+	int Screen2MapY(int y) const;
 
 	int X;
 	int Y;

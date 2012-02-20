@@ -109,12 +109,12 @@ void CParticleManager::add(CParticle *particle)
 	new_particles.push_back(particle);
 }
 
-CPosition CParticleManager::getScreenPos(const CPosition &pos)
+CPosition CParticleManager::getScreenPos(const CPosition &pos) const
 {
-	int x = (int)pos.x;
-	int y = (int)pos.y;
-	vp->MapPixel2Viewport(x, y);
-	return CPosition(x, y);
+	const PixelPos mapPixelPos = { (int)pos.x, (int)pos.y};
+	const PixelPos screenPixelPos = vp->MapToScreenPixelPos(mapPixelPos);
+
+	return CPosition(screenPixelPos.x, screenPixelPos.y);
 }
 
 //@}

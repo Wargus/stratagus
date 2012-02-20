@@ -795,9 +795,11 @@ void MouseScrollMap(int x, int y)
 		speed = UI.MouseScrollSpeedDefault;
 	}
 
-	UI.MouseViewport->Set(UI.MouseViewport->MapX, UI.MouseViewport->MapY,
-		UI.MouseViewport->OffsetX + speed * (x - CursorStartX),
-		UI.MouseViewport->OffsetY + speed * (y - CursorStartY));
+	const Vec2i vpTilePos = {UI.MouseViewport->MapX, UI.MouseViewport->MapY};
+	const PixelDiff vpOffset = {UI.MouseViewport->OffsetX, UI.MouseViewport->OffsetY};
+	const PixelDiff diff = {x - CursorX, y - CursorY};
+
+	UI.MouseViewport->Set(vpTilePos, vpOffset + speed * diff);
 	UI.MouseWarpX = CursorStartX;
 	UI.MouseWarpY = CursorStartY;
 }
@@ -883,13 +885,15 @@ void UIHandleMouseMove(int x, int y)
 
 	// This is forbidden for unexplored and not visible space
 	// FIXME: This must done new, moving units, scrolling...
-	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorX, CursorY)) {
-		const CViewport *vp = UI.MouseViewport;
-		const Vec2i tilePos = {vp->Viewport2MapX(x), vp->Viewport2MapY(y)};
+	const PixelPos cursorPixelPos = {CursorX, CursorY};
+	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(cursorPixelPos)) {
+		const CViewport &vp = *UI.MouseViewport;
+		const PixelPos screenPos = {x, y};
+		const Vec2i tilePos = vp.ScreenToTilePos(screenPos);
 
 		if (Map.IsFieldExplored(*ThisPlayer, tilePos) || ReplayRevealMap) {
-			UnitUnderCursor = UnitOnScreen(NULL, x - vp->X + vp->MapX * PixelTileSize.x + vp->OffsetX,
-				y - vp->Y + vp->MapY * PixelTileSize.y + vp->OffsetY);
+			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(screenPos);
+			UnitUnderCursor = UnitOnScreen(NULL, mapPixelPos.x, mapPixelPos.y);
 		}
 	} else if (CursorOn == CursorOnMinimap) {
 		const Vec2i tilePos = {UI.Minimap.Screen2MapX(x), UI.Minimap.Screen2MapY(y)};
@@ -1408,7 +1412,8 @@ static void UISelectStateButtonDown(unsigned)
 	//
 	//  Clicking on the map.
 	//
-	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorX, CursorY)) {
+	const PixelPos screenPixelPos = {CursorX, CursorY};
+	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(screenPixelPos)) {
 		UI.StatusLine.Clear();
 		ClearCosts();
 		CursorState = CursorStatePoint;
@@ -1419,7 +1424,6 @@ static void UISelectStateButtonDown(unsigned)
 
 		if (MouseButtons & LeftButton) {
 			const CViewport &vp = *UI.MouseViewport;
-			const PixelPos screenPixelPos = {CursorX, CursorY};
 			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(screenPixelPos);
 
 			if (!ClickMissile.empty()) {
@@ -1575,16 +1579,15 @@ void UIHandleButtonDown(unsigned button)
 			if (!DoubleLeftButton)
 				return;
 #endif
+			const PixelPos cursorPixelPos = {CursorX, CursorY};
 			// Possible Selected[0] was removed from map
 			// need to make sure there is a unit to build
-			if (Selected[0] && (MouseButtons & LeftButton) &&
-					UI.MouseViewport->IsInsideMapArea(CursorX, CursorY)) {// enter select mode
-				int explored;
-				const Vec2i tilePos = {UI.MouseViewport->Viewport2MapX(CursorX),
-										UI.MouseViewport->Viewport2MapY(CursorY)};
+			if (Selected[0] && (MouseButtons & LeftButton)
+				&& UI.MouseViewport->IsInsideMapArea(cursorPixelPos)) {// enter select mode
+				int explored = 1;
+				const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(cursorPixelPos);
 				// FIXME: error messages
 
-				explored = 1;
 				for (int j = 0; explored && j < Selected[0]->Type->TileHeight; ++j) {
 					for (int i = 0; i < Selected[0]->Type->TileWidth; ++i) {
 						const Vec2i tempPos = {i, j};
@@ -1629,12 +1632,12 @@ void UIHandleButtonDown(unsigned button)
 #else
 		} else if (MouseButtons & RightButton) {
 #endif
-			if (!GameObserve && !GamePaused && UI.MouseViewport->IsInsideMapArea(CursorX, CursorY)) {
+			const PixelPos cursorPixelPos = {CursorX, CursorY};
+			if (!GameObserve && !GamePaused && UI.MouseViewport->IsInsideMapArea(cursorPixelPos)) {
 				CUnit *unit;
 				// FIXME: Rethink the complete chaos of coordinates here
 				// FIXME: Johns: Perhaps we should use a pixel map coordinates
-				const Vec2i tilePos = {UI.MouseViewport->Viewport2MapX(CursorX),
-										UI.MouseViewport->Viewport2MapY(CursorY)};
+				const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(cursorPixelPos);
 
 				if (UnitUnderCursor != NULL && (unit = UnitOnMapTile(tilePos, -1)) &&
 						!UnitUnderCursor->Type->Decoration) {
@@ -1933,13 +1936,13 @@ void UIHandleButtonUp(unsigned button)
 			//
 			// cade: cannot select unit on invisible space
 			// FIXME: johns: only complete invisibile units
-			const Vec2i cursorTilePos = {UI.MouseViewport->Viewport2MapX(CursorX),
-										UI.MouseViewport->Viewport2MapY(CursorY)};
-			if (Map.IsFieldVisible(*ThisPlayer, cursorTilePos) || ReplayRevealMap) {
-				int pixelposx = CursorX - UI.MouseViewport->X + UI.MouseViewport->MapX * PixelTileSize.x + UI.MouseViewport->OffsetX;
-				int pixelposy = CursorY - UI.MouseViewport->Y + UI.MouseViewport->MapY * PixelTileSize.y + UI.MouseViewport->OffsetY;
+			const PixelPos cursorPixelPos = {CursorX, CursorY};
+			const Vec2i cursorTilePos = UI.MouseViewport->ScreenToTilePos(cursorPixelPos);
 
-				unit = UnitOnScreen(unit, pixelposx, pixelposy);
+			if (Map.IsFieldVisible(*ThisPlayer, cursorTilePos) || ReplayRevealMap) {
+				const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(cursorPixelPos);
+
+				unit = UnitOnScreen(unit, cursorMapPos.x, cursorMapPos.y);
 			}
 			if (unit) {
 				// FIXME: Not nice coded, button number hardcoded!

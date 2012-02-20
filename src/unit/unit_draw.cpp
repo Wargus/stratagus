@@ -171,15 +171,14 @@ void DrawUnitSelection(const CViewport *vp, const CUnit &unit)
 		return;
 	}
 
-	const CUnitType *type = unit.Type;
-	int x = vp->Map2ViewportX(unit.tilePos.x) + unit.IX +
-		type->TileWidth * PixelTileSize.x / 2 - type->BoxWidth / 2 -
-		(type->Width - type->Sprite->Width) / 2;
-	int y = vp->Map2ViewportY(unit.tilePos.y) + unit.IY +
-		type->TileHeight * PixelTileSize.y / 2 - type->BoxHeight / 2 -
-		(type->Height - type->Sprite->Height) / 2;
+	const CUnitType &type = *unit.Type;
+	const PixelPos screenPos = vp->TilePosToScreen_TopLeft(unit.tilePos);
+	const int x = screenPos.x + unit.IX +type.TileWidth * PixelTileSize.x / 2
+		- type.BoxWidth / 2 - (type.Width - type.Sprite->Width) / 2;
+	const int y = screenPos.y + unit.IY + type.TileHeight * PixelTileSize.y / 2
+		- type.BoxHeight / 2 - (type.Height - type.Sprite->Height) / 2;
 
-	DrawSelection(color, x, y, x + type->BoxWidth, y + type->BoxHeight);
+	DrawSelection(color, x, y, x + type.BoxWidth, y + type.BoxHeight);
 }
 
 /**
@@ -670,36 +669,32 @@ void DrawShadow(const CUnitType &type, int frame, int x, int y)
 **
 **  @param unit   Pointer to unit.
 **  @param order  Pointer to order.
-**  @param x      Resulting screen X cordinate.
-**  @param y      Resulting screen Y cordinate.
+**  @param pos    Resulting screen cordinates.
 */
-static void GetOrderPosition(const CUnit &unit, const COrderPtr order, int *x, int *y)
+static void GetOrderPosition(const CUnit &unit, const COrder &order, PixelPos *screenPos)
 {
+	Assert(screenPos);
+
 	CUnit *goal;
 
 	// FIXME: n0body: Check for goal gone?
-	if ((goal = order->GetGoal()) && (!goal->Removed)) {
+	if ((goal = order.GetGoal()) && (!goal->Removed)) {
 		// Order has a goal, get it's location.
-		*x = CurrentViewport->Map2ViewportX(goal->tilePos.x) + goal->IX +
-			goal->Type->TileWidth * PixelTileSize.x / 2;
-		*y = CurrentViewport->Map2ViewportY(goal->tilePos.y) + goal->IY +
-			goal->Type->TileHeight * PixelTileSize.y / 2;
+		const PixelPos mapPos = goal->GetMapPixelPosCenter();
+		*screenPos = CurrentViewport->MapToScreenPixelPos(mapPos);
 	} else {
-		if (order->goalPos.x >= 0 && order->goalPos.y >= 0) {
+		if (Map.Info.IsPointOnMap(order.goalPos)) {
 			// Order is for a location, show that.
-			*x = CurrentViewport->Map2ViewportX(order->goalPos.x) + PixelTileSize.x / 2;
-			*y = CurrentViewport->Map2ViewportY(order->goalPos.y) + PixelTileSize.y / 2;
+			*screenPos = CurrentViewport->TilePosToScreen_Center(order.goalPos);
 		} else {
 			// Some orders ignore x,y (like StandStill).
 			// Use the unit's position instead.
-			*x = CurrentViewport->Map2ViewportX(unit.tilePos.x) + unit.IX +
-				unit.Type->TileWidth * PixelTileSize.x / 2;
-			*y = CurrentViewport->Map2ViewportY(unit.tilePos.y) + unit.IY +
-				unit.Type->TileHeight * PixelTileSize.y / 2;
+			const PixelPos mapPos = unit.GetMapPixelPosCenter();
+			*screenPos = CurrentViewport->MapToScreenPixelPos(mapPos);
 		}
-		if (order->Action == UnitActionBuild) {
-			*x += (order->Arg1.Type->TileWidth - 1) * PixelTileSize.x / 2;
-			*y += (order->Arg1.Type->TileHeight - 1) * PixelTileSize.y / 2;
+		if (order.Action == UnitActionBuild) {
+			screenPos->x += (order.Arg1.Type->TileWidth - 1) * PixelTileSize.x / 2;
+			screenPos->y += (order.Arg1.Type->TileHeight - 1) * PixelTileSize.y / 2;
 		}
 	}
 }
@@ -708,22 +703,20 @@ static void GetOrderPosition(const CUnit &unit, const COrderPtr order, int *x, i
 **  Show the order on map.
 **
 **  @param unit   Unit pointer.
-**  @param x1     X pixel coordinate.
-**  @param y1     Y pixel coordinate.
+**  @param pos    screen pixel coordinate.
 **  @param order  Order to display.
 */
-static void ShowSingleOrder(const CUnit &unit, int x1, int y1, const COrderPtr order)
+static void ShowSingleOrder(const CUnit &unit, const PixelPos &pos, const COrder &order)
 {
-	int x2;
-	int y2;
 	Uint32 color;
 	Uint32 e_color;
-	bool dest;
 
-	GetOrderPosition(unit, order, &x2, &y2);
+	PixelPos pos1 = pos;
+	PixelPos pos2;
+	GetOrderPosition(unit, order, &pos2);
 
-	dest = false;
-	switch (order->Action) {
+	bool dest = false;
+	switch (order.Action) {
 		case UnitActionNone:
 			e_color = color = ColorGray;
 			break;
@@ -743,10 +736,9 @@ static void ShowSingleOrder(const CUnit &unit, int x1, int y1, const COrderPtr o
 			break;
 
 		case UnitActionPatrol:
-			Video.DrawLineClip(ColorGreen, x1, y1, x2, y2);
+			Video.DrawLineClip(ColorGreen, pos1.x, pos1.y, pos2.x, pos2.y);
 			e_color = color = ColorBlue;
-			x1 = CurrentViewport->Map2ViewportX(order->Arg1.Patrol.x) + PixelTileSize.x / 2;
-			y1 = CurrentViewport->Map2ViewportY(order->Arg1.Patrol.y) + PixelTileSize.y / 2;
+			pos1 = CurrentViewport->TilePosToScreen_Center(order.Arg1.Patrol);
 			dest = true;
 			break;
 
@@ -756,8 +748,7 @@ static void ShowSingleOrder(const CUnit &unit, int x1, int y1, const COrderPtr o
 			break;
 
 		case UnitActionAttackGround:
-			x2 = CurrentViewport->Map2ViewportX(order->goalPos.x) + PixelTileSize.x / 2;
-			y2 = CurrentViewport->Map2ViewportY(order->goalPos.y) + PixelTileSize.y / 2;
+			pos2 = CurrentViewport->TilePosToScreen_Center(order.goalPos);
 			// FALL THROUGH
 		case UnitActionAttack:
 			if (unit.SubAction & 2) { // Show weak targets.
@@ -802,10 +793,9 @@ static void ShowSingleOrder(const CUnit &unit, int x1, int y1, const COrderPtr o
 
 		case UnitActionBuild:
 		{
-			int w = order->Arg1.Type->BoxWidth;
-			int h = order->Arg1.Type->BoxHeight;
-			DrawSelection(ColorGray, x2 - w / 2, y2 - h / 2, x2 + w / 2,
-				y2 + h / 2);
+			int w = order.Arg1.Type->BoxWidth;
+			int h = order.Arg1.Type->BoxHeight;
+			DrawSelection(ColorGray, pos2.x - w / 2, pos2.y - h / 2, pos2.x + w / 2, pos2.y + h / 2);
 			e_color = color = ColorGreen;
 			dest = true;
 		}
@@ -827,14 +817,14 @@ static void ShowSingleOrder(const CUnit &unit, int x1, int y1, const COrderPtr o
 
 		default:
 			e_color = color = ColorGray;
-			DebugPrint("Unknown action %d\n" _C_ order->Action);
+			DebugPrint("Unknown action %d\n" _C_ order.Action);
 			break;
 	}
 
-	Video.FillCircleClip(color, x1, y1, 2);
+	Video.FillCircleClip(color, pos1.x, pos1.y, 2);
 	if (dest) {
-		Video.DrawLineClip(color, x1, y1, x2, y2);
-		Video.FillCircleClip(e_color, x2, y2, 3);
+		Video.DrawLineClip(color, pos1.x, pos1.y, pos2.x, pos2.y);
+		Video.FillCircleClip(e_color, pos2.x, pos2.y, 3);
 	}
 }
 
@@ -845,23 +835,16 @@ static void ShowSingleOrder(const CUnit &unit, int x1, int y1, const COrderPtr o
 */
 void ShowOrder(const CUnit &unit)
 {
-	int x1;
-	int y1;
-	COrderPtr order;
-
 	if (unit.Destroyed) {
 		return;
 	}
-
 	if (unit.Player != ThisPlayer && !ThisPlayer->IsAllied(unit)) {
 		return;
 	}
-
 	// Get current position
-	x1 = CurrentViewport->Map2ViewportX(
-		unit.tilePos.x) + unit.IX + unit.Type->TileWidth * PixelTileSize.x / 2;
-	y1 = CurrentViewport->Map2ViewportY(
-		unit.tilePos.y) + unit.IY + unit.Type->TileHeight * PixelTileSize.y / 2;
+	const PixelPos mapPos = unit.GetMapPixelPosCenter();
+	PixelPos screenStartPos = CurrentViewport->MapToScreenPixelPos(mapPos);
+	COrderPtr order;
 
 	// If the current order is cancelled show the next one
 	if (unit.Orders.size() > 1 && unit.OrderFlush) {
@@ -869,17 +852,18 @@ void ShowOrder(const CUnit &unit)
 	} else {
 		order = unit.Orders[0];
 	}
-	ShowSingleOrder(unit, x1, y1, order);
+	ShowSingleOrder(unit, screenStartPos, *order);
 
 	// Show the rest of the orders
 	for (size_t i = 1 + (unit.OrderFlush ? 1 : 0); i < unit.Orders.size(); ++i) {
-		GetOrderPosition(unit, unit.Orders[i - 1], &x1, &y1);
-		ShowSingleOrder(unit, x1, y1, unit.Orders[i]);
+		PixelPos screenPos;
+		GetOrderPosition(unit, *unit.Orders[i - 1], &screenPos);
+		ShowSingleOrder(unit, screenPos, *unit.Orders[i]);
 	}
 
 	// Show order for new trained units
-	if (!unit.CanMove() && unit.NewOrder) {
-		ShowSingleOrder(unit, x1, y1, unit.NewOrder);
+	if (unit.NewOrder) {
+		ShowSingleOrder(unit, screenStartPos, *unit.NewOrder);
 	}
 }
 
@@ -1118,14 +1102,12 @@ void CUnit::Draw(const CViewport *vp) const
 	int player = this->RescuedFrom ? this->RescuedFrom->Index : this->Player->Index;
 	int action = this->CurrentAction();
 	if (ReplayRevealMap || IsVisible) {
+		const PixelPos &screenPos = vp->TilePosToScreen_TopLeft(this->tilePos);
 		type = this->Type;
 		frame = this->Frame;
-		y = this->IY;
-		x = this->IX;
-		x += vp->Map2ViewportX(this->tilePos.x);
-		y += vp->Map2ViewportY(this->tilePos.y);
-		state = (action == UnitActionBuilt) |
-				((action == UnitActionUpgradeTo) << 1);
+		x = screenPos.x + this->IX;
+		y = screenPos.y + this->IY;
+		state = (action == UnitActionBuilt) | ((action == UnitActionUpgradeTo) << 1);
 		constructed = this->Constructed;
 		// Reset Type to the type being upgraded to
 		if (state == 2) {
@@ -1134,10 +1116,11 @@ void CUnit::Draw(const CViewport *vp) const
 		// This is trash unless the unit is being built, and that's when we use it.
 		cframe = this->CurrentOrder()->Data.Built.Frame;
 	} else {
-		y = this->Seen.IY;
-		x = this->Seen.IX;
-		x += vp->Map2ViewportX(this->Seen.X);
-		y += vp->Map2ViewportY(this->Seen.Y);
+		const Vec2i seenTilePos = {this->Seen.X, this->Seen.Y};
+		const PixelPos &screenPos = vp->TilePosToScreen_TopLeft(seenTilePos);
+
+		x = screenPos.x + this->Seen.IX;
+		y = screenPos.y + this->Seen.IY;
 		frame = this->Seen.Frame;
 		type = this->Seen.Type;
 		constructed = this->Seen.Constructed;
@@ -1401,8 +1384,10 @@ void CUnitDrawProxy::DrawSelectionAt(int x, int y) const
 
 void CUnitDrawProxy::Draw(const CViewport *vp) const
 {
-	int x = this->IX + vp->Map2ViewportX(this->X);
-	int y = this->IY + vp->Map2ViewportY(this->Y);
+	const Vec2i tilePos = {this->X, this->Y};
+	const PixelPos screenPos = vp->TilePosToScreen_TopLeft(tilePos);
+	const int x = screenPos.x + this->IX;
+	const int y = screenPos.y + this->IY;
 
 	/* FIXME: check if we have to push real type here?*/
 	if (state == 1 && cframe) {

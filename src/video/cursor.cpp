@@ -193,9 +193,12 @@ static void DrawBuildingCursor()
 {
 	// Align to grid
 	const CViewport &vp = *UI.MouseViewport;
-	int x = CursorX - (CursorX - vp.X + vp.OffsetX) % PixelTileSize.x;
-	int y = CursorY - (CursorY - vp.Y + vp.OffsetY) % PixelTileSize.y;
-	const Vec2i mpos = {vp.Viewport2MapX(x), vp.Viewport2MapY(y)};
+	const PixelPos cursorScreenPos = {CursorX, CursorY};
+//	int x = CursorX - (CursorX - vp.X + vp.OffsetX) % PixelTileSize.x;
+//	int y = CursorY - (CursorY - vp.Y + vp.OffsetY) % PixelTileSize.y;
+	const Vec2i mpos = vp.ScreenToTilePos(cursorScreenPos);
+	const PixelPos screenPos = vp.TilePosToScreen_TopLeft(mpos);
+
 	CUnit *ontop = NULL;
 
 	//
@@ -208,13 +211,13 @@ static void DrawBuildingCursor()
 #endif
 	PushClipping();
 	SetClipping(vp.X, vp.Y, vp.EndX, vp.EndY);
-	DrawShadow(*CursorBuilding, CursorBuilding->StillFrame, x, y);
+	DrawShadow(*CursorBuilding, CursorBuilding->StillFrame, screenPos.x, screenPos.y);
 	DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
-		CursorBuilding->StillFrame, x, y);
+		CursorBuilding->StillFrame, screenPos.x, screenPos.y);
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value>0){
 		Video.DrawCircleClip(ColorRed,
-					x + CursorBuilding->TileWidth * PixelTileSize.x / 2,
-					y + CursorBuilding->TileHeight * PixelTileSize.y / 2,
+					screenPos.x + CursorBuilding->TileWidth * PixelTileSize.x / 2,
+					screenPos.y + CursorBuilding->TileHeight * PixelTileSize.y / 2,
 					(CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileWidth - 1)) * PixelTileSize.x + 1);
 	}
 
@@ -261,8 +264,8 @@ static void DrawBuildingCursor()
 			} else {
 				color = ColorRed;
 			}
-			Video.FillTransRectangleClip(color, x + w * PixelTileSize.x, y + h *
-				PixelTileSize.y, PixelTileSize.x, PixelTileSize.y, 95);
+			Video.FillTransRectangleClip(color, screenPos.x + w * PixelTileSize.x,
+										screenPos.y + h * PixelTileSize.y, PixelTileSize.x, PixelTileSize.y, 95);
 		}
 	}
 	PopClipping();

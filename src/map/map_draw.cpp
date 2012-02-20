@@ -60,114 +60,36 @@
 /**
 **  Check if any part of an area is visible in a viewport.
 **
-**  @param sx  X map tile position of area in map to be checked.
-**  @param sy  Y map tile position of area in map to be checked.
-**  @param ex  X map tile position of area in map to be checked.
-**  @param ey  Y map tile position of area in map to be checked.
+**  @param boxmin  map tile position of area in map to be checked.
+**  @param boxmax  map tile position of area in map to be checked.
 **
 **  @return    True if any part of area is visible, false otherwise
 */
-bool CViewport::AnyMapAreaVisibleInViewport(int sx, int sy, int ex, int ey) const
+bool CViewport::AnyMapAreaVisibleInViewport(const Vec2i &boxmin, const Vec2i &boxmax) const
 {
-	if (ex < this->MapX || ey < this->MapY ||
-			sx >= this->MapX + this->MapWidth || sy >= this->MapY + this->MapHeight) {
+	Assert(boxmin.x <= boxmax.x && boxmin.y <= boxmax.y);
+
+	if (boxmax.x < this->MapX
+		|| boxmax.y < this->MapY
+		|| boxmin.x >= this->MapX + this->MapWidth
+		|| boxmin.y >= this->MapY + this->MapHeight) {
 		return false;
 	}
 	return true;
 }
 
-bool CViewport::IsInsideMapArea(int x, int y) const
+bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
 {
-	int tilex;
-	int tiley;
+	const Vec2i tilePos = ScreenToTilePos(screenPixelPos);
 
-	tilex = x - this->X + this->MapX * PixelTileSize.x + this->OffsetX;
-	if (tilex < 0) {
-		tilex = (tilex - PixelTileSize.x + 1) / PixelTileSize.x;
-	} else {
-		tilex /= PixelTileSize.x;
-	}
-
-	tiley = y - this->Y + this->MapY * PixelTileSize.y + this->OffsetY;
-	if (tiley < 0) {
-		tiley = (tiley - PixelTileSize.y + 1) / PixelTileSize.y;
-	} else {
-		tiley /= PixelTileSize.y;
-	}
-
-	return (tilex >= 0 && tiley >= 0 && tilex < Map.Info.MapWidth && tiley < Map.Info.MapHeight);
-}
-
-/**
-**  Convert viewport x coordinate to map tile x coordinate.
-**
-**  @param x   X coordinate into this viewport (in pixels, relative
-**             to origin of Stratagus's window - not the viewport
-**             itself!).
-**
-**  @return    X map tile coordinate.
-*/
-int CViewport::Viewport2MapX(int x) const
-{
-	int r = (x - this->X + this->MapX * PixelTileSize.x + this->OffsetX) / PixelTileSize.x;
-	return std::min<int>(r, Map.Info.MapWidth - 1);
-}
-
-/**
-**  Convert viewport y coordinate to map tile y coordinate.
-**
-**  @param y   Y coordinate into this viewport (in pixels, relative
-**             to origin of Stratagus's window - not the viewport
-**             itself!).
-**
-**  @return    Y map tile coordinate.
-*/
-int CViewport::Viewport2MapY(int y) const
-{
-	int r = (y - this->Y + this->MapY * PixelTileSize.y + this->OffsetY) / PixelTileSize.y;
-	return std::min<int>(r, Map.Info.MapHeight - 1);
-}
-
-/**
-**  Convert a map tile X coordinate into a viewport x pixel coordinate.
-**
-**  @param x   The map tile's X coordinate.
-**
-**  @return    X screen coordinate in pixels (relative
-**             to origin of Stratagus's window).
-*/
-int CViewport::Map2ViewportX(int x) const
-{
-	return this->X + (x - this->MapX) * PixelTileSize.x - this->OffsetX;
-}
-
-/**
-**  Convert a map tile Y coordinate into a viewport y pixel coordinate.
-**
-**  @param y   The map tile's Y coordinate.
-**
-**  @return    Y screen coordinate in pixels (relative
-**             to origin of Stratagus's window).
-*/
-int CViewport::Map2ViewportY(int y) const
-{
-	return this->Y + (y - this->MapY) * PixelTileSize.y - this->OffsetY;
-}
-
-/**
-**  Convert map pixel coordinates into viewport coordinates.
-*/
-void CViewport::MapPixel2Viewport(int &x, int &y) const
-{
-	x = x + this->X - (this->MapX * PixelTileSize.x + this->OffsetX);
-	y = y + this->Y - (this->MapY * PixelTileSize.y + this->OffsetY);
+	return Map.Info.IsPointOnMap(tilePos);
 }
 
 // Convert viewport coordinates into map pixel coordinates
 PixelPos CViewport::ScreenToMapPixelPos(const PixelPos &screenPixelPos) const
 {
-	const int x = (screenPixelPos.x - this->X + this->MapX * PixelTileSize.x + this->OffsetX);
-	const int y = (screenPixelPos.y - this->Y + this->MapY * PixelTileSize.y + this->OffsetY);
+	const int x = screenPixelPos.x - this->X + this->MapX * PixelTileSize.x + this->OffsetX;
+	const int y = screenPixelPos.y - this->Y + this->MapY * PixelTileSize.y + this->OffsetY;
 	const PixelPos mapPixelPos = {x, y};
 
 	return mapPixelPos;
@@ -181,34 +103,49 @@ PixelPos CViewport::MapToScreenPixelPos(const PixelPos &mapPixelPos) const
 		mapPixelPos.y + this->Y - (this->MapY * PixelTileSize.y + this->OffsetY)
 	};
 	return screenPixelPos;
+}
 
+/// convert screen coordinate into tilepos
+Vec2i CViewport::ScreenToTilePos(const PixelPos& screenPixelPos) const
+{
+	const PixelPos mapPixelPos = ScreenToMapPixelPos(screenPixelPos);
+	const Vec2i tilePos = {mapPixelPos.x / PixelTileSize.x, mapPixelPos.y / PixelTileSize.y};
+
+	return tilePos;
+}
+
+/// convert tilepos coordonates into screen (take the top left of the tile)
+PixelPos CViewport::TilePosToScreen_TopLeft(const Vec2i &tilePos) const
+{
+	const PixelPos mapPos = {tilePos.x * PixelTileSize.x, tilePos.y * PixelTileSize.y};
+
+	return MapToScreenPixelPos(mapPos);
+}
+
+/// convert tilepos coordonates into screen (take the center of the tile)
+PixelPos CViewport::TilePosToScreen_Center(const Vec2i &tilePos) const
+{
+	const PixelPos topLeft = TilePosToScreen_TopLeft(tilePos);
+
+	return topLeft + PixelTileSize / 2;
 }
 
 /**
-**  Change viewpoint of map viewport v to x,y.
+**  Change viewpoint of map viewport v to tilePos.
 **
-**  @param x        X map tile position.
-**  @param y        Y map tile position.
-**  @param offsetx  X offset in tile.
-**  @param offsety  Y offset in tile.
+**  @param tilePos  map tile position.
+**  @param offset   offset in tile.
 */
-void CViewport::Set(int x, int y, int offsetx, int offsety)
+void CViewport::Set(const PixelPos &mapPos)
 {
-	x = x * PixelTileSize.x + offsetx;
-	y = y * PixelTileSize.y + offsety;
+	int x = mapPos.x;
+	int y = mapPos.y;
 
-	if (x < -UI.MapArea.ScrollPaddingLeft) {
-		x = -UI.MapArea.ScrollPaddingLeft;
-	}
-	if (y < -UI.MapArea.ScrollPaddingTop) {
-		y = -UI.MapArea.ScrollPaddingTop;
-	}
-	if (x > Map.Info.MapWidth * PixelTileSize.x - (this->EndX - this->X) - 1 + UI.MapArea.ScrollPaddingRight) {
-		x = Map.Info.MapWidth * PixelTileSize.x- (this->EndX - this->X) - 1 + UI.MapArea.ScrollPaddingRight;
-	}
-	if (y > Map.Info.MapHeight * PixelTileSize.y- (this->EndY - this->Y) - 1 + UI.MapArea.ScrollPaddingBottom) {
-		y = Map.Info.MapHeight * PixelTileSize.y- (this->EndY - this->Y) - 1 + UI.MapArea.ScrollPaddingBottom;
-	}
+	x = std::max(x, -UI.MapArea.ScrollPaddingLeft);
+	y = std::max(y, -UI.MapArea.ScrollPaddingTop);
+
+	x = std::min(x, Map.Info.MapWidth * PixelTileSize.x - (this->EndX - this->X) - 1 + UI.MapArea.ScrollPaddingRight);
+	y = std::min(y, Map.Info.MapHeight * PixelTileSize.y - (this->EndY - this->Y) - 1 + UI.MapArea.ScrollPaddingBottom);
 
 	this->MapX = x / PixelTileSize.x;
 	if (x < 0 && x % PixelTileSize.x) {
@@ -231,6 +168,21 @@ void CViewport::Set(int x, int y, int offsetx, int offsety)
 }
 
 /**
+**  Change viewpoint of map viewport v to tilePos.
+**
+**  @param tilePos  map tile position.
+**  @param offset   offset in tile.
+*/
+void CViewport::Set(const Vec2i &tilePos, const PixelDiff &offset)
+{
+	const int x = tilePos.x * PixelTileSize.x + offset.x;
+	const int y = tilePos.y * PixelTileSize.y + offset.y;
+	const PixelPos mapPixelPos = {x, y};
+
+	this->Set(mapPixelPos);
+}
+
+/**
 **  Center map viewport v on map tile (pos).
 **
 **  @param pos     map tile position.
@@ -238,9 +190,11 @@ void CViewport::Set(int x, int y, int offsetx, int offsety)
 */
 void CViewport::Center(const Vec2i &pos, const PixelDiff &offset)
 {
-	int x = pos.x * PixelTileSize.x + offset.x - (this->EndX - this->X) / 2;
-	int y = pos.y * PixelTileSize.y + offset.y - (this->EndY - this->Y) / 2;
-	this->Set(x / PixelTileSize.x, y / PixelTileSize.y, x % PixelTileSize.x, y % PixelTileSize.y);
+	const int x = pos.x * PixelTileSize.x + offset.x - (this->EndX - this->X) / 2;
+	const int y = pos.y * PixelTileSize.y + offset.y - (this->EndY - this->Y) / 2;
+	const PixelPos mapPixelPos = {x, y};
+
+	this->Set(mapPixelPos);
 }
 
 /**
@@ -353,38 +307,36 @@ void CViewport::DrawMapBackgroundInViewport() const
 
 class CDrawProxy {
 public:
-	CDrawProxy(): nunits(0), nmissiles(0) {}
+	CDrawProxy() : nunits(0), nmissiles(0) {}
 
-	void Update(const CViewport *const vp)
+	void Update(const CViewport &vp)
 	{
-		//
 		// We find and sort units after draw level.
-		//
 		if (lock.TryLock()) {
-			nunits = FindAndSortUnits(vp, unittable);
-			nmissiles = FindAndSortMissiles(*vp, missiletable, MAX_MISSILES * 9);
+			nunits = FindAndSortUnits(&vp, unittable);
+			nmissiles = FindAndSortMissiles(vp, missiletable, MAX_MISSILES * 9);
 			lock.UnLock();
 		}
 	}
 
-	void Draw(const CViewport *const vp)
+	void Draw(const CViewport &vp)
 	{
 		int i = 0, j = 0;
 		lock.Lock ();
 		while (i < nunits && j < nmissiles) {
 			if (unittable[i].Type->DrawLevel <= missiletable[j].Type->DrawLevel) {
-				unittable[i].Draw(vp);
+				unittable[i].Draw(&vp);
 				++i;
 			} else {
-				missiletable[j].DrawMissile(*vp);
+				missiletable[j].DrawMissile(vp);
 				++j;
 			}
 		}
 		for (; i < nunits; ++i) {
-			unittable[i].Draw(vp);
+			unittable[i].Draw(&vp);
 		}
 		for (; j < nmissiles; ++j) {
-			missiletable[j].DrawMissile(*vp);
+			missiletable[j].DrawMissile(vp);
 		}
 		lock.UnLock();
 	}
@@ -401,7 +353,7 @@ void CViewport::UpdateUnits()
 	if (!Proxy) {
 		Proxy = new CDrawProxy();
 	}
-	Proxy->Update(this);
+	Proxy->Update(*this);
 }
 
 /**
@@ -409,7 +361,6 @@ void CViewport::UpdateUnits()
 */
 void CViewport::Draw() const
 {
-
 	PushClipping();
 	SetClipping(this->X, this->Y, this->EndX, this->EndY);
 
@@ -418,16 +369,14 @@ void CViewport::Draw() const
 
 	CurrentViewport = this;
 	if (Proxy) {
-		Proxy->Draw(this);
-	} else 	{
+		Proxy->Draw(*this);
+	} else {
 		CUnit *unittable[UnitMax];
 		Missile* missiletable[MAX_MISSILES * 9];
 
-		//
 		// We find and sort units after draw level.
-		//
-		int nunits = FindAndSortUnits(this, unittable);
-		int nmissiles = FindAndSortMissiles(*this, missiletable, MAX_MISSILES * 9);
+		const int nunits = FindAndSortUnits(this, unittable);
+		const int nmissiles = FindAndSortMissiles(*this, missiletable, MAX_MISSILES * 9);
 		int i = 0;
 		int j = 0;
 
@@ -455,16 +404,14 @@ void CViewport::Draw() const
 	// Drawn here so that they are shown even when the unit is out of the screen.
 	//
 	//FIXME: This is still unsecure during parallel
-	if (!Preference.ShowOrders){}
-	else if (Preference.ShowOrders < 0 ||
+	if (!Preference.ShowOrders) {
+	} else if (Preference.ShowOrders < 0 ||
 		(ShowOrdersCount >= GameCycle) || (KeyModifiers & ModifierShift)) {
 		for (int i = 0; i < NumSelected; ++i) {
 			ShowOrder(*Selected[i]);
 		}
 	}
-
 	DrawBorder();
-
 	PopClipping();
 }
 
@@ -488,9 +435,7 @@ void CViewport::DrawBorder() const
 }
 
 CViewport::~CViewport() {
-	if (Proxy) {
-		delete Proxy;
-	}
+	delete Proxy;
 }
 
 //@}

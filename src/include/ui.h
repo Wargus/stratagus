@@ -169,29 +169,29 @@ public:
 	~CViewport();
 
 
-	/// Check if X and Y pixels are within map area
-	bool IsInsideMapArea(int x, int y) const;
-	/// Convert screen X pixel to map tile
-	int Viewport2MapX(int x) const;
-	/// Convert screen Y pixel to map tile
-	int Viewport2MapY(int y) const;
-	/// Convert map tile to screen X pixel
-	int Map2ViewportX(int x) const;
-	/// Convert map tile to screen Y pixel
-	int Map2ViewportY(int y) const;
-	/// Convert map pixel coordinates into viewport coordinates
-	void MapPixel2Viewport(int &x, int &y) const;
+	/// Check if pos pixels are within map area
+	bool IsInsideMapArea(const PixelPos &screenPixelPos) const;
 
-	// Convert screen coordinates into map pixel coordinates
-	PixelPos ScreenToMapPixelPos(const PixelPos& screenPixelPos) const;
+	/// Convert screen coordinates into map pixel coordinates
+	PixelPos ScreenToMapPixelPos(const PixelPos &screenPixelPos) const;
 	// Convert map pixel coordinates into screen coordinates
-	PixelPos MapToScreenPixelPos(const PixelPos& mapPixelPos) const;
+	PixelPos MapToScreenPixelPos(const PixelPos &mapPixelPos) const;
+
+	/// convert screen coordinate into tilepos
+	Vec2i ScreenToTilePos(const PixelPos &screenPixelPos) const;
+	/// convert tilepos coordonates into screen (take the top left of the tile)
+	PixelPos TilePosToScreen_TopLeft(const Vec2i &tilePos) const;
+	/// convert tilepos coordonates into screen (take the center of the tile)
+	PixelPos TilePosToScreen_Center(const Vec2i &tilePos) const;
 
 	/// Set the current map view to x,y(upper,left corner)
-	void Set(int x, int y, int offsetx, int offsety);
+	void Set(const Vec2i &tilePos, const PixelDiff &offset);
 	/// Center map on point in viewport
-	void Center(const Vec2i& pos, const PixelPos &offset);
+	void Center(const Vec2i& pos, const PixelDiff &offset);
+
 protected:
+	/// Set the current map view to x,y(upper,left corner)
+	void Set(const PixelPos &mapPixelPos);
 	/// Draw the map background
 	void DrawMapBackgroundInViewport() const;
 	/// Draw the map fog of war
@@ -203,8 +203,8 @@ public:
 	void Draw() const;
 	void DrawBorder() const;
 	/// Check if any part of an area is visible in viewport
-	bool AnyMapAreaVisibleInViewport(int sx, int sy, int ex, int ey) const;
-
+	bool AnyMapAreaVisibleInViewport(const Vec2i &boxmin, const Vec2i &boxmax) const;
+//private:
 	int X;                      /// Screen pixel left corner x coordinate
 	int Y;                      /// Screen pixel upper corner y coordinate
 	int EndX;                   /// Screen pixel right x coordinate

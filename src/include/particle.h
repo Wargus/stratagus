@@ -181,7 +181,7 @@ public:
 	void add(CParticle *particle);
 	void clear();
 
-	CPosition getScreenPos(const CPosition &pos);
+	CPosition getScreenPos(const CPosition &pos) const;
 
 	inline void setLowDetail(bool detail) { lowDetail = detail; }
 	inline bool getLowDetail() const { return lowDetail; }
