@@ -756,10 +756,7 @@ void CommandCancelResearch(CUnit &unit)
 {
 	// Check if unit is still researching? (NETWORK!)
 	if (unit.CurrentAction() == UnitActionResearch) {
-		const CUpgrade &upgrade = *unit.CurrentOrder()->Data.Research.Upgrade;
-		unit.Player->UpgradeTimers.Upgrades[upgrade.ID] = 0;
-
-		unit.Player->AddCostsFactor(upgrade.Costs, CancelResearchCostsFactor);
+		unit.CurrentOrder()->Cancel(unit);
 		RemoveOrder(unit, 0);
 		if (Selected) {
 			SelectedUnitChanged();

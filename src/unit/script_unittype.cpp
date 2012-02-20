@@ -2156,10 +2156,45 @@ static int CclDefineDecorations(lua_State *l)
 // ----------------------------------------------------------------------------
 
 
+/* virtual */ void COrder::UpdateUnitVariables(CUnit &unit) const
+{
+	const CUnitType *type = unit.Type;
+
+	switch (unit.CurrentAction()) {
+		// Build
+		case UnitActionBuilt:
+			unit.Variable[BUILD_INDEX].Value = unit.CurrentOrder()->Data.Built.Progress;
+			unit.Variable[BUILD_INDEX].Max = type->Stats[unit.Player->Index].Costs[TimeCost] * 600;
+
+			// This should happen when building unit with several peons
+			// Maybe also with only one.
+			// FIXME : Should be better to fix it in action_{build,repair}.c ?
+			if (unit.Variable[BUILD_INDEX].Value > unit.Variable[BUILD_INDEX].Max) {
+				// assume value is wrong.
+				unit.Variable[BUILD_INDEX].Value = unit.Variable[BUILD_INDEX].Max;
+			}
+		break;
+		// Training
+		case UnitActionTrain:
+			unit.Variable[TRAINING_INDEX].Value = unit.CurrentOrder()->Data.Train.Ticks;
+			unit.Variable[TRAINING_INDEX].Max =
+				unit.CurrentOrder()->Arg1.Type->Stats[unit.Player->Index].Costs[TimeCost];
+		break;
+		// UpgradeTo
+		case UnitActionUpgradeTo:
+			unit.Variable[UPGRADINGTO_INDEX].Value = unit.CurrentOrder()->Data.UpgradeTo.Ticks;
+			unit.Variable[UPGRADINGTO_INDEX].Max =
+				unit.CurrentOrder()->Arg1.Type->Stats[unit.Player->Index].Costs[TimeCost];
+		break;
+		default:
+		break;
+	}
+}
+
 /**
 **  Update unit variables which are not user defined.
 */
-void UpdateUnitVariables(const CUnit &unit)
+void UpdateUnitVariables(CUnit &unit)
 {
 	int i;
 	CUnitType *type = unit.Type;
@@ -2181,41 +2216,7 @@ void UpdateUnitVariables(const CUnit &unit)
 	unit.Variable[TRANSPORT_INDEX].Value = unit.BoardCount;
 	unit.Variable[TRANSPORT_INDEX].Max = unit.Type->MaxOnBoard;
 
-	switch (unit.CurrentAction()) {
-		// Build
-		case UnitActionBuilt:
-			unit.Variable[BUILD_INDEX].Value = unit.CurrentOrder()->Data.Built.Progress;
-			unit.Variable[BUILD_INDEX].Max = type->Stats[unit.Player->Index].Costs[TimeCost] * 600;
-
-			// This should happen when building unit with several peons
-			// Maybe also with only one.
-			// FIXME : Should be better to fix it in action_{build,repair}.c ?
-			if (unit.Variable[BUILD_INDEX].Value > unit.Variable[BUILD_INDEX].Max) {
-				// assume value is wrong.
-				unit.Variable[BUILD_INDEX].Value = unit.Variable[BUILD_INDEX].Max;
-			}
-		break;
-		// Research.
-		case UnitActionResearch:
-			unit.Variable[RESEARCH_INDEX].Value =
-				unit.Player->UpgradeTimers.Upgrades[unit.CurrentOrder()->Data.Research.Upgrade->ID];
-			unit.Variable[RESEARCH_INDEX].Max = unit.CurrentOrder()->Data.Research.Upgrade->Costs[TimeCost];
-		break;
-		// Training
-		case UnitActionTrain:
-			unit.Variable[TRAINING_INDEX].Value = unit.CurrentOrder()->Data.Train.Ticks;
-			unit.Variable[TRAINING_INDEX].Max =
-				unit.CurrentOrder()->Arg1.Type->Stats[unit.Player->Index].Costs[TimeCost];
-		break;
-		// UpgradeTo
-		case UnitActionUpgradeTo:
-			unit.Variable[UPGRADINGTO_INDEX].Value = unit.CurrentOrder()->Data.UpgradeTo.Ticks;
-			unit.Variable[UPGRADINGTO_INDEX].Max =
-				unit.CurrentOrder()->Arg1.Type->Stats[unit.Player->Index].Costs[TimeCost];
-		break;
-		default:
-		break;
-	}
+	unit.CurrentOrder()->UpdateUnitVariables(unit);
 
 	// Resources.
 	if (unit.Type->GivesResource) {

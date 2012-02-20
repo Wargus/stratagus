@@ -1230,7 +1230,7 @@ extern void CleanUnitTypes();                    /// Cleanup unit-type module
 extern void DefineVariableField(lua_State *l, CVariable *var, int lua_index);
 
 	/// Update custom Variables with other variable (like Hp, ...)
-extern void UpdateUnitVariables(const CUnit &unit);
+extern void UpdateUnitVariables(CUnit &unit);
 
 //@}
 

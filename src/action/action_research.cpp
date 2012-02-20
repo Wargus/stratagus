@@ -47,10 +47,100 @@
 #include "upgrade_structs.h"
 #include "upgrade.h"
 #include "ai.h"
+#include "iolib.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+/* virtual */ COrder_Research *COrder_Research::Clone() const
+{
+	return new COrder_Research(*this);
+}
+
+/* virtual */ void COrder_Research::Save(CFile &file, const CUnit &unit) const
+{
+	file.printf("{\"action-research\"");
+
+	if (this->Upgrade) {
+		file.printf(", \"upgrade\", \"%s\"", this->Upgrade->Ident.c_str());
+	}
+	file.printf("}");
+}
+
+/* virtual */ bool COrder_Research::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+{
+	if (!strcmp(value, "upgrade")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Upgrade = CUpgrade::Get(LuaToString(l, -1));
+		lua_pop(l, 1);
+	} else {
+		return false;
+	}
+	return true;
+}
+
+
+/* virtual */ void COrder_Research::UpdateUnitVariables(CUnit &unit) const
+{
+	unit.Variable[RESEARCH_INDEX].Value = unit.Player->UpgradeTimers.Upgrades[this->Upgrade->ID];
+	unit.Variable[RESEARCH_INDEX].Max = this->Upgrade->Costs[TimeCost];
+}
+
+/**
+**  Research upgrade.
+**
+**  @return true when finished.
+*/
+/* virtual */ bool COrder_Research::Execute(CUnit &unit)
+{
+	const CUpgrade &upgrade = this->GetUpgrade();
+	const CUnitType &type = *unit.Type;
+
+	type.Animations->Research ?
+		UnitShowAnimation(unit, type.Animations->Research) :
+		UnitShowAnimation(unit, type.Animations->Still);
+	if (unit.Wait) {
+		unit.Wait--;
+		return false;
+	}
+#if 0
+	if (unit.Anim.Unbreakable) {
+		return false;
+	}
+#endif
+	CPlayer &player = *unit.Player;
+	player.UpgradeTimers.Upgrades[upgrade.ID] += SpeedResearch;
+	if (player.UpgradeTimers.Upgrades[upgrade.ID] >= upgrade.Costs[TimeCost]) {
+		player.Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
+			_("%s: research complete"), type.Name.c_str());
+		if (&player == ThisPlayer) {
+			CSound *sound = GameSounds.ResearchComplete[player.Race].Sound;
+
+			if (sound) {
+				PlayGameSound(sound, MaxSampleVolume);
+			}
+		}
+		if (player.AiEnabled) {
+			AiResearchComplete(unit, &upgrade);
+		}
+		UpgradeAcquire(player, &upgrade);
+		return true;
+	}
+	unit.Wait = CYCLES_PER_SECOND / 6;
+	return false;
+}
+
+/* virtual */ void COrder_Research::Cancel(CUnit &unit)
+{
+	const CUpgrade &upgrade = this->GetUpgrade();
+	unit.Player->UpgradeTimers.Upgrades[upgrade.ID] = 0;
+
+	unit.Player->AddCostsFactor(upgrade.Costs, CancelResearchCostsFactor);
+}
+
 
 /**
 **  Unit researches!
@@ -59,54 +149,11 @@
 */
 void HandleActionResearch(COrder& order, CUnit &unit)
 {
-	const CUpgrade *upgrade;
+	Assert(order.Action == UnitActionResearch);
 
-	if (!unit.SubAction) { // first entry
-		upgrade = order.Data.Research.Upgrade = order.Arg1.Upgrade;
-#if 0
-		// FIXME: I want to support both, but with network we need this check
-		//  but if want combined upgrades this is worse
-
-		// Check if an other building has already started?
-		if (unit.Player->UpgradeTimers.Upgrades[upgrade - Upgrades]) {
-			DebugPrint("Two researches running\n");
-			PlayerAddCosts(unit.Player, upgrade->Costs);
-
-			unit.ClearAction();
-			return;
-		}
-#endif
-		unit.SubAction = 1;
-	} else {
-		upgrade = order.Data.Research.Upgrade;
-	}
-
-	unit.Type->Animations->Research ?
-		UnitShowAnimation(unit, unit.Type->Animations->Research) :
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
-	if (unit.Wait) {
-		unit.Wait--;
-		return;
-	}
-
-	unit.Player->UpgradeTimers.Upgrades[upgrade->ID] += SpeedResearch;
-	if (unit.Player->UpgradeTimers.Upgrades[upgrade->ID] >= upgrade->Costs[TimeCost]) {
-
-		unit.Player->Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
-			_("%s: research complete"), unit.Type->Name.c_str());
-		if (unit.Player == ThisPlayer) {
-			if (GameSounds.ResearchComplete[unit.Player->Race].Sound)
-				PlayGameSound(GameSounds.ResearchComplete[unit.Player->Race].Sound,
-							MaxSampleVolume);
-		}
-		if (unit.Player->AiEnabled) {
-			AiResearchComplete(unit, upgrade);
-		}
-		UpgradeAcquire(*unit.Player, upgrade);
+	if (order.Execute(unit)) {
 		unit.ClearAction();
-		return;
 	}
-	unit.Wait = CYCLES_PER_SECOND / 6;
 }
 
 //@}

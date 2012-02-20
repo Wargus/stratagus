@@ -237,38 +237,6 @@ static void CclParseResWorker(lua_State *l, COrderPtr order)
 }
 
 /**
-**  Parse research
-**
-**  @param l     Lua state.
-**  @param unit  Unit pointer which should be filled with the data.
-*/
-static void CclParseResearch(lua_State *l, COrderPtr order)
-{
-	const char *value;
-	int args;
-	int j;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	args = lua_objlen(l, -1);
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++j;
-		if (!strcmp(value, "ident")) {
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
-			order->Data.Research.Upgrade = CUpgrade::Get(value);
-		} else {
-			LuaError(l, "ParseResearch: Unsupported tag: %s" _C_ value);
-		}
-	}
-}
-
-/**
 **  Parse upgrade to
 **
 **  @param l     Lua state.
@@ -431,17 +399,6 @@ bool COrder::ParseSpecificData(lua_State *l, int &j, const char *value, const CU
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->Arg1.Patrol.x , &this->Arg1.Patrol.y);
 		lua_pop(l, 1);
-	} else if (!strcmp(value, "spell")) {
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		this->Arg1.Spell = SpellTypeByIdent(LuaToString(l, -1));
-		lua_pop(l, 1);
-
-	} else if (!strcmp(value, "upgrade")) {
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		this->Arg1.Upgrade = CUpgrade::Get(LuaToString(l, -1));
-		lua_pop(l, 1);
 	} else if (!strcmp(value, "current-resource")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
@@ -471,11 +428,6 @@ bool COrder::ParseSpecificData(lua_State *l, int &j, const char *value, const CU
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		CclParseResWorker(l, this);
-		lua_pop(l, 1);
-	} else if (!strcmp(value, "data-research")) {
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		CclParseResearch(l, this);
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "data-upgrade-to")) {
 		++j;

@@ -265,14 +265,14 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade)
 {
-	COrder *order = new COrder;
+	COrder_Research *order = new COrder_Research();
 
 	order->Action = UnitActionResearch;
 
 	// FIXME: if you give quick an other order, the resources are lost!
 	unit.Player->SubCosts(upgrade.Costs);
 
-	order->Arg1.Upgrade = &upgrade;
+	order->SetUpgrade(upgrade);
 
 	return order;
 }
@@ -332,7 +332,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionSpellCast(SpellType &spell, const Vec2i &pos, CUnit *target)
 {
-	COrder *order = new COrder;
+	COrder_SpellCast *order = new COrder_SpellCast;
 
 	order->Action = UnitActionSpellCast;
 
@@ -353,7 +353,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 	} else {
 		order->goalPos = pos;
 	}
-	order->Arg1.Spell = &spell;
+	order->SetSpell(spell);
 
 	return order;
 }
@@ -494,7 +494,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionResearch()
 {
-	COrder *order = new COrder;
+	COrder_Research *order = new COrder_Research;
 
 	order->Action = UnitActionResearch;
 	return order;
@@ -751,20 +751,11 @@ void COrder::AiUnitKilled(CUnit& unit)
 /**
 **  Call when animation step is "attack"
 */
-void COrder::OnAnimationAttack(CUnit &unit)
+/* virtual */ void COrder::OnAnimationAttack(CUnit &unit)
 {
 	Assert(unit.CurrentOrder() == this);
 
-	if (Action == UnitActionSpellCast) {
-		CUnit *goal = GetGoal();
-		if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
-			unit.ReCast = 0;
-		} else {
-			unit.ReCast = SpellCast(unit, Arg1.Spell, goal, goalPos.x, goalPos.y);
-		}
-	} else {
-		FireMissile(unit);
-	}
+	FireMissile(unit);
 	UnHideUnit(unit); // unit is invisible until attacks
 }
 

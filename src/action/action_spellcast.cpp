@@ -55,35 +55,92 @@
 #include "map.h"
 #include "spells.h"
 #include "interface.h"
+#include "iolib.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+/* virtual */ COrder_SpellCast *COrder_SpellCast::Clone() const
+{
+	return new COrder_SpellCast(*this);
+}
+
+/* virtual */ void COrder_SpellCast::Save(CFile &file, const CUnit &unit) const
+{
+	file.printf("{\"action-spell-cast\",");
+
+	file.printf(" \"range\", %d,", this->Range);
+	file.printf(" \"width\", %d,", this->Width);
+	file.printf(" \"height\", %d,", this->Height);
+	file.printf(" \"min-range\", %d,", this->MinRange);
+	if (this->HasGoal()) {
+		CUnit &goal = *this->GetGoal();
+		if (goal.Destroyed) {
+			/* this unit is destroyed so it's not in the global unit
+			 * array - this means it won't be saved!!! */
+			printf ("FIXME: storing destroyed Goal - loading will fail.\n");
+		}
+		file.printf(" \"goal\", \"%s\",", UnitReference(goal).c_str());
+	}
+	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
+
+	file.printf(" \"spell\", \"%s\",\n  ", this->Spell->Ident.c_str());
+
+	SaveDataMove(file);
+	file.printf("}");
+}
+
+/* virtual */ bool COrder_SpellCast::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+{
+	if (!strcmp(value, "spell")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Spell = SpellTypeByIdent(LuaToString(l, -1));
+		lua_pop(l, 1);
+	} else {
+		return false;
+	}
+	return true;
+}
+
+
+/**
+**  Call when animation step is "attack"
+*/
+/* virtual */ void COrder_SpellCast::OnAnimationAttack(CUnit &unit)
+{
+	CUnit *goal = GetGoal();
+	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
+		unit.ReCast = 0;
+	} else {
+		unit.ReCast = SpellCast(unit, this->Spell, goal, goalPos.x, goalPos.y);
+	}
+	UnHideUnit(unit); // unit is invisible until attacks
+}
+
+
 
 /**
 **  Animate unit spell cast 
 **
 **  @param unit  Unit, for that spell cast/attack animation is played.
 */
-void AnimateActionSpellCast(CUnit &unit)
+static void AnimateActionSpellCast(CUnit &unit, COrder_SpellCast &order)
 {
-	//if don't have animations just cast spell
-	if (!unit.Type->Animations || (!unit.Type->Animations->Attack && !unit.Type->Animations->SpellCast)) {
-		CUnit *goal = unit.CurrentOrder()->GetGoal();
-		if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
-			unit.ReCast = 0;
-		} else {
-			COrderPtr order = unit.CurrentOrder();
-			unit.ReCast = SpellCast(unit, order->Arg1.Spell,
-								goal, order->goalPos.x, order->goalPos.y);
-		}
-		UnHideUnit(unit);// unit is invisible until casts spell
+	const CAnimations *animations = unit.Type->Animations;
+
+	if (!animations || (!animations->Attack && !animations->SpellCast)) {
+		// if don't have animations just cast spell
+		order.OnAnimationAttack(unit);
 		return;
 	}
-	if (unit.Type->Animations->SpellCast)
-		UnitShowAnimation(unit, unit.Type->Animations->SpellCast);
-	else
-		UnitShowAnimation(unit, unit.Type->Animations->Attack);
+	if (animations->SpellCast) {
+		UnitShowAnimation(unit, animations->SpellCast);
+	} else {
+		UnitShowAnimation(unit, animations->Attack);
+	}
 }
 
 /**
@@ -132,49 +189,45 @@ static void SpellMoveToTarget(CUnit &unit)
 	Assert(!unit.Type->Vanishes && !unit.Destroyed);
 }
 
-/**
-**  Unit casts a spell!
-**
-**  @param unit  Unit, for that the spell cast is handled.
-*/
-void HandleActionSpellCast(COrder& order, CUnit &unit)
+
+/* virtual */ bool COrder_SpellCast::Execute(CUnit &unit)
 {
+	COrder_SpellCast &order = *this;
+
 	if (unit.Wait) {
 		unit.Wait--;
-		return;
+		return false;
 	}
-	const SpellType *spell = order.Arg1.Spell;
+	const SpellType &spell = order.GetSpell();
 	switch (unit.SubAction) {
 		case 0:
 			// Check if we can cast the spell.
-			if (!CanCastSpell(unit, spell, order.GetGoal(), order.goalPos.x, order.goalPos.y)) {
+			if (!CanCastSpell(unit, &spell, order.GetGoal(), order.goalPos.x, order.goalPos.y)) {
 				// Notify player about this problem
-				if (unit.Variable[MANA_INDEX].Value < spell->ManaCost) {
+				if (unit.Variable[MANA_INDEX].Value < spell.ManaCost) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
 						_("%s: not enough mana for spell: %s"),
-						unit.Type->Name.c_str(), spell->Name.c_str());
+						unit.Type->Name.c_str(), spell.Name.c_str());
 				} else {
 					unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
 						_("%s: can't cast spell: %s"),
-						unit.Type->Name.c_str(), spell->Name.c_str());
+						unit.Type->Name.c_str(), spell.Name.c_str());
 				}
 
 				if (unit.Player->AiEnabled) {
 					DebugPrint("FIXME: do we need an AI callback?\n");
 				}
-				order.ClearGoal(); // Release references
-				unit.ClearAction();
-				return;
+				return true;
 			}
 			// FIXME FIXME FIXME: Check if already in range and skip straight to 2(casting)
-			if (!spell->IsCasterOnly()) {
+			if (!spell.IsCasterOnly()) {
 				unit.CurrentOrder()->NewResetPath();
 			}
 			unit.ReCast = 0; // repeat spell on next pass? (defaults to `no')
 			unit.SubAction = 1;
 			// FALL THROUGH
 		case 1:                         // Move to the target.
-			if (spell->Range && spell->Range != INFINITE_RANGE) {
+			if (spell.Range && spell.Range != INFINITE_RANGE) {
 				SpellMoveToTarget(unit);
 				break;
 			} else {
@@ -182,10 +235,10 @@ void HandleActionSpellCast(COrder& order, CUnit &unit)
 			}
 			// FALL THROUGH
 		case 2:                         // Cast spell on the target.
-			if (!spell->IsCasterOnly()) {
-				AnimateActionSpellCast(unit);
+			if (!spell.IsCasterOnly()) {
+				AnimateActionSpellCast(unit, *this);
 				if (unit.Anim.Unbreakable) {
-					return;
+					return false;
 				}
 			} else {
 				// FIXME: what todo, if unit/goal is removed?
@@ -193,18 +246,38 @@ void HandleActionSpellCast(COrder& order, CUnit &unit)
 				if (goal && goal != &unit && !goal->IsVisibleAsGoal(*unit.Player)) {
 					unit.ReCast = 0;
 				} else {
-					unit.ReCast = SpellCast(unit, spell, goal, order.goalPos.x, order.goalPos.y);
+					unit.ReCast = SpellCast(unit, &spell, goal, order.goalPos.x, order.goalPos.y);
 				}
 			}
 			if (!unit.ReCast && unit.CurrentAction() != UnitActionDie) {
-				order.ClearGoal(); // Release references
-				unit.ClearAction();
+				return true;
 			}
 			break;
 
 		default:
 			unit.SubAction = 0; // Reset path, than move to target
 			break;
+	}
+	return false;
+}
+
+/* virtual */ void COrder_SpellCast::Cancel(CUnit&)
+{
+}
+
+
+/**
+**  Unit casts a spell!
+**
+**  @param unit  Unit, for that the spell cast is handled.
+*/
+void HandleActionSpellCast(COrder& order, CUnit &unit)
+{
+	Assert(order.Action == UnitActionSpellCast);
+
+	if (order.Execute(unit)) {
+		order.ClearGoal();
+		unit.ClearAction();
 	}
 }
 

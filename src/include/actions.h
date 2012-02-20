@@ -91,6 +91,7 @@ enum UnitAction {
 
 class CConstructionFrame;
 class CUnit;
+class CFile;
 class CUnitType;
 class CUpgrade;
 class SpellType;
@@ -111,9 +112,19 @@ public:
 		memset(&Arg1, 0, sizeof (Arg1));
 		memset(&Data, 0, sizeof (Data));
 	}
-	~COrder();
+	virtual ~COrder();
 
-	COrder *Clone() const;
+	virtual COrder *Clone() const;
+	virtual bool Execute(CUnit &unit) { return false; }
+	virtual void Cancel(CUnit &unit) {}
+	virtual void OnAnimationAttack(CUnit &unit);
+
+	virtual void Save(CFile &file, const CUnit &unit) const;
+	bool ParseGenericData(lua_State *l, int &j, const char *value);
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+	virtual void UpdateUnitVariables(CUnit &unit) const;
+
 
 	void ReleaseRefs(CUnit &owner);
 	bool CheckRange() const;
@@ -143,14 +154,13 @@ public:
 	**  To remove pathfinder internals. Called if path destination changed.
 	*/
 	void NewResetPath() { Data.Move.Fast = 1; Data.Move.Length = 0; }
-
+	void SaveDataMove(CFile &file) const;
 
 	void FillSeenValues(CUnit &unit) const;
 
 	bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 	void AiUnitKilled(CUnit &unit);
 
-	void OnAnimationAttack(CUnit &unit);
 
 	static COrder* NewActionAttack(const CUnit &attacker, CUnit &target);
 	static COrder* NewActionAttack(const CUnit &attacker, const Vec2i &dest);
@@ -176,9 +186,6 @@ public:
 	static COrder* NewActionUnload(const Vec2i &pos, CUnit *what);
 	static COrder* NewActionUpgradeTo(CUnit &unit, CUnitType &type);
 
-	bool ParseGenericData(lua_State *l, int &j, const char *value);
-	bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
-
 #if 1 // currently needed for parsing
 	static COrder* NewActionAttack();
 	static COrder* NewActionAttackGround();
@@ -199,8 +206,6 @@ public:
 #endif
 
 private:
-	COrder(const COrder &ths); // no implementation
-	COrder& operator=(const COrder &rhs); // no implementation
 
 	CUnit *Goal;
 public:
@@ -219,8 +224,6 @@ public:
 			Vec2i Pos; /// position for terrain resource.
 			CUnit *Mine;
 		} Resource;
-		SpellType *Spell;             /// spell when casting.
-		CUpgrade *Upgrade;            /// upgrade.
 		CUnitType *Type;        /// Unit-type argument used mostly for traning/building, etc.
 	} Arg1;             /// Extra command argument.
 
@@ -248,9 +251,6 @@ public:
 	struct _order_repair_ {
 		int Cycles;                 /// Cycles unit has been repairing for
 	} Repair; /// Repairing unit
-	struct _order_research_ {
-		CUpgrade *Upgrade;          /// Upgrade researched
-	} Research; /// Research action
 	struct _order_upgradeto_ {
 		int Ticks; /// Ticks to complete
 	} UpgradeTo; /// Upgrade to action
@@ -260,6 +260,42 @@ public:
 	} Data; /// Storage room for different commands
 };
 
+class COrder_Research : public COrder
+{
+public:
+	virtual COrder_Research *Clone() const;
+
+	virtual void Save(CFile &file, const CUnit &unit) const;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+	virtual bool Execute(CUnit &unit);
+	virtual void Cancel(CUnit &unit);
+
+	virtual void UpdateUnitVariables(CUnit &unit) const;
+
+	const CUpgrade& GetUpgrade() const { return *Upgrade; }
+	void SetUpgrade(CUpgrade &upgrade) { Upgrade = &upgrade; }
+private:
+	CUpgrade *Upgrade;
+};
+
+class COrder_SpellCast: public COrder
+{
+public:
+	virtual COrder_SpellCast *Clone() const;
+
+	virtual void Save(CFile &file, const CUnit &unit) const;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+	virtual bool Execute(CUnit &unit);
+	virtual void Cancel(CUnit &unit);
+	virtual void OnAnimationAttack(CUnit &unit);
+
+	const SpellType& GetSpell() const { return *Spell; }
+	void SetSpell(SpellType &spell) { Spell = &spell; }
+private:
+	SpellType *Spell;
+};
 
 
 
@@ -369,8 +405,6 @@ extern HandleActionFunc HandleActionRepair;
 extern HandleActionFunc HandleActionPatrol;
 	/// Show attack animation
 extern void AnimateActionAttack(CUnit &unit);
-	/// Show spell cast animation
-extern void AnimateActionSpellCast(CUnit &unit);
 	/// Handle command attack
 extern HandleActionFunc HandleActionAttack;
 	/// Handle command board

@@ -556,7 +556,7 @@ void CDecoVarStaticSprite::Draw(int x, int y,
 }
 
 
-extern void UpdateUnitVariables(const CUnit &unit);
+extern void UpdateUnitVariables(CUnit &unit);
 
 
 /**
@@ -576,7 +576,7 @@ static void DrawDecoration(const CUnit &unit, const CUnitType *type, int x, int 
 	VideoDrawNumberClip(x + 1, y + 1, GetGameFont(), unit.Refs);
 #endif
 
-	UpdateUnitVariables(unit);
+	UpdateUnitVariables(const_cast<CUnit&>(unit));
 	// Now show decoration for each variable.
 	for (std::vector<CDecoVar *>::const_iterator i = UnitTypeVar.DecoVar.begin();
 			i < UnitTypeVar.DecoVar.end(); ++i) {

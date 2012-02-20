@@ -711,15 +711,19 @@ static void DrawUnitInfo(CUnit &unit)
 			//  Building research new technology.
 			//
 			case UnitActionResearch:
+			{
 				if (UI.ResearchingButton) {
-					unit.CurrentOrder()->Data.Research.Upgrade->Icon->DrawUnitIcon(unit.Player,
+					COrder_Research &order = *static_cast<COrder_Research *>(unit.CurrentOrder());
+
+					order.GetUpgrade().Icon->DrawUnitIcon(unit.Player,
 						UI.ResearchingButton->Style,
 						(ButtonAreaUnderCursor == ButtonAreaResearching &&
 							ButtonUnderCursor == 0) ?
 							(IconActive | (MouseButtons & LeftButton)) : 0,
 						UI.ResearchingButton->X, UI.ResearchingButton->Y, "");
 				}
-			return;
+				return;
+			}
 			default:
 			break;
 		}

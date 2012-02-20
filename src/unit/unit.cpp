@@ -1038,11 +1038,9 @@ void UnitLost(CUnit &unit)
 	}
 
 	//
-	//  Handle research cancels.
+	//  Handle order cancels.
 	//
-	if (unit.CurrentAction() == UnitActionResearch) {
-		unit.Player->UpgradeTimers.Upgrades[unit.CurrentOrder()->Data.Research.Upgrade->ID] = 0;
-	}
+	unit.CurrentOrder()->Cancel(unit);
 
 	DebugPrint("%d: Lost %s(%d)\n"
 		_C_ unit.Player->Index
