@@ -445,7 +445,10 @@ void HandleActionAttack(COrder& order, CUnit &unit)
 		case MOVE_TO_TARGET:
 		case MOVE_TO_TARGET + WEAK_TARGET:
 			if (!unit.CanMove()) {
-				unit.RestoreOrder();
+				if (!unit.RestoreOrder()) {
+					unit.ClearAction();
+					unit.State = 0;
+				}
 				return;
 			}
 			MoveToTarget(unit);

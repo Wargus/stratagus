@@ -953,7 +953,7 @@ struct CResourceDepositFinder {
 class CPreference {
 public:
 	CPreference() : ShowSightRange(false), ShowReactionRange(false),
-		ShowAttackRange(false), ShowMessages(false),
+		ShowAttackRange(false), ShowMessages(true),
 		BigScreen(false),ShowOrders(0) {};
 
 	bool ShowSightRange;     /// Show sight range.

@@ -337,7 +337,7 @@ void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
 	}
 	COrderPtr *order;
 
-	if (unit.Type->CanAttack) {
+	if (!unit.Type->CanAttack) {
 		ClearNewAction(unit);
 		order = &unit.NewOrder;
 	} else {
