@@ -154,7 +154,8 @@ void HandleActionFollow(COrder& order, CUnit &unit)
 						}
 					}
 
-					*(unit.CurrentOrder()) = *dest.NewOrder;
+					delete unit.CurrentOrder();
+					unit.Orders[0] = dest.NewOrder->Clone();
 					unit.CurrentResource = dest.CurrentResource;
 				}
 				return;
@@ -186,7 +187,7 @@ void HandleActionFollow(COrder& order, CUnit &unit)
 			goal = AttackUnitsInReactRange(unit);
 			if (goal) {
 				// Save current command to come back.
-				COrder *savedOrder = new COrder(order);
+				COrder *savedOrder = order.Clone();
 
 				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
 

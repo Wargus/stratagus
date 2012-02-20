@@ -90,24 +90,6 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 --  Functions
 ----------------------------------------------------------------------------*/
 
-COrder::COrder(const COrder &rhs): Goal(rhs.Goal), Range(rhs.Range),
-	 MinRange(rhs.MinRange), Width(rhs.Width), Height(rhs.Height),
-	 Action(rhs.Action), CurrentResource(rhs.CurrentResource),
-	 goalPos(rhs.goalPos)
- {
-	if (Goal) {
-		Goal->RefsIncrease();
-	}
-
-	memcpy(&Arg1, &rhs.Arg1, sizeof(Arg1));
-	memcpy(&Data, &rhs.Data, sizeof (Data));
-	if (Action == UnitActionResource && Arg1.Resource.Mine) {
-		Arg1.Resource.Mine->RefsIncrease();
-	}
-}
-
-
-
 /* static */ COrder* COrder::NewActionAttack(const CUnit &attacker, CUnit &target)
 {
 	COrder *order = new COrder;
@@ -445,24 +427,158 @@ COrder::COrder(const COrder &rhs): Goal(rhs.Goal), Range(rhs.Range),
 	return order;
 }
 
-COrder& COrder::operator=(const COrder &rhs) {
-	if (this != &rhs) {
-		Action = rhs.Action;
-		Range = rhs.Range;
-		MinRange = rhs.MinRange;
-		Width = rhs.Width;
-		Height = rhs.Height;
-		CurrentResource = rhs.CurrentResource;
-		SetGoal(rhs.Goal);
-		goalPos = rhs.goalPos;
-		memcpy(&Arg1, &rhs.Arg1, sizeof(Arg1));
-		memcpy(&Data, &rhs.Data, sizeof (Data));
-		//FIXME: Hardcoded wood
-		if (Action == UnitActionResource && Arg1.Resource.Mine) {
-			Arg1.Resource.Mine->RefsIncrease();
-		}
+#if 1 // currently needed for parsing
+/* static */ COrder* COrder::NewActionAttack()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionAttack;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionAttackGround()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionAttackGround;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionBoard()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionBoard;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionBuild()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionBuild;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionFollow()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionFollow;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionMove()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionMove;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionPatrol()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionPatrol;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionRepair()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionRepair;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionResearch()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionResearch;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionResource()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionResource;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionReturnGoods()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionReturnGoods;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionSpellCast()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionSpellCast;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionTrain()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionTrain;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionTransformInto()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionTransformInto;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionUnload()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionUnload;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionUpgradeTo()
+{
+	COrder *order = new COrder;
+
+	order->Action = UnitActionUpgradeTo;
+	return order;
+}
+
+#endif
+
+
+
+COrder* COrder::Clone() const
+{
+	COrder *clone = new COrder();
+
+	clone->Action = this->Action;
+	clone->Range = this->Range;
+	clone->MinRange = this->MinRange;
+	clone->Width = this->Width;
+	clone->Height = this->Height;
+	clone->CurrentResource = this->CurrentResource;
+	clone->SetGoal(this->Goal);
+	clone->goalPos = this->goalPos;
+	memcpy(&clone->Arg1, &this->Arg1, sizeof (clone->Arg1));
+	memcpy(&clone->Data, &this->Data, sizeof (clone->Data));
+	//FIXME: Hardcoded wood
+	if (clone->Action == UnitActionResource && clone->Arg1.Resource.Mine) {
+		clone->Arg1.Resource.Mine->RefsIncrease();
 	}
-	return *this;
+	return clone;
 }
 
 COrder::~COrder()

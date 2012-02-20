@@ -129,7 +129,7 @@ void HandleActionPatrol(COrder& order, CUnit &unit)
 			const CUnit *goal = AttackUnitsInReactRange(unit);
 			if (goal) {
 				// Save current command to come back.
-				COrder *savedOrder = new COrder(order);
+				COrder *savedOrder = order.Clone();
 
 				DebugPrint("Patrol attack %d\n" _C_ UnitNumber(*goal));
 				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);

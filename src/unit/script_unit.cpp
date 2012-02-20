@@ -380,6 +380,149 @@ static void CclParseMove(lua_State *l, COrderPtr order)
 	}
 }
 
+bool COrder::ParseGenericData(lua_State *l, int &j, const char *value)
+{
+	if (!strcmp(value, "range")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Range = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "min-range")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->MinRange = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "width")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Width = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "height")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Height = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "goal")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Goal = CclGetUnitFromRef(l);
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "tile")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
+		lua_pop(l, 1);
+	} else {
+		return false;
+	}
+	return true;
+}
+
+bool COrder::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+{
+	if (!strcmp(value, "type")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Arg1.Type = UnitTypeByIdent(LuaToString(l, -1));
+		lua_pop(l, 1);
+
+	} else if (!strcmp(value, "patrol")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		CclGetPos(l, &this->Arg1.Patrol.x , &this->Arg1.Patrol.y);
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "spell")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Arg1.Spell = SpellTypeByIdent(LuaToString(l, -1));
+		lua_pop(l, 1);
+
+	} else if (!strcmp(value, "upgrade")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Arg1.Upgrade = CUpgrade::Get(LuaToString(l, -1));
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "current-resource")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->CurrentResource = CclGetResourceByName(l);
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "resource-pos")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Arg1.Resource.Mine = NULL;
+		CclGetPos(l, &this->Arg1.Resource.Pos.x , &this->Arg1.Resource.Pos.y);
+		lua_pop(l, 1);
+
+		Assert(this->CurrentResource);
+	} else if (!strcmp(value, "resource-mine")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		Vec2i invalidPos = {-1, -1};
+		this->Arg1.Resource.Pos = invalidPos;
+		this->Arg1.Resource.Mine = CclGetUnitFromRef(l);
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "data-built")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		CclParseBuilt(l, unit, this);
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "data-res-worker")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		CclParseResWorker(l, this);
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "data-research")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		CclParseResearch(l, this);
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "data-upgrade-to")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		CclParseUpgradeTo(l, this);
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "data-train")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		CclParseTrain(l, this);
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "data-move")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		CclParseMove(l, this);
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "mine")) { /* old save format */
+		int pos;
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		pos = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+
+		const Vec2i mpos = {pos >> 16, pos & 0xFFFF};
+		CUnit *mine = NULL;
+		pos = 0;
+		do {
+			pos++;
+			mine = ResourceOnMap(mpos, pos, true);
+		} while (!mine && pos < MaxCosts);
+		if (mine) {
+			Vec2i invalidPos = {-1, -1};
+			this->Arg1.Resource.Pos = invalidPos;
+
+			mine->RefsIncrease();
+			this->Arg1.Resource.Mine = mine;
+			this->CurrentResource = pos;
+		} else {
+			this->CurrentResource = WoodCost;
+			this->Arg1.Resource.Mine = NULL;
+			this->Arg1.Resource.Pos = mpos;
+		}
+	} else {
+		return false;
+	}
+	return true;
+}
 
 /**
 **  Parse order
@@ -387,184 +530,70 @@ static void CclParseMove(lua_State *l, COrderPtr order)
 **  @param l      Lua state.
 **  @param order  OUT: resulting order.
 */
-void CclParseOrder(lua_State *l, const CUnit &unit, COrderPtr order)
+void CclParseOrder(lua_State *l, const CUnit &unit, COrderPtr *orderPtr)
 {
 	const int args = lua_objlen(l, -1);
-	for (int j = 0; j < args; ++j) {
+
+	lua_rawgeti(l, -1, 1);
+	const char *actiontype = LuaToString(l, -1);
+	lua_pop(l, 1);
+
+	if (!strcmp(actiontype, "action-still")) {
+		*orderPtr = COrder::NewActionStill();
+	} else if (!strcmp(actiontype, "action-stand-ground")) {
+		*orderPtr = COrder::NewActionStandGround();
+	} else if (!strcmp(actiontype, "action-follow")) {
+		*orderPtr = COrder::NewActionFollow();
+	} else if (!strcmp(actiontype, "action-move")) {
+		*orderPtr = COrder::NewActionMove();
+	} else if (!strcmp(actiontype, "action-attack")) {
+		*orderPtr = COrder::NewActionAttack();
+	} else if (!strcmp(actiontype, "action-attack-ground")) {
+		*orderPtr = COrder::NewActionAttackGround();
+	} else if (!strcmp(actiontype, "action-die")) {
+		*orderPtr = COrder::NewActionDie();
+	} else if (!strcmp(actiontype, "action-spell-cast")) {
+		*orderPtr = COrder::NewActionSpellCast();
+	} else if (!strcmp(actiontype, "action-train")) {
+		*orderPtr = COrder::NewActionTrain();
+	} else if (!strcmp(actiontype, "action-upgrade-to")) {
+		*orderPtr = COrder::NewActionUpgradeTo();
+	} else if (!strcmp(actiontype, "action-research")) {
+		*orderPtr = COrder::NewActionResearch();
+	} else if (!strcmp(actiontype, "action-built")) {
+		*orderPtr = COrder::NewActionBuilt();
+	} else if (!strcmp(actiontype, "action-board")) {
+		*orderPtr = COrder::NewActionBoard();
+	} else if (!strcmp(actiontype, "action-unload")) {
+		*orderPtr = COrder::NewActionUnload();
+	} else if (!strcmp(actiontype, "action-patrol")) {
+		*orderPtr = COrder::NewActionPatrol();
+	} else if (!strcmp(actiontype, "action-build")) {
+		*orderPtr = COrder::NewActionBuild();
+	} else if (!strcmp(actiontype, "action-repair")) {
+		*orderPtr = COrder::NewActionRepair();
+	} else if (!strcmp(actiontype, "action-resource")) {
+		*orderPtr = COrder::NewActionResource();
+	} else if (!strcmp(actiontype, "action-return-goods")) {
+		*orderPtr = COrder::NewActionReturnGoods();
+	} else if (!strcmp(actiontype, "action-transform-into")) {
+		*orderPtr = COrder::NewActionTransformInto();
+	} else {
+		LuaError(l, "ParseOrder: Unsupported type: %s" _C_ actiontype);
+	}
+
+	COrder &order = **orderPtr;
+
+	for (int j = 1; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 		const char *value = LuaToString(l, -1);
 		lua_pop(l, 1);
-		if (!strcmp(value, "action-none")) {
-			order->Action = UnitActionNone;
-		} else if (!strcmp(value, "action-still")) {
-			order->Action = UnitActionStill;
-		} else if (!strcmp(value, "action-stand-ground")) {
-			order->Action = UnitActionStandGround;
-		} else if (!strcmp(value, "action-follow")) {
-			order->Action = UnitActionFollow;
-		} else if (!strcmp(value, "action-move")) {
-			order->Action = UnitActionMove;
-		} else if (!strcmp(value, "action-attack")) {
-			order->Action = UnitActionAttack;
-		} else if (!strcmp(value, "action-attack-ground")) {
-			order->Action = UnitActionAttackGround;
-		} else if (!strcmp(value, "action-die")) {
-			order->Action = UnitActionDie;
-		} else if (!strcmp(value, "action-spell-cast")) {
-			order->Action = UnitActionSpellCast;
-		} else if (!strcmp(value, "action-train")) {
-			order->Action = UnitActionTrain;
-		} else if (!strcmp(value, "action-upgrade-to")) {
-			order->Action = UnitActionUpgradeTo;
-		} else if (!strcmp(value, "action-research")) {
-			order->Action = UnitActionResearch;
-		} else if (!strcmp(value, "action-built")) {
-			order->Action = UnitActionBuilt;
-		} else if (!strcmp(value, "action-board")) {
-			order->Action = UnitActionBoard;
-		} else if (!strcmp(value, "action-unload")) {
-			order->Action = UnitActionUnload;
-		} else if (!strcmp(value, "action-patrol")) {
-			order->Action = UnitActionPatrol;
-		} else if (!strcmp(value, "action-build")) {
-			order->Action = UnitActionBuild;
-		} else if (!strcmp(value, "action-repair")) {
-			order->Action = UnitActionRepair;
-		} else if (!strcmp(value, "action-resource")) {
-			order->Action = UnitActionResource;
-		} else if (!strcmp(value, "action-return-goods")) {
-			order->Action = UnitActionReturnGoods;
-		} else if (!strcmp(value, "action-transform-into")) {
-			order->Action = UnitActionTransformInto;
-		} else if (!strcmp(value, "range")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->Range = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "min-range")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->MinRange = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "width")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->Width = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "height")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->Height = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "goal")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->Goal = CclGetUnitFromRef(l);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "tile")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			CclGetPos(l, &order->goalPos.x , &order->goalPos.y);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "type")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->Arg1.Type = UnitTypeByIdent(LuaToString(l, -1));
-			lua_pop(l, 1);
 
-		} else if (!strcmp(value, "patrol")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			CclGetPos(l, &order->Arg1.Patrol.x , &order->Arg1.Patrol.y);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "spell")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->Arg1.Spell = SpellTypeByIdent(LuaToString(l, -1));
-			lua_pop(l, 1);
-
-		} else if (!strcmp(value, "upgrade")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->Arg1.Upgrade = CUpgrade::Get(LuaToString(l, -1));
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "current-resource")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->CurrentResource = CclGetResourceByName(l);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "resource-pos")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->Arg1.Resource.Mine = NULL;
-			CclGetPos(l, &order->Arg1.Resource.Pos.x , &order->Arg1.Resource.Pos.y);
-			lua_pop(l, 1);
-
-			Assert(order->CurrentResource);
-		} else if (!strcmp(value, "resource-mine")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			Vec2i invalidPos = {-1, -1};
-			order->Arg1.Resource.Pos = invalidPos;
-			order->Arg1.Resource.Mine = CclGetUnitFromRef(l);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-built")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			CclParseBuilt(l, unit, order);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-res-worker")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			CclParseResWorker(l, order);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-research")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			CclParseResearch(l, order);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-upgrade-to")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			CclParseUpgradeTo(l, order);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-train")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			CclParseTrain(l, order);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-move")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			CclParseMove(l, order);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "mine")) { /* old save format */
-			int pos;
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			pos = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-
-			const Vec2i mpos = {pos >> 16, pos & 0xFFFF};
-			CUnit *mine = NULL;
-			pos = 0;
-			do {
-				pos++;
-				mine = ResourceOnMap(mpos, pos, true);
-			} while (!mine && pos < MaxCosts);
-			if (mine) {
-				Vec2i invalidPos = {-1, -1};
-				order->Arg1.Resource.Pos = invalidPos;
-
-				mine->RefsIncrease();
-				order->Arg1.Resource.Mine = mine;
-				order->CurrentResource = pos;
-			} else {
-				order->CurrentResource = WoodCost;
-				order->Arg1.Resource.Mine = NULL;
-				order->Arg1.Resource.Pos = mpos;
-			}
-		} else {
+		if (order.ParseGenericData(l, j, value)) {
+			continue;
+		} else if (order.ParseSpecificData(l, j, value, unit)) {
+			continue;
+		}else {
 		   // This leaves a half initialized unit
 		   LuaError(l, "ParseOrder: Unsupported tag: %s" _C_ value);
 		}
@@ -590,10 +619,10 @@ static void CclParseOrders(lua_State *l, CUnit &unit)
 	for (int j = 0; j < n; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 
-		unit.Orders.push_back(new COrder);
+		unit.Orders.push_back(NULL);
 		COrderPtr* order = &unit.Orders.back();
 
-		CclParseOrder(l, unit, *order);
+		CclParseOrder(l, unit, order);
 		lua_pop(l, 1);
 	}
 }
@@ -852,18 +881,15 @@ static int CclUnit(lua_State *l)
 			}
 		} else if (!strcmp(value, "critical-order")) {
 			lua_pushvalue(l, j + 1);
-			unit->CriticalOrder = new COrder;
-			CclParseOrder(l, *unit , unit->CriticalOrder);
+			CclParseOrder(l, *unit , &unit->CriticalOrder);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "saved-order")) {
 			lua_pushvalue(l, j + 1);
-			unit->SavedOrder = new COrder;
-			CclParseOrder(l, *unit, unit->SavedOrder);
+			CclParseOrder(l, *unit, &unit->SavedOrder);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "new-order")) {
 			lua_pushvalue(l, j + 1);
-			unit->NewOrder = new COrder;
-			CclParseOrder(l, *unit, unit->NewOrder);
+			CclParseOrder(l, *unit, &unit->NewOrder);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "goal")) {
 			unit->Goal = UnitSlots[(int)LuaToNumber(l, j + 1)];

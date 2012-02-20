@@ -192,7 +192,8 @@ void HandleActionTrain(COrder& order, CUnit &unit)
 			}
 
 			if (CanHandleOrder(*nunit, unit.NewOrder) == true) {
-				*(nunit->CurrentOrder()) = *unit.NewOrder;
+				delete nunit->CurrentOrder();
+				nunit->Orders[0] = unit.NewOrder->Clone();
 #if 0
 			} else {
 				// Tell the unit to move instead of trying any funny stuff.

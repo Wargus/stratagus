@@ -3096,7 +3096,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 			}
 		}
 		if (goal) {
-			COrder *savedOrder = new COrder(*target.CurrentOrder());
+			COrder *savedOrder = target.CurrentOrder()->Clone();
 
 			CommandAttack(target, goal->tilePos, NoUnitP, FlushCommands);
 			if (target.StoreOrder(savedOrder) == false) {

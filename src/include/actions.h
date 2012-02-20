@@ -95,6 +95,7 @@ class CUnitType;
 class CUpgrade;
 class SpellType;
 class CAnimation;
+struct lua_State;
 
 /**
 **  Unit order structure.
@@ -110,11 +111,11 @@ public:
 		memset(&Arg1, 0, sizeof (Arg1));
 		memset(&Data, 0, sizeof (Data));
 	}
-	COrder(const COrder &ths);
 	~COrder();
 
+	COrder *Clone() const;
+
 	void ReleaseRefs(CUnit &owner);
-	COrder& operator=(const COrder &rhs);
 	bool CheckRange() const;
 
 	void Init() {
@@ -175,8 +176,31 @@ public:
 	static COrder* NewActionUnload(const Vec2i &pos, CUnit *what);
 	static COrder* NewActionUpgradeTo(CUnit &unit, CUnitType &type);
 
+	bool ParseGenericData(lua_State *l, int &j, const char *value);
+	bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+#if 1 // currently needed for parsing
+	static COrder* NewActionAttack();
+	static COrder* NewActionAttackGround();
+	static COrder* NewActionBoard();
+	static COrder* NewActionBuild();
+	static COrder* NewActionFollow();
+	static COrder* NewActionMove();
+	static COrder* NewActionPatrol();
+	static COrder* NewActionRepair();
+	static COrder* NewActionResearch();
+	static COrder* NewActionResource();
+	static COrder* NewActionReturnGoods();
+	static COrder* NewActionSpellCast();
+	static COrder* NewActionTrain();
+	static COrder* NewActionTransformInto();
+	static COrder* NewActionUnload();
+	static COrder* NewActionUpgradeTo();
+#endif
+
 private:
-	friend void CclParseOrder(lua_State *l, const CUnit &unit, COrder* order);
+	COrder(const COrder &ths); // no implementation
+	COrder& operator=(const COrder &rhs); // no implementation
 
 	CUnit *Goal;
 public:

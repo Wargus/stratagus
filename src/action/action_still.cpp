@@ -244,7 +244,7 @@ bool AutoRepair(CUnit &unit)
 
 		if (repairedUnit != NoUnitP) {
 			const Vec2i invalidPos = {-1, -1};
-			COrder *savedOrder = new COrder(*unit.CurrentOrder());
+			COrder *savedOrder = unit.CurrentOrder()->Clone();
 
 			//Command* will clear unit.SavedOrder
 			CommandRepair(unit, invalidPos, repairedUnit, FlushCommands);

@@ -166,7 +166,7 @@ static int CheckForTargetInRange(CUnit &unit)
 		CUnit *temp = AttackUnitsInReactRange(unit);
 
 		if (temp && temp->Type->Priority > goal->Type->Priority) {
-			COrder *savedOrder = new COrder(*order);
+			COrder *savedOrder = order->Clone();
 
 			if (unit.StoreOrder(savedOrder) == false) {
 				delete savedOrder;
@@ -324,7 +324,7 @@ static void AttackTarget(CUnit &unit)
 			return;
 		}
 		// Save current command to come back.
-		COrder *savedOrder = new COrder(*order);
+		COrder *savedOrder = order->Clone();
 
 		if (unit.StoreOrder(savedOrder) == false) {
 			delete savedOrder;
@@ -345,7 +345,7 @@ static void AttackTarget(CUnit &unit)
 		if ((unit.SubAction & WEAK_TARGET)) {
 			CUnit *temp = AttackUnitsInReactRange(unit);
 			if (temp && temp->Type->Priority > goal->Type->Priority) {
-				COrder *savedOrder = new COrder(*order);
+				COrder *savedOrder = order->Clone();
 
 				if (unit.StoreOrder(savedOrder) == false) {
 					delete savedOrder;
@@ -366,7 +366,7 @@ static void AttackTarget(CUnit &unit)
 	//
 	int dist = unit.MapDistanceTo(*goal);
 	if (dist > unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-		COrder *savedOrder = new COrder(*order);
+		COrder *savedOrder = order->Clone();
 
 		if (unit.StoreOrder(savedOrder) == false) {
 			delete savedOrder;
