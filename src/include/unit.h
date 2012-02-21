@@ -354,8 +354,6 @@
 #include "player.h"
 #endif
 
-#include "actions.h"
-
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
@@ -546,7 +544,7 @@ public:
 	/* Seen stuff. */
 	int VisCount[PlayerMax];     /// Unit visibility counts
 	struct _seen_stuff_ {
-		CConstructionFrame  *CFrame;                  /// Seen construction frame
+		const CConstructionFrame  *CFrame;           /// Seen construction frame
 		int                 Frame;                   /// last seen frame/stage of buildings
 		CUnitType          *Type;                    /// Pointer to last seen unit-type
 		int                 X;                       /// Last unit->X Seen
@@ -1105,6 +1103,9 @@ extern int CanTransport(const CUnit &transporter, const CUnit &unit);
 
 	/// Generate a unit reference, a printable unique string for unit
 extern std::string UnitReference(const CUnit &unit);
+	/// Generate a unit reference, a printable unique string for unit
+extern std::string UnitReference(const CUnitPtr &unit);
+
 	/// Save an order
 extern void SaveOrder(const COrder &order, const CUnit &unit, CFile *file);
 	/// save unit-structure

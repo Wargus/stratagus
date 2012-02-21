@@ -45,6 +45,7 @@
 #include "spells.h"
 #include "construct.h"
 #include "iolib.h"
+#include "actions.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -60,6 +61,20 @@ std::string UnitReference(const CUnit &unit)
 		std::hex << UnitNumber(unit);
 	return ss.str();
 }
+
+/**
+**  Generate a unit reference, a printable unique string for unit.
+*/
+std::string UnitReference(const CUnitPtr &unit)
+{
+	Assert(unit != NULL);
+
+	std::ostringstream ss;
+	ss << "U" << std::setfill('0') << std::setw(4) << std::uppercase <<
+		std::hex << unit->Slot;
+	return ss.str();
+}
+
 
 /**
 **  Save an order.
@@ -107,9 +122,6 @@ void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 			break;
 		case UnitActionUpgradeTo:
 			file.printf("\"action-upgrade-to\",");
-			break;
-		case UnitActionBuilt:
-			file.printf("\"action-built\",");
 			break;
 		case UnitActionBoard:
 			file.printf("\"action-board\",");
@@ -203,28 +215,6 @@ void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 			file.printf("}");
 			break;
 		case UnitActionBuilt:
-		{
-			CConstructionFrame *cframe;
-			int frame;
-
-			cframe = unit.Type->Construction->Frames;
-			frame = 0;
-			while (cframe != order.Data.Built.Frame) {
-				cframe = cframe->Next;
-				++frame;
-			}
-			file.printf(",\n  \"data-built\", {");
-
-			if (order.Data.Built.Worker) {
-				file.printf("\"worker\", \"%s\", ", UnitReference(*order.Data.Built.Worker).c_str());
-			}
-			file.printf("\"progress\", %d, \"frame\", %d", order.Data.Built.Progress, frame);
-			if (order.Data.Built.Cancel) {
-				file.printf(", \"cancel\"");
-			}
-			file.printf("}");
-			break;
-		}
 		case UnitActionResearch:
 			break;
 		case UnitActionUpgradeTo:

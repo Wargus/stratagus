@@ -49,41 +49,12 @@
 #include "interface.h"
 #include "pathfinder.h"
 #include "construct.h"
+#include "iolib.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**  Update construction frame
-**
-**  @param unit  The building under construction.
-*/
-static void UpdateConstructionFrame(CUnit &unit)
-{
-	CConstructionFrame *cframe;
-	CConstructionFrame *tmp;
-	int percent;
-
-	percent = unit.CurrentOrder()->Data.Built.Progress /
-		(unit.Type->Stats[unit.Player->Index].Costs[TimeCost] * 6);
-	cframe = tmp = unit.Type->Construction->Frames;
-	while (tmp) {
-		if (percent < tmp->Percent) {
-			break;
-		}
-		cframe = tmp;
-		tmp = tmp->Next;
-	}
-	if (cframe != unit.CurrentOrder()->Data.Built.Frame) {
-		unit.CurrentOrder()->Data.Built.Frame = cframe;
-		if (unit.Frame < 0) {
-			unit.Frame = -cframe->Frame - 1;
-		} else {
-			unit.Frame = cframe->Frame;
-		}
-	}
-}
 
 /**
 **  Move to build location
@@ -287,7 +258,8 @@ static void StartBuilding(CUnit &unit, CUnit &ontop)
 	}
 
 	// Must set action before placing, otherwise it will incorrectly mark radar
-	build->CurrentOrder()->Action = UnitActionBuilt;
+	delete build->CurrentOrder();
+	build->Orders[0] = COrder::NewActionBuilt(unit, *build);
 
 	// Must place after previous for map flags
 	build->Place(pos);
@@ -298,18 +270,10 @@ static void StartBuilding(CUnit &unit, CUnit &ontop)
 	// HACK: the building is not ready yet
 	build->Player->UnitTypesCount[type.Slot]--;
 
-	// Make sure the bulding doesn't cancel itself out right away.
-	build->CurrentOrder()->Data.Built.Progress = 0;//FIXME ? 100 : 0
-	build->Variable[HP_INDEX].Value = 1;
-	if (build->Variable[SHIELD_INDEX].Max)
-		build->Variable[SHIELD_INDEX].Value = 1;
-	UpdateConstructionFrame(*build);
-
 	// We need somebody to work on it.
 	if (!type.BuilderOutside) {
 		//FIXME: cancel buld gen crash
 		// Place the builder inside the building
-		build->CurrentOrder()->Data.Built.Worker = &unit;
 		// HACK: allows the unit to be removed
 		build->CurrentSightRange = 1;
 		//HACK: reset anim
@@ -337,7 +301,6 @@ static void StartBuilding(CUnit &unit, CUnit &ontop)
 		// Mark the new building seen.
 		MapMarkUnitSight(*build);
 	}
-	UpdateConstructionFrame(*build);
 }
 
 /**
@@ -359,48 +322,6 @@ static void BuildBuilding(CUnit &unit)
 	//
 	//int animlength = unit.Data.Build.Cycles;
 	unit.CurrentOrder()->Data.Build.Cycles = 0;
-#if 0
-	CUnit *goal;
-	int hp;
-
-	//goal hp are mod by HandleActionBuilt
-	//and outsid builder use repair now.
-	goal = unit.CurrentOrder()->GetGoal();
-	//Assert(goal);
-	if(!goal) {
-		return;
-	}
-
-	if (goal->CurrentAction() == UnitActionDie) {
-		unit.CurrentOrder()->ClearGoal();
-		unit.State = 0;
-		unit.ClearAction();
-		return;
-	}
-
-	// hp is the current damage taken by the unit.
-	hp = (goal->CurrentOrder()->Data.Built.Progress * goal->Variable[HP_INDEX].Max) /
-		(goal->Stats->Costs[TimeCost] * 600) - goal->Variable[HP_INDEX].Value;
-
-	// FIXME: implement this below:
-	// unit.CurrentOrder()->Data.Built.Worker->Type->BuilderSpeedFactor;
-	goal->CurrentOrder()->Data.Built.Progress += 100 * animlength * SpeedBuild;
-	// Keep the same level of damage while increasing HP.
-	goal->Variable[HP_INDEX].Value = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) /
-		(goal->Stats->Costs[TimeCost] * 600) - hp;
-	if (goal->Variable[HP_INDEX].Value > goal->Variable[HP_INDEX].Max) {
-		goal->Variable[HP_INDEX].Value = goal->Variable[HP_INDEX].Max;
-	}
-
-	//
-	// Building is gone or finished
-	//
-	if (goal->Variable[HP_INDEX].Value == goal->Variable[HP_INDEX].Max) {
-		unit.CurrentOrder()->ClearGoal();
-		unit.State = 0;
-		unit.ClearAction();
-	}
-#endif
 }
 
 /**
@@ -425,6 +346,317 @@ void HandleActionBuild(COrder& /*order*/, CUnit &unit)
 	}
 }
 
+///////////////////////////
+// Action_built
+//////////////////////////
+
+/* virtual */ COrder_Built *COrder_Built::Clone() const
+{
+	return new COrder_Built(*this);
+}
+/* virtual */ void COrder_Built::Save(CFile &file, const CUnit &unit) const
+{
+	file.printf("{\"action-built\", ");
+
+	CConstructionFrame *cframe = unit.Type->Construction->Frames;
+	int frame = 0;
+	while (cframe != this->Data.Frame) {
+		cframe = cframe->Next;
+		++frame;
+	}
+	if (this->Data.Worker == NULL) {
+		file.printf("\"worker\", \"%s\", ", UnitReference(this->Data.Worker).c_str());
+	}
+	file.printf("\"progress\", %d, \"frame\", %d", this->Data.Progress, frame);
+	if (this->Data.Cancel) {
+		file.printf(", \"cancel\"");
+	}
+	file.printf("}");
+}
+
+/* virtual */ bool COrder_Built::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+{
+	if (!strcmp(value, "worker")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Data.Worker = CclGetUnitFromRef(l);
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "progress")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Data.Progress = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "cancel")) {
+		this->Data.Cancel = 1;
+	} else if (!strcmp(value, "frame")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		int frame = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+		CConstructionFrame *cframe = unit.Type->Construction->Frames;
+		while (frame--) {
+			cframe = cframe->Next;
+		}
+		this->Data.Frame = cframe;
+	} else {
+		return false;
+	}
+	return true;
+}
+
+
+static void CancelBuilt(COrder_Built &order, CUnit &unit)
+{
+	Assert(unit.CurrentOrder() == &order);
+	CUnit *worker = order.GetWorkerPtr();
+
+	// Drop out unit
+	if (worker != NULL) {
+
+
+
+		worker->ClearAction();
+
+		// HACK: make sure the sight is updated correctly
+//		unit.CurrentSightRange = 1;
+		DropOutOnSide(*worker, LookingW, &unit);
+//		unit.CurrentSightRange = 0;
+	}
+
+	// Player gets back 75% of the original cost for a building.
+	unit.Player->AddCostsFactor(unit.Stats->Costs, CancelBuildingCostsFactor);
+	// Cancel building
+	LetUnitDie(unit);
+}
+
+static bool Finish(COrder_Built &order, CUnit& unit)
+{
+	const CUnitType &type = *unit.Type;
+	CPlayer &player = *unit.Player;
+
+	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.Index _C_ type.Ident.c_str() _C_ type.Name.c_str() );
+
+	// HACK: the building is ready now
+	player.UnitTypesCount[type.Slot]++;
+	unit.Constructed = 0;
+	if (unit.Frame < 0) {
+		unit.Frame = -1;
+	} else {
+		unit.Frame = 0;
+	}
+	CUnit *worker = order.GetWorkerPtr();
+
+	if (worker != NULL) {
+		if (type.BuilderLost) {
+			// Bye bye worker.
+			LetUnitDie(*worker);
+			worker = NULL;
+		} else { // Drop out the worker.
+			worker->ClearAction();
+#if 0
+			// HACK: make sure the sight is updated correctly
+			// unit.CurrentSightRange = 1;
+#endif
+			DropOutOnSide(*worker, LookingW, &unit);
+
+			// If we can harvest from the new building, do it.
+			if (worker->Type->ResInfo[type.GivesResource]) {
+				CommandResource(*worker, unit, 0);
+			}
+		}
+	}
+
+	if (type.GivesResource && type.StartingResources != 0) {
+		// Has StartingResources, Use those
+		unit.ResourcesHeld = type.StartingResources;
+	}
+
+	player.Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y, _("New %s done"), type.Name.c_str());
+	if (&player == ThisPlayer) {
+		if (type.Sound.Ready.Sound) {
+			PlayUnitSound(unit, VoiceReady);
+		} else if (worker) {
+			PlayUnitSound(*worker, VoiceWorkCompleted);
+		} else {
+			PlayUnitSound(unit, VoiceBuilding);
+		}
+	}
+
+	if (player.AiEnabled) {
+		/* Worker can be NULL */
+		AiWorkComplete(worker, unit);
+	}
+
+	// FIXME: Vladi: this is just a hack to test wall fixing,
+	// FIXME:  also not sure if the right place...
+	// FIXME: Johns: hardcoded unit-type wall / more races!
+	if (&type == UnitTypeOrcWall || &type == UnitTypeHumanWall) {
+		Map.SetWall(unit.tilePos, &type == UnitTypeHumanWall);
+		unit.Remove(NULL);
+		UnitLost(unit);
+		UnitClearOrders(unit);
+		unit.Release();
+		return false;
+	}
+
+	UpdateForNewUnit(unit, 0);
+
+	// Set the direction of the building if it supports them
+	if (type.NumDirections > 1) {
+		if (type.Wall) { // Special logic for walls
+			CorrectWallDirections(unit);
+			CorrectWallNeighBours(unit);
+		} else {
+			unit.Direction = (MyRand() >> 8) & 0xFF; // random heading
+		}
+		UnitUpdateHeading(unit);
+	}
+
+	if (IsOnlySelected(unit) || &player == ThisPlayer) {
+		SelectedUnitChanged();
+	}
+	MapUnmarkUnitSight(unit);
+	unit.CurrentSightRange = unit.Stats->Variables[SIGHTRANGE_INDEX].Max;
+	MapMarkUnitSight(unit);
+	return true;
+}
+
+
+/* virtual */ bool COrder_Built::Execute(CUnit &unit)
+{
+	const CUnitType &type = *unit.Type;
+
+	int amount;
+	if (type.BuilderOutside) {
+		amount = type.AutoBuildRate;
+	} else {
+		// FIXME: implement this below:
+		// this->Data.Worker->Type->BuilderSpeedFactor;
+		amount = 100;
+	}
+	this->Progress(unit, amount);
+
+	// Check if construction should be canceled...
+	if (this->Data.Cancel || this->Data.Progress < 0) {
+		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.Type->Name.c_str());
+
+		CancelBuilt(*this, unit);
+		return false;
+	}
+
+	const int maxProgress = type.Stats[unit.Player->Index].Costs[TimeCost] * 600;
+
+	// Check if building ready. Note we can both build and repair.
+	if (!unit.Anim.Unbreakable && this->Data.Progress >= maxProgress) {
+		return Finish(*this, unit);
+	}
+	return false;
+}
+
+/* virtual */ void COrder_Built::Cancel(CUnit &unit)
+{
+	this->Data.Cancel = 1;
+}
+
+/* virtual */ void COrder_Built::UpdateUnitVariables(CUnit &unit) const
+{
+	Assert(unit.CurrentOrder() == this);
+
+	unit.Variable[BUILD_INDEX].Value = this->Data.Progress;
+	unit.Variable[BUILD_INDEX].Max = unit.Type->Stats[unit.Player->Index].Costs[TimeCost] * 600;
+
+	// This should happen when building unit with several peons
+	// Maybe also with only one.
+	// FIXME : Should be better to fix it in action_{build,repair}.c ?
+	if (unit.Variable[BUILD_INDEX].Value > unit.Variable[BUILD_INDEX].Max) {
+		// assume value is wrong.
+		unit.Variable[BUILD_INDEX].Value = unit.Variable[BUILD_INDEX].Max;
+	}
+}
+
+/* virtual */ void COrder_Built::FillSeenValues(CUnit &unit) const
+{
+	unit.Seen.State = 1;
+	unit.Seen.CFrame = this->Data.Frame;
+}
+
+
+static const CConstructionFrame *FindCFramePercent(const CConstructionFrame &cframe, int percent)
+{
+	const CConstructionFrame *prev = &cframe;
+
+	for (const CConstructionFrame *it = cframe.Next; it; it = it->Next) {
+		if (percent < it->Percent) {
+			return prev;
+		}
+		prev = it;
+	}
+	return prev;
+}
+
+/**
+**  Update construction frame
+**
+**  @param unit  The building under construction.
+*/
+void COrder_Built::UpdateConstructionFrame(CUnit &unit)
+{
+	const CUnitType &type = *unit.Type;
+	const int percent = this->Data.Progress / (type.Stats[unit.Player->Index].Costs[TimeCost] * 6);
+	const CConstructionFrame *cframe = FindCFramePercent(*type.Construction->Frames, percent);
+
+	Assert(cframe != NULL);
+
+	if (cframe != this->Data.Frame) {
+		this->Data.Frame = cframe;
+		if (unit.Frame < 0) {
+			unit.Frame = -cframe->Frame - 1;
+		} else {
+			unit.Frame = cframe->Frame;
+		}
+	}
+}
+
+
+void COrder_Built::Progress(CUnit &unit, int amount)
+{
+	Boost(unit, amount, HP_INDEX);
+	Boost(unit, amount, SHIELD_INDEX);
+
+	this->Data.Progress += amount * SpeedBuild;
+	UpdateConstructionFrame(unit);
+}
+
+void COrder_Built::ProgressHp(CUnit &unit, int amount)
+{
+	Boost(unit, amount, HP_INDEX);
+
+	this->Data.Progress += amount * SpeedBuild;
+	UpdateConstructionFrame(unit);
+}
+
+
+void COrder_Built::Boost(CUnit &building, int amount, int varIndex) const
+{
+	Assert(building.CurrentOrder() == this);
+
+	const int costs = building.Stats->Costs[TimeCost] * 600;
+	const int progress = this->Data.Progress;
+	const int newProgress = progress + amount * SpeedBuild;
+	const int maxValue = building.Variable[varIndex].Max;
+
+	int &currentValue = building.Variable[varIndex].Value;
+
+	// damageValue is the current damage taken by the unit.
+	const int damageValue = (progress * maxValue) / costs - currentValue;
+	
+	// Keep the same level of damage while increasing Value.
+	currentValue = (newProgress * maxValue) / costs - damageValue;
+	currentValue = std::min(currentValue, maxValue);
+}
+
+
+
 /**
 **  Unit under Construction
 **
@@ -432,183 +664,12 @@ void HandleActionBuild(COrder& /*order*/, CUnit &unit)
 */
 void HandleActionBuilt(COrder& order, CUnit &unit)
 {
-	CUnit *worker;
-	CUnitType *type;
-	int n, mod;
-	int progress, oldprogress;
-	//For shields
-	int sn, smod;
+	Assert(order.Action == UnitActionBuilt);
 
-	type = unit.Type;
-
-	// mod is use for round to upper
-	mod = (unit.Stats->Costs[TimeCost] * 600) - unit.Variable[HP_INDEX].Value;
-	smod = (unit.Stats->Costs[TimeCost] * 600) - unit.Variable[SHIELD_INDEX].Value;
-
-	// n is the current damage taken by the unit.
-	n = (order.Data.Built.Progress * unit.Variable[HP_INDEX].Max + (mod - 1)) / mod;
-	sn = (order.Data.Built.Progress * unit.Variable[SHIELD_INDEX].Max + (smod - 1)) / smod;
-
-	// This below is most often 0
-	if (type->BuilderOutside) {
-		progress = unit.Type->AutoBuildRate;
-	} else {
-		progress = 100;
-		// FIXME: implement this below:
-		// unit.Data.Built.Worker->Type->BuilderSpeedFactor;
-	}
-	// Building speeds increase or decrease.
-	progress *= SpeedBuild;
-	oldprogress = order.Data.Built.Progress;
-	order.Data.Built.Progress += progress;
-	// mod is use for round to upper and use it as cache
-	mod = type->Stats[unit.Player->Index].Costs[TimeCost] * 600;
-
-	// Keep the same level of damage while increasing HP.
-	unit.Variable[HP_INDEX].Value +=
-	 (order.Data.Built.Progress * unit.Variable[HP_INDEX].Max + (mod - n - 1)) / (mod - n) -
-	  (oldprogress * unit.Variable[HP_INDEX].Max + (mod - n - 1)) / (mod - n);
-	if (unit.Variable[HP_INDEX].Value > unit.Stats->Variables[HP_INDEX].Max) {
-		unit.Variable[HP_INDEX].Value = unit.Stats->Variables[HP_INDEX].Max;
-	}
-	if (unit.Variable[SHIELD_INDEX].Max > 0)
-	{
-		unit.Variable[SHIELD_INDEX].Value +=
-		 (order.Data.Built.Progress * unit.Variable[SHIELD_INDEX].Max + (mod - sn - 1)) / (mod - sn) -
-		  (oldprogress * unit.Variable[SHIELD_INDEX].Max + (mod - sn - 1)) / (mod - sn);
-		if (unit.Variable[SHIELD_INDEX].Value > unit.Stats->Variables[SHIELD_INDEX].Max) {
-			unit.Variable[SHIELD_INDEX].Value = unit.Stats->Variables[SHIELD_INDEX].Max;
-		}
-	}
-
-	// Check if construction should be canceled...
-	if (order.Data.Built.Cancel || order.Data.Built.Progress < 0) {
-		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.Type->Name.c_str());
-		// Drop out unit
-		if ((worker = order.Data.Built.Worker)) {
-
-			worker->CurrentOrder()->ClearGoal();
-			worker->ClearAction();
-			//worker->State = 0;
-
-			unit.CurrentOrder()->Data.Built.Worker = NoUnitP;
-			// HACK: make sure the sight is updated correctly
-			unit.CurrentSightRange = 1;
-			DropOutOnSide(*worker, LookingW, &unit);
-			unit.CurrentSightRange = 0;
-		}
-
-		// Player gets back 75% of the original cost for a building.
-		unit.Player->AddCostsFactor(unit.Stats->Costs, CancelBuildingCostsFactor);
-		// Cancel building
-		LetUnitDie(unit);
-		return;
-	}
-
-	//
-	// Check if building ready. Note we can both build and repair.
-	//
-	//if (unit.CurrentOrder()->Data.Built.Progress >= unit.Stats->Costs[TimeCost] * 600 ||
-	if (!order.Data.Built.Worker->Anim.Unbreakable && (order.Data.Built.Progress >= mod ||
-			unit.Variable[HP_INDEX].Value >= unit.Stats->Variables[HP_INDEX].Max)) {
-		DebugPrint("%d: Building %s(%s) ready.\n" _C_ unit.Player->Index
-		_C_ unit.Type->Ident.c_str() _C_ unit.Type->Name.c_str() );
-		if (unit.Variable[HP_INDEX].Value > unit.Stats->Variables[HP_INDEX].Max) {
-			unit.Variable[HP_INDEX].Value = unit.Stats->Variables[HP_INDEX].Max;
-		}
+	if (order.Execute(unit)) {
+		order.ClearGoal();
 		unit.ClearAction();
-		// HACK: the building is ready now
-		unit.Player->UnitTypesCount[type->Slot]++;
-		unit.Constructed = 0;
-		if (unit.Frame < 0) {
-			unit.Frame = -1;
-		} else {
-			unit.Frame = 0;
-		}
-
-		if ((worker = unit.CurrentOrder()->Data.Built.Worker)) {
-			// Bye bye worker.
-			if (type->BuilderLost) {
-				// FIXME: enough?
-				LetUnitDie(*worker);
-				worker = NULL;
-			// Drop out the worker.
-			} else {
-				worker->ClearAction();
-				worker->SubAction = 0;//may be 40
-				// HACK: make sure the sight is updated correctly
-				unit.CurrentSightRange = 1;
-				DropOutOnSide(*worker, LookingW, &unit);
-
-				worker->CurrentOrder()->ClearGoal();
-
-				//
-				// If we can harvest from the new building, do it.
-				//
-				if (worker->Type->ResInfo[type->GivesResource]) {
-					CommandResource(*worker, unit, 0);
-				}
-			}
-		}
-
-		if (type->GivesResource) {
-			// Set to Zero as it's part of a union
-			memset(&unit.CurrentOrder()->Data, 0, sizeof(unit.CurrentOrder()->Data));
-			// Has StartingResources, Use those
-			unit.ResourcesHeld = type->StartingResources;
-		}
-
-		unit.Player->Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
-			_("New %s done"), type->Name.c_str());
-		if (unit.Player == ThisPlayer) {
-			if (unit.Type->Sound.Ready.Sound) {
-				PlayUnitSound(unit, VoiceReady);
-			} else if (worker) {
-				PlayUnitSound(*worker, VoiceWorkCompleted);
-			} else {
-				PlayUnitSound(unit, VoiceBuilding);
-			}
-		}
-
-		if (unit.Player->AiEnabled) {
-			/* Worker can be NULL */
-			AiWorkComplete(worker, unit);
-		}
-
-		// FIXME: Vladi: this is just a hack to test wall fixing,
-		// FIXME:  also not sure if the right place...
-		// FIXME: Johns: hardcoded unit-type wall / more races!
-		if (unit.Type == UnitTypeOrcWall || unit.Type == UnitTypeHumanWall) {
-			Map.SetWall(unit.tilePos, unit.Type == UnitTypeHumanWall);
-			unit.Remove(NULL);
-			UnitLost(unit);
-			UnitClearOrders(unit);
-			unit.Release();
-			return;
-		}
-
-		UpdateForNewUnit(unit, 0);
-
-		// Set the direction of the building if it supports them
-		if (unit.Type->NumDirections > 1) {
-			if (unit.Type->Wall) { // Special logic for walls
-				CorrectWallDirections(unit);
-				CorrectWallNeighBours(unit);
-			} else {
-				unit.Direction = (MyRand() >> 8) & 0xFF; // random heading
-			}
-			UnitUpdateHeading(unit);
-		}
-
-		if (IsOnlySelected(unit) || unit.Player == ThisPlayer) {
-			SelectedUnitChanged();
-		}
-		unit.CurrentSightRange = unit.Stats->Variables[SIGHTRANGE_INDEX].Max;
-		MapMarkUnitSight(unit);
-		return;
 	}
-
-	UpdateConstructionFrame(unit);
 }
 
 //@}

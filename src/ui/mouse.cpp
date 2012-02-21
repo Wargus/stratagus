@@ -61,6 +61,7 @@
 #include "network.h"
 #include "spells.h"
 #include "widgets.h"
+#include "actions.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

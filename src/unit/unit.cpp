@@ -266,7 +266,9 @@ unsigned int CUnit::CurrentAction() const
 
 void CUnit::ClearAction()
 {
-	CurrentOrder()->Action = UnitActionStill;
+	delete CurrentOrder();
+	Orders[0] = COrder::NewActionStill();
+
 	SubAction = 0;
 	if (Selected) {
 		SelectedUnitChanged();
@@ -2821,16 +2823,6 @@ void LetUnitDie(CUnit &unit)
 		unit.Goal = NULL;
 	}
 
-	// During resource build, the worker holds the resource amount,
-	// but if canceling building the platform, the worker is already
-	// outside.
-	if (type->GivesResource &&
-			unit.CurrentAction() == UnitActionBuilt &&
-			unit.CurrentOrder()->Data.Built.Worker) {
-		// Restore value for oil-patch
-		unit.ResourcesHeld = unit.CurrentOrder()->Data.Built.Worker->ResourcesHeld;
-	}
-
 	// Transporters lose or save their units and building their workers
 	if (unit.UnitInside && unit.Type->SaveCargo)
 		DropOutAll(unit);
@@ -2840,7 +2832,6 @@ void LetUnitDie(CUnit &unit)
 	unit.Remove(NULL);
 	UnitLost(unit);
 	UnitClearOrders(unit);
-
 
 
 	// Unit has death animation.

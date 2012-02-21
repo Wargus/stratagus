@@ -165,7 +165,7 @@ void ChangeSelectedUnits(CUnit **units, int count)
 	if (count == 1 && units[0]->Type->ClicksToExplode &&
 		!units[0]->Type->IsNotSelectable) {
 		HandleSuicideClick(*units[0]);
-		if (units[0]->CurrentAction() == UnitActionDie) {
+		if (!units[0]->IsAlive()) {
 			NetworkSendSelection(units, count);
 			return ;
 		}
@@ -379,7 +379,7 @@ int SelectUnitsByType(CUnit &base)
 
 	// if unit is a cadaver or hidden (not on map)
 	// no unit can be selected.
-	if (base.Removed || base.CurrentAction() == UnitActionDie) {
+	if (base.Removed || base.IsAlive() == false) {
 		return 0;
 	}
 
@@ -464,7 +464,7 @@ int ToggleUnitsByType(CUnit &base)
 
 	// if unit is a cadaver or hidden (not on map)
 	// no unit can be selected.
-	if (base.Removed || base.CurrentAction() == UnitActionDie) {
+	if (base.Removed || base.IsAlive() == false) {
 		return 0;
 	}
 	// if unit isn't belonging to the player, or is a static unit
@@ -709,7 +709,7 @@ CUnit**table, int num_units = UnitMax)
 			continue;
 		}
 		// FIXME: Can we get this?
-		if (!unit.Removed && unit.CurrentAction() != UnitActionDie) {
+		if (!unit.Removed && unit.IsAlive()) {
 			SelectSingleUnit(unit);
 			return 1;
 		}

@@ -40,6 +40,7 @@
 #include "unittype.h"
 #include "unit.h"
 #include "pathfinder.h"
+#include "actions.h"
 
 //astar.cpp
 

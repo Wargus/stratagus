@@ -60,6 +60,7 @@
 #include "ai.h"
 #include "widgets.h"
 #include "replay.h"
+#include "actions.h"
 
 /*----------------------------------------------------------------------------
 --  Defines

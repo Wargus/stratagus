@@ -62,69 +62,45 @@
 */
 static void RepairUnit(CUnit &unit, CUnit &goal)
 {
-	CPlayer *player;
-	int animlength;
-	int hp;
+	if (goal.CurrentAction() == UnitActionBuilt) {
+		COrder_Built &order = *static_cast<COrder_Built *>(goal.CurrentOrder());
+
+		order.ProgressHp(goal, 100 * unit.CurrentOrder()->Data.Repair.Cycles);
+		unit.CurrentOrder()->Data.Repair.Cycles = 0;
+		return ;
+	}
+	CPlayer *player = unit.Player;
 	char buf[100];
 
-	player = unit.Player;
+	// Calculate the repair costs.
+	Assert(goal.Stats->Variables[HP_INDEX].Max);
 
-	if (goal.CurrentAction() != UnitActionBuilt) {
-		//
-		// Calculate the repair costs.
-		//
-		Assert(goal.Stats->Variables[HP_INDEX].Max);
-
-		//
-		// Check if enough resources are available
-		//
-		for (int i = 1; i < MaxCosts; ++i) {
-			if (player->Resources[i] < goal.Type->RepairCosts[i]) {
-				snprintf(buf, 100, _("We need more %s for repair!"),
-					DefaultResourceNames[i].c_str());
-				player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y, buf);
-				if (player->AiEnabled) {
-					// FIXME: call back to AI?
-					unit.CurrentOrder()->ClearGoal();
-					if (!unit.RestoreOrder()) {
-						unit.ClearAction();
-						unit.State = 0;
-					}
+	// Check if enough resources are available
+	for (int i = 1; i < MaxCosts; ++i) {
+		if (player->Resources[i] < goal.Type->RepairCosts[i]) {
+			snprintf(buf, 100, _("We need more %s for repair!"),
+				DefaultResourceNames[i].c_str());
+			player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y, buf);
+			if (player->AiEnabled) {
+				// FIXME: call back to AI?
+				unit.CurrentOrder()->ClearGoal();
+				if (!unit.RestoreOrder()) {
+					unit.ClearAction();
+					unit.State = 0;
 				}
-				// FIXME: We shouldn't animate if no resources are available.
-				return;
 			}
+			// FIXME: We shouldn't animate if no resources are available.
+			return;
 		}
-		//
-		// Subtract the resources
-		//
-		player->SubCosts(goal.Type->RepairCosts);
+	}
+	//
+	// Subtract the resources
+	//
+	player->SubCosts(goal.Type->RepairCosts);
 
-		goal.Variable[HP_INDEX].Value += goal.Type->RepairHP;
-		if (goal.Variable[HP_INDEX].Value > goal.Variable[HP_INDEX].Max) {
-			goal.Variable[HP_INDEX].Value = goal.Variable[HP_INDEX].Max;
-		}
-	} else {
-		int costs = goal.Stats->Costs[TimeCost] * 600;
-		// hp is the current damage taken by the unit.
-		hp = (goal.CurrentOrder()->Data.Built.Progress * goal.Variable[HP_INDEX].Max) /
-			costs - goal.Variable[HP_INDEX].Value;
-		//
-		// Calculate the length of the attack (repair) anim.
-		//
-		animlength = unit.CurrentOrder()->Data.Repair.Cycles;
-		unit.CurrentOrder()->Data.Repair.Cycles = 0;
-
-		// FIXME: implement this below:
-		//unit.Data.Built.Worker->Type->BuilderSpeedFactor;
-		goal.CurrentOrder()->Data.Built.Progress += 100 * animlength * SpeedBuild;
-		// Keep the same level of damage while increasing HP.
-		goal.Variable[HP_INDEX].Value =
-			(goal.CurrentOrder()->Data.Built.Progress * goal.Stats->Variables[HP_INDEX].Max) /
-			costs - hp;
-		if (goal.Variable[HP_INDEX].Value > goal.Variable[HP_INDEX].Max) {
-			goal.Variable[HP_INDEX].Value = goal.Variable[HP_INDEX].Max;
-		}
+	goal.Variable[HP_INDEX].Value += goal.Type->RepairHP;
+	if (goal.Variable[HP_INDEX].Value > goal.Variable[HP_INDEX].Max) {
+		goal.Variable[HP_INDEX].Value = goal.Variable[HP_INDEX].Max;
 	}
 }
 

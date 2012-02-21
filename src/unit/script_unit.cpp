@@ -156,53 +156,6 @@ static void CclGetPos(lua_State *l, T *x , T *y, const int offset = -1)
 }
 
 /**
-**  Parse built
-**
-**  @param l     Lua state.
-**  @param order  Unit pointer which should be filled with the data.
-*/
-static void CclParseBuilt(lua_State *l, const CUnit &unit, COrderPtr order)
-{
-	const char *value;
-	int args;
-	int j;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	args = lua_objlen(l, -1);
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++j;
-		if (!strcmp(value, "worker")) {
-			lua_rawgeti(l, -1, j + 1);
-			order->Data.Built.Worker = CclGetUnitFromRef(l);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "progress")) {
-			lua_rawgeti(l, -1, j + 1);
-			order->Data.Built.Progress = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "cancel")) {
-			order->Data.Built.Cancel = 1;
-			--j;
-		} else if (!strcmp(value, "frame")) {
-			lua_rawgeti(l, -1, j + 1);
-			int frame = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			CConstructionFrame *cframe = unit.Type->Construction->Frames;
-			while (frame--) {
-				cframe = cframe->Next;
-			}
-			order->Data.Built.Frame = cframe;
-		} else {
-			LuaError(l, "ParseBuilt: Unsupported tag: %s" _C_ value);
-		}
-	}
-}
-
-/**
 **  Parse res worker data
 **
 **  @param l     Lua state.
@@ -418,11 +371,6 @@ bool COrder::ParseSpecificData(lua_State *l, int &j, const char *value, const CU
 		Vec2i invalidPos = {-1, -1};
 		this->Arg1.Resource.Pos = invalidPos;
 		this->Arg1.Resource.Mine = CclGetUnitFromRef(l);
-		lua_pop(l, 1);
-	} else if (!strcmp(value, "data-built")) {
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		CclParseBuilt(l, unit, this);
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "data-res-worker")) {
 		++j;

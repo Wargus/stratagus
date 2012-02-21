@@ -176,13 +176,27 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 	return order;
 }
 
-/* static */ COrder* COrder::NewActionBuilt()
+/* static */ COrder* COrder::NewActionBuilt(CUnit &builder, CUnit &unit)
 {
-	COrder *order = new COrder;
+	COrder_Built* order = new COrder_Built();
 
 	order->Action = UnitActionBuilt;
+
+	// Make sure the bulding doesn't cancel itself out right away.
+
+	order->Data.Progress = 0;//FIXME ? 100 : 0
+	unit.Variable[HP_INDEX].Value = 1;
+	if (unit.Variable[SHIELD_INDEX].Max) {
+		unit.Variable[SHIELD_INDEX].Value = 1;
+	}
+	order->UpdateConstructionFrame(unit);
+
+	if (unit.Type->BuilderOutside == false) {
+		order->Data.Worker = &builder;
+	}
 	return order;
 }
+
 
 /* static */ COrder* COrder::NewActionDie()
 {
@@ -460,6 +474,14 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 	return order;
 }
 
+/* static */ COrder* COrder::NewActionBuilt()
+{
+	COrder *order = new COrder_Built;
+
+	order->Action = UnitActionBuilt;
+	return order;
+}
+
 /* static */ COrder* COrder::NewActionFollow()
 {
 	COrder *order = new COrder;
@@ -518,7 +540,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionSpellCast()
 {
-	COrder *order = new COrder;
+	COrder *order = new COrder_SpellCast;
 
 	order->Action = UnitActionSpellCast;
 	return order;
@@ -655,17 +677,13 @@ bool COrder::CheckRange() const
 	return (Range <= Map.Info.MapWidth || Range <= Map.Info.MapHeight);
 }
 
-void COrder::FillSeenValues(CUnit &unit) const
+/* virtual */ void COrder::FillSeenValues(CUnit &unit) const
 {
-	unit.Seen.State = (Action == UnitActionBuilt) | ((Action == UnitActionUpgradeTo) << 1);
+	unit.Seen.State = ((Action == UnitActionUpgradeTo) << 1);
 	if (unit.CurrentAction() == UnitActionDie) {
 		unit.Seen.State = 3;
 	}
-	if (Action == UnitActionBuilt) {
-		unit.Seen.CFrame = Data.Built.Frame;
-	} else {
-		unit.Seen.CFrame = NULL;
-	}
+	unit.Seen.CFrame = NULL;
 }
 
 bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)

@@ -53,6 +53,7 @@
 #include "unit.h"
 #include "unit_manager.h"
 #include "player.h"
+#include "actions.h"
 #include "luacallback.h"
 
 /*----------------------------------------------------------------------------
@@ -2158,22 +2159,7 @@ static int CclDefineDecorations(lua_State *l)
 
 /* virtual */ void COrder::UpdateUnitVariables(CUnit &unit) const
 {
-	const CUnitType *type = unit.Type;
-
 	switch (unit.CurrentAction()) {
-		// Build
-		case UnitActionBuilt:
-			unit.Variable[BUILD_INDEX].Value = unit.CurrentOrder()->Data.Built.Progress;
-			unit.Variable[BUILD_INDEX].Max = type->Stats[unit.Player->Index].Costs[TimeCost] * 600;
-
-			// This should happen when building unit with several peons
-			// Maybe also with only one.
-			// FIXME : Should be better to fix it in action_{build,repair}.c ?
-			if (unit.Variable[BUILD_INDEX].Value > unit.Variable[BUILD_INDEX].Max) {
-				// assume value is wrong.
-				unit.Variable[BUILD_INDEX].Value = unit.Variable[BUILD_INDEX].Max;
-			}
-		break;
 		// Training
 		case UnitActionTrain:
 			unit.Variable[TRAINING_INDEX].Value = unit.CurrentOrder()->Data.Train.Ticks;

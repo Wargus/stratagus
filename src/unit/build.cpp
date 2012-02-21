@@ -38,6 +38,7 @@
 #include "unittype.h"
 #include "map.h"
 #include "player.h"
+#include "actions.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

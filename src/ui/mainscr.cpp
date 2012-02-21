@@ -59,6 +59,7 @@
 #include "network.h"
 #include "menus.h"
 #include "spells.h"
+#include "actions.h"
 #ifdef DEBUG
 #include "../ai/ai_local.h"
 #endif
@@ -285,7 +286,7 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 **
 **  @return      The desired unit.
 */
-const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
+static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 {
 	switch (e) {
 		case UnitRefItSelf:
@@ -296,7 +297,9 @@ const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 			return unit.Container;
 		case UnitRefWorker :
 			if (unit.CurrentAction() == UnitActionBuilt) {
-				return unit.CurrentOrder()->Data.Built.Worker;
+				COrder_Built &order = *static_cast<COrder_Built*>(unit.CurrentOrder());
+
+				return order.GetWorkerPtr();
 			} else {
 				return NoUnitP;
 			}

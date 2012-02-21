@@ -471,7 +471,7 @@ void CommandDismiss(CUnit &unit)
 {
 	// Check if building is still under construction? (NETWORK!)
 	if (unit.CurrentAction() == UnitActionBuilt) {
-		unit.CurrentOrder()->Data.Built.Cancel = 1;
+		unit.CurrentOrder()->Cancel(unit);
 	} else {
 		DebugPrint("Suicide unit ... \n");
 		LetUnitDie(unit);

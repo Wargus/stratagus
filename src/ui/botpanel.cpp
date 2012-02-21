@@ -56,6 +56,7 @@
 #include "commands.h"
 #include "video.h"
 #include "font.h"
+#include "actions.h"
 #include "guichan/key.h"
 #include "guichan/sdl/sdlinput.h"
 

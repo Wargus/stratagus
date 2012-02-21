@@ -31,15 +31,13 @@
 #define __ACTIONS_H__
 
 //@{
-#ifndef __UNIT_CACHE_H__
-#include "unit_cache.h"
+#ifndef __UNIT_H__
+#include "unit.h"
 #endif
 
 #ifndef __VEC2I_H__
 #include "vec2i.h"
 #endif
-
-//#include "vec2i.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -124,6 +122,7 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void UpdateUnitVariables(CUnit &unit) const;
+	virtual void FillSeenValues(CUnit &unit) const;
 
 
 	void ReleaseRefs(CUnit &owner);
@@ -156,7 +155,6 @@ public:
 	void NewResetPath() { Data.Move.Fast = 1; Data.Move.Length = 0; }
 	void SaveDataMove(CFile &file) const;
 
-	void FillSeenValues(CUnit &unit) const;
 
 	bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 	void AiUnitKilled(CUnit &unit);
@@ -168,6 +166,7 @@ public:
 	static COrder* NewActionBoard(CUnit &unit);
 	static COrder* NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
 	static COrder* NewActionBuilt();
+	static COrder* NewActionBuilt(CUnit &builder, CUnit &unit);
 	static COrder* NewActionDie();
 	static COrder* NewActionFollow(CUnit &dest);
 	static COrder* NewActionMove(const Vec2i &pos);
@@ -235,12 +234,6 @@ public:
 #define MAX_PATH_LENGTH 28          /// max length of precalculated path
 		char Path[MAX_PATH_LENGTH]; /// directions of stored path
 	} Move; /// ActionMove,...
-	struct _order_built_ {
-		CUnit *Worker;              /// Worker building this unit
-		int Progress;               /// Progress counter, in 1/100 cycles.
-		int Cancel;                 /// Cancel construction
-		CConstructionFrame *Frame;   /// Construction frame
-	} Built; /// ActionBuilt,...
 	struct _order_build_ {
 		int Cycles;                 /// Cycles unit has been building for
 	} Build; /// ActionBuild
@@ -259,6 +252,43 @@ public:
 	} Train; /// Train units action
 	} Data; /// Storage room for different commands
 };
+
+class COrder_Built : public COrder
+{
+	friend COrder* COrder::NewActionBuilt(CUnit &builder, CUnit &unit);
+public:
+	virtual COrder_Built *Clone() const;
+
+	virtual void Save(CFile &file, const CUnit &unit) const;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+	virtual bool Execute(CUnit &unit);
+	virtual void Cancel(CUnit &unit);
+
+	virtual void UpdateUnitVariables(CUnit &unit) const;
+	virtual void FillSeenValues(CUnit &unit) const;
+
+	void Progress(CUnit & unit, int amount);
+	void ProgressHp(CUnit &unit, int amount);
+
+	const CConstructionFrame& GetFrame() const { return *Data.Frame; }
+	const CUnitPtr &GetWorker() const { return Data.Worker; }
+	CUnit *GetWorkerPtr() { return Data.Worker; }
+
+private:
+	void Boost(CUnit &building, int amount, int varIndex) const;
+	void UpdateConstructionFrame(CUnit &unit);
+
+private:
+	struct {
+		CUnitPtr Worker;            /// Worker building this unit
+		int Progress;               /// Progress counter, in 1/100 cycles.
+		int Cancel;                 /// Cancel construction
+		const CConstructionFrame *Frame;  /// Construction frame
+	} Data; /// ActionBuilt,...
+};
+
+
 
 class COrder_Research : public COrder
 {

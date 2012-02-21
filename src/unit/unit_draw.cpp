@@ -55,6 +55,7 @@
 #include "interface.h"
 #include "font.h"
 #include "ui.h"
+#include "actions.h"
 #include "script.h"
 
 /*----------------------------------------------------------------------------
@@ -173,7 +174,7 @@ void DrawUnitSelection(const CViewport *vp, const CUnit &unit)
 
 	const CUnitType &type = *unit.Type;
 	const PixelPos screenPos = vp->TilePosToScreen_TopLeft(unit.tilePos);
-	const int x = screenPos.x + unit.IX +type.TileWidth * PixelTileSize.x / 2
+	const int x = screenPos.x + unit.IX + type.TileWidth * PixelTileSize.x / 2
 		- type.BoxWidth / 2 - (type.Width - type.Sprite->Width) / 2;
 	const int y = screenPos.y + unit.IY + type.TileHeight * PixelTileSize.y / 2
 		- type.BoxHeight / 2 - (type.Height - type.Sprite->Height) / 2;
@@ -1080,7 +1081,7 @@ void CUnit::Draw(const CViewport *vp) const
 	int constructed;
 	CPlayerColorGraphic *sprite;
 	ResourceInfo *resinfo;
-	CConstructionFrame *cframe;
+	const CConstructionFrame *cframe;
 	CUnitType *type;
 
 	/*
@@ -1113,8 +1114,14 @@ void CUnit::Draw(const CViewport *vp) const
 		if (state == 2) {
 			type = this->CurrentOrder()->Arg1.Type;
 		}
-		// This is trash unless the unit is being built, and that's when we use it.
-		cframe = this->CurrentOrder()->Data.Built.Frame;
+
+		if (this->CurrentAction() == UnitActionBuilt) {
+			COrder_Built &order = *static_cast<COrder_Built*>(this->CurrentOrder());
+
+			cframe = &order.GetFrame();
+		} else {
+			cframe = NULL;
+		}
 	} else {
 		const Vec2i seenTilePos = {this->Seen.X, this->Seen.Y};
 		const PixelPos &screenPos = vp->TilePosToScreen_TopLeft(seenTilePos);
@@ -1257,8 +1264,13 @@ void CUnitDrawProxy::operator=(const CUnit *unit)
 		}
 
 		if (unit->Constructed) {
-			// This is trash unless the unit is being built, and that's when we use it.
-			cframe = unit->CurrentOrder()->Data.Built.Frame;
+			if (unit->CurrentAction() == UnitActionBuilt) {
+				COrder_Built &order = *static_cast<COrder_Built*>(unit->CurrentOrder());
+
+				cframe = &order.GetFrame();
+			} else {
+				cframe = NULL;
+			}
 		}
 	} else {
 		IY = unit->Seen.IY;

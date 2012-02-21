@@ -284,6 +284,11 @@ extern void SaveCcl(CFile *file);     /// Save CCL module
 extern void SavePreferences();        /// Save user preferences
 extern int CclCommand(const std::string &command, bool exitOnError = true);
 
+
+CUnit *CclGetUnitFromRef(lua_State *l);
+
+
+
 extern NumberDesc *Damage;  /// Damage calculation for missile.
 
 /// transform string in corresponding index.

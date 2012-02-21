@@ -44,6 +44,7 @@
 #include "interface.h"
 #include "network.h"
 #include "player.h"
+#include "actions.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
