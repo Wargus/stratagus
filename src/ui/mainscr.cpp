@@ -589,6 +589,48 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
 	}
 }
 
+static void DrawUnitInfo_Training(const CUnit &unit)
+{
+	if (unit.Orders.size() == 1 || unit.Orders[1]->Action != UnitActionTrain) {
+		if (!UI.SingleTrainingText.empty()) {
+			CLabel label(UI.SingleTrainingFont);
+			label.Draw(UI.SingleTrainingTextX, UI.SingleTrainingTextY,
+				UI.SingleTrainingText);
+		}
+		if (UI.SingleTrainingButton) {
+			const COrder_Train &order = *static_cast<COrder_Train*>(unit.CurrentOrder());
+			const unsigned int flags = (ButtonAreaUnderCursor == ButtonAreaTraining && ButtonUnderCursor == 0) ?
+					(IconActive | (MouseButtons & LeftButton)) : 0;
+
+			order.GetUnitType().Icon.Icon->DrawUnitIcon(unit.Player,
+				UI.SingleTrainingButton->Style, flags,
+				UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y, "");
+		}
+	} else {
+		if (!UI.TrainingText.empty()) {
+			CLabel label(UI.TrainingFont);
+			label.Draw(UI.TrainingTextX, UI.TrainingTextY,
+				UI.TrainingText);
+		}
+		if (!UI.TrainingButtons.empty()) {
+			for (size_t i = 0; i < unit.Orders.size()
+				&& i < UI.TrainingButtons.size(); ++i) {
+				if (unit.Orders[i]->Action == UnitActionTrain) {
+					const COrder_Train &order = *static_cast<COrder_Train*>(unit.Orders[i]);
+
+					const int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
+							&& static_cast<size_t>(ButtonUnderCursor) == i) ?
+							(IconActive | (MouseButtons & LeftButton)) : 0;
+
+					order.GetUnitType().Icon.Icon->DrawUnitIcon(unit.Player,
+						 UI.TrainingButtons[i].Style, flag,
+						UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y, "");
+				}
+			}
+		}
+	}
+}
+
 
 
 /**
@@ -647,74 +689,29 @@ static void DrawUnitInfo(CUnit &unit)
 	{
 		return;
 	}
-	CLabel label(GetGameFont());
 
 	//
 	//  Show progress if they are selected.
 	//
 	if (NumSelected == 1 && Selected[0] == &unit) {
 		switch (unit.CurrentAction()) {
-
-			//
-			//  Building training units.
-			//
-			case UnitActionTrain:
-				if (unit.Orders.size() == 1 || unit.Orders[1]->Action != UnitActionTrain) {
-					if (!UI.SingleTrainingText.empty()) {
-						label.SetFont(UI.SingleTrainingFont);
-						label.Draw(UI.SingleTrainingTextX, UI.SingleTrainingTextY,
-							UI.SingleTrainingText);
-					}
-					if (UI.SingleTrainingButton) {
-						unit.CurrentOrder()->Arg1.Type->Icon.Icon->DrawUnitIcon(unit.Player,
-							UI.SingleTrainingButton->Style,
-							(ButtonAreaUnderCursor == ButtonAreaTraining &&
-								ButtonUnderCursor == 0) ?
-								(IconActive | (MouseButtons & LeftButton)) : 0,
-							UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y, "");
-					}
-				} else {
-					if (!UI.TrainingText.empty()) {
-						label.SetFont(UI.TrainingFont);
-						label.Draw(UI.TrainingTextX, UI.TrainingTextY,
-							UI.TrainingText);
-					}
-					if (!UI.TrainingButtons.empty()) {
-						for (size_t i = 0; i < unit.Orders.size()
-							&& i < UI.TrainingButtons.size(); ++i) {
-							if (unit.Orders[i]->Action == UnitActionTrain) {
-								const int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
-										&& static_cast<size_t>(ButtonUnderCursor) == i) ?
-										(IconActive | (MouseButtons & LeftButton)) : 0;
-
-								unit.Orders[i]->Arg1.Type->Icon.Icon->DrawUnitIcon(unit.Player,
-									 UI.TrainingButtons[i].Style, flag,
-									UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y, "");
-							}
-						}
-					}
-				}
-			return;
-
-			//
-			//  Building upgrading to better type.
-			//
-			case UnitActionUpgradeTo:
+			case UnitActionTrain: { //  Building training units.
+				DrawUnitInfo_Training(unit);
+				return;
+			}
+			case UnitActionUpgradeTo: { //  Building upgrading to better type.
 				if (UI.UpgradingButton) {
-					unit.CurrentOrder()->Arg1.Type->Icon.Icon->DrawUnitIcon(unit.Player,
+					const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo*>(unit.CurrentOrder());
+					order.GetUnitType().Icon.Icon->DrawUnitIcon(unit.Player,
 						UI.UpgradingButton->Style,
 						(ButtonAreaUnderCursor == ButtonAreaUpgrading &&
 							ButtonUnderCursor == 0) ?
 							(IconActive | (MouseButtons & LeftButton)) : 0,
 						UI.UpgradingButton->X, UI.UpgradingButton->Y, "");
 				}
-			return;
-
-			//
-			//  Building research new technology.
-			//
-			case UnitActionResearch:
-			{
+				return;
+			}
+			case UnitActionResearch: { //  Building research new technology.
 				if (UI.ResearchingButton) {
 					COrder_Research &order = *static_cast<COrder_Research *>(unit.CurrentOrder());
 
@@ -728,7 +725,7 @@ static void DrawUnitInfo(CUnit &unit)
 				return;
 			}
 			default:
-			break;
+				break;
 		}
 	}
 

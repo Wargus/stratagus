@@ -2156,27 +2156,6 @@ static int CclDefineDecorations(lua_State *l)
 
 // ----------------------------------------------------------------------------
 
-
-/* virtual */ void COrder::UpdateUnitVariables(CUnit &unit) const
-{
-	switch (unit.CurrentAction()) {
-		// Training
-		case UnitActionTrain:
-			unit.Variable[TRAINING_INDEX].Value = unit.CurrentOrder()->Data.Train.Ticks;
-			unit.Variable[TRAINING_INDEX].Max =
-				unit.CurrentOrder()->Arg1.Type->Stats[unit.Player->Index].Costs[TimeCost];
-		break;
-		// UpgradeTo
-		case UnitActionUpgradeTo:
-			unit.Variable[UPGRADINGTO_INDEX].Value = unit.CurrentOrder()->Data.UpgradeTo.Ticks;
-			unit.Variable[UPGRADINGTO_INDEX].Max =
-				unit.CurrentOrder()->Arg1.Type->Stats[unit.Player->Index].Costs[TimeCost];
-		break;
-		default:
-		break;
-	}
-}
-
 /**
 **  Update unit variables which are not user defined.
 */

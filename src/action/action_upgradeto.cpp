@@ -43,29 +43,31 @@
 #include "unit.h"
 #include "actions.h"
 #include "ai.h"
-#include "interface.h"
 #include "map.h"
 #include "spells.h"
+#include "script.h"
+#include "iolib.h"
+
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**  Transform an unit in another.
+**  Transform a unit in another.
 **
 **  @param unit     unit to transform.
 **  @param newtype  new type of the unit.
 **
 **  @return 0 on error, 1 if nothing happens, 2 else.
 */
-static int TransformUnitIntoType(CUnit &unit, CUnitType &newtype)
+static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 {
-	CUnitType *oldtype = unit.Type;
-	if (oldtype == &newtype) { // nothing to do
+	const CUnitType &oldtype = *unit.Type;
+	if (&oldtype == &newtype) { // nothing to do
 		return 1;
 	}
-	const Vec2i pos = unit.tilePos + oldtype->GetHalfTileSize() - newtype.GetHalfTileSize();
+	const Vec2i pos = unit.tilePos + oldtype.GetHalfTileSize() - newtype.GetHalfTileSize();
 	CUnit *container = unit.Container;
 
 	if (container) {
@@ -81,16 +83,16 @@ static int TransformUnitIntoType(CUnit &unit, CUnitType &newtype)
 		}
 	}
 	CPlayer &player = *unit.Player;
-	player.UnitTypesCount[oldtype->Slot]--;
+	player.UnitTypesCount[oldtype.Slot]--;
 	player.UnitTypesCount[newtype.Slot]++;
 
-	player.Demand += newtype.Demand - oldtype->Demand;
-	player.Supply += newtype.Supply - oldtype->Supply;
+	player.Demand += newtype.Demand - oldtype.Demand;
+	player.Supply += newtype.Supply - oldtype.Supply;
 
 	// Change resource limit
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (player.MaxResources[i] != -1) {
-			player.MaxResources[i] += newtype._Storing[i] - oldtype->_Storing[i];
+			player.MaxResources[i] += newtype._Storing[i] - oldtype._Storing[i];
 			player.SetResource(i, player.Resources[i]);
 		}
 	}
@@ -110,8 +112,8 @@ static int TransformUnitIntoType(CUnit &unit, CUnitType &newtype)
 		unit.Variable[i].Enable = newstats.Variables[i].Enable;
 	}
 
-	unit.Type = &newtype;
-	unit.Stats = &newtype.Stats[player.Index];
+	unit.Type = const_cast<CUnitType*>(&newtype);
+	unit.Stats = &unit.Type->Stats[player.Index];
 
 	if (newtype.CanCastSpell && !unit.AutoCastSpell) {
 		unit.AutoCastSpell = new char[SpellTypeTable.size()];
@@ -137,60 +139,144 @@ static int TransformUnitIntoType(CUnit &unit, CUnitType &newtype)
 	return 1;
 }
 
-/**
-**  Unit transform into unit.
-**
-**  @param unit  Pointer to unit.
-*/
-void HandleActionTransformInto(COrder& order, CUnit &unit)
+
+#if 1 // TransFormInto
+
+/* virtual */ void COrder_TransformInto::Save(CFile &file, const CUnit &unit) const
 {
-	// What to do if an error occurs ?
-	TransformUnitIntoType(unit, *order.Arg1.Type);
+	file.printf("{\"action-transform-into\",");
+	file.printf(" \"type\", \"%s\"", this->Type->Ident.c_str());
+	file.printf("}");
 }
 
-/**
-**  Unit upgrades unit!
-**
-**  @param unit  Pointer to unit.
-*/
-void HandleActionUpgradeTo(COrder& order, CUnit &unit)
+/* virtual */ bool COrder_TransformInto::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
-	if (!unit.SubAction) { // first entry
-		order.Data.UpgradeTo.Ticks = 0;
-		unit.SubAction = 1;
+	if (!strcmp(value, "type")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Type = UnitTypeByIdent(LuaToString(l, -1));
+		lua_pop(l, 1);
+	} else {
+		return false;
 	}
+	return true;
+}
+
+/* virtual */ bool COrder_TransformInto::Execute(CUnit &unit)
+{
+	TransformUnitIntoType(unit, *this->Type);
+	return true;
+}
+
+void HandleActionTransformInto(COrder& order, CUnit &unit)
+{
+	Assert(order.Action == UnitActionTransformInto);
+
+	if (order.Execute(unit)) {
+//		unit.ClearAction();
+	}
+}
+
+#endif
+
+#if 1  //  COrder_UpgradeTo
+
+/* virtual */ void COrder_UpgradeTo::Save(CFile &file, const CUnit &unit) const
+{
+	file.printf("{\"action-upgrade-to\",");
+	file.printf(" \"type\", \"%s\",", this->Type->Ident.c_str());
+	file.printf(" \"ticks\", %d", this->Ticks);
+	file.printf("}");
+}
+
+/* virtual */ bool COrder_UpgradeTo::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+{
+	if (!strcmp(value, "type")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Type = UnitTypeByIdent(LuaToString(l, -1));
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "ticks")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Ticks = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	} else {
+		return false;
+	}
+	return true;
+}
+
+
+static void AnimateActionUpgradeTo(CUnit &unit)
+{
 	unit.Type->Animations->Upgrade ?
 		UnitShowAnimation(unit, unit.Type->Animations->Upgrade) :
 		UnitShowAnimation(unit, unit.Type->Animations->Still);
-	if (unit.Wait) {
-		unit.Wait--;
-		return;
-	}
-	CPlayer *player = unit.Player;
-	CUnitType &newtype = *order.Arg1.Type;
-	const CUnitStats *newstats = &newtype.Stats[player->Index];
-
-	// FIXME: Should count down here
-	order.Data.UpgradeTo.Ticks += SpeedUpgrade;
-	if (order.Data.UpgradeTo.Ticks < newstats->Costs[TimeCost]) {
-		unit.Wait = CYCLES_PER_SECOND / 6;
-		return;
-	}
-
-	unit.ClearAction();
-	unit.State = 0;
-
-	if (TransformUnitIntoType(unit, newtype) == 0) {
-		player->Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
-			_("Upgrade to %s canceled"), newtype.Name.c_str());
-		return ;
-	}
-	//  Warn AI.
-	if (player->AiEnabled) {
-		AiUpgradeToComplete(unit, newtype);
-	}
-	player->Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
-		_("Upgrade to %s complete"), unit.Type->Name.c_str());
 }
 
+/* virtual */ bool COrder_UpgradeTo::Execute(CUnit &unit)
+{
+	AnimateActionUpgradeTo(unit);
+	if (unit.Wait) {
+		unit.Wait--;
+		return false;
+	}
+	CPlayer &player = *unit.Player;
+	const CUnitType &newtype = *this->Type;
+	const CUnitStats &newstats = newtype.Stats[player.Index];
+
+	this->Ticks += SpeedUpgrade;
+	if (this->Ticks < newstats.Costs[TimeCost]) {
+		unit.Wait = CYCLES_PER_SECOND / 6;
+		return false;
+	}
+
+	if (unit.Anim.Unbreakable) {
+		this->Ticks = newstats.Costs[TimeCost];
+		return false;
+	}
+
+	if (TransformUnitIntoType(unit, newtype) == 0) {
+		player.Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
+			_("Upgrade to %s canceled"), newtype.Name.c_str());
+		return true;
+	}
+	player.Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
+		_("Upgrade to %s complete"), unit.Type->Name.c_str());
+
+	//  Warn AI.
+	if (player.AiEnabled) {
+		AiUpgradeToComplete(unit, newtype);
+	}
+	return true;
+}
+
+/* virtual */ void COrder_UpgradeTo::Cancel(CUnit &unit)
+{
+	CPlayer &player = *unit.Player;
+
+	player.AddCostsFactor(this->Type->Stats[player.Index].Costs, CancelUpgradeCostsFactor);
+}
+
+/* virtual */ void COrder_UpgradeTo::UpdateUnitVariables(CUnit &unit) const
+{
+	Assert(unit.CurrentOrder() == this);
+
+	unit.Variable[UPGRADINGTO_INDEX].Value = this->Ticks;
+	unit.Variable[UPGRADINGTO_INDEX].Max = this->Type->Stats[unit.Player->Index].Costs[TimeCost];
+}
+
+
+
+void HandleActionUpgradeTo(COrder& order, CUnit &unit)
+{
+	Assert(order.Action == UnitActionUpgradeTo);
+
+	if (order.Execute(unit)) {
+		unit.ClearAction();
+	}
+}
+
+#endif
 //@}

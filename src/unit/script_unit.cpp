@@ -166,69 +166,6 @@ static void CclParseResWorker(lua_State *l, COrderPtr order)
 	}
 }
 
-/**
-**  Parse upgrade to
-**
-**  @param l     Lua state.
-**  @param unit  Unit pointer which should be filled with the data.
-*/
-static void CclParseUpgradeTo(lua_State *l, COrderPtr order)
-{
-	const char *value;
-	int args;
-	int j;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	args = lua_objlen(l, -1);
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++j;
-		if (!strcmp(value, "ticks")) {
-			lua_rawgeti(l, -1, j + 1);
-			order->Data.UpgradeTo.Ticks = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else {
-			LuaError(l, "ParseUpgradeTo: Unsupported tag: %s" _C_ value);
-		}
-	}
-}
-
-/**
-**  Parse stored data for train order
-**
-**  @param l     Lua state.
-**  @param unit  Unit pointer which should be filled with the data.
-*/
-static void CclParseTrain(lua_State *l, COrderPtr order)
-{
-	const char *value;
-	int args;
-	int j;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	args = lua_objlen(l, -1);
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++j;
-		if (!strcmp(value, "ticks")) {
-			lua_rawgeti(l, -1, j + 1);
-			order->Data.Train.Ticks = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else {
-			LuaError(l, "ParseTrain: Unsupported tag: %s" _C_ value);
-		}
-	}
-}
-
-
 bool COrder::ParseGenericData(lua_State *l, int &j, const char *value)
 {
 	if (!strcmp(value, "range")) {
@@ -315,13 +252,7 @@ bool COrder::ParseMoveData(lua_State *l, int &j, const char *value)
 
 bool COrder::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
-	if (!strcmp(value, "type")) {
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		this->Arg1.Type = UnitTypeByIdent(LuaToString(l, -1));
-		lua_pop(l, 1);
-
-	} else if (!strcmp(value, "current-resource")) {
+	if (!strcmp(value, "current-resource")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->CurrentResource = CclGetResourceByName(l);
@@ -345,16 +276,6 @@ bool COrder::ParseSpecificData(lua_State *l, int &j, const char *value, const CU
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		CclParseResWorker(l, this);
-		lua_pop(l, 1);
-	} else if (!strcmp(value, "data-upgrade-to")) {
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		CclParseUpgradeTo(l, this);
-		lua_pop(l, 1);
-	} else if (!strcmp(value, "data-train")) {
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		CclParseTrain(l, this);
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "mine")) { /* old save format */
 		int pos;
@@ -419,9 +340,9 @@ void CclParseOrder(lua_State *l, const CUnit &unit, COrderPtr *orderPtr)
 	} else if (!strcmp(actiontype, "action-spell-cast")) {
 		*orderPtr = new COrder_SpellCast;
 	} else if (!strcmp(actiontype, "action-train")) {
-		*orderPtr = COrder::NewActionTrain();
+		*orderPtr = new COrder_Train;
 	} else if (!strcmp(actiontype, "action-upgrade-to")) {
-		*orderPtr = COrder::NewActionUpgradeTo();
+		*orderPtr = new COrder_UpgradeTo;
 	} else if (!strcmp(actiontype, "action-research")) {
 		*orderPtr = new COrder_Research;
 	} else if (!strcmp(actiontype, "action-built")) {
@@ -433,7 +354,7 @@ void CclParseOrder(lua_State *l, const CUnit &unit, COrderPtr *orderPtr)
 	} else if (!strcmp(actiontype, "action-patrol")) {
 		*orderPtr = new COrder_Patrol;
 	} else if (!strcmp(actiontype, "action-build")) {
-		*orderPtr = COrder::NewActionBuild();
+		*orderPtr = new COrder_Build;
 	} else if (!strcmp(actiontype, "action-repair")) {
 		*orderPtr = COrder::NewActionRepair();
 	} else if (!strcmp(actiontype, "action-resource")) {
@@ -441,7 +362,7 @@ void CclParseOrder(lua_State *l, const CUnit &unit, COrderPtr *orderPtr)
 	} else if (!strcmp(actiontype, "action-return-goods")) {
 		*orderPtr = COrder::NewActionReturnGoods();
 	} else if (!strcmp(actiontype, "action-transform-into")) {
-		*orderPtr = COrder::NewActionTransformInto();
+		*orderPtr = new COrder_TransformInto();
 	} else {
 		LuaError(l, "ParseOrder: Unsupported type: %s" _C_ actiontype);
 	}

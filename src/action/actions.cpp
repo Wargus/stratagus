@@ -83,9 +83,6 @@
 unsigned SyncHash; /// Hash calculated to find sync failures
 
 
-extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
-
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -147,7 +144,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building)
 {
-	COrder *order = new COrder(UnitActionBuild);
+	COrder_Build *order = new COrder_Build;
 
 	order->goalPos = pos;
 	order->Width = building.TileWidth;
@@ -161,7 +158,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 			order->Range = 1;
 		}
 	}
-	order->Arg1.Type = &building;
+	order->Type = &building;
 	if (building.BuilderOutside) {
 		order->MinRange = 1;
 	}
@@ -176,7 +173,6 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 	// Make sure the bulding doesn't cancel itself out right away.
 
-	order->Data.Progress = 0;//FIXME ? 100 : 0
 	unit.Variable[HP_INDEX].Value = 1;
 	if (unit.Variable[SHIELD_INDEX].Max) {
 		unit.Variable[SHIELD_INDEX].Value = 1;
@@ -184,7 +180,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 	order->UpdateConstructionFrame(unit);
 
 	if (unit.Type->BuilderOutside == false) {
-		order->Data.Worker = &builder;
+		order->Worker = &builder;
 	}
 	return order;
 }
@@ -367,9 +363,9 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionTrain(CUnit &trainer, CUnitType &type)
 {
-	COrder *order = new COrder(UnitActionTrain);
+	COrder_Train *order = new COrder_Train;
 
-	order->Arg1.Type = &type;
+	order->Type = &type;
 	// FIXME: if you give quick an other order, the resources are lost!
 	trainer.Player->SubUnitType(type);
 
@@ -378,9 +374,9 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionTransformInto(CUnitType &type)
 {
-	COrder *order = new COrder(UnitActionTransformInto);
+	COrder_TransformInto *order = new COrder_TransformInto;
 
-	order->Arg1.Type = &type;
+	order->Type = &type;
 
 	return order;
 }
@@ -399,11 +395,11 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type)
 {
-	COrder *order = new COrder(UnitActionUpgradeTo);
+	COrder_UpgradeTo *order = new COrder_UpgradeTo;
 
 	// FIXME: if you give quick an other order, the resources are lost!
 	unit.Player->SubUnitType(type);
-	order->Arg1.Type = &type;
+	order->Type = &type;
 
 	return order;
 }
@@ -563,25 +559,12 @@ bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
 /** Called when unit is killed.
 **  warn the AI module.
 */
-void COrder::AiUnitKilled(CUnit& unit)
+/* virtual */ void COrder::AiUnitKilled(CUnit& unit)
 {
 	switch (Action) {
 		case UnitActionStill:
 		case UnitActionAttack:
 		case UnitActionMove:
-			break;
-		case UnitActionBuilt:
-			DebugPrint("%d: %d(%s) killed, under construction!\n" _C_
-				unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
-			AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type);
-			break;
-		case UnitActionBuild:
-			DebugPrint("%d: %d(%s) killed, with order %s!\n" _C_
-				unit.Player->Index _C_ UnitNumber(unit) _C_
-				unit.Type->Ident.c_str() _C_ Arg1.Type->Ident.c_str());
-			if (!HasGoal()) {
-				AiReduceMadeInBuilt(*unit.Player->Ai, *Arg1.Type);
-			}
 			break;
 		default:
 			DebugPrint("FIXME: %d: %d(%s) killed, with order %d!\n" _C_

@@ -485,16 +485,12 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 		//
 		} else {
 			for (size_t j = 0; j < unit.Orders.size(); ++j) {
-				if (unit.Orders[j]->Action == UnitActionTrain
-					&& unit.Orders[j]->Arg1.Type == &src) {
-						if (j == 0) {
-							// Must Adjust Ticks to the fraction that was trained
-							unit.CurrentOrder()->Data.Train.Ticks =
-								unit.CurrentOrder()->Data.Train.Ticks *
-								dst.Stats[player.Index].Costs[TimeCost] /
-								src.Stats[player.Index].Costs[TimeCost];
-						}
-					unit.Orders[j]->Arg1.Type = &dst;
+				if (unit.Orders[j]->Action == UnitActionTrain) {
+					COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[j]);
+
+					if (&order.GetUnitType() == &src) {
+						order.ConvertUnitType(unit, dst);
+					}
 				}
 			}
 		}

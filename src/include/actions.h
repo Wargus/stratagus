@@ -121,28 +121,12 @@ public:
 	bool ParseGenericData(lua_State *l, int &j, const char *value);
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
-	virtual void UpdateUnitVariables(CUnit &unit) const;
+	virtual void UpdateUnitVariables(CUnit &unit) const {}
 	virtual void FillSeenValues(CUnit &unit) const;
-
+	virtual void AiUnitKilled(CUnit &unit);
 
 	void ReleaseRefs(CUnit &owner);
 	bool CheckRange() const;
-
-	void Init() {
-		Assert(Action != UnitActionResource
-				|| (Action == UnitActionResource && Arg1.Resource.Mine == NULL));
-		Action = UnitActionNone;
-		Range = 0;
-		MinRange = 0;
-		Width = 0;
-		Height = 0;
-		CurrentResource = 0;
-		Assert(!Goal);
-		goalPos.x = -1;
-		goalPos.y = -1;
-		memset(&Arg1, 0, sizeof(Arg1));
-		memset(&Data, 0, sizeof(Data));
-	};
 
 	bool HasGoal() const { return Goal != NULL; }
 	CUnit * GetGoal() const { return Goal; };
@@ -157,7 +141,6 @@ public:
 	bool ParseMoveData(lua_State *l, int &j, const char *value);
 
 	bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
-	void AiUnitKilled(CUnit &unit);
 
 
 	static COrder* NewActionAttack(const CUnit &attacker, CUnit &target);
@@ -188,16 +171,12 @@ public:
 	static COrder* NewActionAttack() { return new COrder(UnitActionAttack); }
 	static COrder* NewActionAttackGround() { return new COrder(UnitActionAttackGround); }
 	static COrder* NewActionBoard() { return new COrder(UnitActionBoard); }
-	static COrder* NewActionBuild() { return new COrder(UnitActionBuild); }
 	static COrder* NewActionFollow() { return new COrder(UnitActionFollow); }
 	static COrder* NewActionMove() { return new COrder(UnitActionMove); }
 	static COrder* NewActionRepair() { return new COrder(UnitActionRepair); }
 	static COrder* NewActionResource() { return new COrder(UnitActionResource); }
 	static COrder* NewActionReturnGoods() { return new COrder(UnitActionReturnGoods); }
-	static COrder* NewActionTrain() { return new COrder(UnitActionTrain); }
-	static COrder* NewActionTransformInto() { return new COrder(UnitActionTransformInto); }
 	static COrder* NewActionUnload() { return new COrder(UnitActionUnload); }
-	static COrder* NewActionUpgradeTo() { return new COrder(UnitActionUpgradeTo); }
 #endif
 
 private:
@@ -218,7 +197,6 @@ public:
 			Vec2i Pos; /// position for terrain resource.
 			CUnit *Mine;
 		} Resource;
-		CUnitType *Type;        /// Unit-type argument used mostly for traning/building, etc.
 	} Arg1;             /// Extra command argument.
 
 	union _order_data_ {
@@ -229,9 +207,6 @@ public:
 #define MAX_PATH_LENGTH 28          /// max length of precalculated path
 		char Path[MAX_PATH_LENGTH]; /// directions of stored path
 	} Move; /// ActionMove,...
-	struct _order_build_ {
-		int Cycles;                 /// Cycles unit has been building for
-	} Build; /// ActionBuild
 	struct _order_resource_worker_ {
 		int TimeToHarvest;          /// how much time until we harvest some more.
 		unsigned DoneHarvesting:1;  /// Harvesting done, wait for action to break.
@@ -239,20 +214,40 @@ public:
 	struct _order_repair_ {
 		int Cycles;                 /// Cycles unit has been repairing for
 	} Repair; /// Repairing unit
-	struct _order_upgradeto_ {
-		int Ticks; /// Ticks to complete
-	} UpgradeTo; /// Upgrade to action
-	struct _order_train_ {
-		int Ticks;                  /// Ticks to complete
-	} Train; /// Train units action
 	} Data; /// Storage room for different commands
 };
+
+class COrder_Build : public COrder
+{
+	friend COrder* COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
+public:
+	COrder_Build() : COrder(UnitActionBuild), Type(NULL) {}
+
+	virtual COrder_Build *Clone() const { return new COrder_Build(*this); }
+
+	virtual void Save(CFile &file, const CUnit &unit) const;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+	virtual bool Execute(CUnit &unit);
+
+	virtual void AiUnitKilled(CUnit &unit);
+
+	const CUnitType& GetUnitType() const { return *Type; }
+
+private:
+	bool StartBuilding(CUnit &unit, CUnit &ontop);
+	bool BuildFromOutside(CUnit &unit) const;
+private:
+	CUnitType *Type;        /// build a unit of this unit-type
+	CUnitPtr BuildingUnit;  /// unit builded.
+};
+
 
 class COrder_Built : public COrder
 {
 	friend COrder* COrder::NewActionBuilt(CUnit &builder, CUnit &unit);
 public:
-	COrder_Built() : COrder(UnitActionBuilt) {}
+	COrder_Built() : COrder(UnitActionBuilt), ProgressCounter(0), IsCancelled(false), Frame(NULL) {}
 
 	virtual COrder_Built *Clone() const { return new COrder_Built(*this); }
 
@@ -264,25 +259,24 @@ public:
 
 	virtual void UpdateUnitVariables(CUnit &unit) const;
 	virtual void FillSeenValues(CUnit &unit) const;
+	virtual void AiUnitKilled(CUnit &unit);
 
 	void Progress(CUnit & unit, int amount);
 	void ProgressHp(CUnit &unit, int amount);
 
-	const CConstructionFrame& GetFrame() const { return *Data.Frame; }
-	const CUnitPtr &GetWorker() const { return Data.Worker; }
-	CUnit *GetWorkerPtr() { return Data.Worker; }
+	const CConstructionFrame& GetFrame() const { return *Frame; }
+	const CUnitPtr &GetWorker() const { return Worker; }
+	CUnit *GetWorkerPtr() { return Worker; }
 
 private:
 	void Boost(CUnit &building, int amount, int varIndex) const;
 	void UpdateConstructionFrame(CUnit &unit);
 
 private:
-	struct {
-		CUnitPtr Worker;            /// Worker building this unit
-		int Progress;               /// Progress counter, in 1/100 cycles.
-		int Cancel;                 /// Cancel construction
-		const CConstructionFrame *Frame;  /// Construction frame
-	} Data; /// ActionBuilt,...
+	CUnitPtr Worker;                  /// Worker building this unit
+	int ProgressCounter;              /// Progress counter, in 1/100 cycles.
+	bool IsCancelled;                  /// Cancel construction
+	const CConstructionFrame *Frame;  /// Construction frame
 };
 
 
@@ -390,6 +384,72 @@ public:
 };
 
 
+
+
+
+class COrder_Train : public COrder
+{
+	friend COrder* COrder::NewActionTrain(CUnit &trainer, CUnitType &type);
+public:
+	COrder_Train() : COrder(UnitActionTrain), Type(NULL), Ticks(0) {}
+
+	virtual COrder_Train *Clone() const { return new COrder_Train(*this); }
+
+	virtual void Save(CFile &file, const CUnit &unit) const;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+	virtual bool Execute(CUnit &unit);
+	virtual void Cancel(CUnit &unit);
+
+	virtual void UpdateUnitVariables(CUnit &unit) const;
+
+	void ConvertUnitType(const CUnit &unit, CUnitType& newType);
+
+	const CUnitType &GetUnitType() const { return *Type; }
+private:
+	CUnitType *Type; /// train a unit of this unit-type
+	int Ticks;       /// Ticks to complete
+};
+
+class COrder_TransformInto : public COrder
+{
+	friend COrder* COrder::NewActionTransformInto(CUnitType &type);
+public:
+	COrder_TransformInto() : COrder(UnitActionTransformInto), Type(NULL) {}
+
+	virtual COrder_TransformInto *Clone() const { return new COrder_TransformInto(*this); }
+
+	virtual void Save(CFile &file, const CUnit &unit) const;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+	virtual bool Execute(CUnit &unit);
+
+private:
+	CUnitType *Type; /// Transform unit into this unit-type
+};
+
+
+class COrder_UpgradeTo : public COrder
+{
+	friend COrder* COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type);
+public:
+	COrder_UpgradeTo() : COrder(UnitActionUpgradeTo), Type(NULL), Ticks(0) {}
+
+	virtual COrder_UpgradeTo *Clone() const { return new COrder_UpgradeTo(*this); }
+
+	virtual void Save(CFile &file, const CUnit &unit) const;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+	virtual bool Execute(CUnit &unit);
+	virtual void Cancel(CUnit &unit);
+
+	virtual void UpdateUnitVariables(CUnit &unit) const;
+
+	const CUnitType& GetUnitType() const { return *Type; }
+private:
+	CUnitType *Type; /// upgrate to this unit-type
+	int Ticks;       /// Ticks to complete
+};
 
 
 /*----------------------------------------------------------------------------

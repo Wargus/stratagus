@@ -806,7 +806,7 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 **  @param unit  Pointer to unit what builds the building.
 **  @param what  Pointer to unit-type.
 */
-void AiCanNotBuild(CUnit &unit, const CUnitType &what)
+void AiCanNotBuild(const CUnit &unit, const CUnitType &what)
 {
 	DebugPrint("%d: %d(%s) Can't build %s at %d,%d\n" _C_
 		unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_

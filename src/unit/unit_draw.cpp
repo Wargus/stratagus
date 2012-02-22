@@ -694,8 +694,10 @@ static void GetOrderPosition(const CUnit &unit, const COrder &order, PixelPos *s
 			*screenPos = CurrentViewport->MapToScreenPixelPos(mapPos);
 		}
 		if (order.Action == UnitActionBuild) {
-			screenPos->x += (order.Arg1.Type->TileWidth - 1) * PixelTileSize.x / 2;
-			screenPos->y += (order.Arg1.Type->TileHeight - 1) * PixelTileSize.y / 2;
+			const COrder_Build& orderBuild = static_cast<const COrder_Build&>(order);
+
+			screenPos->x += (orderBuild.GetUnitType().TileWidth - 1) * PixelTileSize.x / 2;
+			screenPos->y += (orderBuild.GetUnitType().TileHeight - 1) * PixelTileSize.y / 2;
 		}
 	}
 }
@@ -797,8 +799,10 @@ static void ShowSingleOrder(const CUnit &unit, const PixelPos &pos, const COrder
 
 		case UnitActionBuild:
 		{
-			int w = order.Arg1.Type->BoxWidth;
-			int h = order.Arg1.Type->BoxHeight;
+			const COrder_Build& orderBuild = static_cast<const COrder_Build&>(order);
+
+			const int w = orderBuild.GetUnitType().BoxWidth;
+			const int h = orderBuild.GetUnitType().BoxHeight;
 			DrawSelection(ColorGray, pos2.x - w / 2, pos2.y - h / 2, pos2.x + w / 2, pos2.y + h / 2);
 			e_color = color = ColorGreen;
 			dest = true;
@@ -1114,8 +1118,10 @@ void CUnit::Draw(const CViewport *vp) const
 		state = (action == UnitActionBuilt) | ((action == UnitActionUpgradeTo) << 1);
 		constructed = this->Constructed;
 		// Reset Type to the type being upgraded to
-		if (state == 2) {
-			type = this->CurrentOrder()->Arg1.Type;
+		if (action == UnitActionUpgradeTo) {
+			const COrder_UpgradeTo& order = *static_cast<COrder_UpgradeTo*>(this->CurrentOrder());
+
+			type = const_cast<CUnitType*>(&order.GetUnitType());
 		}
 
 		if (this->CurrentAction() == UnitActionBuilt) {
@@ -1262,8 +1268,10 @@ void CUnitDrawProxy::operator=(const CUnit *unit)
 				((action == UnitActionUpgradeTo) << 1);
 
 		// Reset Type to the type being upgraded to
-		if (state == 2) {
-			Type = unit->CurrentOrder()->Arg1.Type;
+		if (action == UnitActionUpgradeTo) {
+			const COrder_UpgradeTo& order = *static_cast<COrder_UpgradeTo*>(unit->CurrentOrder());
+
+			Type = const_cast<CUnitType*>(&order.GetUnitType());
 		}
 
 		if (unit->Constructed) {

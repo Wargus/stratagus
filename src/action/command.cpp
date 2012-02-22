@@ -628,9 +628,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 	if (slot == -1) {
 		// Cancel All training
 		while (unit.CurrentAction() == UnitActionTrain) {
-			unit.Player->AddCostsFactor(
-				unit.CurrentOrder()->Arg1.Type->Stats[unit.Player->Index].Costs,
-				CancelTrainingCostsFactor);
+			unit.CurrentOrder()->Cancel(unit);
 			RemoveOrder(unit, 0);
 		}
 		if (unit.Player == ThisPlayer && unit.Selected) {
@@ -643,16 +641,13 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 		// Order has moved, we are not training
 		return;
 	} else if (unit.Orders[slot]->Action == UnitActionTrain) {
+		COrder_Train& order = *static_cast<COrder_Train*>(unit.Orders[slot]);
 		// Still training this order, same unit?
-		if (type && unit.Orders[slot]->Arg1.Type != type) {
+		if (type && &order.GetUnitType() != type) {
 			// Different unit being trained
 			return;
 		}
-		DebugPrint("Cancel training\n");
-
-		unit.Player->AddCostsFactor(
-			unit.Orders[slot]->Arg1.Type->Stats[unit.Player->Index].Costs,
-			CancelTrainingCostsFactor);
+		order.Cancel(unit);
 		RemoveOrder(unit, slot);
 
 		// Update interface.
@@ -711,10 +706,7 @@ void CommandCancelUpgradeTo(CUnit &unit)
 {
 	// Check if unit is still upgrading? (NETWORK!)
 	if (unit.CurrentAction() == UnitActionUpgradeTo) {
-		unit.Player->AddCostsFactor(
-			unit.CurrentOrder()->Arg1.Type->Stats[unit.Player->Index].Costs,
-			CancelUpgradeCostsFactor);
-
+		unit.CurrentOrder()->Cancel(unit);
 		RemoveOrder(unit, 0);
 		if (Selected) {
 			SelectedUnitChanged();

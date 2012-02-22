@@ -839,7 +839,6 @@ void ResourceGiveUp(CUnit &unit)
 	DebugPrint("%d: Worker %d report: Gave up on resource gathering.\n" _C_ unit.Player->Index _C_ unit.Slot);
 	unit.CurrentOrder()->ClearGoal();
 	DropResource(unit);
-	unit.CurrentOrder()->Init();
 	unit.ClearAction();
 }
 

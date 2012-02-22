@@ -46,76 +46,166 @@
 #include "actions.h"
 #include "map.h"
 #include "ai.h"
-#include "interface.h"
 #include "pathfinder.h"
 #include "construct.h"
 #include "iolib.h"
 #include "script.h"
 
+extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
+
+
+enum
+{
+	State_MoveToLocationMax = 10, // Range from prev
+	State_NearOfLocation = 11, // Range to next
+	State_StartBuilding_Failed = 20,
+	State_BuildFromInside = 21,
+	State_BuildFromOutside = 22
+};
+
+
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+
+/* virtual */ void COrder_Build::Save(CFile &file, const CUnit &unit) const
+{
+	file.printf("{\"action-build\",");
+	file.printf(" \"range\", %d,", this->Range);
+#if 1 // Fixed with Type
+	file.printf(" \"width\", %d,", this->Width);
+	file.printf(" \"height\", %d,", this->Height);
+	file.printf(" \"min-range\", %d,", this->MinRange);
+#endif
+	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
+
+	if (this->BuildingUnit != NULL) {
+		if (this->BuildingUnit->Destroyed) {
+			/* this unit is destroyed so it's not in the global unit
+			 * array - this means it won't be saved!!! */
+			printf ("FIXME: storing destroyed Goal - loading will fail.\n");
+		}
+		file.printf(" \"building\", \"%s\",", UnitReference(this->BuildingUnit).c_str());
+	}
+	file.printf(" \"type\", \"%s\",\n  ", this->Type->Ident.c_str());
+
+	SaveDataMove(file);
+	file.printf("}");
+}
+
+/* virtual */ bool COrder_Build::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+{
+	if (ParseMoveData(l, j, value)) {
+		return true;
+	} else if (!strcmp(value, "building")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->BuildingUnit = CclGetUnitFromRef(l);
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "type")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Type = UnitTypeByIdent(LuaToString(l, -1));
+		lua_pop(l, 1);
+	} else {
+		return false;
+	}
+	return true;
+}
+
+/** Called when unit is killed.
+**  warn the AI module.
+*/
+void COrder_Build::AiUnitKilled(CUnit& unit)
+{
+	DebugPrint("%d: %d(%s) killed, with order %s!\n" _C_
+		unit.Player->Index _C_ UnitNumber(unit) _C_
+		unit.Type->Ident.c_str() _C_ this->Type->Ident.c_str());
+	if (this->BuildingUnit == NULL) {
+		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type);
+	}
+}
+
+
 
 /**
 **  Move to build location
 **
 **  @param unit  Unit to move
 */
-static void MoveToLocation(CUnit &unit)
+static bool MoveToLocation(CUnit &unit, COrder_Build &order)
 {
 	// First entry
 	if (!unit.SubAction) {
+		order.Data.Move.Cycles = 0; //moving counter
 		unit.SubAction = 1;
-		unit.CurrentOrder()->NewResetPath();
+		order.NewResetPath();
 	}
-
-	if (unit.Wait) {
-		// FIXME: show still animation while we wait?
-		unit.Wait--;
-		return;
-	}
-
 	switch (DoActionMove(unit)) { // reached end-point?
-		case PF_UNREACHABLE:
-			//
+		case PF_UNREACHABLE: {
 			// Some tries to reach the goal
-			//
 			if (unit.SubAction++ < 10) {
 				// To keep the load low, retry each 1/4 second.
 				// NOTE: we can already inform the AI about this problem?
-				unit.Wait = CYCLES_PER_SECOND / 4 + unit.SubAction;
-				return;
+				unit.Wait = CYCLES_PER_SECOND / 4;
+				return false;
 			}
 
 			unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
 				_("You cannot reach building place"));
 			if (unit.Player->AiEnabled) {
-				AiCanNotReach(unit, *unit.CurrentOrder()->Arg1.Type);
+				AiCanNotReach(unit, order.GetUnitType());
 			}
-
-			unit.ClearAction();
-			return;
-
+			return true;
+		}
 		case PF_REACHED:
-			unit.SubAction = 20;
-			return;
+			unit.SubAction = State_NearOfLocation;
+			return false;
 
 		default:
 			// Moving...
-			return;
+			return false;
 	}
 }
 
+static bool CheckLimit(const CUnit &unit, const CUnitType &type)
+{
+	const CPlayer &player = *unit.Player;
+	bool isOk = true;
+
+	// Check if enough resources for the building.
+	if (player.CheckUnitType(type)) {
+		// FIXME: Better tell what is missing?
+		player.Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
+			_("Not enough resources to build %s"), type.Name.c_str());
+		isOk = false;
+	}
+
+	// Check if hiting any limits for the building.
+	if (player.CheckLimits(type) < 0) {
+		player.Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
+			_("Can't build more units %s"), type.Name.c_str());
+		isOk = false;
+	}
+	if (isOk == false && player.AiEnabled) {
+		AiCanNotBuild(unit, type);
+	}
+	return isOk;
+}
+
+
 class AlreadyBuildingFinder {
 public:
-	AlreadyBuildingFinder(const CUnit &unit, const CUnitType *t) :
-		worker(&unit), type(t) {}
-	inline bool operator() (const CUnit *const unit) const
+	AlreadyBuildingFinder(const CUnit &unit, const CUnitType &t) :
+		worker(&unit), type(&t) {}
+	bool operator() (const CUnit *const unit) const
 	{
-		return (!unit->Destroyed && unit->Type == type &&
-				(worker->Player == unit->Player || worker->IsAllied(*unit)));
+		return (!unit->Destroyed && unit->Type == type
+				&& (worker->Player == unit->Player || worker->IsAllied(*unit)));
 	}
-	inline CUnit *Find(const CMapField *const mf) const
+	CUnit *Find(const CMapField *const mf) const
 	{
 		return mf->UnitCache.find(*this);
 	}
@@ -129,103 +219,54 @@ private:
 **
 **  @param unit  Unit to check
 */
-static CUnit *CheckCanBuild(CUnit &unit)
+static CUnit *CheckCanBuild(CUnit &unit, COrder_Build &order)
 {
-	CUnit *ontop;
+	const Vec2i pos = order.goalPos;
+	const CUnitType &type = order.GetUnitType();
 
-	if (unit.Wait) {
-		// FIXME: show still animation while we wait?
-		unit.Wait--;
-		return NULL;
+	// Check if the building could be built there.
+
+	CUnit *ontop = CanBuildUnitType(&unit, type, pos, 1);
+
+	if (ontop != NULL) {
+		return ontop;
 	}
 
-	COrderPtr order = unit.CurrentOrder();
-	const Vec2i pos = order->goalPos;
-	CUnitType &type = *order->Arg1.Type;
-
-	//
-	// Check if the building could be built there.
-	//
-	if ((ontop = CanBuildUnitType(&unit, type, pos, 1)) == NULL) {
-		/*
-		 *	FIXME: rb - CheckAlreadyBuilding should be somehow
-		 *	ebabled/disable via game lua scripting
-		 */
-		if ((ontop =
-			AlreadyBuildingFinder(unit, &type).Find(Map.Field(pos))
-			) != NULL) {
+	/*
+	 * FIXME: rb - CheckAlreadyBuilding should be somehow
+	 * enabled/disable via game lua scripting
+	 */
+	CUnit *building = AlreadyBuildingFinder(unit, type).Find(Map.Field(pos));
+	if (building != NULL) {
+		if (unit.CurrentOrder() == &order) {
 			DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
 					_C_ unit.Player->Index _C_ unit.Slot
-					_C_ ontop->Type->Name.c_str()
-					_C_ ontop->Slot);
-			order->Init();
-			order->Action = UnitActionRepair;
-			order->SetGoal(ontop);
-			order->Range = unit.Type->RepairRange;
-			unit.SubAction = 0;
-			return NULL;
-		}
+					_C_ building->Type->Name.c_str()
+					_C_ building->Slot);
 
-		//
-		// Some tries to build the building.
-		//
-		if (unit.SubAction++ < 30) {
-			// To keep the load low, retry each 10 cycles
-			// NOTE: we can already inform the AI about this problem?
-			unit.Wait = 10;
-			return NULL;
-		}
-
-		unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
-			_("You cannot build %s here"), type.Name.c_str());
-		if (unit.Player->AiEnabled) {
-			AiCanNotBuild(unit, type);
-		}
-		unit.ClearAction();
+		unit.SubAction = 0;
+		delete &order;
+		unit.Orders[0] = COrder::NewActionRepair(unit, *building);
 		return NULL;
+		}
 	}
 
-	//
-	// Check if enough resources for the building.
-	//
-	if (unit.Player->CheckUnitType(type)) {
-		// FIXME: Better tell what is missing?
-		unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
-			_("Not enough resources to build %s"), type.Name.c_str());
-		if (unit.Player->AiEnabled) {
-			AiCanNotBuild(unit, type);
-		}
-		unit.ClearAction();
-		return NULL;
-	}
-
-	//
-	// Check if hiting any limits for the building.
-	//
-	if (unit.Player->CheckLimits(type) < 0) {
-		unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
-			_("Can't build more units %s"), type.Name.c_str());
-		if (unit.Player->AiEnabled) {
-			AiCanNotBuild(unit, type);
-		}
-		unit.ClearAction();
-		return NULL;
-	}
-	return ontop;
+	// Some tries to build the building.
+	unit.SubAction++;
+	// To keep the load low, retry each 10 cycles
+	// NOTE: we can already inform the AI about this problem?
+	unit.Wait = 10;
+	return NULL;
 }
 
-/**
-**  Start building
-*/
-static void StartBuilding(CUnit &unit, CUnit &ontop)
+
+bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 {
-	COrderPtr order = unit.CurrentOrder();
-	const Vec2i pos = order->goalPos;
-	CUnitType &type = *order->Arg1.Type;
+	const CUnitType &type = this->GetUnitType();
 
 	unit.Player->SubUnitType(type);
 
-	CUnit *build = MakeUnit(type, unit.Player);
+	CUnit *build = MakeUnit(const_cast<CUnitType &>(type), unit.Player);
 
 	// If unable to make unit, stop, and report message
 	if (build == NoUnitP) {
@@ -235,10 +276,8 @@ static void StartBuilding(CUnit &unit, CUnit &ontop)
 		if (unit.Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
-		unit.ClearAction();
-		return;
+		return false;
 	}
-
 	build->Constructed = 1;
 	build->CurrentSightRange = 0;
 
@@ -261,67 +300,108 @@ static void StartBuilding(CUnit &unit, CUnit &ontop)
 	delete build->CurrentOrder();
 	build->Orders[0] = COrder::NewActionBuilt(unit, *build);
 
+	UpdateUnitSightRange(*build);
 	// Must place after previous for map flags
-	build->Place(pos);
-	if (!type.BuilderOutside) {
-		build->CurrentSightRange = 1;
-	}
+	build->Place(this->goalPos);
 
 	// HACK: the building is not ready yet
 	build->Player->UnitTypesCount[type.Slot]--;
 
 	// We need somebody to work on it.
 	if (!type.BuilderOutside) {
-		//FIXME: cancel buld gen crash
-		// Place the builder inside the building
-		// HACK: allows the unit to be removed
-		build->CurrentSightRange = 1;
-		//HACK: reset anim
 		UnitShowAnimation(unit, unit.Type->Animations->Still);
 		unit.Remove(build);
-		build->CurrentSightRange = 0;
-		unit.tilePos = pos;
-		order->Action = UnitActionBuild;
-		unit.CurrentOrder()->Data.Build.Cycles = 0;
-		unit.SubAction = 40;
-		order->SetGoal(build);
+		unit.SubAction = State_BuildFromInside;
 		if (unit.Selected) {
 			SelectedUnitChanged();
 		}
 	} else {
-		// Use repair to do the building
-		order->Action = UnitActionRepair;
-		order->SetGoal(build);
-		order->goalPos.x = order->goalPos.y = -1;
-		// FIXME: Should have a BuildRange?
-		order->Range = unit.Type->RepairRange;
-		unit.SubAction = 0;
-		unit.Direction = DirectionToHeading(pos - unit.tilePos);
+		unit.SubAction = State_BuildFromOutside;
+		this->BuildingUnit = build;
+		unit.Direction = DirectionToHeading(build->tilePos - unit.tilePos);
 		UnitUpdateHeading(unit);
-		// Mark the new building seen.
-		MapMarkUnitSight(*build);
+	}
+	return true;
+}
+
+static void AnimateActionBuild(CUnit &unit)
+{
+	CAnimations *animations = unit.Type->Animations;
+
+	if (animations == NULL) {
+		return ;
+	}
+	if (animations->Build) {
+		UnitShowAnimation(unit, animations->Build);
+	} else if (animations->Repair) {
+		UnitShowAnimation(unit, animations->Repair);
 	}
 }
+
 
 /**
 **  Build the building
 **
 **  @param unit  worker which build.
 */
-static void BuildBuilding(CUnit &unit)
+bool COrder_Build::BuildFromOutside(CUnit &unit) const
 {
+	AnimateActionBuild(unit);
 
-	UnitShowAnimation(unit, unit.Type->Animations->Build);
-	unit.CurrentOrder()->Data.Build.Cycles++;
-	if (unit.Anim.Unbreakable) {
-		return ;
+	if (this->BuildingUnit == NULL) {
+		return false;
 	}
 
-	//
-	// Calculate the length of the attack (repair) anim.
-	//
-	//int animlength = unit.Data.Build.Cycles;
-	unit.CurrentOrder()->Data.Build.Cycles = 0;
+	if (this->BuildingUnit->CurrentAction() == UnitActionBuilt) {
+		COrder_Built &targetOrder = *static_cast<COrder_Built *>(this->BuildingUnit->CurrentOrder());
+		CUnit& goal = *const_cast<COrder_Build*>(this)->BuildingUnit;
+
+
+		targetOrder.ProgressHp(goal, 100);
+	}
+	if (unit.Anim.Unbreakable) {
+		return false;
+	}
+	return this->BuildingUnit->CurrentAction() != UnitActionBuilt;
+}
+
+
+/* virtual */ bool COrder_Build::Execute(CUnit &unit)
+{
+	if (unit.Wait) {
+		unit.Wait--;
+		return false;
+	}
+	if (unit.SubAction <= State_MoveToLocationMax) {
+		if (MoveToLocation(unit, *this)) {
+			return true;
+		}
+	}
+	const CUnitType &type = this->GetUnitType();
+
+	if (State_NearOfLocation <= unit.SubAction && unit.SubAction < State_StartBuilding_Failed) {
+		if (CheckLimit(unit, type) == false) {
+			return true;
+		}
+		CUnit *ontop = CheckCanBuild(unit, *this);
+
+		if (ontop != NULL) {
+			this->StartBuilding(unit, *ontop);
+		}
+	}
+	if (unit.SubAction == State_StartBuilding_Failed) {
+		unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
+			_("You cannot build %s here"), type.Name.c_str());
+		if (unit.Player->AiEnabled) {
+			AiCanNotBuild(unit, type);
+		}
+		return true;
+	}
+	if (unit.SubAction == State_BuildFromOutside) {
+		this->BuildFromOutside(unit);
+	}
+
+	return false;
 }
 
 /**
@@ -329,22 +409,17 @@ static void BuildBuilding(CUnit &unit)
 **
 **  @param unit  Unit that builds a building
 */
-void HandleActionBuild(COrder& /*order*/, CUnit &unit)
+void HandleActionBuild(COrder& order, CUnit &unit)
 {
-	CUnit *ontop;
+	Assert(order.Action == UnitActionBuild);
 
-	if (unit.SubAction <= 10) {
-		MoveToLocation(unit);
-	}
-	if (20 <= unit.SubAction && unit.SubAction <= 30) {
-		if ((ontop = CheckCanBuild(unit))) {
-			StartBuilding(unit, *ontop);
-		}
-	}
-	if (unit.SubAction == 40) {
-		BuildBuilding(unit);
+	if (order.Execute(unit)) {
+		unit.ClearAction();
 	}
 }
+
+
+
 
 ///////////////////////////
 // Action_built
@@ -356,15 +431,15 @@ void HandleActionBuild(COrder& /*order*/, CUnit &unit)
 
 	CConstructionFrame *cframe = unit.Type->Construction->Frames;
 	int frame = 0;
-	while (cframe != this->Data.Frame) {
+	while (cframe != this->Frame) {
 		cframe = cframe->Next;
 		++frame;
 	}
-	if (this->Data.Worker == NULL) {
-		file.printf("\"worker\", \"%s\", ", UnitReference(this->Data.Worker).c_str());
+	if (this->Worker == NULL) {
+		file.printf("\"worker\", \"%s\", ", UnitReference(this->Worker).c_str());
 	}
-	file.printf("\"progress\", %d, \"frame\", %d", this->Data.Progress, frame);
-	if (this->Data.Cancel) {
+	file.printf("\"progress\", %d, \"frame\", %d", this->ProgressCounter, frame);
+	if (this->IsCancelled) {
 		file.printf(", \"cancel\"");
 	}
 	file.printf("}");
@@ -375,15 +450,15 @@ void HandleActionBuild(COrder& /*order*/, CUnit &unit)
 	if (!strcmp(value, "worker")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		this->Data.Worker = CclGetUnitFromRef(l);
+		this->Worker = CclGetUnitFromRef(l);
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "progress")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		this->Data.Progress = LuaToNumber(l, -1);
+		this->ProgressCounter = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "cancel")) {
-		this->Data.Cancel = 1;
+		this->IsCancelled = true;
 	} else if (!strcmp(value, "frame")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
@@ -393,7 +468,7 @@ void HandleActionBuild(COrder& /*order*/, CUnit &unit)
 		while (frame--) {
 			cframe = cframe->Next;
 		}
-		this->Data.Frame = cframe;
+		this->Frame = cframe;
 	} else {
 		return false;
 	}
@@ -408,9 +483,6 @@ static void CancelBuilt(COrder_Built &order, CUnit &unit)
 
 	// Drop out unit
 	if (worker != NULL) {
-
-
-
 		worker->ClearAction();
 
 		// HACK: make sure the sight is updated correctly
@@ -418,7 +490,6 @@ static void CancelBuilt(COrder_Built &order, CUnit &unit)
 		DropOutOnSide(*worker, LookingW, &unit);
 //		unit.CurrentSightRange = 0;
 	}
-
 	// Player gets back 75% of the original cost for a building.
 	unit.Player->AddCostsFactor(unit.Stats->Costs, CancelBuildingCostsFactor);
 	// Cancel building
@@ -449,10 +520,7 @@ static bool Finish(COrder_Built &order, CUnit& unit)
 			worker = NULL;
 		} else { // Drop out the worker.
 			worker->ClearAction();
-#if 0
-			// HACK: make sure the sight is updated correctly
-			// unit.CurrentSightRange = 1;
-#endif
+
 			DropOutOnSide(*worker, LookingW, &unit);
 
 			// If we can harvest from the new building, do it.
@@ -533,7 +601,7 @@ static bool Finish(COrder_Built &order, CUnit& unit)
 	this->Progress(unit, amount);
 
 	// Check if construction should be canceled...
-	if (this->Data.Cancel || this->Data.Progress < 0) {
+	if (this->IsCancelled || this->ProgressCounter < 0) {
 		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.Type->Name.c_str());
 
 		CancelBuilt(*this, unit);
@@ -543,7 +611,7 @@ static bool Finish(COrder_Built &order, CUnit& unit)
 	const int maxProgress = type.Stats[unit.Player->Index].Costs[TimeCost] * 600;
 
 	// Check if building ready. Note we can both build and repair.
-	if (!unit.Anim.Unbreakable && this->Data.Progress >= maxProgress) {
+	if (!unit.Anim.Unbreakable && this->ProgressCounter >= maxProgress) {
 		return Finish(*this, unit);
 	}
 	return false;
@@ -551,14 +619,14 @@ static bool Finish(COrder_Built &order, CUnit& unit)
 
 /* virtual */ void COrder_Built::Cancel(CUnit &unit)
 {
-	this->Data.Cancel = 1;
+	this->IsCancelled = true;
 }
 
 /* virtual */ void COrder_Built::UpdateUnitVariables(CUnit &unit) const
 {
 	Assert(unit.CurrentOrder() == this);
 
-	unit.Variable[BUILD_INDEX].Value = this->Data.Progress;
+	unit.Variable[BUILD_INDEX].Value = this->ProgressCounter;
 	unit.Variable[BUILD_INDEX].Max = unit.Type->Stats[unit.Player->Index].Costs[TimeCost] * 600;
 
 	// This should happen when building unit with several peons
@@ -573,7 +641,17 @@ static bool Finish(COrder_Built &order, CUnit& unit)
 /* virtual */ void COrder_Built::FillSeenValues(CUnit &unit) const
 {
 	unit.Seen.State = 1;
-	unit.Seen.CFrame = this->Data.Frame;
+	unit.Seen.CFrame = this->Frame;
+}
+
+/** Called when unit is killed.
+**  warn the AI module.
+*/
+void COrder_Built::AiUnitKilled(CUnit& unit)
+{
+	DebugPrint("%d: %d(%s) killed, under construction!\n" _C_
+		unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
+	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type);
 }
 
 
@@ -598,13 +676,13 @@ static const CConstructionFrame *FindCFramePercent(const CConstructionFrame &cfr
 void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 {
 	const CUnitType &type = *unit.Type;
-	const int percent = this->Data.Progress / (type.Stats[unit.Player->Index].Costs[TimeCost] * 6);
+	const int percent = this->ProgressCounter / (type.Stats[unit.Player->Index].Costs[TimeCost] * 6);
 	const CConstructionFrame *cframe = FindCFramePercent(*type.Construction->Frames, percent);
 
 	Assert(cframe != NULL);
 
-	if (cframe != this->Data.Frame) {
-		this->Data.Frame = cframe;
+	if (cframe != this->Frame) {
+		this->Frame = cframe;
 		if (unit.Frame < 0) {
 			unit.Frame = -cframe->Frame - 1;
 		} else {
@@ -619,7 +697,7 @@ void COrder_Built::Progress(CUnit &unit, int amount)
 	Boost(unit, amount, HP_INDEX);
 	Boost(unit, amount, SHIELD_INDEX);
 
-	this->Data.Progress += amount * SpeedBuild;
+	this->ProgressCounter += amount * SpeedBuild;
 	UpdateConstructionFrame(unit);
 }
 
@@ -627,7 +705,7 @@ void COrder_Built::ProgressHp(CUnit &unit, int amount)
 {
 	Boost(unit, amount, HP_INDEX);
 
-	this->Data.Progress += amount * SpeedBuild;
+	this->ProgressCounter += amount * SpeedBuild;
 	UpdateConstructionFrame(unit);
 }
 
@@ -637,7 +715,7 @@ void COrder_Built::Boost(CUnit &building, int amount, int varIndex) const
 	Assert(building.CurrentOrder() == this);
 
 	const int costs = building.Stats->Costs[TimeCost] * 600;
-	const int progress = this->Data.Progress;
+	const int progress = this->ProgressCounter;
 	const int newProgress = progress + amount * SpeedBuild;
 	const int maxValue = building.Variable[varIndex].Max;
 

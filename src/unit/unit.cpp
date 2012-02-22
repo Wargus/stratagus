@@ -641,7 +641,7 @@ void UpdateUnitSightRange(CUnit &unit)
 #endif
 	// FIXME : these values must be configurable.
 	if (unit.Constructed) { // Units under construction have no sight range.
-		unit.CurrentSightRange = 0;
+		unit.CurrentSightRange = 1;
 	} else if (!unit.Container) { // proper value.
 		unit.CurrentSightRange = unit.Stats->Variables[SIGHTRANGE_INDEX].Max;
 	} else { // value of it container.

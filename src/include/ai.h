@@ -81,7 +81,7 @@ extern void AiNeedMoreSupply(const CPlayer &player);
 	/// Called if AI unit has completed work
 extern void AiWorkComplete(CUnit *unit, CUnit &what);
 	/// Called if AI unit can't build
-extern void AiCanNotBuild(CUnit &unit, const CUnitType &what);
+extern void AiCanNotBuild(const CUnit &unit, const CUnitType &what);
 	/// Called if AI unit can't reach building place
 extern void AiCanNotReach(CUnit &unit, const CUnitType &what);
 	/// Called if an AI unit can't move

@@ -82,10 +82,12 @@ static int AiCheckCosts(const int *costs)
 	CUnit **units = AiPlayer->Player->Units;
 	for (int i = 0; i < nunits; ++i) {
 		for (size_t k = 0; k < units[i]->Orders.size(); ++k) {
-			COrder &order = *units[i]->Orders[k];
+			const COrder &order = *units[i]->Orders[k];
 
 			if (order.Action == UnitActionBuild) {
-				const int *building_costs = order.Arg1.Type->Stats[AiPlayer->Player->Index].Costs;
+				const COrder_Build& orderBuild = static_cast<const COrder_Build&>(order);
+				const int *building_costs = orderBuild.GetUnitType().Stats[AiPlayer->Player->Index].Costs;
+
 				for (int j = 1; j < MaxCosts; ++j) {
 					used[j] += building_costs[j];
 				}

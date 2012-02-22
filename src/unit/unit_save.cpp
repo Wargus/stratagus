@@ -108,20 +108,11 @@ void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 		case UnitActionAttackGround:
 			file.printf("\"action-attack-ground\",");
 			break;
-		case UnitActionTrain:
-			file.printf("\"action-train\",");
-			break;
-		case UnitActionUpgradeTo:
-			file.printf("\"action-upgrade-to\",");
-			break;
 		case UnitActionBoard:
 			file.printf("\"action-board\",");
 			break;
 		case UnitActionUnload:
 			file.printf("\"action-unload\",");
-			break;
-		case UnitActionBuild:
-			file.printf("\"action-build\",");
 			break;
 		case UnitActionRepair:
 			file.printf("\"action-repair\",");
@@ -131,9 +122,6 @@ void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 			break;
 		case UnitActionReturnGoods:
 			file.printf("\"action-return-goods\",");
-			break;
-		case UnitActionTransformInto:
-			file.printf("\"action-transform-into\",");
 			break;
 		default:
 			DebugPrint("Unknown action in order\n");
@@ -156,12 +144,6 @@ void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 
 	// Extra arg.
 	switch (order.Action) {
-		case UnitActionTrain:
-		case UnitActionUpgradeTo:
-		case UnitActionBuild:
-		case UnitActionTransformInto:
-			file.printf(", \"type\", \"%s\"", order.Arg1.Type->Ident.c_str());
-		break;
 		case UnitActionResource :
 		case UnitActionReturnGoods :
 			if (order.CurrentResource) {
@@ -201,16 +183,8 @@ void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 			break;
 		case UnitActionBuilt:
 		case UnitActionResearch:
-			break;
 		case UnitActionUpgradeTo:
-			file.printf(",\n  \"data-upgrade-to\", {");
-			file.printf("\"ticks\", %d", order.Data.UpgradeTo.Ticks);
-			file.printf("}");
-			break;
 		case UnitActionTrain:
-			file.printf(",\n  \"data-train\", {");
-			file.printf("\"ticks\", %d ", order.Data.Train.Ticks);
-			file.printf("}");
 			break;
 		default:
 			file.printf(",\n  ");
