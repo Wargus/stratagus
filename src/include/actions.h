@@ -102,8 +102,8 @@ struct lua_State;
 class COrder
 {
 public:
-	COrder() : Goal(NULL), Range(0), MinRange(0), Width(0),
-		Height(0), Action(UnitActionNone), CurrentResource(0)
+	COrder(int action) : Goal(NULL), Range(0), MinRange(0), Width(0),
+		Height(0), Action(action), CurrentResource(0)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -154,7 +154,7 @@ public:
 	*/
 	void NewResetPath() { Data.Move.Fast = 1; Data.Move.Length = 0; }
 	void SaveDataMove(CFile &file) const;
-
+	bool ParseMoveData(lua_State *l, int &j, const char *value);
 
 	bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 	void AiUnitKilled(CUnit &unit);
@@ -165,7 +165,6 @@ public:
 	static COrder* NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
 	static COrder* NewActionBoard(CUnit &unit);
 	static COrder* NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
-	static COrder* NewActionBuilt();
 	static COrder* NewActionBuilt(CUnit &builder, CUnit &unit);
 	static COrder* NewActionDie();
 	static COrder* NewActionFollow(CUnit &dest);
@@ -186,22 +185,19 @@ public:
 	static COrder* NewActionUpgradeTo(CUnit &unit, CUnitType &type);
 
 #if 1 // currently needed for parsing
-	static COrder* NewActionAttack();
-	static COrder* NewActionAttackGround();
-	static COrder* NewActionBoard();
-	static COrder* NewActionBuild();
-	static COrder* NewActionFollow();
-	static COrder* NewActionMove();
-	static COrder* NewActionPatrol();
-	static COrder* NewActionRepair();
-	static COrder* NewActionResearch();
-	static COrder* NewActionResource();
-	static COrder* NewActionReturnGoods();
-	static COrder* NewActionSpellCast();
-	static COrder* NewActionTrain();
-	static COrder* NewActionTransformInto();
-	static COrder* NewActionUnload();
-	static COrder* NewActionUpgradeTo();
+	static COrder* NewActionAttack() { return new COrder(UnitActionAttack); }
+	static COrder* NewActionAttackGround() { return new COrder(UnitActionAttackGround); }
+	static COrder* NewActionBoard() { return new COrder(UnitActionBoard); }
+	static COrder* NewActionBuild() { return new COrder(UnitActionBuild); }
+	static COrder* NewActionFollow() { return new COrder(UnitActionFollow); }
+	static COrder* NewActionMove() { return new COrder(UnitActionMove); }
+	static COrder* NewActionRepair() { return new COrder(UnitActionRepair); }
+	static COrder* NewActionResource() { return new COrder(UnitActionResource); }
+	static COrder* NewActionReturnGoods() { return new COrder(UnitActionReturnGoods); }
+	static COrder* NewActionTrain() { return new COrder(UnitActionTrain); }
+	static COrder* NewActionTransformInto() { return new COrder(UnitActionTransformInto); }
+	static COrder* NewActionUnload() { return new COrder(UnitActionUnload); }
+	static COrder* NewActionUpgradeTo() { return new COrder(UnitActionUpgradeTo); }
 #endif
 
 private:
@@ -218,7 +214,6 @@ public:
 	Vec2i goalPos;          /// or tile coordinate of destination
 
 	union {
-		Vec2i Patrol; /// position for patroling.
 		struct {
 			Vec2i Pos; /// position for terrain resource.
 			CUnit *Mine;
@@ -257,7 +252,9 @@ class COrder_Built : public COrder
 {
 	friend COrder* COrder::NewActionBuilt(CUnit &builder, CUnit &unit);
 public:
-	virtual COrder_Built *Clone() const;
+	COrder_Built() : COrder(UnitActionBuilt) {}
+
+	virtual COrder_Built *Clone() const { return new COrder_Built(*this); }
 
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
@@ -289,11 +286,45 @@ private:
 };
 
 
+class COrder_Die : public COrder
+{
+public:
+	COrder_Die() : COrder(UnitActionDie) {}
+
+	virtual COrder_Die *Clone() const { return new COrder_Die(*this); }
+
+	virtual void Save(CFile &file, const CUnit &unit) const;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+	virtual bool Execute(CUnit &unit);
+};
+
+
+class COrder_Patrol : public COrder
+{
+	friend COrder* COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
+public:
+	COrder_Patrol() : COrder(UnitActionPatrol) {}
+
+	virtual COrder_Patrol *Clone() const { return new COrder_Patrol(*this); }
+
+	virtual void Save(CFile &file, const CUnit &unit) const;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+	virtual bool Execute(CUnit &unit);
+
+	const Vec2i& GetWayPoint() const { return WayPoint; }
+private:
+	Vec2i WayPoint; /// position for patroling.
+};
+
 
 class COrder_Research : public COrder
 {
 public:
-	virtual COrder_Research *Clone() const;
+	COrder_Research() : COrder(UnitActionResearch), Upgrade(NULL) {}
+
+	virtual COrder_Research *Clone() const { return new COrder_Research(*this); }
 
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
@@ -309,10 +340,12 @@ private:
 	CUpgrade *Upgrade;
 };
 
-class COrder_SpellCast: public COrder
+class COrder_SpellCast : public COrder
 {
 public:
-	virtual COrder_SpellCast *Clone() const;
+	COrder_SpellCast() : COrder(UnitActionSpellCast), Spell(NULL) {}
+
+	virtual COrder_SpellCast *Clone() const { return new COrder_SpellCast(*this); }
 
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
@@ -326,6 +359,36 @@ public:
 private:
 	SpellType *Spell;
 };
+
+
+
+
+class COrder_StandGround : public COrder
+{
+public:
+	COrder_StandGround() : COrder(UnitActionStandGround) {}
+
+	virtual COrder_StandGround *Clone() const { return new COrder_StandGround(*this); }
+
+	virtual void Save(CFile &file, const CUnit &unit) const;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+	virtual bool Execute(CUnit &unit);
+};
+
+class COrder_Still : public COrder
+{
+public:
+	COrder_Still() : COrder(UnitActionStill) {}
+
+	virtual COrder_Still *Clone() const { return new COrder_Still(*this); }
+
+	virtual void Save(CFile &file, const CUnit &unit) const;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+	virtual bool Execute(CUnit &unit);
+};
+
 
 
 
@@ -413,6 +476,10 @@ extern void DropResource(CUnit &unit);
 extern void ResourceGiveUp(CUnit &unit);
 extern int GetNumWaitingWorkers(const CUnit &mine);
 extern void AutoAttack(CUnit &unit, CUnitCache &targets, bool stand_ground);
+extern bool AutoAttack(CUnit &unit, bool stand_ground);
+extern bool AutoRepair(CUnit &unit);
+extern bool AutoCast(CUnit &unit);
+
 extern void UnHideUnit(CUnit &unit);
 
 typedef void HandleActionFunc(COrder& order, CUnit &unit);

@@ -42,26 +42,97 @@
 #include "actions.h"
 #include "pathfinder.h"
 #include "map.h"
+#include "iolib.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern bool AutoRepair(CUnit &unit);
-extern bool AutoCast(CUnit &unit);
 
-/**
-**  Swap the patrol points.
-*/
-static void SwapPatrolPoints(CUnit &unit)
+/* virtual */ void COrder_Patrol::Save(CFile &file, const CUnit &unit) const
 {
-	COrderPtr order = unit.CurrentOrder();
+	file.printf("{\"action-patrol\",");
 
-	std::swap(order->Arg1.Patrol.x, order->goalPos.x);
-	std::swap(order->Arg1.Patrol.y, order->goalPos.y);
+	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
+	file.printf(" \"range\", %d,", this->Range);
 
-	unit.CurrentOrder()->Data.Move.Cycles = 0; //moving counter
-	unit.CurrentOrder()->NewResetPath();
+	file.printf(" \"patrol\", {%d, %d},\n  ", this->WayPoint.x, this->WayPoint.y);
+	SaveDataMove(file);
+	file.printf("}");
+}
+
+/* virtual */ bool COrder_Patrol::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+{
+	if (ParseMoveData(l, j, value)) {
+		return true;
+	} else if (!strcmp(value, "patrol")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		CclGetPos(l, &this->WayPoint.x , &this->WayPoint.y);
+		lua_pop(l, 1);
+	} else {
+		return false;
+	}
+	return true;
+}
+
+/* virtual */ bool COrder_Patrol::Execute(CUnit &unit)
+{
+	if (unit.Wait) {
+		unit.Wait--;
+		return false;
+	}
+
+	if (!unit.SubAction) { // first entry.
+		this->Data.Move.Cycles = 0; //moving counter
+		this->NewResetPath();
+		unit.SubAction = 1;
+	}
+
+	switch (DoActionMove(unit)) {
+		case PF_FAILED:
+			unit.SubAction = 1;
+			break;
+		case PF_UNREACHABLE:
+			// Increase range and try again
+			unit.SubAction = 1;
+			if (this->CheckRange()) {
+				this->Range++;
+				break;
+			}
+			// FALL THROUGH
+		case PF_REACHED:
+			unit.SubAction = 1;
+			this->Range = 0;
+			std::swap(this->WayPoint, this->goalPos);
+
+			this->Data.Move.Cycles = 0; //moving counter
+			this->NewResetPath();
+			break;
+		case PF_WAIT:
+			// Wait for a while then give up
+			unit.SubAction++;
+			if (unit.SubAction == 5) {
+				unit.SubAction = 1;
+				this->Range = 0;
+				std::swap(this->WayPoint, this->goalPos);
+
+				this->Data.Move.Cycles = 0; //moving counter
+				this->NewResetPath();
+			}
+			break;
+		default: // moving
+			unit.SubAction = 1;
+			break;
+	}
+
+	if (!unit.Anim.Unbreakable) {
+		if (AutoAttack(unit, false) || AutoRepair(unit) || AutoCast(unit)) {
+			return true;
+		}
+	}
+	return false;
 }
 
 /**
@@ -77,76 +148,10 @@ static void SwapPatrolPoints(CUnit &unit)
 */
 void HandleActionPatrol(COrder& order, CUnit &unit)
 {
-	if (unit.Wait) {
-		unit.Wait--;
-		return;
-	}
+	Assert(order.Action == UnitActionPatrol);
 
-	if (!unit.SubAction) { // first entry.
-		order.Data.Move.Cycles = 0; //moving counter
-		order.NewResetPath();
-		unit.SubAction = 1;
-	}
-
-	switch (DoActionMove(unit)) {
-		case PF_FAILED:
-			unit.SubAction = 1;
-			break;
-		case PF_UNREACHABLE:
-			// Increase range and try again
-			unit.SubAction = 1;
-			if (order.CheckRange()) {
-				order.Range++;
-				break;
-			}
-			// FALL THROUGH
-		case PF_REACHED:
-			unit.SubAction = 1;
-			order.Range = 0;
-			SwapPatrolPoints(unit);
-			break;
-		case PF_WAIT:
-			// Wait for a while then give up
-			unit.SubAction++;
-			if (unit.SubAction == 5) {
-				unit.SubAction = 1;
-				order.Range = 0;
-				SwapPatrolPoints(unit);
-			}
-			break;
-		default: // moving
-			unit.SubAction = 1;
-			break;
-	}
-
-	if (!unit.Anim.Unbreakable) {
-		//
-		// Attack any enemy in reaction range.
-		//  If don't set the goal, the unit can then choose a
-		//  better goal if moving nearer to enemy.
-		//
-		if (unit.Type->CanAttack) {
-			const CUnit *goal = AttackUnitsInReactRange(unit);
-			if (goal) {
-				// Save current command to come back.
-				COrder *savedOrder = order.Clone();
-
-				DebugPrint("Patrol attack %d\n" _C_ UnitNumber(*goal));
-				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
-
-				if (unit.StoreOrder(savedOrder) == false) {
-					delete savedOrder;
-					savedOrder = NULL;
-				}
-				unit.ClearAction();
-				return;
-			}
-		}
-
-		// Look for something to auto repair or auto cast
-		if (AutoRepair(unit) || AutoCast(unit)) {
-			return;
-		}
+	if (order.Execute(unit)) {
+		unit.ClearAction();
 	}
 }
 

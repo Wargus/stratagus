@@ -54,11 +54,6 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* virtual */ COrder_Research *COrder_Research::Clone() const
-{
-	return new COrder_Research(*this);
-}
-
 /* virtual */ void COrder_Research::Save(CFile &file, const CUnit &unit) const
 {
 	file.printf("{\"action-research\"");

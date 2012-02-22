@@ -47,10 +47,34 @@
 #include "pathfinder.h"
 #include "spells.h"
 #include "player.h"
+#include "iolib.h"
 
 #define SUB_STILL_INIT		0
 #define SUB_STILL_STANDBY	1
 #define SUB_STILL_ATTACK	2
+
+
+
+/* virtual */ void COrder_Still::Save(CFile &file, const CUnit &unit) const
+{
+	file.printf("{\"action-still\"");
+	if (this->HasGoal()) {
+		CUnit &goal = *this->GetGoal();
+		if (goal.Destroyed) {
+			/* this unit is destroyed so it's not in the global unit
+			 * array - this means it won't be saved!!! */
+			printf ("FIXME: storing destroyed Goal - loading will fail.\n");
+		}
+		file.printf(", \"goal\", \"%s\"", UnitReference(goal).c_str());
+	}
+	file.printf("}");
+}
+
+/* virtual */ bool COrder_Still::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+{
+	return false;
+}
+
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -239,66 +263,81 @@ bool AutoRepair(CUnit &unit)
 {
 	const int repairRange = unit.Type->Variable[AUTOREPAIRRANGE_INDEX].Value;
 
-	if (unit.AutoRepair && repairRange) {
-		CUnit *repairedUnit = UnitToRepairInRange(unit, repairRange);
-
-		if (repairedUnit != NoUnitP) {
-			const Vec2i invalidPos = {-1, -1};
-			COrder *savedOrder = unit.CurrentOrder()->Clone();
-
-			//Command* will clear unit.SavedOrder
-			CommandRepair(unit, invalidPos, repairedUnit, FlushCommands);
-			if (unit.StoreOrder(savedOrder) == false) {
-				delete savedOrder;
-				savedOrder = NULL;
-			}
-			return true;
-		}
+	if (unit.AutoRepair == false || repairRange == 0) {
+		return false;
 	}
-	return false;
+	CUnit *repairedUnit = UnitToRepairInRange(unit, repairRange);
+
+	if (repairedUnit == NoUnitP) {
+		return false;
+	}
+	const Vec2i invalidPos = {-1, -1};
+	COrder *savedOrder = unit.CurrentOrder()->Clone();
+
+	//Command* will clear unit.SavedOrder
+	CommandRepair(unit, invalidPos, repairedUnit, FlushCommands);
+	if (unit.StoreOrder(savedOrder) == false) {
+		delete savedOrder;
+		savedOrder = NULL;
+	}
+	return true;
 }
 
 /**
 **  Auto attack nearby units if possible
 */
-static bool AutoAttack(CUnit &unit, bool stand_ground)
+bool AutoAttack(CUnit &unit, bool stand_ground)
 {
-	CUnit *goal;
-
-	// Cowards and invisible units don't attack unless ordered.
-	if (unit.IsAgressive()) {
-		// Normal units react in reaction range.
-		if (!stand_ground && !unit.Removed && unit.CanMove()) {
-			if ((goal = AttackUnitsInReactRange(unit))) {
-				// Weak goal, can choose other unit, come back after attack
-				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
-				COrder *savedOrder = COrder::NewActionAttack(unit, unit.tilePos);
-
-				if (unit.StoreOrder(savedOrder) == false) {
-					delete savedOrder;
-				}
-				return true;
-			}
-		// Removed units can only attack in AttackRange, from bunker
-		} else {
-			if ((goal = AttackUnitsInRange(unit))) {
-				CUnit *temp = unit.CurrentOrder()->GetGoal();
-				if (temp && temp->CurrentAction() == UnitActionDie) {
-					unit.CurrentOrder()->ClearGoal();
-					temp = NoUnitP;
-				}
-				if (unit.SubAction < SUB_STILL_ATTACK || temp != goal) {
-					// New target.
-					unit.CurrentOrder()->SetGoal(goal);
-					unit.State = 0;
-					unit.SubAction = SUB_STILL_ATTACK; // Mark attacking.
-					UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos);
-				}
-				return true;
-			}
-		}
+	if (unit.Type->CanAttack == false) {
+		return false;
 	}
-	return false;
+
+	if (stand_ground || unit.Removed || unit.CanMove() == false) {
+		// Removed units can only attack in AttackRange, from bunker
+		CUnit *goal = AttackUnitsInRange(unit);
+
+		if (goal == NULL) {
+			return false;
+		}
+
+		CUnit *temp = unit.CurrentOrder()->GetGoal();
+		if (temp && temp->CurrentAction() == UnitActionDie) {
+			unit.CurrentOrder()->ClearGoal();
+			temp = NoUnitP;
+		}
+		if (unit.SubAction < SUB_STILL_ATTACK || temp != goal) {
+			// New target.
+			unit.CurrentOrder()->SetGoal(goal);
+			unit.State = 0;
+			unit.SubAction = SUB_STILL_ATTACK; // Mark attacking.
+			UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos);
+		}
+		return true;
+	}
+	// Normal units react in reaction range.
+	CUnit *goal = AttackUnitsInReactRange(unit);
+
+	if (goal == NULL) {
+		return false;
+	}
+
+	COrder *savedOrder;
+
+	if (unit.SavedOrder != NULL) {
+		savedOrder = unit.SavedOrder->Clone();
+	} else if (unit.CurrentAction() == UnitActionStill) {
+		savedOrder = COrder::NewActionAttack(unit, unit.tilePos);
+	} else {
+		savedOrder = unit.CurrentOrder()->Clone();
+	}
+
+	// Weak goal, can choose other unit, come back after attack
+	CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
+
+	if (unit.StoreOrder(savedOrder) == false) {
+		delete savedOrder;
+	}
+	return true;
 }
 
 void AutoAttack(CUnit &unit, CUnitCache &targets, bool stand_ground)
@@ -360,8 +399,7 @@ void ActionStillGeneric(CUnit &unit, bool stand_ground)
 		return;
 	}
 
-	switch (unit.SubAction)
-	{
+	switch (unit.SubAction) {
 		case SUB_STILL_INIT: //first entry
 			MapMarkUnitGuard(unit);
 			unit.SubAction = SUB_STILL_STANDBY;
@@ -378,7 +416,7 @@ void ActionStillGeneric(CUnit &unit, bool stand_ground)
 		return;
 	}
 
-	if (AutoAttack(unit, stand_ground)
+	if ((unit.IsAgressive() && AutoAttack(unit, stand_ground))
 		|| AutoCast(unit)
 		|| AutoRepair(unit)
 		|| MoveRandomly(unit)) {
@@ -391,9 +429,18 @@ void ActionStillGeneric(CUnit &unit, bool stand_ground)
 **
 **  @param unit  Unit pointer for still action.
 */
-void HandleActionStill(COrder& /*order*/, CUnit &unit)
+void HandleActionStill(COrder& order, CUnit &unit)
+{
+	Assert(order.Action == UnitActionStill);
+
+	order.Execute(unit);
+}
+
+/* virtual */ bool COrder_Still::Execute(CUnit &unit)
 {
 	ActionStillGeneric(unit, false);
+	return false;
 }
+
 
 //@}

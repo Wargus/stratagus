@@ -350,10 +350,6 @@ void HandleActionBuild(COrder& /*order*/, CUnit &unit)
 // Action_built
 //////////////////////////
 
-/* virtual */ COrder_Built *COrder_Built::Clone() const
-{
-	return new COrder_Built(*this);
-}
 /* virtual */ void COrder_Built::Save(CFile &file, const CUnit &unit) const
 {
 	file.printf("{\"action-built\", ");

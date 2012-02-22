@@ -39,14 +39,80 @@
 #include "stratagus.h"
 #include "unittype.h"
 #include "animation.h"
-#include "player.h"
 #include "unit.h"
 #include "actions.h"
-#include "map.h"
+#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+/* virtual */ void COrder_Die::Save(CFile &file, const CUnit &unit) const
+{
+	file.printf("{\"action-die\"}");
+}
+
+/* virtual */ bool COrder_Die::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+{
+	return false;
+}
+
+static bool AnimateActionDie(CUnit &unit)
+{
+	const CAnimations *animations = unit.Type->Animations;
+
+	if (animations == NULL) {
+		return false;
+	}
+	if (animations->Death[unit.DamagedType]) {
+		UnitShowAnimation(unit, animations->Death[unit.DamagedType]);
+		return true;
+	} else if (animations->Death[ANIMATIONS_DEATHTYPES]) {
+		UnitShowAnimation(unit, animations->Death[ANIMATIONS_DEATHTYPES]);
+		return true;
+	}
+	return false;
+}
+
+
+/* virtual */ bool COrder_Die::Execute(CUnit &unit)
+{
+	// Show death animation
+	if (AnimateActionDie(unit) == false) {
+		// some units has no death animation
+		unit.Anim.Unbreakable = 0;
+	}
+	if (unit.Anim.Unbreakable) {
+		return false;
+	}
+	CUnitType &type = *unit.Type;
+
+	// Die sequence terminated, generate corpse.
+	if (type.CorpseType == NULL) {
+		unit.Remove(NULL);
+		unit.Release();
+		return false;
+	}
+
+	CUnitType &corpseType = *type.CorpseType;
+	Assert(type.TileWidth >= corpseType.TileWidth && type.TileHeight >= corpseType.TileHeight);
+
+	// Update sight for new corpse
+	// We have to unmark BEFORE changing the type.
+	// Always do that, since types can have different vision properties.
+
+	unit.Remove(NULL);
+	unit.Type = &corpseType;
+	unit.Stats = &type.Stats[unit.Player->Index];
+	unit.Place(unit.tilePos);
+
+	unit.SubAction = 0;
+	unit.Frame = 0;
+	UnitUpdateHeading(unit);
+	AnimateActionDie(unit); // with new corpse.
+	return false;
+}
+
 
 /**
 **  Unit dies!
@@ -57,48 +123,8 @@ void HandleActionDie(COrder& order, CUnit &unit)
 {
 	Assert(order.Action == UnitActionDie);
 
-	// Show death animation
-	if (unit.Type->Animations && unit.Type->Animations->Death[unit.DamagedType]) {
-		UnitShowAnimation(unit, unit.Type->Animations->Death[unit.DamagedType]);
-	}
-	else if (unit.Type->Animations && unit.Type->Animations->Death[ANIMATIONS_DEATHTYPES]) {
-		UnitShowAnimation(unit, unit.Type->Animations->Death[ANIMATIONS_DEATHTYPES]);
-	} else {
-		// some units has no death animation
-		unit.Anim.Unbreakable = 0;
-	}
-
-	if (unit.Anim.Unbreakable) {
-		return;
-	}
-	// Die sequence terminated, generate corpse.
-	if (!unit.Type->CorpseType) {
-		// We may be in the cache if we just finished out death animation
-		// even though there is no corpse.
-		// (unit.Type->Animations && unit.Type->Animations->Death)
-		// Remove us from the map to be safe
-		unit.Remove(NULL);
-		unit.Release();
-		return;
-	}
-
-	Assert(unit.Type->TileWidth >= unit.Type->CorpseType->TileWidth &&
-		unit.Type->TileHeight >= unit.Type->CorpseType->TileHeight);
-
-	// Update sight for new corpse
-	// We have to unmark BEFORE changing the type.
-	// Always do that, since types can have different vision properties.
-
-	unit.Remove(NULL);
-	unit.Type = unit.Type->CorpseType;
-	unit.Stats = &unit.Type->Stats[unit.Player->Index];
-	unit.Place(unit.tilePos);
-
-	unit.SubAction = 0;
-	unit.Frame = 0;
-	UnitUpdateHeading(unit);
-	if (unit.Type->Animations && unit.Type->Animations->Death[ANIMATIONS_DEATHTYPES]) {
-		UnitShowAnimation(unit, unit.Type->Animations->Death[ANIMATIONS_DEATHTYPES]);
+	if (order.Execute(unit)) {
+		unit.ClearAction();
 	}
 }
 

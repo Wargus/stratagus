@@ -287,7 +287,28 @@ extern int CclCommand(const std::string &command, bool exitOnError = true);
 
 CUnit *CclGetUnitFromRef(lua_State *l);
 
-
+/**
+**  Get a position from lua state
+**
+**  @param l  Lua state.
+**  param x  pointer to output x position.
+**  @param y  pointer to output y position.
+**
+**  @return   The unit pointer
+*/
+template <typename T>
+static void CclGetPos(lua_State *l, T *x , T *y, const int offset = -1)
+{
+	if (!lua_istable(l, offset) || lua_objlen(l, offset) != 2) {
+		LuaError(l, "incorrect argument");
+	}
+	lua_rawgeti(l, offset, 1);
+	*x = LuaToNumber(l, -1);
+	lua_pop(l, 1);
+	lua_rawgeti(l, offset, 2);
+	*y = LuaToNumber(l, -1);
+	lua_pop(l, 1);
+}
 
 extern NumberDesc *Damage;  /// Damage calculation for missile.
 

@@ -737,12 +737,15 @@ static void ShowSingleOrder(const CUnit &unit, const PixelPos &pos, const COrder
 			break;
 
 		case UnitActionPatrol:
+		{
 			Video.DrawLineClip(ColorGreen, pos1.x, pos1.y, pos2.x, pos2.y);
 			e_color = color = ColorBlue;
-			pos1 = CurrentViewport->TilePosToScreen_Center(order.Arg1.Patrol);
+			const COrder_Patrol &orderPatrol = static_cast<const COrder_Patrol&>(order);
+
+			pos1 = CurrentViewport->TilePosToScreen_Center(orderPatrol.GetWayPoint());
 			dest = true;
 			break;
-
+		}
 		case UnitActionRepair:
 			e_color = color = ColorGreen;
 			dest = true;

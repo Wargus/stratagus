@@ -38,19 +38,53 @@
 #include "stratagus.h"
 #include "unit.h"
 #include "actions.h"
+#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+
+/* virtual */ void COrder_StandGround::Save(CFile &file, const CUnit &unit) const
+{
+	file.printf("{\"action-stand-ground\"");
+	if (this->HasGoal()) {
+		CUnit &goal = *this->GetGoal();
+		if (goal.Destroyed) {
+			/* this unit is destroyed so it's not in the global unit
+			 * array - this means it won't be saved!!! */
+			printf ("FIXME: storing destroyed Goal - loading will fail.\n");
+		}
+		file.printf(", \"goal\", \"%s\"", UnitReference(goal).c_str());
+	}
+	file.printf("}");
+}
+
+/* virtual */ bool COrder_StandGround::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+{
+	return false;
+}
+
+/* virtual */ bool COrder_StandGround::Execute(CUnit &unit)
+{
+	ActionStillGeneric(unit, true);
+
+	return false;
+}
+
 
 /**
 **  Unit stands ground!
 **
 **  @param unit  Action handled for this unit pointer.
 */
-void HandleActionStandGround(COrder& /*order*/, CUnit &unit)
+void HandleActionStandGround(COrder& order, CUnit &unit)
 {
-	ActionStillGeneric(unit, true);
+	Assert(order.Action == UnitActionStandGround);
+
+	if (order.Execute(unit)) {
+		unit.ClearAction();
+	}
 }
 
 //@}

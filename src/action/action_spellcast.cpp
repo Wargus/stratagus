@@ -62,11 +62,6 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* virtual */ COrder_SpellCast *COrder_SpellCast::Clone() const
-{
-	return new COrder_SpellCast(*this);
-}
-
 /* virtual */ void COrder_SpellCast::Save(CFile &file, const CUnit &unit) const
 {
 	file.printf("{\"action-spell-cast\",");
@@ -94,7 +89,9 @@
 
 /* virtual */ bool COrder_SpellCast::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
-	if (!strcmp(value, "spell")) {
+	if (ParseMoveData(l, j, value)) {
+		return true;
+	} else if (!strcmp(value, "spell")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->Spell = SpellTypeByIdent(LuaToString(l, -1));

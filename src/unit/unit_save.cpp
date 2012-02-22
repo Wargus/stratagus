@@ -96,12 +96,6 @@ void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 		case UnitActionNone:
 			file.printf("\"action-none\",");
 			break;
-		case UnitActionStill:
-			file.printf("\"action-still\",");
-			break;
-		case UnitActionStandGround:
-			file.printf("\"action-stand-ground\",");
-			break;
 		case UnitActionFollow:
 			file.printf("\"action-follow\",");
 			break;
@@ -114,9 +108,6 @@ void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 		case UnitActionAttackGround:
 			file.printf("\"action-attack-ground\",");
 			break;
-		case UnitActionDie:
-			file.printf("\"action-die\",");
-			break;
 		case UnitActionTrain:
 			file.printf("\"action-train\",");
 			break;
@@ -128,9 +119,6 @@ void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 			break;
 		case UnitActionUnload:
 			file.printf("\"action-unload\",");
-			break;
-		case UnitActionPatrol:
-			file.printf("\"action-patrol\",");
 			break;
 		case UnitActionBuild:
 			file.printf("\"action-build\",");
@@ -174,9 +162,6 @@ void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 		case UnitActionTransformInto:
 			file.printf(", \"type\", \"%s\"", order.Arg1.Type->Ident.c_str());
 		break;
-		case UnitActionPatrol:
-			file.printf(", \"patrol\", {%d, %d}", order.Arg1.Patrol.x, order.Arg1.Patrol.y);
-			break;
 		case UnitActionResource :
 		case UnitActionReturnGoods :
 			if (order.CurrentResource) {

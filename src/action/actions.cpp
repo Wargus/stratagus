@@ -92,9 +92,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionAttack(const CUnit &attacker, CUnit &target)
 {
-	COrder *order = new COrder;
-
-	order->Action = UnitActionAttack;
+	COrder *order = new COrder(UnitActionAttack);
 
 	if (target.Destroyed) {
 		order->goalPos = target.tilePos + target.Type->GetHalfTileSize();
@@ -111,9 +109,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 {
 	Assert(Map.Info.IsPointOnMap(dest));
 
-	COrder *order = new COrder;
-
-	order->Action = UnitActionAttack;
+	COrder *order = new COrder(UnitActionAttack);
 
 	if (Map.WallOnMap(dest) && Map.IsFieldExplored(*attacker.Player, dest)) {
 		// FIXME: look into action_attack.cpp about this ugly problem
@@ -128,9 +124,8 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest)
 {
-	COrder *order = new COrder;
+	COrder *order = new COrder(UnitActionAttackGround);
 
-	order->Action = UnitActionAttackGround;
 	order->goalPos = dest;
 	order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
 	order->MinRange = attacker.Type->MinAttackRange;
@@ -141,9 +136,8 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionBoard(CUnit &unit)
 {
-	COrder *order = new COrder;
+	COrder *order = new COrder(UnitActionBoard);
 
-	order->Action = UnitActionBoard;
 	order->SetGoal(&unit);
 	order->Range = 1;
 
@@ -153,9 +147,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building)
 {
-	COrder *order = new COrder;
-
-	order->Action = UnitActionBuild;
+	COrder *order = new COrder(UnitActionBuild);
 
 	order->goalPos = pos;
 	order->Width = building.TileWidth;
@@ -200,17 +192,13 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionDie()
 {
-	COrder *order = new COrder;
-
-	order->Action = UnitActionDie;
-	return order;
+	return new COrder_Die;
 }
 
 /* static */ COrder* COrder::NewActionFollow(CUnit &dest)
 {
-	COrder *order = new COrder;
+	COrder *order = new COrder(UnitActionFollow);
 
-	order->Action = UnitActionFollow;
 	// Destination could be killed.
 	// Should be handled in action, but is not possible!
 	// Unit::Refs is used as timeout counter.
@@ -227,9 +215,8 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionMove(const Vec2i &pos)
 {
-	COrder *order = new COrder;
+	COrder *order = new COrder(UnitActionMove);
 
-	order->Action = UnitActionMove;
 	order->goalPos = pos;
 
 	return order;
@@ -241,20 +228,18 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 	Assert(Map.Info.IsPointOnMap(currentPos));
 	Assert(Map.Info.IsPointOnMap(dest));
 
-	COrder *order = new COrder;
+	COrder_Patrol *order = new COrder_Patrol();
 
-	order->Action = UnitActionPatrol;
 	order->goalPos = dest;
-	order->Arg1.Patrol = currentPos;
+	order->WayPoint = currentPos;
 
 	return order;
 }
 
 /* static */ COrder* COrder::NewActionRepair(CUnit &unit, CUnit &target)
 {
-	COrder *order = new COrder;
+	COrder *order = new COrder(UnitActionRepair);
 
-	order->Action = UnitActionRepair;
 	if (target.Destroyed) {
 		order->goalPos = target.tilePos + target.Type->GetHalfTileSize();
 	} else {
@@ -268,9 +253,8 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
-	COrder *order = new COrder;
+	COrder *order = new COrder(UnitActionRepair);
 
-	order->Action = UnitActionRepair;
 	order->goalPos = pos;
 	return order;
 }
@@ -293,10 +277,8 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionResource(CUnit &harvester, const Vec2i &pos)
 {
-	COrder *order = new COrder;
+	COrder *order = new COrder(UnitActionResource);
 	Vec2i ressourceLoc;
-
-	order->Action = UnitActionResource;
 
 	//  Find the closest piece of wood next to a tile where the unit can move
 	if (!FindTerrainType(0, (harvester.Type->MovementMask), 1, 20, harvester.Player, pos, &ressourceLoc)) {
@@ -319,9 +301,8 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionResource(CUnit &mine)
 {
-	COrder *order = new COrder;
+	COrder *order = new COrder(UnitActionResource);
 
-	order->Action = UnitActionResource;
 	order->SetGoal(&mine);
 	order->Range = 1;
 
@@ -332,9 +313,8 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionReturnGoods(CUnit *depot)
 {
-	COrder *order = new COrder;
+	COrder *order = new COrder(UnitActionReturnGoods);
 
-	order->Action = UnitActionReturnGoods;
 	// Destination could be killed. NETWORK!
 	if (depot && !depot->Destroyed) {
 		order->SetGoal(depot);
@@ -374,19 +354,12 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionStandGround()
 {
-	COrder *order = new COrder;
-
-	order->Action = UnitActionStandGround;
-	return order;
+	return new COrder_StandGround;
 }
-
 
 /* static */ COrder* COrder::NewActionStill()
 {
-	COrder *order = new COrder;
-
-	order->Action = UnitActionStill;
-	return order;
+	return new COrder_Still;
 }
 
 
@@ -394,9 +367,8 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionTrain(CUnit &trainer, CUnitType &type)
 {
-	COrder *order = new COrder;
+	COrder *order = new COrder(UnitActionTrain);
 
-	order->Action = UnitActionTrain;
 	order->Arg1.Type = &type;
 	// FIXME: if you give quick an other order, the resources are lost!
 	trainer.Player->SubUnitType(type);
@@ -406,9 +378,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionTransformInto(CUnitType &type)
 {
-	COrder *order = new COrder;
-
-	order->Action = UnitActionTransformInto;
+	COrder *order = new COrder(UnitActionTransformInto);
 
 	order->Arg1.Type = &type;
 
@@ -417,9 +387,8 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionUnload(const Vec2i &pos, CUnit *what)
 {
-	COrder *order = new COrder;
+	COrder *order = new COrder(UnitActionUnload);
 
-	order->Action = UnitActionUnload;
 	order->goalPos = pos;
 	if (what && !what->Destroyed) {
 		order->SetGoal(what);
@@ -430,9 +399,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type)
 {
-	COrder *order = new COrder;
-
-	order->Action = UnitActionUpgradeTo;
+	COrder *order = new COrder(UnitActionUpgradeTo);
 
 	// FIXME: if you give quick an other order, the resources are lost!
 	unit.Player->SubUnitType(type);
@@ -441,152 +408,10 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 	return order;
 }
 
-#if 1 // currently needed for parsing
-/* static */ COrder* COrder::NewActionAttack()
-{
-	COrder *order = new COrder;
-
-	order->Action = UnitActionAttack;
-	return order;
-}
-
-/* static */ COrder* COrder::NewActionAttackGround()
-{
-	COrder *order = new COrder;
-
-	order->Action = UnitActionAttackGround;
-	return order;
-}
-
-/* static */ COrder* COrder::NewActionBoard()
-{
-	COrder *order = new COrder;
-
-	order->Action = UnitActionBoard;
-	return order;
-}
-
-/* static */ COrder* COrder::NewActionBuild()
-{
-	COrder *order = new COrder;
-
-	order->Action = UnitActionBuild;
-	return order;
-}
-
-/* static */ COrder* COrder::NewActionBuilt()
-{
-	COrder *order = new COrder_Built;
-
-	order->Action = UnitActionBuilt;
-	return order;
-}
-
-/* static */ COrder* COrder::NewActionFollow()
-{
-	COrder *order = new COrder;
-
-	order->Action = UnitActionFollow;
-	return order;
-}
-
-/* static */ COrder* COrder::NewActionMove()
-{
-	COrder *order = new COrder;
-
-	order->Action = UnitActionMove;
-	return order;
-}
-
-/* static */ COrder* COrder::NewActionPatrol()
-{
-	COrder *order = new COrder;
-
-	order->Action = UnitActionPatrol;
-	return order;
-}
-
-/* static */ COrder* COrder::NewActionRepair()
-{
-	COrder *order = new COrder;
-
-	order->Action = UnitActionRepair;
-	return order;
-}
-
-/* static */ COrder* COrder::NewActionResearch()
-{
-	COrder_Research *order = new COrder_Research;
-
-	order->Action = UnitActionResearch;
-	return order;
-}
-
-/* static */ COrder* COrder::NewActionResource()
-{
-	COrder *order = new COrder;
-
-	order->Action = UnitActionResource;
-	return order;
-}
-
-/* static */ COrder* COrder::NewActionReturnGoods()
-{
-	COrder *order = new COrder;
-
-	order->Action = UnitActionReturnGoods;
-	return order;
-}
-
-/* static */ COrder* COrder::NewActionSpellCast()
-{
-	COrder *order = new COrder_SpellCast;
-
-	order->Action = UnitActionSpellCast;
-	return order;
-}
-
-/* static */ COrder* COrder::NewActionTrain()
-{
-	COrder *order = new COrder;
-
-	order->Action = UnitActionTrain;
-	return order;
-}
-
-/* static */ COrder* COrder::NewActionTransformInto()
-{
-	COrder *order = new COrder;
-
-	order->Action = UnitActionTransformInto;
-	return order;
-}
-
-/* static */ COrder* COrder::NewActionUnload()
-{
-	COrder *order = new COrder;
-
-	order->Action = UnitActionUnload;
-	return order;
-}
-
-/* static */ COrder* COrder::NewActionUpgradeTo()
-{
-	COrder *order = new COrder;
-
-	order->Action = UnitActionUpgradeTo;
-	return order;
-}
-
-#endif
-
-
-
 COrder* COrder::Clone() const
 {
-	COrder *clone = new COrder();
+	COrder *clone = new COrder(this->Action);
 
-	clone->Action = this->Action;
 	clone->Range = this->Range;
 	clone->MinRange = this->MinRange;
 	clone->Width = this->Width;
