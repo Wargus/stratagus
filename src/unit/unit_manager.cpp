@@ -126,7 +126,7 @@ void CUnitManager::Save(CFile *file)
 
 	std::list<CUnit *>::iterator it = ReleasedUnits.begin();
 	for (; it != ReleasedUnits.end(); ++it) {
-		file->printf(", {Slot = %d, FreeCycle = %lu}", (*it)->Slot, (*it)->Refs);
+		file->printf(", {Slot = %d, FreeCycle = %u}", (*it)->Slot, (*it)->Refs);
 	}
 	file->printf(")\n");
 }

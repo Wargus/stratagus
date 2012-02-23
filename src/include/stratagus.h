@@ -97,6 +97,14 @@
 #define UNUSED(var) (var)
 #endif
 
+#ifdef __GNUC__
+#define PRINTF_VAARG_ATTRIBUTE(a, b) __attribute__((format (printf, a, b)))
+#else
+#define PRINTF_VAARG_ATTRIBUTE(a, b)
+#endif
+
+
+
 /*============================================================================
 ==  Debug definitions
 ============================================================================*/
@@ -276,7 +284,7 @@ extern void DrawMapArea();              /// Draw the map area
 extern void GameMainLoop();             /// Game main loop
 
 	/// Show load progress
-extern void ShowLoadProgress(const char *fmt, ...);
+extern void ShowLoadProgress(const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(1, 2);
 
 struct DisplayAutoLocker {
 	DisplayAutoLocker();

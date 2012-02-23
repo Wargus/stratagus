@@ -68,7 +68,7 @@ class FileWriter
 public:
 	virtual ~FileWriter() {}
 
-	void printf(const char *format, ...);
+	void printf(const char *format, ...) PRINTF_VAARG_ATTRIBUTE(2, 3); // Don't forget to count this
 
 	virtual int write(const char *data, unsigned int size) = 0;
 };
@@ -113,7 +113,8 @@ public:
 	int read(void *buf, size_t len);
 	int seek(long offset, int whence);
 	long tell();
-	int printf(const char *format, ...);
+
+	int printf(const char *format, ...) PRINTF_VAARG_ATTRIBUTE(2, 3); // Don't forget to count this
 
 private:
 	int   cl_type;   /// type of CFile

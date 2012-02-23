@@ -402,7 +402,7 @@ public:
 	int HaveUnitTypeByIdent(const std::string &ident) const;
 
 	/// Notify player about a problem
-	void Notify(int type, int x, int y, const char *fmt, ...) const;
+	void Notify(int type, int x, int y, const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(5, 6); // Don't forget to count this
 
 	/**
 	**  Check if the player index is an enemy

@@ -349,9 +349,9 @@ extern void DrawMessages();
 	/// Draw the player resource in resource line
 extern void DrawResources();
 	/// Set message to display
-extern void SetMessage(const char *fmt, ...);
+extern void SetMessage(const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(1, 2);
 	/// Set message to display with event point
-extern void SetMessageEvent(int x, int y, const char *fmt, ...);
+extern void SetMessageEvent(int x, int y, const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(3, 4);
 	/// Center view-point on last event message
 extern void CenterOnMessage();
 	/// Cleanup all messages
