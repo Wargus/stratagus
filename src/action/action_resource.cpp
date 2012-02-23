@@ -161,7 +161,7 @@ static void UnitGotoGoal(CUnit &unit, CUnit *const goal, int mode)
 		}
 	}
 	order->Range = 1;
-	unit.SubAction = mode;
+	order->SubAction.Res = mode;
 	unit.State = 0;
 	if (mode == SUB_MOVE_TO_DEPOT || mode == SUB_MOVE_TO_RESOURCE) {
 		unit.CurrentOrder()->Data.Move.Cycles = 0; //moving counter
@@ -209,7 +209,7 @@ static int StartGathering(CUnit &unit)
 		// Find an alternative, but don't look too far.
 		unit.CurrentOrder()->goalPos.x = unit.CurrentOrder()->goalPos.y = -1;
 		if ((goal = UnitFindResource(unit, unit.tilePos, 15, unit.CurrentResource, unit.Player->AiEnabled))) {
-			unit.SubAction = SUB_START_RESOURCE;
+			unit.CurrentOrder()->SubAction.Res = SUB_START_RESOURCE;
 			unit.CurrentOrder()->SetGoal(goal);
 		} else {
 			unit.CurrentOrder()->ClearGoal();
@@ -324,7 +324,7 @@ static void LoseResource(CUnit &unit, const CUnit &source)
 			unit.CurrentOrder()->Arg1.Resource.Mine = goal;
 			unit.CurrentOrder()->Range = 1;
 			unit.CurrentOrder()->goalPos = goal->tilePos;
-			unit.SubAction = SUB_MOVE_TO_RESOURCE;
+			unit.CurrentOrder()->SubAction.Res = SUB_MOVE_TO_RESOURCE;
 			unit.State = 0;
 			return;
 		}
@@ -361,7 +361,7 @@ static void LoseResource(CUnit &unit, const CUnit &source)
 	if (depot) {
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Found another resource.\n"
 			_C_ unit.Player->Index _C_ unit.Slot);
-		unit.SubAction = SUB_START_RESOURCE;
+		unit.CurrentOrder()->SubAction.Res = SUB_START_RESOURCE;
 		unit.State = 0;
 		unit.CurrentOrder()->SetGoal(depot);
 	} else {
@@ -391,7 +391,9 @@ static int GatherResource(CUnit &unit)
 	int addload;
 
 	if (!resinfo.HarvestFromOutside && unit.Container != NULL) {
-		unit.Container->SubAction = SUB_GATHER_RESOURCE;
+#if 0
+//		unit.Container->SubAction = SUB_GATHER_RESOURCE;
+#endif
 		UnitShowAnimation(*unit.Container, unit.Container->Type->Animations->Harvest[unit.CurrentResource]);
 	}
 
@@ -412,7 +414,7 @@ static int GatherResource(CUnit &unit)
 	if (resinfo.TerrainHarvester && !Map.ForestOnMap(unit.CurrentOrder()->goalPos)) {
 		if (!unit.Anim.Unbreakable) {
 			// Action now breakable, move to resource again.
-			unit.SubAction = SUB_MOVE_TO_RESOURCE;
+			unit.CurrentOrder()->SubAction.Res = SUB_MOVE_TO_RESOURCE;
 			// Give it some reasonable look while searching.
 			// FIXME: which frame?
 			unit.Frame = 0;
@@ -529,7 +531,7 @@ int GetNumWaitingWorkers(const CUnit &mine)
 
 	for (int i = 0; NULL != worker; worker = worker->NextWorker, ++i)
 	{
-		if (worker->SubAction == SUB_START_GATHERING && worker->Wait) {
+		if (worker->CurrentOrder()->SubAction.Res == SUB_START_GATHERING && worker->Wait) {
 			ret++;
 		}
 		Assert(i <= mine.Resource.Assigned);
@@ -558,10 +560,11 @@ static int StopGathering(CUnit &unit)
 		}
 		source->Resource.Active--;
 		Assert(source->Resource.Active >= 0);
-
+#if 0
 		if (!resinfo.HarvestFromOutside && source->Resource.Active == 0) {
 			source->SubAction = 1;
 		}
+#endif
 		//Store resource position.
 		if (unit.Orders[0]->Arg1.Resource.Mine) {
 			unit.Orders[0]->Arg1.Resource.Mine->RefsDecrease();
@@ -575,7 +578,7 @@ static int StopGathering(CUnit &unit)
 			CUnit *next = NULL;
 			for(; NULL != worker; worker = worker->NextWorker)
 			{
-				if (worker != &unit && worker->SubAction == SUB_START_GATHERING && worker->Wait) {
+				if (worker != &unit && worker->CurrentOrder()->SubAction.Res == SUB_START_GATHERING && worker->Wait) {
 					count++;
 					if (next) {
 						if (next->Wait > worker->Wait)
@@ -849,7 +852,7 @@ void ResourceGiveUp(CUnit &unit)
 */
 static bool ActionResourceInit(CUnit &unit)
 {
-	Assert(unit.SubAction == SUB_START_RESOURCE);
+	Assert(unit.CurrentOrder()->SubAction.Res == SUB_START_RESOURCE);
 
 	CUnit *const goal = unit.CurrentOrder()->GetGoal();
 	int newres;
@@ -905,27 +908,27 @@ void HandleActionResource(COrder& order, CUnit &unit)
 	}
 
 	// Let's start mining.
-	if (unit.SubAction == SUB_START_RESOURCE) {
+	if (order.SubAction.Res == SUB_START_RESOURCE) {
 		if (ActionResourceInit(unit) == false) {
 			return;
 		}
 	}
 
 	// Move to the resource location.
-	if (SUB_MOVE_TO_RESOURCE <= unit.SubAction && unit.SubAction < SUB_UNREACHABLE_RESOURCE) {
+	if (SUB_MOVE_TO_RESOURCE <= order.SubAction.Res && order.SubAction.Res < SUB_UNREACHABLE_RESOURCE) {
 		const int ret = MoveToResource(unit);
 
 		switch (ret)
 		{
 			case -1: // Can't Reach
 			{
-				unit.SubAction++;
+				order.SubAction.Res++;
 				unit.Wait = 5;
 				return;
 			}
 			case 1: // Reached
 			{
-				unit.SubAction = SUB_START_GATHERING;
+				order.SubAction.Res = SUB_START_GATHERING;
 				break;
 			}
 			case 0: // Move along.
@@ -939,53 +942,53 @@ void HandleActionResource(COrder& order, CUnit &unit)
 	}
 
 	// Resource seems to be unreachable
-	if (unit.SubAction == SUB_UNREACHABLE_RESOURCE) {
+	if (order.SubAction.Res == SUB_UNREACHABLE_RESOURCE) {
 		ResourceGiveUp(unit);
 		return;
 	}
 
 	// Start gathering the resource
-	if (unit.SubAction == SUB_START_GATHERING) {
+	if (order.SubAction.Res == SUB_START_GATHERING) {
 		if (StartGathering(unit)) {
-			unit.SubAction = SUB_GATHER_RESOURCE;
+			order.SubAction.Res = SUB_GATHER_RESOURCE;
 		} else {
 			return;
 		}
 	}
 
 	// Gather the resource.
-	if (unit.SubAction == SUB_GATHER_RESOURCE) {
+	if (order.SubAction.Res == SUB_GATHER_RESOURCE) {
 		if (GatherResource(unit)) {
-			unit.SubAction = SUB_STOP_GATHERING;
+			order.SubAction.Res = SUB_STOP_GATHERING;
 		} else {
 			return;
 		}
 	}
 
 	// Stop gathering the resource.
-	if (unit.SubAction == SUB_STOP_GATHERING) {
+	if (order.SubAction.Res == SUB_STOP_GATHERING) {
 		if (StopGathering(unit)) {
-			unit.SubAction = SUB_MOVE_TO_DEPOT;
-			unit.CurrentOrder()->Data.Move.Cycles = 0; //moving counter
+			order.SubAction.Res = SUB_MOVE_TO_DEPOT;
+			order.Data.Move.Cycles = 0; //moving counter
 		} else
 			return;
 	}
 
 	// Move back home.
-	if (SUB_MOVE_TO_DEPOT <= unit.SubAction && unit.SubAction < SUB_UNREACHABLE_DEPOT) {
+	if (SUB_MOVE_TO_DEPOT <= order.SubAction.Res && order.SubAction.Res < SUB_UNREACHABLE_DEPOT) {
 		const int ret = MoveToDepot(unit);
 
 		switch (ret)
 		{
 			case -1: // Can't Reach
 			{
-				unit.SubAction++;
+				order.SubAction.Res++;
 				unit.Wait = 5;
 				return;
 			}
 			case 1: // Reached
 			{
-				unit.SubAction = SUB_RETURN_RESOURCE;
+				order.SubAction.Res = SUB_RETURN_RESOURCE;
 				return;
 			}
 			case 0: // Move along.
@@ -999,15 +1002,15 @@ void HandleActionResource(COrder& order, CUnit &unit)
 	}
 
 	// Depot seems to be unreachable
-	if (unit.SubAction == SUB_UNREACHABLE_DEPOT) {
+	if (order.SubAction.Res == SUB_UNREACHABLE_DEPOT) {
 		ResourceGiveUp(unit);
 		return;
 	}
 
 	// Unload resources at the depot.
-	if (unit.SubAction == SUB_RETURN_RESOURCE) {
+	if (order.SubAction.Res == SUB_RETURN_RESOURCE) {
 		if (WaitInDepot(unit)) {
-			unit.SubAction = SUB_START_RESOURCE;
+			order.SubAction.Res = SUB_START_RESOURCE;
 
 			// It's posible, though very rare that the unit's goal blows up
 			// this cycle, but after this unit. Thus, next frame the unit

@@ -269,12 +269,6 @@
 **  in a harvester.
 **  @todo continue documentation
 **
-**  CUnit::SubAction
-**
-**  This is an action private variable, it is zero on the first
-**  entry of an action. Must be set to zero, if an action finishes.
-**  It should only be used inside of actions.
-**
 **  CUnit::Wait
 **
 **  The unit is forced too wait for that many cycles. Be carefull,
@@ -514,7 +508,6 @@ public:
 
 	unsigned char DamagedType;   /// Index of damage type of unit which damaged this unit
 	unsigned long Attacked; /// gamecycle unit was last attacked
-	unsigned SubAction : 8; /// sub-action of unit
 	unsigned State : 8;     /// action state
 	unsigned Blink : 3;     /// Let selection rectangle blink
 	unsigned Moving : 1;    /// The unit is moving

@@ -54,7 +54,6 @@
 #include "tileset.h"
 #include "map.h"
 #include "spells.h"
-#include "interface.h"
 #include "iolib.h"
 #include "script.h"
 
@@ -81,6 +80,7 @@
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 
+	file.printf("\"state\", %d", this->State);
 	file.printf(" \"spell\", \"%s\",\n  ", this->Spell->Ident.c_str());
 
 	SaveDataMove(file);
@@ -95,6 +95,11 @@
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->Spell = SpellTypeByIdent(LuaToString(l, -1));
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "state")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->State = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 	} else {
 		return false;
@@ -145,45 +150,38 @@ static void AnimateActionSpellCast(CUnit &unit, COrder_SpellCast &order)
 **
 **  @param unit  Unit, for that the spell cast is handled.
 */
-static void SpellMoveToTarget(CUnit &unit)
+bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 {
-	CUnit *goal;
-	int err;
-
 	// Unit can't move
-	err = 1;
+	int err = 1;
 	if (unit.CanMove()) {
 		err = DoActionMove(unit);
 		if (unit.Anim.Unbreakable) {
-			return;
+			return false;
 		}
 	}
 
 	// when reached DoActionMove changes unit action
 	// FIXME: use return codes from pathfinder
-	COrderPtr order = unit.CurrentOrder();
-	goal = order->GetGoal();
+	CUnit *goal = this->GetGoal();
 
-	if (goal && unit.MapDistanceTo(*goal) <= order->Range) {
+	if (goal && unit.MapDistanceTo(*goal) <= this->Range) {
 		// there is goal and it is in range
 		unit.State = 0;
 		UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos);
-		unit.SubAction++; // cast the spell
-		return;
-	} else if (!goal && unit.MapDistanceTo(order->goalPos.x, order->goalPos.y) <= order->Range) {
+		this->State++; // cast the spell
+		return false;
+	} else if (!goal && unit.MapDistanceTo(this->goalPos.x, this->goalPos.y) <= this->Range) {
 		// there is no goal and target spot is in range
-		UnitHeadingFromDeltaXY(unit, order->goalPos - unit.tilePos);
-		unit.SubAction++; // cast the spell
-		return;
+		UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
+		this->State++; // cast the spell
+		return false;
 	} else if (err == PF_UNREACHABLE) {
-		//
 		// goal/spot unreachable and out of range -- give up
-		//
-		unit.ClearAction();
 		unit.State = 0;
-		order->ClearGoal(); // Release references
+		return true;
 	}
-	Assert(!unit.Type->Vanishes && !unit.Destroyed);
+	return false;
 }
 
 
@@ -196,7 +194,7 @@ static void SpellMoveToTarget(CUnit &unit)
 		return false;
 	}
 	const SpellType &spell = order.GetSpell();
-	switch (unit.SubAction) {
+	switch (this->State) {
 		case 0:
 			// Check if we can cast the spell.
 			if (!CanCastSpell(unit, &spell, order.GetGoal(), order.goalPos.x, order.goalPos.y)) {
@@ -221,14 +219,16 @@ static void SpellMoveToTarget(CUnit &unit)
 				unit.CurrentOrder()->NewResetPath();
 			}
 			unit.ReCast = 0; // repeat spell on next pass? (defaults to `no')
-			unit.SubAction = 1;
+			this->State = 1;
 			// FALL THROUGH
 		case 1:                         // Move to the target.
 			if (spell.Range && spell.Range != INFINITE_RANGE) {
-				SpellMoveToTarget(unit);
-				break;
+				if (SpellMoveToTarget(unit) == true) {
+					return true;
+				}
+				return false;
 			} else {
-				unit.SubAction = 2;
+				this->State = 2;
 			}
 			// FALL THROUGH
 		case 2:                         // Cast spell on the target.
@@ -252,7 +252,7 @@ static void SpellMoveToTarget(CUnit &unit)
 			break;
 
 		default:
-			unit.SubAction = 0; // Reset path, than move to target
+			this->State = 0; // Reset path, than move to target
 			break;
 	}
 	return false;

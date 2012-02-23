@@ -170,7 +170,6 @@ void CUnit::Init()
 	GroupId = 0;
 	LastGroup = 0;
 	ResourcesHeld = 0;
-	SubAction = 0;
 	Wait = 0;
 	State = 0;
 	Blink = 0;
@@ -268,7 +267,6 @@ void CUnit::ClearAction()
 	delete CurrentOrder();
 	Orders[0] = COrder::NewActionStill();
 
-	SubAction = 0;
 	if (Selected) {
 		SelectedUnitChanged();
 	}
@@ -372,7 +370,6 @@ bool CUnit::RestoreOrder()
 
 	// Restart order state.
 	this->State = 0;
-	this->SubAction = 0;
 
 	// Cannot delete this->Orders[0] since it is generally that order
 	// which call this method.
@@ -1064,7 +1061,7 @@ void UnitClearOrders(CUnit &unit)
 	}
 	unit.Orders.clear();
 	unit.Orders.push_back(COrder::NewActionStill());
-	unit.SubAction = unit.State = 0;
+	unit.State = 0;
 }
 
 /**
@@ -2136,7 +2133,6 @@ void DropOutAll(const CUnit &source)
 		DropOutOnSide(*unit, LookingW, &source);
 		Assert(!unit->CurrentOrder()->HasGoal());
 		unit->CurrentOrder()->Action = UnitActionStill;
-		unit->SubAction = 0;
 	}
 }
 
@@ -2821,7 +2817,6 @@ void LetUnitDie(CUnit &unit)
 	// Unit has death animation.
 
 	// Not good: UnitUpdateHeading(unit);
-	unit.SubAction = 0;
 	unit.State = 0;
 	delete unit.Orders[0];
 	unit.Orders[0] = COrder::NewActionDie();

@@ -182,13 +182,6 @@ void HandleActionMove(COrder& order, CUnit &unit)
 		return;
 	}
 
-	if (!unit.SubAction) { // first entry
-		unit.SubAction = 1;
-		unit.CurrentOrder()->NewResetPath();
-		order.Data.Move.Cycles = 0;
-		Assert(unit.State == 0);
-	}
-
 	// FIXME: (mr-russ) Make a reachable goal here with GoalReachable ...
 
 	switch (DoActionMove(unit)) { // reached end-point?

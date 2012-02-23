@@ -47,7 +47,6 @@
 #include "player.h"
 #include "unit.h"
 #include "missile.h"
-#include "interface.h"
 #include "map.h"
 #include "sound.h"
 #include "spells.h"
@@ -133,7 +132,7 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 
 /* static */ COrder* COrder::NewActionBoard(CUnit &unit)
 {
-	COrder *order = new COrder(UnitActionBoard);
+	COrder_Board *order = new COrder_Board;
 
 	order->SetGoal(&unit);
 	order->Range = 1;
@@ -234,7 +233,7 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 
 /* static */ COrder* COrder::NewActionRepair(CUnit &unit, CUnit &target)
 {
-	COrder *order = new COrder(UnitActionRepair);
+	COrder_Repair *order = new COrder_Repair();
 
 	if (target.Destroyed) {
 		order->goalPos = target.tilePos + target.Type->GetHalfTileSize();
@@ -249,12 +248,11 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
-	COrder *order = new COrder(UnitActionRepair);
+	COrder_Repair *order = new COrder_Repair;
 
 	order->goalPos = pos;
 	return order;
 }
-
 
 
 /* static */ COrder* COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade)
@@ -350,16 +348,13 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 
 /* static */ COrder* COrder::NewActionStandGround()
 {
-	return new COrder_StandGround;
+	return new COrder_Still(true);
 }
 
 /* static */ COrder* COrder::NewActionStill()
 {
-	return new COrder_Still;
+	return new COrder_Still(false);
 }
-
-
-
 
 /* static */ COrder* COrder::NewActionTrain(CUnit &trainer, CUnitType &type)
 {
@@ -383,7 +378,7 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 
 /* static */ COrder* COrder::NewActionUnload(const Vec2i &pos, CUnit *what)
 {
-	COrder *order = new COrder(UnitActionUnload);
+	COrder *order = new COrder_Unload;
 
 	order->goalPos = pos;
 	if (what && !what->Destroyed) {
@@ -452,7 +447,7 @@ void COrder::ReleaseRefs(CUnit &unit)
 	if (this->HasGoal()) {
 		// If mining decrease the active count on the resource.
 		if (this->Action == UnitActionResource) {
-			if (unit.SubAction == 60 /* SUB_GATHER_RESOURCE */ ) {
+			if (this->SubAction.Res == 60 /* SUB_GATHER_RESOURCE */ ) {
 				CUnit *goal = this->GetGoal();
 
 				goal->Resource.Active--;
@@ -460,7 +455,7 @@ void COrder::ReleaseRefs(CUnit &unit)
 			}
 		}
 		// Still shouldn't have a reference unless attacking
-		Assert(!(this->Action == UnitActionStill && !unit.SubAction));
+		Assert(!(this->Action == UnitActionStill && !SubAction.Attack));
 		this->ClearGoal();
 	}
 #ifdef DEBUG
@@ -525,11 +520,11 @@ bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
 			// Maybe AI should cancel action and save resources ???
 			return true;
 		case UnitActionResource:
-			if (unit.SubAction >= 65) {
+			if (SubAction.Res >= 65) {
 				//Normal return to depot
 				return true;
 			}
-			if (unit.SubAction > 55  &&
+			if (SubAction.Res > 55  &&
 				unit.ResourcesHeld > 0) {
 				//escape to Depot with this what you have;
 				Data.ResWorker.DoneHarvesting = 1;
@@ -1564,10 +1559,7 @@ static void HandleUnitAction(CUnit &unit)
 			delete unit.Orders[0];
 			unit.Orders.erase(unit.Orders.begin());
 
-			//
-			// Note subaction 0 should reset.
-			//
-			unit.SubAction = unit.State = 0;
+			unit.State = 0;
 			unit.Wait = 0;
 
 			if (IsOnlySelected(unit)) { // update display for new action
@@ -1721,7 +1713,7 @@ void UnitActions()
 		SyncHash = (SyncHash << 5) | (SyncHash >> 27);
 		SyncHash ^= unit.Orders.size() > 0 ? unit.CurrentAction() << 18 : 0;
 		SyncHash ^= unit.State << 12;
-		SyncHash ^= unit.SubAction << 6;
+//		SyncHash ^= unit.SubAction << 6;
 		SyncHash ^= unit.Refs << 3;
 	}
 }

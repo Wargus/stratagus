@@ -252,7 +252,14 @@ bool COrder::ParseMoveData(lua_State *l, int &j, const char *value)
 
 bool COrder::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
-	if (!strcmp(value, "current-resource")) {
+	if (this->ParseMoveData(l, j, value)) {
+		return true;
+	} else if (!strcmp(value, "subaction")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->SubAction.Attack = this->SubAction.Follow = this->SubAction.Res = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "current-resource")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->CurrentResource = CclGetResourceByName(l);
@@ -324,9 +331,9 @@ void CclParseOrder(lua_State *l, const CUnit &unit, COrderPtr *orderPtr)
 	lua_pop(l, 1);
 
 	if (!strcmp(actiontype, "action-still")) {
-		*orderPtr = new COrder_Still;
+		*orderPtr = new COrder_Still(false);
 	} else if (!strcmp(actiontype, "action-stand-ground")) {
-		*orderPtr = new COrder_StandGround;
+		*orderPtr = new COrder_Still(true);
 	} else if (!strcmp(actiontype, "action-follow")) {
 		*orderPtr = COrder::NewActionFollow();
 	} else if (!strcmp(actiontype, "action-move")) {
@@ -348,7 +355,7 @@ void CclParseOrder(lua_State *l, const CUnit &unit, COrderPtr *orderPtr)
 	} else if (!strcmp(actiontype, "action-built")) {
 		*orderPtr = new COrder_Built;
 	} else if (!strcmp(actiontype, "action-board")) {
-		*orderPtr = COrder::NewActionBoard();
+		*orderPtr = new COrder_Board;
 	} else if (!strcmp(actiontype, "action-unload")) {
 		*orderPtr = COrder::NewActionUnload();
 	} else if (!strcmp(actiontype, "action-patrol")) {
@@ -356,13 +363,13 @@ void CclParseOrder(lua_State *l, const CUnit &unit, COrderPtr *orderPtr)
 	} else if (!strcmp(actiontype, "action-build")) {
 		*orderPtr = new COrder_Build;
 	} else if (!strcmp(actiontype, "action-repair")) {
-		*orderPtr = COrder::NewActionRepair();
+		*orderPtr = new COrder_Repair;
 	} else if (!strcmp(actiontype, "action-resource")) {
 		*orderPtr = COrder::NewActionResource();
 	} else if (!strcmp(actiontype, "action-return-goods")) {
 		*orderPtr = COrder::NewActionReturnGoods();
 	} else if (!strcmp(actiontype, "action-transform-into")) {
-		*orderPtr = new COrder_TransformInto();
+		*orderPtr = new COrder_TransformInto;
 	} else {
 		LuaError(l, "ParseOrder: Unsupported type: %s" _C_ actiontype);
 	}
@@ -591,8 +598,6 @@ static int CclUnit(lua_State *l)
 			lua_pushvalue(l, j + 1);
 			unit->CurrentResource = CclGetResourceByName(l);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "sub-action")) {
-			unit->SubAction = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "wait")) {
 			unit->Wait = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "state")) {

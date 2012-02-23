@@ -108,15 +108,6 @@ void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 		case UnitActionAttackGround:
 			file.printf("\"action-attack-ground\",");
 			break;
-		case UnitActionBoard:
-			file.printf("\"action-board\",");
-			break;
-		case UnitActionUnload:
-			file.printf("\"action-unload\",");
-			break;
-		case UnitActionRepair:
-			file.printf("\"action-repair\",");
-			break;
 		case UnitActionResource:
 			file.printf("\"action-resource\",");
 			break;
@@ -141,6 +132,21 @@ void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 		file.printf(" \"goal\", \"%s\",", UnitReference(goal).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d}", order.goalPos.x, order.goalPos.y);
+
+	switch (order.Action) {
+		case UnitActionAttack:
+		case UnitActionAttackGround:
+			file.printf(", \"subaction\", %d", order.SubAction.Attack);
+			break;
+		case UnitActionFollow:
+			file.printf(", \"subaction\", %d", order.SubAction.Follow);
+			break;
+		case UnitActionResource:
+		case UnitActionReturnGoods:
+			file.printf(", \"subaction\", %d", order.SubAction.Res);
+			break;
+	}
+
 
 	// Extra arg.
 	switch (order.Action) {
@@ -329,17 +335,6 @@ void SaveUnit(const CUnit &unit, CFile *file)
 	if (unit.CurrentResource) {
 		file->printf("\"current-resource\", \"%s\",\n  ",
 			DefaultResourceNames[unit.CurrentResource].c_str());
-	}
-	if (unit.SubAction && unit.IsAgressive() &&
-		(unit.CurrentAction() == UnitActionStill ||
-		unit.CurrentAction() == UnitActionStandGround))
-	{
-		//Force recalculate Guard points
-		//if unit atack from StandGround then attac target is recalculate
-		//When unit first time handle action code.
-		file->printf("\"sub-action\", 0, ");
-	} else	{
-		file->printf("\"sub-action\", %d, ", unit.SubAction);
 	}
 	file->printf("\"wait\", %d, ", unit.Wait);
 	file->printf("\"state\", %d,", unit.State);

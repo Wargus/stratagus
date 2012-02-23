@@ -47,7 +47,6 @@
 #include "upgrade.h"
 #include "pathfinder.h"
 #include "spells.h"
-#include "interface.h"
 #include "ui.h"
 
 /*----------------------------------------------------------------------------
@@ -107,9 +106,6 @@ static void RemoveOrder(CUnit &unit, unsigned int order)
 
 	delete unit.Orders[order];
 	unit.Orders.erase(unit.Orders.begin() + order);
-	if (order == 0) {
-		unit.SubAction = 0;
-	}
 	if (unit.Orders.empty()) {
 		unit.Orders.push_back(COrder::NewActionStill());
 	}

@@ -238,10 +238,15 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, int near_
 			int action = unit.Orders[j]->Action;
 			if (action == UnitActionBuild ||
 				action == UnitActionRepair ||
-				action == UnitActionReturnGoods ||
-				(action == UnitActionResource &&
-					 unit.SubAction > 55) /* SUB_START_GATHERING */) {
-				break;
+				action == UnitActionReturnGoods) {
+					break;
+				}
+			if (action == UnitActionResource) {
+				const COrder &order = *unit.Orders[j];
+
+				if (order.SubAction.Res > 55 /* SUB_START_GATHERING */) {
+					break;
+				}
 			}
 		}
 		if (j == unit.Orders.size()) {
@@ -1093,7 +1098,9 @@ static void AiCollectResources()
 					for (int k = num_units_assigned[src_c] - 1; k >= 0 && !unit; --k) {
 						unit = units_assigned[src_c][k];
 
-						if (unit->SubAction >= 65 /* SUB_STOP_GATHERING */ ) {
+						COrder &order = *unit->CurrentOrder();
+
+						if (order.SubAction.Res >= 65 /* SUB_STOP_GATHERING */ ) {
 							//worker returning with resource
 							continue;
 						}
@@ -1162,10 +1169,16 @@ static int AiRepairBuilding(const CUnitType &type, CUnit &building)
 	for (int i = 0; i < nunits; ++i) {
 		CUnit &unit = *table[i];
 
-		if (unit.Type->RepairRange && unit.Orders.size() == 1 &&
-			((unit.CurrentAction() == UnitActionResource && unit.SubAction <= 55) /* SUB_START_GATHERING */ ||
-				unit.CurrentAction() == UnitActionStill)) {
-			table[num++] = &unit;
+		if (unit.Type->RepairRange && unit.Orders.size() == 1) {
+			if (unit.CurrentAction() == UnitActionStill) {
+				table[num++] = &unit;
+			} else if (unit.CurrentAction() == UnitActionResource) {
+				COrder &order = *unit.CurrentOrder();
+
+				if (order.SubAction.Res <= 55 /* SUB_START_GATHERING */) {
+					table[num++] = &unit;
+				}
+			}
 		}
 	}
 

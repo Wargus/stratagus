@@ -57,6 +57,9 @@
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 	file.printf(" \"range\", %d,", this->Range);
 
+	if (this->WaitingCycle != 0) {
+		file.printf(" \"waiting-cycle\", %d,", this->WaitingCycle);
+	}
 	file.printf(" \"patrol\", {%d, %d},\n  ", this->WayPoint.x, this->WayPoint.y);
 	SaveDataMove(file);
 	file.printf("}");
@@ -71,6 +74,11 @@
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->WayPoint.x , &this->WayPoint.y);
 		lua_pop(l, 1);
+	} else if (!strcmp(value, "waiting-cycle")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->WaitingCycle = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	} else {
 		return false;
 	}
@@ -84,37 +92,30 @@
 		return false;
 	}
 
-	if (!unit.SubAction) { // first entry.
-		this->Data.Move.Cycles = 0; //moving counter
-		this->NewResetPath();
-		unit.SubAction = 1;
-	}
-
 	switch (DoActionMove(unit)) {
 		case PF_FAILED:
-			unit.SubAction = 1;
+			this->WaitingCycle = 0;
 			break;
 		case PF_UNREACHABLE:
 			// Increase range and try again
-			unit.SubAction = 1;
+			this->WaitingCycle = 1;
 			if (this->CheckRange()) {
 				this->Range++;
 				break;
 			}
 			// FALL THROUGH
 		case PF_REACHED:
-			unit.SubAction = 1;
+			this->WaitingCycle = 1;
 			this->Range = 0;
 			std::swap(this->WayPoint, this->goalPos);
 
-			this->Data.Move.Cycles = 0; //moving counter
 			this->NewResetPath();
 			break;
 		case PF_WAIT:
 			// Wait for a while then give up
-			unit.SubAction++;
-			if (unit.SubAction == 5) {
-				unit.SubAction = 1;
+			this->WaitingCycle++;
+			if (this->WaitingCycle == 5) {
+				this->WaitingCycle = 0;
 				this->Range = 0;
 				std::swap(this->WayPoint, this->goalPos);
 
@@ -123,12 +124,12 @@
 			}
 			break;
 		default: // moving
-			unit.SubAction = 1;
+			this->WaitingCycle = 0;
 			break;
 	}
 
 	if (!unit.Anim.Unbreakable) {
-		if (AutoAttack(unit, false) || AutoRepair(unit) || AutoCast(unit)) {
+		if (AutoAttack(unit) || AutoRepair(unit) || AutoCast(unit)) {
 			return true;
 		}
 	}

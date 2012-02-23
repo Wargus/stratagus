@@ -757,7 +757,8 @@ static void ShowSingleOrder(const CUnit &unit, const PixelPos &pos, const COrder
 			pos2 = CurrentViewport->TilePosToScreen_Center(order.goalPos);
 			// FALL THROUGH
 		case UnitActionAttack:
-			if (unit.SubAction & 2) { // Show weak targets.
+		{
+			if (order.SubAction.Attack & 2) { // Show weak targets.
 				e_color = ColorBlue;
 			} else {
 				e_color = ColorRed;
@@ -765,7 +766,7 @@ static void ShowSingleOrder(const CUnit &unit, const PixelPos &pos, const COrder
 			color = ColorRed;
 			dest = true;
 			break;
-
+		}
 		case UnitActionBoard:
 			e_color = color = ColorGreen;
 			dest = true;

@@ -108,6 +108,7 @@ public:
 		goalPos.x = -1;
 		goalPos.y = -1;
 		memset(&Arg1, 0, sizeof (Arg1));
+		memset(&SubAction, 0, sizeof (SubAction));
 		memset(&Data, 0, sizeof (Data));
 	}
 	virtual ~COrder();
@@ -170,10 +171,8 @@ public:
 #if 1 // currently needed for parsing
 	static COrder* NewActionAttack() { return new COrder(UnitActionAttack); }
 	static COrder* NewActionAttackGround() { return new COrder(UnitActionAttackGround); }
-	static COrder* NewActionBoard() { return new COrder(UnitActionBoard); }
 	static COrder* NewActionFollow() { return new COrder(UnitActionFollow); }
 	static COrder* NewActionMove() { return new COrder(UnitActionMove); }
-	static COrder* NewActionRepair() { return new COrder(UnitActionRepair); }
 	static COrder* NewActionResource() { return new COrder(UnitActionResource); }
 	static COrder* NewActionReturnGoods() { return new COrder(UnitActionReturnGoods); }
 	static COrder* NewActionUnload() { return new COrder(UnitActionUnload); }
@@ -199,6 +198,13 @@ public:
 		} Resource;
 	} Arg1;             /// Extra command argument.
 
+	union {
+		int Attack;
+		int Follow;
+		int Res;
+	} SubAction;
+
+
 	union _order_data_ {
 	struct _order_move_ {
 		unsigned short int Cycles;          /// how much Cycles we move.
@@ -211,17 +217,34 @@ public:
 		int TimeToHarvest;          /// how much time until we harvest some more.
 		unsigned DoneHarvesting:1;  /// Harvesting done, wait for action to break.
 	} ResWorker; /// Worker harvesting
-	struct _order_repair_ {
-		int Cycles;                 /// Cycles unit has been repairing for
-	} Repair; /// Repairing unit
 	} Data; /// Storage room for different commands
+};
+
+class COrder_Board : public COrder
+{
+	friend COrder* COrder::NewActionBoard(CUnit &unit);
+public:
+	COrder_Board() : COrder(UnitActionBoard), State(0) {}
+
+	virtual COrder_Board *Clone() const { return new COrder_Board(*this); }
+
+	virtual void Save(CFile &file, const CUnit &unit) const;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+	virtual bool Execute(CUnit &unit);
+
+private:
+	bool WaitForTransporter(CUnit &unit);
+
+private:
+	int State;
 };
 
 class COrder_Build : public COrder
 {
 	friend COrder* COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
 public:
-	COrder_Build() : COrder(UnitActionBuild), Type(NULL) {}
+	COrder_Build() : COrder(UnitActionBuild), Type(NULL), State(0) {}
 
 	virtual COrder_Build *Clone() const { return new COrder_Build(*this); }
 
@@ -235,11 +258,14 @@ public:
 	const CUnitType& GetUnitType() const { return *Type; }
 
 private:
+	bool MoveToLocation(CUnit &unit);
+	CUnit *CheckCanBuild(CUnit &unit);
 	bool StartBuilding(CUnit &unit, CUnit &ontop);
 	bool BuildFromOutside(CUnit &unit) const;
 private:
 	CUnitType *Type;        /// build a unit of this unit-type
 	CUnitPtr BuildingUnit;  /// unit builded.
+	int State;
 };
 
 
@@ -298,7 +324,7 @@ class COrder_Patrol : public COrder
 {
 	friend COrder* COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
 public:
-	COrder_Patrol() : COrder(UnitActionPatrol) {}
+	COrder_Patrol() : COrder(UnitActionPatrol), WaitingCycle(0) {}
 
 	virtual COrder_Patrol *Clone() const { return new COrder_Patrol(*this); }
 
@@ -310,7 +336,29 @@ public:
 	const Vec2i& GetWayPoint() const { return WayPoint; }
 private:
 	Vec2i WayPoint; /// position for patroling.
+	unsigned int WaitingCycle; /// number of cycle pathfinder wait.
 };
+
+class COrder_Repair : public COrder
+{
+	friend COrder* COrder::NewActionRepair(CUnit &unit, CUnit &target);
+	friend COrder* COrder::NewActionRepair(const Vec2i &pos);
+public:
+	COrder_Repair() : COrder(UnitActionRepair), State(0), RepairCycle(0) {}
+
+	virtual COrder_Repair *Clone() const { return new COrder_Repair(*this); }
+
+	virtual void Save(CFile &file, const CUnit &unit) const;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+	virtual bool Execute(CUnit &unit);
+private:
+	bool RepairUnit(const CUnit &unit, CUnit &goal);
+private:
+	unsigned int State;
+	unsigned int RepairCycle;
+};
+
 
 
 class COrder_Research : public COrder
@@ -337,7 +385,7 @@ private:
 class COrder_SpellCast : public COrder
 {
 public:
-	COrder_SpellCast() : COrder(UnitActionSpellCast), Spell(NULL) {}
+	COrder_SpellCast() : COrder(UnitActionSpellCast), Spell(NULL), State(0) {}
 
 	virtual COrder_SpellCast *Clone() const { return new COrder_SpellCast(*this); }
 
@@ -351,29 +399,16 @@ public:
 	const SpellType& GetSpell() const { return *Spell; }
 	void SetSpell(SpellType &spell) { Spell = &spell; }
 private:
+	bool SpellMoveToTarget(CUnit &unit);
+private:
 	SpellType *Spell;
-};
-
-
-
-
-class COrder_StandGround : public COrder
-{
-public:
-	COrder_StandGround() : COrder(UnitActionStandGround) {}
-
-	virtual COrder_StandGround *Clone() const { return new COrder_StandGround(*this); }
-
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
-
-	virtual bool Execute(CUnit &unit);
+	int State;
 };
 
 class COrder_Still : public COrder
 {
 public:
-	COrder_Still() : COrder(UnitActionStill) {}
+	COrder_Still(bool stand) : COrder(stand ? UnitActionStandGround : UnitActionStill), State(0) {}
 
 	virtual COrder_Still *Clone() const { return new COrder_Still(*this); }
 
@@ -381,10 +416,11 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual bool Execute(CUnit &unit);
+private:
+	bool AutoAttackStand(CUnit &unit);
+private:
+	int State;
 };
-
-
-
 
 
 class COrder_Train : public COrder
@@ -429,6 +465,27 @@ private:
 };
 
 
+
+class COrder_Unload : public COrder
+{
+	friend COrder* COrder::NewActionUnload(const Vec2i &pos, CUnit *what);
+public:
+	COrder_Unload() : COrder(UnitActionUnload), State(0) {}
+
+	virtual COrder_Unload *Clone() const { return new COrder_Unload(*this); }
+
+	virtual void Save(CFile &file, const CUnit &unit) const;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+	virtual bool Execute(CUnit &unit);
+
+private:
+	bool LeaveTransporter(CUnit &transporter);
+private:
+	int State;
+};
+
+
 class COrder_UpgradeTo : public COrder
 {
 	friend COrder* COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type);
@@ -450,7 +507,6 @@ private:
 	CUnitType *Type; /// upgrate to this unit-type
 	int Ticks;       /// Ticks to complete
 };
-
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -535,7 +591,7 @@ extern void CommandSharedVision(int player, bool state, int opponent);
 extern void DropResource(CUnit &unit);
 extern void ResourceGiveUp(CUnit &unit);
 extern int GetNumWaitingWorkers(const CUnit &mine);
-extern bool AutoAttack(CUnit &unit, bool stand_ground);
+extern bool AutoAttack(CUnit &unit);
 extern bool AutoRepair(CUnit &unit);
 extern bool AutoCast(CUnit &unit);
 
@@ -543,8 +599,6 @@ extern void UnHideUnit(CUnit &unit);
 
 typedef void HandleActionFunc(COrder& order, CUnit &unit);
 
-	/// Generic still action
-extern void ActionStillGeneric(CUnit &unit, bool stand_ground);
 	/// Handle command still
 extern HandleActionFunc HandleActionStill;
 	/// Handle command stand ground

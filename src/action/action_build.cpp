@@ -56,6 +56,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 enum
 {
+	State_Start = 0,
 	State_MoveToLocationMax = 10, // Range from prev
 	State_NearOfLocation = 11, // Range to next
 	State_StartBuilding_Failed = 20,
@@ -89,8 +90,8 @@ enum
 		}
 		file.printf(" \"building\", \"%s\",", UnitReference(this->BuildingUnit).c_str());
 	}
-	file.printf(" \"type\", \"%s\",\n  ", this->Type->Ident.c_str());
-
+	file.printf(" \"type\", \"%s\",", this->Type->Ident.c_str());
+	file.printf(" \"state\", %d,\n  ", this->State);
 	SaveDataMove(file);
 	file.printf("}");
 }
@@ -103,6 +104,11 @@ enum
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->BuildingUnit = CclGetUnitFromRef(l);
+		lua_pop(l, 1);
+	} else if (!strcmp(value, "state")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->State = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "type")) {
 		++j;
@@ -135,18 +141,18 @@ void COrder_Build::AiUnitKilled(CUnit& unit)
 **
 **  @param unit  Unit to move
 */
-static bool MoveToLocation(CUnit &unit, COrder_Build &order)
+bool COrder_Build::MoveToLocation(CUnit &unit)
 {
 	// First entry
-	if (!unit.SubAction) {
-		order.Data.Move.Cycles = 0; //moving counter
-		unit.SubAction = 1;
-		order.NewResetPath();
+	if (this->State == 0) {
+		this->Data.Move.Cycles = 0; //moving counter
+		this->State = 1;
+		this->NewResetPath();
 	}
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE: {
 			// Some tries to reach the goal
-			if (unit.SubAction++ < 10) {
+			if (this->State++ < 10) {
 				// To keep the load low, retry each 1/4 second.
 				// NOTE: we can already inform the AI about this problem?
 				unit.Wait = CYCLES_PER_SECOND / 4;
@@ -156,12 +162,12 @@ static bool MoveToLocation(CUnit &unit, COrder_Build &order)
 			unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
 				_("You cannot reach building place"));
 			if (unit.Player->AiEnabled) {
-				AiCanNotReach(unit, order.GetUnitType());
+				AiCanNotReach(unit, this->GetUnitType());
 			}
 			return true;
 		}
 		case PF_REACHED:
-			unit.SubAction = State_NearOfLocation;
+			this->State = State_NearOfLocation;
 			return false;
 
 		default:
@@ -219,10 +225,10 @@ private:
 **
 **  @param unit  Unit to check
 */
-static CUnit *CheckCanBuild(CUnit &unit, COrder_Build &order)
+CUnit *COrder_Build::CheckCanBuild(CUnit &unit)
 {
-	const Vec2i pos = order.goalPos;
-	const CUnitType &type = order.GetUnitType();
+	const Vec2i pos = this->goalPos;
+	const CUnitType &type = this->GetUnitType();
 
 	// Check if the building could be built there.
 
@@ -231,28 +237,27 @@ static CUnit *CheckCanBuild(CUnit &unit, COrder_Build &order)
 	if (ontop != NULL) {
 		return ontop;
 	}
-
+#if 0
 	/*
 	 * FIXME: rb - CheckAlreadyBuilding should be somehow
 	 * enabled/disable via game lua scripting
 	 */
 	CUnit *building = AlreadyBuildingFinder(unit, type).Find(Map.Field(pos));
 	if (building != NULL) {
-		if (unit.CurrentOrder() == &order) {
+		if (unit.CurrentOrder() == this) {
 			DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
 					_C_ unit.Player->Index _C_ unit.Slot
 					_C_ building->Type->Name.c_str()
 					_C_ building->Slot);
 
-		unit.SubAction = 0;
-		delete &order;
-		unit.Orders[0] = COrder::NewActionRepair(unit, *building);
-		return NULL;
+			delete this; // Bad
+			unit.Orders[0] = COrder::NewActionRepair(unit, *building);
+			return NULL;
 		}
 	}
-
+#endif
 	// Some tries to build the building.
-	unit.SubAction++;
+	this->State++;
 	// To keep the load low, retry each 10 cycles
 	// NOTE: we can already inform the AI about this problem?
 	unit.Wait = 10;
@@ -311,12 +316,12 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	if (!type.BuilderOutside) {
 		UnitShowAnimation(unit, unit.Type->Animations->Still);
 		unit.Remove(build);
-		unit.SubAction = State_BuildFromInside;
+		this->State = State_BuildFromInside;
 		if (unit.Selected) {
 			SelectedUnitChanged();
 		}
 	} else {
-		unit.SubAction = State_BuildFromOutside;
+		this->State = State_BuildFromOutside;
 		this->BuildingUnit = build;
 		unit.Direction = DirectionToHeading(build->tilePos - unit.tilePos);
 		UnitUpdateHeading(unit);
@@ -372,24 +377,24 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 		unit.Wait--;
 		return false;
 	}
-	if (unit.SubAction <= State_MoveToLocationMax) {
-		if (MoveToLocation(unit, *this)) {
+	if (this->State <= State_MoveToLocationMax) {
+		if (this->MoveToLocation(unit)) {
 			return true;
 		}
 	}
 	const CUnitType &type = this->GetUnitType();
 
-	if (State_NearOfLocation <= unit.SubAction && unit.SubAction < State_StartBuilding_Failed) {
+	if (State_NearOfLocation <= this->State && this->State < State_StartBuilding_Failed) {
 		if (CheckLimit(unit, type) == false) {
 			return true;
 		}
-		CUnit *ontop = CheckCanBuild(unit, *this);
+		CUnit *ontop = this->CheckCanBuild(unit);
 
 		if (ontop != NULL) {
 			this->StartBuilding(unit, *ontop);
 		}
 	}
-	if (unit.SubAction == State_StartBuilding_Failed) {
+	if (this->State == State_StartBuilding_Failed) {
 		unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
 			_("You cannot build %s here"), type.Name.c_str());
 		if (unit.Player->AiEnabled) {
@@ -397,7 +402,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 		}
 		return true;
 	}
-	if (unit.SubAction == State_BuildFromOutside) {
+	if (this->State == State_BuildFromOutside) {
 		this->BuildFromOutside(unit);
 	}
 

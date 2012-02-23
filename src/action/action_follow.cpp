@@ -42,7 +42,6 @@
 #include "unittype.h"
 #include "pathfinder.h"
 #include "map.h"
-#include "interface.h"
 #include "actions.h"
 
 /*----------------------------------------------------------------------------
@@ -67,7 +66,7 @@ void HandleActionFollow(COrder& order, CUnit &unit)
 	CUnit *goal = order.GetGoal();
 
 	// Reached target
-	if (unit.SubAction == 128) {
+	if (order.SubAction.Follow == 128) {
 
 		if (!goal || !goal->IsVisibleAsGoal(*unit.Player)) {
 			DebugPrint("Goal gone\n");
@@ -91,14 +90,14 @@ void HandleActionFollow(COrder& order, CUnit &unit)
 			unit.Wait = 10;
 			if (order.Range > 1) {
 				order.Range = 1;
-				unit.SubAction = 0;
+				order.SubAction.Follow = 0;
 			}
 			return;
 		}
-		unit.SubAction = 0;
+		order.SubAction.Follow = 0;
 	}
-	if (!unit.SubAction) { // first entry
-		unit.SubAction = 1;
+	if (!order.SubAction.Follow) { // first entry
+		order.SubAction .Follow= 1;
 		order.NewResetPath();
 		Assert(unit.State == 0);
 	}
@@ -161,7 +160,7 @@ void HandleActionFollow(COrder& order, CUnit &unit)
 				return;
 			}
 			order.goalPos = goal->tilePos;
-			unit.SubAction = 128;
+			order.SubAction.Follow = 128;
 		}
 			// FALL THROUGH
 		default:

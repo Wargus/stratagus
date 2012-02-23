@@ -157,11 +157,11 @@ static int CheckForTargetInRange(CUnit &unit)
 			order->MinRange = unit.Type->MinAttackRange;
 			order->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 			order->goalPos.x = order->goalPos.y = -1;
-			unit.SubAction |= WEAK_TARGET; // weak target
+			order->SubAction.Attack |= WEAK_TARGET; // weak target
 			order->NewResetPath();
 		}
 	// Have a weak target, try a better target.
-	} else if (order->HasGoal() && (unit.SubAction & WEAK_TARGET)) {
+	} else if (order->HasGoal() && (order->SubAction.Attack & WEAK_TARGET)) {
 		CUnit *goal = order->GetGoal();
 		CUnit *temp = AttackUnitsInReactRange(unit);
 
@@ -231,7 +231,7 @@ static void MoveToTarget(CUnit &unit)
 			unit.State = 0;
 			const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
 			UnitHeadingFromDeltaXY(unit, dir);
-			unit.SubAction++;
+			order->SubAction.Attack++;
 			return;
 		}
 		//
@@ -244,8 +244,8 @@ static void MoveToTarget(CUnit &unit)
 			// Reached wall or ground, now attacking it
 			unit.State = 0;
 			UnitHeadingFromDeltaXY(unit, order->goalPos - unit.tilePos);
-			unit.SubAction &= WEAK_TARGET;
-			unit.SubAction |= ATTACK_TARGET;
+			order->SubAction.Attack &= WEAK_TARGET;
+			order->SubAction.Attack |= ATTACK_TARGET;
 			return;
 		}
 	}
@@ -320,7 +320,7 @@ static void AttackTarget(CUnit &unit)
 			if (unit.RestoreOrder()) {
 				return;
 			}
-			unit.SubAction = MOVE_TO_TARGET;
+			order->SubAction.Attack = MOVE_TO_TARGET;
 			return;
 		}
 		// Save current command to come back.
@@ -335,14 +335,14 @@ static void AttackTarget(CUnit &unit)
 		order->MinRange = unit.Type->MinAttackRange;
 		order->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 		order->NewResetPath();
-		unit.SubAction |= WEAK_TARGET;
+		order->SubAction.Attack |= WEAK_TARGET;
 
 	//
 	// Have a weak target, try a better target.
 	// FIXME: if out of range also try another target quick
 	//
 	} else {
-		if ((unit.SubAction & WEAK_TARGET)) {
+		if ((order->SubAction.Attack & WEAK_TARGET)) {
 			CUnit *temp = AttackUnitsInReactRange(unit);
 			if (temp && temp->Type->Priority > goal->Type->Priority) {
 				COrder *savedOrder = order->Clone();
@@ -355,7 +355,7 @@ static void AttackTarget(CUnit &unit)
 				order->SetGoal(temp);
 				order->goalPos.x = order->goalPos.y = -1;
 				order->MinRange = unit.Type->MinAttackRange;
-				unit.SubAction = MOVE_TO_TARGET;
+				order->SubAction.Attack = MOVE_TO_TARGET;
 				order->NewResetPath();
 			}
 		}
@@ -375,11 +375,11 @@ static void AttackTarget(CUnit &unit)
 		order->NewResetPath();
 		unit.Frame = 0;
 		unit.State = 0;
-		unit.SubAction &= WEAK_TARGET;
-		unit.SubAction |= MOVE_TO_TARGET;
+		order->SubAction.Attack &= WEAK_TARGET;
+		order->SubAction.Attack |= MOVE_TO_TARGET;
 	}
 	if (dist < unit.Type->MinAttackRange) {
-		unit.SubAction = MOVE_TO_TARGET;
+		order->SubAction.Attack = MOVE_TO_TARGET;
 	}
 
 	//
@@ -414,7 +414,7 @@ void HandleActionAttack(COrder& order, CUnit &unit)
 		return;
 	}
 
-	switch (unit.SubAction) {
+	switch (order.SubAction.Attack) {
 		case 0: // First entry
 		{
 			// did Order change ?
@@ -431,12 +431,12 @@ void HandleActionAttack(COrder& order, CUnit &unit)
 					const Vec2i dir = goal.tilePos + goal.Type->GetHalfTileSize() - unit.tilePos;
 
 					UnitHeadingFromDeltaXY(unit, dir);
-					unit.SubAction = ATTACK_TARGET;
+					order.SubAction.Attack = ATTACK_TARGET;
 					AttackTarget(unit);
 					return;
 				}
 			}
-			unit.SubAction = MOVE_TO_TARGET;
+			order.SubAction.Attack = MOVE_TO_TARGET;
 			order.NewResetPath();
 			// FIXME: should use a reachable place to reduce pathfinder time.
 			Assert(unit.State == 0);

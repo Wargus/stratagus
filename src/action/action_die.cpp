@@ -106,7 +106,6 @@ static bool AnimateActionDie(CUnit &unit)
 	unit.Stats = &type.Stats[unit.Player->Index];
 	unit.Place(unit.tilePos);
 
-	unit.SubAction = 0;
 	unit.Frame = 0;
 	UnitUpdateHeading(unit);
 	AnimateActionDie(unit); // with new corpse.

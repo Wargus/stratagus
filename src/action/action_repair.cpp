@@ -48,10 +48,57 @@
 #include "map.h"
 #include "pathfinder.h"
 #include "interface.h"
+#include "iolib.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+/* virtual */ void COrder_Repair::Save(CFile &file, const CUnit &unit) const
+{
+	file.printf("{\"action-repair\",");
+
+	file.printf(" \"range\", %d,", this->Range);
+	if (this->HasGoal()) {
+		CUnit &goal = *this->GetGoal();
+		if (goal.Destroyed) {
+			/* this unit is destroyed so it's not in the global unit
+			 * array - this means it won't be saved!!! */
+			printf ("FIXME: storing destroyed Goal - loading will fail.\n");
+		}
+		file.printf(" \"goal\", \"%s\",", UnitReference(goal).c_str());
+	}
+	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
+
+	file.printf(" \"repaircycle\", %d,", this->RepairCycle);
+	file.printf(" \"state\", %d,\n  ", this->State);
+
+	SaveDataMove(file);
+
+	file.printf("}");
+}
+
+/* virtual */ bool COrder_Repair::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+{
+	if (this->ParseMoveData(l, j, value)) {
+		return true;
+	} else if (!strcmp("repaircycle", value)) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->RepairCycle = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	} else if (!strcmp("state", value)) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->State = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	} else {
+		return false;
+	}
+	return true;
+}
+
 
 
 /**
@@ -59,49 +106,45 @@
 **
 **  @param unit  unit repairing
 **  @param goal  unit being repaired
+**
+**  @return true when action is finished/canceled.
 */
-static void RepairUnit(CUnit &unit, CUnit &goal)
+bool COrder_Repair::RepairUnit(const CUnit &unit, CUnit &goal)
 {
 	if (goal.CurrentAction() == UnitActionBuilt) {
 		COrder_Built &order = *static_cast<COrder_Built *>(goal.CurrentOrder());
 
-		order.ProgressHp(goal, 100 * unit.CurrentOrder()->Data.Repair.Cycles);
-		unit.CurrentOrder()->Data.Repair.Cycles = 0;
-		return ;
+		order.ProgressHp(goal, 100 * this->RepairCycle);
+		this->RepairCycle = 0;
+		return false;
 	}
-	CPlayer *player = unit.Player;
-	char buf[100];
+	if (goal.Variable[HP_INDEX].Value >= goal.Variable[HP_INDEX].Max) {
+		return true;
+	}
+	CPlayer &player = *unit.Player;
 
 	// Calculate the repair costs.
 	Assert(goal.Stats->Variables[HP_INDEX].Max);
 
 	// Check if enough resources are available
 	for (int i = 1; i < MaxCosts; ++i) {
-		if (player->Resources[i] < goal.Type->RepairCosts[i]) {
-			snprintf(buf, 100, _("We need more %s for repair!"),
-				DefaultResourceNames[i].c_str());
-			player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y, buf);
-			if (player->AiEnabled) {
-				// FIXME: call back to AI?
-				unit.CurrentOrder()->ClearGoal();
-				if (!unit.RestoreOrder()) {
-					unit.ClearAction();
-					unit.State = 0;
-				}
-			}
-			// FIXME: We shouldn't animate if no resources are available.
-			return;
+		if (player.Resources[i] < goal.Type->RepairCosts[i]) {
+			char buf[100];
+
+			snprintf(buf, 100, _("We need more %s for repair!"), DefaultResourceNames[i].c_str());
+			player.Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y, buf);
+			return true;
 		}
 	}
-	//
 	// Subtract the resources
-	//
-	player->SubCosts(goal.Type->RepairCosts);
+	player.SubCosts(goal.Type->RepairCosts);
 
 	goal.Variable[HP_INDEX].Value += goal.Type->RepairHP;
-	if (goal.Variable[HP_INDEX].Value > goal.Variable[HP_INDEX].Max) {
+	if (goal.Variable[HP_INDEX].Value >= goal.Variable[HP_INDEX].Max) {
 		goal.Variable[HP_INDEX].Value = goal.Variable[HP_INDEX].Max;
+		return true;
 	}
+	return false;
 }
 
 /**
@@ -109,46 +152,33 @@ static void RepairUnit(CUnit &unit, CUnit &goal)
 **
 **  @param unit  Unit, for that the repair animation is played.
 */
-static int AnimateActionRepair(CUnit &unit)
+static void AnimateActionRepair(CUnit &unit)
 {
 	UnitShowAnimation(unit, unit.Type->Animations->Repair);
-	return 0;
 }
 
-/**
-**  Unit repairs
-**
-**  @param unit  Unit, for that the attack is handled.
-*/
-void HandleActionRepair(COrder& order, CUnit &unit)
+/* virtual */ bool COrder_Repair::Execute(CUnit &unit)
 {
-	CUnit *goal;
-	int err;
-
-	switch (unit.SubAction) {
+	switch (this->State) {
 		case 0:
-			order.NewResetPath();
-			unit.SubAction = 1;
+			this->NewResetPath();
+			this->State = 1;
 			// FALL THROUGH
-		case 1:// Move near to target.
+		case 1: { // Move near to target.
 			// FIXME: RESET FIRST!! Why? We move first and than check if
 			// something is in sight.
-			err = DoActionMove(unit);
+			int err = DoActionMove(unit);
 			if (!unit.Anim.Unbreakable) {
 				// No goal: if meeting damaged building repair it.
-				goal = order.GetGoal();
+				CUnit *goal = this->GetGoal();
 
-				// Target is dead, choose new one.
-				//
-				// Check if goal is correct unit.
 				if (goal) {
 					if (!goal->IsVisibleAsGoal(*unit.Player)) {
 						DebugPrint("repair target gone.\n");
-						order.goalPos = goal->tilePos;
-						// FIXME: should I clear this here?
-						order.ClearGoal();
+						this->goalPos = goal->tilePos;
+						this->ClearGoal();
 						goal = NULL;
-						order.NewResetPath();
+						this->NewResetPath();
 					}
 				} else if (unit.Player->AiEnabled) {
 					// Ai players workers should stop if target is killed
@@ -156,70 +186,65 @@ void HandleActionRepair(COrder& order, CUnit &unit)
 				}
 
 				// Have reached target? FIXME: could use return value
-				if (goal && unit.MapDistanceTo(*goal) <= unit.Type->RepairRange &&
-						goal->Variable[HP_INDEX].Value < goal->Variable[HP_INDEX].Max) {
+				if (goal && unit.MapDistanceTo(*goal) <= unit.Type->RepairRange
+					&& goal->Variable[HP_INDEX].Value < goal->Variable[HP_INDEX].Max) {
 					unit.State = 0;
-					unit.SubAction = 2;
-					order.Data.Repair.Cycles = 0;
+					this->State = 2;
+					this->RepairCycle = 0;
 					const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
 					UnitHeadingFromDeltaXY(unit, dir);
 				} else if (err < 0) {
-					order.ClearGoal();
-					if (!unit.RestoreOrder()) {
-						unit.ClearAction();
-						unit.State = 0;
-					}
-					return;
+					return true;
 				}
-
-				// FIXME: Should be it already?
-				Assert(unit.CurrentAction() == UnitActionRepair);
 			}
 			break;
-
-		case 2:// Repair the target.
+		}
+		case 2: {// Repair the target.
 			AnimateActionRepair(unit);
-			order.Data.Repair.Cycles++;
-			if (!unit.Anim.Unbreakable) {
-				goal = unit.CurrentOrder()->GetGoal();
-
-				// Target is dead, choose new one.
-				//
-				// Check if goal is correct unit.
-				// FIXME: should I do a function for this?
-				if (goal) {
-					if (!goal->IsVisibleAsGoal(*unit.Player)) {
-						DebugPrint("repair goal is gone\n");
-						order.goalPos = goal->tilePos;
-						// FIXME: should I clear this here?
-						order.ClearGoal();
-						goal = NULL;
-						order.NewResetPath();
-					} else {
-						int dist = unit.MapDistanceTo(*goal);
-						if (dist <= unit.Type->RepairRange) {
-							RepairUnit(unit, *goal);
-							goal = order.GetGoal();
-						} else if (dist > unit.Type->RepairRange) {
-							// If goal has move, chase after it
-							unit.State = 0;
-							unit.SubAction = 0;
-						}
-					}
-				}
-
-				// Target is fine, choose new one.
-				if (!goal || goal->Variable[HP_INDEX].Value >= goal->Variable[HP_INDEX].Max) {
-					order.ClearGoal();
-					if (!unit.RestoreOrder()) {
-						unit.ClearAction();
-						unit.State = 0;
-					}
-					return;
-				}
-				// FIXME: automatic repair
+			this->RepairCycle++;
+			if (unit.Anim.Unbreakable) {
+				return false;
 			}
-			break;
+			CUnit *goal = this->GetGoal();
+
+			if (goal) {
+				if (!goal->IsVisibleAsGoal(*unit.Player)) {
+					DebugPrint("repair goal is gone\n");
+					this->goalPos = goal->tilePos;
+					// FIXME: should I clear this here?
+					this->ClearGoal();
+					goal = NULL;
+					this->NewResetPath();
+				} else {
+					const int dist = unit.MapDistanceTo(*goal);
+
+					if (dist <= unit.Type->RepairRange) {
+						if (RepairUnit(unit, *goal)) {
+							return true;
+						}
+					} else if (dist > unit.Type->RepairRange) {
+						// If goal has move, chase after it
+						unit.State = 0;
+						this->State = 0;
+					}
+				}
+			}
+			// Target is fine, choose new one.
+			if (!goal || goal->Variable[HP_INDEX].Value >= goal->Variable[HP_INDEX].Max) {
+				return true;
+			}
+			// FIXME: automatic repair
+		}
+		break;
+	}
+	return false;
+}
+
+
+void HandleActionRepair(COrder& order, CUnit &unit)
+{
+	if (order.Execute(unit)) {
+		unit.ClearAction();
 	}
 }
 
