@@ -581,9 +581,6 @@ void MapMarkUnitSight(CUnit &unit);
 /// Unmark on vision table the Sight of the unit.
 void MapUnmarkUnitSight(CUnit &unit);
 
-void MapMarkUnitGuard(CUnit &unit);
-void MapUnmarkUnitGuard(CUnit &unit);
-
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/

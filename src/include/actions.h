@@ -535,7 +535,6 @@ extern void CommandSharedVision(int player, bool state, int opponent);
 extern void DropResource(CUnit &unit);
 extern void ResourceGiveUp(CUnit &unit);
 extern int GetNumWaitingWorkers(const CUnit &mine);
-extern void AutoAttack(CUnit &unit, CUnitCache &targets, bool stand_ground);
 extern bool AutoAttack(CUnit &unit, bool stand_ground);
 extern bool AutoRepair(CUnit &unit);
 extern bool AutoCast(CUnit &unit);

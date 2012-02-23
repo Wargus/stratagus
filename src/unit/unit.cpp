@@ -177,7 +177,6 @@ void CUnit::Init()
 	Moving = 0;
 	ReCast = 0;
 	CacheLock = 0;
-	GuardLock = 0;
 	memset(&Anim, 0, sizeof(Anim));
 	CurrentResource = 0;
 	OrderFlush = 0;
@@ -793,17 +792,6 @@ static void UnitInXY(CUnit &unit, const Vec2i &pos)
 	unit.tilePos = pos;
 	unit.Offset = Map.getIndex(pos);
 
-	if (!unit.Container) {
-		//Only Top Units
-		const CMapField *const mf = Map.Field(unit.Offset);
-		const CPlayer *const p = unit.Player;
-		for (int player = 0; player < NumPlayers; ++player) {
-			if(player != p->Index && mf->Guard[player] && p->IsEnemy(player)) {
-				Players[player].AutoAttackTargets.InsertS(&unit);
-				unit.RefsIncrease();
-			}
-		}
-	}
 	for (int i = unit.InsideCount; i--; unit_inside = unit_inside->NextContained) {
 		UnitInXY(*unit_inside, pos);
 	}
@@ -843,7 +831,6 @@ void CUnit::Place(const Vec2i &pos)
 	Assert(Removed);
 
 	if (Container) {
-		MapUnmarkUnitGuard(*this);
 		MapUnmarkUnitSight(*this);
 		RemoveUnitFromContainer(*this);
 	}
@@ -908,7 +895,6 @@ void CUnit::Remove(CUnit *host)
 	Map.Remove(*this);
 	MapUnmarkUnitSight(*this);
 	UnmarkUnitFieldFlags(*this);
-	MapUnmarkUnitGuard(*this);
 
 	if (host) {
 		AddInContainer(*host);
@@ -1665,11 +1651,9 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	*PlayerSlot = this;
 
 	MapUnmarkUnitSight(*this);
-	MapUnmarkUnitGuard(*this);
 	Player = &newplayer;
 	Stats = &Type->Stats[newplayer.Index];
 	UpdateUnitSightRange(*this);
-	MapMarkUnitGuard(*this);
 	MapMarkUnitSight(*this);
 
 	//  Must change food/gold and other.

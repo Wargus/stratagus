@@ -80,70 +80,9 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static void MapMarkTileGuard(const CPlayer &player, const unsigned int index)
-{
-	++Map.Field(index)->Guard[player.Index];
-}
-
-
-static void MapUnmarkTileGuard(const CPlayer &player, const unsigned int index)
-{
-	Assert(Map.Field(index)->Guard[player.Index] > 0);
-	--Map.Field(index)->Guard[player.Index];
-}
-
-void MapMarkUnitGuard(CUnit &unit)
-{
-	if (unit.IsAgressive() && !unit.GuardLock) {
-		if (!unit.Removed) {
-			unit.GuardLock = 1;
-			MapSight(*unit.Player, unit.tilePos,
-				unit.Type->TileWidth, unit.Type->TileHeight,
-				unit.GetReactRange(),
-				MapMarkTileGuard);
-		} else {
-			CUnit *c = unit.Container;
-			if (c && c->Type->AttackFromTransporter) {
-				unit.GuardLock = 1;
-				MapSight(*unit.Player, c->tilePos,
-					c->Type->TileWidth, c->Type->TileHeight,
-					unit.GetReactRange(), MapMarkTileGuard);
-			}
-		}
-	}
-}
-
-void MapUnmarkUnitGuard(CUnit &unit)
-{
-	if (unit.IsAgressive() && unit.GuardLock) {
-		if (!unit.Removed) {
-			unit.GuardLock = 0;
-			MapSight(*unit.Player, unit.tilePos,
-				unit.Type->TileWidth, unit.Type->TileHeight,
-				unit.GetReactRange(), MapUnmarkTileGuard);
-		} else {
-			CUnit *c = unit.Container;
-			if (c && c->Type->AttackFromTransporter) {
-				unit.GuardLock = 0;
-				MapSight(*unit.Player, c->tilePos,
-					c->Type->TileWidth, c->Type->TileHeight,
-					unit.GetReactRange(), MapUnmarkTileGuard);
-			}
-		}
-	}
-}
-
 void UnHideUnit(CUnit &unit)
 {
-	const int action = unit.CurrentAction();
-	const bool mark_guard = (action == UnitActionStill ||
-						action == UnitActionStandGround) &&
-						unit.Variable[INVISIBLE_INDEX].Value > 0;
 	unit.Variable[INVISIBLE_INDEX].Value = 0;
-	if (mark_guard)
-	{
-		MapMarkUnitGuard(unit);
-	}
 }
 
 /**
@@ -195,7 +134,6 @@ static bool MoveRandomly(CUnit &unit)
 				order->Range = 0;
 				order->goalPos = pos;
 				unit.State = 0;
-				MapUnmarkUnitGuard(unit);
 				//return true;//TESTME: new localization
 			}
 			MarkUnitFieldFlags(unit);
@@ -340,45 +278,6 @@ bool AutoAttack(CUnit &unit, bool stand_ground)
 	return true;
 }
 
-void AutoAttack(CUnit &unit, CUnitCache &targets, bool stand_ground)
-{
-	// Cowards and invisible units don't attack unless ordered.
-	if (unit.IsAgressive()) {
-		// Normal units react in reaction range.
-		if (!stand_ground && !unit.Removed && unit.CanMove()) {
-			CUnit *goal = AutoAttackUnitsInDistance(unit, unit.GetReactRange(), targets);
-
-			if (goal) {
-				// Weak goal, can choose other unit, come back after attack
-				CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
-				COrder *savedOrder = COrder::NewActionAttack(unit, unit.tilePos);
-
-				if (unit.StoreOrder(savedOrder) == false) {
-					delete savedOrder;
-				}
-			}
-		// Removed units can only attack in AttackRange, from bunker
-		} else {
-			CUnit *goal = AutoAttackUnitsInDistance(unit, unit.Stats->Variables[ATTACKRANGE_INDEX].Max, targets);
-
-			if (goal) {
-				CUnit *temp = unit.CurrentOrder()->GetGoal();
-				if (temp && temp->CurrentAction() == UnitActionDie) {
-					unit.CurrentOrder()->ClearGoal();
-					temp = NoUnitP;
-				}
-				if (unit.SubAction < SUB_STILL_ATTACK || temp != goal) {
-					// New target.
-					unit.CurrentOrder()->SetGoal(goal);
-					unit.State = 0;
-					unit.SubAction = SUB_STILL_ATTACK; // Mark attacking.
-					UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos);
-				}
-			}
-		}
-	}
-}
-
 
 
 /**
@@ -401,7 +300,6 @@ void ActionStillGeneric(CUnit &unit, bool stand_ground)
 
 	switch (unit.SubAction) {
 		case SUB_STILL_INIT: //first entry
-			MapMarkUnitGuard(unit);
 			unit.SubAction = SUB_STILL_STANDBY;
 			// no break : follow
 		case SUB_STILL_STANDBY:

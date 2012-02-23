@@ -531,7 +531,6 @@ public:
 	unsigned Active : 1;         /// Unit is active for AI
 	unsigned Boarded : 1;        /// Unit is on board a transporter.
 	unsigned CacheLock : 1;        /// Unit is on lock by unitcache operations.
-	unsigned GuardLock : 1;        /// Unit is on lock by guard operations.
 
 	/** set to random 1..100 when MakeUnit()
 	** used for fancy buildings

@@ -151,7 +151,6 @@ public:
 #endif
 	{
 		memset(Visible, 0, sizeof(Visible));
-		memset(Guard, 0, sizeof(Guard));
 		memset(VisCloak, 0, sizeof(VisCloak));
 		memset(Radar, 0, sizeof(Radar));
 		memset(RadarJammer, 0, sizeof(RadarJammer));
@@ -165,7 +164,6 @@ public:
 	//        different.
 	unsigned char Value;                  /// HP for walls/ Wood Regeneration
 	unsigned short Visible[PlayerMax];    /// Seen counter 0 unexplored
-	unsigned short Guard[PlayerMax];    /// Guard counter for autoatack: 0 unguarded
 	unsigned char VisCloak[PlayerMax];    /// Visiblity for cloaking.
 	unsigned char Radar[PlayerMax];       /// Visiblity for radar.
 	unsigned char RadarJammer[PlayerMax]; /// Jamming capabilities.

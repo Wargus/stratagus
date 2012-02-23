@@ -269,30 +269,6 @@ void SavePlayers(CFile *file)
 		}
 		file->printf("}");
 
-		if (p.AutoAttackTargets.size() > 0) {
-
-			file->printf("\n  \"enemy-targets\", {");
-
-			CUnitCache &autoatacktargets = const_cast<CUnitCache &>(p.AutoAttackTargets);
-			for(unsigned int k = 0; k < autoatacktargets.size();)
-			{
-				CUnit &aatarget = *autoatacktargets[k];
-
-				//Additional security
-				if (!aatarget.IsAliveOnMap() ||
-					Map.Field(aatarget.tilePos)->Guard[i] == 0) {
-					autoatacktargets.Units.erase(autoatacktargets.Units.begin() + k);
-					aatarget.RefsDecrease();
-					continue;
-				}
-				if (k) {
-					file->printf(" ,");
-				}
-				file->printf("\"%s\"", UnitReference(aatarget).c_str());
-				++k;
-			}
-			file->printf("}");
-		}
 		file->printf(")\n\n");
 	}
 
@@ -320,8 +296,6 @@ void CreatePlayer(int type)
 	//  FIXME: ARI: is this needed for 'PlayerNobody' ??
 	//  FIXME: A: Johns: currently we need no init for the nobody player.
 	memset(player.Units, 0, sizeof (player.Units));
-
-	player.AutoAttackTargets.clear();
 
 	//
 	//  Take first slot for person on this computer,
@@ -534,7 +508,6 @@ void CPlayer::Clear()
 	TotalKills = 0;
 	Color = 0;
 	UpgradeTimers.Clear();
-	AutoAttackTargets.clear();
 }
 
 /*----------------------------------------------------------------------------
@@ -760,34 +733,10 @@ void PlayersInitAi()
 void PlayersEachCycle()
 {
 	for (int player = 0; player < NumPlayers; ++player) {
-		CPlayer *p = &Players[player];
-		if (p->AutoAttackTargets.size() > 0) {
-			CUnitCache &autoatacktargets = p->AutoAttackTargets;
-			/* both loops can not be connected !!!! */
-			for (unsigned int i = 0; i < autoatacktargets.size();) {
-				CUnit *aatarget = autoatacktargets[i];
-				if (!aatarget->IsAliveOnMap() ||
-					Map.Field(aatarget->Offset)->Guard[player] == 0) {
-					autoatacktargets.Units.erase(autoatacktargets.Units.begin() + i);
-					aatarget->RefsDecrease();
-					continue;
-				}
-				++i;
-			}
-			if (autoatacktargets.size() > 0) {
-				for (int j = 0; j < p->TotalNumUnits; ++j) {
-					CUnit &guard = *p->Units[j];
-					bool stand_ground = guard.CurrentAction() == UnitActionStandGround;
-					if (guard.Type->CanAttack &&
-								(stand_ground || guard.IsIdle()) &&
-								 !guard.IsUnusable()) {
-						AutoAttack(guard, autoatacktargets, stand_ground);
-					}
-				}
-			}
-		}
-		if (p->AiEnabled) {
-			AiEachCycle(p);
+		CPlayer &p = Players[player];
+//						AutoAttack(guard, autoatacktargets, stand_ground);
+		if (p.AiEnabled) {
+			AiEachCycle(&p);
 		}
 	}
 }

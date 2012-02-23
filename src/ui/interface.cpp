@@ -747,10 +747,6 @@ static bool CommandKey(int key)
 	return true;
 }
 
-#if defined(DEBUG) || defined(PROF)
-extern void MapUnmarkUnitGuard(CUnit &unit);
-#endif
-
 /**
 **  Handle cheats
 **
@@ -774,17 +770,6 @@ int HandleCheats(const std::string &input)
 			SetMessage("Cannot disable 'ai me' cheat");
 #endif
 		} else {
-
-			for (int j = 0; j < ThisPlayer->TotalNumUnits; ++j) {
-				CUnit *guard = ThisPlayer->Units[j];
-				bool stand_ground =
-					guard->CurrentAction() == UnitActionStandGround;
-				if ((stand_ground || guard->IsIdle()) &&
-							 !guard->IsUnusable()) {
-					MapUnmarkUnitGuard(*guard);
-					guard->SubAction = 0;
-				}
-			}
 			ThisPlayer->AiEnabled = 1;
 			ThisPlayer->Type = PlayerComputer;
 			if (!ThisPlayer->Ai) {

@@ -363,7 +363,6 @@ public:
 	// Upgrades/Allows:
 	CAllow Allow;                 /// Allowed for player
 	CUpgradeTimers UpgradeTimers; /// Timer for the upgrades
-	CUnitCache AutoAttackTargets; /// Current know autoattack targets
 
 	/// Change player side
 	void SetSide(int side);

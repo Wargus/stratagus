@@ -83,7 +83,6 @@ int DoActionMove(CUnit &unit)
 		// FIXME: So units flying up and down are not affected.
 		unit.IX = unit.IY = 0;
 
-		MapUnmarkUnitGuard(unit);
 		UnmarkUnitFieldFlags(unit);
 		d = NextPathElement(unit, &posd.x, &posd.y);
 		MarkUnitFieldFlags(unit);
