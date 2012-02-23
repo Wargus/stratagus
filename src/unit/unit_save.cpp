@@ -96,12 +96,6 @@ void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 		case UnitActionNone:
 			file.printf("\"action-none\",");
 			break;
-		case UnitActionFollow:
-			file.printf("\"action-follow\",");
-			break;
-		case UnitActionMove:
-			file.printf("\"action-move\",");
-			break;
 		case UnitActionAttack:
 			file.printf("\"action-attack\",");
 			break;
@@ -137,9 +131,6 @@ void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 		case UnitActionAttack:
 		case UnitActionAttackGround:
 			file.printf(", \"subaction\", %d", order.SubAction.Attack);
-			break;
-		case UnitActionFollow:
-			file.printf(", \"subaction\", %d", order.SubAction.Follow);
 			break;
 		case UnitActionResource:
 		case UnitActionReturnGoods:

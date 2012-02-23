@@ -63,7 +63,7 @@
 		file.printf(" \"goal\", \"%s\",", UnitReference(goal).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d}, ", this->goalPos.x, this->goalPos.y);
-	file.printf("\"state\", %d,\n  ");
+	file.printf("\"state\", %d,\n  ", this->State);
 	SaveDataMove(file);
 	file.printf("}");
 }

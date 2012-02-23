@@ -257,7 +257,7 @@ bool COrder::ParseSpecificData(lua_State *l, int &j, const char *value, const CU
 	} else if (!strcmp(value, "subaction")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		this->SubAction.Attack = this->SubAction.Follow = this->SubAction.Res = LuaToNumber(l, -1);
+		this->SubAction.Attack = this->SubAction.Res = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "current-resource")) {
 		++j;
@@ -335,9 +335,9 @@ void CclParseOrder(lua_State *l, const CUnit &unit, COrderPtr *orderPtr)
 	} else if (!strcmp(actiontype, "action-stand-ground")) {
 		*orderPtr = new COrder_Still(true);
 	} else if (!strcmp(actiontype, "action-follow")) {
-		*orderPtr = COrder::NewActionFollow();
+		*orderPtr = new COrder_Follow;
 	} else if (!strcmp(actiontype, "action-move")) {
-		*orderPtr = COrder::NewActionMove();
+		*orderPtr = new COrder_Move;
 	} else if (!strcmp(actiontype, "action-attack")) {
 		*orderPtr = COrder::NewActionAttack();
 	} else if (!strcmp(actiontype, "action-attack-ground")) {
@@ -357,7 +357,7 @@ void CclParseOrder(lua_State *l, const CUnit &unit, COrderPtr *orderPtr)
 	} else if (!strcmp(actiontype, "action-board")) {
 		*orderPtr = new COrder_Board;
 	} else if (!strcmp(actiontype, "action-unload")) {
-		*orderPtr = COrder::NewActionUnload();
+		*orderPtr = new COrder_Unload;
 	} else if (!strcmp(actiontype, "action-patrol")) {
 		*orderPtr = new COrder_Patrol;
 	} else if (!strcmp(actiontype, "action-build")) {

@@ -192,7 +192,7 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 
 /* static */ COrder* COrder::NewActionFollow(CUnit &dest)
 {
-	COrder *order = new COrder(UnitActionFollow);
+	COrder_Follow *order = new COrder_Follow;
 
 	// Destination could be killed.
 	// Should be handled in action, but is not possible!
@@ -210,7 +210,9 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 
 /* static */ COrder* COrder::NewActionMove(const Vec2i &pos)
 {
-	COrder *order = new COrder(UnitActionMove);
+	Assert(Map.Info.IsPointOnMap(pos));
+
+	COrder_Move *order = new COrder_Move;
 
 	order->goalPos = pos;
 

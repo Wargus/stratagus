@@ -37,27 +37,43 @@
 #include <stdlib.h>
 
 #include "stratagus.h"
-#include "video.h"
+
+#include "actions.h"
 #include "unittype.h"
 #include "animation.h"
-#include "player.h"
 #include "unit.h"
-#include "tileset.h"
-#include "map.h"
-#include "actions.h"
 #include "pathfinder.h"
 #include "sound.h"
 #include "interface.h"
 #include "map.h"
 #include "ai.h"
+#include "iolib.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
---  Variables
+--  Functions
 ----------------------------------------------------------------------------*/
 
-/*----------------------------------------------------------------------------
---  Function
-----------------------------------------------------------------------------*/
+
+/* virtual */ void COrder_Move::Save(CFile &file, const CUnit &unit) const
+{
+	file.printf("{\"action-move\",");
+
+	file.printf(" \"range\", %d,", this->Range);
+	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
+
+	SaveDataMove(file);
+	file.printf("}");
+}
+
+/* virtual */ bool COrder_Move::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+{
+	if (ParseMoveData(l, j, value)) {
+		return true;
+	} else {
+		return false;
+	}
+}
 
 /**
 **  Unit moves! Generic function called from other actions.
@@ -72,16 +88,17 @@ int DoActionMove(CUnit &unit)
 	Vec2i posd; // movement in tile.
 	int d;
 	Vec2i pos;
-	int move;
-	int off;
 
 	Assert(unit.CanMove());
-	if (!unit.Moving &&
-			(unit.Type->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
+
+	COrder& order = *unit.CurrentOrder();
+
+	if (!unit.Moving && (unit.Type->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
 		Assert(!unit.Anim.Unbreakable);
 
 		// FIXME: So units flying up and down are not affected.
-		unit.IX = unit.IY = 0;
+		unit.IX = 0;
+		unit.IY = 0;
 
 		UnmarkUnitFieldFlags(unit);
 		d = NextPathElement(unit, &posd.x, &posd.y);
@@ -110,14 +127,14 @@ int DoActionMove(CUnit &unit)
 				break;
 		}
 		pos = unit.tilePos;
-		off = unit.Offset;
+		int off = unit.Offset;
 		//
 		// Transporter (un)docking?
 		//
 		// FIXME: This is an ugly hack
-		if (unit.Type->CanTransport() &&
-				((Map.WaterOnMap(off) && Map.CoastOnMap(pos + posd)) ||
-				(Map.CoastOnMap(off) && Map.WaterOnMap(pos + posd)))) {
+		if (unit.Type->CanTransport()
+			&& ((Map.WaterOnMap(off) && Map.CoastOnMap(pos + posd))
+				|| (Map.CoastOnMap(off) && Map.WaterOnMap(pos + posd)))) {
 			PlayUnitSound(unit, VoiceDocking);
 		}
 
@@ -142,12 +159,11 @@ int DoActionMove(CUnit &unit)
 	} else {
 		posd.x = Heading2X[unit.Direction / NextDirection];
 		posd.y = Heading2Y[unit.Direction / NextDirection];
-		d = unit.CurrentOrder()->Data.Move.Length + 1;
+		d = order.Data.Move.Length + 1;
 	}
 
-	unit.CurrentOrder()->Data.Move.Cycles++;//reset have to be manualy controled by caller.
-	move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move,
-			Map.Field(unit.Offset)->Cost);
+	order.Data.Move.Cycles++;//reset have to be manualy controled by caller.
+	int move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move, Map.Field(unit.Offset)->Cost);
 
 	unit.IX += posd.x * move;
 	unit.IY += posd.y * move;
@@ -161,58 +177,37 @@ int DoActionMove(CUnit &unit)
 	return d;
 }
 
-/**
-**  Unit move action:
-**
-**  Move to a place or to a unit (can move).
-**  Tries 10x to reach the target, note this are the complete tries.
-**  If the target entered another unit, move to it's position.
-**  If the target unit is destroyed, continue to move to it's last position.
-**
-**  @param unit  Pointer to unit.
-*/
-void HandleActionMove(COrder& order, CUnit &unit)
-{
-	CUnit *goal;
 
+/* virtual */ bool COrder_Move::Execute(CUnit &unit)
+{
 	Assert(unit.CanMove());
 
 	if (unit.Wait) {
 		unit.Wait--;
-		return;
+		return false;
 	}
-
 	// FIXME: (mr-russ) Make a reachable goal here with GoalReachable ...
 
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
-			//
 			// Some tries to reach the goal
-			//
-			if (order.CheckRange()) {
-				order.Range++;
+			if (this->CheckRange()) {
+				this->Range++;
 				break;
 			}
 			// FALL THROUGH
 		case PF_REACHED:
-			// Release target, if any.
-			order.ClearGoal();
-			unit.ClearAction();
-			return;
-
+			return true;
 		default:
 			break;
 	}
+	return false;
+}
 
-	//
-	// Target destroyed?
-	//
-	goal = order.GetGoal();
-	if (goal && goal->Destroyed) {
-		DebugPrint("Goal dead\n");
-		order.goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
-		order.ClearGoal();
-		order.NewResetPath();
+void HandleActionMove(COrder& order, CUnit &unit)
+{
+	if (order.Execute(unit)) {
+		unit.ClearAction();
 	}
 }
 

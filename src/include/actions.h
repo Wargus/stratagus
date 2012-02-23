@@ -171,11 +171,8 @@ public:
 #if 1 // currently needed for parsing
 	static COrder* NewActionAttack() { return new COrder(UnitActionAttack); }
 	static COrder* NewActionAttackGround() { return new COrder(UnitActionAttackGround); }
-	static COrder* NewActionFollow() { return new COrder(UnitActionFollow); }
-	static COrder* NewActionMove() { return new COrder(UnitActionMove); }
 	static COrder* NewActionResource() { return new COrder(UnitActionResource); }
 	static COrder* NewActionReturnGoods() { return new COrder(UnitActionReturnGoods); }
-	static COrder* NewActionUnload() { return new COrder(UnitActionUnload); }
 #endif
 
 private:
@@ -200,7 +197,6 @@ public:
 
 	union {
 		int Attack;
-		int Follow;
 		int Res;
 	} SubAction;
 
@@ -318,6 +314,35 @@ public:
 
 	virtual bool Execute(CUnit &unit);
 };
+
+class COrder_Follow : public COrder
+{
+public:
+	COrder_Follow() : COrder(UnitActionFollow), State(0) {}
+
+	virtual COrder_Follow *Clone() const { return new COrder_Follow(*this); }
+
+	virtual void Save(CFile &file, const CUnit &unit) const;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+	virtual bool Execute(CUnit &unit);
+private:
+	unsigned int State;
+};
+
+class COrder_Move : public COrder
+{
+public:
+	COrder_Move() : COrder(UnitActionMove) {}
+
+	virtual COrder_Move *Clone() const { return new COrder_Move(*this); }
+
+	virtual void Save(CFile &file, const CUnit &unit) const;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+	virtual bool Execute(CUnit &unit);
+};
+
 
 
 class COrder_Patrol : public COrder
