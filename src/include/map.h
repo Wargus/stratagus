@@ -427,9 +427,9 @@ public:
 
 	/// Select units in rectange range
 	int Select(int x1, int y1, int x2, int y2, CUnit *table[],
-		 const int tablesize = UnitMax);
+		 const int tablesize = UnitMax, int neutral = 0);
 	int SelectFixed(const Vec2i &ltpos, const Vec2i &rbpos, CUnit*table[],
-		 const int tablesize = UnitMax);
+		 const int tablesize = UnitMax, int neutral = 0);
 
 
 	// Select units on map tile. - helper funtion. don't use directly

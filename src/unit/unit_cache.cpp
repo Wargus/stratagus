@@ -121,10 +121,12 @@ int CMap::Select(const Vec2i &pos, CUnit *table[], const int tablesize)
 **  @param rbpos      Right Bottom position of selection rectangle
 **  @param table      All units in the selection rectangle
 **  @param tablesize  Size of table array
+**  @param neutral	  Don't include neutral units for faster computing
 **
 **  @return           Returns the number of units found
 */
-int CMap::SelectFixed(const Vec2i &ltpos, const Vec2i &rbpos, CUnit *table[], const int tablesize)
+int CMap::SelectFixed(const Vec2i &ltpos, const Vec2i &rbpos, CUnit *table[], const int tablesize,
+						int neutral)
 {
 	Assert(Info.IsPointOnMap(ltpos));
 	Assert(Info.IsPointOnMap(rbpos));
@@ -155,7 +157,8 @@ int CMap::SelectFixed(const Vec2i &ltpos, const Vec2i &rbpos, CUnit *table[], co
 					// It should only be used in here, unless you somehow want the unit
 					// to be out of cache.
 					//
-					if (!unit->CacheLock && !unit->Type->Revealer) {
+					if (!unit->CacheLock && !unit->Type->Revealer && 
+						(!neutral || neutral && unit->Player->Index != PlayerNumNeutral)) {
 						Assert(!unit->Removed);
 						unit->CacheLock = 1;
 						table[n++] = unit;
@@ -175,7 +178,8 @@ int CMap::SelectFixed(const Vec2i &ltpos, const Vec2i &rbpos, CUnit *table[], co
 					// It should only be used in here, unless you somehow want the unit
 					// to be out of cache.
 					//
-					if (!unit->CacheLock && !unit->Type->Revealer) {
+					if (!unit->CacheLock && !unit->Type->Revealer && 
+						(!neutral || unit->Player->Index != PlayerNumNeutral)) {
 						Assert(!unit->Removed);
 						unit->CacheLock = 1;
 						table[n++] = unit;
@@ -214,12 +218,12 @@ int CMap::SelectFixed(const Vec2i &ltpos, const Vec2i &rbpos, CUnit *table[], co
 }
 
 int CMap::Select(int x1, int y1,
-		int x2, int y2, CUnit *table[], const int tablesize)
+		int x2, int y2, CUnit *table[], const int tablesize, int neutral)
 {
 	//  Reduce to map limits.
 	Vec2i ltpos = {std::max<int>(x1, 0), std::max<int>(y1, 0)};
 	Vec2i rbpos = {std::min<int>(x2, Info.MapWidth - 1), std::min<int>(y2, Info.MapHeight - 1)};
 
-	return SelectFixed(ltpos, rbpos, table, tablesize);
+	return SelectFixed(ltpos, rbpos, table, tablesize, neutral);
 }
 

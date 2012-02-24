@@ -659,13 +659,13 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range)
 			int y = unit.Container->tilePos.y;
 			n = Map.Select(x - missile_range, y - missile_range,
 				x + missile_range + unit.Container->Type->TileWidth,
-				y + missile_range + unit.Container->Type->TileHeight, table);
+				y + missile_range + unit.Container->Type->TileHeight, table, UnitMax, 1);
 		} else {
 			int x = unit.tilePos.x;
 			int y = unit.tilePos.y;
 			n = Map.Select(x - missile_range, y - missile_range,
 				x + missile_range + unit.Type->TileWidth,
-				y + missile_range + unit.Type->TileHeight, table);
+				y + missile_range + unit.Type->TileHeight, table, UnitMax, 1);
 		}
 
 		if (n) {

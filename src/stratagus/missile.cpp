@@ -945,7 +945,7 @@ static void MissileHit(Missile &missile)
 		//
 		const int range = mtype.Range;
 		CUnit *table[UnitMax];
-		const int n = Map.Select(pos.x - range + 1, pos.y - range + 1, pos.x + range, pos.y + range, table);
+		const int n = Map.Select(pos.x - range + 1, pos.y - range + 1, pos.x + range - 1, pos.y + range - 1, table);
 		Assert(missile.SourceUnit != NULL);
 		for (int i = 0; i < n; ++i) {
 			CUnit &goal = *table[i];
@@ -955,10 +955,14 @@ static void MissileHit(Missile &missile)
 			// Also check CorrectSphashDamage so land explosions can't hit the air units
 			//
 			if (CanTarget(missile.SourceUnit->Type, goal.Type)
-				&& (mtype.CorrectSphashDamage == false
-					|| goal.Type->UnitType == missile.TargetUnit->Type->UnitType)
+				&& ((missile.SourceUnit->CurrentOrder()->Action != UnitActionAttackGround &&
+						(mtype.CorrectSphashDamage == false 
+						|| goal.Type->UnitType == missile.TargetUnit->Type->UnitType))
+					|| (missile.SourceUnit->CurrentOrder()->Action == UnitActionAttackGround &&
+						(mtype.CorrectSphashDamage == false 
+						|| goal.Type->UnitType == missile.SourceUnit->Type->UnitType)))
 				&& (mtype.FriendlyFire == false
-					|| (missile.TargetUnit->Player->Index != missile.SourceUnit->Player->Index))) {
+					|| (goal.Player->Index != missile.SourceUnit->Player->Index))) {
 				int splash = goal.MapDistanceTo(pos.x, pos.y);
 
 				if (splash) {
