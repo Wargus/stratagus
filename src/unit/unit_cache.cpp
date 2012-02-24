@@ -121,12 +121,12 @@ int CMap::Select(const Vec2i &pos, CUnit *table[], const int tablesize)
 **  @param rbpos      Right Bottom position of selection rectangle
 **  @param table      All units in the selection rectangle
 **  @param tablesize  Size of table array
-**  @param neutral	  Don't include neutral units for faster computing
+**  @param excludeNeutral  if true, don't include neutral units
 **
 **  @return           Returns the number of units found
 */
 int CMap::SelectFixed(const Vec2i &ltpos, const Vec2i &rbpos, CUnit *table[], const int tablesize,
-						int neutral)
+						bool excludeNeutral)
 {
 	Assert(Info.IsPointOnMap(ltpos));
 	Assert(Info.IsPointOnMap(rbpos));
@@ -136,57 +136,31 @@ int CMap::SelectFixed(const Vec2i &ltpos, const Vec2i &rbpos, CUnit *table[], co
 		return Select(ltpos, table, tablesize);
 	}
 
-	int i;
 	int n = 0;
-	CUnit *unit;
 	unsigned int index = getIndex(ltpos);
 	int j = rbpos.y - ltpos.y + 1;
 	do {
 		const CMapField *mf = Field(index);
-		i = rbpos.x - ltpos.x + 1;
+		int i = rbpos.x - ltpos.x + 1;
 		do {
-#if __GNUC__ >  3
-			//GCC version only, since std::vector::data() is not in STL
-			size_t count = mf->UnitCache.size();
-			if (count) {
-				CUnit **cache = (CUnit **)mf->UnitCache.Units.data();
-				do {
-					unit = *cache;
-					//
-					// To avoid getting a unit in multiple times we use a cache lock.
-					// It should only be used in here, unless you somehow want the unit
-					// to be out of cache.
-					//
-					if (!unit->CacheLock && !unit->Type->Revealer && 
-						(!neutral || neutral && unit->Player->Index != PlayerNumNeutral)) {
-						Assert(!unit->Removed);
-						unit->CacheLock = 1;
-						table[n++] = unit;
+			const CUnitCache &cache = mf->UnitCache;
+			const size_t unitCount = cache.size();
+			for (size_t k = 0; k != unitCount; ++k) {
+				CUnit &unit = *cache[k];
+
+				// To avoid getting a unit in multiple times we use a cache lock.
+				// It should only be used in here, unless you somehow want the unit
+				// to be out of cache.
+				if (unit.CacheLock == false && unit.Type->Revealer == false
+					&& (excludeNeutral == false || unit.Player->Index != PlayerNeutral)) {
+					Assert(!unit.Removed);
+					unit.CacheLock = 1;
+					table[n++] = &unit;
+					if (n == tablesize) {
+						break;
 					}
-					++cache;
-				} while(--count && n < tablesize);
+				}
 			}
-#else
-			const size_t count = mf->UnitCache.size();
-			if (count) {
-				unsigned int k = 0;
-				const CUnitCache &cache = mf->UnitCache;
-				do {
-					unit = cache[k];
-					//
-					// To avoid getting a unit in multiple times we use a cache lock.
-					// It should only be used in here, unless you somehow want the unit
-					// to be out of cache.
-					//
-					if (!unit->CacheLock && !unit->Type->Revealer && 
-						(!neutral || unit->Player->Index != PlayerNumNeutral)) {
-						Assert(!unit->Removed);
-						unit->CacheLock = 1;
-						table[n++] = unit;
-					}
-				} while(++k < count && n < tablesize);
-			}
-#endif
 			++mf;
 		} while(--i && n < tablesize);
 		index += Info.MapWidth;
@@ -195,35 +169,20 @@ int CMap::SelectFixed(const Vec2i &ltpos, const Vec2i &rbpos, CUnit *table[], co
 	if (!n)
 		return 0;
 
-	//
 	// Clean the cache locks, restore to original situation.
-	//
-#ifndef __GNUG__
-	for (i = 0; i < n; ++i) {
+	for (int i = 0; i < n; ++i) {
 		table[i]->CacheLock = 0;
 	}
-#else
-	i = 0;
-	j = (n+3)/4;
-	switch (n & 3) {
-		case 0: do {
-						table[i++]->CacheLock = 0;
-		case 3:			table[i++]->CacheLock = 0;
-		case 2:			table[i++]->CacheLock = 0;
-		case 1:			table[i++]->CacheLock = 0;
-			} while ( --j > 0 );
-	}
-#endif
 	return n;
 }
 
-int CMap::Select(int x1, int y1,
-		int x2, int y2, CUnit *table[], const int tablesize, int neutral)
+int CMap::Select(int x1, int y1, int x2, int y2,
+				CUnit *table[], const int tablesize, bool excludeNeutral)
 {
 	//  Reduce to map limits.
 	Vec2i ltpos = {std::max<int>(x1, 0), std::max<int>(y1, 0)};
 	Vec2i rbpos = {std::min<int>(x2, Info.MapWidth - 1), std::min<int>(y2, Info.MapHeight - 1)};
 
-	return SelectFixed(ltpos, rbpos, table, tablesize, neutral);
+	return SelectFixed(ltpos, rbpos, table, tablesize, excludeNeutral);
 }
 
