@@ -49,7 +49,11 @@
 
 /* virtual */ void COrder_Die::Save(CFile &file, const CUnit &unit) const
 {
-	file.printf("{\"action-die\"}");
+	file.printf("{\"action-die\"");
+	if (this->Finished) {
+		file.printf(", \"finished\"");
+	}
+	file.printf("}");
 }
 
 /* virtual */ bool COrder_Die::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
@@ -75,7 +79,7 @@ static bool AnimateActionDie(CUnit &unit)
 }
 
 
-/* virtual */ bool COrder_Die::Execute(CUnit &unit)
+/* virtual */ void COrder_Die::Execute(CUnit &unit)
 {
 	// Show death animation
 	if (AnimateActionDie(unit) == false) {
@@ -83,7 +87,7 @@ static bool AnimateActionDie(CUnit &unit)
 		unit.Anim.Unbreakable = 0;
 	}
 	if (unit.Anim.Unbreakable) {
-		return false;
+		return ;
 	}
 	CUnitType &type = *unit.Type;
 
@@ -91,7 +95,7 @@ static bool AnimateActionDie(CUnit &unit)
 	if (type.CorpseType == NULL) {
 		unit.Remove(NULL);
 		unit.Release();
-		return false;
+		return ;
 	}
 
 	CUnitType &corpseType = *type.CorpseType;
@@ -109,22 +113,6 @@ static bool AnimateActionDie(CUnit &unit)
 	unit.Frame = 0;
 	UnitUpdateHeading(unit);
 	AnimateActionDie(unit); // with new corpse.
-	return false;
-}
-
-
-/**
-**  Unit dies!
-**
-**  @param unit  The unit which dies.
-*/
-void HandleActionDie(COrder& order, CUnit &unit)
-{
-	Assert(order.Action == UnitActionDie);
-
-	if (order.Execute(unit)) {
-		unit.ClearAction();
-	}
 }
 
 //@}

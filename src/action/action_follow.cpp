@@ -45,6 +45,15 @@
 #include "iolib.h"
 #include "script.h"
 
+enum {
+	State_Init = 0,
+	State_Initialized = 1,
+
+	State_TargetReached = 128,
+};
+
+
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -54,6 +63,9 @@
 {
 	file.printf("{\"action-follow\",");
 
+	if (this->Finished) {
+		file.printf(" \"finished\", ");
+	}
 	file.printf(" \"range\", %d,", this->Range);
 	if (this->HasGoal()) {
 		CUnit &goal = *this->GetGoal();
@@ -87,26 +99,28 @@
 	return true;
 }
 
-/* virtual */ bool COrder_Follow::Execute(CUnit &unit)
+/* virtual */ void COrder_Follow::Execute(CUnit &unit)
 {
 	if (unit.Wait) {
 		unit.Wait--;
-		return false;
+		return ;
 	}
 	CUnit *goal = this->GetGoal();
 
 	// Reached target
-	if (this->State == 128) {
+	if (this->State == State_TargetReached) {
 
 		if (!goal || !goal->IsVisibleAsGoal(*unit.Player)) {
 			DebugPrint("Goal gone\n");
-			return true;
+			this->Finished = true;
+			return ;
 		}
 
 		if (goal->tilePos == this->goalPos) {
 			// Move to the next order
 			if (unit.Orders.size() > 1) {
-				return true;
+				this->Finished = true;
+				return ;
 			}
 
 			// Reset frame to still frame while we wait
@@ -116,14 +130,14 @@
 			unit.Wait = 10;
 			if (this->Range > 1) {
 				this->Range = 1;
-				this->State = 0;
+				this->State = State_Init;
 			}
-			return false;
+			return ;
 		}
-		this->State = 0;
+		this->State = State_Init;
 	}
-	if (!this->State) { // first entry
-		this->State = 1;
+	if (this->State == State_Init) { // first entry
+		this->State = State_Initialized;
 		this->NewResetPath();
 	}
 	switch (DoActionMove(unit)) { // reached end-point?
@@ -137,7 +151,8 @@
 		case PF_REACHED:
 		{
 			if (!goal) { // goal has died
-				return true;
+				this->Finished = true;
+				return ;
 			}
 			// Handle Teleporter Units
 			// FIXME: BAD HACK
@@ -163,24 +178,24 @@
 					|| (dest.NewOrder->Action == UnitActionResource && !unit.Type->Harvester)
 					|| (dest.NewOrder->Action == UnitActionAttack && !unit.Type->CanAttack)
 					|| (dest.NewOrder->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand)) {
-					return true;
+					this->Finished = true;
+					return ;
 				} else {
 					if (dest.NewOrder->HasGoal()) {
 						if (dest.NewOrder->GetGoal()->Destroyed) {
 							delete dest.NewOrder;
 							dest.NewOrder = NULL;
-							return true;
+							this->Finished = true;
+							return ;
 						}
 					}
-
-					delete unit.CurrentOrder();
-					unit.Orders[0] = dest.NewOrder->Clone();
-					unit.CurrentResource = dest.CurrentResource;
-					return false;
+					unit.Orders.insert(unit.Orders.begin() + 1, dest.NewOrder->Clone());
+					this->Finished = true;
+					return ;
 				}
 			}
 			this->goalPos = goal->tilePos;
-			this->State = 128;
+			this->State = State_TargetReached;
 		}
 			// FALL THROUGH
 		default:
@@ -197,7 +212,7 @@
 	}
 
 	if (unit.Anim.Unbreakable) {
-		return false;
+		return ;
 	}
 	// If our leader is dead or stops or attacks:
 	// Attack any enemy in reaction range.
@@ -210,22 +225,14 @@
 			// Save current command to come back.
 			COrder *savedOrder = this->Clone();
 
-			CommandAttack(unit, target->tilePos, NULL, FlushCommands);
+			this->Finished = true;
+			unit.Orders.insert(unit.Orders.begin() + 1, COrder::NewActionAttack(unit, target->tilePos));
 
 			if (unit.StoreOrder(savedOrder) == false) {
 				delete savedOrder;
 				savedOrder = NULL;
 			}
-			return true;
 		}
-	}
-	return false;
-}
-
-void HandleActionFollow(COrder& order, CUnit &unit)
-{
-	if (order.Execute(unit)) {
-		unit.ClearAction();
 	}
 }
 

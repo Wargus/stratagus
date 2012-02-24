@@ -58,6 +58,9 @@
 /* virtual */ void COrder_Train::Save(CFile &file, const CUnit &unit) const
 {
 	file.printf("{\"action-train\",");
+	if (this->Finished) {
+		file.printf(" \"finished\", ");
+	}
 	file.printf("\"type\", \"%s\",", this->Type->Ident.c_str());
 	file.printf("\"ticks\", %d", this->Ticks);
 	file.printf("}");
@@ -152,12 +155,12 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 }
 
-/* virtual */ bool COrder_Train::Execute(CUnit &unit)
+/* virtual */ void COrder_Train::Execute(CUnit &unit)
 {
 	AnimateActionTrain(unit);
 	if (unit.Wait) {
 		unit.Wait--;
-		return false;
+		return ;
 	}
 	CPlayer &player = *unit.Player;
 	CUnitType &nType = *this->Type;
@@ -166,14 +169,14 @@ static void AnimateActionTrain(CUnit &unit)
 
 	if (this->Ticks < cost) {
 		unit.Wait = CYCLES_PER_SECOND / 6;
-		return false;
+		return ;
 	}
 	this->Ticks = std::min(this->Ticks, cost);
 
 	// Check if there are still unit slots.
 	if (NumUnits >= UnitMax) {
 		unit.Wait = CYCLES_PER_SECOND / 6;
-		return false;
+		return ;
 	}
 
 	// Check if enough supply available.
@@ -183,7 +186,7 @@ static void AnimateActionTrain(CUnit &unit)
 			AiNeedMoreSupply(*unit.Player);
 		}
 		unit.Wait = CYCLES_PER_SECOND / 6;
-		return false;
+		return ;
 	}
 
 	CUnit *newUnit = MakeUnit(nType, &player);
@@ -192,7 +195,7 @@ static void AnimateActionTrain(CUnit &unit)
 		player.Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
 				_("Unable to train %s"), nType.Name.c_str());
 		unit.Wait = CYCLES_PER_SECOND / 6;
-		return false;
+		return ;
 	}
 
 	// New unit might supply food
@@ -228,27 +231,18 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 
 	if (CanHandleOrder(*newUnit, unit.NewOrder) == true) {
-		delete newUnit->CurrentOrder();
+		delete newUnit->Orders[0];
 		newUnit->Orders[0] = unit.NewOrder->Clone();
 	} else {
 #if 0
 		// Tell the unit to rigth-click ?
 #endif
 	}
+	this->Finished = true;
 	if (IsOnlySelected(unit)) {
 		UI.ButtonPanel.Update();
 	}
-	return true;
-}
 
-void HandleActionTrain(COrder& order, CUnit &unit)
-{
-	Assert(order.Action == UnitActionTrain);
-
-	if (order.Execute(unit)) {
-
-		unit.ClearAction();
-	}
 }
 
 //@}

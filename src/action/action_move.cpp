@@ -59,6 +59,9 @@
 {
 	file.printf("{\"action-move\",");
 
+	if (this->Finished) {
+		file.printf(" \"finished\", ");
+	}
 	file.printf(" \"range\", %d,", this->Range);
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 
@@ -178,13 +181,13 @@ int DoActionMove(CUnit &unit)
 }
 
 
-/* virtual */ bool COrder_Move::Execute(CUnit &unit)
+/* virtual */ void COrder_Move::Execute(CUnit &unit)
 {
 	Assert(unit.CanMove());
 
 	if (unit.Wait) {
 		unit.Wait--;
-		return false;
+		return ;
 	}
 	// FIXME: (mr-russ) Make a reachable goal here with GoalReachable ...
 
@@ -193,21 +196,16 @@ int DoActionMove(CUnit &unit)
 			// Some tries to reach the goal
 			if (this->CheckRange()) {
 				this->Range++;
-				break;
+			} else {
+				this->Finished = true;
 			}
-			// FALL THROUGH
+			break;
+
 		case PF_REACHED:
-			return true;
+			this->Finished = true;
+			break;
 		default:
 			break;
-	}
-	return false;
-}
-
-void HandleActionMove(COrder& order, CUnit &unit)
-{
-	if (order.Execute(unit)) {
-		unit.ClearAction();
 	}
 }
 

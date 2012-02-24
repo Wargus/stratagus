@@ -168,8 +168,6 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 {
 	COrder_Built* order = new COrder_Built();
 
-	order->Action = UnitActionBuilt;
-
 	// Make sure the bulding doesn't cancel itself out right away.
 
 	unit.Variable[HP_INDEX].Value = 1;
@@ -261,8 +259,6 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 {
 	COrder_Research *order = new COrder_Research();
 
-	order->Action = UnitActionResearch;
-
 	// FIXME: if you give quick an other order, the resources are lost!
 	unit.Player->SubCosts(upgrade.Costs);
 
@@ -323,8 +319,6 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 /* static */ COrder* COrder::NewActionSpellCast(SpellType &spell, const Vec2i &pos, CUnit *target)
 {
 	COrder_SpellCast *order = new COrder_SpellCast;
-
-	order->Action = UnitActionSpellCast;
 
 	order->Range = spell.Range;
 	if (target) {
@@ -457,7 +451,7 @@ void COrder::ReleaseRefs(CUnit &unit)
 			}
 		}
 		// Still shouldn't have a reference unless attacking
-		Assert(!(this->Action == UnitActionStill && !SubAction.Attack));
+		Assert(this->Action != UnitActionStill);
 		this->ClearGoal();
 	}
 #ifdef DEBUG
@@ -1339,26 +1333,26 @@ static void HandleActionNotWritten(COrder&, CUnit &unit)
 */
 static void (*HandleActionTable[256])(COrder&, CUnit &) = {
 	HandleActionNone,
-	HandleActionStill,
-	HandleActionStandGround,
-	HandleActionFollow,
-	HandleActionMove,
+	HandleActionNone, // HandleActionStill,
+	HandleActionNone, // HandleActionStandGround,
+	HandleActionNone, // HandleActionFollow,
+	HandleActionNone, // HandleActionMove,
 	HandleActionAttack,
 	HandleActionAttack, // HandleActionAttackGround,
-	HandleActionDie,
-	HandleActionSpellCast,
-	HandleActionTrain,
-	HandleActionUpgradeTo,
-	HandleActionResearch,
-	HandleActionBuilt,
-	HandleActionBoard,
-	HandleActionUnload,
-	HandleActionPatrol,
-	HandleActionBuild,
-	HandleActionRepair,
+	HandleActionNone, // HandleActionDie,
+	HandleActionNone, // HandleActionSpellCast,
+	HandleActionNone, // HandleActionTrain,
+	HandleActionNone, // HandleActionUpgradeTo,
+	HandleActionNone, // HandleActionResearch,
+	HandleActionNone, // HandleActionBuilt,
+	HandleActionNone, // HandleActionBoard,
+	HandleActionNone, // HandleActionUnload,
+	HandleActionNone, // HandleActionPatrol,
+	HandleActionNone, // HandleActionBuild,
+	HandleActionNone, // HandleActionRepair,
 	HandleActionResource,
 	HandleActionReturnGoods,
-	HandleActionTransformInto,
+	HandleActionNone, // HandleActionTransformInto,
 	HandleActionNotWritten,
 
 	// Enough for the future ?
@@ -1522,9 +1516,12 @@ static void HandleBuffs(CUnit &unit, int amount)
 	}
 }
 
-static void RunAction(COrder &order, CUnit &unit)
+
+
+
+void COrder::Execute(CUnit &unit)
 {
-	HandleActionTable[order.Action](order, unit);
+	HandleActionTable[Action](*this, unit);
 }
 
 
@@ -1538,40 +1535,44 @@ static void HandleUnitAction(CUnit &unit)
 	// If current action is breakable proceed with next one.
 	if (!unit.Anim.Unbreakable) {
 		if (unit.CriticalOrder != NULL) {
-			RunAction(*unit.CriticalOrder, unit);
+			unit.CriticalOrder->Execute(unit);
 			delete unit.CriticalOrder;
 			unit.CriticalOrder = NULL;
 		}
 
+		if (unit.Orders[0]->Finished && unit.Orders[0]->Action != UnitActionStill
+			&& unit.Orders.size() == 1) {
+			unit.Orders[0]->ReleaseRefs(unit);
+
+			delete unit.Orders[0];
+			unit.Orders[0] = new COrder_Still(false);
+			unit.State = 0;
+			if (IsOnlySelected(unit)) { // update display for new action
+				SelectedUnitChanged();
+			}
+		}
+
 		// o Look if we have a new order and old finished.
 		// o Or the order queue should be flushed.
-		if (unit.Orders.size() > 1
-			&& (unit.CurrentAction() == UnitActionStill || unit.OrderFlush)) {
-
+		if (unit.Orders[0]->Finished && unit.Orders.size() > 1) {
 			if (unit.Removed) { // FIXME: johns I see this as an error
 				DebugPrint("Flushing removed unit\n");
 				// This happens, if building with ALT+SHIFT.
 				return;
 			}
-			COrderPtr order = unit.CurrentOrder();
+			unit.Orders[0]->ReleaseRefs(unit);
 
-			order->ReleaseRefs(unit);
-
-			unit.OrderFlush = 0;
 			delete unit.Orders[0];
 			unit.Orders.erase(unit.Orders.begin());
 
 			unit.State = 0;
 			unit.Wait = 0;
-
 			if (IsOnlySelected(unit)) { // update display for new action
 				SelectedUnitChanged();
 			}
 		}
 	}
-
-	// Select action.
-	RunAction(*unit.CurrentOrder(), unit);
+	unit.Orders[0]->Execute(unit);
 }
 
 /**

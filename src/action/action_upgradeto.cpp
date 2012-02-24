@@ -145,6 +145,9 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 /* virtual */ void COrder_TransformInto::Save(CFile &file, const CUnit &unit) const
 {
 	file.printf("{\"action-transform-into\",");
+	if (this->Finished) {
+		file.printf(" \"finished\", ");
+	}
 	file.printf(" \"type\", \"%s\"", this->Type->Ident.c_str());
 	file.printf("}");
 }
@@ -162,19 +165,10 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	return true;
 }
 
-/* virtual */ bool COrder_TransformInto::Execute(CUnit &unit)
+/* virtual */ void COrder_TransformInto::Execute(CUnit &unit)
 {
 	TransformUnitIntoType(unit, *this->Type);
-	return true;
-}
-
-void HandleActionTransformInto(COrder& order, CUnit &unit)
-{
-	Assert(order.Action == UnitActionTransformInto);
-
-	if (order.Execute(unit)) {
-//		unit.ClearAction();
-	}
+	this->Finished = true;
 }
 
 #endif
@@ -184,6 +178,9 @@ void HandleActionTransformInto(COrder& order, CUnit &unit)
 /* virtual */ void COrder_UpgradeTo::Save(CFile &file, const CUnit &unit) const
 {
 	file.printf("{\"action-upgrade-to\",");
+	if (this->Finished) {
+		file.printf(" \"finished\", ");
+	}
 	file.printf(" \"type\", \"%s\",", this->Type->Ident.c_str());
 	file.printf(" \"ticks\", %d", this->Ticks);
 	file.printf("}");
@@ -215,12 +212,12 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 		UnitShowAnimation(unit, unit.Type->Animations->Still);
 }
 
-/* virtual */ bool COrder_UpgradeTo::Execute(CUnit &unit)
+/* virtual */ void COrder_UpgradeTo::Execute(CUnit &unit)
 {
 	AnimateActionUpgradeTo(unit);
 	if (unit.Wait) {
 		unit.Wait--;
-		return false;
+		return ;
 	}
 	CPlayer &player = *unit.Player;
 	const CUnitType &newtype = *this->Type;
@@ -229,18 +226,19 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	this->Ticks += SpeedUpgrade;
 	if (this->Ticks < newstats.Costs[TimeCost]) {
 		unit.Wait = CYCLES_PER_SECOND / 6;
-		return false;
+		return ;
 	}
 
 	if (unit.Anim.Unbreakable) {
 		this->Ticks = newstats.Costs[TimeCost];
-		return false;
+		return ;
 	}
 
 	if (TransformUnitIntoType(unit, newtype) == 0) {
 		player.Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
 			_("Upgrade to %s canceled"), newtype.Name.c_str());
-		return true;
+		this->Finished = true;
+		return ;
 	}
 	player.Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
 		_("Upgrade to %s complete"), unit.Type->Name.c_str());
@@ -249,7 +247,7 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	if (player.AiEnabled) {
 		AiUpgradeToComplete(unit, newtype);
 	}
-	return true;
+	this->Finished = true;
 }
 
 /* virtual */ void COrder_UpgradeTo::Cancel(CUnit &unit)
@@ -265,17 +263,6 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 
 	unit.Variable[UPGRADINGTO_INDEX].Value = this->Ticks;
 	unit.Variable[UPGRADINGTO_INDEX].Max = this->Type->Stats[unit.Player->Index].Costs[TimeCost];
-}
-
-
-
-void HandleActionUpgradeTo(COrder& order, CUnit &unit)
-{
-	Assert(order.Action == UnitActionUpgradeTo);
-
-	if (order.Execute(unit)) {
-		unit.ClearAction();
-	}
 }
 
 #endif

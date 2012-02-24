@@ -36,25 +36,10 @@
 #include <stdio.h>
 
 #include "stratagus.h"
-#include "unit.h"
-#include "actions.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/**
-**  Unit stands ground!
-**
-**  @param unit  Action handled for this unit pointer.
-*/
-void HandleActionStandGround(COrder& order, CUnit &unit)
-{
-	Assert(order.Action == UnitActionStandGround);
-
-	if (order.Execute(unit)) {
-		unit.ClearAction();
-	}
-}
 
 //@}

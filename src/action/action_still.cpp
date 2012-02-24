@@ -63,6 +63,9 @@ enum {
 	} else {
 		file.printf("{\"action-stand-ground\",");
 	}
+	if (this->Finished) {
+		file.printf(" \"finished\", ");
+	}
 	if (this->HasGoal()) {
 		CUnit &goal = *this->GetGoal();
 		if (goal.Destroyed) {
@@ -241,19 +244,9 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	if (goal == NULL) {
 		return false;
 	}
-
-	CUnit *oldGoal =this->GetGoal();
-	if (oldGoal && oldGoal->CurrentAction() == UnitActionDie) {
-		this->ClearGoal();
-		oldGoal = NULL;
-	}
-	if (this->State < SUB_STILL_ATTACK || oldGoal != goal) {
-		// New target.
-		this->SetGoal(goal);
-		unit.State = 0;
-		this->State = SUB_STILL_ATTACK; // Mark attacking.
-		UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos);
-	}
+	this->SetGoal(goal);
+	this->State = SUB_STILL_ATTACK; // Mark attacking.
+	UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos);
 	return true;
 }
 
@@ -291,13 +284,14 @@ bool AutoAttack(CUnit &unit)
 }
 
 
-/* virtual */ bool COrder_Still::Execute(CUnit &unit)
+/* virtual */ void COrder_Still::Execute(CUnit &unit)
 {
 	// If unit is not bunkered and removed, wait
 	if (unit.Removed
 		&& (unit.Container == NULL || unit.Container->Type->AttackFromTransporter == false)) {
-		return false;
+		return ;
 	}
+	this->Finished = false;
 
 	switch (this->State) {
 		case SUB_STILL_INIT: //first entry
@@ -311,38 +305,22 @@ bool AutoAttack(CUnit &unit)
 		break;
 	}
 	if (unit.Anim.Unbreakable) { // animation can't be aborted here
-		return false;
+		return ;
 	}
+	this->State = SUB_STILL_STANDBY;
+	this->Finished = (this->Action == UnitActionStill);
 	if (this->Action == UnitActionStandGround || unit.Removed || unit.CanMove() == false) {
 		if (unit.IsAgressive()) {
 			this->AutoAttackStand(unit);
-			return false;
 		}
 	} else {
 		if ((unit.IsAgressive() && AutoAttack(unit))
 			|| AutoCast(unit)
 			|| AutoRepair(unit)
 			|| MoveRandomly(unit)) {
-			return true;
 		}
 	}
-	return false;
 }
-
-/**
-**  Unit stands still!
-**
-**  @param unit  Unit pointer for still action.
-*/
-void HandleActionStill(COrder& order, CUnit &unit)
-{
-	Assert(order.Action == UnitActionStill);
-
-	if (order.Execute(unit)) {
-		unit.ClearAction();
-	}
-}
-
 
 
 //@}

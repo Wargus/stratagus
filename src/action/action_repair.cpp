@@ -59,6 +59,9 @@
 {
 	file.printf("{\"action-repair\",");
 
+	if (this->Finished) {
+		file.printf(" \"finished\", ");
+	}
 	file.printf(" \"range\", %d,", this->Range);
 	if (this->HasGoal()) {
 		CUnit &goal = *this->GetGoal();
@@ -157,7 +160,7 @@ static void AnimateActionRepair(CUnit &unit)
 	UnitShowAnimation(unit, unit.Type->Animations->Repair);
 }
 
-/* virtual */ bool COrder_Repair::Execute(CUnit &unit)
+/* virtual */ void COrder_Repair::Execute(CUnit &unit)
 {
 	switch (this->State) {
 		case 0:
@@ -194,7 +197,8 @@ static void AnimateActionRepair(CUnit &unit)
 					const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
 					UnitHeadingFromDeltaXY(unit, dir);
 				} else if (err < 0) {
-					return true;
+					this->Finished = true;
+					return ;
 				}
 			}
 			break;
@@ -203,7 +207,7 @@ static void AnimateActionRepair(CUnit &unit)
 			AnimateActionRepair(unit);
 			this->RepairCycle++;
 			if (unit.Anim.Unbreakable) {
-				return false;
+				return ;
 			}
 			CUnit *goal = this->GetGoal();
 
@@ -220,7 +224,8 @@ static void AnimateActionRepair(CUnit &unit)
 
 					if (dist <= unit.Type->RepairRange) {
 						if (RepairUnit(unit, *goal)) {
-							return true;
+							this->Finished = true;
+							return ;
 						}
 					} else if (dist > unit.Type->RepairRange) {
 						// If goal has move, chase after it
@@ -231,21 +236,14 @@ static void AnimateActionRepair(CUnit &unit)
 			}
 			// Target is fine, choose new one.
 			if (!goal || goal->Variable[HP_INDEX].Value >= goal->Variable[HP_INDEX].Max) {
-				return true;
+				this->Finished = true;
+				return ;
 			}
 			// FIXME: automatic repair
 		}
 		break;
 	}
-	return false;
 }
 
-
-void HandleActionRepair(COrder& order, CUnit &unit)
-{
-	if (order.Execute(unit)) {
-		unit.ClearAction();
-	}
-}
 
 //@}

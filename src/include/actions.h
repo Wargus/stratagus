@@ -101,9 +101,10 @@ struct lua_State;
 */
 class COrder
 {
+
 public:
 	COrder(int action) : Goal(NULL), Range(0), MinRange(0), Width(0),
-		Height(0), Action(action), CurrentResource(0)
+		Height(0), Action(action), Finished(false), CurrentResource(0)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -114,7 +115,7 @@ public:
 	virtual ~COrder();
 
 	virtual COrder *Clone() const;
-	virtual bool Execute(CUnit &unit) { return false; }
+	virtual void Execute(CUnit &unit);
 	virtual void Cancel(CUnit &unit) {}
 	virtual void OnAnimationAttack(CUnit &unit);
 
@@ -184,6 +185,7 @@ public:
 	unsigned char Width;    /// Goal Width (used when Goal is not)
 	unsigned char Height;   /// Goal Height (used when Goal is not)
 	unsigned char Action;   /// global action
+	bool Finished; /// true when order is finish
 	unsigned char CurrentResource; ///used in UnitActionResource and UnitActionReturnGoods
 
 	Vec2i goalPos;          /// or tile coordinate of destination
@@ -227,7 +229,7 @@ public:
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
-	virtual bool Execute(CUnit &unit);
+	virtual void Execute(CUnit &unit);
 
 private:
 	bool WaitForTransporter(CUnit &unit);
@@ -247,7 +249,7 @@ public:
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
-	virtual bool Execute(CUnit &unit);
+	virtual void Execute(CUnit &unit);
 
 	virtual void AiUnitKilled(CUnit &unit);
 
@@ -276,7 +278,7 @@ public:
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
-	virtual bool Execute(CUnit &unit);
+	virtual void Execute(CUnit &unit);
 	virtual void Cancel(CUnit &unit);
 
 	virtual void UpdateUnitVariables(CUnit &unit) const;
@@ -312,7 +314,7 @@ public:
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
-	virtual bool Execute(CUnit &unit);
+	virtual void Execute(CUnit &unit);
 };
 
 class COrder_Follow : public COrder
@@ -325,7 +327,7 @@ public:
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
-	virtual bool Execute(CUnit &unit);
+	virtual void Execute(CUnit &unit);
 private:
 	unsigned int State;
 };
@@ -340,7 +342,7 @@ public:
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
-	virtual bool Execute(CUnit &unit);
+	virtual void Execute(CUnit &unit);
 };
 
 
@@ -356,7 +358,7 @@ public:
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
-	virtual bool Execute(CUnit &unit);
+	virtual void Execute(CUnit &unit);
 
 	const Vec2i& GetWayPoint() const { return WayPoint; }
 private:
@@ -376,7 +378,7 @@ public:
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
-	virtual bool Execute(CUnit &unit);
+	virtual void Execute(CUnit &unit);
 private:
 	bool RepairUnit(const CUnit &unit, CUnit &goal);
 private:
@@ -396,7 +398,7 @@ public:
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
-	virtual bool Execute(CUnit &unit);
+	virtual void Execute(CUnit &unit);
 	virtual void Cancel(CUnit &unit);
 
 	virtual void UpdateUnitVariables(CUnit &unit) const;
@@ -417,8 +419,7 @@ public:
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
-	virtual bool Execute(CUnit &unit);
-	virtual void Cancel(CUnit &unit);
+	virtual void Execute(CUnit &unit);
 	virtual void OnAnimationAttack(CUnit &unit);
 
 	const SpellType& GetSpell() const { return *Spell; }
@@ -440,7 +441,7 @@ public:
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
-	virtual bool Execute(CUnit &unit);
+	virtual void Execute(CUnit &unit);
 private:
 	bool AutoAttackStand(CUnit &unit);
 private:
@@ -459,7 +460,7 @@ public:
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
-	virtual bool Execute(CUnit &unit);
+	virtual void Execute(CUnit &unit);
 	virtual void Cancel(CUnit &unit);
 
 	virtual void UpdateUnitVariables(CUnit &unit) const;
@@ -483,7 +484,7 @@ public:
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
-	virtual bool Execute(CUnit &unit);
+	virtual void Execute(CUnit &unit);
 
 private:
 	CUnitType *Type; /// Transform unit into this unit-type
@@ -502,7 +503,7 @@ public:
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
-	virtual bool Execute(CUnit &unit);
+	virtual void Execute(CUnit &unit);
 
 private:
 	bool LeaveTransporter(CUnit &transporter);
@@ -522,7 +523,7 @@ public:
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
-	virtual bool Execute(CUnit &unit);
+	virtual void Execute(CUnit &unit);
 	virtual void Cancel(CUnit &unit);
 
 	virtual void UpdateUnitVariables(CUnit &unit) const;
@@ -619,55 +620,22 @@ extern int GetNumWaitingWorkers(const CUnit &mine);
 extern bool AutoAttack(CUnit &unit);
 extern bool AutoRepair(CUnit &unit);
 extern bool AutoCast(CUnit &unit);
-
 extern void UnHideUnit(CUnit &unit);
+
+	/// Generic move action
+extern int DoActionMove(CUnit &unit);
+	/// Show attack animation
+extern void AnimateActionAttack(CUnit &unit);
+
 
 typedef void HandleActionFunc(COrder& order, CUnit &unit);
 
-	/// Handle command still
-extern HandleActionFunc HandleActionStill;
-	/// Handle command stand ground
-extern HandleActionFunc HandleActionStandGround;
-	/// Handle command follow
-extern HandleActionFunc HandleActionFollow;
-	/// Generic move action
-extern int DoActionMove(CUnit &unit);
-	/// Handle command move
-extern HandleActionFunc HandleActionMove;
-	/// Handle command repair
-extern HandleActionFunc HandleActionRepair;
-	/// Handle command patrol
-extern HandleActionFunc HandleActionPatrol;
-	/// Show attack animation
-extern void AnimateActionAttack(CUnit &unit);
 	/// Handle command attack
 extern HandleActionFunc HandleActionAttack;
-	/// Handle command board
-extern HandleActionFunc HandleActionBoard;
-	/// Handle command unload
-extern HandleActionFunc HandleActionUnload;
 	/// Handle command resource
 extern HandleActionFunc HandleActionResource;
 	/// Handle command return
 extern HandleActionFunc HandleActionReturnGoods;
-	/// Handle command die
-extern HandleActionFunc HandleActionDie;
-	/// Handle command build
-extern HandleActionFunc HandleActionBuild;
-	/// Handle command built
-extern HandleActionFunc HandleActionBuilt;
-	/// Handle command train
-extern HandleActionFunc HandleActionTrain;
-	/// Handle command upgrade to
-extern HandleActionFunc HandleActionUpgradeTo;
-	/// Handle command transform into
-extern HandleActionFunc HandleActionTransformInto;
-	/// Handle command upgrade
-extern HandleActionFunc HandleActionUpgrade;
-	/// Handle command research
-extern HandleActionFunc HandleActionResearch;
-	/// Handle command spellcast
-extern HandleActionFunc HandleActionSpellCast;
 
 /*----------------------------------------------------------------------------
 --  Actions: actions.c

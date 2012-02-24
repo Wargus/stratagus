@@ -188,6 +188,10 @@ bool COrder::ParseGenericData(lua_State *l, int &j, const char *value)
 		lua_rawgeti(l, -1, j + 1);
 		this->Height = LuaToNumber(l, -1);
 		lua_pop(l, 1);
+	} else if (!strcmp(value, "finished")) {
+		lua_rawgeti(l, -1, j + 1);
+		this->Finished = true;
+		lua_pop(l, 1);
 	} else if (!strcmp(value, "goal")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
@@ -656,8 +660,6 @@ static int CclUnit(lua_State *l)
 				lua_pop(l, 1);
 				u->AddInContainer(*unit);
 			}
-		} else if (!strcmp(value, "order-flush")) {
-			unit->OrderFlush = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "orders")) {
 			lua_pushvalue(l, j + 1);
 			CclParseOrders(l, *unit);

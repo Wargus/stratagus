@@ -65,6 +65,9 @@
 {
 	file.printf("{\"action-spell-cast\",");
 
+	if (this->Finished) {
+		file.printf(" \"finished\", ");
+	}
 	file.printf(" \"range\", %d,", this->Range);
 	file.printf(" \"width\", %d,", this->Width);
 	file.printf(" \"height\", %d,", this->Height);
@@ -185,13 +188,13 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 }
 
 
-/* virtual */ bool COrder_SpellCast::Execute(CUnit &unit)
+/* virtual */ void COrder_SpellCast::Execute(CUnit &unit)
 {
 	COrder_SpellCast &order = *this;
 
 	if (unit.Wait) {
 		unit.Wait--;
-		return false;
+		return ;
 	}
 	const SpellType &spell = order.GetSpell();
 	switch (this->State) {
@@ -212,7 +215,8 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				if (unit.Player->AiEnabled) {
 					DebugPrint("FIXME: do we need an AI callback?\n");
 				}
-				return true;
+				this->Finished = true;
+				return ;
 			}
 			// FIXME FIXME FIXME: Check if already in range and skip straight to 2(casting)
 			if (!spell.IsCasterOnly()) {
@@ -224,9 +228,10 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		case 1:                         // Move to the target.
 			if (spell.Range && spell.Range != INFINITE_RANGE) {
 				if (SpellMoveToTarget(unit) == true) {
-					return true;
+					this->Finished = true;
+					return ;
 				}
-				return false;
+				return ;
 			} else {
 				this->State = 2;
 			}
@@ -235,7 +240,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 			if (!spell.IsCasterOnly()) {
 				AnimateActionSpellCast(unit, *this);
 				if (unit.Anim.Unbreakable) {
-					return false;
+					return ;
 				}
 			} else {
 				// FIXME: what todo, if unit/goal is removed?
@@ -247,34 +252,14 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				}
 			}
 			if (!unit.ReCast && unit.CurrentAction() != UnitActionDie) {
-				return true;
+				this->Finished = true;
+				return ;
 			}
 			break;
 
 		default:
 			this->State = 0; // Reset path, than move to target
 			break;
-	}
-	return false;
-}
-
-/* virtual */ void COrder_SpellCast::Cancel(CUnit&)
-{
-}
-
-
-/**
-**  Unit casts a spell!
-**
-**  @param unit  Unit, for that the spell cast is handled.
-*/
-void HandleActionSpellCast(COrder& order, CUnit &unit)
-{
-	Assert(order.Action == UnitActionSpellCast);
-
-	if (order.Execute(unit)) {
-		order.ClearGoal();
-		unit.ClearAction();
 	}
 }
 

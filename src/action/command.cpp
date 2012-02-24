@@ -67,7 +67,7 @@ static void ReleaseOrders(CUnit &unit)
 		delete unit.Orders[i];
 	}
 	unit.Orders.resize(1);
-	unit.OrderFlush = 1;
+	unit.Orders[0]->Finished = true;
 }
 
 /**

@@ -116,6 +116,11 @@ void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 	file.printf(" \"width\", %d,", order.Width);
 	file.printf(" \"height\", %d,", order.Height);
 	file.printf(" \"min-range\", %d,", order.MinRange);
+
+	if (order.Finished) {
+		file.printf(" \"finished\", ");
+	}
+
 	if (order.HasGoal()) {
 		CUnit &goal = *order.GetGoal();
 		if (goal.Destroyed) {
@@ -382,7 +387,6 @@ void SaveUnit(const CUnit &unit, CFile *file)
 		}
 		file->printf("},\n  ");
 	}
-	file->printf("\"order-flush\", %d,\n  ", unit.OrderFlush);
 	file->printf("\"orders\", {\n");
 	Assert(unit.Orders.empty() == false);
 	SaveOrder(*unit.Orders[0], unit, file);

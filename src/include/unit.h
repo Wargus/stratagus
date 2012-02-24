@@ -295,12 +295,6 @@
 **  Pointer to the original owner of a unit. It will be NULL if
 **  the unit was not rescued.
 **
-**
-**  CUnit::OrderFlush
-**
-**  A flag, which tells the unit to stop with the current order
-**  and immediately start with the next order.
-**
 **  CUnit::Orders
 **
 **  Contains all orders of the unit. Slot 0 is always used.
@@ -566,11 +560,11 @@ public:
 	} Anim;
 
 
-	char OrderFlush;            /// cancel current order, take next
 	std::vector<COrder *> Orders; /// orders to process
 	COrder *SavedOrder;         /// order to continue after current
 	COrder *NewOrder;           /// order for new trained units
 	COrder *CriticalOrder;      /// order to do as possible in breakable animation.
+
 	char *AutoCastSpell;        /// spells to auto cast
 
 	CUnit *Goal; /// Generic/Teleporter goal pointer

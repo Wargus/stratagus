@@ -53,6 +53,9 @@
 /* virtual */ void COrder_Unload::Save(CFile &file, const CUnit &unit) const
 {
 	file.printf("{\"action-unload\",");
+	if (this->Finished) {
+		file.printf(" \"finished\", ");
+	}
 	if (this->HasGoal()) {
 		CUnit &goal = *this->GetGoal();
 		if (goal.Destroyed) {
@@ -352,7 +355,7 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 	}
 }
 
-/* virtual */ bool COrder_Unload::Execute(CUnit &unit)
+/* virtual */ void COrder_Unload::Execute(CUnit &unit)
 {
 	const int maxSearchRange = 20;
 
@@ -365,7 +368,8 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 				Vec2i pos;
 
 				if (!ClosestFreeDropZone(unit, this->goalPos, maxSearchRange, &pos)) {
-					return true;
+					this->Finished = true;
+					return ;
 				}
 				this->goalPos = pos;
 			}
@@ -382,40 +386,26 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 				if (moveResult) {
 					if (moveResult == PF_REACHED) {
 						if (++this->State == 1) {
-							return true;
+							this->Finished = true;
+							return ;
 						}
 					} else {
 						this->State = 2;
 					}
 				}
-				return false;
+				return ;
 			}
 		case 2: { // Leave the transporter
 			// FIXME: show still animations ?
 			if (LeaveTransporter(unit)) {
-				return true;
+				this->Finished = true;
+				return ;
 			}
-			return false;
+			return ;
 		}
 		default:
-			return false;
+			return ;
 	}
 }
-
-
-/**
-**  The transporter unloads a unit.
-**
-**  @param unit  Pointer to unit.
-*/
-void HandleActionUnload(COrder& order, CUnit &unit)
-{
-	Assert(order.Action == UnitActionUnload);
-
-	if (order.Execute(unit)) {
-		unit.ClearAction();
-	}
-}
-
 
 //@}

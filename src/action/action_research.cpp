@@ -58,6 +58,9 @@
 {
 	file.printf("{\"action-research\"");
 
+	if (this->Finished) {
+		file.printf(" \"finished\", ");
+	}
 	if (this->Upgrade) {
 		file.printf(", \"upgrade\", \"%s\"", this->Upgrade->Ident.c_str());
 	}
@@ -89,7 +92,7 @@
 **
 **  @return true when finished.
 */
-/* virtual */ bool COrder_Research::Execute(CUnit &unit)
+/* virtual */ void COrder_Research::Execute(CUnit &unit)
 {
 	const CUpgrade &upgrade = this->GetUpgrade();
 	const CUnitType &type = *unit.Type;
@@ -99,11 +102,11 @@
 		UnitShowAnimation(unit, type.Animations->Still);
 	if (unit.Wait) {
 		unit.Wait--;
-		return false;
+		return ;
 	}
 #if 0
 	if (unit.Anim.Unbreakable) {
-		return false;
+		return ;
 	}
 #endif
 	CPlayer &player = *unit.Player;
@@ -122,10 +125,10 @@
 			AiResearchComplete(unit, &upgrade);
 		}
 		UpgradeAcquire(player, &upgrade);
-		return true;
+		this->Finished = true;
+		return ;
 	}
 	unit.Wait = CYCLES_PER_SECOND / 6;
-	return false;
 }
 
 /* virtual */ void COrder_Research::Cancel(CUnit &unit)
@@ -134,21 +137,6 @@
 	unit.Player->UpgradeTimers.Upgrades[upgrade.ID] = 0;
 
 	unit.Player->AddCostsFactor(upgrade.Costs, CancelResearchCostsFactor);
-}
-
-
-/**
-**  Unit researches!
-**
-**  @param unit  Pointer of researching unit.
-*/
-void HandleActionResearch(COrder& order, CUnit &unit)
-{
-	Assert(order.Action == UnitActionResearch);
-
-	if (order.Execute(unit)) {
-		unit.ClearAction();
-	}
 }
 
 //@}

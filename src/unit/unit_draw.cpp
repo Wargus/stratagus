@@ -854,9 +854,10 @@ void ShowOrder(const CUnit &unit)
 	const PixelPos mapPos = unit.GetMapPixelPosCenter();
 	PixelPos screenStartPos = CurrentViewport->MapToScreenPixelPos(mapPos);
 	COrderPtr order;
+	const bool flushed = unit.Orders[0]->Finished;
 
 	// If the current order is cancelled show the next one
-	if (unit.Orders.size() > 1 && unit.OrderFlush) {
+	if (unit.Orders.size() > 1 && flushed) {
 		order = unit.Orders[1];
 	} else {
 		order = unit.Orders[0];
@@ -864,7 +865,7 @@ void ShowOrder(const CUnit &unit)
 	ShowSingleOrder(unit, screenStartPos, *order);
 
 	// Show the rest of the orders
-	for (size_t i = 1 + (unit.OrderFlush ? 1 : 0); i < unit.Orders.size(); ++i) {
+	for (size_t i = 1 + (flushed ? 1 : 0); i < unit.Orders.size(); ++i) {
 		PixelPos screenPos;
 		GetOrderPosition(unit, *unit.Orders[i - 1], &screenPos);
 		ShowSingleOrder(unit, screenPos, *unit.Orders[i]);

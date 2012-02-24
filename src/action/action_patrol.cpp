@@ -54,6 +54,9 @@
 {
 	file.printf("{\"action-patrol\",");
 
+	if (this->Finished) {
+		file.printf(" \"finished\", ");
+	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 	file.printf(" \"range\", %d,", this->Range);
 
@@ -85,11 +88,11 @@
 	return true;
 }
 
-/* virtual */ bool COrder_Patrol::Execute(CUnit &unit)
+/* virtual */ void COrder_Patrol::Execute(CUnit &unit)
 {
 	if (unit.Wait) {
 		unit.Wait--;
-		return false;
+		return ;
 	}
 
 	switch (DoActionMove(unit)) {
@@ -130,29 +133,8 @@
 
 	if (!unit.Anim.Unbreakable) {
 		if (AutoAttack(unit) || AutoRepair(unit) || AutoCast(unit)) {
-			return true;
+			this->Finished = true;
 		}
-	}
-	return false;
-}
-
-/**
-**  Unit Patrol:
-**    The unit patrols between two points.
-**    Any enemy unit in reaction range is attacked.
-**  @todo FIXME:
-**    Should do some tries to reach the end-points.
-**    Should support patrol between more points!
-**    Patrol between units.
-**
-**  @param unit  Patroling unit pointer.
-*/
-void HandleActionPatrol(COrder& order, CUnit &unit)
-{
-	Assert(order.Action == UnitActionPatrol);
-
-	if (order.Execute(unit)) {
-		unit.ClearAction();
 	}
 }
 

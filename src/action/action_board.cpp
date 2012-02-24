@@ -47,6 +47,15 @@
 #include "iolib.h"
 #include "script.h"
 
+
+
+enum {
+	State_Init = 0,
+	State_MoveToTransporterMax = 200, // Range from previous
+	State_WaitForTransporter = 201,
+	State_EnterTransporter = 202
+};
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -55,6 +64,9 @@
 {
 	file.printf("{\"action-board\",");
 
+	if (this->Finished) {
+		file.printf(" \"finished\", ");
+	}
 	file.printf(" \"range\", %d,", this->Range);
 	if (this->HasGoal()) {
 		CUnit &goal = *this->GetGoal();
@@ -152,7 +164,7 @@ bool COrder_Board::WaitForTransporter(CUnit &unit)
 	// is not there. The unit searches with a big range, so it thinks
 	// it's there. This is why we reset the search. The transporter
 	// should be a lot closer now, so it's not as bad as it seems.
-	this->State = 0;
+	this->State = State_Init;
 	this->Range = 1;
 	// Uhh wait a bit.
 	unit.Wait = 10;
@@ -194,39 +206,40 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 	DebugPrint("No free slot in transporter\n");
 }
 
-/* virtual */ bool COrder_Board::Execute(CUnit &unit)
+/* virtual */ void COrder_Board::Execute(CUnit &unit)
 {
 	switch (this->State) {
 		// Wait for transporter
-		case 201:
+		case State_WaitForTransporter:
 			if (this->WaitForTransporter(unit)) {
-				this->State = 202;
+				this->State = State_EnterTransporter;
 			} else {
 				UnitShowAnimation(unit, unit.Type->Animations->Still);
 			}
 			break;
-		// Enter transporter
-		case 202:
+
+		case State_EnterTransporter: {
 			EnterTransporter(unit, *this);
-			return true;
-			break;
-		// Move to transporter
-		case 0:
+			this->Finished = true;
+			return ;
+		}
+		case State_Init:
 			if (unit.Wait) {
 				unit.Wait--;
-				return false;
+				return;
 			}
 			this->NewResetPath();
 			this->State = 1;
 			// FALL THROUGH
-		default:
-			if (this->State <= 200) {
+		default: { // Move to transporter
+			if (this->State <= State_MoveToTransporterMax) {
 				const int pathRet = MoveToTransporter(unit);
 				// FIXME: if near transporter wait for enter
 				if (pathRet) {
 					if (pathRet == PF_UNREACHABLE) {
-						if (++this->State == 200) {
-							return true;
+						if (++this->State == State_MoveToTransporterMax) {
+							this->Finished = true;
+							return;
 						} else {
 							// Try with a bigger range.
 							if (this->CheckRange()) {
@@ -235,27 +248,14 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 							}
 						}
 					} else if (pathRet == PF_REACHED) {
-						this->State = 201;
+						this->State = State_WaitForTransporter;
 					}
 				}
 			}
 			break;
+		}
 	}
-	return false;
 }
 
-/**
-**  The unit boards a transporter.
-**
-**  @todo FIXME: While waiting for the transporter the units must defend themselves.
-**
-**  @param unit  Pointer to unit.
-*/
-void HandleActionBoard(COrder& order, CUnit &unit)
-{
-	if (order.Execute(unit)) {
-		unit.ClearAction();
-	}
-}
 
 //@}

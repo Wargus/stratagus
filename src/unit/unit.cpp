@@ -178,7 +178,6 @@ void CUnit::Init()
 	CacheLock = 0;
 	memset(&Anim, 0, sizeof(Anim));
 	CurrentResource = 0;
-	OrderFlush = 0;
 	Orders.clear();
 	delete SavedOrder;
 	SavedOrder = NULL;
@@ -264,8 +263,7 @@ unsigned int CUnit::CurrentAction() const
 
 void CUnit::ClearAction()
 {
-	delete CurrentOrder();
-	Orders[0] = COrder::NewActionStill();
+	Orders[0]->Finished = true;
 
 	if (Selected) {
 		SelectedUnitChanged();
@@ -373,12 +371,12 @@ bool CUnit::RestoreOrder()
 
 	// Cannot delete this->Orders[0] since it is generally that order
 	// which call this method.
+	this->Orders[0]->Finished = true;
+
 
 	//copy
-	this->Orders[0] = this->SavedOrder;
+	this->Orders.insert(this->Orders.begin() + 1, this->SavedOrder);
 	this->CurrentResource = this->SavedOrder->CurrentResource;
-
-	this->CurrentOrder()->NewResetPath();
 
 	this->SavedOrder = NULL;
 	return true;
@@ -2131,8 +2129,6 @@ void DropOutAll(const CUnit &source)
 
 	for (int i = source.InsideCount; i; --i, unit = unit->NextContained) {
 		DropOutOnSide(*unit, LookingW, &source);
-		Assert(!unit->CurrentOrder()->HasGoal());
-		unit->CurrentOrder()->Action = UnitActionStill;
 	}
 }
 

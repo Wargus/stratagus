@@ -74,6 +74,10 @@ enum
 /* virtual */ void COrder_Build::Save(CFile &file, const CUnit &unit) const
 {
 	file.printf("{\"action-build\",");
+
+	if (this->Finished) {
+		file.printf(" \"finished\", ");
+	}
 	file.printf(" \"range\", %d,", this->Range);
 #if 1 // Fixed with Type
 	file.printf(" \"width\", %d,", this->Width);
@@ -371,22 +375,24 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 }
 
 
-/* virtual */ bool COrder_Build::Execute(CUnit &unit)
+/* virtual */ void COrder_Build::Execute(CUnit &unit)
 {
 	if (unit.Wait) {
 		unit.Wait--;
-		return false;
+		return ;
 	}
 	if (this->State <= State_MoveToLocationMax) {
 		if (this->MoveToLocation(unit)) {
-			return true;
+			this->Finished = true;
+			return ;
 		}
 	}
 	const CUnitType &type = this->GetUnitType();
 
 	if (State_NearOfLocation <= this->State && this->State < State_StartBuilding_Failed) {
 		if (CheckLimit(unit, type) == false) {
-			return true;
+			this->Finished = true;
+			return ;
 		}
 		CUnit *ontop = this->CheckCanBuild(unit);
 
@@ -400,30 +406,13 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 		if (unit.Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
-		return true;
+		this->Finished = true;
+		return ;
 	}
 	if (this->State == State_BuildFromOutside) {
 		this->BuildFromOutside(unit);
 	}
-
-	return false;
 }
-
-/**
-**  Unit builds a building.
-**
-**  @param unit  Unit that builds a building
-*/
-void HandleActionBuild(COrder& order, CUnit &unit)
-{
-	Assert(order.Action == UnitActionBuild);
-
-	if (order.Execute(unit)) {
-		unit.ClearAction();
-	}
-}
-
-
 
 
 ///////////////////////////
@@ -433,7 +422,9 @@ void HandleActionBuild(COrder& order, CUnit &unit)
 /* virtual */ void COrder_Built::Save(CFile &file, const CUnit &unit) const
 {
 	file.printf("{\"action-built\", ");
-
+	if (this->Finished) {
+		file.printf(" \"finished\", ");
+	}
 	CConstructionFrame *cframe = unit.Type->Construction->Frames;
 	int frame = 0;
 	while (cframe != this->Frame) {
@@ -501,7 +492,7 @@ static void CancelBuilt(COrder_Built &order, CUnit &unit)
 	LetUnitDie(unit);
 }
 
-static bool Finish(COrder_Built &order, CUnit& unit)
+static void Finish(COrder_Built &order, CUnit& unit)
 {
 	const CUnitType &type = *unit.Type;
 	CPlayer &player = *unit.Player;
@@ -565,7 +556,7 @@ static bool Finish(COrder_Built &order, CUnit& unit)
 		UnitLost(unit);
 		UnitClearOrders(unit);
 		unit.Release();
-		return false;
+		return ;
 	}
 
 	UpdateForNewUnit(unit, 0);
@@ -587,11 +578,11 @@ static bool Finish(COrder_Built &order, CUnit& unit)
 	MapUnmarkUnitSight(unit);
 	unit.CurrentSightRange = unit.Stats->Variables[SIGHTRANGE_INDEX].Max;
 	MapMarkUnitSight(unit);
-	return true;
+	order.Finished = true;
 }
 
 
-/* virtual */ bool COrder_Built::Execute(CUnit &unit)
+/* virtual */ void COrder_Built::Execute(CUnit &unit)
 {
 	const CUnitType &type = *unit.Type;
 
@@ -610,16 +601,16 @@ static bool Finish(COrder_Built &order, CUnit& unit)
 		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.Type->Name.c_str());
 
 		CancelBuilt(*this, unit);
-		return false;
+		this->Finished = true;
+		return ;
 	}
 
 	const int maxProgress = type.Stats[unit.Player->Index].Costs[TimeCost] * 600;
 
 	// Check if building ready. Note we can both build and repair.
 	if (!unit.Anim.Unbreakable && this->ProgressCounter >= maxProgress) {
-		return Finish(*this, unit);
+		Finish(*this, unit);
 	}
-	return false;
 }
 
 /* virtual */ void COrder_Built::Cancel(CUnit &unit)
@@ -732,23 +723,6 @@ void COrder_Built::Boost(CUnit &building, int amount, int varIndex) const
 	// Keep the same level of damage while increasing Value.
 	currentValue = (newProgress * maxValue) / costs - damageValue;
 	currentValue = std::min(currentValue, maxValue);
-}
-
-
-
-/**
-**  Unit under Construction
-**
-**  @param unit  Unit that is being built
-*/
-void HandleActionBuilt(COrder& order, CUnit &unit)
-{
-	Assert(order.Action == UnitActionBuilt);
-
-	if (order.Execute(unit)) {
-		order.ClearGoal();
-		unit.ClearAction();
-	}
 }
 
 //@}
