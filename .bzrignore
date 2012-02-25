@@ -7,3 +7,15 @@ debian/stratagus-dbg
 debian/stratagus-dev
 debian/stratagus-doc
 obj-*
+./*.vcxproj
+./*.filters
+./*.user
+./CMakeCache.txt
+./Doxyfile
+./cmake_install.cmake
+./stratagus.opensdf
+./stratagus.sdf
+./stratagus.sln
+./stratagus.suo
+./tolua.cpp
+./tolua.cpp.rule
