@@ -42,6 +42,7 @@ set(action_SRCS
 	src/action/action_attack.cpp
 	src/action/action_board.cpp
 	src/action/action_build.cpp
+	src/action/action_built.cpp
 	src/action/action_die.cpp
 	src/action/action_follow.cpp
 	src/action/action_move.cpp
@@ -49,14 +50,12 @@ set(action_SRCS
 	src/action/action_repair.cpp
 	src/action/action_research.cpp
 	src/action/action_resource.cpp
-	src/action/action_returngoods.cpp
-	src/action/actions.cpp
 	src/action/action_spellcast.cpp
-	src/action/action_stand.cpp
 	src/action/action_still.cpp
 	src/action/action_train.cpp
 	src/action/action_unload.cpp
 	src/action/action_upgradeto.cpp
+	src/action/actions.cpp
 	src/action/command.cpp
 )
 source_group(action FILES ${action_SRCS})
