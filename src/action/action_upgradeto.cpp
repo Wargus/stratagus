@@ -235,13 +235,11 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	}
 
 	if (TransformUnitIntoType(unit, newtype) == 0) {
-		player.Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
-			_("Upgrade to %s canceled"), newtype.Name.c_str());
+		player.Notify(NotifyGreen, unit.tilePos, _("Upgrade to %s canceled"), newtype.Name.c_str());
 		this->Finished = true;
 		return ;
 	}
-	player.Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
-		_("Upgrade to %s complete"), unit.Type->Name.c_str());
+	player.Notify(NotifyGreen, unit.tilePos, _("Upgrade to %s complete"), unit.Type->Name.c_str());
 
 	//  Warn AI.
 	if (player.AiEnabled) {

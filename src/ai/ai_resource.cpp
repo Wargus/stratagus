@@ -169,7 +169,7 @@ static int AiCheckUnitTypeCosts(const CUnitType &type)
 **
 **  @return       Number of enemy units.
 */
-int AiEnemyUnitsInDistance(const CPlayer *player,
+int AiEnemyUnitsInDistance(const CPlayer &player,
 		const CUnitType *type, const Vec2i &pos, unsigned range)
 {
 	// Select all units in range.
@@ -187,7 +187,7 @@ int AiEnemyUnitsInDistance(const CPlayer *player,
 			dest->CurrentAction() == UnitActionDie) {
 			continue;
 		}
-		if (!player->IsEnemy(*dest)) { // a friend or neutral
+		if (!player.IsEnemy(*dest)) { // a friend or neutral
 			continue;
 		}
 		// Unit can attack back?
@@ -208,7 +208,7 @@ int AiEnemyUnitsInDistance(const CPlayer *player,
 */
 int AiEnemyUnitsInDistance(const CUnit &unit, unsigned range)
 {
-	return AiEnemyUnitsInDistance(unit.Player, unit.Type, unit.tilePos, range);
+	return AiEnemyUnitsInDistance(*unit.Player, unit.Type, unit.tilePos, range);
 }
 
 /**
@@ -838,7 +838,7 @@ static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource)
 	Vec2i forestPos;
 
 	// Code for terrain harvesters. Search for piece of terrain to mine.
-	if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 1000, unit.Player, unit.tilePos, &forestPos)) {
+	if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 1000, *unit.Player, unit.tilePos, &forestPos)) {
 		CommandResourceLoc(unit, forestPos, FlushCommands);
 		return 1;
 	}

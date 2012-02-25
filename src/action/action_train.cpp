@@ -192,8 +192,7 @@ static void AnimateActionTrain(CUnit &unit)
 	CUnit *newUnit = MakeUnit(nType, &player);
 
 	if (newUnit == NULL) { // No more memory :/
-		player.Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
-				_("Unable to train %s"), nType.Name.c_str());
+		player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
 		unit.Wait = CYCLES_PER_SECOND / 6;
 		return ;
 	}
@@ -216,7 +215,7 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 
 	DropOutOnSide(*newUnit, LookingW, &unit);
-	player.Notify(NotifyYellow, newUnit->tilePos.x, newUnit->tilePos.y, _("New %s ready"), nType.Name.c_str());
+	player.Notify(NotifyYellow, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
 	if (&player == ThisPlayer) {
 		PlayUnitSound(*newUnit, VoiceReady);
 	}

@@ -239,7 +239,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 			if (Players[i].Type == PlayerNobody) {
 				continue;
 			}
-			f->printf("SetStartView(%d, %d, %d)\n", i, Players[i].StartX, Players[i].StartY);
+			f->printf("SetStartView(%d, %d, %d)\n", i, Players[i].StartPos.x, Players[i].StartPos.y);
 			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 				i, DefaultResourceNames[WoodCost].c_str(),
 				Players[i].Resources[WoodCost]);
@@ -446,10 +446,10 @@ static void GameTypeTopVsBottom()
 	const int middle = Map.Info.MapHeight / 2;
 
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		const bool top_i = Players[i].StartY <= middle;
+		const bool top_i = Players[i].StartPos.y <= middle;
 
 		for (int j = i + 1; j < PlayerMax - 1; ++j) {
-			const bool top_j = Players[j].StartY <= middle;
+			const bool top_j = Players[j].StartPos.y <= middle;
 
 			if (top_i == top_j) {
 				CommandDiplomacy(i, DiplomacyAllied, j);
@@ -472,10 +472,10 @@ static void GameTypeLeftVsRight()
 	const int middle = Map.Info.MapWidth / 2;
 
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		const bool left_i = Players[i].StartX <= middle;
+		const bool left_i = Players[i].StartPos.x <= middle;
 
 		for (int j = i + 1; j < PlayerMax - 1; ++j) {
-			const bool left_j = Players[j].StartX <= middle;
+			const bool left_j = Players[j].StartPos.x <= middle;
 
 			if (left_i ==left_j) {
 				CommandDiplomacy(i, DiplomacyAllied, j);
@@ -750,8 +750,7 @@ void CreateGame(const std::string &filename, CMap *map)
 		UI.SelectedViewport = UI.Viewports;
 	}
 #endif
-	const Vec2i start = {ThisPlayer->StartX, ThisPlayer->StartY};
-	UI.SelectedViewport->Center(start, PixelTileSize / 2);
+	UI.SelectedViewport->Center(ThisPlayer->StartPos, PixelTileSize / 2);
 
 	//
 	// Various hacks wich must be done after the map is loaded.

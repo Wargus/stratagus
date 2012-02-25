@@ -726,9 +726,8 @@ void AiForce::Update()
 			if (aiunit.Type->CanAttack) {
 				CommandAttack(aiunit, pos, NULL, FlushCommands);
 			} else if (aiunit.Type->CanTransport()) {
-				const Vec2i startPos = {aiunit.Player->StartX, aiunit.Player->StartY};
 				// FIXME : Retrieve unit blocked (transport previously full)
-				CommandMove(aiunit, startPos, FlushCommands);
+				CommandMove(aiunit, aiunit.Player->StartPos, FlushCommands);
 			} else {
 				CommandMove(aiunit, pos, FlushCommands);
 			}

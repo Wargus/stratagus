@@ -171,10 +171,10 @@ static int CclPlayer(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
-			player->StartX = LuaToNumber(l, -1);
+			player->StartPos.x = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, j + 1, 2);
-			player->StartY = LuaToNumber(l, -1);
+			player->StartPos.y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "resources")) {
 			if (!lua_istable(l, j + 1)) {

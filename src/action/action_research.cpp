@@ -112,8 +112,7 @@
 	CPlayer &player = *unit.Player;
 	player.UpgradeTimers.Upgrades[upgrade.ID] += SpeedResearch;
 	if (player.UpgradeTimers.Upgrades[upgrade.ID] >= upgrade.Costs[TimeCost]) {
-		player.Notify(NotifyGreen, unit.tilePos.x, unit.tilePos.y,
-			_("%s: research complete"), type.Name.c_str());
+		player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.Name.c_str());
 		if (&player == ThisPlayer) {
 			CSound *sound = GameSounds.ResearchComplete[player.Race].Sound;
 

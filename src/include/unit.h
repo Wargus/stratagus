@@ -591,7 +591,7 @@ public:
 	/// Initialize unit structure with default values
 	void Init(CUnitType &type);
 	/// Assign unit to player
-	void AssignToPlayer(CPlayer *player);
+	void AssignToPlayer(CPlayer &player);
 
 	/// Draw a single unit
 	void Draw(const CViewport *vp) const;
@@ -1063,7 +1063,7 @@ extern CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last);
 
 	/// Find the neareast piece of terrain with specific flags.
 extern int FindTerrainType(int movemask, int resmask, int rvresult, int range,
-		const CPlayer *player, const Vec2i &startPos, Vec2i *pos);
+		const CPlayer &player, const Vec2i &startPos, Vec2i *pos);
 	/// Find the nearest piece of wood in sight range
 extern int FindWoodInSight(const CUnit &unit, Vec2i *pos);
 

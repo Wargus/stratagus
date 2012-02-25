@@ -450,7 +450,7 @@ void SaveAi(CFile *file)
 **
 **  @param player  The player structure pointer.
 */
-void AiInit(CPlayer *player)
+void AiInit(CPlayer &player)
 {
 	PlayerAi *pai = new PlayerAi;
 
@@ -459,11 +459,9 @@ void AiInit(CPlayer *player)
 		exit(0);
 	}
 
-	pai->Player = player;
-	CAiType *ait = NULL;
+	pai->Player = &player;
 
-	DebugPrint("%d - %p - looking for class %s\n" _C_
-		player->Index _C_ (void *)player _C_ player->AiName.c_str());
+	DebugPrint("%d - looking for class %s\n" _C_ player.Index _C_ player.AiName.c_str());
 	//MAPTODO print the player name (player->Name) instead of the pointer
 
 	//  Search correct AI type.
@@ -472,29 +470,30 @@ void AiInit(CPlayer *player)
 		DebugPrint("AI: Look at the DefineAi() documentation.\n");
 		Exit(0);
 	}
-	int i;
+	size_t i;
+	CAiType *ait = NULL;
 
-	for (i = 0; i < (int)AiTypes.size(); ++i) {
+	for (i = 0; i < AiTypes.size(); ++i) {
 		ait = AiTypes[i];
-		if (!ait->Race.empty() && ait->Race != PlayerRaces.Name[player->Race]) {
+		if (!ait->Race.empty() && ait->Race != PlayerRaces.Name[player.Race]) {
 			continue;
 		}
-		if (!player->AiName.empty() && ait->Class != player->AiName) {
+		if (!player.AiName.empty() && ait->Class != player.AiName) {
 			continue;
 		}
 		break;
 	}
-	if (i == (int)AiTypes.size()) {
+	if (i == AiTypes.size()) {
 		DebugPrint("AI: Found no matching ai scripts at all!\n");
 		// FIXME: surely we can do something better than exit
 		exit(0);
 	}
-	if (player->AiName.empty()) {
+	if (player.AiName.empty()) {
 		DebugPrint("AI: not found!!!!!!!!!!\n");
 		DebugPrint("AI: Using fallback:\n");
 	}
-	DebugPrint("AI: %s:%s with %s:%s\n" _C_ PlayerRaces.Name[player->Race].c_str() _C_
-		!ait->Race.empty() ? ait->Race.c_str() : "All" _C_ player->AiName.c_str() _C_ ait->Class.c_str());
+	DebugPrint("AI: %s:%s with %s:%s\n" _C_ PlayerRaces.Name[player.Race].c_str() _C_
+		!ait->Race.empty() ? ait->Race.c_str() : "All" _C_ player.AiName.c_str() _C_ ait->Class.c_str());
 
 	pai->AiType = ait;
 	pai->Script = ait->Script;
@@ -503,7 +502,7 @@ void AiInit(CPlayer *player)
 	pai->Collect[WoodCost] = 50;
 	pai->Collect[OilCost] = 0;
 
-	player->Ai = pai;
+	player.Ai = pai;
 }
 
 /**
@@ -1034,9 +1033,9 @@ void AiResearchComplete(CUnit &unit, const CUpgrade *what)
 **
 **  @param player  The player structure pointer.
 */
-void AiEachCycle(CPlayer *player)
+void AiEachCycle(CPlayer &player)
 {
-	AiPlayer = player->Ai;
+	AiPlayer = player.Ai;
 }
 
 /**
@@ -1044,9 +1043,9 @@ void AiEachCycle(CPlayer *player)
 **
 **  @param player  The player structure pointer.
 */
-void AiEachSecond(CPlayer *player)
+void AiEachSecond(CPlayer &player)
 {
-	AiPlayer = player->Ai;
+	AiPlayer = player.Ai;
 #ifdef DEBUG
 	if (!AiPlayer) {
 		return;

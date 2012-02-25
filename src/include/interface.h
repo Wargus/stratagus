@@ -351,7 +351,7 @@ extern void DrawResources();
 	/// Set message to display
 extern void SetMessage(const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(1, 2);
 	/// Set message to display with event point
-extern void SetMessageEvent(int x, int y, const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(3, 4);
+extern void SetMessageEvent(const Vec2i &pos, const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(2, 3);
 	/// Center view-point on last event message
 extern void CenterOnMessage();
 	/// Cleanup all messages

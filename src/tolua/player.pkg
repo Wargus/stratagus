@@ -16,9 +16,9 @@ class CPlayer
 	int Race;
 	string AiName;
 
-	int StartX;
-	int StartY;
-	void SetStartView(int x, int y);
+	Vec2i StartPos;
+
+	void SetStartView(const Vec2i &pos);
 
 	int Resources[MaxCosts];
 	int Incomes[MaxCosts];

@@ -216,7 +216,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 	// Wood gone, look somewhere else.
 	if ((Map.Info.IsPointOnMap(pos) == false || Map.ForestOnMap(pos) == false) && (!unit.IX) && (!unit.IY)) {
 		if (!FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 16,
-				unit.Player, unit.CurrentOrder()->goalPos, &pos)) {
+				*unit.Player, unit.CurrentOrder()->goalPos, &pos)) {
 			// no wood in range
 			return -1;
 		} else {
@@ -228,7 +228,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 		case PF_UNREACHABLE:
 			unit.Wait = 10;
 			if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 9999,
-					unit.Player, unit.tilePos, &pos)) {
+					*unit.Player, unit.tilePos, &pos)) {
 				this->goalPos = pos;
 				this->NewResetPath();
 				DebugPrint("Found a better place to harvest %d,%d\n" _C_ pos.x _C_ pos.y);
@@ -859,7 +859,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 	if (resinfo.TerrainHarvester) {
 		Vec2i pos = this->Resource.Pos;
 
-		if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 10, unit.Player, pos, &pos)) {
+		if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 10, *unit.Player, pos, &pos)) {
 			if (depot) {
 				DropOutNearest(unit, pos, depot);
 			}

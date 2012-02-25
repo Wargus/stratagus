@@ -622,12 +622,7 @@ static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 */
 void CButtonPanel::Draw()
 {
-	CPlayer *player;
-	char buf[8];
-
-	//
 	//  Draw background
-	//
 	if (UI.ButtonPanel.G) {
 		UI.ButtonPanel.G->DrawSubClip(0, 0,
 			UI.ButtonPanel.G->Width, UI.ButtonPanel.G->Height,
@@ -641,11 +636,9 @@ void CButtonPanel::Draw()
 	ButtonActionProxy buttons(CurrentButtons);
 
 	Assert(NumSelected > 0);
-	player = Selected[0]->Player;
+	char buf[8];
 
-	//
 	//  Draw all buttons.
-	//
 	for (int i = 0; i < (int)UI.ButtonPanel.Buttons.size(); ++i) {
 		if (buttons[i].Pos == -1) {
 			continue;
@@ -668,7 +661,7 @@ void CButtonPanel::Draw()
 		//
 		// Draw main Icon.
 		//
-		buttons[i].Icon.Icon->DrawUnitIcon(player, UI.ButtonPanel.Buttons[i].Style,
+		buttons[i].Icon.Icon->DrawUnitIcon(UI.ButtonPanel.Buttons[i].Style,
 			GetButtonStatus(&buttons[i], ButtonUnderCursor),
 			UI.ButtonPanel.Buttons[i].X, UI.ButtonPanel.Buttons[i].Y, buf);
 
@@ -1208,8 +1201,7 @@ void CButtonPanel::DoClicked(int button)
 			// FIXME: this can be correct written, with a little more code.
 			if (Selected[0]->CurrentAction() == UnitActionTrain &&
 					!EnableTrainingQueue) {
-				Selected[0]->Player->Notify(NotifyYellow, Selected[0]->tilePos.x,
-					Selected[0]->tilePos.y, _("Unit training queue is full"));
+				Selected[0]->Player->Notify(NotifyYellow, Selected[0]->tilePos, _("Unit training queue is full"));
 			} else if (Selected[0]->Player->CheckLimits(type) >= 0 &&
 					!Selected[0]->Player->CheckUnitType(type)) {
 				//PlayerSubUnitType(player,type);

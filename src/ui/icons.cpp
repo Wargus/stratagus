@@ -190,14 +190,13 @@ void CIcon::DrawIcon(const CPlayer &player, int x, int y) const
 /**
 **  Draw unit icon 'icon' with border on x,y
 **
-**  @param player  Player pointer used for icon colors
 **  @param style   Button style
 **  @param flags   State of icon (clicked, mouse over...)
 **  @param x       X display pixel position
 **  @param y       Y display pixel position
 **  @param text    Optional text to display
 */
-void CIcon::DrawUnitIcon(const CPlayer *, ButtonStyle *style,
+void CIcon::DrawUnitIcon(ButtonStyle *style,
 	unsigned flags, int x, int y, const std::string &text) const
 {
 	ButtonStyle s(*style);

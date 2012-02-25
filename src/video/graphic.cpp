@@ -258,7 +258,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 	int x, int y)
 {
 	if (!UseOpenGL) {
-		GraphicPlayerPixels(Players[player], this);
+		GraphicPlayerPixels(Players[player], *this);
 		DrawFrameClip(frame, x, y);
 	} else {
 		if (!PlayerColorTextures[player]) {
@@ -435,7 +435,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 	int x, int y)
 {
 	if (!UseOpenGL) {
-		GraphicPlayerPixels(Players[player], this);
+		GraphicPlayerPixels(Players[player], *this);
 		DrawFrameClipX(frame, x, y);
 	} else {
 		if (!PlayerColorTextures[player]) {

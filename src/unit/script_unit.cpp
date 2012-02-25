@@ -564,7 +564,8 @@ static int CclUnit(lua_State *l)
 			CclParseOrders(l, *unit);
 			lua_pop(l, 1);
 			// now we know unit's action so we can assign it to a player
-			unit->AssignToPlayer (player);
+			Assert(player != NULL);
+			unit->AssignToPlayer(*player);
 			if (unit->CurrentAction() == UnitActionBuilt) {
 				DebugPrint("HACK: the building is not ready yet\n");
 				// HACK: the building is not ready yet
@@ -608,7 +609,8 @@ static int CclUnit(lua_State *l)
 	// have orders for those units.  They should appear here as if
 	// they were just created.
 	if (!unit->Player) {
-		unit->AssignToPlayer(player);
+		Assert(player);
+		unit->AssignToPlayer(*player);
 		UpdateForNewUnit(*unit, 0);
 	}
 

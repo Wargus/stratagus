@@ -170,7 +170,7 @@ static int AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, int 
 	// Look if we can build at current place.
 	//
 	if (CanBuildUnitType(&worker, type, pos, 1) &&
-		!AiEnemyUnitsInDistance(worker.Player, NULL, pos, 8)) {
+		!AiEnemyUnitsInDistance(*worker.Player, NULL, pos, 8)) {
 		if (AiCheckSurrounding(worker, type, pos.x, pos.y, backupok) && surround) {
 			*dpos = pos;
 			return 1;
@@ -224,7 +224,7 @@ static int AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, int 
 				// Look if we can build here and no enemies nearby.
 				//
 				if (CanBuildUnitType(&worker, type, pos, 1) &&
-						!AiEnemyUnitsInDistance(worker.Player, NULL, pos, 8)) {
+						!AiEnemyUnitsInDistance(*worker.Player, NULL, pos, 8)) {
 					if (AiCheckSurrounding(worker, type, pos.x, pos.y, backupok) && surround) {
 						*dpos = pos;
 						delete[] points;

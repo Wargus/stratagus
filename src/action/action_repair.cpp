@@ -132,10 +132,8 @@ bool COrder_Repair::RepairUnit(const CUnit &unit, CUnit &goal)
 	// Check if enough resources are available
 	for (int i = 1; i < MaxCosts; ++i) {
 		if (player.Resources[i] < goal.Type->RepairCosts[i]) {
-			char buf[100];
-
-			snprintf(buf, 100, _("We need more %s for repair!"), DefaultResourceNames[i].c_str());
-			player.Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y, buf);
+			player.Notify(NotifyYellow, unit.tilePos,
+				_("We need more %s for repair!"), DefaultResourceNames[i].c_str());
 			return true;
 		}
 	}

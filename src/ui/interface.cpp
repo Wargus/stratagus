@@ -773,7 +773,7 @@ int HandleCheats(const std::string &input)
 			ThisPlayer->AiEnabled = 1;
 			ThisPlayer->Type = PlayerComputer;
 			if (!ThisPlayer->Ai) {
-				AiInit(ThisPlayer);
+				AiInit(*ThisPlayer);
 			}
 			SetMessage("I'm the BORG, resistance is futile!");
 		}

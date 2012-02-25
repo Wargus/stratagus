@@ -804,14 +804,14 @@ static void DrawEditorPanel()
 	icon = Editor.Select.Icon;
 	Assert(icon);
 	// FIXME: wrong button style
-	icon->DrawUnitIcon(Players, UI.SingleSelectedButton->Style,
+	icon->DrawUnitIcon(UI.SingleSelectedButton->Style,
 		(ButtonUnderCursor == SelectButton ? IconActive : 0) |
 			(Editor.State == EditorSelecting ? IconSelected : 0),
 		x, y, "");
 	icon = Editor.Units.Icon;
 	Assert(icon);
 	// FIXME: wrong button style
-	icon->DrawUnitIcon(Players, UI.SingleSelectedButton->Style,
+	icon->DrawUnitIcon(UI.SingleSelectedButton->Style,
 		(ButtonUnderCursor == UnitButton ? IconActive : 0) |
 			(Editor.State == EditorEditUnit ? IconSelected : 0),
 		x + UNIT_ICON_X, y + UNIT_ICON_Y, "");
@@ -825,7 +825,7 @@ static void DrawEditorPanel()
 	if (Editor.StartUnit) {
 		icon = Editor.StartUnit->Icon.Icon;
 		Assert(icon);
-		icon->DrawUnitIcon(Players, UI.SingleSelectedButton->Style,
+		icon->DrawUnitIcon(UI.SingleSelectedButton->Style,
 			(ButtonUnderCursor == StartButton ? IconActive : 0) |
 				(Editor.State == EditorSetStartLocation ? IconSelected : 0),
 			x + START_ICON_X, y + START_ICON_Y, "");
@@ -941,8 +941,7 @@ static void DrawStartLocations()
 
 		for (int i = 0; i < PlayerMax; i++) {
 			if (Map.Info.PlayerType[i] != PlayerNobody && Map.Info.PlayerType[i] != PlayerNeutral) {
-				const Vec2i startTilePos = {Players[i].StartX, Players[i].StartY};
-				const PixelPos startScreenPos = vp->TilePosToScreen_TopLeft(startTilePos);
+				const PixelPos startScreenPos = vp->TilePosToScreen_TopLeft(Players[i].StartPos);
 
 				if (type) {
 					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos.x, startScreenPos.y);
@@ -1336,8 +1335,7 @@ static void EditorCallbackButtonDown(unsigned button)
 					}
 				}
 			} else if (Editor.State == EditorSetStartLocation) {
-				Players[Editor.SelectedPlayer].StartX = tilePos.x;
-				Players[Editor.SelectedPlayer].StartY = tilePos.y;
+				Players[Editor.SelectedPlayer].StartPos = tilePos;
 			}
 		} else if (MouseButtons & MiddleButton) {
 			// enter move map mode

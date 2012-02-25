@@ -262,12 +262,11 @@ static int CclCenterMap(lua_State *l)
 */
 static int CclSetStartView(lua_State *l)
 {
-	int p;
-
 	LuaCheckArgs(l, 3);
-	p = LuaToNumber(l, 1);
-	Players[p].StartX = LuaToNumber(l, 2);
-	Players[p].StartY = LuaToNumber(l, 3);
+
+	const int p = LuaToNumber(l, 1);
+	Players[p].StartPos.x = LuaToNumber(l, 2);
+	Players[p].StartPos.y = LuaToNumber(l, 3);
 
 	return 0;
 }

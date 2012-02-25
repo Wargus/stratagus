@@ -404,47 +404,43 @@ bool CUnit::StoreOrder(COrder* order)
 **
 **  @param player  player which have the unit.
 */
-void CUnit::AssignToPlayer(CPlayer *player)
+void CUnit::AssignToPlayer(CPlayer &player)
 {
-	CUnitType *type;  // type of unit.
+	CUnitType &type = *Type;
 
-	Assert(player);
-	type = Type;
 
-	//
 	// Build player unit table
-	//
-	if (!type->Vanishes && CurrentAction() != UnitActionDie) {
-		PlayerSlot = player->Units + player->TotalNumUnits++;
+	if (!type.Vanishes && CurrentAction() != UnitActionDie) {
+		PlayerSlot = player.Units + player.TotalNumUnits++;
 		if (!SaveGameLoading) {
 			// If unit is dieing, it's already been lost by all players
 			// don't count again
-			if (type->Building) {
+			if (type.Building) {
 				// FIXME: support more races
-				if (!type->Wall && type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
-					player->TotalBuildings++;
+				if (!type.Wall && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
+					player.TotalBuildings++;
 				}
 			} else {
-				player->TotalUnits++;
+				player.TotalUnits++;
 			}
 		}
 		*PlayerSlot = this;
 
-		player->UnitTypesCount[type->Slot]++;
-		player->Demand += type->Demand; // food needed
+		player.UnitTypesCount[type.Slot]++;
+		player.Demand += type.Demand; // food needed
 	}
 
 
 	// Don't Add the building if it's dieing, used to load a save game
-	if (type->Building && CurrentAction() != UnitActionDie) {
+	if (type.Building && CurrentAction() != UnitActionDie) {
 		// FIXME: support more races
-		if (!type->Wall && type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
-			player->NumBuildings++;
+		if (!type.Wall && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
+			player.NumBuildings++;
 		}
 	}
-	Player = player;
-	Stats = &type->Stats[Player->Index];
-	Colors = &player->UnitColors;
+	Player = &player;
+	Stats = &type.Stats[Player->Index];
+	Colors = &player.UnitColors;
 	if (!SaveGameLoading) {
 		if (UnitTypeVar.GetNumberVariable()) {
 			Assert(Variable);
@@ -478,7 +474,7 @@ CUnit *MakeUnit(CUnitType &type, CPlayer *player)
 	unit->Init(type);
 	// Only Assign if a Player was specified
 	if (player) {
-		unit->AssignToPlayer(player);
+		unit->AssignToPlayer(*player);
 	}
 
 	// Increase the max resources limit
@@ -934,104 +930,81 @@ void UnitLost(CUnit &unit)
 {
 	CUnit *temp;
 	CBuildRestrictionOnTop *b;
-	const CUnitType *type;
-	CPlayer *player = unit.Player;
+	CPlayer &player = *unit.Player;
 
-	Assert(player);  // Next code didn't support no player!
+	Assert(&player);  // Next code didn't support no player!
 
-	//
 	//  Call back to AI, for killed or lost units.
-	//
 	if (Editor.Running == EditorNotRunning){
-		if (player && player->AiEnabled) {
+		if (player.AiEnabled) {
 			AiUnitKilled(unit);
 		} else {
-			//
 			//  Remove unit from its groups
-			//
 			if (unit.GroupId) {
 				RemoveUnitFromGroups(unit);
 			}
 		}
 	}
 
-	//
 	//  Remove the unit from the player's units table.
-	//
-	type = unit.Type;
-	if (player && !type->Vanishes) {
+
+	const CUnitType &type = *unit.Type;
+	if (!type.Vanishes) {
 		Assert(*unit.PlayerSlot == &unit);
-		temp = player->Units[--player->TotalNumUnits];
+		temp = player.Units[--player.TotalNumUnits];
 		temp->PlayerSlot = unit.PlayerSlot;
 		*unit.PlayerSlot = temp;
-		player->Units[player->TotalNumUnits] = NULL;
+		player.Units[player.TotalNumUnits] = NULL;
 
-		if (unit.Type->Building) {
+		if (type.Building) {
 			// FIXME: support more races
-			if (!type->Wall && type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
-				player->NumBuildings--;
+			if (!type.Wall && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
+				player.NumBuildings--;
 			}
 		}
-
 		if (unit.CurrentAction() != UnitActionBuilt) {
-			player->UnitTypesCount[type->Slot]--;
+			player.UnitTypesCount[type.Slot]--;
 		}
 	}
 
-
-	//
 	//  Handle unit demand. (Currently only food supported.)
-	//
-	player->Demand -= type->Demand;
+	player.Demand -= type.Demand;
 
-	//
 	//  Update information.
-	//
 	if (unit.CurrentAction() != UnitActionBuilt) {
-		player->Supply -= type->Supply;
+		player.Supply -= type.Supply;
 		// Decrease resource limit
 		for (int i = 0; i < MaxCosts; ++i) {
-			if (unit.Player->MaxResources[i] != -1 && type->_Storing[i]) {
-				const int newMaxValue = unit.Player->MaxResources[i] - type->_Storing[i];
+			if (player.MaxResources[i] != -1 && type._Storing[i]) {
+				const int newMaxValue = player.MaxResources[i] - type._Storing[i];
 
-				unit.Player->MaxResources[i] = std::max(0, newMaxValue);
-				unit.Player->SetResource(i, unit.Player->Resources[i]);
+				player.MaxResources[i] = std::max(0, newMaxValue);
+				player.SetResource(i, player.Resources[i]);
 			}
 		}
-		//
 		//  Handle income improvements, look if a player loses a building
 		//  which have given him a better income, find the next best
 		//  income.
-		//
 		for (int i = 1; i < MaxCosts; ++i) {
-			if (player->Incomes[i] && type->ImproveIncomes[i] == player->Incomes[i]) {
-				int m;
-				int j;
+			if (player.Incomes[i] && type.ImproveIncomes[i] == player.Incomes[i]) {
+				int m = DefaultIncomes[i];
 
-				m = DefaultIncomes[i];
-				for (j = 0; j < player->TotalNumUnits; ++j) {
-					if (m < player->Units[j]->Type->ImproveIncomes[i]) {
-						m = player->Units[j]->Type->ImproveIncomes[i];
-					}
+				for (int j = 0; j < player.TotalNumUnits; ++j) {
+					m = std::max(m, player.Units[j]->Type->ImproveIncomes[i]);
 				}
-				player->Incomes[i] = m;
+				player.Incomes[i] = m;
 			}
 		}
 	}
 
-	//
 	//  Handle order cancels.
-	//
 	unit.CurrentOrder()->Cancel(unit);
 
-	DebugPrint("%d: Lost %s(%d)\n"
-		_C_ unit.Player->Index
-		_C_ unit.Type->Ident.c_str()
-		_C_ UnitNumber(unit));
+	DebugPrint("%d: Lost %s(%d)\n" _C_ player.Index _C_ type.Ident.c_str() _C_ UnitNumber(unit));
 
 	// Destroy resource-platform, must re-make resource patch.
 	if ((b = OnTopDetails(unit, NULL)) != NULL) {
-		if (b->ReplaceOnDie && (unit.Type->GivesResource && unit.ResourcesHeld != 0)) {
+		if (b->ReplaceOnDie && (type.GivesResource && unit.ResourcesHeld != 0)) {
 			temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, &Players[PlayerNumNeutral]);
 			if (temp == NoUnitP) {
 				DebugPrint("Unable to allocate Unit");
@@ -1040,9 +1013,9 @@ void UnitLost(CUnit &unit)
 			}
 		}
 	}
-	Assert(player->NumBuildings <= UnitMax);
-	Assert(player->TotalNumUnits <= UnitMax);
-	Assert(player->UnitTypesCount[type->Slot] <= UnitMax);
+	Assert(player.NumBuildings <= UnitMax);
+	Assert(player.TotalNumUnits <= UnitMax);
+	Assert(player.UnitTypesCount[type.Slot] <= UnitMax);
 }
 
 /**
@@ -1069,29 +1042,23 @@ void UnitClearOrders(CUnit &unit)
 */
 void UpdateForNewUnit(const CUnit &unit, int upgrade)
 {
-	const CUnitType *type = unit.Type;
-	CPlayer *player = unit.Player;
+	const CUnitType &type = *unit.Type;
+	CPlayer &player = *unit.Player;
 
-	//
 	// Handle unit supply and max resources.
 	// Note an upgraded unit can't give more supply.
-	//
 	if (!upgrade) {
-		player->Supply += type->Supply;
+		player.Supply += type.Supply;
 		for (int i = 0; i < MaxCosts; ++i) {
-			if (unit.Player->MaxResources[i] != -1 && type->_Storing[i]) {
-				unit.Player->MaxResources[i] += type->_Storing[i];
+			if (player.MaxResources[i] != -1 && type._Storing[i]) {
+				player.MaxResources[i] += type._Storing[i];
 			}
 		}
 	}
 
-	//
 	// Update resources
-	//
 	for (int u = 1; u < MaxCosts; ++u) {
-		if (player->Incomes[u] < unit.Type->ImproveIncomes[u]) {
-			player->Incomes[u] = unit.Type->ImproveIncomes[u];
-		}
+		player.Incomes[u] = std::max(player.Incomes[u], type.ImproveIncomes[u]);
 	}
 }
 
@@ -2144,7 +2111,7 @@ void DropOutAll(const CUnit &source)
 int FindWoodInSight(const CUnit &unit, Vec2i *pos)
 {
 	return FindTerrainType(unit.Type->MovementMask, 0, MapFieldForest, 9999,
-		unit.Player, unit.tilePos, pos);
+		*unit.Player, unit.tilePos, pos);
 }
 
 /**
@@ -2169,7 +2136,7 @@ int FindWoodInSight(const CUnit &unit, Vec2i *pos)
 **  @return            True if wood was found.
 */
 int FindTerrainType(int movemask, int resmask, int rvresult, int range,
-	const CPlayer *player, const Vec2i &startPos, Vec2i *terrainPos)
+	const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
 {
 	const Vec2i offset[] = {{0, -1}, {-1, 0}, {1, 0}, {0, 1}, {-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
 	Vec2i *points;
@@ -2216,7 +2183,7 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 				 *	AI players (our exploration code is too week for real
 				 *	competition with human players)
 				 */
-				if (*m || (player && !player->AiEnabled &&!Map.IsFieldExplored(*player, pos))) {
+				if (*m || (!player.AiEnabled &&!Map.IsFieldExplored(player, pos))) {
 					continue;
 				}
 				// Look if found what was required.
@@ -2936,8 +2903,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 				}
 			}
 		}
-		target.Player->Notify(NotifyRed, target.tilePos.x, target.tilePos.y,
-			_("%s attacked"), target.Type->Name.c_str());
+		target.Player->Notify(NotifyRed, target.tilePos, _("%s attacked"), target.Type->Name.c_str());
 
 		if (attacker && !target.Type->Building) {
 			if (target.Player->AiEnabled) {

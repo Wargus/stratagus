@@ -33,255 +33,6 @@
 //@{
 
 /*----------------------------------------------------------------------------
---  Documentation
-----------------------------------------------------------------------------*/
-
-/**
-**  @class CPlayer player.h
-**
-**  \#include "player.h"
-**
-**  This structure contains all informations about a player in game.
-**
-**  The player structure members:
-**
-**  CPlayer::Player
-**
-**    This is the unique slot number. It is not possible that two
-**    players have the same slot number at the same time. The slot
-**    numbers are reused in the future. This means if a player is
-**    defeated, a new player can join using this slot. Currently
-**    #PlayerMax (16) players are supported. This member is used to
-**    access bit fields.
-**    Slot #PlayerNumNeutral (15) is reserved for the neutral units
-**    like gold-mines or critters.
-**
-**    @note Should call this member Slot?
-**
-**  CPlayer::Name
-**
-**    Name of the player used for displays and network game.
-**    It is restricted to 15 characters plus final zero.
-**
-**  CPlayer::Type
-**
-**    Type of the player. This field is setup from the level (map).
-**    We support currently #PlayerNeutral,
-**    #PlayerNobody, #PlayerComputer, #PlayerPerson,
-**    #PlayerRescuePassive and #PlayerRescueActive.
-**    @see #PlayerTypes.
-**
-**  CPlayer::RaceName
-**
-**    Name of the race to which the player belongs, used to select
-**    the user interface and the AI.
-**    We have 'orc', 'human', 'alliance' or 'mythical'. Should
-**    only be used during configuration and not during runtime.
-**
-**  CPlayer::Race
-**
-**    Race number of the player. This field is setup from the level
-**    map. This number is mapped with #PlayerRaces to the symbolic
-**    name CPlayer::RaceName.
-**
-**  CPlayer::AiName
-**
-**    AI name for computer. This field is setup
-**    from the map. Used to select the AI for the computer
-**    player.
-**
-**  CPlayer::Team
-**
-**    Team of player. Selected during network game setup. All players
-**    of the same team are allied and enemy to all other teams.
-**    @note It is planned to show the team on the map.
-**
-**  CPlayer::Enemy
-**
-**    A bit field which contains the enemies of this player.
-**    If CPlayer::Enemy & (1<<CPlayer::Player) != 0 its an enemy.
-**    Setup during startup using the CPlayer::Team, can later be
-**    changed with diplomacy. CPlayer::Enemy and CPlayer::Allied
-**    are combined, if none bit is set, the player is neutral.
-**    @note You can be allied to a player, which sees you as enemy.
-**
-**  CPlayer::Allied
-**
-**    A bit field which contains the allies of this player.
-**    If CPlayer::Allied & (1<<CPlayer::Player) != 0 its an allied.
-**    Setup during startup using the Player:Team, can later be
-**    changed with diplomacy. CPlayer::Enemy and CPlayer::Allied
-**    are combined, if none bit is set, the player is neutral.
-**    @note You can be allied to a player, which sees you as enemy.
-**
-**  CPlayer::SharedVision
-**
-**    A bit field which contains shared vision for this player.
-**    Shared vision only works when it's activated both ways. Really.
-**
-**  CPlayer::StartX CPlayer::StartY
-**
-**    The tile map coordinates of the player start position. 0,0 is
-**    the upper left on the map. This members are setup from the
-**    map and only important for the game start.
-**    Ignored if game starts with level settings. Used to place
-**    the initial workers if you play with 1 or 3 workers.
-**
-**  CPlayer::Resources[::MaxCosts]
-**
-**    How many resources the player owns. Needed for building
-**    units and structures.
-**    @see _costs_, TimeCost, GoldCost, WoodCost, OilCost, MaxCosts.
-**
-**  CPlayer::MaxResources[::MaxCosts]
-**
-**    How many resources the player can store at the moment. 
-**
-**  CPlayer::Incomes[::MaxCosts]
-**
-**    Income of the resources, when they are delivered at a store.
-**    @see _costs_, TimeCost, GoldCost, WoodCost, OilCost, MaxCosts.
-**
-**  CPlayer::LastResources[::MaxCosts]
-**
-**    Keeps track of resources in time (used for calculating
-**    CPlayer::Revenue, see below)
-**
-**  CPlayer::Revenue[::MaxCosts]
-**
-**    Production of resources per minute (or estimates)
-**    Used just as information (statistics) for the player...
-**
-**  CPlayer::UnitTypesCount[::UnitTypeMax]
-**
-**    Total count for each different unit type. Used by the AI and
-**    for dependencies checks. The addition of all counts should
-**    be CPlayer::TotalNumUnits.
-**    @note Should not use the maximum number of unit-types here,
-**    only the real number of unit-types used.
-**
-**  CPlayer::AiEnabled
-**
-**    If the player is controlled by the computer and this flag is
-**    true, than the player is handled by the AI on this local
-**    computer.
-**
-**    @note Currently the AI is calculated parallel on all computers
-**    in a network play. It is planned to change this.
-**
-**  CPlayer::Ai
-**
-**    AI structure pointer. Please look at #PlayerAi for more
-**    informations.
-**
-**  CPlayer::Units
-**
-**    A table of all (CPlayer::TotalNumUnits) units of the player.
-**
-**  CPlayer::TotalNumUnits
-**
-**    Total number of units (incl. buildings) in the CPlayer::Units
-**    table.
-**
-**  CPlayer::Demand
-**
-**    Total unit demand, used to demand limit.
-**    A player can only build up to CPlayer::Food units and not more
-**    than CPlayer::FoodUnitLimit units.
-**
-**    @note that CPlayer::NumFoodUnits > CPlayer::Food, when enough
-**    farms are destroyed.
-**
-**  CPlayer::NumBuildings
-**
-**    Total number buildings, units that don't need food.
-**
-**  CPlayer::Food
-**
-**    Number of food available/produced. Player can't train more
-**    CPlayer::NumFoodUnits than this.
-**    @note that all limits are always checked.
-**
-**  CPlayer::FoodUnitLimit
-**
-**    Number of food units allowed. Player can't train more
-**    CPlayer::NumFoodUnits than this.
-**    @note that all limits are always checked.
-**
-**  CPlayer::BuildingLimit
-**
-**    Number of buildings allowed.  Player can't build more
-**    CPlayer::NumBuildings than this.
-**    @note that all limits are always checked.
-**
-**  CPlayer::TotalUnitLimit
-**
-**    Number of total units allowed. Player can't have more
-**    CPlayer::NumFoodUnits+CPlayer::NumBuildings=CPlayer::TotalNumUnits
-**    this.
-**    @note that all limits are always checked.
-**
-**  CPlayer::Score
-**
-**    Total number of points. You can get points for killing units,
-**    destroying buildings ...
-**
-**  CPlayer::TotalUnits
-**
-**    Total number of units made.
-**
-**  CPlayer::TotalBuildings
-**
-**    Total number of buildings made.
-**
-**  CPlayer::TotalResources[::MaxCosts]
-**
-**    Total number of resources collected.
-**    @see _costs_, TimeCost, GoldCost, WoodCost, OilCost, MaxCosts.
-**
-**  CPlayer::TotalRazings
-**
-**    Total number of buildings destroyed.
-**
-**  CPlayer::TotalKills
-**
-**    Total number of kills.
-**
-**  CPlayer::Color
-**
-**    Color of units of this player on the minimap. Index number
-**    into the global palette.
-**
-**  CPlayer::UnitColors
-**
-**    Unit colors of this player. Contains the hardware dependent
-**    pixel values for the player colors (palette index #208-#211).
-**    Setup from the global palette.
-**    @note Index #208-#211 are various SHADES of the team color
-**    (#208 is brightest shade, #211 is darkest shade) .... these
-**    numbers are NOT red=#208, blue=#209, etc
-**
-**  CPlayer::Allow
-**
-**    Contains which unit-types and upgrades are allowed for the
-**    player. Possible values are:
-**    @li  `A' -- allowed,
-**    @li  `F' -- forbidden,
-**    @li  `R' -- acquired, perhaps other values
-**    @li  `Q' -- acquired but forbidden (does it make sense?:))
-**    @li  `E' -- enabled, allowed by level but currently forbidden
-**    @see CAllow
-**
-**  CPlayer::UpgradeTimers
-**
-**    Timer for the upgrades. One timer for all possible upgrades.
-**    Initial 0 counted up by the upgrade action, until it reaches
-**    the upgrade time.
-**    @see _upgrade_timers_
-**    @note it is planned to combine research for faster upgrades.
-*/
-
-/*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
@@ -292,6 +43,7 @@
 #ifndef __MAP_TILE_H__
 #include "tile.h"
 #endif
+#include "vec2i.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -301,6 +53,7 @@ class CUnit;
 class CUnitType;
 class PlayerAi;
 class CFile;
+
 
 /*----------------------------------------------------------------------------
 --  Player type
@@ -323,9 +76,9 @@ public:
 	unsigned int Allied;        /// allied bit field for this player
 	unsigned int SharedVision;  /// shared vision bit field
 
-	int StartX;  /// map tile start X position
-	int StartY;  /// map tile start Y position
-	inline void SetStartView(int x, int y) { StartX = x; StartY = y; }
+	Vec2i StartPos;  /// map tile start position
+
+	inline void SetStartView(const Vec2i &pos) { StartPos = pos; }
 
 	int Resources[MaxCosts];      /// resources in store
 	int MaxResources[MaxCosts];   /// max resources can be stored
@@ -402,7 +155,10 @@ public:
 	int HaveUnitTypeByIdent(const std::string &ident) const;
 
 	/// Notify player about a problem
-	void Notify(int type, int x, int y, const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(5, 6); // Don't forget to count this
+	void Notify(int type, const Vec2i &pos, const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(4, 5); // Don't forget to count this
+	/// Notify player about a problem
+	void Notify(const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(2, 3); // Don't forget to count this
+
 
 	/**
 	**  Check if the player index is an enemy
@@ -536,7 +292,7 @@ extern void CleanPlayers();
 	/// Clean up races
 extern void CleanRaces();
 	/// Save players
-extern void SavePlayers(CFile *file);
+extern void SavePlayers(CFile &file);
 
 	/// Create a new player
 extern void CreatePlayer(int type);
@@ -550,7 +306,7 @@ extern void PlayersEachCycle();
 extern void PlayersEachSecond(int player);
 
 	/// Change current color set to new player of the sprite
-extern void GraphicPlayerPixels(CPlayer &player, const CGraphic *sprite);
+extern void GraphicPlayerPixels(CPlayer &player, const CGraphic &sprite);
 
 	/// Output debug informations for players
 extern void DebugPlayers();
@@ -563,8 +319,7 @@ void FreePlayerColors();
 extern void PlayerCclRegister();
 
 	/// Allowed to select multiple units, maybe not mine
-#define CanSelectMultipleUnits(player) \
-	(&(player) == ThisPlayer || ThisPlayer->IsTeamed(player))
+inline bool CanSelectMultipleUnits(const CPlayer &player) { return &player == ThisPlayer || ThisPlayer->IsTeamed(player); }
 
 //@}
 

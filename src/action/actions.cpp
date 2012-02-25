@@ -273,12 +273,12 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 	Vec2i ressourceLoc;
 
 	//  Find the closest piece of wood next to a tile where the unit can move
-	if (!FindTerrainType(0, (harvester.Type->MovementMask), 1, 20, harvester.Player, pos, &ressourceLoc)) {
+	if (!FindTerrainType(0, (harvester.Type->MovementMask), 1, 20, *harvester.Player, pos, &ressourceLoc)) {
 		DebugPrint("FIXME: Give up???\n");
 	}
 	// Max Value > 1
 	if ((MyAbs(ressourceLoc.x - pos.x) | MyAbs(ressourceLoc.y - pos.y)) > 1) {
-		if (!FindTerrainType(0, MapFieldForest, 0, 20, harvester.Player, ressourceLoc, &ressourceLoc)) {
+		if (!FindTerrainType(0, MapFieldForest, 0, 20, *harvester.Player, ressourceLoc, &ressourceLoc)) {
 			DebugPrint("FIXME: Give up???\n");
 		}
 	} else {

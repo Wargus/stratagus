@@ -203,11 +203,11 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 			if (!CanCastSpell(unit, &spell, order.GetGoal(), order.goalPos.x, order.goalPos.y)) {
 				// Notify player about this problem
 				if (unit.Variable[MANA_INDEX].Value < spell.ManaCost) {
-					unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
+					unit.Player->Notify(NotifyYellow, unit.tilePos,
 						_("%s: not enough mana for spell: %s"),
 						unit.Type->Name.c_str(), spell.Name.c_str());
 				} else {
-					unit.Player->Notify(NotifyYellow, unit.tilePos.x, unit.tilePos.y,
+					unit.Player->Notify(NotifyYellow, unit.tilePos,
 						_("%s: can't cast spell: %s"),
 						unit.Type->Name.c_str(), spell.Name.c_str());
 				}

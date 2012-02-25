@@ -602,7 +602,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			const unsigned int flags = (ButtonAreaUnderCursor == ButtonAreaTraining && ButtonUnderCursor == 0) ?
 					(IconActive | (MouseButtons & LeftButton)) : 0;
 
-			order.GetUnitType().Icon.Icon->DrawUnitIcon(unit.Player,
+			order.GetUnitType().Icon.Icon->DrawUnitIcon(
 				UI.SingleTrainingButton->Style, flags,
 				UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y, "");
 		}
@@ -622,7 +622,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 							&& static_cast<size_t>(ButtonUnderCursor) == i) ?
 							(IconActive | (MouseButtons & LeftButton)) : 0;
 
-					order.GetUnitType().Icon.Icon->DrawUnitIcon(unit.Player,
+					order.GetUnitType().Icon.Icon->DrawUnitIcon(
 						 UI.TrainingButtons[i].Style, flag,
 						UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y, "");
 				}
@@ -682,7 +682,7 @@ static void DrawUnitInfo(CUnit &unit)
 		const int flag = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
 				(IconActive | (MouseButtons & LeftButton)) : 0;
 
-		type.Icon.Icon->DrawUnitIcon(unit.Player, UI.SingleSelectedButton->Style, flag, x, y, "");
+		type.Icon.Icon->DrawUnitIcon(UI.SingleSelectedButton->Style, flag, x, y, "");
 	}
 
 	if (unit.Player != ThisPlayer && !ThisPlayer->IsAllied(*unit.Player) )
@@ -702,7 +702,7 @@ static void DrawUnitInfo(CUnit &unit)
 			case UnitActionUpgradeTo: { //  Building upgrading to better type.
 				if (UI.UpgradingButton) {
 					const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo*>(unit.CurrentOrder());
-					order.GetUnitType().Icon.Icon->DrawUnitIcon(unit.Player,
+					order.GetUnitType().Icon.Icon->DrawUnitIcon(
 						UI.UpgradingButton->Style,
 						(ButtonAreaUnderCursor == ButtonAreaUpgrading &&
 							ButtonUnderCursor == 0) ?
@@ -715,7 +715,7 @@ static void DrawUnitInfo(CUnit &unit)
 				if (UI.ResearchingButton) {
 					COrder_Research &order = *static_cast<COrder_Research *>(unit.CurrentOrder());
 
-					order.GetUpgrade().Icon->DrawUnitIcon(unit.Player,
+					order.GetUpgrade().Icon->DrawUnitIcon(
 						UI.ResearchingButton->Style,
 						(ButtonAreaUnderCursor == ButtonAreaResearching &&
 							ButtonUnderCursor == 0) ?
@@ -738,7 +738,7 @@ static void DrawUnitInfo(CUnit &unit)
 
 		for (int i = 0; i < unit.InsideCount; ++i, uins = uins->NextContained) {
 			if (uins->Boarded && j < UI.TransportingButtons.size()) {
-				uins->Type->Icon.Icon->DrawUnitIcon(unit.Player, UI.TransportingButtons[j].Style,
+				uins->Type->Icon.Icon->DrawUnitIcon(UI.TransportingButtons[j].Style,
 					(ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
 					UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y, "");
@@ -1179,8 +1179,10 @@ void ShiftMessagesEvent()
 **  @note FIXME: vladi: I know this can be just separated func w/o msg but
 **               it is handy to stick all in one call, someone?
 */
-void SetMessageEvent(int x, int y, const char *fmt, ...)
+void SetMessageEvent(const Vec2i& pos, const char *fmt, ...)
 {
+	Assert(Map.Info.IsPointOnMap(pos));
+
 	char temp[128];
 	va_list va;
 
@@ -1194,13 +1196,11 @@ void SetMessageEvent(int x, int y, const char *fmt, ...)
 		ShiftMessagesEvent();
 	}
 
-	if (x != -1) {
-		strcpy_s(MessagesEvent[MessagesEventCount], sizeof(MessagesEvent[MessagesEventCount]), temp);
-		MessagesEventX[MessagesEventCount] = x;
-		MessagesEventY[MessagesEventCount] = y;
-		MessagesEventIndex = MessagesEventCount;
-		++MessagesEventCount;
-	}
+	strcpy_s(MessagesEvent[MessagesEventCount], sizeof(MessagesEvent[MessagesEventCount]), temp);
+	MessagesEventX[MessagesEventCount] = pos.x;
+	MessagesEventY[MessagesEventCount] = pos.y;
+	MessagesEventIndex = MessagesEventCount;
+	++MessagesEventCount;
 }
 
 /**
@@ -1486,7 +1486,7 @@ static void DrawInfoPanelMultipleSelected()
 		CUIButton *button = &UI.SelectedButtons[i];
 		bool mouseOver = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i);
 
-		Selected[i]->Type->Icon.Icon->DrawUnitIcon(ThisPlayer, button->Style,
+		Selected[i]->Type->Icon.Icon->DrawUnitIcon(button->Style,
 			mouseOver ? (IconActive | (MouseButtons & LeftButton)) : 0,
 			button->X, button->Y, "");
 		UiDrawLifeBar(*Selected[i], button->X, button->Y);

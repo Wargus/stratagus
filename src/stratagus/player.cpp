@@ -55,6 +55,255 @@
 #include "actions.h"
 
 /*----------------------------------------------------------------------------
+--  Documentation
+----------------------------------------------------------------------------*/
+
+/**
+**  @class CPlayer player.h
+**
+**  \#include "player.h"
+**
+**  This structure contains all informations about a player in game.
+**
+**  The player structure members:
+**
+**  CPlayer::Player
+**
+**    This is the unique slot number. It is not possible that two
+**    players have the same slot number at the same time. The slot
+**    numbers are reused in the future. This means if a player is
+**    defeated, a new player can join using this slot. Currently
+**    #PlayerMax (16) players are supported. This member is used to
+**    access bit fields.
+**    Slot #PlayerNumNeutral (15) is reserved for the neutral units
+**    like gold-mines or critters.
+**
+**    @note Should call this member Slot?
+**
+**  CPlayer::Name
+**
+**    Name of the player used for displays and network game.
+**    It is restricted to 15 characters plus final zero.
+**
+**  CPlayer::Type
+**
+**    Type of the player. This field is setup from the level (map).
+**    We support currently #PlayerNeutral,
+**    #PlayerNobody, #PlayerComputer, #PlayerPerson,
+**    #PlayerRescuePassive and #PlayerRescueActive.
+**    @see #PlayerTypes.
+**
+**  CPlayer::RaceName
+**
+**    Name of the race to which the player belongs, used to select
+**    the user interface and the AI.
+**    We have 'orc', 'human', 'alliance' or 'mythical'. Should
+**    only be used during configuration and not during runtime.
+**
+**  CPlayer::Race
+**
+**    Race number of the player. This field is setup from the level
+**    map. This number is mapped with #PlayerRaces to the symbolic
+**    name CPlayer::RaceName.
+**
+**  CPlayer::AiName
+**
+**    AI name for computer. This field is setup
+**    from the map. Used to select the AI for the computer
+**    player.
+**
+**  CPlayer::Team
+**
+**    Team of player. Selected during network game setup. All players
+**    of the same team are allied and enemy to all other teams.
+**    @note It is planned to show the team on the map.
+**
+**  CPlayer::Enemy
+**
+**    A bit field which contains the enemies of this player.
+**    If CPlayer::Enemy & (1<<CPlayer::Player) != 0 its an enemy.
+**    Setup during startup using the CPlayer::Team, can later be
+**    changed with diplomacy. CPlayer::Enemy and CPlayer::Allied
+**    are combined, if none bit is set, the player is neutral.
+**    @note You can be allied to a player, which sees you as enemy.
+**
+**  CPlayer::Allied
+**
+**    A bit field which contains the allies of this player.
+**    If CPlayer::Allied & (1<<CPlayer::Player) != 0 its an allied.
+**    Setup during startup using the Player:Team, can later be
+**    changed with diplomacy. CPlayer::Enemy and CPlayer::Allied
+**    are combined, if none bit is set, the player is neutral.
+**    @note You can be allied to a player, which sees you as enemy.
+**
+**  CPlayer::SharedVision
+**
+**    A bit field which contains shared vision for this player.
+**    Shared vision only works when it's activated both ways. Really.
+**
+**  CPlayer::StartX CPlayer::StartY
+**
+**    The tile map coordinates of the player start position. 0,0 is
+**    the upper left on the map. This members are setup from the
+**    map and only important for the game start.
+**    Ignored if game starts with level settings. Used to place
+**    the initial workers if you play with 1 or 3 workers.
+**
+**  CPlayer::Resources[::MaxCosts]
+**
+**    How many resources the player owns. Needed for building
+**    units and structures.
+**    @see _costs_, TimeCost, GoldCost, WoodCost, OilCost, MaxCosts.
+**
+**  CPlayer::MaxResources[::MaxCosts]
+**
+**    How many resources the player can store at the moment.
+**
+**  CPlayer::Incomes[::MaxCosts]
+**
+**    Income of the resources, when they are delivered at a store.
+**    @see _costs_, TimeCost, GoldCost, WoodCost, OilCost, MaxCosts.
+**
+**  CPlayer::LastResources[::MaxCosts]
+**
+**    Keeps track of resources in time (used for calculating
+**    CPlayer::Revenue, see below)
+**
+**  CPlayer::Revenue[::MaxCosts]
+**
+**    Production of resources per minute (or estimates)
+**    Used just as information (statistics) for the player...
+**
+**  CPlayer::UnitTypesCount[::UnitTypeMax]
+**
+**    Total count for each different unit type. Used by the AI and
+**    for dependencies checks. The addition of all counts should
+**    be CPlayer::TotalNumUnits.
+**    @note Should not use the maximum number of unit-types here,
+**    only the real number of unit-types used.
+**
+**  CPlayer::AiEnabled
+**
+**    If the player is controlled by the computer and this flag is
+**    true, than the player is handled by the AI on this local
+**    computer.
+**
+**    @note Currently the AI is calculated parallel on all computers
+**    in a network play. It is planned to change this.
+**
+**  CPlayer::Ai
+**
+**    AI structure pointer. Please look at #PlayerAi for more
+**    informations.
+**
+**  CPlayer::Units
+**
+**    A table of all (CPlayer::TotalNumUnits) units of the player.
+**
+**  CPlayer::TotalNumUnits
+**
+**    Total number of units (incl. buildings) in the CPlayer::Units
+**    table.
+**
+**  CPlayer::Demand
+**
+**    Total unit demand, used to demand limit.
+**    A player can only build up to CPlayer::Food units and not more
+**    than CPlayer::FoodUnitLimit units.
+**
+**    @note that CPlayer::NumFoodUnits > CPlayer::Food, when enough
+**    farms are destroyed.
+**
+**  CPlayer::NumBuildings
+**
+**    Total number buildings, units that don't need food.
+**
+**  CPlayer::Food
+**
+**    Number of food available/produced. Player can't train more
+**    CPlayer::NumFoodUnits than this.
+**    @note that all limits are always checked.
+**
+**  CPlayer::FoodUnitLimit
+**
+**    Number of food units allowed. Player can't train more
+**    CPlayer::NumFoodUnits than this.
+**    @note that all limits are always checked.
+**
+**  CPlayer::BuildingLimit
+**
+**    Number of buildings allowed.  Player can't build more
+**    CPlayer::NumBuildings than this.
+**    @note that all limits are always checked.
+**
+**  CPlayer::TotalUnitLimit
+**
+**    Number of total units allowed. Player can't have more
+**    CPlayer::NumFoodUnits+CPlayer::NumBuildings=CPlayer::TotalNumUnits
+**    this.
+**    @note that all limits are always checked.
+**
+**  CPlayer::Score
+**
+**    Total number of points. You can get points for killing units,
+**    destroying buildings ...
+**
+**  CPlayer::TotalUnits
+**
+**    Total number of units made.
+**
+**  CPlayer::TotalBuildings
+**
+**    Total number of buildings made.
+**
+**  CPlayer::TotalResources[::MaxCosts]
+**
+**    Total number of resources collected.
+**    @see _costs_, TimeCost, GoldCost, WoodCost, OilCost, MaxCosts.
+**
+**  CPlayer::TotalRazings
+**
+**    Total number of buildings destroyed.
+**
+**  CPlayer::TotalKills
+**
+**    Total number of kills.
+**
+**  CPlayer::Color
+**
+**    Color of units of this player on the minimap. Index number
+**    into the global palette.
+**
+**  CPlayer::UnitColors
+**
+**    Unit colors of this player. Contains the hardware dependent
+**    pixel values for the player colors (palette index #208-#211).
+**    Setup from the global palette.
+**    @note Index #208-#211 are various SHADES of the team color
+**    (#208 is brightest shade, #211 is darkest shade) .... these
+**    numbers are NOT red=#208, blue=#209, etc
+**
+**  CPlayer::Allow
+**
+**    Contains which unit-types and upgrades are allowed for the
+**    player. Possible values are:
+**    @li  `A' -- allowed,
+**    @li  `F' -- forbidden,
+**    @li  `R' -- acquired, perhaps other values
+**    @li  `Q' -- acquired but forbidden (does it make sense?:))
+**    @li  `E' -- enabled, allowed by level but currently forbidden
+**    @see CAllow
+**
+**  CPlayer::UpgradeTimers
+**
+**    Timer for the upgrades. One timer for all possible upgrades.
+**    Initial 0 counted up by the upgrade action, until it reaches
+**    the upgrade time.
+**    @see _upgrade_timers_
+**    @note it is planned to combine research for faster upgrades.
+*/
+
+/*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
@@ -146,136 +395,136 @@ void CleanRaces()
 **
 **  @note FIXME: Not completely saved.
 */
-void SavePlayers(CFile *file)
+void SavePlayers(CFile &file)
 {
 	Uint8 r, g, b;
 
-	file->printf("\n--------------------------------------------\n");
-	file->printf("--- MODULE: players\n\n");
+	file.printf("\n--------------------------------------------\n");
+	file.printf("--- MODULE: players\n\n");
 
 	//  Dump all players
 	for (int i = 0; i < NumPlayers; ++i) {
 		const CPlayer &p = Players[i];
-		file->printf("Player(%d,\n", i);
-		file->printf("  \"name\", \"%s\",\n", p.Name.c_str());
-		file->printf("  \"type\", ");
+		file.printf("Player(%d,\n", i);
+		file.printf("  \"name\", \"%s\",\n", p.Name.c_str());
+		file.printf("  \"type\", ");
 		switch (p.Type) {
-			case PlayerNeutral:       file->printf("\"neutral\",");         break;
-			case PlayerNobody:        file->printf("\"nobody\",");          break;
-			case PlayerComputer:      file->printf("\"computer\",");        break;
-			case PlayerPerson:        file->printf("\"person\",");          break;
-			case PlayerRescuePassive: file->printf("\"rescue-passive\",");break;
-			case PlayerRescueActive:  file->printf("\"rescue-active\","); break;
-			default:                  file->printf("%d,", p.Type);break;
+			case PlayerNeutral:       file.printf("\"neutral\",");         break;
+			case PlayerNobody:        file.printf("\"nobody\",");          break;
+			case PlayerComputer:      file.printf("\"computer\",");        break;
+			case PlayerPerson:        file.printf("\"person\",");          break;
+			case PlayerRescuePassive: file.printf("\"rescue-passive\",");break;
+			case PlayerRescueActive:  file.printf("\"rescue-active\","); break;
+			default:                  file.printf("%d,", p.Type);break;
 		}
-		file->printf(" \"race\", \"%s\",", PlayerRaces.Name[p.Race].c_str());
-		file->printf(" \"ai-name\", \"%s\",\n", p.AiName.c_str());
-		file->printf("  \"team\", %d,", p.Team);
+		file.printf(" \"race\", \"%s\",", PlayerRaces.Name[p.Race].c_str());
+		file.printf(" \"ai-name\", \"%s\",\n", p.AiName.c_str());
+		file.printf("  \"team\", %d,", p.Team);
 
-		file->printf(" \"enemy\", \"");
+		file.printf(" \"enemy\", \"");
 		for (int j = 0; j < PlayerMax; ++j) {
-			file->printf("%c",(p.Enemy & (1 << j)) ? 'X' : '_');
+			file.printf("%c",(p.Enemy & (1 << j)) ? 'X' : '_');
 		}
-		file->printf("\", \"allied\", \"");
+		file.printf("\", \"allied\", \"");
 		for (int j = 0; j < PlayerMax; ++j) {
-			file->printf("%c", (p.Allied & (1 << j)) ? 'X' : '_');
+			file.printf("%c", (p.Allied & (1 << j)) ? 'X' : '_');
 		}
-		file->printf("\", \"shared-vision\", \"");
+		file.printf("\", \"shared-vision\", \"");
 		for (int j = 0; j < PlayerMax; ++j) {
-			file->printf("%c", (p.SharedVision & (1 << j)) ? 'X' : '_');
+			file.printf("%c", (p.SharedVision & (1 << j)) ? 'X' : '_');
 		}
-		file->printf("\",\n  \"start\", {%d, %d},\n", p.StartX, p.StartY);
+		file.printf("\",\n  \"start\", {%d, %d},\n", p.StartPos.x, p.StartPos.y);
 
 		// Resources
-		file->printf("  \"resources\", {");
+		file.printf("  \"resources\", {");
 		for (int j = 0; j < MaxCosts; ++j) {
-			file->printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.Resources[j]);
+			file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.Resources[j]);
 		}
 		// Max Resources
-		file->printf("},\n  \"max-resources\", {");
+		file.printf("},\n  \"max-resources\", {");
 		for (int j = 0; j < MaxCosts; ++j) {
-			file->printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.MaxResources[j]);
+			file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.MaxResources[j]);
 		}
 		// Last Resources
-		file->printf("},\n  \"last-resources\", {");
+		file.printf("},\n  \"last-resources\", {");
 		for (int j = 0; j < MaxCosts; ++j) {
-			file->printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.LastResources[j]);
+			file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.LastResources[j]);
 		}
 		// Incomes
-		file->printf("},\n  \"incomes\", {");
+		file.printf("},\n  \"incomes\", {");
 		for (int j = 0; j < MaxCosts; ++j) {
 			if (j) {
 				if (j == MaxCosts / 2) {
-					file->printf("\n ");
+					file.printf("\n ");
 				} else {
-					file->printf(" ");
+					file.printf(" ");
 				}
 			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), p.Incomes[j]);
+			file.printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), p.Incomes[j]);
 		}
 		// Revenue
-		file->printf("},\n  \"revenue\", {");
+		file.printf("},\n  \"revenue\", {");
 		for (int j = 0; j < MaxCosts; ++j) {
 			if (j) {
 				if (j == MaxCosts / 2) {
-					file->printf("\n ");
+					file.printf("\n ");
 				} else {
-					file->printf(" ");
+					file.printf(" ");
 				}
 			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), p.Revenue[j]);
+			file.printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), p.Revenue[j]);
 		}
 
 		// UnitTypesCount done by load units.
 
-		file->printf("},\n  \"%s\",\n", p.AiEnabled ? "ai-enabled" : "ai-disabled");
+		file.printf("},\n  \"%s\",\n", p.AiEnabled ? "ai-enabled" : "ai-disabled");
 
 		// Ai done by load ais.
 		// Units done by load units.
 		// TotalNumUnits done by load units.
 		// NumBuildings done by load units.
 
-		file->printf(" \"supply\", %d,", p.Supply);
-		file->printf(" \"unit-limit\", %d,", p.UnitLimit);
-		file->printf(" \"building-limit\", %d,", p.BuildingLimit);
-		file->printf(" \"total-unit-limit\", %d,", p.TotalUnitLimit);
+		file.printf(" \"supply\", %d,", p.Supply);
+		file.printf(" \"unit-limit\", %d,", p.UnitLimit);
+		file.printf(" \"building-limit\", %d,", p.BuildingLimit);
+		file.printf(" \"total-unit-limit\", %d,", p.TotalUnitLimit);
 
-		file->printf("\n  \"score\", %d,", p.Score);
-		file->printf("\n  \"total-units\", %d,", p.TotalUnits);
-		file->printf("\n  \"total-buildings\", %d,", p.TotalBuildings);
-		file->printf("\n  \"total-resources\", {");
+		file.printf("\n  \"score\", %d,", p.Score);
+		file.printf("\n  \"total-units\", %d,", p.TotalUnits);
+		file.printf("\n  \"total-buildings\", %d,", p.TotalBuildings);
+		file.printf("\n  \"total-resources\", {");
 		for (int j = 0; j < MaxCosts; ++j) {
 			if (j) {
-				file->printf(" ");
+				file.printf(" ");
 			}
-			file->printf("%d,", p.TotalResources[j]);
+			file.printf("%d,", p.TotalResources[j]);
 		}
-		file->printf("},");
-		file->printf("\n  \"total-razings\", %d,", p.TotalRazings);
-		file->printf("\n  \"total-kills\", %d,", p.TotalKills);
+		file.printf("},");
+		file.printf("\n  \"total-razings\", %d,", p.TotalRazings);
+		file.printf("\n  \"total-kills\", %d,", p.TotalKills);
 
 		SDL_GetRGB(p.Color, TheScreen->format, &r, &g, &b);
-		file->printf("\n  \"color\", { %d, %d, %d },", r, g, b);
+		file.printf("\n  \"color\", { %d, %d, %d },", r, g, b);
 
 		// UnitColors done by init code.
 		// Allow saved by allow.
 
-		file->printf("\n  \"timers\", {");
+		file.printf("\n  \"timers\", {");
 		for (int j = 0; j < UpgradeMax; ++j) {
 			if (j) {
-				file->printf(" ,");
+				file.printf(" ,");
 			}
-			file->printf("%d", p.UpgradeTimers.Upgrades[j]);
+			file.printf("%d", p.UpgradeTimers.Upgrades[j]);
 		}
-		file->printf("}");
+		file.printf("}");
 
-		file->printf(")\n\n");
+		file.printf(")\n\n");
 	}
 
 	DebugPrint("FIXME: must save unit-stats?\n");
 
 	//  Dump local variables
-	file->printf("SetThisPlayer(%d)\n\n", ThisPlayer->Index);
+	file.printf("SetThisPlayer(%d)\n\n", ThisPlayer->Index);
 }
 
 /**
@@ -297,10 +546,8 @@ void CreatePlayer(int type)
 	//  FIXME: A: Johns: currently we need no init for the nobody player.
 	memset(player.Units, 0, sizeof (player.Units));
 
-	//
 	//  Take first slot for person on this computer,
 	//  fill other with computer players.
-	//
 	if (type == PlayerPerson && !NetPlayers) {
 		if (!ThisPlayer) {
 			ThisPlayer = &player;
@@ -322,10 +569,8 @@ void CreatePlayer(int type)
 		return;
 	}
 
-	//
 	//  Make simple teams:
 	//  All person players are enemies.
-	//
 	int team;
 	switch (type) {
 		case PlayerNeutral:
@@ -408,16 +653,12 @@ void CreatePlayer(int type)
 		}
 	}
 
-	//
 	//  Initial default incomes.
-	//
 	for (int i = 0; i < MaxCosts; ++i) {
 		player.Incomes[i] = DefaultIncomes[i];
 	}
 
-	//
 	//  Initial max resource amounts.
-	//
 	for (int i = 0; i < MaxCosts; ++i) {
 		player.MaxResources[i] = DefaultResourceMaxAmounts[i];
 	}
@@ -481,8 +722,8 @@ void CPlayer::Clear()
 	Enemy = 0;
 	Allied = 0;
 	SharedVision = 0;
-	StartX = 0;
-	StartY = 0;
+	StartPos.x = 0;
+	StartPos.y = 0;
 	memset(Resources, 0, sizeof(Resources));
 	memset(MaxResources, 0, sizeof(MaxResources));
 	memset(LastResources, 0, sizeof(LastResources));
@@ -540,34 +781,31 @@ void CPlayer::SetResource(int resource, int value)
 */
 int CPlayer::CheckLimits(const CUnitType &type) const
 {
-	//
 	//  Check game limits.
-	//
 	if (NumUnits < UnitMax) {
 		if (type.Building && NumBuildings >= BuildingLimit) {
-			Notify(NotifyYellow, -1, -1, _("Building Limit Reached"));
+			Notify(_("Building Limit Reached"));
 			return -1;
 		}
 		if (!type.Building && (TotalNumUnits - NumBuildings) >= UnitLimit) {
-			Notify(NotifyYellow, -1, -1, _("Unit Limit Reached"));
+			Notify(_("Unit Limit Reached"));
 			return -2;
 		}
 		if (this->Demand + type.Demand > this->Supply && type.Demand) {
-			Notify(NotifyYellow, -1, -1, _("Insufficient Supply, increase Supply."));
+			Notify(_("Insufficient Supply, increase Supply."));
 			return -3;
 		}
 		if (TotalNumUnits >= TotalUnitLimit) {
-			Notify(NotifyYellow, -1, -1, _("Total Unit Limit Reached"));
+			Notify(_("Total Unit Limit Reached"));
 			return -4;
 		}
 		if (UnitTypesCount[type.Slot] >=  Allow.Units[type.Slot]) {
-			Notify(NotifyYellow, -1, -1, _("Limit of %d reached for this unit type"),
-				Allow.Units[type.Slot]);
+			Notify(_("Limit of %d reached for this unit type"), Allow.Units[type.Slot]);
 			return -6;
 		}
 		return 1;
 	} else {
-		Notify(NotifyYellow, -1, -1, _("Cannot create more units."));
+		Notify(_("Cannot create more units."));
 		if (AiEnabled) {
 			// AiNoMoreUnits(player, type);
 		}
@@ -588,19 +826,20 @@ int CPlayer::CheckCosts(const int *costs) const
 {
 	int err = 0;
 	for (int i = 1; i < MaxCosts; ++i) {
-		if (this->Resources[i] < costs[i]) {
-			Notify(NotifyYellow, -1, -1, "Not enough %s...%s more %s.",
-				DefaultResourceNames[i].c_str(), DefaultActions[i].c_str(), DefaultResourceNames[i].c_str());
+		if (this->Resources[i] >= costs[i]) {
+			continue;
+		}
+		const char *name = DefaultResourceNames[i].c_str();
+		const char *actionName = DefaultActions[i].c_str();
 
-			err |= 1 << i;
-			if (i==1)
-				if (GameSounds.NotEnough1[this->Race].Sound)
-					PlayGameSound(GameSounds.NotEnough1[this->Race].Sound,
-								MaxSampleVolume);
-			if (i==2)
-				if (GameSounds.NotEnough2[this->Race].Sound)
-					PlayGameSound(GameSounds.NotEnough2[this->Race].Sound,
-								MaxSampleVolume);
+		Notify(_("Not enough %s...%s more %s."), name, actionName, name);
+
+		err |= 1 << i;
+		if (i == 1 && GameSounds.NotEnough1[this->Race].Sound) {
+			PlayGameSound(GameSounds.NotEnough1[this->Race].Sound, MaxSampleVolume);
+		}
+		if (i == 2 && GameSounds.NotEnough2[this->Race].Sound) {
+			PlayGameSound(GameSounds.NotEnough2[this->Race].Sound, MaxSampleVolume);
 		}
 	}
 	return err;
@@ -637,7 +876,6 @@ void CPlayer::AddCosts(const int *costs)
 */
 void CPlayer::AddUnitType(const CUnitType &type)
 {
-	// FIXME: a player could make money by upgrading and than cancel
 	AddCosts(type.Stats[this->Index].Costs);
 }
 
@@ -722,7 +960,7 @@ void PlayersInitAi()
 {
 	for (int player = 0; player < NumPlayers; ++player) {
 		if (Players[player].AiEnabled) {
-			AiInit(&Players[player]);
+			AiInit(Players[player]);
 		}
 	}
 }
@@ -734,9 +972,9 @@ void PlayersEachCycle()
 {
 	for (int player = 0; player < NumPlayers; ++player) {
 		CPlayer &p = Players[player];
-//						AutoAttack(guard, autoatacktargets, stand_ground);
+
 		if (p.AiEnabled) {
-			AiEachCycle(&p);
+			AiEachCycle(p);
 		}
 	}
 }
@@ -744,22 +982,21 @@ void PlayersEachCycle()
 /**
 **  Handle AI of a player each second.
 **
-**  @param player  the player to update AI
+**  @param playerIdx  the player to update AI
 */
-void PlayersEachSecond(int player)
+void PlayersEachSecond(int playerIdx)
 {
+	CPlayer &player = Players[playerIdx];
+
 	if ((GameCycle / CYCLES_PER_SECOND) % 10 == 0) {
 		for (int res = 0; res < MaxCosts; ++res) {
-			Players[player].Revenue[res] =
-				Players[player].Resources[res] -
-				Players[player].LastResources[res];
-			Players[player].Revenue[res] *= 6;  // estimate per minute
-			Players[player].LastResources[res] =
-				Players[player].Resources[res];
+			player.Revenue[res] = player.Resources[res] - player.LastResources[res];
+			player.Revenue[res] *= 6;  // estimate per minute
+			player.LastResources[res] = player.Resources[res];
 		}
 	}
-	if (Players[player].AiEnabled) {
-		AiEachSecond(&Players[player]);
+	if (player.AiEnabled) {
+		AiEachSecond(player);
 	}
 }
 
@@ -771,18 +1008,16 @@ void PlayersEachSecond(int player)
 **  @param player  Pointer to player.
 **  @param sprite  The sprite in which the colors should be changed.
 */
-void GraphicPlayerPixels(CPlayer &player, const CGraphic *sprite)
+void GraphicPlayerPixels(CPlayer &player, const CGraphic &sprite)
 {
 	Assert(PlayerColorIndexCount);
 
-	SDL_LockSurface(sprite->Surface);
-	SDL_SetColors(sprite->Surface, player.UnitColors.Colors,
-		PlayerColorIndexStart, PlayerColorIndexCount);
-	if (sprite->SurfaceFlip) {
-		SDL_SetColors(sprite->SurfaceFlip,
-			player.UnitColors.Colors, PlayerColorIndexStart, PlayerColorIndexCount);
+	SDL_LockSurface(sprite.Surface);
+	SDL_SetColors(sprite.Surface, player.UnitColors.Colors, PlayerColorIndexStart, PlayerColorIndexCount);
+	if (sprite.SurfaceFlip) {
+		SDL_SetColors(sprite.SurfaceFlip, player.UnitColors.Colors, PlayerColorIndexStart, PlayerColorIndexCount);
 	}
-	SDL_UnlockSurface(sprite->Surface);
+	SDL_UnlockSurface(sprite.Surface);
 }
 
 /**
@@ -839,15 +1074,15 @@ void DebugPlayers()
 **  Notify player about a problem.
 **
 **  @param type    Problem type
-**  @param x       Map X tile position
-**  @param y       Map Y tile position
+**  @param pos     Map tile position
 **  @param fmt     Message format
 **  @param ...     Message varargs
 **
 **  @todo FIXME: We must also notfiy allied players.
 */
-void CPlayer::Notify(int type, int x, int y, const char *fmt, ...) const
+void CPlayer::Notify(int type, const Vec2i &pos, const char *fmt, ...) const
 {
+	Assert(Map.Info.IsPointOnMap(pos));
 	char temp[128];
 	Uint32 color;
 	va_list va;
@@ -874,17 +1109,44 @@ void CPlayer::Notify(int type, int x, int y, const char *fmt, ...) const
 			break;
 		default: color = ColorWhite;
 	}
-
-	if (x != -1) {
-		UI.Minimap.AddEvent(x, y, color);
-	}
+	UI.Minimap.AddEvent(pos.x, pos.y, color);
 	if (this == ThisPlayer) {
-		SetMessageEvent(x, y, "%s", temp);
+		SetMessageEvent(pos, "%s", temp);
 	} else {
-		SetMessageEvent(x, y, "(%s): %s", Name.c_str(), temp);
+		SetMessageEvent(pos, "(%s): %s", Name.c_str(), temp);
 	}
-
 }
+
+/**
+**  Notify player about a problem.
+**
+**  @param type    Problem type
+**  @param pos     Map tile position
+**  @param fmt     Message format
+**  @param ...     Message varargs
+**
+**  @todo FIXME: We must also notfiy allied players.
+*/
+void CPlayer::Notify(const char *fmt, ...) const
+{
+	// Notify me, and my TEAM members
+	if (this != ThisPlayer && !IsTeamed(*ThisPlayer)) {
+		return;
+	}
+	char temp[128];
+	va_list va;
+
+	va_start(va, fmt);
+	temp[sizeof(temp) - 1] = '\0';
+	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
+	va_end(va);
+	if (this == ThisPlayer) {
+		SetMessage("%s", temp);
+	} else {
+		SetMessage("(%s): %s", Name.c_str(), temp);
+	}
+}
+
 
 /**
 **  Check if the player is an enemy

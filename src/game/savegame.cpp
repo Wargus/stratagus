@@ -143,7 +143,7 @@ int SaveGame(const std::string &filename)
 	SaveCcl(&file);
 	SaveUnitTypes(&file);
 	SaveUpgrades(&file);
-	SavePlayers(&file);
+	SavePlayers(file);
 	Map.Save(&file);
 	SaveUnits(&file);
 	SaveUserInterface(&file);

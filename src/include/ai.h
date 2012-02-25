@@ -52,11 +52,11 @@ extern int AiSleepCycles;  /// Ai sleeps # cycles
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void AiEachCycle(CPlayer *player);   /// Called each game cycle
-extern void AiEachSecond(CPlayer *player);  /// Called each second
+extern void AiEachCycle(CPlayer &player);   /// Called each game cycle
+extern void AiEachSecond(CPlayer &player);  /// Called each second
 
 extern void InitAiModule();       /// Init AI global structures
-extern void AiInit(CPlayer *player);   /// Init AI for this player
+extern void AiInit(CPlayer &player);   /// Init AI for this player
 extern void CleanAi();            /// Cleanup the AI module
 extern void FreeAi();            /// Free the AI resources
 extern void SaveAi(CFile *file);     /// Save the AI state
