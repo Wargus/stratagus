@@ -576,7 +576,7 @@ endif()
 if(WIN32)
 	add_definitions(-DUSE_WIN32)
 	set(stratagus_SRCS ${stratagus_SRCS} ${win32_SRCS})
-	set(stratagus_LIBS ${stratagus_LIBS} dsound dxguid winmm ws2_32)
+	set(stratagus_LIBS ${stratagus_LIBS} dsound winmm ws2_32)
 endif()
 
 if (WIN32 AND MSVC)
