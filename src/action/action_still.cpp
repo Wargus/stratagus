@@ -59,7 +59,7 @@ enum {
 /* virtual */ void COrder_Still::Save(CFile &file, const CUnit &unit) const
 {
 	if (this->Action == UnitActionStill) {
-		file.printf("{\"action-still\"");
+		file.printf("{\"action-still\",");
 	} else {
 		file.printf("{\"action-stand-ground\",");
 	}
@@ -76,7 +76,7 @@ enum {
 		file.printf(" \"goal\", \"%s\",", UnitReference(goal).c_str());
 	}
 
-	file.printf(", \"state\", %d", this->State);
+	file.printf("\"state\", %d", this->State);
 	file.printf("}");
 }
 

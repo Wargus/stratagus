@@ -819,11 +819,6 @@ static void ShowSingleOrder(const CUnit &unit, const PixelPos &pos, const COrder
 			dest = true;
 			break;
 
-		case UnitActionReturnGoods:
-			e_color = color = ColorYellow;
-			dest = true;
-			break;
-
 		default:
 			e_color = color = ColorGray;
 			DebugPrint("Unknown action %d\n" _C_ order.Action);

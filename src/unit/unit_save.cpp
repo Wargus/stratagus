@@ -102,12 +102,6 @@ void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 		case UnitActionAttackGround:
 			file.printf("\"action-attack-ground\",");
 			break;
-		case UnitActionResource:
-			file.printf("\"action-resource\",");
-			break;
-		case UnitActionReturnGoods:
-			file.printf("\"action-return-goods\",");
-			break;
 		default:
 			DebugPrint("Unknown action in order\n");
 	}
@@ -137,52 +131,16 @@ void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 		case UnitActionAttackGround:
 			file.printf(", \"subaction\", %d", order.SubAction.Attack);
 			break;
-		case UnitActionResource:
-		case UnitActionReturnGoods:
-			file.printf(", \"subaction\", %d", order.SubAction.Res);
-			break;
-	}
-
-
-	// Extra arg.
-	switch (order.Action) {
-		case UnitActionResource :
-		case UnitActionReturnGoods :
-			if (order.CurrentResource) {
-				file.printf(", \"current-resource\", \"%s\",", DefaultResourceNames[order.CurrentResource].c_str());
-				const CUnit *mine = order.Arg1.Resource.Mine;
-
-				if (mine == NULL) {
-					const Vec2i &pos = order.Arg1.Resource.Pos;
-
-					file.printf(" \"resource-pos\", {%d, %d}", pos.x, pos.y);
-				} else {
-					if (mine->Destroyed) {
-						/* this unit is destroyed so it's not in the global unit
-						 * array - this means it won't be saved!!! */
-						printf ("FIXME: storing destroyed Mine - loading will fail.\n");
-					}
-					file.printf(" \"resource-mine\", \"%s\"", UnitReference(*mine).c_str());
-				}
-			}
-			break;
 		default:
 			break;
 	}
+
 	//
 	//  Order data part
 	//
 	switch (order.Action) {
 		case UnitActionStill:
-			// FIXME: support other resource types
-			break;
 		case UnitActionResource:
-			file.printf(", \"data-res-worker\", {\"time-to-harvest\", %d", order.Data.ResWorker.TimeToHarvest);
-			if (order.Data.ResWorker.DoneHarvesting) {
-				file.printf(", \"done-harvesting\"");
-			}
-			file.printf("}");
-			break;
 		case UnitActionBuilt:
 		case UnitActionResearch:
 		case UnitActionUpgradeTo:

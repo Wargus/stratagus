@@ -536,7 +536,7 @@ void CommandResource(CUnit &unit, CUnit &dest, int flush)
 			return;
 		}
 	}
-	*order = COrder::NewActionResource(dest);
+	*order = COrder::NewActionResource(unit, dest);
 	ClearSavedAction(unit);
 }
 
@@ -568,7 +568,7 @@ void CommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
 			return;
 		}
 	}
-	*order = COrder::NewActionReturnGoods(goal);
+	*order = COrder::NewActionReturnGoods(unit, goal);
 	ClearSavedAction(unit);
 }
 

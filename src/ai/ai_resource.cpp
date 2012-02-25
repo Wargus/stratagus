@@ -237,14 +237,13 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, int near_
 		for (j = 0; j < unit.Orders.size(); ++j) {
 			int action = unit.Orders[j]->Action;
 			if (action == UnitActionBuild ||
-				action == UnitActionRepair ||
-				action == UnitActionReturnGoods) {
+				action == UnitActionRepair) {
 					break;
 				}
 			if (action == UnitActionResource) {
-				const COrder &order = *unit.Orders[j];
+				const COrder_Resource &order = *static_cast<const COrder_Resource*>(unit.Orders[j]);
 
-				if (order.SubAction.Res > 55 /* SUB_START_GATHERING */) {
+				if (order.IsGatheringStarted()) {
 					break;
 				}
 			}
@@ -330,18 +329,10 @@ void AiNewDepotRequest(CUnit &worker) {
 				_C_ worker->Data.Move.Cycles
 				);
 	*/
+	Assert(worker.CurrentAction() == UnitActionResource);
+	COrder_Resource &order = *static_cast<COrder_Resource*>(worker.CurrentOrder());
 
-	Vec2i pos = {-1, -1};
-	ResourceInfo *resinfo = worker.Type->ResInfo[worker.CurrentResource];
-
-	if (resinfo->TerrainHarvester) {
-		pos = worker.CurrentOrder()->Arg1.Resource.Pos;
-	} else {
-		CUnit *mine = worker.CurrentOrder()->Arg1.Resource.Mine;
-		if (mine) {
-			pos = mine->tilePos;
-		}
-	}
+	const Vec2i pos = order.GetHarvestLocation();
 
 	if (pos.x != -1 && NULL != FindDepositNearLoc(*worker.Player, pos, 10, worker.CurrentResource)) {
 		/*
@@ -1098,9 +1089,10 @@ static void AiCollectResources()
 					for (int k = num_units_assigned[src_c] - 1; k >= 0 && !unit; --k) {
 						unit = units_assigned[src_c][k];
 
-						COrder &order = *unit->CurrentOrder();
+						Assert(unit->CurrentAction() == UnitActionResource);
+						COrder_Resource &order = *static_cast<COrder_Resource*>(unit->CurrentOrder());
 
-						if (order.SubAction.Res >= 65 /* SUB_STOP_GATHERING */ ) {
+						if (order.IsGatheringFinished()) {
 							//worker returning with resource
 							continue;
 						}
@@ -1173,9 +1165,9 @@ static int AiRepairBuilding(const CUnitType &type, CUnit &building)
 			if (unit.CurrentAction() == UnitActionStill) {
 				table[num++] = &unit;
 			} else if (unit.CurrentAction() == UnitActionResource) {
-				COrder &order = *unit.CurrentOrder();
+				COrder_Resource &order = *static_cast<COrder_Resource*>(unit.CurrentOrder());
 
-				if (order.SubAction.Res <= 55 /* SUB_START_GATHERING */) {
+				if (order.IsGatheringStarted() == false) {
 					table[num++] = &unit;
 				}
 			}

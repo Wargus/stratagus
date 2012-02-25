@@ -269,7 +269,7 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 
 /* static */ COrder* COrder::NewActionResource(CUnit &harvester, const Vec2i &pos)
 {
-	COrder *order = new COrder(UnitActionResource);
+	COrder_Resource *order = new COrder_Resource(harvester);
 	Vec2i ressourceLoc;
 
 	//  Find the closest piece of wood next to a tile where the unit can move
@@ -286,16 +286,21 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 		ressourceLoc = pos;
 	}
 	order->goalPos = ressourceLoc;
+	order->CurrentResource = WoodCost; // Hard-coded resource.
 	order->Range = 1;
 
 	return order;
 }
 
-/* static */ COrder* COrder::NewActionResource(CUnit &mine)
+/* static */ COrder* COrder::NewActionResource(CUnit &harvester, CUnit &mine)
 {
-	COrder *order = new COrder(UnitActionResource);
+	COrder_Resource *order = new COrder_Resource(harvester);
 
 	order->SetGoal(&mine);
+	order->Resource.Mine = &mine;
+	harvester.AssignWorkerToMine(mine);
+	order->Resource.Pos = mine.tilePos + mine.Type->GetHalfTileSize();
+	order->CurrentResource = mine.Type->GivesResource;
 	order->Range = 1;
 
 	return order;
@@ -303,16 +308,25 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 
 
 
-/* static */ COrder* COrder::NewActionReturnGoods(CUnit *depot)
+/* static */ COrder* COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot)
 {
-	COrder *order = new COrder(UnitActionReturnGoods);
+	COrder_Resource *order = new COrder_Resource(harvester);
 
 	// Destination could be killed. NETWORK!
-	if (depot && !depot->Destroyed) {
-		order->SetGoal(depot);
+	if (depot && depot->Destroyed) {
+		depot = NULL;
 	}
 	order->Range = 1;
+	order->CurrentResource = harvester.CurrentResource;
+	order->DoneHarvesting = true;
 
+	if (depot == NULL) {
+		depot = FindDeposit(harvester, 1000, harvester.CurrentResource);
+	}
+	order->Depot = depot;
+	if (depot) {
+		order->UnitGotoGoal(harvester, depot, 70); //SUB_MOVE_TO_DEPOT);
+	}
 	return order;
 }
 
@@ -403,15 +417,9 @@ COrder* COrder::Clone() const
 	clone->MinRange = this->MinRange;
 	clone->Width = this->Width;
 	clone->Height = this->Height;
-	clone->CurrentResource = this->CurrentResource;
 	clone->SetGoal(this->Goal);
 	clone->goalPos = this->goalPos;
-	memcpy(&clone->Arg1, &this->Arg1, sizeof (clone->Arg1));
 	memcpy(&clone->Data, &this->Data, sizeof (clone->Data));
-	//FIXME: Hardcoded wood
-	if (clone->Action == UnitActionResource && clone->Arg1.Resource.Mine) {
-		clone->Arg1.Resource.Mine->RefsIncrease();
-	}
 	return clone;
 }
 
@@ -421,47 +429,6 @@ COrder::~COrder()
 		Goal->RefsDecrease();
 		Goal = NoUnitP;
 	}
-	if (Action == UnitActionResource && Arg1.Resource.Mine) {
-		Arg1.Resource.Mine->RefsDecrease();
-		Arg1.Resource.Mine = NoUnitP;
-	}
-}
-
-void COrder::ReleaseRefs(CUnit &unit)
-{
-	// Release pending references.
-	if (this->Action == UnitActionResource) {
-		CUnit *mine = this->Arg1.Resource.Mine;
-
-		if (mine) {
-			unit.DeAssignWorkerFromMine(*mine);
-			mine->RefsDecrease();
-			this->Arg1.Resource.Mine = NULL;
-
-		}
-	}
-	if (this->HasGoal()) {
-		// If mining decrease the active count on the resource.
-		if (this->Action == UnitActionResource) {
-			if (this->SubAction.Res == 60 /* SUB_GATHER_RESOURCE */ ) {
-				CUnit *goal = this->GetGoal();
-
-				goal->Resource.Active--;
-				Assert(goal->Resource.Active >= 0);
-			}
-		}
-		// Still shouldn't have a reference unless attacking
-		Assert(this->Action != UnitActionStill);
-		this->ClearGoal();
-	}
-#ifdef DEBUG
-	 else {
-		if (unit.CurrentResource &&
-			!unit.Type->ResInfo[unit.CurrentResource]->TerrainHarvester) {
-			Assert(this->Action != UnitActionResource);
-		}
-	}
-#endif
 }
 
 void COrder::SetGoal(CUnit *const new_goal)
@@ -511,21 +478,6 @@ bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
 		case UnitActionTransformInto:
 		case UnitActionBoard:
 		case UnitActionUnload:
-		case UnitActionReturnGoods:
-			// Unit is working ?
-			// Maybe AI should cancel action and save resources ???
-			return true;
-		case UnitActionResource:
-			if (SubAction.Res >= 65) {
-				//Normal return to depot
-				return true;
-			}
-			if (SubAction.Res > 55  &&
-				unit.ResourcesHeld > 0) {
-				//escape to Depot with this what you have;
-				Data.ResWorker.DoneHarvesting = 1;
-				return true;
-			}
 		break;
 		case UnitActionAttack:
 		{
@@ -1350,8 +1302,8 @@ static void (*HandleActionTable[256])(COrder&, CUnit &) = {
 	HandleActionNone, // HandleActionPatrol,
 	HandleActionNone, // HandleActionBuild,
 	HandleActionNone, // HandleActionRepair,
-	HandleActionResource,
-	HandleActionReturnGoods,
+	HandleActionNone, // HandleActionResource,
+	HandleActionNone, // HandleActionReturnGoods,
 	HandleActionNone, // HandleActionTransformInto,
 	HandleActionNotWritten,
 

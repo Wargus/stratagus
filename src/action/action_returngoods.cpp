@@ -47,7 +47,7 @@
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
+#if 0
 /**
 **  Return goods to gold/wood deposit.
 **
@@ -90,5 +90,5 @@ void HandleActionReturnGoods(COrder& order, CUnit &unit)
 	order.NewResetPath();
 	order.SubAction.Res = /* SUB_MOVE_TO_DEPOT */ 70; // FIXME : Define value.
 }
-
+#endif
 //@}

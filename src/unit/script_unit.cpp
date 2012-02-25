@@ -132,39 +132,6 @@ CUnit *CclGetUnitFromRef(lua_State *l)
 	return UnitSlots[slot];
 }
 
-/**
-**  Parse res worker data
-**
-**  @param l     Lua state.
-**  @param unit  Unit pointer which should be filled with the data.
-*/
-static void CclParseResWorker(lua_State *l, COrderPtr order)
-{
-	const char *value;
-	int args;
-	int j;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	args = lua_objlen(l, -1);
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++j;
-		if (!strcmp(value, "time-to-harvest")) {
-			lua_rawgeti(l, -1, j + 1);
-			order->Data.ResWorker.TimeToHarvest = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "done-harvesting")) {
-			order->Data.ResWorker.DoneHarvesting = 1;
-			--j;
-		} else {
-			LuaError(l, "ParseResWorker: Unsupported tag: %s" _C_ value);
-		}
-	}
-}
 
 bool COrder::ParseGenericData(lua_State *l, int &j, const char *value)
 {
@@ -261,59 +228,8 @@ bool COrder::ParseSpecificData(lua_State *l, int &j, const char *value, const CU
 	} else if (!strcmp(value, "subaction")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		this->SubAction.Attack = this->SubAction.Res = LuaToNumber(l, -1);
+		this->SubAction.Attack = LuaToNumber(l, -1);
 		lua_pop(l, 1);
-	} else if (!strcmp(value, "current-resource")) {
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		this->CurrentResource = CclGetResourceByName(l);
-		lua_pop(l, 1);
-	} else if (!strcmp(value, "resource-pos")) {
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		this->Arg1.Resource.Mine = NULL;
-		CclGetPos(l, &this->Arg1.Resource.Pos.x , &this->Arg1.Resource.Pos.y);
-		lua_pop(l, 1);
-
-		Assert(this->CurrentResource);
-	} else if (!strcmp(value, "resource-mine")) {
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		Vec2i invalidPos = {-1, -1};
-		this->Arg1.Resource.Pos = invalidPos;
-		this->Arg1.Resource.Mine = CclGetUnitFromRef(l);
-		lua_pop(l, 1);
-	} else if (!strcmp(value, "data-res-worker")) {
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		CclParseResWorker(l, this);
-		lua_pop(l, 1);
-	} else if (!strcmp(value, "mine")) { /* old save format */
-		int pos;
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		pos = LuaToNumber(l, -1);
-		lua_pop(l, 1);
-
-		const Vec2i mpos = {pos >> 16, pos & 0xFFFF};
-		CUnit *mine = NULL;
-		pos = 0;
-		do {
-			pos++;
-			mine = ResourceOnMap(mpos, pos, true);
-		} while (!mine && pos < MaxCosts);
-		if (mine) {
-			Vec2i invalidPos = {-1, -1};
-			this->Arg1.Resource.Pos = invalidPos;
-
-			mine->RefsIncrease();
-			this->Arg1.Resource.Mine = mine;
-			this->CurrentResource = pos;
-		} else {
-			this->CurrentResource = WoodCost;
-			this->Arg1.Resource.Mine = NULL;
-			this->Arg1.Resource.Pos = mpos;
-		}
 	} else {
 		return false;
 	}
@@ -326,7 +242,7 @@ bool COrder::ParseSpecificData(lua_State *l, int &j, const char *value, const CU
 **  @param l      Lua state.
 **  @param order  OUT: resulting order.
 */
-void CclParseOrder(lua_State *l, const CUnit &unit, COrderPtr *orderPtr)
+void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 {
 	const int args = lua_objlen(l, -1);
 
@@ -369,9 +285,7 @@ void CclParseOrder(lua_State *l, const CUnit &unit, COrderPtr *orderPtr)
 	} else if (!strcmp(actiontype, "action-repair")) {
 		*orderPtr = new COrder_Repair;
 	} else if (!strcmp(actiontype, "action-resource")) {
-		*orderPtr = COrder::NewActionResource();
-	} else if (!strcmp(actiontype, "action-return-goods")) {
-		*orderPtr = COrder::NewActionReturnGoods();
+		*orderPtr = new COrder_Resource(unit);
 	} else if (!strcmp(actiontype, "action-transform-into")) {
 		*orderPtr = new COrder_TransformInto;
 	} else {

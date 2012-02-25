@@ -83,7 +83,7 @@ enum UnitAction {
 
 	UnitActionRepair,       /// unit repairing
 	UnitActionResource,     /// unit harvesting resources
-	UnitActionReturnGoods,  /// unit returning any resource
+	UnitActionDummy, // UnitActionReturnGoods,  /// unit returning any resource
 	UnitActionTransformInto /// unit transform into type.
 };
 
@@ -104,11 +104,10 @@ class COrder
 
 public:
 	COrder(int action) : Goal(NULL), Range(0), MinRange(0), Width(0),
-		Height(0), Action(action), Finished(false), CurrentResource(0)
+		Height(0), Action(action), Finished(false)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
-		memset(&Arg1, 0, sizeof (Arg1));
 		memset(&SubAction, 0, sizeof (SubAction));
 		memset(&Data, 0, sizeof (Data));
 	}
@@ -127,7 +126,7 @@ public:
 	virtual void FillSeenValues(CUnit &unit) const;
 	virtual void AiUnitKilled(CUnit &unit);
 
-	void ReleaseRefs(CUnit &owner);
+	void ReleaseRefs(CUnit &owner) {}
 	bool CheckRange() const;
 
 	bool HasGoal() const { return Goal != NULL; }
@@ -159,8 +158,8 @@ public:
 	static COrder* NewActionRepair(const Vec2i &pos);
 	static COrder* NewActionResearch(CUnit &unit, CUpgrade &upgrade);
 	static COrder* NewActionResource(CUnit &harvester, const Vec2i &pos);
-	static COrder* NewActionResource(CUnit &mine);
-	static COrder* NewActionReturnGoods(CUnit *depot);
+	static COrder* NewActionResource(CUnit &harvester, CUnit &mine);
+	static COrder* NewActionReturnGoods(CUnit &harvester, CUnit *depot);
 	static COrder* NewActionSpellCast(SpellType &spell, const Vec2i &pos, CUnit *target);
 	static COrder* NewActionStandGround();
 	static COrder* NewActionStill();
@@ -172,8 +171,6 @@ public:
 #if 1 // currently needed for parsing
 	static COrder* NewActionAttack() { return new COrder(UnitActionAttack); }
 	static COrder* NewActionAttackGround() { return new COrder(UnitActionAttackGround); }
-	static COrder* NewActionResource() { return new COrder(UnitActionResource); }
-	static COrder* NewActionReturnGoods() { return new COrder(UnitActionReturnGoods); }
 #endif
 
 private:
@@ -184,22 +181,13 @@ public:
 	unsigned int  MinRange; /// How far away minimum
 	unsigned char Width;    /// Goal Width (used when Goal is not)
 	unsigned char Height;   /// Goal Height (used when Goal is not)
-	unsigned char Action;   /// global action
+	const unsigned char Action;   /// global action
 	bool Finished; /// true when order is finish
-	unsigned char CurrentResource; ///used in UnitActionResource and UnitActionReturnGoods
 
 	Vec2i goalPos;          /// or tile coordinate of destination
 
 	union {
-		struct {
-			Vec2i Pos; /// position for terrain resource.
-			CUnit *Mine;
-		} Resource;
-	} Arg1;             /// Extra command argument.
-
-	union {
 		int Attack;
-		int Res;
 	} SubAction;
 
 
@@ -211,12 +199,9 @@ public:
 #define MAX_PATH_LENGTH 28          /// max length of precalculated path
 		char Path[MAX_PATH_LENGTH]; /// directions of stored path
 	} Move; /// ActionMove,...
-	struct _order_resource_worker_ {
-		int TimeToHarvest;          /// how much time until we harvest some more.
-		unsigned DoneHarvesting:1;  /// Harvesting done, wait for action to break.
-	} ResWorker; /// Worker harvesting
 	} Data; /// Storage room for different commands
 };
+
 
 class COrder_Board : public COrder
 {
@@ -407,6 +392,63 @@ public:
 	void SetUpgrade(CUpgrade &upgrade) { Upgrade = &upgrade; }
 private:
 	CUpgrade *Upgrade;
+};
+
+class COrder_Resource : public COrder
+{
+	friend COrder* COrder::NewActionResource(CUnit &harvester, const Vec2i &pos);
+	friend COrder* COrder::NewActionResource(CUnit &harvester, CUnit &mine);
+	friend COrder* COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot);
+
+public:
+	COrder_Resource(CUnit &harvester) : COrder(UnitActionResource), worker(&harvester),
+		CurrentResource(0), State(0), TimeToHarvest(0), DoneHarvesting(false)
+	{
+		Resource.Pos.x = Resource.Pos.y = -1;
+	}
+
+	~COrder_Resource();
+
+	virtual COrder_Resource *Clone() const { return new COrder_Resource(*this); }
+
+	virtual void Save(CFile &file, const CUnit &unit) const;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+	virtual void Execute(CUnit &unit);
+
+	bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
+	virtual void ReleaseRefs(CUnit &unit);
+
+
+	Vec2i GetHarvestLocation() const; // { return Pos || Mine->tilePos;}
+	bool IsGatheringStarted() const;
+	bool IsGatheringFinished() const;
+	bool IsGatheringWaiting() const;
+private:
+	int MoveToResource_Terrain(CUnit &unit);
+	int MoveToResource_Unit(CUnit &unit);
+	int MoveToResource(CUnit &unit);
+	void UnitGotoGoal(CUnit &unit, CUnit *const goal, int state);
+	int StartGathering(CUnit &unit);
+	void LoseResource(CUnit &unit, const CUnit &source);
+	int GatherResource(CUnit &unit);
+	int StopGathering(CUnit &unit);
+	int MoveToDepot(CUnit &unit);
+	bool WaitInDepot(CUnit &unit);
+	void DropResource(CUnit &unit);
+	void ResourceGiveUp(CUnit &unit);
+	bool ActionResourceInit(CUnit &unit);
+private:
+	CUnitPtr worker; /// unit that own this order.
+	unsigned char CurrentResource;
+	struct {
+		Vec2i Pos; /// position for terrain resource.
+		CUnitPtr Mine;
+	} Resource;
+	CUnitPtr Depot;
+	int State;
+	int TimeToHarvest;          /// how much time until we harvest some more.
+	bool DoneHarvesting;  /// Harvesting done, wait for action to break.
 };
 
 class COrder_SpellCast : public COrder
@@ -614,8 +656,6 @@ extern void CommandSharedVision(int player, bool state, int opponent);
 --  Actions: in action_<name>.c
 ----------------------------------------------------------------------------*/
 
-extern void DropResource(CUnit &unit);
-extern void ResourceGiveUp(CUnit &unit);
 extern int GetNumWaitingWorkers(const CUnit &mine);
 extern bool AutoAttack(CUnit &unit);
 extern bool AutoRepair(CUnit &unit);
@@ -632,10 +672,6 @@ typedef void HandleActionFunc(COrder& order, CUnit &unit);
 
 	/// Handle command attack
 extern HandleActionFunc HandleActionAttack;
-	/// Handle command resource
-extern HandleActionFunc HandleActionResource;
-	/// Handle command return
-extern HandleActionFunc HandleActionReturnGoods;
 
 /*----------------------------------------------------------------------------
 --  Actions: actions.c

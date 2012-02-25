@@ -376,7 +376,6 @@ bool CUnit::RestoreOrder()
 
 	//copy
 	this->Orders.insert(this->Orders.begin() + 1, this->SavedOrder);
-	this->CurrentResource = this->SavedOrder->CurrentResource;
 
 	this->SavedOrder = NULL;
 	return true;
@@ -3410,18 +3409,6 @@ void CleanUnits()
 				continue;
 			}
 			if (!unit->Destroyed) {
-				if (unit->CurrentAction() == UnitActionResource) {
-					ResourceInfo *resinfo = unit->Type->ResInfo[unit->CurrentResource];
-					if (resinfo && !resinfo->TerrainHarvester) {
-						CUnit *mine = unit->CurrentOrder()->Arg1.Resource.Mine;
-						if (mine && !mine->Destroyed) {
-							unit->DeAssignWorkerFromMine(*mine);
-							mine->RefsDecrease();
-							unit->CurrentOrder()->Arg1.Resource.Mine = NULL;
-						}
-					}
-				}
-				unit->CurrentOrder()->ClearGoal();
 				if (!unit->Removed) {
 					unit->Remove(NULL);
 				}
