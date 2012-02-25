@@ -50,6 +50,9 @@
  *
  * ::EXTRACT_BIN
  *
+ *
+ * And optional:
+ *
  * ::EXTRACT_COMMAND
  *
  * ::EXTRACT_INFO
@@ -103,12 +106,14 @@
 
 /**
  * \def EXTRACT_COMMAND
- * Full patch to extract program with command line arguments for extracting data
+ * Optional: Full patch to extract program with command line arguments for extracting data
+ * If not specified 'EXTRACT_BIN DATA_DIR EXTRACT_DIR' is used
  **/
 
 /**
  * \def EXTRACT_INFO
- * Additional extract data game info
+ * Optional: Additional extract data game info
+ * Default empty
  **/
 
 /* Fake definitions for Doxygen */
@@ -119,11 +124,9 @@
 #define GAME_CD_FILE
 #define GAME
 #define EXTRACT_BIN
-#define EXTRACT_COMMAND
-#define EXTRACT_INFO
 #endif
 
-#if ! defined (GAME_NAME) || ! defined (GAME_CD) || ! defined (GAME_CD_DIR) || ! defined (GAME_CD_FILE) || ! defined (GAME) || ! defined (EXTRACT_BIN) || ! defined (EXTRACT_COMMAND) || ! defined (EXTRACT_INFO)
+#if ! defined (GAME_NAME) || ! defined (GAME_CD) || ! defined (GAME_CD_DIR) || ! defined (GAME_CD_FILE) || ! defined (GAME) || ! defined (EXTRACT_BIN)
 #error You need to define all Game macros, see stratagus-maemo-extract.h
 #endif
 
@@ -138,14 +141,22 @@
 #include <gtk/gtk.h>
 #include <hildon/hildon.h>
 
+#define DATA_DIR "/home/user/" GAME_CD_DIR
+#define EXTRACT_DIR "/home/user/MyDocs/stratagus/" GAME
+
+#ifndef EXTRACT_COMMAND
+#define EXTRACT_COMMAND EXTRACT_BIN " " DATA_DIR " " EXTRACT_DIR
+#endif
+
+#ifndef EXTRACT_INFO
+#define EXTRACT_INFO ""
+#endif
+
 #define DATA_NEED_COPY "Note: You need the original " GAME_CD "\n(Battle.net edition doesn't work)\nto extract the game data files.\nData files are needed to run " GAME_NAME ".\n\nFirst copy " GAME_CD " to folder " GAME_CD_DIR "\n, then press OK. " EXTRACT_INFO
 #define DATA_FOUND GAME_CD " data files was found in folder " GAME_CD_DIR "\n\nPlease be patient, the data may take\na couple of minutes to extract...\n\nPress OK to start extracting data now."
 #define DATA_NOT_FOUND "Error: " GAME_CD " data files was not found.\n\nCheck if you have file\n" GAME_CD_DIR"/"GAME_CD_FILE
 #define EXTRACT_OK GAME_CD " data files was successfull extracted."
 #define EXTRACT_FAILED "Error: Cannot extract " GAME_CD " data files,\nextract program crashed."
-
-#define DATA_DIR "/home/user/" GAME_CD_DIR
-#define EXTRACT_DIR "/home/user/MyDocs/stratagus/" GAME
 
 static void message(char * title, char * text, int error) {
 
