@@ -3025,7 +3025,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 
 		if (fire) {
 			const PixelDiff offset = {0, -PixelTileSize.y};
-			Missile *missile = MakeMissile(*fire, targetPixelCenter - offset, targetPixelCenter - offset);
+			Missile *missile = MakeMissile(*fire, targetPixelCenter + offset, targetPixelCenter + offset);
 
 			target.RefsIncrease();
 			missile->SourceUnit = &target;
