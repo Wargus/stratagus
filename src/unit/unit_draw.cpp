@@ -756,9 +756,10 @@ static void ShowSingleOrder(const CUnit &unit, const PixelPos &pos, const COrder
 		case UnitActionAttackGround:
 			pos2 = CurrentViewport->TilePosToScreen_Center(order.goalPos);
 			// FALL THROUGH
-		case UnitActionAttack:
-		{
-			if (order.SubAction.Attack & 2) { // Show weak targets.
+		case UnitActionAttack: {
+			const COrder_Attack &orderAttack = static_cast<const COrder_Attack&>(order);
+
+			if (orderAttack.IsWeakTargetSelected()) { // Show weak targets.
 				e_color = ColorBlue;
 			} else {
 				e_color = ColorRed;

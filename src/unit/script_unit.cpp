@@ -221,21 +221,6 @@ bool COrder::ParseMoveData(lua_State *l, int &j, const char *value)
 	return true;
 }
 
-bool COrder::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
-{
-	if (this->ParseMoveData(l, j, value)) {
-		return true;
-	} else if (!strcmp(value, "subaction")) {
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		this->SubAction.Attack = LuaToNumber(l, -1);
-		lua_pop(l, 1);
-	} else {
-		return false;
-	}
-	return true;
-}
-
 /**
 **  Parse order
 **
@@ -250,44 +235,44 @@ void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 	const char *actiontype = LuaToString(l, -1);
 	lua_pop(l, 1);
 
-	if (!strcmp(actiontype, "action-still")) {
-		*orderPtr = new COrder_Still(false);
-	} else if (!strcmp(actiontype, "action-stand-ground")) {
-		*orderPtr = new COrder_Still(true);
+	if (!strcmp(actiontype, "action-attack")) {
+		*orderPtr = new COrder_Attack(false);
+	} else if (!strcmp(actiontype, "action-attack-ground")) {
+		*orderPtr = new COrder_Attack(true);
+	} else if (!strcmp(actiontype, "action-board")) {
+		*orderPtr = new COrder_Board;
+	} else if (!strcmp(actiontype, "action-build")) {
+		*orderPtr = new COrder_Build;
+	} else if (!strcmp(actiontype, "action-built")) {
+		*orderPtr = new COrder_Built;
+	} else if (!strcmp(actiontype, "action-die")) {
+		*orderPtr = new COrder_Die;
 	} else if (!strcmp(actiontype, "action-follow")) {
 		*orderPtr = new COrder_Follow;
 	} else if (!strcmp(actiontype, "action-move")) {
 		*orderPtr = new COrder_Move;
-	} else if (!strcmp(actiontype, "action-attack")) {
-		*orderPtr = COrder::NewActionAttack();
-	} else if (!strcmp(actiontype, "action-attack-ground")) {
-		*orderPtr = COrder::NewActionAttackGround();
-	} else if (!strcmp(actiontype, "action-die")) {
-		*orderPtr = new COrder_Die;
-	} else if (!strcmp(actiontype, "action-spell-cast")) {
-		*orderPtr = new COrder_SpellCast;
-	} else if (!strcmp(actiontype, "action-train")) {
-		*orderPtr = new COrder_Train;
-	} else if (!strcmp(actiontype, "action-upgrade-to")) {
-		*orderPtr = new COrder_UpgradeTo;
-	} else if (!strcmp(actiontype, "action-research")) {
-		*orderPtr = new COrder_Research;
-	} else if (!strcmp(actiontype, "action-built")) {
-		*orderPtr = new COrder_Built;
-	} else if (!strcmp(actiontype, "action-board")) {
-		*orderPtr = new COrder_Board;
-	} else if (!strcmp(actiontype, "action-unload")) {
-		*orderPtr = new COrder_Unload;
 	} else if (!strcmp(actiontype, "action-patrol")) {
 		*orderPtr = new COrder_Patrol;
-	} else if (!strcmp(actiontype, "action-build")) {
-		*orderPtr = new COrder_Build;
 	} else if (!strcmp(actiontype, "action-repair")) {
 		*orderPtr = new COrder_Repair;
+	} else if (!strcmp(actiontype, "action-research")) {
+		*orderPtr = new COrder_Research;
 	} else if (!strcmp(actiontype, "action-resource")) {
 		*orderPtr = new COrder_Resource(unit);
+	} else if (!strcmp(actiontype, "action-spell-cast")) {
+		*orderPtr = new COrder_SpellCast;
+	} else if (!strcmp(actiontype, "action-stand-ground")) {
+		*orderPtr = new COrder_Still(true);
+	} else if (!strcmp(actiontype, "action-still")) {
+		*orderPtr = new COrder_Still(false);
+	} else if (!strcmp(actiontype, "action-train")) {
+		*orderPtr = new COrder_Train;
 	} else if (!strcmp(actiontype, "action-transform-into")) {
 		*orderPtr = new COrder_TransformInto;
+	} else if (!strcmp(actiontype, "action-upgrade-to")) {
+		*orderPtr = new COrder_UpgradeTo;
+	} else if (!strcmp(actiontype, "action-unload")) {
+		*orderPtr = new COrder_Unload;
 	} else {
 		LuaError(l, "ParseOrder: Unsupported type: %s" _C_ actiontype);
 	}

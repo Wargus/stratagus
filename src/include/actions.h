@@ -83,7 +83,6 @@ enum UnitAction {
 
 	UnitActionRepair,       /// unit repairing
 	UnitActionResource,     /// unit harvesting resources
-	UnitActionDummy, // UnitActionReturnGoods,  /// unit returning any resource
 	UnitActionTransformInto /// unit transform into type.
 };
 
@@ -101,26 +100,24 @@ struct lua_State;
 */
 class COrder
 {
-
 public:
 	COrder(int action) : Goal(NULL), Range(0), MinRange(0), Width(0),
 		Height(0), Action(action), Finished(false)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
-		memset(&SubAction, 0, sizeof (SubAction));
 		memset(&Data, 0, sizeof (Data));
 	}
 	virtual ~COrder();
 
-	virtual COrder *Clone() const;
-	virtual void Execute(CUnit &unit);
+	virtual COrder *Clone() const = 0;
+	virtual void Execute(CUnit &unit) = 0;
 	virtual void Cancel(CUnit &unit) {}
 	virtual void OnAnimationAttack(CUnit &unit);
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
+	virtual void Save(CFile &file, const CUnit &unit) const = 0;
 	bool ParseGenericData(lua_State *l, int &j, const char *value);
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) = 0;
 
 	virtual void UpdateUnitVariables(CUnit &unit) const {}
 	virtual void FillSeenValues(CUnit &unit) const;
@@ -142,7 +139,6 @@ public:
 	bool ParseMoveData(lua_State *l, int &j, const char *value);
 
 	bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
-
 
 	static COrder* NewActionAttack(const CUnit &attacker, CUnit &target);
 	static COrder* NewActionAttack(const CUnit &attacker, const Vec2i &dest);
@@ -168,13 +164,7 @@ public:
 	static COrder* NewActionUnload(const Vec2i &pos, CUnit *what);
 	static COrder* NewActionUpgradeTo(CUnit &unit, CUnitType &type);
 
-#if 1 // currently needed for parsing
-	static COrder* NewActionAttack() { return new COrder(UnitActionAttack); }
-	static COrder* NewActionAttackGround() { return new COrder(UnitActionAttackGround); }
-#endif
-
 private:
-
 	CUnit *Goal;
 public:
 	int Range;              /// How far away
@@ -186,12 +176,7 @@ public:
 
 	Vec2i goalPos;          /// or tile coordinate of destination
 
-	union {
-		int Attack;
-	} SubAction;
-
-
-	union _order_data_ {
+	struct _order_data_ {
 	struct _order_move_ {
 		unsigned short int Cycles;          /// how much Cycles we move.
 		char Fast;                  /// Flag fast move (one step)
@@ -202,6 +187,33 @@ public:
 	} Data; /// Storage room for different commands
 };
 
+class COrder_Attack : public COrder
+{
+	friend COrder* COrder::NewActionAttack(const CUnit &attacker, CUnit &target);
+	friend COrder* COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest);
+	friend COrder* COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
+public:
+	COrder_Attack(bool ground) : COrder(ground ? UnitActionAttackGround : UnitActionAttack), State(0)
+	{}
+
+	virtual COrder_Attack* Clone() const { return new COrder_Attack(*this); }
+
+	virtual void Save(CFile &file, const CUnit &unit) const;
+	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+
+	virtual void Execute(CUnit &unit);
+
+	bool IsWeakTargetSelected() const;
+
+private:
+	bool CheckForDeadGoal(CUnit &unit);
+	bool CheckForTargetInRange(CUnit &unit);
+	void MoveToTarget(CUnit &unit);
+	void AttackTarget(CUnit &unit);
+
+private:
+	int State;
+};
 
 class COrder_Board : public COrder
 {
@@ -666,12 +678,6 @@ extern void UnHideUnit(CUnit &unit);
 extern int DoActionMove(CUnit &unit);
 	/// Show attack animation
 extern void AnimateActionAttack(CUnit &unit);
-
-
-typedef void HandleActionFunc(COrder& order, CUnit &unit);
-
-	/// Handle command attack
-extern HandleActionFunc HandleActionAttack;
 
 /*----------------------------------------------------------------------------
 --  Actions: actions.c

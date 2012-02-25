@@ -88,7 +88,7 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 
 /* static */ COrder* COrder::NewActionAttack(const CUnit &attacker, CUnit &target)
 {
-	COrder *order = new COrder(UnitActionAttack);
+	COrder_Attack *order = new COrder_Attack(false);
 
 	if (target.Destroyed) {
 		order->goalPos = target.tilePos + target.Type->GetHalfTileSize();
@@ -105,7 +105,7 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 {
 	Assert(Map.Info.IsPointOnMap(dest));
 
-	COrder *order = new COrder(UnitActionAttack);
+	COrder_Attack *order = new COrder_Attack(false);
 
 	if (Map.WallOnMap(dest) && Map.IsFieldExplored(*attacker.Player, dest)) {
 		// FIXME: look into action_attack.cpp about this ugly problem
@@ -120,7 +120,7 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 
 /* static */ COrder* COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest)
 {
-	COrder *order = new COrder(UnitActionAttackGround);
+	COrder_Attack *order = new COrder_Attack(true);
 
 	order->goalPos = dest;
 	order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
@@ -407,20 +407,6 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 	order->Type = &type;
 
 	return order;
-}
-
-COrder* COrder::Clone() const
-{
-	COrder *clone = new COrder(this->Action);
-
-	clone->Range = this->Range;
-	clone->MinRange = this->MinRange;
-	clone->Width = this->Width;
-	clone->Height = this->Height;
-	clone->SetGoal(this->Goal);
-	clone->goalPos = this->goalPos;
-	memcpy(&clone->Data, &this->Data, sizeof (clone->Data));
-	return clone;
 }
 
 COrder::~COrder()
@@ -1255,140 +1241,6 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 ----------------------------------------------------------------------------*/
 
 /**
-**  Unit does nothing!
-**
-**  @param unit  Unit pointer for none action.
-*/
-static void HandleActionNone(COrder&, CUnit &unit)
-{
-	DebugPrint("FIXME: Should not happen!\n");
-	DebugPrint("FIXME: Unit (%d) %s has action none.!\n" _C_
-		UnitNumber(unit) _C_ unit.Type->Ident.c_str());
-}
-
-/**
-**  Unit has not written function.
-**
-**  @param unit  Unit pointer for not written action.
-*/
-static void HandleActionNotWritten(COrder&, CUnit &unit)
-{
-	DebugPrint("FIXME: Not written!\n");
-	DebugPrint("FIXME: Unit (%d) %s has action %d.!\n" _C_
-		UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_ unit.CurrentAction());
-}
-
-/**
-**  Jump table for actions.
-**
-**  @note can move function into unit structure.
-*/
-static void (*HandleActionTable[256])(COrder&, CUnit &) = {
-	HandleActionNone,
-	HandleActionNone, // HandleActionStill,
-	HandleActionNone, // HandleActionStandGround,
-	HandleActionNone, // HandleActionFollow,
-	HandleActionNone, // HandleActionMove,
-	HandleActionAttack,
-	HandleActionAttack, // HandleActionAttackGround,
-	HandleActionNone, // HandleActionDie,
-	HandleActionNone, // HandleActionSpellCast,
-	HandleActionNone, // HandleActionTrain,
-	HandleActionNone, // HandleActionUpgradeTo,
-	HandleActionNone, // HandleActionResearch,
-	HandleActionNone, // HandleActionBuilt,
-	HandleActionNone, // HandleActionBoard,
-	HandleActionNone, // HandleActionUnload,
-	HandleActionNone, // HandleActionPatrol,
-	HandleActionNone, // HandleActionBuild,
-	HandleActionNone, // HandleActionRepair,
-	HandleActionNone, // HandleActionResource,
-	HandleActionNone, // HandleActionReturnGoods,
-	HandleActionNone, // HandleActionTransformInto,
-	HandleActionNotWritten,
-
-	// Enough for the future ?
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-	HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
-};
-
-/**
 **  Increment a unit's health
 **
 **  @param unit  the unit to operate on
@@ -1466,14 +1318,6 @@ static void HandleBuffs(CUnit &unit, int amount)
 			}
 		}
 	}
-}
-
-
-
-
-void COrder::Execute(CUnit &unit)
-{
-	HandleActionTable[Action](*this, unit);
 }
 
 
