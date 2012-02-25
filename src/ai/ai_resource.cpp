@@ -1118,10 +1118,6 @@ static void AiCollectResources()
 				// i got a new unit.
 				priority_needed[i]--;
 
-				// Add to the assigned
-				units_assigned[c].push_back(unit);
-				num_units_assigned[c]++;
-
 				// Recompute priority now
 				break;
 			}
