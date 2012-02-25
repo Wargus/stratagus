@@ -583,6 +583,10 @@ if (WIN32 AND MSVC)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE=1)
 endif()
 
+if (WIN32 AND MINGW)
+	set(stratagus_LIBS ${stratagus_LIBS} dxguid)
+endif()
+
 if(APPLE)
 	add_definitions(-DUSE_MAC)
 	add_definitions(-D__unix)
@@ -609,8 +613,8 @@ endif()
 
 # Stratagus needs to have char by default signed
 # No idea how to tell this to other compilers
-if(CMAKE_COMPILER_IS_GNUCC)
-	add_definitions(-fsigned-char)
+if(CMAKE_COMPILER_IS_GNUCXX)
+	set(CMAKE_CXX_FLAGS "-fsigned-char")
 endif()
 
 check_function_exists("strcasestr" HAVE_STRCASESTR)
