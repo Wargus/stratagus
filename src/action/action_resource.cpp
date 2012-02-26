@@ -70,7 +70,11 @@
 
 Vec2i COrder_Resource::GetHarvestLocation() const
 {
-	return this->Resource.Pos;
+	if (this->Resource.Mine != NULL) {
+		return this->Resource.Mine->tilePos;
+	} else {
+		return this->Resource.Pos;
+	}
 }
 
 bool COrder_Resource::IsGatheringStarted() const
@@ -90,18 +94,12 @@ bool COrder_Resource::IsGatheringWaiting() const
 
 COrder_Resource::~COrder_Resource()
 {
-
-}
-
-void COrder_Resource::ReleaseRefs(CUnit &owner)
-{
 	CUnit *mine = this->Resource.Mine;
 
 	if (mine && mine->IsAlive()) {
-		owner.DeAssignWorkerFromMine(*mine);
-		this->Resource.Mine = NULL;
+		worker->DeAssignWorkerFromMine(*mine);
 	}
-	if (this->HasGoal()) {
+	if (this->HasGoal() && this->GetGoal()->IsAlive()) {
 		// If mining decrease the active count on the resource.
 		if (this->State == SUB_GATHER_RESOURCE ) {
 			CUnit *goal = this->GetGoal();
@@ -109,7 +107,6 @@ void COrder_Resource::ReleaseRefs(CUnit &owner)
 			goal->Resource.Active--;
 			Assert(goal->Resource.Active >= 0);
 		}
-		this->ClearGoal();
 	}
 }
 
@@ -120,9 +117,6 @@ void COrder_Resource::ReleaseRefs(CUnit &owner)
 		file.printf(" \"finished\",");
 	}
 	file.printf(" \"range\", %d,", this->Range);
-//	file.printf(" \"width\", %d,", order.Width);
-//	file.printf(" \"height\", %d,", order.Height);
-//	file.printf(" \"min-range\", %d,", order.MinRange);
 	if (this->HasGoal()) {
 		CUnit &goal = *this->GetGoal();
 		if (goal.Destroyed) {
@@ -202,6 +196,21 @@ void COrder_Resource::ReleaseRefs(CUnit &owner)
 	}
 	return true;
 }
+
+/* virtual */ bool COrder_Resource::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /* damage*/)
+{
+	if (this->IsGatheringFinished()) {
+		// Normal return to depot
+		return true;
+	}
+	if (this->IsGatheringStarted()  && unit.ResourcesHeld > 0) {
+		// escape to Depot with what you have
+		this->DoneHarvesting = true;
+		return true;
+	}
+	return false;
+}
+
 
 
 /**

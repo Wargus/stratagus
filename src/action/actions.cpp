@@ -451,7 +451,7 @@ bool COrder::CheckRange() const
 	unit.Seen.CFrame = NULL;
 }
 
-bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
+/* virtual */ bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
 {
 	Assert(unit.CurrentOrder() == this);
 
@@ -1338,7 +1338,6 @@ static void HandleUnitAction(CUnit &unit)
 
 		if (unit.Orders[0]->Finished && unit.Orders[0]->Action != UnitActionStill
 			&& unit.Orders.size() == 1) {
-			unit.Orders[0]->ReleaseRefs(unit);
 
 			delete unit.Orders[0];
 			unit.Orders[0] = new COrder_Still(false);
@@ -1356,7 +1355,6 @@ static void HandleUnitAction(CUnit &unit)
 				// This happens, if building with ALT+SHIFT.
 				return;
 			}
-			unit.Orders[0]->ReleaseRefs(unit);
 
 			delete unit.Orders[0];
 			unit.Orders.erase(unit.Orders.begin());

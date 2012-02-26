@@ -123,7 +123,6 @@ public:
 	virtual void FillSeenValues(CUnit &unit) const;
 	virtual void AiUnitKilled(CUnit &unit);
 
-	void ReleaseRefs(CUnit &owner) {}
 	bool CheckRange() const;
 
 	bool HasGoal() const { return Goal != NULL; }
@@ -138,7 +137,7 @@ public:
 	void SaveDataMove(CFile &file) const;
 	bool ParseMoveData(lua_State *l, int &j, const char *value);
 
-	bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
+	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 
 	static COrder* NewActionAttack(const CUnit &attacker, CUnit &target);
 	static COrder* NewActionAttack(const CUnit &attacker, const Vec2i &dest);
@@ -428,11 +427,10 @@ public:
 
 	virtual void Execute(CUnit &unit);
 
-	bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
-	virtual void ReleaseRefs(CUnit &unit);
+	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 
 
-	Vec2i GetHarvestLocation() const; // { return Pos || Mine->tilePos;}
+	Vec2i GetHarvestLocation() const;
 	bool IsGatheringStarted() const;
 	bool IsGatheringFinished() const;
 	bool IsGatheringWaiting() const;
