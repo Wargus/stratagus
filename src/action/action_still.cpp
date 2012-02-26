@@ -174,6 +174,21 @@ bool AutoCast(CUnit &unit)
 	return false;
 }
 
+class IsAReparableUnitBy
+{
+public:
+	explicit IsAReparableUnitBy(const CUnit& _worker) : worker(&_worker) {}
+	bool operator () (CUnit* unit) const {
+		return (unit->IsTeamed(*worker)
+			&& unit->Type->RepairHP
+			&& unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max
+			&& unit->IsVisibleAsGoal(*worker->Player));
+	}
+private:
+	const CUnit* worker;
+};
+
+
 /**
 **  Try to find a repairable unit around and return it.
 **
@@ -186,22 +201,9 @@ bool AutoCast(CUnit &unit)
 */
 static CUnit *UnitToRepairInRange(const CUnit &unit, int range)
 {
-	CUnit *table[UnitMax];
-	const int n = Map.Select(unit.tilePos.x - range, unit.tilePos.y - range,
-		unit.tilePos.x + unit.Type->TileWidth + range,
-		unit.tilePos.y + unit.Type->TileHeight + range,
-		table);
-	for (int i = 0; i < n; ++i) {
-		CUnit &candidate = *table[i];
+	const Vec2i offset = {range, range};
 
-		if (candidate.IsTeamed(unit)
-			&& candidate.Type->RepairHP
-			&& candidate.Variable[HP_INDEX].Value < candidate.Variable[HP_INDEX].Max
-			&& candidate.IsVisibleAsGoal(*unit.Player)) {
-			return &candidate;
-		}
-	}
-	return NULL;
+	return Map.Find_If(unit.tilePos - offset, unit.tilePos + offset, IsAReparableUnitBy(unit));
 }
 
 /**

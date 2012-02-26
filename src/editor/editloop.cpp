@@ -318,6 +318,8 @@ void EditTiles(const Vec2i &pos, int tile, int size)
 */
 static void EditorActionPlaceUnit(const Vec2i &pos, CUnitType &type, CPlayer *player)
 {
+	Assert(Map.Info.IsPointOnMap(pos));
+
 	if (type.Neutral) {
 		player = &Players[PlayerNumNeutral];
 	}
@@ -331,21 +333,17 @@ static void EditorActionPlaceUnit(const Vec2i &pos, CUnitType &type, CPlayer *pl
 
 	CBuildRestrictionOnTop *b = OnTopDetails(*unit, NULL);
 	if (b && b->ReplaceOnBuild) {
-		CUnit *table[UnitMax];
+		CUnitCache &unitCache = Map.Field(pos)->UnitCache;
+		CUnitCache::iterator it = std::find_if(unitCache.begin(), unitCache.end(), HasSameTypeAs(*b->Parent));
 
-		//FIXME: rb: use tile functor find here.
-		int n = Map.Select(pos, table);
-		while (n--) {
-			if (table[n]->Type == b->Parent) {
-				unit->ResourcesHeld = table[n]->ResourcesHeld; // We capture the value of what is beneath.
-				table[n]->Remove(NULL); // Destroy building beneath
-				UnitLost(*table[n]);
-				UnitClearOrders(*table[n]);
-				table[n]->Release();
-				break;
-			}
+		if (it != unitCache.end()) {
+			CUnit &replacedUnit = **it;
+			unit->ResourcesHeld = replacedUnit.ResourcesHeld; // We capture the value of what is beneath.
+			replacedUnit.Remove(NULL); // Destroy building beneath
+			UnitLost(replacedUnit);
+			UnitClearOrders(replacedUnit);
+			replacedUnit.Release();
 		}
-
 	}
 	if (unit != NoUnitP) {
 		if (type.GivesResource) {

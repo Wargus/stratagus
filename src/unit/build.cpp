@@ -105,36 +105,34 @@ bool CBuildRestrictionAnd::Check(const CUnitType &type, int x, int y, CUnit *&on
 bool CBuildRestrictionDistance::Check(const CUnitType &type, int x, int y, CUnit *&) const
 {
 	const Vec2i pos = {x, y};
-	int x1 = 0;
-	int x2 = 0;
-	int y1 = 0;
-	int y2 = 0;
+	Vec2i pos1 = {0, 0};
+	Vec2i pos2 = {0, 0};
 	int distance = 0;
 
 	if (this->DistanceType == LessThanEqual ||
 			this->DistanceType == GreaterThan ||
 			this->DistanceType == Equal ||
 			this->DistanceType == NotEqual) {
-		x1 = std::max<int>(x - this->Distance, 0);
-		y1 = std::max<int>(y - this->Distance, 0);
-		x2 = std::min<int>(x + type.TileWidth + this->Distance, Map.Info.MapWidth);
-		y2 = std::min<int>(y + type.TileHeight + this->Distance, Map.Info.MapHeight);
+		pos1.x = std::max<int>(x - this->Distance, 0);
+		pos1.y = std::max<int>(y - this->Distance, 0);
+		pos2.x = std::min<int>(x + type.TileWidth + this->Distance, Map.Info.MapWidth);
+		pos2.y = std::min<int>(y + type.TileHeight + this->Distance, Map.Info.MapHeight);
 		distance = this->Distance;
 	} else if (this->DistanceType == LessThan ||
 			this->DistanceType == GreaterThanEqual) {
-		x1 = std::max<int>(x - this->Distance - 1, 0);
-		y1 = std::max<int>(y - this->Distance - 1, 0);
-		x2 = std::min<int>(x + type.TileWidth + this->Distance + 1, Map.Info.MapWidth);
-		y2 = std::min<int>(y + type.TileHeight + this->Distance + 1, Map.Info.MapHeight);
+		pos1.x = std::max<int>(x - this->Distance - 1, 0);
+		pos1.y = std::max<int>(y - this->Distance - 1, 0);
+		pos2.x = std::min<int>(x + type.TileWidth + this->Distance + 1, Map.Info.MapWidth);
+		pos2.y = std::min<int>(y + type.TileHeight + this->Distance + 1, Map.Info.MapHeight);
 		distance = this->Distance - 1;
 	}
-	CUnit *table[UnitMax];
-	int n = Map.Select(x1, y1, x2, y2, table);
+	std::vector<CUnit *> table;
+	Map.Select(pos1, pos2, table);
 
 	switch (this->DistanceType) {
 		case GreaterThan :
 		case GreaterThanEqual :
-			for (int i = 0; i < n; ++i) {
+			for (size_t i = 0; i != table.size(); ++i) {
 				if (this->RestrictType == table[i]->Type &&
 					MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
 					return false;
@@ -143,7 +141,7 @@ bool CBuildRestrictionDistance::Check(const CUnitType &type, int x, int y, CUnit
 			return true;
 		case LessThan :
 		case LessThanEqual :
-			for (int i = 0; i < n; ++i) {
+			for (size_t i = 0; i != table.size(); ++i) {
 				if (this->RestrictType == table[i]->Type &&
 					MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
 					return true;
@@ -151,7 +149,7 @@ bool CBuildRestrictionDistance::Check(const CUnitType &type, int x, int y, CUnit
 			}
 			return false;
 		case Equal :
-			for (int i = 0; i < n; ++i) {
+			for (size_t i = 0; i != table.size(); ++i) {
 				if (this->RestrictType == table[i]->Type &&
 					MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
 					return true;
@@ -159,7 +157,7 @@ bool CBuildRestrictionDistance::Check(const CUnitType &type, int x, int y, CUnit
 			}
 			return false;
 		case NotEqual :
-			for (int i = 0; i < n; ++i) {
+			for (size_t i = 0; i != table.size(); ++i) {
 				if (this->RestrictType == table[i]->Type &&
 					MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
 					return false;
@@ -214,12 +212,38 @@ inline bool CBuildRestrictionOnTop::functor::operator() (CUnit *const unit)
 	return true;
 }
 
+class AliveConstructedAndSameTypeAs
+{
+public:
+	explicit AliveConstructedAndSameTypeAs(const CUnitType& unitType) : type(&unitType) {}
+	bool operator () (const CUnit* unit) const
+	{
+		return unit->IsAlive() && unit->Type == type && unit->CurrentAction() != UnitActionBuilt;
+	}
+private:
+	const CUnitType *type;
+};
+
+
 bool CBuildRestrictionOnTop::Check(const CUnitType &, int x, int y, CUnit *&ontoptarget) const
 {
-	CUnit *table[UnitMax];
 	const Vec2i pos = {x, y};
+	Assert(Map.Info.IsPointOnMap(pos));
 
 	ontoptarget = NULL;
+#if 1
+	CUnitCache &cache = Map.Field(pos)->UnitCache;
+
+	CUnitCache::iterator it = std::find_if(cache.begin(), cache.end(), AliveConstructedAndSameTypeAs(*this->Parent));
+
+	if (it != cache.end()) {
+		ontoptarget = *it;
+		return true;
+	}
+	return false;
+#else
+	CUnit *table[UnitMax];
+
 	int n = Map.Select(pos, table, UnitMax);
 	for (int i = 0; i < n; ++i) {
 		if (table[i]->tilePos == pos && !table[i]->Destroyed &&
@@ -230,8 +254,8 @@ bool CBuildRestrictionOnTop::Check(const CUnitType &, int x, int y, CUnit *&onto
 			}
 		}
 	}
-
 	return ontoptarget != NULL;
+#endif
 }
 
 

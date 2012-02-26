@@ -92,27 +92,31 @@ void CMap::Remove(CUnit &unit)
 	} while( --i && unit.tilePos.y + (i - h) < Info.MapHeight);
 }
 
-/**
-**  Select units on map tile.
-**
-**  @param pos        Map tile position
-**  @param table      All units in the selection rectangle
-**  @param tablesize  Size of table array
-**
-**  @return           Returns the number of units found
-*/
-int CMap::Select(const Vec2i &pos, CUnit *table[], const int tablesize)
+
+
+
+class NoFilter
 {
-	int n = 0;
-	CUnitCache &cache = Field(pos)->UnitCache;
-	const size_t size = cache.size();
-	for(unsigned int i = 0; n < tablesize && i < size; ++i) {
-		CUnit *unit = cache.Units[i];
-		Assert(!unit->Removed);
-		table[n++] = unit;
-	}
-	return n;
+public:
+	bool operator () (const CUnit*) const { return true; }
+};
+
+void CMap::Select(const Vec2i& ltPos, const Vec2i& rbPos, std::vector<CUnit*>& units)
+{
+	Select(ltPos, rbPos, units, NoFilter());
 }
+
+void CMap::SelectFixed(const Vec2i& ltPos, const Vec2i& rbPos, std::vector<CUnit*>& units)
+{
+	Select(ltPos, rbPos, units, NoFilter());
+}
+
+void CMap::SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit*>& around)
+{
+	SelectAroundUnit(unit, range, around, NoFilter());
+}
+
+#if 0
 
 /**
 **  Select units in rectangle range.
@@ -132,8 +136,15 @@ int CMap::SelectFixed(const Vec2i &ltpos, const Vec2i &rbpos, CUnit *table[], co
 	Assert(Info.IsPointOnMap(rbpos));
 
 	// Optimize small searches.
-	if (ltpos == rbpos) {
-		return Select(ltpos, table, tablesize);
+	if (ltpos == rbpos && excludeNeutral == false) {
+		CUnitCache &cache = this->Field(ltpos)->UnitCache;
+
+		const size_t size = std::min<size_t>(tablesize, cache.size());
+
+		for (size_t i = 0; i != size; ++i) {
+			table[i] = cache[i];
+		}
+		return size;
 	}
 
 	int n = 0;
@@ -176,6 +187,8 @@ int CMap::SelectFixed(const Vec2i &ltpos, const Vec2i &rbpos, CUnit *table[], co
 	return n;
 }
 
+
+
 int CMap::Select(int x1, int y1, int x2, int y2,
 				CUnit *table[], const int tablesize, bool excludeNeutral)
 {
@@ -185,4 +198,6 @@ int CMap::Select(int x1, int y1, int x2, int y2,
 
 	return SelectFixed(ltpos, rbpos, table, tablesize, excludeNeutral);
 }
+
+#endif
 

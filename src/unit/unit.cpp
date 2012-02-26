@@ -1110,23 +1110,6 @@ static void UnitFillSeenValues(CUnit &unit)
 	unit.CurrentOrder()->FillSeenValues(unit);
 }
 
-class SamePlayerAndTypeAs
-{
-public:
-	explicit SamePlayerAndTypeAs(const CUnit &unit) :
-		player(unit.Player), type(unit.Type)
-	{}
-
-	bool operator() (const CUnit *unit) const
-	{
-		return (unit->Player == player && unit->Type == type);
-	}
-
-private:
-	const CPlayer *player;
-	const CUnitType *type;
-};
-
 // Wall unit positions
 enum {
 	W_NORTH = 0x10,
@@ -1164,7 +1147,7 @@ void CorrectWallDirections(CUnit &unit)
 			flags |= dirFlag;
 		} else {
 			const CUnitCache &unitCache = Map.Field(pos)->UnitCache;
-			const CUnit *neighboor = unitCache.find(SamePlayerAndTypeAs(unit));
+			const CUnit *neighboor = unitCache.find(HasSamePlayerAndTypeAs(unit));
 
 			if (neighboor != NULL) {
 				flags |= dirFlag;
@@ -1192,7 +1175,7 @@ void CorrectWallNeighBours(CUnit &unit)
 			continue;
 		}
 		CUnitCache &unitCache = Map.Field(pos)->UnitCache;
-		CUnit *neighboor = unitCache.find(SamePlayerAndTypeAs(unit));
+		CUnit *neighboor = unitCache.find(HasSamePlayerAndTypeAs(unit));
 
 		if (neighboor != NULL) {
 			CorrectWallDirections(*neighboor);
@@ -1736,13 +1719,11 @@ static void ChangePlayerOwner(CPlayer &oldplayer, CPlayer &newplayer)
 */
 void RescueUnits()
 {
-	CUnit *table[UnitMax];
-	CUnit *around[UnitMax];
-	int n;
-
 	if (NoRescueCheck) {  // all possible units are rescued
 		return;
 	}
+	CUnit *table[UnitMax];
+
 	NoRescueCheck = true;
 
 	//  Look if player could be rescued.
@@ -1763,23 +1744,13 @@ void RescueUnits()
 					continue;
 				}
 
-				if (unit->Type->UnitType == UnitTypeLand) {
-					n = Map.Select(
-							unit->tilePos.x - 1, unit->tilePos.y - 1,
-							unit->tilePos.x + unit->Type->TileWidth + 1,
-							unit->tilePos.y + unit->Type->TileHeight + 1, around);
-				} else {
-					n = Map.Select(
-							unit->tilePos.x - 2, unit->tilePos.y - 2,
-							unit->tilePos.x + unit->Type->TileWidth + 2,
-							unit->tilePos.y + unit->Type->TileHeight + 2, around);
-				}
-				//
+				std::vector<CUnit *> around;
+
+				Map.SelectAroundUnit(*unit, 1, around);
+
 				//  Look if ally near the unit.
-				//
-				for (int i = 0; i < n; ++i) {
+				for (size_t i = 0; i != around.size(); ++i) {
 					if (around[i]->Type->CanAttack && unit->IsAllied(*around[i])) {
-						//
 						//  City center converts complete race
 						//  NOTE: I use a trick here, centers could
 						//        store gold. FIXME!!!

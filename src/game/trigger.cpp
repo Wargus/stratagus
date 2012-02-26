@@ -185,67 +185,37 @@ static CompareFunction GetCompareFunction(const char *op)
 */
 static int CclGetNumUnitsAt(lua_State *l)
 {
-	int plynr;
-	int x1;
-	int y1;
-	int x2;
-	int y2;
-	const CUnitType *unittype;
-	CUnit *table[UnitMax];
-	CUnit *unit;
-	int an;
-	int j;
-	int s;
-
 	LuaCheckArgs(l, 4);
 
-	plynr = LuaToNumber(l, 1);
+	int plynr = LuaToNumber(l, 1);
 	lua_pushvalue(l, 2);
-	unittype = TriggerGetUnitType(l);
-	lua_pop(l, 1);
-	if (!lua_istable(l, 3) || lua_objlen(l, 3) != 2) {
-		LuaError(l, "incorrect argument");
-	}
-	lua_rawgeti(l, 3, 1);
-	x1 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, 3, 2);
-	y1 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	if (!lua_istable(l, 4) || lua_objlen(l, 4) != 2) {
-		LuaError(l, "incorrect argument");
-	}
-	lua_rawgeti(l, 4, 1);
-	x2 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, 4, 2);
-	y2 = LuaToNumber(l, -1);
+	const CUnitType *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 
-	//
-	// Get all unit types in location.
-	//
-	// FIXME: I hope SelectUnits checks bounds?
-	// FIXME: Yes, but caller should check.
-	// NOTE: +1 right,bottom isn't inclusive :(
-	an = Map.Select(x1, y1, x2 + 1, y2 + 1, table);
-	//
-	// Count the requested units
-	//
-	for (j = s = 0; j < an; ++j) {
-		unit = table[j];
-		//
+	Vec2i minPos;
+	Vec2i maxPos;
+	CclGetPos(l, &minPos.x, &minPos.y, 3);
+	CclGetPos(l, &maxPos.x, &maxPos.y, 4);
+	maxPos.x += 1;
+	maxPos.y += 1;
+
+	std::vector<CUnit*> units;
+
+	Map.Select(minPos, maxPos, units);
+
+	int s = 0;
+	for (size_t i = 0; i != units.size(); ++i) {
+		const CUnit& unit = *units[i];
 		// Check unit type
-		//
+
 		// FIXME: ALL_UNITS
-		if (unittype == ANY_UNIT ||
-				(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
-				(unittype == ALL_BUILDINGS && unit->Type->Building) ||
-				(unittype == unit->Type && !unit->Constructed)) {
-			//
+		if (unittype == ANY_UNIT
+			|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
+			|| (unittype == ALL_BUILDINGS && unit.Type->Building)
+			|| (unittype == unit.Type && !unit.Constructed)) {
+
 			// Check the player
-			//
-			if (plynr == -1 || plynr == unit->Player->Index) {
+			if (plynr == -1 || plynr == unit.Player->Index) {
 				++s;
 			}
 		}
@@ -254,40 +224,17 @@ static int CclGetNumUnitsAt(lua_State *l)
 	return 1;
 }
 
-static int SelectAroundUnit(CUnit &unit, CUnit **around)
-{
-	// FIXME: I hope SelectUnits checks bounds?
-	// FIXME: Yes, but caller should check.
-	// NOTE: +1 right,bottom isn't inclusive :(
-	if (unit.Type->UnitType == UnitTypeLand) {
-		return Map.Select(unit.tilePos.x - 1, unit.tilePos.y - 1,
-			unit.tilePos.x + unit.Type->TileWidth + 1,
-			unit.tilePos.y + unit.Type->TileHeight + 1, around);
-	} else {
-		return Map.Select(unit.tilePos.x - 2, unit.tilePos.y - 2,
-			unit.tilePos.x + unit.Type->TileWidth + 2,
-			unit.tilePos.y + unit.Type->TileHeight + 2, around);
-	}
-}
-
 /**
 **  Player has the quantity of unit-type near to unit-type.
 */
 static int CclIfNearUnit(lua_State *l)
 {
-	int plynr;
-	int q;
-	int n;
-	int i;
-	const char *op;
-	CUnit *table[UnitMax];
-
 	LuaCheckArgs(l, 5);
 	lua_pushvalue(l, 1);
-	plynr = TriggerGetPlayer(l);
+	const int plynr = TriggerGetPlayer(l);
 	lua_pop(l, 1);
-	op = LuaToString(l, 2);
-	q = LuaToNumber(l, 3);
+	const char* op = LuaToString(l, 2);
+	const int q = LuaToNumber(l, 3);
 	lua_pushvalue(l, 4);
 	const CUnitType *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
@@ -303,50 +250,40 @@ static int CclIfNearUnit(lua_State *l)
 	//
 	// Get all unit types 'near'.
 	//
-	n = FindUnitsByType(*ut2, table);
-	for (i = 0; i < n; ++i) {
-		CUnit *unit;
-		CUnit *around[UnitMax];
-		int an;
-		int j;
-		int s;
 
-		unit = table[i];
-		an = SelectAroundUnit(*unit, around);
+	std::vector<CUnit*> unitsOfType;
 
-		//
+	FindUnitsByType(*ut2, unitsOfType);
+	for (size_t i = 0; i != unitsOfType.size(); ++i) {
+		const CUnit &centerUnit = *unitsOfType[i];
+
+		std::vector<CUnit *> around;
+		Map.SelectAroundUnit(centerUnit, 1, around);
+
 		// Count the requested units
-		//
-		for (j = s = 0; j < an; ++j) {
-			unit = around[j];
-			//
+		int s = 0;
+		for (size_t j = 0; j < around.size(); ++j) {
+			const CUnit& unit = *around[j];
+
 			// Check unit type
 			//
 			// FIXME: ALL_UNITS
-			if (unittype == ANY_UNIT ||
-					(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
-					(unittype == ALL_BUILDINGS && unit->Type->Building) ||
-					(unittype == unit->Type)) {
-				//
+			if (unittype == ANY_UNIT
+				|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
+				|| (unittype == ALL_BUILDINGS && unit.Type->Building)
+				|| (unittype == unit.Type)) {
+
 				// Check the player
-				//
-				if (plynr == -1 || plynr == unit->Player->Index) {
+				if (plynr == -1 || plynr == unit.Player->Index) {
 					++s;
 				}
 			}
-		}
-		// Check if we counted the unit near itself
-		if (unittype == ANY_UNIT ||
-				(unittype == ALL_FOODUNITS && ut2->Building) ||
-				(unittype == ALL_BUILDINGS && ut2->Building)) {
-			--s;
 		}
 		if (compare(s, q)) {
 			lua_pushboolean(l, 1);
 			return 1;
 		}
 	}
-
 	lua_pushboolean(l, 0);
 	return 1;
 }
@@ -356,18 +293,13 @@ static int CclIfNearUnit(lua_State *l)
 */
 static int CclIfRescuedNearUnit(lua_State *l)
 {
-	int plynr;
-	int q;
-	const char *op;
-	CUnit *table[UnitMax];
-
 	LuaCheckArgs(l, 5);
 
 	lua_pushvalue(l, 1);
-	plynr = TriggerGetPlayer(l);
+	const int plynr = TriggerGetPlayer(l);
 	lua_pop(l, 1);
-	op = LuaToString(l, 2);
-	q = LuaToNumber(l, 3);
+	const char* op = LuaToString(l, 2);
+	const int q = LuaToNumber(l, 3);
 	lua_pushvalue(l, 4);
 	const CUnitType *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
@@ -381,55 +313,41 @@ static int CclIfRescuedNearUnit(lua_State *l)
 		LuaError(l, "Illegal comparison operation in if-rescued-near-unit: %s" _C_ op);
 	}
 
-	//
 	// Get all unit types 'near'.
-	//
-	int n = FindUnitsByType(*ut2, table);
-	for (int i = 0; i < n; ++i) {
-		CUnit *unit;
-		CUnit *around[UnitMax];
-		int an;
-		int j;
-		int s;
+	std::vector<CUnit *> table;
+	FindUnitsByType(*ut2, table);
+	for (size_t i = 0; i != table.size(); ++i) {
+		CUnit &centerUnit = *table[i];
+		std::vector<CUnit *> around;
 
-		unit = table[i];
-		an = SelectAroundUnit(*unit, around);
+		Map.SelectAroundUnit(centerUnit, 1, around);
 
-		//
 		// Count the requested units
-		//
-		for (j = s = 0; j < an; ++j) {
-			unit = around[j];
-			if (unit->RescuedFrom) { // only rescued units
-				//
+		int s = 0;
+		for (size_t j = 0; j != around.size(); ++j) {
+			CUnit& unit = *around[j];
+
+			if (unit.RescuedFrom) { // only rescued units
 				// Check unit type
-				//
+
 				// FIXME: ALL_UNITS
-				if (unittype == ANY_UNIT ||
-						(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
-						(unittype == ALL_BUILDINGS && unit->Type->Building) ||
-						(unittype == unit->Type)) {
-					//
+				if (unittype == ANY_UNIT
+					|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
+					|| (unittype == ALL_BUILDINGS && unit.Type->Building)
+					|| (unittype == unit.Type)) {
+
 					// Check the player
-					//
-					if (plynr == -1 || plynr == unit->Player->Index) {
+					if (plynr == -1 || plynr == unit.Player->Index) {
 						++s;
 					}
 				}
 			}
-		}
-		// Check if we counted the unit near itself
-		if (unittype == ANY_UNIT ||
-				(unittype == ALL_FOODUNITS && ut2->Building) ||
-				(unittype == ALL_BUILDINGS && ut2->Building)) {
-			--s;
 		}
 		if (compare(s, q)) {
 			lua_pushboolean(l, 1);
 			return 1;
 		}
 	}
-
 	lua_pushboolean(l, 0);
 	return 1;
 }

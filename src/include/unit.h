@@ -1129,14 +1129,15 @@ extern void CleanDecorations();
 	/// Draw unit's shadow
 extern void DrawShadow(const CUnitType &type, int frame, int x, int y);
 	/// Draw all units visible on map in viewport
-extern int FindAndSortUnits(const CViewport *vp, CUnit *table[]);
+extern int FindAndSortUnits(const CViewport *vp, std::vector<CUnit *>& table);
 extern int FindAndSortUnits(const CViewport *vp, CUnitDrawProxy table[]);
 	/// Show a unit's orders.
 extern void ShowOrder(const CUnit &unit);
 
 // in unit_find.cpp
-	/// Find all units of this type
-extern int FindUnitsByType(const CUnitType &type, CUnit **table);
+
+extern void FindUnitsByType(const CUnitType &type, std::vector<CUnit *>& units);
+
 	/// Find all units of this type of the player
 extern int FindPlayerUnitsByType(const CPlayer &, const CUnitType &, CUnit **);
 	/// Return any unit on that map tile

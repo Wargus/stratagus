@@ -371,11 +371,12 @@ void CViewport::Draw() const
 	if (Proxy) {
 		Proxy->Draw(*this);
 	} else {
-		CUnit *unittable[UnitMax];
+		std::vector<CUnit *> unittable;
 		Missile* missiletable[MAX_MISSILES * 9];
 
 		// We find and sort units after draw level.
-		const int nunits = FindAndSortUnits(this, unittable);
+		FindAndSortUnits(this, unittable);
+		const int nunits = static_cast<int>(unittable.size());
 		const int nmissiles = FindAndSortMissiles(*this, missiletable, MAX_MISSILES * 9);
 		int i = 0;
 		int j = 0;

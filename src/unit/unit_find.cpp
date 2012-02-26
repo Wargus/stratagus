@@ -99,6 +99,24 @@ int FindUnitsByType(const CUnitType &type, CUnit **table)
 /**
 **  Find all units of type.
 **
+**  @param type   type of unit requested
+**  @param units  array in which we have to store the units
+*/
+void FindUnitsByType(const CUnitType &type, std::vector<CUnit *>& units)
+{
+	for (int i = 0; i < NumUnits; ++i) {
+		CUnit &unit = *Units[i];
+
+		if (unit.Type == &type && !unit.IsUnusable()) {
+			units.push_back(&unit);
+		}
+	}
+}
+
+
+/**
+**  Find all units of type.
+**
 **  @param player  we're looking for the units of this player
 **  @param type    type of unit requested
 **  @param table   table in which we have to store the units
@@ -164,18 +182,18 @@ CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type)
 */
 CUnit *TargetOnMap(const CUnit &source, int x1, int y1, int x2, int y2)
 {
-	CUnit *table[UnitMax];
-	CUnit *unit;
-	CUnit *best = NoUnitP;
-	const CUnitType *type;
+	const Vec2i pos1 = {x1, y1};
+	const Vec2i pos2 = {x2, y2};
+	std::vector<CUnit *> table;
 
-	int n = Map.Select(x1, y1, x2, y2, table);
-	for (int i = 0; i < n; ++i) {
-		unit = table[i];
+	Map.Select(pos1, pos2, table);
+	CUnit *best = NULL;
+	for (size_t i = 0; i != table.size(); ++i) {
+		CUnit *unit = table[i];
 		if (!unit->IsVisibleAsGoal(*source.Player)) {
 			continue;
 		}
-		type = unit->Type;
+		const CUnitType *type = unit->Type;
 		if (x2 < unit->tilePos.x || x1 >= unit->tilePos.x + type->TileWidth ||
 				y2 < unit->tilePos.y || y1 >= unit->tilePos.y + type->TileHeight) {
 			continue;
@@ -236,9 +254,9 @@ public:
 		attacker(&a), range(r)
 	{}
 	
-	CUnit *Find(CUnit* table[], const int table_size) const
+	CUnit *Find(const std::vector<CUnit*>& table) const
 	{
-		return Find(table, table + table_size);
+		return Find(table.begin(), table.end());
 	}
 
 	CUnit *Find(CUnitCache &cache) const
@@ -344,16 +362,11 @@ public:
 		{
 		}
 
-		int Fill(CUnit *table[], const int table_size)
-		{
-			return Fill(table, table + table_size);
-		}
-
 		int Fill(CUnitCache &cache)
 		{
 			return Fill(cache.begin(), cache.end());
 		}
-	private:
+
 		template <typename Iterator>
 		int Fill(Iterator begin, Iterator end)
 		{
@@ -362,6 +375,7 @@ public:
 			}
 			return enemy_count;
 		}
+	private:
 
 		void Compute(CUnit *const dest)
 		{
@@ -486,9 +500,9 @@ public:
 		int *bad;
 	};
 
-	CUnit *Find(CUnit* table[], const int table_size) {
-		FillBadGood(*attacker, range, good, bad).Fill(table, table_size);
-		return Find(table, table + table_size);
+	CUnit *Find(std::vector<CUnit*>& table) {
+		FillBadGood(*attacker, range, good, bad).Fill(table.begin(), table.end());
+		return Find(table.begin(), table.end());
 
 	}
 
@@ -639,53 +653,41 @@ CUnit *AutoAttackUnitsInDistance(const CUnit &unit, int range,
 */
 CUnit *AttackUnitsInDistance(const CUnit &unit, int range)
 {
-	CUnit *table[UnitMax];
-	int n;
 	// if necessary, take possible damage on allied units into account...
 	if (unit.Type->Missile.Missile->Range > 1 &&
 			(range + unit.Type->Missile.Missile->Range < 15)) {
 
 		//  If catapult, count units near the target...
 		//   FIXME : make it configurable
-		//
+
 
 		int missile_range = unit.Type->Missile.Missile->Range + range - 1;
 
 		Assert(2 * missile_range + 1 < 32);
-		//
+
 		// If unit is removed, use containers x and y
-		if (unit.Removed) {
-			int x = unit.Container->tilePos.x;
-			int y = unit.Container->tilePos.y;
-			n = Map.Select(x - missile_range, y - missile_range,
-				x + missile_range + unit.Container->Type->TileWidth,
-				y + missile_range + unit.Container->Type->TileHeight, table, UnitMax, 1);
-		} else {
-			int x = unit.tilePos.x;
-			int y = unit.tilePos.y;
-			n = Map.Select(x - missile_range, y - missile_range,
-				x + missile_range + unit.Type->TileWidth,
-				y + missile_range + unit.Type->TileHeight, table, UnitMax, 1);
-		}
+		const CUnit* firstContainer = unit.Container ? unit.Container : &unit;
+		std::vector<CUnit*> table;
+		Map.SelectAroundUnit(*firstContainer, missile_range, table,
+			MakeNotPredicate(HasSamePlayerAs(Players[PlayerNeutral])));
 
-		if (n) {
-			return BestRangeTargetFinder(unit, range).Find(table, n);
+		if (table.empty() == false){
+			return BestRangeTargetFinder(unit, range).Find(table);
 		}
-		return NoUnitP;
-
+		return NULL;
 	} else {
-		n = Map.Select(unit.tilePos.x - range, unit.tilePos.y - range,
-			unit.tilePos.x + range + unit.Type->TileWidth,
-			unit.tilePos.y + range + unit.Type->TileHeight, table);
+		std::vector<CUnit *> table;
 
-		if (range > 25 && n > 9) {
-			std::sort(table, table + n, CompareUnitDistance(unit));
+		Map.SelectAroundUnit(unit, range, table,
+			MakeNotPredicate(HasSamePlayerAs(Players[PlayerNeutral])));
+
+		const int n = static_cast<int>(table.size());
+		if (range > 25 && table.size() > 9) {
+			std::sort(table.begin(), table.begin() + n, CompareUnitDistance(unit));
 		}
 
-		//
 		// Find the best unit to attack
-		//
-		return BestTargetFinder	(unit, range).Find(table, n);
+		return BestTargetFinder(unit, range).Find(table);
 	}
 }
 

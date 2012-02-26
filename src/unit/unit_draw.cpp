@@ -1502,47 +1502,49 @@ static inline bool DrawLevelCompare(const CUnit*c1, const CUnit*c2)
 **  @param table  Table of units to return in sorted order
 **
 */
-int FindAndSortUnits(const CViewport *vp, CUnit*table[])
+int FindAndSortUnits(const CViewport *vp, std::vector<CUnit*>& table)
 {
-	//
 	//  Select all units touching the viewpoint.
-	//
-	int n = Map.Select(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
-		vp->MapY + vp->MapHeight + 1, table);
+	const Vec2i minPos = {vp->MapX - 1, vp->MapY - 1};
+	const Vec2i maxPos = {vp->MapX + vp->MapWidth + 1, vp->MapY + vp->MapHeight + 1};
 
-	for (int i = 0; i < n; ++i) {
+	Map.Select(minPos, maxPos, table);
+
+	int n = static_cast<int>(table.size());
+	for (size_t i = 0; i < table.size(); ++i) {
 		if (!table[i]->IsVisibleInViewport(vp)) {
 			table[i--] = table[--n];
+			table.pop_back();
 		}
 	}
-
+	Assert(n == static_cast<int>(table.size()));
 	if (n > 1) {
-		std::sort(table, table + n, DrawLevelCompare);
+		std::sort(table.begin(), table.begin() + n, DrawLevelCompare);
 	}
-
 	return n;
 }
 
 int FindAndSortUnits(const CViewport *vp, CUnitDrawProxy table[])
 {
-	CUnit* buffer[UnitMax];
-
-	//
 	//  Select all units touching the viewpoint.
-	//
-	int n = Map.Select(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
-		vp->MapY + vp->MapHeight + 1, buffer);
+	const Vec2i minPos = {vp->MapX - 1, vp->MapY - 1};
+	const Vec2i maxPos = {vp->MapX + vp->MapWidth + 1, vp->MapY + vp->MapHeight + 1};
+	std::vector<CUnit*> buffer;
+
+	Map.Select(minPos, maxPos, buffer);
+	int n = static_cast<int>(buffer.size());
 
 	for (int i = 0; i < n; ++i) {
-		if (!buffer[i]->IsVisibleInViewport(vp) ||
-			 buffer[i]->Destroyed || buffer[i]->Container ||
-			 buffer[i]->Type->Revealer) {
+		if (!buffer[i]->IsVisibleInViewport(vp)
+			|| buffer[i]->Destroyed || buffer[i]->Container
+			|| buffer[i]->Type->Revealer) {
 			buffer[i--] = buffer[--n];
+			buffer.pop_back();
 		}
 	}
 
 	if (n > 1) {
-		std::sort(buffer, buffer + n, DrawLevelCompare);
+		std::sort(buffer.begin(), buffer.begin() + n, DrawLevelCompare);
 		for (int i = 0; i < n; ++i) {
 			UpdateUnitVariables(*buffer[i]);
 			table[i] = buffer[i];

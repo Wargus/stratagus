@@ -379,49 +379,20 @@ static int CclPlayer(lua_State *l)
 */
 static int CclChangeUnitsOwner(lua_State *l)
 {
-	CUnit *table[UnitMax];
-	int n;
-	int oldp;
-	int newp;
-	int x1;
-	int y1;
-	int x2;
-	int y2;
-
 	LuaCheckArgs(l, 4);
-	if (!lua_istable(l, 1) || !lua_istable(l, 2)) {
-		LuaError(l, "incorrect argument");
-	}
-	if (lua_objlen(l, 1) != 2) {
-		LuaError(l, "incorrect argument");
-	}
-	lua_rawgeti(l, 1, 1);
-	x1 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, 1, 1);
-	y1 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
 
-	if (lua_objlen(l, 2) != 2) {
-		LuaError(l, "incorrect argument");
-	}
-	lua_rawgeti(l, 2, 1);
-	x2 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, 2, 1);
-	y2 = LuaToNumber(l, -1);
-	lua_pop(l, 1);
+	Vec2i pos1;
+	Vec2i pos2;
+	CclGetPos(l, &pos1.x, &pos1.y, 1);
+	CclGetPos(l, &pos2.x, &pos2.y, 2);
+	const int oldp = LuaToNumber(l, 3);
+	const int newp = LuaToNumber(l, 4);
+	std::vector<CUnit *> table;
 
-	n = Map.Select(x1, y1, x2 + 1, y2 + 1, table);
-	oldp = LuaToNumber(l, 3);
-	newp = LuaToNumber(l, 4);
-	while (n) {
-		if (table[n - 1]->Player->Index == oldp) {
-			table[n - 1]->ChangeOwner(Players[newp]);
-		}
-		--n;
+	Map.Select(pos1, pos2, table, HasSamePlayerAs(Players[oldp]));
+	for (size_t i = 0; i != table.size(); ++i) {
+		table[i]->ChangeOwner(Players[newp]);
 	}
-
 	return 0;
 }
 

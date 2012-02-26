@@ -943,11 +943,11 @@ static void MissileHit(Missile &missile)
 		//
 		// Hits all units in range.
 		//
-		const int range = mtype.Range;
-		CUnit *table[UnitMax];
-		const int n = Map.Select(pos.x - range + 1, pos.y - range + 1, pos.x + range - 1, pos.y + range - 1, table);
+		const Vec2i range = {mtype.Range - 1, mtype.Range - 1};
+		std::vector<CUnit *> table;
+		Map.Select(pos - range, pos + range, table);
 		Assert(missile.SourceUnit != NULL);
-		for (int i = 0; i < n; ++i) {
+		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &goal = *table[i];
 			//
 			// Can the unit attack the this unit-type?
@@ -1578,13 +1578,9 @@ void MissileFlameShield::Action()
 		return;
 	}
 
-	CUnit* table[UnitMax];
-	const int n = Map.Select(upos.x - 1, upos.y - 1, upos.x + 1 + 1, upos.y + 1 + 1, table);
-	for (int i = 0; i < n; ++i) {
-		if (table[i] == unit) {
-			// cannot hit target unit
-			continue;
-		}
+	std::vector<CUnit*> table;
+	Map.SelectAroundUnit(*unit, 1, table);
+	for (size_t i = 0; i != table.size(); ++i) {
 		if (table[i]->CurrentAction() != UnitActionDie) {
 			HitUnit(this->SourceUnit, *table[i], this->Damage);
 		}
@@ -1749,34 +1745,25 @@ void MissileDeathCoil::Action()
 			//
 			// No target unit -- try enemies in range 5x5 // Must be parametrable
 			//
-			int ec = 0;  // enemy count
-			CUnit* table[UnitMax];
-			const int x = this->destination.x / PixelTileSize.x;
-			const int y = this->destination.y / PixelTileSize.y;
-			const int n = Map.Select(x - 2, y - 2, x + 2 + 1, y + 2 + 1, table);
+			std::vector<CUnit*> table;
+			const Vec2i destPos = {this->destination.x / PixelTileSize.x, this->destination.y / PixelTileSize.y};
+			const Vec2i range = {2, 2};
+			Map.Select(destPos - range, destPos + range, table, IsEnemyWith(*source.Player));
 
-			if (n == 0) {
+			if (table.empty()) {
 				return;
 			}
-			// calculate organic enemy count
-			for (int i = 0; i < n; ++i) {
-				ec += (source.IsEnemy(*table[i])
-				/*&& table[i]->Type->Organic != 0*/);
+			const size_t n = table.size();  // enemy count
+			const int damage = std::min<int>(1, this->Damage / n);
+
+			// disperse damage between them
+			for (size_t i = 0; i != n; ++i) {
+				HitUnit(&source, *table[i], damage);
 			}
-			if (ec > 0)  {
-				// yes organic enemies found
-				for (int i = 0; i < n; ++i) {
-					if (source.IsEnemy(*table[i])/* && table[i]->Type->Organic != 0*/) {
-						// disperse damage between them
-						// NOTE: 1 is the minimal damage
-						HitUnit(&source, *table[i], this->Damage / ec);
-					}
-				}
-				if (source.CurrentAction() != UnitActionDie) {
-					source.Variable[HP_INDEX].Value += this->Damage;
-					if (source.Variable[HP_INDEX].Value > source.Variable[HP_INDEX].Max) {
-						source.Variable[HP_INDEX].Value = source.Variable[HP_INDEX].Max;
-					}
+			if (source.CurrentAction() != UnitActionDie) {
+				source.Variable[HP_INDEX].Value += this->Damage;
+				if (source.Variable[HP_INDEX].Value > source.Variable[HP_INDEX].Max) {
+					source.Variable[HP_INDEX].Value = source.Variable[HP_INDEX].Max;
 				}
 			}
 		}

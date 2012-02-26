@@ -404,20 +404,20 @@ int SelectUnitsByType(CUnit &base)
 	//
 	// Search for other visible units of the same type
 	//
-	CUnit* table[UnitMax];
+	std::vector<CUnit*> table;
 	// select all visible units.
 	// StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
 	/* FIXME: this should probably be cleaner implemented if SelectUnitsByType()
 	 * took parameters of the selection rectangle as arguments */
-	int r = Map.Select(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
-		vp->MapY + vp->MapHeight + 1, table);
-
+	const Vec2i minPos = {vp->MapX - 1, vp->MapY - 1};
+	const Vec2i maxPos = {vp->MapX + vp->MapWidth + 1, vp->MapY + vp->MapHeight + 1};
+	Map.Select(minPos, maxPos, table, HasSameTypeAs(type));
 
 	// FIXME: peon/peasant with gold/wood & co are considered from
 	//   different type... idem for tankers
-	for (int i = 0; i < r; ++i) {
+	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
-		if (!CanSelectMultipleUnits(*unit.Player) || unit.Type != &type) {
+		if (!CanSelectMultipleUnits(*unit.Player)) {
 			continue;
 		}
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
@@ -460,7 +460,6 @@ int SelectUnitsByType(CUnit &base)
 int ToggleUnitsByType(CUnit &base)
 {
 	const CUnitType *type = base.Type;
-	int i;
 
 	// if unit is a cadaver or hidden (not on map)
 	// no unit can be selected.
@@ -484,19 +483,19 @@ int ToggleUnitsByType(CUnit &base)
 	// StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
 	// FIXME: this should probably be cleaner implemented if SelectUnitsByType()
 	// took parameters of the selection rectangle as arguments */
-	CUnit* table[UnitMax];
 	const CViewport *vp = UI.MouseViewport;
-	int r = Map.Select(vp->MapX - 1, vp->MapY - 1,
-		vp->MapX + vp->MapWidth + 1,
-		vp->MapY + vp->MapHeight + 1, table);
+	const Vec2i minPos = {vp->MapX - 1, vp->MapY - 1};
+	const Vec2i maxPos = {vp->MapX + vp->MapWidth + 1, vp->MapY + vp->MapHeight + 1};
+	std::vector<CUnit*> table;
 
+	Map.Select(minPos, maxPos, table, HasSameTypeAs(*type));
 
 	// FIXME: peon/peasant with gold/wood & co are considered from
 	// different type... idem for tankers
-	for (i = 0; i < r; ++i) {
+	for (size_t i = 0; i < table.size(); ++i) {
 		CUnit &unit = *table[i];
 
-		if (!CanSelectMultipleUnits(*unit.Player) || unit.Type != type) {
+		if (!CanSelectMultipleUnits(*unit.Player)) {
 			continue;
 		}
 		if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
@@ -606,33 +605,35 @@ int SelectGroupFromUnit(CUnit &unit)
 **  Return the original table if no unit is found.
 **
 **  @param table      Input/Output table of units.
-**  @param num_units  Number of units in input table.
 **
-**  @return           the number of units found.
+**  return true if at least a unit is found;
 */
-static int SelectOrganicUnitsInTable(CUnit**table, int num_units)
+static bool SelectOrganicUnitsInTable(std::vector<CUnit*> &table)
 {
-	CUnit *unit;
-	int n;
-	int i;
+	int n = 0;
 
-	for (n = i = 0; i < num_units; ++i) {
-		unit = table[i];
-		if (!CanSelectMultipleUnits(*unit->Player) || !unit->Type->SelectableByRectangle) {
+	for (size_t i = 0; i != table.size(); ++i) {
+		CUnit &unit = *table[i];
+
+		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->SelectableByRectangle) {
 			continue;
 		}
-		if (unit->IsUnusable()) {  // guess SelectUnits doesn't check this
+		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit->TeamSelected) { // Somebody else onteam has this unit
+		if (unit.TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
-		table[n++] = unit;
+		table[n++] = &unit;
 		if (n == MaxSelectable) {
 			break;
 		}
 	}
-	return n;
+	if (n != 0) {
+		table.resize(n);
+		return true;
+	}
+	return false;
 }
 
 /**
@@ -650,61 +651,50 @@ static int SelectOrganicUnitsInTable(CUnit**table, int num_units)
 **
 **  @return           number of units found
 */
-static int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
-	CUnit **table, int num_units)
+static void SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
+	std::vector<CUnit *>&table)
 {
-	int n;
-	int i;
+	int n = 0;
 
-	for (i = n = 0; i < num_units; ++i) {
-		int sprite_x;
-		int sprite_y;
-		CUnit* unit = (CUnit*)table[i];
-		const CUnitType *type = unit->Type;
+	for (size_t i = 0; i != table.size(); ++i) {
+		CUnit& unit = *table[i];
+		const CUnitType &type = *unit.Type;
+		PixelPos spritePos = unit.GetMapPixelPosCenter();
 
-		sprite_x = unit->tilePos.x * PixelTileSize.x + unit->IX;
-		sprite_x -= (type->BoxWidth - PixelTileSize.x * type->TileWidth) / 2;
-		sprite_x += type->OffsetX;
-		sprite_y = unit->tilePos.y * PixelTileSize.y + unit->IY;
-		sprite_y -= (type->BoxHeight - PixelTileSize.y * type->TileHeight) / 2;
-		sprite_y += type->OffsetY;
-		if (sprite_x + type->BoxWidth < sx0) {
+		spritePos.x += type.OffsetX - type.BoxWidth / 2;
+		spritePos.y += type.OffsetY - type.BoxHeight / 2;
+		if (spritePos.x + type.BoxWidth < sx0
+			|| spritePos.x > sx1
+			|| spritePos.y + type.BoxHeight < sy0
+			|| spritePos.y > sy1) {
 			continue;
 		}
-		if (sprite_x > sx1) {
-			continue;
-		}
-		if (sprite_y + type->BoxHeight < sy0) {
-			continue;
-		}
-		if (sprite_y > sy1) {
-			continue;
-		}
-		table[n++] = unit;
+		table[n++] = &unit;
 	}
-	return n;
+	table.resize(n);
 }
 
-static int DoSelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1,
-CUnit**table, int num_units = UnitMax)
+static int DoSelectUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
-	const int tx0 = sx0 / PixelTileSize.x;
-	const int ty0 = sy0 / PixelTileSize.y;
-	const int tx1 = sx1 / PixelTileSize.x;
-	const int ty1 = sy1 / PixelTileSize.y;
-	int r = Map.Select(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table, num_units);
-	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
+	const Vec2i t0 = {sx0 / PixelTileSize.x, sy0 / PixelTileSize.y};
+	const Vec2i t1 = {sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1};
+	const Vec2i range = {2, 2};
+	std::vector<CUnit*> table;
+
+	Map.Select(t0 - range, t1 + range, table);
+	SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table);
 
 	// 1) search for the player units selectable with rectangle
-	const int n = SelectOrganicUnitsInTable(table, r);
-	if (n) {
-		ChangeSelectedUnits(table, n);
-		return n;
+	if (SelectOrganicUnitsInTable(table)) {
+		const int size = static_cast<int>(table.size());
+		ChangeSelectedUnits(&table[0], size);
+		return size;
 	}
 
 	// 2) If no unit found, try a player's unit not selectable by rectangle
-	for (int i = 0; i < r; ++i) {
+	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
+
 		if (!CanSelectMultipleUnits(*unit.Player)) {
 			continue;
 		}
@@ -716,7 +706,7 @@ CUnit**table, int num_units = UnitMax)
 	}
 
 	// 3) If no unit found, try a resource or a neutral critter
-	for (int i = 0; i < r; ++i) {
+	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 		// Unit visible FIXME: write function UnitSelectable
 		if (!unit.IsVisibleInViewport(UI.SelectedViewport)) {
@@ -734,7 +724,7 @@ CUnit**table, int num_units = UnitMax)
 	}
 
 	// 4) If no unit found, select an enemy unit (first found)
-	for (int i = 0; i < r; ++i) {
+	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 		// Unit visible FIXME: write function UnitSelectable
 		if (!unit.IsVisibleInViewport(UI.SelectedViewport)) {
@@ -752,6 +742,7 @@ CUnit**table, int num_units = UnitMax)
 	return 0;
 }
 
+
 /**
 **  Select units in a rectangle.
 **  Proceed in order in none found:
@@ -767,10 +758,9 @@ CUnit**table, int num_units = UnitMax)
 **
 **  @return     the number of units found.
 */
-int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
+int SelectUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
-	CUnit* table[UnitMax];
-	return DoSelectUnitsInRectangle (sx0, sy0, sx1, sy1, table);
+	return DoSelectUnitsInRectangle(sx0, sy0, sx1, sy1);
 }
 
 /**
@@ -785,9 +775,6 @@ int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 */
 int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 {
-	int toggle_num;
-	int n;
-
 	// Check if the original selected unit (if it's alone) is ours,
 	// and can be selectable by rectangle.
 	// In this case, do nothing.
@@ -796,58 +783,48 @@ int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 				!Selected[0]->Type->SelectableByRectangle)) {
 		return NumSelected;
 	}
-
-	CUnit* table[UnitMax];
-
 	// If there is no selected unit yet, do a simple selection.
 	if (!NumSelected) {
-		return DoSelectUnitsInRectangle(x0, y0, x1, y1, table);
+		return DoSelectUnitsInRectangle(x0, y0, x1, y1);
 	}
+	const Vec2i tilePos0 = {x0 / PixelTileSize.x, y0 / PixelTileSize.y};
+	const Vec2i tilePos1 = {x1 / PixelTileSize.x + 1, y1 / PixelTileSize.y + 1};
+	const Vec2i range = {2, 2};
+	std::vector<CUnit*> table;
 
+	Map.Select(tilePos0 - range, tilePos1 + range, table);
+	SelectSpritesInsideRectangle(x0, y0, x1, y1, table);
 	// If no unit in rectangle area... do nothing
-	toggle_num = Map.Select((x0 / PixelTileSize.x) - 2, (y0 / PixelTileSize.y) - 2,
-		(x1 / PixelTileSize.x) + 2 + 1, (y1 / PixelTileSize.y) + 2 + 1, table);
-	if (!toggle_num) {
-		return NumSelected;
-	}
-	toggle_num = SelectSpritesInsideRectangle(x0, y0, x1, y1, table, toggle_num);
-	if (!toggle_num) {
+	if (table.empty()) {
 		return NumSelected;
 	}
 
 	// Now we should only have mobile (organic) units belonging to us,
 	// so if there's no such units in the rectangle, do nothing.
-	if (!(n = SelectOrganicUnitsInTable(table, toggle_num))) {
+	if (SelectOrganicUnitsInTable(table) == false) {
 		return NumSelected;
 	}
 
-	for (int i = 0; i < n && NumSelected < MaxSelectable; ++i) {
+	for (size_t i = 0; i < table.size() && NumSelected < MaxSelectable; ++i) {
 		SelectUnit(*table[i]);
 	}
 	return NumSelected;
 }
 
-static int DoSelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1,
-CUnit**table, int num_units = UnitMax)
+static int DoSelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
-	int r;
-	int n;
-	int i;
-	int tx0;
-	int ty0;
-	int tx1;
-	int ty1;
+	const Vec2i t0 = {sx0 / PixelTileSize.x, sy0 / PixelTileSize.y};
+	const Vec2i t1 = {sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1};
+	const Vec2i range = {2, 2};
+	std::vector<CUnit*> table;
 
-	tx0 = sx0 / PixelTileSize.x;
-	ty0 = sy0 / PixelTileSize.y;
-	tx1 = sx1 / PixelTileSize.x;
-	ty1 = sy1 / PixelTileSize.y;
+	Map.Select(t0 - range, t1 + range, table);
+	SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table);
 
-	r = Map.Select(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table, num_units);
-	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
-
-	for (n = i = 0; i < r; ++i) {
+	int n = 0;
+	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
+
 		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->SelectableByRectangle) {
 			continue;
 		}
@@ -866,7 +843,7 @@ CUnit**table, int num_units = UnitMax)
 		}
 	}
 	if (n) {
-		ChangeSelectedUnits(table, n);
+		ChangeSelectedUnits(&table[0], n);
 	}
 	return n;
 }
@@ -883,21 +860,20 @@ CUnit**table, int num_units = UnitMax)
 */
 int SelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
-	CUnit* table[UnitMax];
-	return DoSelectGroundUnitsInRectangle(sx0, sy0, sx1, sy1, table);
+	return DoSelectGroundUnitsInRectangle(sx0, sy0, sx1, sy1);
 }
 
-int DoSelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1, CUnit**table)
+static int DoSelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
-	const int tx0 = sx0 / PixelTileSize.x;
-	const int ty0 = sy0 / PixelTileSize.y;
-	const int tx1 = sx1 / PixelTileSize.x;
-	const int ty1 = sy1 / PixelTileSize.y;
+	const Vec2i t0 = {sx0 / PixelTileSize.x, sy0 / PixelTileSize.y};
+	const Vec2i t1 = {sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1};
+	const Vec2i range = {2, 2};
+	std::vector<CUnit*> table;
 
-	int r = Map.Select(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
-	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
+	Map.Select(t0 - range, t1 + range, table);
+	SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table);
 	int n = 0;
-	for (int i = 0; i < r; ++i) {
+	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->SelectableByRectangle) {
 			continue;
@@ -917,7 +893,7 @@ int DoSelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1, CUnit**table
 		}
 	}
 	if (n) {
-		ChangeSelectedUnits(table, n);
+		ChangeSelectedUnits(&table[0], n);
 	}
 	return n;
 }
@@ -934,8 +910,7 @@ int DoSelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1, CUnit**table
 */
 int SelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
-	CUnit* table[UnitMax];
-	return DoSelectAirUnitsInRectangle(sx0, sy0, sx1, sy1, table);
+	return DoSelectAirUnitsInRectangle(sx0, sy0, sx1, sy1);
 }
 
 /**
@@ -959,23 +934,23 @@ int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 		return NumSelected;
 	}
 
-	CUnit* table[UnitMax];
-
 	// If there is no selected unit yet, do a simple selection.
 	if (!NumSelected) {
-		return DoSelectGroundUnitsInRectangle(sx0, sy0, sx1, sy1, table);
+		return DoSelectGroundUnitsInRectangle(sx0, sy0, sx1, sy1);
 	}
 
-	const int tx0 = sx0 / PixelTileSize.x;
-	const int ty0 = sy0 / PixelTileSize.y;
-	const int tx1 = sx1 / PixelTileSize.x;
-	const int ty1 = sy1 / PixelTileSize.y;
-	int r = Map.Select(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
-	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
+	const Vec2i t0 = {sx0 / PixelTileSize.x, sy0 / PixelTileSize.y};
+	const Vec2i t1 = {sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1};
+	const Vec2i range = {2, 2};
+	std::vector<CUnit*> table;
+
+	Map.Select(t0 - range, t1 + range, table);
+	SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table);
 
 	int n = 0;
-	for (int i = 0; i < r; ++i) {
-			CUnit &unit = *table[i];
+	for (size_t i = 0; i < table.size(); ++i) {
+		CUnit &unit = *table[i];
+
 		if (!CanSelectMultipleUnits(*unit.Player) ||
 			!unit.Type->SelectableByRectangle) {
 			continue;
@@ -995,9 +970,7 @@ int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 		}
 	}
 
-	//
 	// Add the units to selected.
-	//
 	for (int i = 0; i < n && NumSelected < MaxSelectable; ++i) {
 		SelectUnit(*table[i]);
 	}
@@ -1025,22 +998,20 @@ int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 		return NumSelected;
 	}
 
-	CUnit* table[UnitMax];
-
 	// If there is no selected unit yet, do a simple selection.
 	if (!NumSelected) {
-		return DoSelectAirUnitsInRectangle(sx0, sy0, sx1, sy1, table);
+		return DoSelectAirUnitsInRectangle(sx0, sy0, sx1, sy1);
 	}
 
-	const int tx0 = sx0 / PixelTileSize.x;
-	const int ty0 = sy0 / PixelTileSize.y;
-	const int tx1 = sx1 / PixelTileSize.x;
-	const int ty1 = sy1 / PixelTileSize.y;
+	const Vec2i t0 = {sx0 / PixelTileSize.x, sy0 / PixelTileSize.y};
+	const Vec2i t1 = {sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1};
+	const Vec2i range = {2, 2};
+	std::vector<CUnit*> table;
 
-	int r = Map.Select(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
-	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
+	Map.Select(t0 - range, t1 + range, table);
+	SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table);
 	int n = 0;
-	for (int i = 0; i < r; ++i) {
+	for (size_t i = 0; i < table.size(); ++i) {
 		CUnit &unit = *table[i];
 		if (!CanSelectMultipleUnits(*unit.Player) ||
 			!unit.Type->SelectableByRectangle) {

@@ -123,9 +123,9 @@ int Demolish::Cast(CUnit &caster, const SpellType *, CUnit *, int x, int y)
 	//  Effect of the explosion on units. Don't bother if damage is 0
 	//
 	if (this->Damage) {
-		CUnit* table[UnitMax];
-		const int n = Map.SelectFixed(minpos, maxpos, table);
-		for (int i = 0; i < n; ++i) {
+		std::vector<CUnit*> table;
+		Map.SelectFixed(minpos, maxpos, table);
+		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &unit = *table[i];
 			if (unit.Type->UnitType != UnitTypeFly && unit.IsAlive() &&
 					unit.MapDistanceTo(x, y) <= this->Range) {
@@ -181,22 +181,17 @@ int SpawnPortal::Cast(CUnit &caster, const SpellType *, CUnit *, int x, int y)
 */
 int AreaAdjustVitals::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int x, int y)
 {
-	CUnit *units[UnitMax];
-	int nunits;
-	int j;
-	int hp;
-	int mana;
+	const Vec2i tilePos = {x, y};
+	const Vec2i range = {spell->Range, spell->Range};
+	const Vec2i typeSize = {caster.Type->Width, caster.Type->Height};
+	std::vector<CUnit *> units;
 
 	// Get all the units around the unit
-	nunits = Map.Select(x - spell->Range,
-		y - spell->Range,
-		x + spell->Range + caster.Type->Width,
-		y + spell->Range + caster.Type->Height,
-		units);
-	hp = this->HP;
-	mana = this->Mana;
+	Map.Select(tilePos - range, tilePos + typeSize + range, units);
+	int hp = this->HP;
+	int mana = this->Mana;
 	caster.Variable[MANA_INDEX].Value -= spell->ManaCost;
-	for (j = 0; j < nunits; ++j) {
+	for (size_t j = 0; j != units.size(); ++j) {
 		target = units[j];
 // if (!PassCondition(caster, spell, target, x, y) {
 		if (!CanCastSpell(caster, spell, target, x, y)) {
@@ -618,6 +613,16 @@ int Capture::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int, int
 	return 0;
 }
 
+class IsDyingAndNotABuilding
+{
+public:
+	bool operator () (const CUnit* unit) const
+	{
+		return unit->CurrentAction() == UnitActionDie && !unit->Type->Building;
+	}
+};
+
+
 /**
 **  Cast summon spell.
 **
@@ -637,24 +642,18 @@ int Summon::Cast(CUnit &caster, const SpellType *spell,
 	int ttl = this->TTL;
 
 	if (this->RequireCorpse) {
-		CUnit *unit;
-		CUnit *table[UnitMax];
-		int n = Map.Select(x - 1, y - 1, x + 2, y + 2, table);
+		const Vec2i minPos = {x - 1, y - 1};
+		const Vec2i maxPos = {x + 2, y + 2};
+
+		CUnit *unit = Map.Find_If(minPos, maxPos, IsDyingAndNotABuilding());
 		cansummon = 0;
-		while (n) {
-			n--;
-			unit = table[n];
-			if (unit->CurrentAction() == UnitActionDie && !unit->Type->Building) {
-				//
-				//  Found a corpse. eliminate it and proceed to summoning.
-				//
-				x = unit->tilePos.x;
-				y = unit->tilePos.y;
-				unit->Remove(NULL);
-				unit->Release();
-				cansummon = 1;
-				break;
-			}
+
+		if (unit != NULL) { //  Found a corpse. eliminate it and proceed to summoning.
+			x = unit->tilePos.x;
+			y = unit->tilePos.y;
+			unit->Remove(NULL);
+			unit->Release();
+			cansummon = 1;
 		}
 	} else {
 		cansummon = 1;
@@ -813,14 +812,6 @@ static bool PassCondition(const CUnit &caster, const SpellType *spell, const CUn
 */
 static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType *spell)
 {
-	CUnit *table[UnitMax];
-	int x;
-	int y;
-	int range;
-	int nunits;
-	int i;
-	int j;
-	int combat;
 	AutoCastInfo *autocast;
 
 	// Ai cast should be a lot better. Use autocast if not found.
@@ -830,29 +821,26 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType *spell
 		autocast = spell->AutoCast;
 	}
 	Assert(autocast);
-	x = caster.tilePos.x;
-	y = caster.tilePos.y;
-	range = spell->AutoCast->Range;
+	int x = caster.tilePos.x;
+	int y = caster.tilePos.y;
+	int range = spell->AutoCast->Range;
 
-	//
+
 	// Select all units aroung the caster
-	//
-	nunits = Map.Select(caster.tilePos.x - range, caster.tilePos.y - range,
-		caster.tilePos.x + range + caster.Type->TileWidth,
-		caster.tilePos.y + range + caster.Type->TileHeight, table);
-	//
+
+	std::vector<CUnit *> table;
+	Map.SelectAroundUnit(caster, range, table);
+
 	//  Check every unit if it is hostile
-	//
-	combat = 0;
-	for (i = 0; i < nunits; ++i) {
+	int combat = 0;
+	for (size_t i = 0; i < table.size(); ++i) {
 		if (caster.IsEnemy(*table[i]) && !table[i]->Type->Coward) {
 			combat = 1;
+			break;
 		}
 	}
 
-	//
 	// Check generic conditions. FIXME: a better way to do this?
-	//
 	if (autocast->Combat != CONDITION_TRUE) {
 		if ((autocast->Combat == CONDITION_ONLY) ^ (combat)) {
 			return NULL;
@@ -874,43 +862,37 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType *spell
 			//  Cast summon until out of mana in the heat of battle. Trivial?
 			//  Find a tight group of units and cast area-damage spells. HARD,
 			//  but it is a must-have for AI. What about area-heal?
-		case TargetUnit:
-			//
+		case TargetUnit: {
 			// The units are already selected.
 			//  Check every unit if it is a possible target
-			//
-			for (i = 0, j = 0; i < nunits; ++i) {
-				// Can't cast spell on ourself
-				if (&caster == table[i]) {
-					continue;
-				}
+
+			int n = 0;
+			for (size_t i = 0; i != table.size(); ++i) {
 				//  FIXME: autocast conditions should include normal conditions.
 				//  FIXME: no, really, they should.
 				if (PassCondition(caster, spell, table[i], x, y, spell->Condition) &&
 						PassCondition(caster, spell, table[i], x, y, autocast->Condition)) {
-					table[j++] = table[i];
+					table[n++] = table[i];
 				}
 			}
-			nunits = j;
-			//
 			// Now select the best unit to target.
 			// FIXME: Some really smart way to do this.
 			// FIXME: Heal the unit with the lowest hit-points
 			// FIXME: Bloodlust the unit with the highest hit-point
 			// FIMXE: it will survive more
-			//
-			if (nunits != 0) {
+			if (n != 0) {
 #if 0
 				// For the best target???
-				sort(table, nb_units, spell->autocast->f_order);
+				sort(table, n, spell->autocast->f_order);
 				return NewTargetUnit(*table[0]);
 #else
 				// Best unit, random unit, oh well, same stuff.
-				i = SyncRand() % nunits;
-				return NewTargetUnit(*table[i]);
+				int index = SyncRand() % n;
+				return NewTargetUnit(*table[index]);
 #endif
 			}
 			break;
+		}
 		default:
 			// Something is wrong
 			DebugPrint("Spell is screwed up, unknown target type\n");

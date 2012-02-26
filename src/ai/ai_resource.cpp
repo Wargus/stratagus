@@ -159,6 +159,34 @@ static int AiCheckUnitTypeCosts(const CUnitType &type)
 	return AiCheckCosts(type.Stats[AiPlayer->Player->Index].Costs);
 }
 
+class IsAEnemyUnitOf
+{
+public:
+	explicit IsAEnemyUnitOf(const CPlayer& _player) : player(&_player) {}
+	bool operator() (const CUnit* unit) const {
+		return unit->IsVisibleAsGoal(*player)
+			&& unit->IsEnemy(*player);
+	}
+private:
+	const CPlayer* player;
+};
+
+class IsAEnemyUnitWhichCanCounterAttackOf
+{
+public:
+	explicit IsAEnemyUnitWhichCanCounterAttackOf(const CPlayer& _player, const CUnitType& _type) :
+		player(&_player), type(&_type)
+	{}
+	bool operator() (const CUnit* unit) const {
+		return unit->IsVisibleAsGoal(*player)
+			&& unit->IsEnemy(*player)
+			&& CanTarget(unit->Type, type);
+	}
+private:
+	const CPlayer* player;
+	const CUnitType* type;
+};
+
 /**
 **  Enemy units in distance.
 **
@@ -172,30 +200,19 @@ static int AiCheckUnitTypeCosts(const CUnitType &type)
 int AiEnemyUnitsInDistance(const CPlayer &player,
 		const CUnitType *type, const Vec2i &pos, unsigned range)
 {
-	// Select all units in range.
-	CUnit *table[UnitMax];
-	const unsigned int n = Map.Select(pos.x - range, pos.y - range,
-		pos.x + range + (type ? type->TileWidth :0),
-		pos.y + range + (type ? type->TileHeight:0), table);
+	const Vec2i offset = {range, range};
+	std::vector<CUnit*> units;
 
-	// Find the enemy units which can attack
-	int e = 0;
-	for (unsigned int i = 0; i < n; ++i) {
-		const CUnit *dest = table[i];
-		// Those can't attack anyway.
-		if (dest->Removed || dest->Variable[INVISIBLE_INDEX].Value ||
-			dest->CurrentAction() == UnitActionDie) {
-			continue;
-		}
-		if (!player.IsEnemy(*dest)) { // a friend or neutral
-			continue;
-		}
-		// Unit can attack back?
-		if (!type || CanTarget(dest->Type, type)) {
-			++e;
-		}
+	if (type == NULL) {
+		Map.Select(pos - offset, pos + offset, units, IsAEnemyUnitOf(player));
+		return static_cast<int>(units.size());
+	} else {
+		const Vec2i typeSize = {type->TileWidth - 1, type->TileHeight - 1};
+		const IsAEnemyUnitWhichCanCounterAttackOf pred(player, *type);
+
+		Map.Select(pos - offset, pos + typeSize + offset, units, pred);
+		return static_cast<int>(units.size());
 	}
-	return e;
 }
 
 /**

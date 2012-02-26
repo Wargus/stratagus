@@ -104,6 +104,10 @@
 #include "tile.h"
 #endif
 
+#ifndef __UNIT_H__
+#include "unit.h"
+#endif
+
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
@@ -171,6 +175,105 @@ public:
 	void Clear();
 
 };
+
+//
+//  Some predicates
+//
+
+class HasSameTypeAs
+{
+public:
+	explicit HasSameTypeAs(const CUnitType& _type) : type(&_type) {}
+	bool operator () (const CUnit* unit) const { return unit->Type == type; }
+private:
+	const CUnitType* type;
+};
+
+class HasSamePlayerAs
+{
+public:
+	explicit HasSamePlayerAs(const CPlayer& _player) : player(&_player) {}
+	bool operator () (const CUnit* unit) const { return unit->Player == player; }
+private:
+	const CPlayer* player;
+};
+
+class IsAlliedWith
+{
+public:
+	explicit IsAlliedWith(const CPlayer& _player) : player(&_player) {}
+	bool operator () (const CUnit* unit) const { return unit->IsAllied(*player); }
+private:
+	const CPlayer* player;
+};
+
+class IsEnemyWith
+{
+public:
+	explicit IsEnemyWith(const CPlayer& _player) : player(&_player) {}
+	bool operator () (const CUnit* unit) const { return unit->IsEnemy(*player); }
+private:
+	const CPlayer* player;
+};
+
+class HasSamePlayerAndTypeAs
+{
+public:
+	explicit HasSamePlayerAndTypeAs(const CUnit& unit) :
+		player(unit.Player), type(unit.Type)
+	{}
+	HasSamePlayerAndTypeAs(const CPlayer& _player, const CUnitType& _type) :
+		player(&_player), type(&_type)
+	{}
+
+	bool operator() (const CUnit *unit) const
+	{
+		return (unit->Player == player && unit->Type == type);
+	}
+
+private:
+	const CPlayer *player;
+	const CUnitType *type;
+};
+
+class IsNotTheSameUnitAs
+{
+public:
+	explicit IsNotTheSameUnitAs(const CUnit& unit) : forbidden(&unit) {}
+	bool operator () (const CUnit* unit) const { return unit != forbidden; }
+private:
+	const CUnit* forbidden;
+};
+
+
+template <typename Pred>
+class NotPredicate
+{
+public:
+	explicit NotPredicate(Pred _pred) : pred(_pred) {}
+	bool operator () (const CUnit* unit) const { return pred(unit) == false; }
+private:
+	Pred pred;
+};
+
+template <typename Pred>
+NotPredicate<Pred> MakeNotPredicate(Pred pred) { return NotPredicate<Pred>(pred); }
+
+template <typename Pred1, typename Pred2>
+class AndPredicate
+{
+public:
+	AndPredicate(Pred1 _pred1, Pred2 _pred2) : pred1(_pred1), pred2(_pred2) {}
+	bool operator () (const CUnit* unit) const { return pred1(unit) && pred2(unit); }
+private:
+	Pred1 pred1;
+	Pred2 pred2;
+};
+
+template <typename Pred1, typename Pred2>
+AndPredicate<Pred1, Pred2> MakeAndPredicate(Pred1 pred1, Pred2 pred2) { return AndPredicate<Pred1, Pred2>(pred1, pred2); }
+
+
 
 /*----------------------------------------------------------------------------
 --  Map itself
@@ -425,17 +528,88 @@ public:
 		maxpos.y = std::min<short>(maxpos.y, Info.MapHeight - 1);
 	}
 
-	/// Select units in rectange range
-	int Select(int x1, int y1, int x2, int y2, CUnit *table[],
-		 const int tablesize = UnitMax, bool excludeNeutral = false);
-	int SelectFixed(const Vec2i &ltpos, const Vec2i &rbpos, CUnit*table[],
-		 const int tablesize = UnitMax, bool excludeNeutral = false);
+	void Select(const Vec2i& ltPos, const Vec2i& rbPos, std::vector<CUnit*>& units);
+	void SelectFixed(const Vec2i& ltPos, const Vec2i& rbPos, std::vector<CUnit*>& units);
+	void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit*>& around);
+
+	template <typename Pred>
+	void SelectFixed(const Vec2i& ltPos, const Vec2i& rbPos, std::vector<CUnit*>& units, Pred pred)
+	{
+		Assert(Info.IsPointOnMap(ltPos));
+		Assert(Info.IsPointOnMap(rbPos));
+		Assert(units.empty());
+
+		for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
+			for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
+				const CMapField& mf = *Field(posIt);
+				const CUnitCache& cache = mf.UnitCache;
+
+				for (size_t i = 0; i != cache.size(); ++i) {
+					CUnit& unit = *cache[i];
+
+					if (unit.CacheLock == 0 && pred(&unit)) {
+						unit.CacheLock = 1;
+						units.push_back(&unit);
+					}
+				}
+			}
+		}
+		for (size_t i = 0; i != units.size(); ++i) {
+			units[i]->CacheLock = 0;
+		}
+	}
+
+	template <typename Pred>
+	void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit*>& around, Pred pred)
+	{
+		const Vec2i offset = {range, range};
+		const Vec2i typeSize = {unit.Type->TileWidth - 1, unit.Type->TileHeight - 1};
+
+		Select(unit.tilePos - offset,
+				unit.tilePos + typeSize + offset, around,
+				MakeAndPredicate(IsNotTheSameUnitAs(unit), pred));
+	}
+
+	template <typename Pred>
+	void Select(const Vec2i& ltPos, const Vec2i& rbPos, std::vector<CUnit*>& units, Pred pred) {
+		Vec2i minPos = ltPos;
+		Vec2i maxPos = rbPos;
+
+		FixSelectionArea(minPos, maxPos);
+		SelectFixed(minPos, maxPos, units, pred);
+	}
 
 
-	// Select units on map tile. - helper funtion. don't use directly
-	int Select(const Vec2i &pos, CUnit *table[], const int tablesize = UnitMax);
+	template <typename Pred>
+	CUnit* Find_IfFixed(const Vec2i& ltPos, const Vec2i& rbPos, Pred pred)
+	{
+		Assert(Info.IsPointOnMap(ltPos));
+		Assert(Info.IsPointOnMap(rbPos));
+
+		for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
+			for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
+				const CMapField& mf = *Field(posIt);
+				const CUnitCache& cache = mf.UnitCache;
+
+				CUnitCache::const_iterator it = std::find_if(cache.begin(), cache.end(), pred);
+				if (it != cache.end()) {
+					return *it;
+				}
+			}
+		}
+		return NULL;
+	}
 
 
+
+	template <typename Pred>
+	CUnit* Find_If(const Vec2i& ltPos, const Vec2i& rbPos, Pred pred) {
+		Vec2i minPos = ltPos;
+		Vec2i maxPos = rbPos;
+
+		FixSelectionArea(minPos, maxPos);
+		return Find_IfFixed(minPos, maxPos, pred);
+	}
 private:
 	/// Build tables for fog of war
 	void InitFogOfWar();
@@ -461,6 +635,8 @@ public:
 
 	CMapInfo Info;             /// descriptive information
 };
+
+
 
 /*----------------------------------------------------------------------------
 --  Variables

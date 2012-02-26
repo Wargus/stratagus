@@ -773,23 +773,23 @@ static int CclOrderUnit(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	lua_rawgeti(l, 3, 1);
-	int x1 = LuaToNumber(l, -1);
+	Vec2i pos1;
+	pos1.x = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 	lua_rawgeti(l, 3, 2);
-	int y1 = LuaToNumber(l, -1);
+	pos1.y = LuaToNumber(l, -1);
 	lua_pop(l, 1);
-	int x2;
-	int y2;
+
+	Vec2i pos2;
 	if (lua_objlen(l, 3) == 4) {
 		lua_rawgeti(l, 3, 3);
-		x2 = LuaToNumber(l, -1);
+		pos2.x = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 		lua_rawgeti(l, 3, 4);
-		y2 = LuaToNumber(l, -1);
+		pos2.y = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 	} else {
-		x2 = x1;
-		y2 = y1;
+		pos2 = pos1;
 	}
 	if (!lua_istable(l, 4)) {
 		LuaError(l, "incorrect argument");
@@ -813,9 +813,9 @@ static int CclOrderUnit(lua_State *l)
 		dpos2 = dpos1;
 	}
 	const char *order = LuaToString(l, 5);
-	CUnit *table[UnitMax];
-	const int an = Map.Select(x1, y1, x2 + 1, y2 + 1, table);
-	for (int i = 0; i < an; ++i) {
+	std::vector<CUnit *> table;
+	Map.Select(pos1, pos2, table);
+	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
 		if (unittype == ANY_UNIT ||
@@ -826,9 +826,8 @@ static int CclOrderUnit(lua_State *l)
 				if (!strcmp(order,"move")) {
 					CommandMove(unit, (dpos1 + dpos2) / 2, 1);
 				} else if (!strcmp(order, "attack")) {
-					CUnit *attack;
+					CUnit *attack = TargetOnMap(unit, dpos1.x, dpos1.y, dpos2.x + 1, dpos2.y + 1);
 
-					attack = TargetOnMap(unit, dpos1.x, dpos1.y, dpos2.x + 1, dpos2.y + 1);
 					CommandAttack(unit, (dpos1 + dpos2) / 2, attack, 1);
 				} else if (!strcmp(order, "patrol")) {
 					CommandPatrolUnit(unit, (dpos1 + dpos2) / 2, 1);
@@ -895,47 +894,41 @@ static int CclKillUnit(lua_State *l)
 */
 static int CclKillUnitAt(lua_State *l)
 {
-	int plynr;
-	int q;
-	int x1;
-	int y1;
-	int x2;
-	int y2;
-	const CUnitType *unittype;
-	CUnit *table[UnitMax];
-	CUnit *unit;
-	int an;
-	int j;
-	int s;
-
 	LuaCheckArgs(l, 2);
 
 	lua_pushvalue(l, 2);
-	plynr = TriggerGetPlayer(l);
+	int plynr = TriggerGetPlayer(l);
 	lua_pop(l, 1);
-	q = LuaToNumber(l, 3);
+	int q = LuaToNumber(l, 3);
 	lua_pushvalue(l, 1);
-	unittype = TriggerGetUnitType(l);
+	const CUnitType *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 	if (!lua_istable(l, 4)) {
 		LuaError(l, "incorrect argument");
 	}
+	Vec2i pos1;
+	Vec2i pos2;
 	lua_rawgeti(l, 4, 1);
-	x1 = LuaToNumber(l, -1);
+	pos1.x = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 	lua_rawgeti(l, 4, 2);
-	y1 = LuaToNumber(l, -1);
+	pos1.y = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 	lua_rawgeti(l, 4, 3);
-	x2 = LuaToNumber(l, -1);
+	pos2.x = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 	lua_rawgeti(l, 4, 4);
-	y2 = LuaToNumber(l, -1);
+	pos2.y = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 
-	an = Map.Select(x1, y1, x2 + 1, y2 + 1, table);
-	for (j = s = 0; j < an && s < q; ++j) {
-		unit = table[j];
+	std::vector<CUnit *> table;
+
+	Map.Select(pos1, pos2, table);
+
+	int s = 0;
+	for (size_t j = 0; j < table.size() && s < q; ++j) {
+		CUnit *unit = table[j];
+
 		if (unittype == ANY_UNIT ||
 				(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
 				(unittype == ALL_BUILDINGS && unit->Type->Building) ||
@@ -946,7 +939,6 @@ static int CclKillUnitAt(lua_State *l)
 			}
 		}
 	}
-
 	lua_pushnumber(l, s);
 	return 1;
 }

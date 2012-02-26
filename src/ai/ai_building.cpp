@@ -345,25 +345,22 @@ static int AiFindHallPlace(const CUnit &worker,
 				// Look if there is a mine
 				//
 				if ((mine = ResourceOnMap(pos, resource))) {
-					int buildings;
-					int j;
-					int nunits;
-					CUnit *units[UnitMax];
-
-					buildings = 0;
-
-					//
 					// Check units around mine
-					//
-					Vec2i minpos = {mine->tilePos.x - 5, mine->tilePos.y - 5};
-					Vec2i maxpos = {mine->tilePos.x + mine->Type->TileWidth + 5,
-									mine->tilePos.y + mine->Type->TileHeight + 5};
-					Map.FixSelectionArea(minpos, maxpos);
-					nunits = Map.SelectFixed(minpos, maxpos, units);
+					const Vec2i offset = {5, 5};
+					const Vec2i minpos = mine->tilePos - offset;
+					const Vec2i typeSize = {mine->Type->TileWidth - 1, mine->Type->TileHeight - 1};
+					const Vec2i maxpos = mine->tilePos + typeSize + offset;
+					std::vector<CUnit*> units;
+
+					Map.Select(minpos, maxpos, units);
+
+					const size_t nunits = units.size();
+					int buildings = 0;
+					size_t j;
+
 					for (j = 0; j < nunits; ++j) {
 						// Enemy near mine
-						if (AiPlayer->Player->Enemy &
-									 (1 << units[j]->Player->Index)) {
+						if (AiPlayer->Player->Enemy &  (1 << units[j]->Player->Index)) {
 							break;
 						}
 						// Town hall near mine
@@ -372,8 +369,8 @@ static int AiFindHallPlace(const CUnit &worker,
 						}
 						// Town hall may not be near but we may be using it, check
 						// for 2 buildings near it and assume it's been used
-						if (units[j]->Type->Building &&
-							!units[j]->Type->GivesResource == resource) {
+						if (units[j]->Type->Building
+							&& !units[j]->Type->GivesResource == resource) {
 							++buildings;
 							if (buildings == 2) {
 								break;
@@ -381,7 +378,7 @@ static int AiFindHallPlace(const CUnit &worker,
 						}
 					}
 					if (j == nunits) {
-						if (AiFindBuildingPlace2(worker, type, pos.x, pos.y, dpos,1)) {
+						if (AiFindBuildingPlace2(worker, type, pos.x, pos.y, dpos, 1)) {
 							delete[] morg;
 							delete[] points;
 							return 1;

@@ -508,15 +508,11 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 */
 static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 {
-	int z;                      // iterator on upgrade or unittype.
-	int pn;                     // player number.
-	int varModified;            // 0 if variable is not modified.
-	int numunits;               // number of unit of the current type.
-	CUnit *unitupgrade[UnitMax]; // array of unit of the current type
-
 	Assert(um);
-	pn = player.Index;
-	for (z = 0; z < UpgradeMax; ++z) {
+
+	int pn = player.Index;
+
+	for (int z = 0; z < UpgradeMax; ++z) {
 		// allow/forbid upgrades for player.  only if upgrade is not acquired
 
 		// FIXME: check if modify is allowed
@@ -535,7 +531,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		}
 	}
 
-	for (z = 0; z < UnitTypeMax; ++z) {
+	for (int z = 0; z < UnitTypeMax; ++z) {
 		// add/remove allowed units
 
 		// FIXME: check if modify is allowed
@@ -550,9 +546,11 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			// If Sight range is upgraded, we need to change EVERY unit
 			// to the new range, otherwise the counters get confused.
 			if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
-				numunits = FindUnitsByType(*UnitTypes[z], unitupgrade);
-				for (numunits--; numunits >= 0; --numunits) {
-					CUnit &unit = *unitupgrade[numunits];
+				std::vector<CUnit*> unitupgrade;
+
+				FindUnitsByType(*UnitTypes[z], unitupgrade);
+				for (size_t j = 0; j != unitupgrade.size(); ++j) {
+					CUnit &unit = *unitupgrade[j];
 					if (unit.Player->Index == pn && !unit.Removed) {
 						MapUnmarkUnitSight(unit);
 						unit.CurrentSightRange = UnitTypes[z]->Stats[pn].Variables[SIGHTRANGE_INDEX].Max +
@@ -566,7 +564,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				UnitTypes[z]->Stats[pn].Costs[j] += um->Modifier.Costs[j];
 			}
 
-			varModified = 0;
+			int varModified = 0;
 			for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
 				varModified |= um->Modifier.Variables[j].Value
 					| um->Modifier.Variables[j].Max
@@ -587,10 +585,12 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 
 			// And now modify ingame units
 			if (varModified) {
-				numunits = FindUnitsByType(*UnitTypes[z], unitupgrade);
-				numunits--; // Change to 0 Start not 1 start
-				for (; numunits >= 0; --numunits) {
-					CUnit &unit = *unitupgrade[numunits];
+				std::vector<CUnit*> unitupgrade;
+
+				FindUnitsByType(*UnitTypes[z], unitupgrade);
+				for (size_t j = 0; j != unitupgrade.size(); ++j) {
+					CUnit &unit = *unitupgrade[0];
+
 					if (unit.Player->Index != player.Index) {
 						continue;
 					}
