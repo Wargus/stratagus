@@ -152,11 +152,11 @@
 #define EXTRACT_INFO ""
 #endif
 
-#define DATA_NEED_COPY "Note: You need the original " GAME_CD "\n(Battle.net edition doesn't work)\nto extract the game data files.\nData files are needed to run " GAME_NAME ".\n\nFirst copy " GAME_CD " to folder " GAME_CD_DIR "\n, then press OK. " EXTRACT_INFO
-#define DATA_FOUND GAME_CD " data files was found in folder " GAME_CD_DIR "\n\nPlease be patient, the data may take\na couple of minutes to extract...\n\nPress OK to start extracting data now."
-#define DATA_NOT_FOUND "Error: " GAME_CD " data files was not found.\n\nCheck if you have file\n" GAME_CD_DIR"/"GAME_CD_FILE
+#define DATA_NEED_COPY "Note: You need the original " GAME_CD "\nto extract the game data files.\nData files are needed to run " GAME_NAME ".\n\nFirst copy " GAME_CD " to folder\n" GAME_CD_DIR "\nthen press OK. " EXTRACT_INFO
+#define DATA_FOUND GAME_CD " data files was found in folder\n" GAME_CD_DIR "\n\nPlease be patient, the data may take\na couple of minutes to extract...\n\nPress OK to start extracting data now."
+#define DATA_NOT_FOUND "Error: " GAME_CD " data files was not found.\n\nCheck if you have file\n" GAME_CD_DIR "/" GAME_CD_FILE
 #define EXTRACT_OK GAME_CD " data files was successfull extracted."
-#define EXTRACT_FAILED "Error: Cannot extract " GAME_CD " data files,\nextract program crashed."
+#define EXTRACT_FAILED "Error: Cannot extract " GAME_CD " data files\nextract program crashed."
 
 static void message(char * title, char * text, int error) {
 
