@@ -44,7 +44,6 @@
 #include "SDL.h"
 
 #include "sound_server.h"
-#include "sound.h"
 #include "iolib.h"
 #include "iocompat.h"
 
@@ -692,7 +691,6 @@ int PlayMusic(const std::string &file)
 		return 0;
 	} else {
 		DebugPrint("Could not play %s\n" _C_ file.c_str());
-		CheckMusicFinished(true);
 		return -1;
 	}
 }
