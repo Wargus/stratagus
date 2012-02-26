@@ -456,7 +456,7 @@ void StartMap(const std::string &filename, bool clean)
 	CreateGame(filename.c_str(), &Map);
 
 	UI.StatusLine.Set(NameLine);
-	SetMessage(_("Do it! Do it now!"));
+	SetMessage("%s", _("Do it! Do it now!"));
 
 	//  Play the game.
 	GameMainLoop();

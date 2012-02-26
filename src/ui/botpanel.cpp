@@ -1201,7 +1201,7 @@ void CButtonPanel::DoClicked(int button)
 			// FIXME: this can be correct written, with a little more code.
 			if (Selected[0]->CurrentAction() == UnitActionTrain &&
 					!EnableTrainingQueue) {
-				Selected[0]->Player->Notify(NotifyYellow, Selected[0]->tilePos, _("Unit training queue is full"));
+				Selected[0]->Player->Notify(NotifyYellow, Selected[0]->tilePos, "%s", _("Unit training queue is full"));
 			} else if (Selected[0]->Player->CheckLimits(type) >= 0 &&
 					!Selected[0]->Player->CheckUnitType(type)) {
 				//PlayerSubUnitType(player,type);

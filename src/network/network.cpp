@@ -1165,7 +1165,7 @@ static void ParseNetworkCommand(const CNetworkCommandQueue *ncq)
 			if (ply != NetworkSyncSeeds[GameCycle & 0xFF] ||
 					ntohs(ncq->Data.Unit) != NetworkSyncHashs[GameCycle & 0xFF]) {
 
-				SetMessage(_("Network out of sync"));
+				SetMessage("%s", _("Network out of sync"));
 				DebugPrint("\nNetwork out of sync %x!=%x! %d!=%d! Cycle %lu\n\n" _C_
 					ply _C_ NetworkSyncSeeds[GameCycle & 0xFF] _C_
 					ntohs(ncq->Data.Unit) _C_ NetworkSyncHashs[GameCycle & 0xFF] _C_ GameCycle);
@@ -1414,7 +1414,7 @@ void NetworkRecover()
 				NetworkIn[n & 0xFF][Hosts[i].PlyNr][0].Type = MessageQuit;
 				NetworkIn[n & 0xFF][Hosts[i].PlyNr][0].Data = nc;
 				PlayerQuit[Hosts[i].PlyNr] = 1;
-				SetMessage(_("Timed out"));
+				SetMessage("%s", _("Timed out"));
 
 				ncq = &NetworkIn[n & 0xFF][Hosts[i].PlyNr][0];
 				np.Header.Cycle = ncq->Time & 0xFF;

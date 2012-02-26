@@ -160,7 +160,7 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 				return false;
 			}
 
-			unit.Player->Notify(NotifyYellow, unit.tilePos, _("You cannot reach building place"));
+			unit.Player->Notify(NotifyYellow, unit.tilePos, "%s", _("You cannot reach building place"));
 			if (unit.Player->AiEnabled) {
 				AiCanNotReach(unit, this->GetUnitType());
 			}
