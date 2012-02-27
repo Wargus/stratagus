@@ -99,6 +99,11 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 	return true;
 }
 
+/* virtual */ PixelPos COrder_Built::Show(const CViewport& , const PixelPos& lastScreenPos) const
+{
+	return lastScreenPos;
+}
+
 
 static void CancelBuilt(COrder_Built &order, CUnit &unit)
 {

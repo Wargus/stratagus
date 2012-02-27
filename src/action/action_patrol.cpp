@@ -44,6 +44,7 @@
 #include "map.h"
 #include "iolib.h"
 #include "script.h"
+#include "ui.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -87,6 +88,19 @@
 	}
 	return true;
 }
+
+/* virtual */ PixelPos COrder_Patrol::Show(const CViewport& vp, const PixelPos& lastScreenPos) const
+{
+	const PixelPos pos1 = vp.TilePosToScreen_Center(this->goalPos);
+	const PixelPos pos2 = vp.TilePosToScreen_Center(this->WayPoint);
+
+	Video.DrawLineClip(ColorGreen, lastScreenPos, pos1);
+	Video.FillCircleClip(ColorBlue, pos1, 2);
+	Video.DrawLineClip(ColorBlue, pos1, pos2);
+	Video.FillCircleClip(ColorBlue, pos2, 3);
+	return pos2;
+}
+
 
 /* virtual */ void COrder_Patrol::Execute(CUnit &unit)
 {

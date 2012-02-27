@@ -183,8 +183,7 @@ void DrawUnitSelection(const CViewport *vp, const CUnit &unit)
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionNone(Uint32, int, int,
-	int, int)
+void DrawSelectionNone(Uint32, int, int, int, int)
 {
 }
 
@@ -208,8 +207,7 @@ void DrawSelectionCircle(Uint32 color, int x1, int y1, int x2, int y2)
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1,
-	int x2, int y2)
+void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1, int x2, int y2)
 {
 	Video.FillTransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
 		std::min((x2 - x1) / 2, (y2 - y1) / 2), 95);
@@ -224,8 +222,7 @@ void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1,
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionRectangle(Uint32 color, int x1, int y1,
-	int x2, int y2)
+void DrawSelectionRectangle(Uint32 color, int x1, int y1, int x2, int y2)
 {
 	Video.DrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
 }
@@ -237,8 +234,7 @@ void DrawSelectionRectangle(Uint32 color, int x1, int y1,
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1,
-	int x2, int y2)
+void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1, int x2, int y2)
 {
 	Video.DrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
 	Video.FillTransRectangleClip(color, x1 + 1, y1 + 1,
@@ -658,173 +654,6 @@ void DrawShadow(const CUnitType &type, int frame, int x, int y)
 	}
 }
 
-/**
-**  Get the location of a unit's order.
-**
-**  @param unit   Pointer to unit.
-**  @param order  Pointer to order.
-**  @param pos    Resulting screen cordinates.
-*/
-static void GetOrderPosition(const CUnit &unit, const COrder &order, PixelPos *screenPos)
-{
-	Assert(screenPos);
-
-	CUnit *goal;
-
-	// FIXME: n0body: Check for goal gone?
-	if ((goal = order.GetGoal()) && (!goal->Removed)) {
-		// Order has a goal, get it's location.
-		const PixelPos mapPos = goal->GetMapPixelPosCenter();
-		*screenPos = CurrentViewport->MapToScreenPixelPos(mapPos);
-	} else {
-		if (Map.Info.IsPointOnMap(order.goalPos)) {
-			// Order is for a location, show that.
-			*screenPos = CurrentViewport->TilePosToScreen_Center(order.goalPos);
-		} else {
-			// Some orders ignore x,y (like StandStill).
-			// Use the unit's position instead.
-			const PixelPos mapPos = unit.GetMapPixelPosCenter();
-			*screenPos = CurrentViewport->MapToScreenPixelPos(mapPos);
-		}
-		if (order.Action == UnitActionBuild) {
-			const COrder_Build& orderBuild = static_cast<const COrder_Build&>(order);
-
-			screenPos->x += (orderBuild.GetUnitType().TileWidth - 1) * PixelTileSize.x / 2;
-			screenPos->y += (orderBuild.GetUnitType().TileHeight - 1) * PixelTileSize.y / 2;
-		}
-	}
-}
-
-/**
-**  Show the order on map.
-**
-**  @param unit   Unit pointer.
-**  @param pos    screen pixel coordinate.
-**  @param order  Order to display.
-*/
-static void ShowSingleOrder(const CUnit &unit, const PixelPos &pos, const COrder &order)
-{
-	Uint32 color;
-	Uint32 e_color;
-
-	PixelPos pos1 = pos;
-	PixelPos pos2;
-	GetOrderPosition(unit, order, &pos2);
-
-	bool dest = false;
-	switch (order.Action) {
-		case UnitActionNone:
-			e_color = color = ColorGray;
-			break;
-
-		case UnitActionStill:
-			e_color = color = ColorGray;
-			break;
-
-		case UnitActionStandGround:
-			e_color = color = ColorGreen;
-			break;
-
-		case UnitActionFollow:
-		case UnitActionMove:
-			e_color = color = ColorGreen;
-			dest = true;
-			break;
-
-		case UnitActionPatrol:
-		{
-			Video.DrawLineClip(ColorGreen, pos1.x, pos1.y, pos2.x, pos2.y);
-			e_color = color = ColorBlue;
-			const COrder_Patrol &orderPatrol = static_cast<const COrder_Patrol&>(order);
-
-			pos1 = CurrentViewport->TilePosToScreen_Center(orderPatrol.GetWayPoint());
-			dest = true;
-			break;
-		}
-		case UnitActionRepair:
-			e_color = color = ColorGreen;
-			dest = true;
-			break;
-
-		case UnitActionAttackGround:
-			pos2 = CurrentViewport->TilePosToScreen_Center(order.goalPos);
-			// FALL THROUGH
-		case UnitActionAttack: {
-			const COrder_Attack &orderAttack = static_cast<const COrder_Attack&>(order);
-
-			if (orderAttack.IsWeakTargetSelected()) { // Show weak targets.
-				e_color = ColorBlue;
-			} else {
-				e_color = ColorRed;
-			}
-			color = ColorRed;
-			dest = true;
-			break;
-		}
-		case UnitActionBoard:
-			e_color = color = ColorGreen;
-			dest = true;
-			break;
-
-		case UnitActionUnload:
-			e_color = color = ColorGreen;
-			dest = true;
-			break;
-
-		case UnitActionDie:
-			e_color = color = ColorGray;
-			break;
-
-		case UnitActionSpellCast:
-			e_color = color = ColorBlue;
-			dest = true;
-			break;
-
-		case UnitActionTrain:
-			e_color = color = ColorGray;
-			break;
-
-		case UnitActionUpgradeTo:
-			e_color = color = ColorGray;
-			break;
-
-		case UnitActionResearch:
-			e_color = color = ColorGray;
-			break;
-
-		case UnitActionBuild:
-		{
-			const COrder_Build& orderBuild = static_cast<const COrder_Build&>(order);
-
-			const int w = orderBuild.GetUnitType().BoxWidth;
-			const int h = orderBuild.GetUnitType().BoxHeight;
-			DrawSelection(ColorGray, pos2.x - w / 2, pos2.y - h / 2, pos2.x + w / 2, pos2.y + h / 2);
-			e_color = color = ColorGreen;
-			dest = true;
-		}
-			break;
-
-		case UnitActionBuilt:
-			e_color = color = ColorGray;
-			break;
-
-		case UnitActionResource:
-			e_color = color = ColorYellow;
-			dest = true;
-			break;
-
-		default:
-			e_color = color = ColorGray;
-			DebugPrint("Unknown action %d\n" _C_ order.Action);
-			break;
-	}
-
-	Video.FillCircleClip(color, pos1.x, pos1.y, 2);
-	if (dest) {
-		Video.DrawLineClip(color, pos1.x, pos1.y, pos2.x, pos2.y);
-		Video.FillCircleClip(e_color, pos2.x, pos2.y, 3);
-	}
-}
 
 /**
 **  Show the current order of a unit.
@@ -851,18 +680,15 @@ void ShowOrder(const CUnit &unit)
 	} else {
 		order = unit.Orders[0];
 	}
-	ShowSingleOrder(unit, screenStartPos, *order);
-
+	PixelPos screenPos = order->Show(*CurrentViewport, screenStartPos);
 	// Show the rest of the orders
 	for (size_t i = 1 + (flushed ? 1 : 0); i < unit.Orders.size(); ++i) {
-		PixelPos screenPos;
-		GetOrderPosition(unit, *unit.Orders[i - 1], &screenPos);
-		ShowSingleOrder(unit, screenPos, *unit.Orders[i]);
+		screenPos =unit.Orders[i]->Show(*CurrentViewport, screenPos);
 	}
 
 	// Show order for new trained units
 	if (unit.NewOrder) {
-		ShowSingleOrder(unit, screenStartPos, *unit.NewOrder);
+		unit.NewOrder->Show(*CurrentViewport, screenStartPos);
 	}
 }
 

@@ -46,8 +46,10 @@
 #include "unit.h"
 #include "ai.h"
 #include "pathfinder.h"
+#include "tileset.h"
 #include "iolib.h"
 #include "script.h"
+#include "ui.h"
 
 extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
@@ -121,6 +123,22 @@ enum
 	}
 	return true;
 }
+
+/* virtual */ PixelPos COrder_Build::Show(const CViewport& vp, const PixelPos& lastScreenPos) const
+{
+	PixelPos targetPos = vp.TilePosToScreen_TopLeft(this->goalPos);
+	targetPos.x += (this->GetUnitType().TileWidth - 1) * PixelTileSize.x / 2;
+	targetPos.y += (this->GetUnitType().TileHeight - 1) * PixelTileSize.y / 2;
+
+	const int w = this->GetUnitType().BoxWidth;
+	const int h = this->GetUnitType().BoxHeight;
+	DrawSelection(ColorGray, targetPos.x - w / 2, targetPos.y - h / 2, targetPos.x + w / 2, targetPos.y + h / 2);
+	Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
+	Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
+	Video.FillCircleClip(ColorGreen, targetPos, 3);
+	return targetPos;
+}
+
 
 /** Called when unit is killed.
 **  warn the AI module.

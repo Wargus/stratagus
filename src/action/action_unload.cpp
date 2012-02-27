@@ -45,6 +45,7 @@
 #include "pathfinder.h"
 #include "script.h"
 #include "iolib.h"
+#include "ui.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -86,6 +87,15 @@
 	return true;
 }
 
+/* virtual */ PixelPos COrder_Unload::Show(const CViewport& vp, const PixelPos& lastScreenPos) const
+{
+	const PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
+
+	Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
+	Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
+	Video.FillCircleClip(ColorGreen, targetPos, 3);
+	return targetPos;
+}
 
 
 

@@ -165,6 +165,12 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	return true;
 }
 
+/* virtual */ PixelPos COrder_TransformInto::Show(const CViewport& , const PixelPos& lastScreenPos) const
+{
+	return lastScreenPos;
+}
+
+
 /* virtual */ void COrder_TransformInto::Execute(CUnit &unit)
 {
 	TransformUnitIntoType(unit, *this->Type);
@@ -202,6 +208,11 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		return false;
 	}
 	return true;
+}
+
+/* virtual */ PixelPos COrder_UpgradeTo::Show(const CViewport& , const PixelPos& lastScreenPos) const
+{
+	return lastScreenPos;
 }
 
 

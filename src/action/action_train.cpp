@@ -84,6 +84,12 @@
 	return true;
 }
 
+/* virtual */ PixelPos COrder_Train::Show(const CViewport& , const PixelPos& lastScreenPos) const
+{
+	return lastScreenPos;
+}
+
+
 /* virtual */ void COrder_Train::Cancel(CUnit &unit)
 {
 	DebugPrint("Cancel training\n");

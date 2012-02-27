@@ -93,6 +93,14 @@ enum {
 	return true;
 }
 
+/* virtual */ PixelPos COrder_Still::Show(const CViewport& , const PixelPos& lastScreenPos) const
+{
+	if (this->Action == UnitActionStandGround) {
+		Video.FillCircleClip(ColorBlack, lastScreenPos, 2);
+	}
+	return lastScreenPos;
+}
+
 
 /*----------------------------------------------------------------------------
 --  Functions

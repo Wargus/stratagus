@@ -49,6 +49,7 @@
 #include "ai.h"
 #include "iolib.h"
 #include "script.h"
+#include "ui.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -77,6 +78,22 @@
 		return false;
 	}
 }
+
+/* virtual */ PixelPos COrder_Move::Show(const CViewport& vp, const PixelPos& lastScreenPos) const
+{
+	PixelPos targetPos;
+
+	if (this->HasGoal()) {
+		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
+	} else {
+		targetPos = vp.TilePosToScreen_Center(this->goalPos);
+	}
+	Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
+	Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
+	Video.FillCircleClip(ColorGreen, targetPos, 3);
+	return targetPos;
+}
+
 
 /**
 **  Unit moves! Generic function called from other actions.

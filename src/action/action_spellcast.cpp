@@ -56,6 +56,7 @@
 #include "spells.h"
 #include "iolib.h"
 #include "script.h"
+#include "ui.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -108,6 +109,21 @@
 		return false;
 	}
 	return true;
+}
+
+/* virtual */ PixelPos COrder_SpellCast::Show(const CViewport& vp, const PixelPos& lastScreenPos) const
+{
+	PixelPos targetPos;
+
+	if (this->HasGoal()) {
+		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
+	} else {
+		targetPos = vp.TilePosToScreen_Center(this->goalPos);
+	}
+	Video.FillCircleClip(ColorBlue, lastScreenPos, 2);
+	Video.DrawLineClip(ColorBlue, lastScreenPos, targetPos);
+	Video.FillCircleClip(ColorBlue, targetPos, 3);
+	return targetPos;
 }
 
 

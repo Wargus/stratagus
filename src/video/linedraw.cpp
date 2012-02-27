@@ -2115,12 +2115,12 @@ void CVideo::DrawTransLine(Uint32 color, int sx, int sy, int dx, int dy, unsigne
 		linedraw_sdl::DrawTransLine(color, sx, sy, dx, dy, alpha);
 	}
 }
-void CVideo::DrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
+void CVideo::DrawLineClip(Uint32 color, const PixelPos &pos1, const PixelPos &pos2)
 {
 	if (UseOpenGL) {
-		linedraw_gl::DrawLineClip(color, sx, sy, dx, dy);
+		linedraw_gl::DrawLineClip(color, pos1.x, pos1.y, pos2.x, pos2.y);
 	} else {
-		linedraw_sdl::DrawLineClip(color, sx, sy, dx, dy);
+		linedraw_sdl::DrawLineClip(color, pos1.x, pos1.y, pos2.x, pos2.y);
 	}
 }
 void CVideo::DrawTransLineClip(Uint32 color, int sx, int sy, int dx, int dy, unsigned char alpha)
@@ -2247,12 +2247,12 @@ void CVideo::FillTransCircle(Uint32 color, int x, int y, int r, unsigned char al
 		linedraw_sdl::FillTransCircle(color, x, y, r, alpha);
 	}
 }
-void CVideo::FillCircleClip(Uint32 color, int x, int y, int r)
+void CVideo::FillCircleClip(Uint32 color, const PixelPos& screenPos, int r)
 {
 	if (UseOpenGL) {
-		linedraw_gl::FillCircleClip(color, x, y, r);
+		linedraw_gl::FillCircleClip(color, screenPos.x, screenPos.y, r);
 	} else {
-		linedraw_sdl::FillCircleClip(color, x, y, r);
+		linedraw_sdl::FillCircleClip(color, screenPos.x, screenPos.y, r);
 	}
 }
 void CVideo::FillTransCircleClip(Uint32 color, int x, int y, int r, unsigned char alpha)

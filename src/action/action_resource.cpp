@@ -49,6 +49,7 @@
 #include "map.h"
 #include "script.h"
 #include "iolib.h"
+#include "ui.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -196,6 +197,22 @@ COrder_Resource::~COrder_Resource()
 	}
 	return true;
 }
+
+/* virtual */ PixelPos COrder_Resource::Show(const CViewport& vp, const PixelPos& lastScreenPos) const
+{
+	PixelPos targetPos;
+
+	if (this->HasGoal()) {
+		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
+	} else {
+		targetPos = vp.TilePosToScreen_Center(this->goalPos);
+	}
+	Video.FillCircleClip(ColorYellow, lastScreenPos, 2);
+	Video.DrawLineClip(ColorYellow, lastScreenPos, targetPos);
+	Video.FillCircleClip(ColorYellow, targetPos, 3);
+	return targetPos;
+}
+
 
 /* virtual */ bool COrder_Resource::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /* damage*/)
 {

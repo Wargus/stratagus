@@ -50,6 +50,7 @@
 #include "interface.h"
 #include "iolib.h"
 #include "script.h"
+#include "ui.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -102,6 +103,23 @@
 	return true;
 }
 
+
+
+
+/* virtual */ PixelPos COrder_Repair::Show(const CViewport& vp, const PixelPos& lastScreenPos) const
+{
+	PixelPos targetPos;
+
+	if (this->HasGoal()) {
+		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
+	} else {
+		targetPos = vp.TilePosToScreen_Center(this->goalPos);
+	}
+	Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
+	Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
+	Video.FillCircleClip(ColorYellow, targetPos, 3);
+	return targetPos;
+}
 
 
 /**

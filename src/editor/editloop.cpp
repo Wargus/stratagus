@@ -837,8 +837,15 @@ static void DrawEditorPanel()
 			Video.DrawRectangleClip(ColorGray, x - 1, y - 1, IconHeight, IconHeight);
 		}
 		Video.FillRectangleClip(ColorBlack, x, y, IconHeight - 2, IconHeight - 2);
-		Video.DrawLineClip(PlayerColors[Editor.SelectedPlayer][0], x, y, x + IconHeight - 2, y + IconHeight - 2);
-		Video.DrawLineClip(PlayerColors[Editor.SelectedPlayer][0], x, y + IconHeight - 2, x + IconHeight - 2, y);
+
+		const PixelPos lt = {x, y};
+		const PixelPos lb = {x, y + IconHeight - 2};
+		const PixelPos rt = {x + IconHeight - 2, y};
+		const PixelPos rb = {x + IconHeight - 2, y + IconHeight - 2};
+		const Uint32 color = PlayerColors[Editor.SelectedPlayer][0];
+
+		Video.DrawLineClip(color, lt, rb);
+		Video.DrawLineClip(color, rt, lb);
 		PopClipping();
 	}
 
@@ -944,13 +951,14 @@ static void DrawStartLocations()
 				if (type) {
 					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos.x, startScreenPos.y);
 				} else { // Draw a cross
-					const int x = startScreenPos.x;
-					const int y = startScreenPos.y;
-					const int w = PixelTileSize.x;
-					const int h = PixelTileSize.y;
+					const PixelPos lt = startScreenPos;
+					const PixelPos lb = {startScreenPos.x, startScreenPos.y + PixelTileSize.y};
+					const PixelPos rt = {startScreenPos.x + PixelTileSize.x, startScreenPos.y};
+					const PixelPos rb = startScreenPos + PixelTileSize;
+					const Uint32 color = PlayerColors[i][0];
 
-					Video.DrawLineClip(PlayerColors[i][0], x, y, x + w, y + h);
-					Video.DrawLineClip(PlayerColors[i][0], x, y + h, x + w, y);
+					Video.DrawLineClip(color, lt, rb);
+					Video.DrawLineClip(color, lb, rt);
 				}
 			}
 		}

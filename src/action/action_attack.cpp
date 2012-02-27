@@ -54,6 +54,7 @@
 #include "pathfinder.h"
 #include "script.h"
 #include "iolib.h"
+#include "ui.h"
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -134,6 +135,23 @@ void AnimateActionAttack(CUnit &unit)
 	}
 	return true;
 }
+
+/* virtual */ PixelPos COrder_Attack::Show(const CViewport& vp, const PixelPos& lastScreenPos) const
+{
+	PixelPos targetPos;
+
+	if (this->HasGoal()) {
+		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
+	} else {
+		targetPos = vp.TilePosToScreen_Center(this->goalPos);
+	}
+	Video.FillCircleClip(ColorRed, lastScreenPos, 2);
+	Video.DrawLineClip(ColorRed, lastScreenPos, targetPos);
+	Video.FillCircleClip(IsWeakTargetSelected() ? ColorBlue : ColorRed, targetPos, 3);
+	return targetPos;
+}
+
+
 
 bool COrder_Attack::IsWeakTargetSelected() const
 {

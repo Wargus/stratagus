@@ -81,6 +81,12 @@
 }
 
 
+
+/* virtual */ PixelPos COrder_Research::Show(const CViewport& , const PixelPos& lastScreenPos) const
+{
+	return lastScreenPos;
+}
+
 /* virtual */ void COrder_Research::UpdateUnitVariables(CUnit &unit) const
 {
 	unit.Variable[RESEARCH_INDEX].Value = unit.Player->UpgradeTimers.Upgrades[this->Upgrade->ID];

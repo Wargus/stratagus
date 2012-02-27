@@ -61,6 +61,12 @@
 	return false;
 }
 
+/* virtual */ PixelPos COrder_Die::Show(const CViewport& , const PixelPos& lastScreenPos) const
+{
+	return lastScreenPos;
+}
+
+
 static bool AnimateActionDie(CUnit &unit)
 {
 	const CAnimations *animations = unit.Type->Animations;

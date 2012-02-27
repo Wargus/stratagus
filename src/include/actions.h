@@ -113,6 +113,9 @@ public:
 	virtual COrder *Clone() const = 0;
 	virtual void Execute(CUnit &unit) = 0;
 	virtual void Cancel(CUnit &unit) {}
+
+	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const = 0;
+
 	virtual void OnAnimationAttack(CUnit &unit);
 
 	virtual void Save(CFile &file, const CUnit &unit) const = 0;
@@ -201,6 +204,7 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
+	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
 
 	bool IsWeakTargetSelected() const;
 
@@ -226,7 +230,7 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-
+	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
 private:
 	bool WaitForTransporter(CUnit &unit);
 
@@ -246,6 +250,7 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
+	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
 
 	virtual void AiUnitKilled(CUnit &unit);
 
@@ -276,6 +281,7 @@ public:
 
 	virtual void Execute(CUnit &unit);
 	virtual void Cancel(CUnit &unit);
+	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
 
 	virtual void UpdateUnitVariables(CUnit &unit) const;
 	virtual void FillSeenValues(CUnit &unit) const;
@@ -311,6 +317,7 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
+	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
 };
 
 class COrder_Follow : public COrder
@@ -324,6 +331,7 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
+	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
 private:
 	unsigned int State;
 };
@@ -339,6 +347,7 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
+	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
 };
 
 
@@ -355,6 +364,7 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
+	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
 
 	const Vec2i& GetWayPoint() const { return WayPoint; }
 private:
@@ -375,6 +385,7 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
+	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
 private:
 	bool RepairUnit(const CUnit &unit, CUnit &goal);
 private:
@@ -396,6 +407,7 @@ public:
 
 	virtual void Execute(CUnit &unit);
 	virtual void Cancel(CUnit &unit);
+	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
 
 	virtual void UpdateUnitVariables(CUnit &unit) const;
 
@@ -426,6 +438,7 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
+	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
 
 	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 
@@ -472,6 +485,8 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
+	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
+
 	virtual void OnAnimationAttack(CUnit &unit);
 
 	const SpellType& GetSpell() const { return *Spell; }
@@ -494,6 +509,7 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
+	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
 private:
 	bool AutoAttackStand(CUnit &unit);
 private:
@@ -514,6 +530,7 @@ public:
 
 	virtual void Execute(CUnit &unit);
 	virtual void Cancel(CUnit &unit);
+	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
 
 	virtual void UpdateUnitVariables(CUnit &unit) const;
 
@@ -537,6 +554,7 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
+	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
 
 private:
 	CUnitType *Type; /// Transform unit into this unit-type
@@ -556,6 +574,7 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
+	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
 
 private:
 	bool LeaveTransporter(CUnit &transporter);
@@ -577,6 +596,7 @@ public:
 
 	virtual void Execute(CUnit &unit);
 	virtual void Cancel(CUnit &unit);
+	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
 
 	virtual void UpdateUnitVariables(CUnit &unit) const;
 
