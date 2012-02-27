@@ -301,8 +301,6 @@ bool AutoAttack(CUnit &unit)
 			// no break : follow
 		case SUB_STILL_STANDBY:
 			UnitShowAnimation(unit, unit.Type->Animations->Still);
-			if (this->Action == UnitActionDie) // used for AnimationDie
-				return;
 		break;
 		case SUB_STILL_ATTACK: // attacking unit in attack range.
 			AnimateActionAttack(unit);

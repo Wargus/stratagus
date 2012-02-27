@@ -1009,7 +1009,7 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 				const Vec2i pos = { unit.tilePos.x + offX, unit.tilePos.y + offY};
 				CUnitType *type = UnitTypeByIdent(unit.Anim.Anim->D.SpawnUnit.Unit);
 				Vec2i resPos;
-				DebugPrint("Creating a %s\n" _C_ *type->Name.c_str());
+				DebugPrint("Creating a %s\n" _C_ type->Name.c_str());
 				FindNearestDrop(*type, pos, resPos, LookingW);
 				if (MapDistance(pos, resPos) <= range) {
 					CUnit *target = MakeUnit(*type, &player);
