@@ -836,30 +836,21 @@ void NetworkSendSelection(CUnit **units, int count)
 */
 static void NetworkProcessSelection(CNetworkPacket *packet, int player)
 {
-	CUnit *units[UnitMax];
-	NetworkSelectionHeader *header;
-	CNetworkSelection *selection;
-	int adjust;
-	int count;
-	int unitcount;
-
-	header = (NetworkSelectionHeader *)&(packet->Header);
-	//
-	// Create Unit Array
-	//
-	count = header->NumberSent;
-	adjust = (header->Add << 1) | header->Remove;
-	unitcount = 0;
+	NetworkSelectionHeader *header = (NetworkSelectionHeader *)&(packet->Header);
+	const size_t count = header->NumberSent;
+	const int adjust = (header->Add << 1) | header->Remove;
+	std::vector<CUnit *> units;
 
 	for (int i = 0; header->Type[i] == MessageSelection; ++i) {
-		selection = (CNetworkSelection *)&(packet->Command[i]);
-		for (int j = 0; j < 4 && unitcount < count; ++j) {
-			units[unitcount++] = Units[ntohs(selection->Unit[j])];
+		CNetworkSelection *selection = (CNetworkSelection *)&(packet->Command[i]);
+
+		for (int j = 0; j < 4 && units.size() < count; ++j) {
+			units.push_back(Units[ntohs(selection->Unit[j])]);
 		}
 	}
-	Assert(count == unitcount);
+	Assert(count == units.size());
 
-	ChangeTeamSelectedUnits(Players[player], units, adjust, count);
+	ChangeTeamSelectedUnits(Players[player], units, adjust);
 }
 
 /**

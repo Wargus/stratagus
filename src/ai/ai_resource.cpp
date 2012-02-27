@@ -228,6 +228,26 @@ int AiEnemyUnitsInDistance(const CUnit &unit, unsigned range)
 	return AiEnemyUnitsInDistance(*unit.Player, unit.Type, unit.tilePos, range);
 }
 
+static bool IsAlreadyWorking(const CUnit& unit)
+{
+	for (size_t i = 0; i != unit.Orders.size(); ++i) {
+		const int action = unit.Orders[i]->Action;
+
+		if (action == UnitActionBuild || action == UnitActionRepair) {
+			return true;
+		}
+		if (action == UnitActionResource) {
+			const COrder_Resource &order = *static_cast<const COrder_Resource*>(unit.Orders[i]);
+
+			if (order.IsGatheringStarted()) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+
 /**
 **  Check if we can build the building.
 **
@@ -240,36 +260,20 @@ int AiEnemyUnitsInDistance(const CUnit &unit, unsigned range)
 */
 static int AiBuildBuilding(const CUnitType &type, CUnitType &building, int near_x, int near_y)
 {
-	CUnit *table[UnitMax];
+	std::vector<CUnit *> table;
+
+	FindPlayerUnitsByType(*AiPlayer->Player, type, table);
+
 	int num = 0;
 
-	//
 	// Remove all workers on the way building something
-	//
-	const int nunits = FindPlayerUnitsByType(*AiPlayer->Player, type, table);
-	for (int i = 0; i < nunits; ++i) {
+	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit& unit = *table[i];
-		size_t j;
 
-		for (j = 0; j < unit.Orders.size(); ++j) {
-			int action = unit.Orders[j]->Action;
-			if (action == UnitActionBuild ||
-				action == UnitActionRepair) {
-					break;
-				}
-			if (action == UnitActionResource) {
-				const COrder_Resource &order = *static_cast<const COrder_Resource*>(unit.Orders[j]);
-
-				if (order.IsGatheringStarted()) {
-					break;
-				}
-			}
-		}
-		if (j == unit.Orders.size()) {
+		if (IsAlreadyWorking(unit) == false) {
 			table[num++] = &unit;
 		}
 	}
-
 	if (num == 0) {
 		// No workers available to build
 		return 0;
@@ -537,29 +541,20 @@ static bool AiRequestSupply()
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiTrainUnit(const CUnitType &type, CUnitType &what)
+static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
 {
-	CUnit *table[UnitMax];
-	int num = 0;
+	std::vector<CUnit *> table;
 
-	//
-	// Remove all units already doing something.
-	//
-	const int nunits = FindPlayerUnitsByType(*AiPlayer->Player, type, table);
-	for (int i = 0; i < nunits; ++i) {
-		CUnit *unit = table[i];
-
-		if (unit->IsIdle()) {
-			table[num++] = unit;
-		}
-	}
-	for (int i = 0; i < num; ++i) {
+	FindPlayerUnitsByType(*AiPlayer->Player, type, table);
+	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
-		CommandTrainUnit(unit, what, FlushCommands);
-		return 1;
+		if (unit.IsIdle()) {
+			CommandTrainUnit(unit, what, FlushCommands);
+			return true;
+		}
 	}
-	return 0;
+	return false;
 }
 
 /**
@@ -635,29 +630,20 @@ static int AiMakeUnit(CUnitType &typeToMake, int near_x, int near_y)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiResearchUpgrade(const CUnitType &type, CUpgrade *what)
+static bool AiResearchUpgrade(const CUnitType &type, CUpgrade &what)
 {
-	CUnit *table[UnitMax];
-	int num = 0;
+	std::vector<CUnit *> table;
 
-	// Remove all units already doing something.
-
-	const int nunits = FindPlayerUnitsByType(*AiPlayer->Player, type, table);
-	for (int i = 0; i < nunits; ++i) {
+	FindPlayerUnitsByType(*AiPlayer->Player, type, table);
+	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
 		if (unit.IsIdle()) {
-			table[num++] = &unit;
+			CommandResearch(unit, &what, FlushCommands);
+			return true;
 		}
 	}
-
-	for (int i = 0; i < num; ++i) {
-		CUnit &unit = *table[i];
-
-		CommandResearch(unit, what, FlushCommands);
-		return 1;
-	}
-	return 0;
+	return false;
 }
 
 /**
@@ -695,10 +681,9 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 	const int *unit_count = AiPlayer->Player->UnitTypesCount;
 	for (unsigned int i = 0; i < table.size(); ++i) {
 		// The type is available
-		if (unit_count[table[i]->Slot]) {
-			if (AiResearchUpgrade(*table[i], upgrade)) {
-				return;
-			}
+		if (unit_count[table[i]->Slot]
+			&& AiResearchUpgrade(*table[i], *upgrade)) {
+			return;
 		}
 	}
 }
@@ -713,28 +698,21 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiUpgradeTo(const CUnitType &type, CUnitType &what)
+static bool AiUpgradeTo(const CUnitType &type, CUnitType &what)
 {
-	CUnit *table[UnitMax];
-	int num = 0;
+	std::vector<CUnit *> table;
 
 	// Remove all units already doing something.
-	const int nunits = FindPlayerUnitsByType(*AiPlayer->Player, type, table);
-	for (int i = 0; i < nunits; ++i) {
-		CUnit *unit = table[i];
-
-		if (unit->IsIdle()) {
-			table[num++] = unit;
-		}
-	}
-
-	for (int i = 0; i < num; ++i) {
+	FindPlayerUnitsByType(*AiPlayer->Player, type, table);
+	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
-		CommandUpgradeTo(unit, what, FlushCommands);
-		return 1;
+		if (unit.IsIdle()) {
+			CommandUpgradeTo(unit, what, FlushCommands);
+			return true;
+		}
 	}
-	return 0;
+	return false;
 }
 
 /**
@@ -1168,10 +1146,10 @@ static int AiRepairBuilding(const CUnitType &type, CUnit &building)
 	// FIXME: too many workers repair the same building!
 
 	// Selection of mining workers.
-	CUnit *table[UnitMax];
-	int nunits = FindPlayerUnitsByType(*AiPlayer->Player, type, table);
+	std::vector<CUnit *> table;
+	FindPlayerUnitsByType(*AiPlayer->Player, type, table);
 	int num = 0;
-	for (int i = 0; i < nunits; ++i) {
+	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
 		if (unit.Type->RepairRange && unit.Orders.size() == 1) {
@@ -1186,9 +1164,10 @@ static int AiRepairBuilding(const CUnitType &type, CUnit &building)
 			}
 		}
 	}
-
+	table.resize(num);
 	// Sort by distance loops -Antonis-
-	int distance[UnitMax];
+	std::vector<int> distance;
+	distance.resize(num);
 	for (int i = 0; i < num; ++i) {
 		CUnit &unit = *table[i];
 		int rX = unit.tilePos.x - building.tilePos.x;

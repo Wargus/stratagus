@@ -120,26 +120,30 @@ void FindUnitsByType(const CUnitType &type, std::vector<CUnit *>& units)
 **  @param player  we're looking for the units of this player
 **  @param type    type of unit requested
 **  @param table   table in which we have to store the units
-**
-**  @return        Returns the number of units found.
 */
-int FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, CUnit **table)
+void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *> &table)
 {
 	const int nunits = player.TotalNumUnits;
 	int typecount = player.UnitTypesCount[type.Slot];
-	int num = 0;
 
-	for (int i = 0; i < nunits && typecount; ++i) {
-		CUnit *unit = player.Units[i];
+	if (typecount == 0) {
+		return;
+	}
 
-		if (unit->Type == &type) {
-			if (!unit->IsUnusable()) {
-				table[num++] = unit;
-			}
-			--typecount;
+	for (int i = 0; i < nunits; ++i) {
+		CUnit &unit = *player.Units[i];
+
+		if (unit.Type != &type) {
+			continue;
+		}
+		if (!unit.IsUnusable()) {
+			table.push_back(&unit);
+		}
+		--typecount;
+		if (typecount == 0) {
+			return ;
 		}
 	}
-	return num;
 }
 
 /**

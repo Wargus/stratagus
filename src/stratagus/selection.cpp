@@ -158,7 +158,7 @@ static void HandleSuicideClick(CUnit &unit)
 **  @param units  Array of units to be selected.
 **  @param count  Number of units in array to be selected.
 */
-void ChangeSelectedUnits(CUnit **units, int count)
+static void ChangeSelectedUnits(CUnit **units, int count)
 {
 	Assert(count <= MaxSelectable);
 
@@ -192,9 +192,8 @@ void ChangeSelectedUnits(CUnit **units, int count)
 **  @param player  The Player who is selecting the units
 **  @param units   The Units to add/remove
 **  @param adjust  0 = reset, 1 = remove units, 2 = add units
-**  @param count   the number of units to be adjusted
 */
-void ChangeTeamSelectedUnits(CPlayer &player, CUnit **units, int adjust, int count)
+void ChangeTeamSelectedUnits(CPlayer &player, const std::vector<CUnit *>& units, int adjust)
 {
 	switch (adjust) {
 		case 0:
@@ -206,18 +205,19 @@ void ChangeTeamSelectedUnits(CPlayer &player, CUnit **units, int adjust, int cou
 			}
 			// FALL THROUGH
 		case 2:
-			for (int i = 0; i < count; ++i) {
-				Assert(!units[i]->Removed);
-				if (!units[i]->Type->IsNotSelectable) {
-					TeamSelected[player.Index][TeamNumSelected[player.Index]++] = units[i];
-					units[i]->TeamSelected |= 1 << player.Index;
+			for (size_t i = 0; i != units.size(); ++i) {
+				CUnit& unit = *units[i];
+				Assert(!unit.Removed);
+				if (!unit.Type->IsNotSelectable) {
+					TeamSelected[player.Index][TeamNumSelected[player.Index]++] = &unit;
+					unit.TeamSelected |= 1 << player.Index;
 				}
 			}
 			Assert(TeamNumSelected[player.Index] <= MaxSelectable);
 			break;
 		case 1:
 			for (int n = 0; n < TeamNumSelected[player.Index]; ++n) {
-				for (int i = 0; i < count; ++i) {
+				for (size_t i = 0; i != units.size(); ++i) {
 					if (units[i] == TeamSelected[player.Index][n]) {
 						TeamSelected[player.Index][n] =
 							TeamSelected[player.Index][TeamNumSelected[player.Index]--];

@@ -904,7 +904,8 @@ void CommandQuit(int player)
 			CommandSharedVision(i, 0, player);
 			CommandSharedVision(player, 0, i);
 			// Remove Selection from Quit Player
-			ChangeTeamSelectedUnits(Players[player], NULL, 0, 0);
+			std::vector<CUnit*> empty;
+			ChangeTeamSelectedUnits(Players[player], empty, 0);
 		}
 	}
 

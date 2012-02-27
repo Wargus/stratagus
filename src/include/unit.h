@@ -1139,7 +1139,7 @@ extern void ShowOrder(const CUnit &unit);
 extern void FindUnitsByType(const CUnitType &type, std::vector<CUnit *>& units);
 
 	/// Find all units of this type of the player
-extern int FindPlayerUnitsByType(const CPlayer &, const CUnitType &, CUnit **);
+extern void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *>&units);
 	/// Return any unit on that map tile
 extern CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type);// = -1);
 	/// Return possible attack target on that map area
@@ -1200,10 +1200,8 @@ extern void SaveSelection();
 extern void RestoreSelection();
 	/// Clear current selection
 extern void UnSelectAll();
-	/// Select group as selection
-extern void ChangeSelectedUnits(CUnit **units, int num_units);
 	/// Changed TeamUnit Selection
-extern void ChangeTeamSelectedUnits(CPlayer &player, CUnit **units, int adjust, int count);
+extern void ChangeTeamSelectedUnits(CPlayer &player, const std::vector<CUnit *> &units, int adjust);
 	/// Add a unit to selection
 extern int SelectUnit(CUnit &unit);
 	/// Select one unit as selection
