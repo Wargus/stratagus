@@ -599,7 +599,7 @@ static int AStarMarkGoal(int gx, int gy, int gw, int gh,
 	ProfileBegin("AStarMarkGoal");
 
 	if (minrange == 0 && maxrange == 0 && gw == 0 && gh == 0) {
-		if (gx + tilesizex >= AStarMapWidth || gy + tilesizey >= AStarMapHeight) {
+		if (gx + tilesizex > AStarMapWidth || gy + tilesizey > AStarMapHeight) {
 			ProfileEnd("AStarMarkGoal");
 			return 0;
 		}
