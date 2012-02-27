@@ -381,16 +381,17 @@ void FireMissile(CUnit &unit)
 
 	// Goal dead?
 	if (goal) {
-		// Better let the caller/action handle this.
-		if (goal->Destroyed) {
-			DebugPrint("destroyed unit\n");
-			return;
+		Assert(!unit.Type->Missile.Missile->AlwaysFire || unit.Type->Missile.Missile->Range);
+		if (!unit.Type->Missile.Missile->AlwaysFire) {
+			// Better let the caller/action handle this.
+			if ( goal->Destroyed) {
+				DebugPrint("destroyed unit\n");
+				return;
+			}
+			if (goal->Removed || goal->CurrentAction() == UnitActionDie) {
+				return;
+			}
 		}
-		if (goal->Removed || goal->CurrentAction() == UnitActionDie) {
-			return;
-		}
-		// FIXME: Some missile hit the field of the target and all units on it.
-		// FIXME: goal is already dead, but missile could hit others?
 	}
 
 	// No missile hits immediately!
@@ -1277,7 +1278,7 @@ MissileType::MissileType(const std::string &ident) :
 	Ident(ident), Transparency(0),
 	DrawLevel(0), SpriteFrames(0), NumDirections(0),
 	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
-	Class(), NumBounces(0), StartDelay(0), Sleep(0), Speed(0),
+	AlwaysFire(false), Class(), NumBounces(0), StartDelay(0), Sleep(0), Speed(0),
 	Range(0), SplashFactor(0), ImpactMissile(NULL),
 	SmokeMissile(NULL), ImpactParticle(NULL), G(NULL)
 {

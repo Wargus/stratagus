@@ -424,8 +424,7 @@ enum UnitVoiceGroup {
 	VoiceDocking,           /// only for transport reaching coast
 	VoiceRepairing,         /// repairing
 	VoiceHarvesting,        /// harvesting
-	VoiceAttack,             /// Attack command
-	VoiceExtraDying             /// extra deaths
+	VoiceAttack             /// Attack command
 };
 
 /**

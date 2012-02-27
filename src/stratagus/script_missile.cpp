@@ -168,6 +168,8 @@ static int CclDefineMissileType(lua_State *l)
 			mtype->ImpactParticle = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "CanHitOwner")) {
 			mtype->CanHitOwner = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "AlwaysFire")) {
+			mtype->AlwaysFire = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "FriendlyFire")) {
 			mtype->FriendlyFire = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SplashFactor")) {
