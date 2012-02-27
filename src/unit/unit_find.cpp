@@ -618,32 +618,6 @@ struct CompareUnitDistance {
 };
 
 /**
-**  AutoAttack units in distance.
-**
-**  If the unit can attack must be handled by caller.
-**  Choose the best target, that can be attacked.
-**
-**  @param unit   Find in distance for this unit.
-**  @param range  Distance range to look.
-**  @param autotargets  Know enemy targets to chose in range.
-**
-**  @return       Unit to be attacked.
-**
-*/
-CUnit *AutoAttackUnitsInDistance(const CUnit &unit, int range,
-		CUnitCache &autotargets)
-{
-	// if necessary, take possible damage on allied units into account...
-	if (unit.Type->Missile.Missile->Range > 1
-		&& (range + unit.Type->Missile.Missile->Range < 15)) {
-		return BestRangeTargetFinder(unit, range).Find(autotargets);
-	} else {
-		// Find the best unit to auto attack
-		return BestTargetFinder(unit, range).Find(autotargets);
-	}
-}
-
-/**
 **  Attack units in distance.
 **
 **  If the unit can attack must be handled by caller.
@@ -653,7 +627,6 @@ CUnit *AutoAttackUnitsInDistance(const CUnit &unit, int range,
 **  @param range  Distance range to look.
 **
 **  @return       Unit to be attacked.
-**
 */
 CUnit *AttackUnitsInDistance(const CUnit &unit, int range)
 {

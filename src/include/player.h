@@ -117,8 +117,6 @@ public:
 	CAllow Allow;                 /// Allowed for player
 	CUpgradeTimers UpgradeTimers; /// Timer for the upgrades
 
-	/// Change player side
-	void SetSide(int side);
 	/// Change player name
 	void SetName(const std::string &name);
 

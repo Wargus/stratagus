@@ -231,7 +231,6 @@ bool CBuildRestrictionOnTop::Check(const CUnitType &, int x, int y, CUnit *&onto
 	Assert(Map.Info.IsPointOnMap(pos));
 
 	ontoptarget = NULL;
-#if 1
 	CUnitCache &cache = Map.Field(pos)->UnitCache;
 
 	CUnitCache::iterator it = std::find_if(cache.begin(), cache.end(), AliveConstructedAndSameTypeAs(*this->Parent));
@@ -241,21 +240,6 @@ bool CBuildRestrictionOnTop::Check(const CUnitType &, int x, int y, CUnit *&onto
 		return true;
 	}
 	return false;
-#else
-	CUnit *table[UnitMax];
-
-	int n = Map.Select(pos, table, UnitMax);
-	for (int i = 0; i < n; ++i) {
-		if (table[i]->tilePos == pos && !table[i]->Destroyed &&
-				table[i]->CurrentAction() != UnitActionDie) {
-			if (table[i]->Type == this->Parent && table[i]->CurrentAction() != UnitActionBuilt) {
-				// Available to build on
-				ontoptarget = table[i];
-			}
-		}
-	}
-	return ontoptarget != NULL;
-#endif
 }
 
 

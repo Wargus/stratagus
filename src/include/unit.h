@@ -533,8 +533,7 @@ public:
 		const CConstructionFrame  *CFrame;           /// Seen construction frame
 		int                 Frame;                   /// last seen frame/stage of buildings
 		CUnitType          *Type;                    /// Pointer to last seen unit-type
-		int                 X;                       /// Last unit->X Seen
-		int                 Y;                       /// Last unit->Y Seen
+		Vec2i               tilePos;                 /// Last unit->tilePos Seen
 		signed char         IX;                      /// Seen X image displacement to map position
 		signed char         IY;                      /// seen Y image displacement to map position
 		unsigned            Constructed : 1;         /// Unit seen construction
@@ -697,12 +696,6 @@ public:
 	/// Returns true if unit is visible in an viewport. Only for ThisPlayer.
 	bool IsVisibleInViewport(const CViewport *vp) const;
 
-	/// Returns true, if unit is visible on current map view (any viewport).
-	bool IsVisibleOnScreen() const;
-
-	/// @todo more docu
-	void GetMapArea(int *sx, int *sy, int *ex, int *ey) const;
-
 	bool IsEnemy(const CPlayer &player) const;
 	bool IsEnemy(const CUnit &unit) const;
 	bool IsAllied(const CPlayer &player) const;
@@ -826,15 +819,12 @@ class CUnitDrawProxy {
 	void DrawDecorationAt(int x, int y) const;
 public:
 
-	CUnitDrawProxy(): Variable(0) {}
+	CUnitDrawProxy(): Variable(NULL) {}
 	~CUnitDrawProxy() {
-		if (Variable) {
-			delete[] Variable;
-		}
+		delete[] Variable;
 	}
 
-	int X;
-	int Y;
+	Vec2i tilePos;
 	int frame;
 	int TeamSelected; //unit->TeamSelected
 	int GroupId; //unit->GroupId
@@ -847,7 +837,7 @@ public:
 	unsigned int Selected:1; //unit->Selected
 	unsigned int ResourcesHeld:1;      /// isResources Held by a unit
 	unsigned int state: 2;
-	unsigned int Blink: 3;	//unit->Blink
+	unsigned int Blink: 3; //unit->Blink
 
 	const CConstructionFrame *cframe;
 	const CUnitType *Type;
@@ -1064,8 +1054,6 @@ extern CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last);
 	/// Find the neareast piece of terrain with specific flags.
 extern int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 		const CPlayer &player, const Vec2i &startPos, Vec2i *pos);
-	/// Find the nearest piece of wood in sight range
-extern int FindWoodInSight(const CUnit &unit, Vec2i *pos);
 
 	/// @todo more docu
 extern CUnit *UnitOnScreen(CUnit *unit, int x, int y);
@@ -1157,9 +1145,6 @@ extern CUnit *AttackUnitsInRange(const CUnit &unit);
 	/// Find best enemy in reaction range to attack
 extern CUnit *AttackUnitsInReactRange(const CUnit &unit);
 
-extern CUnit *
-AutoAttackUnitsInDistance(const CUnit &unit, int range, CUnitCache &autotargets);
-
 // in groups.c
 
 	/// Initialize data structures for groups
@@ -1185,8 +1170,6 @@ extern void SetGroup(CUnit **units, int nunits, int num);
 extern void RemoveUnitFromGroups(CUnit &unit);
 	/// Register CCL group features
 extern void GroupCclRegister();
-	/// ask group members for help
-extern void GroupHelpMe(CUnit *attacker, CUnit &defender);
 extern int IsGroupTainted(int num);
 
 // in selection.c

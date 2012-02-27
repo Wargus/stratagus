@@ -1099,8 +1099,7 @@ void NearestOfUnit(const CUnit &unit, const Vec2i& pos, Vec2i *dpos)
 static void UnitFillSeenValues(CUnit &unit)
 {
 	// Seen values are undefined for visible units.
-	unit.Seen.Y = unit.tilePos.y;
-	unit.Seen.X = unit.tilePos.x;
+	unit.Seen.tilePos = unit.tilePos;
 	unit.Seen.IY = unit.IY;
 	unit.Seen.IX = unit.IX;
 	unit.Seen.Frame = unit.Frame;
@@ -1521,39 +1520,6 @@ bool CUnit::IsVisibleInViewport(const CViewport *vp) const
 			return false;
 		}
 	}
-}
-
-/**
-**  Returns true, if unit is visible on current map view (any viewport).
-**
-**  @return  True if visible, false otherwise.
-*/
-bool CUnit::IsVisibleOnScreen() const
-{
-	for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
-		if (IsVisibleInViewport(vp)) {
-			return true;
-		}
-	}
-	return false;
-}
-
-/**
-**  Get area of map tiles covered by unit, including its displacement.
-**
-**  @param sx  Out: Top left X tile map postion.
-**  @param sy  Out: Top left Y tile map postion.
-**  @param ex  Out: Bottom right X tile map postion.
-**  @param ey  Out: Bottom right Y tile map postion.
-**
-**  @return    sx,sy,ex,ey defining area in Map
-*/
-void CUnit::GetMapArea(int *sx, int *sy, int *ex, int *ey) const
-{
-	*sx = tilePos.x - (IX < 0);
-	*ex = *sx + Type->TileWidth - !IX;
-	*sy = tilePos.y - (IY < 0);
-	*ey = *sy + Type->TileHeight - !IY;
 }
 
 /**
@@ -2072,18 +2038,6 @@ void DropOutAll(const CUnit &source)
 /*----------------------------------------------------------------------------
   -- Finding units
   ----------------------------------------------------------------------------*/
-
-/**
-**  Find the closest piece of wood for an unit.
-**
-**  @param unit    The unit.
-**  @param pos     OUT: Map position of tile.
-*/
-int FindWoodInSight(const CUnit &unit, Vec2i *pos)
-{
-	return FindTerrainType(unit.Type->MovementMask, 0, MapFieldForest, 9999,
-		*unit.Player, unit.tilePos, pos);
-}
 
 /**
 **  Find the closest piece of terrain with the given flags.

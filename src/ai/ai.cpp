@@ -281,7 +281,7 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 
 	//  All forces
 	for (size_t i = 0; i < ai.Force.Size(); ++i) {
-		file.printf("  \"force\", {%zd, %s%s%s", i,
+		file.printf("  \"force\", {%d, %s%s%s", (int) i,
 			ai.Force[i].Completed ? "\"complete\"," : "\"recruit\",",
 			ai.Force[i].Attacking ? " \"attack\"," : "",
 			ai.Force[i].Defending ? " \"defend\"," : "");

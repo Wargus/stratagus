@@ -737,37 +737,8 @@ char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident)
 	if ((id = UpgradeIdByIdent(ident)) != -1) {
 		return UpgradeIdAllowed(player, id);
 	}
-	DebugPrint("Fix your code, wrong idenifier `%s'\n" _C_ ident.c_str());
+	DebugPrint("Fix your code, wrong identifier `%s'\n" _C_ ident.c_str());
 	return '-';
-}
-
-/*----------------------------------------------------------------------------
---  Check availablity
-----------------------------------------------------------------------------*/
-
-/**
-**  Check if upgrade (also spells) available for the player.
-**
-**  @param player  Player pointer.
-**  @param ident   Upgrade ident.
-*/
-int UpgradeIdentAvailable(const CPlayer &player, const std::string &ident)
-{
-	int allow;
-
-#if 0
-	//
-	//  Check dependencies
-	//
-	if (!CheckDependByIdent(player, ident)) {
-		return 0;
-	}
-#endif
-	//
-	//  Allowed by level
-	//
-	allow = UpgradeIdentAllowed(player, ident);
-	return allow == 'R' || allow == 'X';
 }
 
 //@}

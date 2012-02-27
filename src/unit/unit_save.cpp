@@ -230,7 +230,7 @@ void SaveUnit(const CUnit &unit, CFile *file)
 	for (i = 0; i < NumAnimations; ++i) {
 		if (AnimationsArray[i] == unit.Anim.CurrAnim) {
 			file->printf("\"curr-anim\", %d,", i);
-			file->printf("\"anim\", %ld,", unit.Anim.Anim - unit.Anim.CurrAnim);
+			file->printf("\"anim\", %d,", static_cast<int>(unit.Anim.Anim - unit.Anim.CurrAnim));
 			break;
 		}
 	}

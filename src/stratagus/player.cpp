@@ -683,19 +683,6 @@ void CreatePlayer(int type)
 }
 
 /**
-**  Change player side.
-**
-**  @param side    New side (Race).
-*/
-void CPlayer::SetSide(int side)
-{
-	Assert((unsigned int) side < PlayerRaces.Count);
-	Assert(!PlayerRaces.Name[side].empty());
-
-	this->Race = side;
-}
-
-/**
 **  Change player name.
 **
 **  @param name    New name.

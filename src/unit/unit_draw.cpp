@@ -58,12 +58,6 @@
 #include "actions.h"
 #include "script.h"
 
-/*----------------------------------------------------------------------------
---  Definitions
-----------------------------------------------------------------------------*/
-static inline int s_min(int a, int b) { return a < b ? a : b; }
-static inline int s_max(int a, int b) { return a > b ? a : b; }
-
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -201,11 +195,10 @@ void DrawSelectionNone(Uint32, int, int,
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionCircle(Uint32 color, int x1, int y1,
-	int x2, int y2)
+void DrawSelectionCircle(Uint32 color, int x1, int y1, int x2, int y2)
 {
 	Video.DrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-		s_min((x2 - x1) / 2, (y2 - y1) / 2) + 2);
+		std::min((x2 - x1) / 2, (y2 - y1) / 2) + 2);
 }
 
 /**
@@ -219,9 +212,9 @@ void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1,
 	int x2, int y2)
 {
 	Video.FillTransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-		s_min((x2 - x1) / 2, (y2 - y1) / 2), 95);
+		std::min((x2 - x1) / 2, (y2 - y1) / 2), 95);
 	Video.DrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-		s_min((x2 - x1) / 2, (y2 - y1) / 2));
+		std::min((x2 - x1) / 2, (y2 - y1) / 2));
 }
 
 /**
@@ -1130,8 +1123,7 @@ void CUnit::Draw(const CViewport *vp) const
 			cframe = NULL;
 		}
 	} else {
-		const Vec2i seenTilePos = {this->Seen.X, this->Seen.Y};
-		const PixelPos &screenPos = vp->TilePosToScreen_TopLeft(seenTilePos);
+		const PixelPos &screenPos = vp->TilePosToScreen_TopLeft(this->Seen.tilePos);
 
 		x = screenPos.x + this->Seen.IX;
 		y = screenPos.y + this->Seen.IY;
@@ -1259,8 +1251,7 @@ void CUnitDrawProxy::operator=(const CUnit *unit)
 		frame = unit->Frame;
 		IY = unit->IY;
 		IX = unit->IX;
-		X = unit->tilePos.x;
-		Y = unit->tilePos.y;
+		tilePos = unit->tilePos;
 
 		state = (action == UnitActionBuilt) |
 				((action == UnitActionUpgradeTo) << 1);
@@ -1284,8 +1275,7 @@ void CUnitDrawProxy::operator=(const CUnit *unit)
 	} else {
 		IY = unit->Seen.IY;
 		IX = unit->Seen.IX;
-		X = unit->Seen.X;
-		Y = unit->Seen.Y;
+		tilePos = unit->Seen.tilePos;
 		frame = unit->Seen.Frame;
 		Type = unit->Seen.Type;
 		state = unit->Seen.State;
@@ -1405,8 +1395,7 @@ void CUnitDrawProxy::DrawSelectionAt(int x, int y) const
 
 void CUnitDrawProxy::Draw(const CViewport *vp) const
 {
-	const Vec2i tilePos = {this->X, this->Y};
-	const PixelPos screenPos = vp->TilePosToScreen_TopLeft(tilePos);
+	const PixelPos screenPos = vp->TilePosToScreen_TopLeft(this->tilePos);
 	const int x = screenPos.x + this->IX;
 	const int y = screenPos.y + this->IY;
 

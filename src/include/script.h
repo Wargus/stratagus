@@ -318,7 +318,6 @@ extern NumberDesc *CclParseNumberDesc(lua_State *l); /// Parse a number descript
 extern UnitDesc *CclParseUnitDesc(lua_State *l);     /// Parse a unit description.
 StringDesc *CclParseStringDesc(lua_State *l);        /// Parse a string description.
 
-StringDesc *NewStringDesc(const char *s);            /// Create a StringDesc with const string.
 extern int EvalNumber(const NumberDesc *numberdesc); /// Evaluate the number.
 extern CUnit *EvalUnit(const UnitDesc *unitdesc);    /// Evaluate the unit.
 std::string EvalString(const StringDesc *s);         /// Evaluate the string.

@@ -93,9 +93,6 @@ extern int UnitIdAllowed(const CPlayer &player, int id);
 extern char UpgradeIdAllowed(const CPlayer &player, int id);
 extern char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident);
 
-	/// Check if the upgrade is researched.
-extern int UpgradeIdentAvailable(const CPlayer &player, const std::string &ident);
-
 //@}
 
 #endif  // !__UPGRADE_H__

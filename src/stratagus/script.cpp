@@ -819,26 +819,6 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 }
 
 /**
-**  Create a StringDesc with const string.
-**
-**  @param s  direct value for the StringDesc
-**
-**  @return   the new StringDesc.
-*/
-StringDesc *NewStringDesc(const char *s)
-{
-	StringDesc *res;
-
-	if (!s) {
-		return NULL;
-	}
-	res = new StringDesc;
-	res->e = EString_Dir;
-	res->D.Val = new_strdup(s);
-	return res;
-}
-
-/**
 **  Return String description.
 **
 **  @param l  lua state.

@@ -65,7 +65,7 @@ static DependRule *DependHash[101];
 **  @param count     Amount of the required needed.
 **  @param or_flag   Start of or rule.
 */
-static void AddDependency(const std::string &target, const std::string required, int count,
+static void AddDependency(const std::string &target, const std::string &required, int count,
 	int or_flag)
 {
 	DependRule rule;
