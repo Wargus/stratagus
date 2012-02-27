@@ -38,18 +38,20 @@
 #include <string.h>
 
 #include "stratagus.h"
+
+#include "action/action_resource.h"
+
+#include "animation.h"
+#include "interface.h"
+#include "iolib.h"
+#include "map.h"
+#include "pathfinder.h"
 #include "player.h"
+#include "script.h"
+#include "sound.h"
+#include "ui.h"
 #include "unit.h"
 #include "unittype.h"
-#include "animation.h"
-#include "actions.h"
-#include "pathfinder.h"
-#include "interface.h"
-#include "sound.h"
-#include "map.h"
-#include "script.h"
-#include "iolib.h"
-#include "ui.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations

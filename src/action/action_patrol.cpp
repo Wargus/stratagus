@@ -37,14 +37,16 @@
 #include <stdlib.h>
 
 #include "stratagus.h"
-#include "unit.h"
-#include "unittype.h"
-#include "actions.h"
-#include "pathfinder.h"
-#include "map.h"
+
+#include "action/action_patrol.h"
+
 #include "iolib.h"
+#include "map.h"
+#include "pathfinder.h"
 #include "script.h"
 #include "ui.h"
+#include "unit.h"
+#include "unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

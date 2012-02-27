@@ -38,13 +38,15 @@
 #include <string.h>
 
 #include "stratagus.h"
-#include "unit.h"
-#include "unittype.h"
-#include "pathfinder.h"
-#include "actions.h"
+
+#include "action/action_follow.h"
+
 #include "iolib.h"
+#include "pathfinder.h"
 #include "script.h"
 #include "ui.h"
+#include "unit.h"
+#include "unittype.h"
 
 enum {
 	State_Init = 0,

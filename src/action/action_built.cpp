@@ -34,16 +34,17 @@
 #include <stdlib.h>
 
 #include "stratagus.h"
-#include "actions.h"
-#include "unittype.h"
-#include "player.h"
-#include "unit.h"
-#include "sound.h"
-#include "map.h"
+#include "action/action_built.h"
+
 #include "ai.h"
 #include "construct.h"
 #include "iolib.h"
+#include "map.h"
+#include "player.h"
 #include "script.h"
+#include "sound.h"
+#include "unit.h"
+#include "unittype.h"
 
 extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 

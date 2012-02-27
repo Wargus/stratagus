@@ -38,15 +38,18 @@
 #include <stdlib.h>
 
 #include "stratagus.h"
+
+#include "ai_local.h"
+
+#include "action/action_build.h"
+#include "action/action_resource.h"
+#include "depend.h"
+#include "map.h"
+#include "pathfinder.h"
+#include "player.h"
 #include "unit.h"
 #include "unittype.h"
 #include "upgrade.h"
-#include "map.h"
-#include "pathfinder.h"
-#include "ai_local.h"
-#include "actions.h"
-#include "player.h"
-#include "depend.h"
 
 /*----------------------------------------------------------------------------
 --  Defines

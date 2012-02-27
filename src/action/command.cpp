@@ -38,16 +38,18 @@
 #include <string.h>
 
 #include "stratagus.h"
-#include "unittype.h"
-#include "player.h"
-#include "unit.h"
+
 #include "actions.h"
-#include "tileset.h"
+#include "action/action_train.h"
 #include "map.h"
-#include "upgrade.h"
 #include "pathfinder.h"
+#include "player.h"
 #include "spells.h"
+#include "tileset.h"
+#include "upgrade.h"
 #include "ui.h"
+#include "unit.h"
+#include "unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

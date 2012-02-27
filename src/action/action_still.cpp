@@ -37,18 +37,19 @@
 #include <stdlib.h>
 
 #include "stratagus.h"
-#include "missile.h"
-#include "unittype.h"
+
+#include "action/action_still.h"
+
 #include "animation.h"
-#include "unit.h"
-#include "actions.h"
-#include "tileset.h"
-#include "map.h"
-#include "pathfinder.h"
-#include "spells.h"
-#include "player.h"
 #include "iolib.h"
+#include "map.h"
+#include "missile.h"
+#include "player.h"
 #include "script.h"
+#include "spells.h"
+#include "tileset.h"
+#include "unit.h"
+#include "unittype.h"
 
 enum {
 	SUB_STILL_INIT = 0,

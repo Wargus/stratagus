@@ -37,17 +37,18 @@
 #include <stdlib.h>
 
 #include "stratagus.h"
-#include "unittype.h"
+
+#include "action/action_board.h"
+
 #include "animation.h"
-#include "player.h"
-#include "unit.h"
-#include "actions.h"
-#include "pathfinder.h"
-#include "map.h"
 #include "iolib.h"
+#include "map.h"
+#include "pathfinder.h"
+#include "player.h"
 #include "script.h"
 #include "ui.h"
-
+#include "unit.h"
+#include "unittype.h"
 
 
 enum {

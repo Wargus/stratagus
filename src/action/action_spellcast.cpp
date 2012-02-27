@@ -42,21 +42,20 @@
 #include <stdlib.h>
 
 #include "stratagus.h"
-#include "video.h"
-#include "unittype.h"
+
+#include "action/action_spellcast.h"
+
 #include "animation.h"
-#include "player.h"
-#include "unit.h"
-#include "missile.h"
-#include "actions.h"
-#include "pathfinder.h"
-#include "sound.h"
-#include "tileset.h"
-#include "map.h"
-#include "spells.h"
 #include "iolib.h"
+#include "missile.h"
+#include "pathfinder.h"
+#include "player.h"
 #include "script.h"
+#include "sound.h"
+#include "spells.h"
 #include "ui.h"
+#include "unit.h"
+#include "unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

@@ -41,6 +41,7 @@
 #include <ctype.h>
 
 #include "stratagus.h"
+
 #include "tileset.h"
 #include "video.h"
 #include "map.h"
@@ -62,6 +63,7 @@
 #include "spells.h"
 #include "widgets.h"
 #include "actions.h"
+#include "action/action_train.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

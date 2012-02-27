@@ -36,27 +36,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "stratagus.h"
-
 #include <string>
 #include <vector>
 #include <map>
 
+#include "stratagus.h"
+
 #include "upgrade.h"
-#include "player.h"
+
+#include "action/action_train.h"
 #include "depend.h"
 #include "interface.h"
+#include "iolib.h"
 #include "map.h"
+#include "player.h"
 #include "script.h"
-#include "spells.h"
 #include "unit.h"
 #include "unittype.h"
-#include "actions.h"
-#include "iolib.h"
-
-#include "myendian.h"
-
 #include "util.h"
 
 /*----------------------------------------------------------------------------

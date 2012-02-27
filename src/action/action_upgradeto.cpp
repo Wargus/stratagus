@@ -37,17 +37,18 @@
 #include <stdlib.h>
 
 #include "stratagus.h"
-#include "player.h"
-#include "unittype.h"
-#include "animation.h"
-#include "unit.h"
-#include "actions.h"
-#include "ai.h"
-#include "map.h"
-#include "spells.h"
-#include "script.h"
-#include "iolib.h"
 
+#include "action/action_upgradeto.h"
+
+#include "ai.h"
+#include "animation.h"
+#include "iolib.h"
+#include "map.h"
+#include "player.h"
+#include "script.h"
+#include "spells.h"
+#include "unit.h"
+#include "unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

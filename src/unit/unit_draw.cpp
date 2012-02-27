@@ -36,28 +36,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <vector>
 
 #include "stratagus.h"
 
-#include <vector>
-
-#include "video.h"
-#include "sound.h"
-#include "unitsound.h"
-#include "editor.h"
-#include "unittype.h"
-#include "player.h"
-#include "unit.h"
-#include "tileset.h"
-#include "map.h"
+#include "actions.h"
+#include "action/action_build.h"
+#include "action/action_built.h"
+#include "action/action_upgradeto.h"
 #include "construct.h"
 #include "cursor.h"
-#include "interface.h"
+#include "editor.h"
 #include "font.h"
-#include "ui.h"
-#include "actions.h"
+#include "interface.h"
+#include "map.h"
+#include "player.h"
 #include "script.h"
-
+#include "sound.h"
+#include "tileset.h"
+#include "unit.h"
+#include "unitsound.h"
+#include "unittype.h"
+#include "ui.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 -- Variables

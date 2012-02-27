@@ -39,17 +39,19 @@
 
 #include "stratagus.h"
 
-#include "actions.h"
-#include "unittype.h"
-#include "animation.h"
-#include "player.h"
-#include "unit.h"
+#include "action/action_build.h"
+
+#include "action/action_built.h"
 #include "ai.h"
-#include "pathfinder.h"
-#include "tileset.h"
+#include "animation.h"
 #include "iolib.h"
+#include "pathfinder.h"
+#include "player.h"
 #include "script.h"
+#include "tileset.h"
 #include "ui.h"
+#include "unit.h"
+#include "unittype.h"
 
 extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 

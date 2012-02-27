@@ -38,18 +38,19 @@
 
 #include "stratagus.h"
 
-#include "actions.h"
-#include "unittype.h"
-#include "animation.h"
-#include "unit.h"
-#include "pathfinder.h"
-#include "sound.h"
-#include "interface.h"
-#include "map.h"
+#include "action/action_move.h"
+
 #include "ai.h"
+#include "animation.h"
+#include "interface.h"
 #include "iolib.h"
+#include "map.h"
+#include "pathfinder.h"
 #include "script.h"
+#include "sound.h"
 #include "ui.h"
+#include "unit.h"
+#include "unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

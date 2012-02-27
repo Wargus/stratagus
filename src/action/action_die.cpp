@@ -37,11 +37,13 @@
 #include <stdlib.h>
 
 #include "stratagus.h"
-#include "unittype.h"
+
+#include "action/action_die.h"
+
 #include "animation.h"
-#include "unit.h"
-#include "actions.h"
 #include "iolib.h"
+#include "unit.h"
+#include "unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
