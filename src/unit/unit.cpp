@@ -2690,6 +2690,7 @@ PixelPos CUnit::GetMapPixelPosCenter() const
 */
 void LetUnitDie(CUnit &unit)
 {
+	unit.Variable[HP_INDEX].Value = std::min(0,unit.Variable[HP_INDEX].Value);
 	unit.Moving = 0;
 	unit.TTL = 0;
 	unit.Anim.Unbreakable = 0;

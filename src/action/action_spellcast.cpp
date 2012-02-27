@@ -251,6 +251,11 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 					unit.ReCast = SpellCast(unit, &spell, goal, order.goalPos.x, order.goalPos.y);
 				}
 			}
+			// Check, if goal has moved (for ReCast)
+			if (unit.ReCast && order.GetGoal() && unit.MapDistanceTo(*order.GetGoal()) > this->Range) {
+				this->State = 0;
+				return;
+			}
 			if (!unit.ReCast && unit.CurrentAction() != UnitActionDie) {
 				this->Finished = true;
 				return ;

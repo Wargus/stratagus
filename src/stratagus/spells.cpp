@@ -444,7 +444,7 @@ int AdjustVitals::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int
 	//  When harming cast again to send the hp to negative values.
 	//  Carefull, a perfect 0 target hp kills too.
 	//  Avoid div by 0 errors too!
-	castcount = 0;
+	castcount = 1;
 	if (hp) {
 		castcount = std::max<int>(castcount, diffHP / abs(hp) + (((hp < 0) &&
 			(diffHP % (-hp) > 0)) ? 1 : 0));
@@ -483,7 +483,8 @@ int AdjustVitals::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int
 	if (target->Variable[MANA_INDEX].Value > target->Variable[MANA_INDEX].Max) {
 		target->Variable[MANA_INDEX].Value = target->Variable[MANA_INDEX].Max;
 	}
-
+	if (spell->RepeatCast)
+		return 1;
 	return 0;
 }
 
