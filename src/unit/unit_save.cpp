@@ -135,6 +135,8 @@ void SaveUnit(const CUnit &unit, CFile *file)
 	}
 
 	file->printf("\"tile\", {%d, %d}, ", unit.tilePos.x, unit.tilePos.y);
+	file->printf("\"seen-tile\", {%d, %d}, ", unit.Seen.tilePos.x, unit.Seen.tilePos.y);
+
 	file->printf("\"refs\", %d, ", unit.Refs);
 #if 0
 	// latimerius: why is this so complex?

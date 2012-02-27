@@ -422,6 +422,8 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "tile")) {
 			CclGetPos(l, &unit->tilePos.x , &unit->tilePos.y, j + 1);
 			unit->Offset = Map.getIndex(unit->tilePos.x, unit->tilePos.y);
+		} else if (!strcmp(value, "seen-tile")) {
+			CclGetPos(l, &unit->Seen.tilePos.x , &unit->Seen.tilePos.y, j + 1);
 		} else if (!strcmp(value, "stats")) {
 			unit->Stats = &type->Stats[(int)LuaToNumber(l, j + 1)];
 		} else if (!strcmp(value, "pixel")) {
