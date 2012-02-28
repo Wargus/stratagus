@@ -115,17 +115,14 @@ void AnimateActionAttack(CUnit &unit, COrder& order)
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 
-	file.printf(" \"state\", %d,\n  ", this->State);
-	SaveDataMove(file);
+	file.printf(" \"state\", %d", this->State);
 	file.printf("}");
 }
 
 
 /* virtual */ bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
-	if (this->ParseMoveData(l, j, value)) {
-		return true;
-	} else if (!strcmp(value, "state")) {
+	if (!strcmp(value, "state")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->State = LuaToNumber(l, -1);
@@ -232,7 +229,6 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 			this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 			this->goalPos.x = this->goalPos.y = -1;
 			this->State |= WEAK_TARGET; // weak target
-			this->NewResetPath();
 		}
 	// Have a weak target, try a better target.
 	} else if (this->HasGoal() && (this->State & WEAK_TARGET)) {
@@ -248,7 +244,6 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 			}
 			this->SetGoal(newTarget);
 			this->goalPos.x = this->goalPos.y = -1;
-			this->NewResetPath();
 		}
 	}
 
@@ -383,7 +378,6 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		this->goalPos.x = this->goalPos.y = -1;
 		this->MinRange = unit.Type->MinAttackRange;
 		this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
-		this->NewResetPath();
 		this->State |= WEAK_TARGET;
 
 	// Have a weak target, try a better target.
@@ -403,7 +397,6 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 				this->goalPos.x = this->goalPos.y = -1;
 				this->MinRange = unit.Type->MinAttackRange;
 				this->State = MOVE_TO_TARGET;
-				this->NewResetPath();
 			}
 		}
 	}
@@ -417,7 +410,6 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 			delete savedOrder;
 			savedOrder = NULL;
 		}
-		this->NewResetPath();
 		unit.Frame = 0;
 		unit.State = 0;
 		this->State &= WEAK_TARGET;
@@ -477,7 +469,6 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 				}
 			}
 			this->State = MOVE_TO_TARGET;
-			this->NewResetPath();
 			// FIXME: should use a reachable place to reduce pathfinder time.
 			Assert(unit.State == 0);
 		}

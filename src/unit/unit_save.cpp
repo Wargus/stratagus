@@ -37,15 +37,18 @@
 #include <iomanip>
 
 #include "stratagus.h"
+
 #include "unit.h"
-#include "unittype.h"
-#include "unit_manager.h"
-#include "player.h"
+
+#include "actions.h"
 #include "animation.h"
-#include "spells.h"
 #include "construct.h"
 #include "iolib.h"
-#include "actions.h"
+#include "pathfinder.h"
+#include "player.h"
+#include "spells.h"
+#include "unittype.h"
+#include "unit_manager.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -88,25 +91,40 @@ void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
 	order.Save(*file, unit);
 }
 
-void COrder::SaveDataMove(CFile &file) const
+void PathFinderInput::Save(CFile &file) const
 {
-	file.printf("\"data-move\", {");
-	if (this->Data.Move.Cycles) {
-		file.printf("\"cycles\", %d,", this->Data.Move.Cycles);
+	file.printf("\"pathfinder-input\", {");
+
+	if (this->isRecalculatePathNeeded) {
+		file.printf("\"invalid\"");
+	} else {
+		file.printf("\"unit-size\", {%d, %d}, ", this->unitSize.x, this->unitSize.y);
+		file.printf("\"goalpos\", {%d, %d}, ", this->goalPos.x, this->goalPos.y);
+		file.printf("\"goal-size\", {%d, %d}, ", this->goalSize.x, this->goalSize.y);
+		file.printf("\"minrange\", %d, ", this->minRange);
+		file.printf("\"maxrange\", %d", this->maxRange);
 	}
-	if (this->Data.Move.Fast) {
-		file.printf("\"fast\", ");
-	}
-	if (this->Data.Move.Length > 0) {
-		file.printf("\"path\", {");
-		for (int i = 0; i < this->Data.Move.Length; ++i) {
-			file.printf("%d, ", this->Data.Move.Path[i]);
-		}
-		file.printf("}");
-	}
-	file.printf("}");
+	file.printf("},\n  ");
 }
 
+void PathFinderOutput::Save(CFile &file) const
+{
+	file.printf("\"pathfinder-output\", {");
+
+	if (this->Fast) {
+		file.printf("\"fast\", ");
+	}
+	if (this->Length > 0) {
+		file.printf("\"path\", {");
+		for (int i = 0; i < this->Length; ++i) {
+			file.printf("%d, ", this->Path[i]);
+		}
+		file.printf("},");
+	}
+	file.printf("\"cycles\", %d", this->Cycles);
+
+	file.printf("},\n  ");
+}
 
 
 /**
@@ -226,6 +244,10 @@ void SaveUnit(const CUnit &unit, CFile *file)
 		file->printf("\"current-resource\", \"%s\",\n  ",
 			DefaultResourceNames[unit.CurrentResource].c_str());
 	}
+
+	unit.pathFinderData->input.Save(*file);
+	unit.pathFinderData->output.Save(*file);
+
 	file->printf("\"wait\", %d, ", unit.Wait);
 	file->printf("\"state\", %d,", unit.State);
 	file->printf("\"anim-wait\", %d,", unit.Anim.Wait);

@@ -353,6 +353,7 @@ class CUnit;
 class CUnitType;
 class CUnitStats;
 class CPlayer;
+class PathFinderData;
 class SpellType;
 class CUnitColors;
 class CConstructionFrame;
@@ -452,7 +453,7 @@ enum _directions_ {
 	/// The big unit structure
 class CUnit {
 public:
-	CUnit() : SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
+	CUnit() : pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
 
 	void Init();
 	// @note int is faster than shorts
@@ -487,6 +488,9 @@ public:
 	CPlayer    *Player;            /// Owner of this unit
 	CUnitStats *Stats;             /// Current unit stats
 	int         CurrentSightRange; /// Unit's Current Sight Range
+
+// Pathfinding stuff:
+	PathFinderData *pathFinderData;
 
 // DISPLAY:
 	int         Frame;      /// Image frame: <0 is mirrored

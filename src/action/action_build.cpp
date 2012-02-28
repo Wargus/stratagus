@@ -96,16 +96,13 @@ enum
 		file.printf(" \"building\", \"%s\",", UnitReference(this->BuildingUnit).c_str());
 	}
 	file.printf(" \"type\", \"%s\",", this->Type->Ident.c_str());
-	file.printf(" \"state\", %d,\n  ", this->State);
-	SaveDataMove(file);
+	file.printf(" \"state\", %d", this->State);
 	file.printf("}");
 }
 
 /* virtual */ bool COrder_Build::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
-	if (ParseMoveData(l, j, value)) {
-		return true;
-	} else if (!strcmp(value, "building")) {
+	if (!strcmp(value, "building")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->BuildingUnit = CclGetUnitFromRef(l);
@@ -166,9 +163,8 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 {
 	// First entry
 	if (this->State == 0) {
-		this->Data.Move.Cycles = 0; //moving counter
+		unit.pathFinderData->output.Cycles = 0; //moving counter
 		this->State = 1;
-		this->NewResetPath();
 	}
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE: {

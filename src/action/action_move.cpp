@@ -65,19 +65,14 @@
 		file.printf(" \"finished\", ");
 	}
 	file.printf(" \"range\", %d,", this->Range);
-	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
+	file.printf(" \"tile\", {%d, %d}", this->goalPos.x, this->goalPos.y);
 
-	SaveDataMove(file);
 	file.printf("}");
 }
 
 /* virtual */ bool COrder_Move::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
-	if (ParseMoveData(l, j, value)) {
-		return true;
-	} else {
-		return false;
-	}
+	return false;
 }
 
 /* virtual */ PixelPos COrder_Move::Show(const CViewport& vp, const PixelPos& lastScreenPos) const
@@ -111,8 +106,6 @@ int DoActionMove(CUnit &unit)
 	Vec2i pos;
 
 	Assert(unit.CanMove());
-
-	COrder& order = *unit.CurrentOrder();
 
 	if (!unit.Moving && (unit.Type->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
 		Assert(!unit.Anim.Unbreakable);
@@ -180,10 +173,10 @@ int DoActionMove(CUnit &unit)
 	} else {
 		posd.x = Heading2X[unit.Direction / NextDirection];
 		posd.y = Heading2Y[unit.Direction / NextDirection];
-		d = order.Data.Move.Length + 1;
+		d = unit.pathFinderData->output.Length + 1;
 	}
 
-	order.Data.Move.Cycles++;//reset have to be manualy controled by caller.
+	unit.pathFinderData->output.Cycles++;//reset have to be manualy controled by caller.
 	int move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move, Map.Field(unit.Offset)->Cost);
 
 	unit.IX += posd.x * move;

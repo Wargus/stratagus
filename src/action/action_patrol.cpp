@@ -66,16 +66,13 @@
 	if (this->WaitingCycle != 0) {
 		file.printf(" \"waiting-cycle\", %d,", this->WaitingCycle);
 	}
-	file.printf(" \"patrol\", {%d, %d},\n  ", this->WayPoint.x, this->WayPoint.y);
-	SaveDataMove(file);
+	file.printf(" \"patrol\", {%d, %d}", this->WayPoint.x, this->WayPoint.y);
 	file.printf("}");
 }
 
 /* virtual */ bool COrder_Patrol::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
-	if (ParseMoveData(l, j, value)) {
-		return true;
-	} else if (!strcmp(value, "patrol")) {
+	if (!strcmp(value, "patrol")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->WayPoint.x , &this->WayPoint.y);
@@ -128,7 +125,6 @@
 			this->Range = 0;
 			std::swap(this->WayPoint, this->goalPos);
 
-			this->NewResetPath();
 			break;
 		case PF_WAIT:
 			// Wait for a while then give up
@@ -138,8 +134,7 @@
 				this->Range = 0;
 				std::swap(this->WayPoint, this->goalPos);
 
-				this->Data.Move.Cycles = 0; //moving counter
-				this->NewResetPath();
+				unit.pathFinderData->output.Cycles = 0; //moving counter
 			}
 			break;
 		default: // moving

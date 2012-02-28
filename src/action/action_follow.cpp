@@ -81,17 +81,14 @@ enum {
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 
-	file.printf(" \"state\", %d,", this->State);
-	SaveDataMove(file);
+	file.printf(" \"state\", %d", this->State);
 
 	file.printf("}");
 }
 
 /* virtual */ bool COrder_Follow::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
-	if (ParseMoveData(l, j, value)) {
-		return true;
-	} else if (!strcmp(value, "state")) {
+	if (!strcmp(value, "state")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->State = LuaToNumber(l, -1);
@@ -157,7 +154,6 @@ enum {
 	}
 	if (this->State == State_Init) { // first entry
 		this->State = State_Initialized;
-		this->NewResetPath();
 	}
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
@@ -227,7 +223,6 @@ enum {
 		this->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
 		this->ClearGoal();
 		goal = NoUnitP;
-		this->NewResetPath();
 	}
 
 	if (unit.Anim.Unbreakable) {

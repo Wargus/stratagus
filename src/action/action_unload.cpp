@@ -69,16 +69,13 @@
 		file.printf(" \"goal\", \"%s\",", UnitReference(goal).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d}, ", this->goalPos.x, this->goalPos.y);
-	file.printf("\"state\", %d,\n  ", this->State);
-	SaveDataMove(file);
+	file.printf("\"state\", %d", this->State);
 	file.printf("}");
 }
 
 /* virtual */ bool COrder_Unload::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
-	if (this->ParseMoveData(l, j, value) == true) {
-		return true;
-	} else if (!strcmp("state", value)) {
+	if (!strcmp("state", value)) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->State = LuaToNumber(l, -1);
@@ -386,7 +383,6 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 				this->goalPos = pos;
 			}
 
-			this->NewResetPath();
 			this->State = 1;
 			// follow on next case
 		case 1: // Move unit to destination

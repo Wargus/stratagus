@@ -147,6 +147,10 @@ void CUnit::Init()
 	Player = NULL;
 	Stats = NULL;
 	CurrentSightRange = 0;
+
+	pathFinderData = new PathFinderData;
+	pathFinderData->input.SetUnit(*this);
+
 	Colors = NULL;
 	IX = 0;
 	IY = 0;
@@ -245,6 +249,7 @@ void CUnit::Release(bool final)
 
 	Type = NULL;
 
+	delete pathFinderData;
 	delete[] AutoCastSpell;
 	delete[] Variable;
 	for (std::vector<COrder *>::iterator order = Orders.begin(); order != Orders.end(); ++order) {

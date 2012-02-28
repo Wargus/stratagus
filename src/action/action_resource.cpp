@@ -146,16 +146,13 @@ COrder_Resource::~COrder_Resource()
 		file.printf(" \"done-harvesting\",");
 	}
 	file.printf(" \"timetoharvest\", %d,", this->TimeToHarvest);
-	file.printf(" \"state\", %d,\n  ", this->State);
-	SaveDataMove(file);
+	file.printf(" \"state\", %d", this->State);
 	file.printf("}");
 }
 
 /* virtual */ bool COrder_Resource::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
-	if (this->ParseMoveData(l, j, value)) {
-		return true;
-	} else if (!strcmp(value, "current-res")) {
+	if (!strcmp(value, "current-res")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->CurrentResource = LuaToNumber(l, -1);
@@ -249,7 +246,6 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 			return -1;
 		} else {
 			this->goalPos = pos;
-			this->NewResetPath();
 		}
 	}
 	switch (DoActionMove(unit)) {
@@ -258,7 +254,6 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 			if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 9999,
 					*unit.Player, unit.tilePos, &pos)) {
 				this->goalPos = pos;
-				this->NewResetPath();
 				DebugPrint("Found a better place to harvest %d,%d\n" _C_ pos.x _C_ pos.y);
 				// FIXME: can't this overflow? It really shouldn't, since
 				// x and y are really supossed to be reachable, checked thorugh a flood fill.
@@ -328,8 +323,7 @@ void COrder_Resource::UnitGotoGoal(CUnit &unit, CUnit *const goal, int state)
 	this->State = state;
 	unit.State = 0;
 	if (state == SUB_MOVE_TO_DEPOT || state == SUB_MOVE_TO_RESOURCE) {
-		this->Data.Move.Cycles = 0; //moving counter
-		this->NewResetPath();
+		unit.pathFinderData->output.Cycles = 0; //moving counter
 	}
 }
 
@@ -832,7 +826,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	}
 
 	// Not ready
-	if (player.AiEnabled && this->Data.Move.Cycles > 300) {
+	if (player.AiEnabled && unit.pathFinderData->output.Cycles > 300) {
 		AiNewDepotRequest(unit);
 	}
 
@@ -1091,7 +1085,7 @@ void COrder_Resource::Execute(CUnit &unit)
 	if (this->State == SUB_STOP_GATHERING) {
 		if (StopGathering(unit)) {
 			this->State = SUB_MOVE_TO_DEPOT;
-			this->Data.Move.Cycles = 0; //moving counter
+			unit.pathFinderData->output.Cycles = 0; //moving counter
 		} else
 			return;
 	}

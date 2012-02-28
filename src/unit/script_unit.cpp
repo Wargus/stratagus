@@ -193,16 +193,52 @@ bool COrder::ParseGenericData(lua_State *l, int &j, const char *value)
 }
 
 
-bool COrder::ParseMoveData(lua_State *l, int &j, const char *value)
-{
-	if (strcmp(value, "data-move") != 0) {
-		return false;
-	}
-	++j;
-	lua_rawgeti(l, -1, j + 1);
 
+void PathFinderInput::Load(lua_State *l)
+{
 	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
+		LuaError(l, "incorrect argument in PathFinderInput::Load");
+	}
+	const int args = 1 + lua_objlen(l, -1);
+	for (int i = 1; i < args; ++i) {
+		lua_rawgeti(l, -1, i);
+		const char *tag = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++i;
+		if (!strcmp(tag, "unit-size")) {
+			lua_rawgeti(l, -1, i);
+			CclGetPos(l, &this->unitSize.x, &this->unitSize.y);
+			lua_pop(l, 1);
+		} else if (!strcmp(tag, "goalpos")) {
+			lua_rawgeti(l, -1, i);
+			CclGetPos(l, &this->goalPos.x, &this->goalPos.y);
+			lua_pop(l, 1);
+		} else if (!strcmp(tag, "goal-size")) {
+			lua_rawgeti(l, -1, i);
+			CclGetPos(l, &this->goalSize.x, &this->goalSize.y);
+			lua_pop(l, 1);
+		} else if (!strcmp(tag, "minrange")) {
+			lua_rawgeti(l, -1, i);
+			this->minRange = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(tag, "maxrange")) {
+			lua_rawgeti(l, -1, i);
+			this->maxRange = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(tag, "invalid")) {
+			this->isRecalculatePathNeeded = true;
+			--i;
+		} else {
+			LuaError(l, "PathFinderInput::Load: Unsupported tag: %s" _C_ tag);
+		}
+	}
+}
+
+
+void PathFinderOutput::Load(lua_State *l)
+{
+	if (!lua_istable(l, -1)) {
+		LuaError(l, "incorrect argument in PathFinderOutput::Load");
 	}
 	const int args = 1 + lua_objlen(l, -1);
 	for (int i = 1; i < args; ++i) {
@@ -212,10 +248,10 @@ bool COrder::ParseMoveData(lua_State *l, int &j, const char *value)
 		++i;
 		if (!strcmp(tag, "cycles")) {
 			lua_rawgeti(l, -1, i);
-			this->Data.Move.Cycles = LuaToNumber(l, -1);
+			this->Cycles = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(tag, "fast")) {
-			this->Data.Move.Fast = 1;
+			this->Fast = 1;
 			--i;
 		} else if (!strcmp(tag, "path")) {
 			lua_rawgeti(l, -1, i);
@@ -225,17 +261,15 @@ bool COrder::ParseMoveData(lua_State *l, int &j, const char *value)
 			const int subargs = lua_objlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
-				this->Data.Move.Path[k] = LuaToNumber(l, -1);
+				this->Path[k] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			}
-			this->Data.Move.Length = subargs;
+			this->Length = subargs;
 			lua_pop(l, 1);
 		} else {
-			LuaError(l, "ParseMove: Unsupported tag: %s" _C_ tag);
+			LuaError(l, "PathFinderOutput::Load: Unsupported tag: %s" _C_ tag);
 		}
 	}
-	lua_pop(l, 1);
-	return true;
 }
 
 /**
@@ -519,6 +553,14 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "current-resource")) {
 			lua_pushvalue(l, j + 1);
 			unit->CurrentResource = CclGetResourceByName(l);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "pathfinder-input")) {
+			lua_pushvalue(l, j + 1);
+			unit->pathFinderData->input.Load(l);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "pathfinder-output")) {
+			lua_pushvalue(l, j + 1);
+			unit->pathFinderData->output.Load(l);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "wait")) {
 			unit->Wait = LuaToNumber(l, j + 1);

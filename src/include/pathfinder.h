@@ -67,6 +67,63 @@ enum _move_return_ {
 	PF_MOVE = 1           /// On the way moving
 };
 
+class PathFinderInput
+{
+public:
+	PathFinderInput();
+	CUnit* GetUnit() const { return unit; }
+	const Vec2i& GetUnitPos() const;
+	Vec2i GetUnitSize() const;
+	const Vec2i& GetGoalPos() const { return goalPos; }
+	const Vec2i& GetGoalSize() const { return goalSize; }
+	int GetMinRange() const { return minRange; }
+	int GetMaxRange() const { return maxRange; }
+	bool IsRecalculateNeeded() const { return isRecalculatePathNeeded; }
+
+	void SetUnit(CUnit &_unit);
+	void SetGoal(const Vec2i& pos, const Vec2i& size);
+	void SetMinRange(int range);
+	void SetMaxRange(int range);
+
+	void PathRacalculated();
+
+	void Save(CFile& file) const;
+	void Load(lua_State* l);
+
+private:
+	CUnit* unit;
+	Vec2i unitSize;
+	Vec2i goalPos;
+	Vec2i goalSize;
+	int minRange;
+	int maxRange;
+	bool isRecalculatePathNeeded;
+};
+
+class PathFinderOutput
+{
+public:
+	enum {MAX_PATH_LENGTH = 28}; /// max length of precalculated path
+public:
+	PathFinderOutput();
+	void Save(CFile& file) const;
+	void Load(lua_State* l);
+public:
+	unsigned short int Cycles;  /// how much Cycles we move.
+	char Fast;                  /// Flag fast move (one step)
+	char Length;                /// stored path length
+	char Path[MAX_PATH_LENGTH]; /// directions of stored path
+};
+
+class PathFinderData
+{
+public:
+	PathFinderInput input;
+	PathFinderOutput output;
+};
+
+
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -100,8 +157,7 @@ extern void FreePathfinder();
 extern unsigned char *CreateMatrix();
 	/// Allocate a new matrix and initialize
 extern unsigned char *MakeMatrix();
-	/// Get next element of the way to goal.
-extern int NewPath(CUnit &unit);
+
 	/// Returns the next element of the path
 extern int NextPathElement(CUnit &unit, short int *xdp, short int *ydp);
 	/// Return distance to unit.

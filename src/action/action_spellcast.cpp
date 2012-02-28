@@ -84,17 +84,14 @@
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 
 	file.printf("\"state\", %d", this->State);
-	file.printf(" \"spell\", \"%s\",\n  ", this->Spell->Ident.c_str());
+	file.printf(" \"spell\", \"%s\"", this->Spell->Ident.c_str());
 
-	SaveDataMove(file);
 	file.printf("}");
 }
 
 /* virtual */ bool COrder_SpellCast::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
-	if (ParseMoveData(l, j, value)) {
-		return true;
-	} else if (!strcmp(value, "spell")) {
+	if (!strcmp(value, "spell")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->Spell = SpellTypeByIdent(LuaToString(l, -1));
@@ -234,9 +231,6 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				return ;
 			}
 			// FIXME FIXME FIXME: Check if already in range and skip straight to 2(casting)
-			if (!spell.IsCasterOnly()) {
-				unit.CurrentOrder()->NewResetPath();
-			}
 			unit.ReCast = 0; // repeat spell on next pass? (defaults to `no')
 			this->State = 1;
 			// FALL THROUGH

@@ -78,18 +78,14 @@
 	}
 
 	file.printf(" \"repaircycle\", %d,", this->RepairCycle);
-	file.printf(" \"state\", %d,\n  ", this->State);
-
-	SaveDataMove(file);
+	file.printf(" \"state\", %d", this->State);
 
 	file.printf("}");
 }
 
 /* virtual */ bool COrder_Repair::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
-	if (this->ParseMoveData(l, j, value)) {
-		return true;
-	} else if (!strcmp("repaircycle", value)) {
+	if (!strcmp("repaircycle", value)) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->RepairCycle = LuaToNumber(l, -1);
@@ -189,7 +185,6 @@ static void AnimateActionRepair(CUnit &unit)
 
 	switch (this->State) {
 		case 0:
-			this->NewResetPath();
 			this->State = 1;
 			// FALL THROUGH
 		case 1: { // Move near to target.
@@ -207,7 +202,6 @@ static void AnimateActionRepair(CUnit &unit)
 						ReparableTarget = NULL;
 						this->ClearGoal();
 						goal = NULL;
-						this->NewResetPath();
 					}
 				} else if (unit.Player->AiEnabled) {
 					// Ai players workers should stop if target is killed
@@ -245,7 +239,6 @@ static void AnimateActionRepair(CUnit &unit)
 					this->ClearGoal();
 					ReparableTarget = NULL;
 					goal = NULL;
-					this->NewResetPath();
 				} else {
 					const int dist = unit.MapDistanceTo(*goal);
 

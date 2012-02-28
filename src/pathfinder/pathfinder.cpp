@@ -219,6 +219,73 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range)
 --  REAL PATH-FINDER
 ----------------------------------------------------------------------------*/
 
+PathFinderInput::PathFinderInput() : unit(NULL), minRange(0), maxRange(0),
+	isRecalculatePathNeeded(true)
+{
+	unitSize.x = 0;
+	unitSize.y = 0;
+	goalPos.x = -1;
+	goalPos.y = -1;
+	goalSize.x = 0;
+	goalSize.y = 0;
+}
+
+const Vec2i& PathFinderInput::GetUnitPos() const { return unit->tilePos; }
+Vec2i PathFinderInput::GetUnitSize() const {
+	const Vec2i tileSize = {unit->Type->TileWidth, unit->Type->TileHeight};
+	return tileSize;
+}
+
+void PathFinderInput::SetUnit(CUnit &_unit) {
+	unit = &_unit;
+
+	isRecalculatePathNeeded = true;
+}
+
+
+void PathFinderInput::SetGoal(const Vec2i& pos, const Vec2i& size) {
+	Vec2i newPos = pos;
+	// Large units may have a goal that goes outside the map, fix it here
+	if (newPos.x + unit->Type->TileWidth - 1 >= Map.Info.MapWidth) {
+		newPos.x = Map.Info.MapWidth - unit->Type->TileWidth;
+	}
+	if (newPos.y + unit->Type->TileHeight - 1 >= Map.Info.MapHeight) {
+		newPos.y = Map.Info.MapHeight - unit->Type->TileHeight;
+	}
+	if (goalPos != newPos || goalSize != size) {
+		isRecalculatePathNeeded = true;
+	}
+	goalPos = newPos;
+	goalSize = size;
+}
+
+void PathFinderInput::SetMinRange(int range) {
+	if (minRange != range) {
+		minRange = range;
+		isRecalculatePathNeeded = true;
+	}
+}
+
+void PathFinderInput::SetMaxRange(int range) {
+	if (maxRange != range) {
+		maxRange = range;
+		isRecalculatePathNeeded = true;
+	}
+}
+
+void PathFinderInput::PathRacalculated() {
+	unitSize.x = unit->Type->TileWidth;
+	unitSize.y = unit->Type->TileHeight;
+
+	isRecalculatePathNeeded = false;
+}
+
+
+PathFinderOutput::PathFinderOutput()
+{
+	memset(this, 0, sizeof (*this));
+}
+
 /**
 **  Find new path.
 **
@@ -232,59 +299,27 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range)
 **  @return      >0 remaining path length, 0 wait for path, -1
 **               reached goal, -2 can't reach the goal.
 */
-int NewPath(CUnit &unit)
+static int NewPath(PathFinderInput& input, PathFinderOutput& output)
 {
-	int i;
-	int gw;
-	int gh;
-	int gx;
-	int gy;
-	COrderPtr order = unit.CurrentOrder();
-	int minrange = order->MinRange;
-	int maxrange = order->Range;
-	char *path;
-
-	if (order->HasGoal()) {
-		CUnit *goal = order->GetGoal();
-		gw = goal->Type->TileWidth;
-		gh = goal->Type->TileHeight;
-		gx = goal->tilePos.x;
-		gy = goal->tilePos.y;
-	} else {
-		// Take care of non square goals :)
-		// If goal is non square, range states a non-existant goal rather
-		// than a tile.
-		gw = order->Width;
-		gh = order->Height;
-		// Large units may have a goal that goes outside the map, fix it here
-		if (order->goalPos.x + unit.Type->TileWidth - 1 >= Map.Info.MapWidth) {
-			order->goalPos.x = Map.Info.MapWidth - unit.Type->TileWidth;
-		}
-		if (order->goalPos.y + unit.Type->TileHeight - 1 >= Map.Info.MapHeight) {
-			order->goalPos.y = Map.Info.MapHeight - unit.Type->TileHeight;
-		}
-		gx = order->goalPos.x;
-		gy = order->goalPos.y;
-	}
-	path = unit.CurrentOrder()->Data.Move.Path;
-	i = AStarFindPath(unit.tilePos.x, unit.tilePos.y, gx, gy, gw, gh,
-		unit.Type->TileWidth, unit.Type->TileHeight,
-		 minrange, maxrange, path, MAX_PATH_LENGTH, &unit);
+	char *path = output.Path;
+	int i = AStarFindPath(input.GetUnitPos().x, input.GetUnitPos().y,
+						input.GetGoalPos().x, input.GetGoalPos().y,
+						input.GetGoalSize().x, input.GetGoalSize().y,
+						input.GetUnitSize().x, input.GetUnitSize().y,
+						input.GetMinRange(), input.GetMaxRange(),
+						path, PathFinderOutput::MAX_PATH_LENGTH,
+						input.GetUnit());
+	input.PathRacalculated();
 	if (i == PF_FAILED) {
 		i = PF_UNREACHABLE;
 	}
 
 	// Update path if it was requested. Otherwise we may only want
 	// to know if there exists a path.
-
 	if (path != NULL) {
-		if (i >= MAX_PATH_LENGTH) {
-			unit.CurrentOrder()->Data.Move.Length = MAX_PATH_LENGTH;
-		} else {
-			unit.CurrentOrder()->Data.Move.Length = i;
-		}
-		if (unit.CurrentOrder()->Data.Move.Length == 0) {
-			++unit.CurrentOrder()->Data.Move.Length;
+		output.Length = std::min<int>(i, PathFinderOutput::MAX_PATH_LENGTH);
+		if (output.Length == 0) {
+			++output.Length;
 		}
 	}
 	return i;
@@ -303,67 +338,64 @@ int NewPath(CUnit &unit)
 int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 {
 	int result;
-	COrderPtr order = unit.CurrentOrder();
-	CUnit *goal;
+	PathFinderInput& input = unit.pathFinderData->input;
+	PathFinderOutput& output = unit.pathFinderData->output;
+
+	unit.CurrentOrder()->UpdatePathFinderData(input);
 	// Attempt to use path cache
 	// FIXME: If there is a goal, it may have moved, ruining the cache
 	*pxd = 0;
 	*pyd = 0;
 
 	// Goal has moved, need to recalculate path or no cached path
-	if (unit.CurrentOrder()->Data.Move.Length <= 0 ||
-		((goal = order->GetGoal()) && goal->tilePos != order->goalPos)) {
-		result = NewPath(unit);
+	if (output.Length <= 0 || input.IsRecalculateNeeded()) {
+		result = NewPath(input, output);
 
 		if (result == PF_UNREACHABLE) {
-			unit.CurrentOrder()->Data.Move.Length = 0;
+			output.Length = 0;
 			return result;
 		}
 		if (result == PF_REACHED) {
 			return result;
 		}
-		if (unit.Goal) {
-			// Update Orders
-			order->goalPos = unit.Goal->tilePos;
-		}
 	}
 
-	*pxd = Heading2X[(int)unit.CurrentOrder()->Data.Move.Path[(int)unit.CurrentOrder()->Data.Move.Length - 1]];
-	*pyd = Heading2Y[(int)unit.CurrentOrder()->Data.Move.Path[(int)unit.CurrentOrder()->Data.Move.Length - 1]];
+	*pxd = Heading2X[(int)output.Path[(int)output.Length - 1]];
+	*pyd = Heading2Y[(int)output.Path[(int)output.Length - 1]];
 	const Vec2i dir = {*pxd, *pyd};
-	result = unit.CurrentOrder()->Data.Move.Length;
-	unit.CurrentOrder()->Data.Move.Length--;
+	result = output.Length;
+	output.Length--;
 	if (!UnitCanBeAt(unit, unit.tilePos + dir)) {
 		// If obstructing unit is moving, wait for a bit.
-		if (unit.CurrentOrder()->Data.Move.Fast) {
-			unit.CurrentOrder()->Data.Move.Fast--;
-			AstarDebugPrint("WAIT at %d\n" _C_ unit.CurrentOrder()->Data.Move.Fast);
+		if (output.Fast) {
+			output.Fast--;
+			AstarDebugPrint("WAIT at %d\n" _C_ output.Fast);
 			result = PF_WAIT;
 		} else {
-			unit.CurrentOrder()->Data.Move.Fast = 10;
+			output.Fast = 10;
 			AstarDebugPrint("SET WAIT to 10\n");
 			result = PF_WAIT;
 		}
-		if (unit.CurrentOrder()->Data.Move.Fast == 0 && result != 0) {
+		if (output.Fast == 0 && result != 0) {
 			AstarDebugPrint("WAIT expired\n");
-			result = NewPath(unit);
+			result = NewPath(input, output);
 			if (result > 0) {
-				*pxd = Heading2X[(int)unit.CurrentOrder()->Data.Move.Path[(int)unit.CurrentOrder()->Data.Move.Length - 1]];
-				*pyd = Heading2Y[(int)unit.CurrentOrder()->Data.Move.Path[(int)unit.CurrentOrder()->Data.Move.Length - 1]];
+				*pxd = Heading2X[(int)output.Path[(int)output.Length - 1]];
+				*pyd = Heading2Y[(int)output.Path[(int)output.Length - 1]];
 				if (!UnitCanBeAt(unit, unit.tilePos + dir)) {
 					// There may be unit in the way, Astar may allow you to walk onto it.
 					result = PF_UNREACHABLE;
 					*pxd = 0;
 					*pyd = 0;
 				} else {
-					result = unit.CurrentOrder()->Data.Move.Length;
-					unit.CurrentOrder()->Data.Move.Length--;
+					result = output.Length;
+					output.Length--;
 				}
 			}
 		}
 	}
 	if (result != PF_WAIT) {
-		unit.CurrentOrder()->Data.Move.Fast = 0;
+		output.Fast = 0;
 	}
 	return result;
 }

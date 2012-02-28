@@ -86,13 +86,14 @@ enum UnitAction {
 	UnitActionTransformInto /// unit transform into type.
 };
 
+class CAnimation;
 class CConstructionFrame;
-class CUnit;
 class CFile;
+class CUnit;
 class CUnitType;
 class CUpgrade;
+class PathFinderInput;
 class SpellType;
-class CAnimation;
 struct lua_State;
 
 /**
@@ -106,7 +107,6 @@ public:
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
-		memset(&Data, 0, sizeof (Data));
 	}
 	virtual ~COrder();
 
@@ -126,19 +126,14 @@ public:
 	virtual void FillSeenValues(CUnit &unit) const;
 	virtual void AiUnitKilled(CUnit &unit);
 
+	void UpdatePathFinderData(PathFinderInput& input);
+
 	bool CheckRange() const;
 
 	bool HasGoal() const { return Goal != NULL; }
 	CUnit * GetGoal() const { return Goal; };
 	void SetGoal(CUnit *const new_goal);
 	void ClearGoal();
-
-	/**
-	**  To remove pathfinder internals. Called if path destination changed.
-	*/
-	void NewResetPath() { Data.Move.Fast = 1; Data.Move.Length = 0; }
-	void SaveDataMove(CFile &file) const;
-	bool ParseMoveData(lua_State *l, int &j, const char *value);
 
 	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 
@@ -177,16 +172,6 @@ public:
 	bool Finished; /// true when order is finish
 
 	Vec2i goalPos;          /// or tile coordinate of destination
-
-	struct _order_data_ {
-	struct _order_move_ {
-		unsigned short int Cycles;          /// how much Cycles we move.
-		char Fast;                  /// Flag fast move (one step)
-		char Length;                /// stored path length
-#define MAX_PATH_LENGTH 28          /// max length of precalculated path
-		char Path[MAX_PATH_LENGTH]; /// directions of stored path
-	} Move; /// ActionMove,...
-	} Data; /// Storage room for different commands
 };
 
 /*----------------------------------------------------------------------------

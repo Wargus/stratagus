@@ -63,6 +63,7 @@
 #include "commands.h"
 #include "map.h"
 #include "missile.h"
+#include "pathfinder.h"
 #include "player.h"
 #include "sound.h"
 #include "spells.h"
@@ -459,6 +460,25 @@ void COrder::ClearGoal()
 bool COrder::CheckRange() const
 {
 	return (Range <= Map.Info.MapWidth || Range <= Map.Info.MapHeight);
+}
+
+
+void COrder::UpdatePathFinderData(PathFinderInput& input)
+{
+	input.SetMinRange(this->MinRange);
+	input.SetMaxRange(this->Range);
+
+	Vec2i tileSize;
+	if (this->HasGoal()) {
+		CUnit *goal = this->GetGoal();
+		tileSize.x = goal->Type->TileWidth;
+		tileSize.y = goal->Type->TileHeight;
+		input.SetGoal(goal->tilePos, tileSize);
+	} else {
+		tileSize.x = this->Width;
+		tileSize.y = this->Height;
+		input.SetGoal(this->goalPos, tileSize);
+	}
 }
 
 /* virtual */ void COrder::FillSeenValues(CUnit &unit) const

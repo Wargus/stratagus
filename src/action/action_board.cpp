@@ -79,18 +79,14 @@ enum {
 		}
 		file.printf(" \"goal\", \"%s\",", UnitReference(goal).c_str());
 	}
-	file.printf(" \"state\", %d,\n  ", this->State);
-
-	SaveDataMove(file);
+	file.printf(" \"state\", %d", this->State);
 
 	file.printf("}");
 }
 
 /* virtual */ bool COrder_Board::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
-	if (this->ParseMoveData(l, j, value)) {
-		return true;
-	} else if (!strcmp("state", value)) {
+	if (!strcmp("state", value)) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->State = LuaToNumber(l, -1);
@@ -133,7 +129,6 @@ static int MoveToTransporter(CUnit &unit)
 	// We have to reset a lot, or else they will circle each other and stuff.
 	if (oldPos != unit.tilePos) {
 		unit.CurrentOrder()->Range = 1;
-		unit.CurrentOrder()->NewResetPath();
 	}
 	// New code has this as default.
 	Assert(unit.CurrentAction() == UnitActionBoard);
@@ -246,7 +241,6 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 				unit.Wait--;
 				return;
 			}
-			this->NewResetPath();
 			this->State = 1;
 			// FALL THROUGH
 		default: { // Move to transporter
