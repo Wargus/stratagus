@@ -209,7 +209,7 @@ static void UiAddGroupToSelection(unsigned group)
 	//
 	//  Don't allow to mix units and buildings
 	//
-	if (NumUnits && Selected[0]->Type->Building) {
+	if (NumSelected && Selected[0]->Type->Building) {
 		return;
 	}
 
