@@ -176,7 +176,7 @@ int PlaceReachable(const CUnit &src, int x, int y, int w, int h,
 			i = 0;
 			break;
 		case PF_REACHED:
-			/* sice most of this function usage check return value as bool
+			/* since most of this function usage check return value as bool
 			 * then reached state should be track as true value */
 			i = 1;
 			break;

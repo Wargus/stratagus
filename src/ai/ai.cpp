@@ -936,29 +936,15 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 */
 void AiCanNotMove(CUnit &unit)
 {
-	Vec2i goalPos;
-	int gw, gh;
+	const Vec2i &goalPos = unit.pathFinderData->input.GetGoalPos();
+	const int minrange = unit.pathFinderData->input.GetMinRange();
+	const int maxrange = unit.pathFinderData->input.GetMaxRange();
+	const int gw = unit.pathFinderData->input.GetGoalSize().x;
+	const int gh = unit.pathFinderData->input.GetGoalSize().y;
+
 	AiPlayer = unit.Player->Ai;
-	const COrderPtr order = unit.CurrentOrder();
-	const int minrange = order->MinRange;
-	const int maxrange = order->Range;
-
-	if (order->HasGoal()) {
-		CUnit &goal = *order->GetGoal();
-		gw = goal.Type->TileWidth;
-		gh = goal.Type->TileHeight;
-		goalPos = goal.tilePos;
-	} else {
-		// Take care of non square goals :)
-		// If goal is non square, range states a non-existant goal rather
-		// than a tile.
-		gw = order->Width;
-		gh = order->Height;
-		goalPos = order->goalPos;
-	}
-
-	if (unit.Type->UnitType == UnitTypeFly ||
-			PlaceReachable(unit, goalPos.x, goalPos.y, gw, gh, minrange, maxrange)) {
+	if (unit.Type->UnitType == UnitTypeFly
+		|| PlaceReachable(unit, goalPos.x, goalPos.y, gw, gh, minrange, maxrange)) {
 		// Path probably closed by unit here
 		AiMoveUnitInTheWay(unit);
 	}

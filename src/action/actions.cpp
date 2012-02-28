@@ -165,8 +165,6 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 	COrder_Build *order = new COrder_Build;
 
 	order->goalPos = pos;
-	order->Width = building.TileWidth;
-	order->Height = building.TileHeight;
 	if (building.BuilderOutside) {
 		order->Range = builder.Type->RepairRange;
 	} else {
@@ -177,9 +175,6 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 		}
 	}
 	order->Type = &building;
-	if (building.BuilderOutside) {
-		order->MinRange = 1;
-	}
 	return order;
 }
 
@@ -463,9 +458,9 @@ bool COrder::CheckRange() const
 }
 
 
-void COrder::UpdatePathFinderData(PathFinderInput& input)
+/* virtual */ void COrder::UpdatePathFinderData(PathFinderInput& input)
 {
-	input.SetMinRange(this->MinRange);
+	input.SetMinRange(0);
 	input.SetMaxRange(this->Range);
 
 	Vec2i tileSize;
@@ -475,8 +470,8 @@ void COrder::UpdatePathFinderData(PathFinderInput& input)
 		tileSize.y = goal->Type->TileHeight;
 		input.SetGoal(goal->tilePos, tileSize);
 	} else {
-		tileSize.x = this->Width;
-		tileSize.y = this->Height;
+		tileSize.x = 0;
+		tileSize.y = 0;
 		input.SetGoal(this->goalPos, tileSize);
 	}
 }

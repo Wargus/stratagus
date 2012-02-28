@@ -127,6 +127,11 @@ void AnimateActionAttack(CUnit &unit, COrder& order)
 		lua_rawgeti(l, -1, j + 1);
 		this->State = LuaToNumber(l, -1);
 		lua_pop(l, 1);
+	} else if (!strcmp(value, "min-range")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->MinRange = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	} else {
 		return false;
 	}
@@ -146,6 +151,24 @@ void AnimateActionAttack(CUnit &unit, COrder& order)
 	Video.DrawLineClip(ColorRed, lastScreenPos, targetPos);
 	Video.FillCircleClip(IsWeakTargetSelected() ? ColorBlue : ColorRed, targetPos, 3);
 	return targetPos;
+}
+
+/* virtual */ void COrder_Attack::UpdatePathFinderData(PathFinderInput& input)
+{
+	input.SetMinRange(this->MinRange);
+	input.SetMaxRange(this->Range);
+
+	Vec2i tileSize;
+	if (this->HasGoal()) {
+		CUnit *goal = this->GetGoal();
+		tileSize.x = goal->Type->TileWidth;
+		tileSize.y = goal->Type->TileHeight;
+		input.SetGoal(goal->tilePos, tileSize);
+	} else {
+		tileSize.x = 0;
+		tileSize.y = 0;
+		input.SetGoal(this->goalPos, tileSize);
+	}
 }
 
 /* virtual */ void COrder_Attack::OnAnimationAttack(CUnit &unit)

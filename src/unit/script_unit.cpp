@@ -157,21 +157,6 @@ bool COrder::ParseGenericData(lua_State *l, int &j, const char *value)
 		lua_rawgeti(l, -1, j + 1);
 		this->Range = LuaToNumber(l, -1);
 		lua_pop(l, 1);
-	} else if (!strcmp(value, "min-range")) {
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		this->MinRange = LuaToNumber(l, -1);
-		lua_pop(l, 1);
-	} else if (!strcmp(value, "width")) {
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		this->Width = LuaToNumber(l, -1);
-		lua_pop(l, 1);
-	} else if (!strcmp(value, "height")) {
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		this->Height = LuaToNumber(l, -1);
-		lua_pop(l, 1);
 	} else if (!strcmp(value, "finished")) {
 		lua_rawgeti(l, -1, j + 1);
 		this->Finished = true;

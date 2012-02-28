@@ -80,11 +80,6 @@ enum
 		file.printf(" \"finished\", ");
 	}
 	file.printf(" \"range\", %d,", this->Range);
-#if 1 // Fixed with Type
-	file.printf(" \"width\", %d,", this->Width);
-	file.printf(" \"height\", %d,", this->Height);
-	file.printf(" \"min-range\", %d,", this->MinRange);
-#endif
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 
 	if (this->BuildingUnit != NULL) {
@@ -138,6 +133,14 @@ enum
 	return targetPos;
 }
 
+/* virtual */ void COrder_Build::UpdatePathFinderData(PathFinderInput& input)
+{
+	input.SetMinRange(this->Type->BuilderOutside ? 1 : 0);
+	input.SetMaxRange(this->Range);
+
+	const Vec2i tileSize = {this->Type->TileWidth, this->Type->TileHeight};
+	input.SetGoal(this->goalPos, tileSize);
+}
 
 /** Called when unit is killed.
 **  warn the AI module.

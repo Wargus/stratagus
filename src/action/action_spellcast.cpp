@@ -69,9 +69,6 @@
 		file.printf(" \"finished\", ");
 	}
 	file.printf(" \"range\", %d,", this->Range);
-	file.printf(" \"width\", %d,", this->Width);
-	file.printf(" \"height\", %d,", this->Height);
-	file.printf(" \"min-range\", %d,", this->MinRange);
 	if (this->HasGoal()) {
 		CUnit &goal = *this->GetGoal();
 		if (goal.Destroyed) {

@@ -102,8 +102,7 @@ struct lua_State;
 class COrder
 {
 public:
-	COrder(int action) : Goal(NULL), Range(0), MinRange(0), Width(0),
-		Height(0), Action(action), Finished(false)
+	COrder(int action) : Goal(NULL), Range(0), Action(action), Finished(false)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -126,7 +125,7 @@ public:
 	virtual void FillSeenValues(CUnit &unit) const;
 	virtual void AiUnitKilled(CUnit &unit);
 
-	void UpdatePathFinderData(PathFinderInput& input);
+	virtual void UpdatePathFinderData(PathFinderInput& input);
 
 	bool CheckRange() const;
 
@@ -165,9 +164,6 @@ private:
 	CUnit *Goal;
 public:
 	int Range;              /// How far away
-	unsigned int  MinRange; /// How far away minimum
-	unsigned char Width;    /// Goal Width (used when Goal is not)
-	unsigned char Height;   /// Goal Height (used when Goal is not)
 	const unsigned char Action;   /// global action
 	bool Finished; /// true when order is finish
 
