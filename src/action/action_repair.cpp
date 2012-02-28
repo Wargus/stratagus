@@ -73,6 +73,10 @@
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 
+	if (this->ReparableTarget != NULL) {
+		file.printf(" \"repair-target\", \"%s\",", UnitReference(this->GetReparableTarget()).c_str());
+	}
+
 	file.printf(" \"repaircycle\", %d,", this->RepairCycle);
 	file.printf(" \"state\", %d,\n  ", this->State);
 
@@ -89,6 +93,11 @@
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->RepairCycle = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	} else if (!strcmp("repair-target", value)) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->ReparableTarget = CclGetUnitFromRef(l);
 		lua_pop(l, 1);
 	} else if (!strcmp("state", value)) {
 		++j;
@@ -108,8 +117,8 @@
 {
 	PixelPos targetPos;
 
-	if (this->HasGoal()) {
-		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
+	if (this->ReparableTarget != NULL) {
+		targetPos = vp.MapToScreenPixelPos(this->ReparableTarget->GetMapPixelPosCenter());
 	} else {
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
@@ -176,6 +185,8 @@ static void AnimateActionRepair(CUnit &unit)
 
 /* virtual */ void COrder_Repair::Execute(CUnit &unit)
 {
+	Assert(this->ReparableTarget == this->GetGoal());
+
 	switch (this->State) {
 		case 0:
 			this->NewResetPath();
@@ -192,7 +203,8 @@ static void AnimateActionRepair(CUnit &unit)
 				if (goal) {
 					if (!goal->IsVisibleAsGoal(*unit.Player)) {
 						DebugPrint("repair target gone.\n");
-						this->goalPos = goal->tilePos;
+						this->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
+						ReparableTarget = NULL;
 						this->ClearGoal();
 						goal = NULL;
 						this->NewResetPath();
@@ -228,9 +240,10 @@ static void AnimateActionRepair(CUnit &unit)
 			if (goal) {
 				if (!goal->IsVisibleAsGoal(*unit.Player)) {
 					DebugPrint("repair goal is gone\n");
-					this->goalPos = goal->tilePos;
+					this->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
 					// FIXME: should I clear this here?
 					this->ClearGoal();
+					ReparableTarget = NULL;
 					goal = NULL;
 					this->NewResetPath();
 				} else {

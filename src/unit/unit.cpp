@@ -202,7 +202,6 @@ void CUnit::Release(bool final)
 
 	Assert(Type); // already free.
 	Assert(Orders.size() == 1);
-	Assert(!CurrentOrder()->HasGoal());
 	// Must be removed before here
 	Assert(Removed);
 
@@ -389,7 +388,6 @@ bool CUnit::RestoreOrder()
 bool CUnit::StoreOrder(COrder* order)
 {
 	Assert(order);
-	Assert(order->HasGoal() || Map.Info.IsPointOnMap(order->goalPos));
 
 	if (this->SavedOrder != NULL) {
 		return false;

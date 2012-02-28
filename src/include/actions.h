@@ -278,7 +278,7 @@ extern void UnHideUnit(CUnit &unit);
 	/// Generic move action
 extern int DoActionMove(CUnit &unit);
 	/// Show attack animation
-extern void AnimateActionAttack(CUnit &unit);
+extern void AnimateActionAttack(CUnit &unit, COrder& order);
 
 /*----------------------------------------------------------------------------
 --  Actions: actions.c

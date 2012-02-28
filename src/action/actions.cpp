@@ -257,6 +257,7 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 		order->goalPos = target.tilePos + target.Type->GetHalfTileSize();
 	} else {
 		order->SetGoal(&target);
+		order->ReparableTarget = &target;
 		order->Range = unit.Type->RepairRange;
 	}
 	return order;
@@ -526,10 +527,18 @@ bool COrder::CheckRange() const
 */
 /* virtual */ void COrder::OnAnimationAttack(CUnit &unit)
 {
-	Assert(unit.CurrentOrder() == this);
+	if (unit.Type->CanAttack == false) {
+		return;
+	}
+	CUnit* goal = AttackUnitsInRange(unit);
 
-	FireMissile(unit);
-	UnHideUnit(unit); // unit is invisible until attacks
+	if (goal != NULL) {
+		const Vec2i invalidPos = {-1, -1};
+
+		FireMissile(unit, goal, invalidPos);
+		UnHideUnit(unit); // unit is invisible until attacks
+	}
+	// Fixme : Auto select position to attack ?
 }
 
 /*----------------------------------------------------------------------------

@@ -42,6 +42,7 @@
 #include "ai_local.h"
 
 #include "action/action_build.h"
+#include "action/action_repair.h"
 #include "action/action_resource.h"
 #include "depend.h"
 #include "map.h"
@@ -1318,9 +1319,13 @@ static void AiCheckRepair()
 		if (unit.CurrentAction() == UnitActionBuilt) {
 			int j;
 			for (j = 0; j < AiPlayer->Player->TotalNumUnits; ++j) {
-				COrderPtr order = AiPlayer->Player->Units[j]->CurrentOrder();
-				if (order->Action == UnitActionRepair && order->GetGoal() == &unit) {
+				COrder* order = AiPlayer->Player->Units[j]->CurrentOrder();
+				if (order->Action == UnitActionRepair) {
+					COrder_Repair &orderRepair = *static_cast<COrder_Repair*>(order);
+
+					if (orderRepair.GetReparableTarget() == &unit) {
 					break;
+					}
 				}
 			}
 			if (j == AiPlayer->Player->TotalNumUnits) {

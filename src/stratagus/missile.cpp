@@ -375,10 +375,8 @@ static PixelPos GetPixelPosFromCenterTile(const Vec2i& tilePos)
 **
 **  @param unit  Unit that fires the missile.
 */
-void FireMissile(CUnit &unit)
+void FireMissile(CUnit &unit, CUnit *goal, const Vec2i& goalPos)
 {
-	CUnit *goal = unit.CurrentOrder()->GetGoal();
-
 	// Goal dead?
 	if (goal) {
 		Assert(!unit.Type->Missile.Missile->AlwaysFire || unit.Type->Missile.Missile->Range);
@@ -438,7 +436,7 @@ void FireMissile(CUnit &unit)
 		// If Firing from inside a Bunker
 		NearestOfUnit(*goal, GetFirstContainer(unit)->tilePos, &dpos);
 	} else {
-		dpos = unit.CurrentOrder()->goalPos;
+		dpos = goalPos;
 		// FIXME: Can this be too near??
 	}
 

@@ -574,7 +574,7 @@ extern Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, 
 extern Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
 
 	/// fire a missile
-extern void FireMissile(CUnit &unit);
+extern void FireMissile(CUnit &unit, CUnit *goal, const Vec2i& goalPos);
 
 extern int FindAndSortMissiles(const CViewport &vp, Missile *table[], const int tablesize);
 extern int FindAndSortMissiles(const CViewport &vp, MissileDrawProxy table[], const int tablesize);

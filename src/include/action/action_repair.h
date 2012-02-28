@@ -48,9 +48,12 @@ public:
 
 	virtual void Execute(CUnit &unit);
 	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
+
+	const CUnitPtr& GetReparableTarget() const { return ReparableTarget; }
 private:
 	bool RepairUnit(const CUnit &unit, CUnit &goal);
 private:
+	CUnitPtr ReparableTarget;
 	unsigned int State;
 	unsigned int RepairCycle;
 };

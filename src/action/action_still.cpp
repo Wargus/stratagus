@@ -52,9 +52,8 @@
 #include "unittype.h"
 
 enum {
-	SUB_STILL_INIT = 0,
-	SUB_STILL_STANDBY = 1,
-	SUB_STILL_ATTACK = 2
+	SUB_STILL_STANDBY = 0,
+	SUB_STILL_ATTACK
 };
 
 /* virtual */ void COrder_Still::Save(CFile &file, const CUnit &unit) const
@@ -67,17 +66,17 @@ enum {
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
 	}
-	if (this->HasGoal()) {
-		CUnit &goal = *this->GetGoal();
-		if (goal.Destroyed) {
+	if (this->AutoTarget != NULL) {
+		if (AutoTarget->Destroyed) {
 			/* this unit is destroyed so it's not in the global unit
 			 * array - this means it won't be saved!!! */
 			printf ("FIXME: storing destroyed Goal - loading will fail.\n");
 		}
-		file.printf(" \"goal\", \"%s\",", UnitReference(goal).c_str());
+		file.printf(" \"auto-target\", \"%s\",", UnitReference(AutoTarget).c_str());
 	}
-
-	file.printf("\"state\", %d", this->State);
+	if (this->State != 0) { // useless to write default value
+		file.printf("\"state\", %d", this->State);
+	}
 	file.printf("}");
 }
 
@@ -87,6 +86,11 @@ enum {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->State = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	} else if (!strcmp("auto-target", value)) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->AutoTarget = CclGetUnitFromRef(l);
 		lua_pop(l, 1);
 	} else {
 		return false;
@@ -100,6 +104,16 @@ enum {
 		Video.FillCircleClip(ColorBlack, lastScreenPos, 2);
 	}
 	return lastScreenPos;
+}
+
+/* virtual */ void COrder_Still::OnAnimationAttack(CUnit &unit)
+{
+	if (this->AutoTarget != NULL) {
+		const Vec2i invalidPos = {-1, -1};
+
+		FireMissile(unit, AutoTarget, invalidPos);
+		UnHideUnit(unit);
+	}
 }
 
 
@@ -255,7 +269,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	if (goal == NULL) {
 		return false;
 	}
-	this->SetGoal(goal);
+	this->AutoTarget = goal;
 	this->State = SUB_STILL_ATTACK; // Mark attacking.
 	UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos);
 	return true;
@@ -305,14 +319,11 @@ bool AutoAttack(CUnit &unit)
 	this->Finished = false;
 
 	switch (this->State) {
-		case SUB_STILL_INIT: //first entry
-			this->State = SUB_STILL_STANDBY;
-			// no break : follow
 		case SUB_STILL_STANDBY:
 			UnitShowAnimation(unit, unit.Type->Animations->Still);
 		break;
 		case SUB_STILL_ATTACK: // attacking unit in attack range.
-			AnimateActionAttack(unit);
+			AnimateActionAttack(unit, *this);
 		break;
 	}
 	if (unit.Anim.Unbreakable) { // animation can't be aborted here

@@ -76,14 +76,13 @@
 **
 **  @todo manage correctly unit with no animation attack.
 */
-void AnimateActionAttack(CUnit &unit)
+void AnimateActionAttack(CUnit &unit, COrder& order)
 {
 	//  No animation.
 	//  So direct fire missile.
 	//  FIXME : wait a little.
 	if (!unit.Type->Animations || !unit.Type->Animations->Attack) {
-		FireMissile(unit);
-		UnHideUnit(unit);// unit is invisible until attacks
+		order.OnAnimationAttack(unit);
 		return;
 	}
 	UnitShowAnimation(unit, unit.Type->Animations->Attack);
@@ -152,6 +151,13 @@ void AnimateActionAttack(CUnit &unit)
 	return targetPos;
 }
 
+/* virtual */ void COrder_Attack::OnAnimationAttack(CUnit &unit)
+{
+	Assert(unit.Type->CanAttack);
+
+	FireMissile(unit, this->GetGoal(), this->goalPos);
+	UnHideUnit(unit); // unit is invisible until attacks
+}
 
 
 bool COrder_Attack::IsWeakTargetSelected() const
@@ -337,7 +343,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 {
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
 
-	AnimateActionAttack(unit);
+	AnimateActionAttack(unit, *this);
 	if (unit.Anim.Unbreakable) {
 		return;
 	}
