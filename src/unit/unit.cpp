@@ -2904,6 +2904,15 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		MakeLocalMissile(*mtype, targetPixelCenter, targetPixelCenter + offset)->Damage = -damage;
 	}
 
+	// OnHit callback
+	if (type->OnHit) {
+		const int slot = target.Slot;
+
+		type->OnHit->pushPreamble();
+		type->OnHit->pushInteger(slot);
+		type->OnHit->run();
+	}
+
 	// Show impact missiles
 	if (target.Variable[SHIELD_INDEX].Value > 0
 		&& !target.Type->Impact[ANIMATIONS_DEATHTYPES + 1].Name.empty()) { // shield impact

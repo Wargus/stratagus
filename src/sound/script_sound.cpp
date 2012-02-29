@@ -232,7 +232,7 @@ static int CclDefineGameSounds(lua_State *l)
 {
 	//FIXME: should allow to define ALL the game sounds
 	const char *value;
-	unsigned int i;
+	unsigned int i, k;
 	int args;
 	int j;
 	LuaUserData *data;
@@ -344,11 +344,21 @@ static int CclDefineGameSounds(lua_State *l)
 			}
 			lua_pop(l, 1);
 			GameSounds.ResearchComplete[i].Sound = (CSound *)data->Data;
-		} else if (!strcmp(value, "not-enough-min")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
+		} else if (!strcmp(value, "not-enough-res")) {
+			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
+			value = LuaToString(l, -1);
+			lua_pop(l, 1);
+			for (k = 0; k < MaxCosts; ++k) {
+				if (!strcmp(DefaultResourceNames[k].c_str(), value)) {
+					break;
+				}
+			}
+			if (j == MaxCosts)
+				LuaError(l, "Invalid resource \"%s\"" _C_ value);
+			lua_rawgeti(l, j + 1, 2);
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
 			for (i = 0; i < PlayerRaces.Count; ++i) {
@@ -359,35 +369,13 @@ static int CclDefineGameSounds(lua_State *l)
 			if (i == PlayerRaces.Count) {
 				LuaError(l, "Unknown race: %s" _C_ value);
 			}
-			lua_rawgeti(l, j + 1, 2);
+			lua_rawgeti(l, j + 1, 3);
 			if (!lua_isuserdata(l, -1) ||
 					(data = (LuaUserData *)lua_touserdata(l, -1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
 			lua_pop(l, 1);
-			GameSounds.NotEnough1[i].Sound = (CSound *)data->Data;
-		} else if (!strcmp(value, "not-enough-ore")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, j + 1, 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
-			for (i = 0; i < PlayerRaces.Count; ++i) {
-				if (!strcmp(PlayerRaces.Name[i].c_str(), value)) {
-					break;
-				}
-			}
-			if (i == PlayerRaces.Count) {
-				LuaError(l, "Unknown race: %s" _C_ value);
-			}
-			lua_rawgeti(l, j + 1, 2);
-			if (!lua_isuserdata(l, -1) ||
-					(data = (LuaUserData *)lua_touserdata(l, -1))->Type != LuaSoundType) {
-				LuaError(l, "Sound id expected");
-			}
-			lua_pop(l, 1);
-			GameSounds.NotEnough2[i].Sound = (CSound *)data->Data;
+			GameSounds.NotEnoughRes[i][k].Sound = (CSound *)data->Data;
 		}else if (!strcmp(value, "not-enough-food")) {
 			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");

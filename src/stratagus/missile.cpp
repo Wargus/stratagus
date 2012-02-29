@@ -377,6 +377,7 @@ static PixelPos GetPixelPosFromCenterTile(const Vec2i& tilePos)
 */
 void FireMissile(CUnit &unit, CUnit *goal, const Vec2i& goalPos)
 {
+	bool dead = goal->Removed || goal->CurrentAction() == UnitActionDie || goal->Destroyed; 
 	// Goal dead?
 	if (goal) {
 		Assert(!unit.Type->Missile.Missile->AlwaysFire || unit.Type->Missile.Missile->Range);
@@ -422,7 +423,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i& goalPos)
 	const PixelPos startPixelPos = GetPixelPosFromCenterTile(from->tilePos);
 
 	Vec2i dpos;
-	if (goal) {
+	if (goal && !dead) {
 		Assert(goal->Type);  // Target invalid?
 		// Moved out of attack range?
 
@@ -445,7 +446,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i& goalPos)
 	//
 	// Damage of missile
 	//
-	if (goal) {
+	if (goal && !dead) {
 		missile->TargetUnit = goal;
 		goal->RefsIncrease();
 	}

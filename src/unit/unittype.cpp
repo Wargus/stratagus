@@ -115,7 +115,7 @@ CUnitType::CUnitType() :
 	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	Animations(NULL), StillFrame(0),
-	DeathExplosion(NULL), CorpseType(NULL),
+	DeathExplosion(NULL), OnHit(NULL), CorpseType(NULL),
 	Construction(NULL), RepairHP(0), TileWidth(0), TileHeight(0),
 	BoxWidth(0), BoxHeight(0), NumDirections(0), MinAttackRange(0),
 	ReactRangeComputer(0), ReactRangePerson(0), Priority(0),
@@ -152,6 +152,7 @@ CUnitType::CUnitType() :
 CUnitType::~CUnitType()
 {
 	delete DeathExplosion;
+	delete OnHit;
 
 	delete[] Variable;
 	BoolFlag.clear();

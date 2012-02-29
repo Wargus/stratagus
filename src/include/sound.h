@@ -73,8 +73,7 @@ public:
 	SoundConfig Rescue[MAX_RACES];                /// rescue units
 	SoundConfig ChatMessage;                      /// chat message
 	SoundConfig ResearchComplete[MAX_RACES];      /// research complete message
-	SoundConfig NotEnough1[MAX_RACES];            /// not enough minerals message
-	SoundConfig NotEnough2[MAX_RACES];            /// not enough ore message
+	SoundConfig NotEnoughRes[MAX_RACES][MaxCosts];/// not enough resources message
 	SoundConfig NotEnoughFood[MAX_RACES];         /// not enough food message
 };
 

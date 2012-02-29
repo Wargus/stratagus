@@ -530,17 +530,12 @@ void InitSoundClient()
 		}
 	}
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
-		if (!GameSounds.NotEnough1[i].Sound &&
-				!GameSounds.NotEnough1[i].Name.empty()) {
-			GameSounds.NotEnough1[i].Sound =
-				SoundForName(GameSounds.NotEnough1[i].Name);
-		}
-	}
-	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
-		if (!GameSounds.NotEnough2[i].Sound &&
-				!GameSounds.NotEnough2[i].Name.empty()) {
-			GameSounds.NotEnough2[i].Sound =
-				SoundForName(GameSounds.NotEnough2[i].Name);
+		for (unsigned int j = 0; j < MaxCosts; ++j) {
+			if (!GameSounds.NotEnoughRes[i][j].Sound &&
+					!GameSounds.NotEnoughRes[i][j].Name.empty()) {
+				GameSounds.NotEnoughRes[i][j].Sound =
+					SoundForName(GameSounds.NotEnoughRes[i][j].Name);
+			}
 		}
 	}
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {

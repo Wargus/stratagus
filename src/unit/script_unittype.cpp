@@ -663,6 +663,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->Explosion.Missile = NULL;
 		} else if (!strcmp(value, "DeathExplosion")) {
 			type->DeathExplosion = new LuaCallback(l, -1);
+		} else if (!strcmp(value, "OnHit")) {
+			type->OnHit = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "land")) {
