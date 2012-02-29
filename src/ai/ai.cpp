@@ -146,6 +146,7 @@
 #include "ai.h"
 #include "ai_local.h"
 
+#include "action/action_attack.h"
 #include "player.h"
 #include "unit.h"
 #include "unittype.h"
@@ -706,23 +707,30 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 			// if brother is idle or attack no-agressive target and
 			// can attack our attacker then ask for help
 			// FIXME ad support for help from Coward type units
-			if (aiunit.IsAgressive() && (aiunit.IsIdle() ||
-				!(aiunit.CurrentAction() == UnitActionAttack &&
-				aiunit.CurrentOrder()->HasGoal() &&
-				aiunit.CurrentOrder()->GetGoal()->IsAgressive()))
-				&& CanTarget(aiunit.Type, attacker->Type)) {
-				CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit*>(attacker), FlushCommands);
-				if (aiunit.SavedOrder == NULL) {
-					COrder *savedOrder = COrder::NewActionAttack(aiunit, aiunit.tilePos);
+			if (aiunit.IsAgressive() && CanTarget(aiunit.Type, attacker->Type)) {
+				bool shouldAttack = aiunit.IsIdle();
 
-					if (aiunit.StoreOrder(savedOrder) == false) {
-						delete savedOrder;
-						savedOrder = NULL;
+				if (aiunit.CurrentAction() == UnitActionAttack) {
+					COrder_Attack& orderAttack = *static_cast<COrder_Attack*>(aiunit.CurrentOrder());
+
+					if (orderAttack.GetGoal() == NULL || orderAttack.GetGoal()->IsAgressive() == false) {
+						shouldAttack = true;
+					}
+				}
+
+				if (shouldAttack) {
+					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit*>(attacker), FlushCommands);
+					if (aiunit.SavedOrder == NULL) {
+						COrder *savedOrder = COrder::NewActionAttack(aiunit, aiunit.tilePos);
+
+						if (aiunit.StoreOrder(savedOrder) == false) {
+							delete savedOrder;
+							savedOrder = NULL;
+						}
 					}
 				}
 			}
 		}
-
 		if (!aiForce.Defending && aiForce.State > 0) {
 			DebugPrint("%d: %d(%s) belong to attacking force, don't defend it\n" _C_
 				defender.Player->Index _C_ UnitNumber(defender) _C_ defender.Type->Ident.c_str());

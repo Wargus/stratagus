@@ -38,12 +38,16 @@
 #include <string.h>
 
 #include "stratagus.h"
+
+#include "ai_local.h"
+
+#include "actions.h"
+#include "action/action_board.h"
+#include "depend.h"
+#include "map.h"
+#include "pathfinder.h"
 #include "unittype.h"
 #include "unit.h"
-#include "ai_local.h"
-#include "actions.h"
-#include "map.h"
-#include "depend.h"
 
 /*----------------------------------------------------------------------------
 --  Types
@@ -612,7 +616,9 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 		CUnit &unit = *aiForce.Units[i];
 		CUnit &transporter = *aiForce.Units[transporterIndex];
 
-		if (transporter.IsIdle() && unit.CurrentOrder()->GetGoal() == &transporter) {
+		if (transporter.IsIdle()
+			&& unit.CurrentAction() == UnitActionBoard
+			&& static_cast<COrder_Board*>(unit.CurrentOrder())->GetGoal() == &transporter) {
 			CommandFollow(transporter, unit, 0);
 		}
 		if (CanTransport(transporter, unit) && unit.IsIdle() && unit.Container == NULL) {
@@ -642,8 +648,6 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 */
 void AiForce::Update()
 {
-	const CUnit *unit = NULL;
-
 	if (Size() == 0) {
 		Attacking = false;
 		if (!Defending && State > AiForceAttackingState_Waiting) {
@@ -685,38 +689,24 @@ void AiForce::Update()
 		AiGroupAttackerForTransport(*this);
 		return ;
 	}
-	// Find a unit that isn't idle
-	unit = NoUnitP;
+	// Find a unit that is attacking
+	const CUnit *unit = NoUnitP;
 	if (State == AiForceAttackingState_Attacking) {
 		for (unsigned int i = 0; i < Size(); ++i) {
 			CUnit &aiunit = *Units[i];
 
-			if (!aiunit.IsIdle()) {
-				// Found an no-idle unit, use it if we find nothing better
-				if (unit == NoUnitP) {
-					unit = &aiunit;
-				}
-				// If the unit has a goal use it
-				if (aiunit.CurrentOrder()->HasGoal()) {
-					unit = &aiunit;
-					break;
-				}
+			if (aiunit.CurrentAction() == UnitActionAttack) {
+				unit = &aiunit;
+				break;
 			}
 		}
 	}
-	if (unit != NoUnitP) {
+	if (unit != NULL) {
+		Assert(unit->CurrentAction() == UnitActionAttack);
 		// Give idle units a new goal
 		// FIXME: may not be a good goal
-		COrderPtr order = unit->CurrentOrder();
-		Vec2i pos;
+		const Vec2i& pos = unit->pathFinderData->input.GetGoalPos();
 
-		if (order->HasGoal()) {
-			pos = order->GetGoal()->tilePos;
-		} else if (order->goalPos.x != -1 && order->goalPos.y != -1) {
-			pos = order->goalPos;
-		} else {
-			pos = this->GoalPos;
-		}
 		for (unsigned int i = 0; i < Size(); ++i) {
 			CUnit &aiunit = *Units[i];
 
