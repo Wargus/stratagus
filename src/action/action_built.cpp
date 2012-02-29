@@ -60,7 +60,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 		cframe = cframe->Next;
 		++frame;
 	}
-	if (this->Worker == NULL) {
+	if (this->Worker != NULL) {
 		file.printf("\"worker\", \"%s\", ", UnitReference(this->Worker).c_str());
 	}
 	file.printf("\"progress\", %d, \"frame\", %d", this->ProgressCounter, frame);
