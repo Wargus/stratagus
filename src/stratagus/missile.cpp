@@ -377,9 +377,11 @@ static PixelPos GetPixelPosFromCenterTile(const Vec2i& tilePos)
 */
 void FireMissile(CUnit &unit, CUnit *goal, const Vec2i& goalPos)
 {
-	bool dead = goal->Removed || goal->CurrentAction() == UnitActionDie || goal->Destroyed; 
+	bool dead = false;
+	
 	// Goal dead?
 	if (goal) {
+		dead = goal->Removed || goal->CurrentAction() == UnitActionDie || goal->Destroyed; 
 		Assert(!unit.Type->Missile.Missile->AlwaysFire || unit.Type->Missile.Missile->Range);
 		if (!unit.Type->Missile.Missile->AlwaysFire) {
 			// Better let the caller/action handle this.
