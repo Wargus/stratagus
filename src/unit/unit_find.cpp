@@ -301,7 +301,7 @@ private:
 		// Unit in range ?
 		const int d = attacker->MapDistanceTo(*dest);
 
-		if (d > range || !UnitReachable(*attacker, *dest, attackrange)) {
+		if (d > range || (!attacker->Type->Building && !UnitReachable(*attacker, *dest, attackrange))) {
 			return INT_MAX;
 		}
 
