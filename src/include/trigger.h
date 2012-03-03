@@ -98,7 +98,7 @@ extern const CUnitType *TriggerGetUnitType(lua_State *l); /// get the unit-type
 extern void TriggersEachCycle();    /// test triggers
 
 extern void TriggerCclRegister();   /// Register ccl features
-extern void SaveTriggers(CFile *file); /// Save the trigger module
+extern void SaveTriggers(CFile &file); /// Save the trigger module
 extern void InitTriggers();         /// Setup triggers
 extern void CleanTriggers();        /// Cleanup the trigger module
 

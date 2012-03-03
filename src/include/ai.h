@@ -59,7 +59,7 @@ extern void InitAiModule();       /// Init AI global structures
 extern void AiInit(CPlayer &player);   /// Init AI for this player
 extern void CleanAi();            /// Cleanup the AI module
 extern void FreeAi();            /// Free the AI resources
-extern void SaveAi(CFile *file);     /// Save the AI state
+extern void SaveAi(CFile &file);     /// Save the AI state
 
 extern void AiCclRegister();      /// Register ccl features
 

@@ -150,8 +150,6 @@ static int InitReplay;             /// Initialize replay
 static FullReplay *CurrentReplay;
 static LogEntry *ReplayStep;
 
-static void AppendLog(LogEntry *log, CFile *dest);
-
 //----------------------------------------------------------------------------
 // Log commands
 //----------------------------------------------------------------------------
@@ -266,99 +264,93 @@ static void ApplyReplaySettings()
 */
 static void DeleteReplay(FullReplay *replay)
 {
-	LogEntry *log;
-	LogEntry *next;
+	LogEntry *log = replay->Commands;
 
-	log = replay->Commands;
 	while (log) {
-		next = log->Next;
+		LogEntry *next = log->Next;
 		delete log;
 		log = next;
 	}
-
 	delete replay;
 }
 
-static void PrintLogCommand(LogEntry *log, CFile *dest)
+static void PrintLogCommand(const LogEntry &log, CFile &file)
 {
-	dest->printf("Log( { ");
-	dest->printf("GameCycle = %lu, ", log->GameCycle);
-	if (log->UnitNumber != -1) {
-		dest->printf("UnitNumber = %d, ", log->UnitNumber);
+	file.printf("Log( { ");
+	file.printf("GameCycle = %lu, ", log.GameCycle);
+	if (log.UnitNumber != -1) {
+		file.printf("UnitNumber = %d, ", log.UnitNumber);
 	}
-	if (!log->UnitIdent.empty()) {
-		dest->printf("UnitIdent = \"%s\", ", log->UnitIdent.c_str());
+	if (!log.UnitIdent.empty()) {
+		file.printf("UnitIdent = \"%s\", ", log.UnitIdent.c_str());
 	}
-	dest->printf("Action = \"%s\", ", log->Action.c_str());
-	dest->printf("Flush = %d, ", log->Flush);
-	if (log->PosX != -1 || log->PosY != -1) {
-		dest->printf("PosX = %d, PosY = %d, ", log->PosX, log->PosY);
+	file.printf("Action = \"%s\", ", log.Action.c_str());
+	file.printf("Flush = %d, ", log.Flush);
+	if (log.PosX != -1 || log.PosY != -1) {
+		file.printf("PosX = %d, PosY = %d, ", log.PosX, log.PosY);
 	}
-	if (log->DestUnitNumber != -1) {
-		dest->printf("DestUnitNumber = %d, ", log->DestUnitNumber);
+	if (log.DestUnitNumber != -1) {
+		file.printf("DestUnitNumber = %d, ", log.DestUnitNumber);
 	}
-	if (!log->Value.empty()) {
-		dest->printf("Value = [[%s]], ", log->Value.c_str());
+	if (!log.Value.empty()) {
+		file.printf("Value = [[%s]], ", log.Value.c_str());
 	}
-	if (log->Num != -1) {
-		dest->printf("Num = %d, ", log->Num);
+	if (log.Num != -1) {
+		file.printf("Num = %d, ", log.Num);
 	}
-	dest->printf("SyncRandSeed = %d } )\n", (signed)log->SyncRandSeed);
+	file.printf("SyncRandSeed = %d } )\n", (signed)log.SyncRandSeed);
 }
 
 /**
-**  Output the FullReplay list to dest file
+**  Output the FullReplay list to file
 **
-**  @param dest  The file to output to
+**  @param file  The file to output to
 */
-static void SaveFullLog(CFile *dest)
+static void SaveFullLog(CFile &file)
 {
-	LogEntry *log;
-	int i;
+	file.printf("\n--- -----------------------------------------\n");
+	file.printf("--- MODULE: replay list\n");
 
-	dest->printf("\n--- -----------------------------------------\n");
-	dest->printf("--- MODULE: replay list\n");
-
-	dest->printf("\n");
-	dest->printf("ReplayLog( {\n");
-	dest->printf("  Comment1 = \"%s\",\n", CurrentReplay->Comment1.c_str());
-	dest->printf("  Comment2 = \"%s\",\n", CurrentReplay->Comment2.c_str());
-	dest->printf("  Date = \"%s\",\n", CurrentReplay->Date.c_str());
-	dest->printf("  Map = \"%s\",\n", CurrentReplay->Map.c_str());
-	dest->printf("  MapPath = \"%s\",\n", CurrentReplay->MapPath.c_str());
-	dest->printf("  MapId = %u,\n", CurrentReplay->MapId);
-	dest->printf("  Type = %d,\n", CurrentReplay->Type);
-	dest->printf("  Race = %d,\n", CurrentReplay->Race);
-	dest->printf("  LocalPlayer = %d,\n", CurrentReplay->LocalPlayer);
-	dest->printf("  Players = {\n");
-	for (i = 0; i < PlayerMax; ++i) {
+	file.printf("\n");
+	file.printf("ReplayLog( {\n");
+	file.printf("  Comment1 = \"%s\",\n", CurrentReplay->Comment1.c_str());
+	file.printf("  Comment2 = \"%s\",\n", CurrentReplay->Comment2.c_str());
+	file.printf("  Date = \"%s\",\n", CurrentReplay->Date.c_str());
+	file.printf("  Map = \"%s\",\n", CurrentReplay->Map.c_str());
+	file.printf("  MapPath = \"%s\",\n", CurrentReplay->MapPath.c_str());
+	file.printf("  MapId = %u,\n", CurrentReplay->MapId);
+	file.printf("  Type = %d,\n", CurrentReplay->Type);
+	file.printf("  Race = %d,\n", CurrentReplay->Race);
+	file.printf("  LocalPlayer = %d,\n", CurrentReplay->LocalPlayer);
+	file.printf("  Players = {\n");
+	for (int i = 0; i < PlayerMax; ++i) {
 		if (!CurrentReplay->Players[i].Name.empty()) {
-			dest->printf("\t{ Name = \"%s\",", CurrentReplay->Players[i].Name.c_str());
+			file.printf("\t{ Name = \"%s\",", CurrentReplay->Players[i].Name.c_str());
 		} else {
-			dest->printf("\t{");
+			file.printf("\t{");
 		}
-		dest->printf(" Race = %d,", CurrentReplay->Players[i].Race);
-		dest->printf(" Team = %d,", CurrentReplay->Players[i].Team);
-		dest->printf(" Type = %d }%s", CurrentReplay->Players[i].Type,
+		file.printf(" Race = %d,", CurrentReplay->Players[i].Race);
+		file.printf(" Team = %d,", CurrentReplay->Players[i].Team);
+		file.printf(" Type = %d }%s", CurrentReplay->Players[i].Type,
 			i != PlayerMax - 1 ? ",\n" : "\n");
 	}
-	dest->printf("  },\n");
-	dest->printf("  Resource = %d,\n", CurrentReplay->Resource);
-	dest->printf("  NumUnits = %d,\n", CurrentReplay->NumUnits);
-	dest->printf("  Difficulty = %d,\n", CurrentReplay->Difficulty);
-	dest->printf("  NoFow = %s,\n", CurrentReplay->NoFow ? "true" : "false");
-	dest->printf("  RevealMap = %d,\n", CurrentReplay->RevealMap);
-	dest->printf("  GameType = %d,\n", CurrentReplay->GameType);
-	dest->printf("  Opponents = %d,\n", CurrentReplay->Opponents);
-	dest->printf("  MapRichness = %d,\n", CurrentReplay->MapRichness);
-	dest->printf("  Engine = { %d, %d, %d },\n",
+	file.printf("  },\n");
+	file.printf("  Resource = %d,\n", CurrentReplay->Resource);
+	file.printf("  NumUnits = %d,\n", CurrentReplay->NumUnits);
+	file.printf("  Difficulty = %d,\n", CurrentReplay->Difficulty);
+	file.printf("  NoFow = %s,\n", CurrentReplay->NoFow ? "true" : "false");
+	file.printf("  RevealMap = %d,\n", CurrentReplay->RevealMap);
+	file.printf("  GameType = %d,\n", CurrentReplay->GameType);
+	file.printf("  Opponents = %d,\n", CurrentReplay->Opponents);
+	file.printf("  MapRichness = %d,\n", CurrentReplay->MapRichness);
+	file.printf("  Engine = { %d, %d, %d },\n",
 		CurrentReplay->Engine[0], CurrentReplay->Engine[1], CurrentReplay->Engine[2]);
-	dest->printf("  Network = { %d, %d, %d }\n",
+	file.printf("  Network = { %d, %d, %d }\n",
 		CurrentReplay->Network[0], CurrentReplay->Network[1], CurrentReplay->Network[2]);
-	dest->printf("} )\n");
-	log = CurrentReplay->Commands;
+	file.printf("} )\n");
+	const LogEntry *log = CurrentReplay->Commands;
 	while (log) {
-		PrintLogCommand(log, dest);
+		PrintLogCommand(*log, file);
 		log = log->Next;
 	}
 }
@@ -369,7 +361,7 @@ static void SaveFullLog(CFile *dest)
 **  @param log   Pointer the replay log entry to be added
 **  @param dest  The file to output to
 */
-static void AppendLog(LogEntry *log, CFile *dest)
+static void AppendLog(LogEntry *log, CFile &file)
 {
 	LogEntry **last;
 
@@ -382,13 +374,8 @@ static void AppendLog(LogEntry *log, CFile *dest)
 	*last = log;
 	log->Next = 0;
 
-	// Append to file
-	if (!dest) {
-		return;
-	}
-
-	PrintLogCommand(log, dest);
-	dest->flush();
+	PrintLogCommand(*log, file);
+	file.flush();
 }
 
 /**
@@ -408,12 +395,9 @@ static void AppendLog(LogEntry *log, CFile *dest)
 void CommandLog(const char *action, const CUnit *unit, int flush,
 	int x, int y, const CUnit *dest, const char *value, int num)
 {
-	LogEntry *log;
-
 	if (CommandLogDisabled) { // No log wanted
 		return;
 	}
-
 	//
 	// Create and write header of log file. The player number is added
 	// to the save file name, to test more than one player on one computer.
@@ -448,21 +432,21 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 		}
 
 		if (CurrentReplay) {
-			SaveFullLog(LogFile);
+			SaveFullLog(*LogFile);
 		}
 	}
 
 	if (!CurrentReplay) {
 		CurrentReplay = StartReplay();
 
-		SaveFullLog(LogFile);
+		SaveFullLog(*LogFile);
 	}
 
 	if (!action) {
 		return;
 	}
 
-	log = new LogEntry;
+	LogEntry *log = new LogEntry;
 
 	//
 	// Frame, unit, (type-ident only to be better readable).
@@ -499,7 +483,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	log->SyncRandSeed = SyncRandSeed;
 
 	// Append it to ReplayLog list
-	AppendLog(log, LogFile);
+	AppendLog(log, *LogFile);
 }
 
 /**
@@ -711,7 +695,7 @@ bool IsReplayGame()
 **
 **  @param file  file to save to.
 */
-void SaveReplayList(CFile *file)
+void SaveReplayList(CFile &file)
 {
 	SaveFullLog(file);
 }

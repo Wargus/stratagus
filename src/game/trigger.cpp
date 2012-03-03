@@ -638,47 +638,44 @@ void TriggerCclRegister()
 **
 **  @param file  Open file to print to
 */
-void SaveTriggers(CFile *file)
+void SaveTriggers(CFile &file)
 {
-	int i;
-	int triggers;
+	file.printf("\n--- -----------------------------------------\n");
+	file.printf("--- MODULE: triggers\n");
 
-	file->printf("\n--- -----------------------------------------\n");
-	file->printf("--- MODULE: triggers\n");
-
-	file->printf("\n");
+	file.printf("\n");
 	lua_pushstring(Lua, "_triggers_");
 	lua_gettable(Lua, LUA_GLOBALSINDEX);
-	triggers = lua_objlen(Lua, -1);
+	const int triggers = lua_objlen(Lua, -1);
 
-	file->printf("SetActiveTriggers(");
-	for (i = 0; i < triggers; i += 2) {
+	file.printf("SetActiveTriggers(");
+	for (int i = 0; i < triggers; i += 2) {
 		lua_rawgeti(Lua, -1, i + 1);
 		if (i) {
-			file->printf(", ");
+			file.printf(", ");
 		}
 		if (!lua_isnil(Lua, -1)) {
-			file->printf("true");
+			file.printf("true");
 		} else {
-			file->printf("false");
+			file.printf("false");
 		}
 		lua_pop(Lua, 1);
 	}
-	file->printf(")\n");
+	file.printf(")\n");
 
-	file->printf("SetTrigger(%d)\n", Trigger);
+	file.printf("SetTrigger(%d)\n", Trigger);
 
 	if (GameTimer.Init) {
-		file->printf("ActionSetTimer(%ld, %s)\n",
+		file.printf("ActionSetTimer(%ld, %s)\n",
 			GameTimer.Cycles, (GameTimer.Increasing ? "true" : "false"));
 		if (GameTimer.Running) {
-			file->printf("ActionStartTimer()\n");
+			file.printf("ActionStartTimer()\n");
 		}
 	}
 
-	file->printf("\n");
-	file->printf("if (Triggers ~= nil) then assert(loadstring(Triggers))() end\n");
-	file->printf("\n");
+	file.printf("\n");
+	file.printf("if (Triggers ~= nil) then assert(loadstring(Triggers))() end\n");
+	file.printf("\n");
 }
 
 /**

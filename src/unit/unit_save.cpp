@@ -78,19 +78,6 @@ std::string UnitReference(const CUnitPtr &unit)
 	return ss.str();
 }
 
-
-/**
-**  Save an order.
-**
-**  @param order  Order who should be saved.
-**  @param unit   Order behave to this unit.
-**  @param file   Output file.
-*/
-void SaveOrder(const COrder &order, const CUnit &unit, CFile *file)
-{
-	order.Save(*file, unit);
-}
-
 void PathFinderInput::Save(CFile &file) const
 {
 	file.printf("\"pathfinder-input\", {");
@@ -133,146 +120,143 @@ void PathFinderOutput::Save(CFile &file) const
 **  @param unit  Unit pointer to be saved.
 **  @param file  Output file.
 */
-void SaveUnit(const CUnit &unit, CFile *file)
+void SaveUnit(const CUnit &unit, CFile &file)
 {
-	CUnit *uins;
-	int i;
-
-	file->printf("\nUnit(%d, ", UnitNumber(unit));
+	file.printf("\nUnit(%d, ", UnitNumber(unit));
 
 	// 'type and 'player must be first, needed to create the unit slot
-	file->printf("\"type\", \"%s\", ", unit.Type->Ident.c_str());
+	file.printf("\"type\", \"%s\", ", unit.Type->Ident.c_str());
 	if (unit.Seen.Type) {
-		file->printf("\"seen-type\", \"%s\", ", unit.Seen.Type->Ident.c_str());
+		file.printf("\"seen-type\", \"%s\", ", unit.Seen.Type->Ident.c_str());
 	}
 
-	file->printf("\"player\", %d,\n  ", unit.Player->Index);
+	file.printf("\"player\", %d,\n  ", unit.Player->Index);
 
 	if (unit.Next) {
-		file->printf("\"next\", %d, ", UnitNumber(*unit.Next));
+		file.printf("\"next\", %d, ", UnitNumber(*unit.Next));
 	}
 
-	file->printf("\"tile\", {%d, %d}, ", unit.tilePos.x, unit.tilePos.y);
-	file->printf("\"seen-tile\", {%d, %d}, ", unit.Seen.tilePos.x, unit.Seen.tilePos.y);
+	file.printf("\"tile\", {%d, %d}, ", unit.tilePos.x, unit.tilePos.y);
+	file.printf("\"seen-tile\", {%d, %d}, ", unit.Seen.tilePos.x, unit.Seen.tilePos.y);
 
-	file->printf("\"refs\", %d, ", unit.Refs);
+	file.printf("\"refs\", %d, ", unit.Refs);
 #if 0
 	// latimerius: why is this so complex?
 	// JOHNS: An unit can be owned by a new player and have still the old stats
 	for (i = 0; i < PlayerMax; ++i) {
 		if (&unit.Type->Stats[i] == unit.Stats) {
-			file->printf("\"stats\", %d,\n  ", i);
+			file.printf("\"stats\", %d,\n  ", i);
 			break;
 		}
 	}
 	// latimerius: what's the point of storing a pointer value anyway?
 	if (i == PlayerMax) {
-		file->printf("\"stats\", \"S%08X\",\n  ", (int)unit.Stats);
+		file.printf("\"stats\", \"S%08X\",\n  ", (int)unit.Stats);
 	}
 #else
-	file->printf("\"stats\", %d,\n  ", unit.Player->Index);
+	file.printf("\"stats\", %d,\n  ", unit.Player->Index);
 #endif
-	file->printf("\"pixel\", {%d, %d}, ", unit.IX, unit.IY);
-	file->printf("\"seen-pixel\", {%d, %d}, ", unit.Seen.IX, unit.Seen.IY);
-	file->printf("\"frame\", %d, ", unit.Frame);
+	file.printf("\"pixel\", {%d, %d}, ", unit.IX, unit.IY);
+	file.printf("\"seen-pixel\", {%d, %d}, ", unit.Seen.IX, unit.Seen.IY);
+	file.printf("\"frame\", %d, ", unit.Frame);
 	if (unit.Seen.Frame != UnitNotSeen) {
-		file->printf("\"seen\", %d, ", unit.Seen.Frame);
+		file.printf("\"seen\", %d, ", unit.Seen.Frame);
 	} else {
-		file->printf("\"not-seen\", ");
+		file.printf("\"not-seen\", ");
 	}
-	file->printf("\"direction\", %d,\n  ", unit.Direction);
-	file->printf("\"attacked\", %lu,\n ", unit.Attacked);
-	file->printf(" \"current-sight-range\", %d,", unit.CurrentSightRange);
+	file.printf("\"direction\", %d,\n  ", unit.Direction);
+	file.printf("\"attacked\", %lu,\n ", unit.Attacked);
+	file.printf(" \"current-sight-range\", %d,", unit.CurrentSightRange);
 	if (unit.Burning) {
-		file->printf(" \"burning\",");
+		file.printf(" \"burning\",");
 	}
 	if (unit.Destroyed) {
-		file->printf(" \"destroyed\",");
+		file.printf(" \"destroyed\",");
 	}
 	if (unit.Removed) {
-		file->printf(" \"removed\",");
+		file.printf(" \"removed\",");
 	}
 	if (unit.Selected) {
-		file->printf(" \"selected\",");
+		file.printf(" \"selected\",");
 	}
 	if (unit.RescuedFrom) {
-		file->printf(" \"rescued-from\", %d,", unit.RescuedFrom->Index);
+		file.printf(" \"rescued-from\", %d,", unit.RescuedFrom->Index);
 	}
 	// n0b0dy: How is this useful?
 	// mr-russ: You can't always load units in order, it saved the information
 	// so you can load a unit whose Container hasn't been loaded yet.
 	// SEE unit loading code.
 	if (unit.Container && unit.Removed) {
-		file->printf(" \"host-info\", {%d, %d, %d, %d}, ",
+		file.printf(" \"host-info\", {%d, %d, %d, %d}, ",
 			unit.Container->tilePos.x, unit.Container->tilePos.y,
 			unit.Container->Type->TileWidth,
 			unit.Container->Type->TileHeight);
 	}
-	file->printf(" \"seen-by-player\", \"");
-	for (i = 0; i < PlayerMax; ++i) {
-		file->printf("%c", (unit.Seen.ByPlayer & (1 << i)) ? 'X' : '_');
+	file.printf(" \"seen-by-player\", \"");
+	for (int i = 0; i < PlayerMax; ++i) {
+		file.printf("%c", (unit.Seen.ByPlayer & (1 << i)) ? 'X' : '_');
 	}
-	file->printf("\",\n ");
-	file->printf(" \"seen-destroyed\", \"");
-	for (i = 0; i < PlayerMax; ++i) {
-		file->printf("%c", (unit.Seen.Destroyed & (1 << i)) ? 'X' : '_');
+	file.printf("\",\n ");
+	file.printf(" \"seen-destroyed\", \"");
+	for (int i = 0; i < PlayerMax; ++i) {
+		file.printf("%c", (unit.Seen.Destroyed & (1 << i)) ? 'X' : '_');
 	}
-	file->printf("\",\n ");
+	file.printf("\",\n ");
 	if (unit.Constructed) {
-		file->printf(" \"constructed\",");
+		file.printf(" \"constructed\",");
 	}
 	if (unit.Seen.Constructed) {
-		file->printf(" \"seen-constructed\",");
+		file.printf(" \"seen-constructed\",");
 	}
-	file->printf(" \"seen-state\", %d, ", unit.Seen.State);
+	file.printf(" \"seen-state\", %d, ", unit.Seen.State);
 	if (unit.Active) {
-		file->printf(" \"active\",");
+		file.printf(" \"active\",");
 	}
-	file->printf("\"ttl\", %lu, ", unit.TTL);
+	file.printf("\"ttl\", %lu, ", unit.TTL);
 
-	for (i = 0; i < (int)UnitTypeVar.GetNumberVariable(); ++i) {
-			file->printf("\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
+	for (size_t i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
+			file.printf("\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
 				UnitTypeVar.VariableNameLookup[i], unit.Variable[i].Value, unit.Variable[i].Max,
 				unit.Variable[i].Increase, unit.Variable[i].Enable ? "true" : "false");
 	}
 
-	file->printf("\"group-id\", %d,\n  ", unit.GroupId);
-	file->printf("\"last-group\", %d,\n  ", unit.LastGroup);
+	file.printf("\"group-id\", %d,\n  ", unit.GroupId);
+	file.printf("\"last-group\", %d,\n  ", unit.LastGroup);
 
-	file->printf("\"resources-held\", %d,\n  ", unit.ResourcesHeld);
+	file.printf("\"resources-held\", %d,\n  ", unit.ResourcesHeld);
 	if (unit.CurrentResource) {
-		file->printf("\"current-resource\", \"%s\",\n  ",
+		file.printf("\"current-resource\", \"%s\",\n  ",
 			DefaultResourceNames[unit.CurrentResource].c_str());
 	}
 
-	unit.pathFinderData->input.Save(*file);
-	unit.pathFinderData->output.Save(*file);
+	unit.pathFinderData->input.Save(file);
+	unit.pathFinderData->output.Save(file);
 
-	file->printf("\"wait\", %d, ", unit.Wait);
-	file->printf("\"state\", %d,", unit.State);
-	file->printf("\"anim-wait\", %d,", unit.Anim.Wait);
-	for (i = 0; i < NumAnimations; ++i) {
+	file.printf("\"wait\", %d, ", unit.Wait);
+	file.printf("\"state\", %d,", unit.State);
+	file.printf("\"anim-wait\", %d,", unit.Anim.Wait);
+	for (int i = 0; i < NumAnimations; ++i) {
 		if (AnimationsArray[i] == unit.Anim.CurrAnim) {
-			file->printf("\"curr-anim\", %d,", i);
-			file->printf("\"anim\", %d,", static_cast<int>(unit.Anim.Anim - unit.Anim.CurrAnim));
+			file.printf("\"curr-anim\", %d,", i);
+			file.printf("\"anim\", %d,", static_cast<int>(unit.Anim.Anim - unit.Anim.CurrAnim));
 			break;
 		}
 	}
 	if (unit.Anim.Unbreakable) {
-		file->printf(" \"unbreakable\",");
+		file.printf(" \"unbreakable\",");
 	}
-	file->printf("\n  \"blink\", %d,", unit.Blink);
+	file.printf("\n  \"blink\", %d,", unit.Blink);
 	if (unit.Moving) {
-		file->printf(" \"moving\",");
+		file.printf(" \"moving\",");
 	}
 	if (unit.ReCast) {
-		file->printf(" \"re-cast\",");
+		file.printf(" \"re-cast\",");
 	}
 	if (unit.Boarded) {
-		file->printf(" \"boarded\",");
+		file.printf(" \"boarded\",");
 	}
 	if (unit.AutoRepair) {
-		file->printf(" \"auto-repair\",");
+		file.printf(" \"auto-repair\",");
 	}
 
 	if (unit.NextWorker) {
@@ -281,61 +265,61 @@ void SaveUnit(const CUnit &unit, CFile *file)
 			 * array - this means it won't be saved!!! */
 			printf ("FIXME: storing destroyed Worker - loading will fail.\n");
 		}
-		file->printf(" \"next-worker\", \"%s\",", UnitReference(*unit.NextWorker).c_str());
+		file.printf(" \"next-worker\", \"%s\",", UnitReference(*unit.NextWorker).c_str());
 	}
 
 	if (unit.Resource.Workers != NULL) {
-		file->printf(" \"resource-active\", %d,", unit.Resource.Active);
-		file->printf(" \"resource-assigned\", %d,", unit.Resource.Assigned);
-		file->printf(" \"resource-workers\", \"%s\",", UnitReference(*unit.Resource.Workers).c_str());
+		file.printf(" \"resource-active\", %d,", unit.Resource.Active);
+		file.printf(" \"resource-assigned\", %d,", unit.Resource.Assigned);
+		file.printf(" \"resource-workers\", \"%s\",", UnitReference(*unit.Resource.Workers).c_str());
 	}
-	file->printf(" \"rs\", %d,", unit.Rs);
-	file->printf(" \"units-boarded-count\", %d,", unit.BoardCount);
+	file.printf(" \"rs\", %d,", unit.Rs);
+	file.printf(" \"units-boarded-count\", %d,", unit.BoardCount);
 
 	if (unit.UnitInside) {
-		file->printf("\n  \"units-contained\", {");
-		uins = unit.UnitInside->PrevContained;
-		for (i = unit.InsideCount; i; --i, uins = uins->PrevContained) {
-			file->printf("\"%s\"", UnitReference(*uins).c_str());
+		file.printf("\n  \"units-contained\", {");
+		CUnit* uins = unit.UnitInside->PrevContained;
+		for (int i = unit.InsideCount; i; --i, uins = uins->PrevContained) {
+			file.printf("\"%s\"", UnitReference(*uins).c_str());
 			if (i > 1) {
-				file->printf(", ");
+				file.printf(", ");
 			}
 		}
-		file->printf("},\n  ");
+		file.printf("},\n  ");
 	}
-	file->printf("\"orders\", {\n");
+	file.printf("\"orders\", {\n");
 	Assert(unit.Orders.empty() == false);
-	SaveOrder(*unit.Orders[0], unit, file);
+	unit.Orders[0]->Save(file, unit);
 	for (size_t i = 1; i != unit.Orders.size(); ++i) {
-		file->printf(",\n ");
-		SaveOrder(*unit.Orders[i], unit, file);
+		file.printf(",\n ");
+		unit.Orders[i]->Save(file, unit);
 	}
-	file->printf("}");
+	file.printf("}");
 	if (unit.SavedOrder) {
-		file->printf(",\n  \"saved-order\", ");
-		SaveOrder(*unit.SavedOrder, unit, file);
+		file.printf(",\n  \"saved-order\", ");
+		unit.SavedOrder->Save(file, unit);
 	}
 	if (unit.CriticalOrder) {
-		file->printf(",\n  \"critical-order\", ");
-		SaveOrder(*unit.CriticalOrder, unit, file);
+		file.printf(",\n  \"critical-order\", ");
+		unit.CriticalOrder->Save(file, unit);
 	}
 	if (unit.NewOrder) {
-		file->printf(",\n  \"new-order\", ");
-		SaveOrder(*unit.NewOrder, unit, file);
+		file.printf(",\n  \"new-order\", ");
+		unit.NewOrder->Save(file, unit);
 	}
 
 	if (unit.Goal) {
-		file->printf(",\n  \"goal\", %d", UnitNumber(*unit.Goal));
+		file.printf(",\n  \"goal\", %d", UnitNumber(*unit.Goal));
 	}
 	if (unit.AutoCastSpell) {
-		for (i = 0; (unsigned int) i < SpellTypeTable.size(); ++i) {
+		for (size_t i = 0; i < SpellTypeTable.size(); ++i) {
 			if (unit.AutoCastSpell[i]) {
-				file->printf(",\n  \"auto-cast\", \"%s\"", SpellTypeTable[i]->Ident.c_str());
+				file.printf(",\n  \"auto-cast\", \"%s\"", SpellTypeTable[i]->Ident.c_str());
 			}
 		}
 	}
 
-	file->printf(")\n");
+	file.printf(")\n");
 }
 
 /**
@@ -343,7 +327,7 @@ void SaveUnit(const CUnit &unit, CFile *file)
 **
 **  @param file  Output file.
 */
-void SaveUnits(CFile *file)
+void SaveUnits(CFile &file)
 {
 	UnitManager.Save(file);
 

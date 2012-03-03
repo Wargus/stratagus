@@ -419,29 +419,19 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 }
 
 /**
-**  Save state of player AIs.
-**
-**  @param file  Output file.
-*/
-static void SaveAiPlayers(CFile &file)
-{
-	for (int p = 0; p < PlayerMax; ++p) {
-		if (Players[p].Ai) {
-			SaveAiPlayer(file, p, *Players[p].Ai);
-		}
-	}
-}
-
-/**
 **  Save state of AI to file.
 **
 **  @param file  Output file.
 */
-void SaveAi(CFile *file)
+void SaveAi(CFile &file)
 {
-	file->printf("\n--- -----------------------------------------\n");
+	file.printf("\n--- -----------------------------------------\n");
 
-	SaveAiPlayers(*file);
+	for (int i = 0; i < PlayerMax; ++i) {
+		if (Players[i].Ai) {
+			SaveAiPlayer(file, i, *Players[i].Ai);
+		}
+	}
 
 	DebugPrint("FIXME: Saving lua function definition isn't supported\n");
 }

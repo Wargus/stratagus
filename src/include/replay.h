@@ -75,7 +75,7 @@ extern void EndReplayLog();
 	/// Clean replay
 extern void CleanReplayLog();
 	/// Save the replay list to file
-extern void SaveReplayList(CFile *file);
+extern void SaveReplayList(CFile &file);
 	/// Register ccl functions related to network
 extern void ReplayCclRegister();
 

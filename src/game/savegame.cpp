@@ -140,24 +140,24 @@ int SaveGame(const std::string &filename)
 	// FIXME: probably not the right place for this
 	file.printf("GameCycle = %lu\n", GameCycle);
 
-	SaveCcl(&file);
-	SaveUnitTypes(&file);
-	SaveUpgrades(&file);
+	SaveCcl(file);
+	SaveUnitTypes(file);
+	SaveUpgrades(file);
 	SavePlayers(file);
-	Map.Save(&file);
-	SaveUnits(&file);
-	SaveUserInterface(&file);
-	SaveAi(&file);
-	SaveSelections(&file);
-	SaveGroups(&file);
+	Map.Save(file);
+	SaveUnits(file);
+	SaveUserInterface(file);
+	SaveAi(file);
+	SaveSelections(file);
+	SaveGroups(file);
 	SaveMissiles(file);
-	SaveReplayList(&file);
+	SaveReplayList(file);
 	// FIXME: find all state information which must be saved.
 	s = SaveGlobal(Lua, true);
 	if (!s.empty()) {
 		file.printf("-- Lua state\n\n %s\n", s.c_str());
 	}
-	SaveTriggers(&file); //Triggers are saved in SaveGlobal, so load it after Global
+	SaveTriggers(file); //Triggers are saved in SaveGlobal, so load it after Global
 	file.close();
 	return 0;
 }

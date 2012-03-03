@@ -222,9 +222,9 @@ static void SaveViewports(CFile &file, const CUserInterface &ui)
 **
 **  @param file  Save file handle
 */
-void SaveUserInterface(CFile *file)
+void SaveUserInterface(CFile &file)
 {
-	SaveViewports(*file, UI);
+	SaveViewports(file, UI);
 }
 
 /**

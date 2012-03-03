@@ -2727,20 +2727,20 @@ void LoadCcl(const std::string& filename)
 **
 **  @param file  Save file.
 */
-void SaveCcl(CFile *file)
+void SaveCcl(CFile &file)
 {
-	file->printf("SetGodMode(%s)\n", GodMode ? "true" : "false");
+	file.printf("SetGodMode(%s)\n", GodMode ? "true" : "false");
 
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
-		file->printf("SetSpeedResourcesHarvest(\"%s\", %d)\n",
+		file.printf("SetSpeedResourcesHarvest(\"%s\", %d)\n",
 			DefaultResourceNames[i].c_str(), SpeedResourcesHarvest[i]);
-		file->printf("SetSpeedResourcesReturn(\"%s\", %d)\n",
+		file.printf("SetSpeedResourcesReturn(\"%s\", %d)\n",
 			DefaultResourceNames[i].c_str(), SpeedResourcesReturn[i]);
 	}
-	file->printf("SetSpeedBuild(%d)\n", SpeedBuild);
-	file->printf("SetSpeedTrain(%d)\n", SpeedTrain);
-	file->printf("SetSpeedUpgrade(%d)\n", SpeedUpgrade);
-	file->printf("SetSpeedResearch(%d)\n", SpeedResearch);
+	file.printf("SetSpeedBuild(%d)\n", SpeedBuild);
+	file.printf("SetSpeedTrain(%d)\n", SpeedTrain);
+	file.printf("SetSpeedUpgrade(%d)\n", SpeedUpgrade);
+	file.printf("SetSpeedResearch(%d)\n", SpeedResearch);
 }
 
 //@}

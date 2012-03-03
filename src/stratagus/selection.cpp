@@ -1062,17 +1062,17 @@ void InitSelections()
 **
 **  @param file  Output file.
 */
-void SaveSelections(CFile *file)
+void SaveSelections(CFile &file)
 {
-	file->printf("\n--- -----------------------------------------\n");
-	file->printf("--- MODULE: selection\n\n");
+	file.printf("\n--- -----------------------------------------\n");
+	file.printf("--- MODULE: selection\n\n");
 
-	file->printf("SetGroupId(%d)\n", GroupId);
-	file->printf("Selection(%d, {", NumSelected);
+	file.printf("SetGroupId(%d)\n", GroupId);
+	file.printf("Selection(%d, {", NumSelected);
 	for (int i = 0; i < NumSelected; ++i) {
-		file->printf("\"%s\", ", UnitReference(*Selected[i]).c_str());
+		file.printf("\"%s\", ", UnitReference(*Selected[i]).c_str());
 	}
-	file->printf("})\n");
+	file.printf("})\n");
 }
 
 /**

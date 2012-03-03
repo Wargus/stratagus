@@ -1083,12 +1083,10 @@ extern std::string UnitReference(const CUnit &unit);
 	/// Generate a unit reference, a printable unique string for unit
 extern std::string UnitReference(const CUnitPtr &unit);
 
-	/// Save an order
-extern void SaveOrder(const COrder &order, const CUnit &unit, CFile *file);
 	/// save unit-structure
-extern void SaveUnit(const CUnit &unit, CFile *file);
+extern void SaveUnit(const CUnit &unit, CFile &file);
 	/// save all units
-extern void SaveUnits(CFile *file);
+extern void SaveUnits(CFile &file);
 
 	/// Initialize unit module
 extern void InitUnits();
@@ -1153,7 +1151,7 @@ extern CUnit *AttackUnitsInReactRange(const CUnit &unit);
 	/// Initialize data structures for groups
 extern void InitGroups();
 	/// Save groups
-extern void SaveGroups(CFile *file);
+extern void SaveGroups(CFile &file);
 	/// Cleanup groups
 extern void CleanGroups();
 
@@ -1222,7 +1220,7 @@ extern int AddSelectedAirUnitsInRectangle(int tx, int ty, int w, int h);
 	/// Init selections
 extern void InitSelections();
 	/// Save current selection state
-extern void SaveSelections(CFile *file);
+extern void SaveSelections(CFile &file);
 	/// Clean up selections
 extern void CleanSelections();
 	/// Register CCL selection features

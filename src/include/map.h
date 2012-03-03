@@ -399,7 +399,7 @@ public:
 	/// Reveal the complete map, make everything known.
 	void Reveal();
 	/// Save the map.
-	void Save(CFile *file) const;
+	void Save(CFile &file) const;
 
 	/// Get the MapField at location x,y
 	inline CMapField *Field(int x, int y) const {

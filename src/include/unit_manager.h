@@ -52,7 +52,7 @@ public:
 	void Init();
 	CUnit *AllocUnit();
 	void ReleaseUnit(CUnit *unit);
-	void Save(CFile *file);
+	void Save(CFile &file) const;
 
 private:
 	std::list<CUnit *> ReleasedUnits;

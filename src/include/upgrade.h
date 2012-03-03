@@ -51,7 +51,7 @@ class CUpgrade;
 	/// init upgrade/allow structures
 extern void InitUpgrades();
 	/// save the upgrades
-extern void SaveUpgrades(CFile *file);
+extern void SaveUpgrades(CFile &file);
 	/// cleanup upgrade module
 extern void CleanUpgrades();
 

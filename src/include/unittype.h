@@ -1214,7 +1214,7 @@ extern void UnitTypeCclRegister();               /// Register ccl features
 extern void UpdateStats(int reset_to_default);       /// Update unit stats
 extern CUnitType *UnitTypeByIdent(const std::string &ident);/// Get unit-type by ident
 
-extern void SaveUnitTypes(CFile *file);              /// Save the unit-type table
+extern void SaveUnitTypes(CFile &file);              /// Save the unit-type table
 extern CUnitType *NewUnitTypeSlot(const std::string &ident);/// Allocate an empty unit-type slot
 	/// Draw the sprite frame of unit-type
 extern void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite,

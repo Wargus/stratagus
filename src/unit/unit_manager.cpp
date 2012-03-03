@@ -120,15 +120,15 @@ void CUnitManager::ReleaseUnit(CUnit *unit)
 **
 **  @param file  Output file.
 */
-void CUnitManager::Save(CFile *file)
+void CUnitManager::Save(CFile &file) const
 {
-	file->printf("SlotUsage(%d", UnitSlotFree);
+	file.printf("SlotUsage(%d", UnitSlotFree);
 
-	std::list<CUnit *>::iterator it = ReleasedUnits.begin();
+	std::list<CUnit *>::const_iterator it = ReleasedUnits.begin();
 	for (; it != ReleasedUnits.end(); ++it) {
-		file->printf(", {Slot = %d, FreeCycle = %u}", (*it)->Slot, (*it)->Refs);
+		file.printf(", {Slot = %d, FreeCycle = %u}", (*it)->Slot, (*it)->Refs);
 	}
-	file->printf(")\n");
+	file.printf(")\n");
 }
 
 

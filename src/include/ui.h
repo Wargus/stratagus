@@ -791,7 +791,7 @@ extern bool FancyBuildings;             /// Mirror buildings 1 yes, 0 now.
 	/// Initialize the ui
 extern void InitUserInterface();
 	/// Save the ui state
-extern void SaveUserInterface(CFile *file);
+extern void SaveUserInterface(CFile &file);
 	/// Clean up the ui module
 extern void CleanUserInterface();
 #ifdef DEBUG

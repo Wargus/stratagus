@@ -57,97 +57,92 @@
 **
 ** @param file Output file.
 */
-void CMap::Save(CFile *file) const
+void CMap::Save(CFile &file) const
 {
-	int w;
-	int h;
-	int i;
+	file.printf("\n--- -----------------------------------------\n");
+	file.printf("--- MODULE: map\n");
 
-	file->printf("\n--- -----------------------------------------\n");
-	file->printf("--- MODULE: map\n");
+	file.printf("LoadTileModels(\"%s\")\n\n", this->TileModelsFileName);
 
-	file->printf("LoadTileModels(\"%s\")\n\n", this->TileModelsFileName);
+	file.printf("StratagusMap(\n");
 
-	file->printf("StratagusMap(\n");
-
-	file->printf("  \"version\", \"" StratagusFormatString "\",\n",
+	file.printf("  \"version\", \"" StratagusFormatString "\",\n",
 		StratagusFormatArgs(StratagusVersion));
-	file->printf("  \"description\", \"%s\",\n", this->Info.Description.c_str());
+	file.printf("  \"description\", \"%s\",\n", this->Info.Description.c_str());
 
-	file->printf("  \"the-map\", {\n");
+	file.printf("  \"the-map\", {\n");
 
-	file->printf("  \"size\", {%d, %d},\n", this->Info.MapWidth, this->Info.MapHeight);
-	file->printf("  \"%s\",\n", this->NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
-	file->printf("  \"filename\", \"%s\",\n", this->Info.Filename.c_str());
+	file.printf("  \"size\", {%d, %d},\n", this->Info.MapWidth, this->Info.MapHeight);
+	file.printf("  \"%s\",\n", this->NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
+	file.printf("  \"filename\", \"%s\",\n", this->Info.Filename.c_str());
 
-	file->printf("  \"map-fields\", {\n");
-	for (h = 0; h < this->Info.MapHeight; ++h) {
-		file->printf("  -- %d\n", h);
-		for (w = 0; w < this->Info.MapWidth; ++w) {
-			CMapField* mf;
+	file.printf("  \"map-fields\", {\n");
+	for (int h = 0; h < this->Info.MapHeight; ++h) {
+		file.printf("  -- %d\n", h);
+		for (int w = 0; w < this->Info.MapWidth; ++w) {
+			const CMapField& mf = *this->Field(w, h);
 
-			mf = this->Field(w, h);
-			file->printf("  {%3d, %3d,", mf->Tile, mf->SeenTile);
-			if (mf->Value) {
-				file->printf(" %d,", mf->Value);
+			file.printf("  {%3d, %3d,", mf.Tile, mf.SeenTile);
+			if (mf.Value) {
+				file.printf(" %d,", mf.Value);
 			}
-			for (i = 0; i < PlayerMax; ++i) {
-				if (mf->Visible[i] == 1) {
-					file->printf(" \"explored\", %d,", i);
+			for (int i = 0; i < PlayerMax; ++i) {
+				if (mf.Visible[i] == 1) {
+					file.printf(" \"explored\", %d,", i);
 				}
 			}
-			if (mf->Flags & MapFieldHuman) {
-				file->printf(" \"human\",");
+			if (mf.Flags & MapFieldHuman) {
+				file.printf(" \"human\",");
 			}
-			if (mf->Flags & MapFieldLandAllowed) {
-				file->printf(" \"land\",");
+			if (mf.Flags & MapFieldLandAllowed) {
+				file.printf(" \"land\",");
 			}
-			if (mf->Flags & MapFieldCoastAllowed) {
-				file->printf(" \"coast\",");
+			if (mf.Flags & MapFieldCoastAllowed) {
+				file.printf(" \"coast\",");
 			}
-			if (mf->Flags & MapFieldWaterAllowed) {
-				file->printf(" \"water\",");
+			if (mf.Flags & MapFieldWaterAllowed) {
+				file.printf(" \"water\",");
 			}
-			if (mf->Flags & MapFieldNoBuilding) {
-				file->printf(" \"mud\",");
+			if (mf.Flags & MapFieldNoBuilding) {
+				file.printf(" \"mud\",");
 			}
-			if (mf->Flags & MapFieldUnpassable) {
-				file->printf(" \"block\",");
+			if (mf.Flags & MapFieldUnpassable) {
+				file.printf(" \"block\",");
 			}
-			if (mf->Flags & MapFieldWall) {
-				file->printf(" \"wall\",");
+			if (mf.Flags & MapFieldWall) {
+				file.printf(" \"wall\",");
 			}
-			if (mf->Flags & MapFieldRocks) {
-				file->printf(" \"rock\",");
+			if (mf.Flags & MapFieldRocks) {
+				file.printf(" \"rock\",");
 			}
-			if (mf->Flags & MapFieldForest) {
-				file->printf(" \"wood\",");
+			if (mf.Flags & MapFieldForest) {
+				file.printf(" \"wood\",");
 			}
 #if 1
 			// Not Required for save
 			// These are required for now, UnitType::FieldFlags is 0 until
 			// UpdateStats is called which is after the game is loaded
-			if (mf->Flags & MapFieldLandUnit) {
-				file->printf(" \"ground\",");
+			if (mf.Flags & MapFieldLandUnit) {
+				file.printf(" \"ground\",");
 			}
-			if (mf->Flags & MapFieldAirUnit) {
-				file->printf(" \"air\",");
+			if (mf.Flags & MapFieldAirUnit) {
+				file.printf(" \"air\",");
 			}
-			if (mf->Flags & MapFieldSeaUnit) {
-				file->printf(" \"sea\",");
+			if (mf.Flags & MapFieldSeaUnit) {
+				file.printf(" \"sea\",");
 			}
-			if (mf->Flags & MapFieldBuilding) {
-				file->printf(" \"building\",");
+			if (mf.Flags & MapFieldBuilding) {
+				file.printf(" \"building\",");
 			}
 #endif
 			if (w & 1) {
-				file->printf("},\n");
+				file.printf("},\n");
 			} else {
-				file->printf("}, ");
+				file.printf("}, ");
 			}
 		}
 	}
-	file->printf("}})\n");
+	file.printf("}})\n");
 }
 
 //@}
