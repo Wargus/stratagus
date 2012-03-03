@@ -397,6 +397,9 @@ bool CUnit::StoreOrder(COrder* order)
 	if (this->SavedOrder != NULL) {
 		return false;
 	}
+	if (order && order->Finished == true) {
+		return false;
+	}
 	// Save current order to come back or to continue it.
 	this->SavedOrder = order;
 	return true;
