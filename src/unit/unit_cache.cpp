@@ -93,8 +93,6 @@ void CMap::Remove(CUnit &unit)
 }
 
 
-
-
 class NoFilter
 {
 public:
@@ -115,89 +113,4 @@ void CMap::SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit*>& a
 {
 	SelectAroundUnit(unit, range, around, NoFilter());
 }
-
-#if 0
-
-/**
-**  Select units in rectangle range.
-**
-**  @param ltpos      Left Top position of selection rectangle
-**  @param rbpos      Right Bottom position of selection rectangle
-**  @param table      All units in the selection rectangle
-**  @param tablesize  Size of table array
-**  @param excludeNeutral  if true, don't include neutral units
-**
-**  @return           Returns the number of units found
-*/
-int CMap::SelectFixed(const Vec2i &ltpos, const Vec2i &rbpos, CUnit *table[], const int tablesize,
-						bool excludeNeutral)
-{
-	Assert(Info.IsPointOnMap(ltpos));
-	Assert(Info.IsPointOnMap(rbpos));
-
-	// Optimize small searches.
-	if (ltpos == rbpos && excludeNeutral == false) {
-		CUnitCache &cache = this->Field(ltpos)->UnitCache;
-
-		const size_t size = std::min<size_t>(tablesize, cache.size());
-
-		for (size_t i = 0; i != size; ++i) {
-			table[i] = cache[i];
-		}
-		return size;
-	}
-
-	int n = 0;
-	unsigned int index = getIndex(ltpos);
-	int j = rbpos.y - ltpos.y + 1;
-	do {
-		const CMapField *mf = Field(index);
-		int i = rbpos.x - ltpos.x + 1;
-		do {
-			const CUnitCache &cache = mf->UnitCache;
-			const size_t unitCount = cache.size();
-			for (size_t k = 0; k != unitCount; ++k) {
-				CUnit &unit = *cache[k];
-
-				// To avoid getting a unit in multiple times we use a cache lock.
-				// It should only be used in here, unless you somehow want the unit
-				// to be out of cache.
-				if (unit.CacheLock == false && unit.Type->Revealer == false
-					&& (excludeNeutral == false || unit.Player->Index != PlayerNeutral)) {
-					Assert(!unit.Removed);
-					unit.CacheLock = 1;
-					table[n++] = &unit;
-					if (n == tablesize) {
-						break;
-					}
-				}
-			}
-			++mf;
-		} while(--i && n < tablesize);
-		index += Info.MapWidth;
-	} while(--j && n < tablesize);
-
-	if (!n)
-		return 0;
-
-	// Clean the cache locks, restore to original situation.
-	for (int i = 0; i < n; ++i) {
-		table[i]->CacheLock = 0;
-	}
-	return n;
-}
-
-
-
-int CMap::Select(int x1, int y1, int x2, int y2,
-				CUnit *table[], const int tablesize, bool excludeNeutral)
-{
-	//  Reduce to map limits.
-	Vec2i ltpos = {std::max<int>(x1, 0), std::max<int>(y1, 0)};
-	Vec2i rbpos = {std::min<int>(x2, Info.MapWidth - 1), std::min<int>(y2, Info.MapHeight - 1)};
-
-	return SelectFixed(ltpos, rbpos, table, tablesize, excludeNeutral);
-}
-
-#endif
 
