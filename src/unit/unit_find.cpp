@@ -646,7 +646,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range)
 		const CUnit* firstContainer = unit.Container ? unit.Container : &unit;
 		std::vector<CUnit*> table;
 		Map.SelectAroundUnit(*firstContainer, missile_range, table,
-			MakeNotPredicate(HasSamePlayerAs(Players[PlayerNeutral])));
+			MakeNotPredicate(HasSamePlayerAs(Players[PlayerNumNeutral])));
 
 		if (table.empty() == false){
 			return BestRangeTargetFinder(unit, range).Find(table);
@@ -656,7 +656,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range)
 		std::vector<CUnit *> table;
 
 		Map.SelectAroundUnit(unit, range, table,
-			MakeNotPredicate(HasSamePlayerAs(Players[PlayerNeutral])));
+			MakeNotPredicate(HasSamePlayerAs(Players[PlayerNumNeutral])));
 
 		const int n = static_cast<int>(table.size());
 		if (range > 25 && table.size() > 9) {
