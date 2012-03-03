@@ -62,6 +62,16 @@ enum {
 --  Functions
 ----------------------------------------------------------------------------*/
 
+/* static */ COrder* COrder::NewActionBoard(CUnit &unit)
+{
+	COrder_Board *order = new COrder_Board;
+
+	order->SetGoal(&unit);
+	order->Range = 1;
+
+	return order;
+}
+
 /* virtual */ void COrder_Board::Save(CFile &file, const CUnit &unit) const
 {
 	file.printf("{\"action-board\",");

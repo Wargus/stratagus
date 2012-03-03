@@ -48,6 +48,25 @@
 
 extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
+/* static */ COrder* COrder::NewActionBuilt(CUnit &builder, CUnit &unit)
+{
+	COrder_Built* order = new COrder_Built();
+
+	// Make sure the bulding doesn't cancel itself out right away.
+
+	unit.Variable[HP_INDEX].Value = 1;
+	if (unit.Variable[SHIELD_INDEX].Max) {
+		unit.Variable[SHIELD_INDEX].Value = 1;
+	}
+	order->UpdateConstructionFrame(unit);
+
+	if (unit.Type->BuilderOutside == false) {
+		order->Worker = &builder;
+	}
+	return order;
+}
+
+
 /* virtual */ void COrder_Built::Save(CFile &file, const CUnit &unit) const
 {
 	file.printf("{\"action-built\", ");

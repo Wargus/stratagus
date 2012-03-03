@@ -71,6 +71,24 @@ enum
 --  Functions
 ----------------------------------------------------------------------------*/
 
+/* static */ COrder* COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building)
+{
+	COrder_Build *order = new COrder_Build;
+
+	order->goalPos = pos;
+	if (building.BuilderOutside) {
+		order->Range = builder.Type->RepairRange;
+	} else {
+		// If building inside, but be next to stop
+		if (building.ShoreBuilding && builder.Type->UnitType == UnitTypeLand) {
+				// Peon won't dive :-)
+			order->Range = 1;
+		}
+	}
+	order->Type = &building;
+	return order;
+}
+
 
 /* virtual */ void COrder_Build::Save(CFile &file, const CUnit &unit) const
 {

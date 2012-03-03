@@ -88,6 +88,49 @@ void AnimateActionAttack(CUnit &unit, COrder& order)
 	UnitShowAnimation(unit, unit.Type->Animations->Attack);
 }
 
+/* static */ COrder* COrder::NewActionAttack(const CUnit &attacker, CUnit &target)
+{
+	COrder_Attack *order = new COrder_Attack(false);
+
+	if (target.Destroyed) {
+		order->goalPos = target.tilePos + target.Type->GetHalfTileSize();
+	} else {
+		// Removed, Dying handled by action routine.
+		order->SetGoal(&target);
+		order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
+		order->MinRange = attacker.Type->MinAttackRange;
+	}
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest)
+{
+	Assert(Map.Info.IsPointOnMap(dest));
+
+	COrder_Attack *order = new COrder_Attack(false);
+
+	if (Map.WallOnMap(dest) && Map.IsFieldExplored(*attacker.Player, dest)) {
+		// FIXME: look into action_attack.cpp about this ugly problem
+		order->goalPos = dest;
+		order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
+		order->MinRange = attacker.Type->MinAttackRange;
+	} else {
+		order->goalPos = dest;
+	}
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest)
+{
+	COrder_Attack *order = new COrder_Attack(true);
+
+	order->goalPos = dest;
+	order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
+	order->MinRange = attacker.Type->MinAttackRange;
+
+	return order;
+}
+
 
 /* virtual */ void COrder_Attack::Save(CFile &file, const CUnit &unit) const
 {

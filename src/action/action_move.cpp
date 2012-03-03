@@ -56,6 +56,15 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+/* static */ COrder* COrder::NewActionMove(const Vec2i &pos)
+{
+	Assert(Map.Info.IsPointOnMap(pos));
+
+	COrder_Move *order = new COrder_Move;
+
+	order->goalPos = pos;
+	return order;
+}
 
 /* virtual */ void COrder_Move::Save(CFile &file, const CUnit &unit) const
 {

@@ -54,6 +54,24 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+/* static */ COrder* COrder::NewActionTransformInto(CUnitType &type)
+{
+	COrder_TransformInto *order = new COrder_TransformInto;
+
+	order->Type = &type;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type)
+{
+	COrder_UpgradeTo *order = new COrder_UpgradeTo;
+
+	// FIXME: if you give quick an other order, the resources are lost!
+	unit.Player->SubUnitType(type);
+	order->Type = &type;
+	return order;
+}
+
 /**
 **  Transform a unit in another.
 **

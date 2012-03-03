@@ -43,6 +43,7 @@
 #include "action/action_built.h"
 #include "animation.h"
 #include "iolib.h"
+#include "map.h"
 #include "player.h"
 #include "script.h"
 #include "sound.h"
@@ -53,6 +54,30 @@
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+/* static */ COrder* COrder::NewActionRepair(CUnit &unit, CUnit &target)
+{
+	COrder_Repair *order = new COrder_Repair();
+
+	if (target.Destroyed) {
+		order->goalPos = target.tilePos + target.Type->GetHalfTileSize();
+	} else {
+		order->SetGoal(&target);
+		order->ReparableTarget = &target;
+		order->Range = unit.Type->RepairRange;
+	}
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionRepair(const Vec2i &pos)
+{
+	Assert(Map.Info.IsPointOnMap(pos));
+
+	COrder_Repair *order = new COrder_Repair;
+
+	order->goalPos = pos;
+	return order;
+}
 
 /* virtual */ void COrder_Repair::Save(CFile &file, const CUnit &unit) const
 {

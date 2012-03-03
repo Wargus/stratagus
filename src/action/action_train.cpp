@@ -54,6 +54,17 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+/* static */ COrder* COrder::NewActionTrain(CUnit &trainer, CUnitType &type)
+{
+	COrder_Train *order = new COrder_Train;
+
+	order->Type = &type;
+	// FIXME: if you give quick an other order, the resources are lost!
+	trainer.Player->SubUnitType(type);
+
+	return order;
+}
+
 /* virtual */ void COrder_Train::Save(CFile &file, const CUnit &unit) const
 {
 	file.printf("{\"action-train\",");

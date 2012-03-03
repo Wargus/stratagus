@@ -56,6 +56,17 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+/* static */ COrder* COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade)
+{
+	COrder_Research *order = new COrder_Research();
+
+	// FIXME: if you give quick an other order, the resources are lost!
+	unit.Player->SubCosts(upgrade.Costs);
+
+	order->SetUpgrade(upgrade);
+	return order;
+}
+
 /* virtual */ void COrder_Research::Save(CFile &file, const CUnit &unit) const
 {
 	file.printf("{\"action-research\"");

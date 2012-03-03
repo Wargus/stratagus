@@ -61,6 +61,32 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+/* static */ COrder* COrder::NewActionSpellCast(SpellType &spell, const Vec2i &pos, CUnit *target)
+{
+	COrder_SpellCast *order = new COrder_SpellCast;
+
+	order->Range = spell.Range;
+	if (target) {
+		// Destination could be killed.
+		// Should be handled in action, but is not possible!
+		// Unit::Refs is used as timeout counter.
+		if (target->Destroyed) {
+			// FIXME: where check if spell needs a unit as destination?
+			// FIXME: target->Type is now set to 0. maybe we shouldn't bother.
+			const Vec2i diag = {order->Range, order->Range};
+			order->goalPos = target->tilePos /* + target->Type->GetHalfTileSize() */ - diag;
+			order->Range <<= 1;
+		} else {
+			order->SetGoal(target);
+		}
+	} else {
+		order->goalPos = pos;
+	}
+	order->SetSpell(spell);
+
+	return order;
+}
+
 /* virtual */ void COrder_SpellCast::Save(CFile &file, const CUnit &unit) const
 {
 	file.printf("{\"action-spell-cast\",");

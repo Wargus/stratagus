@@ -71,6 +71,66 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+/* static */ COrder* COrder::NewActionResource(CUnit &harvester, const Vec2i &pos)
+{
+	COrder_Resource *order = new COrder_Resource(harvester);
+	Vec2i ressourceLoc;
+
+	//  Find the closest piece of wood next to a tile where the unit can move
+	if (!FindTerrainType(0, (harvester.Type->MovementMask), 1, 20, *harvester.Player, pos, &ressourceLoc)) {
+		DebugPrint("FIXME: Give up???\n");
+	}
+	// Max Value > 1
+	if ((MyAbs(ressourceLoc.x - pos.x) | MyAbs(ressourceLoc.y - pos.y)) > 1) {
+		if (!FindTerrainType(0, MapFieldForest, 0, 20, *harvester.Player, ressourceLoc, &ressourceLoc)) {
+			DebugPrint("FIXME: Give up???\n");
+		}
+	} else {
+		// The destination is next to a reachable tile.
+		ressourceLoc = pos;
+	}
+	order->goalPos = ressourceLoc;
+	order->CurrentResource = WoodCost; // Hard-coded resource.
+	order->Range = 1;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionResource(CUnit &harvester, CUnit &mine)
+{
+	COrder_Resource *order = new COrder_Resource(harvester);
+
+	order->SetGoal(&mine);
+	order->Resource.Mine = &mine;
+	harvester.AssignWorkerToMine(mine);
+	order->Resource.Pos = mine.tilePos + mine.Type->GetHalfTileSize();
+	order->CurrentResource = mine.Type->GivesResource;
+	order->Range = 1;
+	return order;
+}
+
+/* static */ COrder* COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot)
+{
+	COrder_Resource *order = new COrder_Resource(harvester);
+
+	// Destination could be killed. NETWORK!
+	if (depot && depot->Destroyed) {
+		depot = NULL;
+	}
+	order->Range = 1;
+	order->CurrentResource = harvester.CurrentResource;
+	order->DoneHarvesting = true;
+
+	if (depot == NULL) {
+		depot = FindDeposit(harvester, 1000, harvester.CurrentResource);
+	}
+	order->Depot = depot;
+	if (depot) {
+		order->UnitGotoGoal(harvester, depot, 70); //SUB_MOVE_TO_DEPOT);
+	}
+	return order;
+}
+
+
 Vec2i COrder_Resource::GetHarvestLocation() const
 {
 	if (this->Resource.Mine != NULL) {

@@ -52,6 +52,18 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+/* static */ COrder* COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest)
+{
+	Assert(Map.Info.IsPointOnMap(currentPos));
+	Assert(Map.Info.IsPointOnMap(dest));
+
+	COrder_Patrol *order = new COrder_Patrol();
+
+	order->goalPos = dest;
+	order->WayPoint = currentPos;
+	return order;
+}
+
 
 /* virtual */ void COrder_Patrol::Save(CFile &file, const CUnit &unit) const
 {

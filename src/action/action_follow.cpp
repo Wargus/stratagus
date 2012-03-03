@@ -61,6 +61,21 @@ enum {
 --  Functions
 ----------------------------------------------------------------------------*/
 
+/* static */ COrder* COrder::NewActionFollow(CUnit &dest)
+{
+	COrder_Follow *order = new COrder_Follow;
+
+	// Destination could be killed.
+	// Should be handled in action, but is not possible!
+	// Unit::Refs is used as timeout counter.
+	if (dest.Destroyed) {
+		order->goalPos = dest.tilePos + dest.Type->GetHalfTileSize();
+	} else {
+		order->SetGoal(&dest);
+		order->Range = 1;
+	}
+	return order;
+}
 
 /* virtual */ void COrder_Follow::Save(CFile &file, const CUnit &unit) const
 {

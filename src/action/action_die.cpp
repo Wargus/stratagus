@@ -49,6 +49,11 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+/* static */ COrder* COrder::NewActionDie()
+{
+	return new COrder_Die;
+}
+
 /* virtual */ void COrder_Die::Save(CFile &file, const CUnit &unit) const
 {
 	file.printf("{\"action-die\"");

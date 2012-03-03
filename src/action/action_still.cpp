@@ -56,6 +56,17 @@ enum {
 	SUB_STILL_ATTACK
 };
 
+/* static */ COrder* COrder::NewActionStandGround()
+{
+	return new COrder_Still(true);
+}
+
+/* static */ COrder* COrder::NewActionStill()
+{
+	return new COrder_Still(false);
+}
+
+
 /* virtual */ void COrder_Still::Save(CFile &file, const CUnit &unit) const
 {
 	if (this->Action == UnitActionStill) {

@@ -53,6 +53,17 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+/* static */ COrder* COrder::NewActionUnload(const Vec2i &pos, CUnit *what)
+{
+	COrder *order = new COrder_Unload;
+
+	order->goalPos = pos;
+	if (what && !what->Destroyed) {
+		order->SetGoal(what);
+	}
+	return order;
+}
+
 /* virtual */ void COrder_Unload::Save(CFile &file, const CUnit &unit) const
 {
 	file.printf("{\"action-unload\",");
