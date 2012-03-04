@@ -46,6 +46,10 @@
 #include "unit.h"
 #include "unittype.h"
 
+/// How many resources the player gets back if canceling building
+#define CancelBuildingCostsFactor  75
+
+
 extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 /* static */ COrder* COrder::NewActionBuilt(CUnit &builder, CUnit &unit)

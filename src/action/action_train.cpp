@@ -50,6 +50,9 @@
 #include "unitsound.h"
 #include "unittype.h"
 
+/// How many resources the player gets back if canceling training
+#define CancelTrainingCostsFactor  100
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/

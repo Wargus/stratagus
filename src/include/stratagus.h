@@ -294,21 +294,4 @@ struct DisplayAutoLocker {
 extern const int CPU_NUM;
 extern bool CanAccessFile(const char *filename);
 
-/*============================================================================
-==  Misc
-============================================================================*/
-
-// @todo configurable. maybe we could move it into one big global
-// @todo settings struct?
-	/// How many resources the player gets back if canceling building
-#define CancelBuildingCostsFactor  75
-	/// How many resources the player gets back if canceling training
-#define CancelTrainingCostsFactor  100
-	/// How many resources the player gets back if canceling research
-#define CancelResearchCostsFactor  100
-	/// How many resources the player gets back if canceling upgrade
-#define CancelUpgradeCostsFactor   100
-
-//@}
-
 #endif // !__STRATAGUS_H__

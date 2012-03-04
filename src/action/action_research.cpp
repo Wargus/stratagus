@@ -52,6 +52,10 @@
 #include "upgrade_structs.h"
 #include "upgrade.h"
 
+/// How many resources the player gets back if canceling research
+#define CancelResearchCostsFactor  100
+
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/

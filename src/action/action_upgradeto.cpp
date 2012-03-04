@@ -50,6 +50,10 @@
 #include "unit.h"
 #include "unittype.h"
 
+/// How many resources the player gets back if canceling upgrade
+#define CancelUpgradeCostsFactor   100
+
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
