@@ -424,7 +424,6 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 	CUnitType *type;
 	Uint32 color;
 	SDL_Color c;
-	int bpp;
 
 	if (Editor.Running || ReplayRevealMap || unit.IsVisible(*ThisPlayer)) {
 		type = unit.Type;
@@ -465,6 +464,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 	if (my + h0 >= UI.Minimap.H) { // clip bottom side
 		h0 = UI.Minimap.H - my;
 	}
+	int bpp = 0;
 	if (!UseOpenGL) {
 		bpp = MinimapSurface->format->BytesPerPixel;
 		SDL_GetRGB(color, TheScreen->format, &c.r, &c.g, &c.b);
@@ -493,14 +493,8 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 void CMinimap::Update()
 {
 	static int red_phase;
-	int red_phase_changed;
-	int mx;
-	int my;
-	int n;
-	int visiontype; // 0 unexplored, 1 explored, >1 visible.
-	int bpp;
 
-	red_phase_changed = red_phase != (int)((FrameCounter / FRAMES_PER_SECOND) & 1);
+	int red_phase_changed = red_phase != (int)((FrameCounter / FRAMES_PER_SECOND) & 1);
 	if (red_phase_changed) {
 		red_phase = !red_phase;
 	}
@@ -513,12 +507,7 @@ void CMinimap::Update()
 			memset(MinimapSurfaceGL, 0, MinimapTextureWidth * MinimapTextureHeight * 4);
 		}
 	}
-
-	if (!UseOpenGL) {
-		bpp = MinimapSurface->format->BytesPerPixel;
-	} else {
-		bpp = 0;
-	}
+	const int bpp = (!UseOpenGL) ? MinimapSurface->format->BytesPerPixel : 0;
 
 	//
 	// Draw the terrain
@@ -535,8 +524,10 @@ void CMinimap::Update()
 		SDL_LockSurface(MinimapSurface);
 		SDL_LockSurface(MinimapTerrainSurface);
 	}
-	for (my = 0; my < H; ++my) {
-		for (mx = 0; mx < W; ++mx) {
+	int visiontype; // 0 unexplored, 1 explored, >1 visible.
+
+	for (int my = 0; my < H; ++my) {
+		for (int mx = 0; mx < W; ++mx) {
 			if (ReplayRevealMap) {
 				visiontype = 2;
 			} else {
@@ -558,8 +549,6 @@ void CMinimap::Update()
 						Video.MapRGB(0, 0, 0, 0);
 				}
 			}
-
-
 		}
 	}
 
@@ -567,16 +556,14 @@ void CMinimap::Update()
 		SDL_UnlockSurface(MinimapTerrainSurface);
 	}
 
-
 	//
 	// Draw units on map
 	//
-	for (n = 0; n < NumUnits; ++n) {
+	for (int n = 0; n < NumUnits; ++n) {
 		if (Units[n]->IsVisibleOnMinimap()) {
 			DrawUnitOn(*Units[n], red_phase);
 		}
 	}
-
 	if (!UseOpenGL) {
 		SDL_UnlockSurface(MinimapSurface);
 	}
