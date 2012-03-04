@@ -545,6 +545,7 @@ void COrder_Resource::LoseResource(CUnit &unit, const CUnit &source)
 		//
 		//FIXME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//unit.CurrentOrder()->Arg1.ResourcePos = (unit.X << 16) | unit.Y;
+		this->DoneHarvesting = true;
 		UnitGotoGoal(unit, depot, SUB_MOVE_TO_DEPOT);
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Going to depot\n"
 			_C_ unit.Player->Index _C_ unit.Slot);
@@ -680,7 +681,9 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				for (i = source->InsideCount, uins = source->UnitInside;
 										i; --i, uins = uins->NextContained) {
 					if (uins->CurrentOrder()->Action == UnitActionResource) {
-						LoseResource(*uins, *source);
+						COrder_Resource &order = *static_cast<COrder_Resource*>(uins->CurrentOrder());
+
+						order.LoseResource(*uins, *source);
 					}
 				}
 				// Don't destroy the resource twice.
