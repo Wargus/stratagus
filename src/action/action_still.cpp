@@ -117,14 +117,40 @@ enum {
 	return lastScreenPos;
 }
 
+class IsTargetInRange
+{
+public:
+	explicit IsTargetInRange(const CUnit& _attacker) : attacker(&_attacker) {}
+
+	bool operator () (const CUnit* unit) const
+	{
+		return unit->IsVisibleAsGoal(*attacker->Player)
+			&& IsDistanceCorrect(attacker->MapDistanceTo(*unit));
+	}
+private:
+	bool IsDistanceCorrect(int distance) const
+	{
+		return attacker->Type->MinAttackRange <= distance
+			&& distance <= attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
+	}
+private:
+	const CUnit* attacker;
+};
+
+
 /* virtual */ void COrder_Still::OnAnimationAttack(CUnit &unit)
 {
-	if (this->AutoTarget != NULL) {
-		const Vec2i invalidPos = {-1, -1};
-
-		FireMissile(unit, AutoTarget, invalidPos);
-		UnHideUnit(unit);
+	if (this->AutoTarget == NULL) {
+		return;
 	}
+	if (IsTargetInRange(unit)(this->AutoTarget) == false) {
+		this->AutoTarget = NULL;
+		return;
+	}
+	const Vec2i invalidPos = {-1, -1};
+
+	FireMissile(unit, AutoTarget, invalidPos);
+	UnHideUnit(unit);
 }
 
 
@@ -275,14 +301,13 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 		return false;
 	}
 	// Removed units can only attack in AttackRange, from bunker
-	CUnit *goal = AttackUnitsInRange(unit);
+	this->AutoTarget = AttackUnitsInRange(unit);
 
-	if (goal == NULL) {
+	if (this->AutoTarget == NULL) {
 		return false;
 	}
-	this->AutoTarget = goal;
 	this->State = SUB_STILL_ATTACK; // Mark attacking.
-	UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos);
+	UnitHeadingFromDeltaXY(unit, this->AutoTarget->tilePos + this->AutoTarget->Type->GetHalfTileSize() - unit.tilePos);
 	return true;
 }
 
