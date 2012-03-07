@@ -501,7 +501,13 @@ int ParseAnimInt(CUnit *unit, const char *parseint)
 		}
 		return GetPlayerData(ParseAnimPlayer(*unit, cur), next + 1, arg + 1);
 	} else if (s[0] == 'r') { //random value
-		return SyncRand(atoi(cur));
+		char* next = strchr(cur, '.');
+		if (next == NULL) {
+			return SyncRand(atoi(cur));
+		} else {
+			*next = '\0';
+			return atoi(cur) + SyncRand(atoi(next + 1));
+		}
 	}
 	return atoi(parseint);
 }
@@ -673,19 +679,19 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 					CUnit &target = *goal->CurrentOrder()->GetGoal();
 
 					if (flags & ANIM_SM_PIXEL) {
-						dest.x = target.tilePos.x * PixelTileSize.x + target.IX;
-						dest.y = target.tilePos.y * PixelTileSize.y + target.IY;
+						dest.x = target.tilePos.x * PixelTileSize.x + target.IX + destx;
+						dest.y = target.tilePos.y * PixelTileSize.y + target.IY + desty;
 					} else {
-						dest.x = target.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2;
-						dest.y = target.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2;
+						dest.x = (target.tilePos.x + destx) * PixelTileSize.x + target.Type->TileWidth * PixelTileSize.x / 2;
+						dest.y = (target.tilePos.y + desty) * PixelTileSize.y + target.Type->TileHeight * PixelTileSize.y / 2;
 					}
 				} else {
 					if ((flags & ANIM_SM_PIXEL)) {
 						dest.x = goal->tilePos.x * PixelTileSize.x + goal->IX + destx;
 						dest.y = goal->tilePos.y * PixelTileSize.y + goal->IY + desty;
 					} else {
-						dest.x = (unit.tilePos.x + destx) * PixelTileSize.x + PixelTileSize.x / 2;
-						dest.y = (unit.tilePos.y + desty) * PixelTileSize.y + PixelTileSize.y / 2;
+						dest.x = (goal->tilePos.x + destx) * PixelTileSize.x + goal->Type->TileWidth * PixelTileSize.x / 2;
+						dest.y = (goal->tilePos.y + desty) * PixelTileSize.y + goal->Type->TileHeight * PixelTileSize.y / 2;
 					}
 				}
 				const int dist = goal->MapDistanceTo(dest.x, dest.y);
@@ -697,7 +703,7 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 					if (flags & ANIM_SM_DAMAGE) {
 						missile->SourceUnit = &unit;
 					}
-					if ((flags & ANIM_SM_TOTARGET) && unit.CurrentOrder()->HasGoal()) {
+					if ((flags & ANIM_SM_TOTARGET) && goal->CurrentOrder()->HasGoal()) {
 						missile->TargetUnit = goal->CurrentOrder()->GetGoal();
 					} else {
 						missile->TargetUnit = goal;

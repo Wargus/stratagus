@@ -585,7 +585,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 
 				FindUnitsByType(*UnitTypes[z], unitupgrade);
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
-					CUnit &unit = *unitupgrade[0];
+					CUnit &unit = *unitupgrade[j];
 
 					if (unit.Player->Index != player.Index) {
 						continue;

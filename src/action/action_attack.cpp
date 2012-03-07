@@ -470,11 +470,13 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	// Still near to target, if not goto target.
 	const int dist = unit.MapDistanceTo(*goal);
 	if (dist > unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-		COrder *savedOrder = this->Clone();
-
-		if (unit.StoreOrder(savedOrder) == false) {
-			delete savedOrder;
-			savedOrder = NULL;
+		// towers don't chase after goal
+		if (!unit.Type->Building) {		
+			COrder *savedOrder = this->Clone();
+			if (unit.StoreOrder(savedOrder) == false) {
+				delete savedOrder;
+				savedOrder = NULL;
+			}
 		}
 		unit.Frame = 0;
 		unit.State = 0;

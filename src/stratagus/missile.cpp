@@ -376,13 +376,12 @@ static PixelPos GetPixelPosFromCenterTile(const Vec2i& tilePos)
 **  @param unit  Unit that fires the missile.
 */
 void FireMissile(CUnit &unit, CUnit *goal, const Vec2i& goalPos)
-{
-	bool dead = false;
-	
+{	
+	Vec2i newgoalPos = goalPos;
 	// Goal dead?
 	if (goal) {
-		dead = goal->Removed || goal->CurrentAction() == UnitActionDie || goal->Destroyed; 
 		Assert(!unit.Type->Missile.Missile->AlwaysFire || unit.Type->Missile.Missile->Range);
+		bool dead = goal->Destroyed || goal->Removed || goal->CurrentAction() == UnitActionDie;
 		if (!unit.Type->Missile.Missile->AlwaysFire) {
 			// Better let the caller/action handle this.
 			if ( goal->Destroyed) {
@@ -392,7 +391,11 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i& goalPos)
 			if (goal->Removed || goal->CurrentAction() == UnitActionDie) {
 				return;
 			}
+		} else if (dead) {
+			newgoalPos = goal->tilePos;
+			goal = NoUnitP;
 		}
+
 	}
 
 	// No missile hits immediately!
@@ -425,7 +428,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i& goalPos)
 	const PixelPos startPixelPos = GetPixelPosFromCenterTile(from->tilePos);
 
 	Vec2i dpos;
-	if (goal && !dead) {
+	if (goal) {
 		Assert(goal->Type);  // Target invalid?
 		// Moved out of attack range?
 
@@ -439,7 +442,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i& goalPos)
 		// If Firing from inside a Bunker
 		NearestOfUnit(*goal, GetFirstContainer(unit)->tilePos, &dpos);
 	} else {
-		dpos = goalPos;
+		dpos = newgoalPos;
 		// FIXME: Can this be too near??
 	}
 
@@ -448,7 +451,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i& goalPos)
 	//
 	// Damage of missile
 	//
-	if (goal && !dead) {
+	if (goal) {
 		missile->TargetUnit = goal;
 		goal->RefsIncrease();
 	}

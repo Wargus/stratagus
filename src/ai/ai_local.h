@@ -188,7 +188,7 @@ public:
 };
 
 	// forces
-#define AI_MAX_FORCES 10                    /// How many forces are supported
+#define AI_MAX_FORCES 50                    /// How many forces are supported
 
 /**
 **  AI force manager.

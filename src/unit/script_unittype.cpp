@@ -1635,7 +1635,21 @@ static void ParseAnimationFrame(lua_State *l, const char *str,
 					*next++ = '\0';
 				}
 			}
-		anim->D.IfVar.Type = atoi(op2);
+		if (!strcmp(op2,">=")) {
+			anim->D.IfVar.Type = 1;
+		} else if (!strcmp(op2,">")) {
+			anim->D.IfVar.Type = 2;
+		} else if (!strcmp(op2,"<=")) {
+			anim->D.IfVar.Type = 3;
+		} else if (!strcmp(op2,"<")) {
+			anim->D.IfVar.Type = 4;
+		} else if (!strcmp(op2,"==")) {
+			anim->D.IfVar.Type = 5;
+		} else if (!strcmp(op2,"!=")) {
+			anim->D.IfVar.Type = 6;
+		} else {
+			anim->D.IfVar.Type = atoi(op2);
+		} 
 		op2 = next;
 		while (*op2 == ' ') {
 			++op2;
