@@ -48,7 +48,7 @@ public:
 	virtual void Execute(CUnit &unit);
 	virtual void Cancel(CUnit &unit);
 	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
-
+	virtual void UpdatePathFinderData(PathFinderInput& input) { UpdatePathFinderData_NotCalled(input); }
 	virtual void UpdateUnitVariables(CUnit &unit) const;
 
 	void ConvertUnitType(const CUnit &unit, CUnitType& newType);

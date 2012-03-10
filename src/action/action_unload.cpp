@@ -55,7 +55,7 @@
 
 /* static */ COrder* COrder::NewActionUnload(const Vec2i &pos, CUnit *what)
 {
-	COrder *order = new COrder_Unload;
+	COrder_Unload *order = new COrder_Unload;
 
 	order->goalPos = pos;
 	if (what && !what->Destroyed) {
@@ -91,6 +91,11 @@
 		lua_rawgeti(l, -1, j + 1);
 		this->State = LuaToNumber(l, -1);
 		lua_pop(l, 1);
+	} else if (!strcmp(value, "tile")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
+		lua_pop(l, 1);
 	} else {
 		return false;
 	}
@@ -107,6 +112,15 @@
 	return targetPos;
 }
 
+/* virtual */ void COrder_Unload::UpdatePathFinderData(PathFinderInput& input)
+{
+	input.SetMinRange(0);
+	input.SetMaxRange(0);
+
+	const Vec2i tileSize = {0, 0};
+
+	input.SetGoal(this->goalPos, tileSize);
+}
 
 
 /**

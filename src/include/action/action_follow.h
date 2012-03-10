@@ -38,7 +38,11 @@ class COrder_Follow : public COrder
 {
 	friend COrder* COrder::NewActionFollow(CUnit &dest);
 public:
-	COrder_Follow() : COrder(UnitActionFollow), State(0), Range(0) {}
+	COrder_Follow() : COrder(UnitActionFollow), State(0), Range(0)
+	{
+		goalPos.x = -1;
+		goalPos.y = -1;
+	}
 
 	virtual COrder_Follow *Clone() const { return new COrder_Follow(*this); }
 
@@ -51,6 +55,7 @@ public:
 private:
 	unsigned int State;
 	int Range;
+	Vec2i goalPos;
 };
 
 //@}

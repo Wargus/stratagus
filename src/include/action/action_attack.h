@@ -40,9 +40,12 @@ class COrder_Attack : public COrder
 	friend COrder* COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest);
 	friend COrder* COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
 public:
-	COrder_Attack(bool ground) : COrder(ground ? UnitActionAttackGround : UnitActionAttack),
+	explicit COrder_Attack(bool ground) : COrder(ground ? UnitActionAttackGround : UnitActionAttack),
 		State(0), MinRange(0), Range(0)
-	{}
+	{
+		goalPos.x = -1;
+		goalPos.y = -1;
+	}
 
 	virtual COrder_Attack* Clone() const { return new COrder_Attack(*this); }
 
@@ -53,6 +56,7 @@ public:
 	virtual void OnAnimationAttack(CUnit &unit);
 	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput& input);
+	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 
 	bool IsWeakTargetSelected() const;
 
@@ -66,6 +70,7 @@ private:
 	int State;
 	int MinRange;
 	int Range;
+	Vec2i goalPos;
 };
 //@}
 

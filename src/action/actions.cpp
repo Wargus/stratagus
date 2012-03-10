@@ -115,23 +115,16 @@ void COrder::ClearGoal()
 	Goal = NULL;
 }
 
-/* virtual */ void COrder::UpdatePathFinderData(PathFinderInput& input)
+void COrder::UpdatePathFinderData_NotCalled(PathFinderInput& input)
 {
+	Assert(false); // should not be called.
+
+	// Don't move
 	input.SetMinRange(0);
-#if 0
-	input.SetMaxRange(this->Range);
-#endif
-	Vec2i tileSize;
-	if (this->HasGoal()) {
-		CUnit *goal = this->GetGoal();
-		tileSize.x = goal->Type->TileWidth;
-		tileSize.y = goal->Type->TileHeight;
-		input.SetGoal(goal->tilePos, tileSize);
-	} else {
-		tileSize.x = 0;
-		tileSize.y = 0;
-		input.SetGoal(this->goalPos, tileSize);
-	}
+	input.SetMaxRange(0);
+	const Vec2i tileSize = {0, 0};
+	input.SetGoal(input.GetUnit()->tilePos, tileSize);
+
 }
 
 /* virtual */ void COrder::FillSeenValues(CUnit &unit) const
@@ -145,34 +138,6 @@ void COrder::ClearGoal()
 
 /* virtual */ bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
 {
-	Assert(unit.CurrentOrder() == this);
-
-	switch (Action) {
-		case UnitActionTrain:
-		case UnitActionUpgradeTo:
-		case UnitActionResearch:
-		case UnitActionBuilt:
-		case UnitActionBuild:
-		case UnitActionTransformInto:
-		case UnitActionBoard:
-		case UnitActionUnload:
-		break;
-		case UnitActionAttack:
-		{
-			CUnit *goal = GetGoal();
-			if (goal) {
-				if (goal == attacker ||
-					(goal->CurrentAction() == UnitActionAttack &&
-					goal->CurrentOrder()->GetGoal() == &unit))
-				{
-					//we already fight with one of attackers;
-					return true;
-				}
-			}
-		}
-		default:
-		break;
-	}
 	return false;
 }
 

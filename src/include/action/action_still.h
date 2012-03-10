@@ -37,7 +37,7 @@
 class COrder_Still : public COrder
 {
 public:
-	COrder_Still(bool stand) : COrder(stand ? UnitActionStandGround : UnitActionStill), State(0) {}
+	explicit COrder_Still(bool stand) : COrder(stand ? UnitActionStandGround : UnitActionStill), State(0) {}
 
 	virtual COrder_Still *Clone() const { return new COrder_Still(*this); }
 
@@ -47,6 +47,7 @@ public:
 	virtual void Execute(CUnit &unit);
 	virtual void OnAnimationAttack(CUnit &unit);
 	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
+	virtual void UpdatePathFinderData(PathFinderInput& input) { UpdatePathFinderData_NotCalled(input); }
 private:
 	bool AutoAttackStand(CUnit &unit);
 private:

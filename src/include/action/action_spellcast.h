@@ -38,7 +38,11 @@ class COrder_SpellCast : public COrder
 {
 	friend COrder* COrder::NewActionSpellCast(SpellType &spell, const Vec2i &pos, CUnit *target);
 public:
-	COrder_SpellCast() : COrder(UnitActionSpellCast), Spell(NULL), State(0), Range(0) {}
+	COrder_SpellCast() : COrder(UnitActionSpellCast), Spell(NULL), State(0), Range(0)
+	{
+		goalPos.x = -1;
+		goalPos.y = -1;
+	}
 
 	virtual COrder_SpellCast *Clone() const { return new COrder_SpellCast(*this); }
 
@@ -59,6 +63,7 @@ private:
 	SpellType *Spell;
 	int State;
 	int Range;
+	Vec2i goalPos;
 };
 
 //@}

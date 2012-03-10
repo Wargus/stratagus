@@ -38,7 +38,11 @@ class COrder_Unload : public COrder
 {
 	friend COrder* COrder::NewActionUnload(const Vec2i &pos, CUnit *what);
 public:
-	COrder_Unload() : COrder(UnitActionUnload), State(0) {}
+	COrder_Unload() : COrder(UnitActionUnload), State(0)
+	{
+		goalPos.x = -1;
+		goalPos.y = -1;
+	}
 
 	virtual COrder_Unload *Clone() const { return new COrder_Unload(*this); }
 
@@ -47,11 +51,13 @@ public:
 
 	virtual void Execute(CUnit &unit);
 	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
+	virtual void UpdatePathFinderData(PathFinderInput& input);
 
 private:
 	bool LeaveTransporter(CUnit &transporter);
 private:
 	int State;
+	Vec2i goalPos;
 };
 
 //@}

@@ -106,6 +106,11 @@ enum {
 		lua_rawgeti(l, -1, j + 1);
 		this->Range = LuaToNumber(l, -1);
 		lua_pop(l, 1);
+	} else if (!strcmp(value, "tile")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
+		lua_pop(l, 1);
 	} else {
 		return false;
 	}

@@ -247,6 +247,11 @@ COrder_Resource::~COrder_Resource()
 		lua_rawgeti(l, -1, j + 1);
 		this->worker = CclGetUnitFromRef(l);
 		lua_pop(l, 1);
+	} else if (!strcmp(value, "tile")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
+		lua_pop(l, 1);
 	} else {
 		return false;
 	}
@@ -310,12 +315,12 @@ COrder_Resource::~COrder_Resource()
 */
 int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 {
-	Vec2i pos = unit.CurrentOrder()->goalPos;
+	Vec2i pos = this->goalPos;
 
 	// Wood gone, look somewhere else.
 	if ((Map.Info.IsPointOnMap(pos) == false || Map.ForestOnMap(pos) == false) && (!unit.IX) && (!unit.IY)) {
 		if (!FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 16,
-				*unit.Player, unit.CurrentOrder()->goalPos, &pos)) {
+				*unit.Player, this->goalPos, &pos)) {
 			// no wood in range
 			return -1;
 		} else {

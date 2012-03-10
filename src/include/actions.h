@@ -104,8 +104,6 @@ class COrder
 public:
 	COrder(int action) : Goal(NULL), Action(action), Finished(false)
 	{
-		goalPos.x = -1;
-		goalPos.y = -1;
 	}
 	virtual ~COrder();
 
@@ -125,7 +123,7 @@ public:
 	virtual void FillSeenValues(CUnit &unit) const;
 	virtual void AiUnitKilled(CUnit &unit);
 
-	virtual void UpdatePathFinderData(PathFinderInput& input);
+	virtual void UpdatePathFinderData(PathFinderInput& input) = 0;
 
 	bool HasGoal() const { return Goal != NULL; }
 	CUnit * GetGoal() const { return Goal; };
@@ -158,13 +156,14 @@ public:
 	static COrder* NewActionUnload(const Vec2i &pos, CUnit *what);
 	static COrder* NewActionUpgradeTo(CUnit &unit, CUnitType &type);
 
+protected:
+	void UpdatePathFinderData_NotCalled(PathFinderInput& input);
+
 private:
 	CUnit *Goal;
 public:
 	const unsigned char Action;   /// global action
 	bool Finished; /// true when order is finish
-
-	Vec2i goalPos;          /// or tile coordinate of destination
 };
 
 /*----------------------------------------------------------------------------

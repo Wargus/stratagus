@@ -402,8 +402,6 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i& goalPos)
 	if (unit.Type->Missile.Missile->Class == MissileClassNone) {
 		// No goal, take target coordinates
 		if (!goal) {
-			const Vec2i& goalPos = unit.CurrentOrder()->goalPos;
-
 			if (Map.WallOnMap(goalPos)) {
 				if (Map.HumanWallOnMap(goalPos)) {
 					Map.HitWall(goalPos,

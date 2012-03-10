@@ -161,11 +161,6 @@ bool COrder::ParseGenericData(lua_State *l, int &j, const char *value)
 		lua_rawgeti(l, -1, j + 1);
 		this->Goal = CclGetUnitFromRef(l);
 		lua_pop(l, 1);
-	} else if (!strcmp(value, "tile")) {
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
-		lua_pop(l, 1);
 	} else {
 		return false;
 	}
