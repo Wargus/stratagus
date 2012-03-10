@@ -117,20 +117,22 @@
 #error You need to define all Game macros, see stratagus-game-launcher.h
 #endif
 
+#if ( defined (_MSC_VER) || defined (_WIN32) || defined (_WIN64) ) && ! defined (WIN32)
+#define WIN32
+#endif
+
+#ifndef WIN32
 #if ! defined (DATA_PATH) || ! defined (SCRIPTS_PATH) || ! defined (STRATAGUS_BIN)
 #error You need to define paths, see stratagus-game-launcher.h
+#endif
 #endif
 
 #if ( defined (MAEMO_GTK) || defined (MAEMO_CHANGES) ) && ! defined (MAEMO)
 #define MAEMO
 #endif
 
-#if ( defined (_MSC_VER) || defined (_WIN32) || defined (_WIN64) ) && ! defined (WIN32)
-#define WIN32
-#endif
-
 #ifdef WIN32
-#define WINVER 0x0501
+//#define WINVER 0x0501
 #include <windows.h>
 #include <wincon.h>
 #include <process.h>
@@ -141,10 +143,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef _MSC_VER
 #include <sys/stat.h>
 #include <sys/types.h>
-#endif
 
 #ifdef _MSC_VER
 #include <direct.h>
@@ -189,7 +189,6 @@ static void error(char * title, char * text) {
 	MessageBox(NULL, text, title, MB_OK | MB_ICONERROR);
 #else
 	if ( ! ConsoleMode ) {
-
 		GtkWidget * window = NULL;
 		GtkWidget * dialog = NULL;
 
@@ -210,49 +209,35 @@ static void error(char * title, char * text) {
 #ifdef MAEMO
 		gtk_widget_destroy(window);
 #endif
-
 	} else {
-
 		fprintf(stderr, "%s -- Error: %s\n", title, text);
-
 	}
 #endif
-
 	exit(1);
-
 }
 
 int main(int argc, char * argv[]) {
 
 #ifndef WIN32
-
-	if ( ! XOpenDisplay(NULL) )
+	if ( ! XOpenDisplay(NULL) ) {
 		ConsoleMode = 1;
-
+	}
 	if ( ConsoleMode ) {
-
 #ifdef MAEMO
 		error(TITLE, NO_X_DISPLAY);
 #else
-
-		if ( getuid() != 0 )
+		if ( getuid() != 0 ) {
 			error(TITLE, CONSOLE_MODE_NOT_ROOT);
-
+		}
 #endif
-
 	} else {
-
 		gtk_init(&argc, &argv);
-
 #ifdef MAEMO
 		hildon_init();
 #endif
-
 	}
-
 #endif
 
-	int i;
 	struct stat st;
 	char data_path[BUFF_SIZE];
 	char scripts_path[BUFF_SIZE];
@@ -270,18 +255,17 @@ int main(int argc, char * argv[]) {
 	HKEY key;
 
 	if ( RegOpenKeyEx(HKEY_LOCAL_MACHINE, REGKEY, 0, KEY_QUERY_VALUE, &key) == ERROR_SUCCESS ) {
-                        
-		if ( RegQueryValueEx(key, "InstallLocation", NULL, NULL, (LPBYTE) stratagus_path, &stratagus_path_size) == ERROR_SUCCESS )
-			if ( stratagus_path_size == 0 || strlen(stratagus_path) == 0 )
+		if ( RegQueryValueEx(key, "InstallLocation", NULL, NULL, (LPBYTE) stratagus_path, &stratagus_path_size) == ERROR_SUCCESS ) {
+			if ( stratagus_path_size == 0 || strlen(stratagus_path) == 0 ) {
 				error(TITLE, STRATAGUS_NOT_FOUND);
-
+			}
+		}
 		RegCloseKey(key);
-
 	}
 
-	if ( chdir(stratagus_path) != 0 )
+	if ( chdir(stratagus_path) != 0 ) {
 		error(TITLE, STRATAGUS_NOT_FOUND);
-
+	}
 	strcpy(scripts_path, data_path);
 	sprintf(stratagus_bin, "%s\\stratagus.exe", stratagus_path);
 #else
@@ -290,20 +274,20 @@ int main(int argc, char * argv[]) {
 	strcpy(stratagus_bin, STRATAGUS_BIN);
 #endif
 
-	if ( stat(stratagus_bin, &st) != 0 )
+	if ( stat(stratagus_bin, &st) != 0 ) {
 		error(TITLE, STRATAGUS_NOT_FOUND);
-
-	if ( stat(data_path, &st) != 0 )
+	}
+	if ( stat(data_path, &st) != 0 ) {
 		error(TITLE, DATA_NOT_EXTRACTED);
-
+	}
 #ifdef WIN32
 	sprintf(title_path, "%s\\graphics\\ui\\title.png", data_path);
 
 	int data_path_len = strlen(data_path);
 
-	for ( i = data_path_len - 1; i >= 0; --i )
+	for (int i = data_path_len - 1; i >= 0; --i) {
 		data_path[i + 1] = data_path[i];
-
+	}
 	data_path[0] = '"';
 	data_path[data_path_len + 1] = '"';
 	data_path[data_path_len + 2] = 0;
@@ -311,16 +295,23 @@ int main(int argc, char * argv[]) {
 	sprintf(title_path, "%s/graphics/ui/title.png", data_path);
 #endif
 
-	if ( stat(title_path, &st) != 0 )
+	if ( stat(title_path, &st) != 0 ) {
 		error(TITLE, DATA_NOT_EXTRACTED);
-
+	}
 #ifndef WIN32
-	if ( strcmp(data_path, scripts_path) != 0 )
-		if ( chdir(data_path) != 0 )
+	if ( strcmp(data_path, scripts_path) != 0 ) {
+		if ( chdir(data_path) != 0 ) {
 			error(TITLE, DATA_NOT_EXTRACTED);
+		}
+	}
 #endif
 
+#ifdef _MSC_VER
+	char** stratagus_argv;
+	stratagus_argv = (char**) malloc((argc + 3) * sizeof (*stratagus_argv));
+#else
 	char * stratagus_argv[argc + 3];
+#endif
 
 #ifdef WIN32
 	char stratagus_argv0_esc[BUFF_SIZE];
@@ -337,9 +328,9 @@ int main(int argc, char * argv[]) {
 	stratagus_argv[1] = "-d";
 	stratagus_argv[2] = scripts_path;
 
-	for ( i = 3; i < argc + 2; ++i )
+	for (int i = 3; i < argc + 2; ++i ) {
 		stratagus_argv[i] = argv[i - 2];
-
+	}
 	stratagus_argv[argc + 2] = NULL;
 
 #ifdef WIN32
@@ -347,14 +338,16 @@ int main(int argc, char * argv[]) {
 
 	errno = 0;
 	int ret = spawnvp(_P_WAIT, stratagus_bin, stratagus_argv);
-
-	if ( errno == 0 )
+#ifdef _MSC_VER
+	free (stratagus_argv);
+#endif
+	if ( errno == 0 ) {
 		return ret;
+	}
 #else
 	execvp(stratagus_bin, stratagus_argv);
 #endif
 
 	error(TITLE, STRATAGUS_NOT_FOUND);
 	return 1;
-
 }
