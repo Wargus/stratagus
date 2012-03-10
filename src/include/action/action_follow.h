@@ -36,8 +36,9 @@
 
 class COrder_Follow : public COrder
 {
+	friend COrder* COrder::NewActionFollow(CUnit &dest);
 public:
-	COrder_Follow() : COrder(UnitActionFollow), State(0) {}
+	COrder_Follow() : COrder(UnitActionFollow), State(0), Range(0) {}
 
 	virtual COrder_Follow *Clone() const { return new COrder_Follow(*this); }
 
@@ -46,8 +47,10 @@ public:
 
 	virtual void Execute(CUnit &unit);
 	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
+	virtual void UpdatePathFinderData(PathFinderInput& input);
 private:
 	unsigned int State;
+	int Range;
 };
 
 //@}

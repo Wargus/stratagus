@@ -81,24 +81,35 @@
 
 /* virtual */ bool COrder_Move::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
 {
-	return false;
+	if (!strcmp(value, "range")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Range = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	} else {
+		return false;
+	}
+	return true;
 }
 
 /* virtual */ PixelPos COrder_Move::Show(const CViewport& vp, const PixelPos& lastScreenPos) const
 {
-	PixelPos targetPos;
+	const PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
 
-	if (this->HasGoal()) {
-		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
-	} else {
-		targetPos = vp.TilePosToScreen_Center(this->goalPos);
-	}
 	Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
 	Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
 	Video.FillCircleClip(ColorGreen, targetPos, 3);
 	return targetPos;
 }
 
+/* virtual */ void COrder_Move::UpdatePathFinderData(PathFinderInput& input)
+{
+	input.SetMinRange(0);
+	input.SetMaxRange(this->Range);
+	const Vec2i tileSize = {0, 0};
+
+	input.SetGoal(this->goalPos, tileSize);
+}
 
 /**
 **  Unit moves! Generic function called from other actions.
@@ -214,11 +225,7 @@ int DoActionMove(CUnit &unit)
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
 			// Some tries to reach the goal
-			if (this->CheckRange()) {
-				this->Range++;
-			} else {
-				this->Finished = true;
-			}
+			this->Range++;
 			break;
 
 		case PF_REACHED:

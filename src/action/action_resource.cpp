@@ -91,7 +91,6 @@
 	}
 	order->goalPos = ressourceLoc;
 	order->CurrentResource = WoodCost; // Hard-coded resource.
-	order->Range = 1;
 	return order;
 }
 
@@ -104,7 +103,6 @@
 	harvester.AssignWorkerToMine(mine);
 	order->Resource.Pos = mine.tilePos + mine.Type->GetHalfTileSize();
 	order->CurrentResource = mine.Type->GivesResource;
-	order->Range = 1;
 	return order;
 }
 
@@ -116,7 +114,6 @@
 	if (depot && depot->Destroyed) {
 		depot = NULL;
 	}
-	order->Range = 1;
 	order->CurrentResource = harvester.CurrentResource;
 	order->DoneHarvesting = true;
 
@@ -179,7 +176,6 @@ COrder_Resource::~COrder_Resource()
 	if (this->Finished) {
 		file.printf(" \"finished\",");
 	}
-	file.printf(" \"range\", %d,", this->Range);
 	if (this->HasGoal()) {
 		CUnit &goal = *this->GetGoal();
 		if (goal.Destroyed) {
@@ -270,6 +266,24 @@ COrder_Resource::~COrder_Resource()
 	Video.DrawLineClip(ColorYellow, lastScreenPos, targetPos);
 	Video.FillCircleClip(ColorYellow, targetPos, 3);
 	return targetPos;
+}
+
+/* virtual */ void COrder_Resource::UpdatePathFinderData(PathFinderInput& input)
+{
+	input.SetMinRange(0);
+	input.SetMaxRange(1);
+
+	Vec2i tileSize;
+	if (this->HasGoal()) {
+		CUnit *goal = this->GetGoal();
+		tileSize.x = goal->Type->TileWidth;
+		tileSize.y = goal->Type->TileHeight;
+		input.SetGoal(goal->tilePos, tileSize);
+	} else {
+		tileSize.x = 0;
+		tileSize.y = 0;
+		input.SetGoal(this->goalPos, tileSize);
+	}
 }
 
 
@@ -379,7 +393,6 @@ void COrder_Resource::UnitGotoGoal(CUnit &unit, CUnit *const goal, int state)
 			this->goalPos.x = this->goalPos.y = -1;
 		}
 	}
-	this->Range = 1;
 	this->State = state;
 	unit.State = 0;
 	if (state == SUB_MOVE_TO_DEPOT || state == SUB_MOVE_TO_RESOURCE) {
@@ -528,7 +541,6 @@ void COrder_Resource::LoseResource(CUnit &unit, const CUnit &source)
 			unit.AssignWorkerToMine(*goal);
 			this->SetGoal(goal);
 			this->Resource.Mine = goal;
-			this->Range = 1;
 			this->goalPos = goal->tilePos;
 			this->State = SUB_MOVE_TO_RESOURCE;
 			unit.State = 0;
@@ -975,7 +987,6 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 				this->Resource.Mine = goal;
 			}
 			this->SetGoal(goal);
-			this->Range = 1;
 			this->goalPos.x = this->goalPos.y = -1;
 		} else {
 			DebugPrint("%d: Worker %d report: [%d,%d] Resource gone near [%d,%d] in range %d. Sit and play dumb.\n"

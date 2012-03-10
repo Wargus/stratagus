@@ -48,6 +48,7 @@ public:
 
 	virtual void Execute(CUnit &unit);
 	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
+	virtual void UpdatePathFinderData(PathFinderInput& input);
 
 	const CUnitPtr& GetReparableTarget() const { return ReparableTarget; }
 private:

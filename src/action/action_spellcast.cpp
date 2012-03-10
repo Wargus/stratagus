@@ -119,6 +119,11 @@
 		lua_rawgeti(l, -1, j + 1);
 		this->Spell = SpellTypeByIdent(LuaToString(l, -1));
 		lua_pop(l, 1);
+	} else if (!strcmp(value, "range")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Range = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	} else if (!strcmp(value, "state")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
@@ -145,6 +150,23 @@
 	return targetPos;
 }
 
+/* virtual */ void COrder_SpellCast::UpdatePathFinderData(PathFinderInput& input)
+{
+	input.SetMinRange(0);
+	input.SetMaxRange(this->Range);
+
+	Vec2i tileSize;
+	if (this->HasGoal()) {
+		CUnit *goal = this->GetGoal();
+		tileSize.x = goal->Type->TileWidth;
+		tileSize.y = goal->Type->TileHeight;
+		input.SetGoal(goal->tilePos, tileSize);
+	} else {
+		tileSize.x = 0;
+		tileSize.y = 0;
+		input.SetGoal(this->goalPos, tileSize);
+	}
+}
 
 /**
 **  Call when animation step is "attack"

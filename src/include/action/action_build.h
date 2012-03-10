@@ -38,7 +38,7 @@ class COrder_Build : public COrder
 {
 	friend COrder* COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
 public:
-	COrder_Build() : COrder(UnitActionBuild), Type(NULL), State(0) {}
+	COrder_Build() : COrder(UnitActionBuild), Type(NULL), State(0), Range(0) {}
 
 	virtual COrder_Build *Clone() const { return new COrder_Build(*this); }
 
@@ -62,6 +62,7 @@ private:
 	CUnitType *Type;        /// build a unit of this unit-type
 	CUnitPtr BuildingUnit;  /// unit builded.
 	int State;
+	int Range;
 };
 
 //@}

@@ -175,6 +175,11 @@ void AnimateActionAttack(CUnit &unit, COrder& order)
 		lua_rawgeti(l, -1, j + 1);
 		this->MinRange = LuaToNumber(l, -1);
 		lua_pop(l, 1);
+	} else if (!strcmp(value, "range")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Range = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	} else {
 		return false;
 	}
@@ -377,12 +382,9 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		unit.State = 0;
 		if (!this->HasGoal()) {
 			// When attack-moving we have to allow a bigger range
-			if (this->CheckRange()) {
-				// Try again with more range
-				this->Range++;
-				unit.Wait = 5;
-				return;
-			}
+			this->Range++;
+			unit.Wait = 5;
+			return;
 		} else {
 			this->ClearGoal();
 		}

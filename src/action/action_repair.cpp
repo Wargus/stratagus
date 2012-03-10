@@ -44,6 +44,7 @@
 #include "animation.h"
 #include "iolib.h"
 #include "map.h"
+#include "pathfinder.h"
 #include "player.h"
 #include "script.h"
 #include "sound.h"
@@ -64,7 +65,6 @@
 	} else {
 		order->SetGoal(&target);
 		order->ReparableTarget = &target;
-		order->Range = unit.Type->RepairRange;
 	}
 	return order;
 }
@@ -86,7 +86,6 @@
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
 	}
-	file.printf(" \"range\", %d,", this->Range);
 	if (this->HasGoal()) {
 		CUnit &goal = *this->GetGoal();
 		if (goal.Destroyed) {
@@ -147,6 +146,25 @@
 	Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
 	Video.FillCircleClip(ColorYellow, targetPos, 3);
 	return targetPos;
+}
+
+/* virtual */ void COrder_Repair::UpdatePathFinderData(PathFinderInput& input)
+{
+	const CUnit& unit = *input.GetUnit();
+
+	input.SetMinRange(0);
+	input.SetMaxRange(ReparableTarget != NULL ? unit.Type->RepairRange : 0);
+
+	Vec2i tileSize;
+	if (ReparableTarget != NULL) {
+		tileSize.x = ReparableTarget->Type->TileWidth;
+		tileSize.y = ReparableTarget->Type->TileHeight;
+		input.SetGoal(ReparableTarget->tilePos, tileSize);
+	} else {
+		tileSize.x = 0;
+		tileSize.y = 0;
+		input.SetGoal(this->goalPos, tileSize);
+	}
 }
 
 

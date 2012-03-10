@@ -115,18 +115,12 @@ void COrder::ClearGoal()
 	Goal = NULL;
 }
 
-
-bool COrder::CheckRange() const
-{
-	return (Range <= Map.Info.MapWidth || Range <= Map.Info.MapHeight);
-}
-
-
 /* virtual */ void COrder::UpdatePathFinderData(PathFinderInput& input)
 {
 	input.SetMinRange(0);
+#if 0
 	input.SetMaxRange(this->Range);
-
+#endif
 	Vec2i tileSize;
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();

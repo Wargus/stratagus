@@ -94,6 +94,11 @@
 		lua_rawgeti(l, -1, j + 1);
 		this->WaitingCycle = LuaToNumber(l, -1);
 		lua_pop(l, 1);
+	} else if (!strcmp(value, "range")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Range = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	} else {
 		return false;
 	}
@@ -112,6 +117,14 @@
 	return pos2;
 }
 
+/* virtual */ void COrder_Patrol::UpdatePathFinderData(PathFinderInput& input)
+{
+	input.SetMinRange(0);
+	input.SetMaxRange(this->Range);
+	const Vec2i tileSize = {0, 0};
+	input.SetGoal(this->goalPos, tileSize);
+}
+
 
 /* virtual */ void COrder_Patrol::Execute(CUnit &unit)
 {
@@ -127,11 +140,9 @@
 		case PF_UNREACHABLE:
 			// Increase range and try again
 			this->WaitingCycle = 1;
-			if (this->CheckRange()) {
-				this->Range++;
-				break;
-			}
-			// FALL THROUGH
+			this->Range++;
+			break;
+
 		case PF_REACHED:
 			this->WaitingCycle = 1;
 			this->Range = 0;

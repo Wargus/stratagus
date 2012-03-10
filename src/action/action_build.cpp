@@ -120,6 +120,11 @@ enum
 		lua_rawgeti(l, -1, j + 1);
 		this->BuildingUnit = CclGetUnitFromRef(l);
 		lua_pop(l, 1);
+	} else if (!strcmp(value, "range")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Range = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	} else if (!strcmp(value, "state")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);

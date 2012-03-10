@@ -101,6 +101,11 @@ enum {
 		lua_rawgeti(l, -1, j + 1);
 		this->State = LuaToNumber(l, -1);
 		lua_pop(l, 1);
+	} else if (!strcmp("range", value)) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		this->Range = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	} else {
 		return false;
 	}
@@ -122,6 +127,24 @@ enum {
 	return targetPos;
 }
 
+/* virtual */ void COrder_Board::UpdatePathFinderData(PathFinderInput& input)
+{
+	input.SetMinRange(0);
+	input.SetMaxRange(this->Range);
+
+	Vec2i tileSize;
+	if (this->HasGoal()) {
+		CUnit *goal = this->GetGoal();
+		tileSize.x = goal->Type->TileWidth;
+		tileSize.y = goal->Type->TileHeight;
+		input.SetGoal(goal->tilePos, tileSize);
+	} else {
+		tileSize.x = 0;
+		tileSize.y = 0;
+		input.SetGoal(this->goalPos, tileSize);
+	}
+}
+
 
 /**
 **  Move to transporter.
@@ -131,17 +154,15 @@ enum {
 **  @return      >0 remaining path length, 0 wait for path, -1
 **               reached goal, -2 can't reach the goal.
 */
-static int MoveToTransporter(CUnit &unit)
+int COrder_Board::MoveToTransporter(CUnit &unit)
 {
 	const Vec2i oldPos = unit.tilePos;
 	const int res = DoActionMove(unit);
 
 	// We have to reset a lot, or else they will circle each other and stuff.
 	if (oldPos != unit.tilePos) {
-		unit.CurrentOrder()->Range = 1;
+		this->Range = 1;
 	}
-	// New code has this as default.
-	Assert(unit.CurrentAction() == UnitActionBoard);
 	return res;
 }
 
@@ -264,10 +285,8 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 							return;
 						} else {
 							// Try with a bigger range.
-							if (this->CheckRange()) {
-								this->Range++;
-								this->State--;
-							}
+							this->Range++;
+							this->State--;
 						}
 					} else if (pathRet == PF_REACHED) {
 						this->State = State_WaitForTransporter;

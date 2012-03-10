@@ -56,7 +56,7 @@ public:
 
 	virtual void Execute(CUnit &unit);
 	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
-
+	virtual void UpdatePathFinderData(PathFinderInput& input);
 	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 
 

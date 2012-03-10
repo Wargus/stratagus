@@ -41,7 +41,7 @@ class COrder_Attack : public COrder
 	friend COrder* COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
 public:
 	COrder_Attack(bool ground) : COrder(ground ? UnitActionAttackGround : UnitActionAttack),
-		State(0), MinRange(0)
+		State(0), MinRange(0), Range(0)
 	{}
 
 	virtual COrder_Attack* Clone() const { return new COrder_Attack(*this); }
@@ -65,6 +65,7 @@ private:
 private:
 	int State;
 	int MinRange;
+	int Range;
 };
 //@}
 

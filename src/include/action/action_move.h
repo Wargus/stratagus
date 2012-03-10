@@ -37,7 +37,7 @@
 class COrder_Move : public COrder
 {
 public:
-	COrder_Move() : COrder(UnitActionMove) {}
+	COrder_Move() : COrder(UnitActionMove), Range(0) {}
 
 	virtual COrder_Move *Clone() const { return new COrder_Move(*this); }
 
@@ -46,6 +46,10 @@ public:
 
 	virtual void Execute(CUnit &unit);
 	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
+	virtual void UpdatePathFinderData(PathFinderInput& input);
+
+private:
+	int Range;
 };
 
 //@}

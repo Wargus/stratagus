@@ -36,8 +36,9 @@
 
 class COrder_SpellCast : public COrder
 {
+	friend COrder* COrder::NewActionSpellCast(SpellType &spell, const Vec2i &pos, CUnit *target);
 public:
-	COrder_SpellCast() : COrder(UnitActionSpellCast), Spell(NULL), State(0) {}
+	COrder_SpellCast() : COrder(UnitActionSpellCast), Spell(NULL), State(0), Range(0) {}
 
 	virtual COrder_SpellCast *Clone() const { return new COrder_SpellCast(*this); }
 
@@ -46,6 +47,7 @@ public:
 
 	virtual void Execute(CUnit &unit);
 	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
+	virtual void UpdatePathFinderData(PathFinderInput& input);
 
 	virtual void OnAnimationAttack(CUnit &unit);
 
@@ -56,6 +58,7 @@ private:
 private:
 	SpellType *Spell;
 	int State;
+	int Range;
 };
 
 //@}

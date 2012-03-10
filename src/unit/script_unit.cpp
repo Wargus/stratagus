@@ -152,12 +152,7 @@ CUnit *CclGetUnitFromRef(lua_State *l)
 
 bool COrder::ParseGenericData(lua_State *l, int &j, const char *value)
 {
-	if (!strcmp(value, "range")) {
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		this->Range = LuaToNumber(l, -1);
-		lua_pop(l, 1);
-	} else if (!strcmp(value, "finished")) {
+	if (!strcmp(value, "finished")) {
 		lua_rawgeti(l, -1, j + 1);
 		this->Finished = true;
 		lua_pop(l, 1);
