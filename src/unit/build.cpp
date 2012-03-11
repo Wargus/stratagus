@@ -235,7 +235,7 @@ bool CBuildRestrictionOnTop::Check(const CUnitType &, int x, int y, CUnit *&onto
 
 	CUnitCache::iterator it = std::find_if(cache.begin(), cache.end(), AliveConstructedAndSameTypeAs(*this->Parent));
 
-	if (it != cache.end()) {
+	if (it != cache.end() && (*it)->tilePos == pos) {
 		ontoptarget = *it;
 		return true;
 	}
