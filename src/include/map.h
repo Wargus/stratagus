@@ -323,10 +323,9 @@ public:
 		if (visiontype > 1) {
 			return visiontype;
 		}
-		if (player.SharedVision) {
+		if (player.IsVisionSharing()) {
 			for (int i = 0; i < PlayerMax ; ++i) {
-				if (player.SharedVision & (1 << i) &&
-						(Players[i].SharedVision & (1 << player.Index))) {
+				if (player.IsBothSharedVision(Players[i])) {
 					if (mf->Visible[i] > 1) {
 						return 2;
 					}

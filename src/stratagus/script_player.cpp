@@ -76,49 +76,46 @@ static CPlayer *CclGetPlayer(lua_State *l)
 */
 static int CclPlayer(lua_State *l)
 {
-	const char *value;
-	CPlayer *player;
-	int i;
-	int args;
-	int j;
-	int subargs;
-	int k;
+	int i = LuaToNumber(l, 1);
 
-	args = lua_gettop(l);
-	j = 0;
+	CPlayer &player = Players[i];
+	player.Index = i;
 
-	i = LuaToNumber(l, j + 1);
-	++j;
-	player = &Players[i];
 	if (NumPlayers <= i) {
 		NumPlayers = i + 1;
 	}
-	player->Index = i;
-	memset(player->Units, 0, sizeof(player->Units));
 
-	//
-	//  Parse the list: (still everything could be changed!)
-	//
-	for (; j < args; ++j) {
-		value = LuaToString(l, j + 1);
+	player.Load(l);
+	return 0;
+}
+
+void CPlayer::Load(lua_State *l)
+{
+	const int args = lua_gettop(l);
+
+	memset(this->Units, 0, sizeof(this->Units));
+
+	// j = 0 represent player Index.
+	for (int j = 1; j < args; ++j) {
+		const char *value = LuaToString(l, j + 1);
 		++j;
 
 		if (!strcmp(value, "name")) {
-			player->SetName(LuaToString(l, j + 1));
+			this->SetName(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "type")) {
 			value = LuaToString(l, j + 1);
 			if (!strcmp(value, "neutral")) {
-				player->Type = PlayerNeutral;
+				this->Type = PlayerNeutral;
 			} else if (!strcmp(value, "nobody")) {
-				player->Type = PlayerNobody;
+				this->Type = PlayerNobody;
 			} else if (!strcmp(value, "computer")) {
-				player->Type = PlayerComputer;
+				this->Type = PlayerComputer;
 			} else if (!strcmp(value, "person")) {
-				player->Type = PlayerPerson;
+				this->Type = PlayerPerson;
 			} else if (!strcmp(value, "rescue-passive")) {
-				player->Type = PlayerRescuePassive;
+				this->Type = PlayerRescuePassive;
 			} else if (!strcmp(value, "rescue-active")) {
-				player->Type = PlayerRescueActive;
+				this->Type = PlayerRescueActive;
 			} else {
 				LuaError(l, "Unsupported tag: %s" _C_ value);
 			}
@@ -128,7 +125,7 @@ static int CclPlayer(lua_State *l)
 			value = LuaToString(l, j + 1);
 			for (i = 0; i < PlayerRaces.Count; ++i) {
 				if (!strcmp(value, PlayerRaces.Name[i].c_str())) {
-					player->Race = i;
+					this->Race = i;
 					break;
 				}
 			}
@@ -136,34 +133,34 @@ static int CclPlayer(lua_State *l)
 				LuaError(l, "Unsupported race: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "ai-name")) {
-			player->AiName = LuaToString(l, j + 1);
+			this->AiName = LuaToString(l, j + 1);
 		} else if (!strcmp(value, "team")) {
-			player->Team = LuaToNumber(l, j + 1);
+			this->Team = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "enemy")) {
 			value = LuaToString(l, j + 1);
-			for (i = 0; i < PlayerMax && *value; ++i, ++value) {
+			for (int i = 0; i < PlayerMax && *value; ++i, ++value) {
 				if (*value == '-' || *value == '_' || *value == ' ') {
-					player->Enemy &= ~(1 << i);
+					this->Enemy &= ~(1 << i);
 				} else {
-					player->Enemy |= (1 << i);
+					this->Enemy |= (1 << i);
 				}
 			}
 		} else if (!strcmp(value, "allied")) {
 			value = LuaToString(l, j + 1);
-			for (i = 0; i < PlayerMax && *value; ++i, ++value) {
+			for (int i = 0; i < PlayerMax && *value; ++i, ++value) {
 				if (*value == '-' || *value == '_' || *value == ' ') {
-					player->Allied &= ~(1 << i);
+					this->Allied &= ~(1 << i);
 				} else {
-					player->Allied |= (1 << i);
+					this->Allied |= (1 << i);
 				}
 			}
 		} else if (!strcmp(value, "shared-vision")) {
 			value = LuaToString(l, j + 1);
-			for (i = 0; i < PlayerMax && *value; ++i, ++value) {
+			for (int i = 0; i < PlayerMax && *value; ++i, ++value) {
 				if (*value == '-' || *value == '_' || *value == ' ') {
-					player->SharedVision &= ~(1 << i);
+					this->SharedVision &= ~(1 << i);
 				} else {
-					player->SharedVision |= (1 << i);
+					this->SharedVision |= (1 << i);
 				}
 			}
 		} else if (!strcmp(value, "start")) {
@@ -171,26 +168,27 @@ static int CclPlayer(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
-			player->StartPos.x = LuaToNumber(l, -1);
+			this->StartPos.x = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, j + 1, 2);
-			player->StartPos.y = LuaToNumber(l, -1);
+			this->StartPos.y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "resources")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
+			const int subargs = lua_objlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
 
+				int i;
 				for (i = 0; i < MaxCosts; ++i) {
 					if (!strcmp(value, DefaultResourceNames[i].c_str())) {
 						lua_rawgeti(l, j + 1, k + 1);
-						player->Resources[i] = LuaToNumber(l, -1);
+						this->Resources[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
 						break;
 					}
@@ -203,17 +201,18 @@ static int CclPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
+			const int subargs = lua_objlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
 
+				int i;
 				for (i = 0; i < MaxCosts; ++i) {
 					if (!strcmp(value, DefaultResourceNames[i].c_str())) {
 						lua_rawgeti(l, j + 1, k + 1);
-						player->MaxResources[i] = LuaToNumber(l, -1);
+						this->MaxResources[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
 						break;
 					}
@@ -226,17 +225,18 @@ static int CclPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
+			const int subargs = lua_objlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
 
+				int i;
 				for (i = 0; i < MaxCosts; ++i) {
 					if (!strcmp(value, DefaultResourceNames[i].c_str())) {
 						lua_rawgeti(l, j + 1, k + 1);
-						player->LastResources[i] = LuaToNumber(l, -1);
+						this->LastResources[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
 						break;
 					}
@@ -249,17 +249,18 @@ static int CclPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
+			const int subargs = lua_objlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
 
+				int i;
 				for (i = 0; i < MaxCosts; ++i) {
 					if (!strcmp(value, DefaultResourceNames[i].c_str())) {
 						lua_rawgeti(l, j + 1, k + 1);
-						player->Incomes[i] = LuaToNumber(l, -1);
+						this->Incomes[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
 						break;
 					}
@@ -272,17 +273,18 @@ static int CclPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
+			const int subargs = lua_objlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
 
+				int i;
 				for (i = 0; i < MaxCosts; ++i) {
 					if (!strcmp(value, DefaultResourceNames[i].c_str())) {
 						lua_rawgeti(l, j + 1, k + 1);
-						player->Revenue[i] = LuaToNumber(l, -1);
+						this->Revenue[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
 						break;
 					}
@@ -292,73 +294,69 @@ static int CclPlayer(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "ai-enabled")) {
-			player->AiEnabled = 1;
+			this->AiEnabled = true;
 			--j;
 		} else if (!strcmp(value, "ai-disabled")) {
-			player->AiEnabled = 0;
+			this->AiEnabled = false;
 			--j;
 		} else if (!strcmp(value, "supply")) {
-			player->Supply = LuaToNumber(l, j + 1);
+			this->Supply = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "demand")) {
-			player->Demand = LuaToNumber(l, j + 1);
+			this->Demand = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "unit-limit")) {
-			player->UnitLimit = LuaToNumber(l, j + 1);
+			this->UnitLimit = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "building-limit")) {
-			player->BuildingLimit = LuaToNumber(l, j + 1);
+			this->BuildingLimit = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "total-unit-limit")) {
-			player->TotalUnitLimit = LuaToNumber(l, j + 1);
+			this->TotalUnitLimit = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "score")) {
-			player->Score = LuaToNumber(l, j + 1);
+			this->Score = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "total-units")) {
-			player->TotalUnits = LuaToNumber(l, j + 1);
+			this->TotalUnits = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "total-buildings")) {
-			player->TotalBuildings = LuaToNumber(l, j + 1);
+			this->TotalBuildings = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "total-razings")) {
-			player->TotalRazings = LuaToNumber(l, j + 1);
+			this->TotalRazings = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "total-kills")) {
-			player->TotalKills = LuaToNumber(l, j + 1);
+			this->TotalKills = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "total-resources")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, j + 1);
+			const int subargs = lua_objlen(l, j + 1);
 			if (subargs != MaxCosts) {
-				LuaError(l, "Wrong number of total-resources: %d" _C_ i);
+				LuaError(l, "Wrong number of total-resources: %d" _C_ subargs);
 			}
-			for (k = 0; k < subargs; ++k) {
+			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
-				player->TotalResources[k] = LuaToNumber(l, -1);
+				this->TotalResources[k] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "color")) {
-			int r;
-			int g;
-			int b;
-
 			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
-			r = LuaToNumber(l, -1);
+			const int r = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, j + 1, 2);
-			g = LuaToNumber(l, -1);
+			const int g = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, j + 1, 3);
-			b = LuaToNumber(l, -1);
+			const int b = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-			player->Color = Video.MapRGB(TheScreen->format, r, g, b);
+			this->Color = Video.MapRGB(TheScreen->format, r, g, b);
 		} else if (!strcmp(value, "timers")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, j + 1);
+			const int subargs = lua_objlen(l, j + 1);
 			if (subargs != UpgradeMax) {
-				LuaError(l, "Wrong upgrade timer length: %d" _C_ i);
+				LuaError(l, "Wrong upgrade timer length: %d" _C_ subargs);
 			}
-			for (k = 0; k < subargs; ++k) {
+			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
-				player->UpgradeTimers.Upgrades[k] = LuaToNumber(l, -1);
+				this->UpgradeTimers.Upgrades[k] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			}
 		} else {
@@ -367,9 +365,8 @@ static int CclPlayer(lua_State *l)
 	}
 	// Manage max
 	for (int i = 0; i < MaxCosts; ++i) {
-		player->SetResource(i, player->Resources[i]);
+		this->SetResource(i, this->Resources[i]);
 	}
-	return 0;
 }
 
 /**

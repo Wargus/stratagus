@@ -763,14 +763,14 @@ int HandleCheats(const std::string &input)
 			// for human players.  We can't switch back to a human player or
 			// we'll be using the wrong ref counts.
 #if 0
-			ThisPlayer->AiEnabled = 0;
+			ThisPlayer->AiEnabled = false;
 			ThisPlayer->Type = PlayerPerson;
 			SetMessage("AI is off, Normal Player");
 #else
 			SetMessage("Cannot disable 'ai me' cheat");
 #endif
 		} else {
-			ThisPlayer->AiEnabled = 1;
+			ThisPlayer->AiEnabled = true;
 			ThisPlayer->Type = PlayerComputer;
 			if (!ThisPlayer->Ai) {
 				AiInit(*ThisPlayer);

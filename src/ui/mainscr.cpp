@@ -1547,8 +1547,7 @@ static void DrawInfoPanelNoneSelected()
 	label.Draw(x + 110, y, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
 	y += 20;
 
-	if( y + PlayerMax * GetGameFont()->Height() > Video.Height )
-	{
+	if (y + PlayerMax * GetGameFont()->Height() > Video.Height) {
 		x = 16;
 		y = 30;
 	}
@@ -1556,9 +1555,9 @@ static void DrawInfoPanelNoneSelected()
 	GetDefaultTextColors(nc, rc);
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		if (Players[i].Type != PlayerNobody) {
-			if (ThisPlayer->Allied & (1 << Players[i].Index)) {
+			if (ThisPlayer->IsAllied(Players[i])) {
 				label.SetNormalColor(FontGreen);
-			} else if (ThisPlayer->Enemy & (1 << Players[i].Index)) {
+			} else if (ThisPlayer->IsEnemy(Players[i])) {
 				label.SetNormalColor(FontRed);
 			} else {
 				label.SetNormalColor(nc);

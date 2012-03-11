@@ -360,7 +360,7 @@ static int AiFindHallPlace(const CUnit &worker,
 
 					for (j = 0; j < nunits; ++j) {
 						// Enemy near mine
-						if (AiPlayer->Player->Enemy &  (1 << units[j]->Player->Index)) {
+						if (AiPlayer->Player->IsEnemy(*units[j]->Player)) {
 							break;
 						}
 						// Town hall near mine

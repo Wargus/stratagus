@@ -858,11 +858,8 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 		if (!blocker.IsIdle()) {
 			continue;
 		}
-		if (blocker.Player != unit.Player) {
-			// Not allied
-			if (!(blocker.Player->Allied & (1 << unit.Player->Index))) {
-				continue;
-			}
+		if (blocker.Player != unit.Player && blocker.Player->IsAllied(*unit.Player) == false) {
+			continue;
 		}
 		const CUnitType &blockertype = *blocker.Type;
 

@@ -25,7 +25,7 @@ class CPlayer
 	const int Revenue[MaxCosts];
 
 	const int UnitTypesCount[UnitTypeMax];
-	int AiEnabled;
+	bool AiEnabled;
 
 	CUnit *Units[UnitMax];
 	int TotalNumUnits;

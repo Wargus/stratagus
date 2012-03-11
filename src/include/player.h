@@ -53,7 +53,7 @@ class CUnit;
 class CUnitType;
 class PlayerAi;
 class CFile;
-
+struct lua_State;
 
 /*----------------------------------------------------------------------------
 --  Player type
@@ -72,9 +72,6 @@ public:
 
 	// friend enemy detection
 	int      Team;          /// team of player
-	unsigned int Enemy;         /// enemy bit field for this player
-	unsigned int Allied;        /// allied bit field for this player
-	unsigned int SharedVision;  /// shared vision bit field
 
 	Vec2i StartPos;  /// map tile start position
 
@@ -89,7 +86,7 @@ public:
 	// FIXME: shouldn't use the constant
 	int UnitTypesCount[UnitTypeMax];  /// total units of unit-type
 
-	int   AiEnabled;       /// handle AI on local computer
+	bool AiEnabled;        /// handle AI on local computer
 	PlayerAi *Ai;          /// Ai structure pointer
 
 	CUnit *Units[UnitMax]; /// units of this player
@@ -170,12 +167,29 @@ public:
 	bool IsEnemy(const CUnit &unit) const;
 	bool IsAllied(const CPlayer &player) const;
 	bool IsAllied(const CUnit &unit) const;
+	bool IsVisionSharing() const;
 	bool IsSharedVision(const CPlayer &player) const;
 	bool IsSharedVision(const CUnit &unit) const;
 	bool IsBothSharedVision(const CPlayer &player) const;
 	bool IsBothSharedVision(const CUnit &unit) const;
 	bool IsTeamed(const CPlayer &player) const;
 	bool IsTeamed(const CUnit &unit) const;
+
+	void SetDiplomacyNeutralWith(const CPlayer &player);
+	void SetDiplomacyAlliedWith(const CPlayer &player);
+	void SetDiplomacyEnemyWith(const CPlayer &player);
+	void SetDiplomacyCrazyWith(const CPlayer &player);
+
+	void ShareVisionWith(const CPlayer &player);
+	void UnshareVisionWith(const CPlayer &player);
+
+	void Init(/* PlayerTypes */ int type);
+	void Save(CFile &file) const;
+	void Load(lua_State *l);
+private:
+	unsigned int Enemy;         /// enemy bit field for this player
+	unsigned int Allied;        /// allied bit field for this player
+	unsigned int SharedVision;  /// shared vision bit field
 };
 
 /**

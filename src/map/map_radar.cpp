@@ -59,20 +59,18 @@ IsTileRadarVisible(const CPlayer &pradar, const CPlayer &punit, const CMapField 
 	}
 
 	int p = pradar.Index;
-	if (pradar.SharedVision) {
+	if (pradar.IsVisionSharing()) {
 		const unsigned char *const radar = mf.Radar;
 		const unsigned char *const jamming = mf.RadarJammer;
 		unsigned char radarvision = 0;
 		// Check jamming first, if we are jammed, exit
-		for (int i = 0, mask = 1; i < PlayerMax; ++i, mask = (1 << i)) {
-			if(i != p) {
-				if (jamming[i] > 0 && (punit.SharedVision & mask) &&
-						(Players[i].SharedVision & (1 << punit.Index))) {
+		for (int i = 0; i < PlayerMax; ++i) {
+			if (i != p) {
+				if (jamming[i] > 0 && punit.IsBothSharedVision(Players[i])) {
 					// We are jammed, return nothing
 					return 0;
 				}
-				if (radar[i] > 0 && (pradar.SharedVision & mask) &&
-						(Players[i].SharedVision & (1 << p))) {
+				if (radar[i] > 0 && pradar.IsBothSharedVision(Players[i])) {
 					radarvision |= radar[i];
 				}
 			}

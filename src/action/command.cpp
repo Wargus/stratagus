@@ -810,23 +810,18 @@ void CommandDiplomacy(int player, int state, int opponent)
 {
 	switch (state) {
 		case DiplomacyNeutral:
-			Players[player].Enemy &= ~(1 << opponent);
-			Players[player].Allied &= ~(1 << opponent);
+			Players[player].SetDiplomacyNeutralWith(Players[opponent]);
 			break;
 		case DiplomacyAllied:
-			Players[player].Enemy &= ~(1 << opponent);
-			Players[player].Allied |= 1 << opponent;
+			Players[player].SetDiplomacyAlliedWith(Players[opponent]);
 			break;
 		case DiplomacyEnemy:
-			Players[player].Enemy |= 1 << opponent;
-			Players[player].Allied &= ~(1 << opponent);
+			Players[player].SetDiplomacyEnemyWith(Players[opponent]);
 			break;
 		case DiplomacyCrazy:
-			Players[player].Enemy |= 1 << opponent;
-			Players[player].Allied |= 1 << opponent;
+			Players[player].SetDiplomacyCrazyWith(Players[opponent]);
 			break;
 	}
-	// FIXME: Should we display a message?
 }
 
 /**
@@ -848,9 +843,9 @@ void CommandSharedVision(int player, bool state, int opponent)
 	// Compute Before and after.
 	const int before = Players[player].IsBothSharedVision(Players[opponent]);
 	if (state == false) {
-		Players[player].SharedVision &= ~(1 << opponent);
+		Players[player].UnshareVisionWith(Players[opponent]);
 	} else {
-		Players[player].SharedVision |= (1 << opponent);
+		Players[player].ShareVisionWith(Players[opponent]);
 	}
 	const int after = Players[player].IsBothSharedVision(Players[opponent]);
 
@@ -897,10 +892,8 @@ void CommandQuit(int player)
 	Players[player].Type = PlayerNeutral;
 	for (int i = 0; i < NumPlayers; ++i) {
 		if (i != player && Players[i].Team != Players[player].Team) {
-			Players[i].Allied &= ~(1 << player);
-			Players[i].Enemy &= ~(1 << player);
-			Players[player].Enemy &= ~(1 << i);
-			Players[player].Allied &= ~(1 << i);
+			Players[i].SetDiplomacyNeutralWith(Players[player]);
+			Players[player].SetDiplomacyNeutralWith(Players[i]);
 			//  We clear Shared vision by sending fake shared vision commands.
 			//  We do this because Shared vision is a bit complex.
 			CommandSharedVision(i, 0, player);

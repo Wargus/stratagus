@@ -397,134 +397,139 @@ void CleanRaces()
 */
 void SavePlayers(CFile &file)
 {
-	Uint8 r, g, b;
-
 	file.printf("\n--------------------------------------------\n");
 	file.printf("--- MODULE: players\n\n");
 
 	//  Dump all players
 	for (int i = 0; i < NumPlayers; ++i) {
-		const CPlayer &p = Players[i];
-		file.printf("Player(%d,\n", i);
-		file.printf("  \"name\", \"%s\",\n", p.Name.c_str());
-		file.printf("  \"type\", ");
-		switch (p.Type) {
-			case PlayerNeutral:       file.printf("\"neutral\",");         break;
-			case PlayerNobody:        file.printf("\"nobody\",");          break;
-			case PlayerComputer:      file.printf("\"computer\",");        break;
-			case PlayerPerson:        file.printf("\"person\",");          break;
-			case PlayerRescuePassive: file.printf("\"rescue-passive\",");break;
-			case PlayerRescueActive:  file.printf("\"rescue-active\","); break;
-			default:                  file.printf("%d,", p.Type);break;
-		}
-		file.printf(" \"race\", \"%s\",", PlayerRaces.Name[p.Race].c_str());
-		file.printf(" \"ai-name\", \"%s\",\n", p.AiName.c_str());
-		file.printf("  \"team\", %d,", p.Team);
-
-		file.printf(" \"enemy\", \"");
-		for (int j = 0; j < PlayerMax; ++j) {
-			file.printf("%c",(p.Enemy & (1 << j)) ? 'X' : '_');
-		}
-		file.printf("\", \"allied\", \"");
-		for (int j = 0; j < PlayerMax; ++j) {
-			file.printf("%c", (p.Allied & (1 << j)) ? 'X' : '_');
-		}
-		file.printf("\", \"shared-vision\", \"");
-		for (int j = 0; j < PlayerMax; ++j) {
-			file.printf("%c", (p.SharedVision & (1 << j)) ? 'X' : '_');
-		}
-		file.printf("\",\n  \"start\", {%d, %d},\n", p.StartPos.x, p.StartPos.y);
-
-		// Resources
-		file.printf("  \"resources\", {");
-		for (int j = 0; j < MaxCosts; ++j) {
-			file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.Resources[j]);
-		}
-		// Max Resources
-		file.printf("},\n  \"max-resources\", {");
-		for (int j = 0; j < MaxCosts; ++j) {
-			file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.MaxResources[j]);
-		}
-		// Last Resources
-		file.printf("},\n  \"last-resources\", {");
-		for (int j = 0; j < MaxCosts; ++j) {
-			file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.LastResources[j]);
-		}
-		// Incomes
-		file.printf("},\n  \"incomes\", {");
-		for (int j = 0; j < MaxCosts; ++j) {
-			if (j) {
-				if (j == MaxCosts / 2) {
-					file.printf("\n ");
-				} else {
-					file.printf(" ");
-				}
-			}
-			file.printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), p.Incomes[j]);
-		}
-		// Revenue
-		file.printf("},\n  \"revenue\", {");
-		for (int j = 0; j < MaxCosts; ++j) {
-			if (j) {
-				if (j == MaxCosts / 2) {
-					file.printf("\n ");
-				} else {
-					file.printf(" ");
-				}
-			}
-			file.printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), p.Revenue[j]);
-		}
-
-		// UnitTypesCount done by load units.
-
-		file.printf("},\n  \"%s\",\n", p.AiEnabled ? "ai-enabled" : "ai-disabled");
-
-		// Ai done by load ais.
-		// Units done by load units.
-		// TotalNumUnits done by load units.
-		// NumBuildings done by load units.
-
-		file.printf(" \"supply\", %d,", p.Supply);
-		file.printf(" \"unit-limit\", %d,", p.UnitLimit);
-		file.printf(" \"building-limit\", %d,", p.BuildingLimit);
-		file.printf(" \"total-unit-limit\", %d,", p.TotalUnitLimit);
-
-		file.printf("\n  \"score\", %d,", p.Score);
-		file.printf("\n  \"total-units\", %d,", p.TotalUnits);
-		file.printf("\n  \"total-buildings\", %d,", p.TotalBuildings);
-		file.printf("\n  \"total-resources\", {");
-		for (int j = 0; j < MaxCosts; ++j) {
-			if (j) {
-				file.printf(" ");
-			}
-			file.printf("%d,", p.TotalResources[j]);
-		}
-		file.printf("},");
-		file.printf("\n  \"total-razings\", %d,", p.TotalRazings);
-		file.printf("\n  \"total-kills\", %d,", p.TotalKills);
-
-		SDL_GetRGB(p.Color, TheScreen->format, &r, &g, &b);
-		file.printf("\n  \"color\", { %d, %d, %d },", r, g, b);
-
-		// UnitColors done by init code.
-		// Allow saved by allow.
-
-		file.printf("\n  \"timers\", {");
-		for (int j = 0; j < UpgradeMax; ++j) {
-			if (j) {
-				file.printf(" ,");
-			}
-			file.printf("%d", p.UpgradeTimers.Upgrades[j]);
-		}
-		file.printf("}");
-
-		file.printf(")\n\n");
+		Players[i].Save(file);
 	}
 
-	DebugPrint("FIXME: must save unit-stats?\n");
-
-	//  Dump local variables
 	file.printf("SetThisPlayer(%d)\n\n", ThisPlayer->Index);
+}
+
+
+void CPlayer::Save(CFile &file) const
+{
+	const CPlayer &p = *this;
+	file.printf("Player(%d,\n", this->Index);
+	file.printf("  \"name\", \"%s\",\n", p.Name.c_str());
+	file.printf("  \"type\", ");
+	switch (p.Type) {
+		case PlayerNeutral:       file.printf("\"neutral\",");         break;
+		case PlayerNobody:        file.printf("\"nobody\",");          break;
+		case PlayerComputer:      file.printf("\"computer\",");        break;
+		case PlayerPerson:        file.printf("\"person\",");          break;
+		case PlayerRescuePassive: file.printf("\"rescue-passive\",");break;
+		case PlayerRescueActive:  file.printf("\"rescue-active\","); break;
+		default:                  file.printf("%d,", p.Type);break;
+	}
+	file.printf(" \"race\", \"%s\",", PlayerRaces.Name[p.Race].c_str());
+	file.printf(" \"ai-name\", \"%s\",\n", p.AiName.c_str());
+	file.printf("  \"team\", %d,", p.Team);
+
+	file.printf(" \"enemy\", \"");
+	for (int j = 0; j < PlayerMax; ++j) {
+		file.printf("%c",(p.Enemy & (1 << j)) ? 'X' : '_');
+	}
+	file.printf("\", \"allied\", \"");
+	for (int j = 0; j < PlayerMax; ++j) {
+		file.printf("%c", (p.Allied & (1 << j)) ? 'X' : '_');
+	}
+	file.printf("\", \"shared-vision\", \"");
+	for (int j = 0; j < PlayerMax; ++j) {
+		file.printf("%c", (p.SharedVision & (1 << j)) ? 'X' : '_');
+	}
+	file.printf("\",\n  \"start\", {%d, %d},\n", p.StartPos.x, p.StartPos.y);
+
+	// Resources
+	file.printf("  \"resources\", {");
+	for (int j = 0; j < MaxCosts; ++j) {
+		file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.Resources[j]);
+	}
+	// Max Resources
+	file.printf("},\n  \"max-resources\", {");
+	for (int j = 0; j < MaxCosts; ++j) {
+		file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.MaxResources[j]);
+	}
+	// Last Resources
+	file.printf("},\n  \"last-resources\", {");
+	for (int j = 0; j < MaxCosts; ++j) {
+		file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.LastResources[j]);
+	}
+	// Incomes
+	file.printf("},\n  \"incomes\", {");
+	for (int j = 0; j < MaxCosts; ++j) {
+		if (j) {
+			if (j == MaxCosts / 2) {
+				file.printf("\n ");
+			} else {
+				file.printf(" ");
+			}
+		}
+		file.printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), p.Incomes[j]);
+	}
+	// Revenue
+	file.printf("},\n  \"revenue\", {");
+	for (int j = 0; j < MaxCosts; ++j) {
+		if (j) {
+			if (j == MaxCosts / 2) {
+				file.printf("\n ");
+			} else {
+				file.printf(" ");
+			}
+		}
+		file.printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), p.Revenue[j]);
+	}
+
+	// UnitTypesCount done by load units.
+
+	file.printf("},\n  \"%s\",\n", p.AiEnabled ? "ai-enabled" : "ai-disabled");
+
+	// Ai done by load ais.
+	// Units done by load units.
+	// TotalNumUnits done by load units.
+	// NumBuildings done by load units.
+
+	file.printf(" \"supply\", %d,", p.Supply);
+	file.printf(" \"unit-limit\", %d,", p.UnitLimit);
+	file.printf(" \"building-limit\", %d,", p.BuildingLimit);
+	file.printf(" \"total-unit-limit\", %d,", p.TotalUnitLimit);
+
+	file.printf("\n  \"score\", %d,", p.Score);
+	file.printf("\n  \"total-units\", %d,", p.TotalUnits);
+	file.printf("\n  \"total-buildings\", %d,", p.TotalBuildings);
+	file.printf("\n  \"total-resources\", {");
+	for (int j = 0; j < MaxCosts; ++j) {
+		if (j) {
+			file.printf(" ");
+		}
+		file.printf("%d,", p.TotalResources[j]);
+	}
+	file.printf("},");
+	file.printf("\n  \"total-razings\", %d,", p.TotalRazings);
+	file.printf("\n  \"total-kills\", %d,", p.TotalKills);
+
+	Uint8 r, g, b;
+
+	SDL_GetRGB(p.Color, TheScreen->format, &r, &g, &b);
+	file.printf("\n  \"color\", { %d, %d, %d },", r, g, b);
+
+	// UnitColors done by init code.
+	// Allow saved by allow.
+
+	file.printf("\n  \"timers\", {");
+	for (int j = 0; j < UpgradeMax; ++j) {
+		if (j) {
+			file.printf(" ,");
+		}
+		file.printf("%d", p.UpgradeTimers.Upgrades[j]);
+	}
+	file.printf("}");
+
+	file.printf(")\n\n");
+
+	DebugPrint("FIXME: must save unit-stats?\n");
 }
 
 /**
@@ -540,17 +545,22 @@ void CreatePlayer(int type)
 	CPlayer &player = Players[NumPlayers];
 	player.Index = NumPlayers;
 
+	player.Init(type);
+}
+
+void CPlayer::Init(/* PlayerTypes */ int type)
+{
 	//  Allocate memory for the "list" of this player's units.
 	//  FIXME: brutal way, as we won't need UnitMax for this player...
 	//  FIXME: ARI: is this needed for 'PlayerNobody' ??
 	//  FIXME: A: Johns: currently we need no init for the nobody player.
-	memset(player.Units, 0, sizeof (player.Units));
+	memset(this->Units, 0, sizeof (this->Units));
 
 	//  Take first slot for person on this computer,
 	//  fill other with computer players.
 	if (type == PlayerPerson && !NetPlayers) {
 		if (!ThisPlayer) {
-			ThisPlayer = &player;
+			ThisPlayer = this;
 		} else {
 			type = PlayerComputer;
 		}
@@ -577,31 +587,31 @@ void CreatePlayer(int type)
 		case PlayerNobody:
 		default:
 			team = 0;
-			player.SetName("Neutral");
+			this->SetName("Neutral");
 			break;
 		case PlayerComputer:
 			team = 1;
-			player.SetName("Computer");
+			this->SetName("Computer");
 			break;
 		case PlayerPerson:
 			team = 2 + NumPlayers;
-			player.SetName("Person");
+			this->SetName("Person");
 			break;
 		case PlayerRescuePassive:
 		case PlayerRescueActive:
 			// FIXME: correct for multiplayer games?
-			player.SetName("Computer");
+			this->SetName("Computer");
 			team = 2 + NumPlayers;
 			break;
 	}
-	DebugPrint("CreatePlayer name %s\n" _C_ player.Name.c_str());
+	DebugPrint("CreatePlayer name %s\n" _C_ this->Name.c_str());
 
-	player.Type = type;
-	player.Race = 0;
-	player.Team = team;
-	player.Enemy = 0;
-	player.Allied = 0;
-	player.AiName = "ai-passive";
+	this->Type = type;
+	this->Race = 0;
+	this->Team = team;
+	this->Enemy = 0;
+	this->Allied = 0;
+	this->AiName = "ai-passive";
 
 	//  Calculate enemy/allied mask.
 	for (int i = 0; i < NumPlayers; ++i) {
@@ -613,11 +623,11 @@ void CreatePlayer(int type)
 			case PlayerComputer:
 				// Computer allied with computer and enemy of all persons.
 				if (Players[i].Type == PlayerComputer) {
-					player.Allied |= (1 << i);
+					this->Allied |= (1 << i);
 					Players[i].Allied |= (1 << NumPlayers);
 				} else if (Players[i].Type == PlayerPerson ||
 						Players[i].Type == PlayerRescueActive) {
-					player.Enemy |= (1 << i);
+					this->Enemy |= (1 << i);
 					Players[i].Enemy |= (1 << NumPlayers);
 				}
 				break;
@@ -625,28 +635,28 @@ void CreatePlayer(int type)
 				// Humans are enemy of all?
 				if (Players[i].Type == PlayerComputer ||
 						Players[i].Type == PlayerPerson) {
-					player.Enemy |= (1 << i);
+					this->Enemy |= (1 << i);
 					Players[i].Enemy |= (1 << NumPlayers);
 				} else if (Players[i].Type == PlayerRescueActive ||
 						Players[i].Type == PlayerRescuePassive) {
-					player.Allied |= (1 << i);
+					this->Allied |= (1 << i);
 					Players[i].Allied |= (1 << NumPlayers);
 				}
 				break;
 			case PlayerRescuePassive:
 				// Rescue passive are allied with persons
 				if (Players[i].Type == PlayerPerson) {
-					player.Allied |= (1 << i);
+					this->Allied |= (1 << i);
 					Players[i].Allied |= (1 << NumPlayers);
 				}
 				break;
 			case PlayerRescueActive:
 				// Rescue active are allied with persons and enemies of computer
 				if (Players[i].Type == PlayerComputer) {
-					player.Enemy |= (1 << i);
+					this->Enemy |= (1 << i);
 					Players[i].Enemy |= (1 << NumPlayers);
 				} else if (Players[i].Type == PlayerPerson) {
-					player.Allied |= (1 << i);
+					this->Allied |= (1 << i);
 					Players[i].Allied |= (1 << NumPlayers);
 				}
 				break;
@@ -655,29 +665,29 @@ void CreatePlayer(int type)
 
 	//  Initial default incomes.
 	for (int i = 0; i < MaxCosts; ++i) {
-		player.Incomes[i] = DefaultIncomes[i];
+		this->Incomes[i] = DefaultIncomes[i];
 	}
 
 	//  Initial max resource amounts.
 	for (int i = 0; i < MaxCosts; ++i) {
-		player.MaxResources[i] = DefaultResourceMaxAmounts[i];
+		this->MaxResources[i] = DefaultResourceMaxAmounts[i];
 	}
 
-	memset(player.UnitTypesCount, 0, sizeof (player.UnitTypesCount));
+	memset(this->UnitTypesCount, 0, sizeof (this->UnitTypesCount));
 
-	player.Supply = 0;
-	player.Demand = 0;
-	player.NumBuildings = 0;
-	player.TotalNumUnits = 0;
-	player.Score = 0;
+	this->Supply = 0;
+	this->Demand = 0;
+	this->NumBuildings = 0;
+	this->TotalNumUnits = 0;
+	this->Score = 0;
 
-	player.Color = PlayerColors[NumPlayers][0];
+	this->Color = PlayerColors[NumPlayers][0];
 
 	if (Players[NumPlayers].Type == PlayerComputer ||
 			Players[NumPlayers].Type == PlayerRescueActive) {
-		player.AiEnabled = 1;
+		this->AiEnabled = true;
 	} else {
-		player.AiEnabled = 0;
+		this->AiEnabled = false;
 	}
 	++NumPlayers;
 }
@@ -717,7 +727,7 @@ void CPlayer::Clear()
 	memset(Incomes, 0, sizeof(Incomes));
 	memset(Revenue, 0, sizeof(Revenue));
 	memset(UnitTypesCount, 0, sizeof(UnitTypesCount));
-	AiEnabled = 0;
+	AiEnabled = false;
 	Ai = 0;
 	memset(Units, 0, sizeof(Units));
 	TotalNumUnits = 0;
@@ -1131,6 +1141,40 @@ void CPlayer::Notify(const char *fmt, ...) const
 	}
 }
 
+void CPlayer::SetDiplomacyNeutralWith(const CPlayer &player)
+{
+	this->Enemy &= ~(1 << player.Index);
+	this->Allied &= ~(1 << player.Index);
+}
+
+void CPlayer::SetDiplomacyAlliedWith(const CPlayer &player)
+{
+	this->Enemy &= ~(1 << player.Index);
+	this->Allied |= 1 << player.Index;
+}
+
+void CPlayer::SetDiplomacyEnemyWith(const CPlayer &player)
+{
+	this->Enemy |= 1 << player.Index;
+	this->Allied &= ~(1 << player.Index);
+}
+
+void CPlayer::SetDiplomacyCrazyWith(const CPlayer &player)
+{
+	this->Enemy |= 1 << player.Index;
+	this->Allied |= 1 << player.Index;
+}
+
+void CPlayer::ShareVisionWith(const CPlayer &player)
+{
+	this->SharedVision |= (1 << player.Index);
+}
+
+void CPlayer::UnshareVisionWith(const CPlayer &player)
+{
+	this->SharedVision &= ~(1 << player.Index);
+}
+
 
 /**
 **  Check if the player is an enemy
@@ -1162,6 +1206,12 @@ bool CPlayer::IsAllied(const CPlayer &player) const
 bool CPlayer::IsAllied(const CUnit &unit) const
 {
 	return IsAllied(*unit.Player);
+}
+
+
+bool CPlayer::IsVisionSharing() const
+{
+	return SharedVision != 0;
 }
 
 /**

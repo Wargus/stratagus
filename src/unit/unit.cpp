@@ -3176,17 +3176,17 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 /**
 **  Check if the player is an enemy
 **
-**  @param x  Player to check
+**  @param player  Player to check
 */
 bool CUnit::IsEnemy(const CPlayer &player) const
 {
-	return (this->Player->Enemy & (1 << player.Index)) != 0;
+	return this->Player->IsEnemy(player);
 }
 
 /**
 **  Check if the unit is an enemy
 **
-**  @param x  Unit to check
+**  @param unit  Unit to check
 */
 bool CUnit::IsEnemy(const CUnit &unit) const
 {
@@ -3196,11 +3196,11 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 /**
 **  Check if the player is an ally
 **
-**  @param x  Player to check
+**  @param player  Player to check
 */
 bool CUnit::IsAllied(const CPlayer &player) const
 {
-	return (this->Player->Allied & (1 << player.Index)) != 0;
+	return this->Player->IsAllied(player);
 }
 
 /**
@@ -3220,7 +3220,7 @@ bool CUnit::IsAllied(const CUnit &unit) const
 */
 bool CUnit::IsSharedVision(const CPlayer &player) const
 {
-	return (this->Player->SharedVision & (1 << player.Index)) != 0;
+	return this->Player->IsSharedVision(player);
 }
 
 /**
@@ -3240,8 +3240,7 @@ bool CUnit::IsSharedVision(const CUnit &unit) const
 */
 bool CUnit::IsBothSharedVision(const CPlayer &player) const
 {
-	return (this->Player->SharedVision & (1 << player.Index)) != 0 &&
-		(player.SharedVision & (1 << this->Player->Index)) != 0;
+	return this->Player->IsBothSharedVision(player);
 }
 
 /**

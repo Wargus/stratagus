@@ -453,9 +453,9 @@ static void GameTypeTopVsBottom()
 
 			if (top_i == top_j) {
 				CommandDiplomacy(i, DiplomacyAllied, j);
-				Players[i].SharedVision |= (1 << j);
+				Players[i].ShareVisionWith(Players[j]);
 				CommandDiplomacy(j, DiplomacyAllied, i);
-				Players[j].SharedVision |= (1 << i);
+				Players[j].ShareVisionWith(Players[i]);
 			} else {
 				CommandDiplomacy(i, DiplomacyEnemy, j);
 				CommandDiplomacy(j, DiplomacyEnemy, i);
@@ -479,9 +479,9 @@ static void GameTypeLeftVsRight()
 
 			if (left_i ==left_j) {
 				CommandDiplomacy(i, DiplomacyAllied, j);
-				Players[i].SharedVision |= (1 << j);
+				Players[i].ShareVisionWith(Players[j]);
 				CommandDiplomacy(j, DiplomacyAllied, i);
-				Players[j].SharedVision |= (1 << i);
+				Players[j].ShareVisionWith(Players[i]);
 			} else {
 				CommandDiplomacy(i, DiplomacyEnemy, j);
 				CommandDiplomacy(j, DiplomacyEnemy, i);
@@ -505,9 +505,9 @@ static void GameTypeManVsMachine()
 			}
 			if (Players[i].Type == Players[j].Type) {
 				CommandDiplomacy(i, DiplomacyAllied, j);
-				Players[i].SharedVision |= (1 << j);
+				Players[i].ShareVisionWith(Players[j]);
 				CommandDiplomacy(j, DiplomacyAllied, i);
-				Players[j].SharedVision |= (1 << i);
+				Players[j].ShareVisionWith(Players[i]);
 			} else {
 				CommandDiplomacy(i, DiplomacyEnemy, j);
 				CommandDiplomacy(j, DiplomacyEnemy, i);
@@ -529,7 +529,7 @@ static void GameTypeManTeamVsMachine()
 			if (i != j) {
 				if (Players[i].Type == Players[j].Type) {
 					CommandDiplomacy(i, DiplomacyAllied, j);
-					Players[i].SharedVision |= (1 << j);
+					Players[i].ShareVisionWith(Players[j]);
 				} else {
 					CommandDiplomacy(i, DiplomacyEnemy, j);
 				}
