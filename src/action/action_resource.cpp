@@ -1075,18 +1075,17 @@ bool COrder_Resource::ActionResourceInit(CUnit &unit)
 		return false;
 	}
 	this->CurrentResource = newres;
-	if (goal && this->Resource.Mine != goal) {
-		CUnit *mine = this->Resource.Mine;
+	CUnit *mine = this->Resource.Mine;
 
-		if (mine) {
-			unit.DeAssignWorkerFromMine(*mine);
-			this->Resource.Mine = NULL;
-		}
-		if (goal->CurrentAction() != UnitActionBuilt) {
-			unit.AssignWorkerToMine(*goal);
-			this->Resource.Mine = goal;
-		}
+	if (mine) {
+		unit.DeAssignWorkerFromMine(*mine);
+		this->Resource.Mine = NULL;
 	}
+	if (goal && goal->CurrentAction() != UnitActionBuilt) {
+		unit.AssignWorkerToMine(*goal);
+		this->Resource.Mine = goal;
+	}
+
 	UnitGotoGoal(unit, goal, SUB_MOVE_TO_RESOURCE);
 	return true;
 }
@@ -1100,6 +1099,9 @@ bool COrder_Resource::ActionResourceInit(CUnit &unit)
 */
 void COrder_Resource::Execute(CUnit &unit)
 {
+	// can be different by Cloning (trained unit)...
+	this->worker = &unit;
+
 	if (unit.Wait) {
 		// FIXME: show idle animation while we wait?
 		unit.Wait--;

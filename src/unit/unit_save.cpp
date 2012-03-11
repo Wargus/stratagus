@@ -272,6 +272,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf(" \"resource-active\", %d,", unit.Resource.Active);
 		file.printf(" \"resource-assigned\", %d,", unit.Resource.Assigned);
 		file.printf(" \"resource-workers\", \"%s\",", UnitReference(*unit.Resource.Workers).c_str());
+	} else {
+		Assert(unit.Resource.Active == 0);
+		Assert(unit.Resource.Assigned == 0);
 	}
 	file.printf(" \"rs\", %d,", unit.Rs);
 	file.printf(" \"units-boarded-count\", %d,", unit.BoardCount);
