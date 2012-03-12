@@ -939,7 +939,7 @@ void AiCanNotMove(CUnit &unit)
 
 	AiPlayer = unit.Player->Ai;
 	if (unit.Type->UnitType == UnitTypeFly
-		|| PlaceReachable(unit, goalPos.x, goalPos.y, gw, gh, minrange, maxrange)) {
+		|| PlaceReachable(unit, goalPos, gw, gh, minrange, maxrange)) {
 		// Path probably closed by unit here
 		AiMoveUnitInTheWay(unit);
 	}

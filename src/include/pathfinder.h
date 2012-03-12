@@ -163,7 +163,7 @@ extern int NextPathElement(CUnit &unit, short int *xdp, short int *ydp);
 	/// Return distance to unit.
 extern int UnitReachable(const CUnit &unit, const CUnit &dst, int range);
 	/// Can the unit 'src' reach the place x,y
-extern int PlaceReachable(const CUnit &src, int x, int y, int w, int h,
+extern int PlaceReachable(const CUnit &src, const Vec2i &pos, int w, int h,
 	int minrange, int maxrange);
 
 //

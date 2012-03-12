@@ -45,16 +45,15 @@
 //astar.cpp
 
 /// Init the a* data structures
-extern void InitAStar(int mapWidth, int mapHeight,
-	 int (STDCALL *costMoveTo)(unsigned int index, void *data));
+extern void InitAStar(int mapWidth, int mapHeight);
 
 /// free the a* data structures
 extern void FreeAStar();
 
 /// Find and a* path for a unit
-extern int AStarFindPath(int sx, int sy, int gx, int gy, int gw, int gh,
+extern int AStarFindPath(const Vec2i& startPos, const Vec2i& goalPos, int gw, int gh,
 	int tilesizex, int tilesizey, int minrange,
-	 int maxrange, char *path, int pathlen, void *data);
+	 int maxrange, char *path, int pathlen, const CUnit &unit);
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -80,7 +79,7 @@ static unsigned char Matrix[(MaxMapWidth + 2) * (MaxMapHeight + 3) + 2];  /// Pa
 */
 void InitPathfinder()
 {
-	InitAStar(Map.Info.MapWidth, Map.Info.MapHeight, NULL);
+	InitAStar(Map.Info.MapWidth, Map.Info.MapHeight);
 }
 
 /**
@@ -154,8 +153,7 @@ unsigned char *MakeMatrix()
 **  Can the unit 'src' reach the place x,y.
 **
 **  @param src       Unit for the path.
-**  @param x         Map X tile position.
-**  @param y         Map Y tile position.
+**  @param pos       Map tile position.
 **  @param w         Width of Goal
 **  @param h         Height of Goal
 **  @param minrange  min range to the tile
@@ -163,12 +161,12 @@ unsigned char *MakeMatrix()
 **
 **  @return          Distance to place.
 */
-int PlaceReachable(const CUnit &src, int x, int y, int w, int h,
-	 int minrange, int range)
+int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h,
+	int minrange, int range)
 {
-	int i = AStarFindPath(src.tilePos.x, src.tilePos.y, x, y, w, h,
+	int i = AStarFindPath(src.tilePos, goalPos, w, h,
 		src.Type->TileWidth, src.Type->TileHeight,
-		 minrange, range, NULL, 0, const_cast<CUnit*>(&src));
+		 minrange, range, NULL, 0, src);
 
 	switch (i) {
 		case PF_FAILED:
@@ -207,7 +205,7 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range)
 	//  Find a path to the goal.
 	if (src.Type->Building)
 		return 0;
-	const int depth = PlaceReachable(src, dst.tilePos.x, dst.tilePos.y,
+	const int depth = PlaceReachable(src, dst.tilePos,
 		dst.Type->TileWidth, dst.Type->TileHeight, 0, range);
 	if (depth <= 0) {
 		return 0;
@@ -302,13 +300,13 @@ PathFinderOutput::PathFinderOutput()
 static int NewPath(PathFinderInput& input, PathFinderOutput& output)
 {
 	char *path = output.Path;
-	int i = AStarFindPath(input.GetUnitPos().x, input.GetUnitPos().y,
-						input.GetGoalPos().x, input.GetGoalPos().y,
+	int i = AStarFindPath(input.GetUnitPos(),
+						input.GetGoalPos(),
 						input.GetGoalSize().x, input.GetGoalSize().y,
 						input.GetUnitSize().x, input.GetUnitSize().y,
 						input.GetMinRange(), input.GetMaxRange(),
 						path, PathFinderOutput::MAX_PATH_LENGTH,
-						input.GetUnit());
+						*input.GetUnit());
 	input.PathRacalculated();
 	if (i == PF_FAILED) {
 		i = PF_UNREACHABLE;
