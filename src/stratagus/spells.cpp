@@ -737,6 +737,10 @@ static bool PassCondition(const CUnit &caster, const SpellType *spell, const CUn
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) { // for custom variables
 		const CUnit *unit;
 
+		if (!condition->Variable[i].Check) {
+			continue;
+		}
+
 		unit = (condition->Variable[i].ConditionApplyOnCaster) ? &caster : target;
 		//  Spell should target location and have unit condition.
 		if (unit == NULL) {

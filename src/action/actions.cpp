@@ -621,11 +621,14 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 				CUnit *goal;
 				PixelPos start;
 				PixelPos dest;
-
-				if ((flags & ANIM_SM_RELTARGET) && unit.CurrentOrder()->HasGoal()) {
+				
+				if ((flags & ANIM_SM_RELTARGET)) {
 					goal = unit.CurrentOrder()->GetGoal();
 				} else {
 					goal = &unit;
+				}
+				if (!goal || goal->Destroyed || goal->Removed) {
+					break;
 				}
 				if ((flags & ANIM_SM_PIXEL)) {
 					start.x = goal->tilePos.x * PixelTileSize.x + goal->IX + startx;
@@ -634,15 +637,18 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 					start.x = (goal->tilePos.x + startx) * PixelTileSize.x + PixelTileSize.x / 2;
 					start.y = (goal->tilePos.y + starty) * PixelTileSize.y + PixelTileSize.y / 2;
 				}
-				if ((flags & ANIM_SM_TOTARGET) && goal->CurrentOrder()->HasGoal()) {
-					CUnit &target = *goal->CurrentOrder()->GetGoal();
-
+				if ((flags & ANIM_SM_TOTARGET)) {
+					CUnit *target = goal->CurrentOrder()->GetGoal();
+					Assert(goal->CurrentAction() == UnitActionAttack);
+					if (!target  || target->Destroyed || target->Removed) {
+						break;
+					}
 					if (flags & ANIM_SM_PIXEL) {
-						dest.x = target.tilePos.x * PixelTileSize.x + target.IX + destx;
-						dest.y = target.tilePos.y * PixelTileSize.y + target.IY + desty;
+						dest.x = target->tilePos.x * PixelTileSize.x + target->IX + destx;
+						dest.y = target->tilePos.y * PixelTileSize.y + target->IY + desty;
 					} else {
-						dest.x = (target.tilePos.x + destx) * PixelTileSize.x + target.Type->TileWidth * PixelTileSize.x / 2;
-						dest.y = (target.tilePos.y + desty) * PixelTileSize.y + target.Type->TileHeight * PixelTileSize.y / 2;
+						dest.x = (target->tilePos.x + destx) * PixelTileSize.x + target->Type->TileWidth * PixelTileSize.x / 2;
+						dest.y = (target->tilePos.y + desty) * PixelTileSize.y + target->Type->TileHeight * PixelTileSize.y / 2;
 					}
 				} else {
 					if ((flags & ANIM_SM_PIXEL)) {
@@ -661,11 +667,16 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 					Missile *missile = MakeMissile(*MissileTypeByIdent(unit.Anim.Anim->D.SpawnMissile.Missile), start, dest);
 					if (flags & ANIM_SM_DAMAGE) {
 						missile->SourceUnit = &unit;
+						unit.RefsIncrease();
 					}
-					if ((flags & ANIM_SM_TOTARGET) && goal->CurrentOrder()->HasGoal()) {
-						missile->TargetUnit = goal->CurrentOrder()->GetGoal();
-					} else {
-						missile->TargetUnit = goal;
+					if (!missile->Type->Range) {
+						if (flags & ANIM_SM_TOTARGET) {
+							missile->TargetUnit = goal->CurrentOrder()->GetGoal();
+							goal->CurrentOrder()->GetGoal()->RefsIncrease();
+						} else {
+							missile->TargetUnit = goal;
+							goal->RefsIncrease();
+						}
 					}
 				}
 				break;
@@ -836,15 +847,24 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 				break;
 			}
 			case AnimationDie:
-				if (unit.Anim.Anim->D.Die.DeathType[0] != '\0') {
-					unit.DamagedType = ExtraDeathIndex(unit.Anim.Anim->D.Die.DeathType);
+				if (unit.Anim.Unbreakable) {
+					fprintf(stderr, "Can't call \"die\" action in unbreakable section\n");
+					Exit(1);
+					return 0;
 				}
-				LetUnitDie(unit);
+				if (unit.Anim.Anim->D.Die.DeathType[0] != '\0') {
+					unit.DamagedType = ExtraDeathIndex(unit.Anim.Anim->D.Die.DeathType);				}
+				unit.CurrentOrder()->NeedToDie = true; 
 				return 0;
 
 			case AnimationRotate:
 				if (!strcmp(unit.Anim.Anim->D.Rotate.Rotate, "target") && unit.CurrentOrder()->HasGoal()) {
-					const CUnit &target = *unit.CurrentOrder()->GetGoal();
+					COrder &order = *unit.CurrentOrder();
+					const CUnit &target = *order.GetGoal();
+					if (target.Destroyed) {	
+						order.ClearGoal();
+						break;
+					}
 					const Vec2i pos = target.tilePos + target.Type->GetHalfTileSize() - unit.tilePos;
 					UnitHeadingFromDeltaXY(unit, pos);
 				} else {
@@ -948,7 +968,7 @@ static void HandleBuffs(CUnit &unit, int amount)
 	//
 	// Look if the time to live is over.
 	//
-	if (unit.TTL && unit.TTL < (GameCycle - unit.Variable[HP_INDEX].Value)) {
+	if (unit.TTL && (int)unit.TTL < ((int)GameCycle - unit.Variable[HP_INDEX].Value)) {
 		DebugPrint("Unit must die %lu %lu!\n" _C_ unit.TTL _C_ GameCycle);
 		//
 		// Hit unit does some funky stuff...

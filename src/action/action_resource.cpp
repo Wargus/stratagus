@@ -100,7 +100,6 @@
 
 	order->SetGoal(&mine);
 	order->Resource.Mine = &mine;
-	harvester.AssignWorkerToMine(mine);
 	order->Resource.Pos = mine.tilePos + mine.Type->GetHalfTileSize();
 	order->CurrentResource = mine.Type->GivesResource;
 	return order;

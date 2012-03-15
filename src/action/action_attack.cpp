@@ -498,7 +498,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	const int dist = unit.MapDistanceTo(*goal);
 	if (dist > unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 		// towers don't chase after goal
-		if (!unit.Type->Building) {		
+		if (unit.CanMove()) {		
 			COrder *savedOrder = this->Clone();
 			if (unit.StoreOrder(savedOrder) == false) {
 				delete savedOrder;
@@ -571,10 +571,8 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		case MOVE_TO_TARGET:
 		case MOVE_TO_TARGET + WEAK_TARGET:
 			if (!unit.CanMove()) {
-				if (!unit.RestoreOrder()) {
-					this->Finished = true;
-					unit.State = 0;
-				}
+				this->Finished = true;
+				unit.State = 0;
 				return;
 			}
 			MoveToTarget(unit);

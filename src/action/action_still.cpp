@@ -311,6 +311,20 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	return true;
 }
 
+bool COrder_Still::AutoCastStand(CUnit &unit)
+{
+	if (!unit.Removed) { // Removed units can't cast any spells, from bunker)
+		for (unsigned int i = 0; i < SpellTypeTable.size(); ++i) {
+			if (unit.AutoCastSpell[i]
+				&& (SpellTypeTable[i]->AutoCast || SpellTypeTable[i]->AICast)
+				&& AutoCastSpell(unit, SpellTypeTable[i])) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 
 /**
 **  Auto attack nearby units if possible
@@ -365,12 +379,18 @@ bool AutoAttack(CUnit &unit)
 	if (unit.Anim.Unbreakable) { // animation can't be aborted here
 		return;
 	}
-	if (unit.CurrentAction() == UnitActionDie) { // we used the "die" action in animations
+	if (unit.CurrentOrder()->NeedToDie) { // we used the "die" action in animations
+		this->Finished = true;
+		unit.State = 0;
+		LetUnitDie(unit);
 		return;
 	}
 	this->State = SUB_STILL_STANDBY;
 	this->Finished = (this->Action == UnitActionStill);
 	if (this->Action == UnitActionStandGround || unit.Removed || unit.CanMove() == false) {
+		if (unit.AutoCastSpell) {
+			this->AutoCastStand(unit);
+		}
 		if (unit.IsAgressive()) {
 			this->AutoAttackStand(unit);
 		}

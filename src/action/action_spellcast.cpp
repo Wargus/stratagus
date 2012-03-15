@@ -241,7 +241,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
 		this->State++; // cast the spell
 		return false;
-	} else if (err == PF_UNREACHABLE) {
+	} else if (err == PF_UNREACHABLE || !unit.CanMove()) {
 		// goal/spot unreachable and out of range -- give up
 		unit.State = 0;
 		return true;

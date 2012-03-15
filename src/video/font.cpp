@@ -687,15 +687,16 @@ static int FormatNumber(int number, char *buf)
 	const char sep = ',';
 	char bufs[sizeof(int) * 10 + 2];
 	int s = 0;
-	int d = 0;
-	const int sl = snprintf(bufs, sizeof (bufs), "%d", number);
+	int d = number < 0 ? 1 : 0;
+	const int sl = snprintf(bufs, sizeof (bufs), "%d", abs(number));
 
-	do {
+	while (s <= sl) {
 		if (s > 0 && s < sl && (s - (sl % 3)) % 3 == 0) {
 			buf[d++] = sep;
 		}
 		buf[d++] = bufs[s++];
-	} while (s <= sl);
+	}
+	buf[0] = number < 0 ? '-' : buf[0];
 	return d - 1;
 }
 

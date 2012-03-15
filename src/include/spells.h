@@ -277,11 +277,12 @@ public:
 
 class ConditionInfoVariable {
 public:
-	ConditionInfoVariable() : Enable(0), MinValue(0), MaxValue(0),
+	ConditionInfoVariable() : Enable(0), Check(false), MinValue(0), MaxValue(0),
 		MinMax(0), MinValuePercent(0), MaxValuePercent(0),
 		ConditionApplyOnCaster(0) {};
 
 	char Enable;                /// Target is 'user defined variable'.
+	bool Check;                 /// True if need to check that variable.
 
 	int MinValue;               /// Target must have more Value than that.
 	int MaxValue;               /// Target must have less Value than that.

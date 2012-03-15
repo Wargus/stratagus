@@ -102,7 +102,7 @@ struct lua_State;
 class COrder
 {
 public:
-	explicit COrder(int action) : Goal(NULL), Action(action), Finished(false)
+	explicit COrder(int action) : Goal(NULL), Action(action), Finished(false), NeedToDie(false)
 	{
 	}
 	virtual ~COrder();
@@ -164,6 +164,7 @@ private:
 public:
 	const unsigned char Action;   /// global action
 	bool Finished; /// true when order is finish
+	bool NeedToDie;/// unit called a "die" animation and needs to die
 };
 
 /*----------------------------------------------------------------------------

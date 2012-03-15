@@ -522,6 +522,7 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 	condition->Variable = new ConditionInfoVariable[UnitTypeVar.GetNumberVariable()];
 	// Initialize min/max stuff to values with no effect.
 	for (i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
+		condition->Variable[i].Check = false;
 		condition->Variable[i].MinValue = -1;
 		condition->Variable[i].MaxValue = -1;
 		condition->Variable[i].MinMax = -1;
@@ -566,6 +567,7 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 				}
 				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 					const char *const key = LuaToString(l, -2);
+					condition->Variable[index].Check = true;
 					if (!strcmp(key, "Enable")) {
 						condition->Variable[index].Enable = Ccl2Condition(l, LuaToString(l, -1));
 					} else if (!strcmp(key, "MinValue")) {

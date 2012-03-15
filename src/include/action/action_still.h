@@ -50,6 +50,7 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput& input) { UpdatePathFinderData_NotCalled(input); }
 private:
 	bool AutoAttackStand(CUnit &unit);
+	bool AutoCastStand(CUnit &unit);
 private:
 	CUnitPtr AutoTarget;
 	int State;

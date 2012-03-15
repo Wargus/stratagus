@@ -381,20 +381,20 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i& goalPos)
 	// Goal dead?
 	if (goal) {
 		Assert(!unit.Type->Missile.Missile->AlwaysFire || unit.Type->Missile.Missile->Range);
-		bool dead = goal->Destroyed || goal->Removed || goal->CurrentAction() == UnitActionDie;
-		if (!unit.Type->Missile.Missile->AlwaysFire) {
-			// Better let the caller/action handle this.
-			if ( goal->Destroyed) {
+		if ( goal->Destroyed) {
 				DebugPrint("destroyed unit\n");
 				return;
 			}
-			if (goal->Removed || goal->CurrentAction() == UnitActionDie) {
+		if (goal->Removed) {
 				return;
 			}
-		} else if (dead) {
-			newgoalPos = goal->tilePos;
-			goal = NoUnitP;
-		}
+		if (goal->CurrentAction() == UnitActionDie)
+			if (unit.Type->Missile.Missile->AlwaysFire) {
+				newgoalPos = goal->tilePos;
+				goal = NoUnitP;
+			} else {
+				return;
+			}
 
 	}
 
@@ -769,11 +769,11 @@ static int TracerMissile(Missile &missile)
 	}
 
 	Assert(missile.Type != NULL);
-	Assert(missile.TargetUnit != NULL);
 	Assert(missile.TotalStep != 0);
-
-	missile.destination.x = missile.TargetUnit->tilePos.x * PixelTileSize.x + missile.TargetUnit->IX;
-	missile.destination.y = missile.TargetUnit->tilePos.y * PixelTileSize.y + missile.TargetUnit->IY;
+	if (missile.TargetUnit) {
+		missile.destination.x = missile.TargetUnit->tilePos.x * PixelTileSize.x + missile.TargetUnit->IX;
+		missile.destination.y = missile.TargetUnit->tilePos.y * PixelTileSize.y + missile.TargetUnit->IY;
+	}
 
 	const PixelPos diff = (missile.destination - missile.source);
 	missile.position = missile.source + diff * missile.CurrentStep / missile.TotalStep;
@@ -960,7 +960,7 @@ static void MissileHit(Missile &missile)
 			if (CanTarget(missile.SourceUnit->Type, goal.Type)
 				&& ((missile.SourceUnit->CurrentOrder()->Action != UnitActionAttackGround &&
 						(mtype.CorrectSphashDamage == false 
-						|| goal.Type->UnitType == missile.TargetUnit->Type->UnitType))
+						|| missile.TargetUnit && goal.Type->UnitType == missile.TargetUnit->Type->UnitType))
 					|| (missile.SourceUnit->CurrentOrder()->Action == UnitActionAttackGround &&
 						(mtype.CorrectSphashDamage == false 
 						|| goal.Type->UnitType == missile.SourceUnit->Type->UnitType)))
@@ -1793,11 +1793,12 @@ void MissileTracer::Action()
 */
 void MissileClipToTarget::Action()
 {
-	Assert(this->TargetUnit != NULL);
-
 	this->Wait = this->Type->Sleep;
-	this->position.x = this->TargetUnit->tilePos.x * PixelTileSize.x + this->TargetUnit->IX;
-	this->position.y = this->TargetUnit->tilePos.y * PixelTileSize.y + this->TargetUnit->IY;
+
+	if (this->TargetUnit != NULL) {
+		this->position.x = this->TargetUnit->tilePos.x * PixelTileSize.x + this->TargetUnit->IX;
+		this->position.y = this->TargetUnit->tilePos.y * PixelTileSize.y + this->TargetUnit->IY;
+	}
 
 	if (NextMissileFrame(*this, 1, 0)) {
 		MissileHit(*this);
