@@ -376,7 +376,7 @@ static PixelPos GetPixelPosFromCenterTile(const Vec2i& tilePos)
 **  @param unit  Unit that fires the missile.
 */
 void FireMissile(CUnit &unit, CUnit *goal, const Vec2i& goalPos)
-{	
+{
 	Vec2i newgoalPos = goalPos;
 	// Goal dead?
 	if (goal) {
@@ -388,14 +388,14 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i& goalPos)
 		if (goal->Removed) {
 				return;
 			}
-		if (goal->CurrentAction() == UnitActionDie)
+		if (goal->CurrentAction() == UnitActionDie) {
 			if (unit.Type->Missile.Missile->AlwaysFire) {
 				newgoalPos = goal->tilePos;
 				goal = NoUnitP;
 			} else {
 				return;
 			}
-
+		}
 	}
 
 	// No missile hits immediately!
@@ -958,22 +958,30 @@ static void MissileHit(Missile &missile)
 			// Also check CorrectSphashDamage so land explosions can't hit the air units
 			//
 			if (CanTarget(missile.SourceUnit->Type, goal.Type)
-				&& ((missile.SourceUnit->CurrentOrder()->Action != UnitActionAttackGround &&
-						(mtype.CorrectSphashDamage == false 
-						|| missile.TargetUnit && goal.Type->UnitType == missile.TargetUnit->Type->UnitType))
-					|| (missile.SourceUnit->CurrentOrder()->Action == UnitActionAttackGround &&
-						(mtype.CorrectSphashDamage == false 
-						|| goal.Type->UnitType == missile.SourceUnit->Type->UnitType)))
-				&& (mtype.FriendlyFire == false
-					|| (goal.Player->Index != missile.SourceUnit->Player->Index))) {
-				int splash = goal.MapDistanceTo(pos.x, pos.y);
+				&& (mtype.FriendlyFire == false || goal.Player->Index != missile.SourceUnit->Player->Index)) {
+				bool shouldHit = true;
 
-				if (splash) {
-					splash *= mtype.SplashFactor;
-				} else {
-					splash = 1;
+				if (mtype.CorrectSphashDamage == true) {
+					if (missile.SourceUnit->CurrentAction() == UnitActionAttackGround) {
+						if (goal.Type->UnitType != missile.SourceUnit->Type->UnitType) {
+							shouldHit = false;
+						}
+					} else {
+						if (missile.TargetUnit == NULL || goal.Type->UnitType == missile.TargetUnit->Type->UnitType) {
+							shouldHit = false;
+						}
+					}
 				}
-				MissileHitsGoal(missile, goal, splash);
+				if (shouldHit) {
+					int splash = goal.MapDistanceTo(pos.x, pos.y);
+
+					if (splash) {
+						splash *= mtype.SplashFactor;
+					} else {
+						splash = 1;
+					}
+					MissileHitsGoal(missile, goal, splash);
+				}
 			}
 		}
 	}
