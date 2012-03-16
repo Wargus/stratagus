@@ -825,10 +825,10 @@ static int AStarFindSimplePath(const Vec2i& startPos, const Vec2i& goal, int gw,
 	}
 
 	const Vec2i diff = goal - startPos;
-	const int sqdistance = (square(diff.x) + square(diff.y));
+	const int distance = isqrt(square(diff.x) + square(diff.y));
 
 	// Within range of destination
-	if (square(minrange) <= sqdistance && sqdistance <= square(maxrange)) {
+	if (minrange <= distance && distance <= maxrange) {
 		ProfileEnd("AStarFindSimplePath");
 		return PF_REACHED;
 	}
