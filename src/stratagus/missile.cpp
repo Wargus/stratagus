@@ -967,7 +967,7 @@ static void MissileHit(Missile &missile)
 							shouldHit = false;
 						}
 					} else {
-						if (missile.TargetUnit == NULL || goal.Type->UnitType == missile.TargetUnit->Type->UnitType) {
+						if (missile.TargetUnit == NULL || goal.Type->UnitType != missile.TargetUnit->Type->UnitType) {
 							shouldHit = false;
 						}
 					}

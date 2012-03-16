@@ -119,9 +119,12 @@
 	if (depot == NULL) {
 		depot = FindDeposit(harvester, 1000, harvester.CurrentResource);
 	}
-	order->Depot = depot;
 	if (depot) {
+		order->Depot = depot;
 		order->UnitGotoGoal(harvester, depot, 70); //SUB_MOVE_TO_DEPOT);
+	} else {
+		order->State = SUB_UNREACHABLE_DEPOT;
+		order->goalPos = harvester.tilePos;
 	}
 	return order;
 }
@@ -1051,8 +1054,10 @@ void COrder_Resource::DropResource(CUnit &unit)
 void COrder_Resource::ResourceGiveUp(CUnit &unit)
 {
 	DebugPrint("%d: Worker %d report: Gave up on resource gathering.\n" _C_ unit.Player->Index _C_ unit.Slot);
-	this->ClearGoal();
-	DropResource(unit);
+	if (this->HasGoal()) {
+		DropResource(unit);
+		this->ClearGoal();
+	}
 	this->Finished = true;
 }
 
