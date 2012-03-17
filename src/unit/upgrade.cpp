@@ -468,17 +468,14 @@ int UpgradeIdByIdent(const std::string &ident)
 */
 static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &dst)
 {
-	for (int i = 0; i < player.TotalNumUnits; ++i) {
-		CUnit &unit = *player.Units[i];
-		//
+	for (int i = 0; i < player.GetUnitCount(); ++i) {
+		CUnit &unit = player.GetUnit(i);
+
 		//  Convert already existing units to this type.
-		//
 		if (unit.Type == &src) {
 			CommandTransformIntoType(unit, dst);
-		//
 		//  Convert trained units to this type.
 		//  FIXME: what about buildings?
-		//
 		} else {
 			for (size_t j = 0; j < unit.Orders.size(); ++j) {
 				if (unit.Orders[j]->Action == UnitActionTrain) {

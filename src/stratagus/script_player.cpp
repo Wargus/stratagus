@@ -93,7 +93,7 @@ void CPlayer::Load(lua_State *l)
 {
 	const int args = lua_gettop(l);
 
-	memset(this->Units, 0, sizeof(this->Units));
+	this->Units.resize(0);
 
 	// j = 0 represent player Index.
 	for (int j = 1; j < args; ++j) {
@@ -724,16 +724,13 @@ static int CclDefinePlayerColorIndex(lua_State *l)
 */
 static int CclGetPlayerData(lua_State *l)
 {
-	CPlayer *p;
-	const char *data;
-
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
 	}
 	lua_pushvalue(l, 1);
-	p = CclGetPlayer(l);
+	const CPlayer *p = CclGetPlayer(l);
 	lua_pop(l, 1);
-	data = LuaToString(l, 2);
+	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, p->Name.c_str());
@@ -780,7 +777,7 @@ static int CclGetPlayerData(lua_State *l)
 		lua_pushboolean(l, p->AiEnabled);
 		return 1;
 	} else if (!strcmp(data, "TotalNumUnits")) {
-		lua_pushnumber(l, p->TotalNumUnits);
+		lua_pushnumber(l, p->GetUnitCount());
 		return 1;
 	} else if (!strcmp(data, "NumBuildings")) {
 		lua_pushnumber(l, p->NumBuildings);

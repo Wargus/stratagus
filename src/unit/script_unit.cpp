@@ -876,6 +876,21 @@ static int CclOrderUnit(lua_State *l)
 	return 0;
 }
 
+class HasSameUnitTypeAs
+{
+public:
+	explicit HasSameUnitTypeAs(const CUnitType* _type) : type(_type) {}
+	bool operator () (const CUnit* unit) const
+	{
+		return (type == ANY_UNIT || type == unit->Type
+				|| (type == ALL_FOODUNITS && !unit->Type->Building)
+				|| (type == ALL_BUILDINGS && unit->Type->Building));
+	}
+private:
+	const CUnitType* type;
+};
+
+
 /**
 **  Kill a unit
 **
@@ -885,38 +900,30 @@ static int CclOrderUnit(lua_State *l)
 */
 static int CclKillUnit(lua_State *l)
 {
-	int j;
-	int plynr;
-	const CUnitType *unittype;
-	CUnit *unit;
-	CUnit **table;
-
 	LuaCheckArgs(l, 2);
 
 	lua_pushvalue(l, 1);
-	unittype = TriggerGetUnitType(l);
+	const CUnitType *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
-	plynr = TriggerGetPlayer(l);
+	const int plynr = TriggerGetPlayer(l);
 	if (plynr == -1) {
-		table = Units;
-		j = NumUnits - 1;
-	} else {
-		table = Players[plynr].Units;
-		j = Players[plynr].TotalNumUnits - 1;
-	}
+		CUnit** it = std::find_if(Units, Units + NumUnits, HasSameUnitTypeAs(unittype));
 
-	for (; j >= 0; --j) {
-		unit = table[j];
-		if (unittype == ANY_UNIT ||
-				(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
-				(unittype == ALL_BUILDINGS && unit->Type->Building) ||
-				unittype == unit->Type) {
-			LetUnitDie(*unit);
+		if (it != Units + NumUnits) {
+			LetUnitDie(**it);
+			lua_pushboolean(l, 1);
+			return 1;
+		}
+	} else {
+		CPlayer &player = Players[plynr];
+		std::vector<CUnit*>::iterator it = std::find_if(player.UnitBegin(), player.UnitEnd(), HasSameUnitTypeAs(unittype));
+
+		if (it != player.UnitEnd()) {
+			LetUnitDie(**it);
 			lua_pushboolean(l, 1);
 			return 1;
 		}
 	}
-
 	lua_pushboolean(l, 0);
 	return 1;
 }
@@ -999,8 +1006,8 @@ static int CclGetUnits(lua_State *l)
 			lua_rawseti(l, -2, i + 1);
 		}
 	} else {
-		for (int i = 0; i < Players[plynr].TotalNumUnits; ++i) {
-			lua_pushnumber(l, Players[plynr].Units[i]->Slot);
+		for (int i = 0; i < Players[plynr].GetUnitCount(); ++i) {
+			lua_pushnumber(l, Players[plynr].GetUnit(i).Slot);
 			lua_rawseti(l, -2, i + 1);
 		}
 	}

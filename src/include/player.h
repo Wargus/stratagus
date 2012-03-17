@@ -89,8 +89,6 @@ public:
 	bool AiEnabled;        /// handle AI on local computer
 	PlayerAi *Ai;          /// Ai structure pointer
 
-	CUnit *Units[UnitMax]; /// units of this player
-	int    TotalNumUnits;  /// total # units for units' list
 	int    NumBuildings;   /// # buildings
 	int    Supply;         /// supply available/produced
 	int    Demand;         /// demand of player
@@ -119,6 +117,17 @@ public:
 
 	/// Clear turn related player data
 	void Clear();
+
+	std::vector<CUnit*>::const_iterator UnitBegin() const;
+	std::vector<CUnit*>::iterator UnitBegin();
+	std::vector<CUnit*>::const_iterator UnitEnd() const;
+	std::vector<CUnit*>::iterator UnitEnd();
+
+	CUnit& GetUnit(int index) const;
+	int GetUnitCount() const;
+
+	void AddUnit(CUnit& unit);
+	void RemoveUnit(CUnit& unit);
 
 	/// Set a resource of the player
 	void SetResource(int resource, int value);
@@ -186,7 +195,9 @@ public:
 	void Init(/* PlayerTypes */ int type);
 	void Save(CFile &file) const;
 	void Load(lua_State *l);
+
 private:
+	std::vector<CUnit*> Units;  /// units of this player
 	unsigned int Enemy;         /// enemy bit field for this player
 	unsigned int Allied;        /// allied bit field for this player
 	unsigned int SharedVision;  /// shared vision bit field

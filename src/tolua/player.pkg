@@ -27,8 +27,6 @@ class CPlayer
 	const int UnitTypesCount[UnitTypeMax];
 	bool AiEnabled;
 
-	CUnit *Units[UnitMax];
-	int TotalNumUnits;
 	int NumBuildings;
 	int Supply;
 	int Demand;

@@ -82,9 +82,9 @@ static int AiCheckCosts(const int *costs)
 		used[i] = 0;
 	}
 
-	const int nunits = AiPlayer->Player->TotalNumUnits;
+	const int nunits = AiPlayer->Player->GetUnitCount();
 	for (int i = 0; i < nunits; ++i) {
-		CUnit &unit = *AiPlayer->Player->Units[i];
+		CUnit &unit = AiPlayer->Player->GetUnit(i);
 
 		for (size_t k = 0; k < unit.Orders.size(); ++k) {
 			const COrder &order = *unit.Orders[k];
@@ -946,9 +946,9 @@ static void AiCollectResources()
 	memset(num_units_assigned, 0, sizeof(num_units_assigned));
 
 	// Collect statistics about the current assignment
-	const int n = AiPlayer->Player->TotalNumUnits;
+	const int n = AiPlayer->Player->GetUnitCount();
 	for (int i = 0; i < n; ++i) {
-		CUnit &unit = *AiPlayer->Player->Units[i];
+		CUnit &unit = AiPlayer->Player->GetUnit(i);
 		if (!unit.Type->Harvester) {
 			continue;
 		}
@@ -1263,19 +1263,19 @@ static int AiRepairUnit(CUnit &unit)
 */
 static void AiCheckRepair()
 {
-	const int n = AiPlayer->Player->TotalNumUnits;
+	const int n = AiPlayer->Player->GetUnitCount();
 	int k = 0;
 
 	// Selector for next unit
 	for (int i = n - 1; i >= 0; --i) {
-		CUnit *unit = AiPlayer->Player->Units[i];
-		if (unit && UnitNumber(*unit) == AiPlayer->LastRepairBuilding) {
+		const CUnit &unit = AiPlayer->Player->GetUnit(i);
+		if (UnitNumber(unit) == AiPlayer->LastRepairBuilding) {
 			k = i + 1;
 		}
 	}
 
 	for (int i = k; i < n; ++i) {
-		CUnit &unit = *AiPlayer->Player->Units[i];
+		CUnit &unit = AiPlayer->Player->GetUnit(i);
 		bool repair_flag = true;
 
 		if (!unit.IsAliveOnMap()) {
@@ -1284,11 +1284,11 @@ static void AiCheckRepair()
 
 		// Unit damaged?
 		// Don't repair attacked unit (wait 5 sec before repairing)
-		if (unit.Type->RepairHP &&
-				unit.CurrentAction() != UnitActionBuilt &&
-				unit.CurrentAction() != UnitActionUpgradeTo &&
-				unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max &&
-				unit.Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
+		if (unit.Type->RepairHP
+			&& unit.CurrentAction() != UnitActionBuilt
+			&& unit.CurrentAction() != UnitActionUpgradeTo
+			&& unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max
+			&& unit.Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
 			//
 			// FIXME: Repair only units under control
 			//
@@ -1299,8 +1299,8 @@ static void AiCheckRepair()
 			// Must check, if there are enough resources
 			//
 			for (int j = 1; j < MaxCosts; ++j) {
-				if (unit.Stats->Costs[j] &&
-						AiPlayer->Player->Resources[j] < 99) {
+				if (unit.Stats->Costs[j]
+					&& AiPlayer->Player->Resources[j] < 99) {
 					repair_flag = false;
 					break;
 				}
@@ -1318,17 +1318,17 @@ static void AiCheckRepair()
 		// Building under construction but no worker
 		if (unit.CurrentAction() == UnitActionBuilt) {
 			int j;
-			for (j = 0; j < AiPlayer->Player->TotalNumUnits; ++j) {
-				COrder* order = AiPlayer->Player->Units[j]->CurrentOrder();
+			for (j = 0; j < AiPlayer->Player->GetUnitCount(); ++j) {
+				COrder* order = AiPlayer->Player->GetUnit(j).CurrentOrder();
 				if (order->Action == UnitActionRepair) {
 					COrder_Repair &orderRepair = *static_cast<COrder_Repair*>(order);
 
 					if (orderRepair.GetReparableTarget() == &unit) {
-					break;
+						break;
 					}
 				}
 			}
-			if (j == AiPlayer->Player->TotalNumUnits) {
+			if (j == AiPlayer->Player->GetUnitCount()) {
 				// Make sure we have enough resources first
 				for (j = 0; j < MaxCosts; ++j) {
 					// FIXME: the resources don't necessarily have to be in storage

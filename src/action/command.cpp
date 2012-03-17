@@ -904,7 +904,7 @@ void CommandQuit(int player)
 		}
 	}
 
-	if (Players[player].TotalNumUnits != 0) {
+	if (Players[player].GetUnitCount() != 0) {
 		SetMessage(_("Player \"%s\" has left the game"), Players[player].Name.c_str());
 	} else {
 		SetMessage(_("Player \"%s\" has been killed"), Players[player].Name.c_str());

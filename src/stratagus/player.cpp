@@ -550,11 +550,7 @@ void CreatePlayer(int type)
 
 void CPlayer::Init(/* PlayerTypes */ int type)
 {
-	//  Allocate memory for the "list" of this player's units.
-	//  FIXME: brutal way, as we won't need UnitMax for this player...
-	//  FIXME: ARI: is this needed for 'PlayerNobody' ??
-	//  FIXME: A: Johns: currently we need no init for the nobody player.
-	memset(this->Units, 0, sizeof (this->Units));
+	this->Units.resize(0);
 
 	//  Take first slot for person on this computer,
 	//  fill other with computer players.
@@ -678,7 +674,6 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->Supply = 0;
 	this->Demand = 0;
 	this->NumBuildings = 0;
-	this->TotalNumUnits = 0;
 	this->Score = 0;
 
 	this->Color = PlayerColors[NumPlayers][0];
@@ -729,8 +724,7 @@ void CPlayer::Clear()
 	memset(UnitTypesCount, 0, sizeof(UnitTypesCount));
 	AiEnabled = false;
 	Ai = 0;
-	memset(Units, 0, sizeof(Units));
-	TotalNumUnits = 0;
+	this->Units.resize(0);
 	NumBuildings = 0;
 	Supply = 0;
 	Demand = 0;
@@ -747,6 +741,66 @@ void CPlayer::Clear()
 	Color = 0;
 	UpgradeTimers.Clear();
 }
+
+
+void CPlayer::AddUnit(CUnit& unit)
+{
+	Assert(unit.Player != this);
+	Assert(unit.PlayerSlot == static_cast<size_t>(-1));
+	unit.PlayerSlot = this->Units.size();
+	this->Units.push_back(&unit);
+	unit.Player = this;
+	Assert(this->Units[unit.PlayerSlot] == &unit);
+}
+
+void CPlayer::RemoveUnit(CUnit& unit)
+{
+	Assert(unit.Player == this);
+	Assert(this->Units[unit.PlayerSlot] == &unit);
+
+//	unit.Player = NULL; // we can remove dying unit...
+	CUnit* last = this->Units.back();
+
+	this->Units[unit.PlayerSlot] = last;
+	last->PlayerSlot = unit.PlayerSlot;
+	this->Units.pop_back();
+	unit.PlayerSlot = static_cast<size_t>(-1);
+	Assert(last == &unit || this->Units[last->PlayerSlot] == last);
+}
+
+
+
+std::vector<CUnit*>::const_iterator CPlayer::UnitBegin() const
+{
+	return Units.begin();
+}
+
+std::vector<CUnit*>::iterator CPlayer::UnitBegin()
+{
+	return Units.begin();
+}
+
+std::vector<CUnit*>::const_iterator CPlayer::UnitEnd() const
+{
+	return Units.end();
+}
+
+std::vector<CUnit*>::iterator CPlayer::UnitEnd()
+{
+	return Units.end();
+}
+
+CUnit& CPlayer::GetUnit(int index) const
+{
+	return *Units[index];
+}
+
+int CPlayer::GetUnitCount() const
+{
+	return static_cast<int>(Units.size());
+}
+
+
 
 /*----------------------------------------------------------------------------
 --  Resource management
@@ -784,7 +838,7 @@ int CPlayer::CheckLimits(const CUnitType &type) const
 			Notify("%s", _("Building Limit Reached"));
 			return -1;
 		}
-		if (!type.Building && (TotalNumUnits - NumBuildings) >= UnitLimit) {
+		if (!type.Building && (this->GetUnitCount() - NumBuildings) >= UnitLimit) {
 			Notify("%s", _("Unit Limit Reached"));
 			return -2;
 		}
@@ -792,7 +846,7 @@ int CPlayer::CheckLimits(const CUnitType &type) const
 			Notify("%s", _("Insufficient Supply, increase Supply."));
 			return -3;
 		}
-		if (TotalNumUnits >= TotalUnitLimit) {
+		if (this->GetUnitCount() >= TotalUnitLimit) {
 			Notify("%s", _("Total Unit Limit Reached"));
 			return -4;
 		}

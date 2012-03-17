@@ -299,7 +299,7 @@ static int GetPlayerData(int player, const char *prop, const char *arg)
 	} else if (!strcmp(prop, "AiEnabled")) {
 		return Players[player].AiEnabled;
 	} else if (!strcmp(prop, "TotalNumUnits")) {
-		return Players[player].TotalNumUnits;
+		return Players[player].GetUnitCount();
 	} else if (!strcmp(prop, "NumBuildings")) {
 		return Players[player].NumBuildings;
 	} else if (!strcmp(prop, "Supply")) {
@@ -621,7 +621,7 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 				CUnit *goal;
 				PixelPos start;
 				PixelPos dest;
-				
+
 				if ((flags & ANIM_SM_RELTARGET)) {
 					goal = unit.CurrentOrder()->GetGoal();
 				} else {
@@ -854,14 +854,14 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 				}
 				if (unit.Anim.Anim->D.Die.DeathType[0] != '\0') {
 					unit.DamagedType = ExtraDeathIndex(unit.Anim.Anim->D.Die.DeathType);				}
-				unit.CurrentOrder()->NeedToDie = true; 
+				unit.CurrentOrder()->NeedToDie = true;
 				return 0;
 
 			case AnimationRotate:
 				if (!strcmp(unit.Anim.Anim->D.Rotate.Rotate, "target") && unit.CurrentOrder()->HasGoal()) {
 					COrder &order = *unit.CurrentOrder();
 					const CUnit &target = *order.GetGoal();
-					if (target.Destroyed) {	
+					if (target.Destroyed) {
 						order.ClearGoal();
 						break;
 					}

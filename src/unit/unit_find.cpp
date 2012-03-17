@@ -123,7 +123,7 @@ void FindUnitsByType(const CUnitType &type, std::vector<CUnit *>& units)
 */
 void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *> &table)
 {
-	const int nunits = player.TotalNumUnits;
+	const int nunits = player.GetUnitCount();
 	int typecount = player.UnitTypesCount[type.Slot];
 
 	if (typecount == 0) {
@@ -131,7 +131,7 @@ void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::ve
 	}
 
 	for (int i = 0; i < nunits; ++i) {
-		CUnit &unit = *player.Units[i];
+		CUnit &unit = player.GetUnit(i);
 
 		if (unit.Type != &type) {
 			continue;
@@ -257,7 +257,7 @@ public:
 	BestTargetFinder(const CUnit &a, int r) :
 		attacker(&a), range(r)
 	{}
-	
+
 	CUnit *Find(const std::vector<CUnit*>& table) const
 	{
 		return Find(table.begin(), table.end());

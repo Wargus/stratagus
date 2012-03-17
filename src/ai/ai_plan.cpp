@@ -423,8 +423,8 @@ int AiForce::PlanAttack()
 	// No transport that belongs to the force.
 	CUnit *transporter = NULL;
 	if (state) {
-		for (int i = 0; i < AiPlayer->Player->TotalNumUnits; ++i) {
-			CUnit &unit = *AiPlayer->Player->Units[i];
+		for (int i = 0; i < AiPlayer->Player->GetUnitCount(); ++i) {
+			CUnit &unit = AiPlayer->Player->GetUnit(i);
 
 			if (unit.Type->CanTransport() && unit.IsIdle()) {
 				DebugPrint("%d: Assign any transporter\n" _C_ AiPlayer->Player->Index);
@@ -484,8 +484,8 @@ int AiForce::PlanAttack()
 			}
 			if (totalBoardCapacity < 0) { // Not enough transporter.
 				// Add all other idle transporter.
-				for (int i = 0; i < AiPlayer->Player->TotalNumUnits; ++i) {
-					CUnit &aiunit = *AiPlayer->Player->Units[i];
+				for (int i = 0; i < AiPlayer->Player->GetUnitCount(); ++i) {
+					CUnit &aiunit = AiPlayer->Player->GetUnit(i);
 
 					if (transporterAdded != &aiunit && aiunit.Type->CanTransport() && aiunit.IsIdle()) {
 						DebugPrint("%d: Assign another transporter.\n"_C_ AiPlayer->Player->Index);
@@ -543,8 +543,8 @@ static CUnit* GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 	// Find an idle unit, responding to the mask
 	bool flyeronly = false;
 	int bestdistance = -1;
-	for (int i = 0; i != AiPlayer->Player->TotalNumUnits; ++i) {
-		CUnit &unit = *AiPlayer->Player->Units[i];
+	for (int i = 0; i != AiPlayer->Player->GetUnitCount(); ++i) {
+		CUnit &unit = AiPlayer->Player->GetUnit(i);
 
 		if (!unit.IsIdle()) {
 			continue;

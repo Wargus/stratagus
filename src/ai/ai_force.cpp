@@ -476,11 +476,11 @@ bool AiAssignToForce(CUnit &unit)
 */
 void AiAssignFreeUnitsToForce()
 {
-	const int n = AiPlayer->Player->TotalNumUnits;
+	const int n = AiPlayer->Player->GetUnitCount();
 
 	AiCleanForces();
 	for (int i = 0; i < n; ++i) {
-		CUnit &unit = *AiPlayer->Player->Units[i];
+		CUnit &unit = AiPlayer->Player->GetUnit(i);
 
 		if (unit.Active && unit.GroupId == 0) {
 			AiPlayer->Force.Assign(unit);

@@ -198,16 +198,18 @@ static void AiCheckUnits()
 	AiGetBuildRequestsCount(AiPlayer, counter);
 
 	//  Remove non active units.
-	int n = AiPlayer->Player->TotalNumUnits;
-	for (int i = 0; i < n; ++i) {
-		if (!AiPlayer->Player->Units[i]->Active) {
-			counter[AiPlayer->Player->Units[i]->Type->Slot]--;
+	const int unitCount = AiPlayer->Player->GetUnitCount();
+	for (int i = 0; i < unitCount; ++i) {
+		const CUnit &unit = AiPlayer->Player->GetUnit(i);
+
+		if (!unit.Active) {
+			counter[unit.Type->Slot]--;
 		}
 	}
 	const int *unit_types_count = AiPlayer->Player->UnitTypesCount;
 
 	//  Look if some unit-types are missing.
-	n = AiPlayer->UnitTypeRequests.size();
+	int n = AiPlayer->UnitTypeRequests.size();
 	for (int i = 0; i < n; ++i) {
 		const unsigned int t = AiPlayer->UnitTypeRequests[i].Type->Slot;
 		const int x = AiPlayer->UnitTypeRequests[i].Count;

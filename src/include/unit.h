@@ -75,7 +75,7 @@
 **
 **  CUnit::PlayerSlot
 **
-**  A pointer into Player::Units[], where the unit pointer is
+**  the index into Player::Units[], where the unit pointer is
 **  stored. Player::Units[] is a table of all units currently
 **  belonging to a player. This pointer is only needed to speed
 **  up, the remove of the unit pointer from Player::Units[].
@@ -460,7 +460,7 @@ public:
 	unsigned int     Refs;         /// Reference counter
 	int     Slot;         /// Assigned slot number
 	CUnit **UnitSlot;     /// Slot pointer of Units
-	CUnit **PlayerSlot;   /// Slot pointer of Player->Units
+	size_t PlayerSlot;    /// index in Player->Units
 
 	CUnit        *Next;          /// Generic link pointer (on map)
 

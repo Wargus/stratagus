@@ -126,7 +126,7 @@ void CUnit::Init()
 	Refs = 0;
 	Slot = 0;
 	UnitSlot = NULL;
-	PlayerSlot = NULL;
+	PlayerSlot = static_cast<size_t>(-1);
 	Next = NULL;
 	InsideCount = 0;
 	BoardCount = 0;
@@ -414,10 +414,9 @@ void CUnit::AssignToPlayer(CPlayer &player)
 {
 	CUnitType &type = *Type;
 
-
 	// Build player unit table
 	if (!type.Vanishes && CurrentAction() != UnitActionDie) {
-		PlayerSlot = player.Units + player.TotalNumUnits++;
+		player.AddUnit(*this);
 		if (!SaveGameLoading) {
 			// If unit is dieing, it's already been lost by all players
 			// don't count again
@@ -430,12 +429,9 @@ void CUnit::AssignToPlayer(CPlayer &player)
 				player.TotalUnits++;
 			}
 		}
-		*PlayerSlot = this;
-
 		player.UnitTypesCount[type.Slot]++;
 		player.Demand += type.Demand; // food needed
 	}
-
 
 	// Don't Add the building if it's dieing, used to load a save game
 	if (type.Building && CurrentAction() != UnitActionDie) {
@@ -444,7 +440,6 @@ void CUnit::AssignToPlayer(CPlayer &player)
 			player.NumBuildings++;
 		}
 	}
-	Player = &player;
 	Stats = &type.Stats[Player->Index];
 	Colors = &player.UnitColors;
 	if (!SaveGameLoading) {
@@ -956,11 +951,7 @@ void UnitLost(CUnit &unit)
 
 	const CUnitType &type = *unit.Type;
 	if (!type.Vanishes) {
-		Assert(*unit.PlayerSlot == &unit);
-		temp = player.Units[--player.TotalNumUnits];
-		temp->PlayerSlot = unit.PlayerSlot;
-		*unit.PlayerSlot = temp;
-		player.Units[player.TotalNumUnits] = NULL;
+		player.RemoveUnit(unit);
 
 		if (type.Building) {
 			// FIXME: support more races
@@ -995,8 +986,8 @@ void UnitLost(CUnit &unit)
 			if (player.Incomes[i] && type.ImproveIncomes[i] == player.Incomes[i]) {
 				int m = DefaultIncomes[i];
 
-				for (int j = 0; j < player.TotalNumUnits; ++j) {
-					m = std::max(m, player.Units[j]->Type->ImproveIncomes[i]);
+				for (int j = 0; j < player.GetUnitCount(); ++j) {
+					m = std::max(m, player.GetUnit(j).Type->ImproveIncomes[i]);
 				}
 				player.Incomes[i] = m;
 			}
@@ -1020,7 +1011,7 @@ void UnitLost(CUnit &unit)
 		}
 	}
 	Assert(player.NumBuildings <= UnitMax);
-	Assert(player.TotalNumUnits <= UnitMax);
+	Assert(player.GetUnitCount() <= UnitMax);
 	Assert(player.UnitTypesCount[type.Slot] <= UnitMax);
 }
 
@@ -1554,9 +1545,6 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 
 	//  Now the new side!
 
-	// Insert into new player table.
-
-	PlayerSlot = newplayer.Units + newplayer.TotalNumUnits++;
 	if (Type->Building) {
 		if (!Type->Wall) {
 			newplayer.TotalBuildings++;
@@ -1564,10 +1552,9 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	} else {
 		newplayer.TotalUnits++;
 	}
-	*PlayerSlot = this;
 
 	MapUnmarkUnitSight(*this);
-	Player = &newplayer;
+	newplayer.AddUnit(*this);
 	Stats = &Type->Stats[newplayer.Index];
 	UpdateUnitSightRange(*this);
 	MapMarkUnitSight(*this);
@@ -1667,20 +1654,21 @@ void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 */
 static void ChangePlayerOwner(CPlayer &oldplayer, CPlayer &newplayer)
 {
-	CUnit *table[UnitMax];
+	if (&oldplayer == &newplayer) {
+		return ;
+	}
 
-	// NOTE: table is changed.
-	int n = oldplayer.TotalNumUnits;
-	memcpy(table, oldplayer.Units, n * sizeof(CUnit *));
-	for (int i = 0; i < n; ++i) {
-		CUnit &unit = *table[i];
-		// Don't save the unit again(can happen when inside a town hall)
-		if (unit.Player == &newplayer) {
-			continue;
-		}
-		unit.ChangeOwner(newplayer);
+	for (int i = 0; i != oldplayer.GetUnitCount(); ++i) {
+		CUnit &unit = oldplayer.GetUnit(i);
+
 		unit.Blink = 5;
 		unit.RescuedFrom = &oldplayer;
+	}
+	// ChangeOwner remove unit from the player: so change the array.
+	while (oldplayer.GetUnitCount() != 0) {
+		CUnit &unit = oldplayer.GetUnit(0);
+
+		unit.ChangeOwner(newplayer);
 	}
 }
 
@@ -1694,7 +1682,6 @@ void RescueUnits()
 	if (NoRescueCheck) {  // all possible units are rescued
 		return;
 	}
-	CUnit *table[UnitMax];
 
 	NoRescueCheck = true;
 
@@ -1703,37 +1690,37 @@ void RescueUnits()
 		if (p->Type != PlayerRescuePassive && p->Type != PlayerRescueActive) {
 			continue;
 		}
-		if (p->TotalNumUnits) {
+		if (p->GetUnitCount() != 0) {
 			NoRescueCheck = false;
 			// NOTE: table is changed.
-			const int l = p->TotalNumUnits;
-			memcpy(table, p->Units, l * sizeof(CUnit *));
-			for (int j = 0; j < l; ++j) {
-				CUnit *unit = table[j];
+			std::vector<CUnit*> table;
+			table.insert(table.begin(), p->UnitBegin(), p->UnitEnd());
+
+			const size_t l = table.size();
+			for (size_t j = 0; j != l; ++j) {
+				CUnit &unit = *table[j];
 				// Do not rescue removed units. Units inside something are
 				// rescued by ChangeUnitOwner
-				if (unit->Removed) {
+				if (unit.Removed) {
 					continue;
 				}
-
 				std::vector<CUnit *> around;
 
-				Map.SelectAroundUnit(*unit, 1, around);
-
+				Map.SelectAroundUnit(unit, 1, around);
 				//  Look if ally near the unit.
 				for (size_t i = 0; i != around.size(); ++i) {
-					if (around[i]->Type->CanAttack && unit->IsAllied(*around[i])) {
+					if (around[i]->Type->CanAttack && unit.IsAllied(*around[i])) {
 						//  City center converts complete race
 						//  NOTE: I use a trick here, centers could
 						//        store gold. FIXME!!!
-						if (unit->Type->CanStore[GoldCost]) {
+						if (unit.Type->CanStore[GoldCost]) {
 							ChangePlayerOwner(*p, *around[i]->Player);
 							break;
 						}
-						unit->RescuedFrom = unit->Player;
-						unit->ChangeOwner(*around[i]->Player);
-						unit->Blink = 5;
-						PlayGameSound(GameSounds.Rescue[unit->Player->Race].Sound,
+						unit.RescuedFrom = unit.Player;
+						unit.ChangeOwner(*around[i]->Player);
+						unit.Blink = 5;
+						PlayGameSound(GameSounds.Rescue[unit.Player->Race].Sound,
 							MaxSampleVolume);
 						break;
 					}
@@ -2219,24 +2206,11 @@ public:
 		u_near.loc = pos;
 	}
 
-	CUnit *Find(CUnit **table, const int table_size) {
-#ifdef _MSC_VER
-		for (int i = 0; i < table_size; ++i) {
-			this->operator() (table[i]);
+	template <typename ITERATOR>
+	CUnit *Find(ITERATOR begin, ITERATOR end) {
+		for (ITERATOR it = begin; it != end; ++it) {
+			this->operator() (*it);
 		}
-#else
-		if (table_size) {
-			int i = 0, n = (table_size+3)/4;
-			switch (table_size & 3) {
-				case 0: do {
-								this->operator() (table[i++]);
-				case 3:			this->operator() (table[i++]);
-				case 2:			this->operator() (table[i++]);
-				case 1:			this->operator() (table[i++]);
-					} while ( --n > 0 );
-			}
-		}
-#endif
 		return best_depot;
 	}
 
@@ -2260,14 +2234,14 @@ public:
 CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource)
 {
 	BestDepotFinder<true> finder(pos, resource, range);
-	CUnit *depot = finder.Find(p.Units, p.TotalNumUnits);
+	CUnit *depot = finder.Find(p.UnitBegin(), p.UnitEnd());
 
 	if (!depot) {
 		for (int i = 0; i < PlayerMax; ++i) {
 			if (i != p.Index &&
 				Players[i].IsAllied(p) &&
 				p.IsAllied(Players[i])) {
-				finder.Find(Players[i].Units, Players[i].TotalNumUnits);
+				finder.Find(Players[i].UnitBegin(), Players[i].UnitEnd());
 			}
 		}
 		depot = finder.best_depot;
@@ -2497,13 +2471,13 @@ CUnit *UnitFindResource(const CUnit &unit, const Vec2i &startPos, int range, int
 CUnit *FindDeposit(const CUnit &unit, int range, int resource)
 {
 	BestDepotFinder<false> finder(unit, resource, range);
-	CUnit *depot = finder.Find(unit.Player->Units, unit.Player->TotalNumUnits);
+	CUnit *depot = finder.Find(unit.Player->UnitBegin(), unit.Player->UnitEnd());
 	if (!depot) {
 		for (int i = 0; i < PlayerMax; ++i) {
 			if (i != unit.Player->Index &&
 				Players[i].IsAllied(*unit.Player) &&
 				unit.Player->IsAllied(Players[i])) {
-				finder.Find(Players[i].Units, Players[i].TotalNumUnits);
+				finder.Find(Players[i].UnitBegin(), Players[i].UnitEnd());
 			}
 		}
 		depot = finder.best_depot;
@@ -2523,10 +2497,10 @@ CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 {
 	CUnit *FirstUnitFound = NoUnitP;
 	int SelectNextUnit = (last == NoUnitP) ? 1 : 0;
-	const int nunits = player.TotalNumUnits;
+	const int nunits = player.GetUnitCount();
 
 	for (int i = 0; i < nunits; ++i) {
-		CUnit &unit = *player.Units[i];
+		CUnit &unit = player.GetUnit(i);
 		if (unit.Type->Harvester && unit.Type->ResInfo && !unit.Removed) {
 			if (unit.CurrentAction() == UnitActionStill) {
 				if (SelectNextUnit && !IsOnlySelected(unit)) {

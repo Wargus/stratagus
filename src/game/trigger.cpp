@@ -361,13 +361,13 @@ int GetNumOpponents(int player)
 
 	// Check the player opponents
 	for (int i = 0; i < PlayerMax; ++i) {
-		const int unitCount = Players[i].TotalNumUnits;
+		const int unitCount = Players[i].GetUnitCount();
 
 		// This player is our enemy and has units left.
 		if ((Players[player].IsEnemy(Players[i])) || (Players[i].IsEnemy(Players[player]))) {
 			// Don't count walls
 			for (int j = 0; j < unitCount; ++j) {
-				if (Players[i].Units[j]->Type->Wall == false) {
+				if (Players[i].GetUnit(j).Type->Wall == false) {
 					++n;
 					break;
 				}
