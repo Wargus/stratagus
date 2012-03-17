@@ -988,21 +988,18 @@ static int CclKillUnitAt(lua_State *l)
 */
 static int CclGetUnits(lua_State *l)
 {
-	int plynr;
-	int i;
-
 	LuaCheckArgs(l, 1);
 
-	plynr = TriggerGetPlayer(l);
+	const int plynr = TriggerGetPlayer(l);
 
 	lua_newtable(l);
 	if (plynr == -1) {
-		for (i = 0; i < NumUnits; ++i) {
+		for (int i = 0; i < NumUnits; ++i) {
 			lua_pushnumber(l, Units[i]->Slot);
 			lua_rawseti(l, -2, i + 1);
 		}
 	} else {
-		for (i = 0; i < Players[plynr].TotalNumUnits; ++i) {
+		for (int i = 0; i < Players[plynr].TotalNumUnits; ++i) {
 			lua_pushnumber(l, Players[plynr].Units[i]->Slot);
 			lua_rawseti(l, -2, i + 1);
 		}
@@ -1019,13 +1016,10 @@ static int CclGetUnits(lua_State *l)
 */
 static int CclGetUnitVariable(lua_State *l)
 {
-	const CUnit *unit;
-	int index;
-
 	LuaCheckArgs(l, 2);
 
 	lua_pushvalue(l, 1);
-	unit = CclGetUnit(l);
+	const CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
 
 	const char *const value = LuaToString(l, 2);
@@ -1035,7 +1029,7 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushnumber(l, unit->Player->Index);
 	else
 	{
-		index = UnitTypeVar.VariableNameLookup[value];// User variables
+		int index = UnitTypeVar.VariableNameLookup[value];// User variables
 		if (index == -1) {
 			LuaError(l, "Bad variable name '%s'\n" _C_ value);
 		}
@@ -1053,16 +1047,13 @@ static int CclGetUnitVariable(lua_State *l)
 */
 static int CclSetUnitVariable(lua_State *l)
 {
-	CUnit *unit;
-	int index;
-	int value;
-
 	LuaCheckArgs(l, 3);
 
 	lua_pushvalue(l, 1);
-	unit = CclGetUnit(l);
+	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
 	const char *const name = LuaToString(l, 2);
+	int value;
 	if (!strcmp(name, "RegenerationRate"))
 	{
 		value = LuaToNumber(l, 3);
@@ -1073,7 +1064,7 @@ static int CclSetUnitVariable(lua_State *l)
 	}
 	else
 	{
-		index = UnitTypeVar.VariableNameLookup[name];// User variables
+		const int index = UnitTypeVar.VariableNameLookup[name];// User variables
 		if (index == -1) {
 			LuaError(l, "Bad variable name '%s'\n" _C_ name);
 		}
@@ -1095,27 +1086,23 @@ static int CclSetUnitVariable(lua_State *l)
 */
 static int CclSlotUsage(lua_State *l)
 {
-	unsigned int args;
-	unsigned int i;
-	const char *key;
-	int unit_index;
-	unsigned long cycle;
-
-	args = lua_gettop(l);
+	unsigned int args = lua_gettop(l);
 	if (args == 0) {
 		UnitSlotFree = 0;
 		return 0;
 	}
 	UnitSlotFree = LuaToNumber(l, 1);
-	for (i = 0; i < UnitSlotFree; i++) {
+	for (unsigned int i = 0; i < UnitSlotFree; i++) {
 		UnitSlots[i] = new CUnit;
 		UnitSlots[i]->Slot = i;
 	}
-	for (i = 2; i <= args; i++) {
-		unit_index = -1;
-		cycle = (unsigned long)-1;
+	for (unsigned int i = 2; i <= args; i++) {
+		int unit_index = -1;
+		unsigned long cycle = (unsigned long)-1;
+
 		for (lua_pushnil(l); lua_next(l, i); lua_pop(l, 1)) {
-			key = LuaToString(l, -2);
+			const char *key = LuaToString(l, -2);
+
 			if (!strcmp(key, "Slot")) {
 				unit_index = LuaToNumber(l, -1);
 			} else if (!strcmp(key, "FreeCycle")) {

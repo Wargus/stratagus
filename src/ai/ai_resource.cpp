@@ -83,10 +83,11 @@ static int AiCheckCosts(const int *costs)
 	}
 
 	const int nunits = AiPlayer->Player->TotalNumUnits;
-	CUnit **units = AiPlayer->Player->Units;
 	for (int i = 0; i < nunits; ++i) {
-		for (size_t k = 0; k < units[i]->Orders.size(); ++k) {
-			const COrder &order = *units[i]->Orders[k];
+		CUnit &unit = *AiPlayer->Player->Units[i];
+
+		for (size_t k = 0; k < unit.Orders.size(); ++k) {
+			const COrder &order = *unit.Orders[k];
 
 			if (order.Action == UnitActionBuild) {
 				const COrder_Build& orderBuild = static_cast<const COrder_Build&>(order);
@@ -946,9 +947,8 @@ static void AiCollectResources()
 
 	// Collect statistics about the current assignment
 	const int n = AiPlayer->Player->TotalNumUnits;
-	CUnit **units = AiPlayer->Player->Units;
 	for (int i = 0; i < n; ++i) {
-		CUnit &unit = *units[i];
+		CUnit &unit = *AiPlayer->Player->Units[i];
 		if (!unit.Type->Harvester) {
 			continue;
 		}

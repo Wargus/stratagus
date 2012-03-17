@@ -37,13 +37,15 @@
 #include <stdlib.h>
 
 #include "stratagus.h"
-#include "missile.h"
-#include "unittype.h"
+
+#include "ai_local.h"
+
+#include "actions.h"
 #include "map.h"
+#include "missile.h"
 #include "pathfinder.h"
 #include "unit.h"
-#include "actions.h"
-#include "ai_local.h"
+#include "unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -122,54 +124,35 @@ static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i& pos)
 static void AiMarkWaterTransporter(const CUnit &unit, unsigned char *matrix)
 {
 	const Vec2i offset[] = {{0, -1}, {-1, 0}, {1, 0}, {0, 1}, {-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
-	Vec2i *points;
-	int size;
-	Vec2i pos;
-	Vec2i rpos;
-	int mask;
-	int wp;
-	int rp;
-	int ep;
-	int i;
-	int w;
-	unsigned char *m;
-
-	pos = unit.tilePos;
-	w = Map.Info.MapWidth + 2;
+	Vec2i pos = unit.tilePos;
+	const int w = Map.Info.MapWidth + 2;
 	matrix += w + w + 2;
 	if (matrix[pos.x + pos.y * w]) { // already marked
 		DebugPrint("Done\n");
 		return;
 	}
+	const int size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
+	std::vector<Vec2i> points;
+	points.resize(size);
 
-	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
-	points = new Vec2i[size];
-
-	//
-	// Make movement matrix.
-	//
-	mask = unit.Type->MovementMask;
-	// Ignore all possible mobile units.
-	mask &= ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
-
+	// Make movement matrix : Ignore all possible mobile units.
+	const int mask = unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
 	points[0] = pos;
-	rp = 0;
+	int rp = 0;
 	matrix[pos.x + pos.y * w] = 66; // mark start point
-	ep = wp = 1; // start with one point
+	int ep = 1;
+	int wp = 1; // start with one point
 
-	//
 	// Pop a point from stack, push all neightbors which could be entered.
-	//
 	for (;;) {
 		while (rp != ep) {
-			rpos = points[rp];
-			for (i = 0; i < 8; ++i) { // mark all neighbors
+			Vec2i rpos = points[rp];
+			for (int i = 0; i < 8; ++i) { // mark all neighbors
 				pos = rpos + offset[i];
-				m = matrix + pos.x + pos.y * w;
+				unsigned char *m = matrix + pos.x + pos.y * w;
 				if (*m) { // already checked
 					continue;
 				}
-
 				if (CanMoveToMask(pos, mask)) { // reachable
 					*m = 66;
 					points[wp] = pos; // push the point
@@ -182,22 +165,16 @@ static void AiMarkWaterTransporter(const CUnit &unit, unsigned char *matrix)
 					 */
 				}
 			}
-
 			if (++rp >= size) { // round about
 				rp = 0;
 			}
 		}
-
-		//
 		// Continue with next frame.
-		//
 		if (rp == wp) { // unreachable, no more points available
 			break;
 		}
 		ep = wp;
 	}
-
-	delete[] points;
 }
 
 /**
@@ -210,58 +187,43 @@ static void AiMarkWaterTransporter(const CUnit &unit, unsigned char *matrix)
 **
 **  @return        True if target found.
 */
-static bool AiFindTarget(const CUnit &unit,
-	 unsigned char *matrix, Vec2i *dpos, int *ds)
+static bool AiFindTarget(const CUnit &unit, unsigned char *matrix, Vec2i *dpos, int *ds)
 {
 	const Vec2i offset[] = {{0, -1}, {-1, 0}, {1, 0}, {0, 1}, {-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
 	struct p {
 		Vec2i pos;
 		unsigned char State;
 	} *points;
-	int size;
-	Vec2i pos;
-	Vec2i rpos;
-	int mask;
-	int wp;
-	int rp;
-	int ep;
-	int i;
-	int w;
 	enum {
 		OnWater,
 		OnLand,
 		OnIsle
 	};
-	unsigned char state;
-	unsigned char *m;
-
-	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
+	const int size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
 	points = new p[size];
 
-	pos = unit.tilePos;
+	Vec2i pos = unit.tilePos;
 
-	w = Map.Info.MapWidth + 2;
-	mask = unit.Type->MovementMask;
+	int w = Map.Info.MapWidth + 2;
 	// Ignore all possible mobile units.
-	mask &= ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
+	const int mask = unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
 
 	points[0].pos = pos;
 	points[0].State = OnLand;
 	matrix += w + w + 2;
-	rp = 0;
+	int rp = 0;
 	matrix[pos.x + pos.y * w] = 1; // mark start point
-	ep = wp = 1; // start with one point
+	int ep = 1;
+	int wp = 1; // start with one point
 
-	//
 	// Pop a point from stack, push all neightbors which could be entered.
-	//
 	for (;;) {
 		while (rp != ep) {
-			rpos = points[rp].pos;
-			state = points[rp].State;
-			for (i = 0; i < 8; ++i) { // mark all neighbors
+			const Vec2i rpos = points[rp].pos;
+			const unsigned char state = points[rp].State;
+			for (int i = 0; i < 8; ++i) { // mark all neighbors
 				pos = rpos + offset[i];
-				m = matrix + pos.x + pos.y * w;
+				unsigned char *m = matrix + pos.x + pos.y * w;
 
 				if (state != OnWater) {
 					if (*m) { // already checked
@@ -286,7 +248,6 @@ static bool AiFindTarget(const CUnit &unit,
 						delete[] points;
 						return 1;
 					}
-
 					if (CanMoveToMask(pos, mask)) { // reachable
 
 						*m = 1;
@@ -323,15 +284,11 @@ static bool AiFindTarget(const CUnit &unit,
 					}
 				}
 			}
-
 			if (++rp >= size) { // round about
 				rp = 0;
 			}
 		}
-
-		//
 		// Continue with next frame.
-		//
 		if (rp == wp) { // unreachable, no more points available
 			break;
 		}
@@ -351,23 +308,10 @@ static bool AiFindTarget(const CUnit &unit,
 int AiFindWall(AiForce *force)
 {
 	const Vec2i offset[] = {{0, -1}, {-1, 1}, {1, 0}, {0, 1}, {-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
-	Vec2i *points;
-	int size;
-	Vec2i pos;
-	Vec2i rpos;
-	int mask;
-	int wp;
-	int rp;
-	int ep;
-	int w;
-	unsigned char *m;
-	unsigned char *matrix;
-	Vec2i dest = {-1, -1};
-	CUnit *unit;
 
 	// Find a unit to use.  Best choice is a land unit with range 1.
 	// Next best choice is any land unit.  Otherwise just use the first.
-	unit = force->Units[0];
+	CUnit *unit = force->Units[0];
 	for (unsigned int i = 0; i < force->Units.size(); ++i) {
 		CUnit *aiunit = force->Units[i];
 		if (aiunit->Type->UnitType == UnitTypeLand) {
@@ -377,43 +321,39 @@ int AiFindWall(AiForce *force)
 			}
 		}
 	}
+	Vec2i pos = unit->tilePos;
+	const int size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
+	std::vector<Vec2i> points;
+	points.resize(size);
 
-	pos = unit->tilePos;
-	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
-	points = new Vec2i[size];
-
-	matrix = CreateMatrix();
-	w = Map.Info.MapWidth + 2;
+	unsigned char *matrix = CreateMatrix();
+	const int w = Map.Info.MapWidth + 2;
 	matrix += w + w + 2;
 
 	points[0] = pos;
-	rp = 0;
+	int rp = 0;
 	matrix[pos.x + pos.y * w] = 1; // mark start point
-	ep = wp = 1; // start with one point
+	int ep = 1;
+	int wp = 1; // start with one point
+	const int mask = unit->Type->MovementMask;
+	Vec2i dest = {-1, -1};
 
-	mask = unit->Type->MovementMask;
-
-	//
 	// Pop a point from stack, push all neighbors which could be entered.
-	//
 	for (; dest.x == -1;) {
 		while (rp != ep && dest.x == -1) {
-			rpos = points[rp];
+			Vec2i rpos = points[rp];
 			for (int i = 0; i < 8; ++i) { // mark all neighbors
 				pos = rpos + offset[i];
-				m = matrix + pos.x + pos.y * w;
+				unsigned char *m = matrix + pos.x + pos.y * w;
 				if (*m) {
 					continue;
 				}
-				//
 				// Check for a wall
-				//
 				if (Map.WallOnMap(pos)) {
 					DebugPrint("Wall found %d,%d\n" _C_ pos.x _C_ pos.y);
 					dest = pos;
 					break;
 				}
-
 				if (CanMoveToMask(pos, mask)) { // reachable
 					*m = 1;
 					points[wp] = pos; // push the point
@@ -428,17 +368,12 @@ int AiFindWall(AiForce *force)
 				rp = 0;
 			}
 		}
-
-		//
 		// Continue with next frame.
-		//
 		if (rp == wp) { // unreachable, no more points available
 			break;
 		}
 		ep = wp;
 	}
-	delete[] points;
-
 	if (dest.x != -1) {
 		force->State = AiForceAttackingState_Waiting;
 		for (unsigned int i = 0; i < force->Units.size(); ++i) {
@@ -472,10 +407,8 @@ int AiForce::PlanAttack()
 
 	unsigned char *watermatrix = CreateMatrix();
 
-	//
 	// Transporter must be already assigned to the force.
 	// NOTE: finding free transporters was too much work for me.
-	//
 	int state = 1;
 	for (unsigned int i = 0; i < Size(); ++i) {
 		const CUnit &aiunit = *Units[i];
@@ -487,9 +420,7 @@ int AiForce::PlanAttack()
 		}
 	}
 
-	//
 	// No transport that belongs to the force.
-	//
 	CUnit *transporter = NULL;
 	if (state) {
 		for (int i = 0; i < AiPlayer->Player->TotalNumUnits; ++i) {
@@ -511,10 +442,8 @@ int AiForce::PlanAttack()
 		return 0;
 	}
 
-	//
 	// Find a land unit of the force.
 	// FIXME: if force is split over different places -> broken
-	//
 	CUnit* landUnit = CUnitTypeFinder(UnitTypeLand).Find(Units);
 	if (landUnit == NULL) {
 		DebugPrint("%d: No land unit in force\n" _C_ AiPlayer->Player->Index);
@@ -581,119 +510,104 @@ int AiForce::PlanAttack()
 	return 0;
 }
 
+
+static bool ChooseRandomUnexploredPositionNear(const Vec2i& center, Vec2i *pos)
+{
+	Assert(pos != NULL);
+
+	int ray = 3;
+	const int maxTryCount = 8;
+	for (int i = 0; i != maxTryCount; ++i) {
+		pos->x = center.x + SyncRand() % (2 * ray + 1) - ray;
+		pos->y = center.y + SyncRand() % (2 * ray + 1) - ray;
+
+		if (Map.Info.IsPointOnMap(*pos)
+			&& Map.IsFieldExplored(*AiPlayer->Player, *pos) == false) {
+			return true;
+		}
+		ray = 3 * ray / 2;
+	}
+	return false;
+}
+
+static CUnit* GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
+{
+	// Choose a target, "near"
+	const Vec2i& center = request.pos;
+	if (ChooseRandomUnexploredPositionNear(center, pos) == false) {
+		return NULL;
+	}
+	// We have an unexplored tile in sight (pos)
+
+	CUnit *bestunit = NULL;
+	// Find an idle unit, responding to the mask
+	bool flyeronly = false;
+	int bestdistance = -1;
+	for (int i = 0; i != AiPlayer->Player->TotalNumUnits; ++i) {
+		CUnit &unit = *AiPlayer->Player->Units[i];
+
+		if (!unit.IsIdle()) {
+			continue;
+		}
+		if (Map.Info.IsPointOnMap(unit.tilePos) == false) {
+			continue;
+		}
+		if (unit.CanMove() == false) {
+			continue;
+		}
+		const CUnitType &type = *unit.Type;
+
+		if (type.UnitType != UnitTypeFly) {
+			if (flyeronly) {
+				continue;
+			}
+			if ((request.Mask & MapFieldLandUnit) && type.UnitType != UnitTypeLand) {
+				continue;
+			}
+			if ((request.Mask & MapFieldSeaUnit) && type.UnitType != UnitTypeNaval) {
+				continue;
+			}
+		} else {
+			flyeronly = true;
+		}
+
+		const int distance = MapDistance(unit.tilePos, *pos);
+		if (bestdistance == -1 || distance <= bestdistance
+			|| (bestunit->Type->UnitType != UnitTypeFly && type.UnitType == UnitTypeFly)) {
+			bestdistance = distance;
+			bestunit = &unit;
+		}
+	}
+	return bestunit;
+}
+
+
 /**
 **  Respond to ExplorationRequests
 */
 void AiSendExplorers()
 {
-	AiExplorationRequest *request;
-	int requestcount;
-	int requestid;
-	Vec2i pos;
-	int i;
-	int targetok;
-	int ray;
-	int trycount;
-	int outtrycount;
-	CUnit **unit;
-	CUnitType *type;
-	CUnit *bestunit;
-	int distance;
-	int bestdistance;
-	int flyeronly;
-
 	// Count requests...
-	requestcount = AiPlayer->FirstExplorationRequest.size();
+	const int requestcount = AiPlayer->FirstExplorationRequest.size();
 
 	// Nothing => abort
 	if (!requestcount) {
 		return;
 	}
-
-	outtrycount = 0;
-	do {
-		bestunit = 0;
-		++outtrycount;
-
+	const int maxTryCount = 5;
+	for (int i = 0; i != maxTryCount; ++i) {
 		// Choose a request
-		requestid = SyncRand() % requestcount;
-		request = &AiPlayer->FirstExplorationRequest[requestid];
+		const int requestid = SyncRand() % requestcount;
+		const AiExplorationRequest &request = AiPlayer->FirstExplorationRequest[requestid];
 
-		// Choose a target, "near"
-		const Vec2i& center = request->pos;
-		ray = 3;
-		trycount = 0;
-
-		do {
-			targetok = 0;
-
-			pos.x = center.x + SyncRand() % (2 * ray + 1) - ray;
-			pos.y = center.y + SyncRand() % (2 * ray + 1) - ray;
-
-			if (Map.Info.IsPointOnMap(pos)) {
-				targetok = !Map.IsFieldExplored(*AiPlayer->Player, pos);
-			}
-
-			ray = 3 * ray / 2;
-			++trycount;
-		} while (trycount < 8 && !targetok);
-
-		if (!targetok) {
-			continue;
+		Vec2i pos;
+		CUnit *bestunit = GetBestExplorer(request, &pos);
+		if (bestunit != NULL) {
+			CommandMove(*bestunit, pos, FlushCommands);
+			AiPlayer->LastExplorationGameCycle = GameCycle;
+			break;
 		}
-
-		// We have an unexplored tile in sight (x,y)
-
-		// Find an idle unit, responding to the mask
-		flyeronly = 0;
-		bestdistance = -1;
-
-		unit = AiPlayer->Player->Units;
-		for (i = AiPlayer->Player->TotalNumUnits; i > 0; ++unit) {
-			--i;
-
-			if (!(*unit)->IsIdle()) {
-				continue;
-			}
-
-			if ((*unit)->tilePos.x == -1 || (*unit)->tilePos.y == -1) {
-				continue;
-			}
-
-			type = (*unit)->Type;
-
-			if (!(*unit)->CanMove()) {
-				continue;
-			}
-
-			if (type->UnitType != UnitTypeFly) {
-				if (flyeronly) {
-					continue;
-				}
-				if ((request->Mask & MapFieldLandUnit) && type->UnitType != UnitTypeLand) {
-					continue;
-				}
-				if ((request->Mask & MapFieldSeaUnit) && type->UnitType != UnitTypeNaval) {
-					continue;
-				}
-			} else {
-				flyeronly = 1;
-			}
-
-			distance = ((*unit)->tilePos.x - pos.x) * ((*unit)->tilePos.x - pos.x) + ((*unit)->tilePos.y - pos.y) * ((*unit)->tilePos.y - pos.y);
-			if (bestdistance == -1 || distance <= bestdistance ||
-					(bestunit->Type->UnitType != UnitTypeFly && type->UnitType == UnitTypeFly)) {
-				bestdistance = distance;
-				bestunit = (*unit);
-			}
-		}
-	} while (outtrycount <= 4 && !bestunit);
-
-	if (bestunit) {
-		CommandMove(*bestunit, pos, FlushCommands);
-		AiPlayer->LastExplorationGameCycle = GameCycle;
 	}
-
 	// Remove all requests
 	AiPlayer->FirstExplorationRequest.clear();
 }

@@ -51,10 +51,9 @@ void AiCheckMagic()
 {
 	CPlayer &player = *AiPlayer->Player;
 	const int n = player.TotalNumUnits;
-	CUnit **units = player.Units;
 
 	for (int i = 0; i < n; ++i) {
-		CUnit &unit = *units[i];
+		CUnit &unit = *player.Units[i];
 
 		// Check only magic units
 		if (unit.Type->CanCastSpell) {
