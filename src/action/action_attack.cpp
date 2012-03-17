@@ -237,6 +237,9 @@ void AnimateActionAttack(CUnit &unit, COrder& order)
 	CUnit *goal = this->GetGoal();
 
 	if (goal) {
+		if (goal->IsAlive() == false) {
+			return false;
+		}
 		if (goal == attacker) {
 			return true;
 		}
@@ -498,7 +501,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	const int dist = unit.MapDistanceTo(*goal);
 	if (dist > unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 		// towers don't chase after goal
-		if (unit.CanMove()) {		
+		if (unit.CanMove()) {
 			COrder *savedOrder = this->Clone();
 			if (unit.StoreOrder(savedOrder) == false) {
 				delete savedOrder;
