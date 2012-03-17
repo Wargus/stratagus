@@ -120,7 +120,8 @@ static bool AnimateActionDie(CUnit &unit)
 
 	unit.Remove(NULL);
 	unit.Type = &corpseType;
-	unit.Stats = &type.Stats[unit.Player->Index];
+	unit.Stats = &corpseType.Stats[unit.Player->Index];
+	UpdateUnitSightRange(unit);
 	unit.Place(unit.tilePos);
 
 	unit.Frame = 0;
