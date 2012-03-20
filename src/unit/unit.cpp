@@ -78,6 +78,7 @@ int NumUnits;                             /// Number of slots used
 bool EnableTrainingQueue;                 /// Config: training queues enabled
 bool EnableBuildingCapture;               /// Config: capture buildings enabled
 bool RevealAttacker;                      /// Config: reveal attacker enabled
+int ResourcesMultiBuildersMultiplier = 0; /// Config: spend resources for building with multiple workers
 
 static unsigned long HelpMeLastCycle;     /// Last cycle HelpMe sound played
 static int HelpMeLastX;                   /// Last X coordinate HelpMe sound played
@@ -476,13 +477,6 @@ CUnit *MakeUnit(CUnitType &type, CPlayer *player)
 	// Only Assign if a Player was specified
 	if (player) {
 		unit->AssignToPlayer(*player);
-	}
-
-	// Increase the max resources limit
-	for (int i = 0; i < MaxCosts; ++i) {
-		if (type._Storing[i] && unit->Player->MaxResources[i] != -1) {
-			unit->Player->MaxResources[i] += type._Storing[i];
-		}
 	}
 
 	if (type.Building) {

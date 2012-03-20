@@ -288,6 +288,8 @@ bool COrder_Attack::CheckForDeadGoal(CUnit &unit)
 	this->MinRange = 0;
 	this->Range = 0;
 	this->ClearGoal();
+	this->Finished = true;
+	this->State = 0;
 
 	// If we have a saved order continue this saved order.
 	if (unit.RestoreOrder()) {
@@ -588,6 +590,8 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 
 		case WEAK_TARGET:
 			DebugPrint("FIXME: wrong entry.\n");
+			this->Finished = true;
+			unit.State = 0;
 			break;
 	}
 }

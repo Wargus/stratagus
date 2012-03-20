@@ -123,6 +123,20 @@ static int CclSetRevealAttacker(lua_State *l)
 }
 
 /**
+**  Set reveal attacker
+**
+**  @param l  Lua state.
+**
+**  @return   The old state of the flag
+*/
+static int CclResourcesMultiBuildersMultiplier(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	ResourcesMultiBuildersMultiplier = LuaToNumber(l, 1);
+	return 0;
+}
+
+/**
 **  Get a unit pointer
 **
 **  @param l  Lua state.
@@ -1133,6 +1147,7 @@ void UnitCclRegister()
 	lua_register(Lua, "SetTrainingQueue", CclSetTrainingQueue);
 	lua_register(Lua, "SetBuildingCapture", CclSetBuildingCapture);
 	lua_register(Lua, "SetRevealAttacker", CclSetRevealAttacker);
+	lua_register(Lua, "ResourcesMultiBuildersMultiplier", CclResourcesMultiBuildersMultiplier);
 
 	lua_register(Lua, "Unit", CclUnit);
 

@@ -172,6 +172,28 @@
 	}
 }
 
+bool SubRepairCosts(const CUnit &unit, CPlayer &player, CUnit &goal)
+{
+	int *RepairCosts = goal.Type->RepairCosts;
+
+	// Check if enough resources are available
+	if (ResourcesMultiBuildersMultiplier) {
+		for (int i = 1; i < MaxCosts; ++i) {
+			RepairCosts[i] = goal.Type->RepairCosts[i] * ResourcesMultiBuildersMultiplier;
+		}
+	}	
+	for (int i = 1; i < MaxCosts; ++i) {
+		if (player.Resources[i] < RepairCosts[i]) {
+			player.Notify(NotifyYellow, unit.tilePos,
+				_("We need more %s for repair!"), DefaultResourceNames[i].c_str());
+			return true;
+		}
+	}
+
+	// Subtract the resources
+	player.SubCosts(RepairCosts);
+	return false;
+}
 
 /**
 **  Repair a unit.
@@ -183,31 +205,27 @@
 */
 bool COrder_Repair::RepairUnit(const CUnit &unit, CUnit &goal)
 {
+	CPlayer &player = *unit.Player;
+
 	if (goal.CurrentAction() == UnitActionBuilt) {
 		COrder_Built &order = *static_cast<COrder_Built *>(goal.CurrentOrder());
 
 		order.ProgressHp(goal, 100 * this->RepairCycle);
 		this->RepairCycle = 0;
+		if (ResourcesMultiBuildersMultiplier && SubRepairCosts(unit, player, goal)) {
+			return true;
+		}
 		return false;
 	}
 	if (goal.Variable[HP_INDEX].Value >= goal.Variable[HP_INDEX].Max) {
 		return true;
 	}
-	CPlayer &player = *unit.Player;
 
-	// Calculate the repair costs.
 	Assert(goal.Stats->Variables[HP_INDEX].Max);
 
-	// Check if enough resources are available
-	for (int i = 1; i < MaxCosts; ++i) {
-		if (player.Resources[i] < goal.Type->RepairCosts[i]) {
-			player.Notify(NotifyYellow, unit.tilePos,
-				_("We need more %s for repair!"), DefaultResourceNames[i].c_str());
-			return true;
-		}
+	if (SubRepairCosts(unit, player, goal)) {
+		return true;
 	}
-	// Subtract the resources
-	player.SubCosts(goal.Type->RepairCosts);
 
 	goal.Variable[HP_INDEX].Value += goal.Type->RepairHP;
 	if (goal.Variable[HP_INDEX].Value >= goal.Variable[HP_INDEX].Max) {

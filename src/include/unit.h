@@ -954,9 +954,10 @@ extern int NumUnits;                 /// Number of units used
 // in unit_draw.c
 /// @todo could be moved into the user interface ?
 extern unsigned long ShowOrdersCount;   /// Show orders for some time
-extern bool EnableTrainingQueue;        /// Config: training queues enabled
-extern bool EnableBuildingCapture;      /// Config: building capture enabled
-extern bool RevealAttacker;             /// Config: reveal attacker enabled
+extern bool EnableTrainingQueue;               /// Config: training queues enabled
+extern bool EnableBuildingCapture;             /// Config: building capture enabled
+extern bool RevealAttacker;				       /// Config: reveal attacker enabled
+extern int ResourcesMultiBuildersMultiplier;   /// Config: spend resources for building with multiple workers
 extern const CViewport *CurrentViewport; /// CurrentViewport
 extern void DrawUnitSelection(const CViewport *vp,const CUnit &unit);
 extern void (*DrawSelection)(Uint32, int, int, int, int);

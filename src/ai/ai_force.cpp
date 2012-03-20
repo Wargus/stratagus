@@ -523,6 +523,33 @@ void AiAttackWithForce(unsigned int force)
 		DebugPrint("Force out of range: %d" _C_ force);
 		return ;
 	}
+
+	// The AI finds the first unassigned force, moves all data to it and cleans
+	// the first force, so we can reuse it
+	if (!AiPlayer->Force[force].Defending) {
+		unsigned int top;
+		unsigned int f = AiPlayer->Force.FindFreeForce();
+		AiPlayer->Force[f].Reset();
+
+		AiPlayer->Force[f].Role = AiPlayer->Force[force].Role;
+
+		while (AiPlayer->Force[force].Size()) {
+			CUnit &aiunit = *AiPlayer->Force[force].Units[AiPlayer->Force[force].Size()-1];
+			aiunit.GroupId = f + 1;
+			AiPlayer->Force[force].Units.Remove(&aiunit);
+			AiPlayer->Force[f].Units.Insert(&aiunit);
+		}
+
+		while (AiPlayer->Force[force].UnitTypes.size()) {
+			top = AiPlayer->Force[force].UnitTypes.size()-1;
+			AiPlayer->Force[f].UnitTypes.push_back(AiPlayer->Force[force].UnitTypes[top]);
+			AiPlayer->Force[force].UnitTypes.pop_back();
+		}
+		AiPlayer->Force[force].Reset();
+		AiPlayer->Force[f].Completed = true;
+		force = f;
+	}
+
 	const Vec2i invalidPos = {-1, -1};
 	AiPlayer->Force[force].Attack(invalidPos);
 }
@@ -538,6 +565,7 @@ void AiAttackWithForces(int *forces)
 {
 	const Vec2i invalidPos = {-1, -1};
 	bool found = false;
+	unsigned int top;
 	unsigned int f = AiPlayer->Force.FindFreeForce();
 
 	AiPlayer->Force[f].Reset();
@@ -549,17 +577,18 @@ void AiAttackWithForces(int *forces)
 		{
 			found = true;
 
-			//Fixme: this is triky but should work
 			AiPlayer->Force[f].Role = AiPlayer->Force[force].Role;
 
-			for (unsigned int j = 0; j < AiPlayer->Force[force].Units.size(); ++j) {
-				CUnit &aiunit = *AiPlayer->Force[force].Units[j];
-
+			while (AiPlayer->Force[force].Size()) {
+				CUnit &aiunit = *AiPlayer->Force[force].Units[AiPlayer->Force[force].Size()-1];
 				aiunit.GroupId = f + 1;
+				AiPlayer->Force[force].Units.Remove(&aiunit);
 				AiPlayer->Force[f].Units.Insert(&aiunit);
 			}
-			for (unsigned int j = 0; j < AiPlayer->Force[force].UnitTypes.size(); ++j) {
-				AiPlayer->Force[f].UnitTypes.push_back(AiPlayer->Force[force].UnitTypes[j]);
+			while (AiPlayer->Force[force].UnitTypes.size()) {
+				top = AiPlayer->Force[force].UnitTypes.size()-1;
+				AiPlayer->Force[f].UnitTypes.push_back(AiPlayer->Force[force].UnitTypes[top]);
+				AiPlayer->Force[force].UnitTypes.pop_back();
 			}
 			AiPlayer->Force[force].Reset();
 		} else {
@@ -567,6 +596,7 @@ void AiAttackWithForces(int *forces)
 		}
 	}
 	if (found) {
+		AiPlayer->Force[f].Completed = true;
 		AiPlayer->Force[f].Attack(invalidPos);
 	} else {
 		AiPlayer->Force[f].Reset(true);
