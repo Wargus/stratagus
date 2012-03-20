@@ -174,13 +174,12 @@
 
 bool SubRepairCosts(const CUnit &unit, CPlayer &player, CUnit &goal)
 {
-	int *RepairCosts = goal.Type->RepairCosts;
+	int RepairCosts[MaxCosts];
 
 	// Check if enough resources are available
-	if (ResourcesMultiBuildersMultiplier) {
-		for (int i = 1; i < MaxCosts; ++i) {
-			RepairCosts[i] = goal.Type->RepairCosts[i] * ResourcesMultiBuildersMultiplier;
-		}
+	for (int i = 1; i < MaxCosts; ++i) {
+		RepairCosts[i] = goal.Type->RepairCosts[i] * 
+			(goal.CurrentAction() == UnitActionBuilt ? ResourcesMultiBuildersMultiplier : 1);
 	}	
 	for (int i = 1; i < MaxCosts; ++i) {
 		if (player.Resources[i] < RepairCosts[i]) {

@@ -123,11 +123,9 @@ static int CclSetRevealAttacker(lua_State *l)
 }
 
 /**
-**  Set reveal attacker
+**  Set cost multiplier to RepairCost for buildings additional workers helping (0 = no additional cost)
 **
 **  @param l  Lua state.
-**
-**  @return   The old state of the flag
 */
 static int CclResourcesMultiBuildersMultiplier(lua_State *l)
 {
