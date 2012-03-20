@@ -56,6 +56,7 @@ set(action_SRCS
 	src/action/action_unload.cpp
 	src/action/action_upgradeto.cpp
 	src/action/actions.cpp
+	src/action/animation.cpp
 	src/action/command.cpp
 )
 source_group(action FILES ${action_SRCS})
