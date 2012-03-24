@@ -441,6 +441,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 			player.NumBuildings++;
 		}
 	}
+	Player = &player;
 	Stats = &type.Stats[Player->Index];
 	Colors = &player.UnitColors;
 	if (!SaveGameLoading) {
