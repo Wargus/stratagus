@@ -526,7 +526,6 @@ int ToggleUnitsByType(CUnit &base)
 */
 int SelectGroup(int group_number, GroupSelectionMode mode)
 {
-	Assert(group_number <= NUM_GROUPS);
 	int nunits = GetNumberUnitsOfGroup(group_number, SELECT_ALL);
 	if (nunits) {
 		if (mode == SELECT_ALL || !IsGroupTainted(group_number)) {

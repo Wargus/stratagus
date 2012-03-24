@@ -34,30 +34,31 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stratagus.h"
+
 #include "unit.h"
+
 #include "unit_manager.h"
 #include "unittype.h"
 #include "script.h"
-#include "player.h"
 #include "iolib.h"
-#include "actions.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
 /**
+**  How many groups supported
+*/
+#define NUM_GROUPS 10
+
+/**
 **  Defines a group of units.
 */
 struct CUnitGroup {
-	CUnit **Units;                       /// Units in the group
-	int NumUnits;                        /// How many units in the group
-	int tainted;						/// Group hold unit which can't be SelectableByRectangle
+	CUnit **Units;  /// Units in the group
+	int NumUnits;   /// How many units in the group
+	bool tainted;    /// Group hold unit which can't be SelectableByRectangle
 };                                       /// group of units
 
 static CUnitGroup Groups[NUM_GROUPS];    /// Number of groups predefined
@@ -113,7 +114,8 @@ void CleanGroups()
 	}
 }
 
-int IsGroupTainted(int num) {
+bool IsGroupTainted(int num) {
+	Assert(num < NUM_GROUPS);
 	return Groups[num].tainted;
 }
 
@@ -126,6 +128,7 @@ int IsGroupTainted(int num) {
 */
 int GetNumberUnitsOfGroup(int num, GroupSelectionMode mode)
 {
+	Assert(num < NUM_GROUPS);
 	if (mode != SELECT_ALL && Groups[num].tainted && Groups[num].NumUnits) {
 		int count = 0;
 		for(int i = 0; i < Groups[num].NumUnits; ++i)
@@ -149,6 +152,7 @@ int GetNumberUnitsOfGroup(int num, GroupSelectionMode mode)
 */
 CUnit **GetUnitsOfGroup(int num)
 {
+	Assert(num < NUM_GROUPS);
 	return Groups[num].Units;
 }
 
@@ -159,15 +163,15 @@ CUnit **GetUnitsOfGroup(int num)
 */
 void ClearGroup(int num)
 {
-	CUnitGroup *group;
+	Assert(num < NUM_GROUPS);
+	CUnitGroup &group = Groups[num];
 
-	group = &Groups[num];
-	for (int i = 0; i < group->NumUnits; ++i) {
-		group->Units[i]->GroupId &= ~(1 << num);
-		Assert(!group->Units[i]->Destroyed);
+	for (int i = 0; i < group.NumUnits; ++i) {
+		group.Units[i]->GroupId &= ~(1 << num);
+		Assert(!group.Units[i]->Destroyed);
 	}
-	group->NumUnits = 0;
-	group->tainted = 0;
+	group.NumUnits = 0;
+	group.tainted = 0;
 }
 
 /**
@@ -181,18 +185,18 @@ void AddToGroup(CUnit **units, int nunits, int num)
 {
 	Assert(num <= NUM_GROUPS);
 
-	CUnitGroup *group = &Groups[num];
-	for (int i = 0; group->NumUnits < MaxSelectable && i < nunits; ++i) {
+	CUnitGroup &group = Groups[num];
+	for (int i = 0; group.NumUnits < MaxSelectable && i < nunits; ++i) {
 		// Add to group only if they are on our team
 		// Buildings can be in group but it "taint" the group.
 		// Taited groups normaly select only SelectableByRectangle units but
 		// you can force selection to show hiden members (with buildings) by
-		// seletcing ALT-(SHIFT)-#
+		// selecting ALT-(SHIFT)-#
 		if (ThisPlayer->IsTeamed(*units[i])) {
-			if (!group->tainted) {
-				group->tainted = units[i]->Type->SelectableByRectangle != true;
+			if (!group.tainted) {
+				group.tainted = units[i]->Type->SelectableByRectangle != true;
 			}
-			group->Units[group->NumUnits++] = units[i];
+			group.Units[group.NumUnits++] = units[i];
 			units[i]->GroupId |= (1 << num);
 		}
 	}
@@ -220,38 +224,29 @@ void SetGroup(CUnit **units, int nunits, int num)
 */
 void RemoveUnitFromGroups(CUnit &unit)
 {
-	CUnitGroup *group;
-	int num;
-	int i;
-
 	Assert(unit.GroupId != 0);  // unit doesn't belong to a group
 
-	for (num = 0; unit.GroupId; ++num, unit.GroupId >>= 1) {
+	for (int num = 0; unit.GroupId; ++num, unit.GroupId >>= 1) {
 		if ((unit.GroupId & 1) != 1) {
 			continue;
 		}
+		CUnitGroup &group = Groups[num];
 
-		group = &Groups[num];
-		for (i = 0; group->Units[i] != &unit; ++i) {
-			;
+		int ind;
+		for (ind = 0; group.Units[ind] != &unit; ++ind) {
+			Assert(ind < group.NumUnits); // oops not found
+		}
+		if (ind < --group.NumUnits) {
+			group.Units[ind] = group.Units[group.NumUnits];
 		}
 
-		Assert(i < group->NumUnits);  // oops not found
-
-		// This is a clean way that will allow us to add a unit
-		// to a group easily, or make an easy array walk...
-		if (i < --group->NumUnits) {
-			group->Units[i] = group->Units[group->NumUnits];
-		}
-
-		if (group->tainted && !unit.Type->SelectableByRectangle) {
-			for (i = 0; i < group->NumUnits; ++i) {
-				if (group->Units[i]->Type && !group->Units[i]->Type->SelectableByRectangle) {
-					break;
+		// Update tainted flag.
+		if (group.tainted && !unit.Type->SelectableByRectangle) {
+			group.tainted = false;
+			for (int i = 0; i < group.NumUnits; ++i) {
+				if (group.Units[i]->Type && !group.Units[i]->Type->SelectableByRectangle) {
+					group.tainted = true;
 				}
-			}
-			if (i == group->NumUnits) {
-				group->tainted = 0;
 			}
 		}
 	}
@@ -266,27 +261,23 @@ void RemoveUnitFromGroups(CUnit &unit)
 */
 static int CclGroup(lua_State *l)
 {
-	int i;
-	CUnitGroup *grp;
-	int args;
-	int j;
-
 	LuaCheckArgs(l, 3);
 
 	InitGroups();
-	grp = &Groups[(int)LuaToNumber(l, 1)];
-	grp->NumUnits = LuaToNumber(l, 2);
-	i = 0;
-	args = lua_objlen(l, 3);
-	for (j = 0; j < args; ++j) {
-		const char *str;
-
-		lua_rawgeti(l, 3, j + 1);
-		str = LuaToString(l, -1);
-		lua_pop(l, 1);
-		grp->Units[i++] = UnitSlots[strtol(str + 1, NULL, 16)];
+	const int grpNum = LuaToNumber(l, 1);
+	if (NUM_GROUPS <= grpNum) {
+		LuaError(l, "grpIndex out of bound");
 	}
-
+	CUnitGroup &grp = Groups[grpNum];
+	grp.NumUnits = LuaToNumber(l, 2);
+	int i = 0;
+	const int args = lua_objlen(l, 3);
+	for (int j = 0; j < args; ++j) {
+		lua_rawgeti(l, 3, j + 1);
+		const char *str = LuaToString(l, -1);
+		lua_pop(l, 1);
+		grp.Units[i++] = UnitSlots[strtol(str + 1, NULL, 16)];
+	}
 	return 0;
 }
 

@@ -920,11 +920,6 @@ struct CResourceDepositFinder {
 #define UnitNumber(unit) ((unit).Slot)
 
 /**
-**  How many groups supported
-*/
-#define NUM_GROUPS 10
-
-/**
 **  User preference.
 */
 class CPreference {
@@ -1172,7 +1167,7 @@ extern void SetGroup(CUnit **units, int nunits, int num);
 extern void RemoveUnitFromGroups(CUnit &unit);
 	/// Register CCL group features
 extern void GroupCclRegister();
-extern int IsGroupTainted(int num);
+extern bool IsGroupTainted(int num);
 
 // in selection.c
 
