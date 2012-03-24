@@ -42,6 +42,9 @@ class CPlayer
 	int TotalRazings;
 	int TotalKills;
 
+	CUnit& GetUnit(int index) const;
+	int GetUnitCount() const;
+
 	bool IsEnemy(const CPlayer &player) const;
 	bool IsEnemy(const CUnit &unit) const;
 	bool IsAllied(const CPlayer &player) const;
