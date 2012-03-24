@@ -122,7 +122,7 @@ void PathFinderOutput::Save(CFile &file) const
 */
 void SaveUnit(const CUnit &unit, CFile &file)
 {
-	file.printf("\nUnit(%d, ", UnitNumber(unit));
+	file.printf("\nUnit(%d, {", UnitNumber(unit));
 
 	// 'type and 'player must be first, needed to create the unit slot
 	file.printf("\"type\", \"%s\", ", unit.Type->Ident.c_str());
@@ -322,7 +322,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		}
 	}
 
-	file.printf(")\n");
+	file.printf("})\n");
 }
 
 /**

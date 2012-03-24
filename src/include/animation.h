@@ -118,6 +118,7 @@ public:
 		{
 			delete[] D.SetVar.Var;
 			delete[] D.SetVar.Value;
+			delete[] D.SetVar.UnitSlot;
 		}
 		else if (Type == AnimationSetPlayerVar)
 		{
@@ -201,6 +202,7 @@ public:
 			int Mod;
 			const char *Var;
 			const char *Value;
+			const char *UnitSlot;
 		} SetVar;
 		struct {
 			int Mod;

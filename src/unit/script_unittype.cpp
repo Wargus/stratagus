@@ -1673,10 +1673,22 @@ static void ParseAnimationFrame(lua_State *l, const char *str,
 			}
 		anim->D.SetVar.Mod = atoi(op2);
 		op2 = next;
-		while (*op2 == ' ') {
-			++op2;
-		}
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
 		anim->D.SetVar.Value = new_strdup(op2);
+		if (next) {
+			op2 = next;
+			while (*next == ' ') {
+				*next++ = '\0';
+			}		
+			anim->D.SetVar.UnitSlot = new_strdup(op2);
+		} else {
+			anim->D.SetVar.UnitSlot = NULL;
+		}
 	} else if (op1 == "set-player-var") {
 		anim->Type = AnimationSetPlayerVar;
 		next = strchr(op2, ' ');

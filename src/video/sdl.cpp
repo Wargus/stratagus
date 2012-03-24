@@ -543,7 +543,12 @@ void InitVideoSdl()
 	Video.Height = 480;
 #endif
 
-	flags = 0;
+	#ifdef USE_WIN32
+		flags = SDL_HWSURFACE|SDL_HWPALETTE;
+	#else
+		flags = 0;
+	#endif
+		
 	// Sam said: better for windows.
 	/* SDL_HWSURFACE|SDL_HWPALETTE | */
 	if (Video.FullScreen) {

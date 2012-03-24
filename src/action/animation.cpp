@@ -364,6 +364,9 @@ int ParseAnimInt(CUnit *unit, const char *parseint)
 			*next = '\0';
 			return atoi(cur) + SyncRand(atoi(next + 1));
 		}
+	} else if (s[0] == 'l') { //player number
+		return ParseAnimPlayer(*unit, cur);
+		
 	}
 	return atoi(parseint);
 }
@@ -565,15 +568,10 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 					if (flags & ANIM_SM_DAMAGE) {
 						missile->SourceUnit = &unit;
 						unit.RefsIncrease();
-					}
-					if (!missile->Type->Range) {
-						if (flags & ANIM_SM_TOTARGET) {
-							missile->TargetUnit = goal->CurrentOrder()->GetGoal();
-							goal->CurrentOrder()->GetGoal()->RefsIncrease();
-						} else {
-							missile->TargetUnit = goal;
-							goal->RefsIncrease();
-						}
+					}					
+					if (flags & ANIM_SM_TOTARGET) {
+						missile->TargetUnit = goal->CurrentOrder()->GetGoal();
+						goal->CurrentOrder()->GetGoal()->RefsIncrease();
 					}
 				}
 				break;
@@ -583,7 +581,7 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 				const int offX = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.OffX);
 				const int offY = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.OffY);
 				const int range = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.Range);
-				const int playerId = ParseAnimPlayer(unit, unit.Anim.Anim->D.SpawnUnit.Player);
+				const int playerId = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.Player);
 				CPlayer &player = Players[playerId];
 				const Vec2i pos = { unit.tilePos.x + offX, unit.tilePos.y + offY};
 				CUnitType *type = UnitTypeByIdent(unit.Anim.Anim->D.SpawnUnit.Unit);
@@ -636,6 +634,7 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 			case AnimationSetVar:
 			{
 				char arg1[128];
+				CUnit *goal = &unit;
 
 				strcpy(arg1, unit.Anim.Anim->D.SetVar.Var);
 				const int rop = ParseAnimInt(&unit, unit.Anim.Anim->D.SetVar.Value);
@@ -652,15 +651,31 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 					fprintf(stderr, "Bad variable name '%s'\n" _C_ arg1);
 					Exit(1);
 				}
+				if (unit.Anim.Anim->D.SetVar.UnitSlot) {
+					switch (*unit.Anim.Anim->D.SetVar.UnitSlot) {
+						case 'l': // last created unit
+							goal = Units[NumUnits-1];
+							break;
+						case 't': // target unit
+							goal = unit.CurrentOrder()->GetGoal();
+							break;
+						case 's': // unit self (no use)
+							goal = &unit;
+							break;
+					}
+				}
+				if (!goal) {
+					break;
+				}
 				int value = 0;
 				if (!strcmp(next + 1, "Value")) {
-					value = unit.Variable[index].Value;
+					value = goal->Variable[index].Value;
 				} else if (!strcmp(next + 1, "Max")) {
-					value = unit.Variable[index].Max;
+					value = goal->Variable[index].Max;
 				} else if (!strcmp(next + 1,"Increase")) {
-					value = unit.Variable[index].Increase;
+					value = goal->Variable[index].Increase;
 				} else if (!strcmp(next + 1, "Enable")) {
-					value = unit.Variable[index].Enable;
+					value = goal->Variable[index].Enable;
 				}
 				switch (unit.Anim.Anim->D.SetVar.Mod) {
 					case MOD_ADD:
@@ -692,13 +707,13 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 						value = rop;
 				}
 				if (!strcmp(next + 1, "Value")) {
-					unit.Variable[index].Value = value;
+					goal->Variable[index].Value = value;
 				} else if (!strcmp(next + 1, "Max")) {
-					unit.Variable[index].Max = value;
+					goal->Variable[index].Max = value;
 				} else if (!strcmp(next + 1, "Increase")) {
-					unit.Variable[index].Increase = value;
+					goal->Variable[index].Increase = value;
 				} else if (!strcmp(next + 1, "Enable")) {
-					unit.Variable[index].Enable = value;
+					goal->Variable[index].Enable = value;
 				}
 				break;
 			}
@@ -706,7 +721,7 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 			{
 				const char *var = unit.Anim.Anim->D.SetPlayerVar.Var;
 				const char *arg = unit.Anim.Anim->D.SetPlayerVar.Arg;
-				int playerId = ParseAnimPlayer(unit, unit.Anim.Anim->D.SetPlayerVar.Player);
+				int playerId = ParseAnimInt(&unit, unit.Anim.Anim->D.SetPlayerVar.Player);
 				int rop = ParseAnimInt(&unit, unit.Anim.Anim->D.SetPlayerVar.Value);
 				int data = GetPlayerData(playerId, var, arg);
 
@@ -765,21 +780,21 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 					const Vec2i pos = target.tilePos + target.Type->GetHalfTileSize() - unit.tilePos;
 					UnitHeadingFromDeltaXY(unit, pos);
 				} else {
-					UnitRotate(unit, ParseAnimPlayer(unit, unit.Anim.Anim->D.Rotate.Rotate));
+					UnitRotate(unit, ParseAnimInt(&unit, unit.Anim.Anim->D.Rotate.Rotate));
 				}
 				break;
 
 			case AnimationRandomRotate:
 				if ((SyncRand() >> 8) & 1) {
-					UnitRotate(unit, -ParseAnimPlayer(unit, unit.Anim.Anim->D.Rotate.Rotate));
+					UnitRotate(unit, -ParseAnimInt(&unit, unit.Anim.Anim->D.Rotate.Rotate));
 				} else {
-					UnitRotate(unit, ParseAnimPlayer(unit, unit.Anim.Anim->D.Rotate.Rotate));
+					UnitRotate(unit, ParseAnimInt(&unit, unit.Anim.Anim->D.Rotate.Rotate));
 				}
 				break;
 
 			case AnimationMove:
 				Assert(!move);
-				move = ParseAnimPlayer(unit, unit.Anim.Anim->D.Move.Move);
+				move = ParseAnimInt(&unit, unit.Anim.Anim->D.Move.Move);
 				break;
 
 			case AnimationUnbreakable:
@@ -798,7 +813,7 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 				unit.Anim.Anim = unit.Anim.Anim->D.Goto.Goto;
 				break;
 			case AnimationRandomGoto:
-				if (SyncRand() % 100 < ParseAnimPlayer(unit, unit.Anim.Anim->D.RandomGoto.Random)) {
+				if (SyncRand() % 100 < ParseAnimInt(&unit, unit.Anim.Anim->D.RandomGoto.Random)) {
 					unit.Anim.Anim = unit.Anim.Anim->D.RandomGoto.Goto;
 				}
 				break;

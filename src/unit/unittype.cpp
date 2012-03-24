@@ -239,6 +239,13 @@ void UpdateStats(int reset)
 			}
 		}
 
+		// Non-solid units can always be entered and they don't block anything
+		if (type->NonSolid) {
+			type->MovementMask = 0;
+			type->FieldFlags = 0;
+			continue;
+		}
+
 		//
 		//  As side effect we calculate the movement flags/mask here.
 		//
@@ -290,13 +297,13 @@ void UpdateStats(int reset)
 			}
 			type->MovementMask |= MapFieldNoBuilding;
 			//
-			// A little chaos, buildings without HP or with special flag can be entered.
+			// A little chaos, buildings without HP can be entered.
 			// The oil-patch is a very special case.
 			//
-			if (type->NonSolid || !type->Variable[HP_INDEX].Max) {
-				type->FieldFlags = MapFieldNoBuilding;
-			} else {
+			if (type->Variable[HP_INDEX].Max) {
 				type->FieldFlags = MapFieldBuilding;
+			} else {
+				type->FieldFlags = MapFieldNoBuilding;
 			}
 		} else switch (type->UnitType) {
 			case UnitTypeLand: // on land

@@ -396,7 +396,7 @@ int AdjustVariable::Cast(CUnit &caster, const SpellType *, CUnit *target, int, i
 			unit->Variable[i].Value = unit->Variable[i].Max;
 		}
 	}
-	return 0;
+	return 1;
 }
 
 
@@ -828,7 +828,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType *spell
 	Assert(autocast);
 	int x = caster.tilePos.x;
 	int y = caster.tilePos.y;
-	int range = spell->AutoCast->Range;
+	int range = autocast->Range;
 
 
 	// Select all units aroung the caster

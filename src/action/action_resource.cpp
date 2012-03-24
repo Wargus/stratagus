@@ -542,9 +542,6 @@ void COrder_Resource::LoseResource(CUnit &unit, const CUnit &source)
 
 	// Continue to harvest if we aren't fully loaded
 	if (resinfo.HarvestFromOutside && unit.ResourcesHeld < resinfo.ResourceCapacity){
-		if (unit.Container) {
-			DropOutOnSide(unit, LookingW, &source);
-		}
 		const Vec2i pos = unit.tilePos;
 		CUnit *goal = UnitFindResource(unit, pos, 15, this->CurrentResource, 1);
 
@@ -700,7 +697,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 					return 0;
 				}
 				DebugPrint("%d: Worker %d report: Resource is destroyed\n" _C_ unit.Player->Index _C_ unit.Slot);
-				bool dead = source->CurrentAction() == UnitActionDie;
+				bool dead = source->Destroyed || source->CurrentAction() == UnitActionDie;
 
 				// Improved version of DropOutAll that makes workers go to the depot.
 				LoseResource(unit, *source);

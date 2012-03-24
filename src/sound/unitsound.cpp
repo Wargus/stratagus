@@ -101,6 +101,7 @@ static void MapAnimSounds(CUnitType *type)
 	MapAnimSounds2(type->Animations->Still);
 	MapAnimSounds2(type->Animations->Move);
 	MapAnimSounds2(type->Animations->Attack);
+	MapAnimSounds2(type->Animations->SpellCast);
 	for (i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
 		MapAnimSounds2(type->Animations->Death[i]);
 	}
