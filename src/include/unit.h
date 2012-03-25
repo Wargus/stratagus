@@ -1224,8 +1224,6 @@ extern void SelectionCclRegister();
 
 // in ccl_unit.c
 
-	/// Parse order
-extern void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr order);
 	/// register CCL units features
 extern void UnitCclRegister();
 

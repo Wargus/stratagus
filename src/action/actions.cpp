@@ -42,11 +42,29 @@
 
 #include "actions.h"
 
+#include "action/action_attack.h"
+#include "action/action_board.h"
+#include "action/action_build.h"
+#include "action/action_built.h"
+#include "action/action_die.h"
+#include "action/action_follow.h"
+#include "action/action_move.h"
+#include "action/action_patrol.h"
+#include "action/action_repair.h"
+#include "action/action_research.h"
+#include "action/action_resource.h"
+#include "action/action_spellcast.h"
+#include "action/action_still.h"
+#include "action/action_train.h"
+#include "action/action_unload.h"
+#include "action/action_upgradeto.h"
+
 #include "commands.h"
 #include "map.h"
 #include "missile.h"
 #include "pathfinder.h"
 #include "player.h"
+#include "script.h"
 #include "unit.h"
 #include "unittype.h"
 
@@ -151,6 +169,81 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput& input)
 	}
 	// Fixme : Auto select position to attack ?
 }
+
+/**
+**  Parse order
+**
+**  @param l      Lua state.
+**  @param order  OUT: resulting order.
+*/
+void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
+{
+	const int args = lua_objlen(l, -1);
+
+	lua_rawgeti(l, -1, 1);
+	const char *actiontype = LuaToString(l, -1);
+	lua_pop(l, 1);
+
+	if (!strcmp(actiontype, "action-attack")) {
+		*orderPtr = new COrder_Attack(false);
+	} else if (!strcmp(actiontype, "action-attack-ground")) {
+		*orderPtr = new COrder_Attack(true);
+	} else if (!strcmp(actiontype, "action-board")) {
+		*orderPtr = new COrder_Board;
+	} else if (!strcmp(actiontype, "action-build")) {
+		*orderPtr = new COrder_Build;
+	} else if (!strcmp(actiontype, "action-built")) {
+		*orderPtr = new COrder_Built;
+	} else if (!strcmp(actiontype, "action-die")) {
+		*orderPtr = new COrder_Die;
+	} else if (!strcmp(actiontype, "action-follow")) {
+		*orderPtr = new COrder_Follow;
+	} else if (!strcmp(actiontype, "action-move")) {
+		*orderPtr = new COrder_Move;
+	} else if (!strcmp(actiontype, "action-patrol")) {
+		*orderPtr = new COrder_Patrol;
+	} else if (!strcmp(actiontype, "action-repair")) {
+		*orderPtr = new COrder_Repair;
+	} else if (!strcmp(actiontype, "action-research")) {
+		*orderPtr = new COrder_Research;
+	} else if (!strcmp(actiontype, "action-resource")) {
+		*orderPtr = new COrder_Resource(unit);
+	} else if (!strcmp(actiontype, "action-spell-cast")) {
+		*orderPtr = new COrder_SpellCast;
+	} else if (!strcmp(actiontype, "action-stand-ground")) {
+		*orderPtr = new COrder_Still(true);
+	} else if (!strcmp(actiontype, "action-still")) {
+		*orderPtr = new COrder_Still(false);
+	} else if (!strcmp(actiontype, "action-train")) {
+		*orderPtr = new COrder_Train;
+	} else if (!strcmp(actiontype, "action-transform-into")) {
+		*orderPtr = new COrder_TransformInto;
+	} else if (!strcmp(actiontype, "action-upgrade-to")) {
+		*orderPtr = new COrder_UpgradeTo;
+	} else if (!strcmp(actiontype, "action-unload")) {
+		*orderPtr = new COrder_Unload;
+	} else {
+		LuaError(l, "ParseOrder: Unsupported type: %s" _C_ actiontype);
+	}
+
+	COrder &order = **orderPtr;
+
+	for (int j = 1; j < args; ++j) {
+		lua_rawgeti(l, -1, j + 1);
+		const char *value = LuaToString(l, -1);
+		lua_pop(l, 1);
+
+		if (order.ParseGenericData(l, j, value)) {
+			continue;
+		} else if (order.ParseSpecificData(l, j, value, unit)) {
+			continue;
+		}else {
+			// This leaves a half initialized unit
+			LuaError(l, "ParseOrder: Unsupported tag: %s" _C_ value);
+		}
+	}
+}
+
 
 /*----------------------------------------------------------------------------
 --  Actions
