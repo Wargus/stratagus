@@ -56,10 +56,14 @@ set(action_SRCS
 	src/action/action_unload.cpp
 	src/action/action_upgradeto.cpp
 	src/action/actions.cpp
-	src/action/animation.cpp
 	src/action/command.cpp
 )
 source_group(action FILES ${action_SRCS})
+
+set(animation_SRCS
+	src/animation/animation.cpp
+)
+source_group(animation FILES ${animation_SRCS})
 
 set(ai_SRCS
 	src/ai/ai_building.cpp
@@ -287,6 +291,7 @@ source_group(tolua FILES ${tolua_FILES})
 
 set(stratagus_SRCS
 	${action_SRCS}
+	${animation_SRCS}
 	${ai_SRCS}
 	${editor_SRCS}
 	${game_SRCS}
