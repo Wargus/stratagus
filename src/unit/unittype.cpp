@@ -210,6 +210,13 @@ bool CUnitType::CheckUserBoolFlags(char *BoolFlags) {
 	return true;
 }
 
+bool CUnitType::CanMove() const
+{
+	return Animations && Animations->Move;
+}
+
+
+
 /**
 **  Update the player stats for changed unit types.
 **  @param reset indicates wether default value should be set to each stat (level, upgrades)

@@ -36,7 +36,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 #include "stratagus.h"
 
@@ -44,16 +43,12 @@
 #include "animation.h"
 
 #include "script.h"
-#include "commands.h"
 #include "map.h"
 #include "missile.h"
-#include "pathfinder.h"
 #include "player.h"
 #include "sound.h"
-#include "spells.h"
 #include "unit.h"
 #include "unittype.h"
-#include "video.h"
 
 //SpawnMissile flags
 #define ANIM_SM_DAMAGE 1
@@ -76,6 +71,18 @@
 #define MOD_MUL 3
 #define MOD_DIV 4
 #define MOD_MOD 5
+
+struct LabelsStruct {
+	CAnimation *Anim;
+	std::string Name;
+};
+static std::vector<LabelsStruct> Labels;
+
+struct LabelsLaterStruct {
+	CAnimation **Anim;
+	std::string Name;
+};
+static std::vector<LabelsLaterStruct> LabelsLater;
 
 CAnimation *AnimationsArray[ANIMATIONS_MAXANIM];
 int NumAnimations;
@@ -857,18 +864,6 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 
 
 
-struct LabelsStruct {
-	CAnimation *Anim;
-	std::string Name;
-};
-static std::vector<LabelsStruct> Labels;
-
-struct LabelsLaterStruct {
-	CAnimation **Anim;
-	std::string Name;
-};
-static std::vector<LabelsLaterStruct> LabelsLater;
-
 
 /**
 **  Get the animations structure by ident.
@@ -888,9 +883,9 @@ CAnimations *AnimationsByIdent(const std::string &ident)
 
 void FreeAnimations()
 {
-	std::map<std::string, CAnimations *>::iterator i;
-	for (i = AnimationMap.begin(); i != AnimationMap.end(); ++i) {
-		CAnimations *anims = (*i).second;
+	std::map<std::string, CAnimations *>::iterator it;
+	for (it = AnimationMap.begin(); it != AnimationMap.end(); ++it) {
+		CAnimations *anims = (*it).second;
 		delete anims;
 	}
 	AnimationMap.clear();
@@ -917,6 +912,7 @@ static int ResourceIndex(lua_State *l, const char *resource)
 static void AddLabel(lua_State *, CAnimation *anim, const std::string &name)
 {
 	LabelsStruct label;
+
 	label.Anim = anim;
 	label.Name = name;
 	Labels.push_back(label);
@@ -927,7 +923,7 @@ static void AddLabel(lua_State *, CAnimation *anim, const std::string &name)
 */
 static CAnimation *FindLabel(lua_State *l, const std::string &name)
 {
-	for (int i = 0; i < (int)Labels.size(); ++i) {
+	for (size_t i = 0; i < Labels.size(); ++i) {
 		if (Labels[i].Name == name) {
 			return Labels[i].Anim;
 		}
@@ -942,6 +938,7 @@ static CAnimation *FindLabel(lua_State *l, const std::string &name)
 static void FindLabelLater(lua_State *, CAnimation **anim, const std::string &name)
 {
 	LabelsLaterStruct label;
+
 	label.Anim = anim;
 	label.Name = name;
 	LabelsLater.push_back(label);
@@ -952,7 +949,7 @@ static void FindLabelLater(lua_State *, CAnimation **anim, const std::string &na
 */
 static void FixLabels(lua_State *l)
 {
-	for (int i = 0; i < (int)LabelsLater.size(); ++i) {
+	for (size_t i = 0; i < LabelsLater.size(); ++i) {
 		*LabelsLater[i].Anim = FindLabel(l, LabelsLater[i].Name);
 	}
 }
@@ -1284,24 +1281,18 @@ static void ParseAnimationFrame(lua_State *l, const char *str, CAnimation *anim)
 */
 static CAnimation *ParseAnimation(lua_State *l, int idx)
 {
-	CAnimation *anim;
-	CAnimation *tail;
-	int args;
-	int j;
-	const char *str;
-
 	if (!lua_istable(l, idx)) {
 		LuaError(l, "incorrect argument");
 	}
-	args = lua_objlen(l, idx);
-	anim = new CAnimation[args + 1];
-	tail = NULL;
+	const int args = lua_objlen(l, idx);
+	CAnimation *anim = new CAnimation[args + 1];
+	CAnimation *tail = NULL;
 	Labels.clear();
 	LabelsLater.clear();
 
-	for (j = 0; j < args; ++j) {
+	for (int j = 0; j < args; ++j) {
 		lua_rawgeti(l, idx, j + 1);
-		str = LuaToString(l, -1);
+		const char *str = LuaToString(l, -1);
 		lua_pop(l, 1);
 		ParseAnimationFrame(l, str, &anim[j]);
 		if (!tail) {
@@ -1312,7 +1303,6 @@ static CAnimation *ParseAnimation(lua_State *l, int idx)
 		}
 	}
 	FixLabels(l);
-
 	return anim;
 }
 
@@ -1324,7 +1314,6 @@ static void AddAnimationToArray(CAnimation *anim)
 	if (!anim) {
 		return;
 	}
-
 	AnimationsArray[NumAnimations++] = anim;
 	Assert(NumAnimations != ANIMATIONS_MAXANIM);
 }
@@ -1336,43 +1325,40 @@ static void AddAnimationToArray(CAnimation *anim)
 */
 static int CclDefineAnimations(lua_State *l)
 {
-	const char *name;
-	const char *value;
-	CAnimations *anims;
-	int res = -1;
-	int death = ANIMATIONS_DEATHTYPES;
-
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
 
-	name = LuaToString(l, 1);
-	anims = AnimationsByIdent(name);
+	const char *name = LuaToString(l, 1);
+	CAnimations *anims = AnimationsByIdent(name);
 	if (!anims) {
 		anims = new CAnimations;
 		AnimationMap[name] = anims;
 	}
 
+	int res = -1;
+	int death = ANIMATIONS_DEATHTYPES;
 	lua_pushnil(l);
 	while (lua_next(l, 2)) {
-		value = LuaToString(l, -2);
+		const char *value = LuaToString(l, -2);
 
 		if (!strcmp(value, "Start")) {
 			anims->Start = ParseAnimation(l, -1);
 		} else if (!strncmp(value, "Still", 5)) {
 			anims->Still = ParseAnimation(l, -1);
 		} else if (!strncmp(value, "Death", 5)) {
-			if (strlen(value)>5)
+			if (strlen(value) > 5)
 			{
 				death = ExtraDeathIndex(value + 6);
-				if (death==ANIMATIONS_DEATHTYPES)
+				if (death==ANIMATIONS_DEATHTYPES) {
 					anims->Death[ANIMATIONS_DEATHTYPES] = ParseAnimation(l, -1);
-				else
+				} else {
 					anims->Death[death] = ParseAnimation(l, -1);
-			}
-			else
+				}
+			} else {
 				anims->Death[ANIMATIONS_DEATHTYPES] = ParseAnimation(l, -1);
+			}
 		} else if (!strcmp(value, "Attack")) {
 			anims->Attack = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "SpellCast")) {
@@ -1406,8 +1392,9 @@ static int CclDefineAnimations(lua_State *l)
 	AddAnimationToArray(anims->Move);
 	AddAnimationToArray(anims->Repair);
 	AddAnimationToArray(anims->Train);
-	if(res != -1)
+	if (res != -1) {
 		AddAnimationToArray(anims->Harvest[res]);
+	}
 	return 0;
 }
 

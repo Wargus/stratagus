@@ -41,6 +41,7 @@
 #include "unittype.h"
 
 #include "actions.h"
+#include "animation.h"
 #include "construct.h"
 #include "font.h"
 #include "luacallback.h"

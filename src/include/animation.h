@@ -236,7 +236,7 @@ public:
 	~CAnimations() {
 		delete[] Attack;
 		delete[] Build;
-		for ( int i = 0; i < ANIMATIONS_DEATHTYPES + 1; ++i) {
+		for (int i = 0; i < ANIMATIONS_DEATHTYPES + 1; ++i) {
 			delete[] Death[i];
 		}
 		for (int i = 0; i < MaxCosts; ++i) {
@@ -279,6 +279,12 @@ extern int NumAnimations;
 extern CAnimations *AnimationsByIdent(const std::string &ident);
 
 extern void AnimationCclRegister();
+
+	/// Handle the animation of a unit
+extern int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale);
+	/// Handle the animation of a unit
+extern int UnitShowAnimation(CUnit &unit, const CAnimation *anim);
+
 
 //@}
 

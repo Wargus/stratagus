@@ -42,11 +42,14 @@
 
 #include "stratagus.h"
 
+#include "script.h"
+
+#include "actions.h"
+#include "animation.h"
 #include "iocompat.h"
 #include "unit.h"
 #include "unittype.h"
 #include "iolib.h"
-#include "script.h"
 #include "missile.h"
 #include "depend.h"
 #include "upgrade.h"
@@ -70,7 +73,6 @@
 #include "netconnect.h"
 #include "network.h"
 #include "spells.h"
-#include "actions.h"
 #include "replay.h"
 
 /*----------------------------------------------------------------------------

@@ -534,16 +534,13 @@
 #include "icons.h"
 #endif
 
-#ifndef __ANIMATIONS_H__
-#include "animation.h"
-#endif
-
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CAnimations;
 class CPlayerColorGraphic;
 class CConstruction;
 class MissileType;
@@ -944,7 +941,7 @@ public:
 	CConstruction *Construction;    /// What is shown in construction phase
 
 	int _Costs[MaxCosts];           /// How many resources needed
-	int _Storing[MaxCosts];         /// How many resources the unit can store 
+	int _Storing[MaxCosts];         /// How many resources the unit can store
 	int RepairHP;                   /// Amount of HP per repair
 	int RepairCosts[MaxCosts];      /// How much it costs to repair
 
@@ -1055,10 +1052,7 @@ public:
 	{
 		return MaxOnBoard > 0 && !GivesResource;
 	}
-	bool CanMove() const
-	{
-		return Animations && Animations->Move;
-	}
+	bool CanMove() const;
 
 	bool CanSelect(GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY) const
 	{

@@ -265,10 +265,6 @@ extern void AnimateActionAttack(CUnit &unit, COrder& order);
 	/// Parse order
 extern void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *order);
 
-	/// Handle the animation of a unit
-extern int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale);
-	/// Handle the animation of a unit
-extern int UnitShowAnimation(CUnit &unit, const CAnimation *anim);
 	/// Handle the actions of all units each game cycle
 extern void UnitActions();
 
