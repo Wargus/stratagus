@@ -65,9 +65,8 @@ public:
 };
 
 #define ANY_UNIT ((const CUnitType *)0)
-#define ALL_UNITS ((const CUnitType *)-1)
-#define ALL_FOODUNITS ((const CUnitType *)-2)
-#define ALL_BUILDINGS ((const CUnitType *)-3)
+#define ALL_FOODUNITS ((const CUnitType *)-1)
+#define ALL_BUILDINGS ((const CUnitType *)-2)
 
 
 /**

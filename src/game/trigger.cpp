@@ -38,15 +38,17 @@
 #include <string.h>
 
 #include "stratagus.h"
-#include "script.h"
-#include "unittype.h"
-#include "player.h"
+
 #include "trigger.h"
-#include "results.h"
+
 #include "interface.h"
-#include "unit.h"
 #include "iolib.h"
 #include "map.h"
+#include "player.h"
+#include "results.h"
+#include "script.h"
+#include "unit.h"
+#include "unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -73,24 +75,20 @@ TriggerDataType TriggerData;
 */
 int TriggerGetPlayer(lua_State *l)
 {
-	const char *player;
-	int ret;
-
 	if (lua_isnumber(l, -1)) {
-		ret = LuaToNumber(l, -1);
+		const int ret = LuaToNumber(l, -1);
 		if (ret < 0 || ret > PlayerMax) {
 			LuaError(l, "bad player: %d" _C_ ret);
 		}
 		return ret;
 	}
-	player = LuaToString(l, -1);
+	const char *player = LuaToString(l, -1);
 	if (!strcmp(player, "any")) {
 		return -1;
 	} else if (!strcmp(player, "this")) {
 		return ThisPlayer->Index;
 	}
 	LuaError(l, "bad player: %s" _C_ player);
-
 	return 0;
 }
 
@@ -103,49 +101,27 @@ int TriggerGetPlayer(lua_State *l)
 */
 const CUnitType *TriggerGetUnitType(lua_State *l)
 {
-	const char *unit;
+	const char *unit = LuaToString(l, -1);
 
-	unit = LuaToString(l, -1);
 	if (!strcmp(unit, "any")) {
 		return ANY_UNIT;
-	} else if (!strcmp(unit, "all")) {
-		return ALL_UNITS;
 	} else if (!strcmp(unit, "units")) {
 		return ALL_FOODUNITS;
 	} else if (!strcmp(unit, "buildings")) {
 		return ALL_BUILDINGS;
 	}
-
 	return CclGetUnitType(l);
 }
 
 /*--------------------------------------------------------------------------
 --  Conditions
 --------------------------------------------------------------------------*/
-static int CompareEq(int a, int b)
-{
-	return a == b;
-}
-static int CompareNEq(int a, int b)
-{
-	return a != b;
-}
-static int CompareGrEq(int a, int b)
-{
-	return a >= b;
-}
-static int CompareGr(int a, int b)
-{
-	return a > b;
-}
-static int CompareLeEq(int a, int b)
-{
-	return a <= b;
-}
-static int CompareLe(int a, int b)
-{
-	return a < b;
-}
+static int CompareEq(int a, int b) { return a == b; }
+static int CompareNEq(int a, int b) { return a != b; }
+static int CompareGrEq(int a, int b) { return a >= b; }
+static int CompareGr(int a, int b) { return a > b; }
+static int CompareLeEq(int a, int b) { return a <= b; }
+static int CompareLe(int a, int b) { return a < b; }
 
 typedef int (*CompareFunction)(int, int);
 
@@ -181,7 +157,7 @@ static CompareFunction GetCompareFunction(const char *op)
 }
 
 /**
-**  Return the number of units of a giver unit-type and player at a location.
+**  Return the number of units of a given unit-type and player at a location.
 */
 static int CclGetNumUnitsAt(lua_State *l)
 {
@@ -196,8 +172,6 @@ static int CclGetNumUnitsAt(lua_State *l)
 	Vec2i maxPos;
 	CclGetPos(l, &minPos.x, &minPos.y, 3);
 	CclGetPos(l, &maxPos.x, &maxPos.y, 4);
-	maxPos.x += 1;
-	maxPos.y += 1;
 
 	std::vector<CUnit*> units;
 
@@ -208,7 +182,6 @@ static int CclGetNumUnitsAt(lua_State *l)
 		const CUnit& unit = *units[i];
 		// Check unit type
 
-		// FIXME: ALL_UNITS
 		if (unittype == ANY_UNIT
 			|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
 			|| (unittype == ALL_BUILDINGS && unit.Type->Building)
@@ -266,8 +239,6 @@ static int CclIfNearUnit(lua_State *l)
 			const CUnit& unit = *around[j];
 
 			// Check unit type
-			//
-			// FIXME: ALL_UNITS
 			if (unittype == ANY_UNIT
 				|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
 				|| (unittype == ALL_BUILDINGS && unit.Type->Building)
@@ -321,7 +292,6 @@ static int CclIfRescuedNearUnit(lua_State *l)
 		std::vector<CUnit *> around;
 
 		Map.SelectAroundUnit(centerUnit, 1, around);
-
 		// Count the requested units
 		int s = 0;
 		for (size_t j = 0; j != around.size(); ++j) {
@@ -330,7 +300,6 @@ static int CclIfRescuedNearUnit(lua_State *l)
 			if (unit.RescuedFrom) { // only rescued units
 				// Check unit type
 
-				// FIXME: ALL_UNITS
 				if (unittype == ANY_UNIT
 					|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
 					|| (unittype == ALL_BUILDINGS && unit.Type->Building)
@@ -459,18 +428,14 @@ void ActionStopTimer()
 */
 static int CclAddTrigger(lua_State *l)
 {
-	int i;
-
 	LuaCheckArgs(l, 2);
-	if (!lua_isfunction(l, 1) ||
-			(!lua_isfunction(l, 2) && !lua_istable(l, 2))) {
+	if (!lua_isfunction(l, 1)
+		|| (!lua_isfunction(l, 2) && !lua_istable(l, 2))) {
 		LuaError(l, "incorrect argument");
 	}
 
-	//
 	// Make a list of all triggers.
 	// A trigger is a pair of condition and action
-	//
 	lua_pushstring(l, "_triggers_");
 	lua_gettable(l, LUA_GLOBALSINDEX);
 
@@ -484,7 +449,7 @@ static int CclAddTrigger(lua_State *l)
 		lua_gettable(l, LUA_GLOBALSINDEX);
 	}
 
-	i = lua_objlen(l, -1);
+	const int i = lua_objlen(l, -1);
 	if (ActiveTriggers && !ActiveTriggers[i / 2]) {
 		lua_pushnil(l);
 		lua_rawseti(l, -2, i + 1);
@@ -516,14 +481,12 @@ void SetTrigger(int trigger)
 */
 static int CclSetActiveTriggers(lua_State *l)
 {
-	int args;
+	const int args = lua_gettop(l);
 
-	args = lua_gettop(l);
 	ActiveTriggers = new bool[args];
 	for (int j = 0; j < args; ++j) {
 		ActiveTriggers[j] = LuaToBoolean(l, j + 1);
 	}
-
 	return 0;
 }
 
@@ -536,16 +499,12 @@ static int CclSetActiveTriggers(lua_State *l)
 */
 static int TriggerExecuteAction(int script)
 {
-	int ret;
-	int args;
-	int j;
-	int base = lua_gettop(Lua);
-
-	ret = 0;
+	const int base = lua_gettop(Lua);
+	int ret = 0;
 
 	lua_rawgeti(Lua, -1, script + 1);
-	args = lua_objlen(Lua, -1);
-	for (j = 0; j < args; ++j) {
+	const int args = lua_objlen(Lua, -1);
+	for (int j = 0; j < args; ++j) {
 		lua_rawgeti(Lua, -1, j + 1);
 		LuaCall(0, 0);
 		if (lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1)) {
@@ -579,12 +538,11 @@ static void TriggerRemoveTrigger(int trig)
 */
 void TriggersEachCycle()
 {
-	int triggers;
-	int base = lua_gettop(Lua);
+	const int base = lua_gettop(Lua);
 
 	lua_pushstring(Lua, "_triggers_");
 	lua_gettable(Lua, LUA_GLOBALSINDEX);
-	triggers = lua_objlen(Lua, -1);
+	int triggers = lua_objlen(Lua, -1);
 
 	if (Trigger >= triggers) {
 		Trigger = 0;
@@ -683,9 +641,8 @@ void SaveTriggers(CFile &file)
 */
 void InitTriggers()
 {
-	//
 	// Setup default triggers
-	//
+
 	// FIXME: choose the triggers for game type
 
 	lua_pushstring(Lua, "_triggers_");
