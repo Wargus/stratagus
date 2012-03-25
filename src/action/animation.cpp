@@ -43,6 +43,7 @@
 #include "actions.h"
 #include "animation.h"
 
+#include "script.h"
 #include "commands.h"
 #include "map.h"
 #include "missile.h"
@@ -75,6 +76,12 @@
 #define MOD_MUL 3
 #define MOD_DIV 4
 #define MOD_MOD 5
+
+CAnimation *AnimationsArray[ANIMATIONS_MAXANIM];
+int NumAnimations;
+
+std::map<std::string, CAnimations *> AnimationMap;/// Animation map
+
 
 /*----------------------------------------------------------------------------
 --  Animation
@@ -366,7 +373,7 @@ int ParseAnimInt(CUnit *unit, const char *parseint)
 		}
 	} else if (s[0] == 'l') { //player number
 		return ParseAnimPlayer(*unit, cur);
-		
+
 	}
 	return atoi(parseint);
 }
@@ -432,6 +439,366 @@ found:
 }
 
 
+
+
+int CAnimation::Action(CUnit &unit, int &move, int scale) const
+{
+	switch (unit.Anim.Anim->Type) {
+		case AnimationFrame:
+			unit.Frame = ParseAnimInt(&unit, unit.Anim.Anim->D.Frame.Frame);
+			UnitUpdateHeading(unit);
+			break;
+
+		case AnimationExactFrame:
+			unit.Frame = ParseAnimInt(&unit, unit.Anim.Anim->D.Frame.Frame);
+			break;
+
+		case AnimationWait:
+			unit.Anim.Wait = ParseAnimInt(&unit, unit.Anim.Anim->D.Wait.Wait) << scale >> 8;
+			if (unit.Variable[SLOW_INDEX].Value) { // unit is slowed down
+				unit.Anim.Wait <<= 1;
+			}
+			if (unit.Variable[HASTE_INDEX].Value && unit.Anim.Wait > 1) { // unit is accelerated
+				unit.Anim.Wait >>= 1;
+			}
+			if (unit.Anim.Wait <= 0)
+				unit.Anim.Wait = 1;
+			break;
+		case AnimationRandomWait:
+		{
+			const int arg1 = ParseAnimInt(&unit, unit.Anim.Anim->D.RandomWait.MinWait);
+			const int arg2 = ParseAnimInt(&unit, unit.Anim.Anim->D.RandomWait.MaxWait);
+
+			unit.Anim.Wait = arg1 + SyncRand() % (arg2 - arg1 + 1);
+			break;
+		}
+		case AnimationSound:
+			if (unit.IsVisible(*ThisPlayer) || ReplayRevealMap) {
+				PlayUnitSound(unit, unit.Anim.Anim->D.Sound.Sound);
+			}
+			break;
+		case AnimationRandomSound:
+			if (unit.IsVisible(*ThisPlayer) || ReplayRevealMap) {
+				const int sound = SyncRand() % unit.Anim.Anim->D.RandomSound.NumSounds;
+				PlayUnitSound(unit, unit.Anim.Anim->D.RandomSound.Sound[sound]);
+			}
+			break;
+
+		case AnimationAttack:
+		{
+			unit.CurrentOrder()->OnAnimationAttack(unit);
+			break;
+		}
+		case AnimationSpawnMissile:
+		{
+			const int startx = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.StartX);
+			const int starty = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.StartY);
+			const int destx = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.DestX);
+			const int desty = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.DestY);
+			const int flags = ParseAnimFlags(unit, unit.Anim.Anim->D.SpawnMissile.Flags);
+			CUnit *goal;
+			PixelPos start;
+			PixelPos dest;
+
+			if ((flags & ANIM_SM_RELTARGET)) {
+				goal = unit.CurrentOrder()->GetGoal();
+			} else {
+				goal = &unit;
+			}
+			if (!goal || goal->Destroyed || goal->Removed) {
+				break;
+			}
+			if ((flags & ANIM_SM_PIXEL)) {
+				start.x = goal->tilePos.x * PixelTileSize.x + goal->IX + startx;
+				start.y = goal->tilePos.y * PixelTileSize.y + goal->IY + starty;
+			} else {
+				start.x = (goal->tilePos.x + startx) * PixelTileSize.x + PixelTileSize.x / 2;
+				start.y = (goal->tilePos.y + starty) * PixelTileSize.y + PixelTileSize.y / 2;
+			}
+			if ((flags & ANIM_SM_TOTARGET)) {
+				CUnit *target = goal->CurrentOrder()->GetGoal();
+				Assert(goal->CurrentAction() == UnitActionAttack);
+				if (!target  || target->Destroyed || target->Removed) {
+					break;
+				}
+				if (flags & ANIM_SM_PIXEL) {
+					dest.x = target->tilePos.x * PixelTileSize.x + target->IX + destx;
+					dest.y = target->tilePos.y * PixelTileSize.y + target->IY + desty;
+				} else {
+					dest.x = (target->tilePos.x + destx) * PixelTileSize.x + target->Type->TileWidth * PixelTileSize.x / 2;
+					dest.y = (target->tilePos.y + desty) * PixelTileSize.y + target->Type->TileHeight * PixelTileSize.y / 2;
+				}
+			} else {
+				if ((flags & ANIM_SM_PIXEL)) {
+					dest.x = goal->tilePos.x * PixelTileSize.x + goal->IX + destx;
+					dest.y = goal->tilePos.y * PixelTileSize.y + goal->IY + desty;
+				} else {
+					dest.x = (goal->tilePos.x + destx) * PixelTileSize.x + goal->Type->TileWidth * PixelTileSize.x / 2;
+					dest.y = (goal->tilePos.y + desty) * PixelTileSize.y + goal->Type->TileHeight * PixelTileSize.y / 2;
+				}
+			}
+			const int dist = goal->MapDistanceTo(dest.x, dest.y);
+			if ((flags & ANIM_SM_RANGED) && !(flags & ANIM_SM_PIXEL)
+				&& dist > goal->Stats->Variables[ATTACKRANGE_INDEX].Max
+				&& dist < goal->Type->MinAttackRange) {
+			} else {
+				Missile *missile = MakeMissile(*MissileTypeByIdent(unit.Anim.Anim->D.SpawnMissile.Missile), start, dest);
+				if (flags & ANIM_SM_DAMAGE) {
+					missile->SourceUnit = &unit;
+					unit.RefsIncrease();
+				}
+				if (flags & ANIM_SM_TOTARGET) {
+					missile->TargetUnit = goal->CurrentOrder()->GetGoal();
+					goal->CurrentOrder()->GetGoal()->RefsIncrease();
+				}
+			}
+			break;
+		}
+		case AnimationSpawnUnit:
+		{
+			const int offX = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.OffX);
+			const int offY = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.OffY);
+			const int range = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.Range);
+			const int playerId = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.Player);
+			CPlayer &player = Players[playerId];
+			const Vec2i pos = { unit.tilePos.x + offX, unit.tilePos.y + offY};
+			CUnitType *type = UnitTypeByIdent(unit.Anim.Anim->D.SpawnUnit.Unit);
+			Vec2i resPos;
+			DebugPrint("Creating a %s\n" _C_ type->Name.c_str());
+			FindNearestDrop(*type, pos, resPos, LookingW);
+			if (MapDistance(pos, resPos) <= range) {
+				CUnit *target = MakeUnit(*type, &player);
+				if (target != NoUnitP) {
+					target->tilePos = resPos;
+					target->Place(resPos);
+					//DropOutOnSide(*target, LookingW, NULL);
+				} else {
+					DebugPrint("Unable to allocate Unit");
+				}
+			}
+			break;
+		}
+		case AnimationIfVar:
+		{
+			const int lop = ParseAnimInt(&unit, unit.Anim.Anim->D.IfVar.LeftVar);
+			const int rop = ParseAnimInt(&unit, unit.Anim.Anim->D.IfVar.RightVar);
+			bool go = false;
+
+			switch (unit.Anim.Anim->D.IfVar.Type) {
+				case IF_GREATER_EQUAL:
+					go = (lop >= rop);
+					break;
+				case IF_GREATER:
+					go = (lop > rop);
+					break;
+				case IF_LESS_EQUAL:
+					go = (lop <= rop);
+					break;
+				case IF_LESS:
+					go = (lop < rop);
+					break;
+				case IF_EQUAL:
+					go = (lop == rop);
+					break;
+				case IF_NOT_EQUAL:
+					go = (lop != rop);
+				break;
+			}
+			if (go) {
+				unit.Anim.Anim = unit.Anim.Anim->D.IfVar.Goto;
+			}
+			break;
+		}
+		case AnimationSetVar:
+		{
+			char arg1[128];
+			CUnit *goal = &unit;
+
+			strcpy(arg1, unit.Anim.Anim->D.SetVar.Var);
+			const int rop = ParseAnimInt(&unit, unit.Anim.Anim->D.SetVar.Value);
+
+			char *next = strchr(arg1, '.');
+			if (next == NULL) {
+				fprintf(stderr, "Need also specify the variable '%s' tag \n" _C_ arg1);
+				Exit(1);
+			} else {
+				*next ='\0';
+			}
+			const int index = UnitTypeVar.VariableNameLookup[arg1];// User variables
+			if (index == -1) {
+				fprintf(stderr, "Bad variable name '%s'\n" _C_ arg1);
+				Exit(1);
+			}
+			if (unit.Anim.Anim->D.SetVar.UnitSlot) {
+				switch (*unit.Anim.Anim->D.SetVar.UnitSlot) {
+					case 'l': // last created unit
+						goal = Units[NumUnits-1];
+						break;
+					case 't': // target unit
+						goal = unit.CurrentOrder()->GetGoal();
+						break;
+					case 's': // unit self (no use)
+						goal = &unit;
+						break;
+				}
+			}
+			if (!goal) {
+				break;
+			}
+			int value = 0;
+			if (!strcmp(next + 1, "Value")) {
+				value = goal->Variable[index].Value;
+			} else if (!strcmp(next + 1, "Max")) {
+				value = goal->Variable[index].Max;
+			} else if (!strcmp(next + 1,"Increase")) {
+				value = goal->Variable[index].Increase;
+			} else if (!strcmp(next + 1, "Enable")) {
+				value = goal->Variable[index].Enable;
+			}
+			switch (unit.Anim.Anim->D.SetVar.Mod) {
+				case MOD_ADD:
+					value += rop;
+					break;
+				case MOD_SUB:
+					value -= rop;
+					break;
+				case MOD_MUL:
+					value *= rop;
+					break;
+				case MOD_DIV:
+					if (!rop) {
+						fprintf(stderr, "Division by zero in AnimationSetVar\n");
+						Exit(1);
+						return 0;
+					}
+					value /= rop;
+					break;
+				case MOD_MOD:
+					if (!rop) {
+						fprintf(stderr, "Division by zero in AnimationSetVar\n");
+						Exit(1);
+						return 0;
+					}
+					value %= rop;
+					break;
+				default:
+					value = rop;
+			}
+			if (!strcmp(next + 1, "Value")) {
+				goal->Variable[index].Value = value;
+			} else if (!strcmp(next + 1, "Max")) {
+				goal->Variable[index].Max = value;
+			} else if (!strcmp(next + 1, "Increase")) {
+				goal->Variable[index].Increase = value;
+			} else if (!strcmp(next + 1, "Enable")) {
+				goal->Variable[index].Enable = value;
+			}
+			break;
+		}
+		case AnimationSetPlayerVar:
+		{
+			const char *var = unit.Anim.Anim->D.SetPlayerVar.Var;
+			const char *arg = unit.Anim.Anim->D.SetPlayerVar.Arg;
+			int playerId = ParseAnimInt(&unit, unit.Anim.Anim->D.SetPlayerVar.Player);
+			int rop = ParseAnimInt(&unit, unit.Anim.Anim->D.SetPlayerVar.Value);
+			int data = GetPlayerData(playerId, var, arg);
+
+			switch (unit.Anim.Anim->D.SetPlayerVar.Mod) {
+				case MOD_ADD:
+					data += rop;
+					break;
+				case MOD_SUB:
+					data -= rop;
+					break;
+				case MOD_MUL:
+					data *= rop;
+					break;
+				case MOD_DIV:
+					if (!rop) {
+						fprintf(stderr, "Division by zero in AnimationSetPlayerVar\n");
+						Exit(1);
+						return 0;
+					}
+					data /= rop;
+					break;
+				case MOD_MOD:
+					if (!rop) {
+						fprintf(stderr, "Division by zero in AnimationSetPlayerVar\n");
+						Exit(1);
+						return 0;
+					}
+					data %= rop;
+					break;
+				default:
+					data = rop;
+			}
+			rop = data;
+			SetPlayerData(playerId, var, arg, rop);
+			break;
+		}
+		case AnimationDie:
+			if (unit.Anim.Unbreakable) {
+				fprintf(stderr, "Can't call \"die\" action in unbreakable section\n");
+				Exit(1);
+				return 0;
+			}
+			if (unit.Anim.Anim->D.Die.DeathType[0] != '\0') {
+				unit.DamagedType = ExtraDeathIndex(unit.Anim.Anim->D.Die.DeathType);				}
+			unit.CurrentOrder()->NeedToDie = true;
+			return 0;
+
+		case AnimationRotate:
+			if (!strcmp(unit.Anim.Anim->D.Rotate.Rotate, "target") && unit.CurrentOrder()->HasGoal()) {
+				COrder &order = *unit.CurrentOrder();
+				const CUnit &target = *order.GetGoal();
+				if (target.Destroyed) {
+					order.ClearGoal();
+					break;
+				}
+				const Vec2i pos = target.tilePos + target.Type->GetHalfTileSize() - unit.tilePos;
+				UnitHeadingFromDeltaXY(unit, pos);
+			} else {
+				UnitRotate(unit, ParseAnimInt(&unit, unit.Anim.Anim->D.Rotate.Rotate));
+			}
+			break;
+
+		case AnimationRandomRotate:
+			if ((SyncRand() >> 8) & 1) {
+				UnitRotate(unit, -ParseAnimInt(&unit, unit.Anim.Anim->D.Rotate.Rotate));
+			} else {
+				UnitRotate(unit, ParseAnimInt(&unit, unit.Anim.Anim->D.Rotate.Rotate));
+			}
+			break;
+
+		case AnimationMove:
+			Assert(!move);
+			move = ParseAnimInt(&unit, unit.Anim.Anim->D.Move.Move);
+			break;
+
+		case AnimationUnbreakable:
+			Assert(unit.Anim.Unbreakable ^ unit.Anim.Anim->D.Unbreakable.Begin);
+			/*DebugPrint("UnitShowAnimationScaled: switch Unbreakable from %s to %s\n"
+				_C_ unit.Anim.Unbreakable ? "TRUE" : "FALSE"
+				_C_ unit.Anim.Anim->D.Unbreakable.Begin ? "TRUE" : "FALSE" );*/
+			unit.Anim.Unbreakable = unit.Anim.Anim->D.Unbreakable.Begin;
+			break;
+
+		case AnimationNone:
+		case AnimationLabel:
+			break;
+
+		case AnimationGoto:
+			unit.Anim.Anim = unit.Anim.Anim->D.Goto.Goto;
+			break;
+		case AnimationRandomGoto:
+			if (SyncRand() % 100 < ParseAnimInt(&unit, unit.Anim.Anim->D.RandomGoto.Random)) {
+				unit.Anim.Anim = unit.Anim.Anim->D.RandomGoto.Goto;
+			}
+			break;
+	}
+	return 1;
+}
+
 /**
 **  Show unit animation.
 **
@@ -465,360 +832,9 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 	}
 	int move = 0;
 	while (!unit.Anim.Wait) {
-		switch (unit.Anim.Anim->Type) {
-			case AnimationFrame:
-				unit.Frame = ParseAnimInt(&unit, unit.Anim.Anim->D.Frame.Frame);
-				UnitUpdateHeading(unit);
-				break;
-
-			case AnimationExactFrame:
-				unit.Frame = ParseAnimInt(&unit, unit.Anim.Anim->D.Frame.Frame);
-				break;
-
-			case AnimationWait:
-				unit.Anim.Wait = ParseAnimInt(&unit, unit.Anim.Anim->D.Wait.Wait) << scale >> 8;
-				if (unit.Variable[SLOW_INDEX].Value) { // unit is slowed down
-					unit.Anim.Wait <<= 1;
-				}
-				if (unit.Variable[HASTE_INDEX].Value && unit.Anim.Wait > 1) { // unit is accelerated
-					unit.Anim.Wait >>= 1;
-				}
-				if (unit.Anim.Wait <= 0)
-					unit.Anim.Wait = 1;
-				break;
-			case AnimationRandomWait:
-			{
-				const int arg1 = ParseAnimInt(&unit, unit.Anim.Anim->D.RandomWait.MinWait);
-				const int arg2 = ParseAnimInt(&unit, unit.Anim.Anim->D.RandomWait.MaxWait);
-
-				unit.Anim.Wait = arg1 + SyncRand() % (arg2 - arg1 + 1);
-				break;
-			}
-			case AnimationSound:
-				if (unit.IsVisible(*ThisPlayer) || ReplayRevealMap) {
-					PlayUnitSound(unit, unit.Anim.Anim->D.Sound.Sound);
-				}
-				break;
-			case AnimationRandomSound:
-				if (unit.IsVisible(*ThisPlayer) || ReplayRevealMap) {
-					const int sound = SyncRand() % unit.Anim.Anim->D.RandomSound.NumSounds;
-					PlayUnitSound(unit, unit.Anim.Anim->D.RandomSound.Sound[sound]);
-				}
-				break;
-
-			case AnimationAttack:
-			{
-				unit.CurrentOrder()->OnAnimationAttack(unit);
-				break;
-			}
-			case AnimationSpawnMissile:
-			{
-				const int startx = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.StartX);
-				const int starty = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.StartY);
-				const int destx = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.DestX);
-				const int desty = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.DestY);
-				const int flags = ParseAnimFlags(unit, unit.Anim.Anim->D.SpawnMissile.Flags);
-				CUnit *goal;
-				PixelPos start;
-				PixelPos dest;
-
-				if ((flags & ANIM_SM_RELTARGET)) {
-					goal = unit.CurrentOrder()->GetGoal();
-				} else {
-					goal = &unit;
-				}
-				if (!goal || goal->Destroyed || goal->Removed) {
-					break;
-				}
-				if ((flags & ANIM_SM_PIXEL)) {
-					start.x = goal->tilePos.x * PixelTileSize.x + goal->IX + startx;
-					start.y = goal->tilePos.y * PixelTileSize.y + goal->IY + starty;
-				} else {
-					start.x = (goal->tilePos.x + startx) * PixelTileSize.x + PixelTileSize.x / 2;
-					start.y = (goal->tilePos.y + starty) * PixelTileSize.y + PixelTileSize.y / 2;
-				}
-				if ((flags & ANIM_SM_TOTARGET)) {
-					CUnit *target = goal->CurrentOrder()->GetGoal();
-					Assert(goal->CurrentAction() == UnitActionAttack);
-					if (!target  || target->Destroyed || target->Removed) {
-						break;
-					}
-					if (flags & ANIM_SM_PIXEL) {
-						dest.x = target->tilePos.x * PixelTileSize.x + target->IX + destx;
-						dest.y = target->tilePos.y * PixelTileSize.y + target->IY + desty;
-					} else {
-						dest.x = (target->tilePos.x + destx) * PixelTileSize.x + target->Type->TileWidth * PixelTileSize.x / 2;
-						dest.y = (target->tilePos.y + desty) * PixelTileSize.y + target->Type->TileHeight * PixelTileSize.y / 2;
-					}
-				} else {
-					if ((flags & ANIM_SM_PIXEL)) {
-						dest.x = goal->tilePos.x * PixelTileSize.x + goal->IX + destx;
-						dest.y = goal->tilePos.y * PixelTileSize.y + goal->IY + desty;
-					} else {
-						dest.x = (goal->tilePos.x + destx) * PixelTileSize.x + goal->Type->TileWidth * PixelTileSize.x / 2;
-						dest.y = (goal->tilePos.y + desty) * PixelTileSize.y + goal->Type->TileHeight * PixelTileSize.y / 2;
-					}
-				}
-				const int dist = goal->MapDistanceTo(dest.x, dest.y);
-				if ((flags & ANIM_SM_RANGED) && !(flags & ANIM_SM_PIXEL)
-					&& dist > goal->Stats->Variables[ATTACKRANGE_INDEX].Max
-					&& dist < goal->Type->MinAttackRange) {
-				} else {
-					Missile *missile = MakeMissile(*MissileTypeByIdent(unit.Anim.Anim->D.SpawnMissile.Missile), start, dest);
-					if (flags & ANIM_SM_DAMAGE) {
-						missile->SourceUnit = &unit;
-						unit.RefsIncrease();
-					}					
-					if (flags & ANIM_SM_TOTARGET) {
-						missile->TargetUnit = goal->CurrentOrder()->GetGoal();
-						goal->CurrentOrder()->GetGoal()->RefsIncrease();
-					}
-				}
-				break;
-			}
-			case AnimationSpawnUnit:
-			{
-				const int offX = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.OffX);
-				const int offY = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.OffY);
-				const int range = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.Range);
-				const int playerId = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.Player);
-				CPlayer &player = Players[playerId];
-				const Vec2i pos = { unit.tilePos.x + offX, unit.tilePos.y + offY};
-				CUnitType *type = UnitTypeByIdent(unit.Anim.Anim->D.SpawnUnit.Unit);
-				Vec2i resPos;
-				DebugPrint("Creating a %s\n" _C_ type->Name.c_str());
-				FindNearestDrop(*type, pos, resPos, LookingW);
-				if (MapDistance(pos, resPos) <= range) {
-					CUnit *target = MakeUnit(*type, &player);
-					if (target != NoUnitP) {
-						target->tilePos = resPos;
-						target->Place(resPos);
-						//DropOutOnSide(*target, LookingW, NULL);
-					} else {
-						DebugPrint("Unable to allocate Unit");
-					}
-				}
-				break;
-			}
-			case AnimationIfVar:
-			{
-				const int lop = ParseAnimInt(&unit, unit.Anim.Anim->D.IfVar.LeftVar);
-				const int rop = ParseAnimInt(&unit, unit.Anim.Anim->D.IfVar.RightVar);
-				bool go = false;
-
-				switch (unit.Anim.Anim->D.IfVar.Type) {
-					case IF_GREATER_EQUAL:
-						go = (lop >= rop);
-						break;
-					case IF_GREATER:
-						go = (lop > rop);
-						break;
-					case IF_LESS_EQUAL:
-						go = (lop <= rop);
-						break;
-					case IF_LESS:
-						go = (lop < rop);
-						break;
-					case IF_EQUAL:
-						go = (lop == rop);
-						break;
-					case IF_NOT_EQUAL:
-						go = (lop != rop);
-					break;
-				}
-				if (go) {
-					unit.Anim.Anim = unit.Anim.Anim->D.IfVar.Goto;
-				}
-				break;
-			}
-			case AnimationSetVar:
-			{
-				char arg1[128];
-				CUnit *goal = &unit;
-
-				strcpy(arg1, unit.Anim.Anim->D.SetVar.Var);
-				const int rop = ParseAnimInt(&unit, unit.Anim.Anim->D.SetVar.Value);
-
-				char *next = strchr(arg1, '.');
-				if (next == NULL) {
-					fprintf(stderr, "Need also specify the variable '%s' tag \n" _C_ arg1);
-					Exit(1);
-				} else {
-					*next ='\0';
-				}
-				const int index = UnitTypeVar.VariableNameLookup[arg1];// User variables
-				if (index == -1) {
-					fprintf(stderr, "Bad variable name '%s'\n" _C_ arg1);
-					Exit(1);
-				}
-				if (unit.Anim.Anim->D.SetVar.UnitSlot) {
-					switch (*unit.Anim.Anim->D.SetVar.UnitSlot) {
-						case 'l': // last created unit
-							goal = Units[NumUnits-1];
-							break;
-						case 't': // target unit
-							goal = unit.CurrentOrder()->GetGoal();
-							break;
-						case 's': // unit self (no use)
-							goal = &unit;
-							break;
-					}
-				}
-				if (!goal) {
-					break;
-				}
-				int value = 0;
-				if (!strcmp(next + 1, "Value")) {
-					value = goal->Variable[index].Value;
-				} else if (!strcmp(next + 1, "Max")) {
-					value = goal->Variable[index].Max;
-				} else if (!strcmp(next + 1,"Increase")) {
-					value = goal->Variable[index].Increase;
-				} else if (!strcmp(next + 1, "Enable")) {
-					value = goal->Variable[index].Enable;
-				}
-				switch (unit.Anim.Anim->D.SetVar.Mod) {
-					case MOD_ADD:
-						value += rop;
-						break;
-					case MOD_SUB:
-						value -= rop;
-						break;
-					case MOD_MUL:
-						value *= rop;
-						break;
-					case MOD_DIV:
-						if (!rop) {
-							fprintf(stderr, "Division by zero in AnimationSetVar\n");
-							Exit(1);
-							return 0;
-						}
-						value /= rop;
-						break;
-					case MOD_MOD:
-						if (!rop) {
-							fprintf(stderr, "Division by zero in AnimationSetVar\n");
-							Exit(1);
-							return 0;
-						}
-						value %= rop;
-						break;
-					default:
-						value = rop;
-				}
-				if (!strcmp(next + 1, "Value")) {
-					goal->Variable[index].Value = value;
-				} else if (!strcmp(next + 1, "Max")) {
-					goal->Variable[index].Max = value;
-				} else if (!strcmp(next + 1, "Increase")) {
-					goal->Variable[index].Increase = value;
-				} else if (!strcmp(next + 1, "Enable")) {
-					goal->Variable[index].Enable = value;
-				}
-				break;
-			}
-			case AnimationSetPlayerVar:
-			{
-				const char *var = unit.Anim.Anim->D.SetPlayerVar.Var;
-				const char *arg = unit.Anim.Anim->D.SetPlayerVar.Arg;
-				int playerId = ParseAnimInt(&unit, unit.Anim.Anim->D.SetPlayerVar.Player);
-				int rop = ParseAnimInt(&unit, unit.Anim.Anim->D.SetPlayerVar.Value);
-				int data = GetPlayerData(playerId, var, arg);
-
-				switch (unit.Anim.Anim->D.SetPlayerVar.Mod) {
-					case MOD_ADD:
-						data += rop;
-						break;
-					case MOD_SUB:
-						data -= rop;
-						break;
-					case MOD_MUL:
-						data *= rop;
-						break;
-					case MOD_DIV:
-						if (!rop) {
-							fprintf(stderr, "Division by zero in AnimationSetPlayerVar\n");
-							Exit(1);
-							return 0;
-						}
-						data /= rop;
-						break;
-					case MOD_MOD:
-						if (!rop) {
-							fprintf(stderr, "Division by zero in AnimationSetPlayerVar\n");
-							Exit(1);
-							return 0;
-						}
-						data %= rop;
-						break;
-					default:
-						data = rop;
-				}
-				rop = data;
-				SetPlayerData(playerId, var, arg, rop);
-				break;
-			}
-			case AnimationDie:
-				if (unit.Anim.Unbreakable) {
-					fprintf(stderr, "Can't call \"die\" action in unbreakable section\n");
-					Exit(1);
-					return 0;
-				}
-				if (unit.Anim.Anim->D.Die.DeathType[0] != '\0') {
-					unit.DamagedType = ExtraDeathIndex(unit.Anim.Anim->D.Die.DeathType);				}
-				unit.CurrentOrder()->NeedToDie = true;
-				return 0;
-
-			case AnimationRotate:
-				if (!strcmp(unit.Anim.Anim->D.Rotate.Rotate, "target") && unit.CurrentOrder()->HasGoal()) {
-					COrder &order = *unit.CurrentOrder();
-					const CUnit &target = *order.GetGoal();
-					if (target.Destroyed) {
-						order.ClearGoal();
-						break;
-					}
-					const Vec2i pos = target.tilePos + target.Type->GetHalfTileSize() - unit.tilePos;
-					UnitHeadingFromDeltaXY(unit, pos);
-				} else {
-					UnitRotate(unit, ParseAnimInt(&unit, unit.Anim.Anim->D.Rotate.Rotate));
-				}
-				break;
-
-			case AnimationRandomRotate:
-				if ((SyncRand() >> 8) & 1) {
-					UnitRotate(unit, -ParseAnimInt(&unit, unit.Anim.Anim->D.Rotate.Rotate));
-				} else {
-					UnitRotate(unit, ParseAnimInt(&unit, unit.Anim.Anim->D.Rotate.Rotate));
-				}
-				break;
-
-			case AnimationMove:
-				Assert(!move);
-				move = ParseAnimInt(&unit, unit.Anim.Anim->D.Move.Move);
-				break;
-
-			case AnimationUnbreakable:
-				Assert(unit.Anim.Unbreakable ^ unit.Anim.Anim->D.Unbreakable.Begin);
-				/*DebugPrint("UnitShowAnimationScaled: switch Unbreakable from %s to %s\n"
-					_C_ unit.Anim.Unbreakable ? "TRUE" : "FALSE"
-					_C_ unit.Anim.Anim->D.Unbreakable.Begin ? "TRUE" : "FALSE" );*/
-				unit.Anim.Unbreakable = unit.Anim.Anim->D.Unbreakable.Begin;
-				break;
-
-			case AnimationNone:
-			case AnimationLabel:
-				break;
-
-			case AnimationGoto:
-				unit.Anim.Anim = unit.Anim.Anim->D.Goto.Goto;
-				break;
-			case AnimationRandomGoto:
-				if (SyncRand() % 100 < ParseAnimInt(&unit, unit.Anim.Anim->D.RandomGoto.Random)) {
-					unit.Anim.Anim = unit.Anim.Anim->D.RandomGoto.Goto;
-				}
-				break;
+		if (unit.Anim.Anim->Action(unit, move, scale) == 0) {
+			return 0;
 		}
-
 		if (!unit.Anim.Wait) {
 			// Advance to next frame
 			unit.Anim.Anim = unit.Anim.Anim->Next;
@@ -837,6 +853,567 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 		}
 	}
 	return move;
+}
+
+
+
+struct LabelsStruct {
+	CAnimation *Anim;
+	std::string Name;
+};
+static std::vector<LabelsStruct> Labels;
+
+struct LabelsLaterStruct {
+	CAnimation **Anim;
+	std::string Name;
+};
+static std::vector<LabelsLaterStruct> LabelsLater;
+
+
+/**
+**  Get the animations structure by ident.
+**
+**  @param ident  Identifier for the animation.
+**
+**  @return  Pointer to the animation structure.
+*/
+CAnimations *AnimationsByIdent(const std::string &ident)
+{
+	std::map<std::string, CAnimations *>::iterator ret = AnimationMap.find(ident);
+	if (ret != AnimationMap.end()) {
+		return  (*ret).second;
+	}
+	return NULL;
+}
+
+void FreeAnimations()
+{
+	std::map<std::string, CAnimations *>::iterator i;
+	for (i = AnimationMap.begin(); i != AnimationMap.end(); ++i) {
+		CAnimations *anims = (*i).second;
+		delete anims;
+	}
+	AnimationMap.clear();
+	NumAnimations = 0;
+}
+
+/**
+**  Find the index of a resource
+*/
+static int ResourceIndex(lua_State *l, const char *resource)
+{
+	for (unsigned int res = 0; res < MaxCosts; ++res) {
+		if (!strcmp(resource, DefaultResourceNames[res].c_str())) {
+			return res;
+		}
+	}
+	LuaError(l, "Resource not found: %s" _C_ resource);
+	return 0;
+}
+
+/**
+**  Add a label
+*/
+static void AddLabel(lua_State *, CAnimation *anim, const std::string &name)
+{
+	LabelsStruct label;
+	label.Anim = anim;
+	label.Name = name;
+	Labels.push_back(label);
+}
+
+/**
+**  Find a label
+*/
+static CAnimation *FindLabel(lua_State *l, const std::string &name)
+{
+	for (int i = 0; i < (int)Labels.size(); ++i) {
+		if (Labels[i].Name == name) {
+			return Labels[i].Anim;
+		}
+	}
+	LuaError(l, "Label not found: %s" _C_ name.c_str());
+	return NULL;
+}
+
+/**
+**  Find a label later
+*/
+static void FindLabelLater(lua_State *, CAnimation **anim, const std::string &name)
+{
+	LabelsLaterStruct label;
+	label.Anim = anim;
+	label.Name = name;
+	LabelsLater.push_back(label);
+}
+
+/**
+**  Fix labels
+*/
+static void FixLabels(lua_State *l)
+{
+	for (int i = 0; i < (int)LabelsLater.size(); ++i) {
+		*LabelsLater[i].Anim = FindLabel(l, LabelsLater[i].Name);
+	}
+}
+
+/**
+**  Parse an animation frame
+*/
+static void ParseAnimationFrame(lua_State *l, const char *str, CAnimation *anim)
+{
+	std::string op1(str);
+	std::string all2;
+	char* op2;
+	int index;
+	char *next;
+
+	index = op1.find(' ');
+
+	if (index != -1) {
+		all2 = op1.substr(index + 1);
+		op1 = op1.substr(0, index);
+	}
+	op2 = (char *) all2.c_str();
+	if (op2) {
+		while (*op2 == ' ') {
+			*op2++ = '\0';
+		}
+	}
+	if (op1 == "frame") {
+		anim->Type = AnimationFrame;
+		anim->D.Frame.Frame = new_strdup(op2);
+	} else if (op1 == "exact-frame") {
+		anim->Type = AnimationExactFrame;
+		anim->D.Frame.Frame = new_strdup(op2);
+	} else if (op1 == "wait") {
+		anim->Type = AnimationWait;
+		anim->D.Wait.Wait = new_strdup(op2);
+	} else if (op1 == "random-wait") {
+		anim->Type = AnimationRandomWait;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.RandomWait.MinWait = new_strdup(op2);
+		op2 = next;
+		while (*op2 == ' ') {
+			++op2;
+		}
+		anim->D.RandomWait.MaxWait = new_strdup(op2);
+	} else if (op1 == "sound") {
+		anim->Type = AnimationSound;
+		anim->D.Sound.Name = new_strdup(op2);
+	} else if (op1 == "random-sound") {
+		int count;
+
+		anim->Type = AnimationRandomSound;
+		count = 0;
+		while (op2 && *op2) {
+			next = strchr(op2, ' ');
+			if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+			++count;
+			anim->D.RandomSound.Name = (const char**)
+				realloc(anim->D.RandomSound.Name, count * sizeof(const char *));
+			anim->D.RandomSound.Name[count - 1] = new_strdup(op2);
+			op2 = next;
+		}
+		anim->D.RandomSound.NumSounds = count;
+		anim->D.RandomSound.Sound = new CSound *[count];
+	} else if (op1 == "attack") {
+		anim->Type = AnimationAttack;
+	} else if (op1 == "spawn-missile") {
+		anim->Type = AnimationSpawnMissile;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SpawnMissile.Missile = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SpawnMissile.StartX = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			anim->D.SpawnMissile.StartY = new_strdup(op2);
+			}
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+				anim->D.SpawnMissile.DestX = new_strdup(op2);
+			}
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+				anim->D.SpawnMissile.DestY = new_strdup(op2);
+			}
+		op2 = next;
+		if (next) {
+			while (*op2 == ' ') {
+				++op2;
+			}
+			anim->D.SpawnMissile.Flags = new_strdup(op2);
+		}
+	} else if (op1 == "spawn-unit") {
+		anim->Type = AnimationSpawnUnit;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SpawnUnit.Unit = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SpawnUnit.OffX = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SpawnUnit.OffY = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SpawnUnit.Range = new_strdup(op2);
+		op2 = next;
+		while (*op2 == ' ') {
+			++op2;
+		}
+		anim->D.SpawnUnit.Player = new_strdup(op2);
+	} else if (op1 == "if-var") {
+		anim->Type = AnimationIfVar;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.IfVar.LeftVar = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.IfVar.RightVar = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		if (!strcmp(op2,">=")) {
+			anim->D.IfVar.Type = 1;
+		} else if (!strcmp(op2,">")) {
+			anim->D.IfVar.Type = 2;
+		} else if (!strcmp(op2,"<=")) {
+			anim->D.IfVar.Type = 3;
+		} else if (!strcmp(op2,"<")) {
+			anim->D.IfVar.Type = 4;
+		} else if (!strcmp(op2,"==")) {
+			anim->D.IfVar.Type = 5;
+		} else if (!strcmp(op2,"!=")) {
+			anim->D.IfVar.Type = 6;
+		} else {
+			anim->D.IfVar.Type = atoi(op2);
+		}
+		op2 = next;
+		while (*op2 == ' ') {
+			++op2;
+		}
+		FindLabelLater(l, &anim->D.IfVar.Goto, op2);
+	} else if (op1 == "set-var") {
+		anim->Type = AnimationSetVar;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SetVar.Var = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SetVar.Mod = atoi(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SetVar.Value = new_strdup(op2);
+		if (next) {
+			op2 = next;
+			while (*next == ' ') {
+				*next++ = '\0';
+			}
+			anim->D.SetVar.UnitSlot = new_strdup(op2);
+		} else {
+			anim->D.SetVar.UnitSlot = NULL;
+		}
+	} else if (op1 == "set-player-var") {
+		anim->Type = AnimationSetPlayerVar;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SetPlayerVar.Player = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SetPlayerVar.Var = new_strdup(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SetPlayerVar.Mod = atoi(op2);
+		op2 = next;
+		next = strchr(op2, ' ');
+		if (next) {
+				while (*next == ' ') {
+					*next++ = '\0';
+				}
+			}
+		anim->D.SetPlayerVar.Value = new_strdup(op2);
+		op2 = next;
+		while (*op2 == ' ') {
+			++op2;
+		}
+		anim->D.SetPlayerVar.Arg = new_strdup(op2);
+	} else if (op1 == "die") {
+		anim->Type = AnimationDie;
+		if (op2!='\0')
+			anim->D.Die.DeathType = new_strdup(op2);
+		else
+			anim->D.Die.DeathType = "\0";
+	} else if (op1 == "rotate") {
+		anim->Type = AnimationRotate;
+		anim->D.Rotate.Rotate = new_strdup(op2);
+	} else if (op1 == "random-rotate") {
+		anim->Type = AnimationRandomRotate;
+		anim->D.Rotate.Rotate = new_strdup(op2);
+	} else if (op1 == "move") {
+		anim->Type = AnimationMove;
+		anim->D.Move.Move = new_strdup(op2);
+	} else if (op1 == "unbreakable") {
+		anim->Type = AnimationUnbreakable;
+		if (!strcmp(op2, "begin")) {
+			anim->D.Unbreakable.Begin = 1;
+		} else if (!strcmp(op2, "end")) {
+			anim->D.Unbreakable.Begin = 0;
+		} else {
+			LuaError(l, "Unbreakable must be 'begin' or 'end'.  Found: %s" _C_ op2);
+		}
+	} else if (op1 == "label") {
+		anim->Type = AnimationLabel;
+		AddLabel(l, anim, op2);
+	} else if (op1 == "goto") {
+		anim->Type = AnimationGoto;
+		FindLabelLater(l, &anim->D.Goto.Goto, op2);
+	} else if (op1 == "random-goto") {
+		char *label;
+
+		anim->Type = AnimationRandomGoto;
+		label = strchr(op2, ' ');
+		if (!label) {
+			LuaError(l, "Missing random-goto label");
+		} else {
+			while (*label == ' ') {
+				*label++ = '\0';
+			}
+		}
+		anim->D.RandomGoto.Random = new_strdup(op2);
+		FindLabelLater(l, &anim->D.RandomGoto.Goto, label);
+	} else {
+		LuaError(l, "Unknown animation: %s" _C_ op1.c_str());
+	}
+}
+
+/**
+**  Parse an animation
+*/
+static CAnimation *ParseAnimation(lua_State *l, int idx)
+{
+	CAnimation *anim;
+	CAnimation *tail;
+	int args;
+	int j;
+	const char *str;
+
+	if (!lua_istable(l, idx)) {
+		LuaError(l, "incorrect argument");
+	}
+	args = lua_objlen(l, idx);
+	anim = new CAnimation[args + 1];
+	tail = NULL;
+	Labels.clear();
+	LabelsLater.clear();
+
+	for (j = 0; j < args; ++j) {
+		lua_rawgeti(l, idx, j + 1);
+		str = LuaToString(l, -1);
+		lua_pop(l, 1);
+		ParseAnimationFrame(l, str, &anim[j]);
+		if (!tail) {
+			tail = &anim[j];
+		} else {
+			tail->Next = &anim[j];
+			tail = &anim[j];
+		}
+	}
+	FixLabels(l);
+
+	return anim;
+}
+
+/**
+**  Add animation to AnimationsArray
+*/
+static void AddAnimationToArray(CAnimation *anim)
+{
+	if (!anim) {
+		return;
+	}
+
+	AnimationsArray[NumAnimations++] = anim;
+	Assert(NumAnimations != ANIMATIONS_MAXANIM);
+}
+
+/**
+**  Define a unit-type animation set.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineAnimations(lua_State *l)
+{
+	const char *name;
+	const char *value;
+	CAnimations *anims;
+	int res = -1;
+	int death = ANIMATIONS_DEATHTYPES;
+
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument");
+	}
+
+	name = LuaToString(l, 1);
+	anims = AnimationsByIdent(name);
+	if (!anims) {
+		anims = new CAnimations;
+		AnimationMap[name] = anims;
+	}
+
+	lua_pushnil(l);
+	while (lua_next(l, 2)) {
+		value = LuaToString(l, -2);
+
+		if (!strcmp(value, "Start")) {
+			anims->Start = ParseAnimation(l, -1);
+		} else if (!strncmp(value, "Still", 5)) {
+			anims->Still = ParseAnimation(l, -1);
+		} else if (!strncmp(value, "Death", 5)) {
+			if (strlen(value)>5)
+			{
+				death = ExtraDeathIndex(value + 6);
+				if (death==ANIMATIONS_DEATHTYPES)
+					anims->Death[ANIMATIONS_DEATHTYPES] = ParseAnimation(l, -1);
+				else
+					anims->Death[death] = ParseAnimation(l, -1);
+			}
+			else
+				anims->Death[ANIMATIONS_DEATHTYPES] = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "Attack")) {
+			anims->Attack = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "SpellCast")) {
+			anims->SpellCast = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "Move")) {
+			anims->Move = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "Repair")) {
+			anims->Repair = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "Train")) {
+			anims->Train = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "Research")) {
+			anims->Research = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "Upgrade")) {
+			anims->Upgrade = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "Build")) {
+			anims->Build = ParseAnimation(l, -1);
+		} else if (!strncmp(value, "Harvest_", 8)) {
+			res = ResourceIndex(l, value + 8);
+			anims->Harvest[res] = ParseAnimation(l, -1);
+		} else {
+			LuaError(l, "Unsupported animation: %s" _C_ value);
+		}
+		lua_pop(l, 1);
+	}
+	// Must add to array in a fixed order for save games
+	AddAnimationToArray(anims->Start);
+	AddAnimationToArray(anims->Still);
+	AddAnimationToArray(anims->Death[death]);
+	AddAnimationToArray(anims->Attack);
+	AddAnimationToArray(anims->SpellCast);
+	AddAnimationToArray(anims->Move);
+	AddAnimationToArray(anims->Repair);
+	AddAnimationToArray(anims->Train);
+	if(res != -1)
+		AddAnimationToArray(anims->Harvest[res]);
+	return 0;
+}
+
+void AnimationCclRegister()
+{
+	lua_register(Lua, "DefineAnimations", CclDefineAnimations);
 }
 
 //@}

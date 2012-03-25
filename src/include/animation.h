@@ -38,6 +38,8 @@
 #define ANIMATIONS_MAXANIM 1024
 #define ANIMATIONS_DEATHTYPES 40
 
+class CUnit;
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -67,7 +69,7 @@ enum AnimationType {
 	AnimationSpawnUnit,
 	AnimationIfVar,
 	AnimationSetVar,
-	AnimationSetPlayerVar,	
+	AnimationSetPlayerVar,
 	AnimationDie
 };
 
@@ -78,21 +80,21 @@ public:
 	}
 
 	~CAnimation() {
-		if (Type == AnimationFrame || Type == AnimationExactFrame) 
+		if (Type == AnimationFrame || Type == AnimationExactFrame)
 			delete[] D.Frame.Frame;
-		else if (Type == AnimationWait) 
+		else if (Type == AnimationWait)
 			delete[] D.Wait.Wait;
 		else if (Type == AnimationRandomWait) {
 			delete[] D.RandomWait.MinWait;
 			delete[] D.RandomWait.MaxWait;
 		}
-		else if (Type == AnimationRotate || Type == AnimationRandomRotate) 
+		else if (Type == AnimationRotate || Type == AnimationRandomRotate)
 			delete[] D.Rotate.Rotate;
-		else if (Type == AnimationMove) 
+		else if (Type == AnimationMove)
 			delete[] D.Move.Move;
-		else if (Type == AnimationSound) 
+		else if (Type == AnimationSound)
 			delete[] D.Sound.Name;
-		else if (Type == AnimationSpawnMissile) 
+		else if (Type == AnimationSpawnMissile)
 		{
 			delete[] D.SpawnMissile.Missile;
 			delete[] D.SpawnMissile.StartX;
@@ -101,7 +103,7 @@ public:
 			delete[] D.SpawnMissile.DestY;
 			delete[] D.SpawnMissile.Flags;
 		}
-		else if (Type == AnimationSpawnUnit) 
+		else if (Type == AnimationSpawnUnit)
 		{
 			delete[] D.SpawnUnit.Unit;
 			delete[] D.SpawnUnit.OffX;
@@ -109,7 +111,7 @@ public:
 			delete[] D.SpawnUnit.Range;
 			delete[] D.SpawnUnit.Player;
 		}
-		else if (Type == AnimationIfVar) 
+		else if (Type == AnimationIfVar)
 		{
 			delete[] D.IfVar.LeftVar;
 			delete[] D.IfVar.RightVar;
@@ -127,7 +129,7 @@ public:
 			delete[] D.SetPlayerVar.Arg;
 			delete[] D.SetPlayerVar.Value;
 		}
-		else if (Type == AnimationDie) 
+		else if (Type == AnimationDie)
 		{
 			delete[] D.Die.DeathType;
 		}
@@ -139,6 +141,9 @@ public:
 			delete[] D.RandomSound.Sound;
 		}
 	}
+
+
+	int Action(CUnit &unit, int &move, int scale) const;
 
 	AnimationType Type;
 	union {
@@ -262,13 +267,8 @@ public:
 };
 
 
-
-
 extern CAnimation *AnimationsArray[ANIMATIONS_MAXANIM];
 extern int NumAnimations;
-
-	/// Hash table of all the animations
-extern std::map<std::string, CAnimations *> AnimationMap;
 
 
 /*----------------------------------------------------------------------------
@@ -278,6 +278,7 @@ extern std::map<std::string, CAnimations *> AnimationMap;
 	/// Get the animations structure by ident
 extern CAnimations *AnimationsByIdent(const std::string &ident);
 
+extern void AnimationCclRegister();
 
 //@}
 

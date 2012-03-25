@@ -2460,6 +2460,7 @@ void InitCcl()
 	ConstructionCclRegister();
 	DecorationCclRegister();
 	UnitTypeCclRegister();
+	AnimationCclRegister();
 	UpgradesCclRegister();
 	DependenciesCclRegister();
 	SelectionCclRegister();
