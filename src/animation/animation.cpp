@@ -445,365 +445,422 @@ found:
 	resPos = pos;
 }
 
+static void AnimationFrame_Action(CUnit &unit)
+{
+	Assert(unit.Anim.Anim->Type == AnimationFrame);
+	unit.Frame = ParseAnimInt(&unit, unit.Anim.Anim->D.Frame.Frame);
+	UnitUpdateHeading(unit);
+}
+
+static void AnimationExactFrame_Action(CUnit &unit)
+{
+	Assert(unit.Anim.Anim->Type == AnimationExactFrame);
+	unit.Frame = ParseAnimInt(&unit, unit.Anim.Anim->D.Frame.Frame);
+}
+
+static void AnimationWait_Action(CUnit &unit, int scale)
+{
+	Assert(unit.Anim.Anim->Type == AnimationWait);
+	unit.Anim.Wait = ParseAnimInt(&unit, unit.Anim.Anim->D.Wait.Wait) << scale >> 8;
+	if (unit.Variable[SLOW_INDEX].Value) { // unit is slowed down
+		unit.Anim.Wait <<= 1;
+	}
+	if (unit.Variable[HASTE_INDEX].Value && unit.Anim.Wait > 1) { // unit is accelerated
+		unit.Anim.Wait >>= 1;
+	}
+	if (unit.Anim.Wait <= 0) {
+		unit.Anim.Wait = 1;
+	}
+}
+
+static void AnimationRandomWait_Action(CUnit &unit)
+{
+	Assert(unit.Anim.Anim->Type == AnimationRandomWait);
+
+	const int arg1 = ParseAnimInt(&unit, unit.Anim.Anim->D.RandomWait.MinWait);
+	const int arg2 = ParseAnimInt(&unit, unit.Anim.Anim->D.RandomWait.MaxWait);
+
+	unit.Anim.Wait = arg1 + SyncRand() % (arg2 - arg1 + 1);
+}
+
+static void AnimationSound_Action(CUnit &unit)
+{
+	Assert(unit.Anim.Anim->Type == AnimationSound);
+	if (unit.IsVisible(*ThisPlayer) || ReplayRevealMap) {
+		PlayUnitSound(unit, unit.Anim.Anim->D.Sound.Sound);
+	}
+}
+
+static void AnimationRandomSound_Action(CUnit &unit)
+{
+	Assert(unit.Anim.Anim->Type == AnimationRandomSound);
+
+	if (unit.IsVisible(*ThisPlayer) || ReplayRevealMap) {
+		const int sound = SyncRand() % unit.Anim.Anim->D.RandomSound.NumSounds;
+		PlayUnitSound(unit, unit.Anim.Anim->D.RandomSound.Sound[sound]);
+	}
+}
+
+static void AnimationAttack_Action(CUnit &unit)
+{
+	Assert(unit.Anim.Anim->Type == AnimationAttack);
+	unit.CurrentOrder()->OnAnimationAttack(unit);
+}
+
+static void AnimationSpawnMissile_Action(CUnit &unit)
+{
+	Assert(unit.Anim.Anim->Type == AnimationSpawnMissile);
+	const int startx = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.StartX);
+	const int starty = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.StartY);
+	const int destx = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.DestX);
+	const int desty = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.DestY);
+	const int flags = ParseAnimFlags(unit, unit.Anim.Anim->D.SpawnMissile.Flags);
+	CUnit *goal;
+	PixelPos start;
+	PixelPos dest;
+
+	if ((flags & ANIM_SM_RELTARGET)) {
+		goal = unit.CurrentOrder()->GetGoal();
+	} else {
+		goal = &unit;
+	}
+	if (!goal || goal->Destroyed || goal->Removed) {
+		return;
+	}
+	if ((flags & ANIM_SM_PIXEL)) {
+		start.x = goal->tilePos.x * PixelTileSize.x + goal->IX + startx;
+		start.y = goal->tilePos.y * PixelTileSize.y + goal->IY + starty;
+	} else {
+		start.x = (goal->tilePos.x + startx) * PixelTileSize.x + PixelTileSize.x / 2;
+		start.y = (goal->tilePos.y + starty) * PixelTileSize.y + PixelTileSize.y / 2;
+	}
+	if ((flags & ANIM_SM_TOTARGET)) {
+		CUnit *target = goal->CurrentOrder()->GetGoal();
+		Assert(goal->CurrentAction() == UnitActionAttack);
+		if (!target  || target->Destroyed || target->Removed) {
+			return;
+		}
+		if (flags & ANIM_SM_PIXEL) {
+			dest.x = target->tilePos.x * PixelTileSize.x + target->IX + destx;
+			dest.y = target->tilePos.y * PixelTileSize.y + target->IY + desty;
+		} else {
+			dest.x = (target->tilePos.x + destx) * PixelTileSize.x + target->Type->TileWidth * PixelTileSize.x / 2;
+			dest.y = (target->tilePos.y + desty) * PixelTileSize.y + target->Type->TileHeight * PixelTileSize.y / 2;
+		}
+	} else {
+		if ((flags & ANIM_SM_PIXEL)) {
+			dest.x = goal->tilePos.x * PixelTileSize.x + goal->IX + destx;
+			dest.y = goal->tilePos.y * PixelTileSize.y + goal->IY + desty;
+		} else {
+			dest.x = (goal->tilePos.x + destx) * PixelTileSize.x + goal->Type->TileWidth * PixelTileSize.x / 2;
+			dest.y = (goal->tilePos.y + desty) * PixelTileSize.y + goal->Type->TileHeight * PixelTileSize.y / 2;
+		}
+	}
+	const int dist = goal->MapDistanceTo(dest.x, dest.y);
+	if ((flags & ANIM_SM_RANGED) && !(flags & ANIM_SM_PIXEL)
+		&& dist > goal->Stats->Variables[ATTACKRANGE_INDEX].Max
+		&& dist < goal->Type->MinAttackRange) {
+	} else {
+		Missile *missile = MakeMissile(*MissileTypeByIdent(unit.Anim.Anim->D.SpawnMissile.Missile), start, dest);
+		if (flags & ANIM_SM_DAMAGE) {
+			missile->SourceUnit = &unit;
+			unit.RefsIncrease();
+		}
+		if (flags & ANIM_SM_TOTARGET) {
+			missile->TargetUnit = goal->CurrentOrder()->GetGoal();
+			goal->CurrentOrder()->GetGoal()->RefsIncrease();
+		}
+	}
+}
+
+static void AnimationSpawnUnit_Action(CUnit &unit)
+{
+	Assert(unit.Anim.Anim->Type == AnimationSpawnUnit);
+	const int offX = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.OffX);
+	const int offY = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.OffY);
+	const int range = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.Range);
+	const int playerId = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.Player);
+	CPlayer &player = Players[playerId];
+	const Vec2i pos = { unit.tilePos.x + offX, unit.tilePos.y + offY};
+	CUnitType *type = UnitTypeByIdent(unit.Anim.Anim->D.SpawnUnit.Unit);
+	Vec2i resPos;
+	DebugPrint("Creating a %s\n" _C_ type->Name.c_str());
+	FindNearestDrop(*type, pos, resPos, LookingW);
+	if (MapDistance(pos, resPos) <= range) {
+		CUnit *target = MakeUnit(*type, &player);
+		if (target != NoUnitP) {
+			target->tilePos = resPos;
+			target->Place(resPos);
+			//DropOutOnSide(*target, LookingW, NULL);
+		} else {
+			DebugPrint("Unable to allocate Unit");
+		}
+	}
+}
+
+static void AnimationIfVar_Action(CUnit &unit)
+{
+	Assert(unit.Anim.Anim->Type == AnimationIfVar);
+	const int lop = ParseAnimInt(&unit, unit.Anim.Anim->D.IfVar.LeftVar);
+	const int rop = ParseAnimInt(&unit, unit.Anim.Anim->D.IfVar.RightVar);
+	bool go = false;
+
+	switch (unit.Anim.Anim->D.IfVar.Type) {
+		case IF_GREATER_EQUAL:
+			go = (lop >= rop);
+			break;
+		case IF_GREATER:
+			go = (lop > rop);
+			break;
+		case IF_LESS_EQUAL:
+			go = (lop <= rop);
+			break;
+		case IF_LESS:
+			go = (lop < rop);
+			break;
+		case IF_EQUAL:
+			go = (lop == rop);
+			break;
+		case IF_NOT_EQUAL:
+			go = (lop != rop);
+		break;
+	}
+	if (go) {
+		unit.Anim.Anim = unit.Anim.Anim->D.IfVar.Goto;
+	}
+}
 
 
 
-int CAnimation::Action(CUnit &unit, int &move, int scale) const
+static void AnimationSetVar_Action(CUnit &unit)
+{
+	Assert(unit.Anim.Anim->Type == AnimationSetVar);
+	char arg1[128];
+	CUnit *goal = &unit;
+
+	strcpy(arg1, unit.Anim.Anim->D.SetVar.Var);
+	const int rop = ParseAnimInt(&unit, unit.Anim.Anim->D.SetVar.Value);
+
+	char *next = strchr(arg1, '.');
+	if (next == NULL) {
+		fprintf(stderr, "Need also specify the variable '%s' tag \n" _C_ arg1);
+		Exit(1);
+	} else {
+		*next ='\0';
+	}
+	const int index = UnitTypeVar.VariableNameLookup[arg1];// User variables
+	if (index == -1) {
+		fprintf(stderr, "Bad variable name '%s'\n" _C_ arg1);
+		Exit(1);
+	}
+	if (unit.Anim.Anim->D.SetVar.UnitSlot) {
+		switch (*unit.Anim.Anim->D.SetVar.UnitSlot) {
+			case 'l': // last created unit
+				goal = Units[NumUnits-1];
+				break;
+			case 't': // target unit
+				goal = unit.CurrentOrder()->GetGoal();
+				break;
+			case 's': // unit self (no use)
+				goal = &unit;
+				break;
+		}
+	}
+	if (!goal) {
+		return;
+	}
+	int value = 0;
+	if (!strcmp(next + 1, "Value")) {
+		value = goal->Variable[index].Value;
+	} else if (!strcmp(next + 1, "Max")) {
+		value = goal->Variable[index].Max;
+	} else if (!strcmp(next + 1,"Increase")) {
+		value = goal->Variable[index].Increase;
+	} else if (!strcmp(next + 1, "Enable")) {
+		value = goal->Variable[index].Enable;
+	}
+	switch (unit.Anim.Anim->D.SetVar.Mod) {
+		case MOD_ADD:
+			value += rop;
+			break;
+		case MOD_SUB:
+			value -= rop;
+			break;
+		case MOD_MUL:
+			value *= rop;
+			break;
+		case MOD_DIV:
+			if (!rop) {
+				fprintf(stderr, "Division by zero in AnimationSetVar\n");
+				Exit(1);
+			}
+			value /= rop;
+			break;
+		case MOD_MOD:
+			if (!rop) {
+				fprintf(stderr, "Division by zero in AnimationSetVar\n");
+				Exit(1);
+			}
+			value %= rop;
+			break;
+		default:
+			value = rop;
+	}
+	if (!strcmp(next + 1, "Value")) {
+		goal->Variable[index].Value = value;
+	} else if (!strcmp(next + 1, "Max")) {
+		goal->Variable[index].Max = value;
+	} else if (!strcmp(next + 1, "Increase")) {
+		goal->Variable[index].Increase = value;
+	} else if (!strcmp(next + 1, "Enable")) {
+		goal->Variable[index].Enable = value;
+	}
+}
+
+static void AnimationSetPlayerVar_Action(CUnit &unit)
+{
+	Assert(unit.Anim.Anim->Type == AnimationSetPlayerVar);
+
+	const char *var = unit.Anim.Anim->D.SetPlayerVar.Var;
+	const char *arg = unit.Anim.Anim->D.SetPlayerVar.Arg;
+	int playerId = ParseAnimInt(&unit, unit.Anim.Anim->D.SetPlayerVar.Player);
+	int rop = ParseAnimInt(&unit, unit.Anim.Anim->D.SetPlayerVar.Value);
+	int data = GetPlayerData(playerId, var, arg);
+
+	switch (unit.Anim.Anim->D.SetPlayerVar.Mod) {
+		case MOD_ADD:
+			data += rop;
+			break;
+		case MOD_SUB:
+			data -= rop;
+			break;
+		case MOD_MUL:
+			data *= rop;
+			break;
+		case MOD_DIV:
+			if (!rop) {
+				fprintf(stderr, "Division by zero in AnimationSetPlayerVar\n");
+				Exit(1);
+			}
+			data /= rop;
+			break;
+		case MOD_MOD:
+			if (!rop) {
+				fprintf(stderr, "Division by zero in AnimationSetPlayerVar\n");
+				Exit(1);
+			}
+			data %= rop;
+			break;
+		default:
+			data = rop;
+	}
+	rop = data;
+	SetPlayerData(playerId, var, arg, rop);
+}
+
+
+
+static void AnimationDie_Action(CUnit &unit)
+{
+	Assert(unit.Anim.Anim->Type == AnimationDie);
+	if (unit.Anim.Unbreakable) {
+		fprintf(stderr, "Can't call \"die\" action in unbreakable section\n");
+		Exit(1);
+	}
+	if (unit.Anim.Anim->D.Die.DeathType[0] != '\0') {
+		unit.DamagedType = ExtraDeathIndex(unit.Anim.Anim->D.Die.DeathType);
+	}
+	unit.CurrentOrder()->NeedToDie = true;
+}
+
+
+static void AnimationRotate_Action(CUnit &unit)
+{
+	Assert(unit.Anim.Anim->Type == AnimationRotate);
+
+	if (!strcmp(unit.Anim.Anim->D.Rotate.Rotate, "target") && unit.CurrentOrder()->HasGoal()) {
+		COrder &order = *unit.CurrentOrder();
+		const CUnit &target = *order.GetGoal();
+		if (target.Destroyed) {
+			order.ClearGoal();
+			return;
+		}
+		const Vec2i pos = target.tilePos + target.Type->GetHalfTileSize() - unit.tilePos;
+		UnitHeadingFromDeltaXY(unit, pos);
+	} else {
+		UnitRotate(unit, ParseAnimInt(&unit, unit.Anim.Anim->D.Rotate.Rotate));
+	}
+}
+
+static void AnimationRandomRotate_Action(CUnit &unit)
+{
+	Assert(unit.Anim.Anim->Type == AnimationRandomRotate);
+	if ((SyncRand() >> 8) & 1) {
+		UnitRotate(unit, -ParseAnimInt(&unit, unit.Anim.Anim->D.Rotate.Rotate));
+	} else {
+		UnitRotate(unit, ParseAnimInt(&unit, unit.Anim.Anim->D.Rotate.Rotate));
+	}
+}
+
+
+static void AnimationMove_Action(CUnit &unit, int &move)
+{
+	Assert(unit.Anim.Anim->Type == AnimationMove);
+	Assert(!move);
+	move = ParseAnimInt(&unit, unit.Anim.Anim->D.Move.Move);
+}
+
+
+static void AnimationUnbreakable_Action(CUnit &unit)
+{
+	Assert(unit.Anim.Anim->Type == AnimationUnbreakable);
+	Assert(unit.Anim.Unbreakable ^ unit.Anim.Anim->D.Unbreakable.Begin);
+	/*DebugPrint("UnitShowAnimationScaled: switch Unbreakable from %s to %s\n"
+		_C_ unit.Anim.Unbreakable ? "TRUE" : "FALSE"
+		_C_ unit.Anim.Anim->D.Unbreakable.Begin ? "TRUE" : "FALSE" );*/
+	unit.Anim.Unbreakable = unit.Anim.Anim->D.Unbreakable.Begin;
+}
+
+static void AnimationGoto_Action(CUnit &unit)
+{
+	Assert(unit.Anim.Anim->Type == AnimationGoto);
+	unit.Anim.Anim = unit.Anim.Anim->D.Goto.Goto;
+}
+
+static void AnimationRandomGoto_Action(CUnit &unit)
+{
+	Assert(unit.Anim.Anim->Type == AnimationRandomGoto);
+
+	if (SyncRand() % 100 < ParseAnimInt(&unit, unit.Anim.Anim->D.RandomGoto.Random)) {
+		unit.Anim.Anim = unit.Anim.Anim->D.RandomGoto.Goto;
+	}
+}
+
+/* static */ void CAnimation::Action(CUnit &unit, int &move, int scale)
 {
 	switch (unit.Anim.Anim->Type) {
-		case AnimationFrame:
-			unit.Frame = ParseAnimInt(&unit, unit.Anim.Anim->D.Frame.Frame);
-			UnitUpdateHeading(unit);
-			break;
-
-		case AnimationExactFrame:
-			unit.Frame = ParseAnimInt(&unit, unit.Anim.Anim->D.Frame.Frame);
-			break;
-
-		case AnimationWait:
-			unit.Anim.Wait = ParseAnimInt(&unit, unit.Anim.Anim->D.Wait.Wait) << scale >> 8;
-			if (unit.Variable[SLOW_INDEX].Value) { // unit is slowed down
-				unit.Anim.Wait <<= 1;
-			}
-			if (unit.Variable[HASTE_INDEX].Value && unit.Anim.Wait > 1) { // unit is accelerated
-				unit.Anim.Wait >>= 1;
-			}
-			if (unit.Anim.Wait <= 0)
-				unit.Anim.Wait = 1;
-			break;
-		case AnimationRandomWait:
-		{
-			const int arg1 = ParseAnimInt(&unit, unit.Anim.Anim->D.RandomWait.MinWait);
-			const int arg2 = ParseAnimInt(&unit, unit.Anim.Anim->D.RandomWait.MaxWait);
-
-			unit.Anim.Wait = arg1 + SyncRand() % (arg2 - arg1 + 1);
-			break;
-		}
-		case AnimationSound:
-			if (unit.IsVisible(*ThisPlayer) || ReplayRevealMap) {
-				PlayUnitSound(unit, unit.Anim.Anim->D.Sound.Sound);
-			}
-			break;
-		case AnimationRandomSound:
-			if (unit.IsVisible(*ThisPlayer) || ReplayRevealMap) {
-				const int sound = SyncRand() % unit.Anim.Anim->D.RandomSound.NumSounds;
-				PlayUnitSound(unit, unit.Anim.Anim->D.RandomSound.Sound[sound]);
-			}
-			break;
-
-		case AnimationAttack:
-		{
-			unit.CurrentOrder()->OnAnimationAttack(unit);
-			break;
-		}
-		case AnimationSpawnMissile:
-		{
-			const int startx = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.StartX);
-			const int starty = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.StartY);
-			const int destx = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.DestX);
-			const int desty = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnMissile.DestY);
-			const int flags = ParseAnimFlags(unit, unit.Anim.Anim->D.SpawnMissile.Flags);
-			CUnit *goal;
-			PixelPos start;
-			PixelPos dest;
-
-			if ((flags & ANIM_SM_RELTARGET)) {
-				goal = unit.CurrentOrder()->GetGoal();
-			} else {
-				goal = &unit;
-			}
-			if (!goal || goal->Destroyed || goal->Removed) {
-				break;
-			}
-			if ((flags & ANIM_SM_PIXEL)) {
-				start.x = goal->tilePos.x * PixelTileSize.x + goal->IX + startx;
-				start.y = goal->tilePos.y * PixelTileSize.y + goal->IY + starty;
-			} else {
-				start.x = (goal->tilePos.x + startx) * PixelTileSize.x + PixelTileSize.x / 2;
-				start.y = (goal->tilePos.y + starty) * PixelTileSize.y + PixelTileSize.y / 2;
-			}
-			if ((flags & ANIM_SM_TOTARGET)) {
-				CUnit *target = goal->CurrentOrder()->GetGoal();
-				Assert(goal->CurrentAction() == UnitActionAttack);
-				if (!target  || target->Destroyed || target->Removed) {
-					break;
-				}
-				if (flags & ANIM_SM_PIXEL) {
-					dest.x = target->tilePos.x * PixelTileSize.x + target->IX + destx;
-					dest.y = target->tilePos.y * PixelTileSize.y + target->IY + desty;
-				} else {
-					dest.x = (target->tilePos.x + destx) * PixelTileSize.x + target->Type->TileWidth * PixelTileSize.x / 2;
-					dest.y = (target->tilePos.y + desty) * PixelTileSize.y + target->Type->TileHeight * PixelTileSize.y / 2;
-				}
-			} else {
-				if ((flags & ANIM_SM_PIXEL)) {
-					dest.x = goal->tilePos.x * PixelTileSize.x + goal->IX + destx;
-					dest.y = goal->tilePos.y * PixelTileSize.y + goal->IY + desty;
-				} else {
-					dest.x = (goal->tilePos.x + destx) * PixelTileSize.x + goal->Type->TileWidth * PixelTileSize.x / 2;
-					dest.y = (goal->tilePos.y + desty) * PixelTileSize.y + goal->Type->TileHeight * PixelTileSize.y / 2;
-				}
-			}
-			const int dist = goal->MapDistanceTo(dest.x, dest.y);
-			if ((flags & ANIM_SM_RANGED) && !(flags & ANIM_SM_PIXEL)
-				&& dist > goal->Stats->Variables[ATTACKRANGE_INDEX].Max
-				&& dist < goal->Type->MinAttackRange) {
-			} else {
-				Missile *missile = MakeMissile(*MissileTypeByIdent(unit.Anim.Anim->D.SpawnMissile.Missile), start, dest);
-				if (flags & ANIM_SM_DAMAGE) {
-					missile->SourceUnit = &unit;
-					unit.RefsIncrease();
-				}
-				if (flags & ANIM_SM_TOTARGET) {
-					missile->TargetUnit = goal->CurrentOrder()->GetGoal();
-					goal->CurrentOrder()->GetGoal()->RefsIncrease();
-				}
-			}
-			break;
-		}
-		case AnimationSpawnUnit:
-		{
-			const int offX = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.OffX);
-			const int offY = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.OffY);
-			const int range = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.Range);
-			const int playerId = ParseAnimInt(&unit, unit.Anim.Anim->D.SpawnUnit.Player);
-			CPlayer &player = Players[playerId];
-			const Vec2i pos = { unit.tilePos.x + offX, unit.tilePos.y + offY};
-			CUnitType *type = UnitTypeByIdent(unit.Anim.Anim->D.SpawnUnit.Unit);
-			Vec2i resPos;
-			DebugPrint("Creating a %s\n" _C_ type->Name.c_str());
-			FindNearestDrop(*type, pos, resPos, LookingW);
-			if (MapDistance(pos, resPos) <= range) {
-				CUnit *target = MakeUnit(*type, &player);
-				if (target != NoUnitP) {
-					target->tilePos = resPos;
-					target->Place(resPos);
-					//DropOutOnSide(*target, LookingW, NULL);
-				} else {
-					DebugPrint("Unable to allocate Unit");
-				}
-			}
-			break;
-		}
-		case AnimationIfVar:
-		{
-			const int lop = ParseAnimInt(&unit, unit.Anim.Anim->D.IfVar.LeftVar);
-			const int rop = ParseAnimInt(&unit, unit.Anim.Anim->D.IfVar.RightVar);
-			bool go = false;
-
-			switch (unit.Anim.Anim->D.IfVar.Type) {
-				case IF_GREATER_EQUAL:
-					go = (lop >= rop);
-					break;
-				case IF_GREATER:
-					go = (lop > rop);
-					break;
-				case IF_LESS_EQUAL:
-					go = (lop <= rop);
-					break;
-				case IF_LESS:
-					go = (lop < rop);
-					break;
-				case IF_EQUAL:
-					go = (lop == rop);
-					break;
-				case IF_NOT_EQUAL:
-					go = (lop != rop);
-				break;
-			}
-			if (go) {
-				unit.Anim.Anim = unit.Anim.Anim->D.IfVar.Goto;
-			}
-			break;
-		}
-		case AnimationSetVar:
-		{
-			char arg1[128];
-			CUnit *goal = &unit;
-
-			strcpy(arg1, unit.Anim.Anim->D.SetVar.Var);
-			const int rop = ParseAnimInt(&unit, unit.Anim.Anim->D.SetVar.Value);
-
-			char *next = strchr(arg1, '.');
-			if (next == NULL) {
-				fprintf(stderr, "Need also specify the variable '%s' tag \n" _C_ arg1);
-				Exit(1);
-			} else {
-				*next ='\0';
-			}
-			const int index = UnitTypeVar.VariableNameLookup[arg1];// User variables
-			if (index == -1) {
-				fprintf(stderr, "Bad variable name '%s'\n" _C_ arg1);
-				Exit(1);
-			}
-			if (unit.Anim.Anim->D.SetVar.UnitSlot) {
-				switch (*unit.Anim.Anim->D.SetVar.UnitSlot) {
-					case 'l': // last created unit
-						goal = Units[NumUnits-1];
-						break;
-					case 't': // target unit
-						goal = unit.CurrentOrder()->GetGoal();
-						break;
-					case 's': // unit self (no use)
-						goal = &unit;
-						break;
-				}
-			}
-			if (!goal) {
-				break;
-			}
-			int value = 0;
-			if (!strcmp(next + 1, "Value")) {
-				value = goal->Variable[index].Value;
-			} else if (!strcmp(next + 1, "Max")) {
-				value = goal->Variable[index].Max;
-			} else if (!strcmp(next + 1,"Increase")) {
-				value = goal->Variable[index].Increase;
-			} else if (!strcmp(next + 1, "Enable")) {
-				value = goal->Variable[index].Enable;
-			}
-			switch (unit.Anim.Anim->D.SetVar.Mod) {
-				case MOD_ADD:
-					value += rop;
-					break;
-				case MOD_SUB:
-					value -= rop;
-					break;
-				case MOD_MUL:
-					value *= rop;
-					break;
-				case MOD_DIV:
-					if (!rop) {
-						fprintf(stderr, "Division by zero in AnimationSetVar\n");
-						Exit(1);
-						return 0;
-					}
-					value /= rop;
-					break;
-				case MOD_MOD:
-					if (!rop) {
-						fprintf(stderr, "Division by zero in AnimationSetVar\n");
-						Exit(1);
-						return 0;
-					}
-					value %= rop;
-					break;
-				default:
-					value = rop;
-			}
-			if (!strcmp(next + 1, "Value")) {
-				goal->Variable[index].Value = value;
-			} else if (!strcmp(next + 1, "Max")) {
-				goal->Variable[index].Max = value;
-			} else if (!strcmp(next + 1, "Increase")) {
-				goal->Variable[index].Increase = value;
-			} else if (!strcmp(next + 1, "Enable")) {
-				goal->Variable[index].Enable = value;
-			}
-			break;
-		}
-		case AnimationSetPlayerVar:
-		{
-			const char *var = unit.Anim.Anim->D.SetPlayerVar.Var;
-			const char *arg = unit.Anim.Anim->D.SetPlayerVar.Arg;
-			int playerId = ParseAnimInt(&unit, unit.Anim.Anim->D.SetPlayerVar.Player);
-			int rop = ParseAnimInt(&unit, unit.Anim.Anim->D.SetPlayerVar.Value);
-			int data = GetPlayerData(playerId, var, arg);
-
-			switch (unit.Anim.Anim->D.SetPlayerVar.Mod) {
-				case MOD_ADD:
-					data += rop;
-					break;
-				case MOD_SUB:
-					data -= rop;
-					break;
-				case MOD_MUL:
-					data *= rop;
-					break;
-				case MOD_DIV:
-					if (!rop) {
-						fprintf(stderr, "Division by zero in AnimationSetPlayerVar\n");
-						Exit(1);
-						return 0;
-					}
-					data /= rop;
-					break;
-				case MOD_MOD:
-					if (!rop) {
-						fprintf(stderr, "Division by zero in AnimationSetPlayerVar\n");
-						Exit(1);
-						return 0;
-					}
-					data %= rop;
-					break;
-				default:
-					data = rop;
-			}
-			rop = data;
-			SetPlayerData(playerId, var, arg, rop);
-			break;
-		}
-		case AnimationDie:
-			if (unit.Anim.Unbreakable) {
-				fprintf(stderr, "Can't call \"die\" action in unbreakable section\n");
-				Exit(1);
-				return 0;
-			}
-			if (unit.Anim.Anim->D.Die.DeathType[0] != '\0') {
-				unit.DamagedType = ExtraDeathIndex(unit.Anim.Anim->D.Die.DeathType);				}
-			unit.CurrentOrder()->NeedToDie = true;
-			return 0;
-
-		case AnimationRotate:
-			if (!strcmp(unit.Anim.Anim->D.Rotate.Rotate, "target") && unit.CurrentOrder()->HasGoal()) {
-				COrder &order = *unit.CurrentOrder();
-				const CUnit &target = *order.GetGoal();
-				if (target.Destroyed) {
-					order.ClearGoal();
-					break;
-				}
-				const Vec2i pos = target.tilePos + target.Type->GetHalfTileSize() - unit.tilePos;
-				UnitHeadingFromDeltaXY(unit, pos);
-			} else {
-				UnitRotate(unit, ParseAnimInt(&unit, unit.Anim.Anim->D.Rotate.Rotate));
-			}
-			break;
-
-		case AnimationRandomRotate:
-			if ((SyncRand() >> 8) & 1) {
-				UnitRotate(unit, -ParseAnimInt(&unit, unit.Anim.Anim->D.Rotate.Rotate));
-			} else {
-				UnitRotate(unit, ParseAnimInt(&unit, unit.Anim.Anim->D.Rotate.Rotate));
-			}
-			break;
-
-		case AnimationMove:
-			Assert(!move);
-			move = ParseAnimInt(&unit, unit.Anim.Anim->D.Move.Move);
-			break;
-
-		case AnimationUnbreakable:
-			Assert(unit.Anim.Unbreakable ^ unit.Anim.Anim->D.Unbreakable.Begin);
-			/*DebugPrint("UnitShowAnimationScaled: switch Unbreakable from %s to %s\n"
-				_C_ unit.Anim.Unbreakable ? "TRUE" : "FALSE"
-				_C_ unit.Anim.Anim->D.Unbreakable.Begin ? "TRUE" : "FALSE" );*/
-			unit.Anim.Unbreakable = unit.Anim.Anim->D.Unbreakable.Begin;
-			break;
-
-		case AnimationNone:
-		case AnimationLabel:
-			break;
-
-		case AnimationGoto:
-			unit.Anim.Anim = unit.Anim.Anim->D.Goto.Goto;
-			break;
-		case AnimationRandomGoto:
-			if (SyncRand() % 100 < ParseAnimInt(&unit, unit.Anim.Anim->D.RandomGoto.Random)) {
-				unit.Anim.Anim = unit.Anim.Anim->D.RandomGoto.Goto;
-			}
-			break;
+		case AnimationFrame: AnimationFrame_Action(unit); break;
+		case AnimationExactFrame: AnimationExactFrame_Action(unit); break;
+		case AnimationWait: AnimationWait_Action(unit, scale); break;
+		case AnimationRandomWait: AnimationRandomWait_Action(unit); break;
+		case AnimationSound: AnimationSound_Action(unit); break;
+		case AnimationRandomSound: AnimationRandomSound_Action(unit); break;
+		case AnimationAttack: AnimationAttack_Action(unit); break;
+		case AnimationSpawnMissile: AnimationSpawnMissile_Action(unit); break;
+		case AnimationSpawnUnit: AnimationSpawnUnit_Action(unit); break;
+		case AnimationIfVar: AnimationIfVar_Action(unit); break;
+		case AnimationSetVar: AnimationSetVar_Action(unit); break;
+		case AnimationSetPlayerVar: AnimationSetPlayerVar_Action(unit); break;
+		case AnimationDie: AnimationDie_Action(unit); break;
+		case AnimationRotate: AnimationRotate_Action(unit); break;
+		case AnimationRandomRotate: AnimationRandomRotate_Action(unit); break;
+		case AnimationMove: AnimationMove_Action(unit, move); break;
+		case AnimationUnbreakable: AnimationUnbreakable_Action(unit); break;
+		case AnimationNone: break;
+		case AnimationLabel: break;
+		case AnimationGoto: AnimationGoto_Action(unit); break;
+		case AnimationRandomGoto: AnimationRandomGoto_Action(unit); break;
 	}
-	return 1;
 }
 
 /**
@@ -839,7 +896,8 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 	}
 	int move = 0;
 	while (!unit.Anim.Wait) {
-		if (unit.Anim.Anim->Action(unit, move, scale) == 0) {
+		CAnimation::Action(unit, move, scale);
+		if (unit.Anim.Anim->Type == AnimationDie) {
 			return 0;
 		}
 		if (!unit.Anim.Wait) {

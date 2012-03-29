@@ -143,7 +143,7 @@ public:
 	}
 
 
-	int Action(CUnit &unit, int &move, int scale) const;
+	static void Action(CUnit &unit, int &move, int scale);
 
 	AnimationType Type;
 	union {
