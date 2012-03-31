@@ -37,10 +37,11 @@
 
 #include "sound.h"
 
-#define ANIMATIONS_MAXANIM 1024
 #define ANIMATIONS_DEATHTYPES 40
 
+class CFile;
 class CUnit;
+struct lua_State;
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -254,6 +255,10 @@ public:
 		delete[] Upgrade;
 	}
 
+	static void SaveUnitAnim(CFile &file, const CUnit &unit);
+	static void LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
+
+public:
 	CAnimation *Attack;
 	CAnimation *Build;
 	CAnimation *Death[ANIMATIONS_DEATHTYPES + 1];
@@ -267,10 +272,6 @@ public:
 	CAnimation *Train;
 	CAnimation *Upgrade;
 };
-
-
-extern CAnimation *AnimationsArray[ANIMATIONS_MAXANIM];
-extern int NumAnimations;
 
 
 /*----------------------------------------------------------------------------

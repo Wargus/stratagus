@@ -521,21 +521,10 @@ static int CclUnit(lua_State *l)
 			lua_rawgeti(l, 2, j + 1);
 			unit->State = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "anim-wait")) {
+		} else if (!strcmp(value, "anim-data")) {
 			lua_rawgeti(l, 2, j + 1);
-			unit->Anim.Wait = LuaToNumber(l, -1);
+			CAnimations::LoadUnitAnim(l, *unit, -1);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "curr-anim")) {
-			lua_rawgeti(l, 2, j + 1);
-			unit->Anim.CurrAnim = AnimationsArray[(int)LuaToNumber(l, -1)];
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "anim")) {
-			lua_rawgeti(l, 2, j + 1);
-			unit->Anim.Anim = unit->Anim.CurrAnim + (int)LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "unbreakable")) {
-			unit->Anim.Unbreakable = 1;
-			--j;
 		} else if (!strcmp(value, "blink")) {
 			lua_rawgeti(l, 2, j + 1);
 			unit->Blink = LuaToNumber(l, -1);

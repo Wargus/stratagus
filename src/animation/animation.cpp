@@ -39,17 +39,20 @@
 
 #include "stratagus.h"
 
-#include "actions.h"
 #include "animation.h"
 #include "animation/animation_die.h"
 
-#include "script.h"
+#include "actions.h"
+#include "iolib.h"
 #include "map.h"
 #include "missile.h"
 #include "player.h"
+#include "script.h"
 #include "sound.h"
 #include "unit.h"
 #include "unittype.h"
+
+#define ANIMATIONS_MAXANIM 1024
 
 //SpawnMissile flags
 #define ANIM_SM_DAMAGE 1
@@ -931,6 +934,61 @@ void FreeAnimations()
 	AnimationMap.clear();
 	NumAnimations = 0;
 }
+
+
+/* static */ void CAnimations::SaveUnitAnim(CFile &file, const CUnit &unit)
+{
+	file.printf("\"anim-data\", {");
+	file.printf("\"anim-wait\", %d,", unit.Anim.Wait);
+	for (int i = 0; i < NumAnimations; ++i) {
+		if (AnimationsArray[i] == unit.Anim.CurrAnim) {
+			file.printf("\"curr-anim\", %d,", i);
+			file.printf("\"anim\", %d,", static_cast<int>(unit.Anim.Anim - unit.Anim.CurrAnim));
+			break;
+		}
+	}
+	if (unit.Anim.Unbreakable) {
+		file.printf(" \"unbreakable\",");
+	}
+	file.printf("}");
+}
+
+/* static */ void CAnimations::LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex)
+{
+	if (!lua_istable(l, luaIndex)) {
+		LuaError(l, "incorrect argument");
+	}
+	const int nargs = lua_objlen(l, luaIndex);
+
+	for (int j = 0; j != nargs; ++j) {
+		lua_rawgeti(l, luaIndex, j + 1);
+		const char *value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++j;
+
+		if (!strcmp(value, "anim-wait")) {
+			lua_rawgeti(l, luaIndex, j + 1);
+			unit.Anim.Wait = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "curr-anim")) {
+			lua_rawgeti(l, luaIndex, j + 1);
+			const int animIndex = LuaToNumber(l, -1);
+			unit.Anim.CurrAnim = AnimationsArray[animIndex];
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "anim")) {
+			lua_rawgeti(l, luaIndex, j + 1);
+			const int animIndex = LuaToNumber(l, -1);
+			unit.Anim.Anim = unit.Anim.CurrAnim + animIndex;
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "unbreakable")) {
+			unit.Anim.Unbreakable = 1;
+			--j;
+		} else {
+			LuaError(l, "Unit anim-data: Unsupported tag: %s" _C_ value);
+		}
+	}
+}
+
 
 /**
 **  Find the index of a resource
