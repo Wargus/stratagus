@@ -234,18 +234,8 @@ void SaveUnit(const CUnit &unit, CFile &file)
 
 	file.printf("\"wait\", %d, ", unit.Wait);
 	file.printf("\"state\", %d,", unit.State);
-	file.printf("\"anim-wait\", %d,", unit.Anim.Wait);
-	for (int i = 0; i < NumAnimations; ++i) {
-		if (AnimationsArray[i] == unit.Anim.CurrAnim) {
-			file.printf("\"curr-anim\", %d,", i);
-			file.printf("\"anim\", %d,", static_cast<int>(unit.Anim.Anim - unit.Anim.CurrAnim));
-			break;
-		}
-	}
-	if (unit.Anim.Unbreakable) {
-		file.printf(" \"unbreakable\",");
-	}
-	file.printf("\n  \"blink\", %d,", unit.Blink);
+	CAnimations::SaveUnitAnim(file, unit);
+	file.printf(",\n  \"blink\", %d,", unit.Blink);
 	if (unit.Moving) {
 		file.printf(" \"moving\",");
 	}
