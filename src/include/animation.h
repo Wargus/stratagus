@@ -35,6 +35,8 @@
 #include <string>
 #include <map>
 
+#include "sound.h"
+
 #define ANIMATIONS_MAXANIM 1024
 #define ANIMATIONS_DEATHTYPES 40
 

@@ -59,6 +59,7 @@
 #include "action/action_unload.h"
 #include "action/action_upgradeto.h"
 
+#include "animation/animation_die.h"
 #include "commands.h"
 #include "map.h"
 #include "missile.h"
@@ -444,9 +445,11 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		if (unit.Destroyed) {
 			continue;
 		}
-
-		HandleUnitAction(unit);
-
+		try {
+			HandleUnitAction(unit);
+		} catch (AnimationDie_Exception& ) {
+			AnimationDie_OnCatch(unit);
+		}
 #ifdef DEBUG_LOG
 		DumpUnitInfo();
 #endif

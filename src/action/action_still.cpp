@@ -379,12 +379,6 @@ bool AutoAttack(CUnit &unit)
 	if (unit.Anim.Unbreakable) { // animation can't be aborted here
 		return;
 	}
-	if (unit.CurrentOrder()->NeedToDie) { // we used the "die" action in animations
-		this->Finished = true;
-		unit.State = 0;
-		LetUnitDie(unit);
-		return;
-	}
 	this->State = SUB_STILL_STANDBY;
 	this->Finished = (this->Action == UnitActionStill);
 	if (this->Action == UnitActionStandGround || unit.Removed || unit.CanMove() == false) {

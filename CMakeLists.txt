@@ -62,6 +62,7 @@ source_group(action FILES ${action_SRCS})
 
 set(animation_SRCS
 	src/animation/animation.cpp
+	src/animation/animation_die.cpp
 )
 source_group(animation FILES ${animation_SRCS})
 
@@ -374,6 +375,9 @@ set(stratagus_action_HDRS
 	src/include/action/action_upgradeto.h
 )
 
+set(stratagus_animation_HDRS
+	src/include/animation/animation_die.h
+)
 
 set(stratagus_generic_HDRS
 	src/ai/ai_local.h
@@ -440,9 +444,10 @@ set(stratagus_generic_HDRS
 
 source_group(include FILES ${stratagus_generic_HDRS})
 source_group(include\\action FILES ${stratagus_action_HDRS})
+source_group(include\\animation FILES ${stratagus_animation_HDRS})
 source_group(include\\guichan FILES ${stratagus_guichan_HDRS})
 
-set (stratagus_HDRS ${stratagus_generic_HDRS} ${stratagus_action_HDRS} ${stratagus_guichan_HDRS})
+set (stratagus_HDRS ${stratagus_generic_HDRS} ${stratagus_action_HDRS} ${stratagus_animation_HDRS} ${stratagus_guichan_HDRS})
 
 # Additional platform checks
 

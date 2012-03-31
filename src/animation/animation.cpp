@@ -41,6 +41,7 @@
 
 #include "actions.h"
 #include "animation.h"
+#include "animation/animation_die.h"
 
 #include "script.h"
 #include "map.h"
@@ -758,22 +759,6 @@ static void AnimationSetPlayerVar_Action(CUnit &unit)
 	SetPlayerData(playerId, var, arg, rop);
 }
 
-
-
-static void AnimationDie_Action(CUnit &unit)
-{
-	Assert(unit.Anim.Anim->Type == AnimationDie);
-	if (unit.Anim.Unbreakable) {
-		fprintf(stderr, "Can't call \"die\" action in unbreakable section\n");
-		Exit(1);
-	}
-	if (unit.Anim.Anim->D.Die.DeathType[0] != '\0') {
-		unit.DamagedType = ExtraDeathIndex(unit.Anim.Anim->D.Die.DeathType);
-	}
-	unit.CurrentOrder()->NeedToDie = true;
-}
-
-
 static void AnimationRotate_Action(CUnit &unit)
 {
 	Assert(unit.Anim.Anim->Type == AnimationRotate);
@@ -897,9 +882,6 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 	int move = 0;
 	while (!unit.Anim.Wait) {
 		CAnimation::Action(unit, move, scale);
-		if (unit.Anim.Anim->Type == AnimationDie) {
-			return 0;
-		}
 		if (!unit.Anim.Wait) {
 			// Advance to next frame
 			unit.Anim.Anim = unit.Anim.Anim->Next;
