@@ -37,7 +37,6 @@
 
 #include "animation/animation_unbreakable.h"
 
-#include "animation.h"
 #include "unit.h"
 
 /* virtual */ void CAnimation_Unbreakable::Action(CUnit& unit, int &/*move*/, int /*scale*/) const

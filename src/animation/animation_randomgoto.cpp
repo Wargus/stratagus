@@ -37,7 +37,6 @@
 
 #include "animation/animation_randomgoto.h"
 
-#include "animation.h"
 #include "unit.h"
 
 /* virtual */ void CAnimation_RandomGoto::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
@@ -49,19 +48,22 @@
 	}
 }
 
+/*
+**  s : "percent label"
+*/
 /* virtual */ void CAnimation_RandomGoto::Init(const char* s)
 {
-	char *op2 = const_cast<char*>(s);
-	char *label = strchr(op2, ' ');
+	const std::string str(s);
+	const size_t len = str.size();
 
-	if (!label) {
-//		LuaError(l, "Missing random-goto label");
-	} else {
-		while (*label == ' ') {
-			*label++ = '\0';
-		}
-	}
-	this->randomStr = op2;
+	size_t begin = 0;
+	size_t end = str.find(' ', begin);
+	this->randomStr.assign(str, begin, end);
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	const std::string label(str, std::min(len, begin), end);
+
 	FindLabelLater(&this->gotoLabel, label);
 }
 

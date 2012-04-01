@@ -38,7 +38,6 @@
 #include "animation/animation_spawnmissile.h"
 
 #include "actions.h"
-#include "animation.h"
 #include "map.h"
 #include "missile.h"
 #include "unit.h"
@@ -95,11 +94,11 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 {
 	Assert(unit.Anim.Anim == this);
 
-	const int startx = ParseAnimInt(&unit, this->startX.c_str());
-	const int starty = ParseAnimInt(&unit, this->startY.c_str());
-	const int destx = ParseAnimInt(&unit, this->destX.c_str());
-	const int desty = ParseAnimInt(&unit, this->destY.c_str());
-	const int flags = ParseAnimFlags(unit, this->flags.c_str());
+	const int startx = ParseAnimInt(&unit, this->startXStr.c_str());
+	const int starty = ParseAnimInt(&unit, this->startYStr.c_str());
+	const int destx = ParseAnimInt(&unit, this->destXStr.c_str());
+	const int desty = ParseAnimInt(&unit, this->destYStr.c_str());
+	const int flags = ParseAnimFlags(unit, this->flagsStr.c_str());
 	CUnit *goal;
 	PixelPos start;
 	PixelPos dest;
@@ -146,7 +145,7 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 		&& dist > goal->Stats->Variables[ATTACKRANGE_INDEX].Max
 		&& dist < goal->Type->MinAttackRange) {
 	} else {
-		Missile *missile = MakeMissile(*MissileTypeByIdent(this->missile.c_str()), start, dest);
+		Missile *missile = MakeMissile(*MissileTypeByIdent(this->missileTypeStr.c_str()), start, dest);
 		if (flags & ANIM_SM_DAMAGE) {
 			missile->SourceUnit = &unit;
 			unit.RefsIncrease();
@@ -158,57 +157,37 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 	}
 }
 
+/*
+**  s = "missileType startX startY destX destY [flag1[.flagN]]"
+*/
 /* virtual */ void CAnimation_SpawnMissile::Init(const char* s)
 {
-	// FIXME : Bad const_cast
-	char* op2 = const_cast<char*>(s);
+	const std::string str(s);
+	const size_t len = str.size();
 
-	char *next = strchr(op2, ' ');
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-	}
-	this->missile = op2;
-	op2 = next;
-	next = strchr(op2, ' ');
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-		this->startX = op2;
-	}
-	op2 = next;
-	next = strchr(op2, ' ');
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-		this->startY = op2;
-	}
-	op2 = next;
-	next = strchr(op2, ' ');
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-		this->destX = op2;
-	}
-	op2 = next;
-	next = strchr(op2, ' ');
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-		this->destY = op2;
-	}
-	op2 = next;
-	if (next) {
-		while (*op2 == ' ') {
-			++op2;
-		}
-		this->flags = op2;
-	}
+	size_t begin = 0;
+	size_t end = str.find(' ', begin);
+	this->missileTypeStr.assign(str, begin, end);
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	this->startXStr.assign(str, std::min(len, begin), end);
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	this->startYStr.assign(str, std::min(len, begin), end);
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	this->destXStr.assign(str, std::min(len, begin), end);
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	this->destYStr.assign(str, std::min(len, begin), end);
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	this->flagsStr.assign(str, std::min(len, begin), end);
 }
 
 //@}

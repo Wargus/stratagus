@@ -44,7 +44,7 @@ public:
 	virtual void Init(const char* s);
 
 private:
-	std::string unitStr;
+	std::string unitTypeStr;
 	std::string offXStr;
 	std::string offYStr;
 	std::string rangeStr;

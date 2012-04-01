@@ -38,7 +38,6 @@
 #include "animation/animation_setvar.h"
 
 #include "actions.h"
-#include "animation.h"
 #include "unit.h"
 
 //Modify types
@@ -135,39 +134,30 @@
 	}
 }
 
+/*
+**  s = "var mod value [unitSlot]"
+*/
 /* virtual */ void CAnimation_SetVar::Init(const char* s)
 {
-	char *op2 = const_cast<char*>(s);
-	char *next = strchr(op2, ' ');
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-	}
-	this->varStr = op2;
-	op2 = next;
-	next = strchr(op2, ' ');
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-	}
-	this->mod = atoi(op2);
-	op2 = next;
-	next = strchr(op2, ' ');
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-	}
-	this->valueStr = op2;
-	if (next) {
-		op2 = next;
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-		this->unitSlotStr = op2;
-	}
+	const std::string str(s);
+	const size_t len = str.size();
+
+	size_t begin = 0;
+	size_t end = str.find(' ', begin);
+	this->varStr.assign(str, begin, end);
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	const std::string modStr(str, std::min(len, begin), end);
+	this->mod = atoi(modStr.c_str());
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	this->valueStr.assign(str, std::min(len, begin), end);
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	this->unitSlotStr.assign(str, std::min(len, begin), end);
 }
 
 //@}

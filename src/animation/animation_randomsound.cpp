@@ -37,7 +37,6 @@
 
 #include "animation/animation_randomsound.h"
 
-#include "animation.h"
 #include "map.h"
 #include "sound.h"
 #include "unit.h"
@@ -52,22 +51,18 @@
 	}
 }
 
+/*
+**  s = "Sound1 [SoundN ...]"
+*/
 /* virtual */ void CAnimation_RandomSound::Init(const char* s)
 {
-	// FIXME : Bad const cast.
-	char *op2 = const_cast<char*>(s);
-	int count = 0;
+	const std::string str(s);
 
-	while (op2 && *op2) {
-		char *next = strchr(op2, ' ');
-		if (next) {
-			while (*next == ' ') {
-				*next++ = '\0';
-			}
-		}
-		++count;
-		this->sounds.push_back(SoundConfig(op2));
-		op2 = next;
+	for (size_t begin = 0; begin != std::string::npos; ) {
+		const size_t end = str.find(' ', begin);
+
+		this->sounds.push_back(SoundConfig(str.substr(begin, end)));
+		begin = str.find_first_not_of(' ', end);
 	}
 }
 

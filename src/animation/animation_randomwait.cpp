@@ -37,7 +37,6 @@
 
 #include "animation/animation_RandomWait.h"
 
-#include "animation.h"
 #include "unit.h"
 
 /* virtual */ void CAnimation_RandomWait::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
@@ -50,22 +49,21 @@
 	unit.Anim.Wait = arg1 + SyncRand() % (arg2 - arg1 + 1);
 }
 
+/*
+** s = "minWait MaxWait"
+*/
 /* virtual */ void CAnimation_RandomWait::Init(const char* s)
 {
-	char* op2 = const_cast<char*>(s);
-	char *next = strchr(op2, ' ');
+	const std::string str(s);
+	const size_t len = str.size();
 
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-	}
-	this->minWait = new_strdup(op2);
-	op2 = next;
-	while (*op2 == ' ') {
-		++op2;
-	}
-	this->maxWait = new_strdup(op2);
+	size_t begin = 0;
+	size_t end = str.find(' ', begin);
+	this->minWait.assign(str, begin, end);
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	this->maxWait.assign(str, std::min(len, begin), end);
 }
 
 //@}

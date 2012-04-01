@@ -220,45 +220,34 @@ static void SetPlayerData(int player, const char *prop, const char *arg, int val
 	SetPlayerData(playerId, var, arg, rop);
 }
 
+/*
+**  s = "player var mod value [arg2]"
+*/
 /* virtual */ void CAnimation_SetPlayerVar::Init(const char* s)
 {
-	char *op2 = const_cast<char*>(s);
-	char *next = strchr(op2, ' ');
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-	}
-	this->playerStr = op2;
-	op2 = next;
-	next = strchr(op2, ' ');
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-	}
-	this->varStr = op2;
-	op2 = next;
-	next = strchr(op2, ' ');
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-	}
-	this->mod = atoi(op2);
-	op2 = next;
-	next = strchr(op2, ' ');
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-	}
-	this->valueStr = op2;
-	op2 = next;
-	while (*op2 == ' ') {
-		++op2;
-	}
-	this->argStr = op2;
+	const std::string str(s);
+	const size_t len = str.size();
+
+	size_t begin = 0;
+	size_t end = str.find(' ', begin);
+	this->playerStr.assign(str, begin, end);
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	this->varStr.assign(str, std::min(len, begin), end);
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	const std::string modStr(str, std::min(len, begin), end);
+	this->mod = atoi(modStr.c_str());
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	this->valueStr.assign(str, std::min(len, begin), end);
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	this->argStr.assign(str, std::min(len, begin), end);
 }
 
 //@}

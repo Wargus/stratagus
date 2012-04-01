@@ -37,7 +37,6 @@
 
 #include "animation/animation_frame.h"
 
-#include "animation.h"
 #include "unit.h"
 
 /* virtual */ void CAnimation_Frame::Action(CUnit& unit, int &/*move*/, int /*scale*/) const

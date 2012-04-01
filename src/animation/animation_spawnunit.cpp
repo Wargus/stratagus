@@ -37,7 +37,6 @@
 
 #include "animation/animation_spawnunit.h"
 
-#include "animation.h"
 #include "map.h"
 #include "unit.h"
 
@@ -111,7 +110,7 @@ found:
 	const int playerId = ParseAnimInt(&unit, this->playerStr.c_str());
 	CPlayer &player = Players[playerId];
 	const Vec2i pos = { unit.tilePos.x + offX, unit.tilePos.y + offY};
-	CUnitType *type = UnitTypeByIdent(this->unitStr.c_str());
+	CUnitType *type = UnitTypeByIdent(this->unitTypeStr.c_str());
 	Vec2i resPos;
 	DebugPrint("Creating a %s\n" _C_ type->Name.c_str());
 	FindNearestDrop(*type, pos, resPos, LookingW);
@@ -127,45 +126,33 @@ found:
 	}
 }
 
+/*
+**  s = "unitType offX offY range player"
+*/
 /* virtual */ void CAnimation_SpawnUnit::Init(const char* s)
 {
-	char* op2 = const_cast<char*>(s);
-	char *next = strchr(op2, ' ');
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-	}
-	this->unitStr = op2;
-	op2 = next;
-	next = strchr(op2, ' ');
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-	}
-	this->offXStr = op2;
-	op2 = next;
-	next = strchr(op2, ' ');
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-	}
-	this->offYStr = op2;
-	op2 = next;
-	next = strchr(op2, ' ');
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-	}
-	this->rangeStr = op2;
-	op2 = next;
-	while (*op2 == ' ') {
-		++op2;
-	}
-	this->playerStr = op2;
+	const std::string str(s);
+	const size_t len = str.size();
+
+	size_t begin = 0;
+	size_t end = str.find(' ', begin);
+	this->unitTypeStr.assign(str, begin, end);
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	this->offXStr.assign(str, std::min(len, begin), end);
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	this->offYStr.assign(str, std::min(len, begin), end);
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	this->rangeStr.assign(str, std::min(len, begin), end);
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	this->playerStr.assign(str, std::min(len, begin), end);
 }
 
 //@}

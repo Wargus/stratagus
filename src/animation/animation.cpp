@@ -423,24 +423,18 @@ static void FixLabels(lua_State *l)
 
 /**
 **  Parse an animation frame
+**
+**  @param str  string formated as "animationType extraArgs"
 */
 static CAnimation *ParseAnimationFrame(lua_State *l, const char *str)
 {
-	std::string op1(str);
-	std::string all2;
+	const std::string all(str);
+	const size_t len = all.size();
+	size_t end = all.find(' ');
+	const std::string op1(all, 0, end);
+	size_t begin = all.find_first_not_of(' ', end);
+	const std::string extraArg(all, std::min(begin, len), std::string::npos);
 
-	int index = op1.find(' ');
-
-	if (index != -1) {
-		all2 = op1.substr(index + 1);
-		op1 = op1.substr(0, index);
-	}
-	char* op2 = (char *) all2.c_str();
-	if (op2) {
-		while (*op2 == ' ') {
-			*op2++ = '\0';
-		}
-	}
 	CAnimation *anim = NULL;
 	if (op1 == "frame") {
 		anim = new CAnimation_Frame;
@@ -468,7 +462,6 @@ static CAnimation *ParseAnimationFrame(lua_State *l, const char *str)
 		anim = new CAnimation_SetPlayerVar;
 	} else if (op1 == "die") {
 		anim = new CAnimation_Die();
-		anim->Init(op2);
 	} else if (op1 == "rotate") {
 		anim = new CAnimation_Rotate;
 	} else if (op1 == "random-rotate") {
@@ -479,7 +472,7 @@ static CAnimation *ParseAnimationFrame(lua_State *l, const char *str)
 		anim = new CAnimation_Unbreakable;
 	} else if (op1 == "label") {
 		anim = new CAnimation_Label;
-		AddLabel(l, anim, op2);
+		AddLabel(l, anim, extraArg);
 	} else if (op1 == "goto") {
 		anim = new CAnimation_Goto;
 	} else if (op1 == "random-goto") {
@@ -487,7 +480,7 @@ static CAnimation *ParseAnimationFrame(lua_State *l, const char *str)
 	} else {
 		LuaError(l, "Unknown animation: %s" _C_ op1.c_str());
 	}
-	anim->Init(op2);
+	anim->Init(extraArg.c_str());
 	return anim;
 }
 

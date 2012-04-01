@@ -37,16 +37,26 @@
 
 #include "animation/animation_ifvar.h"
 
-#include "animation.h"
 #include "unit.h"
 
 //IfVar compare types
-#define IF_GREATER_EQUAL 1
-#define IF_GREATER 2
-#define IF_LESS_EQUAL 3
-#define IF_LESS 4
-#define IF_EQUAL 5
-#define IF_NOT_EQUAL 6
+enum EIfVarBinOp
+{
+	IF_GREATER_EQUAL = 1,
+	IF_GREATER,
+	IF_LESS_EQUAL,
+	IF_LESS,
+	IF_EQUAL,
+	IF_NOT_EQUAL,
+};
+
+bool binOpGeaterEqual(int lhs, int rhs) { return lhs >= rhs; }
+bool binOpGeater(int lhs, int rhs) { return lhs > rhs; }
+bool binOpLessEqual(int lhs, int rhs) { return lhs <= rhs; }
+bool binOpLess(int lhs, int rhs) { return lhs < rhs; }
+bool binOpEqual(int lhs, int rhs) { return lhs == rhs; }
+bool binOpNotEqual(int lhs, int rhs) { return lhs != rhs; }
+bool returnFalse(int , int) { return false; }
 
 /* virtual */ void CAnimation_IfVar::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
 {
@@ -54,78 +64,63 @@
 
 	const int lop = ParseAnimInt(&unit, this->leftVar.c_str());
 	const int rop = ParseAnimInt(&unit, this->rightVar.c_str());
-	bool go = false;
+	const bool cond = this->binOpFunc(lop, rop);
 
-	switch (this->type) {
-		case IF_GREATER_EQUAL:
-			go = (lop >= rop);
-			break;
-		case IF_GREATER:
-			go = (lop > rop);
-			break;
-		case IF_LESS_EQUAL:
-			go = (lop <= rop);
-			break;
-		case IF_LESS:
-			go = (lop < rop);
-			break;
-		case IF_EQUAL:
-			go = (lop == rop);
-			break;
-		case IF_NOT_EQUAL:
-			go = (lop != rop);
-		break;
-	}
-	if (go) {
+	if (cond) {
 		unit.Anim.Anim = this->gotoLabel;
 	}
 }
 
+/*
+** s = "leftOp rigthOp Op gotoLabel"
+*/
 /* virtual */ void CAnimation_IfVar::Init(const char* s)
 {
-	char *op2 = const_cast<char*>(s);
-	char *next = strchr(op2, ' ');
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-	}
-	this->leftVar = op2;
-	op2 = next;
-	next = strchr(op2, ' ');
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-	}
-	this->rightVar = op2;
-	op2 = next;
-	next = strchr(op2, ' ');
-	if (next) {
-		while (*next == ' ') {
-			*next++ = '\0';
-		}
-	}
-	if (!strcmp(op2,">=")) {
-		this->type = 1;
-	} else if (!strcmp(op2,">")) {
-		this->type = 2;
-	} else if (!strcmp(op2,"<=")) {
-		this->type = 3;
-	} else if (!strcmp(op2,"<")) {
-		this->type = 4;
-	} else if (!strcmp(op2,"==")) {
-		this->type = 5;
-	} else if (!strcmp(op2,"!=")) {
-		this->type = 6;
+	const std::string str(s);
+	const size_t len = str.size();
+
+	size_t begin = 0;
+	size_t end = str.find(' ', begin);
+	this->leftVar.assign(str, begin, end);
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	this->rightVar.assign(std::min(len, begin), end);
+
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	std::string op(str, std::min(len, begin), end);
+
+	if (op == ">=") {
+		this->binOpFunc = binOpGeaterEqual;
+	} else if (op == ">") {
+		this->binOpFunc = binOpGeater;
+	} else if (op == "<=") {
+		this->binOpFunc = binOpLessEqual;
+	} else if (op == "<") {
+		this->binOpFunc = binOpLess;
+	} else if (op == "==") {
+		this->binOpFunc = binOpNotEqual;
+	} else if (op == "!=") {
+		this->binOpFunc = binOpNotEqual;
 	} else {
-		this->type = atoi(op2);
+		EIfVarBinOp type = static_cast<EIfVarBinOp>(atoi(op.c_str()));
+
+		switch (type) {
+			case IF_GREATER_EQUAL: this->binOpFunc = binOpGeaterEqual; break;
+			case IF_GREATER: this->binOpFunc = binOpGeater; break;
+			case IF_LESS_EQUAL: this->binOpFunc = binOpLessEqual; break;
+			case IF_LESS: this->binOpFunc = binOpLess; break;
+			case IF_EQUAL: this->binOpFunc = binOpEqual; break;
+			case IF_NOT_EQUAL: this->binOpFunc = binOpNotEqual; break;
+			default: this->binOpFunc = returnFalse; break;
+		}
 	}
-	op2 = next;
-	while (*op2 == ' ') {
-		++op2;
-	}
-	FindLabelLater(&this->gotoLabel, op2);
+	begin = str.find_first_not_of(' ', end);
+	end = str.find(' ', begin);
+	std::string label(str, std::min(len, begin), end);
+
+	FindLabelLater(&this->gotoLabel, label);
 }
 
 //@}

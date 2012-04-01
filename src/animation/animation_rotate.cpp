@@ -38,7 +38,6 @@
 #include "animation/animation_rotate.h"
 
 #include "actions.h"
-#include "animation.h"
 #include "unit.h"
 
 /**

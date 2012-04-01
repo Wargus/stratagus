@@ -37,7 +37,6 @@
 
 #include "animation/animation_label.h"
 
-#include "animation.h"
 #include "unit.h"
 
 /* virtual */ void CAnimation_Label::Action(CUnit& unit, int &/*move*/, int /*scale*/) const

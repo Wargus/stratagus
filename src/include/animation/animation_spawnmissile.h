@@ -44,12 +44,12 @@ public:
 	virtual void Init(const char* s);
 
 private:
-	std::string missile;
-	std::string startX;
-	std::string startY;
-	std::string destX;
-	std::string destY;
-	std::string flags;
+	std::string missileTypeStr;
+	std::string startXStr;
+	std::string startYStr;
+	std::string destXStr;
+	std::string destYStr;
+	std::string flagsStr;
 };
 
 //@}

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_exactframe.cpp - The animation . */
+/**@name animation_exactframe.cpp - The animation ExactFrame. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -37,7 +37,6 @@
 
 #include "animation/animation_exactframe.h"
 
-#include "animation.h"
 #include "unit.h"
 
 /* virtual */ void CAnimation_ExactFrame::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
