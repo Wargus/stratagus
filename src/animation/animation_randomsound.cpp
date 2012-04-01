@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_die.cpp - The animation die. */
+/**@name animation_randomsound.cpp - The animation RandomSound. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Russell Smith, and Jimmy Salmon
+//      (c) Copyright 2012 by Joris Dauphin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -35,33 +35,47 @@
 
 #include "stratagus.h"
 
-#include "animation/animation_die.h"
+#include "animation/animation_randomsound.h"
 
 #include "animation.h"
+#include "map.h"
+#include "sound.h"
 #include "unit.h"
 
-/* virtual */ void CAnimation_Die::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_RandomSound::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
-	if (unit.Anim.Unbreakable) {
-		fprintf(stderr, "Can't call \"die\" action in unbreakable section\n");
-		Exit(1);
+
+	if (unit.IsVisible(*ThisPlayer) || ReplayRevealMap) {
+		const size_t index = SyncRand() % this->sounds.size();
+		PlayUnitSound(unit, this->sounds[index].Sound);
 	}
-	if (this->DeathType.empty() == false) {
-		unit.DamagedType = ExtraDeathIndex(this->DeathType.c_str());
-	}
-	throw AnimationDie_Exception();
 }
 
-/* virtual */ void CAnimation_Die::Init(const char* s)
+/* virtual */ void CAnimation_RandomSound::Init(const char* s)
 {
-	this->DeathType = s;
+	// FIXME : Bad const cast.
+	char *op2 = const_cast<char*>(s);
+	int count = 0;
+
+	while (op2 && *op2) {
+		char *next = strchr(op2, ' ');
+		if (next) {
+			while (*next == ' ') {
+				*next++ = '\0';
+			}
+		}
+		++count;
+		this->sounds.push_back(SoundConfig(op2));
+		op2 = next;
+	}
 }
 
-void AnimationDie_OnCatch(CUnit& unit)
+void CAnimation_RandomSound::MapSound()
 {
-	unit.State = 0;
-	LetUnitDie(unit);
+	for (size_t i = 0; i != this->sounds.size(); ++i) {
+		this->sounds[i].Sound = SoundForName(this->sounds[i].Name);
+	}
 }
 
 

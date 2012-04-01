@@ -62,7 +62,26 @@ source_group(action FILES ${action_SRCS})
 
 set(animation_SRCS
 	src/animation/animation.cpp
+	src/animation/animation_attack.cpp
 	src/animation/animation_die.cpp
+	src/animation/animation_exactframe.cpp
+	src/animation/animation_frame.cpp
+	src/animation/animation_goto.cpp
+	src/animation/animation_ifvar.cpp
+	src/animation/animation_label.cpp
+	src/animation/animation_move.cpp
+	src/animation/animation_randomgoto.cpp
+	src/animation/animation_randomrotate.cpp
+	src/animation/animation_randomsound.cpp
+	src/animation/animation_randomwait.cpp
+	src/animation/animation_rotate.cpp
+	src/animation/animation_setplayervar.cpp
+	src/animation/animation_setvar.cpp
+	src/animation/animation_sound.cpp
+	src/animation/animation_spawnmissile.cpp
+	src/animation/animation_spawnunit.cpp
+	src/animation/animation_unbreakable.cpp
+	src/animation/animation_wait.cpp
 )
 source_group(animation FILES ${animation_SRCS})
 
@@ -376,7 +395,26 @@ set(stratagus_action_HDRS
 )
 
 set(stratagus_animation_HDRS
+	src/include/animation/animation_attack.h
 	src/include/animation/animation_die.h
+	src/include/animation/animation_exactframe.h
+	src/include/animation/animation_frame.h
+	src/include/animation/animation_goto.h
+	src/include/animation/animation_ifvar.h
+	src/include/animation/animation_label.h
+	src/include/animation/animation_move.h
+	src/include/animation/animation_randomgoto.h
+	src/include/animation/animation_randomrotate.h
+	src/include/animation/animation_randomsound.h
+	src/include/animation/animation_randomwait.h
+	src/include/animation/animation_rotate.h
+	src/include/animation/animation_setplayervar.h
+	src/include/animation/animation_setvar.h
+	src/include/animation/animation_sound.h
+	src/include/animation/animation_spawnmissile.h
+	src/include/animation/animation_spawnunit.h
+	src/include/animation/animation_unbreakable.h
+	src/include/animation/animation_wait.h
 )
 
 set(stratagus_generic_HDRS

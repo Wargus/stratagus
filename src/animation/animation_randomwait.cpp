@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_die.cpp - The animation die. */
+/**@name animation_randomwait.cpp - The animation RandomWait. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Russell Smith, and Jimmy Salmon
+//      (c) Copyright 2012 by Joris Dauphin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -35,34 +35,37 @@
 
 #include "stratagus.h"
 
-#include "animation/animation_die.h"
+#include "animation/animation_RandomWait.h"
 
 #include "animation.h"
 #include "unit.h"
 
-/* virtual */ void CAnimation_Die::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_RandomWait::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
-	if (unit.Anim.Unbreakable) {
-		fprintf(stderr, "Can't call \"die\" action in unbreakable section\n");
-		Exit(1);
-	}
-	if (this->DeathType.empty() == false) {
-		unit.DamagedType = ExtraDeathIndex(this->DeathType.c_str());
-	}
-	throw AnimationDie_Exception();
+
+	const int arg1 = ParseAnimInt(&unit, this->minWait.c_str());
+	const int arg2 = ParseAnimInt(&unit, this->maxWait.c_str());
+
+	unit.Anim.Wait = arg1 + SyncRand() % (arg2 - arg1 + 1);
 }
 
-/* virtual */ void CAnimation_Die::Init(const char* s)
+/* virtual */ void CAnimation_RandomWait::Init(const char* s)
 {
-	this->DeathType = s;
-}
+	char* op2 = const_cast<char*>(s);
+	char *next = strchr(op2, ' ');
 
-void AnimationDie_OnCatch(CUnit& unit)
-{
-	unit.State = 0;
-	LetUnitDie(unit);
+	if (next) {
+		while (*next == ' ') {
+			*next++ = '\0';
+		}
+	}
+	this->minWait = new_strdup(op2);
+	op2 = next;
+	while (*op2 == ' ') {
+		++op2;
+	}
+	this->maxWait = new_strdup(op2);
 }
-
 
 //@}

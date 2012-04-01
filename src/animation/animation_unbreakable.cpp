@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_die.cpp - The animation die. */
+/**@name animation_unbreakable.cpp - The animation Unbreakable. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Russell Smith, and Jimmy Salmon
+//      (c) Copyright 2012 by Joris Dauphin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -35,34 +35,28 @@
 
 #include "stratagus.h"
 
-#include "animation/animation_die.h"
+#include "animation/animation_unbreakable.h"
 
 #include "animation.h"
 #include "unit.h"
 
-/* virtual */ void CAnimation_Die::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_Unbreakable::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
-	if (unit.Anim.Unbreakable) {
-		fprintf(stderr, "Can't call \"die\" action in unbreakable section\n");
-		Exit(1);
-	}
-	if (this->DeathType.empty() == false) {
-		unit.DamagedType = ExtraDeathIndex(this->DeathType.c_str());
-	}
-	throw AnimationDie_Exception();
+	Assert(unit.Anim.Unbreakable ^ this->state);
+
+	unit.Anim.Unbreakable = this->state;
 }
 
-/* virtual */ void CAnimation_Die::Init(const char* s)
+/* virtual */ void CAnimation_Unbreakable::Init(const char* s)
 {
-	this->DeathType = s;
+	if (!strcmp(s, "begin")) {
+		this->state = 1;
+	} else if (!strcmp(s, "end")) {
+		this->state = 0;
+	} else {
+//		LuaError(l, "Unbreakable must be 'begin' or 'end'.  Found: %s" _C_ op2);
+	}
 }
-
-void AnimationDie_OnCatch(CUnit& unit)
-{
-	unit.State = 0;
-	LetUnitDie(unit);
-}
-
 
 //@}

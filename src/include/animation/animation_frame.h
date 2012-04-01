@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_die.cpp - The animation die. */
+/**@name animation_frame.h - The animation Frame headerfile. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Russell Smith, and Jimmy Salmon
+//      (c) Copyright 2012 by Joris Dauphin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,42 +27,27 @@
 //      02111-1307, USA.
 //
 
+#ifndef ANIMATION_FRAME_H
+#define ANIMATION_FRAME_H
+
 //@{
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
-#include "stratagus.h"
-
-#include "animation/animation_die.h"
-
+#include <string>
 #include "animation.h"
-#include "unit.h"
 
-/* virtual */ void CAnimation_Die::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+class CAnimation_Frame : public CAnimation
 {
-	Assert(unit.Anim.Anim == this);
-	if (unit.Anim.Unbreakable) {
-		fprintf(stderr, "Can't call \"die\" action in unbreakable section\n");
-		Exit(1);
-	}
-	if (this->DeathType.empty() == false) {
-		unit.DamagedType = ExtraDeathIndex(this->DeathType.c_str());
-	}
-	throw AnimationDie_Exception();
-}
+public:
+	CAnimation_Frame() : CAnimation(AnimationFrame) {}
 
-/* virtual */ void CAnimation_Die::Init(const char* s)
-{
-	this->DeathType = s;
-}
+	virtual void Action(CUnit& unit, int &move, int scale) const;
+	virtual void Init(const char* s);
 
-void AnimationDie_OnCatch(CUnit& unit)
-{
-	unit.State = 0;
-	LetUnitDie(unit);
-}
-
+	int ParseAnimInt(const CUnit *unit) const;
+private:
+	std::string frame;
+};
 
 //@}
+
+#endif // ANIMATION_FRAME_H

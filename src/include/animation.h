@@ -35,8 +35,7 @@
 #include <string>
 #include <map>
 
-#include "sound.h"
-
+#include "upgrade_structs.h" // MaxCost
 #define ANIMATIONS_DEATHTYPES 40
 
 class CFile;
@@ -78,151 +77,14 @@ enum AnimationType {
 
 class CAnimation {
 public:
-	CAnimation(AnimationType type) : Type(type), Next(NULL) {
-		memset(&D, 0, sizeof(D));
-	}
+	CAnimation(AnimationType type) : Type(type), Next(NULL) {}
 
-	~CAnimation() {
-		if (Type == AnimationFrame || Type == AnimationExactFrame)
-			delete[] D.Frame.Frame;
-		else if (Type == AnimationWait)
-			delete[] D.Wait.Wait;
-		else if (Type == AnimationRandomWait) {
-			delete[] D.RandomWait.MinWait;
-			delete[] D.RandomWait.MaxWait;
-		}
-		else if (Type == AnimationRotate || Type == AnimationRandomRotate)
-			delete[] D.Rotate.Rotate;
-		else if (Type == AnimationMove)
-			delete[] D.Move.Move;
-		else if (Type == AnimationSound)
-			delete[] D.Sound.Name;
-		else if (Type == AnimationSpawnMissile)
-		{
-			delete[] D.SpawnMissile.Missile;
-			delete[] D.SpawnMissile.StartX;
-			delete[] D.SpawnMissile.StartY;
-			delete[] D.SpawnMissile.DestX;
-			delete[] D.SpawnMissile.DestY;
-			delete[] D.SpawnMissile.Flags;
-		}
-		else if (Type == AnimationSpawnUnit)
-		{
-			delete[] D.SpawnUnit.Unit;
-			delete[] D.SpawnUnit.OffX;
-			delete[] D.SpawnUnit.OffY;
-			delete[] D.SpawnUnit.Range;
-			delete[] D.SpawnUnit.Player;
-		}
-		else if (Type == AnimationIfVar)
-		{
-			delete[] D.IfVar.LeftVar;
-			delete[] D.IfVar.RightVar;
-		}
-		else if (Type == AnimationSetVar)
-		{
-			delete[] D.SetVar.Var;
-			delete[] D.SetVar.Value;
-			delete[] D.SetVar.UnitSlot;
-		}
-		else if (Type == AnimationSetPlayerVar)
-		{
-			delete[] D.SetPlayerVar.Player;
-			delete[] D.SetPlayerVar.Var;
-			delete[] D.SetPlayerVar.Arg;
-			delete[] D.SetPlayerVar.Value;
-		}
-		else if (Type == AnimationDie)
-		{
-			delete[] D.Die.DeathType;
-		}
-		else if (Type == AnimationRandomSound) {
-			for (unsigned int i = 0; i < D.RandomSound.NumSounds; ++i) {
-				delete[] D.RandomSound.Name[i];
-			}
-			delete[] D.RandomSound.Name;
-			delete[] D.RandomSound.Sound;
-		}
-	}
+	virtual ~CAnimation() {}
 
-
-	static void Action(CUnit &unit, int &move, int scale);
+	virtual void Action(CUnit &unit, int &move, int scale) const = 0;
+	virtual void Init(const char* s) {}
 
 	const AnimationType Type;
-	union {
-		struct {
-			const char *Frame;
-		} Frame;
-		struct {
-			const char *Wait;
-		} Wait;
-		struct {
-			const char *MinWait;
-			const char *MaxWait;
-		} RandomWait;
-		struct {
-			const char *Name;
-			CSound *Sound;
-		} Sound;
-		struct {
-			const char **Name;
-			CSound **Sound;
-			unsigned int NumSounds;
-		} RandomSound;
-		struct {
-			const char *Rotate;
-		} Rotate;
-		struct {
-			const char *Move;
-		} Move;
-		struct {
-			int Begin;
-		} Unbreakable;
-		struct {
-			CAnimation *Goto;
-		} Goto;
-		struct {
-			const char *Random;
-			CAnimation *Goto;
-		} RandomGoto;
-		struct {
-			const char *Missile;
-			const char *StartX;
-			const char *StartY;
-			const char *DestX;
-			const char *DestY;
-			const char *Flags;
-		} SpawnMissile;
-		struct {
-			const char *Unit;
-			const char *OffX;
-			const char *OffY;
-			const char *Range;
-			const char *Player;
-		} SpawnUnit;
-		struct {
-			const char *LeftVar;
-			const char *RightVar;
-			int Type;
-			CAnimation *Goto;
-		} IfVar;
-		struct {
-			int Mod;
-			const char *Var;
-			const char *Value;
-			const char *UnitSlot;
-		} SetVar;
-		struct {
-			int Mod;
-			const char *Player;
-			const char *Var;
-			const char *Arg;
-			const char *Value;
-		} SetPlayerVar;
-		struct {
-			const char *DeathType;
-		} Die;
-	} D;
 	CAnimation *Next;
 };
 
@@ -289,6 +151,9 @@ extern int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scal
 extern int UnitShowAnimation(CUnit &unit, const CAnimation *anim);
 
 
+extern int ParseAnimInt(const CUnit *unit, const char *parseint);
+
+extern void FindLabelLater(CAnimation **anim, const std::string &name);
 //@}
 
 #endif // !__ANIMATIONS_H__

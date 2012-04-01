@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_die.cpp - The animation die. */
+/**@name animation_randomrotate.cpp - The animation RandomRotate. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Russell Smith, and Jimmy Salmon
+//      (c) Copyright 2012 by Joris Dauphin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -35,34 +35,26 @@
 
 #include "stratagus.h"
 
-#include "animation/animation_die.h"
+#include "animation/animation_randomrotate.h"
 
+#include "animation/animation_rotate.h"
 #include "animation.h"
 #include "unit.h"
 
-/* virtual */ void CAnimation_Die::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_RandomRotate::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
-	if (unit.Anim.Unbreakable) {
-		fprintf(stderr, "Can't call \"die\" action in unbreakable section\n");
-		Exit(1);
+
+	if ((SyncRand() >> 8) & 1) {
+		UnitRotate(unit, -ParseAnimInt(&unit, this->rotateStr.c_str()));
+	} else {
+		UnitRotate(unit, ParseAnimInt(&unit, this->rotateStr.c_str()));
 	}
-	if (this->DeathType.empty() == false) {
-		unit.DamagedType = ExtraDeathIndex(this->DeathType.c_str());
-	}
-	throw AnimationDie_Exception();
 }
 
-/* virtual */ void CAnimation_Die::Init(const char* s)
+/* virtual */ void CAnimation_RandomRotate::Init(const char* s)
 {
-	this->DeathType = s;
+	this->rotateStr = s;
 }
-
-void AnimationDie_OnCatch(CUnit& unit)
-{
-	unit.State = 0;
-	LetUnitDie(unit);
-}
-
 
 //@}

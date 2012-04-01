@@ -40,15 +40,17 @@
 #include "stratagus.h"
 
 #include "unitsound.h"
-#include "video.h"
-#include "sound.h"
-#include "unittype.h"
-#include "animation.h"
+
+#include "animation/animation_randomsound.h"
+#include "animation/animation_sound.h"
+#include "map.h"
 #include "player.h"
-#include "unit.h"
+#include "sound.h"
 #include "sound_server.h"
 #include "tileset.h"
-#include "map.h"
+#include "unit.h"
+#include "unittype.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -69,6 +71,19 @@ void LoadUnitSounds()
 {
 }
 
+static void MapAnimSound(CAnimation &anim)
+{
+	if (anim.Type == AnimationSound) {
+		CAnimation_Sound &anim_sound = *static_cast<CAnimation_Sound*>(&anim);
+
+		anim_sound.MapSound();
+	} else if (anim.Type == AnimationRandomSound) {
+		CAnimation_RandomSound &anim_rsound = *static_cast<CAnimation_RandomSound*>(&anim);
+
+		anim_rsound.MapSound();
+	}
+}
+
 /**
 **  Map animation sounds
 */
@@ -77,21 +92,9 @@ static void MapAnimSounds2(CAnimation *anim)
 	if (anim == NULL) {
 		return ;
 	}
-	if (anim->Type == AnimationSound) {
-		anim->D.Sound.Sound = SoundForName(anim->D.Sound.Name);
-	} else if (anim->Type == AnimationRandomSound) {
-		for (unsigned int i = 0; i < anim->D.RandomSound.NumSounds; ++i) {
-			anim->D.RandomSound.Sound[i] = SoundForName(anim->D.RandomSound.Name[i]);
-		}
-	}
+	MapAnimSound(*anim);
 	for (CAnimation *it = anim->Next; it != anim; it = it->Next) {
-		if (it->Type == AnimationSound) {
-			it->D.Sound.Sound = SoundForName(it->D.Sound.Name);
-		} else if (it->Type == AnimationRandomSound) {
-			for (unsigned int i = 0; i < it->D.RandomSound.NumSounds; ++i) {
-				it->D.RandomSound.Sound[i] = SoundForName(it->D.RandomSound.Name[i]);
-			}
-		}
+		MapAnimSound(*it);
 	}
 }
 

@@ -43,14 +43,18 @@
 #include <string>
 #include <map>
 
+#include "unittype.h"
+
+#include "animation.h"
+#include "animation/animation_exactframe.h"
+#include "animation/animation_frame.h"
+
 #include "video.h"
 #include "tileset.h"
 #include "map.h"
 #include "sound.h"
 #include "unitsound.h"
 #include "construct.h"
-#include "unittype.h"
-#include "animation.h"
 #include "player.h"
 #include "missile.h"
 #include "script.h"
@@ -476,10 +480,13 @@ static int GetStillFrame(CUnitType *type)
 
 	while (anim) {
 		if (anim->Type == AnimationFrame) {
+			CAnimation_Frame& a_frame = *static_cast<CAnimation_Frame*>(anim);
 			// Use the frame facing down
-			return ParseAnimInt(NoUnitP, anim->D.Frame.Frame) + type->NumDirections / 2;
+			return a_frame.ParseAnimInt(NoUnitP) + type->NumDirections / 2;
 		} else if (anim->Type == AnimationExactFrame) {
-			return ParseAnimInt(NoUnitP, anim->D.Frame.Frame);
+			CAnimation_ExactFrame& a_frame = *static_cast<CAnimation_ExactFrame*>(anim);
+
+			return a_frame.ParseAnimInt(NoUnitP);
 		}
 		anim = anim->Next;
 	}

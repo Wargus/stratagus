@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_die.cpp - The animation die. */
+/**@name animation_randomgoto.cpp - The animation RandomGoto. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Russell Smith, and Jimmy Salmon
+//      (c) Copyright 2012 by Joris Dauphin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -35,34 +35,34 @@
 
 #include "stratagus.h"
 
-#include "animation/animation_die.h"
+#include "animation/animation_randomgoto.h"
 
 #include "animation.h"
 #include "unit.h"
 
-/* virtual */ void CAnimation_Die::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_RandomGoto::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
-	if (unit.Anim.Unbreakable) {
-		fprintf(stderr, "Can't call \"die\" action in unbreakable section\n");
-		Exit(1);
+
+	if (SyncRand() % 100 < ParseAnimInt(&unit, this->randomStr.c_str())) {
+		unit.Anim.Anim = this->gotoLabel;
 	}
-	if (this->DeathType.empty() == false) {
-		unit.DamagedType = ExtraDeathIndex(this->DeathType.c_str());
+}
+
+/* virtual */ void CAnimation_RandomGoto::Init(const char* s)
+{
+	char *op2 = const_cast<char*>(s);
+	char *label = strchr(op2, ' ');
+
+	if (!label) {
+//		LuaError(l, "Missing random-goto label");
+	} else {
+		while (*label == ' ') {
+			*label++ = '\0';
+		}
 	}
-	throw AnimationDie_Exception();
+	this->randomStr = op2;
+	FindLabelLater(&this->gotoLabel, label);
 }
-
-/* virtual */ void CAnimation_Die::Init(const char* s)
-{
-	this->DeathType = s;
-}
-
-void AnimationDie_OnCatch(CUnit& unit)
-{
-	unit.State = 0;
-	LetUnitDie(unit);
-}
-
 
 //@}

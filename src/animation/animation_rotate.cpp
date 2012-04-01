@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_die.cpp - The animation die. */
+/**@name animation_rotate.cpp - The animation Rotate. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Russell Smith, and Jimmy Salmon
+//      (c) Copyright 2012 by Joris Dauphin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -35,34 +35,45 @@
 
 #include "stratagus.h"
 
-#include "animation/animation_die.h"
+#include "animation/animation_rotate.h"
 
+#include "actions.h"
 #include "animation.h"
 #include "unit.h"
 
-/* virtual */ void CAnimation_Die::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/**
+**  Rotate a unit
+**
+**  @param unit    Unit to rotate
+**  @param rotate  Number of frames to rotate (>0 clockwise, <0 counterclockwise)
+*/
+void UnitRotate(CUnit &unit, int rotate)
+{
+	unit.Direction += rotate * 256 / unit.Type->NumDirections;
+	UnitUpdateHeading(unit);
+}
+
+/* virtual */ void CAnimation_Rotate::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
-	if (unit.Anim.Unbreakable) {
-		fprintf(stderr, "Can't call \"die\" action in unbreakable section\n");
-		Exit(1);
+
+	if (!strcmp(this->rotateStr.c_str(), "target") && unit.CurrentOrder()->HasGoal()) {
+		COrder &order = *unit.CurrentOrder();
+		const CUnit &target = *order.GetGoal();
+		if (target.Destroyed) {
+			order.ClearGoal();
+			return;
+		}
+		const Vec2i pos = target.tilePos + target.Type->GetHalfTileSize() - unit.tilePos;
+		UnitHeadingFromDeltaXY(unit, pos);
+	} else {
+		UnitRotate(unit, ParseAnimInt(&unit, this->rotateStr.c_str()));
 	}
-	if (this->DeathType.empty() == false) {
-		unit.DamagedType = ExtraDeathIndex(this->DeathType.c_str());
-	}
-	throw AnimationDie_Exception();
 }
 
-/* virtual */ void CAnimation_Die::Init(const char* s)
+/* virtual */ void CAnimation_Rotate::Init(const char* s)
 {
-	this->DeathType = s;
+	this->rotateStr = s;
 }
-
-void AnimationDie_OnCatch(CUnit& unit)
-{
-	unit.State = 0;
-	LetUnitDie(unit);
-}
-
 
 //@}
