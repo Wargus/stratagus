@@ -78,7 +78,7 @@ enum AnimationType {
 
 class CAnimation {
 public:
-	CAnimation() : Type(AnimationNone), Next(NULL) {
+	CAnimation(AnimationType type) : Type(type), Next(NULL) {
 		memset(&D, 0, sizeof(D));
 	}
 
@@ -148,7 +148,7 @@ public:
 
 	static void Action(CUnit &unit, int &move, int scale);
 
-	AnimationType Type;
+	const AnimationType Type;
 	union {
 		struct {
 			const char *Frame;
@@ -237,22 +237,22 @@ public:
 	}
 
 	~CAnimations() {
-		delete[] Attack;
-		delete[] Build;
+		delete Attack;
+		delete Build;
 		for (int i = 0; i < ANIMATIONS_DEATHTYPES + 1; ++i) {
-			delete[] Death[i];
+			delete Death[i];
 		}
 		for (int i = 0; i < MaxCosts; ++i) {
-			delete[] Harvest[i];
+			delete Harvest[i];
 		}
-		delete[] Move;
-		delete[] Repair;
-		delete[] Research;
-		delete[] SpellCast;
-		delete[] Start;
-		delete[] Still;
-		delete[] Train;
-		delete[] Upgrade;
+		delete Move;
+		delete Repair;
+		delete Research;
+		delete SpellCast;
+		delete Start;
+		delete Still;
+		delete Train;
+		delete Upgrade;
 	}
 
 	static void SaveUnitAnim(CFile &file, const CUnit &unit);

@@ -876,9 +876,6 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 		if (!unit.Anim.Wait) {
 			// Advance to next frame
 			unit.Anim.Anim = unit.Anim.Anim->Next;
-			if (!unit.Anim.Anim) {
-				unit.Anim.Anim = unit.Anim.CurrAnim;
-			}
 		}
 		return 0;
 	}
@@ -888,9 +885,6 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 		if (!unit.Anim.Wait) {
 			// Advance to next frame
 			unit.Anim.Anim = unit.Anim.Anim->Next;
-			if (!unit.Anim.Anim) {
-				unit.Anim.Anim = unit.Anim.CurrAnim;
-			}
 		}
 	}
 
@@ -898,14 +892,9 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 	if (!unit.Anim.Wait) {
 		// Advance to next frame
 		unit.Anim.Anim = unit.Anim.Anim->Next;
-		if (!unit.Anim.Anim) {
-			unit.Anim.Anim = unit.Anim.CurrAnim;
-		}
 	}
 	return move;
 }
-
-
 
 
 /**
@@ -935,6 +924,21 @@ void FreeAnimations()
 	NumAnimations = 0;
 }
 
+static int GetAdvanceIndex(const CAnimation *base, const CAnimation *anim)
+{
+	if (base == anim) {
+		return 0;
+	}
+	int i = 1;
+	for (const CAnimation *it = base->Next; it != base; it = it->Next) {
+		if (it == anim) {
+			return i;
+		}
+		++i;
+	}
+	return -1;
+}
+
 
 /* static */ void CAnimations::SaveUnitAnim(CFile &file, const CUnit &unit)
 {
@@ -943,7 +947,7 @@ void FreeAnimations()
 	for (int i = 0; i < NumAnimations; ++i) {
 		if (AnimationsArray[i] == unit.Anim.CurrAnim) {
 			file.printf("\"curr-anim\", %d,", i);
-			file.printf("\"anim\", %d,", static_cast<int>(unit.Anim.Anim - unit.Anim.CurrAnim));
+			file.printf("\"anim\", %d,", GetAdvanceIndex(unit.Anim.CurrAnim, unit.Anim.Anim));
 			break;
 		}
 	}
@@ -952,6 +956,17 @@ void FreeAnimations()
 	}
 	file.printf("}");
 }
+
+
+static const CAnimation* Advance(const CAnimation* anim, int n)
+{
+	for (int i = 0; i != n; ++i)
+	{
+		anim = anim->Next;
+	}
+	return anim;
+}
+
 
 /* static */ void CAnimations::LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex)
 {
@@ -978,7 +993,7 @@ void FreeAnimations()
 		} else if (!strcmp(value, "anim")) {
 			lua_rawgeti(l, luaIndex, j + 1);
 			const int animIndex = LuaToNumber(l, -1);
-			unit.Anim.Anim = unit.Anim.CurrAnim + animIndex;
+			unit.Anim.Anim = Advance(unit.Anim.CurrAnim, animIndex);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "unbreakable")) {
 			unit.Anim.Unbreakable = 1;
@@ -1055,7 +1070,7 @@ static void FixLabels(lua_State *l)
 /**
 **  Parse an animation frame
 */
-static void ParseAnimationFrame(lua_State *l, const char *str, CAnimation *anim)
+static CAnimation *ParseAnimationFrame(lua_State *l, const char *str)
 {
 	std::string op1(str);
 	std::string all2;
@@ -1075,17 +1090,18 @@ static void ParseAnimationFrame(lua_State *l, const char *str, CAnimation *anim)
 			*op2++ = '\0';
 		}
 	}
+	CAnimation *anim = NULL;
 	if (op1 == "frame") {
-		anim->Type = AnimationFrame;
+		anim = new CAnimation(AnimationFrame);
 		anim->D.Frame.Frame = new_strdup(op2);
 	} else if (op1 == "exact-frame") {
-		anim->Type = AnimationExactFrame;
+		anim = new CAnimation(AnimationExactFrame);
 		anim->D.Frame.Frame = new_strdup(op2);
 	} else if (op1 == "wait") {
-		anim->Type = AnimationWait;
+		anim = new CAnimation(AnimationWait);
 		anim->D.Wait.Wait = new_strdup(op2);
 	} else if (op1 == "random-wait") {
-		anim->Type = AnimationRandomWait;
+		anim = new CAnimation(AnimationRandomWait);
 		next = strchr(op2, ' ');
 		if (next) {
 				while (*next == ' ') {
@@ -1099,12 +1115,12 @@ static void ParseAnimationFrame(lua_State *l, const char *str, CAnimation *anim)
 		}
 		anim->D.RandomWait.MaxWait = new_strdup(op2);
 	} else if (op1 == "sound") {
-		anim->Type = AnimationSound;
+		anim = new CAnimation(AnimationSound);
 		anim->D.Sound.Name = new_strdup(op2);
 	} else if (op1 == "random-sound") {
 		int count;
 
-		anim->Type = AnimationRandomSound;
+		anim = new CAnimation(AnimationRandomSound);
 		count = 0;
 		while (op2 && *op2) {
 			next = strchr(op2, ' ');
@@ -1122,9 +1138,9 @@ static void ParseAnimationFrame(lua_State *l, const char *str, CAnimation *anim)
 		anim->D.RandomSound.NumSounds = count;
 		anim->D.RandomSound.Sound = new CSound *[count];
 	} else if (op1 == "attack") {
-		anim->Type = AnimationAttack;
+		anim = new CAnimation(AnimationAttack);
 	} else if (op1 == "spawn-missile") {
-		anim->Type = AnimationSpawnMissile;
+		anim = new CAnimation(AnimationSpawnMissile);
 		next = strchr(op2, ' ');
 		if (next) {
 				while (*next == ' ') {
@@ -1172,7 +1188,7 @@ static void ParseAnimationFrame(lua_State *l, const char *str, CAnimation *anim)
 			anim->D.SpawnMissile.Flags = new_strdup(op2);
 		}
 	} else if (op1 == "spawn-unit") {
-		anim->Type = AnimationSpawnUnit;
+		anim = new CAnimation(AnimationSpawnUnit);
 		next = strchr(op2, ' ');
 		if (next) {
 				while (*next == ' ') {
@@ -1210,7 +1226,7 @@ static void ParseAnimationFrame(lua_State *l, const char *str, CAnimation *anim)
 		}
 		anim->D.SpawnUnit.Player = new_strdup(op2);
 	} else if (op1 == "if-var") {
-		anim->Type = AnimationIfVar;
+		anim = new CAnimation(AnimationIfVar);
 		next = strchr(op2, ' ');
 		if (next) {
 				while (*next == ' ') {
@@ -1254,7 +1270,7 @@ static void ParseAnimationFrame(lua_State *l, const char *str, CAnimation *anim)
 		}
 		FindLabelLater(l, &anim->D.IfVar.Goto, op2);
 	} else if (op1 == "set-var") {
-		anim->Type = AnimationSetVar;
+		anim = new CAnimation(AnimationSetVar);
 		next = strchr(op2, ' ');
 		if (next) {
 				while (*next == ' ') {
@@ -1288,7 +1304,7 @@ static void ParseAnimationFrame(lua_State *l, const char *str, CAnimation *anim)
 			anim->D.SetVar.UnitSlot = NULL;
 		}
 	} else if (op1 == "set-player-var") {
-		anim->Type = AnimationSetPlayerVar;
+		anim = new CAnimation(AnimationSetPlayerVar);
 		next = strchr(op2, ' ');
 		if (next) {
 				while (*next == ' ') {
@@ -1326,22 +1342,23 @@ static void ParseAnimationFrame(lua_State *l, const char *str, CAnimation *anim)
 		}
 		anim->D.SetPlayerVar.Arg = new_strdup(op2);
 	} else if (op1 == "die") {
-		anim->Type = AnimationDie;
-		if (op2!='\0')
+		anim = new CAnimation(AnimationDie);
+		if (op2 != '\0') {
 			anim->D.Die.DeathType = new_strdup(op2);
-		else
+		} else {
 			anim->D.Die.DeathType = "\0";
+		}
 	} else if (op1 == "rotate") {
-		anim->Type = AnimationRotate;
+		anim = new CAnimation(AnimationRotate);
 		anim->D.Rotate.Rotate = new_strdup(op2);
 	} else if (op1 == "random-rotate") {
-		anim->Type = AnimationRandomRotate;
+		anim = new CAnimation(AnimationRandomRotate);
 		anim->D.Rotate.Rotate = new_strdup(op2);
 	} else if (op1 == "move") {
-		anim->Type = AnimationMove;
+		anim = new CAnimation(AnimationMove);
 		anim->D.Move.Move = new_strdup(op2);
 	} else if (op1 == "unbreakable") {
-		anim->Type = AnimationUnbreakable;
+		anim = new CAnimation(AnimationUnbreakable);
 		if (!strcmp(op2, "begin")) {
 			anim->D.Unbreakable.Begin = 1;
 		} else if (!strcmp(op2, "end")) {
@@ -1350,15 +1367,15 @@ static void ParseAnimationFrame(lua_State *l, const char *str, CAnimation *anim)
 			LuaError(l, "Unbreakable must be 'begin' or 'end'.  Found: %s" _C_ op2);
 		}
 	} else if (op1 == "label") {
-		anim->Type = AnimationLabel;
+		anim = new CAnimation(AnimationLabel);
 		AddLabel(l, anim, op2);
 	} else if (op1 == "goto") {
-		anim->Type = AnimationGoto;
+		anim = new CAnimation(AnimationGoto);
 		FindLabelLater(l, &anim->D.Goto.Goto, op2);
 	} else if (op1 == "random-goto") {
 		char *label;
 
-		anim->Type = AnimationRandomGoto;
+		anim = new CAnimation(AnimationRandomGoto);
 		label = strchr(op2, ' ');
 		if (!label) {
 			LuaError(l, "Missing random-goto label");
@@ -1372,6 +1389,7 @@ static void ParseAnimationFrame(lua_State *l, const char *str, CAnimation *anim)
 	} else {
 		LuaError(l, "Unknown animation: %s" _C_ op1.c_str());
 	}
+	return anim;
 }
 
 /**
@@ -1383,25 +1401,30 @@ static CAnimation *ParseAnimation(lua_State *l, int idx)
 		LuaError(l, "incorrect argument");
 	}
 	const int args = lua_objlen(l, idx);
-	CAnimation *anim = new CAnimation[args + 1];
-	CAnimation *tail = NULL;
+
+	if (args == 0) {
+		return NULL;
+	}
 	Labels.clear();
 	LabelsLater.clear();
 
-	for (int j = 0; j < args; ++j) {
+	lua_rawgeti(l, idx, 1);
+	const char *str = LuaToString(l, -1);
+	lua_pop(l, 1);
+
+	CAnimation *firstAnim = ParseAnimationFrame(l, str);
+	CAnimation *prev = firstAnim;
+	for (int j = 1; j < args; ++j) {
 		lua_rawgeti(l, idx, j + 1);
 		const char *str = LuaToString(l, -1);
 		lua_pop(l, 1);
-		ParseAnimationFrame(l, str, &anim[j]);
-		if (!tail) {
-			tail = &anim[j];
-		} else {
-			tail->Next = &anim[j];
-			tail = &anim[j];
-		}
+		CAnimation *anim = ParseAnimationFrame(l, str);
+		prev->Next = anim;
+		prev = anim;
 	}
+	prev->Next = firstAnim;
 	FixLabels(l);
-	return anim;
+	return firstAnim;
 }
 
 /**
@@ -1449,7 +1472,7 @@ static int CclDefineAnimations(lua_State *l)
 			if (strlen(value) > 5)
 			{
 				death = ExtraDeathIndex(value + 6);
-				if (death==ANIMATIONS_DEATHTYPES) {
+				if (death == ANIMATIONS_DEATHTYPES) {
 					anims->Death[ANIMATIONS_DEATHTYPES] = ParseAnimation(l, -1);
 				} else {
 					anims->Death[death] = ParseAnimation(l, -1);

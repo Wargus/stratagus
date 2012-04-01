@@ -74,15 +74,24 @@ void LoadUnitSounds()
 */
 static void MapAnimSounds2(CAnimation *anim)
 {
-	while (anim) {
-		if (anim->Type == AnimationSound) {
-			anim->D.Sound.Sound = SoundForName(anim->D.Sound.Name);
-		} else if (anim->Type == AnimationRandomSound) {
-			for (unsigned int i = 0; i < anim->D.RandomSound.NumSounds; ++i) {
-				anim->D.RandomSound.Sound[i] = SoundForName(anim->D.RandomSound.Name[i]);
+	if (anim == NULL) {
+		return ;
+	}
+	if (anim->Type == AnimationSound) {
+		anim->D.Sound.Sound = SoundForName(anim->D.Sound.Name);
+	} else if (anim->Type == AnimationRandomSound) {
+		for (unsigned int i = 0; i < anim->D.RandomSound.NumSounds; ++i) {
+			anim->D.RandomSound.Sound[i] = SoundForName(anim->D.RandomSound.Name[i]);
+		}
+	}
+	for (CAnimation *it = anim->Next; it != anim; it = it->Next) {
+		if (it->Type == AnimationSound) {
+			it->D.Sound.Sound = SoundForName(it->D.Sound.Name);
+		} else if (it->Type == AnimationRandomSound) {
+			for (unsigned int i = 0; i < it->D.RandomSound.NumSounds; ++i) {
+				it->D.RandomSound.Sound[i] = SoundForName(it->D.RandomSound.Name[i]);
 			}
 		}
-		anim = anim->Next;
 	}
 }
 
@@ -91,8 +100,6 @@ static void MapAnimSounds2(CAnimation *anim)
 */
 static void MapAnimSounds(CUnitType *type)
 {
-	int i;
-
 	if (!type->Animations) {
 		return;
 	}
@@ -102,7 +109,7 @@ static void MapAnimSounds(CUnitType *type)
 	MapAnimSounds2(type->Animations->Move);
 	MapAnimSounds2(type->Animations->Attack);
 	MapAnimSounds2(type->Animations->SpellCast);
-	for (i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
+	for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
 		MapAnimSounds2(type->Animations->Death[i]);
 	}
 	MapAnimSounds2(type->Animations->Repair);
@@ -110,7 +117,7 @@ static void MapAnimSounds(CUnitType *type)
 	MapAnimSounds2(type->Animations->Research);
 	MapAnimSounds2(type->Animations->Upgrade);
 	MapAnimSounds2(type->Animations->Build);
-	for (i = 0; i < MaxCosts; ++i) {
+	for (int i = 0; i < MaxCosts; ++i) {
 		MapAnimSounds2(type->Animations->Harvest[i]);
 	}
 }
