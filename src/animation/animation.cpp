@@ -357,20 +357,6 @@ static const CAnimation* Advance(const CAnimation* anim, int n)
 	}
 }
 
-
-/**
-**  Find the index of a resource
-*/
-static int ResourceIndex(lua_State *l, const char *resource)
-{
-	const int res = GetResourceIdByName(resource);
-
-	if (res == -1) {
-		LuaError(l, "Resource not found: %s" _C_ resource);
-	}
-	return res;
-}
-
 /**
 **  Add a label
 */
@@ -560,8 +546,7 @@ static int CclDefineAnimations(lua_State *l)
 		} else if (!strncmp(value, "Still", 5)) {
 			anims->Still = ParseAnimation(l, -1);
 		} else if (!strncmp(value, "Death", 5)) {
-			if (strlen(value) > 5)
-			{
+			if (strlen(value) > 5) {
 				death = ExtraDeathIndex(value + 6);
 				if (death == ANIMATIONS_DEATHTYPES) {
 					anims->Death[ANIMATIONS_DEATHTYPES] = ParseAnimation(l, -1);
@@ -588,7 +573,7 @@ static int CclDefineAnimations(lua_State *l)
 		} else if (!strcmp(value, "Build")) {
 			anims->Build = ParseAnimation(l, -1);
 		} else if (!strncmp(value, "Harvest_", 8)) {
-			res = ResourceIndex(l, value + 8);
+			res = GetResourceIdByName(l, value + 8);
 			anims->Harvest[res] = ParseAnimation(l, -1);
 		} else {
 			LuaError(l, "Unsupported animation: %s" _C_ value);

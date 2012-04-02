@@ -50,6 +50,7 @@
 class CUnitType;
 class CVariable;
 class CIcon;
+struct lua_State;
 
 /**
 **  Indices into costs/resource/income array.
@@ -127,7 +128,8 @@ extern int DefaultResourceAmounts[MaxCosts];
 */
 extern int DefaultResourceMaxAmounts[MaxCosts];
 
-extern int GetResourceIdByName(const char *name);
+extern int GetResourceIdByName(const char *resourceName);
+extern int GetResourceIdByName(lua_State *l, const char *resourceName);
 
 /**
 **  These are the current stats of a unit. Upgraded or downgraded.

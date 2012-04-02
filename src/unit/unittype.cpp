@@ -112,14 +112,23 @@ std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 --  Functions
 ----------------------------------------------------------------------------*/
 
-int GetResourceIdByName(const char *name)
+int GetResourceIdByName(const char *resourceName)
 {
 	for (unsigned int res = 0; res < MaxCosts; ++res) {
-		if (!strcmp(name, DefaultResourceNames[res].c_str())) {
+		if (!strcmp(resourceName, DefaultResourceNames[res].c_str())) {
 			return res;
 		}
 	}
 	return -1;
+}
+
+int GetResourceIdByName(lua_State *l, const char *resourceName)
+{
+	const int res = GetResourceIdByName(resourceName);
+	if (res == -1) {
+		LuaError(l, "Resource not found: %s" _C_ resourceName);
+	}
+	return res;
 }
 
 	/// Parse integer in animation frame.

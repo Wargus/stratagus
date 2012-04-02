@@ -183,11 +183,7 @@ unsigned CclGetResourceByName(lua_State *l)
 	const char *const tmp = LuaToString(l, -1);
 	const std::string value = tmp ? tmp : "";
 
-	const int resId = GetResourceIdByName(value.c_str());
-	if (resId == -1) {
-		LuaError(l, "GetResourceByName: Unsupported resource tag: %s" _C_ value.c_str());
-		return 0xABCDEF;
-	}
+	const int resId = GetResourceIdByName(l, value.c_str());
 	return resId;
 }
 
@@ -1036,10 +1032,7 @@ static int CclDefineUnitType(lua_State *l)
 					const std::string name = LuaToString(l, -1);
 					lua_pop(l, 1);
 					++k;
-					const int resId = GetResourceIdByName(value);
-					if (resId == -1) {
-						LuaError(l, "Resource not found: %s" _C_ value);
-					}
+					const int resId = GetResourceIdByName(l, value);
 					lua_rawgeti(l, -1, k + 1);
 					type->Sound.Harvest[resId].Name = LuaToString(l, -1);
 					lua_pop(l, 1);
@@ -1160,11 +1153,7 @@ static int CclDefineUnitStats(lua_State *l)
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
-				const int resId = GetResourceIdByName(value);
-				if (resId == -1) {
-				   // This leaves half initialized stats
-				   LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
+				const int resId = GetResourceIdByName(l, value);
 				lua_rawgeti(l, j + 1, k + 1);
 				stats->Costs[resId] = LuaToNumber(l, -1);
 				lua_pop(l, 1);

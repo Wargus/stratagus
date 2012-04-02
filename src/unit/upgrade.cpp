@@ -255,10 +255,7 @@ static int CclDefineModifier(lua_State *l)
 			lua_rawgeti(l, j + 1, 1);
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
-			const int resId = GetResourceIdByName(value);
-			if (resId == -1) {
-				LuaError(l, "Resource not found: %s" _C_ value);
-			}
+			const int resId = GetResourceIdByName(l, value);
 			lua_rawgeti(l, j + 1, 2);
 			um->Modifier.Costs[resId] = LuaToNumber(l, -1);
 			lua_pop(l, 1);

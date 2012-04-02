@@ -183,10 +183,7 @@ void CPlayer::Load(lua_State *l)
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
-				const int resId = GetResourceIdByName(value);
-				if (resId == -1) {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
+				const int resId = GetResourceIdByName(l, value);
 				lua_rawgeti(l, j + 1, k + 1);
 				this->Resources[resId] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
@@ -201,10 +198,7 @@ void CPlayer::Load(lua_State *l)
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
-				const int resId = GetResourceIdByName(value);
-				if (resId == -1) {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
+				const int resId = GetResourceIdByName(l, value);
 				lua_rawgeti(l, j + 1, k + 1);
 				this->MaxResources[resId] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
@@ -219,10 +213,7 @@ void CPlayer::Load(lua_State *l)
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
-				const int resId = GetResourceIdByName(value);
-				if (resId == -1) {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
+				const int resId = GetResourceIdByName(l, value);
 				lua_rawgeti(l, j + 1, k + 1);
 				this->LastResources[resId] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
@@ -238,10 +229,7 @@ void CPlayer::Load(lua_State *l)
 				lua_pop(l, 1);
 				++k;
 
-				const int resId = GetResourceIdByName(value);
-				if (resId == -1) {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
+				const int resId = GetResourceIdByName(l, value);
 				lua_rawgeti(l, j + 1, k + 1);
 				this->Incomes[resId] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
@@ -257,10 +245,7 @@ void CPlayer::Load(lua_State *l)
 				lua_pop(l, 1);
 				++k;
 
-				const int resId = GetResourceIdByName(value);
-				if (resId == -1) {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
+				const int resId = GetResourceIdByName(l, value);
 				lua_rawgeti(l, j + 1, k + 1);
 				this->Revenue[resId] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
@@ -714,20 +699,14 @@ static int CclGetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 3);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(res.c_str());
-		if (resId == -1) {
-			LuaError(l, "Invalid resource \"%s\"" _C_ res.c_str());
-		}
+		const int resId = GetResourceIdByName(l, res.c_str());
 		lua_pushnumber(l, p->Resources[resId]);
 		return 1;
 	} else if (!strcmp(data, "MaxResources")) {
 		LuaCheckArgs(l, 3);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(res.c_str());
-		if (resId == -1) {
-			LuaError(l, "Invalid resource \"%s\"" _C_ res.c_str());
-		}
+		const int resId = GetResourceIdByName(l, res.c_str());
 		lua_pushnumber(l, p->MaxResources[resId]);
 		return 1;
 	} else if (!strcmp(data, "UnitTypesCount")) {
@@ -774,10 +753,7 @@ static int CclGetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 3);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(res.c_str());
-		if (resId == -1) {
-			LuaError(l, "Invalid resource \"%s\"" _C_ res.c_str());
-		}
+		const int resId = GetResourceIdByName(l, res.c_str());
 		lua_pushnumber(l, p->TotalResources[resId]);
 		return 1;
 	} else if (!strcmp(data, "TotalRazings")) {
@@ -832,10 +808,7 @@ static int CclSetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 4);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(res.c_str());
-		if (resId == -1) {
-			LuaError(l, "Invalid resource \"%s\"" _C_ res.c_str());
-		}
+		const int resId = GetResourceIdByName(l, res.c_str());
 		p->SetResource(resId, LuaToNumber(l, 4));
 // } else if (!strcmp(data, "UnitTypesCount")) {
 // } else if (!strcmp(data, "AiEnabled")) {
@@ -859,10 +832,7 @@ static int CclSetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 3);
 
 		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(res.c_str());
-		if (resId == -1) {
-			LuaError(l, "Invalid resource \"%s\"" _C_ res.c_str());
-		}
+		const int resId = GetResourceIdByName(l, res.c_str());
 		p->TotalResources[resId] = LuaToNumber(l, 4);
 	} else if (!strcmp(data, "TotalRazings")) {
 		p->TotalRazings = LuaToNumber(l, 3);

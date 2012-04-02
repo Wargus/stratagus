@@ -1430,10 +1430,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				lua_rawgeti(l, j + 1, k + 1);
 				int num = LuaToNumber(l, -1);
 				lua_pop(l, 1);
-				const int resId = GetResourceIdByName(type);
-				if (resId == -1) {
-					LuaError(l, "Resource not found: %s" _C_ type);
-				}
+				const int resId = GetResourceIdByName(l, type);
 				ai->Reserve[resId] = num;
 			}
 		} else if (!strcmp(value, "used")) {
@@ -1452,10 +1449,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				lua_rawgeti(l, j + 1, k + 1);
 				num = LuaToNumber(l, -1);
 				lua_pop(l, 1);
-				const int resId = GetResourceIdByName(type);
-				if (resId == -1) {
-					LuaError(l, "Resource not found: %s" _C_ type);
-				}
+				const int resId = GetResourceIdByName(l, type);
 				ai->Used[resId] = num;
 			}
 		} else if (!strcmp(value, "needed")) {
@@ -1474,10 +1468,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				lua_rawgeti(l, j + 1, k + 1);
 				num = LuaToNumber(l, -1);
 				lua_pop(l, 1);
-				const int resId = GetResourceIdByName(type);
-				if (resId == -1) {
-					LuaError(l, "Resource not found: %s" _C_ type);
-				}
+				const int resId = GetResourceIdByName(l, type);
 				ai->Needed[resId] = num;
 			}
 		} else if (!strcmp(value, "collect")) {
@@ -1496,10 +1487,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				lua_rawgeti(l, j + 1, k + 1);
 				num = LuaToNumber(l, -1);
 				lua_pop(l, 1);
-				const int resId = GetResourceIdByName(type);
-				if (resId == -1) {
-					LuaError(l, "Resource not found: %s" _C_ type);
-				}
+				const int resId = GetResourceIdByName(l, type);
 				ai->Collect[resId] = num;
 			}
 		} else if (!strcmp(value, "need-mask")) {
@@ -1511,10 +1499,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				lua_rawgeti(l, j + 1, k + 1);
 				const char *type = LuaToString(l, -1);
 				lua_pop(l, 1);
-				const int resId = GetResourceIdByName(type);
-				if (resId == -1) {
-					LuaError(l, "Resource not found: %s" _C_ type);
-				}
+				const int resId = GetResourceIdByName(l, type);
 				ai->NeededMask |= (1 << resId);
 			}
 		} else if (!strcmp(value, "need-supply")) {
