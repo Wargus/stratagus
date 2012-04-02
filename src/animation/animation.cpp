@@ -363,13 +363,12 @@ static const CAnimation* Advance(const CAnimation* anim, int n)
 */
 static int ResourceIndex(lua_State *l, const char *resource)
 {
-	for (unsigned int res = 0; res < MaxCosts; ++res) {
-		if (!strcmp(resource, DefaultResourceNames[res].c_str())) {
-			return res;
-		}
+	const int res = GetResourceIdByName(resource);
+
+	if (res == -1) {
+		LuaError(l, "Resource not found: %s" _C_ resource);
 	}
-	LuaError(l, "Resource not found: %s" _C_ resource);
-	return 0;
+	return res;
 }
 
 /**

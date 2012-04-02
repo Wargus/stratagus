@@ -127,6 +127,8 @@ extern int DefaultResourceAmounts[MaxCosts];
 */
 extern int DefaultResourceMaxAmounts[MaxCosts];
 
+extern int GetResourceIdByName(const char *name);
+
 /**
 **  These are the current stats of a unit. Upgraded or downgraded.
 */

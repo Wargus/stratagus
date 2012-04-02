@@ -112,6 +112,16 @@ std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 --  Functions
 ----------------------------------------------------------------------------*/
 
+int GetResourceIdByName(const char *name)
+{
+	for (unsigned int res = 0; res < MaxCosts; ++res) {
+		if (!strcmp(name, DefaultResourceNames[res].c_str())) {
+			return res;
+		}
+	}
+	return -1;
+}
+
 	/// Parse integer in animation frame.
 extern int ParseAnimInt(CUnit *unit, const char *parseint);
 

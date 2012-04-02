@@ -1195,25 +1195,6 @@ static int CclAiDump(lua_State *l)
 }
 
 /**
-**  Get the default resource number
-**
-**  @param name  Resource name.
-**
-**  @return      The number of the resource in DefaultResourceNames
-*/
-static int DefaultResourceNumber(const char *name)
-{
-	for (unsigned int i = 0; i < MaxCosts; ++i) {
-		if (DefaultResourceNames[i].compare(name) == 0) {
-			return i;
-		}
-	}
-	// Resource not found, should never happen
-	Assert(0);
-	return -1;
-}
-
-/**
 **  Parse AiBuildQueue builing list
 **
 **  @param l     Lua state.
@@ -1442,17 +1423,18 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
-				const char *type;
-				int num;
-
 				lua_rawgeti(l, j + 1, k + 1);
-				type = LuaToString(l, -1);
+				const char *type = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
 				lua_rawgeti(l, j + 1, k + 1);
-				num = LuaToNumber(l, -1);
+				int num = LuaToNumber(l, -1);
 				lua_pop(l, 1);
-				ai->Reserve[DefaultResourceNumber(type)] = num;
+				const int resId = GetResourceIdByName(type);
+				if (resId == -1) {
+					LuaError(l, "Resource not found: %s" _C_ type);
+				}
+				ai->Reserve[resId] = num;
 			}
 		} else if (!strcmp(value, "used")) {
 			if (!lua_istable(l, j + 1)) {
@@ -1470,7 +1452,11 @@ static int CclDefineAiPlayer(lua_State *l)
 				lua_rawgeti(l, j + 1, k + 1);
 				num = LuaToNumber(l, -1);
 				lua_pop(l, 1);
-				ai->Used[DefaultResourceNumber(type)] = num;
+				const int resId = GetResourceIdByName(type);
+				if (resId == -1) {
+					LuaError(l, "Resource not found: %s" _C_ type);
+				}
+				ai->Used[resId] = num;
 			}
 		} else if (!strcmp(value, "needed")) {
 			if (!lua_istable(l, j + 1)) {
@@ -1488,7 +1474,11 @@ static int CclDefineAiPlayer(lua_State *l)
 				lua_rawgeti(l, j + 1, k + 1);
 				num = LuaToNumber(l, -1);
 				lua_pop(l, 1);
-				ai->Needed[DefaultResourceNumber(type)] = num;
+				const int resId = GetResourceIdByName(type);
+				if (resId == -1) {
+					LuaError(l, "Resource not found: %s" _C_ type);
+				}
+				ai->Needed[resId] = num;
 			}
 		} else if (!strcmp(value, "collect")) {
 			if (!lua_istable(l, j + 1)) {
@@ -1506,7 +1496,11 @@ static int CclDefineAiPlayer(lua_State *l)
 				lua_rawgeti(l, j + 1, k + 1);
 				num = LuaToNumber(l, -1);
 				lua_pop(l, 1);
-				ai->Collect[DefaultResourceNumber(type)] = num;
+				const int resId = GetResourceIdByName(type);
+				if (resId == -1) {
+					LuaError(l, "Resource not found: %s" _C_ type);
+				}
+				ai->Collect[resId] = num;
 			}
 		} else if (!strcmp(value, "need-mask")) {
 			if (!lua_istable(l, j + 1)) {
@@ -1514,12 +1508,14 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
-				const char *type;
-
 				lua_rawgeti(l, j + 1, k + 1);
-				type = LuaToString(l, -1);
+				const char *type = LuaToString(l, -1);
 				lua_pop(l, 1);
-				ai->NeededMask |= (1 << DefaultResourceNumber(type));
+				const int resId = GetResourceIdByName(type);
+				if (resId == -1) {
+					LuaError(l, "Resource not found: %s" _C_ type);
+				}
+				ai->NeededMask |= (1 << resId);
 			}
 		} else if (!strcmp(value, "need-supply")) {
 			ai->NeedSupply = true;

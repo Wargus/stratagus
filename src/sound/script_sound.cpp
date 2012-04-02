@@ -231,17 +231,14 @@ static int CclPlaySound(lua_State *l)
 static int CclDefineGameSounds(lua_State *l)
 {
 	//FIXME: should allow to define ALL the game sounds
-	const char *value;
-	unsigned int i, k;
-	int args;
-	int j;
-	LuaUserData *data;
+	unsigned int i;
 
-	args = lua_gettop(l);
-	data = NULL;
-	for (j = 0; j < args; ++j) {
-		value = LuaToString(l, j + 1);
+	const int args = lua_gettop(l);
+	for (int j = 0; j < args; ++j) {
+		const char *value = LuaToString(l, j + 1);
 		++j;
+
+		LuaUserData *data = NULL;
 
 		// let's handle now the different cases
 		if (!strcmp(value, "click")) {
@@ -351,13 +348,10 @@ static int CclDefineGameSounds(lua_State *l)
 			lua_rawgeti(l, j + 1, 1);
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
-			for (k = 0; k < MaxCosts; ++k) {
-				if (!strcmp(DefaultResourceNames[k].c_str(), value)) {
-					break;
-				}
-			}
-			if (j == MaxCosts)
+			const int resId = GetResourceIdByName(value);
+			if (resId == -1) {
 				LuaError(l, "Invalid resource \"%s\"" _C_ value);
+			}
 			lua_rawgeti(l, j + 1, 2);
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
@@ -375,7 +369,7 @@ static int CclDefineGameSounds(lua_State *l)
 				LuaError(l, "Sound id expected");
 			}
 			lua_pop(l, 1);
-			GameSounds.NotEnoughRes[i][k].Sound = (CSound *)data->Data;
+			GameSounds.NotEnoughRes[i][resId].Sound = (CSound *)data->Data;
 		}else if (!strcmp(value, "not-enough-food")) {
 			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");

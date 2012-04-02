@@ -2067,14 +2067,13 @@ static int CclSetSpeedResourcesHarvest(lua_State *l)
 	LuaCheckArgs(l, 2);
 
 	const std::string resource = LuaToString(l, 1);
+	const int resId = GetResourceIdByName(resource.c_str());
 
-	for (unsigned int i = 0; i < MaxCosts; ++i) {
-		if (resource == DefaultResourceNames[i]) {
-			SpeedResourcesHarvest[i] = LuaToNumber(l, 2);
-			return 0;
-		}
+	if (resId == -1) {
+		LuaError(l, "Resource not found: %s" _C_ resource.c_str());
+		return 0;
 	}
-	LuaError(l, "Resource not found: %s" _C_ resource.c_str());
+	SpeedResourcesHarvest[resId] = LuaToNumber(l, 2);
 	return 0;
 }
 
@@ -2087,13 +2086,13 @@ static int CclSetSpeedResourcesReturn(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	const std::string resource = LuaToString(l, 1);
-	for (unsigned int i = 0; i < MaxCosts; ++i) {
-		if (resource == DefaultResourceNames[i]) {
-			SpeedResourcesReturn[i] = LuaToNumber(l, 2);
-			return 0;
-		}
+	const int resId = GetResourceIdByName(resource.c_str());
+
+	if (resId == -1) {
+		LuaError(l, "Resource not found: %s" _C_ resource.c_str());
+		return 0;
 	}
-	LuaError(l, "Resource not found: %s" _C_ resource.c_str());
+	SpeedResourcesReturn[resId] = LuaToNumber(l, 2);
 	return 0;
 }
 
@@ -2267,19 +2266,15 @@ static int CclDefineDefaultResourceAmounts(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	for (unsigned int j = 0; j < args; ++j) {
-		const std::string value = LuaToString(l, j + 1);
-		unsigned int i;
+		const std::string resource = LuaToString(l, j + 1);
+		const int resId = GetResourceIdByName(resource.c_str());
 
-		for (i = 0; i < MaxCosts; ++i) {
-			if (value == DefaultResourceNames[i]) {
-				++j;
-				DefaultResourceAmounts[i] = LuaToNumber(l, j + 1);
-				break;
-			}
+		if (resId == -1) {
+			LuaError(l, "Resource not found: %s" _C_ resource.c_str());
+			return 0;
 		}
-		if (i == MaxCosts) {
-			LuaError(l, "Resource not found: %s" _C_ value.c_str());
-		}
+		++j;
+		DefaultResourceAmounts[resId] = LuaToNumber(l, j + 1);
 	}
 	return 0;
 }

@@ -183,13 +183,12 @@ unsigned CclGetResourceByName(lua_State *l)
 	const char *const tmp = LuaToString(l, -1);
 	const std::string value = tmp ? tmp : "";
 
-	for (unsigned int i = 0; i < MaxCosts; ++i) {
-		if (value == DefaultResourceNames[i]) {
-			return i;
-		}
+	const int resId = GetResourceIdByName(value.c_str());
+	if (resId == -1) {
+		LuaError(l, "GetResourceByName: Unsupported resource tag: %s" _C_ value.c_str());
+		return 0xABCDEF;
 	}
-	LuaError(l, "GetResourceByName: Unsupported resource tag: %s" _C_ value.c_str());
-	return 0xABCDEF;
+	return resId;
 }
 
 
@@ -1033,22 +1032,16 @@ static int CclDefineUnitType(lua_State *l)
 					type->Sound.Repair.Name = LuaToString(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "harvest")) {
-					int res;
-
 					lua_rawgeti(l, -1, k + 1);
 					const std::string name = LuaToString(l, -1);
 					lua_pop(l, 1);
 					++k;
-					for (res = 0; res < MaxCosts; ++res) {
-						if (name == DefaultResourceNames[res]) {
-							break;
-						}
-					}
-					if (res == MaxCosts) {
+					const int resId = GetResourceIdByName(value);
+					if (resId == -1) {
 						LuaError(l, "Resource not found: %s" _C_ value);
 					}
 					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Harvest[res].Name = LuaToString(l, -1);
+					type->Sound.Harvest[resId].Name = LuaToString(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "help")) {
 					lua_rawgeti(l, -1, k + 1);
@@ -1133,25 +1126,18 @@ static int CclDefineUnitType(lua_State *l)
 */
 static int CclDefineUnitStats(lua_State *l)
 {
-	const char *value;
-	CUnitType *type;
-	CUnitStats *stats;
-	int i;
-	int args;
-	int j;
+	const int args = lua_gettop(l);
+	int j = 0;
 
-	args = lua_gettop(l);
-	j = 0;
-
-	type = UnitTypeByIdent(LuaToString(l, j + 1));
+	CUnitType *type = UnitTypeByIdent(LuaToString(l, j + 1));
 	Assert(type);
 	++j;
 
-	i = LuaToNumber(l, j + 1);
-	Assert(i < PlayerMax);
+	int playerId = LuaToNumber(l, j + 1);
+	Assert(playerId < PlayerMax);
 	++j;
 
-	stats = &type->Stats[i];
+	CUnitStats *stats = &type->Stats[playerId];
 	if (!stats->Variables) {
 		stats->Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
 	}
@@ -1160,40 +1146,31 @@ static int CclDefineUnitStats(lua_State *l)
 	// Parse the list: (still everything could be changed!)
 	//
 	for (; j < args; ++j) {
-
-		value = LuaToString(l, j + 1);
+		const char *value = LuaToString(l, j + 1);
 		++j;
 
 		if (!strcmp(value, "costs")) {
-			int subargs;
-			int k;
-
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
+			const int subargs = lua_objlen(l, j + 1);
 
+			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
-
-				for (i = 0; i < MaxCosts; ++i) {
-					if (!strcmp(value, DefaultResourceNames[i].c_str())) {
-						lua_rawgeti(l, j + 1, k + 1);
-						stats->Costs[i] = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-						break;
-					}
-				}
-				if (i == MaxCosts) {
+				const int resId = GetResourceIdByName(value);
+				if (resId == -1) {
 				   // This leaves half initialized stats
 				   LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
+				lua_rawgeti(l, j + 1, k + 1);
+				stats->Costs[resId] = LuaToNumber(l, -1);
+				lua_pop(l, 1);
 			}
 		} else {
-			i = UnitTypeVar.VariableNameLookup[value];// User variables
+			int i = UnitTypeVar.VariableNameLookup[value];// User variables
 			if (i != -1) { // valid index
 				if (lua_istable(l, j + 1)) {
 					DefineVariableField(l, stats->Variables + i, j + 1);
@@ -1206,8 +1183,6 @@ static int CclDefineUnitStats(lua_State *l)
 				}
 				continue;
 			}
-
-
 		   // This leaves a half initialized unit
 		   LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
