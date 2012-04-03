@@ -65,9 +65,9 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 	strcpy(s, parseflag);
 	char* cur = s;
 	char* next = s;
-	while (next){
+	while (next) {
 		next = strchr(cur, '.');
-		if (next){
+		if (next) {
 			*next = '\0';
 			++next;
 		}

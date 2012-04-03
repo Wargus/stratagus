@@ -116,7 +116,8 @@ int UnitShowAnimation(CUnit &unit, const CAnimation *anim)
 **  @return  The parsed value.
 */
 
-static int ParseAnimPlayer(const CUnit &unit, const char *parseint){
+static int ParseAnimPlayer(const CUnit &unit, const char *parseint)
+{
 	if (!strcmp(parseint, "this")) {
 		return unit.Player->Index;
 	}
@@ -217,7 +218,7 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 {
 	// Changing animations
 	if (anim && unit.Anim.CurrAnim != anim) {
-	// Assert fails when transforming unit (upgrade-to).
+		// Assert fails when transforming unit (upgrade-to).
 		Assert(!unit.Anim.Unbreakable);
 		unit.Anim.Anim = unit.Anim.CurrAnim = anim;
 		unit.Anim.Wait = 0;
@@ -261,7 +262,7 @@ CAnimations *AnimationsByIdent(const std::string &ident)
 {
 	std::map<std::string, CAnimations *>::iterator ret = AnimationMap.find(ident);
 	if (ret != AnimationMap.end()) {
-		return  (*ret).second;
+		return (*ret).second;
 	}
 	return NULL;
 }
@@ -313,8 +314,7 @@ static int GetAdvanceIndex(const CAnimation *base, const CAnimation *anim)
 
 static const CAnimation* Advance(const CAnimation* anim, int n)
 {
-	for (int i = 0; i != n; ++i)
-	{
+	for (int i = 0; i != n; ++i) {
 		anim = anim->Next;
 	}
 	return anim;
