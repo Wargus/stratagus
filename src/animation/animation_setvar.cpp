@@ -144,20 +144,20 @@
 
 	size_t begin = 0;
 	size_t end = str.find(' ', begin);
-	this->varStr.assign(str, begin, end);
+	this->varStr.assign(str, begin, end - begin);
 
-	begin = str.find_first_not_of(' ', end);
-	end = str.find(' ', begin);
-	const std::string modStr(str, std::min(len, begin), end);
+	begin = std::min(len, str.find_first_not_of(' ', end));
+	end = std::min(len, str.find(' ', begin));
+	const std::string modStr(str, begin, end - begin);
 	this->mod = atoi(modStr.c_str());
 
-	begin = str.find_first_not_of(' ', end);
-	end = str.find(' ', begin);
-	this->valueStr.assign(str, std::min(len, begin), end);
+	begin = std::min(len, str.find_first_not_of(' ', end));
+	end = std::min(len, str.find(' ', begin));
+	this->valueStr.assign(str, begin, end - begin);
 
-	begin = str.find_first_not_of(' ', end);
-	end = str.find(' ', begin);
-	this->unitSlotStr.assign(str, std::min(len, begin), end);
+	begin = std::min(len, str.find_first_not_of(' ', end));
+	end = std::min(len, str.find(' ', begin));
+	this->unitSlotStr.assign(str, begin, end - begin);
 }
 
 //@}

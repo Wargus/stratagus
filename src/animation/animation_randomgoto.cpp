@@ -58,11 +58,11 @@
 
 	size_t begin = 0;
 	size_t end = str.find(' ', begin);
-	this->randomStr.assign(str, begin, end);
+	this->randomStr.assign(str, begin, end - begin);
 
-	begin = str.find_first_not_of(' ', end);
-	end = str.find(' ', begin);
-	const std::string label(str, std::min(len, begin), end);
+	begin = std::min(len, str.find_first_not_of(' ', end));
+	end = std::min(len, str.find(' ', begin));
+	const std::string label(str, begin, end - begin);
 
 	FindLabelLater(&this->gotoLabel, label);
 }

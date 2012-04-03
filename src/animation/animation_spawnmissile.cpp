@@ -167,27 +167,27 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 
 	size_t begin = 0;
 	size_t end = str.find(' ', begin);
-	this->missileTypeStr.assign(str, begin, end);
+	this->missileTypeStr.assign(str, begin, end - begin);
 
-	begin = str.find_first_not_of(' ', end);
-	end = str.find(' ', begin);
-	this->startXStr.assign(str, std::min(len, begin), end);
+	begin = std::min(len, str.find_first_not_of(' ', end));
+	end = std::min(len, str.find(' ', begin));
+	this->startXStr.assign(str, begin, end - begin);
 
-	begin = str.find_first_not_of(' ', end);
-	end = str.find(' ', begin);
-	this->startYStr.assign(str, std::min(len, begin), end);
+	begin = std::min(len, str.find_first_not_of(' ', end));
+	end = std::min(len, str.find(' ', begin));
+	this->startYStr.assign(str, begin, end - begin);
 
-	begin = str.find_first_not_of(' ', end);
-	end = str.find(' ', begin);
-	this->destXStr.assign(str, std::min(len, begin), end);
+	begin = std::min(len, str.find_first_not_of(' ', end));
+	end = std::min(len, str.find(' ', begin));
+	this->destXStr.assign(str, begin, end - begin);
 
-	begin = str.find_first_not_of(' ', end);
-	end = str.find(' ', begin);
-	this->destYStr.assign(str, std::min(len, begin), end);
+	begin = std::min(len, str.find_first_not_of(' ', end));
+	end = std::min(len, str.find(' ', begin));
+	this->destYStr.assign(str, begin, end - begin);
 
-	begin = str.find_first_not_of(' ', end);
-	end = str.find(' ', begin);
-	this->flagsStr.assign(str, std::min(len, begin), end);
+	begin = std::min(len, str.find_first_not_of(' ', end));
+	end = std::min(len, str.find(' ', begin));
+	this->flagsStr.assign(str, begin, end - begin);
 }
 
 //@}

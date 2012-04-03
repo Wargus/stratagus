@@ -57,11 +57,12 @@
 /* virtual */ void CAnimation_RandomSound::Init(const char* s)
 {
 	const std::string str(s);
+	const size_t len = str.size();
 
 	for (size_t begin = 0; begin != std::string::npos; ) {
-		const size_t end = str.find(' ', begin);
+		const size_t end = std::min(len, str.find(' ', begin));
 
-		this->sounds.push_back(SoundConfig(str.substr(begin, end)));
+		this->sounds.push_back(SoundConfig(str.substr(begin, end - begin)));
 		begin = str.find_first_not_of(' ', end);
 	}
 }

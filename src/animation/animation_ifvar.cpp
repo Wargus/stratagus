@@ -80,16 +80,16 @@ bool returnFalse(int , int) { return false; }
 	const size_t len = str.size();
 
 	size_t begin = 0;
-	size_t end = str.find(' ', begin);
-	this->leftVar.assign(str, begin, end);
+	size_t end = std::min(len, str.find(' ', begin));
+	this->leftVar.assign(str, begin, end - begin);
 
-	begin = str.find_first_not_of(' ', end);
-	end = str.find(' ', begin);
-	this->rightVar.assign(std::min(len, begin), end);
+	begin = std::min(len, str.find_first_not_of(' ', end));
+	end = std::min(len, str.find(' ', begin));
+	this->rightVar.assign(str, begin, end - begin);
 
-	begin = str.find_first_not_of(' ', end);
-	end = str.find(' ', begin);
-	std::string op(str, std::min(len, begin), end);
+	begin = std::min(len, str.find_first_not_of(' ', end));
+	end = std::min(len, str.find(' ', begin));
+	std::string op(str, begin, end - begin);
 
 	if (op == ">=") {
 		this->binOpFunc = binOpGeaterEqual;
@@ -116,9 +116,9 @@ bool returnFalse(int , int) { return false; }
 			default: this->binOpFunc = returnFalse; break;
 		}
 	}
-	begin = str.find_first_not_of(' ', end);
-	end = str.find(' ', begin);
-	std::string label(str, std::min(len, begin), end);
+	begin = std::min(len, str.find_first_not_of(' ', end));
+	end = std::min(len, str.find(' ', begin));
+	std::string label(str, begin, end - begin);
 
 	FindLabelLater(&this->gotoLabel, label);
 }

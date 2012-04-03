@@ -417,8 +417,8 @@ static CAnimation *ParseAnimationFrame(lua_State *l, const char *str)
 	const size_t len = all.size();
 	size_t end = all.find(' ');
 	const std::string op1(all, 0, end);
-	size_t begin = all.find_first_not_of(' ', end);
-	const std::string extraArg(all, std::min(begin, len), std::string::npos);
+	size_t begin = std::min(len, all.find_first_not_of(' ', end));
+	const std::string extraArg(all, begin);
 
 	CAnimation *anim = NULL;
 	if (op1 == "frame") {
