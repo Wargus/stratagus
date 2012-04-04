@@ -57,7 +57,7 @@
 **  @param base   Base type to insert into table.
 */
 static void AiHelperInsert(std::vector<std::vector<CUnitType *> > &table,
-	unsigned int n, CUnitType *base)
+						   unsigned int n, CUnitType *base)
 {
 	Assert(base != NULL);
 
@@ -78,7 +78,7 @@ static void AiHelperInsert(std::vector<std::vector<CUnitType *> > &table,
 /**
 **  Transform list of unit separed with coma to a true list.
 */
-static std::vector<CUnitType *> getUnitTypeFromString(const std::string& list)
+static std::vector<CUnitType *> getUnitTypeFromString(const std::string &list)
 {
 	std::vector<CUnitType *> res;
 
@@ -249,8 +249,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 			}
 		}
 
-		for (std::vector<CUnitType *>::const_iterator d = UnitTypes.begin();
-			d != UnitTypes.end(); ++d) {
+		for (std::vector<CUnitType *>::const_iterator d = UnitTypes.begin(); d != UnitTypes.end(); ++d) {
 			CUnitType *type = *d;
 
 			if (type->CanStore[i] > 0) {
@@ -258,7 +257,6 @@ static void InitAiHelper(AiHelper &aiHelper)
 				AiHelperInsert(aiHelper.Depots, i - 1, *d);
 			}
 		}
-
 	}
 
 	for (int i = 0; i < (int)UnitButtonTable.size(); ++i) {
@@ -273,8 +271,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 					}
 				}
 				break;
-			case ButtonBuild:
-			{
+			case ButtonBuild: {
 				CUnitType *buildingType = UnitTypeByIdent(button.ValueStr);
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
@@ -282,8 +279,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			}
-			case ButtonTrain :
-			{
+			case ButtonTrain : {
 				CUnitType *trainingType = UnitTypeByIdent(button.ValueStr);
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
@@ -291,8 +287,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			}
-			case ButtonUpgradeTo :
-			{
+			case ButtonUpgradeTo : {
 				CUnitType *upgradeToType = UnitTypeByIdent(button.ValueStr);
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
@@ -300,8 +295,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			}
-			case ButtonResearch :
-			{
+			case ButtonResearch : {
 				int researchId = UpgradeIdByIdent(button.ValueStr);
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
@@ -1181,8 +1175,8 @@ static int CclAiDump(lua_State *l)
 	//
 	for (i = 0; i < (int)AiPlayer->Force.Size(); ++i) {
 		printf("Force(%d%s%s):\n", i,
-			AiPlayer->Force[i].Completed ? ",complete" : ",recruit",
-			AiPlayer->Force[i].Attacking ? ",attack" : "");
+			   AiPlayer->Force[i].Completed ? ",complete" : ",recruit",
+			   AiPlayer->Force[i].Attacking ? ",attack" : "");
 		for (int j = 0; j < (int)AiPlayer->Force[i].UnitTypes.size(); ++j) {
 			aut = &AiPlayer->Force[i].UnitTypes[j];
 			printf("%s(%d) ", aut->Type->Ident.c_str(), aut->Want);
@@ -1209,7 +1203,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 	const char *value;
 	int made;
 	int want;
-	int x = -1,y = -1;
+	int x = -1, y = -1;
 
 	const int args = lua_objlen(l, offset);
 	for (int k = 0; k < args; ++k) {
@@ -1219,37 +1213,37 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 		++k;
 
 		if (!strcmp(value, "onpos")) {
-				lua_rawgeti(l, offset, k + 1);
-				x = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-				++k;
-				lua_rawgeti(l, offset, k + 1);
-				y = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+			lua_rawgeti(l, offset, k + 1);
+			x = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			++k;
+			lua_rawgeti(l, offset, k + 1);
+			y = LuaToNumber(l, -1);
+			lua_pop(l, 1);
 		} else {
 
-				//lua_rawgeti(l, j + 1, k + 1);
-				//ident = LuaToString(l, -1);
-				//lua_pop(l, 1);
-				//++k;
-				lua_rawgeti(l, offset, k + 1);
-				made = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-				++k;
-				lua_rawgeti(l, offset, k + 1);
-				want = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+			//lua_rawgeti(l, j + 1, k + 1);
+			//ident = LuaToString(l, -1);
+			//lua_pop(l, 1);
+			//++k;
+			lua_rawgeti(l, offset, k + 1);
+			made = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			++k;
+			lua_rawgeti(l, offset, k + 1);
+			want = LuaToNumber(l, -1);
+			lua_pop(l, 1);
 
-				AiBuildQueue queue;
-				queue.Type = UnitTypeByIdent(value);
-				queue.Want = want;
-				queue.Made = made;
-				queue.X = x;
-				queue.Y = y;
+			AiBuildQueue queue;
+			queue.Type = UnitTypeByIdent(value);
+			queue.Want = want;
+			queue.Made = made;
+			queue.X = x;
+			queue.Y = y;
 
-				ai->UnitTypeBuilt.push_back(queue);
-				x = -1;
-				y = -1;
+			ai->UnitTypeBuilt.push_back(queue);
+			x = -1;
+			y = -1;
 		}
 	}
 }
@@ -1277,7 +1271,7 @@ static int CclDefineAiPlayer(lua_State *l)
 	++j;
 
 	Assert(i >= 0 && i <= PlayerMax);
-	DebugPrint("%p %d\n" _C_ (void *)Players[i].Ai _C_ Players[i].AiEnabled );
+	DebugPrint("%p %d\n" _C_(void *)Players[i].Ai _C_ Players[i].AiEnabled);
 	// FIXME: lose this:
 	// Assert(!Players[i].Ai && Players[i].AiEnabled);
 
@@ -1585,7 +1579,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				ai->ResearchRequests.push_back(CUpgrade::Get(ident));
 			}
 		} else if (!strcmp(value, "building")) {
-			CclParseBuildQueue(l, ai, j+1);
+			CclParseBuildQueue(l, ai, j + 1);
 		} else if (!strcmp(value, "repair-building")) {
 			ai->LastRepairBuilding = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "repair-workers")) {

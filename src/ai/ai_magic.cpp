@@ -59,9 +59,9 @@ void AiCheckMagic()
 		if (unit.Type->CanCastSpell) {
 			for (unsigned int j = 0; j < SpellTypeTable.size(); ++j) {
 				// Check if we can cast this spell. SpellIsAvailable checks for upgrades.
-				if (unit.Type->CanCastSpell[j] && SpellIsAvailable(player, j) &&
-					(SpellTypeTable[j]->AutoCast || SpellTypeTable[j]->AICast)) {
-						AutoCastSpell(unit, SpellTypeTable[j]);
+				if (unit.Type->CanCastSpell[j] && SpellIsAvailable(player, j)
+					&& (SpellTypeTable[j]->AutoCast || SpellTypeTable[j]->AICast)) {
+					AutoCastSpell(unit, SpellTypeTable[j]);
 				}
 			}
 		}

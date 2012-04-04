@@ -59,11 +59,10 @@ class _EnemyOnMapTile
 {
 public:
 	_EnemyOnMapTile(const CUnit &unit, const Vec2i _pos, CUnit **enemy) :
-		source(&unit) , pos(_pos), best(enemy)
-	{
+		source(&unit) , pos(_pos), best(enemy) {
 	}
 
-	void operator() (CUnit *const unit) const {
+	void operator()(CUnit *const unit) const {
 		const CUnitType &type = *unit->Type;
 		// unusable unit ?
 		// if (unit->IsUnusable()) can't attack constructions
@@ -104,9 +103,9 @@ private:
 **
 **  @return        Returns ideal target on map tile.
 */
-static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i& pos)
+static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i &pos)
 {
-	CUnit* enemy = NULL;
+	CUnit *enemy = NULL;
 
 	_EnemyOnMapTile filter(source, pos, &enemy);
 	Map.Field(pos)->UnitCache.for_each(filter);
@@ -123,7 +122,7 @@ static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i& pos)
 */
 static void AiMarkWaterTransporter(const CUnit &unit, unsigned char *matrix)
 {
-	const Vec2i offset[] = {{0, -1}, {-1, 0}, {1, 0}, {0, 1}, {-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
+	const Vec2i offset[] = {{0, -1}, { -1, 0}, {1, 0}, {0, 1}, { -1, -1}, {1, -1}, { -1, 1}, {1, 1}};
 	Vec2i pos = unit.tilePos;
 	const int w = Map.Info.MapWidth + 2;
 	matrix += w + w + 2;
@@ -189,7 +188,7 @@ static void AiMarkWaterTransporter(const CUnit &unit, unsigned char *matrix)
 */
 static bool AiFindTarget(const CUnit &unit, unsigned char *matrix, Vec2i *dpos, int *ds)
 {
-	const Vec2i offset[] = {{0, -1}, {-1, 0}, {1, 0}, {0, 1}, {-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
+	const Vec2i offset[] = {{0, -1}, { -1, 0}, {1, 0}, {0, 1}, { -1, -1}, {1, -1}, { -1, 1}, {1, 1}};
 	struct p {
 		Vec2i pos;
 		unsigned char State;
@@ -307,7 +306,7 @@ static bool AiFindTarget(const CUnit &unit, unsigned char *matrix, Vec2i *dpos, 
 */
 int AiFindWall(AiForce *force)
 {
-	const Vec2i offset[] = {{0, -1}, {-1, 1}, {1, 0}, {0, 1}, {-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
+	const Vec2i offset[] = {{0, -1}, { -1, 1}, {1, 0}, {0, 1}, { -1, -1}, {1, -1}, { -1, 1}, {1, 1}};
 
 	// Find a unit to use.  Best choice is a land unit with range 1.
 	// Next best choice is any land unit.  Otherwise just use the first.
@@ -336,7 +335,7 @@ int AiFindWall(AiForce *force)
 	int ep = 1;
 	int wp = 1; // start with one point
 	const int mask = unit->Type->MovementMask;
-	Vec2i dest = {-1, -1};
+	Vec2i dest = { -1, -1};
 
 	// Pop a point from stack, push all neighbors which could be entered.
 	for (; dest.x == -1;) {
@@ -403,7 +402,7 @@ int AiFindWall(AiForce *force)
 int AiForce::PlanAttack()
 {
 	DebugPrint("%d: Planning for force #%lu of player #%d\n"_C_ AiPlayer->Player->Index
-	 _C_ (long unsigned int)(this - &(AiPlayer->Force[0])) _C_ AiPlayer->Player->Index);
+			   _C_(long unsigned int)(this - & (AiPlayer->Force[0])) _C_ AiPlayer->Player->Index);
 
 	unsigned char *watermatrix = CreateMatrix();
 
@@ -444,7 +443,7 @@ int AiForce::PlanAttack()
 
 	// Find a land unit of the force.
 	// FIXME: if force is split over different places -> broken
-	CUnit* landUnit = CUnitTypeFinder(UnitTypeLand).Find(Units);
+	CUnit *landUnit = CUnitTypeFinder(UnitTypeLand).Find(Units);
 	if (landUnit == NULL) {
 		DebugPrint("%d: No land unit in force\n" _C_ AiPlayer->Player->Index);
 		return 0;
@@ -511,7 +510,7 @@ int AiForce::PlanAttack()
 }
 
 
-static bool ChooseRandomUnexploredPositionNear(const Vec2i& center, Vec2i *pos)
+static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)
 {
 	Assert(pos != NULL);
 
@@ -530,10 +529,10 @@ static bool ChooseRandomUnexploredPositionNear(const Vec2i& center, Vec2i *pos)
 	return false;
 }
 
-static CUnit* GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
+static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 {
 	// Choose a target, "near"
-	const Vec2i& center = request.pos;
+	const Vec2i &center = request.pos;
 	if (ChooseRandomUnexploredPositionNear(center, pos) == false) {
 		return NULL;
 	}
