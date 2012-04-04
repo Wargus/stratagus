@@ -250,7 +250,7 @@ static void LuaLoadBuffer(const std::string &file, std::string &buffer)
 
 	if (fp.open(file.c_str(), CL_OPEN_READ) == -1) {
 		fprintf(stderr, "Can't open file '%s': %s\n",
-			file.c_str(), strerror(errno));
+				file.c_str(), strerror(errno));
 		return;
 	}
 
@@ -512,20 +512,20 @@ void CclGarbageCollect(int)
 {
 #if LUA_VERSION_NUM >= 501
 	DebugPrint("Garbage collect (before): %d\n" _C_
-		lua_gc(Lua, LUA_GCCOUNT, 0));
+			   lua_gc(Lua, LUA_GCCOUNT, 0));
 
 	lua_gc(Lua, LUA_GCCOLLECT, 0);
 
 	DebugPrint("Garbage collect (after): %d\n" _C_
-		lua_gc(Lua, LUA_GCCOUNT, 0));
+			   lua_gc(Lua, LUA_GCCOUNT, 0));
 #else
 	DebugPrint("Garbage collect (before): %d/%d\n" _C_
-		lua_getgccount(Lua) _C_ lua_getgcthreshold(Lua));
+			   lua_getgccount(Lua) _C_ lua_getgcthreshold(Lua));
 
 	lua_setgcthreshold(Lua, 0);
 
 	DebugPrint("Garbage collect (after): %d/%d\n" _C_
-		lua_getgccount(Lua) _C_ lua_getgcthreshold(Lua));
+			   lua_getgccount(Lua) _C_ lua_getgcthreshold(Lua));
 #endif
 }
 
@@ -769,7 +769,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 				} else if (!strcmp(key, "Loc")) {
 					res->D.UnitStat.Loc = LuaToNumber(l, -1);
 					if (res->D.UnitStat.Loc < 0 || 2 < res->D.UnitStat.Loc) {
-						LuaError(l, "Bad Loc number :'%d'" _C_ (int) LuaToNumber(l, -1));
+						LuaError(l, "Bad Loc number :'%d'" _C_(int) LuaToNumber(l, -1));
 					}
 				} else {
 					LuaError(l, "Bad param %s for Unit" _C_ key);
@@ -849,7 +849,7 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		key = LuaToString(l, -1);
 		lua_pop(l, 1);
 		lua_rawgeti(l, -1, 2); // table
-		if (!strcmp(key, "Concat")){
+		if (!strcmp(key, "Concat")) {
 			int i; // iterator.
 
 			res->e = EString_Concat;
@@ -1032,20 +1032,20 @@ int EvalNumber(const NumberDesc *number)
 			unit = EvalUnit(number->D.UnitStat.Unit);
 			if (unit != NULL) {
 				return GetComponent(*unit, number->D.UnitStat.Index,
-					number->D.UnitStat.Component, number->D.UnitStat.Loc).i;
+									number->D.UnitStat.Component, number->D.UnitStat.Loc).i;
 			} else { // ERROR.
 				return 0;
 			}
 		case ENumber_VideoTextLength : // VideoTextLength(font, s)
-			if (number->D.VideoTextLength.String != NULL &&
-					!(s = EvalString(number->D.VideoTextLength.String)).empty()) {
+			if (number->D.VideoTextLength.String != NULL
+				&& !(s = EvalString(number->D.VideoTextLength.String)).empty()) {
 				return number->D.VideoTextLength.Font->Width(s);
 			} else { // ERROR.
 				return 0;
 			}
 		case ENumber_StringFind : // s.find(c)
-			if (number->D.StringFind.String != NULL &&
-					!(s = EvalString(number->D.StringFind.String)).empty()) {
+			if (number->D.StringFind.String != NULL
+				&& !(s = EvalString(number->D.StringFind.String)).empty()) {
 				size_t pos = s.find(number->D.StringFind.C);
 				return pos != std::string::npos ? (int)pos : -1;
 			} else { // ERROR.
@@ -1082,8 +1082,7 @@ std::string EvalString(const StringDesc *s)
 				res += EvalString(s->D.Concat.Strings[i]);
 			}
 			return res;
-		case EString_String :     // 42 -> "42".
-		{
+		case EString_String : {   // 42 -> "42".
 			char buffer[16]; // Should be enough ?
 			sprintf(buffer, "%d", EvalNumber(s->D.Number));
 			return std::string(buffer);
@@ -1109,8 +1108,8 @@ std::string EvalString(const StringDesc *s)
 				return std::string("");
 			}
 		case EString_SubString : // substring(s, begin, end)
-			if (s->D.SubString.String != NULL &&
-					!(tmp1 = EvalString(s->D.SubString.String)).empty()) {
+			if (s->D.SubString.String != NULL
+				&& !(tmp1 = EvalString(s->D.SubString.String)).empty()) {
 				int begin;
 				int end;
 
@@ -1132,8 +1131,7 @@ std::string EvalString(const StringDesc *s)
 				return std::string("");
 			}
 		case EString_Line : // line n of the string
-			if (s->D.Line.String == NULL ||
-					(tmp1 = EvalString(s->D.Line.String)).empty()) {
+			if (s->D.Line.String == NULL || (tmp1 = EvalString(s->D.Line.String)).empty()) {
 				return std::string(""); // ERROR.
 			} else {
 				int line;
@@ -1311,12 +1309,12 @@ static int AliasUnitVar(lua_State *l, const char *s)
 
 	Assert(0 < lua_gettop(l) && lua_gettop(l) <= 3);
 	nargs = lua_gettop(l);
-	lua_newtable (l);
+	lua_newtable(l);
 	lua_pushnumber(l, 1);
 	lua_pushstring(l, "UnitVar");
 	lua_rawset(l, -3);
 	lua_pushnumber(l, 2);
-	lua_newtable (l);
+	lua_newtable(l);
 
 	lua_pushstring(l, "Unit");
 	lua_pushstring(l, s);
@@ -1422,13 +1420,13 @@ static int Alias(lua_State *l, const char *s)
 
 	narg = lua_gettop(l);
 	Assert(narg);
-	lua_newtable (l);
+	lua_newtable(l);
 	lua_pushnumber(l, 1);
 	lua_pushstring(l, s);
 	lua_rawset(l, -3);
 	lua_pushnumber(l, 2);
 	if (narg > 1) {
-		lua_newtable (l);
+		lua_newtable(l);
 		for (i = 1; i <= narg; i++) {
 			lua_pushnumber(l, i);
 			lua_pushvalue(l, i);
@@ -1742,13 +1740,13 @@ static int CclGameInfo(lua_State *l)
 static int CclVideoTextLength(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
-	lua_newtable (l);
+	lua_newtable(l);
 	lua_pushnumber(l, 1);
 	lua_pushstring(l, "VideoTextLength");
 	lua_rawset(l, -3);
 	lua_pushnumber(l, 2);
 
-	lua_newtable (l);
+	lua_newtable(l);
 	lua_pushstring(l, "Font");
 	lua_pushvalue(l, 1);
 	lua_rawset(l, -3);
@@ -1862,7 +1860,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	if (pathtype == 1) {
 		++userdir;
 		std::string dir(Parameters::Instance.GetUserDirectory());
-		if(!GameName.empty()) {
+		if (!GameName.empty()) {
 			dir += "/";
 			dir += GameName;
 		}
@@ -1927,7 +1925,7 @@ static int CclSetGameName(lua_State *l)
 		GameName = lua_tostring(l, 1);
 	}
 
-	if(!GameName.empty()) {
+	if (!GameName.empty()) {
 		std::string path = Parameters::Instance.GetUserDirectory() + "/" + GameName;
 		makedir(path.c_str(), 0777);
 	}
@@ -2279,8 +2277,9 @@ static int CclDefineDefaultResourceMaxAmounts(lua_State *l)
 	for (int i = 0; i < args; ++i) {
 		DefaultResourceMaxAmounts[i] = LuaToNumber(l, i + 1);
 	}
-	for (int i = args; i < MaxCosts; ++i)
+	for (int i = args; i < MaxCosts; ++i) {
 		DefaultResourceMaxAmounts[i] = -1;
+	}
 	return 0;
 }
 
@@ -2359,10 +2358,10 @@ static void InitLua()
 	// For security we don't load all libs
 	static const luaL_Reg lualibs[] = {
 		{"", luaopen_base},
-//		{LUA_LOADLIBNAME, luaopen_package},
+		//		{LUA_LOADLIBNAME, luaopen_package},
 		{LUA_TABLIBNAME, luaopen_table},
-//		{LUA_IOLIBNAME, luaopen_io},
-//		{LUA_OSLIBNAME, luaopen_os},
+		//		{LUA_IOLIBNAME, luaopen_io},
+		//		{LUA_OSLIBNAME, luaopen_os},
 		{LUA_STRLIBNAME, luaopen_string},
 		{LUA_MATHLIBNAME, luaopen_math},
 		{LUA_DBLIBNAME, luaopen_debug},
@@ -2517,7 +2516,7 @@ std::string SaveGlobal(lua_State *l, bool is_root)
 	std::string tmp;
 	int b;
 
-//	Assert(!is_root || !lua_gettop(l));
+	//	Assert(!is_root || !lua_gettop(l));
 	first = 1;
 	if (is_root) {
 		lua_pushstring(l, "_G");// global table in lua.
@@ -2531,22 +2530,22 @@ std::string SaveGlobal(lua_State *l, bool is_root)
 		type_value = lua_type(l, -1);
 		const std::string key = (type_key == LUA_TSTRING) ? lua_tostring(l, -2) : "";
 		if ((key == "_G") || (is_root && (
-				(key == "assert") || (key == "gcinfo") || (key == "getfenv") ||
-				(key == "unpack") || (key == "tostring") || (key == "tonumber") ||
-				(key == "setmetatable") || (key == "require") || (key == "pcall") ||
-				(key == "rawequal") || (key == "collectgarbage") || (key == "type") ||
-				(key == "getmetatable") || (key == "next") || (key == "print") ||
-				(key == "xpcall") || (key == "rawset") || (key == "setfenv") ||
-				(key == "rawget") || (key == "newproxy") || (key == "ipairs") ||
-				(key == "loadstring") || (key == "dofile") || (key == "_TRACEBACK") ||
-				(key == "_VERSION") || (key == "pairs") || (key == "__pow") ||
-				(key == "error") || (key == "loadfile") || (key == "arg") ||
-				(key == "_LOADED") || (key == "loadlib") || (key == "string") ||
-				(key == "os") || (key == "io") || (key == "debug") ||
-				(key == "coroutine") || (key == "Icons") || (key == "Upgrades") ||
-				(key == "Fonts") || (key == "FontColors") || (key == "expansion")
-				// other string to protected ?
-				))) {
+								  (key == "assert") || (key == "gcinfo") || (key == "getfenv") ||
+								  (key == "unpack") || (key == "tostring") || (key == "tonumber") ||
+								  (key == "setmetatable") || (key == "require") || (key == "pcall") ||
+								  (key == "rawequal") || (key == "collectgarbage") || (key == "type") ||
+								  (key == "getmetatable") || (key == "next") || (key == "print") ||
+								  (key == "xpcall") || (key == "rawset") || (key == "setfenv") ||
+								  (key == "rawget") || (key == "newproxy") || (key == "ipairs") ||
+								  (key == "loadstring") || (key == "dofile") || (key == "_TRACEBACK") ||
+								  (key == "_VERSION") || (key == "pairs") || (key == "__pow") ||
+								  (key == "error") || (key == "loadfile") || (key == "arg") ||
+								  (key == "_LOADED") || (key == "loadlib") || (key == "string") ||
+								  (key == "os") || (key == "io") || (key == "debug") ||
+								  (key == "coroutine") || (key == "Icons") || (key == "Upgrades") ||
+								  (key == "Fonts") || (key == "FontColors") || (key == "expansion")
+								  // other string to protected ?
+							  ))) {
 			lua_pop(l, 1); // pop the value
 			continue;
 		}
@@ -2562,7 +2561,7 @@ std::string SaveGlobal(lua_State *l, bool is_root)
 				value = b ? "true" : "false";
 				break;
 			case LUA_TSTRING:
-				value = ( ( std::string(lua_tostring(l, -1)).find('\n') != std::string::npos ) ? ( std::string("[[") + lua_tostring(l, -1) + "]]" ) : ( std::string("\"") + lua_tostring(l, -1) + "\"" ) );
+				value = ((std::string(lua_tostring(l, -1)).find('\n') != std::string::npos) ? (std::string("[[") + lua_tostring(l, -1) + "]]") : (std::string("\"") + lua_tostring(l, -1) + "\""));
 				break;
 			case LUA_TTABLE:
 				lua_pushvalue(l, -1);
@@ -2573,9 +2572,9 @@ std::string SaveGlobal(lua_State *l, bool is_root)
 				}
 				break;
 			case LUA_TFUNCTION:
-			// Could be done with string.dump(function)
-			// and debug.getinfo(function).name (could be nil for anonymous function)
-			// But not usefull yet.
+				// Could be done with string.dump(function)
+				// and debug.getinfo(function).name (could be nil for anonymous function)
+				// But not usefull yet.
 				value = "";
 				break;
 			case LUA_TUSERDATA:
@@ -2628,7 +2627,7 @@ std::string SaveGlobal(lua_State *l, bool is_root)
 		res += "\n";
 	}
 	lua_pop(l, 1); // pop the table
-//	Assert(!is_root || !lua_gettop(l));
+	//	Assert(!is_root || !lua_gettop(l));
 	return res;
 }
 
@@ -2650,16 +2649,12 @@ void SavePreferences()
 			tableName += "preferences";
 			lua_pushstring(Lua, "preferences");
 			lua_gettable(Lua, -2);
-		}
-		else
-		{
+		} else {
 			lua_pushstring(Lua, "preferences");
 			lua_gettable(Lua, LUA_GLOBALSINDEX);
 			tableName = "preferences";
 		}
-	}
-	else
-	{
+	} else {
 		tableName = "preferences";
 		lua_pushstring(Lua, "preferences");
 		lua_gettable(Lua, LUA_GLOBALSINDEX);
@@ -2690,7 +2685,7 @@ void SavePreferences()
 /**
 **  Load stratagus config file.
 */
-void LoadCcl(const std::string& filename)
+void LoadCcl(const std::string &filename)
 {
 	char buf[PATH_MAX];
 
@@ -2719,9 +2714,9 @@ void SaveCcl(CFile &file)
 
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
 		file.printf("SetSpeedResourcesHarvest(\"%s\", %d)\n",
-			DefaultResourceNames[i].c_str(), SpeedResourcesHarvest[i]);
+					DefaultResourceNames[i].c_str(), SpeedResourcesHarvest[i]);
 		file.printf("SetSpeedResourcesReturn(\"%s\", %d)\n",
-			DefaultResourceNames[i].c_str(), SpeedResourcesReturn[i]);
+					DefaultResourceNames[i].c_str(), SpeedResourcesReturn[i]);
 	}
 	file.printf("SetSpeedBuild(%d)\n", SpeedBuild);
 	file.printf("SetSpeedTrain(%d)\n", SpeedTrain);

@@ -176,9 +176,9 @@ unsigned int strncpy_s(char *dst, size_t dstsize, const char *src, size_t count)
 
 	size_t mincount;
 	if (count == _TRUNCATE) {
-	   mincount = strnlen(src, dstsize);
+		mincount = strnlen(src, dstsize);
 	} else {
-	   mincount = strnlen(src, count);
+		mincount = strnlen(src, count);
 	}
 	if (mincount >= dstsize) {
 		if (count != _TRUNCATE) {
@@ -209,7 +209,7 @@ unsigned int strcat_s(char *dst, size_t dstsize, const char *src)
 	if (count == 0) {
 		return EINVAL;
 	}
-	if (strlen(src) >= count ) {
+	if (strlen(src) >= count) {
 		return ERANGE;
 	}
 	strcpy(enddst, src);
@@ -380,23 +380,22 @@ int GetClipboard(std::string &str)
 
 	// Creates a non maped temporary X window to hold the selection
 	if (!(window = XCreateSimpleWindow(display,
-			DefaultRootWindow(display), 0, 0, 1, 1, 0, 0, 0))) {
+									   DefaultRootWindow(display), 0, 0, 1, 1, 0, 0, 0))) {
 		XCloseDisplay(display);
 		return -1;
 	}
 
 	XConvertSelection(display, XA_PRIMARY, XA_STRING, XA_STRING,
-		window, CurrentTime);
+					  window, CurrentTime);
 
 	XNextEvent(display, &event);
 
-	if (event.type != SelectionNotify ||
-			event.xselection.property != XA_STRING) {
+	if (event.type != SelectionNotify || event.xselection.property != XA_STRING) {
 		return -1;
 	}
 
 	XGetWindowProperty(display, window, XA_STRING, 0, 1024, False,
-		XA_STRING, &rettype, &retform, &nitem, &dummy, &clipboard);
+					   XA_STRING, &rettype, &retform, &nitem, &dummy, &clipboard);
 
 	XDestroyWindow(display, window);
 	XCloseDisplay(display);
@@ -480,124 +479,125 @@ int UTF8GetNext(const std::string &text, int curpos)
 ----------------------------------------------------------------------------*/
 
 
-CMutex::CMutex ()
+CMutex::CMutex()
 {
 #if !defined (__unix)
-	InitializeCriticalSection (&_mut);
+	InitializeCriticalSection(&_mut);
 #else
-  	if (pthread_mutexattr_init (&_attr) == 0) {
-  #if defined (__linux)
-  		if (pthread_mutexattr_settype (&_attr, PTHREAD_MUTEX_RECURSIVE_NP) == 0)
-  #elif defined (USE_BSD)
-  		if (pthread_mutexattr_settype (&_attr, PTHREAD_MUTEX_RECURSIVE) == 0)
-  #else // HP & SUN
-  		if (pthread_mutexattr_settype (&_attr, PTHREAD_MUTEX_RECURSIVE) == 0 &&
-  			pthread_mutexattr_setpshared (&_attr, PTHREAD_PROCESS_PRIVATE) == 0)
-  #endif
-  		{
-  			pthread_mutex_init (&_mut, &_attr);
-  		}
-  	}
+	if (pthread_mutexattr_init(&_attr) == 0) {
+#if defined (__linux)
+		if (pthread_mutexattr_settype(&_attr, PTHREAD_MUTEX_RECURSIVE_NP) == 0)
+#elif defined (USE_BSD)
+		if (pthread_mutexattr_settype(&_attr, PTHREAD_MUTEX_RECURSIVE) == 0)
+#else // HP & SUN
+		if (pthread_mutexattr_settype(&_attr, PTHREAD_MUTEX_RECURSIVE) == 0 &&
+			pthread_mutexattr_setpshared(&_attr, PTHREAD_PROCESS_PRIVATE) == 0)
+#endif
+		{
+			pthread_mutex_init(&_mut, &_attr);
+		}
+	}
 #endif
 }
 
-CMutex::~CMutex ()
+CMutex::~CMutex()
 {
 #if !defined (__unix)
-	DeleteCriticalSection (&_mut);
+	DeleteCriticalSection(&_mut);
 #else
-	pthread_mutex_destroy (&_mut);
-	pthread_mutexattr_destroy (&_attr);
+	pthread_mutex_destroy(&_mut);
+	pthread_mutexattr_destroy(&_attr);
 #endif
 }
 
 #if !defined (__unix)
-unsigned long WINAPI CThread::threadFun (void *pThread)
+unsigned long WINAPI CThread::threadFun(void *pThread)
 {
-	CThread *ptr = static_cast<CThread*>(pThread);
-	if (ptr)
-	{
-		ptr->Run ();
+	CThread *ptr = static_cast<CThread *>(pThread);
+	if (ptr) {
+		ptr->Run();
 	}
 	return 0;
 }
 #else
-void* CThread::threadFun (void *pThread)
+void *CThread::threadFun(void *pThread)
 {
-	CThread *ptr = static_cast<CThread*>(pThread);
-	if (ptr)
-	{
-		ptr->Run ();
+	CThread *ptr = static_cast<CThread *>(pThread);
+	if (ptr) {
+		ptr->Run();
 	}
 	return NULL;
 }
 #endif
 
-void CThread::Terminate ()
+void CThread::Terminate()
 {
-  if (m_bRunning)
-  {
+	if (m_bRunning) {
 #if !defined (__unix)
-    TerminateThread(m_hndlThread, 0);
+		TerminateThread(m_hndlThread, 0);
 #else
-    pthread_cancel(m_dThreadID);
+		pthread_cancel(m_dThreadID);
 #endif
-    m_bRunning = false;
-  }
+		m_bRunning = false;
+	}
 }
 
-CThread::~CThread ()
+CThread::~CThread()
 {
-    Terminate ();
+	Terminate();
 }
 
-int CThread::Start ()
+int CThread::Start()
 {
-  if (m_bRunning)
-    return -1;
+	if (m_bRunning) {
+		return -1;
+	}
 
 #if !defined (__unix)
-  m_hndlThread = CreateThread (NULL, 0, CThread::threadFun, (LPVOID)this, 0, &m_dThreadID);
-  if (m_hndlThread == NULL)
-  	return -2;
+	m_hndlThread = CreateThread(NULL, 0, CThread::threadFun, (LPVOID)this, 0, &m_dThreadID);
+	if (m_hndlThread == NULL) {
+		return -2;
+	}
 #else
-  int result = pthread_create (&m_dThreadID, NULL, CThread::threadFun, (void*)this);
-  if (result != 0)
-  	return -2;
+	int result = pthread_create(&m_dThreadID, NULL, CThread::threadFun, (void *)this);
+	if (result != 0) {
+		return -2;
+	}
 #endif
 
-  m_bRunning = true;
-  return 0;
+	m_bRunning = true;
+	return 0;
 }
 
-int CThread::Wait ()
+int CThread::Wait()
 {
-	if (m_bRunning)
-	{
+	if (m_bRunning) {
 #if !defined (__unix)
-		if (::WaitForSingleObject (m_hndlThread, INFINITE) == WAIT_FAILED)
+		if (::WaitForSingleObject(m_hndlThread, INFINITE) == WAIT_FAILED) {
 			return -1;
-		if (::CloseHandle (m_hndlThread) == 0)
-    		return -2;
+		}
+		if (::CloseHandle(m_hndlThread) == 0) {
+			return -2;
+		}
 #else
-		if (pthread_join (m_dThreadID, NULL) != 0)
-    		return -1;
+		if (pthread_join(m_dThreadID, NULL) != 0) {
+			return -1;
+		}
 #endif
 		m_bRunning = false;
 	}
 	return 0;
 }
 
-void CThread::Exit ()
+void CThread::Exit()
 {
-  if (m_bRunning)
-  {
-    m_bRunning = false;
+	if (m_bRunning) {
+		m_bRunning = false;
 #if !defined (__unix)
-	ExitThread(0);
+		ExitThread(0);
 #else
-	pthread_exit(0);
+		pthread_exit(0);
 #endif
-  }
+	}
 }
 

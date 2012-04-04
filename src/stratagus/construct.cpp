@@ -93,8 +93,7 @@ void LoadConstructions()
 		(*i)->ShadowHeight = (*i)->ShadowFile.Height;
 		if (!file.empty()) {
 			ShowLoadProgress("Construction %s", file.c_str());
-			(*i)->ShadowSprite = CGraphic::ForceNew(file,
-				(*i)->ShadowWidth, (*i)->ShadowHeight);
+			(*i)->ShadowSprite = CGraphic::ForceNew(file, (*i)->ShadowWidth, (*i)->ShadowHeight);
 			(*i)->ShadowSprite->Load();
 			(*i)->ShadowSprite->Flip();
 			(*i)->ShadowSprite->MakeShadow();
@@ -194,8 +193,7 @@ static int CclDefineConstruction(lua_State *l)
 
 		value = LuaToString(l, -2);
 
-		if ((files = !strcmp(value, "Files")) ||
-				!strcmp(value, "ShadowFiles")) {
+		if ((files = !strcmp(value, "Files")) || !strcmp(value, "ShadowFiles")) {
 			std::string file;
 			int w;
 			int h;

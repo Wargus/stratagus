@@ -248,8 +248,9 @@ void Parameters::SetUserDirectory()
 	UserDirectory = getenv("HOME");
 #endif
 
-	if (!UserDirectory.empty())
+	if (!UserDirectory.empty()) {
 		UserDirectory += "/";
+	}
 
 #ifdef USE_WIN32
 	UserDirectory += "Stratagus";
@@ -270,7 +271,7 @@ void Parameters::SetUserDirectory()
 
 std::string StratagusLibPath;        /// Path for data directory
 
-	/// Name, Version, Copyright
+/// Name, Version, Copyright
 const char NameLine[] = NAME " V" VERSION ", " COPYRIGHT;
 
 std::string CliMapName;          /// Filename of the map given on the command line
@@ -348,10 +349,11 @@ void PreMenuSetup()
 
 	InitVideoCursors();
 
-	if (MenuRace.empty())
+	if (MenuRace.empty()) {
 		LoadCursors(PlayerRaces.Name[0]);
-	else
+	} else {
 		LoadCursors(MenuRace);
+	}
 
 	InitSettings();
 
@@ -420,7 +422,7 @@ static void ExpandPath(std::string &newpath, const std::string &path)
 {
 	if (path[0] == '~') {
 		newpath = Parameters::Instance.GetUserDirectory();
-		if(!GameName.empty()) {
+		if (!GameName.empty()) {
 			newpath += "/";
 			newpath += GameName;
 		}
@@ -613,26 +615,26 @@ static void PrintHeader()
 		"";
 
 	fprintf(stdout,
-		"%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n"
-		"  Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon, Pali Rohar,\n"
-		"  and others.\n"
-		"\t" HOMEPAGE "\n"
-		"Compile options %s",
-		NameLine, CompileOptions.c_str());
+			"%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n"
+			"  Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon, Pali Rohar,\n"
+			"  and others.\n"
+			"\t" HOMEPAGE "\n"
+			"Compile options %s",
+			NameLine, CompileOptions.c_str());
 }
 
 void PrintLicense()
 {
 	printf("\n"
-			"\n"
-			"Stratagus may be copied only under the terms of the GNU General Public License\n"
-			"which may be found in the Stratagus source kit.\n"
-			"\n"
-			"DISCLAIMER:\n"
-			"This software is provided as-is.  The author(s) can not be held liable for any\n"
-			"damage that might arise from the use of this software.\n"
-			"Use it at your own risk.\n"
-			"\n");
+		   "\n"
+		   "Stratagus may be copied only under the terms of the GNU General Public License\n"
+		   "which may be found in the Stratagus source kit.\n"
+		   "\n"
+		   "DISCLAIMER:\n"
+		   "This software is provided as-is.  The author(s) can not be held liable for any\n"
+		   "damage that might arise from the use of this software.\n"
+		   "Use it at your own risk.\n"
+		   "\n");
 }
 
 
@@ -665,8 +667,8 @@ void Exit(int err)
 	}
 	freeGuichan();
 	DebugPrint("Frames %lu, Slow frames %d = %ld%%\n" _C_
-		FrameCounter _C_ SlowFrameCounter _C_
-		(SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1));
+			   FrameCounter _C_ SlowFrameCounter _C_
+			   (SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1));
 	lua_settop(Lua, 0);
 	lua_close(Lua);
 	DeInitVideo();
@@ -716,7 +718,7 @@ static void Usage()
 		"\t-v mode\t\tVideo mode resolution in format <xres>x<yres>\n"
 		"\t-W\t\tWindowed video mode\n"
 		"map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n",
-			Parameters::Instance.applicationName.c_str());
+		Parameters::Instance.applicationName.c_str());
 }
 
 #ifdef REDIRECT_OUTPUT
@@ -762,15 +764,14 @@ static void RedirectOutput()
 }
 #endif
 
-void ParseCommandLine(int argc, char** argv, Parameters& parameters)
+void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
 	for (;;) {
 		switch (getopt(argc, argv, "c:d:D:eE:FhI:lL:n:N:oOP:s:S:U:v:W?")) {
 			case 'c':
 				parameters.luaStartFilename = optarg;
 				continue;
-			case 'd':
-			{
+			case 'd': {
 				StratagusLibPath = optarg;
 				size_t index;
 				while ((index = StratagusLibPath.find('\\')) != std::string::npos) {
@@ -831,19 +832,18 @@ void ParseCommandLine(int argc, char** argv, Parameters& parameters)
 			case 'U':
 				NetworkUpdates = atoi(optarg);
 				continue;
-			case 'v':
-			{
-				char * sep = strchr(optarg, 'x');
-				if (!sep || !*(sep+1)) {
+			case 'v': {
+				char *sep = strchr(optarg, 'x');
+				if (!sep || !*(sep + 1)) {
 					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%s'\n", argv[0], optarg);
 					Usage();
 					ExitFatal(-1);
 				}
-				Video.Height = atoi(sep+1);
+				Video.Height = atoi(sep + 1);
 				*sep = 0;
 				Video.Width = atoi(optarg);
 				if (!Video.Height || !Video.Width) {
-					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%sx%s'\n", argv[0], optarg, sep+1);
+					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%sx%s'\n", argv[0], optarg, sep + 1);
 					Usage();
 					ExitFatal(-1);
 				}
@@ -882,7 +882,7 @@ void ParseCommandLine(int argc, char** argv, Parameters& parameters)
 
 std::string GetLocalPlayerNameFromEnv()
 {
-//  Default player name to username on unix systems.
+	//  Default player name to username on unix systems.
 #if defined(USE_WIN32) || defined(USE_MAEMO)
 	return "Anonymous";
 #else
@@ -922,14 +922,14 @@ int main(int argc, char **argv)
 	// Look for the specified data set inside the application bundle
 	// This should be a subdir of the Resources directory
 	CFURLRef pluginRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(),
-		CFSTR(MAC_BUNDLE_DATADIR), NULL, NULL);
+						 CFSTR(MAC_BUNDLE_DATADIR), NULL, NULL);
 	CFStringRef macPath = CFURLCopyFileSystemPath(pluginRef,  kCFURLPOSIXPathStyle);
 	const char *pathPtr = CFStringGetCStringPtr(macPath, CFStringGetSystemEncoding());
 	Assert(pathPtr);
 	StratagusLibPath = pathPtr;
 #endif
 
-	Parameters& parameters = Parameters::Instance;
+	Parameters &parameters = Parameters::Instance;
 	parameters.SetDefaultValues();
 	parameters.applicationName = argv[0];
 	parameters.LocalPlayerName = GetLocalPlayerNameFromEnv();

@@ -74,10 +74,10 @@ void DrawGuichanWidgets();
 // Variables
 //----------------------------------------------------------------------------
 
-	/// variable set when we are scrolling via keyboard
+/// variable set when we are scrolling via keyboard
 int KeyScrollState = ScrollNone;
 
-	/// variable set when we are scrolling via mouse
+/// variable set when we are scrolling via mouse
 int MouseScrollState = ScrollNone;
 
 EventCallback GameCallbacks;   /// Game callbacks
@@ -137,8 +137,7 @@ void DoScrollArea(int state, bool fast)
 		stepx = (int)(UI.MouseScrollSpeed * PixelTileSize.x * FRAMES_PER_SECOND / 4);
 		stepy = (int)(UI.MouseScrollSpeed * PixelTileSize.y * FRAMES_PER_SECOND / 4);
 	}
-	if ((state & (ScrollLeft | ScrollRight)) &&
-			(state & (ScrollLeft | ScrollRight)) != (ScrollLeft | ScrollRight)) {
+	if ((state & (ScrollLeft | ScrollRight)) && (state & (ScrollLeft | ScrollRight)) != (ScrollLeft | ScrollRight)) {
 		stepx = stepx * 100 * 100 / VideoSyncSpeed / FRAMES_PER_SECOND / (SkipFrames + 1);
 		remx += stepx - (stepx / 100) * 100;
 		stepx /= 100;
@@ -149,8 +148,7 @@ void DoScrollArea(int state, bool fast)
 	} else {
 		stepx = 0;
 	}
-	if ((state & (ScrollUp | ScrollDown)) &&
-			(state & (ScrollUp | ScrollDown)) != (ScrollUp | ScrollDown)) {
+	if ((state & (ScrollUp | ScrollDown)) && (state & (ScrollUp | ScrollDown)) != (ScrollUp | ScrollDown)) {
 		stepy = stepy * 100 * 100 / VideoSyncSpeed / FRAMES_PER_SECOND / (SkipFrames + 1);
 		remy += stepy - (stepy / 100) * 100;
 		stepy /= 100;
@@ -186,8 +184,7 @@ void DrawMapArea()
 	for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
 		// Center viewport on tracked unit
 		if (vp->Unit) {
-			if (vp->Unit->Destroyed ||
-					vp->Unit->CurrentAction() == UnitActionDie) {
+			if (vp->Unit->Destroyed || vp->Unit->CurrentAction() == UnitActionDie) {
 				vp->Unit = NoUnitP;
 			} else {
 				const PixelSize offset = {vp->Unit->IX + PixelTileSize.x / 2, vp->Unit->IY + PixelTileSize.y / 2};
@@ -215,21 +212,21 @@ void UpdateDisplay()
 			DrawCursor();
 		}
 
-		if ((Preference.BigScreen && !BigMapMode) || (!Preference.BigScreen && BigMapMode))
+		if ((Preference.BigScreen && !BigMapMode) || (!Preference.BigScreen && BigMapMode)) {
 			UiToggleBigMap();
+		}
 
 		if (!BigMapMode) {
 			for (int i = 0; i < (int)UI.Fillers.size(); ++i) {
 				UI.Fillers[i].G->DrawSubClip(0, 0,
-					UI.Fillers[i].G->Width,
-					UI.Fillers[i].G->Height,
-					UI.Fillers[i].X, UI.Fillers[i].Y);
+											 UI.Fillers[i].G->Width,
+											 UI.Fillers[i].G->Height,
+											 UI.Fillers[i].X, UI.Fillers[i].Y);
 			}
 			DrawMenuButtonArea();
 
 			UI.Minimap.Draw(UI.SelectedViewport->MapX, UI.SelectedViewport->MapY);
-			UI.Minimap.DrawCursor(UI.SelectedViewport->MapX,
-				UI.SelectedViewport->MapY);
+			UI.Minimap.DrawCursor(UI.SelectedViewport->MapX, UI.SelectedViewport->MapY);
 
 			UI.InfoPanel.Draw();
 			UI.ButtonPanel.Draw();
@@ -390,8 +387,7 @@ static void DisplayLoop()
 	ColorCycle();
 
 #ifdef REALVIDEO
-	if (FastForwardCycle > GameCycle &&
-			RealVideoSyncSpeed != VideoSyncSpeed) {
+	if (FastForwardCycle > GameCycle && RealVideoSyncSpeed != VideoSyncSpeed) {
 		RealVideoSyncSpeed = VideoSyncSpeed;
 		VideoSyncSpeed = 3000;
 	}
@@ -431,8 +427,7 @@ static void SingleGameLoop()
 }
 
 struct GameLogic: public CThread {
-	void Run()
-	{
+	void Run() {
 		while (GameRunning) {
 			GameLogicLoop();
 		}

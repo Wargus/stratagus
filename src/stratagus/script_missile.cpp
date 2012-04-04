@@ -137,7 +137,7 @@ static int CclDefineMissileType(lua_State *l)
 		} else if (!strcmp(value, "ImpactSound")) {
 			mtype->ImpactSound.Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Class")) {
-			const char* className = LuaToString(l, -1);
+			const char *className = LuaToString(l, -1);
 			unsigned int i = 0;
 			for (; MissileClassNames[i]; ++i) {
 				if (!strcmp(className, MissileClassNames[i])) {
@@ -196,9 +196,9 @@ static int CclDefineMissileType(lua_State *l)
 static int CclMissile(lua_State *l)
 {
 	MissileType *type = NULL;
-	PixelPos position = {-1, -1};
-	PixelPos destination = {-1, -1};
-	PixelPos source = {-1, -1};
+	PixelPos position = { -1, -1};
+	PixelPos destination = { -1, -1};
+	PixelPos source = { -1, -1};
 	Missile *missile = NULL;
 
 	DebugPrint("FIXME: not finished\n");
@@ -322,7 +322,7 @@ static int CclMissile(lua_State *l)
 static int CclDefineBurningBuilding(lua_State *l)
 {
 	for (std::vector<BurningBuildingFrame *>::iterator i = BurningBuildingFrames.begin();
-			i != BurningBuildingFrames.end(); ++i) {
+		 i != BurningBuildingFrames.end(); ++i) {
 		delete *i;
 	}
 	BurningBuildingFrames.clear();

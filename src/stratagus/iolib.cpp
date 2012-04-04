@@ -144,7 +144,7 @@ int CFile::open(const char *name, long openflags)
 
 	if ((openflags & CL_OPEN_READ) && (openflags & CL_OPEN_WRITE)) {
 		openstring = "rwb";
-	} else if (openflags &CL_OPEN_READ) {
+	} else if (openflags & CL_OPEN_READ) {
 		openstring = "rb";
 	} else if (openflags & CL_OPEN_WRITE) {
 		openstring = "wb";
@@ -158,20 +158,20 @@ int CFile::open(const char *name, long openflags)
 
 	if (openflags & CL_OPEN_WRITE) {
 #ifdef USE_BZ2LIB
-		if ((openflags & CL_WRITE_BZ2) &&
-				(cl_bz = BZ2_bzopen(strcat(strcpy(buf, name), ".bz2"), openstring))) {
+		if ((openflags & CL_WRITE_BZ2)
+			&& (cl_bz = BZ2_bzopen(strcat(strcpy(buf, name), ".bz2"), openstring))) {
 			cl_type = CLF_TYPE_BZIP2;
 		} else
 #endif
 #ifdef USE_ZLIB
-		if ((openflags & CL_WRITE_GZ) &&
-				(cl_gz = gzopen(strcat(strcpy(buf, name), ".gz"), openstring))) {
-			cl_type = CLF_TYPE_GZIP;
-		} else
+			if ((openflags & CL_WRITE_GZ)
+				&& (cl_gz = gzopen(strcat(strcpy(buf, name), ".gz"), openstring))) {
+				cl_type = CLF_TYPE_GZIP;
+			} else
 #endif
-		if ((cl_plain = fopen(name, openstring))) {
-			cl_type = CLF_TYPE_PLAIN;
-		}
+				if ((cl_plain = fopen(name, openstring))) {
+					cl_type = CLF_TYPE_PLAIN;
+				}
 	} else {
 		if (!(cl_plain = fopen(name, openstring))) { // try plain first
 #ifdef USE_ZLIB
@@ -180,11 +180,11 @@ int CFile::open(const char *name, long openflags)
 			} else
 #endif
 #ifdef USE_BZ2LIB
-			if ((cl_bz = BZ2_bzopen(strcat(strcpy(buf, name), ".bz2"), "rb"))) {
-				cl_type = CLF_TYPE_BZIP2;
-			} else
+				if ((cl_bz = BZ2_bzopen(strcat(strcpy(buf, name), ".bz2"), "rb"))) {
+					cl_type = CLF_TYPE_BZIP2;
+				} else
 #endif
-			{ }
+				{ }
 
 		} else {
 			cl_type = CLF_TYPE_PLAIN;
@@ -225,7 +225,6 @@ int CFile::open(const char *name, long openflags)
 		//fprintf(stderr, "%s in ", buf);
 		return -1;
 	}
-
 	return 0;
 }
 
@@ -589,7 +588,7 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 **  @return the number of entries added to FileList.
 */
 int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *),
-	std::vector<FileList> &fl)
+					  std::vector<FileList> &fl)
 {
 #ifndef _MSC_VER
 	DIR *dirp;
@@ -703,17 +702,16 @@ public:
 	RawFileWriter(const std::string &filename) {
 		file = fopen(filename.c_str(), "wb");
 		if (!file) {
-			fprintf(stderr,"Can't open file '%s' for writing\n", filename.c_str());
+			fprintf(stderr, "Can't open file '%s' for writing\n", filename.c_str());
 			throw FileException();
 		}
 	}
 
 	virtual ~RawFileWriter() {
-		if(file) fclose(file);
+		if (file) { fclose(file); }
 	}
 
-	virtual int write(const char *data, unsigned int size)
-	{
+	virtual int write(const char *data, unsigned int size) {
 		return fwrite(data, size, 1, file);
 	}
 };
@@ -726,17 +724,16 @@ public:
 	GzFileWriter(const std::string &filename) {
 		file = gzopen(filename.c_str(), "wb9");
 		if (!file) {
-			fprintf(stderr,"Can't open file '%s' for writing\n", filename.c_str());
+			fprintf(stderr, "Can't open file '%s' for writing\n", filename.c_str());
 			throw FileException();
 		}
 	}
 
 	virtual ~GzFileWriter() {
-		if(file) gzclose(file);
+		if (file) { gzclose(file); }
 	}
 
-	virtual int write(const char *data, unsigned int size)
-	{
+	virtual int write(const char *data, unsigned int size) {
 		return gzwrite(file, data, size);
 	}
 };

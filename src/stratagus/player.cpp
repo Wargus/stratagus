@@ -344,8 +344,8 @@ void InitPlayers()
 		}
 		for (int x = 0; x < PlayerColorIndexCount; ++x) {
 			PlayerColors[p][x] = Video.MapRGB(TheScreen->format,
-				PlayerColorsRGB[p][x].r,
-				PlayerColorsRGB[p][x].g, PlayerColorsRGB[p][x].b);
+											  PlayerColorsRGB[p][x].r,
+											  PlayerColorsRGB[p][x].g, PlayerColorsRGB[p][x].b);
 		}
 	}
 }
@@ -420,9 +420,9 @@ void CPlayer::Save(CFile &file) const
 		case PlayerNobody:        file.printf("\"nobody\",");          break;
 		case PlayerComputer:      file.printf("\"computer\",");        break;
 		case PlayerPerson:        file.printf("\"person\",");          break;
-		case PlayerRescuePassive: file.printf("\"rescue-passive\",");break;
+		case PlayerRescuePassive: file.printf("\"rescue-passive\","); break;
 		case PlayerRescueActive:  file.printf("\"rescue-active\","); break;
-		default:                  file.printf("%d,", p.Type);break;
+		default:                  file.printf("%d,", p.Type); break;
 	}
 	file.printf(" \"race\", \"%s\",", PlayerRaces.Name[p.Race].c_str());
 	file.printf(" \"ai-name\", \"%s\",\n", p.AiName.c_str());
@@ -430,7 +430,7 @@ void CPlayer::Save(CFile &file) const
 
 	file.printf(" \"enemy\", \"");
 	for (int j = 0; j < PlayerMax; ++j) {
-		file.printf("%c",(p.Enemy & (1 << j)) ? 'X' : '_');
+		file.printf("%c", (p.Enemy & (1 << j)) ? 'X' : '_');
 	}
 	file.printf("\", \"allied\", \"");
 	for (int j = 0; j < PlayerMax; ++j) {
@@ -621,20 +621,17 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 				if (Players[i].Type == PlayerComputer) {
 					this->Allied |= (1 << i);
 					Players[i].Allied |= (1 << NumPlayers);
-				} else if (Players[i].Type == PlayerPerson ||
-						Players[i].Type == PlayerRescueActive) {
+				} else if (Players[i].Type == PlayerPerson || Players[i].Type == PlayerRescueActive) {
 					this->Enemy |= (1 << i);
 					Players[i].Enemy |= (1 << NumPlayers);
 				}
 				break;
 			case PlayerPerson:
 				// Humans are enemy of all?
-				if (Players[i].Type == PlayerComputer ||
-						Players[i].Type == PlayerPerson) {
+				if (Players[i].Type == PlayerComputer || Players[i].Type == PlayerPerson) {
 					this->Enemy |= (1 << i);
 					Players[i].Enemy |= (1 << NumPlayers);
-				} else if (Players[i].Type == PlayerRescueActive ||
-						Players[i].Type == PlayerRescuePassive) {
+				} else if (Players[i].Type == PlayerRescueActive || Players[i].Type == PlayerRescuePassive) {
 					this->Allied |= (1 << i);
 					Players[i].Allied |= (1 << NumPlayers);
 				}
@@ -669,7 +666,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 		this->MaxResources[i] = DefaultResourceMaxAmounts[i];
 	}
 
-	memset(this->UnitTypesCount, 0, sizeof (this->UnitTypesCount));
+	memset(this->UnitTypesCount, 0, sizeof(this->UnitTypesCount));
 
 	this->Supply = 0;
 	this->Demand = 0;
@@ -678,8 +675,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 
 	this->Color = PlayerColors[NumPlayers][0];
 
-	if (Players[NumPlayers].Type == PlayerComputer ||
-			Players[NumPlayers].Type == PlayerRescueActive) {
+	if (Players[NumPlayers].Type == PlayerComputer || Players[NumPlayers].Type == PlayerRescueActive) {
 		this->AiEnabled = true;
 	} else {
 		this->AiEnabled = false;
@@ -729,9 +725,9 @@ void CPlayer::Clear()
 	Supply = 0;
 	Demand = 0;
 	// FIXME: can't clear limits since it's initialized already
-//	UnitLimit = 0;
-//	BuildingLimit = 0;
-//	TotalUnitLimit = 0;
+	//	UnitLimit = 0;
+	//	BuildingLimit = 0;
+	//	TotalUnitLimit = 0;
 	Score = 0;
 	TotalUnits = 0;
 	TotalBuildings = 0;
@@ -743,7 +739,7 @@ void CPlayer::Clear()
 }
 
 
-void CPlayer::AddUnit(CUnit& unit)
+void CPlayer::AddUnit(CUnit &unit)
 {
 	Assert(unit.Player != this);
 	Assert(unit.PlayerSlot == static_cast<size_t>(-1));
@@ -753,13 +749,13 @@ void CPlayer::AddUnit(CUnit& unit)
 	Assert(this->Units[unit.PlayerSlot] == &unit);
 }
 
-void CPlayer::RemoveUnit(CUnit& unit)
+void CPlayer::RemoveUnit(CUnit &unit)
 {
 	Assert(unit.Player == this);
 	Assert(this->Units[unit.PlayerSlot] == &unit);
 
-//	unit.Player = NULL; // we can remove dying unit...
-	CUnit* last = this->Units.back();
+	//	unit.Player = NULL; // we can remove dying unit...
+	CUnit *last = this->Units.back();
 
 	this->Units[unit.PlayerSlot] = last;
 	last->PlayerSlot = unit.PlayerSlot;
@@ -770,27 +766,27 @@ void CPlayer::RemoveUnit(CUnit& unit)
 
 
 
-std::vector<CUnit*>::const_iterator CPlayer::UnitBegin() const
+std::vector<CUnit *>::const_iterator CPlayer::UnitBegin() const
 {
 	return Units.begin();
 }
 
-std::vector<CUnit*>::iterator CPlayer::UnitBegin()
+std::vector<CUnit *>::iterator CPlayer::UnitBegin()
 {
 	return Units.begin();
 }
 
-std::vector<CUnit*>::const_iterator CPlayer::UnitEnd() const
+std::vector<CUnit *>::const_iterator CPlayer::UnitEnd() const
 {
 	return Units.end();
 }
 
-std::vector<CUnit*>::iterator CPlayer::UnitEnd()
+std::vector<CUnit *>::iterator CPlayer::UnitEnd()
 {
 	return Units.end();
 }
 
-CUnit& CPlayer::GetUnit(int index) const
+CUnit &CPlayer::GetUnit(int index) const
 {
 	return *Units[index];
 }
@@ -1078,8 +1074,7 @@ void SetPlayersPalette()
 	for (int i = 0; i < PlayerMax; ++i) {
 		delete[] Players[i].UnitColors.Colors;
 		Players[i].UnitColors.Colors = new SDL_Color[PlayerColorIndexCount];
-		memcpy(Players[i].UnitColors.Colors, PlayerColorsRGB[i],
-			sizeof(SDL_Color) * PlayerColorIndexCount);
+		memcpy(Players[i].UnitColors.Colors, PlayerColorsRGB[i], sizeof(SDL_Color) * PlayerColorIndexCount);
 	}
 }
 
@@ -1109,11 +1104,11 @@ void DebugPlayers()
 			default : playertype = "?unknown?   "; break;
 		}
 		DebugPrint("%2d: %8.8s %c %-8.8s %s %7s %s\n" _C_ i _C_ PlayerColorNames[i].c_str() _C_
-			ThisPlayer == &Players[i] ? '*' :
-				Players[i].AiEnabled ? '+' : ' ' _C_
-			Players[i].Name.c_str() _C_ playertype _C_
-			PlayerRaces.Name[Players[i].Race].c_str() _C_
-			Players[i].AiName.c_str());
+				   ThisPlayer == &Players[i] ? '*' :
+				   Players[i].AiEnabled ? '+' : ' ' _C_
+				   Players[i].Name.c_str() _C_ playertype _C_
+				   PlayerRaces.Name[Players[i].Race].c_str() _C_
+				   Players[i].AiName.c_str());
 	}
 #endif
 }
@@ -1144,8 +1139,7 @@ void CPlayer::Notify(int type, const Vec2i &pos, const char *fmt, ...) const
 	temp[sizeof(temp) - 1] = '\0';
 	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
 	va_end(va);
-	switch (type)
-	{
+	switch (type) {
 		case NotifyRed:
 			color = ColorRed;
 			break;
@@ -1289,8 +1283,8 @@ bool CPlayer::IsSharedVision(const CUnit &unit) const
 */
 bool CPlayer::IsBothSharedVision(const CPlayer &player) const
 {
-	return (SharedVision & (1 << player.Index)) != 0 &&
-		(player.SharedVision & (1 << Index)) != 0;
+	return (SharedVision & (1 << player.Index)) != 0
+		   && (player.SharedVision & (1 << Index)) != 0;
 }
 
 /**

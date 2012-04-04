@@ -133,7 +133,7 @@ void LoadPO(const char *file)
 			currmsg = msgid;
 			*currmsg = '\0';
 			s += 6;
-			while (*s == ' ') ++s;
+			while (*s == ' ') { ++s; }
 		} else if (!strncmp(s, "msgstr ", 7)) {
 			if (state == MSGID) {
 				*currmsg = '\0';
@@ -142,7 +142,7 @@ void LoadPO(const char *file)
 			currmsg = msgstr;
 			*currmsg = '\0';
 			s += 7;
-			while (*s == ' ') ++s;
+			while (*s == ' ') { ++s; }
 		}
 
 		// String

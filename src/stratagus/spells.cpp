@@ -69,7 +69,7 @@
 /**
 ** Define the names and effects of all im play available spells.
 */
-std::vector<SpellType*> SpellTypeTable;
+std::vector<SpellType *> SpellTypeTable;
 
 
 /*----------------------------------------------------------------------------
@@ -123,12 +123,12 @@ int Demolish::Cast(CUnit &caster, const SpellType *, CUnit *, int x, int y)
 	//  Effect of the explosion on units. Don't bother if damage is 0
 	//
 	if (this->Damage) {
-		std::vector<CUnit*> table;
+		std::vector<CUnit *> table;
 		Map.SelectFixed(minpos, maxpos, table);
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &unit = *table[i];
-			if (unit.Type->UnitType != UnitTypeFly && unit.IsAlive() &&
-					unit.MapDistanceTo(x, y) <= this->Range) {
+			if (unit.Type->UnitType != UnitTypeFly && unit.IsAlive()
+				&& unit.MapDistanceTo(x, y) <= this->Range) {
 				// Don't hit flying units!
 				HitUnit(&caster, unit, this->Damage);
 			}
@@ -193,7 +193,7 @@ int AreaAdjustVitals::Cast(CUnit &caster, const SpellType *spell, CUnit *target,
 	caster.Variable[MANA_INDEX].Value -= spell->ManaCost;
 	for (size_t j = 0; j != units.size(); ++j) {
 		target = units[j];
-// if (!PassCondition(caster, spell, target, x, y) {
+		// if (!PassCondition(caster, spell, target, x, y) {
 		if (!CanCastSpell(caster, spell, target, x, y)) {
 			continue;
 		}
@@ -248,8 +248,9 @@ int AreaBombardment::Cast(CUnit &caster, const SpellType *, CUnit *, int x, int 
 			dy = y + SyncRand() % 5 - 2;
 		} while (!Map.Info.IsPointOnMap(dx, dy));
 
-		const PixelPos dest = { dx * PixelTileSize.x + PixelTileSize.x / 2,
-								dy * PixelTileSize.y + PixelTileSize.y / 2};
+		const PixelPos dest = { dx *PixelTileSize.x + PixelTileSize.x / 2,
+								dy *PixelTileSize.y + PixelTileSize.y / 2
+							  };
 		const PixelPos start = dest + offset;
 		for (int i = 0; i < shards; ++i) {
 			::Missile *mis = MakeMissile(*missile, start, dest);
@@ -282,7 +283,7 @@ int AreaBombardment::Cast(CUnit &caster, const SpellType *, CUnit *, int x, int 
 ** @param resy         pointer to Y coord of the result
 */
 static void EvaluateMissileLocation(const SpellActionMissileLocation *location,
-	CUnit &caster, CUnit *target, int x, int y, int *resx, int *resy)
+									CUnit &caster, CUnit *target, int x, int y, int *resx, int *resy)
 {
 	if (location->Base == LocBaseCaster) {
 		*resx = caster.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2;
@@ -323,9 +324,9 @@ int SpawnMissile::Cast(CUnit &caster, const SpellType *, CUnit *target, int x, i
 	PixelPos endPos;
 
 	EvaluateMissileLocation(&this->StartPoint,
-		caster, target, x, y, &startPos.x, &startPos.y);
+							caster, target, x, y, &startPos.x, &startPos.y);
 	EvaluateMissileLocation(&this->EndPoint,
-		caster, target, x, y, &endPos.x, &endPos.y);
+							caster, target, x, y, &endPos.x, &endPos.y);
 
 	::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
 	missile->TTL = this->TTL;
@@ -388,7 +389,7 @@ int AdjustVariable::Cast(CUnit &caster, const SpellType *, CUnit *target, int, i
 		}
 		unit->Variable[i].Value += this->Var[i].AddValue;
 		unit->Variable[i].Value += this->Var[i].IncreaseTime
-			* unit->Variable[i].Increase;
+								   * unit->Variable[i].Increase;
 
 		if (unit->Variable[i].Value <= 0) {
 			unit->Variable[i].Value = 0;
@@ -446,12 +447,12 @@ int AdjustVitals::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int
 	//  Avoid div by 0 errors too!
 	castcount = 1;
 	if (hp) {
-		castcount = std::max<int>(castcount, diffHP / abs(hp) + (((hp < 0) &&
-			(diffHP % (-hp) > 0)) ? 1 : 0));
+		castcount = std::max<int>(castcount,
+								diffHP / abs(hp) + (((hp < 0) && (diffHP % (-hp) > 0)) ? 1 : 0));
 	}
 	if (mana) {
-		castcount = std::max<int>(castcount, diffMana / abs(mana) + (((mana < 0) &&
-			(diffMana % (-mana) > 0)) ? 1 : 0));
+		castcount = std::max<int>(castcount,
+								diffMana / abs(mana) + (((mana < 0) && (diffMana % (-mana) > 0)) ? 1 : 0));
 	}
 	if (manacost) {
 		castcount = std::min<int>(castcount, caster.Variable[MANA_INDEX].Value / manacost);
@@ -483,8 +484,9 @@ int AdjustVitals::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int
 	if (target->Variable[MANA_INDEX].Value > target->Variable[MANA_INDEX].Max) {
 		target->Variable[MANA_INDEX].Value = target->Variable[MANA_INDEX].Max;
 	}
-	if (spell->RepeatCast)
+	if (spell->RepeatCast) {
 		return 1;
+	}
 	return 0;
 }
 
@@ -574,16 +576,16 @@ int Capture::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int, int
 		if ((100 * target->Variable[HP_INDEX].Value) /
 			target->Variable[HP_INDEX].Max > this->DamagePercent &&
 			target->Variable[HP_INDEX].Value > this->Damage) {
-				HitUnit(&caster, *target, this->Damage);
-				if (this->SacrificeEnable) {
-					// No corpse.
-					caster.Remove(NULL);
-					UnitLost(caster);
-					UnitClearOrders(caster);
-				}
-				return 1;
+			HitUnit(&caster, *target, this->Damage);
+			if (this->SacrificeEnable) {
+				// No corpse.
+				caster.Remove(NULL);
+				UnitLost(caster);
+				UnitClearOrders(caster);
 			}
+			return 1;
 		}
+	}
 	caster.Player->Score += target->Variable[POINTS_INDEX].Value;
 	if (caster.IsEnemy(*target)) {
 		if (target->Type->Building) {
@@ -617,8 +619,7 @@ int Capture::Cast(CUnit &caster, const SpellType *spell, CUnit *target, int, int
 class IsDyingAndNotABuilding
 {
 public:
-	bool operator () (const CUnit* unit) const
-	{
+	bool operator()(const CUnit *unit) const {
 		return unit->CurrentAction() == UnitActionDie && !unit->Type->Building;
 	}
 };
@@ -636,7 +637,7 @@ public:
 **  @return             =!0 if spell should be repeated, 0 if not
 */
 int Summon::Cast(CUnit &caster, const SpellType *spell,
-	CUnit *target, int x, int y)
+				 CUnit *target, int x, int y)
 {
 	int cansummon;
 	CUnitType &unittype = *this->UnitType;
@@ -721,7 +722,7 @@ static Target *NewTargetUnit(CUnit &unit)
 **  @return            true if passed, false otherwise.
 */
 static bool PassCondition(const CUnit &caster, const SpellType *spell, const CUnit *target,
-	int, int, const ConditionInfo *condition)
+						  int, int, const ConditionInfo *condition)
 {
 	if (caster.Variable[MANA_INDEX].Value < spell->ManaCost) { // Check caster mana.
 		return false;
@@ -751,7 +752,7 @@ static bool PassCondition(const CUnit &caster, const SpellType *spell, const CUn
 				return false;
 			}
 		}
-	// Value and Max
+		// Value and Max
 		if (condition->Variable[i].MinValue >= unit->Variable[i].Value) {
 			return false;
 		}
@@ -767,7 +768,7 @@ static bool PassCondition(const CUnit &caster, const SpellType *spell, const CUn
 		if (!unit->Variable[i].Max) {
 			continue;
 		}
-	// Percent
+		// Percent
 		if (condition->Variable[i].MinValuePercent * unit->Variable[i].Max
 			>= 100 * unit->Variable[i].Value) {
 			return false;
@@ -786,14 +787,14 @@ static bool PassCondition(const CUnit &caster, const SpellType *spell, const CUn
 	}
 	if (condition->Alliance != CONDITION_TRUE) {
 		if ((condition->Alliance == CONDITION_ONLY) ^
-				// own units could be not allied ?
-				(caster.IsAllied(*target) || target->Player == caster.Player)) {
+			// own units could be not allied ?
+			(caster.IsAllied(*target) || target->Player == caster.Player)) {
 			return false;
 		}
 	}
 	if (condition->Opponent != CONDITION_TRUE) {
 		if ((condition->Opponent == CONDITION_ONLY) ^
-				(caster.IsEnemy(*target) && 1)) {
+			(caster.IsEnemy(*target) && 1)) {
 			return false;
 		}
 	}
@@ -854,8 +855,8 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType *spell
 
 	switch (spell->Target) {
 		case TargetSelf :
-			if (PassCondition(caster, spell, &caster, x, y, spell->Condition) &&
-					PassCondition(caster, spell, &caster, x, y, autocast->Condition)) {
+			if (PassCondition(caster, spell, &caster, x, y, spell->Condition)
+				&& PassCondition(caster, spell, &caster, x, y, autocast->Condition)) {
 				return NewTargetUnit(caster);
 			}
 			return NULL;
@@ -875,8 +876,8 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType *spell
 			for (size_t i = 0; i != table.size(); ++i) {
 				//  FIXME: autocast conditions should include normal conditions.
 				//  FIXME: no, really, they should.
-				if (PassCondition(caster, spell, table[i], x, y, spell->Condition) &&
-						PassCondition(caster, spell, table[i], x, y, autocast->Condition)) {
+				if (PassCondition(caster, spell, table[i], x, y, spell->Condition)
+					&& PassCondition(caster, spell, table[i], x, y, autocast->Condition)) {
 					table[n++] = table[i];
 				}
 			}
@@ -972,7 +973,7 @@ bool SpellIsAvailable(const CPlayer &player, int spellid)
 **  @note caster must know the spell, and spell must be researched.
 */
 bool CanCastSpell(const CUnit &caster, const SpellType *spell,
-	const CUnit *target, int x, int y)
+				  const CUnit *target, int x, int y)
 {
 	if (spell->Target == TargetUnit && target == NULL) {
 		return false;
@@ -1004,7 +1005,7 @@ int AutoCastSpell(CUnit &caster, const SpellType *spell)
 		// Must move before ?
 		// FIXME: SpellType* of CommandSpellCast must be const.
 		CommandSpellCast(caster, target->targetPos, target->Unit,
-			const_cast<SpellType *>(spell), FlushCommands);
+						 const_cast<SpellType *>(spell), FlushCommands);
 		delete target;
 	}
 	return 1;
@@ -1040,7 +1041,7 @@ int SpellCast(CUnit &caster, const SpellType *spell, CUnit *target, int x, int y
 		target = &caster;
 	}
 	DebugPrint("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->Ident.c_str() _C_
-		caster.Type->Name.c_str() _C_ target ? target->Type->Name.c_str() : "none" _C_ x _C_ y);
+			   caster.Type->Name.c_str() _C_ target ? target->Type->Name.c_str() : "none" _C_ x _C_ y);
 	if (CanCastSpell(caster, spell, target, x, y)) {
 		cont = 1;
 		mustSubtractMana = 1;
@@ -1048,8 +1049,8 @@ int SpellCast(CUnit &caster, const SpellType *spell, CUnit *target, int x, int y
 		//  Ugly hack, CastAdjustVitals makes it's own mana calculation.
 		//
 		PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
-		for (std::vector<SpellActionType*>::const_iterator act = spell->Action.begin();
-			act != spell->Action.end();	++act) {
+		for (std::vector<SpellActionType *>::const_iterator act = spell->Action.begin();
+			 act != spell->Action.end(); ++act) {
 			if ((*act)->ModifyManaCaster) {
 				mustSubtractMana = 0;
 			}

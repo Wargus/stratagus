@@ -114,7 +114,8 @@ void CleanGroups()
 	}
 }
 
-bool IsGroupTainted(int num) {
+bool IsGroupTainted(int num)
+{
 	Assert(num < NUM_GROUPS);
 	return Groups[num].tainted;
 }
@@ -131,8 +132,7 @@ int GetNumberUnitsOfGroup(int num, GroupSelectionMode mode)
 	Assert(num < NUM_GROUPS);
 	if (mode != SELECT_ALL && Groups[num].tainted && Groups[num].NumUnits) {
 		int count = 0;
-		for(int i = 0; i < Groups[num].NumUnits; ++i)
-		{
+		for (int i = 0; i < Groups[num].NumUnits; ++i) {
 			const CUnitType *type = Groups[num].Units[i]->Type;
 			if (type && type->CanSelect(mode)) {
 				count++;

@@ -182,8 +182,7 @@ void ShowTitleScreens()
 		}
 
 		if (!TitleScreens[i]->Music.empty()) {
-			if (TitleScreens[i]->Music == "none" ||
-					PlayMusic(TitleScreens[i]->Music) == -1) {
+			if (TitleScreens[i]->Music == "none" || PlayMusic(TitleScreens[i]->Music) == -1) {
 				StopMusic();
 			}
 		}

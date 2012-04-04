@@ -421,7 +421,7 @@ static SpellActionType *CclSpellAction(lua_State *l)
 				lua_pop(l, 1);
 				spellaction->NewForm = UnitTypeByIdent(value);
 				if (!spellaction->NewForm) {
-					spellaction->NewForm= 0;
+					spellaction->NewForm = 0;
 					DebugPrint("unit type \"%s\" not found for polymorph spell.\n" _C_ value);
 				}
 				// FIXME: temp polymorphs? hard to do.

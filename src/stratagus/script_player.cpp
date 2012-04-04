@@ -810,12 +810,12 @@ static int CclSetPlayerData(lua_State *l)
 		const std::string res = LuaToString(l, 3);
 		const int resId = GetResourceIdByName(l, res.c_str());
 		p->SetResource(resId, LuaToNumber(l, 4));
-// } else if (!strcmp(data, "UnitTypesCount")) {
-// } else if (!strcmp(data, "AiEnabled")) {
-// } else if (!strcmp(data, "TotalNumUnits")) {
-// } else if (!strcmp(data, "NumBuildings")) {
-// } else if (!strcmp(data, "Supply")) {
-// } else if (!strcmp(data, "Demand")) {
+		// } else if (!strcmp(data, "UnitTypesCount")) {
+		// } else if (!strcmp(data, "AiEnabled")) {
+		// } else if (!strcmp(data, "TotalNumUnits")) {
+		// } else if (!strcmp(data, "NumBuildings")) {
+		// } else if (!strcmp(data, "Supply")) {
+		// } else if (!strcmp(data, "Demand")) {
 	} else if (!strcmp(data, "UnitLimit")) {
 		p->UnitLimit = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "BuildingLimit")) {
@@ -880,12 +880,9 @@ void PlayerCclRegister()
 
 	lua_register(Lua, "SetMaxSelectable", CclSetMaxSelectable);
 
-	lua_register(Lua, "SetAllPlayersUnitLimit",
-		CclSetAllPlayersUnitLimit);
-	lua_register(Lua, "SetAllPlayersBuildingLimit",
-		CclSetAllPlayersBuildingLimit);
-	lua_register(Lua, "SetAllPlayersTotalUnitLimit",
-		CclSetAllPlayersTotalUnitLimit);
+	lua_register(Lua, "SetAllPlayersUnitLimit", CclSetAllPlayersUnitLimit);
+	lua_register(Lua, "SetAllPlayersBuildingLimit", CclSetAllPlayersBuildingLimit);
+	lua_register(Lua, "SetAllPlayersTotalUnitLimit", CclSetAllPlayersTotalUnitLimit);
 
 	lua_register(Lua, "SetDiplomacy", CclSetDiplomacy);
 	lua_register(Lua, "Diplomacy", CclDiplomacy);

@@ -97,13 +97,12 @@ void LuaCallback::pushString(const std::string &s)
 */
 void LuaCallback::run()
 {
-	int status;
+	//FIXME call error reporting function
+	int status = lua_pcall(luastate, arguments, 0, base);
 
-	 //FIXME call error reporting function
-	status = lua_pcall(luastate, arguments, 0, base);
 	if (status) {
-		const char *msg;
-		msg = lua_tostring(luastate, -1);
+		const char *msg = lua_tostring(luastate, -1);
+
 		if (msg == NULL) {
 			msg = "(error with no message)";
 		}
