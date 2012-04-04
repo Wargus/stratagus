@@ -68,7 +68,7 @@ CGraphic *CMap::FogGraphic;
 **  Mapping for fog of war tiles.
 */
 static const int FogTable[16] = {
-	 0,11,10, 2,  13, 6, 14, 3,  12, 15, 4, 1,  8, 9, 7, 0,
+	0, 11, 10, 2,  13, 6, 14, 3,  12, 15, 4, 1,  8, 9, 7, 0,
 };
 
 static unsigned short *VisibleTable;
@@ -84,12 +84,11 @@ static CGraphic *AlphaFogG;
 class _filter_flags
 {
 public:
-	_filter_flags(const CPlayer &p, int *fogmask) : player(&p), fogmask(fogmask)
-	{
+	_filter_flags(const CPlayer &p, int *fogmask) : player(&p), fogmask(fogmask) {
 		Assert(fogmask != NULL);
 	}
 
-	void operator() (const CUnit *const unit) const {
+	void operator()(const CUnit *const unit) const {
 		if (!unit->IsVisibleAsGoal(*player)) {
 			*fogmask &= ~unit->Type->FieldFlags;
 		}
@@ -120,8 +119,7 @@ int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask)
 
 int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask)
 {
-	if (Map.Info.IsPointOnMap(pos))
-	{
+	if (Map.Info.IsPointOnMap(pos)) {
 		return MapFogFilterFlags(player, Map.getIndex(pos), mask);
 	}
 	return mask;
@@ -265,7 +263,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	if (!range) {
 		return;
 	}
-// Up hemi-cyle
+	// Up hemi-cyle
 	const int miny = std::max(-range, 0 - pos.y);
 	for (int offsety = miny; offsety != 0; ++offsety) {
 		const int offsetx = isqrt(square(range + 1) - square(-offsety) - 1);
@@ -276,9 +274,9 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
 #ifdef MARKER_ON_INDEX
-				marker(player, mpos.x + index);
+			marker(player, mpos.x + index);
 #else
-				marker(player, mpos);
+			marker(player, mpos);
 #endif
 		}
 	}
@@ -290,13 +288,13 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
 #ifdef MARKER_ON_INDEX
-				marker(player, mpos.x + index);
+			marker(player, mpos.x + index);
 #else
-				marker(player, mpos);
+			marker(player, mpos);
 #endif
 		}
 	}
-// bottom hemi-cycle
+	// bottom hemi-cycle
 	const int maxy = std::min(range, Map.Info.MapHeight - pos.y - h);
 	for (int offsety = 0; offsety < maxy; ++offsety) {
 		const int offsetx = isqrt(square(range + 1) - square(offsety) - 1);
@@ -307,9 +305,9 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
 #ifdef MARKER_ON_INDEX
-				marker(player, mpos.x + index);
+			marker(player, mpos.x + index);
 #else
-				marker(player, mpos);
+			marker(player, mpos);
 #endif
 		}
 	}
@@ -330,10 +328,10 @@ void UpdateFogOfWarChange()
 		int w = Map.Info.MapHeight * Map.Info.MapWidth;
 		do {
 			if (Map.IsFieldExplored(*ThisPlayer, index)) {
-					Map.MarkSeenTile(index);
+				Map.MarkSeenTile(index);
 			}
 			index++;
-		} while(--w);
+		} while (--w);
 	}
 	//
 	//  Global seen recount.
@@ -378,7 +376,7 @@ void VideoDrawOnlyFog(int x, int y)
 		SDL_BlitSurface(OnlyFogSurface, &srect, TheScreen, &drect);
 	} else {
 		Video.FillRectangleClip(Video.MapRGBA(0, 0, 0, 0, FogOfWarOpacity),
-			x, y, PixelTileSize.x, PixelTileSize.y);
+								x, y, PixelTileSize.x, PixelTileSize.y);
 	}
 }
 
@@ -404,7 +402,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 
 
 	int w = Map.Info.MapWidth;
-	int tile = 0,tile2 = 0;
+	int tile = 0, tile2 = 0;
 	int x = sx - sy;
 	//int y = sy / Map.Info.MapWidth;
 
@@ -423,7 +421,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 			if (!IsMapFieldExploredTable(x - 1 + index)) {
 				tile2 |= 2;
 				tile |= 2;
-			//} else if (!IsMapFieldVisibleTable(x - 1, y - 1)) {
+				//} else if (!IsMapFieldVisibleTable(x - 1, y - 1)) {
 			} else if (!IsMapFieldVisibleTable(x - 1 + index)) {
 				tile |= 2;
 			}
@@ -432,7 +430,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 		if (!IsMapFieldExploredTable(x + index)) {
 			tile2 |= 3;
 			tile |= 3;
-		//} else if (!IsMapFieldVisibleTable(x, y - 1)) {
+			//} else if (!IsMapFieldVisibleTable(x, y - 1)) {
 		} else if (!IsMapFieldVisibleTable(x + index)) {
 			tile |= 3;
 		}
@@ -441,7 +439,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 			if (!IsMapFieldExploredTable(x + 1 + index)) {
 				tile2 |= 1;
 				tile |= 1;
-			//} else if (!IsMapFieldVisibleTable(x + 1, y - 1)) {
+				//} else if (!IsMapFieldVisibleTable(x + 1, y - 1)) {
 			} else if (!IsMapFieldVisibleTable(x + 1 + index)) {
 				tile |= 1;
 			}
@@ -454,7 +452,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 		if (!IsMapFieldExploredTable(x - 1 + index)) {
 			tile2 |= 10;
 			tile |= 10;
-		//} else if (!IsMapFieldVisibleTable(x - 1, y)) {
+			//} else if (!IsMapFieldVisibleTable(x - 1, y)) {
 		} else if (!IsMapFieldVisibleTable(x - 1 + index)) {
 			tile |= 10;
 		}
@@ -465,7 +463,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 		if (!IsMapFieldExploredTable(x + 1 + index)) {
 			tile2 |= 5;
 			tile |= 5;
-		//} else if (!IsMapFieldVisibleTable(x + 1, y)) {
+			//} else if (!IsMapFieldVisibleTable(x + 1, y)) {
 		} else if (!IsMapFieldVisibleTable(x + 1 + index)) {
 			tile |= 5;
 		}
@@ -478,7 +476,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 			if (!IsMapFieldExploredTable(x - 1 + index)) {
 				tile2 |= 8;
 				tile |= 8;
-			//} else if (!IsMapFieldVisibleTable(x - 1, y + 1)) {
+				//} else if (!IsMapFieldVisibleTable(x - 1, y + 1)) {
 			} else if (!IsMapFieldVisibleTable(x - 1 + index)) {
 				tile |= 8;
 			}
@@ -487,7 +485,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 		if (!IsMapFieldExploredTable(x + index)) {
 			tile2 |= 12;
 			tile |= 12;
-		//} else if (!IsMapFieldVisibleTable(x, y + 1)) {
+			//} else if (!IsMapFieldVisibleTable(x, y + 1)) {
 		} else if (!IsMapFieldVisibleTable(x + index)) {
 			tile |= 12;
 		}
@@ -496,7 +494,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 			if (!IsMapFieldExploredTable(x + 1 + index)) {
 				tile2 |= 4;
 				tile |= 4;
-			//} else if (!IsMapFieldVisibleTable(x + 1, y + 1)) {
+				//} else if (!IsMapFieldVisibleTable(x + 1, y + 1)) {
 			} else if (!IsMapFieldVisibleTable(x + 1 + index)) {
 				tile |= 4;
 			}
@@ -550,12 +548,12 @@ void CViewport::DrawMapFogOfWar() const
 		return;
 	}
 
-    sx = std::max<int>(MapX - 1, 0);
-    ex = std::min<int>(MapX + MapWidth + 1, Map.Info.MapWidth);
-    my = std::max<int>(MapY - 1, 0);
-    ey = std::min<int>(MapY + MapHeight + 1, Map.Info.MapHeight);
+	sx = std::max<int>(MapX - 1, 0);
+	ex = std::min<int>(MapX + MapWidth + 1, Map.Info.MapWidth);
+	my = std::max<int>(MapY - 1, 0);
+	ey = std::min<int>(MapY + MapHeight + 1, Map.Info.MapHeight);
 
-    // Update for visibility all tile in viewport
+	// Update for visibility all tile in viewport
 	// and 1 tile around viewport (for fog-of-war connection display)
 
 	unsigned int my_index = my * Map.Info.MapWidth;
@@ -607,7 +605,7 @@ void CMap::InitFogOfWar()
 		// Generate Only Fog surface.
 		//
 		s = SDL_CreateRGBSurface(SDL_SWSURFACE, PixelTileSize.x, PixelTileSize.y,
-			32, RMASK, GMASK, BMASK, AMASK);
+								 32, RMASK, GMASK, BMASK, AMASK);
 
 		SDL_GetRGB(FogOfWarColorSDL, TheScreen->format, &r, &g, &b);
 		color = Video.MapRGB(s->format, r, g, b);
@@ -634,13 +632,13 @@ void CMap::InitFogOfWar()
 			// Copy the top row to a new surface
 			f = FogGraphic->Surface->format;
 			s = SDL_CreateRGBSurface(SDL_SWSURFACE, FogGraphic->Surface->w, PixelTileSize.y,
-				f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
+									 f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
 			SDL_LockSurface(s);
 			SDL_LockSurface(FogGraphic->Surface);
 			for (i = 0; i < s->h; ++i) {
 				memcpy((Uint8 *)s->pixels + i * s->pitch,
-					(Uint8 *)FogGraphic->Surface->pixels + i * FogGraphic->Surface->pitch,
-					FogGraphic->Surface->w * f->BytesPerPixel);
+					   (Uint8 *)FogGraphic->Surface->pixels + i * FogGraphic->Surface->pitch,
+					   FogGraphic->Surface->w * f->BytesPerPixel);
 			}
 			SDL_UnlockSurface(s);
 			SDL_UnlockSurface(FogGraphic->Surface);
@@ -649,11 +647,11 @@ void CMap::InitFogOfWar()
 			SDL_LockSurface(s);
 			for (j = 0; j < s->h; ++j) {
 				for (i = 0; i < s->w; ++i) {
-					c = *(Uint32 *)&((Uint8*)s->pixels)[i * 4 + j * s->pitch];
+					c = *(Uint32 *) &((Uint8 *)s->pixels)[i * 4 + j * s->pitch];
 					Video.GetRGBA(c, s->format, &r, &g, &b, &a);
 					if (a) {
 						c = Video.MapRGBA(s->format, r, g, b, FogOfWarOpacity);
-						*(Uint32 *)&((Uint8*)s->pixels)[i * 4 + j * s->pitch] = c;
+						*(Uint32 *)&((Uint8 *)s->pixels)[i * 4 + j * s->pitch] = c;
 					}
 
 				}

@@ -95,9 +95,9 @@ bool CUnit::IsVisibleOnRadar(const CPlayer &pradar) const
 				return true;
 			}
 			++mf;
-		} while(--i);
+		} while (--i);
 		index += Map.Info.MapWidth;
-	} while(--j);
+	} while (--j);
 
 	// Can't exit till the end, as we might be be able to see a different tile
 	return false;

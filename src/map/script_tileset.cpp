@@ -221,17 +221,17 @@ static void DefineTilesetParseSpecial(lua_State *l, CTileset *tileset)
 			lua_rawgeti(l, -1, j + 1);
 			tileset->BotOneTree = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		//
-		//  removed-tree
-		//
+			//
+			//  removed-tree
+			//
 		} else if (!strcmp(value, "removed-tree")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
 			tileset->RemovedTree = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		//
-		//  growing-tree
-		//
+			//
+			//  growing-tree
+			//
 		} else if (!strcmp(value, "growing-tree")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
@@ -248,9 +248,9 @@ static void DefineTilesetParseSpecial(lua_State *l, CTileset *tileset)
 			}
 			lua_pop(l, 1);
 
-		//
-		//  top-one-rock, mid-one-rock, bot-one-rock
-		//
+			//
+			//  top-one-rock, mid-one-rock, bot-one-rock
+			//
 		} else if (!strcmp(value, "top-one-rock")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
@@ -266,9 +266,9 @@ static void DefineTilesetParseSpecial(lua_State *l, CTileset *tileset)
 			lua_rawgeti(l, -1, j + 1);
 			tileset->BotOneRock = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		//
-		//  removed-rock
-		//
+			//
+			//  removed-rock
+			//
 		} else if (!strcmp(value, "removed-rock")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
@@ -456,16 +456,16 @@ static void DefineTilesetParseSlot(lua_State *l, CTileset *tileset, int t)
 			lua_rawgeti(l, t, j + 1);
 			DefineTilesetParseSpecial(l, tileset);
 			lua_pop(l, 1);
-		//
-		//  solid part
-		//
+			//
+			//  solid part
+			//
 		} else if (!strcmp(value, "solid")) {
 			lua_rawgeti(l, t, j + 1);
 			index = DefineTilesetParseSolid(l, tileset, index);
 			lua_pop(l, 1);
-		//
-		//  mixed part
-		//
+			//
+			//  mixed part
+			//
 		} else if (!strcmp(value, "mixed")) {
 			lua_rawgeti(l, t, j + 1);
 			index = DefineTilesetParseMixed(l, tileset, index);
@@ -611,8 +611,8 @@ static int CclBuildTilesetTables(lua_State *l)
 		} else {
 			if (Map.Tileset.Tiles[i].BaseTerrain != 0 &&
 				Map.Tileset.Tiles[i].MixTerrain == 0) {
-					if (Map.Tileset.FlagsTable[i] & MapFieldForest) {
-						solid = i;
+				if (Map.Tileset.FlagsTable[i] & MapFieldForest) {
+					solid = i;
 				}
 			}
 			i += 16;
@@ -720,9 +720,9 @@ static int CclBuildTilesetTables(lua_State *l)
 		} else {
 			if (Map.Tileset.Tiles[i].BaseTerrain != 0 &&
 				Map.Tileset.Tiles[i].MixTerrain == 0) {
-					  if (Map.Tileset.FlagsTable[i] & MapFieldRocks) {
+				if (Map.Tileset.FlagsTable[i] & MapFieldRocks) {
 					solid = i;
-					  }
+				}
 			}
 			i += 16;
 		}

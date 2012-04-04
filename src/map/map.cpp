@@ -103,7 +103,7 @@ void CMap::MarkSeenTile(const unsigned int index)
 			FixTile(MapFieldForest, 1, pos);
 			FixNeighbors(MapFieldForest, 1, pos);
 
-		// Handle rock changes.
+			// Handle rock changes.
 		} else if (seentile != this->Tileset.RemovedRock && tile == Map.Tileset.RemovedRock) {
 			FixNeighbors(MapFieldRocks, 1, pos);
 		} else if (seentile == this->Tileset.RemovedRock && tile != Map.Tileset.RemovedRock) {
@@ -112,11 +112,11 @@ void CMap::MarkSeenTile(const unsigned int index)
 			FixTile(MapFieldRocks, 1, pos);
 			FixNeighbors(MapFieldRocks, 1, pos);
 
-		//  Handle Walls changes.
-		} else if (this->Tileset.TileTypeTable[tile] == TileTypeHumanWall ||
-				this->Tileset.TileTypeTable[tile] == TileTypeOrcWall ||
-				this->Tileset.TileTypeTable[seentile] == TileTypeHumanWall ||
-				this->Tileset.TileTypeTable[seentile] == TileTypeOrcWall) {
+			//  Handle Walls changes.
+		} else if (this->Tileset.TileTypeTable[tile] == TileTypeHumanWall
+					|| this->Tileset.TileTypeTable[tile] == TileTypeOrcWall
+					|| this->Tileset.TileTypeTable[seentile] == TileTypeHumanWall
+					|| this->Tileset.TileTypeTable[seentile] == TileTypeOrcWall) {
 			MapFixSeenWallTile(pos);
 			MapFixSeenWallNeighbors(pos);
 		}
@@ -149,8 +149,7 @@ void CMap::Reveal()
 		//  Reveal neutral buildings. Gold mines:)
 		if (Units[i]->Player->Type == PlayerNeutral) {
 			for (int p = 0; p < PlayerMax; ++p) {
-				if (Players[p].Type != PlayerNobody &&
-						(!(Units[i]->Seen.ByPlayer & (1 << p)))) {
+				if (Players[p].Type != PlayerNobody && (!(Units[i]->Seen.ByPlayer & (1 << p)))) {
 					UnitGoesOutOfFog(*Units[i], Players[p]);
 					UnitGoesUnderFog(*Units[i], Players[p]);
 				}
@@ -232,8 +231,8 @@ bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos)
 
 	for (int addy = 0; addy < type.TileHeight; ++addy) {
 		for (int addx = 0; addx < type.TileWidth; ++addx) {
-			if (!(Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy) &&
-				!Map.CheckMask(pos.x + addx + index, mask))) {
+			if (!(Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy)
+				&& !Map.CheckMask(pos.x + addx + index, mask))) {
 				return false;
 			}
 		}
@@ -350,8 +349,7 @@ void CMap::Clean()
 void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 {
 	//  Outside of map or no wood.
-	if (!Info.IsPointOnMap(pos))
-	{
+	if (!Info.IsPointOnMap(pos)) {
 		return;
 	}
 	unsigned int index = getIndex(pos);
@@ -449,7 +447,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 
 	//Test if we have top tree, or bottom tree, they are special
 	if ((ttdown & 0x10) && 1) {
-		tile |= ((ttleft & 0x06) && 1)* 1;
+		tile |= ((ttleft & 0x06) && 1) * 1;
 		tile |= ((ttright & 0x09) && 1) * 2;
 	}
 
@@ -481,7 +479,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 			UI.Minimap.UpdateXY(pos);
 		}
 	} else if (seen && this->Tileset.MixedLookupTable[mf->SeenTile] ==
-				this->Tileset.MixedLookupTable[tile]) { //Same Type
+			   this->Tileset.MixedLookupTable[tile]) { //Same Type
 		return;
 	} else {
 		if (seen) {
@@ -509,10 +507,9 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 */
 void CMap::FixNeighbors(unsigned short type, int seen, const Vec2i &pos)
 {
-	const Vec2i offset[] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
+	const Vec2i offset[] = {{1, 0}, { -1, 0}, {0, 1}, {0, -1}, { -1, -1}, { -1, 1}, {1, -1}, {1, 1}};
 
-	for (unsigned int i = 0; i < sizeof (offset) / sizeof (*offset); ++i)
-	{
+	for (unsigned int i = 0; i < sizeof(offset) / sizeof(*offset); ++i) {
 		FixTile(type, seen, pos + offset[i]);
 	}
 }
@@ -583,9 +580,9 @@ void CMap::RegenerateForestTile(int x, int y)
 	if (mf->Value >= ForestRegeneration || ++mf->Value == ForestRegeneration) {
 		if (y && !(mf->Flags & occupedFlag)) {
 			CMapField *tmp = mf - this->Info.MapWidth;
-			if (tmp->Tile == this->Tileset.RemovedTree &&
-					tmp->Value >= ForestRegeneration &&
-					!(tmp->Flags & occupedFlag)) {
+			if (tmp->Tile == this->Tileset.RemovedTree
+				&& tmp->Value >= ForestRegeneration
+				&& !(tmp->Flags & occupedFlag)) {
 				DebugPrint("Real place wood\n");
 				tmp->Tile = this->Tileset.TopOneTree;
 				tmp->Value = 0;

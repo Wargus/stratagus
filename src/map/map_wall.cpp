@@ -77,9 +77,8 @@
 */
 static int MapIsSeenTileWall(int x, int y, int walltype)
 {
-	int t;
+	int t = Map.Tileset.TileTypeTable[Map.Field(x, y)->SeenTile];
 
-	t = Map.Tileset.TileTypeTable[Map.Field(x, y)->SeenTile];
 	if (walltype == -1) {
 		return t == TileTypeHumanWall || t == TileTypeOrcWall;
 	}
@@ -89,21 +88,16 @@ static int MapIsSeenTileWall(int x, int y, int walltype)
 /**
 ** Correct the seen wall field, depending on the surrounding.
 **
-** @param x Map X tile-position.
-** @param y Map Y tile-position.
+** @param pos Map tile-position.
 */
 void MapFixSeenWallTile(const Vec2i &pos)
 {
-	int t;
-	int tile;
-	CMapField *mf;
-
 	//  Outside of map or no wall.
 	if (!Map.Info.IsPointOnMap(pos)) {
 		return;
 	}
-	mf = Map.Field(pos);
-	t = Map.Tileset.TileTypeTable[mf->SeenTile];
+	CMapField *mf = Map.Field(pos);
+	int t = Map.Tileset.TileTypeTable[mf->SeenTile];
 	if (t != TileTypeHumanWall && t != TileTypeOrcWall) {
 		return;
 	}
@@ -111,7 +105,7 @@ void MapFixSeenWallTile(const Vec2i &pos)
 	//
 	//  Calculate the correct tile. Depends on the surrounding.
 	//
-	tile = 0;
+	int tile = 0;
 	if ((pos.y - 1) < 0 || MapIsSeenTileWall(pos.x, pos.y - 1, t)) {
 		tile |= 1 << 0;
 	}
@@ -173,10 +167,9 @@ void MapFixSeenWallTile(const Vec2i &pos)
 */
 void MapFixSeenWallNeighbors(const Vec2i &pos)
 {
-	const Vec2i offset[] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+	const Vec2i offset[] = {{1, 0}, { -1, 0}, {0, 1}, {0, -1}};
 
-	for (unsigned int i = 0; i < 4; ++i)
-	{
+	for (unsigned int i = 0; i < 4; ++i) {
 		MapFixSeenWallTile(pos + offset[i]);
 	}
 }
@@ -184,8 +177,7 @@ void MapFixSeenWallNeighbors(const Vec2i &pos)
 /**
 ** Correct the real wall field, depending on the surrounding.
 **
-** @param x Map X tile-position.
-** @param y Map Y tile-position.
+** @param pos Map tile-position.
 */
 void MapFixWallTile(const Vec2i &pos)
 {
@@ -203,20 +195,20 @@ void MapFixWallTile(const Vec2i &pos)
 	//  Calculate the correct tile. Depends on the surrounding.
 	//
 	int tile = 0;
-	if ((pos.y - 1) < 0 || (Map.Field(pos.x, (pos.y - 1))->
-			Flags & (MapFieldHuman | MapFieldWall)) == t) {
+	if ((pos.y - 1) < 0
+		|| (Map.Field(pos.x, (pos.y - 1))->Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 0;
 	}
-	if ((pos.x + 1) >= Map.Info.MapWidth || (Map.Field(pos.x + 1, pos.y)->
-			Flags & (MapFieldHuman | MapFieldWall)) == t) {
+	if ((pos.x + 1) >= Map.Info.MapWidth
+		|| (Map.Field(pos.x + 1, pos.y)->Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 1;
 	}
-	if ((pos.y + 1) >= Map.Info.MapHeight || (Map.Field(pos.x, pos.y + 1)->
-			Flags & (MapFieldHuman | MapFieldWall)) == t) {
+	if ((pos.y + 1) >= Map.Info.MapHeight
+		|| (Map.Field(pos.x, pos.y + 1)->Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 2;
 	}
-	if ((pos.x - 1) < 0 || (Map.Field(pos.x - 1, pos.y)->
-			Flags & (MapFieldHuman | MapFieldWall)) == t) {
+	if ((pos.x - 1) < 0
+		|| (Map.Field(pos.x - 1, pos.y)->Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 3;
 	}
 
@@ -269,10 +261,9 @@ void MapFixWallTile(const Vec2i &pos)
 */
 static void MapFixWallNeighbors(const Vec2i &pos)
 {
-	const Vec2i offset[] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+	const Vec2i offset[] = {{1, 0}, { -1, 0}, {0, 1}, {0, -1}};
 
-	for (unsigned int i = 0; i < sizeof (offset) / sizeof (*offset); ++i)
-	{
+	for (unsigned int i = 0; i < sizeof(offset) / sizeof(*offset); ++i) {
 		MapFixWallTile(pos + offset[i]);
 	}
 }

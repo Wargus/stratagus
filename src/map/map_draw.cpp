@@ -106,7 +106,7 @@ PixelPos CViewport::MapToScreenPixelPos(const PixelPos &mapPixelPos) const
 }
 
 /// convert screen coordinate into tilepos
-Vec2i CViewport::ScreenToTilePos(const PixelPos& screenPixelPos) const
+Vec2i CViewport::ScreenToTilePos(const PixelPos &screenPixelPos) const
 {
 	const PixelPos mapPixelPos = ScreenToMapPixelPos(screenPixelPos);
 	const Vec2i tilePos = {mapPixelPos.x / PixelTileSize.x, mapPixelPos.y / PixelTileSize.y};
@@ -239,13 +239,13 @@ void CViewport::DrawMapBackgroundInViewport() const
 
 	while (dy <= ey && sy  < map_max) {
 
-	/*
-		if (sy / Map.Info.MapWidth < 0) {
-			sy += Map.Info.MapWidth;
-			dy += PixelTileSize.y;
-			continue;
-		}
-*/
+		/*
+			if (sy / Map.Info.MapWidth < 0) {
+				sy += Map.Info.MapWidth;
+				dy += PixelTileSize.y;
+				continue;
+			}
+		*/
 		int sx = this->MapX + sy;
 		int dx = this->X - this->OffsetX;
 		while (dx <= ex && (sx - sy < Map.Info.MapWidth)) {
@@ -265,35 +265,33 @@ void CViewport::DrawMapBackgroundInViewport() const
 #ifdef DEBUG
 			int my_mask = 0;
 			unsigned int color = 0;
-			if (Map.CheckMask(sx, MapFieldUnpassable))
-			{
+			if (Map.CheckMask(sx, MapFieldUnpassable)) {
 				my_mask = 1;
 			}
-			if (Map.CheckMask(sx, MapFieldNoBuilding))
-			{
+			if (Map.CheckMask(sx, MapFieldNoBuilding)) {
 				my_mask |= 2;
 			}
-			switch(my_mask) {
+			switch (my_mask) {
 				case 1://tile only Unpassable
 					color = 0xFF0000;
-				break;
+					break;
 				case 2://tile only NoBuilding
 					color = 0x00FF00;
-				break;
+					break;
 				case 3://tile Unpassable and NoBuilding
 					color = 0xFF;
-				break;
+					break;
 				default:
-				break;
+					break;
 			}
 
 			Video.DrawHLineClip(color, dx, dy, PixelTileSize.x);
 			Video.DrawVLineClip(color, dx, dy, PixelTileSize.y);
-			if ( 0 && my_mask ) {
+			if (0 && my_mask) {
 				CLabel label(GetSmallFont());
-				label.Draw(dx + 2, dy +2, tile);
+				label.Draw(dx + 2, dy + 2, tile);
 				label.Draw(dx + 2, dy + GetSmallFont()->Height() + 4,
-					 Map.Fields[sx].TilesetTile );
+						   Map.Fields[sx].TilesetTile);
 
 			}
 #endif
@@ -305,12 +303,12 @@ void CViewport::DrawMapBackgroundInViewport() const
 	}
 }
 
-class CDrawProxy {
+class CDrawProxy
+{
 public:
 	CDrawProxy() : nunits(0), nmissiles(0) {}
 
-	void Update(const CViewport &vp)
-	{
+	void Update(const CViewport &vp) {
 		// We find and sort units after draw level.
 		if (lock.TryLock()) {
 			nunits = FindAndSortUnits(&vp, unittable);
@@ -319,10 +317,9 @@ public:
 		}
 	}
 
-	void Draw(const CViewport &vp)
-	{
+	void Draw(const CViewport &vp) {
 		int i = 0, j = 0;
-		lock.Lock ();
+		lock.Lock();
 		while (i < nunits && j < nmissiles) {
 			if (unittable[i].Type->DrawLevel <= missiletable[j].Type->DrawLevel) {
 				unittable[i].Draw(&vp);
@@ -372,7 +369,7 @@ void CViewport::Draw() const
 		Proxy->Draw(*this);
 	} else {
 		std::vector<CUnit *> unittable;
-		Missile* missiletable[MAX_MISSILES * 9];
+		Missile *missiletable[MAX_MISSILES * 9];
 
 		// We find and sort units after draw level.
 		FindAndSortUnits(this, unittable);
@@ -406,8 +403,8 @@ void CViewport::Draw() const
 	//
 	//FIXME: This is still unsecure during parallel
 	if (!Preference.ShowOrders) {
-	} else if (Preference.ShowOrders < 0 ||
-		(ShowOrdersCount >= GameCycle) || (KeyModifiers & ModifierShift)) {
+	} else if (Preference.ShowOrders < 0
+				|| (ShowOrdersCount >= GameCycle) || (KeyModifiers & ModifierShift)) {
 		for (int i = 0; i < NumSelected; ++i) {
 			ShowOrder(*Selected[i]);
 		}
@@ -432,10 +429,11 @@ void CViewport::DrawBorder() const
 	}
 
 	Video.DrawRectangle(color, this->X, this->Y, this->EndX - this->X + 1,
-		this->EndY - this->Y + 1);
+						this->EndY - this->Y + 1);
 }
 
-CViewport::~CViewport() {
+CViewport::~CViewport()
+{
 	delete Proxy;
 }
 

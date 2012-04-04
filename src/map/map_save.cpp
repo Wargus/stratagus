@@ -67,7 +67,7 @@ void CMap::Save(CFile &file) const
 	file.printf("StratagusMap(\n");
 
 	file.printf("  \"version\", \"" StratagusFormatString "\",\n",
-		StratagusFormatArgs(StratagusVersion));
+				StratagusFormatArgs(StratagusVersion));
 	file.printf("  \"description\", \"%s\",\n", this->Info.Description.c_str());
 
 	file.printf("  \"the-map\", {\n");
@@ -80,7 +80,7 @@ void CMap::Save(CFile &file) const
 	for (int h = 0; h < this->Info.MapHeight; ++h) {
 		file.printf("  -- %d\n", h);
 		for (int w = 0; w < this->Info.MapWidth; ++w) {
-			const CMapField& mf = *this->Field(w, h);
+			const CMapField &mf = *this->Field(w, h);
 
 			file.printf("  {%3d, %3d,", mf.Tile, mf.SeenTile);
 			if (mf.Value) {

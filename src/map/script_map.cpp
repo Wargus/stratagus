@@ -204,7 +204,7 @@ static int CclStratagusMap(lua_State *l)
 								Map.Fields[i].Flags |= MapFieldBuilding;
 
 							} else {
-							   LuaError(l, "Unsupported tag: %s" _C_ value);
+								LuaError(l, "Unsupported tag: %s" _C_ value);
 							}
 						}
 						lua_pop(l, 1);
@@ -212,12 +212,12 @@ static int CclStratagusMap(lua_State *l)
 					}
 					lua_pop(l, 1);
 				} else {
-				   LuaError(l, "Unsupported tag: %s" _C_ value);
+					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 			}
 
 		} else {
-		   LuaError(l, "Unsupported tag: %s" _C_ value);
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 
@@ -283,7 +283,7 @@ static int CclShowMapLocation(lua_State *l)
 
 	LuaCheckArgs(l, 4);
 	const char *unitname = LuaToString(l, 5);
-	CUnitType* unitType = UnitTypeByIdent(unitname);
+	CUnitType *unitType = UnitTypeByIdent(unitname);
 	if (!unitType) {
 		DebugPrint("Unable to find UnitType '%s'" _C_ unitname);
 		return 0;
@@ -394,18 +394,18 @@ static int CclSetForestRegeneration(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclSetFogOfWarColor(lua_State* l)
+static int CclSetFogOfWarColor(lua_State *l)
 {
-	int r,g,b;
+	int r, g, b;
 
 	LuaCheckArgs(l, 3);
 	r = LuaToNumber(l, 1);
 	g = LuaToNumber(l, 2);
 	b = LuaToNumber(l, 3);
 
-	if ( (r < 0 || r > 255) ||
-	     (g < 0 || g > 255) ||
-	     (b < 0 || b > 255) ) {
+	if ((r < 0 || r > 255) ||
+		(g < 0 || g > 255) ||
+		(b < 0 || b > 255)) {
 		LuaError(l, "Arguments must be in the range 0-255");
 	}
 
@@ -511,8 +511,9 @@ static int CclDefinePlayerTypes(lua_State *l)
 	for (i = numplayers; i < PlayerMax - 1; ++i) {
 		Map.Info.PlayerType[i] = PlayerNobody;
 	}
-	if (numplayers < PlayerMax)
-		Map.Info.PlayerType[PlayerMax-1] = PlayerNeutral;
+	if (numplayers < PlayerMax) {
+		Map.Info.PlayerType[PlayerMax - 1] = PlayerNeutral;
+	}
 	return 0;
 }
 
@@ -555,7 +556,7 @@ void MapCclRegister()
 	lua_register(Lua, "SetFogOfWarOpacity", CclSetFogOfWarOpacity);
 	lua_register(Lua, "SetFogOfWarColor", CclSetFogOfWarColor);
 
-	lua_register(Lua, "SetForestRegeneration",CclSetForestRegeneration);
+	lua_register(Lua, "SetForestRegeneration", CclSetForestRegeneration);
 
 	lua_register(Lua, "LoadTileModels", CclLoadTileModels);
 	lua_register(Lua, "DefinePlayerTypes", CclDefinePlayerTypes);
