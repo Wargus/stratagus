@@ -245,9 +245,25 @@ int main(int argc, char * argv[]) {
 	char title_path[BUFF_SIZE];
 
 #ifdef WIN32
+	char executable_path[BUFF_SIZE];
+	memset(executable_path, 0, sizeof(executable_path));
+	GetModuleFileName(NULL, executable_path, sizeof(executable_path)-1);
+
+	char executable_drive[_MAX_DRIVE];
+	char executable_dir[_MAX_DIR];
+	memset(executable_drive, 0, sizeof(executable_drive));
+	memset(executable_dir, 0, sizeof(executable_dir));
+	_splitpath(executable_path, executable_drive, executable_dir, NULL, NULL);
+
 	size_t data_path_size = sizeof(data_path);
 	memset(data_path, 0, data_path_size);
-	getcwd(data_path, data_path_size);
+
+	if (executable_path[0] && executable_drive[0] && executable_dir[0]) {
+		strcpy(data_path, executable_drive);
+		strcpy(data_path+strlen(executable_drive), executable_dir);
+	} else {
+		getcwd(data_path, data_path_size);
+	}
 
 	char stratagus_path[BUFF_SIZE];
 	DWORD stratagus_path_size = sizeof(stratagus_path);
