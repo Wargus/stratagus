@@ -39,12 +39,12 @@
 
 #include "unit.h"
 
-/* virtual */ void CAnimation_Label::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_Label::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 }
 
-/* virtual */ void CAnimation_Label::Init(const char* s)
+/* virtual */ void CAnimation_Label::Init(const char *s)
 {
 }
 

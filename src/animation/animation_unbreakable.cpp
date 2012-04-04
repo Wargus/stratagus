@@ -39,7 +39,7 @@
 
 #include "unit.h"
 
-/* virtual */ void CAnimation_Unbreakable::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_Unbreakable::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 	Assert(unit.Anim.Unbreakable ^ this->state);
@@ -47,14 +47,14 @@
 	unit.Anim.Unbreakable = this->state;
 }
 
-/* virtual */ void CAnimation_Unbreakable::Init(const char* s)
+/* virtual */ void CAnimation_Unbreakable::Init(const char *s)
 {
 	if (!strcmp(s, "begin")) {
 		this->state = 1;
 	} else if (!strcmp(s, "end")) {
 		this->state = 0;
 	} else {
-//		LuaError(l, "Unbreakable must be 'begin' or 'end'.  Found: %s" _C_ op2);
+		//LuaError(l, "Unbreakable must be 'begin' or 'end'.  Found: %s" _C_ op2);
 	}
 }
 

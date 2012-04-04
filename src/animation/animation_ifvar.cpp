@@ -40,8 +40,7 @@
 #include "unit.h"
 
 //IfVar compare types
-enum EIfVarBinOp
-{
+enum EIfVarBinOp {
 	IF_GREATER_EQUAL = 1,
 	IF_GREATER,
 	IF_LESS_EQUAL,
@@ -58,7 +57,7 @@ bool binOpEqual(int lhs, int rhs) { return lhs == rhs; }
 bool binOpNotEqual(int lhs, int rhs) { return lhs != rhs; }
 bool returnFalse(int , int) { return false; }
 
-/* virtual */ void CAnimation_IfVar::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_IfVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 
@@ -74,7 +73,7 @@ bool returnFalse(int , int) { return false; }
 /*
 ** s = "leftOp rigthOp Op gotoLabel"
 */
-/* virtual */ void CAnimation_IfVar::Init(const char* s)
+/* virtual */ void CAnimation_IfVar::Init(const char *s)
 {
 	const std::string str(s);
 	const size_t len = str.size();

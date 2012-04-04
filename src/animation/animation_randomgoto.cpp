@@ -39,7 +39,7 @@
 
 #include "unit.h"
 
-/* virtual */ void CAnimation_RandomGoto::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_RandomGoto::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 
@@ -51,7 +51,7 @@
 /*
 **  s : "percent label"
 */
-/* virtual */ void CAnimation_RandomGoto::Init(const char* s)
+/* virtual */ void CAnimation_RandomGoto::Init(const char *s)
 {
 	const std::string str(s);
 	const size_t len = str.size();

@@ -39,7 +39,7 @@
 
 #include "unit.h"
 
-/* virtual */ void CAnimation_Wait::Action(CUnit& unit, int &/*move*/, int scale) const
+/* virtual */ void CAnimation_Wait::Action(CUnit &unit, int &/*move*/, int scale) const
 {
 	Assert(unit.Anim.Anim == this);
 	unit.Anim.Wait = ParseAnimInt(&unit, this->wait.c_str()) << scale >> 8;
@@ -54,7 +54,7 @@
 	}
 }
 
-/* virtual */ void CAnimation_Wait::Init(const char* s)
+/* virtual */ void CAnimation_Wait::Init(const char *s)
 {
 	this->wait = s;
 }

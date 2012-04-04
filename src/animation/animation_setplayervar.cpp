@@ -163,7 +163,7 @@ static void SetPlayerData(int player, const char *prop, const char *arg, int val
 }
 
 
-/* virtual */ void CAnimation_SetPlayerVar::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_SetPlayerVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 
@@ -207,7 +207,7 @@ static void SetPlayerData(int player, const char *prop, const char *arg, int val
 /*
 **  s = "player var mod value [arg2]"
 */
-/* virtual */ void CAnimation_SetPlayerVar::Init(const char* s)
+/* virtual */ void CAnimation_SetPlayerVar::Init(const char *s)
 {
 	const std::string str(s);
 	const size_t len = str.size();

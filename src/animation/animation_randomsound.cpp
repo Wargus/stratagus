@@ -41,7 +41,7 @@
 #include "sound.h"
 #include "unit.h"
 
-/* virtual */ void CAnimation_RandomSound::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_RandomSound::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 
@@ -54,12 +54,12 @@
 /*
 **  s = "Sound1 [SoundN ...]"
 */
-/* virtual */ void CAnimation_RandomSound::Init(const char* s)
+/* virtual */ void CAnimation_RandomSound::Init(const char *s)
 {
 	const std::string str(s);
 	const size_t len = str.size();
 
-	for (size_t begin = 0; begin != std::string::npos; ) {
+	for (size_t begin = 0; begin != std::string::npos;) {
 		const size_t end = std::min(len, str.find(' ', begin));
 
 		this->sounds.push_back(SoundConfig(str.substr(begin, end - begin)));

@@ -39,7 +39,7 @@
 
 #include "unit.h"
 
-/* virtual */ void CAnimation_Die::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_Die::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 	if (unit.Anim.Unbreakable) {
@@ -52,12 +52,12 @@
 	throw AnimationDie_Exception();
 }
 
-/* virtual */ void CAnimation_Die::Init(const char* s)
+/* virtual */ void CAnimation_Die::Init(const char *s)
 {
 	this->DeathType = s;
 }
 
-void AnimationDie_OnCatch(CUnit& unit)
+void AnimationDie_OnCatch(CUnit &unit)
 {
 	unit.State = 0;
 	LetUnitDie(unit);

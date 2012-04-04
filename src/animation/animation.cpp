@@ -137,10 +137,10 @@ static int ParseAnimPlayer(const CUnit &unit, const char *parseint)
 int ParseAnimInt(const CUnit *unit, const char *parseint)
 {
 	char s[100];
-	const CUnit* goal = unit;
+	const CUnit *goal = unit;
 
 	strncpy(s, parseint, strlen(parseint) + 1);
-	char* cur = &s[2];
+	char *cur = &s[2];
 	if ((s[0] == 'v' || s[0] == 't') && unit != NULL) { //unit variable detected
 		if (s[0] == 't') {
 			if (unit->CurrentOrder()->HasGoal()) {
@@ -149,7 +149,7 @@ int ParseAnimInt(const CUnit *unit, const char *parseint)
 				return 0;
 			}
 		}
-		char* next = strchr(cur, '.');
+		char *next = strchr(cur, '.');
 		if (next == NULL) {
 			fprintf(stderr, "Need also specify the variable '%s' tag \n", cur);
 			Exit(1);
@@ -164,7 +164,7 @@ int ParseAnimInt(const CUnit *unit, const char *parseint)
 			fprintf(stderr, "Bad variable name '%s'\n", cur);
 			Exit(1);
 		}
-		if (!strcmp(next + 1,"Value")) {
+		if (!strcmp(next + 1, "Value")) {
 			return goal->Variable[index].Value;
 		} else if (!strcmp(next + 1, "Max")) {
 			return goal->Variable[index].Max;
@@ -177,12 +177,12 @@ int ParseAnimInt(const CUnit *unit, const char *parseint)
 		}
 		return 0;
 	} else if (s[0] == 'p' && unit != NULL) { //player variable detected
-		char* next = strchr(cur, '.');
+		char *next = strchr(cur, '.');
 		if (next == NULL) {
 			fprintf(stderr, "Need also specify the %s player's property\n", cur);
 			Exit(1);
 		} else {
-			*next='\0';
+			*next = '\0';
 		}
 		char *arg = strchr(next + 1, '.');
 		if (arg != NULL) {
@@ -190,7 +190,7 @@ int ParseAnimInt(const CUnit *unit, const char *parseint)
 		}
 		return GetPlayerData(ParseAnimPlayer(*unit, cur), next + 1, arg + 1);
 	} else if (s[0] == 'r') { //random value
-		char* next = strchr(cur, '.');
+		char *next = strchr(cur, '.');
 		if (next == NULL) {
 			return SyncRand(atoi(cur));
 		} else {
@@ -312,7 +312,7 @@ static int GetAdvanceIndex(const CAnimation *base, const CAnimation *anim)
 }
 
 
-static const CAnimation* Advance(const CAnimation* anim, int n)
+static const CAnimation *Advance(const CAnimation *anim, int n)
 {
 	for (int i = 0; i != n; ++i) {
 		anim = anim->Next;

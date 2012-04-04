@@ -48,7 +48,7 @@
 #define MOD_MOD 5
 
 
-/* virtual */ void CAnimation_SetVar::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_SetVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 
@@ -63,7 +63,7 @@
 		fprintf(stderr, "Need also specify the variable '%s' tag \n" _C_ arg1);
 		Exit(1);
 	} else {
-		*next ='\0';
+		*next = '\0';
 	}
 	const int index = UnitTypeVar.VariableNameLookup[arg1];// User variables
 	if (index == -1) {
@@ -91,7 +91,7 @@
 		value = goal->Variable[index].Value;
 	} else if (!strcmp(next + 1, "Max")) {
 		value = goal->Variable[index].Max;
-	} else if (!strcmp(next + 1,"Increase")) {
+	} else if (!strcmp(next + 1, "Increase")) {
 		value = goal->Variable[index].Increase;
 	} else if (!strcmp(next + 1, "Enable")) {
 		value = goal->Variable[index].Enable;
@@ -137,7 +137,7 @@
 /*
 **  s = "var mod value [unitSlot]"
 */
-/* virtual */ void CAnimation_SetVar::Init(const char* s)
+/* virtual */ void CAnimation_SetVar::Init(const char *s)
 {
 	const std::string str(s);
 	const size_t len = str.size();

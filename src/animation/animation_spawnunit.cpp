@@ -100,7 +100,7 @@ found:
 	resPos = pos;
 }
 
-/* virtual */ void CAnimation_SpawnUnit::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_SpawnUnit::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 
@@ -129,7 +129,7 @@ found:
 /*
 **  s = "unitType offX offY range player"
 */
-/* virtual */ void CAnimation_SpawnUnit::Init(const char* s)
+/* virtual */ void CAnimation_SpawnUnit::Init(const char *s)
 {
 	const std::string str(s);
 	const size_t len = str.size();

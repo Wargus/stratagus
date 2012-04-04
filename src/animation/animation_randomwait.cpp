@@ -39,7 +39,7 @@
 
 #include "unit.h"
 
-/* virtual */ void CAnimation_RandomWait::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_RandomWait::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 
@@ -52,7 +52,7 @@
 /*
 ** s = "minWait MaxWait"
 */
-/* virtual */ void CAnimation_RandomWait::Init(const char* s)
+/* virtual */ void CAnimation_RandomWait::Init(const char *s)
 {
 	const std::string str(s);
 	const size_t len = str.size();

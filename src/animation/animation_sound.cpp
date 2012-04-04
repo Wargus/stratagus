@@ -41,7 +41,7 @@
 #include "sound.h"
 #include "unit.h"
 
-/* virtual */ void CAnimation_Sound::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_Sound::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 	if (unit.IsVisible(*ThisPlayer) || ReplayRevealMap) {
@@ -49,7 +49,7 @@
 	}
 }
 
-/* virtual */ void CAnimation_Sound::Init(const char* s)
+/* virtual */ void CAnimation_Sound::Init(const char *s)
 {
 	this->sound.Name = s;
 }

@@ -52,7 +52,7 @@ void UnitRotate(CUnit &unit, int rotate)
 	UnitUpdateHeading(unit);
 }
 
-/* virtual */ void CAnimation_Rotate::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_Rotate::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 
@@ -70,7 +70,7 @@ void UnitRotate(CUnit &unit, int rotate)
 	}
 }
 
-/* virtual */ void CAnimation_Rotate::Init(const char* s)
+/* virtual */ void CAnimation_Rotate::Init(const char *s)
 {
 	this->rotateStr = s;
 }

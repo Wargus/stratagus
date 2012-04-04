@@ -39,7 +39,7 @@
 
 #include "unit.h"
 
-/* virtual */ void CAnimation_Move::Action(CUnit& unit, int &move, int /*scale*/) const
+/* virtual */ void CAnimation_Move::Action(CUnit &unit, int &move, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 	Assert(!move);
@@ -47,7 +47,7 @@
 	move = ParseAnimInt(&unit, this->moveStr.c_str());
 }
 
-/* virtual */ void CAnimation_Move::Init(const char* s)
+/* virtual */ void CAnimation_Move::Init(const char *s)
 {
 	this->moveStr = s;
 }

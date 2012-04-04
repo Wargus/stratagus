@@ -39,13 +39,13 @@
 
 #include "unit.h"
 
-/* virtual */ void CAnimation_ExactFrame::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_ExactFrame::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 	unit.Frame = ParseAnimInt(&unit);
 }
 
-/* virtual */ void CAnimation_ExactFrame::Init(const char* s)
+/* virtual */ void CAnimation_ExactFrame::Init(const char *s)
 {
 	this->frame = s;
 }

@@ -40,7 +40,7 @@
 #include "animation/animation_rotate.h"
 #include "unit.h"
 
-/* virtual */ void CAnimation_RandomRotate::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_RandomRotate::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 
@@ -51,7 +51,7 @@
 	}
 }
 
-/* virtual */ void CAnimation_RandomRotate::Init(const char* s)
+/* virtual */ void CAnimation_RandomRotate::Init(const char *s)
 {
 	this->rotateStr = s;
 }

@@ -63,8 +63,8 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 	int flags = 0;
 
 	strcpy(s, parseflag);
-	char* cur = s;
-	char* next = s;
+	char *cur = s;
+	char *next = s;
 	while (next) {
 		next = strchr(cur, '.');
 		if (next) {
@@ -90,7 +90,7 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 }
 
 
-/* virtual */ void CAnimation_SpawnMissile::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 
@@ -160,7 +160,7 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 /*
 **  s = "missileType startX startY destX destY [flag1[.flagN]]"
 */
-/* virtual */ void CAnimation_SpawnMissile::Init(const char* s)
+/* virtual */ void CAnimation_SpawnMissile::Init(const char *s)
 {
 	const std::string str(s);
 	const size_t len = str.size();

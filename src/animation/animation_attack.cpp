@@ -40,14 +40,14 @@
 #include "actions.h"
 #include "unit.h"
 
-/* virtual */ void CAnimation_Attack::Action(CUnit& unit, int &/*move*/, int /*scale*/) const
+/* virtual */ void CAnimation_Attack::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 	unit.CurrentOrder()->OnAnimationAttack(unit);
 }
 
 
-/* virtual */ void CAnimation_Attack::Init(const char* s)
+/* virtual */ void CAnimation_Attack::Init(const char *s)
 {
 }
 
