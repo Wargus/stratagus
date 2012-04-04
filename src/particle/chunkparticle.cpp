@@ -38,7 +38,8 @@
 
 static const int gravity = 32 * 12;
 
-static inline float deg2rad(int degrees) {
+static inline float deg2rad(int degrees)
+{
 	return degrees * (3.1415926535f / 180);
 }
 
@@ -77,20 +78,18 @@ void CChunkParticle::draw()
 	Uint32 color = ColorBlack;
 
 	Video.DrawRectangleClip(color, (int)screenPos.x - 1,
-		(int)calculateScreenPos(screenPos.y, height) - 1, 2, 2);
+							(int)calculateScreenPos(screenPos.y, height) - 1, 2, 2);
 }
 
-static float getHorizontalPosition(int initialVelocity,
-	float trajectoryAngle, float time)
+static float getHorizontalPosition(int initialVelocity, float trajectoryAngle, float time)
 {
-    return (initialVelocity * cos(trajectoryAngle)) * time;
+	return (initialVelocity * cos(trajectoryAngle)) * time;
 }
 
-static float getVerticalPosition(int initialVelocity,
-	float trajectoryAngle, float time)
+static float getVerticalPosition(int initialVelocity, float trajectoryAngle, float time)
 {
-    return (initialVelocity * sin(trajectoryAngle)) * time -
-    	(gravity / 2.0f) * (time * time);
+	return (initialVelocity * sin(trajectoryAngle)) * time -
+		   (gravity / 2.0f) * (time * time);
 }
 
 void CChunkParticle::update(int ticks)
@@ -115,8 +114,7 @@ void CChunkParticle::update(int ticks)
 
 	float time = age / 1000.f;
 
-	float distance =
-		getHorizontalPosition(initialVelocity, trajectoryAngle, time);
+	float distance = getHorizontalPosition(initialVelocity, trajectoryAngle, time);
 	pos.x = initialPos.x + distance * direction.x;
 	pos.y = initialPos.y + distance * direction.y;
 
@@ -124,7 +122,7 @@ void CChunkParticle::update(int ticks)
 }
 
 
-CParticle* CChunkParticle::clone()
+CParticle *CChunkParticle::clone()
 {
 	return new CChunkParticle(pos, smokeAnimation);
 }

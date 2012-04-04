@@ -62,9 +62,9 @@ void StaticParticle::update(int ticks)
 	}
 }
 
-CParticle* StaticParticle::clone()
+CParticle *StaticParticle::clone()
 {
-	CParticle * p = new StaticParticle(pos, animation);
+	CParticle *p = new StaticParticle(pos, animation);
 	return p;
 }
 

@@ -61,7 +61,7 @@ bool GraphicAnimation::isFinished()
 	return currentFrame >= g->NumFrames;
 }
 
-Animation * GraphicAnimation::clone()
+Animation *GraphicAnimation::clone()
 {
 	return new GraphicAnimation(g, ticksPerFrame);
 }

@@ -65,7 +65,7 @@ void CSmokeParticle::update(int ticks)
 	pos.y -= ticks / 1000.f * smokeRisePerSecond;
 }
 
-CParticle* CSmokeParticle::clone()
+CParticle *CSmokeParticle::clone()
 {
 	return new CSmokeParticle(pos, puff);
 }
