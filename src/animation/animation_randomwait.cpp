@@ -35,7 +35,7 @@
 
 #include "stratagus.h"
 
-#include "animation/animation_RandomWait.h"
+#include "animation/animation_randomwait.h"
 
 #include "unit.h"
 
