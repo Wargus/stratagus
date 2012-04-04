@@ -56,7 +56,7 @@
 #define LH_QUAD_M 0xFF00FF00 /// Left half quad mask
 #define RH_QUAD_M 0x00FF00FF /// Right half quad mask
 
-	/// Callback for changed tile (with direction mask)
+/// Callback for changed tile (with direction mask)
 static void EditorTileChanged2(const Vec2i &pos, int d);
 
 /*----------------------------------------------------------------------------
@@ -166,21 +166,21 @@ static int FindTilePath(int base, int goal, int length, char *marks, int *tile)
 	int l = INT_MAX;
 	for (int i = 0; i < Map.Tileset.NumTiles;) {
 		// goal found.
-		if (base == Map.Tileset.Tiles[i].BaseTerrain &&
-				goal == Map.Tileset.Tiles[i].MixTerrain) {
+		if (base == Map.Tileset.Tiles[i].BaseTerrain
+			&& goal == Map.Tileset.Tiles[i].MixTerrain) {
 			*tile = i;
 			return length;
 		}
 		// goal found.
-		if (goal == Map.Tileset.Tiles[i].BaseTerrain &&
-				base == Map.Tileset.Tiles[i].MixTerrain) {
+		if (goal == Map.Tileset.Tiles[i].BaseTerrain
+			&& base == Map.Tileset.Tiles[i].MixTerrain) {
 			*tile = i;
 			return length;
 		}
 
 		// possible path found
-		if (base == Map.Tileset.Tiles[i].BaseTerrain &&
-				Map.Tileset.Tiles[i].MixTerrain) {
+		if (base == Map.Tileset.Tiles[i].BaseTerrain
+			&& Map.Tileset.Tiles[i].MixTerrain) {
 			const int j = Map.Tileset.Tiles[i].MixTerrain;
 			if (!marks[j]) {
 				marks[j] = j;
@@ -191,9 +191,9 @@ static int FindTilePath(int base, int goal, int length, char *marks, int *tile)
 					l = n;
 				}
 			}
-		// possible path found
-		} else if (Map.Tileset.Tiles[i].BaseTerrain &&
-				base == Map.Tileset.Tiles[i].MixTerrain) {
+			// possible path found
+		} else if (Map.Tileset.Tiles[i].BaseTerrain
+				   && base == Map.Tileset.Tiles[i].MixTerrain) {
 			const int j = Map.Tileset.Tiles[i].BaseTerrain;
 			if (!marks[j]) {
 				marks[j] = j;
@@ -256,7 +256,7 @@ find_solid:
 			//
 			for (i = 0; i < Map.Tileset.NumTiles;) {
 				if (type1 == Map.Tileset.Tiles[i].BaseTerrain &&
-						!Map.Tileset.Tiles[i].MixTerrain) {
+					!Map.Tileset.Tiles[i].MixTerrain) {
 					break;
 				}
 				// Advance solid or mixed.
@@ -283,8 +283,7 @@ find_solid:
 		fixed = (quad >> 0) & 0xFF;
 		if (fixed != type1 && fixed != type2) {
 			quad &= 0xFFFFFF00;
-			if (FindTilePath(type1, fixed, 0, marks, &i) <
-					FindTilePath(type2, fixed, 0, marks, &i)) {
+			if (FindTilePath(type1, fixed, 0, marks, &i) < FindTilePath(type2, fixed, 0, marks, &i)) {
 				quad |= type1 << 0;
 			} else {
 				quad |= type2 << 0;
@@ -293,8 +292,7 @@ find_solid:
 		fixed = (quad >> 8) & 0xFF;
 		if (fixed != type1 && fixed != type2) {
 			quad &= 0xFFFF00FF;
-			if (FindTilePath(type1, fixed, 0, marks, &i) <
-					FindTilePath(type2, fixed, 0, marks, &i)) {
+			if (FindTilePath(type1, fixed, 0, marks, &i) < FindTilePath(type2, fixed, 0, marks, &i)) {
 				quad |= type1 << 8;
 			} else {
 				quad |= type2 << 8;
@@ -303,8 +301,7 @@ find_solid:
 		fixed = (quad >> 16) & 0xFF;
 		if (fixed != type1 && fixed != type2) {
 			quad &= 0xFF00FFFF;
-			if (FindTilePath(type1, fixed, 0, marks, &i) <
-					FindTilePath(type2, fixed, 0, marks, &i)) {
+			if (FindTilePath(type1, fixed, 0, marks, &i) < FindTilePath(type2, fixed, 0, marks, &i)) {
 				quad |= type1 << 16;
 			} else {
 				quad |= type2 << 16;
@@ -313,14 +310,12 @@ find_solid:
 		fixed = (quad >> 24) & 0xFF;
 		if (fixed != type1 && fixed != type2) {
 			quad &= 0x00FFFFFF;
-			if (FindTilePath(type1, fixed, 0, marks, &i) <
-					FindTilePath(type2, fixed, 0, marks, &i)) {
+			if (FindTilePath(type1, fixed, 0, marks, &i) < FindTilePath(type2, fixed, 0, marks, &i)) {
 				quad |= type1 << 24;
 			} else {
 				quad |= type2 << 24;
 			}
 		}
-
 		delete[] marks;
 	}
 
@@ -328,12 +323,10 @@ find_solid:
 	// Need a mixed tile
 	//
 	for (i = 0; i < Map.Tileset.NumTiles;) {
-		if (type1 == Map.Tileset.Tiles[i].BaseTerrain &&
-				type2 == Map.Tileset.Tiles[i].MixTerrain) {
+		if (type1 == Map.Tileset.Tiles[i].BaseTerrain && type2 == Map.Tileset.Tiles[i].MixTerrain) {
 			break;
 		}
-		if (type2 == Map.Tileset.Tiles[i].BaseTerrain &&
-				type1 == Map.Tileset.Tiles[i].MixTerrain) {
+		if (type2 == Map.Tileset.Tiles[i].BaseTerrain && type1 == Map.Tileset.Tiles[i].MixTerrain) {
 			// Other mixed
 			type1 ^= type2;
 			type2 ^= type1;
@@ -385,7 +378,7 @@ find_solid:
 	if (((quad >> 0) & 0xFF) == type1) {
 		direction |= 1;
 	}
-						  // 0  1  2  3   4  5  6  7   8  9  A   B  C   D  E  F
+	//                       0  1  2  3   4  5  6  7   8  9  A   B  C   D  E  F
 	const char table[16] = { 0, 7, 3, 11, 1, 9, 5, 13, 0, 8, 4, 12, 2, 10, 6, 0 };
 	return base | (table[direction] << 4);
 }
@@ -429,9 +422,9 @@ static void EditorChangeTile(const Vec2i &pos, int tile, int d)
 	// Change the flags
 	//
 	CMapField *mf = Map.Field(pos);
-	mf->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
-		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
-		MapFieldWall | MapFieldRocks | MapFieldForest);
+	mf->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed
+				   | MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable
+				   | MapFieldWall | MapFieldRocks | MapFieldForest);
 
 	mf->Flags |= Map.Tileset.FlagsTable[tile];
 
@@ -496,7 +489,7 @@ static void EditorTileChanged2(const Vec2i &pos, int d)
 		}
 	}
 	if (d & DIR_LEFT && pos.x) {
-		const Vec2i offset = {-1, 0};
+		const Vec2i offset = { -1, 0};
 		//
 		// Insert into the left the new tile.
 		//
