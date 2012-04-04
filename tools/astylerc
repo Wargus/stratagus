@@ -1,0 +1,29 @@
+# config file for AStyle ( http://astyle.sourceforge.net/ )
+# AStyle version : 2.02
+
+# style
+--style=otbs
+--indent=force-tab=4
+--lineend=linux
+--min-conditional-indent=0
+--keep-one-line-statements
+--keep-one-line-blocks
+--indent-preprocessor
+--indent-col1-comments
+--indent-switches
+--pad-oper
+--pad-header
+--unpad-paren
+--add-brackets
+--align-pointer=name
+--align-reference=name
+--mode=c
+
+
+# extra options
+
+--exclude=guichan
+--ignore-exclude-errors-x
+
+--preserve-date
+--suffix=none
