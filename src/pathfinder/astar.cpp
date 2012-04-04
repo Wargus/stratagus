@@ -73,10 +73,10 @@ static inline int AStarCosts(const Vec2i &pos, const Vec2i &goalPos)
 
 //  Convert heading into direction.
 //                      //  N NE  E SE  S SW  W NW
-const int Heading2X[9] = {  0,+1,+1,+1, 0,-1,-1,-1, 0 };
-const int Heading2Y[9] = { -1,-1, 0,+1,+1,+1, 0,-1, 0 };
+const int Heading2X[9] = {  0, +1, +1, +1, 0, -1, -1, -1, 0 };
+const int Heading2Y[9] = { -1, -1, 0, +1, +1, +1, 0, -1, 0 };
 int Heading2O[9];//heading to offset
-const int XY2Heading[3][3] = { {7,6,5},{0,0,4},{1,2,3}};
+const int XY2Heading[3][3] = { {7, 6, 5}, {0, 0, 4}, {1, 2, 3}};
 
 /// cost matrix
 static Node *AStarMatrix;
@@ -130,20 +130,21 @@ union LARGE_INTEGER {
 	uint64_t QuadPart;
 	uint32_t DoublePart[2];
 };
-inline int QueryPerformanceCounter(LARGE_INTEGER*ptr)
+inline int QueryPerformanceCounter(LARGE_INTEGER *ptr)
 {
-   unsigned int lo, hi;
-   __asm__ __volatile__ (      // serialize
-     "xorl %%eax,%%eax \n        cpuid"
-     ::: "%rax", "%rbx", "%rcx", "%rdx");
-   /* We cannot use "=A", since this would use %rax on x86_64 */
-   __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
-   ptr->DoublePart[0] = lo;
-   ptr->DoublePart[1] = hi;
-   return 1;
+	unsigned int lo, hi;
+	__asm__ __volatile__(       // serialize
+		"xorl %%eax,%%eax \n        cpuid"
+		::: "%rax", "%rbx", "%rcx", "%rdx");
+	/* We cannot use "=A", since this would use %rax on x86_64 */
+	__asm__ __volatile__("rdtsc" : "=a"(lo), "=d"(hi));
+	ptr->DoublePart[0] = lo;
+	ptr->DoublePart[1] = hi;
+	return 1;
 };
 
-inline int QueryPerformanceFrequency(LARGE_INTEGER*ptr){
+inline int QueryPerformanceFrequency(LARGE_INTEGER *ptr)
+{
 	ptr->QuadPart = 1000;
 	return 1;
 }
@@ -186,8 +187,7 @@ inline void ProfileEnd(const char *const function)
 	data->TotalTime += time;
 }
 
-static bool compProfileData(const ProfileData* lhs,
-						const ProfileData* rhs)
+static bool compProfileData(const ProfileData *lhs, const ProfileData *rhs)
 {
 	return (lhs->TotalTime > rhs->TotalTime);
 }
@@ -199,30 +199,29 @@ inline void ProfilePrint()
 	if (!QueryPerformanceFrequency(&frequency)) {
 		return;
 	}
-	std::vector<ProfileData*> prof;
-	for (std::map<const char *const, ProfileData>::iterator i
-		 = functionProfiles.begin(); i != functionProfiles.end(); ++i) {
+	std::vector<ProfileData *> prof;
+	for (std::map<const char *const, ProfileData>::iterator i = functionProfiles.begin();
+		i != functionProfiles.end(); ++i) {
 		ProfileData *data = &i->second;
 		prof.insert(std::upper_bound(prof.begin(), prof.end(), data, compProfileData), data);
 	}
 
-
 	FILE *fd = fopen("profile.txt", "wb");
 	fprintf(fd, "    total\t    calls\t      per\tname\n");
 
-	for (std::vector<ProfileData*>::iterator i = prof.begin(); i != prof.end(); ++i) {
+	for (std::vector<ProfileData *>::iterator i = prof.begin(); i != prof.end(); ++i) {
 		ProfileData *data = (*i);
 		fprintf(fd, "%9.3f\t%9lu\t%9.3f\t",
-			(double)data->TotalTime / frequency.QuadPart * 1000.0,
-			data->Calls,
-			(double)data->TotalTime / frequency.QuadPart * 1000.0 / data->Calls);
-			for (std::map<const char *const, ProfileData>::iterator j =
+				(double)data->TotalTime / frequency.QuadPart * 1000.0,
+				data->Calls,
+				(double)data->TotalTime / frequency.QuadPart * 1000.0 / data->Calls);
+		for (std::map<const char *const, ProfileData>::iterator j =
 				 functionProfiles.begin(); j != functionProfiles.end(); ++j) {
-				ProfileData *data2 = &j->second;
-				if (data == data2) {
-					fprintf(fd, "%s\n",j->first);
-				}
+			ProfileData *data2 = &j->second;
+			if (data == data2) {
+				fprintf(fd, "%s\n", j->first);
 			}
+		}
 
 	}
 
@@ -263,8 +262,9 @@ void InitAStar(int mapWidth, int mapHeight)
 
 	CostMoveToCache = new int[AStarMapWidth * AStarMapHeight];
 
-	for(int i = 0; i < 9; ++i)
+	for (int i = 0; i < 9; ++i) {
 		Heading2O[i] = Heading2Y[i] * AStarMapWidth;
+	}
 
 	ProfileInit();
 }
@@ -328,15 +328,15 @@ static void CostMoveToCacheCleanUp()
 	conv.i[0] = CacheNotSet;
 	conv.i[1] = CacheNotSet;
 
-	if(((uintptr_t)ptr) & 4) {
+	if (((uintptr_t)ptr) & 4) {
 		*ptr++ = CacheNotSet;
 		--AStarMapMax;
 	}
 #endif
 	while (AStarMapMax > 3) {
 #ifdef __x86_64__
-		*((intptr_t*)ptr) = conv.d;
-		*((intptr_t*)(ptr + 2)) = conv.d;
+		*((intptr_t *)ptr) = conv.d;
+		*((intptr_t *)(ptr + 2)) = conv.d;
 		ptr += 4;
 #else
 		*ptr++ = CacheNotSet;
@@ -344,9 +344,9 @@ static void CostMoveToCacheCleanUp()
 		*ptr++ = CacheNotSet;
 		*ptr++ = CacheNotSet;
 #endif
-		AStarMapMax-=4;
+		AStarMapMax -= 4;
 	};
-	while(AStarMapMax) {
+	while (AStarMapMax) {
 		*ptr++ = CacheNotSet;
 		--AStarMapMax;
 	}
@@ -409,13 +409,13 @@ static inline int AStarAddNode(const Vec2i &pos, int o, int costs)
 		midcost = open->Costs;
 		midCostToGoal = AStarMatrix[open->O].CostToGoal;
 		midDist = MyAbs(open->pos.x - AStarGoalX) + MyAbs(open->pos.y - AStarGoalY);
-		if (costs > midcost || (costs == midcost &&
-				(costToGoal > midCostToGoal || (costToGoal == midCostToGoal &&
-					dist > midDist)))) {
+		if (costs > midcost || (costs == midcost
+								&& (costToGoal > midCostToGoal || (costToGoal == midCostToGoal
+										&& dist > midDist)))) {
 			smalli = midi;
-		} else if (costs < midcost || (costs == midcost &&
-				(costToGoal < midCostToGoal || (costToGoal == midCostToGoal &&
-					dist < midDist)))) {
+		} else if (costs < midcost || (costs == midcost
+									   && (costToGoal < midCostToGoal || (costToGoal == midCostToGoal
+											&& dist < midDist)))) {
 			if (bigi == midi) {
 				bigi++;
 			} else {
@@ -429,7 +429,7 @@ static inline int AStarAddNode(const Vec2i &pos, int o, int costs)
 
 	if (OpenSetSize > bigi) {
 		// free a the slot for our node
-		memmove(&OpenSet[bigi+1], &OpenSet[bigi], (OpenSetSize - bigi) * sizeof(Open));
+		memmove(&OpenSet[bigi + 1], &OpenSet[bigi], (OpenSetSize - bigi) * sizeof(Open));
 	}
 
 	// fill our new node
@@ -458,7 +458,7 @@ static void AStarReplaceNode(int pos, int)
 	node = OpenSet[pos];
 	OpenSetSize--;
 	//memmove(&OpenSet[pos], &OpenSet[pos+1], sizeof(Open) * (OpenSetSize-pos));
-	memcpy(&OpenSet[pos], &OpenSet[pos+1], sizeof(Open) * (OpenSetSize-pos));
+	memcpy(&OpenSet[pos], &OpenSet[pos + 1], sizeof(Open) * (OpenSetSize - pos));
 
 	// Re-add the node with the new cost
 	AStarAddNode(node.pos, node.O, node.Costs);
@@ -552,9 +552,9 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 			// Add tile movement cost
 			cost += mf->Cost;
 			++mf;
-		} while(--i);
+		} while (--i);
 		index += AStarMapWidth;
-	} while(--h);
+	} while (--h);
 	return cost;
 }
 
@@ -570,7 +570,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 **                0 -> no induced cost, except move
 **               >0 -> costly tile
 */
-static inline int CostMoveTo(unsigned int index, const CUnit& unit)
+static inline int CostMoveTo(unsigned int index, const CUnit &unit)
 {
 	int *c = &CostMoveToCache[index];
 	if (*c != CacheNotSet) {
@@ -589,7 +589,7 @@ inline int square(int v)
 **  MarkAStarGoal
 */
 static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
-	int tilesizex, int tilesizey, int minrange, int maxrange, const CUnit& unit)
+						 int tilesizex, int tilesizey, int minrange, int maxrange, const CUnit &unit)
 {
 	ProfileBegin("AStarMarkGoal");
 
@@ -662,8 +662,7 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 				const int minxs[2] = {std::max(0, goal.x - offsetx1 - extratilesize.x), std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + offsetx2)};
 				const int maxxs[2] = {std::max(0, goal.x - offsetx2 - extratilesize.x), std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + offsetx1)};
 
-				for (int i = 0; i < 2; ++i)
-				{
+				for (int i = 0; i < 2; ++i) {
 					const int minx = minxs[i];
 					const int maxx = maxxs[i];
 					Vec2i mpos = {minx, goal.y + offsety};
@@ -682,9 +681,11 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 		{
 			// center
 			const int mincenters[] = {std::max(0, goal.x - maxrange - extratilesize.x),
-									std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + minrange)};
+									  std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + minrange)
+									 };
 			const int maxcenters[] = {std::max(0, goal.x - minrange - extratilesize.x),
-									std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + maxrange)};
+									  std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + maxrange)
+									 };
 
 			const int miny = std::max(0 - goal.y, -extratilesize.y);
 			const int maxy = std::min(Map.Info.MapHeight - goal.y - extratilesize.y, gh);
@@ -715,8 +716,7 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 				const int minxs[2] = {std::max(0, goal.x - offsetx1) - extratilesize.x, std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + offsetx2)};
 				const int maxxs[2] = {std::max(0, goal.x - offsetx2) - extratilesize.x, std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + offsetx1)};
 
-				for (int i = 0; i < 2; ++i)
-				{
+				for (int i = 0; i < 2; ++i) {
 					const int minx = minxs[i];
 					const int maxx = maxxs[i];
 					Vec2i mpos = {minx, goal.y + offsety};
@@ -807,9 +807,9 @@ static int AStarSavePath(const Vec2i &startPos, const Vec2i &endPos, char *path,
 **  Optimization to find a simple path
 **  Check if we're at the goal or if it's 1 tile away
 */
-static int AStarFindSimplePath(const Vec2i& startPos, const Vec2i& goal, int gw, int gh,
-	int, int, int minrange, int maxrange,
-	 char *path, int, const CUnit& unit)
+static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw, int gh,
+							   int, int, int minrange, int maxrange,
+							   char *path, int, const CUnit &unit)
 {
 	ProfileBegin("AStarFindSimplePath");
 	// At exact destination point already
@@ -854,9 +854,9 @@ static int AStarFindSimplePath(const Vec2i& startPos, const Vec2i& goal, int gw,
 /**
 **  Find path.
 */
-int AStarFindPath(const Vec2i& startPos, const Vec2i& goalPos, int gw, int gh,
-	int tilesizex, int tilesizey, int minrange, int maxrange,
-	char *path, int pathlen, const CUnit &unit)
+int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
+				  int tilesizex, int tilesizey, int minrange, int maxrange,
+				  char *path, int pathlen, const CUnit &unit)
 {
 	Assert(Map.Info.IsPointOnMap(startPos));
 
@@ -867,7 +867,7 @@ int AStarFindPath(const Vec2i& startPos, const Vec2i& goalPos, int gw, int gh,
 
 	//  Check for simple cases first
 	int ret = AStarFindSimplePath(startPos, goalPos, gw, gh, tilesizex, tilesizey,
-			minrange, maxrange, path, pathlen, unit);
+								  minrange, maxrange, path, pathlen, unit);
 	if (ret != PF_FAILED) {
 		ProfileEnd("AStarFindPath");
 		return ret;
@@ -957,8 +957,8 @@ int AStarFindPath(const Vec2i& startPos, const Vec2i& goalPos, int gw, int gh,
 			}
 
 			// Outside the map or can't be entered.
-			if (endPos.x < 0 || endPos.x + tilesizex - 1 >= AStarMapWidth ||
-					endPos.y < 0 || endPos.y + tilesizey - 1 >= AStarMapHeight) {
+			if (endPos.x < 0 || endPos.x + tilesizex - 1 >= AStarMapWidth
+				|| endPos.y < 0 || endPos.y + tilesizey - 1 >= AStarMapHeight) {
 				continue;
 			}
 
@@ -1028,8 +1028,7 @@ int AStarFindPath(const Vec2i& startPos, const Vec2i& goalPos, int gw, int gh,
 	return ret;
 }
 
-struct StatsNode
-{
+struct StatsNode {
 	StatsNode() : Direction(0), InGoal(0), CostFromStart(0), Costs(0) {}
 
 	int Direction;
@@ -1072,34 +1071,40 @@ void AStarFreeStats(StatsNode *stats)
 ----------------------------------------------------------------------------*/
 
 // AStarFixedUnitCrossingCost
-void SetAStarFixedUnitCrossingCost(int cost) {
+void SetAStarFixedUnitCrossingCost(int cost)
+{
 	if (cost <= 3) {
 		fprintf(stderr, "AStarFixedUnitCrossingCost must be greater than 3\n");
 	}
 }
-int GetAStarFixedUnitCrossingCost() {
+int GetAStarFixedUnitCrossingCost()
+{
 	return AStarFixedUnitCrossingCost;
 }
 
 // AStarMovingUnitCrossingCost
-void SetAStarMovingUnitCrossingCost(int cost) {
+void SetAStarMovingUnitCrossingCost(int cost)
+{
 	if (cost <= 3) {
 		fprintf(stderr, "AStarMovingUnitCrossingCost must be greater than 3\n");
 	}
 }
-int GetAStarMovingUnitCrossingCost() {
+int GetAStarMovingUnitCrossingCost()
+{
 	return AStarMovingUnitCrossingCost;
 }
 
 // AStarUnknownTerrainCost
-void SetAStarUnknownTerrainCost(int cost) {
+void SetAStarUnknownTerrainCost(int cost)
+{
 	if (cost < 0) {
 		fprintf(stderr, "AStarUnknownTerrainCost must be non-negative\n");
 		return;
 	}
 	AStarUnknownTerrainCost = cost;
 }
-int GetAStarUnknownTerrainCost() {
+int GetAStarUnknownTerrainCost()
+{
 	return AStarUnknownTerrainCost;
 }
 

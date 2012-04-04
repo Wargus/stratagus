@@ -51,9 +51,9 @@ extern void InitAStar(int mapWidth, int mapHeight);
 extern void FreeAStar();
 
 /// Find and a* path for a unit
-extern int AStarFindPath(const Vec2i& startPos, const Vec2i& goalPos, int gw, int gh,
-	int tilesizex, int tilesizey, int minrange,
-	 int maxrange, char *path, int pathlen, const CUnit &unit);
+extern int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
+						 int tilesizex, int tilesizey, int minrange,
+						 int maxrange, char *path, int pathlen, const CUnit &unit);
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -150,10 +150,10 @@ unsigned char *MakeMatrix()
 ----------------------------------------------------------------------------*/
 
 /**
-**  Can the unit 'src' reach the place x,y.
+**  Can the unit 'src' reach the place goalPos.
 **
 **  @param src       Unit for the path.
-**  @param pos       Map tile position.
+**  @param goalPos   Map tile position.
 **  @param w         Width of Goal
 **  @param h         Height of Goal
 **  @param minrange  min range to the tile
@@ -161,12 +161,11 @@ unsigned char *MakeMatrix()
 **
 **  @return          Distance to place.
 */
-int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h,
-	int minrange, int range)
+int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range)
 {
 	int i = AStarFindPath(src.tilePos, goalPos, w, h,
-		src.Type->TileWidth, src.Type->TileHeight,
-		 minrange, range, NULL, 0, src);
+						  src.Type->TileWidth, src.Type->TileHeight,
+						  minrange, range, NULL, 0, src);
 
 	switch (i) {
 		case PF_FAILED:
@@ -203,10 +202,11 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h,
 int UnitReachable(const CUnit &src, const CUnit &dst, int range)
 {
 	//  Find a path to the goal.
-	if (src.Type->Building)
+	if (src.Type->Building) {
 		return 0;
+	}
 	const int depth = PlaceReachable(src, dst.tilePos,
-		dst.Type->TileWidth, dst.Type->TileHeight, 0, range);
+									 dst.Type->TileWidth, dst.Type->TileHeight, 0, range);
 	if (depth <= 0) {
 		return 0;
 	}
@@ -228,20 +228,23 @@ PathFinderInput::PathFinderInput() : unit(NULL), minRange(0), maxRange(0),
 	goalSize.y = 0;
 }
 
-const Vec2i& PathFinderInput::GetUnitPos() const { return unit->tilePos; }
-Vec2i PathFinderInput::GetUnitSize() const {
+const Vec2i &PathFinderInput::GetUnitPos() const { return unit->tilePos; }
+Vec2i PathFinderInput::GetUnitSize() const
+{
 	const Vec2i tileSize = {unit->Type->TileWidth, unit->Type->TileHeight};
 	return tileSize;
 }
 
-void PathFinderInput::SetUnit(CUnit &_unit) {
+void PathFinderInput::SetUnit(CUnit &_unit)
+{
 	unit = &_unit;
 
 	isRecalculatePathNeeded = true;
 }
 
 
-void PathFinderInput::SetGoal(const Vec2i& pos, const Vec2i& size) {
+void PathFinderInput::SetGoal(const Vec2i &pos, const Vec2i &size)
+{
 	Vec2i newPos = pos;
 	// Large units may have a goal that goes outside the map, fix it here
 	if (newPos.x + unit->Type->TileWidth - 1 >= Map.Info.MapWidth) {
@@ -257,21 +260,24 @@ void PathFinderInput::SetGoal(const Vec2i& pos, const Vec2i& size) {
 	goalSize = size;
 }
 
-void PathFinderInput::SetMinRange(int range) {
+void PathFinderInput::SetMinRange(int range)
+{
 	if (minRange != range) {
 		minRange = range;
 		isRecalculatePathNeeded = true;
 	}
 }
 
-void PathFinderInput::SetMaxRange(int range) {
+void PathFinderInput::SetMaxRange(int range)
+{
 	if (maxRange != range) {
 		maxRange = range;
 		isRecalculatePathNeeded = true;
 	}
 }
 
-void PathFinderInput::PathRacalculated() {
+void PathFinderInput::PathRacalculated()
+{
 	unitSize.x = unit->Type->TileWidth;
 	unitSize.y = unit->Type->TileHeight;
 
@@ -281,7 +287,7 @@ void PathFinderInput::PathRacalculated() {
 
 PathFinderOutput::PathFinderOutput()
 {
-	memset(this, 0, sizeof (*this));
+	memset(this, 0, sizeof(*this));
 }
 
 /**
@@ -297,16 +303,16 @@ PathFinderOutput::PathFinderOutput()
 **  @return      >0 remaining path length, 0 wait for path, -1
 **               reached goal, -2 can't reach the goal.
 */
-static int NewPath(PathFinderInput& input, PathFinderOutput& output)
+static int NewPath(PathFinderInput &input, PathFinderOutput &output)
 {
 	char *path = output.Path;
 	int i = AStarFindPath(input.GetUnitPos(),
-						input.GetGoalPos(),
-						input.GetGoalSize().x, input.GetGoalSize().y,
-						input.GetUnitSize().x, input.GetUnitSize().y,
-						input.GetMinRange(), input.GetMaxRange(),
-						path, PathFinderOutput::MAX_PATH_LENGTH,
-						*input.GetUnit());
+						  input.GetGoalPos(),
+						  input.GetGoalSize().x, input.GetGoalSize().y,
+						  input.GetUnitSize().x, input.GetUnitSize().y,
+						  input.GetMinRange(), input.GetMaxRange(),
+						  path, PathFinderOutput::MAX_PATH_LENGTH,
+						  *input.GetUnit());
 	input.PathRacalculated();
 	if (i == PF_FAILED) {
 		i = PF_UNREACHABLE;
@@ -336,8 +342,8 @@ static int NewPath(PathFinderInput& input, PathFinderOutput& output)
 int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 {
 	int result;
-	PathFinderInput& input = unit.pathFinderData->input;
-	PathFinderOutput& output = unit.pathFinderData->output;
+	PathFinderInput &input = unit.pathFinderData->input;
+	PathFinderOutput &output = unit.pathFinderData->output;
 
 	unit.CurrentOrder()->UpdatePathFinderData(input);
 	// Attempt to use path cache
