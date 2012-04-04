@@ -49,7 +49,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder* COrder::NewActionDie()
+/* static */ COrder *COrder::NewActionDie()
 {
 	return new COrder_Die;
 }
@@ -68,7 +68,7 @@
 	return false;
 }
 
-/* virtual */ PixelPos COrder_Die::Show(const CViewport& , const PixelPos& lastScreenPos) const
+/* virtual */ PixelPos COrder_Die::Show(const CViewport & , const PixelPos &lastScreenPos) const
 {
 	return lastScreenPos;
 }

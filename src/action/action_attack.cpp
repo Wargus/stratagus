@@ -76,7 +76,7 @@
 **
 **  @todo manage correctly unit with no animation attack.
 */
-void AnimateActionAttack(CUnit &unit, COrder& order)
+void AnimateActionAttack(CUnit &unit, COrder &order)
 {
 	//  No animation.
 	//  So direct fire missile.
@@ -88,7 +88,7 @@ void AnimateActionAttack(CUnit &unit, COrder& order)
 	UnitShowAnimation(unit, unit.Type->Animations->Attack);
 }
 
-/* static */ COrder* COrder::NewActionAttack(const CUnit &attacker, CUnit &target)
+/* static */ COrder *COrder::NewActionAttack(const CUnit &attacker, CUnit &target)
 {
 	COrder_Attack *order = new COrder_Attack(false);
 
@@ -103,7 +103,7 @@ void AnimateActionAttack(CUnit &unit, COrder& order)
 	return order;
 }
 
-/* static */ COrder* COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest)
+/* static */ COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest)
 {
 	Assert(Map.Info.IsPointOnMap(dest));
 
@@ -120,7 +120,7 @@ void AnimateActionAttack(CUnit &unit, COrder& order)
 	return order;
 }
 
-/* static */ COrder* COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest)
+/* static */ COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest)
 {
 	COrder_Attack *order = new COrder_Attack(true);
 
@@ -152,7 +152,7 @@ void AnimateActionAttack(CUnit &unit, COrder& order)
 		if (goal.Destroyed) {
 			/* this unit is destroyed so it's not in the global unit
 			 * array - this means it won't be saved!!! */
-			printf ("FIXME: storing destroyed Goal - loading will fail.\n");
+			printf("FIXME: storing destroyed Goal - loading will fail.\n");
 		}
 		file.printf(" \"goal\", \"%s\",", UnitReference(goal).c_str());
 	}
@@ -191,7 +191,7 @@ void AnimateActionAttack(CUnit &unit, COrder& order)
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Attack::Show(const CViewport& vp, const PixelPos& lastScreenPos) const
+/* virtual */ PixelPos COrder_Attack::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	PixelPos targetPos;
 
@@ -206,7 +206,7 @@ void AnimateActionAttack(CUnit &unit, COrder& order)
 	return targetPos;
 }
 
-/* virtual */ void COrder_Attack::UpdatePathFinderData(PathFinderInput& input)
+/* virtual */ void COrder_Attack::UpdatePathFinderData(PathFinderInput &input)
 {
 	input.SetMinRange(this->MinRange);
 	input.SetMaxRange(this->Range);
@@ -244,7 +244,7 @@ void AnimateActionAttack(CUnit &unit, COrder& order)
 			return true;
 		}
 		if (goal->CurrentAction() == UnitActionAttack) {
-			const COrder_Attack &order = *static_cast<COrder_Attack*>(goal->CurrentOrder());
+			const COrder_Attack &order = *static_cast<COrder_Attack *>(goal->CurrentOrder());
 			if (order.GetGoal() == &unit) {
 				//we already fight with one of attackers;
 				return true;
@@ -331,7 +331,7 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 			this->goalPos.x = this->goalPos.y = -1;
 			this->State |= WEAK_TARGET; // weak target
 		}
-	// Have a weak target, try a better target.
+		// Have a weak target, try a better target.
 	} else if (this->HasGoal() && (this->State & WEAK_TARGET)) {
 		CUnit *goal = this->GetGoal();
 		CUnit *newTarget = AttackUnitsInReactRange(unit);
@@ -387,7 +387,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		CUnit *goal = this->GetGoal();
 		// Have reached target? FIXME: could use the new return code?
 		if (goal
-		&& unit.MapDistanceTo(*goal) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
+			&& unit.MapDistanceTo(*goal) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 			// Reached another unit, now attacking it
 			unit.State = 0;
 			const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
@@ -478,8 +478,8 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 		this->State |= WEAK_TARGET;
 
-	// Have a weak target, try a better target.
-	// FIXME: if out of range also try another target quick
+		// Have a weak target, try a better target.
+		// FIXME: if out of range also try another target quick
 	} else {
 		if ((this->State & WEAK_TARGET)) {
 			CUnit *newTarget = AttackUnitsInReactRange(unit);
@@ -559,7 +559,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 				const int dist = goal.MapDistanceTo(unit);
 
 				if (unit.Type->MinAttackRange < dist &&
-					 dist <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
+					dist <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 					const Vec2i dir = goal.tilePos + goal.Type->GetHalfTileSize() - unit.tilePos;
 
 					UnitHeadingFromDeltaXY(unit, dir);

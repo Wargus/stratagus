@@ -57,7 +57,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder* COrder::NewActionTrain(CUnit &trainer, CUnitType &type)
+/* static */ COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type)
 {
 	COrder_Train *order = new COrder_Train;
 
@@ -97,7 +97,7 @@
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Train::Show(const CViewport& , const PixelPos& lastScreenPos) const
+/* virtual */ PixelPos COrder_Train::Show(const CViewport & , const PixelPos &lastScreenPos) const
 {
 	return lastScreenPos;
 }
@@ -119,7 +119,7 @@
 	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[unit.Player->Index].Costs[TimeCost];
 }
 
-void COrder_Train::ConvertUnitType(const CUnit &unit, CUnitType& newType)
+void COrder_Train::ConvertUnitType(const CUnit &unit, CUnitType &newType)
 {
 	const CPlayer &player = *unit.Player;
 	const int oldCost = this->Type->Stats[player.Index].Costs[TimeCost];
@@ -227,7 +227,7 @@ static void AnimateActionTrain(CUnit &unit)
 	/* Auto Group Add */
 	if (!unit.Player->AiEnabled && unit.GroupId) {
 		int num = 0;
-		while(!(unit.GroupId & (1 << num))) {
+		while (!(unit.GroupId & (1 << num))) {
 			++num;
 		}
 		AddToGroup(&newUnit, 1, num);

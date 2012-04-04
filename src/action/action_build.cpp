@@ -55,8 +55,7 @@
 
 extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
-enum
-{
+enum {
 	State_Start = 0,
 	State_MoveToLocationMax = 10, // Range from prev
 	State_NearOfLocation = 11, // Range to next
@@ -71,7 +70,7 @@ enum
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder* COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building)
+/* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building)
 {
 	COrder_Build *order = new COrder_Build;
 
@@ -81,7 +80,7 @@ enum
 	} else {
 		// If building inside, but be next to stop
 		if (building.ShoreBuilding && builder.Type->UnitType == UnitTypeLand) {
-				// Peon won't dive :-)
+			// Peon won't dive :-)
 			order->Range = 1;
 		}
 	}
@@ -104,7 +103,7 @@ enum
 		if (this->BuildingUnit->Destroyed) {
 			/* this unit is destroyed so it's not in the global unit
 			 * array - this means it won't be saved!!! */
-			printf ("FIXME: storing destroyed Goal - loading will fail.\n");
+			printf("FIXME: storing destroyed Goal - loading will fail.\n");
 		}
 		file.printf(" \"building\", \"%s\",", UnitReference(this->BuildingUnit).c_str());
 	}
@@ -146,7 +145,7 @@ enum
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Build::Show(const CViewport& vp, const PixelPos& lastScreenPos) const
+/* virtual */ PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	PixelPos targetPos = vp.TilePosToScreen_TopLeft(this->goalPos);
 	targetPos.x += (this->GetUnitType().TileWidth - 1) * PixelTileSize.x / 2;
@@ -161,7 +160,7 @@ enum
 	return targetPos;
 }
 
-/* virtual */ void COrder_Build::UpdatePathFinderData(PathFinderInput& input)
+/* virtual */ void COrder_Build::UpdatePathFinderData(PathFinderInput &input)
 {
 	input.SetMinRange(this->Type->BuilderOutside ? 1 : 0);
 	input.SetMaxRange(this->Range);
@@ -173,11 +172,11 @@ enum
 /** Called when unit is killed.
 **  warn the AI module.
 */
-void COrder_Build::AiUnitKilled(CUnit& unit)
+void COrder_Build::AiUnitKilled(CUnit &unit)
 {
 	DebugPrint("%d: %d(%s) killed, with order %s!\n" _C_
-		unit.Player->Index _C_ UnitNumber(unit) _C_
-		unit.Type->Ident.c_str() _C_ this->Type->Ident.c_str());
+			   unit.Player->Index _C_ UnitNumber(unit) _C_
+			   unit.Type->Ident.c_str() _C_ this->Type->Ident.c_str());
 	if (this->BuildingUnit == NULL) {
 		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type);
 	}
@@ -232,14 +231,14 @@ static bool CheckLimit(const CUnit &unit, const CUnitType &type)
 	if (player.CheckUnitType(type)) {
 		// FIXME: Better tell what is missing?
 		player.Notify(NotifyYellow, unit.tilePos,
-			_("Not enough resources to build %s"), type.Name.c_str());
+					  _("Not enough resources to build %s"), type.Name.c_str());
 		isOk = false;
 	}
 
 	// Check if hiting any limits for the building.
 	if (player.CheckLimits(type) < 0) {
 		player.Notify(NotifyYellow, unit.tilePos,
-			_("Can't build more units %s"), type.Name.c_str());
+					  _("Can't build more units %s"), type.Name.c_str());
 		isOk = false;
 	}
 	if (isOk == false && player.AiEnabled) {
@@ -249,17 +248,16 @@ static bool CheckLimit(const CUnit &unit, const CUnitType &type)
 }
 
 
-class AlreadyBuildingFinder {
+class AlreadyBuildingFinder
+{
 public:
 	AlreadyBuildingFinder(const CUnit &unit, const CUnitType &t) :
 		worker(&unit), type(&t) {}
-	bool operator() (const CUnit *const unit) const
-	{
+	bool operator()(const CUnit *const unit) const {
 		return (!unit->Destroyed && unit->Type == type
 				&& (worker->Player == unit->Player || worker->IsAllied(*unit)));
 	}
-	CUnit *Find(const CMapField *const mf) const
-	{
+	CUnit *Find(const CMapField *const mf) const {
 		return mf->UnitCache.find(*this);
 	}
 private:
@@ -293,9 +291,9 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit)
 	if (building != NULL) {
 		if (unit.CurrentOrder() == this) {
 			DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
-					_C_ unit.Player->Index _C_ unit.Slot
-					_C_ building->Type->Name.c_str()
-					_C_ building->Slot);
+					   _C_ unit.Player->Index _C_ unit.Slot
+					   _C_ building->Type->Name.c_str()
+					   _C_ building->Slot);
 
 			delete this; // Bad
 			unit.Orders[0] = COrder::NewActionRepair(unit, *building);
@@ -324,7 +322,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	if (build == NoUnitP) {
 		// FIXME: Should we retry this?
 		unit.Player->Notify(NotifyYellow, unit.tilePos,
-			_("Unable to create building %s"), type.Name.c_str());
+							_("Unable to create building %s"), type.Name.c_str());
 		if (unit.Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
@@ -337,7 +335,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	if (&ontop != &unit) {
 		CBuildRestrictionOnTop *b;
 
-		b = static_cast<CBuildRestrictionOnTop *> (OnTopDetails(*build, ontop.Type));
+		b = static_cast<CBuildRestrictionOnTop *>(OnTopDetails(*build, ontop.Type));
 		Assert(b);
 		if (b->ReplaceOnBuild) {
 			build->ResourcesHeld = ontop.ResourcesHeld; // We capture the value of what is beneath.
@@ -406,7 +404,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 
 	if (this->BuildingUnit->CurrentAction() == UnitActionBuilt) {
 		COrder_Built &targetOrder = *static_cast<COrder_Built *>(this->BuildingUnit->CurrentOrder());
-		CUnit& goal = *const_cast<COrder_Build*>(this)->BuildingUnit;
+		CUnit &goal = *const_cast<COrder_Build *>(this)->BuildingUnit;
 
 
 		targetOrder.ProgressHp(goal, 100);
@@ -445,7 +443,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 	}
 	if (this->State == State_StartBuilding_Failed) {
 		unit.Player->Notify(NotifyYellow, unit.tilePos,
-			_("You cannot build %s here"), type.Name.c_str());
+							_("You cannot build %s here"), type.Name.c_str());
 		if (unit.Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}

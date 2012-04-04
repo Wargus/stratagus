@@ -56,7 +56,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder* COrder::NewActionRepair(CUnit &unit, CUnit &target)
+/* static */ COrder *COrder::NewActionRepair(CUnit &unit, CUnit &target)
 {
 	COrder_Repair *order = new COrder_Repair();
 
@@ -69,7 +69,7 @@
 	return order;
 }
 
-/* static */ COrder* COrder::NewActionRepair(const Vec2i &pos)
+/* static */ COrder *COrder::NewActionRepair(const Vec2i &pos)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
@@ -91,7 +91,7 @@
 		if (goal.Destroyed) {
 			/* this unit is destroyed so it's not in the global unit
 			 * array - this means it won't be saved!!! */
-			printf ("FIXME: storing destroyed Goal - loading will fail.\n");
+			printf("FIXME: storing destroyed Goal - loading will fail.\n");
 		}
 		file.printf(" \"goal\", \"%s\",", UnitReference(goal).c_str());
 	}
@@ -138,7 +138,7 @@
 
 
 
-/* virtual */ PixelPos COrder_Repair::Show(const CViewport& vp, const PixelPos& lastScreenPos) const
+/* virtual */ PixelPos COrder_Repair::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	PixelPos targetPos;
 
@@ -153,9 +153,9 @@
 	return targetPos;
 }
 
-/* virtual */ void COrder_Repair::UpdatePathFinderData(PathFinderInput& input)
+/* virtual */ void COrder_Repair::UpdatePathFinderData(PathFinderInput &input)
 {
-	const CUnit& unit = *input.GetUnit();
+	const CUnit &unit = *input.GetUnit();
 
 	input.SetMinRange(0);
 	input.SetMaxRange(ReparableTarget != NULL ? unit.Type->RepairRange : 0);
@@ -178,13 +178,13 @@ bool SubRepairCosts(const CUnit &unit, CPlayer &player, CUnit &goal)
 
 	// Check if enough resources are available
 	for (int i = 1; i < MaxCosts; ++i) {
-		RepairCosts[i] = goal.Type->RepairCosts[i] * 
-			(goal.CurrentAction() == UnitActionBuilt ? ResourcesMultiBuildersMultiplier : 1);
-	}	
+		RepairCosts[i] = goal.Type->RepairCosts[i] *
+						 (goal.CurrentAction() == UnitActionBuilt ? ResourcesMultiBuildersMultiplier : 1);
+	}
 	for (int i = 1; i < MaxCosts; ++i) {
 		if (player.Resources[i] < RepairCosts[i]) {
 			player.Notify(NotifyYellow, unit.tilePos,
-				_("We need more %s for repair!"), DefaultResourceNames[i].c_str());
+						  _("We need more %s for repair!"), DefaultResourceNames[i].c_str());
 			return true;
 		}
 	}

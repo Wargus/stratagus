@@ -60,7 +60,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder* COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade)
+/* static */ COrder *COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade)
 {
 	COrder_Research *order = new COrder_Research();
 
@@ -99,7 +99,7 @@
 
 
 
-/* virtual */ PixelPos COrder_Research::Show(const CViewport& , const PixelPos& lastScreenPos) const
+/* virtual */ PixelPos COrder_Research::Show(const CViewport & , const PixelPos &lastScreenPos) const
 {
 	return lastScreenPos;
 }
@@ -120,9 +120,8 @@
 	const CUpgrade &upgrade = this->GetUpgrade();
 	const CUnitType &type = *unit.Type;
 
-	type.Animations->Research ?
-		UnitShowAnimation(unit, type.Animations->Research) :
-		UnitShowAnimation(unit, type.Animations->Still);
+
+	UnitShowAnimation(unit, type.Animations->Research ? type.Animations->Research : type.Animations->Still);
 	if (unit.Wait) {
 		unit.Wait--;
 		return ;

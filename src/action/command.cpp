@@ -168,7 +168,7 @@ void CommandStopUnit(CUnit &unit)
 */
 void CommandStandGround(CUnit &unit, int flush)
 {
-	COrderPtr* order;
+	COrderPtr *order;
 
 	if (unit.Type->Building) {
 		ClearNewAction(unit);
@@ -618,7 +618,7 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int)
 void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 {
 	DebugPrint("Cancel %d type: %s\n" _C_ slot _C_
-		type ? type->Ident.c_str() : "-any-");
+			   type ? type->Ident.c_str() : "-any-");
 
 	ClearSavedAction(unit);
 
@@ -639,7 +639,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 		// Order has moved, we are not training
 		return;
 	} else if (unit.Orders[slot]->Action == UnitActionTrain) {
-		COrder_Train& order = *static_cast<COrder_Train*>(unit.Orders[slot]);
+		COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[slot]);
 		// Still training this order, same unit?
 		if (type && &order.GetUnitType() != type) {
 			// Different unit being trained
@@ -767,7 +767,7 @@ void CommandCancelResearch(CUnit &unit)
 void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, SpellType *spell, int flush)
 {
 	DebugPrint(": %d casts %s at %d %d on %d\n" _C_
-		UnitNumber(unit) _C_ spell->Ident.c_str() _C_ pos.x _C_ pos.y _C_ dest ? UnitNumber(*dest) : 0);
+			   UnitNumber(unit) _C_ spell->Ident.c_str() _C_ pos.x _C_ pos.y _C_ dest ? UnitNumber(*dest) : 0);
 	Assert(unit.Type->CanCastSpell[spell->Slot]);
 	Assert(Map.Info.IsPointOnMap(pos));
 
@@ -899,7 +899,7 @@ void CommandQuit(int player)
 			CommandSharedVision(i, 0, player);
 			CommandSharedVision(player, 0, i);
 			// Remove Selection from Quit Player
-			std::vector<CUnit*> empty;
+			std::vector<CUnit *> empty;
 			ChangeTeamSelectedUnits(Players[player], empty, 0);
 		}
 	}

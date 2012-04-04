@@ -62,7 +62,7 @@ enum {
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder* COrder::NewActionBoard(CUnit &unit)
+/* static */ COrder *COrder::NewActionBoard(CUnit &unit)
 {
 	COrder_Board *order = new COrder_Board;
 
@@ -85,7 +85,7 @@ enum {
 		if (goal.Destroyed) {
 			/* this unit is destroyed so it's not in the global unit
 			 * array - this means it won't be saved!!! */
-			printf ("FIXME: storing destroyed Goal - loading will fail.\n");
+			printf("FIXME: storing destroyed Goal - loading will fail.\n");
 		}
 		file.printf(" \"goal\", \"%s\",", UnitReference(goal).c_str());
 	}
@@ -117,7 +117,7 @@ enum {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Board::Show(const CViewport& vp, const PixelPos& lastScreenPos) const
+/* virtual */ PixelPos COrder_Board::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	PixelPos targetPos;
 
@@ -132,7 +132,7 @@ enum {
 	return targetPos;
 }
 
-/* virtual */ void COrder_Board::UpdatePathFinderData(PathFinderInput& input)
+/* virtual */ void COrder_Board::UpdatePathFinderData(PathFinderInput &input)
 {
 	input.SetMinRange(0);
 	input.SetMaxRange(this->Range);
@@ -258,7 +258,7 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 /* virtual */ void COrder_Board::Execute(CUnit &unit)
 {
 	switch (this->State) {
-		// Wait for transporter
+			// Wait for transporter
 		case State_WaitForTransporter:
 			if (this->WaitForTransporter(unit)) {
 				this->State = State_EnterTransporter;

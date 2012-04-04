@@ -56,12 +56,12 @@ enum {
 	SUB_STILL_ATTACK
 };
 
-/* static */ COrder* COrder::NewActionStandGround()
+/* static */ COrder *COrder::NewActionStandGround()
 {
 	return new COrder_Still(true);
 }
 
-/* static */ COrder* COrder::NewActionStill()
+/* static */ COrder *COrder::NewActionStill()
 {
 	return new COrder_Still(false);
 }
@@ -81,7 +81,7 @@ enum {
 		if (AutoTarget->Destroyed) {
 			/* this unit is destroyed so it's not in the global unit
 			 * array - this means it won't be saved!!! */
-			printf ("FIXME: storing destroyed Goal - loading will fail.\n");
+			printf("FIXME: storing destroyed Goal - loading will fail.\n");
 		}
 		file.printf(" \"auto-target\", \"%s\",", UnitReference(AutoTarget).c_str());
 	}
@@ -109,7 +109,7 @@ enum {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Still::Show(const CViewport& , const PixelPos& lastScreenPos) const
+/* virtual */ PixelPos COrder_Still::Show(const CViewport & , const PixelPos &lastScreenPos) const
 {
 	if (this->Action == UnitActionStandGround) {
 		Video.FillCircleClip(ColorBlack, lastScreenPos, 2);
@@ -120,21 +120,19 @@ enum {
 class IsTargetInRange
 {
 public:
-	explicit IsTargetInRange(const CUnit& _attacker) : attacker(&_attacker) {}
+	explicit IsTargetInRange(const CUnit &_attacker) : attacker(&_attacker) {}
 
-	bool operator () (const CUnit* unit) const
-	{
+	bool operator()(const CUnit *unit) const {
 		return unit->IsVisibleAsGoal(*attacker->Player)
-			&& IsDistanceCorrect(attacker->MapDistanceTo(*unit));
+			   && IsDistanceCorrect(attacker->MapDistanceTo(*unit));
 	}
 private:
-	bool IsDistanceCorrect(int distance) const
-	{
+	bool IsDistanceCorrect(int distance) const {
 		return attacker->Type->MinAttackRange <= distance
-			&& distance <= attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
+			   && distance <= attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
 	}
 private:
-	const CUnit* attacker;
+	const CUnit *attacker;
 };
 
 
@@ -147,7 +145,7 @@ private:
 		this->AutoTarget = NULL;
 		return;
 	}
-	const Vec2i invalidPos = {-1, -1};
+	const Vec2i invalidPos = { -1, -1};
 
 	FireMissile(unit, AutoTarget, invalidPos);
 	UnHideUnit(unit);
@@ -237,15 +235,15 @@ bool AutoCast(CUnit &unit)
 class IsAReparableUnitBy
 {
 public:
-	explicit IsAReparableUnitBy(const CUnit& _worker) : worker(&_worker) {}
-	bool operator () (CUnit* unit) const {
+	explicit IsAReparableUnitBy(const CUnit &_worker) : worker(&_worker) {}
+	bool operator()(CUnit *unit) const {
 		return (unit->IsTeamed(*worker)
-			&& unit->Type->RepairHP
-			&& unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max
-			&& unit->IsVisibleAsGoal(*worker->Player));
+				&& unit->Type->RepairHP
+				&& unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max
+				&& unit->IsVisibleAsGoal(*worker->Player));
 	}
 private:
-	const CUnit* worker;
+	const CUnit *worker;
 };
 
 
@@ -283,7 +281,7 @@ bool AutoRepair(CUnit &unit)
 	if (repairedUnit == NULL) {
 		return false;
 	}
-	const Vec2i invalidPos = {-1, -1};
+	const Vec2i invalidPos = { -1, -1};
 	COrder *savedOrder = unit.CurrentOrder()->Clone();
 
 	//Command* will clear unit.SavedOrder
@@ -371,10 +369,10 @@ bool AutoAttack(CUnit &unit)
 	switch (this->State) {
 		case SUB_STILL_STANDBY:
 			UnitShowAnimation(unit, unit.Type->Animations->Still);
-		break;
+			break;
 		case SUB_STILL_ATTACK: // attacking unit in attack range.
 			AnimateActionAttack(unit, *this);
-		break;
+			break;
 	}
 	if (unit.Anim.Unbreakable) { // animation can't be aborted here
 		return;

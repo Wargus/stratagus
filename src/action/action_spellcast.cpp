@@ -61,7 +61,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder* COrder::NewActionSpellCast(SpellType &spell, const Vec2i &pos, CUnit *target)
+/* static */ COrder *COrder::NewActionSpellCast(SpellType &spell, const Vec2i &pos, CUnit *target)
 {
 	COrder_SpellCast *order = new COrder_SpellCast;
 
@@ -100,7 +100,7 @@
 		if (goal.Destroyed) {
 			/* this unit is destroyed so it's not in the global unit
 			 * array - this means it won't be saved!!! */
-			printf ("FIXME: storing destroyed Goal - loading will fail.\n");
+			printf("FIXME: storing destroyed Goal - loading will fail.\n");
 		}
 		file.printf(" \"goal\", \"%s\",", UnitReference(goal).c_str());
 	}
@@ -140,7 +140,7 @@
 	return true;
 }
 
-/* virtual */ PixelPos COrder_SpellCast::Show(const CViewport& vp, const PixelPos& lastScreenPos) const
+/* virtual */ PixelPos COrder_SpellCast::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	PixelPos targetPos;
 
@@ -155,7 +155,7 @@
 	return targetPos;
 }
 
-/* virtual */ void COrder_SpellCast::UpdatePathFinderData(PathFinderInput& input)
+/* virtual */ void COrder_SpellCast::UpdatePathFinderData(PathFinderInput &input)
 {
 	input.SetMinRange(0);
 	input.SetMaxRange(this->Range);
@@ -190,7 +190,7 @@
 
 
 /**
-**  Animate unit spell cast 
+**  Animate unit spell cast
 **
 **  @param unit  Unit, for that spell cast/attack animation is played.
 */
@@ -266,12 +266,12 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				// Notify player about this problem
 				if (unit.Variable[MANA_INDEX].Value < spell.ManaCost) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
-						_("%s: not enough mana for spell: %s"),
-						unit.Type->Name.c_str(), spell.Name.c_str());
+										_("%s: not enough mana for spell: %s"),
+										unit.Type->Name.c_str(), spell.Name.c_str());
 				} else {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
-						_("%s: can't cast spell: %s"),
-						unit.Type->Name.c_str(), spell.Name.c_str());
+										_("%s: can't cast spell: %s"),
+										unit.Type->Name.c_str(), spell.Name.c_str());
 				}
 
 				if (unit.Player->AiEnabled) {

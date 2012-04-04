@@ -52,9 +52,9 @@
 
 extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
-/* static */ COrder* COrder::NewActionBuilt(CUnit &builder, CUnit &unit)
+/* static */ COrder *COrder::NewActionBuilt(CUnit &builder, CUnit &unit)
 {
-	COrder_Built* order = new COrder_Built();
+	COrder_Built *order = new COrder_Built();
 
 	// Make sure the bulding doesn't cancel itself out right away.
 
@@ -123,7 +123,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Built::Show(const CViewport& , const PixelPos& lastScreenPos) const
+/* virtual */ PixelPos COrder_Built::Show(const CViewport & , const PixelPos &lastScreenPos) const
 {
 	return lastScreenPos;
 }
@@ -146,12 +146,12 @@ static void CancelBuilt(COrder_Built &order, CUnit &unit)
 	LetUnitDie(unit);
 }
 
-static void Finish(COrder_Built &order, CUnit& unit)
+static void Finish(COrder_Built &order, CUnit &unit)
 {
 	const CUnitType &type = *unit.Type;
 	CPlayer &player = *unit.Player;
 
-	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.Index _C_ type.Ident.c_str() _C_ type.Name.c_str() );
+	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.Index _C_ type.Ident.c_str() _C_ type.Name.c_str());
 
 	// HACK: the building is ready now
 	player.UnitTypesCount[type.Slot]++;
@@ -297,10 +297,10 @@ static void Finish(COrder_Built &order, CUnit& unit)
 /** Called when unit is killed.
 **  warn the AI module.
 */
-void COrder_Built::AiUnitKilled(CUnit& unit)
+void COrder_Built::AiUnitKilled(CUnit &unit)
 {
 	DebugPrint("%d: %d(%s) killed, under construction!\n" _C_
-		unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
+			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
 	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type);
 }
 
@@ -373,7 +373,7 @@ void COrder_Built::Boost(CUnit &building, int amount, int varIndex) const
 
 	// damageValue is the current damage taken by the unit.
 	const int damageValue = (progress * maxValue) / costs - currentValue;
-	
+
 	// Keep the same level of damage while increasing Value.
 	currentValue = (newProgress * maxValue) / costs - damageValue;
 	currentValue = std::min(currentValue, maxValue);

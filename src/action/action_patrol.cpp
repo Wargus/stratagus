@@ -52,7 +52,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder* COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest)
+/* static */ COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest)
 {
 	Assert(Map.Info.IsPointOnMap(currentPos));
 	Assert(Map.Info.IsPointOnMap(dest));
@@ -110,7 +110,7 @@
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Patrol::Show(const CViewport& vp, const PixelPos& lastScreenPos) const
+/* virtual */ PixelPos COrder_Patrol::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	const PixelPos pos1 = vp.TilePosToScreen_Center(this->goalPos);
 	const PixelPos pos2 = vp.TilePosToScreen_Center(this->WayPoint);
@@ -122,7 +122,7 @@
 	return pos2;
 }
 
-/* virtual */ void COrder_Patrol::UpdatePathFinderData(PathFinderInput& input)
+/* virtual */ void COrder_Patrol::UpdatePathFinderData(PathFinderInput &input)
 {
 	input.SetMinRange(0);
 	input.SetMaxRange(this->Range);

@@ -107,7 +107,7 @@ void COrder::ClearGoal()
 	Goal = NULL;
 }
 
-void COrder::UpdatePathFinderData_NotCalled(PathFinderInput& input)
+void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 {
 	Assert(false); // should not be called.
 
@@ -137,7 +137,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput& input)
 /** Called when unit is killed.
 **  warn the AI module.
 */
-/* virtual */ void COrder::AiUnitKilled(CUnit& unit)
+/* virtual */ void COrder::AiUnitKilled(CUnit &unit)
 {
 	switch (Action) {
 		case UnitActionStill:
@@ -146,8 +146,8 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput& input)
 			break;
 		default:
 			DebugPrint("FIXME: %d: %d(%s) killed, with order %d!\n" _C_
-				unit.Player->Index _C_ UnitNumber(unit) _C_
-				unit.Type->Ident.c_str() _C_ Action);
+					   unit.Player->Index _C_ UnitNumber(unit) _C_
+					   unit.Type->Ident.c_str() _C_ Action);
 			break;
 	}
 }
@@ -160,10 +160,10 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput& input)
 	if (unit.Type->CanAttack == false) {
 		return;
 	}
-	CUnit* goal = AttackUnitsInRange(unit);
+	CUnit *goal = AttackUnitsInRange(unit);
 
 	if (goal != NULL) {
-		const Vec2i invalidPos = {-1, -1};
+		const Vec2i invalidPos = { -1, -1};
 
 		FireMissile(unit, goal, invalidPos);
 		UnHideUnit(unit); // unit is invisible until attacks
@@ -238,7 +238,7 @@ void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 			continue;
 		} else if (order.ParseSpecificData(l, j, value, unit)) {
 			continue;
-		}else {
+		} else {
 			// This leaves a half initialized unit
 			LuaError(l, "ParseOrder: Unsupported tag: %s" _C_ value);
 		}
@@ -260,9 +260,9 @@ static void HandleRegenerations(CUnit &unit)
 	int f = 0;
 
 	// Burn
-	if (!unit.Removed && !unit.Destroyed && unit.Variable[HP_INDEX].Max &&
-			unit.CurrentAction() != UnitActionBuilt &&
-			unit.CurrentAction() != UnitActionDie) {
+	if (!unit.Removed && !unit.Destroyed && unit.Variable[HP_INDEX].Max
+		&& unit.CurrentAction() != UnitActionBuilt
+		&& unit.CurrentAction() != UnitActionDie) {
 		f = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
 		if (f <= unit.Type->BurnPercent && unit.Type->BurnDamageRate) {
 			HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate);
@@ -311,8 +311,7 @@ static void HandleBuffs(CUnit &unit, int amount)
 			if (i == INVISIBLE_INDEX &&
 				unit.Variable[INVISIBLE_INDEX].Value > 0 &&
 				unit.Variable[INVISIBLE_INDEX].Value +
-				unit.Variable[INVISIBLE_INDEX].Increase <= 0)
-			{
+				unit.Variable[INVISIBLE_INDEX].Increase <= 0) {
 				UnHideUnit(unit);
 			} else {
 				unit.Variable[i].Value += unit.Variable[i].Increase;
@@ -386,8 +385,7 @@ static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		}
 
 		// 1) Blink flag.
-		if (unit.Blink)
-		{
+		if (unit.Blink) {
 			--unit.Blink;
 		}
 		// 2) Buffs...
@@ -422,13 +420,13 @@ static void DumpUnitInfo()
 
 	fprintf(logf, "%lu: ", GameCycle);
 	fprintf(logf, "%d %s S%d-%d P%d Refs %d: %X %d,%d %d,%d\n",
-		UnitNumber(unit), unit.Type ? unit.Type->Ident.c_str() : "unit-killed",
-		unit.State,
-		!unit.Orders.empty() ? unit.CurrentAction() : -1,
-		unit.Player ? unit.Player->Index : -1, unit.Refs,SyncRandSeed,
-		unit.X, unit.Y, unit.IX, unit.IY);
+			UnitNumber(unit), unit.Type ? unit.Type->Ident.c_str() : "unit-killed",
+			unit.State,
+			!unit.Orders.empty() ? unit.CurrentAction() : -1,
+			unit.Player ? unit.Player->Index : -1, unit.Refs, SyncRandSeed,
+			unit.X, unit.Y, unit.IX, unit.IY);
 #if 0
-	SaveUnit(unit,logf);
+	SaveUnit(unit, logf);
 #endif
 	fflush(NULL);
 }
@@ -447,7 +445,7 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		}
 		try {
 			HandleUnitAction(unit);
-		} catch (AnimationDie_Exception& ) {
+		} catch (AnimationDie_Exception &) {
 			AnimationDie_OnCatch(unit);
 		}
 #ifdef DEBUG_LOG
