@@ -244,7 +244,7 @@ void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
 void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("build",& unit, flush, pos.x, pos.y, NoUnitP, what.Ident.c_str(), -1);
+		CommandLog("build", &unit, flush, pos.x, pos.y, NoUnitP, what.Ident.c_str(), -1);
 		CommandBuildBuilding(unit, pos, what, flush);
 	} else {
 		NetworkSendCommand(MessageCommandBuild, unit, pos.x, pos.y, NoUnitP, &what, flush);
@@ -346,11 +346,11 @@ void SendCommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("cancel-train", &unit, FlushCommands, -1, -1, NoUnitP,
-				type ? type->Ident.c_str() : NULL, slot);
+				   type ? type->Ident.c_str() : NULL, slot);
 		CommandCancelTraining(unit, slot, type);
 	} else {
 		NetworkSendCommand(MessageCommandCancelTrain, unit, slot, 0, NoUnitP,
-			type, FlushCommands);
+						   type, FlushCommands);
 	}
 }
 
@@ -383,7 +383,7 @@ void SendCommandCancelUpgradeTo(CUnit &unit)
 		CommandCancelUpgradeTo(unit);
 	} else {
 		NetworkSendCommand(MessageCommandCancelUpgrade, unit,
-			0, 0, NoUnitP, NULL, FlushCommands);
+						   0, 0, NoUnitP, NULL, FlushCommands);
 	}
 }
 
@@ -401,7 +401,7 @@ void SendCommandResearch(CUnit &unit, CUpgrade *what, int flush)
 		CommandResearch(unit, what, flush);
 	} else {
 		NetworkSendCommand(MessageCommandResearch, unit,
-			what->ID, 0, NoUnitP, NULL, flush);
+						   what->ID, 0, NoUnitP, NULL, flush);
 	}
 }
 
@@ -417,7 +417,7 @@ void SendCommandCancelResearch(CUnit &unit)
 		CommandCancelResearch(unit);
 	} else {
 		NetworkSendCommand(MessageCommandCancelResearch, unit,
-			0, 0, NoUnitP, NULL, FlushCommands);
+						   0, 0, NoUnitP, NULL, FlushCommands);
 	}
 }
 
@@ -437,7 +437,7 @@ void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spelli
 		CommandSpellCast(unit, pos, dest, SpellTypeTable[spellid], flush);
 	} else {
 		NetworkSendCommand(MessageCommandSpellCast + spellid,
-			unit, pos.x, pos.y, dest, NULL, flush);
+						   unit, pos.x, pos.y, dest, NULL, flush);
 	}
 }
 
@@ -455,7 +455,7 @@ void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on)
 		CommandAutoSpellCast(unit, spellid, on);
 	} else {
 		NetworkSendCommand(MessageCommandSpellCast + spellid,
-			unit, on, -1, NoUnitP, NULL, FlushCommands);
+						   unit, on, -1, NoUnitP, NULL, FlushCommands);
 	}
 }
 
@@ -472,25 +472,25 @@ void SendCommandDiplomacy(int player, int state, int opponent)
 		switch (state) {
 			case DiplomacyNeutral:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
-					NoUnitP, "neutral", -1);
+						   NoUnitP, "neutral", -1);
 				break;
 			case DiplomacyAllied:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
-					NoUnitP, "allied", -1);
+						   NoUnitP, "allied", -1);
 				break;
 			case DiplomacyEnemy:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
-					NoUnitP, "enemy", -1);
+						   NoUnitP, "enemy", -1);
 				break;
 			case DiplomacyCrazy:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
-					NoUnitP, "crazy", -1);
+						   NoUnitP, "crazy", -1);
 				break;
 		}
 		CommandDiplomacy(player, state, opponent);
 	} else {
 		NetworkSendExtendedCommand(ExtendedMessageDiplomacy,
-			-1, player, state, opponent, 0);
+								   -1, player, state, opponent, 0);
 	}
 }
 
@@ -506,15 +506,15 @@ void SendCommandSharedVision(int player, bool state, int opponent)
 	if (!IsNetworkGame()) {
 		if (state == false) {
 			CommandLog("shared-vision", NoUnitP, 0, player, opponent,
-				NoUnitP, "0", -1);
+					   NoUnitP, "0", -1);
 		} else {
 			CommandLog("shared-vision", NoUnitP, 0, player, opponent,
-				NoUnitP, "1", -1);
+					   NoUnitP, "1", -1);
 		}
 		CommandSharedVision(player, state, opponent);
 	} else {
 		NetworkSendExtendedCommand(ExtendedMessageSharedVision,
-			-1, player, state, opponent, 0);
+								   -1, player, state, opponent, 0);
 	}
 }
 
@@ -537,7 +537,7 @@ void SendCommandSharedVision(int player, bool state, int opponent)
 ** @param dstnr    optional destination unit.
 */
 void ParseCommand(unsigned char msgnr, UnitRef unum,
-	unsigned short x, unsigned short y, UnitRef dstnr)
+				  unsigned short x, unsigned short y, UnitRef dstnr)
 {
 	Assert(unum < UnitSlotFree);
 	Assert(UnitSlots[unum]);
@@ -674,24 +674,24 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 		}
 		case MessageCommandTrain:
 			CommandLog("train", &unit, status, -1, -1, NoUnitP,
-				UnitTypes[dstnr]->Ident.c_str(), -1);
+					   UnitTypes[dstnr]->Ident.c_str(), -1);
 			CommandTrainUnit(unit, *UnitTypes[dstnr], status);
 			break;
 		case MessageCommandCancelTrain:
 			// We need (short)x for the last slot -1
 			if (dstnr != (unsigned short)0xFFFF) {
 				CommandLog("cancel-train", &unit, FlushCommands, -1, -1, NoUnitP,
-					UnitTypes[dstnr]->Ident.c_str(), (short)x);
+						   UnitTypes[dstnr]->Ident.c_str(), (short)x);
 				CommandCancelTraining(unit, (short)x, UnitTypes[dstnr]);
 			} else {
 				CommandLog("cancel-train", &unit, FlushCommands, -1, -1, NoUnitP,
-					NULL, (short)x);
+						   NULL, (short)x);
 				CommandCancelTraining(unit, (short)x, NULL);
 			}
 			break;
 		case MessageCommandUpgrade:
 			CommandLog("upgrade-to", &unit, status, -1, -1, NoUnitP,
-				UnitTypes[dstnr]->Ident.c_str(), -1);
+					   UnitTypes[dstnr]->Ident.c_str(), -1);
 			CommandUpgradeTo(unit, *UnitTypes[dstnr], status);
 			break;
 		case MessageCommandCancelUpgrade:
@@ -700,7 +700,7 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		case MessageCommandResearch:
 			CommandLog("research", &unit, status, -1, -1, NoUnitP,
-				AllUpgrades[arg1]->Ident.c_str(), -1);
+					   AllUpgrades[arg1]->Ident.c_str(), -1);
 			CommandResearch(unit, AllUpgrades[arg1], status);
 			break;
 		case MessageCommandCancelResearch:
@@ -708,7 +708,7 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 			CommandCancelResearch(unit);
 			break;
 		default: {
-			int id = (msgnr&0x7f) - MessageCommandSpellCast;
+			int id = (msgnr & 0x7f) - MessageCommandSpellCast;
 			if (arg2 != (unsigned short)0xFFFF) {
 				CUnit *dest = NoUnitP;
 				if (dstnr != (unsigned short)0xFFFF) {
@@ -737,8 +737,8 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 ** @param arg4     Messe argument 4
 */
 void ParseExtendedCommand(unsigned char type, int status,
-	unsigned char arg1, unsigned short arg2, unsigned short arg3,
-	unsigned short arg4)
+						  unsigned char arg1, unsigned short arg2, unsigned short arg3,
+						  unsigned short arg4)
 {
 	// Note: destroyed units are handled by the action routines.
 
@@ -747,19 +747,19 @@ void ParseExtendedCommand(unsigned char type, int status,
 			switch (arg3) {
 				case DiplomacyNeutral:
 					CommandLog("diplomacy", NoUnitP, 0, arg2, arg4,
-						NoUnitP, "neutral", -1);
+							   NoUnitP, "neutral", -1);
 					break;
 				case DiplomacyAllied:
 					CommandLog("diplomacy", NoUnitP, 0, arg2, arg4,
-						NoUnitP, "allied", -1);
+							   NoUnitP, "allied", -1);
 					break;
 				case DiplomacyEnemy:
 					CommandLog("diplomacy", NoUnitP, 0, arg2, arg4,
-						NoUnitP, "enemy", -1);
+							   NoUnitP, "enemy", -1);
 					break;
 				case DiplomacyCrazy:
 					CommandLog("diplomacy", NoUnitP, 0, arg2, arg4,
-						NoUnitP, "crazy", -1);
+							   NoUnitP, "crazy", -1);
 					break;
 			}
 			CommandDiplomacy(arg2, arg3, arg4);
@@ -767,17 +767,17 @@ void ParseExtendedCommand(unsigned char type, int status,
 		case ExtendedMessageSharedVision:
 			if (arg3 == 0) {
 				CommandLog("shared-vision", NoUnitP, 0, arg2, arg4,
-					NoUnitP, "0", -1);
+						   NoUnitP, "0", -1);
 			} else {
 				CommandLog("shared-vision", NoUnitP, 0, arg2, arg4,
-					NoUnitP, "1", -1);
+						   NoUnitP, "1", -1);
 			}
 			CommandSharedVision(arg2, arg3 ? true : false, arg4);
 			break;
 		default:
 			DebugPrint("Unknown extended message %u/%s %u %u %u %u\n" _C_
-				type _C_ status ? "flush" : "-" _C_
-				arg1 _C_ arg2 _C_ arg3 _C_ arg4);
+					   type _C_ status ? "flush" : "-" _C_
+					   arg1 _C_ arg2 _C_ arg3 _C_ arg4);
 			break;
 	}
 }

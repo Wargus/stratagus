@@ -104,7 +104,7 @@ int MetaInit()
 	MetaServerFildes = NetworkFildes;
 	for (i = port_range_min; i < port_range_max; ++i) {
 		MetaServerFildes = NetOpenTCP(NetworkAddr, i);  //FIXME: need to make a dynamic port allocation there...if (!MetaServerFildes) {...}
-		if (MetaServerFildes != (Socket)-1) {
+		if (MetaServerFildes != static_cast<Socket>(-1)) {
 			if (NetConnectTCP(MetaServerFildes, NetResolveHost(MasterHost), MasterPort) != -1) {
 				break;
 			}
@@ -233,7 +233,7 @@ int SendMetaCommand(const char *command, const char *format, ...)
 	// <Stratagus> if for Magnant Compatibility, it may be removed
 	// Player Name, Game Name, VERSION, Command, **Paramaters**
 	sprintf(s, "<Stratagus>\n%s\n%s\n%s\n%s\n",
-		Parameters::Instance.LocalPlayerName.c_str(), GameName.c_str(), VERSION, command);
+			Parameters::Instance.LocalPlayerName.c_str(), GameName.c_str(), VERSION, command);
 
 	// Commands
 	// Login - password

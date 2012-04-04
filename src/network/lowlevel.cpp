@@ -242,23 +242,21 @@ int NetSocketAddr(const Socket sock)
 	DWORD bytesReturned;
 	SOCKADDR_IN *pAddrInet;
 	u_long SetFlags;
-	int i;
 	int nif;
 	int wsError;
 	int numLocalAddr;
 
 	nif = 0;
-	if (sock != (Socket)-1) {
+	if (sock != static_cast<Socket>(-1)) {
 		wsError = WSAIoctl(sock, SIO_GET_INTERFACE_LIST, NULL, 0, &localAddr,
-			sizeof(localAddr), &bytesReturned, NULL, NULL);
+						   sizeof(localAddr), &bytesReturned, NULL, NULL);
 		if (wsError == SOCKET_ERROR) {
-			DebugPrint("SIOCGIFCONF:WSAIoctl(SIO_GET_INTERFACE_LIST) - errno %d\n" _C_
-				WSAGetLastError());
+			DebugPrint("SIOCGIFCONF:WSAIoctl(SIO_GET_INTERFACE_LIST) - errno %d\n" _C_ WSAGetLastError());
 		}
 
 		// parse interface information
 		numLocalAddr = (bytesReturned / sizeof(INTERFACE_INFO));
-		for (i = 0; i < numLocalAddr; ++i) {
+		for (int i = 0; i < numLocalAddr; ++i) {
 			SetFlags = localAddr[i].iiFlags;
 			if ((SetFlags & IFF_UP) == 0) {
 				continue;
@@ -295,7 +293,7 @@ int NetSocketAddr(const Socket sock)
 	int nif;
 
 	nif = 0;
-	if (sock != (Socket)-1) {
+	if (sock != static_cast<Socket>(-1)) {
 		ifc.ifc_len = sizeof(buf);
 		ifc.ifc_buf = buf;
 		if (ioctl(sock, SIOCGIFCONF, (char *)&ifc) < 0) {
@@ -306,16 +304,15 @@ int NetSocketAddr(const Socket sock)
 		ifr = ifc.ifc_req;
 		cplim = buf + ifc.ifc_len; // skip over if's with big ifr_addr's
 		for (cp = buf; cp < cplim;
-				cp += sizeof(ifr->ifr_name) + sizeof(ifr->ifr_ifru)) {
+			 cp += sizeof(ifr->ifr_name) + sizeof(ifr->ifr_ifru)) {
 			ifr = (struct ifreq *)cp;
 			ifreq = *ifr;
 			if (ioctl(sock, SIOCGIFFLAGS, (char *)&ifreq) < 0) {
 				DebugPrint("%s: SIOCGIFFLAGS - errno %d\n" _C_
-					ifr->ifr_name _C_ errno);
+						   ifr->ifr_name _C_ errno);
 				continue;
 			}
-			if ((ifreq.ifr_flags & IFF_UP) == 0 ||
-					ifr->ifr_addr.sa_family == AF_UNSPEC) {
+			if ((ifreq.ifr_flags & IFF_UP) == 0 || ifr->ifr_addr.sa_family == AF_UNSPEC) {
 				continue;
 			}
 			// argh, this'll have to change sometime
@@ -331,7 +328,7 @@ int NetSocketAddr(const Socket sock)
 			if (ifreq.ifr_flags & IFF_POINTOPOINT) {
 				if (ioctl(sock, SIOCGIFDSTADDR, (char *)&ifreq) < 0) {
 					DebugPrint("%s: SIOCGIFDSTADDR - errno %d\n" _C_
-						ifr->ifr_name _C_ errno);
+							   ifr->ifr_name _C_ errno);
 					// failed to obtain dst addr - ignore
 					continue;
 				}
@@ -376,14 +373,14 @@ int NetSocketAddr(const Socket sock)
 **
 **  @return If success the socket fildes, -1 otherwise.
 */
-Socket NetOpenUDP(char* addr, int port)
+Socket NetOpenUDP(char *addr, int port)
 {
 	Socket sockfd;
 
 	// open the socket
 	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	if (sockfd == INVALID_SOCKET) {
-		return (Socket)-1;
+		return static_cast<Socket>(-1);
 	}
 	// bind local port
 	if (port) {
@@ -391,16 +388,17 @@ Socket NetOpenUDP(char* addr, int port)
 
 		memset(&sock_addr, 0, sizeof(sock_addr));
 		sock_addr.sin_family = AF_INET;
-		if (addr)
+		if (addr) {
 			sock_addr.sin_addr.s_addr = inet_addr(addr);
-		else
+		} else {
 			sock_addr.sin_addr.s_addr = INADDR_ANY;
+		}
 		sock_addr.sin_port = htons(port);
 		// Bind the socket for listening
 		if (bind(sockfd, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0) {
 			fprintf(stderr, "Couldn't bind to local port\n");
 			NetCloseUDP(sockfd);
-			return (Socket)-1;
+			return static_cast<Socket>(-1);
 		}
 		NetLastHost = sock_addr.sin_addr.s_addr;
 		NetLastPort = sock_addr.sin_port;
@@ -415,13 +413,13 @@ Socket NetOpenUDP(char* addr, int port)
 **
 **  @return If success the socket fildes, -1 otherwise
 */
-Socket NetOpenTCP(char* addr, int port)
+Socket NetOpenTCP(char *addr, int port)
 {
 	Socket sockfd;
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd == INVALID_SOCKET) {
-		return (Socket)-1;
+		return static_cast<Socket>(-1);
 	}
 	// bind local port
 	if (port) {
@@ -430,19 +428,20 @@ Socket NetOpenTCP(char* addr, int port)
 
 		memset(&sock_addr, 0, sizeof(sock_addr));
 		sock_addr.sin_family = AF_INET;
-		if (addr)
+		if (addr) {
 			sock_addr.sin_addr.s_addr = inet_addr(addr);
-		else
+		} else {
 			sock_addr.sin_addr.s_addr = INADDR_ANY;
+		}
 		sock_addr.sin_port = htons(port);
 
 		opt = 1;
 		setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (setsockopttype)&opt, sizeof(opt));
 
-		if (bind(sockfd,(struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0) {
+		if (bind(sockfd, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0) {
 			fprintf(stderr, "Couldn't bind to local port\n");
 			NetCloseTCP(sockfd);
-			return (Socket)-1;
+			return static_cast<Socket>(-1);
 		}
 		NetLastHost = sock_addr.sin_addr.s_addr;
 		NetLastPort = sock_addr.sin_port;
@@ -483,7 +482,7 @@ int NetConnectTCP(Socket sockfd, unsigned long addr, int port)
 
 	if (connect(sockfd, (struct sockaddr *)&sa, sizeof(sa)) < 0) {
 		fprintf(stderr, "connect to %d.%d.%d.%d:%d failed\n",
-			NIPQUAD(ntohl(addr)), port);
+				NIPQUAD(ntohl(addr)), port);
 		return -1;
 	}
 
@@ -559,7 +558,8 @@ int NetSocketSetReady(SocketSet *set, int timeout)
 	} while (retval == -1 && errno == EINTR);
 #endif
 
-	for (size_t i = 0; i < set->Sockets.size(); ++i) {
+	for (size_t i = 0; i < set->Sockets.size(); ++i)
+	{
 		set->SocketReady[i] = FD_ISSET(set->Sockets[i], &mask);
 	}
 
@@ -659,7 +659,7 @@ int NetRecvTCP(Socket sockfd, void *buf, int len)
 **  @return Number of bytes sent.
 */
 int NetSendUDP(Socket sockfd, unsigned long host, int port,
-	const void *buf, int len)
+			   const void *buf, int len)
 {
 	int n;
 	struct sockaddr_in sock_addr;
