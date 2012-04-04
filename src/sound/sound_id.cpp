@@ -60,7 +60,7 @@ static CSound *FindSound(const std::string &name)
 {
 	std::map<std::string, CSound *>::iterator ret = SoundMap.find(name);
 	if (ret != SoundMap.end()) {
-		return  (*ret).second;
+		return (*ret).second;
 	}
 	return NULL;
 }
@@ -124,8 +124,9 @@ CSound *MakeSound(const std::string &name, const char *file[], int nb)
 	}
 
 	sound = RegisterSound(file, nb);
-	if(sound != NO_SOUND)
+	if (sound != NO_SOUND) {
 		MapSound(name, sound);
+	}
 
 	return sound;
 }
@@ -153,8 +154,9 @@ CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second)
 	}
 
 	sound = RegisterTwoGroups(first, second);
-	if(sound != NO_SOUND)
+	if (sound != NO_SOUND) {
 		MapSound(name, sound);
+	}
 
 	return sound;
 }
@@ -166,8 +168,9 @@ void FreeSounds()
 	for (i = SoundMap.begin(); i != SoundMap.end(); ++i) {
 		CSound *sound = (*i).second;
 		Assert(sound && sound->Mapref != 0);
-		if(sound && !--sound->Mapref)
+		if (sound && !--sound->Mapref) {
 			delete sound;
+		}
 	}
 }
 #endif

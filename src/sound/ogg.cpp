@@ -137,7 +137,7 @@ int VorbisProcessData(OggData *data, char *buffer)
 						}
 
 						*(Sint16 *)(buffer + len
-						  + (j * 2 * data->vinfo.channels) + i * 2) = (Sint16)val;
+									+ (j * 2 * data->vinfo.channels) + i * 2) = (Sint16)val;
 					}
 				}
 				len += j * 2 * data->vinfo.channels;
@@ -214,12 +214,12 @@ int OggInit(CFile *f, OggData *data)
 				++num_theora;
 			} else
 #endif
-			if (!vorbis_synthesis_headerin(&data->vinfo, &data->vcomment, &packet)) {
-				memcpy(&data->astream, &test, sizeof(test));
-				++num_vorbis;
-			} else {
-				ogg_stream_clear(&test);
-			}
+				if (!vorbis_synthesis_headerin(&data->vinfo, &data->vcomment, &packet)) {
+					memcpy(&data->astream, &test, sizeof(test));
+					++num_vorbis;
+				} else {
+					ogg_stream_clear(&test);
+				}
 		}
 	}
 
@@ -231,10 +231,10 @@ int OggInit(CFile *f, OggData *data)
 	// remainint codec headers
 	while ((num_vorbis && num_vorbis < 3)
 #ifdef USE_THEORA
-	  || (num_theora && num_theora < 3) ) {
+		   || (num_theora && num_theora < 3)) {
 		// are we in the theora page ?
 		while (num_theora && num_theora < 3 &&
-		  (ret = ogg_stream_packetout(&data->vstream, &packet))) {
+			   (ret = ogg_stream_packetout(&data->vstream, &packet))) {
 			if (ret < 0) {
 				return -1;
 			}
@@ -244,12 +244,12 @@ int OggInit(CFile *f, OggData *data)
 			++num_theora;
 		}
 #else
-	  ) {
+		  ) {
 #endif
 
 		// are we in the vorbis page ?
 		while (num_vorbis && num_vorbis < 3 &&
-		  (ret = ogg_stream_packetout(&data->astream, &packet))) {
+			   (ret = ogg_stream_packetout(&data->astream, &packet))) {
 			if (ret < 0) {
 				return -1;
 			}
@@ -261,7 +261,7 @@ int OggInit(CFile *f, OggData *data)
 		}
 
 		if (OggGetNextPage(&data->page, &data->sync, f)) {
-				break;
+			break;
 		}
 
 		if (num_vorbis) {
@@ -278,8 +278,8 @@ int OggInit(CFile *f, OggData *data)
 		vorbis_synthesis_init(&data->vdsp, &data->vinfo);
 		vorbis_block_init(&data->vdsp, &data->vblock);
 	} else {
-    	vorbis_info_clear(&data->vinfo);
-    	vorbis_comment_clear(&data->vcomment);
+		vorbis_info_clear(&data->vinfo);
+		vorbis_comment_clear(&data->vcomment);
 	}
 
 #ifdef USE_THEORA
@@ -287,8 +287,8 @@ int OggInit(CFile *f, OggData *data)
 		theora_decode_init(&data->tstate, &data->tinfo);
 		data->tstate.internal_encode = NULL;  // needed for a bug in libtheora (fixed in next release)
 	} else {
-    	theora_info_clear(&data->tinfo);
-    	theora_comment_clear(&data->tcomment);
+		theora_info_clear(&data->tinfo);
+		theora_comment_clear(&data->tcomment);
 	}
 
 	return !(num_vorbis || num_theora);
@@ -460,7 +460,7 @@ CSample *LoadVorbis(const char *name, int flags)
 		pos = 0;
 
 		while ((ret = VorbisStreamRead(sample, &((CSampleVorbis *)sample)->Data,
-				sample->Buffer + pos, 8192))) {
+									   sample->Buffer + pos, 8192))) {
 			pos += ret;
 		}
 

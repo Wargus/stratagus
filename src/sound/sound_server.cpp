@@ -61,7 +61,7 @@ static int MusicVolume = 128;    /// music volume
 static bool MusicEnabled = true;
 static bool EffectsEnabled = true;
 
-	/// Channels for sound effects and unit speach
+/// Channels for sound effects and unit speach
 struct SoundChannel {
 	CSample *Sample;       /// sample to play
 	unsigned char Volume;  /// Volume of this channel
@@ -105,7 +105,7 @@ static int MixerBufferSize;
 **  @return           Number of bytes written in 'dest'
 */
 static int ConvertToStereo32(const char *src, char *dest, int frequency,
-	int chansize, int channels, int bytes)
+							 int chansize, int channels, int bytes)
 {
 	SDL_AudioCVT acvt;
 	Uint16 format;
@@ -152,12 +152,12 @@ static void MixMusicToStereo32(int *buffer, int size)
 		buf = new short[len];
 
 		div = 176400 / (MusicChannel.Sample->Frequency * (MusicChannel.Sample->SampleSize / 8)
-				* MusicChannel.Sample->Channels);
+						* MusicChannel.Sample->Channels);
 
 		size = MusicChannel.Sample->Read(tmp, len / div);
 
 		n = ConvertToStereo32((char *)(tmp), (char *)buf, MusicChannel.Sample->Frequency,
-			MusicChannel.Sample->SampleSize / 8, MusicChannel.Sample->Channels, size);
+							  MusicChannel.Sample->SampleSize / 8, MusicChannel.Sample->Channels, size);
 
 		for (i = 0; i < n / (int)sizeof(*buf); ++i) {
 			// Add to our samples
@@ -198,7 +198,7 @@ static void MixMusicToStereo32(int *buffer, int size)
 **  @todo          Can mix faster if signed 8 bit buffers are used.
 */
 static int MixSampleToStereo32(CSample *sample, int index, unsigned char volume,
-	char stereo, int *buffer, int size)
+							   char stereo, int *buffer, int size)
 {
 	int local_volume;
 	unsigned char left;
@@ -208,7 +208,7 @@ static int MixSampleToStereo32(CSample *sample, int index, unsigned char volume,
 	int div;
 
 	div = 176400 / (sample->Frequency * (sample->SampleSize / 8)
-			* sample->Channels);
+					* sample->Channels);
 
 	local_volume = (int)volume * EffectsVolume / MaxVolume;
 
@@ -227,8 +227,8 @@ static int MixSampleToStereo32(CSample *sample, int index, unsigned char volume,
 	}
 
 	size = ConvertToStereo32((char *)(sample->Buffer + index), (char *)buf, sample->Frequency,
-			sample->SampleSize / 8, sample->Channels,
-			size * 2 / div);
+							 sample->SampleSize / 8, sample->Channels,
+							 size * 2 / div);
 
 	size /= 2;
 	for (i = 0; i < size; i += 2) {
@@ -258,8 +258,8 @@ static int MixChannelsToStereo32(int *buffer, int size)
 	for (channel = 0; channel < MaxChannels; ++channel) {
 		if (Channels[channel].Playing && Channels[channel].Sample) {
 			i = MixSampleToStereo32(Channels[channel].Sample,
-				Channels[channel].Point, Channels[channel].Volume,
-				Channels[channel].Stereo, buffer, size);
+									Channels[channel].Point, Channels[channel].Volume,
+									Channels[channel].Stereo, buffer, size);
 			Channels[channel].Point += i;
 			Assert(Channels[channel].Point <= Channels[channel].Sample->Len);
 
@@ -553,8 +553,7 @@ int PlaySample(CSample *sample)
 
 	SDL_LockAudio();
 
-	if (SoundEnabled() && EffectsEnabled && sample &&
-			NextFreeChannel != MaxChannels) {
+	if (SoundEnabled() && EffectsEnabled && sample && NextFreeChannel != MaxChannels) {
 		channel = FillChannel(sample, EffectsVolume, 0);
 	}
 

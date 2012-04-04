@@ -111,8 +111,8 @@ static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 
 	if (sound->Number == TWO_GROUPS) {
 		// handle a special sound (selection)
-		if (SelectionHandler.Source.Base == source.Base &&
-				SelectionHandler.Source.Id == source.Id) {
+		if (SelectionHandler.Source.Base == source.Base
+			&& SelectionHandler.Source.Id == source.Id) {
 			if (SelectionHandler.Sound == sound->Sound.TwoGroups.First) {
 				result = SimpleChooseSample(SelectionHandler.Sound);
 				SelectionHandler.HowMany++;
@@ -175,10 +175,11 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 		case VoiceHelpMe:
 			return unit.Type->Sound.Help.Sound;
 		case VoiceDying:
-			if (unit.Type->Sound.Dead[unit.DamagedType].Sound)
+			if (unit.Type->Sound.Dead[unit.DamagedType].Sound) {
 				return unit.Type->Sound.Dead[unit.DamagedType].Sound;
-			else
+			} else {
 				return unit.Type->Sound.Dead[ANIMATIONS_DEATHTYPES].Sound;
+			}
 		case VoiceWorkCompleted:
 			return GameSounds.WorkComplete[ThisPlayer->Race].Sound;
 		case VoiceBuilding:
@@ -219,8 +220,7 @@ static unsigned char VolumeForDistance(unsigned short d, unsigned char range)
 			if (d_tmp > range_tmp) {
 				return 0;
 			} else {
-				return (unsigned char)((range_tmp - d_tmp) *
-					MAX_SOUND_RANGE / range_tmp);
+				return (unsigned char)((range_tmp - d_tmp) * MAX_SOUND_RANGE / range_tmp);
 			}
 		} else {
 			return 0;
@@ -254,8 +254,8 @@ static char CalculateStereo(const CUnit &unit)
 	int stereo;
 
 	stereo = ((unit.tilePos.x * PixelTileSize.x + unit.Type->TileWidth * PixelTileSize.x / 2 +
-		unit.IX - UI.SelectedViewport->MapX * PixelTileSize.x) * 256 /
-		((UI.SelectedViewport->MapWidth - 1) * PixelTileSize.x)) - 128;
+			   unit.IX - UI.SelectedViewport->MapX * PixelTileSize.x) * 256 /
+			  ((UI.SelectedViewport->MapWidth - 1) * PixelTileSize.x)) - 128;
 	if (stereo < -128) {
 		stereo = -128;
 	} else if (stereo > 127) {
@@ -319,8 +319,8 @@ void PlayUnitSound(const CUnit &unit, CSound *sound)
 void PlayMissileSound(const Missile *missile, CSound *sound)
 {
 	int stereo = ((missile->position.x + missile->Type->G->Width / 2 -
-		UI.SelectedViewport->MapX * PixelTileSize.x) * 256 /
-		((UI.SelectedViewport->MapWidth - 1) * PixelTileSize.x)) - 128;
+				   UI.SelectedViewport->MapX * PixelTileSize.x) * 256 /
+				  ((UI.SelectedViewport->MapWidth - 1) * PixelTileSize.x)) - 128;
 
 	if (stereo < -128) {
 		stereo = -128;
@@ -486,16 +486,16 @@ void InitSoundClient()
 	// let's map game sounds, look if already setup in ccl.
 
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
-		if (!GameSounds.PlacementError[i].Sound &&
-				!GameSounds.PlacementError[i].Name.empty()) {
+		if (!GameSounds.PlacementError[i].Sound
+			&& !GameSounds.PlacementError[i].Name.empty()) {
 			GameSounds.PlacementError[i].Sound =
 				SoundForName(GameSounds.PlacementError[i].Name);
 		}
 	}
 
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
-		if (!GameSounds.PlacementSuccess[i].Sound &&
-				!GameSounds.PlacementSuccess[i].Name.empty()) {
+		if (!GameSounds.PlacementSuccess[i].Sound
+			&& !GameSounds.PlacementSuccess[i].Name.empty()) {
 			GameSounds.PlacementSuccess[i].Sound =
 				SoundForName(GameSounds.PlacementSuccess[i].Name);
 		}
@@ -509,51 +509,49 @@ void InitSoundClient()
 	}
 
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
-		if (!GameSounds.BuildingConstruction[i].Sound &&
-				!GameSounds.BuildingConstruction[i].Name.empty()) {
+		if (!GameSounds.BuildingConstruction[i].Sound
+			&& !GameSounds.BuildingConstruction[i].Name.empty()) {
 			GameSounds.BuildingConstruction[i].Sound =
 				SoundForName(GameSounds.BuildingConstruction[i].Name);
 		}
 	}
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
-		if (!GameSounds.WorkComplete[i].Sound &&
-				!GameSounds.WorkComplete[i].Name.empty()) {
+		if (!GameSounds.WorkComplete[i].Sound
+			&& !GameSounds.WorkComplete[i].Name.empty()) {
 			GameSounds.WorkComplete[i].Sound =
 				SoundForName(GameSounds.WorkComplete[i].Name);
 		}
 	}
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
-		if (!GameSounds.ResearchComplete[i].Sound &&
-				!GameSounds.ResearchComplete[i].Name.empty()) {
+		if (!GameSounds.ResearchComplete[i].Sound
+			&& !GameSounds.ResearchComplete[i].Name.empty()) {
 			GameSounds.ResearchComplete[i].Sound =
 				SoundForName(GameSounds.ResearchComplete[i].Name);
 		}
 	}
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
 		for (unsigned int j = 0; j < MaxCosts; ++j) {
-			if (!GameSounds.NotEnoughRes[i][j].Sound &&
-					!GameSounds.NotEnoughRes[i][j].Name.empty()) {
+			if (!GameSounds.NotEnoughRes[i][j].Sound
+				&& !GameSounds.NotEnoughRes[i][j].Name.empty()) {
 				GameSounds.NotEnoughRes[i][j].Sound =
 					SoundForName(GameSounds.NotEnoughRes[i][j].Name);
 			}
 		}
 	}
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
-		if (!GameSounds.NotEnoughFood[i].Sound &&
-				!GameSounds.NotEnoughFood[i].Name.empty()) {
+		if (!GameSounds.NotEnoughFood[i].Sound
+			&& !GameSounds.NotEnoughFood[i].Name.empty()) {
 			GameSounds.NotEnoughFood[i].Sound =
 				SoundForName(GameSounds.NotEnoughFood[i].Name);
 		}
 	}
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
 		if (!GameSounds.Rescue[i].Sound && !GameSounds.Rescue[i].Name.empty()) {
-			GameSounds.Rescue[i].Sound =
-				SoundForName(GameSounds.Rescue[i].Name);
+			GameSounds.Rescue[i].Sound = SoundForName(GameSounds.Rescue[i].Name);
 		}
 	}
 	if (!GameSounds.ChatMessage.Sound && !GameSounds.ChatMessage.Name.empty()) {
-		GameSounds.ChatMessage.Sound =
-			SoundForName(GameSounds.ChatMessage.Name);
+		GameSounds.ChatMessage.Sound = SoundForName(GameSounds.ChatMessage.Name);
 	}
 
 	int MapWidth = (UI.MapArea.EndX - UI.MapArea.X + PixelTileSize.x) / PixelTileSize.x;

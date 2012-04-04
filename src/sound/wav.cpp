@@ -282,8 +282,7 @@ CSample *LoadWav(const char *name, int flags)
 		delete f;
 		return NULL;
 	}
-	Assert(wavfmt.Frequency == 44100 || wavfmt.Frequency == 22050 ||
-		wavfmt.Frequency == 11025);
+	Assert(wavfmt.Frequency == 44100 || wavfmt.Frequency == 22050 || wavfmt.Frequency == 11025);
 
 	//
 	//  Read sample

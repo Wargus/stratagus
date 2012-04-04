@@ -74,11 +74,11 @@ void LoadUnitSounds()
 static void MapAnimSound(CAnimation &anim)
 {
 	if (anim.Type == AnimationSound) {
-		CAnimation_Sound &anim_sound = *static_cast<CAnimation_Sound*>(&anim);
+		CAnimation_Sound &anim_sound = *static_cast<CAnimation_Sound *>(&anim);
 
 		anim_sound.MapSound();
 	} else if (anim.Type == AnimationRandomSound) {
-		CAnimation_RandomSound &anim_rsound = *static_cast<CAnimation_RandomSound*>(&anim);
+		CAnimation_RandomSound &anim_rsound = *static_cast<CAnimation_RandomSound *>(&anim);
 
 		anim_rsound.MapSound();
 	}
@@ -145,12 +145,10 @@ void MapUnitSounds()
 			MapAnimSounds(type);
 
 			if (!type->Sound.Selected.Name.empty()) {
-				type->Sound.Selected.Sound =
-					SoundForName(type->Sound.Selected.Name);
+				type->Sound.Selected.Sound = SoundForName(type->Sound.Selected.Name);
 			}
 			if (!type->Sound.Acknowledgement.Name.empty()) {
-				type->Sound.Acknowledgement.Sound =
-					SoundForName(type->Sound.Acknowledgement.Name);
+				type->Sound.Acknowledgement.Sound = SoundForName(type->Sound.Acknowledgement.Name);
 				/*
 				// Acknowledge sounds have infinite range
 				SetSoundRange(type->Sound.Acknowledgement.Sound,
@@ -158,37 +156,29 @@ void MapUnitSounds()
 				*/
 			}
 			if (!type->Sound.Attack.Name.empty()) {
-				type->Sound.Attack.Sound =
-					SoundForName(type->Sound.Attack.Name);
+				type->Sound.Attack.Sound = SoundForName(type->Sound.Attack.Name);
 			}
 			if (!type->Sound.Ready.Name.empty()) {
-				type->Sound.Ready.Sound =
-					SoundForName(type->Sound.Ready.Name);
+				type->Sound.Ready.Sound = SoundForName(type->Sound.Ready.Name);
 				// Ready sounds have infinite range
-				SetSoundRange(type->Sound.Ready.Sound,
-					INFINITE_SOUND_RANGE);
+				SetSoundRange(type->Sound.Ready.Sound, INFINITE_SOUND_RANGE);
 			}
 			if (!type->Sound.Repair.Name.empty()) {
-				type->Sound.Repair.Sound =
-					SoundForName(type->Sound.Repair.Name);
+				type->Sound.Repair.Sound = SoundForName(type->Sound.Repair.Name);
 			}
 			for (j = 0; j < MaxCosts; ++j) {
 				if (!type->Sound.Harvest[j].Name.empty()) {
-					type->Sound.Harvest[j].Sound =
-						SoundForName(type->Sound.Harvest[j].Name);
+					type->Sound.Harvest[j].Sound = SoundForName(type->Sound.Harvest[j].Name);
 				}
 			}
 			if (!type->Sound.Help.Name.empty()) {
-				type->Sound.Help.Sound =
-					SoundForName(type->Sound.Help.Name);
+				type->Sound.Help.Sound = SoundForName(type->Sound.Help.Name);
 				// Help sounds have infinite range
-				SetSoundRange(type->Sound.Help.Sound,
-					INFINITE_SOUND_RANGE);
+				SetSoundRange(type->Sound.Help.Sound, INFINITE_SOUND_RANGE);
 			}
 			for (j = 0; j <= ANIMATIONS_DEATHTYPES; ++j) {
 				if (!type->Sound.Dead[j].Name.empty()) {
-					type->Sound.Dead[j].Sound =
-						SoundForName(type->Sound.Dead[j].Name);
+					type->Sound.Dead[j].Sound = SoundForName(type->Sound.Dead[j].Name);
 				}
 			}
 		}
