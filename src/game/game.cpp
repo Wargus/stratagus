@@ -168,9 +168,10 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map, char *)
 	int i;
 	int topplayer;
 	int numplayers;
-//	char *mapsetupname;
+	//	char *mapsetupname;
 	const char *type[] = {"", "", "neutral", "nobody",
-		"computer", "person", "rescue-passive", "rescue-active"};
+						  "computer", "person", "rescue-passive", "rescue-active"
+						 };
 
 	numplayers = 0;
 	topplayer = PlayerMax - 2;
@@ -195,14 +196,14 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map, char *)
 		f->printf(")\n");
 
 		f->printf("PresentMap(\"%s\", %d, %d, %d, %d)\n",
-			map.Info.Description.c_str(), numplayers, map.Info.MapWidth, map.Info.MapHeight,
-			map.Info.MapUID + 1);
+				  map.Info.Description.c_str(), numplayers, map.Info.MapWidth, map.Info.MapHeight,
+				  map.Info.MapUID + 1);
 
-//		mapsetupname = strrchr(mapsetup, '/');
-//		if (!mapsetupname) {
-//			mapsetupname = mapsetup;
-//		}
-//		f->printf("DefineMapSetup(GetCurrentLuaPath()..\"%s\")\n", mapsetupname);
+		//		mapsetupname = strrchr(mapsetup, '/');
+		//		if (!mapsetupname) {
+		//			mapsetupname = mapsetup;
+		//		}
+		//		f->printf("DefineMapSetup(GetCurrentLuaPath()..\"%s\")\n", mapsetupname);
 	} catch (const FileException &) {
 		fprintf(stderr, "ERROR: cannot write the map presentation\n");
 		delete f;
@@ -241,18 +242,18 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 			}
 			f->printf("SetStartView(%d, %d, %d)\n", i, Players[i].StartPos.x, Players[i].StartPos.y);
 			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
-				i, DefaultResourceNames[WoodCost].c_str(),
-				Players[i].Resources[WoodCost]);
+					  i, DefaultResourceNames[WoodCost].c_str(),
+					  Players[i].Resources[WoodCost]);
 			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
-				i, DefaultResourceNames[GoldCost].c_str(),
-				Players[i].Resources[GoldCost]);
+					  i, DefaultResourceNames[GoldCost].c_str(),
+					  Players[i].Resources[GoldCost]);
 			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
-				i, DefaultResourceNames[OilCost].c_str(),
-				Players[i].Resources[OilCost]);
+					  i, DefaultResourceNames[OilCost].c_str(),
+					  Players[i].Resources[OilCost]);
 			f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
-				i, PlayerRaces.Name[Players[i].Race].c_str());
+					  i, PlayerRaces.Name[Players[i].Race].c_str());
 			f->printf("SetAiType(%d, \"%s\")\n",
-				i, Players[i].AiName.c_str());
+					  i, Players[i].AiName.c_str());
 		}
 		f->printf("\n");
 
@@ -278,16 +279,16 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 		f->printf("-- place units\n");
 		for (i = 0; i < NumUnits; ++i) {
 			f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
-				Units[i]->Type->Ident.c_str(),
-				Units[i]->Player->Index,
-				Units[i]->tilePos.x, Units[i]->tilePos.y);
+					  Units[i]->Type->Ident.c_str(),
+					  Units[i]->Player->Index,
+					  Units[i]->tilePos.x, Units[i]->tilePos.y);
 			if (Units[i]->Type->GivesResource) {
 				f->printf("SetResourcesHeld(unit, %d)\n", Units[i]->ResourcesHeld);
 			}
 		}
 		f->printf("\n\n");
 	} catch (const FileException &) {
-		fprintf(stderr,"Can't save map setup : `%s' \n", mapSetup);
+		fprintf(stderr, "Can't save map setup : `%s' \n", mapSetup);
 		delete f;
 		return -1;
 	}
@@ -357,12 +358,12 @@ static void LoadMap(const std::string &filename, CMap &map)
 #endif
 		if (!strcmp(tmp, ".smp")
 #ifdef USE_ZLIB
-				|| !strcmp(tmp, ".smp.gz")
+			|| !strcmp(tmp, ".smp.gz")
 #endif
 #ifdef USE_BZ2LIB
-				|| !strcmp(tmp, ".smp.bz2")
+			|| !strcmp(tmp, ".smp.bz2")
 #endif
-		) {
+		   ) {
 			if (map.Info.Filename.empty()) {
 				// The map info hasn't been loaded yet => do it now
 				LoadStratagusMapInfo(filename);
@@ -477,7 +478,7 @@ static void GameTypeLeftVsRight()
 		for (int j = i + 1; j < PlayerMax - 1; ++j) {
 			const bool left_j = Players[j].StartPos.x <= middle;
 
-			if (left_i ==left_j) {
+			if (left_i == left_j) {
 				CommandDiplomacy(i, DiplomacyAllied, j);
 				Players[i].ShareVisionWith(Players[j]);
 				CommandDiplomacy(j, DiplomacyAllied, i);
@@ -610,7 +611,7 @@ void CreateGame(const std::string &filename, CMap *map)
 		DebugPrint("Client setup: Calling InitNetwork2\n");
 		InitNetwork2();
 	} else {
-		const std::string& localPlayerName = Parameters::Instance.LocalPlayerName;
+		const std::string &localPlayerName = Parameters::Instance.LocalPlayerName;
 
 		if (!localPlayerName.empty() && localPlayerName != "Anonymous") {
 			ThisPlayer->SetName(localPlayerName);
@@ -650,7 +651,7 @@ void CreateGame(const std::string &filename, CMap *map)
 			case SettingsGameTypeManTeamVsMachine:
 				GameTypeManTeamVsMachine();
 
-			// Future game type ideas
+				// Future game type ideas
 #if 0
 			case SettingsGameTypeOneOnOne:
 				break;

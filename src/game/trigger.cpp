@@ -173,13 +173,13 @@ static int CclGetNumUnitsAt(lua_State *l)
 	CclGetPos(l, &minPos.x, &minPos.y, 3);
 	CclGetPos(l, &maxPos.x, &maxPos.y, 4);
 
-	std::vector<CUnit*> units;
+	std::vector<CUnit *> units;
 
 	Map.Select(minPos, maxPos, units);
 
 	int s = 0;
 	for (size_t i = 0; i != units.size(); ++i) {
-		const CUnit& unit = *units[i];
+		const CUnit &unit = *units[i];
 		// Check unit type
 
 		if (unittype == ANY_UNIT
@@ -206,7 +206,7 @@ static int CclIfNearUnit(lua_State *l)
 	lua_pushvalue(l, 1);
 	const int plynr = TriggerGetPlayer(l);
 	lua_pop(l, 1);
-	const char* op = LuaToString(l, 2);
+	const char *op = LuaToString(l, 2);
 	const int q = LuaToNumber(l, 3);
 	lua_pushvalue(l, 4);
 	const CUnitType *unittype = TriggerGetUnitType(l);
@@ -224,7 +224,7 @@ static int CclIfNearUnit(lua_State *l)
 	// Get all unit types 'near'.
 	//
 
-	std::vector<CUnit*> unitsOfType;
+	std::vector<CUnit *> unitsOfType;
 
 	FindUnitsByType(*ut2, unitsOfType);
 	for (size_t i = 0; i != unitsOfType.size(); ++i) {
@@ -236,7 +236,7 @@ static int CclIfNearUnit(lua_State *l)
 		// Count the requested units
 		int s = 0;
 		for (size_t j = 0; j < around.size(); ++j) {
-			const CUnit& unit = *around[j];
+			const CUnit &unit = *around[j];
 
 			// Check unit type
 			if (unittype == ANY_UNIT
@@ -269,7 +269,7 @@ static int CclIfRescuedNearUnit(lua_State *l)
 	lua_pushvalue(l, 1);
 	const int plynr = TriggerGetPlayer(l);
 	lua_pop(l, 1);
-	const char* op = LuaToString(l, 2);
+	const char *op = LuaToString(l, 2);
 	const int q = LuaToNumber(l, 3);
 	lua_pushvalue(l, 4);
 	const CUnitType *unittype = TriggerGetUnitType(l);
@@ -295,7 +295,7 @@ static int CclIfRescuedNearUnit(lua_State *l)
 		// Count the requested units
 		int s = 0;
 		for (size_t j = 0; j != around.size(); ++j) {
-			CUnit& unit = *around[j];
+			CUnit &unit = *around[j];
 
 			if (unit.RescuedFrom) { // only rescued units
 				// Check unit type
@@ -625,7 +625,7 @@ void SaveTriggers(CFile &file)
 
 	if (GameTimer.Init) {
 		file.printf("ActionSetTimer(%ld, %s)\n",
-			GameTimer.Cycles, (GameTimer.Increasing ? "true" : "false"));
+					GameTimer.Cycles, (GameTimer.Increasing ? "true" : "false"));
 		if (GameTimer.Running) {
 			file.printf("ActionStartTimer()\n");
 		}

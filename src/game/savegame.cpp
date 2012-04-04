@@ -79,12 +79,12 @@ static std::string GetSaveDir()
 {
 	struct stat tmp;
 	std::string dir(Parameters::Instance.GetUserDirectory());
-	if(!GameName.empty()) {
+	if (!GameName.empty()) {
 		dir += "/";
 		dir += GameName;
 	}
 	dir += "/save";
-	if(stat(dir.c_str(), &tmp) < 0) {
+	if (stat(dir.c_str(), &tmp) < 0) {
 		makedir(dir.c_str(), 0777);
 	}
 	return dir;
@@ -130,7 +130,7 @@ int SaveGame(const std::string &filename)
 	file.printf("---  \"map\",     \"%s\",\n", Map.Info.Description.c_str());
 	file.printf("---  \"media-version\", \"%s\"", "Undefined");
 	file.printf("---  \"engine\",  {%d, %d, %d},\n",
-		StratagusMajorVersion, StratagusMinorVersion, StratagusPatchLevel);
+				StratagusMajorVersion, StratagusMinorVersion, StratagusPatchLevel);
 	file.printf("  SyncHash = %d, \n", SyncHash);
 	file.printf("  SyncRandSeed = %d, \n", SyncRandSeed);
 	file.printf("  SaveFile = \"%s\"\n", CurrentMapPath);

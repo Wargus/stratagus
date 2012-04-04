@@ -58,11 +58,11 @@
 /**
 **  LogEntry structure.
 */
-class LogEntry {
+class LogEntry
+{
 public:
 	LogEntry() : GameCycle(0), Flush(0), PosX(0), PosY(0), DestUnitNumber(0),
-		Num(0), SyncRandSeed(0), Next(NULL)
-	{
+		Num(0), SyncRandSeed(0), Next(NULL) {
 		UnitNumber = 0;
 	}
 
@@ -83,7 +83,8 @@ public:
 /**
 **  Multiplayer Player definition
 */
-class MPPlayer {
+class MPPlayer
+{
 public:
 	MPPlayer() : Race(0), Team(0), Type(0) {}
 
@@ -96,13 +97,13 @@ public:
 /**
 ** Full replay structure (definition + logs)
 */
-class FullReplay {
+class FullReplay
+{
 public:
 	FullReplay() :
 		MapId(0), Type(0), Race(0), LocalPlayer(0),
 		Resource(0), NumUnits(0), Difficulty(0), NoFow(false), RevealMap(0),
-		MapRichness(0), GameType(0), Opponents(0), Commands(NULL)
-	{
+		MapRichness(0), GameType(0), Opponents(0), Commands(NULL) {
 		memset(Engine, 0, sizeof(Engine));
 		memset(Network, 0, sizeof(Network));
 	}
@@ -332,7 +333,7 @@ static void SaveFullLog(CFile &file)
 		file.printf(" Race = %d,", CurrentReplay->Players[i].Race);
 		file.printf(" Team = %d,", CurrentReplay->Players[i].Team);
 		file.printf(" Type = %d }%s", CurrentReplay->Players[i].Type,
-			i != PlayerMax - 1 ? ",\n" : "\n");
+					i != PlayerMax - 1 ? ",\n" : "\n");
 	}
 	file.printf("  },\n");
 	file.printf("  Resource = %d,\n", CurrentReplay->Resource);
@@ -344,9 +345,9 @@ static void SaveFullLog(CFile &file)
 	file.printf("  Opponents = %d,\n", CurrentReplay->Opponents);
 	file.printf("  MapRichness = %d,\n", CurrentReplay->MapRichness);
 	file.printf("  Engine = { %d, %d, %d },\n",
-		CurrentReplay->Engine[0], CurrentReplay->Engine[1], CurrentReplay->Engine[2]);
+				CurrentReplay->Engine[0], CurrentReplay->Engine[1], CurrentReplay->Engine[2]);
 	file.printf("  Network = { %d, %d, %d }\n",
-		CurrentReplay->Network[0], CurrentReplay->Network[1], CurrentReplay->Network[2]);
+				CurrentReplay->Network[0], CurrentReplay->Network[1], CurrentReplay->Network[2]);
 	file.printf("} )\n");
 	const LogEntry *log = CurrentReplay->Commands;
 	while (log) {
@@ -393,7 +394,7 @@ static void AppendLog(LogEntry *log, CFile &file)
 **  @param num     optional number argument
 */
 void CommandLog(const char *action, const CUnit *unit, int flush,
-	int x, int y, const CUnit *dest, const char *value, int num)
+				int x, int y, const CUnit *dest, const char *value, int num)
 {
 	if (CommandLogDisabled) { // No log wanted
 		return;
@@ -406,13 +407,13 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 		struct stat tmp;
 		char buf[16];
 		std::string path(Parameters::Instance.GetUserDirectory());
-		if(!GameName.empty()) {
+		if (!GameName.empty()) {
 			path += "/";
 			path += GameName;
 		}
 		path += "/logs";
 
-		if(stat(path.c_str(), &tmp) < 0) {
+		if (stat(path.c_str(), &tmp) < 0) {
 			makedir(path.c_str(), 0777);
 		}
 
@@ -751,10 +752,10 @@ void CleanReplayLog()
 	}
 	ReplayStep = NULL;
 
-// if (DisabledLog) {
-		CommandLogDisabled = false;
-		DisabledLog = false;
-// }
+	// if (DisabledLog) {
+	CommandLogDisabled = false;
+	DisabledLog = false;
+	// }
 	GameObserve = false;
 	NetPlayers = 0;
 	ReplayGameType = ReplayNone;
