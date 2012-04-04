@@ -130,12 +130,12 @@ void DoScrollArea(int state, bool fast)
 	vp = UI.SelectedViewport;
 
 	if (fast) {
-		stepx = (int)((UI.MouseScrollSpeed / 8) * vp->MapWidth / 2 * PixelTileSize.x * FRAMES_PER_SECOND);
-		stepy = (int)((UI.MouseScrollSpeed / 8) * vp->MapHeight / 2 * PixelTileSize.y * FRAMES_PER_SECOND);
+		stepx = (int)(UI.MouseScrollSpeed * vp->MapWidth / 2 * PixelTileSize.x * FRAMES_PER_SECOND / 4);
+		stepy = (int)(UI.MouseScrollSpeed * vp->MapHeight / 2 * PixelTileSize.y * FRAMES_PER_SECOND / 4);
 	} else {// dynamic: let these variables increase upto fast..
 		// FIXME: pixels per second should be configurable
-		stepx = (int)((UI.MouseScrollSpeed / 8) * PixelTileSize.x * FRAMES_PER_SECOND);
-		stepy = (int)((UI.MouseScrollSpeed / 8) * PixelTileSize.y * FRAMES_PER_SECOND);
+		stepx = (int)(UI.MouseScrollSpeed * PixelTileSize.x * FRAMES_PER_SECOND / 4);
+		stepy = (int)(UI.MouseScrollSpeed * PixelTileSize.y * FRAMES_PER_SECOND / 4);
 	}
 	if ((state & (ScrollLeft | ScrollRight)) &&
 			(state & (ScrollLeft | ScrollRight)) != (ScrollLeft | ScrollRight)) {
@@ -161,17 +161,6 @@ void DoScrollArea(int state, bool fast)
 	} else {
 		stepy = 0;
 	}
-
-#ifdef USE_TOUCHSCREEN
-	// Decrease scrolling speed on touch screen, it is too high
-	if (state & ScrollUp || state & ScrollDown) {
-		stepy /= 4;
-	}
-
-	if (state & ScrollLeft || state & ScrollRight) {
-		stepx /= 4;
-	}
-#endif
 
 	if (state & ScrollUp) {
 		stepy = -stepy;
