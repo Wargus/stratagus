@@ -213,8 +213,7 @@ static void InitOpenGLExtensions()
 {
 	// ARB_texture_compression
 #ifndef USE_GLES
-	if (IsExtensionSupported("GL_ARB_texture_compression"))
-	{
+	if (IsExtensionSupported("GL_ARB_texture_compression")) {
 		glCompressedTexImage3DARB =
 			(PFNGLCOMPRESSEDTEXIMAGE3DARBPROC)(uintptr_t)SDL_GL_GetProcAddress("glCompressedTexImage3DARB");
 		glCompressedTexImage2DARB =
@@ -233,17 +232,12 @@ static void InitOpenGLExtensions()
 		if (glCompressedTexImage3DARB && glCompressedTexImage2DARB &&
 			glCompressedTexImage1DARB && glCompressedTexSubImage3DARB &&
 			glCompressedTexSubImage2DARB && glCompressedTexSubImage1DARB &&
-			glGetCompressedTexImageARB)
-		{
+			glGetCompressedTexImageARB) {
 			GLTextureCompressionSupported = true;
-		}
-		else
-		{
+		} else {
 			GLTextureCompressionSupported = false;
 		}
-	}
-	else
-	{
+	} else {
 		GLTextureCompressionSupported = false;
 	}
 #else
@@ -301,15 +295,15 @@ static void InitOpenGL()
 		// FIXME: try to use GL_PROXY_TEXTURE_2D to get a valid size
 #if 0
 		glTexImage2D(GL_PROXY_TEXTURE_2D, 0, GL_RGBA, size, size, 0,
-			GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+					 GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		glGetTexLevelParameterfv(GL_PROXY_TEXTURE_2D, 0,
-			GL_TEXTURE_INTERNAL_FORMAT, &internalFormat);
+								 GL_TEXTURE_INTERNAL_FORMAT, &internalFormat);
 #endif
 		fprintf(stderr, "GL_MAX_TEXTURE_SIZE is 0, using 256 by default\n");
 		GLMaxTextureSize = 256;
 	}
 	if (GLMaxTextureSize > GLMaxTextureSizeOverride
-	    && GLMaxTextureSizeOverride > 0) {
+		&& GLMaxTextureSizeOverride > 0) {
 		GLMaxTextureSize = GLMaxTextureSizeOverride;
 	}
 }
@@ -449,11 +443,11 @@ void InitVideoSdl()
 #endif
 		int res = SDL_Init(
 #ifdef DEBUG
-				SDL_INIT_NOPARACHUTE |
+					  SDL_INIT_NOPARACHUTE |
 #endif
-				SDL_INIT_AUDIO | SDL_INIT_VIDEO |
-				SDL_INIT_TIMER);
-		if ( res < 0 ) {
+					  SDL_INIT_AUDIO | SDL_INIT_VIDEO |
+					  SDL_INIT_TIMER);
+		if (res < 0) {
 			fprintf(stderr, "Couldn't initialize SDL: %s\n", SDL_GetError());
 			exit(1);
 		}
@@ -472,18 +466,19 @@ void InitVideoSdl()
 		signal(SIGABRT, CleanExit);
 #endif
 		// Set WindowManager Title
-		if (FullGameName.empty())
+		if (FullGameName.empty()) {
 			SDL_WM_SetCaption("Stratagus", "Stratagus");
-		else
+		} else {
 			SDL_WM_SetCaption(FullGameName.c_str(), FullGameName.c_str());
+		}
 
 #if ! defined(USE_WIN32) && ! defined(USE_MAEMO)
 		// Make sure, that we not create OpenGL textures (and do not call OpenGL functions), when creating icon surface
 		bool UseOpenGL_orig = UseOpenGL;
 		UseOpenGL = false;
 
-		SDL_Surface * icon = NULL;
-		CGraphic * g = NULL;
+		SDL_Surface *icon = NULL;
+		CGraphic *g = NULL;
 		struct stat st;
 
 		char pixmaps[4][1024];
@@ -493,27 +488,29 @@ void InitVideoSdl()
 		sprintf(pixmaps[3], "/usr/share/pixmaps/Stratagus.png");
 		pixmaps[1][19] = tolower(pixmaps[1][19]);
 
-		for (int i=0; i<4; ++i) {
+		for (int i = 0; i < 4; ++i) {
 			if (stat(pixmaps[i], &st) == 0) {
-				if (g) CGraphic::Free(g);
+				if (g) { CGraphic::Free(g); }
 				g = CGraphic::New(pixmaps[i]);
 				g->Load();
 				icon = g->Surface;
-				if (icon) break;
+				if (icon) { break; }
 			}
 		}
 
-		if (icon)
+		if (icon) {
 			SDL_WM_SetIcon(icon, 0);
+		}
 
-		if (g)
+		if (g) {
 			CGraphic::Free(g);
+		}
 
 		UseOpenGL = UseOpenGL_orig;
 #endif
 #ifdef USE_WIN32
 		int argc = 0;
-		LPWSTR * argv = NULL;
+		LPWSTR *argv = NULL;
 		HWND hwnd = NULL;
 		HICON hicon = NULL;
 		SDL_SysWMinfo info;
@@ -521,11 +518,13 @@ void InitVideoSdl()
 
 		argv = CommandLineToArgvW(GetCommandLineW(), &argc);
 
-		if (SDL_GetWMInfo(&info))
+		if (SDL_GetWMInfo(&info)) {
 			hwnd = info.window;
+		}
 
-		if (hwnd && argc > 0 && argv)
+		if (hwnd && argc > 0 && argv) {
 			hicon = ExtractIconW(GetModuleHandle(NULL), argv[0], 0);
+		}
 
 		if (hicon) {
 			SendMessage(hwnd, (UINT)WM_SETICON, ICON_SMALL, (LPARAM)hicon);
@@ -543,12 +542,12 @@ void InitVideoSdl()
 	Video.Height = 480;
 #endif
 
-	#ifdef USE_WIN32
-		flags = SDL_HWSURFACE|SDL_HWPALETTE;
-	#else
-		flags = 0;
-	#endif
-		
+#ifdef USE_WIN32
+	flags = SDL_HWSURFACE | SDL_HWPALETTE;
+#else
+	flags = 0;
+#endif
+
 	// Sam said: better for windows.
 	/* SDL_HWSURFACE|SDL_HWPALETTE | */
 	if (Video.FullScreen) {
@@ -580,14 +579,14 @@ void InitVideoSdl()
 	}
 
 	TheScreen = SDL_SetVideoMode(Video.Width, Video.Height, Video.Depth, flags);
-	if (TheScreen && (TheScreen->format->BitsPerPixel != 16 &&
-			TheScreen->format->BitsPerPixel != 32)) {
+	if (TheScreen && (TheScreen->format->BitsPerPixel != 16
+					  && TheScreen->format->BitsPerPixel != 32)) {
 		// Only support 16 and 32 bpp, default to 16
 		TheScreen = SDL_SetVideoMode(Video.Width, Video.Height, 16, flags);
 	}
 	if (TheScreen == NULL) {
 		fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
-			Video.Width, Video.Height, Video.Depth, SDL_GetError());
+				Video.Width, Video.Height, Video.Depth, SDL_GetError());
 		exit(1);
 	}
 
@@ -611,7 +610,7 @@ void InitVideoSdl()
 			fprintf(stderr, "Couldn't initialize SDL_GLES_MakeCurrent: %s\n", SDL_GetError());
 			exit(1);
 		}
-//		atexit(GLES_DeleteContext(context));
+		// atexit(GLES_DeleteContext(context));
 #endif
 		InitOpenGL();
 	}
@@ -640,8 +639,9 @@ void InitVideoSdl()
 int VideoValidResolution(int w, int h)
 {
 #ifdef USE_MAEMO
-	if (w != 800 || h != 480)
+	if (w != 800 || h != 480) {
 		return 0;
+	}
 #endif
 	return SDL_VideoModeOK(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
 }
@@ -691,24 +691,21 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 {
 	switch (event->type) {
 		case SDL_MOUSEBUTTONDOWN:
-			InputMouseButtonPress(callbacks, SDL_GetTicks(),
-				event->button.button);
+			InputMouseButtonPress(callbacks, SDL_GetTicks(), event->button.button);
 			break;
 
 		case SDL_MOUSEBUTTONUP:
-			InputMouseButtonRelease(callbacks, SDL_GetTicks(),
-				event->button.button);
+			InputMouseButtonRelease(callbacks, SDL_GetTicks(), event->button.button);
 			break;
 
 			// FIXME: check if this is only useful for the cursor
 			// FIXME: if this is the case we don't need this.
 		case SDL_MOUSEMOTION:
 			InputMouseMove(callbacks, SDL_GetTicks(),
-				event->motion.x, event->motion.y);
+						   event->motion.x, event->motion.y);
 			// FIXME: Same bug fix from X11
-			if ((UI.MouseWarpX != -1 || UI.MouseWarpY != -1) &&
-					(event->motion.x != UI.MouseWarpX ||
-						event->motion.y != UI.MouseWarpY)) {
+			if ((UI.MouseWarpX != -1 || UI.MouseWarpY != -1)
+				&& (event->motion.x != UI.MouseWarpX || event->motion.y != UI.MouseWarpY)) {
 				int xw = UI.MouseWarpX;
 				int yw = UI.MouseWarpY;
 				UI.MouseWarpX = -1;
@@ -750,12 +747,12 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 
 		case SDL_KEYDOWN:
 			InputKeyButtonPress(callbacks, SDL_GetTicks(),
-				event->key.keysym.sym, event->key.keysym.unicode);
+								event->key.keysym.sym, event->key.keysym.unicode);
 			break;
 
 		case SDL_KEYUP:
 			InputKeyButtonRelease(callbacks, SDL_GetTicks(),
-				event->key.keysym.sym, event->key.keysym.unicode);
+								  event->key.keysym.sym, event->key.keysym.unicode);
 			break;
 
 		case SDL_QUIT:
@@ -866,7 +863,7 @@ void WaitEventsOneFrame()
 
 #if 0
 		s = select(maxfd + 1, &rfds, &wfds, NULL,
-			(i = SDL_PollEvent(event)) ? &tv : NULL);
+				   (i = SDL_PollEvent(event)) ? &tv : NULL);
 #else
 		// QUICK HACK to fix the event/timer problem
 		// The timer code didn't interrupt the select call.
@@ -887,7 +884,7 @@ void WaitEventsOneFrame()
 			//
 			// Network
 			//
-			if (IsNetworkGame() && FD_ISSET(NetworkFildes, &rfds) ) {
+			if (IsNetworkGame() && FD_ISSET(NetworkFildes, &rfds)) {
 				GetCallbacks()->NetworkEvent();
 			}
 		}
@@ -1058,7 +1055,7 @@ void ToggleFullScreen()
 				return;
 			}
 			memcpy(palette, TheScreen->format->palette->colors,
-				ncolors * sizeof(SDL_Color));
+				   ncolors * sizeof(SDL_Color));
 		}
 		SDL_UnlockSurface(TheScreen);
 	}

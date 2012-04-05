@@ -131,23 +131,23 @@ private:
 	CColorCycling() : ColorCycleAll(false)
 	{}
 
-	static void CreateInstanceIfNeeded()
-	{
-		if (s_instance == NULL)
+	static void CreateInstanceIfNeeded() {
+		if (s_instance == NULL) {
 			s_instance = new CColorCycling;
+		}
 	}
 
 public:
-	static CColorCycling& GetInstance() { CreateInstanceIfNeeded(); return *s_instance; }
+	static CColorCycling &GetInstance() { CreateInstanceIfNeeded(); return *s_instance; }
 
 	static void ReleaseInstance() { delete s_instance; s_instance = NULL; }
 public:
-	std::vector<SDL_Surface*> PaletteList;         /// List of all used palettes.
+	std::vector<SDL_Surface *> PaletteList;        /// List of all used palettes.
 	std::vector<ColorIndexRange> ColorIndexRanges; /// List of range of color index for cycling.
 	bool ColorCycleAll;                            /// Flag Color Cycle with all palettes
 
 private:
-	static CColorCycling* s_instance;
+	static CColorCycling *s_instance;
 };
 
 
@@ -213,9 +213,9 @@ Uint32 ColorYellow;
 */
 void SetClipping(int left, int top, int right, int bottom)
 {
-	Assert(left <= right && top <= bottom && left >= 0 && left < Video.Width &&
-		top >= 0 && top < Video.Height && right >= 0 &&
-		right < Video.Width && bottom >= 0 && bottom < Video.Height);
+	Assert(left <= right && top <= bottom && left >= 0 && left < Video.Width
+		   && top >= 0 && top < Video.Height && right >= 0
+		   && right < Video.Width && bottom >= 0 && bottom < Video.Height);
 
 	ClipX1 = left;
 	ClipY1 = top;
@@ -288,8 +288,7 @@ bool CVideo::ResizeScreen(int w, int h)
 		}
 		Width = w;
 		Height = h;
-		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel,
-			TheScreen->flags);
+		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
 		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
 		if (UseOpenGL) {
 			ReloadOpenGL();
@@ -329,14 +328,14 @@ void DeInitVideo()
 **
 **  @param surface  The SDL surface to add to the list to cycle.
 */
-void VideoPaletteListAdd(SDL_Surface* surface)
+void VideoPaletteListAdd(SDL_Surface *surface)
 {
 	if (surface == NULL || surface->format == NULL || surface->format->BytesPerPixel != 1) {
 		return;
 	}
 
 	CColorCycling &colorCycling = CColorCycling::GetInstance();
-	std::vector<SDL_Surface*>::iterator it = std::find(colorCycling.PaletteList.begin(), colorCycling.PaletteList.end(), surface);
+	std::vector<SDL_Surface *>::iterator it = std::find(colorCycling.PaletteList.begin(), colorCycling.PaletteList.end(), surface);
 
 	if (it != colorCycling.PaletteList.end()) {
 		return ;
@@ -349,10 +348,10 @@ void VideoPaletteListAdd(SDL_Surface* surface)
 **
 **  @param surface  The SDL surface to add to the list to cycle.
 */
-void VideoPaletteListRemove(SDL_Surface* surface)
+void VideoPaletteListRemove(SDL_Surface *surface)
 {
 	CColorCycling &colorCycling = CColorCycling::GetInstance();
-	std::vector<SDL_Surface*>::iterator it = std::find(colorCycling.PaletteList.begin(), colorCycling.PaletteList.end(), surface);
+	std::vector<SDL_Surface *>::iterator it = std::find(colorCycling.PaletteList.begin(), colorCycling.PaletteList.end(), surface);
 
 	if (it != colorCycling.PaletteList.end()) {
 		colorCycling.PaletteList.erase(it);
@@ -383,7 +382,7 @@ static void ColorCycleSurface(SDL_Surface &surface)
 	SDL_Color colors[256];
 	CColorCycling &colorCycling = CColorCycling::GetInstance();
 
-	memcpy(colors, palcolors, sizeof (colors));
+	memcpy(colors, palcolors, sizeof(colors));
 	for (std::vector<ColorIndexRange>::const_iterator it = colorCycling.ColorIndexRanges.begin(); it != colorCycling.ColorIndexRanges.end(); ++it) {
 		const ColorIndexRange &range = *it;
 
@@ -406,7 +405,7 @@ void ColorCycle()
 	}
 	CColorCycling &colorCycling = CColorCycling::GetInstance();
 	if (colorCycling.ColorCycleAll) {
-		for (std::vector<SDL_Surface*>::iterator it = colorCycling.PaletteList.begin(); it != colorCycling.PaletteList.end(); ++it) {
+		for (std::vector<SDL_Surface *>::iterator it = colorCycling.PaletteList.begin(); it != colorCycling.PaletteList.end(); ++it) {
 			SDL_Surface *surface = (*it);
 
 			ColorCycleSurface(*surface);

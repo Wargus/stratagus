@@ -59,7 +59,8 @@
 #define ClipCodeRight  8 /// Clipping right rectangle
 
 
-namespace linedraw_sdl {
+namespace linedraw_sdl
+{
 
 void (*VideoDrawPixel)(Uint32 color, int x, int y);
 static void (*VideoDoDrawPixel)(Uint32 color, int x, int y);
@@ -143,7 +144,7 @@ static void VideoDoDrawTransPixel32(Uint32 color, int x, int y, unsigned char al
 
 	alpha = 255 - alpha;
 
-	p = &((Uint32*)TheScreen->pixels)[x + y * Video.Width];
+	p = &((Uint32 *)TheScreen->pixels)[x + y * Video.Width];
 
 	sp2 = (color & 0xFF00FF00) >> 8;
 	color &= 0x00FF00FF;
@@ -223,7 +224,7 @@ void DrawVLine(Uint32 color, int x, int y, int height)
 **  Draw a transparent vertical line
 */
 void DrawTransVLine(Uint32 color, int x, int y,
-	int height, unsigned char alpha)
+					int height, unsigned char alpha)
 {
 	Video.LockScreen();
 	for (int i = 0; i < height; ++i) {
@@ -246,7 +247,7 @@ void DrawVLineClip(Uint32 color, int x, int y, int height)
 **  Draw a transparent vertical line clipped
 */
 void DrawTransVLineClip(Uint32 color, int x, int y,
-	int height, unsigned char alpha)
+						int height, unsigned char alpha)
 {
 	Video.LockScreen();
 	for (int i = 0; i < height; ++i) {
@@ -281,7 +282,7 @@ void DrawHLineClip(Uint32 color, int x, int y, int width)
 **  Draw a transparent horizontal line
 */
 void DrawTransHLine(Uint32 color, int x, int y,
-	int width, unsigned char alpha)
+					int width, unsigned char alpha)
 {
 	Video.LockScreen();
 	for (int i = 0; i < width; ++i) {
@@ -294,7 +295,7 @@ void DrawTransHLine(Uint32 color, int x, int y,
 **  Draw a transparent horizontal line clipped
 */
 void DrawTransHLineClip(Uint32 color, int x, int y,
-	int width, unsigned char alpha)
+						int width, unsigned char alpha)
 {
 	Video.LockScreen();
 	for (int i = 0; i < width; ++i) {
@@ -527,7 +528,7 @@ void DrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 **  Draw a transparent line
 */
 void DrawTransLine(Uint32 color, int sx, int sy,
-	int dx, int dy, unsigned char)
+				   int dx, int dy, unsigned char)
 {
 	// FIXME: trans
 	DrawLine(color, sx, sy, dx, dy);
@@ -537,7 +538,7 @@ void DrawTransLine(Uint32 color, int sx, int sy,
 **  Draw a transparent line clipped
 */
 void DrawTransLineClip(Uint32 color, int sx, int sy,
-	int dx, int dy, unsigned char)
+					   int dx, int dy, unsigned char)
 {
 	// FIXME: trans
 	DrawLineClip(color, sx, sy, dx, dy);
@@ -571,7 +572,7 @@ void DrawRectangleClip(Uint32 color, int x, int y, int w, int h)
 **  Draw a transparent rectangle
 */
 void DrawTransRectangle(Uint32 color, int x, int y,
-	int w, int h, unsigned char alpha)
+						int w, int h, unsigned char alpha)
 {
 	DrawTransHLine(color, x, y, w, alpha);
 	DrawTransHLine(color, x, y + h - 1, w, alpha);
@@ -591,7 +592,7 @@ void DrawTransRectangle(Uint32 color, int x, int y,
 **  @param alpha  alpha value of pixels.
 */
 void DrawTransRectangleClip(Uint32 color, int x, int y,
-	int w, int h, unsigned char alpha)
+							int w, int h, unsigned char alpha)
 {
 	DrawTransHLineClip(color, x, y, w, alpha);
 	DrawTransHLineClip(color, x, y + h - 1, w, alpha);
@@ -613,7 +614,7 @@ void FillRectangle(Uint32 color, int x, int y, int w, int h)
 **  Draw a filled rectangle clipped
 */
 void FillRectangleClip(Uint32 color, int x, int y,
-	int w, int h)
+					   int w, int h)
 {
 	SDL_Rect oldrect;
 	SDL_Rect newrect;
@@ -633,7 +634,7 @@ void FillRectangleClip(Uint32 color, int x, int y,
 **  Draw a filled transparent rectangle
 */
 void FillTransRectangle(Uint32 color, int x, int y,
-	int w, int h, unsigned char alpha)
+						int w, int h, unsigned char alpha)
 {
 	int ex = x + w;
 	int ey = y + h;
@@ -652,7 +653,7 @@ void FillTransRectangle(Uint32 color, int x, int y,
 **  Draw a filled transparent rectangle clipped
 */
 void FillTransRectangleClip(Uint32 color, int x, int y,
-	int w, int h, unsigned char alpha)
+							int w, int h, unsigned char alpha)
 {
 	CLIP_RECTANGLE(x, y, w, h);
 	FillTransRectangle(color, x, y, w, h, alpha);
@@ -696,7 +697,7 @@ void DrawCircle(Uint32 color, int x, int y, int r)
 **  Draw a transparent circle
 */
 void DrawTransCircle(Uint32 color, int x, int y,
-	int r, unsigned char alpha)
+					 int r, unsigned char alpha)
 {
 	int p;
 	int px;
@@ -765,7 +766,7 @@ void DrawCircleClip(Uint32 color, int x, int y, int r)
 **  Draw a transparent circle clipped
 */
 void DrawTransCircleClip(Uint32 color, int x, int y,
-	int r, unsigned char alpha)
+						 int r, unsigned char alpha)
 {
 	int p;
 	int px;
@@ -838,7 +839,7 @@ void FillCircle(Uint32 color, int x, int y, int r)
 **  Draw a filled transparent circle
 */
 void FillTransCircle(Uint32 color, int x, int y,
-	int r, unsigned char alpha)
+					 int r, unsigned char alpha)
 {
 	int p;
 	int px;
@@ -915,7 +916,7 @@ void FillCircleClip(Uint32 color, int x, int y, int r)
 **  Draw a filled transparent circle clipped
 */
 void FillTransCircleClip(Uint32 color, int x, int y,
-	int r, unsigned char alpha)
+						 int r, unsigned char alpha)
 {
 	int p;
 	int px;
@@ -971,7 +972,8 @@ void InitLineDraw()
 }
 
 }
-namespace linedraw_gl {
+namespace linedraw_gl
+{
 
 /**
 **  Draw pixel unclipped.
@@ -989,7 +991,7 @@ void DrawPixel(Uint32 color, int x, int y)
 	glColor4ub(r, g, b, a);
 #ifdef USE_GLES
 	float vertex[] = {
-		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*y+1.0f
+		2.0f / (GLfloat)Video.Width *x - 1.0f, -2.0f / (GLfloat)Video.Height *y + 1.0f
 	};
 
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -1015,7 +1017,7 @@ void DrawPixel(Uint32 color, int x, int y)
 **  @param alpha  alpha value of pixel.
 */
 void DrawTransPixel(Uint32 color, int x, int y,
-	unsigned char alpha)
+					unsigned char alpha)
 {
 	GLubyte r, g, b;
 
@@ -1048,7 +1050,7 @@ void DrawPixelClip(Uint32 color, int x, int y)
 **  @param alpha  alpha value of pixel.
 */
 void DrawTransPixelClip(Uint32 color, int x, int y,
-	unsigned char alpha)
+						unsigned char alpha)
 {
 	GLubyte r, g, b;
 
@@ -1074,8 +1076,8 @@ void DrawHLine(Uint32 color, int x, int y, int width)
 	glColor4ub(r, g, b, a);
 #ifdef USE_GLES
 	float vertex[] = {
-		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*y+1.0f,
-		2.0f/(GLfloat)Video.Width*(x+width)-1.0f, -2.0f/(GLfloat)Video.Height*y+1.0f
+		2.0f / (GLfloat)Video.Width *x - 1.0f, -2.0f / (GLfloat)Video.Height *y + 1.0f,
+		2.0f / (GLfloat)Video.Width *(x + width) - 1.0f, -2.0f / (GLfloat)Video.Height *y + 1.0f
 	};
 
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -1103,7 +1105,7 @@ void DrawHLine(Uint32 color, int x, int y, int width)
 **  @param alpha  alpha value of pixels.
 */
 void DrawTransHLine(Uint32 color, int x, int y, int width,
-	unsigned char alpha)
+					unsigned char alpha)
 {
 	GLubyte r, g, b;
 
@@ -1152,7 +1154,7 @@ void DrawHLineClip(Uint32 color, int x, int y, int width)
 **  @param alpha  Alpha value of pixels
 */
 void DrawTransHLineClip(Uint32 color, int x, int y, int width,
-	unsigned char alpha)
+						unsigned char alpha)
 {
 	GLubyte r, g, b;
 
@@ -1178,8 +1180,8 @@ void DrawVLine(Uint32 color, int x, int y, int height)
 	glColor4ub(r, g, b, a);
 #ifdef USE_GLES
 	float vertex[] = {
-		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*y+1.0f,
-		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*(y+height)+1.0f
+		2.0f / (GLfloat)Video.Width *x - 1.0f, -2.0f / (GLfloat)Video.Height *y + 1.0f,
+		2.0f / (GLfloat)Video.Width *x - 1.0f, -2.0f / (GLfloat)Video.Height *(y + height) + 1.0f
 	};
 
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -1207,7 +1209,7 @@ void DrawVLine(Uint32 color, int x, int y, int height)
 **  @param alpha   alpha value of pixels.
 */
 void DrawTransVLine(Uint32 color, int x, int y, int height,
-	unsigned char alpha)
+					unsigned char alpha)
 {
 	GLubyte r, g, b;
 
@@ -1256,7 +1258,7 @@ void DrawVLineClip(Uint32 color, int x, int y, int height)
 **  @param alpha   alpha value of pixels.
 */
 void DrawTransVLineClip(Uint32 color, int x, int y,
-	int height, unsigned char alpha)
+						int height, unsigned char alpha)
 {
 	GLubyte r, g, b;
 
@@ -1300,8 +1302,8 @@ void DrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 	glColor4ub(r, g, b, a);
 #ifdef USE_GLES
 	float vertex[] = {
-		2.0f/(GLfloat)Video.Width*xx1-1.0f, -2.0f/(GLfloat)Video.Height*yy1+1.0f,
-		2.0f/(GLfloat)Video.Width*xx2-1.0f, -2.0f/(GLfloat)Video.Height*yy2+1.0f
+		2.0f / (GLfloat)Video.Width *xx1 - 1.0f, -2.0f / (GLfloat)Video.Height *yy1 + 1.0f,
+		2.0f / (GLfloat)Video.Width *xx2 - 1.0f, -2.0f / (GLfloat)Video.Height *yy2 + 1.0f
 	};
 
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -1391,7 +1393,7 @@ void DrawLineClip(Uint32 color, int x1, int y1, int x2, int y2)
 
 	// Make sure coordinates or on/in clipped rectangle
 	while (code1 = ClipCodeLine(x1, y1), code2 = ClipCodeLine(x2, y2),
-		LineIsUnclipped(code1, code2)) {
+		   LineIsUnclipped(code1, code2)) {
 		if (LineIsUnclippedOnSameSide(code1, code2)) {
 			return;
 		}
@@ -1427,7 +1429,7 @@ void DrawLineClip(Uint32 color, int x1, int y1, int x2, int y2)
 	//        position(s) on the clipped retangle should be denoted to the line
 	//        drawing routine..
 	Assert(x1 >= ClipX1 && x2 >= ClipX1 && x1 <= ClipX2 && x2 <= ClipX2 &&
-		y1 >= ClipY1 && y2 >= ClipY1 && y1 <= ClipY2 && y2 <= ClipY2);
+		   y1 >= ClipY1 && y2 >= ClipY1 && y1 <= ClipY2 && y2 <= ClipY2);
 	DrawLine(color, x1, y1, x2, y2);
 }
 
@@ -1435,7 +1437,7 @@ void DrawLineClip(Uint32 color, int x1, int y1, int x2, int y2)
 **  Draw a transparent line
 */
 void DrawTransLine(Uint32 color, int sx, int sy,
-	int dx, int dy, unsigned char)
+				   int dx, int dy, unsigned char)
 {
 	// FIXME: trans
 	DrawLine(color, sx, sy, dx, dy);
@@ -1445,7 +1447,7 @@ void DrawTransLine(Uint32 color, int sx, int sy,
 **  Draw a transparent line clipped
 */
 void DrawTransLineClip(Uint32 color, int sx, int sy,
-	int dx, int dy, unsigned char)
+					   int dx, int dy, unsigned char)
 {
 	// FIXME: trans
 	DrawLineClip(color, sx, sy, dx, dy);
@@ -1469,14 +1471,14 @@ void DrawRectangle(Uint32 color, int x, int y, int w, int h)
 	glColor4ub(r, g, b, a);
 #ifdef USE_GLES
 	float vertex[] = {
-		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*y+1.0f,
-		2.0f/(GLfloat)Video.Width*(x+w)-1.0f, -2.0f/(GLfloat)Video.Height*y+1.0f,
-		2.0f/(GLfloat)Video.Width*(x+w-1)-1.0f, -2.0f/(GLfloat)Video.Height*(y+1)+1.0f,
-		2.0f/(GLfloat)Video.Width*(x+w-1)-1.0f, -2.0f/(GLfloat)Video.Height*(y+h)+1.0f,
-		2.0f/(GLfloat)Video.Width*(x+w-1)-1.0f, -2.0f/(GLfloat)Video.Height*(y+h-1)+1.0f,
-		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*(y+h-1)+1.0f,
-		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*(y+h-1)+1.0f,
-		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*(y+1)+1.0f
+		2.0f / (GLfloat)Video.Width *x - 1.0f, -2.0f / (GLfloat)Video.Height *y + 1.0f,
+		2.0f / (GLfloat)Video.Width *(x + w) - 1.0f, -2.0f / (GLfloat)Video.Height *y + 1.0f,
+		2.0f / (GLfloat)Video.Width *(x + w - 1) - 1.0f, -2.0f / (GLfloat)Video.Height *(y + 1) + 1.0f,
+		2.0f / (GLfloat)Video.Width *(x + w - 1) - 1.0f, -2.0f / (GLfloat)Video.Height *(y + h) + 1.0f,
+		2.0f / (GLfloat)Video.Width *(x + w - 1) - 1.0f, -2.0f / (GLfloat)Video.Height *(y + h - 1) + 1.0f,
+		2.0f / (GLfloat)Video.Width *x - 1.0f, -2.0f / (GLfloat)Video.Height *(y + h - 1) + 1.0f,
+		2.0f / (GLfloat)Video.Width *x - 1.0f, -2.0f / (GLfloat)Video.Height *(y + h - 1) + 1.0f,
+		2.0f / (GLfloat)Video.Width *x - 1.0f, -2.0f / (GLfloat)Video.Height *(y + 1) + 1.0f
 	};
 
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -1514,7 +1516,7 @@ void DrawRectangle(Uint32 color, int x, int y, int w, int h)
 **  @param alpha  alpha value of pixel.
 */
 void DrawTransRectangle(Uint32 color, int x, int y,
-	int w, int h, unsigned char alpha)
+						int w, int h, unsigned char alpha)
 {
 	GLubyte r, g, b;
 
@@ -1533,7 +1535,7 @@ void DrawTransRectangle(Uint32 color, int x, int y,
 **  @param w      width of rectangle (0=don't draw).
 */
 void DrawRectangleClip(Uint32 color, int x, int y,
-	int w, int h)
+					   int w, int h)
 {
 	int f;
 	int left;
@@ -1619,7 +1621,7 @@ void DrawRectangleClip(Uint32 color, int x, int y,
 **  @param alpha  alpha value of pixels.
 */
 void DrawTransRectangleClip(Uint32 color, int x, int y,
-	int w, int h, unsigned char alpha)
+							int w, int h, unsigned char alpha)
 {
 	GLubyte r, g, b;
 
@@ -1638,7 +1640,7 @@ void DrawTransRectangleClip(Uint32 color, int x, int y,
 **  @param w      width of rectangle (0=don't draw).
 */
 void FillRectangle(Uint32 color, int x, int y,
-	int w, int h)
+				   int w, int h)
 {
 	GLubyte r, g, b, a;
 
@@ -1647,10 +1649,10 @@ void FillRectangle(Uint32 color, int x, int y,
 	glColor4ub(r, g, b, a);
 #ifdef USE_GLES
 	float vertex[] = {
-		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*y+1.0f,
-		2.0f/(GLfloat)Video.Width*(x+w)-1.0f, -2.0f/(GLfloat)Video.Height*y+1.0f,
-		2.0f/(GLfloat)Video.Width*x-1.0f, -2.0f/(GLfloat)Video.Height*(y+h)+1.0f,
-		2.0f/(GLfloat)Video.Width*(x+w)-1.0f, -2.0f/(GLfloat)Video.Height*(y+h)+1.0f
+		2.0f / (GLfloat)Video.Width *x - 1.0f, -2.0f / (GLfloat)Video.Height *y + 1.0f,
+		2.0f / (GLfloat)Video.Width *(x + w) - 1.0f, -2.0f / (GLfloat)Video.Height *y + 1.0f,
+		2.0f / (GLfloat)Video.Width *x - 1.0f, -2.0f / (GLfloat)Video.Height *(y + h) + 1.0f,
+		2.0f / (GLfloat)Video.Width *(x + w) - 1.0f, -2.0f / (GLfloat)Video.Height *(y + h) + 1.0f
 	};
 
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -1681,7 +1683,7 @@ void FillRectangle(Uint32 color, int x, int y,
 **  @param alpha  alpha value of pixel.
 */
 void FillTransRectangle(Uint32 color, int x, int y,
-	int w, int h, unsigned char alpha)
+						int w, int h, unsigned char alpha)
 {
 	GLubyte r, g, b;
 
@@ -1700,7 +1702,7 @@ void FillTransRectangle(Uint32 color, int x, int y,
 **  @param w      width of rectangle (0=don't draw).
 */
 void FillRectangleClip(Uint32 color, int x, int y,
-	int w, int h)
+					   int w, int h)
 {
 	CLIP_RECTANGLE(x, y, w, h);
 	FillRectangle(color, x, y, w, h);
@@ -1717,7 +1719,7 @@ void FillRectangleClip(Uint32 color, int x, int y,
 **  @param alpha  alpha value of pixels.
 */
 void FillTransRectangleClip(Uint32 color, int x, int y,
-	int w, int h, unsigned char alpha)
+							int w, int h, unsigned char alpha)
 {
 	GLubyte r, g, b;
 
@@ -1854,7 +1856,7 @@ void DrawCircleClip(Uint32 color, int x, int y, int radius)
 **  @param alpha   alpha value of pixels.
 */
 void DrawTransCircle(Uint32 color, int x, int y, int radius,
-	unsigned char alpha)
+					 unsigned char alpha)
 {
 	GLubyte r, g, b;
 
@@ -1873,7 +1875,7 @@ void DrawTransCircle(Uint32 color, int x, int y, int radius,
 **  @param alpha   alpha value of pixels.
 */
 void DrawTransCircleClip(Uint32 color, int x, int y, int radius,
-	unsigned char alpha)
+						 unsigned char alpha)
 {
 	GLubyte r, g, b;
 
@@ -1934,7 +1936,7 @@ void FillCircle(Uint32 color, int x, int y, int radius)
 **  @param alpha   alpha value of pixels.
 */
 void FillTransCircle(Uint32 color, int x, int y,
-	int radius, unsigned char alpha)
+					 int radius, unsigned char alpha)
 {
 	GLubyte r, g, b;
 
@@ -1998,7 +2000,7 @@ void FillCircleClip(Uint32 color, int x, int y, int radius)
 **  @param alpha   alpha value of pixels.
 */
 void FillTransCircleClip(Uint32 color, int x, int y,
-	int radius, unsigned char alpha)
+						 int radius, unsigned char alpha)
 {
 	GLubyte r, g, b;
 
@@ -2247,7 +2249,7 @@ void CVideo::FillTransCircle(Uint32 color, int x, int y, int r, unsigned char al
 		linedraw_sdl::FillTransCircle(color, x, y, r, alpha);
 	}
 }
-void CVideo::FillCircleClip(Uint32 color, const PixelPos& screenPos, int r)
+void CVideo::FillCircleClip(Uint32 color, const PixelPos &screenPos, int r)
 {
 	if (UseOpenGL) {
 		linedraw_gl::FillCircleClip(color, screenPos.x, screenPos.y, r);

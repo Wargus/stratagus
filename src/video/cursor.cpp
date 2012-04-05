@@ -61,23 +61,23 @@
 **
 **  @todo FIXME: Should this be move to ui part?
 */
-std::vector<CCursor*> AllCursors;
+std::vector<CCursor *> AllCursors;
 
 CursorStates CursorState;    /// current cursor state (point,...)
 int CursorAction;            /// action for selection
 int CursorValue;             /// value for CursorAction (spell type f.e.)
 std::string CustomCursor;             /// custom cursor for button
 
-	// Event changed mouse position, can alter at any moment
+// Event changed mouse position, can alter at any moment
 int CursorX;                 /// cursor position on screen X
 int CursorY;                 /// cursor position on screen Y
 
 int CursorStartX;            /// rectangle started on screen X
 int CursorStartY;            /// rectangle started on screen Y
 
-	/// X position of starting point of selection rectangle, in screen pixels.
+/// X position of starting point of selection rectangle, in screen pixels.
 int CursorStartScrMapX;
-	/// Y position of starting point of selection rectangle, in screen pixels.
+/// Y position of starting point of selection rectangle, in screen pixels.
 int CursorStartScrMapY;
 
 
@@ -100,8 +100,8 @@ static SDL_Surface *HiddenSurface;
 */
 void LoadCursors(const std::string &race)
 {
-	for (std::vector<CCursor*>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
-		CCursor& cursor = **i;
+	for (std::vector<CCursor *>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
+		CCursor &cursor = **i;
 
 		//  Only load cursors of this race or universal cursors.
 		if (!cursor.Race.empty() && cursor.Race != race) {
@@ -127,13 +127,15 @@ void LoadCursors(const std::string &race)
 */
 CCursor *CursorByIdent(const std::string &ident)
 {
-	for (std::vector<CCursor*>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
-		CCursor& cursor = **i;
+	for (std::vector<CCursor *>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
+		CCursor &cursor = **i;
 
-		if (cursor.Ident != ident || !cursor.G->IsLoaded())
+		if (cursor.Ident != ident || !cursor.G->IsLoaded()) {
 			continue;
-		if (cursor.Race.empty() || !ThisPlayer || cursor.Race == PlayerRaces.Name[ThisPlayer->Race])
+		}
+		if (cursor.Race.empty() || !ThisPlayer || cursor.Race == PlayerRaces.Name[ThisPlayer->Race]) {
 			return &cursor;
+		}
 	}
 	DebugPrint("Cursor `%s' not found, please check your code.\n" _C_ ident.c_str());
 	return NULL;
@@ -194,8 +196,8 @@ static void DrawBuildingCursor()
 	// Align to grid
 	const CViewport &vp = *UI.MouseViewport;
 	const PixelPos cursorScreenPos = {CursorX, CursorY};
-//	int x = CursorX - (CursorX - vp.X + vp.OffsetX) % PixelTileSize.x;
-//	int y = CursorY - (CursorY - vp.Y + vp.OffsetY) % PixelTileSize.y;
+	// int x = CursorX - (CursorX - vp.X + vp.OffsetX) % PixelTileSize.x;
+	// int y = CursorY - (CursorY - vp.Y + vp.OffsetY) % PixelTileSize.y;
 	const Vec2i mpos = vp.ScreenToTilePos(cursorScreenPos);
 	const PixelPos screenPos = vp.TilePosToScreen_TopLeft(mpos);
 
@@ -213,12 +215,12 @@ static void DrawBuildingCursor()
 	SetClipping(vp.X, vp.Y, vp.EndX, vp.EndY);
 	DrawShadow(*CursorBuilding, CursorBuilding->StillFrame, screenPos.x, screenPos.y);
 	DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
-		CursorBuilding->StillFrame, screenPos.x, screenPos.y);
-	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value>0){
+				 CursorBuilding->StillFrame, screenPos.x, screenPos.y);
+	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
 		Video.DrawCircleClip(ColorRed,
-					screenPos.x + CursorBuilding->TileWidth * PixelTileSize.x / 2,
-					screenPos.y + CursorBuilding->TileHeight * PixelTileSize.y / 2,
-					(CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileWidth - 1)) * PixelTileSize.x + 1);
+							 screenPos.x + CursorBuilding->TileWidth * PixelTileSize.x / 2,
+							 screenPos.y + CursorBuilding->TileHeight * PixelTileSize.y / 2,
+							 (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileWidth - 1)) * PixelTileSize.x + 1);
 	}
 
 	//
@@ -256,16 +258,16 @@ static void DrawBuildingCursor()
 			Uint32 color;
 
 			if (f && (ontop ||
-					CanBuildOn(posIt, MapFogFilterFlags(*ThisPlayer, posIt,
-						mask & ((NumSelected && Selected[0]->tilePos == posIt) ?
-								~(MapFieldLandUnit | MapFieldSeaUnit) : -1)))) &&
-					Map.IsFieldExplored(*ThisPlayer, posIt)) {
+					  CanBuildOn(posIt, MapFogFilterFlags(*ThisPlayer, posIt,
+								 mask & ((NumSelected && Selected[0]->tilePos == posIt) ?
+										 ~(MapFieldLandUnit | MapFieldSeaUnit) : -1)))) &&
+				Map.IsFieldExplored(*ThisPlayer, posIt)) {
 				color = ColorGreen;
 			} else {
 				color = ColorRed;
 			}
 			Video.FillTransRectangleClip(color, screenPos.x + w * PixelTileSize.x,
-										screenPos.y + h * PixelTileSize.y, PixelTileSize.x, PixelTileSize.y, 95);
+										 screenPos.y + h * PixelTileSize.y, PixelTileSize.x, PixelTileSize.y, 95);
 		}
 	}
 	PopClipping();
@@ -278,8 +280,7 @@ static void DrawBuildingCursor()
 void DrawCursor()
 {
 	// Selecting rectangle
-	if (CursorState == CursorStateRectangle &&
-			(CursorStartX != CursorX || CursorStartY != CursorY)) {
+	if (CursorState == CursorStateRectangle && (CursorStartX != CursorX || CursorStartY != CursorY)) {
 		DrawVisibleRectangleCursor(
 			CursorStartScrMapX + UI.MouseViewport->X - PixelTileSize.x * UI.MouseViewport->MapX - UI.MouseViewport->OffsetX,
 			CursorStartScrMapY + UI.MouseViewport->Y - PixelTileSize.y * UI.MouseViewport->MapY - UI.MouseViewport->OffsetY,
@@ -290,23 +291,22 @@ void DrawCursor()
 	}
 
 	if (!UseOpenGL && !GameRunning && !Editor.Running && GameCursor) {
-		if (!HiddenSurface ||
-			HiddenSurface->w != GameCursor->G->getWidth() ||
-			HiddenSurface->h != GameCursor->G->getHeight())
-		{
+		if (!HiddenSurface
+			|| HiddenSurface->w != GameCursor->G->getWidth()
+			|| HiddenSurface->h != GameCursor->G->getHeight()) {
 			if (HiddenSurface) {
 				VideoPaletteListRemove(HiddenSurface);
 				SDL_FreeSurface(HiddenSurface);
 			}
 
 			HiddenSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-				GameCursor->G->getWidth(),
-				GameCursor->G->getHeight(),
-				TheScreen->format->BitsPerPixel,
-				TheScreen->format->Rmask,
-				TheScreen->format->Gmask,
-				TheScreen->format->Bmask,
-				TheScreen->format->Amask);
+												 GameCursor->G->getWidth(),
+												 GameCursor->G->getHeight(),
+												 TheScreen->format->BitsPerPixel,
+												 TheScreen->format->Rmask,
+												 TheScreen->format->Gmask,
+												 TheScreen->format->Bmask,
+												 TheScreen->format->Amask);
 		}
 
 		SDL_Rect srcRect = {
@@ -328,7 +328,7 @@ void DrawCursor()
 			GameCursor->G->Load();
 		}
 		GameCursor->G->DrawFrameClip(GameCursor->SpriteFrame,
-			CursorX - GameCursor->HotX, CursorY - GameCursor->HotY);
+									 CursorX - GameCursor->HotX, CursorY - GameCursor->HotY);
 	}
 }
 
@@ -342,7 +342,7 @@ void HideCursor()
 			CursorX - GameCursor->HotX, CursorY - GameCursor->HotY,
 			0, 0
 		};
- 		SDL_BlitSurface(HiddenSurface, NULL, TheScreen, &dstRect);
+		SDL_BlitSurface(HiddenSurface, NULL, TheScreen, &dstRect);
 	}
 }
 
@@ -379,7 +379,7 @@ void InitVideoCursors()
 */
 void CleanCursors()
 {
-	for (std::vector<CCursor*>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
+	for (std::vector<CCursor *>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
 		CGraphic::Free((**i).G);
 		delete *i;
 	}

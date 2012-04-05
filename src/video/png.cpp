@@ -64,8 +64,7 @@ static void CL_png_read_data(png_structp png_ptr, png_bytep data, png_size_t len
 	CFile *f;
 
 	f = (CFile *)png_get_io_ptr(png_ptr);
-	check = (png_size_t)f->read(data,
-		(size_t)length);
+	check = (png_size_t)f->read(data, (size_t)length);
 	if (check != length) {
 		png_error(png_ptr, "Read Error");
 	}
@@ -126,7 +125,7 @@ int LoadGraphicPNG(CGraphic *g)
 
 	/* Create the PNG loading context structure */
 	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
-		NULL, NULL, NULL);
+									 NULL, NULL, NULL);
 	if (png_ptr == NULL) {
 		fprintf(stderr, "Couldn't allocate memory for PNG file");
 		ret = -1;
@@ -157,7 +156,7 @@ int LoadGraphicPNG(CGraphic *g)
 	/* Read PNG header info */
 	png_read_info(png_ptr, info_ptr);
 	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth,
-		&color_type, &interlace_type, NULL, NULL);
+				 &color_type, &interlace_type, NULL, NULL);
 
 	/* tell libpng to strip 16 bit/color files down to 8 bits/color */
 	png_set_strip_16(png_ptr) ;
@@ -179,8 +178,7 @@ int LoadGraphicPNG(CGraphic *g)
 		int num_trans;
 		png_bytep trans;
 
-		png_get_tRNS(png_ptr, info_ptr, &trans, &num_trans,
-			&transv);
+		png_get_tRNS(png_ptr, info_ptr, &trans, &num_trans, &transv);
 		if (color_type == PNG_COLOR_TYPE_PALETTE) {
 			/* Check if all tRNS entries are opaque except one */
 			int i;
@@ -216,7 +214,7 @@ int LoadGraphicPNG(CGraphic *g)
 	png_read_update_info(png_ptr, info_ptr);
 
 	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth,
-		&color_type, &interlace_type, NULL, NULL);
+				 &color_type, &interlace_type, NULL, NULL);
 
 	/* Allocate the SDL surface to hold the image */
 	Rmask = Gmask = Bmask = Amask = 0 ;
@@ -237,7 +235,7 @@ int LoadGraphicPNG(CGraphic *g)
 		}
 	}
 	surface = SDL_AllocSurface(SDL_SWSURFACE, width, height,
-		bit_depth * png_get_channels(png_ptr, info_ptr), Rmask, Gmask, Bmask, Amask);
+							   bit_depth * png_get_channels(png_ptr, info_ptr), Rmask, Gmask, Bmask, Amask);
 	if (surface == NULL) {
 		fprintf(stderr, "Out of memory");
 		goto done;
@@ -247,9 +245,9 @@ int LoadGraphicPNG(CGraphic *g)
 		if (color_type != PNG_COLOR_TYPE_PALETTE) {
 			/* FIXME: Should these be truncated or shifted down? */
 			ckey = SDL_MapRGB(surface->format,
-				(Uint8)transv->red,
-				(Uint8)transv->green,
-				(Uint8)transv->blue);
+							  (Uint8)transv->red,
+							  (Uint8)transv->green,
+							  (Uint8)transv->blue);
 		}
 		SDL_SetColorKey(surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ckey);
 	}
@@ -265,7 +263,7 @@ int LoadGraphicPNG(CGraphic *g)
 	}
 	for (row = 0; row < (int)height; ++row) {
 		row_pointers[row] = (png_bytep)
-			(Uint8 *)surface->pixels + row * surface->pitch;
+							(Uint8 *)surface->pixels + row * surface->pitch;
 	}
 
 	/* Read the entire image in one go */
@@ -305,7 +303,7 @@ int LoadGraphicPNG(CGraphic *g)
 
 done:   /* Clean up and return */
 	png_destroy_read_struct(&png_ptr, info_ptr ? &info_ptr : (png_infopp)0,
-		(png_infopp)0);
+							(png_infopp)0);
 	if (row_pointers) {
 		delete[] row_pointers;
 	}
@@ -355,8 +353,8 @@ void SaveScreenshotPNG(const char *name)
 	png_init_io(png_ptr, fp);
 
 	png_set_IHDR(png_ptr, info_ptr, Video.Width, Video.Height, 8,
-		PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
-		PNG_FILTER_TYPE_DEFAULT);
+				 PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+				 PNG_FILTER_TYPE_DEFAULT);
 
 	Video.LockScreen();
 
@@ -371,8 +369,7 @@ void SaveScreenshotPNG(const char *name)
 #ifndef USE_GLES
 		glReadBuffer(GL_FRONT);
 #endif
-		glReadPixels(0, 0, Video.Width, Video.Height, GL_RGB, GL_UNSIGNED_BYTE,
-			pixels);
+		glReadPixels(0, 0, Video.Width, Video.Height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 		for (i = 0; i < Video.Height; ++i) {
 			png_write_row(png_ptr, pixels + (Video.Height - 1 - i) * Video.Width * 3);
 		}

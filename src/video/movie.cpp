@@ -124,16 +124,16 @@ static int OutputTheora(OggData *data, SDL_Overlay *yuv_overlay, SDL_Rect *rect)
 	crop_offset = data->tinfo.offset_x + yuv.y_stride * data->tinfo.offset_y;
 	for (i = 0; i < yuv_overlay->h; ++i) {
 		memcpy(yuv_overlay->pixels[0] + yuv_overlay->pitches[0] * i,
-			yuv.y + crop_offset + yuv.y_stride * i, yuv_overlay->w);
+			   yuv.y + crop_offset + yuv.y_stride * i, yuv_overlay->w);
 	}
 
 	crop_offset = (data->tinfo.offset_x / 2) + (yuv.uv_stride) *
-		(data->tinfo.offset_y / 2);
+				  (data->tinfo.offset_y / 2);
 	for (i = 0; i < yuv_overlay->h / 2; ++i) {
 		memcpy(yuv_overlay->pixels[1] + yuv_overlay->pitches[1] * i,
-			yuv.v + yuv.uv_stride * i, yuv_overlay->w / 2);
+			   yuv.v + yuv.uv_stride * i, yuv_overlay->w / 2);
 		memcpy(yuv_overlay->pixels[2] + yuv_overlay->pitches[2] * i,
-			yuv.u + crop_offset + yuv.uv_stride * i, yuv_overlay->w / 2);
+			   yuv.u + crop_offset + yuv.uv_stride * i, yuv_overlay->w / 2);
 	}
 
 	if (SDL_MUSTLOCK(TheScreen)) {
@@ -221,14 +221,15 @@ int PlayMovie(const std::string &name)
 #ifndef USE_GLES
 	// When SDL_OPENGL is used, it is not possible to call SDL_CreateYUVOverlay, so turn temporary OpenGL off
 	// With GLES is all ok
-	if (UseOpenGL)
+	if (UseOpenGL) {
 		SDL_SetVideoMode(Video.Width, Video.Height, Video.Depth, SDL_GetVideoSurface()->flags & ~SDL_OPENGL);
+	}
 #endif
 
 	SDL_FillRect(SDL_GetVideoSurface(), NULL, 0);
 	Video.ClearScreen();
 	yuv_overlay = SDL_CreateYUVOverlay(data.tinfo.frame_width,
-		data.tinfo.frame_height, SDL_YV12_OVERLAY, TheScreen);
+									   data.tinfo.frame_height, SDL_YV12_OVERLAY, TheScreen);
 
 	if (yuv_overlay == NULL) {
 		fprintf(stderr, "SDL_CreateYUVOverlay: %s\n", SDL_GetError());
@@ -239,8 +240,7 @@ int PlayMovie(const std::string &name)
 
 	StopMusic();
 	if ((sample = LoadVorbis(buffer, PlayAudioStream))) {
-		if ((sample->Channels != 1 && sample->Channels != 2) ||
-				sample->SampleSize != 16) {
+		if ((sample->Channels != 1 && sample->Channels != 2) || sample->SampleSize != 16) {
 			fprintf(stderr, "Unsupported sound format in movie\n");
 			delete sample;
 			SDL_FreeYUVOverlay(yuv_overlay);
@@ -279,7 +279,7 @@ int PlayMovie(const std::string &name)
 		}
 
 		diff = SDL_GetTicks() - start_ticks - static_cast<int>(
-			theora_granule_time(&data.tstate, data.tstate.granulepos) * 1000);
+				   theora_granule_time(&data.tstate, data.tstate.granulepos) * 1000);
 
 		if (diff > 100) {
 			// too far behind, skip some frames

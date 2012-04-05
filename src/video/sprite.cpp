@@ -80,8 +80,8 @@
 **    to @a gx_beg and which one to @a gx_end.
 */
 void DrawTexture(const CGraphic *g, GLuint *textures,
-	int gx_beg, int gy_beg, int gx_end, int gy_end,
-	int sx_beg, int sy_beg, int flip)
+				 int gx_beg, int gy_beg, int gx_end, int gy_end,
+				 int sx_beg, int sy_beg, int flip)
 {
 	// gx and gy coordinates count pixels from the top left corner
 	//           of the CGraphic, which can span multiple textures.
@@ -98,12 +98,13 @@ void DrawTexture(const CGraphic *g, GLuint *textures,
 	Assert(gy_end <= g->GraphicHeight);
 
 	for (int tex_gy_beg = gy_beg / GLMaxTextureSize * GLMaxTextureSize;;
-			tex_gy_beg += GLMaxTextureSize) {
+		 tex_gy_beg += GLMaxTextureSize) {
 		int tex_gy_end = tex_gy_beg + GLMaxTextureSize;
 		int clip_gy_beg = std::max<int>(gy_beg, tex_gy_beg);
 		int clip_gy_end = std::min<int>(gy_end, tex_gy_end);
-		if (clip_gy_beg >= clip_gy_end)
+		if (clip_gy_beg >= clip_gy_end) {
 			break;
+		}
 
 		int clip_sy_beg = clip_gy_beg - gy_beg + sy_beg;
 		int clip_sy_end = clip_gy_end - gy_beg + sy_beg;
@@ -116,28 +117,29 @@ void DrawTexture(const CGraphic *g, GLuint *textures,
 			// the Y direction.  These textures may
 			// be smaller than the ones at the top.
 			clip_ty_beg = (clip_gy_beg - tex_gy_beg)
-				* g->TextureHeight
-				/ (g->GraphicHeight - tex_gy_beg);
+						  * g->TextureHeight
+						  / (g->GraphicHeight - tex_gy_beg);
 			clip_ty_end = (clip_gy_end - tex_gy_beg)
-				* g->TextureHeight
-				/ (g->GraphicHeight - tex_gy_beg);
+						  * g->TextureHeight
+						  / (g->GraphicHeight - tex_gy_beg);
 		} else {
 			clip_ty_beg = (clip_gy_beg - tex_gy_beg)
-				/ GLfloat(GLMaxTextureSize);
+						  / GLfloat(GLMaxTextureSize);
 			clip_ty_end = (clip_gy_end - tex_gy_beg)
-				/ GLfloat(GLMaxTextureSize);
+						  / GLfloat(GLMaxTextureSize);
 		}
 		Assert(0.0f <= clip_ty_beg);
 		Assert(clip_ty_beg < clip_ty_end);
 		Assert(clip_ty_end <= 1.0f);
 
 		for (int tex_gx_beg = gx_beg / GLMaxTextureSize * GLMaxTextureSize;;
-				tex_gx_beg += GLMaxTextureSize) {
+			 tex_gx_beg += GLMaxTextureSize) {
 			int tex_gx_end = tex_gx_beg + GLMaxTextureSize;
 			int clip_gx_beg = std::max<int>(gx_beg, tex_gx_beg);
 			int clip_gx_end = std::min<int>(gx_end, tex_gx_end);
-			if (clip_gx_beg >= clip_gx_end)
+			if (clip_gx_beg >= clip_gx_end) {
 				break;
+			}
 
 			// Flipping does not change which parts of the
 			// CGraphic get drawn.  It only changes where
@@ -159,24 +161,24 @@ void DrawTexture(const CGraphic *g, GLuint *textures,
 				// the X direction.  These textures may
 				// be smaller than the ones at the left.
 				clip_tx_beg = (clip_gx_beg - tex_gx_beg)
-					* g->TextureWidth
-					/ (g->GraphicWidth - tex_gx_beg);
+							  * g->TextureWidth
+							  / (g->GraphicWidth - tex_gx_beg);
 				clip_tx_end = (clip_gx_end - tex_gx_beg)
-					* g->TextureWidth
-					/ (g->GraphicWidth - tex_gx_beg);
+							  * g->TextureWidth
+							  / (g->GraphicWidth - tex_gx_beg);
 			} else {
 				clip_tx_beg = (clip_gx_beg - tex_gx_beg)
-					/ GLfloat(GLMaxTextureSize);
+							  / GLfloat(GLMaxTextureSize);
 				clip_tx_end = (clip_gx_end - tex_gx_beg)
-					/ GLfloat(GLMaxTextureSize);
+							  / GLfloat(GLMaxTextureSize);
 			}
 			Assert(0.0f <= clip_tx_beg);
 			Assert(clip_tx_beg < clip_tx_end);
 			Assert(clip_tx_end <= 1.0f);
 
 			int texture = tex_gy_beg / GLMaxTextureSize
-				* ((g->GraphicWidth - 1) / GLMaxTextureSize + 1)
-				+ tex_gx_beg / GLMaxTextureSize;
+						  * ((g->GraphicWidth - 1) / GLMaxTextureSize + 1)
+						  + tex_gx_beg / GLMaxTextureSize;
 			Assert(texture >= 0 && texture < g->NumTextures);
 
 			glBindTexture(GL_TEXTURE_2D, textures[texture]);
@@ -189,10 +191,10 @@ void DrawTexture(const CGraphic *g, GLuint *textures,
 			};
 
 			float vertex[] = {
-				2.0f/(GLfloat)Video.Width*clip_sx_beg-1.0f, -2.0f/(GLfloat)Video.Height*clip_sy_beg+1.0f,
-				2.0f/(GLfloat)Video.Width*clip_sx_end-1.0f, -2.0f/(GLfloat)Video.Height*clip_sy_beg+1.0f,
-				2.0f/(GLfloat)Video.Width*clip_sx_beg-1.0f, -2.0f/(GLfloat)Video.Height*clip_sy_end+1.0f,
-				2.0f/(GLfloat)Video.Width*clip_sx_end-1.0f, -2.0f/(GLfloat)Video.Height*clip_sy_end+1.0f
+				2.0f / (GLfloat)Video.Width *clip_sx_beg - 1.0f, -2.0f / (GLfloat)Video.Height *clip_sy_beg + 1.0f,
+				2.0f / (GLfloat)Video.Width *clip_sx_end - 1.0f, -2.0f / (GLfloat)Video.Height *clip_sy_beg + 1.0f,
+				2.0f / (GLfloat)Video.Width *clip_sx_beg - 1.0f, -2.0f / (GLfloat)Video.Height *clip_sy_end + 1.0f,
+				2.0f / (GLfloat)Video.Width *clip_sx_end - 1.0f, -2.0f / (GLfloat)Video.Height *clip_sy_end + 1.0f
 			};
 
 			glEnableClientState(GL_TEXTURE_COORD_ARRAY);

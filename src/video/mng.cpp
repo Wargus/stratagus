@@ -59,7 +59,7 @@ static mng_ptr MNG_DECL my_alloc(mng_size_t len)
 
 static void MNG_DECL my_free(mng_ptr ptr, mng_size_t)
 {
-	delete[] static_cast<char*>(ptr);
+	delete[] static_cast<char *>(ptr);
 }
 
 static mng_bool MNG_DECL my_openstream(mng_handle handle)
@@ -86,7 +86,7 @@ static mng_bool MNG_DECL my_closestream(mng_handle handle)
 }
 
 static mng_bool MNG_DECL my_readdata(mng_handle handle, mng_ptr buf, mng_uint32 buflen,
-	mng_uint32p read)
+									 mng_uint32p read)
 {
 	Mng *mng;
 
@@ -96,7 +96,7 @@ static mng_bool MNG_DECL my_readdata(mng_handle handle, mng_ptr buf, mng_uint32 
 }
 
 static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
-	mng_uint32 height)
+		mng_uint32 height)
 {
 	Uint32 Rmask;
 	Uint32 Gmask;
@@ -144,7 +144,7 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 	memset(mng->buffer, width * height * 3, sizeof(unsigned char));
 
 	mng->surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height,
-		8 * 3, Rmask, Gmask, Bmask, 0);
+										8 * 3, Rmask, Gmask, Bmask, 0);
 	if (mng->surface == NULL) {
 		fprintf(stderr, "Out of memory");
 		exit(1);
@@ -162,7 +162,7 @@ static mng_ptr MNG_DECL my_getcanvasline(mng_handle handle, mng_uint32 linenr)
 }
 
 static mng_bool MNG_DECL my_refresh(mng_handle handle, mng_uint32, mng_uint32,
-	mng_uint32, mng_uint32)
+									mng_uint32, mng_uint32)
 {
 	Mng *mng;
 	int i;
@@ -171,12 +171,12 @@ static mng_bool MNG_DECL my_refresh(mng_handle handle, mng_uint32, mng_uint32,
 	SDL_LockSurface(mng->surface);
 	for (i = 0; i < mng->surface->h; ++i) {
 		memcpy((char *)mng->surface->pixels + i * mng->surface->pitch,
-			mng->buffer + i * mng->surface->w * 3, mng->surface->w * 3);
+			   mng->buffer + i * mng->surface->w * 3, mng->surface->w * 3);
 	}
 	if (UseOpenGL) {
 		glBindTexture(GL_TEXTURE_2D, mng->texture_name);
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mng->surface->w, mng->surface->h,
-				GL_RGB, GL_UNSIGNED_BYTE, mng->surface->pixels);
+						GL_RGB, GL_UNSIGNED_BYTE, mng->surface->pixels);
 	}
 	SDL_UnlockSurface(mng->surface);
 
@@ -199,7 +199,7 @@ static mng_bool MNG_DECL my_settimer(mng_handle handle, mng_uint32 msecs)
 }
 
 static mng_bool MNG_DECL my_processmend(mng_handle handle, mng_uint32 iterationsdone,
-	mng_uint32)
+										mng_uint32)
 {
 	Mng *mng;
 
@@ -210,7 +210,7 @@ static mng_bool MNG_DECL my_processmend(mng_handle handle, mng_uint32 iterations
 }
 
 static mng_bool MNG_DECL my_errorproc(mng_handle handle, mng_int32,
-	mng_int8, mng_chunkid, mng_uint32, mng_int32, mng_int32, mng_pchar errortext)
+									  mng_int8, mng_chunkid, mng_uint32, mng_int32, mng_int32, mng_pchar errortext)
 {
 	Mng *mng;
 
@@ -235,7 +235,7 @@ Mng::Mng() :
 
 Mng::~Mng()
 {
-//	delete[] name;
+	//	delete[] name;
 	if (handle) {
 		mng_cleanup(&handle);
 	}
@@ -279,10 +279,10 @@ void Mng::Draw(int x, int y)
 		};
 
 		float vertex[] = {
-			2.0f/(GLfloat)Video.Width*sx-1.0f, -2.0f/(GLfloat)Video.Height*sy+1.0f,
-			2.0f/(GLfloat)Video.Width*ex-1.0f, -2.0f/(GLfloat)Video.Height*sy+1.0f,
-			2.0f/(GLfloat)Video.Width*sx-1.0f, -2.0f/(GLfloat)Video.Height*ey+1.0f,
-			2.0f/(GLfloat)Video.Width*ex-1.0f, -2.0f/(GLfloat)Video.Height*ey+1.0f
+			2.0f / (GLfloat)Video.Width *sx - 1.0f, -2.0f / (GLfloat)Video.Height *sy + 1.0f,
+			2.0f / (GLfloat)Video.Width *ex - 1.0f, -2.0f / (GLfloat)Video.Height *sy + 1.0f,
+			2.0f / (GLfloat)Video.Width *sx - 1.0f, -2.0f / (GLfloat)Video.Height *ey + 1.0f,
+			2.0f / (GLfloat)Video.Width *ex - 1.0f, -2.0f / (GLfloat)Video.Height *ey + 1.0f
 		};
 
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
