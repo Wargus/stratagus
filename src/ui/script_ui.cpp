@@ -163,7 +163,7 @@ static int CclSetUseOpenGL(lua_State *l)
 	LuaCheckArgs(l, 1);
 	if (CclInConfigFile) {
 		// May have been set from the command line
-		if(!ForceUseOpenGL) {
+		if (!ForceUseOpenGL) {
 			UseOpenGL = LuaToBoolean(l, 1);
 		}
 	}
@@ -471,7 +471,8 @@ EnumVariable Str2EnumVariable(lua_State *l, const char *s)
 		{"Diff", VariableDiff},
 		{"Percent", VariablePercent},
 		{"Name", VariableName},
-		{0, VariableValue}}; // List of possible values.
+		{0, VariableValue}
+	}; // List of possible values.
 	int i; // Iterator.
 
 	for (i = 0; list[i].s; i++) {
@@ -503,7 +504,8 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 		{"Container", UnitRefContainer},
 		{"Worker", UnitRefWorker},
 		{"Goal", UnitRefGoal},
-		{0, UnitRefItSelf}}; // List of possible values.
+		{0, UnitRefItSelf}
+	}; // List of possible values.
 	int i; // Iterator.
 
 	for (i = 0; list[i].s; i++) {
@@ -532,12 +534,12 @@ static ConditionPanel *ParseConditionPanel(lua_State *l)
 		key = LuaToString(l, -2);
 		if (!strcmp(key, "ShowOnlySelected")) {
 			condition->ShowOnlySelected = LuaToBoolean(l, -1);
-			} else if (!strcmp(key, "HideNeutral")) {
-				condition->HideNeutral = LuaToBoolean(l, -1);
-			} else if (!strcmp(key, "HideAllied")) {
-				condition->HideAllied = LuaToBoolean(l, -1);
-			} else if (!strcmp(key, "ShowOpponent")) {
-				condition->ShowOpponent = LuaToBoolean(l, -1);
+		} else if (!strcmp(key, "HideNeutral")) {
+			condition->HideNeutral = LuaToBoolean(l, -1);
+		} else if (!strcmp(key, "HideAllied")) {
+			condition->HideAllied = LuaToBoolean(l, -1);
+		} else if (!strcmp(key, "ShowOpponent")) {
+			condition->ShowOpponent = LuaToBoolean(l, -1);
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[key];
 			if (index != -1) {
@@ -656,11 +658,11 @@ static CContentType *CclParseContent(lua_State *l)
 				Assert(lua_istable(l, -1));
 				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 					key = LuaToString(l, -2);
-						if (!strcmp(key, "Format")) {
-							contentformattedtext2->Format = LuaToString(l, -1);
-						} else if (!strcmp(key, "Font")) {
-							contentformattedtext2->Font = CFont::Get(LuaToString(l, -1));
-						} else if (!strcmp(key, "Variable")) {
+					if (!strcmp(key, "Format")) {
+						contentformattedtext2->Format = LuaToString(l, -1);
+					} else if (!strcmp(key, "Font")) {
+						contentformattedtext2->Font = CFont::Get(LuaToString(l, -1));
+					} else if (!strcmp(key, "Variable")) {
 						const char *const name = LuaToString(l, -1);
 						contentformattedtext2->Index1 = UnitTypeVar.VariableNameLookup[name];
 						contentformattedtext2->Index2 = contentformattedtext2->Index1;
@@ -755,26 +757,27 @@ static CContentType *CclParseContent(lua_State *l)
 					} else if (!strcmp(key, "Color")) {
 						//FIXME: need more general way
 						const char *const color = LuaToString(l, -1);
-						if (!strcmp(color, "red"))
+						if (!strcmp(color, "red")) {
 							contenttypecompletebar->Color = 1;
-						else if (!strcmp(color, "yellow"))
+						} else if (!strcmp(color, "yellow")) {
 							contenttypecompletebar->Color = 2;
-						else if (!strcmp(color, "green"))
+						} else if (!strcmp(color, "green")) {
 							contenttypecompletebar->Color = 3;
-						else if (!strcmp(color, "gray"))
+						} else if (!strcmp(color, "gray")) {
 							contenttypecompletebar->Color = 4;
-						else if (!strcmp(color, "white"))
+						} else if (!strcmp(color, "white")) {
 							contenttypecompletebar->Color = 5;
-						else if (!strcmp(color, "orange"))
+						} else if (!strcmp(color, "orange")) {
 							contenttypecompletebar->Color = 6;
-						else if (!strcmp(color, "blue"))
+						} else if (!strcmp(color, "blue")) {
 							contenttypecompletebar->Color = 7;
-						else if (!strcmp(color, "dark-green"))
+						} else if (!strcmp(color, "dark-green")) {
 							contenttypecompletebar->Color = 8;
-						else if (!strcmp(color, "black"))
+						} else if (!strcmp(color, "black")) {
 							contenttypecompletebar->Color = 9;
-						else
+						} else {
 							LuaError(l, "incorrect color: '%s' " _C_ color);
+						}
 					} else {
 						LuaError(l, "'%s' invalid for method 'CompleteBar' in DefinePanels" _C_ key);
 					}
@@ -852,7 +855,7 @@ static int CclDefinePanelContents(lua_State *l)
 			}
 		}
 		for (std::vector<CContentType *>::iterator content = infopanel->Contents.begin();
-				content != infopanel->Contents.end(); ++content) { // Default value for invalid value.
+			 content != infopanel->Contents.end(); ++content) { // Default value for invalid value.
 			(*content)->PosX += infopanel->PosX;
 			(*content)->PosY += infopanel->PosY;
 		}
@@ -1368,8 +1371,8 @@ static int CclDefineButton(lua_State *l)
 		lua_pop(l, 1);
 	}
 	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr,
-		ba.Allowed, ba.AllowStr, /*ba.Key,*/ ba.Hint, ba.Description, ba.CommentSound.Name,
-		ba.ButtonCursor, ba.UnitMask);
+			  ba.Allowed, ba.AllowStr, /*ba.Key,*/ ba.Hint, ba.Description, ba.CommentSound.Name,
+			  ba.ButtonCursor, ba.UnitMask);
 	return 0;
 }
 

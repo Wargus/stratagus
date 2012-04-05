@@ -127,13 +127,13 @@ void initGuichan()
 */
 void freeGuichan()
 {
-	if ( Gui ) {
+	if (Gui) {
 		delete Gui->getGraphics();
 		delete Gui;
 		Gui = NULL;
 	}
 
-	if ( Input ) {
+	if (Input) {
 		delete Input;
 		Input = NULL;
 	}
@@ -224,8 +224,8 @@ void MyOpenGLGraphics::_endDraw()
 	popClipArea();
 }
 
-void MyOpenGLGraphics::drawImage(const gcn::Image* image, int srcX, int srcY,
-	int dstX, int dstY, int width, int height)
+void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY,
+								 int dstX, int dstY, int width, int height)
 {
 	const gcn::ClipRectangle &r = this->getCurrentClipArea();
 	int right = std::min<int>(r.x + r.width - 1, Video.Width - 1);
@@ -238,7 +238,7 @@ void MyOpenGLGraphics::drawImage(const gcn::Image* image, int srcX, int srcY,
 	PushClipping();
 	SetClipping(r.x, r.y, right, bottom);
 	((CGraphic *)image)->DrawSubClip(srcX, srcY, width, height,
-		dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
+									 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
 	PopClipping();
 }
 
@@ -246,7 +246,7 @@ void MyOpenGLGraphics::drawPoint(int x, int y)
 {
 	gcn::Color c = this->getColor();
 	Video.DrawPixelClip(Video.MapRGBA(0, c.r, c.g, c.b, c.a),
-		x + mClipStack.top().xOffset, y + mClipStack.top().yOffset);
+						x + mClipStack.top().xOffset, y + mClipStack.top().yOffset);
 }
 
 void MyOpenGLGraphics::drawLine(int x1, int y1, int x2, int y2)
@@ -258,7 +258,7 @@ void MyOpenGLGraphics::drawLine(int x1, int y1, int x2, int y2)
 	Video.DrawLineClip(Video.MapRGBA(0, c.r, c.g, c.b, c.a), pos1, pos2);
 }
 
-void MyOpenGLGraphics::drawRectangle(const gcn::Rectangle& rectangle)
+void MyOpenGLGraphics::drawRectangle(const gcn::Rectangle &rectangle)
 {
 	gcn::Color c = this->getColor();
 	if (c.a == 0) {
@@ -267,8 +267,8 @@ void MyOpenGLGraphics::drawRectangle(const gcn::Rectangle& rectangle)
 
 	const gcn::ClipRectangle top = mClipStack.top();
 	gcn::Rectangle area = gcn::Rectangle(rectangle.x + top.xOffset,
-								rectangle.y + top.yOffset,
-								rectangle.width, rectangle.height);
+										 rectangle.y + top.yOffset,
+										 rectangle.width, rectangle.height);
 
 	if (!area.intersect(top)) {
 		return;
@@ -280,20 +280,21 @@ void MyOpenGLGraphics::drawRectangle(const gcn::Rectangle& rectangle)
 	int y2 = std::min<int>(area.y + area.height, top.y + top.height);
 
 	Video.DrawTransRectangle(Video.MapRGB(0, c.r, c.g, c.b),
-		x1, y1, x2 - x1, y2 - y1, mColor.a);
+							 x1, y1, x2 - x1, y2 - y1, mColor.a);
 }
 
-void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle& rectangle)
+void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle &rectangle)
 {
 	const gcn::Color c = this->getColor();
 
-	if (c.a == 0)
+	if (c.a == 0) {
 		return;
+	}
 
 	const gcn::ClipRectangle top = mClipStack.top();
 	gcn::Rectangle area = gcn::Rectangle(rectangle.x + top.xOffset,
-								rectangle.y + top.yOffset,
-								rectangle.width, rectangle.height);
+										 rectangle.y + top.yOffset,
+										 rectangle.width, rectangle.height);
 
 	if (!area.intersect(top)) {
 		return;
@@ -305,7 +306,7 @@ void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle& rectangle)
 	int y2 = std::min<int>(area.y + area.height, top.y + top.height);
 
 	Video.FillTransRectangle(Video.MapRGB(0, c.r, c.g, c.b),
-		x1, y1, x2 - x1, y2 - y1, c.a);
+							 x1, y1, x2 - x1, y2 - y1, c.a);
 }
 
 /*----------------------------------------------------------------------------
@@ -360,7 +361,7 @@ void ImageButton::draw(gcn::Graphics *graphics)
 		img = normalImage;
 	}
 	graphics->drawImage(img, 0, 0, 0, 0,
-		img->getWidth(), img->getHeight());
+						img->getWidth(), img->getHeight());
 
 	graphics->setColor(getForegroundColor());
 
@@ -427,7 +428,7 @@ ImageRadioButton::ImageRadioButton() : gcn::RadioButton(),
 **  ImageRadioButton constructor
 */
 ImageRadioButton::ImageRadioButton(const std::string &caption,
-		const std::string &group, bool marked) :
+								   const std::string &group, bool marked) :
 	gcn::RadioButton(caption, group, marked),
 	uncheckedNormalImage(NULL), uncheckedPressedImage(NULL),
 	checkedNormalImage(NULL), checkedPressedImage(NULL),
@@ -458,7 +459,7 @@ void ImageRadioButton::drawBox(gcn::Graphics *graphics)
 
 	if (img) {
 		graphics->drawImage(img, 0, 0, 0, (getHeight() - img->getHeight()) / 2,
-			img->getWidth(), img->getHeight());
+							img->getWidth(), img->getHeight());
 	} else {
 		RadioButton::drawBox(graphics);
 	}
@@ -516,8 +517,8 @@ void ImageRadioButton::mouseRelease(int, int, int button)
 void ImageRadioButton::mouseClick(int, int, int button, int)
 {
 	if (button == gcn::MouseInput::LEFT) {
-        setMarked(true);
-        generateAction();
+		setMarked(true);
+		generateAction();
 	}
 }
 
@@ -620,7 +621,7 @@ void ImageCheckBox::drawBox(gcn::Graphics *graphics)
 
 	if (img) {
 		graphics->drawImage(img, 0, 0, 0, (getHeight() - img->getHeight()) / 2,
-			img->getWidth(), img->getHeight());
+							img->getWidth(), img->getHeight());
 	} else {
 		CheckBox::drawBox(graphics);
 	}
@@ -710,11 +711,11 @@ void ImageSlider::drawMarker(gcn::Graphics *graphics)
 		if (getOrientation() == HORIZONTAL) {
 			int v = getMarkerPosition();
 			graphics->drawImage(markerImage, 0, 0, v, 0,
-				markerImage->getWidth(), markerImage->getHeight());
+								markerImage->getWidth(), markerImage->getHeight());
 		} else {
 			int v = (getHeight() - getMarkerLength()) - getMarkerPosition();
 			graphics->drawImage(markerImage, 0, 0, 0, v,
-				markerImage->getWidth(), markerImage->getHeight());
+								markerImage->getWidth(), markerImage->getHeight());
 		}
 	} else {
 		Slider::drawMarker(graphics);
@@ -728,7 +729,7 @@ void ImageSlider::draw(gcn::Graphics *graphics)
 {
 	if (backgroundImage) {
 		graphics->drawImage(backgroundImage, 0, 0, 0, 0,
-			backgroundImage->getWidth(), backgroundImage->getHeight());
+							backgroundImage->getWidth(), backgroundImage->getHeight());
 		drawMarker(graphics);
 	} else {
 		Slider::draw(graphics);
@@ -911,7 +912,7 @@ void MultiLineLabel::draw(gcn::Graphics *graphics)
 
 	for (int i = 0; i < (int)this->mTextRows.size(); ++i) {
 		graphics->drawText(this->mTextRows[i], textX, textY + i * this->getFont()->getHeight(),
-			this->getAlignment());
+						   this->getAlignment());
 	}
 }
 
@@ -1070,7 +1071,7 @@ void ScrollingWidget::add(gcn::Widget *widget, int x, int y)
 void ScrollingWidget::logic()
 {
 	setDirty(true);
-	if (container.getHeight() + containerY - speedY > 0 ) {
+	if (container.getHeight() + containerY - speedY > 0) {
 		// the bottom of the container is lower than the top
 		// of the widget. It is thus still visible.
 		containerY -= speedY;
@@ -1297,7 +1298,7 @@ void ListBoxWidget::setSelected(int selected)
 */
 int ListBoxWidget::getSelected() const
 {
-	return const_cast<gcn::ListBox &> (listbox).getSelected();
+	return const_cast<gcn::ListBox &>(listbox).getSelected();
 }
 
 /**
@@ -1427,8 +1428,8 @@ void StatBoxWidget::draw(gcn::Graphics *graphics)
 	graphics->fillRectangle(gcn::Rectangle(2, 2, width - 4, height - 4));
 	graphics->setFont(getFont());
 	graphics->drawText(getCaption(),
-						(getWidth() - getFont()->getWidth(getCaption())) / 2,
-						(height - getFont()->getHeight()) / 2);
+					   (getWidth() - getFont()->getWidth(getCaption())) / 2,
+					   (height - getFont()->getHeight()) / 2);
 }
 
 /**

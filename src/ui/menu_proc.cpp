@@ -57,7 +57,7 @@
 **  @param text   text to print on button
 */
 void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
-	const std::string &text)
+					const std::string &text)
 {
 	int i;
 	ButtonStyleProperties *p;
@@ -98,17 +98,17 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 		std::string oldrc;
 		GetDefaultTextColors(oldnc, oldrc);
 		CLabel label(style->Font,
-			(!p->TextNormalColor.empty() ? p->TextNormalColor :
-			!style->TextNormalColor.empty() ? style->TextNormalColor : oldnc),
-			(!p->TextReverseColor.empty() ? p->TextReverseColor :
-			!style->TextReverseColor.empty() ? style->TextReverseColor : oldrc));
+					 (!p->TextNormalColor.empty() ? p->TextNormalColor :
+					  !style->TextNormalColor.empty() ? style->TextNormalColor : oldnc),
+					 (!p->TextReverseColor.empty() ? p->TextReverseColor :
+					  !style->TextReverseColor.empty() ? style->TextReverseColor : oldrc));
 
 		if (p->TextAlign == TextAlignCenter || p->TextAlign == TextAlignUndefined) {
 			label.DrawCentered(x + p->TextX, y + p->TextY, text);
 		} else if (p->TextAlign == TextAlignLeft) {
 			label.Draw(x + p->TextX, y + p->TextY, text);
 		} else {
-			label.Draw(x + p->TextX - style->Font->Width(text), y + p->TextY,text);
+			label.Draw(x + p->TextX - style->Font->Width(text), y + p->TextY, text);
 		}
 
 	}
@@ -118,12 +118,12 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 	//
 	if (!p->BorderColor) {
 		p->BorderColor = Video.MapRGB(TheScreen->format,
-			p->BorderColorRGB.r, p->BorderColorRGB.g, p->BorderColorRGB.b);
+									  p->BorderColorRGB.r, p->BorderColorRGB.g, p->BorderColorRGB.b);
 	}
 	if (p->BorderSize) {
 		for (i = 0; i < p->BorderSize; ++i) {
 			Video.DrawRectangleClip(p->BorderColor, x - i, y - i,
-				style->Width + 2 * i, style->Height + 2 * i);
+									style->Width + 2 * i, style->Height + 2 * i);
 		}
 	}
 }

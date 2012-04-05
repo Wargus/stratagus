@@ -66,13 +66,13 @@
 --  Defines
 ----------------------------------------------------------------------------*/
 
-	/// Scrolling area (<= 15 y)
+/// Scrolling area (<= 15 y)
 #define SCROLL_UP     15
-	/// Scrolling area (>= VideoHeight - 16 y)
+/// Scrolling area (>= VideoHeight - 16 y)
 #define SCROLL_DOWN   (Video.Height - 16)
-	/// Scrolling area (<= 15 y)
+/// Scrolling area (<= 15 y)
 #define SCROLL_LEFT   15
-	/// Scrolling area (>= VideoWidth - 16 x)
+/// Scrolling area (>= VideoWidth - 16 x)
 #define SCROLL_RIGHT  (Video.Width - 16)
 
 /*----------------------------------------------------------------------------
@@ -156,7 +156,7 @@ static void UiCenterOnGroup(unsigned group, GroupSelectionMode mode = SELECTABLE
 {
 	CUnit **units;
 	int n;
-	Vec2i pos = {-1, -1};
+	Vec2i pos = { -1, -1};
 
 	n = GetNumberUnitsOfGroup(group, SELECT_ALL);
 	if (n--) {
@@ -231,7 +231,7 @@ static void UiAddGroupToSelection(unsigned group)
 */
 static void UiDefineGroup(unsigned group)
 {
-	for (int i= 0; i < NumSelected; ++i) {
+	for (int i = 0; i < NumSelected; ++i) {
 		if (Selected[i]->GroupId) {
 			RemoveUnitFromGroups(*Selected[i]);
 		}
@@ -485,8 +485,7 @@ static void UiToggleGrabMouse()
 static void UiTrackUnit()
 {
 	//Check if player has selected at least 1 unit
-	if (!Selected[0])
-	{
+	if (!Selected[0]) {
 		UI.SelectedViewport->Unit = NULL;
 		return;
 	}
@@ -550,19 +549,19 @@ static bool CommandKey(int key)
 	}
 
 	switch (key) {
-		// Return enters chat/input mode.
+			// Return enters chat/input mode.
 		case SDLK_RETURN:
 		case SDLK_KP_ENTER: // RETURN
 			UiBeginInput();
 			return true;
 
-		// Unselect everything
+			// Unselect everything
 		case SDLK_CARET:
 		case SDLK_BACKQUOTE:
 			UiUnselectAll();
 			break;
 
-		// Group selection
+			// Group selection
 		case '0': case '1': case '2':
 		case '3': case '4': case '5':
 		case '6': case '7': case '8':
@@ -705,16 +704,15 @@ static bool CommandKey(int key)
 				ToggleShowMessages();
 			}
 #ifdef DEBUG
-			else
-			if (KeyModifiers & ModifierAlt) {
+			else if (KeyModifiers & ModifierAlt) {
 				ToggleShowBuilListMessages();
 			}
 #endif
 			break;
 
 		case SDLK_TAB: // TAB toggles minimap.
-					// FIXME: more...
-					// FIXME: shift+TAB
+			// FIXME: more...
+			// FIXME: shift+TAB
 			if (KeyModifiers & ModifierAlt) {
 				break;
 			}
@@ -832,13 +830,13 @@ static int InputKey(int key)
 				}
 			} else
 #endif
-			if (!IsNetworkGame()) {
-				if (!GameObserve && !GamePaused) {
-					if (HandleCheats(Input)) {
-						CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, Input, -1);
+				if (!IsNetworkGame()) {
+					if (!GameObserve && !GamePaused) {
+						if (HandleCheats(Input)) {
+							CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, Input, -1);
+						}
 					}
 				}
-			}
 
 			// Check for Replay and ffw x
 #ifdef DEBUG
@@ -863,8 +861,8 @@ static int InputKey(int key)
 					}
 				}
 				snprintf(ChatMessage, sizeof(ChatMessage), "~%s~<%s>~> %s",
-					PlayerColorNames[ThisPlayer->Index].c_str(),
-					ThisPlayer->Name.c_str(), Input);
+						 PlayerColorNames[ThisPlayer->Index].c_str(),
+						 ThisPlayer->Name.c_str(), Input);
 				// FIXME: only to selected players ...
 				NetworkChatMessage(ChatMessage);
 			}
@@ -1089,8 +1087,7 @@ void HandleKeyDown(unsigned key, unsigned keychar)
 		InputKey(kp ? kp : keychar);
 	} else {
 		// If no modifier look if button bound
-		if (!(KeyModifiers & (ModifierControl | ModifierAlt |
-				ModifierSuper))) {
+		if (!(KeyModifiers & (ModifierControl | ModifierAlt | ModifierSuper))) {
 			if (!GameObserve && !GamePaused) {
 				if (UI.ButtonPanel.DoKey(key)) {
 					return;
@@ -1296,7 +1293,7 @@ static unsigned LastMouseTicks;          /// Ticks of last mouse event
 **  @param button     Mouse button pressed.
 */
 void InputMouseButtonPress(const EventCallback *callbacks,
-	unsigned ticks, unsigned button)
+						   unsigned ticks, unsigned button)
 {
 	//
 	//  Button new pressed.
@@ -1306,8 +1303,8 @@ void InputMouseButtonPress(const EventCallback *callbacks,
 		//
 		//  Detect double click
 		//
-		if (MouseState == ClickedMouseState && button == LastMouseButton &&
-				ticks < StartMouseTicks + DoubleClickDelay) {
+		if (MouseState == ClickedMouseState && button == LastMouseButton
+			&& ticks < StartMouseTicks + DoubleClickDelay) {
 			MouseButtons |= (1 << button) << MouseDoubleShift;
 			button |= button << MouseDoubleShift;
 		} else {
@@ -1329,7 +1326,7 @@ void InputMouseButtonPress(const EventCallback *callbacks,
 **  @param button     Mouse button released.
 */
 void InputMouseButtonRelease(const EventCallback *callbacks,
-	unsigned ticks, unsigned button)
+							 unsigned ticks, unsigned button)
 {
 	unsigned mask;
 
@@ -1368,13 +1365,13 @@ void InputMouseButtonRelease(const EventCallback *callbacks,
 **  @param y          Y movement
 */
 void InputMouseMove(const EventCallback *callbacks,
-	unsigned ticks, int x, int y)
+					unsigned ticks, int x, int y)
 {
 	// Don't reset the mouse state unless we really moved
 #ifdef USE_TOUCHSCREEN
 #define buff 32
-	if (((x - buff) <= MouseX && MouseX <= (x + buff)) == 0 ||
-			((y - buff) <= MouseY && MouseY <= (y + buff)) == 0) {
+	if (((x - buff) <= MouseX && MouseX <= (x + buff)) == 0
+		|| ((y - buff) <= MouseY && MouseY <= (y + buff)) == 0) {
 		MouseState = InitialMouseState;
 		LastMouseTicks = ticks;
 	}
@@ -1423,8 +1420,7 @@ void InputMouseTimeout(const EventCallback *callbacks, unsigned ticks)
 		if (ticks > LastMouseTicks + HoldClickDelay) {
 			LastMouseTicks = ticks;
 			MouseButtons |= (1 << LastMouseButton) << MouseHoldShift;
-			callbacks->ButtonPressed(LastMouseButton |
-				(LastMouseButton << MouseHoldShift));
+			callbacks->ButtonPressed(LastMouseButton | (LastMouseButton << MouseHoldShift));
 		}
 	}
 }
@@ -1447,10 +1443,9 @@ static unsigned DoubleKey;                   /// last key pressed
 **  @param ikeychar   Character code.
 */
 void InputKeyButtonPress(const EventCallback *callbacks,
-	unsigned ticks, unsigned ikey, unsigned ikeychar)
+						 unsigned ticks, unsigned ikey, unsigned ikeychar)
 {
-	if (!LastIKey && DoubleKey == ikey &&
-			ticks < LastKeyTicks + DoubleClickDelay) {
+	if (!LastIKey && DoubleKey == ikey && ticks < LastKeyTicks + DoubleClickDelay) {
 		KeyModifiers |= ModifierDoublePress;
 	}
 	DoubleKey = ikey;
@@ -1470,7 +1465,7 @@ void InputKeyButtonPress(const EventCallback *callbacks,
 **  @param ikeychar   Character code.
 */
 void InputKeyButtonRelease(const EventCallback *callbacks,
-	unsigned ticks, unsigned ikey, unsigned ikeychar)
+						   unsigned ticks, unsigned ikey, unsigned ikeychar)
 {
 	if (ikey == LastIKey) {
 		LastIKey = 0;

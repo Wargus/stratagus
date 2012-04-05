@@ -68,12 +68,12 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-	/// for unit buttons sub-menus etc.
+/// for unit buttons sub-menus etc.
 int CurrentButtonLevel;
-	/// All buttons for units
+/// All buttons for units
 std::vector<ButtonAction *> UnitButtonTable;
-	/// Pointer to current buttons
-ButtonActionProxy CurrentButtons;           
+/// Pointer to current buttons
+ButtonActionProxy CurrentButtons;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -99,9 +99,9 @@ void InitButtons()
 **  FIXME: docu
 */
 int AddButton(int pos, int level, const std::string &icon_ident,
-	ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
-	const std::string &allow, const std::string &hint, const std::string &descr, 
-	const std::string &sound, const std::string &cursor, const std::string &umask)
+			  ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
+			  const std::string &allow, const std::string &hint, const std::string &descr,
+			  const std::string &sound, const std::string &cursor, const std::string &umask)
 {
 	char buf[2048];
 	ButtonAction *ba;
@@ -159,9 +159,9 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 	ba->Description = descr;
 	ba->CommentSound.Name = sound;
 	if (!ba->CommentSound.Name.empty()) {
-				ba->CommentSound.Sound =
-					SoundForName(ba->CommentSound.Name);
-			}
+		ba->CommentSound.Sound =
+			SoundForName(ba->CommentSound.Name);
+	}
 	ba->ButtonCursor = cursor;
 	// FIXME: here should be added costs to the hint
 	// FIXME: johns: show should be nice done?
@@ -312,7 +312,7 @@ static int GetButtonStatus(const ButtonAction *button, int UnderCursor)
 				res |= IconAutoCast;
 			}
 			break;
-		// FIXME: must handle more actions
+			// FIXME: must handle more actions
 		default:
 			break;
 	}
@@ -324,7 +324,7 @@ static int GetPopupCostsWidth(const CFont *font, const int *Costs)
 	int popupWidth = 0;
 	for (unsigned int i = 1; i < MaxCosts; ++i) {
 		if (Costs[i]) {
-			if(UI.Resources[i].IconWidth != -1)	{
+			if (UI.Resources[i].IconWidth != -1)	{
 				popupWidth += (UI.Resources[i].IconWidth + 5);
 			} else {
 				const CGraphic *G = UI.Resources[i].G;
@@ -360,8 +360,9 @@ static int DrawPopupCosts(int x, int y, const CLabel &label, const int *Costs)
 }
 
 void DrawPopupUnitInfo(const CUnitType *type,
-		int player_index, CFont *font, Uint32 backgroundColor,
-		int buttonX, int buttonY) {
+					   int player_index, CFont *font, Uint32 backgroundColor,
+					   int buttonX, int buttonY)
+{
 
 	const CGraphic *G;
 	const CUnitStats *stats = &type->Stats[player_index];
@@ -374,9 +375,8 @@ void DrawPopupUnitInfo(const CUnitType *type,
 
 	//detect max Width
 	int popupWidth = GetPopupCostsWidth(font, stats->Costs);
-	if(type->Demand) {
-		if(UI.Resources[FoodCost].IconWidth != -1)
-		{
+	if (type->Demand) {
+		if (UI.Resources[FoodCost].IconWidth != -1) {
 			popupWidth += (UI.Resources[FoodCost].IconWidth + 5);
 		} else {
 			G = UI.Resources[FoodCost].G;
@@ -389,17 +389,18 @@ void DrawPopupUnitInfo(const CUnitType *type,
 	popupWidth += 10;
 	popupWidth = std::max<int>(popupWidth, font->Width(type->Name) + 10);
 
-	if(popupWidth < 120)
+	if (popupWidth < 120) {
 		popupWidth = 120;
+	}
 
 	int start_x = std::min<int>(buttonX, Video.Width - 1 - popupWidth);
 	int y = buttonY - popupHeight - 10;
 	int x = start_x;
-	CLabel label(font,"white", "red");
+	CLabel label(font, "white", "red");
 
 	// Background
 	Video.FillTransRectangle(backgroundColor, x, y,
-										 popupWidth, popupHeight, 128);
+							 popupWidth, popupHeight, 128);
 	Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
 
 	// Name
@@ -411,19 +412,19 @@ void DrawPopupUnitInfo(const CUnitType *type,
 	// Costs
 	x = DrawPopupCosts(x + 5, y, label,  stats->Costs);
 
-	if(type->Demand) {
-			int y_offset = 0;
-			G = UI.Resources[FoodCost].G;
-			if (G) {
-				int x_offset = UI.Resources[FoodCost].IconWidth;
-				G->DrawFrameClip(UI.Resources[FoodCost].IconFrame, x, y);
-				x += ( (x_offset != -1 ? x_offset : G->Width) + 5 );
-				y_offset = G->Height;
-				y_offset -= font->Height();
-				y_offset /= 2;
-			}
-			label.Draw(x, y + y_offset, type->Demand);
-			//x += 5;
+	if (type->Demand) {
+		int y_offset = 0;
+		G = UI.Resources[FoodCost].G;
+		if (G) {
+			int x_offset = UI.Resources[FoodCost].IconWidth;
+			G->DrawFrameClip(UI.Resources[FoodCost].IconFrame, x, y);
+			x += ((x_offset != -1 ? x_offset : G->Width) + 5);
+			y_offset = G->Height;
+			y_offset -= font->Height();
+			y_offset /= 2;
+		}
+		label.Draw(x, y + y_offset, type->Demand);
+		//x += 5;
 	}
 
 	y += 20;//15;
@@ -441,7 +442,7 @@ void DrawPopupUnitInfo(const CUnitType *type,
 		// Damage
 		int min_damage = std::max<int>(1, type->Variable[PIERCINGDAMAGE_INDEX].Value / 2);
 		int max_damage = type->Variable[PIERCINGDAMAGE_INDEX].Value +
-			 type->Variable[BASICDAMAGE_INDEX].Value;
+						 type->Variable[BASICDAMAGE_INDEX].Value;
 		std::ostringstream damage;
 		damage << "Damage: " << min_damage << "-" << max_damage;
 		label.Draw(x + 5, y, damage.str());
@@ -494,11 +495,10 @@ static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 
 	//GameFont
 	// Draw hint
-	switch(button->Action) {
+	switch (button->Action) {
 
-		case ButtonResearch:
-		{
-			CLabel label(font,"white", "red");
+		case ButtonResearch: {
+			CLabel label(font, "white", "red");
 			int *Costs = AllUpgrades[button->Value]->Costs;
 			popupWidth = GetPopupCostsWidth(font, Costs);
 			popupWidth = std::max<int>(popupWidth, font->Width(button->Hint) + 10);
@@ -512,7 +512,7 @@ static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 
 			// Background
 			Video.FillTransRectangle(backgroundColor, x, y,
-												 popupWidth, popupHeight, 128);
+									 popupWidth, popupHeight, 128);
 			Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
 
 			// Name
@@ -525,20 +525,18 @@ static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 
 		}
 		break;
-		case ButtonSpellCast:
-		{
-			CLabel label(font,"white", "red");
+		case ButtonSpellCast: {
+			CLabel label(font, "white", "red");
 			// FIXME: hardcoded image!!!
 			const int IconID = GoldCost;
 			//SetCosts(SpellTypeTable[button->Value]->ManaCost, 0, NULL);
 			const CGraphic *G = UI.Resources[IconID].G;
 			const SpellType *spell = SpellTypeTable[button->Value];
 
-			if(spell->ManaCost) {
+			if (spell->ManaCost) {
 				popupHeight = 40;
 				popupWidth = 10;
-				if(UI.Resources[IconID].IconWidth != -1)
-				{
+				if (UI.Resources[IconID].IconWidth != -1) {
 					popupWidth += (UI.Resources[IconID].IconWidth + 5);
 				} else {
 					if (G) {
@@ -559,10 +557,10 @@ static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 
 			// Background
 			Video.FillTransRectangle(backgroundColor, x, y,
-												 popupWidth, popupHeight, 128);
+									 popupWidth, popupHeight, 128);
 			Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
 
-			if(spell->ManaCost) {
+			if (spell->ManaCost) {
 				int y_offset = 0;
 				// Name
 				label.Draw(x + 5, y + 5, spell->Name);
@@ -573,16 +571,15 @@ static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 					x += 5;
 					// FIXME: hardcoded image!!!
 					G->DrawFrameClip(3, x, y);
-					x += ( (x_offset != -1 ? x_offset : G->Width) + 5 );
+					x += ((x_offset != -1 ? x_offset : G->Width) + 5);
 					y_offset = G->Height;
 					y_offset -= font_height;
 					y_offset /= 2;
 				}
-				label.Draw(x, y + y_offset, spell->ManaCost );
+				label.Draw(x, y + y_offset, spell->ManaCost);
 			} else {
 				// Only Hint
-				label.Draw(x + 5, y + (popupHeight - font_height)/2,
-					 button->Hint);
+				label.Draw(x + 5, y + (popupHeight - font_height) / 2, 	button->Hint);
 			}
 		}
 		break;
@@ -591,9 +588,9 @@ static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 		case ButtonTrain:
 		case ButtonUpgradeTo:
 			DrawPopupUnitInfo(UnitTypes[button->Value],
-				ThisPlayer->Index, font, backgroundColor,
-				uibutton->X, uibutton->Y);
-		break;
+							  ThisPlayer->Index, font, backgroundColor,
+							  uibutton->X, uibutton->Y);
+			break;
 
 
 		default:
@@ -608,8 +605,8 @@ static void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 
 			// Hint
 			CLabel(font, "white", "red").Draw(x + 5,
-				y + (popupHeight - font_height)/2, button->Hint);
-		break;
+											  y + (popupHeight - font_height) / 2, button->Hint);
+			break;
 
 	}
 
@@ -625,8 +622,8 @@ void CButtonPanel::Draw()
 	//  Draw background
 	if (UI.ButtonPanel.G) {
 		UI.ButtonPanel.G->DrawSubClip(0, 0,
-			UI.ButtonPanel.G->Width, UI.ButtonPanel.G->Height,
-			UI.ButtonPanel.X, UI.ButtonPanel.Y);
+									  UI.ButtonPanel.G->Width, UI.ButtonPanel.G->Height,
+									  UI.ButtonPanel.X, UI.ButtonPanel.Y);
 	}
 
 	// No buttons
@@ -662,14 +659,14 @@ void CButtonPanel::Draw()
 		// Draw main Icon.
 		//
 		buttons[i].Icon.Icon->DrawUnitIcon(UI.ButtonPanel.Buttons[i].Style,
-			GetButtonStatus(&buttons[i], ButtonUnderCursor),
-			UI.ButtonPanel.Buttons[i].X, UI.ButtonPanel.Buttons[i].Y, buf);
+										   GetButtonStatus(&buttons[i], ButtonUnderCursor),
+										   UI.ButtonPanel.Buttons[i].X, UI.ButtonPanel.Buttons[i].Y, buf);
 
 		//
 		//  Update status line for this button
 		//
 		if (ButtonAreaUnderCursor == ButtonAreaButton &&
-				ButtonUnderCursor == i && KeyState != KeyStateInput) {
+			ButtonUnderCursor == i && KeyState != KeyStateInput) {
 			DrawPopup(&buttons[i], &UI.ButtonPanel.Buttons[i]);
 			UpdateStatusLineForButton(&buttons[i]);
 		}
@@ -685,13 +682,10 @@ void UpdateStatusLineForButton(const ButtonAction *button)
 {
 	const CUnitStats *stats;
 	Assert(button);
-	if (button->Description.length())
-	{
+	if (button->Description.length()) {
 		UI.StatusLine.Set(button->Description);
 		ClearCosts();
-	}
-	else
-	{
+	} else {
 		UI.StatusLine.Set(button->Hint);
 		switch (button->Action) {
 			case ButtonBuild:
@@ -757,18 +751,18 @@ static bool IsButtonAllowed(const CUnit &unit, const ButtonAction *buttonaction)
 			res = unit.CanMove();
 			break;
 		case ButtonHarvest:
-			if (!unit.CurrentResource ||
-					!(unit.ResourcesHeld > 0 && !unit.Type->ResInfo[unit.CurrentResource]->LoseResources) ||
-					(unit.ResourcesHeld != unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity &&
-						unit.Type->ResInfo[unit.CurrentResource]->LoseResources)) {
+			if (!unit.CurrentResource
+				|| !(unit.ResourcesHeld > 0 && !unit.Type->ResInfo[unit.CurrentResource]->LoseResources)
+				|| (unit.ResourcesHeld != unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity
+					&& unit.Type->ResInfo[unit.CurrentResource]->LoseResources)) {
 				res = true;
 			}
 			break;
 		case ButtonReturn:
-			if (!(!unit.CurrentResource ||
-					!(unit.ResourcesHeld > 0 && !unit.Type->ResInfo[unit.CurrentResource]->LoseResources) ||
-					(unit.ResourcesHeld != unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity &&
-						unit.Type->ResInfo[unit.CurrentResource]->LoseResources))) {
+			if (!(!unit.CurrentResource
+				|| !(unit.ResourcesHeld > 0 && !unit.Type->ResInfo[unit.CurrentResource]->LoseResources)
+				|| (unit.ResourcesHeld != unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity
+					&& unit.Type->ResInfo[unit.CurrentResource]->LoseResources))) {
 				res = true;
 			}
 			break;
@@ -782,8 +776,7 @@ static bool IsButtonAllowed(const CUnit &unit, const ButtonAction *buttonaction)
 			break;
 		case ButtonTrain:
 			// Check if building queue is enabled
-			if (!EnableTrainingQueue &&
-					unit.CurrentAction() == UnitActionTrain) {
+			if (!EnableTrainingQueue && unit.CurrentAction() == UnitActionTrain) {
 				break;
 			}
 			// FALL THROUGH
@@ -805,8 +798,8 @@ static bool IsButtonAllowed(const CUnit &unit, const ButtonAction *buttonaction)
 			res = true;
 			break;
 		case ButtonCancelUpgrade:
-			res = unit.CurrentAction() == UnitActionUpgradeTo ||
-				unit.CurrentAction() == UnitActionResearch;
+			res = unit.CurrentAction() == UnitActionUpgradeTo
+				  || unit.CurrentAction() == UnitActionResearch;
 			break;
 		case ButtonCancelTrain:
 			res = unit.CurrentAction() == UnitActionTrain;
@@ -834,30 +827,25 @@ static bool IsButtonAllowed(const CUnit &unit, const ButtonAction *buttonaction)
 */
 static ButtonAction *UpdateButtonPanelMultipleUnits()
 {
-	char unit_ident[128];
-	int z;
-	ButtonAction *res;
-	bool allow;         // button is available for at least 1 unit.
-
-	res = new ButtonAction[UI.ButtonPanel.Buttons.size()];
-	for (z = 0; z < (int)UI.ButtonPanel.Buttons.size(); ++z) {
+	ButtonAction *res = new ButtonAction[UI.ButtonPanel.Buttons.size()];
+	for (size_t z = 0; z < UI.ButtonPanel.Buttons.size(); ++z) {
 		res[z].Pos = -1;
 	}
+	char unit_ident[128];
 
-	sprintf(unit_ident,	",%s-group,",
-			PlayerRaces.Name[ThisPlayer->Race].c_str());
+	sprintf(unit_ident, ",%s-group,", PlayerRaces.Name[ThisPlayer->Race].c_str());
 
-	for (z = 0; z < (int)UnitButtonTable.size(); ++z) {
+	for (size_t z = 0; z < UnitButtonTable.size(); ++z) {
 		if (UnitButtonTable[z]->Level != CurrentButtonLevel) {
 			continue;
 		}
 
 		// any unit or unit in list
-		if (UnitButtonTable[z]->UnitMask[0] != '*' &&
-				!strstr(UnitButtonTable[z]->UnitMask.c_str(), unit_ident)) {
+		if (UnitButtonTable[z]->UnitMask[0] != '*'
+			&& !strstr(UnitButtonTable[z]->UnitMask.c_str(), unit_ident)) {
 			continue;
 		}
-		allow = true;
+		bool allow = true;
 		for (int i = 0; i < NumSelected; i++) {
 			if (!IsButtonAllowed(*Selected[i], UnitButtonTable[z])) {
 				allow = false;
@@ -888,15 +876,12 @@ static ButtonAction *UpdateButtonPanelMultipleUnits()
 */
 static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit &unit)
 {
-	int allow;
-	char unit_ident[128];
-	ButtonAction *buttonaction;
-	ButtonAction *res;
+	ButtonAction *res = new ButtonAction[UI.ButtonPanel.Buttons.size()];
 
-	res = new ButtonAction[UI.ButtonPanel.Buttons.size()];
 	for (unsigned int z = 0; z < UI.ButtonPanel.Buttons.size(); ++z) {
 		res[z].Pos = -1;
 	}
+	char unit_ident[128];
 
 	//
 	//  FIXME: johns: some hacks for cancel buttons
@@ -913,11 +898,10 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit &unit)
 	} else {
 		sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
 	}
-
 	for (unsigned int z = 0; z < UnitButtonTable.size(); ++z) {
 		int pos; // keep position, modified if alt-buttons required
 
-		buttonaction = UnitButtonTable[z];
+		ButtonAction *buttonaction = UnitButtonTable[z];
 		Assert(0 < buttonaction->Pos && buttonaction->Pos <= (int)UI.ButtonPanel.Buttons.size());
 
 		// Same level
@@ -927,10 +911,10 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit &unit)
 
 		// any unit or unit in list
 		if (buttonaction->UnitMask[0] != '*' &&
-				!strstr(buttonaction->UnitMask.c_str(), unit_ident)) {
+			!strstr(buttonaction->UnitMask.c_str(), unit_ident)) {
 			continue;
 		}
-		allow = IsButtonAllowed(unit, buttonaction);
+		int allow = IsButtonAllowed(unit, buttonaction);
 
 		pos = buttonaction->Pos;
 
@@ -950,9 +934,6 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit &unit)
 */
 void CButtonPanel::Update()
 {
-	bool sameType;
-
-
 	if (!NumSelected) {
 		CurrentButtons.Reset();
 		return;
@@ -965,7 +946,7 @@ void CButtonPanel::Update()
 		return;
 	}
 
-	sameType = true;
+	bool sameType = true;
 	// multiple selected
 	for (int i = 1; i < NumSelected; ++i) {
 		if (Selected[i]->Type != unit.Type) {
@@ -1000,13 +981,13 @@ void CButtonPanel::DoClicked(int button)
 	//  Button not available.
 	//  or Not Teamed
 	//
-	if (CurrentButtons[button].Pos == -1 ||
-			!ThisPlayer->IsTeamed(*Selected[0])) {
+	if (CurrentButtons[button].Pos == -1 || !ThisPlayer->IsTeamed(*Selected[0])) {
 		return;
 	}
 	PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-	if (CurrentButtons[button].CommentSound.Sound)
+	if (CurrentButtons[button].CommentSound.Sound) {
 		PlayGameSound(CurrentButtons[button].CommentSound.Sound, MaxSampleVolume);
+	}
 
 	//
 	//  Handle action on button.
@@ -1018,19 +999,19 @@ void CButtonPanel::DoClicked(int button)
 			//  Unload on coast, transporter standing, unload all units right now.
 			//  That or a bunker.
 			//
-			if ((NumSelected == 1 && Selected[0]->CurrentAction() == UnitActionStill &&
-					Map.CoastOnMap(Selected[0]->tilePos)) || !Selected[0]->CanMove()) {
+			if ((NumSelected == 1 && Selected[0]->CurrentAction() == UnitActionStill
+				&& Map.CoastOnMap(Selected[0]->tilePos))
+				|| !Selected[0]->CanMove()) {
 				SendCommandUnload(*Selected[0], Selected[0]->tilePos, NoUnitP, flush);
 				break;
 			}
 			CursorState = CursorStateSelect;
-			if (CurrentButtons[button].ButtonCursor.length() && CursorByIdent(CurrentButtons[button].ButtonCursor))
-			{
+			if (CurrentButtons[button].ButtonCursor.length() && CursorByIdent(CurrentButtons[button].ButtonCursor)) {
 				GameCursor = CursorByIdent(CurrentButtons[button].ButtonCursor);
 				CustomCursor = CurrentButtons[button].ButtonCursor;
-			}
-			else
+			} else {
 				GameCursor = UI.YellowHair.Cursor;
+			}
 			CursorAction = CurrentButtons[button].Action;
 			CursorValue = CurrentButtons[button].Value;
 			CurrentButtonLevel = 9; // level 9 is cancel-only
@@ -1038,15 +1019,14 @@ void CButtonPanel::DoClicked(int button)
 			UI.StatusLine.Set(_("Select Target"));
 			break;
 		}
-		case ButtonSpellCast:
-		{
+		case ButtonSpellCast: {
 			int spellId = CurrentButtons[button].Value;
 			if (KeyModifiers & ModifierControl) {
 				int autocast = 0;
 
 				if (!SpellTypeTable[spellId]->AutoCast) {
 					PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound,
-						MaxSampleVolume);
+								  MaxSampleVolume);
 					break;
 				}
 
@@ -1077,7 +1057,7 @@ void CButtonPanel::DoClicked(int button)
 				break;
 			}
 		}
-			// Follow Next -> Select target.
+		// Follow Next -> Select target.
 		case ButtonRepair:
 			if (KeyModifiers & ModifierControl) {
 				unsigned autorepair;
@@ -1106,13 +1086,12 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonAttackGround:
 			// Select target.
 			CursorState = CursorStateSelect;
-			if (CurrentButtons[button].ButtonCursor.length() && CursorByIdent(CurrentButtons[button].ButtonCursor))
-			{
+			if (CurrentButtons[button].ButtonCursor.length() && CursorByIdent(CurrentButtons[button].ButtonCursor)) {
 				GameCursor = CursorByIdent(CurrentButtons[button].ButtonCursor);
 				CustomCursor = CurrentButtons[button].ButtonCursor;
-			}
-			else
+			} else {
 				GameCursor = UI.YellowHair.Cursor;
+			}
 			CursorAction = CurrentButtons[button].Action;
 			CursorValue = CurrentButtons[button].Value;
 			CurrentButtonLevel = 9; // level 9 is cancel-only
@@ -1142,15 +1121,15 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonCancel:
 		case ButtonCancelUpgrade:
 			if (NumSelected == 1) {
-				switch(Selected[0]->CurrentAction()) {
+				switch (Selected[0]->CurrentAction()) {
 					case UnitActionUpgradeTo:
 						SendCommandCancelUpgradeTo(*Selected[0]);
-					break;
+						break;
 					case UnitActionResearch:
 						SendCommandCancelResearch(*Selected[0]);
-					break;
+						break;
 					default:
-					break;
+						break;
 				}
 			}
 			UI.StatusLine.Clear();
@@ -1199,19 +1178,16 @@ void CButtonPanel::DoClicked(int button)
 			// FIXME:        enough resources are available.
 			// FIXME: training queue full check is not correct for network.
 			// FIXME: this can be correct written, with a little more code.
-			if (Selected[0]->CurrentAction() == UnitActionTrain &&
-					!EnableTrainingQueue) {
+			if (Selected[0]->CurrentAction() == UnitActionTrain && !EnableTrainingQueue) {
 				Selected[0]->Player->Notify(NotifyYellow, Selected[0]->tilePos, "%s", _("Unit training queue is full"));
-			} else if (Selected[0]->Player->CheckLimits(type) >= 0 &&
-					!Selected[0]->Player->CheckUnitType(type)) {
+			} else if (Selected[0]->Player->CheckLimits(type) >= 0 && !Selected[0]->Player->CheckUnitType(type)) {
 				//PlayerSubUnitType(player,type);
 				SendCommandTrainUnit(*Selected[0], type, !(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();
 				ClearCosts();
 			} else if (Selected[0]->Player->CheckLimits(type) == -3)
 				if (GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound)
-					PlayGameSound(GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound,
-								MaxSampleVolume);
+					PlayGameSound(GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound, MaxSampleVolume);
 			break;
 		}
 		case ButtonUpgradeTo: {

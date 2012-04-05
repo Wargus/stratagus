@@ -151,7 +151,7 @@ void LoadIcons()
 		ShowLoadProgress("Icons %s", icon->G->File.c_str());
 		if (icon->Frame >= icon->G->NumFrames) {
 			DebugPrint("Invalid icon frame: %s - %d\n" _C_
-				icon->GetIdent().c_str() _C_ icon->Frame);
+					   icon->GetIdent().c_str() _C_ icon->Frame);
 			icon->Frame = 0;
 		}
 	}
@@ -197,7 +197,7 @@ void CIcon::DrawIcon(const CPlayer &player, int x, int y) const
 **  @param text    Optional text to display
 */
 void CIcon::DrawUnitIcon(ButtonStyle *style,
-	unsigned flags, int x, int y, const std::string &text) const
+						 unsigned flags, int x, int y, const std::string &text) const
 {
 	ButtonStyle s(*style);
 

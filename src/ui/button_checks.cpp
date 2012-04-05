@@ -101,11 +101,9 @@ bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction *button)
 */
 bool ButtonCheckUnitsOr(const CUnit &unit, const ButtonAction *button)
 {
-	char *buf;
-	CPlayer *player;
+	CPlayer *player = unit.Player;
+	char *buf = new_strdup(button->AllowStr.c_str());
 
-	player = unit.Player;
-	buf = new_strdup(button->AllowStr.c_str());
 	for (const char *s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
 		if (player->HaveUnitTypeByIdent(s)) {
 			delete[] buf;
@@ -126,11 +124,9 @@ bool ButtonCheckUnitsOr(const CUnit &unit, const ButtonAction *button)
 */
 bool ButtonCheckUnitsAnd(const CUnit &unit, const ButtonAction *button)
 {
-	char *buf;
-	CPlayer *player;
+	CPlayer *player = unit.Player;
+	char *buf = new_strdup(button->AllowStr.c_str());
 
-	player = unit.Player;
-	buf = new_strdup(button->AllowStr.c_str());
 	for (const char *s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
 		if (!player->HaveUnitTypeByIdent(s)) {
 			delete[] buf;
@@ -183,9 +179,9 @@ bool ButtonCheckNoNetwork(const CUnit &, const ButtonAction *)
 bool ButtonCheckNoWork(const CUnit &unit, const ButtonAction *)
 {
 	int action = unit.CurrentAction();
-	return action != UnitActionTrain &&
-		action != UnitActionUpgradeTo &&
-		action != UnitActionResearch;
+	return action != UnitActionTrain
+		   && action != UnitActionUpgradeTo
+		   && action != UnitActionResearch;
 }
 
 /**
@@ -199,8 +195,7 @@ bool ButtonCheckNoWork(const CUnit &unit, const ButtonAction *)
 bool ButtonCheckNoResearch(const CUnit &unit, const ButtonAction *)
 {
 	int action = unit.CurrentAction();
-	return action != UnitActionUpgradeTo &&
-		action != UnitActionResearch;
+	return action != UnitActionUpgradeTo && action != UnitActionResearch;
 }
 
 /**
@@ -252,8 +247,8 @@ bool ButtonCheckResearch(const CUnit &unit, const ButtonAction *button)
 	if (!CheckDependByIdent(*unit.Player, button->ValueStr)) {
 		return false;
 	}
-	if (!strncmp(button->ValueStr.c_str(), "upgrade-", 8) &&
-			UpgradeIdentAllowed(*unit.Player, button->ValueStr) != 'A') {
+	if (!strncmp(button->ValueStr.c_str(), "upgrade-", 8)
+		&& UpgradeIdentAllowed(*unit.Player, button->ValueStr) != 'A') {
 		return false;
 	}
 	return true;
@@ -270,11 +265,9 @@ bool ButtonCheckResearch(const CUnit &unit, const ButtonAction *button)
 */
 bool ButtonCheckSingleResearch(const CUnit &unit, const ButtonAction *button)
 {
-	if (ButtonCheckResearch(unit, button)) {
-		if (!unit.Player->UpgradeTimers.Upgrades[
-				UpgradeIdByIdent(button->ValueStr)]) {
-			return true;
-		}
+	if (ButtonCheckResearch(unit, button)
+		&& !unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(button->ValueStr)]) {
+		return true;
 	}
 	return false;
 }

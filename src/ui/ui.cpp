@@ -130,9 +130,9 @@ void InitUserInterface()
 	SetViewportMode(VIEWPORT_SINGLE);
 
 	UI.CompletedBarColor = Video.MapRGB(TheScreen->format,
-		UI.CompletedBarColorRGB.r,
-		UI.CompletedBarColorRGB.g,
-		UI.CompletedBarColorRGB.b);
+										UI.CompletedBarColorRGB.r,
+										UI.CompletedBarColorRGB.g,
+										UI.CompletedBarColorRGB.b);
 	UI.ViewportCursorColor = ColorWhite;
 }
 
@@ -212,7 +212,7 @@ static void SaveViewports(CFile &file, const CUserInterface &ui)
 	for (int i = 0; i < ui.NumViewports; ++i) {
 		const CViewport &vp = ui.Viewports[i];
 		file.printf(",\n  \"viewport\", {%d, %d, %d}", vp.MapX, vp.MapY,
-			vp.Unit ? UnitNumber(*vp.Unit) : -1);
+					vp.Unit ? UnitNumber(*vp.Unit) : -1);
 	}
 	file.printf(")\n\n");
 }
@@ -253,7 +253,7 @@ void CleanUserInterface()
 	// Info Panel
 	CGraphic::Free(UI.InfoPanel.G);
 	for (std::vector<CUnitInfoPanel *>::iterator panel = UI.InfoPanelContents.begin();
-			panel != UI.InfoPanelContents.end(); ++panel) {
+		 panel != UI.InfoPanelContents.end(); ++panel) {
 		delete *panel;
 	}
 	UI.InfoPanelContents.clear();
@@ -293,7 +293,7 @@ void FreeButtonStyles()
 {
 	std::map<std::string, ButtonStyle *>::iterator i;
 	for (i = ButtonStyleHash.begin(); i != ButtonStyleHash.end(); ++i) {
-		delete (*i).second;
+		delete(*i).second;
 	}
 	ButtonStyleHash.clear();
 }
@@ -451,7 +451,7 @@ static void SetViewportModeSplitHoriz()
 	new_vps[0].X = UI.MapArea.X;
 	new_vps[0].Y = UI.MapArea.Y;
 	ClipViewport(new_vps[0], UI.MapArea.EndX,
-		UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
+				 UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
 
 	new_vps[1].X = UI.MapArea.X;
 	new_vps[1].Y = new_vps[0].EndY + 1;
@@ -480,13 +480,13 @@ static void SetViewportModeSplitHoriz3()
 	new_vps[0].X = UI.MapArea.X;
 	new_vps[0].Y = UI.MapArea.Y;
 	ClipViewport(new_vps[0], UI.MapArea.EndX,
-		UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
+				 UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
 
 	new_vps[1].X = UI.MapArea.X;
 	new_vps[1].Y = new_vps[0].EndY + 1;
 	ClipViewport(new_vps[1],
-		UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
-		UI.MapArea.EndY);
+				 UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
+				 UI.MapArea.EndY);
 
 	new_vps[2].X = new_vps[1].EndX + 1;
 	new_vps[2].Y = new_vps[0].EndY + 1;
@@ -514,8 +514,8 @@ static void SetViewportModeSplitVert()
 	new_vps[0].X = UI.MapArea.X;
 	new_vps[0].Y = UI.MapArea.Y;
 	ClipViewport(new_vps[0],
-		UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
-		UI.MapArea.EndY);
+				 UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
+				 UI.MapArea.EndY);
 
 	new_vps[1].X = new_vps[0].EndX + 1;
 	new_vps[1].Y = UI.MapArea.Y;
@@ -543,20 +543,20 @@ static void SetViewportModeQuad()
 	new_vps[0].X = UI.MapArea.X;
 	new_vps[0].Y = UI.MapArea.Y;
 	ClipViewport(new_vps[0],
-		UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
-		UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
+				 UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
+				 UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
 
 	new_vps[1].X = new_vps[0].EndX + 1;
 	new_vps[1].Y = UI.MapArea.Y;
 	ClipViewport(new_vps[1],
-		UI.MapArea.EndX,
-		UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
+				 UI.MapArea.EndX,
+				 UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
 
 	new_vps[2].X = UI.MapArea.X;
 	new_vps[2].Y = new_vps[0].EndY + 1;
 	ClipViewport(new_vps[2],
-		UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
-		UI.MapArea.EndY);
+				 UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
+				 UI.MapArea.EndY);
 
 	new_vps[3].X = new_vps[1].X;
 	new_vps[3].Y = new_vps[2].Y;
