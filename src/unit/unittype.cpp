@@ -131,7 +131,7 @@ int GetResourceIdByName(lua_State *l, const char *resourceName)
 	return res;
 }
 
-	/// Parse integer in animation frame.
+/// Parse integer in animation frame.
 extern int ParseAnimInt(CUnit *unit, const char *parseint);
 
 CUnitType::CUnitType() :
@@ -186,7 +186,7 @@ CUnitType::~CUnitType()
 
 	// Free Building Restrictions if there are any
 	for (std::vector<CBuildRestriction *>::iterator b = BuildingRules.begin();
-			b != BuildingRules.end(); ++b) {
+		 b != BuildingRules.end(); ++b) {
 		delete *b;
 	}
 	BuildingRules.clear();
@@ -213,7 +213,7 @@ CUnitType::~CUnitType()
 		int j;
 		for (j = 0; j < this->Portrait.Num; ++j) {
 			delete this->Portrait.Mngs[j];
-//			delete[] this->Portrait.Files[j];
+			// delete[] this->Portrait.Files[j];
 		}
 		delete[] this->Portrait.Mngs;
 		delete[] this->Portrait.Files;
@@ -223,7 +223,8 @@ CUnitType::~CUnitType()
 }
 
 
-bool CUnitType::CheckUserBoolFlags(char *BoolFlags) {
+bool CUnitType::CheckUserBoolFlags(char *BoolFlags)
+{
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); ++i) { // User defined flags
 		if (BoolFlags[i] != CONDITION_TRUE &&
 			((BoolFlags[i] == CONDITION_ONLY) ^ (BoolFlag[i].value))) {
@@ -246,26 +247,23 @@ bool CUnitType::CanMove() const
 */
 void UpdateStats(int reset)
 {
-	CUnitType *type;
-	CUnitStats *stats;
-
 	//
 	//  Update players stats
 	//
 	for (std::vector<CUnitType *>::size_type j = 0; j < UnitTypes.size(); ++j) {
-		type = UnitTypes[j];
+		CUnitType *type = UnitTypes[j];
 		if (reset) {
 			// LUDO : FIXME : reset loading of player stats !
 			for (int player = 0; player < PlayerMax; ++player) {
-				stats = &type->Stats[player];
+				CUnitStats &stats = type->Stats[player];
 				for (unsigned int i = 0; i < MaxCosts; ++i) {
-					stats->Costs[i] = type->_Costs[i];
+					stats.Costs[i] = type->_Costs[i];
 				}
-				if (!stats->Variables) {
-					stats->Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
+				if (!stats.Variables) {
+					stats.Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
 				}
-				memcpy(stats->Variables, type->Variable,
-					UnitTypeVar.GetNumberVariable() * sizeof(*type->Variable));
+				memcpy(stats.Variables, type->Variable,
+					   UnitTypeVar.GetNumberVariable() * sizeof(*type->Variable));
 			}
 		}
 
@@ -290,8 +288,7 @@ void UpdateStats(int reset)
 					MapFieldUnpassable;
 				break;
 			case UnitTypeFly:                               // in air
-				type->MovementMask =
-					MapFieldAirUnit; // already occuppied
+				type->MovementMask = MapFieldAirUnit; // already occuppied
 				break;
 			case UnitTypeNaval:                             // on water
 				if (type->CanTransport()) {
@@ -335,20 +332,22 @@ void UpdateStats(int reset)
 			} else {
 				type->FieldFlags = MapFieldNoBuilding;
 			}
-		} else switch (type->UnitType) {
-			case UnitTypeLand: // on land
-				type->FieldFlags = MapFieldLandUnit;
-				break;
-			case UnitTypeFly: // in air
-				type->FieldFlags = MapFieldAirUnit;
-				break;
-			case UnitTypeNaval: // on water
-				type->FieldFlags = MapFieldSeaUnit;
-				break;
-			default:
-				DebugPrint("Where moves this unit?\n");
-				type->FieldFlags = 0;
-				break;
+		} else {
+			switch (type->UnitType) {
+				case UnitTypeLand: // on land
+					type->FieldFlags = MapFieldLandUnit;
+					break;
+				case UnitTypeFly: // in air
+					type->FieldFlags = MapFieldAirUnit;
+					break;
+				case UnitTypeNaval: // on water
+					type->FieldFlags = MapFieldSeaUnit;
+					break;
+				default:
+					DebugPrint("Where moves this unit?\n");
+					type->FieldFlags = 0;
+					break;
+			}
 		}
 	}
 }
@@ -362,15 +361,15 @@ void UpdateStats(int reset)
 **  @param file   Output file.
 */
 static void SaveUnitStats(const CUnitStats &stats, const std::string &ident, int plynr,
-	CFile &file)
+						  CFile &file)
 {
 	Assert(plynr < PlayerMax);
 	file.printf("DefineUnitStats(\"%s\", %d,\n  ", ident.c_str(), plynr);
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		file.printf("\"%s\", {Value = %d, Max = %d, Increase = %d%s},\n  ",
-			UnitTypeVar.VariableNameLookup[i], stats.Variables[i].Value,
-			stats.Variables[i].Max, stats.Variables[i].Increase,
-			stats.Variables[i].Enable ? ", Enable = true" : "");
+					UnitTypeVar.VariableNameLookup[i], stats.Variables[i].Value,
+					stats.Variables[i].Max, stats.Variables[i].Increase,
+					stats.Variables[i].Enable ? ", Enable = true" : "");
 	}
 	file.printf("\"costs\", {");
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
@@ -415,7 +414,7 @@ CUnitType *UnitTypeByIdent(const std::string &ident)
 {
 	std::map<std::string, CUnitType *>::iterator ret = UnitTypeMap.find(ident);
 	if (ret != UnitTypeMap.end()) {
-		return  (*ret).second;
+		return (*ret).second;
 	}
 	return NULL;
 }
@@ -442,7 +441,7 @@ CUnitType *NewUnitTypeSlot(const std::string &ident)
 	type->BoolFlag.resize(new_bool_size);
 
 	type->Variable = new CVariable[UnitTypeVar.GetNumberVariable()];
-	for (unsigned int i = 0;i < UnitTypeVar.GetNumberVariable(); ++i) {
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		type->Variable[i] = UnitTypeVar.Variable[i];
 	}
 	UnitTypes.push_back(type);
@@ -499,11 +498,11 @@ static int GetStillFrame(CUnitType *type)
 
 	while (anim) {
 		if (anim->Type == AnimationFrame) {
-			CAnimation_Frame& a_frame = *static_cast<CAnimation_Frame*>(anim);
+			CAnimation_Frame &a_frame = *static_cast<CAnimation_Frame *>(anim);
 			// Use the frame facing down
 			return a_frame.ParseAnimInt(NoUnitP) + type->NumDirections / 2;
 		} else if (anim->Type == AnimationExactFrame) {
-			CAnimation_ExactFrame& a_frame = *static_cast<CAnimation_ExactFrame*>(anim);
+			CAnimation_ExactFrame &a_frame = *static_cast<CAnimation_ExactFrame *>(anim);
 
 			return a_frame.ParseAnimInt(NoUnitP);
 		}
@@ -531,7 +530,7 @@ void InitUnitTypes(int reset_player_stats)
 
 		// Lookup BuildingTypes
 		for (std::vector<CBuildRestriction *>::iterator b = type->BuildingRules.begin();
-			b < type->BuildingRules.end(); ++b) {
+			 b < type->BuildingRules.end(); ++b) {
 			(*b)->Init();
 		}
 	}
@@ -571,7 +570,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 			}
 			if (!resinfo->FileWhenLoaded.empty()) {
 				resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->FileWhenLoaded,
-					type.Width, type.Height);
+											type.Width, type.Height);
 				resinfo->SpriteWhenLoaded->Load();
 				if (type.Flip) {
 					resinfo->SpriteWhenLoaded->Flip();
@@ -579,7 +578,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 			}
 			if (!resinfo->FileWhenEmpty.empty()) {
 				resinfo->SpriteWhenEmpty = CPlayerColorGraphic::New(resinfo->FileWhenEmpty,
-					type.Width, type.Height);
+										   type.Width, type.Height);
 				resinfo->SpriteWhenEmpty->Load();
 				if (type.Flip) {
 					resinfo->SpriteWhenEmpty->Flip();
@@ -660,8 +659,8 @@ void CUnitTypeVar::Clear()
 	Variable.clear();
 
 	for (std::vector<CDecoVar *>::iterator it = DecoVar.begin();
-		it != DecoVar.end(); ++it) {
-		delete (*it);
+		 it != DecoVar.end(); ++it) {
+		delete(*it);
 	}
 	DecoVar.clear();
 }

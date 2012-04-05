@@ -131,16 +131,18 @@ static const char MAXHARVESTERS_KEY[] = "MaxHarvesters";
 --  Functions
 ----------------------------------------------------------------------------*/
 
-CUnitTypeVar::CBoolKeys::CBoolKeys() {
+CUnitTypeVar::CBoolKeys::CBoolKeys()
+{
 
-	const char *const tmp[] = {COWARD_KEY,BUILDING_KEY,FLIP_KEY,REVEALER_KEY,
-		LANDUNIT_KEY,AIRUNIT_KEY,SEAUNIT_KEY,EXPLODEWHENKILLED_KEY,
-		VISIBLEUNDERFOG_KEY, PERMANENTCLOACK_KEY,DETECTCLOAK_KEY,
-		ATTACKFROMTRANSPORTER_KEY,VANISHES_KEY,GROUNDATTACK_KEY,
-		SHOREBUILDING_KEY, CANATTACK_KEY,BUILDEROUTSIDE_KEY,
-		BUILDERLOST_KEY,CANHARVEST_KEY,HARVESTER_KEY,SELECTABLEBYRECTANGLE_KEY,
-		ISNOTSELECTABLE_KEY,DECORATION_KEY,INDESTRUCTIBLE_KEY,TELEPORTER_KEY,SHIELDPIERCE_KEY,
-		SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY};
+	const char *const tmp[] = {COWARD_KEY, BUILDING_KEY, FLIP_KEY, REVEALER_KEY,
+							   LANDUNIT_KEY, AIRUNIT_KEY, SEAUNIT_KEY, EXPLODEWHENKILLED_KEY,
+							   VISIBLEUNDERFOG_KEY, PERMANENTCLOACK_KEY, DETECTCLOAK_KEY,
+							   ATTACKFROMTRANSPORTER_KEY, VANISHES_KEY, GROUNDATTACK_KEY,
+							   SHOREBUILDING_KEY, CANATTACK_KEY, BUILDEROUTSIDE_KEY,
+							   BUILDERLOST_KEY, CANHARVEST_KEY, HARVESTER_KEY, SELECTABLEBYRECTANGLE_KEY,
+							   ISNOTSELECTABLE_KEY, DECORATION_KEY, INDESTRUCTIBLE_KEY, TELEPORTER_KEY, SHIELDPIERCE_KEY,
+							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY
+							  };
 
 	for (int i = 0; i < NBARALREADYDEFINED; ++i) {
 		buildin[i].offset = i;
@@ -150,16 +152,18 @@ CUnitTypeVar::CBoolKeys::CBoolKeys() {
 	Init();
 }
 
-CUnitTypeVar::CVariableKeys::CVariableKeys() {
+CUnitTypeVar::CVariableKeys::CVariableKeys()
+{
 
-	const char *const tmp[] = {HITPOINTS_KEY,BUILD_KEY,MANA_KEY,TRANSPORT_KEY,
-		RESEARCH_KEY,TRAINING_KEY,UPGRADETO_KEY,GIVERESOURCE_KEY,
-		CARRYRESOURCE_KEY, XP_KEY,KILL_KEY,	SUPPLY_KEY,DEMAND_KEY,ARMOR_KEY,
-		SIGHTRANGE_KEY, ATTACKRANGE_KEY,PIERCINGDAMAGE_KEY,
-		BASICDAMAGE_KEY,POSX_KEY,POSY_KEY,RADARRANGE_KEY,
-		RADARJAMMERRANGE_KEY,AUTOREPAIRRANGE_KEY,BLOODLUST_KEY,HASTE_KEY,
-		SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY, SHIELD_KEY, POINTS_KEY,
-		MAXHARVESTERS_KEY};
+	const char *const tmp[] = {HITPOINTS_KEY, BUILD_KEY, MANA_KEY, TRANSPORT_KEY,
+							   RESEARCH_KEY, TRAINING_KEY, UPGRADETO_KEY, GIVERESOURCE_KEY,
+							   CARRYRESOURCE_KEY, XP_KEY, KILL_KEY,	SUPPLY_KEY, DEMAND_KEY, ARMOR_KEY,
+							   SIGHTRANGE_KEY, ATTACKRANGE_KEY, PIERCINGDAMAGE_KEY,
+							   BASICDAMAGE_KEY, POSX_KEY, POSY_KEY, RADARRANGE_KEY,
+							   RADARJAMMERRANGE_KEY, AUTOREPAIRRANGE_KEY, BLOODLUST_KEY, HASTE_KEY,
+							   SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY, SHIELD_KEY, POINTS_KEY,
+							   MAXHARVESTERS_KEY
+							  };
 
 	for (int i = 0; i < NVARALREADYDEFINED; ++i) {
 		buildin[i].offset = i;
@@ -593,7 +597,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->CorpseType = NULL;
 		} else if (!strcmp(value, "DamageType")) {
 			value = LuaToString(l, -1);
-//			int check = ExtraDeathIndex(value);
+			//			int check = ExtraDeathIndex(value);
 			type->DamageType = value;
 		} else if (!strcmp(value, "ExplodeWhenKilled")) {
 			type->ExplodeWhenKilled = 1;
@@ -729,7 +733,7 @@ static int CclDefineUnitType(lua_State *l)
 			subargs = lua_objlen(l, -1);
 			// Free any old restrictions if they are redefined
 			for (std::vector<CBuildRestriction *>::iterator b = type->BuildingRules.begin();
-				b != type->BuildingRules.end(); ++b) {
+				 b != type->BuildingRules.end(); ++b) {
 				delete *b;
 			}
 			type->BuildingRules.clear();
@@ -863,8 +867,8 @@ static int CclDefineUnitType(lua_State *l)
 						res->FileWhenLoaded = LuaToString(l, -1);
 						lua_pop(l, 1);
 					} else {
-					   printf("\n%s\n", type->Name.c_str());
-					   LuaError(l, "Unsupported tag: %s" _C_ value);
+						printf("\n%s\n", type->Name.c_str());
+						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
 				if (!res->FinalResource) {
@@ -1054,9 +1058,7 @@ static int CclDefineUnitType(lua_State *l)
 					}
 					if (death == ANIMATIONS_DEATHTYPES) {
 						type->Sound.Dead[ANIMATIONS_DEATHTYPES].Name = name;
-					}
-					else
-					{
+					} else {
 						lua_rawgeti(l, -1, k + 1);
 						type->Sound.Dead[death].Name = LuaToString(l, -1);
 						lua_pop(l, 1);
@@ -1172,8 +1174,8 @@ static int CclDefineUnitStats(lua_State *l)
 				}
 				continue;
 			}
-		   // This leaves a half initialized unit
-		   LuaError(l, "Unsupported tag: %s" _C_ value);
+			// This leaves a half initialized unit
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 	return 0;
@@ -1366,7 +1368,7 @@ static int CclDefineVariables(lua_State *l)
 		str = LuaToString(l, j + 1);
 
 		index = UnitTypeVar.VariableNameLookup.AddKey(str);
-		if(index == old) {
+		if (index == old) {
 			old++;
 			UnitTypeVar.Variable.resize(old);
 		} else {
@@ -1536,15 +1538,14 @@ static int CclDefineDecorations(lua_State *l)
 
 					decovartext->Font = CFont::Get(LuaToString(l, -1));
 					lua_pop(l, 1);
-// FIXME : More arguments ? color...
+					// FIXME : More arguments ? color...
 					decovar = decovartext;
 				} else if (!strcmp(key, "sprite")) {
 					CDecoVarSpriteBar *decovarspritebar = new CDecoVarSpriteBar;
 					lua_rawgeti(l, -1, 1);
 					decovarspritebar->NSprite = GetSpriteIndex(LuaToString(l, -1));
 					if (decovarspritebar->NSprite == -1) {
-						LuaError(l, "invalid sprite-name '%s' for Method in DefineDecorations" _C_
-							LuaToString(l, -1));
+						LuaError(l, "invalid sprite-name '%s' for Method in DefineDecorations" _C_ LuaToString(l, -1));
 					}
 					lua_pop(l, 1);
 					// FIXME : More arguments ?
@@ -1671,13 +1672,13 @@ void UpdateUnitVariables(CUnit &unit)
 #ifdef DEBUG
 		if (unit.Variable[i].Value > unit.Variable[i].Max) {
 			DebugPrint("Value out of range: '%s'(%d), for variable '%s',"
-						" value = %d, max = %d\n"
-						_C_ type->Ident.c_str() _C_ unit.Slot _C_ UnitTypeVar.VariableNameLookup[i]
-						_C_ unit.Variable[i].Value _C_ unit.Variable[i].Max);
+					   " value = %d, max = %d\n"
+					   _C_ type->Ident.c_str() _C_ unit.Slot _C_ UnitTypeVar.VariableNameLookup[i]
+					   _C_ unit.Variable[i].Value _C_ unit.Variable[i].Max);
 			unit.Variable[i].Value = unit.Variable[i].Max;
 		} else
 #endif
-		Assert(unit.Variable[i].Value <= unit.Variable[i].Max);
+			Assert(unit.Variable[i].Value <= unit.Variable[i].Max);
 	}
 
 	// BoolFlag

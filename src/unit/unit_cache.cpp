@@ -55,7 +55,7 @@ void CMap::Insert(CUnit &unit)
 	unsigned int index = unit.Offset;
 	const int w = unit.Type->TileWidth;
 	const int h = unit.Type->TileHeight;
-	int j,i = h;
+	int j, i = h;
 
 	do {
 		CMapField *mf = Field(index);
@@ -63,9 +63,9 @@ void CMap::Insert(CUnit &unit)
 		do {
 			mf->UnitCache.Insert(&unit);
 			++mf;
-		} while( --j && unit.tilePos.x + (j - w) < Info.MapWidth);
+		} while (--j && unit.tilePos.x + (j - w) < Info.MapWidth);
 		index += Info.MapWidth;
-	} while( --i && unit.tilePos.y + (i - h) < Info.MapHeight);
+	} while (--i && unit.tilePos.y + (i - h) < Info.MapHeight);
 }
 
 /**
@@ -79,7 +79,7 @@ void CMap::Remove(CUnit &unit)
 	unsigned int index = unit.Offset;
 	const int w = unit.Type->TileWidth;
 	const int h = unit.Type->TileHeight;
-	int j,i = h;
+	int j, i = h;
 
 	do {
 		CMapField *mf = Field(index);
@@ -87,29 +87,29 @@ void CMap::Remove(CUnit &unit)
 		do {
 			mf->UnitCache.Remove(&unit);
 			++mf;
-		} while( --j && unit.tilePos.x + (j - w) < Info.MapWidth);
+		} while (--j && unit.tilePos.x + (j - w) < Info.MapWidth);
 		index += Info.MapWidth;
-	} while( --i && unit.tilePos.y + (i - h) < Info.MapHeight);
+	} while (--i && unit.tilePos.y + (i - h) < Info.MapHeight);
 }
 
 
 class NoFilter
 {
 public:
-	bool operator () (const CUnit*) const { return true; }
+	bool operator()(const CUnit *) const { return true; }
 };
 
-void CMap::Select(const Vec2i& ltPos, const Vec2i& rbPos, std::vector<CUnit*>& units)
+void CMap::Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units)
 {
 	Select(ltPos, rbPos, units, NoFilter());
 }
 
-void CMap::SelectFixed(const Vec2i& ltPos, const Vec2i& rbPos, std::vector<CUnit*>& units)
+void CMap::SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units)
 {
 	Select(ltPos, rbPos, units, NoFilter());
 }
 
-void CMap::SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit*>& around)
+void CMap::SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around)
 {
 	SelectAroundUnit(unit, range, around, NoFilter());
 }

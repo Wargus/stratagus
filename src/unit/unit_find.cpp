@@ -102,7 +102,7 @@ int FindUnitsByType(const CUnitType &type, CUnit **table)
 **  @param type   type of unit requested
 **  @param units  array in which we have to store the units
 */
-void FindUnitsByType(const CUnitType &type, std::vector<CUnit *>& units)
+void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units)
 {
 	for (int i = 0; i < NumUnits; ++i) {
 		CUnit &unit = *Units[i];
@@ -198,8 +198,8 @@ CUnit *TargetOnMap(const CUnit &source, int x1, int y1, int x2, int y2)
 			continue;
 		}
 		const CUnitType *type = unit->Type;
-		if (x2 < unit->tilePos.x || x1 >= unit->tilePos.x + type->TileWidth ||
-				y2 < unit->tilePos.y || y1 >= unit->tilePos.y + type->TileHeight) {
+		if (x2 < unit->tilePos.x || x1 >= unit->tilePos.x + type->TileWidth
+			|| y2 < unit->tilePos.y || y1 >= unit->tilePos.y + type->TileHeight) {
 			continue;
 		}
 		if (!CanTarget(source.Type, unit->Type)) {
@@ -258,20 +258,17 @@ public:
 		attacker(&a), range(r)
 	{}
 
-	CUnit *Find(const std::vector<CUnit*>& table) const
-	{
+	CUnit *Find(const std::vector<CUnit *> &table) const {
 		return Find(table.begin(), table.end());
 	}
 
-	CUnit *Find(CUnitCache &cache) const
-	{
+	CUnit *Find(CUnitCache &cache) const {
 		return Find(cache.begin(), cache.end());
 	}
 
 private:
 	template <typename Iterator>
-	CUnit *Find(Iterator begin, Iterator end) const
-	{
+	CUnit *Find(Iterator begin, Iterator end) const {
 		CUnit *enemy = NULL;
 		int best_cost = INT_MAX;
 
@@ -286,8 +283,7 @@ private:
 		return enemy;
 	}
 
-	int ComputeCost(CUnit *const dest) const
-	{
+	int ComputeCost(CUnit *const dest) const {
 		const CPlayer &player = *attacker->Player;
 		const CUnitType &type = *attacker->Type;
 		const CUnitType &dtype = *dest->Type;
@@ -344,7 +340,8 @@ private:
 **  @note   Limited to attack range smaller than 16.
 **  @note Will be moved to unit_ai.c soon.
 */
-class BestRangeTargetFinder {
+class BestRangeTargetFinder
+{
 public:
 	/**
 	**  @param a      Find in distance for this unit.
@@ -352,7 +349,7 @@ public:
 	**
 	*/
 	BestRangeTargetFinder(const CUnit &a, const int r) : attacker(&a), range(r),
-		 best_unit(0), best_cost(INT_MIN) {
+		best_unit(0), best_cost(INT_MIN) {
 		memset(good, 0 , sizeof(int) * 32 * 32);
 		memset(bad, 0 , sizeof(int) * 32 * 32);
 	};
@@ -362,18 +359,15 @@ public:
 	public:
 		FillBadGood(const CUnit &a, int r, int *g, int *b):
 			attacker(&a), range(r),
-			enemy_count(0), good(g), bad(b)
-		{
+			enemy_count(0), good(g), bad(b) {
 		}
 
-		int Fill(CUnitCache &cache)
-		{
+		int Fill(CUnitCache &cache) {
 			return Fill(cache.begin(), cache.end());
 		}
 
 		template <typename Iterator>
-		int Fill(Iterator begin, Iterator end)
-		{
+		int Fill(Iterator begin, Iterator end) {
 			for (Iterator it = begin; it != end; ++it) {
 				Compute(*it);
 			}
@@ -381,8 +375,7 @@ public:
 		}
 	private:
 
-		void Compute(CUnit *const dest)
-		{
+		void Compute(CUnit *const dest) {
 			const CPlayer &player = *attacker->Player;
 
 			if (!dest->IsVisibleAsGoal(player)) {
@@ -404,7 +397,7 @@ public:
 			int cost = 0;
 			const int hp_damage_evaluate =
 				attacker->Stats->Variables[BASICDAMAGE_INDEX].Value
-						+ attacker->Stats->Variables[PIERCINGDAMAGE_INDEX].Value;
+				+ attacker->Stats->Variables[PIERCINGDAMAGE_INDEX].Value;
 
 			if (!player.IsEnemy(*dest)) { // a friend or neutral
 				dest->CacheLock = 1;
@@ -416,8 +409,8 @@ public:
 				// It costs (is positive) if hp_damage_evaluate>dest->HP ...)
 				// FIXME : assume that PRIORITY_FACTOR>HEALTH_FACTOR
 				cost = HEALTH_FACTOR * (2 * hp_damage_evaluate -
-						 dest->Variable[HP_INDEX].Value) /
-					(dtype.TileWidth * dtype.TileWidth);
+										dest->Variable[HP_INDEX].Value) /
+					   (dtype.TileWidth * dtype.TileWidth);
 				if (cost < 1) {
 					cost = 1;
 				}
@@ -504,7 +497,7 @@ public:
 		int *bad;
 	};
 
-	CUnit *Find(std::vector<CUnit*>& table) {
+	CUnit *Find(std::vector<CUnit *> &table) {
 		FillBadGood(*attacker, range, good, bad).Fill(table.begin(), table.end());
 		return Find(table.begin(), table.end());
 
@@ -517,16 +510,14 @@ public:
 
 private:
 	template <typename Iterator>
-	CUnit *Find(Iterator begin, Iterator end)
-	{
+	CUnit *Find(Iterator begin, Iterator end) {
 		for (Iterator it = begin; it != end; ++it) {
 			Compute(*it);
 		}
 		return best_unit;
 	}
 
-	void Compute(CUnit *const dest)
-	{
+	void Compute(CUnit *const dest) {
 		if (dest->CacheLock) {
 			dest->CacheLock = 0;
 			return;
@@ -534,7 +525,7 @@ private:
 		const CUnitType &type =  *attacker->Type;
 		const CUnitType &dtype = *dest->Type;
 		const int missile_range = type.Missile.Missile->Range + range - 1;
-		int x,y;
+		int x, y;
 
 		// put in x-y the real point which will be hit...
 		// (only meaningful when dtype->TileWidth > 1)
@@ -563,10 +554,10 @@ private:
 		int sgood = 0;
 		int yy = -(type.Missile.Missile->Range - 1);
 		int yy_offset = x + yy * 32;
-		for (;yy <= type.Missile.Missile->Range - 1; ++yy) {
+		for (; yy <= type.Missile.Missile->Range - 1; ++yy) {
 			if ((y + yy >= 0) && ((y + yy) < 2 * missile_range + 1)) {
 				for (int xx = -(type.Missile.Missile->Range - 1);
-					xx <= type.Missile.Missile->Range - 1; ++xx) {
+					 xx <= type.Missile.Missile->Range - 1; ++xx) {
 					if ((x + xx >= 0) && ((x + xx) < 2 * missile_range + 1)) {
 						sbad += bad[yy_offset + xx];
 						sgood += good[yy_offset + xx];
@@ -598,15 +589,14 @@ private:
 	const int range;
 	CUnit *best_unit;
 	int best_cost;
-	int good[32*32];
-	int bad[32*32];
+	int good[32 * 32];
+	int bad[32 * 32];
 };
 
 struct CompareUnitDistance {
 	const CUnit *referenceunit;
 	CompareUnitDistance(const CUnit &unit): referenceunit(&unit) {}
-	bool operator() (const CUnit*c1, const CUnit*c2)
-	{
+	bool operator()(const CUnit *c1, const CUnit *c2) {
 		int d1 = c1->MapDistanceTo(*referenceunit);
 		int d2 = c2->MapDistanceTo(*referenceunit);
 		if (d1 == d2) {
@@ -631,24 +621,22 @@ struct CompareUnitDistance {
 CUnit *AttackUnitsInDistance(const CUnit &unit, int range)
 {
 	// if necessary, take possible damage on allied units into account...
-	if (unit.Type->Missile.Missile->Range > 1 &&
-			(range + unit.Type->Missile.Missile->Range < 15)) {
-
+	if (unit.Type->Missile.Missile->Range > 1
+		&& (range + unit.Type->Missile.Missile->Range < 15)) {
 		//  If catapult, count units near the target...
 		//   FIXME : make it configurable
-
 
 		int missile_range = unit.Type->Missile.Missile->Range + range - 1;
 
 		Assert(2 * missile_range + 1 < 32);
 
 		// If unit is removed, use containers x and y
-		const CUnit* firstContainer = unit.Container ? unit.Container : &unit;
-		std::vector<CUnit*> table;
+		const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
+		std::vector<CUnit *> table;
 		Map.SelectAroundUnit(*firstContainer, missile_range, table,
-			MakeNotPredicate(HasSamePlayerAs(Players[PlayerNumNeutral])));
+							 MakeNotPredicate(HasSamePlayerAs(Players[PlayerNumNeutral])));
 
-		if (table.empty() == false){
+		if (table.empty() == false) {
 			return BestRangeTargetFinder(unit, range).Find(table);
 		}
 		return NULL;
@@ -656,7 +644,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range)
 		std::vector<CUnit *> table;
 
 		Map.SelectAroundUnit(unit, range, table,
-			MakeNotPredicate(HasSamePlayerAs(Players[PlayerNumNeutral])));
+							 MakeNotPredicate(HasSamePlayerAs(Players[PlayerNumNeutral])));
 
 		const int n = static_cast<int>(table.size());
 		if (range > 25 && table.size() > 9) {

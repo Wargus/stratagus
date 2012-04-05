@@ -61,7 +61,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	/// Get resource by name
+/// Get resource by name
 extern unsigned CclGetResourceByName(lua_State *l);
 
 /**
@@ -252,8 +252,8 @@ void PathFinderOutput::Load(lua_State *l)
 static void CclParseOrders(lua_State *l, CUnit &unit)
 {
 	for (std::vector<COrderPtr>::iterator order = unit.Orders.begin();
-			order != unit.Orders.end();
-			++order) {
+		 order != unit.Orders.end();
+		 ++order) {
 		delete *order;
 	}
 	unit.Orders.clear();
@@ -263,7 +263,7 @@ static void CclParseOrders(lua_State *l, CUnit &unit)
 		lua_rawgeti(l, -1, j + 1);
 
 		unit.Orders.push_back(NULL);
-		COrderPtr* order = &unit.Orders.back();
+		COrderPtr *order = &unit.Orders.back();
 
 		CclParseOrder(l, unit, order);
 		lua_pop(l, 1);
@@ -743,8 +743,8 @@ static int CclCreateUnit(lua_State *l)
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
-		if (UnitCanBeAt(*unit, ipos) ||
-				(unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, ipos, 0))) {
+		if (UnitCanBeAt(*unit, ipos)
+			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, ipos, 0))) {
 			unit->Place(ipos);
 		} else {
 			const int heading = SyncRand() % 256;
@@ -850,12 +850,12 @@ static int CclOrderUnit(lua_State *l)
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
-		if (unittype == ANY_UNIT ||
-				(unittype == ALL_FOODUNITS && !unit.Type->Building) ||
-				(unittype == ALL_BUILDINGS && unit.Type->Building) ||
-				unittype == unit.Type) {
+		if (unittype == ANY_UNIT
+			|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
+			|| (unittype == ALL_BUILDINGS && unit.Type->Building)
+			|| unittype == unit.Type) {
 			if (plynr == -1 || plynr == unit.Player->Index) {
-				if (!strcmp(order,"move")) {
+				if (!strcmp(order, "move")) {
 					CommandMove(unit, (dpos1 + dpos2) / 2, 1);
 				} else if (!strcmp(order, "attack")) {
 					CUnit *attack = TargetOnMap(unit, dpos1.x, dpos1.y, dpos2.x + 1, dpos2.y + 1);
@@ -875,15 +875,14 @@ static int CclOrderUnit(lua_State *l)
 class HasSameUnitTypeAs
 {
 public:
-	explicit HasSameUnitTypeAs(const CUnitType* _type) : type(_type) {}
-	bool operator () (const CUnit* unit) const
-	{
+	explicit HasSameUnitTypeAs(const CUnitType *_type) : type(_type) {}
+	bool operator()(const CUnit *unit) const {
 		return (type == ANY_UNIT || type == unit->Type
 				|| (type == ALL_FOODUNITS && !unit->Type->Building)
 				|| (type == ALL_BUILDINGS && unit->Type->Building));
 	}
 private:
-	const CUnitType* type;
+	const CUnitType *type;
 };
 
 
@@ -903,7 +902,7 @@ static int CclKillUnit(lua_State *l)
 	lua_pop(l, 1);
 	const int plynr = TriggerGetPlayer(l);
 	if (plynr == -1) {
-		CUnit** it = std::find_if(Units, Units + NumUnits, HasSameUnitTypeAs(unittype));
+		CUnit **it = std::find_if(Units, Units + NumUnits, HasSameUnitTypeAs(unittype));
 
 		if (it != Units + NumUnits) {
 			LetUnitDie(**it);
@@ -912,7 +911,7 @@ static int CclKillUnit(lua_State *l)
 		}
 	} else {
 		CPlayer &player = Players[plynr];
-		std::vector<CUnit*>::iterator it = std::find_if(player.UnitBegin(), player.UnitEnd(), HasSameUnitTypeAs(unittype));
+		std::vector<CUnit *>::iterator it = std::find_if(player.UnitBegin(), player.UnitEnd(), HasSameUnitTypeAs(unittype));
 
 		if (it != player.UnitEnd()) {
 			LetUnitDie(**it);
@@ -968,10 +967,10 @@ static int CclKillUnitAt(lua_State *l)
 	for (size_t j = 0; j < table.size() && s < q; ++j) {
 		CUnit *unit = table[j];
 
-		if (unittype == ANY_UNIT ||
-				(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
-				(unittype == ALL_BUILDINGS && unit->Type->Building) ||
-				unittype==unit->Type) {
+		if (unittype == ANY_UNIT
+			|| (unittype == ALL_FOODUNITS && !unit->Type->Building)
+			|| (unittype == ALL_BUILDINGS && unit->Type->Building)
+			|| unittype == unit->Type) {
 			if (plynr == -1 || plynr == unit->Player->Index) {
 				LetUnitDie(*unit);
 				++s;
@@ -1026,12 +1025,11 @@ static int CclGetUnitVariable(lua_State *l)
 	lua_pop(l, 1);
 
 	const char *const value = LuaToString(l, 2);
-	if (!strcmp(value, "RegenerationRate"))
+	if (!strcmp(value, "RegenerationRate")) {
 		lua_pushnumber(l, unit->Variable[HP_INDEX].Increase);
-	else if (!strcmp(value, "Player"))
+	} else if (!strcmp(value, "Player")) {
 		lua_pushnumber(l, unit->Player->Index);
-	else
-	{
+	} else {
 		int index = UnitTypeVar.VariableNameLookup[value];// User variables
 		if (index == -1) {
 			LuaError(l, "Bad variable name '%s'\n" _C_ value);
@@ -1057,16 +1055,14 @@ static int CclSetUnitVariable(lua_State *l)
 	lua_pop(l, 1);
 	const char *const name = LuaToString(l, 2);
 	int value;
-	if (!strcmp(name, "RegenerationRate"))
-	{
+	if (!strcmp(name, "RegenerationRate")) {
 		value = LuaToNumber(l, 3);
-		if (value > unit->Variable[HP_INDEX].Max)
+		if (value > unit->Variable[HP_INDEX].Max) {
 			unit->Stats->Variables[HP_INDEX].Increase = unit->Variable[HP_INDEX].Max;
-		else
+		} else {
 			unit->Stats->Variables[HP_INDEX].Increase = value;
-	}
-	else
-	{
+		}
+	} else {
 		const int index = UnitTypeVar.VariableNameLookup[name];// User variables
 		if (index == -1) {
 			LuaError(l, "Bad variable name '%s'\n" _C_ name);
@@ -1101,7 +1097,7 @@ static int CclSlotUsage(lua_State *l)
 	}
 	for (unsigned int i = 2; i <= args; i++) {
 		int unit_index = -1;
-		unsigned long cycle = (unsigned long)-1;
+		unsigned long cycle = static_cast<unsigned long>(-1);
 
 		for (lua_pushnil(l); lua_next(l, i); lua_pop(l, 1)) {
 			const char *key = LuaToString(l, -2);
@@ -1114,7 +1110,7 @@ static int CclSlotUsage(lua_State *l)
 				LuaError(l, "Wrong key %s" _C_ key);
 			}
 		}
-		Assert(unit_index != -1 && cycle != (unsigned long)-1);
+		Assert(unit_index != -1 && cycle != static_cast<unsigned long>(-1));
 		UnitManager.ReleaseUnit(UnitSlots[unit_index]);
 		UnitSlots[unit_index]->Refs = cycle;
 	}

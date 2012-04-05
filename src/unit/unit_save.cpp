@@ -60,8 +60,8 @@
 std::string UnitReference(const CUnit &unit)
 {
 	std::ostringstream ss;
-	ss << "U" << std::setfill('0') << std::setw(4) << std::uppercase <<
-		std::hex << UnitNumber(unit);
+	ss << "U" << std::setfill('0') << std::setw(4) << std::uppercase
+		<< std::hex << UnitNumber(unit);
 	return ss.str();
 }
 
@@ -73,8 +73,8 @@ std::string UnitReference(const CUnitPtr &unit)
 	Assert(unit != NULL);
 
 	std::ostringstream ss;
-	ss << "U" << std::setfill('0') << std::setw(4) << std::uppercase <<
-		std::hex << unit->Slot;
+	ss << "U" << std::setfill('0') << std::setw(4) << std::uppercase
+		<< std::hex << unit->Slot;
 	return ss.str();
 }
 
@@ -188,9 +188,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	// SEE unit loading code.
 	if (unit.Container && unit.Removed) {
 		file.printf(" \"host-info\", {%d, %d, %d, %d}, ",
-			unit.Container->tilePos.x, unit.Container->tilePos.y,
-			unit.Container->Type->TileWidth,
-			unit.Container->Type->TileHeight);
+					unit.Container->tilePos.x, unit.Container->tilePos.y,
+					unit.Container->Type->TileWidth,
+					unit.Container->Type->TileHeight);
 	}
 	file.printf(" \"seen-by-player\", \"");
 	for (int i = 0; i < PlayerMax; ++i) {
@@ -215,9 +215,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	file.printf("\"ttl\", %lu, ", unit.TTL);
 
 	for (size_t i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
-			file.printf("\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
-				UnitTypeVar.VariableNameLookup[i], unit.Variable[i].Value, unit.Variable[i].Max,
-				unit.Variable[i].Increase, unit.Variable[i].Enable ? "true" : "false");
+		file.printf("\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
+					UnitTypeVar.VariableNameLookup[i], unit.Variable[i].Value, unit.Variable[i].Max,
+					unit.Variable[i].Increase, unit.Variable[i].Enable ? "true" : "false");
 	}
 
 	file.printf("\"group-id\", %d,\n  ", unit.GroupId);
@@ -226,7 +226,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	file.printf("\"resources-held\", %d,\n  ", unit.ResourcesHeld);
 	if (unit.CurrentResource) {
 		file.printf("\"current-resource\", \"%s\",\n  ",
-			DefaultResourceNames[unit.CurrentResource].c_str());
+					DefaultResourceNames[unit.CurrentResource].c_str());
 	}
 
 	unit.pathFinderData->input.Save(file);
@@ -253,7 +253,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		if (unit.NextWorker->Destroyed) {
 			/* this unit is destroyed so it's not in the global unit
 			 * array - this means it won't be saved!!! */
-			printf ("FIXME: storing destroyed Worker - loading will fail.\n");
+			printf("FIXME: storing destroyed Worker - loading will fail.\n");
 		}
 		file.printf(" \"next-worker\", \"%s\",", UnitReference(*unit.NextWorker).c_str());
 	}
@@ -271,7 +271,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 
 	if (unit.UnitInside) {
 		file.printf("\n  \"units-contained\", {");
-		CUnit* uins = unit.UnitInside->PrevContained;
+		CUnit *uins = unit.UnitInside->PrevContained;
 		for (int i = unit.InsideCount; i; --i, uins = uins->PrevContained) {
 			file.printf("\"%s\"", UnitReference(*uins).c_str());
 			if (i > 1) {

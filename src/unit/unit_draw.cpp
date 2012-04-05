@@ -67,7 +67,8 @@
 /**
 **  Decoration: health, mana.
 */
-class Decoration {
+class Decoration
+{
 public:
 	Decoration() : HotX(0), HotY(0), Width(0), Height(0), Sprite(NULL) {}
 
@@ -77,7 +78,7 @@ public:
 	int Width;        /// width of the decoration
 	int Height;       /// height of the decoration
 
-// --- FILLED UP ---
+	// --- FILLED UP ---
 	CGraphic *Sprite;  /// loaded sprite images
 };
 
@@ -85,7 +86,8 @@ public:
 /**
 **	Structure grouping all Sprites for decoration.
 */
-class DecoSpriteType {
+class DecoSpriteType
+{
 public:
 	std::vector<std::string> Name;            /// Name of the sprite.
 	std::vector<Decoration> SpriteArray;      /// Sprite to display variable.
@@ -107,8 +109,7 @@ unsigned long ShowOrdersCount;    /// Show orders for some time
 **  @param x1,y1    Coordinates of the top left corner.
 **  @param x2,y2    Coordinates of the bottom right corner.
 */
-void (*DrawSelection)(Uint32 color, int x1, int y1,
-	int x2, int y2) = DrawSelectionNone;
+void (*DrawSelection)(Uint32 color, int x1, int y1, int x2, int y2) = DrawSelectionNone;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -132,15 +133,13 @@ void DrawUnitSelection(const CViewport *vp, const CUnit &unit)
 
 	// FIXME: make these colors customizable with scripts.
 
-	if (Editor.Running && UnitUnderCursor == &unit &&
-			Editor.State == EditorSelecting) {
+	if (Editor.Running && UnitUnderCursor == &unit && Editor.State == EditorSelecting) {
 		color = ColorWhite;
 	} else if (unit.Selected || unit.TeamSelected || (unit.Blink & 1)) {
 		if (unit.Player->Index == PlayerNumNeutral) {
 			color = ColorYellow;
-		} else if ((unit.Selected || (unit.Blink & 1)) &&
-				(unit.Player == ThisPlayer ||
-					ThisPlayer->IsTeamed(unit))) {
+		} else if ((unit.Selected || (unit.Blink & 1))
+				   && (unit.Player == ThisPlayer || ThisPlayer->IsTeamed(unit))) {
 			color = ColorGreen;
 		} else if (ThisPlayer->IsEnemy(unit)) {
 			color = ColorRed;
@@ -158,9 +157,9 @@ void DrawUnitSelection(const CViewport *vp, const CUnit &unit)
 				color = Players[i].Color;
 			}
 		}
-	} else if (CursorBuilding && unit.Type->Building &&
-			unit.CurrentAction() != UnitActionDie &&
-			(unit.Player == ThisPlayer || ThisPlayer->IsTeamed(unit))) {
+	} else if (CursorBuilding && unit.Type->Building
+			   && unit.CurrentAction() != UnitActionDie
+			   && (unit.Player == ThisPlayer || ThisPlayer->IsTeamed(unit))) {
 		// If building mark all own buildings
 		color = ColorGray;
 	} else {
@@ -170,9 +169,9 @@ void DrawUnitSelection(const CViewport *vp, const CUnit &unit)
 	const CUnitType &type = *unit.Type;
 	const PixelPos screenPos = vp->TilePosToScreen_TopLeft(unit.tilePos);
 	const int x = screenPos.x + unit.IX + type.TileWidth * PixelTileSize.x / 2
-		- type.BoxWidth / 2 - (type.Width - type.Sprite->Width) / 2;
+				  - type.BoxWidth / 2 - (type.Width - type.Sprite->Width) / 2;
 	const int y = screenPos.y + unit.IY + type.TileHeight * PixelTileSize.y / 2
-		- type.BoxHeight / 2 - (type.Height - type.Sprite->Height) / 2;
+				  - type.BoxHeight / 2 - (type.Height - type.Sprite->Height) / 2;
 
 	DrawSelection(color, x, y, x + type.BoxWidth, y + type.BoxHeight);
 }
@@ -198,7 +197,7 @@ void DrawSelectionNone(Uint32, int, int, int, int)
 void DrawSelectionCircle(Uint32 color, int x1, int y1, int x2, int y2)
 {
 	Video.DrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-		std::min((x2 - x1) / 2, (y2 - y1) / 2) + 2);
+						 std::min((x2 - x1) / 2, (y2 - y1) / 2) + 2);
 }
 
 /**
@@ -211,9 +210,9 @@ void DrawSelectionCircle(Uint32 color, int x1, int y1, int x2, int y2)
 void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1, int x2, int y2)
 {
 	Video.FillTransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-		std::min((x2 - x1) / 2, (y2 - y1) / 2), 95);
+							  std::min((x2 - x1) / 2, (y2 - y1) / 2), 95);
 	Video.DrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-		std::min((x2 - x1) / 2, (y2 - y1) / 2));
+						 std::min((x2 - x1) / 2, (y2 - y1) / 2));
 }
 
 /**
@@ -239,7 +238,7 @@ void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1, int x2, int y
 {
 	Video.DrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
 	Video.FillTransRectangleClip(color, x1 + 1, y1 + 1,
-		x2 - x1 - 2, y2 - y1 - 2, 75);
+								 x2 - x1 - 2, y2 - y1 - 2, 75);
 }
 
 /**
@@ -401,7 +400,7 @@ void CleanDecorations()
 **  @todo fix color configuration.
 */
 void CDecoVarBar::Draw(int x, int y,
-	const CUnitType *Type, const CVariable &Variable) const
+					   const CUnitType *Type, const CVariable &Variable) const
 {
 	int height;
 	int width;
@@ -450,7 +449,7 @@ void CDecoVarBar::Draw(int x, int y,
 		} else {
 			if (this->SEToNW) {
 				Video.FillRectangleClip(bcolor, x - b - w + width, y - b - h + height,
-					2 * b + w, 2 * b + h);
+										2 * b + w, 2 * b + h);
 			} else {
 				Video.FillRectangleClip(bcolor, x - b, y - b, 2 * b + w, 2 * b + h);
 			}
@@ -472,7 +471,7 @@ void CDecoVarBar::Draw(int x, int y,
 **  @todo fix font/color configuration.
 */
 void CDecoVarText::Draw(int x, int y,
-	const CUnitType *, const CVariable &Variable) const
+						const CUnitType *, const CVariable &Variable) const
 {
 	if (this->IsCenteredInX) {
 		x -= 2; // GetGameFont()->Width(buf) / 2, with buf = str(Value)
@@ -492,7 +491,7 @@ void CDecoVarText::Draw(int x, int y,
 **  @todo fix sprite configuration.
 */
 void CDecoVarSpriteBar::Draw(int x, int y,
-	const CUnitType *, const CVariable &Variable) const
+							 const CUnitType *, const CVariable &Variable) const
 {
 	int n;                   // frame of the sprite to show.
 	CGraphic *sprite;        // the sprite to show.
@@ -528,7 +527,7 @@ void CDecoVarSpriteBar::Draw(int x, int y,
 **  @todo fix sprite configuration configuration.
 */
 void CDecoVarStaticSprite::Draw(int x, int y,
-	const CUnitType *, const CVariable &) const
+								const CUnitType *, const CVariable &) const
 {
 	CGraphic *sprite;         // the sprite to show.
 	Decoration *decosprite;  // Info on the sprite.
@@ -567,10 +566,10 @@ static void DrawDecoration(const CUnit &unit, const CUnitType *type, int x, int 
 	VideoDrawNumberClip(x + 1, y + 1, GetGameFont(), unit.Refs);
 #endif
 
-	UpdateUnitVariables(const_cast<CUnit&>(unit));
+	UpdateUnitVariables(const_cast<CUnit &>(unit));
 	// Now show decoration for each variable.
 	for (std::vector<CDecoVar *>::const_iterator i = UnitTypeVar.DecoVar.begin();
-			i < UnitTypeVar.DecoVar.end(); ++i) {
+		 i < UnitTypeVar.DecoVar.end(); ++i) {
 		int value;
 		int max;
 		const CDecoVar *var = (*i);
@@ -578,14 +577,14 @@ static void DrawDecoration(const CUnit &unit, const CUnitType *type, int x, int 
 		max = unit.Variable[var->Index].Max;
 		Assert(value <= max);
 
-		if (!((value == 0 && !var->ShowWhenNull) || (value == max && !var->ShowWhenMax) ||
-				(var->HideHalf && value != 0 && value != max) ||
-				(!var->ShowIfNotEnable && !unit.Variable[var->Index].Enable) ||
-				(var->ShowOnlySelected && !unit.Selected) ||
-				(unit.Player->Type == PlayerNeutral && var->HideNeutral) ||
-				(ThisPlayer->IsEnemy(unit) && !var->ShowOpponent) ||
-				(ThisPlayer->IsAllied(unit) && (unit.Player != ThisPlayer) && var->HideAllied) ||
-				max == 0)) {
+		if (!((value == 0 && !var->ShowWhenNull) || (value == max && !var->ShowWhenMax)
+			|| (var->HideHalf && value != 0 && value != max)
+			|| (!var->ShowIfNotEnable && !unit.Variable[var->Index].Enable)
+			|| (var->ShowOnlySelected && !unit.Selected)
+			|| (unit.Player->Type == PlayerNeutral && var->HideNeutral)
+			|| (ThisPlayer->IsEnemy(unit) && !var->ShowOpponent)
+			|| (ThisPlayer->IsAllied(unit) && (unit.Player != ThisPlayer) && var->HideAllied)
+			|| max == 0)) {
 			var->Draw(
 				x + var->OffsetX + var->OffsetXPercent * unit.Type->TileWidth * PixelTileSize.x / 100,
 				y + var->OffsetY + var->OffsetYPercent * unit.Type->TileHeight * PixelTileSize.y / 100,
@@ -600,7 +599,7 @@ static void DrawDecoration(const CUnit &unit, const CUnitType *type, int x, int 
 #ifndef DEBUG
 		&& unit.Player == ThisPlayer
 #endif
-		) {
+	   ) {
 		int groupId = 0;
 
 		if (unit.Player->AiEnabled) {
@@ -684,7 +683,7 @@ void ShowOrder(const CUnit &unit)
 	PixelPos screenPos = order->Show(*CurrentViewport, screenStartPos);
 	// Show the rest of the orders
 	for (size_t i = 1 + (flushed ? 1 : 0); i < unit.Orders.size(); ++i) {
-		screenPos =unit.Orders[i]->Show(*CurrentViewport, screenPos);
+		screenPos = unit.Orders[i]->Show(*CurrentViewport, screenPos);
 	}
 
 	// Show order for new trained units
@@ -711,9 +710,9 @@ static void DrawInformations(const CUnit &unit, const CUnitType *type, int x, in
 #if 0 && DEBUG // This is for showing vis counts and refs.
 	char buf[10];
 	sprintf(buf, "%d%c%c%d", unit.VisCount[ThisPlayer->Index],
-		unit.Seen.ByPlayer & (1 << ThisPlayer->Index) ? 'Y' : 'N',
-		unit.Seen.Destroyed & (1 << ThisPlayer->Index) ? 'Y' : 'N',
-		unit.Refs);
+			unit.Seen.ByPlayer & (1 << ThisPlayer->Index) ? 'Y' : 'N',
+			unit.Seen.Destroyed & (1 << ThisPlayer->Index) ? 'Y' : 'N',
+			unit.Refs);
 	CLabel(GetSmallFont()).Draw(x + 10, y + 10, buf);
 #endif
 
@@ -726,9 +725,9 @@ static void DrawInformations(const CUnit &unit, const CUnitType *type, int x, in
 		if (Preference.ShowSightRange) {
 			// Radius -1 so you can see all ranges
 			Video.DrawCircleClip(ColorGreen,
-				x + type->TileWidth * PixelTileSize.x / 2,
-				y + type->TileHeight * PixelTileSize.y / 2,
-				((stats->Variables[SIGHTRANGE_INDEX].Max + (type->TileWidth - 1)) * PixelTileSize.x) - 1);
+								 x + type->TileWidth * PixelTileSize.x / 2,
+								 y + type->TileHeight * PixelTileSize.y / 2,
+								 ((stats->Variables[SIGHTRANGE_INDEX].Max + (type->TileWidth - 1)) * PixelTileSize.x) - 1);
 		}
 		if (type->CanAttack) {
 			if (Preference.ShowReactionRange) {
@@ -736,17 +735,17 @@ static void DrawInformations(const CUnit &unit, const CUnitType *type, int x, in
 					type->ReactRangePerson : type->ReactRangeComputer;
 				if (r) {
 					Video.DrawCircleClip(ColorBlue,
-						x + type->TileWidth * PixelTileSize.x / 2,
-						y + type->TileHeight * PixelTileSize.y / 2,
-						(r + (type->TileWidth - 1)) * PixelTileSize.x);
+										 x + type->TileWidth * PixelTileSize.x / 2,
+										 y + type->TileHeight * PixelTileSize.y / 2,
+										 (r + (type->TileWidth - 1)) * PixelTileSize.x);
 				}
 			}
 			if (Preference.ShowAttackRange && stats->Variables[ATTACKRANGE_INDEX].Max) {
 				// Radius + 1 so you can see all ranges
 				Video.DrawCircleClip(ColorRed,
-					x + type->TileWidth * PixelTileSize.x / 2,
-					y + type->TileHeight * PixelTileSize.y / 2,
-					(stats->Variables[ATTACKRANGE_INDEX].Max + (type->TileWidth - 1)) * PixelTileSize.x + 1);
+									 x + type->TileWidth * PixelTileSize.x / 2,
+									 y + type->TileHeight * PixelTileSize.y / 2,
+									 (stats->Variables[ATTACKRANGE_INDEX].Max + (type->TileWidth - 1)) * PixelTileSize.x + 1);
 			}
 		}
 	}
@@ -769,7 +768,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType *type, int x, in
 **  @param y         Y position.
 */
 void DrawUnitPlayerColor(const CUnitType *type, CGraphic *sprite,
-	int player, int frame, int x, int y)
+						 int player, int frame, int x, int y)
 {
 	int f;
 
@@ -827,13 +826,13 @@ void DrawUnitPlayerColor(const CUnitType *type, CGraphic *sprite,
 **  @param y       Y position.
 */
 static void DrawConstructionShadow(const CUnitType &type, const CConstructionFrame *cframe,
-	int frame, int x, int y)
+								   int frame, int x, int y)
 {
 	if (cframe->File == ConstructionFileConstruction) {
 		if (type.Construction->ShadowSprite) {
 			x -= (type.Construction->Width - type.TileWidth * PixelTileSize.x) / 2;
 			x += type.OffsetX;
-			y -= (type.Construction->Height - type.TileHeight * PixelTileSize.y )/ 2;
+			y -= (type.Construction->Height - type.TileHeight * PixelTileSize.y) / 2;
 			y += type.OffsetY;
 			if (frame < 0) {
 				type.Construction->ShadowSprite->DrawFrameClipX(-frame - 1, x, y);
@@ -867,7 +866,7 @@ static void DrawConstructionShadow(const CUnitType &type, const CConstructionFra
 **  @param y       Y position.
 */
 static void DrawConstruction(const int player, const CConstructionFrame *cframe,
-	const CUnitType &type, int frame, int x, int y)
+							 const CUnitType &type, int frame, int x, int y)
 {
 	if (cframe->File == ConstructionFileConstruction) {
 		const CConstruction *construction;
@@ -937,13 +936,13 @@ void CUnit::Draw(const CViewport *vp) const
 		constructed = this->Constructed;
 		// Reset Type to the type being upgraded to
 		if (action == UnitActionUpgradeTo) {
-			const COrder_UpgradeTo& order = *static_cast<COrder_UpgradeTo*>(this->CurrentOrder());
+			const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(this->CurrentOrder());
 
-			type = const_cast<CUnitType*>(&order.GetUnitType());
+			type = const_cast<CUnitType *>(&order.GetUnitType());
 		}
 
 		if (this->CurrentAction() == UnitActionBuilt) {
-			COrder_Built &order = *static_cast<COrder_Built*>(this->CurrentOrder());
+			COrder_Built &order = *static_cast<COrder_Built *>(this->CurrentOrder());
 
 			cframe = &order.GetFrame();
 		} else {
@@ -969,7 +968,7 @@ void CUnit::Draw(const CViewport *vp) const
 
 	if (!IsVisible && frame == UnitNotSeen) {
 		DebugPrint("FIXME: Something is wrong, unit %d not seen but drawn time %lu?.\n" _C_
-			this->Slot _C_ GameCycle);
+				   this->Slot _C_ GameCycle);
 		return;
 	}
 
@@ -1011,12 +1010,12 @@ void CUnit::Draw(const CViewport *vp) const
 	if (state == 1) {
 		if (constructed) {
 			DrawConstruction(player, cframe, *type, frame,
-				x + (type->TileWidth * PixelTileSize.x) / 2,
-				y + (type->TileHeight * PixelTileSize.y) / 2);
+							 x + (type->TileWidth * PixelTileSize.x) / 2,
+							 y + (type->TileHeight * PixelTileSize.y) / 2);
 		}
-	//
-	// Draw the future unit type, if upgrading to it.
-	//
+		//
+		// Draw the future unit type, if upgrading to it.
+		//
 	} else if (state == 2) {
 		// FIXME: this frame is hardcoded!!!
 		DrawUnitType(*type, sprite, player, frame < 0 ? /*-1*/ - 1 : 1, x, y);
@@ -1047,7 +1046,7 @@ void CUnitDrawProxy::operator=(const CUnit *unit)
 			GroupId = unit->GroupId;
 		} else {
 			int num = 0;
-			while(!(unit->GroupId & (1 << num))) {
+			while (!(unit->GroupId & (1 << num))) {
 				++num;
 			}
 			GroupId = num + 1;
@@ -1085,14 +1084,14 @@ void CUnitDrawProxy::operator=(const CUnit *unit)
 
 		// Reset Type to the type being upgraded to
 		if (action == UnitActionUpgradeTo) {
-			const COrder_UpgradeTo& order = *static_cast<COrder_UpgradeTo*>(unit->CurrentOrder());
+			const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(unit->CurrentOrder());
 
-			Type = const_cast<CUnitType*>(&order.GetUnitType());
+			Type = const_cast<CUnitType *>(&order.GetUnitType());
 		}
 
 		if (unit->Constructed) {
 			if (unit->CurrentAction() == UnitActionBuilt) {
-				COrder_Built &order = *static_cast<COrder_Built*>(unit->CurrentOrder());
+				COrder_Built &order = *static_cast<COrder_Built *>(unit->CurrentOrder());
 
 				cframe = &order.GetFrame();
 			} else {
@@ -1140,15 +1139,15 @@ void CUnitDrawProxy::DrawDecorationAt(int x, int y) const
 			int max = Variable[i].Max;
 			Assert(value <= max);
 
-			if (!((value == 0 && !var->ShowWhenNull) || (value == max && !var->ShowWhenMax) ||
-					(var->HideHalf && value != 0 && value != max) ||
-					//(!var->ShowIfNotEnable && !Variable[var->Index].Enable) ||
-					(!var->ShowIfNotEnable && !Variable[i].Enable) ||
-					(var->ShowOnlySelected && !Selected) ||
-					((Player != ThisPlayer) && ((Player->Type == PlayerNeutral && var->HideNeutral) ||
-					(ThisPlayer->IsEnemy(*Player) && !var->ShowOpponent) ||
-					(ThisPlayer->IsAllied(*Player) && var->HideAllied))) ||
-					max == 0)) {
+			if (!((value == 0 && !var->ShowWhenNull) || (value == max && !var->ShowWhenMax)
+				|| (var->HideHalf && value != 0 && value != max)
+				//|| (!var->ShowIfNotEnable && !Variable[var->Index].Enable) ||
+				|| (!var->ShowIfNotEnable && !Variable[i].Enable)
+				|| (var->ShowOnlySelected && !Selected)
+				|| (Player != ThisPlayer && ((Player->Type == PlayerNeutral && var->HideNeutral)
+											|| (ThisPlayer->IsEnemy(*Player) && !var->ShowOpponent)
+											|| (ThisPlayer->IsAllied(*Player) && var->HideAllied)))
+				|| max == 0)) {
 				var->Draw(
 					x + var->OffsetX + var->OffsetXPercent * Type->TileWidth * PixelTileSize.x / 100,
 					y + var->OffsetY + var->OffsetYPercent * Type->TileHeight * PixelTileSize.y / 100,
@@ -1162,9 +1161,9 @@ void CUnitDrawProxy::DrawDecorationAt(int x, int y) const
 	//
 	if (Selected && GroupId != 0
 #ifndef DEBUG
-	 && Player == ThisPlayer
+		&& Player == ThisPlayer
 #endif
-	 ) {
+	   ) {
 		int width = GetGameFont()->Width(GroupId - 1);
 		x += (Type->TileWidth * PixelTileSize.x + Type->BoxWidth) / 2 - width;
 		width = GetGameFont()->Height();
@@ -1180,12 +1179,11 @@ void CUnitDrawProxy::DrawSelectionAt(int x, int y) const
 	Uint32 color;
 
 	// FIXME: make these colors customizable with scripts.
-	if ( Selected || TeamSelected || (Blink & 1) ) {
+	if (Selected || TeamSelected || (Blink & 1)) {
 		if (Player->Index == PlayerNumNeutral) {
 			color = ColorYellow;
-		} else if ((Selected || (Blink & 1)) &&
-				(Player == ThisPlayer ||
-					ThisPlayer->IsTeamed(*Player))) {
+		} else if ((Selected || (Blink & 1))
+					&& (Player == ThisPlayer || ThisPlayer->IsTeamed(*Player))) {
 			color = ColorGreen;
 		} else if (ThisPlayer->IsEnemy(*Player)) {
 			color = ColorRed;
@@ -1203,8 +1201,8 @@ void CUnitDrawProxy::DrawSelectionAt(int x, int y) const
 				color = Players[i].Color;
 			}
 		}
-	} else if (CursorBuilding && Type->Building &&	IsAlive &&
-		(Player == ThisPlayer || ThisPlayer->IsTeamed(*Player))) {
+	} else if (CursorBuilding && Type->Building &&	IsAlive
+				&& (Player == ThisPlayer || ThisPlayer->IsTeamed(*Player))) {
 		// If building mark all own buildings
 		color = ColorGray;
 	} else {
@@ -1212,9 +1210,9 @@ void CUnitDrawProxy::DrawSelectionAt(int x, int y) const
 	}
 
 	int xx = x + Type->TileWidth * PixelTileSize.x / 2 - Type->BoxWidth / 2 -
-		(Type->Width - Type->Sprite->Width) / 2;
+			 (Type->Width - Type->Sprite->Width) / 2;
 	int yy = y + Type->TileHeight * PixelTileSize.y / 2 - Type->BoxHeight / 2 -
-		(Type->Height - Type->Sprite->Height) / 2;
+			 (Type->Height - Type->Sprite->Height) / 2;
 
 	DrawSelection(color, xx, yy, xx + Type->BoxWidth, yy + Type->BoxHeight);
 }
@@ -1264,12 +1262,12 @@ void CUnitDrawProxy::Draw(const CViewport *vp) const
 	if (state == 1) {
 		if (cframe) {
 			DrawConstruction(Player->Index, cframe, *Type, frame,
-				x + (Type->TileWidth * PixelTileSize.x) / 2,
-				y + (Type->TileHeight * PixelTileSize.y) / 2);
+							 x + (Type->TileWidth * PixelTileSize.x) / 2,
+							 y + (Type->TileHeight * PixelTileSize.y) / 2);
 		}
-	//
-	// Draw the future unit type, if upgrading to it.
-	//
+		//
+		// Draw the future unit type, if upgrading to it.
+		//
 	} else if (state == 2) {
 		// FIXME: this frame is hardcoded!!!
 		DrawUnitType(*Type, sprite, Player->Index, frame < 0 ? /*-1*/ - 1 : 1, x, y);
@@ -1293,7 +1291,7 @@ void CUnitDrawProxy::Draw(const CViewport *vp) const
 **  @param c2  Second Unit to compare (*Unit)
 **
 */
-static inline bool DrawLevelCompare(const CUnit*c1, const CUnit*c2)
+static inline bool DrawLevelCompare(const CUnit *c1, const CUnit *c2)
 {
 	int drawlevel1 = c1->GetDrawLevel();
 	int drawlevel2 = c2->GetDrawLevel();
@@ -1305,7 +1303,7 @@ static inline bool DrawLevelCompare(const CUnit*c1, const CUnit*c2)
 		const int pos1 = (c1->tilePos.y * PixelTileSize.y + c1->IY + c1->Type->Height);
 		const int pos2 = (c2->tilePos.y * PixelTileSize.y + c2->IY + c2->Type->Height);
 		return pos1 == pos2 ?
-			(c1->tilePos.x - c2->tilePos.x ? c1->tilePos.x < c2->tilePos.x : c1->Slot < c2->Slot) : pos1 < pos2;
+			   (c1->tilePos.x - c2->tilePos.x ? c1->tilePos.x < c2->tilePos.x : c1->Slot < c2->Slot) : pos1 < pos2;
 	} else {
 		return drawlevel1 < drawlevel2;
 	}
@@ -1318,7 +1316,7 @@ static inline bool DrawLevelCompare(const CUnit*c1, const CUnit*c2)
 **  @param table  Table of units to return in sorted order
 **
 */
-int FindAndSortUnits(const CViewport *vp, std::vector<CUnit*>& table)
+int FindAndSortUnits(const CViewport *vp, std::vector<CUnit *> &table)
 {
 	//  Select all units touching the viewpoint.
 	const Vec2i minPos = {vp->MapX - 1, vp->MapY - 1};
@@ -1345,7 +1343,7 @@ int FindAndSortUnits(const CViewport *vp, CUnitDrawProxy table[])
 	//  Select all units touching the viewpoint.
 	const Vec2i minPos = {vp->MapX - 1, vp->MapY - 1};
 	const Vec2i maxPos = {vp->MapX + vp->MapWidth + 1, vp->MapY + vp->MapHeight + 1};
-	std::vector<CUnit*> buffer;
+	std::vector<CUnit *> buffer;
 
 	Map.Select(minPos, maxPos, buffer);
 	int n = static_cast<int>(buffer.size());

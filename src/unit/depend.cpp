@@ -50,7 +50,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-	/// All dependencies hash
+/// All dependencies hash
 static DependRule *DependHash[101];
 
 /*----------------------------------------------------------------------------
@@ -65,8 +65,7 @@ static DependRule *DependHash[101];
 **  @param count     Amount of the required needed.
 **  @param or_flag   Start of or rule.
 */
-static void AddDependency(const std::string &target, const std::string &required, int count,
-	int or_flag)
+static void AddDependency(const std::string &target, const std::string &required, int count, int or_flag)
 {
 	DependRule rule;
 	DependRule *node;
@@ -85,8 +84,7 @@ static void AddDependency(const std::string &target, const std::string &required
 		rule.Type = DependRuleUpgrade;
 		rule.Kind.Upgrade = CUpgrade::Get(target);
 	} else {
-		DebugPrint("dependency target `%s' should be unit-type or upgrade\n" _C_
-			target.c_str());
+		DebugPrint("dependency target `%s' should be unit-type or upgrade\n" _C_ target.c_str());
 		return;
 	}
 
@@ -96,8 +94,7 @@ static void AddDependency(const std::string &target, const std::string &required
 	//  Find correct hash slot.
 	//
 	if ((node = DependHash[hash])) {  // find correct entry
-		while (node->Type != rule.Type ||
-				node->Kind.Upgrade != rule.Kind.Upgrade) {
+		while (node->Type != rule.Type || node->Kind.Upgrade != rule.Kind.Upgrade) {
 			if (!node->Next) {  // end of list
 				temp = new DependRule;
 				temp->Next = NULL;
@@ -143,8 +140,7 @@ static void AddDependency(const std::string &target, const std::string &required
 		temp->Type = DependRuleUpgrade;
 		temp->Kind.Upgrade = CUpgrade::Get(required);
 	} else {
-		DebugPrint("dependency required `%s' should be unit-type or upgrade\n" _C_
-			required.c_str());
+		DebugPrint("dependency required `%s' should be unit-type or upgrade\n" _C_ required.c_str());
 		delete temp;
 		return;
 	}
@@ -422,7 +418,7 @@ static int CclDefineDependency(lua_State *l)
 */
 static int CclGetDependency(lua_State *l)
 {
-	DebugPrint("FIXME: write this %p\n" _C_ (void*)l);
+	DebugPrint("FIXME: write this %p\n" _C_(void *)l);
 
 	return 0;
 }
@@ -436,7 +432,7 @@ static int CclGetDependency(lua_State *l)
 */
 static int CclCheckDependency(lua_State *l)
 {
-	DebugPrint("FIXME: write this %p\n" _C_ (void *)l);
+	DebugPrint("FIXME: write this %p\n" _C_(void *)l);
 
 	return 0;
 }
