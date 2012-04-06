@@ -78,11 +78,6 @@ enum {
 		file.printf(" \"finished\", ");
 	}
 	if (this->AutoTarget != NULL) {
-		if (AutoTarget->Destroyed) {
-			/* this unit is destroyed so it's not in the global unit
-			 * array - this means it won't be saved!!! */
-			printf("FIXME: storing destroyed Goal - loading will fail.\n");
-		}
 		file.printf(" \"auto-target\", \"%s\",", UnitReference(AutoTarget).c_str());
 	}
 	if (this->State != 0) { // useless to write default value

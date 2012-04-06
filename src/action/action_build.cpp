@@ -100,11 +100,6 @@ enum {
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 
 	if (this->BuildingUnit != NULL) {
-		if (this->BuildingUnit->Destroyed) {
-			/* this unit is destroyed so it's not in the global unit
-			 * array - this means it won't be saved!!! */
-			printf("FIXME: storing destroyed Goal - loading will fail.\n");
-		}
 		file.printf(" \"building\", \"%s\",", UnitReference(this->BuildingUnit).c_str());
 	}
 	file.printf(" \"type\", \"%s\",", this->Type->Ident.c_str());

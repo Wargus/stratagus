@@ -121,7 +121,7 @@
 	}
 	if (depot) {
 		order->Depot = depot;
-		order->UnitGotoGoal(harvester, depot, 70); //SUB_MOVE_TO_DEPOT);
+		order->UnitGotoGoal(harvester, depot, SUB_MOVE_TO_DEPOT);
 	} else {
 		order->State = SUB_UNREACHABLE_DEPOT;
 		order->goalPos = harvester.tilePos;
@@ -179,13 +179,7 @@ COrder_Resource::~COrder_Resource()
 		file.printf(" \"finished\",");
 	}
 	if (this->HasGoal()) {
-		CUnit &goal = *this->GetGoal();
-		if (goal.Destroyed) {
-			/* this unit is destroyed so it's not in the global unit
-			 * array - this means it won't be saved!!! */
-			printf("FIXME: storing destroyed Goal - loading will fail.\n");
-		}
-		file.printf(" \"goal\", \"%s\",", UnitReference(goal).c_str());
+		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 
