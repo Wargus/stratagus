@@ -2142,7 +2142,7 @@ class BestDepotFinder
 			// Unit in range?
 
 			if (NEARLOCATION) {
-				int d = dest->MapDistanceTo(u_near.loc.x, u_near.loc.y);
+				int d = dest->MapDistanceTo(u_near.loc);
 
 				//
 				// Take this depot?
@@ -3055,7 +3055,8 @@ int ViewPointDistance(const Vec2i &pos)
 int ViewPointDistanceToUnit(const CUnit &dest)
 {
 	const CViewport &vp = *UI.SelectedViewport;
-	return dest.MapDistanceTo(vp.MapX + vp.MapWidth / 2, vp.MapY + vp.MapHeight / 2);
+	const Vec2i midPos = {vp.MapX + vp.MapWidth / 2, vp.MapY + vp.MapHeight / 2};
+	return dest.MapDistanceTo(midPos);
 }
 
 /**

@@ -140,7 +140,8 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 			dest.y = (goal->tilePos.y + desty) * PixelTileSize.y + goal->Type->TileHeight * PixelTileSize.y / 2;
 		}
 	}
-	const int dist = goal->MapDistanceTo(dest.x, dest.y);
+	Vec2i destTilePos = {dest.x / PixelTileSize.x, dest.y / PixelTileSize.y};
+	const int dist = goal->MapDistanceTo(destTilePos);
 	if ((flags & ANIM_SM_RANGED) && !(flags & ANIM_SM_PIXEL)
 		&& dist > goal->Stats->Variables[ATTACKRANGE_INDEX].Max
 		&& dist < goal->Type->MinAttackRange) {

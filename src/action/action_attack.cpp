@@ -367,7 +367,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	// Look if we have reached the target.
 	if (err == 0 && !this->HasGoal()) {
 		// Check if we're in range when attacking a location and we are waiting
-		if (unit.MapDistanceTo(this->goalPos.x, this->goalPos.y) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
+		if (unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 			err = PF_REACHED;
 		}
 	}
@@ -391,7 +391,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		}
 		// Attacking wall or ground.
 		if (!goal && (Map.WallOnMap(this->goalPos) || this->Action == UnitActionAttackGround)
-			&& unit.MapDistanceTo(this->goalPos.x, this->goalPos.y) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
+			&& unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 			// Reached wall or ground, now attacking it
 			unit.State = 0;
 			UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);

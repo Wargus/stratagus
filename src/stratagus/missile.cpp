@@ -975,7 +975,7 @@ static void MissileHit(Missile &missile)
 					}
 				}
 				if (shouldHit) {
-					int splash = goal.MapDistanceTo(pos.x, pos.y);
+					int splash = goal.MapDistanceTo(pos);
 
 					if (splash) {
 						splash *= mtype.SplashFactor;

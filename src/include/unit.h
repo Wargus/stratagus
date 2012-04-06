@@ -727,15 +727,13 @@ public:
 	/**
 	 **  Returns the map distance to unit.
 	 **
-	 **  @param x     X map tile position.
-	 **  @param y     Y map tile position.
+	 **  @param pos   map tile position.
 	 **  @param dest  Distance to this unit.
 	 **
 	 **  @return      The distance between in tiles.
 	 */
-	int MapDistanceTo(int x, int y) const
+	int MapDistanceTo(const Vec2i &pos) const
 	{
-		const Vec2i pos = {x, y};
 		return MapDistanceToType(pos, *Type, this->tilePos);
 	}
 
