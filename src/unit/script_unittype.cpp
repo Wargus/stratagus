@@ -270,9 +270,9 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				value = LuaToString(l, -2);
 				if (!strcmp(value, "OffsetX")) {
-					b->OffsetX = LuaToNumber(l, -1);
+					b->Offset.x = LuaToNumber(l, -1);
 				} else if (!strcmp(value, "OffsetY")) {
-					b->OffsetY = LuaToNumber(l, -1);
+					b->Offset.y = LuaToNumber(l, -1);
 				} else if (!strcmp(value, "Type")) {
 					b->ParentName = LuaToString(l, -1);
 				} else {

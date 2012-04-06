@@ -798,14 +798,14 @@ enum DistanceTypeType {
 
 class CBuildRestriction {
 public:
-
-	virtual ~CBuildRestriction() {} ;
+	virtual ~CBuildRestriction() {}
 	virtual void Init() {};
-	virtual bool Check(const CUnitType &type, int x, int y, CUnit *&ontoptarget) const = 0;
+	virtual bool Check(const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const = 0;
 };
 
 
-class CBuildRestrictionAnd : public CBuildRestriction {
+class CBuildRestrictionAnd : public CBuildRestriction
+{
 public:
 
 	virtual ~CBuildRestrictionAnd() {
@@ -814,56 +814,61 @@ public:
 			delete *i;
 		}
 		_or_list.clear();
-	} ;
+	}
 	virtual void Init() {
 		for (std::vector<CBuildRestriction*>::const_iterator i = _or_list.begin();
 				i != _or_list.end(); ++i) {
 			(*i)->Init();
 		}
-	};
-	virtual bool Check(const CUnitType &type, int x, int y, CUnit *&ontoptarget) const;
-
-	void push_back(CBuildRestriction *restriction) {
-		_or_list.push_back(restriction);
 	}
+	virtual bool Check(const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 
+	void push_back(CBuildRestriction *restriction) { _or_list.push_back(restriction); }
+public:
 	std::vector<CBuildRestriction*> _or_list;
 };
 
 
 
-class CBuildRestrictionAddOn : public CBuildRestriction {
-	struct functor {
-		const CUnitType *const Parent;   /// building that is unit is an addon too.
-		const int x,y;	//functor work position
-		functor(const CUnitType *type, int _x, int _y): Parent(type), x(_x), y(_y) {}
+class CBuildRestrictionAddOn : public CBuildRestriction
+{
+	class functor
+	{
+	public:
+		functor(const CUnitType *type, const Vec2i &_pos): Parent(type), pos(_pos) {}
 		inline bool operator() (const CUnit *const unit) const;
+	private:
+		const CUnitType *const Parent;   /// building that is unit is an addon too.
+		const Vec2i pos; //functor work position
 	};
 public:
-	CBuildRestrictionAddOn() : OffsetX(0), OffsetY(0), Parent(NULL) {};
+	CBuildRestrictionAddOn() : Parent(NULL) { Offset.x = Offset.y = 0; };
 	virtual ~CBuildRestrictionAddOn() {};
 	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
-	virtual bool Check(const CUnitType &type, int x, int y, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 
-	int OffsetX;         /// offset from the main building to place this
-	int OffsetY;         /// offset from the main building to place this
+	Vec2i Offset;         /// offset from the main building to place this
 	std::string ParentName; /// building that is unit is an addon too.
 	CUnitType *Parent;   /// building that is unit is an addon too.
 };
 
-class CBuildRestrictionOnTop : public CBuildRestriction {
-	struct functor {
-		CUnit *ontop;   /// building that is unit is an addon too.
-		const CUnitType *const Parent;   /// building that is unit is an addon too.
-		const int x,y;	//functor work position
-		functor(const CUnitType *type, int _x, int _y): ontop(0), Parent(type), x(_x), y(_y) {}
+class CBuildRestrictionOnTop : public CBuildRestriction
+{
+	class functor
+	{
+	public:
+		functor(const CUnitType *type, const Vec2i &_pos): ontop(0), Parent(type), pos(_pos) {}
 		inline bool operator() (CUnit *const unit);
+		CUnit *ontop;   /// building that is unit is an addon too.
+	private:
+		const CUnitType *const Parent;   /// building that is unit is an addon too.
+		const Vec2i pos;  //functor work position
 	};
 public:
 	CBuildRestrictionOnTop() : Parent(NULL), ReplaceOnDie(0), ReplaceOnBuild(0) {};
 	virtual ~CBuildRestrictionOnTop() {};
 	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
-	virtual bool Check(const CUnitType &type, int x, int y, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 
 	std::string ParentName;  /// building that is unit is an addon too.
 	CUnitType *Parent;   /// building that is unit is an addon too.
@@ -876,7 +881,7 @@ public:
 	CBuildRestrictionDistance() : Distance(0), RestrictType(NULL) {};
 	virtual ~CBuildRestrictionDistance() {};
 	virtual void Init() {this->RestrictType = UnitTypeByIdent(this->RestrictTypeName);};
-	virtual bool Check(const CUnitType &type, int x, int y, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 
 	int Distance;        /// distance to build (circle)
 	DistanceTypeType DistanceType;
