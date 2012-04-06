@@ -56,7 +56,7 @@
 
 void CAnimation_Sound::MapSound()
 {
-	this->sound.Sound = SoundForName(this->sound.Name);
+	this->sound.MapSound();
 }
 
 //@}

@@ -486,72 +486,58 @@ void InitSoundClient()
 	// let's map game sounds, look if already setup in ccl.
 
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
-		if (!GameSounds.PlacementError[i].Sound
-			&& !GameSounds.PlacementError[i].Name.empty()) {
-			GameSounds.PlacementError[i].Sound =
-				SoundForName(GameSounds.PlacementError[i].Name);
+		if (!GameSounds.PlacementError[i].Sound) {
+			GameSounds.PlacementError[i].MapSound();
 		}
 	}
 
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
-		if (!GameSounds.PlacementSuccess[i].Sound
-			&& !GameSounds.PlacementSuccess[i].Name.empty()) {
-			GameSounds.PlacementSuccess[i].Sound =
-				SoundForName(GameSounds.PlacementSuccess[i].Name);
+		if (!GameSounds.PlacementSuccess[i].Sound) {
+			GameSounds.PlacementSuccess[i].MapSound();
 		}
 	}
 
-	if (!GameSounds.Click.Sound && !GameSounds.Click.Name.empty()) {
-		GameSounds.Click.Sound = SoundForName(GameSounds.Click.Name);
+	if (!GameSounds.Click.Sound) {
+		GameSounds.Click.MapSound();
 	}
-	if (!GameSounds.Docking.Sound && !GameSounds.Docking.Name.empty()) {
-		GameSounds.Docking.Sound = SoundForName(GameSounds.Docking.Name);
+	if (!GameSounds.Docking.Sound) {
+		GameSounds.Docking.MapSound();
 	}
 
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
-		if (!GameSounds.BuildingConstruction[i].Sound
-			&& !GameSounds.BuildingConstruction[i].Name.empty()) {
-			GameSounds.BuildingConstruction[i].Sound =
-				SoundForName(GameSounds.BuildingConstruction[i].Name);
+		if (!GameSounds.BuildingConstruction[i].Sound) {
+			GameSounds.BuildingConstruction[i].MapSound();
 		}
 	}
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
-		if (!GameSounds.WorkComplete[i].Sound
-			&& !GameSounds.WorkComplete[i].Name.empty()) {
-			GameSounds.WorkComplete[i].Sound =
-				SoundForName(GameSounds.WorkComplete[i].Name);
+		if (!GameSounds.WorkComplete[i].Sound) {
+			GameSounds.WorkComplete[i].MapSound();
 		}
 	}
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
-		if (!GameSounds.ResearchComplete[i].Sound
-			&& !GameSounds.ResearchComplete[i].Name.empty()) {
-			GameSounds.ResearchComplete[i].Sound =
-				SoundForName(GameSounds.ResearchComplete[i].Name);
+		if (!GameSounds.ResearchComplete[i].Sound) {
+			GameSounds.ResearchComplete[i].MapSound();
 		}
 	}
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
 		for (unsigned int j = 0; j < MaxCosts; ++j) {
-			if (!GameSounds.NotEnoughRes[i][j].Sound
-				&& !GameSounds.NotEnoughRes[i][j].Name.empty()) {
-				GameSounds.NotEnoughRes[i][j].Sound =
-					SoundForName(GameSounds.NotEnoughRes[i][j].Name);
+			if (!GameSounds.NotEnoughRes[i][j].Sound) {
+				GameSounds.NotEnoughRes[i][j].MapSound();
 			}
 		}
 	}
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
-		if (!GameSounds.NotEnoughFood[i].Sound
-			&& !GameSounds.NotEnoughFood[i].Name.empty()) {
-			GameSounds.NotEnoughFood[i].Sound =
-				SoundForName(GameSounds.NotEnoughFood[i].Name);
+		if (!GameSounds.NotEnoughFood[i].Sound) {
+			GameSounds.NotEnoughFood[i].MapSound();
 		}
 	}
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
-		if (!GameSounds.Rescue[i].Sound && !GameSounds.Rescue[i].Name.empty()) {
-			GameSounds.Rescue[i].Sound = SoundForName(GameSounds.Rescue[i].Name);
+		if (!GameSounds.Rescue[i].Sound) {
+			GameSounds.Rescue[i].MapSound();
 		}
 	}
-	if (!GameSounds.ChatMessage.Sound && !GameSounds.ChatMessage.Name.empty()) {
-		GameSounds.ChatMessage.Sound = SoundForName(GameSounds.ChatMessage.Name);
+	if (!GameSounds.ChatMessage.Sound) {
+		GameSounds.ChatMessage.MapSound();
 	}
 
 	int MapWidth = (UI.MapArea.EndX - UI.MapArea.X + PixelTileSize.x) / PixelTileSize.x;

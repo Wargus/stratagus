@@ -70,7 +70,7 @@
 void CAnimation_RandomSound::MapSound()
 {
 	for (size_t i = 0; i != this->sounds.size(); ++i) {
-		this->sounds[i].Sound = SoundForName(this->sounds[i].Name);
+		this->sounds[i].MapSound();
 	}
 }
 

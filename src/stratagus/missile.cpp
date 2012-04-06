@@ -1256,12 +1256,8 @@ void SaveMissiles(CFile &file)
 void MissileType::Init()
 {
 	// Resolve impact missiles and sounds.
-	if (!this->FiredSound.Name.empty()) {
-		this->FiredSound.Sound = SoundForName(this->FiredSound.Name);
-	}
-	if (!this->ImpactSound.Name.empty()) {
-		this->ImpactSound.Sound = SoundForName(this->ImpactSound.Name);
-	}
+	this->FiredSound.MapSound();
+	this->ImpactSound.MapSound();
 	this->ImpactMissile = MissileTypeByIdent(this->ImpactName);
 	this->SmokeMissile = MissileTypeByIdent(this->SmokeName);
 }

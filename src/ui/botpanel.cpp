@@ -159,8 +159,7 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 	ba->Description = descr;
 	ba->CommentSound.Name = sound;
 	if (!ba->CommentSound.Name.empty()) {
-		ba->CommentSound.Sound =
-			SoundForName(ba->CommentSound.Name);
+		ba->CommentSound.MapSound();
 	}
 	ba->ButtonCursor = cursor;
 	// FIXME: here should be added costs to the hint

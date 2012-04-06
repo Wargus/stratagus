@@ -745,7 +745,7 @@ static int CclDefineSpell(lua_State *l)
 		} else if (!strcmp(value, "sound-when-cast")) {
 			//  Free the old name, get the new one
 			spell->SoundWhenCast.Name = LuaToString(l, i + 1);
-			spell->SoundWhenCast.Sound = SoundForName(spell->SoundWhenCast.Name);
+			spell->SoundWhenCast.MapSound();
 			//  Check for sound.
 			if (!spell->SoundWhenCast.Sound) {
 				spell->SoundWhenCast.Name.clear();

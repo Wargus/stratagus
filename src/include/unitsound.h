@@ -57,6 +57,10 @@ public:
 	SoundConfig() : Sound(NULL) {}
 	SoundConfig(std::string name) : Name(name), Sound(NULL) {}
 
+	bool MapSound();
+	void SetSoundRange(unsigned char range);
+
+public:
 	std::string Name;     /// config sound name
 	CSound *Sound;        /// identifier send to sound server
 };
