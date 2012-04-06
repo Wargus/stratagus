@@ -738,17 +738,16 @@ void CMinimap::DrawCursor(int vx, int vy)
 /**
 **  Add a minimap event
 **
-**  @param x  Map X tile position
-**  @param y  Map Y tile position
+**  @param pos  Map tile position
 */
-void CMinimap::AddEvent(int x, int y, Uint32 color)
+void CMinimap::AddEvent(const Vec2i &pos, Uint32 color)
 {
 	if (NumMinimapEvents == MAX_MINIMAP_EVENTS) {
 		return;
 	}
 
-	MinimapEvents[NumMinimapEvents].X = X + XOffset + (x * MinimapScaleX) / MINIMAP_FAC;
-	MinimapEvents[NumMinimapEvents].Y = Y + YOffset + (y * MinimapScaleY) / MINIMAP_FAC;
+	MinimapEvents[NumMinimapEvents].X = X + XOffset + (pos.x * MinimapScaleX) / MINIMAP_FAC;
+	MinimapEvents[NumMinimapEvents].Y = Y + YOffset + (pos.y * MinimapScaleY) / MINIMAP_FAC;
 	MinimapEvents[NumMinimapEvents].Size = (W < H) ? W / 3 : H / 3;
 	MinimapEvents[NumMinimapEvents].Color = color;
 	++NumMinimapEvents;

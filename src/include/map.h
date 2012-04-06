@@ -619,7 +619,7 @@ private:
 	void FixTile(unsigned short type, int seen, const Vec2i &pos);
 
 	/// Regenerate the forest.
-	void RegenerateForestTile(int x, int y);
+	void RegenerateForestTile(const Vec2i &pos);
 
 
 public:

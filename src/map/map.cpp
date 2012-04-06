@@ -558,50 +558,49 @@ void CMap::ClearTile(unsigned short type, const Vec2i &pos)
 /**
 **  Regenerate forest.
 **
-**  @param x  X tile
-**  @param y  Y tile
+**  @param pos  Map tile pos
 */
-void CMap::RegenerateForestTile(int x, int y)
+void CMap::RegenerateForestTile(const Vec2i &pos)
 {
-	CMapField *mf = this->Field(x, y);
+	Assert(Map.Info.IsPointOnMap(pos));
+	CMapField &mf = *this->Field(pos);
 
-	if (mf->Tile != this->Tileset.RemovedTree) {
+	if (mf.Tile != this->Tileset.RemovedTree) {
 		return;
 	}
 
-	//
 	//  Increment each value of no wood.
 	//  If grown up, place new wood.
 	//  FIXME: a better looking result would be fine
 	//    Allow general updates to any tiletype that regrows
-	//
 
 	const unsigned int occupedFlag = (MapFieldWall | MapFieldUnpassable | MapFieldLandUnit | MapFieldBuilding);
-	if (mf->Value >= ForestRegeneration || ++mf->Value == ForestRegeneration) {
-		if (y && !(mf->Flags & occupedFlag)) {
-			CMapField *tmp = mf - this->Info.MapWidth;
-			if (tmp->Tile == this->Tileset.RemovedTree
-				&& tmp->Value >= ForestRegeneration
-				&& !(tmp->Flags & occupedFlag)) {
-				DebugPrint("Real place wood\n");
-				tmp->Tile = this->Tileset.TopOneTree;
-				tmp->Value = 0;
-				tmp->Flags |= MapFieldForest | MapFieldUnpassable;
+	++mf.Value;
+	if (mf.Value < ForestRegeneration) {
+		return;
+	}
+	mf.Value = ForestRegeneration;
+	if ((mf.Flags & occupedFlag) || pos.y == 0) {
+		return;
+	}
+	CMapField &topMf = *(&mf - this->Info.MapWidth);
+	if (topMf.Tile == this->Tileset.RemovedTree
+		&& topMf.Value >= ForestRegeneration
+		&& !(topMf.Flags & occupedFlag)) {
+		DebugPrint("Real place wood\n");
+		topMf.Tile = this->Tileset.TopOneTree;
+		topMf.Value = 0;
+		topMf.Flags |= MapFieldForest | MapFieldUnpassable;
 
-				mf->Tile = this->Tileset.BotOneTree;
-				mf->Value = 0;
-				mf->Flags |= MapFieldForest | MapFieldUnpassable;
-				Vec2i pos;
-				pos.x = x;
-				pos.y = y;
-				if (Map.IsFieldVisible(*ThisPlayer, pos)) {
-					MarkSeenTile(pos);
-				}
-				pos.y = y - 1;
-				if (Map.IsFieldVisible(*ThisPlayer, pos)) {
-					MarkSeenTile(pos);
-				}
-			}
+		mf.Tile = this->Tileset.BotOneTree;
+		mf.Value = 0;
+		mf.Flags |= MapFieldForest | MapFieldUnpassable;
+		if (Map.IsFieldVisible(*ThisPlayer, pos)) {
+			MarkSeenTile(pos);
+		}
+		const Vec2i offset = {0, -1};
+		if (Map.IsFieldVisible(*ThisPlayer, pos + offset)) {
+			MarkSeenTile(pos);
 		}
 	}
 }
@@ -614,10 +613,10 @@ void CMap::RegenerateForest()
 	if (!ForestRegeneration) {
 		return;
 	}
-
-	for (int y = 0; y < Info.MapHeight; ++y) {
-		for (int x = 0; x < Info.MapWidth; ++x) {
-			RegenerateForestTile(x, y);
+	Vec2i pos;
+	for (pos.y = 0; pos.y < Info.MapHeight; ++pos.y) {
+		for (pos.x = 0; pos.x < Info.MapWidth; ++pos.x) {
+			RegenerateForestTile(pos);
 		}
 	}
 }

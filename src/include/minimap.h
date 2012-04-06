@@ -61,7 +61,7 @@ public:
 	void Destroy();
 	void Draw(int vx, int vy);
 	void DrawCursor(int vx, int vy);
-	void AddEvent(int x, int y, Uint32 color);
+	void AddEvent(const Vec2i &pos, Uint32 color);
 
 	Vec2i ScreenToTilePos(const PixelPos& screenPos) const;
 	int Screen2MapX(int x) const;

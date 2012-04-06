@@ -1151,7 +1151,7 @@ void CPlayer::Notify(int type, const Vec2i &pos, const char *fmt, ...) const
 			break;
 		default: color = ColorWhite;
 	}
-	UI.Minimap.AddEvent(pos.x, pos.y, color);
+	UI.Minimap.AddEvent(pos, color);
 	if (this == ThisPlayer) {
 		SetMessageEvent(pos, "%s", temp);
 	} else {
