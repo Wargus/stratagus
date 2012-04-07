@@ -49,8 +49,8 @@ enum EIfVarBinOp {
 	IF_NOT_EQUAL,
 };
 
-bool binOpGeaterEqual(int lhs, int rhs) { return lhs >= rhs; }
-bool binOpGeater(int lhs, int rhs) { return lhs > rhs; }
+bool binOpGreaterEqual(int lhs, int rhs) { return lhs >= rhs; }
+bool binOpGreater(int lhs, int rhs) { return lhs > rhs; }
 bool binOpLessEqual(int lhs, int rhs) { return lhs <= rhs; }
 bool binOpLess(int lhs, int rhs) { return lhs < rhs; }
 bool binOpEqual(int lhs, int rhs) { return lhs == rhs; }
@@ -91,23 +91,23 @@ bool returnFalse(int , int) { return false; }
 	std::string op(str, begin, end - begin);
 
 	if (op == ">=") {
-		this->binOpFunc = binOpGeaterEqual;
+		this->binOpFunc = binOpGreaterEqual;
 	} else if (op == ">") {
-		this->binOpFunc = binOpGeater;
+		this->binOpFunc = binOpGreater;
 	} else if (op == "<=") {
 		this->binOpFunc = binOpLessEqual;
 	} else if (op == "<") {
 		this->binOpFunc = binOpLess;
 	} else if (op == "==") {
-		this->binOpFunc = binOpNotEqual;
+		this->binOpFunc = binOpEqual;
 	} else if (op == "!=") {
 		this->binOpFunc = binOpNotEqual;
 	} else {
 		EIfVarBinOp type = static_cast<EIfVarBinOp>(atoi(op.c_str()));
 
 		switch (type) {
-			case IF_GREATER_EQUAL: this->binOpFunc = binOpGeaterEqual; break;
-			case IF_GREATER: this->binOpFunc = binOpGeater; break;
+			case IF_GREATER_EQUAL: this->binOpFunc = binOpGreaterEqual; break;
+			case IF_GREATER: this->binOpFunc = binOpGreater; break;
 			case IF_LESS_EQUAL: this->binOpFunc = binOpLessEqual; break;
 			case IF_LESS: this->binOpFunc = binOpLess; break;
 			case IF_EQUAL: this->binOpFunc = binOpEqual; break;

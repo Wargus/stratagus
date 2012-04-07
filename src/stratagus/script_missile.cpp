@@ -41,10 +41,10 @@
 #include "video.h"
 #include "tileset.h"
 #include "unittype.h"
+#include "unit.h"
 #include "missile.h"
 #include "script_sound.h"
 #include "script.h"
-#include "unit.h"
 #include "unit_manager.h"
 #include "particle.h"
 #include "luacallback.h"
@@ -270,14 +270,16 @@ static int CclMissile(lua_State *l)
 			missile->Delay = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "source")) {
 			Assert(missile);
-			value = LuaToString(l, j + 1);
-			missile->SourceUnit = UnitSlots[strtol(value + 1, 0, 16)];
-			missile->SourceUnit->RefsIncrease();
+			++j;
+			lua_rawgeti(l, -1, j + 1);
+			missile->SourceUnit = CclGetUnitFromRef(l);
+			lua_pop(l, 1);
 		} else if (!strcmp(value, "target")) {
 			Assert(missile);
-			value = LuaToString(l, j + 1);
-			missile->TargetUnit = UnitSlots[strtol(value + 1, 0, 16)];
-			missile->TargetUnit->RefsIncrease();
+			++j;
+			lua_rawgeti(l, -1, j + 1);
+			missile->TargetUnit = CclGetUnitFromRef(l);
+			lua_pop(l, 1);
 		} else if (!strcmp(value, "damage")) {
 			Assert(missile);
 			missile->Damage = LuaToNumber(l, j + 1);

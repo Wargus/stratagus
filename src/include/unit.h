@@ -782,6 +782,11 @@ public:
 		return unit;
 	}
 
+	operator CUnit *() const 
+	{
+		return unit;
+	}
+
 	CUnit & operator*() {
 		return *unit;
 	}

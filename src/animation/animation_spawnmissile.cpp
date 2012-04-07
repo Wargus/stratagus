@@ -149,11 +149,9 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 		Missile *missile = MakeMissile(*MissileTypeByIdent(this->missileTypeStr.c_str()), start, dest);
 		if (flags & ANIM_SM_DAMAGE) {
 			missile->SourceUnit = &unit;
-			unit.RefsIncrease();
 		}
 		if (flags & ANIM_SM_TOTARGET) {
 			missile->TargetUnit = goal->CurrentOrder()->GetGoal();
-			goal->CurrentOrder()->GetGoal()->RefsIncrease();
 		}
 	}
 }

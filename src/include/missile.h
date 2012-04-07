@@ -435,10 +435,10 @@ public:
 	int State;        /// state
 	int AnimWait;     /// Animation wait.
 	int Wait;         /// delay between frames
-	int Delay;        /// delay to showup
+	int Delay;        /// delay to show up
 
-	CUnit *SourceUnit;  /// unit that fires (could be killed)
-	CUnit *TargetUnit;  /// target unit, used for spells
+	CUnitPtr SourceUnit;  /// unit that fires (could be killed)
+	CUnitPtr TargetUnit;  /// target unit, used for spells
 
 	int Damage;  /// direct damage that missile applies
 

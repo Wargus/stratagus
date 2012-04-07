@@ -21,6 +21,7 @@ class CPlayer
 	void SetStartView(const Vec2i &pos);
 
 	int Resources[MaxCosts];
+	int StoredResources[MaxCosts];
 	int Incomes[MaxCosts];
 	const int Revenue[MaxCosts];
 

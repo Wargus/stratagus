@@ -926,10 +926,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 
 	// Update resource.
 	const int rindex = resinfo.FinalResource;
-	player.Resources[rindex] += (unit.ResourcesHeld * player.Incomes[rindex]) / 100;
-	if (player.MaxResources[rindex] != -1) {
-		player.Resources[rindex] = std::min(player.Resources[rindex], player.MaxResources[rindex]);
-	}
+	player.ChangeResource(rindex, (unit.ResourcesHeld * player.Incomes[rindex]) / 100, true);
 	player.TotalResources[rindex] += (unit.ResourcesHeld * player.Incomes[rindex]) / 100;
 	unit.ResourcesHeld = 0;
 	unit.CurrentResource = 0;

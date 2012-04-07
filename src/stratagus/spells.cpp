@@ -160,7 +160,6 @@ int SpawnPortal::Cast(CUnit &caster, const SpellType *, CUnit *, const Vec2i &go
 	}
 	//  Goal is used to link to destination circle of power
 	caster.Goal = portal;
-	portal->RefsIncrease();
 	//FIXME: setting destination circle of power should use mana
 	return 0;
 }
@@ -259,7 +258,6 @@ int AreaBombardment::Cast(CUnit &caster, const SpellType *, CUnit *, const Vec2i
 			// FIXME: not correct -- blizzard should continue even if mage is
 			//    destroyed (though it will be quite short time...)
 			mis->SourceUnit = &caster;
-			caster.RefsIncrease();
 		}
 	}
 	return 1;
@@ -322,14 +320,11 @@ int SpawnMissile::Cast(CUnit &caster, const SpellType *, CUnit *target, const Ve
 	if (this->UseUnitVar) {
 		missile->Damage = 0;
 		missile->SourceUnit = &caster;
-		caster.RefsIncrease();
 	} else if (missile->Damage != 0) {
 		missile->SourceUnit = &caster;
-		caster.RefsIncrease();
 	}
-	if ((missile->TargetUnit = target)) {
-		target->RefsIncrease();
-	}
+	missile->TargetUnit = target;
+	
 	return 1;
 }
 

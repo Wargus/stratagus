@@ -102,7 +102,7 @@ struct lua_State;
 class COrder
 {
 public:
-	explicit COrder(int action) : Goal(NULL), Action(action), Finished(false)
+	explicit COrder(int action) : Goal(), Action(action), Finished(false)
 	{
 	}
 	virtual ~COrder();
@@ -126,7 +126,7 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput& input) = 0;
 
 	bool HasGoal() const { return Goal != NULL; }
-	CUnit * GetGoal() const { return Goal; };
+	CUnitPtr GetGoal() const { return Goal; };
 	void SetGoal(CUnit *const new_goal);
 	void ClearGoal();
 
@@ -160,7 +160,7 @@ protected:
 	void UpdatePathFinderData_NotCalled(PathFinderInput& input);
 
 private:
-	CUnit *Goal;
+	CUnitPtr Goal;
 public:
 	const unsigned char Action;   /// global action
 	bool Finished; /// true when order is finish

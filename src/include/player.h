@@ -77,8 +77,9 @@ public:
 
 	inline void SetStartView(const Vec2i &pos) { StartPos = pos; }
 
-	int Resources[MaxCosts];      /// resources in store
+	int Resources[MaxCosts];      /// resources in overall store
 	int MaxResources[MaxCosts];   /// max resources can be stored
+	int StoredResources[MaxCosts];/// resources in store buildings (can't exceed MaxResources)
 	int LastResources[MaxCosts];  /// last values for revenue
 	int Incomes[MaxCosts];        /// income of the resources
 	int Revenue[MaxCosts];        /// income rate of the resources
@@ -129,8 +130,14 @@ public:
 	void AddUnit(CUnit& unit);
 	void RemoveUnit(CUnit& unit);
 
+	/// Get a resource of the player
+	int GetResource(int resource, int type);
+	/// Adds/subtracts some resources to/from the player store
+	void ChangeResource(int resource, int value, bool store = false);
 	/// Set a resource of the player
-	void SetResource(int resource, int value);
+	void SetResource(int resource, int value, bool store = false);
+	/// Check, if there enough resources for action.
+	bool CheckResource(int resource, int value);
 
 	/// Check if the unit-type didn't break any unit limits and supply/demand
 	int CheckLimits(const CUnitType &type) const;

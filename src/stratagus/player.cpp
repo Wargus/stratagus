@@ -447,6 +447,11 @@ void CPlayer::Save(CFile &file) const
 	for (int j = 0; j < MaxCosts; ++j) {
 		file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.Resources[j]);
 	}
+	// Stored Resources
+	file.printf("  \"stored-resources\", {");
+	for (int j = 0; j < MaxCosts; ++j) {
+		file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.StoredResources[j]);
+	}
 	// Max Resources
 	file.printf("},\n  \"max-resources\", {");
 	for (int j = 0; j < MaxCosts; ++j) {
@@ -713,6 +718,7 @@ void CPlayer::Clear()
 	StartPos.x = 0;
 	StartPos.y = 0;
 	memset(Resources, 0, sizeof(Resources));
+	memset(StoredResources, 0, sizeof(StoredResources));
 	memset(MaxResources, 0, sizeof(MaxResources));
 	memset(LastResources, 0, sizeof(LastResources));
 	memset(Incomes, 0, sizeof(Incomes));
@@ -803,18 +809,79 @@ int CPlayer::GetUnitCount() const
 ----------------------------------------------------------------------------*/
 
 /**
+**  Gets the player resource.
+**
+**  @param resource  Resource to get.
+**  @param store     Resource type to get
+**		
+**  @note Resource types: 0 - overall store, 1 - store buildings, 2 - both
+*/
+int CPlayer::GetResource(int resource, int type)
+{
+	switch (type) {
+		case 0: 
+			return this->Resources[resource];
+		case 1:
+			return this->StoredResources[resource];
+		case 2:
+			return this->Resources[resource] + this->StoredResources[resource];
+		default:
+			DebugPrint("Wrong resource type\n");
+			return -1;
+	}
+}
+
+/**
+**  Adds/subtracts some resources to/from the player store
+**
+**  @param resource  Resource to add/subtract.
+**  @param value     How many of this resource (can be negative).
+**  @param store     If true, sets the building store resources, else the overall resources.
+*/
+void CPlayer::ChangeResource(int resource, int value, bool store)
+{
+	if (value < 0) {
+		int fromStore = std::min(this->StoredResources[resource], abs(value));
+		this->StoredResources[resource] -= fromStore;
+		this->Resources[resource] -= abs(value) - fromStore;
+	} else {
+		if (store && this->MaxResources[resource] != -1) {
+			this->StoredResources[resource] += std::min(value, this->MaxResources[resource] - this->StoredResources[resource]);
+		} else {
+			this->Resources[resource] += value;
+		} 
+	}
+}
+
+/**
 **  Change the player resource.
 **
 **  @param resource  Resource to change.
 **  @param value     How many of this resource.
+**  @param store     If true, sets the building store resources, else the overall resources.
 */
-void CPlayer::SetResource(int resource, int value)
+void CPlayer::SetResource(int resource, int value, bool store)
 {
-	if (this->MaxResources[resource] != -1) {
-		this->Resources[resource] = std::min(value, this->MaxResources[resource]);
+	if (store && this->MaxResources[resource] != -1) {
+		this->StoredResources[resource] = std::min(value, this->MaxResources[resource]);
 	} else {
 		this->Resources[resource] = value;
 	}
+}
+
+/**
+**  Check, if there enough resources for action.
+**
+**  @param resource  Resource to change.
+**  @param value     How many of this resource.
+*/
+bool CPlayer::CheckResource(int resource, int value)
+{
+	int result = this->Resources[resource];
+	if (this->MaxResources[resource] != -1) {
+		result += this->StoredResources[resource];
+	}
+	return result < value ? false : true;
 }
 
 /**
@@ -873,7 +940,7 @@ int CPlayer::CheckCosts(const int *costs) const
 {
 	int err = 0;
 	for (int i = 1; i < MaxCosts; ++i) {
-		if (this->Resources[i] >= costs[i]) {
+		if (this->Resources[i] + this->StoredResources[i] >= costs[i]) {
 			continue;
 		}
 		const char *name = DefaultResourceNames[i].c_str();
@@ -909,7 +976,7 @@ int CPlayer::CheckUnitType(const CUnitType &type) const
 void CPlayer::AddCosts(const int *costs)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
-		SetResource(i, Resources[i] + costs[i]);
+		ChangeResource(i, costs[i], false);
 	}
 }
 
@@ -932,7 +999,7 @@ void CPlayer::AddUnitType(const CUnitType &type)
 void CPlayer::AddCostsFactor(const int *costs, int factor)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
-		SetResource(i, this->Resources[i] + costs[i] * factor / 100);
+		ChangeResource(i, costs[i] * factor / 100, true);
 	}
 }
 
@@ -944,7 +1011,7 @@ void CPlayer::AddCostsFactor(const int *costs, int factor)
 void CPlayer::SubCosts(const int *costs)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
-		SetResource(i, this->Resources[i] - costs[i]);
+		ChangeResource(i, -costs[i], true);
 	}
 }
 
@@ -967,7 +1034,7 @@ void CPlayer::SubUnitType(const CUnitType &type)
 void CPlayer::SubCostsFactor(const int *costs, int factor)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
-		SetResource(i, this->Resources[i] - costs[i] * 100 / factor);
+		ChangeResource(i, -costs[i] * 100 / factor);
 	}
 }
 
@@ -1034,9 +1101,9 @@ void PlayersEachSecond(int playerIdx)
 
 	if ((GameCycle / CYCLES_PER_SECOND) % 10 == 0) {
 		for (int res = 0; res < MaxCosts; ++res) {
-			player.Revenue[res] = player.Resources[res] - player.LastResources[res];
+			player.Revenue[res] = player.Resources[res] + player.StoredResources[res] - player.LastResources[res];
 			player.Revenue[res] *= 6;  // estimate per minute
-			player.LastResources[res] = player.Resources[res];
+			player.LastResources[res] = player.Resources[res] + player.StoredResources[res];
 		}
 	}
 	if (player.AiEnabled) {

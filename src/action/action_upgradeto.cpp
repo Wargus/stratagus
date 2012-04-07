@@ -116,7 +116,7 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (player.MaxResources[i] != -1) {
 			player.MaxResources[i] += newtype._Storing[i] - oldtype._Storing[i];
-			player.SetResource(i, player.Resources[i]);
+			player.SetResource(i, player.Resources[i], true);
 		}
 	}
 

@@ -68,6 +68,14 @@ int GetPlayerData(int player, const char *prop, const char *arg)
 			Exit(1);
 		}
 		return Players[player].Resources[resId];
+	} else if (!strcmp(prop, "StoredResources")) {
+
+		const int resId = GetResourceIdByName(arg);
+		if (resId == -1) {
+			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			Exit(1);
+		}
+		return Players[player].StoredResources[resId];
 	} else if (!strcmp(prop, "MaxResources")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
@@ -133,6 +141,13 @@ static void SetPlayerData(int player, const char *prop, const char *arg, int val
 			Exit(1);
 		}
 		Players[player].SetResource(resId, value);
+	} else if (!strcmp(prop, "StoredResources")) {
+		const int resId = GetResourceIdByName(arg);
+		if (resId == -1) {
+			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			Exit(1);
+		}
+		Players[player].SetResource(resId, value, true);
 	} else if (!strcmp(prop, "UnitLimit")) {
 		Players[player].UnitLimit = value;
 	} else if (!strcmp(prop, "BuildingLimit")) {

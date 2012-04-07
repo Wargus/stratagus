@@ -781,8 +781,9 @@ void DrawResources()
 			const int resourceAmount = ThisPlayer->Resources[i];
 
 			if (ThisPlayer->MaxResources[i] != -1) {
+				const int storedAmount = ThisPlayer->StoredResources[i];
 				char tmp[128];
-				snprintf(tmp, sizeof(tmp), "%d/%d", resourceAmount, ThisPlayer->MaxResources[i]);
+				snprintf(tmp, sizeof(tmp), "%d/%d (%d)", storedAmount, ThisPlayer->MaxResources[i], resourceAmount);
 				label.SetFont(GetSmallFont());
 
 				label.Draw(UI.Resources[i].TextX, UI.Resources[i].TextY + 3, tmp);

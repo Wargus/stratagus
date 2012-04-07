@@ -147,7 +147,7 @@ MissileType *NewMissileTypeSlot(const std::string &ident)
 */
 Missile::Missile() :
 	Type(NULL), SpriteFrame(0), State(0), AnimWait(0), Wait(0),
-	Delay(0), SourceUnit(NULL), TargetUnit(NULL), Damage(0),
+	Delay(0), SourceUnit(), TargetUnit(), Damage(0),
 	TTL(-1), Hidden(0),
 	CurrentStep(0), TotalStep(0),
 	Local(0)
@@ -278,17 +278,8 @@ Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, co
 */
 static void FreeMissile(std::vector<Missile *> &missiles, std::vector<Missile *>::size_type i)
 {
-	CUnit *unit;
 	Missile *missile = missiles[i];
-	//
-	// Release all unit references.
-	//
-	if ((unit = missile->SourceUnit)) {
-		unit->RefsDecrease();
-	}
-	if ((unit = missile->TargetUnit)) {
-		unit->RefsDecrease();
-	}
+
 	for (std::vector<Missile *>::iterator j = missiles.begin(); j != missiles.end(); ++j) {
 		if (*j == missile) {
 			missiles.erase(j);
@@ -452,10 +443,8 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 	//
 	if (goal) {
 		missile->TargetUnit = goal;
-		goal->RefsIncrease();
 	}
 	missile->SourceUnit = &unit;
-	unit.RefsIncrease();
 }
 
 /**
@@ -584,9 +573,9 @@ void MissileDrawProxy::operator=(const Missile *missile)
 void Missile::DrawMissile(const CViewport &vp) const
 {
 	Assert(this->Type);
-
+	CUnit *sunit = this->SourceUnit;
 	// FIXME: I should copy SourcePlayer for second level missiles.
-	if (this->SourceUnit && this->SourceUnit->Player) {
+	if (sunit && sunit->Player) {
 #ifdef DYNAMIC_LOAD
 		if (!this->Type->Sprite) {
 			LoadMissileSprite(this->Type);
@@ -835,9 +824,9 @@ static int ParabolicMissile(Missile &missile)
 **  @param goal     Goal of the missile.
 **  @param splash   Splash damage divisor.
 */
-static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
+static void MissileHitsGoal(Missile &missile, CUnit &goal, int splash)
 {
-	if (!missile.Type->CanHitOwner && &goal == missile.SourceUnit) {
+	if (!missile.Type->CanHitOwner && missile.SourceUnit == &goal) {
 		return;
 	}
 
@@ -933,7 +922,6 @@ static void MissileHit(Missile &missile)
 			//
 			CUnit &goal = *missile.TargetUnit;
 			if (goal.Destroyed) {  // Destroyed
-				goal.RefsDecrease();
 				missile.TargetUnit = NoUnitP;
 				return;
 			}
@@ -1212,12 +1200,12 @@ void Missile::SaveMissile(CFile &file) const
 	file.printf(", \"goal\", ");
 	SavePixelPos(file, this->destination);
 	file.printf(",\n  \"frame\", %d, \"state\", %d, \"anim-wait\", %d, \"wait\", %d, \"delay\", %d,\n ",
-				this->SpriteFrame, this->State, this->AnimWait, this->Wait, this->Delay);
-	if (this->SourceUnit) {
-		file.printf(" \"source\", \"%s\",", UnitReference(*this->SourceUnit).c_str());
+		this->SpriteFrame, this->State, this->AnimWait, this->Wait, this->Delay);
+	if ((CUnitPtr)this->SourceUnit) {
+		file.printf(" \"source\", \"%s\",", UnitReference(this->SourceUnit).c_str());
 	}
-	if (this->TargetUnit) {
-		file.printf(" \"target\", \"%s\",", UnitReference(*this->TargetUnit).c_str());
+	if ((CUnitPtr)this->TargetUnit) {
+		file.printf(" \"target\", \"%s\",", UnitReference(this->TargetUnit).c_str());
 	}
 	file.printf(" \"damage\", %d,", this->Damage);
 	file.printf(" \"ttl\", %d,", this->TTL);

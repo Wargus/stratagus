@@ -102,9 +102,10 @@ static int AiCheckCosts(const int *costs)
 
 	int err = 0;
 	const int *resources = AiPlayer->Player->Resources;
+	const int *storedresources = AiPlayer->Player->StoredResources;
 	const int *reserve = AiPlayer->Reserve;
 	for (int i = 1; i < MaxCosts; ++i) {
-		if (resources[i] - used[i] < costs[i] - reserve[i]) {
+		if (resources[i] + storedresources[i] - used[i] < costs[i] - reserve[i]) {
 			err |= 1 << i;
 		}
 	}
@@ -1296,7 +1297,7 @@ static void AiCheckRepair()
 			//
 			for (int j = 1; j < MaxCosts; ++j) {
 				if (unit.Stats->Costs[j]
-					&& AiPlayer->Player->Resources[j] < 99) {
+					&& (AiPlayer->Player->Resources[j] + AiPlayer->Player->StoredResources[j])  < 99) {
 					repair_flag = false;
 					break;
 				}
@@ -1328,7 +1329,7 @@ static void AiCheckRepair()
 				// Make sure we have enough resources first
 				for (j = 0; j < MaxCosts; ++j) {
 					// FIXME: the resources don't necessarily have to be in storage
-					if (AiPlayer->Player->Resources[j] < unit.Stats->Costs[j]) {
+					if (AiPlayer->Player->Resources[j] + AiPlayer->Player->StoredResources[j] < unit.Stats->Costs[j]) {
 						break;
 					}
 				}

@@ -82,28 +82,16 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 
 COrder::~COrder()
 {
-	if (Goal) {
-		Goal->RefsDecrease();
-		Goal = NoUnitP;
-	}
+	Goal = NoUnitP;
 }
 
 void COrder::SetGoal(CUnit *const new_goal)
 {
-	if (new_goal) {
-		new_goal->RefsIncrease();
-	}
-	if (Goal) {
-		Goal->RefsDecrease();
-	}
 	Goal = new_goal;
 }
 
 void COrder::ClearGoal()
 {
-	if (Goal) {
-		Goal->RefsDecrease();
-	}
 	Goal = NULL;
 }
 

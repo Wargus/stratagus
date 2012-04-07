@@ -188,6 +188,30 @@ void CPlayer::Load(lua_State *l)
 				this->Resources[resId] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			}
+		} else if (!strcmp(value, "stored-resources")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_objlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, j + 1, k + 1);
+				value = LuaToString(l, -1);
+				lua_pop(l, 1);
+				++k;
+
+				int i;
+				for (i = 0; i < MaxCosts; ++i) {
+					if (!strcmp(value, DefaultResourceNames[i].c_str())) {
+						lua_rawgeti(l, j + 1, k + 1);
+						this->StoredResources[i] = LuaToNumber(l, -1);
+						lua_pop(l, 1);
+						break;
+					}
+				}
+				if (i == MaxCosts) {
+					LuaError(l, "Unsupported tag: %s" _C_ value);
+				}
+			}
 		} else if (!strcmp(value, "max-resources")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -702,6 +726,13 @@ static int CclGetPlayerData(lua_State *l)
 		const int resId = GetResourceIdByName(l, res.c_str());
 		lua_pushnumber(l, p->Resources[resId]);
 		return 1;
+	} else if (!strcmp(data, "StoredResources")) {
+		LuaCheckArgs(l, 3);
+
+		const std::string res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res.c_str());
+		lua_pushnumber(l, p->StoredResources[resId]);
+		return 1;
 	} else if (!strcmp(data, "MaxResources")) {
 		LuaCheckArgs(l, 3);
 
@@ -810,12 +841,18 @@ static int CclSetPlayerData(lua_State *l)
 		const std::string res = LuaToString(l, 3);
 		const int resId = GetResourceIdByName(l, res.c_str());
 		p->SetResource(resId, LuaToNumber(l, 4));
-		// } else if (!strcmp(data, "UnitTypesCount")) {
-		// } else if (!strcmp(data, "AiEnabled")) {
-		// } else if (!strcmp(data, "TotalNumUnits")) {
-		// } else if (!strcmp(data, "NumBuildings")) {
-		// } else if (!strcmp(data, "Supply")) {
-		// } else if (!strcmp(data, "Demand")) {
+	} else if (!strcmp(data, "StoredResources")) {
+		LuaCheckArgs(l, 4);
+
+		const std::string res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res.c_str());
+		p->SetResource(resId, LuaToNumber(l, 4), true);
+// } else if (!strcmp(data, "UnitTypesCount")) {
+// } else if (!strcmp(data, "AiEnabled")) {
+// } else if (!strcmp(data, "TotalNumUnits")) {
+// } else if (!strcmp(data, "NumBuildings")) {
+// } else if (!strcmp(data, "Supply")) {
+// } else if (!strcmp(data, "Demand")) {
 	} else if (!strcmp(data, "UnitLimit")) {
 		p->UnitLimit = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "BuildingLimit")) {

@@ -232,6 +232,8 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 
 	if (goal) {
 		if (goal->IsAlive() == false) {
+			this->ClearGoal();
+			this->goalPos = goal->tilePos;
 			return false;
 		}
 		if (goal == attacker) {
@@ -282,8 +284,6 @@ bool COrder_Attack::CheckForDeadGoal(CUnit &unit)
 	this->MinRange = 0;
 	this->Range = 0;
 	this->ClearGoal();
-	this->Finished = true;
-	this->State = 0;
 
 	// If we have a saved order continue this saved order.
 	if (unit.RestoreOrder()) {
@@ -390,7 +390,8 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			return;
 		}
 		// Attacking wall or ground.
-		if (!goal && (Map.WallOnMap(this->goalPos) || this->Action == UnitActionAttackGround)
+		if (((goal && goal->Type && goal->Type->Wall) || ((!goal) 
+			&& (Map.WallOnMap(this->goalPos) || this->Action == UnitActionAttackGround)))
 			&& unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 			// Reached wall or ground, now attacking it
 			unit.State = 0;
@@ -584,8 +585,6 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 
 		case WEAK_TARGET:
 			DebugPrint("FIXME: wrong entry.\n");
-			this->Finished = true;
-			unit.State = 0;
 			break;
 	}
 }

@@ -2744,12 +2744,6 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 	if (!damage) {
 		return;
 	}
-	// Units with 0 hp can't be hit
-	if (target.Variable[HP_INDEX].Value == 0) {
-		return;
-	}
-
-	Assert(damage != 0 && target.CurrentAction() != UnitActionDie && !target.Type->Vanishes);
 
 	if (target.Variable[UNHOLYARMOR_INDEX].Value > 0 || target.Type->Indestructible) {
 		// vladi: units with active UnholyArmour are invulnerable
@@ -2759,6 +2753,9 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		DebugPrint("Removed target hit\n");
 		return;
 	}
+
+	Assert(damage != 0 && target.CurrentAction() != UnitActionDie && !target.Type->Vanishes);
+
 	if (GodMode) {
 		if (attacker && attacker->Player == ThisPlayer) {
 			damage = target.Variable[HP_INDEX].Value;
@@ -2810,7 +2807,8 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 	}
 
 	if ((target.Variable[HP_INDEX].Value <= damage && attacker && attacker->Type->ShieldPiercing) ||
-		(target.Variable[HP_INDEX].Value <= damage - target.Variable[SHIELD_INDEX].Value)) { // unit is killed or destroyed
+		(target.Variable[HP_INDEX].Value <= damage - target.Variable[SHIELD_INDEX].Value) ||
+		(target.Variable[HP_INDEX].Value == 0)) { // unit is killed or destroyed
 		//  increase scores of the attacker, but not if attacking it's own units.
 		//  prevents cheating by killing your own units.
 		if (attacker && target.IsEnemy(*attacker)) {
@@ -2894,7 +2892,6 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 			const PixelDiff offset = {0, -PixelTileSize.y};
 			Missile *missile = MakeMissile(*fire, targetPixelCenter + offset, targetPixelCenter + offset);
 
-			target.RefsIncrease();
 			missile->SourceUnit = &target;
 			target.Burning = 1;
 		}
@@ -2909,7 +2906,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 
 	// Attack units in range (which or the attacker?)
 	if (attacker && target.IsAgressive() && target.CanMove()) {
-		if (target.CurrentAction() != UnitActionStill && !target.Player->AiEnabled) {
+		if (target.CurrentAction() != UnitActionStill) {
 			return;
 		}
 		CUnit *goal;

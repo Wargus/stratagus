@@ -176,7 +176,7 @@ bool SubRepairCosts(const CUnit &unit, CPlayer &player, CUnit &goal)
 						 (goal.CurrentAction() == UnitActionBuilt ? ResourcesMultiBuildersMultiplier : 1);
 	}
 	for (int i = 1; i < MaxCosts; ++i) {
-		if (player.Resources[i] < RepairCosts[i]) {
+		if (player.CheckResource(i, RepairCosts[i])) {
 			player.Notify(NotifyYellow, unit.tilePos,
 						  _("We need more %s for repair!"), DefaultResourceNames[i].c_str());
 			return true;
