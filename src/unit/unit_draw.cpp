@@ -702,11 +702,8 @@ void ShowOrder(const CUnit &unit)
 **
 **  @todo FIXME: The different styles should become a function call.
 */
-static void DrawInformations(const CUnit &unit, const CUnitType *type, int x, int y)
+static void DrawInformations(const CUnit &unit, const CUnitType &type, int x, int y)
 {
-	const CUnitStats *stats;
-	int r;
-
 #if 0 && DEBUG // This is for showing vis counts and refs.
 	char buf[10];
 	sprintf(buf, "%d%c%c%d", unit.VisCount[ThisPlayer->Index],
@@ -716,43 +713,48 @@ static void DrawInformations(const CUnit &unit, const CUnitType *type, int x, in
 	CLabel(GetSmallFont()).Draw(x + 10, y + 10, buf);
 #endif
 
-	stats = unit.Stats;
+	const CUnitStats &stats = *unit.Stats;
 
 	//
 	// For debug draw sight, react and attack range!
 	//
 	if (NumSelected == 1 && unit.Selected) {
+		const PixelPos center = {x + type.TileWidth * PixelTileSize.x / 2,
+								 y + type.TileHeight * PixelTileSize.y / 2};
+
 		if (Preference.ShowSightRange) {
-			// Radius -1 so you can see all ranges
-			Video.DrawCircleClip(ColorGreen,
-								 x + type->TileWidth * PixelTileSize.x / 2,
-								 y + type->TileHeight * PixelTileSize.y / 2,
-								 ((stats->Variables[SIGHTRANGE_INDEX].Max + (type->TileWidth - 1)) * PixelTileSize.x) - 1);
+			const int value = stats.Variables[SIGHTRANGE_INDEX].Max;
+			const int radius = value * PixelTileSize.x + (type.TileWidth - 1) * PixelTileSize.x / 2;
+
+			if (value) {
+				// Radius -1 so you can see all ranges
+				Video.DrawCircleClip(ColorGreen, center.x, center.y, radius - 1);
+			}
 		}
-		if (type->CanAttack) {
+		if (type.CanAttack) {
 			if (Preference.ShowReactionRange) {
-				r = (unit.Player->Type == PlayerPerson) ?
-					type->ReactRangePerson : type->ReactRangeComputer;
-				if (r) {
-					Video.DrawCircleClip(ColorBlue,
-										 x + type->TileWidth * PixelTileSize.x / 2,
-										 y + type->TileHeight * PixelTileSize.y / 2,
-										 (r + (type->TileWidth - 1)) * PixelTileSize.x);
+				const int value = (unit.Player->Type == PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
+				const int radius = value * PixelTileSize.x + (type.TileWidth - 1) * PixelTileSize.x / 2;
+
+				if (value) {
+					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius);
 				}
 			}
-			if (Preference.ShowAttackRange && stats->Variables[ATTACKRANGE_INDEX].Max) {
-				// Radius + 1 so you can see all ranges
-				Video.DrawCircleClip(ColorRed,
-									 x + type->TileWidth * PixelTileSize.x / 2,
-									 y + type->TileHeight * PixelTileSize.y / 2,
-									 (stats->Variables[ATTACKRANGE_INDEX].Max + (type->TileWidth - 1)) * PixelTileSize.x + 1);
+			if (Preference.ShowAttackRange) {
+				const int value = stats.Variables[ATTACKRANGE_INDEX].Max;
+				const int radius = value * PixelTileSize.x + (type.TileWidth - 1) * PixelTileSize.x / 2;
+
+				if (value) {
+					// Radius +1 so you can see all ranges
+					Video.DrawCircleClip(ColorGreen, center.x, center.y, radius - 1);
+				}
 			}
 		}
 	}
 
 	// FIXME: johns: ugly check here, should be removed!
 	if (unit.CurrentAction() != UnitActionDie && unit.IsVisible(*ThisPlayer)) {
-		DrawDecoration(unit, type, x, y);
+		DrawDecoration(unit, &type, x, y);
 	}
 }
 
@@ -1024,7 +1026,7 @@ void CUnit::Draw(const CViewport *vp) const
 	}
 
 	// Unit's extras not fully supported.. need to be decorations themselves.
-	DrawInformations(*this, type, x, y);
+	DrawInformations(*this, *type, x, y);
 }
 
 void CUnitDrawProxy::operator=(const CUnit *unit)
