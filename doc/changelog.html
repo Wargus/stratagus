@@ -19,7 +19,7 @@
 ----    02111-1307, USA.
 -->
 
-    <title>ChangeLog: Stratagus Version 2.2.5.5</title>
+    <title>ChangeLog: Stratagus Version 2.2.6</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 
@@ -43,6 +43,31 @@
 
 
 <ul>
+<p/>
+	<li>trunk</li>
+	<ul>
+	<li>Fix bug #909454: compile errorson OpenBSD. (from Pali Rohár)</li>
+	<li>Fix compilation for maemo. (from Pali Rohár)</li>
+	<li>Fix bug #910078: worker unable to do anything after building structure. (patch from Neil Tan)</li>
+	<li>Fix bug #912904: Fix pathfinfing problem with unit near of goal. (patch from Neil Tan)</li>
+	<li>Fix bug #911062: Fix segfault. (patch from Neil Tan)</li>
+	<li>Fix bug #841133: Fix Action resource and DeassignWorkerFromMine. (from Joris Dauphin)</li>
+	<li>Fix some regression in pathFinding. (from Joris Dauphin)</li>
+	<li>Rearchitecturing of COrder and CAnimation. (from Joris Dauphin)</li>
+	<li>Add DefineDefaultResourceMaxAmounts() to define max value per resource. Add "Storing" in UnitType to increase MaxResourceAmount (from Cybermind)</li>
+	<li>New unitType flag:"Wall" which create "connection" with its neighboors. (from Cybermind)</li>
+	<li>New unitType flag:"NonSolid" for unit which don't forbid other unit to be in the same place. (from Cybermind)</li>
+	<li>New missile class "missile-class-treacer" which seek towards its target. (from Cybermind)</li>
+	<li>New missile class "missile-class-clip-to-target" which is clipped to the target, then animate once before deal the damege. (from Cybermind)</li>
+	<li>Add parameter "use-unit-var" to "spawn-missile" spell to use caster's damage. (from Cybermind)</li>
+	<li>Rework animation parser to have access to some variables. (from Cybermind)</li>
+	<li>Add impact by type. (from Cybermind)</li>
+	<li>Add "AlwaysFire" flag to missile to shoot even if target is dead.(from Cybermind)</li>
+	<li>Fix some saving issues.(from Joris Dauphin)</li>
+	<li>Activate AutocastSpell for non moving unit. (from Cybermind)</li>
+	<li>Disable buggy multithreading support. (from Pali Rohár)</li>
+	</ul>
+
 <p><li>2.2.6 Released<p>
 	<ul>
 	<li>Changed directory structure for CMake, DoxyGen and platform code (from Pali Rohár)
