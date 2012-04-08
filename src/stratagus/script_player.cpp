@@ -199,18 +199,10 @@ void CPlayer::Load(lua_State *l)
 				lua_pop(l, 1);
 				++k;
 
-				int i;
-				for (i = 0; i < MaxCosts; ++i) {
-					if (!strcmp(value, DefaultResourceNames[i].c_str())) {
-						lua_rawgeti(l, j + 1, k + 1);
-						this->StoredResources[i] = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-						break;
-					}
-				}
-				if (i == MaxCosts) {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
+				const int resId = GetResourceIdByName(l, value);
+				lua_rawgeti(l, j + 1, k + 1);
+				this->StoredResources[resId] = LuaToNumber(l, -1);
+				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "max-resources")) {
 			if (!lua_istable(l, j + 1)) {

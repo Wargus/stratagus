@@ -824,7 +824,7 @@ static int ParabolicMissile(Missile &missile)
 **  @param goal     Goal of the missile.
 **  @param splash   Splash damage divisor.
 */
-static void MissileHitsGoal(Missile &missile, CUnit &goal, int splash)
+static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 {
 	if (!missile.Type->CanHitOwner && missile.SourceUnit == &goal) {
 		return;
@@ -1201,10 +1201,10 @@ void Missile::SaveMissile(CFile &file) const
 	SavePixelPos(file, this->destination);
 	file.printf(",\n  \"frame\", %d, \"state\", %d, \"anim-wait\", %d, \"wait\", %d, \"delay\", %d,\n ",
 		this->SpriteFrame, this->State, this->AnimWait, this->Wait, this->Delay);
-	if ((CUnitPtr)this->SourceUnit) {
+	if (this->SourceUnit != NULL) {
 		file.printf(" \"source\", \"%s\",", UnitReference(this->SourceUnit).c_str());
 	}
-	if ((CUnitPtr)this->TargetUnit) {
+	if (this->TargetUnit != NULL) {
 		file.printf(" \"target\", \"%s\",", UnitReference(this->TargetUnit).c_str());
 	}
 	file.printf(" \"damage\", %d,", this->Damage);
