@@ -448,7 +448,7 @@ void CPlayer::Save(CFile &file) const
 		file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.Resources[j]);
 	}
 	// Stored Resources
-	file.printf("  \"stored-resources\", {");
+	file.printf("},\n  \"stored-resources\", {");
 	for (int j = 0; j < MaxCosts; ++j) {
 		file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.StoredResources[j]);
 	}
@@ -813,13 +813,13 @@ int CPlayer::GetUnitCount() const
 **
 **  @param resource  Resource to get.
 **  @param store     Resource type to get
-**		
+**
 **  @note Resource types: 0 - overall store, 1 - store buildings, 2 - both
 */
 int CPlayer::GetResource(int resource, int type)
 {
 	switch (type) {
-		case 0: 
+		case 0:
 			return this->Resources[resource];
 		case 1:
 			return this->StoredResources[resource];
@@ -849,7 +849,7 @@ void CPlayer::ChangeResource(int resource, int value, bool store)
 			this->StoredResources[resource] += std::min(value, this->MaxResources[resource] - this->StoredResources[resource]);
 		} else {
 			this->Resources[resource] += value;
-		} 
+		}
 	}
 }
 
