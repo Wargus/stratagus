@@ -270,14 +270,12 @@ static int CclMissile(lua_State *l)
 			missile->Delay = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "source")) {
 			Assert(missile);
-			++j;
-			lua_rawgeti(l, -1, j + 1);
+			lua_pushvalue(l, j + 1);
 			missile->SourceUnit = CclGetUnitFromRef(l);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "target")) {
 			Assert(missile);
-			++j;
-			lua_rawgeti(l, -1, j + 1);
+			lua_pushvalue(l, j + 1);
 			missile->TargetUnit = CclGetUnitFromRef(l);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "damage")) {
