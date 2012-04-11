@@ -420,6 +420,10 @@ static int CclUnit(lua_State *l)
 			lua_rawgeti(l, 2, j + 1);
 			unit->Direction = LuaToNumber(l, -1);
 			lua_pop(l, 1);
+		} else if (!strcmp(value, "damage-type")) {
+			lua_rawgeti(l, 2, j + 1);
+			unit->DamagedType = LuaToNumber(l, -1);
+			lua_pop(l, 1);
 		} else if (!strcmp(value, "attacked")) {
 			lua_rawgeti(l, 2, j + 1);
 			// FIXME : unsigned long should be better handled

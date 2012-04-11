@@ -165,6 +165,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf("\"not-seen\", ");
 	}
 	file.printf("\"direction\", %d,\n  ", unit.Direction);
+	file.printf("\"damage-type\", %d,", unit.DamagedType);
 	file.printf("\"attacked\", %lu,\n ", unit.Attacked);
 	file.printf(" \"current-sight-range\", %d,", unit.CurrentSightRange);
 	if (unit.Burning) {

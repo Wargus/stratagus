@@ -535,8 +535,6 @@ static int CclDefineAnimations(lua_State *l)
 		AnimationMap[name] = anims;
 	}
 
-	int res = -1;
-	int death = ANIMATIONS_DEATHTYPES;
 	lua_pushnil(l);
 	while (lua_next(l, 2)) {
 		const char *value = LuaToString(l, -2);
@@ -547,7 +545,7 @@ static int CclDefineAnimations(lua_State *l)
 			anims->Still = ParseAnimation(l, -1);
 		} else if (!strncmp(value, "Death", 5)) {
 			if (strlen(value) > 5) {
-				death = ExtraDeathIndex(value + 6);
+				const int death = ExtraDeathIndex(value + 6);
 				if (death == ANIMATIONS_DEATHTYPES) {
 					anims->Death[ANIMATIONS_DEATHTYPES] = ParseAnimation(l, -1);
 				} else {
@@ -573,7 +571,7 @@ static int CclDefineAnimations(lua_State *l)
 		} else if (!strcmp(value, "Build")) {
 			anims->Build = ParseAnimation(l, -1);
 		} else if (!strncmp(value, "Harvest_", 8)) {
-			res = GetResourceIdByName(l, value + 8);
+			const int res = GetResourceIdByName(l, value + 8);
 			anims->Harvest[res] = ParseAnimation(l, -1);
 		} else {
 			LuaError(l, "Unsupported animation: %s" _C_ value);
@@ -583,14 +581,16 @@ static int CclDefineAnimations(lua_State *l)
 	// Must add to array in a fixed order for save games
 	AddAnimationToArray(anims->Start);
 	AddAnimationToArray(anims->Still);
-	AddAnimationToArray(anims->Death[death]);
+	for (int i = 0; i != ANIMATIONS_DEATHTYPES + 1; ++i) {
+		AddAnimationToArray(anims->Death[i]);
+	}
 	AddAnimationToArray(anims->Attack);
 	AddAnimationToArray(anims->SpellCast);
 	AddAnimationToArray(anims->Move);
 	AddAnimationToArray(anims->Repair);
 	AddAnimationToArray(anims->Train);
-	if (res != -1) {
-		AddAnimationToArray(anims->Harvest[res]);
+	for (int i = 0; i != MaxCosts; ++i) {
+		AddAnimationToArray(anims->Harvest[i]);
 	}
 	return 0;
 }
