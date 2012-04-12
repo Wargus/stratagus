@@ -73,7 +73,7 @@ int MouseButtons;                            /// Current pressed mouse buttons
 
 int KeyModifiers;                            /// Current keyboard modifiers
 
-CUnitPtr UnitUnderCursor;                    /// Unit under cursor
+CUnit *UnitUnderCursor;                    /// Unit under cursor
 int ButtonAreaUnderCursor = -1;              /// Button area under cursor
 int ButtonUnderCursor = -1;                  /// Button under cursor
 bool GameMenuButtonClicked;                  /// Menu button was clicked
@@ -129,12 +129,12 @@ void DoRightButton(int sx, int sy)
 	//
 	flush = !(KeyModifiers & ModifierShift);
 
-	CUnitPtr dest_lock(UnitUnderCursor);// just in case
+	CUnit *dest_lock = UnitUnderCursor;// just in case
 	if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->Decoration) {
 		dest = UnitUnderCursor;
 	} else {
 		dest = NULL;
-		dest_lock.Reset();
+		dest_lock = NoUnitP;
 	}
 
 	//
@@ -843,7 +843,7 @@ void UIHandleMouseMove(int x, int y)
 		return;
 	}
 
-	UnitUnderCursor.Reset();
+	UnitUnderCursor = NoUnitP;
 	GameCursor = UI.Point.Cursor;  // Reset
 	HandleMouseOn(x, y);
 
@@ -905,7 +905,7 @@ void UIHandleMouseMove(int x, int y)
 	// NOTE: If unit is not selectable as a goal, you can't get a cursor hint
 	if (UnitUnderCursor != NULL && !UnitUnderCursor->IsVisibleAsGoal(*ThisPlayer) &&
 		!ReplayRevealMap) {
-		UnitUnderCursor.Reset();
+		UnitUnderCursor = NoUnitP;
 	}
 
 	//
@@ -1617,7 +1617,7 @@ void UIHandleButtonDown(unsigned button)
 		}
 
 		if (MouseButtons & UI.PieMenu.MouseButton) { // enter pie menu
-			UnitUnderCursor.Reset();
+			UnitUnderCursor = NoUnitP;
 			GameCursor = UI.Point.Cursor;  // Reset
 			CursorStartX = CursorX;
 			CursorStartY = CursorY;

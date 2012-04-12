@@ -738,9 +738,6 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 						DoTogglePause = false;
 						UiTogglePause();
 					}
-					if (UseOpenGL) {
-						RegenerateScreen = true;
-					}
 				}
 			}
 			break;

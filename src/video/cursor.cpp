@@ -387,7 +387,7 @@ void CleanCursors()
 
 	CursorBuilding = NULL;
 	GameCursor = NULL;
-	UnitUnderCursor.Reset();
+	UnitUnderCursor = NoUnitP;
 }
 
 //@}

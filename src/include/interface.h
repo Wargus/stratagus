@@ -217,7 +217,7 @@ extern int MouseScrollState;
 	/// current key state
 extern enum _key_state_ KeyState;
 	/// shared pointer to unit under the cursor
-extern CUnitPtr UnitUnderCursor;
+extern CUnit *UnitUnderCursor;
 	/// button area under the cursor
 extern int ButtonAreaUnderCursor;
 	/// button number under the cursor

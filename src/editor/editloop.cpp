@@ -1843,7 +1843,7 @@ static void EditorCallbackMouse(int x, int y)
 	//
 	// Map
 	//
-	UnitUnderCursor.Reset();
+	UnitUnderCursor = NoUnitP;
 	if (x >= UI.MapArea.X && x <= UI.MapArea.EndX
 		&& y >= UI.MapArea.Y && y <= UI.MapArea.EndY) {
 		CViewport *vp = GetViewport(x, y);

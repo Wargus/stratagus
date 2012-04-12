@@ -99,15 +99,10 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 	const int destx = ParseAnimInt(&unit, this->destXStr.c_str());
 	const int desty = ParseAnimInt(&unit, this->destYStr.c_str());
 	const int flags = ParseAnimFlags(unit, this->flagsStr.c_str());
-	CUnit *goal;
+	const CUnit *goal = flags & ANIM_SM_RELTARGET ? unit.CurrentOrder()->GetGoal(): &unit;
 	PixelPos start;
 	PixelPos dest;
 
-	if ((flags & ANIM_SM_RELTARGET)) {
-		goal = unit.CurrentOrder()->GetGoal();
-	} else {
-		goal = &unit;
-	}
 	if (!goal || goal->Destroyed || goal->Removed) {
 		return;
 	}
@@ -119,7 +114,7 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 		start.y = (goal->tilePos.y + starty) * PixelTileSize.y + PixelTileSize.y / 2;
 	}
 	if ((flags & ANIM_SM_TOTARGET)) {
-		CUnit *target = goal->CurrentOrder()->GetGoal();
+		const CUnit *target = goal->CurrentOrder()->GetGoal();
 		Assert(goal->CurrentAction() == UnitActionAttack);
 		if (!target  || target->Destroyed || target->Removed) {
 			return;

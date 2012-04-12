@@ -910,7 +910,7 @@ void CUnit::Remove(CUnit *host)
 
 	// Unit is seen as under cursor
 	if (UnitUnderCursor == this) {
-		UnitUnderCursor.Reset();
+		UnitUnderCursor = NoUnitP;
 	}
 }
 

@@ -280,6 +280,9 @@ static void FreeMissile(std::vector<Missile *> &missiles, std::vector<Missile *>
 {
 	Missile *missile = missiles[i];
 
+	missile->TargetUnit.Reset();
+	missile->SourceUnit.Reset();
+
 	for (std::vector<Missile *>::iterator j = missiles.begin(); j != missiles.end(); ++j) {
 		if (*j == missile) {
 			missiles.erase(j);

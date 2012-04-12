@@ -415,7 +415,7 @@ void CleanGame()
 	CleanReplayLog();
 	FreePathfinder();
 	CursorBuilding = NULL;
-	UnitUnderCursor.Reset();
+	UnitUnderCursor = NoUnitP;
 }
 
 static void ExpandPath(std::string &newpath, const std::string &path)

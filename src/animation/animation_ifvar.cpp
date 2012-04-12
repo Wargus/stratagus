@@ -84,10 +84,6 @@ bool returnFalse(int , int) { return false; }
 
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));
-	this->rightVar.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
 	std::string op(str, begin, end - begin);
 
 	if (op == ">=") {
@@ -115,6 +111,11 @@ bool returnFalse(int , int) { return false; }
 			default: this->binOpFunc = returnFalse; break;
 		}
 	}
+
+	begin = std::min(len, str.find_first_not_of(' ', end));
+	end = std::min(len, str.find(' ', begin));
+	this->rightVar.assign(str, begin, end - begin);
+
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));
 	std::string label(str, begin, end - begin);

@@ -1520,7 +1520,7 @@ static void DrawInfoPanelSingleSelected()
 */
 static void DrawInfoPanelNoneSelected()
 {
-	CUnitPtr lock(UnitUnderCursor);
+	CUnit *lock = UnitUnderCursor;
 	// Check if a unit is under the cursor
 	if (lock != NULL && lock->IsVisible(*ThisPlayer)) {
 		DrawUnitInfo(*lock);

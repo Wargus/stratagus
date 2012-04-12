@@ -796,7 +796,7 @@ public:
 	}
 
 	CUnitPtr& operator= (CUnit *u) {
-        if (this->unit != u) {
+    	if (this->unit != u) {
         	if (u) {
         		u->RefsIncrease();
         	}

@@ -82,7 +82,7 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 
 COrder::~COrder()
 {
-	Goal = NoUnitP;
+	Goal.Reset();
 }
 
 void COrder::SetGoal(CUnit *const new_goal)
@@ -92,7 +92,7 @@ void COrder::SetGoal(CUnit *const new_goal)
 
 void COrder::ClearGoal()
 {
-	Goal = NULL;
+	Goal.Reset();
 }
 
 void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
@@ -386,7 +386,7 @@ static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 
 #ifdef DEBUG_LOG
 
-static void DumpUnitInfo()
+static void DumpUnitInfo(CUnit &unit)
 {
 	// Dump the unit to find the network sync bugs.
 	static FILE *logf = NULL;
@@ -412,7 +412,7 @@ static void DumpUnitInfo()
 			unit.State,
 			!unit.Orders.empty() ? unit.CurrentAction() : -1,
 			unit.Player ? unit.Player->Index : -1, unit.Refs, SyncRandSeed,
-			unit.X, unit.Y, unit.IX, unit.IY);
+			unit.tilePos.x, unit.tilePos.y, unit.IX, unit.IY);
 #if 0
 	SaveUnit(unit, logf);
 #endif
@@ -437,7 +437,7 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 			AnimationDie_OnCatch(unit);
 		}
 #ifdef DEBUG_LOG
-		DumpUnitInfo();
+		DumpUnitInfo(unit);
 #endif
 		// Calculate some hash.
 		SyncHash = (SyncHash << 5) | (SyncHash >> 27);
