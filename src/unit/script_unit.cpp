@@ -708,20 +708,19 @@ static int CclMoveUnit(lua_State *l)
 */
 static int CclCreateUnit(lua_State *l)
 {
-	CUnitType *unittype;
-	CUnit *unit;
-	int playerno;
-	Vec2i ipos;
-
 	LuaCheckArgs(l, 3);
 
 	lua_pushvalue(l, 1);
-	unittype = CclGetUnitType(l);
+	CUnitType *unittype = CclGetUnitType(l);
+	if (unittype == NULL) {
+		LuaError(l, "Bad unittype");
+	}
 	lua_pop(l, 1);
 	if (!lua_istable(l, 3) || lua_objlen(l, 3) != 2) {
 		LuaError(l, "incorrect argument !!");
 	}
 	lua_rawgeti(l, 3, 1);
+	Vec2i ipos;
 	ipos.x = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 	lua_rawgeti(l, 3, 2);
@@ -729,7 +728,7 @@ static int CclCreateUnit(lua_State *l)
 	lua_pop(l, 1);
 
 	lua_pushvalue(l, 2);
-	playerno = TriggerGetPlayer(l);
+	const int playerno = TriggerGetPlayer(l);
 	lua_pop(l, 1);
 	if (playerno == -1) {
 		printf("CreateUnit: You cannot use \"any\" in create-unit, specify a player\n");
@@ -741,8 +740,7 @@ static int CclCreateUnit(lua_State *l)
 		LuaError(l, "bad player");
 		return 0;
 	}
-
-	unit = MakeUnit(*unittype, &Players[playerno]);
+	CUnit *unit = MakeUnit(*unittype, &Players[playerno]);
 	if (unit == NoUnitP) {
 		DebugPrint("Unable to allocate unit");
 		return 0;
