@@ -160,6 +160,8 @@ int ParseAnimInt(const CUnit *unit, const char *parseint)
 		if (index == -1) {
 			if (!strcmp(cur, "ResourcesHeld")) {
 				return goal->ResourcesHeld;
+			} else if (!strcmp(cur, "ResourceActive")) {
+				return goal->Resource.Active;
 			}
 			fprintf(stderr, "Bad variable name '%s'\n", cur);
 			Exit(1);

@@ -608,10 +608,6 @@ int COrder_Resource::GatherResource(CUnit &unit)
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
 	int addload;
 
-	if (!resinfo.HarvestFromOutside && unit.Container != NULL) {
-		UnitShowAnimation(*unit.Container, unit.Container->Type->Animations->Harvest[unit.CurrentResource]);
-	}
-
 	if (resinfo.HarvestFromOutside || resinfo.TerrainHarvester) {
 		AnimateActionHarvest(unit);
 	} else {
