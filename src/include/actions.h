@@ -31,13 +31,9 @@
 #define __ACTIONS_H__
 
 //@{
-#ifndef __UNIT_H__
-#include "unit.h"
-#endif
 
-#ifndef __VEC2I_H__
+#include "unitptr.h"
 #include "vec2i.h"
-#endif
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -94,6 +90,7 @@ class CUnitType;
 class CUpgrade;
 class PathFinderInput;
 class SpellType;
+class CViewport;
 struct lua_State;
 
 /**
@@ -165,6 +162,9 @@ public:
 	const unsigned char Action;   /// global action
 	bool Finished; /// true when order is finish
 };
+
+typedef COrder* COrderPtr;
+
 
 /*----------------------------------------------------------------------------
 --  Variables

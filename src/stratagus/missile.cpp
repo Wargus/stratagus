@@ -38,30 +38,22 @@
 #include <string.h>
 #include <math.h>
 
-
 #include "stratagus.h"
 
-#include <vector>
-#include <string>
-#include <map>
+#include "missile.h"
 
-#include "video.h"
+#include "actions.h"
 #include "font.h"
-#include "tileset.h"
+#include "iolib.h"
+#include "luacallback.h"
 #include "map.h"
+#include "player.h"
+#include "sound.h"
+#include "trigger.h"
+#include "ui.h"
+#include "unit.h"
 #include "unitsound.h"
 #include "unittype.h"
-#include "player.h"
-#include "unit.h"
-#include "missile.h"
-#include "sound.h"
-#include "ui.h"
-#include "actions.h"
-#include "iolib.h"
-
-#include "util.h"
-#include "trigger.h"
-#include "luacallback.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations

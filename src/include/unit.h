@@ -348,22 +348,26 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CAnimation;
+class CBuildRestrictionOnTop;
+class CConstructionFrame;
+class CFile;
 class COrder;
-class CUnit;
-class CUnitType;
-class CUnitStats;
 class CPlayer;
+class CUnit;
+class CUnitColors;
+class CUnitPtr;
+class CUnitStats;
+class CUnitType;
+class CUpgrade;
+class CVariable;
+class CViewport;
 class PathFinderData;
 class SpellType;
-class CUnitColors;
-class CConstructionFrame;
-class CVariable;
-class CUpgrade;
-class CBuildRestrictionOnTop;
-class CFile;
 struct lua_State;
-class CViewport;
-class CAnimation;
+
+typedef COrder* COrderPtr;
+
 
 	/// Called whenever the selected unit was updated
 extern void SelectedUnitChanged();
@@ -748,75 +752,6 @@ public:
 	int GetDrawLevel() const;
 
 	PixelPos GetMapPixelPosCenter() const;
-};
-
-typedef COrder* COrderPtr;
-
-class CUnitPtr {
-	CUnit *unit;
-public:
-
-	void Reset() {
-		if (unit) {
-			unit->RefsDecrease();
-		}
-		unit = NULL;
-	}
-
-	CUnitPtr() : unit(NULL) {}
-	CUnitPtr(CUnit *u) : unit(u) {
-		if (unit) {
-			unit->RefsIncrease();
-		}
-	}
-	CUnitPtr(const CUnitPtr &u) : unit(u.unit) {
-		if (unit) {
-			unit->RefsIncrease();
-		}
-	}
-	~CUnitPtr() {
-		Reset();
-	}
-
-	operator CUnit *() {
-		return unit;
-	}
-
-	operator CUnit *() const 
-	{
-		return unit;
-	}
-
-	CUnit & operator*() {
-		return *unit;
-	}
-	CUnit *operator->() const
-	{
-		return unit;
-	}
-
-	CUnitPtr& operator= (CUnit *u) {
-    	if (this->unit != u) {
-        	if (u) {
-        		u->RefsIncrease();
-        	}
-			if (unit) {
-				unit->RefsDecrease();
-			}
-            unit = u;
-        }
-        return *this;
-    }
-
-	bool operator== (CUnit *u) const
-	{
-        return this->unit == u;
-	}
-	bool operator!= (CUnit *u) const
-	{
-        return this->unit != u;
-	}
-
 };
 
 class CUnitDrawProxy {

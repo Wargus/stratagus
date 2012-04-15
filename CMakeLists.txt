@@ -261,6 +261,7 @@ set(unit_SRCS
 	src/unit/unit_find.cpp
 	src/unit/unit_manager.cpp
 	src/unit/unit_save.cpp
+	src/unit/unitptr.cpp
 	src/unit/unittype.cpp
 	src/unit/upgrade.cpp
 )
@@ -464,9 +465,10 @@ set(stratagus_generic_HDRS
 	src/include/translate.h
 	src/include/trigger.h
 	src/include/ui.h
-	src/include/unit_cache.h
 	src/include/unit.h
+	src/include/unit_cache.h
 	src/include/unit_manager.h
+	src/include/unitptr.h
 	src/include/unitsound.h
 	src/include/unittype.h
 	src/include/upgrade.h
