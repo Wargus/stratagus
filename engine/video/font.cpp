@@ -317,8 +317,18 @@ static void VideoDrawChar(const CGraphic *g,
 	int gx, int gy, int w, int h, int x, int y)
 {
 	if (!UseOpenGL) {
-		SDL_Rect srect = {gx, gy, w, h};
-		SDL_Rect drect = {x, y, 0, 0};
+		SDL_Rect srect = {
+			static_cast<Sint16>(gx),
+			static_cast<Sint16>(gy),
+			static_cast<Uint16>(w),
+			static_cast<Uint16>(h)
+		};
+		SDL_Rect drect = {
+			static_cast<Sint16>(x),
+			static_cast<Sint16>(y),
+			0, // SDL_BlitSurface ignores the width and height.
+			0
+		};
 
 		SDL_SetColors(g->Surface, FontColor->Colors, 0, MaxFontColors);
 		SDL_BlitSurface(g->Surface, &srect, TheScreen, &drect);

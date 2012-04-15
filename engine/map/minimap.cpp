@@ -491,7 +491,12 @@ static void DrawEvents()
 void CMinimap::Draw(int vx, int vy)
 {
 	if (!UseOpenGL) {
-		SDL_Rect drect = {X, Y, 0, 0};
+		SDL_Rect drect = {
+			static_cast<Sint16>(X),
+			static_cast<Sint16>(Y),
+			0, // SDL_BlitSurface ignores the width and height.
+			0
+		};
 		SDL_BlitSurface(MinimapSurface, NULL, TheScreen, &drect);
 	} else {
 		glBindTexture(GL_TEXTURE_2D, MinimapTexture);

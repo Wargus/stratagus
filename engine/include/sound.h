@@ -122,7 +122,7 @@ public:
 */
 struct Origin {
 	const void *Base;   /// pointer on a Unit
-	unsigned Id;        /// unique identifier (if the pointer has been shared)
+	int Id;        /// unique identifier (if the pointer has been shared)
 };
 
 
