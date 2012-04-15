@@ -132,8 +132,8 @@ def Check(b, lib=None, header='', function='', name=''):
 
 def pkgconfig(b, package):
     try:
-        b.cflags += shell('pkg-config', '--cflags', package).strip().split()
-        b.ldflags += shell('pkg-config', '--libs', package).strip().split()
+        b.cflags += shell('pkg-config', '--cflags', package).decode().strip().split()
+        b.ldflags += shell('pkg-config', '--libs', package).decode().strip().split()
     except ExecutionError as e:
         return False
     return True
