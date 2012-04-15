@@ -302,10 +302,10 @@ void DrawCursor(void)
 		}
 
 		SDL_Rect srcRect = {
-			CursorX - GameCursor->HotX,
-			CursorY - GameCursor->HotY,
-			GameCursor->G->getWidth(),
-			GameCursor->G->getHeight()
+			static_cast<Sint16>(CursorX - GameCursor->HotX),
+			static_cast<Sint16>(CursorY - GameCursor->HotY),
+			static_cast<Uint16>(GameCursor->G->getWidth()),
+			static_cast<Uint16>(GameCursor->G->getHeight())
 		};
 		SDL_BlitSurface(TheScreen, &srcRect, HiddenSurface, NULL);
 	}
@@ -328,8 +328,8 @@ void HideCursor(void)
 {
 	if (!UseOpenGL && !GameRunning && !Editor.Running && !PatchEditorRunning && GameCursor) {
 		SDL_Rect dstRect = {
-			CursorX - GameCursor->HotX,
-			CursorY - GameCursor->HotY,
+			static_cast<Sint16>(CursorX - GameCursor->HotX),
+			static_cast<Sint16>(CursorY - GameCursor->HotY),
 			0,
 			0
 		};
