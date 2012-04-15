@@ -126,8 +126,18 @@ void CGraphic::DrawClip(int x, int y) const
 void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y) const
 {
 	if (!UseOpenGL) {
-		SDL_Rect srect = {gx, gy, w, h};
-		SDL_Rect drect = {x, y, 0, 0};
+		SDL_Rect srect = {
+			static_cast<Sint16>(gx),
+			static_cast<Sint16>(gy),
+			static_cast<Uint16>(w),
+			static_cast<Uint16>(h)
+		};
+		SDL_Rect drect = {
+			static_cast<Sint16>(x),
+			static_cast<Sint16>(y),
+			0, // SDL_BlitSurface ignores the width and height.
+			0
+		};
 
 		SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
 	} else {
