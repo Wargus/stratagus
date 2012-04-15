@@ -406,7 +406,12 @@ void SaveUnit(const CUnit *unit, CFile *file)
 	for (i = 0; i < NumAnimations; ++i) {
 		if (AnimationsArray[i] == unit->Anim.CurrAnim) {
 			file->printf("\"curr-anim\", %d,", i);
-			file->printf("\"anim\", %d,", unit->Anim.Anim - unit->Anim.CurrAnim);
+			// The cast from ptrdiff_t to int will not
+			// overflow because the array of animation
+			// frames was converted from a Lua list
+			// and lua_objlen returns int.
+			file->printf("\"anim\", %d,",
+				     static_cast<int>(unit->Anim.Anim - unit->Anim.CurrAnim));
 			break;
 		}
 	}
