@@ -246,7 +246,7 @@ def parallel_run(commands, jobs=2, builder=default_builder):
            builder.store_deps(command, deps, outputs)
 
 def runall(commands, jobs=None):
-    jobs= jobs or main.options.jobs
+    jobs= jobs or int(main.options.jobs)
     if jobs > 1:
         parallel_run(commands)
     else:
