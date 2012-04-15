@@ -1041,7 +1041,7 @@ def main(globals_dict=None, build_dir=None, extra_options=None):
                 printerr('%r command not defined!' % action)
                 sys.exit(1)
     except ExecutionError as exc:
-        message, data, status = exc
+        message, data, status = exc.args
         printerr('fabricate: ' + message)
     finally:
         if not options.quiet and os.path.abspath(build_dir) != original_path:
