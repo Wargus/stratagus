@@ -146,7 +146,7 @@ def shell(*args, **kwargs):
         "input" is a string to pass standard input into the process (or the
             default of None to use parent's stdin, eg: the keyboard)
         "silent" is True (default) to return process's standard output as a
-            string, or False to print it as it comes out
+            byte sequence, or False to print it as it comes out
         "shell" set to True will run the command via the shell (/bin/sh or
             COMSPEC) instead of running the command directly (the default)
 
