@@ -19,13 +19,7 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# This script is currently compatible with Python 2, not Python 3.
-# Feb uses an operating system where "python" is Python 3 and
-# "python2" is Python 2.  However, the #! line of this script must not
-# specify "python2" because the official Python 2.7 sources do not
-# install such a binary and e.g. Debian squeeze doesn't have one.
-# Instead, the #! line specifies /bin/sh, and the following embedded
-# shell script then tries to find a suitable version of Python.
+# This script is compatible with both Python 2 and Python 3.
 
 import os
 import glob
