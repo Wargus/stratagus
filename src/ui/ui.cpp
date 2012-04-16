@@ -108,6 +108,22 @@ CUserInterface::CUserInterface() :
 	ReverseFontColor = "yellow";
 }
 
+/**
+**  Get popup class pointer by string identifier.
+**
+**  @param ident  Popup identifier.
+**
+**  @return       popup class pointer.
+*/
+CPopup *PopupByIdent(const std::string &ident)
+{
+	for (std::vector<CPopup *>::iterator i = UI.ButtonPopups.begin(); i < UI.ButtonPopups.end(); ++i) {
+		if ((*i)->Ident == ident) {
+			return *i;
+		}
+	}
+	return NULL;
+}
 
 /**
 **  Initialize the user interface.
@@ -160,7 +176,7 @@ void CUserInterface::Load()
 		Fillers[i].Load();
 	}
 
-	for (int i = 0; i <= ScoreCost; ++i) {
+	for (int i = 0; i <= ManaResCost; ++i) {
 		if (Resources[i].G) {
 			Resources[i].G->Load();
 			Resources[i].G->UseDisplayFormat();
@@ -246,7 +262,7 @@ void CleanUserInterface()
 	UI.Fillers.clear();
 
 	// Resource Icons
-	for (int i = 0; i <= ScoreCost; ++i) {
+	for (int i = 0; i <= ManaResCost; ++i) {
 		CGraphic::Free(UI.Resources[i].G);
 	}
 
@@ -257,6 +273,13 @@ void CleanUserInterface()
 		delete *panel;
 	}
 	UI.InfoPanelContents.clear();
+
+	// Button Popups
+	for (std::vector<CPopup *>::iterator popup = UI.ButtonPopups.begin();
+		popup != UI.ButtonPopups.end(); ++popup) {
+			delete *popup;
+	}
+	UI.ButtonPopups.clear();
 
 	delete UI.SingleSelectedButton;
 	UI.SelectedButtons.clear();

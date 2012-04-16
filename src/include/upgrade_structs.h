@@ -72,6 +72,7 @@ enum CostType {
 
 #define FoodCost MaxCosts
 #define ScoreCost (MaxCosts + 1)
+#define ManaResCost (MaxCosts + 2)
 
 /**
 **  Speed factor for harvesting resources

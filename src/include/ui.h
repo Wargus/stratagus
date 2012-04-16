@@ -514,6 +514,120 @@ public:
 	}
 };
 
+/// Popup System
+
+class PopupConditionPanel {
+public:
+	PopupConditionPanel() :  BoolFlags(NULL), Variables(NULL) {}
+	~PopupConditionPanel() {
+		delete[] BoolFlags;
+		delete[] Variables;
+	}
+
+	ButtonCmd ButtonType;		/// type of button activated
+
+	char *BoolFlags;            /// array of condition about user flags.
+	char *Variables;            /// array of variable to verify (enable and max > 0)
+};
+
+class CPopupContentType {
+public:
+	CPopupContentType() : PosX(0), PosY(0), Condition(NULL) {}
+	virtual ~CPopupContentType() { delete Condition; }
+
+	/// Tell how show the variable Index.
+	virtual void Draw(int x, int y, const ButtonAction *button, int *Costs) const = 0;
+	/// Get the content's width
+	virtual int GetWidth(const ButtonAction *button, int *Costs) const = 0;
+	/// Get the content's height
+	virtual int GetHeight(const ButtonAction *button, int *Costs) const = 0;
+
+	int PosX;				/// X coordinate where to display.
+	int PosY;				/// Y coordinate where to display.
+
+	PopupConditionPanel *Condition; /// Condition to show the content; if NULL, no condition.
+};
+
+class CPopupContentTypeName : public CPopupContentType {
+public:
+	CPopupContentTypeName() : Font(NULL), Centered(0) {}
+	virtual ~CPopupContentTypeName() {}
+
+	virtual void Draw(int x, int y, const ButtonAction *button, int *Costs) const;
+	virtual int GetWidth(const ButtonAction *button, int *Costs) const;
+	virtual int GetHeight(const ButtonAction *button, int *Costs) const;
+
+	std::string Name;            /// Text to display.
+	CFont *Font;                 /// Font to use.
+	char Centered;               /// if true, center the display.
+};
+
+class CPopupContentTypeCosts : public CPopupContentType {
+public:
+	CPopupContentTypeCosts() : Font(NULL), Centered(0) {}
+	virtual ~CPopupContentTypeCosts() {}
+
+	virtual void Draw(int x, int y, const ButtonAction *button, int *Costs) const;
+
+	virtual int GetWidth(const ButtonAction *button, int *Costs) const;
+	virtual int GetHeight(const ButtonAction *button, int *Costs) const;
+
+	CFont *Font;                 /// Font to use.
+	char Centered;               /// if true, center the display.
+};
+
+class CPopupContentTypeLine : public CPopupContentType {
+public:
+	CPopupContentTypeLine() : Width(0), Height(0), Color(0) {}
+	virtual ~CPopupContentTypeLine() {}
+
+	virtual void Draw(int x, int y, const ButtonAction *button, int *Costs) const;
+
+	virtual int GetWidth(const ButtonAction *button, int *Costs) const;
+	virtual int GetHeight(const ButtonAction *button, int *Costs) const;
+
+	Uint32 Color;		/// Color used for line.
+	int Width;			/// line height
+	int Height;			/// line height
+};
+
+class CPopupContentTypeVariable : public CPopupContentType {
+public:
+	CPopupContentTypeVariable() : Text(NULL), Font(NULL), Centered(0), Index(-1) {}
+	virtual ~CPopupContentTypeVariable() {
+		FreeStringDesc(Text);
+		delete Text;
+	}
+
+	virtual void Draw(int x, int y, const ButtonAction *button, int *Costs) const;
+
+	virtual int GetWidth(const ButtonAction *button, int *Costs) const;
+	virtual int GetHeight(const ButtonAction *button, int *Costs) const;
+
+	StringDesc *Text;            /// Text to display.
+	CFont *Font;                 /// Font to use.
+	char Centered;               /// if true, center the display.
+	int Index;                   /// Index of the variable to show, -1 if not.
+};
+
+class CPopup {
+public:
+	CPopup() : Contents(), DefaultFont(0), BackgroundColor(ColorBlue), BorderColor(ColorWhite) {}
+	~CPopup() {
+		for (std::vector<CPopupContentType *>::iterator content = Contents.begin();
+			content != Contents.end(); ++content) {
+				delete *content;
+		}
+	}
+
+	std::string Ident;							/// Ident of the popup.
+	CFont *DefaultFont;							/// Default font for content.
+	Uint32 BackgroundColor;						/// Color used for popup's background.
+	Uint32 BorderColor;							/// Color used for popup's borders.
+
+	std::vector<CPopupContentType *>Contents;	/// Array of contents to display.
+};
+
 class CResourceInfo {
 public:
 	CResourceInfo() : G(NULL), IconFrame(0), IconX(0), IconY(0), IconWidth(-1),
@@ -527,7 +641,7 @@ public:
 	int TextX;                        /// text X position
 	int TextY;                        /// text Y position
 };
-#define MaxResourceInfo  MaxCosts + 2 /// +2 for food and score
+#define MaxResourceInfo  MaxCosts + 3 /// +2 for food and score
 
 class CInfoPanel
 {
@@ -604,6 +718,8 @@ public:
 
 	CInfoPanel InfoPanel;               /// Info panel
 	std::vector<CUnitInfoPanel *> InfoPanelContents;/// Info panel contents
+
+	std::vector<CPopup *> ButtonPopups;	/// Popup windows for buttons
 
 	CUIButton *SingleSelectedButton;    /// Button for single selected unit
 
@@ -799,6 +915,9 @@ extern void FreeButtonStyles();
 #endif
 	/// Register ccl features
 extern void UserInterfaceCclRegister();
+
+	/// return popup by ident string
+extern CPopup *PopupByIdent(const std::string &ident);
 
 	/// Find a button style
 extern ButtonStyle *FindButtonStyle(const std::string &style);

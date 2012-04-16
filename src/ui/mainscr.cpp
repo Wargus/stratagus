@@ -770,7 +770,7 @@ void DrawResources()
 	CLabel label(GetGameFont());
 
 	// Draw all icons of resource.
-	for (int i = 0; i <= ScoreCost; ++i) {
+	for (int i = 0; i <= ManaResCost; ++i) {
 		if (UI.Resources[i].G) {
 			UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame,
 											 UI.Resources[i].IconX, UI.Resources[i].IconY);
@@ -1276,15 +1276,13 @@ void CStatusLine::Clear()
 --  COSTS
 ----------------------------------------------------------------------------*/
 
-static int CostsMana;                    /// mana cost to display in status line
-static int Costs[MaxCosts + 1];          /// costs to display in status line
+static int Costs[MaxCosts + 2];          /// costs to display in status line
 
 /**
 **  Draw costs in status line.
 **
 **  @todo FIXME : make DrawCosts more configurable.
 **  @todo FIXME : 'time' resource should be shown too.
-**  @todo FIXME : remove hardcoded image for mana.
 **
 **  @internal MaxCost == FoodCost.
 */
@@ -1292,12 +1290,11 @@ void DrawCosts()
 {
 	int x = UI.StatusLine.TextX + 268;
 	CLabel label(GetGameFont());
-	if (CostsMana) {
-		// FIXME: hardcoded image!!!
-		UI.Resources[GoldCost].G->DrawFrameClip(3, x, UI.StatusLine.TextY);
+	if (Costs[MaxCosts + 1]) {
+		UI.Resources[ManaResCost].G->DrawFrameClip(3, x, UI.StatusLine.TextY);
 
 		x += 20;
-		x += label.Draw(x, UI.StatusLine.TextY, CostsMana);
+		x += label.Draw(x, UI.StatusLine.TextY, Costs[MaxCosts + 1]);
 	}
 
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
@@ -1325,7 +1322,7 @@ void DrawCosts()
 */
 void SetCosts(int mana, int food, const int *costs)
 {
-	CostsMana = mana;
+	Costs[MaxCosts + 1] = mana;
 	if (costs) {
 		memcpy(Costs, costs, MaxCosts * sizeof(*costs));
 	} else {

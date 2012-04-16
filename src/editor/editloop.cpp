@@ -1111,7 +1111,7 @@ void EditorUpdateDisplay()
 
 	DrawGuichanWidgets();
 
-	DrawPopup();
+	// DrawPopup();
 
 	DrawCursor();
 

@@ -92,15 +92,16 @@ public:
 	int Value;        /// extra value for command
 	std::string ValueStr;    /// keep original value string
 
-	ButtonCheckFunc Allowed; /// Check if this button is allowed
-	std::string AllowStr;    /// argument for allowed
-	std::string UnitMask;    /// for which units is it available
-	IconConfig  Icon;        /// icon to display
-	int Key;                 /// alternative on keyboard
-	std::string Hint;        /// tip textz
-	std::string Description;        /// description shown on status bar (optional)
-	SoundConfig CommentSound; ///Sound comment used when you press the button
-	std::string ButtonCursor; ///Custom cursor for button action (for example, to set spell target)
+	ButtonCheckFunc Allowed;    /// Check if this button is allowed
+	std::string AllowStr;       /// argument for allowed
+	std::string UnitMask;       /// for which units is it available
+	IconConfig Icon;            /// icon to display
+	int Key;                    /// alternative on keyboard
+	std::string Hint;           /// tip texts
+	std::string Description;    /// description shown on status bar (optional)
+	SoundConfig CommentSound;   /// Sound comment used when you press the button
+	std::string ButtonCursor;   /// Custom cursor for button action (for example, to set spell target)
+	std::string Popup;          /// Popup screen used for button
 };
 
 	/// Button area under cursor
@@ -256,7 +257,8 @@ extern void CleanButtons();
 extern int AddButton(int pos, int level, const std::string &IconIdent,
 	ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
 	const std::string &arg, const std::string &hint, const std::string &descr, 
-	const std::string &sound, const std::string &cursor, const std::string &umask);
+	const std::string &sound, const std::string &cursor, const std::string &umask,
+	const std::string &popup);
 
 //
 // in mouse.cpp
