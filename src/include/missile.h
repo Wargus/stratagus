@@ -427,6 +427,10 @@ public:
 
 	void DrawMissile(const CViewport &vp) const;
 	void SaveMissile(CFile &file) const;
+	void MissileHit();
+	bool NextMissileFrame(char sign, char longAnimation);
+	void NextMissileFrameCycle();
+	void MissileNewHeadingFromXY(const PixelPos &delta);
 
 	PixelPos source; /// Missile source position
 	PixelPos position;   /// missile pixel position
@@ -455,6 +459,9 @@ public:
 
 	static unsigned int Count; /// slot number generator.
 };
+
+extern bool MissileInitMove(Missile &missile);
+extern int PointToPointMissile(Missile &missile);
 
 class MissileDrawProxy
 {

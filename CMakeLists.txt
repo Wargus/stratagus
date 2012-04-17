@@ -179,9 +179,25 @@ source_group(map FILES ${map_SRCS})
 
 set(missile_SRCS
 	src/missile/missile.cpp
+	src/missile/missile_cliptotarget.cpp
+	src/missile/missile_cycleonce.cpp
+	src/missile/missile_deathcoil.cpp
+	src/missile/missile_fire.cpp
+	src/missile/missile_flameshield.cpp
+	src/missile/missile_hit.cpp
+	src/missile/missile_landmine.cpp
+	src/missile/missile_none.cpp
+	src/missile/missile_parabolic.cpp
+	src/missile/missile_pointotpointwithhit.cpp
+	src/missile/missile_pointtopoint.cpp
+	src/missile/missile_pointtopointbounce.cpp
+	src/missile/missile_pointtopointcycleonce.cpp
+	src/missile/missile_stay.cpp
+	src/missile/missile_tracer.cpp
+	src/missile/missile_whirlwind.cpp
 	src/missile/script_missile.cpp
 )
-source_group(map FILES ${missile_SRCS})
+source_group(missile FILES ${missile_SRCS})
 
 set(network_SRCS
 	src/network/commands.cpp
@@ -227,10 +243,8 @@ set(stratagusmain_SRCS
 	src/stratagus/iolib.cpp
 	src/stratagus/luacallback.cpp
 	src/stratagus/mainloop.cpp
-	src/stratagus/missile.cpp
 	src/stratagus/player.cpp
 	src/stratagus/script.cpp
-	src/stratagus/script_missile.cpp
 	src/stratagus/script_player.cpp
 	src/stratagus/script_spell.cpp
 	src/stratagus/selection.cpp
