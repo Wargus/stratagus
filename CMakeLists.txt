@@ -177,6 +177,12 @@ set(map_SRCS
 )
 source_group(map FILES ${map_SRCS})
 
+set(missile_SRCS
+	src/missile/missile.cpp
+	src/missile/script_missile.cpp
+)
+source_group(map FILES ${missile_SRCS})
+
 set(network_SRCS
 	src/network/commands.cpp
 	src/network/lowlevel.cpp
@@ -318,6 +324,7 @@ set(stratagus_SRCS
 	${game_SRCS}
 	${guichan_SRCS}
 	${map_SRCS}
+	${missile_SRCS}
 	${network_SRCS}
 	${particle_SRCS}
 	${pathfinder_SRCS}
