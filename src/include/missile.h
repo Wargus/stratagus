@@ -463,21 +463,6 @@ public:
 extern bool MissileInitMove(Missile &missile);
 extern int PointToPointMissile(Missile &missile);
 
-class MissileDrawProxy
-{
-public:
-	void DrawMissile(const CViewport &vp) const;
-
-	void operator=(const Missile* missile);
-public:
-	const MissileType *Type;  /// missile-type pointer
-	union {
-		int Damage;  /// direct damage that missile applies
-		int SpriteFrame; /// sprite frame counter
-	} data;
-	PixelPos pixelPos;
-};
-
 class MissileNone : public Missile {
 public:
 	virtual void Action();
@@ -585,7 +570,6 @@ extern Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &start
 extern void FireMissile(CUnit &unit, CUnit *goal, const Vec2i& goalPos);
 
 extern int FindAndSortMissiles(const CViewport &vp, Missile *table[], const int tablesize);
-extern int FindAndSortMissiles(const CViewport &vp, MissileDrawProxy table[], const int tablesize);
 
 	/// handle all missiles
 extern void MissileActions();

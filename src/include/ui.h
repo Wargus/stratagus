@@ -68,7 +68,9 @@ class CUnit;
 class CFile;
 class CFont;
 class LuaActionListener;
+#if 1 // for parallell drawing
 class CDrawProxy;
+#endif
 
 /*----------------------------------------------------------------------------
 --  Definitions
@@ -164,8 +166,8 @@ public:
 class CViewport {
 public:
 	CViewport() : X(0), Y(0), EndX(0), EndY(0), MapX(0), MapY(0),
-		OffsetX(0), OffsetY(0), MapWidth(0), MapHeight(0), Unit(NULL),
-		Proxy(NULL) {}
+		OffsetX(0), OffsetY(0), MapWidth(0), MapHeight(0), Unit(NULL), Proxy(NULL)
+	{}
 	~CViewport();
 
 
@@ -197,8 +199,9 @@ protected:
 	/// Draw the map fog of war
 	void DrawMapFogOfWar() const;
 public:
-	void UpdateUnits();
-
+#if 1 // for parallell drawing
+	void UpdateParallelProxy();
+#endif
 	/// Draw the full Viewport.
 	void Draw() const;
 	void DrawBorder() const;
@@ -218,7 +221,9 @@ public:
 	int MapHeight;              /// Height in map tiles
 
 	CUnit *Unit;                /// Bound to this unit
+#if 1 // for parallell drawing
 	CDrawProxy *Proxy;
+#endif
 };
 
 /**
@@ -940,7 +945,6 @@ extern void CycleViewportMode(int);
 	/// Select viewport mode
 extern void SetViewportMode(ViewportModeType mode);
 extern void CheckViewportMode();
-extern void UpdateViewports();
 
 	/// Use the mouse to scroll the map
 extern void MouseScrollMap(int x, int y);

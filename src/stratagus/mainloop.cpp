@@ -326,10 +326,13 @@ static void GameLogicLoop()
 					PlayersEachSecond(player);
 				}
 		}
-
+#if 1 // for parallell drawing
 		if (CPU_NUM > 1) {
-			UpdateViewports();
+			for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
+				vp->UpdateParallelProxy();
+			}
 		}
+#endif
 	}
 
 	TriggersEachCycle();  // handle triggers

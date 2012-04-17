@@ -537,31 +537,6 @@ void MissileType::DrawMissileType(int frame, const PixelPos &pos) const
 	}
 }
 
-void MissileDrawProxy::DrawMissile(const CViewport &vp) const
-{
-	const PixelPos sceenPixelPos = vp.MapToScreenPixelPos(this->pixelPos);
-
-	switch (this->Type->Class) {
-		case MissileClassHit:
-			CLabel(GetGameFont()).DrawClip(sceenPixelPos.x, sceenPixelPos.y, this->data.Damage);
-			break;
-		default:
-			this->Type->DrawMissileType(this->data.SpriteFrame, sceenPixelPos);
-			break;
-	}
-}
-
-void MissileDrawProxy::operator=(const Missile *missile)
-{
-	this->Type = missile->Type;
-	this->pixelPos = missile->position;
-	if (missile->Type->Class == MissileClassHit) {
-		this->data.Damage = missile->Damage;
-	} else {
-		this->data.SpriteFrame = missile->SpriteFrame;
-	}
-}
-
 /**
 **  Draw missile.
 */
@@ -637,20 +612,6 @@ int FindAndSortMissiles(const CViewport &vp, Missile *table[], const int tablesi
 	}
 	return nmissiles;
 }
-
-int FindAndSortMissiles(const CViewport &vp, MissileDrawProxy table[], const int tablesize)
-{
-	Assert(tablesize <= MAX_MISSILES * 9);
-
-	Missile *buffer[MAX_MISSILES * 9];
-	const int n = FindAndSortMissiles(vp, buffer, MAX_MISSILES * 9);
-
-	for (int i = 0; i < n; ++i) {
-		table[i] = buffer[i];
-	}
-	return n;
-}
-
 
 /**
 **  Change missile heading from x,y.

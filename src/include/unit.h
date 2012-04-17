@@ -754,42 +754,6 @@ public:
 	PixelPos GetMapPixelPosCenter() const;
 };
 
-class CUnitDrawProxy {
-
-	void DrawSelectionAt(int x, int y) const;
-	void DrawDecorationAt(int x, int y) const;
-public:
-
-	CUnitDrawProxy(): Variable(NULL) {}
-	~CUnitDrawProxy() {
-		delete[] Variable;
-	}
-
-	Vec2i tilePos;
-	int frame;
-	int TeamSelected; //unit->TeamSelected
-	int GroupId; //unit->GroupId
-
-	signed char IX;
-	signed char IY;
-	unsigned char CurrentResource;
-
-	unsigned int IsAlive:1;
-	unsigned int Selected:1; //unit->Selected
-	unsigned int ResourcesHeld:1;      /// isResources Held by a unit
-	unsigned int state: 2;
-	unsigned int Blink: 3; //unit->Blink
-
-	const CConstructionFrame *cframe;
-	const CUnitType *Type;
-	const CPlayer *Player;
-
-	CVariable *Variable;
-
-	void operator=(const CUnit *unit);
-	void Draw(const CViewport *vp) const;
-};
-
 //unit_find
 struct CUnitTypeFinder {
 	const UnitTypeType type;
@@ -1053,7 +1017,7 @@ extern void CleanDecorations();
 extern void DrawShadow(const CUnitType &type, int frame, int x, int y);
 	/// Draw all units visible on map in viewport
 extern int FindAndSortUnits(const CViewport *vp, std::vector<CUnit *>& table);
-extern int FindAndSortUnits(const CViewport *vp, CUnitDrawProxy table[]);
+
 	/// Show a unit's orders.
 extern void ShowOrder(const CUnit &unit);
 
