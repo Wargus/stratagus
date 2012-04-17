@@ -317,7 +317,6 @@ void ShowLoadProgress(const char *fmt, ...)
 	va_end(va);
 
 	if (Video.Depth && GetGameFont() && GetGameFont()->IsLoaded()) {
-		DisplayAutoLocker autolock;
 		// Remove non printable chars
 		for (char *s = temp; *s; ++s) {
 			if (*s < 32) {

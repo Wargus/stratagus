@@ -286,12 +286,6 @@ extern void GameMainLoop();             /// Game main loop
 	/// Show load progress
 extern void ShowLoadProgress(const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(1, 2);
 
-struct DisplayAutoLocker {
-	DisplayAutoLocker();
-	~DisplayAutoLocker();
-};
-
-extern const int CPU_NUM;
 extern bool CanAccessFile(const char *filename);
 
 //@}

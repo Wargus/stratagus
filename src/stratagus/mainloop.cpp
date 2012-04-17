@@ -83,25 +83,6 @@ int MouseScrollState = ScrollNone;
 EventCallback GameCallbacks;   /// Game callbacks
 EventCallback EditorCallbacks; /// Editor callbacks
 
-const int CPU_NUM = 1;
-//const int CPU_NUM = get_cpu_count(); // Multithread is buggy
-
-static CMutex DisplayUpdateLocker;
-
-DisplayAutoLocker::DisplayAutoLocker()
-{
-	if (GameRunning && CPU_NUM > 1) {
-		DisplayUpdateLocker.Lock();
-	}
-}
-
-DisplayAutoLocker::~DisplayAutoLocker()
-{
-	if (GameRunning && CPU_NUM > 1) {
-		DisplayUpdateLocker.UnLock();
-	}
-}
-
 //----------------------------------------------------------------------------
 // Functions
 //----------------------------------------------------------------------------
@@ -326,13 +307,6 @@ static void GameLogicLoop()
 					PlayersEachSecond(player);
 				}
 		}
-#if 1 // for parallell drawing
-		if (CPU_NUM > 1) {
-			for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
-				vp->UpdateParallelProxy();
-			}
-		}
-#endif
 	}
 
 	TriggersEachCycle();  // handle triggers
@@ -429,15 +403,6 @@ static void SingleGameLoop()
 	}
 }
 
-struct GameLogic: public CThread {
-	void Run() {
-		while (GameRunning) {
-			GameLogicLoop();
-		}
-	}
-};
-
-
 /**
 **  Game main loop.
 **
@@ -471,24 +436,7 @@ void GameMainLoop()
 
 	MultiPlayerReplayEachCycle();
 
-	if (CPU_NUM > 1) {
-		GameLogic GameThr;
-		if (GameThr.Start() == 0) {
-			printf("%d CPUs detected!\n", CPU_NUM);
-			while (GameRunning) {
-				DisplayUpdateLocker.Lock();
-				DisplayLoop();
-				DisplayUpdateLocker.UnLock();
-				/* Make CPU happy */
-				SDL_Delay(1);
-			}
-			GameThr.Wait();
-		} else {
-			SingleGameLoop();
-		}
-	} else {
-		SingleGameLoop();
-	}
+	SingleGameLoop();
 
 	//
 	// Game over

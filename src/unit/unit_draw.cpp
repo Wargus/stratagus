@@ -827,7 +827,7 @@ void DrawUnitPlayerColor(const CUnitType *type, CGraphic *sprite,
 **  @param x       X position.
 **  @param y       Y position.
 */
-void DrawConstructionShadow(const CUnitType &type, const CConstructionFrame *cframe,
+static void DrawConstructionShadow(const CUnitType &type, const CConstructionFrame *cframe,
 								   int frame, int x, int y)
 {
 	if (cframe->File == ConstructionFileConstruction) {
@@ -867,8 +867,8 @@ void DrawConstructionShadow(const CUnitType &type, const CConstructionFrame *cfr
 **  @param x       X position.
 **  @param y       Y position.
 */
-void DrawConstruction(const int player, const CConstructionFrame *cframe,
-					  const CUnitType &type, int frame, int x, int y)
+static void DrawConstruction(const int player, const CConstructionFrame *cframe,
+							 const CUnitType &type, int frame, int x, int y)
 {
 	if (cframe->File == ConstructionFileConstruction) {
 		const CConstruction *construction;

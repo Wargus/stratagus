@@ -641,9 +641,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 */
 static void DrawUnitInfo(CUnit &unit)
 {
-	if (CPU_NUM == 1) {
-		UpdateUnitVariables(unit);
-	}
+	UpdateUnitVariables(unit);
 	for (size_t i = 0; i < UI.InfoPanelContents.size(); ++i) {
 		if (CanShowContent(UI.InfoPanelContents[i]->Condition, unit)) {
 			for (std::vector<CContentType *>::const_iterator content = UI.InfoPanelContents[i]->Contents.begin();

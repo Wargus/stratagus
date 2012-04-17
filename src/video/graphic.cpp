@@ -708,19 +708,16 @@ void CGraphic::Free(CGraphic *g)
 	if (!g->Refs) {
 		// No more uses of this graphic
 		if (UseOpenGL) {
-			{
-				DisplayAutoLocker autolock;
-				if (g->Textures) {
-					glDeleteTextures(g->NumTextures, g->Textures);
-					delete[] g->Textures;
-				}
-				CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
-				if (cg) {
-					for (int i = 0; i < PlayerMax; ++i) {
-						if (cg->PlayerColorTextures[i]) {
-							glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[i]);
-							delete[] cg->PlayerColorTextures[i];
-						}
+			if (g->Textures) {
+				glDeleteTextures(g->NumTextures, g->Textures);
+				delete[] g->Textures;
+			}
+			CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
+			if (cg) {
+				for (int i = 0; i < PlayerMax; ++i) {
+					if (cg->PlayerColorTextures[i]) {
+						glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[i]);
+						delete[] cg->PlayerColorTextures[i];
 					}
 				}
 			}
@@ -750,7 +747,6 @@ void CGraphic::Free(CGraphic *g)
 */
 void FreeOpenGLGraphics()
 {
-	DisplayAutoLocker autolock;
 	std::list<CGraphic *>::iterator i;
 	for (i = Graphics.begin(); i != Graphics.end(); ++i) {
 		if ((*i)->Textures) {
@@ -1081,31 +1077,27 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 */
 static void MakeTextures(CGraphic *g, int player, CUnitColors *colors)
 {
-	DisplayAutoLocker autolock;
-	int i;
-	int tw;
-	int th;
-	GLuint *textures;
+	int tw = (g->GraphicWidth - 1) / GLMaxTextureSize + 1;
+	const int th = (g->GraphicHeight - 1) / GLMaxTextureSize + 1;
 
-	tw = (g->GraphicWidth - 1) / GLMaxTextureSize + 1;
-	th = (g->GraphicHeight - 1) / GLMaxTextureSize + 1;
+	int w = g->GraphicWidth % GLMaxTextureSize;
+	if (w == 0) {
+		w = GLMaxTextureSize;
+	}
+	g->TextureWidth = (GLfloat)w / PowerOf2(w);
 
-	i = g->GraphicWidth % GLMaxTextureSize;
-	if (i == 0) {
-		i = GLMaxTextureSize;
+	int h = g->GraphicHeight % GLMaxTextureSize;
+	if (h == 0) {
+		h = GLMaxTextureSize;
 	}
-	g->TextureWidth = (GLfloat)i / PowerOf2(i);
-	i = g->GraphicHeight % GLMaxTextureSize;
-	if (i == 0) {
-		i = GLMaxTextureSize;
-	}
-	g->TextureHeight = (GLfloat)i / PowerOf2(i);
+	g->TextureHeight = (GLfloat)h / PowerOf2(h);
 
 	g->NumTextures = tw * th;
 	if (g->NumTextures > 1) {
 		tw = tw;
 	}
 	CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
+	GLuint *textures;
 	if (!colors || !cg) {
 		textures = g->Textures = new GLuint[g->NumTextures];
 		glGenTextures(g->NumTextures, g->Textures);
@@ -1115,7 +1107,7 @@ static void MakeTextures(CGraphic *g, int player, CUnitColors *colors)
 	}
 
 	for (int j = 0; j < th; ++j) {
-		for (i = 0; i < tw; ++i) {
+		for (int i = 0; i < tw; ++i) {
 			MakeTextures2(g, textures[j * tw + i], colors, GLMaxTextureSize * i, GLMaxTextureSize * j);
 		}
 	}

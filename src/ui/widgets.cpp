@@ -1510,11 +1510,8 @@ int MenuScreen::run(bool loop)
 		const EventCallback *old_callbacks = GetCallbacks();
 		SetCallbacks(&GuichanCallbacks);
 		while (runLoop) {
-			if (!(GameRunning && CPU_NUM > 1)) {
-				/* No Parallel drawing... do it here */
-				UpdateDisplay();
-				RealizeVideoMemory();
-			}
+			UpdateDisplay();
+			RealizeVideoMemory();
 			CheckMusicFinished();
 			WaitEventsOneFrame();
 		}
