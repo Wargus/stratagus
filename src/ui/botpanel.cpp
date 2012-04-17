@@ -338,7 +338,7 @@ int CPopupContentTypeName::GetHeight(const ButtonAction *, int *) const
 	return font->Height();
 }
 
-void CPopupContentTypeName::Draw(int x, int y, const ButtonAction *button, int *) const 
+void CPopupContentTypeName::Draw(int x, int y, const ButtonAction *button, int *) const
 {
 	CFont *font = this->Font ? this->Font : GetSmallFont();
 	CLabel label(font, "white", "red");
@@ -346,8 +346,8 @@ void CPopupContentTypeName::Draw(int x, int y, const ButtonAction *button, int *
 }
 
 int CPopupContentTypeCosts::GetWidth(const ButtonAction *button, int *Costs) const
-{	
-	int popupWidth = 0; 
+{
+	int popupWidth = 0;
 	CFont *font = this->Font ? this->Font : GetSmallFont();
 
 	for (unsigned int i = 1; i < MaxCosts; ++i) {
@@ -362,7 +362,7 @@ int CPopupContentTypeCosts::GetWidth(const ButtonAction *button, int *Costs) con
 			}
 			popupWidth += (font->Width(Costs[i]) + 5);
 		}
-	} 
+	}
 	if (Costs[MaxCosts]) {
 		const CGraphic *G = UI.Resources[ManaResCost].G;
 		const SpellType *spell = SpellTypeTable[button->Value];
@@ -399,11 +399,11 @@ int CPopupContentTypeCosts::GetHeight(const ButtonAction *button, int *Costs) co
 	return std::max(popupHeight, font->Height());
 }
 
-void CPopupContentTypeCosts::Draw(int x, int y, const ButtonAction *button, int *Costs) const 
+void CPopupContentTypeCosts::Draw(int x, int y, const ButtonAction *button, int *Costs) const
 {
 	CFont *font = this->Font ? this->Font : GetSmallFont();
 	CLabel label(this->Font, "white", "red");
-	
+
 	for (unsigned int i = 1; i < MaxCosts; ++i) {
 		if (Costs[i]) {
 			int y_offset = 0;
@@ -445,16 +445,16 @@ void CPopupContentTypeCosts::Draw(int x, int y, const ButtonAction *button, int 
 }
 
 int CPopupContentTypeLine::GetWidth(const ButtonAction *button, int *Costs) const
-{	
+{
 	return this->Width;
 }
 
 int CPopupContentTypeLine::GetHeight(const ButtonAction *button, int *Costs) const
-{	
+{
 	return this->Height;
 }
 
-void CPopupContentTypeLine::Draw(int x, int y, const ButtonAction *button, int *Costs) const 
+void CPopupContentTypeLine::Draw(int x, int y, const ButtonAction *button, int *Costs) const
 {
 	Video.DrawLine(this->Color, x, y, x + Width, y + Height);
 }
@@ -472,7 +472,7 @@ int CPopupContentTypeVariable::GetHeight(const ButtonAction *, int *) const
 	return font->Height();
 }
 
-void CPopupContentTypeVariable::Draw(int x, int y, const ButtonAction *button, int *) const 
+void CPopupContentTypeVariable::Draw(int x, int y, const ButtonAction *button, int *) const
 {
 	std::string text;											// Optional text to display.
 	CFont *font = this->Font ? this->Font : GetSmallFont();		// Font to use.
@@ -515,7 +515,8 @@ void CPopupContentTypeVariable::Draw(int x, int y, const ButtonAction *button, i
 **
 **  @return            0 if we can't show the content, else 1.
 */
-static bool CanShowPopupContent(const PopupConditionPanel *condition, const ButtonAction *button, 
+static bool CanShowPopupContent(const PopupConditionPanel *condition,
+								const ButtonAction *button,
 								CUnitType *type)
 {
 	if (!condition) {
@@ -542,26 +543,28 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition, const Butt
 	return true;
 }
 
-static void GetPopupSize(const ButtonAction *button, const CUIButton *uibutton, 
+static void GetPopupSize(const ButtonAction *button, const CUIButton *uibutton,
 						 int &popupWidth, int &popupHeight, int *Costs)
 {
-	popupWidth = 0; popupHeight = 0;
-	CPopup *popup = PopupByIdent(button->Popup);
-	
-	for (std::vector<CPopupContentType *>::const_iterator content = popup->Contents.begin();
-		content != popup->Contents.end(); ++content) {
-			if (CanShowPopupContent((*content)->Condition, button, UnitTypes[button->Value])) {
-				popupWidth = std::max(popupWidth, 
-					(*content)->PosX + (*content)->GetWidth(button, Costs));
-				popupHeight = std::max(popupHeight, 
-					(*content)->PosY + (*content)->GetHeight(button, Costs));
-			}
+	popupWidth = 0;
+	popupHeight = 0;
+	CPopup &popup = *PopupByIdent(button->Popup);
+
+	for (std::vector<CPopupContentType *>::const_iterator it = popup.Contents.begin();
+		it != popup.Contents.end();
+		++it) {
+		const CPopupContentType &content = **it;
+
+		if (CanShowPopupContent(content.Condition, button, UnitTypes[button->Value])) {
+			popupWidth = std::max(popupWidth, content.PosX + content.GetWidth(button, Costs));
+			popupHeight = std::max(popupHeight, content.PosY + content.GetHeight(button, Costs));
+		}
 	}
 }
 
 
-// Fixme: need to remove soon
-/*void DrawPopupUnitInfo(const CUnitType *type,
+#if 0 // Fixme: need to remove soon
+void DrawPopupUnitInfo(const CUnitType *type,
 					   int player_index, CFont *font, Uint32 backgroundColor,
 					   int buttonX, int buttonY)
 {
@@ -677,9 +680,8 @@ static void GetPopupSize(const ButtonAction *button, const CUIButton *uibutton,
 		label.Draw(x + 5, y, sightRange.str());
 	}
 	//y += 15;
-
-
-}*/
+}
+#endif
 
 /**
 **  Draw popup
@@ -693,32 +695,31 @@ void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 	}
 
 	int popupWidth, popupHeight;
-	int x, y;
 	int Costs[MaxCosts + 1];
 	memset(Costs, 0, sizeof(Costs));
-	
+
 	GetPopupSize(button, uibutton, popupWidth, popupHeight, Costs);
-	x = std::min<int>(uibutton->X, Video.Width - 1 - popupWidth);
-	y = uibutton->Y - popupHeight - 10;
+	int x = std::min<int>(uibutton->X, Video.Width - 1 - popupWidth);
+	int y = uibutton->Y - popupHeight - 10;
 
 	// Background
-	Video.FillTransRectangle(popup->BackgroundColor, x, y,
-		popupWidth + 5, popupHeight + 5, 128);
+	Video.FillTransRectangle(popup->BackgroundColor, x, y, popupWidth + 5, popupHeight + 5, 128);
 	Video.DrawRectangle(popup->BorderColor, x, y, popupWidth + 5, popupHeight + 5);
 
-	switch (button->Action)
-	{
-	case ButtonResearch:
-		memcpy(Costs, AllUpgrades[button->Value]->Costs, sizeof(AllUpgrades[button->Value]->Costs));
-		break;
-	case ButtonSpellCast:
-		Costs[MaxCosts] = SpellTypeTable[button->Value]->ManaCost;
-		break;
-	case ButtonBuild:
-	case ButtonTrain:
-	case ButtonUpgradeTo:
-		memcpy(Costs, AllUpgrades[button->Value]->Costs, sizeof(AllUpgrades[button->Value]->Costs));
-		break;
+	switch (button->Action) {
+		case ButtonResearch:
+			memcpy(Costs, AllUpgrades[button->Value]->Costs, sizeof(AllUpgrades[button->Value]->Costs));
+			break;
+		case ButtonSpellCast:
+			Costs[MaxCosts] = SpellTypeTable[button->Value]->ManaCost;
+			break;
+		case ButtonBuild:
+		case ButtonTrain:
+		case ButtonUpgradeTo:
+			memcpy(Costs, AllUpgrades[button->Value]->Costs, sizeof(AllUpgrades[button->Value]->Costs));
+			break;
+		default:
+			break;
 	}
 
 	// Contents
@@ -729,8 +730,7 @@ void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 			}
 	}
 
-	// Fixme: need to remove soon
-	/*
+#if 0 // Fixme: need to remove soon
 	switch (button->Action) {
 		case ButtonResearch: {
 			CLabel label(font, "white", "red");
@@ -738,7 +738,7 @@ void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 			popupWidth = GetPopupCostsS(font, Costs);
 			popupWidth = std::max<int>(popupWidth, font->Width(button->Hint) + 10);
 
-			popupHeight	= 40;
+			popupHeight = 40;
 
 			start_x = std::min<int>(uibutton->X, Video.Width - 1 - popupWidth);
 
@@ -757,7 +757,6 @@ void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 			y += 20;
 			x = start_x;
 			DrawPopupCosts(x + 5, y, label, Costs);
-
 		}
 		break;
 		case ButtonSpellCast: {
@@ -843,7 +842,8 @@ void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 											  y + (popupHeight - font_height) / 2, button->Hint);
 			break;
 
-	}*/
+	}
+#endif
 }
 
 /**

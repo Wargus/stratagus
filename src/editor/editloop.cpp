@@ -608,6 +608,7 @@ static void DrawPlayers()
 	}
 }
 
+#if 0
 extern void DrawPopupUnitInfo(const CUnitType *type,
 							  int player_index, CFont *font,
 							  Uint32 backgroundColor, int buttonX, int buttonY);
@@ -624,6 +625,7 @@ static void DrawPopup()
 		SetDefaultTextColors(nc, rc);
 	}
 }
+#endif
 
 /**
 **  Draw unit icons.

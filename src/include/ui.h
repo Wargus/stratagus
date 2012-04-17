@@ -578,7 +578,7 @@ public:
 
 class CPopupContentTypeLine : public CPopupContentType {
 public:
-	CPopupContentTypeLine() : Width(0), Height(0), Color(0) {}
+	CPopupContentTypeLine() : Color(0), Width(0), Height(0) {}
 	virtual ~CPopupContentTypeLine() {}
 
 	virtual void Draw(int x, int y, const ButtonAction *button, int *Costs) const;
@@ -586,9 +586,9 @@ public:
 	virtual int GetWidth(const ButtonAction *button, int *Costs) const;
 	virtual int GetHeight(const ButtonAction *button, int *Costs) const;
 
-	Uint32 Color;		/// Color used for line.
-	int Width;			/// line height
-	int Height;			/// line height
+	Uint32 Color;  /// Color used for line.
+	int Width;     /// line height
+	int Height;    /// line height
 };
 
 class CPopupContentTypeVariable : public CPopupContentType {
@@ -612,7 +612,7 @@ public:
 
 class CPopup {
 public:
-	CPopup() : Contents(), DefaultFont(0), BackgroundColor(ColorBlue), BorderColor(ColorWhite) {}
+	CPopup() : Contents(), DefaultFont(NULL), BackgroundColor(ColorBlue), BorderColor(ColorWhite) {}
 	~CPopup() {
 		for (std::vector<CPopupContentType *>::iterator content = Contents.begin();
 			content != Contents.end(); ++content) {
@@ -620,12 +620,11 @@ public:
 		}
 	}
 
-	std::string Ident;							/// Ident of the popup.
-	CFont *DefaultFont;							/// Default font for content.
-	Uint32 BackgroundColor;						/// Color used for popup's background.
-	Uint32 BorderColor;							/// Color used for popup's borders.
-
-	std::vector<CPopupContentType *>Contents;	/// Array of contents to display.
+	std::vector<CPopupContentType *> Contents; /// Array of contents to display.
+	std::string Ident;                         /// Ident of the popup.
+	CFont *DefaultFont;                        /// Default font for content.
+	Uint32 BackgroundColor;                    /// Color used for popup's background.
+	Uint32 BorderColor;                        /// Color used for popup's borders.
 };
 
 class CResourceInfo {
@@ -633,15 +632,15 @@ public:
 	CResourceInfo() : G(NULL), IconFrame(0), IconX(0), IconY(0), IconWidth(-1),
 		TextX(-1), TextY(-1) {}
 
-	CGraphic *G;                      /// icon graphic
-	int IconFrame;                    /// icon frame
-	int IconX;                        /// icon X position
-	int IconY;                        /// icon Y position
-	int IconWidth;						/// icon W size
-	int TextX;                        /// text X position
-	int TextY;                        /// text Y position
+	CGraphic *G;   /// icon graphic
+	int IconFrame; /// icon frame
+	int IconX;     /// icon X position
+	int IconY;     /// icon Y position
+	int IconWidth; /// icon W size
+	int TextX;     /// text X position
+	int TextY;     /// text Y position
 };
-#define MaxResourceInfo  MaxCosts + 3 /// +2 for food and score
+#define MaxResourceInfo  MaxCosts + 3 /// +3 for food and score and mana
 
 class CInfoPanel
 {
