@@ -351,9 +351,9 @@ void AiNewDepotRequest(CUnit &worker)
 {
 #if 0
 	DebugPrint("%d: Worker %d report: Resource [%d] too far from depot, returning time [%d].\n"
-				_C_ worker->Player->Index _C_ worker->Slot
-				_C_ worker->CurrentResource
-				_C_ worker->Data.Move.Cycles);
+			   _C_ worker->Player->Index _C_ worker->Slot
+			   _C_ worker->CurrentResource
+			   _C_ worker->Data.Move.Cycles);
 #endif
 	Assert(worker.CurrentAction() == UnitActionResource);
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
@@ -768,8 +768,7 @@ static void AiCheckingWork()
 {
 	// Suppy has the highest priority
 	if (AiPlayer->NeedSupply) {
-		if (!(!AiPlayer->UnitTypeBuilt.empty()
-			&& AiPlayer->UnitTypeBuilt[0].Type->Supply)) {
+		if (AiPlayer->UnitTypeBuilt.empty() || AiPlayer->UnitTypeBuilt[0].Type->Supply == 0) {
 			AiPlayer->NeedSupply = false;
 			AiRequestSupply();
 		}
