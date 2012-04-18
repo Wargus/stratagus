@@ -195,6 +195,7 @@ set(missile_SRCS
 	src/missile/missile_stay.cpp
 	src/missile/missile_tracer.cpp
 	src/missile/missile_whirlwind.cpp
+	src/missile/missileconfig.cpp
 	src/missile/script_missile.cpp
 )
 source_group(missile FILES ${missile_SRCS})
@@ -463,6 +464,7 @@ set(stratagus_generic_HDRS
 	src/include/menus.h
 	src/include/minimap.h
 	src/include/missile.h
+	src/include/missileconfig.h
 	src/include/movie.h
 	src/include/myendian.h
 	src/include/netconnect.h

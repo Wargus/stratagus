@@ -534,6 +534,7 @@
 #include "icons.h"
 #endif
 
+#include "missileconfig.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
@@ -557,19 +558,6 @@ enum GroupSelectionMode {
 	SELECTABLE_BY_RECTANGLE_ONLY = 0,
 	NON_SELECTABLE_BY_RECTANGLE_ONLY,
 	SELECT_ALL
-};
-
-/**
-**  Missile type definition (used in config tables)
-**
-**  @todo Move this to missle.h?
-*/
-class MissileConfig {
-public:
-	MissileConfig() : Missile(NULL) {}
-
-	std::string Name;        /// Config missile name
-	MissileType *Missile;    /// Identifier to use to run time
 };
 
 class ResourceInfo {

@@ -73,9 +73,9 @@ static int ParabolicMissile(Missile &missile)
 	missile.position.x += z * zprojToX / 64;
 	missile.position.y += z * zprojToY / 64;
 	missile.MissileNewHeadingFromXY(missile.position - orig_pos);
-	if (missile.Type->SmokeMissile && missile.CurrentStep) {
+	if (missile.Type->Smoke.Missile && missile.CurrentStep) {
 		const PixelPos position = missile.position + missile.Type->size / 2;
-		MakeMissile(*missile.Type->SmokeMissile, position, position);
+		MakeMissile(*missile.Type->Smoke.Missile, position, position);
 	}
 	return 0;
 }

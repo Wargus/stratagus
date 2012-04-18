@@ -694,9 +694,9 @@ int PointToPointMissile(Missile &missile)
 	const PixelPos diff = (missile.destination - missile.source);
 	missile.position = missile.source + diff * missile.CurrentStep / missile.TotalStep;
 
-	if (missile.Type->SmokeMissile && missile.CurrentStep) {
+	if (missile.Type->Smoke.Missile && missile.CurrentStep) {
 		const PixelPos position =  missile.position + missile.Type->size / 2;
-		MakeMissile(*missile.Type->SmokeMissile, position, position);
+		MakeMissile(*missile.Type->Smoke.Missile, position, position);
 	}
 	return 0;
 }
@@ -771,8 +771,8 @@ void Missile::MissileHit()
 	//
 	// The impact generates a new missile.
 	//
-	if (mtype.ImpactMissile) {
-		MakeMissile(*mtype.ImpactMissile, pixelPos, pixelPos);
+	if (mtype.Impact.Missile) {
+		MakeMissile(*mtype.Impact.Missile, pixelPos, pixelPos);
 	}
 	if (mtype.ImpactParticle) {
 		mtype.ImpactParticle->pushPreamble();
@@ -1104,10 +1104,10 @@ void Missile::SaveMissile(CFile &file) const
 */
 void SaveMissiles(CFile &file)
 {
-	std::vector<Missile *>::const_iterator i;
-
 	file.printf("\n--- -----------------------------------------\n");
 	file.printf("--- MODULE: missiles\n\n");
+
+	std::vector<Missile *>::const_iterator i;
 
 	for (i = GlobalMissiles.begin(); i != GlobalMissiles.end(); ++i) {
 		(*i)->SaveMissile(file);
@@ -1125,8 +1125,8 @@ void MissileType::Init()
 	// Resolve impact missiles and sounds.
 	this->FiredSound.MapSound();
 	this->ImpactSound.MapSound();
-	this->ImpactMissile = MissileTypeByIdent(this->ImpactName);
-	this->SmokeMissile = MissileTypeByIdent(this->SmokeName);
+	this->Impact.MapMissile();
+	this->Smoke.MapMissile();
 }
 
 /**
@@ -1134,12 +1134,6 @@ void MissileType::Init()
 */
 void InitMissileTypes()
 {
-#if 0
-	// Rehash.
-	for (std::vector<MissileType *>::iterator i = MissileTypes.begin(); i != MissileTypes.end(); ++i) {
-		MissileTypeMap[(*i)->Ident] = *i;
-	}
-#endif
 	for (std::vector<MissileType *>::iterator i = MissileTypes.begin(); i != MissileTypes.end(); ++i) {
 		(*i)->Init();
 	}
@@ -1153,13 +1147,10 @@ MissileType::MissileType(const std::string &ident) :
 	DrawLevel(0), SpriteFrames(0), NumDirections(0),
 	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
 	AlwaysFire(false), Class(), NumBounces(0), StartDelay(0), Sleep(0), Speed(0),
-	Range(0), SplashFactor(0), ImpactMissile(NULL),
-	SmokeMissile(NULL), ImpactParticle(NULL), G(NULL)
+	Range(0), SplashFactor(0), ImpactParticle(NULL), G(NULL)
 {
 	size.x = 0;
 	size.y = 0;
-	FiredSound.Sound = NULL;
-	ImpactSound.Sound = NULL;
 }
 
 /**

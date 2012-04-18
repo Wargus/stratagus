@@ -619,15 +619,12 @@ void LoadUnitTypes()
 		// Lookup icons.
 		type.Icon.Load();
 		// Lookup missiles.
-		type.Missile.Missile = MissileTypeByIdent(type.Missile.Name);
-		if (!type.Explosion.Name.empty()) {
-			type.Explosion.Missile = MissileTypeByIdent(type.Explosion.Name);
-		}
+		type.Missile.MapMissile();
+		type.Explosion.MapMissile();
+
 		// Lookup impacts
 		for (int i = 0; i < ANIMATIONS_DEATHTYPES + 2; ++i) {
-			if (!type.Impact[i].Name.empty()) {
-				type.Impact[i].Missile = MissileTypeByIdent(type.Impact[i].Name);
-			}
+			type.Impact[i].MapMissile();
 		}
 		// Lookup corpse.
 		if (!type.CorpseName.empty()) {

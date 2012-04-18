@@ -153,28 +153,16 @@
 **
 **    Determines The Splash damage divisor, see Range
 **
-**  MissileType::ImpactName
+**  MissileType::Impact
 **
-**    The name of the next (other) missile to generate, when this
+**    The config of the next (other) missile to generate, when this
 **    missile reached its end point or its life time is over.  So it
 **    can be used to generate a chain of missiles.
-**    @note Used and should only be used during configuration and
-**    startup.
 **
-**  MissileType::ImpactMissile
+**  MissileType::Smoke
 **
-**    Pointer to the impact missile-type. Used during run time.
-**
-**  MissileType::SmokeName
-**
-**    The name of the next (other) missile to generate a trailing smoke.  So it
+**    The config of the next (other) missile to generate a trailing smoke.  So it
 **    can be used to generate a chain of missiles.
-**    @note Used and should only be used during configuration and
-**    startup.
-**
-**  MissileType::SmokeMissile
-**
-**    Pointer to the smoke missile-type. Used during run time.
 **
 **  MissileType::Sprite
 **
@@ -314,6 +302,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "missileconfig.h"
 #include "unitptr.h"
 #include "unitsound.h"
 #include "vec2i.h"
@@ -369,6 +358,8 @@ public:
 	void Init();
 	void DrawMissileType(int frame, const PixelPos &pos) const;
 
+	void Load(lua_State *l);
+
 	int Width() const { return size.x; }
 	int Height() const { return size.y; }
 
@@ -398,10 +389,8 @@ public:
 
 	int Range;                 /// missile damage range
 	int SplashFactor;          /// missile splash divisor
-	std::string ImpactName;    /// impact missile-type name
-	MissileType *ImpactMissile;/// missile produces an impact
-	std::string SmokeName;     /// impact missile-type name
-	MissileType *SmokeMissile; /// Trailling missile
+	MissileConfig Impact;      /// missile produces an impact
+	MissileConfig Smoke;       /// Trailling missile
 	LuaCallback *ImpactParticle; /// impact particle
 
 // --- FILLED UP ---
@@ -432,6 +421,8 @@ public:
 	void NextMissileFrameCycle();
 	void MissileNewHeadingFromXY(const PixelPos &delta);
 
+
+//private:
 	PixelPos source; /// Missile source position
 	PixelPos position;   /// missile pixel position
 	PixelPos destination;  /// missile pixel destination

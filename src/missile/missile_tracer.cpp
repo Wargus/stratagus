@@ -65,9 +65,9 @@ static int TracerMissile(Missile &missile)
 	const PixelPos diff = (missile.destination - missile.source);
 	missile.position = missile.source + diff * missile.CurrentStep / missile.TotalStep;
 
-	if (missile.Type->SmokeMissile && missile.CurrentStep) {
+	if (missile.Type->Smoke.Missile && missile.CurrentStep) {
 		const PixelPos position =  missile.position + missile.Type->size / 2;
-		MakeMissile(*missile.Type->SmokeMissile, position, position);
+		MakeMissile(*missile.Type->Smoke.Missile, position, position);
 	}
 	return 0;
 }

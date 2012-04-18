@@ -80,6 +80,93 @@ static const char *MissileClassNames[] = {
 --  Functions
 ----------------------------------------------------------------------------*/
 
+void MissileType::Load(lua_State *l)
+{
+	this->NumDirections = 1;
+	this->Flip = true;
+	// Ensure we don't divide by zero.
+	this->SplashFactor = 100;
+
+	// Parse the arguments
+	std::string file;
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+
+		if (!strcmp(value, "File")) {
+			file = LuaToString(l, -1);
+		} else if (!strcmp(value, "Size")) {
+			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
+				LuaError(l, "incorrect argument");
+			}
+			lua_rawgeti(l, -1, 1);
+			this->size.x = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			this->size.y = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "Frames")) {
+			this->SpriteFrames = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Flip")) {
+			this->Flip = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "NumDirections")) {
+			this->NumDirections = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Transparency")) {
+			this->Transparency = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "FiredSound")) {
+			this->FiredSound.Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "ImpactSound")) {
+			this->ImpactSound.Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Class")) {
+			const char *className = LuaToString(l, -1);
+			unsigned int i = 0;
+			for (; MissileClassNames[i]; ++i) {
+				if (!strcmp(className, MissileClassNames[i])) {
+					this->Class = i;
+					break;
+				}
+			}
+			if (!MissileClassNames[i]) {
+				LuaError(l, "Unsupported class: %s" _C_ value);
+			}
+		} else if (!strcmp(value, "NumBounces")) {
+			this->NumBounces = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Delay")) {
+			this->StartDelay = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Sleep")) {
+			this->Sleep = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Speed")) {
+			this->Speed = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "DrawLevel")) {
+			this->DrawLevel = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Range")) {
+			this->Range = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "ImpactMissile")) {
+			this->Impact.Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "SmokeMissile")) {
+			this->Smoke.Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "ImpactParticle")) {
+			this->ImpactParticle = new LuaCallback(l, -1);
+		} else if (!strcmp(value, "CanHitOwner")) {
+			this->CanHitOwner = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "AlwaysFire")) {
+			this->AlwaysFire = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "FriendlyFire")) {
+			this->FriendlyFire = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "SplashFactor")) {
+			this->SplashFactor = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "CorrectSphashDamage")) {
+			this->CorrectSphashDamage = LuaToBoolean(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+
+	if (!file.empty()) {
+		this->G = CGraphic::New(file, this->Width(), this->Height());
+	}
+
+}
+
 /**
 **  Parse missile-type.
 **
@@ -101,90 +188,7 @@ static int CclDefineMissileType(lua_State *l)
 	} else {
 		mtype = NewMissileTypeSlot(str);
 	}
-
-	mtype->NumDirections = 1;
-	mtype->Flip = true;
-	// Ensure we don't divide by zero.
-	mtype->SplashFactor = 100;
-
-	// Parse the arguments
-	std::string file;
-	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
-		const char *value = LuaToString(l, -2);
-
-		if (!strcmp(value, "File")) {
-			file = LuaToString(l, -1);
-		} else if (!strcmp(value, "Size")) {
-			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			mtype->size.x = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			mtype->size.y = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "Frames")) {
-			mtype->SpriteFrames = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Flip")) {
-			mtype->Flip = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "NumDirections")) {
-			mtype->NumDirections = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Transparency")) {
-			mtype->Transparency = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "FiredSound")) {
-			mtype->FiredSound.Name = LuaToString(l, -1);
-		} else if (!strcmp(value, "ImpactSound")) {
-			mtype->ImpactSound.Name = LuaToString(l, -1);
-		} else if (!strcmp(value, "Class")) {
-			const char *className = LuaToString(l, -1);
-			unsigned int i = 0;
-			for (; MissileClassNames[i]; ++i) {
-				if (!strcmp(className, MissileClassNames[i])) {
-					mtype->Class = i;
-					break;
-				}
-			}
-			if (!MissileClassNames[i]) {
-				LuaError(l, "Unsupported class: %s" _C_ value);
-			}
-		} else if (!strcmp(value, "NumBounces")) {
-			mtype->NumBounces = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Delay")) {
-			mtype->StartDelay = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Sleep")) {
-			mtype->Sleep = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Speed")) {
-			mtype->Speed = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "DrawLevel")) {
-			mtype->DrawLevel = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Range")) {
-			mtype->Range = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "ImpactMissile")) {
-			mtype->ImpactName = LuaToString(l, -1);
-		} else if (!strcmp(value, "SmokeMissile")) {
-			mtype->SmokeName = LuaToString(l, -1);
-		} else if (!strcmp(value, "ImpactParticle")) {
-			mtype->ImpactParticle = new LuaCallback(l, -1);
-		} else if (!strcmp(value, "CanHitOwner")) {
-			mtype->CanHitOwner = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "AlwaysFire")) {
-			mtype->AlwaysFire = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "FriendlyFire")) {
-			mtype->FriendlyFire = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SplashFactor")) {
-			mtype->SplashFactor = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "CorrectSphashDamage")) {
-			mtype->CorrectSphashDamage = LuaToBoolean(l, -1);
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-	}
-
-	if (!file.empty()) {
-		mtype->G = CGraphic::New(file, mtype->Width(), mtype->Height());
-	}
-
+	mtype->Load(l);
 	return 0;
 }
 
