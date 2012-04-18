@@ -534,43 +534,34 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 */
 void CViewport::DrawMapFogOfWar() const
 {
-	int sx;
-	int sy;
-	int dx;
-	int ex;
-	int dy;
-	int ey;
-	int my;
-	int mx;
-
 	// flags must redraw or not
 	if (ReplayRevealMap) {
 		return;
 	}
 
-	sx = std::max<int>(MapX - 1, 0);
-	ex = std::min<int>(MapX + MapWidth + 1, Map.Info.MapWidth);
-	my = std::max<int>(MapY - 1, 0);
-	ey = std::min<int>(MapY + MapHeight + 1, Map.Info.MapHeight);
+	int sx = std::max<int>(MapX - 1, 0);
+	int ex = std::min<int>(MapX + MapWidth + 1, Map.Info.MapWidth);
+	int my = std::max<int>(MapY - 1, 0);
+	int ey = std::min<int>(MapY + MapHeight + 1, Map.Info.MapHeight);
 
 	// Update for visibility all tile in viewport
 	// and 1 tile around viewport (for fog-of-war connection display)
 
 	unsigned int my_index = my * Map.Info.MapWidth;
 	for (; my < ey; ++my) {
-		for (mx = sx; mx < ex; ++mx) {
+		for (int mx = sx; mx < ex; ++mx) {
 			VisibleTable[my_index + mx] = Map.IsTileVisible(*ThisPlayer, mx + my_index);
 		}
 		my_index += Map.Info.MapWidth;
 	}
 	ex = EndX;
-	sy = MapY * Map.Info.MapWidth;
-	dy = Y - OffsetY;
+	int sy = MapY * Map.Info.MapWidth;
+	int dy = Y - OffsetY;
 	ey = EndY;
 
 	while (dy <= ey) {
 		sx = MapX + sy;
-		dx = X - OffsetX;
+		int dx = X - OffsetX;
 		while (dx <= ex) {
 			if (VisibleTable[sx]) {
 				DrawFogOfWarTile(sx, sy, dx, dy);
@@ -595,7 +586,6 @@ void CMap::InitFogOfWar()
 	FogOfWarColorSDL = Video.MapRGB(TheScreen->format, FogOfWarColor[0], FogOfWarColor[1], FogOfWarColor[2]);
 
 	Uint8 r, g, b;
-	Uint32 color;
 	SDL_Surface *s;
 
 	FogGraphic->Load();
@@ -608,7 +598,7 @@ void CMap::InitFogOfWar()
 								 32, RMASK, GMASK, BMASK, AMASK);
 
 		SDL_GetRGB(FogOfWarColorSDL, TheScreen->format, &r, &g, &b);
-		color = Video.MapRGB(s->format, r, g, b);
+		Uint32 color = Video.MapRGB(s->format, r, g, b);
 
 		SDL_FillRect(s, NULL, color);
 		OnlyFogSurface = SDL_DisplayFormat(s);
@@ -623,21 +613,15 @@ void CMap::InitFogOfWar()
 			s = SDL_DisplayFormat(FogGraphic->Surface);
 			SDL_SetAlpha(s, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
 		} else {
-			int i;
-			int j;
-			Uint32 c;
-			Uint8 a;
-			SDL_PixelFormat *f;
-
 			// Copy the top row to a new surface
-			f = FogGraphic->Surface->format;
+			SDL_PixelFormat *f = FogGraphic->Surface->format;
 			s = SDL_CreateRGBSurface(SDL_SWSURFACE, FogGraphic->Surface->w, PixelTileSize.y,
 									 f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
 			SDL_LockSurface(s);
 			SDL_LockSurface(FogGraphic->Surface);
-			for (i = 0; i < s->h; ++i) {
-				memcpy((Uint8 *)s->pixels + i * s->pitch,
-					   (Uint8 *)FogGraphic->Surface->pixels + i * FogGraphic->Surface->pitch,
+			for (int i = 0; i < s->h; ++i) {
+				memcpy(reinterpret_cast<Uint8 *>(s->pixels) + i * s->pitch,
+					   reinterpret_cast<Uint8 *>(FogGraphic->Surface->pixels) + i * FogGraphic->Surface->pitch,
 					   FogGraphic->Surface->w * f->BytesPerPixel);
 			}
 			SDL_UnlockSurface(s);
@@ -645,15 +629,16 @@ void CMap::InitFogOfWar()
 
 			// Convert any non-transparent pixels to use FogOfWarOpacity as alpha
 			SDL_LockSurface(s);
-			for (j = 0; j < s->h; ++j) {
-				for (i = 0; i < s->w; ++i) {
-					c = *(Uint32 *) &((Uint8 *)s->pixels)[i * 4 + j * s->pitch];
+			for (int j = 0; j < s->h; ++j) {
+				for (int i = 0; i < s->w; ++i) {
+					Uint32 c = *reinterpret_cast<Uint32 *>(&reinterpret_cast<Uint8 *>(s->pixels)[i * 4 + j * s->pitch]);
+					Uint8 a;
+
 					Video.GetRGBA(c, s->format, &r, &g, &b, &a);
 					if (a) {
 						c = Video.MapRGBA(s->format, r, g, b, FogOfWarOpacity);
-						*(Uint32 *)&((Uint8 *)s->pixels)[i * 4 + j * s->pitch] = c;
+						*reinterpret_cast<Uint32 *>(&reinterpret_cast<Uint8 *>(s->pixels)[i * 4 + j * s->pitch]) = c;
 					}
-
 				}
 			}
 			SDL_UnlockSurface(s);
