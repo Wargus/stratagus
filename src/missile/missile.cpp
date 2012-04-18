@@ -263,28 +263,6 @@ Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, co
 }
 
 /**
-**  Free a missile.
-**
-**  @param missiles  Missile pointer.
-**  @param i         Index in missiles of missile to free
-*/
-static void FreeMissile(std::vector<Missile *> &missiles, std::vector<Missile *>::size_type i)
-{
-	Missile *missile = missiles[i];
-
-	missile->TargetUnit.Reset();
-	missile->SourceUnit.Reset();
-
-	for (std::vector<Missile *>::iterator j = missiles.begin(); j != missiles.end(); ++j) {
-		if (*j == missile) {
-			missiles.erase(j);
-			break;
-		}
-	}
-	delete missile;
-}
-
-/**
 **  Calculate damage.
 **
 **  @todo NOTE: different targets (big are hit by some missiles better)
@@ -648,7 +626,7 @@ void Missile::MissileNewHeadingFromXY(const PixelPos &delta)
 **
 **  @param missile  missile to initialise for movement.
 **
-**  @return         1 if goal is reached, 0 else.
+**  @return         true if goal is reached, false else.
 */
 bool MissileInitMove(Missile &missile)
 {
@@ -680,12 +658,12 @@ bool MissileInitMove(Missile &missile)
 **
 **  @param missile  Missile pointer.
 **
-**  @return         1 if goal is reached, 0 else.
+**  @return         true if goal is reached, false else.
 */
-int PointToPointMissile(Missile &missile)
+bool PointToPointMissile(Missile &missile)
 {
-	if (MissileInitMove(missile) == 1) {
-		return 1;
+	if (MissileInitMove(missile) == true) {
+		return true;
 	}
 
 	Assert(missile.Type != NULL);
@@ -695,10 +673,10 @@ int PointToPointMissile(Missile &missile)
 	missile.position = missile.source + diff * missile.CurrentStep / missile.TotalStep;
 
 	if (missile.Type->Smoke.Missile && missile.CurrentStep) {
-		const PixelPos position =  missile.position + missile.Type->size / 2;
+		const PixelPos position = missile.position + missile.Type->size / 2;
 		MakeMissile(*missile.Type->Smoke.Missile, position, position);
 	}
-	return 0;
+	return false;
 }
 
 /**
@@ -887,30 +865,23 @@ void Missile::MissileHit()
 */
 bool Missile::NextMissileFrame(char sign, char longAnimation)
 {
-	int neg;                 // True for mirroring sprite.
-	int animationIsFinished; // returned value.
-	int numDirections;       // Number of direction of the missile.
-
-	//
-	// Animate missile, cycle through frames
-	//
-	neg = 0;
-	animationIsFinished = 0;
-	numDirections = this->Type->NumDirections / 2 + 1;
+	int neg = 0; // True for mirroring sprite.
+	bool animationIsFinished = false;
+	int numDirections = this->Type->NumDirections / 2 + 1;
 	if (this->SpriteFrame < 0) {
 		neg = 1;
 		this->SpriteFrame = -this->SpriteFrame - 1;
 	}
 	if (longAnimation) {
-		int totalf;   // Total number of frame (for one direction).
-		int df;       // Current frame (for one direction).
-		int totalx;   // Total distance to cover.
-		int dx;       // Covered distance.
+		// Total distance to cover.
+		const int totalx = MapDistance(this->destination, this->source);
+		// Covered distance.
+		const int dx = MapDistance(this->position, this->source);
+		// Total number of frame (for one direction).
+		const int totalf = this->Type->SpriteFrames / numDirections;
+		// Current frame (for one direction).
+		const int df = this->SpriteFrame / numDirections;
 
-		totalx = MapDistance(this->destination, this->source);
-		dx = MapDistance(this->position, this->source);
-		totalf = this->Type->SpriteFrames / numDirections;
-		df = this->SpriteFrame / numDirections;
 		if ((sign == 1 && dx * totalf <= df * totalx)
 			|| (sign == -1 && dx * totalf > df * totalx)) {
 			return animationIsFinished;
@@ -920,18 +891,17 @@ bool Missile::NextMissileFrame(char sign, char longAnimation)
 	if (sign > 0) {
 		if (this->SpriteFrame >= this->Type->SpriteFrames) {
 			this->SpriteFrame -= this->Type->SpriteFrames;
-			animationIsFinished = 1;
+			animationIsFinished = true;
 		}
 	} else {
 		if (this->SpriteFrame < 0) {
 			this->SpriteFrame += this->Type->SpriteFrames;
-			animationIsFinished = 1;
+			animationIsFinished = true;
 		}
 	}
 	if (neg) {
 		this->SpriteFrame = -this->SpriteFrame - 1;
 	}
-
 	return animationIsFinished;
 }
 
@@ -975,40 +945,34 @@ void Missile::NextMissileFrameCycle()
 */
 static void MissilesActionLoop(std::vector<Missile *> &missiles)
 {
-	//
-	// NOTE: missiles[??] could be modified!!! Yes (freed)
-	//
-	for (std::vector<Missile *>::size_type i = 0; i != missiles.size();) {
-		Missile &missile = *missiles[i];
+	for (std::vector<Missile *>::iterator it = missiles.begin(); it != missiles.end(); /* empty */) {
+		Missile &missile = **it;
 
 		if (missile.Delay) {
 			missile.Delay--;
-			++i;
+			++it;
 			continue;  // delay start of missile
 		}
-
 		if (missile.TTL > 0) {
 			missile.TTL--;  // overall time to live if specified
 		}
-
-		if (!missile.TTL) {
-			FreeMissile(missiles, i);
+		if (missile.TTL == 0) {
+			delete *it;
+			it = missiles.erase(it);
 			continue;
 		}
-
 		Assert(missile.Wait);
 		if (--missile.Wait) {  // wait until time is over
-			++i;
+			++it;
 			continue;
 		}
-
 		missile.Action();
-
-		if (!missile.TTL) {
-			FreeMissile(missiles, i);
+		if (missile.TTL == 0) {
+			delete *it;
+			it = missiles.erase(it);
 			continue;
 		}
-		++i;
+		++it;
 	}
 }
 

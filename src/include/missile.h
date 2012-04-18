@@ -452,7 +452,7 @@ public:
 };
 
 extern bool MissileInitMove(Missile &missile);
-extern int PointToPointMissile(Missile &missile);
+extern bool PointToPointMissile(Missile &missile);
 
 class MissileNone : public Missile {
 public:
