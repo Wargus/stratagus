@@ -114,9 +114,9 @@ void CMap::MarkSeenTile(const unsigned int index)
 
 			//  Handle Walls changes.
 		} else if (this->Tileset.TileTypeTable[tile] == TileTypeHumanWall
-					|| this->Tileset.TileTypeTable[tile] == TileTypeOrcWall
-					|| this->Tileset.TileTypeTable[seentile] == TileTypeHumanWall
-					|| this->Tileset.TileTypeTable[seentile] == TileTypeOrcWall) {
+				   || this->Tileset.TileTypeTable[tile] == TileTypeOrcWall
+				   || this->Tileset.TileTypeTable[seentile] == TileTypeHumanWall
+				   || this->Tileset.TileTypeTable[seentile] == TileTypeOrcWall) {
 			MapFixSeenWallTile(pos);
 			MapFixSeenWallNeighbors(pos);
 		}
@@ -231,8 +231,8 @@ bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos)
 
 	for (int addy = 0; addy < type.TileHeight; ++addy) {
 		for (int addx = 0; addx < type.TileWidth; ++addx) {
-			if (!(Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy)
-				&& !Map.CheckMask(pos.x + addx + index, mask))) {
+			if (Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy) == false
+				|| Map.CheckMask(pos.x + addx + index, mask) == true) {
 				return false;
 			}
 		}

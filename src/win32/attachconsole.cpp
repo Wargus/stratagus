@@ -36,47 +36,54 @@ static HINSTANCE lib_ntdll = NULL;
 typedef int FAR WINAPI proto_AttachConsole(int);
 typedef int FAR WINAPI proto_NtQueryObject(HANDLE, int, void *, unsigned long int, unsigned long int *);
 
-static proto_AttachConsole * func_AttachConsole = NULL;
-static proto_NtQueryObject * func_NtQueryObject = NULL;
+static proto_AttachConsole *func_AttachConsole = NULL;
+static proto_NtQueryObject *func_NtQueryObject = NULL;
 
 /// Check if HANDLE is attached to console
-static int WINAPI_CheckIfConsoleHandle(HANDLE handle) {
+static int WINAPI_CheckIfConsoleHandle(HANDLE handle)
+{
 
 	wchar_t filename[MAX_PATH];
 	unsigned long int length = 0;
 
 	// Try to get filename of HANDLE
-	if ( func_NtQueryObject )
+	if (func_NtQueryObject) {
 		func_NtQueryObject(handle, 1, filename, MAX_PATH, &length);
+	}
 
 	// Filename start at position 8
-	if ( length > 8 )
+	if (length > 8) {
 		return 0;
-	else
+	} else {
 		return 1;
+	}
 
 }
 
 /// Try to reopen FILE* from WINAPI HANDLE
-static void WINAPI_ReopenFileFromHandle(HANDLE handle, FILE * file, const char * mode) {
+static void WINAPI_ReopenFileFromHandle(HANDLE handle, FILE *file, const char *mode)
+{
 
 	int fd;
-	FILE * newfile;
+	FILE *newfile;
 
-	if ( ! handle || handle == INVALID_HANDLE_VALUE )
+	if (! handle || handle == INVALID_HANDLE_VALUE) {
 		return;
+	}
 
 	// Get file descriptor from HANDLE
 	fd = _open_osfhandle((intptr_t)handle, O_TEXT);
 
-	if ( fd < 0 )
+	if (fd < 0) {
 		return;
+	}
 
 	// Get C structure FILE* from file descriptior
 	newfile = _fdopen(fd, mode);
 
-	if ( ! newfile )
+	if (! newfile) {
 		return;
+	}
 
 	// Close current file
 	fclose(file);
@@ -87,7 +94,7 @@ static void WINAPI_ReopenFileFromHandle(HANDLE handle, FILE * file, const char *
 	setvbuf(file, NULL, _IONBF, 0);
 
 	// If stdout/stderr write 2 empty lines to cmd console
-	if ( ! fixmode && strcmp(mode, "w") == 0 ) {
+	if (! fixmode && strcmp(mode, "w") == 0) {
 
 		fprintf(file, "\n\n");
 		fixmode = 1;
@@ -97,27 +104,31 @@ static void WINAPI_ReopenFileFromHandle(HANDLE handle, FILE * file, const char *
 }
 
 /// Try to set std HANDLE from FILE*
-static void WINAPI_SetStdHandleFromFile(int type, FILE * file) {
+static void WINAPI_SetStdHandleFromFile(int type, FILE *file)
+{
 
 	int fd;
 	HANDLE handle;
 
 	fd = _fileno(file);
 
-	if ( fd < 0 )
+	if (fd < 0) {
 		return;
+	}
 
 	handle = (HANDLE)_get_osfhandle(fd);
 
-	if ( ! handle || handle == INVALID_HANDLE_VALUE )
+	if (! handle || handle == INVALID_HANDLE_VALUE) {
 		return;
+	}
 
 	SetStdHandle(type, handle);
 
 }
 
 /// Try attach console of parent process for std input/output in Windows NT, 2000, XP or new
-static void WINAPI_AttachConsole(void) {
+static void WINAPI_AttachConsole(void)
+{
 
 	OSVERSIONINFO osvi;
 	int hasVersion;
@@ -132,29 +143,34 @@ static void WINAPI_AttachConsole(void) {
 
 	hasVersion = GetVersionEx(&osvi);
 
-	if ( ! hasVersion )
+	if (! hasVersion) {
 		return;
+	}
 
-	version = ( osvi.dwMajorVersion << 8 ) | osvi.dwMinorVersion;
+	version = (osvi.dwMajorVersion << 8) | osvi.dwMinorVersion;
 
 	// We need Windows 2000 or new
-	if ( version < 0x0500 )
+	if (version < 0x0500) {
 		return;
+	}
 
 	lib_kernel32 = LoadLibrary("kernel32.dll");
 
-	if ( ! lib_kernel32 )
+	if (! lib_kernel32) {
 		return;
+	}
 
-	func_AttachConsole = (proto_AttachConsole*)GetProcAddress(lib_kernel32, "AttachConsole");
+	func_AttachConsole = (proto_AttachConsole *)GetProcAddress(lib_kernel32, "AttachConsole");
 
-	if ( ! func_AttachConsole )
+	if (! func_AttachConsole) {
 		return;
+	}
 
 	lib_ntdll = LoadLibrary("ntdll.dll");
 
-	if ( lib_ntdll )
-		func_NtQueryObject = (proto_NtQueryObject*)GetProcAddress(lib_ntdll, "NtQueryObject");
+	if (lib_ntdll) {
+		func_NtQueryObject = (proto_NtQueryObject *)GetProcAddress(lib_ntdll, "NtQueryObject");
+	}
 
 	// Ignore if HANDLE is not attached console
 	reopen_stdin = WINAPI_CheckIfConsoleHandle(GetStdHandle(STD_INPUT_HANDLE));
@@ -163,23 +179,27 @@ static void WINAPI_AttachConsole(void) {
 
 	attached = func_AttachConsole(-1);
 
-	if ( ! attached )
+	if (! attached) {
 		return;
+	}
 
-	if ( reopen_stdin )
+	if (reopen_stdin) {
 		WINAPI_ReopenFileFromHandle(GetStdHandle(STD_INPUT_HANDLE), stdin, "r");
-	else
+	} else {
 		WINAPI_SetStdHandleFromFile(STD_INPUT_HANDLE, stdin);
+	}
 
-	if ( reopen_stdout )
+	if (reopen_stdout) {
 		WINAPI_ReopenFileFromHandle(GetStdHandle(STD_OUTPUT_HANDLE), stdout, "w");
-	else
+	} else {
 		WINAPI_SetStdHandleFromFile(STD_OUTPUT_HANDLE, stdout);
+	}
 
-	if ( reopen_stderr )
+	if (reopen_stderr) {
 		WINAPI_ReopenFileFromHandle(GetStdHandle(STD_ERROR_HANDLE), stderr, "w");
-	else
+	} else {
 		WINAPI_SetStdHandleFromFile(STD_ERROR_HANDLE, stderr);
+	}
 
 #ifdef __cplusplus
 	std::cin.clear();

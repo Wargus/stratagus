@@ -95,8 +95,8 @@ static int AiCheckSurrounding(const CUnit &worker,
 			if (x == worker.tilePos.x && y == worker.tilePos.y) {
 				surrounding[surroundingnb++] = 1;
 			} else if (Map.CheckMask(x + y_offset,
-									(MapFieldUnpassable | MapFieldWall | MapFieldRocks
-									| MapFieldForest | MapFieldBuilding))) {
+									 (MapFieldUnpassable | MapFieldWall | MapFieldRocks
+									  | MapFieldForest | MapFieldBuilding))) {
 				surrounding[surroundingnb++] = 0;
 			} else {
 				// Can pass there

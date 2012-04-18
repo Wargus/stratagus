@@ -324,7 +324,6 @@ int SpawnMissile::Cast(CUnit &caster, const SpellType *, CUnit *target, const Ve
 		missile->SourceUnit = &caster;
 	}
 	missile->TargetUnit = target;
-	
 	return 1;
 }
 
@@ -423,11 +422,11 @@ int AdjustVitals::Cast(CUnit &caster, const SpellType *spell, CUnit *target, con
 	int castcount = 1;
 	if (hp) {
 		castcount = std::max<int>(castcount,
-								diffHP / abs(hp) + (((hp < 0) && (diffHP % (-hp) > 0)) ? 1 : 0));
+								  diffHP / abs(hp) + (((hp < 0) && (diffHP % (-hp) > 0)) ? 1 : 0));
 	}
 	if (mana) {
 		castcount = std::max<int>(castcount,
-								diffMana / abs(mana) + (((mana < 0) && (diffMana % (-mana) > 0)) ? 1 : 0));
+								  diffMana / abs(mana) + (((mana < 0) && (diffMana % (-mana) > 0)) ? 1 : 0));
 	}
 	if (manacost) {
 		castcount = std::min<int>(castcount, caster.Variable[MANA_INDEX].Value / manacost);
@@ -689,7 +688,7 @@ static Target *NewTargetUnit(CUnit &unit)
 **  @return            true if passed, false otherwise.
 */
 static bool PassCondition(const CUnit &caster, const SpellType *spell, const CUnit *target,
-						const Vec2i &/*goalPos*/, const ConditionInfo *condition)
+						  const Vec2i &/*goalPos*/, const ConditionInfo *condition)
 {
 	if (caster.Variable[MANA_INDEX].Value < spell->ManaCost) { // Check caster mana.
 		return false;

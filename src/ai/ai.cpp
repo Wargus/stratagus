@@ -876,9 +876,9 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 
 		// Check for collision
 		if (!((u0.x == b1.x + 1 || u1.x == b0.x - 1)
-			&& (std::max<int>(b0.y, u0.y) <= std::min<int>(b1.y, u1.y)))
+			  && (std::max<int>(b0.y, u0.y) <= std::min<int>(b1.y, u1.y)))
 			&& !((u0.y == b1.y + 1 || u1.y == b0.y - 1)
-			&& (std::max<int>(b0.x, u0.x) <= std::min<int>(b1.x, u1.x)))) {
+				 && (std::max<int>(b0.x, u0.x) <= std::min<int>(b1.x, u1.x)))) {
 			continue;
 		}
 

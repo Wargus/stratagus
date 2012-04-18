@@ -56,7 +56,7 @@ void CUnitPtr::Reset()
 	unit = NULL;
 }
 
-CUnitPtr& CUnitPtr::operator= (CUnit *u)
+CUnitPtr &CUnitPtr::operator= (CUnit *u)
 {
 	if (this->unit != u) {
 		if (u) {

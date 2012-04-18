@@ -1591,10 +1591,10 @@ void CUnit::AssignWorkerToMine(CUnit &mine)
 	CUnit *head = mine.Resource.Workers;
 #if 0
 	DebugPrint("%d: Worker [%d] is adding into %s [%d] on %d pos\n"
-				_C_ this->Player->Index _C_ this->Slot
-				_C_ mine.Type->Name.c_str()
-				_C_ mine.Slot
-				_C_ mine.Data.Resource.Assigned);
+			   _C_ this->Player->Index _C_ this->Slot
+			   _C_ mine.Type->Name.c_str()
+			   _C_ mine.Slot
+			   _C_ mine.Data.Resource.Assigned);
 #endif
 	this->RefsIncrease();
 	this->NextWorker = head;
@@ -1610,10 +1610,10 @@ void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 	CUnit *prev = NULL, *worker = mine.Resource.Workers;
 #if 0
 	DebugPrint("%d: Worker [%d] is removing from %s [%d] left %d units assigned\n"
-				_C_ this->Player->Index _C_ this->Slot
-				_C_ mine.Type->Name.c_str()
-				_C_ mine.Slot
-				_C_ mine.CurrentOrder()->Data.Resource.Assigned);
+			   _C_ this->Player->Index _C_ this->Slot
+			   _C_ mine.Type->Name.c_str()
+			   _C_ mine.Slot
+			   _C_ mine.CurrentOrder()->Data.Resource.Assigned);
 #endif
 	for (int i = 0; NULL != worker; worker = worker->NextWorker, ++i) {
 		if (worker == this) {

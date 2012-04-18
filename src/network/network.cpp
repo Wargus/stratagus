@@ -1038,7 +1038,7 @@ void NetworkEvent()
 
 				if (slot < UnitSlotFree
 					&& (UnitSlots[slot]->Player->Index == player
-					|| Players[player].IsTeamed(*UnitSlots[slot]))) {
+						|| Players[player].IsTeamed(*UnitSlots[slot]))) {
 					validCommand = true;
 				} else {
 					validCommand = false;
@@ -1054,7 +1054,7 @@ void NetworkEvent()
 		} else {
 			SetMessage(_("%s sent bad command"), Players[player].Name.c_str());
 			DebugPrint("%s sent bad command: 0x%x\n" _C_ Players[player].Name.c_str()
-						_C_ packet.Header.Type[i] & 0x7F);
+					   _C_ packet.Header.Type[i] & 0x7F);
 		}
 	}
 

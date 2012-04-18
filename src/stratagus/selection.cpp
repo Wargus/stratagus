@@ -779,7 +779,7 @@ int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 	// In this case, do nothing.
 	if (NumSelected == 1
 		&& (!CanSelectMultipleUnits(*Selected[0]->Player)
-		|| !Selected[0]->Type->SelectableByRectangle)) {
+			|| !Selected[0]->Type->SelectableByRectangle)) {
 		return NumSelected;
 	}
 	// If there is no selected unit yet, do a simple selection.
@@ -929,7 +929,7 @@ int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	// In this case, do nothing.
 	if (NumSelected == 1
 		&& (!CanSelectMultipleUnits(*Selected[0]->Player)
-		|| !Selected[0]->Type->SelectableByRectangle)) {
+			|| !Selected[0]->Type->SelectableByRectangle)) {
 		return NumSelected;
 	}
 
@@ -993,7 +993,7 @@ int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	// In this case, do nothing.
 	if (NumSelected == 1
 		&& (!CanSelectMultipleUnits(*Selected[0]->Player)
-		|| !Selected[0]->Type->SelectableByRectangle)) {
+			|| !Selected[0]->Type->SelectableByRectangle)) {
 		return NumSelected;
 	}
 

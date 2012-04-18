@@ -352,7 +352,7 @@ void CViewport::Draw() const
 	//FIXME: This is still unsecure during parallel
 	if (!Preference.ShowOrders) {
 	} else if (Preference.ShowOrders < 0
-				|| (ShowOrdersCount >= GameCycle) || (KeyModifiers & ModifierShift)) {
+			   || (ShowOrdersCount >= GameCycle) || (KeyModifiers & ModifierShift)) {
 		for (int i = 0; i < NumSelected; ++i) {
 			ShowOrder(*Selected[i]);
 		}

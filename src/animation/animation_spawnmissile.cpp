@@ -99,7 +99,7 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 	const int destx = ParseAnimInt(&unit, this->destXStr.c_str());
 	const int desty = ParseAnimInt(&unit, this->destYStr.c_str());
 	const int flags = ParseAnimFlags(unit, this->flagsStr.c_str());
-	const CUnit *goal = flags & ANIM_SM_RELTARGET ? unit.CurrentOrder()->GetGoal(): &unit;
+	const CUnit *goal = flags & ANIM_SM_RELTARGET ? unit.CurrentOrder()->GetGoal() : &unit;
 	PixelPos start;
 	PixelPos dest;
 

@@ -201,7 +201,7 @@ inline void ProfilePrint()
 	}
 	std::vector<ProfileData *> prof;
 	for (std::map<const char *const, ProfileData>::iterator i = functionProfiles.begin();
-		i != functionProfiles.end(); ++i) {
+		 i != functionProfiles.end(); ++i) {
 		ProfileData *data = &i->second;
 		prof.insert(std::upper_bound(prof.begin(), prof.end(), data, compProfileData), data);
 	}
@@ -415,7 +415,7 @@ static inline int AStarAddNode(const Vec2i &pos, int o, int costs)
 			smalli = midi;
 		} else if (costs < midcost || (costs == midcost
 									   && (costToGoal < midCostToGoal || (costToGoal == midCostToGoal
-											&& dist < midDist)))) {
+											   && dist < midDist)))) {
 			if (bigi == midi) {
 				bigi++;
 			} else {

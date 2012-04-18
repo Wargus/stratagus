@@ -839,12 +839,12 @@ static int CclSetPlayerData(lua_State *l)
 		const std::string res = LuaToString(l, 3);
 		const int resId = GetResourceIdByName(l, res.c_str());
 		p->SetResource(resId, LuaToNumber(l, 4), true);
-// } else if (!strcmp(data, "UnitTypesCount")) {
-// } else if (!strcmp(data, "AiEnabled")) {
-// } else if (!strcmp(data, "TotalNumUnits")) {
-// } else if (!strcmp(data, "NumBuildings")) {
-// } else if (!strcmp(data, "Supply")) {
-// } else if (!strcmp(data, "Demand")) {
+		// } else if (!strcmp(data, "UnitTypesCount")) {
+		// } else if (!strcmp(data, "AiEnabled")) {
+		// } else if (!strcmp(data, "TotalNumUnits")) {
+		// } else if (!strcmp(data, "NumBuildings")) {
+		// } else if (!strcmp(data, "Supply")) {
+		// } else if (!strcmp(data, "Demand")) {
 	} else if (!strcmp(data, "UnitLimit")) {
 		p->UnitLimit = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "BuildingLimit")) {

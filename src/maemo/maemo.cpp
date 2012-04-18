@@ -44,7 +44,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static osso_context_t * osso = NULL;
+static osso_context_t *osso = NULL;
 static SDL_TimerID timer = NULL;
 
 /*----------------------------------------------------------------------------
@@ -57,8 +57,9 @@ static SDL_TimerID timer = NULL;
  **/
 static Uint32 OssoKeepBacklightAlive(Uint32 interval, void *)
 {
-	if (!osso)
+	if (!osso) {
 		return 0;
+	}
 
 	osso_display_state_on(osso);
 	osso_display_blanking_pause(osso);
@@ -72,15 +73,16 @@ static Uint32 OssoKeepBacklightAlive(Uint32 interval, void *)
  **/
 static void OssoInitialize(void)
 {
-	char * application;
+	char *application;
 
 	if (FullGameName.empty()) {
 		application = strdup("org.stratagus");
 	} else {
 		application = (char *)calloc(FullGameName.size() + 15, 1);
 		strcpy(application, "org.stratagus.");
-		for (int i = 0; i < FullGameName.size(); i++)
-			application[i+14] = tolower(FullGameName[i]);
+		for (int i = 0; i < FullGameName.size(); i++) {
+			application[i + 14] = tolower(FullGameName[i]);
+		}
 	}
 
 	osso = osso_initialize(application, VERSION, TRUE, NULL);

@@ -397,7 +397,7 @@ static int CclDefineAiHelper(lua_State *l)
 	return 0;
 }
 
-static CAiType *GetAiTypesByName(const char* name)
+static CAiType *GetAiTypesByName(const char *name)
 {
 	for (size_t i = 0; i < AiTypes.size(); ++i) {
 		CAiType *ait = AiTypes[i];
@@ -425,7 +425,7 @@ static int CclDefineAi(lua_State *l)
 	CAiType *aitype = new CAiType;
 
 	// AI Name
-	const char* aiName = LuaToString(l, 1);
+	const char *aiName = LuaToString(l, 1);
 	aitype->Name = aiName;
 
 #ifdef DEBUG
@@ -1273,7 +1273,7 @@ static int CclDefineAiPlayer(lua_State *l)
 		++j;
 
 		if (!strcmp(value, "ai-type")) {
-			const char* aiName = LuaToString(l, j + 1);
+			const char *aiName = LuaToString(l, j + 1);
 			CAiType *ait = GetAiTypesByName(aiName);
 			if (ait == NULL) {
 				lua_pushfstring(l, "ai-type not found: %s", aiName);
@@ -1299,7 +1299,7 @@ static int CclDefineAiPlayer(lua_State *l)
 
 			for (int k = 1; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
-				const char* value = LuaToString(l, -1);
+				const char *value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
 				if (!strcmp(value, "complete")) {

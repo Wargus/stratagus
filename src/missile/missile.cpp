@@ -781,7 +781,7 @@ void Missile::MissileHit()
 	//
 	if (!mtype.Range) {
 		if (this->TargetUnit && (mtype.FriendlyFire == false
-								   || this->TargetUnit->Player->Index != this->SourceUnit->Player->Index)) {
+								 || this->TargetUnit->Player->Index != this->SourceUnit->Player->Index)) {
 			//
 			// Missiles without range only hits the goal always.
 			//
@@ -934,7 +934,7 @@ void Missile::NextMissileFrameCycle()
 				j = f - i;
 			}
 			this->SpriteFrame = this->SpriteFrame % (this->Type->NumDirections / 2 + 1) +
-								  j * (this->Type->NumDirections / 2 + 1);
+								j * (this->Type->NumDirections / 2 + 1);
 			break;
 		}
 	}
@@ -1048,7 +1048,7 @@ void Missile::SaveMissile(CFile &file) const
 	file.printf(", \"goal\", ");
 	SavePixelPos(file, this->destination);
 	file.printf(",\n  \"frame\", %d, \"state\", %d, \"anim-wait\", %d, \"wait\", %d, \"delay\", %d,\n ",
-		this->SpriteFrame, this->State, this->AnimWait, this->Wait, this->Delay);
+				this->SpriteFrame, this->State, this->AnimWait, this->Wait, this->Delay);
 	if (this->SourceUnit != NULL) {
 		file.printf(" \"source\", \"%s\",", UnitReference(this->SourceUnit).c_str());
 	}

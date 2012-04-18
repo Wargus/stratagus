@@ -352,7 +352,7 @@ int CPopupContentTypeCosts::GetWidth(const ButtonAction *button, int *Costs) con
 
 	for (unsigned int i = 1; i < MaxCosts; ++i) {
 		if (Costs[i]) {
-			if(UI.Resources[i].IconWidth != -1)	{
+			if (UI.Resources[i].IconWidth != -1)	{
 				popupWidth += (UI.Resources[i].IconWidth + 5);
 			} else {
 				const CGraphic *G = UI.Resources[i].G;
@@ -551,8 +551,8 @@ static void GetPopupSize(const ButtonAction *button, const CUIButton *uibutton,
 	CPopup &popup = *PopupByIdent(button->Popup);
 
 	for (std::vector<CPopupContentType *>::const_iterator it = popup.Contents.begin();
-		it != popup.Contents.end();
-		++it) {
+		 it != popup.Contents.end();
+		 ++it) {
 		const CPopupContentType &content = **it;
 
 		if (CanShowPopupContent(content.Condition, button, UnitTypes[button->Value])) {
@@ -724,10 +724,10 @@ void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 
 	// Contents
 	for (std::vector<CPopupContentType *>::const_iterator content = popup->Contents.begin();
-		content != popup->Contents.end(); ++content) {
-			if (CanShowPopupContent((*content)->Condition, button, UnitTypes[button->Value])) {
-				(*content)->Draw(x + (*content)->PosX, y + (*content)->PosY, button, Costs);
-			}
+		 content != popup->Contents.end(); ++content) {
+		if (CanShowPopupContent((*content)->Condition, button, UnitTypes[button->Value])) {
+			(*content)->Draw(x + (*content)->PosX, y + (*content)->PosY, button, Costs);
+		}
 	}
 
 #if 0 // Fixme: need to remove soon
@@ -994,9 +994,9 @@ static bool IsButtonAllowed(const CUnit &unit, const ButtonAction *buttonaction)
 			break;
 		case ButtonReturn:
 			if (!(!unit.CurrentResource
-				|| !(unit.ResourcesHeld > 0 && !unit.Type->ResInfo[unit.CurrentResource]->LoseResources)
-				|| (unit.ResourcesHeld != unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity
-					&& unit.Type->ResInfo[unit.CurrentResource]->LoseResources))) {
+				  || !(unit.ResourcesHeld > 0 && !unit.Type->ResInfo[unit.CurrentResource]->LoseResources)
+				  || (unit.ResourcesHeld != unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity
+					  && unit.Type->ResInfo[unit.CurrentResource]->LoseResources))) {
 				res = true;
 			}
 			break;
@@ -1234,7 +1234,7 @@ void CButtonPanel::DoClicked(int button)
 			//  That or a bunker.
 			//
 			if ((NumSelected == 1 && Selected[0]->CurrentAction() == UnitActionStill
-				&& Map.CoastOnMap(Selected[0]->tilePos))
+				 && Map.CoastOnMap(Selected[0]->tilePos))
 				|| !Selected[0]->CanMove()) {
 				SendCommandUnload(*Selected[0], Selected[0]->tilePos, NoUnitP, flush);
 				break;
@@ -1420,8 +1420,9 @@ void CButtonPanel::DoClicked(int button)
 				UI.StatusLine.Clear();
 				ClearCosts();
 			} else if (Selected[0]->Player->CheckLimits(type) == -3)
-				if (GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound)
+				if (GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound) {
 					PlayGameSound(GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound, MaxSampleVolume);
+				}
 			break;
 		}
 		case ButtonUpgradeTo: {

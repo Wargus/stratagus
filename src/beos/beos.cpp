@@ -30,17 +30,17 @@
 
 extern "C" {
 
-/**
-**  Need init function for beos.
-**
-**  @param argc  Number of command line argurments
-*/
-void beos_init(int argc, char** argv)
-{
-	BPath path( argv[0] );
-	path.GetParent( &path );
-	chdir( path.Path() );
-}
+	/**
+	**  Need init function for beos.
+	**
+	**  @param argc  Number of command line argurments
+	*/
+	void beos_init(int argc, char **argv)
+	{
+		BPath path(argv[0]);
+		path.GetParent(&path);
+		chdir(path.Path());
+	}
 
 }
 

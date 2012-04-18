@@ -703,7 +703,7 @@ static void DrawUnitInfo(CUnit &unit)
 					order.GetUnitType().Icon.Icon->DrawUnitIcon(
 						UI.UpgradingButton->Style,
 						(ButtonAreaUnderCursor == ButtonAreaUpgrading
-						&& ButtonUnderCursor == 0) ?
+						 && ButtonUnderCursor == 0) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
 						UI.UpgradingButton->X, UI.UpgradingButton->Y, "");
 				}
@@ -716,7 +716,7 @@ static void DrawUnitInfo(CUnit &unit)
 					order.GetUpgrade().Icon->DrawUnitIcon(
 						UI.ResearchingButton->Style,
 						(ButtonAreaUnderCursor == ButtonAreaResearching
-						&& ButtonUnderCursor == 0) ?
+						 && ButtonUnderCursor == 0) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
 						UI.ResearchingButton->X, UI.ResearchingButton->Y, "");
 				}

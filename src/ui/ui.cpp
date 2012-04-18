@@ -276,8 +276,8 @@ void CleanUserInterface()
 
 	// Button Popups
 	for (std::vector<CPopup *>::iterator popup = UI.ButtonPopups.begin();
-		popup != UI.ButtonPopups.end(); ++popup) {
-			delete *popup;
+		 popup != UI.ButtonPopups.end(); ++popup) {
+		delete *popup;
 	}
 	UI.ButtonPopups.clear();
 

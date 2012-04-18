@@ -578,13 +578,13 @@ static void DrawDecoration(const CUnit &unit, const CUnitType *type, int x, int 
 		Assert(value <= max);
 
 		if (!((value == 0 && !var->ShowWhenNull) || (value == max && !var->ShowWhenMax)
-			|| (var->HideHalf && value != 0 && value != max)
-			|| (!var->ShowIfNotEnable && !unit.Variable[var->Index].Enable)
-			|| (var->ShowOnlySelected && !unit.Selected)
-			|| (unit.Player->Type == PlayerNeutral && var->HideNeutral)
-			|| (ThisPlayer->IsEnemy(unit) && !var->ShowOpponent)
-			|| (ThisPlayer->IsAllied(unit) && (unit.Player != ThisPlayer) && var->HideAllied)
-			|| max == 0)) {
+			  || (var->HideHalf && value != 0 && value != max)
+			  || (!var->ShowIfNotEnable && !unit.Variable[var->Index].Enable)
+			  || (var->ShowOnlySelected && !unit.Selected)
+			  || (unit.Player->Type == PlayerNeutral && var->HideNeutral)
+			  || (ThisPlayer->IsEnemy(unit) && !var->ShowOpponent)
+			  || (ThisPlayer->IsAllied(unit) && (unit.Player != ThisPlayer) && var->HideAllied)
+			  || max == 0)) {
 			var->Draw(
 				x + var->OffsetX + var->OffsetXPercent * unit.Type->TileWidth * PixelTileSize.x / 100,
 				y + var->OffsetY + var->OffsetYPercent * unit.Type->TileHeight * PixelTileSize.y / 100,
@@ -719,8 +719,9 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, int x, in
 	// For debug draw sight, react and attack range!
 	//
 	if (NumSelected == 1 && unit.Selected) {
-		const PixelPos center = {x + type.TileWidth * PixelTileSize.x / 2,
-								 y + type.TileHeight * PixelTileSize.y / 2};
+		const PixelPos center = {x + type.TileWidth *PixelTileSize.x / 2,
+								 y + type.TileHeight *PixelTileSize.y / 2
+								};
 
 		if (Preference.ShowSightRange) {
 			const int value = stats.Variables[SIGHTRANGE_INDEX].Max;

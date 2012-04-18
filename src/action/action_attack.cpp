@@ -390,8 +390,8 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			return;
 		}
 		// Attacking wall or ground.
-		if (((goal && goal->Type && goal->Type->Wall) || ((!goal) 
-			&& (Map.WallOnMap(this->goalPos) || this->Action == UnitActionAttackGround)))
+		if (((goal && goal->Type && goal->Type->Wall)
+			 || (!goal && (Map.WallOnMap(this->goalPos) || this->Action == UnitActionAttackGround)))
 			&& unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 			// Reached wall or ground, now attacking it
 			unit.State = 0;
