@@ -64,7 +64,7 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-	// Direct acces to clipping rectangle for macro CLIP_RECTANGLE
+// Direct acces to clipping rectangle for macro CLIP_RECTANGLE
 extern int ClipX1; /// current clipping top left
 extern int ClipY1; /// current clipping top left
 extern int ClipX2; /// current clipping bottom right
@@ -92,36 +92,36 @@ extern int ClipY2; /// current clipping bottom right
 ** (return value of width and height can be made smaller)
 */
 #define CLIP_RECTANGLE(x, y, width, height) do { \
-	int f; \
-	if (x < ClipX1) { \
-		f = ClipX1 - x; \
-		if (width <= f) { \
-			return; \
+		int f; \
+		if (x < ClipX1) { \
+			f = ClipX1 - x; \
+			if (width <= f) { \
+				return; \
+			} \
+			width -= f; \
+			x = ClipX1; \
 		} \
-		width -= f; \
-		x = ClipX1; \
-	} \
-	if ((x + width) > ClipX2 + 1) { \
-		if (x > ClipX2) { \
-			return; \
+		if ((x + width) > ClipX2 + 1) { \
+			if (x > ClipX2) { \
+				return; \
+			} \
+			width = ClipX2 - x + 1; \
 		} \
-		width = ClipX2 - x + 1; \
-	} \
-	if (y < ClipY1) { \
-		f = ClipY1 - y; \
-		if (height <= f) { \
-			return; \
+		if (y < ClipY1) { \
+			f = ClipY1 - y; \
+			if (height <= f) { \
+				return; \
+			} \
+			height -= f; \
+			y = ClipY1; \
 		} \
-		height -= f; \
-		y = ClipY1; \
-	} \
-	if ((y + height) > ClipY2 + 1) { \
-		if (y > ClipY2) { \
-			return; \
+		if ((y + height) > ClipY2 + 1) { \
+			if (y > ClipY2) { \
+				return; \
+			} \
+			height = ClipY2 - y + 1; \
 		} \
-		height = ClipY2 - y + 1; \
-	} \
-} while(0)
+	} while(0)
 
 /**
 ** Clip rectangle area (just like CLIP_RECTANGLE), but also return offsets
@@ -147,42 +147,42 @@ extern int ClipY2; /// current clipping bottom right
 ** @note there was no need for 'endy', as it isn't used to draw sprites..
 */
 #define CLIP_RECTANGLE_OFS(x, y, width, height, ofsx, ofsy, endx) do { \
-	if (y < ClipY1) { \
-		ofsy = ClipY1 - y; \
-		if (height <= ofsy) { \
-			return; \
+		if (y < ClipY1) { \
+			ofsy = ClipY1 - y; \
+			if (height <= ofsy) { \
+				return; \
+			} \
+			height -= ofsy; \
+			y = ClipY1; \
+		} else { \
+			ofsy = 0; \
 		} \
-		height -= ofsy; \
-		y = ClipY1; \
-	} else { \
-		ofsy = 0; \
-	} \
-	if ((y + height) > ClipY2 + 1) { \
-		if (y > ClipY2) { \
-			return; \
+		if ((y + height) > ClipY2 + 1) { \
+			if (y > ClipY2) { \
+				return; \
+			} \
+			height = ClipY2 - y + 1; \
 		} \
-		height = ClipY2 - y + 1; \
-	} \
-	if (x < ClipX1) { \
-		ofsx = ClipX1 - x; \
-		if (width <= ofsx) { \
-			return; \
+		if (x < ClipX1) { \
+			ofsx = ClipX1 - x; \
+			if (width <= ofsx) { \
+				return; \
+			} \
+			width -= ofsx; \
+			x = ClipX1; \
+		} else { \
+			ofsx = 0; \
 		} \
-		width -= ofsx; \
-		x = ClipX1; \
-	} else { \
-		ofsx = 0; \
-	} \
-	if ((x + width) > ClipX2 + 1) { \
-		if (x > ClipX2) { \
-			return; \
+		if ((x + width) > ClipX2 + 1) { \
+			if (x > ClipX2) { \
+				return; \
+			} \
+			endx = (x + width) - (ClipX2 + 1); \
+			width = ClipX2 - x + 1; \
+		} else { \
+			endx = 0; \
 		} \
-		endx = (x + width) - (ClipX2 + 1); \
-		width = ClipX2 - x + 1; \
-	} else { \
-		endx = 0; \
-	} \
-} while(0)
+	} while(0)
 
 
 /*----------------------------------------------------------------------------

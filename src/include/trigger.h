@@ -44,7 +44,8 @@ class CFile;
 /**
 **  Timer structure
 */
-class CTimer {
+class CTimer
+{
 public:
 	CTimer() : Init(false), Running(false), Increasing(false), Cycles(0),
 		LastUpdate(0) {}

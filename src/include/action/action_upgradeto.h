@@ -36,7 +36,7 @@
 
 class COrder_TransformInto : public COrder
 {
-	friend COrder* COrder::NewActionTransformInto(CUnitType &type);
+	friend COrder *COrder::NewActionTransformInto(CUnitType &type);
 public:
 	COrder_TransformInto() : COrder(UnitActionTransformInto), Type(NULL) {}
 
@@ -46,8 +46,8 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput& input) { UpdatePathFinderData_NotCalled(input); }
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
 
 private:
 	CUnitType *Type; /// Transform unit into this unit-type
@@ -56,7 +56,7 @@ private:
 
 class COrder_UpgradeTo : public COrder
 {
-	friend COrder* COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type);
+	friend COrder *COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type);
 public:
 	COrder_UpgradeTo() : COrder(UnitActionUpgradeTo), Type(NULL), Ticks(0) {}
 
@@ -67,12 +67,12 @@ public:
 
 	virtual void Execute(CUnit &unit);
 	virtual void Cancel(CUnit &unit);
-	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput& input) { UpdatePathFinderData_NotCalled(input); }
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
 
 	virtual void UpdateUnitVariables(CUnit &unit) const;
 
-	const CUnitType& GetUnitType() const { return *Type; }
+	const CUnitType &GetUnitType() const { return *Type; }
 private:
 	CUnitType *Type; /// upgrate to this unit-type
 	int Ticks;       /// Ticks to complete

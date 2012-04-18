@@ -41,7 +41,8 @@ class MissileType;
 **
 **  @todo Move this to missile.h?
 */
-class MissileConfig {
+class MissileConfig
+{
 public:
 	MissileConfig() : Missile(NULL) {}
 

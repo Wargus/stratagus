@@ -36,10 +36,9 @@
 
 class COrder_Move : public COrder
 {
-	friend COrder* COrder::NewActionMove(const Vec2i &pos);
+	friend COrder *COrder::NewActionMove(const Vec2i &pos);
 public:
-	COrder_Move() : COrder(UnitActionMove), Range(0)
-	{
+	COrder_Move() : COrder(UnitActionMove), Range(0) {
 		goalPos.x = -1;
 		goalPos.y = -1;
 	}
@@ -50,8 +49,8 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput& input);
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual void UpdatePathFinderData(PathFinderInput &input);
 
 private:
 	int Range;

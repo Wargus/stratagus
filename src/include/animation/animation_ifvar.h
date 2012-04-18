@@ -40,8 +40,8 @@ class CAnimation_IfVar : public CAnimation
 public:
 	CAnimation_IfVar() : CAnimation(AnimationIfVar), binOpFunc(NULL), gotoLabel(NULL) {}
 
-	virtual void Action(CUnit& unit, int &move, int scale) const;
-	virtual void Init(const char* s);
+	virtual void Action(CUnit &unit, int &move, int scale) const;
+	virtual void Init(const char *s);
 
 private:
 	typedef bool BinOpFunc(int lhs, int rhs);
@@ -49,7 +49,7 @@ private:
 private:
 	std::string leftVar;
 	std::string rightVar;
-	BinOpFunc* binOpFunc;
+	BinOpFunc *binOpFunc;
 	CAnimation *gotoLabel;
 };
 

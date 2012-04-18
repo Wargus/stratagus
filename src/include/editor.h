@@ -60,7 +60,8 @@ enum EditorStateType {
 	EditorSetStartLocation   /// Set the start location
 };
 
-class CEditor {
+class CEditor
+{
 public:
 	CEditor() : TerrainEditable(true),
 		StartUnit(NULL),
@@ -68,7 +69,7 @@ public:
 		TileIndex(0), CursorTileIndex(-1), SelectedTileIndex(-1),
 		CursorPlayer(-1), SelectedPlayer(PlayerNumNeutral),
 		MapLoaded(false), WriteCompressedMaps(true), PopUpX(-1), PopUpY(-1)
-		{};
+	{};
 	~CEditor() {};
 
 	void Init();
@@ -119,28 +120,28 @@ extern CEditor Editor;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	/// Start the editor
+/// Start the editor
 extern void StartEditor(const char *filename);
 
-	/// Editor main event loop
+/// Editor main event loop
 extern void EditorMainLoop();
-	/// Update editor display
+/// Update editor display
 extern void EditorUpdateDisplay();
 
-	/// Save a map from editor
+/// Save a map from editor
 extern int EditorSaveMap(const std::string &file);
 
-	/// Register ccl features
+/// Register ccl features
 extern void EditorCclRegister();
 
-	/// Edit tile
+/// Edit tile
 extern void EditTile(const Vec2i &pos, int tile);
-	/// Edit tiles
+/// Edit tiles
 extern void EditTiles(const Vec2i &pos, int tile, int size);
 
-	/// Change the view of a tile
+/// Change the view of a tile
 extern void ChangeTile(const Vec2i &pos, int tile);
-	/// Update surroundings for tile changes
+/// Update surroundings for tile changes
 extern void EditorTileChanged(const Vec2i &pos);
 
 

@@ -36,10 +36,9 @@
 
 class COrder_SpellCast : public COrder
 {
-	friend COrder* COrder::NewActionSpellCast(SpellType &spell, const Vec2i &pos, CUnit *target);
+	friend COrder *COrder::NewActionSpellCast(SpellType &spell, const Vec2i &pos, CUnit *target);
 public:
-	COrder_SpellCast() : COrder(UnitActionSpellCast), Spell(NULL), State(0), Range(0)
-	{
+	COrder_SpellCast() : COrder(UnitActionSpellCast), Spell(NULL), State(0), Range(0) {
 		goalPos.x = -1;
 		goalPos.y = -1;
 	}
@@ -50,12 +49,12 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput& input);
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual void UpdatePathFinderData(PathFinderInput &input);
 
 	virtual void OnAnimationAttack(CUnit &unit);
 
-	const SpellType& GetSpell() const { return *Spell; }
+	const SpellType &GetSpell() const { return *Spell; }
 	void SetSpell(SpellType &spell) { Spell = &spell; }
 private:
 	bool SpellMoveToTarget(CUnit &unit);

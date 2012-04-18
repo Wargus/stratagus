@@ -223,13 +223,13 @@ enum TileType {
 	TileTypeWater       /// Any water tile
 };
 
-	/// Single tile definition
+/// Single tile definition
 struct TileInfo {
 	unsigned char BaseTerrain; /// Basic terrain of the tile
 	unsigned char MixTerrain;  /// Terrain mixed with this
 };
 
-	/// Definition for a terrain type
+/// Definition for a terrain type
 struct SolidTerrainInfo {
 	std::string TerrainName;  /// Name of the terrain
 	// TODO: When drawing with the editor add some kind fo probabilities for every tile.
@@ -239,8 +239,9 @@ struct SolidTerrainInfo {
 #define MapFieldRocks      0x0400  /// Field contains rocks
 #define MapFieldForest     0x0800  /// Field contains forest
 
-	/// Tileset definition
-class CTileset {
+/// Tileset definition
+class CTileset
+{
 public:
 	void Clear() {
 		Name.clear();
@@ -306,9 +307,8 @@ public:
 	unsigned HumanWallTable[16];    /// Human wall placement table
 	unsigned OrcWallTable[16];      /// Orc wall placement table
 
-	bool IsSeenTile(unsigned short type, unsigned short seen) const
-	{
-		if(TileTypeTable) {
+	bool IsSeenTile(unsigned short type, unsigned short seen) const {
+		if (TileTypeTable) {
 			switch (type) {
 				case MapFieldForest:
 					return TileTypeTable[seen] == TileTypeWood;

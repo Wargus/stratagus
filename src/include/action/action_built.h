@@ -36,7 +36,7 @@
 
 class COrder_Built : public COrder
 {
-	friend COrder* COrder::NewActionBuilt(CUnit &builder, CUnit &unit);
+	friend COrder *COrder::NewActionBuilt(CUnit &builder, CUnit &unit);
 public:
 	COrder_Built() : COrder(UnitActionBuilt), ProgressCounter(0), IsCancelled(false), Frame(NULL) {}
 
@@ -47,17 +47,17 @@ public:
 
 	virtual void Execute(CUnit &unit);
 	virtual void Cancel(CUnit &unit);
-	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput& input) { UpdatePathFinderData_NotCalled(input); }
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
 
 	virtual void UpdateUnitVariables(CUnit &unit) const;
 	virtual void FillSeenValues(CUnit &unit) const;
 	virtual void AiUnitKilled(CUnit &unit);
 
-	void Progress(CUnit & unit, int amount);
+	void Progress(CUnit &unit, int amount);
 	void ProgressHp(CUnit &unit, int amount);
 
-	const CConstructionFrame& GetFrame() const { return *Frame; }
+	const CConstructionFrame &GetFrame() const { return *Frame; }
 	const CUnitPtr &GetWorker() const { return Worker; }
 	CUnit *GetWorkerPtr() { return Worker; }
 

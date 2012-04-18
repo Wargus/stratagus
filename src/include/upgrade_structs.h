@@ -58,11 +58,11 @@ struct lua_State;
 enum CostType {
 	TimeCost,                               /// time in game cycles
 
-// standard
+	// standard
 	GoldCost,                               /// gold  resource
 	WoodCost,                               /// wood  resource
 	OilCost,                                /// oil   resource
-// extensions
+	// extensions
 	Cost4,                                  /// resource 4
 	Cost5,                                  /// resource 5
 	Cost6,                                  /// resource 6
@@ -135,10 +135,10 @@ extern int GetResourceIdByName(lua_State *l, const char *resourceName);
 /**
 **  These are the current stats of a unit. Upgraded or downgraded.
 */
-class CUnitStats {
+class CUnitStats
+{
 public:
-	CUnitStats() : Variables(NULL)
-	{
+	CUnitStats() : Variables(NULL) {
 		memset(Costs, 0, sizeof(Costs));
 	}
 
@@ -149,7 +149,8 @@ public:
 /**
 **  The main useable upgrades.
 */
-class CUpgrade {
+class CUpgrade
+{
 public:
 	CUpgrade(const std::string &ident);
 	~CUpgrade();
@@ -162,7 +163,7 @@ public:
 	std::string Ident;                /// identifier
 	int   ID;                         /// numerical id
 	int   Costs[MaxCosts];            /// costs for the upgrade
-		// TODO: not used by buttons
+	// TODO: not used by buttons
 	CIcon *Icon;                      /// icon to display to the user
 };
 
@@ -175,10 +176,10 @@ public:
 **  This do the real action of an upgrade, an upgrade can have multiple
 **  modifiers.
 */
-class CUpgradeModifier {
+class CUpgradeModifier
+{
 public:
-	CUpgradeModifier() : UpgradeId(0), ConvertTo(NULL)
-	{
+	CUpgradeModifier() : UpgradeId(0), ConvertTo(NULL) {
 		memset(ChangeUnits, 0, sizeof(ChangeUnits));
 		memset(ChangeUpgrades, 0, sizeof(ChangeUpgrades));
 		memset(ApplyTo, 0, sizeof(ApplyTo));
@@ -213,7 +214,8 @@ public:
 **    @li `E' -- enabled, allowed by level but currently forbidden
 **    @li `X' -- fixed, acquired can't be disabled
 */
-class CAllow {
+class CAllow
+{
 public:
 	CAllow() { this->Clear(); }
 
@@ -230,7 +232,8 @@ public:
 **  Upgrade timer used in the player structure.
 **  Every player has an own UpgradeTimers struct.
 */
-class CUpgradeTimers {
+class CUpgradeTimers
+{
 public:
 	CUpgradeTimers() { this->Clear(); }
 

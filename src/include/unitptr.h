@@ -51,10 +51,10 @@ public:
 	operator CUnit *() { return unit; }
 	operator CUnit *() const { return unit; }
 
-	CUnit & operator*() { return *unit; }
+	CUnit &operator*() { return *unit; }
 	CUnit *operator->() const { return unit; }
 
-	CUnitPtr& operator= (CUnit *u);
+	CUnitPtr &operator= (CUnit *u);
 
 	bool operator== (CUnit *u) const { return this->unit == u; }
 	bool operator!= (CUnit *u) const { return this->unit != u; }

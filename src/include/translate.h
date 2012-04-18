@@ -43,13 +43,13 @@ extern std::string GameTranslation;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	/// Translate a string
+/// Translate a string
 extern const char *Translate(const char *str);
-	/// Add a translation
+/// Add a translation
 extern void AddTranslation(const char *str1, const char *str2);
-	/// Load a .po file
+/// Load a .po file
 extern void LoadPO(const char *file);
-	/// Set the stratagus and game translations
+/// Set the stratagus and game translations
 extern void SetTranslationsFiles(const char *stratagusfile, const char *gamefile);
 
 

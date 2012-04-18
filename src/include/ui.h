@@ -80,12 +80,12 @@ enum TextAlignment {
 	TextAlignRight
 };
 
-class ButtonStyleProperties {
+class ButtonStyleProperties
+{
 public:
 	ButtonStyleProperties() : Sprite(NULL), Frame(0), BorderColor(0),
 		BorderSize(0), TextAlign(TextAlignUndefined),
-		TextX(0), TextY(0)
-	{
+		TextX(0), TextY(0) {
 		BorderColorRGB.r = BorderColorRGB.g = BorderColorRGB.b = 0;
 	}
 
@@ -101,7 +101,8 @@ public:
 	std::string TextReverseColor;   /// Reverse text color
 };
 
-class ButtonStyle {
+class ButtonStyle
+{
 public:
 	ButtonStyle() : Width(0), Height(0), Font(0),
 		TextAlign(TextAlignUndefined), TextX(0), TextY(0) {}
@@ -119,8 +120,9 @@ public:
 	ButtonStyleProperties Clicked;  /// Clicked button properties
 };
 
-	/// buttons on screen themselves
-class CUIButton {
+/// buttons on screen themselves
+class CUIButton
+{
 public:
 	CUIButton() : X(0), Y(0), Style(NULL), Callback(NULL) {}
 	~CUIButton() {}
@@ -160,7 +162,8 @@ public:
 **    changes the position together with the unit.
 **    @todo binding to a group.
 */
-class CViewport {
+class CViewport
+{
 public:
 	CViewport() : X(0), Y(0), EndX(0), EndY(0), MapX(0), MapY(0),
 		OffsetX(0), OffsetY(0), MapWidth(0), MapHeight(0), Unit(NULL)
@@ -186,7 +189,7 @@ public:
 	/// Set the current map view to x,y(upper,left corner)
 	void Set(const Vec2i &tilePos, const PixelDiff &offset);
 	/// Center map on point in viewport
-	void Center(const Vec2i& pos, const PixelDiff &offset);
+	void Center(const Vec2i &pos, const PixelDiff &offset);
 
 protected:
 	/// Set the current map view to x,y(upper,left corner)
@@ -201,7 +204,7 @@ public:
 	void DrawBorder() const;
 	/// Check if any part of an area is visible in viewport
 	bool AnyMapAreaVisibleInViewport(const Vec2i &boxmin, const Vec2i &boxmax) const;
-//private:
+	//private:
 	int X;                      /// Screen pixel left corner x coordinate
 	int Y;                      /// Screen pixel upper corner y coordinate
 	int EndX;                   /// Screen pixel right x coordinate
@@ -251,7 +254,8 @@ public:
 /**
 **  Condition to show panel content.
 */
-class ConditionPanel {
+class ConditionPanel
+{
 public:
 	ConditionPanel() : ShowOnlySelected(false), HideNeutral(false),
 		HideAllied(false), ShowOpponent(false), BoolFlags(NULL),
@@ -274,12 +278,13 @@ public:
 /**
 **  Infos to display the contents of panel.
 */
-class CContentType {
+class CContentType
+{
 public:
 	CContentType() : PosX(0), PosY(0), Condition(NULL) {}
 	virtual ~CContentType() { delete Condition; }
 
-		/// Tell how show the variable Index.
+	/// Tell how show the variable Index.
 	virtual void Draw(const CUnit &unit, CFont *defaultfont) const = 0;
 
 	int PosX;             /// X coordinate where to display.
@@ -291,7 +296,8 @@ public:
 /**
 **  Show simple text followed by variable value.
 */
-class CContentTypeText : public CContentType {
+class CContentTypeText : public CContentType
+{
 public:
 	CContentTypeText() : Text(NULL), Font(NULL), Centered(0), Index(-1),
 		Component(VariableValue), ShowName(0), Stat(0) {}
@@ -314,7 +320,8 @@ public:
 /**
 **  Show formatted text with variable value.
 */
-class CContentTypeFormattedText : public CContentType {
+class CContentTypeFormattedText : public CContentType
+{
 public:
 	CContentTypeFormattedText() : Font(NULL), Centered(false),
 		Index(-1), Component(VariableValue) {}
@@ -332,7 +339,8 @@ public:
 /**
 **  Show formatted text with variable value.
 */
-class CContentTypeFormattedText2 : public CContentType {
+class CContentTypeFormattedText2 : public CContentType
+{
 public:
 	CContentTypeFormattedText2() : Font(NULL), Centered(false),
 		Index1(-1), Component1(VariableValue), Index2(-1), Component2(VariableValue) {}
@@ -352,7 +360,8 @@ public:
 /**
 **  Show icon of the unit
 */
-class CContentTypeIcon : public CContentType {
+class CContentTypeIcon : public CContentType
+{
 public:
 	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
 
@@ -362,7 +371,8 @@ public:
 /**
 **  Show bar which change color depend of value.
 */
-class CContentTypeLifeBar : public CContentType {
+class CContentTypeLifeBar : public CContentType
+{
 public:
 	CContentTypeLifeBar() : Index(-1), Width(0), Height(0) {}
 
@@ -380,7 +390,8 @@ public:
 /**
 **  Show bar.
 */
-class CContentTypeCompleteBar : public CContentType {
+class CContentTypeCompleteBar : public CContentType
+{
 public:
 	CContentTypeCompleteBar() : Index(-1), Width(0), Height(0), Border(0), Color(0) {}
 
@@ -396,13 +407,14 @@ public:
 /**
 **  Info for the panel.
 */
-class CUnitInfoPanel {
+class CUnitInfoPanel
+{
 public:
 	CUnitInfoPanel() : PosX(0), PosY(0), DefaultFont(0),
 		Contents(), Condition(NULL) {}
 	~CUnitInfoPanel() {
 		for (std::vector<CContentType *>::iterator content = Contents.begin();
-				content != Contents.end(); ++content) {
+			 content != Contents.end(); ++content) {
 			delete *content;
 		}
 		delete Condition;
@@ -428,9 +440,8 @@ class CFiller
 
 		void Init(CGraphic *g);
 
-		bool TransparentPixel(int x, int y)
-		{
-			if(bstore) {
+		bool TransparentPixel(int x, int y) {
+			if (bstore) {
 				const unsigned int x_index = x / 32;
 				y *= Width;
 				y /= 32;
@@ -467,8 +478,7 @@ public:
 class CButtonPanel
 {
 public:
-	CButtonPanel() : G(NULL), X(0), Y(0), ShowCommandKey(true)
-	{
+	CButtonPanel() : G(NULL), X(0), Y(0), ShowCommandKey(true) {
 		AutoCastBorderColorRGB.r = 0;
 		AutoCastBorderColorRGB.g = 0;
 		AutoCastBorderColorRGB.b = 0;
@@ -487,10 +497,10 @@ public:
 	bool ShowCommandKey;
 };
 
-class CPieMenu {
+class CPieMenu
+{
 public:
-	CPieMenu() : G(NULL), MouseButton(NoButton)
-	{
+	CPieMenu() : G(NULL), MouseButton(NoButton) {
 		memset(this->X, 0, sizeof(this->X));
 		memset(this->Y, 0, sizeof(this->Y));
 	}
@@ -512,7 +522,8 @@ public:
 
 /// Popup System
 
-class PopupConditionPanel {
+class PopupConditionPanel
+{
 public:
 	PopupConditionPanel() :  BoolFlags(NULL), Variables(NULL) {}
 	~PopupConditionPanel() {
@@ -526,7 +537,8 @@ public:
 	char *Variables;            /// array of variable to verify (enable and max > 0)
 };
 
-class CPopupContentType {
+class CPopupContentType
+{
 public:
 	CPopupContentType() : PosX(0), PosY(0), Condition(NULL) {}
 	virtual ~CPopupContentType() { delete Condition; }
@@ -544,7 +556,8 @@ public:
 	PopupConditionPanel *Condition; /// Condition to show the content; if NULL, no condition.
 };
 
-class CPopupContentTypeName : public CPopupContentType {
+class CPopupContentTypeName : public CPopupContentType
+{
 public:
 	CPopupContentTypeName() : Font(NULL), Centered(0) {}
 	virtual ~CPopupContentTypeName() {}
@@ -558,7 +571,8 @@ public:
 	char Centered;               /// if true, center the display.
 };
 
-class CPopupContentTypeCosts : public CPopupContentType {
+class CPopupContentTypeCosts : public CPopupContentType
+{
 public:
 	CPopupContentTypeCosts() : Font(NULL), Centered(0) {}
 	virtual ~CPopupContentTypeCosts() {}
@@ -572,7 +586,8 @@ public:
 	char Centered;               /// if true, center the display.
 };
 
-class CPopupContentTypeLine : public CPopupContentType {
+class CPopupContentTypeLine : public CPopupContentType
+{
 public:
 	CPopupContentTypeLine() : Color(0), Width(0), Height(0) {}
 	virtual ~CPopupContentTypeLine() {}
@@ -587,7 +602,8 @@ public:
 	int Height;    /// line height
 };
 
-class CPopupContentTypeVariable : public CPopupContentType {
+class CPopupContentTypeVariable : public CPopupContentType
+{
 public:
 	CPopupContentTypeVariable() : Text(NULL), Font(NULL), Centered(0), Index(-1) {}
 	virtual ~CPopupContentTypeVariable() {
@@ -606,13 +622,14 @@ public:
 	int Index;                   /// Index of the variable to show, -1 if not.
 };
 
-class CPopup {
+class CPopup
+{
 public:
 	CPopup() : Contents(), DefaultFont(NULL), BackgroundColor(ColorBlue), BorderColor(ColorWhite) {}
 	~CPopup() {
 		for (std::vector<CPopupContentType *>::iterator content = Contents.begin();
-			content != Contents.end(); ++content) {
-				delete *content;
+			 content != Contents.end(); ++content) {
+			delete *content;
 		}
 	}
 
@@ -623,7 +640,8 @@ public:
 	Uint32 BorderColor;                        /// Color used for popup's borders.
 };
 
-class CResourceInfo {
+class CResourceInfo
+{
 public:
 	CResourceInfo() : G(NULL), IconFrame(0), IconX(0), IconY(0), IconWidth(-1),
 		TextX(-1), TextY(-1) {}
@@ -694,11 +712,11 @@ public:
 
 	bool MouseScroll;                   /// Enable mouse scrolling
 	bool KeyScroll;                     /// Enable keyboard scrolling
-		/// Mouse Scroll Speed (screenpixels per mousepixel)
+	/// Mouse Scroll Speed (screenpixels per mousepixel)
 	int MouseScrollSpeed;
-		/// Middle-Mouse Scroll Speed (screenpixels per mousepixel)
+	/// Middle-Mouse Scroll Speed (screenpixels per mousepixel)
 	int MouseScrollSpeedDefault;
-		/// Middle-Mouse Scroll Speed with Control pressed
+	/// Middle-Mouse Scroll Speed with Control pressed
 	int MouseScrollSpeedControl;
 
 	int MouseWarpX;                     /// Cursor warp X position
@@ -801,11 +819,11 @@ public:
 	CursorConfig ArrowS;                /// Cursor pointing south
 	CursorConfig ArrowSE;               /// Cursor pointing south east
 
-/// @todo could use different sounds/speech for the errors
-/// Is in gamesounds?
-/// SoundConfig PlacementError;         /// played on placements errors
-/// SoundConfig PlacementSuccess;       /// played on placements success
-/// SoundConfig Click;                  /// click noice used often
+	/// @todo could use different sounds/speech for the errors
+	/// Is in gamesounds?
+	/// SoundConfig PlacementError;         /// played on placements errors
+	/// SoundConfig PlacementSuccess;       /// played on placements success
+	/// SoundConfig Click;                  /// click noice used often
 
 	CGraphic *VictoryBackgroundG;       /// Victory background graphic
 	CGraphic *DefeatBackgroundG;        /// Defeat background graphic
@@ -815,63 +833,62 @@ public:
  *	Basic Shared Pointer for Current Selected Buttons
  *	parallel drawing problems.
  */
-class ButtonActionProxy {
-    ButtonAction *ptr;		// pointer to the ButtonAction array
-    int* count;				// shared number of owners
+class ButtonActionProxy
+{
+	ButtonAction *ptr;		// pointer to the ButtonAction array
+	int *count;				// shared number of owners
 
-    void dispose() {
-        if (count == NULL || --*count == 0) {
+	void dispose() {
+		if (count == NULL || --*count == 0) {
 			delete count;
 			delete[] ptr;
-        }
-    }
+		}
+	}
 
-    ButtonActionProxy& operator= (ButtonAction *p) {
-        if (this->ptr != p) {
+	ButtonActionProxy &operator= (ButtonAction *p) {
+		if (this->ptr != p) {
 			if (count == NULL || --*count == 0) {
 				delete[] ptr;
 				if (count) {
 					*count = 1;
 				}
 			}
-            ptr = p;
-        }
-        return *this;
-    }
+			ptr = p;
+		}
+		return *this;
+	}
 
-    friend void CButtonPanel::Update();
+	friend void CButtonPanel::Update();
 public:
 
-  	ButtonActionProxy (): ptr(0), count(0) {}
+	ButtonActionProxy(): ptr(0), count(0) {}
 
-    ButtonActionProxy (const ButtonActionProxy& p)
-     : ptr(p.ptr), count(p.count)
-    {
-     	if (!count) {
-     		count = new int(1);
-     		*count = 1;
-     	}
-        ++*count;
-    }
+	ButtonActionProxy(const ButtonActionProxy &p)
+		: ptr(p.ptr), count(p.count) {
+		if (!count) {
+			count = new int(1);
+			*count = 1;
+		}
+		++*count;
+	}
 
-    ~ButtonActionProxy () {
-        dispose();
-    }
+	~ButtonActionProxy() {
+		dispose();
+	}
 
-    void Reset() {
-    	dispose();
+	void Reset() {
+		dispose();
 		count = NULL;
 		ptr = NULL;
-    }
+	}
 
 	ButtonAction &operator[](unsigned int index) {
 		return ptr[index];
 	}
 
-    bool IsValid()
-    {
-    	return ptr != NULL;
-    }
+	bool IsValid() {
+		return ptr != NULL;
+	}
 
 };
 
@@ -883,7 +900,7 @@ extern ButtonActionProxy CurrentButtons;    /// Current Selected Buttons
 
 extern CUserInterface UI;                           /// The user interface
 
-	/// Hash table of all the button styles
+/// Hash table of all the button styles
 extern std::map<std::string, ButtonStyle *> ButtonStyleHash;
 
 extern bool RightButtonAttacks;         /// right button attacks
@@ -899,61 +916,61 @@ extern bool FancyBuildings;             /// Mirror buildings 1 yes, 0 now.
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	/// Initialize the ui
+/// Initialize the ui
 extern void InitUserInterface();
-	/// Save the ui state
+/// Save the ui state
 extern void SaveUserInterface(CFile &file);
-	/// Clean up the ui module
+/// Clean up the ui module
 extern void CleanUserInterface();
 #ifdef DEBUG
 extern void FreeButtonStyles();
 #endif
-	/// Register ccl features
+/// Register ccl features
 extern void UserInterfaceCclRegister();
 
-	/// return popup by ident string
+/// return popup by ident string
 extern CPopup *PopupByIdent(const std::string &ident);
 
-	/// Find a button style
+/// Find a button style
 extern ButtonStyle *FindButtonStyle(const std::string &style);
 
-	/// Called if the mouse is moved in Normal interface state
+/// Called if the mouse is moved in Normal interface state
 extern void UIHandleMouseMove(int x, int y);
-	/// Called if any mouse button is pressed down
+/// Called if any mouse button is pressed down
 extern void UIHandleButtonDown(unsigned button);
-	/// Called if any mouse button is released up
+/// Called if any mouse button is released up
 extern void UIHandleButtonUp(unsigned button);
 
-	/// Restrict mouse cursor to viewport
+/// Restrict mouse cursor to viewport
 extern void RestrictCursorToViewport();
-	/// Restrict mouse cursor to minimap
+/// Restrict mouse cursor to minimap
 extern void RestrictCursorToMinimap();
 
-	/// Get viewport for screen pixel position
+/// Get viewport for screen pixel position
 extern CViewport *GetViewport(int x, int y);
-	/// Cycle through all available viewport modes
+/// Cycle through all available viewport modes
 extern void CycleViewportMode(int);
-	/// Select viewport mode
+/// Select viewport mode
 extern void SetViewportMode(ViewportModeType mode);
 extern void CheckViewportMode();
 
-	/// Use the mouse to scroll the map
+/// Use the mouse to scroll the map
 extern void MouseScrollMap(int x, int y);
-	/// Check if mouse scrolling is enabled
+/// Check if mouse scrolling is enabled
 extern bool GetMouseScroll();
-	/// Enable/disable scrolling with the mouse
+/// Enable/disable scrolling with the mouse
 extern void SetMouseScroll(bool enabled);
-	/// Check if keyboard scrolling is enabled
+/// Check if keyboard scrolling is enabled
 extern bool GetKeyScroll();
-	/// Enable/disable scrolling with the keyboard
+/// Enable/disable scrolling with the keyboard
 extern void SetKeyScroll(bool enabled);
-	/// Check if mouse grabbing is enabled
+/// Check if mouse grabbing is enabled
 extern bool GetGrabMouse();
-	/// Enable/disable grabbing the mouse
+/// Enable/disable grabbing the mouse
 extern void SetGrabMouse(bool enabled);
-	/// Check if scrolling stops when leaving the window
+/// Check if scrolling stops when leaving the window
 extern bool GetLeaveStops();
-	/// Enable/disable leaving the window stops scrolling
+/// Enable/disable leaving the window stops scrolling
 extern void SetLeaveStops(bool enabled);
 
 extern int AddHandler(lua_State *l);

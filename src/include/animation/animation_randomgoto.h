@@ -40,8 +40,8 @@ class CAnimation_RandomGoto : public CAnimation
 public:
 	CAnimation_RandomGoto() : CAnimation(AnimationRandomGoto), gotoLabel(NULL) {}
 
-	virtual void Action(CUnit& unit, int &move, int scale) const;
-	virtual void Init(const char* s);
+	virtual void Action(CUnit &unit, int &move, int scale) const;
+	virtual void Init(const char *s);
 
 private:
 	std::string randomStr;

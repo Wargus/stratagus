@@ -46,8 +46,8 @@ public:
 
 	virtual void Execute(CUnit &unit);
 	virtual void OnAnimationAttack(CUnit &unit);
-	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput& input) { UpdatePathFinderData_NotCalled(input); }
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
 private:
 	bool AutoAttackStand(CUnit &unit);
 	bool AutoCastStand(CUnit &unit);

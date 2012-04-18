@@ -36,26 +36,25 @@
 
 class COrder_Attack : public COrder
 {
-	friend COrder* COrder::NewActionAttack(const CUnit &attacker, CUnit &target);
-	friend COrder* COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest);
-	friend COrder* COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
+	friend COrder *COrder::NewActionAttack(const CUnit &attacker, CUnit &target);
+	friend COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest);
+	friend COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
 public:
 	explicit COrder_Attack(bool ground) : COrder(ground ? UnitActionAttackGround : UnitActionAttack),
-		State(0), MinRange(0), Range(0)
-	{
+		State(0), MinRange(0), Range(0) {
 		goalPos.x = -1;
 		goalPos.y = -1;
 	}
 
-	virtual COrder_Attack* Clone() const { return new COrder_Attack(*this); }
+	virtual COrder_Attack *Clone() const { return new COrder_Attack(*this); }
 
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
 	virtual void OnAnimationAttack(CUnit &unit);
-	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput& input);
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual void UpdatePathFinderData(PathFinderInput &input);
 	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 
 	bool IsWeakTargetSelected() const;

@@ -36,14 +36,13 @@
 
 class COrder_Resource : public COrder
 {
-	friend COrder* COrder::NewActionResource(CUnit &harvester, const Vec2i &pos);
-	friend COrder* COrder::NewActionResource(CUnit &harvester, CUnit &mine);
-	friend COrder* COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot);
+	friend COrder *COrder::NewActionResource(CUnit &harvester, const Vec2i &pos);
+	friend COrder *COrder::NewActionResource(CUnit &harvester, CUnit &mine);
+	friend COrder *COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot);
 
 public:
 	COrder_Resource(CUnit &harvester) : COrder(UnitActionResource), worker(&harvester),
-		CurrentResource(0), State(0), TimeToHarvest(0), DoneHarvesting(false)
-	{
+		CurrentResource(0), State(0), TimeToHarvest(0), DoneHarvesting(false) {
 		Resource.Pos.x = Resource.Pos.y = -1;
 		goalPos.x = goalPos.y = -1;
 	}
@@ -56,8 +55,8 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput& input);
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual void UpdatePathFinderData(PathFinderInput &input);
 	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 
 

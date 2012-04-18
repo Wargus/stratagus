@@ -53,7 +53,8 @@ class CPlayer;
 /**
 **  Ai Type structure.
 */
-class CAiType {
+class CAiType
+{
 public:
 	CAiType() {}
 
@@ -66,7 +67,8 @@ public:
 /**
 **  AI unit-type table with counter in front.
 */
-class AiRequestType {
+class AiRequestType
+{
 public:
 	AiRequestType() : Count(0), Type(NULL) {}
 
@@ -77,7 +79,8 @@ public:
 /**
 **  Ai unit-type in a force.
 */
-class AiUnitType {
+class AiUnitType
+{
 public:
 	AiUnitType() : Want(0), Type(NULL) {}
 
@@ -93,8 +96,7 @@ enum AiForceRole {
 	AiForceRoleDefend      /// Force should defend
 };
 
-enum AiForceAttackingState
-{
+enum AiForceAttackingState {
 	AiForceAttackingState_Free = -1,
 	AiForceAttackingState_Waiting = 0,
 	AiForceAttackingState_Boarding,
@@ -107,18 +109,17 @@ enum AiForceAttackingState
 **
 **  A force is a group of units belonging together.
 */
-class AiForce {
+class AiForce
+{
 	friend class AiForceManager;
 public:
 	AiForce() :
 		Completed(false), Defending(false), Attacking(false),
-		Role(0), State(AiForceAttackingState_Free)
-	{
+		Role(0), State(AiForceAttackingState_Free) {
 		GoalPos.x = GoalPos.y = 0;
 	}
 
-	void Remove(CUnit &unit)
-	{
+	void Remove(CUnit &unit) {
 		if (Units.Remove(&unit)) {
 			InternalRemoveUnit(&unit);
 		}
@@ -141,15 +142,9 @@ public:
 		Units.clear();
 		GoalPos.x = GoalPos.y = 0;
 	}
-	inline size_t Size() const
-	{
-		return Units.size();
-	}
+	inline size_t Size() const { return Units.size(); }
 
-	inline bool IsAttacking() const
-	{
-		return (!Defending && Attacking);
-	}
+	inline bool IsAttacking() const { return (!Defending && Attacking); }
 
 	void Attack(const Vec2i &pos);
 	void Clean();
@@ -158,8 +153,7 @@ public:
 private:
 	void CountTypes(unsigned int *counter, const size_t len);
 	bool IsBelongsTo(const CUnitType *type);
-	void Insert(CUnit &unit)
-	{
+	void Insert(CUnit &unit) {
 		Units.Insert(&unit);
 		unit.RefsIncrease();
 	}
@@ -187,7 +181,7 @@ public:
 	Vec2i GoalPos; /// Attack point tile map position
 };
 
-	// forces
+// forces
 #define AI_MAX_FORCES 50                    /// How many forces are supported
 
 /**
@@ -195,22 +189,15 @@ public:
 **
 **  A Forces container for the force manager to handle
 */
-class AiForceManager {
+class AiForceManager
+{
 public:
 	AiForceManager();
 
-	inline size_t Size() const
-	{
-		return forces.size();
-	}
+	inline size_t Size() const { return forces.size(); }
 
-	const AiForce &operator[](unsigned int index) const {
-		return forces[index];
-	}
-
-	AiForce &operator[](unsigned int index) {
-		return forces[index];
-	}
+	const AiForce &operator[](unsigned int index) const { return forces[index]; }
+	AiForce &operator[](unsigned int index) { return forces[index]; }
 
 	int getIndex(AiForce *force) const {
 		for (unsigned int i = 0; i < forces.size(); ++i) {
@@ -243,7 +230,8 @@ private:
 **
 **  List of orders for the resource manager to handle
 */
-class AiBuildQueue {
+class AiBuildQueue
+{
 public:
 	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0), X(-1), Y(-1)  {}
 
@@ -259,9 +247,10 @@ public:
 /**
 **  AI exploration request
 */
-class AiExplorationRequest {
+class AiExplorationRequest
+{
 public:
-	AiExplorationRequest(const Vec2i& pos, int mask) : pos(pos), Mask(mask) { }
+	AiExplorationRequest(const Vec2i &pos, int mask) : pos(pos), Mask(mask) {}
 
 public:
 	Vec2i pos;          /// pos on map
@@ -271,13 +260,13 @@ public:
 /**
 **  AI variables.
 */
-class PlayerAi {
+class PlayerAi
+{
 public:
 	PlayerAi() : Player(NULL), AiType(NULL),
 		SleepCycles(0), NeededMask(0), NeedSupply(false),
 		ScriptDebug(false), LastExplorationGameCycle(0),
-		LastCanNotMoveGameCycle(0), LastRepairBuilding(0)
-	{
+		LastCanNotMoveGameCycle(0), LastRepairBuilding(0) {
 		memset(Reserve, 0, sizeof(Reserve));
 		memset(Used, 0, sizeof(Used));
 		memset(Needed, 0, sizeof(Needed));
@@ -321,7 +310,8 @@ public:
 **  building or upgrade or spell, it could lookup in this tables to find
 **  where it could be trained, built or researched.
 */
-class AiHelper {
+class AiHelper
+{
 public:
 	/**
 	** The index is the unit that should be trained, giving a table of all
@@ -389,70 +379,70 @@ extern PlayerAi *AiPlayer; /// Current AI player
 //
 // Resource manager
 //
-	/// Add unit-type request to resource manager
+/// Add unit-type request to resource manager
 extern void AiAddUnitTypeRequest(CUnitType &type, int count);
-	/// Add upgrade-to request to resource manager
+/// Add upgrade-to request to resource manager
 extern void AiAddUpgradeToRequest(CUnitType &type);
-	/// Add research request to resource manager
+/// Add research request to resource manager
 extern void AiAddResearchRequest(CUpgrade *upgrade);
-	/// Periodic called resource manager handler
+/// Periodic called resource manager handler
 extern void AiResourceManager();
-	/// Ask the ai to explore around pos
+/// Ask the ai to explore around pos
 extern void AiExplore(const Vec2i &pos, int exploreMask);
-	/// Make two unittypes be considered equals
+/// Make two unittypes be considered equals
 extern void AiNewUnitTypeEquiv(CUnitType *a, CUnitType *b);
-	/// Remove any equivalence between unittypes
+/// Remove any equivalence between unittypes
 extern void AiResetUnitTypeEquiv();
-	/// Finds all equivalents units to a given one
+/// Finds all equivalents units to a given one
 extern int AiFindUnitTypeEquiv(const CUnitType &type, int *result);
-	/// Finds all available equivalents units to a given one, in the prefered order
+/// Finds all available equivalents units to a given one, in the prefered order
 extern int AiFindAvailableUnitTypeEquiv(const CUnitType &type, int *result);
-extern int AiGetBuildRequestsCount(PlayerAi*,int counter[UnitTypeMax]);
+extern int AiGetBuildRequestsCount(PlayerAi *, int counter[UnitTypeMax]);
 
 extern void AiNewDepotRequest(CUnit &worker);
 
 //
 // Buildings
 //
-	/// Find nice building place
+/// Find nice building place
 extern int AiFindBuildingPlace(const CUnit &worker,
-	const CUnitType &type, int nx, int ny, Vec2i *dpos);
+							   const CUnitType &type, int nx, int ny, Vec2i *dpos);
 
 //
 // Forces
 //
-	/// Cleanup units in force
+/// Cleanup units in force
 extern void AiCleanForces();
-	/// Assign a new unit to a force
+/// Assign a new unit to a force
 extern bool AiAssignToForce(CUnit &unit);
-	/// Assign a free units to a force
+/// Assign a free units to a force
 extern void AiAssignFreeUnitsToForce();
-	/// Attack with force at position
+/// Attack with force at position
 extern void AiAttackWithForceAt(unsigned int force, int x, int y);
-	/// Attack with force
+/// Attack with force
 extern void AiAttackWithForce(unsigned int force);
-	/// Attack with forces in array
+/// Attack with forces in array
 extern void AiAttackWithForces(int *forces);
 
-	/// Periodic called force manager handler
+/// Periodic called force manager handler
 extern void AiForceManager();
 
 //
 // Plans
 //
-	/// Find a wall to attack
+/// Find a wall to attack
 extern int AiFindWall(AiForce *force);
-	/// Plan the an attack
-	/// Send explorers around the map
+/// Plan the an attack
+/// Send explorers around the map
 extern void AiSendExplorers();
-	/// Enemy units in distance
+/// Enemy units in distance
 extern int AiEnemyUnitsInDistance(const CPlayer &player, const CUnitType *type,
-	const Vec2i& pos, unsigned range);
+								  const Vec2i &pos, unsigned range);
 
 //
 // Magic
 //
-	/// Check for magic
+/// Check for magic
 extern void AiCheckMagic();
 
 //@}

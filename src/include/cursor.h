@@ -119,8 +119,9 @@ class CUnitType;
 --  Definitions
 ----------------------------------------------------------------------------*/
 
-	/// Private type which specifies the cursor-type
-class CCursor {
+/// Private type which specifies the cursor-type
+class CCursor
+{
 public:
 	CCursor() : HotX(0), HotY(0),
 		SpriteFrame(0), FrameRate(0), G(NULL) {}
@@ -134,13 +135,14 @@ public:
 	int SpriteFrame;  /// Current displayed cursor frame
 	int FrameRate;    /// Rate of changing the frames
 
-// --- FILLED UP ---
+	// --- FILLED UP ---
 
 	CGraphic *G; /// Cursor sprite image
 };
 
-	/// Cursor config reference
-class CursorConfig {
+/// Cursor config reference
+class CursorConfig
+{
 public:
 	CursorConfig() : Cursor(NULL) {}
 
@@ -150,7 +152,7 @@ public:
 	CCursor *Cursor;  /// Cursor-type pointer
 };
 
-	/// Cursor state
+/// Cursor state
 enum CursorStates {
 	CursorStatePoint,      /// Normal cursor
 	CursorStateSelect,     /// Select position
@@ -162,7 +164,7 @@ enum CursorStates {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern std::vector<CCursor*> AllCursors;/// cursor-types description
+extern std::vector<CCursor *> AllCursors; /// cursor-types description
 
 extern CursorStates CursorState;  /// current cursor state (point,...)
 extern int CursorAction;          /// action for selection
@@ -182,22 +184,22 @@ extern int CursorStartScrMapY;  /// the same in screen map coordinate system
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	/// Load all cursors
+/// Load all cursors
 extern void LoadCursors(const std::string &racename);
 
-	/// Cursor by identifier
+/// Cursor by identifier
 extern CCursor *CursorByIdent(const std::string &ident);
 
-	/// Draw any cursor
+/// Draw any cursor
 extern void DrawCursor();
-	/// Hide the cursor
+/// Hide the cursor
 extern void HideCursor();
-	/// Animate the cursor
+/// Animate the cursor
 extern void CursorAnimate(unsigned ticks);
 
-	/// Initialize the cursor module
+/// Initialize the cursor module
 extern void InitVideoCursors();
-	/// Cleanup the cursor module
+/// Cleanup the cursor module
 extern void CleanCursors();
 
 //@}

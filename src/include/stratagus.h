@@ -109,30 +109,30 @@
 ==  Debug definitions
 ============================================================================*/
 
-	/**
-	**  This simulates vararg macros.
-	**  Example:
-	**    DebugPrint("Test %d %d\n" _C_ 1 _C_ 2);
-	*/
+/**
+**  This simulates vararg macros.
+**  Example:
+**    DebugPrint("Test %d %d\n" _C_ 1 _C_ 2);
+*/
 #define _C_  ,    /// Debug , to simulate vararg macros
 
-	/// Print function in debug macros
+/// Print function in debug macros
 #define PrintFunction() \
 	do { fprintf(stdout, "%s:%d: %s: ", __FILE__, __LINE__, __func__); } while (0)
 
 
 #ifdef DEBUG  // {
 
-	/**
-	**  Assert a condition. If cond is not true abort with file,line.
-	*/
+/**
+**  Assert a condition. If cond is not true abort with file,line.
+*/
 #define Assert(cond)  do { if (!(cond)) { \
-	fprintf(stderr, "Assertion failed at %s:%d: %s: %s\n", __FILE__, __LINE__, __func__, #cond); \
-	abort(); }} while (0)
+			fprintf(stderr, "Assertion failed at %s:%d: %s: %s\n", __FILE__, __LINE__, __func__, #cond); \
+			abort(); }} while (0)
 
-	/**
-	**  Print debug information with function name.
-	*/
+/**
+**  Print debug information with function name.
+*/
 #define DebugPrint(args) \
 	do { PrintFunction(); fprintf(stdout, args); } while (0)
 
@@ -145,12 +145,12 @@
 
 #ifdef REFS_DEBUG  // {
 
-	/**
-	**  Assert a condition for references
-	*/
+/**
+**  Assert a condition for references
+*/
 #define RefsAssert(cond)  do { if (!(cond)) { \
-	fprintf(stderr, "Assertion failed at %s:%d: %s\n", __FILE__, __LINE__, __func__); \
-	abort(); } } while (0)
+			fprintf(stderr, "Assertion failed at %s:%d: %s\n", __FILE__, __LINE__, __func__); \
+			abort(); } } while (0)
 
 #else  // }{ REFS_DEBUG
 
@@ -191,7 +191,7 @@ inline char *new_strdup(const char *str)
 
 #include "version.h"
 
-	/// Text string: Name, Version, Copyright
+/// Text string: Name, Version, Copyright
 extern const char NameLine[];
 
 /*----------------------------------------------------------------------------
@@ -207,18 +207,18 @@ extern const char NameLine[];
 --  Screen
 ----------------------------------------------------------------------------*/
 
-	/// Scrolling area (<= 15 y)
+/// Scrolling area (<= 15 y)
 #define SCROLL_UP     15
-	/// Scrolling area (>= VideoHeight - 16 y)
+/// Scrolling area (>= VideoHeight - 16 y)
 #define SCROLL_DOWN   (Video.Height - 16)
-	/// Scrolling area (<= 15 y)
+/// Scrolling area (<= 15 y)
 #define SCROLL_LEFT   15
-	/// Scrolling area (>= VideoWidth - 16 x)
+/// Scrolling area (>= VideoWidth - 16 x)
 #define SCROLL_RIGHT  (Video.Width - 16)
 
-	/// Frames per second to display (original 30-40)
+/// Frames per second to display (original 30-40)
 #define FRAMES_PER_SECOND  30  // 1/30s
-	/// Game cycles per second to simulate (original 30-40)
+/// Game cycles per second to simulate (original 30-40)
 #define CYCLES_PER_SECOND  30  // 1/30s 0.33ms
 
 /*----------------------------------------------------------------------------
@@ -230,7 +230,7 @@ class Parameters
 public:
 	void SetDefaultValues();
 
-	const std::string& GetUserDirectory() { return UserDirectory; }
+	const std::string &GetUserDirectory() { return UserDirectory; }
 
 private:
 	void SetUserDirectory();
@@ -283,7 +283,7 @@ extern void CleanModules();             /// Cleanup all modules
 extern void DrawMapArea();              /// Draw the map area
 extern void GameMainLoop();             /// Game main loop
 
-	/// Show load progress
+/// Show load progress
 extern void ShowLoadProgress(const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(1, 2);
 
 extern bool CanAccessFile(const char *filename);

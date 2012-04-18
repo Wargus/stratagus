@@ -38,20 +38,20 @@
 --  Defines
 ----------------------------------------------------------------------------*/
 
-	/// Network protocol major version
+/// Network protocol major version
 #define NetworkProtocolMajorVersion StratagusMajorVersion
-	/// Network protocol minor version (maximal 99)
+/// Network protocol minor version (maximal 99)
 #define NetworkProtocolMinorVersion StratagusMinorVersion
-	/// Network protocol patch level (maximal 99)
+/// Network protocol patch level (maximal 99)
 #define NetworkProtocolPatchLevel   StratagusPatchLevel
-	/// Network protocol version (1,2,3) -> 10203
+/// Network protocol version (1,2,3) -> 10203
 #define NetworkProtocolVersion \
 	(NetworkProtocolMajorVersion * 10000 + NetworkProtocolMinorVersion * 100 + \
-		NetworkProtocolPatchLevel)
+	 NetworkProtocolPatchLevel)
 
-	/// Network protocol printf format string
+/// Network protocol printf format string
 #define NetworkProtocolFormatString "%d.%d.%d"
-	/// Network protocol printf format arguments
+/// Network protocol printf format arguments
 #define NetworkProtocolFormatArgs(v) (v) / 10000, ((v) / 100) % 100, (v) % 100
 
 #define NetworkDefaultPort 6660  /// Default communication port
@@ -69,11 +69,12 @@
 /**
 **  Network systems active in current game.
 */
-class CNetworkHost {
+class CNetworkHost
+{
 public:
 	unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 4+2+2+NetPlayerNameSize; }
+	static size_t Size() { return 4 + 2 + 2 + NetPlayerNameSize; }
 
 	Uint32 Host;         /// Host address
 	Uint16 Port;         /// Port on host
@@ -93,14 +94,15 @@ typedef struct _network_state_ {
 /**
 **  Multiplayer game setup menu state
 */
-class CServerSetup {
+class CServerSetup
+{
 public:
 	unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 4+4+4+4+4+4+4+4+ 4*PlayerMax + 4*PlayerMax + 4*PlayerMax + 4*PlayerMax; }
+	static size_t Size() { return 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 * PlayerMax + 4 * PlayerMax + 4 * PlayerMax + 4 * PlayerMax; }
 	void Clear() {
 		ResourcesOption = UnitsOption = FogOfWar = RevealMap = TilesetSelection =
-			GameTypeOption = Difficulty = MapRichness = 0;
+																   GameTypeOption = Difficulty = MapRichness = 0;
 		memset(CompOpt, 0, sizeof(CompOpt));
 		memset(Ready, 0, sizeof(Ready));
 		memset(LastFrame, 0, sizeof(LastFrame));
@@ -127,11 +129,12 @@ public:
 **  @todo Transfering the same data in each message is waste of bandwidth.
 **  I mean the versions and the UID ...
 */
-class CInitMessage {
+class CInitMessage
+{
 public:
 	unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 1+1+4+4+4+4+4+4+1+256 + CNetworkHost::Size()*PlayerMax + CServerSetup::Size(); }
+	static size_t Size() { return 1 + 1 + 4 + 4 + 4 + 4 + 4 + 4 + 1 + 256 + CNetworkHost::Size() * PlayerMax + CServerSetup::Size(); }
 
 	Uint8  Type;        /// Init message type
 	Uint8  SubType;     /// Init message subtype
@@ -210,7 +213,7 @@ enum _net_client_con_state_ {
 
 extern std::string NetworkArg;        /// Network command line argument
 extern int NetPlayers;                /// Network players
-extern char* NetworkAddr;             /// Local network address to use
+extern char *NetworkAddr;             /// Local network address to use
 extern int NetworkPort;               /// Local network port to use
 
 extern int HostsCount;                /// Number of hosts.

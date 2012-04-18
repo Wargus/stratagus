@@ -36,7 +36,7 @@
 
 class COrder_Train : public COrder
 {
-	friend COrder* COrder::NewActionTrain(CUnit &trainer, CUnitType &type);
+	friend COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type);
 public:
 	COrder_Train() : COrder(UnitActionTrain), Type(NULL), Ticks(0) {}
 
@@ -47,11 +47,11 @@ public:
 
 	virtual void Execute(CUnit &unit);
 	virtual void Cancel(CUnit &unit);
-	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput& input) { UpdatePathFinderData_NotCalled(input); }
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
 	virtual void UpdateUnitVariables(CUnit &unit) const;
 
-	void ConvertUnitType(const CUnit &unit, CUnitType& newType);
+	void ConvertUnitType(const CUnit &unit, CUnitType &newType);
 
 	const CUnitType &GetUnitType() const { return *Type; }
 private:

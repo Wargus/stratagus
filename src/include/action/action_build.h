@@ -36,10 +36,9 @@
 
 class COrder_Build : public COrder
 {
-	friend COrder* COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
+	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
 public:
-	COrder_Build() : COrder(UnitActionBuild), Type(NULL), State(0), Range(0)
-	{
+	COrder_Build() : COrder(UnitActionBuild), Type(NULL), State(0), Range(0) {
 		goalPos.x = -1;
 		goalPos.y = -1;
 	}
@@ -50,12 +49,12 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput& input);
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual void UpdatePathFinderData(PathFinderInput &input);
 
 	virtual void AiUnitKilled(CUnit &unit);
 
-	const CUnitType& GetUnitType() const { return *Type; }
+	const CUnitType &GetUnitType() const { return *Type; }
 
 private:
 	bool MoveToLocation(CUnit &unit);

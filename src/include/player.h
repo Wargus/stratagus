@@ -59,7 +59,7 @@ struct lua_State;
 --  Player type
 ----------------------------------------------------------------------------*/
 
-	///  Player structure
+///  Player structure
 class CPlayer
 {
 public:
@@ -119,16 +119,16 @@ public:
 	/// Clear turn related player data
 	void Clear();
 
-	std::vector<CUnit*>::const_iterator UnitBegin() const;
-	std::vector<CUnit*>::iterator UnitBegin();
-	std::vector<CUnit*>::const_iterator UnitEnd() const;
-	std::vector<CUnit*>::iterator UnitEnd();
+	std::vector<CUnit *>::const_iterator UnitBegin() const;
+	std::vector<CUnit *>::iterator UnitBegin();
+	std::vector<CUnit *>::const_iterator UnitEnd() const;
+	std::vector<CUnit *>::iterator UnitEnd();
 
-	CUnit& GetUnit(int index) const;
+	CUnit &GetUnit(int index) const;
 	int GetUnitCount() const;
 
-	void AddUnit(CUnit& unit);
-	void RemoveUnit(CUnit& unit);
+	void AddUnit(CUnit &unit);
+	void RemoveUnit(CUnit &unit);
 
 	/// Get a resource of the player
 	int GetResource(int resource, int type);
@@ -174,8 +174,7 @@ public:
 	/**
 	**  Check if the player index is an enemy
 	*/
-	bool IsEnemy(const int index) const
-	{
+	bool IsEnemy(const int index) const {
 		return (Index != index && (Enemy & (1 << index)) != 0);
 	}
 
@@ -204,7 +203,7 @@ public:
 	void Load(lua_State *l);
 
 private:
-	std::vector<CUnit*> Units;  /// units of this player
+	std::vector<CUnit *> Units; /// units of this player
 	unsigned int Enemy;         /// enemy bit field for this player
 	unsigned int Allied;        /// allied bit field for this player
 	unsigned int SharedVision;  /// shared vision bit field
@@ -215,7 +214,8 @@ private:
 **  Mapped with #PlayerRaces to a symbolic name.
 */
 #define MAX_RACES 8
-class PlayerRace {
+class PlayerRace
+{
 public:
 	PlayerRace() : Count(0) {
 		memset(Visible, 0, sizeof(Visible));
@@ -315,40 +315,40 @@ extern int PlayerColorIndexCount;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	/// Init players
+/// Init players
 extern void InitPlayers();
-	/// Clean up players
+/// Clean up players
 extern void CleanPlayers();
-	/// Clean up races
+/// Clean up races
 extern void CleanRaces();
-	/// Save players
+/// Save players
 extern void SavePlayers(CFile &file);
 
-	/// Create a new player
+/// Create a new player
 extern void CreatePlayer(int type);
 
 
-	/// Initialize the computer opponent AI
+/// Initialize the computer opponent AI
 extern void PlayersInitAi();
-	/// Called each game cycle for player handlers (AI)
+/// Called each game cycle for player handlers (AI)
 extern void PlayersEachCycle();
-	/// Called each second for a given player handler (AI)
+/// Called each second for a given player handler (AI)
 extern void PlayersEachSecond(int player);
 
-	/// Change current color set to new player of the sprite
+/// Change current color set to new player of the sprite
 extern void GraphicPlayerPixels(CPlayer &player, const CGraphic &sprite);
 
-	/// Output debug informations for players
+/// Output debug informations for players
 extern void DebugPlayers();
 
 #ifdef DEBUG
 void FreePlayerColors();
 #endif
 
-	/// register ccl features
+/// register ccl features
 extern void PlayerCclRegister();
 
-	/// Allowed to select multiple units, maybe not mine
+/// Allowed to select multiple units, maybe not mine
 inline bool CanSelectMultipleUnits(const CPlayer &player) { return &player == ThisPlayer || ThisPlayer->IsTeamed(player); }
 
 //@}

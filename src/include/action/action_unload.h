@@ -36,10 +36,9 @@
 
 class COrder_Unload : public COrder
 {
-	friend COrder* COrder::NewActionUnload(const Vec2i &pos, CUnit *what);
+	friend COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what);
 public:
-	COrder_Unload() : COrder(UnitActionUnload), State(0)
-	{
+	COrder_Unload() : COrder(UnitActionUnload), State(0) {
 		goalPos.x = -1;
 		goalPos.y = -1;
 	}
@@ -50,8 +49,8 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput& input);
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual void UpdatePathFinderData(PathFinderInput &input);
 
 private:
 	bool LeaveTransporter(CUnit &transporter);

@@ -59,7 +59,7 @@ public:
 	virtual void _endDraw();
 
 	virtual void drawImage(const gcn::Image *image, int srcX, int srcY,
-		int dstX, int dstY, int width, int height);
+						   int dstX, int dstY, int width, int height);
 
 	virtual void drawPoint(int x, int y);
 	virtual void drawLine(int x1, int y1, int x2, int y2);
@@ -82,8 +82,7 @@ public:
 class ButtonWidget : public gcn::Button
 {
 public:
-	ButtonWidget(const std::string &caption) : Button(caption)
-	{
+	ButtonWidget(const std::string &caption) : Button(caption) {
 		this->setHotKey(GetHotKey(caption));
 	}
 };
@@ -111,7 +110,7 @@ class ImageRadioButton : public gcn::RadioButton
 public:
 	ImageRadioButton();
 	ImageRadioButton(const std::string &caption, const std::string &group,
-		bool marked);
+					 bool marked);
 
 	virtual void drawBox(gcn::Graphics *graphics);
 	virtual void draw(gcn::Graphics *graphics);
@@ -165,8 +164,8 @@ public:
 	ImageSlider(double scaleEnd = 1.0);
 	ImageSlider(double scaleStart, double scaleEnd);
 
-	virtual void drawMarker(gcn::Graphics* graphics);
-	virtual void draw(gcn::Graphics* graphics);
+	virtual void drawMarker(gcn::Graphics *graphics);
+	virtual void draw(gcn::Graphics *graphics);
 
 	void setMarkerImage(gcn::Image *image);
 	void setBackgroundImage(gcn::Image *image);
@@ -241,7 +240,7 @@ private:
 	gcn::ScrollArea scroll;   /// To use scroll bar.
 	gcn::Container container; /// data container.
 	bool blockwholewindow;    /// Manage condition limit of moveable windows. @see mouseMotion.
-                              /// @todo Method to set this variable. Maybe set the variable static.
+	/// @todo Method to set this variable. Maybe set the variable static.
 };
 
 class LuaListModel : public gcn::ListModel

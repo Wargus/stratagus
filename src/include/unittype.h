@@ -560,7 +560,8 @@ enum GroupSelectionMode {
 	SELECT_ALL
 };
 
-class ResourceInfo {
+class ResourceInfo
+{
 public:
 	ResourceInfo() : WaitAtResource(0), ResourceStep(0),
 		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0), FinalResource(0),
@@ -591,7 +592,8 @@ public:
 **  It is used to define variables and use it after
 **  to manage magic, energy, shield or other stuff.
 */
-class CVariable {
+class CVariable
+{
 public:
 	CVariable() : Max(0), Value(0), Increase(0), Enable(0) {}
 
@@ -682,7 +684,8 @@ class CFont;
 **    It is used to show variables graphicly.
 **  @todo add more stuff in this struct.
 */
-class CDecoVar {
+class CDecoVar
+{
 public:
 
 	CDecoVar() {};
@@ -726,7 +729,7 @@ public:
 	int Width;                  /// Width of the bar.
 	bool ShowFullBackground;    /// if true, show background like value equal to max.
 	char BorderSize;            /// Size of the border, 0 for no border.
-// FIXME color depend of percent (red, Orange, Yellow, Green...)
+	// FIXME color depend of percent (red, Orange, Yellow, Green...)
 	Uint32 Color;               /// Color of bar.
 	Uint32 BColor;              /// Color of background.
 };
@@ -739,7 +742,7 @@ public:
 	virtual void Draw(int x, int y, const CUnitType *type, const CVariable &var) const;
 
 	CFont *Font;                   /// Font to use to display value.
-// FIXME : Add Color, format
+	// FIXME : Add Color, format
 };
 
 /// Sprite contains frame from full (left)to empty state (right).
@@ -749,10 +752,10 @@ public:
 	CDecoVarSpriteBar() : NSprite(-1) {};
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y,
-		const CUnitType *Type, const CVariable &Variable) const;
+					  const CUnitType *Type, const CVariable &Variable) const;
 
 	char NSprite; /// Index of number. (@see DefineSprites and @see GetSpriteIndex)
-// FIXME Sprite info. better way ?
+	// FIXME Sprite info. better way ?
 };
 
 /// use to show specific frame in a sprite.
@@ -763,7 +766,7 @@ public:
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y, const CUnitType *type, const CVariable &var) const;
 
-// FIXME Sprite info. and Replace n with more appropriate var.
+	// FIXME Sprite info. and Replace n with more appropriate var.
 	char NSprite;               /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
 	int n;                      /// identifiant in SpellSprite
 };
@@ -784,7 +787,8 @@ enum DistanceTypeType {
 };
 
 
-class CBuildRestriction {
+class CBuildRestriction
+{
 public:
 	virtual ~CBuildRestriction() {}
 	virtual void Init() {};
@@ -797,15 +801,15 @@ class CBuildRestrictionAnd : public CBuildRestriction
 public:
 
 	virtual ~CBuildRestrictionAnd() {
-		for (std::vector<CBuildRestriction*>::const_iterator i = _or_list.begin();
-				i != _or_list.end(); ++i) {
+		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
+			 i != _or_list.end(); ++i) {
 			delete *i;
 		}
 		_or_list.clear();
 	}
 	virtual void Init() {
-		for (std::vector<CBuildRestriction*>::const_iterator i = _or_list.begin();
-				i != _or_list.end(); ++i) {
+		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
+			 i != _or_list.end(); ++i) {
 			(*i)->Init();
 		}
 	}
@@ -813,7 +817,7 @@ public:
 
 	void push_back(CBuildRestriction *restriction) { _or_list.push_back(restriction); }
 public:
-	std::vector<CBuildRestriction*> _or_list;
+	std::vector<CBuildRestriction *> _or_list;
 };
 
 
@@ -824,7 +828,7 @@ class CBuildRestrictionAddOn : public CBuildRestriction
 	{
 	public:
 		functor(const CUnitType *type, const Vec2i &_pos): Parent(type), pos(_pos) {}
-		inline bool operator() (const CUnit *const unit) const;
+		inline bool operator()(const CUnit *const unit) const;
 	private:
 		const CUnitType *const Parent;   /// building that is unit is an addon too.
 		const Vec2i pos; //functor work position
@@ -846,7 +850,7 @@ class CBuildRestrictionOnTop : public CBuildRestriction
 	{
 	public:
 		functor(const CUnitType *type, const Vec2i &_pos): ontop(0), Parent(type), pos(_pos) {}
-		inline bool operator() (CUnit *const unit);
+		inline bool operator()(CUnit *const unit);
 		CUnit *ontop;   /// building that is unit is an addon too.
 	private:
 		const CUnitType *const Parent;   /// building that is unit is an addon too.
@@ -860,11 +864,12 @@ public:
 
 	std::string ParentName;  /// building that is unit is an addon too.
 	CUnitType *Parent;   /// building that is unit is an addon too.
-	int ReplaceOnDie:1;    /// recreate the parent on destruction
-	int ReplaceOnBuild:1;  /// remove the parent, or just build over it.
+	int ReplaceOnDie: 1;   /// recreate the parent on destruction
+	int ReplaceOnBuild: 1; /// remove the parent, or just build over it.
 };
 
-class CBuildRestrictionDistance : public CBuildRestriction {
+class CBuildRestrictionDistance : public CBuildRestriction
+{
 public:
 	CBuildRestrictionDistance() : Distance(0), RestrictType(NULL) {};
 	virtual ~CBuildRestrictionDistance() {};
@@ -877,9 +882,10 @@ public:
 	CUnitType *RestrictType;
 };
 
-	/// Base structure of unit-type
-	/// @todo n0body: AutoBuildRate not implemented.
-class CUnitType {
+/// Base structure of unit-type
+/// @todo n0body: AutoBuildRate not implemented.
+class CUnitType
+{
 public:
 	CUnitType();
 	~CUnitType();
@@ -924,7 +930,7 @@ public:
 	MissileConfig Impact[ANIMATIONS_DEATHTYPES + 2]; /// Missiles spawned if unit is hit(+shield)
 
 	LuaCallback *DeathExplosion;
-	LuaCallback *OnHit;				/// lua function called whel unit is hit
+	LuaCallback *OnHit;             /// lua function called whel unit is hit
 
 	std::string DamageType;         /// DamageType (used for extra death animations and impacts)
 
@@ -1008,9 +1014,9 @@ public:
 
 	CVariable *Variable;            /// Array of user defined variables.
 	struct BoolFlags {
-		bool value;					/// User defined flag. Used for (dis)allow target.
-		char CanTransport;			/// Can transport units with this flag.
-		char CanTargetFlag;			/// Flag needed to target with missile.
+		bool value;          /// User defined flag. Used for (dis)allow target.
+		char CanTransport;   /// Can transport units with this flag.
+		char CanTargetFlag;  /// Flag needed to target with missile.
 	};
 	std::vector<BoolFlags> BoolFlag;
 
@@ -1025,7 +1031,7 @@ public:
 	int Supply;                     /// Food supply
 	int Demand;                     /// Food demand
 
-// --- FILLED UP ---
+	// --- FILLED UP ---
 
 	int ImproveIncomes[MaxCosts];   /// Gives player an improved income
 
@@ -1041,16 +1047,12 @@ public:
 	/* API */
 
 	bool CheckUserBoolFlags(char *BoolFlags);
-	bool CanTransport()  const
-	{
-		return MaxOnBoard > 0 && !GivesResource;
-	}
+	bool CanTransport() const { return MaxOnBoard > 0 && !GivesResource; }
 	bool CanMove() const;
 
-	bool CanSelect(GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY) const
-	{
-		if(!IsNotSelectable) {
-			switch(mode) {
+	bool CanSelect(GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY) const {
+		if (!IsNotSelectable) {
+			switch (mode) {
 				case SELECTABLE_BY_RECTANGLE_ONLY:
 					return SelectableByRectangle;
 				case NON_SELECTABLE_BY_RECTANGLE_ONLY:
@@ -1061,7 +1063,6 @@ public:
 		}
 		return false;
 	}
-
 };
 
 /*----------------------------------------------------------------------------
@@ -1077,23 +1078,22 @@ extern CUnitType *UnitTypeOrcWall;            /// Orc wall
 /**
 **  Variable info for unit and unittype.
 */
-class CUnitTypeVar {
+class CUnitTypeVar
+{
 public:
 
 	template <const unsigned int SIZE>
 	struct CKeys {
 
-		struct DataKey
-		{
-			static bool key_pred(const DataKey& lhs,
-									const DataKey& rhs)
-			{
+		struct DataKey {
+			static bool key_pred(const DataKey &lhs,
+								 const DataKey &rhs) {
 				return ((lhs.keylen == rhs.keylen) ?
-					(strcmp(lhs.key, rhs.key) < 0) : (lhs.keylen < rhs.keylen));
+						(strcmp(lhs.key, rhs.key) < 0) : (lhs.keylen < rhs.keylen));
 			}
 			int offset;
 			unsigned int keylen;
-			const char* key;
+			const char *key;
 		};
 
 		CKeys(): TotalKeys(SIZE) {}
@@ -1103,7 +1103,7 @@ public:
 		unsigned int TotalKeys;
 
 		void Init() {
-			std::sort(buildin, buildin+SIZE, DataKey::key_pred);
+			std::sort(buildin, buildin + SIZE, DataKey::key_pred);
 		}
 
 		const char *operator[](int index) {
@@ -1113,8 +1113,8 @@ public:
 				}
 			}
 			for (std::map<std::string, int>::iterator
-				it(user.begin()), end(user.end());
-				it != end; ++it) {
+				 it(user.begin()), end(user.end());
+				 it != end; ++it) {
 				if ((*it).second == index) {
 					return ((*it).first).c_str();
 				}
@@ -1129,27 +1129,26 @@ public:
 		**
 		**  @return         Index of the variable, -1 if not found.
 		*/
-		int operator[](const char*const key) {
+		int operator[](const char *const key) {
 			DataKey k;
 			k.key = key;
 			k.keylen = strlen(key);
-			const DataKey* p = std::lower_bound(buildin, buildin + SIZE,
-				k, DataKey::key_pred);
+			const DataKey *p = std::lower_bound(buildin, buildin + SIZE,
+												k, DataKey::key_pred);
 			if ((p != buildin + SIZE) && p->keylen == k.keylen &&
 				0 == strcmp(p->key, key)) {
 				return p->offset;
 			} else {
 				std::map<std::string, int>::iterator
-						ret(user.find(key));
+				ret(user.find(key));
 				if (ret != user.end()) {
-					return  (*ret).second;
+					return (*ret).second;
 				}
 			}
 			return -1;
 		}
 
-		int AddKey(const char*const key)
-		{
+		int AddKey(const char *const key) {
 			int index = this->operator[](key);
 			if (index != -1) {
 				DebugPrint("Warning, Key '%s' already defined\n" _C_ key);
@@ -1177,7 +1176,7 @@ public:
 	CBoolKeys BoolFlagNameLookup;		/// Container of name of user defined bool flag.
 	CVariableKeys VariableNameLookup;	/// Container of names of user defined variables.
 
-//	EventType *Event;                   /// Array of functions sets to call when en event occurs.
+	//	EventType *Event;                   /// Array of functions sets to call when en event occurs.
 	std::vector<CVariable> Variable;	/// Array of user defined variables (default value for unittype).
 	std::vector<CDecoVar *> DecoVar;    /// Array to describe how showing variable.
 
@@ -1203,9 +1202,9 @@ extern CUnitType *UnitTypeByIdent(const std::string &ident);/// Get unit-type by
 
 extern void SaveUnitTypes(CFile &file);              /// Save the unit-type table
 extern CUnitType *NewUnitTypeSlot(const std::string &ident);/// Allocate an empty unit-type slot
-	/// Draw the sprite frame of unit-type
+/// Draw the sprite frame of unit-type
 extern void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite,
-	int player, int frame, int x, int y);
+						 int player, int frame, int x, int y);
 
 extern void InitUnitTypes(int reset_player_stats);   /// Init unit-type table
 extern void LoadUnitTypeSprite(CUnitType &unittype); /// Load the sprite for a unittype
@@ -1214,10 +1213,10 @@ extern void CleanUnitTypes();                    /// Cleanup unit-type module
 
 // in script_unittype.c
 
-	/// Parse User Variables field.
+/// Parse User Variables field.
 extern void DefineVariableField(lua_State *l, CVariable *var, int lua_index);
 
-	/// Update custom Variables with other variable (like Hp, ...)
+/// Update custom Variables with other variable (like Hp, ...)
 extern void UpdateUnitVariables(CUnit &unit);
 
 //@}

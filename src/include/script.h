@@ -114,13 +114,13 @@ typedef enum {
 
 
 	ENumber_UnitStat     /// Property of Unit.
-// FIXME: add others.
+	// FIXME: add others.
 } ENumber; /// All possible value for a number.
 
 
 typedef enum {
 	EUnit_Ref           /// Unit direct reference.
-// FIXME: add others.
+	// FIXME: add others.
 } EUnit; /// All possible value for a unit.
 
 typedef enum {
@@ -133,7 +133,7 @@ typedef enum {
 	EString_UnitName,     /// UnitType Name.
 	EString_SubString,    /// SubString.
 	EString_Line          /// line n of the string.
-// FIXME: add others.
+	// FIXME: add others.
 } EString; /// All possible value for a string.
 
 typedef enum {
@@ -279,7 +279,7 @@ extern bool LuaToBoolean(lua_State *l, int narg);
 
 extern void CclGarbageCollect(int fast);  /// Perform garbage collection
 extern void InitCcl();                /// Initialise ccl
-extern void LoadCcl(const std::string& filename);  /// Load ccl config file
+extern void LoadCcl(const std::string &filename);  /// Load ccl config file
 extern void SaveCcl(CFile &file);     /// Save CCL module
 extern void SavePreferences();        /// Save user preferences
 extern int CclCommand(const std::string &command, bool exitOnError = true);

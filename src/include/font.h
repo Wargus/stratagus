@@ -69,8 +69,9 @@
 class CGraphic;
 class CFontColor;
 
-	/// Font definition
-class CFont : public gcn::Font {
+/// Font definition
+class CFont : public gcn::Font
+{
 private:
 	CFont(const std::string &ident) :
 		Ident(ident),
@@ -90,10 +91,9 @@ public:
 	bool IsLoaded() const;
 
 	virtual int getHeight() const { return Height(); }
-	virtual int getWidth(const std::string &text) const
-		{ return Width(text); }
+	virtual int getWidth(const std::string &text) const { return Width(text); }
 	virtual void drawString(gcn::Graphics *graphics, const std::string &text,
-		int x, int y);
+							int x, int y);
 
 
 	void Load();
@@ -121,8 +121,9 @@ private:
 
 #define MaxFontColors 9
 
-	/// Font color definition
-class CFontColor {
+/// Font color definition
+class CFontColor
+{
 public:
 	CFontColor(const std::string &ident);
 	~CFontColor();
@@ -164,33 +165,34 @@ extern CFont *GetGameFont();        /// Normal font used in game
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	/// Set the default text colors for normal and reverse text
+/// Set the default text colors for normal and reverse text
 extern void SetDefaultTextColors(const std::string &normal, const std::string &reverse);
-	/// Get the default text colors for normal and reverse text
+/// Get the default text colors for normal and reverse text
 extern void GetDefaultTextColors(std::string &normalp, std::string &reversep);
-	///  Return the 'line' line of the string 's'.
+///  Return the 'line' line of the string 's'.
 extern std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, CFont *font);
 
-	/// Get the hot key from a string
+/// Get the hot key from a string
 extern int GetHotKey(const std::string &text);
 
-	/// Load and initialize the fonts
+/// Load and initialize the fonts
 extern void LoadFonts();
-	/// Free OpenGL fonts
+/// Free OpenGL fonts
 extern void FreeOpenGLFonts();
-	/// Reload OpenGL fonts
+/// Reload OpenGL fonts
 extern void ReloadFonts();
-	/// Cleanup the font module
+/// Cleanup the font module
 extern void CleanFonts();
 
-class CLabel {
+class CLabel
+{
 	const CFontColor *normal;
 	const CFontColor *reverse;
 	const CFont *font;
 
 	template <const bool CLIP>
-	int DoDrawText(int x, int y, const char*const text,
-		const size_t len, const CFontColor *fc) const;
+	int DoDrawText(int x, int y, const char *const text,
+				   const size_t len, const CFontColor *fc) const;
 
 public:
 	CLabel(const CFont *f, const std::string &nc, const std::string &rc): font(f) {
@@ -199,33 +201,26 @@ public:
 	}
 	CLabel(const CFont *f);
 
-	int Height() const
-	{
-		return font->Height();
-	}
+	int Height() const { return font->Height(); }
 
-	void SetFont(const CFont *f) {
-		font = f;
-	}
+	void SetFont(const CFont *f) { font = f; }
 
-	void SetNormalColor(const std::string &nc) {
-		normal = CFontColor::Get(nc);
-	}
+	void SetNormalColor(const std::string &nc) { normal = CFontColor::Get(nc); }
 
 	/// Draw text/number unclipped
-	int Draw(int x, int y, const char*const text) const;
+	int Draw(int x, int y, const char *const text) const;
 	int Draw(int x, int y, const std::string &text) const;
 	int Draw(int x, int y, int number) const;
 	/// Draw text/number clipped
-	int DrawClip(int x, int y, const char*const text) const;
+	int DrawClip(int x, int y, const char *const text) const;
 	int DrawClip(int x, int y, const std::string &text) const;
 	int DrawClip(int x, int y, int number) const;
 	/// Draw reverse text/number unclipped
-	int DrawReverse(int x, int y, const char*const text) const;
+	int DrawReverse(int x, int y, const char *const text) const;
 	int DrawReverse(int x, int y, const std::string &text) const;
 	int DrawReverse(int x, int y, int number)const ;
 	/// Draw reverse text/number clipped
-	int DrawReverseClip(int x, int y, const char*const text) const;
+	int DrawReverseClip(int x, int y, const char *const text) const;
 	int DrawReverseClip(int x, int y, const std::string &text) const;
 	int DrawReverseClip(int x, int y, int number) const;
 

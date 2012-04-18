@@ -46,12 +46,12 @@ public:
 
 	virtual void Execute(CUnit &unit);
 	virtual void Cancel(CUnit &unit);
-	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput& input) { UpdatePathFinderData_NotCalled(input); }
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
 
 	virtual void UpdateUnitVariables(CUnit &unit) const;
 
-	const CUpgrade& GetUpgrade() const { return *Upgrade; }
+	const CUpgrade &GetUpgrade() const { return *Upgrade; }
 	void SetUpgrade(CUpgrade &upgrade) { Upgrade = &upgrade; }
 private:
 	CUpgrade *Upgrade;

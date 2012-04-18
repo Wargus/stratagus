@@ -80,10 +80,10 @@ public:
 /**
 **  Sound definition.
 */
-class CSound {
+class CSound
+{
 public:
-	CSound() : Mapref(0), Range(0), Number(0)
-	{
+	CSound() : Mapref(0), Range(0), Number(0) {
 		memset(&Sound, 0, sizeof(Sound));
 	}
 	~CSound();
@@ -140,63 +140,63 @@ extern GameSound GameSounds;  /// Game sound configuration
 
 extern bool CallbackMusic;  /// flag true callback ccl if stops
 
-	/// global range control (max cut off distance for sound)
+/// global range control (max cut off distance for sound)
 extern int DistanceSilent;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	/// Play a unit sound
+/// Play a unit sound
 extern void PlayUnitSound(const CUnit &unit, UnitVoiceGroup unit_voice_group);
-	/// Play a unit sound
+/// Play a unit sound
 extern void PlayUnitSound(const CUnit &unit, CSound *sound);
-	/// Play a missile sound
+/// Play a missile sound
 extern void PlayMissileSound(const Missile *missile, CSound *sound);
-	/// Play a game sound
+/// Play a game sound
 extern void PlayGameSound(CSound *sound, unsigned char volume);
 
-	/// Play a sound file
+/// Play a sound file
 extern int PlayFile(const std::string &name, LuaActionListener *listener = NULL);
 
-	/// Modify the range of a given sound.
+/// Modify the range of a given sound.
 extern void SetSoundRange(CSound *sound, unsigned char range);
 
-	/// Register a sound (can be a simple sound or a group)
+/// Register a sound (can be a simple sound or a group)
 extern CSound *RegisterSound(const char *files[], unsigned int number);
 
-	///  Create a special sound group with two sounds
+///  Create a special sound group with two sounds
 extern CSound *RegisterTwoGroups(CSound *first, CSound *second);
 
-	/// Initialize client side of the sound layer.
+/// Initialize client side of the sound layer.
 extern void InitSoundClient();
 
 
 // music.cpp
 
-	/// Check if music is finished and play the next song
+/// Check if music is finished and play the next song
 extern void CheckMusicFinished(bool force = false);
 
-	/// Initialize music
+/// Initialize music
 extern void InitMusic();
 
-	/// Turn music stopped callback on
+/// Turn music stopped callback on
 #define CallbackMusicOn() \
 	CallbackMusic = true;
-	/// Turn music stopped callback off
+/// Turn music stopped callback off
 #define CallbackMusicOff() \
 	CallbackMusic = false;
 
 
 // sound_id.cpp
 
-	/// Map sound to identifier
+/// Map sound to identifier
 extern void MapSound(const std::string &sound_name, CSound *id);
-	/// Get the sound id bound to an identifier
+/// Get the sound id bound to an identifier
 extern CSound *SoundForName(const std::string &sound_name);
-	/// Make a sound bound to identifier
+/// Make a sound bound to identifier
 extern CSound *MakeSound(const std::string &sound_name, const char *file[], int nb);
-	/// Make a sound group bound to identifier
+/// Make a sound group bound to identifier
 extern CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second);
 #ifdef DEBUG
 extern void FreeSounds();
@@ -205,7 +205,7 @@ extern void FreeSounds();
 
 // script_sound.cpp
 
-	/// register ccl features
+/// register ccl features
 extern void SoundCclRegister();
 
 

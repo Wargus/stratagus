@@ -48,14 +48,14 @@ class CUpgrade;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	/// init upgrade/allow structures
+/// init upgrade/allow structures
 extern void InitUpgrades();
-	/// save the upgrades
+/// save the upgrades
 extern void SaveUpgrades(CFile &file);
-	/// cleanup upgrade module
+/// cleanup upgrade module
 extern void CleanUpgrades();
 
-	/// Register CCL features for upgrades
+/// Register CCL features for upgrades
 extern void UpgradesCclRegister();
 
 /*----------------------------------------------------------------------------
@@ -72,7 +72,7 @@ extern int UpgradeIdByIdent(const std::string &sid);
 --  Upgrades
 ----------------------------------------------------------------------------*/
 
-	/// Upgrade will be acquired
+/// Upgrade will be acquired
 extern void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade);
 
 /// for now it will be empty?

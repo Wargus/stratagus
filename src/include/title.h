@@ -40,7 +40,8 @@ enum {
 	TitleFlagCenter = 1 << 0   /// Center Text
 };
 
-class TitleScreenLabel {
+class TitleScreenLabel
+{
 public:
 	TitleScreenLabel() : Font(0), Xofs(0), Yofs(0), Flags(0) {}
 
@@ -51,7 +52,8 @@ public:
 	int Flags;
 };
 
-class TitleScreen {
+class TitleScreen
+{
 public:
 	TitleScreen() : StretchImage(true), Timeout(0), Iterations(0), Editor(0), Labels(NULL) {}
 	~TitleScreen() {

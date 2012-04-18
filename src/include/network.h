@@ -113,14 +113,15 @@ enum _extended_message_type_ {
 /**
 **  Network command message.
 */
-class CNetworkCommand {
+class CNetworkCommand
+{
 public:
 	CNetworkCommand() : Unit(0), X(0), Y(0), Dest(0) {}
 	void Clear() { this->Unit = this->X = this->Y = this->Dest = 0; }
 
 	void Serialize(unsigned char *p) const;
 	void Deserialize(unsigned char *p);
-	static size_t Size() { return 2+2+2+2; }
+	static size_t Size() { return 2 + 2 + 2 + 2; }
 
 	Uint16 Unit;         /// Command for unit
 	Uint16 X;            /// Map position X
@@ -131,13 +132,14 @@ public:
 /**
 **  Extended network command message.
 */
-class CNetworkExtendedCommand {
+class CNetworkExtendedCommand
+{
 public:
 	CNetworkExtendedCommand() : ExtendedType(0), Arg1(0), Arg2(0), Arg3(0), Arg4(0) {}
 
 	void Serialize(unsigned char *p);
 	void Deserialize(unsigned char *p);
-	static size_t Size() { return 1+1+2+2+2; }
+	static size_t Size() { return 1 + 1 + 2 + 2 + 2; }
 
 	Uint8  ExtendedType;  /// Extended network command type
 	Uint8  Arg1;          /// Argument 1
@@ -149,7 +151,8 @@ public:
 /**
 **  Network chat message.
 */
-class CNetworkChat {
+class CNetworkChat
+{
 public:
 	CNetworkChat() {
 		Player = 0;
@@ -158,7 +161,7 @@ public:
 
 	void Serialize(unsigned char *p);
 	void Deserialize(unsigned char *p);
-	static size_t Size() { return 1+7; }
+	static size_t Size() { return 1 + 7; }
 
 	Uint8 Player;   /// Sending player
 	char  Text[7];  /// Message bytes
@@ -177,7 +180,8 @@ typedef struct _network_selection_header_ {
 /**
 **  Network Selection Update
 */
-class CNetworkSelection {
+class CNetworkSelection
+{
 public:
 	CNetworkSelection() {
 		memset(Unit, 0, sizeof(Unit));
@@ -185,7 +189,7 @@ public:
 
 	void Serialize(unsigned char *p);
 	void Deserialize(unsigned char *p);
-	static size_t Size() { return 2*4; }
+	static size_t Size() { return 2 * 4; }
 
 	Uint16 Unit[4];  /// Selection Units
 };
@@ -195,7 +199,8 @@ public:
 **
 **  Header for the packet.
 */
-class CNetworkPacketHeader {
+class CNetworkPacketHeader
+{
 public:
 	CNetworkPacketHeader() {
 		Cycle = 0;
@@ -215,7 +220,8 @@ public:
 **
 **  This is sent over the network.
 */
-class CNetworkPacket {
+class CNetworkPacket
+{
 public:
 	unsigned char *Serialize(int numcommands) const;
 	int Deserialize(unsigned char *p, unsigned int len);
@@ -252,13 +258,13 @@ extern void NetworkQuit();   /// Quit game
 extern void NetworkRecover();   /// Recover network
 extern void NetworkCommands();  /// Get all network commands
 extern void NetworkChatMessage(const std::string &msg);  /// Send chat message
-	/// Send network command.
+/// Send network command.
 extern void NetworkSendCommand(int command, const CUnit &unit, int x,
-	int y, const CUnit *dest, const CUnitType *type, int status);
-	/// Send extended network command.
+							   int y, const CUnit *dest, const CUnitType *type, int status);
+/// Send extended network command.
 extern void NetworkSendExtendedCommand(int command, int arg1, int arg2,
-	int arg3, int arg4, int status);
-	/// Send Selections to Team
+									   int arg3, int arg4, int status);
+/// Send Selections to Team
 extern void NetworkSendSelection(CUnit **units, int count);
 
 //@}

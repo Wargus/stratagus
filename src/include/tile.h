@@ -141,13 +141,14 @@
 --  Map - field
 ----------------------------------------------------------------------------*/
 
-	/// Describes a field of the map
-class CMapField {
+/// Describes a field of the map
+class CMapField
+{
 public:
 
 	CMapField() : Tile(0), SeenTile(0), Flags(0), Cost(0), Value(0), UnitCache()
 #ifdef DEBUG
-	, TilesetTile(0)
+		, TilesetTile(0)
 #endif
 	{
 		memset(Visible, 0, sizeof(Visible));
@@ -173,8 +174,7 @@ public:
 #endif
 
 	/// Check if a field for the user is explored.
-	bool IsExplored(const unsigned int player_index) const
-	{
+	bool IsExplored(const unsigned int player_index) const {
 		return !!Visible[player_index];
 	};
 

@@ -102,8 +102,9 @@ class CGraphic;
 class CPlayer;
 class ButtonStyle;
 
-	/// Icon: rectangle image used in menus
-class CIcon {
+/// Icon: rectangle image used in menus
+class CIcon
+{
 public:
 	CIcon(const std::string &ident);
 	~CIcon();
@@ -115,7 +116,7 @@ public:
 	void DrawIcon(const CPlayer &player, int x, int y) const;
 	/// Draw icon of a unit
 	void DrawUnitIcon(ButtonStyle *style,
-		unsigned flags, int x, int y, const std::string &text) const;
+					  unsigned flags, int x, int y, const std::string &text) const;
 
 	inline const std::string &GetIdent() { return this->Ident; }
 
@@ -125,8 +126,9 @@ private:
 	std::string Ident;        /// Icon identifier
 };
 
-	/// Icon reference (used in config tables)
-class IconConfig {
+/// Icon reference (used in config tables)
+class IconConfig
+{
 public:
 	IconConfig() : Icon(NULL) {}
 
@@ -146,7 +148,7 @@ extern void InitIcons();   /// Init icons
 extern void LoadIcons();   /// Load icons
 extern void CleanIcons();  /// Cleanup icons
 
-	/// Register CCL features
+/// Register CCL features
 extern void IconCclRegister();
 
 //@}

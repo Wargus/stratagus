@@ -40,8 +40,8 @@ class CAnimation_SetVar : public CAnimation
 public:
 	CAnimation_SetVar() : CAnimation(AnimationSetVar) {}
 
-	virtual void Action(CUnit& unit, int &move, int scale) const;
-	virtual void Init(const char* s);
+	virtual void Action(CUnit &unit, int &move, int scale) const;
+	virtual void Init(const char *s);
 
 private:
 	int mod;

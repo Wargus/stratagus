@@ -40,8 +40,8 @@ class CAnimation_Die : public CAnimation
 public:
 	CAnimation_Die() : CAnimation(AnimationDie) {}
 
-	virtual void Action(CUnit& unit, int &move, int scale) const;
-	virtual void Init(const char* s);
+	virtual void Action(CUnit &unit, int &move, int scale) const;
+	virtual void Init(const char *s);
 
 private:
 	std::string DeathType;
@@ -52,7 +52,7 @@ class AnimationDie_Exception
 {
 };
 
-extern void AnimationDie_OnCatch(CUnit& unit);
+extern void AnimationDie_OnCatch(CUnit &unit);
 
 //@}
 

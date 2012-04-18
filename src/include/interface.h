@@ -53,7 +53,7 @@ struct _event_callback_;
 --  Definitons
 ----------------------------------------------------------------------------*/
 
-	/// Button Commands that need target selection
+/// Button Commands that need target selection
 enum ButtonCmd {
 	ButtonMove,           /// order move
 	ButtonAttack,         /// order attack
@@ -80,8 +80,9 @@ enum ButtonCmd {
 class ButtonAction;
 typedef bool (*ButtonCheckFunc)(const CUnit &, const ButtonAction *);
 
-	/// Action of button
-class ButtonAction {
+/// Action of button
+class ButtonAction
+{
 public:
 	ButtonAction() : Pos(0), Level(0), Action(ButtonMove), Value(0),
 		Allowed(NULL), Key(0) {}
@@ -104,7 +105,7 @@ public:
 	std::string Popup;          /// Popup screen used for button
 };
 
-	/// Button area under cursor
+/// Button area under cursor
 enum _button_area_ {
 	ButtonAreaSelected,      /// Selected button
 	ButtonAreaTraining,      /// Training button
@@ -115,26 +116,26 @@ enum _button_area_ {
 	ButtonAreaMenu           /// Menu button
 };
 
-	/// Menu button under cursor
+/// Menu button under cursor
 enum _menu_button_under_ {
 	ButtonUnderMenu,              /// Menu button
 	ButtonUnderNetworkMenu,       /// Network menu button
 	ButtonUnderNetworkDiplomacy   /// Diplomacy button
 };
 
-	/// current interface state
+/// current interface state
 enum _iface_state_ {
 	IfaceStateNormal,  /// Normal Game state
 	IfaceStateMenu     /// Menu active
 };
 
-	/// current key state
+/// current key state
 enum _key_state_ {
 	KeyStateCommand = 0,  /// keys -> commands
 	KeyStateInput         /// keys -> line editor
 };                        /// current keyboard state
 
-	/// Key modifier
+/// Key modifier
 #define ModifierShift 1        /// any shift key pressed
 #define ModifierControl 2      /// any control key pressed
 #define ModifierAlt 4          /// any alt key pressed
@@ -145,7 +146,7 @@ enum _key_state_ {
 #define MouseDragShift   16  /// shift for drag button
 #define MouseHoldShift   24  /// shift for hold button
 
-	/// pressed mouse button flags
+/// pressed mouse button flags
 #define NoButton 0      /// No button
 #define LeftButton 2    /// Left button on mouse
 #define MiddleButton 4  /// Middle button on mouse
@@ -158,7 +159,7 @@ enum _key_state_ {
 #define LeftAndRightButton   (LeftButton | RightButton)   /// Left + Right button on mouse
 #define MiddleAndRightButton (MiddleButton | RightButton) /// Middle + Right button on mouse
 
-	/// Where is our cursor ?
+/// Where is our cursor ?
 enum _cursor_on_ {
 	CursorOnUnknown = -1,     /// not known
 	CursorOnMinimap,          /// minimap area
@@ -174,7 +175,7 @@ enum _cursor_on_ {
 	CursorOnScrollRightDown   /// in scroll right+down area
 };
 
-	/// Are We Scrolling With the Keyboard ?
+/// Are We Scrolling With the Keyboard ?
 #define ScrollNone 0        /// not scrolling
 #define ScrollUp 1          /// scroll up only
 #define ScrollDown 2        /// scroll down only
@@ -190,54 +191,54 @@ enum _cursor_on_ {
 ----------------------------------------------------------------------------*/
 extern std::vector<ButtonAction *> UnitButtonTable;
 
-	/// Flag telling if the game is running
+/// Flag telling if the game is running
 extern bool GameRunning;
-	/// Flag telling if the game is paused
+/// Flag telling if the game is paused
 extern bool GamePaused;
-	/// Flag telling if the game is in observe mode
+/// Flag telling if the game is in observe mode
 extern bool GameObserve;
-	/// Flag telling not to advance to the next game cycle
+/// Flag telling not to advance to the next game cycle
 extern char SkipGameCycle;
-	/// Invincibility cheat
+/// Invincibility cheat
 extern bool GodMode;
-	/// Whether the map is the only thing displayed or not
+/// Whether the map is the only thing displayed or not
 extern char BigMapMode;
-	/// Flag telling if the SDL window is visible
+/// Flag telling if the SDL window is visible
 extern bool IsSDLWindowVisible;
 
-	/// pressed mouse buttons (normal,double,dragged,long)
+/// pressed mouse buttons (normal,double,dragged,long)
 extern int MouseButtons;
-	/// current active modifiers
+/// current active modifiers
 extern int KeyModifiers;
-	/// current interface state
+/// current interface state
 extern enum _iface_state_ InterfaceState;
-	/// current scroll state of keyboard
+/// current scroll state of keyboard
 extern int KeyScrollState;
-	/// current scroll state of mouse
+/// current scroll state of mouse
 extern int MouseScrollState;
-	/// current key state
+/// current key state
 extern enum _key_state_ KeyState;
-	/// shared pointer to unit under the cursor
+/// shared pointer to unit under the cursor
 extern CUnit *UnitUnderCursor;
-	/// button area under the cursor
+/// button area under the cursor
 extern int ButtonAreaUnderCursor;
-	/// button number under the cursor
+/// button number under the cursor
 extern int ButtonUnderCursor;
-	/// menu button was clicked down
+/// menu button was clicked down
 extern bool GameMenuButtonClicked;
-	/// diplomacy button was clicked down
+/// diplomacy button was clicked down
 extern bool GameDiplomacyButtonClicked;
-	/// Mouse leaves windows stops scroll
+/// Mouse leaves windows stops scroll
 extern bool LeaveStops;
-	/// current CursorOn field
+/// current CursorOn field
 extern enum _cursor_on_ CursorOn;
 
-	/// vladi: used for unit buttons sub-menus etc
+/// vladi: used for unit buttons sub-menus etc
 extern int CurrentButtonLevel;
 
-	/// Time to detect double clicks
+/// Time to detect double clicks
 extern int DoubleClickDelay;
-	/// Time to detect hold clicks
+/// Time to detect hold clicks
 extern int HoldClickDelay;
 
 /*----------------------------------------------------------------------------
@@ -249,185 +250,185 @@ extern CUnit *GetUnitUnderCursor();
 //
 // in botpanel.cpp
 //
-	/// Generate all buttons
+/// Generate all buttons
 extern void InitButtons();
-	/// Free memory for buttons
+/// Free memory for buttons
 extern void CleanButtons();
-	/// Make a new button
+/// Make a new button
 extern int AddButton(int pos, int level, const std::string &IconIdent,
-	ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
-	const std::string &arg, const std::string &hint, const std::string &descr, 
-	const std::string &sound, const std::string &cursor, const std::string &umask,
-	const std::string &popup);
+					 ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
+					 const std::string &arg, const std::string &hint, const std::string &descr,
+					 const std::string &sound, const std::string &cursor, const std::string &umask,
+					 const std::string &popup);
 
 //
 // in mouse.cpp
 //
-	/// Called if any mouse button is pressed down
+/// Called if any mouse button is pressed down
 extern void HandleButtonDown(unsigned button);
-	/// Called if any mouse button is released up
+/// Called if any mouse button is released up
 extern void HandleButtonUp(unsigned button);
-	/// Keep coordinates in window and update cursor position
+/// Keep coordinates in window and update cursor position
 extern void HandleCursorMove(int *x, int *y);
-	/// Called if the mouse is moved
+/// Called if the mouse is moved
 extern void HandleMouseMove(int x, int y);
-	/// Called if the mouse exits the game window (only for some videomodes)
+/// Called if the mouse exits the game window (only for some videomodes)
 extern void HandleMouseExit();
 
-	/// Update KeyModifiers if a key is pressed
+/// Update KeyModifiers if a key is pressed
 extern int HandleKeyModifiersDown(unsigned keycode, unsigned keychar);
-	/// Update KeyModifiers if a key is released
+/// Update KeyModifiers if a key is released
 extern int HandleKeyModifiersUp(unsigned keycode, unsigned keychar);
 
-	/// Called if a key is pressed
+/// Called if a key is pressed
 extern void HandleKeyDown(unsigned keycode, unsigned keychar);
-	/// Called when a key is released
+/// Called when a key is released
 extern void HandleKeyUp(unsigned keycode, unsigned keychar);
-	/// Called when a key is repeated
+/// Called when a key is repeated
 extern void HandleKeyRepeat(unsigned keycode, unsigned keychar);
 
 //
 // in interface.c (for link between video and mouse.c)
 //
-	/// Called if any mouse button is pressed down
+/// Called if any mouse button is pressed down
 extern void InputMouseButtonPress(const struct _event_callback_ *callbacks,
-	unsigned ticks, unsigned button);
-	/// Called if any mouse button is released up
+								  unsigned ticks, unsigned button);
+/// Called if any mouse button is released up
 extern void InputMouseButtonRelease(const struct _event_callback_ *callbacks,
-	unsigned ticks, unsigned button);
-	/// Called if the mouse is moved
+									unsigned ticks, unsigned button);
+/// Called if the mouse is moved
 extern void InputMouseMove(const struct _event_callback_ *callbacks,
-	unsigned ticks, int x, int y);
-	/// Called if the mouse exits the game window (when supported by videomode)
+						   unsigned ticks, int x, int y);
+/// Called if the mouse exits the game window (when supported by videomode)
 extern void InputMouseExit(const struct _event_callback_ *callbacks,
-	unsigned ticks);
-	/// Called to look for mouse timeouts
+						   unsigned ticks);
+/// Called to look for mouse timeouts
 extern void InputMouseTimeout(const struct _event_callback_ *callbacks,
-	unsigned ticks);
+							  unsigned ticks);
 
-	/// Called if any key button is pressed down
+/// Called if any key button is pressed down
 extern void InputKeyButtonPress(const struct _event_callback_ *callbacks,
-	unsigned ticks, unsigned ikey, unsigned ikeychar);
-	/// Called if any key button is released up
+								unsigned ticks, unsigned ikey, unsigned ikeychar);
+/// Called if any key button is released up
 extern void InputKeyButtonRelease(const struct _event_callback_ *callbacks,
-	unsigned ticks, unsigned ikey, unsigned ikeychar);
-	/// Called to look for key timeouts
+								  unsigned ticks, unsigned ikey, unsigned ikeychar);
+/// Called to look for key timeouts
 extern void InputKeyTimeout(const struct _event_callback_ *callbacks,
-	unsigned ticks);
+							unsigned ticks);
 
-	/// Get double click delay
+/// Get double click delay
 extern int GetDoubleClickDelay();
-	/// Set double click delay
+/// Set double click delay
 extern void SetDoubleClickDelay(int delay);
-	/// Get hold click delay
+/// Get hold click delay
 extern int GetHoldClickDelay();
-	/// Set hold click delay
+/// Set hold click delay
 extern void SetHoldClickDelay(int delay);
 
-	/// Toggle pause mode
+/// Toggle pause mode
 extern void UiTogglePause();
-	/// Toggle big map
+/// Toggle big map
 extern void UiToggleBigMap();
-	/// Handle cheats
+/// Handle cheats
 extern int HandleCheats(const std::string &input);
 
-	/// Call the lua function HandleCommandKey
+/// Call the lua function HandleCommandKey
 bool HandleCommandKey(int key);
 
 //
 // Chaos pur.
 //
-	/// Called if right mouse button is pressed
+/// Called if right mouse button is pressed
 extern void DoRightButton(int tx, int ty);
-	/// Cancel the building input mode
+/// Cancel the building input mode
 extern void CancelBuildingMode();
 
-	/// Draw menu button area
+/// Draw menu button area
 extern void DrawMenuButtonArea();
-	/// Update messages
+/// Update messages
 extern void UpdateMessages();
-	/// Draw messages as overlay over of the map
+/// Draw messages as overlay over of the map
 extern void DrawMessages();
-	/// Draw the player resource in resource line
+/// Draw the player resource in resource line
 extern void DrawResources();
-	/// Set message to display
+/// Set message to display
 extern void SetMessage(const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(1, 2);
-	/// Set message to display with event point
+/// Set message to display with event point
 extern void SetMessageEvent(const Vec2i &pos, const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(2, 3);
-	/// Center view-point on last event message
+/// Center view-point on last event message
 extern void CenterOnMessage();
-	/// Cleanup all messages
+/// Cleanup all messages
 extern void CleanMessages();
-	/// show/hide messages
+/// show/hide messages
 extern void ToggleShowMessages();
 
-	/// Draw costs in status line
+/// Draw costs in status line
 extern void DrawCosts();
-	/// Set costs to be displayed in status line
+/// Set costs to be displayed in status line
 extern void SetCosts(int mana, int food, const int *costs);
-	/// Clear the costs displayed in status line (undisplay!)
+/// Clear the costs displayed in status line (undisplay!)
 extern void ClearCosts();
 
-	/// Draw the timer
+/// Draw the timer
 extern void DrawTimer();
-	/// Update the timer
+/// Update the timer
 extern void UpdateTimer();
-	/// Update the status line with hints from the button
+/// Update the status line with hints from the button
 extern void UpdateStatusLineForButton(const ButtonAction *button);
-	/// Draw the Pie Menu
+/// Draw the Pie Menu
 extern void DrawPieMenu();
 
-	/// Handle the mouse in scroll area
+/// Handle the mouse in scroll area
 extern int HandleMouseScrollArea(int x, int y);
 
 //
 // in button_checks.cpp
 //
-	/// Check is always true
+/// Check is always true
 extern bool ButtonCheckTrue(const CUnit &unit, const ButtonAction *button);
-	/// Check is always false
+/// Check is always false
 extern bool ButtonCheckFalse(const CUnit &unit, const ButtonAction *button);
-	/// Check if allowed upgrade is ready
+/// Check if allowed upgrade is ready
 extern bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction *button);
-	/// Check if allowed units exists
+/// Check if allowed units exists
 extern bool ButtonCheckUnitsOr(const CUnit &unit, const ButtonAction *button);
-	/// Check if allowed units exists
+/// Check if allowed units exists
 extern bool ButtonCheckUnitsAnd(const CUnit &unit, const ButtonAction *button);
-	/// Check if have network play
+/// Check if have network play
 extern bool ButtonCheckNetwork(const CUnit &unit, const ButtonAction *button);
-	/// Check if don't have network play
+/// Check if don't have network play
 extern bool ButtonCheckNoNetwork(const CUnit &unit, const ButtonAction *button);
-	/// Check if unit isn't working (train,upgrade,research)
+/// Check if unit isn't working (train,upgrade,research)
 extern bool ButtonCheckNoWork(const CUnit &unit, const ButtonAction *button);
-	/// Check if unit isn't researching or upgrading
+/// Check if unit isn't researching or upgrading
 extern bool ButtonCheckNoResearch(const CUnit &unit, const ButtonAction *button);
-	/// Check if all requirements for an attack to are meet
+/// Check if all requirements for an attack to are meet
 extern bool ButtonCheckAttack(const CUnit &unit, const ButtonAction *button);
-	/// Check if all requirements for an upgrade to are meet
+/// Check if all requirements for an upgrade to are meet
 extern bool ButtonCheckUpgradeTo(const CUnit &unit, const ButtonAction *button);
-	/// Check if all requirements for a research are meet
+/// Check if all requirements for a research are meet
 extern bool ButtonCheckResearch(const CUnit &unit, const ButtonAction *button);
-	/// Check if all requirements for a single research are meet
+/// Check if all requirements for a single research are meet
 extern bool ButtonCheckSingleResearch(const CUnit &unit, const ButtonAction *button);
 
 //
 // in ccl_ui.c
 //
-	/// Called whenever the units selection is altered
+/// Called whenever the units selection is altered
 extern void SelectionChanged();
-	/// Called whenever the selected unit was updated
+/// Called whenever the selected unit was updated
 extern void SelectedUnitChanged();
 
 //
 // in game.cpp
 //
-	/// Set the game paused or unpaused
+/// Set the game paused or unpaused
 extern void SetGamePaused(bool paused);
-	/// Get the game paused or unpaused
+/// Get the game paused or unpaused
 extern bool GetGamePaused();
-	/// Set the game speed
+/// Set the game speed
 extern void SetGameSpeed(int speed);
-	/// Get the game speed
+/// Get the game speed
 extern int GetGameSpeed();
 
 //@}

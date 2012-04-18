@@ -53,66 +53,66 @@ class CUpgrade;
 **  are on all computers equal, should use the functions without Send.
 */
 
-	/// Send stop command
+/// Send stop command
 extern void SendCommandStopUnit(CUnit &unit);
-	/// Send stand ground command
+/// Send stand ground command
 extern void SendCommandStandGround(CUnit &unit, int flush);
-	/// Send follow command
+/// Send follow command
 extern void SendCommandFollow(CUnit &unit, CUnit &dest, int flush);
-	/// Send move command
+/// Send move command
 extern void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush);
-	/// Send repair command
+/// Send repair command
 extern void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
-	/// Send auto repair command
+/// Send auto repair command
 extern void SendCommandAutoRepair(CUnit &unit, int on);
-	/// Send attack command
+/// Send attack command
 extern void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
-	/// Send attack ground command
+/// Send attack ground command
 extern void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush);
-	/// Send patrol command
+/// Send patrol command
 extern void SendCommandPatrol(CUnit &unit, const Vec2i &pos, int flush);
-	/// Send board command
+/// Send board command
 extern void SendCommandBoard(CUnit &unit, CUnit &dest, int flush);
-	/// Send unload command
+/// Send unload command
 extern void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush);
-	/// Send build building command
+/// Send build building command
 extern void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush);
-	/// Send cancel building command
+/// Send cancel building command
 extern void SendCommandDismiss(CUnit &unit);
-	/// Send harvest location command
+/// Send harvest location command
 extern void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush);
-	/// Send harvest command
+/// Send harvest command
 extern void SendCommandResource(CUnit &unit, CUnit &dest, int flush);
-	/// Send return goods command
+/// Send return goods command
 extern void SendCommandReturnGoods(CUnit &unit, CUnit *dest, int flush);
-	/// Send train command
+/// Send train command
 extern void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int flush);
-	/// Send cancel training command
+/// Send cancel training command
 extern void SendCommandCancelTraining(CUnit &unit, int slot, const CUnitType *type);
-	/// Send upgrade to command
+/// Send upgrade to command
 extern void SendCommandUpgradeTo(CUnit &unit, CUnitType &what, int flush);
-	/// Send cancel upgrade to command
+/// Send cancel upgrade to command
 extern void SendCommandCancelUpgradeTo(CUnit &unit);
-	/// Send research command
+/// Send research command
 extern void SendCommandResearch(CUnit &unit, CUpgrade *what, int flush);
-	/// Send cancel research command
+/// Send cancel research command
 extern void SendCommandCancelResearch(CUnit &unit);
-	/// Send spell cast command
+/// Send spell cast command
 extern void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, int flush);
-	/// Send auto spell cast command
+/// Send auto spell cast command
 extern void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on);
-	/// Send diplomacy command
+/// Send diplomacy command
 extern void SendCommandDiplomacy(int player, int state, int opponent);
-	/// Send shared vision command
+/// Send shared vision command
 extern void SendCommandSharedVision(int player, bool state, int opponent);
 
-	/// Parse a command (from network).
+/// Parse a command (from network).
 extern void ParseCommand(unsigned char type, UnitRef unum, unsigned short x,
-	unsigned short y, UnitRef dest);
-	/// Parse an extended command (from network).
+						 unsigned short y, UnitRef dest);
+/// Parse an extended command (from network).
 extern void ParseExtendedCommand(unsigned char type, int status,
-	unsigned char arg1, unsigned short arg2, unsigned short arg3,
-	unsigned short arg4);
+								 unsigned char arg1, unsigned short arg2, unsigned short arg3,
+								 unsigned short arg4);
 
 //@}
 

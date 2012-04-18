@@ -61,22 +61,22 @@ extern ReplayType ReplayGameType;  /// Replay game type
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	/// Log commands into file
+/// Log commands into file
 extern void CommandLog(const char *action, const CUnit *unit, int flush,
-	int x, int y, const CUnit *dest, const char *value, int num);
-	/// Replay user commands from log each cycle, single player games
+					   int x, int y, const CUnit *dest, const char *value, int num);
+/// Replay user commands from log each cycle, single player games
 extern void SinglePlayerReplayEachCycle();
-	/// Replay user commands from log each cycle, multiplayer games
+/// Replay user commands from log each cycle, multiplayer games
 extern void MultiPlayerReplayEachCycle();
-	/// Load replay
+/// Load replay
 extern int LoadReplay(const std::string &name);
-	/// End logging
+/// End logging
 extern void EndReplayLog();
-	/// Clean replay
+/// Clean replay
 extern void CleanReplayLog();
-	/// Save the replay list to file
+/// Save the replay list to file
 extern void SaveReplayList(CFile &file);
-	/// Register ccl functions related to network
+/// Register ccl functions related to network
 extern void ReplayCclRegister();
 
 //@}

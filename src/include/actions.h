@@ -71,7 +71,7 @@ enum UnitAction {
 	UnitActionResearch,     /// building is researching spell
 	UnitActionBuilt,      /// building is under construction
 
-// Compound actions
+	// Compound actions
 	UnitActionBoard,        /// unit entering transporter
 	UnitActionUnload,       /// unit leaving transporter
 	UnitActionPatrol,       /// unit paroling area
@@ -99,8 +99,7 @@ struct lua_State;
 class COrder
 {
 public:
-	explicit COrder(int action) : Goal(), Action(action), Finished(false)
-	{
+	explicit COrder(int action) : Goal(), Action(action), Finished(false) {
 	}
 	virtual ~COrder();
 
@@ -108,7 +107,7 @@ public:
 	virtual void Execute(CUnit &unit) = 0;
 	virtual void Cancel(CUnit &unit) {}
 
-	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const = 0;
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const = 0;
 
 	virtual void OnAnimationAttack(CUnit &unit);
 
@@ -120,41 +119,41 @@ public:
 	virtual void FillSeenValues(CUnit &unit) const;
 	virtual void AiUnitKilled(CUnit &unit);
 
-	virtual void UpdatePathFinderData(PathFinderInput& input) = 0;
+	virtual void UpdatePathFinderData(PathFinderInput &input) = 0;
 
 	bool HasGoal() const { return Goal != NULL; }
-	CUnit* GetGoal() const { return Goal; };
+	CUnit *GetGoal() const { return Goal; };
 	void SetGoal(CUnit *const new_goal);
 	void ClearGoal();
 
 	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 
-	static COrder* NewActionAttack(const CUnit &attacker, CUnit &target);
-	static COrder* NewActionAttack(const CUnit &attacker, const Vec2i &dest);
-	static COrder* NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
-	static COrder* NewActionBoard(CUnit &unit);
-	static COrder* NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
-	static COrder* NewActionBuilt(CUnit &builder, CUnit &unit);
-	static COrder* NewActionDie();
-	static COrder* NewActionFollow(CUnit &dest);
-	static COrder* NewActionMove(const Vec2i &pos);
-	static COrder* NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
-	static COrder* NewActionRepair(CUnit &unit, CUnit &target);
-	static COrder* NewActionRepair(const Vec2i &pos);
-	static COrder* NewActionResearch(CUnit &unit, CUpgrade &upgrade);
-	static COrder* NewActionResource(CUnit &harvester, const Vec2i &pos);
-	static COrder* NewActionResource(CUnit &harvester, CUnit &mine);
-	static COrder* NewActionReturnGoods(CUnit &harvester, CUnit *depot);
-	static COrder* NewActionSpellCast(SpellType &spell, const Vec2i &pos, CUnit *target);
-	static COrder* NewActionStandGround();
-	static COrder* NewActionStill();
-	static COrder* NewActionTrain(CUnit &trainer, CUnitType &type);
-	static COrder* NewActionTransformInto(CUnitType &type);
-	static COrder* NewActionUnload(const Vec2i &pos, CUnit *what);
-	static COrder* NewActionUpgradeTo(CUnit &unit, CUnitType &type);
+	static COrder *NewActionAttack(const CUnit &attacker, CUnit &target);
+	static COrder *NewActionAttack(const CUnit &attacker, const Vec2i &dest);
+	static COrder *NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
+	static COrder *NewActionBoard(CUnit &unit);
+	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
+	static COrder *NewActionBuilt(CUnit &builder, CUnit &unit);
+	static COrder *NewActionDie();
+	static COrder *NewActionFollow(CUnit &dest);
+	static COrder *NewActionMove(const Vec2i &pos);
+	static COrder *NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
+	static COrder *NewActionRepair(CUnit &unit, CUnit &target);
+	static COrder *NewActionRepair(const Vec2i &pos);
+	static COrder *NewActionResearch(CUnit &unit, CUpgrade &upgrade);
+	static COrder *NewActionResource(CUnit &harvester, const Vec2i &pos);
+	static COrder *NewActionResource(CUnit &harvester, CUnit &mine);
+	static COrder *NewActionReturnGoods(CUnit &harvester, CUnit *depot);
+	static COrder *NewActionSpellCast(SpellType &spell, const Vec2i &pos, CUnit *target);
+	static COrder *NewActionStandGround();
+	static COrder *NewActionStill();
+	static COrder *NewActionTrain(CUnit &trainer, CUnitType &type);
+	static COrder *NewActionTransformInto(CUnitType &type);
+	static COrder *NewActionUnload(const Vec2i &pos, CUnit *what);
+	static COrder *NewActionUpgradeTo(CUnit &unit, CUnitType &type);
 
 protected:
-	void UpdatePathFinderData_NotCalled(PathFinderInput& input);
+	void UpdatePathFinderData_NotCalled(PathFinderInput &input);
 
 private:
 	CUnitPtr Goal;
@@ -163,7 +162,7 @@ public:
 	bool Finished; /// true when order is finish
 };
 
-typedef COrder* COrderPtr;
+typedef COrder *COrderPtr;
 
 
 /*----------------------------------------------------------------------------
@@ -185,61 +184,61 @@ extern unsigned SyncHash;  /// Hash calculated to find sync failures
 **  by the user the function with Send prefix should be used.
 */
 
-	/// Prepare command quit
+/// Prepare command quit
 extern void CommandQuit(int player);
-	/// Prepare command stop
+/// Prepare command stop
 extern void CommandStopUnit(CUnit &unit);
-	/// Prepare command stand ground
+/// Prepare command stand ground
 extern void CommandStandGround(CUnit &unit, int flush);
-	/// Prepare command follow
+/// Prepare command follow
 extern void CommandFollow(CUnit &unit, CUnit &dest, int flush);
-	/// Prepare command move
+/// Prepare command move
 extern void CommandMove(CUnit &unit, const Vec2i &pos, int flush);
-	/// Prepare command repair
+/// Prepare command repair
 extern void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
-	/// Send auto repair command
+/// Send auto repair command
 extern void CommandAutoRepair(CUnit &unit, int on);
-	/// Prepare command attack
+/// Prepare command attack
 extern void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
-	/// Prepare command attack ground
+/// Prepare command attack ground
 extern void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush);
-	/// Prepare command patrol
+/// Prepare command patrol
 extern void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush);
-	/// Prepare command board
+/// Prepare command board
 extern void CommandBoard(CUnit &unit, CUnit &dest, int flush);
-	/// Prepare command unload
+/// Prepare command unload
 extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush);
-	/// Prepare command build
+/// Prepare command build
 extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush);
-	/// Prepare command dismiss
+/// Prepare command dismiss
 extern void CommandDismiss(CUnit &unit);
-	/// Prepare command resource location
+/// Prepare command resource location
 extern void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush);
-	/// Prepare command resource
+/// Prepare command resource
 extern void CommandResource(CUnit &unit, CUnit &dest, int flush);
-	/// Prepare command return
+/// Prepare command return
 extern void CommandReturnGoods(CUnit &unit, CUnit *goal, int flush);
-	/// Prepare command train
+/// Prepare command train
 extern void CommandTrainUnit(CUnit &unit, CUnitType &what, int flush);
-	/// Prepare command cancel training
+/// Prepare command cancel training
 extern void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type);
-	/// Prepare command upgrade to
+/// Prepare command upgrade to
 extern void CommandUpgradeTo(CUnit &unit, CUnitType &what, int flush);
-	/// immediate transforming into type.
+/// immediate transforming into type.
 extern void CommandTransformIntoType(CUnit &unit, CUnitType &type);
-	/// Prepare command cancel upgrade to
+/// Prepare command cancel upgrade to
 extern void CommandCancelUpgradeTo(CUnit &unit);
-	/// Prepare command research
+/// Prepare command research
 extern void CommandResearch(CUnit &unit, CUpgrade *what, int flush);
-	/// Prepare command cancel research
+/// Prepare command cancel research
 extern void CommandCancelResearch(CUnit &unit);
-	/// Prepare command spellcast
+/// Prepare command spellcast
 extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, SpellType *spell, int flush);
-	/// Prepare command auto spellcast
+/// Prepare command auto spellcast
 extern void CommandAutoSpellCast(CUnit &unit, int spellid, int on);
-	/// Prepare diplomacy command
+/// Prepare diplomacy command
 extern void CommandDiplomacy(int player, int state, int opponent);
-	/// Prepare shared vision command
+/// Prepare shared vision command
 extern void CommandSharedVision(int player, bool state, int opponent);
 
 /*----------------------------------------------------------------------------
@@ -252,19 +251,19 @@ extern bool AutoRepair(CUnit &unit);
 extern bool AutoCast(CUnit &unit);
 extern void UnHideUnit(CUnit &unit);
 
-	/// Generic move action
+/// Generic move action
 extern int DoActionMove(CUnit &unit);
-	/// Show attack animation
-extern void AnimateActionAttack(CUnit &unit, COrder& order);
+/// Show attack animation
+extern void AnimateActionAttack(CUnit &unit, COrder &order);
 
 /*----------------------------------------------------------------------------
 --  Actions: actions.c
 ----------------------------------------------------------------------------*/
 
-	/// Parse order
+/// Parse order
 extern void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *order);
 
-	/// Handle the actions of all units each game cycle
+/// Handle the actions of all units each game cycle
 extern void UnitActions();
 
 //@}

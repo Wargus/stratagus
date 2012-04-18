@@ -43,7 +43,8 @@
 /**
 **  RAW samples.
 */
-class CSample {
+class CSample
+{
 public:
 	CSample() : Channels(0), SampleSize(0), Frequency(0), BitsPerSample(0),
 		Buffer(NULL), Pos(0), Len(0) {}
@@ -79,59 +80,59 @@ extern CSample *LoadWav(const char *name, int flags);    /// Load a wav file
 extern CSample *LoadVorbis(const char *name, int flags); /// Load a vorbis file
 extern CSample *LoadMikMod(const char *name, int flags); /// Load a module file
 
-	/// Set the channel volume
+/// Set the channel volume
 extern int SetChannelVolume(int channel, int volume);
-	/// Set the channel stereo
+/// Set the channel stereo
 extern int SetChannelStereo(int channel, int stereo);
-	/// Set the channel's callback for when a sound finishes playing
+/// Set the channel's callback for when a sound finishes playing
 extern void SetChannelFinishedCallback(int channel, void (*callback)(int channel));
-	/// Get the sample playing on a channel
+/// Get the sample playing on a channel
 extern CSample *GetChannelSample(int channel);
-	/// Stop a channel
+/// Stop a channel
 extern void StopChannel(int channel);
-	/// Stop all channels
+/// Stop all channels
 extern void StopAllChannels();
 
-	/// Load a sample
+/// Load a sample
 extern CSample *LoadSample(const std::string &name);
-	/// Play a sample
+/// Play a sample
 extern int PlaySample(CSample *sample);
-	/// Play a sound file
+/// Play a sound file
 extern int PlaySoundFile(const std::string &name);
 
-	/// Set effects volume
+/// Set effects volume
 extern void SetEffectsVolume(int volume);
-	/// Get effects volume
+/// Get effects volume
 extern int GetEffectsVolume();
-	/// Set effects enabled
+/// Set effects enabled
 extern void SetEffectsEnabled(bool enabled);
-	/// Check if effects are enabled
+/// Check if effects are enabled
 extern bool IsEffectsEnabled();
 
-	/// Set the music finished callback
+/// Set the music finished callback
 void SetMusicFinishedCallback(void (*callback)());
-	/// Play a music file
+/// Play a music file
 extern int PlayMusic(CSample *sample);
-	/// Play a music file
+/// Play a music file
 extern int PlayMusic(const std::string &file);
-	/// Stop music playing
+/// Stop music playing
 extern void StopMusic();
-	/// Set music volume
+/// Set music volume
 extern void SetMusicVolume(int volume);
-	/// Get music volume
+/// Get music volume
 extern int GetMusicVolume();
-	/// Set music enabled
+/// Set music enabled
 extern void SetMusicEnabled(bool enabled);
-	/// Check if music is enabled
+/// Check if music is enabled
 extern bool IsMusicEnabled();
-	/// Check if music is playing
+/// Check if music is playing
 extern bool IsMusicPlaying();
 
-	/// Check if sound is enabled
+/// Check if sound is enabled
 extern bool SoundEnabled();
-	/// Initialize the sound card.
+/// Initialize the sound card.
 extern int InitSound();
-	///  Cleanup sound.
+///  Cleanup sound.
 extern void QuitSound();
 
 //@}

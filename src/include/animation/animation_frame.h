@@ -40,8 +40,8 @@ class CAnimation_Frame : public CAnimation
 public:
 	CAnimation_Frame() : CAnimation(AnimationFrame) {}
 
-	virtual void Action(CUnit& unit, int &move, int scale) const;
-	virtual void Init(const char* s);
+	virtual void Action(CUnit &unit, int &move, int scale) const;
+	virtual void Init(const char *s);
 
 	int ParseAnimInt(const CUnit *unit) const;
 private:

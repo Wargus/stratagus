@@ -50,7 +50,8 @@ class CFont;
 extern char ForceUseOpenGL;
 extern bool UseOpenGL;
 
-class CGraphic : public gcn::Image {
+class CGraphic : public gcn::Image
+{
 
 	struct frame_pos_t {
 		short int x;
@@ -61,8 +62,7 @@ protected:
 	CGraphic() : Surface(NULL), SurfaceFlip(NULL), frame_map(NULL),
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
 		Refs(1), Resized(false),
-		TextureWidth(0.f), TextureHeight(0.f), Textures(NULL), NumTextures(0)
-	{
+		TextureWidth(0.f), TextureHeight(0.f), Textures(NULL), NumTextures(0) {
 		frameFlip_map = NULL;
 	}
 	~CGraphic() {}
@@ -73,9 +73,9 @@ public:
 	void DrawSub(int gx, int gy, int w, int h, int x, int y) const;
 	void DrawSubClip(int gx, int gy, int w, int h, int x, int y) const;
 	void DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
-		unsigned char alpha) const;
+					  unsigned char alpha) const;
 	void DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
-		unsigned char alpha) const;
+						  unsigned char alpha) const;
 
 	// Draw frame
 	void DrawFrame(unsigned frame, int x, int y) const;
@@ -155,7 +155,8 @@ public:
 #ifdef USE_MNG
 #include <libmng.h>
 
-class Mng {
+class Mng
+{
 public:
 	Mng();
 	~Mng();
@@ -176,13 +177,14 @@ public:
 };
 #endif
 
-	/// A platform independent color
-class CColor {
+/// A platform independent color
+class CColor
+{
 public:
 	CColor(unsigned char r = 0, unsigned char g = 0, unsigned char b = 0,
-		unsigned char a = 0) : R(r), G(g), B(b), A(a) {}
+		   unsigned char a = 0) : R(r), G(g), B(b), A(a) {}
 
-		/// Cast to a SDL_Color
+	/// Cast to a SDL_Color
 	operator SDL_Color() const {
 		SDL_Color c = { R, G, B, A };
 		return c;
@@ -194,7 +196,8 @@ public:
 	unsigned char A;       /// Alpha
 };
 
-class CUnitColors {
+class CUnitColors
+{
 public:
 	CUnitColors() : Colors(NULL) {}
 
@@ -209,23 +212,23 @@ public:
 */
 typedef struct _event_callback_ {
 
-		/// Callback for mouse button press
+	/// Callback for mouse button press
 	void (*ButtonPressed)(unsigned buttons);
-		/// Callback for mouse button release
+	/// Callback for mouse button release
 	void (*ButtonReleased)(unsigned buttons);
-		/// Callback for mouse move
+	/// Callback for mouse move
 	void (*MouseMoved)(int x, int y);
-		/// Callback for mouse exit of game window
+	/// Callback for mouse exit of game window
 	void (*MouseExit)();
 
-		/// Callback for key press
+	/// Callback for key press
 	void (*KeyPressed)(unsigned keycode, unsigned keychar);
-		/// Callback for key release
+	/// Callback for key release
 	void (*KeyReleased)(unsigned keycode, unsigned keychar);
-		/// Callback for key repeated
+	/// Callback for key repeated
 	void (*KeyRepeated)(unsigned keycode, unsigned keychar);
 
-		/// Callback for network event
+	/// Callback for network event
 	void (*NetworkEvent)();
 
 } EventCallback;
@@ -342,121 +345,121 @@ public:
 
 extern CVideo Video;
 
-	/**
-	**  Video synchronization speed. Synchronization time in percent.
-	**  If =0, video framerate is not synchronized. 100 is exact
-	**  CYCLES_PER_SECOND (30). Game will try to redraw screen within
-	**  intervals of VideoSyncSpeed, not more, not less.
-	**  @see CYCLES_PER_SECOND
-	*/
+/**
+**  Video synchronization speed. Synchronization time in percent.
+**  If =0, video framerate is not synchronized. 100 is exact
+**  CYCLES_PER_SECOND (30). Game will try to redraw screen within
+**  intervals of VideoSyncSpeed, not more, not less.
+**  @see CYCLES_PER_SECOND
+*/
 extern int VideoSyncSpeed;
 
 extern int SkipFrames;
 
-	/// Fullscreen or windowed set from commandline.
+/// Fullscreen or windowed set from commandline.
 extern char VideoForceFullScreen;
 
-	/// Next frame ticks
+/// Next frame ticks
 extern unsigned long NextFrameTicks;
 
-	/// Counts frames
+/// Counts frames
 extern unsigned long FrameCounter;
 
-	/// Counts quantity of slow frames
+/// Counts quantity of slow frames
 extern int SlowFrameCounter;
 
-	/// Initialize Pixels[] for all players.
-	/// (bring Players[] in sync with Pixels[])
+/// Initialize Pixels[] for all players.
+/// (bring Players[] in sync with Pixels[])
 extern void SetPlayersPalette();
 
-	/// The SDL screen
+/// The SDL screen
 extern SDL_Surface *TheScreen;
 
-	/// Max texture size supported on the video card
+/// Max texture size supported on the video card
 extern GLint GLMaxTextureSize;
-	/// User-specified limit for ::GLMaxTextureSize
+/// User-specified limit for ::GLMaxTextureSize
 extern GLint GLMaxTextureSizeOverride;
-	/// Is OpenGL texture compression supported
+/// Is OpenGL texture compression supported
 extern bool GLTextureCompressionSupported;
-	/// Use OpenGL texture compression
+/// Use OpenGL texture compression
 extern bool UseGLTextureCompression;
 
-	/// initialize the video part
+/// initialize the video part
 extern void InitVideo();
 
-	/// deinitliaize the video part
+/// deinitliaize the video part
 void DeInitVideo();
 
-	/// Check if a resolution is valid
+/// Check if a resolution is valid
 extern int VideoValidResolution(int w, int h);
 
-	/// Load graphic from PNG file
+/// Load graphic from PNG file
 extern int LoadGraphicPNG(CGraphic *g);
 
-	/// Make an OpenGL texture
+/// Make an OpenGL texture
 extern void MakeTexture(CGraphic *graphic);
-	/// Make an OpenGL texture of the player color pixels only.
+/// Make an OpenGL texture of the player color pixels only.
 extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player);
 
-	/// Regenerate Window screen if needed
+/// Regenerate Window screen if needed
 extern void ValidateOpenGLScreen();
 
-	/// Free OpenGL graphics
+/// Free OpenGL graphics
 extern void FreeOpenGLGraphics();
-	/// Reload OpenGL graphics
+/// Reload OpenGL graphics
 extern void ReloadGraphics();
-	/// Reload OpenGL
+/// Reload OpenGL
 extern void ReloadOpenGL();
 
-	/// Initializes video synchronization.
+/// Initializes video synchronization.
 extern void SetVideoSync();
 
-	/// Init line draw
+/// Init line draw
 extern void InitLineDraw();
 
-	/// Simply invalidates whole window or screen.
+/// Simply invalidates whole window or screen.
 extern void Invalidate();
 
-	/// Invalidates selected area on window or screen. Use for accurate
-	/// redrawing. in so
+/// Invalidates selected area on window or screen. Use for accurate
+/// redrawing. in so
 extern void InvalidateArea(int x, int y, int w, int h);
 
-	/// Set clipping for nearly all vector primitives. Functions which support
-	/// clipping will be marked Clip. Set the system-wide clipping rectangle.
+/// Set clipping for nearly all vector primitives. Functions which support
+/// clipping will be marked Clip. Set the system-wide clipping rectangle.
 extern void SetClipping(int left, int top, int right, int bottom);
 
-	/// Realize video memory.
+/// Realize video memory.
 extern void RealizeVideoMemory();
 
-	/// Save a screenshot to a PNG file
+/// Save a screenshot to a PNG file
 extern void SaveScreenshotPNG(const char *name);
 
-	/// Set the current callbacks
+/// Set the current callbacks
 extern void SetCallbacks(const EventCallback *callbacks);
-	/// Get the current callbacks
+/// Get the current callbacks
 extern const EventCallback *GetCallbacks();
 
-	/// Process all system events. Returns if the time for a frame is over
+/// Process all system events. Returns if the time for a frame is over
 extern void WaitEventsOneFrame();
 
-	/// Toggle full screen mode
+/// Toggle full screen mode
 extern void ToggleFullScreen();
 
-	/// Push current clipping.
+/// Push current clipping.
 extern void PushClipping();
 
-	/// Pop current clipping.
+/// Pop current clipping.
 extern void PopClipping();
 
-	/// Returns the ticks in ms since start
+/// Returns the ticks in ms since start
 extern unsigned long GetTicks();
 
-	/// Convert a SDLKey to a string
+/// Convert a SDLKey to a string
 extern const char *SdlKey2Str(int key);
 
-	/// Check if the mouse is grabbed
+/// Check if the mouse is grabbed
 extern bool SdlGetGrabMouse();
-	/// Toggle mouse grab mode
+/// Toggle mouse grab mode
 extern void ToggleGrabMouse(int mode);
 
 extern EventCallback GameCallbacks;   /// Game callbacks
@@ -473,7 +476,7 @@ extern Uint32 ColorGreen;
 extern Uint32 ColorYellow;
 
 void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
-	int ex, int ey, int x, int y, int flip);
+				 int ex, int ey, int x, int y, int flip);
 
 #ifdef DEBUG
 extern void FreeGraphics();
@@ -495,8 +498,8 @@ extern PFNGLGETCOMPRESSEDTEXIMAGEARBPROC   glGetCompressedTexImageARB;
 //  Color Cycling stuff
 //
 
-extern void VideoPaletteListAdd(SDL_Surface* surface);
-extern void VideoPaletteListRemove(SDL_Surface* surface);
+extern void VideoPaletteListAdd(SDL_Surface *surface);
+extern void VideoPaletteListRemove(SDL_Surface *surface);
 extern void ClearAllColorCyclingRange();
 extern void AddColorCyclingRange(unsigned int begin, unsigned int end);
 extern void SetColorCycleAll(bool value);

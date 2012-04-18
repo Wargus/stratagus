@@ -32,7 +32,6 @@
 
 //@{
 
-#include <string>
 #include "animation.h"
 
 class CAnimation_Label : public CAnimation
@@ -40,11 +39,8 @@ class CAnimation_Label : public CAnimation
 public:
 	CAnimation_Label() : CAnimation(AnimationLabel) {}
 
-	virtual void Action(CUnit& unit, int &move, int scale) const;
-	virtual void Init(const char* s);
-
-private:
-//	std::string ;
+	virtual void Action(CUnit &unit, int &move, int scale) const;
+	virtual void Init(const char *s);
 };
 
 //@}

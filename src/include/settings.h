@@ -64,11 +64,11 @@ struct SettingsPresets {
 struct Settings {
 	int NetGameType;   /// Multiplayer or single player
 
-//  Individual presets:
-//  For single-player game only Presets[0] will be used..
+	//  Individual presets:
+	//  For single-player game only Presets[0] will be used..
 	SettingsPresets Presets[PlayerMax];
 
-//  Common settings:
+	//  Common settings:
 	int Resources;   /// Preset resource factor
 	int NumUnits;    /// Preset # of units
 	int Opponents;   /// Preset # of ai-opponents
@@ -121,11 +121,11 @@ extern Settings GameSettings;  /// Game settings
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	/// Show stats
+/// Show stats
 extern void ShowStats();
-	/// Create a game
+/// Create a game
 extern void CreateGame(const std::string &filename, CMap *map);
-	/// Init Setting to default values
+/// Init Setting to default values
 extern void InitSettings();
 
 //@}

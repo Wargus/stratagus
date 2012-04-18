@@ -87,7 +87,8 @@ FileWriter *CreateFileWriter(const std::string &filename);
 /**
 **  FileList struct used by directory access routine
 */
-class FileList {
+class FileList
+{
 public:
 	FileList() : name(NULL), type(0), xdata(NULL) {}
 
@@ -102,7 +103,8 @@ public:
 **
 **  @todo  zip archive support
 */
-class CFile {
+class CFile
+{
 public:
 	CFile();
 	~CFile();
@@ -143,12 +145,12 @@ enum {
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	/// Build libary path name
+/// Build libary path name
 extern char *LibraryFileName(const char *file, char *buffer, size_t buffersize);
 
-	/// Read the contents of a directory
-extern int ReadDataDirectory(const char *dirname, int (*filter)(char*, FileList *),
-	std::vector<FileList> &flp);
+/// Read the contents of a directory
+extern int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *),
+							 std::vector<FileList> &flp);
 
 //@}
 

@@ -63,34 +63,34 @@ extern void SaveAi(CFile &file);     /// Save the AI state
 
 extern void AiCclRegister();      /// Register ccl features
 
-	/// Attack with force at position
+/// Attack with force at position
 extern void AiAttackWithForceAt(unsigned int force, int x, int y);
-	/// Attack with force
+/// Attack with force
 extern void AiAttackWithForce(unsigned int force);
 
 /*--------------------------------------------------------
 --  Call Backs/Triggers
 --------------------------------------------------------*/
 
-	/// Called if AI unit is attacked
+/// Called if AI unit is attacked
 extern void AiHelpMe(const CUnit *attacker, CUnit &defender);
-	/// Called if AI unit is killed
+/// Called if AI unit is killed
 extern void AiUnitKilled(CUnit &unit);
-	/// Called if AI needs more farms
+/// Called if AI needs more farms
 extern void AiNeedMoreSupply(const CPlayer &player);
-	/// Called if AI unit has completed work
+/// Called if AI unit has completed work
 extern void AiWorkComplete(CUnit *unit, CUnit &what);
-	/// Called if AI unit can't build
+/// Called if AI unit can't build
 extern void AiCanNotBuild(const CUnit &unit, const CUnitType &what);
-	/// Called if AI unit can't reach building place
+/// Called if AI unit can't reach building place
 extern void AiCanNotReach(CUnit &unit, const CUnitType &what);
-	/// Called if an AI unit can't move
+/// Called if an AI unit can't move
 extern void AiCanNotMove(CUnit &unit);
-	/// Called if AI unit has completed training
+/// Called if AI unit has completed training
 extern void AiTrainingComplete(CUnit &unit, CUnit &what);
-	/// Called if AI unit has completed upgrade to
+/// Called if AI unit has completed upgrade to
 extern void AiUpgradeToComplete(CUnit &unit, const CUnitType &what);
-	/// Called if AI unit has completed research
+/// Called if AI unit has completed research
 extern void AiResearchComplete(CUnit &unit, const CUpgrade *what);
 
 //@}

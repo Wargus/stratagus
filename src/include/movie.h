@@ -97,7 +97,7 @@ extern int VorbisProcessData(OggData *data, char *buffer);
 
 #endif // USE_VORBIS
 
-	/// Play a movie file
+/// Play a movie file
 extern int PlayMovie(const std::string &name);
 
 //@}

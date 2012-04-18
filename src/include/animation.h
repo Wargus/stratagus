@@ -75,27 +75,28 @@ enum AnimationType {
 	AnimationDie
 };
 
-class CAnimation {
+class CAnimation
+{
 public:
 	CAnimation(AnimationType type) : Type(type), Next(NULL) {}
 
 	virtual ~CAnimation() {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const = 0;
-	virtual void Init(const char* s) {}
+	virtual void Init(const char *s) {}
 
 	const AnimationType Type;
 	CAnimation *Next;
 };
 
-class CAnimations {
+class CAnimations
+{
 public:
 	CAnimations() : Attack(NULL), Build(NULL), Move(NULL), Repair(NULL),
 		Research(NULL), SpellCast(NULL), Start(NULL), Still(NULL),
-		Train(NULL), Upgrade(NULL)
-	{
-		memset(Death, 0, sizeof (Death));
-		memset(Harvest, 0, sizeof (Harvest));
+		Train(NULL), Upgrade(NULL) {
+		memset(Death, 0, sizeof(Death));
+		memset(Harvest, 0, sizeof(Harvest));
 	}
 
 	~CAnimations() {
@@ -140,14 +141,14 @@ public:
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	/// Get the animations structure by ident
+/// Get the animations structure by ident
 extern CAnimations *AnimationsByIdent(const std::string &ident);
 
 extern void AnimationCclRegister();
 
-	/// Handle the animation of a unit
+/// Handle the animation of a unit
 extern int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale);
-	/// Handle the animation of a unit
+/// Handle the animation of a unit
 extern int UnitShowAnimation(CUnit &unit, const CAnimation *anim);
 
 

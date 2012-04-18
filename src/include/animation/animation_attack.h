@@ -40,8 +40,8 @@ class CAnimation_Attack : public CAnimation
 public:
 	CAnimation_Attack() : CAnimation(AnimationAttack) {}
 
-	virtual void Action(CUnit& unit, int &move, int scale) const;
-	virtual void Init(const char* s);
+	virtual void Action(CUnit &unit, int &move, int scale) const;
+	virtual void Init(const char *s);
 
 };
 

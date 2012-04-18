@@ -41,8 +41,8 @@ class CAnimation_Sound : public CAnimation
 public:
 	CAnimation_Sound() : CAnimation(AnimationSound) {}
 
-	virtual void Action(CUnit& unit, int &move, int scale) const;
-	virtual void Init(const char* s);
+	virtual void Action(CUnit &unit, int &move, int scale) const;
+	virtual void Init(const char *s);
 
 	void MapSound();
 

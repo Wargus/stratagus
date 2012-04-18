@@ -58,7 +58,8 @@
 */
 #ifdef __ULTRA_SPARC__
 
-extern unsigned short inline AccessLE16(unsigned char *p) {
+extern unsigned short inline AccessLE16(unsigned char *p)
+{
 	return p[0] + (p[1] << 8);
 }
 
@@ -73,8 +74,9 @@ extern unsigned short inline AccessLE16(unsigned char *p) {
 */
 #ifdef __ULTRA_SPARC__
 
-extern unsigned inline AccessLE32(unsigned char *p) {
-	return  p[0] + (p[1] << 8) + (p[2] << 16) + (p[3] <<24);
+extern unsigned inline AccessLE32(unsigned char *p)
+{
+	return  p[0] + (p[1] << 8) + (p[2] << 16) + (p[3] << 24);
 }
 
 #else
@@ -89,7 +91,8 @@ extern unsigned inline AccessLE32(unsigned char *p) {
 */
 #ifdef __ULTRA_SPARC__
 
-extern unsigned short inline _FetchLE16(unsigned char **pp) {
+extern unsigned short inline _FetchLE16(unsigned char **pp)
+{
 	unsigned char *p = *pp;
 	unsigned short i = p[0] + (p[1] << 8);
 	(*pp) += 2;
@@ -109,9 +112,10 @@ extern unsigned short inline _FetchLE16(unsigned char **pp) {
 */
 #ifdef __ULTRA_SPARC__
 
-extern unsigned inline _FetchLE32(unsigned char **pp) {
+extern unsigned inline _FetchLE32(unsigned char **pp)
+{
 	unsigned char *p = *pp;
-	unsigned int i = p[0] + (p[1] << 8) + (p[2] << 16) + (p[3] <<24);
+	unsigned int i = p[0] + (p[1] << 8) + (p[2] << 16) + (p[3] << 24);
 	(*pp) += 4;
 	return i;
 }

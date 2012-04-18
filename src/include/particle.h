@@ -37,8 +37,7 @@ class CGraphic;
 class CViewport;
 
 
-struct CPosition
-{
+struct CPosition {
 	CPosition(float x, float y) : x(x), y(y) {}
 	float x;
 	float y;
@@ -51,7 +50,7 @@ public:
 	virtual void draw(int x, int y) = 0;
 	virtual void update(int ticks) = 0;
 	virtual bool isFinished() = 0;
-	virtual Animation * clone() = 0;
+	virtual Animation *clone() = 0;
 };
 
 class GraphicAnimation : public Animation
@@ -79,7 +78,7 @@ public:
 
 	virtual bool isFinished();
 
-	virtual Animation * clone();
+	virtual Animation *clone();
 };
 
 
@@ -99,7 +98,7 @@ public:
 	inline void destroy() { destroyed = true; }
 	inline bool isDestroyed() { return destroyed; }
 
-	virtual CParticle * clone() = 0;
+	virtual CParticle *clone() = 0;
 
 protected:
 	CPosition pos;
@@ -115,7 +114,7 @@ public:
 
 	virtual void draw();
 	virtual void update(int ticks);
-	virtual CParticle * clone();
+	virtual CParticle *clone();
 
 protected:
 	Animation *animation;
@@ -131,7 +130,7 @@ public:
 
 	virtual void draw();
 	virtual void update(int ticks);
-	virtual CParticle * clone();
+	virtual CParticle *clone();
 
 protected:
 	CPosition initialPos;
@@ -159,7 +158,7 @@ public:
 
 	virtual void draw();
 	virtual void update(int ticks);
-	virtual CParticle * clone();
+	virtual CParticle *clone();
 
 protected:
 	Animation *puff;

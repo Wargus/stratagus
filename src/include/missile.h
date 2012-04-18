@@ -347,8 +347,9 @@ enum {
 	MissileClassClipToTarget /// Missile remains clipped to target's current goal and plays his animation once
 };
 
-	/// Base structure of missile-types
-class MissileType {
+/// Base structure of missile-types
+class MissileType
+{
 public:
 	explicit MissileType(const std::string &ident);
 	~MissileType();
@@ -363,7 +364,7 @@ public:
 	int Width() const { return size.x; }
 	int Height() const { return size.y; }
 
-//private:
+	//private:
 	std::string Ident;         /// missile name
 	int Transparency;          /// missile transparency
 	PixelSize size;            /// missile size in pixels
@@ -393,7 +394,7 @@ public:
 	MissileConfig Smoke;       /// Trailling missile
 	LuaCallback *ImpactParticle; /// impact particle
 
-// --- FILLED UP ---
+	// --- FILLED UP ---
 	CGraphic *G;         /// missile graphic
 };
 
@@ -401,7 +402,7 @@ public:
 --  Missile
 ----------------------------------------------------------------------------*/
 
-	/// Missile on the map
+/// Missile on the map
 class Missile
 {
 protected:
@@ -422,7 +423,7 @@ public:
 	void MissileNewHeadingFromXY(const PixelPos &delta);
 
 
-//private:
+	//private:
 	PixelPos source; /// Missile source position
 	PixelPos position;   /// missile pixel position
 	PixelPos destination;  /// missile pixel destination
@@ -441,11 +442,11 @@ public:
 	int TTL;     /// time to live (ticks) used for spells
 	int Hidden;  /// If this is 1 then the missile is invisible
 
-// Internal use:
+	// Internal use:
 	int CurrentStep;  /// Current step (0 <= x < TotalStep).
 	int TotalStep;    /// Total step.
 
-	unsigned  Local:1;      /// missile is a local missile
+	unsigned  Local: 1;     /// missile is a local missile
 	unsigned int Slot;      /// unique number for draw level.
 
 	static unsigned int Count; /// slot number generator.
@@ -454,74 +455,91 @@ public:
 extern bool MissileInitMove(Missile &missile);
 extern bool PointToPointMissile(Missile &missile);
 
-class MissileNone : public Missile {
+class MissileNone : public Missile
+{
 public:
 	virtual void Action();
 };
-class MissilePointToPoint : public Missile {
+class MissilePointToPoint : public Missile
+{
 public:
 	virtual void Action();
 };
-class MissilePointToPointWithHit : public Missile {
+class MissilePointToPointWithHit : public Missile
+{
 public:
 	virtual void Action();
 };
-class MissilePointToPointCycleOnce : public Missile {
+class MissilePointToPointCycleOnce : public Missile
+{
 public:
 	virtual void Action();
 };
-class MissilePointToPointBounce : public Missile {
+class MissilePointToPointBounce : public Missile
+{
 public:
 	virtual void Action();
 };
-class MissileStay : public Missile {
+class MissileStay : public Missile
+{
 public:
 	virtual void Action();
 };
-class MissileCycleOnce : public Missile {
+class MissileCycleOnce : public Missile
+{
 public:
 	virtual void Action();
 };
-class MissileFire : public Missile {
+class MissileFire : public Missile
+{
 public:
 	virtual void Action();
 };
-class MissileHit : public Missile {
+class MissileHit : public Missile
+{
 public:
 	virtual void Action();
 };
-class MissileParabolic : public Missile {
+class MissileParabolic : public Missile
+{
 public:
 	virtual void Action();
 };
-class MissileLandMine : public Missile {
+class MissileLandMine : public Missile
+{
 public:
 	virtual void Action();
 };
-class MissileWhirlwind : public Missile {
+class MissileWhirlwind : public Missile
+{
 public:
 	virtual void Action();
 };
-class MissileFlameShield : public Missile {
+class MissileFlameShield : public Missile
+{
 public:
 	virtual void Action();
 };
-class MissileDeathCoil : public Missile {
+class MissileDeathCoil : public Missile
+{
 public:
 	virtual void Action();
 };
 
-class MissileTracer : public Missile {
+class MissileTracer : public Missile
+{
 public:
 	virtual void Action();
 };
 
-class MissileClipToTarget : public Missile {
+class MissileClipToTarget : public Missile
+{
 public:
 	virtual void Action();
 };
 
-class BurningBuildingFrame {
+class BurningBuildingFrame
+{
 public:
 	BurningBuildingFrame() : Percent(0), Missile(NULL) {};
 
@@ -541,45 +559,45 @@ extern std::vector<BurningBuildingFrame *> BurningBuildingFrames;  /// Burning b
 
 // In ccl_missile.c
 
-	/// register ccl features
+/// register ccl features
 extern void MissileCclRegister();
 
 // In missile.c
 
-	/// load all missile sprites
+/// load all missile sprites
 extern void LoadMissileSprites();
-	/// allocate an empty missile-type slot
-extern MissileType *NewMissileTypeSlot(const std::string& ident);
-	/// Get missile-type by ident
-extern MissileType *MissileTypeByIdent(const std::string& ident);
-	/// create a missile
+/// allocate an empty missile-type slot
+extern MissileType *NewMissileTypeSlot(const std::string &ident);
+/// Get missile-type by ident
+extern MissileType *MissileTypeByIdent(const std::string &ident);
+/// create a missile
 extern Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
-	/// create a local missile
+/// create a local missile
 extern Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
 
-	/// fire a missile
-extern void FireMissile(CUnit &unit, CUnit *goal, const Vec2i& goalPos);
+/// fire a missile
+extern void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos);
 
 extern int FindAndSortMissiles(const CViewport &vp, Missile *table[], const int tablesize);
 
-	/// handle all missiles
+/// handle all missiles
 extern void MissileActions();
-	/// distance from view point to missile
+/// distance from view point to missile
 extern int ViewPointDistanceToMissile(const Missile &missile);
 
-	/// Get the burning building missile based on hp percent
+/// Get the burning building missile based on hp percent
 extern MissileType *MissileBurningBuilding(int percent);
 
-	/// Save missiles
+/// Save missiles
 extern void SaveMissiles(CFile &file);
 
-	/// Initialize missile-types
+/// Initialize missile-types
 extern void InitMissileTypes();
-	/// Clean missile-types
+/// Clean missile-types
 extern void CleanMissileTypes();
-	/// Initialize missiles
+/// Initialize missiles
 extern void InitMissiles();
-	/// Clean missiles
+/// Clean missiles
 extern void CleanMissiles();
 
 #ifdef DEBUG

@@ -103,8 +103,9 @@ enum {
 	DependRuleUpgrade    /// Kind is an upgrade
 };
 
-	/// Dependency rule
-class DependRule {
+/// Dependency rule
+class DependRule
+{
 public:
 	DependRule *Next;         /// next hash chain, or rules
 	unsigned char Count;      /// how many required
@@ -120,16 +121,16 @@ public:
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	/// Register CCL features for dependencies
+/// Register CCL features for dependencies
 extern void DependenciesCclRegister();
-	/// Init the dependencies
+/// Init the dependencies
 extern void InitDependencies();
-	/// Cleanup dependencies module
+/// Cleanup dependencies module
 extern void CleanDependencies();
 
-	/// Check a dependency by identifier
+/// Check a dependency by identifier
 extern bool CheckDependByIdent(const CPlayer &player, const std::string &target);
-	/// Check a dependency by unit type
+/// Check a dependency by unit type
 extern bool CheckDependByType(const CPlayer &player, const CUnitType &type);
 //@}
 

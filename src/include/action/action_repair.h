@@ -36,11 +36,10 @@
 
 class COrder_Repair : public COrder
 {
-	friend COrder* COrder::NewActionRepair(CUnit &unit, CUnit &target);
-	friend COrder* COrder::NewActionRepair(const Vec2i &pos);
+	friend COrder *COrder::NewActionRepair(CUnit &unit, CUnit &target);
+	friend COrder *COrder::NewActionRepair(const Vec2i &pos);
 public:
-	COrder_Repair() : COrder(UnitActionRepair), State(0), RepairCycle(0)
-	{
+	COrder_Repair() : COrder(UnitActionRepair), State(0), RepairCycle(0) {
 		goalPos.x = -1;
 		goalPos.y = -1;
 	}
@@ -51,10 +50,10 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport& vp, const PixelPos& lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput& input);
+	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
+	virtual void UpdatePathFinderData(PathFinderInput &input);
 
-	const CUnitPtr& GetReparableTarget() const { return ReparableTarget; }
+	const CUnitPtr &GetReparableTarget() const { return ReparableTarget; }
 private:
 	bool RepairUnit(const CUnit &unit, CUnit &goal);
 private:

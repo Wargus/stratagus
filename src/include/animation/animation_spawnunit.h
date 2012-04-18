@@ -40,8 +40,8 @@ class CAnimation_SpawnUnit : public CAnimation
 public:
 	CAnimation_SpawnUnit() : CAnimation(AnimationSpawnUnit) {}
 
-	virtual void Action(CUnit& unit, int &move, int scale) const;
-	virtual void Init(const char* s);
+	virtual void Action(CUnit &unit, int &move, int scale) const;
+	virtual void Init(const char *s);
 
 private:
 	std::string unitTypeStr;
