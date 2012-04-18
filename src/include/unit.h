@@ -753,7 +753,7 @@ struct CUnitTypeFinder {
 	CUnitTypeFinder(const UnitTypeType t) : type(t)  {}
 	bool operator()(const CUnit *const unit) const {
 		const CUnitType *const t = unit->Type;
-		if (t->Vanishes || (type != reinterpret_cast<UnitTypeType>(-1) && t->UnitType != type)) {
+		if (t->Vanishes || (type != static_cast<UnitTypeType>(-1) && t->UnitType != type)) {
 			return false;
 		}
 		return true;
