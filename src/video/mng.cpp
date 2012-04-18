@@ -96,7 +96,7 @@ static mng_bool MNG_DECL my_readdata(mng_handle handle, mng_ptr buf, mng_uint32 
 }
 
 static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
-		mng_uint32 height)
+										  mng_uint32 height)
 {
 	Uint32 Rmask;
 	Uint32 Gmask;

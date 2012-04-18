@@ -651,7 +651,7 @@ static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table)
 **  @return           number of units found
 */
 static void SelectSpritesInsideRectangle(int sx0, int sy0, int sx1, int sy1,
-		std::vector<CUnit *> &table)
+										 std::vector<CUnit *> &table)
 {
 	int n = 0;
 

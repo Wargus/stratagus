@@ -6,6 +6,7 @@
 --indent=force-tab=4
 --lineend=linux
 --min-conditional-indent=0
+--max-instatement-indent=60
 --keep-one-line-statements
 --keep-one-line-blocks
 --indent-preprocessor

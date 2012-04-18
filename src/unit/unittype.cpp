@@ -570,7 +570,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 			}
 			if (!resinfo->FileWhenLoaded.empty()) {
 				resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->FileWhenLoaded,
-											type.Width, type.Height);
+																	 type.Width, type.Height);
 				resinfo->SpriteWhenLoaded->Load();
 				if (type.Flip) {
 					resinfo->SpriteWhenLoaded->Flip();
@@ -578,7 +578,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 			}
 			if (!resinfo->FileWhenEmpty.empty()) {
 				resinfo->SpriteWhenEmpty = CPlayerColorGraphic::New(resinfo->FileWhenEmpty,
-										   type.Width, type.Height);
+																	type.Width, type.Height);
 				resinfo->SpriteWhenEmpty->Load();
 				if (type.Flip) {
 					resinfo->SpriteWhenEmpty->Flip();

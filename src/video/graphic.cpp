@@ -255,7 +255,7 @@ void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const
 **  @param y       y coordinate on the screen
 */
 void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
-		int x, int y)
+												   int x, int y)
 {
 	if (!UseOpenGL) {
 		GraphicPlayerPixels(Players[player], *this);
@@ -432,7 +432,7 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 **  @param y       y coordinate on the screen
 */
 void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
-		int x, int y)
+													int x, int y)
 {
 	if (!UseOpenGL) {
 		GraphicPlayerPixels(Players[player], *this);
@@ -892,7 +892,7 @@ void CGraphic::Flip()
 
 	for (int frame = 0; frame < NumFrames; ++frame) {
 		frameFlip_map[frame].x = (SurfaceFlip->w - (frame % (SurfaceFlip->w /
-								  Width)) * Width) - Width;
+															 Width)) * Width) - Width;
 		frameFlip_map[frame].y = (frame / (SurfaceFlip->w / Width)) * Height;
 	}
 }

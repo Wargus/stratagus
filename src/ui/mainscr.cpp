@@ -1376,10 +1376,10 @@ void CInfoPanel::Draw()
 			for (i = 0; i < (NumSelected > (int)UI.SelectedButtons.size() ?
 							 (int)UI.SelectedButtons.size() : NumSelected); ++i) {
 				Selected[i]->Type->Icon.Icon->DrawUnitIcon(ThisPlayer,
-						UI.SelectedButtons[i].Style,
-						(ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?
-						(IconActive | (MouseButtons & LeftButton)) : 0,
-						UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y, "");
+														   UI.SelectedButtons[i].Style,
+														   (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?
+														   (IconActive | (MouseButtons & LeftButton)) : 0,
+														   UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y, "");
 				UiDrawLifeBar(Selected[i],
 							  UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 
@@ -1481,8 +1481,8 @@ static void DrawInfoPanelMultipleSelected()
 		bool mouseOver = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i);
 
 		Selected[i]->Type->Icon.Icon->DrawUnitIcon(button->Style,
-				mouseOver ? (IconActive | (MouseButtons & LeftButton)) : 0,
-				button->X, button->Y, "");
+												   mouseOver ? (IconActive | (MouseButtons & LeftButton)) : 0,
+												   button->X, button->Y, "");
 		UiDrawLifeBar(*Selected[i], button->X, button->Y);
 
 		if (mouseOver) {

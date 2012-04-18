@@ -921,7 +921,7 @@ int main(int argc, char **argv)
 	// Look for the specified data set inside the application bundle
 	// This should be a subdir of the Resources directory
 	CFURLRef pluginRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(),
-						 CFSTR(MAC_BUNDLE_DATADIR), NULL, NULL);
+												 CFSTR(MAC_BUNDLE_DATADIR), NULL, NULL);
 	CFStringRef macPath = CFURLCopyFileSystemPath(pluginRef,  kCFURLPOSIXPathStyle);
 	const char *pathPtr = CFStringGetCStringPtr(macPath, CFStringGetSystemEncoding());
 	Assert(pathPtr);

@@ -411,7 +411,7 @@ static inline int AStarAddNode(const Vec2i &pos, int o, int costs)
 		midDist = MyAbs(open->pos.x - AStarGoalX) + MyAbs(open->pos.y - AStarGoalY);
 		if (costs > midcost || (costs == midcost
 								&& (costToGoal > midCostToGoal || (costToGoal == midCostToGoal
-										&& dist > midDist)))) {
+																   && dist > midDist)))) {
 			smalli = midi;
 		} else if (costs < midcost || (costs == midcost
 									   && (costToGoal < midCostToGoal || (costToGoal == midCostToGoal
