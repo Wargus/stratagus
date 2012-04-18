@@ -214,7 +214,9 @@ public:
 
 	int getIndex(AiForce *force) const {
 		for (unsigned int i = 0; i < forces.size(); ++i) {
-			if (force == &forces[i]) return i;
+			if (force == &forces[i]) {
+				return i;
+			}
 		}
 		return -1;
 	}
