@@ -61,13 +61,12 @@
 
 unsigned int Missile::Count = 0;
 
-static std::vector<MissileType *>MissileTypes;  /// Missile types.
-
 static std::vector<Missile *> GlobalMissiles;    /// all global missiles on map
 static std::vector<Missile *> LocalMissiles;     /// all local missiles on map
 
 /// lookup table for missile names
-static std::map<std::string, MissileType *> MissileTypeMap;
+typedef std::map<std::string, MissileType *> MissileTypeMap;
+static MissileTypeMap MissileTypes;
 
 std::vector<BurningBuildingFrame *> BurningBuildingFrames; /// Burning building frames
 
@@ -101,8 +100,8 @@ void MissileType::LoadMissileSprite()
 void LoadMissileSprites()
 {
 #ifndef DYNAMIC_LOAD
-	for (std::vector<MissileType *>::iterator i = MissileTypes.begin(); i != MissileTypes.end(); ++i) {
-		(*i)->LoadMissileSprite();
+	for (MissileTypeMap::iterator it = MissileTypes.begin(); it != MissileTypes.end(); ++it) {
+		(*it).second->LoadMissileSprite();
 	}
 #endif
 }
@@ -115,7 +114,14 @@ void LoadMissileSprites()
 */
 MissileType *MissileTypeByIdent(const std::string &ident)
 {
-	return MissileTypeMap[ident];
+	if (ident.empty()) {
+		return NULL;
+	}
+	MissileTypeMap::iterator it = MissileTypes.find(ident);
+	if (it != MissileTypes.end()) {
+		return it->second;
+	}
+	return NULL;
 }
 
 /**
@@ -129,8 +135,7 @@ MissileType *NewMissileTypeSlot(const std::string &ident)
 {
 	MissileType *mtype = new MissileType(ident);
 
-	MissileTypeMap[ident] = mtype;
-	MissileTypes.push_back(mtype);
+	MissileTypes[ident] = mtype;
 	return mtype;
 }
 
@@ -1098,8 +1103,8 @@ void MissileType::Init()
 */
 void InitMissileTypes()
 {
-	for (std::vector<MissileType *>::iterator i = MissileTypes.begin(); i != MissileTypes.end(); ++i) {
-		(*i)->Init();
+	for (MissileTypeMap::iterator it = MissileTypes.begin(); it != MissileTypes.end(); ++it) {
+		(*it).second->Init();
 	}
 }
 
@@ -1131,11 +1136,10 @@ MissileType::~MissileType()
 */
 void CleanMissileTypes()
 {
-	for (std::vector<MissileType *>::iterator i = MissileTypes.begin(); i != MissileTypes.end(); ++i) {
-		delete *i;
+	for (MissileTypeMap::iterator it = MissileTypes.begin(); it != MissileTypes.end(); ++it) {
+		delete it->second;
 	}
 	MissileTypes.clear();
-	MissileTypeMap.clear();
 }
 
 /**
