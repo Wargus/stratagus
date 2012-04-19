@@ -51,6 +51,7 @@ extern "C" {
 ----------------------------------------------------------------------------*/
 
 class CUnit;
+class CUnitType;
 class CFile;
 class CFont;
 
@@ -112,9 +113,8 @@ typedef enum {
 	ENumber_VideoTextLength, /// VideoTextLength(font, string).
 	ENumber_StringFind,      /// strchr(string, char) - s.
 
-
-	ENumber_UnitStat     /// Property of Unit.
-	// FIXME: add others.
+	ENumber_UnitStat,    /// Property of Unit.
+	ENumber_TypeStat     /// Property of UnitType.
 } ENumber; /// All possible value for a number.
 
 
@@ -206,6 +206,11 @@ struct _NumberDesc_ {
 			EnumVariable Component;    /// Which component.
 			int Loc;                   /// Location of Variables[].
 		} UnitStat;
+		struct {
+			CUnitType **Type;           /// Which unit type.
+			int Index;                 /// Which index variable.
+			EnumVariable Component;    /// Which component.
+		} TypeStat;
 		struct {
 			StringDesc *String; /// String.
 			CFont *Font;        /// Font.
@@ -316,6 +321,7 @@ extern NumberDesc *Damage;  /// Damage calculation for missile.
 extern EnumVariable Str2EnumVariable(lua_State *l, const char *s);
 extern NumberDesc *CclParseNumberDesc(lua_State *l); /// Parse a number description.
 extern UnitDesc *CclParseUnitDesc(lua_State *l);     /// Parse a unit description.
+extern CUnitType **CclParseTypeDesc(lua_State *l);   /// Parse a unit type description.
 StringDesc *CclParseStringDesc(lua_State *l);        /// Parse a string description.
 
 extern int EvalNumber(const NumberDesc *numberdesc); /// Evaluate the number.

@@ -68,6 +68,7 @@ class CUnit;
 class CFile;
 class CFont;
 class LuaActionListener;
+class CPopup;
 
 /*----------------------------------------------------------------------------
 --  Definitions
@@ -522,16 +523,20 @@ public:
 
 /// Popup System
 
-class PopupConditionPanel
+#define MARGIN_X 4
+#define MARGIN_Y 2
+
+class PopupConditionPanel 
 {
 public:
-	PopupConditionPanel() :  BoolFlags(NULL), Variables(NULL) {}
+	PopupConditionPanel() :  HasHint(false), HasDescription(false), BoolFlags(NULL), Variables(NULL) {}
 	~PopupConditionPanel() {
 		delete[] BoolFlags;
 		delete[] Variables;
 	}
 
-	ButtonCmd ButtonType;		/// type of button activated
+	bool HasHint;               /// check if button has hint.
+	bool HasDescription;        /// check if button has description.
 
 	char *BoolFlags;            /// array of condition about user flags.
 	char *Variables;            /// array of variable to verify (enable and max > 0)
@@ -540,33 +545,47 @@ public:
 class CPopupContentType
 {
 public:
-	CPopupContentType() : PosX(0), PosY(0), Condition(NULL) {}
+	CPopupContentType() : PosX(0), PosY(0), 
+		MarginX(MARGIN_X), MarginY(MARGIN_Y), MinWidth(0), MinHeight(0), 
+		Wrap(true), Condition(NULL) {}
 	virtual ~CPopupContentType() { delete Condition; }
 
 	/// Tell how show the variable Index.
-	virtual void Draw(int x, int y, const ButtonAction *button, int *Costs) const = 0;
+	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction *button, int *Costs) const = 0;
 	/// Get the content's width
 	virtual int GetWidth(const ButtonAction *button, int *Costs) const = 0;
 	/// Get the content's height
 	virtual int GetHeight(const ButtonAction *button, int *Costs) const = 0;
 
-	int PosX;				/// X coordinate where to display.
-	int PosY;				/// Y coordinate where to display.
+	int PosX;                   /// X position to draw.
+	int PosY;                   /// X position to draw.
+	int MarginX;                /// Left and right margin width.
+	int MarginY;                /// Upper and lower margin height.
+	int MinWidth;               /// Minimal width covered by content type.
+	int MinHeight;              /// Minimal height covered by content type.
+	bool Wrap;                  /// If true, the next content will be placed on the next "line".
 
 	PopupConditionPanel *Condition; /// Condition to show the content; if NULL, no condition.
 };
 
-class CPopupContentTypeName : public CPopupContentType
+enum PopupButtonInfo_Types {
+	PopupButtonInfo_Hint,
+	PopupButtonInfo_Description
+};
+
+class CPopupContentTypeButtonInfo : public CPopupContentType
 {
 public:
-	CPopupContentTypeName() : Font(NULL), Centered(0) {}
-	virtual ~CPopupContentTypeName() {}
+	CPopupContentTypeButtonInfo() : InfoType(0), MaxWidth(0), Font(NULL), Centered(0) {}
+	virtual ~CPopupContentTypeButtonInfo() {}
 
-	virtual void Draw(int x, int y, const ButtonAction *button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction *button, int *Costs) const;
+
 	virtual int GetWidth(const ButtonAction *button, int *Costs) const;
 	virtual int GetHeight(const ButtonAction *button, int *Costs) const;
 
-	std::string Name;            /// Text to display.
+	int InfoType;                /// Type of information to show.
+	unsigned int MaxWidth;       /// Maximum width of multilined information.
 	CFont *Font;                 /// Font to use.
 	char Centered;               /// if true, center the display.
 };
@@ -577,7 +596,7 @@ public:
 	CPopupContentTypeCosts() : Font(NULL), Centered(0) {}
 	virtual ~CPopupContentTypeCosts() {}
 
-	virtual void Draw(int x, int y, const ButtonAction *button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction *button, int *Costs) const;
 
 	virtual int GetWidth(const ButtonAction *button, int *Costs) const;
 	virtual int GetHeight(const ButtonAction *button, int *Costs) const;
@@ -589,17 +608,17 @@ public:
 class CPopupContentTypeLine : public CPopupContentType
 {
 public:
-	CPopupContentTypeLine() : Color(0), Width(0), Height(0) {}
+	CPopupContentTypeLine() : Color(ColorWhite), Width(0), Height(1) {}
 	virtual ~CPopupContentTypeLine() {}
 
-	virtual void Draw(int x, int y, const ButtonAction *button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction *button, int *Costs) const;
 
 	virtual int GetWidth(const ButtonAction *button, int *Costs) const;
 	virtual int GetHeight(const ButtonAction *button, int *Costs) const;
 
 	Uint32 Color;  /// Color used for line.
-	int Width;     /// line height
-	int Height;    /// line height
+	unsigned int Width;     /// line height
+	unsigned int Height;    /// line height
 };
 
 class CPopupContentTypeVariable : public CPopupContentType
@@ -611,7 +630,7 @@ public:
 		delete Text;
 	}
 
-	virtual void Draw(int x, int y, const ButtonAction *button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction *button, int *Costs) const;
 
 	virtual int GetWidth(const ButtonAction *button, int *Costs) const;
 	virtual int GetHeight(const ButtonAction *button, int *Costs) const;
@@ -625,7 +644,8 @@ public:
 class CPopup
 {
 public:
-	CPopup() : Contents(), DefaultFont(NULL), BackgroundColor(ColorBlue), BorderColor(ColorWhite) {}
+	CPopup() : Contents(), MarginX(MARGIN_X), MarginY(MARGIN_Y), MinWidth(0), MinHeight(0),
+		DefaultFont(NULL), BackgroundColor(ColorBlue), BorderColor(ColorWhite) {}
 	~CPopup() {
 		for (std::vector<CPopupContentType *>::iterator content = Contents.begin();
 			 content != Contents.end(); ++content) {
@@ -635,6 +655,10 @@ public:
 
 	std::vector<CPopupContentType *> Contents; /// Array of contents to display.
 	std::string Ident;                         /// Ident of the popup.
+	int MarginX;                               /// Left and right margin width.
+	int MarginY;                               /// Upper and lower margin height.
+	int MinWidth;                              /// Minimal width covered by popup.
+	int MinHeight;                             /// Minimal height covered by popup.
 	CFont *DefaultFont;                        /// Default font for content.
 	Uint32 BackgroundColor;                    /// Color used for popup's background.
 	Uint32 BorderColor;                        /// Color used for popup's borders.

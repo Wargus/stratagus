@@ -125,6 +125,8 @@ typedef struct {
 } UStrInt;
 /// Get component for unit variable.
 extern UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t);
+/// Get component for unit type variable.
+extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 
 /**
 **  FIXME: docu
@@ -582,6 +584,30 @@ static CUnit **Str2UnitRef(lua_State *l, const char *s)
 }
 
 /**
+**  Convert the string to the corresponding data (which is a unit type).
+**
+**  @param l   lua state.
+**  @param s   Ident.
+**
+**  @return    The reference of the unit type.
+**
+**  @todo better check for error (restrict param).
+*/
+static CUnitType **Str2TypeRef(lua_State *l, const char *s)
+{
+	CUnitType **res = NULL; // Result.
+
+	Assert(l);
+	if (!strcmp(s, "Type")) {
+		res = &TriggerData.Type;
+	} else {
+		LuaError(l, "Invalid type reference '%s'\n" _C_ s);
+	}
+	Assert(res); // Must check for error.
+	return res;
+}
+
+/**
 **  Return unit referernce definition.
 **
 **  @param l  lua state.
@@ -600,6 +626,27 @@ UnitDesc *CclParseUnitDesc(lua_State *l)
 		LuaError(l, "Parse Error in ParseUnit\n");
 	}
 	lua_pop(l, 1);
+	return res;
+}
+
+/**
+**  Return unit type referernce definition.
+**
+**  @param l  lua state.
+**
+**  @return   unit type referernce definition.
+*/
+CUnitType **CclParseTypeDesc(lua_State *l)
+{
+	CUnitType **res;
+
+	if (lua_isstring(l, -1)) {
+		res = Str2TypeRef(l, LuaToString(l, -1));
+		lua_pop(l, 1);
+	} else {
+		LuaError(l, "Parse Error in ParseUnit\n");
+	}
+
 	return res;
 }
 
@@ -770,6 +817,28 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 					res->D.UnitStat.Loc = LuaToNumber(l, -1);
 					if (res->D.UnitStat.Loc < 0 || 2 < res->D.UnitStat.Loc) {
 						LuaError(l, "Bad Loc number :'%d'" _C_(int) LuaToNumber(l, -1));
+					}
+				} else {
+					LuaError(l, "Bad param %s for Unit" _C_ key);
+				}
+			}
+			lua_pop(l, 1); // pop the table.
+		} else if (!strcmp(key, "TypeVar")) {
+			Assert(lua_istable(l, -1));
+
+			res->e = ENumber_TypeStat;
+			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+				key = LuaToString(l, -2);
+				if (!strcmp(key, "Type")) {
+					res->D.TypeStat.Type = CclParseTypeDesc(l);
+					lua_pushnil(l);
+				} else if (!strcmp(key, "Component")) {
+					res->D.TypeStat.Component = Str2EnumVariable(l, LuaToString(l, -1));
+				} else if (!strcmp(key, "Variable")) {
+					const char *const name = LuaToString(l, -1);
+					res->D.TypeStat.Index = UnitTypeVar.VariableNameLookup[name];
+					if (res->D.TypeStat.Index == -1) {
+						LuaError(l, "Bad variable name :'%s'" _C_ LuaToString(l, -1));
 					}
 				} else {
 					LuaError(l, "Bad param %s for Unit" _C_ key);
@@ -969,6 +1038,7 @@ CUnit *EvalUnit(const UnitDesc *unitdesc)
 int EvalNumber(const NumberDesc *number)
 {
 	CUnit *unit;
+	CUnitType **type;
 	std::string s;
 	int a;
 	int b;
@@ -1033,6 +1103,14 @@ int EvalNumber(const NumberDesc *number)
 			if (unit != NULL) {
 				return GetComponent(*unit, number->D.UnitStat.Index,
 									number->D.UnitStat.Component, number->D.UnitStat.Loc).i;
+			} else { // ERROR.
+				return 0;
+			}
+		case ENumber_TypeStat : // property of unit type.
+			type = number->D.TypeStat.Type;
+			if (type != NULL) {
+				return GetComponent(**type, number->D.TypeStat.Index,
+					number->D.TypeStat.Component).i;
 			} else { // ERROR.
 				return 0;
 			}
@@ -1213,6 +1291,9 @@ void FreeNumberDesc(NumberDesc *number)
 			FreeUnitDesc(number->D.UnitStat.Unit);
 			delete number->D.UnitStat.Unit;
 			break;
+		case ENumber_TypeStat : // property of unit type.
+			delete *number->D.TypeStat.Type;
+			break;
 		case ENumber_VideoTextLength : // VideoTextLength(font, s)
 			FreeStringDesc(number->D.VideoTextLength.String);
 			delete number->D.VideoTextLength.String;
@@ -1293,6 +1374,42 @@ void FreeStringDesc(StringDesc *s)
 /*............................................................................
 ..  Aliases
 ............................................................................*/
+
+/**
+**  Make alias for some unit type Variable function.
+**
+**  @param l  lua State.
+**  @param s  FIXME: docu
+**
+**  @return   the lua table {"TypeVar", {Variable = arg1,
+**                           Component = "Value" or arg2}
+*/
+static int AliasTypeVar(lua_State *l, const char *s)
+{
+	int nargs; // number of args in lua.
+
+	Assert(0 < lua_gettop(l) && lua_gettop(l) <= 2);
+	nargs = lua_gettop(l);
+	lua_newtable(l);
+	lua_pushnumber(l, 1);
+	lua_pushstring(l, "TypeVar");
+	lua_rawset(l, -3);
+	lua_pushnumber(l, 2);
+	lua_newtable(l);
+
+	lua_pushstring(l, "Type");
+	lua_pushstring(l, s);
+	lua_rawset(l, -3);
+	lua_pushstring(l, "Variable");
+	lua_pushvalue(l, 1);
+	lua_rawset(l, -3);
+	lua_pushstring(l, "Component");
+	lua_pushvalue(l, 2);
+	lua_rawset(l, -3);
+	
+	lua_rawset(l, -3);
+	return 1;
+}
 
 /**
 **  Make alias for some unit Variable function.
@@ -1402,6 +1519,22 @@ static int CclActiveUnitVar(lua_State *l)
 		LuaError(l, "Bad number of arg for ActiveUnitVar()\n");
 	}
 	return AliasUnitVar(l, "Active");
+}
+
+/**
+**  Return equivalent lua table for .
+**  {"Type", {Type = "Active", Variable = arg1, Component = "Value" or arg2}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclActiveTypeVar(lua_State *l)
+{
+	if (lua_gettop(l) == 0 || lua_gettop(l) > 3) {
+		LuaError(l, "Bad number of arg for ActiveTypeVar()\n");
+	}
+	return AliasTypeVar(l, "Type");
 }
 
 
@@ -1799,6 +1932,8 @@ static void AliasRegister()
 	lua_register(Lua, "DefenderVar", CclUnitDefenderVar);
 	lua_register(Lua, "ActiveUnitVar", CclActiveUnitVar);
 
+	// Type
+	lua_register(Lua, "TypeVar", CclActiveTypeVar);
 
 	// String.
 	lua_register(Lua, "Concat", CclConcat);

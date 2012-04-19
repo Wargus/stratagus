@@ -857,7 +857,7 @@ void Missile::MissileHit()
 **  Pass to the next frame for animation.
 **
 **  @param sign           1 for next frame, -1 for previous frame.
-**  @param longAnimation  1 if Frame is conditionned by covered distance, 0 else.
+**  @param longAnimation  1 if Frame is conditioned by covered distance, 0 else.
 **
 **  @return               true if animation is finished, false else.
 */

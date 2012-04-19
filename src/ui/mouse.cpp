@@ -73,7 +73,7 @@ int MouseButtons;                            /// Current pressed mouse buttons
 
 int KeyModifiers;                            /// Current keyboard modifiers
 
-CUnit *UnitUnderCursor;                    /// Unit under cursor
+CUnit *UnitUnderCursor;                      /// Unit under cursor
 int ButtonAreaUnderCursor = -1;              /// Button area under cursor
 int ButtonUnderCursor = -1;                  /// Button under cursor
 bool GameMenuButtonClicked;                  /// Menu button was clicked

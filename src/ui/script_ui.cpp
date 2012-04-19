@@ -889,8 +889,10 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 	condition = new PopupConditionPanel;
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		key = LuaToString(l, -2);
-		if (!strcmp(key, "ButtonType")) {
-
+		if (!strcmp(key, "HasHint")) {
+			condition->HasHint = LuaToBoolean(l, -1);
+		} else if (!strcmp(key, "HasDescription")) {
+			condition->HasDescription = LuaToBoolean(l, -1);
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[key];
 			if (index != -1) {
@@ -922,8 +924,11 @@ static CPopupContentType *CclParsePopupContent(lua_State *l)
 {
 	CPopupContentType *content;
 	const char *key;
-	int posX = 0;
-	int posY = 0;
+	bool wrap = true;
+	int marginX = MARGIN_X;
+	int marginY = MARGIN_Y;
+	int minWidth = 0;
+	int minHeight = 0;
 	PopupConditionPanel *condition;
 
 	Assert(lua_istable(l, -1));
@@ -931,48 +936,84 @@ static CPopupContentType *CclParsePopupContent(lua_State *l)
 	condition = NULL;
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		key = LuaToString(l, -2);
-		if (!strcmp(key, "Pos")) {
+		if (!strcmp(key, "Wrap")) {
+			wrap = LuaToBoolean(l, -1);
+		} else if (!strcmp(key, "Margin")) {
 			Assert(lua_istable(l, -1));
 			lua_rawgeti(l, -1, 1); // X
 			lua_rawgeti(l, -2, 2); // Y
-			posX = LuaToNumber(l, -2);
-			posY = LuaToNumber(l, -1);
+			marginX = LuaToNumber(l, -2);
+			marginY = LuaToNumber(l, -1);
 			lua_pop(l, 2); // Pop X and Y
+		} else if (!strcmp(key, "MinWidth")) {
+			minWidth = LuaToNumber(l, -1);
+		} else if (!strcmp(key, "MinHeight")) {
+			minHeight = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "More")) {
 			Assert(lua_istable(l, -1));
 			lua_rawgeti(l, -1, 1); // Method name
 			lua_rawgeti(l, -2, 2); // Method data
 			key = LuaToString(l, -2);
-			if (!strcmp(key, "Name")) {
-				CPopupContentTypeName *contentname = new CPopupContentTypeName;
+			if (!strcmp(key, "ButtonInfo")) {
+				CPopupContentTypeButtonInfo *contentbtype = new CPopupContentTypeButtonInfo;
 
 				Assert(lua_istable(l, -1));
 				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 					key = LuaToString(l, -2);
-					if (!strcmp(key, "Font")) {
-						contentname->Font = CFont::Get(LuaToString(l, -1));
+					if (!strcmp(key, "InfoType")) {
+						std::string temp(LuaToString(l, -1));
+						if (temp == "Hint") {
+							contentbtype->InfoType = PopupButtonInfo_Hint;
+						} else if (temp == "Description") {
+							contentbtype->InfoType = PopupButtonInfo_Description;
+						}
+					} else if (!strcmp(key, "MaxWidth")) {
+						contentbtype->MaxWidth = LuaToNumber(l, -1);
+					} else if (!strcmp(key, "Font")) {
+						contentbtype->Font = CFont::Get(LuaToString(l, -1));
 					} else if (!strcmp(key, "Centered")) {
-						contentname->Centered = LuaToBoolean(l, -1);
+						contentbtype->Centered = LuaToBoolean(l, -1);
 					} else {
 						LuaError(l, "'%s' invalid for method 'Name' in DefinePopups" _C_ key);
 					}
 				}
-				content = contentname;
+				content = contentbtype;
 			} else if (!strcmp(key, "Costs")) {
 				CPopupContentTypeCosts *contentcosts = new CPopupContentTypeCosts;
 
-				Assert(lua_istable(l, -1));
-				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-					key = LuaToString(l, -2);
-					if (!strcmp(key, "Font")) {
-						contentcosts->Font = CFont::Get(LuaToString(l, -1));
-					} else if (!strcmp(key, "Centered")) {
-						contentcosts->Centered = LuaToBoolean(l, -1);
-					} else {
-						LuaError(l, "'%s' invalid for method 'Costs' in DefinePopups" _C_ key);
+					Assert(lua_istable(l, -1) || lua_isnil(l, -1));
+					if (!lua_isnil(l, -1)) {
+						for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+							key = LuaToString(l, -2);
+							if (!strcmp(key, "Font")) {
+								contentcosts->Font = CFont::Get(LuaToString(l, -1));
+							} else if (!strcmp(key, "Centered")) {
+								contentcosts->Centered = LuaToBoolean(l, -1);
+							} else {
+								LuaError(l, "'%s' invalid for method 'Costs' in DefinePopups" _C_ key);
+							}
+						}
+					}
+					content = contentcosts;
+			} else if (!strcmp(key, "Line")) {
+				CPopupContentTypeLine *contentline = new CPopupContentTypeLine;
+
+				Assert(lua_istable(l, -1) || lua_isnil(l, -1));
+				if (!lua_isnil(l, -1)) {
+					for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+						key = LuaToString(l, -2);
+						if (!strcmp(key, "Width")) {
+							contentline->Width = LuaToNumber(l, -1);
+						} else if (!strcmp(key, "Height")) {
+							contentline->Height = LuaToNumber(l, -1);
+						} else if (!strcmp(key, "Color")) {
+							contentline->Color = LuaToNumber(l, -1);
+						} else {
+							LuaError(l, "'%s' invalid for method 'Costs' in DefinePopups" _C_ key);
+						}
 					}
 				}
-				content = contentcosts;
+				content = contentline;
 			} else if (!strcmp(key, "Variable")) {
 				CPopupContentTypeVariable *contenttext = new CPopupContentTypeVariable;
 
@@ -1012,8 +1053,11 @@ static CPopupContentType *CclParsePopupContent(lua_State *l)
 			LuaError(l, "'%s' invalid for Contents in DefinePopups" _C_ key);
 		}
 	}
-	content->PosX = posX;
-	content->PosY = posY;
+	content->Wrap = wrap;
+	content->MarginX = marginX;
+	content->MarginY = marginY;
+	content->MinWidth = minWidth;
+	content->MinHeight = minHeight;
 	content->Condition = condition;
 	return content;
 }
@@ -1043,6 +1087,17 @@ static int CclDefinePopup(lua_State *l)
 			popup->BackgroundColor = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "BorderColor")) {
 			popup->BorderColor = LuaToNumber(l, -1);
+		} else if (!strcmp(key, "Margin")) {
+			Assert(lua_istable(l, -1));
+			lua_rawgeti(l, -1, 1); // X
+			lua_rawgeti(l, -2, 2); // Y
+			popup->MarginX = LuaToNumber(l, -2);
+			popup->MarginY = LuaToNumber(l, -1);
+			lua_pop(l, 2); // Pop X and Y
+		} else if (!strcmp(key, "MinWidth")) {
+			popup->MinWidth = LuaToNumber(l, -1);
+		} else if (!strcmp(key, "MinHeight")) {
+			popup->MinHeight = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "Contents")) {
 			Assert(lua_istable(l, -1));
 			for (j = 0; j < luaL_getn(l, -1); j++, lua_pop(l, 1)) {

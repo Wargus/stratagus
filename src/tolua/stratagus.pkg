@@ -46,7 +46,8 @@ $]
 #define MaxCosts 7
 #define FoodCost MaxCosts
 #define ScoreCost MaxCosts + 1
-#define MaxResourceInfo MaxCosts + 2
+#define ManaResCost MaxCosts + 2
+#define MaxResourceInfo MaxCosts + 3
 #define PlayerMax 16
 #define PlayerNumNeutral (PlayerMax - 1)
 #define UnitMax 65536

@@ -282,6 +282,48 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 	return val;
 }
 
+UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e)
+{
+	UStrInt val;
+	CVariable *var = &type.Stats->Variables[index];
+
+	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
+
+	switch (e) {
+		case VariableValue:
+			val.type = USTRINT_INT;
+			val.i = var->Value;
+			break;
+		case VariableMax:
+			val.type = USTRINT_INT;
+			val.i = var->Max;
+			break;
+		case VariableIncrease:
+			val.type = USTRINT_INT;
+			val.i = var->Increase;
+			break;
+		case VariableDiff:
+			val.type = USTRINT_INT;
+			val.i = var->Max - var->Value;
+			break;
+		case VariablePercent:
+			Assert(type.Stats->Variables[index].Max != 0);
+			val.type = USTRINT_INT;
+			val.i = 100 * var->Value / var->Max;
+			break;
+		case VariableName:
+			if (index == GIVERESOURCE_INDEX) {
+				val.type = USTRINT_STR;
+				val.s = DefaultResourceNames[type.GivesResource].c_str();
+			} else {
+				val.type = USTRINT_STR;
+				val.s = UnitTypeVar.VariableNameLookup[index];
+			}
+			break;
+	}
+	return val;
+}
+
 /**
 **  Get unit from a unit depending of the relation.
 **

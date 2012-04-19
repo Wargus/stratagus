@@ -77,6 +77,7 @@ typedef struct {
 	CUnit *Attacker;  /// Unit which send the missile.
 	CUnit *Defender;  /// Unit which is hit by missile.
 	CUnit *Active;    /// Unit which is selected or else under cursor unit.
+	CUnitType *Type;  /// Type used in trigger; 
 } TriggerDataType;
 
 /*----------------------------------------------------------------------------
