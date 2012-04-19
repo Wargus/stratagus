@@ -1386,10 +1386,8 @@ void FreeStringDesc(StringDesc *s)
 */
 static int AliasTypeVar(lua_State *l, const char *s)
 {
-	int nargs; // number of args in lua.
-
 	Assert(0 < lua_gettop(l) && lua_gettop(l) <= 2);
-	nargs = lua_gettop(l);
+
 	lua_newtable(l);
 	lua_pushnumber(l, 1);
 	lua_pushstring(l, "TypeVar");
@@ -1406,7 +1404,7 @@ static int AliasTypeVar(lua_State *l, const char *s)
 	lua_pushstring(l, "Component");
 	lua_pushvalue(l, 2);
 	lua_rawset(l, -3);
-	
+
 	lua_rawset(l, -3);
 	return 1;
 }
