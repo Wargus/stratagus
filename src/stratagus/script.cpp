@@ -1110,7 +1110,7 @@ int EvalNumber(const NumberDesc *number)
 			type = number->D.TypeStat.Type;
 			if (type != NULL) {
 				return GetComponent(**type, number->D.TypeStat.Index,
-					number->D.TypeStat.Component).i;
+									number->D.TypeStat.Component).i;
 			} else { // ERROR.
 				return 0;
 			}

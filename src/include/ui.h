@@ -526,7 +526,7 @@ public:
 #define MARGIN_X 4
 #define MARGIN_Y 2
 
-class PopupConditionPanel 
+class PopupConditionPanel
 {
 public:
 	PopupConditionPanel() :  HasHint(false), HasDescription(false), BoolFlags(NULL), Variables(NULL) {}
@@ -545,8 +545,8 @@ public:
 class CPopupContentType
 {
 public:
-	CPopupContentType() : PosX(0), PosY(0), 
-		MarginX(MARGIN_X), MarginY(MARGIN_Y), MinWidth(0), MinHeight(0), 
+	CPopupContentType() : PosX(0), PosY(0),
+		MarginX(MARGIN_X), MarginY(MARGIN_Y), MinWidth(0), MinHeight(0),
 		Wrap(true), Condition(NULL) {}
 	virtual ~CPopupContentType() { delete Condition; }
 

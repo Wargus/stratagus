@@ -981,20 +981,20 @@ static CPopupContentType *CclParsePopupContent(lua_State *l)
 			} else if (!strcmp(key, "Costs")) {
 				CPopupContentTypeCosts *contentcosts = new CPopupContentTypeCosts;
 
-					Assert(lua_istable(l, -1) || lua_isnil(l, -1));
-					if (!lua_isnil(l, -1)) {
-						for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-							key = LuaToString(l, -2);
-							if (!strcmp(key, "Font")) {
-								contentcosts->Font = CFont::Get(LuaToString(l, -1));
-							} else if (!strcmp(key, "Centered")) {
-								contentcosts->Centered = LuaToBoolean(l, -1);
-							} else {
-								LuaError(l, "'%s' invalid for method 'Costs' in DefinePopups" _C_ key);
-							}
+				Assert(lua_istable(l, -1) || lua_isnil(l, -1));
+				if (!lua_isnil(l, -1)) {
+					for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+						key = LuaToString(l, -2);
+						if (!strcmp(key, "Font")) {
+							contentcosts->Font = CFont::Get(LuaToString(l, -1));
+						} else if (!strcmp(key, "Centered")) {
+							contentcosts->Centered = LuaToBoolean(l, -1);
+						} else {
+							LuaError(l, "'%s' invalid for method 'Costs' in DefinePopups" _C_ key);
 						}
 					}
-					content = contentcosts;
+				}
+				content = contentcosts;
 			} else if (!strcmp(key, "Line")) {
 				CPopupContentTypeLine *contentline = new CPopupContentTypeLine;
 

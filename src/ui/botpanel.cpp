@@ -331,14 +331,13 @@ int CPopupContentTypeButtonInfo::GetWidth(const ButtonAction *button, int *) con
 {
 	CFont *font = this->Font ? this->Font : GetSmallFont();
 	std::string draw("");
-	switch (this->InfoType)
-	{
-	case PopupButtonInfo_Hint:
-		draw = button->Hint;
-		break;
-	case PopupButtonInfo_Description:
-		draw = button->Description;
-		break;
+	switch (this->InfoType) {
+		case PopupButtonInfo_Hint:
+			draw = button->Hint;
+			break;
+		case PopupButtonInfo_Description:
+			draw = button->Description;
+			break;
 	}
 	return this->MaxWidth ? std::min((unsigned int)font->getWidth(draw), this->MaxWidth) : font->getWidth(draw);
 }
@@ -348,14 +347,13 @@ int CPopupContentTypeButtonInfo::GetHeight(const ButtonAction *button, int *) co
 	CFont *font = this->Font ? this->Font : GetSmallFont();
 	int height = font->Height();
 	std::string draw("");
-	switch (this->InfoType)
-	{
-	case PopupButtonInfo_Hint:
-		draw = button->Hint;
-		break;
-	case PopupButtonInfo_Description:
-		draw = button->Description;
-		break;
+	switch (this->InfoType) {
+		case PopupButtonInfo_Hint:
+			draw = button->Hint;
+			break;
+		case PopupButtonInfo_Description:
+			draw = button->Description;
+			break;
 	}
 	if (this->MaxWidth && draw.length()) {
 		int i = 1;
@@ -371,14 +369,13 @@ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup *popup, const 
 	CFont *font = this->Font ? this->Font : GetSmallFont();
 	CLabel label(font, "white", "red");
 	std::string draw("");
-	switch (this->InfoType)
-	{
+	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
 			draw = button->Hint;
 			break;
 		case PopupButtonInfo_Description:
 			draw = button->Description;
-				break;
+			break;
 	}
 	std::string sub(draw);
 	if (this->MaxWidth && draw.length()) {
@@ -500,8 +497,8 @@ int CPopupContentTypeLine::GetHeight(const ButtonAction *button, int *Costs) con
 
 void CPopupContentTypeLine::Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction *button, int *Costs) const
 {
-	Video.FillRectangle(this->Color, x - popup->MarginX - this->MarginX + 1, 
-		y, this->Width && Width < popupWidth ? Width : popupWidth - 2, Height);
+	Video.FillRectangle(this->Color, x - popup->MarginX - this->MarginX + 1,
+						y, this->Width && Width < popupWidth ? Width : popupWidth - 2, Height);
 }
 
 int CPopupContentTypeVariable::GetWidth(const ButtonAction *button, int *) const
@@ -607,8 +604,8 @@ static void GetPopupSize(const CPopup &popup, const ButtonAction *button, const 
 	popupHeight = popup.MarginY;
 
 	for (std::vector<CPopupContentType *>::const_iterator it = popup.Contents.begin();
-		it != popup.Contents.end();
-		++it) {
+		 it != popup.Contents.end();
+		 ++it) {
 		CPopupContentType &content = **it;
 
 		if (CanShowPopupContent(content.Condition, button, UnitTypes[button->Value])) {
@@ -617,9 +614,9 @@ static void GetPopupSize(const CPopup &popup, const ButtonAction *button, const 
 			content.PosY = popupHeight + content.MarginY;
 
 			contentWidth += std::max(content.MinWidth, 2 * content.MarginX
-				+ content.GetWidth(button, Costs));
+									 + content.GetWidth(button, Costs));
 			contentHeight = std::max(content.MinHeight, 2 * content.MarginY
-				+ content.GetHeight(button, Costs));
+									 + content.GetHeight(button, Costs));
 			maxContentHeight = std::max(contentHeight, maxContentHeight);
 			if (content.Wrap) {
 				popupWidth += contentWidth - maxContentWidth > 0 ? contentWidth - maxContentWidth : 0;
@@ -799,10 +796,10 @@ void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 
 	// Contents
 	for (std::vector<CPopupContentType *>::const_iterator content = popup->Contents.begin();
-		content != popup->Contents.end(); ++content) {
-			if (CanShowPopupContent((*content)->Condition, button, UnitTypes[button->Value])) {
-				(*content)->Draw(x + (*content)->PosX, y + (*content)->PosY, popup, popupWidth, button, Costs);
-			}
+		 content != popup->Contents.end(); ++content) {
+		if (CanShowPopupContent((*content)->Condition, button, UnitTypes[button->Value])) {
+			(*content)->Draw(x + (*content)->PosX, y + (*content)->PosY, popup, popupWidth, button, Costs);
+		}
 	}
 
 #if 0 // Fixme: need to remove soon

@@ -165,7 +165,7 @@ void CMinimap::Create()
 	if (!UseOpenGL) {
 		SDL_PixelFormat *f = Map.TileGraphic->Surface->format;
 		MinimapTerrainSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-								W, H, f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
+													 W, H, f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
 		MinimapSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
 											  W, H, 32, TheScreen->format->Rmask, TheScreen->format->Gmask,
 											  TheScreen->format->Bmask, 0);
@@ -609,10 +609,10 @@ void CMinimap::Draw(int, int)
 		};
 
 		float vertex[] = {
-			2.0f / (GLfloat)Video.Width * X - 1.0f, -2.0f / (GLfloat)Video.Height * Y + 1.0f,
-			2.0f / (GLfloat)Video.Width * (X + W) - 1.0f, -2.0f / (GLfloat)Video.Height * Y + 1.0f,
-			2.0f / (GLfloat)Video.Width * X - 1.0f, -2.0f / (GLfloat)Video.Height * (Y + H) + 1.0f,
-			2.0f / (GLfloat)Video.Width *(X + W) - 1.0f, -2.0f / (GLfloat)Video.Height * (Y + H) + 1.0f
+			2.0f / (GLfloat)Video.Width *X - 1.0f, -2.0f / (GLfloat)Video.Height *Y + 1.0f,
+			2.0f / (GLfloat)Video.Width *(X + W) - 1.0f, -2.0f / (GLfloat)Video.Height *Y + 1.0f,
+			2.0f / (GLfloat)Video.Width *X - 1.0f, -2.0f / (GLfloat)Video.Height *(Y + H) + 1.0f,
+			2.0f / (GLfloat)Video.Width *(X + W) - 1.0f, -2.0f / (GLfloat)Video.Height *(Y + H) + 1.0f
 		};
 
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
