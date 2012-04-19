@@ -943,34 +943,34 @@ void Missile::NextMissileFrameCycle()
 */
 static void MissilesActionLoop(std::vector<Missile *> &missiles)
 {
-	for (std::vector<Missile *>::iterator it = missiles.begin(); it != missiles.end(); /* empty */) {
-		Missile &missile = **it;
+	for (size_t i = 0; i != missiles.size(); /* empty */) {
+		Missile &missile = *missiles[i];
 
 		if (missile.Delay) {
 			missile.Delay--;
-			++it;
+			++i;
 			continue;  // delay start of missile
 		}
 		if (missile.TTL > 0) {
 			missile.TTL--;  // overall time to live if specified
 		}
 		if (missile.TTL == 0) {
-			delete *it;
-			it = missiles.erase(it);
+			delete &missile;
+			missiles.erase(missiles.begin() + i);
 			continue;
 		}
 		Assert(missile.Wait);
 		if (--missile.Wait) {  // wait until time is over
-			++it;
+			++i;
 			continue;
 		}
-		missile.Action();
+		missile.Action(); // may create other missiles, and so modifies the array
 		if (missile.TTL == 0) {
-			delete *it;
-			it = missiles.erase(it);
+			delete &missile;
+			missiles.erase(missiles.begin() + i);
 			continue;
 		}
-		++it;
+		++i;
 	}
 }
 
