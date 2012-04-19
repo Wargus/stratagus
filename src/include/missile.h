@@ -321,12 +321,8 @@ class LuaCallback;
 --  Missile-type
 ----------------------------------------------------------------------------*/
 
-#define MAX_MISSILES 2048        /// maximum number of missiles
-#define MAX_LOCAL_MISSILES 4096  /// maximum number of local missiles
-
 /**
 **  Missile-class this defines how a missile-type reacts.
-**
 */
 enum {
 	MissileClassNone, /// Missile does nothing
@@ -578,7 +574,7 @@ extern Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &start
 /// fire a missile
 extern void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos);
 
-extern int FindAndSortMissiles(const CViewport &vp, Missile *table[], const int tablesize);
+extern void FindAndSortMissiles(const CViewport &vp, std::vector<Missile *> &table);
 
 /// handle all missiles
 extern void MissileActions();

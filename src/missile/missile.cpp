@@ -561,39 +561,32 @@ static bool MissileDrawLevelCompare(const Missile *const l, const Missile *const
 **
 **  @param vp         Viewport pointer.
 **  @param table      OUT : array of missile to display sorted by DrawLevel.
-**  @param tablesize  Size of table array
-**
-**  @return           number of missiles returned in table
 */
-int FindAndSortMissiles(const CViewport &vp, Missile *table[], const int tablesize)
+void FindAndSortMissiles(const CViewport &vp, std::vector<Missile *> &table)
 {
-	int nmissiles = 0;
-	std::vector<Missile *>::const_iterator i;
+	typedef std::vector<Missile *>::const_iterator MissilePtrConstiterator;
 
 	// Loop through global missiles, then through locals.
-	for (i = GlobalMissiles.begin(); i != GlobalMissiles.end() && nmissiles < tablesize; ++i) {
+	for (MissilePtrConstiterator i = GlobalMissiles.begin(); i != GlobalMissiles.end(); ++i) {
 		Missile &missile = *(*i);
 		if (missile.Delay || missile.Hidden) {
 			continue;  // delayed or hidden -> aren't shown
 		}
 		// Draw only visible missiles
 		if (MissileVisibleInViewport(vp, missile)) {
-			table[nmissiles++] = &missile;
+			table.push_back(&missile);
 		}
 	}
 
-	for (i = LocalMissiles.begin(); i != LocalMissiles.end() && nmissiles < tablesize; ++i) {
+	for (MissilePtrConstiterator i = LocalMissiles.begin(); i != LocalMissiles.end(); ++i) {
 		Missile &missile = *(*i);
 		if (missile.Delay || missile.Hidden) {
 			continue;  // delayed or hidden -> aren't shown
 		}
 		// Local missile are visible.
-		table[nmissiles++] = &missile;
+		table.push_back(&missile);
 	}
-	if (nmissiles > 1) {
-		std::sort(table, table + nmissiles, MissileDrawLevelCompare);
-	}
-	return nmissiles;
+	std::sort(table.begin(), table.end(), MissileDrawLevelCompare);
 }
 
 /**
