@@ -132,7 +132,11 @@ public:
 		ShadowFile.Width = 0;
 		ShadowFile.Height = 0;
 	}
+	~CConstruction();
+	void Clean();
+	void Load();
 
+public:
 	std::string Ident;   /// construction identifier
 	struct {
 		std::string File;/// sprite file

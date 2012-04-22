@@ -113,7 +113,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 		int frame = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 		CConstructionFrame *cframe = unit.Type->Construction->Frames;
-		while (frame--) {
+		while (frame-- && cframe->Next != NULL) {
 			cframe = cframe->Next;
 		}
 		this->Frame = cframe;

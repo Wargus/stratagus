@@ -33,16 +33,14 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stratagus.h"
-#include "video.h"
-#include "tileset.h"
-#include "map.h"
+
 #include "construct.h"
+
+#include <vector>
+
 #include "script.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -56,6 +54,62 @@ static std::vector<CConstruction *> Constructions;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+CConstruction::~CConstruction()
+{
+	Clean();
+}
+
+void CConstruction::Clean()
+{
+	CGraphic::Free(this->Sprite);
+	this->Sprite = NULL;
+	CGraphic::Free(this->ShadowSprite);
+	this->ShadowSprite = NULL;
+	CConstructionFrame *cframe = this->Frames;
+	this->Frames = NULL;
+	while (cframe) {
+		CConstructionFrame *next = cframe->Next;
+		delete cframe;
+		cframe = next;
+	}
+	this->Width = 0;
+	this->Height = 0;
+	this->ShadowWidth = 0;
+	this->ShadowHeight = 0;
+	this->File.Width = 0;
+	this->File.Height = 0;
+	this->ShadowFile.Width = 0;
+	this->ShadowFile.Height = 0;
+}
+
+void CConstruction::Load()
+{
+	if (this->Ident.empty()) {
+		return;
+	}
+	std::string file = this->File.File;
+
+	this->Width = this->File.Width;
+	this->Height = this->File.Height;
+	if (!file.empty()) {
+		ShowLoadProgress("Construction %s", file.c_str());
+		this->Sprite = CPlayerColorGraphic::New(file, this->Width, this->Height);
+		this->Sprite->Load();
+		this->Sprite->Flip();
+	}
+	file = this->ShadowFile.File;
+	this->ShadowWidth = this->ShadowFile.Width;
+	this->ShadowHeight = this->ShadowFile.Height;
+	if (!file.empty()) {
+		ShowLoadProgress("Construction %s", file.c_str());
+		this->ShadowSprite = CGraphic::ForceNew(file, this->ShadowWidth, this->ShadowHeight);
+		this->ShadowSprite->Load();
+		this->ShadowSprite->Flip();
+		this->ShadowSprite->MakeShadow();
+	}
+}
+
 
 /**
 **  Initialize  the constructions.
@@ -72,32 +126,10 @@ void InitConstructions()
 */
 void LoadConstructions()
 {
-	std::vector<CConstruction *>::iterator i;
-
-	for (i = Constructions.begin(); i != Constructions.end(); ++i) {
-		if ((*i)->Ident.empty()) {
-			continue;
-		}
-		std::string file = (*i)->File.File;
-
-		(*i)->Width = (*i)->File.Width;
-		(*i)->Height = (*i)->File.Height;
-		if (!file.empty()) {
-			ShowLoadProgress("Construction %s", file.c_str());
-			(*i)->Sprite = CPlayerColorGraphic::New(file, (*i)->Width, (*i)->Height);
-			(*i)->Sprite->Load();
-			(*i)->Sprite->Flip();
-		}
-		file = (*i)->ShadowFile.File;
-		(*i)->ShadowWidth = (*i)->ShadowFile.Width;
-		(*i)->ShadowHeight = (*i)->ShadowFile.Height;
-		if (!file.empty()) {
-			ShowLoadProgress("Construction %s", file.c_str());
-			(*i)->ShadowSprite = CGraphic::ForceNew(file, (*i)->ShadowWidth, (*i)->ShadowHeight);
-			(*i)->ShadowSprite->Load();
-			(*i)->ShadowSprite->Flip();
-			(*i)->ShadowSprite->MakeShadow();
-		}
+	for (std::vector<CConstruction *>::iterator it = Constructions.begin();
+		 it != Constructions.end();
+		 ++it) {
+		(*it)->Load();
 	}
 }
 
@@ -106,23 +138,11 @@ void LoadConstructions()
 */
 void CleanConstructions()
 {
-	CConstructionFrame *cframe;
-	CConstructionFrame *tmp;
-	std::vector<CConstruction *>::iterator i;
-
-	//
 	//  Free the construction table.
-	//
-	for (i = Constructions.begin(); i != Constructions.end(); ++i) {
-		CGraphic::Free((*i)->Sprite);
-		CGraphic::Free((*i)->ShadowSprite);
-		cframe = (*i)->Frames;
-		while (cframe) {
-			tmp = cframe->Next;
-			delete cframe;
-			cframe = tmp;
-		}
-		delete *i;
+	for (std::vector<CConstruction *>::iterator it = Constructions.begin();
+		 it != Constructions.end();
+		 ++it) {
+		delete *it;
 	}
 	Constructions.clear();
 }
@@ -134,20 +154,17 @@ void CleanConstructions()
 **
 **  @return       Construction structure pointer
 */
-CConstruction *ConstructionByIdent(const std::string &ident)
+CConstruction *ConstructionByIdent(const std::string &name)
 {
-	std::vector<CConstruction *>::iterator i;
-
-	for (i = Constructions.begin(); i != Constructions.end(); ++i) {
-		if (ident == (*i)->Ident) {
-			return *i;
+	for (std::vector<CConstruction *>::const_iterator it = Constructions.begin();
+		 it != Constructions.end();
+		 ++it) {
+		if ((*it)->Ident == name) {
+			return *it;
 		}
 	}
-	DebugPrint("Construction `%s' not found.\n" _C_ ident.c_str());
 	return NULL;
 }
-
-// ----------------------------------------------------------------------------
 
 /**
 **  Parse the construction.
@@ -158,54 +175,41 @@ CConstruction *ConstructionByIdent(const std::string &ident)
 */
 static int CclDefineConstruction(lua_State *l)
 {
-	const char *value;
-	std::string str;
-	CConstruction *construction;
-	std::vector<CConstruction *>::iterator i;
-
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
 
 	// Slot identifier
+	const std::string str = LuaToString(l, 1);
+	CConstruction *construction = ConstructionByIdent(str);
+	std::vector<CConstruction *>::iterator i;
 
-	str = LuaToString(l, 1);
-	for (i = Constructions.begin(); i != Constructions.end(); ++i) {
-		if ((*i)->Ident == str) {
-			// Redefine
-			construction = *i;
-			break;
-		}
-	}
-	if (i == Constructions.end()) {
+	if (construction == NULL) {
 		construction = new CConstruction;
 		Constructions.push_back(construction);
+	} else { // redefine completely.
+		construction->Clean();
 	}
 	construction->Ident = str;
 
-	//
 	//  Parse the arguments, in tagged format.
-	//
 	lua_pushnil(l);
 	while (lua_next(l, 2)) {
-		int files;
+		const char *value = LuaToString(l, -2);
+		bool files = !strcmp(value, "Files");
 
-		value = LuaToString(l, -2);
-
-		if ((files = !strcmp(value, "Files")) || !strcmp(value, "ShadowFiles")) {
+		if (files || !strcmp(value, "ShadowFiles")) {
 			std::string file;
-			int w;
-			int h;
+			int w = 0;
+			int h = 0;
 
-			w = 0;
-			h = 0;
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_pushnil(l);
 			while (lua_next(l, -2)) {
-				value = LuaToString(l, -2);
+				const char *value = LuaToString(l, -2);
 
 				if (!strcmp(value, "File")) {
 					file = LuaToString(l, -1);
@@ -237,14 +241,9 @@ static int CclDefineConstruction(lua_State *l)
 			const unsigned int subargs = lua_objlen(l, -1);
 
 			for (unsigned int k = 0; k < subargs; ++k) {
-				int percent;
-				ConstructionFileType file;
-				int frame;
-				CConstructionFrame **cframe;
-
-				percent = 0;
-				file = ConstructionFileConstruction;
-				frame = 0;
+				int percent = 0;
+				ConstructionFileType file = ConstructionFileConstruction;
+				int frame = 0;
 
 				lua_rawgeti(l, -1, k + 1);
 				if (!lua_istable(l, -1)) {
@@ -252,12 +251,13 @@ static int CclDefineConstruction(lua_State *l)
 				}
 				lua_pushnil(l);
 				while (lua_next(l, -2)) {
-					value = LuaToString(l, -2);
+					const char *value = LuaToString(l, -2);
 
 					if (!strcmp(value, "Percent")) {
 						percent = LuaToNumber(l, -1);
 					} else if (!strcmp(value, "File")) {
-						value = LuaToString(l, -1);
+						const char *value = LuaToString(l, -1);
+
 						if (!strcmp(value, "construction")) {
 							file = ConstructionFileConstruction;
 						} else if (!strcmp(value, "main")) {
@@ -273,7 +273,7 @@ static int CclDefineConstruction(lua_State *l)
 					lua_pop(l, 1);
 				}
 				lua_pop(l, 1);
-				cframe = &construction->Frames;
+				CConstructionFrame **cframe = &construction->Frames;
 				while (*cframe) {
 					cframe = &((*cframe)->Next);
 				}
