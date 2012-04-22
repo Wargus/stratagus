@@ -91,6 +91,7 @@ void CleanModules()
 	CleanRaces();
 	CleanConstructions();
 	CleanDecorations();
+	CleanMissiles();
 	CleanUnits();
 	CleanUnitTypes();
 	CleanPlayers();
@@ -100,7 +101,6 @@ void CleanModules()
 	CleanDependencies();
 	CleanButtons();
 	CleanMissileTypes();
-	CleanMissiles();
 	CleanTilesets();
 	Map.Clean();
 	Map.CleanFogOfWar();

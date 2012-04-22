@@ -404,17 +404,17 @@ void CleanGame()
 	CleanMessages();
 
 	CleanTriggers();
-	CleanUnits();
 	CleanAi();
-	CleanSelections();
 	CleanGroups();
 	CleanMissiles();
+	CleanUnits();
+	CleanSelections();
 	CleanTilesets();
 	Map.Clean();
 	CleanReplayLog();
 	FreePathfinder();
 	CursorBuilding = NULL;
-	UnitUnderCursor = NoUnitP;
+	UnitUnderCursor = NULL;
 }
 
 static void ExpandPath(std::string &newpath, const std::string &path)
