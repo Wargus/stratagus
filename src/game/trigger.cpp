@@ -664,6 +664,9 @@ void CleanTriggers()
 	lua_pushnil(Lua);
 	lua_settable(Lua, LUA_GLOBALSINDEX);
 
+	lua_pushnil(Lua);
+	lua_setglobal(Lua, "Triggers");
+
 	Trigger = 0;
 
 	delete[] ActiveTriggers;
