@@ -266,7 +266,7 @@ static CUnit *UnitToRepairInRange(const CUnit &unit, int range)
 */
 bool AutoRepair(CUnit &unit)
 {
-	const int repairRange = unit.Type->Variable[AUTOREPAIRRANGE_INDEX].Value;
+	const int repairRange = unit.Variable[AUTOREPAIRRANGE_INDEX].Value;
 
 	if (unit.AutoRepair == false || repairRange == 0) {
 		return false;

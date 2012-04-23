@@ -141,7 +141,13 @@ public:
 	CUnitStats() : Variables(NULL) {
 		memset(Costs, 0, sizeof(Costs));
 	}
+	~CUnitStats();
 
+	const CUnitStats &operator = (const CUnitStats &rhs);
+
+	bool operator == (const CUnitStats &rhs) const;
+	bool operator != (const CUnitStats &rhs) const;
+public:
 	CVariable *Variables;           /// user defined variable.
 	int Costs[MaxCosts];            /// current costs of the unit
 };

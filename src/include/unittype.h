@@ -597,6 +597,15 @@ class CVariable
 public:
 	CVariable() : Max(0), Value(0), Increase(0), Enable(0) {}
 
+	bool operator ==(const CVariable &rhs) const {
+		return this->Max == rhs.Max
+			&& this->Value == rhs.Value
+			&& this->Increase == rhs.Increase
+			&& this->Enable == rhs.Enable;
+	}
+	bool operator !=(const CVariable &rhs) const { return !(*this == rhs); }
+
+public:
 	int Max;           /// Maximum for the variable. (Assume min is 0.)
 	int Value;         /// Current (or initial) value of the variable (or initial value).
 	char Increase;     /// Number to increase(decrease) Value by second.
@@ -939,7 +948,6 @@ public:
 
 	CConstruction *Construction;    /// What is shown in construction phase
 
-	int _Costs[MaxCosts];           /// How many resources needed
 	int _Storing[MaxCosts];         /// How many resources the unit can store
 	int RepairHP;                   /// Amount of HP per repair
 	int RepairCosts[MaxCosts];      /// How much it costs to repair
@@ -1012,7 +1020,7 @@ public:
 	unsigned NonSolid : 1;              /// Unit can be entered by other units.
 	unsigned Wall : 1;                  /// Use special logic for Direction field.
 
-	CVariable *Variable;            /// Array of user defined variables.
+	CUnitStats DefaultStat;
 	struct BoolFlags {
 		bool value;          /// User defined flag. Used for (dis)allow target.
 		char CanTransport;   /// Can transport units with this flag.

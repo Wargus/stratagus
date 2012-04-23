@@ -156,14 +156,13 @@ CUnitType::CUnitType() :
 	BuilderOutside(0), BuilderLost(0), CanHarvest(0), Harvester(0),
 	Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
 	Indestructible(0), Teleporter(0), ShieldPiercing(0), SaveCargo(0),
-	NonSolid(0), Wall(0), Variable(NULL),
+	NonSolid(0), Wall(0),
 	GivesResource(0), Supply(0), Demand(0), FieldFlags(0), MovementMask(0),
 	Sprite(NULL), ShadowSprite(NULL)
 {
 #ifdef USE_MNG
 	memset(&Portrait, 0, sizeof(Portrait));
 #endif
-	memset(_Costs, 0, sizeof(_Costs));
 	memset(_Storing, 0, sizeof(_Storing));
 	memset(RepairCosts, 0, sizeof(RepairCosts));
 	memset(CanStore, 0, sizeof(CanStore));
@@ -177,12 +176,7 @@ CUnitType::~CUnitType()
 	delete DeathExplosion;
 	delete OnHit;
 
-	delete[] Variable;
 	BoolFlag.clear();
-
-	for (int i = 0; i < PlayerMax; ++i) {
-		delete[] Stats[i].Variables;
-	}
 
 	// Free Building Restrictions if there are any
 	for (std::vector<CBuildRestriction *>::iterator b = BuildingRules.begin();
@@ -251,35 +245,26 @@ void UpdateStats(int reset)
 	//  Update players stats
 	//
 	for (std::vector<CUnitType *>::size_type j = 0; j < UnitTypes.size(); ++j) {
-		CUnitType *type = UnitTypes[j];
+		CUnitType &type = *UnitTypes[j];
 		if (reset) {
-			// LUDO : FIXME : reset loading of player stats !
 			for (int player = 0; player < PlayerMax; ++player) {
-				CUnitStats &stats = type->Stats[player];
-				for (unsigned int i = 0; i < MaxCosts; ++i) {
-					stats.Costs[i] = type->_Costs[i];
-				}
-				if (!stats.Variables) {
-					stats.Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
-				}
-				memcpy(stats.Variables, type->Variable,
-					   UnitTypeVar.GetNumberVariable() * sizeof(*type->Variable));
+				type.Stats[player] = type.DefaultStat;
 			}
 		}
 
 		// Non-solid units can always be entered and they don't block anything
-		if (type->NonSolid) {
-			type->MovementMask = 0;
-			type->FieldFlags = 0;
+		if (type.NonSolid) {
+			type.MovementMask = 0;
+			type.FieldFlags = 0;
 			continue;
 		}
 
 		//
 		//  As side effect we calculate the movement flags/mask here.
 		//
-		switch (type->UnitType) {
+		switch (type.UnitType) {
 			case UnitTypeLand:                              // on land
-				type->MovementMask =
+				type.MovementMask =
 					MapFieldLandUnit |
 					MapFieldSeaUnit |
 					MapFieldBuilding | // already occuppied
@@ -288,18 +273,18 @@ void UpdateStats(int reset)
 					MapFieldUnpassable;
 				break;
 			case UnitTypeFly:                               // in air
-				type->MovementMask = MapFieldAirUnit; // already occuppied
+				type.MovementMask = MapFieldAirUnit; // already occuppied
 				break;
 			case UnitTypeNaval:                             // on water
-				if (type->CanTransport()) {
-					type->MovementMask =
+				if (type.CanTransport()) {
+					type.MovementMask =
 						MapFieldLandUnit |
 						MapFieldSeaUnit |
 						MapFieldBuilding | // already occuppied
 						MapFieldLandAllowed; // can't move on this
 					// Johns: MapFieldUnpassable only for land units?
 				} else {
-					type->MovementMask =
+					type.MovementMask =
 						MapFieldLandUnit |
 						MapFieldSeaUnit |
 						MapFieldBuilding | // already occuppied
@@ -310,42 +295,42 @@ void UpdateStats(int reset)
 				break;
 			default:
 				DebugPrint("Where moves this unit?\n");
-				type->MovementMask = 0;
+				type.MovementMask = 0;
 				break;
 		}
-		if (type->Building || type->ShoreBuilding) {
+		if (type.Building || type.ShoreBuilding) {
 			// Shore building is something special.
-			if (type->ShoreBuilding) {
-				type->MovementMask =
+			if (type.ShoreBuilding) {
+				type.MovementMask =
 					MapFieldLandUnit |
 					MapFieldSeaUnit |
 					MapFieldBuilding | // already occuppied
 					MapFieldLandAllowed; // can't build on this
 			}
-			type->MovementMask |= MapFieldNoBuilding;
+			type.MovementMask |= MapFieldNoBuilding;
 			//
 			// A little chaos, buildings without HP can be entered.
 			// The oil-patch is a very special case.
 			//
-			if (type->Variable[HP_INDEX].Max) {
-				type->FieldFlags = MapFieldBuilding;
+			if (type.DefaultStat.Variables[HP_INDEX].Max) {
+				type.FieldFlags = MapFieldBuilding;
 			} else {
-				type->FieldFlags = MapFieldNoBuilding;
+				type.FieldFlags = MapFieldNoBuilding;
 			}
 		} else {
-			switch (type->UnitType) {
+			switch (type.UnitType) {
 				case UnitTypeLand: // on land
-					type->FieldFlags = MapFieldLandUnit;
+					type.FieldFlags = MapFieldLandUnit;
 					break;
 				case UnitTypeFly: // in air
-					type->FieldFlags = MapFieldAirUnit;
+					type.FieldFlags = MapFieldAirUnit;
 					break;
 				case UnitTypeNaval: // on water
-					type->FieldFlags = MapFieldSeaUnit;
+					type.FieldFlags = MapFieldSeaUnit;
 					break;
 				default:
 					DebugPrint("Where moves this unit?\n");
-					type->FieldFlags = 0;
+					type.FieldFlags = 0;
 					break;
 			}
 		}
@@ -360,11 +345,11 @@ void UpdateStats(int reset)
 **  @param plynr  Player number.
 **  @param file   Output file.
 */
-static void SaveUnitStats(const CUnitStats &stats, const std::string &ident, int plynr,
+static void SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int plynr,
 						  CFile &file)
 {
 	Assert(plynr < PlayerMax);
-	file.printf("DefineUnitStats(\"%s\", %d,\n  ", ident.c_str(), plynr);
+	file.printf("DefineUnitStats(\"%s\", %d,\n  ", type.Ident.c_str(), plynr);
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		file.printf("\"%s\", {Value = %d, Max = %d, Increase = %d%s},\n  ",
 					UnitTypeVar.VariableNameLookup[i], stats.Variables[i].Value,
@@ -397,7 +382,7 @@ void SaveUnitTypes(CFile &file)
 		file.printf("\n");
 		for (int j = 0; j < PlayerMax; ++j) {
 			if (Players[j].Type != PlayerNobody) {
-				SaveUnitStats(type.Stats[j], type.Ident, j, file);
+				SaveUnitStats(type.Stats[j], type, j, file);
 			}
 		}
 	}
@@ -440,9 +425,9 @@ CUnitType *NewUnitTypeSlot(const std::string &ident)
 	type->Ident = ident;
 	type->BoolFlag.resize(new_bool_size);
 
-	type->Variable = new CVariable[UnitTypeVar.GetNumberVariable()];
+	type->DefaultStat.Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
-		type->Variable[i] = UnitTypeVar.Variable[i];
+		type->DefaultStat.Variables[i] = UnitTypeVar.Variable[i];
 	}
 	UnitTypes.push_back(type);
 	UnitTypeMap[type->Ident] = type;

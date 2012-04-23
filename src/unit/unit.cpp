@@ -317,9 +317,9 @@ void CUnit::Init(CUnitType &type)
 
 	if (UnitTypeVar.GetNumberVariable()) {
 		Assert(!Variable);
-		Variable = new CVariable[UnitTypeVar.GetNumberVariable()];
-		memcpy(Variable, Type->Variable,
-			   UnitTypeVar.GetNumberVariable() * sizeof(*Variable));
+		const unsigned int size = UnitTypeVar.GetNumberVariable();
+		Variable = new CVariable[size];
+		std::copy(type.DefaultStat.Variables, type.DefaultStat.Variables + size, Variable);
 	} else {
 		Variable = NULL;
 	}

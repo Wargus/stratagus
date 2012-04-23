@@ -518,8 +518,8 @@ int CPopupContentTypeVariable::GetHeight(const ButtonAction *, int *) const
 
 void CPopupContentTypeVariable::Draw(int x, int y, const CPopup *, const unsigned int, const ButtonAction *button, int *) const
 {
-	std::string text;											// Optional text to display.
-	CFont *font = this->Font ? this->Font : GetSmallFont();		// Font to use.
+	std::string text;										// Optional text to display.
+	CFont *font = this->Font ? this->Font : GetSmallFont(); // Font to use.
 
 	Assert(font);
 	Assert(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.GetNumberVariable()));
@@ -539,8 +539,8 @@ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup *, const unsigne
 
 	if (this->Index != -1) {
 		CUnitType &type = *UnitTypes[button->Value];
-		int value = type.Variable[this->Index].Value;
-		int diff = type.Stats->Variables[this->Index].Value - value;
+		int value = type.DefaultStat.Variables[this->Index].Value;
+		int diff = type.Stats->Variables[this->Index].Value - value; // FIXME : player index for stats
 
 		if (!diff) {
 			label.Draw(x, y, value);

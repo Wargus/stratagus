@@ -121,7 +121,7 @@ void MapFixSeenWallTile(const Vec2i &pos)
 
 	if (t == TileTypeHumanWall) {
 		tile = Map.Tileset.HumanWallTable[tile];
-		if (UnitTypeHumanWall && mf->Value <= UnitTypeHumanWall->Variable[HP_INDEX].Max / 2) {
+		if (UnitTypeHumanWall && mf->Value <= UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
 			while (Map.Tileset.Table[tile]) { // Skip good tiles
 				++tile;
 			}
@@ -131,7 +131,7 @@ void MapFixSeenWallTile(const Vec2i &pos)
 		}
 	} else {
 		tile = Map.Tileset.OrcWallTable[tile];
-		if (UnitTypeOrcWall && mf->Value <= UnitTypeOrcWall->Variable[HP_INDEX].Max / 2) {
+		if (UnitTypeOrcWall && mf->Value <= UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
 			while (Map.Tileset.Table[tile]) { // Skip good tiles
 				++tile;
 			}
@@ -214,7 +214,7 @@ void MapFixWallTile(const Vec2i &pos)
 
 	if (t & MapFieldHuman) {
 		tile = Map.Tileset.HumanWallTable[tile];
-		if (UnitTypeHumanWall && mf->Value <= UnitTypeHumanWall->Variable[HP_INDEX].Max / 2) {
+		if (UnitTypeHumanWall && mf->Value <= UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
 			while (Map.Tileset.Table[tile]) { // Skip good tiles
 				++tile;
 			}
@@ -224,7 +224,7 @@ void MapFixWallTile(const Vec2i &pos)
 		}
 	} else {
 		tile = Map.Tileset.OrcWallTable[tile];
-		if (UnitTypeOrcWall && mf->Value <= UnitTypeOrcWall->Variable[HP_INDEX].Max / 2) {
+		if (UnitTypeOrcWall && mf->Value <= UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
 			while (Map.Tileset.Table[tile]) { // Skip good tiles
 				++tile;
 			}
@@ -308,12 +308,12 @@ void CMap::SetWall(const Vec2i &pos, int humanwall)
 		// FIXME: Set random walls
 		mf->Tile = this->Tileset.Table[this->Tileset.HumanWallTable[0]];
 		mf->Flags |= MapFieldWall | MapFieldUnpassable | MapFieldHuman;
-		mf->Value = UnitTypeHumanWall->Variable[HP_INDEX].Max;
+		mf->Value = UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max;
 	} else {
 		// FIXME: Set random walls
 		mf->Tile = this->Tileset.Table[this->Tileset.OrcWallTable[0]];
 		mf->Flags |= MapFieldWall | MapFieldUnpassable;
-		mf->Value = UnitTypeOrcWall->Variable[HP_INDEX].Max;
+		mf->Value = UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max;
 	}
 
 	UI.Minimap.UpdateXY(pos);

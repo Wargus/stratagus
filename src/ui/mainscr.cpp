@@ -233,7 +233,7 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 			var = &unit.Variable[index];
 			break;
 		case 1: // Type:
-			var = &unit.Type->Variable[index];
+			var = &unit.Type->DefaultStat.Variables[index];
 			break;
 		case 2: // Stats:
 			var = &unit.Stats->Variables[index];
@@ -285,7 +285,7 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e)
 {
 	UStrInt val;
-	CVariable *var = &type.Stats->Variables[index];
+	CVariable *var = &type.Stats->Variables[index]; // FIXME : player index for stats
 
 	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
 
@@ -307,7 +307,7 @@ UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e)
 			val.i = var->Max - var->Value;
 			break;
 		case VariablePercent:
-			Assert(type.Stats->Variables[index].Max != 0);
+			Assert(type.Stats->Variables[index].Max != 0); // FIXME: player index for stats
 			val.type = USTRINT_INT;
 			val.i = 100 * var->Value / var->Max;
 			break;
@@ -412,7 +412,7 @@ void CContentTypeText::Draw(const CUnit &unit, CFont *defaultfont) const
 					Assert(0);
 			}
 		} else {
-			int value = unit.Type->Variable[this->Index].Value;
+			int value = unit.Type->DefaultStat.Variables[this->Index].Value;
 			int diff = unit.Stats->Variables[this->Index].Value - value;
 
 			if (!diff) {

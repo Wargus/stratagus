@@ -81,6 +81,45 @@ std::map<std::string, CUpgrade *> Upgrades;
 --  Functions
 ----------------------------------------------------------------------------*/
 
+
+CUnitStats::~CUnitStats()
+{
+	delete [] this->Variables;
+}
+
+const CUnitStats &CUnitStats::operator = (const CUnitStats &rhs)
+{
+	for (unsigned int i = 0; i < MaxCosts; ++i) {
+		this->Costs[i] = rhs.Costs[i];
+	}
+	delete [] this->Variables;
+	const unsigned int size = UnitTypeVar.GetNumberVariable();
+	this->Variables = new CVariable[size];
+
+	std::copy(rhs.Variables, rhs.Variables + size, this->Variables);
+	return *this;
+}
+
+bool CUnitStats::operator == (const CUnitStats &rhs) const
+{
+	for (int i = 0; i != MaxCosts; ++i) {
+		if (this->Costs[i] != rhs.Costs[i]) {
+			return false;
+		}
+	}
+	for (unsigned int i = 0; i != UnitTypeVar.GetNumberVariable(); ++i) {
+		if (this->Variables[i] != rhs.Variables[i]) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool CUnitStats::operator != (const CUnitStats &rhs) const
+{
+	return !(*this == rhs);
+}
+
 CUpgrade::CUpgrade(const std::string &ident) :
 	Ident(ident), ID(0)
 {

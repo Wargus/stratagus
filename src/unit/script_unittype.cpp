@@ -475,7 +475,7 @@ static int CclDefineUnitType(lua_State *l)
 				lua_pop(l, 1);
 				++k;
 				lua_rawgeti(l, -1, k + 1);
-				type->_Costs[res] = LuaToNumber(l, -1);
+				type->DefaultStat.Costs[res] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "Storing")) {
@@ -518,16 +518,16 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "StartingResources")) {
 			type->StartingResources = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "RegenerationRate")) {
-			type->Variable[HP_INDEX].Increase = LuaToNumber(l, -1);
+			type->DefaultStat.Variables[HP_INDEX].Increase = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "BurnPercent")) {
 			type->BurnPercent = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "BurnDamageRate")) {
 			type->BurnDamageRate = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ShieldPoints")) {
-			type->Variable[SHIELD_INDEX].Max = LuaToNumber(l, -1);
-			type->Variable[SHIELD_INDEX].Value = 0;
-			type->Variable[SHIELD_INDEX].Increase = 1;
-			type->Variable[SHIELD_INDEX].Enable = 1;
+			type->DefaultStat.Variables[SHIELD_INDEX].Max = LuaToNumber(l, -1);
+			type->DefaultStat.Variables[SHIELD_INDEX].Value = 0;
+			type->DefaultStat.Variables[SHIELD_INDEX].Increase = 1;
+			type->DefaultStat.Variables[SHIELD_INDEX].Enable = 1;
 		} else if (!strcmp(value, "TileSize")) {
 			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
@@ -577,11 +577,11 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "MinAttackRange")) {
 			type->MinAttackRange = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxAttackRange")) {
-			type->Variable[ATTACKRANGE_INDEX].Value = LuaToNumber(l, -1);
-			type->Variable[ATTACKRANGE_INDEX].Max = LuaToNumber(l, -1);
+			type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = LuaToNumber(l, -1);
+			type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxHarvesters")) {
-			type->Variable[MAXHARVESTERS_INDEX].Value = LuaToNumber(l, -1);
-			type->Variable[MAXHARVESTERS_INDEX].Max = LuaToNumber(l, -1);
+			type->DefaultStat.Variables[MAXHARVESTERS_INDEX].Value = LuaToNumber(l, -1);
+			type->DefaultStat.Variables[MAXHARVESTERS_INDEX].Max = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Priority")) {
 			type->Priority = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "AnnoyComputerFactor")) {
@@ -1071,13 +1071,13 @@ static int CclDefineUnitType(lua_State *l)
 			int index = UnitTypeVar.VariableNameLookup[value];
 			if (index != -1) { // valid index
 				if (lua_isboolean(l, -1)) {
-					type->Variable[index].Enable = LuaToBoolean(l, -1);
+					type->DefaultStat.Variables[index].Enable = LuaToBoolean(l, -1);
 				} else if (lua_istable(l, -1)) {
-					DefineVariableField(l, type->Variable + index, -1);
+					DefineVariableField(l, type->DefaultStat.Variables + index, -1);
 				} else if (lua_isnumber(l, -1)) {
-					type->Variable[index].Enable = 1;
-					type->Variable[index].Value = LuaToNumber(l, -1);
-					type->Variable[index].Max = LuaToNumber(l, -1);
+					type->DefaultStat.Variables[index].Enable = 1;
+					type->DefaultStat.Variables[index].Value = LuaToNumber(l, -1);
+					type->DefaultStat.Variables[index].Max = LuaToNumber(l, -1);
 				} else { // Error
 					LuaError(l, "incorrect argument for the variable in unittype");
 				}
@@ -1642,11 +1642,11 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.Variable[DEMAND_INDEX].Enable = unit.Type->Demand > 0;
 
 	// SightRange
-	unit.Variable[SIGHTRANGE_INDEX].Value = type->Variable[SIGHTRANGE_INDEX].Value;
+	unit.Variable[SIGHTRANGE_INDEX].Value = type->DefaultStat.Variables[SIGHTRANGE_INDEX].Value;
 	unit.Variable[SIGHTRANGE_INDEX].Max = unit.Stats->Variables[SIGHTRANGE_INDEX].Max;
 
 	// AttackRange
-	unit.Variable[ATTACKRANGE_INDEX].Value = type->Variable[ATTACKRANGE_INDEX].Max;
+	unit.Variable[ATTACKRANGE_INDEX].Value = type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max;
 	unit.Variable[ATTACKRANGE_INDEX].Max = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 
 	// Position

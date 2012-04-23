@@ -148,7 +148,7 @@ static std::vector<CUnitType *> getSupplyUnits()
 			unsigned int cost = 0;
 
 			for (unsigned j = 0; j < MaxCosts; ++j) {
-				cost += type->_Costs[j];
+				cost += type->DefaultStat.Costs[j];
 			}
 			score = ((float) type->Supply) / cost;
 			if (score > bestscore) {
