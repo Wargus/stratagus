@@ -345,10 +345,14 @@ void UpdateStats(int reset)
 **  @param plynr  Player number.
 **  @param file   Output file.
 */
-static void SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int plynr,
+static bool SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int plynr,
 						  CFile &file)
 {
 	Assert(plynr < PlayerMax);
+
+	if (stats == type.DefaultStat) {
+		return false;
+	}
 	file.printf("DefineUnitStats(\"%s\", %d,\n  ", type.Ident.c_str(), plynr);
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		file.printf("\"%s\", {Value = %d, Max = %d, Increase = %d%s},\n  ",
@@ -364,6 +368,7 @@ static void SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int pl
 		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.Costs[i]);
 	}
 	file.printf("})\n");
+	return true;
 }
 
 /**
@@ -379,11 +384,15 @@ void SaveUnitTypes(CFile &file)
 	// Save all stats
 	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 		const CUnitType &type = *UnitTypes[i];
-		file.printf("\n");
+		bool somethingSaved = false;
+
 		for (int j = 0; j < PlayerMax; ++j) {
 			if (Players[j].Type != PlayerNobody) {
-				SaveUnitStats(type.Stats[j], type, j, file);
+				somethingSaved |= SaveUnitStats(type.Stats[j], type, j, file);
 			}
+		}
+		if (somethingSaved) {
+			file.printf("\n");
 		}
 	}
 }

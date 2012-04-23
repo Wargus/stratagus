@@ -213,12 +213,14 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.Active) {
 		file.printf(" \"active\",");
 	}
-	file.printf("\"ttl\", %lu, ", unit.TTL);
+	file.printf("\"ttl\", %lu,\n  ", unit.TTL);
 
 	for (size_t i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
-		file.printf("\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
-					UnitTypeVar.VariableNameLookup[i], unit.Variable[i].Value, unit.Variable[i].Max,
-					unit.Variable[i].Increase, unit.Variable[i].Enable ? "true" : "false");
+		if (unit.Variable[i] != unit.Type->DefaultStat.Variables[i]) {
+			file.printf("\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
+						UnitTypeVar.VariableNameLookup[i], unit.Variable[i].Value, unit.Variable[i].Max,
+						unit.Variable[i].Increase, unit.Variable[i].Enable ? "true" : "false");
+		}
 	}
 
 	file.printf("\"group-id\", %d,\n  ", unit.GroupId);
