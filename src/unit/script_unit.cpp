@@ -280,37 +280,22 @@ static void CclParseOrders(lua_State *l, CUnit &unit)
 */
 static int CclUnit(lua_State *l)
 {
-	const char *value;
-	CUnit *unit;
-	CUnitType *type;
-	CUnitType *seentype;
-	CPlayer *player;
-	int slot;
-	int i;
-	const char *s;
-	int args;
-	int j = 0;
-
-	slot = LuaToNumber(l, 1);
+	const int slot = LuaToNumber(l, 1);
 
 	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
 
-	args = lua_objlen(l, 2);
+	CUnit *unit = NULL;
+	CUnitType *type = NULL;
+	CUnitType *seentype = NULL;
+	CPlayer *player = NULL;
 
-	unit = NULL;
-	type = NULL;
-	seentype = NULL;
-	player = NULL;
-	i = 0;
-
-	//
-	// Parse the list: (still everything could be changed!)
-	//
-	for (; j < args; ++j) {
+	// Parse the list:
+	const int args = lua_objlen(l, 2);
+	for (int j = 0; j < args; ++j) {
 		lua_rawgeti(l, 2, j + 1);
-		value = LuaToString(l, -1);
+		const char *value = LuaToString(l, -1);
 		lua_pop(l, 1);
 		++j;
 
@@ -450,10 +435,10 @@ static int CclUnit(lua_State *l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "seen-by-player")) {
 			lua_rawgeti(l, 2, j + 1);
-			s = LuaToString(l, -1);
+			const char *s = LuaToString(l, -1);
 			lua_pop(l, 1);
 			unit->Seen.ByPlayer = 0;
-			for (i = 0; i < PlayerMax && *s; ++i, ++s) {
+			for (int i = 0; i < PlayerMax && *s; ++i, ++s) {
 				if (*s == '-' || *s == '_' || *s == ' ') {
 					unit->Seen.ByPlayer &= ~(1 << i);
 				} else {
@@ -462,10 +447,10 @@ static int CclUnit(lua_State *l)
 			}
 		} else if (!strcmp(value, "seen-destroyed")) {
 			lua_rawgeti(l, 2, j + 1);
-			s = LuaToString(l, -1);
+			const char *s = LuaToString(l, -1);
 			lua_pop(l, 1);
 			unit->Seen.Destroyed = 0;
-			for (i = 0; i < PlayerMax && *s; ++i, ++s) {
+			for (int i = 0; i < PlayerMax && *s; ++i, ++s) {
 				if (*s == '-' || *s == '_' || *s == ' ') {
 					unit->Seen.Destroyed &= ~(1 << i);
 				} else {
@@ -619,7 +604,7 @@ static int CclUnit(lua_State *l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "auto-cast")) {
 			lua_rawgeti(l, 2, j + 1);
-			s = LuaToString(l, -1);
+			const char *s = LuaToString(l, -1);
 			Assert(SpellTypeByIdent(s));
 			if (!unit->AutoCastSpell) {
 				unit->AutoCastSpell = new char[SpellTypeTable.size()];
@@ -628,10 +613,10 @@ static int CclUnit(lua_State *l)
 			unit->AutoCastSpell[SpellTypeByIdent(s)->Slot] = 1;
 			lua_pop(l, 1);
 		} else {
-			i = UnitTypeVar.VariableNameLookup[value];// User variables
-			if (i != -1) { // Valid index
+			const int index = UnitTypeVar.VariableNameLookup[value];// User variables
+			if (index != -1) { // Valid index
 				lua_rawgeti(l, 2, j + 1);
-				DefineVariableField(l, unit->Variable + i, -1);
+				DefineVariableField(l, unit->Variable + index, -1);
 				lua_pop(l, 1);
 				continue;
 			}
