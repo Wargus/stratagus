@@ -177,9 +177,7 @@ void InitUpgrades()
 */
 void CleanUpgrades()
 {
-	//
 	//  Free the upgrades.
-	//
 	while (AllUpgrades.size()) {
 		CUpgrade *upgrade = AllUpgrades.back();
 		AllUpgrades.pop_back();
@@ -191,7 +189,6 @@ void CleanUpgrades()
 	//  Free the upgrade modifiers.
 	//
 	for (int i = 0; i < NumUpgradeModifiers; ++i) {
-		delete[] UpgradeModifiers[i]->Modifier.Variables;
 		delete UpgradeModifiers[i];
 	}
 	NumUpgradeModifiers = 0;
