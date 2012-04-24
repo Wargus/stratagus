@@ -326,20 +326,6 @@ static int CalculateDamage(const CUnit &attacker, const CUnit &goal)
 	return res;
 }
 
-
-/**
-**  Get pixel position of the center of the specified tilePos.
-*/
-static PixelPos GetPixelPosFromCenterTile(const Vec2i &tilePos)
-{
-	PixelPos pixelPos = {tilePos.x *PixelTileSize.x + PixelTileSize.x / 2,
-						 tilePos.y *PixelTileSize.y + PixelTileSize.y / 2
-						};
-
-	return pixelPos;
-}
-
-
 /**
 **  Fire missile.
 **
@@ -393,7 +379,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 
 	// If Firing from inside a Bunker
 	CUnit *from = GetFirstContainer(unit);
-	const PixelPos startPixelPos = GetPixelPosFromCenterTile(from->tilePos);
+	const PixelPos startPixelPos = Map.TilePosToMapPixelPos_Center(from->tilePos);
 
 	Vec2i dpos;
 	if (goal) {
@@ -414,7 +400,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 		// FIXME: Can this be too near??
 	}
 
-	const PixelPos destPixelPos = GetPixelPosFromCenterTile(dpos);
+	const PixelPos destPixelPos = Map.TilePosToMapPixelPos_Center(dpos);
 	Missile *missile = MakeMissile(*unit.Type->Missile.Missile, startPixelPos, destPixelPos);
 	//
 	// Damage of missile
@@ -761,7 +747,7 @@ void Missile::MissileHit()
 		return;
 	}
 
-	const Vec2i pos = {pixelPos.x / PixelTileSize.x, pixelPos.y / PixelTileSize.y};
+	const Vec2i pos = Map.MapPixelPosToTilePos(pixelPos);
 
 	if (!Map.Info.IsPointOnMap(pos)) {
 		// FIXME: this should handled by caller?
@@ -993,7 +979,7 @@ void MissileActions()
 int ViewPointDistanceToMissile(const Missile &missile)
 {
 	const PixelPos pixelPos = missile.position + missile.Type->size / 2;
-	const Vec2i tilePos = { pixelPos.x / PixelTileSize.x, pixelPos.y / PixelTileSize.y };
+	const Vec2i tilePos = Map.MapPixelPosToTilePos(pixelPos);
 
 	return ViewPointDistance(tilePos);
 }

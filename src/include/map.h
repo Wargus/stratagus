@@ -303,12 +303,19 @@ public:
 	/// Remove wood/rock from the map.
 	void ClearTile(unsigned short type, const Vec2i &pos);
 
+	/// convert map pixelpos coordonates into tilepos
+	Vec2i MapPixelPosToTilePos(const PixelPos &mapPos) const;
+	/// convert tilepos coordonates into map pixel pos (take the top left of the tile)
+	PixelPos TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos) const;
+	/// convert tilepos coordonates into map pixel pos (take the center of the tile)
+	PixelPos TilePosToMapPixelPos_Center(const Vec2i &tilePos) const;
+
 	/**
 	**  Find out if a field is seen (By player, or by shared vision)
 	**  This function will return > 1 with no fog of war.
 	**
-	**  @param player		Player to check for.
-	**  @param index		flat tile index adress.
+	**  @param player  Player to check for.
+	**  @param index   flat tile index adress.
 	**
 	**  @return        0 unexplored, 1 explored, > 1 visible.
 	*/

@@ -109,7 +109,7 @@ PixelPos CViewport::MapToScreenPixelPos(const PixelPos &mapPixelPos) const
 Vec2i CViewport::ScreenToTilePos(const PixelPos &screenPixelPos) const
 {
 	const PixelPos mapPixelPos = ScreenToMapPixelPos(screenPixelPos);
-	const Vec2i tilePos = {mapPixelPos.x / PixelTileSize.x, mapPixelPos.y / PixelTileSize.y};
+	const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos);
 
 	return tilePos;
 }
@@ -117,7 +117,7 @@ Vec2i CViewport::ScreenToTilePos(const PixelPos &screenPixelPos) const
 /// convert tilepos coordonates into screen (take the top left of the tile)
 PixelPos CViewport::TilePosToScreen_TopLeft(const Vec2i &tilePos) const
 {
-	const PixelPos mapPos = {tilePos.x * PixelTileSize.x, tilePos.y * PixelTileSize.y};
+	const PixelPos mapPos = Map.TilePosToMapPixelPos_TopLeft(tilePos);
 
 	return MapToScreenPixelPos(mapPos);
 }

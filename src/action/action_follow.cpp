@@ -214,10 +214,8 @@ enum {
 				PlayGameSound(SoundForName("invisibility"), MaxSampleVolume);
 				// FIXME: MissileTypeByIdent() should be called once
 				MakeMissile(MissileTypeByIdent("missile-normal-spell"),
-							unit.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2,
-							unit.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2,
-							unit.tilePos.x * PixelTileSize.x + PixelTileSize.x / 2,
-							unit.tilePos.y * PixelTileSize.y + PixelTileSize.y / 2);
+							unit.GetMapPixelPosCenter(),
+							unit.GetMapPixelPosCenter());
 #endif
 				// FIXME: we must check if the units supports the new order.
 				CUnit &dest = *goal->Goal;

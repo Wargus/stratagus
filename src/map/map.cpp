@@ -163,6 +163,25 @@ void CMap::Reveal()
 --  Map queries
 ----------------------------------------------------------------------------*/
 
+Vec2i CMap::MapPixelPosToTilePos(const PixelPos &mapPos) const
+{
+	const Vec2i tilePos = {mapPos.x / PixelTileSize.x, mapPos.y / PixelTileSize.y};
+
+	return tilePos;
+}
+
+PixelPos CMap::TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos) const
+{
+	PixelPos mapPixelPos = {tilePos.x * PixelTileSize.x, tilePos.y * PixelTileSize.y};
+
+	return mapPixelPos;
+}
+
+PixelPos CMap::TilePosToMapPixelPos_Center(const Vec2i &tilePos) const
+{
+	return TilePosToMapPixelPos_TopLeft(tilePos) + PixelTileSize / 2;
+}
+
 /**
 **  Wall on map tile.
 **

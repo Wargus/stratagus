@@ -58,9 +58,8 @@ void MissileWhirlwind::Action()
 
 	// Center of the tornado
 	const PixelPos pixelCenter = this->position + this->Type->size / 2;
-	const Vec2i center = {(pixelCenter.x + PixelTileSize.x / 2) / PixelTileSize.x,
-						  (pixelCenter.y + PixelTileSize.y) / PixelTileSize.y
-						 };
+	const PixelPos centerOffset = {PixelTileSize.x / 2, PixelTileSize.y};
+	const Vec2i center = Map.MapPixelPosToTilePos(pixelCenter + centerOffset);
 
 #if 0
 	if (!(this->TTL % 4)) { // Every 4 cycles 4 points damage in tornado center
@@ -96,16 +95,14 @@ void MissileWhirlwind::Action()
 #endif
 	// Changes direction every 3 seconds (approx.)
 	if (!(this->TTL % 100)) { // missile has reached target unit/spot
-		int nx;
-		int ny;
+		Vec2i newPos;
 
 		do {
 			// find new destination in the map
-			nx = center.x + SyncRand() % 5 - 2;
-			ny = center.y + SyncRand() % 5 - 2;
-		} while (!Map.Info.IsPointOnMap(nx, ny));
-		this->destination.x = nx * PixelTileSize.x + PixelTileSize.x / 2;
-		this->destination.y = ny * PixelTileSize.y + PixelTileSize.y / 2;
+			newPos.x = center.x + SyncRand() % 5 - 2;
+			newPos.y = center.y + SyncRand() % 5 - 2;
+		} while (!Map.Info.IsPointOnMap(newPos));
+		this->destination = Map.TilePosToMapPixelPos_Center(newPos);
 		this->source = this->position;
 		this->State = 0;
 		DebugPrint("Whirlwind new direction: %d, %d, TTL: %d\n" _C_

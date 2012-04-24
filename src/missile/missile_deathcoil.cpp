@@ -74,7 +74,7 @@ void MissileDeathCoil::Action()
 			// No target unit -- try enemies in range 5x5 // Must be parametrable
 			//
 			std::vector<CUnit *> table;
-			const Vec2i destPos = {this->destination.x / PixelTileSize.x, this->destination.y / PixelTileSize.y};
+			const Vec2i destPos = Map.MapPixelPosToTilePos(this->destination);
 			const Vec2i range = {2, 2};
 			Map.Select(destPos - range, destPos + range, table, IsEnemyWith(*source.Player));
 

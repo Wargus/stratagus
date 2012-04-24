@@ -117,11 +117,8 @@
 **
 **  CUnit::tilePos
 **
-**  The tile map coordinates of the unit. 0,0 is the upper left on
-**  the map. To convert the map coordinates into pixels, they
-**  must be multiplicated with the #PixelTileSize.x and #PixelTileSize.y.
-**  To get the pixel coordinates of a unit, calculate
-**  CUnit::X*#PixelTileSize.x+CUnit::IX , CUnit::Y*#PixelTileSize.y+CUnit::IY.
+**  The tile map coordinates of the unit.
+**  0,0 is the upper left on the map.
 **
 **  CUnit::Type
 **

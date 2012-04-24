@@ -111,8 +111,8 @@ void DoRightButton(int sx, int sy)
 	if (!NumSelected) {
 		return;
 	}
-
-	const Vec2i pos = {sx / PixelTileSize.x, sy / PixelTileSize.y};
+	const PixelPos mapPixelPos = {sx, sy};
+	const Vec2i pos = Map.MapPixelPosToTilePos(mapPixelPos);
 
 	//
 	//  Right mouse with SHIFT appends command to old commands.
@@ -975,6 +975,7 @@ void UIHandleMouseMove(int x, int y)
 */
 static int SendRepair(int sx, int sy)
 {
+	const PixelPos mapPixelPos = {sx, sy};
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
 
@@ -986,7 +987,7 @@ static int SendRepair(int sx, int sy)
 			CUnit *unit = Selected[i];
 
 			if (unit->Type->RepairRange) {
-				const Vec2i tilePos = {sx / PixelTileSize.x, sy / PixelTileSize.y};
+				const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos);
 				const int flush = !(KeyModifiers & ModifierShift);
 
 				SendCommandRepair(*unit, tilePos, dest, flush);
@@ -1010,11 +1011,12 @@ static int SendRepair(int sx, int sy)
 */
 static int SendMove(int sx, int sy)
 {
-	CUnit *transporter;
+	const PixelPos mapPixelPos = {sx, sy};
+	CUnit *transporter = UnitUnderCursor;
 	int ret = 0;
 
 	// Move to a transporter.
-	if ((transporter = UnitUnderCursor) && transporter->Type->CanTransport()) {
+	if (transporter && transporter->Type->CanTransport()) {
 		int i;
 		for (i = 0; i < NumSelected; ++i) {
 			if (CanTransport(*transporter, *Selected[i])) {
@@ -1030,7 +1032,7 @@ static int SendMove(int sx, int sy)
 		transporter = NULL;
 	}
 
-	const Vec2i tilePos = {sx / PixelTileSize.x, sy / PixelTileSize.y};
+	const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos);
 	const int flush = !(KeyModifiers & ModifierShift);
 
 	for (int i = 0; i < NumSelected; ++i) {
@@ -1067,7 +1069,8 @@ static int SendMove(int sx, int sy)
 */
 static int SendAttack(int sx, int sy)
 {
-	const Vec2i tilePos = {sx / PixelTileSize.x, sy / PixelTileSize.y};
+	const PixelPos mapPixelPos = {sx, sy};
+	const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos);
 	const int flush = !(KeyModifiers & ModifierShift);
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
@@ -1104,7 +1107,8 @@ static int SendAttack(int sx, int sy)
 */
 static int SendAttackGround(int sx, int sy)
 {
-	const Vec2i tilePos = {sx / PixelTileSize.x, sy / PixelTileSize.y};
+	const PixelPos mapPixelPos = {sx, sy};
+	const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos);
 	const int flush = !(KeyModifiers & ModifierShift);
 	int ret = 0;
 
@@ -1129,7 +1133,8 @@ static int SendAttackGround(int sx, int sy)
 */
 static int SendPatrol(int sx, int sy)
 {
-	const Vec2i tilePos = {sx / PixelTileSize.x, sy / PixelTileSize.y};
+	const PixelPos mapPixelPos = {sx, sy};
+	const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos);;
 	const int flush = !(KeyModifiers & ModifierShift);
 
 	int ret = 0;
@@ -1155,7 +1160,8 @@ static int SendResource(int sx, int sy)
 	int res;
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
-	const Vec2i pos = {sx / PixelTileSize.x, sy / PixelTileSize.y};
+	const PixelPos mapPixelPos = {sx, sy};
+	const Vec2i pos = Map.MapPixelPosToTilePos(mapPixelPos);
 	const int flush = !(KeyModifiers & ModifierShift);
 
 	for (int i = 0; i < NumSelected; ++i) {
@@ -1218,7 +1224,8 @@ static int SendResource(int sx, int sy)
 */
 static int SendUnload(int sx, int sy)
 {
-	const Vec2i tilePos = {sx / PixelTileSize.x, sy / PixelTileSize.y};
+	const PixelPos mapPixelPos = {sx, sy};
+	const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos);
 	const int flush = !(KeyModifiers & ModifierShift);
 	int ret = 0;
 
@@ -1244,7 +1251,8 @@ static int SendUnload(int sx, int sy)
 */
 static int SendSpellCast(int sx, int sy)
 {
-	const Vec2i tilePos = {sx / PixelTileSize.x, sy / PixelTileSize.y};
+	const PixelPos mapPixelPos = {sx, sy};
+	const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos);
 	const int flush = !(KeyModifiers & ModifierShift);
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
@@ -1639,7 +1647,8 @@ void UIHandleButtonDown(unsigned button)
 						MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
 					}
 				}
-				DoRightButton(tilePos.x * PixelTileSize.x, tilePos.y * PixelTileSize.y);
+				const PixelPos mapPixelPos = UI.MouseViewport->ScreenToMapPixelPos(cursorPixelPos);
+				DoRightButton(mapPixelPos.x, mapPixelPos.y);
 			}
 		} else if (MouseButtons & LeftButton) { // enter select mode
 			CursorStartX = CursorX;
@@ -1665,9 +1674,7 @@ void UIHandleButtonDown(unsigned button)
 			UI.SelectedViewport->Center(cursorTilePos, PixelTileSize / 2);
 		} else if (MouseButtons & RightButton) {
 			if (!GameObserve && !GamePaused) {
-				PixelPos mapPixelPos = { cursorTilePos.x *PixelTileSize.x + PixelTileSize.x / 2,
-										 cursorTilePos.y *PixelTileSize.y + PixelTileSize.y / 2
-									   };
+				const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_Center(cursorTilePos);
 				if (!ClickMissile.empty()) {
 					MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
 				}

@@ -231,19 +231,16 @@ int AreaBombardment::Cast(CUnit &caster, const SpellType *, CUnit *, const Vec2i
 	const MissileType *missile = this->Missile;
 
 	while (fields--) {
-		int dx;
-		int dy;
+		Vec2i dpos;
 
 		// FIXME: radius configurable...
 		do {
 			// find new destination in the map
-			dx = goalPos.x + SyncRand() % 5 - 2;
-			dy = goalPos.y + SyncRand() % 5 - 2;
-		} while (!Map.Info.IsPointOnMap(dx, dy));
+			dpos.x = goalPos.x + SyncRand() % 5 - 2;
+			dpos.y = goalPos.y + SyncRand() % 5 - 2;
+		} while (!Map.Info.IsPointOnMap(dpos));
 
-		const PixelPos dest = { dx *PixelTileSize.x + PixelTileSize.x / 2,
-								dy *PixelTileSize.y + PixelTileSize.y / 2
-							  };
+		const PixelPos dest = Map.TilePosToMapPixelPos_Center(dpos);
 		const PixelPos start = dest + offset;
 		for (int i = 0; i < shards; ++i) {
 			::Missile *mis = MakeMissile(*missile, start, dest);
@@ -281,8 +278,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 		if (target) {
 			*res = target->GetMapPixelPosCenter();
 		} else {
-			res->x = goalPos.x * PixelTileSize.x + PixelTileSize.x / 2;
-			res->y = goalPos.y * PixelTileSize.y + PixelTileSize.y / 2;
+			*res = Map.TilePosToMapPixelPos_Center(goalPos);
 		}
 	}
 	res->x += location.AddX;

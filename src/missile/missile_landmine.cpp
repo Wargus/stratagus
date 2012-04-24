@@ -63,7 +63,7 @@ struct LandMineTargetFinder {
 */
 void MissileLandMine::Action()
 {
-	const Vec2i pos = {this->position.x / PixelTileSize.x, this->position.y / PixelTileSize.y};
+	const Vec2i pos = Map.MapPixelPosToTilePos(this->position);
 
 	if (LandMineTargetFinder(this->SourceUnit, this->Type->CanHitOwner).FindOnTile(Map.Field(pos)) != NULL) {
 		DebugPrint("Landmine explosion at %d,%d.\n" _C_ pos.x _C_ pos.y);
