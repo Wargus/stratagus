@@ -46,9 +46,7 @@
 */
 void MissileWhirlwind::Action()
 {
-	//
 	// Animate, move.
-	//
 	if (!this->AnimWait--) {
 		if (this->NextMissileFrame(1, 0)) {
 			this->SpriteFrame = 0;
@@ -57,37 +55,40 @@ void MissileWhirlwind::Action()
 		this->AnimWait = this->Type->Sleep;
 	}
 	this->Wait = 1;
-	//
+
 	// Center of the tornado
-	//
-	PixelPos center = this->position + this->Type->size / 2;
-	center.x = (center.x + PixelTileSize.x / 2) / PixelTileSize.x;
-	center.y = (center.y + PixelTileSize.y) / PixelTileSize.y;
+	const PixelPos pixelCenter = this->position + this->Type->size / 2;
+	const Vec2i center = {(pixelCenter.x + PixelTileSize.x / 2) / PixelTileSize.x,
+						  (pixelCenter.y + PixelTileSize.y) / PixelTileSize.y
+						 };
 
 #if 0
-	CUnit *table[UnitMax];
-
 	if (!(this->TTL % 4)) { // Every 4 cycles 4 points damage in tornado center
-		int n = SelectUnitsOnTile(x, y, table);
-		for (int i = 0; i < n; ++i) {
-			if (table[i]->CurrentAction() != UnitActionDie) {
+		CUnitCache &cache = Map.Field(center)->UnitCache;
+
+		for (CUnitCache::iterator it = cache.begin(); it != cache.end(); ++it) {
+			CUnit &unit = **it;
+
+			if (unit.CurrentAction() != UnitActionDie) {
 				// should be missile damage ?
-				HitUnit(this->SourceUnit, table[i], WHIRLWIND_DAMAGE1);
+				HitUnit(this->SourceUnit, unit, WHIRLWIND_DAMAGE1);
 			}
 		}
 	}
 	if (!(this->TTL % (CYCLES_PER_SECOND / 10))) { // Every 1/10s 1 points damage on tornado periphery
+		std::vector<CUnit *> table;
 		// we should parameter this
-		int n = SelectUnits(center.x - 1, center.y - 1, center.x + 1, center.y + 1, table);
-		for (int i = 0; i < n; ++i) {
-			if ((table[i]->X != center.x || table[i]->Y != center.y) && table[i]->CurrentAction() != UnitActionDie) {
+		const Vec2i offset = {1, 1};
+		Map.Select(center - offset, center + offset, table);
+		for (size_t i = 0; i < table.size(); ++i) {
+			CUnit &unit = *table[i];
+
+			if (unit.tilePos != center && unit.CurrentAction() != UnitActionDie) {
 				// should be in missile
-				HitUnit(this->SourceUnit, table[i], WHIRLWIND_DAMAGE2);
+				HitUnit(this->SourceUnit, unit, WHIRLWIND_DAMAGE2);
 			}
 		}
 	}
-	DebugPrint("Whirlwind: %d, %d, TTL: %d state: %d\n" _C_
-			   missile->X _C_ missile->Y _C_ missile->TTL _C_ missile->State);
 #else
 	if (!(this->TTL % CYCLES_PER_SECOND / 10)) {
 		this->MissileHit();
