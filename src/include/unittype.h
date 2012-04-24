@@ -599,9 +599,9 @@ public:
 
 	bool operator ==(const CVariable &rhs) const {
 		return this->Max == rhs.Max
-			&& this->Value == rhs.Value
-			&& this->Increase == rhs.Increase
-			&& this->Enable == rhs.Enable;
+			   && this->Value == rhs.Value
+			   && this->Increase == rhs.Increase
+			   && this->Enable == rhs.Enable;
 	}
 	bool operator !=(const CVariable &rhs) const { return !(*this == rhs); }
 
