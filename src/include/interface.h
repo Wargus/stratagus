@@ -338,8 +338,6 @@ bool HandleCommandKey(int key);
 //
 // Chaos pur.
 //
-/// Called if right mouse button is pressed
-extern void DoRightButton(int tx, int ty);
 /// Cancel the building input mode
 extern void CancelBuildingMode();
 

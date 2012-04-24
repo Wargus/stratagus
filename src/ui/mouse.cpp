@@ -42,28 +42,28 @@
 
 #include "stratagus.h"
 
-#include "tileset.h"
-#include "video.h"
+#include "ui.h"
+
+#include "action/action_train.h"
+#include "actions.h"
+#include "commands.h"
+#include "cursor.h"
+#include "font.h"
+#include "interface.h"
 #include "map.h"
+#include "menus.h"
+#include "minimap.h"
+#include "missile.h"
+#include "network.h"
+#include "player.h"
 #include "sound.h"
+#include "spells.h"
+#include "tileset.h"
+#include "unit.h"
 #include "unitsound.h"
 #include "unittype.h"
-#include "player.h"
-#include "unit.h"
-#include "missile.h"
-#include "commands.h"
-#include "minimap.h"
-#include "font.h"
-#include "cursor.h"
-#include "interface.h"
-#include "menus.h"
-#include "sound.h"
-#include "ui.h"
-#include "network.h"
-#include "spells.h"
+#include "video.h"
 #include "widgets.h"
-#include "actions.h"
-#include "action/action_train.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -102,16 +102,14 @@ void CancelBuildingMode()
 /**
 **  Called when right button is pressed
 **
-**  @param sx  X map position in pixels.
-**  @param sy  Y map position in pixels.
+**  @param mapPixelPos  map position in pixels.
 */
-void DoRightButton(int sx, int sy)
+void DoRightButton(const PixelPos &mapPixelPos)
 {
 	// No unit selected
 	if (!NumSelected) {
 		return;
 	}
-	const PixelPos mapPixelPos = {sx, sy};
 	const Vec2i pos = Map.MapPixelPosToTilePos(mapPixelPos);
 
 	//
@@ -493,16 +491,17 @@ void DoRightButton(int sx, int sy)
 /**
 **  Check if the mouse is on a button
 **
-**  @param x       X coordinate.
-**  @param y       Y coordinate.
-**  @param button  Button to check.
+**  @param x       X screen coordinate.
+**  @param y       Y screen coordinate.
 **
 **  @return        True if mouse is on the button, False otherwise.
 */
-static inline bool OnButton(int x, int y, CUIButton *button)
+bool CUIButton::IsOnButton(int x, int y) const
 {
-	return x >= button->X && x < button->X + button->Style->Width
-		   && y >= button->Y && y < button->Y + button->Style->Height;
+	Assert(this->Style);
+
+	return this->X <= x && x < this->X + this->Style->Width
+		   && this->Y <= y && y < this->Y + this->Style->Height;
 }
 
 /**
@@ -514,7 +513,6 @@ static inline bool OnButton(int x, int y, CUIButton *button)
 static void HandleMouseOn(int x, int y)
 {
 	int i;
-	bool on_ui;
 	size_t size;
 
 	MouseScrollState = ScrollNone;
@@ -535,7 +533,7 @@ static void HandleMouseOn(int x, int y)
 	//
 	if (!IsNetworkGame()) {
 		if (UI.MenuButton.X != -1) {
-			if (OnButton(x, y, &UI.MenuButton)) {
+			if (UI.MenuButton.IsOnButton(x, y)) {
 				ButtonAreaUnderCursor = ButtonAreaMenu;
 				ButtonUnderCursor = ButtonUnderMenu;
 				CursorOn = CursorOnButton;
@@ -544,7 +542,7 @@ static void HandleMouseOn(int x, int y)
 		}
 	} else {
 		if (UI.NetworkMenuButton.X != -1) {
-			if (OnButton(x, y, &UI.NetworkMenuButton)) {
+			if (UI.NetworkMenuButton.IsOnButton(x, y)) {
 				ButtonAreaUnderCursor = ButtonAreaMenu;
 				ButtonUnderCursor = ButtonUnderNetworkMenu;
 				CursorOn = CursorOnButton;
@@ -552,7 +550,7 @@ static void HandleMouseOn(int x, int y)
 			}
 		}
 		if (UI.NetworkDiplomacyButton.X != -1) {
-			if (OnButton(x, y, &UI.NetworkDiplomacyButton)) {
+			if (UI.NetworkDiplomacyButton.IsOnButton(x, y)) {
 				ButtonAreaUnderCursor = ButtonAreaMenu;
 				ButtonUnderCursor = ButtonUnderNetworkDiplomacy;
 				CursorOn = CursorOnButton;
@@ -562,7 +560,7 @@ static void HandleMouseOn(int x, int y)
 	}
 	size = UI.ButtonPanel.Buttons.size();
 	for (unsigned int j = 0; j < size; ++j) {
-		if (OnButton(x, y, &UI.ButtonPanel.Buttons[j])) {
+		if (UI.ButtonPanel.Buttons[j].IsOnButton(x, y)) {
 			ButtonAreaUnderCursor = ButtonAreaButton;
 			if (CurrentButtons.IsValid() && CurrentButtons[j].Pos != -1) {
 				ButtonUnderCursor = j;
@@ -577,7 +575,7 @@ static void HandleMouseOn(int x, int y)
 			i = Selected[0]->BoardCount < (int)size ?
 				Selected[0]->BoardCount - 1 : size - 1;
 			for (; i >= 0; --i) {
-				if (OnButton(x, y, &UI.TransportingButtons[i])) {
+				if (UI.TransportingButtons[i].IsOnButton(x, y)) {
 					ButtonAreaUnderCursor = ButtonAreaTransporting;
 					ButtonUnderCursor = i;
 					CursorOn = CursorOnButton;
@@ -588,7 +586,7 @@ static void HandleMouseOn(int x, int y)
 		if (NumSelected == 1) {
 			if (Selected[0]->CurrentAction() == UnitActionTrain) {
 				if (Selected[0]->Orders.size() == 1) {
-					if (OnButton(x, y, UI.SingleTrainingButton)) {
+					if (UI.SingleTrainingButton->IsOnButton(x, y)) {
 						ButtonAreaUnderCursor = ButtonAreaTraining;
 						ButtonUnderCursor = 0;
 						CursorOn = CursorOnButton;
@@ -600,7 +598,7 @@ static void HandleMouseOn(int x, int y)
 						Selected[0]->Orders.size() - 1 : size - 1;
 					for (; i >= 0; --i) {
 						if (Selected[0]->Orders[i]->Action == UnitActionTrain
-							&& OnButton(x, y, &UI.TrainingButtons[i])) {
+							&& UI.TrainingButtons[i].IsOnButton(x, y)) {
 							ButtonAreaUnderCursor = ButtonAreaTraining;
 							ButtonUnderCursor = i;
 							CursorOn = CursorOnButton;
@@ -609,14 +607,14 @@ static void HandleMouseOn(int x, int y)
 					}
 				}
 			} else if (Selected[0]->CurrentAction() == UnitActionUpgradeTo) {
-				if (OnButton(x, y, UI.UpgradingButton)) {
+				if (UI.UpgradingButton->IsOnButton(x, y)) {
 					ButtonAreaUnderCursor = ButtonAreaUpgrading;
 					ButtonUnderCursor = 0;
 					CursorOn = CursorOnButton;
 					return;
 				}
 			} else if (Selected[0]->CurrentAction() == UnitActionResearch) {
-				if (OnButton(x, y, UI.ResearchingButton)) {
+				if (UI.ResearchingButton->IsOnButton(x, y)) {
 					ButtonAreaUnderCursor = ButtonAreaResearching;
 					ButtonUnderCursor = 0;
 					CursorOn = CursorOnButton;
@@ -625,7 +623,7 @@ static void HandleMouseOn(int x, int y)
 			}
 		}
 		if (NumSelected == 1) {
-			if (UI.SingleSelectedButton && OnButton(x, y, UI.SingleSelectedButton)) {
+			if (UI.SingleSelectedButton && UI.SingleSelectedButton->IsOnButton(x, y)) {
 				ButtonAreaUnderCursor = ButtonAreaSelected;
 				ButtonUnderCursor = 0;
 				CursorOn = CursorOnButton;
@@ -635,7 +633,7 @@ static void HandleMouseOn(int x, int y)
 			size = UI.SelectedButtons.size();
 			i = NumSelected > (int)size ? size - 1 : NumSelected - 1;
 			for (; i >= 0; --i) {
-				if (OnButton(x, y, &UI.SelectedButtons[i])) {
+				if (UI.SelectedButtons[i].IsOnButton(x, y)) {
 					ButtonAreaUnderCursor = ButtonAreaSelected;
 					ButtonUnderCursor = i;
 					CursorOn = CursorOnButton;
@@ -657,7 +655,7 @@ static void HandleMouseOn(int x, int y)
 	//
 	//  On UI graphic
 	//
-	on_ui = false;
+	bool on_ui = false;
 	size = UI.Fillers.size();
 	for (unsigned int j = 0; j < size; ++j) {
 		if (UI.Fillers[j].OnGraphic(x, y)) {
@@ -970,12 +968,10 @@ void UIHandleMouseMove(int x, int y)
 /**
 **  Send selected units to repair
 **
-**  @param sx  X screen map position.
-**  @param sy  Y screen map position.
+**  @param tilePos  tile map position.
 */
-static int SendRepair(int sx, int sy)
+static int SendRepair(const Vec2i &tilePos)
 {
-	const PixelPos mapPixelPos = {sx, sy};
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
 
@@ -987,7 +983,6 @@ static int SendRepair(int sx, int sy)
 			CUnit *unit = Selected[i];
 
 			if (unit->Type->RepairRange) {
-				const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos);
 				const int flush = !(KeyModifiers & ModifierShift);
 
 				SendCommandRepair(*unit, tilePos, dest, flush);
@@ -1003,15 +998,13 @@ static int SendRepair(int sx, int sy)
 /**
 **  Send selected units to point.
 **
-**  @param sx  X screen tile position.
-**  @param sy  Y screen tile position.
+**  @param tilePos  tile map position.
 **
 **  @todo To reduce the CPU load for pathfinder, we should check if
 **        the destination is reachable and handle nice group movements.
 */
-static int SendMove(int sx, int sy)
+static int SendMove(const Vec2i &tilePos)
 {
-	const PixelPos mapPixelPos = {sx, sy};
 	CUnit *transporter = UnitUnderCursor;
 	int ret = 0;
 
@@ -1032,7 +1025,6 @@ static int SendMove(int sx, int sy)
 		transporter = NULL;
 	}
 
-	const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos);
 	const int flush = !(KeyModifiers & ModifierShift);
 
 	for (int i = 0; i < NumSelected; ++i) {
@@ -1060,17 +1052,14 @@ static int SendMove(int sx, int sy)
 **  To unit:
 **    Move to unit attacking and tracing the unit until dead.
 **
-**  @param sx  X screen map position.
-**  @param sy  Y screen map position.
+**  @param tilePos  tile map position.
 **
 **  @return 1 if any unit have a new order, 0 else.
 **
 **  @see Selected, @see NumSelected
 */
-static int SendAttack(int sx, int sy)
+static int SendAttack(const Vec2i &tilePos)
 {
-	const PixelPos mapPixelPos = {sx, sy};
-	const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos);
 	const int flush = !(KeyModifiers & ModifierShift);
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
@@ -1102,13 +1091,10 @@ static int SendAttack(int sx, int sy)
 /**
 **  Send the current selected group ground attacking.
 **
-**  @param sx  X screen map position.
-**  @param sy  Y screen map position.
+**  @param tilePos  tile map position.
 */
-static int SendAttackGround(int sx, int sy)
+static int SendAttackGround(const Vec2i &tilePos)
 {
-	const PixelPos mapPixelPos = {sx, sy};
-	const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos);
 	const int flush = !(KeyModifiers & ModifierShift);
 	int ret = 0;
 
@@ -1126,42 +1112,33 @@ static int SendAttackGround(int sx, int sy)
 }
 
 /**
-**  Let units patrol between current postion and the selected.
+**  Let units patrol between current position and the selected.
 **
-**  @param sx  X screen map position.
-**  @param sy  Y screen map position.
+**  @param tilePos  tile map position.
 */
-static int SendPatrol(int sx, int sy)
+static int SendPatrol(const Vec2i &tilePos)
 {
-	const PixelPos mapPixelPos = {sx, sy};
-	const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos);;
 	const int flush = !(KeyModifiers & ModifierShift);
-
-	int ret = 0;
 
 	for (int i = 0; i < NumSelected; ++i) {
 		CUnit &unit = *Selected[i];
 		SendCommandPatrol(unit, tilePos, flush);
-		ret = 1;
 	}
-	return ret;
+	return NumSelected != 0 ? 1 : 0;
 }
 
 /**
 **  Let units harvest wood/mine gold/haul oil
 **
-**  @param sx  X screen map position
-**  @param sy  Y screen map position
+**  @param pos  tile map position
 **
 **  @see Selected
 */
-static int SendResource(int sx, int sy)
+static int SendResource(const Vec2i &pos)
 {
 	int res;
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
-	const PixelPos mapPixelPos = {sx, sy};
-	const Vec2i pos = Map.MapPixelPosToTilePos(mapPixelPos);
 	const int flush = !(KeyModifiers & ModifierShift);
 
 	for (int i = 0; i < NumSelected; ++i) {
@@ -1219,22 +1196,17 @@ static int SendResource(int sx, int sy)
 /**
 **  Send selected units to unload passengers.
 **
-**  @param sx  X screen map position.
-**  @param sy  Y screen map position.
+**  @param tilePos  tile map position.
 */
-static int SendUnload(int sx, int sy)
+static int SendUnload(const Vec2i &tilePos)
 {
-	const PixelPos mapPixelPos = {sx, sy};
-	const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos);
 	const int flush = !(KeyModifiers & ModifierShift);
-	int ret = 0;
 
 	for (int i = 0; i < NumSelected; ++i) {
 		// FIXME: not only transporter selected?
 		SendCommandUnload(*Selected[i], tilePos, NoUnitP, flush);
-		ret = 1;
 	}
-	return ret;
+	return NumSelected != 0 ? 1 : 0;
 }
 
 /**
@@ -1244,15 +1216,12 @@ static int SendUnload(int sx, int sy)
 **  To unit:
 **    Spell cast on unit or on map spot.
 **
-**  @param sx  X screen map position.
-**  @param sy  Y screen map position.
+**  @param tilePos  tile map position.
 **
 **  @see Selected, @see NumSelected
 */
-static int SendSpellCast(int sx, int sy)
+static int SendSpellCast(const Vec2i &tilePos)
 {
-	const PixelPos mapPixelPos = {sx, sy};
-	const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos);
 	const int flush = !(KeyModifiers & ModifierShift);
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
@@ -1285,46 +1254,43 @@ static int SendSpellCast(int sx, int sy)
 /**
 **  Send a command to selected units.
 **
-**  @param sx  X screen map position
-**  @param sy  Y screen map position
+**  @param tilePos  tile map position.
 */
-static void SendCommand(int sx, int sy)
+static void SendCommand(const Vec2i &tilePos)
 {
-	int ret;
+	int ret = 0;
 
-	ret = 0;
 	CurrentButtonLevel = 0;
 	UI.ButtonPanel.Update();
 	switch (CursorAction) {
 		case ButtonMove:
-			ret = SendMove(sx, sy);
+			ret = SendMove(tilePos);
 			break;
 		case ButtonRepair:
-			ret = SendRepair(sx, sy);
+			ret = SendRepair(tilePos);
 			break;
 		case ButtonAttack:
-			ret = SendAttack(sx, sy);
+			ret = SendAttack(tilePos);
 			break;
 		case ButtonAttackGround:
-			ret = SendAttackGround(sx, sy);
+			ret = SendAttackGround(tilePos);
 			break;
 		case ButtonPatrol:
-			ret = SendPatrol(sx, sy);
+			ret = SendPatrol(tilePos);
 			break;
 		case ButtonHarvest:
-			ret = SendResource(sx, sy);
+			ret = SendResource(tilePos);
 			break;
 		case ButtonUnload:
-			ret = SendUnload(sx, sy);
+			ret = SendUnload(tilePos);
 			break;
 		case ButtonSpellCast:
-			ret = SendSpellCast(sx, sy);
+			ret = SendSpellCast(tilePos);
 			break;
 		default:
 			DebugPrint("Unsupported send action %d\n" _C_ CursorAction);
 			break;
 	}
-
 	if (ret) {
 		// Acknowledge the command with first selected unit.
 		for (int i = 0; i < NumSelected; ++i) {
@@ -1427,7 +1393,7 @@ static void UISelectStateButtonDown(unsigned)
 			if (!ClickMissile.empty()) {
 				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
 			}
-			SendCommand(mapPixelPos.x, mapPixelPos.y);
+			SendCommand(Map.MapPixelPosToTilePos(mapPixelPos));
 		}
 		return;
 	}
@@ -1441,9 +1407,7 @@ static void UISelectStateButtonDown(unsigned)
 		const Vec2i cursorTilePos = {mx, my};
 
 		if (MouseButtons & LeftButton) {
-			const int sx = cursorTilePos.x * PixelTileSize.x + PixelTileSize.x / 2;
-			const int sy = cursorTilePos.y * PixelTileSize.y + PixelTileSize.y / 2;
-			const PixelPos mapPixelPos = {sx, sy};
+			const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_Center(cursorTilePos);
 
 			UI.StatusLine.Clear();
 			ClearCosts();
@@ -1455,7 +1419,7 @@ static void UISelectStateButtonDown(unsigned)
 			if (!ClickMissile.empty()) {
 				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
 			}
-			SendCommand(mapPixelPos.x, mapPixelPos.y);
+			SendCommand(cursorTilePos);
 		} else {
 			UI.SelectedViewport->Center(cursorTilePos, PixelTileSize / 2);
 		}
@@ -1648,7 +1612,7 @@ void UIHandleButtonDown(unsigned button)
 					}
 				}
 				const PixelPos mapPixelPos = UI.MouseViewport->ScreenToMapPixelPos(cursorPixelPos);
-				DoRightButton(mapPixelPos.x, mapPixelPos.y);
+				DoRightButton(mapPixelPos);
 			}
 		} else if (MouseButtons & LeftButton) { // enter select mode
 			CursorStartX = CursorX;
@@ -1678,7 +1642,7 @@ void UIHandleButtonDown(unsigned button)
 				if (!ClickMissile.empty()) {
 					MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
 				}
-				DoRightButton(mapPixelPos.x, mapPixelPos.y);
+				DoRightButton(mapPixelPos);
 			}
 		}
 		//

@@ -128,6 +128,9 @@ public:
 	CUIButton() : X(0), Y(0), Style(NULL), Callback(NULL) {}
 	~CUIButton() {}
 
+	bool IsOnButton(int x, int y) const;
+
+public:
 	int X;                          /// x coordinate on the screen
 	int Y;                          /// y coordinate on the screen
 	std::string Text;               /// button text
