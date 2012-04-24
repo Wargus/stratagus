@@ -532,17 +532,17 @@ int SelectGroup(int group_number, GroupSelectionMode mode)
 			ChangeSelectedUnits(GetUnitsOfGroup(group_number), nunits);
 			return NumSelected;
 		} else {
-			int ntable = 0;
-			CUnit *table[UnitMax];
+			std::vector<CUnit *> table;
 			CUnit **group = GetUnitsOfGroup(group_number);
+
 			for (int i = 0; i < nunits; ++i) {
 				const CUnitType *type = group[i]->Type;
 				if (type && type->CanSelect(mode)) {
-					table[ntable++] = group[i];
+					table.push_back(group[i]);
 				}
 			}
-			if (ntable) {
-				ChangeSelectedUnits(table, ntable);
+			if (table.empty() == false) {
+				ChangeSelectedUnits(&table[0], static_cast<int>(table.size()));
 				return NumSelected;
 			}
 		}
