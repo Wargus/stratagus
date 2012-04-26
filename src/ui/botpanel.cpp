@@ -525,9 +525,9 @@ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup *, const unsigne
 	Assert(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.GetNumberVariable()));
 
 	CLabel label(font, "white", "red");
-	TriggerData.Type = UnitTypes[button->Value];
 
 	if (this->Text) {
+		TriggerData.Type = UnitTypes[button->Value];
 		text = EvalString(this->Text);
 		TriggerData.Type = NULL;
 		if (this->Centered) {
@@ -539,8 +539,8 @@ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup *, const unsigne
 
 	if (this->Index != -1) {
 		CUnitType &type = *UnitTypes[button->Value];
-		int value = type.DefaultStat.Variables[this->Index].Value;
-		int diff = type.Stats->Variables[this->Index].Value - value; // FIXME : player index for stats
+		int value = type.Stats[ThisPlayer->Index].Variables[this->Index].Value;
+		int diff = type.Stats[ThisPlayer->Index].Variables[this->Index].Value - value;
 
 		if (!diff) {
 			label.Draw(x, y, value);
@@ -584,7 +584,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	if (condition->Variables && type) {
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
-				if ((condition->Variables[i] == CONDITION_ONLY) ^ type->Stats->Variables[i].Enable) {
+				if ((condition->Variables[i] == CONDITION_ONLY) ^ type->DefaultStat.Variables[i].Enable) {
 					return false;
 				}
 			}
@@ -778,7 +778,8 @@ void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 		case ButtonBuild:
 		case ButtonTrain:
 		case ButtonUpgradeTo:
-			memcpy(Costs, AllUpgrades[button->Value]->Costs, sizeof(AllUpgrades[button->Value]->Costs));
+			memcpy(Costs, UnitTypes[button->Value]->Stats[ThisPlayer->Index].Costs, 
+				sizeof(UnitTypes[button->Value]->Stats[ThisPlayer->Index].Costs));
 			break;
 		default:
 			break;

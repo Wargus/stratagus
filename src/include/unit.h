@@ -806,7 +806,7 @@ class CPreference
 public:
 	CPreference() : ShowSightRange(false), ShowReactionRange(false),
 		ShowAttackRange(false), ShowMessages(true),
-		BigScreen(false), ShowOrders(0) {};
+		BigScreen(false), ShowOrders(0), ShowNameDelay(0), ShowNameTime(0) {};
 
 	bool ShowSightRange;     /// Show sight range.
 	bool ShowReactionRange;  /// Show reaction range.
@@ -815,6 +815,8 @@ public:
 	bool BigScreen;			 /// If true, shows the big screen(without panels)
 
 	int  ShowOrders;         /// How many second show orders of unit on map.
+	int  ShowNameDelay;      /// How many cycles need to wait until unit's name popup will appear.
+	int  ShowNameTime;       /// How many cycles need to show unit's name popup.
 };
 
 extern CPreference Preference;
@@ -829,6 +831,8 @@ extern int NumUnits;                 /// Number of units used
 // in unit_draw.c
 /// @todo could be moved into the user interface ?
 extern unsigned long ShowOrdersCount;   /// Show orders for some time
+extern unsigned long ShowNameDelay;     /// Delay to show unit's name
+extern unsigned long ShowNameTime;      /// Show unit's name for some time
 extern bool EnableTrainingQueue;               /// Config: training queues enabled
 extern bool EnableBuildingCapture;             /// Config: building capture enabled
 extern bool RevealAttacker;				       /// Config: reveal attacker enabled

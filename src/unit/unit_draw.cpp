@@ -97,7 +97,8 @@ static DecoSpriteType DecoSprite; /// All sprite's infos.
 
 unsigned long ShowOrdersCount;    /// Show orders for some time
 
-
+unsigned long ShowNameDelay;                 /// Delay to show unit's name
+unsigned long ShowNameTime;                  /// Show unit's name for some time
 
 // FIXME: not all variables of this file are here
 // FIXME: perhaps split this file into two or three parts?

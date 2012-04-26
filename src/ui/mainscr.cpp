@@ -285,7 +285,7 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e)
 {
 	UStrInt val;
-	CVariable *var = &type.Stats->Variables[index]; // FIXME : player index for stats
+	CVariable *var = &type.Stats[ThisPlayer->Index].Variables[index];
 
 	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
 
@@ -307,7 +307,7 @@ UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e)
 			val.i = var->Max - var->Value;
 			break;
 		case VariablePercent:
-			Assert(type.Stats->Variables[index].Max != 0); // FIXME: player index for stats
+			Assert(type.Stats[ThisPlayer->Index].Variables[index].Max != 0);
 			val.type = USTRINT_INT;
 			val.i = 100 * var->Value / var->Max;
 			break;

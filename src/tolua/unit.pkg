@@ -26,6 +26,8 @@ class CPreference
 	bool BigScreen;
 
 	unsigned int ShowOrders;
+	unsigned int  ShowNameDelay;
+	unsigned int  ShowNameTime;
 };
 
 CPreference Preference;

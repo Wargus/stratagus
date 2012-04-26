@@ -331,6 +331,50 @@ void CViewport::DrawMapBackgroundInViewport() const
 }
 
 /**
+**  Show unit's name under cursor or print the message if territory is invisible.
+**
+**  @param pos  Mouse position.
+**  @param unit  Unit to show name.
+**  @param hidden  If true, write "Unrevealed terrain"
+**
+*/
+static void ShowUnitName(const CViewport *vp, PixelPos pos, CUnit *unit, bool hidden = false)
+{
+	CFont *font = GetSmallFont();
+	int width;
+	int height = font->Height() + 6;
+	CLabel label(font, "white", "red");
+	int x;
+	int y = std::min<int>(pos.y + 10, vp->BottomRightPos.y - 1 - height);
+	const CPlayer *tplayer = ThisPlayer;
+
+	if (unit) {
+		int backgroundColor;
+		if (unit->Player->Index == (*tplayer).Index) {
+			backgroundColor = Video.MapRGB(TheScreen->format, 0, 0, 252);
+		} else if (unit->Player->IsAllied(*tplayer)) {
+			backgroundColor = Video.MapRGB(TheScreen->format, 0, 176, 0);
+		} else if (unit->Player->IsEnemy(*tplayer)) {
+			backgroundColor = Video.MapRGB(TheScreen->format, 252, 0, 0);
+		} else {
+			backgroundColor = Video.MapRGB(TheScreen->format, 176, 176, 176);
+		}
+		width = font->getWidth(unit->Type->Name) + 10;
+		x = std::min<int>(pos.x, vp->BottomRightPos.x - 1 - width);
+		Video.FillTransRectangle(backgroundColor, x, y, width, height, 128);
+		Video.DrawRectangle(ColorWhite, x, y, width, height);
+		label.DrawCentered(x + width / 2, y + 3, unit->Type->Name);
+	} else if (hidden) {
+		const std::string str("Unrevealed terrain");
+		width = font->getWidth(str) + 10;
+		x = std::min<int>(pos.x, vp->BottomRightPos.x - 1 - width);
+		Video.FillTransRectangle(ColorBlue, x, y, width, height, 128);
+		Video.DrawRectangle(ColorWhite, x, y, width, height);
+		label.DrawCentered(x + width / 2, y + 3, str);
+	}
+}
+
+/**
 **  Draw a map viewport.
 */
 void CViewport::Draw() const
@@ -377,7 +421,6 @@ void CViewport::Draw() const
 	// Draw orders of selected units.
 	// Drawn here so that they are shown even when the unit is out of the screen.
 	//
-	//FIXME: This is still unsecure during parallel
 	if (!Preference.ShowOrders) {
 	} else if (Preference.ShowOrders < 0
 			   || (ShowOrdersCount >= GameCycle) || (KeyModifiers & ModifierShift)) {
@@ -385,6 +428,22 @@ void CViewport::Draw() const
 			ShowOrder(*Selected[i]);
 		}
 	}
+
+	//
+	// Draw unit's name popup
+	//
+	if (CursorOn == CursorOnMap && Preference.ShowNameDelay && (ShowNameDelay < GameCycle) && (GameCycle < ShowNameTime)) {
+		const PixelPos mousePos = {CursorX, CursorY};
+		const Vec2i tilePos = this->ScreenToTilePos(mousePos);
+		if (UI.MouseViewport->IsInsideMapArea(mousePos) 
+			&& Map.IsFieldVisible(*ThisPlayer, tilePos) || ReplayRevealMap) {
+			ShowUnitName(this, mousePos, UnitUnderCursor);
+		} else if (!Map.IsFieldVisible(*ThisPlayer, tilePos)) {
+			ShowUnitName(this, mousePos, NULL, true);
+		}
+
+	} 
+
 	DrawBorder();
 	PopClipping();
 }

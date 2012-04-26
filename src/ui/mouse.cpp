@@ -889,14 +889,19 @@ void UIHandleMouseMove(int x, int y)
 		const PixelPos screenPos = {x, y};
 		const Vec2i tilePos = vp.ScreenToTilePos(screenPos);
 
-		if (Map.IsFieldExplored(*ThisPlayer, tilePos) || ReplayRevealMap) {
+		if (Preference.ShowNameDelay) {
+			ShowNameDelay = GameCycle + Preference.ShowNameDelay;
+			ShowNameTime = GameCycle + Preference.ShowNameDelay + Preference.ShowNameTime;
+		}
+
+		if (Map.IsFieldVisible(*ThisPlayer, tilePos) || ReplayRevealMap) {
 			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(screenPos);
 			UnitUnderCursor = UnitOnScreen(NULL, mapPixelPos.x, mapPixelPos.y);
 		}
 	} else if (CursorOn == CursorOnMinimap) {
 		const Vec2i tilePos = {UI.Minimap.Screen2MapX(x), UI.Minimap.Screen2MapY(y)};
 
-		if (Map.IsFieldExplored(*ThisPlayer, tilePos) || ReplayRevealMap) {
+		if (Map.IsFieldVisible(*ThisPlayer, tilePos) || ReplayRevealMap) {
 			UnitUnderCursor = UnitOnMapTile(tilePos, -1);
 		}
 	}
@@ -904,7 +909,7 @@ void UIHandleMouseMove(int x, int y)
 	// NOTE: If unit is not selectable as a goal, you can't get a cursor hint
 	if (UnitUnderCursor != NULL && !UnitUnderCursor->IsVisibleAsGoal(*ThisPlayer) &&
 		!ReplayRevealMap) {
-		UnitUnderCursor = NoUnitP;
+			UnitUnderCursor = NoUnitP;
 	}
 
 	//

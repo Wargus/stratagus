@@ -1200,6 +1200,8 @@ int HandleMouseScrollArea(int x, int y)
 **
 **  @param x  screen pixel X position.
 **  @param y  screen pixel Y position.
+**
+**  @return   true if the mouse has moved, false otherwise
 */
 void HandleCursorMove(int *x, int *y)
 {
