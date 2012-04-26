@@ -99,6 +99,389 @@ void CancelBuildingMode()
 	UI.ButtonPanel.Update();
 }
 
+static void DoRightButton_ForForeignUnit(CUnit *dest)
+{
+	CUnit &unit = *Selected[0];
+
+	if (unit.Player->Index != PlayerNumNeutral || dest == NULL
+		|| !(dest->Player == ThisPlayer || dest->IsTeamed(*ThisPlayer))) {
+		return;
+	}
+	// tell to go and harvest from a unit
+	const int res = unit.Type->GivesResource;
+
+	if (res
+		&& dest->Type->Harvester
+		&& dest->Type->ResInfo[res]
+		&& dest->ResourcesHeld < dest->Type->ResInfo[res]->ResourceCapacity
+		&& unit.Type->CanHarvest) {
+		unit.Blink = 4;
+		//  Right mouse with SHIFT appends command to old commands.
+		const int flush = !(KeyModifiers & ModifierShift);
+		SendCommandResource(*dest, unit, flush);
+	}
+}
+
+static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &acknowledged)
+{
+	//  Enter transporters ?
+	if (dest == NULL) {
+		return false;
+	}
+	// dest is the transporter
+	if (dest->Type->CanTransport()) {
+		// Let the transporter move to the unit. And QUEUE!!!
+		if (dest->CanMove() && CanTransport(*dest, unit)) {
+			DebugPrint("Send command follow\n");
+			// is flush value correct ?
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceAcknowledging);
+				acknowledged = 1;
+			}
+			SendCommandFollow(*dest, unit, 0);
+		}
+		// FIXME : manage correctly production units.
+		if (!unit.CanMove() || CanTransport(*dest, unit)) {
+			dest->Blink = 4;
+			DebugPrint("Board transporter\n");
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceAcknowledging);
+				acknowledged = 1;
+			}
+			SendCommandBoard(unit, *dest, flush);
+			return true;
+		}
+	}
+	//  unit is the transporter
+	//  FIXME : Make it more configurable ? NumSelect == 1, lua option
+	if (CanTransport(unit, *dest)) {
+		// Let the transporter move to the unit. And QUEUE!!!
+		if (unit.CanMove()) {
+			DebugPrint("Send command follow\n");
+			// is flush value correct ?
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceAcknowledging);
+				acknowledged = 1;
+			}
+			SendCommandFollow(unit, *dest, 0);
+		} else if (!dest->CanMove()) {
+			DebugPrint("Want to transport but no unit can move\n");
+			return true;
+		}
+		dest->Blink = 4;
+		DebugPrint("Board transporter\n");
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		SendCommandBoard(*dest, unit, flush);
+		return true;
+	}
+	return false;
+}
+
+static bool DoRightButton_Harvest(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
+{
+	const CUnitType &type = *unit.Type;
+
+	// Go and repair
+	if (type.RepairRange && dest != NULL
+		&& dest->Type->RepairHP
+		&& dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max
+		&& (dest->Player == unit.Player || unit.IsAllied(*dest))) {
+		dest->Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		SendCommandRepair(unit, pos, dest, flush);
+		return true;
+	}
+	// Harvest
+	if (type.Harvester) {
+		if (dest != NULL) {
+			// Return a loaded harvester to deposit
+			if (unit.ResourcesHeld > 0
+				&& dest->Type->CanStore[unit.CurrentResource]
+				&& dest->Player == unit.Player) {
+				dest->Blink = 4;
+				if (!acknowledged) {
+					PlayUnitSound(unit, VoiceAcknowledging);
+					acknowledged = 1;
+				}
+				SendCommandReturnGoods(unit, dest, flush);
+				return true;
+			}
+			// Go and harvest from a unit
+			const int res = dest->Type->GivesResource;
+			if (res
+				&& type.ResInfo[res]
+				&& unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity
+				&& dest->Type->CanHarvest
+				&& (dest->Player == unit.Player || dest->Player->Index == PlayerNumNeutral)) {
+				dest->Blink = 4;
+				if (!acknowledged) {
+					PlayUnitSound(unit, VoiceAcknowledging);
+					acknowledged = 1;
+				}
+				SendCommandResource(unit, *dest, flush);
+				return true;
+			}
+		} else {
+			// FIXME: support harvesting more types of terrain.
+			for (int res = 0; res < MaxCosts; ++res) {
+				if (type.ResInfo[res]
+					&& type.ResInfo[res]->TerrainHarvester
+					&& Map.IsFieldExplored(*unit.Player, pos)
+					&& Map.ForestOnMap(pos)
+					&& ((unit.CurrentResource != res)
+						|| (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity))) {
+					if (!acknowledged) {
+						PlayUnitSound(unit, VoiceAcknowledging);
+						acknowledged = 1;
+					}
+					SendCommandResourceLoc(unit, pos, flush);
+					return true;
+				}
+			}
+		}
+	}
+	// Follow another unit
+	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit
+		&& (dest->Player == unit.Player || unit.IsAllied(*dest))) {
+		dest->Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		SendCommandFollow(unit, *dest, flush);
+		return true;
+	}
+	// Move
+	if (!acknowledged) {
+		PlayUnitSound(unit, VoiceAcknowledging);
+		acknowledged = 1;
+	}
+	SendCommandMove(unit, pos, flush);
+	return true;
+}
+
+static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
+{
+	const CUnitType &type = *unit.Type;
+	const int action = type.MouseAction;
+
+	if (dest != NULL && unit.CurrentAction() != UnitActionBuilt) {
+		if (unit.IsEnemy(*dest)) {
+			dest->Blink = 4;
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceAttack);
+				acknowledged = 1;
+			}
+			if (action == MouseActionSpellCast) {
+				// This is for demolition squads and such
+				Assert(unit.Type->CanCastSpell);
+				size_t spellnum;
+				for (spellnum = 0; !type.CanCastSpell[spellnum] && spellnum < SpellTypeTable.size() ; spellnum++) {
+				}
+				SendCommandSpellCast(unit, pos, dest, spellnum, flush);
+			} else {
+				if (CanTarget(&type, dest->Type)) {
+					SendCommandAttack(unit, pos, dest, flush);
+				} else { // No valid target
+					SendCommandAttack(unit, pos, NoUnitP, flush);
+				}
+			}
+			return;
+		}
+		if ((dest->Player == unit.Player || unit.IsAllied(*dest)) && dest != &unit) {
+			dest->Blink = 4;
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceAcknowledging);
+				acknowledged = 1;
+			}
+			SendCommandFollow(unit, *dest, flush);
+			return;
+		}
+	}
+	if (Map.WallOnMap(pos)) {
+		if (unit.Player->Race == PlayerRaceHuman && Map.OrcWallOnMap(pos)) {
+			SendCommandAttack(unit, pos, NoUnitP, flush);
+			return;
+		}
+		if (unit.Player->Race == PlayerRaceOrc && Map.HumanWallOnMap(pos)) {
+			SendCommandAttack(unit, pos, NoUnitP, flush);
+			return;
+		}
+	}
+	// empty space
+	if ((KeyModifiers & ModifierControl)) {
+		if (RightButtonAttacks) {
+			SendCommandMove(unit, pos, flush);
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceAcknowledging);
+				acknowledged = 1;
+			}
+		} else {
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceAttack);
+				acknowledged = 1;
+			}
+			SendCommandAttack(unit, pos, NoUnitP, flush);
+		}
+	} else {
+		if (RightButtonAttacks) {
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceAttack);
+				acknowledged = 1;
+			}
+			SendCommandAttack(unit, pos, NoUnitP, flush);
+		} else {
+			// Note: move is correct here, right default is move
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceAcknowledging);
+				acknowledged = 1;
+			}
+			SendCommandMove(unit, pos, flush);
+		}
+	}
+	// FIXME: ALT-RIGHT-CLICK, move but fight back if attacked.
+}
+
+static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &acknowledged)
+{
+	if (dest.Player == unit.Player || unit.IsAllied(dest)) {
+		dest.Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		SendCommandFollow(unit, dest, flush);
+		return true;
+	}
+	return false;
+}
+
+static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, int &acknowledged)
+{
+	const CUnitType &type = *unit.Type;
+
+	// tell to return a loaded harvester to deposit
+	if (dest.ResourcesHeld > 0
+		&& type.CanStore[dest.CurrentResource]
+		&& dest.Player == unit.Player) {
+		dest.Blink = 4;
+		SendCommandReturnGoods(dest, &unit, flush);
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		return true;
+	}
+	// tell to go and harvest from a building
+	const int res = type.GivesResource;
+	if (res
+		&& dest.Type->ResInfo[res]
+		&& dest.ResourcesHeld < dest.Type->ResInfo[res]->ResourceCapacity
+		&& type.CanHarvest
+		&& dest.Player == unit.Player) {
+		unit.Blink = 4;
+		SendCommandResource(dest, unit, flush);
+		return true;
+	}
+	return false;
+}
+
+static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
+{
+	// Go and harvest from a unit
+	if (dest != NULL && dest->Type->GivesResource && dest->Type->CanHarvest
+		&& (dest->Player == unit.Player || dest->Player->Index == PlayerNumNeutral)) {
+		dest->Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		SendCommandResource(unit, *dest, flush);
+		return true;
+	}
+	// FIXME: support harvesting more types of terrain.
+	if (Map.IsFieldExplored(*unit.Player, pos) && Map.ForestOnMap(pos)) {
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		SendCommandResourceLoc(unit, pos, flush);
+		return true;
+	}
+	return false;
+}
+
+static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i &pos, int &acknowledged)
+{
+	// don't self targetting.
+	if (dest == &unit) {
+		return;
+	}
+	const CUnitType &type = *unit.Type;
+	const int action = type.MouseAction;
+	//  Right mouse with SHIFT appends command to old commands.
+	const int flush = !(KeyModifiers & ModifierShift);
+
+	//  Control + right click on unit is follow anything.
+	if ((KeyModifiers & ModifierControl) && dest) {
+		dest->Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		SendCommandFollow(unit, *dest, flush);
+		return;
+	}
+
+	if (DoRightButton_Transporter(unit, dest, flush, acknowledged)) {
+		return;
+	}
+
+	//  Handle resource workers.
+	if (action == MouseActionHarvest) {
+		DoRightButton_Harvest(unit, dest, pos, flush, acknowledged);
+		return;
+	}
+
+	//  Fighters
+	if (action == MouseActionSpellCast || action == MouseActionAttack) {
+		DoRightButton_Attack(unit, dest, pos, flush, acknowledged);
+		return;
+	}
+
+	// FIXME: attack/follow/board ...
+	if (dest != NULL && (action == MouseActionMove || action == MouseActionSail)) {
+		if (DoRightButton_Follow(unit, *dest, flush, acknowledged)) {
+			return;
+		}
+	}
+
+	// Manage harvester from the destination side.
+	if (dest != NULL && dest->Type->Harvester) {
+		if (DoRightButton_Harvest_Reverse(unit, *dest, flush, acknowledged)) {
+			return;
+		}
+	}
+
+	// Manage new order.
+	if (!unit.CanMove()) {
+		if (DoRightButton_NewOrder(unit, dest, pos, flush, acknowledged)) {
+			return;
+		}
+	}
+	if (!acknowledged) {
+		PlayUnitSound(unit, VoiceAcknowledging);
+		acknowledged = 1;
+	}
+	SendCommandMove(unit, pos, flush);
+}
+
 /**
 **  Called when right button is pressed
 **
@@ -111,11 +494,6 @@ void DoRightButton(const PixelPos &mapPixelPos)
 		return;
 	}
 	const Vec2i pos = Map.MapPixelPosToTilePos(mapPixelPos);
-
-	//
-	//  Right mouse with SHIFT appends command to old commands.
-	//
-	int flush = !(KeyModifiers & ModifierShift);
 	CUnit *dest;            // unit under the cursor if any.
 
 	if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->Decoration) {
@@ -124,28 +502,11 @@ void DoRightButton(const PixelPos &mapPixelPos)
 		dest = NULL;
 	}
 
-	//
 	//  Unit selected isn't owned by the player.
 	//  You can't select your own units + foreign unit(s)
 	//  except if it is neutral and it is a resource.
-	//
 	if (!CanSelectMultipleUnits(*Selected[0]->Player)) {
-		CUnit &unit = *Selected[0];
-		if (unit.Player->Index != PlayerNumNeutral || dest == NULL
-			|| !(dest->Player == ThisPlayer || dest->IsTeamed(*ThisPlayer))) {
-			return ;
-		}
-		// tell to go and harvest from a unit
-		const int res = unit.Type->GivesResource;
-		if (dest->Type->Harvester
-			&& res
-			&& dest->Type->ResInfo[res]
-			&& dest->ResourcesHeld < dest->Type->ResInfo[res]->ResourceCapacity
-			&& unit.Type->CanHarvest) {
-			unit.Blink = 4;
-			SendCommandResource(*dest, unit, flush);
-			return;
-		}
+		DoRightButton_ForForeignUnit(dest);
 		return;
 	}
 
@@ -167,323 +528,10 @@ void DoRightButton(const PixelPos &mapPixelPos)
 
 	int acknowledged = 0; // to play sound
 	for (int i = 0; i < NumSelected; ++i) {
+		Assert(Selected[i]);
 		CUnit &unit = *Selected[i];
-		// don't self targetting.
-		if (dest == &unit) {
-			continue;
-		}
-		Assert(&unit);
-		const CUnitType &type = *unit.Type;
-		const int action = type.MouseAction;
 
-		//
-		//  Control + right click on unit is follow anything.
-		//
-		if ((KeyModifiers & ModifierControl) && dest) {
-			dest->Blink = 4;
-			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAcknowledging);
-				acknowledged = 1;
-			}
-			SendCommandFollow(unit, *dest, flush);
-			continue;
-		}
-
-		//
-		//  Enter transporters ?
-		//
-		if (dest != NULL) {
-			// dest is the transporter
-			if (dest->Type->CanTransport()) {
-				// Let the transporter move to the unit. And QUEUE!!!
-				if (dest->CanMove() && CanTransport(*dest, unit)) {
-					DebugPrint("Send command follow\n");
-					// is flush value correct ?
-					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAcknowledging);
-						acknowledged = 1;
-					}
-					SendCommandFollow(*dest, unit, 0);
-				}
-				// FIXME : manage correctly production units.
-				if (!unit.CanMove() || CanTransport(*dest, unit)) {
-					dest->Blink = 4;
-					DebugPrint("Board transporter\n");
-					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAcknowledging);
-						acknowledged = 1;
-					}
-					SendCommandBoard(unit, *dest, flush);
-					continue;
-				}
-			}
-			//  unit is the transporter
-			//  FIXME : Make it more configurable ? NumSelect == 1, lua option
-			if (CanTransport(unit, *dest)) {
-				// Let the transporter move to the unit. And QUEUE!!!
-				if (unit.CanMove()) {
-					DebugPrint("Send command follow\n");
-					// is flush value correct ?
-					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAcknowledging);
-						acknowledged = 1;
-					}
-					SendCommandFollow(unit, *dest, 0);
-				} else if (!dest->CanMove()) {
-					DebugPrint("Want to transport but no unit can move\n");
-					continue;
-				}
-				dest->Blink = 4;
-				DebugPrint("Board transporter\n");
-				if (!acknowledged) {
-					PlayUnitSound(unit, VoiceAcknowledging);
-					acknowledged = 1;
-				}
-				SendCommandBoard(*dest, unit, flush);
-				continue;
-			}
-		}
-
-		//
-		//  Handle resource workers.
-		//
-		if (action == MouseActionHarvest) {
-			// Go and repair
-			if (type.RepairRange && dest != NULL
-				&& dest->Type->RepairHP
-				&& dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max
-				&& (dest->Player == unit.Player || unit.IsAllied(*dest))) {
-				dest->Blink = 4;
-				if (!acknowledged) {
-					PlayUnitSound(unit, VoiceAcknowledging);
-					acknowledged = 1;
-				}
-				SendCommandRepair(unit, pos, dest, flush);
-				continue;
-			}
-			// Harvest
-			if (type.Harvester) {
-				if (dest != NULL) {
-					// Return a loaded harvester to deposit
-					if (unit.ResourcesHeld > 0
-						&& dest->Type->CanStore[unit.CurrentResource]
-						&& dest->Player == unit.Player) {
-						dest->Blink = 4;
-						if (!acknowledged) {
-							PlayUnitSound(unit, VoiceAcknowledging);
-							acknowledged = 1;
-						}
-						SendCommandReturnGoods(unit, dest, flush);
-						continue;
-					}
-					// Go and harvest from a unit
-					const int res = dest->Type->GivesResource;
-					if (res
-						&& type.ResInfo[res]
-						&& unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity
-						&& dest->Type->CanHarvest
-						&& (dest->Player == unit.Player || dest->Player->Index == PlayerNumNeutral)) {
-						dest->Blink = 4;
-						if (!acknowledged) {
-							PlayUnitSound(unit, VoiceAcknowledging);
-							acknowledged = 1;
-						}
-						SendCommandResource(unit, *dest, flush);
-						continue;
-					}
-				} else {
-					// FIXME: support harvesting more types of terrain.
-					int res;
-					for (res = 0; res < MaxCosts; ++res) {
-						if (type.ResInfo[res]
-							&& type.ResInfo[res]->TerrainHarvester
-							&& Map.IsFieldExplored(*unit.Player, pos)
-							&& Map.ForestOnMap(pos)
-							&& ((unit.CurrentResource != res)
-								|| (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity))) {
-							if (!acknowledged) {
-								PlayUnitSound(unit, VoiceAcknowledging);
-								acknowledged = 1;
-							}
-							SendCommandResourceLoc(unit, pos, flush);
-							break;
-						}
-					}
-					if (res != MaxCosts) {
-						continue;
-					}
-				}
-			}
-			// Follow another unit
-			if (UnitUnderCursor != NULL && dest != NULL && dest != &unit
-				&& (dest->Player == unit.Player || unit.IsAllied(*dest))) {
-				dest->Blink = 4;
-				if (!acknowledged) {
-					PlayUnitSound(unit, VoiceAcknowledging);
-					acknowledged = 1;
-				}
-				SendCommandFollow(unit, *dest, flush);
-				continue;
-			}
-			// Move
-			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAcknowledging);
-				acknowledged = 1;
-			}
-			SendCommandMove(unit, pos, flush);
-			continue;
-		}
-
-		//
-		//  Fighters
-		//
-		if (action == MouseActionSpellCast || action == MouseActionAttack) {
-			if (dest != NULL && unit.CurrentAction() != UnitActionBuilt) {
-				if (unit.IsEnemy(*dest)) {
-					dest->Blink = 4;
-					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAttack);
-						acknowledged = 1;
-					}
-					if (action == MouseActionSpellCast) {
-						// This is for demolition squads and such
-						Assert(unit.Type->CanCastSpell);
-						size_t spellnum;
-						for (spellnum = 0; !type.CanCastSpell[spellnum] && spellnum < SpellTypeTable.size() ; spellnum++) {
-						}
-						SendCommandSpellCast(unit, pos, dest, spellnum, flush);
-					} else {
-						if (CanTarget(&type, dest->Type)) {
-							SendCommandAttack(unit, pos, dest, flush);
-						} else { // No valid target
-							SendCommandAttack(unit, pos, NoUnitP, flush);
-						}
-					}
-					continue;
-				}
-				if ((dest->Player == unit.Player || unit.IsAllied(*dest)) && dest != &unit) {
-					dest->Blink = 4;
-					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAcknowledging);
-						acknowledged = 1;
-					}
-					SendCommandFollow(unit, *dest, flush);
-					continue;
-				}
-			}
-			if (Map.WallOnMap(pos)) {
-				if (unit.Player->Race == PlayerRaceHuman && Map.OrcWallOnMap(pos)) {
-					SendCommandAttack(unit, pos, NoUnitP, flush);
-					continue;
-				}
-				if (unit.Player->Race == PlayerRaceOrc && Map.HumanWallOnMap(pos)) {
-					SendCommandAttack(unit, pos, NoUnitP, flush);
-					continue;
-				}
-			}
-			// empty space
-			if ((KeyModifiers & ModifierControl)) {
-				if (RightButtonAttacks) {
-					SendCommandMove(unit, pos, flush);
-					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAcknowledging);
-						acknowledged = 1;
-					}
-				} else {
-					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAttack);
-						acknowledged = 1;
-					}
-					SendCommandAttack(unit, pos, NoUnitP, flush);
-				}
-			} else {
-				if (RightButtonAttacks) {
-					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAttack);
-						acknowledged = 1;
-					}
-					SendCommandAttack(unit, pos, NoUnitP, flush);
-				} else {
-					// Note: move is correct here, right default is move
-					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAcknowledging);
-						acknowledged = 1;
-					}
-					SendCommandMove(unit, pos, flush);
-				}
-			}
-			// FIXME: ALT-RIGHT-CLICK, move but fight back if attacked.
-			continue;
-		}
-
-		// FIXME: attack/follow/board ...
-		if ((action == MouseActionMove || action == MouseActionSail)
-			&& (dest && dest != &unit)
-			&& (dest->Player == unit.Player || unit.IsAllied(*dest))) {
-			dest->Blink = 4;
-			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAcknowledging);
-				acknowledged = 1;
-			}
-			SendCommandFollow(unit, *dest, flush);
-			continue;
-		}
-
-		// Manage harvester from the destination side.
-		if (dest != NULL && dest->Type->Harvester) {
-			// tell to return a loaded harvester to deposit
-			if (dest->ResourcesHeld > 0
-				&& type.CanStore[dest->CurrentResource]
-				&& dest->Player == unit.Player) {
-				dest->Blink = 4;
-				SendCommandReturnGoods(*dest, &unit, flush);
-				if (!acknowledged) {
-					PlayUnitSound(unit, VoiceAcknowledging);
-					acknowledged = 1;
-				}
-				continue;
-			}
-			// tell to go and harvest from a building
-			const int res = type.GivesResource;
-			if (res
-				&& dest->Type->ResInfo[res]
-				&& dest->ResourcesHeld < dest->Type->ResInfo[res]->ResourceCapacity
-				&& type.CanHarvest
-				&& dest->Player == unit.Player) {
-				unit.Blink = 4;
-				SendCommandResource(*dest, unit, flush);
-				continue;
-			}
-		}
-
-		// Manage new order.
-		if (!unit.CanMove()) {
-			// Go and harvest from a unit
-			if (dest != NULL && dest->Type->GivesResource && dest->Type->CanHarvest
-				&& (dest->Player == unit.Player || dest->Player->Index == PlayerNumNeutral)) {
-				dest->Blink = 4;
-				if (!acknowledged) {
-					PlayUnitSound(unit, VoiceAcknowledging);
-					acknowledged = 1;
-				}
-				SendCommandResource(unit, *dest, flush);
-				continue;
-			}
-			// FIXME: support harvesting more types of terrain.
-			if (Map.IsFieldExplored(*unit.Player, pos) && Map.ForestOnMap(pos)) {
-				if (!acknowledged) {
-					PlayUnitSound(unit, VoiceAcknowledging);
-					acknowledged = 1;
-				}
-				SendCommandResourceLoc(unit, pos, flush);
-				break;
-			}
-		}
-		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
-			acknowledged = 1;
-		}
-		SendCommandMove(unit, pos, flush);
+		DoRightButton_ForSelectedUnit(unit, dest, pos, acknowledged);
 	}
 	ShowOrdersCount = GameCycle + Preference.ShowOrders * CYCLES_PER_SECOND;
 }
