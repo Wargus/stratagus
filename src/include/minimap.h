@@ -67,6 +67,8 @@ public:
 	int Screen2MapX(int x) const;
 	int Screen2MapY(int y) const;
 
+	bool Contains(const PixelPos &screenPos) const;
+public:
 	int X;
 	int Y;
 	int W;

@@ -128,7 +128,7 @@ public:
 	CUIButton() : X(0), Y(0), Style(NULL), Callback(NULL) {}
 	~CUIButton() {}
 
-	bool IsOnButton(int x, int y) const;
+	bool Contains(const PixelPos &screenPos) const;
 
 public:
 	int X;                          /// x coordinate on the screen
@@ -245,6 +245,9 @@ public:
 		ScrollPaddingLeft(0), ScrollPaddingRight(0),
 		ScrollPaddingTop(0), ScrollPaddingBottom(0) {}
 
+	bool Contains(const PixelPos &screenPos) const;
+
+public:
 	int X;                          /// Screen pixel left corner x coordinate
 	int Y;                          /// Screen pixel upper corner y coordinate
 	int EndX;                       /// Screen pixel right x coordinate

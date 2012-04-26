@@ -753,4 +753,10 @@ void CMinimap::AddEvent(const Vec2i &pos, Uint32 color)
 	++NumMinimapEvents;
 }
 
+bool CMinimap::Contains(const PixelPos &screenPos) const
+{
+	return this->X <= screenPos.x && screenPos.x < this->X + this->W
+		   && this->Y <= screenPos.y && screenPos.y < this->Y + this->H;
+}
+
 //@}

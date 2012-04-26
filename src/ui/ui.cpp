@@ -215,6 +215,13 @@ void CUserInterface::Load()
 	ArrowSE.Load();
 }
 
+
+bool CMapArea::Contains(const PixelPos &screenPos) const
+{
+	return this->X <= screenPos.x && screenPos.x <= this->EndX
+		   && this->Y <= screenPos.y && screenPos.y <= this->EndY;
+}
+
 /**
 **  Save the viewports.
 **

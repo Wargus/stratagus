@@ -544,12 +544,12 @@ void DoRightButton(const PixelPos &mapPixelPos)
 **
 **  @return        True if mouse is on the button, False otherwise.
 */
-bool CUIButton::IsOnButton(int x, int y) const
+bool CUIButton::Contains(const PixelPos &screenPos) const
 {
 	Assert(this->Style);
 
-	return this->X <= x && x < this->X + this->Style->Width
-		   && this->Y <= y && y < this->Y + this->Style->Height;
+	return this->X <= screenPos.x && screenPos.x < this->X + this->Style->Width
+		   && this->Y <= screenPos.y && screenPos.y < this->Y + this->Style->Height;
 }
 
 /**
@@ -560,8 +560,7 @@ bool CUIButton::IsOnButton(int x, int y) const
 */
 static void HandleMouseOn(int x, int y)
 {
-	int i;
-	size_t size;
+	const PixelPos screenPos = {x, y};
 
 	MouseScrollState = ScrollNone;
 	ButtonAreaUnderCursor = -1;
@@ -570,18 +569,15 @@ static void HandleMouseOn(int x, int y)
 	// BigMapMode is the mode which show only the map (without panel, minimap)
 	if (BigMapMode) {
 		CursorOn = CursorOnMap;
-		//
 		//  Scrolling Region Handling.
-		//
-		HandleMouseScrollArea(x, y);
+		HandleMouseScrollArea(screenPos.x, screenPos.y);
 		return;
 	}
-	//
+
 	//  Handle buttons
-	//
 	if (!IsNetworkGame()) {
 		if (UI.MenuButton.X != -1) {
-			if (UI.MenuButton.IsOnButton(x, y)) {
+			if (UI.MenuButton.Contains(screenPos)) {
 				ButtonAreaUnderCursor = ButtonAreaMenu;
 				ButtonUnderCursor = ButtonUnderMenu;
 				CursorOn = CursorOnButton;
@@ -590,7 +586,7 @@ static void HandleMouseOn(int x, int y)
 		}
 	} else {
 		if (UI.NetworkMenuButton.X != -1) {
-			if (UI.NetworkMenuButton.IsOnButton(x, y)) {
+			if (UI.NetworkMenuButton.Contains(screenPos)) {
 				ButtonAreaUnderCursor = ButtonAreaMenu;
 				ButtonUnderCursor = ButtonUnderNetworkMenu;
 				CursorOn = CursorOnButton;
@@ -598,7 +594,7 @@ static void HandleMouseOn(int x, int y)
 			}
 		}
 		if (UI.NetworkDiplomacyButton.X != -1) {
-			if (UI.NetworkDiplomacyButton.IsOnButton(x, y)) {
+			if (UI.NetworkDiplomacyButton.Contains(screenPos)) {
 				ButtonAreaUnderCursor = ButtonAreaMenu;
 				ButtonUnderCursor = ButtonUnderNetworkDiplomacy;
 				CursorOn = CursorOnButton;
@@ -606,9 +602,9 @@ static void HandleMouseOn(int x, int y)
 			}
 		}
 	}
-	size = UI.ButtonPanel.Buttons.size();
-	for (unsigned int j = 0; j < size; ++j) {
-		if (UI.ButtonPanel.Buttons[j].IsOnButton(x, y)) {
+	const size_t buttonCount = UI.ButtonPanel.Buttons.size();
+	for (unsigned int j = 0; j < buttonCount; ++j) {
+		if (UI.ButtonPanel.Buttons[j].Contains(screenPos)) {
 			ButtonAreaUnderCursor = ButtonAreaButton;
 			if (CurrentButtons.IsValid() && CurrentButtons[j].Pos != -1) {
 				ButtonUnderCursor = j;
@@ -619,11 +615,11 @@ static void HandleMouseOn(int x, int y)
 	}
 	if (NumSelected > 0) {
 		if (NumSelected == 1 && Selected[0]->Type->CanTransport() && Selected[0]->BoardCount) {
-			size = UI.TransportingButtons.size();
-			i = Selected[0]->BoardCount < (int)size ?
-				Selected[0]->BoardCount - 1 : size - 1;
-			for (; i >= 0; --i) {
-				if (UI.TransportingButtons[i].IsOnButton(x, y)) {
+			const size_t size = UI.TransportingButtons.size();
+
+			for (size_t i = std::min<size_t>(Selected[0]->BoardCount, size); i != 0; ) {
+				--i;
+				if (UI.TransportingButtons[i].Contains(screenPos)) {
 					ButtonAreaUnderCursor = ButtonAreaTransporting;
 					ButtonUnderCursor = i;
 					CursorOn = CursorOnButton;
@@ -634,19 +630,19 @@ static void HandleMouseOn(int x, int y)
 		if (NumSelected == 1) {
 			if (Selected[0]->CurrentAction() == UnitActionTrain) {
 				if (Selected[0]->Orders.size() == 1) {
-					if (UI.SingleTrainingButton->IsOnButton(x, y)) {
+					if (UI.SingleTrainingButton->Contains(screenPos)) {
 						ButtonAreaUnderCursor = ButtonAreaTraining;
 						ButtonUnderCursor = 0;
 						CursorOn = CursorOnButton;
 						return;
 					}
 				} else {
-					size = UI.TrainingButtons.size();
-					i = Selected[0]->Orders.size() < size ?
-						Selected[0]->Orders.size() - 1 : size - 1;
-					for (; i >= 0; --i) {
+					const size_t size = UI.TrainingButtons.size();
+
+					for (size_t i = std::min(Selected[0]->Orders.size(), size); i != 0;) {
+						--i;
 						if (Selected[0]->Orders[i]->Action == UnitActionTrain
-							&& UI.TrainingButtons[i].IsOnButton(x, y)) {
+							&& UI.TrainingButtons[i].Contains(screenPos)) {
 							ButtonAreaUnderCursor = ButtonAreaTraining;
 							ButtonUnderCursor = i;
 							CursorOn = CursorOnButton;
@@ -655,14 +651,14 @@ static void HandleMouseOn(int x, int y)
 					}
 				}
 			} else if (Selected[0]->CurrentAction() == UnitActionUpgradeTo) {
-				if (UI.UpgradingButton->IsOnButton(x, y)) {
+				if (UI.UpgradingButton->Contains(screenPos)) {
 					ButtonAreaUnderCursor = ButtonAreaUpgrading;
 					ButtonUnderCursor = 0;
 					CursorOn = CursorOnButton;
 					return;
 				}
 			} else if (Selected[0]->CurrentAction() == UnitActionResearch) {
-				if (UI.ResearchingButton->IsOnButton(x, y)) {
+				if (UI.ResearchingButton->Contains(screenPos)) {
 					ButtonAreaUnderCursor = ButtonAreaResearching;
 					ButtonUnderCursor = 0;
 					CursorOn = CursorOnButton;
@@ -671,17 +667,18 @@ static void HandleMouseOn(int x, int y)
 			}
 		}
 		if (NumSelected == 1) {
-			if (UI.SingleSelectedButton && UI.SingleSelectedButton->IsOnButton(x, y)) {
+			if (UI.SingleSelectedButton && UI.SingleSelectedButton->Contains(screenPos)) {
 				ButtonAreaUnderCursor = ButtonAreaSelected;
 				ButtonUnderCursor = 0;
 				CursorOn = CursorOnButton;
 				return;
 			}
 		} else {
-			size = UI.SelectedButtons.size();
-			i = NumSelected > (int)size ? size - 1 : NumSelected - 1;
-			for (; i >= 0; --i) {
-				if (UI.SelectedButtons[i].IsOnButton(x, y)) {
+			const size_t size = UI.SelectedButtons.size();
+
+			for (size_t i = std::min<size_t>(NumSelected, size); i >= 0;) {
+				--i;
+				if (UI.SelectedButtons[i].Contains(screenPos)) {
 					ButtonAreaUnderCursor = ButtonAreaSelected;
 					ButtonUnderCursor = i;
 					CursorOn = CursorOnButton;
@@ -691,20 +688,15 @@ static void HandleMouseOn(int x, int y)
 		}
 	}
 
-	//
 	//  Minimap
-	//
-	if (x >= UI.Minimap.X && x < UI.Minimap.X + UI.Minimap.W
-		&& y >= UI.Minimap.Y && y < UI.Minimap.Y + UI.Minimap.H) {
+	if (UI.Minimap.Contains(screenPos)) {
 		CursorOn = CursorOnMinimap;
 		return;
 	}
 
-	//
 	//  On UI graphic
-	//
 	bool on_ui = false;
-	size = UI.Fillers.size();
+	const size_t size = UI.Fillers.size();
 	for (unsigned int j = 0; j < size; ++j) {
 		if (UI.Fillers[j].OnGraphic(x, y)) {
 			on_ui = true;
@@ -712,14 +704,9 @@ static void HandleMouseOn(int x, int y)
 		}
 	}
 
-	//
 	//  Map
-	//
-	if (!on_ui && x >= UI.MapArea.X && x <= UI.MapArea.EndX &&
-		y >= UI.MapArea.Y && y <= UI.MapArea.EndY) {
-		CViewport *vp;
-
-		vp = GetViewport(x, y);
+	if (!on_ui && UI.MapArea.Contains(screenPos)) {
+		CViewport *vp = GetViewport(x, y);
 		Assert(vp);
 		// viewport changed
 		if (UI.MouseViewport != vp) {
@@ -734,9 +721,7 @@ static void HandleMouseOn(int x, int y)
 		CursorOn = CursorOnUnknown;
 	}
 
-	//
 	//  Scrolling Region Handling.
-	//
 	HandleMouseScrollArea(x, y);
 }
 
