@@ -554,14 +554,14 @@ void CViewport::DrawMapFogOfWar() const
 		}
 		my_index += Map.Info.MapWidth;
 	}
-	ex = EndX;
+	ex = this->BottomRightPos.x;
 	int sy = MapY * Map.Info.MapWidth;
-	int dy = Y - OffsetY;
-	ey = EndY;
+	int dy = this->TopLeftPos.y - OffsetY;
+	ey = this->BottomRightPos.y;
 
 	while (dy <= ey) {
 		sx = MapX + sy;
-		int dx = X - OffsetX;
+		int dx = this->TopLeftPos.x - OffsetX;
 		while (dx <= ex) {
 			if (VisibleTable[sx]) {
 				DrawFogOfWarTile(sx, sy, dx, dy);

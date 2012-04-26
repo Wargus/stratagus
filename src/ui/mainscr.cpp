@@ -1255,7 +1255,7 @@ void CenterOnMessage()
 		return;
 	}
 	const Vec2i pos = {MessagesEventX[MessagesEventIndex], MessagesEventY[MessagesEventIndex]};
-	UI.SelectedViewport->Center(pos, PixelTileSize / 2);
+	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(pos));
 	SetMessage(_("~<Event: %s~>"), MessagesEvent[MessagesEventIndex]);
 	++MessagesEventIndex;
 }

@@ -154,29 +154,27 @@ static void UiUnselectAll()
 */
 static void UiCenterOnGroup(unsigned group, GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY)
 {
-	CUnit **units;
-	int n;
-	Vec2i pos = { -1, -1};
+	int n = GetNumberUnitsOfGroup(group, SELECT_ALL);
 
-	n = GetNumberUnitsOfGroup(group, SELECT_ALL);
 	if (n--) {
-		units = GetUnitsOfGroup(group);
+		CUnit **units = GetUnitsOfGroup(group);
+		PixelPos pos = { -1, -1};
+
 		// FIXME: what should we do with the removed units? ignore?
 		if (units[n]->Type && units[n]->Type->CanSelect(mode)) {
-			pos = units[n]->tilePos;
+			pos = units[n]->GetMapPixelPosCenter();
 		}
-
 		while (n--) {
 			if (units[n]->Type && units[n]->Type->CanSelect(mode)) {
 				if (pos.x != -1) {
-					pos += (units[n]->tilePos - pos) / 2;
+					pos += (units[n]->GetMapPixelPosCenter() - pos) / 2;
 				} else {
-					pos = units[n]->tilePos;
+					pos = units[n]->GetMapPixelPosCenter();
 				}
 			}
 		}
 		if (pos.x != -1) {
-			UI.SelectedViewport->Center(pos, PixelTileSize / 2);
+			UI.SelectedViewport->Center(pos);
 		}
 	}
 }
@@ -402,12 +400,12 @@ static void UiCenterOnSelected()
 	int n = NumSelected;
 
 	if (n) {
-		Vec2i pos = Selected[--n]->tilePos;
+		PixelPos pos = Selected[--n]->GetMapPixelPosCenter();
 
 		while (n--) {
-			pos += (Selected[n]->tilePos - pos) / 2;
+			pos += (Selected[n]->GetMapPixelPosCenter() - pos) / 2;
 		}
-		UI.SelectedViewport->Center(pos, PixelTileSize / 2);
+		UI.SelectedViewport->Center(pos);
 	}
 }
 
@@ -465,7 +463,7 @@ static void UiFindIdleWorker()
 		CurrentButtonLevel = 0;
 		PlayUnitSound(*Selected[0], VoiceSelected);
 		SelectionChanged();
-		UI.SelectedViewport->Center(unit->tilePos, PixelTileSize / 2);
+		UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
 	}
 }
 

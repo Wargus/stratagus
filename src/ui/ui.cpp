@@ -333,8 +333,7 @@ void FreeButtonStyles()
 **  Takes coordinates of a pixel in stratagus's window and computes
 **  the map viewport which contains this pixel.
 **
-**  @param x  x pixel coordinate with origin at UL corner of screen
-**  @param y  y pixel coordinate with origin at UL corner of screen
+**  @param screenPos  pixel coordinate with origin at UL corner of screen
 **
 **  @return viewport pointer or NULL if this pixel is not inside
 **  any of the viewports.
@@ -342,10 +341,10 @@ void FreeButtonStyles()
 **  @note This functions only works with rectangular viewports, when
 **  we support shaped map window, this must be rewritten.
 */
-CViewport *GetViewport(int x, int y)
+CViewport *GetViewport(const PixelPos &screenPos)
 {
 	for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
-		if (x >= vp->X && x <= vp->EndX && y >= vp->Y && y <= vp->EndY) {
+		if (vp->Contains(screenPos)) {
 			return vp;
 		}
 	}
@@ -365,26 +364,19 @@ CViewport *GetViewport(int x, int y)
 */
 static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 {
-	if (UI.NumViewports < num_vps) {
-		//  Compute location of the viewport using oldviewport
-		for (int i = 0; i < num_vps; ++i) {
-			new_vps[i].MapX = 0;
-			new_vps[i].MapY = 0;
-			const CViewport *vp = GetViewport(new_vps[i].X, new_vps[i].Y);
-			if (vp) {
-				new_vps[i].OffsetX = new_vps[i].X - vp->X + vp->MapX * PixelTileSize.x + vp->OffsetX;
-				new_vps[i].OffsetY = new_vps[i].Y - vp->Y + vp->MapY * PixelTileSize.y + vp->OffsetY;
-			} else {
-				new_vps[i].OffsetX = 0;
-				new_vps[i].OffsetY = 0;
-			}
-		}
-	} else {
-		for (int i = 0; i < num_vps; ++i) {
-			new_vps[i].MapX = UI.Viewports[i].MapX;
-			new_vps[i].MapY = UI.Viewports[i].MapY;
-			new_vps[i].OffsetX = UI.Viewports[i].OffsetX;
-			new_vps[i].OffsetY = UI.Viewports[i].OffsetY;
+	//  Compute location of the viewport using oldviewport
+	for (int i = 0; i < num_vps; ++i) {
+		new_vps[i].MapX = 0;
+		new_vps[i].MapY = 0;
+		const CViewport *vp = GetViewport(new_vps[i].GetTopLeftPos());
+		if (vp) {
+			const PixelDiff relDiff = new_vps[i].GetTopLeftPos() - vp->GetTopLeftPos();
+
+			new_vps[i].OffsetX = relDiff.x + vp->MapX * PixelTileSize.x + vp->OffsetX;
+			new_vps[i].OffsetY = relDiff.y + vp->MapY * PixelTileSize.y + vp->OffsetY;
+		} else {
+			new_vps[i].OffsetX = 0;
+			new_vps[i].OffsetY = 0;
 		}
 	}
 
@@ -392,10 +384,8 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 	for (int i = 0; i < num_vps; ++i) {
 		CViewport &vp = UI.Viewports[i];
 
-		vp.X = new_vps[i].X;
-		vp.EndX = new_vps[i].EndX;
-		vp.Y = new_vps[i].Y;
-		vp.EndY = new_vps[i].EndY;
+		vp.TopLeftPos = new_vps[i].TopLeftPos;
+		vp.BottomRightPos = new_vps[i].BottomRightPos;
 		const Vec2i vpTilePos = {new_vps[i].MapX, new_vps[i].MapY};
 		const PixelDiff offset = {new_vps[i].OffsetX, new_vps[i].OffsetY};
 		vp.Set(vpTilePos, offset);
@@ -405,7 +395,8 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 	//
 	//  Update the viewport pointers
 	//
-	UI.MouseViewport = GetViewport(CursorX, CursorY);
+	PixelPos CursorScreenPos = {CursorX, CursorY};
+	UI.MouseViewport = GetViewport(CursorScreenPos);
 	if (UI.SelectedViewport > UI.Viewports + UI.NumViewports - 1) {
 		UI.SelectedViewport = UI.Viewports + UI.NumViewports - 1;
 	}
@@ -430,15 +421,15 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 static void ClipViewport(CViewport &vp, int ClipX, int ClipY)
 {
 	// begin with maximum possible viewport size
-	vp.EndX = vp.X + Map.Info.MapWidth * PixelTileSize.x - 1;
-	vp.EndY = vp.Y + Map.Info.MapHeight * PixelTileSize.y - 1;
+	vp.BottomRightPos.x = vp.TopLeftPos.x + Map.Info.MapWidth * PixelTileSize.x - 1;
+	vp.BottomRightPos.y = vp.TopLeftPos.y + Map.Info.MapHeight * PixelTileSize.y - 1;
 
 	// first clip it to MapArea size if necessary
-	vp.EndX = std::min<int>(vp.EndX, ClipX);
-	vp.EndY = std::min<int>(vp.EndY, ClipY);
+	vp.BottomRightPos.x = std::min<int>(vp.BottomRightPos.x, ClipX);
+	vp.BottomRightPos.y = std::min<int>(vp.BottomRightPos.y, ClipY);
 
-	Assert(vp.EndX <= UI.MapArea.EndX);
-	Assert(vp.EndY <= UI.MapArea.EndY);
+	Assert(vp.BottomRightPos.x <= UI.MapArea.EndX);
+	Assert(vp.BottomRightPos.y <= UI.MapArea.EndY);
 }
 
 /**
@@ -455,8 +446,8 @@ static void SetViewportModeSingle()
 
 	DebugPrint("Single viewport set\n");
 
-	new_vps[0].X = UI.MapArea.X;
-	new_vps[0].Y = UI.MapArea.Y;
+	new_vps[0].TopLeftPos.x = UI.MapArea.X;
+	new_vps[0].TopLeftPos.y = UI.MapArea.Y;
 	ClipViewport(new_vps[0], UI.MapArea.EndX, UI.MapArea.EndY);
 
 	FinishViewportModeConfiguration(new_vps, 1);
@@ -478,13 +469,13 @@ static void SetViewportModeSplitHoriz()
 
 	DebugPrint("Two horizontal viewports set\n");
 
-	new_vps[0].X = UI.MapArea.X;
-	new_vps[0].Y = UI.MapArea.Y;
+	new_vps[0].TopLeftPos.x = UI.MapArea.X;
+	new_vps[0].TopLeftPos.y = UI.MapArea.Y;
 	ClipViewport(new_vps[0], UI.MapArea.EndX,
 				 UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
 
-	new_vps[1].X = UI.MapArea.X;
-	new_vps[1].Y = new_vps[0].EndY + 1;
+	new_vps[1].TopLeftPos.x = UI.MapArea.X;
+	new_vps[1].TopLeftPos.y = new_vps[0].BottomRightPos.y + 1;
 	ClipViewport(new_vps[1], UI.MapArea.EndX, UI.MapArea.EndY);
 
 	FinishViewportModeConfiguration(new_vps, 2);
@@ -507,19 +498,19 @@ static void SetViewportModeSplitHoriz3()
 
 	DebugPrint("Horizontal 3-way viewport division set\n");
 
-	new_vps[0].X = UI.MapArea.X;
-	new_vps[0].Y = UI.MapArea.Y;
+	new_vps[0].TopLeftPos.x = UI.MapArea.X;
+	new_vps[0].TopLeftPos.y = UI.MapArea.Y;
 	ClipViewport(new_vps[0], UI.MapArea.EndX,
 				 UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
 
-	new_vps[1].X = UI.MapArea.X;
-	new_vps[1].Y = new_vps[0].EndY + 1;
+	new_vps[1].TopLeftPos.x = UI.MapArea.X;
+	new_vps[1].TopLeftPos.y = new_vps[0].BottomRightPos.y + 1;
 	ClipViewport(new_vps[1],
 				 UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
 				 UI.MapArea.EndY);
 
-	new_vps[2].X = new_vps[1].EndX + 1;
-	new_vps[2].Y = new_vps[0].EndY + 1;
+	new_vps[2].TopLeftPos.x = new_vps[1].BottomRightPos.x + 1;
+	new_vps[2].TopLeftPos.y = new_vps[0].BottomRightPos.y + 1;
 	ClipViewport(new_vps[2], UI.MapArea.EndX, UI.MapArea.EndY);
 
 	FinishViewportModeConfiguration(new_vps, 3);
@@ -541,14 +532,14 @@ static void SetViewportModeSplitVert()
 
 	DebugPrint("Two vertical viewports set\n");
 
-	new_vps[0].X = UI.MapArea.X;
-	new_vps[0].Y = UI.MapArea.Y;
+	new_vps[0].TopLeftPos.x = UI.MapArea.X;
+	new_vps[0].TopLeftPos.y = UI.MapArea.Y;
 	ClipViewport(new_vps[0],
 				 UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
 				 UI.MapArea.EndY);
 
-	new_vps[1].X = new_vps[0].EndX + 1;
-	new_vps[1].Y = UI.MapArea.Y;
+	new_vps[1].TopLeftPos.x = new_vps[0].BottomRightPos.x + 1;
+	new_vps[1].TopLeftPos.y = UI.MapArea.Y;
 	ClipViewport(new_vps[1], UI.MapArea.EndX, UI.MapArea.EndY);
 
 	FinishViewportModeConfiguration(new_vps, 2);
@@ -570,26 +561,26 @@ static void SetViewportModeQuad()
 
 	DebugPrint("Four viewports set\n");
 
-	new_vps[0].X = UI.MapArea.X;
-	new_vps[0].Y = UI.MapArea.Y;
+	new_vps[0].TopLeftPos.x = UI.MapArea.X;
+	new_vps[0].TopLeftPos.y = UI.MapArea.Y;
 	ClipViewport(new_vps[0],
 				 UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
 				 UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
 
-	new_vps[1].X = new_vps[0].EndX + 1;
-	new_vps[1].Y = UI.MapArea.Y;
+	new_vps[1].TopLeftPos.x = new_vps[0].BottomRightPos.x + 1;
+	new_vps[1].TopLeftPos.y = UI.MapArea.Y;
 	ClipViewport(new_vps[1],
 				 UI.MapArea.EndX,
 				 UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
 
-	new_vps[2].X = UI.MapArea.X;
-	new_vps[2].Y = new_vps[0].EndY + 1;
+	new_vps[2].TopLeftPos.x = UI.MapArea.X;
+	new_vps[2].TopLeftPos.y = new_vps[0].BottomRightPos.y + 1;
 	ClipViewport(new_vps[2],
 				 UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
 				 UI.MapArea.EndY);
 
-	new_vps[3].X = new_vps[1].X;
-	new_vps[3].Y = new_vps[2].Y;
+	new_vps[3].TopLeftPos.x = new_vps[1].TopLeftPos.x;
+	new_vps[3].TopLeftPos.y = new_vps[2].TopLeftPos.y;
 	ClipViewport(new_vps[3], UI.MapArea.EndX, UI.MapArea.EndY);
 
 	FinishViewportModeConfiguration(new_vps, 4);

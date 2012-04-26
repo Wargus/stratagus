@@ -60,6 +60,9 @@
 #ifndef __MINIMAP_H__
 #include "minimap.h"
 #endif
+
+#include "viewport.h"
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -139,90 +142,6 @@ public:
 };
 
 #define MAX_NUM_VIEWPORTS 8         /// Number of supported viewports
-
-/**
-**  A map viewport.
-**
-**  A part of the map displayed on sceen.
-**
-**  CViewport::X CViewport::Y
-**  CViewport::EndX CViewport::EndY
-**
-**    upper left corner of this viewport is located at pixel
-**    coordinates (X, Y) with respect to upper left corner of
-**    stratagus's window, similarly lower right corner of this
-**    viewport is (EndX, EndY) pixels away from the UL corner of
-**    stratagus's window.
-**
-**  CViewport::MapX CViewport::MapY
-**  CViewport::MapWidth CViewport::MapHeight
-**
-**    Tile coordinates of UL corner of this viewport with respect to
-**    UL corner of the whole map.
-**
-**  CViewport::Unit
-**
-**    Viewport is bound to a unit. If the unit moves the viewport
-**    changes the position together with the unit.
-**    @todo binding to a group.
-*/
-class CViewport
-{
-public:
-	CViewport() : X(0), Y(0), EndX(0), EndY(0), MapX(0), MapY(0),
-		OffsetX(0), OffsetY(0), MapWidth(0), MapHeight(0), Unit(NULL)
-	{}
-	~CViewport();
-
-
-	/// Check if pos pixels are within map area
-	bool IsInsideMapArea(const PixelPos &screenPixelPos) const;
-
-	/// Convert screen coordinates into map pixel coordinates
-	PixelPos ScreenToMapPixelPos(const PixelPos &screenPixelPos) const;
-	// Convert map pixel coordinates into screen coordinates
-	PixelPos MapToScreenPixelPos(const PixelPos &mapPixelPos) const;
-
-	/// convert screen coordinate into tilepos
-	Vec2i ScreenToTilePos(const PixelPos &screenPixelPos) const;
-	/// convert tilepos coordonates into screen (take the top left of the tile)
-	PixelPos TilePosToScreen_TopLeft(const Vec2i &tilePos) const;
-	/// convert tilepos coordonates into screen (take the center of the tile)
-	PixelPos TilePosToScreen_Center(const Vec2i &tilePos) const;
-
-	/// Set the current map view to x,y(upper,left corner)
-	void Set(const Vec2i &tilePos, const PixelDiff &offset);
-	/// Center map on point in viewport
-	void Center(const Vec2i &pos, const PixelDiff &offset);
-
-protected:
-	/// Set the current map view to x,y(upper,left corner)
-	void Set(const PixelPos &mapPixelPos);
-	/// Draw the map background
-	void DrawMapBackgroundInViewport() const;
-	/// Draw the map fog of war
-	void DrawMapFogOfWar() const;
-public:
-	/// Draw the full Viewport.
-	void Draw() const;
-	void DrawBorder() const;
-	/// Check if any part of an area is visible in viewport
-	bool AnyMapAreaVisibleInViewport(const Vec2i &boxmin, const Vec2i &boxmax) const;
-	//private:
-	int X;                      /// Screen pixel left corner x coordinate
-	int Y;                      /// Screen pixel upper corner y coordinate
-	int EndX;                   /// Screen pixel right x coordinate
-	int EndY;                   /// Screen pixel bottom y coordinate
-
-	int MapX;                   /// Map tile left corner x coordinate
-	int MapY;                   /// Map tile upper corner y coordinate
-	int OffsetX;                /// X Offset within MapX
-	int OffsetY;                /// Y Offset within MapY
-	int MapWidth;               /// Width in map tiles
-	int MapHeight;              /// Height in map tiles
-
-	CUnit *Unit;                /// Bound to this unit
-};
 
 /**
 **  Enumeration of the different predefined viewport configurations.
@@ -977,7 +896,7 @@ extern void RestrictCursorToViewport();
 extern void RestrictCursorToMinimap();
 
 /// Get viewport for screen pixel position
-extern CViewport *GetViewport(int x, int y);
+extern CViewport *GetViewport(const PixelPos &screenPos);
 /// Cycle through all available viewport modes
 extern void CycleViewportMode(int);
 /// Select viewport mode

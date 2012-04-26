@@ -159,16 +159,7 @@ static void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 	//  Clip to map window.
 	//  FIXME: should re-use CLIP_RECTANGLE in some way from linedraw.c ?
 	//
-	if (x1 < vp.X) {
-		x1 = vp.X;
-	} else if (x1 > vp.EndX) {
-		x1 = vp.EndX;
-	}
-	if (y1 < vp.Y) {
-		y1 = vp.Y;
-	} else if (y1 > vp.EndY) {
-		y1 = vp.EndY;
-	}
+	vp.Restrict(x1, y1);
 
 	if (x > x1) {
 		w = x - x1 + 1;
@@ -212,7 +203,7 @@ static void DrawBuildingCursor()
 	}
 #endif
 	PushClipping();
-	SetClipping(vp.X, vp.Y, vp.EndX, vp.EndY);
+	vp.SetClipping();
 	DrawShadow(*CursorBuilding, CursorBuilding->StillFrame, screenPos.x, screenPos.y);
 	DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
 				 CursorBuilding->StillFrame, screenPos.x, screenPos.y);
@@ -281,10 +272,10 @@ void DrawCursor()
 {
 	// Selecting rectangle
 	if (CursorState == CursorStateRectangle && (CursorStartX != CursorX || CursorStartY != CursorY)) {
-		DrawVisibleRectangleCursor(
-			CursorStartScrMapX + UI.MouseViewport->X - PixelTileSize.x * UI.MouseViewport->MapX - UI.MouseViewport->OffsetX,
-			CursorStartScrMapY + UI.MouseViewport->Y - PixelTileSize.y * UI.MouseViewport->MapY - UI.MouseViewport->OffsetY,
-			CursorX, CursorY);
+		const PixelPos cursorStartMapPos = {CursorStartScrMapX, CursorStartScrMapY};
+		const PixelPos cursorStartScreenPos = UI.MouseViewport->MapToScreenPixelPos(cursorStartMapPos);
+
+		DrawVisibleRectangleCursor(cursorStartScreenPos.x, cursorStartScreenPos.y, CursorX, CursorY);
 	} else if (CursorBuilding && CursorOn == CursorOnMap) {
 		// Selecting position for building
 		DrawBuildingCursor();

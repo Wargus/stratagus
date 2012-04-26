@@ -751,7 +751,7 @@ void CreateGame(const std::string &filename, CMap *map)
 		UI.SelectedViewport = UI.Viewports;
 	}
 #endif
-	UI.SelectedViewport->Center(ThisPlayer->StartPos, PixelTileSize / 2);
+	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos));
 
 	//
 	// Various hacks wich must be done after the map is loaded.

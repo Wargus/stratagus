@@ -168,9 +168,7 @@ void DrawMapArea()
 			if (vp->Unit->Destroyed || vp->Unit->CurrentAction() == UnitActionDie) {
 				vp->Unit = NoUnitP;
 			} else {
-				const PixelSize offset = {vp->Unit->IX + PixelTileSize.x / 2, vp->Unit->IY + PixelTileSize.y / 2};
-
-				vp->Center(vp->Unit->tilePos, offset);
+				vp->Center(vp->Unit->GetMapPixelPosCenter());
 			}
 		}
 		vp->Draw();

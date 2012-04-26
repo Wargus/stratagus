@@ -676,7 +676,7 @@ static void HandleMouseOn(int x, int y)
 		} else {
 			const size_t size = UI.SelectedButtons.size();
 
-			for (size_t i = std::min<size_t>(NumSelected, size); i >= 0;) {
+			for (size_t i = std::min<size_t>(NumSelected, size); i != 0;) {
 				--i;
 				if (UI.SelectedButtons[i].Contains(screenPos)) {
 					ButtonAreaUnderCursor = ButtonAreaSelected;
@@ -706,7 +706,7 @@ static void HandleMouseOn(int x, int y)
 
 	//  Map
 	if (!on_ui && UI.MapArea.Contains(screenPos)) {
-		CViewport *vp = GetViewport(x, y);
+		CViewport *vp = GetViewport(screenPos);
 		Assert(vp);
 		// viewport changed
 		if (UI.MouseViewport != vp) {
@@ -755,24 +755,9 @@ void HandleMouseExit()
 */
 void RestrictCursorToViewport()
 {
-	if (CursorX < UI.SelectedViewport->X) {
-		CursorStartX = UI.SelectedViewport->X;
-	} else if (CursorX >= UI.SelectedViewport->EndX) {
-		CursorStartX = UI.SelectedViewport->EndX - 1;
-	} else {
-		CursorStartX = CursorX;
-	}
-
-	if (CursorY < UI.SelectedViewport->Y) {
-		CursorStartY = UI.SelectedViewport->Y;
-	} else if (CursorY >= UI.SelectedViewport->EndY) {
-		CursorStartY = UI.SelectedViewport->EndY - 1;
-	} else {
-		CursorStartY = CursorY;
-	}
-
-	UI.MouseWarpX = CursorX = CursorStartX;
-	UI.MouseWarpY = CursorY = CursorStartY;
+	UI.SelectedViewport->Restrict(CursorX, CursorY);
+	UI.MouseWarpX = CursorStartX = CursorX;
+	UI.MouseWarpY = CursorStartY = CursorY;
 	CursorOn = CursorOnMap;
 }
 
@@ -843,16 +828,7 @@ void UIHandleMouseMove(int x, int y)
 	//
 	if (CursorState == CursorStateRectangle) {
 		// Restrict cursor to viewport.
-		if (CursorX < UI.SelectedViewport->X) {
-			CursorX = UI.SelectedViewport->X;
-		} else if (CursorX >= UI.SelectedViewport->EndX) {
-			CursorX = UI.SelectedViewport->EndX - 1;
-		}
-		if (CursorY < UI.SelectedViewport->Y) {
-			CursorY = UI.SelectedViewport->Y;
-		} else if (CursorY >= UI.SelectedViewport->EndY) {
-			CursorY = UI.SelectedViewport->EndY - 1;
-		}
+		UI.SelectedViewport->Restrict(CursorX, CursorY);
 		UI.MouseWarpX = CursorX;
 		UI.MouseWarpY = CursorY;
 		return;
@@ -894,7 +870,7 @@ void UIHandleMouseMove(int x, int y)
 		const Vec2i cursorPos = {UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY)};
 
 		RestrictCursorToMinimap();
-		UI.SelectedViewport->Center(cursorPos, PixelTileSize / 2);
+		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorPos));
 		return;
 	}
 
@@ -962,7 +938,7 @@ void UIHandleMouseMove(int x, int y)
 				//
 				//  Minimap move viewpoint
 				//
-				UI.SelectedViewport->Center(cursorPos, PixelTileSize / 2);
+				UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorPos));
 			}
 		}
 		// FIXME: must move minimap if right button is down !
@@ -989,7 +965,7 @@ void UIHandleMouseMove(int x, int y)
 		//
 		const Vec2i cursorPos = {UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY)};
 
-		UI.SelectedViewport->Center(cursorPos, PixelTileSize / 2);
+		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorPos));
 		CursorStartX = CursorX;
 		CursorStartY = CursorY;
 		return;
@@ -1454,7 +1430,7 @@ static void UISelectStateButtonDown(unsigned)
 			}
 			SendCommand(cursorTilePos);
 		} else {
-			UI.SelectedViewport->Center(cursorTilePos, PixelTileSize / 2);
+			UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorTilePos));
 		}
 		return;
 	}
@@ -1650,10 +1626,10 @@ void UIHandleButtonDown(unsigned button)
 		} else if (MouseButtons & LeftButton) { // enter select mode
 			CursorStartX = CursorX;
 			CursorStartY = CursorY;
-			CursorStartScrMapX = CursorStartX - UI.MouseViewport->X +
-								 PixelTileSize.x * UI.MouseViewport->MapX + UI.MouseViewport->OffsetX;
-			CursorStartScrMapY = CursorStartY - UI.MouseViewport->Y +
-								 PixelTileSize.y * UI.MouseViewport->MapY + UI.MouseViewport->OffsetY;
+			const PixelPos screenCursorPos = {CursorX, CursorY};
+			const PixelPos mapCursorPos = UI.MouseViewport->ScreenToMapPixelPos(screenCursorPos);
+			CursorStartScrMapX = mapCursorPos.x;
+			CursorStartScrMapY = mapCursorPos.y;
 			GameCursor = UI.Cross.Cursor;
 			CursorState = CursorStateRectangle;
 		} else if (MouseButtons & MiddleButton) {// enter move map mode
@@ -1668,7 +1644,7 @@ void UIHandleButtonDown(unsigned button)
 		const Vec2i cursorTilePos = {UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY)};
 
 		if (MouseButtons & LeftButton) { // enter move mini-mode
-			UI.SelectedViewport->Center(cursorTilePos, PixelTileSize / 2);
+			UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorTilePos));
 		} else if (MouseButtons & RightButton) {
 			if (!GameObserve && !GamePaused) {
 				const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_Center(cursorTilePos);
@@ -1708,12 +1684,8 @@ void UIHandleButtonDown(unsigned button)
 				//  clicked on single unit shown
 				//
 				if (ButtonUnderCursor == 0 && NumSelected == 1) {
-					const PixelPos offset = {Selected[0]->IX + PixelTileSize.x / 2,
-											 Selected[0]->IY + PixelTileSize.y / 2
-											};
-
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-					UI.SelectedViewport->Center(Selected[0]->tilePos, offset);
+					UI.SelectedViewport->Center(Selected[0]->GetMapPixelPosCenter());
 				}
 				//
 				//  clicked on training button
@@ -1875,10 +1847,10 @@ void UIHandleButtonUp(unsigned button)
 			|| CursorStartY < CursorY - 1 || CursorStartY > CursorY + 1) {
 			int x0 = CursorStartScrMapX;
 			int y0 = CursorStartScrMapY;
-			int x1 = CursorX - UI.MouseViewport->X +
-					 UI.MouseViewport->MapX * PixelTileSize.x + UI.MouseViewport->OffsetX;
-			int y1 = CursorY - UI.MouseViewport->Y +
-					 UI.MouseViewport->MapY * PixelTileSize.y + UI.MouseViewport->OffsetY;
+			const PixelPos cursorScreenPos = {CursorX, CursorY};
+			const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(cursorScreenPos);
+			int x1 = cursorMapPos.x;
+			int y1 = cursorMapPos.y;
 
 			if (x0 > x1) {
 				std::swap(x0, x1);
@@ -2043,7 +2015,7 @@ void DrawPieMenu()
 	CLabel label(GetGameFont());
 	CViewport *vp = UI.SelectedViewport;
 	PushClipping();
-	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
+	vp->SetClipping();
 
 	// Draw background
 	if (UI.PieMenu.G) {

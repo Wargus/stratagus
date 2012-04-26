@@ -500,6 +500,7 @@ set(stratagus_generic_HDRS
 	src/include/vec2i.h
 	src/include/version.h
 	src/include/video.h
+	src/include/viewport.h
 	src/include/wav.h
 	src/include/widgets.h
 )

@@ -895,18 +895,17 @@ static void DrawMapCursor()
 		if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
 			const unsigned short frame = Map.Tileset.Table[Editor.ShownTileTypes[Editor.SelectedTileIndex]];
 			PushClipping();
-			SetClipping(UI.MouseViewport->X, UI.MouseViewport->Y,
-						UI.MouseViewport->EndX, UI.MouseViewport->EndY);
+			UI.MouseViewport->SetClipping();
 
 			PixelPos screenPosIt;
 			for (int j = 0; j < TileCursorSize; ++j) {
 				screenPosIt.y = screenPos.y + j * PixelTileSize.y;
-				if (screenPosIt.y >= UI.MouseViewport->EndY) {
+				if (screenPosIt.y >= UI.MouseViewport->GetBottomRightPos().y) {
 					break;
 				}
 				for (int i = 0; i < TileCursorSize; ++i) {
 					screenPosIt.x = screenPos.x + i * PixelTileSize.x;
-					if (screenPosIt.x >= UI.MouseViewport->EndX) {
+					if (screenPosIt.x >= UI.MouseViewport->GetBottomRightPos().x) {
 						break;
 					}
 					Map.TileGraphic->DrawFrameClip(frame, screenPosIt.x, screenPosIt.y);
@@ -919,8 +918,7 @@ static void DrawMapCursor()
 			//  is drawn somewhere else (Check DrawUnitSelection.)
 			if (UnitUnderCursor != NULL) {
 				PushClipping();
-				SetClipping(UI.MouseViewport->X, UI.MouseViewport->Y,
-							UI.MouseViewport->EndX, UI.MouseViewport->EndY);
+				UI.MouseViewport->SetClipping();
 				Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, PixelTileSize.x, PixelTileSize.y);
 				PopClipping();
 			}
@@ -936,7 +934,7 @@ static void DrawStartLocations()
 	const CUnitType *type = Editor.StartUnit;
 	for (const CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
 		PushClipping();
-		SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
+		vp->SetClipping();
 
 		for (int i = 0; i < PlayerMax; i++) {
 			if (Map.Info.PlayerType[i] != PlayerNobody && Map.Info.PlayerType[i] != PlayerNeutral) {
@@ -956,7 +954,6 @@ static void DrawStartLocations()
 				}
 			}
 		}
-
 		PopClipping();
 	}
 }
@@ -1180,7 +1177,7 @@ static void EditorCallbackButtonDown(unsigned button)
 		if (MouseButtons & LeftButton) { // enter move mini-mode
 			const PixelPos cursorPixelPos = {CursorX, CursorY};
 			const Vec2i tilePos = UI.Minimap.ScreenToTilePos(cursorPixelPos);
-			UI.SelectedViewport->Center(tilePos, PixelTileSize / 2);
+			UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(tilePos));
 		}
 		return;
 	}
@@ -1303,7 +1300,8 @@ static void EditorCallbackButtonDown(unsigned button)
 			}
 		}
 
-		CViewport *vp = GetViewport(CursorX, CursorY);
+		const PixelPos cursorScreenpos = {CursorX, CursorY};
+		CViewport *vp = GetViewport(cursorScreenpos);
 		Assert(vp);
 		if ((MouseButtons & LeftButton) && UI.SelectedViewport != vp) {
 			// viewport changed
@@ -1540,6 +1538,7 @@ static void EditorCallbackMouse(int x, int y)
 	char buf[256];
 
 	HandleCursorMove(&x, &y); // Reduce to screen
+	const PixelPos screenPos = {x, y};
 
 	//
 	// Move map.
@@ -1579,8 +1578,8 @@ static void EditorCallbackMouse(int x, int y)
 	}
 
 	// Automatically unpress when map tile has changed
-	const PixelPos screenPos = {CursorX, CursorY};
-	const Vec2i cursorTilePos = UI.SelectedViewport->ScreenToTilePos(screenPos);
+	const PixelPos cursorScreenPos = {CursorX, CursorY};
+	const Vec2i cursorTilePos = UI.SelectedViewport->ScreenToTilePos(cursorScreenPos);
 
 	if (LastMapX != cursorTilePos.x || LastMapY != cursorTilePos.y) {
 		LastMapX = cursorTilePos.x;
@@ -1596,18 +1595,18 @@ static void EditorCallbackMouse(int x, int y)
 		//
 		// Scroll the map
 		//
-		if (CursorX <= UI.SelectedViewport->X) {
+		if (CursorX <= UI.SelectedViewport->GetTopLeftPos().x) {
 			vpTilePos.x--;
 			UI.SelectedViewport->Set(vpTilePos, PixelTileSize / 2);
-		} else if (CursorX >= UI.SelectedViewport->EndX) {
+		} else if (CursorX >= UI.SelectedViewport->GetBottomRightPos().x) {
 			vpTilePos.x++;
 			UI.SelectedViewport->Set(vpTilePos, PixelTileSize / 2);
 		}
 
-		if (CursorY <= UI.SelectedViewport->Y) {
+		if (CursorY <= UI.SelectedViewport->GetTopLeftPos().y) {
 			vpTilePos.y--;
 			UI.SelectedViewport->Set(vpTilePos, PixelTileSize / 2);
-		} else if (CursorY >= UI.SelectedViewport->EndY) {
+		} else if (CursorY >= UI.SelectedViewport->GetBottomRightPos().y) {
 			vpTilePos.y++;
 			UI.SelectedViewport->Set(vpTilePos, PixelTileSize / 2);
 		}
@@ -1641,7 +1640,7 @@ static void EditorCallbackMouse(int x, int y)
 		const PixelPos cursorPixelPos = {CursorX, CursorY};
 		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(cursorPixelPos);
 
-		UI.SelectedViewport->Center(tilePos, PixelTileSize / 2);
+		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(tilePos));
 		return;
 	}
 
@@ -1653,11 +1652,8 @@ static void EditorCallbackMouse(int x, int y)
 	Editor.CursorTileIndex = -1;
 	ButtonUnderCursor = -1;
 
-	//
 	// Minimap
-	//
-	if (x >= UI.Minimap.X && x < UI.Minimap.X + UI.Minimap.W
-		&& y >= UI.Minimap.Y && y < UI.Minimap.Y + UI.Minimap.H) {
+	if (UI.Minimap.Contains(screenPos)) {
 		CursorOn = CursorOnMinimap;
 	}
 
@@ -1727,9 +1723,7 @@ static void EditorCallbackMouse(int x, int y)
 		}
 	}
 
-	//
 	// Handle tile area
-	//
 	if (Editor.State == EditorEditTile) {
 		i = 0;
 		bx = UI.InfoPanel.X + 4;
@@ -1770,9 +1764,7 @@ static void EditorCallbackMouse(int x, int y)
 		}
 	}
 
-	//
 	// Handle buttons
-	//
 	if (UI.InfoPanel.X + 4 < CursorX
 		&& CursorX < UI.InfoPanel.X + 4 + Editor.Select.Icon->G->Width
 		&& UI.InfoPanel.Y + 4 < CursorY
@@ -1822,10 +1814,7 @@ static void EditorCallbackMouse(int x, int y)
 		return;
 	}
 	if (UI.MenuButton.X != -1) {
-		if (x >= UI.MenuButton.X
-			&& x <= UI.MenuButton.X + UI.MenuButton.Style->Width
-			&& y > UI.MenuButton.Y
-			&& y <= UI.MenuButton.Y + UI.MenuButton.Style->Height) {
+		if (UI.MenuButton.Contains(screenPos)) {
 			ButtonAreaUnderCursor = ButtonAreaMenu;
 			ButtonUnderCursor = ButtonUnderMenu;
 			CursorOn = CursorOnButton;
@@ -1833,22 +1822,16 @@ static void EditorCallbackMouse(int x, int y)
 		}
 	}
 
-	//
 	// Minimap
-	//
-	if (x >= UI.Minimap.X && x < UI.Minimap.X + UI.Minimap.W
-		&& y >= UI.Minimap.Y && y < UI.Minimap.Y + UI.Minimap.H) {
+	if (UI.Minimap.Contains(screenPos)) {
 		CursorOn = CursorOnMinimap;
 		return;
 	}
 
-	//
 	// Map
-	//
 	UnitUnderCursor = NoUnitP;
-	if (x >= UI.MapArea.X && x <= UI.MapArea.EndX
-		&& y >= UI.MapArea.Y && y <= UI.MapArea.EndY) {
-		CViewport *vp = GetViewport(x, y);
+	if (UI.MapArea.Contains(screenPos)) {
+		CViewport *vp = GetViewport(screenPos);
 		Assert(vp);
 		if (UI.MouseViewport != vp) { // viewport changed
 			UI.MouseViewport = vp;
@@ -1861,11 +1844,10 @@ static void EditorCallbackMouse(int x, int y)
 		// Look if there is an unit under the cursor.
 		// FIXME: use Viewport2MapX Viewport2MapY
 		//
-		UnitUnderCursor = UnitOnScreen(NULL,
-									   CursorX - UI.MouseViewport->X +
-									   UI.MouseViewport->MapX * PixelTileSize.x + UI.MouseViewport->OffsetX,
-									   CursorY - UI.MouseViewport->Y +
-									   UI.MouseViewport->MapY * PixelTileSize.y + UI.MouseViewport->OffsetY);
+		const PixelPos cursorScreenPos = {CursorX, CursorY};
+		const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(cursorScreenPos);
+		UnitUnderCursor = UnitOnScreen(NULL, cursorMapPos.x, cursorMapPos.y);
+
 		if (UnitUnderCursor != NULL) {
 			ShowUnitInfo(*UnitUnderCursor);
 			return;

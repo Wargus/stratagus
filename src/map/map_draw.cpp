@@ -29,33 +29,63 @@
 
 //@{
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
-#include "unit.h"
-#include "tileset.h"
-#include "video.h"
-#include "map.h"
-#include "player.h"
-#include "pathfinder.h"
-#include "ui.h"
-#include "missile.h"
-#include "unittype.h"
+
+#include "viewport.h"
+
 #include "font.h"
+#include "map.h"
+#include "missile.h"
+#include "pathfinder.h"
+#include "player.h"
+#include "tileset.h"
+#include "unit.h"
+#include "unittype.h"
+#include "ui.h"
+#include "video.h"
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+CViewport::CViewport() : MapX(0), MapY(0),
+	OffsetX(0), OffsetY(0), MapWidth(0), MapHeight(0), Unit(NULL)
+{
+	this->TopLeftPos.x = this->TopLeftPos.y = 0;
+	this->BottomRightPos.x = this->BottomRightPos.y = 0;
+}
 
-/*----------------------------------------------------------------------------
---  Global functions
-----------------------------------------------------------------------------*/
+CViewport::~CViewport()
+{
+}
+
+bool CViewport::Contains(const PixelPos &screenPos) const
+{
+	return this->GetTopLeftPos().x <= screenPos.x && screenPos.x <= this->GetBottomRightPos().x
+		   && this->GetTopLeftPos().y <= screenPos.y && screenPos.y <= this->GetBottomRightPos().y;
+}
+
+
+void CViewport::Restrict(int &screenPosX, int &screenPosY) const
+{
+	if (screenPosX < this->GetTopLeftPos().x) {
+		screenPosX = this->GetTopLeftPos().x;
+	} else if (screenPosX > this->GetBottomRightPos().x - 1) {
+		screenPosX = this->GetBottomRightPos().x - 1;
+	}
+	if (screenPosY < this->GetTopLeftPos().y) {
+		screenPosY = this->GetTopLeftPos().y;
+	} else if (screenPosY > this->GetBottomRightPos().y - 1) {
+		screenPosY = this->GetBottomRightPos().y - 1;
+	}
+}
+
+PixelSize CViewport::GetPixelSize() const
+{
+	return this->BottomRightPos - this->TopLeftPos;
+}
+
+void CViewport::SetClipping() const
+{
+	::SetClipping(this->TopLeftPos.x, this->TopLeftPos.y, this->BottomRightPos.x, this->BottomRightPos.y);
+}
 
 /**
 **  Check if any part of an area is visible in a viewport.
@@ -88,8 +118,9 @@ bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
 // Convert viewport coordinates into map pixel coordinates
 PixelPos CViewport::ScreenToMapPixelPos(const PixelPos &screenPixelPos) const
 {
-	const int x = screenPixelPos.x - this->X + this->MapX * PixelTileSize.x + this->OffsetX;
-	const int y = screenPixelPos.y - this->Y + this->MapY * PixelTileSize.y + this->OffsetY;
+	const PixelDiff relPos = screenPixelPos - this->TopLeftPos;
+	const int x = relPos.x + this->MapX * PixelTileSize.x + this->OffsetX;
+	const int y = relPos.y + this->MapY * PixelTileSize.y + this->OffsetY;
 	const PixelPos mapPixelPos = {x, y};
 
 	return mapPixelPos;
@@ -98,11 +129,11 @@ PixelPos CViewport::ScreenToMapPixelPos(const PixelPos &screenPixelPos) const
 // Convert map pixel coordinates into viewport coordinates
 PixelPos CViewport::MapToScreenPixelPos(const PixelPos &mapPixelPos) const
 {
-	PixelPos screenPixelPos = {
-		mapPixelPos.x + this->X - (this->MapX * PixelTileSize.x + this->OffsetX),
-		mapPixelPos.y + this->Y - (this->MapY * PixelTileSize.y + this->OffsetY)
+	const PixelDiff relPos = {
+		mapPixelPos.x - (this->MapX * PixelTileSize.x + this->OffsetX),
+		mapPixelPos.y - (this->MapY * PixelTileSize.y + this->OffsetY)
 	};
-	return screenPixelPos;
+	return this->TopLeftPos + relPos;
 }
 
 /// convert screen coordinate into tilepos
@@ -144,8 +175,9 @@ void CViewport::Set(const PixelPos &mapPos)
 	x = std::max(x, -UI.MapArea.ScrollPaddingLeft);
 	y = std::max(y, -UI.MapArea.ScrollPaddingTop);
 
-	x = std::min(x, Map.Info.MapWidth * PixelTileSize.x - (this->EndX - this->X) - 1 + UI.MapArea.ScrollPaddingRight);
-	y = std::min(y, Map.Info.MapHeight * PixelTileSize.y - (this->EndY - this->Y) - 1 + UI.MapArea.ScrollPaddingBottom);
+	const PixelSize pixelSize = this->GetPixelSize();
+	x = std::min(x, Map.Info.MapWidth * PixelTileSize.x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
+	y = std::min(y, Map.Info.MapHeight * PixelTileSize.y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
 
 	this->MapX = x / PixelTileSize.x;
 	if (x < 0 && x % PixelTileSize.x) {
@@ -163,8 +195,8 @@ void CViewport::Set(const PixelPos &mapPos)
 	if (this->OffsetY < 0) {
 		this->OffsetY += PixelTileSize.y;
 	}
-	this->MapWidth = ((this->EndX - this->X) + this->OffsetX - 1) / PixelTileSize.x + 1;
-	this->MapHeight = ((this->EndY - this->Y) + this->OffsetY - 1) / PixelTileSize.y + 1;
+	this->MapWidth = (pixelSize.x + this->OffsetX - 1) / PixelTileSize.x + 1;
+	this->MapHeight = (pixelSize.y + this->OffsetY - 1) / PixelTileSize.y + 1;
 }
 
 /**
@@ -185,16 +217,11 @@ void CViewport::Set(const Vec2i &tilePos, const PixelDiff &offset)
 /**
 **  Center map viewport v on map tile (pos).
 **
-**  @param pos     map tile position.
-**  @param offset  offset in tile.
+**  @param mapPixelPos     map pixel position.
 */
-void CViewport::Center(const Vec2i &pos, const PixelDiff &offset)
+void CViewport::Center(const PixelPos &mapPixelPos)
 {
-	const int x = pos.x * PixelTileSize.x + offset.x - (this->EndX - this->X) / 2;
-	const int y = pos.y * PixelTileSize.y + offset.y - (this->EndY - this->Y) / 2;
-	const PixelPos mapPixelPos = {x, y};
-
-	this->Set(mapPixelPos);
+	this->Set(mapPixelPos - this->GetPixelSize() / 2);
 }
 
 /**
@@ -224,10 +251,10 @@ void CViewport::Center(const Vec2i &pos, const PixelDiff &offset)
 */
 void CViewport::DrawMapBackgroundInViewport() const
 {
-	int ex = this->EndX;
+	int ex = this->BottomRightPos.x;
+	int ey = this->BottomRightPos.y;
 	int sy = this->MapY;
-	int dy = this->Y - this->OffsetY;
-	int ey = this->EndY;
+	int dy = this->TopLeftPos.y - this->OffsetY;
 	const int map_max = Map.Info.MapWidth * Map.Info.MapHeight;
 	unsigned short int tile;
 
@@ -247,7 +274,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 		*/
 		int sx = this->MapX + sy;
-		int dx = this->X - this->OffsetX;
+		int dx = this->TopLeftPos.x - this->OffsetX;
 		while (dx <= ex && (sx - sy < Map.Info.MapWidth)) {
 			if (sx - sy < 0) {
 				++sx;
@@ -309,7 +336,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 void CViewport::Draw() const
 {
 	PushClipping();
-	SetClipping(this->X, this->Y, this->EndX, this->EndY);
+	this->SetClipping();
 
 	/* this may take while */
 	this->DrawMapBackgroundInViewport();
@@ -377,12 +404,8 @@ void CViewport::DrawBorder() const
 		color = ColorOrange;
 	}
 
-	Video.DrawRectangle(color, this->X, this->Y, this->EndX - this->X + 1,
-						this->EndY - this->Y + 1);
-}
-
-CViewport::~CViewport()
-{
+	const PixelSize pixelSize = this->GetPixelSize();
+	Video.DrawRectangle(color, this->TopLeftPos.x, this->TopLeftPos.y, pixelSize.x + 1, pixelSize.y + 1);
 }
 
 //@}
