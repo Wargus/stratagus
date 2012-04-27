@@ -539,7 +539,7 @@ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup *, const unsigne
 
 	if (this->Index != -1) {
 		CUnitType &type = *UnitTypes[button->Value];
-		int value = type.Stats[ThisPlayer->Index].Variables[this->Index].Value;
+		int value = type.DefaultStat.Variables[this->Index].Value;
 		int diff = type.Stats[ThisPlayer->Index].Variables[this->Index].Value - value;
 
 		if (!diff) {

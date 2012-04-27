@@ -1200,14 +1200,10 @@ int HandleMouseScrollArea(int x, int y)
 **
 **  @param x  screen pixel X position.
 **  @param y  screen pixel Y position.
-**
-**  @return   true if the mouse has moved, false otherwise
 */
 void HandleCursorMove(int *x, int *y)
 {
-	//
 	//  Reduce coordinates to window-size.
-	//
 	if (*x < 0) {
 		*x = 0;
 	} else if (*x >= Video.Width) {
@@ -1218,7 +1214,6 @@ void HandleCursorMove(int *x, int *y)
 	} else if (*y >= Video.Height) {
 		*y = Video.Height - 1;
 	}
-
 	CursorX = *x;
 	CursorY = *y;
 }
