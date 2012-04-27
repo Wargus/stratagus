@@ -59,8 +59,8 @@ public:
 	void FreeOpenGL();
 	void Reload();
 	void Destroy();
-	void Draw();
-	void DrawCursor(int vx, int vy);
+	void Draw() const;
+	void DrawViewportArea(const CViewport &viewport) const;
 	void AddEvent(const Vec2i &pos, Uint32 color);
 
 	Vec2i ScreenToTilePos(const PixelPos &screenPos) const;

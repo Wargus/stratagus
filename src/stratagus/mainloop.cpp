@@ -195,7 +195,7 @@ void UpdateDisplay()
 		}
 
 		if (!BigMapMode) {
-			for (int i = 0; i < (int)UI.Fillers.size(); ++i) {
+			for (size_t i = 0; i < UI.Fillers.size(); ++i) {
 				UI.Fillers[i].G->DrawSubClip(0, 0,
 											 UI.Fillers[i].G->Width,
 											 UI.Fillers[i].G->Height,
@@ -204,7 +204,7 @@ void UpdateDisplay()
 			DrawMenuButtonArea();
 
 			UI.Minimap.Draw();
-			UI.Minimap.DrawCursor(UI.SelectedViewport->MapPos.x, UI.SelectedViewport->MapPos.y);
+			UI.Minimap.DrawViewportArea(*UI.SelectedViewport);
 
 			UI.InfoPanel.Draw();
 			UI.ButtonPanel.Draw();

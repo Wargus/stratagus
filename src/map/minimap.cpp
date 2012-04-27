@@ -590,7 +590,7 @@ static void DrawEvents()
 /**
 **  Draw the minimap on the screen
 */
-void CMinimap::Draw()
+void CMinimap::Draw() const
 {
 	if (!UseOpenGL) {
 		SDL_Rect drect = {X, Y, 0, 0};
@@ -723,13 +723,13 @@ void CMinimap::Destroy()
 **  @param vx  View point X position.
 **  @param vy  View point Y position.
 */
-void CMinimap::DrawCursor(int vx, int vy)
+void CMinimap::DrawViewportArea(const CViewport &viewport) const
 {
 	// Determine and save region below minimap cursor
-	int x = X + XOffset + (vx * MinimapScaleX) / MINIMAP_FAC;
-	int y = Y + YOffset + (vy * MinimapScaleY) / MINIMAP_FAC;
-	int w = (UI.SelectedViewport->MapWidth * MinimapScaleX) / MINIMAP_FAC;
-	int h = (UI.SelectedViewport->MapHeight * MinimapScaleY) / MINIMAP_FAC;
+	int x = X + XOffset + (viewport.MapPos.x * MinimapScaleX) / MINIMAP_FAC;
+	int y = Y + YOffset + (viewport.MapPos.y * MinimapScaleY) / MINIMAP_FAC;
+	int w = (viewport.MapWidth * MinimapScaleX) / MINIMAP_FAC;
+	int h = (viewport.MapHeight * MinimapScaleY) / MINIMAP_FAC;
 
 	// Draw cursor as rectangle (Note: unclipped, as it is always visible)
 	Video.DrawTransRectangle(UI.ViewportCursorColor, x, y, w, h, 128);

@@ -1083,7 +1083,7 @@ void EditorUpdateDisplay()
 	//
 	if (UI.SelectedViewport) {
 		UI.Minimap.Draw();
-		UI.Minimap.DrawCursor(UI.SelectedViewport->MapPos.x, UI.SelectedViewport->MapPos.y);
+		UI.Minimap.DrawViewportArea(*UI.SelectedViewport);
 	}
 	//
 	// Info panel
