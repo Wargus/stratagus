@@ -435,14 +435,13 @@ void CViewport::Draw() const
 	if (CursorOn == CursorOnMap && Preference.ShowNameDelay && (ShowNameDelay < GameCycle) && (GameCycle < ShowNameTime)) {
 		const PixelPos mousePos = {CursorX, CursorY};
 		const Vec2i tilePos = this->ScreenToTilePos(mousePos);
-		if (UI.MouseViewport->IsInsideMapArea(mousePos) 
-			&& Map.IsFieldVisible(*ThisPlayer, tilePos) || ReplayRevealMap) {
+		if (UI.MouseViewport->IsInsideMapArea(mousePos)
+			&& (Map.IsFieldVisible(*ThisPlayer, tilePos) || ReplayRevealMap)) {
 			ShowUnitName(this, mousePos, UnitUnderCursor);
 		} else if (!Map.IsFieldVisible(*ThisPlayer, tilePos)) {
 			ShowUnitName(this, mousePos, NULL, true);
 		}
-
-	} 
+	}
 
 	DrawBorder();
 	PopClipping();
