@@ -59,7 +59,7 @@ public:
 	void FreeOpenGL();
 	void Reload();
 	void Destroy();
-	void Draw(int vx, int vy);
+	void Draw();
 	void DrawCursor(int vx, int vy);
 	void AddEvent(const Vec2i &pos, Uint32 color);
 

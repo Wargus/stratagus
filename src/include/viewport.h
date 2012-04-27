@@ -115,10 +115,8 @@ public:
 	PixelPos BottomRightPos;  /// Screen pixel bottom-right corner
 
 public:
-	int MapX;                 /// Map tile left corner x coordinate
-	int MapY;                 /// Map tile upper corner y coordinate
-	int OffsetX;              /// X Offset within MapX
-	int OffsetY;              /// Y Offset within MapY
+	Vec2i MapPos;             /// Map tile left-upper corner
+	PixelDiff Offset;         /// Offset within MapX, MapY
 	int MapWidth;             /// Width in map tiles
 	int MapHeight;            /// Height in map tiles
 

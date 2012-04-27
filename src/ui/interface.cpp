@@ -416,8 +416,8 @@ static void UiCenterOnSelected()
 */
 static void UiSaveMapPosition(unsigned position)
 {
-	SavedMapPositionX[position] = UI.SelectedViewport->MapX;
-	SavedMapPositionY[position] = UI.SelectedViewport->MapY;
+	SavedMapPositionX[position] = UI.SelectedViewport->MapPos.x;
+	SavedMapPositionY[position] = UI.SelectedViewport->MapPos.y;
 }
 
 /**

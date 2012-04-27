@@ -187,8 +187,6 @@ static void DrawBuildingCursor()
 	// Align to grid
 	const CViewport &vp = *UI.MouseViewport;
 	const PixelPos cursorScreenPos = {CursorX, CursorY};
-	// int x = CursorX - (CursorX - vp.X + vp.OffsetX) % PixelTileSize.x;
-	// int y = CursorY - (CursorY - vp.Y + vp.OffsetY) % PixelTileSize.y;
 	const Vec2i mpos = vp.ScreenToTilePos(cursorScreenPos);
 	const PixelPos screenPos = vp.TilePosToScreen_TopLeft(mpos);
 
@@ -235,13 +233,10 @@ static void DrawBuildingCursor()
 	const int mask = CursorBuilding->MovementMask;
 	int h = CursorBuilding->TileHeight;
 	// reduce to view limits
-	if (mpos.y + h > vp.MapY + vp.MapHeight) {
-		h = vp.MapY + vp.MapHeight - mpos.y;
-	}
+	h = std::min(h, vp.MapPos.y + vp.MapHeight - mpos.y);
 	int w0 = CursorBuilding->TileWidth;
-	if (mpos.x + w0 > vp.MapX + vp.MapWidth) {
-		w0 = vp.MapX + vp.MapWidth - mpos.x;
-	}
+	w0 = std::min(w0, vp.MapPos.x + vp.MapWidth - mpos.x);
+
 	while (h--) {
 		int w = w0;
 		while (w--) {

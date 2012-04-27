@@ -234,7 +234,7 @@ static void SaveViewports(CFile &file, const CUserInterface &ui)
 	file.printf("DefineViewports(\"mode\", %d", ui.ViewportMode);
 	for (int i = 0; i < ui.NumViewports; ++i) {
 		const CViewport &vp = ui.Viewports[i];
-		file.printf(",\n  \"viewport\", {%d, %d, %d}", vp.MapX, vp.MapY,
+		file.printf(",\n  \"viewport\", {%d, %d, %d}", vp.MapPos.x, vp.MapPos.y,
 					vp.Unit ? UnitNumber(*vp.Unit) : -1);
 	}
 	file.printf(")\n\n");
@@ -366,17 +366,16 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 {
 	//  Compute location of the viewport using oldviewport
 	for (int i = 0; i < num_vps; ++i) {
-		new_vps[i].MapX = 0;
-		new_vps[i].MapY = 0;
+		new_vps[i].MapPos.x = 0;
+		new_vps[i].MapPos.y = 0;
 		const CViewport *vp = GetViewport(new_vps[i].GetTopLeftPos());
 		if (vp) {
 			const PixelDiff relDiff = new_vps[i].GetTopLeftPos() - vp->GetTopLeftPos();
 
-			new_vps[i].OffsetX = relDiff.x + vp->MapX * PixelTileSize.x + vp->OffsetX;
-			new_vps[i].OffsetY = relDiff.y + vp->MapY * PixelTileSize.y + vp->OffsetY;
+			new_vps[i].Offset = relDiff + Map.TilePosToMapPixelPos_TopLeft(vp->MapPos) + vp->Offset;
 		} else {
-			new_vps[i].OffsetX = 0;
-			new_vps[i].OffsetY = 0;
+			new_vps[i].Offset.x = 0;
+			new_vps[i].Offset.y = 0;
 		}
 	}
 
@@ -386,9 +385,7 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 
 		vp.TopLeftPos = new_vps[i].TopLeftPos;
 		vp.BottomRightPos = new_vps[i].BottomRightPos;
-		const Vec2i vpTilePos = {new_vps[i].MapX, new_vps[i].MapY};
-		const PixelDiff offset = {new_vps[i].OffsetX, new_vps[i].OffsetY};
-		vp.Set(vpTilePos, offset);
+		vp.Set(new_vps[i].MapPos, new_vps[i].Offset);
 	}
 	UI.NumViewports = num_vps;
 

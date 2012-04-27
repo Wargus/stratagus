@@ -1066,19 +1066,21 @@ static inline bool DrawLevelCompare(const CUnit *c1, const CUnit *c2)
 int FindAndSortUnits(const CViewport *vp, std::vector<CUnit *> &table)
 {
 	//  Select all units touching the viewpoint.
-	const Vec2i minPos = {vp->MapX - 1, vp->MapY - 1};
-	const Vec2i maxPos = {vp->MapX + vp->MapWidth + 1, vp->MapY + vp->MapHeight + 1};
+	const Vec2i offset = {1, 1};
+	const Vec2i vpSize = {vp->MapWidth, vp->MapHeight};
+	const Vec2i minPos = vp->MapPos - offset;
+	const Vec2i maxPos = vp->MapPos + vpSize + offset;
 
 	Map.Select(minPos, maxPos, table);
 
-	int n = static_cast<int>(table.size());
+	size_t n = table.size();
 	for (size_t i = 0; i < table.size(); ++i) {
 		if (!table[i]->IsVisibleInViewport(vp)) {
 			table[i--] = table[--n];
 			table.pop_back();
 		}
 	}
-	Assert(n == static_cast<int>(table.size()));
+	Assert(n == table.size());
 	if (n > 1) {
 		std::sort(table.begin(), table.begin() + n, DrawLevelCompare);
 	}

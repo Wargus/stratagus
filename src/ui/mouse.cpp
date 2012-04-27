@@ -790,11 +790,9 @@ void MouseScrollMap(int x, int y)
 		speed = UI.MouseScrollSpeedDefault;
 	}
 
-	const Vec2i vpTilePos = {UI.MouseViewport->MapX, UI.MouseViewport->MapY};
-	const PixelDiff vpOffset = {UI.MouseViewport->OffsetX, UI.MouseViewport->OffsetY};
 	const PixelDiff diff = {x - CursorX, y - CursorY};
 
-	UI.MouseViewport->Set(vpTilePos, vpOffset + speed * diff);
+	UI.MouseViewport->Set(UI.MouseViewport->MapPos, UI.MouseViewport->Offset + speed * diff);
 	UI.MouseWarpX = CursorStartX;
 	UI.MouseWarpY = CursorStartY;
 }

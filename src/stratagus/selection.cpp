@@ -409,8 +409,10 @@ int SelectUnitsByType(CUnit &base)
 	// StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
 	/* FIXME: this should probably be cleaner implemented if SelectUnitsByType()
 	 * took parameters of the selection rectangle as arguments */
-	const Vec2i minPos = {vp->MapX - 1, vp->MapY - 1};
-	const Vec2i maxPos = {vp->MapX + vp->MapWidth + 1, vp->MapY + vp->MapHeight + 1};
+	const Vec2i offset = {1, 1};
+	const Vec2i minPos = vp->MapPos - offset;
+	const Vec2i vpSize = {vp->MapWidth, vp->MapHeight};
+	const Vec2i maxPos = vp->MapPos + vpSize + offset;
 	Map.Select(minPos, maxPos, table, HasSameTypeAs(type));
 
 	// FIXME: peon/peasant with gold/wood & co are considered from
@@ -484,8 +486,10 @@ int ToggleUnitsByType(CUnit &base)
 	// FIXME: this should probably be cleaner implemented if SelectUnitsByType()
 	// took parameters of the selection rectangle as arguments */
 	const CViewport *vp = UI.MouseViewport;
-	const Vec2i minPos = {vp->MapX - 1, vp->MapY - 1};
-	const Vec2i maxPos = {vp->MapX + vp->MapWidth + 1, vp->MapY + vp->MapHeight + 1};
+	const Vec2i offset = {1, 1};
+	const Vec2i minPos = vp->MapPos - offset;
+	const Vec2i vpSize = {vp->MapWidth, vp->MapHeight};
+	const Vec2i maxPos = vp->MapPos + vpSize + offset;
 	std::vector<CUnit *> table;
 
 	Map.Select(minPos, maxPos, table, HasSameTypeAs(*type));

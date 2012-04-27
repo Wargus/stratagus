@@ -147,10 +147,9 @@ void DoScrollArea(int state, bool fast)
 	if (state & ScrollLeft) {
 		stepx = -stepx;
 	}
-	const Vec2i vpTilePos = {vp->MapX, vp->MapY};
-	const PixelDiff offset = {vp->OffsetX + stepx, vp->OffsetY + stepy};
+	const PixelDiff offset = {stepx, stepy};
 
-	vp->Set(vpTilePos, offset);
+	vp->Set(vp->MapPos, vp->Offset + offset);
 
 	// This recalulates some values
 	HandleMouseMove(CursorX, CursorY);
@@ -204,8 +203,8 @@ void UpdateDisplay()
 			}
 			DrawMenuButtonArea();
 
-			UI.Minimap.Draw(UI.SelectedViewport->MapX, UI.SelectedViewport->MapY);
-			UI.Minimap.DrawCursor(UI.SelectedViewport->MapX, UI.SelectedViewport->MapY);
+			UI.Minimap.Draw();
+			UI.Minimap.DrawCursor(UI.SelectedViewport->MapPos.x, UI.SelectedViewport->MapPos.y);
 
 			UI.InfoPanel.Draw();
 			UI.ButtonPanel.Draw();

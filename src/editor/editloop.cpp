@@ -1082,8 +1082,8 @@ void EditorUpdateDisplay()
 	// Minimap
 	//
 	if (UI.SelectedViewport) {
-		UI.Minimap.Draw(UI.SelectedViewport->MapX, UI.SelectedViewport->MapY);
-		UI.Minimap.DrawCursor(UI.SelectedViewport->MapX, UI.SelectedViewport->MapY);
+		UI.Minimap.Draw();
+		UI.Minimap.DrawCursor(UI.SelectedViewport->MapPos.x, UI.SelectedViewport->MapPos.y);
 	}
 	//
 	// Info panel
@@ -1544,7 +1544,7 @@ static void EditorCallbackMouse(int x, int y)
 	// Move map.
 	//
 	if (GameCursor == UI.Scroll.Cursor) {
-		Vec2i tilePos = {UI.MouseViewport->MapX, UI.MouseViewport->MapY};
+		Vec2i tilePos = UI.MouseViewport->MapPos;
 
 		// FIXME: Support with CTRL for faster scrolling.
 		// FIXME: code duplication, see ../ui/mouse.c
@@ -1591,7 +1591,7 @@ static void EditorCallbackMouse(int x, int y)
 	//
 	if (CursorOn == CursorOnMap && (MouseButtons & LeftButton)
 		&& (Editor.State == EditorEditTile || Editor.State == EditorEditUnit)) {
-		Vec2i vpTilePos = {UI.SelectedViewport->MapX, UI.SelectedViewport->MapX};
+		Vec2i vpTilePos = UI.SelectedViewport->MapPos;
 		//
 		// Scroll the map
 		//

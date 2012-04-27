@@ -1146,10 +1146,10 @@ static int CclDefineViewports(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
-			UI.Viewports[i].MapX = LuaToNumber(l, -1);
+			UI.Viewports[i].MapPos.x = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, j + 1, 2);
-			UI.Viewports[i].MapY = LuaToNumber(l, -1);
+			UI.Viewports[i].MapPos.y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, j + 1, 3);
 			slot = (int)LuaToNumber(l, -1);

@@ -539,10 +539,10 @@ void CViewport::DrawMapFogOfWar() const
 		return;
 	}
 
-	int sx = std::max<int>(MapX - 1, 0);
-	int ex = std::min<int>(MapX + MapWidth + 1, Map.Info.MapWidth);
-	int my = std::max<int>(MapY - 1, 0);
-	int ey = std::min<int>(MapY + MapHeight + 1, Map.Info.MapHeight);
+	int sx = std::max<int>(MapPos.x - 1, 0);
+	int ex = std::min<int>(MapPos.x + MapWidth + 1, Map.Info.MapWidth);
+	int my = std::max<int>(MapPos.y - 1, 0);
+	int ey = std::min<int>(MapPos.y + MapHeight + 1, Map.Info.MapHeight);
 
 	// Update for visibility all tile in viewport
 	// and 1 tile around viewport (for fog-of-war connection display)
@@ -555,13 +555,13 @@ void CViewport::DrawMapFogOfWar() const
 		my_index += Map.Info.MapWidth;
 	}
 	ex = this->BottomRightPos.x;
-	int sy = MapY * Map.Info.MapWidth;
-	int dy = this->TopLeftPos.y - OffsetY;
+	int sy = MapPos.y * Map.Info.MapWidth;
+	int dy = this->TopLeftPos.y - Offset.y;
 	ey = this->BottomRightPos.y;
 
 	while (dy <= ey) {
-		sx = MapX + sy;
-		int dx = this->TopLeftPos.x - OffsetX;
+		sx = MapPos.x + sy;
+		int dx = this->TopLeftPos.x - Offset.x;
 		while (dx <= ex) {
 			if (VisibleTable[sx]) {
 				DrawFogOfWarTile(sx, sy, dx, dy);

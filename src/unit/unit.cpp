@@ -1477,9 +1477,7 @@ bool CUnit::IsVisibleInViewport(const CViewport *vp) const
 	int x = tilePos.x * PixelTileSize.x + IX - (Type->Width - Type->TileWidth * PixelTileSize.x) / 2 + Type->OffsetX;
 	int y = tilePos.y * PixelTileSize.y + IY - (Type->Height - Type->TileHeight * PixelTileSize.y) / 2 + Type->OffsetY;
 	const PixelSize vpSize = vp->GetPixelSize();
-	const PixelPos vpTopLeftMapPos = {vp->MapX *PixelTileSize.x + vp->OffsetX,
-									  vp->MapY *PixelTileSize.y + vp->OffsetY
-									 };
+	const PixelPos vpTopLeftMapPos = Map.TilePosToMapPixelPos_TopLeft(vp->MapPos) + vp->Offset;
 	const PixelPos vpBottomRightMapPos = vpTopLeftMapPos + vpSize;
 
 	if (x + Type->Width < vpTopLeftMapPos.x || x > vpBottomRightMapPos.x
@@ -3031,7 +3029,8 @@ int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1, const CUnit
 int ViewPointDistance(const Vec2i &pos)
 {
 	const CViewport &vp = *UI.SelectedViewport;
-	const Vec2i middle = {vp.MapX + vp.MapWidth / 2, vp.MapY + vp.MapHeight / 2};
+	const Vec2i vpSize = {vp.MapWidth, vp.MapHeight};
+	const Vec2i middle = vp.MapPos + vpSize / 2;
 
 	return MapDistance(middle, pos);
 }
@@ -3046,7 +3045,9 @@ int ViewPointDistance(const Vec2i &pos)
 int ViewPointDistanceToUnit(const CUnit &dest)
 {
 	const CViewport &vp = *UI.SelectedViewport;
-	const Vec2i midPos = {vp.MapX + vp.MapWidth / 2, vp.MapY + vp.MapHeight / 2};
+	const Vec2i vpSize = {vp.MapWidth, vp.MapHeight};
+	const Vec2i midPos = vp.MapPos + vpSize / 2;
+
 	return dest.MapDistanceTo(midPos);
 }
 
