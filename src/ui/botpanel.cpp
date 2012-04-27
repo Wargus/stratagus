@@ -778,8 +778,8 @@ void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 		case ButtonBuild:
 		case ButtonTrain:
 		case ButtonUpgradeTo:
-			memcpy(Costs, UnitTypes[button->Value]->Stats[ThisPlayer->Index].Costs, 
-				sizeof(UnitTypes[button->Value]->Stats[ThisPlayer->Index].Costs));
+			memcpy(Costs, UnitTypes[button->Value]->Stats[ThisPlayer->Index].Costs,
+				   sizeof(UnitTypes[button->Value]->Stats[ThisPlayer->Index].Costs));
 			break;
 		default:
 			break;

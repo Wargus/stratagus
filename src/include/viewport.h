@@ -110,7 +110,7 @@ private:
 	void DrawMapFogOfWar() const;
 
 public:
-//private:
+	//private:
 	PixelPos TopLeftPos;      /// Screen pixel top-left corner
 	PixelPos BottomRightPos;  /// Screen pixel bottom-right corner
 

@@ -1477,8 +1477,9 @@ bool CUnit::IsVisibleInViewport(const CViewport *vp) const
 	int x = tilePos.x * PixelTileSize.x + IX - (Type->Width - Type->TileWidth * PixelTileSize.x) / 2 + Type->OffsetX;
 	int y = tilePos.y * PixelTileSize.y + IY - (Type->Height - Type->TileHeight * PixelTileSize.y) / 2 + Type->OffsetY;
 	const PixelSize vpSize = vp->GetPixelSize();
-	const PixelPos vpTopLeftMapPos = {vp->MapX * PixelTileSize.x + vp->OffsetX,
-									  vp->MapY * PixelTileSize.y + vp->OffsetY};
+	const PixelPos vpTopLeftMapPos = {vp->MapX *PixelTileSize.x + vp->OffsetX,
+									  vp->MapY *PixelTileSize.y + vp->OffsetY
+									 };
 	const PixelPos vpBottomRightMapPos = vpTopLeftMapPos + vpSize;
 
 	if (x + Type->Width < vpTopLeftMapPos.x || x > vpBottomRightMapPos.x

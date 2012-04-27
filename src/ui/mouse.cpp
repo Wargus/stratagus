@@ -617,7 +617,7 @@ static void HandleMouseOn(int x, int y)
 		if (NumSelected == 1 && Selected[0]->Type->CanTransport() && Selected[0]->BoardCount) {
 			const size_t size = UI.TransportingButtons.size();
 
-			for (size_t i = std::min<size_t>(Selected[0]->BoardCount, size); i != 0; ) {
+			for (size_t i = std::min<size_t>(Selected[0]->BoardCount, size); i != 0;) {
 				--i;
 				if (UI.TransportingButtons[i].Contains(screenPos)) {
 					ButtonAreaUnderCursor = ButtonAreaTransporting;
@@ -909,7 +909,7 @@ void UIHandleMouseMove(int x, int y)
 	// NOTE: If unit is not selectable as a goal, you can't get a cursor hint
 	if (UnitUnderCursor != NULL && !UnitUnderCursor->IsVisibleAsGoal(*ThisPlayer) &&
 		!ReplayRevealMap) {
-			UnitUnderCursor = NoUnitP;
+		UnitUnderCursor = NoUnitP;
 	}
 
 	//
