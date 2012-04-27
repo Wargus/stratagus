@@ -184,16 +184,7 @@ static bool MoveRandomly(CUnit &unit)
 	}
 
 	// restrict to map
-	if (pos.x < 0) {
-		pos.x = 0;
-	} else if (pos.x >= Map.Info.MapWidth) {
-		pos.x = Map.Info.MapWidth - 1;
-	}
-	if (pos.y < 0) {
-		pos.y = 0;
-	} else if (pos.y >= Map.Info.MapHeight) {
-		pos.y = Map.Info.MapHeight - 1;
-	}
+	Map.Clamp(pos);
 
 	// move if possible
 	if (pos != unit.tilePos) {

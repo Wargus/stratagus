@@ -766,24 +766,11 @@ void RestrictCursorToViewport()
 */
 void RestrictCursorToMinimap()
 {
-	if (CursorX < UI.Minimap.X) {
-		CursorStartX = UI.Minimap.X;
-	} else if (CursorX >= UI.Minimap.X + UI.Minimap.W) {
-		CursorStartX = UI.Minimap.X + UI.Minimap.W - 1;
-	} else {
-		CursorStartX = CursorX;
-	}
+	clamp(&CursorX, UI.Minimap.X, UI.Minimap.X + UI.Minimap.W - 1);
+	clamp(&CursorY, UI.Minimap.Y, UI.Minimap.Y + UI.Minimap.H - 1);
 
-	if (CursorY < UI.Minimap.Y) {
-		CursorStartY = UI.Minimap.Y;
-	} else if (CursorY >= UI.Minimap.Y + UI.Minimap.H) {
-		CursorStartY = UI.Minimap.Y + UI.Minimap.H - 1;
-	} else {
-		CursorStartY = CursorY;
-	}
-
-	CursorX = UI.MouseWarpX = CursorStartX;
-	CursorY = UI.MouseWarpY = CursorStartY;
+	UI.MouseWarpX = CursorStartX = CursorX;
+	UI.MouseWarpY = CursorStartY = CursorY;
 	CursorOn = CursorOnMinimap;
 }
 

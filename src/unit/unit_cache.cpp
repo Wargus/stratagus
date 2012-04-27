@@ -93,6 +93,12 @@ void CMap::Remove(CUnit &unit)
 }
 
 
+void CMap::Clamp(Vec2i &pos) const
+{
+	clamp<short int>(&pos.x, 0, this->Info.MapWidth - 1);
+	clamp<short int>(&pos.y, 0, this->Info.MapHeight - 1);
+}
+
 class NoFilter
 {
 public:

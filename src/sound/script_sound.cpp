@@ -472,22 +472,15 @@ static int CclSetGlobalSoundRange(lua_State *l)
 */
 static int CclSetSoundRange(lua_State *l)
 {
-	unsigned char theRange;
-	int tmp;
-	CSound *id;
 
 	LuaCheckArgs(l, 2);
 
-	tmp = LuaToNumber(l, 2);
-	if (tmp < 0) {
-		theRange = 0;
-	} else if (tmp > 255) {
-		theRange = 255;
-	} else {
-		theRange = (unsigned char)tmp;
-	}
+	int tmp = LuaToNumber(l, 2);
+	clamp(&tmp, 0, 255);
+	const unsigned char theRange = static_cast<unsigned char>(tmp);
+
 	lua_pushvalue(l, 1);
-	id = CclGetSound(l);
+	CSound *id = CclGetSound(l);
 	SetSoundRange(id, theRange);
 	return 1;
 }

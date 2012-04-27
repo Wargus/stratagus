@@ -2955,17 +2955,8 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 			d = 1;
 		}
 		pos.x = target.tilePos.x + (pos.x * 5) / d + (SyncRand() & 3);
-		if (pos.x < 0) {
-			pos.x = 0;
-		} else if (pos.x >= Map.Info.MapWidth) {
-			pos.x = Map.Info.MapWidth - 1;
-		}
 		pos.y = target.tilePos.y + (pos.y * 5) / d + (SyncRand() & 3);
-		if (pos.y < 0) {
-			pos.y = 0;
-		} else if (pos.y >= Map.Info.MapHeight) {
-			pos.y = Map.Info.MapHeight - 1;
-		}
+		Map.Clamp(pos);
 		CommandStopUnit(target);
 		CommandMove(target, pos, 0);
 	}

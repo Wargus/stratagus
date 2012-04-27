@@ -364,14 +364,9 @@ int AdjustVariable::Cast(CUnit &caster, const SpellType *, CUnit *target, const 
 			unit->Variable[i].Value = this->Var[i].Value;
 		}
 		unit->Variable[i].Value += this->Var[i].AddValue;
-		unit->Variable[i].Value += this->Var[i].IncreaseTime
-								   * unit->Variable[i].Increase;
+		unit->Variable[i].Value += this->Var[i].IncreaseTime * unit->Variable[i].Increase;
 
-		if (unit->Variable[i].Value <= 0) {
-			unit->Variable[i].Value = 0;
-		} else if (unit->Variable[i].Value > unit->Variable[i].Max) {
-			unit->Variable[i].Value = unit->Variable[i].Max;
-		}
+		clamp(&unit->Variable[i].Value, 0, unit->Variable[i].Max);
 	}
 	return 1;
 }

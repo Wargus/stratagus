@@ -176,6 +176,20 @@ extern inline int MyAbs(int x) { return (x ^ (x >> 31)) - (x >> 31); }
 /// Compute a square root using ints
 extern long isqrt(long num);
 
+
+template <typename T>
+void clamp(T* value, T minValue, T maxValue)
+{
+	Assert(minValue < maxValue);
+
+	if (*value < minValue) {
+		*value = minValue;
+	} else if (maxValue < *value) {
+		*value = maxValue;
+	}
+}
+
+
 /*----------------------------------------------------------------------------
 --  Strings
 ----------------------------------------------------------------------------*/

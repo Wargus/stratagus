@@ -503,6 +503,8 @@ public:
 	/// Remove unit from cache
 	void Remove(CUnit &unit);
 
+	void Clamp(Vec2i &pos) const;
+
 	//Warning: we expect typical usage as xmin = x - range
 	void FixSelectionArea(Vec2i &minpos, Vec2i &maxpos) {
 		minpos.x = std::max<short>(0, minpos.x);

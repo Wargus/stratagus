@@ -585,13 +585,8 @@ int PlaySoundFile(const std::string &name)
 */
 void SetEffectsVolume(int volume)
 {
-	if (volume < 0) {
-		EffectsVolume = 0;
-	} else if (volume > MaxVolume) {
-		EffectsVolume = MaxVolume;
-	} else {
-		EffectsVolume = volume;
-	}
+	clamp(&volume, 0, MaxVolume);
+	EffectsVolume = volume;
 }
 
 /**
@@ -717,13 +712,8 @@ void StopMusic()
 */
 void SetMusicVolume(int volume)
 {
-	if (volume < 0) {
-		MusicVolume = 0;
-	} else if (volume > MaxVolume) {
-		MusicVolume = MaxVolume;
-	} else {
-		MusicVolume = volume;
-	}
+	clamp(&volume, 0, MaxVolume);
+	MusicVolume = volume;
 }
 
 /**

@@ -65,16 +65,8 @@ bool CViewport::Contains(const PixelPos &screenPos) const
 
 void CViewport::Restrict(int &screenPosX, int &screenPosY) const
 {
-	if (screenPosX < this->GetTopLeftPos().x) {
-		screenPosX = this->GetTopLeftPos().x;
-	} else if (screenPosX > this->GetBottomRightPos().x - 1) {
-		screenPosX = this->GetBottomRightPos().x - 1;
-	}
-	if (screenPosY < this->GetTopLeftPos().y) {
-		screenPosY = this->GetTopLeftPos().y;
-	} else if (screenPosY > this->GetBottomRightPos().y - 1) {
-		screenPosY = this->GetBottomRightPos().y - 1;
-	}
+	clamp(&screenPosX, this->GetTopLeftPos().x, this->GetBottomRightPos().x - 1);
+	clamp(&screenPosY, this->GetTopLeftPos().y, this->GetBottomRightPos().y - 1);
 }
 
 PixelSize CViewport::GetPixelSize() const

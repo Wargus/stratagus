@@ -293,23 +293,16 @@ static void HandleBuffs(CUnit &unit, int amount)
 
 	unit.Variable[SHIELD_INDEX].Increase = 1;
 
+	const bool lastStatusIsHidden = unit.Variable[INVISIBLE_INDEX].Value > 0;
 	// User defined variables
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
 		if (unit.Variable[i].Enable && unit.Variable[i].Increase) {
-			if (i == INVISIBLE_INDEX &&
-				unit.Variable[INVISIBLE_INDEX].Value > 0 &&
-				unit.Variable[INVISIBLE_INDEX].Value +
-				unit.Variable[INVISIBLE_INDEX].Increase <= 0) {
-				UnHideUnit(unit);
-			} else {
-				unit.Variable[i].Value += unit.Variable[i].Increase;
-				if (unit.Variable[i].Value <= 0) {
-					unit.Variable[i].Value = 0;
-				} else if (unit.Variable[i].Value > unit.Variable[i].Max) {
-					unit.Variable[i].Value = unit.Variable[i].Max;
-				}
-			}
+			unit.Variable[i].Value += unit.Variable[i].Increase;
+			clamp(&unit.Variable[i].Value, 0, unit.Variable[i].Max);
 		}
+	}
+	if (lastStatusIsHidden && unit.Variable[INVISIBLE_INDEX].Value == 0) {
+		UnHideUnit(unit);
 	}
 }
 
