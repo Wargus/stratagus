@@ -195,7 +195,7 @@ static void AiCheckUnits()
 {
 	//  Count the already made build requests.
 	int counter[UnitTypeMax];
-	AiGetBuildRequestsCount(AiPlayer, counter);
+	AiGetBuildRequestsCount(*AiPlayer, counter);
 
 	//  Remove non active units.
 	const int unitCount = AiPlayer->Player->GetUnitCount();
@@ -397,8 +397,8 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 	for (size_t i = 0; i != UnitTypeBuiltCount; ++i) {
 		const AiBuildQueue &queue = ai.UnitTypeBuilt[i];
 		/* rb - for backward compatibility of save format we have to put it first */
-		if (queue.X != -1) {
-			file.printf("\"onpos\", %d, %d, ", queue.X, queue.Y);
+		if (queue.Pos.x != -1) {
+			file.printf("\"onpos\", %d, %d, ", queue.Pos.x, queue.Pos.y);
 		}
 		/* */
 

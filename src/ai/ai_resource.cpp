@@ -62,7 +62,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static int AiMakeUnit(CUnitType &type, int near_x, int near_y);
+static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos);
 
 /**
 **  Check if the costs are available for the AI.
@@ -125,25 +125,25 @@ static int AiCheckCosts(const int *costs)
 **  @todo  The number of food currently trained can be stored global
 **         for faster use.
 */
-static int AiCheckSupply(const PlayerAi *pai, const CUnitType &type)
+static int AiCheckSupply(const PlayerAi &pai, const CUnitType &type)
 {
 	// Count food supplies under construction.
 	int remaining = 0;
-	for (unsigned int i = 0; i < pai->UnitTypeBuilt.size(); ++i) {
-		const AiBuildQueue &queue = pai->UnitTypeBuilt[i];
+	for (unsigned int i = 0; i < pai.UnitTypeBuilt.size(); ++i) {
+		const AiBuildQueue &queue = pai.UnitTypeBuilt[i];
 		if (queue.Type->Supply) {
 			remaining += queue.Made * queue.Type->Supply;
 		}
 	}
 
 	// We are already out of food.
-	remaining += pai->Player->Supply - pai->Player->Demand - type.Demand;
+	remaining += pai.Player->Supply - pai.Player->Demand - type.Demand;
 	if (remaining < 0) {
 		return 0;
 	}
 	// Count what we train.
-	for (unsigned int i = 0; i < pai->UnitTypeBuilt.size(); ++i) {
-		const AiBuildQueue &queue = pai->UnitTypeBuilt[i];
+	for (unsigned int i = 0; i < pai.UnitTypeBuilt.size(); ++i) {
+		const AiBuildQueue &queue = pai.UnitTypeBuilt[i];
 		if ((remaining -= queue.Made * queue.Type->Demand) < 0) {
 			return 0;
 		}
@@ -170,8 +170,7 @@ class IsAEnemyUnitOf
 public:
 	explicit IsAEnemyUnitOf(const CPlayer &_player) : player(&_player) {}
 	bool operator()(const CUnit *unit) const {
-		return unit->IsVisibleAsGoal(*player)
-			   && unit->IsEnemy(*player);
+		return unit->IsVisibleAsGoal(*player) && unit->IsEnemy(*player);
 	}
 private:
 	const CPlayer *player;
@@ -264,7 +263,7 @@ static bool IsAlreadyWorking(const CUnit &unit)
 **
 **  @note            We must check if the dependencies are fulfilled.
 */
-static int AiBuildBuilding(const CUnitType &type, CUnitType &building, int near_x, int near_y)
+static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos)
 {
 	std::vector<CUnit *> table;
 
@@ -289,16 +288,16 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, int near_
 
 	Vec2i pos;
 	// Find a place to build.
-	if (AiFindBuildingPlace(unit, building, near_x, near_y, &pos)) {
+	if (AiFindBuildingPlace(unit, building, nearPos.x, nearPos.y, &pos)) {
 		CommandBuildBuilding(unit, pos, building, FlushCommands);
 		return 1;
 	} else {
 		//when first worker can't build then rest also won't be able (save CPU)
-		if (near_x != -1 && near_y != -1) {
+		if (Map.Info.IsPointOnMap(nearPos)) {
 			//Crush CPU !!!!!
 			for (int i = 0; i < num && table[i] != &unit; ++i) {
 				// Find a place to build.
-				if (AiFindBuildingPlace(*table[i], building, near_x, near_y, &pos)) {
+				if (AiFindBuildingPlace(*table[i], building, nearPos.x, nearPos.y, &pos)) {
 					CommandBuildBuilding(*table[i], pos, building, FlushCommands);
 					return 1;
 				}
@@ -310,10 +309,11 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, int near_
 
 static bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type)
 {
-	const int size = AiHelpers.Build[type.Slot].size();
-	for (int i = 0; i < size; ++i) {
-		CUnitType *builder = AiHelpers.Build[type.Slot][i];
-		if (player.UnitTypesCount[builder->Slot] > 0
+	const size_t size = AiHelpers.Build[type.Slot].size();
+	for (size_t i = 0; i != size; ++i) {
+		CUnitType &builder = *AiHelpers.Build[type.Slot][i];
+
+		if (player.UnitTypesCount[builder.Slot] > 0
 			&& CheckDependByType(player, type)) {
 			return true;
 		}
@@ -332,14 +332,14 @@ static bool cnode_cmp(const cnode &lhs, const cnode &rhs)
 	return lhs.unit_cost < rhs.unit_cost;
 }
 
-int
-AiGetBuildRequestsCount(PlayerAi *pai, int counter[UnitTypeMax])
+int AiGetBuildRequestsCount(const PlayerAi &pai, int (&counter)[UnitTypeMax])
 {
-	const int size = (int)pai->UnitTypeBuilt.size();
+	const int size = (int)pai.UnitTypeBuilt.size();
 	memset(counter, 0, sizeof(int) * UnitTypeMax);
 	for (int i = 0; i < size; ++i) {
-		AiBuildQueue *queue = &pai->UnitTypeBuilt[i];
-		counter[queue->Type->Slot] += queue->Want;
+		const AiBuildQueue &queue = pai.UnitTypeBuilt[i];
+
+		counter[queue.Type->Slot] += queue.Want;
 	}
 	return size;
 }
@@ -373,7 +373,7 @@ void AiNewDepotRequest(CUnit &worker)
 	// Count the already made build requests.
 	int counter[UnitTypeMax];
 
-	AiGetBuildRequestsCount(worker.Player->Ai, counter);
+	AiGetBuildRequestsCount(*worker.Player->Ai, counter);
 
 	const int n = AiHelpers.Depots[worker.CurrentResource - 1].size();
 
@@ -399,7 +399,6 @@ void AiNewDepotRequest(CUnit &worker)
 			best_cost = cost;
 			//best_mask = needmask;
 		}
-
 	}
 
 	if (best_type) {
@@ -409,17 +408,16 @@ void AiNewDepotRequest(CUnit &worker)
 		queue.Type = best_type;
 		queue.Want = 1;
 		queue.Made = 0;
-		queue.X = pos.x;
-		queue.Y = pos.y;
+		queue.Pos = pos;
 
 		worker.Player->Ai->UnitTypeBuilt.push_back(queue);
 
 		DebugPrint("%d: Worker %d report: Requesting new depot near [%d,%d].\n"
 				   _C_ worker.Player->Index _C_ worker.Slot
-				   _C_ queue.X _C_ queue.Y);
+				   _C_ queue.Pos.x _C_ queue.Pos.y);
 		/*
 		} else {
-		AiPlayer->NeededMask |= best_mask;
+			AiPlayer->NeededMask |= best_mask;
 		}
 		*/
 	}
@@ -441,7 +439,7 @@ static bool AiRequestSupply()
 	// Count the already made build requests.
 	int counter[UnitTypeMax];
 
-	AiGetBuildRequestsCount(AiPlayer, counter);
+	AiGetBuildRequestsCount(*AiPlayer, counter);
 	struct cnode cache[16];
 
 	memset(cache, 0, sizeof(cache));
@@ -486,7 +484,8 @@ static bool AiRequestSupply()
 	if (j) {
 		if (!cache[0].needmask) {
 			CUnitType &type = *cache[0].type;
-			if (AiMakeUnit(type, -1, -1)) {
+			Vec2i invalidPos = {-1, -1};
+			if (AiMakeUnit(type, invalidPos)) {
 				AiBuildQueue newqueue;
 				newqueue.Type = &type;
 				newqueue.Want = 1;
@@ -568,7 +567,7 @@ static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiMakeUnit(CUnitType &typeToMake, int near_x, int near_y)
+static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
 {
 	// Find equivalents unittypes.
 	int usableTypes[UnitTypeMax + 1];
@@ -608,7 +607,7 @@ static int AiMakeUnit(CUnitType &typeToMake, int near_x, int near_y)
 			//
 			if (unit_count[table[i]->Slot]) {
 				if (type.Building) {
-					if (AiBuildBuilding(*table[i], type, near_x, near_y)) {
+					if (AiBuildBuilding(*table[i], type, nearPos)) {
 						return 1;
 					}
 				} else {
@@ -783,7 +782,7 @@ static void AiCheckingWork()
 		// Buildings can be destroyed.
 
 		// Check if we have enough food.
-		if (type.Demand && !AiCheckSupply(AiPlayer, type)) {
+		if (type.Demand && !AiCheckSupply(*AiPlayer, type)) {
 			AiPlayer->NeedSupply = true;
 			AiRequestSupply();
 		}
@@ -799,7 +798,7 @@ static void AiCheckingWork()
 			//  resource or other resource need!
 			continue;
 		} else if (queue.Want > queue.Made && queue.Wait <= GameCycle) {
-			if (AiMakeUnit(type, queue.X, queue.Y)) {
+			if (AiMakeUnit(type, queue.Pos)) {
 				// AiRequestSupply can change UnitTypeBuilt so recalculate queue
 				AiBuildQueue &queue2 = AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
 				++queue2.Made;

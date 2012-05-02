@@ -1201,25 +1201,22 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 		LuaError(l, "incorrect argument");
 	}
 
-	const char *value;
-	int made;
-	int want;
-	int x = -1, y = -1;
+	Vec2i pos = {-1, -1};
 
 	const int args = lua_objlen(l, offset);
 	for (int k = 0; k < args; ++k) {
 		lua_rawgeti(l, offset, k + 1);
-		value = LuaToString(l, -1);
+		const char *value = LuaToString(l, -1);
 		lua_pop(l, 1);
 		++k;
 
 		if (!strcmp(value, "onpos")) {
 			lua_rawgeti(l, offset, k + 1);
-			x = LuaToNumber(l, -1);
+			pos.x = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			++k;
 			lua_rawgeti(l, offset, k + 1);
-			y = LuaToNumber(l, -1);
+			pos.y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else {
 
@@ -1228,23 +1225,22 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 			//lua_pop(l, 1);
 			//++k;
 			lua_rawgeti(l, offset, k + 1);
-			made = LuaToNumber(l, -1);
+			const int made = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			++k;
 			lua_rawgeti(l, offset, k + 1);
-			want = LuaToNumber(l, -1);
+			const int want = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 
 			AiBuildQueue queue;
 			queue.Type = UnitTypeByIdent(value);
 			queue.Want = want;
 			queue.Made = made;
-			queue.X = x;
-			queue.Y = y;
+			queue.Pos = pos;
 
 			ai->UnitTypeBuilt.push_back(queue);
-			x = -1;
-			y = -1;
+			pos.x = -1;
+			pos.y = -1;
 		}
 	}
 }

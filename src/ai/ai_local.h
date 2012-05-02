@@ -233,15 +233,17 @@ private:
 class AiBuildQueue
 {
 public:
-	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0), X(-1), Y(-1)  {}
+	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0)
+	{
+		Pos.x = Pos.y = -1;
+	}
 
 public:
 	unsigned int Want;  /// requested number
 	unsigned int Made;  /// built number
 	CUnitType *Type;    /// unit-type
 	unsigned long Wait; /// wait until this cycle
-	short int X;        /// build near x pos on map
-	short int Y;        /// build near y pos on map
+	Vec2i Pos;          /// build near pos on map
 };
 
 /**
@@ -397,7 +399,7 @@ extern void AiResetUnitTypeEquiv();
 extern int AiFindUnitTypeEquiv(const CUnitType &type, int *result);
 /// Finds all available equivalents units to a given one, in the prefered order
 extern int AiFindAvailableUnitTypeEquiv(const CUnitType &type, int *result);
-extern int AiGetBuildRequestsCount(PlayerAi *, int counter[UnitTypeMax]);
+extern int AiGetBuildRequestsCount(const PlayerAi &pai, int (&counter)[UnitTypeMax]);
 
 extern void AiNewDepotRequest(CUnit &worker);
 

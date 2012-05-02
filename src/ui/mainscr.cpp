@@ -967,8 +967,8 @@ void MessagesDisplay::DrawMessages()
 						 ThisPlayer->Ai->UnitTypeBuilt[z].Made,
 						 ThisPlayer->Ai->UnitTypeBuilt[z].Want,
 						 ThisPlayer->Ai->UnitTypeBuilt[z].Wait,
-						 ThisPlayer->Ai->UnitTypeBuilt[z].X,
-						 ThisPlayer->Ai->UnitTypeBuilt[z].Y);
+						 ThisPlayer->Ai->UnitTypeBuilt[z].Pos.x,
+						 ThisPlayer->Ai->UnitTypeBuilt[z].Pos.y);
 
 				label.DrawClip(UI.MapArea.X + 8,
 							   UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1),
