@@ -19,26 +19,26 @@
 ----    02111-1307, USA.
 -->
 
-    <title>ChangeLog: Stratagus Version 2.2.6</title>
+    <title>ChangeLog: Stratagus Version 2.2.7</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 
 <body>
 
 <pre width=80>
-         _________ __                 __                               
+         _________ __                 __
         /   _____//  |_____________ _/  |______     ____  __ __  ______
         \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
         /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
        /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-               \/                  \/          \//_____/            \/ 
+               \/                  \/          \//_____/            \/
     ______________________                           ______________________
 			  T H E   W A R   B E G I N S
 	   Stratagus - A free fantasy real time strategy game engine
 </pre>
 <hr>
 
-<h1>ChangeLog: Stratagus Version 2.2.6</h1>
+<h1>ChangeLog: Stratagus Version 2.2.7</h1>
 <hr>
 
 
@@ -46,6 +46,7 @@
 <p/>
 	<li>trunk</li>
 	<ul>
+	<li>Code compile now with Lua 5.2 (from Joris Dauphin).</li>
 	<li>Fix bug #909454: compile errorson OpenBSD. (from Pali Rohár)</li>
 	<li>Fix compilation for maemo. (from Pali Rohár)</li>
 	<li>Fix bug #910078: worker unable to do anything after building structure. (patch from Neil Tan)</li>
@@ -206,10 +207,10 @@
 	<li>Fix X check in configure (from Nehal Mistry)
 	<li>Updated french translation (from Francois Beerten)
 	</ul>
-	
+
 <p><li>2.2 Released<p>
 	<ul>
-	<li>Fixed bug #1599216: dragging the mouse when a game ends 
+	<li>Fixed bug #1599216: dragging the mouse when a game ends
 	    crashes in the results menu (from Jimmy Salmon)
 	<li>Added utf8 support in guichan text boxes (from Jimmy Salmon)
 	<li>Added paste support in guichan text boxes (from Jimmy Salmon and Nehal Mistry)
@@ -244,7 +245,7 @@ g the callback. (from Francois Beerten)
 	<li>Replaced IfTimer by GetTimer (from Fran&ccedil;ois Beerten).
 	<li>Replaced IfOpponents by GetNumOpponents (from Fran&ccedil;ois Beerten).
 	<li>Removed IfSwitch and ActionSetSwitch (from Fran&ccedil;ois Beerten).
-	<li>Removed IfScore, IfKills, IfUnit and IfResource. 
+	<li>Removed IfScore, IfKills, IfUnit and IfResource.
 	    Use GetPlayerData instead (from Fran&ccedil;ois Beerten).
 	<li>Removed IfElapsed, use GameCycle instead (from Fran&ccedil;ois Beerten).
 	<li>Player colors are now configurable (from Jimmy Salmon).
@@ -257,7 +258,7 @@ g the callback. (from Francois Beerten)
 	<li>Fixed bug #1072829: Radar working during construction (from Russell Smith).
 	<li>Removed DefineTilesetWcNames and related (From Fran&ccedil;ois Beerten).
 	<li>Removed DefineAiWcNames (From Fran&ccedil;ois Beerten).
-	<li>Removed DefineConstructionWcNames, DefineUnitTypeWcNames, DefineIconWcNames 
+	<li>Removed DefineConstructionWcNames, DefineUnitTypeWcNames, DefineIconWcNames
 		and DefineUpgradeWcNames (from Fran&ccedil;ois Beerten).
 	<li>Allow sound paths outside of the sounds subdirectory (from Fran&ccedil;ois Beerten).
 	<li>Add auto repair mode (use AutoRepairRange in DefineUnitType) (from Joris Dauphin).
@@ -428,7 +429,7 @@ g the callback. (from Francois Beerten)
     <li>Fixed bug #5116 on lose-resource option (from Crestez Leonard).
     <li>Fixed Ai resource gathering (and bug #5180) (from Crestez Leonard).
     <li>Applied patch #1885, updated msvc project files (from Jimmy Salmon).
-    <li>New resource harvesting, no hardcoded unit types (from Crestez Leonard). 
+    <li>New resource harvesting, no hardcoded unit types (from Crestez Leonard).
     <li>NEW_UI: Fixed save/load (from Martin Renold).
     <li>Pathfinder fixes for when the goal moves (EXPERIMENTAL) (from Russell Smith).
     <li>Added repair-costs and repair-hp for units that can be repaired (from Russell Smith).
@@ -791,7 +792,7 @@ g the callback. (from Francois Beerten)
     <li>Added name generations for units.
     <li>Fixed feature request #422244: Units in multiple groups (from Jimmy Salmon).
     <li>Added support for drawing clipped numbers.
-    <li>Added showing the damage on the map. 
+    <li>Added showing the damage on the map.
     <li>Fixed bug: Wrong error message "illegal level", if loading .cm maps for network play.
     <li>Fixed feature request #499301: Find idle workers (from Jimmy Salmon).
     <li>New video frame and game simulation timing code written. Closes bug #205006.
@@ -829,7 +830,7 @@ g the callback. (from Francois Beerten)
     <li>Fixed bug: Scouts could rescue units.
     <li>More AI scripts written.
     <li>AI uses transporters.
-    <li>New triggers added. Old goals removed. 
+    <li>New triggers added. Old goals removed.
     <li>Add campaign support.
     <li>CD player support with SDL. (from Nehal)
     <li>Many documentation fixes. (from Ender)
@@ -1348,7 +1349,7 @@ g the callback. (from Francois Beerten)
     <li>UDTA section of puds are now parsed and supported.
     <li>Moved sound CCL code into own file.
     <li>Moved unit-type CCL code into own file.
-    <li>Started moving unit code into own directory. 
+    <li>Started moving unit code into own directory.
     <li>Support for 15bit X11 server. (My new graphic card needs it)
     <li>Applied patches: sound is distance dependent. (Fabrice Rossi)
     </ul>
@@ -1429,7 +1430,7 @@ g the callback. (from Francois Beerten)
 </ul>
 
 <hr>
-(C) Copyright 1998-2011 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project 
+(C) Copyright 1998-2011 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project
 under the <a href="gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>
