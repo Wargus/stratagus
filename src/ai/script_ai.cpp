@@ -1198,7 +1198,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 		LuaError(l, "incorrect argument");
 	}
 
-	Vec2i pos = {-1, -1};
+	Vec2i pos = { -1, -1};
 
 	const int args = lua_rawlen(l, offset);
 	for (int k = 0; k < args; ++k) {

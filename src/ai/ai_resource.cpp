@@ -484,7 +484,7 @@ static bool AiRequestSupply()
 	if (j) {
 		if (!cache[0].needmask) {
 			CUnitType &type = *cache[0].type;
-			Vec2i invalidPos = {-1, -1};
+			Vec2i invalidPos = { -1, -1};
 			if (AiMakeUnit(type, invalidPos)) {
 				AiBuildQueue newqueue;
 				newqueue.Type = &type;

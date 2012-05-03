@@ -178,7 +178,7 @@ extern long isqrt(long num);
 
 
 template <typename T>
-void clamp(T* value, T minValue, T maxValue)
+void clamp(T *value, T minValue, T maxValue)
 {
 	Assert(minValue < maxValue);
 

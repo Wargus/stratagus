@@ -233,8 +233,7 @@ private:
 class AiBuildQueue
 {
 public:
-	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0)
-	{
+	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0) {
 		Pos.x = Pos.y = -1;
 	}
 

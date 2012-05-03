@@ -252,7 +252,7 @@ static unsigned char CalculateVolume(bool isVolume, int power, unsigned char ran
 static char CalculateStereo(const CUnit &unit)
 {
 	int stereo = ((unit.tilePos.x * PixelTileSize.x + unit.Type->TileWidth * PixelTileSize.x / 2 +
-				  unit.IX - UI.SelectedViewport->MapPos.x * PixelTileSize.x) * 256 /
+				   unit.IX - UI.SelectedViewport->MapPos.x * PixelTileSize.x) * 256 /
 				  ((UI.SelectedViewport->MapWidth - 1) * PixelTileSize.x)) - 128;
 	clamp(&stereo, -128, 127);
 	return stereo;
