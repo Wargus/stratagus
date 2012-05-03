@@ -144,7 +144,9 @@ static int AiCheckSupply(const PlayerAi &pai, const CUnitType &type)
 	// Count what we train.
 	for (unsigned int i = 0; i < pai.UnitTypeBuilt.size(); ++i) {
 		const AiBuildQueue &queue = pai.UnitTypeBuilt[i];
-		if ((remaining -= queue.Made * queue.Type->Demand) < 0) {
+
+		remaining -= queue.Made * queue.Type->Demand;
+		if (remaining < 0) {
 			return 0;
 		}
 	}
@@ -288,7 +290,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 
 	Vec2i pos;
 	// Find a place to build.
-	if (AiFindBuildingPlace(unit, building, nearPos.x, nearPos.y, &pos)) {
+	if (AiFindBuildingPlace(unit, building, nearPos, &pos)) {
 		CommandBuildBuilding(unit, pos, building, FlushCommands);
 		return 1;
 	} else {
@@ -297,7 +299,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 			//Crush CPU !!!!!
 			for (int i = 0; i < num && table[i] != &unit; ++i) {
 				// Find a place to build.
-				if (AiFindBuildingPlace(*table[i], building, nearPos.x, nearPos.y, &pos)) {
+				if (AiFindBuildingPlace(*table[i], building, nearPos, &pos)) {
 					CommandBuildBuilding(*table[i], pos, building, FlushCommands);
 					return 1;
 				}

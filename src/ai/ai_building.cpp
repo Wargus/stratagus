@@ -608,8 +608,7 @@ static int AiFindMiningPlace(const CUnit &worker,
 **
 **  @param worker  Worker to build building.
 **  @param type    Type of building.
-**  @param nx      Start search near X position (or worker->X if nx == -1).
-**  @param ny      Start search near Y position (or worker->Y if ny == -1).
+**  @param nearPos Start search near nearPos position (or worker->X if nearPos is invalid).
 **  @param dpos    Pointer for position returned.
 **
 **  @return        True if place found, false if no found.
@@ -617,11 +616,9 @@ static int AiFindMiningPlace(const CUnit &worker,
 **  @todo          Better and faster way to find building place of oil
 **                 platforms Special routines for special buildings.
 */
-int AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, int nx, int ny, Vec2i *dpos)
+int AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *dpos)
 {
-	//
 	// Find a good place for a new hall
-	//
 	DebugPrint("%d: Want to build a %s(%s)\n" _C_ AiPlayer->Player->Index
 			   _C_ type.Ident.c_str() _C_ type.Name.c_str());
 
@@ -631,27 +628,25 @@ int AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, int nx, int 
 		//Depots
 		if (type.CanStore[i]) {
 			if (resinfo && resinfo->TerrainHarvester) {
-				return AiFindLumberMillPlace(worker, type, nx, ny, dpos);
+				return AiFindLumberMillPlace(worker, type, nearPos.x, nearPos.y, dpos);
 			} else {
-				return AiFindHallPlace(worker, type, nx, ny, dpos, i);
+				return AiFindHallPlace(worker, type, nearPos.x, nearPos.y, dpos, i);
 			}
 		} else
 			//mines
 			if (type.GivesResource == i) {
 				if (resinfo && resinfo->RefineryHarvester) {
 					//Mine have to be build ONTOP resources
-					return AiFindMiningPlace(worker, type, nx, ny,  dpos, i);
+					return AiFindMiningPlace(worker, type, nearPos.x, nearPos.y,  dpos, i);
 				} else {
 					//Mine can be build without resource restrictions: solar panels, etc
-					return AiFindBuildingPlace2(worker, type,
-												(nx != -1 ? nx : worker.tilePos.x),
-												(ny != -1 ? ny : worker.tilePos.y), dpos, 1);
+					const Vec2i& startPos = Map.Info.IsPointOnMap(nearPos) ? nearPos : worker.tilePos;
+					return AiFindBuildingPlace2(worker, type, startPos.x, startPos.y, dpos, 1);
 				}
 			}
 	}
-
-	return AiFindBuildingPlace2(worker, type,
-								(nx != -1 ? nx : worker.tilePos.x), (ny != -1 ? ny : worker.tilePos.y), dpos, 1);
+	const Vec2i& startPos = Map.Info.IsPointOnMap(nearPos) ? nearPos : worker.tilePos;
+	return AiFindBuildingPlace2(worker, type, startPos.x, startPos.y, dpos, 1);
 }
 
 //@}
