@@ -352,37 +352,27 @@ void CleanDependencies()
 */
 static int CclDefineDependency(lua_State *l)
 {
-	const char *target;
-	const char *required;
-	int count;
-	const char *value;
-	int or_flag;
-	int args;
-	int j;
-	int subargs;
-	int k;
+	int args = lua_gettop(l);
+	int j = 0;
 
-	args = lua_gettop(l);
-	j = 0;
-
-	target = LuaToString(l, j + 1);
+	const char *target = LuaToString(l, j + 1);
 	++j;
 
 	//
 	//  All or rules.
 	//
-	or_flag = 0;
+	int or_flag = 0;
 	for (; j < args; ++j) {
 		if (!lua_istable(l, j + 1)) {
 			LuaError(l, "incorrect argument");
 		}
-		subargs = lua_objlen(l, j + 1);
+		const int subargs = lua_rawlen(l, j + 1);
 
-		for (k = 0; k < subargs; ++k) {
+		for (int k = 0; k < subargs; ++k) {
 			lua_rawgeti(l, j + 1, k + 1);
-			required = LuaToString(l, -1);
+			const char *required = LuaToString(l, -1);
 			lua_pop(l, 1);
-			count = 1;
+			int count = 1;
 			if (k + 1 < subargs) {
 				lua_rawgeti(l, j + 1, k + 2);
 				if (lua_isnumber(l, -1)) {
@@ -391,13 +381,12 @@ static int CclDefineDependency(lua_State *l)
 				}
 				lua_pop(l, 1);
 			}
-
 			AddDependency(target, required, count, or_flag);
 			or_flag = 0;
 		}
 		if (j + 1 < args) {
 			++j;
-			value = LuaToString(l, j + 1);
+			const char *value = LuaToString(l, j + 1);
 			if (strcmp(value, "or")) {
 				LuaError(l, "not or symbol: %s" _C_ value);
 				return 0;
@@ -405,7 +394,6 @@ static int CclDefineDependency(lua_State *l)
 			or_flag = 1;
 		}
 	}
-
 	return 0;
 }
 

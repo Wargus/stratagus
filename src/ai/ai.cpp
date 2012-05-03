@@ -180,8 +180,7 @@ static void AiExecuteScript()
 	if (AiPlayer->Script.empty()) {
 		return;
 	}
-	lua_pushstring(Lua, "_ai_scripts_");
-	lua_gettable(Lua, LUA_GLOBALSINDEX);
+	lua_getglobal(Lua, "_ai_scripts_");
 	lua_pushstring(Lua, AiPlayer->Script.c_str());
 	lua_rawget(Lua, -2);
 	LuaCall(0, 1);

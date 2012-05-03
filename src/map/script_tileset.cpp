@@ -193,7 +193,7 @@ static void DefineTilesetParseSpecial(lua_State *l, CTileset *tileset)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	const int args = lua_objlen(l, -1);
+	const int args = lua_rawlen(l, -1);
 
 	//
 	//  Parse the list: (still everything could be changed!)
@@ -238,7 +238,7 @@ static void DefineTilesetParseSpecial(lua_State *l, CTileset *tileset)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			if (lua_objlen(l, -1) != 2) {
+			if (lua_rawlen(l, -1) != 2) {
 				LuaError(l, "growing-tree: Wrong table length");
 			}
 			for (int i = 0; i < 2; ++i) {
@@ -312,7 +312,7 @@ static int DefineTilesetParseSolid(lua_State *l, CTileset *tileset, int index)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	const int len = lua_objlen(l, -1);
+	const int len = lua_rawlen(l, -1);
 
 	j = 0;
 	for (int i = 0; i < len; ++i, ++j) {
@@ -373,7 +373,7 @@ static int DefineTilesetParseMixed(lua_State *l, CTileset *tileset, int index)
 		LuaError(l, "incorrect argument");
 	}
 	int j = 0;
-	const int args = lua_objlen(l, -1);
+	const int args = lua_rawlen(l, -1);
 	lua_rawgeti(l, -1, j + 1);
 	++j;
 	const int basic_name = TilesetParseName(l, tileset);
@@ -393,7 +393,7 @@ static int DefineTilesetParseMixed(lua_State *l, CTileset *tileset, int index)
 		//
 		//  Vector: the tiles.
 		//
-		const int len = lua_objlen(l, -1);
+		const int len = lua_rawlen(l, -1);
 		for (int i = 0; i < len; ++i) {
 			lua_rawgeti(l, -1, i + 1);
 			const int pud = LuaToNumber(l, -1);
@@ -442,7 +442,7 @@ static void DefineTilesetParseSlot(lua_State *l, CTileset *tileset, int t)
 	tileset->NumTerrainTypes = 1;
 
 	//  Parse the list: (still everything could be changed!)
-	const int args = lua_objlen(l, t);
+	const int args = lua_rawlen(l, t);
 	for (int j = 0; j < args; ++j) {
 		lua_rawgeti(l, t, j + 1);
 		const char *value = LuaToString(l, -1);

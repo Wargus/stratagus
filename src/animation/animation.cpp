@@ -328,7 +328,7 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 	if (!lua_istable(l, luaIndex)) {
 		LuaError(l, "incorrect argument");
 	}
-	const int nargs = lua_objlen(l, luaIndex);
+	const int nargs = lua_rawlen(l, luaIndex);
 
 	for (int j = 0; j != nargs; ++j) {
 		lua_rawgeti(l, luaIndex, j + 1);
@@ -479,7 +479,7 @@ static CAnimation *ParseAnimation(lua_State *l, int idx)
 	if (!lua_istable(l, idx)) {
 		LuaError(l, "incorrect argument");
 	}
-	const int args = lua_objlen(l, idx);
+	const int args = lua_rawlen(l, idx);
 
 	if (args == 0) {
 		return NULL;

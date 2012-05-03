@@ -271,7 +271,7 @@ static int CclGroup(lua_State *l)
 	CUnitGroup &grp = Groups[grpNum];
 	grp.NumUnits = LuaToNumber(l, 2);
 	int i = 0;
-	const int args = lua_objlen(l, 3);
+	const int args = lua_rawlen(l, 3);
 	for (int j = 0; j < args; ++j) {
 		lua_rawgeti(l, 3, j + 1);
 		const char *str = LuaToString(l, -1);

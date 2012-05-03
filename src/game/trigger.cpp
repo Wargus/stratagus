@@ -436,20 +436,17 @@ static int CclAddTrigger(lua_State *l)
 
 	// Make a list of all triggers.
 	// A trigger is a pair of condition and action
-	lua_pushstring(l, "_triggers_");
-	lua_gettable(l, LUA_GLOBALSINDEX);
+	lua_getglobal(l, "_triggers_");
 
 	if (lua_isnil(l, -1)) {
 		DebugPrint("Trigger not set, defining trigger\n");
 		lua_pop(l, 1);
-		lua_pushstring(l, "_triggers_");
 		lua_newtable(l);
-		lua_settable(l, LUA_GLOBALSINDEX);
-		lua_pushstring(l, "_triggers_");
-		lua_gettable(l, LUA_GLOBALSINDEX);
+		lua_setglobal(l, "_triggers_");
+		lua_getglobal(l, "_triggers_");
 	}
 
-	const int i = lua_objlen(l, -1);
+	const int i = lua_rawlen(l, -1);
 	if (ActiveTriggers && !ActiveTriggers[i / 2]) {
 		lua_pushnil(l);
 		lua_rawseti(l, -2, i + 1);
@@ -503,7 +500,7 @@ static int TriggerExecuteAction(int script)
 	int ret = 0;
 
 	lua_rawgeti(Lua, -1, script + 1);
-	const int args = lua_objlen(Lua, -1);
+	const int args = lua_rawlen(Lua, -1);
 	for (int j = 0; j < args; ++j) {
 		lua_rawgeti(Lua, -1, j + 1);
 		LuaCall(0, 0);
@@ -540,9 +537,8 @@ void TriggersEachCycle()
 {
 	const int base = lua_gettop(Lua);
 
-	lua_pushstring(Lua, "_triggers_");
-	lua_gettable(Lua, LUA_GLOBALSINDEX);
-	int triggers = lua_objlen(Lua, -1);
+	lua_getglobal(Lua, "_triggers_");
+	int triggers = lua_rawlen(Lua, -1);
 
 	if (Trigger >= triggers) {
 		Trigger = 0;
@@ -602,9 +598,8 @@ void SaveTriggers(CFile &file)
 	file.printf("--- MODULE: triggers\n");
 
 	file.printf("\n");
-	lua_pushstring(Lua, "_triggers_");
-	lua_gettable(Lua, LUA_GLOBALSINDEX);
-	const int triggers = lua_objlen(Lua, -1);
+	lua_getglobal(Lua, "_triggers_");
+	const int triggers = lua_rawlen(Lua, -1);
 
 	file.printf("SetActiveTriggers(");
 	for (int i = 0; i < triggers; i += 2) {
@@ -645,11 +640,10 @@ void InitTriggers()
 
 	// FIXME: choose the triggers for game type
 
-	lua_pushstring(Lua, "_triggers_");
-	lua_gettable(Lua, LUA_GLOBALSINDEX);
+	lua_getglobal(Lua, "_triggers_");
 	if (lua_isnil(Lua, -1)) {
-		lua_pushstring(Lua, "SinglePlayerTriggers");
-		lua_gettable(Lua, LUA_GLOBALSINDEX);
+		lua_pop(Lua, 1);
+		lua_getglobal(Lua, "SinglePlayerTriggers");
 		LuaCall(0, 1);
 	}
 	lua_pop(Lua, 1);
@@ -660,9 +654,8 @@ void InitTriggers()
 */
 void CleanTriggers()
 {
-	lua_pushstring(Lua, "_triggers_");
 	lua_pushnil(Lua);
-	lua_settable(Lua, LUA_GLOBALSINDEX);
+	lua_setglobal(Lua, "_triggers_");
 
 	lua_pushnil(Lua);
 	lua_setglobal(Lua, "Triggers");

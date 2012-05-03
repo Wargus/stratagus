@@ -312,7 +312,7 @@ static int CclDefineSprites(lua_State *l)
 			} else if (!strcmp(key, "File")) {
 				deco.File = LuaToString(l, -1);
 			} else if (!strcmp(key, "Offset")) {
-				if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
+				if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
 					LuaError(l, "incorrect argument");
 				}
 				lua_rawgeti(l, -1, 1); // offsetX
@@ -321,7 +321,7 @@ static int CclDefineSprites(lua_State *l)
 				deco.HotY = LuaToNumber(l, -1);
 				lua_pop(l, 2); // Pop offsetX and Y
 			} else if (!strcmp(key, "Size")) {
-				if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
+				if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
 					LuaError(l, "incorrect argument");
 				}
 				lua_rawgeti(l, -1, 1); // Width

@@ -134,7 +134,7 @@ static int CclMakeSound(lua_State *l)
 		id = MakeSound(c_name, &c_file, 1);
 	} else if (lua_istable(l, 2)) {
 		// several files
-		args = lua_objlen(l, 2);
+		args = lua_rawlen(l, 2);
 		c_files = new char *[args];
 		for (j = 0; j < args; ++j) {
 			lua_rawgeti(l, 2, j + 1);
@@ -254,7 +254,7 @@ static int CclDefineGameSounds(lua_State *l)
 			}
 			GameSounds.Docking.Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "placement-error")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -276,7 +276,7 @@ static int CclDefineGameSounds(lua_State *l)
 			lua_pop(l, 1);
 			GameSounds.PlacementError[i].Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "placement-success")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -298,7 +298,7 @@ static int CclDefineGameSounds(lua_State *l)
 			lua_pop(l, 1);
 			GameSounds.PlacementSuccess[i].Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "work-complete")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -320,7 +320,7 @@ static int CclDefineGameSounds(lua_State *l)
 			lua_pop(l, 1);
 			GameSounds.WorkComplete[i].Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "research-complete")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -342,7 +342,7 @@ static int CclDefineGameSounds(lua_State *l)
 			lua_pop(l, 1);
 			GameSounds.ResearchComplete[i].Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "not-enough-res")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 3) {
+			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -368,7 +368,7 @@ static int CclDefineGameSounds(lua_State *l)
 			lua_pop(l, 1);
 			GameSounds.NotEnoughRes[i][resId].Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "not-enough-food")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -390,7 +390,7 @@ static int CclDefineGameSounds(lua_State *l)
 			lua_pop(l, 1);
 			GameSounds.NotEnoughFood[i].Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "rescue")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -412,7 +412,7 @@ static int CclDefineGameSounds(lua_State *l)
 			lua_pop(l, 1);
 			GameSounds.Rescue[i].Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "building-construction")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);

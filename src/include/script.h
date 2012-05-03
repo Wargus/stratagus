@@ -36,6 +36,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <string>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -91,6 +92,14 @@ extern int LuaCall(int narg, int clear, bool exitOnError = true);
 		} \
 	} while (0)
 
+#if LUA_VERSION_NUM <= 501
+
+inline size_t lua_rawlen(lua_State *l, int index)
+{
+	return luaL_getn(l, index);
+}
+
+#endif
 
 typedef enum {
 	ENumber_Lua,         /// a lua function.
@@ -304,7 +313,7 @@ CUnit *CclGetUnitFromRef(lua_State *l);
 template <typename T>
 static void CclGetPos(lua_State *l, T *x , T *y, const int offset = -1)
 {
-	if (!lua_istable(l, offset) || lua_objlen(l, offset) != 2) {
+	if (!lua_istable(l, offset) || lua_rawlen(l, offset) != 2) {
 		LuaError(l, "incorrect argument");
 	}
 	lua_rawgeti(l, offset, 1);

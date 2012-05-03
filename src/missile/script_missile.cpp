@@ -95,7 +95,7 @@ void MissileType::Load(lua_State *l)
 		if (!strcmp(value, "File")) {
 			file = LuaToString(l, -1);
 		} else if (!strcmp(value, "Size")) {
-			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
+			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
@@ -215,7 +215,7 @@ static int CclMissile(lua_State *l)
 		if (!strcmp(value, "type")) {
 			type = MissileTypeByIdent(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "pos")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -225,7 +225,7 @@ static int CclMissile(lua_State *l)
 			position.y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "origin-pos")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -235,7 +235,7 @@ static int CclMissile(lua_State *l)
 			source.y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "goal")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -294,7 +294,7 @@ static int CclMissile(lua_State *l)
 			--j;
 		} else if (!strcmp(value, "step")) {
 			Assert(missile);
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -337,7 +337,7 @@ static int CclDefineBurningBuilding(lua_State *l)
 			LuaError(l, "incorrect argument");
 		}
 		BurningBuildingFrame *ptr = new BurningBuildingFrame;
-		const int subargs = lua_objlen(l, j + 1);
+		const int subargs = lua_rawlen(l, j + 1);
 
 		for (int k = 0; k < subargs; ++k) {
 			lua_rawgeti(l, j + 1, k + 1);

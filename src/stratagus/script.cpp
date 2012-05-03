@@ -193,8 +193,7 @@ static int report(int status, bool exitOnError)
 
 static int luatraceback(lua_State *L)
 {
-	lua_pushliteral(L, "debug");
-	lua_gettable(L, LUA_GLOBALSINDEX);
+	lua_getglobal(L, "debug");
 	if (!lua_istable(L, -1)) {
 		lua_pop(L, 1);
 		return 1;
@@ -544,7 +543,7 @@ static void ParseBinOp(lua_State *l, BinOp *binop)
 	Assert(l);
 	Assert(binop);
 	Assert(lua_istable(l, -1));
-	Assert(lua_objlen(l, -1) == 2);
+	Assert(lua_rawlen(l, -1) == 2);
 
 	lua_rawgeti(l, -1, 1); // left
 	binop->Left = CclParseNumberDesc(l);
@@ -662,15 +661,12 @@ CUnitType **CclParseTypeDesc(lua_State *l)
 */
 static int ParseLuaFunction(lua_State *l, const char *tablename, int *counter)
 {
-	lua_pushstring(l, tablename);
-	lua_gettable(l, LUA_GLOBALSINDEX);
+	lua_getglobal(l, tablename);
 	if (lua_isnil(l, -1)) {
 		lua_pop(l, 1);
-		lua_pushstring(l, tablename);
 		lua_newtable(l);
-		lua_settable(l, LUA_GLOBALSINDEX);
-		lua_pushstring(l, tablename);
-		lua_gettable(l, LUA_GLOBALSINDEX);
+		lua_setglobal(l, tablename);
+		lua_getglobal(l, tablename);
 	}
 	lua_pushvalue(l, -2);
 	lua_rawseti(l, -2, *counter);
@@ -687,18 +683,15 @@ static int ParseLuaFunction(lua_State *l, const char *tablename, int *counter)
 */
 static int CallLuaNumberFunction(unsigned int handler)
 {
-	int narg;
-	int res;
+	const int narg = lua_gettop(Lua);
 
-	narg = lua_gettop(Lua);
-	lua_pushstring(Lua, "_numberfunction_");
-	lua_gettable(Lua, LUA_GLOBALSINDEX);
+	lua_getglobal(Lua, "_numberfunction_");
 	lua_rawgeti(Lua, -1, handler);
 	LuaCall(0, 0);
 	if (lua_gettop(Lua) - narg != 2) {
 		LuaError(Lua, "Function must return one value.");
 	}
-	res = LuaToNumber(Lua, -1);
+	const int res = LuaToNumber(Lua, -1);
 	lua_pop(Lua, 2);
 	return res;
 }
@@ -712,18 +705,14 @@ static int CallLuaNumberFunction(unsigned int handler)
 */
 static char *CallLuaStringFunction(unsigned int handler)
 {
-	int narg;
-	char *res;
-
-	narg = lua_gettop(Lua);
-	lua_pushstring(Lua, "_stringfunction_");
-	lua_gettable(Lua, LUA_GLOBALSINDEX);
+	const int narg = lua_gettop(Lua);
+	lua_getglobal(Lua, "_stringfunction_");
 	lua_rawgeti(Lua, -1, handler);
 	LuaCall(0, 0);
 	if (lua_gettop(Lua) - narg != 2) {
 		LuaError(Lua, "Function must return one value.");
 	}
-	res = new_strdup(LuaToString(Lua, -1));
+	char *res = new_strdup(LuaToString(Lua, -1));
 	lua_pop(Lua, 2);
 	return res;
 }
@@ -737,11 +726,8 @@ static char *CallLuaStringFunction(unsigned int handler)
 */
 NumberDesc *CclParseNumberDesc(lua_State *l)
 {
-	NumberDesc *res;
-	int nargs;
-	const char *key;
+	NumberDesc *res = new NumberDesc;
 
-	res = new NumberDesc;
 	if (lua_isnumber(l, -1)) {
 		res->e = ENumber_Dir;
 		res->D.Val = LuaToNumber(l, -1);
@@ -749,12 +735,12 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 		res->e = ENumber_Lua;
 		res->D.Index = ParseLuaFunction(l, "_numberfunction_", &NumberCounter);
 	} else if (lua_istable(l, -1)) {
-		nargs = lua_objlen(l, -1);
+		const int nargs = lua_rawlen(l, -1);
 		if (nargs != 2) {
 			LuaError(l, "Bad number of args in parse Number table\n");
 		}
 		lua_rawgeti(l, -1, 1); // key
-		key = LuaToString(l, -1);
+		const char *key = LuaToString(l, -1);
 		lua_pop(l, 1);
 		lua_rawgeti(l, -1, 2); // table
 		if (!strcmp(key, "Add")) {
@@ -867,7 +853,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 		} else if (!strcmp(key, "StringFind")) {
 			Assert(lua_istable(l, -1));
 			res->e = ENumber_StringFind;
-			if (lua_objlen(l, -1) != 2) {
+			if (lua_rawlen(l, -1) != 2) {
 				LuaError(l, "Bad param for StringFind");
 			}
 			lua_rawgeti(l, -1, 1); // left
@@ -910,7 +896,7 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		res->e = EString_Lua;
 		res->D.Index = ParseLuaFunction(l, "_stringfunction_", &StringCounter);
 	} else if (lua_istable(l, -1)) {
-		nargs = lua_objlen(l, -1);
+		nargs = lua_rawlen(l, -1);
 		if (nargs != 2) {
 			LuaError(l, "Bad number of args in parse String table\n");
 		}
@@ -922,7 +908,7 @@ StringDesc *CclParseStringDesc(lua_State *l)
 			int i; // iterator.
 
 			res->e = EString_Concat;
-			res->D.Concat.n = lua_objlen(l, -1);
+			res->D.Concat.n = lua_rawlen(l, -1);
 			if (res->D.Concat.n < 1) {
 				LuaError(l, "Bad number of args in Concat\n");
 			}
@@ -943,47 +929,47 @@ StringDesc *CclParseStringDesc(lua_State *l)
 			res->D.Unit = CclParseUnitDesc(l);
 		} else if (!strcmp(key, "If")) {
 			res->e = EString_If;
-			if (lua_objlen(l, -1) != 2 && lua_objlen(l, -1) != 3) {
+			if (lua_rawlen(l, -1) != 2 && lua_rawlen(l, -1) != 3) {
 				LuaError(l, "Bad number of args in If\n");
 			}
 			lua_rawgeti(l, -1, 1); // Condition.
 			res->D.If.Cond = CclParseNumberDesc(l);
 			lua_rawgeti(l, -1, 2); // Then.
 			res->D.If.True = CclParseStringDesc(l);
-			if (lua_objlen(l, -1) == 3) {
+			if (lua_rawlen(l, -1) == 3) {
 				lua_rawgeti(l, -1, 3); // Else.
 				res->D.If.False = CclParseStringDesc(l);
 			}
 			lua_pop(l, 1); // table.
 		} else if (!strcmp(key, "SubString")) {
 			res->e = EString_SubString;
-			if (lua_objlen(l, -1) != 2 && lua_objlen(l, -1) != 3) {
+			if (lua_rawlen(l, -1) != 2 && lua_rawlen(l, -1) != 3) {
 				LuaError(l, "Bad number of args in SubString\n");
 			}
 			lua_rawgeti(l, -1, 1); // String.
 			res->D.SubString.String = CclParseStringDesc(l);
 			lua_rawgeti(l, -1, 2); // Begin.
 			res->D.SubString.Begin = CclParseNumberDesc(l);
-			if (lua_objlen(l, -1) == 3) {
+			if (lua_rawlen(l, -1) == 3) {
 				lua_rawgeti(l, -1, 3); // End.
 				res->D.SubString.End = CclParseNumberDesc(l);
 			}
 			lua_pop(l, 1); // table.
 		} else if (!strcmp(key, "Line")) {
 			res->e = EString_Line;
-			if (lua_objlen(l, -1) < 2 || lua_objlen(l, -1) > 4) {
+			if (lua_rawlen(l, -1) < 2 || lua_rawlen(l, -1) > 4) {
 				LuaError(l, "Bad number of args in Line\n");
 			}
 			lua_rawgeti(l, -1, 1); // Line.
 			res->D.Line.Line = CclParseNumberDesc(l);
 			lua_rawgeti(l, -1, 2); // String.
 			res->D.Line.String = CclParseStringDesc(l);
-			if (lua_objlen(l, -1) >= 3) {
+			if (lua_rawlen(l, -1) >= 3) {
 				lua_rawgeti(l, -1, 3); // Lenght.
 				res->D.Line.MaxLen = CclParseNumberDesc(l);
 			}
 			res->D.Line.Font = NULL;
-			if (lua_objlen(l, -1) >= 4) {
+			if (lua_rawlen(l, -1) >= 4) {
 				lua_rawgeti(l, -1, 4); // Font.
 				res->D.Line.Font = CFont::Get(LuaToString(l, -1));
 				if (!res->D.Line.Font) {
@@ -2641,26 +2627,21 @@ static char *LuaEscape(const char *str)
 */
 std::string SaveGlobal(lua_State *l, bool is_root)
 {
-	int type_key;
-	int type_value;
 	std::string value;
-	int first;
 	std::string res;
 	std::string tmp;
-	int b;
 
-	//	Assert(!is_root || !lua_gettop(l));
-	first = 1;
+	//Assert(!is_root || !lua_gettop(l));
+	int first = 1;
 	if (is_root) {
-		lua_pushstring(l, "_G");// global table in lua.
-		lua_gettable(l, LUA_GLOBALSINDEX);
+		lua_getglobal(l, "_G");// global table in lua.
 	}
 	const std::string sep = is_root ? "" : ", ";
 	Assert(lua_istable(l, -1));
 	lua_pushnil(l);
 	while (lua_next(l, -2)) {
-		type_key = lua_type(l, -2);
-		type_value = lua_type(l, -1);
+		int type_key = lua_type(l, -2);
+		int type_value = lua_type(l, -1);
 		const std::string key = (type_key == LUA_TSTRING) ? lua_tostring(l, -2) : "";
 		if ((key == "_G") || (is_root && (
 								  (key == "assert") || (key == "gcinfo") || (key == "getfenv") ||
@@ -2689,10 +2670,11 @@ std::string SaveGlobal(lua_State *l, bool is_root)
 			case LUA_TNUMBER:
 				value = lua_tostring(l, -1); // let lua do the conversion
 				break;
-			case LUA_TBOOLEAN:
-				b = lua_toboolean(l, -1);
+			case LUA_TBOOLEAN: {
+				int b = lua_toboolean(l, -1);
 				value = b ? "true" : "false";
 				break;
+			}
 			case LUA_TSTRING:
 				value = ((std::string(lua_tostring(l, -1)).find('\n') != std::string::npos) ? (std::string("[[") + lua_tostring(l, -1) + "]]") : (std::string("\"") + lua_tostring(l, -1) + "\""));
 				break;
@@ -2760,7 +2742,7 @@ std::string SaveGlobal(lua_State *l, bool is_root)
 		res += "\n";
 	}
 	lua_pop(l, 1); // pop the table
-	//	Assert(!is_root || !lua_gettop(l));
+	//Assert(!is_root || !lua_gettop(l));
 	return res;
 }
 
@@ -2769,13 +2751,10 @@ std::string SaveGlobal(lua_State *l, bool is_root)
 */
 void SavePreferences()
 {
-	FILE *fd;
-	std::string path;
 	std::string tableName;
 
 	if (!GameName.empty()) {
-		lua_pushstring(Lua, GameName.c_str());
-		lua_gettable(Lua, LUA_GLOBALSINDEX);
+		lua_getglobal(Lua, GameName.c_str());
 		if (lua_type(Lua, -1) == LUA_TTABLE) {
 			tableName = GameName;
 			tableName += ".";
@@ -2783,24 +2762,23 @@ void SavePreferences()
 			lua_pushstring(Lua, "preferences");
 			lua_gettable(Lua, -2);
 		} else {
-			lua_pushstring(Lua, "preferences");
-			lua_gettable(Lua, LUA_GLOBALSINDEX);
+			lua_getglobal(Lua, "preferences");
 			tableName = "preferences";
 		}
 	} else {
 		tableName = "preferences";
-		lua_pushstring(Lua, "preferences");
-		lua_gettable(Lua, LUA_GLOBALSINDEX);
+		lua_getglobal(Lua, "preferences");
 	}
 	if (lua_type(Lua, -1) == LUA_TTABLE) {
-		path = Parameters::Instance.GetUserDirectory();
+		std::string path = Parameters::Instance.GetUserDirectory();
+
 		if (!GameName.empty()) {
 			path += "/";
 			path += GameName;
 		}
 		path += "/preferences.lua";
 
-		fd = fopen(path.c_str(), "w");
+		FILE *fd = fopen(path.c_str(), "w");
 		if (!fd) {
 			DebugPrint("Cannot open file %s for writing\n" _C_ path.c_str());
 			return;

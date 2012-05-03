@@ -170,7 +170,7 @@ void PathFinderInput::Load(lua_State *l)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument in PathFinderInput::Load");
 	}
-	const int args = 1 + lua_objlen(l, -1);
+	const int args = 1 + lua_rawlen(l, -1);
 	for (int i = 1; i < args; ++i) {
 		lua_rawgeti(l, -1, i);
 		const char *tag = LuaToString(l, -1);
@@ -211,7 +211,7 @@ void PathFinderOutput::Load(lua_State *l)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument in PathFinderOutput::Load");
 	}
-	const int args = 1 + lua_objlen(l, -1);
+	const int args = 1 + lua_rawlen(l, -1);
 	for (int i = 1; i < args; ++i) {
 		lua_rawgeti(l, -1, i);
 		const char *tag = LuaToString(l, -1);
@@ -229,7 +229,7 @@ void PathFinderOutput::Load(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument _");
 			}
-			const int subargs = lua_objlen(l, -1);
+			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				this->Path[k] = LuaToNumber(l, -1);
@@ -257,7 +257,7 @@ static void CclParseOrders(lua_State *l, CUnit &unit)
 		delete *order;
 	}
 	unit.Orders.clear();
-	const int n = lua_objlen(l, -1);
+	const int n = lua_rawlen(l, -1);
 
 	for (int j = 0; j < n; ++j) {
 		lua_rawgeti(l, -1, j + 1);
@@ -292,7 +292,7 @@ static int CclUnit(lua_State *l)
 	CPlayer *player = NULL;
 
 	// Parse the list:
-	const int args = lua_objlen(l, 2);
+	const int args = lua_rawlen(l, 2);
 	for (int j = 0; j < args; ++j) {
 		lua_rawgeti(l, 2, j + 1);
 		const char *value = LuaToString(l, -1);
@@ -346,7 +346,7 @@ static int CclUnit(lua_State *l)
 			int h;
 
 			lua_rawgeti(l, 2, j + 1);
-			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 4) {
+			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 4) {
 				LuaError(l, "incorrect argument");
 			}
 			Vec2i pos;
@@ -562,7 +562,7 @@ static int CclUnit(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, -1);
+			subargs = lua_rawlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				CUnit *u = CclGetUnitFromRef(l);
@@ -701,7 +701,7 @@ static int CclCreateUnit(lua_State *l)
 		LuaError(l, "Bad unittype");
 	}
 	lua_pop(l, 1);
-	if (!lua_istable(l, 3) || lua_objlen(l, 3) != 2) {
+	if (!lua_istable(l, 3) || lua_rawlen(l, 3) != 2) {
 		LuaError(l, "incorrect argument !!");
 	}
 	lua_rawgeti(l, 3, 1);
@@ -800,7 +800,7 @@ static int CclOrderUnit(lua_State *l)
 	lua_pop(l, 1);
 
 	Vec2i pos2;
-	if (lua_objlen(l, 3) == 4) {
+	if (lua_rawlen(l, 3) == 4) {
 		lua_rawgeti(l, 3, 3);
 		pos2.x = LuaToNumber(l, -1);
 		lua_pop(l, 1);
@@ -821,7 +821,7 @@ static int CclOrderUnit(lua_State *l)
 	lua_rawgeti(l, 4, 2);
 	dpos1.y = LuaToNumber(l, -1);
 	lua_pop(l, 1);
-	if (lua_objlen(l, 4) == 4) {
+	if (lua_rawlen(l, 4) == 4) {
 		lua_rawgeti(l, 4, 3);
 		dpos2.x = LuaToNumber(l, -1);
 		lua_pop(l, 1);

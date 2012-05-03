@@ -167,7 +167,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 */
 void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 {
-	const int args = lua_objlen(l, -1);
+	const int args = lua_rawlen(l, -1);
 
 	lua_rawgeti(l, -1, 1);
 	const char *actiontype = LuaToString(l, -1);

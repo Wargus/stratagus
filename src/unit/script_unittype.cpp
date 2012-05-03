@@ -217,7 +217,7 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 	int args;
 	CBuildRestrictionAnd *andlist = new CBuildRestrictionAnd();
 
-	args = lua_objlen(l, -1);
+	args = lua_rawlen(l, -1);
 	Assert(!(args & 1)); // must be even
 
 	for (int i = 0; i < args; ++i) {
@@ -348,7 +348,7 @@ static int CclDefineUnitType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, -1);
+			subargs = lua_rawlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				value = LuaToString(l, -1);
@@ -383,7 +383,7 @@ static int CclDefineUnitType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, -1);
+			subargs = lua_rawlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				value = LuaToString(l, -1);
@@ -427,7 +427,7 @@ static int CclDefineUnitType(lua_State *l)
 				type->ShadowSprite = NULL;
 			}
 		} else if (!strcmp(value, "Offset")) {
-			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
+			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
@@ -451,7 +451,7 @@ static int CclDefineUnitType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, -1);
+			subargs = lua_rawlen(l, -1);
 			type->Portrait.Num = subargs;
 			type->Portrait.Files = new std::string[type->Portrait.Num];
 			type->Portrait.Mngs = new Mng *[type->Portrait.Num];
@@ -466,7 +466,7 @@ static int CclDefineUnitType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, -1);
+			subargs = lua_rawlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				int res;
 
@@ -482,7 +482,7 @@ static int CclDefineUnitType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, -1);
+			subargs = lua_rawlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				const int res = CclGetResourceByName(l);
@@ -496,7 +496,7 @@ static int CclDefineUnitType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, -1);
+			subargs = lua_rawlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				int res;
 
@@ -529,7 +529,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->DefaultStat.Variables[SHIELD_INDEX].Increase = 1;
 			type->DefaultStat.Variables[SHIELD_INDEX].Enable = 1;
 		} else if (!strcmp(value, "TileSize")) {
-			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
+			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
@@ -541,7 +541,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Decoration")) {
 			type->Decoration = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NeutralMinimapColor")) {
-			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 3) {
+			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
@@ -554,7 +554,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->NeutralMinimapColorRGB.b = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "BoxSize")) {
-			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
+			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
@@ -622,7 +622,7 @@ static int CclDefineUnitType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, -1);
+			subargs = lua_rawlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				value = LuaToString(l, -1);
@@ -691,7 +691,7 @@ static int CclDefineUnitType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, -1);
+			subargs = lua_rawlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				int res;
 
@@ -730,7 +730,7 @@ static int CclDefineUnitType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, -1);
+			subargs = lua_rawlen(l, -1);
 			// Free any old restrictions if they are redefined
 			for (std::vector<CBuildRestriction *>::iterator b = type->BuildingRules.begin();
 				 b != type->BuildingRules.end(); ++b) {
@@ -783,7 +783,7 @@ static int CclDefineUnitType(lua_State *l)
 				type->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
 			}
 
-			subargs = lua_objlen(l, -1);
+			subargs = lua_rawlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				value = LuaToString(l, -1);
@@ -808,14 +808,14 @@ static int CclDefineUnitType(lua_State *l)
 			int args;
 			int j;
 
-			args = lua_objlen(l, -1);
+			args = lua_rawlen(l, -1);
 			for (j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
 				res = new ResourceInfo;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument");
 				}
-				subargs = lua_objlen(l, -1);
+				subargs = lua_rawlen(l, -1);
 				for (k = 0; k < subargs; ++k) {
 					lua_rawgeti(l, -1, k + 1);
 					value = LuaToString(l, -1);
@@ -888,7 +888,7 @@ static int CclDefineUnitType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, -1);
+			subargs = lua_rawlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				type->CanStore[CclGetResourceByName(l)] = 1;
@@ -908,7 +908,7 @@ static int CclDefineUnitType(lua_State *l)
 				type->CanCastSpell = new char[SpellTypeTable.size()];
 				memset(type->CanCastSpell, 0, SpellTypeTable.size() * sizeof(char));
 			}
-			subargs = lua_objlen(l, -1);
+			subargs = lua_rawlen(l, -1);
 			if (subargs == 0) {
 				delete[] type->CanCastSpell;
 				type->CanCastSpell = NULL;
@@ -938,7 +938,7 @@ static int CclDefineUnitType(lua_State *l)
 				type->AutoCastActive = new char[SpellTypeTable.size()];
 				memset(type->AutoCastActive, 0, SpellTypeTable.size() * sizeof(char));
 			}
-			subargs = lua_objlen(l, -1);
+			subargs = lua_rawlen(l, -1);
 			if (subargs == 0) {
 				delete[] type->AutoCastActive;
 				type->AutoCastActive = NULL;
@@ -970,7 +970,7 @@ static int CclDefineUnitType(lua_State *l)
 			if (type->BoolFlag.size() < UnitTypeVar.GetNumberBoolFlag()) {
 				type->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
 			}
-			subargs = lua_objlen(l, -1);
+			subargs = lua_rawlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				value = LuaToString(l, -1);
@@ -1004,7 +1004,7 @@ static int CclDefineUnitType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = lua_objlen(l, -1);
+			subargs = lua_rawlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				value = LuaToString(l, -1);
@@ -1148,7 +1148,7 @@ static int CclDefineUnitStats(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			const int subargs = lua_objlen(l, j + 1);
+			const int subargs = lua_rawlen(l, j + 1);
 
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);

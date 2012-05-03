@@ -334,7 +334,7 @@ static int CclDefineAiHelper(lua_State *l)
 		if (!lua_istable(l, j + 1)) {
 			LuaError(l, "incorrect argument");
 		}
-		subargs = lua_objlen(l, j + 1);
+		subargs = lua_rawlen(l, j + 1);
 		k = 0;
 		lua_rawgeti(l, j + 1, k + 1);
 		value = LuaToString(l, -1);
@@ -453,15 +453,12 @@ static int CclDefineAi(lua_State *l)
 	//
 	// AI Script
 	//
-	lua_pushstring(l, "_ai_scripts_");
-	lua_gettable(l, LUA_GLOBALSINDEX);
+	lua_getglobal(l, "_ai_scripts_");
 	if (lua_isnil(l, -1)) {
 		lua_pop(l, 1);
-		lua_pushstring(l, "_ai_scripts_");
 		lua_newtable(l);
-		lua_settable(l, LUA_GLOBALSINDEX);
-		lua_pushstring(l, "_ai_scripts_");
-		lua_gettable(l, LUA_GLOBALSINDEX);
+		lua_setglobal(l, "_ai_scripts_");
+		lua_getglobal(l, "_ai_scripts_");
 	}
 	aitype->Script = aitype->Name + aitype->Race + aitype->Class;
 	lua_pushstring(l, aitype->Script.c_str());
@@ -782,7 +779,7 @@ static int CclAiForce(lua_State *l)
 	}
 	AiForce &aiforce = AiPlayer->Force[AiPlayer->Force.getScriptForce(force)];
 
-	args = lua_objlen(l, 2);
+	args = lua_rawlen(l, 2);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, 2, j + 1);
 		type = CclGetUnitType(l);
@@ -941,7 +938,7 @@ static int CclAiWaitForces(lua_State *l)
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
-	int force, args = lua_objlen(l, 1);
+	int force, args = lua_rawlen(l, 1);
 	for (int i = 0; i < args; ++i) {
 		lua_rawgeti(l, 1, i + 1);
 		force = LuaToNumber(l, -1);
@@ -971,7 +968,7 @@ static int CclAiAttackWithForces(lua_State *l)
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
-	int force, args = lua_objlen(l, 1);
+	int force, args = lua_rawlen(l, 1);
 	for (int i = 0; i < args; ++i) {
 		lua_rawgeti(l, 1, i + 1);
 		force = LuaToNumber(l, -1);
@@ -1203,7 +1200,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 
 	Vec2i pos = {-1, -1};
 
-	const int args = lua_objlen(l, offset);
+	const int args = lua_rawlen(l, offset);
 	for (int k = 0; k < args; ++k) {
 		lua_rawgeti(l, offset, k + 1);
 		const char *value = LuaToString(l, -1);
@@ -1286,7 +1283,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			const int subargs = lua_objlen(l, j + 1);
+			const int subargs = lua_rawlen(l, j + 1);
 			lua_rawgeti(l, j + 1, 0 + 1);
 			const int cclforceIdx = LuaToNumber(l, -1);
 			UNUSED(cclforceIdx);
@@ -1326,7 +1323,7 @@ static int CclDefineAiPlayer(lua_State *l)
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
 					}
-					const int subsubargs = lua_objlen(l, -1);
+					const int subsubargs = lua_rawlen(l, -1);
 					for (int subk = 0; subk < subsubargs; ++subk) {
 						lua_rawgeti(l, -1, subk + 1);
 						const int num = LuaToNumber(l, -1);
@@ -1347,7 +1344,7 @@ static int CclDefineAiPlayer(lua_State *l)
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
 					}
-					const int subsubargs = lua_objlen(l, -1);
+					const int subsubargs = lua_rawlen(l, -1);
 					for (int subk = 0; subk < subsubargs; ++subk) {
 						lua_rawgeti(l, -1, subk + 1);
 						const int num = LuaToNumber(l, -1);
@@ -1384,7 +1381,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			const int subargs = lua_objlen(l, j + 1);
+			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				const char *type = LuaToString(l, -1);
@@ -1400,7 +1397,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			const int subargs = lua_objlen(l, j + 1);
+			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				const char *type = LuaToString(l, -1);
@@ -1416,7 +1413,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			const int subargs = lua_objlen(l, j + 1);
+			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				const char *type = LuaToString(l, -1);
@@ -1432,7 +1429,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			const int subargs = lua_objlen(l, j + 1);
+			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				const char *type = LuaToString(l, -1);
@@ -1448,7 +1445,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			const int subargs = lua_objlen(l, j + 1);
+			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				const char *type = LuaToString(l, -1);
@@ -1463,12 +1460,12 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			const int subargs = lua_objlen(l, j + 1);
+			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				Vec2i pos;
 
 				lua_rawgeti(l, j + 1, k + 1);
-				if (!lua_istable(l, -1) || lua_objlen(l, -1) != 3) {
+				if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 3) {
 					LuaError(l, "incorrect argument");
 				}
 				lua_rawgeti(l, -1, 1);
@@ -1492,7 +1489,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			const int subargs = lua_objlen(l, j + 1);
+			const int subargs = lua_rawlen(l, j + 1);
 			int i = 0;
 			if (subargs) {
 				ai->UnitTypeRequests.resize(subargs / 2);
@@ -1513,7 +1510,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			const int subargs = lua_objlen(l, j + 1);
+			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				const char *ident = LuaToString(l, -1);
@@ -1524,7 +1521,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			const int subargs = lua_objlen(l, j + 1);
+			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				const char *ident = LuaToString(l, -1);
@@ -1539,7 +1536,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			const int subargs = lua_objlen(l, j + 1);
+			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				const int num = LuaToNumber(l, -1);

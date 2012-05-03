@@ -285,7 +285,7 @@ static int CclDefineModifier(lua_State *l)
 			um->Modifier.Variables[HP_INDEX].Increase = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(key, "cost")) {
-			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
