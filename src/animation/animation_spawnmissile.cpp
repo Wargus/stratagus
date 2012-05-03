@@ -114,10 +114,12 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 		start.y = (goal->tilePos.y + starty) * PixelTileSize.y + PixelTileSize.y / 2;
 	}
 	if ((flags & ANIM_SM_TOTARGET)) {
-		const CUnit *target = goal->CurrentOrder()->GetGoal();
-		Assert(goal->CurrentAction() == UnitActionAttack);
+		CUnit *target = goal->CurrentOrder()->GetGoal();
 		if (!target  || target->Destroyed || target->Removed) {
-			return;
+			Assert(!unit.Type->Missile.Missile->AlwaysFire || unit.Type->Missile.Missile->Range);
+			if (!target || !unit.Type->Missile.Missile->AlwaysFire) {
+				return;
+			}
 		}
 		if (flags & ANIM_SM_PIXEL) {
 			dest.x = target->tilePos.x * PixelTileSize.x + target->IX + destx;

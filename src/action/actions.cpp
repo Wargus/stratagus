@@ -335,7 +335,8 @@ static void HandleUnitAction(CUnit &unit)
 
 		// o Look if we have a new order and old finished.
 		// o Or the order queue should be flushed.
-		if (unit.Orders[0]->Finished && unit.Orders.size() > 1) {
+		if ((unit.Orders[0]->Action == UnitActionStandGround || unit.Orders[0]->Finished)
+			&& unit.Orders.size() > 1) {
 			if (unit.Removed) { // FIXME: johns I see this as an error
 				DebugPrint("Flushing removed unit\n");
 				// This happens, if building with ALT+SHIFT.

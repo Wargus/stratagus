@@ -254,8 +254,18 @@ void UpdateStats(int reset)
 
 		// Non-solid units can always be entered and they don't block anything
 		if (type.NonSolid) {
-			type.MovementMask = 0;
-			type.FieldFlags = 0;
+			if (type.Building) {
+				type.MovementMask = MapFieldLandUnit |
+					MapFieldSeaUnit |
+					MapFieldBuilding |
+					MapFieldCoastAllowed |
+					MapFieldWaterAllowed |
+					MapFieldUnpassable;
+				type.FieldFlags = MapFieldNoBuilding;
+			} else {
+				type.MovementMask = 0;
+				type.FieldFlags = 0;
+			}
 			continue;
 		}
 

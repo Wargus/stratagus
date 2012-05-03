@@ -71,7 +71,7 @@ bool returnFalse(int , int) { return false; }
 }
 
 /*
-** s = "leftOp rigthOp Op gotoLabel"
+** s = "leftOp Op rigthOp gotoLabel"
 */
 /* virtual */ void CAnimation_IfVar::Init(const char *s)
 {

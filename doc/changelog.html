@@ -2,7 +2,7 @@
 <html>
 <head>
 <!--
-----	(c) Copyright 1998-2011 by Lutz Sammer and Pali Rohár
+----	(c) Copyright 1998-2012 by Lutz Sammer and Pali Rohár
 
 ----    This program is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -46,8 +46,13 @@
 <p/>
 	<li>trunk</li>
 	<ul>
+	<li>Added OnHit Lua callback parameter for UnitType to create some effects if unit is hit (from Cybermind)</li>
+	<li>Reworked the button's popup system to achieve more flexibility (from Cybermind)</li>
+	<li>Added Preference.ShowNameDelay and Preference.ShowNameTime to show a popup for unit under cursor (from Cybermind)</li>
 	<li>Code compile now with Lua 5.2 (from Joris Dauphin).</li>
-	<li>Fix bug #909454: compile errorson OpenBSD. (from Pali Rohár)</li>
+	<li>Fix bug #901393: Always "network out of sync" in multiplayer mode (from Cybermind)</li>
+	<li>Fix bug #710187: OpenGL is slower than without OpenGL (from Cybermind)</li>
+	<li>Fix bug #909454: compile errors on OpenBSD. (from Pali Rohár)</li>
 	<li>Fix compilation for maemo. (from Pali Rohár)</li>
 	<li>Fix bug #910078: worker unable to do anything after building structure. (patch from Neil Tan)</li>
 	<li>Fix bug #912904: Fix pathfinfing problem with unit near of goal. (patch from Neil Tan)</li>
@@ -55,7 +60,7 @@
 	<li>Fix bug #841133: Fix Action resource and DeassignWorkerFromMine. (from Joris Dauphin)</li>
 	<li>Fix some regression in pathFinding. (from Joris Dauphin)</li>
 	<li>Rearchitecturing of COrder and CAnimation. (from Joris Dauphin)</li>
-	<li>Add DefineDefaultResourceMaxAmounts() to define max value per resource. Add "Storing" in UnitType to increase MaxResourceAmount (from Cybermind)</li>
+	<li>Add DefineDefaultResourceMaxAmounts() to define max value per resource (like tiberium from C&C). Add "Storing" in UnitType to increase MaxResourceAmount (from Cybermind)</li>
 	<li>New unitType flag:"Wall" which create "connection" with its neighboors. (from Cybermind)</li>
 	<li>New unitType flag:"NonSolid" for unit which don't forbid other unit to be in the same place. (from Cybermind)</li>
 	<li>New missile class "missile-class-treacer" which seek towards its target. (from Cybermind)</li>
@@ -1430,7 +1435,7 @@ g the callback. (from Francois Beerten)
 </ul>
 
 <hr>
-(C) Copyright 1998-2011 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project
+(C) Copyright 1998-2012 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project
 under the <a href="gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>

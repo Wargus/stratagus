@@ -970,7 +970,7 @@ void UnitLost(CUnit &unit)
 				const int newMaxValue = player.MaxResources[i] - type._Storing[i];
 
 				player.MaxResources[i] = std::max(0, newMaxValue);
-				player.SetResource(i, player.Resources[i]);
+				player.SetResource(i, player.StoredResources[i], true);
 			}
 		}
 		//  Handle income improvements, look if a player loses a building

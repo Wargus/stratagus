@@ -108,6 +108,8 @@ enum {
 {
 	if (this->Action == UnitActionStandGround) {
 		Video.FillCircleClip(ColorBlack, lastScreenPos, 2);
+	} else {
+		Video.FillCircleClip(ColorGray, lastScreenPos, 2);
 	}
 	return lastScreenPos;
 }
@@ -257,7 +259,7 @@ static CUnit *UnitToRepairInRange(const CUnit &unit, int range)
 */
 bool AutoRepair(CUnit &unit)
 {
-	const int repairRange = unit.Variable[AUTOREPAIRRANGE_INDEX].Value;
+	const int repairRange = unit.Type->DefaultStat.Variables[AUTOREPAIRRANGE_INDEX].Value;
 
 	if (unit.AutoRepair == false || repairRange == 0) {
 		return false;
@@ -291,6 +293,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 		return false;
 	}
 	this->State = SUB_STILL_ATTACK; // Mark attacking.
+	this->SetGoal(this->AutoTarget);
 	UnitHeadingFromDeltaXY(unit, this->AutoTarget->tilePos + this->AutoTarget->Type->GetHalfTileSize() - unit.tilePos);
 	return true;
 }
