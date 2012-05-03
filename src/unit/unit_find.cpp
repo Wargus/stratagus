@@ -254,8 +254,8 @@ CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource)
 class BestTargetFinder
 {
 public:
-	BestTargetFinder(const CUnit &a, int r) :
-		attacker(&a), range(r)
+	BestTargetFinder(const CUnit &a) :
+		attacker(&a)
 	{}
 
 	CUnit *Find(const std::vector<CUnit *> &table) const {
@@ -297,7 +297,7 @@ private:
 		// Unit in range ?
 		const int d = attacker->MapDistanceTo(*dest);
 
-		if (d > range && !UnitReachable(*attacker, *dest, attackrange)) {
+		if (d > attackrange && !UnitReachable(*attacker, *dest, attackrange)) {
 			return INT_MAX;
 		}
 
@@ -326,7 +326,6 @@ private:
 
 private:
 	const CUnit *attacker;
-	const int range;
 };
 
 /**
@@ -652,7 +651,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range)
 		}
 
 		// Find the best unit to attack
-		return BestTargetFinder(unit, range).Find(table);
+		return BestTargetFinder(unit).Find(table);
 	}
 }
 
