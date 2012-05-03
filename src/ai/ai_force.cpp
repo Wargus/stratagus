@@ -295,7 +295,7 @@ bool AiForce::IsBelongsTo(const CUnitType *type)
 /**
 **  Ai clean units in a force.
 */
-void AiForce::Clean()
+void AiForce::RemoveDeadUnit()
 {
 	// Release all killed units.
 	for (unsigned int i = 0; i != Units.size();) {
@@ -314,7 +314,7 @@ void AiForce::Clean()
 void AiForce::Attack(const Vec2i &pos)
 {
 	Vec2i goalPos(pos);
-	Clean();
+	RemoveDeadUnit();
 
 	Attacking = false;
 	if (Units.size() == 0) {
@@ -349,7 +349,7 @@ AiForceManager::AiForceManager()
 	memset(script, -1, AI_MAX_FORCES * sizeof(char));
 }
 
-unsigned int AiForceManager::FindFreeForce(int role)
+unsigned int AiForceManager::FindFreeForce(AiForceRole role)
 {
 	/* find free force */
 	unsigned int f = 0;
@@ -367,10 +367,10 @@ unsigned int AiForceManager::FindFreeForce(int role)
 /**
 **  Cleanup units in forces.
 */
-void AiForceManager::Clean()
+void AiForceManager::RemoveDeadUnit()
 {
 	for (unsigned int i = 0; i < forces.size(); ++i) {
-		forces[i].Clean();
+		forces[i].RemoveDeadUnit();
 	}
 }
 
@@ -445,9 +445,9 @@ void AiForceManager::CheckUnits(int *counter)
 /**
 **  Cleanup units in forces.
 */
-void AiCleanForces()
+void AiRemoveDeadUnitInForces()
 {
-	AiPlayer->Force.Clean();
+	AiPlayer->Force.RemoveDeadUnit();
 }
 
 /**
@@ -467,7 +467,7 @@ void AiAssignFreeUnitsToForce()
 {
 	const int n = AiPlayer->Player->GetUnitCount();
 
-	AiCleanForces();
+	AiRemoveDeadUnitInForces();
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
 
@@ -768,7 +768,7 @@ void AiForceManager::Update()
 		//  Look if our defenders still have enemies in range.
 
 		if (force.Defending) {
-			force.Clean();
+			force.RemoveDeadUnit();
 			//  Look if still enemies in attack range.
 			const CUnit *dummy = NULL;
 			if (!AiForceEnemyFinder<true>(force, &dummy).found()) {
@@ -778,7 +778,7 @@ void AiForceManager::Update()
 				force.Attacking = false;
 			}
 		} else if (force.Attacking) {
-			force.Clean();
+			force.RemoveDeadUnit();
 			force.Update();
 		}
 	}

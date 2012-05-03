@@ -92,6 +92,7 @@ public:
 **  Roles for forces
 */
 enum AiForceRole {
+	AiForceRoleDefault = 0, /// So default is attacking
 	AiForceRoleAttack = 0, /// Force should attack
 	AiForceRoleDefend      /// Force should defend
 };
@@ -115,8 +116,8 @@ class AiForce
 public:
 	AiForce() :
 		Completed(false), Defending(false), Attacking(false),
-		Role(0), State(AiForceAttackingState_Free) {
-		GoalPos.x = GoalPos.y = 0;
+		Role(AiForceRoleDefault), State(AiForceAttackingState_Free) {
+		GoalPos.x = GoalPos.y = -1;
 	}
 
 	void Remove(CUnit &unit) {
@@ -147,7 +148,7 @@ public:
 	inline bool IsAttacking() const { return (!Defending && Attacking); }
 
 	void Attack(const Vec2i &pos);
-	void Clean();
+	void RemoveDeadUnit();
 	int PlanAttack();
 
 private:
@@ -166,17 +167,15 @@ private:
 	}
 
 public:
-	bool Completed;     /// Flag saying force is complete build
-	bool Defending;     /// Flag saying force is defending
-	bool Attacking;     /// Flag saying force is attacking
-	char Role;          /// Role of the force
+	bool Completed;    /// Flag saying force is complete build
+	bool Defending;    /// Flag saying force is defending
+	bool Attacking;    /// Flag saying force is attacking
+	AiForceRole Role;  /// Role of the force
 
 	std::vector<AiUnitType> UnitTypes; /// Count and types of unit-type
-	CUnitCache Units;   /// Units in the force
+	CUnitCache Units;  /// Units in the force
 
-	//
 	// If attacking
-	//
 	AiForceAttackingState State; /// Attack state
 	Vec2i GoalPos; /// Attack point tile map position
 };
@@ -215,10 +214,10 @@ public:
 		return script[index];
 	}
 
-	void Clean();
+	void RemoveDeadUnit();
 	bool Assign(CUnit &unit);
 	void Update();
-	unsigned int FindFreeForce(int role = AiForceRoleAttack);
+	unsigned int FindFreeForce(AiForceRole role = AiForceRoleDefault);
 	void CheckUnits(int *counter);
 private:
 	std::vector<AiForce> forces;
@@ -413,7 +412,7 @@ extern int AiFindBuildingPlace(const CUnit &worker,
 // Forces
 //
 /// Cleanup units in force
-extern void AiCleanForces();
+extern void AiRemoveDeadUnitInForces();
 /// Assign a new unit to a force
 extern bool AiAssignToForce(CUnit &unit);
 /// Assign a free units to a force

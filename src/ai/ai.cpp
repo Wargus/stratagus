@@ -971,7 +971,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 
 	AiRemoveFromBuilt(unit.Player->Ai, *what.Type);
 
-	unit.Player->Ai->Force.Clean();
+	unit.Player->Ai->Force.RemoveDeadUnit();
 	unit.Player->Ai->Force.Assign(what);
 
 }
