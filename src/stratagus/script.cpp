@@ -637,7 +637,7 @@ UnitDesc *CclParseUnitDesc(lua_State *l)
 */
 CUnitType **CclParseTypeDesc(lua_State *l)
 {
-	CUnitType **res;
+	CUnitType **res = NULL;
 
 	if (lua_isstring(l, -1)) {
 		res = Str2TypeRef(l, LuaToString(l, -1));
@@ -645,7 +645,6 @@ CUnitType **CclParseTypeDesc(lua_State *l)
 	} else {
 		LuaError(l, "Parse Error in ParseUnit\n");
 	}
-
 	return res;
 }
 
