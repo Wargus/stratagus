@@ -95,7 +95,6 @@ void CheckMusicFinished(bool force)
 		} else {
 			LuaCall(0, 1);
 		}
-		lua_pop(Lua, 1);
 	}
 }
 

@@ -504,7 +504,6 @@ bool HandleCommandKey(int key)
 
 	lua_getglobal(Lua, "HandleCommandKey");
 	if (!lua_isfunction(Lua, -1)) {
-		lua_pop(Lua, 1);
 		DebugPrint("No HandleCommandKey function in lua.\n");
 		return false;
 	}
@@ -779,7 +778,6 @@ int HandleCheats(const std::string &input)
 	int base = lua_gettop(Lua);
 	lua_getglobal(Lua, "HandleCheats");
 	if (!lua_isfunction(Lua, -1)) {
-		lua_pop(Lua, 1);
 		DebugPrint("No HandleCheats function in lua.\n");
 		return 0;
 	}

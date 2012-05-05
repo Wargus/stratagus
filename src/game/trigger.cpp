@@ -642,7 +642,6 @@ void InitTriggers()
 
 	lua_getglobal(Lua, "_triggers_");
 	if (lua_isnil(Lua, -1)) {
-		lua_pop(Lua, 1);
 		lua_getglobal(Lua, "SinglePlayerTriggers");
 		LuaCall(0, 1);
 	}

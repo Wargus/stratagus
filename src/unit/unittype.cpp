@@ -260,6 +260,7 @@ void UpdateStats(int reset)
 					MapFieldBuilding |
 					MapFieldCoastAllowed |
 					MapFieldWaterAllowed |
+					MapFieldNoBuilding |
 					MapFieldUnpassable;
 				type.FieldFlags = MapFieldNoBuilding;
 			} else {
