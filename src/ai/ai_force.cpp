@@ -86,52 +86,6 @@ private:
 	const CUnit **enemy;
 };
 
-class AiForceAttackSender
-{
-public:
-	//  Send all units in the force to enemy at pos.
-	AiForceAttackSender(int force, const Vec2i &pos) : goalPos(pos), delta(0) {
-		DebugPrint("%d: Attacking with force #%d\n" _C_ AiPlayer->Player->Index _C_ force);
-		AiForce &aiForce = AiPlayer->Force[force];
-
-		aiForce.Attacking = true;
-		aiForce.State = AiForceAttackingState_Attacking;
-		aiForce.Units.for_each(*this);
-	}
-
-	AiForceAttackSender(AiForce *force, const Vec2i &pos) :
-		goalPos(pos), delta(0) {
-		DebugPrint("%d: Attacking with force #%lu\n" _C_ AiPlayer->Player->Index
-				   _C_(long unsigned int)(force  - & (AiPlayer->Force[0])));
-		force->Attacking = true;
-		force->State = AiForceAttackingState_Attacking;
-		force->Units.for_each(*this);
-	}
-
-	void operator()(CUnit *const unit) const {
-		// this may be problem if units are in bunker and we want sent
-		// them to attack
-		if (unit->Container == NULL) {
-			// To avoid lot of CPU consuption, send them with a small time difference.
-			unit->Wait = delta;
-			++delta;
-			if (unit->Type->CanTransport() && unit->BoardCount > 0) {
-				CommandUnload(*unit, goalPos, NULL, FlushCommands);
-			} else if (unit->Type->CanAttack) {
-				CommandAttack(*unit, goalPos,  NULL, FlushCommands);
-			} else {
-				CommandMove(*unit, goalPos, FlushCommands);
-			}
-		}
-	}
-
-private:
-	Vec2i goalPos;
-	mutable int delta;
-};
-
-
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -322,7 +276,7 @@ void AiForce::Attack(const Vec2i &pos)
 	}
 	Attacking = true;
 
-	if (goalPos.x == -1 || goalPos.y == -1) {
+	if (Map.Info.IsPointOnMap(goalPos) == false) {
 		/* Search in entire map */
 		const CUnit *enemy = NULL;
 		AiForceEnemyFinder<false>(*this, &enemy);
@@ -331,7 +285,7 @@ void AiForce::Attack(const Vec2i &pos)
 		}
 	}
 	this->GoalPos = goalPos;
-	if (goalPos.x == -1 || goalPos.y == -1) {
+	if (Map.Info.IsPointOnMap(goalPos) == false) {
 		DebugPrint("%d: Need to plan an attack with transporter\n" _C_ AiPlayer->Player->Index);
 		if (State == AiForceAttackingState_Waiting && !PlanAttack()) {
 			DebugPrint("%d: Can't transport\n" _C_ AiPlayer->Player->Index);
@@ -340,7 +294,7 @@ void AiForce::Attack(const Vec2i &pos)
 		return;
 	}
 	//  Send all units in the force to enemy.
-	AiForceAttackSender(this, goalPos);
+	this->State = AiForceAttackingState_Attacking;
 }
 
 AiForceManager::AiForceManager()
@@ -706,58 +660,41 @@ void AiForce::Update()
 		AiGroupAttackerForTransport(*this);
 		return ;
 	}
-	// Find a unit that is attacking
-	const CUnit *unit = NoUnitP;
-	if (State == AiForceAttackingState_Attacking) {
-		for (unsigned int i = 0; i < Size(); ++i) {
-			CUnit &aiunit = *Units[i];
 
-			if (aiunit.CurrentAction() == UnitActionAttack) {
-				unit = &aiunit;
-				break;
+	std::vector<CUnit *> idleUnits;
+	const CUnit *leader = NULL;
+	for (unsigned int i = 0; i != Size(); ++i) {
+		CUnit &aiunit = *Units[i];
+
+		if (aiunit.IsIdle()) {
+			if (aiunit.IsAliveOnMap()) {
+				idleUnits.push_back(&aiunit);
 			}
+		} else if (aiunit.CurrentAction() == UnitActionAttack) {
+			leader = &aiunit;
+		} else if (leader == NULL) {
+			leader = &aiunit;
 		}
 	}
-	if (unit != NULL) {
-		Assert(unit->CurrentAction() == UnitActionAttack);
-		// Give idle units a new goal
-		// FIXME: may not be a good goal
-		const Vec2i &pos = unit->pathFinderData->input.GetGoalPos();
+	const Vec2i pos = leader != NULL ? leader->tilePos : this->GoalPos;
+	for (size_t i = 0; i != idleUnits.size(); ++i) {
+		CUnit &aiunit = *idleUnits[i];
+		const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
 
-		for (unsigned int i = 0; i < Size(); ++i) {
-			CUnit &aiunit = *Units[i];
-
-			if (!aiunit.IsIdle()) {
-				continue;
-			}
-			if (aiunit.Type->CanAttack) {
-				CommandAttack(aiunit, pos, NULL, FlushCommands);
-			} else if (aiunit.Type->CanTransport()) {
+		aiunit.Wait = delay;
+		if (aiunit.Type->CanAttack) {
+			CommandAttack(aiunit, pos, NULL, FlushCommands);
+		} else if (aiunit.Type->CanTransport()) {
+			if (aiunit.BoardCount != 0) {
+				CommandUnload(aiunit, pos, NULL, FlushCommands);
+			} else {
 				// FIXME : Retrieve unit blocked (transport previously full)
 				CommandMove(aiunit, aiunit.Player->StartPos, FlushCommands);
-			} else {
-				CommandMove(aiunit, pos, FlushCommands);
+				this->Remove(aiunit);
 			}
-		}
-	} else { // Everyone is idle, find a new target
-		Vec2i pos;
-
-		if (State == AiForceAttackingState_Attacking) {
-			AiForceEnemyFinder<false>(*this, &unit);
-
-			if (!unit) {
-				// No enemy found, give up
-				// FIXME: should the force go home or keep trying to attack?
-				DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
-						   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
-				Attacking = false;
-				return;
-			}
-			pos = unit->tilePos;
 		} else {
-			pos = this->GoalPos;
+			CommandMove(aiunit, pos, FlushCommands);
 		}
-		AiForceAttackSender(this, pos);
 	}
 }
 
