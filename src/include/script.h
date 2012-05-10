@@ -341,6 +341,8 @@ void FreeNumberDesc(NumberDesc *number);  /// Free number description content. (
 void FreeUnitDesc(UnitDesc *unitdesc);    /// Free unit description content. (no pointer itself).
 void FreeStringDesc(StringDesc *s);       /// Frre string description content. (no pointer itself).
 
+// call the lua function: CleanGame_Lua.
+void CleanGame_Lua();
 
 //@}
 

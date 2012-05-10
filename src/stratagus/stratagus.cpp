@@ -403,6 +403,7 @@ void CleanGame()
 	EndReplayLog();
 	CleanMessages();
 
+	CleanGame_Lua();
 	CleanTriggers();
 	CleanAi();
 	CleanGroups();

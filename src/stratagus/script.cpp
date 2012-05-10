@@ -2834,4 +2834,18 @@ void SaveCcl(CFile &file)
 	file.printf("SetSpeedResearch(%d)\n", SpeedResearch);
 }
 
+
+
+void CleanGame_Lua()
+{
+	lua_getglobal(Lua, "CleanGame_Lua");
+	if (lua_isfunction(Lua, -1)) {
+		LuaCall(0, 1);
+	} else {
+		lua_pop(Lua, 1);
+	}
+}
+
+
+
 //@}
