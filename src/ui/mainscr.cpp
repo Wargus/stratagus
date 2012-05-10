@@ -1407,26 +1407,20 @@ static void DrawInfoPanelBackground(unsigned frame)
 */
 void CInfoPanel::Draw()
 {
-	int i;
-
 	if (NumSelected) {
 		if (NumSelected > 1) {
 			//
 			//  If there are more units selected draw their pictures and a health bar
 			//
 			DrawInfoPanelBackground(0);
-			for (i = 0; i < (NumSelected > (int)UI.SelectedButtons.size() ?
-							 (int)UI.SelectedButtons.size() : NumSelected); ++i) {
-				Selected[i]->Type->Icon.Icon->DrawUnitIcon(ThisPlayer,
-														   UI.SelectedButtons[i].Style,
+			for (int i = 0; i < std::min<int>(NumSelected, UI.SelectedButtons.size()); ++i) {
+				Selected[i]->Type->Icon.Icon->DrawUnitIcon(UI.SelectedButtons[i].Style,
 														   (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?
 														   (IconActive | (MouseButtons & LeftButton)) : 0,
 														   UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y, "");
-				UiDrawLifeBar(Selected[i],
-							  UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
+				UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 
-				if (ButtonAreaUnderCursor == ButtonAreaSelected &&
-					ButtonUnderCursor == i) {
+				if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) {
 					UI.StatusLine.Set(Selected[i]->Type->Name);
 				}
 			}
@@ -1438,26 +1432,27 @@ void CInfoPanel::Draw()
 			}
 			return;
 		} else {
+			int panelIndex;
 			// FIXME: not correct for enemy's units
 			if (Selected[0]->Player == ThisPlayer
-				|| ThisPlayer->IsTeamed(Selected[0])
-				|| ThisPlayer->IsAllied(Selected[0])
+				|| ThisPlayer->IsTeamed(*Selected[0])
+				|| ThisPlayer->IsAllied(*Selected[0])
 				|| ReplayRevealMap) {
 				if (Selected[0]->Orders[0]->Action == UnitActionBuilt
 					|| Selected[0]->Orders[0]->Action == UnitActionResearch
 					|| Selected[0]->Orders[0]->Action == UnitActionUpgradeTo
 					|| Selected[0]->Orders[0]->Action == UnitActionTrain) {
-					i = 3;
+					panelIndex = 3;
 				} else if (Selected[0]->Stats->Variables[MANA_INDEX].Max) {
-					i = 2;
+					panelIndex = 2;
 				} else {
-					i = 1;
+					panelIndex = 1;
 				}
 			} else {
-				i = 0;
+				panelIndex = 0;
 			}
-			DrawInfoPanelBackground(i);
-			DrawUnitInfo(Selected[0]);
+			DrawInfoPanelBackground(panelIndex);
+			DrawUnitInfo(*Selected[0]);
 			if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
 				UI.StatusLine.Set(Selected[0]->Type->Name);
 			}
@@ -1468,43 +1463,44 @@ void CInfoPanel::Draw()
 	//  Nothing selected
 
 	DrawInfoPanelBackground(0);
-	if (UnitUnderCursor && UnitUnderCursor->IsVisible(ThisPlayer)) {
+	if (UnitUnderCursor && UnitUnderCursor->IsVisible(*ThisPlayer)) {
 		// FIXME: not correct for enemies units
-		DrawUnitInfo(UnitUnderCursor);
+		DrawUnitInfo(*UnitUnderCursor);
 	} else {
 		// FIXME: need some cool ideas for this.
 
 		int x = UI.InfoPanel.X + 16;
 		int y = UI.InfoPanel.Y + 8;
 
-		CLabel(GetGameFont()).Draw(x, y, "Stratagus");
+		CLabel label(GetGameFont());
+		label.Draw(x, y, "Stratagus");
 		y += 16;
-		CLabel(GetGameFont()).Draw(x, y,  "Cycle:");
-		VideoDrawNumberClip(x + 48, y, GetGameFont(), GameCycle);
-		VideoDrawNumberClip(x + 110, y, GetGameFont(), CYCLES_PER_SECOND * VideoSyncSpeed / 100);
+		label.Draw(x, y,  "Cycle:");
+		label.Draw(x + 48, y, GameCycle);
+		label.Draw(x + 110, y, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
 		y += 20;
 
 		std::string nc;
 		std::string rc;
 
 		GetDefaultTextColors(nc, rc);
-		for (i = 0; i < PlayerMax - 1; ++i) {
+		for (int i = 0; i < PlayerMax - 1; ++i) {
 			if (Players[i].Type != PlayerNobody) {
-				if (ThisPlayer->Allied & (1 << Players[i].Index)) {
+				if (ThisPlayer->IsAllied(Players[i])) {
 					SetDefaultTextColors(FontGreen, rc);
-				} else if (ThisPlayer->Enemy & (1 << Players[i].Index)) {
+				} else if (ThisPlayer->IsEnemy(Players[i])) {
 					SetDefaultTextColors(FontRed, rc);
 				} else {
 					SetDefaultTextColors(nc, rc);
 				}
 
-				VideoDrawNumberClip(x + 15, y, GetGameFont(), i);
+				label.Draw(x + 15, y, i);
 
 				Video.DrawRectangleClip(ColorWhite, x, y, 12, 12);
 				Video.FillRectangleClip(Players[i].Color, x + 1, y + 1, 10, 10);
 
-				CLabel(GetGameFont()).Draw(x + 27, y, Players[i].Name);
-				VideoDrawNumberClip(x + 117, y, GetGameFont(), Players[i].Score);
+				label.Draw(x + 27, y, Players[i].Name);
+				label.Draw(x + 117, y, Players[i].Score);
 				y += 14;
 			}
 		}
