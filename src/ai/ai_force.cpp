@@ -262,7 +262,6 @@ void AiForce::RemoveDeadUnit()
 		}
 		++i;
 	}
-
 }
 
 void AiForce::Attack(const Vec2i &pos)
@@ -303,12 +302,12 @@ void AiForce::Attack(const Vec2i &pos)
 	//  Send all units in the force to enemy.
 	this->State = AiForceAttackingState_Attacking;
 	for (size_t i = 0; i != this->Units.size(); ++i) {
-		CUnit* const unit = this->Units[i];
-		int delta = 0;
+		CUnit *const unit = this->Units[i];
+
 		if (unit->Container == NULL) {
-			// To avoid lot of CPU consuption, send them with a small time difference.
-			unit->Wait = delta;
-			++delta;
+			const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
+
+			unit->Wait = delay;
 			if (unit->Type->CanAttack) {
 				CommandAttack(*unit, goalPos,  NULL, FlushCommands);
 			} else {
@@ -727,19 +726,26 @@ void AiForceManager::Update()
 
 		if (force.Defending) {
 			force.RemoveDeadUnit();
+
+			if (force.Size() == 0) {
+				force.Attacking = false;
+				force.Defending = false;
+				continue;
+			}
+			const int nearDist = 5;
 			//  Check if some unit from force reached goal point
-			if (Map.Info.IsPointOnMap(force.GoalPos) &&
-				force.Units[0]->MapDistanceTo(force.GoalPos) <= 5) {
+			if (Map.Info.IsPointOnMap(force.GoalPos)
+				&& force.Units[0]->MapDistanceTo(force.GoalPos) <= nearDist) {
 				//  Look if still enemies in attack range.
 				const CUnit *dummy = NULL;
 				if (!AiForceEnemyFinder<true>(force, &dummy).found()) {
 					if (Map.Info.IsPointOnMap(force.HomePos)) {
+						for (size_t i = 0; i != force.Units.size(); ++i) {
+							CUnit &unit = *force.Units[i];
+							CommandMove(unit, force.HomePos, FlushCommands);
+						}
 						const Vec2i invalidPos = { -1, -1};
 
-						for (size_t i = 0; i != force.Units.size(); ++i) {
-							CUnit* const unit = force.Units[i];
-							CommandMove(*unit, force.HomePos, FlushCommands);
-						}
 						force.HomePos = invalidPos;
 					}
 					force.Defending = false;
