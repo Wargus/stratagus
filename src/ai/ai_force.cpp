@@ -270,6 +270,12 @@ void AiForce::Attack(const Vec2i &pos)
 	Vec2i goalPos(pos);
 	RemoveDeadUnit();
 
+	// Remember the original force position so we can return there after attack
+	if (this->Size() > 0 && (this->Role == AiForceRoleDefend && !this->Attacking)
+		|| (this->Role == AiForceRoleAttack && !this->Attacking && !this->State)) {
+		this->HomePos = this->Units[0]->tilePos;
+	}
+
 	Attacking = false;
 	if (Units.size() == 0) {
 		return;
@@ -295,6 +301,20 @@ void AiForce::Attack(const Vec2i &pos)
 	}
 	//  Send all units in the force to enemy.
 	this->State = AiForceAttackingState_Attacking;
+	for (size_t i = 0; i != this->Units.size(); ++i) {
+		CUnit* const unit = this->Units[i];
+		int delta = 0;
+		if (unit->Container == NULL) {
+			// To avoid lot of CPU consuption, send them with a small time difference.
+			unit->Wait = delta;
+			++delta;
+			if (unit->Type->CanAttack) {
+				CommandAttack(*unit, goalPos,  NULL, FlushCommands);
+			} else {
+				CommandMove(*unit, goalPos, FlushCommands);
+			}
+		}
+	}
 }
 
 AiForceManager::AiForceManager()
@@ -706,13 +726,24 @@ void AiForceManager::Update()
 
 		if (force.Defending) {
 			force.RemoveDeadUnit();
-			//  Look if still enemies in attack range.
-			const CUnit *dummy = NULL;
-			if (!AiForceEnemyFinder<true>(force, &dummy).found()) {
-				DebugPrint("%d:FIXME: not written, should send force #%d home\n"
-						   _C_ AiPlayer->Player->Index _C_ f);
-				force.Defending = false;
-				force.Attacking = false;
+			//  Check if some unit from force reached goal point
+			if (Map.Info.IsPointOnMap(force.GoalPos) &&
+				force.Units[0]->MapDistanceTo(force.GoalPos) <= 5) {
+				//  Look if still enemies in attack range.
+				const CUnit *dummy = NULL;
+				if (!AiForceEnemyFinder<true>(force, &dummy).found()) {
+					if (Map.Info.IsPointOnMap(force.HomePos)) {
+						const Vec2i invalidPos = { -1, -1};
+
+						for (size_t i = 0; i != force.Units.size(); ++i) {
+							CUnit* const unit = force.Units[i];
+							CommandMove(*unit, force.HomePos, FlushCommands);
+						}
+						force.HomePos = invalidPos;
+					}
+					force.Defending = false;
+					force.Attacking = false;
+				}
 			}
 		} else if (force.Attacking) {
 			force.RemoveDeadUnit();

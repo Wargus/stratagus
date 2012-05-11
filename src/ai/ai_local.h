@@ -117,7 +117,7 @@ public:
 	AiForce() :
 		Completed(false), Defending(false), Attacking(false),
 		Role(AiForceRoleDefault), State(AiForceAttackingState_Free) {
-		GoalPos.x = GoalPos.y = -1;
+		HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
 	}
 
 	void Remove(CUnit &unit) {
@@ -141,7 +141,7 @@ public:
 		}
 		Units.for_each(InternalRemoveUnit);
 		Units.clear();
-		GoalPos.x = GoalPos.y = 0;
+		GoalPos.x = GoalPos.y = -1;
 	}
 	inline size_t Size() const { return Units.size(); }
 
@@ -178,6 +178,7 @@ public:
 	// If attacking
 	AiForceAttackingState State; /// Attack state
 	Vec2i GoalPos; /// Attack point tile map position
+	Vec2i HomePos; /// Return after attack tile map position
 };
 
 // forces

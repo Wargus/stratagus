@@ -801,7 +801,7 @@ class CBuildRestriction
 public:
 	virtual ~CBuildRestriction() {}
 	virtual void Init() {};
-	virtual bool Check(const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const = 0;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const = 0;
 };
 
 
@@ -822,7 +822,7 @@ public:
 			(*i)->Init();
 		}
 	}
-	virtual bool Check(const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 
 	void push_back(CBuildRestriction *restriction) { _or_list.push_back(restriction); }
 public:
@@ -846,7 +846,7 @@ public:
 	CBuildRestrictionAddOn() : Parent(NULL) { Offset.x = Offset.y = 0; };
 	virtual ~CBuildRestrictionAddOn() {};
 	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
-	virtual bool Check(const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 
 	Vec2i Offset;         /// offset from the main building to place this
 	std::string ParentName; /// building that is unit is an addon too.
@@ -869,7 +869,7 @@ public:
 	CBuildRestrictionOnTop() : Parent(NULL), ReplaceOnDie(0), ReplaceOnBuild(0) {};
 	virtual ~CBuildRestrictionOnTop() {};
 	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
-	virtual bool Check(const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 
 	std::string ParentName;  /// building that is unit is an addon too.
 	CUnitType *Parent;   /// building that is unit is an addon too.
@@ -883,7 +883,7 @@ public:
 	CBuildRestrictionDistance() : Distance(0), RestrictType(NULL) {};
 	virtual ~CBuildRestrictionDistance() {};
 	virtual void Init() {this->RestrictType = UnitTypeByIdent(this->RestrictTypeName);};
-	virtual bool Check(const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 
 	int Distance;        /// distance to build (circle)
 	DistanceTypeType DistanceType;
@@ -948,7 +948,6 @@ public:
 
 	CConstruction *Construction;    /// What is shown in construction phase
 
-	int _Storing[MaxCosts];         /// How many resources the unit can store
 	int RepairHP;                   /// Amount of HP per repair
 	int RepairCosts[MaxCosts];      /// How much it costs to repair
 
@@ -1032,6 +1031,7 @@ public:
 	int GivesResource;                  /// The resource this unit gives.
 	ResourceInfo *ResInfo[MaxCosts];    /// Resource information.
 	std::vector<CBuildRestriction *> BuildingRules;   /// Rules list for building a building.
+	std::vector<CBuildRestriction *> AiBuildingRules; /// Rules list for for AI to build a building.
 	SDL_Color NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 
 	CUnitSound Sound;               /// Sounds for events

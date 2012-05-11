@@ -163,7 +163,6 @@ CUnitType::CUnitType() :
 #ifdef USE_MNG
 	memset(&Portrait, 0, sizeof(Portrait));
 #endif
-	memset(_Storing, 0, sizeof(_Storing));
 	memset(RepairCosts, 0, sizeof(RepairCosts));
 	memset(CanStore, 0, sizeof(CanStore));
 	memset(ResInfo, 0, sizeof(ResInfo));
@@ -184,6 +183,11 @@ CUnitType::~CUnitType()
 		delete *b;
 	}
 	BuildingRules.clear();
+	for (std::vector<CBuildRestriction *>::iterator b = AiBuildingRules.begin();
+		b != AiBuildingRules.end(); ++b) {
+			delete *b;
+	}
+	AiBuildingRules.clear();
 
 	delete[] CanCastSpell;
 	delete[] AutoCastActive;
@@ -378,6 +382,13 @@ static bool SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int pl
 		}
 		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.Costs[i]);
 	}
+	file.printf("\"storing\", {");
+	for (unsigned int i = 0; i < MaxCosts; ++i) {
+		if (i) {
+			file.printf(" ");
+		}
+		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.Storing[i]);
+	}
 	file.printf("})\n");
 	return true;
 }
@@ -537,6 +548,12 @@ void InitUnitTypes(int reset_player_stats)
 		for (std::vector<CBuildRestriction *>::iterator b = type->BuildingRules.begin();
 			 b < type->BuildingRules.end(); ++b) {
 			(*b)->Init();
+		}
+
+		// Lookup AiBuildingTypes
+		for (std::vector<CBuildRestriction *>::iterator b = type->AiBuildingRules.begin();
+			b < type->AiBuildingRules.end(); ++b) {
+				(*b)->Init();
 		}
 	}
 

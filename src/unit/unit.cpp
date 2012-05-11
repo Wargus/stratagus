@@ -367,7 +367,11 @@ void CUnit::Init(CUnitType &type)
 */
 bool CUnit::RestoreOrder()
 {
-	if (this->SavedOrder == NULL) {
+	COrder *savedOrder = this->SavedOrder;
+
+	if (savedOrder == NULL 
+		|| (savedOrder->Action == UnitActionAttack 
+		&& (!savedOrder->HasGoal() || savedOrder->GetGoal()->IsAlive()))) {
 		return false;
 	}
 
@@ -380,7 +384,7 @@ bool CUnit::RestoreOrder()
 
 
 	//copy
-	this->Orders.insert(this->Orders.begin() + 1, this->SavedOrder);
+	this->Orders.insert(this->Orders.begin() + 1, savedOrder);
 
 	this->SavedOrder = NULL;
 	return true;
@@ -966,8 +970,8 @@ void UnitLost(CUnit &unit)
 		player.Supply -= type.Supply;
 		// Decrease resource limit
 		for (int i = 0; i < MaxCosts; ++i) {
-			if (player.MaxResources[i] != -1 && type._Storing[i]) {
-				const int newMaxValue = player.MaxResources[i] - type._Storing[i];
+			if (player.MaxResources[i] != -1 && type.Stats[player.Index].Storing[i]) {
+				const int newMaxValue = player.MaxResources[i] - type.Stats[player.Index].Storing[i];
 
 				player.MaxResources[i] = std::max(0, newMaxValue);
 				player.SetResource(i, player.StoredResources[i], true);
@@ -994,7 +998,7 @@ void UnitLost(CUnit &unit)
 	DebugPrint("%d: Lost %s(%d)\n" _C_ player.Index _C_ type.Ident.c_str() _C_ UnitNumber(unit));
 
 	// Destroy resource-platform, must re-make resource patch.
-	if ((b = OnTopDetails(unit, NULL)) != NULL) {
+	if ((b = OnTopDetails(unit.Type->BuildingRules, unit, NULL)) != NULL) {
 		if (b->ReplaceOnDie && (type.GivesResource && unit.ResourcesHeld != 0)) {
 			temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, &Players[PlayerNumNeutral]);
 			if (temp == NoUnitP) {
@@ -1040,8 +1044,8 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 	if (!upgrade) {
 		player.Supply += type.Supply;
 		for (int i = 0; i < MaxCosts; ++i) {
-			if (player.MaxResources[i] != -1 && type._Storing[i]) {
-				player.MaxResources[i] += type._Storing[i];
+			if (player.MaxResources[i] != -1 && type.Stats[player.Index].Storing[i]) {
+				player.MaxResources[i] += type.Stats[player.Index].Storing[i];
 			}
 		}
 	}
@@ -1559,8 +1563,8 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	newplayer.Supply += Type->Supply;
 	// Increase resource limit
 	for (int i = 0; i < MaxCosts; ++i) {
-		if (newplayer.MaxResources[i] != -1 && Type->_Storing[i]) {
-			newplayer.MaxResources[i] += Type->_Storing[i];
+		if (newplayer.MaxResources[i] != -1 && Type->Stats[newplayer.Index].Storing[i]) {
+			newplayer.MaxResources[i] += Type->Stats[newplayer.Index].Storing[i];
 		}
 	}
 	if (Type->Building && !Type->Wall) {

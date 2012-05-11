@@ -718,7 +718,7 @@ static int CclGetPlayerData(lua_State *l)
 
 		const std::string res = LuaToString(l, 3);
 		const int resId = GetResourceIdByName(l, res.c_str());
-		lua_pushnumber(l, p->Resources[resId]);
+		lua_pushnumber(l, p->Resources[resId] + p->StoredResources[resId]);
 		return 1;
 	} else if (!strcmp(data, "StoredResources")) {
 		LuaCheckArgs(l, 3);

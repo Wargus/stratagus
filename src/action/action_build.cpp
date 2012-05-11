@@ -330,7 +330,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	if (&ontop != &unit) {
 		CBuildRestrictionOnTop *b;
 
-		b = static_cast<CBuildRestrictionOnTop *>(OnTopDetails(*build, ontop.Type));
+		b = static_cast<CBuildRestrictionOnTop *>(OnTopDetails(unit.Type->BuildingRules, *build, ontop.Type));
 		Assert(b);
 		if (b->ReplaceOnBuild) {
 			build->ResourcesHeld = ontop.ResourcesHeld; // We capture the value of what is beneath.

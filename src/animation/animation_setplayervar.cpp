@@ -61,15 +61,13 @@ int GetPlayerData(int player, const char *prop, const char *arg)
 	if (!strcmp(prop, "RaceName")) {
 		return Players[player].Race;
 	} else if (!strcmp(prop, "Resources")) {
-
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return Players[player].Resources[resId];
+		return Players[player].Resources[resId] + Players[player].StoredResources[resId];
 	} else if (!strcmp(prop, "StoredResources")) {
-
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);

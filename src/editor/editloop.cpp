@@ -329,7 +329,7 @@ static void EditorActionPlaceUnit(const Vec2i &pos, CUnitType &type, CPlayer *pl
 		return;
 	}
 
-	CBuildRestrictionOnTop *b = OnTopDetails(*unit, NULL);
+	CBuildRestrictionOnTop *b = OnTopDetails(unit->Type->BuildingRules, *unit, NULL);
 	if (b && b->ReplaceOnBuild) {
 		CUnitCache &unitCache = Map.Field(pos)->UnitCache;
 		CUnitCache::iterator it = std::find_if(unitCache.begin(), unitCache.end(), HasSameTypeAs(*b->Parent));

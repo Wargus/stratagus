@@ -489,7 +489,7 @@ static int CclDefineUnitType(lua_State *l)
 				lua_pop(l, 1);
 				++k;
 				lua_rawgeti(l, -1, k + 1);
-				type->_Storing[res] = LuaToNumber(l, -1);
+				type->DefaultStat.Storing[res] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "ImproveProduction")) {
@@ -743,6 +743,25 @@ static int CclDefineUnitType(lua_State *l)
 					LuaError(l, "incorrect argument");
 				}
 				ParseBuildingRules(l, type->BuildingRules);
+				lua_pop(l, 1);
+			}
+		} else if (!strcmp(value, "AiBuildingRules")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			subargs = lua_rawlen(l, -1);
+			// Free any old restrictions if they are redefined
+			for (std::vector<CBuildRestriction *>::iterator b = type->AiBuildingRules.begin();
+				b != type->AiBuildingRules.end(); ++b) {
+					delete *b;
+			}
+			type->AiBuildingRules.clear();
+			for (k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, -1, k + 1);
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument");
+				}
+				ParseBuildingRules(l, type->AiBuildingRules);
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "BuilderOutside")) {
@@ -1158,6 +1177,22 @@ static int CclDefineUnitStats(lua_State *l)
 				const int resId = GetResourceIdByName(l, value);
 				lua_rawgeti(l, j + 1, k + 1);
 				stats->Costs[resId] = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+			}
+		} else if (!strcmp(value, "storing")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, j + 1);
+
+			for (int k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, j + 1, k + 1);
+				value = LuaToString(l, -1);
+				lua_pop(l, 1);
+				++k;
+				const int resId = GetResourceIdByName(l, value);
+				lua_rawgeti(l, j + 1, k + 1);
+				stats->Storing[resId] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			}
 		} else {

@@ -91,6 +91,7 @@ const CUnitStats &CUnitStats::operator = (const CUnitStats &rhs)
 {
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
 		this->Costs[i] = rhs.Costs[i];
+		this->Storing[i] = rhs.Storing[i];
 	}
 	delete [] this->Variables;
 	const unsigned int size = UnitTypeVar.GetNumberVariable();
@@ -104,6 +105,9 @@ bool CUnitStats::operator == (const CUnitStats &rhs) const
 {
 	for (int i = 0; i != MaxCosts; ++i) {
 		if (this->Costs[i] != rhs.Costs[i]) {
+			return false;
+		}
+		if (this->Storing[i] != rhs.Storing[i]) {
 			return false;
 		}
 	}
@@ -294,6 +298,17 @@ static int CclDefineModifier(lua_State *l)
 			const int resId = GetResourceIdByName(l, value);
 			lua_rawgeti(l, j + 1, 2);
 			um->Modifier.Costs[resId] = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(key, "storing")) {
+			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
+				LuaError(l, "incorrect argument");
+			}
+			lua_rawgeti(l, j + 1, 1);
+			value = LuaToString(l, -1);
+			lua_pop(l, 1);
+			const int resId = GetResourceIdByName(l, value);
+			lua_rawgeti(l, j + 1, 2);
+			um->Modifier.Storing[resId] = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(key, "allow-unit")) {
 			lua_rawgeti(l, j + 1, 2);
@@ -582,6 +597,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			// upgrade costs :)
 			for (unsigned int j = 0; j < MaxCosts; ++j) {
 				UnitTypes[z]->Stats[pn].Costs[j] += um->Modifier.Costs[j];
+				UnitTypes[z]->Stats[pn].Storing[j] += um->Modifier.Storing[j];
 			}
 
 			int varModified = 0;

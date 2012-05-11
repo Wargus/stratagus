@@ -140,6 +140,7 @@ class CUnitStats
 public:
 	CUnitStats() : Variables(NULL) {
 		memset(Costs, 0, sizeof(Costs));
+		memset(Storing, 0, sizeof(Storing));
 	}
 	~CUnitStats();
 
@@ -150,6 +151,7 @@ public:
 public:
 	CVariable *Variables;           /// user defined variable.
 	int Costs[MaxCosts];            /// current costs of the unit
+	int Storing[MaxCosts];          /// storage increasing
 };
 
 /**
