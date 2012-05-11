@@ -55,7 +55,7 @@
 **
 **  @return        the BuildingRestrictionDetails
 */
-CBuildRestrictionOnTop *OnTopDetails(std::vector<CBuildRestriction *> &restr, 
+CBuildRestrictionOnTop *OnTopDetails(std::vector<CBuildRestriction *> &restr,
 									 const CUnit &unit, const CUnitType *parent)
 {
 	CBuildRestrictionAnd *andb;

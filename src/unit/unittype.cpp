@@ -184,8 +184,8 @@ CUnitType::~CUnitType()
 	}
 	BuildingRules.clear();
 	for (std::vector<CBuildRestriction *>::iterator b = AiBuildingRules.begin();
-		b != AiBuildingRules.end(); ++b) {
-			delete *b;
+		 b != AiBuildingRules.end(); ++b) {
+		delete *b;
 	}
 	AiBuildingRules.clear();
 
@@ -260,12 +260,12 @@ void UpdateStats(int reset)
 		if (type.NonSolid) {
 			if (type.Building) {
 				type.MovementMask = MapFieldLandUnit |
-					MapFieldSeaUnit |
-					MapFieldBuilding |
-					MapFieldCoastAllowed |
-					MapFieldWaterAllowed |
-					MapFieldNoBuilding |
-					MapFieldUnpassable;
+									MapFieldSeaUnit |
+									MapFieldBuilding |
+									MapFieldCoastAllowed |
+									MapFieldWaterAllowed |
+									MapFieldNoBuilding |
+									MapFieldUnpassable;
 				type.FieldFlags = MapFieldNoBuilding;
 			} else {
 				type.MovementMask = 0;
@@ -552,8 +552,8 @@ void InitUnitTypes(int reset_player_stats)
 
 		// Lookup AiBuildingTypes
 		for (std::vector<CBuildRestriction *>::iterator b = type->AiBuildingRules.begin();
-			b < type->AiBuildingRules.end(); ++b) {
-				(*b)->Init();
+			 b < type->AiBuildingRules.end(); ++b) {
+			(*b)->Init();
 		}
 	}
 

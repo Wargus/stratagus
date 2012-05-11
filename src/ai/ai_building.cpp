@@ -640,12 +640,12 @@ int AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i 
 					return AiFindMiningPlace(worker, type, nearPos.x, nearPos.y,  dpos, i);
 				} else {
 					//Mine can be build without resource restrictions: solar panels, etc
-					const Vec2i& startPos = Map.Info.IsPointOnMap(nearPos) ? nearPos : worker.tilePos;
+					const Vec2i &startPos = Map.Info.IsPointOnMap(nearPos) ? nearPos : worker.tilePos;
 					return AiFindBuildingPlace2(worker, type, startPos.x, startPos.y, dpos, 1);
 				}
 			}
 	}
-	const Vec2i& startPos = Map.Info.IsPointOnMap(nearPos) ? nearPos : worker.tilePos;
+	const Vec2i &startPos = Map.Info.IsPointOnMap(nearPos) ? nearPos : worker.tilePos;
 	return AiFindBuildingPlace2(worker, type, startPos.x, startPos.y, dpos, 1);
 }
 
