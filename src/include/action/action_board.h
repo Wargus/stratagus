@@ -45,6 +45,8 @@ public:
 
 	virtual COrder_Board *Clone() const { return new COrder_Board(*this); }
 
+	virtual bool IsValid() const;
+
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 

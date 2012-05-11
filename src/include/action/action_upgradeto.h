@@ -42,6 +42,8 @@ public:
 
 	virtual COrder_TransformInto *Clone() const { return new COrder_TransformInto(*this); }
 
+	virtual bool IsValid() const;
+
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
@@ -61,6 +63,8 @@ public:
 	COrder_UpgradeTo() : COrder(UnitActionUpgradeTo), Type(NULL), Ticks(0) {}
 
 	virtual COrder_UpgradeTo *Clone() const { return new COrder_UpgradeTo(*this); }
+
+	virtual bool IsValid() const;
 
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);

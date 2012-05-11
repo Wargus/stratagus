@@ -45,6 +45,7 @@
 #include "ai.h"
 #include "animation.h"
 #include "iolib.h"
+#include "map.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
@@ -72,6 +73,8 @@ enum {
 
 /* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building)
 {
+	Assert(Map.Info.IsPointOnMap(pos));
+
 	COrder_Build *order = new COrder_Build;
 
 	order->goalPos = pos;
@@ -137,6 +140,11 @@ enum {
 	} else {
 		return false;
 	}
+	return true;
+}
+
+/* virtual */ bool COrder_Build::IsValid() const
+{
 	return true;
 }
 

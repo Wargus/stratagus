@@ -123,6 +123,11 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 	return true;
 }
 
+/* virtual */ bool COrder_Built::IsValid() const
+{
+	return true;
+}
+
 /* virtual */ PixelPos COrder_Built::Show(const CViewport & , const PixelPos &lastScreenPos) const
 {
 	return lastScreenPos;

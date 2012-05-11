@@ -369,9 +369,9 @@ bool CUnit::RestoreOrder()
 {
 	COrder *savedOrder = this->SavedOrder;
 
-	if (savedOrder == NULL
-		|| (savedOrder->Action == UnitActionAttack
-			&& (!savedOrder->HasGoal() || savedOrder->GetGoal()->IsAlive()))) {
+	if (savedOrder == NULL || savedOrder->IsValid() == false) {
+		delete this->SavedOrder;
+		this->SavedOrder = NULL;
 		return false;
 	}
 

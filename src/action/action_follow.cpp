@@ -118,6 +118,11 @@ enum {
 	return true;
 }
 
+/* virtual */ bool COrder_Follow::IsValid() const
+{
+	return true;
+}
+
 /* virtual */ PixelPos COrder_Follow::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	PixelPos targetPos;

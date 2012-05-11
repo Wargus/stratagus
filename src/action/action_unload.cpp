@@ -96,6 +96,11 @@
 	return true;
 }
 
+/* virtual */ bool COrder_Unload::IsValid() const
+{
+	return true;
+}
+
 /* virtual */ PixelPos COrder_Unload::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	const PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);

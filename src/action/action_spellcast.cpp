@@ -134,6 +134,11 @@
 	return true;
 }
 
+/* virtual */ bool COrder_SpellCast::IsValid() const
+{
+	return true;
+}
+
 /* virtual */ PixelPos COrder_SpellCast::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	PixelPos targetPos;

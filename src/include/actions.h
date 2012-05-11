@@ -106,6 +106,7 @@ public:
 	virtual COrder *Clone() const = 0;
 	virtual void Execute(CUnit &unit) = 0;
 	virtual void Cancel(CUnit &unit) {}
+	virtual bool IsValid() const = 0;
 
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const = 0;
 

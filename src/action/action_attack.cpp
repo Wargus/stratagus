@@ -185,6 +185,20 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	return true;
 }
 
+/* virtual */ bool COrder_Attack::IsValid() const
+{
+	if (Action == UnitActionAttack) {
+		if (this->HasGoal()) {
+			return this->GetGoal()->IsAlive();
+		} else {
+			return Map.Info.IsPointOnMap(this->goalPos);
+		}
+	} else {
+		Assert(Action == UnitActionAttackGround);
+		return Map.Info.IsPointOnMap(this->goalPos);
+	}
+}
+
 /* virtual */ PixelPos COrder_Attack::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	PixelPos targetPos;

@@ -254,6 +254,11 @@ COrder_Resource::~COrder_Resource()
 	return true;
 }
 
+/* virtual */ bool COrder_Resource::IsValid() const
+{
+	return true;
+}
+
 /* virtual */ PixelPos COrder_Resource::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	PixelPos targetPos;

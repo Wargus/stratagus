@@ -41,6 +41,8 @@ public:
 
 	virtual COrder_Still *Clone() const { return new COrder_Still(*this); }
 
+	virtual bool IsValid() const;
+
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 

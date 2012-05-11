@@ -110,6 +110,11 @@
 	return true;
 }
 
+/* virtual */ bool COrder_Patrol::IsValid() const
+{
+	return true;
+}
+
 /* virtual */ PixelPos COrder_Patrol::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	const PixelPos pos1 = vp.TilePosToScreen_Center(this->goalPos);

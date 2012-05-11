@@ -104,6 +104,11 @@ enum {
 	return true;
 }
 
+/* virtual */ bool COrder_Still::IsValid() const
+{
+	return true;
+}
+
 /* virtual */ PixelPos COrder_Still::Show(const CViewport & , const PixelPos &lastScreenPos) const
 {
 	if (this->Action == UnitActionStandGround) {

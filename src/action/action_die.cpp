@@ -68,6 +68,11 @@
 	return false;
 }
 
+/* virtual */ bool COrder_Die::IsValid() const
+{
+	return true;
+}
+
 /* virtual */ PixelPos COrder_Die::Show(const CViewport & , const PixelPos &lastScreenPos) const
 {
 	return lastScreenPos;

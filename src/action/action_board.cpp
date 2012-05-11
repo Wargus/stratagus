@@ -111,6 +111,11 @@ enum {
 	return true;
 }
 
+/* virtual */ bool COrder_Board::IsValid() const
+{
+	return this->HasGoal() && this->GetGoal()->IsAliveOnMap();
+}
+
 /* virtual */ PixelPos COrder_Board::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	PixelPos targetPos;

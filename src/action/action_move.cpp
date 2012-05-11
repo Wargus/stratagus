@@ -97,6 +97,11 @@
 	return true;
 }
 
+/* virtual */ bool COrder_Move::IsValid() const
+{
+	return true;
+}
+
 /* virtual */ PixelPos COrder_Move::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	const PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);

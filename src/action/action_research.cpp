@@ -97,7 +97,10 @@
 	return true;
 }
 
-
+/* virtual */ bool COrder_Research::IsValid() const
+{
+	return true;
+}
 
 /* virtual */ PixelPos COrder_Research::Show(const CViewport & , const PixelPos &lastScreenPos) const
 {

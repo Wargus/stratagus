@@ -129,8 +129,10 @@
 	return true;
 }
 
-
-
+/* virtual */ bool COrder_Repair::IsValid() const
+{
+	return true;
+}
 
 /* virtual */ PixelPos COrder_Repair::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {

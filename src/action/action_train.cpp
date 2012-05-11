@@ -97,6 +97,11 @@
 	return true;
 }
 
+/* virtual */ bool COrder_Train::IsValid() const
+{
+	return true;
+}
+
 /* virtual */ PixelPos COrder_Train::Show(const CViewport & , const PixelPos &lastScreenPos) const
 {
 	return lastScreenPos;
