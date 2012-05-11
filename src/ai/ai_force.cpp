@@ -267,20 +267,21 @@ void AiForce::RemoveDeadUnit()
 
 void AiForce::Attack(const Vec2i &pos)
 {
-	Vec2i goalPos(pos);
 	RemoveDeadUnit();
 
-	// Remember the original force position so we can return there after attack
-	if (this->Size() > 0 && (this->Role == AiForceRoleDefend && !this->Attacking)
-		|| (this->Role == AiForceRoleAttack && !this->Attacking && !this->State)) {
-		this->HomePos = this->Units[0]->tilePos;
-	}
-
-	Attacking = false;
 	if (Units.size() == 0) {
+		this->Attacking = false;
 		return;
 	}
-	Attacking = true;
+	if (!this->Attacking) {
+		// Remember the original force position so we can return there after attack
+		if (this->Role == AiForceRoleDefend
+			|| (this->Role == AiForceRoleAttack && this->State == AiForceAttackingState_Waiting)) {
+			this->HomePos = this->Units[0]->tilePos;
+		}
+		this->Attacking = true;
+	}
+	Vec2i goalPos(pos);
 
 	if (Map.Info.IsPointOnMap(goalPos) == false) {
 		/* Search in entire map */
