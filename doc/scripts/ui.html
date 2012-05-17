@@ -37,6 +37,7 @@
 <a href="#DefineButtonStyle">DefineButtonStyle</a>
 <a href="#DefineCursor">DefineCursor</a>
 <a href="#DefineViewports">DefineViewports</a>
+<a href="#HandleCommandKey">HandleCommandKey</a>
 <a href="#MaxFontColors">MaxFontColors</a>
 <a href="#SetGameCursor">SetGameCursor</a>
 <a href="#text_formatting">text formatting</a>
@@ -347,6 +348,32 @@ Set the game cursor.
 -- Set the game cursor to 'cursor-point'.
 SetGameCursor("cursor-point")
 </pre>
+
+<a name="HandleCommandKey"></a>
+<h3>HandleCommandKey("key", ctrl, alt, shift)</h3>
+
+<p>The Lua script must define this function.  The engine calls it when
+the user presses a key that the engine does not handle on its own, and
+no menu is open.  The engine can call this function during the game,
+in the map editor, or in the patch editor.  To handle different keys
+in different situations, the Lua script can redefine this function
+when the user enters or leaves an editor.</p>
+
+<dl>
+<dt>"key"</dt>
+<dd>The name of the key that the user pressed; for example, "a" or
+"escape".  The name does not depend on which the language the user
+selected.</dd>
+<dt>ctrl</dt>
+<dd>true if the user pressed the Control key too, false if not.</dd>
+<dt>alt</dt>
+<dd>true if the user pressed the Alt key too, false if not.</dd>
+<dt>shift</dt>
+<dd>true if the user pressed the Shift key too, false if not.</dd>
+<dt><i>RETURNS</i></dt>
+<dd>true if HandleCommandKey handled the key, false if the engine
+should try to handle the key in some other way.</dd>
+</dl>
 
 <h2>Variables</h2>
 

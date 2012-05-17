@@ -50,6 +50,9 @@ function ErrorEditorMenu(errmsg)
   menu:run(false)
 end
 
+-- Called when the user presses an unhandled key while the map editor
+-- is active and no menu is open.  Returns true if it handled the key.
+-- See the HTML documentation on HandleCommandKey for details.
 function HandleEditorIngameCommandKey(key, ctrl, alt, shift)
   if ((key == "m" and alt) or key == "f10") then
     RunEditorIngameMenu()

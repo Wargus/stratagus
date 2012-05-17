@@ -1,3 +1,6 @@
+-- Called when the user presses an unhandled key during the game
+-- while no menu is open.  Returns true if it handled the key.
+-- See the HTML documentation on HandleCommandKey for details.
 function HandleIngameCommandKey(key, ctrl, alt, shift)
   if ((key == "h" and (ctrl or alt)) or key == "f1") then
     if (not IsNetworkGame()) then SetGamePaused(true) end
