@@ -23,6 +23,9 @@
 --      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 --      02111-1307, USA.
 
+-- Called when the user presses an unhandled key while the patch editor
+-- is active and no menu is open.  Returns true if it handled the key.
+-- See the HTML documentation on HandleCommandKey for details.
 function HandlePatchEditorIngameCommandKey(key, ctrl, alt, shift)
   return false
 end
