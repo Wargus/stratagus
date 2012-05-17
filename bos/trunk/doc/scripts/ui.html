@@ -85,98 +85,168 @@ following format codes.</p>
 <a name="DefineButton"></a>
 <h3>DefineButton({tag1 = value1, tag2 value2, ...})</h3>
 
-Define a button in the button panel show during the game. Possible tags:
+Define a button in the button panel shown during the game.
+Possible tags:
 
 <dl>
-<dt>Pos = number</dt>
-<dd>Position number.
+<dt id="DefineButton.Pos">Pos = number</dt>
+<dd>The position in which the button will appear in the button panel
+or in the pie menu.
 <pre>
 0 1 2
 3 4 5
 6 7 8
 </pre>
 </dd>
-<dt>Level = number</dt>
-<dd>Visible when in this button level (0 default, 9 cancel-only)
-</dd>
-<dt>Icon = "icon-name"</dt>
+<dt id="DefineButton.Level">Level = number</dt>
+<dd>Visible when in this button level (0 default, 9 cancel-only).
+  <p>The engine normally returns to button
+level 0 when the player selects a unit.  Level 0 is also the default for
+buttons that you define without explicitly specifying Level = number.</p>
+  <p>Button level 9 should contain only a Cancel
+button (<a href="#DefineButton.Action.cancel">Action = "cancel"</a>).
+The engine selects level 9 when it expects the player to choose
+a target location or a target unit on the map.</p></dd>
+<dt id="DefineButton.Icon">Icon = "icon-name"</dt>
 <dd>Name of the icon to display.
 </dd>
-<dt>Action = "action"</dt>
-<dd>Action to perform when the button is clicked.  Can be any of the following:
+<dt id="DefineButton.Action">Action = "action"</dt>
+<dd>Action to perform when the player clicks the button.
+Can be any of the following:
 <dl>
-  <dt>"move"</dt>
-  <dd>The unit moves to location</dd>
-  <dt>"stop"</dt>
-  <dd>the unit stops. Orders queue is also erased. The unit wait for order but can react by itself.</dd>
-  <dt>"attack"</dt>
-  <dd>The unit attacks target. if target is a unit then it attacks only the unit.
-If target is a position, it will move to location by attacking any opponent on the way.</dd>
-  <dt>"repair"</dt>
-  <dd>The unit will repair the target unit.</dd>
-  <dt>"harvest"</dt>
-  <dd>The unit will harvest the ressources.</dd>
-  <dt>"button"</dt>
-  <dd>FIXME. Need Value = number.</dd>
-  <dt>"build"</dt>
-  <dd>The unit will build the unit (building structure)</dd>
-  <dt>"train-unit"</dt>
-  <dd>The unit trains an unit. Generally use for building to create news units.
-Need Value = "unit-name".</dd>
-  <dt>"patrol"</dt>
-  <dd>The unit patrol between target position and current position and attack any opponent
-on the way.</dd>
-  <dt>"stand-ground"</dt>
-  <dd>The unit doesn't move. The unit stay at its location until it receives a new order.</dd>
-  <dt>"attack-ground"</dt>
-  <dd>The unit attack a location. Usefull for unit with spalsh damage.</dd>
-  <dt>"cast-spell"</dt>
-  <dd>The unit cast a spell.
-Need Value = "spell-name"</dd>
-  <dt>"unload"</dt>
-  <dd>The unit unload unit inside of itself. Usefull for transporter or bunkers.</dd>
-  <dt>"cancel"</dt>
-  <dd>FIXME : difference between cancels.</dd>
-  <dt>"cancel-train-unit"</dt>
-  <dd>FIXME</dd>
-  <dt>"cancel-build"</dt>
-  <dd>FIXME</dd>
+  <dt id="DefineButton.Action.move">"move"</dt>
+  <dd>The selected unit will follow the target unit or move to the
+target location.  In the former case, the selected unit will stop
+following if it reaches the target unit.</dd>
+  <dt id="DefineButton.Action.stop">"stop"</dt>
+  <dd>The selected unit stops.
+The orders queue of the selected unit is also erased.
+The selected unit then waits for an order but can react by itself.</dd>
+  <dt id="DefineButton.Action.attack">"attack"</dt>
+  <dd>The selected unit will attack only the target unit, or move to
+the target location and attack any opponent on the way.</dd>
+  <dt id="DefineButton.Action.repair">"repair"</dt>
+  <dd>The selected unit will repair the target unit.</dd>
+  <dt id="DefineButton.Action.harvest">"harvest"</dt>
+  <dd>The selected unit will harvest resources from the target unit.
+After the target unit is destroyed, the selected unit will try to find
+more resources of the same type, unless it has another order in its queue.</dd>
+  <dt id="DefineButton.Action.button">"button"</dt>
+  <dd>Switches to a different button level; changes the button panel
+to show the buttons of that level.  
+<p>You must set <a href="#DefineButton.Value">Value</a> = number.
+The engine will show the allowed buttons that have
+<a href="#DefineButton.Level">Level</a> = that number.</p></dd>
+  <dt id="DefineButton.Action.build">"build"</dt>
+  <dd>The selected unit will build a new unit at the target location.
+The new unit will appear on the map as soon as the selected unit
+begins building it.
+<p>You must set <a href="#DefineButton.Value">Value</a> = "unit-name".
+This is the type of the new unit that the selected unit will build.  Normally,
+you would specify a <a href="unittype.html#DefineUnitType.Building">building</a>
+type here.</p></dd>
+  <dt id="DefineButton.Action.train-unit">"train-unit"</dt>
+  <dd>The selected unit will train a new unit within itself.
+When training completes, the new unit will appear next to the unit
+that trained it, or further away if it doesn't fit any closer.
+Normally, you would specify a
+<a href="unittype.html#DefineUnitType.Building">building</a> type
+in the <a href="#DefineButton.ForUnit">ForUnit</a> list.
+<p>You must set <a href="#DefineButton.Value">Value</a> = "unit-name".
+This is the type of the new unit that the selected unit will train.</p></dd>
+  <dt id="DefineButton.Action.patrol">"patrol"</dt>
+  <dd>The selected unit will patrol between target location
+and its current location and attack any opponent on the way.</dd>
+  <dt id="DefineButton.Action.stand-ground">"stand-ground"</dt>
+  <dd>The selected unit will not move.
+It will stay at its location until it receives a new order.
+It will however fire at any opponents that come too close.</dd>
+  <dt id="DefineButton.Action.attack-ground">"attack-ground"</dt>
+  <dd>The selected unit will attack the target location.
+Useful for units with <a href="magic.html#DefineMissileType.Range">splash damage</a>.</dd>
+  <dt id="DefineButton.Action.cast-spell">"cast-spell"</dt>
+  <dd>The selected unit will cast a spell.
+<p>You must set <a href="#DefineButton.Value">Value</a> = "spell-ident".
+This is the unique identifier of the spell, as defined with
+<a href="magic.html#DefineSpell">DefineSpell</a>.</p></dd>
+  <dt id="DefineButton.Action.unload">"unload"</dt>
+  <dd>The selected unit will unload all the units that it is carrying.
+Useful for unit types defined with
+<a href="unittype.html#DefineUnitType.CanTransport">CanTransport</a> = true.
+If the selected unit cannot move (its unit type has no move animation
+defined), then the engine assumes it is a bunker, and it will unload
+its inhabitants where it is.
+If the selected unit can move, then the engine assumes it is a
+transporter; the player must select a target location on the map,
+and the transporter will unload its passengers there.
+There are some exceptions to these rules.</dd>
+  <dt id="DefineButton.Action.cancel">"cancel"</dt>
+  <dd>The engine stops waiting for the player to choose a target.
+The action for which the engine wants a target is not yet in the order
+queue of the selected unit, so the button does not affect the unit.
+This kind of cancel should be used only with
+<a href="#DefineButton.Level">Level</a> = 9.</dd>
+  <dt id="DefineButton.Action.cancel-train-unit">"cancel-train-unit"</dt>
+  <dd>The selected unit stops training units.  All unit-training orders
+(<a href="#DefineButton.Action.train-unit">Action = "train-unit"</a>)
+are erased from the order queue of the selected unit.
+(In principle, if there is some other type of order in between,
+then unit-training orders that follow it are not erased.
+However, units that can train typically cannot do anything else.)</dd>
+  <dt id="DefineButton.Action.cancel-build">"cancel-build"</dt>
+  <dd>The selected unit stops being built and is destroyed.
+Any workers who were building it are freed.</dd>
   </dl>
   </dd>
-<dt>Value = arg</dt>
-<dd>Optional value associated with the action.
+<dt id="DefineButton.Value">Value = arg</dt>
+<dd>Optional value associated with the <a href="#DefineButton.Action">Action</a>.
 </dd>
-<dt>Allowed = "check-name"</dt>
+<dt id="DefineButton.Allowed">Allowed = "check-name"</dt>
 <dd>Optional check to see if a button is allowed. Can be any of the following:
   <dl>
   <dt>"check-true"</dt>
   <dd>No restriction on this button.</dd>
   <dt>"check-false"</dt>
-  <dd>this button is forbidden. FIXME : ? to be removed. What is its usage ?</dd>
+  <dd>The button is forbidden. FIXME : ? to be removed. What is its usage ?</dd>
   <dt>"check-units-or"</dt>
-  <dd>this button is available if at least one of the unit are available.
-  Need AllowArg = {"unit-name1", "unit-name2"}</dd>
+  <dd>The button is allowed if the player has at least one unit of
+any of the specified types.
+Need <a href="#DefineButton.AllowArg">AllowArg</a> = {"unit-name1", "unit-name2"}</dd>
   <dt>"check-units-and"</dt>
-  <dd>FIXME</dd>
+  <dd>The button is allowed if the player has at least one unit of
+each of the specified types.
+Need <a href="#DefineButton.AllowArg">AllowArg</a> = {"unit-name1", "unit-name2"}</dd>
   <dt>"check-network"</dt>
-  <dd>Button is available only if network is available too.</dd>
+  <dd>The button is allowed only during a network game.</dd>
   <dt>"check-no-network"</dt>
-  <dd>Button is available only if network is not available.</dd>
+  <dd>The button is allowed only during a non-network game.</dd>
   <dt>"check-no-work"</dt>
-  <dd>FIXME</dd>
+  <dd>The button is allowed unless the selected unit is training a unit
+(with <a href="#DefineButton.Action.train-unit">Action = "train-unit"</a>).</dd>
   <dt>"check-attack"</dt>
-  <dd>FIXME</dd>
+  <dd>The button is allowed if the selected unit can attack at all,
+i.e. its unit type was defined with
+<a href="unittype.html#DefineUnitType.CanAttack">CanAttack</a> = true.</dd>
   </dl>
+If you do not specify Allowed, then the engine decides
+whether the button is allowed, based on which units the player has selected
+and which <a href="#DefineButton.Action">Action</a> the button has.
+For example, if the button has
+<a href="#DefineButton.Action.patrol">Action = "patrol"</a>,
+and the player selects a building that cannot move,
+then the button is not allowed by default.
+If you do specify Allowed, it overrides these default checks,
+but the <a href="#DefineButton.ForUnit">ForUnit</a> list still applies.
 </dd>
-<dt>AllowArg = {"arg1", ...}</dt>
+<dt id="DefineButton.AllowArg">AllowArg = {"arg1", ...}</dt>
 <dd>Optional argument used by the allowed function.
 </dd>
-<dt>Hint = "string"</dt>
+<dt id="DefineButton.Hint">Hint = "string"</dt>
 <dd>Hint to be displayed for the button.  To define a shortcut key
 for the button, use the "~!", "~&lt;", and "~&gt;" format codes
 described in <a href="#text_formatting">Text formatting</a>.
 </dd>
-<dt>ForUnit = {"unit-name1", ...} or {"*"} </dt>
+<dt id="DefineButton.ForUnit">ForUnit = {"unit-name1", ...} or {"*"} </dt>
 <dd>List of units the button applies to, or {"*"} for all units.
 </dd>
 </dl>
