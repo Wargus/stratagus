@@ -1479,6 +1479,9 @@ void UIHandleButtonDown(unsigned button)
 	CUnit *uins;
 	int i;
 
+	// Reset the ShowNameDelay counters
+	ShowNameDelay = ShowNameTime = GameCycle;
+
 	if (LongLeftButton) {
 		if (!OldValid) {
 			OldShowSightRange = Preference.ShowSightRange;

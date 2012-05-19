@@ -141,7 +141,7 @@ public:
 		}
 		Units.for_each(InternalRemoveUnit);
 		Units.clear();
-		GoalPos.x = GoalPos.y = -1;
+		HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
 	}
 	inline size_t Size() const { return Units.size(); }
 

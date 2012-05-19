@@ -56,6 +56,7 @@
 #include "ui.h"
 #include "unit.h"
 #include "unittype.h"
+#include "spells.h"
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -189,7 +190,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 {
 	if (Action == UnitActionAttack) {
 		if (this->HasGoal()) {
-			return this->GetGoal()->IsAlive();
+			return this->GetGoal()->IsAliveOnMap();
 		} else {
 			return Map.Info.IsPointOnMap(this->goalPos);
 		}
@@ -336,23 +337,24 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 			this->SetGoal(goal);
 			this->MinRange = unit.Type->MinAttackRange;
 			this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
-			this->goalPos.x = this->goalPos.y = -1;
+			this->goalPos = goal->tilePos;
 			this->State |= WEAK_TARGET; // weak target
 		}
 		// Have a weak target, try a better target.
-	} else if (this->HasGoal() && (this->State & WEAK_TARGET)) {
+	} else if (this->HasGoal() && (this->State & WEAK_TARGET || unit.Player->AiEnabled)) {
 		CUnit *goal = this->GetGoal();
 		CUnit *newTarget = AttackUnitsInReactRange(unit);
 
-		if (newTarget && newTarget->Type->Priority > goal->Type->Priority) {
-			COrder *savedOrder = this->Clone();
+		if (newTarget && newTarget->IsAgressive()
+			&& ThreatCalculate(unit, newTarget) < ThreatCalculate(unit, goal)) {
+				COrder *savedOrder = this->Clone();
 
-			if (unit.StoreOrder(savedOrder) == false) {
-				delete savedOrder;
-				savedOrder = NULL;
-			}
-			this->SetGoal(newTarget);
-			this->goalPos.x = this->goalPos.y = -1;
+				if (unit.StoreOrder(savedOrder) == false) {
+					delete savedOrder;
+					savedOrder = NULL;
+				}
+				this->SetGoal(newTarget);
+				this->goalPos = newTarget->tilePos;
 		}
 	}
 
@@ -482,7 +484,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 			savedOrder = NULL;
 		}
 		this->SetGoal(goal);
-		this->goalPos.x = this->goalPos.y = -1;
+		this->goalPos = goal->tilePos;
 		this->MinRange = unit.Type->MinAttackRange;
 		this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 		this->State |= WEAK_TARGET;
@@ -492,18 +494,19 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	} else {
 		if ((this->State & WEAK_TARGET)) {
 			CUnit *newTarget = AttackUnitsInReactRange(unit);
-			if (newTarget && newTarget->Type->Priority > goal->Type->Priority) {
-				COrder *savedOrder = this->Clone();
+			if (newTarget && newTarget->IsAgressive()
+				&& ThreatCalculate(unit, newTarget) < ThreatCalculate(unit, goal)) {
+					COrder *savedOrder = this->Clone();
 
-				if (unit.StoreOrder(savedOrder) == false) {
-					delete savedOrder;
-					savedOrder = NULL;
-				}
-				goal = newTarget;
-				this->SetGoal(newTarget);
-				this->goalPos.x = this->goalPos.y = -1;
-				this->MinRange = unit.Type->MinAttackRange;
-				this->State = MOVE_TO_TARGET;
+					if (unit.StoreOrder(savedOrder) == false) {
+						delete savedOrder;
+						savedOrder = NULL;
+					}
+					goal = newTarget;
+					this->SetGoal(newTarget);
+					this->goalPos = newTarget->tilePos;
+					this->MinRange = unit.Type->MinAttackRange;
+					this->State = MOVE_TO_TARGET;
 			}
 		}
 	}

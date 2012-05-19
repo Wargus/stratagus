@@ -475,6 +475,11 @@ static int CclUnit(lua_State *l)
 			// FIXME : unsigned long should be better handled
 			unit->TTL = LuaToNumber(l, -1);
 			lua_pop(l, 1);
+		} else if (!strcmp(value, "threshold")) {
+			lua_rawgeti(l, 2, j + 1);
+			// FIXME : unsigned long should be better handled
+			unit->Threshold = LuaToNumber(l, -1);
+			lua_pop(l, 1);
 		} else if (!strcmp(value, "group-id")) {
 			lua_rawgeti(l, 2, j + 1);
 			unit->GroupId = LuaToNumber(l, -1);

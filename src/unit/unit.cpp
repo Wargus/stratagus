@@ -172,6 +172,7 @@ void CUnit::Init()
 	memset(&Seen, 0, sizeof(Seen));
 	Variable = NULL;
 	TTL = 0;
+	Threshold = 0;
 	GroupId = 0;
 	LastGroup = 0;
 	ResourcesHeld = 0;
@@ -369,7 +370,11 @@ bool CUnit::RestoreOrder()
 {
 	COrder *savedOrder = this->SavedOrder;
 
-	if (savedOrder == NULL || savedOrder->IsValid() == false) {
+	if (savedOrder == NULL) {
+		return false;
+	}
+
+	if (savedOrder->IsValid() == false) {
 		delete this->SavedOrder;
 		this->SavedOrder = NULL;
 		return false;
@@ -400,6 +405,10 @@ bool CUnit::StoreOrder(COrder *order)
 	Assert(order);
 
 	if (this->SavedOrder != NULL) {
+		if (this->SavedOrder->IsValid() == false) {
+			delete this->SavedOrder;
+			this->SavedOrder = NULL;
+		}
 		return false;
 	}
 	if (order && order->Finished == true) {
@@ -2580,6 +2589,11 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 				continue;
 			}
 		}
+		// Check if better units are present on this location
+		if (unit->Type->IsNotSelectable) {
+			funit = unit;
+			continue;
+		}
 		//
 		// This could be taken.
 		//
@@ -2735,6 +2749,47 @@ void DestroyAllInside(CUnit &source)
   -- Unit AI
   ----------------------------------------------------------------------------*/
 
+int ThreatCalculate(const CUnit &unit, const CUnit *dest)
+{
+	int cost = 0;
+
+	const CUnitType &type = *unit.Type;
+	const CUnitType &dtype = *dest->Type;
+
+	// Priority 0-255
+	cost -= dtype.Priority * PRIORITY_FACTOR;
+	// Remaining HP (Health) 0-65535
+	cost += dest->Variable[HP_INDEX].Value * 100 / dest->Variable[HP_INDEX].Max * HEALTH_FACTOR;
+
+	int d = unit.MapDistanceTo(*dest);
+
+	if (d <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max && d >= type.MinAttackRange) {
+		cost += d * INRANGE_FACTOR;
+		cost -= INRANGE_BONUS;
+	} else {
+		cost += d * DISTANCE_FACTOR;
+	}
+
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
+		if (type.BoolFlag[i].AiPriorityTarget != CONDITION_TRUE) {
+			if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_ONLY) &
+				(dtype.BoolFlag[i].value)) {
+					cost -= AIPRIORITY_BONUS;
+			}
+			if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_FALSE) &
+				(dtype.BoolFlag[i].value)) {
+					cost += AIPRIORITY_BONUS;
+			}
+		}
+	}
+
+	// Unit can attack back.
+	if (CanTarget(&dtype, &type)) {
+		cost -= CANATTACK_BONUS;
+	}
+	return cost;
+}
+
 /**
 **  Unit is hit by missile or other damage.
 **
@@ -2807,7 +2862,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		}
 	}
 
-	if (attacker && !target.Type->Wall && target.Type->Building && target.Player->AiEnabled) {
+	if (attacker && !target.Type->Wall && target.Player->AiEnabled) {
 		AiHelpMe(attacker, target);
 	}
 
@@ -2816,6 +2871,9 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		(target.Variable[HP_INDEX].Value == 0)) { // unit is killed or destroyed
 		//  increase scores of the attacker, but not if attacking it's own units.
 		//  prevents cheating by killing your own units.
+
+		//  Setting ai threshold counter to 0 so it can target other units
+		attacker->Threshold = 0;
 		if (attacker && target.IsEnemy(*attacker)) {
 			attacker->Player->Score += target.Variable[POINTS_INDEX].Value;
 			if (type->Building) {
@@ -2909,47 +2967,14 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		}
 	}
 
-	// Attack units in range (which or the attacker?)
-	if (attacker && target.IsAgressive() && target.CanMove()) {
-		if (target.CurrentAction() != UnitActionStill) {
-			return;
-		}
-		CUnit *goal;
-
-		if (RevealAttacker && CanTarget(target.Type, attacker->Type)) {
-			// Reveal Unit that is attacking
-			goal = attacker;
-		} else {
-			if (target.CurrentAction() == UnitActionStandGround) {
-				goal = AttackUnitsInRange(target);
-			} else {
-				// Check for any other units in range
-				goal = AttackUnitsInReactRange(target);
-			}
-		}
-		if (goal) {
-			COrder *savedOrder = target.CurrentOrder()->Clone();
-
-			CommandAttack(target, goal->tilePos, NoUnitP, FlushCommands);
-			if (target.StoreOrder(savedOrder) == false) {
-				delete savedOrder;
-				savedOrder = NULL;
-			}
-			return;
-		}
+	if (!attacker) {
+		return;
 	}
-
-	/*
-		What should we do with workers on :
-		case UnitActionRepair:
-
-		Drop orders and run away or return after escape?
-	*/
 
 	//
 	// Can't attack run away.
 	//
-	if (attacker && target.CanMove() && target.CurrentAction() == UnitActionStill) {
+	if (!target.IsAgressive() && target.CanMove() && target.CurrentAction() == UnitActionStill) {
 		Vec2i pos = target.tilePos - attacker->tilePos;
 		int d = isqrt(pos.x * pos.x + pos.y * pos.y);
 
@@ -2962,6 +2987,73 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		CommandStopUnit(target);
 		CommandMove(target, pos, 0);
 	}
+
+	// The rest instructions is only for AI units.
+	if (!target.Player->AiEnabled) {
+		return;
+	}
+
+	const int threshold = 30;
+
+	if (target.Threshold && target.CurrentOrder()->HasGoal() && target.CurrentOrder()->GetGoal() == attacker) {
+		target.Threshold = threshold;
+		return;
+	}
+
+	// If the threshold counter is not zero, ignoring
+	if (target.Threshold) {
+		return;
+	}
+
+	// Attack units in range (which or the attacker?)
+	// Don't bother unit if it casting repeatable spell
+	if (target.IsAgressive() && target.CanMove() && target.CurrentAction() != UnitActionSpellCast) {
+		COrder *savedOrder = target.CurrentOrder()->Clone();
+		CUnit *oldgoal = target.CurrentOrder()->GetGoal();
+		CUnit *goal, *best = oldgoal;
+
+		if (RevealAttacker && CanTarget(target.Type, attacker->Type)) {
+			// Reveal Unit that is attacking
+			goal = attacker;
+		} else {
+			if (target.CurrentAction() == UnitActionStandGround) {
+				goal = AttackUnitsInRange(target);
+			} else {
+				// Check for any other units in range
+				goal = AttackUnitsInReactRange(target);
+			}
+		}
+
+		// Calculate the best target we could attack
+		best = oldgoal ? oldgoal : (goal ? goal : attacker);
+		if (best && best != attacker) {
+			if (goal && ((goal->IsAgressive() && best->IsAgressive() == false)
+				|| (ThreatCalculate(target, goal) < ThreatCalculate(target, best)))) {
+				best = goal;
+			}
+			if (!RevealAttacker && (best->IsAgressive() == false || ThreatCalculate(target, attacker) < ThreatCalculate(target, best))) {
+				best = attacker;
+			}
+		}
+		CommandAttack(target, best->tilePos, NoUnitP, FlushCommands);
+
+		// Set threshold value only for agressive units
+		if (best->IsAgressive()) {
+			target.Threshold = threshold;
+		}
+		if (target.StoreOrder(savedOrder) == false) {
+			delete savedOrder;
+			savedOrder = NULL;
+		}
+		return;
+	}
+
+	/*
+		What should we do with workers on :
+		case UnitActionRepair:
+
+		Drop orders and run away or return after escape?
+	*/
 }
 
 /*----------------------------------------------------------------------------

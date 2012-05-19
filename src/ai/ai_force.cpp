@@ -52,8 +52,11 @@
 /*----------------------------------------------------------------------------
 --  Types
 ----------------------------------------------------------------------------*/
+#define AIATTACK_RANGE 0
+#define AIATTACK_ALLMAP 1
+#define AIATTACK_BUILDING 2
 
-template <const bool IN_REACT_RANGE>
+template <const int FIND_TYPE>
 class AiForceEnemyFinder
 {
 public:
@@ -75,10 +78,16 @@ public:
 		if (unit->Type->CanAttack == false) {
 			return *enemy == NULL;
 		}
-		if (IN_REACT_RANGE) {
+		if (FIND_TYPE == AIATTACK_RANGE) {
 			*enemy = AttackUnitsInReactRange(*unit);
-		} else {
+		} else if (FIND_TYPE == AIATTACK_ALLMAP) {
 			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
+		} else if (FIND_TYPE == AIATTACK_BUILDING) {
+			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, true);
+			Assert(!*enemy || (*enemy)->Type->Building);
+			if (*enemy == NULL) {
+				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
+			}
 		}
 		return *enemy == NULL;
 	}
@@ -285,7 +294,7 @@ void AiForce::Attack(const Vec2i &pos)
 	if (Map.Info.IsPointOnMap(goalPos) == false) {
 		/* Search in entire map */
 		const CUnit *enemy = NULL;
-		AiForceEnemyFinder<false>(*this, &enemy);
+		AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &enemy);
 		if (enemy) {
 			goalPos = enemy->tilePos;
 		}
@@ -639,6 +648,8 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 */
 void AiForce::Update()
 {
+	bool isTransporterAttack = false;
+
 	if (Size() == 0) {
 		Attacking = false;
 		if (!Defending && State > AiForceAttackingState_Waiting) {
@@ -651,6 +662,9 @@ void AiForce::Update()
 	Attacking = false;
 	for (unsigned int i = 0; i < Size(); ++i) {
 		CUnit *aiunit = Units[i];
+		if (!isTransporterAttack && aiunit->Type->CanTransport()) {
+			isTransporterAttack = true;
+		}
 		if (aiunit->Type->CanAttack) {
 			Attacking = true;
 			break;
@@ -681,39 +695,91 @@ void AiForce::Update()
 		return ;
 	}
 
-	std::vector<CUnit *> idleUnits;
-	const CUnit *leader = NULL;
-	for (unsigned int i = 0; i != Size(); ++i) {
-		CUnit &aiunit = *Units[i];
+	Assert(Map.Info.IsPointOnMap(GoalPos));
+	std::vector<CUnit *> attackUnits;
+	CUnit *leader = NULL;
+	int distance = 0;
+	Vec2i pos = GoalPos;
 
-		if (aiunit.IsIdle()) {
-			if (aiunit.IsAliveOnMap()) {
-				idleUnits.push_back(&aiunit);
+	if (isTransporterAttack) {
+		for (unsigned int i = 0; i != Size(); ++i) {
+			CUnit &aiunit = *Units[i];
+
+			if (aiunit.IsIdle()) {
+				if (aiunit.IsAliveOnMap()) {
+					attackUnits.push_back(&aiunit);
+				}
+			} else if (aiunit.CurrentAction() == UnitActionAttack) {
+				leader = &aiunit;
 			}
-		} else if (aiunit.CurrentAction() == UnitActionAttack) {
-			leader = &aiunit;
-		} else if (leader == NULL) {
-			leader = &aiunit;
+		}
+	} else {
+		attackUnits = Units.Units;
+		for (unsigned int i = 0; i < Size(); ++i) {
+			CUnit &aiunit = *Units[i];
+			if (aiunit.CurrentAction() == UnitActionAttack) {
+				leader = &aiunit;
+				if (leader->CurrentOrder()->HasGoal() && leader->CurrentOrder()->GetGoal()->IsAliveOnMap()) {
+					pos = leader->CurrentOrder()->GetGoal()->tilePos;
+				}
+				break;
+			}
 		}
 	}
-	const Vec2i pos = leader != NULL ? leader->tilePos : this->GoalPos;
-	for (size_t i = 0; i != idleUnits.size(); ++i) {
-		CUnit &aiunit = *idleUnits[i];
-		const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
 
-		aiunit.Wait = delay;
-		if (aiunit.Type->CanAttack) {
-			CommandAttack(aiunit, pos, NULL, FlushCommands);
-		} else if (aiunit.Type->CanTransport()) {
-			if (aiunit.BoardCount != 0) {
-				CommandUnload(aiunit, pos, NULL, FlushCommands);
-			} else {
-				// FIXME : Retrieve unit blocked (transport previously full)
-				CommandMove(aiunit, aiunit.Player->StartPos, FlushCommands);
-				this->Remove(aiunit);
+	if (leader != NULL) {
+		for (size_t i = 0; i != attackUnits.size(); ++i) {
+			CUnit &aiunit = *attackUnits[i];
+
+			if (aiunit.CurrentAction() == UnitActionAttack) {
+				continue;
 			}
-		} else {
-			CommandMove(aiunit, pos, FlushCommands);
+
+			const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
+
+			aiunit.Wait = delay;
+			if (aiunit.Type->CanAttack) {
+				CommandAttack(aiunit, pos, NULL, FlushCommands);
+			} else if (isTransporterAttack && aiunit.Type->CanTransport()) {
+				if (aiunit.BoardCount != 0) {
+					CommandUnload(aiunit, pos, NULL, FlushCommands);
+				} else {
+					// FIXME : Retrieve unit blocked (transport previously full)
+					CommandMove(aiunit, aiunit.Player->StartPos, FlushCommands);
+					this->Remove(aiunit);
+				}
+			} else {
+				CommandMove(aiunit, pos, FlushCommands);
+			}
+		}
+	} else { // Everyone is idle, find a new target
+		const CUnit *unit = NULL;
+
+		AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
+
+		if (!unit) {
+			// No enemy found, give up
+			// FIXME: should the force go home or keep trying to attack?
+			DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
+					   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
+			Attacking = false;
+			return;
+		}
+		GoalPos = unit->tilePos;
+		this->State = AiForceAttackingState_Attacking;
+		for (size_t i = 0; i != this->Units.size(); ++i) {
+			CUnit *const unit = this->Units[i];
+
+			if (unit->Container == NULL) {
+				const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
+
+				unit->Wait = delay;
+				if (unit->Type->CanAttack) {
+					CommandAttack(*unit, GoalPos,  NULL, FlushCommands);
+				} else {
+					CommandMove(*unit, GoalPos, FlushCommands);
+				}
+			}
 		}
 	}
 }
@@ -738,7 +804,7 @@ void AiForceManager::Update()
 				&& force.Units[0]->MapDistanceTo(force.GoalPos) <= nearDist) {
 				//  Look if still enemies in attack range.
 				const CUnit *dummy = NULL;
-				if (!AiForceEnemyFinder<true>(force, &dummy).found()) {
+				if (!AiForceEnemyFinder<AIATTACK_RANGE>(force, &dummy).found()) {
 					if (Map.Info.IsPointOnMap(force.HomePos)) {
 						for (size_t i = 0; i != force.Units.size(); ++i) {
 							CUnit &unit = *force.Units[i];
@@ -750,6 +816,31 @@ void AiForceManager::Update()
 					}
 					force.Defending = false;
 					force.Attacking = false;
+				}
+			} else { // Find idle units and order them to defend
+				std::vector<CUnit *> idleUnits;
+				for (unsigned int i = 0; i != Size(); ++i) {
+					CUnit &aiunit = *Units[i];
+
+					if (aiunit.IsIdle()) {
+						if (aiunit.IsAliveOnMap()) {
+							idleUnits.push_back(&aiunit);
+						}
+					}
+				}
+				for (unsigned int i = 0; i != idleUnits.size(); ++i) {
+					CUnit *const unit = idleUnits[i];
+
+					if (unit->Container == NULL) {
+						const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
+
+						unit->Wait = delay;
+						if (unit->Type->CanAttack) {
+							CommandAttack(*unit, force.GoalPos,  NULL, FlushCommands);
+						} else {
+							CommandMove(*unit, force.GoalPos, FlushCommands);
+						}
+					}
 				}
 			}
 		} else if (force.Attacking) {

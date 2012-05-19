@@ -666,7 +666,7 @@ void ShowOrder(const CUnit &unit)
 	if (unit.Destroyed) {
 		return;
 	}
-	if (unit.Player != ThisPlayer && !ThisPlayer->IsAllied(unit)) {
+	if (!DEBUG && unit.Player != ThisPlayer && !ThisPlayer->IsAllied(unit)) {
 		return;
 	}
 	// Get current position

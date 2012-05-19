@@ -1021,9 +1021,10 @@ public:
 
 	CUnitStats DefaultStat;
 	struct BoolFlags {
-		bool value;          /// User defined flag. Used for (dis)allow target.
-		char CanTransport;   /// Can transport units with this flag.
-		char CanTargetFlag;  /// Flag needed to target with missile.
+		bool value;             /// User defined flag. Used for (dis)allow target.
+		char CanTransport;      /// Can transport units with this flag.
+		char CanTargetFlag;     /// Flag needed to target with missile.
+		char AiPriorityTarget;  /// Attack this units first.
 	};
 	std::vector<BoolFlags> BoolFlag;
 

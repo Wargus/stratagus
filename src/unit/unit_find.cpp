@@ -51,20 +51,11 @@
 #include "interface.h"
 #include "tileset.h"
 #include "pathfinder.h"
+#include "spells.h"
 
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
-
-/*
-** Configuration of the small (unit) AI.
-*/
-#define PRIORITY_FACTOR   0x00010000
-#define HEALTH_FACTOR     0x00000001
-#define DISTANCE_FACTOR   0x00100000
-#define INRANGE_FACTOR    0x00010000
-#define INRANGE_BONUS     0x01000000
-#define CANATTACK_BONUS   0x00100000
 
 /*----------------------------------------------------------------------------
 --  Local Data
@@ -308,13 +299,26 @@ private:
 		// Priority 0-255
 		cost -= dtype.Priority * PRIORITY_FACTOR;
 		// Remaining HP (Health) 0-65535
-		cost += dest->Variable[HP_INDEX].Value * HEALTH_FACTOR;
+		cost += dest->Variable[HP_INDEX].Value * 100 / dest->Variable[HP_INDEX].Max * HEALTH_FACTOR;
 
 		if (d <= attackrange && d >= type.MinAttackRange) {
 			cost += d * INRANGE_FACTOR;
 			cost -= INRANGE_BONUS;
 		} else {
 			cost += d * DISTANCE_FACTOR;
+		}
+
+		for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
+			if (type.BoolFlag[i].AiPriorityTarget != CONDITION_TRUE) {
+				if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_ONLY) &
+					(dtype.BoolFlag[i].value)) {
+						cost -= AIPRIORITY_BONUS;
+				}
+				if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_FALSE) &
+					(dtype.BoolFlag[i].value)) {
+						cost += AIPRIORITY_BONUS;
+				}
+			}
 		}
 
 		// Unit can attack back.
@@ -417,6 +421,19 @@ public:
 			} else {
 				//  Priority 0-255
 				cost += dtype.Priority * PRIORITY_FACTOR;
+
+				for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
+					if (type.BoolFlag[i].AiPriorityTarget != CONDITION_TRUE) {
+						if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_ONLY) &
+							(dtype.BoolFlag[i].value)) {
+								cost -= AIPRIORITY_BONUS;
+						} else if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_FALSE) &
+							(dtype.BoolFlag[i].value)) {
+								cost += AIPRIORITY_BONUS;
+						}
+					}
+				}
+
 				//  Remaining HP (Health) 0-65535
 				// Give a boost to unit we can kill in one shoot only
 
@@ -612,12 +629,13 @@ struct CompareUnitDistance {
 **  If the unit can attack must be handled by caller.
 **  Choose the best target, that can be attacked.
 **
-**  @param unit   Find in distance for this unit.
-**  @param range  Distance range to look.
+**  @param unit           Find in distance for this unit.
+**  @param range          Distance range to look.
+**  @param onlyBuildings  Search only buildings (useful when attacking with AI force)
 **
 **  @return       Unit to be attacked.
 */
-CUnit *AttackUnitsInDistance(const CUnit &unit, int range)
+CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool onlyBuildings)
 {
 	// if necessary, take possible damage on allied units into account...
 	if (unit.Type->Missile.Missile->Range > 1
@@ -632,8 +650,13 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range)
 		// If unit is removed, use containers x and y
 		const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
 		std::vector<CUnit *> table;
-		Map.SelectAroundUnit(*firstContainer, missile_range, table,
-							 MakeNotPredicate(HasSamePlayerAs(Players[PlayerNumNeutral])));
+		if (onlyBuildings) {
+			Map.SelectAroundUnit(*firstContainer, missile_range, table,
+				MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), IsBuildingType()));
+		} else {
+			Map.SelectAroundUnit(*firstContainer, missile_range, table,
+								 MakeNotPredicate(HasSamePlayerAs(Players[PlayerNumNeutral])));
+		}
 
 		if (table.empty() == false) {
 			return BestRangeTargetFinder(unit, range).Find(table);
@@ -642,8 +665,13 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range)
 	} else {
 		std::vector<CUnit *> table;
 
-		Map.SelectAroundUnit(unit, range, table,
-							 MakeNotPredicate(HasSamePlayerAs(Players[PlayerNumNeutral])));
+		if (onlyBuildings) {
+			Map.SelectAroundUnit(unit, range, table,
+				MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), IsBuildingType()));
+		} else {
+			Map.SelectAroundUnit(unit, range, table,
+								 MakeNotPredicate(HasSamePlayerAs(Players[PlayerNumNeutral])));
+		}
 
 		const int n = static_cast<int>(table.size());
 		if (range > 25 && table.size() > 9) {

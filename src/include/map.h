@@ -197,6 +197,15 @@ private:
 	const CPlayer *player;
 };
 
+class HasNotSamePlayerAs
+{
+public:
+	explicit HasNotSamePlayerAs(const CPlayer &_player) : player(&_player) {}
+	bool operator()(const CUnit *unit) const { return unit->Player != player; }
+private:
+	const CPlayer *player;
+};
+
 class IsAlliedWith
 {
 public:
@@ -241,6 +250,12 @@ public:
 	bool operator()(const CUnit *unit) const { return unit != forbidden; }
 private:
 	const CUnit *forbidden;
+};
+
+class IsBuildingType
+{
+public:
+	bool operator()(const CUnit *unit) const { return unit->Type->Building; }
 };
 
 

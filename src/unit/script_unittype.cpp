@@ -126,6 +126,7 @@ static const char SLOT_KEY[] = "Slot";
 static const char SHIELD_KEY[] = "ShieldPoints";
 static const char POINTS_KEY[] = "Points";
 static const char MAXHARVESTERS_KEY[] = "MaxHarvesters";
+static const char AITHRESHOLD_KEY[] = "AiThreshold";
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -162,7 +163,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   BASICDAMAGE_KEY, POSX_KEY, POSY_KEY, RADARRANGE_KEY,
 							   RADARJAMMERRANGE_KEY, AUTOREPAIRRANGE_KEY, BLOODLUST_KEY, HASTE_KEY,
 							   SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY, SHIELD_KEY, POINTS_KEY,
-							   MAXHARVESTERS_KEY
+							   MAXHARVESTERS_KEY, AITHRESHOLD_KEY
 							  };
 
 	for (int i = 0; i < NVARALREADYDEFINED; ++i) {
@@ -1004,6 +1005,33 @@ static int CclDefineUnitType(lua_State *l)
 					continue;
 				}
 				LuaError(l, "Unsupported flag tag for can-target-flag: %s" _C_ value);
+			}
+		} else if (!strcmp(value, "PriorityTarget")) {
+			//
+			// Warning: ai-priority-target should only be used AFTER all bool flags
+			// have been defined.
+			//
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			if (type->BoolFlag.size() < UnitTypeVar.GetNumberBoolFlag()) {
+				type->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
+			}
+			subargs = lua_rawlen(l, -1);
+			for (k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, -1, k + 1);
+				value = LuaToString(l, -1);
+				lua_pop(l, 1);
+				++k;
+				int index = UnitTypeVar.BoolFlagNameLookup[value];
+				if (index != -1) {
+					lua_rawgeti(l, -1, k + 1);
+					value = LuaToString(l, -1);
+					lua_pop(l, 1);
+					type->BoolFlag[index].AiPriorityTarget = Ccl2Condition(l, value);
+					continue;
+				}
+				LuaError(l, "Unsupported flag tag for ai-priority-target: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "IsNotSelectable")) {
 			type->IsNotSelectable = LuaToBoolean(l, -1);

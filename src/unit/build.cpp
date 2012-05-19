@@ -305,7 +305,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 	}
 
 	// Check special rules for AI players
-	if (unit->Player->AiEnabled) {
+	if (unit && unit->Player->AiEnabled) {
 		size_t count = type.AiBuildingRules.size();
 		if (count > 0) {
 			ontoptarget = NULL;

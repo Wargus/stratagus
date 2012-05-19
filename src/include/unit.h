@@ -365,6 +365,17 @@ struct lua_State;
 
 typedef COrder *COrderPtr;
 
+/*
+** Configuration of the small (unit) AI.
+*/
+#define PRIORITY_FACTOR   0x00001000
+#define HEALTH_FACTOR     0x00000001
+#define DISTANCE_FACTOR   0x00010000
+#define INRANGE_FACTOR    0x00001000
+#define INRANGE_BONUS     0x00100000
+#define CANATTACK_BONUS   0x00010000
+#define AIPRIORITY_BONUS  0x01000000
+
 
 /// Called whenever the selected unit was updated
 extern void SelectedUnitChanged();
@@ -543,8 +554,8 @@ public:
 		signed char IY;                     /// seen Y image displacement to map position
 		unsigned    Constructed : 1;        /// Unit seen construction
 		unsigned    State : 3;              /// Unit seen build/upgrade state
-		unsigned    Destroyed : PlayerMax;  /// Unit seen destroyed or not
-		unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
+unsigned    Destroyed : PlayerMax;  /// Unit seen destroyed or not
+unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 	} Seen;
 
 	CVariable *Variable; /// array of User Defined variables.
@@ -555,6 +566,7 @@ public:
 	int LastGroup;      /// unit belongs to this last group
 
 	unsigned int Wait;          /// action counter
+	int Threshold;              /// The counter while ai unit couldn't change target.
 
 	struct _unit_anim_ {
 		const CAnimation *Anim;      /// Anim
@@ -943,8 +955,10 @@ extern CUnit *UnitOnScreen(CUnit *unit, int x, int y);
 
 /// Let a unit die
 extern void LetUnitDie(CUnit &unit);
-/// Destory all units inside another unit
+/// Destroy all units inside another unit
 extern void DestroyAllInside(CUnit &source);
+/// Calculate some value to measure the unit's priority for AI
+extern int ThreatCalculate(const CUnit &unit, const CUnit *dest);
 /// Hit unit with damage, if destroyed give attacker the points
 extern void HitUnit(CUnit *attacker, CUnit &target, int damage);
 
@@ -1020,7 +1034,7 @@ extern CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top = t
 extern CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource);
 
 /// Find best enemy in numeric range to attack
-extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range);
+extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool onlyBuildings = false);
 /// Find best enemy in attack range to attack
 extern CUnit *AttackUnitsInRange(const CUnit &unit);
 /// Find best enemy in reaction range to attack

@@ -703,20 +703,19 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				if (aiunit.CurrentAction() == UnitActionAttack) {
 					COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
 
-					if (orderAttack.GetGoal() == NULL || orderAttack.GetGoal()->IsAgressive() == false) {
-						shouldAttack = true;
+					if (orderAttack.GetGoal() == NULL || orderAttack.GetGoal()->IsAgressive() == false
+						|| ThreatCalculate(defender, attacker) < ThreatCalculate(defender, orderAttack.GetGoal())) {
+							shouldAttack = true;
 					}
 				}
 
 				if (shouldAttack) {
 					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands);
-					if (aiunit.SavedOrder == NULL) {
-						COrder *savedOrder = COrder::NewActionAttack(aiunit, aiunit.tilePos);
+					COrder *savedOrder = COrder::NewActionAttack(aiunit, attacker->tilePos);
 
-						if (aiunit.StoreOrder(savedOrder) == false) {
-							delete savedOrder;
-							savedOrder = NULL;
-						}
+					if (aiunit.StoreOrder(savedOrder) == false) {
+						delete savedOrder;
+						savedOrder = NULL;
 					}
 				}
 			}

@@ -274,7 +274,7 @@ static void HandleBuffs(CUnit &unit, int amount)
 {
 	// Look if the time to live is over.
 
-	if (unit.TTL && (int)unit.TTL < ((int)GameCycle - unit.Variable[HP_INDEX].Value)) {
+	if (unit.TTL && unit.TTL < GameCycle) {
 		DebugPrint("Unit must die %lu %lu!\n" _C_ unit.TTL _C_ GameCycle);
 
 		// Hit unit does some funky stuff...
@@ -282,6 +282,11 @@ static void HandleBuffs(CUnit &unit, int amount)
 		if (unit.Variable[HP_INDEX].Value <= 0) {
 			LetUnitDie(unit);
 		}
+	}
+
+	unit.Threshold -= amount;
+	if (unit.Threshold < 0) {
+		unit.Threshold = 0;
 	}
 
 	//  decrease spells effects time.

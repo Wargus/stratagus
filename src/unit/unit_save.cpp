@@ -214,6 +214,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf(" \"active\",");
 	}
 	file.printf("\"ttl\", %lu,\n  ", unit.TTL);
+	file.printf("\"threshold\", %lu,\n  ", unit.Threshold);
 
 	for (size_t i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		if (unit.Variable[i] != unit.Type->DefaultStat.Variables[i]) {
