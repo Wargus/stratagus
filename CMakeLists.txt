@@ -614,6 +614,13 @@ if(NOT WITH_RENDERER)
 	endif()
 endif()
 
+# Install paths
+set(BINDIR "bin" CACHE PATH "Where to install binaries")
+set(SBINDIR "sbin" CACHE PATH "Where to install metaserver binary")
+set(DOCDIR "share/doc/stratagus" CACHE PATH "Sets the doc directory to a non-default location.")
+set(MANDIR "share/man/man6" CACHE PATH "Sets the man directory to a non-default location.")
+set(STRATAGUS_HEADERS "include" CACHE PATH "Where to install stratagus headers.")
+
 # Stratagus definitions
 
 add_definitions(${PNG_DEFINITIONS} -DUSE_ZLIB)
@@ -717,7 +724,7 @@ endif()
 # Stratagus needs to have char by default signed
 # No idea how to tell this to other compilers
 if(CMAKE_COMPILER_IS_GNUCXX)
-	set(CMAKE_CXX_FLAGS "-fsigned-char")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsigned-char")
 endif()
 
 check_function_exists("strcasestr" HAVE_STRCASESTR)
@@ -735,9 +742,7 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 
 if(ENABLE_STRIP)
-	set(CMAKE_EXE_LINKER_FLAGS "-s")
-else()
-	set(CMAKE_EXE_LINKER_FLAGS "")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s")
 endif()
 
 if(ENABLE_TOUCHSCREEN)
@@ -985,15 +990,15 @@ endif()
 
 ########### install files ###############
 
-install(TARGETS stratagus DESTINATION games)
-install(TARGETS png2stratagus DESTINATION bin)
+install(TARGETS stratagus DESTINATION ${BINDIR})
+install(TARGETS png2stratagus DESTINATION ${BINDIR})
 
 if(SQLITE_FOUND)
-	install(TARGETS metaserver DESTINATION sbin)
+	install(TARGETS metaserver DESTINATION ${SBINDIR})
 endif()
 
 if(ENABLE_DOC AND DOXYGEN_FOUND)
-	install(FILES doc/stratagus.6 DESTINATION share/man/man6)
+	install(FILES doc/stratagus.6 DESTINATION ${MANDIR})
 	install(FILES
 		doc/development.html
 		doc/faq.html
@@ -1007,9 +1012,9 @@ if(ENABLE_DOC AND DOXYGEN_FOUND)
 		doc/README-SDL.txt
 		DESTINATION share/doc/stratagus
 	)
-	install(DIRECTORY doc/graphics doc/scripts ${CMAKE_CURRENT_BINARY_DIR}/doxygen DESTINATION share/doc/stratagus)
+	install(DIRECTORY doc/graphics doc/scripts ${CMAKE_CURRENT_BINARY_DIR}/doxygen DESTINATION ${DOCDIR})
 endif(ENABLE_DOC AND DOXYGEN_FOUND)
 
 if(ENABLE_DEV)
-	install(FILES ${gameheaders_HDRS} DESTINATION include)
+	install(FILES ${gameheaders_HDRS} DESTINATION ${STRATAGUS_HEADERS})
 endif()
