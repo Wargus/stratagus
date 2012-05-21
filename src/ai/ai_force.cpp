@@ -42,6 +42,7 @@
 #include "ai_local.h"
 
 #include "actions.h"
+#include "action/action_attack.h"
 #include "action/action_board.h"
 #include "depend.h"
 #include "map.h"
@@ -586,13 +587,13 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 
 	unsigned int nbToTransport = 0;
 	unsigned int transporterIndex = 0;
-	bool goNext = true;
+	bool forceIsReady = true;
 
 	for (; transporterIndex < aiForce.Size(); ++transporterIndex) {
-		const CUnit *unit = aiForce.Units[transporterIndex];
+		const CUnit &unit = *aiForce.Units[transporterIndex];
 
-		if (unit->Type->CanTransport() && unit->Type->MaxOnBoard - unit->BoardCount > 0) {
-			nbToTransport = unit->Type->MaxOnBoard - unit->BoardCount;
+		if (unit.Type->CanTransport() && unit.Type->MaxOnBoard - unit.BoardCount > 0) {
+			nbToTransport = unit.Type->MaxOnBoard - unit.BoardCount;
 			break;
 		}
 	}
@@ -605,10 +606,11 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 		const CUnit &transporter = *aiForce.Units[transporterIndex];
 
 		if (CanTransport(transporter, unit) && unit.Container == NULL) {
-			goNext = false;
+			forceIsReady = false;
+			break;
 		}
 	}
-	if (goNext == true) {
+	if (forceIsReady == true) {
 		aiForce.State = AiForceAttackingState_AttackingWithTransporter;
 		return ;
 	}
@@ -648,8 +650,6 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 */
 void AiForce::Update()
 {
-	bool isTransporterAttack = false;
-
 	if (Size() == 0) {
 		Attacking = false;
 		if (!Defending && State > AiForceAttackingState_Waiting) {
@@ -662,9 +662,7 @@ void AiForce::Update()
 	Attacking = false;
 	for (unsigned int i = 0; i < Size(); ++i) {
 		CUnit *aiunit = Units[i];
-		if (!isTransporterAttack && aiunit->Type->CanTransport()) {
-			isTransporterAttack = true;
-		}
+
 		if (aiunit->Type->CanAttack) {
 			Attacking = true;
 			break;
@@ -696,89 +694,66 @@ void AiForce::Update()
 	}
 
 	Assert(Map.Info.IsPointOnMap(GoalPos));
-	std::vector<CUnit *> attackUnits;
-	CUnit *leader = NULL;
-	Vec2i pos = GoalPos;
+	std::vector<CUnit *> idleUnits;
+	const CUnit *leader = NULL;
+	for (unsigned int i = 0; i != Size(); ++i) {
+		CUnit &aiunit = *Units[i];
 
-	if (isTransporterAttack) {
-		for (unsigned int i = 0; i != Size(); ++i) {
-			CUnit &aiunit = *Units[i];
-
-			if (aiunit.IsIdle()) {
-				if (aiunit.IsAliveOnMap()) {
-					attackUnits.push_back(&aiunit);
-				}
-			} else if (aiunit.CurrentAction() == UnitActionAttack) {
-				leader = &aiunit;
+		if (aiunit.IsIdle()) {
+			if (aiunit.IsAliveOnMap()) {
+				idleUnits.push_back(&aiunit);
 			}
-		}
-	} else {
-		attackUnits = Units.Units;
-		for (unsigned int i = 0; i < Size(); ++i) {
-			CUnit &aiunit = *Units[i];
-			if (aiunit.CurrentAction() == UnitActionAttack) {
+		} else if (leader == NULL && aiunit.CurrentAction() == UnitActionAttack) {
+			const COrder_Attack &order = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
+
+			if (order.HasGoal() && order.IsValid()) {
 				leader = &aiunit;
-				if (leader->CurrentOrder()->HasGoal() && leader->CurrentOrder()->GetGoal()->IsAliveOnMap()) {
-					pos = leader->CurrentOrder()->GetGoal()->tilePos;
-				}
-				break;
 			}
 		}
 	}
+	if (idleUnits.empty()) {
+		return ;
+	}
+	if (leader == NULL) {
+		const int thresholdDist = 5; // Hard coded value
+		int maxDist = 0;
 
-	if (leader != NULL) {
-		for (size_t i = 0; i != attackUnits.size(); ++i) {
-			CUnit &aiunit = *attackUnits[i];
+		for (size_t i = 0; i != idleUnits.size(); ++i) {
+			maxDist = std::max(maxDist, idleUnits[i]->MapDistanceTo(this->GoalPos));
+		}
+		if (maxDist < thresholdDist) {
+			const CUnit *unit = NULL;
 
-			if (aiunit.CurrentAction() == UnitActionAttack) {
-				continue;
+			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
+			if (!unit) {
+				// No enemy found, give up
+				// FIXME: should the force go home or keep trying to attack?
+				DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
+						   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
+				Attacking = false;
+				return;
 			}
+			GoalPos = unit->tilePos;
+		}
+	}
+	const Vec2i pos = leader != NULL ? leader->tilePos : this->GoalPos;
+	for (size_t i = 0; i != idleUnits.size(); ++i) {
+		CUnit &aiunit = *idleUnits[i];
+		const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
 
-			const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
-
-			aiunit.Wait = delay;
-			if (aiunit.Type->CanAttack) {
-				CommandAttack(aiunit, pos, NULL, FlushCommands);
-			} else if (isTransporterAttack && aiunit.Type->CanTransport()) {
-				if (aiunit.BoardCount != 0) {
-					CommandUnload(aiunit, pos, NULL, FlushCommands);
-				} else {
-					// FIXME : Retrieve unit blocked (transport previously full)
-					CommandMove(aiunit, aiunit.Player->StartPos, FlushCommands);
-					this->Remove(aiunit);
-				}
+		aiunit.Wait = delay;
+		if (aiunit.Type->CanAttack) {
+			CommandAttack(aiunit, pos, NULL, FlushCommands);
+		} else if (aiunit.Type->CanTransport()) {
+			if (aiunit.BoardCount != 0) {
+				CommandUnload(aiunit, pos, NULL, FlushCommands);
 			} else {
-				CommandMove(aiunit, pos, FlushCommands);
+				// FIXME : Retrieve unit blocked (transport previously full)
+				CommandMove(aiunit, aiunit.Player->StartPos, FlushCommands);
+				this->Remove(aiunit);
 			}
-		}
-	} else { // Everyone is idle, find a new target
-		const CUnit *unit = NULL;
-
-		AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
-
-		if (!unit) {
-			// No enemy found, give up
-			// FIXME: should the force go home or keep trying to attack?
-			DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
-					   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
-			Attacking = false;
-			return;
-		}
-		GoalPos = unit->tilePos;
-		this->State = AiForceAttackingState_Attacking;
-		for (size_t i = 0; i != this->Units.size(); ++i) {
-			CUnit *const unit = this->Units[i];
-
-			if (unit->Container == NULL) {
-				const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
-
-				unit->Wait = delay;
-				if (unit->Type->CanAttack) {
-					CommandAttack(*unit, GoalPos,  NULL, FlushCommands);
-				} else {
-					CommandMove(*unit, GoalPos, FlushCommands);
-				}
-			}
+		} else {
+			CommandMove(aiunit, pos, FlushCommands);
 		}
 	}
 }
