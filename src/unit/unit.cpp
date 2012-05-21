@@ -2774,11 +2774,11 @@ int ThreatCalculate(const CUnit &unit, const CUnit *dest)
 		if (type.BoolFlag[i].AiPriorityTarget != CONDITION_TRUE) {
 			if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_ONLY) &
 				(dtype.BoolFlag[i].value)) {
-					cost -= AIPRIORITY_BONUS;
+				cost -= AIPRIORITY_BONUS;
 			}
 			if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_FALSE) &
 				(dtype.BoolFlag[i].value)) {
-					cost += AIPRIORITY_BONUS;
+				cost += AIPRIORITY_BONUS;
 			}
 		}
 	}
@@ -3028,7 +3028,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		best = oldgoal ? oldgoal : (goal ? goal : attacker);
 		if (best && best != attacker) {
 			if (goal && ((goal->IsAgressive() && best->IsAgressive() == false)
-				|| (ThreatCalculate(target, goal) < ThreatCalculate(target, best)))) {
+						 || (ThreatCalculate(target, goal) < ThreatCalculate(target, best)))) {
 				best = goal;
 			}
 			if (!RevealAttacker && (best->IsAgressive() == false || ThreatCalculate(target, attacker) < ThreatCalculate(target, best))) {

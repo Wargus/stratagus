@@ -347,14 +347,14 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 
 		if (newTarget && newTarget->IsAgressive()
 			&& ThreatCalculate(unit, newTarget) < ThreatCalculate(unit, goal)) {
-				COrder *savedOrder = this->Clone();
+			COrder *savedOrder = this->Clone();
 
-				if (unit.StoreOrder(savedOrder) == false) {
-					delete savedOrder;
-					savedOrder = NULL;
-				}
-				this->SetGoal(newTarget);
-				this->goalPos = newTarget->tilePos;
+			if (unit.StoreOrder(savedOrder) == false) {
+				delete savedOrder;
+				savedOrder = NULL;
+			}
+			this->SetGoal(newTarget);
+			this->goalPos = newTarget->tilePos;
 		}
 	}
 
@@ -496,17 +496,17 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 			CUnit *newTarget = AttackUnitsInReactRange(unit);
 			if (newTarget && newTarget->IsAgressive()
 				&& ThreatCalculate(unit, newTarget) < ThreatCalculate(unit, goal)) {
-					COrder *savedOrder = this->Clone();
+				COrder *savedOrder = this->Clone();
 
-					if (unit.StoreOrder(savedOrder) == false) {
-						delete savedOrder;
-						savedOrder = NULL;
-					}
-					goal = newTarget;
-					this->SetGoal(newTarget);
-					this->goalPos = newTarget->tilePos;
-					this->MinRange = unit.Type->MinAttackRange;
-					this->State = MOVE_TO_TARGET;
+				if (unit.StoreOrder(savedOrder) == false) {
+					delete savedOrder;
+					savedOrder = NULL;
+				}
+				goal = newTarget;
+				this->SetGoal(newTarget);
+				this->goalPos = newTarget->tilePos;
+				this->MinRange = unit.Type->MinAttackRange;
+				this->State = MOVE_TO_TARGET;
 			}
 		}
 	}

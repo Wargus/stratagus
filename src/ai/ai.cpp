@@ -705,7 +705,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 
 					if (orderAttack.GetGoal() == NULL || orderAttack.GetGoal()->IsAgressive() == false
 						|| ThreatCalculate(defender, attacker) < ThreatCalculate(defender, orderAttack.GetGoal())) {
-							shouldAttack = true;
+						shouldAttack = true;
 					}
 				}
 
