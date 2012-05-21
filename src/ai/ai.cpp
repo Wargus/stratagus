@@ -701,10 +701,11 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				bool shouldAttack = aiunit.IsIdle();
 
 				if (aiunit.CurrentAction() == UnitActionAttack) {
-					COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
+					const COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
+					const CUnit *oldGoal = orderAttack.GetGoal();
 
-					if (orderAttack.GetGoal() == NULL || orderAttack.GetGoal()->IsAgressive() == false
-						|| ThreatCalculate(defender, attacker) < ThreatCalculate(defender, orderAttack.GetGoal())) {
+					if (oldGoal == NULL || oldGoal->IsAgressive() == false
+						|| ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)) {
 						shouldAttack = true;
 					}
 				}

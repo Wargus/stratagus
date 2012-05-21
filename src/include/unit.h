@@ -958,7 +958,7 @@ extern void LetUnitDie(CUnit &unit);
 /// Destroy all units inside another unit
 extern void DestroyAllInside(CUnit &source);
 /// Calculate some value to measure the unit's priority for AI
-extern int ThreatCalculate(const CUnit &unit, const CUnit *dest);
+extern int ThreatCalculate(const CUnit &unit, const CUnit &dest);
 /// Hit unit with damage, if destroyed give attacker the points
 extern void HitUnit(CUnit *attacker, CUnit &target, int damage);
 

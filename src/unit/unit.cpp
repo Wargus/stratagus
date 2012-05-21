@@ -2749,19 +2749,19 @@ void DestroyAllInside(CUnit &source)
   -- Unit AI
   ----------------------------------------------------------------------------*/
 
-int ThreatCalculate(const CUnit &unit, const CUnit *dest)
+int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 {
 	int cost = 0;
 
 	const CUnitType &type = *unit.Type;
-	const CUnitType &dtype = *dest->Type;
+	const CUnitType &dtype = *dest.Type;
 
 	// Priority 0-255
 	cost -= dtype.Priority * PRIORITY_FACTOR;
 	// Remaining HP (Health) 0-65535
-	cost += dest->Variable[HP_INDEX].Value * 100 / dest->Variable[HP_INDEX].Max * HEALTH_FACTOR;
+	cost += dest.Variable[HP_INDEX].Value * 100 / dest.Variable[HP_INDEX].Max * HEALTH_FACTOR;
 
-	int d = unit.MapDistanceTo(*dest);
+	int d = unit.MapDistanceTo(dest);
 
 	if (d <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max && d >= type.MinAttackRange) {
 		cost += d * INRANGE_FACTOR;
@@ -2772,12 +2772,10 @@ int ThreatCalculate(const CUnit &unit, const CUnit *dest)
 
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
 		if (type.BoolFlag[i].AiPriorityTarget != CONDITION_TRUE) {
-			if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_ONLY) &
-				(dtype.BoolFlag[i].value)) {
+			if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_ONLY) & (dtype.BoolFlag[i].value)) {
 				cost -= AIPRIORITY_BONUS;
 			}
-			if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_FALSE) &
-				(dtype.BoolFlag[i].value)) {
+			if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_FALSE) & (dtype.BoolFlag[i].value)) {
 				cost += AIPRIORITY_BONUS;
 			}
 		}
@@ -3028,10 +3026,10 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		best = oldgoal ? oldgoal : (goal ? goal : attacker);
 		if (best && best != attacker) {
 			if (goal && ((goal->IsAgressive() && best->IsAgressive() == false)
-						 || (ThreatCalculate(target, goal) < ThreatCalculate(target, best)))) {
+						 || (ThreatCalculate(target, *goal) < ThreatCalculate(target, *best)))) {
 				best = goal;
 			}
-			if (!RevealAttacker && (best->IsAgressive() == false || ThreatCalculate(target, attacker) < ThreatCalculate(target, best))) {
+			if (!RevealAttacker && (best->IsAgressive() == false || ThreatCalculate(target, *attacker) < ThreatCalculate(target, *best))) {
 				best = attacker;
 			}
 		}

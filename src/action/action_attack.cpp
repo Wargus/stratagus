@@ -346,7 +346,7 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 		CUnit *newTarget = AttackUnitsInReactRange(unit);
 
 		if (newTarget && newTarget->IsAgressive()
-			&& ThreatCalculate(unit, newTarget) < ThreatCalculate(unit, goal)) {
+			&& ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal)) {
 			COrder *savedOrder = this->Clone();
 
 			if (unit.StoreOrder(savedOrder) == false) {
@@ -495,7 +495,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		if ((this->State & WEAK_TARGET)) {
 			CUnit *newTarget = AttackUnitsInReactRange(unit);
 			if (newTarget && newTarget->IsAgressive()
-				&& ThreatCalculate(unit, newTarget) < ThreatCalculate(unit, goal)) {
+				&& ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal)) {
 				COrder *savedOrder = this->Clone();
 
 				if (unit.StoreOrder(savedOrder) == false) {
