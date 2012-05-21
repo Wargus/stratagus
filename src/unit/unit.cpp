@@ -404,15 +404,15 @@ bool CUnit::StoreOrder(COrder *order)
 {
 	Assert(order);
 
-	if (this->SavedOrder != NULL) {
-		if (this->SavedOrder->IsValid() == false) {
-			delete this->SavedOrder;
-			this->SavedOrder = NULL;
-		}
-		return false;
-	}
 	if (order && order->Finished == true) {
 		return false;
+	}
+	if (this->SavedOrder != NULL) {
+		if (this->SavedOrder->IsValid() == true) {
+			return false;
+		}
+		delete this->SavedOrder;
+		this->SavedOrder = NULL;
 	}
 	// Save current order to come back or to continue it.
 	this->SavedOrder = order;
