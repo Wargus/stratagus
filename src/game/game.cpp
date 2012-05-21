@@ -560,8 +560,6 @@ static void GameTypeManTeamVsMachine()
 */
 void CreateGame(const std::string &filename, CMap *map)
 {
-	int i;
-
 	if (SaveGameLoading) {
 		SaveGameLoading = false;
 		// Load game, already created game with Init/LoadModules
@@ -580,7 +578,7 @@ void CreateGame(const std::string &filename, CMap *map)
 		}
 	}
 
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		int playertype = (PlayerTypes)Map.Info.PlayerType[i];
 		// Network games only:
 		if (GameSettings.Presets[i].Type != SettingsPresetMapDefault) {
@@ -762,7 +760,7 @@ void CreateGame(const std::string &filename, CMap *map)
 	// FIXME: The palette is loaded after the units are created.
 	// FIXME: This loops fixes the colors of the units.
 	//
-	for (i = 0; i < NumUnits; ++i) {
+	for (int i = 0; i < NumUnits; ++i) {
 		// I don't really think that there can be any rescued
 		// units at this point.
 		if (Units[i]->RescuedFrom) {

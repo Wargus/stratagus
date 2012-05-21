@@ -698,7 +698,6 @@ void AiForce::Update()
 	Assert(Map.Info.IsPointOnMap(GoalPos));
 	std::vector<CUnit *> attackUnits;
 	CUnit *leader = NULL;
-	int distance = 0;
 	Vec2i pos = GoalPos;
 
 	if (isTransporterAttack) {

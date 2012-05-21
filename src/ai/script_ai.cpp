@@ -1060,19 +1060,19 @@ static int CclAiDump(lua_State *l)
 	// Requests
 	//
 	size_t n = AiPlayer->UnitTypeRequests.size();
-	printf("UnitTypeRequests(%lu):\n", n);
+	printf("UnitTypeRequests(%u):\n", static_cast<unsigned int>(n));
 	for (size_t i = 0; i < n; ++i) {
 		printf("%s ", AiPlayer->UnitTypeRequests[i].Type->Ident.c_str());
 	}
 	printf("\n");
 	n = AiPlayer->UpgradeToRequests.size();
-	printf("UpgradeToRequests(%lu):\n", n);
+	printf("UpgradeToRequests(%u):\n", static_cast<unsigned int>(n));
 	for (size_t i = 0; i < n; ++i) {
 		printf("%s ", AiPlayer->UpgradeToRequests[i]->Ident.c_str());
 	}
 	printf("\n");
 	n = AiPlayer->ResearchRequests.size();
-	printf("ResearchRequests(%lu):\n", n);
+	printf("ResearchRequests(%u):\n", static_cast<unsigned int>(n));
 	for (size_t i = 0; i < n; ++i) {
 		printf("%s ", AiPlayer->ResearchRequests[i]->Ident.c_str());
 	}
@@ -1088,7 +1088,7 @@ static int CclAiDump(lua_State *l)
 
 	// PrintForce
 	for (size_t i = 0; i < AiPlayer->Force.Size(); ++i) {
-		printf("Force(%lu%s%s):\n", i,
+		printf("Force(%u%s%s):\n", static_cast<unsigned int>(i),
 			   AiPlayer->Force[i].Completed ? ",complete" : ",recruit",
 			   AiPlayer->Force[i].Attacking ? ",attack" : "");
 		for (size_t j = 0; j < AiPlayer->Force[i].UnitTypes.size(); ++j) {
