@@ -312,11 +312,11 @@ private:
 			if (type.BoolFlag[i].AiPriorityTarget != CONDITION_TRUE) {
 				if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_ONLY) &
 					(dtype.BoolFlag[i].value)) {
-						cost -= AIPRIORITY_BONUS;
+					cost -= AIPRIORITY_BONUS;
 				}
 				if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_FALSE) &
 					(dtype.BoolFlag[i].value)) {
-						cost += AIPRIORITY_BONUS;
+					cost += AIPRIORITY_BONUS;
 				}
 			}
 		}
@@ -426,10 +426,10 @@ public:
 					if (type.BoolFlag[i].AiPriorityTarget != CONDITION_TRUE) {
 						if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_ONLY) &
 							(dtype.BoolFlag[i].value)) {
-								cost -= AIPRIORITY_BONUS;
+							cost -= AIPRIORITY_BONUS;
 						} else if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_FALSE) &
-							(dtype.BoolFlag[i].value)) {
-								cost += AIPRIORITY_BONUS;
+								   (dtype.BoolFlag[i].value)) {
+							cost += AIPRIORITY_BONUS;
 						}
 					}
 				}
@@ -652,7 +652,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool onlyBuildings)
 		std::vector<CUnit *> table;
 		if (onlyBuildings) {
 			Map.SelectAroundUnit(*firstContainer, missile_range, table,
-				MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), IsBuildingType()));
+								 MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), IsBuildingType()));
 		} else {
 			Map.SelectAroundUnit(*firstContainer, missile_range, table,
 								 MakeNotPredicate(HasSamePlayerAs(Players[PlayerNumNeutral])));
@@ -667,7 +667,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool onlyBuildings)
 
 		if (onlyBuildings) {
 			Map.SelectAroundUnit(unit, range, table,
-				MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), IsBuildingType()));
+								 MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), IsBuildingType()));
 		} else {
 			Map.SelectAroundUnit(unit, range, table,
 								 MakeNotPredicate(HasSamePlayerAs(Players[PlayerNumNeutral])));
