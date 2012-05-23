@@ -82,6 +82,18 @@ static int CclSetMouseScrollSpeed(lua_State *l)
 }
 
 /**
+**  Get speed of mouse scroll
+**
+**  @param l  Lua state.
+*/
+static int CclGetMouseScrollSpeed(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushnumber(l, UI.MouseScrollSpeed);
+	return 1;
+}
+
+/**
 **  Set speed of middle-mouse scroll
 **
 **  @param l  Lua state.
@@ -94,6 +106,18 @@ static int CclSetMouseScrollSpeedDefault(lua_State *l)
 }
 
 /**
+**  Get speed of middle-mouse scroll
+**
+**  @param l  Lua state.
+*/
+static int CclGetMouseScrollSpeedDefault(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushnumber(l, UI.MouseScrollSpeedDefault);
+	return 0;
+}
+
+/**
 **  Set speed of ctrl-middle-mouse scroll
 **
 **  @param l  Lua state.
@@ -102,6 +126,18 @@ static int CclSetMouseScrollSpeedControl(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	UI.MouseScrollSpeedControl = LuaToNumber(l, 1);
+	return 0;
+}
+
+/**
+**  Get speed of ctrl-middle-mouse scroll
+**
+**  @param l  Lua state.
+*/
+static int CclGetMouseScrollSpeedControl(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushnumber(l, UI.MouseScrollSpeedControl);
 	return 0;
 }
 
@@ -1736,8 +1772,11 @@ void UserInterfaceCclRegister()
 	lua_register(Lua, "AddMessage", CclAddMessage);
 
 	lua_register(Lua, "SetMouseScrollSpeed", CclSetMouseScrollSpeed);
+	lua_register(Lua, "GetMouseScrollSpeed", CclGetMouseScrollSpeed);
 	lua_register(Lua, "SetMouseScrollSpeedDefault", CclSetMouseScrollSpeedDefault);
+	lua_register(Lua, "GetMouseScrollSpeedDefault", CclGetMouseScrollSpeedDefault);
 	lua_register(Lua, "SetMouseScrollSpeedControl", CclSetMouseScrollSpeedControl);
+	lua_register(Lua, "GetMouseScrollSpeedControl", CclGetMouseScrollSpeedControl);
 
 	lua_register(Lua, "SetClickMissile", CclSetClickMissile);
 	lua_register(Lua, "SetDamageMissile", CclSetDamageMissile);
