@@ -264,6 +264,10 @@ int main(int argc, char * argv[]) {
 	} else {
 		getcwd(data_path, data_path_size);
 	}
+	const size_t data_path_length = strlen(data_path);
+	if (data_path_length != 0 && data_path[data_path_length - 1] == '\\') {
+		data_path[data_path_length - 1] = '\0';
+	}
 
 	char stratagus_path[BUFF_SIZE];
 	DWORD stratagus_path_size = sizeof(stratagus_path);
