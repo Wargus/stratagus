@@ -879,14 +879,14 @@ void UIHandleMouseMove(int x, int y)
 			ShowNameTime = GameCycle + Preference.ShowNameDelay + Preference.ShowNameTime;
 		}
 
-		if (Map.IsFieldVisible(*ThisPlayer, tilePos) || ReplayRevealMap) {
+		if (Map.IsFieldExplored(*ThisPlayer, tilePos) || ReplayRevealMap) {
 			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(screenPos);
 			UnitUnderCursor = UnitOnScreen(NULL, mapPixelPos.x, mapPixelPos.y);
 		}
 	} else if (CursorOn == CursorOnMinimap) {
 		const Vec2i tilePos = {UI.Minimap.Screen2MapX(x), UI.Minimap.Screen2MapY(y)};
 
-		if (Map.IsFieldVisible(*ThisPlayer, tilePos) || ReplayRevealMap) {
+		if (Map.IsFieldExplored(*ThisPlayer, tilePos) || ReplayRevealMap) {
 			UnitUnderCursor = UnitOnMapTile(tilePos, -1);
 		}
 	}
