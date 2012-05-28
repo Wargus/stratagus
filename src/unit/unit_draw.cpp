@@ -666,13 +666,11 @@ void ShowOrder(const CUnit &unit)
 	if (unit.Destroyed) {
 		return;
 	}
-	if (!ThisPlayer->IsAllied(unit)
 #ifndef DEBUG
-		&& unit.Player != ThisPlayer
-#endif
-	   ) {
+	if (!ThisPlayer->IsAllied(unit) && unit.Player != ThisPlayer) {
 		return;
 	}
+#endif
 	// Get current position
 	const PixelPos mapPos = unit.GetMapPixelPosCenter();
 	PixelPos screenStartPos = CurrentViewport->MapToScreenPixelPos(mapPos);
