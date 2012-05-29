@@ -348,8 +348,15 @@ static void HandleUnitAction(CUnit &unit)
 				return;
 			}
 
-			delete unit.Orders[0];
-			unit.Orders.erase(unit.Orders.begin());
+			do {
+				delete unit.Orders[0];
+				unit.Orders.erase(unit.Orders.begin());
+			} while (unit.Orders[0]->IsValid() == false && unit.Orders.size() > 1);
+
+			if (unit.Orders[0]->IsValid() == false && unit.Orders.size() == 1) {
+				delete unit.Orders[0];
+				unit.Orders[0] = COrder::NewActionStill();
+			}
 
 			unit.State = 0;
 			unit.Wait = 0;

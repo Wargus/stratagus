@@ -404,7 +404,7 @@ bool CUnit::StoreOrder(COrder *order)
 {
 	Assert(order);
 
-	if (order && order->Finished == true) {
+	if (order && order->Finished == true && order->IsValid() == false) {
 		return false;
 	}
 	if (this->SavedOrder != NULL) {
@@ -3023,27 +3023,30 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		}
 
 		// Calculate the best target we could attack
-		best = oldgoal ? oldgoal : (goal ? goal : attacker);
-		if (best && best != attacker) {
-			if (goal && ((goal->IsAgressive() && best->IsAgressive() == false)
-						 || (ThreatCalculate(target, *goal) < ThreatCalculate(target, *best)))) {
+		if (!best || (goal && ((goal->IsAgressive() && best->IsAgressive() == false)
+			|| (ThreatCalculate(target, *goal) < ThreatCalculate(target, *best))))) {
 				best = goal;
-			}
-			if (!RevealAttacker && (best->IsAgressive() == false || ThreatCalculate(target, *attacker) < ThreatCalculate(target, *best))) {
+		}
+		if (CanTarget(target.Type, attacker->Type) && (!best || (attacker && goal != attacker
+			&& ((attacker->IsAgressive() && best->IsAgressive() == false)
+			|| (ThreatCalculate(target, *attacker) < ThreatCalculate(target, *best)))))) {
 				best = attacker;
+		}
+		if (best) {
+			if (target.MapDistanceTo(*best) <= target.Stats->Variables[ATTACKRANGE_INDEX].Max) {
+				CommandAttack(target, best->tilePos, best, FlushCommands);
+			} else {
+				CommandAttack(target, best->tilePos, NoUnitP, FlushCommands);
+			}
+			// Set threshold value only for agressive units
+			if (best->IsAgressive()) {
+				target.Threshold = threshold;
+			}
+			if (target.StoreOrder(savedOrder) == false) {
+				delete savedOrder;
+				savedOrder = NULL;
 			}
 		}
-		CommandAttack(target, best->tilePos, NoUnitP, FlushCommands);
-
-		// Set threshold value only for agressive units
-		if (best->IsAgressive()) {
-			target.Threshold = threshold;
-		}
-		if (target.StoreOrder(savedOrder) == false) {
-			delete savedOrder;
-			savedOrder = NULL;
-		}
-		return;
 	}
 
 	/*

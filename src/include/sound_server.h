@@ -34,6 +34,12 @@
 //@{
 
 /*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include "sound.h"
+
+/*----------------------------------------------------------------------------
 --  Definitons
 ----------------------------------------------------------------------------*/
 
@@ -93,10 +99,14 @@ extern void StopChannel(int channel);
 /// Stop all channels
 extern void StopAllChannels();
 
+/// Check if this unit plays some sound
+extern bool UnitSoundIsPlaying(Origin *origin);
+/// Check, if this sample is already playing
+extern bool SampleIsPlaying(CSample *sample);
 /// Load a sample
 extern CSample *LoadSample(const std::string &name);
 /// Play a sample
-extern int PlaySample(CSample *sample);
+extern int PlaySample(CSample *sample, Origin *origin = NULL);
 /// Play a sound file
 extern int PlaySoundFile(const std::string &name);
 

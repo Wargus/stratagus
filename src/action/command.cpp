@@ -311,7 +311,7 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush)
 			return;
 		}
 	}
-	if (target) {
+	if (target && target->IsAlive()) {
 		*order = COrder::NewActionAttack(unit, *target);
 	} else {
 		*order = COrder::NewActionAttack(unit, pos);

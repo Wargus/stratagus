@@ -106,7 +106,7 @@ static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 	CSample *result = NULL;
 
 	if (!sound || !SoundEnabled()) {
-		return NULL;
+			return NULL;
 	}
 
 	if (sound->Number == TWO_GROUPS) {
@@ -276,7 +276,11 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 	bool selection = (voice == VoiceSelected || voice == VoiceBuilding);
 	Origin source = {&unit, unit.Slot};
 
-	int channel = PlaySample(ChooseSample(sound, selection, source));
+	if (UnitSoundIsPlaying(&source)) {
+		return;
+	}
+
+	int channel = PlaySample(ChooseSample(sound, selection, source), &source);
 	if (channel == -1) {
 		return;
 	}
@@ -295,6 +299,7 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 void PlayUnitSound(const CUnit &unit, CSound *sound)
 {
 	Origin source = {&unit, unit.Slot};
+
 	int channel = PlaySample(ChooseSample(sound, false, source));
 	if (channel == -1) {
 		return;
@@ -336,7 +341,13 @@ void PlayGameSound(CSound *sound, unsigned char volume)
 {
 	Origin source = {NULL, 0};
 
-	int channel = PlaySample(ChooseSample(sound, false, source));
+	CSample *sample = ChooseSample(sound, false, source);
+
+	if (SampleIsPlaying(sample)) {
+		return;
+	}
+
+	int channel = PlaySample(sample);
 	if (channel == -1) {
 		return;
 	}

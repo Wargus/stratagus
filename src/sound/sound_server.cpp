@@ -64,6 +64,7 @@ static bool EffectsEnabled = true;
 /// Channels for sound effects and unit speach
 struct SoundChannel {
 	CSample *Sample;       /// sample to play
+	Origin *Unit;          /// pointer to unit, who plays the sound, if any
 	unsigned char Volume;  /// Volume of this channel
 	signed char Stereo;    /// stereo location of sound (-128 left, 0 center, 127 right)
 
@@ -347,6 +348,30 @@ static void FillAudio(void *, Uint8 *stream, int len)
 ----------------------------------------------------------------------------*/
 
 /**
+**  Check if this sound is already playing
+*/
+bool SampleIsPlaying(CSample *sample)
+{
+	for (int i = 0; i < MaxChannels; ++i) {
+		if (Channels[i].Sample == sample && Channels[i].Playing) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool UnitSoundIsPlaying(Origin *origin)
+{
+	for (int i = 0; i < MaxChannels; ++i) {
+		if (origin && Channels[i].Unit && origin->Id && Channels[i].Unit->Id
+			&& origin->Id == Channels[i].Unit->Id && Channels[i].Playing) {
+				return true;
+		}
+	}
+	return false;
+}
+
+/**
 **  A channel is finished playing
 */
 static void ChannelFinished(int channel)
@@ -355,6 +380,10 @@ static void ChannelFinished(int channel)
 		Channels[channel].FinishedCallback(channel);
 	}
 
+	if (Channels[channel].Unit) {
+		delete Channels[channel].Unit;
+		Channels[channel].Unit = NULL;
+	}
 	Channels[channel].Playing = false;
 	Channels[channel].Point = NextFreeChannel;
 	NextFreeChannel = channel;
@@ -363,7 +392,7 @@ static void ChannelFinished(int channel)
 /**
 **  Put a sound request in the next free channel.
 */
-static int FillChannel(CSample *sample, unsigned char volume, char stereo)
+static int FillChannel(CSample *sample, unsigned char volume, char stereo, Origin *origin)
 {
 	Assert(NextFreeChannel < MaxChannels);
 
@@ -376,6 +405,12 @@ static int FillChannel(CSample *sample, unsigned char volume, char stereo)
 	Channels[NextFreeChannel].Sample = sample;
 	Channels[NextFreeChannel].Stereo = stereo;
 	Channels[NextFreeChannel].FinishedCallback = NULL;
+	if (origin && origin->Base) {
+		Origin *source = new Origin;
+		source->Base = origin->Base;
+		source->Id = origin->Id;
+		Channels[NextFreeChannel].Unit = source;
+	}
 
 	NextFreeChannel = next_free;
 
@@ -547,14 +582,14 @@ CSample *LoadSample(const std::string &name)
 **
 **  @return        Channel number, -1 for error
 */
-int PlaySample(CSample *sample)
+int PlaySample(CSample *sample, Origin *origin)
 {
 	int channel = -1;
 
 	SDL_LockAudio();
 
 	if (SoundEnabled() && EffectsEnabled && sample && NextFreeChannel != MaxChannels) {
-		channel = FillChannel(sample, EffectsVolume, 0);
+			channel = FillChannel(sample, EffectsVolume, 0, origin);
 	}
 
 	SDL_UnlockAudio();
