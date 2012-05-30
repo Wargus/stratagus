@@ -3024,13 +3024,14 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 
 		// Calculate the best target we could attack
 		if (!best || (goal && ((goal->IsAgressive() && best->IsAgressive() == false)
-			|| (ThreatCalculate(target, *goal) < ThreatCalculate(target, *best))))) {
-				best = goal;
+							   || (ThreatCalculate(target, *goal) < ThreatCalculate(target, *best))))) {
+			best = goal;
 		}
-		if (CanTarget(target.Type, attacker->Type) && (!best || (attacker && goal != attacker
-			&& ((attacker->IsAgressive() && best->IsAgressive() == false)
-			|| (ThreatCalculate(target, *attacker) < ThreatCalculate(target, *best)))))) {
-				best = attacker;
+		if (CanTarget(target.Type, attacker->Type)
+			&& (!best || (attacker && goal != attacker
+						  && ((attacker->IsAgressive() && best->IsAgressive() == false)
+							  || (ThreatCalculate(target, *attacker) < ThreatCalculate(target, *best)))))) {
+			best = attacker;
 		}
 		if (best) {
 			if (target.MapDistanceTo(*best) <= target.Stats->Variables[ATTACKRANGE_INDEX].Max) {

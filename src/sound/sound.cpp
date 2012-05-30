@@ -106,7 +106,7 @@ static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 	CSample *result = NULL;
 
 	if (!sound || !SoundEnabled()) {
-			return NULL;
+		return NULL;
 	}
 
 	if (sound->Number == TWO_GROUPS) {

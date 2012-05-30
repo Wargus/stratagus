@@ -141,17 +141,16 @@ static void MixMusicToStereo32(int *buffer, int size)
 	if (MusicPlaying) {
 		Assert(MusicChannel.Sample);
 
-		short* buf = new short[size];
+		short *buf = new short[size];
 		int len = size * sizeof(short);
-		char* tmp = new char[len];
+		char *tmp = new char[len];
 
-		int div = 176400 / (MusicChannel.Sample->Frequency * (MusicChannel.Sample->SampleSize / 8)
-						* MusicChannel.Sample->Channels);
+		int div = 176400 / (MusicChannel.Sample->Frequency * (MusicChannel.Sample->SampleSize / 8) * MusicChannel.Sample->Channels);
 
 		size = MusicChannel.Sample->Read(tmp, len / div);
 
-		int n = ConvertToStereo32((char *)(tmp), (char *)buf, MusicChannel.Sample->Frequency,
-							  MusicChannel.Sample->SampleSize / 8, MusicChannel.Sample->Channels, size);
+		int n = ConvertToStereo32(tmp, (char *)buf, MusicChannel.Sample->Frequency,
+								  MusicChannel.Sample->SampleSize / 8, MusicChannel.Sample->Channels, size);
 
 		for (int i = 0; i < n / (int)sizeof(*buf); ++i) {
 			// Add to our samples
@@ -244,8 +243,8 @@ static int MixChannelsToStereo32(int *buffer, int size)
 	for (int channel = 0; channel < MaxChannels; ++channel) {
 		if (Channels[channel].Playing && Channels[channel].Sample) {
 			int i = MixSampleToStereo32(Channels[channel].Sample,
-									Channels[channel].Point, Channels[channel].Volume,
-									Channels[channel].Stereo, buffer, size);
+										Channels[channel].Point, Channels[channel].Volume,
+										Channels[channel].Stereo, buffer, size);
 			Channels[channel].Point += i;
 			Assert(Channels[channel].Point <= Channels[channel].Sample->Len);
 
@@ -346,7 +345,7 @@ bool UnitSoundIsPlaying(Origin *origin)
 	for (int i = 0; i < MaxChannels; ++i) {
 		if (origin && Channels[i].Unit && origin->Id && Channels[i].Unit->Id
 			&& origin->Id == Channels[i].Unit->Id && Channels[i].Playing) {
-				return true;
+			return true;
 		}
 	}
 	return false;
