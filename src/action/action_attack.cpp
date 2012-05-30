@@ -53,10 +53,10 @@
 #include "player.h"
 #include "script.h"
 #include "sound.h"
+#include "spells.h"
 #include "ui.h"
 #include "unit.h"
 #include "unittype.h"
-#include "spells.h"
 
 /*----------------------------------------------------------------------------
 --  Defines
