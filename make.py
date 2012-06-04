@@ -29,6 +29,7 @@ try:
 except ImportError:
    import queue
 import threading
+from warnings import warn
 from fabricate import *
 
 
@@ -124,10 +125,113 @@ def Check(b, lib=None, header='', function='', name=''):
        return False
     return True
 
+def cmdline2list(s):
+    r"""Split a string into words and remove quotation marks and backslashes,
+as a Bourne shell would.
+
+If e.g. pkg-config --cflags lua5.1 outputs:
+-DDEB_HOST_MULTIARCH=\"x86_64-linux-gnu\" -I/usr/include/lua5.1  
+this function can convert it to a list of words:
+('-DDEB_HOST_MULTIARCH="x86_64-linux-gnu"', '-I/usr/include/lua5.1')
+that you can then pass to subprocess.list2cmdline and get the
+backslashes back.
+
+This function neither parses nor executes any shell expansions.  For
+example, it does not support the ${variable} or `command` syntaxes.
+If it sees any of those, it warns and passes the metacharacters
+through unchanged."""
+    words = ()
+    pos = 0
+    # Read words from the string until we get to the end.
+    while pos < len(s):
+        if s[pos].isspace():
+            # Spaces delimit words.  Discard them.
+            pos += 1
+        else:
+            # Any non-space character begins a word.
+            word = ""
+            if pos < len(s) and s[pos] == '~':
+                # An unquoted tilde at the beginning of a word should
+                # refer to a home directory or to a directory stack.
+                # We support neither.
+                warn("tilde expansion not supported")
+            while pos < len(s) and not s[pos].isspace():
+                if s[pos] == '\\':
+                    # An unquoted backslash escapes the following character.
+                    pos += 1
+                    if pos >= len(s):
+                        warn("trailing backslash")
+                    else:
+                        word += s[pos]
+                        pos += 1
+                    continue
+                if s[pos] == '"':
+                    # A double-quoted string.  Read characters until we get
+                    # to the closing double-quotation mark.
+                    pos += 1
+                    while True:
+                        if pos >= len(s):
+                            warn("unterminated double-quoted string")
+                            break
+                        elif s[pos] == '"':
+                            # This closes the string.
+                            pos += 1
+                            break
+                        elif s[pos] == '\\':
+                            # Within a double-quoted string, a
+                            # backslash followed by another backslash,
+                            # double-quotation mark, dollar sign, or
+                            # backtick escapes that character.
+                            # Otherwise, it's just part of the string.
+                            if pos + 1 >= len(s):
+                                warn("trailing backslash in double-quoted string")
+                            elif s[pos + 1] in '\\"$`':
+                                word += s[pos + 1]
+                                pos += 2
+                                continue
+                        elif s[pos] in "$`":
+                            # Within a double-quoted string, a dollar
+                            # sign or a backtick would begin some
+                            # shell-expansion syntax that this
+                            # function does not support.
+                            warn("unsupported character %s in double-quoted string" % s[pos])
+                        # Otherwise, the character is part of the string.
+                        word += s[pos]
+                        pos += 1
+                    continue
+                elif s[pos] == "'":
+                    # A single-quoted string.  Backslashes have
+                    # no special meaning here.  Just search for
+                    # the closing single-quotation mark.
+                    pos += 1
+                    while True:
+                        if pos >= len(s):
+                            warn("unterminated single-quoted string")
+                            break
+                        elif s[pos] == "'":
+                            # This closes the string.
+                            pos += 1
+                            break
+                        # Otherwise, the character is part of the string.
+                        word += s[pos]
+                        pos += 1
+                    continue
+                elif s[pos] in "#$&()*;<>?[]`|":
+                    # When not part of a {double,single}-quoted
+                    # string, these characters invoke various shell
+                    # features that this function does not support.
+                    warn("unsupported character %s" % s[pos])
+                word += s[pos]
+                pos += 1
+            # Finished reading the word; reached a space or the end of
+            # the input string.
+            words += (word,)
+    return words
+
 def pkgconfig(b, package):
     try:
-        b.cflags += shell('pkg-config', '--cflags', package).decode().strip().split()
-        b.ldflags += shell('pkg-config', '--libs', package).decode().strip().split()
+        b.cflags += cmdline2list(shell('pkg-config', '--cflags', package).decode())
+        b.ldflags += cmdline2list(shell('pkg-config', '--libs', package).decode())
     except ExecutionError as e:
         return False
     return True
