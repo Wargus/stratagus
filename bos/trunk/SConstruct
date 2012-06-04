@@ -62,6 +62,8 @@ if not optionsChanged:
    optionsChanged  = not filecmp.cmp('build_options.py', 'build_options_OLD_FOR_CHECK.py', False)
    os.remove('build_options_OLD_FOR_CHECK.py')
 
+CacheDir('build/cache')
+
 engineSourceDir = 'engine'
 
 def globSources(sourceDirs, builddir):
