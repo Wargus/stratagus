@@ -117,7 +117,9 @@ def Check(b, lib=None, header='', function='', name=''):
        f.write('#include "%s"\n' % header)
     if function:
        f.write('#ifdef __cplusplus\nextern "C"\n#endif\nchar %s();\n'%function)
-    f.write('int main()\n{\nreturn 0;\n}\n\n')
+       f.write('int main()\n{\n%s();\nreturn 0;\n}\n\n'%function)
+    else:
+       f.write('int main()\n{\nreturn 0;\n}\n\n')
     f.close()
     if lib:
         t.lib(lib)
