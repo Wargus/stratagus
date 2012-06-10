@@ -196,7 +196,7 @@ extern void DrawMapArea(void);              /// Draw the map area
 extern void GameMainLoop(void);             /// Game main loop
 
 	/// Show load progress
-extern void ShowLoadProgress(const char *fmt, ...);
+extern void ShowLoadProgress(const char *fmt, ...) GCC_ATTR((format(printf, 1, 2)));
 
 //@}
 
