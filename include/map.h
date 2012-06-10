@@ -59,7 +59,7 @@
 **      buildings (shipyard) are allowed.
 **    ::MapFieldShallowWater small water units allowed.
 **    ::MapFieldDeepWater both small and big water units allowed.
-**    ::MapFieldNoBuilding no buildings allowed.
+**    ::MapFieldNoBuilding no buildings allowed, except neutral (e.g. rocks).
 **    ::MapFieldUnpassable field is movement blocked.
 **    ::MapFieldLandUnit land unit on field.
 **    ::MapFieldAirUnit air unit on field.
@@ -170,7 +170,7 @@ public:
 #define MapFieldLandAllowed  0x0010  /// Land units allowed
 #define MapFieldCoastAllowed 0x0020  /// Coast (transporter) units allowed
 #define MapFieldDeepWater    0x0040  /// Small and big water units allowed
-#define MapFieldNoBuilding   0x0080  /// No buildings allowed
+#define MapFieldNoBuilding   0x0080  /// No buildings allowed, except neutral (e.g. rocks)
 
 #define MapFieldUnpassable   0x0100  /// Field is movement blocked
 #define MapFieldTransparent  0x0200  /// Field is transparent
