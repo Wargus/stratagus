@@ -59,7 +59,7 @@ class FileWriter
 public:
 	virtual ~FileWriter() {}
 
-	void printf(const char *format, ...);
+	void printf(const char *format, ...) GCC_ATTR((format(printf, 2, 3)));
 
 	virtual int write(const char *data, unsigned int size) = 0;
 };
@@ -104,7 +104,7 @@ public:
 	int read(void *buf, size_t len);
 	int seek(long offset, int whence);
 	long tell();
-	int printf(const char *format, ...);
+	int printf(const char *format, ...) GCC_ATTR((format(printf, 2, 3)));
 
 private:
 	int   cl_type;   /// type of CFile

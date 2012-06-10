@@ -31,6 +31,21 @@
 //@{
 
 /*----------------------------------------------------------------------------
+--  Function attributes
+----------------------------------------------------------------------------*/
+
+// Most *.cpp files include "stratagus.h", which includes "util.h".
+// The guichan *.cpp files do not include "stratagus.h", but some of them
+// do include "util.h".  Because we want to use GCC_ATTR in the sprintf_s
+// declaration in "util.h", define GCC_ATTR here.
+
+#ifdef __GNUC__
+# define GCC_ATTR(list) __attribute__(list)
+#else
+# define GCC_ATTR(list)
+#endif
+
+/*----------------------------------------------------------------------------
 --  Random
 ----------------------------------------------------------------------------*/
 
@@ -61,7 +76,7 @@ extern long isqrt(long num);
 extern unsigned int strcpy_s(char *dst, size_t dstsize, const char *src);
 extern unsigned int strncpy_s(char *dst, size_t dstsize, const char *src, size_t count);
 extern unsigned int strcat_s(char *dst, size_t dstsize, const char *src);
-extern int sprintf_s(char *dest, size_t destSize, const char *format, ...);
+extern int sprintf_s(char *dest, size_t destSize, const char *format, ...) GCC_ATTR((format(printf, 3, 4)));
 #endif
 
 inline char *new_strdup(const char *str)

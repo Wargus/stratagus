@@ -330,9 +330,9 @@ extern void DrawMessages(void);
 	/// Draw the player resource in resource line
 extern void DrawResources(void);
 	/// Set message to display
-extern void SetMessage(const char *fmt, ...);
+extern void SetMessage(const char *fmt, ...) GCC_ATTR((format(printf, 1, 2)));
 	/// Set message to display with event point
-extern void SetMessageEvent(int x, int y, const char *fmt, ...);
+extern void SetMessageEvent(int x, int y, const char *fmt, ...) GCC_ATTR((format(printf, 3, 4)));
 	/// Center view-point on last event message
 extern void CenterOnMessage(void);
 	/// Cleanup all messages

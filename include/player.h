@@ -419,7 +419,7 @@ public:
 	int HaveUnitTypeByIdent(const std::string &ident) const;
 
 	/// Notify player about a problem
-	void Notify(int type, int x, int y, const char *fmt, ...) const;
+	void Notify(int type, int x, int y, const char *fmt, ...) const GCC_ATTR((format(printf, 5, 6)));
 
 	bool IsEnemy(const CPlayer *x) const;
 	bool IsEnemy(const CUnit *x) const;
