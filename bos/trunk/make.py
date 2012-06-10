@@ -42,7 +42,9 @@ def find(startdir, pattern):
     results = []
     for dirpath,dirnames,files in os.walk(startdir):
        for f in files:
-          if fnmatch.fnmatch(f, pattern):
+          # Ignore dot files.  GNU Emacs especially creates lock files
+          # with names like ".#script.cpp".  Don't try to compile those.
+          if fnmatch.fnmatch(f, pattern) and not f.startswith("."):
              results.append(dirpath+'/'+f)
     return results
     
