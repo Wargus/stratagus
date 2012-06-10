@@ -204,7 +204,14 @@ void UpdateStats(int reset)
 					MapFieldBuilding | // already occuppied
 					MapFieldLandAllowed; // can't build on this
 			}
-			type->MovementMask |= MapFieldNoBuilding;
+			// Neutral harvestable units such as rocks and trees
+			// are marked as buildings because they cannot move
+			// and their corpses should not fuel spells.  They
+			// should however ignore MapFieldNoBuilding so that
+			// the map author can place them wherever desired.
+			if (!type->Neutral) {
+				type->MovementMask |= MapFieldNoBuilding;
+			}
 			//
 			// A little chaos, buildings without HP can be entered.
 			// The oil-patch is a very special case.
