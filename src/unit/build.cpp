@@ -58,12 +58,11 @@
 CBuildRestrictionOnTop *OnTopDetails(std::vector<CBuildRestriction *> &restr,
 									 const CUnit &unit, const CUnitType *parent)
 {
-	CBuildRestrictionAnd *andb;
-	CBuildRestrictionOnTop *ontopb;
 
-	for (std::vector<CBuildRestriction *>::const_iterator i = restr.begin();
-		 i != restr.end(); ++i) {
-		if ((ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*i))) {
+	for (std::vector<CBuildRestriction *>::const_iterator i = restr.begin(); i != restr.end(); ++i) {
+		CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*i);
+
+		if (ontopb) {
 			if (!parent) {
 				// Guess this is right
 				return ontopb;
@@ -71,10 +70,14 @@ CBuildRestrictionOnTop *OnTopDetails(std::vector<CBuildRestriction *> &restr,
 			if (parent == ontopb->Parent) {
 				return ontopb;
 			}
-		} else if ((andb = dynamic_cast<CBuildRestrictionAnd *>(*i))) {
-			for (std::vector<CBuildRestriction *>::iterator i = andb->_or_list.begin();
-				 i != andb->_or_list.end(); ++i) {
-				if ((ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*i))) {
+			continue;
+		}
+		CBuildRestrictionAnd *andb = dynamic_cast<CBuildRestrictionAnd *>(*i);
+
+		if (andb) {
+			for (std::vector<CBuildRestriction *>::iterator j = andb->_or_list.begin(); j != andb->_or_list.end(); ++j) {
+				CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*i);
+				if (ontopb) {
 					if (!parent) {
 						// Guess this is right
 						return ontopb;
@@ -249,11 +252,7 @@ bool CBuildRestrictionOnTop::Check(const CUnit *, const CUnitType &, const Vec2i
 */
 CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 {
-	CUnit *ontoptarget;
-
-	//
 	//  Can't build outside the map
-	//
 	if (pos.x + type.TileWidth > Map.Info.MapWidth) {
 		return NULL;
 	}
@@ -288,16 +287,16 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 
 	size_t count = type.BuildingRules.size();
 	if (count > 0) {
-		ontoptarget = NULL;
 		for (unsigned int i = 0; i < count; ++i) {
 			CBuildRestriction *rule = type.BuildingRules[i];
+			CUnit *ontoptarget = NULL;
 			// All checks processed, did we really have success
 			if (rule->Check(unit, type, pos, ontoptarget)) {
 				// We passed a full ruleset return
 				if (unit == NULL) {
 					return ontoptarget ? ontoptarget : (CUnit *)1;
 				} else {
-					return ontoptarget ? ontoptarget : (CUnit *)unit;
+					return ontoptarget ? ontoptarget : const_cast<CUnit *>(unit);
 				}
 			}
 		}
@@ -308,7 +307,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 	if (unit && unit->Player->AiEnabled) {
 		size_t count = type.AiBuildingRules.size();
 		if (count > 0) {
-			ontoptarget = NULL;
+			CUnit *ontoptarget = NULL;
 			for (unsigned int i = 0; i < count; ++i) {
 				CBuildRestriction *rule = type.AiBuildingRules[i];
 				// All checks processed, did we really have success
@@ -317,7 +316,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 					if (unit == NULL) {
 						return ontoptarget ? ontoptarget : (CUnit *)1;
 					} else {
-						return ontoptarget ? ontoptarget : (CUnit *)unit;
+						return ontoptarget ? ontoptarget : const_cast<CUnit *>(unit);
 					}
 				}
 			}
@@ -333,7 +332,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 **  @param pos   tile map position.
 **  @param  mask terrain mask
 **
-**  @return 1 if we can build on this point.
+**  @return true if we can build on this point.
 */
 bool CanBuildOn(const Vec2i &pos, int mask)
 {

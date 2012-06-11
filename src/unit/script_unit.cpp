@@ -662,13 +662,13 @@ static int CclUnit(lua_State *l)
 */
 static int CclMoveUnit(lua_State *l)
 {
-	Vec2i ipos;
-
 	LuaCheckArgs(l, 2);
 
 	lua_pushvalue(l, 1);
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
+
+	Vec2i ipos;
 
 	lua_rawgeti(l, 2, 1);
 	ipos.x = LuaToNumber(l, -1);
@@ -758,9 +758,6 @@ static int CclCreateUnit(lua_State *l)
 */
 static int CclSetResourcesHeld(lua_State *l)
 {
-	CUnit *unit;
-	int value;
-
 	LuaCheckArgs(l, 2);
 
 	if (lua_isnil(l, 1)) {
@@ -768,9 +765,9 @@ static int CclSetResourcesHeld(lua_State *l)
 	}
 
 	lua_pushvalue(l, 1);
-	unit = CclGetUnit(l);
+	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
-	value = LuaToNumber(l, 2);
+	const int value = LuaToNumber(l, 2);
 	unit->ResourcesHeld = value;
 
 	return 0;
