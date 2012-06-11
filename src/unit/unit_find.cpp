@@ -39,53 +39,16 @@
 #include <limits.h>
 
 #include "stratagus.h"
-#include "map.h"
-#include "video.h"
-#include "sound.h"
-#include "unitsound.h"
-#include "unittype.h"
-#include "actions.h"
-#include "player.h"
-#include "missile.h"
+
 #include "unit.h"
-#include "interface.h"
-#include "tileset.h"
+
+#include "actions.h"
+#include "map.h"
+#include "missile.h"
 #include "pathfinder.h"
+#include "player.h"
 #include "spells.h"
-
-/*----------------------------------------------------------------------------
---  Defines
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---  Local Data
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/**
-**  Find all units of type.
-**
-**  @param type   type of unit requested
-**  @param table  table in which we have to store the units
-**
-**  @return       Returns the number of units found.
-*/
-int FindUnitsByType(const CUnitType &type, CUnit **table)
-{
-	int num = 0;
-
-	for (int i = 0; i < NumUnits; ++i) {
-		CUnit *unit = Units[i];
-
-		if (unit->Type == &type && !unit->IsUnusable()) {
-			table[num++] = unit;
-		}
-	}
-	return num;
-}
+#include "unittype.h"
 
 /**
 **  Find all units of type.
@@ -103,7 +66,6 @@ void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units)
 		}
 	}
 }
-
 
 /**
 **  Find all units of type.
