@@ -292,7 +292,7 @@ int CUnit::GetDrawLevel() const
 **
 **  @param type    Unit-type
 */
-void CUnit::Init(CUnitType &type)
+void CUnit::Init(const CUnitType &type)
 {
 	//  Set refs to 1. This is the "I am alive ref", lost in ReleaseUnit.
 	Refs = 1;
@@ -417,7 +417,7 @@ bool CUnit::StoreOrder(COrder *order)
 */
 void CUnit::AssignToPlayer(CPlayer &player)
 {
-	CUnitType &type = *Type;
+	const CUnitType &type = *Type;
 
 	// Build player unit table
 	if (!type.Vanishes && CurrentAction() != UnitActionDie) {
@@ -465,7 +465,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 **
 **  @return          Pointer to created unit.
 */
-CUnit *MakeUnit(CUnitType &type, CPlayer *player)
+CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 {
 	// Game unit limit reached.
 	if (NumUnits >= UnitMax) {
@@ -843,7 +843,7 @@ void CUnit::Place(const Vec2i &pos)
 **
 **  @return        Pointer to created unit.
 */
-CUnit *MakeUnitAndPlace(const Vec2i &pos, CUnitType &type, CPlayer *player)
+CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player)
 {
 	CUnit *unit = MakeUnit(type, player);
 
@@ -2562,7 +2562,7 @@ void LetUnitDie(CUnit &unit)
 	unit.TTL = 0;
 	unit.Anim.Unbreakable = 0;
 
-	CUnitType *type = unit.Type;
+	const CUnitType *type = unit.Type;
 
 	while (unit.Resource.Workers) {
 		unit.Resource.Workers->DeAssignWorkerFromMine(unit);

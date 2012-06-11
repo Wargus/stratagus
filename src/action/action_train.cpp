@@ -187,7 +187,7 @@ static void AnimateActionTrain(CUnit &unit)
 		return ;
 	}
 	CPlayer &player = *unit.Player;
-	CUnitType &nType = *this->Type;
+	const CUnitType &nType = *this->Type;
 	const int cost = nType.Stats[player.Index].Costs[TimeCost];
 	this->Ticks += SpeedTrain;
 

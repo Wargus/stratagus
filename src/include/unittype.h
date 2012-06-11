@@ -1055,7 +1055,7 @@ public:
 
 	/* API */
 
-	bool CheckUserBoolFlags(char *BoolFlags);
+	bool CheckUserBoolFlags(const char *BoolFlags) const;
 	bool CanTransport() const { return MaxOnBoard > 0 && !GivesResource; }
 	bool CanMove() const;
 

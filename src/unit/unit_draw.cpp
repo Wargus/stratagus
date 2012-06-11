@@ -912,15 +912,8 @@ void CUnit::Draw(const CViewport *vp) const
 	CPlayerColorGraphic *sprite;
 	ResourceInfo *resinfo;
 	const CConstructionFrame *cframe;
-	CUnitType *type;
+	const CUnitType *type;
 
-	/*
-	 * Since we can draw in parallel to game logic units may be already destroyed
-	 * or removed (this->Container != NULL) most dangerus is destroyed state
-	 * but due existence of UnitCashe, unit memory is always valid only we need check
-	 * Destroyed flag... the hack is that  this->Type == NULL but 'or' logic
-	 * should secure this scenario and retir before this->Type->Revealer check
-	 */
 	if (this->Destroyed || this->Container || this->Type->Revealer) { // Revealers are not drawn
 		return;
 	}
@@ -944,7 +937,7 @@ void CUnit::Draw(const CViewport *vp) const
 		if (action == UnitActionUpgradeTo) {
 			const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(this->CurrentOrder());
 
-			type = const_cast<CUnitType *>(&order.GetUnitType());
+			type = &order.GetUnitType();
 		}
 
 		if (this->CurrentAction() == UnitActionBuilt) {

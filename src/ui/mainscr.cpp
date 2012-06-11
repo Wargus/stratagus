@@ -696,7 +696,7 @@ static void DrawUnitInfo(CUnit &unit)
 	}
 
 
-	CUnitType &type = *unit.Type;
+	const CUnitType &type = *unit.Type;
 	Assert(&type);
 
 	// Draw IconUnit

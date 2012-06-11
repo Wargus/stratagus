@@ -221,7 +221,7 @@ CUnitType::~CUnitType()
 }
 
 
-bool CUnitType::CheckUserBoolFlags(char *BoolFlags)
+bool CUnitType::CheckUserBoolFlags(const char *BoolFlags) const
 {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); ++i) { // User defined flags
 		if (BoolFlags[i] != CONDITION_TRUE &&

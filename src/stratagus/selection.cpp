@@ -715,7 +715,7 @@ static int DoSelectUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 		if (!unit.IsVisibleInViewport(UI.SelectedViewport)) {
 			continue;
 		}
-		CUnitType &type = *unit.Type;
+		const CUnitType &type = *unit.Type;
 		// Buildings are visible but not selectable
 		if (type.Building && !unit.IsVisibleOnMap(*ThisPlayer)) {
 			continue;

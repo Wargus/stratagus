@@ -303,6 +303,40 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 	blist.push_back(andlist);
 }
 
+static void UpdateDefaultBoolFlags(CUnitType& type)
+{
+	// BoolFlag
+	type.BoolFlag[COWARD_INDEX].value                = type.Coward;
+	type.BoolFlag[BUILDING_INDEX].value              = type.Building;
+	type.BoolFlag[FLIP_INDEX].value                  = type.Flip;
+	type.BoolFlag[REVEALER_INDEX].value              = type.Revealer;
+	type.BoolFlag[LANDUNIT_INDEX].value              = type.LandUnit;
+	type.BoolFlag[AIRUNIT_INDEX].value               = type.AirUnit;
+	type.BoolFlag[SEAUNIT_INDEX].value               = type.SeaUnit;
+	type.BoolFlag[EXPLODEWHENKILLED_INDEX].value     = type.ExplodeWhenKilled;
+	type.BoolFlag[VISIBLEUNDERFOG_INDEX].value       = type.VisibleUnderFog;
+	type.BoolFlag[PERMANENTCLOAK_INDEX].value        = type.PermanentCloak;
+	type.BoolFlag[DETECTCLOAK_INDEX].value           = type.DetectCloak;
+	type.BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value = type.AttackFromTransporter;
+	type.BoolFlag[VANISHES_INDEX].value              = type.Vanishes;
+	type.BoolFlag[GROUNDATTACK_INDEX].value          = type.GroundAttack;
+	type.BoolFlag[SHOREBUILDING_INDEX].value         = type.ShoreBuilding;
+	type.BoolFlag[CANATTACK_INDEX].value             = type.CanAttack;
+	type.BoolFlag[BUILDEROUTSIDE_INDEX].value        = type.BuilderOutside;
+	type.BoolFlag[BUILDERLOST_INDEX].value           = type.BuilderLost;
+	type.BoolFlag[CANHARVEST_INDEX].value            = type.CanHarvest;
+	type.BoolFlag[HARVESTER_INDEX].value             = type.Harvester;
+	type.BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value = type.SelectableByRectangle;
+	type.BoolFlag[ISNOTSELECTABLE_INDEX].value       = type.IsNotSelectable;
+	type.BoolFlag[DECORATION_INDEX].value            = type.Decoration;
+	type.BoolFlag[INDESTRUCTIBLE_INDEX].value        = type.Indestructible;
+	type.BoolFlag[TELEPORTER_INDEX].value            = type.Teleporter;
+	type.BoolFlag[SHIELDPIERCE_INDEX].value          = type.ShieldPiercing;
+	type.BoolFlag[SAVECARGO_INDEX].value             = type.SaveCargo;
+	type.BoolFlag[NONSOLID_INDEX].value              = type.NonSolid;
+	type.BoolFlag[WALL_INDEX].value                  = type.Wall;
+}
+
 /**
 **  Parse unit-type.
 **
@@ -1134,6 +1168,7 @@ static int CclDefineUnitType(lua_State *l)
 	if (type->MouseAction == MouseActionAttack && !type->CanAttack) {
 		LuaError(l, "Unit-type `%s': right-attack is set, but can-attack is not\n" _C_ type->Name.c_str());
 	}
+	UpdateDefaultBoolFlags(*type);
 	return 0;
 }
 
@@ -1607,7 +1642,7 @@ static int CclDefineDecorations(lua_State *l)
 */
 void UpdateUnitVariables(CUnit &unit)
 {
-	CUnitType *type = unit.Type;
+	const CUnitType *type = unit.Type;
 
 	for (int i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
@@ -1690,39 +1725,7 @@ void UpdateUnitVariables(CUnit &unit)
 #endif
 			Assert(unit.Variable[i].Value <= unit.Variable[i].Max);
 	}
-
-	// BoolFlag
-	type->BoolFlag[COWARD_INDEX].value                = type->Coward;
-	type->BoolFlag[BUILDING_INDEX].value              = type->Building;
-	type->BoolFlag[FLIP_INDEX].value                  = type->Flip;
-	type->BoolFlag[REVEALER_INDEX].value              = type->Revealer;
-	type->BoolFlag[LANDUNIT_INDEX].value              = type->LandUnit;
-	type->BoolFlag[AIRUNIT_INDEX].value               = type->AirUnit;
-	type->BoolFlag[SEAUNIT_INDEX].value               = type->SeaUnit;
-	type->BoolFlag[EXPLODEWHENKILLED_INDEX].value     = type->ExplodeWhenKilled;
-	type->BoolFlag[VISIBLEUNDERFOG_INDEX].value       = type->VisibleUnderFog;
-	type->BoolFlag[PERMANENTCLOAK_INDEX].value        = type->PermanentCloak;
-	type->BoolFlag[DETECTCLOAK_INDEX].value           = type->DetectCloak;
-	type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value = type->AttackFromTransporter;
-	type->BoolFlag[VANISHES_INDEX].value              = type->Vanishes;
-	type->BoolFlag[GROUNDATTACK_INDEX].value          = type->GroundAttack;
-	type->BoolFlag[SHOREBUILDING_INDEX].value         = type->ShoreBuilding;
-	type->BoolFlag[CANATTACK_INDEX].value             = type->CanAttack;
-	type->BoolFlag[BUILDEROUTSIDE_INDEX].value        = type->BuilderOutside;
-	type->BoolFlag[BUILDERLOST_INDEX].value           = type->BuilderLost;
-	type->BoolFlag[CANHARVEST_INDEX].value            = type->CanHarvest;
-	type->BoolFlag[HARVESTER_INDEX].value             = type->Harvester;
-	type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value = type->SelectableByRectangle;
-	type->BoolFlag[ISNOTSELECTABLE_INDEX].value       = type->IsNotSelectable;
-	type->BoolFlag[DECORATION_INDEX].value            = type->Decoration;
-	type->BoolFlag[INDESTRUCTIBLE_INDEX].value        = type->Indestructible;
-	type->BoolFlag[TELEPORTER_INDEX].value            = type->Teleporter;
-	type->BoolFlag[SHIELDPIERCE_INDEX].value          = type->ShieldPiercing;
-	type->BoolFlag[SAVECARGO_INDEX].value             = type->SaveCargo;
-	type->BoolFlag[NONSOLID_INDEX].value              = type->NonSolid;
-	type->BoolFlag[WALL_INDEX].value                  = type->Wall;
 }
-
 
 /**
 **  Register CCL features for unit-type.

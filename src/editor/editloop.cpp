@@ -112,7 +112,7 @@ enum EditorActionType {
 struct EditorAction {
 	EditorActionType Type;
 	Vec2i tilePos;
-	CUnitType *UnitType;
+	const CUnitType *UnitType;
 	CPlayer *Player;
 };
 
@@ -314,7 +314,7 @@ void EditTiles(const Vec2i &pos, int tile, int size)
 **  @todo  FIXME: Check if the player has already a start-point.
 **  @bug   This function does not support mirror editing!
 */
-static void EditorActionPlaceUnit(const Vec2i &pos, CUnitType &type, CPlayer *player)
+static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 

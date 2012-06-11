@@ -497,9 +497,9 @@ public:
 
 	unsigned int Offset;/// Map position as flat index offset (x + y * w)
 
-	CUnitType  *Type;              /// Pointer to unit-type (peon,...)
+	const CUnitType  *Type;        /// Pointer to unit-type (peon,...)
 	CPlayer    *Player;            /// Owner of this unit
-	CUnitStats *Stats;             /// Current unit stats
+	const CUnitStats *Stats;       /// Current unit stats
 	int         CurrentSightRange; /// Unit's Current Sight Range
 
 	// Pathfinding stuff:
@@ -548,7 +548,7 @@ public:
 	struct _seen_stuff_ {
 		const CConstructionFrame  *CFrame;  /// Seen construction frame
 		int         Frame;                  /// last seen frame/stage of buildings
-		CUnitType  *Type;                   /// Pointer to last seen unit-type
+		const CUnitType  *Type;             /// Pointer to last seen unit-type
 		Vec2i       tilePos;                /// Last unit->tilePos Seen
 		signed char IX;                     /// Seen X image displacement to map position
 		signed char IY;                     /// seen Y image displacement to map position
@@ -604,7 +604,7 @@ unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 	void RefsDecrease();
 
 	/// Initialize unit structure with default values
-	void Init(CUnitType &type);
+	void Init(const CUnitType &type);
 	/// Assign unit to player
 	void AssignToPlayer(CPlayer &player);
 
@@ -870,9 +870,9 @@ void UnmarkUnitFieldFlags(const CUnit &unit);
 /// Update unit->CurrentSightRange.
 void UpdateUnitSightRange(CUnit &unit);
 /// Create a new unit
-extern CUnit *MakeUnit(CUnitType &type, CPlayer *player);
+extern CUnit *MakeUnit(const CUnitType &type, CPlayer *player);
 /// Create a new unit and place on map
-extern CUnit *MakeUnitAndPlace(const Vec2i &pos, CUnitType &type, CPlayer *player);
+extern CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player);
 /// Handle the loss of a unit (food,...)
 extern void UnitLost(CUnit &unit);
 /// Remove the Orders of a Unit
@@ -927,7 +927,7 @@ extern void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *conta
 extern void DropOutAll(const CUnit &unit);
 
 /// Return the rule used to build this building.
-extern CBuildRestrictionOnTop *OnTopDetails(std::vector<CBuildRestriction *> &restr, const CUnit &unit, const CUnitType *parent);
+extern CBuildRestrictionOnTop *OnTopDetails(const std::vector<CBuildRestriction *> &restr, const CUnit &unit, const CUnitType *parent);
 /// @todo more docu
 extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos);
 /// @todo more docu

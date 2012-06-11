@@ -107,7 +107,7 @@ static bool AnimateActionDie(CUnit &unit)
 	if (unit.Anim.Unbreakable) {
 		return ;
 	}
-	CUnitType &type = *unit.Type;
+	const CUnitType &type = *unit.Type;
 
 	// Die sequence terminated, generate corpse.
 	if (type.CorpseType == NULL) {
@@ -116,7 +116,7 @@ static bool AnimateActionDie(CUnit &unit)
 		return ;
 	}
 
-	CUnitType &corpseType = *type.CorpseType;
+	const CUnitType &corpseType = *type.CorpseType;
 	Assert(type.TileWidth >= corpseType.TileWidth && type.TileHeight >= corpseType.TileHeight);
 
 	// Update sight for new corpse

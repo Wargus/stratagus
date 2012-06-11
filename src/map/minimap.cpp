@@ -421,7 +421,7 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 */
 static void DrawUnitOn(CUnit &unit, int red_phase)
 {
-	CUnitType *type;
+	const CUnitType *type;
 	Uint32 color;
 	SDL_Color c;
 
