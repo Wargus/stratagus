@@ -64,13 +64,10 @@ static void AiHelperInsert(std::vector<std::vector<CUnitType *> > &table,
 	if (n >= table.size()) {
 		table.resize(n + 1);
 	}
-
 	// Look if already known
-	std::vector<CUnitType *>::const_iterator i;
-	for (i = table[n].begin(); i != table[n].end(); ++i) {
-		if (*i == &base) {
-			return;
-		}
+	std::vector<CUnitType *>::const_iterator it = std::find(table[n].begin(), table[n].end(), &base);
+	if (it != table[n].end()) {
+		return;
 	}
 	table[n].push_back(&base);
 }
@@ -311,8 +308,6 @@ static void InitAiHelper(AiHelper &aiHelper)
 */
 static int CclDefineAiHelper(lua_State *l)
 {
-	int what;
-
 	InitAiHelper(AiHelpers);
 
 	const int args = lua_gettop(l);
@@ -330,6 +325,8 @@ static int CclDefineAiHelper(lua_State *l)
 		//
 		// Type build,train,research/upgrade.
 		//
+		int what;
+
 		if (!strcmp(value, "build")) {
 			what = -1;
 		} else if (!strcmp(value, "train")) {
@@ -578,25 +575,24 @@ static int CclAiDebug(lua_State *l)
 */
 static int CclAiDebugPlayer(lua_State *l)
 {
-	const char *item;
-	int playerid;
-
 	const int args = lua_gettop(l);
 	for (int j = 0; j < args; ++j) {
+		const char *item;
+
 		if (lua_isstring(l, j + 1)) {
 			item = LuaToString(l, j + 1);
 		} else {
 			item = NULL;
 		}
-
 		if (item && !strcmp(item, "none")) {
-			for (playerid = 0; playerid < NumPlayers; ++playerid) {
-				if (!Players[playerid].AiEnabled || !Players[playerid].Ai) {
+			for (int i = 0; i != NumPlayers; ++i) {
+				if (!Players[i].AiEnabled || !Players[i].Ai) {
 					continue;
 				}
-				((PlayerAi *)Players[playerid].Ai)->ScriptDebug = 0;
+				Players[i].Ai->ScriptDebug = 0;
 			}
 		} else {
+			int playerid;
 			if (item && !strcmp(item, "self")) {
 				if (!ThisPlayer) {
 					continue;
@@ -609,7 +605,7 @@ static int CclAiDebugPlayer(lua_State *l)
 			if (!Players[playerid].AiEnabled || !Players[playerid].Ai) {
 				continue;
 			}
-			((PlayerAi *)Players[playerid].Ai)->ScriptDebug = 1;
+			Players[playerid].Ai->ScriptDebug = 1;
 		}
 	}
 	return 0;
@@ -947,15 +943,15 @@ static int CclAiSleep(lua_State *l)
 */
 static int CclAiResearch(lua_State *l)
 {
-	CUpgrade *upgrade;
-
 	LuaCheckArgs(l, 1);
 	const char *str = LuaToString(l, 1);
+	CUpgrade *upgrade;
+
 	if (str) {
 		upgrade = CUpgrade::Get(str);
 	} else {
 		LuaError(l, "Upgrade needed");
-		upgrade = 0;
+		upgrade = NULL;
 	}
 	InsertResearchRequests(upgrade);
 	lua_pushboolean(l, 0);
@@ -1510,6 +1506,5 @@ void AiCclRegister()
 	lua_register(Lua, "AiAttackWithForces", CclAiAttackWithForces);
 	lua_register(Lua, "AiWaitForces", CclAiWaitForces);
 }
-
 
 //@}

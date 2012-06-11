@@ -1384,26 +1384,21 @@ void AiExplore(const Vec2i &pos, int mask)
 */
 void AiResourceManager()
 {
-	//
 	// Check if something needs to be build / trained.
-	//
 	AiCheckingWork();
-	//
+
 	// Look if we can build a farm in advance.
-	//
 	if (!AiPlayer->NeedSupply && AiPlayer->Player->Supply == AiPlayer->Player->Demand) {
 		AiRequestSupply();
 	}
-	//
+
 	// Collect resources.
-	//
 	if ((GameCycle / CYCLES_PER_SECOND) % COLLECT_RESOURCES_INTERVAL ==
 		(unsigned long)AiPlayer->Player->Index % COLLECT_RESOURCES_INTERVAL) {
 		AiCollectResources();
 	}
-	//
+
 	// Check repair.
-	//
 	AiCheckRepair();
 
 	AiPlayer->NeededMask = 0;
