@@ -276,11 +276,11 @@ public:
 	}
 
 public:
-	CPlayer *Player;               /// Engine player structure
-	CAiType *AiType;               /// AI type of this player AI
+	CPlayer *Player;            /// Engine player structure
+	CAiType *AiType;            /// AI type of this player AI
 	// controller
-	std::string Script;            /// Script executed
-	unsigned long SleepCycles;     /// Cycles to sleep
+	std::string Script;         /// Script executed
+	unsigned long SleepCycles;  /// Cycles to sleep
 
 	AiForceManager Force;  /// Forces controlled by AI
 
@@ -291,17 +291,17 @@ public:
 	int Collect[MaxCosts]; /// Collect % of resources
 	int NeededMask;        /// Mask for needed resources
 	bool NeedSupply;       /// Flag need food
-	bool ScriptDebug;              /// Flag script debuging on/off
+	bool ScriptDebug;      /// Flag script debuging on/off
 
 	std::vector<AiExplorationRequest> FirstExplorationRequest;/// Requests for exploration
-	unsigned long LastExplorationGameCycle;         /// When did the last explore occur?
-	unsigned long LastCanNotMoveGameCycle;          /// Last can not move cycle
-	std::vector<AiRequestType> UnitTypeRequests;    /// unit-types to build/train request,priority list
-	std::vector<CUnitType *> UpgradeToRequests;     /// Upgrade to unit-type requested and priority list
-	std::vector<CUpgrade *> ResearchRequests;       /// Upgrades requested and priority list
-	std::vector<AiBuildQueue> UnitTypeBuilt;        /// What the resource manager should build
-	int LastRepairBuilding;                         /// Last building checked for repair in this turn
-	unsigned int TriedRepairWorkers[UnitMax];       /// No. workers that failed trying to repair a building
+	unsigned long LastExplorationGameCycle;       /// When did the last explore occur?
+	unsigned long LastCanNotMoveGameCycle;        /// Last can not move cycle
+	std::vector<AiRequestType> UnitTypeRequests;  /// unit-types to build/train request,priority list
+	std::vector<CUnitType *> UpgradeToRequests;   /// Upgrade to unit-type requested and priority list
+	std::vector<CUpgrade *> ResearchRequests;     /// Upgrades requested and priority list
+	std::vector<AiBuildQueue> UnitTypeBuilt;      /// What the resource manager should build
+	int LastRepairBuilding;                       /// Last building checked for repair in this turn
+	unsigned int TriedRepairWorkers[UnitMax];     /// No. workers that failed trying to repair a building
 };
 
 /**
