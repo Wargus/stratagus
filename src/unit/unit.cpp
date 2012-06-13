@@ -2072,7 +2072,7 @@ bool FindTerrainType(int movemask, int resmask, int range,
 
 	terrainTraversal.PushPos(startPos);
 
-	TerrainFinder terrainFinder(player, range, movemask, resmask, terrainPos);
+	TerrainFinder terrainFinder(player, range, movemask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit), resmask, terrainPos);
 
 	return terrainTraversal.Run(terrainFinder);
 }
@@ -2220,7 +2220,7 @@ CUnit *UnitFindResource(const CUnit &unit, const Vec2i &startPos, int range, int
 	// Make movement matrix. FIXME: can create smaller matrix.
 	unsigned char *matrix = CreateMatrix();
 	const int w = Map.Info.MapWidth + 2;
-	matrix += w + w + 2;
+	matrix += w + w + 1;
 	//  Unit movement mask
 	unsigned int mask = unit.Type->MovementMask;
 	//  Ignore all units along the way. Might seem wierd, but otherwise

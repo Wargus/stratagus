@@ -952,11 +952,12 @@ static void AiCollectResources()
 		if (!unit.Type->Harvester) {
 			continue;
 		}
-		const int c = unit.CurrentResource;
 
 		// See if it's assigned already
-		if (c && unit.Orders.size() == 1 &&
+		if (unit.Orders.size() == 1 &&
 			unit.CurrentAction() == UnitActionResource) {
+			const COrder_Resource& order = *static_cast<COrder_Resource*>(unit.CurrentOrder());
+			const int c = order.GetCurrentResource();
 			units_assigned[c].push_back(&unit);
 			num_units_assigned[c]++;
 			total_harvester++;
@@ -969,7 +970,9 @@ static void AiCollectResources()
 		}
 
 		// Send workers with resources back home.
-		if (unit.ResourcesHeld && c) {
+		if (unit.ResourcesHeld) {
+			const int c = unit.CurrentResource;
+
 			num_units_with_resource[c]++;
 			CommandReturnGoods(unit, 0, FlushCommands);
 			total_harvester++;

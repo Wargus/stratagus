@@ -62,6 +62,7 @@ public:
 	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 
 
+	int GetCurrentResource() const { return CurrentResource; }
 	Vec2i GetHarvestLocation() const;
 	bool IsGatheringStarted() const;
 	bool IsGatheringFinished() const;

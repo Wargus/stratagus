@@ -125,7 +125,7 @@ static void AiMarkWaterTransporter(const CUnit &unit, unsigned char *matrix)
 	const Vec2i offset[] = {{0, -1}, { -1, 0}, {1, 0}, {0, 1}, { -1, -1}, {1, -1}, { -1, 1}, {1, 1}};
 	Vec2i pos = unit.tilePos;
 	const int w = Map.Info.MapWidth + 2;
-	matrix += w + w + 2;
+	matrix += w + w + 1;
 	if (matrix[pos.x + pos.y * w]) { // already marked
 		DebugPrint("Done\n");
 		return;
@@ -209,7 +209,7 @@ static bool AiFindTarget(const CUnit &unit, unsigned char *matrix, Vec2i *dpos, 
 
 	points[0].pos = pos;
 	points[0].State = OnLand;
-	matrix += w + w + 2;
+	matrix += w + w + 1;
 	int rp = 0;
 	matrix[pos.x + pos.y * w] = 1; // mark start point
 	int ep = 1;
@@ -327,7 +327,7 @@ int AiFindWall(AiForce *force)
 
 	unsigned char *matrix = CreateMatrix();
 	const int w = Map.Info.MapWidth + 2;
-	matrix += w + w + 2;
+	matrix += w + w + 1;
 
 	points[0] = pos;
 	int rp = 0;
