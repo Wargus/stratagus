@@ -50,7 +50,11 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+#include <queue>
+#include "Vec2i.h"
+
 class CUnit;
+class CFile;
 
 /**
 **  Result codes of the pathfinder.
@@ -122,6 +126,69 @@ public:
 	PathFinderOutput output;
 };
 
+
+//
+//  Terrain traversal stuff.
+//
+
+enum VisitResult
+{
+	VisitResult_Finished,
+	VisitResult_DeadEnd,
+	VisitResult_Ok,
+	VisitResult_Cancel
+};
+
+class TerrainTraversal
+{
+public:
+	void SetSize(unsigned int width, unsigned int height);
+	void Init(unsigned char borderValue);
+
+	void PushPos(const Vec2i &pos);
+	void PushNeighboor(const Vec2i &pos);
+
+	template <typename T>
+	bool Run(T &context);
+
+	bool IsVisited(const Vec2i &pos) const;
+
+	// Accept pos to be at one inside the real map
+	unsigned char Get(const Vec2i &pos) const;
+	unsigned char& Get(const Vec2i &pos);
+
+private:
+	struct PosNode
+	{
+		PosNode(const Vec2i &pos, const Vec2i &from) : pos(pos), from(from) {}
+		Vec2i pos;
+		Vec2i from;
+	};
+
+private:
+	std::vector<unsigned char> m_values;
+	std::queue<PosNode> m_queue;
+	unsigned int m_extented_width;
+	unsigned int m_height;
+};
+
+template <typename T>
+bool TerrainTraversal::Run(T &context)
+{
+	for (; m_queue.empty() == false; m_queue.pop())
+	{
+		const PosNode& posNode = m_queue.front();
+
+		switch (context.Visit(*this, posNode.pos, posNode.from)) {
+			case VisitResult_Finished: return true;
+			case VisitResult_DeadEnd: break;
+			case VisitResult_Ok: PushNeighboor(posNode.pos); break;
+			case VisitResult_Cancel: return false;
+		}
+		Assert(IsVisited(posNode.pos));
+	}
+	return false;
+}
 
 
 /*----------------------------------------------------------------------------

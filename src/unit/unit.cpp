@@ -2005,6 +2005,89 @@ void DropOutAll(const CUnit &source)
   -- Finding units
   ----------------------------------------------------------------------------*/
 
+class TerrainFinder
+{
+public:
+	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i* resPos, Vec2i* lastPos) :
+		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos), lastPos(lastPos) {}
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+private:
+	const CPlayer &player;
+	int maxDist;
+	int movemask;
+	int resmask;
+	Vec2i* resPos;
+	Vec2i* lastPos;
+};
+
+class TerrainFinder_Inv
+{
+public:
+	TerrainFinder_Inv(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i* resPos, Vec2i* lastPos) :
+		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos), lastPos(lastPos) {}
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+private:
+	const CPlayer &player;
+	int maxDist;
+	int movemask;
+	int resmask;
+	Vec2i* resPos;
+	Vec2i* lastPos;
+};
+
+VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+{
+	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
+		terrainTraversal.Get(pos) = -1;
+		return VisitResult_DeadEnd;
+	}
+	// Look if found what was required.
+	bool can_move_to = CanMoveToMask(pos, resmask);
+	if (!can_move_to) {
+		*resPos = pos;
+		if (lastPos) {
+			*lastPos = from;
+		}
+		return VisitResult_Finished;
+	}
+	if (CanMoveToMask(pos, movemask)) { // reachable
+		terrainTraversal.Get(pos) = terrainTraversal.Get(from) + 1;
+		if (terrainTraversal.Get(pos) <= maxDist) {
+			return VisitResult_Ok;
+		} else {
+			return VisitResult_DeadEnd;
+		}
+	} else { // unreachable
+		terrainTraversal.Get(pos) = -1;
+		return VisitResult_DeadEnd;
+	}
+}
+
+VisitResult TerrainFinder_Inv::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+{
+	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
+		terrainTraversal.Get(pos) = -1;
+		return VisitResult_DeadEnd;
+	}
+	// Look if found what was required.
+	bool can_move_to = CanMoveToMask(pos, resmask);
+	if (can_move_to) {
+		*resPos = pos;
+		return VisitResult_Finished;
+	}
+	if (CanMoveToMask(pos, movemask)) { // reachable
+		terrainTraversal.Get(pos) = terrainTraversal.Get(from) + 1;
+		if (terrainTraversal.Get(pos) <= maxDist) {
+			return VisitResult_Ok;
+		} else {
+			return VisitResult_DeadEnd;
+		}
+	} else { // unreachable
+		terrainTraversal.Get(pos) = -1;
+		return VisitResult_DeadEnd;
+	}
+}
+
 /**
 **  Find the closest piece of terrain with the given flags.
 **
@@ -2026,80 +2109,27 @@ void DropOutAll(const CUnit &source)
 **
 **  @return            True if wood was found.
 */
-int FindTerrainType(int movemask, int resmask, int rvresult, int range,
+bool FindTerrainType(int movemask, int resmask, int rvresult, int range,
 					const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
 {
-	const Vec2i offsets[] = {{0, -1}, { -1, 0}, {1, 0}, {0, 1}, { -1, -1}, {1, -1}, { -1, 1}, {1, 1}};
-	Vec2i pos(startPos);
-	const int size = std::min<int>(Map.Info.MapWidth * Map.Info.MapHeight / 4, range * range * 5);
-	std::vector<Vec2i> points;
+	TerrainTraversal terrainTraversal;
 
-	points.resize(size);
+	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	terrainTraversal.Init(-1);
 
-	// Make movement matrix. FIXME: can create smaller matrix.
-	unsigned char *matrix = CreateMatrix();
-	const int w = Map.Info.MapWidth + 2;
-	matrix += w + w + 2;
-	points[0] = pos;
-	int rp = 0;
-	matrix[pos.x + pos.y * w] = 1; // mark start point
-	int wp = 1;
-	int ep = 1; // start with one point
-	int cdist = 0; // current distance is 0
+	terrainTraversal.PushPos(startPos);
 
-	// Pop a point from stack, push all neighbors which could be entered.
-	for (;;) {
-		while (rp != ep) {
-			Vec2i rpos = points[rp];
-			for (int i = 0; i < 8; ++i) { // mark all neighbors
-				pos = rpos + offsets[i];
-				//  Make sure we don't leave the map.
-				if (!Map.Info.IsPointOnMap(pos)) {
-					continue;
-				}
-				unsigned char *m = matrix + pos.x + pos.y * w;
-				/*
-				 *  Check if visited or unexplored for non
-				 *  AI players (our exploration code is too week for real
-				 *  competition with human players)
-				 */
-				if (*m || (!player.AiEnabled && !Map.IsFieldExplored(player, pos))) {
-					continue;
-				}
-				// Look if found what was required.
-				bool can_move_to = CanMoveToMask(pos, resmask);
-				if ((rvresult ? can_move_to : !can_move_to)) {
-					*terrainPos = pos;
-					return 1;
-				}
-				if (CanMoveToMask(pos, movemask)) { // reachable
-					*m = 1;
-					points[wp] = pos; // push the point
-					if (++wp >= size) { // round about
-						wp = 0;
-					}
-					if (wp == ep) {
-						//  We are out of points, give up!
-						DebugPrint("Ran out of points the hard way, beware.\n");
-						break;
-					}
-				} else { // unreachable
-					*m = 99;
-				}
-			}
-			if (++rp >= size) { // round about
-				rp = 0;
-			}
-		}
-		++cdist;
-		if (rp == wp || cdist >= range) { // unreachable, no more points available
-			break;
-		}
-		// Continue with next set.
-		ep = wp;
+	if (rvresult) {
+		TerrainFinder_Inv terrainFinder(player, range, movemask, resmask, terrainPos, NULL);
+
+		return terrainTraversal.Run(terrainFinder);
+	} else {
+		TerrainFinder terrainFinder(player, range, movemask, resmask, terrainPos, NULL);
+
+		return terrainTraversal.Run(terrainFinder);
 	}
-	return 0;
 }
+
 
 template <const bool NEARLOCATION>
 class BestDepotFinder
