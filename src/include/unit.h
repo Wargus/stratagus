@@ -947,7 +947,7 @@ extern CUnit *FindDeposit(const CUnit &unit, int range, int resource);
 extern CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last);
 
 /// Find the neareast piece of terrain with specific flags.
-extern bool FindTerrainType(int movemask, int resmask, int rvresult, int range,
+extern bool FindTerrainType(int movemask, int resmask, int range,
 						   const CPlayer &player, const Vec2i &startPos, Vec2i *pos);
 
 /// @todo more docu

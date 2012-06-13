@@ -71,22 +71,73 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+class NearReachableTerrainFinder
+{
+public:
+	NearReachableTerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i* resPos) :
+		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos) {}
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+private:
+	const CPlayer &player;
+	int maxDist;
+	int movemask;
+	int resmask;
+	Vec2i* resPos;
+};
+
+VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+{
+	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
+		terrainTraversal.Get(pos) = -1;
+		return VisitResult_DeadEnd;
+	}
+	// Look if found what was required.
+	if (CanMoveToMask(pos, movemask)) {
+		if (resPos) {
+			*resPos = from;
+		}
+		return VisitResult_Finished;
+	}
+	if (Map.CheckMask(pos, resmask)) { // reachable
+		terrainTraversal.Get(pos) = terrainTraversal.Get(from) + 1;
+		if (terrainTraversal.Get(pos) <= maxDist) {
+			return VisitResult_Ok;
+		} else {
+			return VisitResult_DeadEnd;
+		}
+	} else { // unreachable
+		terrainTraversal.Get(pos) = -1;
+		return VisitResult_DeadEnd;
+	}
+}
+
+static bool FindNearestReachableTerrainType(int movemask, int resmask, int range,
+						   const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
+{
+	TerrainTraversal terrainTraversal;
+
+	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	terrainTraversal.Init(-1);
+
+	Assert(Map.CheckMask(startPos, resmask));
+	terrainTraversal.PushPos(startPos);
+
+	NearReachableTerrainFinder nearReachableTerrainFinder(player, range, movemask, resmask, terrainPos);
+
+	return terrainTraversal.Run(nearReachableTerrainFinder);
+}
+
+
+
+
 /* static */ COrder *COrder::NewActionResource(CUnit &harvester, const Vec2i &pos)
 {
 	COrder_Resource *order = new COrder_Resource(harvester);
 	Vec2i ressourceLoc;
 
 	//  Find the closest piece of wood next to a tile where the unit can move
-	if (!FindTerrainType(0, (harvester.Type->MovementMask), 1, 20, *harvester.Player, pos, &ressourceLoc)) {
+	if (!FindNearestReachableTerrainType(harvester.Type->MovementMask, MapFieldForest, 20, *harvester.Player, pos, &ressourceLoc)) {
 		DebugPrint("FIXME: Give up???\n");
-	}
-	// Max Value > 1
-	if ((MyAbs(ressourceLoc.x - pos.x) | MyAbs(ressourceLoc.y - pos.y)) > 1) {
-		if (!FindTerrainType(0, MapFieldForest, 0, 20, *harvester.Player, ressourceLoc, &ressourceLoc)) {
-			DebugPrint("FIXME: Give up???\n");
-		}
-	} else {
-		// The destination is next to a reachable tile.
 		ressourceLoc = pos;
 	}
 	order->goalPos = ressourceLoc;
@@ -320,8 +371,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 
 	// Wood gone, look somewhere else.
 	if ((Map.Info.IsPointOnMap(pos) == false || Map.ForestOnMap(pos) == false) && (!unit.IX) && (!unit.IY)) {
-		if (!FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 16,
-							 *unit.Player, this->goalPos, &pos)) {
+		if (!FindTerrainType(unit.Type->MovementMask, MapFieldForest, 16, *unit.Player, this->goalPos, &pos)) {
 			// no wood in range
 			return -1;
 		} else {
@@ -331,8 +381,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 	switch (DoActionMove(unit)) {
 		case PF_UNREACHABLE:
 			unit.Wait = 10;
-			if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 9999,
-								*unit.Player, unit.tilePos, &pos)) {
+			if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 9999, *unit.Player, unit.tilePos, &pos)) {
 				this->goalPos = pos;
 				DebugPrint("Found a better place to harvest %d,%d\n" _C_ pos.x _C_ pos.y);
 				// FIXME: can't this overflow? It really shouldn't, since
@@ -959,7 +1008,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 	if (resinfo.TerrainHarvester) {
 		Vec2i pos = this->Resource.Pos;
 
-		if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 10, *unit.Player, pos, &pos)) {
+		if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 10, *unit.Player, pos, &pos)) {
 			if (depot) {
 				DropOutNearest(unit, pos, depot);
 			}

@@ -2008,8 +2008,8 @@ void DropOutAll(const CUnit &source)
 class TerrainFinder
 {
 public:
-	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i* resPos, Vec2i* lastPos) :
-		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos), lastPos(lastPos) {}
+	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i* resPos) :
+		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos) {}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
 	const CPlayer &player;
@@ -2017,22 +2017,6 @@ private:
 	int movemask;
 	int resmask;
 	Vec2i* resPos;
-	Vec2i* lastPos;
-};
-
-class TerrainFinder_Inv
-{
-public:
-	TerrainFinder_Inv(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i* resPos, Vec2i* lastPos) :
-		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos), lastPos(lastPos) {}
-	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
-private:
-	const CPlayer &player;
-	int maxDist;
-	int movemask;
-	int resmask;
-	Vec2i* resPos;
-	Vec2i* lastPos;
 };
 
 VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
@@ -2042,37 +2026,10 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 		return VisitResult_DeadEnd;
 	}
 	// Look if found what was required.
-	bool can_move_to = CanMoveToMask(pos, resmask);
-	if (!can_move_to) {
-		*resPos = pos;
-		if (lastPos) {
-			*lastPos = from;
+	if (Map.CheckMask(pos, resmask)) {
+		if (resPos) {
+			*resPos = pos;
 		}
-		return VisitResult_Finished;
-	}
-	if (CanMoveToMask(pos, movemask)) { // reachable
-		terrainTraversal.Get(pos) = terrainTraversal.Get(from) + 1;
-		if (terrainTraversal.Get(pos) <= maxDist) {
-			return VisitResult_Ok;
-		} else {
-			return VisitResult_DeadEnd;
-		}
-	} else { // unreachable
-		terrainTraversal.Get(pos) = -1;
-		return VisitResult_DeadEnd;
-	}
-}
-
-VisitResult TerrainFinder_Inv::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
-{
-	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
-		terrainTraversal.Get(pos) = -1;
-		return VisitResult_DeadEnd;
-	}
-	// Look if found what was required.
-	bool can_move_to = CanMoveToMask(pos, resmask);
-	if (can_move_to) {
-		*resPos = pos;
 		return VisitResult_Finished;
 	}
 	if (CanMoveToMask(pos, movemask)) { // reachable
@@ -2093,23 +2050,19 @@ VisitResult TerrainFinder_Inv::Visit(TerrainTraversal &terrainTraversal, const V
 **
 **  @param movemask    The movement mask to reach that location.
 **  @param resmask     Result tile mask.
-**  @param rvresult    Return a tile that doesn't match.
 **  @param range       Maximum distance for the search.
 **  @param player      Only search fields explored by player
 **  @param startPos    Map start position for the search.
 **
-**  @param pos         OUT: Map position of tile.
+**  @param terrainPos  OUT: Map position of tile.
 **
 **  @note Movement mask can be 0xFFFFFFFF to have no effect
 **  Range is not circular, but square.
 **  Player is ignored if nil(search the entire map)
-**  Use rvresult if you search for a tile that doesn't
-**  match resmask. Like for a tile where an unit can go
-**  with it's movement mask.
 **
 **  @return            True if wood was found.
 */
-bool FindTerrainType(int movemask, int resmask, int rvresult, int range,
+bool FindTerrainType(int movemask, int resmask, int range,
 					const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
 {
 	TerrainTraversal terrainTraversal;
@@ -2119,15 +2072,9 @@ bool FindTerrainType(int movemask, int resmask, int rvresult, int range,
 
 	terrainTraversal.PushPos(startPos);
 
-	if (rvresult) {
-		TerrainFinder_Inv terrainFinder(player, range, movemask, resmask, terrainPos, NULL);
+	TerrainFinder terrainFinder(player, range, movemask, resmask, terrainPos);
 
-		return terrainTraversal.Run(terrainFinder);
-	} else {
-		TerrainFinder terrainFinder(player, range, movemask, resmask, terrainPos, NULL);
-
-		return terrainTraversal.Run(terrainFinder);
-	}
+	return terrainTraversal.Run(terrainFinder);
 }
 
 

@@ -835,7 +835,7 @@ static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource)
 	Vec2i forestPos;
 
 	// Code for terrain harvesters. Search for piece of terrain to mine.
-	if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 0, 1000, *unit.Player, unit.tilePos, &forestPos)) {
+	if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 1000, *unit.Player, unit.tilePos, &forestPos)) {
 		CommandResourceLoc(unit, forestPos, FlushCommands);
 		return 1;
 	}
