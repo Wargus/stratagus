@@ -403,7 +403,11 @@ static bool AiFindLumberMillPlace(const CUnit &worker, const CUnitType &type, co
 	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
 	terrainTraversal.Init(-1);
 
-	terrainTraversal.PushPos(startPos);
+	if (Map.Info.IsPointOnMap(startPos)) {
+		terrainTraversal.PushPos(startPos);
+	} else {
+		terrainTraversal.PushPos(worker.tilePos);
+	}
 
 	LumberMillPlaceFinder lumberMillPlaceFinder(worker, type, dpos);
 
