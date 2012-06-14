@@ -88,6 +88,7 @@ void TerrainTraversal::PushPos(const Vec2i &pos)
 {
 	if (IsVisited(pos) == false) {
 		m_queue.push(PosNode(pos, pos));
+		Set(pos, 1);
 	}
 }
 
@@ -100,6 +101,7 @@ void TerrainTraversal::PushNeighboor(const Vec2i &pos)
 
 		if (IsVisited(newPos) == false) {
 			m_queue.push(PosNode(newPos, pos));
+			Set(newPos, Get(pos) + 1);
 		}
 	}
 }
@@ -114,9 +116,9 @@ unsigned char TerrainTraversal::Get(const Vec2i& pos) const
 	return m_values[m_extented_width + 1 + pos.y * m_extented_width + pos.x];
 }
 
-unsigned char& TerrainTraversal::Get(const Vec2i& pos)
+void TerrainTraversal::Set(const Vec2i& pos, unsigned char value)
 {
-	return m_values[m_extented_width + 1 + pos.y * m_extented_width + pos.x];
+	m_values[m_extented_width + 1 + pos.y * m_extented_width + pos.x] = value;
 }
 
 /**

@@ -162,7 +162,6 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 {
 #if 0
 	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
-		terrainTraversal.Get(pos) = -1;
 		return VisitResult_DeadEnd;
 	}
 #endif
@@ -177,10 +176,8 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 		}
 	}
 	if (CanMoveToMask(pos, movemask)) { // reachable
-		terrainTraversal.Get(pos) = 1;
 		return VisitResult_Ok;
 	} else { // unreachable
-		terrainTraversal.Get(pos) = -1;
 		return VisitResult_DeadEnd;
 	}
 }
@@ -214,8 +211,10 @@ static int AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, cons
 				terrainTraversal.PushPos(it);
 			}
 		}
-	} else {
+	} else if (Map.Info.IsPointOnMap(startPos)) {
 		terrainTraversal.PushPos(startPos);
+	} else {
+		terrainTraversal.PushPos(worker.tilePos);
 	}
 
 	BuildingPlaceFinder buildingPlaceFinder(worker, type, checkSurround, dpos);
@@ -284,7 +283,6 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 {
 #if 0
 	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
-		terrainTraversal.Get(pos) = -1;
 		return VisitResult_DeadEnd;
 	}
 #endif
@@ -295,10 +293,8 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		}
 	}
 	if (CanMoveToMask(pos, movemask)) { // reachable
-		terrainTraversal.Get(pos) = 1;
 		return VisitResult_Ok;
 	} else { // unreachable
-		terrainTraversal.Get(pos) = -1;
 		return VisitResult_DeadEnd;
 	}
 }
@@ -366,7 +362,6 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 {
 #if 0
 	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
-		terrainTraversal.Get(pos) = -1;
 		return VisitResult_DeadEnd;
 	}
 #endif
@@ -376,10 +371,8 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 		}
 	}
 	if (CanMoveToMask(pos, movemask)) { // reachable
-		terrainTraversal.Get(pos) = 1;
 		return VisitResult_Ok;
 	} else { // unreachable
-		terrainTraversal.Get(pos) = -1;
 		return VisitResult_DeadEnd;
 	}
 }
@@ -387,16 +380,16 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 /**
 **  Find free building place for lumber mill. (flood fill version)
 **
-**  @param worker   Worker to build building.
-**  @param type     Type of building.
-**  @param startPos Start search X position (if == -1 then unit X pos used).
-**  @param dpos     OUT: Pointer for position returned.
+**  @param worker    Worker to build building.
+**  @param type      Type of building.
+**  @param startPos  Start search X position (if == -1 then unit X pos used).
+**  @param resultPos OUT: Pointer for position returned.
 **
 **  @return        True if place found, false if not found.
 **
 **  @todo          FIXME: This is slow really slow, using two flood fills, is not a perfect solution.
 */
-static bool AiFindLumberMillPlace(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, Vec2i *dpos)
+static bool AiFindLumberMillPlace(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, Vec2i *resultPos)
 {
 	TerrainTraversal terrainTraversal;
 
@@ -409,97 +402,20 @@ static bool AiFindLumberMillPlace(const CUnit &worker, const CUnitType &type, co
 		terrainTraversal.PushPos(worker.tilePos);
 	}
 
-	LumberMillPlaceFinder lumberMillPlaceFinder(worker, type, dpos);
+	LumberMillPlaceFinder lumberMillPlaceFinder(worker, type, resultPos);
 
 	return terrainTraversal.Run(lumberMillPlaceFinder);
 }
 
 static int AiFindMiningPlace(const CUnit &worker,
 							 const CUnitType &type,
-							 int nx, int ny,
-							 Vec2i *dpos,
-							 int resource)
+							 const Vec2i &startPos,
+							 int resource,
+							 Vec2i *resultPos)
 {
-	const Vec2i offset[] = {{0, -1}, { -1, 0}, {1, 0}, {0, 1}, { -1, -1}, {1, -1}, { -1, 1}, {1, 1}};
-	Vec2i pos;
-	Vec2i rpos;
-	int wp;
-	int ep;
-	unsigned char *m;
-	CUnit *mine;
-
-	pos.x = (nx != -1 ? nx : worker.tilePos.x);
-	pos.y = (ny != -1 ? ny : worker.tilePos.y);
-	int size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
-	Vec2i *points = new Vec2i[size];
-
-	//
-	// Make movement matrix. FIXME: can create smaller matrix.
-	//
-	unsigned char *morg = MakeMatrix();
-	int w = Map.Info.MapWidth + 2;
-	unsigned char *matrix = morg + w + w + 1;
-
-	points[0] = pos;
-	int rp = 0;
-	//if(worker->tilePos == pos)
-	matrix[pos.x + pos.y * w] = 1; // mark start point
-	ep = wp = 1; // start with one point
-
-	int mask = worker.Type->MovementMask;
-
-	//
-	// Pop a point from stack, push all neighbors which could be entered.
-	//
-	for (;;) {
-		while (rp != ep) {
-			rpos = points[rp];
-			for (int i = 0; i < 8; ++i) { // mark all neighbors
-				pos = rpos + offset[i];
-				m = matrix + pos.x + pos.y * w;
-				if (*m) { // already checked
-					continue;
-				}
-				//
-				// Look if there is a mine area
-				//
-				if ((mine = ResourceOnMap(pos, resource, false)) &&
-					AiFindBuildingPlace2(worker, type, mine->tilePos, mine, dpos, false)) {
-					delete[] morg;
-					delete[] points;
-					return 1;
-				}
-
-				if (CanMoveToMask(pos, mask)) { // reachable
-					*m = 1;
-					points[wp] = pos; // push the point
-					if (++wp >= size) { // round about
-						wp = 0;
-					}
-				} else { // unreachable
-					*m = 99;
-				}
-			}
-			if (++rp >= size) { // round about
-				rp = 0;
-			}
-		}
-
-		//
-		// Continue with next frame.
-		//
-		if (rp == wp) { // unreachable, no more points available
-			break;
-		}
-		ep = wp;
-	}
-
-	delete[] morg;
-	delete[] points;
-	return 0;
+	// look near (mine = ResourceOnMap(pos, resource, false) ?
+	return AiFindBuildingPlace2(worker, type, startPos, NULL, resultPos, false);
 }
-
-
 
 /**
 **  Find free building place.
@@ -535,7 +451,7 @@ int AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i 
 			if (type.GivesResource == i) {
 				if (resinfo && resinfo->RefineryHarvester) {
 					//Mine have to be build ONTOP resources
-					return AiFindMiningPlace(worker, type, nearPos.x, nearPos.y,  dpos, i);
+					return AiFindMiningPlace(worker, type, nearPos, i, dpos);
 				} else {
 					//Mine can be build without resource restrictions: solar panels, etc
 					const Vec2i &startPos = Map.Info.IsPointOnMap(nearPos) ? nearPos : worker.tilePos;

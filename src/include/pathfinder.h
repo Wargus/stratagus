@@ -155,9 +155,10 @@ public:
 
 	// Accept pos to be at one inside the real map
 	unsigned char Get(const Vec2i &pos) const;
-	unsigned char& Get(const Vec2i &pos);
 
 private:
+	void Set(const Vec2i &pos, unsigned char value);
+
 	struct PosNode
 	{
 		PosNode(const Vec2i &pos, const Vec2i &from) : pos(pos), from(from) {}

@@ -88,7 +88,6 @@ private:
 VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
-		terrainTraversal.Get(pos) = -1;
 		return VisitResult_DeadEnd;
 	}
 	// Look if found what was required.
@@ -99,14 +98,12 @@ VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal
 		return VisitResult_Finished;
 	}
 	if (Map.CheckMask(pos, resmask)) { // reachable
-		terrainTraversal.Get(pos) = terrainTraversal.Get(from) + 1;
 		if (terrainTraversal.Get(pos) <= maxDist) {
 			return VisitResult_Ok;
 		} else {
 			return VisitResult_DeadEnd;
 		}
 	} else { // unreachable
-		terrainTraversal.Get(pos) = -1;
 		return VisitResult_DeadEnd;
 	}
 }
