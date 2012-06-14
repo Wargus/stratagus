@@ -223,8 +223,6 @@ extern void FreePathfinder();
 
 /// Create a matrix for the old pathfinder
 extern unsigned char *CreateMatrix();
-/// Allocate a new matrix and initialize
-extern unsigned char *MakeMatrix();
 
 /// Returns the next element of the path
 extern int NextPathElement(CUnit &unit, short int *xdp, short int *ydp);

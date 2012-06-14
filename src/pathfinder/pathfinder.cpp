@@ -189,17 +189,6 @@ unsigned char *CreateMatrix()
 	return Matrix;
 }
 
-/**
-**  Allocate a new matrix and initialize
-*/
-unsigned char *MakeMatrix()
-{
-	unsigned char *matrix = new unsigned char[(Map.Info.MapWidth + 2) * (Map.Info.MapHeight + 3) + 2];
-	InitMatrix(matrix);
-
-	return matrix;
-}
-
 /*----------------------------------------------------------------------------
 --  PATH-FINDER USE
 ----------------------------------------------------------------------------*/
