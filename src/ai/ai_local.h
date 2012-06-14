@@ -406,7 +406,7 @@ extern void AiNewDepotRequest(CUnit &worker);
 // Buildings
 //
 /// Find nice building place
-extern int AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *dpos);
+extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos);
 
 //
 // Forces
