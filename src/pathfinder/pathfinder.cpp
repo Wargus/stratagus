@@ -125,6 +125,16 @@ bool TerrainTraversal::IsVisited(const Vec2i &pos) const
 	return Get(pos) != 0;
 }
 
+bool TerrainTraversal::IsReached(const Vec2i &pos) const
+{
+	return Get(pos) != 0 && Get(pos) != -1;
+}
+
+bool TerrainTraversal::IsInvalid(const Vec2i &pos) const
+{
+	return Get(pos) != -1;
+}
+
 TerrainTraversal::dataType TerrainTraversal::Get(const Vec2i& pos) const
 {
 	return m_values[m_extented_width + 1 + pos.y * m_extented_width + pos.x];

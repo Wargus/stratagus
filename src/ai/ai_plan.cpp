@@ -112,192 +112,6 @@ static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i &pos)
 	return enemy;
 }
 
-/**
-**  Mark all by transporter reachable water tiles.
-**
-**  @param unit    Transporter
-**  @param matrix  Water matrix.
-**
-**  @note only works for water transporters!
-*/
-static void AiMarkWaterTransporter(const CUnit &unit, unsigned char *matrix)
-{
-	const Vec2i offset[] = {{0, -1}, { -1, 0}, {1, 0}, {0, 1}, { -1, -1}, {1, -1}, { -1, 1}, {1, 1}};
-	Vec2i pos = unit.tilePos;
-	const int w = Map.Info.MapWidth + 2;
-	matrix += w + w + 1;
-	if (matrix[pos.x + pos.y * w]) { // already marked
-		DebugPrint("Done\n");
-		return;
-	}
-	const int size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
-	std::vector<Vec2i> points;
-	points.resize(size);
-
-	// Make movement matrix : Ignore all possible mobile units.
-	const int mask = unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
-	points[0] = pos;
-	int rp = 0;
-	matrix[pos.x + pos.y * w] = 66; // mark start point
-	int ep = 1;
-	int wp = 1; // start with one point
-
-	// Pop a point from stack, push all neightbors which could be entered.
-	for (;;) {
-		while (rp != ep) {
-			Vec2i rpos = points[rp];
-			for (int i = 0; i < 8; ++i) { // mark all neighbors
-				pos = rpos + offset[i];
-				unsigned char *m = matrix + pos.x + pos.y * w;
-				if (*m) { // already checked
-					continue;
-				}
-				if (CanMoveToMask(pos, mask)) { // reachable
-					*m = 66;
-					points[wp] = pos; // push the point
-					if (++wp >= size) { // round about
-						wp = 0;
-					}
-					/* Must be checked multiple
-					   } else { // unreachable
-					   *m=99;
-					 */
-				}
-			}
-			if (++rp >= size) { // round about
-				rp = 0;
-			}
-		}
-		// Continue with next frame.
-		if (rp == wp) { // unreachable, no more points available
-			break;
-		}
-		ep = wp;
-	}
-}
-
-/**
-**  Find possible targets.
-**
-**  @param unit    Attack.
-**  @param matrix  Water matrix.
-**  @param dpos    Attack point.
-**  @param ds      Attack state.
-**
-**  @return        True if target found.
-*/
-static bool AiFindTarget(const CUnit &unit, unsigned char *matrix, Vec2i *dpos, int *ds)
-{
-	const Vec2i offset[] = {{0, -1}, { -1, 0}, {1, 0}, {0, 1}, { -1, -1}, {1, -1}, { -1, 1}, {1, 1}};
-	struct p {
-		Vec2i pos;
-		unsigned char State;
-	} *points;
-	enum {
-		OnWater,
-		OnLand,
-		OnIsle
-	};
-	const int size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
-	points = new p[size];
-
-	Vec2i pos = unit.tilePos;
-
-	int w = Map.Info.MapWidth + 2;
-	// Ignore all possible mobile units.
-	const int mask = unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
-
-	points[0].pos = pos;
-	points[0].State = OnLand;
-	matrix += w + w + 1;
-	int rp = 0;
-	matrix[pos.x + pos.y * w] = 1; // mark start point
-	int ep = 1;
-	int wp = 1; // start with one point
-
-	// Pop a point from stack, push all neightbors which could be entered.
-	for (;;) {
-		while (rp != ep) {
-			const Vec2i rpos = points[rp].pos;
-			const unsigned char state = points[rp].State;
-			for (int i = 0; i < 8; ++i) { // mark all neighbors
-				pos = rpos + offset[i];
-				unsigned char *m = matrix + pos.x + pos.y * w;
-
-				if (state != OnWater) {
-					if (*m) { // already checked
-						if (state == OnLand && *m == 66) { // tansporter?
-							DebugPrint("->Water\n");
-							*m = 6;
-							points[wp].pos = pos; // push the point
-							points[wp].State = OnWater;
-							if (++wp >= size) { // round about
-								wp = 0;
-							}
-						}
-						continue;
-					}
-					// Check targets on tile?
-					// FIXME: the move code didn't likes a shore building as
-					//  target
-					if (EnemyOnMapTile(unit, pos)) {
-						DebugPrint("Target found %d,%d-%d\n" _C_ pos.x _C_ pos.y _C_ state);
-						*dpos = pos;
-						*ds = state;
-						delete[] points;
-						return 1;
-					}
-					if (CanMoveToMask(pos, mask)) { // reachable
-
-						*m = 1;
-						points[wp].pos = pos; // push the point
-						points[wp].State = state;
-						if (++wp >= size) { // round about
-							wp = 0;
-						}
-					} else { // unreachable
-						*m = 99;
-					}
-				} else { // On water
-					if (*m) { // already checked
-						if (*m == 66) { // tansporter?
-							*m = 6;
-							points[wp].pos = pos; // push the point
-							points[wp].State = OnWater;
-							if (++wp >= size) { // round about
-								wp = 0;
-							}
-						}
-						continue;
-					}
-					if (CanMoveToMask(pos, mask)) { // reachable
-						DebugPrint("->Land\n");
-						*m = 1;
-						points[wp].pos = pos; // push the point
-						points[wp].State = OnIsle;
-						if (++wp >= size) { // round about
-							wp = 0;
-						}
-					} else { // unreachable
-						*m = 99;
-					}
-				}
-			}
-			if (++rp >= size) { // round about
-				rp = 0;
-			}
-		}
-		// Continue with next frame.
-		if (rp == wp) { // unreachable, no more points available
-			break;
-		}
-		ep = wp;
-	}
-	delete[] points;
-	return false;
-}
-
-
 class WallFinder
 {
 public:
@@ -394,6 +208,125 @@ int AiFindWall(AiForce *force)
 	return 0;
 }
 
+
+class ReachableTerrainMarker
+{
+public:
+	ReachableTerrainMarker(const CUnit &unit) :
+		unit(unit),
+		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit))
+	{}
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+private:
+	const CUnit &unit;
+	int movemask;
+};
+
+VisitResult ReachableTerrainMarker::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+{
+#if 0
+	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
+		return VisitResult_DeadEnd;
+	}
+#endif
+	if (CanMoveToMask(pos, movemask)) { // reachable
+		return VisitResult_Ok;
+	} else { // unreachable
+		return VisitResult_DeadEnd;
+	}
+}
+
+static void MarkReacheableTerrainType(const CUnit &unit, TerrainTraversal *terrainTraversal)
+{
+	terrainTraversal->PushUnitPosAndNeighboor(unit);
+
+	ReachableTerrainMarker reachableTerrainMarker(unit);
+
+	terrainTraversal->Run(reachableTerrainMarker);
+}
+
+class EnemyFinderWithTransporter
+{
+public:
+	EnemyFinderWithTransporter(const CUnit &unit, const TerrainTraversal &terrainTransporter, Vec2i *resultPos) :
+		unit(unit),
+		terrainTransporter(terrainTransporter),
+		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
+		resultPos(resultPos)
+	{}
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+private:
+	bool IsAccessibleForTransporter(const Vec2i &pos) const;
+private:
+	const CUnit &unit;
+	const TerrainTraversal &terrainTransporter;
+	int movemask;
+	Vec2i *resultPos;
+};
+
+bool EnemyFinderWithTransporter::IsAccessibleForTransporter(const Vec2i &pos) const
+{
+	return terrainTransporter.IsReached(pos);
+}
+
+VisitResult EnemyFinderWithTransporter::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+{
+#if 0
+	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
+		return VisitResult_DeadEnd;
+	}
+#endif
+	if (EnemyOnMapTile(unit, pos) && CanMoveToMask(from, movemask)) {
+		DebugPrint("Target found %d,%d\n" _C_ pos.x _C_ pos.y);
+		*resultPos = pos;
+		return VisitResult_Finished;
+	}
+	if (CanMoveToMask(pos, movemask) || IsAccessibleForTransporter(pos)) { // reachable
+		return VisitResult_Ok;
+	} else { // unreachable
+		return VisitResult_DeadEnd;
+	}
+}
+
+static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTransporter, Vec2i *resultPos)
+{
+	TerrainTraversal terrainTraversal;
+
+	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	terrainTraversal.Init();
+
+	terrainTraversal.PushUnitPosAndNeighboor(unit);
+
+	EnemyFinderWithTransporter enemyFinderWithTransporter(unit, terrainTransporter, resultPos);
+
+	return terrainTraversal.Run(enemyFinderWithTransporter);
+}
+
+class IsAFreeTransporter
+{
+public:
+	bool operator () (const CUnit* unit) const
+	{
+		return unit->Type->CanMove() && unit->BoardCount < unit->Type->MaxOnBoard;
+	}
+};
+
+template <typename ITERATOR>
+int GetTotalBoardCapacity(ITERATOR begin, ITERATOR end)
+{
+	int totalBoardCapacity = 0;
+	IsAFreeTransporter isAFreeTransporter;
+
+	for (ITERATOR it = begin; it != end; ++it) {
+		const CUnit *unit = *it;
+
+		if (isAFreeTransporter(unit)) {
+			totalBoardCapacity += unit->Type->MaxOnBoard - unit->BoardCount;
+		}
+	}
+	return totalBoardCapacity;
+}
+
 /**
 **  Plan an attack with a force.
 **  We know, that we must use a transporter.
@@ -407,114 +340,89 @@ int AiFindWall(AiForce *force)
 */
 int AiForce::PlanAttack()
 {
-	DebugPrint("%d: Planning for force #%lu of player #%d\n"_C_ AiPlayer->Player->Index
-			   _C_(long unsigned int)(this - & (AiPlayer->Force[0])) _C_ AiPlayer->Player->Index);
+	CPlayer &player = *AiPlayer->Player;
+	DebugPrint("%d: Planning for force #%lu of player #%d\n"_C_ player.Index
+			   _C_(long unsigned int)(this - & (AiPlayer->Force[0])) _C_ player.Index);
 
-	unsigned char *watermatrix = CreateMatrix();
+	TerrainTraversal transporterTerrainTraversal;
 
-	// Transporter must be already assigned to the force.
-	// NOTE: finding free transporters was too much work for me.
-	int state = 1;
-	for (unsigned int i = 0; i < Size(); ++i) {
-		const CUnit &aiunit = *Units[i];
+	transporterTerrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	transporterTerrainTraversal.Init();
 
-		if (aiunit.Type->CanTransport()) {
-			DebugPrint("%d: Transporter #%d\n" _C_ AiPlayer->Player->Index _C_ UnitNumber(aiunit));
-			AiMarkWaterTransporter(aiunit, watermatrix);
-			state = 0;
+	CUnit *transporter = Units.find(IsAFreeTransporter());
+
+	if (transporter != NULL) {
+		DebugPrint("%d: Transporter #%d\n" _C_ player.Index _C_ UnitNumber(*transporter));
+		MarkReacheableTerrainType(*transporter, &transporterTerrainTraversal);
+	} else {
+		std::vector<CUnit *>::iterator it = std::find_if(player.UnitBegin(), player.UnitEnd(), IsAFreeTransporter());
+		if (it != player.UnitEnd()) {
+			transporter = *it;
+			MarkReacheableTerrainType(*transporter, &transporterTerrainTraversal);
+		} else {
+			DebugPrint("%d: No transporter available\n" _C_ player.Index);
+			return 0;
 		}
-	}
-
-	// No transport that belongs to the force.
-	CUnit *transporter = NULL;
-	if (state) {
-		for (int i = 0; i < AiPlayer->Player->GetUnitCount(); ++i) {
-			CUnit &unit = AiPlayer->Player->GetUnit(i);
-
-			if (unit.Type->CanTransport() && unit.IsIdle()) {
-				DebugPrint("%d: Assign any transporter\n" _C_ AiPlayer->Player->Index);
-				AiMarkWaterTransporter(unit, watermatrix);
-				// FIXME: can be the wrong transporter.
-				transporter = &unit;
-				state = 0;
-			}
-		}
-	}
-
-	if (state) { // Absolute no transporter
-		DebugPrint("%d: No transporter available\n" _C_ AiPlayer->Player->Index);
-		// FIXME: should tell the resource manager we need a transporter!
-		return 0;
 	}
 
 	// Find a land unit of the force.
 	// FIXME: if force is split over different places -> broken
 	CUnit *landUnit = CUnitTypeFinder(UnitTypeLand).Find(Units);
 	if (landUnit == NULL) {
-		DebugPrint("%d: No land unit in force\n" _C_ AiPlayer->Player->Index);
+		DebugPrint("%d: No land unit in force\n" _C_ player.Index);
 		return 0;
 	}
 
 	Vec2i pos = this->GoalPos;
 
-	if (AiFindTarget(*landUnit, watermatrix, &pos, &state)) {
-		if (state != 1) { // Need transporter.
-			if (transporter) {
-				DebugPrint("%d: Assign any transporter\n" _C_ AiPlayer->Player->Index);
-				if (transporter->GroupId) {
-					transporter->Player->Ai->Force[transporter->GroupId - 1].Remove(*transporter);
-				}
-				Insert(*transporter);
-				transporter->GroupId = transporter->Player->Ai->Force.getIndex(this) + 1;
+	if (AiFindTarget(*landUnit, transporterTerrainTraversal, &pos)) {
+		const int forceIndex = AiPlayer->Force.getIndex(this) + 1;
+
+		if (transporter->GroupId != forceIndex) {
+			DebugPrint("%d: Assign any transporter #%d\n" _C_ player.Index _C_ UnitNumber(*transporter));
+
+			if (transporter->GroupId) {
+				transporter->Player->Ai->Force[transporter->GroupId - 1].Remove(*transporter);
 			}
-			int totalBoardCapacity = 0;
-			CUnit *transporterAdded = transporter;
+			Insert(*transporter);
+			transporter->GroupId = forceIndex;
+		}
 
-			// Verify we have enough transporter.
-			// @note: Minimal check for unitType (flyers...)
-			for (unsigned int i = 0; i < Size(); ++i) {
-				CUnit &aiunit = *Units[i];
+		int totalBoardCapacity = GetTotalBoardCapacity(Units.begin(), Units.end());
 
-				if (aiunit.Type->CanTransport()) {
-					totalBoardCapacity += aiunit.Type->MaxOnBoard - aiunit.BoardCount;
-					transporter = &aiunit;
-				}
+		// Verify we have enough transporter.
+		// @note: Minimal check for unitType (flyers...)
+		for (unsigned int i = 0; i < Size(); ++i) {
+			CUnit &unit = *Units[i];
+
+			if (CanTransport(*transporter, unit)) {
+				totalBoardCapacity--;
 			}
-			for (unsigned int i = 0; i < Size(); ++i) {
-				CUnit &aiunit = *Units[i];
+		}
+		if (totalBoardCapacity < 0) { // Not enough transporter.
+			IsAFreeTransporter isAFreeTransporter;
+			// Add all other idle transporter.
+			for (int i = 0; i < player.GetUnitCount(); ++i) {
+				CUnit &unit = player.GetUnit(i);
 
-				if (CanTransport(*transporter, aiunit)) {
-					totalBoardCapacity--;
-				}
-			}
-			if (totalBoardCapacity < 0) { // Not enough transporter.
-				// Add all other idle transporter.
-				for (int i = 0; i < AiPlayer->Player->GetUnitCount(); ++i) {
-					CUnit &aiunit = AiPlayer->Player->GetUnit(i);
-
-					if (transporterAdded != &aiunit && aiunit.Type->CanTransport() && aiunit.IsIdle()) {
-						DebugPrint("%d: Assign another transporter.\n"_C_ AiPlayer->Player->Index);
-						if (aiunit.GroupId) {
-							aiunit.Player->Ai->Force[aiunit.GroupId - 1].Remove(aiunit);
-						}
-						Insert(aiunit);
-						aiunit.GroupId = aiunit.Player->Ai->Force.getIndex(this) + 1;
-						totalBoardCapacity += aiunit.Type->MaxOnBoard - aiunit.BoardCount;
-						if (totalBoardCapacity >= 0) {
-							break;
-						}
+				if (isAFreeTransporter(&unit) && unit.GroupId == 0 && unit.IsIdle()) {
+					DebugPrint("%d: Assign any transporter #%d\n" _C_ player.Index _C_ UnitNumber(unit));
+					Insert(unit);
+					unit.GroupId = forceIndex;
+					totalBoardCapacity += unit.Type->MaxOnBoard - unit.BoardCount;
+					if (totalBoardCapacity >= 0) {
+						break;
 					}
 				}
 			}
 		}
-		DebugPrint("%d: Can attack\n" _C_ AiPlayer->Player->Index);
+		DebugPrint("%d: Can attack\n" _C_ player.Index);
 		GoalPos = pos;
 		State = AiForceAttackingState_Boarding;
 		return 1;
 	}
 	return 0;
 }
-
 
 static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)
 {

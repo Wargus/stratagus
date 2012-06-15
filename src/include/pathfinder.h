@@ -155,6 +155,8 @@ public:
 	bool Run(T &context);
 
 	bool IsVisited(const Vec2i &pos) const;
+	bool IsReached(const Vec2i &pos) const;
+	bool IsInvalid(const Vec2i &pos) const;
 
 	// Accept pos to be at one inside the real map
 	dataType Get(const Vec2i &pos) const;
@@ -185,7 +187,7 @@ bool TerrainTraversal::Run(T &context)
 
 		switch (context.Visit(*this, posNode.pos, posNode.from)) {
 			case VisitResult_Finished: return true;
-			case VisitResult_DeadEnd: break;
+			case VisitResult_DeadEnd: Set(posNode.pos, -1); break;
 			case VisitResult_Ok: PushNeighboor(posNode.pos); break;
 			case VisitResult_Cancel: return false;
 		}
