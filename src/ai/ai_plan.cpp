@@ -297,6 +297,64 @@ static bool AiFindTarget(const CUnit &unit, unsigned char *matrix, Vec2i *dpos, 
 	return false;
 }
 
+
+class WallFinder
+{
+public:
+	WallFinder(const CUnit &unit, int maxDist, Vec2i* resultPos) :
+		unit(unit),
+		maxDist(maxDist),
+		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
+		resultPos(resultPos)
+	{}
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+private:
+	const CUnit &unit;
+	int maxDist;
+	int movemask;
+	Vec2i* resultPos;
+};
+
+VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+{
+#if 0
+	if (!unit.Player->AiEnabled && !Map.IsFieldExplored(*unit.Player, pos)) {
+		return VisitResult_DeadEnd;
+	}
+#endif
+	// Look if found what was required.
+	if (Map.WallOnMap(pos)) {
+		DebugPrint("Wall found %d, %d\n" _C_ pos.x _C_ pos.y);
+		if (resultPos) {
+			*resultPos = from;
+		}
+		return VisitResult_Finished;
+	}
+	if (Map.CheckMask(pos, movemask)) { // reachable
+		if (terrainTraversal.Get(pos) <= maxDist) {
+			return VisitResult_Ok;
+		} else {
+			return VisitResult_DeadEnd;
+		}
+	} else { // unreachable
+		return VisitResult_DeadEnd;
+	}
+}
+
+static bool FindWall(const CUnit &unit, int range, Vec2i *wallPos)
+{
+	TerrainTraversal terrainTraversal;
+
+	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	terrainTraversal.Init();
+
+	terrainTraversal.PushUnitPosAndNeighboor(unit);
+
+	WallFinder wallFinder(unit, range, wallPos);
+
+	return terrainTraversal.Run(wallFinder);
+}
+
 /**
 **  Find possible walls to target.
 **
@@ -306,8 +364,6 @@ static bool AiFindTarget(const CUnit &unit, unsigned char *matrix, Vec2i *dpos, 
 */
 int AiFindWall(AiForce *force)
 {
-	const Vec2i offset[] = {{0, -1}, { -1, 1}, {1, 0}, {0, 1}, { -1, -1}, {1, -1}, { -1, 1}, {1, 1}};
-
 	// Find a unit to use.  Best choice is a land unit with range 1.
 	// Next best choice is any land unit.  Otherwise just use the first.
 	CUnit *unit = force->Units[0];
@@ -320,67 +376,17 @@ int AiFindWall(AiForce *force)
 			}
 		}
 	}
-	Vec2i pos = unit->tilePos;
-	const int size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
-	std::vector<Vec2i> points;
-	points.resize(size);
+	const int maxRange = 1000;
+	Vec2i wallPos;
 
-	unsigned char *matrix = CreateMatrix();
-	const int w = Map.Info.MapWidth + 2;
-	matrix += w + w + 1;
-
-	points[0] = pos;
-	int rp = 0;
-	matrix[pos.x + pos.y * w] = 1; // mark start point
-	int ep = 1;
-	int wp = 1; // start with one point
-	const int mask = unit->Type->MovementMask;
-	Vec2i dest = { -1, -1};
-
-	// Pop a point from stack, push all neighbors which could be entered.
-	for (; dest.x == -1;) {
-		while (rp != ep && dest.x == -1) {
-			Vec2i rpos = points[rp];
-			for (int i = 0; i < 8; ++i) { // mark all neighbors
-				pos = rpos + offset[i];
-				unsigned char *m = matrix + pos.x + pos.y * w;
-				if (*m) {
-					continue;
-				}
-				// Check for a wall
-				if (Map.WallOnMap(pos)) {
-					DebugPrint("Wall found %d,%d\n" _C_ pos.x _C_ pos.y);
-					dest = pos;
-					break;
-				}
-				if (CanMoveToMask(pos, mask)) { // reachable
-					*m = 1;
-					points[wp] = pos; // push the point
-					if (++wp >= size) { // round about
-						wp = 0;
-					}
-				} else { // unreachable
-					*m = 99;
-				}
-			}
-			if (++rp >= size) { // round about
-				rp = 0;
-			}
-		}
-		// Continue with next frame.
-		if (rp == wp) { // unreachable, no more points available
-			break;
-		}
-		ep = wp;
-	}
-	if (dest.x != -1) {
+	if (FindWall(*unit, maxRange, &wallPos)) {
 		force->State = AiForceAttackingState_Waiting;
 		for (unsigned int i = 0; i < force->Units.size(); ++i) {
 			CUnit &aiunit = *force->Units[i];
 			if (aiunit.Type->CanAttack) {
-				CommandAttack(aiunit, dest, NULL, FlushCommands);
+				CommandAttack(aiunit, wallPos, NULL, FlushCommands);
 			} else {
-				CommandMove(aiunit, dest, FlushCommands);
+				CommandMove(aiunit, wallPos, FlushCommands);
 			}
 		}
 		return 1;
