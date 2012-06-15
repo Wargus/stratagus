@@ -339,6 +339,10 @@
 #include "player.h"
 #endif
 
+#ifndef __MISSILE_H__
+#include "missile.h"
+#endif
+
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
@@ -676,6 +680,10 @@ unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 		if (IsInvisibile(player)) {
 			return false;
 		}
+		// Don't attack revealers
+		if (this->Type->Revealer) {
+			return false;
+		}
 		if ((player.Type == PlayerComputer && !this->Type->PermanentCloak)
 			|| IsVisible(player) || IsVisibleOnRadar(player)) {
 			return IsAliveOnMap();
@@ -960,7 +968,7 @@ extern void DestroyAllInside(CUnit &source);
 /// Calculate some value to measure the unit's priority for AI
 extern int ThreatCalculate(const CUnit &unit, const CUnit &dest);
 /// Hit unit with damage, if destroyed give attacker the points
-extern void HitUnit(CUnit *attacker, CUnit &target, int damage);
+extern void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile = NULL);
 
 /// Calculate the distance from current view point to coordinate
 extern int ViewPointDistance(const Vec2i &pos);

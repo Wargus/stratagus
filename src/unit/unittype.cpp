@@ -368,7 +368,7 @@ static bool SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int pl
 	if (stats == type.DefaultStat) {
 		return false;
 	}
-	file.printf("DefineUnitStats(\"%s\", %d,\n  ", type.Ident.c_str(), plynr);
+	file.printf("DefineUnitStats(\"%s\", %d, {\n  ", type.Ident.c_str(), plynr);
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		file.printf("\"%s\", {Value = %d, Max = %d, Increase = %d%s},\n  ",
 					UnitTypeVar.VariableNameLookup[i], stats.Variables[i].Value,
@@ -382,14 +382,14 @@ static bool SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int pl
 		}
 		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.Costs[i]);
 	}
-	file.printf("\"storing\", {");
+	file.printf("},\n\"storing\", {");
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
 		if (i) {
 			file.printf(" ");
 		}
 		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.Storing[i]);
 	}
-	file.printf("})\n");
+	file.printf("}})\n");
 	return true;
 }
 

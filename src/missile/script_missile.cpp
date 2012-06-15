@@ -116,6 +116,18 @@ void MissileType::Load(lua_State *l)
 			this->FiredSound.Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "ImpactSound")) {
 			this->ImpactSound.Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "ChangeVariable")) {
+			const int index = UnitTypeVar.VariableNameLookup[LuaToString(l, -1)];// User variables
+			if (index == -1) {
+				fprintf(stderr, "Bad variable name '%s'\n", LuaToString(l, -1));
+				Exit(1);
+				return;
+			}
+			this->ChangeVariable = index;
+		} else if (!strcmp(value, "ChangeAmount")) {
+			this->ChangeAmount = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "ChangeMax")) {
+			this->ChangeMax = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Class")) {
 			const char *className = LuaToString(l, -1);
 			unsigned int i = 0;

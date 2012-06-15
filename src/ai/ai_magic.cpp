@@ -37,6 +37,7 @@
 #include "unittype.h"
 #include "unit.h"
 #include "spells.h"
+#include "actions.h"
 #include "ai_local.h"
 
 /*----------------------------------------------------------------------------
@@ -55,8 +56,8 @@ void AiCheckMagic()
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = player.GetUnit(i);
 
-		// Check only magic units
-		if (unit.Type->CanCastSpell) {
+		// Check only idle magic units
+		if (unit.Type->CanCastSpell && unit.CurrentAction() != UnitActionSpellCast) {
 			for (unsigned int j = 0; j < SpellTypeTable.size(); ++j) {
 				// Check if we can cast this spell. SpellIsAvailable checks for upgrades.
 				if (unit.Type->CanCastSpell[j] && SpellIsAvailable(player, j)

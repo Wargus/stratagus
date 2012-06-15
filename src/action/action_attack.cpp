@@ -477,7 +477,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 			return;
 		}
 		// Save current command to come back.
-		COrder *savedOrder = this->Clone();
+		COrder *savedOrder = COrder::NewActionAttack(unit, this->goalPos);
 
 		if (unit.StoreOrder(savedOrder) == false) {
 			delete savedOrder;

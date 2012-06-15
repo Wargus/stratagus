@@ -682,7 +682,7 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 		} else {
 			Assert(missile.SourceUnit != NULL);
 			HitUnit(missile.SourceUnit, goal,
-					CalculateDamage(*missile.SourceUnit, goal) / splash);
+					CalculateDamage(*missile.SourceUnit, goal) / splash, &missile);
 		}
 	}
 }
@@ -1091,8 +1091,8 @@ void InitMissileTypes()
 **  Constructor.
 */
 MissileType::MissileType(const std::string &ident) :
-	Ident(ident), Transparency(0),
-	DrawLevel(0), SpriteFrames(0), NumDirections(0),
+	Ident(ident), Transparency(0), DrawLevel(0), 
+	SpriteFrames(0), NumDirections(0), ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
 	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
 	AlwaysFire(false), Class(), NumBounces(0), StartDelay(0), Sleep(0), Speed(0),
 	Range(0), SplashFactor(0), ImpactParticle(NULL), G(NULL)

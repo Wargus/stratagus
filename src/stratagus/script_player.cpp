@@ -840,7 +840,7 @@ static int CclSetPlayerData(lua_State *l)
 
 		const std::string res = LuaToString(l, 3);
 		const int resId = GetResourceIdByName(l, res.c_str());
-		p->SetResource(resId, LuaToNumber(l, 4), true);
+		p->SetResource(resId, LuaToNumber(l, 4), STORE_BUILDING);
 		// } else if (!strcmp(data, "UnitTypesCount")) {
 		// } else if (!strcmp(data, "AiEnabled")) {
 		// } else if (!strcmp(data, "TotalNumUnits")) {

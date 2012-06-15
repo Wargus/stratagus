@@ -812,18 +812,18 @@ int CPlayer::GetUnitCount() const
 **  Gets the player resource.
 **
 **  @param resource  Resource to get.
-**  @param store     Resource type to get
+**  @param type      Storing type
 **
-**  @note Resource types: 0 - overall store, 1 - store buildings, 2 - both
+**  @note Storing types: 0 - overall store, 1 - store buildings, 2 - both
 */
 int CPlayer::GetResource(int resource, int type)
 {
 	switch (type) {
-		case 0:
+		case STORE_OVERALL:
 			return this->Resources[resource];
-		case 1:
+		case STORE_BUILDING:
 			return this->StoredResources[resource];
-		case 2:
+		case STORE_BOTH:
 			return this->Resources[resource] + this->StoredResources[resource];
 		default:
 			DebugPrint("Wrong resource type\n");
@@ -844,6 +844,9 @@ void CPlayer::ChangeResource(int resource, int value, bool store)
 		int fromStore = std::min(this->StoredResources[resource], abs(value));
 		this->StoredResources[resource] -= fromStore;
 		this->Resources[resource] -= abs(value) - fromStore;
+		if (this->Resources[resource] < 0) {
+			this->Resources[resource] = 0;
+		}
 	} else {
 		if (store && this->MaxResources[resource] != -1) {
 			this->StoredResources[resource] += std::min(value, this->MaxResources[resource] - this->StoredResources[resource]);
@@ -858,13 +861,21 @@ void CPlayer::ChangeResource(int resource, int value, bool store)
 **
 **  @param resource  Resource to change.
 **  @param value     How many of this resource.
-**  @param store     If true, sets the building store resources, else the overall resources.
+**  @param type      Resource types: 0 - overall store, 1 - store buildings, 2 - both
 */
-void CPlayer::SetResource(int resource, int value, bool store)
+void CPlayer::SetResource(int resource, int value, int type)
 {
-	if (store && this->MaxResources[resource] != -1) {
+	if (type == STORE_BOTH) {
+		if (this->MaxResources[resource] != -1) {
+			const int toStore = std::min(0, value - this->Resources[resource]);
+			this->StoredResources[resource] = std::min(toStore, this->MaxResources[resource]);
+			this->Resources[resource] = std::max(0, value - toStore);
+		} else {
+			this->Resources[resource] = value;
+		}
+	} else if (type == STORE_BUILDING && this->MaxResources[resource] != -1) {
 		this->StoredResources[resource] = std::min(value, this->MaxResources[resource]);
-	} else {
+	} else if (type == STORE_OVERALL) {
 		this->Resources[resource] = value;
 	}
 }

@@ -360,6 +360,9 @@ public:
 	int DrawLevel;             /// Level to draw missile at
 	int SpriteFrames;          /// number of sprite frames in graphic
 	int NumDirections;         /// number of directions missile can face
+	int ChangeVariable;        /// variable to change
+	int ChangeAmount;          /// how many to change
+	bool ChangeMax;            /// modify the max, if value will exceed it
 
 	/// @todo FiredSound defined but not used!
 	SoundConfig FiredSound;    /// fired sound

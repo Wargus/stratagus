@@ -46,6 +46,14 @@
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
+--  Definitons
+----------------------------------------------------------------------------*/
+
+#define STORE_OVERALL 0
+#define STORE_BUILDING 1
+#define STORE_BOTH 2
+
+/*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
@@ -135,7 +143,7 @@ public:
 	/// Adds/subtracts some resources to/from the player store
 	void ChangeResource(int resource, int value, bool store = false);
 	/// Set a resource of the player
-	void SetResource(int resource, int value, bool store = false);
+	void SetResource(int resource, int value, int type = STORE_OVERALL);
 	/// Check, if there enough resources for action.
 	bool CheckResource(int resource, int value);
 

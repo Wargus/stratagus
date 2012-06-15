@@ -1179,16 +1179,11 @@ static int CclDefineUnitType(lua_State *l)
 */
 static int CclDefineUnitStats(lua_State *l)
 {
-	const int args = lua_gettop(l);
-	int j = 0;
-
-	CUnitType *type = UnitTypeByIdent(LuaToString(l, j + 1));
+	CUnitType *type = UnitTypeByIdent(LuaToString(l, 1));
+	const int playerId = LuaToNumber(l, 2);
+	
 	Assert(type);
-	++j;
-
-	int playerId = LuaToNumber(l, j + 1);
 	Assert(playerId < PlayerMax);
-	++j;
 
 	CUnitStats *stats = &type->Stats[playerId];
 	if (!stats->Variables) {
@@ -1196,51 +1191,61 @@ static int CclDefineUnitStats(lua_State *l)
 	}
 
 	// Parse the list: (still everything could be changed!)
-	for (; j < args; ++j) {
-		const char *value = LuaToString(l, j + 1);
+	const int args = lua_rawlen(l, 3);
+	for (int j = 0; j < args; ++j) {
+		lua_rawgeti(l, 3, j + 1);
+		const char *value = LuaToString(l, -1);
+		lua_pop(l, 1);
 		++j;
 
 		if (!strcmp(value, "costs")) {
-			if (!lua_istable(l, j + 1)) {
+			lua_rawgeti(l, 3, j + 1);
+			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			const int subargs = lua_rawlen(l, j + 1);
+			const int subargs = lua_rawlen(l, -1);
 
 			for (int k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
+				lua_rawgeti(l, 3, j + 1);
+				lua_rawgeti(l, -1, k + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
 				const int resId = GetResourceIdByName(l, value);
-				lua_rawgeti(l, j + 1, k + 1);
+				lua_rawgeti(l, -1, k + 1);
 				stats->Costs[resId] = LuaToNumber(l, -1);
+				lua_pop(l, 1);
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "storing")) {
-			if (!lua_istable(l, j + 1)) {
+			lua_rawgeti(l, 3, j + 1);
+			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			const int subargs = lua_rawlen(l, j + 1);
+			const int subargs = lua_rawlen(l, -1);
 
 			for (int k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
+				lua_rawgeti(l, 3, j + 1);
+				lua_rawgeti(l, -1, k + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
 				const int resId = GetResourceIdByName(l, value);
-				lua_rawgeti(l, j + 1, k + 1);
+				lua_rawgeti(l, -1, k + 1);
 				stats->Storing[resId] = LuaToNumber(l, -1);
+				lua_pop(l, 1);
 				lua_pop(l, 1);
 			}
 		} else {
 			int i = UnitTypeVar.VariableNameLookup[value];// User variables
 			if (i != -1) { // valid index
-				if (lua_istable(l, j + 1)) {
-					DefineVariableField(l, stats->Variables + i, j + 1);
+				lua_rawgeti(l, 3, j + 1);
+				if (lua_istable(l, -1)) {
+					DefineVariableField(l, stats->Variables + i, -1);
 				} else if (lua_isnumber(l, -1)) {
 					stats->Variables[i].Enable = 1;
-					stats->Variables[i].Value = LuaToNumber(l, j + 1);
-					stats->Variables[i].Max = LuaToNumber(l, j + 1);
+					stats->Variables[i].Value = LuaToNumber(l, -1);
+					stats->Variables[i].Max = LuaToNumber(l, -1);
 				} else { // Error
 					LuaError(l, "incorrect argument for the variable in unittype");
 				}

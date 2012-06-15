@@ -959,7 +959,7 @@ void UnitLost(CUnit &unit)
 				const int newMaxValue = player.MaxResources[i] - type.Stats[player.Index].Storing[i];
 
 				player.MaxResources[i] = std::max(0, newMaxValue);
-				player.SetResource(i, player.StoredResources[i], true);
+				player.SetResource(i, player.StoredResources[i], STORE_BUILDING);
 			}
 		}
 		//  Handle income improvements, look if a player loses a building
@@ -2695,8 +2695,9 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 **  @param attacker    Unit that attacks.
 **  @param target      Unit that is hit.
 **  @param damage      How many damage to take.
+**  @param missile     Which missile took the damage.
 */
-void HitUnit(CUnit *attacker, CUnit &target, int damage)
+void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 {
 	// Can now happen by splash damage
 	// Multiple places send x/y as damage, which may be zero
@@ -2834,6 +2835,16 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage)
 		type->OnHit->pushPreamble();
 		type->OnHit->pushInteger(slot);
 		type->OnHit->run();
+	}
+
+	// Increase variables
+	if (missile && missile->Type->ChangeVariable != -1) {
+		const int var = missile->Type->ChangeVariable;
+		target.Variable[var].Enable = 1;
+		target.Variable[var].Value += missile->Type->ChangeAmount;
+		if (target.Variable[var].Value > target.Variable[var].Max && missile->Type->ChangeMax) {
+			target.Variable[var].Max = target.Variable[var].Value;
+		}
 	}
 
 	// Show impact missiles

@@ -39,6 +39,8 @@
 
 #include "stratagus.h"
 
+#include "action/action_spellcast.h"
+
 #include "animation.h"
 
 #include "animation/animation_attack.h"
@@ -66,6 +68,7 @@
 #include "iolib.h"
 #include "player.h"
 #include "script.h"
+#include "spells.h"
 #include "unit.h"
 #include "unittype.h"
 
@@ -176,6 +179,22 @@ int ParseAnimInt(const CUnit *unit, const char *parseint)
 			return goal->Variable[index].Enable;
 		} else if (!strcmp(next + 1, "Percent")) {
 			return goal->Variable[index].Value * 100 / goal->Variable[index].Max;
+		}
+		return 0;
+	} else if ((s[0] == 'b') && unit != NULL) { //unit bool flag detected
+		const int index = UnitTypeVar.BoolFlagNameLookup[cur];// User bool flags
+		if (index == -1) {
+			fprintf(stderr, "Bad bool-flag name '%s'\n", cur);
+			Exit(1);
+			return 0;
+		}
+		return goal->Type->BoolFlag[index].value;
+	} else if ((s[0] == 's') && unit != NULL) { //spell type detected
+		Assert(goal->CurrentAction() == UnitActionSpellCast);
+		const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
+		const SpellType &spell = order.GetSpell();
+		if (!strcmp(spell.Ident.c_str(), cur)) {
+			return 1;
 		}
 		return 0;
 	} else if (s[0] == 'p' && unit != NULL) { //player variable detected

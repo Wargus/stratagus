@@ -138,14 +138,14 @@ static void SetPlayerData(int player, const char *prop, const char *arg, int val
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		Players[player].SetResource(resId, value);
+		Players[player].SetResource(resId, value, STORE_BOTH);
 	} else if (!strcmp(prop, "StoredResources")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		Players[player].SetResource(resId, value, true);
+		Players[player].SetResource(resId, value, STORE_BUILDING);
 	} else if (!strcmp(prop, "UnitLimit")) {
 		Players[player].UnitLimit = value;
 	} else if (!strcmp(prop, "BuildingLimit")) {
