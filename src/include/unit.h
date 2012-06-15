@@ -935,7 +935,7 @@ extern void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *conta
 extern void DropOutAll(const CUnit &unit);
 
 /// Return the rule used to build this building.
-extern CBuildRestrictionOnTop *OnTopDetails(const std::vector<CBuildRestriction *> &restr, const CUnit &unit, const CUnitType *parent);
+extern CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent);
 /// @todo more docu
 extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos);
 /// @todo more docu

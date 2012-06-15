@@ -55,11 +55,11 @@
 **
 **  @return        the BuildingRestrictionDetails
 */
-CBuildRestrictionOnTop *OnTopDetails(const std::vector<CBuildRestriction *> &restr,
-									 const CUnit &unit, const CUnitType *parent)
+CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent)
 {
 
-	for (std::vector<CBuildRestriction *>::const_iterator i = restr.begin(); i != restr.end(); ++i) {
+	for (std::vector<CBuildRestriction *>::const_iterator i = unit.Type->BuildingRules.begin();
+		i != unit.Type->BuildingRules.end(); ++i) {
 		CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*i);
 
 		if (ontopb) {
@@ -76,7 +76,7 @@ CBuildRestrictionOnTop *OnTopDetails(const std::vector<CBuildRestriction *> &res
 
 		if (andb) {
 			for (std::vector<CBuildRestriction *>::iterator j = andb->_or_list.begin(); j != andb->_or_list.end(); ++j) {
-				CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*i);
+				CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*j);
 				if (ontopb) {
 					if (!parent) {
 						// Guess this is right
@@ -291,7 +291,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 			CBuildRestriction *rule = type.BuildingRules[i];
 			CUnit *ontoptarget = NULL;
 			// All checks processed, did we really have success
-			if (rule->Check(unit, type, pos, ontoptarget)) {
+			if (rule->Check(NoUnitP, type, pos, ontoptarget)) {
 				// We passed a full ruleset return
 				if (unit == NULL) {
 					return ontoptarget ? ontoptarget : (CUnit *)1;

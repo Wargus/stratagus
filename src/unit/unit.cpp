@@ -983,7 +983,7 @@ void UnitLost(CUnit &unit)
 	DebugPrint("%d: Lost %s(%d)\n" _C_ player.Index _C_ type.Ident.c_str() _C_ UnitNumber(unit));
 
 	// Destroy resource-platform, must re-make resource patch.
-	CBuildRestrictionOnTop *b = OnTopDetails(unit.Type->BuildingRules, unit, NULL);
+	CBuildRestrictionOnTop *b = OnTopDetails(unit, NULL);
 	if (b != NULL) {
 		if (b->ReplaceOnDie && (type.GivesResource && unit.ResourcesHeld != 0)) {
 			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, &Players[PlayerNumNeutral]);
