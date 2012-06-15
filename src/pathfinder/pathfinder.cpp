@@ -68,20 +68,19 @@ void TerrainTraversal::SetSize(unsigned int width, unsigned int height)
 	m_height = height;
 }
 
-void TerrainTraversal::Init(unsigned char borderValue)
+void TerrainTraversal::Init()
 {
-	const unsigned int insideValue = 0;
 	const unsigned int height = m_height;
 	const unsigned int width = m_extented_width - 2;
 	const unsigned int width_ext = m_extented_width;
 
-	memset(&m_values[0], borderValue, width_ext);
+	memset(&m_values[0], '\xFF', width_ext * sizeof(dataType));
 	for (unsigned i = 1; i < 1 + height; ++i) {
-		m_values[i * width_ext] = borderValue;
-		memset(&m_values[i * width_ext + 1], insideValue, width);
-		m_values[i * width_ext + width + 1] = borderValue;
+		m_values[i * width_ext] = -1;
+		memset(&m_values[i * width_ext + 1], '\0', width * sizeof(dataType));
+		m_values[i * width_ext + width + 1] = -1;
 	}
-	memset(&m_values[(height + 1) * width_ext], borderValue, width_ext);
+	memset(&m_values[(height + 1) * width_ext], '\xFF', width_ext * sizeof(dataType));
 }
 
 void TerrainTraversal::PushPos(const Vec2i &pos)
@@ -106,17 +105,32 @@ void TerrainTraversal::PushNeighboor(const Vec2i &pos)
 	}
 }
 
+void TerrainTraversal::PushUnitPosAndNeighboor(const CUnit& unit)
+{
+	const CUnit *startUnit = GetFirstContainer(unit);
+	const Vec2i offset = {1, 1};
+	const Vec2i extraTileSize = {startUnit->Type->TileWidth - 1, startUnit->Type->TileHeight - 1};
+	const Vec2i start = startUnit->tilePos - offset;
+	const Vec2i end = startUnit->tilePos + extraTileSize + offset;
+
+	for (Vec2i it = start; it.y != end.y; ++it.y) {
+		for (it.x = start.x; it.x != end.x; ++it.x) {
+			PushPos(it);
+		}
+	}
+}
+
 bool TerrainTraversal::IsVisited(const Vec2i &pos) const
 {
 	return Get(pos) != 0;
 }
 
-unsigned char TerrainTraversal::Get(const Vec2i& pos) const
+TerrainTraversal::dataType TerrainTraversal::Get(const Vec2i& pos) const
 {
 	return m_values[m_extented_width + 1 + pos.y * m_extented_width + pos.x];
 }
 
-void TerrainTraversal::Set(const Vec2i& pos, unsigned char value)
+void TerrainTraversal::Set(const Vec2i& pos, TerrainTraversal::dataType value)
 {
 	m_values[m_extented_width + 1 + pos.y * m_extented_width + pos.x] = value;
 }

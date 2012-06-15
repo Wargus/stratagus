@@ -190,19 +190,10 @@ static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, con
 	TerrainTraversal terrainTraversal;
 
 	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.Init(-1);
+	terrainTraversal.Init();
 
 	if (startUnit != NULL) {
-		const Vec2i offset = {1, 1};
-		const Vec2i extraTileSize = {startUnit->Type->TileWidth - 1, startUnit->Type->TileHeight - 1};
-		const Vec2i start = startUnit->tilePos - offset;
-		const Vec2i end = startUnit->tilePos + extraTileSize + offset;
-
-		for (Vec2i it = start; it.y != end.y; ++it.y) {
-			for (it.x = start.x; it.x != end.x; ++it.x) {
-				terrainTraversal.PushPos(it);
-			}
-		}
+		terrainTraversal.PushUnitPosAndNeighboor(*startUnit);
 	} else {
 		Assert(Map.Info.IsPointOnMap(startPos));
 		terrainTraversal.PushPos(startPos);
@@ -321,7 +312,7 @@ static int AiFindHallPlace(const CUnit &worker,
 	TerrainTraversal terrainTraversal;
 
 	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.Init(-1);
+	terrainTraversal.Init();
 
 	Assert(Map.Info.IsPointOnMap(startPos));
 	terrainTraversal.PushPos(startPos);
@@ -383,7 +374,7 @@ static bool AiFindLumberMillPlace(const CUnit &worker, const CUnitType &type, co
 	TerrainTraversal terrainTraversal;
 
 	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.Init(-1);
+	terrainTraversal.Init();
 
 	Assert(Map.Info.IsPointOnMap(startPos));
 	terrainTraversal.PushPos(startPos);

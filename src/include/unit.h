@@ -946,8 +946,8 @@ extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const V
 extern int ExtraDeathIndex(const char *death);
 
 /// Find resource
-extern CUnit *UnitFindResource(const CUnit &unit, const Vec2i &startPos, int range,
-							   int resource, bool check_usage = false, const CUnit *destu = NULL);
+extern CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range,
+							   int resource, bool check_usage = false, const CUnit *deposit = NULL);
 
 /// Find nearest deposit
 extern CUnit *FindDeposit(const CUnit &unit, int range, int resource);

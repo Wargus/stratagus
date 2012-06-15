@@ -859,7 +859,7 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
 	// Try to find the nearest depot first.
 	CUnit *depot = FindDeposit(unit, 1000, resource);
 	// Find a resource to harvest from.
-	CUnit *mine = UnitFindResource(unit, depot ? depot->tilePos : unit.tilePos, 1000, resource, true);
+	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true);
 
 	if (mine) {
 		CommandResource(unit, *mine, FlushCommands);

@@ -142,11 +142,14 @@ enum VisitResult
 class TerrainTraversal
 {
 public:
+	typedef short unsigned int dataType;
+public:
 	void SetSize(unsigned int width, unsigned int height);
-	void Init(unsigned char borderValue);
+	void Init();
 
 	void PushPos(const Vec2i &pos);
 	void PushNeighboor(const Vec2i &pos);
+	void PushUnitPosAndNeighboor(const CUnit& unit);
 
 	template <typename T>
 	bool Run(T &context);
@@ -154,10 +157,10 @@ public:
 	bool IsVisited(const Vec2i &pos) const;
 
 	// Accept pos to be at one inside the real map
-	unsigned char Get(const Vec2i &pos) const;
+	dataType Get(const Vec2i &pos) const;
 
 private:
-	void Set(const Vec2i &pos, unsigned char value);
+	void Set(const Vec2i &pos, dataType value);
 
 	struct PosNode
 	{
@@ -167,7 +170,7 @@ private:
 	};
 
 private:
-	std::vector<unsigned char> m_values;
+	std::vector<dataType> m_values;
 	std::queue<PosNode> m_queue;
 	unsigned int m_extented_width;
 	unsigned int m_height;

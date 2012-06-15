@@ -114,7 +114,7 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 	TerrainTraversal terrainTraversal;
 
 	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.Init(-1);
+	terrainTraversal.Init();
 
 	Assert(Map.CheckMask(startPos, resmask));
 	terrainTraversal.PushPos(startPos);
@@ -495,7 +495,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 		// Find an alternative, but don't look too far.
 		this->goalPos.x = -1;
 		this->goalPos.y = -1;
-		if ((goal = UnitFindResource(unit, unit.tilePos, 15, this->CurrentResource, unit.Player->AiEnabled))) {
+		if ((goal = UnitFindResource(unit, unit, 15, this->CurrentResource, unit.Player->AiEnabled))) {
 			this->State = SUB_START_RESOURCE;
 			this->SetGoal(goal);
 		} else {
@@ -586,8 +586,7 @@ void COrder_Resource::LoseResource(CUnit &unit, const CUnit &source)
 
 	// Continue to harvest if we aren't fully loaded
 	if (resinfo.HarvestFromOutside && unit.ResourcesHeld < resinfo.ResourceCapacity) {
-		const Vec2i pos = unit.tilePos;
-		CUnit *goal = UnitFindResource(unit, pos, 15, this->CurrentResource, 1);
+		CUnit *goal = UnitFindResource(unit, unit, 15, this->CurrentResource, 1);
 
 		if (goal) {
 			CUnit *mine = this->Resource.Mine;
@@ -629,7 +628,7 @@ void COrder_Resource::LoseResource(CUnit &unit, const CUnit &source)
 	this->goalPos.x = -1;
 	this->goalPos.y = -1;
 	//use depot as goal
-	depot = UnitFindResource(unit, unit.tilePos, 15, this->CurrentResource, unit.Player->AiEnabled);
+	depot = UnitFindResource(unit, unit, 15, this->CurrentResource, unit.Player->AiEnabled);
 	if (depot) {
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Found another resource.\n"
 				   _C_ unit.Player->Index _C_ unit.Slot);
@@ -1020,8 +1019,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 	} else {
 		CUnit *mine = this->Resource.Mine;
 		const int range = (mine ? 15 : 1000);
-		const Vec2i pos = mine ? mine->tilePos : unit.tilePos;
-		CUnit *goal = UnitFindResource(unit, pos, range, this->CurrentResource, unit.Player->AiEnabled, depot);
+		CUnit *goal = UnitFindResource(unit, mine ? *mine : unit, range, this->CurrentResource, unit.Player->AiEnabled, depot);
 
 		if (goal) {
 			if (depot) {
@@ -1038,6 +1036,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			this->SetGoal(goal);
 			this->goalPos.x = this->goalPos.y = -1;
 		} else {
+			const Vec2i& pos = mine ? mine->tilePos : unit.tilePos;
 			DebugPrint("%d: Worker %d report: [%d,%d] Resource gone near [%d,%d] in range %d. Sit and play dumb.\n"
 					   _C_ unit.Player->Index _C_ unit.Slot
 					   _C_ unit.tilePos.x _C_ unit.tilePos.y

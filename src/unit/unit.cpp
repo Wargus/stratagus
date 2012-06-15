@@ -2065,7 +2065,7 @@ bool FindTerrainType(int movemask, int resmask, int range,
 	TerrainTraversal terrainTraversal;
 
 	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.Init(-1);
+	terrainTraversal.Init();
 
 	terrainTraversal.PushPos(startPos);
 
@@ -2179,11 +2179,121 @@ CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource)
 	return depot;
 }
 
+class ResourceUnitFinder
+{
+public:
+	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit** resultMine) :
+		worker(worker),
+		resinfo(*worker.Type->ResInfo[resource]),
+		deposit(deposit),
+		movemask(worker.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
+		resource(resource),
+		maxRange(maxRange),
+		check_usage(check_usage),
+		res_finder(resource, 1),
+		resultMine(resultMine)
+	{
+		bestCost.SetToMax();
+		*resultMine = NULL;
+	}
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+private:
+	bool MineIsUsable(const CUnit &mine) const;
+
+	struct ResourceUnitFinder_Cost
+	{
+	public:
+		void SetFrom(const CUnit &mine, const CUnit *deposit, bool check_usage);
+		bool operator < (const ResourceUnitFinder_Cost &rhs) const
+		{
+			if (assigned != rhs.assigned) {
+				return assigned < rhs.assigned;
+			} else if (waiting != rhs.waiting) {
+				return waiting < rhs.waiting;
+			} else {
+				return distance < rhs.distance;
+			}
+		}
+		void SetToMax() { assigned = waiting = distance = UINT_MAX; }
+		bool IsMin() const { return assigned == 0 && waiting == 0 && distance == 0; }
+
+	public:
+		unsigned int assigned;
+		unsigned int waiting;
+		unsigned int distance;
+	};
+
+private:
+	const CUnit &worker;
+	const ResourceInfo &resinfo;
+	const CUnit *deposit;
+	unsigned int movemask;
+	int resource;
+	int maxRange;
+	bool check_usage;
+	CResourceFinder res_finder;
+	ResourceUnitFinder_Cost bestCost;
+	CUnit** resultMine;
+};
+
+bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
+{
+	return mine.Type->CanHarvest && mine.ResourcesHeld
+		&& (resinfo.HarvestFromOutside
+			|| mine.Player->Index == PlayerMax - 1
+			|| mine.Player == worker.Player
+			|| (worker.IsAllied(mine) && mine.IsAllied(worker)));
+}
+
+void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, const CUnit *deposit, bool check_usage)
+{
+	distance = deposit ? mine.MapDistanceTo(*deposit) : 0;
+	if (check_usage) {
+		assigned = mine.Resource.Assigned - mine.Type->MaxOnBoard;
+		waiting = GetNumWaitingWorkers(mine);
+	} else {
+		assigned = 0;
+		waiting = 0;
+	}
+}
+
+VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+{
+	if (!worker.Player->AiEnabled && !Map.IsFieldExplored(*worker.Player, pos)) {
+		return VisitResult_DeadEnd;
+	}
+
+	CUnit* mine = res_finder.Find(Map.Field(pos));
+
+	if (mine && mine != *resultMine && MineIsUsable(*mine)) {
+		ResourceUnitFinder::ResourceUnitFinder_Cost cost;
+
+		cost.SetFrom(*mine, deposit, check_usage);
+		if (cost < bestCost) {
+			*resultMine = mine;
+
+			if (cost.IsMin()) {
+				return VisitResult_Finished;
+			}
+			bestCost = cost;
+		}
+	}
+	if (CanMoveToMask(pos, movemask)) { // reachable
+		if (terrainTraversal.Get(pos) < maxRange) {
+			return VisitResult_Ok;
+		} else {
+			return VisitResult_DeadEnd;
+		}
+	} else { // unreachable
+		return VisitResult_DeadEnd;
+	}
+}
+
 /**
 **  Find Resource.
 **
 **  @param unit        The unit that wants to find a resource.
-**  @param startPos    Find closest unit from this location
+**  @param startUnit   Find closest unit from this location
 **  @param range       Maximum distance to the resource.
 **  @param resource    The resource id.
 **
@@ -2192,177 +2302,26 @@ CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource)
 **
 **  @return            NoUnitP or resource unit
 */
-CUnit *UnitFindResource(const CUnit &unit, const Vec2i &startPos, int range, int resource,
-						bool check_usage, const CUnit *destu)
+CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, int resource,
+						bool check_usage, const CUnit *deposit)
 {
-	const Vec2i offsets[] = {{0, 0}, {0, -1}, { -1, 0}, {1, 0}, {0, 1}, { -1, -1}, {1, -1}, { -1, 1}, {1, 1}};
-	int n = 0;
-	Vec2i pos = startPos;
-	Vec2i dest = pos;
-	int bestd = 99999, bestw = 99999, besta = 99999;
-	const ResourceInfo &resinfo = *unit.Type->ResInfo[resource];
-	const int size = std::min<int>(Map.Info.MapWidth * Map.Info.MapHeight / 4, range * range * 5);
-	std::vector<Vec2i> points;
-
-	points.resize(size);
-
-	// Find the nearest gold depot
-	if (!destu) {
-		destu = FindDepositNearLoc(*unit.Player, pos, range, resource);
-	}
-	if (destu) {
-		NearestOfUnit(*destu, pos, &dest);
+	if (!deposit) { // Find the nearest depot
+		deposit = FindDepositNearLoc(*unit.Player, startUnit.tilePos, range, resource);
 	}
 
-	// Make movement matrix. FIXME: can create smaller matrix.
-	unsigned char *matrix = CreateMatrix();
-	const int w = Map.Info.MapWidth + 2;
-	matrix += w + w + 1;
-	//  Unit movement mask
-	unsigned int mask = unit.Type->MovementMask;
-	//  Ignore all units along the way. Might seem wierd, but otherwise
-	//  peasants would lock at a mine with a lot of workers.
-	mask &= ~(MapFieldLandUnit | MapFieldSeaUnit | MapFieldAirUnit);
-	points[0] = pos;
-	int rp = 0;
-	if (unit.tilePos == pos) {
-		matrix[pos.x + pos.y * w] = 1; // mark start point
-	}
-	int wp = 1;
-	int ep = 1; // start with one point
-	int cdist = 0; // current distance is 0
-	CUnit *bestmine = NULL;
+	TerrainTraversal terrainTraversal;
 
-	CResourceFinder res_finder(resource, 1);
+	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	terrainTraversal.Init();
 
-	// Pop a point from stack, push all neighbors which could be entered.
-	for (;;) {
-		while (rp != ep) {
-			Vec2i rpos = points[rp];
-			for (int i = 0; i < 9; ++i) { // mark all neighbors
-				pos = rpos + offsets[i];
-				unsigned char *m = matrix + pos.x + pos.y * w;
-				if (*m) { // already checked
-					continue;
-				}
+	terrainTraversal.PushUnitPosAndNeighboor(startUnit);
 
-				/*
-				 *  Check if unexplored for non AI players only.
-				 *  Our exploration code is too week for real
-				 *  competition with human players.
-				 */
-				if (!unit.Player->AiEnabled && !Map.IsFieldExplored(*unit.Player, pos)) { // Unknown.
-					continue;
-				}
+	CUnit *resultMine = NULL;
 
-				// Look if there is a mine
-				CUnit* mine = res_finder.Find(Map.Field(pos));
-				if (mine && mine->Type->CanHarvest && mine->ResourcesHeld
-					&& (resinfo.HarvestFromOutside
-						|| mine->Player->Index == PlayerMax - 1
-						|| mine->Player == unit.Player
-						|| (unit.IsAllied(*mine) && mine->IsAllied(unit)))
-				   ) {
-					if (destu) {
-						bool better = (mine != bestmine);
+	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine);
 
-						if (better) {
-							n = std::max<int>(MyAbs(dest.x - pos.x), MyAbs(dest.y - pos.y));
-							if (check_usage && mine->Type->MaxOnBoard) {
-								int assign = mine->Resource.Assigned - mine->Type->MaxOnBoard;
-								int waiting = (assign > 0 ? GetNumWaitingWorkers(*mine) : 0);
-								if (bestmine != NoUnitP) {
-									if (besta >= assign) {
-										if (assign > 0) {
-											waiting = GetNumWaitingWorkers(*mine);
-											if (besta == assign) {
-												if (bestw < waiting) {
-													better = false;
-												} else {
-													if (bestw == waiting && bestd < n) {
-														better = false;
-													}
-												}
-											}
-										} else {
-											if (besta == assign && bestd < n) {
-												better = false;
-											}
-										}
-									} else {
-										if (assign > 0 || bestd < n) {
-											better = false;
-										}
-									}
-								}
-								if (better) {
-									besta = assign;
-									bestw = waiting;
-								}
-							} else {
-								if (bestmine != NoUnitP && bestd < n) {
-									better = false;
-								}
-							}
-						}
-						if (better) {
-							bestd = n;
-							bestmine = mine;
-						}
-						*m = 99;
-					} else {
-						if (check_usage && mine->Type->MaxOnBoard) {
-							bool better = (mine != bestmine
-										   //During construction Data.Resource is corrupted
-										   && mine->CurrentAction() != UnitActionBuilt);
-							if (better) {
-								int assign = mine->Resource.Assigned - mine->Type->MaxOnBoard;
-								int waiting = (assign > 0 ? GetNumWaitingWorkers(*mine) : 0);
-								if (assign < besta ||
-									(assign == besta && waiting < bestw)) {
-									bestd = n;
-									besta = assign;
-									bestw = waiting;
-									bestmine = mine;
-								}
-							}
-							*m = 99;
-						} else { // no goal take the first
-							return mine;
-						}
-					}
-				}
-
-				if (CanMoveToMask(pos, mask)) { // reachable
-					*m = 1;
-					points[wp] = pos; // push the point
-					if (++wp >= size) { // round about
-						wp = 0;
-					}
-					if (wp == ep) {
-						//  We are out of points, give up!
-						break;
-					}
-				} else { // unreachable
-					*m = 99;
-				}
-			}
-			if (++rp >= size) { // round about
-				rp = 0;
-			}
-		}
-		// Take best of this frame, if any.
-		if (bestd != 99999) {
-			return bestmine;
-		}
-		++cdist;
-		if (rp == wp || cdist >= range) { // unreachable, no more points available
-			break;
-		}
-		// Continue with next set.
-		ep = wp;
-	}
-	return NoUnitP;
+	terrainTraversal.Run(resourceUnitFinder);
+	return resultMine;
 }
 
 /**
