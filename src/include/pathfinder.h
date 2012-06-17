@@ -51,7 +51,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <queue>
-#include "Vec2i.h"
+#include "vec2i.h"
 
 class CUnit;
 class CFile;
