@@ -50,7 +50,7 @@ Package: stratagus-dbg
 Section: debug
 Priority: extra
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, stratagus (= ${binary:Version})
+Depends: ${misc:Depends}, ${shlibs:Depends}, libc6-dbg, stratagus (= ${binary:Version})
 Description: Strategy Gaming Engine (debugging symbols)
  Stratagus is a free cross-platform real-time strategy gaming engine.
  It includes support for playing over Internet/LAN, or playing vs.
