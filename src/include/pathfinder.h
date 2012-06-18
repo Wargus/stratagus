@@ -226,9 +226,6 @@ extern void InitPathfinder();
 /// Free the pathfinder
 extern void FreePathfinder();
 
-/// Create a matrix for the old pathfinder
-extern unsigned char *CreateMatrix();
-
 /// Returns the next element of the path
 extern int NextPathElement(CUnit &unit, short int *xdp, short int *ydp);
 /// Return distance to unit.

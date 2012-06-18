@@ -145,17 +145,6 @@ void TerrainTraversal::Set(const Vec2i& pos, TerrainTraversal::dataType value)
 	m_values[m_extented_width + 1 + pos.y * m_extented_width + pos.x] = value;
 }
 
-/**
-**  The matrix is used to generated the paths.
-**
-**  0:      Nothing must check if usable.
-**  1-8:    Field on the path 1->2->3->4->5...
-**  88:     Marks the possible goal fields.
-**  98:     Marks map border, for faster limits checks.
-*/
-static unsigned char Matrix[(MaxMapWidth + 2) * (MaxMapHeight + 3) + 2];  /// Path matrix
-
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -174,43 +163,6 @@ void InitPathfinder()
 void FreePathfinder()
 {
 	FreeAStar();
-}
-
-/**
-**  Initialize a matrix
-**
-**  @note  Double border for ships/flyers.
-**
-**    98 98 98 98 98
-**    98 98 98 98 98
-**    98          98
-**    98          98
-**    98 98 98 98 98
-*/
-static void InitMatrix(unsigned char *matrix)
-{
-	const char border = 98;
-	const char valid = 0;
-	const unsigned int w = Map.Info.MapWidth;
-	const unsigned int h = Map.Info.MapHeight;
-	const unsigned int offset = 2 * (w + 2);
-	memset(matrix, border, offset);
-
-	for (unsigned i = 0; i < h; ++i) {   // mark left and right border
-		matrix[offset + i * (w + 2)] = border;
-		memset(matrix + offset + i * (w + 2) + 1, valid, w);
-		matrix[offset + i * (w + 2) + w + 1] = border;
-	}
-	memset(matrix + offset + h * (w + 2), border, w + 2);
-}
-
-/**
-**  Create empty movement matrix.
-*/
-unsigned char *CreateMatrix()
-{
-	InitMatrix(Matrix);
-	return Matrix;
 }
 
 /*----------------------------------------------------------------------------
