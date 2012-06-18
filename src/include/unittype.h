@@ -930,8 +930,8 @@ public:
 		std::string *Files;
 		int Num;
 		Mng **Mngs;
-		int CurrMng;
-		int NumIterations;
+		mutable int CurrMng;
+		mutable int NumIterations;
 	} Portrait;
 #endif
 	MissileConfig Missile;                           /// Missile weapon

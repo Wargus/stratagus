@@ -316,7 +316,6 @@ void Mng::Draw(int x, int y)
 */
 int Mng::Load(const std::string &name)
 {
-	mng_retcode myretcode;
 	char buf[PATH_MAX];
 
 	LibraryFileName(name.c_str(), buf, sizeof(buf));
@@ -339,7 +338,7 @@ int Mng::Load(const std::string &name)
 
 	mng_read(handle);
 	if (surface && iteration != 0x7fffffff) {
-		myretcode = mng_display(handle);
+		mng_display(handle);
 	}
 
 	if (!surface || iteration == 0x7fffffff) {
