@@ -418,6 +418,10 @@ public:
 		return Field(pos.x, pos.y);
 	}
 
+	// return true if there is the specified (terrain) resource on map.
+	bool IsTerrainResourceOnMap(const Vec2i &pos, int resource) const;
+	bool IsTerrainResourceOnMap(const Vec2i &pos) const;
+
 	//
 	// Wall
 	//
@@ -473,42 +477,6 @@ public:
 		Assert(Info.IsPointOnMap(pos));
 		return CoastOnMap(getIndex(pos));
 	}
-
-
-	/// Returns true, if forest on the map tile field
-	bool ForestOnMap(const unsigned int index) const {
-		return CheckMask(index, MapFieldForest);
-	};
-
-	/**
-	**  Forest on map tile.
-	**
-	**  @param pos  map tile position.
-	**
-	**  @return    True if forest, false otherwise.
-	*/
-	bool ForestOnMap(const Vec2i &pos) const {
-		Assert(Info.IsPointOnMap(pos));
-		return ForestOnMap(getIndex(pos));
-	}
-
-
-	/// Returns true, if rock on the map tile field
-	bool RockOnMap(const unsigned int index) const {
-		return CheckMask(index, MapFieldRocks);
-	};
-
-	/**
-	**  Rock on map tile.
-	**
-	**  @param pos  map tile position.
-	**
-	**  @return    True if rock, false otherwise.
-	*/
-	bool RockOnMap(const Vec2i &pos) const {
-		Assert(Info.IsPointOnMap(pos));
-		return RockOnMap(getIndex(pos));
-	};
 
 	//UnitCache
 
@@ -578,7 +546,6 @@ public:
 		SelectFixed(minPos, maxPos, units, pred);
 	}
 
-
 	template <typename Pred>
 	CUnit *Find_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, Pred pred) {
 		Assert(Info.IsPointOnMap(ltPos));
@@ -598,8 +565,6 @@ public:
 		return NULL;
 	}
 
-
-
 	template <typename Pred>
 	CUnit *Find_If(const Vec2i &ltPos, const Vec2i &rbPos, Pred pred) {
 		Vec2i minPos = ltPos;
@@ -609,6 +574,41 @@ public:
 		return Find_IfFixed(minPos, maxPos, pred);
 	}
 private:
+
+	/// Returns true, if forest on the map tile field
+	bool ForestOnMap(const unsigned int index) const {
+		return CheckMask(index, MapFieldForest);
+	}
+
+	/**
+	**  Forest on map tile.
+	**
+	**  @param pos  map tile position.
+	**
+	**  @return    True if forest, false otherwise.
+	*/
+	bool ForestOnMap(const Vec2i &pos) const {
+		Assert(Info.IsPointOnMap(pos));
+		return ForestOnMap(getIndex(pos));
+	}
+
+	/// Returns true, if rock on the map tile field
+	bool RockOnMap(const unsigned int index) const {
+		return CheckMask(index, MapFieldRocks);
+	}
+
+	/**
+	**  Rock on map tile.
+	**
+	**  @param pos  map tile position.
+	**
+	**  @return    True if rock, false otherwise.
+	*/
+	bool RockOnMap(const Vec2i &pos) const {
+		Assert(Info.IsPointOnMap(pos));
+		return RockOnMap(getIndex(pos));
+	}
+
 	/// Build tables for fog of war
 	void InitFogOfWar();
 

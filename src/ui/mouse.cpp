@@ -228,20 +228,21 @@ static bool DoRightButton_Harvest(CUnit &unit, CUnit *dest, const Vec2i &pos, in
 				return true;
 			}
 		} else {
-			// FIXME: support harvesting more types of terrain.
-			for (int res = 0; res < MaxCosts; ++res) {
-				if (type.ResInfo[res]
-					&& type.ResInfo[res]->TerrainHarvester
-					&& Map.IsFieldExplored(*unit.Player, pos)
-					&& Map.ForestOnMap(pos)
-					&& ((unit.CurrentResource != res)
-						|| (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity))) {
-					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAcknowledging);
-						acknowledged = 1;
+			if (Map.IsFieldExplored(*unit.Player, pos)) {
+				// FIXME: support harvesting more types of terrain.
+				for (int res = 0; res < MaxCosts; ++res) {
+					if (type.ResInfo[res]
+						&& type.ResInfo[res]->TerrainHarvester
+						&& Map.IsTerrainResourceOnMap(pos, res)
+						&& ((unit.CurrentResource != res)
+							|| (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity))) {
+						if (!acknowledged) {
+							PlayUnitSound(unit, VoiceAcknowledging);
+							acknowledged = 1;
+						}
+						SendCommandResourceLoc(unit, pos, flush);
+						return true;
 					}
-					SendCommandResourceLoc(unit, pos, flush);
-					return true;
 				}
 			}
 		}
@@ -406,7 +407,7 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 		return true;
 	}
 	// FIXME: support harvesting more types of terrain.
-	if (Map.IsFieldExplored(*unit.Player, pos) && Map.ForestOnMap(pos)) {
+	if (Map.IsFieldExplored(*unit.Player, pos) && Map.IsTerrainResourceOnMap(pos)) {
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAcknowledging);
 			acknowledged = 1;
@@ -1151,7 +1152,7 @@ static int SendResource(const Vec2i &pos)
 				&& dest->Type->CanHarvest
 				&& (dest->Player == unit.Player || dest->Player->Index == PlayerMax - 1)) {
 				dest->Blink = 4;
-				SendCommandResource(*Selected[i], *dest, flush);
+				SendCommandResource(unit, *dest, flush);
 				ret = 1;
 				continue;
 			} else {
@@ -1159,8 +1160,8 @@ static int SendResource(const Vec2i &pos)
 					if (unit.Type->ResInfo[res]
 						&& unit.Type->ResInfo[res]->TerrainHarvester
 						&& Map.IsFieldExplored(*unit.Player, pos)
-						&& Map.ForestOnMap(pos)
-						&& Selected[i]->ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
+						&& Map.IsTerrainResourceOnMap(pos, res)
+						&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
 						&& (unit.CurrentResource != res || unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity)) {
 						SendCommandResourceLoc(unit, pos, flush);
 						ret = 1;
@@ -1179,7 +1180,7 @@ static int SendResource(const Vec2i &pos)
 				ret = 1;
 				continue;
 			}
-			if (Map.IsFieldExplored(*unit.Player, pos) && Map.ForestOnMap(pos)) {
+			if (Map.IsFieldExplored(*unit.Player, pos) && Map.IsTerrainResourceOnMap(pos)) {
 				SendCommandResourceLoc(unit, pos, flush);
 				ret = 1;
 				continue;

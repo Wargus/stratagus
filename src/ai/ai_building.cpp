@@ -325,9 +325,10 @@ static int AiFindHallPlace(const CUnit &worker,
 class LumberMillPlaceFinder
 {
 public:
-	LumberMillPlaceFinder(const CUnit &worker, const CUnitType &type, Vec2i* resultPos) :
+	LumberMillPlaceFinder(const CUnit &worker, const CUnitType &type, int resource, Vec2i* resultPos) :
 		worker(worker), type(type),
 		movemask(worker.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
+		resource(resource),
 		resultPos(resultPos)
 	{}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
@@ -335,6 +336,7 @@ private:
 	const CUnit &worker;
 	const CUnitType &type;
 	unsigned int movemask;
+	int resource;
 	Vec2i* resultPos;
 };
 
@@ -345,7 +347,7 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 		return VisitResult_DeadEnd;
 	}
 #endif
-	if (Map.ForestOnMap(pos)) {
+	if (Map.IsTerrainResourceOnMap(pos, resource)) {
 		if (AiFindBuildingPlace2(worker, type, pos, NULL, true, resultPos)) {
 			return VisitResult_Finished;
 		}
@@ -362,6 +364,7 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 **
 **  @param worker    Worker to build building.
 **  @param type      Type of building.
+**  @param resource  resource terrain to be near.
 **  @param startPos  Start search X position (if == -1 then unit X pos used).
 **  @param resultPos OUT: Pointer for position returned.
 **
@@ -369,7 +372,7 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 **
 **  @todo          FIXME: This is slow really slow, using two flood fills, is not a perfect solution.
 */
-static bool AiFindLumberMillPlace(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, Vec2i *resultPos)
+static bool AiFindLumberMillPlace(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, int resource, Vec2i *resultPos)
 {
 	TerrainTraversal terrainTraversal;
 
@@ -379,7 +382,7 @@ static bool AiFindLumberMillPlace(const CUnit &worker, const CUnitType &type, co
 	Assert(Map.Info.IsPointOnMap(startPos));
 	terrainTraversal.PushPos(startPos);
 
-	LumberMillPlaceFinder lumberMillPlaceFinder(worker, type, resultPos);
+	LumberMillPlaceFinder lumberMillPlaceFinder(worker, type, resource, resultPos);
 
 	return terrainTraversal.Run(lumberMillPlaceFinder);
 }
@@ -421,7 +424,7 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
 		//Depots
 		if (type.CanStore[i]) {
 			if (resinfo && resinfo->TerrainHarvester) {
-				return AiFindLumberMillPlace(worker, type, startPos, resultPos);
+				return AiFindLumberMillPlace(worker, type, startPos, i, resultPos);
 			} else {
 				return AiFindHallPlace(worker, type, startPos, i, resultPos);
 			}

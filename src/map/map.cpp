@@ -182,6 +182,25 @@ PixelPos CMap::TilePosToMapPixelPos_Center(const Vec2i &tilePos) const
 	return TilePosToMapPixelPos_TopLeft(tilePos) + PixelTileSize / 2;
 }
 
+bool CMap::IsTerrainResourceOnMap(const Vec2i &pos, int resource) const
+{
+	// TODO: Hard coded stuff.
+	if (resource == WoodCost) {
+		return ForestOnMap(pos);
+	}
+	return false;
+}
+
+bool CMap::IsTerrainResourceOnMap(const Vec2i &pos) const
+{
+	for (int i = 0; i != MaxCosts; ++i) {
+		if (IsTerrainResourceOnMap(pos, i)) {
+			return true;
+		}
+	}
+	return false;
+}
+
 /**
 **  Wall on map tile.
 **
