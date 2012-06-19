@@ -615,8 +615,9 @@ if(NOT WITH_RENDERER)
 endif()
 
 # Install paths
-set(BINDIR "bin" CACHE PATH "Where to install binaries")
-set(SBINDIR "sbin" CACHE PATH "Where to install metaserver binary")
+set(BINDIR "bin" CACHE PATH "Where to install user binaries")
+set(SBINDIR "sbin" CACHE PATH "Where to install system binaries")
+set(GAMEDIR "games" CACHE PATH "Where to install games binaries")
 set(DOCDIR "share/doc/stratagus" CACHE PATH "Sets the doc directory to a non-default location.")
 set(MANDIR "share/man/man6" CACHE PATH "Sets the man directory to a non-default location.")
 set(STRATAGUS_HEADERS "include" CACHE PATH "Where to install stratagus headers.")
@@ -990,7 +991,7 @@ endif()
 
 ########### install files ###############
 
-install(TARGETS stratagus DESTINATION ${BINDIR})
+install(TARGETS stratagus DESTINATION ${GAMEDIR})
 install(TARGETS png2stratagus DESTINATION ${BINDIR})
 
 if(SQLITE_FOUND)
