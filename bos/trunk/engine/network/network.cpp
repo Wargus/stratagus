@@ -1050,7 +1050,7 @@ void NetworkEvent(void)
 			{
 				unsigned int slot = ntohs(nc->Unit);
 
-				if (slot >= 0 && slot < UnitSlotFree &&
+				if (slot < UnitSlotFree &&
 						(UnitSlots[slot]->Player->Index == player ||
 							Players[player].IsTeamed(UnitSlots[slot]))) {
 					validCommand = true;
