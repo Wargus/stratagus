@@ -1254,7 +1254,7 @@ static void ShowPatchInfo(const CPatch *patch, int mapX, int mapY)
 	const CMapField *field = Map.Field(mapX, mapY);
 	o << _("Field") << " (" << mapX << ", " << mapY << ")";
 	
-	bool comma = false;
+	int comma = 0;
 	Assert(!(field->Flags & MapFieldTransparent));
 	if (field->Flags & MapFieldUnpassable)
 	{
