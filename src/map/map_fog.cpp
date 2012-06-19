@@ -35,18 +35,13 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stratagus.h"
-#include "player.h"
-#include "unittype.h"
-#include "unit.h"
+
 #include "map.h"
-#include "tileset.h"
+
 #include "minimap.h"
-#include "font.h"
+#include "player.h"
+#include "tileset.h"
 #include "ui.h"
 #include "../video/intern_video.h"
 
@@ -318,7 +313,6 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 */
 void UpdateFogOfWarChange()
 {
-
 	DebugPrint("::UpdateFogOfWarChange\n");
 	//
 	//  Mark all explored fields as visible again.

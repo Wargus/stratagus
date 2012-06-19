@@ -36,8 +36,6 @@
 
 #include "stratagus.h"
 
-#include <stdlib.h>
-
 #include "map.h"
 #include "unit.h"
 

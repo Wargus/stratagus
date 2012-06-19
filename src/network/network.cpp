@@ -213,27 +213,24 @@
 
 #include "stratagus.h"
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <stddef.h>
-#include <string.h>
 #include <list>
 
+#include "network.h"
+
+#include "actions.h"
+#include "commands.h"
+#include "interface.h"
+#include "map.h"
+#include "master.h"
+#include "netconnect.h"
 #include "net_lowlevel.h"
+#include "player.h"
+#include "replay.h"
+#include "sound.h"
 #include "unit.h"
 #include "unit_manager.h"
 #include "unittype.h"
-#include "map.h"
-#include "actions.h"
-#include "player.h"
-#include "network.h"
-#include "netconnect.h"
-#include "commands.h"
-#include "replay.h"
-#include "interface.h"
-#include "results.h"
-#include "sound.h"
-#include "master.h"
 
 
 //----------------------------------------------------------------------------

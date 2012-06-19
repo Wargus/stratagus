@@ -33,19 +33,17 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stratagus.h"
-#include "unittype.h"
+
 #include "player.h"
-#include "script.h"
-#include "ai.h"
-#include "unit.h"
+
 #include "actions.h"
+#include "ai.h"
 #include "commands.h"
 #include "map.h"
+#include "script.h"
+#include "unittype.h"
+#include "unit.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

@@ -32,16 +32,14 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stratagus.h"
+
 #include "spells.h"
+
+#include "missile.h"
 #include "script_sound.h"
 #include "sound.h"
 #include "script.h"
-#include "missile.h"
 #include "unittype.h"
 #include "upgrade.h"
 

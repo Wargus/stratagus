@@ -33,9 +33,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <math.h>
 
 #include "stratagus.h"
@@ -1091,7 +1088,7 @@ void InitMissileTypes()
 **  Constructor.
 */
 MissileType::MissileType(const std::string &ident) :
-	Ident(ident), Transparency(0), DrawLevel(0), 
+	Ident(ident), Transparency(0), DrawLevel(0),
 	SpriteFrames(0), NumDirections(0), ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
 	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
 	AlwaysFire(false), Class(), NumBounces(0), StartDelay(0), Sleep(0), Speed(0),

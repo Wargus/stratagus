@@ -46,21 +46,18 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stratagus.h"
 
-#include "unittype.h"
-#include "upgrade.h"
 #include "spells.h"
-#include "sound.h"
-#include "missile.h"
+
+#include "actions.h"
 #include "map.h"
+#include "missile.h"
+#include "sound.h"
 #include "tileset.h"
 #include "ui.h"
-#include "actions.h"
+#include "unittype.h"
+#include "upgrade.h"
 
 /*----------------------------------------------------------------------------
 -- Variables

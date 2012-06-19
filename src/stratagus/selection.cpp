@@ -34,24 +34,18 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stratagus.h"
-#include "unittype.h"
+
+#include "commands.h"
+#include "interface.h"
+#include "iolib.h"
+#include "map.h"
+#include "network.h"
 #include "player.h"
+#include "ui.h"
+#include "unittype.h"
 #include "unit.h"
 #include "unit_manager.h"
-#include "interface.h"
-#include "map.h"
-#include "tileset.h"
-#include "ui.h"
-#include "commands.h"
-#include "network.h"
-#include "iolib.h"
-
-#include "script.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

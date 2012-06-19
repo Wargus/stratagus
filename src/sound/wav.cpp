@@ -35,10 +35,6 @@
 
 #include "stratagus.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
 #include "SDL.h"
 #include "SDL_endian.h"
 

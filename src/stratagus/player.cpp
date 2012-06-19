@@ -33,26 +33,22 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <stdarg.h>
 
 #include "stratagus.h"
-#include "video.h"
+
+#include "player.h"
+
+#include "ai.h"
+#include "iolib.h"
+#include "map.h"
+#include "network.h"
+#include "netconnect.h"
 #include "sound.h"
 #include "unitsound.h"
 #include "unittype.h"
-#include "player.h"
 #include "unit.h"
-#include "map.h"
-#include "ai.h"
-#include "network.h"
-#include "netconnect.h"
-#include "interface.h"
-#include "iolib.h"
 #include "ui.h"
-#include "actions.h"
 
 /*----------------------------------------------------------------------------
 --  Documentation

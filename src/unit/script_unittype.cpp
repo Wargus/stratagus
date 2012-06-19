@@ -32,9 +32,6 @@
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #include "stratagus.h"
 
@@ -1181,7 +1178,7 @@ static int CclDefineUnitStats(lua_State *l)
 {
 	CUnitType *type = UnitTypeByIdent(LuaToString(l, 1));
 	const int playerId = LuaToNumber(l, 2);
-	
+
 	Assert(type);
 	Assert(playerId < PlayerMax);
 

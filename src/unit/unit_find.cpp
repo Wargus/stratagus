@@ -33,9 +33,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
 #include <limits.h>
 
 #include "stratagus.h"

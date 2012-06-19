@@ -37,9 +37,6 @@
 
 #ifdef USE_MIKMOD // {
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include "sound.h"
 #include "sound_server.h"
 #include "iolib.h"

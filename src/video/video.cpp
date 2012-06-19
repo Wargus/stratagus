@@ -80,23 +80,19 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
 #include "stratagus.h"
 
 #include <vector>
-#include <string.h>
 
 #include "video.h"
-#include "font.h"
-#include "ui.h"
+#include "intern_video.h"
+
 #include "cursor.h"
+#include "font.h"
 #include "iolib.h"
 #include "map.h"
+#include "ui.h"
 
-#include "intern_video.h"
 
 #include "SDL.h"
 

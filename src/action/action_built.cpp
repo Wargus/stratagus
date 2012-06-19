@@ -30,9 +30,6 @@
 
 //@{
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "stratagus.h"
 #include "action/action_built.h"
 

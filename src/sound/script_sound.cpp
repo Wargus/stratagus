@@ -33,12 +33,7 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
-#include <string.h>
-#include <stdio.h>
-
 #include "stratagus.h"
-
-#include <stdlib.h>
 
 #include "script.h"
 #include "sound.h"

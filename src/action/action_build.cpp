@@ -34,9 +34,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "stratagus.h"
 
 #include "action/action_build.h"

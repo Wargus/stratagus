@@ -33,19 +33,14 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stratagus.h"
+
+#include "map.h"
+
 #include "player.h"
 #include "unittype.h"
 #include "unit.h"
-#include "map.h"
-#include "tileset.h"
-#include "minimap.h"
-#include "font.h"
-#include "ui.h"
+
 
 /*----------------------------------------------------------------------------
 --  Functions

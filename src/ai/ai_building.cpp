@@ -33,16 +33,15 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "stratagus.h"
-#include "unit.h"
-#include "unittype.h"
+
+#include "ai_local.h"
+
 #include "map.h"
 #include "pathfinder.h"
-#include "ai_local.h"
 #include "player.h"
+#include "unit.h"
+#include "unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

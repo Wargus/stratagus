@@ -33,18 +33,16 @@
 // Includes
 //----------------------------------------------------------------------------
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <stddef.h>
-#include <string.h>
 
 #include "stratagus.h"
+
+#include "netconnect.h"
 
 #include "net_lowlevel.h"
 #include "player.h"
 #include "map.h"
 #include "network.h"
-#include "netconnect.h"
 #include "interface.h"
 #include "menus.h"
 #include "settings.h"

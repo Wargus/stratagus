@@ -33,14 +33,12 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "stratagus.h"
-#include "script.h"
+
 #include "tileset.h"
+
 #include "map.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

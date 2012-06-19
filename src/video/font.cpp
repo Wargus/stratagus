@@ -33,21 +33,18 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stratagus.h"
 
 #include <string>
 #include <vector>
 #include <map>
 
-#include "video.h"
 #include "font.h"
-#include "script.h"
-
 #include "intern_video.h"
+
+#include "script.h"
+#include "video.h"
+
 
 /*----------------------------------------------------------------------------
 --  Variables

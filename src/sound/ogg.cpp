@@ -39,9 +39,6 @@
 
 #ifdef USE_VORBIS // {
 
-#include <stdlib.h>
-#include <string.h>
-
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 #ifdef USE_THEORA

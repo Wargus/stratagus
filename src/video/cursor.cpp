@@ -34,23 +34,19 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stratagus.h"
-#include "video.h"
-#include "unittype.h"
-#include "player.h"
-#include "unit.h"
-#include "cursor.h"
-#include "tileset.h"
-#include "map.h"
-#include "interface.h"
-#include "ui.h"
-#include "editor.h"
 
+#include "cursor.h"
 #include "intern_video.h"
+
+#include "editor.h"
+#include "interface.h"
+#include "map.h"
+#include "player.h"
+#include "ui.h"
+#include "unit.h"
+#include "unittype.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

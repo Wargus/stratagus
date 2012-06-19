@@ -33,19 +33,15 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stratagus.h"
-#include "video.h"
-#include "tileset.h"
-#include "map.h"
-#include "unittype.h"
-#include "player.h"
-#include "unit.h"
-#include "script.h"
+
 #include "pathfinder.h"
+
+#include "map.h"
+#include "player.h"
+#include "script.h"
+#include "unittype.h"
+#include "unit.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

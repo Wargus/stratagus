@@ -33,34 +33,26 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stratagus.h"
-#include "video.h"
+
+#include "interface.h"
+
+#include "ai.h"
+#include "commands.h"
+#include "cursor.h"
+#include "font.h"
+#include "iolib.h"
+#include "network.h"
+#include "player.h"
+#include "replay.h"
 #include "sound.h"
 #include "sound_server.h"
-#include "unittype.h"
-#include "player.h"
-#include "unit.h"
-#include "interface.h"
-#include "cursor.h"
-#include "ui.h"
-#include "menus.h"
-#include "script.h"
 #include "tileset.h"
-#include "minimap.h"
-#include "network.h"
-#include "font.h"
-#include "results.h"
+#include "unittype.h"
+#include "unit.h"
+#include "ui.h"
 #include "video.h"
-#include "iolib.h"
-#include "commands.h"
-#include "ai.h"
 #include "widgets.h"
-#include "replay.h"
-#include "actions.h"
 
 /*----------------------------------------------------------------------------
 --  Defines

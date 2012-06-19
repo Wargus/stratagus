@@ -33,21 +33,14 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stratagus.h"
-#include "video.h"
-#include "tileset.h"
+
+#include "missile.h"
+
+#include "luacallback.h"
+#include "script.h"
 #include "unittype.h"
 #include "unit.h"
-#include "missile.h"
-#include "script_sound.h"
-#include "script.h"
-#include "unit_manager.h"
-#include "particle.h"
-#include "luacallback.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

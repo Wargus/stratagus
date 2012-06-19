@@ -33,21 +33,17 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stratagus.h"
 
 #include <string>
 #include <vector>
 #include <map>
 
-#include "video.h"
 #include "icons.h"
+#include "menus.h"
 #include "player.h"
 #include "ui.h"
-#include "menus.h"
+#include "video.h"
 
 
 /*----------------------------------------------------------------------------

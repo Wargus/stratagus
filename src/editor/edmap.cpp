@@ -33,11 +33,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <limits.h>
-
 #include "stratagus.h"
 #include "editor.h"
 #include "map.h"

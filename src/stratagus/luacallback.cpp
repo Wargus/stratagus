@@ -29,11 +29,10 @@
 
 //@{
 
-
-#include <stdlib.h>
+#include "stratagus.h"
 
 #include "luacallback.h"
-#include "stratagus.h"
+
 #include "script.h"
 
 /**

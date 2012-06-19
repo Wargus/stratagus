@@ -33,9 +33,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sstream>
 #include <deque>
 
 #include "stratagus.h"
