@@ -867,9 +867,9 @@ void CPlayer::SetResource(int resource, int value, int type)
 {
 	if (type == STORE_BOTH) {
 		if (this->MaxResources[resource] != -1) {
-			const int toStore = std::min(0, value - this->Resources[resource]);
-			this->StoredResources[resource] = std::min(toStore, this->MaxResources[resource]);
-			this->Resources[resource] = std::max(0, value - toStore);
+			const int toRes = std::max(0, value - this->StoredResources[resource]);
+			this->Resources[resource] = std::max(0, toRes);
+			this->StoredResources[resource] = std::min(value - toRes, this->MaxResources[resource]);
 		} else {
 			this->Resources[resource] = value;
 		}
@@ -960,7 +960,7 @@ int CPlayer::CheckCosts(const int *costs) const
 		Notify(_("Not enough %s...%s more %s."), name, actionName, name);
 
 		err |= 1 << i;
-		if (GameSounds.NotEnoughRes[this->Race][i].Sound) {
+		if (this == ThisPlayer && GameSounds.NotEnoughRes[this->Race][i].Sound) {
 			PlayGameSound(GameSounds.NotEnoughRes[this->Race][i].Sound, MaxSampleVolume);
 		}
 	}

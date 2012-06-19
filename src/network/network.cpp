@@ -1168,6 +1168,7 @@ static void ParseNetworkCommand(const CNetworkCommandQueue *ncq)
 				NetMsgBuf[ply][127] = '\0';
 				SetMessage("%s", NetMsgBuf[ply]);
 				PlayGameSound(GameSounds.ChatMessage.Sound, MaxSampleVolume);
+				CommandLog("chat", NoUnitP, FlushCommands, -1, -1, NoUnitP, NetMsgBuf[ply], -1);
 				NetMsgBufLen[ply] = 0;
 			}
 		}

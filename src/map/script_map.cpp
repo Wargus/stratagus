@@ -158,13 +158,16 @@ static int CclStratagusMap(lua_State *l)
 						Map.Fields[i].SeenTile = LuaToNumber(l, -1);
 						lua_pop(l, 1);
 						++j2;
+						lua_rawgeti(l, -1, j2 + 1);
+						Map.Fields[i].Value = LuaToNumber(l, -1);
+						lua_pop(l, 1);
+						++j2;
+						lua_rawgeti(l, -1, j2 + 1);
+						Map.Fields[i].Cost = LuaToNumber(l, -1);
+						lua_pop(l, 1);
+						++j2;
 						for (; j2 < args2; ++j2) {
 							lua_rawgeti(l, -1, j2 + 1);
-							if (lua_isnumber(l, -1)) {
-								Map.Fields[i].Value = LuaToNumber(l, -1);
-								lua_pop(l, 1);
-								continue;
-							}
 							value = LuaToString(l, -1);
 							lua_pop(l, 1);
 							if (!strcmp(value, "explored")) {

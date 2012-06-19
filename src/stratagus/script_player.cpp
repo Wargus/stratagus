@@ -339,7 +339,7 @@ void CPlayer::Load(lua_State *l)
 	// Manage max
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (this->MaxResources[i] != -1) {
-			this->SetResource(i, this->StoredResources[i]);
+			this->SetResource(i, this->Resources[i] + this->StoredResources[i], STORE_BOTH);
 		}
 	}
 }

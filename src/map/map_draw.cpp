@@ -277,6 +277,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			Map.TileGraphic->DrawFrameClip(tile, dx, dy);
 
 #ifdef DEBUG
+#ifdef DEBUGMAPDRAW
 			int my_mask = 0;
 			unsigned int color = 0;
 			if (Map.CheckMask(sx, MapFieldUnpassable)) {
@@ -308,6 +309,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 						   Map.Fields[sx].TilesetTile);
 
 			}
+#endif
 #endif
 			++sx;
 			dx += PixelTileSize.x;

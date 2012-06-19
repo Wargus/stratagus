@@ -50,6 +50,7 @@
 #include "network.h"
 #include "interface.h"
 #include "actions.h"
+#include "sound.h"
 
 //----------------------------------------------------------------------------
 // Structures
@@ -881,6 +882,9 @@ static void DoNextReplay()
 		} else {
 			HandleCheats(val);
 		}
+	} else if (!strcmp(action, "chat")) {
+		SetMessage("%s", val);
+		PlayGameSound(GameSounds.ChatMessage.Sound, MaxSampleVolume);
 	} else if (!strcmp(action, "quit")) {
 		CommandQuit(arg1);
 	} else {

@@ -504,6 +504,7 @@ int CFont::Width(const int number) const
 		int utf8;
 		size_t pos = 0;
 		const CFontColor *backup = fc;
+		bool isReverse = false;
 		font->DynamicLoad();
 		CGraphic *g = font->GetFontColorGraphic(FontColor);
 
@@ -526,6 +527,7 @@ int CFont::Width(const int number) const
 					case '<':
 						LastTextColor = (CFontColor *)fc;
 						if (fc != reverse) {
+							isReverse = true;
 							fc = reverse;
 							g = font->GetFontColorGraphic(fc);
 						}
@@ -534,6 +536,7 @@ int CFont::Width(const int number) const
 					case '>':
 						if (fc != LastTextColor) {
 							const CFontColor *rev = LastTextColor;  // swap last and current color
+							isReverse = false;
 							LastTextColor = (CFontColor *)fc;
 							fc = rev;
 							g = font->GetFontColorGraphic(fc);
@@ -566,7 +569,7 @@ int CFont::Width(const int number) const
 
 			widths += font->DrawChar<CLIP>(g, utf8, x + widths, y, fc);
 
-			if (fc != backup) {
+			if (isReverse == false && fc != backup) {
 				fc = backup;
 				if (UseOpenGL) {
 					g = FontColorGraphics[font][fc];

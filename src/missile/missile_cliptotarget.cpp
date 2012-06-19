@@ -53,7 +53,9 @@ void MissileClipToTarget::Action()
 	}
 
 	if (this->NextMissileFrame(1, 0)) {
-		this->MissileHit();
+		if (this->SourceUnit && this->SourceUnit->IsAliveOnMap()) {
+			this->MissileHit();
+		}
 		this->TTL = 0;
 	}
 }
