@@ -107,6 +107,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <vector>
+#include <vec2i.h>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -170,15 +171,14 @@ extern CursorStates CursorState;  /// current cursor state (point,...)
 extern int CursorAction;          /// action for selection
 extern int CursorValue;           /// value for action (spell type f.e.)
 extern CUnitType *CursorBuilding; /// building cursor
-extern std::string CustomCursor;             /// custom cursor for button
+extern std::string CustomCursor;  /// custom cursor for button
 
 extern CCursor *GameCursor;     /// cursor-type
 extern int CursorX;             /// cursor position on screen X
 extern int CursorY;             /// cursor position on screen Y
 extern int CursorStartX;        /// rectangle started on screen X
 extern int CursorStartY;        /// rectangle started on screen Y
-extern int CursorStartScrMapX;  /// the same in screen map coordinate system
-extern int CursorStartScrMapY;  /// the same in screen map coordinate system
+extern PixelPos CursorStartMapPos; /// the same in screen map coordinate system
 
 /*----------------------------------------------------------------------------
 --  Functions

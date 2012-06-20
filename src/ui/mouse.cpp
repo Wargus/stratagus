@@ -1620,8 +1620,7 @@ void UIHandleButtonDown(unsigned button)
 			CursorStartY = CursorY;
 			const PixelPos screenCursorPos = {CursorX, CursorY};
 			const PixelPos mapCursorPos = UI.MouseViewport->ScreenToMapPixelPos(screenCursorPos);
-			CursorStartScrMapX = mapCursorPos.x;
-			CursorStartScrMapY = mapCursorPos.y;
+			CursorStartMapPos = mapCursorPos;
 			GameCursor = UI.Cross.Cursor;
 			CursorState = CursorStateRectangle;
 		} else if (MouseButtons & MiddleButton) {// enter move map mode
@@ -1837,8 +1836,8 @@ void UIHandleButtonUp(unsigned button)
 		//
 		if (CursorStartX < CursorX - 1 || CursorStartX > CursorX + 1
 			|| CursorStartY < CursorY - 1 || CursorStartY > CursorY + 1) {
-			int x0 = CursorStartScrMapX;
-			int y0 = CursorStartScrMapY;
+			int x0 = CursorStartMapPos.x;
+			int y0 = CursorStartMapPos.y;
 			const PixelPos cursorScreenPos = {CursorX, CursorY};
 			const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(cursorScreenPos);
 			int x1 = cursorMapPos.x;

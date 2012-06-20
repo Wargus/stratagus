@@ -71,10 +71,8 @@ int CursorY;                 /// cursor position on screen Y
 int CursorStartX;            /// rectangle started on screen X
 int CursorStartY;            /// rectangle started on screen Y
 
-/// X position of starting point of selection rectangle, in screen pixels.
-int CursorStartScrMapX;
-/// Y position of starting point of selection rectangle, in screen pixels.
-int CursorStartScrMapY;
+/// position of starting point of selection rectangle, in Map pixels.
+PixelPos CursorStartMapPos;
 
 
 /*--- DRAW BUILDING  CURSOR ------------------------------------------------*/
@@ -263,8 +261,7 @@ void DrawCursor()
 {
 	// Selecting rectangle
 	if (CursorState == CursorStateRectangle && (CursorStartX != CursorX || CursorStartY != CursorY)) {
-		const PixelPos cursorStartMapPos = {CursorStartScrMapX, CursorStartScrMapY};
-		const PixelPos cursorStartScreenPos = UI.MouseViewport->MapToScreenPixelPos(cursorStartMapPos);
+		const PixelPos cursorStartScreenPos = UI.MouseViewport->MapToScreenPixelPos(CursorStartMapPos);
 
 		DrawVisibleRectangleCursor(cursorStartScreenPos.x, cursorStartScreenPos.y, CursorX, CursorY);
 	} else if (CursorBuilding && CursorOn == CursorOnMap) {
