@@ -38,6 +38,7 @@
 #include "action/action_still.h"
 
 #include "animation.h"
+#include "commands.h"
 #include "iolib.h"
 #include "map.h"
 #include "missile.h"

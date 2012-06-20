@@ -34,6 +34,7 @@
 #include "action/action_built.h"
 
 #include "ai.h"
+#include "commands.h"
 #include "construct.h"
 #include "iolib.h"
 #include "map.h"

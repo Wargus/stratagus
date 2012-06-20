@@ -143,6 +143,7 @@
 #include "ai_local.h"
 
 #include "action/action_attack.h"
+#include "commands.h"
 #include "player.h"
 #include "unit.h"
 #include "unittype.h"

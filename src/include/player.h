@@ -67,6 +67,13 @@ struct lua_State;
 --  Player type
 ----------------------------------------------------------------------------*/
 
+enum _diplomacy_ {
+	DiplomacyAllied,   /// Ally with opponent
+	DiplomacyNeutral,  /// Don't attack be neutral
+	DiplomacyEnemy,    /// Attack opponent
+	DiplomacyCrazy     /// Ally and attack opponent
+}; /// Diplomacy states for CommandDiplomacy
+
 ///  Player structure
 class CPlayer
 {

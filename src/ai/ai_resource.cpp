@@ -40,6 +40,7 @@
 #include "action/action_build.h"
 #include "action/action_repair.h"
 #include "action/action_resource.h"
+#include "commands.h"
 #include "depend.h"
 #include "map.h"
 #include "pathfinder.h"

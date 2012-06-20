@@ -38,6 +38,7 @@
 #include "action/action_board.h"
 
 #include "animation.h"
+#include "commands.h"
 #include "iolib.h"
 #include "map.h"
 #include "pathfinder.h"

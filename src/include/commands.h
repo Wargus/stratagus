@@ -46,6 +46,71 @@ class CUpgrade;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------
+--  Commands: in command.c
+----------------------------------------------------------------------------*/
+
+/**
+**  This function gives a unit a new command. If the command is given
+**  by the user the function with Send prefix should be used.
+*/
+
+/// Prepare command quit
+extern void CommandQuit(int player);
+/// Prepare command stop
+extern void CommandStopUnit(CUnit &unit);
+/// Prepare command stand ground
+extern void CommandStandGround(CUnit &unit, int flush);
+/// Prepare command follow
+extern void CommandFollow(CUnit &unit, CUnit &dest, int flush);
+/// Prepare command move
+extern void CommandMove(CUnit &unit, const Vec2i &pos, int flush);
+/// Prepare command repair
+extern void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
+/// Send auto repair command
+extern void CommandAutoRepair(CUnit &unit, int on);
+/// Prepare command attack
+extern void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
+/// Prepare command attack ground
+extern void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush);
+/// Prepare command patrol
+extern void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush);
+/// Prepare command board
+extern void CommandBoard(CUnit &unit, CUnit &dest, int flush);
+/// Prepare command unload
+extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush);
+/// Prepare command build
+extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush);
+/// Prepare command dismiss
+extern void CommandDismiss(CUnit &unit);
+/// Prepare command resource location
+extern void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush);
+/// Prepare command resource
+extern void CommandResource(CUnit &unit, CUnit &dest, int flush);
+/// Prepare command return
+extern void CommandReturnGoods(CUnit &unit, CUnit *goal, int flush);
+/// Prepare command train
+extern void CommandTrainUnit(CUnit &unit, CUnitType &what, int flush);
+/// Prepare command cancel training
+extern void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type);
+/// Prepare command upgrade to
+extern void CommandUpgradeTo(CUnit &unit, CUnitType &what, int flush);
+/// immediate transforming into type.
+extern void CommandTransformIntoType(CUnit &unit, CUnitType &type);
+/// Prepare command cancel upgrade to
+extern void CommandCancelUpgradeTo(CUnit &unit);
+/// Prepare command research
+extern void CommandResearch(CUnit &unit, CUpgrade *what, int flush);
+/// Prepare command cancel research
+extern void CommandCancelResearch(CUnit &unit);
+/// Prepare command spellcast
+extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, SpellType *spell, int flush);
+/// Prepare command auto spellcast
+extern void CommandAutoSpellCast(CUnit &unit, int spellid, int on);
+/// Prepare diplomacy command
+extern void CommandDiplomacy(int player, int state, int opponent);
+/// Prepare shared vision command
+extern void CommandSharedVision(int player, bool state, int opponent);
 
 /*
 **  The send command functions sends a command, if needed over the

@@ -41,6 +41,7 @@
 #include "stratagus.h"
 
 #include "unit.h"
+#include "commands.h"
 #include "unit_manager.h"
 #include "video.h"
 #include "unitsound.h"

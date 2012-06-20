@@ -51,6 +51,7 @@
 #include "spells.h"
 
 #include "actions.h"
+#include "commands.h"
 #include "map.h"
 #include "missile.h"
 #include "sound.h"

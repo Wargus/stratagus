@@ -40,6 +40,7 @@
 #include "actions.h"
 #include "action/action_attack.h"
 #include "action/action_board.h"
+#include "commands.h"
 #include "depend.h"
 #include "map.h"
 #include "pathfinder.h"

@@ -42,6 +42,7 @@
 #include "upgrade.h"
 
 #include "action/action_train.h"
+#include "commands.h"
 #include "depend.h"
 #include "interface.h"
 #include "iolib.h"

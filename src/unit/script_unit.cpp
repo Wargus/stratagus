@@ -38,6 +38,7 @@
 
 #include "actions.h"
 #include "animation.h"
+#include "commands.h"
 #include "construct.h"
 #include "map.h"
 #include "pathfinder.h"
