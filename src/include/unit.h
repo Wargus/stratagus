@@ -33,299 +33,10 @@
 //@{
 
 /*----------------------------------------------------------------------------
--- Documentation
-----------------------------------------------------------------------------*/
-
-/**
-**  @class CUnit unit.h
-**
-**  \#include "unit.h"
-**
-**  Everything belonging to a unit. FIXME: rearrange for less memory.
-**
-**  This class contains all information about a unit in game.
-**  A unit could be anything: a man, a vehicle, a ship, or a building.
-**  Currently only a tile, a unit, or a missile could be placed on the map.
-**
-**  The unit structure members:
-**
-**  CUnit::Refs
-**
-**  The reference counter of the unit. If the pointer to the unit
-**  is stored the counter must be incremented and if this reference
-**  is destroyed the counter must be decremented. Alternative it
-**  would be possible to implement a garbage collector for this.
-**
-**  CUnit::Slot
-**
-**  This is the unique slot number. It is not possible that two
-**  units have the same slot number at the same time. The slot
-**  numbers are reused.
-**  This field could be accessed by the macro UnitNumber(Unit *).
-**  Maximal 65535 (=#MAX_UNIT_SLOTS) simultaneous units are
-**  supported.
-**
-**  CUnit::UnitSlot
-**
-**  This is the pointer into #Units[], where the unit pointer is
-**  stored.  #Units[] is a table of all units currently active in
-**  game. This pointer is only needed to speed up, the remove of
-**  the unit pointer from #Units[], it didn't must be searched in
-**  the table.
-**
-**  CUnit::PlayerSlot
-**
-**  the index into Player::Units[], where the unit pointer is
-**  stored. Player::Units[] is a table of all units currently
-**  belonging to a player. This pointer is only needed to speed
-**  up, the remove of the unit pointer from Player::Units[].
-**
-**  CUnit::Next
-**
-**  A generic link pointer. This member is currently used, if an
-**  unit is on the map, to link all units on the same map field
-**  together. This also links corpses and stuff. Also, this is
-**  used in memory management to link unused units.
-**
-**  CUnit::Container
-**
-**  Pointer to the unit containing it, or NoUnitP if the unit is
-**  free. This points to the transporter for units on board, or to
-**  the building for peasants inside(when they are mining).
-**
-**  CUnit::UnitInside
-**
-**  Pointer to the last unit added inside. Order doesn't really
-**  matter. All units inside are kept in a circular linked list.
-**  This is NoUnitP if there are no units inside. Multiple levels
-**  of inclusion are allowed, though not very usefull right now
-**
-**  CUnit::NextContained, CUnit::PrevContained
-**
-**  The next and previous element in the curent container. Bogus
-**  values allowed for units not contained.
-**
-**  CUnit::InsideCount
-**
-**  The number of units inside the container.
-**
-**  CUnit::BoardCount
-**
-**  The number of units transported inside the container. This
-**  does not include for instance stuff like harvesters returning
-**  cargo.
-**
-**  CUnit::tilePos
-**
-**  The tile map coordinates of the unit.
-**  0,0 is the upper left on the map.
-**
-**  CUnit::Type
-**
-**  Pointer to the unit-type (::UnitType). The unit-type contains
-**  all informations that all units of the same type shares.
-**  (Animations, Name, Stats, ...)
-**
-**  CUnit::SeenType
-**  Pointer to the unit-type that this unit was, when last seen.
-**  Currently only used by buildings.
-**
-**  CUnit::Player
-**
-**  Pointer to the owner of this unit (::Player). An unit could
-**  only be owned by one player.
-**
-**  CUnit::Stats
-**
-**  Pointer to the current status (::UnitStats) of a unit. The
-**  units of the same player and the same type could share the same
-**  stats. The status contains all values which could be different
-**  for each player. This f.e. the upgradeable abilities of an
-**  unit.  (CUnit::Stats::SightRange, CUnit::Stats::Armor,
-**  CUnit::Stats::HitPoints, ...)
-**
-**  CUnit::CurrentSightRange
-**
-**  Current sight range of a unit, this changes when a unit enters
-**  a transporter or building or exits one of these.
-**
-**  CUnit::Colors
-**
-**  Player colors of the unit. Contains the hardware dependent
-**  pixel values for the player colors (palette index #208-#211).
-**  Setup from the global palette. This is a pointer.
-**  @note Index #208-#211 are various SHADES of the team color
-**  (#208 is brightest shade, #211 is darkest shade) .... these
-**  numbers are NOT red=#208, blue=#209, etc
-**
-**  CUnit::IX CUnit::IY
-**
-**  Coordinate displacement in pixels or coordinates inside a tile.
-**  Currently only !=0, if the unit is moving from one tile to
-**  another (0-32 and for ships/flyers 0-64).
-**
-**  CUnit::Frame
-**
-**  Current graphic image of the animation sequence. The high bit
-**  (128) is used to flip this image horizontal (x direction).
-**  This also limits the number of different frames/image to 126.
-**
-**  CUnit::SeenFrame
-**
-**  Graphic image (see CUnit::Frame) what the player on this
-**  computer has last seen. If UnitNotSeen the player haven't seen
-**  this unit yet.
-**
-**  CUnit::Direction
-**
-**  Contains the binary angle (0-255) in which the direction the
-**  unit looks. 0, 32, 64, 128, 160, 192, 224, 256 corresponds to
-**  0�, 45�, 90�, 135�, 180�, 225�, 270�, 315�, 360� or north,
-**  north-east, east, south-east, south, south-west, west,
-**  north-west, north. Currently only 8 directions are used, this
-**  is more for the future.
-**
-**  CUnit::Attacked
-**
-**  Last cycle the unit was attacked. 0 means never.
-**
-**  CUnit::Burning
-**
-**  If Burning is non-zero, the unit is burning.
-**
-**  CUnit::VisCount[PlayerMax]
-**
-**              Used to keep track of visible units on the map, it counts the
-**              Number of seen tiles for each player. This is only modified
-**              in UnitsMarkSeen and UnitsUnmarkSeen, from fow.
-**              We keep track of visilibty for each player, and combine with
-**              Shared vision ONLY when querying and such.
-**
-**  CUnit::SeenByPlayer
-**
-**              This is a bitmask of 1 and 0 values. SeenByPlayer & (1<<p) is 0
-**              If p never saw the unit and 1 if it did. This is important for
-**              keeping track of dead units under fog. We only keep track of units
-**              that are visible under fog with this.
-**
-**  CUnit::Destroyed
-**
-** @todo docu.
-**  If you need more informations, please send me an email or write it self.
-**
-**  CUnit::Removed
-**
-**  This flag means the unit is not active on map. This flag
-**  have workers set if they are inside a building, units that are
-**  on board of a transporter.
-**
-**  CUnit::Selected
-**
-**  Unit is selected. (So you can give it orders)
-**
-**  CUnit::Constructed
-**  Set when a building is under construction, and still using the
-**  generic building animation.
-**
-**  CUnit::SeenConstructed
-**  Last seen state of construction.  Used to draw correct building
-**  frame. See CUnit::Constructed for more information.
-**
-**  CUnit::SeenState
-**  The Seen State of the building.
-**  01 The building in being built when last seen.
-**  10 The building was been upgraded when last seen.
-**
-**  CUnit::Boarded
-**
-**  This is 1 if the unit is on board a transporter.
-**
-**
-**  CUnit::XP
-**
-**  Number of XP of the unit.
-**
-**  CUnit::Kills
-**
-**  How many units have been killed by the unit.
-**
-**  CUnit::GroupId
-**
-**  Number of the group to that the unit belongs. This is the main
-**  group showed on map, a unit can belong to many groups.
-**
-**  CUnit::LastGroup
-**
-**  Automatic group number, to reselect the same units. When the
-**  user selects more than one unit all units is given the next
-**  same number. (Used for ALT-CLICK)
-**
-**  CUnit::Value
-**
-**  This values hold the amount of resources in a resource or in
-**  in a harvester.
-**  @todo continue documentation
-**
-**  CUnit::Wait
-**
-**  The unit is forced too wait for that many cycles. Be carefull,
-**  setting this to 0 will lock the unit.
-**
-**  CUnit::State
-**
-**  Animation state, currently position in the animation script.
-**  0 if an animation has just started, it should only be changed
-**  inside of actions.
-**
-**  CUnit::Reset
-**
-**  @todo continue documentation
-**
-**  CUnit::Blink
-**
-**
-**  CUnit::Moving
-**
-**
-**  CUnit::RescuedFrom
-**
-**  Pointer to the original owner of a unit. It will be NULL if
-**  the unit was not rescued.
-**
-**  CUnit::Orders
-**
-**  Contains all orders of the unit. Slot 0 is always used.
-**
-**  CUnit::SavedOrder
-**
-**  This order is executed, if the current order is finished.
-**  This is used for attacking units, to return to the old
-**  place or for patrolling units to return to patrol after
-**  killing some enemies. Any new order given to the unit,
-**  clears this saved order.
-**
-**  CUnit::NewOrder
-**
-**  This field is only used by buildings and this order is
-**  assigned to any by this building new trained unit.
-**  This is can be used to set the exit or gathering point of a
-**  building.
-**
-**  CUnit::Goal
-**
-**  Generic goal pointer. Used by teleporters to point to circle of power.
-**
-**
-** @todo continue documentation
-**
-*/
-
-/*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
 #include <vector>
-#include "SDL.h"
 
 #ifndef __UNITTYPE_H__
 #include "unittype.h"
@@ -423,11 +134,6 @@ extern int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1,
 
 
 /**
-**  Unit references over network, or for memory saving.
-*/
-typedef unsigned short UnitRef;
-
-/**
 **  Voice groups for a unit
 */
 enum UnitVoiceGroup {
@@ -495,8 +201,6 @@ public:
 		int Active; /// how many units are harvesting from the resource.
 	} Resource; /// Resource still
 
-
-
 	Vec2i tilePos; /// Map position X
 
 	unsigned int Offset;/// Map position as flat index offset (x + y * w)
@@ -519,7 +223,6 @@ public:
 	unsigned char CurrentResource;
 	int ResourcesHeld;      /// Resources Held by a unit
 
-
 	unsigned char DamagedType;   /// Index of damage type of unit which damaged this unit
 	unsigned long Attacked; /// gamecycle unit was last attacked
 	unsigned State : 8;     /// action state
@@ -532,7 +235,6 @@ public:
 	unsigned Destroyed : 1; /// unit is destroyed pending reference
 	unsigned Removed : 1;   /// unit is removed (not on map)
 	unsigned Selected : 1;  /// unit is selected
-
 
 	unsigned Constructed : 1;    /// Unit is in construction
 	unsigned Active : 1;         /// Unit is active for AI
@@ -598,8 +300,7 @@ unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 	void ClearAction();
 
 	inline int GetReactRange() const {
-		return (Player->Type == PlayerPerson ?
-				Type->ReactRangePerson : Type->ReactRangeComputer);
+		return (Player->Type == PlayerPerson ? Type->ReactRangePerson : Type->ReactRangeComputer);
 	}
 
 	/// Increase a unit's reference count
@@ -755,7 +456,7 @@ unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 	**  Test if unit can move.
 	**  For the moment only check for move animation.
 	**
-	**  @return true if unit cann move.
+	**  @return true if unit can move.
 	*/
 	bool CanMove() const { return Type->CanMove(); }
 
@@ -795,21 +496,7 @@ struct CResourceFinder {
 	CUnit *Find(const CMapField *const mf) const { return mf->UnitCache.find(*this); }
 };
 
-struct CResourceDepositFinder {
-	const int resource;
-	CResourceDepositFinder(const int r) : resource(r) {}
-	inline bool operator()(const CUnit *const unit) const {
-		return (unit->Type->CanStore[resource] && !unit->IsUnusable());
-	}
-	inline CUnit *Find(const CMapField *const mf) const {
-		return mf->UnitCache.find(*this);
-	}
-};
-
 #define NoUnitP (CUnit *)0        /// return value: for no unit found
-#define InfiniteDistance INT_MAX /// the distance is unreachable
-
-#define FlushCommands 1          /// Flush commands in queue
 
 #define MAX_UNIT_SLOTS 65535     /// Maximal number of used slots
 

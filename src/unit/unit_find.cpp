@@ -184,6 +184,20 @@ CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top)
 	return CResourceFinder(resource, mine_on_top).Find(Map.Field(pos));
 }
 
+class CResourceDepositFinder
+{
+public:
+	CResourceDepositFinder(const int r) : resource(r) {}
+	inline bool operator()(const CUnit *const unit) const {
+		return (unit->Type->CanStore[resource] && !unit->IsUnusable());
+	}
+	inline CUnit *Find(const CMapField &mf) const {
+		return mf.UnitCache.find(*this);
+	}
+private:
+	const int resource;
+};
+
 /**
 **  Resource deposit on map tile
 **
@@ -194,7 +208,7 @@ CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top)
 */
 CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource)
 {
-	return CResourceDepositFinder(resource).Find(Map.Field(pos));
+	return CResourceDepositFinder(resource).Find(*Map.Field(pos));
 }
 
 /*----------------------------------------------------------------------------

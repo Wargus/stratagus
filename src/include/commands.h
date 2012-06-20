@@ -32,16 +32,17 @@
 
 //@{
 
-#include "unit.h"
+#include "vec2i.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CUnit;
 class CFile;
+class SpellType;
 class CUnitType;
 class CUpgrade;
-
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -118,6 +119,11 @@ extern void CommandSharedVision(int player, bool state, int opponent);
 **  are on all computers equal, should use the functions without Send.
 */
 
+/**
+**  Unit references over network, or for memory saving.
+*/
+typedef unsigned short UnitRef;
+
 /// Send stop command
 extern void SendCommandStopUnit(CUnit &unit);
 /// Send stand ground command
@@ -178,6 +184,10 @@ extern void ParseCommand(unsigned char type, UnitRef unum, unsigned short x,
 extern void ParseExtendedCommand(unsigned char type, int status,
 								 unsigned char arg1, unsigned short arg2, unsigned short arg3,
 								 unsigned short arg4);
+
+
+
+#define FlushCommands 1          /// Flush commands in queue
 
 //@}
 

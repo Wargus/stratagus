@@ -37,6 +37,7 @@
 
 #include "actions.h"
 #include "action/action_train.h"
+#include "commands.h"
 #include "map.h"
 #include "pathfinder.h"
 #include "player.h"
