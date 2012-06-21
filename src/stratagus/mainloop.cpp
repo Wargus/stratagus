@@ -149,7 +149,7 @@ void DoScrollArea(int state, bool fast)
 	vp->Set(vp->MapPos, vp->Offset + offset);
 
 	// This recalulates some values
-	HandleMouseMove(CursorScreenPos.x, CursorScreenPos.y);
+	HandleMouseMove(CursorScreenPos);
 }
 
 /**

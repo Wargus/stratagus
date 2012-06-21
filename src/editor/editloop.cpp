@@ -1514,17 +1514,15 @@ static void EditorCallbackKeyRepeated(unsigned key, unsigned)
 **  @param x  Screen X position.
 **  @param y  Screen Y position.
 */
-static void EditorCallbackMouse(int x, int y)
+static void EditorCallbackMouse(const PixelPos &pos)
 {
-	int i;
-	int bx;
-	int by;
 	static int LastMapX;
 	static int LastMapY;
 	char buf[256];
 
-	HandleCursorMove(&x, &y); // Reduce to screen
-	const PixelPos screenPos = {x, y};
+	PixelPos restrictPos = pos;
+	HandleCursorMove(&restrictPos.x, &restrictPos.y); // Reduce to screen
+	const PixelPos screenPos = pos;
 
 	//
 	// Move map.
@@ -1535,25 +1533,25 @@ static void EditorCallbackMouse(int x, int y)
 		// FIXME: Support with CTRL for faster scrolling.
 		// FIXME: code duplication, see ../ui/mouse.c
 		if (UI.MouseScrollSpeedDefault < 0) {
-			if (x < CursorStartScreenPos.x) {
+			if (screenPos.x < CursorStartScreenPos.x) {
 				tilePos.x++;
-			} else if (x > CursorStartScreenPos.x) {
+			} else if (screenPos.x > CursorStartScreenPos.x) {
 				tilePos.x--;
 			}
-			if (y < CursorStartScreenPos.y) {
+			if (screenPos.y < CursorStartScreenPos.y) {
 				tilePos.y++;
-			} else if (y > CursorStartScreenPos.y) {
+			} else if (screenPos.y > CursorStartScreenPos.y) {
 				tilePos.y--;
 			}
 		} else {
-			if (x < CursorStartScreenPos.x) {
+			if (screenPos.x < CursorStartScreenPos.x) {
 				tilePos.x--;
-			} else if (x > CursorStartScreenPos.x) {
+			} else if (screenPos.x > CursorStartScreenPos.x) {
 				tilePos.x++;
 			}
-			if (y < CursorStartScreenPos.y) {
+			if (screenPos.y < CursorStartScreenPos.y) {
 				tilePos.y--;
-			} else if (y > CursorStartScreenPos.y) {
+			} else if (screenPos.y > CursorStartScreenPos.y) {
 				tilePos.y++;
 			}
 		}
@@ -1650,14 +1648,14 @@ static void EditorCallbackMouse(int x, int y)
 			&& CursorScreenPos.y < UI.ButtonPanel.Y + 24) {
 			return;
 		}
-		bx = UI.InfoPanel.X + 8;
-		by = UI.InfoPanel.Y + 4 + IconHeight + 10;
-		for (i = 0; i < PlayerMax; ++i) {
+		int bx = UI.InfoPanel.X + 8;
+		int by = UI.InfoPanel.Y + 4 + IconHeight + 10;
+		for (int i = 0; i < PlayerMax; ++i) {
 			if (i == PlayerMax / 2) {
 				bx = UI.InfoPanel.X + 8;
 				by += 20;
 			}
-			if (bx < x && x < bx + 20 && by < y && y < by + 20) {
+			if (bx < screenPos.x && screenPos.x < bx + 20 && by < screenPos.y && screenPos.y < by + 20) {
 				if (Map.Info.PlayerType[i] != PlayerNobody) {
 					snprintf(buf, sizeof(buf), "Select player #%d", i);
 					UI.StatusLine.Set(buf);
@@ -1674,7 +1672,7 @@ static void EditorCallbackMouse(int x, int y)
 			bx += 20;
 		}
 
-		i = Editor.UnitIndex;
+		int i = Editor.UnitIndex;
 		by = UI.ButtonPanel.Y + 24;
 		while (by < UI.ButtonPanel.Y + ButtonPanelHeight - IconHeight) {
 			if (i >= (int)Editor.ShownUnitTypes.size()) {
@@ -1685,8 +1683,8 @@ static void EditorCallbackMouse(int x, int y)
 				if (i >= (int)Editor.ShownUnitTypes.size()) {
 					break;
 				}
-				if (bx < x && x < bx + IconWidth
-					&& by < y && y < by + IconHeight) {
+				if (bx < screenPos.x && screenPos.x < bx + IconWidth
+					&& by < screenPos.y && screenPos.y < by + IconHeight) {
 					snprintf(buf, sizeof(buf), "%s \"%s\"",
 							 Editor.ShownUnitTypes[i]->Ident.c_str(),
 							 Editor.ShownUnitTypes[i]->Name.c_str());
@@ -1707,21 +1705,19 @@ static void EditorCallbackMouse(int x, int y)
 
 	// Handle tile area
 	if (Editor.State == EditorEditTile) {
-		i = 0;
-		bx = UI.InfoPanel.X + 4;
-		by = UI.InfoPanel.Y + 4 + IconHeight + 10;
+		int bx = UI.InfoPanel.X + 4;
+		int by = UI.InfoPanel.Y + 4 + IconHeight + 10;
 
-		while (i < 6) {
-			if (bx < x && x < bx + 100 && by < y && y < by + 18) {
+		for (int i = 0; i < 6; ++i) {
+			if (bx < screenPos.x && screenPos.x < bx + 100 && by < screenPos.y && screenPos.y < by + 18) {
 				ButtonUnderCursor = i + 300;
 				CursorOn = CursorOnButton;
 				return;
 			}
-			++i;
 			by += 20;
 		}
 
-		i = Editor.TileIndex;
+		int i = Editor.TileIndex;
 		by = UI.ButtonPanel.Y + 24;
 		while (by < UI.ButtonPanel.Y + ButtonPanelHeight - PixelTileSize.y) {
 			if (i >= (int)Editor.ShownTileTypes.size()) {
@@ -1732,8 +1728,8 @@ static void EditorCallbackMouse(int x, int y)
 				if (i >= (int)Editor.ShownTileTypes.size()) {
 					break;
 				}
-				if (bx < x && x < bx + PixelTileSize.x
-					&& by < y && y < by + PixelTileSize.y) {
+				if (bx < screenPos.x && screenPos.x < bx + PixelTileSize.x
+					&& by < screenPos.y && screenPos.y < by + PixelTileSize.y) {
 					int base = Map.Tileset.Tiles[Editor.ShownTileTypes[i]].BaseTerrain;
 					UI.StatusLine.Set(Map.Tileset.SolidTerrainTypes[base].TerrainName);
 					Editor.CursorTileIndex = i;
@@ -1836,7 +1832,7 @@ static void EditorCallbackMouse(int x, int y)
 	//
 	// Scrolling Region Handling
 	//
-	if (HandleMouseScrollArea(x, y)) {
+	if (HandleMouseScrollArea(screenPos.x, screenPos.y)) {
 		return;
 	}
 

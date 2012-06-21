@@ -1206,10 +1206,11 @@ void HandleCursorMove(int *x, int *y)
 **  @param x  screen pixel X position.
 **  @param y  screen pixel Y position.
 */
-void HandleMouseMove(int x, int y)
+void HandleMouseMove(const PixelPos &screenPos)
 {
-	HandleCursorMove(&x, &y);
-	UIHandleMouseMove(x, y);
+	PixelPos pos(screenPos);
+	HandleCursorMove(&pos.x, &pos.y);
+	UIHandleMouseMove(pos);
 }
 
 /**
@@ -1346,7 +1347,7 @@ void InputMouseMove(const EventCallback *callbacks,
 {
 	// Don't reset the mouse state unless we really moved
 #ifdef USE_TOUCHSCREEN
-#define buff 32
+	const int buff = 32;
 	if (((x - buff) <= MouseX && MouseX <= (x + buff)) == 0
 		|| ((y - buff) <= MouseY && MouseY <= (y + buff)) == 0) {
 		MouseState = InitialMouseState;
@@ -1356,7 +1357,6 @@ void InputMouseMove(const EventCallback *callbacks,
 		MouseX = x;
 		MouseY = y;
 	}
-#undef buff
 #else
 	if (MouseX != x || MouseY != y) {
 		MouseState = InitialMouseState;
@@ -1365,7 +1365,8 @@ void InputMouseMove(const EventCallback *callbacks,
 		MouseY = y;
 	}
 #endif
-	callbacks->MouseMoved(x, y);
+	const PixelPos pos = {x, y};
+	callbacks->MouseMoved(pos);
 }
 
 /**

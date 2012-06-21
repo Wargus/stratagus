@@ -271,7 +271,7 @@ extern void HandleButtonUp(unsigned button);
 /// Keep coordinates in window and update cursor position
 extern void HandleCursorMove(int *x, int *y);
 /// Called if the mouse is moved
-extern void HandleMouseMove(int x, int y);
+extern void HandleMouseMove(const PixelPos &pos);
 /// Called if the mouse exits the game window (only for some videomodes)
 extern void HandleMouseExit();
 

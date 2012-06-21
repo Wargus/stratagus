@@ -883,7 +883,7 @@ extern CPopup *PopupByIdent(const std::string &ident);
 extern ButtonStyle *FindButtonStyle(const std::string &style);
 
 /// Called if the mouse is moved in Normal interface state
-extern void UIHandleMouseMove(int x, int y);
+extern void UIHandleMouseMove(const PixelPos &pos);
 /// Called if any mouse button is pressed down
 extern void UIHandleButtonDown(unsigned button);
 /// Called if any mouse button is released up

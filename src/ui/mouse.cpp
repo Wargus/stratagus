@@ -796,10 +796,9 @@ void MouseScrollMap(int x, int y)
 /**
 **  Handle movement of the cursor.
 **
-**  @param x  Screen X position.
-**  @param y  Screen Y position.
+**  @param mousePos  Screen X position.
 */
-void UIHandleMouseMove(int x, int y)
+void UIHandleMouseMove(const PixelPos &cursorPos)
 {
 	enum _cursor_on_ OldCursorOn;
 
@@ -818,13 +817,13 @@ void UIHandleMouseMove(int x, int y)
 	//  Move map.
 	//
 	if (GameCursor == UI.Scroll.Cursor) {
-		MouseScrollMap(x, y);
+		MouseScrollMap(cursorPos.x, cursorPos.y);
 		return;
 	}
 
 	UnitUnderCursor = NoUnitP;
 	GameCursor = UI.Point.Cursor;  // Reset
-	HandleMouseOn(x, y);
+	HandleMouseOn(cursorPos.x, cursorPos.y);
 
 	//
 	//  Make the piemenu "follow" the mouse
@@ -855,8 +854,7 @@ void UIHandleMouseMove(int x, int y)
 	// FIXME: This must done new, moving units, scrolling...
 	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
 		const CViewport &vp = *UI.MouseViewport;
-		const PixelPos screenPos = {x, y};
-		const Vec2i tilePos = vp.ScreenToTilePos(screenPos);
+		const Vec2i tilePos = vp.ScreenToTilePos(cursorPos);
 
 		if (Preference.ShowNameDelay) {
 			ShowNameDelay = GameCycle + Preference.ShowNameDelay;
@@ -864,11 +862,11 @@ void UIHandleMouseMove(int x, int y)
 		}
 
 		if (Map.IsFieldExplored(*ThisPlayer, tilePos) || ReplayRevealMap) {
-			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(screenPos);
+			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(cursorPos);
 			UnitUnderCursor = UnitOnScreen(NULL, mapPixelPos.x, mapPixelPos.y);
 		}
 	} else if (CursorOn == CursorOnMinimap) {
-		const Vec2i tilePos = {UI.Minimap.Screen2MapX(x), UI.Minimap.Screen2MapY(y)};
+		const Vec2i tilePos = {UI.Minimap.Screen2MapX(cursorPos.x), UI.Minimap.Screen2MapY(cursorPos.y)};
 
 		if (Map.IsFieldExplored(*ThisPlayer, tilePos) || ReplayRevealMap) {
 			UnitUnderCursor = UnitOnMapTile(tilePos, -1);
@@ -2041,12 +2039,12 @@ static void HandlePieMenuMouseSelection()
 				CursorState = CursorStatePoint;
 			}
 			CursorOn = CursorOnUnknown;
-			UIHandleMouseMove(CursorScreenPos.x, CursorScreenPos.y); // recompute CursorOn and company
+			UIHandleMouseMove(CursorScreenPos); // recompute CursorOn and company
 		}
 	} else {
 		CursorState = CursorStatePoint;
 		CursorOn = CursorOnUnknown;
-		UIHandleMouseMove(CursorScreenPos.x, CursorScreenPos.y); // recompute CursorOn and company
+		UIHandleMouseMove(CursorScreenPos); // recompute CursorOn and company
 	}
 }
 //@}

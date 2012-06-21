@@ -90,7 +90,7 @@ static void MovieCallbackKeyRepeated(unsigned, unsigned)
 {
 }
 
-static void MovieCallbackMouseMove(int, int)
+static void MovieCallbackMouseMove(const PixelPos &)
 {
 }
 

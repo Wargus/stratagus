@@ -83,7 +83,7 @@ static void WaitCallbackKeyRepeated(unsigned, unsigned)
 /**
 **  Callback for input.
 */
-static void WaitCallbackMouse(int, int)
+static void WaitCallbackMouse(const PixelPos &)
 {
 }
 

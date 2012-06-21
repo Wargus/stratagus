@@ -67,9 +67,10 @@ static void MenuHandleButtonDown(unsigned)
 static void MenuHandleButtonUp(unsigned)
 {
 }
-static void MenuHandleMouseMove(int x, int y)
+static void MenuHandleMouseMove(const PixelPos &screenPos)
 {
-	HandleCursorMove(&x, &y);
+	PixelPos pos(screenPos);
+	HandleCursorMove(&pos.x, &pos.y);
 }
 static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 {
@@ -1549,7 +1550,7 @@ void MenuScreen::stop(int result, bool stopAll)
 			GamePaused = false;
 			UI.StatusLine.Clear();
 			if (GameRunning) {
-				UIHandleMouseMove(CursorScreenPos.x, CursorScreenPos.y);
+				UIHandleMouseMove(CursorScreenPos);
 			}
 		}
 	}

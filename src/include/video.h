@@ -217,7 +217,7 @@ typedef struct _event_callback_ {
 	/// Callback for mouse button release
 	void (*ButtonReleased)(unsigned buttons);
 	/// Callback for mouse move
-	void (*MouseMoved)(int x, int y);
+	void (*MouseMoved)(const PixelPos &screenPos);
 	/// Callback for mouse exit of game window
 	void (*MouseExit)();
 
