@@ -176,8 +176,7 @@ extern std::string CustomCursor;  /// custom cursor for button
 extern CCursor *GameCursor;     /// cursor-type
 extern int CursorX;             /// cursor position on screen X
 extern int CursorY;             /// cursor position on screen Y
-extern int CursorStartX;        /// rectangle started on screen X
-extern int CursorStartY;        /// rectangle started on screen Y
+extern PixelPos CursorStartScreenPos; /// rectangle started on screen
 extern PixelPos CursorStartMapPos; /// the same in screen map coordinate system
 
 /*----------------------------------------------------------------------------

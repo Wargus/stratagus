@@ -68,8 +68,7 @@ std::string CustomCursor;             /// custom cursor for button
 int CursorX;                 /// cursor position on screen X
 int CursorY;                 /// cursor position on screen Y
 
-int CursorStartX;            /// rectangle started on screen X
-int CursorStartY;            /// rectangle started on screen Y
+PixelPos CursorStartScreenPos;  /// rectangle started on screen
 
 /// position of starting point of selection rectangle, in Map pixels.
 PixelPos CursorStartMapPos;
@@ -260,7 +259,7 @@ static void DrawBuildingCursor()
 void DrawCursor()
 {
 	// Selecting rectangle
-	if (CursorState == CursorStateRectangle && (CursorStartX != CursorX || CursorStartY != CursorY)) {
+	if (CursorState == CursorStateRectangle && (CursorStartScreenPos.x != CursorX || CursorStartScreenPos.y != CursorY)) {
 		const PixelPos cursorStartScreenPos = UI.MouseViewport->MapToScreenPixelPos(CursorStartMapPos);
 
 		DrawVisibleRectangleCursor(cursorStartScreenPos.x, cursorStartScreenPos.y, CursorX, CursorY);

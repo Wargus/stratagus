@@ -1331,8 +1331,8 @@ static void EditorCallbackButtonDown(unsigned button)
 			}
 		} else if (MouseButtons & MiddleButton) {
 			// enter move map mode
-			CursorStartX = CursorX;
-			CursorStartY = CursorY;
+			CursorStartScreenPos.x = CursorX;
+			CursorStartScreenPos.y = CursorY;
 			GameCursor = UI.Scroll.Cursor;
 		}
 	}
@@ -1546,30 +1546,30 @@ static void EditorCallbackMouse(int x, int y)
 		// FIXME: Support with CTRL for faster scrolling.
 		// FIXME: code duplication, see ../ui/mouse.c
 		if (UI.MouseScrollSpeedDefault < 0) {
-			if (x < CursorStartX) {
+			if (x < CursorStartScreenPos.x) {
 				tilePos.x++;
-			} else if (x > CursorStartX) {
+			} else if (x > CursorStartScreenPos.x) {
 				tilePos.x--;
 			}
-			if (y < CursorStartY) {
+			if (y < CursorStartScreenPos.y) {
 				tilePos.y++;
-			} else if (y > CursorStartY) {
+			} else if (y > CursorStartScreenPos.y) {
 				tilePos.y--;
 			}
 		} else {
-			if (x < CursorStartX) {
+			if (x < CursorStartScreenPos.x) {
 				tilePos.x--;
-			} else if (x > CursorStartX) {
+			} else if (x > CursorStartScreenPos.x) {
 				tilePos.x++;
 			}
-			if (y < CursorStartY) {
+			if (y < CursorStartScreenPos.y) {
 				tilePos.y--;
-			} else if (y > CursorStartY) {
+			} else if (y > CursorStartScreenPos.y) {
 				tilePos.y++;
 			}
 		}
-		UI.MouseWarpX = CursorStartX;
-		UI.MouseWarpY = CursorStartY;
+		UI.MouseWarpX = CursorStartScreenPos.x;
+		UI.MouseWarpY = CursorStartScreenPos.y;
 		UI.MouseViewport->Set(tilePos, PixelTileSize / 2);
 		return;
 	}

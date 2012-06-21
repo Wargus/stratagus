@@ -755,8 +755,8 @@ void HandleMouseExit()
 void RestrictCursorToViewport()
 {
 	UI.SelectedViewport->Restrict(CursorX, CursorY);
-	UI.MouseWarpX = CursorStartX = CursorX;
-	UI.MouseWarpY = CursorStartY = CursorY;
+	UI.MouseWarpX = CursorStartScreenPos.x = CursorX;
+	UI.MouseWarpY = CursorStartScreenPos.y = CursorY;
 	CursorOn = CursorOnMap;
 }
 
@@ -768,8 +768,8 @@ void RestrictCursorToMinimap()
 	clamp(&CursorX, UI.Minimap.X, UI.Minimap.X + UI.Minimap.W - 1);
 	clamp(&CursorY, UI.Minimap.Y, UI.Minimap.Y + UI.Minimap.H - 1);
 
-	UI.MouseWarpX = CursorStartX = CursorX;
-	UI.MouseWarpY = CursorStartY = CursorY;
+	UI.MouseWarpX = CursorStartScreenPos.x = CursorX;
+	UI.MouseWarpY = CursorStartScreenPos.y = CursorY;
 	CursorOn = CursorOnMinimap;
 }
 
@@ -792,8 +792,8 @@ void MouseScrollMap(int x, int y)
 	const PixelDiff diff = {x - CursorX, y - CursorY};
 
 	UI.MouseViewport->Set(UI.MouseViewport->MapPos, UI.MouseViewport->Offset + speed * diff);
-	UI.MouseWarpX = CursorStartX;
-	UI.MouseWarpY = CursorStartY;
+	UI.MouseWarpX = CursorStartScreenPos.x;
+	UI.MouseWarpY = CursorStartScreenPos.y;
 }
 
 /**
@@ -834,18 +834,8 @@ void UIHandleMouseMove(int x, int y)
 	//  Make the piemenu "follow" the mouse
 	//
 	if (CursorState == CursorStatePieMenu && CursorOn == CursorOnMap) {
-		if (CursorX - CursorStartX > UI.PieMenu.X[2]) {
-			CursorStartX = CursorX - UI.PieMenu.X[2];
-		}
-		if (CursorStartX - CursorX > UI.PieMenu.X[2]) {
-			CursorStartX = CursorX + UI.PieMenu.X[2];
-		}
-		if (CursorStartY - CursorY > UI.PieMenu.Y[4]) {
-			CursorStartY = CursorY + UI.PieMenu.Y[4];
-		}
-		if (CursorY - CursorStartY > UI.PieMenu.Y[4]) {
-			CursorStartY = CursorY - UI.PieMenu.Y[4];
-		}
+		clamp(&CursorStartScreenPos.x, CursorX - UI.PieMenu.X[2], CursorX + UI.PieMenu.X[2]);
+		clamp(&CursorStartScreenPos.y, CursorY - UI.PieMenu.Y[4], CursorY + UI.PieMenu.Y[4]);
 		return;
 	}
 
@@ -955,8 +945,8 @@ void UIHandleMouseMove(int x, int y)
 		const Vec2i cursorPos = {UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY)};
 
 		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorPos));
-		CursorStartX = CursorX;
-		CursorStartY = CursorY;
+		CursorStartScreenPos.x = CursorX;
+		CursorStartScreenPos.y = CursorY;
 		return;
 	}
 }
@@ -1584,8 +1574,8 @@ void UIHandleButtonDown(unsigned button)
 		if (MouseButtons & UI.PieMenu.MouseButton) { // enter pie menu
 			UnitUnderCursor = NoUnitP;
 			GameCursor = UI.Point.Cursor;  // Reset
-			CursorStartX = CursorX;
-			CursorStartY = CursorY;
+			CursorStartScreenPos.x = CursorX;
+			CursorStartScreenPos.y = CursorY;
 			if (NumSelected && Selected[0]->Player == ThisPlayer && CursorState == CursorStatePoint) {
 				CursorState = CursorStatePieMenu;
 			}
@@ -1616,16 +1606,16 @@ void UIHandleButtonDown(unsigned button)
 				DoRightButton(mapPixelPos);
 			}
 		} else if (MouseButtons & LeftButton) { // enter select mode
-			CursorStartX = CursorX;
-			CursorStartY = CursorY;
+			CursorStartScreenPos.x = CursorX;
+			CursorStartScreenPos.y = CursorY;
 			const PixelPos screenCursorPos = {CursorX, CursorY};
 			const PixelPos mapCursorPos = UI.MouseViewport->ScreenToMapPixelPos(screenCursorPos);
 			CursorStartMapPos = mapCursorPos;
 			GameCursor = UI.Cross.Cursor;
 			CursorState = CursorStateRectangle;
 		} else if (MouseButtons & MiddleButton) {// enter move map mode
-			CursorStartX = CursorX;
-			CursorStartY = CursorY;
+			CursorStartScreenPos.x = CursorX;
+			CursorStartScreenPos.x = CursorY;
 			GameCursor = UI.Scroll.Cursor;
 		}
 		//
@@ -1775,8 +1765,8 @@ void UIHandleButtonUp(unsigned button)
 	//
 	if (CursorState == CursorStatePieMenu) {
 		// Little threshold
-		if (CursorStartX < CursorX - 1 || CursorStartX > CursorX + 1
-			|| CursorStartY < CursorY - 1 || CursorStartY > CursorY + 1) {
+		if (CursorStartScreenPos.x < CursorX - 1 || CursorX + 1 < CursorStartScreenPos.x
+			|| CursorStartScreenPos.y < CursorY - 1 || CursorY + 1 < CursorStartScreenPos.y) {
 			// there was a move, handle the selected button/pie
 			HandlePieMenuMouseSelection();
 		}
@@ -1834,8 +1824,8 @@ void UIHandleButtonUp(unsigned button)
 		//
 		//  Little threshold
 		//
-		if (CursorStartX < CursorX - 1 || CursorStartX > CursorX + 1
-			|| CursorStartY < CursorY - 1 || CursorStartY > CursorY + 1) {
+		if (CursorStartScreenPos.x < CursorX - 1 || CursorX + 1 < CursorStartScreenPos.x
+			|| CursorStartScreenPos.y < CursorY - 1 || CursorY + 1 < CursorStartScreenPos.y ) {
 			int x0 = CursorStartMapPos.x;
 			int y0 = CursorStartMapPos.y;
 			const PixelPos cursorScreenPos = {CursorX, CursorY};
@@ -1962,8 +1952,8 @@ void UIHandleButtonUp(unsigned button)
 			}
 		}
 
-		CursorStartX = 0;
-		CursorStartY = 0;
+		CursorStartScreenPos.x = 0;
+		CursorStartScreenPos.y = 0;
 		GameCursor = UI.Point.Cursor;
 		CursorState = CursorStatePoint;
 	}
@@ -1976,8 +1966,8 @@ void UIHandleButtonUp(unsigned button)
 */
 static int GetPieUnderCursor()
 {
-	int x = CursorX - (CursorStartX - ICON_SIZE_X / 2);
-	int y = CursorY - (CursorStartY - ICON_SIZE_Y / 2);
+	int x = CursorX - (CursorStartScreenPos.x - ICON_SIZE_X / 2);
+	int y = CursorY - (CursorStartScreenPos.y - ICON_SIZE_Y / 2);
 	for (int i = 0; i < 8; ++i) {
 		if (x > UI.PieMenu.X[i] && x < UI.PieMenu.X[i] + ICON_SIZE_X
 			&& y > UI.PieMenu.Y[i] && y < UI.PieMenu.Y[i] + ICON_SIZE_Y) {
@@ -2011,15 +2001,15 @@ void DrawPieMenu()
 	// Draw background
 	if (UI.PieMenu.G) {
 		UI.PieMenu.G->DrawFrameClip(0,
-									CursorStartX - UI.PieMenu.G->Width / 2,
-									CursorStartY - UI.PieMenu.G->Height / 2);
+									CursorStartScreenPos.x - UI.PieMenu.G->Width / 2,
+									CursorStartScreenPos.y - UI.PieMenu.G->Height / 2);
 	}
 	CPlayer &player = *Selected[0]->Player;
 
 	for (int i = 0; i < (int)UI.ButtonPanel.Buttons.size() && i < 8; ++i) {
 		if (buttons[i].Pos != -1) {
-			int x = CursorStartX - ICON_SIZE_X / 2 + UI.PieMenu.X[i];
-			int y = CursorStartY - ICON_SIZE_Y / 2 + UI.PieMenu.Y[i];
+			int x = CursorStartScreenPos.x - ICON_SIZE_X / 2 + UI.PieMenu.X[i];
+			int y = CursorStartScreenPos.y - ICON_SIZE_Y / 2 + UI.PieMenu.Y[i];
 
 			// Draw icon
 			buttons[i].Icon.Icon->DrawIcon(player, x, y);
@@ -2062,8 +2052,8 @@ static void HandlePieMenuMouseSelection()
 		if (CurrentButtons[pie].Action == ButtonButton) {
 			// there is a submenu => stay in piemenu mode
 			// and recenter the piemenu around the cursor
-			CursorStartX = CursorX;
-			CursorStartY = CursorY;
+			CursorStartScreenPos.x = CursorX;
+			CursorStartScreenPos.y = CursorY;
 		} else {
 			if (CursorState == CursorStatePieMenu) {
 				CursorState = CursorStatePoint;
