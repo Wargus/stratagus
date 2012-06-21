@@ -205,24 +205,51 @@ namespace gcn
             ret = true;
         }
         else if (key.getValue() == Key::UP)
-        {      
-            setSelected(mSelected - 1);
-
-            if (mSelected == -1)
-            {
-                setSelected(0);
-            }
-            generateAction(selectEventId);
+        {
+            selectNextPrevElement(-1);
             ret = true;
         }
         else if (key.getValue() == Key::DOWN)
         {
-            setSelected(mSelected + 1);
-            generateAction(selectEventId);
+            selectNextPrevElement(+1);
             ret = true;
+        }
+        else if (key.getValue() == Key::PAGE_UP)
+        {
+            ret = selectNextPrevPage(-1);
+        }
+        else if (key.getValue() == Key::PAGE_DOWN)
+        {
+            ret = selectNextPrevPage(+1);
         }
 
         return ret;
+    }
+
+    bool ListBox::selectNextPrevPage(int sign)
+    {
+        BasicContainer *parent = getParent();
+        if (parent == NULL)
+        {
+            return false;
+        }
+
+        int drawWidth = 0, drawHeight = 0;
+        parent->getDrawSize(drawWidth, drawHeight, this);
+        int pageSize = std::max(drawHeight / getFont()->getHeight(), 1);
+        selectNextPrevElement(sign * pageSize);
+        return true;
+    }
+
+    void ListBox::selectNextPrevElement(int sign)
+    {
+        int index = mSelected + sign;
+        if (index < 0)
+        {
+            index = 0;
+        }
+        setSelected(index);
+        generateAction(selectEventId);
     }
 
     void ListBox::mousePress(int x, int y, int button)
