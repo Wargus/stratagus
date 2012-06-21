@@ -744,8 +744,8 @@ void HandleMouseExit()
 
 	// Show hour-glass (to denote to the user, the game is waiting)
 	// FIXME: couldn't define a hour-glass that easily, so used pointer
-	CursorX = Video.Width / 2;
-	CursorY = Video.Height / 2;
+	CursorScreenPos.x = Video.Width / 2;
+	CursorScreenPos.y = Video.Height / 2;
 	GameCursor = UI.Point.Cursor;
 }
 
@@ -754,9 +754,8 @@ void HandleMouseExit()
 */
 void RestrictCursorToViewport()
 {
-	UI.SelectedViewport->Restrict(CursorX, CursorY);
-	UI.MouseWarpX = CursorStartScreenPos.x = CursorX;
-	UI.MouseWarpY = CursorStartScreenPos.y = CursorY;
+	UI.SelectedViewport->Restrict(CursorScreenPos.x, CursorScreenPos.y);
+	UI.MouseWarpPos = CursorStartScreenPos = CursorScreenPos;
 	CursorOn = CursorOnMap;
 }
 
@@ -765,11 +764,10 @@ void RestrictCursorToViewport()
 */
 void RestrictCursorToMinimap()
 {
-	clamp(&CursorX, UI.Minimap.X, UI.Minimap.X + UI.Minimap.W - 1);
-	clamp(&CursorY, UI.Minimap.Y, UI.Minimap.Y + UI.Minimap.H - 1);
+	clamp(&CursorScreenPos.x, UI.Minimap.X, UI.Minimap.X + UI.Minimap.W - 1);
+	clamp(&CursorScreenPos.y, UI.Minimap.Y, UI.Minimap.Y + UI.Minimap.H - 1);
 
-	UI.MouseWarpX = CursorStartScreenPos.x = CursorX;
-	UI.MouseWarpY = CursorStartScreenPos.y = CursorY;
+	UI.MouseWarpPos = CursorStartScreenPos = CursorScreenPos;
 	CursorOn = CursorOnMinimap;
 }
 
@@ -789,11 +787,10 @@ void MouseScrollMap(int x, int y)
 		speed = UI.MouseScrollSpeedDefault;
 	}
 
-	const PixelDiff diff = {x - CursorX, y - CursorY};
+	const PixelDiff diff = {x - CursorScreenPos.x, y - CursorScreenPos.y};
 
 	UI.MouseViewport->Set(UI.MouseViewport->MapPos, UI.MouseViewport->Offset + speed * diff);
-	UI.MouseWarpX = CursorStartScreenPos.x;
-	UI.MouseWarpY = CursorStartScreenPos.y;
+	UI.MouseWarpPos = CursorStartScreenPos;
 }
 
 /**
@@ -812,9 +809,8 @@ void UIHandleMouseMove(int x, int y)
 	//
 	if (CursorState == CursorStateRectangle) {
 		// Restrict cursor to viewport.
-		UI.SelectedViewport->Restrict(CursorX, CursorY);
-		UI.MouseWarpX = CursorX;
-		UI.MouseWarpY = CursorY;
+		UI.SelectedViewport->Restrict(CursorScreenPos.x, CursorScreenPos.y);
+		UI.MouseWarpPos = CursorScreenPos;
 		return;
 	}
 
@@ -834,14 +830,14 @@ void UIHandleMouseMove(int x, int y)
 	//  Make the piemenu "follow" the mouse
 	//
 	if (CursorState == CursorStatePieMenu && CursorOn == CursorOnMap) {
-		clamp(&CursorStartScreenPos.x, CursorX - UI.PieMenu.X[2], CursorX + UI.PieMenu.X[2]);
-		clamp(&CursorStartScreenPos.y, CursorY - UI.PieMenu.Y[4], CursorY + UI.PieMenu.Y[4]);
+		clamp(&CursorStartScreenPos.x, CursorScreenPos.x - UI.PieMenu.X[2], CursorScreenPos.x + UI.PieMenu.X[2]);
+		clamp(&CursorStartScreenPos.y, CursorScreenPos.y - UI.PieMenu.Y[4], CursorScreenPos.y + UI.PieMenu.Y[4]);
 		return;
 	}
 
 	// Restrict mouse to minimap when dragging
 	if (OldCursorOn == CursorOnMinimap && CursorOn != CursorOnMinimap && (MouseButtons & LeftButton)) {
-		const Vec2i cursorPos = {UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY)};
+		const Vec2i cursorPos = {UI.Minimap.Screen2MapX(CursorScreenPos.x), UI.Minimap.Screen2MapY(CursorScreenPos.y)};
 
 		RestrictCursorToMinimap();
 		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorPos));
@@ -857,8 +853,7 @@ void UIHandleMouseMove(int x, int y)
 
 	// This is forbidden for unexplored and not visible space
 	// FIXME: This must done new, moving units, scrolling...
-	const PixelPos cursorPixelPos = {CursorX, CursorY};
-	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(cursorPixelPos)) {
+	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
 		const CViewport &vp = *UI.MouseViewport;
 		const PixelPos screenPos = {x, y};
 		const Vec2i tilePos = vp.ScreenToTilePos(screenPos);
@@ -913,7 +908,7 @@ void UIHandleMouseMove(int x, int y)
 				}
 			}
 			if (CursorOn == CursorOnMinimap && (MouseButtons & RightButton)) {
-				const Vec2i cursorPos = {UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY)};
+				const Vec2i cursorPos = {UI.Minimap.Screen2MapX(CursorScreenPos.x), UI.Minimap.Screen2MapY(CursorScreenPos.y)};
 				//
 				//  Minimap move viewpoint
 				//
@@ -942,11 +937,10 @@ void UIHandleMouseMove(int x, int y)
 		//
 		//  Minimap move viewpoint
 		//
-		const Vec2i cursorPos = {UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY)};
+		const Vec2i cursorPos = {UI.Minimap.Screen2MapX(CursorScreenPos.x), UI.Minimap.Screen2MapY(CursorScreenPos.y)};
 
 		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorPos));
-		CursorStartScreenPos.x = CursorX;
-		CursorStartScreenPos.y = CursorY;
+		CursorStartScreenPos = CursorScreenPos;
 		return;
 	}
 }
@@ -1364,8 +1358,7 @@ static void UISelectStateButtonDown(unsigned)
 	//
 	//  Clicking on the map.
 	//
-	const PixelPos screenPixelPos = {CursorX, CursorY};
-	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(screenPixelPos)) {
+	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
 		UI.StatusLine.Clear();
 		ClearCosts();
 		CursorState = CursorStatePoint;
@@ -1376,7 +1369,7 @@ static void UISelectStateButtonDown(unsigned)
 
 		if (MouseButtons & LeftButton) {
 			const CViewport &vp = *UI.MouseViewport;
-			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(screenPixelPos);
+			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(CursorScreenPos);
 
 			if (!ClickMissile.empty()) {
 				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
@@ -1390,8 +1383,8 @@ static void UISelectStateButtonDown(unsigned)
 	//  Clicking on the minimap.
 	//
 	if (CursorOn == CursorOnMinimap) {
-		int mx = UI.Minimap.Screen2MapX(CursorX);
-		int my = UI.Minimap.Screen2MapY(CursorY);
+		int mx = UI.Minimap.Screen2MapX(CursorScreenPos.x);
+		int my = UI.Minimap.Screen2MapY(CursorScreenPos.y);
 		const Vec2i cursorTilePos = {mx, my};
 
 		if (MouseButtons & LeftButton) {
@@ -1494,7 +1487,7 @@ void UIHandleButtonDown(unsigned button)
 		return;
 	}
 	// CursorOn should have changed with BigMapMode, so recompute it.
-	HandleMouseOn(CursorX, CursorY);
+	HandleMouseOn(CursorScreenPos.x, CursorScreenPos.y);
 	//
 	//  Selecting target. (Move,Attack,Patrol,... commands);
 	//
@@ -1534,13 +1527,12 @@ void UIHandleButtonDown(unsigned button)
 				return;
 			}
 #endif
-			const PixelPos cursorPixelPos = {CursorX, CursorY};
 			// Possible Selected[0] was removed from map
 			// need to make sure there is a unit to build
 			if (Selected[0] && (MouseButtons & LeftButton)
-				&& UI.MouseViewport->IsInsideMapArea(cursorPixelPos)) {// enter select mode
+				&& UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {// enter select mode
 				int explored = 1;
-				const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(cursorPixelPos);
+				const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 				// FIXME: error messages
 
 				for (int j = 0; explored && j < Selected[0]->Type->TileHeight; ++j) {
@@ -1574,8 +1566,7 @@ void UIHandleButtonDown(unsigned button)
 		if (MouseButtons & UI.PieMenu.MouseButton) { // enter pie menu
 			UnitUnderCursor = NoUnitP;
 			GameCursor = UI.Point.Cursor;  // Reset
-			CursorStartScreenPos.x = CursorX;
-			CursorStartScreenPos.y = CursorY;
+			CursorStartScreenPos = CursorScreenPos;
 			if (NumSelected && Selected[0]->Player == ThisPlayer && CursorState == CursorStatePoint) {
 				CursorState = CursorStatePieMenu;
 			}
@@ -1584,45 +1575,39 @@ void UIHandleButtonDown(unsigned button)
 #else
 		} else if (MouseButtons & RightButton) {
 #endif
-			const PixelPos cursorPixelPos = {CursorX, CursorY};
-			if (!GameObserve && !GamePaused && UI.MouseViewport->IsInsideMapArea(cursorPixelPos)) {
+			if (!GameObserve && !GamePaused && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
 				CUnit *unit;
 				// FIXME: Rethink the complete chaos of coordinates here
 				// FIXME: Johns: Perhaps we should use a pixel map coordinates
-				const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(cursorPixelPos);
+				const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
 				if (UnitUnderCursor != NULL && (unit = UnitOnMapTile(tilePos, -1))
 					&& !UnitUnderCursor->Type->Decoration) {
 					unit->Blink = 4;                // if right click on building -- blink
 				} else { // if not not click on building -- green cross
 					if (!ClickMissile.empty()) {
-						const PixelPos screenPos = {CursorX, CursorY};
-						const PixelPos mapPixelPos = UI.MouseViewport->ScreenToMapPixelPos(screenPos);
+						const PixelPos mapPixelPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 
 						MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
 					}
 				}
-				const PixelPos mapPixelPos = UI.MouseViewport->ScreenToMapPixelPos(cursorPixelPos);
+				const PixelPos mapPixelPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 				DoRightButton(mapPixelPos);
 			}
 		} else if (MouseButtons & LeftButton) { // enter select mode
-			CursorStartScreenPos.x = CursorX;
-			CursorStartScreenPos.y = CursorY;
-			const PixelPos screenCursorPos = {CursorX, CursorY};
-			const PixelPos mapCursorPos = UI.MouseViewport->ScreenToMapPixelPos(screenCursorPos);
-			CursorStartMapPos = mapCursorPos;
+			CursorStartScreenPos = CursorScreenPos;
+			CursorStartMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 			GameCursor = UI.Cross.Cursor;
 			CursorState = CursorStateRectangle;
 		} else if (MouseButtons & MiddleButton) {// enter move map mode
-			CursorStartScreenPos.x = CursorX;
-			CursorStartScreenPos.x = CursorY;
+			CursorStartScreenPos = CursorScreenPos;
 			GameCursor = UI.Scroll.Cursor;
 		}
 		//
 		//  Cursor is on the minimap area
 		//
 	} else if (CursorOn == CursorOnMinimap) {
-		const Vec2i cursorTilePos = {UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY)};
+		const Vec2i cursorTilePos = {UI.Minimap.Screen2MapX(CursorScreenPos.x), UI.Minimap.Screen2MapY(CursorScreenPos.y)};
 
 		if (MouseButtons & LeftButton) { // enter move mini-mode
 			UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorTilePos));
@@ -1765,8 +1750,8 @@ void UIHandleButtonUp(unsigned button)
 	//
 	if (CursorState == CursorStatePieMenu) {
 		// Little threshold
-		if (CursorStartScreenPos.x < CursorX - 1 || CursorX + 1 < CursorStartScreenPos.x
-			|| CursorStartScreenPos.y < CursorY - 1 || CursorY + 1 < CursorStartScreenPos.y) {
+		if (CursorStartScreenPos.x < CursorScreenPos.x - 1 || CursorScreenPos.x + 1 < CursorStartScreenPos.x
+			|| CursorStartScreenPos.y < CursorScreenPos.y - 1 || CursorScreenPos.y + 1 < CursorStartScreenPos.y) {
 			// there was a move, handle the selected button/pie
 			HandlePieMenuMouseSelection();
 		}
@@ -1824,12 +1809,11 @@ void UIHandleButtonUp(unsigned button)
 		//
 		//  Little threshold
 		//
-		if (CursorStartScreenPos.x < CursorX - 1 || CursorX + 1 < CursorStartScreenPos.x
-			|| CursorStartScreenPos.y < CursorY - 1 || CursorY + 1 < CursorStartScreenPos.y ) {
+		if (CursorStartScreenPos.x < CursorScreenPos.x - 1 || CursorScreenPos.x + 1 < CursorStartScreenPos.x
+			|| CursorStartScreenPos.y < CursorScreenPos.y - 1 || CursorScreenPos.y + 1 < CursorStartScreenPos.y ) {
 			int x0 = CursorStartMapPos.x;
 			int y0 = CursorStartMapPos.y;
-			const PixelPos cursorScreenPos = {CursorX, CursorY};
-			const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(cursorScreenPos);
+			const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 			int x1 = cursorMapPos.x;
 			int y1 = cursorMapPos.y;
 
@@ -1868,11 +1852,10 @@ void UIHandleButtonUp(unsigned button)
 			//
 			// cade: cannot select unit on invisible space
 			// FIXME: johns: only complete invisibile units
-			const PixelPos cursorPixelPos = {CursorX, CursorY};
-			const Vec2i cursorTilePos = UI.MouseViewport->ScreenToTilePos(cursorPixelPos);
+			const Vec2i cursorTilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
 			if (Map.IsFieldVisible(*ThisPlayer, cursorTilePos) || ReplayRevealMap) {
-				const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(cursorPixelPos);
+				const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 
 				unit = UnitOnScreen(unit, cursorMapPos.x, cursorMapPos.y);
 			}
@@ -1966,8 +1949,8 @@ void UIHandleButtonUp(unsigned button)
 */
 static int GetPieUnderCursor()
 {
-	int x = CursorX - (CursorStartScreenPos.x - ICON_SIZE_X / 2);
-	int y = CursorY - (CursorStartScreenPos.y - ICON_SIZE_Y / 2);
+	int x = CursorScreenPos.x - (CursorStartScreenPos.x - ICON_SIZE_X / 2);
+	int y = CursorScreenPos.y - (CursorStartScreenPos.y - ICON_SIZE_Y / 2);
 	for (int i = 0; i < 8; ++i) {
 		if (x > UI.PieMenu.X[i] && x < UI.PieMenu.X[i] + ICON_SIZE_X
 			&& y > UI.PieMenu.Y[i] && y < UI.PieMenu.Y[i] + ICON_SIZE_Y) {
@@ -2052,19 +2035,18 @@ static void HandlePieMenuMouseSelection()
 		if (CurrentButtons[pie].Action == ButtonButton) {
 			// there is a submenu => stay in piemenu mode
 			// and recenter the piemenu around the cursor
-			CursorStartScreenPos.x = CursorX;
-			CursorStartScreenPos.y = CursorY;
+			CursorStartScreenPos = CursorScreenPos;
 		} else {
 			if (CursorState == CursorStatePieMenu) {
 				CursorState = CursorStatePoint;
 			}
 			CursorOn = CursorOnUnknown;
-			UIHandleMouseMove(CursorX, CursorY); // recompute CursorOn and company
+			UIHandleMouseMove(CursorScreenPos.x, CursorScreenPos.y); // recompute CursorOn and company
 		}
 	} else {
 		CursorState = CursorStatePoint;
 		CursorOn = CursorOnUnknown;
-		UIHandleMouseMove(CursorX, CursorY); // recompute CursorOn and company
+		UIHandleMouseMove(CursorScreenPos.x, CursorScreenPos.y); // recompute CursorOn and company
 	}
 }
 //@}

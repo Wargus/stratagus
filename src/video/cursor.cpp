@@ -65,13 +65,9 @@ int CursorValue;             /// value for CursorAction (spell type f.e.)
 std::string CustomCursor;             /// custom cursor for button
 
 // Event changed mouse position, can alter at any moment
-int CursorX;                 /// cursor position on screen X
-int CursorY;                 /// cursor position on screen Y
-
+PixelPos CursorScreenPos;    /// cursor position on screen
 PixelPos CursorStartScreenPos;  /// rectangle started on screen
-
-/// position of starting point of selection rectangle, in Map pixels.
-PixelPos CursorStartMapPos;
+PixelPos CursorStartMapPos;/// position of starting point of selection rectangle, in Map pixels.
 
 
 /*--- DRAW BUILDING  CURSOR ------------------------------------------------*/
@@ -179,8 +175,7 @@ static void DrawBuildingCursor()
 {
 	// Align to grid
 	const CViewport &vp = *UI.MouseViewport;
-	const PixelPos cursorScreenPos = {CursorX, CursorY};
-	const Vec2i mpos = vp.ScreenToTilePos(cursorScreenPos);
+	const Vec2i mpos = vp.ScreenToTilePos(CursorScreenPos);
 	const PixelPos screenPos = vp.TilePosToScreen_TopLeft(mpos);
 
 	CUnit *ontop = NULL;
@@ -259,10 +254,10 @@ static void DrawBuildingCursor()
 void DrawCursor()
 {
 	// Selecting rectangle
-	if (CursorState == CursorStateRectangle && (CursorStartScreenPos.x != CursorX || CursorStartScreenPos.y != CursorY)) {
+	if (CursorState == CursorStateRectangle && CursorStartScreenPos != CursorScreenPos) {
 		const PixelPos cursorStartScreenPos = UI.MouseViewport->MapToScreenPixelPos(CursorStartMapPos);
 
-		DrawVisibleRectangleCursor(cursorStartScreenPos.x, cursorStartScreenPos.y, CursorX, CursorY);
+		DrawVisibleRectangleCursor(cursorStartScreenPos.x, cursorStartScreenPos.y, CursorScreenPos.x, CursorScreenPos.y);
 	} else if (CursorBuilding && CursorOn == CursorOnMap) {
 		// Selecting position for building
 		DrawBuildingCursor();
@@ -288,8 +283,8 @@ void DrawCursor()
 		}
 
 		SDL_Rect srcRect = {
-			CursorX - GameCursor->HotX,
-			CursorY - GameCursor->HotY,
+			CursorScreenPos.x - GameCursor->HotX,
+			CursorScreenPos.y - GameCursor->HotY,
 			GameCursor->G->getWidth(),
 			GameCursor->G->getHeight()
 		};
@@ -306,7 +301,7 @@ void DrawCursor()
 			GameCursor->G->Load();
 		}
 		GameCursor->G->DrawFrameClip(GameCursor->SpriteFrame,
-									 CursorX - GameCursor->HotX, CursorY - GameCursor->HotY);
+									 CursorScreenPos.x - GameCursor->HotX, CursorScreenPos.y - GameCursor->HotY);
 	}
 }
 
@@ -317,7 +312,7 @@ void HideCursor()
 {
 	if (!UseOpenGL && !GameRunning && !Editor.Running && GameCursor) {
 		SDL_Rect dstRect = {
-			CursorX - GameCursor->HotX, CursorY - GameCursor->HotY,
+			CursorScreenPos.x - GameCursor->HotX, CursorScreenPos.y - GameCursor->HotY,
 			0, 0
 		};
 		SDL_BlitSurface(HiddenSurface, NULL, TheScreen, &dstRect);

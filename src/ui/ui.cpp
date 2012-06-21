@@ -70,7 +70,6 @@ CUserInterface UI;
 CUserInterface::CUserInterface() :
 	MouseScroll(false), KeyScroll(false), MouseScrollSpeed(1),
 	MouseScrollSpeedDefault(0), MouseScrollSpeedControl(0),
-	MouseWarpX(0), MouseWarpY(0),
 	SingleSelectedButton(NULL),
 	MaxSelectedFont(NULL), MaxSelectedTextX(0), MaxSelectedTextY(0),
 	SingleTrainingButton(NULL),
@@ -83,6 +82,7 @@ CUserInterface::CUserInterface() :
 	ViewportCursorColor(0), Offset640X(0), Offset480Y(0),
 	VictoryBackgroundG(NULL), DefeatBackgroundG(NULL)
 {
+	MouseWarpPos.x = MouseWarpPos.y = 0;
 	memset(&CompletedBarColorRGB, 0, sizeof(CompletedBarColorRGB));
 
 	Point.Name = "cursor-point";
@@ -390,7 +390,6 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 	//
 	//  Update the viewport pointers
 	//
-	PixelPos CursorScreenPos = {CursorX, CursorY};
 	UI.MouseViewport = GetViewport(CursorScreenPos);
 	if (UI.SelectedViewport > UI.Viewports + UI.NumViewports - 1) {
 		UI.SelectedViewport = UI.Viewports + UI.NumViewports - 1;

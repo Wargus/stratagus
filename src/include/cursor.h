@@ -174,8 +174,7 @@ extern CUnitType *CursorBuilding; /// building cursor
 extern std::string CustomCursor;  /// custom cursor for button
 
 extern CCursor *GameCursor;     /// cursor-type
-extern int CursorX;             /// cursor position on screen X
-extern int CursorY;             /// cursor position on screen Y
+extern PixelPos CursorScreenPos; /// cursor position on screen
 extern PixelPos CursorStartScreenPos; /// rectangle started on screen
 extern PixelPos CursorStartMapPos; /// the same in screen map coordinate system
 

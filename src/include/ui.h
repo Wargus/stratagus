@@ -668,8 +668,7 @@ public:
 	/// Middle-Mouse Scroll Speed with Control pressed
 	int MouseScrollSpeedControl;
 
-	int MouseWarpX;                     /// Cursor warp X position
-	int MouseWarpY;                     /// Cursor warp Y position
+	PixelPos MouseWarpPos;              /// Cursor warp screen position
 
 	std::string NormalFontColor;        /// Color for normal text displayed
 	std::string ReverseFontColor;       /// Color for reverse text displayed

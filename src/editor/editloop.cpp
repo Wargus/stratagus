@@ -885,8 +885,7 @@ static void DrawMapCursor()
 
 	// Draw map cursor
 	if (UI.MouseViewport && !CursorBuilding) {
-		const PixelPos screenCursorPos = { CursorX, CursorY };
-		const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(screenCursorPos);
+		const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 		const PixelPos screenPos = UI.MouseViewport->TilePosToScreen_TopLeft(tilePos);
 
 		if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
@@ -963,26 +962,20 @@ static void DrawStartLocations()
 static void DrawEditorInfo()
 {
 #if 0
-	int tile;
-	int i;
-	int x;
-	int y;
-	unsigned flags;
-	char buf[256];
+	Vec2i pos = {0, 0};
 
-	x = y = 0;
 	if (UI.MouseViewport) {
-		x = Viewport2MapX(UI.MouseViewport, CursorX);
-		y = Viewport2MapY(UI.MouseViewport, CursorY);
+		pos = UI.MouseViewport.ScreenToTilePos(CursorScreenPos);
 	}
 
-	snprintf(buf, sizeof(buf), "Editor (%d %d)", x, y);
+	char buf[256];
+	snprintf(buf, sizeof(buf), "Editor (%d %d)", pos.x, pos.y);
 	CLabel(GetGameFont()).Draw(UI.ResourceX + 2, UI.ResourceY + 2, buf);
-	CMapField *mf = Map.Field(x, y);
+	const CMapField *mf = Map.Field(pos);
 	//
 	// Flags info
 	//
-	flags = mf->Flags;
+	unsigned flags = mf->Flags;
 	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
 			mf->Value, flags,
 			flags & MapFieldUnpassable   ? 'u' : '-',
@@ -1003,8 +996,8 @@ static void DrawEditorInfo()
 	//
 	// Tile info
 	//
-	tile = mf->Tile;
-
+	const int tile = mf->Tile;
+	int i;
 	for (i = 0; i < Map.Tileset.NumTiles; ++i) {
 		if (tile == Map.Tileset.Table[i]) {
 			break;
@@ -1172,8 +1165,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	//
 	if (CursorOn == CursorOnMinimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
-			const PixelPos cursorPixelPos = {CursorX, CursorY};
-			const Vec2i tilePos = UI.Minimap.ScreenToTilePos(cursorPixelPos);
+			const Vec2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 			UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(tilePos));
 		}
 		return;
@@ -1297,8 +1289,7 @@ static void EditorCallbackButtonDown(unsigned button)
 			}
 		}
 
-		const PixelPos cursorScreenpos = {CursorX, CursorY};
-		CViewport *vp = GetViewport(cursorScreenpos);
+		CViewport *vp = GetViewport(CursorScreenPos);
 		Assert(vp);
 		if ((MouseButtons & LeftButton) && UI.SelectedViewport != vp) {
 			// viewport changed
@@ -1306,8 +1297,7 @@ static void EditorCallbackButtonDown(unsigned button)
 		}
 
 		if (MouseButtons & LeftButton) {
-			const PixelPos screenPos = {CursorX, CursorY};
-			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(screenPos);
+			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
 			if (Editor.State == EditorEditTile &&
 				Editor.SelectedTileIndex != -1) {
@@ -1331,8 +1321,7 @@ static void EditorCallbackButtonDown(unsigned button)
 			}
 		} else if (MouseButtons & MiddleButton) {
 			// enter move map mode
-			CursorStartScreenPos.x = CursorX;
-			CursorStartScreenPos.y = CursorY;
+			CursorStartScreenPos = CursorScreenPos;
 			GameCursor = UI.Scroll.Cursor;
 		}
 	}
@@ -1568,15 +1557,13 @@ static void EditorCallbackMouse(int x, int y)
 				tilePos.y++;
 			}
 		}
-		UI.MouseWarpX = CursorStartScreenPos.x;
-		UI.MouseWarpY = CursorStartScreenPos.y;
+		UI.MouseWarpPos = CursorStartScreenPos;
 		UI.MouseViewport->Set(tilePos, PixelTileSize / 2);
 		return;
 	}
 
 	// Automatically unpress when map tile has changed
-	const PixelPos cursorScreenPos = {CursorX, CursorY};
-	const Vec2i cursorTilePos = UI.SelectedViewport->ScreenToTilePos(cursorScreenPos);
+	const Vec2i cursorTilePos = UI.SelectedViewport->ScreenToTilePos(CursorScreenPos);
 
 	if (LastMapX != cursorTilePos.x || LastMapY != cursorTilePos.y) {
 		LastMapX = cursorTilePos.x;
@@ -1592,18 +1579,18 @@ static void EditorCallbackMouse(int x, int y)
 		//
 		// Scroll the map
 		//
-		if (CursorX <= UI.SelectedViewport->GetTopLeftPos().x) {
+		if (CursorScreenPos.x <= UI.SelectedViewport->GetTopLeftPos().x) {
 			vpTilePos.x--;
 			UI.SelectedViewport->Set(vpTilePos, PixelTileSize / 2);
-		} else if (CursorX >= UI.SelectedViewport->GetBottomRightPos().x) {
+		} else if (CursorScreenPos.x >= UI.SelectedViewport->GetBottomRightPos().x) {
 			vpTilePos.x++;
 			UI.SelectedViewport->Set(vpTilePos, PixelTileSize / 2);
 		}
 
-		if (CursorY <= UI.SelectedViewport->GetTopLeftPos().y) {
+		if (CursorScreenPos.y <= UI.SelectedViewport->GetTopLeftPos().y) {
 			vpTilePos.y--;
 			UI.SelectedViewport->Set(vpTilePos, PixelTileSize / 2);
-		} else if (CursorY >= UI.SelectedViewport->GetBottomRightPos().y) {
+		} else if (CursorScreenPos.y >= UI.SelectedViewport->GetBottomRightPos().y) {
 			vpTilePos.y++;
 			UI.SelectedViewport->Set(vpTilePos, PixelTileSize / 2);
 		}
@@ -1612,8 +1599,7 @@ static void EditorCallbackMouse(int x, int y)
 		// Scroll the map, if cursor moves outside the viewport.
 		//
 		RestrictCursorToViewport();
-		const PixelPos cursorPixelPos = {CursorX, CursorY};
-		const Vec2i tilePos = UI.SelectedViewport->ScreenToTilePos(cursorPixelPos);
+		const Vec2i tilePos = UI.SelectedViewport->ScreenToTilePos(CursorScreenPos);
 
 		if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
 			EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
@@ -1634,8 +1620,7 @@ static void EditorCallbackMouse(int x, int y)
 	//
 	if (CursorOn == CursorOnMinimap && (MouseButtons & LeftButton)) {
 		RestrictCursorToMinimap();
-		const PixelPos cursorPixelPos = {CursorX, CursorY};
-		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(cursorPixelPos);
+		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(tilePos));
 		return;
@@ -1659,10 +1644,10 @@ static void EditorCallbackMouse(int x, int y)
 	//
 	if (Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation) {
 		// Scrollbar
-		if (UI.ButtonPanel.X + 4 < CursorX
-			&& CursorX < UI.ButtonPanel.X + 176 - 4
-			&& UI.ButtonPanel.Y + 4 < CursorY
-			&& CursorY < UI.ButtonPanel.Y + 24) {
+		if (UI.ButtonPanel.X + 4 < CursorScreenPos.x
+			&& CursorScreenPos.x < UI.ButtonPanel.X + 176 - 4
+			&& UI.ButtonPanel.Y + 4 < CursorScreenPos.y
+			&& CursorScreenPos.y < UI.ButtonPanel.Y + 24) {
 			return;
 		}
 		bx = UI.InfoPanel.X + 8;
@@ -1762,10 +1747,10 @@ static void EditorCallbackMouse(int x, int y)
 	}
 
 	// Handle buttons
-	if (UI.InfoPanel.X + 4 < CursorX
-		&& CursorX < UI.InfoPanel.X + 4 + Editor.Select.Icon->G->Width
-		&& UI.InfoPanel.Y + 4 < CursorY
-		&& CursorY < UI.InfoPanel.Y + 4 + Editor.Select.Icon->G->Width) {
+	if (UI.InfoPanel.X + 4 < CursorScreenPos.x
+		&& CursorScreenPos.x < UI.InfoPanel.X + 4 + Editor.Select.Icon->G->Width
+		&& UI.InfoPanel.Y + 4 < CursorScreenPos.y
+		&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + Editor.Select.Icon->G->Width) {
 		// FIXME: what is this button?
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = SelectButton;
@@ -1773,10 +1758,10 @@ static void EditorCallbackMouse(int x, int y)
 		UI.StatusLine.Set(_("Select mode"));
 		return;
 	}
-	if (UI.InfoPanel.X + 4 + UNIT_ICON_X < CursorX
-		&& CursorX < UI.InfoPanel.X + 4 + UNIT_ICON_X + Editor.Units.Icon->G->Width
-		&& UI.InfoPanel.Y + 4 + UNIT_ICON_Y < CursorY
-		&& CursorY < UI.InfoPanel.Y + 4 + UNIT_ICON_Y + Editor.Units.Icon->G->Height) {
+	if (UI.InfoPanel.X + 4 + UNIT_ICON_X < CursorScreenPos.x
+		&& CursorScreenPos.x < UI.InfoPanel.X + 4 + UNIT_ICON_X + Editor.Units.Icon->G->Width
+		&& UI.InfoPanel.Y + 4 + UNIT_ICON_Y < CursorScreenPos.y
+		&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + UNIT_ICON_Y + Editor.Units.Icon->G->Height) {
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = UnitButton;
 		CursorOn = CursorOnButton;
@@ -1784,10 +1769,10 @@ static void EditorCallbackMouse(int x, int y)
 		return;
 	}
 	if (Editor.TerrainEditable) {
-		if (UI.InfoPanel.X + 4 + TILE_ICON_X < CursorX
-			&& CursorX < UI.InfoPanel.X + 4 + TILE_ICON_X + PixelTileSize.x + 7
-			&& UI.InfoPanel.Y + 4 + TILE_ICON_Y < CursorY
-			&& CursorY < UI.InfoPanel.Y + 4 + TILE_ICON_Y + PixelTileSize.y + 7) {
+		if (UI.InfoPanel.X + 4 + TILE_ICON_X < CursorScreenPos.x
+			&& CursorScreenPos.x < UI.InfoPanel.X + 4 + TILE_ICON_X + PixelTileSize.x + 7
+			&& UI.InfoPanel.Y + 4 + TILE_ICON_Y < CursorScreenPos.y
+			&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + TILE_ICON_Y + PixelTileSize.y + 7) {
 			ButtonAreaUnderCursor = -1;
 			ButtonUnderCursor = TileButton;
 			CursorOn = CursorOnButton;
@@ -1800,10 +1785,10 @@ static void EditorCallbackMouse(int x, int y)
 						 Editor.StartUnit->Icon.Icon->G->Width : PixelTileSize.x + 7;
 	int StartUnitHeight = Editor.StartUnit ?
 						  Editor.StartUnit->Icon.Icon->G->Height : PixelTileSize.y + 7;
-	if (UI.InfoPanel.X + 4 + START_ICON_X < CursorX
-		&& CursorX < UI.InfoPanel.X + 4 + START_ICON_X + StartUnitWidth
-		&& UI.InfoPanel.Y + 4 + START_ICON_Y < CursorY
-		&& CursorY < UI.InfoPanel.Y + 4 + START_ICON_Y + StartUnitHeight) {
+	if (UI.InfoPanel.X + 4 + START_ICON_X < CursorScreenPos.x
+		&& CursorScreenPos.x < UI.InfoPanel.X + 4 + START_ICON_X + StartUnitWidth
+		&& UI.InfoPanel.Y + 4 + START_ICON_Y < CursorScreenPos.y
+		&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + START_ICON_Y + StartUnitHeight) {
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = StartButton;
 		CursorOn = CursorOnButton;
@@ -1839,10 +1824,8 @@ static void EditorCallbackMouse(int x, int y)
 
 		//
 		// Look if there is an unit under the cursor.
-		// FIXME: use Viewport2MapX Viewport2MapY
 		//
-		const PixelPos cursorScreenPos = {CursorX, CursorY};
-		const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(cursorScreenPos);
+		const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 		UnitUnderCursor = UnitOnScreen(NULL, cursorMapPos.x, cursorMapPos.y);
 
 		if (UnitUnderCursor != NULL) {

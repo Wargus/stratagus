@@ -422,13 +422,12 @@ void CViewport::Draw() const
 	// Draw unit's name popup
 	//
 	if (CursorOn == CursorOnMap && Preference.ShowNameDelay && (ShowNameDelay < GameCycle) && (GameCycle < ShowNameTime)) {
-		const PixelPos mousePos = {CursorX, CursorY};
-		const Vec2i tilePos = this->ScreenToTilePos(mousePos);
-		if (UI.MouseViewport->IsInsideMapArea(mousePos)
+		const Vec2i tilePos = this->ScreenToTilePos(CursorScreenPos);
+		if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos)
 			&& (Map.IsFieldVisible(*ThisPlayer, tilePos) || ReplayRevealMap)) {
-			ShowUnitName(this, mousePos, UnitUnderCursor);
+			ShowUnitName(this, CursorScreenPos, UnitUnderCursor);
 		} else if (!Map.IsFieldVisible(*ThisPlayer, tilePos)) {
-			ShowUnitName(this, mousePos, NULL, true);
+			ShowUnitName(this, CursorScreenPos, NULL, true);
 		}
 	}
 

@@ -1198,8 +1198,8 @@ void Windows::mouseMotion(int x, int y)
 	// Move the cursor.
 	// Usefull only when window reachs the limit.
 	getAbsolutePosition(absx, absy);
-	CursorX = absx + mMouseXOffset;
-	CursorY = absy + mMouseYOffset;
+	CursorScreenPos.x= absx + mMouseXOffset;
+	CursorScreenPos.y = absy + mMouseYOffset;
 }
 
 /**
@@ -1549,7 +1549,7 @@ void MenuScreen::stop(int result, bool stopAll)
 			GamePaused = false;
 			UI.StatusLine.Clear();
 			if (GameRunning) {
-				UIHandleMouseMove(CursorX, CursorY);
+				UIHandleMouseMove(CursorScreenPos.x, CursorScreenPos.y);
 			}
 		}
 	}

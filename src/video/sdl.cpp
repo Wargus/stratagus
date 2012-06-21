@@ -625,7 +625,7 @@ void InitVideoSdl()
 	ColorGreen = Video.MapRGB(TheScreen->format, 0, 252, 0);
 	ColorYellow = Video.MapRGB(TheScreen->format, 252, 252, 0);
 
-	UI.MouseWarpX = UI.MouseWarpY = -1;
+	UI.MouseWarpPos.x = UI.MouseWarpPos.y = -1;
 }
 
 /**
@@ -702,12 +702,12 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 			InputMouseMove(callbacks, SDL_GetTicks(),
 						   event->motion.x, event->motion.y);
 			// FIXME: Same bug fix from X11
-			if ((UI.MouseWarpX != -1 || UI.MouseWarpY != -1)
-				&& (event->motion.x != UI.MouseWarpX || event->motion.y != UI.MouseWarpY)) {
-				int xw = UI.MouseWarpX;
-				int yw = UI.MouseWarpY;
-				UI.MouseWarpX = -1;
-				UI.MouseWarpY = -1;
+			if ((UI.MouseWarpPos.x != -1 || UI.MouseWarpPos.y != -1)
+				&& (event->motion.x != UI.MouseWarpPos.x || event->motion.y != UI.MouseWarpPos.y)) {
+				int xw = UI.MouseWarpPos.x;
+				int yw = UI.MouseWarpPos.y;
+				UI.MouseWarpPos.x = -1;
+				UI.MouseWarpPos.y = -1;
 				SDL_WarpMouse(xw, yw);
 			}
 			break;

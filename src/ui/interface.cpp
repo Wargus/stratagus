@@ -1196,8 +1196,8 @@ void HandleCursorMove(int *x, int *y)
 	//  Reduce coordinates to window-size.
 	clamp(x, 0, Video.Width - 1);
 	clamp(y, 0, Video.Height - 1);
-	CursorX = *x;
-	CursorY = *y;
+	CursorScreenPos.x = *x;
+	CursorScreenPos.y = *y;
 }
 
 /**
