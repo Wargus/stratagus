@@ -42,7 +42,7 @@ extern std::string GameTranslation;
 ----------------------------------------------------------------------------*/
 
 	/// Translate a string
-extern const char *Translate(const char *str);
+extern const char *Translate(const char *str) GCC_ATTR((format_arg(1)));
 	/// Add a translation
 extern void AddTranslation(const std::string &str1, const std::string &str2);
 	/// Load a .po file
