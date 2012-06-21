@@ -146,7 +146,11 @@ namespace gcn
 
     protected:
         ListModel *mListModel;
-        int mSelected;    
+        int mSelected;
+
+    private:
+        void selectNextPrevElement(int sign);
+        bool selectNextPrevPage(int sign);
     };  
 }
 
