@@ -370,7 +370,7 @@ extern void UpdateStatusLineForButton(const ButtonAction *button);
 extern void DrawPieMenu();
 
 /// Handle the mouse in scroll area
-extern int HandleMouseScrollArea(int x, int y);
+extern bool HandleMouseScrollArea(const PixelPos &mousePos);
 
 //
 // in button_checks.cpp

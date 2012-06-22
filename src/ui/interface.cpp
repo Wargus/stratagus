@@ -1139,16 +1139,16 @@ void HandleKeyRepeat(unsigned, unsigned keychar)
 **  @param x  Screen X position.
 **  @param y  Screen Y position.
 **
-**  @return   1 if the mouse is in the scroll area, 0 otherwise
+**  @return   true if the mouse is in the scroll area, false otherwise
 */
-int HandleMouseScrollArea(int x, int y)
+bool HandleMouseScrollArea(const PixelPos &mousePos)
 {
-	if (x < SCROLL_LEFT) {
-		if (y < SCROLL_UP) {
+	if (mousePos.x < SCROLL_LEFT) {
+		if (mousePos.y < SCROLL_UP) {
 			CursorOn = CursorOnScrollLeftUp;
 			MouseScrollState = ScrollLeftUp;
 			GameCursor = UI.ArrowNW.Cursor;
-		} else if (y > SCROLL_DOWN) {
+		} else if (mousePos.y > SCROLL_DOWN) {
 			CursorOn = CursorOnScrollLeftDown;
 			MouseScrollState = ScrollLeftDown;
 			GameCursor = UI.ArrowSW.Cursor;
@@ -1157,12 +1157,12 @@ int HandleMouseScrollArea(int x, int y)
 			MouseScrollState = ScrollLeft;
 			GameCursor = UI.ArrowW.Cursor;
 		}
-	} else if (x > SCROLL_RIGHT) {
-		if (y < SCROLL_UP) {
+	} else if (mousePos.x > SCROLL_RIGHT) {
+		if (mousePos.y < SCROLL_UP) {
 			CursorOn = CursorOnScrollRightUp;
 			MouseScrollState = ScrollRightUp;
 			GameCursor = UI.ArrowNE.Cursor;
-		} else if (y > SCROLL_DOWN) {
+		} else if (mousePos.y > SCROLL_DOWN) {
 			CursorOn = CursorOnScrollRightDown;
 			MouseScrollState = ScrollRightDown;
 			GameCursor = UI.ArrowSE.Cursor;
@@ -1171,18 +1171,20 @@ int HandleMouseScrollArea(int x, int y)
 			MouseScrollState = ScrollRight;
 			GameCursor = UI.ArrowE.Cursor;
 		}
-	} else if (y < SCROLL_UP) {
-		CursorOn = CursorOnScrollUp;
-		MouseScrollState = ScrollUp;
-		GameCursor = UI.ArrowN.Cursor;
-	} else if (y > SCROLL_DOWN) {
-		CursorOn = CursorOnScrollDown;
-		MouseScrollState = ScrollDown;
-		GameCursor = UI.ArrowS.Cursor;
 	} else {
-		return 0;
+		if (mousePos.y < SCROLL_UP) {
+			CursorOn = CursorOnScrollUp;
+			MouseScrollState = ScrollUp;
+			GameCursor = UI.ArrowN.Cursor;
+		} else if (mousePos.y > SCROLL_DOWN) {
+			CursorOn = CursorOnScrollDown;
+			MouseScrollState = ScrollDown;
+			GameCursor = UI.ArrowS.Cursor;
+		} else {
+			return false;
+		}
 	}
-	return 1;
+	return true;
 }
 
 /**

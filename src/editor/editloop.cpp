@@ -1832,7 +1832,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	//
 	// Scrolling Region Handling
 	//
-	if (HandleMouseScrollArea(screenPos.x, screenPos.y)) {
+	if (HandleMouseScrollArea(screenPos)) {
 		return;
 	}
 

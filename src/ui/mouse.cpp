@@ -554,13 +554,10 @@ bool CUIButton::Contains(const PixelPos &screenPos) const
 /**
 **  Set flag on which area is the cursor.
 **
-**  @param x  X coordinate.
-**  @param y  Y coordinate.
+**  @param screenPos  screen position.
 */
-static void HandleMouseOn(int x, int y)
+static void HandleMouseOn(const PixelPos screenPos)
 {
-	const PixelPos screenPos = {x, y};
-
 	MouseScrollState = ScrollNone;
 	ButtonAreaUnderCursor = -1;
 	ButtonUnderCursor = -1;
@@ -569,7 +566,7 @@ static void HandleMouseOn(int x, int y)
 	if (BigMapMode) {
 		CursorOn = CursorOnMap;
 		//  Scrolling Region Handling.
-		HandleMouseScrollArea(screenPos.x, screenPos.y);
+		HandleMouseScrollArea(screenPos);
 		return;
 	}
 
@@ -697,7 +694,7 @@ static void HandleMouseOn(int x, int y)
 	bool on_ui = false;
 	const size_t size = UI.Fillers.size();
 	for (unsigned int j = 0; j < size; ++j) {
-		if (UI.Fillers[j].OnGraphic(x, y)) {
+		if (UI.Fillers[j].OnGraphic(screenPos.x, screenPos.y)) {
 			on_ui = true;
 			break;
 		}
@@ -721,7 +718,7 @@ static void HandleMouseOn(int x, int y)
 	}
 
 	//  Scrolling Region Handling.
-	HandleMouseScrollArea(x, y);
+	HandleMouseScrollArea(screenPos);
 }
 
 /**
@@ -823,7 +820,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 	UnitUnderCursor = NoUnitP;
 	GameCursor = UI.Point.Cursor;  // Reset
-	HandleMouseOn(cursorPos.x, cursorPos.y);
+	HandleMouseOn(cursorPos);
 
 	//
 	//  Make the piemenu "follow" the mouse
@@ -1483,7 +1480,7 @@ void UIHandleButtonDown(unsigned button)
 		return;
 	}
 	// CursorOn should have changed with BigMapMode, so recompute it.
-	HandleMouseOn(CursorScreenPos.x, CursorScreenPos.y);
+	HandleMouseOn(CursorScreenPos);
 	//
 	//  Selecting target. (Move,Attack,Patrol,... commands);
 	//
