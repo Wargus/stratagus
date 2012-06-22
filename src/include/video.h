@@ -210,7 +210,7 @@ public:
 **  This is placed in the video part, because it depends on the video
 **  hardware driver.
 */
-typedef struct _event_callback_ {
+struct EventCallback {
 
 	/// Callback for mouse button press
 	void (*ButtonPressed)(unsigned buttons);
@@ -231,7 +231,7 @@ typedef struct _event_callback_ {
 	/// Callback for network event
 	void (*NetworkEvent)();
 
-} EventCallback;
+};
 
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
 #define RSHIFT  0

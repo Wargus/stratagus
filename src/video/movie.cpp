@@ -57,7 +57,7 @@
 ----------------------------------------------------------------------------*/
 
 extern SDL_Surface *TheScreen;
-static int MovieStop;
+static bool MovieStop;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -69,7 +69,7 @@ static int MovieStop;
 
 static void MovieCallbackButtonPressed(unsigned)
 {
-	MovieStop = 1;
+	MovieStop = true;
 }
 
 static void MovieCallbackButtonReleased(unsigned)
@@ -78,7 +78,7 @@ static void MovieCallbackButtonReleased(unsigned)
 
 static void MovieCallbackKeyPressed(unsigned, unsigned)
 {
-	MovieStop = 1;
+	MovieStop = true;
 }
 
 
@@ -103,9 +103,7 @@ static void MovieCallbackMouseExit()
 */
 static int OutputTheora(OggData *data, SDL_Overlay *yuv_overlay, SDL_Rect *rect)
 {
-	int i;
 	yuv_buffer yuv;
-	int crop_offset;
 
 	theora_decode_YUVout(&data->tstate, &yuv);
 
@@ -119,15 +117,15 @@ static int OutputTheora(OggData *data, SDL_Overlay *yuv_overlay, SDL_Rect *rect)
 		return -1;
 	}
 
-	crop_offset = data->tinfo.offset_x + yuv.y_stride * data->tinfo.offset_y;
-	for (i = 0; i < yuv_overlay->h; ++i) {
+	int crop_offset = data->tinfo.offset_x + yuv.y_stride * data->tinfo.offset_y;
+	for (int i = 0; i < yuv_overlay->h; ++i) {
 		memcpy(yuv_overlay->pixels[0] + yuv_overlay->pitches[0] * i,
 			   yuv.y + crop_offset + yuv.y_stride * i, yuv_overlay->w);
 	}
 
 	crop_offset = (data->tinfo.offset_x / 2) + (yuv.uv_stride) *
 				  (data->tinfo.offset_y / 2);
-	for (i = 0; i < yuv_overlay->h / 2; ++i) {
+	for (int i = 0; i < yuv_overlay->h / 2; ++i) {
 		memcpy(yuv_overlay->pixels[1] + yuv_overlay->pitches[1] * i,
 			   yuv.v + yuv.uv_stride * i, yuv_overlay->w / 2);
 		memcpy(yuv_overlay->pixels[2] + yuv_overlay->pitches[2] * i,
@@ -157,7 +155,6 @@ static int TheoraProcessData(OggData *data)
 				// EOF
 				return -1;
 			}
-
 			ogg_stream_pagein(&data->vstream, &data->page);
 		} else {
 			theora_decode_packetin(&data->tstate, &packet);
@@ -176,25 +173,17 @@ static int TheoraProcessData(OggData *data)
 */
 int PlayMovie(const std::string &name)
 {
-	OggData data;
-	CFile f;
-	SDL_Rect rect;
-	SDL_Overlay *yuv_overlay;
-	CSample *sample;
-	const EventCallback *old_callbacks;
-	EventCallback callbacks;
-	unsigned int start_ticks;
-	int need_data;
-	int diff;
 	char buffer[PATH_MAX];
 
 	LibraryFileName(name.c_str(), buffer, sizeof(buffer));
 
+	CFile f;
 	if (f.open(buffer, CL_OPEN_READ) == -1) {
 		fprintf(stderr, "Can't open file `%s'\n", name.c_str());
 		return 0;
 	}
 
+	OggData data;
 	memset(&data, 0, sizeof(data));
 	if (OggInit(&f, &data) || !data.video) {
 		OggFree(&data);
@@ -203,6 +192,7 @@ int PlayMovie(const std::string &name)
 	}
 
 	data.File = &f;
+	SDL_Rect rect;
 
 	if (data.tinfo.frame_width * 300 / 4 > data.tinfo.frame_height * 100) {
 		rect.w = Video.Width;
@@ -226,8 +216,7 @@ int PlayMovie(const std::string &name)
 
 	SDL_FillRect(SDL_GetVideoSurface(), NULL, 0);
 	Video.ClearScreen();
-	yuv_overlay = SDL_CreateYUVOverlay(data.tinfo.frame_width,
-									   data.tinfo.frame_height, SDL_YV12_OVERLAY, TheScreen);
+	SDL_Overlay *yuv_overlay = SDL_CreateYUVOverlay(data.tinfo.frame_width, data.tinfo.frame_height, SDL_YV12_OVERLAY, TheScreen);
 
 	if (yuv_overlay == NULL) {
 		fprintf(stderr, "SDL_CreateYUVOverlay: %s\n", SDL_GetError());
@@ -237,7 +226,8 @@ int PlayMovie(const std::string &name)
 	}
 
 	StopMusic();
-	if ((sample = LoadVorbis(buffer, PlayAudioStream))) {
+	CSample *sample = LoadVorbis(buffer, PlayAudioStream);
+	if (sample) {
 		if ((sample->Channels != 1 && sample->Channels != 2) || sample->SampleSize != 16) {
 			fprintf(stderr, "Unsupported sound format in movie\n");
 			delete sample;
@@ -249,6 +239,8 @@ int PlayMovie(const std::string &name)
 		PlayMusic(sample);
 	}
 
+	EventCallback callbacks;
+
 	callbacks.ButtonPressed = MovieCallbackButtonPressed;
 	callbacks.ButtonReleased = MovieCallbackButtonReleased;
 	callbacks.MouseMoved = MovieCallbackMouseMove;
@@ -258,34 +250,34 @@ int PlayMovie(const std::string &name)
 	callbacks.KeyRepeated = MovieCallbackKeyRepeated;
 	callbacks.NetworkEvent = NetworkEvent;
 
-	old_callbacks = GetCallbacks();
+	const EventCallback *old_callbacks = GetCallbacks();
 	SetCallbacks(&callbacks);
 
 	Invalidate();
 	RealizeVideoMemory();
 
-	MovieStop = 0;
-	start_ticks = SDL_GetTicks();
-	need_data = 1;
+	MovieStop = false;
+	const unsigned int start_ticks = SDL_GetTicks();
+	bool need_data = true;
 	while (!MovieStop) {
 		if (need_data) {
 			if (TheoraProcessData(&data)) {
 				break;
 			}
-			need_data = 0;
+			need_data = false;
 		}
 
-		diff = SDL_GetTicks() - start_ticks - static_cast<int>(
-				   theora_granule_time(&data.tstate, data.tstate.granulepos) * 1000);
+		const int diff = SDL_GetTicks() - start_ticks
+						- static_cast<int>(theora_granule_time(&data.tstate, data.tstate.granulepos) * 1000);
 
 		if (diff > 100) {
 			// too far behind, skip some frames
-			need_data = 1;
+			need_data = true;
 			continue;
 		}
 		if (diff > 0) {
 			OutputTheora(&data, yuv_overlay, &rect);
-			need_data = 1;
+			need_data = true;
 		}
 
 		WaitEventsOneFrame();

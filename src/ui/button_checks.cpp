@@ -35,13 +35,14 @@
 
 #include "stratagus.h"
 
-#include "unittype.h"
-#include "upgrade.h"
+#include "actions.h"
 #include "depend.h"
 #include "interface.h"
 #include "network.h"
 #include "player.h"
-#include "actions.h"
+#include "unit.h"
+#include "unittype.h"
+#include "upgrade.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

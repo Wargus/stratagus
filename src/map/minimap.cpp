@@ -36,15 +36,16 @@
 #include <string.h>
 
 #include "stratagus.h"
-#include "video.h"
-#include "tileset.h"
-#include "map.h"
+
 #include "minimap.h"
-#include "unittype.h"
+
+#include "editor.h"
+#include "map.h"
 #include "player.h"
 #include "unit.h"
 #include "ui.h"
-#include "editor.h"
+#include "unittype.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --  Defines

@@ -61,6 +61,7 @@
 #include "minimap.h"
 #endif
 
+#include "video.h"
 #include "viewport.h"
 
 /*----------------------------------------------------------------------------
