@@ -87,8 +87,7 @@ static int MinimapScaleY;                  /// Minimap scale to fit into window
 #define MAX_MINIMAP_EVENTS 8
 
 struct MinimapEvent {
-	int X;
-	int Y;
+	PixelPos pos;
 	int Size;
 	Uint32 Color;
 } MinimapEvents[MAX_MINIMAP_EVENTS];
@@ -124,13 +123,9 @@ static void CreateMinimapTexture()
 */
 void CMinimap::Create()
 {
-	int n;
+	// Scale to biggest value.
+	const int n = std::max(Map.Info.MapWidth, Map.Info.MapHeight);
 
-	if (Map.Info.MapWidth > Map.Info.MapHeight) { // Scale to biggest value.
-		n = Map.Info.MapWidth;
-	} else {
-		n = Map.Info.MapHeight;
-	}
 	MinimapScaleX = (W * MINIMAP_FAC + n - 1) / n;
 	MinimapScaleY = (H * MINIMAP_FAC + n - 1) / n;
 
@@ -149,17 +144,17 @@ void CMinimap::Create()
 	memset(Minimap2MapX, 0, W * H * sizeof(int));
 	Minimap2MapY = new int[W * H];
 	memset(Minimap2MapY, 0, W * H * sizeof(int));
-	for (n = XOffset; n < W - XOffset; ++n) {
-		Minimap2MapX[n] = ((n - XOffset) * MINIMAP_FAC) / MinimapScaleX;
+	for (int i = XOffset; i < W - XOffset; ++i) {
+		Minimap2MapX[i] = ((i - XOffset) * MINIMAP_FAC) / MinimapScaleX;
 	}
-	for (n = YOffset; n < H - YOffset; ++n) {
-		Minimap2MapY[n] = (((n - YOffset) * MINIMAP_FAC) / MinimapScaleY) * Map.Info.MapWidth;
+	for (int i = YOffset; i < H - YOffset; ++i) {
+		Minimap2MapY[i] = (((i - YOffset) * MINIMAP_FAC) / MinimapScaleY) * Map.Info.MapWidth;
 	}
-	for (n = 0; n < Map.Info.MapWidth; ++n) {
-		Map2MinimapX[n] = (n * MinimapScaleX) / MINIMAP_FAC;
+	for (int i = 0; i < Map.Info.MapWidth; ++i) {
+		Map2MinimapX[i] = (i * MinimapScaleX) / MINIMAP_FAC;
 	}
-	for (n = 0; n < Map.Info.MapHeight; ++n) {
-		Map2MinimapY[n] = (n * MinimapScaleY) / MINIMAP_FAC;
+	for (int i = 0; i < Map.Info.MapHeight; ++i) {
+		Map2MinimapY[i] = (i * MinimapScaleY) / MINIMAP_FAC;
 	}
 
 	// Palette updated from UpdateMinimapTerrain()
@@ -218,22 +213,15 @@ static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int
 */
 void CMinimap::UpdateTerrain()
 {
-	int mx;
-	int my;
-	int scalex;
-	int scaley;
-	int tilepitch;
-	int xofs;
-	int yofs;
-	int bpp;
-
-	if (!(scalex = (MinimapScaleX * SCALE_PRECISION / MINIMAP_FAC))) {
+	int scalex = MinimapScaleX * SCALE_PRECISION / MINIMAP_FAC;
+	if (!scalex) {
 		scalex = 1;
 	}
-	if (!(scaley = (MinimapScaleY * SCALE_PRECISION / MINIMAP_FAC))) {
+	int scaley = MinimapScaleY * SCALE_PRECISION / MINIMAP_FAC;
+	if (!scaley) {
 		scaley = 1;
 	}
-	bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
+	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
 
 	if (!UseOpenGL) {
 		if (bpp == 1) {
@@ -242,7 +230,7 @@ void CMinimap::UpdateTerrain()
 		}
 	}
 
-	tilepitch = Map.TileGraphic->Surface->w / PixelTileSize.x;
+	const int tilepitch = Map.TileGraphic->Surface->w / PixelTileSize.x;
 
 	if (!UseOpenGL) {
 		SDL_LockSurface(MinimapTerrainSurface);
@@ -253,26 +241,19 @@ void CMinimap::UpdateTerrain()
 	//
 	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
 	//
-	for (my = YOffset; my < H - YOffset; ++my) {
-		for (mx = XOffset; mx < W - XOffset; ++mx) {
-			int tile;
-			Uint32 c;
-
-			tile = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].Tile;
-
-			xofs = PixelTileSize.x * (tile % tilepitch);
-			yofs = PixelTileSize.y * (tile / tilepitch);
+	for (int my = YOffset; my < H - YOffset; ++my) {
+		for (int mx = XOffset; mx < W - XOffset; ++mx) {
+			const int tile = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].Tile;
+			const int xofs = PixelTileSize.x * (tile % tilepitch);
+			const int yofs = PixelTileSize.y * (tile / tilepitch);
 
 			if (!UseOpenGL) {
 				if (bpp == 1) {
 					((Uint8 *)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch] =
 						*GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 				} else if (bpp == 3) {
-					Uint8 *d;
-					Uint8 *s;
-
-					d = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
-					s = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
+					Uint8 *d = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
+					Uint8 *s = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 					*d++ = *s++;
 					*d++ = *s++;
 					*d++ = *s++;
@@ -281,16 +262,14 @@ void CMinimap::UpdateTerrain()
 						*(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 				}
 			} else {
-				if (bpp == 1) {
-					SDL_Color color;
+				Uint32 c;
 
-					color = Map.TileGraphic->Surface->format->palette->colors[
+				if (bpp == 1) {
+					SDL_Color color = Map.TileGraphic->Surface->format->palette->colors[
 								*GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp)];
 					c = Video.MapRGB(0, color.r, color.g, color.b);
 				} else {
-					SDL_PixelFormat *f;
-
-					f = Map.TileGraphic->Surface->format;
+					SDL_PixelFormat *f = Map.TileGraphic->Surface->format;
 					c = *(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 					c = Video.MapRGB(0,
 									 ((c & f->Rmask) >> f->Rshift),
@@ -301,7 +280,6 @@ void CMinimap::UpdateTerrain()
 			}
 		}
 	}
-
 	if (!UseOpenGL) {
 		SDL_UnlockSurface(MinimapTerrainSurface);
 	}
@@ -375,19 +353,18 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 			const int yofs = PixelTileSize.y * (tile / tilepitch);
 
 			if (!UseOpenGL) {
+				const int index = mx * bpp + my * MinimapTerrainSurface->pitch;
+				Uint8 *s = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 				if (bpp == 1) {
-					((Uint8 *)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch] =
-						*GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
+					((Uint8 *)MinimapTerrainSurface->pixels)[index] = *s;
 				} else if (bpp == 3) {
-					Uint8 *d = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
-					Uint8 *s = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
+					Uint8 *d = &((Uint8 *)MinimapTerrainSurface->pixels)[index];
 
 					*d++ = *s++;
 					*d++ = *s++;
 					*d++ = *s++;
 				} else {
-					*(Uint32 *)&((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch] =
-						*(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
+					*(Uint32 *)&((Uint8 *)MinimapTerrainSurface->pixels)[index] = *(Uint32 *)s;
 				}
 			} else {
 				Uint32 c;
@@ -410,7 +387,6 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 			}
 		}
 	}
-
 	if (!UseOpenGL) {
 		SDL_UnlockSurface(MinimapTerrainSurface);
 	}
@@ -423,8 +399,6 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 static void DrawUnitOn(CUnit &unit, int red_phase)
 {
 	const CUnitType *type;
-	Uint32 color;
-	SDL_Color c;
 
 	if (Editor.Running || ReplayRevealMap || unit.IsVisible(*ThisPlayer)) {
 		type = unit.Type;
@@ -437,6 +411,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 		}
 	}
 
+	Uint32 color;
 	if (unit.Player->Index == PlayerNumNeutral) {
 		color = Video.MapRGB(TheScreen->format,
 							 type->NeutralMinimapColorRGB.r,
@@ -467,6 +442,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 	}
 	int bpp = 0;
 	if (!UseOpenGL) {
+		SDL_Color c;
 		bpp = MinimapSurface->format->BytesPerPixel;
 		SDL_GetRGB(color, TheScreen->format, &c.r, &c.g, &c.b);
 	}
@@ -474,12 +450,11 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 		int h = h0;
 		while (h-- >= 0) {
 			if (!UseOpenGL) {
+				const unsigned int index = (mx + w) * bpp + (my + h) * MinimapSurface->pitch;
 				if (bpp == 2) {
-					*(Uint16 *)&((Uint8 *)MinimapSurface->pixels)[(mx + w) * bpp + (my + h) * MinimapSurface->pitch] =
-						color;
+					*(Uint16 *)&((Uint8 *)MinimapSurface->pixels)[index] = color;
 				} else {
-					*(Uint32 *)&((Uint8 *)MinimapSurface->pixels)[(mx + w) * bpp + (my + h) * MinimapSurface->pitch] =
-						color;
+					*(Uint32 *)&((Uint8 *)MinimapSurface->pixels)[index] = color;
 				}
 			} else {
 				*(Uint32 *)&(MinimapSurfaceGL[((mx + w) + (my + h) * MinimapTextureWidth) * 4]) = color;
@@ -525,10 +500,11 @@ void CMinimap::Update()
 		SDL_LockSurface(MinimapSurface);
 		SDL_LockSurface(MinimapTerrainSurface);
 	}
-	int visiontype; // 0 unexplored, 1 explored, >1 visible.
 
 	for (int my = 0; my < H; ++my) {
 		for (int mx = 0; mx < W; ++mx) {
+			int visiontype; // 0 unexplored, 1 explored, >1 visible.
+
 			if (ReplayRevealMap) {
 				visiontype = 2;
 			} else {
@@ -538,21 +514,18 @@ void CMinimap::Update()
 
 			if (visiontype == 0 || (visiontype == 1 && ((mx & 1) != (my & 1)))) {
 				if (!UseOpenGL) {
+					const int index = mx * bpp + my * MinimapSurface->pitch;
 					if (bpp == 2) {
-						*(Uint16 *)&((Uint8 *)MinimapSurface->pixels)[mx * bpp + my * MinimapSurface->pitch] =
-							ColorBlack;
+						*(Uint16 *)&((Uint8 *)MinimapSurface->pixels)[index] = ColorBlack;
 					} else {
-						*(Uint32 *)&((Uint8 *)MinimapSurface->pixels)[mx * bpp + my * MinimapSurface->pitch] =
-							ColorBlack;
+						*(Uint32 *)&((Uint8 *)MinimapSurface->pixels)[index] = ColorBlack;
 					}
 				} else {
-					*(Uint32 *)&(MinimapSurfaceGL[(mx + my * MinimapTextureWidth) * 4]) =
-						Video.MapRGB(0, 0, 0, 0);
+					*(Uint32 *)&(MinimapSurfaceGL[(mx + my * MinimapTextureWidth) * 4]) = Video.MapRGB(0, 0, 0, 0);
 				}
 			}
 		}
 	}
-
 	if (!UseOpenGL) {
 		SDL_UnlockSurface(MinimapTerrainSurface);
 	}
@@ -575,11 +548,12 @@ void CMinimap::Update()
 */
 static void DrawEvents()
 {
-	for (int i = 0; i < NumMinimapEvents; ++i) {
+	const unsigned char alpha = 192;
 
+	for (int i = 0; i < NumMinimapEvents; ++i) {
 		Video.DrawTransCircleClip(MinimapEvents[i].Color,
-								  MinimapEvents[i].X, MinimapEvents[i].Y,
-								  MinimapEvents[i].Size, 192);
+								  MinimapEvents[i].pos.x, MinimapEvents[i].pos.y,
+								  MinimapEvents[i].Size, alpha);
 		MinimapEvents[i].Size -= 1;
 		if (MinimapEvents[i].Size < 2) {
 			MinimapEvents[i] = MinimapEvents[--NumMinimapEvents];
@@ -642,48 +616,34 @@ void CMinimap::Draw() const
 	DrawEvents();
 }
 
-
 /**
-**  Convert minimap cursor X position to tile map coordinate.
+**  Convert screen position to tile map coordinate.
 **
-**  @param x  Screen X pixel coordinate.
+**  @param screenPos  Screen pixel coordinate.
 **
-**  @return   Tile X coordinate.
+**  @return   Tile coordinate.
 */
-int CMinimap::Screen2MapX(int x) const
-{
-	int tx;
-
-	tx = (((x - X - XOffset) * MINIMAP_FAC) / MinimapScaleX);
-	if (tx < 0) {
-		return 0;
-	}
-	return std::min<int>(tx, Map.Info.MapWidth - 1);
-}
-
-/**
-**  Convert minimap cursor Y position to tile map coordinate.
-**
-**  @param y  Screen Y pixel coordinate.
-**
-**  @return   Tile Y coordinate.
-*/
-int CMinimap::Screen2MapY(int y) const
-{
-	int ty;
-
-	ty = (((y - Y - YOffset) * MINIMAP_FAC) / MinimapScaleY);
-	if (ty < 0) {
-		return 0;
-	}
-	return std::min<int>(ty, Map.Info.MapHeight - 1);
-}
-
 Vec2i CMinimap::ScreenToTilePos(const PixelPos &screenPos) const
 {
-	const Vec2i tilePos = {Screen2MapX(screenPos.x), Screen2MapY(screenPos.y)};
+	Vec2i tilePos = {(((screenPos.x - X - XOffset) * MINIMAP_FAC) / MinimapScaleX),
+					 (((screenPos.y - Y - YOffset) * MINIMAP_FAC) / MinimapScaleY)};
 
+	Map.Clamp(tilePos);
 	return tilePos;
+}
+
+/**
+**  Convert tile map coordinate to screen position.
+**
+**  @param tilePos  Tile coordinate.
+**
+**  @return   Screen pixel coordinate.
+*/
+PixelPos CMinimap::TilePosToScreenPos(const Vec2i &tilePos) const
+{
+	const PixelPos screenPos = {X + XOffset + (tilePos.x * MinimapScaleX) / MINIMAP_FAC,
+								Y + YOffset + (tilePos.y * MinimapScaleY) / MINIMAP_FAC};
+	return screenPos;
 }
 
 /**
@@ -719,21 +679,17 @@ void CMinimap::Destroy()
 }
 
 /**
-**  Draw minimap cursor.
-**
-**  @param vx  View point X position.
-**  @param vy  View point Y position.
+**  Draw viewport area contour.
 */
 void CMinimap::DrawViewportArea(const CViewport &viewport) const
 {
 	// Determine and save region below minimap cursor
-	int x = X + XOffset + (viewport.MapPos.x * MinimapScaleX) / MINIMAP_FAC;
-	int y = Y + YOffset + (viewport.MapPos.y * MinimapScaleY) / MINIMAP_FAC;
+	const PixelPos screenPos = TilePosToScreenPos(viewport.MapPos);
 	int w = (viewport.MapWidth * MinimapScaleX) / MINIMAP_FAC;
 	int h = (viewport.MapHeight * MinimapScaleY) / MINIMAP_FAC;
 
 	// Draw cursor as rectangle (Note: unclipped, as it is always visible)
-	Video.DrawTransRectangle(UI.ViewportCursorColor, x, y, w, h, 128);
+	Video.DrawTransRectangle(UI.ViewportCursorColor, screenPos.x, screenPos.y, w, h, 128);
 }
 
 /**
@@ -746,9 +702,7 @@ void CMinimap::AddEvent(const Vec2i &pos, Uint32 color)
 	if (NumMinimapEvents == MAX_MINIMAP_EVENTS) {
 		return;
 	}
-
-	MinimapEvents[NumMinimapEvents].X = X + XOffset + (pos.x * MinimapScaleX) / MINIMAP_FAC;
-	MinimapEvents[NumMinimapEvents].Y = Y + YOffset + (pos.y * MinimapScaleY) / MINIMAP_FAC;
+	MinimapEvents[NumMinimapEvents].pos = TilePosToScreenPos(pos);
 	MinimapEvents[NumMinimapEvents].Size = (W < H) ? W / 3 : H / 3;
 	MinimapEvents[NumMinimapEvents].Color = color;
 	++NumMinimapEvents;

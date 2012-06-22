@@ -69,8 +69,7 @@ public:
 	void AddEvent(const Vec2i &pos, Uint32 color);
 
 	Vec2i ScreenToTilePos(const PixelPos &screenPos) const;
-	int Screen2MapX(int x) const;
-	int Screen2MapY(int y) const;
+	PixelPos TilePosToScreenPos(const Vec2i &tilePos) const;
 
 	bool Contains(const PixelPos &screenPos) const;
 public:
