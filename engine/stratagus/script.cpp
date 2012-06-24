@@ -142,6 +142,18 @@ static int report(int status, bool exitOnError)
 	return status;
 }
 
+/**
+**  Gets a backtrace of the Lua call stack, by calling the
+**  debug.traceback function.
+**
+**  @return Number of return values in the Lua stack; always 1.
+**
+**  @par Parameters in the Lua stack:
+**    @li message (string) The error message last thrown.
+**
+**  @par Return values in the Lua stack: 
+**    @li trace (string) Stack backtrace, with @a message prepended.
+*/
 int luatraceback(lua_State *L)
 {
 	lua_pushliteral(L, "debug");
