@@ -133,39 +133,27 @@ CCursor *CursorByIdent(const std::string &ident)
 /**
 **  Draw rectangle cursor when visible
 **
-**  @param x   Screen x start position of rectangle
-**  @param y   Screen y start position of rectangle
-**  @param x1  Screen x end position of rectangle
-**  @param y1  Screen y end position of rectangle
+**  @param corner1   Screen start position of rectangle
+**  @param corner2   Screen end position of rectangle
 */
-static void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
+static void DrawVisibleRectangleCursor(PixelPos corner1, PixelPos corner2)
 {
-	int w;
-	int h;
 	const CViewport &vp = *UI.SelectedViewport;
 
-	//
 	//  Clip to map window.
 	//  FIXME: should re-use CLIP_RECTANGLE in some way from linedraw.c ?
-	//
-	vp.Restrict(x1, y1);
+	vp.Restrict(corner2.x, corner2.y);
 
-	if (x > x1) {
-		w = x - x1 + 1;
-		x = x1;
-	} else {
-		w = x1 - x + 1;
+	if (corner1.x > corner2.x) {
+		std::swap(corner1.x, corner2.x);
 	}
-	if (y > y1) {
-		h = y - y1 + 1;
-		y = y1;
-	} else {
-		h = y1 - y + 1;
+	if (corner1.y > corner2.y) {
+		std::swap(corner1.y, corner2.y);
 	}
+	const int w = corner2.x - corner1.x + 1;
+	const int h = corner2.y - corner1.y + 1;
 
-	if (w && h) {
-		Video.DrawRectangleClip(ColorGreen, x, y, w, h);
-	}
+	Video.DrawRectangleClip(ColorGreen, corner1.x, corner1.y, w, h);
 }
 
 /**
@@ -257,7 +245,7 @@ void DrawCursor()
 	if (CursorState == CursorStateRectangle && CursorStartScreenPos != CursorScreenPos) {
 		const PixelPos cursorStartScreenPos = UI.MouseViewport->MapToScreenPixelPos(CursorStartMapPos);
 
-		DrawVisibleRectangleCursor(cursorStartScreenPos.x, cursorStartScreenPos.y, CursorScreenPos.x, CursorScreenPos.y);
+		DrawVisibleRectangleCursor(cursorStartScreenPos, CursorScreenPos);
 	} else if (CursorBuilding && CursorOn == CursorOnMap) {
 		// Selecting position for building
 		DrawBuildingCursor();
