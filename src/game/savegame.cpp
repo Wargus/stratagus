@@ -150,7 +150,7 @@ int SaveGame(const std::string &filename)
 	SaveMissiles(file);
 	SaveReplayList(file);
 	// FIXME: find all state information which must be saved.
-	s = SaveGlobal(Lua, true);
+	s = SaveGlobal(Lua);
 	if (!s.empty()) {
 		file.printf("-- Lua state\n\n %s\n", s.c_str());
 	}

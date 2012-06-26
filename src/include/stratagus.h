@@ -275,7 +275,7 @@ extern int SaveGame(const std::string &filename); /// Save game
 extern void DeleteSaveGame(const std::string &filename); /// Delete save game
 extern bool SaveGameLoading;                 /// Save game is in progress of loading
 struct lua_State;
-extern std::string SaveGlobal(lua_State *l, bool is_root); /// For saving lua state
+extern std::string SaveGlobal(lua_State *l); /// For saving lua state
 
 extern void Exit(int err);                  /// Exit
 extern void ExitFatal(int err);             /// Exit with fatal error

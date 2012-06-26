@@ -2611,6 +2611,95 @@ static char *LuaEscape(const char *str)
 }
 */
 
+static std::string ConcatTableString(const std::vector<std::string>& blockTableNames)
+{
+	if (blockTableNames.empty()) {
+		return "";
+	}
+	std::string res(blockTableNames[0]);
+	for (size_t i = 1; i != blockTableNames.size(); ++i) {
+		res += ".";
+		res += blockTableNames[i];
+	}
+	return res;
+}
+
+static bool IsAValidTableName(const std::string &key)
+{
+	return key.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789") == std::string::npos;
+}
+
+static bool ShouldGlobalTableBeSaved(const std::string &key)
+{
+	if (IsAValidTableName(key) == false) {
+		return false;
+	}
+	const std::string forbiddenNames[] = {
+		"assert", "gcinfo", "getfenv", "unpack", "tostring", "tonumber",
+		"setmetatable", "require", "pcall", "rawequal", "collectgarbage", "type",
+		"getmetatable", "math", "next", "print", "xpcall", "rawset", "setfenv",
+		"rawget", "newproxy", "ipairs", "loadstring", "dofile", "_TRACEBACK",
+		"_VERSION", "pairs", "__pow", "error", "loadfile", "arg",
+		"_LOADED", "loadlib", "string", "os", "io", "debug",
+		"coroutine", "Icons", "Upgrades", "Fonts", "FontColors", "expansion",
+		"CMap", "CPlayer", "Graphics", "Vec2i", "_triggers_"
+	}; // other string to protected ?
+	const int size = sizeof(forbiddenNames) / sizeof(*forbiddenNames);
+
+	return std::find(forbiddenNames, forbiddenNames + size, key) == forbiddenNames + size;
+}
+
+static bool ShouldLocalTableBeSaved(const std::string &key)
+{
+	if (IsAValidTableName(key) == false) {
+		return false;
+	}
+	const std::string forbiddenNames[] = { "tolua_ubox" }; // other string to protected ?
+	const int size = sizeof(forbiddenNames) / sizeof(*forbiddenNames);
+
+	return std::find(forbiddenNames, forbiddenNames + size, key) == forbiddenNames + size;
+}
+
+static bool LuaValueToString(lua_State *l, std::string &value)
+{
+	const int type_value = lua_type(l, -1);
+
+	switch (type_value) {
+		case LUA_TNIL:
+			value = "nil";
+			return true;
+		case LUA_TNUMBER:
+			value = lua_tostring(l, -1); // let lua do the conversion
+			return true;
+		case LUA_TBOOLEAN: {
+			const bool b = lua_toboolean(l, -1);
+			value = b ? "true" : "false";
+			return true;
+		}
+		case LUA_TSTRING: {
+			const std::string s = lua_tostring(l, -1);
+			value = ((s.find('\n') != std::string::npos) ? (std::string("[[") + s + "]]") : (std::string("\"") + s + "\""));
+			return true;
+		}
+		case LUA_TTABLE:
+			value = "";
+			return false;
+		case LUA_TFUNCTION:
+			// Could be done with string.dump(function)
+			// and debug.getinfo(function).name (could be nil for anonymous function)
+			// But not usefull yet.
+			value = "";
+			return false;
+		case LUA_TUSERDATA:
+		case LUA_TTHREAD:
+		case LUA_TLIGHTUSERDATA:
+		case LUA_TNONE:
+		default : // no other cases
+			value = "";
+			return false;
+	}
+}
+
 /**
 **  For saving lua state (table, number, string, bool, not function).
 **
@@ -2621,125 +2710,69 @@ static char *LuaEscape(const char *str)
 **           else a string that could be executed in lua to restore lua state
 **  @todo    do the output prettier (adjust indentation, newline)
 */
-std::string SaveGlobal(lua_State *l, bool is_root)
+static std::string SaveGlobal(lua_State *l, bool is_root, std::vector<std::string> &blockTableNames)
 {
-	std::string value;
-	std::string res;
-	std::string tmp;
-
 	//Assert(!is_root || !lua_gettop(l));
-	int first = 1;
 	if (is_root) {
 		lua_getglobal(l, "_G");// global table in lua.
 	}
-	const std::string sep = is_root ? "" : ", ";
+	std::string res;
+	const std::string tablesName = ConcatTableString(blockTableNames);
+
+	if (blockTableNames.empty() == false) {
+		res = "if (" + tablesName + " == nil) then " + tablesName + " = {} end\n";
+	}
 	Assert(lua_istable(l, -1));
+
 	lua_pushnil(l);
 	while (lua_next(l, -2)) {
-		int type_key = lua_type(l, -2);
-		int type_value = lua_type(l, -1);
+		const int type_key = lua_type(l, -2);
 		const std::string key = (type_key == LUA_TSTRING) ? lua_tostring(l, -2) : "";
-		if ((key == "_G") || (is_root && (
-								  (key == "assert") || (key == "gcinfo") || (key == "getfenv") ||
-								  (key == "unpack") || (key == "tostring") || (key == "tonumber") ||
-								  (key == "setmetatable") || (key == "require") || (key == "pcall") ||
-								  (key == "rawequal") || (key == "collectgarbage") || (key == "type") ||
-								  (key == "getmetatable") || (key == "next") || (key == "print") ||
-								  (key == "xpcall") || (key == "rawset") || (key == "setfenv") ||
-								  (key == "rawget") || (key == "newproxy") || (key == "ipairs") ||
-								  (key == "loadstring") || (key == "dofile") || (key == "_TRACEBACK") ||
-								  (key == "_VERSION") || (key == "pairs") || (key == "__pow") ||
-								  (key == "error") || (key == "loadfile") || (key == "arg") ||
-								  (key == "_LOADED") || (key == "loadlib") || (key == "string") ||
-								  (key == "os") || (key == "io") || (key == "debug") ||
-								  (key == "coroutine") || (key == "Icons") || (key == "Upgrades") ||
-								  (key == "Fonts") || (key == "FontColors") || (key == "expansion")
-								  // other string to protected ?
-							  ))) {
+		if ((key == "_G")
+			|| (is_root && ShouldGlobalTableBeSaved(key) == false)
+			|| (!is_root && ShouldLocalTableBeSaved(key) == false)) {
 			lua_pop(l, 1); // pop the value
 			continue;
 		}
-		switch (type_value) {
-			case LUA_TNIL:
-				value = "nil";
-				break;
-			case LUA_TNUMBER:
-				value = lua_tostring(l, -1); // let lua do the conversion
-				break;
-			case LUA_TBOOLEAN: {
-				int b = lua_toboolean(l, -1);
-				value = b ? "true" : "false";
-				break;
-			}
-			case LUA_TSTRING:
-				value = ((std::string(lua_tostring(l, -1)).find('\n') != std::string::npos) ? (std::string("[[") + lua_tostring(l, -1) + "]]") : (std::string("\"") + lua_tostring(l, -1) + "\""));
-				break;
-			case LUA_TTABLE:
-				lua_pushvalue(l, -1);
-				tmp = SaveGlobal(l, false);
-				value = "";
-				if (!tmp.empty()) {
-					value = "{" + tmp + "}";
-				}
-				break;
-			case LUA_TFUNCTION:
-				// Could be done with string.dump(function)
-				// and debug.getinfo(function).name (could be nil for anonymous function)
-				// But not usefull yet.
-				value = "";
-				break;
-			case LUA_TUSERDATA:
-			case LUA_TTHREAD:
-			case LUA_TLIGHTUSERDATA:
-			case LUA_TNONE:
-			default : // no other cases
-				value = "";
-				break;
-		}
-		lua_pop(l, 1); /* pop the value */
-
-		// Check the validity of the key (only [a-zA-z_])
-		if (type_key == LUA_TSTRING) {
-			for (unsigned int i = 0; key[i]; ++i) {
-				if (!isalnum(key[i]) && key[i] != '_') {
-					value.clear();
-					break;
-				}
-			}
-		}
-		if (value.empty()) {
-			if (!is_root) {
-				lua_pop(l, 2); // pop the key and the table
-				return "";
-			}
-			continue;
-		}
-		if (type_key == LUA_TSTRING && key == value.c_str()) {
-			continue;
-		}
-		if (first) {
-			first = 0;
+		std::string lhsLine;
+		if (tablesName.empty() == false) {
 			if (type_key == LUA_TSTRING) {
-				res = key + "=" + value;
-			} else {
-				res = value;
+				lhsLine = tablesName + "." + key;
+			} else if (type_key == LUA_TNUMBER) {
+				lua_pushvalue(l, -2);
+				lhsLine = tablesName + "[" + lua_tostring(l, -1) + "]";
+				lua_pop(l, 1);
 			}
 		} else {
-			if (type_key == LUA_TSTRING) {
-				tmp = value;
-				value = key + "=" + value;
-				tmp = res;
-				res = res + sep + value;
-			} else {
-				res = res + sep + value;
+			lhsLine = key;
+		}
+
+		std::string value;
+		const bool b = LuaValueToString(l, value);
+		if (b) {
+			res += lhsLine + " = " + value + "\n";
+		} else {
+			const int type_value = lua_type(l, -1);
+			if (type_value == LUA_TTABLE) {
+				lua_pushvalue(l, -1);
+				//res += "if (" + lhsLine + " == nil) then " + lhsLine + " = {} end\n";
+				blockTableNames.push_back(key);
+				res += SaveGlobal(l, false, blockTableNames);
+				blockTableNames.pop_back();
 			}
 		}
-		tmp = res;
-		res += "\n";
+		lua_pop(l, 1); /* pop the value */
 	}
 	lua_pop(l, 1); // pop the table
 	//Assert(!is_root || !lua_gettop(l));
 	return res;
+}
+
+std::string SaveGlobal(lua_State *l)
+{
+	std::vector<std::string> blockTableNames;
+
+	return SaveGlobal(l, true, blockTableNames);
 }
 
 /**
@@ -2747,24 +2780,21 @@ std::string SaveGlobal(lua_State *l, bool is_root)
 */
 void SavePreferences()
 {
-	std::string tableName;
+	std::vector<std::string> blockTableNames;
 
 	if (!GameName.empty()) {
 		lua_getglobal(Lua, GameName.c_str());
 		if (lua_type(Lua, -1) == LUA_TTABLE) {
-			tableName = GameName;
-			tableName += ".";
-			tableName += "preferences";
+			blockTableNames.push_back(GameName);
 			lua_pushstring(Lua, "preferences");
 			lua_gettable(Lua, -2);
 		} else {
 			lua_getglobal(Lua, "preferences");
-			tableName = "preferences";
 		}
 	} else {
-		tableName = "preferences";
 		lua_getglobal(Lua, "preferences");
 	}
+	blockTableNames.push_back("preferences");
 	if (lua_type(Lua, -1) == LUA_TTABLE) {
 		std::string path = Parameters::Instance.GetUserDirectory();
 
@@ -2780,11 +2810,11 @@ void SavePreferences()
 			return;
 		}
 
-		std::string s = SaveGlobal(Lua, false);
+		std::string s = SaveGlobal(Lua, false, blockTableNames);
 		if (!GameName.empty()) {
 			fprintf(fd, "if (%s == nil) then %s = {} end\n", GameName.c_str(), GameName.c_str());
 		}
-		fprintf(fd, "%s = {\n%s}\n", tableName.c_str(), s.c_str());
+		fprintf(fd, "%s\n", s.c_str());
 		fclose(fd);
 	}
 }
