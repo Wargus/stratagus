@@ -32,6 +32,7 @@
 
 //@{
 
+#include "unit.h"
 #include "unitptr.h"
 #include "vec2i.h"
 

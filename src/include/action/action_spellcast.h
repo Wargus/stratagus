@@ -59,6 +59,7 @@ public:
 	const SpellType &GetSpell() const { return *Spell; }
 	void SetSpell(SpellType &spell) { Spell = &spell; }
 private:
+	bool CheckForDeadGoal(CUnit &unit);
 	bool SpellMoveToTarget(CUnit &unit);
 private:
 	SpellType *Spell;

@@ -273,13 +273,15 @@ bool AutoRepair(CUnit &unit)
 		return false;
 	}
 	const Vec2i invalidPos = { -1, -1};
-	COrder *savedOrder = unit.CurrentOrder()->Clone();
+	COrder *savedOrder = NULL;
+	if (unit.CanStoreOrder(unit.CurrentOrder())) {
+		savedOrder = unit.CurrentOrder()->Clone();
+	}
 
 	//Command* will clear unit.SavedOrder
 	CommandRepair(unit, invalidPos, repairedUnit, FlushCommands);
-	if (unit.StoreOrder(savedOrder) == false) {
-		delete savedOrder;
-		savedOrder = NULL;
+	if (savedOrder != NULL) {
+		unit.SavedOrder = savedOrder;
 	}
 	return true;
 }
@@ -292,11 +294,10 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	// Removed units can only attack in AttackRange, from bunker
 	this->AutoTarget = AttackUnitsInRange(unit);
 
-	if (this->AutoTarget == NULL) {
+	if (this->AutoTarget == NoUnitP) {
 		return false;
 	}
 	this->State = SUB_STILL_ATTACK; // Mark attacking.
-	this->SetGoal(this->AutoTarget);
 	UnitHeadingFromDeltaXY(unit, this->AutoTarget->tilePos + this->AutoTarget->Type->GetHalfTileSize() - unit.tilePos);
 	return true;
 }
@@ -330,20 +331,18 @@ bool AutoAttack(CUnit &unit)
 	if (goal == NULL) {
 		return false;
 	}
-	COrder *savedOrder;
+	COrder *savedOrder = NULL;
 
-	if (unit.SavedOrder != NULL) {
-		savedOrder = unit.SavedOrder->Clone();
-	} else if (unit.CurrentAction() == UnitActionStill) {
+	if (unit.CurrentAction() == UnitActionStill) {
 		savedOrder = COrder::NewActionAttack(unit, unit.tilePos);
-	} else {
+	} else if (unit.CanStoreOrder(unit.CurrentOrder())) {
 		savedOrder = unit.CurrentOrder()->Clone();
 	}
 	// Weak goal, can choose other unit, come back after attack
 	CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
 
-	if (unit.StoreOrder(savedOrder) == false) {
-		delete savedOrder;
+	if (savedOrder != NULL) {
+		unit.SavedOrder = savedOrder;
 	}
 	return true;
 }

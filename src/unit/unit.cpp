@@ -411,6 +411,7 @@ void CUnit::RefsDecrease()
 void CUnit::Init()
 {
 	Refs = 0;
+	ReleaseCycle = 0;
 	Slot = 0;
 	UnitSlot = NULL;
 	PlayerSlot = static_cast<size_t>(-1);
@@ -463,7 +464,6 @@ void CUnit::Init()
 	LastGroup = 0;
 	ResourcesHeld = 0;
 	Wait = 0;
-	State = 0;
 	Blink = 0;
 	Moving = 0;
 	ReCast = 0;
@@ -653,13 +653,10 @@ bool CUnit::RestoreOrder()
 	}
 
 	if (savedOrder->IsValid() == false) {
-		delete this->SavedOrder;
+		delete savedOrder;
 		this->SavedOrder = NULL;
 		return false;
 	}
-
-	// Restart order state.
-	this->State = 0;
 
 	// Cannot delete this->Orders[0] since it is generally that order
 	// which call this method.
@@ -673,11 +670,11 @@ bool CUnit::RestoreOrder()
 }
 
 /**
-**  Store the Current order
+**  Check if we can store this order
 **
-**  @return      True if the current order was saved
+**  @return      True if the order could be saved
 */
-bool CUnit::StoreOrder(COrder *order)
+bool CUnit::CanStoreOrder(COrder *order)
 {
 	Assert(order);
 
@@ -685,14 +682,8 @@ bool CUnit::StoreOrder(COrder *order)
 		return false;
 	}
 	if (this->SavedOrder != NULL) {
-		if (this->SavedOrder->IsValid() == true) {
-			return false;
-		}
-		delete this->SavedOrder;
-		this->SavedOrder = NULL;
+		return false;
 	}
-	// Save current order to come back or to continue it.
-	this->SavedOrder = order;
 	return true;
 }
 
@@ -1297,7 +1288,6 @@ void UnitClearOrders(CUnit &unit)
 	}
 	unit.Orders.clear();
 	unit.Orders.push_back(COrder::NewActionStill());
-	unit.State = 0;
 }
 
 /**
@@ -2838,7 +2828,6 @@ void LetUnitDie(CUnit &unit)
 	// Unit has death animation.
 
 	// Not good: UnitUpdateHeading(unit);
-	unit.State = 0;
 	delete unit.Orders[0];
 	unit.Orders[0] = COrder::NewActionDie();
 	if (type->CorpseType) {
@@ -3160,8 +3149,11 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 
 	// Attack units in range (which or the attacker?)
 	// Don't bother unit if it casting repeatable spell
-	if (target.IsAgressive() && target.CanMove() && target.CurrentAction() != UnitActionSpellCast) {
-		COrder *savedOrder = target.CurrentOrder()->Clone();
+	if (target.IsAgressive() && target.CanMove() && !target.ReCast) {
+		COrder *savedOrder = NULL;
+		if (target.CanStoreOrder(target.CurrentOrder())) {
+			 savedOrder = target.CurrentOrder()->Clone();
+		}
 		CUnit *oldgoal = target.CurrentOrder()->GetGoal();
 		CUnit *goal, *best = oldgoal;
 
@@ -3188,7 +3180,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 							  || (ThreatCalculate(target, *attacker) < ThreatCalculate(target, *best)))))) {
 			best = attacker;
 		}
-		if (best) {
+		if (best && best != oldgoal) {
 			if (target.MapDistanceTo(*best) <= target.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 				CommandAttack(target, best->tilePos, best, FlushCommands);
 			} else {
@@ -3198,9 +3190,8 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 			if (best->IsAgressive()) {
 				target.Threshold = threshold;
 			}
-			if (target.StoreOrder(savedOrder) == false) {
-				delete savedOrder;
-				savedOrder = NULL;
+			if (savedOrder != NULL) {
+				target.SavedOrder = savedOrder;
 			}
 		}
 	}

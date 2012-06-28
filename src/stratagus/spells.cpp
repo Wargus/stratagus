@@ -683,7 +683,7 @@ static bool PassCondition(const CUnit &caster, const SpellType *spell, const CUn
 		return false;
 	}
 	if (spell->Target == TargetUnit) { // Casting a unit spell without a target.
-		if ((!target) || target->Destroyed || target->CurrentAction() == UnitActionDie) {
+		if ((!target) || target->IsAlive() == false) {
 			return false;
 		}
 	}

@@ -48,7 +48,7 @@ void MissileFire::Action()
 	CUnit &unit = *this->SourceUnit;
 
 	this->Wait = this->Type->Sleep;
-	if (unit.Destroyed || unit.CurrentAction() == UnitActionDie) {
+	if (unit.IsAlive() == false) {
 		this->TTL = 0;
 		return;
 	}

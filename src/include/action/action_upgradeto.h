@@ -78,7 +78,7 @@ public:
 
 	const CUnitType &GetUnitType() const { return *Type; }
 private:
-	CUnitType *Type; /// upgrate to this unit-type
+	CUnitType *Type; /// upgrade to this unit-type
 	int Ticks;       /// Ticks to complete
 };
 

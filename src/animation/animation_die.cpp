@@ -59,7 +59,6 @@
 
 void AnimationDie_OnCatch(CUnit &unit)
 {
-	unit.State = 0;
 	LetUnitDie(unit);
 }
 

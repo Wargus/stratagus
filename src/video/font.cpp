@@ -568,9 +568,7 @@ int CFont::Width(const int number) const
 
 			if (isReverse == false && fc != backup) {
 				fc = backup;
-				if (UseOpenGL) {
-					g = FontColorGraphics[font][fc];
-				}
+				g = font->GetFontColorGraphic(fc);
 			}
 		}
 

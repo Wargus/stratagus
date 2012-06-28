@@ -166,8 +166,7 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index)
 	switch (*v) {
 		case 0:  // Unexplored
 		case 1:
-			// We are at minimum, don't do anything shouldn't happen.
-			Assert(0);
+			// This happens when we unmark everything in CommandSharedVision
 			break;
 		case 2:
 			// When there is NoFogOfWar units never get unmarked.

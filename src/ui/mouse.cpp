@@ -858,7 +858,18 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			ShowNameTime = GameCycle + Preference.ShowNameDelay + Preference.ShowNameTime;
 		}
 
-		if (Map.IsFieldExplored(*ThisPlayer, tilePos) || ReplayRevealMap) {
+		bool show = ReplayRevealMap ? true : false;
+		if (show == false) {
+			for (int i = 0; i < PlayerMax; ++i) {
+				if (Map.IsFieldExplored(Players[i], tilePos) 
+					&& (i == ThisPlayer->Index || Players[i].IsBothSharedVision(*ThisPlayer))) {
+						show = true;
+						break;
+				}
+			}
+		}
+
+		if (show) {
 			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(cursorPos);
 			UnitUnderCursor = UnitOnScreen(NULL, mapPixelPos.x, mapPixelPos.y);
 		}

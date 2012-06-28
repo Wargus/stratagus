@@ -103,7 +103,7 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 	PixelPos start;
 	PixelPos dest;
 
-	if (!goal || goal->Destroyed || goal->Removed) {
+	if (!goal || goal->IsAliveOnMap() == false) {
 		return;
 	}
 	if ((flags & ANIM_SM_PIXEL)) {
@@ -115,7 +115,7 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 	}
 	if ((flags & ANIM_SM_TOTARGET)) {
 		CUnit *target = goal->CurrentOrder()->GetGoal();
-		if (!target  || target->Destroyed || target->Removed) {
+		if (!target  || goal->IsAliveOnMap() == false) {
 			Assert(!unit.Type->Missile.Missile->AlwaysFire || unit.Type->Missile.Missile->Range);
 			if (!target || !unit.Type->Missile.Missile->AlwaysFire) {
 				return;

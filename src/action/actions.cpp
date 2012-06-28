@@ -60,6 +60,7 @@
 
 #include "animation/animation_die.h"
 #include "commands.h"
+#include "luacallback.h"
 #include "map.h"
 #include "missile.h"
 #include "pathfinder.h"
@@ -331,7 +332,6 @@ static void HandleUnitAction(CUnit &unit)
 
 			delete unit.Orders[0];
 			unit.Orders[0] = COrder::NewActionStill();
-			unit.State = 0;
 			if (IsOnlySelected(unit)) { // update display for new action
 				SelectedUnitChanged();
 			}
@@ -347,17 +347,9 @@ static void HandleUnitAction(CUnit &unit)
 				return;
 			}
 
-			do {
-				delete unit.Orders[0];
-				unit.Orders.erase(unit.Orders.begin());
-			} while (unit.Orders[0]->IsValid() == false && unit.Orders.size() > 1);
+			delete unit.Orders[0];
+			unit.Orders.erase(unit.Orders.begin());
 
-			if (unit.Orders[0]->IsValid() == false && unit.Orders.size() == 1) {
-				delete unit.Orders[0];
-				unit.Orders[0] = COrder::NewActionStill();
-			}
-
-			unit.State = 0;
 			unit.Wait = 0;
 			if (IsOnlySelected(unit)) { // update display for new action
 				SelectedUnitChanged();
@@ -375,6 +367,13 @@ static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 
 		if (unit.Destroyed) {
 			continue;
+		}
+
+		// OnEachSecond callback
+		if (unit.Type->OnEachSecond) {
+			unit.Type->OnEachSecond->pushPreamble();
+			unit.Type->OnEachSecond->pushInteger(unit.Slot);
+			unit.Type->OnEachSecond->run();
 		}
 
 		// 1) Blink flag.
@@ -413,11 +412,11 @@ static void DumpUnitInfo(CUnit &unit)
 
 	fprintf(logf, "%lu: ", GameCycle);
 	fprintf(logf, "%d %s S%d-%d P%d Refs %d: %X %d,%d %d,%d\n",
-			UnitNumber(unit), unit.Type ? unit.Type->Ident.c_str() : "unit-killed",
-			unit.State,
-			!unit.Orders.empty() ? unit.CurrentAction() : -1,
-			unit.Player ? unit.Player->Index : -1, unit.Refs, SyncRandSeed,
-			unit.tilePos.x, unit.tilePos.y, unit.IX, unit.IY);
+		UnitNumber(unit), unit.Type ? unit.Type->Ident.c_str() : "unit-killed",
+		unit.State,
+		!unit.Orders.empty() ? unit.CurrentAction() : -1,
+		unit.Player ? unit.Player->Index : -1, unit.Refs, SyncRandSeed,
+		unit.tilePos.x, unit.tilePos.y, unit.IX, unit.IY);
 #if 0
 	SaveUnit(unit, logf);
 #endif
@@ -436,6 +435,14 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		if (unit.Destroyed) {
 			continue;
 		}
+
+		// OnEachCycle callback
+		if (unit.Type->OnEachCycle) {
+			unit.Type->OnEachCycle->pushPreamble();
+			unit.Type->OnEachCycle->pushInteger(unit.Slot);
+			unit.Type->OnEachCycle->run();
+		}
+
 		try {
 			HandleUnitAction(unit);
 		} catch (AnimationDie_Exception &) {
@@ -447,7 +454,6 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		// Calculate some hash.
 		SyncHash = (SyncHash << 5) | (SyncHash >> 27);
 		SyncHash ^= unit.Orders.empty() == false ? unit.CurrentAction() << 18 : 0;
-		SyncHash ^= unit.State << 12;
 		SyncHash ^= unit.Refs << 3;
 	}
 }

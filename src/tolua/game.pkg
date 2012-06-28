@@ -37,7 +37,7 @@ extern int GetGameSpeed();
 extern tolua_property__s int GameSpeed;
 extern bool GameObserve;
 
-extern tolua_readonly unsigned long GameCycle;
+extern unsigned long GameCycle;
 
 
 $#include "settings.h"

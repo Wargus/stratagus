@@ -205,10 +205,11 @@ COrder_Resource::~COrder_Resource()
 	if (mine && mine->IsAlive()) {
 		worker->DeAssignWorkerFromMine(*mine);
 	}
-	if (this->HasGoal() && this->GetGoal()->IsAlive()) {
+
+	CUnit *goal = this->GetGoal();
+	if (goal) {
 		// If mining decrease the active count on the resource.
 		if (this->State == SUB_GATHER_RESOURCE) {
-			CUnit *goal = this->GetGoal();
 
 			goal->Resource.Active--;
 			Assert(goal->Resource.Active >= 0);
@@ -443,7 +444,6 @@ void COrder_Resource::UnitGotoGoal(CUnit &unit, CUnit *const goal, int state)
 		}
 	}
 	this->State = state;
-	unit.State = 0;
 	if (state == SUB_MOVE_TO_DEPOT || state == SUB_MOVE_TO_RESOURCE) {
 		unit.pathFinderData->output.Cycles = 0; //moving counter
 	}
@@ -488,7 +488,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	goal = this->GetGoal();
 
 	// Target is dead, stop getting resources.
-	if (!goal->IsVisibleAsGoal(*unit.Player)) {
+	if (!goal || goal->IsVisibleAsGoal(*unit.Player) == false) {
 		// Find an alternative, but don't look too far.
 		this->goalPos.x = -1;
 		this->goalPos.y = -1;
@@ -586,17 +586,10 @@ void COrder_Resource::LoseResource(CUnit &unit, const CUnit &source)
 		CUnit *goal = UnitFindResource(unit, unit, 15, this->CurrentResource, 1);
 
 		if (goal) {
-			CUnit *mine = this->Resource.Mine;
-
-			if (mine) {
-				unit.DeAssignWorkerFromMine(*mine);
-			}
-			unit.AssignWorkerToMine(*goal);
+			this->goalPos.x = -1;
+			this->goalPos.y = -1;
+			this->State = SUB_START_RESOURCE;
 			this->SetGoal(goal);
-			this->Resource.Mine = goal;
-			this->goalPos = goal->tilePos;
-			this->State = SUB_MOVE_TO_RESOURCE;
-			unit.State = 0;
 			return;
 		}
 	}
@@ -630,13 +623,11 @@ void COrder_Resource::LoseResource(CUnit &unit, const CUnit &source)
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Found another resource.\n"
 				   _C_ unit.Player->Index _C_ unit.Slot);
 		this->State = SUB_START_RESOURCE;
-		unit.State = 0;
 		this->SetGoal(depot);
 	} else {
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Just sits around confused.\n"
 				   _C_ unit.Player->Index _C_ unit.Slot);
 		this->Finished = true;
-		unit.State = 0;
 	}
 }
 
@@ -733,7 +724,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 					return 0;
 				}
 				DebugPrint("%d: Worker %d report: Resource is destroyed\n" _C_ unit.Player->Index _C_ unit.Slot);
-				bool dead = source->Destroyed || source->CurrentAction() == UnitActionDie;
+				bool dead = source->IsAlive() == false;
 
 				// Improved version of DropOutAll that makes workers go to the depot.
 				LoseResource(unit, *source);

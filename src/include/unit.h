@@ -181,6 +181,7 @@ public:
 	void Init();
 	// @note int is faster than shorts
 	unsigned int     Refs;         /// Reference counter
+	unsigned int     ReleaseCycle; /// When this unit could be recycled
 	int     Slot;         /// Assigned slot number
 	CUnit **UnitSlot;     /// Slot pointer of Units
 	size_t PlayerSlot;    /// index in Player->Units
@@ -225,7 +226,6 @@ public:
 
 	unsigned char DamagedType;   /// Index of damage type of unit which damaged this unit
 	unsigned long Attacked; /// gamecycle unit was last attacked
-	unsigned State : 8;     /// action state
 	unsigned Blink : 3;     /// Let selection rectangle blink
 	unsigned Moving : 1;    /// The unit is moving
 	unsigned ReCast : 1;    /// Recast again next cycle
@@ -335,7 +335,7 @@ unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 	void Release(bool final = false);
 
 	bool RestoreOrder();
-	bool StoreOrder(COrder *order);
+	bool CanStoreOrder(COrder *order);
 
 	// Cowards and invisible units don't attack unless ordered.
 	bool IsAgressive() const {

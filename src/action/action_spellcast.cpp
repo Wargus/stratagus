@@ -44,6 +44,7 @@
 
 #include "animation.h"
 #include "iolib.h"
+#include "map.h"
 #include "missile.h"
 #include "pathfinder.h"
 #include "player.h"
@@ -133,7 +134,12 @@
 
 /* virtual */ bool COrder_SpellCast::IsValid() const
 {
-	return true;
+	Assert(Action == UnitActionSpellCast);
+	if (this->HasGoal()) {
+		return this->GetGoal()->IsAliveOnMap();
+	} else {
+		return Map.Info.IsPointOnMap(this->goalPos);
+	}
 }
 
 /* virtual */ PixelPos COrder_SpellCast::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
@@ -207,6 +213,40 @@ static void AnimateActionSpellCast(CUnit &unit, COrder_SpellCast &order)
 }
 
 /**
+**  Check for dead goal.
+**
+**  @warning  The caller must check, if he likes the restored SavedOrder!
+**
+**  @todo     If a unit enters an building, than the attack choose an
+**            other goal, perhaps it is better to wait for the goal?
+**
+**  @param unit  Unit using the goal.
+**
+**  @return      true if order have changed, false else.
+*/
+bool COrder_SpellCast::CheckForDeadGoal(CUnit &unit)
+{
+	CUnit *goal = this->GetGoal();
+
+	// Position or valid target, it is ok.
+	if (!goal || goal->IsVisibleAsGoal(*unit.Player)) {
+		return false;
+	}
+
+	// Goal could be destroyed or unseen
+	// So, cannot use type.
+	this->goalPos = goal->tilePos;
+	this->Range = 0;
+	this->ClearGoal();
+
+	// If we have a saved order continue this saved order.
+	if (unit.RestoreOrder()) {
+		return true;
+	}
+	return false;
+}
+
+/**
 **  Handle moving to the target.
 **
 **  @param unit  Unit, for that the spell cast is handled.
@@ -228,7 +268,6 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 
 	if (goal && unit.MapDistanceTo(*goal) <= this->Range) {
 		// there is goal and it is in range
-		unit.State = 0;
 		UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos);
 		this->State++; // cast the spell
 		return false;
@@ -239,7 +278,6 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		return false;
 	} else if (err == PF_UNREACHABLE || !unit.CanMove()) {
 		// goal/spot unreachable and out of range -- give up
-		unit.State = 0;
 		return true;
 	}
 	return false;
@@ -276,6 +314,9 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				this->Finished = true;
 				return ;
 			}
+			if (CheckForDeadGoal(unit)) {
+				return;
+			}
 			// FIXME FIXME FIXME: Check if already in range and skip straight to 2(casting)
 			unit.ReCast = 0; // repeat spell on next pass? (defaults to `no')
 			this->State = 1;
@@ -306,6 +347,12 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 					unit.ReCast = SpellCast(unit, &spell, goal, order.goalPos);
 				}
 			}
+
+			// Target is dead ? Change order ?
+			if (CheckForDeadGoal(unit)) {
+				return;
+			}
+
 			// Check, if goal has moved (for ReCast)
 			if (unit.ReCast && order.GetGoal() && unit.MapDistanceTo(*order.GetGoal()) > this->Range) {
 				this->State = 0;

@@ -237,7 +237,6 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	unit.pathFinderData->output.Save(file);
 
 	file.printf("\"wait\", %d, ", unit.Wait);
-	file.printf("\"state\", %d,", unit.State);
 	CAnimations::SaveUnitAnim(file, unit);
 	file.printf(",\n  \"blink\", %d,", unit.Blink);
 	if (unit.Moving) {

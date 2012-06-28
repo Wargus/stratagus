@@ -269,14 +269,16 @@ enum {
 		CUnit *target = AttackUnitsInReactRange(unit);
 		if (target) {
 			// Save current command to come back.
-			COrder *savedOrder = this->Clone();
+			COrder *savedOrder = NULL;
+			if (unit.CanStoreOrder(unit.CurrentOrder())) {
+				savedOrder = this->Clone();
+			}
 
 			this->Finished = true;
 			unit.Orders.insert(unit.Orders.begin() + 1, COrder::NewActionAttack(unit, target->tilePos));
 
-			if (unit.StoreOrder(savedOrder) == false) {
-				delete savedOrder;
-				savedOrder = NULL;
+			if (savedOrder != NULL) {
+				unit.SavedOrder = savedOrder;
 			}
 		}
 	}

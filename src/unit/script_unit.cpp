@@ -508,10 +508,6 @@ static int CclUnit(lua_State *l)
 			lua_rawgeti(l, 2, j + 1);
 			unit->Wait = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "state")) {
-			lua_rawgeti(l, 2, j + 1);
-			unit->State = LuaToNumber(l, -1);
-			lua_pop(l, 1);
 		} else if (!strcmp(value, "anim-data")) {
 			lua_rawgeti(l, 2, j + 1);
 			CAnimations::LoadUnitAnim(l, *unit, -1);
@@ -1098,7 +1094,7 @@ static int CclSlotUsage(lua_State *l)
 		}
 		Assert(unit_index != -1 && cycle != static_cast<unsigned long>(-1));
 		UnitManager.ReleaseUnit(UnitSlots[unit_index]);
-		UnitSlots[unit_index]->Refs = cycle;
+		UnitSlots[unit_index]->ReleaseCycle = cycle;
 	}
 	return 0;
 }

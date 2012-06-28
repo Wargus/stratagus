@@ -83,7 +83,7 @@ CUnit *CUnitManager::AllocUnit()
 	//
 	// Can use released unit?
 	//
-	if (!ReleasedUnits.empty() && ReleasedUnits.front()->Refs < GameCycle) {
+	if (!ReleasedUnits.empty() && ReleasedUnits.front()->ReleaseCycle < GameCycle) {
 		unit = ReleasedUnits.front();
 		ReleasedUnits.pop_front();
 		int slot = unit->Slot;
@@ -111,7 +111,7 @@ CUnit *CUnitManager::AllocUnit()
 void CUnitManager::ReleaseUnit(CUnit *unit)
 {
 	ReleasedUnits.push_back(unit);
-	unit->Refs = GameCycle + 500; // can be reused after this time
+	unit->ReleaseCycle = GameCycle + 500; // can be reused after this time
 	//Refs = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
 }
 
@@ -126,7 +126,7 @@ void CUnitManager::Save(CFile &file) const
 
 	std::list<CUnit *>::const_iterator it = ReleasedUnits.begin();
 	for (; it != ReleasedUnits.end(); ++it) {
-		file.printf(", {Slot = %d, FreeCycle = %u}", (*it)->Slot, (*it)->Refs);
+		file.printf(", {Slot = %d, FreeCycle = %u}", (*it)->Slot, (*it)->ReleaseCycle);
 	}
 	file.printf(")\n");
 }
