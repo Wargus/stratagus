@@ -612,7 +612,7 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 
 	bool goal_reachable = false;
 
-	const Vec2i extratilesize = {tilesizex - 1, tilesizey - 1};
+	const Vec2i extratilesize(tilesizex - 1, tilesizey - 1);
 
 	// top hemi cycle
 	{
@@ -621,7 +621,7 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 			const int offsetx = isqrt(square(maxrange + 1) - square(-offsety) - 1);
 			const int minx = std::max(0, goal.x - offsetx - extratilesize.x);
 			const int maxx = std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + offsetx);
-			Vec2i mpos = {minx, goal.y + offsety};
+			Vec2i mpos(minx, goal.y + offsety);
 			const unsigned int offset = mpos.y * Map.Info.MapWidth;
 
 			for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
@@ -638,7 +638,7 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 		for (int offsety = -extratilesize.y; offsety < gh; ++offsety) {
 			const int minx = std::max(0, goal.x - maxrange - extratilesize.x);
 			const int maxx = std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + maxrange);
-			Vec2i mpos = {minx, goal.y + offsety};
+			Vec2i mpos(minx, goal.y + offsety);
 			const unsigned int offset = mpos.y * Map.Info.MapWidth;
 
 			for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
@@ -663,7 +663,7 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 				for (int i = 0; i < 2; ++i) {
 					const int minx = minxs[i];
 					const int maxx = maxxs[i];
-					Vec2i mpos = {minx, goal.y + offsety};
+					Vec2i mpos(minx, goal.y + offsety);
 					const unsigned int offset = mpos.y * Map.Info.MapWidth;
 
 					for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
@@ -692,7 +692,7 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 				for (int offsety = miny; offsety < maxy; ++offsety) {
 					const int minx = mincenters[i];
 					const int maxx = maxcenters[i];
-					Vec2i mpos = {minx, goal.y + offsety};
+					Vec2i mpos(minx, goal.y + offsety);
 					const unsigned int offset = mpos.y * Map.Info.MapWidth;
 
 					for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
@@ -717,7 +717,7 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 				for (int i = 0; i < 2; ++i) {
 					const int minx = minxs[i];
 					const int maxx = maxxs[i];
-					Vec2i mpos = {minx, goal.y + offsety};
+					Vec2i mpos(minx, goal.y + offsety);
 					const unsigned int offset = mpos.y * Map.Info.MapWidth;
 
 					for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
@@ -738,7 +738,7 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 			const int offsetx = isqrt(square(maxrange + 1) - square(offsety + 1) - 1);
 			const int minx = std::max(0, goal.x - offsetx - extratilesize.x);
 			const int maxx = std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + offsetx);
-			Vec2i mpos = {minx, goal.y + gh + offsety};
+			Vec2i mpos(minx, goal.y + gh + offsety);
 			const unsigned int offset = mpos.y * Map.Info.MapWidth;
 
 			for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {

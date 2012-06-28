@@ -109,7 +109,7 @@ found:
 	const int range = ParseAnimInt(&unit, this->rangeStr.c_str());
 	const int playerId = ParseAnimInt(&unit, this->playerStr.c_str());
 	CPlayer &player = Players[playerId];
-	const Vec2i pos = { unit.tilePos.x + offX, unit.tilePos.y + offY};
+	const Vec2i pos(unit.tilePos.x + offX, unit.tilePos.y + offY);
 	CUnitType *type = UnitTypeByIdent(this->unitTypeStr.c_str());
 	Vec2i resPos;
 	DebugPrint("Creating a %s\n" _C_ type->Name.c_str());

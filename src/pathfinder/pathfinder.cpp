@@ -93,7 +93,8 @@ void TerrainTraversal::PushPos(const Vec2i &pos)
 
 void TerrainTraversal::PushNeighboor(const Vec2i &pos)
 {
-	const Vec2i offsets[] = {{0, -1}, { -1, 0}, {1, 0}, {0, 1}, { -1, -1}, {1, -1}, { -1, 1}, {1, 1}};
+	const Vec2i offsets[] = {Vec2i(0, -1), Vec2i(-1, 0), Vec2i(1, 0), Vec2i(0, 1),
+							 Vec2i(-1, -1), Vec2i(1, -1), Vec2i(-1, 1), Vec2i(1, 1)};
 
 	for (int i = 0; i != 8; ++i) {
 		const Vec2i newPos = pos + offsets[i];
@@ -108,8 +109,8 @@ void TerrainTraversal::PushNeighboor(const Vec2i &pos)
 void TerrainTraversal::PushUnitPosAndNeighboor(const CUnit &unit)
 {
 	const CUnit *startUnit = GetFirstContainer(unit);
-	const Vec2i offset = {1, 1};
-	const Vec2i extraTileSize = {startUnit->Type->TileWidth - 1, startUnit->Type->TileHeight - 1};
+	const Vec2i offset(1, 1);
+	const Vec2i extraTileSize(startUnit->Type->TileWidth - 1, startUnit->Type->TileHeight - 1);
 	const Vec2i start = startUnit->tilePos - offset;
 	const Vec2i end = startUnit->tilePos + extraTileSize + offset;
 
@@ -250,7 +251,7 @@ PathFinderInput::PathFinderInput() : unit(NULL), minRange(0), maxRange(0),
 const Vec2i &PathFinderInput::GetUnitPos() const { return unit->tilePos; }
 Vec2i PathFinderInput::GetUnitSize() const
 {
-	const Vec2i tileSize = {unit->Type->TileWidth, unit->Type->TileHeight};
+	const Vec2i tileSize(unit->Type->TileWidth, unit->Type->TileHeight);
 	return tileSize;
 }
 
@@ -384,7 +385,7 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 
 	*pxd = Heading2X[(int)output.Path[(int)output.Length - 1]];
 	*pyd = Heading2Y[(int)output.Path[(int)output.Length - 1]];
-	const Vec2i dir = {*pxd, *pyd};
+	const Vec2i dir(*pxd, *pyd);
 	int result = output.Length;
 	output.Length--;
 	if (!UnitCanBeAt(unit, unit.tilePos + dir)) {

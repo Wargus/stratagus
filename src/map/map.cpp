@@ -87,7 +87,7 @@ void CMap::MarkSeenTile(const unsigned int index)
 		//rb - GRRRRRRRRRRRR
 		const int y = index / Info.MapWidth;
 		const int x = index - (y * Info.MapWidth);
-		const Vec2i pos = {x, y};
+		const Vec2i pos(x, y);
 #endif
 
 		//  Handle wood changes. FIXME: check if for growing wood correct?
@@ -161,14 +161,14 @@ void CMap::Reveal()
 
 Vec2i CMap::MapPixelPosToTilePos(const PixelPos &mapPos) const
 {
-	const Vec2i tilePos = {mapPos.x / PixelTileSize.x, mapPos.y / PixelTileSize.y};
+	const Vec2i tilePos(mapPos.x / PixelTileSize.x, mapPos.y / PixelTileSize.y);
 
 	return tilePos;
 }
 
 PixelPos CMap::TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos) const
 {
-	PixelPos mapPixelPos = {tilePos.x * PixelTileSize.x, tilePos.y * PixelTileSize.y};
+	PixelPos mapPixelPos(tilePos.x * PixelTileSize.x, tilePos.y * PixelTileSize.y);
 
 	return mapPixelPos;
 }
@@ -541,7 +541,8 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 */
 void CMap::FixNeighbors(unsigned short type, int seen, const Vec2i &pos)
 {
-	const Vec2i offset[] = {{1, 0}, { -1, 0}, {0, 1}, {0, -1}, { -1, -1}, { -1, 1}, {1, -1}, {1, 1}};
+	const Vec2i offset[] = {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1),
+							Vec2i(-1, -1), Vec2i(-1, 1), Vec2i(1, -1), Vec2i(1, 1)};
 
 	for (unsigned int i = 0; i < sizeof(offset) / sizeof(*offset); ++i) {
 		FixTile(type, seen, pos + offset[i]);
@@ -632,7 +633,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		if (Map.IsFieldVisible(*ThisPlayer, pos)) {
 			MarkSeenTile(pos);
 		}
-		const Vec2i offset = {0, -1};
+		const Vec2i offset(0, -1);
 		if (Map.IsFieldVisible(*ThisPlayer, pos + offset)) {
 			MarkSeenTile(pos);
 		}

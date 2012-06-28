@@ -136,8 +136,8 @@ CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type)
 */
 CUnit *TargetOnMap(const CUnit &source, int x1, int y1, int x2, int y2)
 {
-	const Vec2i pos1 = {x1, y1};
-	const Vec2i pos2 = {x2, y2};
+	const Vec2i pos1(x1, y1);
+	const Vec2i pos2(x2, y2);
 	std::vector<CUnit *> table;
 
 	Map.Select(pos1, pos2, table);

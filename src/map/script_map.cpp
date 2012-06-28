@@ -248,7 +248,7 @@ static int CclRevealMap(lua_State *l)
 static int CclCenterMap(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
-	const Vec2i pos = {LuaToNumber(l, 1), LuaToNumber(l, 2)};
+	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
 	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(pos));
 	return 0;

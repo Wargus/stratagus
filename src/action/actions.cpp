@@ -102,7 +102,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 	// Don't move
 	input.SetMinRange(0);
 	input.SetMaxRange(0);
-	const Vec2i tileSize = {0, 0};
+	const Vec2i tileSize(0, 0);
 	input.SetGoal(input.GetUnit()->tilePos, tileSize);
 
 }
@@ -151,7 +151,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 	CUnit *goal = AttackUnitsInRange(unit);
 
 	if (goal != NULL) {
-		const Vec2i invalidPos = { -1, -1};
+		const Vec2i invalidPos(-1, -1);
 
 		FireMissile(unit, goal, invalidPos);
 		UnHideUnit(unit); // unit is invisible until attacks

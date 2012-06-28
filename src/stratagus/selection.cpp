@@ -403,9 +403,9 @@ int SelectUnitsByType(CUnit &base)
 	// StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
 	/* FIXME: this should probably be cleaner implemented if SelectUnitsByType()
 	 * took parameters of the selection rectangle as arguments */
-	const Vec2i offset = {1, 1};
+	const Vec2i offset(1, 1);
 	const Vec2i minPos = vp->MapPos - offset;
-	const Vec2i vpSize = {vp->MapWidth, vp->MapHeight};
+	const Vec2i vpSize(vp->MapWidth, vp->MapHeight);
 	const Vec2i maxPos = vp->MapPos + vpSize + offset;
 	Map.Select(minPos, maxPos, table, HasSameTypeAs(type));
 
@@ -480,9 +480,9 @@ int ToggleUnitsByType(CUnit &base)
 	// FIXME: this should probably be cleaner implemented if SelectUnitsByType()
 	// took parameters of the selection rectangle as arguments */
 	const CViewport *vp = UI.MouseViewport;
-	const Vec2i offset = {1, 1};
+	const Vec2i offset(1, 1);
 	const Vec2i minPos = vp->MapPos - offset;
-	const Vec2i vpSize = {vp->MapWidth, vp->MapHeight};
+	const Vec2i vpSize(vp->MapWidth, vp->MapHeight);
 	const Vec2i maxPos = vp->MapPos + vpSize + offset;
 	std::vector<CUnit *> table;
 
@@ -673,9 +673,9 @@ static void SelectSpritesInsideRectangle(int sx0, int sy0, int sx1, int sy1,
 
 static int DoSelectUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
-	const Vec2i t0 = {sx0 / PixelTileSize.x, sy0 / PixelTileSize.y};
-	const Vec2i t1 = {sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1};
-	const Vec2i range = {2, 2};
+	const Vec2i t0(sx0 / PixelTileSize.x, sy0 / PixelTileSize.y);
+	const Vec2i t1(sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1);
+	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
 	Map.Select(t0 - range, t1 + range, table);
@@ -784,9 +784,9 @@ int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 	if (!NumSelected) {
 		return DoSelectUnitsInRectangle(x0, y0, x1, y1);
 	}
-	const Vec2i tilePos0 = {x0 / PixelTileSize.x, y0 / PixelTileSize.y};
-	const Vec2i tilePos1 = {x1 / PixelTileSize.x + 1, y1 / PixelTileSize.y + 1};
-	const Vec2i range = {2, 2};
+	const Vec2i tilePos0(x0 / PixelTileSize.x, y0 / PixelTileSize.y);
+	const Vec2i tilePos1(x1 / PixelTileSize.x + 1, y1 / PixelTileSize.y + 1);
+	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
 	Map.Select(tilePos0 - range, tilePos1 + range, table);
@@ -810,9 +810,9 @@ int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 
 static int DoSelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
-	const Vec2i t0 = {sx0 / PixelTileSize.x, sy0 / PixelTileSize.y};
-	const Vec2i t1 = {sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1};
-	const Vec2i range = {2, 2};
+	const Vec2i t0(sx0 / PixelTileSize.x, sy0 / PixelTileSize.y);
+	const Vec2i t1(sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1);
+	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
 	Map.Select(t0 - range, t1 + range, table);
@@ -862,9 +862,9 @@ int SelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 
 static int DoSelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
-	const Vec2i t0 = {sx0 / PixelTileSize.x, sy0 / PixelTileSize.y};
-	const Vec2i t1 = {sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1};
-	const Vec2i range = {2, 2};
+	const Vec2i t0(sx0 / PixelTileSize.x, sy0 / PixelTileSize.y);
+	const Vec2i t1(sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1);
+	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
 	Map.Select(t0 - range, t1 + range, table);
@@ -936,9 +936,9 @@ int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 		return DoSelectGroundUnitsInRectangle(sx0, sy0, sx1, sy1);
 	}
 
-	const Vec2i t0 = {sx0 / PixelTileSize.x, sy0 / PixelTileSize.y};
-	const Vec2i t1 = {sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1};
-	const Vec2i range = {2, 2};
+	const Vec2i t0(sx0 / PixelTileSize.x, sy0 / PixelTileSize.y);
+	const Vec2i t1(sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1);
+	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
 	Map.Select(t0 - range, t1 + range, table);
@@ -1000,9 +1000,9 @@ int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 		return DoSelectAirUnitsInRectangle(sx0, sy0, sx1, sy1);
 	}
 
-	const Vec2i t0 = {sx0 / PixelTileSize.x, sy0 / PixelTileSize.y};
-	const Vec2i t1 = {sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1};
-	const Vec2i range = {2, 2};
+	const Vec2i t0(sx0 / PixelTileSize.x, sy0 / PixelTileSize.y);
+	const Vec2i t1(sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1);
+	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
 	Map.Select(t0 - range, t1 + range, table);

@@ -263,7 +263,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 		const int offsetx = isqrt(square(range + 1) - square(-offsety) - 1);
 		const int minx = std::max(0, pos.x - offsetx);
 		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + offsetx);
-		Vec2i mpos = {minx, pos.y + offsety};
+		Vec2i mpos(minx, pos.y + offsety);
 		const unsigned int index = mpos.y * Map.Info.MapWidth;
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
@@ -277,7 +277,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	for (int offsety = 0; offsety < h; ++offsety) {
 		const int minx = std::max(0, pos.x - range);
 		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + range);
-		Vec2i mpos = {minx, pos.y + offsety};
+		Vec2i mpos(minx, pos.y + offsety);
 		const unsigned int index = mpos.y * Map.Info.MapWidth;
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
@@ -294,7 +294,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 		const int offsetx = isqrt(square(range + 1) - square(offsety) - 1);
 		const int minx = std::max(0, pos.x - offsetx);
 		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + offsetx);
-		Vec2i mpos = {minx, pos.y + h + offsety};
+		Vec2i mpos(minx, pos.y + h + offsety);
 		const unsigned int index = mpos.y * Map.Info.MapWidth;
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {

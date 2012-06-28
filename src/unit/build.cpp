@@ -110,8 +110,8 @@ bool CBuildRestrictionAnd::Check(const CUnit *builder, const CUnitType &type, co
 */
 bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&) const
 {
-	Vec2i pos1 = {0, 0};
-	Vec2i pos2 = {0, 0};
+	Vec2i pos1(0, 0);
+	Vec2i pos2(0, 0);
 	int distance = 0;
 
 	if (this->DistanceType == LessThanEqual

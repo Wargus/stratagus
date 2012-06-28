@@ -253,8 +253,8 @@ void MyOpenGLGraphics::drawPoint(int x, int y)
 void MyOpenGLGraphics::drawLine(int x1, int y1, int x2, int y2)
 {
 	gcn::Color c = this->getColor();
-	const PixelPos pos1 = {x1 + mClipStack.top().xOffset, y1 + mClipStack.top().yOffset};
-	const PixelPos pos2 = {x2 + mClipStack.top().xOffset, y2 + mClipStack.top().yOffset};
+	const PixelPos pos1(x1 + mClipStack.top().xOffset, y1 + mClipStack.top().yOffset);
+	const PixelPos pos2(x2 + mClipStack.top().xOffset, y2 + mClipStack.top().yOffset);
 
 	Video.DrawLineClip(Video.MapRGBA(0, c.r, c.g, c.b, c.a), pos1, pos2);
 }

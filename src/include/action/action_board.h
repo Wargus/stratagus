@@ -38,10 +38,7 @@ class COrder_Board : public COrder
 {
 	friend COrder *COrder::NewActionBoard(CUnit &unit);
 public:
-	COrder_Board() : COrder(UnitActionBoard), State(0), Range(0) {
-		goalPos.x = -1;
-		goalPos.y = -1;
-	}
+	COrder_Board() : COrder(UnitActionBoard), State(0), Range(0), goalPos(-1, -1) {}
 
 	virtual COrder_Board *Clone() const { return new COrder_Board(*this); }
 

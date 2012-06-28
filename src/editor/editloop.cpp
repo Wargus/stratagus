@@ -257,7 +257,7 @@ void EditTile(const Vec2i &pos, int tile)
 static void EditTilesInternal(const Vec2i &pos, int tile, int size)
 {
 	Vec2i minPos = pos;
-	Vec2i maxPos = {pos.x + size - 1, pos.y + size - 1};
+	Vec2i maxPos(pos.x + size - 1, pos.y + size - 1);
 
 	Map.FixSelectionArea(minPos, maxPos);
 
@@ -283,15 +283,15 @@ void EditTiles(const Vec2i &pos, int tile, int size)
 	if (!MirrorEdit) {
 		return;
 	}
-	const Vec2i mpos = {Map.Info.MapWidth - size, Map.Info.MapHeight - size};
+	const Vec2i mpos(Map.Info.MapWidth - size, Map.Info.MapHeight - size);
 	const Vec2i mirror = mpos - pos;
-	const Vec2i mirrorv = {mirror.x, pos.y};
+	const Vec2i mirrorv(mirror.x, pos.y);
 
 	EditTilesInternal(mirrorv, tile, size);
 	if (MirrorEdit == 1) {
 		return;
 	}
-	const Vec2i mirrorh = {pos.x, mirror.y};
+	const Vec2i mirrorh(pos.x, mirror.y);
 
 	EditTilesInternal(mirrorh, tile, size);
 	EditTilesInternal(mirror, tile, size);
@@ -829,10 +829,10 @@ static void DrawEditorPanel()
 		}
 		Video.FillRectangleClip(ColorBlack, x, y, IconHeight - 2, IconHeight - 2);
 
-		const PixelPos lt = {x, y};
-		const PixelPos lb = {x, y + IconHeight - 2};
-		const PixelPos rt = {x + IconHeight - 2, y};
-		const PixelPos rb = {x + IconHeight - 2, y + IconHeight - 2};
+		const PixelPos lt(x, y);
+		const PixelPos lb(x, y + IconHeight - 2);
+		const PixelPos rt(x + IconHeight - 2, y);
+		const PixelPos rb(x + IconHeight - 2, y + IconHeight - 2);
 		const Uint32 color = PlayerColors[Editor.SelectedPlayer][0];
 
 		Video.DrawLineClip(color, lt, rb);
@@ -940,8 +940,8 @@ static void DrawStartLocations()
 					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos.x, startScreenPos.y);
 				} else { // Draw a cross
 					const PixelPos lt = startScreenPos;
-					const PixelPos lb = {startScreenPos.x, startScreenPos.y + PixelTileSize.y};
-					const PixelPos rt = {startScreenPos.x + PixelTileSize.x, startScreenPos.y};
+					const PixelPos lb(startScreenPos.x, startScreenPos.y + PixelTileSize.y);
+					const PixelPos rt(startScreenPos.x + PixelTileSize.x, startScreenPos.y);
 					const PixelPos rb = startScreenPos + PixelTileSize;
 					const Uint32 color = PlayerColors[i][0];
 

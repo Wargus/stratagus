@@ -167,7 +167,7 @@ void MapFixSeenWallTile(const Vec2i &pos)
 */
 void MapFixSeenWallNeighbors(const Vec2i &pos)
 {
-	const Vec2i offset[] = {{1, 0}, { -1, 0}, {0, 1}, {0, -1}};
+	const Vec2i offset[] = {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1)};
 
 	for (unsigned int i = 0; i < 4; ++i) {
 		MapFixSeenWallTile(pos + offset[i]);
@@ -261,7 +261,7 @@ void MapFixWallTile(const Vec2i &pos)
 */
 static void MapFixWallNeighbors(const Vec2i &pos)
 {
-	const Vec2i offset[] = {{1, 0}, { -1, 0}, {0, 1}, {0, -1}};
+	const Vec2i offset[] = {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1)};
 
 	for (unsigned int i = 0; i < sizeof(offset) / sizeof(*offset); ++i) {
 		MapFixWallTile(pos + offset[i]);

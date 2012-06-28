@@ -777,7 +777,7 @@ void Missile::MissileHit()
 		//
 		// Hits all units in range.
 		//
-		const Vec2i range = {mtype.Range - 1, mtype.Range - 1};
+		const Vec2i range(mtype.Range - 1, mtype.Range - 1);
 		std::vector<CUnit *> table;
 		Map.Select(pos - range, pos + range, table);
 		Assert(this->SourceUnit != NULL);
@@ -818,11 +818,11 @@ void Missile::MissileHit()
 	}
 
 	// Missile hits ground.
-	const Vec2i offset = { mtype.Range, mtype.Range};
+	const Vec2i offset(mtype.Range, mtype.Range);
 	const Vec2i posmin = pos - offset;
 	for (int i = mtype.Range * 2; --i;) {
 		for (int j = mtype.Range * 2; --j;) {
-			const Vec2i posIt = {posmin.x + i, posmin.y + j};
+			const Vec2i posIt(posmin.x + i, posmin.y + j);
 
 			if (Map.Info.IsPointOnMap(posIt)) {
 				int d = MapDistance(pos, posIt);

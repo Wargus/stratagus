@@ -831,7 +831,7 @@ void AiCanNotReach(CUnit &unit, const CUnitType &what)
 */
 static void AiMoveUnitInTheWay(CUnit &unit)
 {
-	static Vec2i dirs[8] = {{ -1, -1}, { -1, 0}, { -1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}};
+	static Vec2i dirs[8] = {Vec2i(-1, -1), Vec2i(-1, 0), Vec2i(-1, 1), Vec2i(0, 1), Vec2i(1, 1), Vec2i(1, 0), Vec2i(1, -1), Vec2i(0, -1)};
 	CUnit *movableunits[16];
 	Vec2i movablepos[16];
 	int movablenb;
@@ -845,7 +845,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 
 	const CUnitType &unittype = *unit.Type;
 	const Vec2i u0 = unit.tilePos;
-	const Vec2i u1 = {u0.x + unittype.TileWidth - 1, u0.y + unittype.TileHeight - 1};
+	const Vec2i u1(u0.x + unittype.TileWidth - 1, u0.y + unittype.TileHeight - 1);
 
 	movablenb = 0;
 
@@ -872,7 +872,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 		}
 
 		const Vec2i b0 = blocker.tilePos;
-		const Vec2i b1 = {b0.x + blockertype.TileWidth - 1, b0.y + blockertype.TileHeight - 1};
+		const Vec2i b1(b0.x + blockertype.TileWidth - 1, b0.y + blockertype.TileHeight - 1);
 
 		// Check for collision
 		if (!((u0.x == b1.x + 1 || u1.x == b0.x - 1)

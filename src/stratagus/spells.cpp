@@ -90,7 +90,7 @@ std::vector<SpellType *> SpellTypeTable;
 int Demolish::Cast(CUnit &caster, const SpellType *, CUnit *, const Vec2i &goalPos)
 {
 	// Allow error margins. (Lame, I know)
-	const Vec2i offset = {this->Range + 2, this->Range + 2};
+	const Vec2i offset(this->Range + 2, this->Range + 2);
 	Vec2i minpos = goalPos - offset;
 	Vec2i maxpos = goalPos + offset;
 
@@ -174,8 +174,8 @@ int SpawnPortal::Cast(CUnit &caster, const SpellType *, CUnit *, const Vec2i &go
 */
 int AreaAdjustVitals::Cast(CUnit &caster, const SpellType *spell, CUnit *target, const Vec2i &goalPos)
 {
-	const Vec2i range = {spell->Range, spell->Range};
-	const Vec2i typeSize = {caster.Type->Width, caster.Type->Height};
+	const Vec2i range(spell->Range, spell->Range);
+	const Vec2i typeSize(caster.Type->Width, caster.Type->Height);
 	std::vector<CUnit *> units;
 
 	// Get all the units around the unit
@@ -225,7 +225,7 @@ int AreaBombardment::Cast(CUnit &caster, const SpellType *, CUnit *, const Vec2i
 	int fields = this->Fields;
 	const int shards = this->Shards;
 	const int damage = this->Damage;
-	const PixelDiff offset = { this->StartOffsetX, this->StartOffsetY};
+	const PixelDiff offset(this->StartOffsetX, this->StartOffsetY);
 	const MissileType *missile = this->Missile;
 
 	while (fields--) {
@@ -469,7 +469,7 @@ int Polymorph::Cast(CUnit &caster, const SpellType *spell, CUnit *target, const 
 		return 0;
 	}
 	CUnitType &type = *this->NewForm;
-	const Vec2i pos = {goalPos.x - type.TileWidth / 2, goalPos.y - type.TileHeight / 2};
+	const Vec2i pos(goalPos.x - type.TileWidth / 2, goalPos.y - type.TileHeight / 2);
 
 	caster.Player->Score += target->Variable[POINTS_INDEX].Value;
 	if (caster.IsEnemy(*target)) {
@@ -601,7 +601,7 @@ int Summon::Cast(CUnit &caster, const SpellType *spell, CUnit *target, const Vec
 	int ttl = this->TTL;
 
 	if (this->RequireCorpse) {
-		const Vec2i offset = {1, 1};
+		const Vec2i offset(1, 1);
 		const Vec2i minPos = pos - offset;
 		const Vec2i maxPos = pos + offset;
 

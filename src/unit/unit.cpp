@@ -1390,8 +1390,8 @@ void CorrectWallDirections(CUnit &unit)
 	const struct {
 		Vec2i offset;
 		const int dirFlag;
-	} configs[] = {{{0, -1}, W_NORTH}, {{1, 0}, W_EAST},
-		{{0, 1}, W_SOUTH}, {{ -1, 0}, W_WEST}
+	} configs[] = {{Vec2i(0, -1), W_NORTH}, {Vec2i(1, 0), W_EAST},
+		{Vec2i(0, 1), W_SOUTH}, {Vec2i(-1, 0), W_WEST}
 	};
 	int flags = 0;
 
@@ -1422,7 +1422,7 @@ void CorrectWallNeighBours(CUnit &unit)
 {
 	Assert(unit.Type->Wall);
 
-	const Vec2i offset[] = {{1, 0}, { -1, 0}, {0, 1}, {0, -1}};
+	const Vec2i offset[] = {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1)};
 
 	for (unsigned int i = 0; i < sizeof(offset) / sizeof(*offset); ++i) {
 		const Vec2i pos = unit.tilePos + offset[i];
@@ -2046,7 +2046,7 @@ int DirectionToHeading(const Vec2i &delta)
 int DirectionToHeading(const PixelDiff &delta)
 {
 	// code is identic for Vec2i and PixelDiff
-	Vec2i delta2 = {delta.x, delta.y};
+	Vec2i delta2(delta.x, delta.y);
 	return DirectionToHeading(delta2);
 }
 
@@ -2193,7 +2193,7 @@ found:
 void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 {
 	Vec2i pos;
-	Vec2i bestPos = {0, 0};
+	Vec2i bestPos;
 	int bestd = 99999;
 	int addx = 0;
 	int addy = 0;
@@ -2426,7 +2426,7 @@ public:
 		return best_depot;
 	}
 private:
-	union {
+	struct {
 		const CUnit *worker;
 		Vec2i loc;
 	} u_near;
@@ -2750,9 +2750,8 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 
 PixelPos CUnit::GetMapPixelPosCenter() const
 {
-	const PixelPos center = { tilePos.x *PixelTileSize.x + IX + Type->TileWidth *PixelTileSize.x / 2,
-							  tilePos.y *PixelTileSize.y + IY + Type->TileHeight *PixelTileSize.y / 2
-							};
+	const PixelPos center(tilePos.x * PixelTileSize.x + IX + Type->TileWidth * PixelTileSize.x / 2,
+						  tilePos.y * PixelTileSize.y + IY + Type->TileHeight * PixelTileSize.y / 2);
 	return center;
 }
 
@@ -3054,7 +3053,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 
 	if ((target.IsVisibleOnMap(*ThisPlayer) || ReplayRevealMap) && !DamageMissile.empty()) {
 		MissileType *mtype = MissileTypeByIdent(DamageMissile);
-		const PixelDiff offset = {3, -mtype->Range};
+		const PixelDiff offset(3, -mtype->Range);
 
 		MakeLocalMissile(*mtype, targetPixelCenter, targetPixelCenter + offset)->Damage = -damage;
 	}
@@ -3093,7 +3092,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		MissileType *fire = MissileBurningBuilding(f);
 
 		if (fire) {
-			const PixelDiff offset = {0, -PixelTileSize.y};
+			const PixelDiff offset(0, -PixelTileSize.y);
 			Missile *missile = MakeMissile(*fire, targetPixelCenter + offset, targetPixelCenter + offset);
 
 			missile->SourceUnit = &target;
@@ -3270,7 +3269,7 @@ int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1, const CUnit
 int ViewPointDistance(const Vec2i &pos)
 {
 	const CViewport &vp = *UI.SelectedViewport;
-	const Vec2i vpSize = {vp.MapWidth, vp.MapHeight};
+	const Vec2i vpSize(vp.MapWidth, vp.MapHeight);
 	const Vec2i middle = vp.MapPos + vpSize / 2;
 
 	return MapDistance(middle, pos);
@@ -3286,7 +3285,7 @@ int ViewPointDistance(const Vec2i &pos)
 int ViewPointDistanceToUnit(const CUnit &dest)
 {
 	const CViewport &vp = *UI.SelectedViewport;
-	const Vec2i vpSize = {vp.MapWidth, vp.MapHeight};
+	const Vec2i vpSize(vp.MapWidth, vp.MapHeight);
 	const Vec2i midPos = vp.MapPos + vpSize / 2;
 
 	return dest.MapDistanceTo(midPos);

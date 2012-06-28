@@ -843,9 +843,9 @@ class CBuildRestrictionAddOn : public CBuildRestriction
 		const Vec2i pos; //functor work position
 	};
 public:
-	CBuildRestrictionAddOn() : Parent(NULL) { Offset.x = Offset.y = 0; };
-	virtual ~CBuildRestrictionAddOn() {};
-	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
+	CBuildRestrictionAddOn() : Offset(0, 0), Parent(NULL) {}
+	virtual ~CBuildRestrictionAddOn() {}
+	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);}
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 
 	Vec2i Offset;         /// offset from the main building to place this
@@ -900,7 +900,7 @@ public:
 	~CUnitType();
 
 	Vec2i GetHalfTileSize() const {
-		Vec2i res = {TileWidth / 2, TileHeight / 2};
+		Vec2i res(TileWidth / 2, TileHeight / 2);
 
 		return res;
 	}

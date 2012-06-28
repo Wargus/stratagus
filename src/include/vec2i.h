@@ -36,6 +36,9 @@ template <typename T>
 class Vec2T
 {
 public:
+	Vec2T() : x(0), y(0) {}
+	Vec2T(T x, T y) : x(x), y(y) {}
+public:
 	T x;
 	T y;
 };

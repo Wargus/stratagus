@@ -47,7 +47,7 @@
 /**
 ** Size of a tile in pixel
 */
-PixelSize PixelTileSize = {32, 32};
+PixelSize PixelTileSize(32, 32);
 
 
 /*----------------------------------------------------------------------------

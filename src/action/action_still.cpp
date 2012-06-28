@@ -145,7 +145,7 @@ private:
 		this->AutoTarget = NULL;
 		return;
 	}
-	const Vec2i invalidPos = { -1, -1};
+	const Vec2i invalidPos(-1, -1);
 
 	FireMissile(unit, AutoTarget, invalidPos);
 	UnHideUnit(unit);
@@ -250,7 +250,7 @@ private:
 */
 static CUnit *UnitToRepairInRange(const CUnit &unit, int range)
 {
-	const Vec2i offset = {range, range};
+	const Vec2i offset(range, range);
 
 	return Map.Find_If(unit.tilePos - offset, unit.tilePos + offset, IsAReparableUnitBy(unit));
 }
@@ -272,7 +272,7 @@ bool AutoRepair(CUnit &unit)
 	if (repairedUnit == NULL) {
 		return false;
 	}
-	const Vec2i invalidPos = { -1, -1};
+	const Vec2i invalidPos(-1, -1);
 	COrder *savedOrder = NULL;
 	if (unit.CanStoreOrder(unit.CurrentOrder())) {
 		savedOrder = unit.CurrentOrder()->Clone();

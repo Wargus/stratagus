@@ -71,7 +71,7 @@
 		if (target->Destroyed) {
 			// FIXME: where check if spell needs a unit as destination?
 			// FIXME: target->Type is now set to 0. maybe we shouldn't bother.
-			const Vec2i diag = {order->Range, order->Range};
+			const Vec2i diag(order->Range, order->Range);
 			order->goalPos = target->tilePos /* + target->Type->GetHalfTileSize() */ - diag;
 			order->Range <<= 1;
 		} else {

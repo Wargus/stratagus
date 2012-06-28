@@ -113,7 +113,7 @@
 	input.SetMinRange(0);
 	input.SetMaxRange(0);
 
-	const Vec2i tileSize = {0, 0};
+	const Vec2i tileSize(0, 0);
 
 	input.SetGoal(this->goalPos, tileSize);
 }

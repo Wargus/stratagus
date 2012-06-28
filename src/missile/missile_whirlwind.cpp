@@ -58,7 +58,7 @@ void MissileWhirlwind::Action()
 
 	// Center of the tornado
 	const PixelPos pixelCenter = this->position + this->Type->size / 2;
-	const PixelPos centerOffset = {PixelTileSize.x / 2, PixelTileSize.y};
+	const PixelPos centerOffset(PixelTileSize.x / 2, PixelTileSize.y);
 	const Vec2i center = Map.MapPixelPosToTilePos(pixelCenter + centerOffset);
 
 #if 0

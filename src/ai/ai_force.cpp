@@ -467,7 +467,7 @@ void AiAssignFreeUnitsToForce()
 */
 void AiAttackWithForceAt(unsigned int force, int x, int y)
 {
-	const Vec2i pos = {x, y};
+	const Vec2i pos(x, y);
 
 	if (!(force < AI_MAX_FORCES)) {
 		DebugPrint("Force out of range: %d" _C_ force);
@@ -520,7 +520,7 @@ void AiAttackWithForce(unsigned int force)
 		force = f;
 	}
 
-	const Vec2i invalidPos = { -1, -1};
+	const Vec2i invalidPos(-1, -1);
 	AiPlayer->Force[force].Attack(invalidPos);
 }
 
@@ -533,7 +533,7 @@ void AiAttackWithForce(unsigned int force)
 */
 void AiAttackWithForces(int *forces)
 {
-	const Vec2i invalidPos = { -1, -1};
+	const Vec2i invalidPos(-1, -1);
 	bool found = false;
 	unsigned int top;
 	unsigned int f = AiPlayer->Force.FindFreeForce();
@@ -781,7 +781,7 @@ void AiForceManager::Update()
 							CUnit &unit = *force.Units[i];
 							CommandMove(unit, force.HomePos, FlushCommands);
 						}
-						const Vec2i invalidPos = { -1, -1};
+						const Vec2i invalidPos(-1, -1);
 
 						force.HomePos = invalidPos;
 					}

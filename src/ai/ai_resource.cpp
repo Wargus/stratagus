@@ -204,14 +204,14 @@ private:
 int AiEnemyUnitsInDistance(const CPlayer &player,
 						   const CUnitType *type, const Vec2i &pos, unsigned range)
 {
-	const Vec2i offset = {range, range};
+	const Vec2i offset(range, range);
 	std::vector<CUnit *> units;
 
 	if (type == NULL) {
 		Map.Select(pos - offset, pos + offset, units, IsAEnemyUnitOf(player));
 		return static_cast<int>(units.size());
 	} else {
-		const Vec2i typeSize = {type->TileWidth - 1, type->TileHeight - 1};
+		const Vec2i typeSize(type->TileWidth - 1, type->TileHeight - 1);
 		const IsAEnemyUnitWhichCanCounterAttackOf pred(player, *type);
 
 		Map.Select(pos - offset, pos + typeSize + offset, units, pred);
@@ -483,7 +483,7 @@ static bool AiRequestSupply()
 	if (j) {
 		if (!cache[0].needmask) {
 			CUnitType &type = *cache[0].type;
-			Vec2i invalidPos = { -1, -1};
+			Vec2i invalidPos(-1, -1);
 			if (AiMakeUnit(type, invalidPos)) {
 				AiBuildQueue newqueue;
 				newqueue.Type = &type;
@@ -1209,7 +1209,7 @@ static int AiRepairBuilding(const CUnitType &type, CUnit &building)
 		CUnit &unit = *table[i];
 
 		if (UnitReachable(unit, building, unit.Type->RepairRange)) {
-			const Vec2i invalidPos = { -1, -1};
+			const Vec2i invalidPos(-1, -1);
 			CommandRepair(unit, invalidPos, &building, FlushCommands);
 			return 1;
 		}

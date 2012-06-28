@@ -75,7 +75,7 @@ void MissileDeathCoil::Action()
 			//
 			std::vector<CUnit *> table;
 			const Vec2i destPos = Map.MapPixelPosToTilePos(this->destination);
-			const Vec2i range = {2, 2};
+			const Vec2i range(2, 2);
 			Map.Select(destPos - range, destPos + range, table, IsEnemyWith(*source.Player));
 
 			if (table.empty()) {

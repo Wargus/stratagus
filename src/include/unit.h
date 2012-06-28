@@ -176,7 +176,7 @@ enum _directions_ {
 class CUnit
 {
 public:
-	CUnit() : pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
+	CUnit() : tilePos(-1, -1), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
 
 	void Init();
 	// @note int is faster than shorts
@@ -252,6 +252,7 @@ public:
 	/* Seen stuff. */
 	int VisCount[PlayerMax];     /// Unit visibility counts
 	struct _seen_stuff_ {
+		_seen_stuff_() : CFrame(NULL), Type(NULL), tilePos(-1, -1) {}
 		const CConstructionFrame  *CFrame;  /// Seen construction frame
 		int         Frame;                  /// last seen frame/stage of buildings
 		const CUnitType  *Type;             /// Pointer to last seen unit-type
@@ -260,8 +261,8 @@ public:
 		signed char IY;                     /// seen Y image displacement to map position
 		unsigned    Constructed : 1;        /// Unit seen construction
 		unsigned    State : 3;              /// Unit seen build/upgrade state
-unsigned    Destroyed : PlayerMax;  /// Unit seen destroyed or not
-unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
+		unsigned    Destroyed : PlayerMax;  /// Unit seen destroyed or not
+		unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 	} Seen;
 
 	CVariable *Variable; /// array of User Defined variables.

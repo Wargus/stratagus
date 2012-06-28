@@ -144,7 +144,7 @@ void DoScrollArea(int state, bool fast)
 	if (state & ScrollLeft) {
 		stepx = -stepx;
 	}
-	const PixelDiff offset = {stepx, stepy};
+	const PixelDiff offset(stepx, stepy);
 
 	vp->Set(vp->MapPos, vp->Offset + offset);
 

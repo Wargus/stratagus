@@ -543,7 +543,7 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 	Assert(UnitSlots[unum]);
 
 	CUnit &unit = *UnitSlots[unum];
-	const Vec2i pos = {x, y};
+	const Vec2i pos(x, y);
 	const int arg1 = x;
 	const int arg2 = y;
 	//

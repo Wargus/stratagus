@@ -85,8 +85,8 @@ static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit)
 */
 static bool AiCheckSurrounding(const CUnit &worker, const CUnitType &type, const Vec2i &pos, bool &backupok)
 {
-	const Vec2i pos_topLeft = {pos.x - 1, pos.y - 1};
-	const Vec2i pos_bottomRight = {pos.x + type.TileWidth, pos.y + type.TileWidth};
+	const Vec2i pos_topLeft(pos.x - 1, pos.y - 1);
+	const Vec2i pos_bottomRight(pos.x + type.TileWidth, pos.y + type.TileWidth);
 	Vec2i it = pos_topLeft;
 	const bool firstVal = IsPosFree(it, worker);
 	bool lastval = firstVal;
@@ -235,9 +235,9 @@ private:
 bool HallPlaceFinder::IsAUsableMine(const CUnit &mine) const
 {
 	// Check units around mine
-	const Vec2i offset = {5, 5};
+	const Vec2i offset(5, 5);
 	const Vec2i minpos = mine.tilePos - offset;
-	const Vec2i typeSize = {mine.Type->TileWidth - 1, mine.Type->TileHeight - 1};
+	const Vec2i typeSize(mine.Type->TileWidth - 1, mine.Type->TileHeight - 1);
 	const Vec2i maxpos = mine.tilePos + typeSize + offset;
 	std::vector<CUnit *> units;
 

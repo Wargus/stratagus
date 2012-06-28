@@ -150,7 +150,7 @@ static void UiCenterOnGroup(unsigned group, GroupSelectionMode mode = SELECTABLE
 
 	if (n--) {
 		CUnit **units = GetUnitsOfGroup(group);
-		PixelPos pos = { -1, -1};
+		PixelPos pos(-1, -1);
 
 		// FIXME: what should we do with the removed units? ignore?
 		if (units[n]->Type && units[n]->Type->CanSelect(mode)) {
@@ -419,7 +419,7 @@ static void UiSaveMapPosition(unsigned position)
 */
 static void UiRecallMapPosition(unsigned position)
 {
-	const Vec2i savedTilePos = {SavedMapPositionX[position], SavedMapPositionY[position]};
+	const Vec2i savedTilePos(SavedMapPositionX[position], SavedMapPositionY[position]);
 
 	UI.SelectedViewport->Set(savedTilePos, PixelTileSize / 2);
 }
@@ -1367,7 +1367,7 @@ void InputMouseMove(const EventCallback *callbacks,
 		MouseY = y;
 	}
 #endif
-	const PixelPos pos = {x, y};
+	const PixelPos pos(x, y);
 	callbacks->MouseMoved(pos);
 }
 

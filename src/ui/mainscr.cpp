@@ -1251,7 +1251,7 @@ void CenterOnMessage()
 	if (MessagesEventCount == 0) {
 		return;
 	}
-	const Vec2i pos = {MessagesEventX[MessagesEventIndex], MessagesEventY[MessagesEventIndex]};
+	const Vec2i pos(MessagesEventX[MessagesEventIndex], MessagesEventY[MessagesEventIndex]);
 	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(pos));
 	SetMessage(_("~<Event: %s~>"), MessagesEvent[MessagesEventIndex]);
 	++MessagesEventIndex;

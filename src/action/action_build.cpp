@@ -165,7 +165,7 @@ enum {
 	input.SetMinRange(this->Type->BuilderOutside ? 1 : 0);
 	input.SetMaxRange(this->Range);
 
-	const Vec2i tileSize = {this->Type->TileWidth, this->Type->TileHeight};
+	const Vec2i tileSize(this->Type->TileWidth, this->Type->TileHeight);
 	input.SetGoal(this->goalPos, tileSize);
 }
 

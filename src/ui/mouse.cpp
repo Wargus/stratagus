@@ -784,7 +784,7 @@ void MouseScrollMap(int x, int y)
 		speed = UI.MouseScrollSpeedDefault;
 	}
 
-	const PixelDiff diff = {x - CursorScreenPos.x, y - CursorScreenPos.y};
+	const PixelDiff diff(x - CursorScreenPos.x, y - CursorScreenPos.y);
 
 	UI.MouseViewport->Set(UI.MouseViewport->MapPos, UI.MouseViewport->Offset + speed * diff);
 	UI.MouseWarpPos = CursorStartScreenPos;
@@ -1541,7 +1541,7 @@ void UIHandleButtonDown(unsigned button)
 
 				for (int j = 0; explored && j < Selected[0]->Type->TileHeight; ++j) {
 					for (int i = 0; i < Selected[0]->Type->TileWidth; ++i) {
-						const Vec2i tempPos = {i, j};
+						const Vec2i tempPos(i, j);
 						if (!Map.IsFieldExplored(*ThisPlayer, tilePos + tempPos)) {
 							explored = 0;
 							break;

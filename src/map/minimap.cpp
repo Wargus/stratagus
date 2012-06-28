@@ -508,7 +508,7 @@ void CMinimap::Update()
 			if (ReplayRevealMap) {
 				visiontype = 2;
 			} else {
-				const Vec2i tilePos = {Minimap2MapX[mx], Minimap2MapY[my] / Map.Info.MapWidth};
+				const Vec2i tilePos(Minimap2MapX[mx], Minimap2MapY[my] / Map.Info.MapWidth);
 				visiontype = Map.IsTileVisible(*ThisPlayer, tilePos);
 			}
 
@@ -625,9 +625,8 @@ void CMinimap::Draw() const
 */
 Vec2i CMinimap::ScreenToTilePos(const PixelPos &screenPos) const
 {
-	Vec2i tilePos = {(((screenPos.x - X - XOffset) * MINIMAP_FAC) / MinimapScaleX),
-					 (((screenPos.y - Y - YOffset) * MINIMAP_FAC) / MinimapScaleY)
-					};
+	Vec2i tilePos((((screenPos.x - X - XOffset) * MINIMAP_FAC) / MinimapScaleX),
+				  (((screenPos.y - Y - YOffset) * MINIMAP_FAC) / MinimapScaleY));
 
 	Map.Clamp(tilePos);
 	return tilePos;
@@ -642,9 +641,8 @@ Vec2i CMinimap::ScreenToTilePos(const PixelPos &screenPos) const
 */
 PixelPos CMinimap::TilePosToScreenPos(const Vec2i &tilePos) const
 {
-	const PixelPos screenPos = {X + XOffset + (tilePos.x * MinimapScaleX) / MINIMAP_FAC,
-								Y + YOffset + (tilePos.y * MinimapScaleY) / MINIMAP_FAC
-							   };
+	const PixelPos screenPos(X + XOffset + (tilePos.x * MinimapScaleX) / MINIMAP_FAC,
+							 Y + YOffset + (tilePos.y * MinimapScaleY) / MINIMAP_FAC);
 	return screenPos;
 }
 

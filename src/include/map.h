@@ -529,8 +529,8 @@ public:
 
 	template <typename Pred>
 	void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, Pred pred) {
-		const Vec2i offset = {range, range};
-		const Vec2i typeSize = {unit.Type->TileWidth - 1, unit.Type->TileHeight - 1};
+		const Vec2i offset(range, range);
+		const Vec2i typeSize(unit.Type->TileWidth - 1, unit.Type->TileHeight - 1);
 
 		Select(unit.tilePos - offset,
 			   unit.tilePos + typeSize + offset, around,
@@ -721,7 +721,7 @@ extern void SetTile(int tile, const Vec2i &pos, int value = 0);
 
 inline void SetTile(int tile, int x, int y, int value = 0)
 {
-	const Vec2i pos = {x, y};
+	const Vec2i pos(x, y);
 	SetTile(tile, pos, value);
 }
 

@@ -719,9 +719,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, int x, in
 	// For debug draw sight, react and attack range!
 	//
 	if (NumSelected == 1 && unit.Selected) {
-		const PixelPos center = {x + type.TileWidth *PixelTileSize.x / 2,
-								 y + type.TileHeight *PixelTileSize.y / 2
-								};
+		const PixelPos center(x + type.TileWidth * PixelTileSize.x / 2, y + type.TileHeight *PixelTileSize.y / 2);
 
 		if (Preference.ShowSightRange) {
 			const int value = stats.Variables[SIGHTRANGE_INDEX].Max;
@@ -1058,8 +1056,8 @@ static inline bool DrawLevelCompare(const CUnit *c1, const CUnit *c2)
 int FindAndSortUnits(const CViewport *vp, std::vector<CUnit *> &table)
 {
 	//  Select all units touching the viewpoint.
-	const Vec2i offset = {1, 1};
-	const Vec2i vpSize = {vp->MapWidth, vp->MapHeight};
+	const Vec2i offset(1, 1);
+	const Vec2i vpSize(vp->MapWidth, vp->MapHeight);
 	const Vec2i minPos = vp->MapPos - offset;
 	const Vec2i maxPos = vp->MapPos + vpSize + offset;
 
