@@ -51,6 +51,24 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit)
+{
+	if (Map.Info.IsPointOnMap(pos) == false) {
+		return false;
+	}
+	const CMapField &mf = *Map.Field(pos);
+	const CUnitCache &unitCache = mf.UnitCache;
+	if (std::find(unitCache.begin(), unitCache.end(), &exceptionUnit) != unitCache.end()) {
+		return true;
+	}
+	const unsigned int blockedFlag = (MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest | MapFieldBuilding);
+	if (mf.Flags & blockedFlag) {
+		return false;
+	}
+	const unsigned int passableFlag = (MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldLandAllowed);
+	return (mf.Flags & passableFlag);
+}
+
 /**
 **  Check if the surrounding are free. Depending on the value of flag, it will check :
 **  0: the building will not block any way
@@ -58,74 +76,65 @@
 **
 **  @param worker    Worker to build.
 **  @param type      Type of building.
-**  @param x         X map tile position for the building.
-**  @param y         Y map tile position for the building.
+**  @param pos       map tile position for the building.
 **  @param backupok  Location can be used as a backup
 **
 **  @return          True if the surrounding is free, false otherwise.
 **
 **  @note            Can be faster written.
 */
-static bool AiCheckSurrounding(const CUnit &worker, const CUnitType &type, int x, int y, bool &backupok)
+static bool AiCheckSurrounding(const CUnit &worker, const CUnitType &type, const Vec2i &pos, bool &backupok)
 {
-	static int dirs[4][3] = {{1, 0, 0}, {0, 1, Map.Info.MapWidth},
-		{ -1, 0, 0}, {0, -1, -Map.Info.MapWidth}
-	};
-	int surrounding[1024]; // Max circonference for building
-	int surroundingnb = 0;
-	const int x0 = x - 1;
-	const int y0 = y - 1;
-	const int x1 = x0 + type.TileWidth + 1;
-	const int y1 = y0 + type.TileWidth + 1;
+	const Vec2i pos_topLeft = {pos.x - 1, pos.y - 1};
+	const Vec2i pos_bottomRight = {pos.x + type.TileWidth, pos.y + type.TileWidth};
+	Vec2i it = pos_topLeft;
+	const bool firstVal = IsPosFree(it, worker);
+	bool lastval = firstVal;
+	int obstacleCount = 0;
 
-	x = x0;
-	y = y0;
-	int y_offset = y * Map.Info.MapWidth;
-	int dir = -1;
-	while (dir < 4) {
-		if (Map.Info.IsPointOnMap(x, y)) {
-			if (x == worker.tilePos.x && y == worker.tilePos.y) {
-				surrounding[surroundingnb++] = 1;
-			} else if (Map.CheckMask(x + y_offset,
-									 (MapFieldUnpassable | MapFieldWall | MapFieldRocks
-									  | MapFieldForest | MapFieldBuilding))) {
-				surrounding[surroundingnb++] = 0;
-			} else {
-				// Can pass there
-				surrounding[surroundingnb++] = Map.CheckMask(x + y_offset, (MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldLandAllowed));
-			}
-		} else {
-			surrounding[surroundingnb++] = 0;
-		}
+	for (++it.x; it.x < pos_bottomRight.x; ++it.x) {
+		const bool isfree = IsPosFree(it, worker);
 
-		if ((x == x0 || x == x1) && (y == y0 || y == y1)) {
-			dir++;
+		if (isfree && !lastval) {
+			++obstacleCount;
 		}
-		x += dirs[dir][0];
-		y += dirs[dir][1];
-		y_offset += dirs[dir][2];
+		lastval = isfree;
 	}
+	for (; it.y < pos_bottomRight.y; ++it.y) {
+		const bool isfree = IsPosFree(it, worker);
 
-	int lastval = surrounding[surroundingnb - 1];
-	int obstacle = 0;
-	for (int i = 0 ; i < surroundingnb; ++i) {
-		if (lastval && !surrounding[i]) {
-			++obstacle;
+		if (isfree && !lastval) {
+			++obstacleCount;
 		}
-		lastval = surrounding[i];
+		lastval = isfree;
 	}
+	for (; pos_topLeft.x < it.x; --it.x) {
+		const bool isfree = IsPosFree(it, worker);
 
-	if (obstacle == 0) {
-		obstacle = !surrounding[0];
+		if (isfree && !lastval) {
+			++obstacleCount;
+		}
+		lastval = isfree;
+	}
+	for (; pos_topLeft.y < it.y; --it.y) {
+		const bool isfree = IsPosFree(it, worker);
+
+		if (isfree && !lastval) {
+			++obstacleCount;
+		}
+		lastval = isfree;
+	}
+	if (firstVal && !lastval) {
+		++obstacleCount;
 	}
 
 	if (!type.ShoreBuilding) {
-		backupok = obstacle < 5;
+		backupok = obstacleCount < 5;
 	} else {
 		// Shore building have at least 2 obstacles : sea->ground & ground->sea
-		backupok = obstacle < 3;
+		backupok = obstacleCount < 3;
 	}
-	return obstacle == 0;
+	return obstacleCount == 0;
 }
 
 class BuildingPlaceFinder
@@ -159,7 +168,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 	if (CanBuildUnitType(&worker, type, pos, 1)
 		&& !AiEnemyUnitsInDistance(*worker.Player, NULL, pos, 8)) {
 		bool backupok;
-		if (AiCheckSurrounding(worker, type, pos.x, pos.y, backupok) && checkSurround) {
+		if (AiCheckSurrounding(worker, type, pos, backupok) && checkSurround) {
 			*resultPos = pos;
 			return VisitResult_Finished;
 		} else if (backupok && resultPos->x == -1) {
