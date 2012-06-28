@@ -795,17 +795,17 @@ extern int AddGroupFromUnitToSelection(CUnit &unit);
 /// Select the units from the same group as the one in parameter
 extern int SelectGroupFromUnit(CUnit &unit);
 /// Select the units in the selection rectangle
-extern int SelectUnitsInRectangle(int tx, int ty, int w, int h);
+extern int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright);
 /// Select ground units in the selection rectangle
-extern int SelectGroundUnitsInRectangle(int tx, int ty, int w, int h);
+extern int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright);
 /// Select flying units in the selection rectangle
-extern int SelectAirUnitsInRectangle(int tx, int ty, int w, int h);
+extern int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright);
 /// Add the units in the selection rectangle to the current selection
-extern int AddSelectedUnitsInRectangle(int tx, int ty, int w, int h);
+extern int AddSelectedUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright);
 /// Add ground units in the selection rectangle to the current selection
-extern int AddSelectedGroundUnitsInRectangle(int tx, int ty, int w, int h);
+extern int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright);
 /// Add flying units in the selection rectangle to the current selection
-extern int AddSelectedAirUnitsInRectangle(int tx, int ty, int w, int h);
+extern int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright);
 
 /// Init selections
 extern void InitSelections();

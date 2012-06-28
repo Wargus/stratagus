@@ -1815,33 +1815,31 @@ void UIHandleButtonUp(unsigned button)
 		//
 		if (CursorStartScreenPos.x < CursorScreenPos.x - 1 || CursorScreenPos.x + 1 < CursorStartScreenPos.x
 			|| CursorStartScreenPos.y < CursorScreenPos.y - 1 || CursorScreenPos.y + 1 < CursorStartScreenPos.y) {
-			int x0 = CursorStartMapPos.x;
-			int y0 = CursorStartMapPos.y;
+			PixelPos pos0 = CursorStartMapPos;
 			const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
-			int x1 = cursorMapPos.x;
-			int y1 = cursorMapPos.y;
+			PixelPos pos1 = cursorMapPos;
 
-			if (x0 > x1) {
-				std::swap(x0, x1);
+			if (pos0.x > pos1.x) {
+				std::swap(pos0.x, pos1.x);
 			}
-			if (y0 > y1) {
-				std::swap(y0, y1);
+			if (pos0.y > pos1.y) {
+				std::swap(pos0.y, pos1.y);
 			}
 			if (KeyModifiers & ModifierShift) {
 				if (KeyModifiers & ModifierAlt) {
-					num = AddSelectedGroundUnitsInRectangle(x0, y0, x1, y1);
+					num = AddSelectedGroundUnitsInRectangle(pos0, pos1);
 				} else if (KeyModifiers & ModifierControl) {
-					num = AddSelectedAirUnitsInRectangle(x0, y0, x1, y1);
+					num = AddSelectedAirUnitsInRectangle(pos0, pos1);
 				} else {
-					num = AddSelectedUnitsInRectangle(x0, y0, x1, y1);
+					num = AddSelectedUnitsInRectangle(pos0, pos1);
 				}
 			} else {
 				if (KeyModifiers & ModifierAlt) {
-					num = SelectGroundUnitsInRectangle(x0, y0, x1, y1);
+					num = SelectGroundUnitsInRectangle(pos0, pos1);
 				} else if (KeyModifiers & ModifierControl) {
-					num = SelectAirUnitsInRectangle(x0, y0, x1, y1);
+					num = SelectAirUnitsInRectangle(pos0, pos1);
 				} else {
-					num = SelectUnitsInRectangle(x0, y0, x1, y1);
+					num = SelectUnitsInRectangle(pos0, pos1);
 				}
 			}
 #ifdef USE_TOUCHSCREEN

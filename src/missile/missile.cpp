@@ -419,16 +419,12 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 */
 static void GetMissileMapArea(const Missile &missile, Vec2i &boxMin, Vec2i &boxMax)
 {
-#define BoundX(x) std::min<int>(std::max<int>(0, x), Map.Info.MapWidth - 1)
-#define BoundY(y) std::min<int>(std::max<int>(0, y), Map.Info.MapHeight - 1)
-
-	boxMin.x = BoundX(missile.position.x / PixelTileSize.x);
-	boxMin.y = BoundY(missile.position.y / PixelTileSize.y);
-	boxMax.x = BoundX((missile.position.x + missile.Type->Width() + PixelTileSize.x - 1) / PixelTileSize.x);
-	boxMax.y = BoundY((missile.position.y + missile.Type->Height() + PixelTileSize.y - 1) / PixelTileSize.y);
-
-#undef BoundX
-#undef BoundY
+	PixelSize missileSize(missile.Type->Width(), missile.Type->Height());
+	PixelDiff margin(PixelTileSize.x - 1, PixelTileSize.y - 1);
+	boxMin = Map.MapPixelPosToTilePos(missile.position);
+	boxMax = Map.MapPixelPosToTilePos(missile.position + missileSize + margin);
+	Map.Clamp(boxMin);
+	Map.Clamp(boxMax);
 }
 
 /**

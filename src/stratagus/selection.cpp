@@ -639,16 +639,13 @@ static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table)
 **  of its upper left and lower right corner expressed in screen map
 **  coordinate system.
 **
-**  @param sx0        x-coord of upper left corner of the rectangle
-**  @param sy0        y-coord of upper left corner of the rectangle
-**  @param sx1        x-coord of lower right corner of the rectangle
-**  @param sy1        y-coord of lower right corner of the rectangle
-**  @param table      table of units
-**  @param num_units  number of units in table
+**  @param corner_topleft      coord of upper left corner of the rectangle
+**  @param corner_bottomright  coord of lower right corner of the rectangle
+**  @param table               table of units
 **
 **  @return           number of units found
 */
-static void SelectSpritesInsideRectangle(int sx0, int sy0, int sx1, int sy1,
+static void SelectSpritesInsideRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright,
 										 std::vector<CUnit *> &table)
 {
 	int n = 0;
@@ -660,10 +657,10 @@ static void SelectSpritesInsideRectangle(int sx0, int sy0, int sx1, int sy1,
 
 		spritePos.x += type.OffsetX - type.BoxWidth / 2;
 		spritePos.y += type.OffsetY - type.BoxHeight / 2;
-		if (spritePos.x + type.BoxWidth < sx0
-			|| spritePos.x > sx1
-			|| spritePos.y + type.BoxHeight < sy0
-			|| spritePos.y > sy1) {
+		if (spritePos.x + type.BoxWidth < corner_topleft.x
+			|| spritePos.x > corner_bottomright.x
+			|| spritePos.y + type.BoxHeight < corner_topleft.y
+			|| spritePos.y > corner_bottomright.y) {
 			continue;
 		}
 		table[n++] = &unit;
@@ -671,15 +668,28 @@ static void SelectSpritesInsideRectangle(int sx0, int sy0, int sx1, int sy1,
 	table.resize(n);
 }
 
-static int DoSelectUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
+/**
+**  Select units in a rectangle.
+**  Proceed in order in none found:
+**    @li select local player mobile units
+**    @li select one local player static unit (random)
+**    @li select one neutral unit (critter, mine...)
+**    @li select one enemy unit (random)
+**
+**  @param corner_topleft,  start of selection rectangle
+**  @param corner_bottomright end of selection rectangle
+**
+**  @return     the number of units found.
+*/
+int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
-	const Vec2i t0(sx0 / PixelTileSize.x, sy0 / PixelTileSize.y);
-	const Vec2i t1(sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1);
+	const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
+	const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
 	Map.Select(t0 - range, t1 + range, table);
-	SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table);
+	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
 	// 1) search for the player units selectable with rectangle
 	if (SelectOrganicUnitsInTable(table)) {
@@ -739,38 +749,15 @@ static int DoSelectUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	return 0;
 }
 
-
-/**
-**  Select units in a rectangle.
-**  Proceed in order in none found:
-**    @li select local player mobile units
-**    @li select one local player static unit (random)
-**    @li select one neutral unit (critter, mine...)
-**    @li select one enemy unit (random)
-**
-**  @param sx0  X start of selection rectangle in tile coordinates
-**  @param sy0  Y start of selection rectangle in tile coordinates
-**  @param sx1  X start of selection rectangle in tile coordinates
-**  @param sy1  Y start of selection rectangle in tile coordinates
-**
-**  @return     the number of units found.
-*/
-int SelectUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
-{
-	return DoSelectUnitsInRectangle(sx0, sy0, sx1, sy1);
-}
-
 /**
 **  Add the units in the rectangle to the current selection
 **
-**  @param x0  X start of selection rectangle in tile coordinates
-**  @param y0  Y start of selection rectangle in tile coordinates
-**  @param x1  X start of selection rectangle in tile coordinates
-**  @param y1  Y start of selection rectangle in tile coordinates
+**  @param corner_topleft,  start of selection rectangle
+**  @param corner_bottomright end of selection rectangle
 **
 **  @return    the _total_ number of units selected.
 */
-int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
+int AddSelectedUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
 	// Check if the original selected unit (if it's alone) is ours,
 	// and can be selectable by rectangle.
@@ -782,15 +769,15 @@ int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 	}
 	// If there is no selected unit yet, do a simple selection.
 	if (!NumSelected) {
-		return DoSelectUnitsInRectangle(x0, y0, x1, y1);
+		return SelectUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
-	const Vec2i tilePos0(x0 / PixelTileSize.x, y0 / PixelTileSize.y);
-	const Vec2i tilePos1(x1 / PixelTileSize.x + 1, y1 / PixelTileSize.y + 1);
+	const Vec2i tilePos0 = Map.MapPixelPosToTilePos(corner_topleft);
+	const Vec2i tilePos1 = Map.MapPixelPosToTilePos(corner_bottomright);
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
 	Map.Select(tilePos0 - range, tilePos1 + range, table);
-	SelectSpritesInsideRectangle(x0, y0, x1, y1, table);
+	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 	// If no unit in rectangle area... do nothing
 	if (table.empty()) {
 		return NumSelected;
@@ -808,15 +795,23 @@ int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 	return NumSelected;
 }
 
-static int DoSelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
+/**
+**  Select own ground units in a rectangle.
+**
+**  @param corner_topleft,  start of selection rectangle
+**  @param corner_bottomright end of selection rectangle
+**
+**  @return     the number of units found.
+*/
+int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
-	const Vec2i t0(sx0 / PixelTileSize.x, sy0 / PixelTileSize.y);
-	const Vec2i t1(sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1);
+	const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
+	const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
 	Map.Select(t0 - range, t1 + range, table);
-	SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table);
+	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
 	int n = 0;
 	for (size_t i = 0; i != table.size(); ++i) {
@@ -846,29 +841,22 @@ static int DoSelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 }
 
 /**
-**  Select own ground units in a rectangle.
+**  Select own air units in a rectangle.
 **
-**  @param sx0  X start of selection rectangle in tile coordinates
-**  @param sy0  Y start of selection rectangle in tile coordinates
-**  @param sx1  X start of selection rectangle in tile coordinates
-**  @param sy1  Y start of selection rectangle in tile coordinates
+**  @param corner_topleft,  start of selection rectangle
+**  @param corner_bottomright end of selection rectangle
 **
 **  @return     the number of units found.
 */
-int SelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
+int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
-	return DoSelectGroundUnitsInRectangle(sx0, sy0, sx1, sy1);
-}
-
-static int DoSelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
-{
-	const Vec2i t0(sx0 / PixelTileSize.x, sy0 / PixelTileSize.y);
-	const Vec2i t1(sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1);
+	const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
+	const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
 	Map.Select(t0 - range, t1 + range, table);
-	SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table);
+	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 	int n = 0;
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
@@ -895,32 +883,16 @@ static int DoSelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	return n;
 }
 
-/**
-**  Select own air units in a rectangle.
-**
-**  @param sx0  X start of selection rectangle in tile coordinates
-**  @param sy0  Y start of selection rectangle in tile coordinates
-**  @param sx1  X start of selection rectangle in tile coordinates
-**  @param sy1  Y start of selection rectangle in tile coordinates
-**
-**  @return     the number of units found.
-*/
-int SelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
-{
-	return DoSelectAirUnitsInRectangle(sx0, sy0, sx1, sy1);
-}
 
 /**
 **  Add the ground units in the rectangle to the current selection
 **
-**  @param sx0  X start of selection rectangle in tile coordinates
-**  @param sy0  Y start of selection rectangle in tile coordinates
-**  @param sx1  X start of selection rectangle in tile coordinates
-**  @param sy1  Y start of selection rectangle in tile coordinates
+**  @param corner_topleft,     start of selection rectangle
+**  @param corner_bottomright  end of selection rectangle
 **
 **  @return     the number of units found.
 */
-int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
+int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
 	// Check if the original selected unit (if it's alone) is ours,
 	// and can be selectable by rectangle.
@@ -933,16 +905,16 @@ int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 
 	// If there is no selected unit yet, do a simple selection.
 	if (!NumSelected) {
-		return DoSelectGroundUnitsInRectangle(sx0, sy0, sx1, sy1);
+		return SelectGroundUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
 
-	const Vec2i t0(sx0 / PixelTileSize.x, sy0 / PixelTileSize.y);
-	const Vec2i t1(sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1);
+	const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
+	const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
 	Map.Select(t0 - range, t1 + range, table);
-	SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table);
+	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
 	int n = 0;
 	for (size_t i = 0; i < table.size(); ++i) {
@@ -977,14 +949,12 @@ int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 /**
 **  Add the air units in the rectangle to the current selection
 **
-**  @param sx0  X start of selection rectangle in tile coordinates
-**  @param sy0  Y start of selection rectangle in tile coordinates
-**  @param sx1  X start of selection rectangle in tile coordinates
-**  @param sy1  Y start of selection rectangle in tile coordinates
+**  @param corner_topleft,     start of selection rectangle
+**  @param corner_bottomright  end of selection rectangle
 **
 **  @return     the number of units found.
 */
-int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
+int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
 	// Check if the original selected unit (if it's alone) is ours,
 	// and can be selectable by rectangle.
@@ -997,16 +967,16 @@ int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 
 	// If there is no selected unit yet, do a simple selection.
 	if (!NumSelected) {
-		return DoSelectAirUnitsInRectangle(sx0, sy0, sx1, sy1);
+		return SelectAirUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
 
-	const Vec2i t0(sx0 / PixelTileSize.x, sy0 / PixelTileSize.y);
-	const Vec2i t1(sx1 / PixelTileSize.x + 1, sy1 / PixelTileSize.y + 1);
+	const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
+	const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
 	Map.Select(t0 - range, t1 + range, table);
-	SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table);
+	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 	int n = 0;
 	for (size_t i = 0; i < table.size(); ++i) {
 		CUnit &unit = *table[i];
