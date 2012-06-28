@@ -840,7 +840,7 @@ static int CclOrderUnit(lua_State *l)
 				if (!strcmp(order, "move")) {
 					CommandMove(unit, (dpos1 + dpos2) / 2, 1);
 				} else if (!strcmp(order, "attack")) {
-					CUnit *attack = TargetOnMap(unit, dpos1.x, dpos1.y, dpos2.x + 1, dpos2.y + 1);
+					CUnit *attack = TargetOnMap(unit, dpos1, dpos2);
 
 					CommandAttack(unit, (dpos1 + dpos2) / 2, attack, 1);
 				} else if (!strcmp(order, "patrol")) {

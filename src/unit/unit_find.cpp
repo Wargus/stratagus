@@ -122,45 +122,34 @@ CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type)
 	return UnitOnMapTile(Map.getIndex(pos), type);
 }
 
-
 /**
 **  Choose target on map area.
 **
 **  @param source  Unit which want to attack.
-**  @param x1      X position on map, tile-based.
-**  @param y1      Y position on map, tile-based.
-**  @param x2      X position on map, tile-based.
-**  @param y2      Y position on map, tile-based.
+**  @param pos1    position on map, tile-based.
+**  @param pos2    position on map, tile-based.
 **
 **  @return        Returns ideal target on map tile.
 */
-CUnit *TargetOnMap(const CUnit &source, int x1, int y1, int x2, int y2)
+CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2)
 {
-	const Vec2i pos1(x1, y1);
-	const Vec2i pos2(x2, y2);
 	std::vector<CUnit *> table;
 
 	Map.Select(pos1, pos2, table);
 	CUnit *best = NULL;
 	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit *unit = table[i];
-		if (!unit->IsVisibleAsGoal(*source.Player)) {
+		CUnit &unit = *table[i];
+
+		if (!unit.IsVisibleAsGoal(*source.Player)) {
 			continue;
 		}
-		const CUnitType *type = unit->Type;
-		if (x2 < unit->tilePos.x || x1 >= unit->tilePos.x + type->TileWidth
-			|| y2 < unit->tilePos.y || y1 >= unit->tilePos.y + type->TileHeight) {
-			continue;
-		}
-		if (!CanTarget(source.Type, unit->Type)) {
+		if (!CanTarget(source.Type, unit.Type)) {
 			continue;
 		}
 
-		//
 		// Choose the best target.
-		//
-		if (!best || best->Type->Priority < unit->Type->Priority) {
-			best = unit;
+		if (!best || best->Type->Priority < unit.Type->Priority) {
+			best = &unit;
 		}
 	}
 	return best;

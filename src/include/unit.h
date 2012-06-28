@@ -722,7 +722,7 @@ extern void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, 
 /// Return any unit on that map tile
 extern CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type);// = -1);
 /// Return possible attack target on that map area
-extern CUnit *TargetOnMap(const CUnit &unit, int x1, int y1, int x2, int y2);
+extern CUnit *TargetOnMap(const CUnit &unit, const Vec2i &pos1, const Vec2i &pos2);
 
 /// Return resource, if on map tile
 extern CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top = true);
