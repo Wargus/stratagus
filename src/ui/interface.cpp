@@ -71,8 +71,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static int SavedMapPositionX[3];     /// Saved map position X
-static int SavedMapPositionY[3];     /// Saved map position Y
+static Vec2i SavedMapPosition[3];    /// Saved map position
 static char Input[80];               /// line input for messages/long commands
 static int InputIndex;               /// current index into input
 static char InputStatusLine[99];     /// Last input status line
@@ -408,8 +407,7 @@ static void UiCenterOnSelected()
 */
 static void UiSaveMapPosition(unsigned position)
 {
-	SavedMapPositionX[position] = UI.SelectedViewport->MapPos.x;
-	SavedMapPositionY[position] = UI.SelectedViewport->MapPos.y;
+	SavedMapPosition[position] = UI.SelectedViewport->MapPos;
 }
 
 /**
@@ -419,9 +417,7 @@ static void UiSaveMapPosition(unsigned position)
 */
 static void UiRecallMapPosition(unsigned position)
 {
-	const Vec2i savedTilePos(SavedMapPositionX[position], SavedMapPositionY[position]);
-
-	UI.SelectedViewport->Set(savedTilePos, PixelTileSize / 2);
+	UI.SelectedViewport->Set(SavedMapPosition[position], PixelTileSize / 2);
 }
 
 /**
