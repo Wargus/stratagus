@@ -432,8 +432,7 @@ static void EditorChangeTile(const Vec2i &pos, int tile, int d)
 /**
 **  Update surroundings for tile changes.
 **
-**  @param pos  Map X tile position of change.
-**  @param y  Map Y tile position of change.
+**  @param pos  Map tile position of change.
 **  @param d  Fix direction flag 8 up, 4 down, 2 left, 1 right.
 */
 static void EditorTileChanged2(const Vec2i &pos, int d)
@@ -528,7 +527,6 @@ void EditorTileChanged(const Vec2i &pos)
 **  TileFill
 **
 **  @param pos   map tile coordinate for area center.
-**  @param y     Y map tile coordinate for area center.
 **  @param tile  Tile type to edit.
 **  @param size  Size of surrounding rectangle.
 **

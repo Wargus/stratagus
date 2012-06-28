@@ -217,7 +217,7 @@ static void AnimateActionSpellCast(CUnit &unit, COrder_SpellCast &order)
 **
 **  @warning  The caller must check, if he likes the restored SavedOrder!
 **
-**  @todo     If a unit enters an building, than the attack choose an
+**  @todo     If a unit enters into a building, then the caster chooses an
 **            other goal, perhaps it is better to wait for the goal?
 **
 **  @param unit  Unit using the goal.
@@ -226,7 +226,7 @@ static void AnimateActionSpellCast(CUnit &unit, COrder_SpellCast &order)
 */
 bool COrder_SpellCast::CheckForDeadGoal(CUnit &unit)
 {
-	CUnit *goal = this->GetGoal();
+	const CUnit *goal = this->GetGoal();
 
 	// Position or valid target, it is ok.
 	if (!goal || goal->IsVisibleAsGoal(*unit.Player)) {
