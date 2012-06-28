@@ -105,7 +105,7 @@ void TerrainTraversal::PushNeighboor(const Vec2i &pos)
 	}
 }
 
-void TerrainTraversal::PushUnitPosAndNeighboor(const CUnit& unit)
+void TerrainTraversal::PushUnitPosAndNeighboor(const CUnit &unit)
 {
 	const CUnit *startUnit = GetFirstContainer(unit);
 	const Vec2i offset = {1, 1};
@@ -135,12 +135,12 @@ bool TerrainTraversal::IsInvalid(const Vec2i &pos) const
 	return Get(pos) != -1;
 }
 
-TerrainTraversal::dataType TerrainTraversal::Get(const Vec2i& pos) const
+TerrainTraversal::dataType TerrainTraversal::Get(const Vec2i &pos) const
 {
 	return m_values[m_extented_width + 1 + pos.y * m_extented_width + pos.x];
 }
 
-void TerrainTraversal::Set(const Vec2i& pos, TerrainTraversal::dataType value)
+void TerrainTraversal::Set(const Vec2i &pos, TerrainTraversal::dataType value)
 {
 	m_values[m_extented_width + 1 + pos.y * m_extented_width + pos.x] = value;
 }

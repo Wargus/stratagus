@@ -140,12 +140,11 @@ static bool AiCheckSurrounding(const CUnit &worker, const CUnitType &type, const
 class BuildingPlaceFinder
 {
 public:
-	BuildingPlaceFinder(const CUnit &worker, const CUnitType &type, bool checkSurround, Vec2i* resultPos) :
+	BuildingPlaceFinder(const CUnit &worker, const CUnitType &type, bool checkSurround, Vec2i *resultPos) :
 		worker(worker), type(type),
 		movemask(worker.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		checkSurround(checkSurround),
-		resultPos(resultPos)
-	{
+		resultPos(resultPos) {
 		resultPos->x = -1;
 		resultPos->y = -1;
 	}
@@ -155,7 +154,7 @@ private:
 	const CUnitType &type;
 	unsigned int movemask;
 	bool checkSurround;
-	Vec2i* resultPos;
+	Vec2i *resultPos;
 };
 
 VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
@@ -216,7 +215,7 @@ static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, con
 class HallPlaceFinder
 {
 public:
-	HallPlaceFinder(const CUnit &worker, const CUnitType &type, int resource, Vec2i* resultPos) :
+	HallPlaceFinder(const CUnit &worker, const CUnitType &type, int resource, Vec2i *resultPos) :
 		worker(worker), type(type),
 		movemask(worker.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		resource(resource),
@@ -230,7 +229,7 @@ private:
 	const CUnitType &type;
 	const unsigned int movemask;
 	const int resource;
-	Vec2i* resultPos;
+	Vec2i *resultPos;
 };
 
 bool HallPlaceFinder::IsAUsableMine(const CUnit &mine) const
@@ -333,7 +332,7 @@ static int AiFindHallPlace(const CUnit &worker,
 class LumberMillPlaceFinder
 {
 public:
-	LumberMillPlaceFinder(const CUnit &worker, const CUnitType &type, int resource, Vec2i* resultPos) :
+	LumberMillPlaceFinder(const CUnit &worker, const CUnitType &type, int resource, Vec2i *resultPos) :
 		worker(worker), type(type),
 		movemask(worker.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		resource(resource),
@@ -345,7 +344,7 @@ private:
 	const CUnitType &type;
 	unsigned int movemask;
 	int resource;
-	Vec2i* resultPos;
+	Vec2i *resultPos;
 };
 
 VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)

@@ -1199,7 +1199,7 @@ void Windows::mouseMotion(int x, int y)
 	// Move the cursor.
 	// Usefull only when window reachs the limit.
 	getAbsolutePosition(absx, absy);
-	CursorScreenPos.x= absx + mMouseXOffset;
+	CursorScreenPos.x = absx + mMouseXOffset;
 	CursorScreenPos.y = absy + mMouseYOffset;
 }
 

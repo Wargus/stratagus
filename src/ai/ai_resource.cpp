@@ -953,7 +953,7 @@ static void AiCollectResources()
 		// See if it's assigned already
 		if (unit.Orders.size() == 1 &&
 			unit.CurrentAction() == UnitActionResource) {
-			const COrder_Resource& order = *static_cast<COrder_Resource*>(unit.CurrentOrder());
+			const COrder_Resource &order = *static_cast<COrder_Resource *>(unit.CurrentOrder());
 			const int c = order.GetCurrentResource();
 			units_assigned[c].push_back(&unit);
 			num_units_assigned[c]++;

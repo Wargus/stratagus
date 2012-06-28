@@ -70,7 +70,7 @@
 class NearReachableTerrainFinder
 {
 public:
-	NearReachableTerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i* resPos) :
+	NearReachableTerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i *resPos) :
 		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos) {}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
@@ -78,7 +78,7 @@ private:
 	int maxDist;
 	int movemask;
 	int resmask;
-	Vec2i* resPos;
+	Vec2i *resPos;
 };
 
 VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
@@ -105,7 +105,7 @@ VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal
 }
 
 static bool FindNearestReachableTerrainType(int movemask, int resmask, int range,
-						   const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
+											const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
 {
 	TerrainTraversal terrainTraversal;
 
@@ -1025,7 +1025,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			this->goalPos.x = this->goalPos.y = -1;
 		} else {
 #ifdef DEBUG
-			const Vec2i& pos = mine ? mine->tilePos : unit.tilePos;
+			const Vec2i &pos = mine ? mine->tilePos : unit.tilePos;
 			DebugPrint("%d: Worker %d report: [%d,%d] Resource gone near [%d,%d] in range %d. Sit and play dumb.\n"
 					   _C_ unit.Player->Index _C_ unit.Slot
 					   _C_ unit.tilePos.x _C_ unit.tilePos.y

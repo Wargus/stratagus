@@ -300,7 +300,7 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 	blist.push_back(andlist);
 }
 
-static void UpdateDefaultBoolFlags(CUnitType& type)
+static void UpdateDefaultBoolFlags(CUnitType &type)
 {
 	// BoolFlag
 	type.BoolFlag[COWARD_INDEX].value                = type.Coward;

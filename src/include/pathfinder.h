@@ -131,8 +131,7 @@ public:
 //  Terrain traversal stuff.
 //
 
-enum VisitResult
-{
+enum VisitResult {
 	VisitResult_Finished,
 	VisitResult_DeadEnd,
 	VisitResult_Ok,
@@ -149,7 +148,7 @@ public:
 
 	void PushPos(const Vec2i &pos);
 	void PushNeighboor(const Vec2i &pos);
-	void PushUnitPosAndNeighboor(const CUnit& unit);
+	void PushUnitPosAndNeighboor(const CUnit &unit);
 
 	template <typename T>
 	bool Run(T &context);
@@ -164,8 +163,7 @@ public:
 private:
 	void Set(const Vec2i &pos, dataType value);
 
-	struct PosNode
-	{
+	struct PosNode {
 		PosNode(const Vec2i &pos, const Vec2i &from) : pos(pos), from(from) {}
 		Vec2i pos;
 		Vec2i from;
@@ -181,9 +179,8 @@ private:
 template <typename T>
 bool TerrainTraversal::Run(T &context)
 {
-	for (; m_queue.empty() == false; m_queue.pop())
-	{
-		const PosNode& posNode = m_queue.front();
+	for (; m_queue.empty() == false; m_queue.pop()) {
+		const PosNode &posNode = m_queue.front();
 
 		switch (context.Visit(*this, posNode.pos, posNode.from)) {
 			case VisitResult_Finished: return true;

@@ -266,7 +266,7 @@ void CMinimap::UpdateTerrain()
 
 				if (bpp == 1) {
 					SDL_Color color = Map.TileGraphic->Surface->format->palette->colors[
-								*GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp)];
+										  *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp)];
 					c = Video.MapRGB(0, color.r, color.g, color.b);
 				} else {
 					SDL_PixelFormat *f = Map.TileGraphic->Surface->format;
@@ -626,7 +626,8 @@ void CMinimap::Draw() const
 Vec2i CMinimap::ScreenToTilePos(const PixelPos &screenPos) const
 {
 	Vec2i tilePos = {(((screenPos.x - X - XOffset) * MINIMAP_FAC) / MinimapScaleX),
-					 (((screenPos.y - Y - YOffset) * MINIMAP_FAC) / MinimapScaleY)};
+					 (((screenPos.y - Y - YOffset) * MINIMAP_FAC) / MinimapScaleY)
+					};
 
 	Map.Clamp(tilePos);
 	return tilePos;
@@ -642,7 +643,8 @@ Vec2i CMinimap::ScreenToTilePos(const PixelPos &screenPos) const
 PixelPos CMinimap::TilePosToScreenPos(const Vec2i &tilePos) const
 {
 	const PixelPos screenPos = {X + XOffset + (tilePos.x * MinimapScaleX) / MINIMAP_FAC,
-								Y + YOffset + (tilePos.y * MinimapScaleY) / MINIMAP_FAC};
+								Y + YOffset + (tilePos.y * MinimapScaleY) / MINIMAP_FAC
+							   };
 	return screenPos;
 }
 

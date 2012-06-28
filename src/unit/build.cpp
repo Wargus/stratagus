@@ -59,7 +59,7 @@ CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent)
 {
 
 	for (std::vector<CBuildRestriction *>::const_iterator i = unit.Type->BuildingRules.begin();
-		i != unit.Type->BuildingRules.end(); ++i) {
+		 i != unit.Type->BuildingRules.end(); ++i) {
 		CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*i);
 
 		if (ontopb) {

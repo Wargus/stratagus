@@ -113,7 +113,7 @@ static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i &pos)
 class WallFinder
 {
 public:
-	WallFinder(const CUnit &unit, int maxDist, Vec2i* resultPos) :
+	WallFinder(const CUnit &unit, int maxDist, Vec2i *resultPos) :
 		unit(unit),
 		maxDist(maxDist),
 		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
@@ -124,7 +124,7 @@ private:
 	const CUnit &unit;
 	int maxDist;
 	int movemask;
-	Vec2i* resultPos;
+	Vec2i *resultPos;
 };
 
 VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
@@ -303,8 +303,7 @@ static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTrans
 class IsAFreeTransporter
 {
 public:
-	bool operator () (const CUnit* unit) const
-	{
+	bool operator()(const CUnit *unit) const {
 		return unit->Type->CanMove() && unit->BoardCount < unit->Type->MaxOnBoard;
 	}
 };

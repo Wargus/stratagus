@@ -2284,7 +2284,7 @@ void DropOutAll(const CUnit &source)
 class TerrainFinder
 {
 public:
-	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i* resPos) :
+	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i *resPos) :
 		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos) {}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
@@ -2292,7 +2292,7 @@ private:
 	int maxDist;
 	int movemask;
 	int resmask;
-	Vec2i* resPos;
+	Vec2i *resPos;
 };
 
 VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
@@ -2336,7 +2336,7 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 **  @return            True if wood was found.
 */
 bool FindTerrainType(int movemask, int resmask, int range,
-					const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
+					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
 {
 	TerrainTraversal terrainTraversal;
 
@@ -2458,7 +2458,7 @@ CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource)
 class ResourceUnitFinder
 {
 public:
-	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit** resultMine) :
+	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine) :
 		worker(worker),
 		resinfo(*worker.Type->ResInfo[resource]),
 		deposit(deposit),
@@ -2467,8 +2467,7 @@ public:
 		maxRange(maxRange),
 		check_usage(check_usage),
 		res_finder(resource, 1),
-		resultMine(resultMine)
-	{
+		resultMine(resultMine) {
 		bestCost.SetToMax();
 		*resultMine = NULL;
 	}
@@ -2476,12 +2475,10 @@ public:
 private:
 	bool MineIsUsable(const CUnit &mine) const;
 
-	struct ResourceUnitFinder_Cost
-	{
+	struct ResourceUnitFinder_Cost {
 	public:
 		void SetFrom(const CUnit &mine, const CUnit *deposit, bool check_usage);
-		bool operator < (const ResourceUnitFinder_Cost &rhs) const
-		{
+		bool operator < (const ResourceUnitFinder_Cost &rhs) const {
 			if (assigned != rhs.assigned) {
 				return assigned < rhs.assigned;
 			} else if (waiting != rhs.waiting) {
@@ -2509,16 +2506,16 @@ private:
 	bool check_usage;
 	CResourceFinder res_finder;
 	ResourceUnitFinder_Cost bestCost;
-	CUnit** resultMine;
+	CUnit **resultMine;
 };
 
 bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 {
 	return mine.Type->CanHarvest && mine.ResourcesHeld
-		&& (resinfo.HarvestFromOutside
-			|| mine.Player->Index == PlayerMax - 1
-			|| mine.Player == worker.Player
-			|| (worker.IsAllied(mine) && mine.IsAllied(worker)));
+		   && (resinfo.HarvestFromOutside
+			   || mine.Player->Index == PlayerMax - 1
+			   || mine.Player == worker.Player
+			   || (worker.IsAllied(mine) && mine.IsAllied(worker)));
 }
 
 void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, const CUnit *deposit, bool check_usage)
@@ -2539,7 +2536,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 		return VisitResult_DeadEnd;
 	}
 
-	CUnit* mine = res_finder.Find(Map.Field(pos));
+	CUnit *mine = res_finder.Find(Map.Field(pos));
 
 	if (mine && mine != *resultMine && MineIsUsable(*mine)) {
 		ResourceUnitFinder::ResourceUnitFinder_Cost cost;
@@ -3152,7 +3149,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 	if (target.IsAgressive() && target.CanMove() && !target.ReCast) {
 		COrder *savedOrder = NULL;
 		if (target.CanStoreOrder(target.CurrentOrder())) {
-			 savedOrder = target.CurrentOrder()->Clone();
+			savedOrder = target.CurrentOrder()->Clone();
 		}
 		CUnit *oldgoal = target.CurrentOrder()->GetGoal();
 		CUnit *goal, *best = oldgoal;

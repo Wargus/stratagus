@@ -412,11 +412,11 @@ static void DumpUnitInfo(CUnit &unit)
 
 	fprintf(logf, "%lu: ", GameCycle);
 	fprintf(logf, "%d %s S%d-%d P%d Refs %d: %X %d,%d %d,%d\n",
-		UnitNumber(unit), unit.Type ? unit.Type->Ident.c_str() : "unit-killed",
-		unit.State,
-		!unit.Orders.empty() ? unit.CurrentAction() : -1,
-		unit.Player ? unit.Player->Index : -1, unit.Refs, SyncRandSeed,
-		unit.tilePos.x, unit.tilePos.y, unit.IX, unit.IY);
+			UnitNumber(unit), unit.Type ? unit.Type->Ident.c_str() : "unit-killed",
+			unit.State,
+			!unit.Orders.empty() ? unit.CurrentAction() : -1,
+			unit.Player ? unit.Player->Index : -1, unit.Refs, SyncRandSeed,
+			unit.tilePos.x, unit.tilePos.y, unit.IX, unit.IY);
 #if 0
 	SaveUnit(unit, logf);
 #endif

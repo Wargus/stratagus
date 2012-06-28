@@ -861,10 +861,10 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		bool show = ReplayRevealMap ? true : false;
 		if (show == false) {
 			for (int i = 0; i < PlayerMax; ++i) {
-				if (Map.IsFieldExplored(Players[i], tilePos) 
+				if (Map.IsFieldExplored(Players[i], tilePos)
 					&& (i == ThisPlayer->Index || Players[i].IsBothSharedVision(*ThisPlayer))) {
-						show = true;
-						break;
+					show = true;
+					break;
 				}
 			}
 		}
@@ -1814,7 +1814,7 @@ void UIHandleButtonUp(unsigned button)
 		//  Little threshold
 		//
 		if (CursorStartScreenPos.x < CursorScreenPos.x - 1 || CursorScreenPos.x + 1 < CursorStartScreenPos.x
-			|| CursorStartScreenPos.y < CursorScreenPos.y - 1 || CursorScreenPos.y + 1 < CursorStartScreenPos.y ) {
+			|| CursorStartScreenPos.y < CursorScreenPos.y - 1 || CursorScreenPos.y + 1 < CursorStartScreenPos.y) {
 			int x0 = CursorStartMapPos.x;
 			int y0 = CursorStartMapPos.y;
 			const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);

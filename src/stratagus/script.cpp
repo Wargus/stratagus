@@ -2611,7 +2611,7 @@ static char *LuaEscape(const char *str)
 }
 */
 
-static std::string ConcatTableString(const std::vector<std::string>& blockTableNames)
+static std::string ConcatTableString(const std::vector<std::string> &blockTableNames)
 {
 	if (blockTableNames.empty()) {
 		return "";
