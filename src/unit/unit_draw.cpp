@@ -67,11 +67,10 @@
 class Decoration
 {
 public:
-	Decoration() : HotX(0), HotY(0), Width(0), Height(0), Sprite(NULL) {}
+	Decoration() : HotPos(0, 0), Width(0), Height(0), Sprite(NULL) {}
 
 	std::string File; /// File containing the graphics data
-	int HotX;         /// X drawing position (relative)
-	int HotY;         /// Y drawing position (relative)
+	PixelPos HotPos;  /// drawing position (relative)
 	int Width;        /// width of the decoration
 	int Height;       /// height of the decoration
 
@@ -81,7 +80,7 @@ public:
 
 
 /**
-**	Structure grouping all Sprites for decoration.
+**  Structure grouping all Sprites for decoration.
 */
 class DecoSpriteType
 {
@@ -248,7 +247,7 @@ void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1, int x2, int y
 */
 void DrawSelectionCorners(Uint32 color, int x1, int y1, int x2, int y2)
 {
-#define CORNER_PIXELS 6
+	const int CORNER_PIXELS = 6;
 
 	Video.DrawVLineClip(color, x1, y1, CORNER_PIXELS);
 	Video.DrawHLineClip(color, x1 + 1, y1, CORNER_PIXELS - 1);
@@ -261,7 +260,6 @@ void DrawSelectionCorners(Uint32 color, int x1, int y1, int x2, int y2)
 
 	Video.DrawVLineClip(color, x2, y2 - CORNER_PIXELS + 1, CORNER_PIXELS);
 	Video.DrawHLineClip(color, x2 - CORNER_PIXELS + 1, y2, CORNER_PIXELS - 1);
-#undef CORNER_PIXELS
 }
 
 
@@ -290,20 +288,15 @@ int GetSpriteIndex(const char *SpriteName)
 */
 static int CclDefineSprites(lua_State *l)
 {
-	const char *name;     // name of the current sprite.
-	int args;             // number of arguments.
-	int i;                // iterator on argument.
-	const char *key;      // Current key of the lua table.
-	int index;            // Index of the Sprite.
+	const int args = lua_gettop(l);
 
-	args = lua_gettop(l);
-	for (i = 0; i < args; ++i) {
+	for (int i = 0; i < args; ++i) {
 		Decoration deco;
 
 		lua_pushnil(l);
-		name = 0;
+		const char *name = NULL;// name of the current sprite.
 		while (lua_next(l, i + 1)) {
-			key = LuaToString(l, -2); // key name
+			const char *key = LuaToString(l, -2); // key name
 			if (!strcmp(key, "Name")) {
 				name = LuaToString(l, -1);
 			} else if (!strcmp(key, "File")) {
@@ -314,8 +307,8 @@ static int CclDefineSprites(lua_State *l)
 				}
 				lua_rawgeti(l, -1, 1); // offsetX
 				lua_rawgeti(l, -2, 2); // offsetY
-				deco.HotX = LuaToNumber(l, -2);
-				deco.HotY = LuaToNumber(l, -1);
+				deco.HotPos.x = LuaToNumber(l, -2);
+				deco.HotPos.y = LuaToNumber(l, -1);
 				lua_pop(l, 2); // Pop offsetX and Y
 			} else if (!strcmp(key, "Size")) {
 				if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
@@ -334,7 +327,7 @@ static int CclDefineSprites(lua_State *l)
 		if (name == NULL) {
 			LuaError(l, "CclDefineSprites requires the Name flag for sprite.");
 		}
-		index = GetSpriteIndex(name);
+		int index = GetSpriteIndex(name); // Index of the Sprite.
 		if (index == -1) { // new sprite.
 			index = DecoSprite.SpriteArray.size();
 			DecoSprite.Name.push_back(name);
@@ -400,26 +393,19 @@ void CleanDecorations()
 void CDecoVarBar::Draw(int x, int y,
 					   const CUnitType *Type, const CVariable &Variable) const
 {
-	int height;
-	int width;
-	int h;
-	int w;
-	char b;        // BorderSize.
-	Uint32 bcolor; // Border color.
-	Uint32 color;  // inseide color.
-	int f;         // 100 * value / max.
-
 	Assert(Type);
 	Assert(Variable.Max);
 
-	height = this->Height;
+	int height = this->Height;
 	if (height == 0) { // Default value
 		height = Type->BoxHeight; // Better size ? {,Box, Tile}
 	}
-	width = this->Width;
+	int width = this->Width;
 	if (width == 0) { // Default value
 		width = Type->BoxWidth; // Better size ? {,Box, Tile}
 	}
+	int h;
+	int w;
 	if (this->IsVertical)  { // Vertical
 		w = width;
 		h = Variable.Value * height / Variable.Max;
@@ -427,7 +413,6 @@ void CDecoVarBar::Draw(int x, int y,
 		w = Variable.Value * width / Variable.Max;
 		h = height;
 	}
-
 	if (this->IsCenteredInX) {
 		x -= w / 2;
 	}
@@ -435,11 +420,11 @@ void CDecoVarBar::Draw(int x, int y,
 		y -= h / 2;
 	}
 
-	b = this->BorderSize;
+	char b = this->BorderSize; // BorderSize.
 	// Could depend of (value / max)
-	f = Variable.Value * 100 / Variable.Max;
-	bcolor = ColorBlack; // Deco->Data.Bar.BColor
-	color = f > 50 ? (f > 75 ? ColorGreen : ColorYellow) : (f > 25 ? ColorOrange : ColorRed);
+	int f = Variable.Value * 100 / Variable.Max;
+	Uint32 bcolor = ColorBlack; // Deco->Data.Bar.BColor  // Border color.
+	Uint32 color = f > 50 ? (f > 75 ? ColorGreen : ColorYellow) : (f > 25 ? ColorOrange : ColorRed);// inside color.
 	// Deco->Data.Bar.Color
 	if (b) {
 		if (this->ShowFullBackground) {
@@ -491,28 +476,24 @@ void CDecoVarText::Draw(int x, int y,
 void CDecoVarSpriteBar::Draw(int x, int y,
 							 const CUnitType *, const CVariable &Variable) const
 {
-	int n;                   // frame of the sprite to show.
-	CGraphic *sprite;        // the sprite to show.
-	Decoration *decosprite;  // Info on the sprite.
-
 	Assert(Variable.Max);
 	Assert(this->NSprite != -1);
 
-	decosprite = &DecoSprite.SpriteArray[(int)this->NSprite];
-	sprite = decosprite->Sprite;
-	x += decosprite->HotX; // in addition of OffsetX... Usefull ?
-	y += decosprite->HotY; // in addition of OffsetY... Usefull ?
+	Decoration &decosprite = DecoSprite.SpriteArray[(int)this->NSprite];
+	CGraphic &sprite = *decosprite.Sprite;
+	x += decosprite.HotPos.x; // in addition of OffsetX... Usefull ?
+	y += decosprite.HotPos.y; // in addition of OffsetY... Usefull ?
 
-	n = sprite->NumFrames - 1;
+	int n = sprite.NumFrames - 1; // frame of the sprite to show.
 	n -= (n * Variable.Value) / Variable.Max;
 
 	if (this->IsCenteredInX) {
-		x -= sprite->Width / 2;
+		x -= sprite.Width / 2;
 	}
 	if (this->IsCenteredInY) {
-		y -= sprite->Height / 2;
+		y -= sprite.Height / 2;
 	}
-	sprite->DrawFrameClip(n, x, y);
+	sprite.DrawFrameClip(n, x, y);
 }
 
 /**
@@ -527,20 +508,18 @@ void CDecoVarSpriteBar::Draw(int x, int y,
 void CDecoVarStaticSprite::Draw(int x, int y,
 								const CUnitType *, const CVariable &) const
 {
-	CGraphic *sprite;         // the sprite to show.
-	Decoration *decosprite;  // Info on the sprite.
+	Decoration &decosprite = DecoSprite.SpriteArray[(int)this->NSprite];
+	CGraphic &sprite = *decosprite.Sprite;
 
-	decosprite = &DecoSprite.SpriteArray[(int)this->NSprite];
-	sprite = decosprite->Sprite;
-	x += decosprite->HotX; // in addition of OffsetX... Usefull ?
-	y += decosprite->HotY; // in addition of OffsetY... Usefull ?
+	x += decosprite.HotPos.x; // in addition of OffsetX... Usefull ?
+	y += decosprite.HotPos.y; // in addition of OffsetY... Usefull ?
 	if (this->IsCenteredInX) {
-		x -= sprite->Width / 2;
+		x -= sprite.Width / 2;
 	}
 	if (this->IsCenteredInY) {
-		y -= sprite->Height / 2;
+		y -= sprite.Height / 2;
 	}
-	sprite->DrawFrameClip(this->n, x, y);
+	sprite.DrawFrameClip(this->n, x, y);
 }
 
 
@@ -558,41 +537,35 @@ extern void UpdateUnitVariables(CUnit &unit);
 static void DrawDecoration(const CUnit &unit, const CUnitType *type, int x, int y)
 {
 #ifdef REFS_DEBUG
-	//
 	// Show the number of references.
-	//
-	//VideoDrawNumberClip(x + 1, y + 1, GetGameFont(), unit.Refs);
+	VideoDrawNumberClip(x + 1, y + 1, GetGameFont(), unit.Refs);
 #endif
 
 	UpdateUnitVariables(const_cast<CUnit &>(unit));
 	// Now show decoration for each variable.
 	for (std::vector<CDecoVar *>::const_iterator i = UnitTypeVar.DecoVar.begin();
 		 i < UnitTypeVar.DecoVar.end(); ++i) {
-		int value;
-		int max;
-		const CDecoVar *var = (*i);
-		value = unit.Variable[var->Index].Value;
-		max = unit.Variable[var->Index].Max;
+		const CDecoVar &var = *(*i);
+		const int value = unit.Variable[var.Index].Value;
+		const int max = unit.Variable[var.Index].Max;
 		Assert(value <= max);
 
-		if (!((value == 0 && !var->ShowWhenNull) || (value == max && !var->ShowWhenMax)
-			  || (var->HideHalf && value != 0 && value != max)
-			  || (!var->ShowIfNotEnable && !unit.Variable[var->Index].Enable)
-			  || (var->ShowOnlySelected && !unit.Selected)
-			  || (unit.Player->Type == PlayerNeutral && var->HideNeutral)
-			  || (ThisPlayer->IsEnemy(unit) && !var->ShowOpponent)
-			  || (ThisPlayer->IsAllied(unit) && (unit.Player != ThisPlayer) && var->HideAllied)
+		if (!((value == 0 && !var.ShowWhenNull) || (value == max && !var.ShowWhenMax)
+			  || (var.HideHalf && value != 0 && value != max)
+			  || (!var.ShowIfNotEnable && !unit.Variable[var.Index].Enable)
+			  || (var.ShowOnlySelected && !unit.Selected)
+			  || (unit.Player->Type == PlayerNeutral && var.HideNeutral)
+			  || (ThisPlayer->IsEnemy(unit) && !var.ShowOpponent)
+			  || (ThisPlayer->IsAllied(unit) && (unit.Player != ThisPlayer) && var.HideAllied)
 			  || max == 0)) {
-			var->Draw(
-				x + var->OffsetX + var->OffsetXPercent * unit.Type->TileWidth * PixelTileSize.x / 100,
-				y + var->OffsetY + var->OffsetYPercent * unit.Type->TileHeight * PixelTileSize.y / 100,
-				type, unit.Variable[var->Index]);
+			var.Draw(
+				x + var.OffsetX + var.OffsetXPercent * unit.Type->TileWidth * PixelTileSize.x / 100,
+				y + var.OffsetY + var.OffsetYPercent * unit.Type->TileHeight * PixelTileSize.y / 100,
+				type, unit.Variable[var.Index]);
 		}
 	}
 
-	//
 	// Draw group number
-	//
 	if (unit.Selected && unit.GroupId != 0
 #ifndef DEBUG
 		&& unit.Player == ThisPlayer
@@ -606,10 +579,10 @@ static void DrawDecoration(const CUnit &unit, const CUnitType *type, int x, int 
 			for (groupId = 0; !(unit.GroupId & (1 << groupId)); ++groupId) {
 			}
 		}
-		int width = GetGameFont()->Width(groupId);
+		const int width = GetGameFont()->Width(groupId);
 		x += (unit.Type->TileWidth * PixelTileSize.x + unit.Type->BoxWidth) / 2 - width;
-		width = GetGameFont()->Height();
-		y += (unit.Type->TileHeight * PixelTileSize.y + unit.Type->BoxHeight) / 2 - width;
+		const int height = GetGameFont()->Height();
+		y += (unit.Type->TileHeight * PixelTileSize.y + unit.Type->BoxHeight) / 2 - height;
 		CLabel(GetGameFont()).DrawClip(x, y, groupId);
 	}
 }
@@ -671,9 +644,9 @@ void ShowOrder(const CUnit &unit)
 	// Get current position
 	const PixelPos mapPos = unit.GetMapPixelPosCenter();
 	PixelPos screenStartPos = CurrentViewport->MapToScreenPixelPos(mapPos);
-	COrderPtr order;
 	const bool flushed = unit.Orders[0]->Finished;
 
+	COrderPtr order;
 	// If the current order is cancelled show the next one
 	if (unit.Orders.size() > 1 && flushed) {
 		order = unit.Orders[1];
@@ -715,9 +688,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, int x, in
 
 	const CUnitStats &stats = *unit.Stats;
 
-	//
 	// For debug draw sight, react and attack range!
-	//
 	if (NumSelected == 1 && unit.Selected) {
 		const PixelPos center(x + type.TileWidth * PixelTileSize.x / 2, y + type.TileHeight *PixelTileSize.y / 2);
 
@@ -780,9 +751,7 @@ void DrawUnitPlayerColor(const CUnitType *type, CGraphic *sprite,
 			f = frame;
 		}
 	} else {
-		int row;
-
-		row = type->NumDirections / 2 + 1;
+		const int row = type->NumDirections / 2 + 1;
 		if (frame < 0) {
 			f = ((-frame - 1) / row) * type->NumDirections + type->NumDirections - (-frame - 1) % row;
 		} else {
@@ -804,9 +773,7 @@ void DrawUnitPlayerColor(const CUnitType *type, CGraphic *sprite,
 			VideoDrawClip(glsprite[player], frame, x, y);
 		}
 	} else {
-		int row;
-
-		row = type->NumDirections / 2 + 1;
+		const int row = type->NumDirections / 2 + 1;
 		if (frame < 0) {
 			frame = ((-frame - 1) / row) * type->NumDirections + type->NumDirections - (-frame - 1) % row;
 		} else {
@@ -870,15 +837,13 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 							 const CUnitType &type, int frame, int x, int y)
 {
 	if (cframe->File == ConstructionFileConstruction) {
-		const CConstruction *construction;
-
-		construction = type.Construction;
-		x -= construction->Width / 2;
-		y -= construction->Height / 2;
+		const CConstruction &construction = *type.Construction;
+		x -= construction.Width / 2;
+		y -= construction.Height / 2;
 		if (frame < 0) {
-			construction->Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, x, y);
+			construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, x, y);
 		} else {
-			construction->Sprite->DrawPlayerColorFrameClip(player, frame, x, y);
+			construction.Sprite->DrawPlayerColorFrameClip(player, frame, x, y);
 		}
 	} else {
 		x += type.OffsetX - type.Width / 2;
@@ -904,8 +869,6 @@ void CUnit::Draw(const CViewport *vp) const
 	int frame;
 	int state;
 	int constructed;
-	CPlayerColorGraphic *sprite;
-	ResourceInfo *resinfo;
 	const CConstructionFrame *cframe;
 	const CUnitType *type;
 
@@ -983,9 +946,9 @@ void CUnit::Draw(const CViewport *vp) const
 	//
 	// Adjust sprite for Harvesters.
 	//
-	sprite = type->Sprite;
+	CPlayerColorGraphic *sprite = type->Sprite;
 	if (type->Harvester && this->CurrentResource) {
-		resinfo = type->ResInfo[this->CurrentResource];
+		ResourceInfo *resinfo = type->ResInfo[this->CurrentResource];
 		if (this->ResourcesHeld) {
 			if (resinfo->SpriteWhenLoaded) {
 				sprite = resinfo->SpriteWhenLoaded;
@@ -1040,7 +1003,7 @@ static inline bool DrawLevelCompare(const CUnit *c1, const CUnit *c2)
 		const int pos1 = (c1->tilePos.y * PixelTileSize.y + c1->IY + c1->Type->Height);
 		const int pos2 = (c2->tilePos.y * PixelTileSize.y + c2->IY + c2->Type->Height);
 		return pos1 == pos2 ?
-			   (c1->tilePos.x - c2->tilePos.x ? c1->tilePos.x < c2->tilePos.x : c1->Slot < c2->Slot) : pos1 < pos2;
+			   (c1->tilePos.x != c2->tilePos.x ? c1->tilePos.x < c2->tilePos.x : c1->Slot < c2->Slot) : pos1 < pos2;
 	} else {
 		return drawlevel1 < drawlevel2;
 	}
@@ -1071,9 +1034,7 @@ int FindAndSortUnits(const CViewport *vp, std::vector<CUnit *> &table)
 		}
 	}
 	Assert(n == table.size());
-	if (n > 1) {
-		std::sort(table.begin(), table.begin() + n, DrawLevelCompare);
-	}
+	std::sort(table.begin(), table.begin() + n, DrawLevelCompare);
 	return n;
 }
 
