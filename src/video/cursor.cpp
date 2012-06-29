@@ -251,7 +251,14 @@ void DrawCursor()
 		DrawBuildingCursor();
 	}
 
-	if (!UseOpenGL && !GameRunning && !Editor.Running && GameCursor) {
+	//  Cursor may not exist if we are loading a game or something.
+	//  Only draw it if it exists
+	if (GameCursor == NULL) {
+		return;
+	}
+	const PixelPos pos = CursorScreenPos - GameCursor->HotPos;
+
+	if (!UseOpenGL && !GameRunning && !Editor.Running) {
 		if (!HiddenSurface
 			|| HiddenSurface->w != GameCursor->G->getWidth()
 			|| HiddenSurface->h != GameCursor->G->getHeight()) {
@@ -270,27 +277,15 @@ void DrawCursor()
 												 TheScreen->format->Amask);
 		}
 
-		SDL_Rect srcRect = {
-			CursorScreenPos.x - GameCursor->HotX,
-			CursorScreenPos.y - GameCursor->HotY,
-			GameCursor->G->getWidth(),
-			GameCursor->G->getHeight()
-		};
+		SDL_Rect srcRect = { pos.x, pos.y, GameCursor->G->getWidth(), GameCursor->G->getHeight()};
 		SDL_BlitSurface(TheScreen, &srcRect, HiddenSurface, NULL);
 	}
 
-	//
 	//  Last, Normal cursor.
-	//  Cursor may not exist if we are loading a game or something. Only
-	//  draw it if it exists
-	//
-	if (GameCursor) {
-		if (!GameCursor->G->IsLoaded()) {
-			GameCursor->G->Load();
-		}
-		GameCursor->G->DrawFrameClip(GameCursor->SpriteFrame,
-									 CursorScreenPos.x - GameCursor->HotX, CursorScreenPos.y - GameCursor->HotY);
+	if (!GameCursor->G->IsLoaded()) {
+		GameCursor->G->Load();
 	}
+	GameCursor->G->DrawFrameClip(GameCursor->SpriteFrame, pos.x, pos.y);
 }
 
 /**
@@ -299,10 +294,8 @@ void DrawCursor()
 void HideCursor()
 {
 	if (!UseOpenGL && !GameRunning && !Editor.Running && GameCursor) {
-		SDL_Rect dstRect = {
-			CursorScreenPos.x - GameCursor->HotX, CursorScreenPos.y - GameCursor->HotY,
-			0, 0
-		};
+		const PixelPos pos = CursorScreenPos - GameCursor->HotPos;
+		SDL_Rect dstRect = {pos.x, pos.y, 0, 0 };
 		SDL_BlitSurface(HiddenSurface, NULL, TheScreen, &dstRect);
 	}
 }

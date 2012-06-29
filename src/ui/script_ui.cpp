@@ -381,24 +381,21 @@ static int CclSetTitleScreens(lua_State *l)
 */
 static int CclDefineCursor(lua_State *l)
 {
-	const char *value;
 	std::string name;
 	std::string race;
 	std::string file;
-	int hotx;
-	int hoty;
-	int w;
-	int h;
-	int rate;
+	PixelPos hotpos(0, 0);
+	int w = 0;
+	int h = 0;
+	int rate = 0;
 
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
-	hotx = hoty = w = h = rate = 0;
 	lua_pushnil(l);
 	while (lua_next(l, 1)) {
-		value = LuaToString(l, -2);
+		const char *value = LuaToString(l, -2);
 		if (!strcmp(value, "Name")) {
 			name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Race")) {
@@ -410,10 +407,10 @@ static int CclDefineCursor(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
-			hotx = LuaToNumber(l, -1);
+			hotpos.x = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, -1, 2);
-			hoty = LuaToNumber(l, -1);
+			hotpos.y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "Size")) {
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
@@ -443,7 +440,7 @@ static int CclDefineCursor(lua_State *l)
 	//  Look if this kind of cursor already exists.
 	//
 	CCursor *ct = NULL;
-	for (int i = 0; i < (int)AllCursors.size(); ++i) {
+	for (size_t i = 0; i < AllCursors.size(); ++i) {
 		//  Race not same, not found.
 		if (AllCursors[i]->Race != race) {
 			continue;
@@ -463,10 +460,8 @@ static int CclDefineCursor(lua_State *l)
 		ct->Ident = name;
 		ct->Race = race;
 	}
-
 	ct->G = CGraphic::New(file, w, h);
-	ct->HotX = hotx;
-	ct->HotY = hoty;
+	ct->HotPos = hotpos;
 	ct->FrameRate = rate;
 
 	return 0;

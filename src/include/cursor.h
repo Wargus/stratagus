@@ -59,7 +59,7 @@
 **    "mythical", ...). If NULL, this cursor could be used by any
 **    race.
 **
-**  CCursor::HotX CCursor::HotY
+**  CCursor::HotPos
 **
 **    Hot spot of the cursor in pixels. Relative to the sprite origin
 **    (0,0). The hot spot of a cursor is the point to which Stratagus
@@ -124,14 +124,13 @@ class CUnitType;
 class CCursor
 {
 public:
-	CCursor() : HotX(0), HotY(0),
+	CCursor() : HotPos(0, 0),
 		SpriteFrame(0), FrameRate(0), G(NULL) {}
 
 	std::string Ident;  /// Identifier to reference it
 	std::string Race;   /// Race name
 
-	int HotX;     /// Hot point x
-	int HotY;     /// Hot point y
+	PixelPos HotPos;     /// Hot point
 
 	int SpriteFrame;  /// Current displayed cursor frame
 	int FrameRate;    /// Rate of changing the frames
