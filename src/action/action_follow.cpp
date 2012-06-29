@@ -42,6 +42,7 @@
 #include "script.h"
 #include "ui.h"
 #include "unit.h"
+#include "unit_find.h"
 #include "unittype.h"
 
 enum {

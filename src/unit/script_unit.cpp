@@ -46,6 +46,7 @@
 #include "script.h"
 #include "spells.h"
 #include "trigger.h"
+#include "unit_find.h"
 #include "unit_manager.h"
 #include "unittype.h"
 #include "upgrade.h"

@@ -43,6 +43,7 @@
 #include "missile.h"
 #include "pathfinder.h"
 #include "unit.h"
+#include "unit_find.h"
 #include "unittype.h"
 
 /*----------------------------------------------------------------------------

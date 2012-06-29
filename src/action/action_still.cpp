@@ -47,6 +47,7 @@
 #include "spells.h"
 #include "tileset.h"
 #include "unit.h"
+#include "unit_find.h"
 #include "unittype.h"
 
 enum {

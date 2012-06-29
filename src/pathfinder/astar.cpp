@@ -38,6 +38,7 @@
 
 #include "map.h"
 #include "unit.h"
+#include "unit_find.h"
 
 #include "pathfinder.h"
 

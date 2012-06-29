@@ -44,8 +44,9 @@
 #include "depend.h"
 #include "map.h"
 #include "pathfinder.h"
-#include "unittype.h"
 #include "unit.h"
+#include "unit_find.h"
+#include "unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Types

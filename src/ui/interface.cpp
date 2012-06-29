@@ -48,9 +48,10 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "tileset.h"
-#include "unittype.h"
-#include "unit.h"
 #include "ui.h"
+#include "unit.h"
+#include "unit_find.h"
+#include "unittype.h"
 #include "video.h"
 #include "widgets.h"
 

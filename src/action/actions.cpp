@@ -67,6 +67,7 @@
 #include "player.h"
 #include "script.h"
 #include "unit.h"
+#include "unit_find.h"
 #include "unittype.h"
 
 /*----------------------------------------------------------------------------

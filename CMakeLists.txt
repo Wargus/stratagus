@@ -490,6 +490,7 @@ set(stratagus_generic_HDRS
 	src/include/ui.h
 	src/include/unit.h
 	src/include/unit_cache.h
+	src/include/unit_find.h
 	src/include/unit_manager.h
 	src/include/unitptr.h
 	src/include/unitsound.h

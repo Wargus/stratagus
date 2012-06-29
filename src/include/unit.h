@@ -466,37 +466,6 @@ public:
 	PixelPos GetMapPixelPosCenter() const;
 };
 
-//unit_find
-struct CUnitTypeFinder {
-	const UnitTypeType type;
-	CUnitTypeFinder(const UnitTypeType t) : type(t)  {}
-	bool operator()(const CUnit *const unit) const {
-		const CUnitType *const t = unit->Type;
-		if (t->Vanishes || (type != static_cast<UnitTypeType>(-1) && t->UnitType != type)) {
-			return false;
-		}
-		return true;
-	}
-
-	CUnit *Find(const CUnitCache &cache) const { return cache.find(*this); }
-	CUnit *Find(const CMapField *const mf) const { return mf->UnitCache.find(*this); }
-};
-
-struct CResourceFinder {
-	const int resource;
-	const int mine_on_top;
-	CResourceFinder(const int r, int on_top) : resource(r), mine_on_top(on_top) {}
-	inline bool operator()(const CUnit *const unit) const {
-		const CUnitType *const type = unit->Type;
-		return (type->GivesResource == resource
-				&& unit->ResourcesHeld != 0
-				&& (mine_on_top ? type->CanHarvest : !type->CanHarvest)
-				&& !unit->IsUnusable(true) //allow mines under construction
-			   );
-	}
-	CUnit *Find(const CMapField *const mf) const { return mf->UnitCache.find(*this); }
-};
-
 #define NoUnitP (CUnit *)0        /// return value: for no unit found
 
 #define MAX_UNIT_SLOTS 65535     /// Maximal number of used slots
@@ -633,19 +602,6 @@ extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const V
 /// Get the suitable animation frame depends of unit's damaged type.
 extern int ExtraDeathIndex(const char *death);
 
-/// Find resource
-extern CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range,
-							   int resource, bool check_usage = false, const CUnit *deposit = NULL);
-
-/// Find nearest deposit
-extern CUnit *FindDeposit(const CUnit &unit, int range, int resource);
-/// Find the next idle worker
-extern CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last);
-
-/// Find the neareast piece of terrain with specific flags.
-extern bool FindTerrainType(int movemask, int resmask, int range,
-							const CPlayer &player, const Vec2i &startPos, Vec2i *pos);
-
 /// @todo more docu
 extern CUnit *UnitOnScreen(CUnit *unit, int x, int y);
 
@@ -712,29 +668,6 @@ extern int FindAndSortUnits(const CViewport *vp, std::vector<CUnit *> &table);
 
 /// Show a unit's orders.
 extern void ShowOrder(const CUnit &unit);
-
-// in unit_find.cpp
-
-extern void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units);
-
-/// Find all units of this type of the player
-extern void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *> &units);
-/// Return any unit on that map tile
-extern CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type);// = -1);
-/// Return possible attack target on that map area
-extern CUnit *TargetOnMap(const CUnit &unit, const Vec2i &pos1, const Vec2i &pos2);
-
-/// Return resource, if on map tile
-extern CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top = true);
-/// Return resource deposit, if on map tile
-extern CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource);
-
-/// Find best enemy in numeric range to attack
-extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool onlyBuildings = false);
-/// Find best enemy in attack range to attack
-extern CUnit *AttackUnitsInRange(const CUnit &unit);
-/// Find best enemy in reaction range to attack
-extern CUnit *AttackUnitsInReactRange(const CUnit &unit);
 
 // in groups.c
 
