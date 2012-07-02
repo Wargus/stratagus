@@ -617,7 +617,7 @@ bool MissileInitMove(Missile &missile)
 			return true;
 		}
 		// initialize
-		missile.TotalStep = MapDistance(missile.source, missile.destination);
+		missile.TotalStep = Distance(missile.source, missile.destination);
 		missile.State++;
 		return false;
 	}
@@ -821,7 +821,7 @@ void Missile::MissileHit()
 			const Vec2i posIt(posmin.x + i, posmin.y + j);
 
 			if (Map.Info.IsPointOnMap(posIt)) {
-				int d = MapDistance(pos, posIt);
+				int d = Distance(pos, posIt);
 				d *= mtype.SplashFactor;
 				if (d == 0) {
 					d = 1;
@@ -851,9 +851,9 @@ bool Missile::NextMissileFrame(char sign, char longAnimation)
 	}
 	if (longAnimation) {
 		// Total distance to cover.
-		const int totalx = MapDistance(this->destination, this->source);
+		const int totalx = Distance(this->destination, this->source);
 		// Covered distance.
-		const int dx = MapDistance(this->position, this->source);
+		const int dx = Distance(this->position, this->source);
 		// Total number of frame (for one direction).
 		const int totalf = this->Type->SpriteFrames / numDirections;
 		// Current frame (for one direction).

@@ -59,6 +59,9 @@ struct Open {
 	unsigned short int O;     /// Offset into matrix
 };
 
+//for 32 bit signed int
+inline int MyAbs(int x) { return (x ^ (x >> 31)) - (x >> 31); }
+
 /// heuristic cost function for a*
 static inline int AStarCosts(const Vec2i &pos, const Vec2i &goalPos)
 {
@@ -577,11 +580,6 @@ static inline int CostMoveTo(unsigned int index, const CUnit &unit)
 	}
 	*c = CostMoveToCallBack_Default(index, unit);
 	return *c;
-}
-
-inline int square(int v)
-{
-	return v * v;
 }
 
 /**

@@ -236,11 +236,6 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos)
 	MapUnmarkTileDetectCloak(player, Map.getIndex(pos));
 }
 
-inline int square(int v)
-{
-	return v * v;
-}
-
 /**
 **  Mark the sight of unit. (Explore and make visible.)
 **

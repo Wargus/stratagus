@@ -114,7 +114,7 @@ found:
 	Vec2i resPos;
 	DebugPrint("Creating a %s\n" _C_ type->Name.c_str());
 	FindNearestDrop(*type, pos, resPos, LookingW);
-	if (MapDistance(pos, resPos) <= range) {
+	if (SquareDistance(pos, resPos) <= square(range)) {
 		CUnit *target = MakeUnit(*type, &player);
 		if (target != NULL) {
 			target->tilePos = resPos;

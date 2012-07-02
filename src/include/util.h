@@ -170,12 +170,13 @@ extern int SyncRand(int max);               /// Syncron rand
 ///  rand only used on this computer.
 #define MyRand() rand()
 
-//for 32 bit signed int
-extern inline int MyAbs(int x) { return (x ^ (x >> 31)) - (x >> 31); }
-
 /// Compute a square root using ints
 extern long isqrt(long num);
 
+inline int square(int v)
+{
+	return v * v;
+}
 
 template <typename T>
 void clamp(T *value, T minValue, T maxValue)

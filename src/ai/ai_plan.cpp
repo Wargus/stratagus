@@ -453,7 +453,7 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 	CUnit *bestunit = NULL;
 	// Find an idle unit, responding to the mask
 	bool flyeronly = false;
-	int bestdistance = -1;
+	int bestSquareDistance = -1;
 	for (int i = 0; i != AiPlayer->Player->GetUnitCount(); ++i) {
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
 
@@ -482,10 +482,10 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 			flyeronly = true;
 		}
 
-		const int distance = MapDistance(unit.tilePos, *pos);
-		if (bestdistance == -1 || distance <= bestdistance
+		const int sqDistance = SquareDistance(unit.tilePos, *pos);
+		if (bestSquareDistance == -1 || sqDistance <= bestSquareDistance
 			|| (bestunit->Type->UnitType != UnitTypeFly && type.UnitType == UnitTypeFly)) {
-			bestdistance = distance;
+			bestSquareDistance = sqDistance;
 			bestunit = &unit;
 		}
 	}

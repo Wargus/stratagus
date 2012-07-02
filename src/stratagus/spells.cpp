@@ -103,7 +103,7 @@ int Demolish::Cast(CUnit &caster, const SpellType *, CUnit *, const Vec2i &goalP
 	for (ipos.x = minpos.x; ipos.x <= maxpos.x; ++ipos.x) {
 		for (ipos.y = minpos.y; ipos.y <= maxpos.y; ++ipos.y) {
 			const int flag = Map.Field(ipos)->Flags;
-			if (MapDistance(ipos, goalPos) > this->Range) {
+			if (SquareDistance(ipos, goalPos) > square(this->Range)) {
 				// Not in circle range
 				continue;
 			} else if (flag & MapFieldWall) {

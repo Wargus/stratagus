@@ -88,36 +88,6 @@ typedef COrder *COrderPtr;
 /// Called whenever the selected unit was updated
 extern void SelectedUnitChanged();
 
-/**
-**  Returns the map distance between two points.
-**
-**  @param pos1  map tile position.
-**  @param pos2  map tile position.
-**
-**  @return    The distance between in tiles.
-*/
-static inline int MapDistance(const Vec2i &pos1, const Vec2i &pos2)
-{
-	const Vec2i diff = pos2 - pos1;
-
-	return isqrt(diff.x * diff.x + diff.y * diff.y);
-}
-
-/**
-**  Returns the map distance between two points.
-**
-**  @param pos1  map pixel position.
-**  @param pos2  map pixel position.
-**
-**  @return    The distance between in pixels.
-*/
-static inline int MapDistance(const PixelPos &pos1, const PixelPos &pos2)
-{
-	const PixelDiff diff = pos2 - pos1;
-
-	return isqrt(diff.x * diff.x + diff.y * diff.y);
-}
-
 /// Returns the map distance between two points with unit-type
 extern int MapDistanceToType(const Vec2i &pos1, const CUnitType &type, const Vec2i &pos2);
 

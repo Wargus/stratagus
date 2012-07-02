@@ -2216,7 +2216,7 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 	for (;;) {
 		for (int i = addy; i--; ++pos.y) { // go down
 			if (UnitCanBeAt(unit, pos)) {
-				const int n = MapDistance(goalPos, pos);
+				const int n = SquareDistance(goalPos, pos);
 
 				if (n < bestd) {
 					bestd = n;
@@ -2227,7 +2227,7 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 		++addx;
 		for (int i = addx; i--; ++pos.x) { // go right
 			if (UnitCanBeAt(unit, pos)) {
-				const int n = MapDistance(goalPos, pos);
+				const int n = SquareDistance(goalPos, pos);
 
 				if (n < bestd) {
 					bestd = n;
@@ -2238,7 +2238,7 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 		++addy;
 		for (int i = addy; i--; --pos.y) { // go up
 			if (UnitCanBeAt(unit, pos)) {
-				const int n = MapDistance(goalPos, pos);
+				const int n = SquareDistance(goalPos, pos);
 
 				if (n < bestd) {
 					bestd = n;
@@ -2249,7 +2249,7 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 		++addx;
 		for (int i = addx; i--; --pos.x) { // go left
 			if (UnitCanBeAt(unit, pos)) {
-				const int n = MapDistance(goalPos, pos);
+				const int n = SquareDistance(goalPos, pos);
 
 				if (n < bestd) {
 					bestd = n;
@@ -2888,7 +2888,7 @@ int ViewPointDistance(const Vec2i &pos)
 	const Vec2i vpSize(vp.MapWidth, vp.MapHeight);
 	const Vec2i middle = vp.MapPos + vpSize / 2;
 
-	return MapDistance(middle, pos);
+	return Distance(middle, pos);
 }
 
 /**
