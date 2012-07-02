@@ -42,16 +42,8 @@
 #include "unittype.h"
 #endif
 
-#ifndef __MAP_TILE_H__
-#include "tile.h"
-#endif
-
 #ifndef __PLAYER_H__
 #include "player.h"
-#endif
-
-#ifndef __MISSILE_H__
-#include "missile.h"
 #endif
 
 #include "vec2i.h"
@@ -64,6 +56,7 @@ class CAnimation;
 class CBuildRestrictionOnTop;
 class CConstructionFrame;
 class CFile;
+class Missile;
 class COrder;
 class CPlayer;
 class CUnit;
