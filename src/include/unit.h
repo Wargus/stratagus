@@ -149,8 +149,6 @@ public:
 	CUnit **UnitSlot;     /// Slot pointer of Units
 	size_t PlayerSlot;    /// index in Player->Units
 
-	CUnit        *Next;          /// Generic link pointer (on map)
-
 	int    InsideCount;   /// Number of units inside.
 	int    BoardCount;    /// Number of units transported inside.
 	CUnit *UnitInside;    /// Pointer to one of the units inside.
@@ -262,10 +260,6 @@ public:
 	bool IsIdle() const;
 
 	void ClearAction();
-
-	inline int GetReactRange() const {
-		return (Player->Type == PlayerPerson ? Type->ReactRangePerson : Type->ReactRangeComputer);
-	}
 
 	/// Increase a unit's reference count
 	void RefsIncrease();

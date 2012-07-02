@@ -132,10 +132,6 @@ void SaveUnit(const CUnit &unit, CFile &file)
 
 	file.printf("\"player\", %d,\n  ", unit.Player->Index);
 
-	if (unit.Next) {
-		file.printf("\"next\", %d, ", UnitNumber(*unit.Next));
-	}
-
 	file.printf("\"tile\", {%d, %d}, ", unit.tilePos.x, unit.tilePos.y);
 	file.printf("\"seen-tile\", {%d, %d}, ", unit.Seen.tilePos.x, unit.Seen.tilePos.y);
 

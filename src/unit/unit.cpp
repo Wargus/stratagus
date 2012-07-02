@@ -417,7 +417,6 @@ void CUnit::Init()
 	Slot = 0;
 	UnitSlot = NULL;
 	PlayerSlot = static_cast<size_t>(-1);
-	Next = NULL;
 	InsideCount = 0;
 	BoardCount = 0;
 	UnitInside = NULL;

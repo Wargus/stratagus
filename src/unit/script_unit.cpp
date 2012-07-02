@@ -327,10 +327,6 @@ static int CclUnit(lua_State *l)
 			unit->Active = 0;
 			unit->Removed = 0;
 			Assert(unit->Slot == slot);
-		} else if (!strcmp(value, "next")) {
-			lua_rawgeti(l, 2, j + 1);
-			unit->Next = UnitSlots[(int)LuaToNumber(l, -1)];
-			lua_pop(l, 1);
 		} else if (!strcmp(value, "current-sight-range")) {
 			lua_rawgeti(l, 2, j + 1);
 			unit->CurrentSightRange = LuaToNumber(l, -1);

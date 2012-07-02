@@ -1067,7 +1067,8 @@ CUnit *AttackUnitsInRange(const CUnit &unit)
 CUnit *AttackUnitsInReactRange(const CUnit &unit)
 {
 	Assert(unit.Type->CanAttack);
-	return AttackUnitsInDistance(unit, unit.GetReactRange());
+	const int range = unit.Player->Type == PlayerPerson ? unit.Type->ReactRangePerson : unit.Type->ReactRangeComputer;
+	return AttackUnitsInDistance(unit, range);
 }
 
 //@}
