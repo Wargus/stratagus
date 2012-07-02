@@ -60,8 +60,8 @@ public:
 	unsigned int GetUsedSlotCount() const;
 
 private:
-	std::vector<CUnit *> UnitSlots;
-	std::list<CUnit *> ReleasedUnits;
+	std::vector<CUnit *> unitSlots;
+	std::list<CUnit *> releasedUnits;
 };
 
 
