@@ -59,9 +59,7 @@
 void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 					const std::string &text)
 {
-	int i;
 	ButtonStyleProperties *p;
-	ButtonStyleProperties *pimage;
 
 	if (flags & MI_FLAGS_CLICKED) {
 		p = &style->Clicked;
@@ -74,7 +72,7 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 	//
 	//  Image
 	//
-	pimage = p;
+	ButtonStyleProperties *pimage = p;
 	if (!p->Sprite) {
 		// No image.  Try hover, selected, then default
 		if ((flags & MI_FLAGS_ACTIVE) && style->Hover.Sprite) {
@@ -104,13 +102,12 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 					  !style->TextReverseColor.empty() ? style->TextReverseColor : oldrc));
 
 		if (p->TextAlign == TextAlignCenter || p->TextAlign == TextAlignUndefined) {
-			label.DrawCentered(x + p->TextX, y + p->TextY, text);
+			label.DrawCentered(x + p->TextPos.x, y + p->TextPos.y, text);
 		} else if (p->TextAlign == TextAlignLeft) {
-			label.Draw(x + p->TextX, y + p->TextY, text);
+			label.Draw(x + p->TextPos.x, y + p->TextPos.y, text);
 		} else {
-			label.Draw(x + p->TextX - style->Font->Width(text), y + p->TextY, text);
+			label.Draw(x + p->TextPos.x - style->Font->Width(text), y + p->TextPos.y, text);
 		}
-
 	}
 
 	//
@@ -121,7 +118,7 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 									  p->BorderColorRGB.r, p->BorderColorRGB.g, p->BorderColorRGB.b);
 	}
 	if (p->BorderSize) {
-		for (i = 0; i < p->BorderSize; ++i) {
+		for (int i = 0; i < p->BorderSize; ++i) {
 			Video.DrawRectangleClip(p->BorderColor, x - i, y - i,
 									style->Width + 2 * i, style->Height + 2 * i);
 		}

@@ -1307,10 +1307,10 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
-			p->TextX = LuaToNumber(l, -1);
+			p->TextPos.x = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, -1, 2);
-			p->TextY = LuaToNumber(l, -1);
+			p->TextPos.y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "TextAlign")) {
 			value = LuaToString(l, -1);
@@ -1359,7 +1359,7 @@ static int CclDefineButtonStyle(lua_State *l)
 	if (!b) {
 		b = ButtonStyleHash[style] = new ButtonStyle;
 		// Set to bogus value to see if it was set later
-		b->Default.TextX = b->Hover.TextX = b->Clicked.TextX = 0xFFFFFF;
+		b->Default.TextPos.x = b->Hover.TextPos.x = b->Clicked.TextPos.x = 0xFFFFFF;
 	}
 
 	lua_pushnil(l);
@@ -1414,17 +1414,17 @@ static int CclDefineButtonStyle(lua_State *l)
 		lua_pop(l, 1);
 	}
 
-	if (b->Default.TextX == 0xFFFFFF) {
-		b->Default.TextX = b->TextX;
-		b->Default.TextY = b->TextY;
+	if (b->Default.TextPos.x == 0xFFFFFF) {
+		b->Default.TextPos.x = b->TextX;
+		b->Default.TextPos.y = b->TextY;
 	}
-	if (b->Hover.TextX == 0xFFFFFF) {
-		b->Hover.TextX = b->TextX;
-		b->Hover.TextY = b->TextY;
+	if (b->Hover.TextPos.x == 0xFFFFFF) {
+		b->Hover.TextPos.x = b->TextX;
+		b->Hover.TextPos.y = b->TextY;
 	}
-	if (b->Clicked.TextX == 0xFFFFFF) {
-		b->Clicked.TextX = b->TextX;
-		b->Clicked.TextY = b->TextY;
+	if (b->Clicked.TextPos.x == 0xFFFFFF) {
+		b->Clicked.TextPos.x = b->TextX;
+		b->Clicked.TextPos.y = b->TextY;
 	}
 
 	if (b->Default.TextAlign == TextAlignUndefined) {

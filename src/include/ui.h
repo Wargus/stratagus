@@ -90,7 +90,7 @@ class ButtonStyleProperties
 public:
 	ButtonStyleProperties() : Sprite(NULL), Frame(0), BorderColor(0),
 		BorderSize(0), TextAlign(TextAlignUndefined),
-		TextX(0), TextY(0) {
+		TextPos(0, 0) {
 		BorderColorRGB.r = BorderColorRGB.g = BorderColorRGB.b = 0;
 	}
 
@@ -100,8 +100,7 @@ public:
 	Uint32 BorderColor;
 	int BorderSize;
 	TextAlignment TextAlign;        /// Text alignment
-	int TextX;                      /// Text X location
-	int TextY;                      /// Text Y location
+	PixelPos TextPos;               /// Text location
 	std::string TextNormalColor;    /// Normal text color
 	std::string TextReverseColor;   /// Reverse text color
 };
