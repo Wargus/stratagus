@@ -88,9 +88,6 @@ typedef COrder *COrderPtr;
 /// Called whenever the selected unit was updated
 extern void SelectedUnitChanged();
 
-/// Returns the map distance between two points with unit-type
-extern int MapDistanceToType(const Vec2i &pos1, const CUnitType &type, const Vec2i &pos2);
-
 /// Returns the map diestance between to unittype as locations
 extern int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1,
 								   const CUnitType &dst, const Vec2i &pos2);
@@ -398,17 +395,7 @@ public:
 		return MapDistanceBetweenTypes(*Type, tilePos, *dst.Type, dst.tilePos);
 	}
 
-	/**
-	 **  Returns the map distance to unit.
-	 **
-	 **  @param pos   map tile position.
-	 **  @param dest  Distance to this unit.
-	 **
-	 **  @return      The distance between in tiles.
-	 */
-	int MapDistanceTo(const Vec2i &pos) const {
-		return MapDistanceToType(pos, *Type, this->tilePos);
-	}
+	int MapDistanceTo(const Vec2i &pos) const;
 
 	/**
 	**  Test if unit can move.

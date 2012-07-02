@@ -2820,28 +2820,26 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 ----------------------------------------------------------------------------*/
 
 /**
-**  Returns the map distance between two points with unit type.
-**
-**  @param pos1  map tile position.
-**  @param type  Unit type to take into account.
-**  @param pos2  map tile position.
-**
-**  @return      The distance between in tiles.
-*/
-int MapDistanceToType(const Vec2i &pos1, const CUnitType &type, const Vec2i &pos2)
+ **  Returns the map distance to unit.
+ **
+ **  @param pos   map tile position.
+ **
+ **  @return      The distance between in tiles.
+ */
+int CUnit::MapDistanceTo(const Vec2i &pos) const
 {
 	int dx;
 	int dy;
 
-	if (pos1.x <= pos2.x) {
-		dx = pos2.x - pos1.x;
+	if (pos.x <= tilePos.x) {
+		dx = tilePos.x - pos.x;
 	} else {
-		dx = std::max<int>(0, pos1.x - pos2.x - type.TileWidth + 1);
+		dx = std::max<int>(0, pos.x - tilePos.x - Type->TileWidth + 1);
 	}
-	if (pos1.y <= pos2.y) {
-		dy = pos2.y - pos1.y;
+	if (pos.y <= tilePos.y) {
+		dy = tilePos.y - pos.y;
 	} else {
-		dy = std::max<int>(0, pos1.y - pos2.y - type.TileHeight + 1);
+		dy = std::max<int>(0, pos.y - tilePos.y - Type->TileHeight + 1);
 	}
 	return isqrt(dy * dy + dx * dx);
 }
