@@ -785,7 +785,7 @@ void MouseScrollMap(int x, int y)
 		speed = UI.MouseScrollSpeedDefault;
 	}
 
-	const PixelDiff diff(x - CursorScreenPos.x, y - CursorScreenPos.y);
+	const PixelDiff diff(x - CursorStartScreenPos.x, y - CursorStartScreenPos.y);
 
 	UI.MouseViewport->Set(UI.MouseViewport->MapPos, UI.MouseViewport->Offset + speed * diff);
 	UI.MouseWarpPos = CursorStartScreenPos;
