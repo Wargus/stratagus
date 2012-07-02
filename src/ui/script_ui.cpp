@@ -1178,7 +1178,7 @@ static int CclDefineViewports(lua_State *l)
 			lua_rawgeti(l, j + 1, 3);
 			slot = (int)LuaToNumber(l, -1);
 			if (slot != -1) {
-				UI.Viewports[i].Unit = UnitSlots[slot];
+				UI.Viewports[i].Unit = &UnitManager.GetUnit(slot);
 			}
 			lua_pop(l, 1);
 			++i;

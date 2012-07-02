@@ -35,6 +35,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <vector>
 #include <list>
 
 
@@ -44,7 +45,7 @@
 
 class CUnit;
 class CFile;
-
+struct lua_State;
 
 class CUnitManager
 {
@@ -53,8 +54,13 @@ public:
 	CUnit *AllocUnit();
 	void ReleaseUnit(CUnit *unit);
 	void Save(CFile &file) const;
+	void Load(lua_State *Lua);
+
+	CUnit& GetUnit(int slot) const;
+	unsigned int GetUsedSlotCount() const;
 
 private:
+	std::vector<CUnit *> UnitSlots;
 	std::list<CUnit *> ReleasedUnits;
 };
 
@@ -62,9 +68,6 @@ private:
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
-
-extern CUnit *UnitSlots[];         /// All possible units
-extern unsigned int UnitSlotFree;  /// First free unit slot
 
 extern CUnitManager UnitManager;   /// Unit manager
 

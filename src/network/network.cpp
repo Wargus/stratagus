@@ -1031,11 +1031,11 @@ void NetworkEvent()
 			case MessageCommandDismiss:
 				// Fall through!
 			default: {
-				unsigned int slot = ntohs(nc->Unit);
+				const unsigned int slot = ntohs(nc->Unit);
+				const CUnit* unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetUnit(slot) : NULL;
 
-				if (slot < UnitSlotFree
-					&& (UnitSlots[slot]->Player->Index == player
-						|| Players[player].IsTeamed(*UnitSlots[slot]))) {
+				if (unit && (unit->Player->Index == player
+						|| Players[player].IsTeamed(*unit))) {
 					validCommand = true;
 				} else {
 					validCommand = false;
@@ -1225,16 +1225,12 @@ static void NetworkResendCommands()
 */
 static void NetworkSendCommands()
 {
-	CNetworkCommandQueue *incommand;
-	CNetworkCommandQueue *ncq;
-	int numcommands;
-
 	//
 	// No command available, send sync.
 	//
-	numcommands = 0;
-	incommand = NULL;
-	ncq = NetworkIn[(GameCycle + NetworkLag) & 0xFF][ThisPlayer->Index];
+	int numcommands = 0;
+	CNetworkCommandQueue *incommand = NULL;
+	CNetworkCommandQueue *ncq = NetworkIn[(GameCycle + NetworkLag) & 0xFF][ThisPlayer->Index];
 	ncq->Clear();
 	if (CommandsIn.empty() && MsgCommandsIn.empty()) {
 		ncq[0].Type = MessageSync;
@@ -1249,8 +1245,9 @@ static void NetworkSendCommands()
 				incommand = CommandsIn.front();
 #ifdef DEBUG
 				if (incommand->Type != MessageExtendedCommand) {
+					CUnit &unit = UnitManager.GetUnit(ntohs(ncq->Data.Unit));
 					// FIXME: we can send destoyed units over network :(
-					if (UnitSlots[ntohs(ncq->Data.Unit)]->Destroyed) {
+					if (unit.Destroyed) {
 						DebugPrint("Sending destroyed unit %d over network!!!!!!\n" _C_
 								   ntohs(incommand->Data.Unit));
 					}

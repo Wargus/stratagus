@@ -125,7 +125,7 @@ static int CclResourcesMultiBuildersMultiplier(lua_State *l)
 */
 static CUnit *CclGetUnit(lua_State *l)
 {
-	return UnitSlots[(int)LuaToNumber(l, -1)];
+	return &UnitManager.GetUnit((int)LuaToNumber(l, -1));
 }
 
 /**
@@ -138,9 +138,9 @@ static CUnit *CclGetUnit(lua_State *l)
 CUnit *CclGetUnitFromRef(lua_State *l)
 {
 	const char *const value = LuaToString(l, -1);
-	int slot = strtol(value + 1, NULL, 16);
-	Assert(UnitSlots[slot]);
-	return UnitSlots[slot];
+	unsigned int slot = strtol(value + 1, NULL, 16);
+	Assert(slot < UnitManager.GetUsedSlotCount());
+	return &UnitManager.GetUnit(slot);
 }
 
 
@@ -321,7 +321,7 @@ static int CclUnit(lua_State *l)
 			// unit->CurrentAction()==UnitActionDie so we have to wait
 			// until we parsed at least Unit::Orders[].
 			Assert(type);
-			unit = UnitSlots[slot];
+			unit = &UnitManager.GetUnit(slot);
 			unit->Init(*type);
 			unit->Seen.Type = seentype;
 			unit->Active = 0;
@@ -595,7 +595,7 @@ static int CclUnit(lua_State *l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "goal")) {
 			lua_rawgeti(l, 2, j + 1);
-			unit->Goal = UnitSlots[(int)LuaToNumber(l, -1)];
+			unit->Goal = &UnitManager.GetUnit(LuaToNumber(l, -1));
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "auto-cast")) {
 			lua_rawgeti(l, 2, j + 1);
@@ -1064,35 +1064,7 @@ static int CclSetUnitVariable(lua_State *l)
 */
 static int CclSlotUsage(lua_State *l)
 {
-	unsigned int args = lua_gettop(l);
-	if (args == 0) {
-		UnitSlotFree = 0;
-		return 0;
-	}
-	UnitSlotFree = LuaToNumber(l, 1);
-	for (unsigned int i = 0; i < UnitSlotFree; i++) {
-		UnitSlots[i] = new CUnit;
-		UnitSlots[i]->Slot = i;
-	}
-	for (unsigned int i = 2; i <= args; i++) {
-		int unit_index = -1;
-		unsigned long cycle = static_cast<unsigned long>(-1);
-
-		for (lua_pushnil(l); lua_next(l, i); lua_pop(l, 1)) {
-			const char *key = LuaToString(l, -2);
-
-			if (!strcmp(key, "Slot")) {
-				unit_index = LuaToNumber(l, -1);
-			} else if (!strcmp(key, "FreeCycle")) {
-				cycle = LuaToNumber(l, -1);
-			} else {
-				LuaError(l, "Wrong key %s" _C_ key);
-			}
-		}
-		Assert(unit_index != -1 && cycle != static_cast<unsigned long>(-1));
-		UnitManager.ReleaseUnit(UnitSlots[unit_index]);
-		UnitSlots[unit_index]->ReleaseCycle = cycle;
-	}
+	UnitManager.Load(l);
 	return 0;
 }
 

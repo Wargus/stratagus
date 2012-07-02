@@ -1090,27 +1090,19 @@ static int CclSetGroupId(lua_State *l)
 */
 static int CclSelection(lua_State *l)
 {
-	int i;
-	int args;
-	int j;
-
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
 	InitSelections();
 	NumSelected = LuaToNumber(l, 1);
-	i = 0;
-	args = lua_rawlen(l, 2);
-	for (j = 0; j < args; ++j) {
-		const char *str;
-
+	const int args = lua_rawlen(l, 2);
+	for (int j = 0; j < args; ++j) {
 		lua_rawgeti(l, 2, j + 1);
-		str = LuaToString(l, -1);
+		const char *str = LuaToString(l, -1);
 		lua_pop(l, 1);
-		Selected[i++] = UnitSlots[strtol(str + 1, NULL, 16)];
+		Selected[j] = &UnitManager.GetUnit(strtol(str + 1, NULL, 16));
 	}
-
 	return 0;
 }
 

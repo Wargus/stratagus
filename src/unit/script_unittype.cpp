@@ -1716,7 +1716,7 @@ void UpdateUnitVariables(CUnit &unit)
 
 	// SlotNumber
 	unit.Variable[SLOT_INDEX].Value = unit.Slot;
-	unit.Variable[SLOT_INDEX].Max = UnitSlotFree - 1;
+	unit.Variable[SLOT_INDEX].Max = UnitManager.GetUsedSlotCount();
 
 	for (int i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		unit.Variable[i].Enable &= unit.Variable[i].Max > 0;

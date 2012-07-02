@@ -38,14 +38,15 @@
 #include "unit_manager.h"
 #include "unit.h"
 #include "iolib.h"
+#include "script.h"
 
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-CUnit *UnitSlots[MAX_UNIT_SLOTS];  /// All possible units
-unsigned int UnitSlotFree;         /// First free unit slot
+//CUnit *UnitSlots[MAX_UNIT_SLOTS];  /// All possible units
+//unsigned int UnitSlotFree;         /// First free unit slot
 
 CUnitManager UnitManager;          /// Unit manager
 
@@ -67,8 +68,7 @@ void CUnitManager::Init()
 	}
 
 	// Initialize the free unit slots
-	memset(UnitSlots, 0, MAX_UNIT_SLOTS * sizeof(*UnitSlots));
-	UnitSlotFree = 0;
+	UnitSlots.clear();
 }
 
 /**
@@ -78,29 +78,24 @@ void CUnitManager::Init()
 */
 CUnit *CUnitManager::AllocUnit()
 {
-	CUnit *unit = NULL;
-
-	//
 	// Can use released unit?
-	//
 	if (!ReleasedUnits.empty() && ReleasedUnits.front()->ReleaseCycle < GameCycle) {
-		unit = ReleasedUnits.front();
+		CUnit *unit = ReleasedUnits.front();
 		ReleasedUnits.pop_front();
-		int slot = unit->Slot;
+		const int slot = unit->Slot;
 		unit->Init();
 		unit->Slot = slot;
+		return unit;
 	} else {
-		unit = new CUnit;
+		CUnit *unit = new CUnit;
 		if (!unit) {
 			fprintf(stderr, "Out of memory\n");
 			return NULL;
 		}
-		UnitSlots[UnitSlotFree] = unit;
-		unit->Slot = UnitSlotFree;
-		UnitSlotFree++;
+		unit->Slot = UnitSlots.size();
+		UnitSlots.push_back(unit);
+		return unit;
 	}
-
-	return unit;
 }
 
 /**
@@ -115,6 +110,16 @@ void CUnitManager::ReleaseUnit(CUnit *unit)
 	//Refs = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
 }
 
+CUnit& CUnitManager::GetUnit(int index) const
+{
+	return *UnitSlots[index];
+}
+
+unsigned int CUnitManager::GetUsedSlotCount() const
+{
+	return static_cast<unsigned int>(UnitSlots.size());
+}
+
 /**
 **  Save state of unit manager to file.
 **
@@ -122,13 +127,47 @@ void CUnitManager::ReleaseUnit(CUnit *unit)
 */
 void CUnitManager::Save(CFile &file) const
 {
-	file.printf("SlotUsage(%d", UnitSlotFree);
+	file.printf("SlotUsage(%d", UnitSlots.size());
 
 	std::list<CUnit *>::const_iterator it = ReleasedUnits.begin();
 	for (; it != ReleasedUnits.end(); ++it) {
 		file.printf(", {Slot = %d, FreeCycle = %u}", (*it)->Slot, (*it)->ReleaseCycle);
 	}
 	file.printf(")\n");
+}
+
+void CUnitManager::Load(lua_State *l)
+{
+	Init();
+	unsigned int args = lua_gettop(l);
+	if (args == 0) {
+		return;
+	}
+	unsigned int UnitSlotFree = LuaToNumber(l, 1);
+	for (unsigned int i = 0; i < UnitSlotFree; i++) {
+		CUnit *unit = new CUnit;
+		UnitSlots.push_back(unit);
+		unit->Slot = i;
+	}
+	for (unsigned int i = 2; i <= args; i++) {
+		int unit_index = -1;
+		unsigned long cycle = static_cast<unsigned long>(-1);
+
+		for (lua_pushnil(l); lua_next(l, i); lua_pop(l, 1)) {
+			const char *key = LuaToString(l, -2);
+
+			if (!strcmp(key, "Slot")) {
+				unit_index = LuaToNumber(l, -1);
+			} else if (!strcmp(key, "FreeCycle")) {
+				cycle = LuaToNumber(l, -1);
+			} else {
+				LuaError(l, "Wrong key %s" _C_ key);
+			}
+		}
+		Assert(unit_index != -1 && cycle != static_cast<unsigned long>(-1));
+		UnitManager.ReleaseUnit(UnitSlots[unit_index]);
+		UnitSlots[unit_index]->ReleaseCycle = cycle;
+	}
 }
 
 
