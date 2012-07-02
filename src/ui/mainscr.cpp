@@ -344,14 +344,14 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 
 				return order.GetWorkerPtr();
 			} else {
-				return NoUnitP;
+				return NULL;
 			}
 		case UnitRefGoal:
 			return unit.Goal;
 		default:
 			Assert(0);
 	}
-	return NoUnitP;
+	return NULL;
 }
 
 

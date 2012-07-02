@@ -116,7 +116,7 @@ found:
 	FindNearestDrop(*type, pos, resPos, LookingW);
 	if (MapDistance(pos, resPos) <= range) {
 		CUnit *target = MakeUnit(*type, &player);
-		if (target != NoUnitP) {
+		if (target != NULL) {
 			target->tilePos = resPos;
 			target->Place(resPos);
 			//DropOutOnSide(*target, LookingW, NULL);

@@ -819,7 +819,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		return;
 	}
 
-	UnitUnderCursor = NoUnitP;
+	UnitUnderCursor = NULL;
 	GameCursor = UI.Point.Cursor;  // Reset
 	HandleMouseOn(cursorPos);
 
@@ -885,7 +885,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	// NOTE: If unit is not selectable as a goal, you can't get a cursor hint
 	if (UnitUnderCursor != NULL && !UnitUnderCursor->IsVisibleAsGoal(*ThisPlayer) &&
 		!ReplayRevealMap) {
-		UnitUnderCursor = NoUnitP;
+		UnitUnderCursor = NULL;
 	}
 
 	//
@@ -1569,7 +1569,7 @@ void UIHandleButtonDown(unsigned button)
 		}
 
 		if (MouseButtons & UI.PieMenu.MouseButton) { // enter pie menu
-			UnitUnderCursor = NoUnitP;
+			UnitUnderCursor = NULL;
 			GameCursor = UI.Point.Cursor;  // Reset
 			CursorStartScreenPos = CursorScreenPos;
 			if (NumSelected && Selected[0]->Player == ThisPlayer && CursorState == CursorStatePoint) {

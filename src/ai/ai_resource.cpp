@@ -1035,7 +1035,7 @@ static void AiCollectResources()
 				}
 			}
 		}
-		unit = NoUnitP;
+		unit = NULL;
 
 		// Try to complete each ressource in the priority order
 		for (int i = 0; i < MaxCosts; ++i) {
@@ -1099,7 +1099,7 @@ static void AiCollectResources()
 
 						// unit can't harvest : next one
 						if (!unit->Type->ResInfo[c] || !AiAssignHarvester(*unit, c)) {
-							unit = NoUnitP;
+							unit = NULL;
 							continue;
 						}
 

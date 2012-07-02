@@ -412,7 +412,7 @@ void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 **
 **  @param unit   pointer to unit.
 **  @param pos    map position to unload.
-**  @param what   unit to be unloaded, NoUnitP all.
+**  @param what   unit to be unloaded, NULL for all.
 **  @param flush  if true, flush command queue.
 */
 void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)

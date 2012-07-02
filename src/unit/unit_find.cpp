@@ -360,7 +360,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 **  @note This will return an usable resource building that doesn't
 **  belong to the player or one of his allies.
 **
-**  @return            NoUnitP or resource unit
+**  @return            NULL or resource unit
 */
 CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, int resource,
 						bool check_usage, const CUnit *deposit)
@@ -395,7 +395,7 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 **
 **  @note This will return a reachable allied depot.
 **
-**  @return            NoUnitP or deposit unit
+**  @return            NULL or deposit unit
 */
 CUnit *FindDeposit(const CUnit &unit, int range, int resource)
 {
@@ -420,12 +420,12 @@ CUnit *FindDeposit(const CUnit &unit, int range, int resource)
 **  @param player    Player's units to search through
 **  @param last      Previous idle worker selected
 **
-**  @return NoUnitP or next idle worker
+**  @return NULL or next idle worker
 */
 CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 {
-	CUnit *FirstUnitFound = NoUnitP;
-	int SelectNextUnit = (last == NoUnitP) ? 1 : 0;
+	CUnit *FirstUnitFound = NULL;
+	int SelectNextUnit = (last == NULL) ? 1 : 0;
 	const int nunits = player.GetUnitCount();
 
 	for (int i = 0; i < nunits; ++i) {
@@ -444,10 +444,10 @@ CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 			SelectNextUnit = 1;
 		}
 	}
-	if (FirstUnitFound != NoUnitP && !IsOnlySelected(*FirstUnitFound)) {
+	if (FirstUnitFound != NULL && !IsOnlySelected(*FirstUnitFound)) {
 		return FirstUnitFound;
 	}
-	return NoUnitP;
+	return NULL;
 }
 
 /**
@@ -569,7 +569,7 @@ CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2)
 **  @param resource  resource type.
 **  @param mine_on_top  return mine or mining area.
 **
-**  @return          Returns the deposit if found, or NoUnitP.
+**  @return          Returns the deposit if found, or NULL.
 */
 CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top)
 {
@@ -593,7 +593,7 @@ private:
 **  @param pos       position on map, tile-based.
 **  @param resource  resource type.
 **
-**  @return          Returns the deposit if found, or NoUnitP.
+**  @return          Returns the deposit if found, or NULL.
 */
 CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource)
 {

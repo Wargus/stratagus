@@ -115,7 +115,7 @@ void UnSelectAll()
 
 	while (NumSelected) {
 		CUnit *unit = Selected[--NumSelected];
-		Selected[NumSelected] = NoUnitP; // FIXME: only needed for old code
+		Selected[NumSelected] = NULL; // FIXME: only needed for old code
 		unit->Selected = 0;
 	}
 	UI.SelectedViewport->Unit = NULL;
@@ -195,7 +195,7 @@ void ChangeTeamSelectedUnits(CPlayer &player, const std::vector<CUnit *> &units,
 			while (TeamNumSelected[player.Index]) {
 				CUnit *unit = TeamSelected[player.Index][--TeamNumSelected[player.Index]];
 				unit->TeamSelected &= ~(1 << player.Index);
-				TeamSelected[player.Index][TeamNumSelected[player.Index]] = NoUnitP; // FIXME: only needed for old code
+				TeamSelected[player.Index][TeamNumSelected[player.Index]] = NULL; // FIXME: only needed for old code
 			}
 			// FALL THROUGH
 		case 2:
@@ -323,7 +323,7 @@ void UnSelectUnit(CUnit &unit)
 			Selected[i]->LastGroup = GroupId;
 		}
 	}
-	Selected[NumSelected] = NoUnitP; // FIXME: only needed for old code
+	Selected[NumSelected] = NULL; // FIXME: only needed for old code
 	unit.Selected = 0;
 
 	//Turn track unit mode off

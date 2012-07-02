@@ -725,7 +725,7 @@ static int CclCreateUnit(lua_State *l)
 		return 0;
 	}
 	CUnit *unit = MakeUnit(*unittype, &Players[playerno]);
-	if (unit == NoUnitP) {
+	if (unit == NULL) {
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {

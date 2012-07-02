@@ -344,7 +344,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 		if (goal->CurrentAction() == UnitActionDie) {
 			if (unit.Type->Missile.Missile->AlwaysFire) {
 				newgoalPos = goal->tilePos;
-				goal = NoUnitP;
+				goal = NULL;
 			} else {
 				return;
 			}
@@ -759,7 +759,7 @@ void Missile::MissileHit()
 			//
 			CUnit &goal = *this->TargetUnit;
 			if (goal.Destroyed) {
-				this->TargetUnit = NoUnitP;
+				this->TargetUnit = NULL;
 				return;
 			}
 			MissileHitsGoal(*this, goal, 1);

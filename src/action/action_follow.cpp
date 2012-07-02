@@ -255,7 +255,7 @@ enum {
 		DebugPrint("Goal gone\n");
 		this->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
 		this->ClearGoal();
-		goal = NoUnitP;
+		goal = NULL;
 	}
 
 	if (unit.Anim.Unbreakable) {

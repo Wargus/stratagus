@@ -626,7 +626,7 @@ int Summon::Cast(CUnit &caster, const SpellType *spell, CUnit *target, const Vec
 		// FIXME: do summoned units count on food?
 		//
 		target = MakeUnit(unittype, caster.Player);
-		if (target != NoUnitP) {
+		if (target != NULL) {
 			target->tilePos = pos;
 			DropOutOnSide(*target, LookingW, NULL);
 			//

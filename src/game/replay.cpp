@@ -781,7 +781,7 @@ static void DoNextReplay()
 	const Vec2i pos(ReplayStep->PosX, ReplayStep->PosY);
 	const int arg1 = ReplayStep->PosX;
 	const int arg2 = ReplayStep->PosY;
-	CUnit *dunit = (ReplayStep->DestUnitNumber != -1 ? UnitSlots[ReplayStep->DestUnitNumber] : NoUnitP);
+	CUnit *dunit = (ReplayStep->DestUnitNumber != -1 ? UnitSlots[ReplayStep->DestUnitNumber] : NULL);
 	const char *val = ReplayStep->Value.c_str();
 	const int num = ReplayStep->Num;
 

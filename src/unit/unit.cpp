@@ -125,7 +125,7 @@
 **
 **  CUnit::Container
 **
-**  Pointer to the unit containing it, or NoUnitP if the unit is
+**  Pointer to the unit containing it, or NULL if the unit is
 **  free. This points to the transporter for units on board, or to
 **  the building for peasants inside(when they are mining).
 **
@@ -133,7 +133,7 @@
 **
 **  Pointer to the last unit added inside. Order doesn't really
 **  matter. All units inside are kept in a circular linked list.
-**  This is NoUnitP if there are no units inside. Multiple levels
+**  This is NULL if there are no units inside. Multiple levels
 **  of inclusion are allowed, though not very usefull right now
 **
 **  CUnit::NextContained, CUnit::PrevContained
@@ -749,12 +749,12 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 	// Game unit limit reached.
 	if (NumUnits >= UnitMax) {
 		DebugPrint("Over all unit limit (%d) reached.\n" _C_ UnitMax);
-		return NoUnitP;
+		return NULL;
 	}
 
 	CUnit *unit = UnitManager.AllocUnit();
-	if (unit == NoUnitP) {
-		return NoUnitP;
+	if (unit == NULL) {
+		return NULL;
 	}
 	unit->Init(type);
 	// Only Assign if a Player was specified
@@ -993,7 +993,7 @@ void UnmarkUnitFieldFlags(const CUnit &unit)
 */
 void CUnit::AddInContainer(CUnit &host)
 {
-	Assert(Container == NoUnitP);
+	Assert(Container == NULL);
 	Container = &host;
 	if (host.InsideCount == 0) {
 		NextContained = PrevContained = this;
@@ -1022,13 +1022,13 @@ static void RemoveUnitFromContainer(CUnit &unit)
 	unit.NextContained->PrevContained = unit.PrevContained;
 	unit.PrevContained->NextContained = unit.NextContained;
 	if (host->InsideCount == 0) {
-		host->UnitInside = NoUnitP;
+		host->UnitInside = NULL;
 	} else {
 		if (host->UnitInside == &unit) {
 			host->UnitInside = unit.NextContained;
 		}
 	}
-	unit.Container = NoUnitP;
+	unit.Container = NULL;
 }
 
 
@@ -1126,7 +1126,7 @@ CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player
 {
 	CUnit *unit = MakeUnit(type, player);
 
-	if (unit != NoUnitP) {
+	if (unit != NULL) {
 		unit->Place(pos);
 	}
 	return unit;
@@ -1180,7 +1180,7 @@ void CUnit::Remove(CUnit *host)
 
 	// Unit is seen as under cursor
 	if (UnitUnderCursor == this) {
-		UnitUnderCursor = NoUnitP;
+		UnitUnderCursor = NULL;
 	}
 }
 
@@ -1266,7 +1266,7 @@ void UnitLost(CUnit &unit)
 	if (b != NULL) {
 		if (b->ReplaceOnDie && (type.GivesResource && unit.ResourcesHeld != 0)) {
 			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, &Players[PlayerNumNeutral]);
-			if (temp == NoUnitP) {
+			if (temp == NULL) {
 				DebugPrint("Unable to allocate Unit");
 			} else {
 				temp->ResourcesHeld = unit.ResourcesHeld;

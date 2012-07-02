@@ -162,7 +162,7 @@ void DrawMapArea()
 		// Center viewport on tracked unit
 		if (vp->Unit) {
 			if (vp->Unit->Destroyed || vp->Unit->CurrentAction() == UnitActionDie) {
-				vp->Unit = NoUnitP;
+				vp->Unit = NULL;
 			} else {
 				vp->Center(vp->Unit->GetMapPixelPosCenter());
 			}

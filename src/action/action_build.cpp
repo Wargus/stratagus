@@ -319,7 +319,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	CUnit *build = MakeUnit(const_cast<CUnitType &>(type), unit.Player);
 
 	// If unable to make unit, stop, and report message
-	if (build == NoUnitP) {
+	if (build == NULL) {
 		// FIXME: Should we retry this?
 		unit.Player->Notify(NotifyYellow, unit.tilePos,
 							_("Unable to create building %s"), type.Name.c_str());

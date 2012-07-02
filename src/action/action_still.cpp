@@ -245,7 +245,7 @@ private:
 **  @param unit   unit which can repair.
 **  @param range  range to find a repairable unit.
 **
-**  @return       unit to repair if found, NoUnitP otherwise
+**  @return       unit to repair if found, NULL otherwise
 **
 **  @todo         FIXME: find the best unit (most damaged, ...).
 */
@@ -295,7 +295,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	// Removed units can only attack in AttackRange, from bunker
 	this->AutoTarget = AttackUnitsInRange(unit);
 
-	if (this->AutoTarget == NoUnitP) {
+	if (this->AutoTarget == NULL) {
 		return false;
 	}
 	this->State = SUB_STILL_ATTACK; // Mark attacking.

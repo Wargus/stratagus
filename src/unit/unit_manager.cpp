@@ -78,7 +78,7 @@ void CUnitManager::Init()
 */
 CUnit *CUnitManager::AllocUnit()
 {
-	CUnit *unit = NoUnitP;
+	CUnit *unit = NULL;
 
 	//
 	// Can use released unit?
@@ -93,7 +93,7 @@ CUnit *CUnitManager::AllocUnit()
 		unit = new CUnit;
 		if (!unit) {
 			fprintf(stderr, "Out of memory\n");
-			return NoUnitP;
+			return NULL;
 		}
 		UnitSlots[UnitSlotFree] = unit;
 		unit->Slot = UnitSlotFree;

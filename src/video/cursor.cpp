@@ -341,7 +341,7 @@ void CleanCursors()
 
 	CursorBuilding = NULL;
 	GameCursor = NULL;
-	UnitUnderCursor = NoUnitP;
+	UnitUnderCursor = NULL;
 }
 
 //@}

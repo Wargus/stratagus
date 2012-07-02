@@ -323,7 +323,7 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 
 	// FIXME: vladi: should check place when mirror editing is enabled...?
 	CUnit *unit = MakeUnitAndPlace(pos, type, player);
-	if (unit == NoUnitP) {
+	if (unit == NULL) {
 		DebugPrint("Unable to allocate Unit");
 		return;
 	}
@@ -342,7 +342,7 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 			replacedUnit.Release();
 		}
 	}
-	if (unit != NoUnitP) {
+	if (unit != NULL) {
 		if (type.GivesResource) {
 			unit->ResourcesHeld = DefaultResourceAmounts[type.GivesResource];
 		}
@@ -1809,7 +1809,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	}
 
 	// Map
-	UnitUnderCursor = NoUnitP;
+	UnitUnderCursor = NULL;
 	if (UI.MapArea.Contains(screenPos)) {
 		CViewport *vp = GetViewport(screenPos);
 		Assert(vp);
