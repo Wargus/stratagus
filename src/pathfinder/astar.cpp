@@ -525,7 +525,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 					// we can't cross fixed units and other unpassable things
 					return -1;
 				}
-				CUnit *goal = unit_finder.Find(mf);
+				CUnit *goal = mf->UnitCache.find(unit_finder);
 				if (!goal) {
 					// Shouldn't happen, mask says there is something on this tile
 					Assert(0);

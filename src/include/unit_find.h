@@ -35,42 +35,23 @@
 #include "unit.h"
 #include "unittype.h"
 
-class CUnitCache;
-class CMapField;
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
 //unit_find
-struct CUnitTypeFinder {
-	const UnitTypeType type;
-	CUnitTypeFinder(const UnitTypeType t) : type(t)  {}
+class CUnitTypeFinder {
+public:
+	explicit CUnitTypeFinder(const UnitTypeType t) : unitTypeType(t) {}
 	bool operator()(const CUnit *const unit) const {
-		const CUnitType *const t = unit->Type;
-		if (t->Vanishes || (type != static_cast<UnitTypeType>(-1) && t->UnitType != type)) {
+		const CUnitType &type = *unit->Type;
+		if (type.Vanishes || (unitTypeType != static_cast<UnitTypeType>(-1) && type.UnitType != unitTypeType)) {
 			return false;
 		}
 		return true;
 	}
-
-	CUnit *Find(const CUnitCache &cache) const { return cache.find(*this); }
-	CUnit *Find(const CMapField *const mf) const { return mf->UnitCache.find(*this); }
-};
-
-struct CResourceFinder {
-	const int resource;
-	const int mine_on_top;
-	CResourceFinder(const int r, int on_top) : resource(r), mine_on_top(on_top) {}
-	inline bool operator()(const CUnit *const unit) const {
-		const CUnitType *const type = unit->Type;
-		return (type->GivesResource == resource
-				&& unit->ResourcesHeld != 0
-				&& (mine_on_top ? type->CanHarvest : !type->CanHarvest)
-				&& !unit->IsUnusable(true) //allow mines under construction
-			   );
-	}
-	CUnit *Find(const CMapField *const mf) const { return mf->UnitCache.find(*this); }
+private:
+	const UnitTypeType unitTypeType;
 };
 
 /// Find resource

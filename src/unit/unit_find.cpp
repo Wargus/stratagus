@@ -226,6 +226,22 @@ CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource)
 	return depot;
 }
 
+class CResourceFinder {
+public:
+	CResourceFinder(int r, bool on_top) : resource(r), mine_on_top(on_top) {}
+	bool operator()(const CUnit *const unit) const {
+		const CUnitType &type = *unit->Type;
+		return (type.GivesResource == resource
+				&& unit->ResourcesHeld != 0
+				&& (mine_on_top ? type.CanHarvest : !type.CanHarvest)
+				&& !unit->IsUnusable(true) //allow mines under construction
+			   );
+	}
+private:
+	const int resource;
+	const bool mine_on_top;
+};
+
 class ResourceUnitFinder
 {
 public:
@@ -307,7 +323,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 		return VisitResult_DeadEnd;
 	}
 
-	CUnit *mine = res_finder.Find(Map.Field(pos));
+	CUnit *mine = Map.Field(pos)->UnitCache.find(res_finder);
 
 	if (mine && mine != *resultMine && MineIsUsable(*mine)) {
 		ResourceUnitFinder::ResourceUnitFinder_Cost cost;
@@ -493,7 +509,7 @@ void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::ve
 */
 CUnit *UnitOnMapTile(const unsigned int index, unsigned int type)
 {
-	return CUnitTypeFinder((UnitTypeType)type).Find(Map.Field(index));
+	return Map.Field(index)->UnitCache.find(CUnitTypeFinder((UnitTypeType)type));
 }
 
 /**
@@ -557,18 +573,15 @@ CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2)
 */
 CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top)
 {
-	return CResourceFinder(resource, mine_on_top).Find(Map.Field(pos));
+	return Map.Field(pos)->UnitCache.find(CResourceFinder(resource, mine_on_top));
 }
 
-class CResourceDepositFinder
+class IsADepositForResource
 {
 public:
-	CResourceDepositFinder(const int r) : resource(r) {}
-	inline bool operator()(const CUnit *const unit) const {
+	explicit IsADepositForResource(const int r) : resource(r) {}
+	bool operator()(const CUnit *const unit) const {
 		return (unit->Type->CanStore[resource] && !unit->IsUnusable());
-	}
-	inline CUnit *Find(const CMapField &mf) const {
-		return mf.UnitCache.find(*this);
 	}
 private:
 	const int resource;
@@ -584,7 +597,7 @@ private:
 */
 CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource)
 {
-	return CResourceDepositFinder(resource).Find(*Map.Field(pos));
+	return Map.Field(pos)->UnitCache.find(IsADepositForResource(resource));
 }
 
 /*----------------------------------------------------------------------------
@@ -947,7 +960,6 @@ private:
 			best_unit = dest;
 		}
 	}
-
 
 private:
 	const CUnit *attacker;

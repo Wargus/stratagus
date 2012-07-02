@@ -365,7 +365,7 @@ int AiForce::PlanAttack()
 
 	// Find a land unit of the force.
 	// FIXME: if force is split over different places -> broken
-	CUnit *landUnit = CUnitTypeFinder(UnitTypeLand).Find(Units);
+	CUnit *landUnit = Units.find(CUnitTypeFinder(UnitTypeLand));
 	if (landUnit == NULL) {
 		DebugPrint("%d: No land unit in force\n" _C_ player.Index);
 		return 0;
