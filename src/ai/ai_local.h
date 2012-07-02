@@ -40,6 +40,7 @@
 
 #include "upgrade_structs.h"
 #include "unit.h"
+#include "unit_cache.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations

@@ -37,12 +37,10 @@
 ----------------------------------------------------------------------------*/
 
 #include <string>
+
 #include "upgrade_structs.h"
 #include "video.h"
 
-#ifndef __MAP_TILE_H__
-#include "tile.h"
-#endif
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
