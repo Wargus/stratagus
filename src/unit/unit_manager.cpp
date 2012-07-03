@@ -131,6 +131,10 @@ void CUnitManager::Save(CFile &file) const
 		file.printf(", {Slot = %d, FreeCycle = %u}", (*it)->Slot, (*it)->ReleaseCycle);
 	}
 	file.printf(")\n");
+
+	for (CUnit **table = Units; table < &Units[NumUnits]; ++table) {
+		SaveUnit(**table, file);
+	}
 }
 
 void CUnitManager::Load(lua_State *l)

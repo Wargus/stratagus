@@ -48,7 +48,6 @@
 #include "player.h"
 #include "spells.h"
 #include "unittype.h"
-#include "unit_manager.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -312,20 +311,6 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	}
 
 	file.printf("})\n");
-}
-
-/**
-**  Save state of units to file.
-**
-**  @param file  Output file.
-*/
-void SaveUnits(CFile &file)
-{
-	UnitManager.Save(file);
-
-	for (CUnit **table = Units; table < &Units[NumUnits]; ++table) {
-		SaveUnit(**table, file);
-	}
 }
 
 //@}

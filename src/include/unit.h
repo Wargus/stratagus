@@ -142,9 +142,9 @@ public:
 	// @note int is faster than shorts
 	unsigned int     Refs;         /// Reference counter
 	unsigned int     ReleaseCycle; /// When this unit could be recycled
-	int     Slot;         /// Assigned slot number
-	CUnit **UnitSlot;     /// Slot pointer of Units
-	size_t PlayerSlot;    /// index in Player->Units
+	int Slot;           /// index in UnitManager::unitSlots
+	int UnitSlot;       /// index in Units
+	size_t PlayerSlot;  /// index in Player->Units
 
 	int    InsideCount;   /// Number of units inside.
 	int    BoardCount;    /// Number of units transported inside.
@@ -575,8 +575,6 @@ extern std::string UnitReference(const CUnitPtr &unit);
 
 /// save unit-structure
 extern void SaveUnit(const CUnit &unit, CFile &file);
-/// save all units
-extern void SaveUnits(CFile &file);
 
 /// Initialize unit module
 extern void InitUnits();

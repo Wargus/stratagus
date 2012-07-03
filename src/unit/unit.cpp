@@ -103,7 +103,7 @@
 **
 **  CUnit::UnitSlot
 **
-**  This is the pointer into #Units[], where the unit pointer is
+**  This is the index into #Units[], where the unit pointer is
 **  stored.  #Units[] is a table of all units currently active in
 **  game. This pointer is only needed to speed up, the remove of
 **  the unit pointer from #Units[], it didn't must be searched in
@@ -111,17 +111,10 @@
 **
 **  CUnit::PlayerSlot
 **
-**  the index into Player::Units[], where the unit pointer is
+**  The index into Player::Units[], where the unit pointer is
 **  stored. Player::Units[] is a table of all units currently
 **  belonging to a player. This pointer is only needed to speed
 **  up, the remove of the unit pointer from Player::Units[].
-**
-**  CUnit::Next
-**
-**  A generic link pointer. This member is currently used, if an
-**  unit is on the map, to link all units on the same map field
-**  together. This also links corpses and stuff. Also, this is
-**  used in memory management to link unused units.
 **
 **  CUnit::Container
 **
@@ -414,8 +407,8 @@ void CUnit::Init()
 {
 	Refs = 0;
 	ReleaseCycle = 0;
-	Slot = 0;
-	UnitSlot = NULL;
+	Slot = -1;
+	UnitSlot = -1;
 	PlayerSlot = static_cast<size_t>(-1);
 	InsideCount = 0;
 	BoardCount = 0;
@@ -521,15 +514,6 @@ void CUnit::Release(bool final)
 	// memory.
 	//
 
-	//
-	// Remove the unit from the global units table.
-	//
-	Assert(*UnitSlot == this);
-	CUnit *temp = Units[--NumUnits];
-	temp->UnitSlot = UnitSlot;
-	*UnitSlot = temp;
-	Units[NumUnits] = NULL;
-
 	Type = NULL;
 
 	delete pathFinderData;
@@ -540,6 +524,12 @@ void CUnit::Release(bool final)
 	}
 	Orders.clear();
 
+	// Remove the unit from the global units table.
+	Assert(Units[UnitSlot] == this);
+	CUnit *temp = Units[--NumUnits];
+	temp->UnitSlot = UnitSlot;
+	Units[UnitSlot] = temp;
+	Units[NumUnits] = NULL;
 	UnitManager.ReleaseUnit(this);
 }
 
@@ -585,7 +575,7 @@ void CUnit::Init(const CUnitType &type)
 	Refs = 1;
 
 	//  Build all unit table
-	UnitSlot = &Units[NumUnits]; // back pointer
+	UnitSlot = NumUnits;
 	Units[NumUnits++] = this;
 
 	//  Initialise unit structure (must be zero filled!)

@@ -38,28 +38,20 @@
 #include <string>
 
 #include "stratagus.h"
-#include "icons.h"
-#include "ui.h"
-#include "construct.h"
-#include "unittype.h"
-#include "unit.h"
-#include "upgrade.h"
-#include "depend.h"
-#include "interface.h"
-#include "missile.h"
-#include "tileset.h"
-#include "map.h"
-#include "player.h"
-#include "ai.h"
-#include "results.h"
-#include "trigger.h"
-#include "settings.h"
-#include "iolib.h"
-#include "spells.h"
-#include "commands.h"
-#include "script.h"
+
 #include "actions.h"
+#include "ai.h"
+#include "iolib.h"
+#include "map.h"
+#include "missile.h"
+#include "player.h"
 #include "replay.h"
+#include "spells.h"
+#include "trigger.h"
+#include "ui.h"
+#include "unit_manager.h"
+#include "unittype.h"
+#include "upgrade.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -142,7 +134,7 @@ int SaveGame(const std::string &filename)
 	SaveUpgrades(file);
 	SavePlayers(file);
 	Map.Save(file);
-	SaveUnits(file);
+	UnitManager.Save(file);
 	SaveUserInterface(file);
 	SaveAi(file);
 	SaveSelections(file);
