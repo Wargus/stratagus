@@ -404,8 +404,6 @@ void CUnit::Init()
 {
 	Refs = 0;
 	ReleaseCycle = 0;
-	Slot = -1;
-	UnitSlot = -1;
 	PlayerSlot = static_cast<size_t>(-1);
 	InsideCount = 0;
 	BoardCount = 0;
@@ -488,7 +486,7 @@ void CUnit::Release(bool final)
 
 	// First release, remove from lists/tables.
 	if (!Destroyed) {
-		DebugPrint("%d: First release %d\n" _C_ Player->Index _C_ Slot);
+		DebugPrint("%d: First release %d\n" _C_ Player->Index _C_ UnitNumber(*this));
 
 		// Are more references remaining?
 		Destroyed = 1; // mark as destroyed
@@ -1123,7 +1121,7 @@ void CUnit::Remove(CUnit *host)
 {
 	if (Removed) { // could happen!
 		// If unit is removed (inside) and building is destroyed.
-		DebugPrint("unit '%s(%d)' already removed\n" _C_ Type->Ident.c_str() _C_ Slot);
+		DebugPrint("unit '%s(%d)' already removed\n" _C_ Type->Ident.c_str() _C_ UnitNumber(*this));
 		return;
 	}
 	Map.Remove(*this);
@@ -2653,7 +2651,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 
 	// OnHit callback
 	if (type->OnHit) {
-		const int slot = target.Slot;
+		const int slot = UnitNumber(target);
 
 		type->OnHit->pushPreamble();
 		type->OnHit->pushInteger(slot);

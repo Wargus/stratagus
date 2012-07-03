@@ -61,7 +61,7 @@ CUnitManager::CUnitManager() : lastCreated(NULL)
 void CUnitManager::Init()
 {
 	lastCreated = NULL;
-	Assert(units.empty());
+	//Assert(units.empty());
 	units.clear();
 	// Release memory of units in release list.
 	while (!releasedUnits.empty()) {
@@ -72,7 +72,6 @@ void CUnitManager::Init()
 
 	// Initialize the free unit slots
 	unitSlots.clear();
-
 }
 
 /**
@@ -86,14 +85,15 @@ CUnit *CUnitManager::AllocUnit()
 	if (!releasedUnits.empty() && releasedUnits.front()->ReleaseCycle < GameCycle) {
 		CUnit *unit = releasedUnits.front();
 		releasedUnits.pop_front();
-		const int slot = unit->Slot;
+		const int slot = unit->UnitManagerData.slot;
 		unit->Init();
-		unit->Slot = slot;
+		unit->UnitManagerData.slot = slot;
+		unit->UnitManagerData.unitSlot = -1;
 		return unit;
 	} else {
 		CUnit *unit = new CUnit;
 
-		unit->Slot = unitSlots.size();
+		unit->UnitManagerData.slot = unitSlots.size();
 		unitSlots.push_back(unit);
 		return unit;
 	}
@@ -107,13 +107,13 @@ CUnit *CUnitManager::AllocUnit()
 void CUnitManager::ReleaseUnit(CUnit *unit)
 {
 	Assert(unit);
-	Assert(units[unit->UnitSlot] == unit);
+	Assert(units[unit->UnitManagerData.unitSlot] == unit);
 	if (lastCreated == unit) {
 		lastCreated = NULL;
 	}
 	CUnit *temp = units.back();
-	temp->UnitSlot = unit->UnitSlot;
-	units[unit->UnitSlot] = temp;
+	temp->UnitManagerData.unitSlot = unit->UnitManagerData.unitSlot;
+	units[unit->UnitManagerData.unitSlot] = temp;
 	units.pop_back();
 	releasedUnits.push_back(unit);
 	unit->ReleaseCycle = GameCycle + 500; // can be reused after this time
@@ -153,7 +153,7 @@ CUnit* CUnitManager::lastCreatedUnit()
 void CUnitManager::Add(CUnit *unit)
 {
 	lastCreated = unit;
-	unit->UnitSlot = static_cast<int>(units.size());
+	unit->UnitManagerData.unitSlot = static_cast<int>(units.size());
 	units.push_back(unit);
 }
 
@@ -166,9 +166,9 @@ void CUnitManager::Save(CFile &file) const
 {
 	file.printf("SlotUsage(%d", unitSlots.size());
 
-	std::list<CUnit *>::const_iterator it = releasedUnits.begin();
-	for (; it != releasedUnits.end(); ++it) {
-		file.printf(", {Slot = %d, FreeCycle = %u}", (*it)->Slot, (*it)->ReleaseCycle);
+	for (std::list<CUnit *>::const_iterator it = releasedUnits.begin(); it != releasedUnits.end(); ++it) {
+		const CUnit &unit = **it;
+		file.printf(", {Slot = %d, FreeCycle = %u}", UnitNumber(unit), unit.ReleaseCycle);
 	}
 	file.printf(")\n");
 
@@ -189,7 +189,7 @@ void CUnitManager::Load(lua_State *l)
 	for (unsigned int i = 0; i < unitCount; i++) {
 		CUnit *unit = new CUnit;
 		unitSlots.push_back(unit);
-		unit->Slot = i;
+		unit->UnitManagerData.slot = i;
 	}
 	for (unsigned int i = 2; i <= args; i++) {
 		int unit_index = -1;

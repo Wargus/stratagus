@@ -7,12 +7,10 @@ class Vec2i
 
 class CUnit
 {
-	tolua_readonly int Slot;
+	tolua_readonly Vec2i tilePos;
 
-	Vec2i tilePos;
-
-	CUnitType *Type;
-	CPlayer *Player;
+	tolua_readonly CUnitType *Type;
+	tolua_readonly CPlayer *Player;
 	bool Active;
 	int ResourcesHeld;
 };

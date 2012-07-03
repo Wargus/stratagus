@@ -139,116 +139,6 @@ public:
 	CUnit() : tilePos(-1, -1), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
 
 	void Init();
-	// @note int is faster than shorts
-	unsigned int     Refs;         /// Reference counter
-	unsigned int     ReleaseCycle; /// When this unit could be recycled
-	int Slot;           /// index in UnitManager::unitSlots
-	int UnitSlot;       /// index in Units
-	size_t PlayerSlot;  /// index in Player->Units
-
-	int    InsideCount;   /// Number of units inside.
-	int    BoardCount;    /// Number of units transported inside.
-	CUnit *UnitInside;    /// Pointer to one of the units inside.
-	CUnit *Container;     /// Pointer to the unit containing it (or 0)
-	CUnit *NextContained; /// Next unit in the container.
-	CUnit *PrevContained; /// Previous unit in the container.
-
-	CUnit *NextWorker; //pointer to next assigned worker to "Goal" resource.
-	struct {
-		CUnit *Workers; /// pointer to first assigned worker to this resource.
-		int Assigned; /// how many units are assigned to harvesting from the resource.
-		int Active; /// how many units are harvesting from the resource.
-	} Resource; /// Resource still
-
-	Vec2i tilePos; /// Map position X
-
-	unsigned int Offset;/// Map position as flat index offset (x + y * w)
-
-	const CUnitType  *Type;        /// Pointer to unit-type (peon,...)
-	CPlayer    *Player;            /// Owner of this unit
-	const CUnitStats *Stats;       /// Current unit stats
-	int         CurrentSightRange; /// Unit's Current Sight Range
-
-	// Pathfinding stuff:
-	PathFinderData *pathFinderData;
-
-	// DISPLAY:
-	int         Frame;      /// Image frame: <0 is mirrored
-	CUnitColors *Colors;    /// Player colors
-
-	signed char IX;         /// X image displacement to map position
-	signed char IY;         /// Y image displacement to map position
-	unsigned char Direction; //: 8; /// angle (0-255) unit looking
-	unsigned char CurrentResource;
-	int ResourcesHeld;      /// Resources Held by a unit
-
-	unsigned char DamagedType;   /// Index of damage type of unit which damaged this unit
-	unsigned long Attacked; /// gamecycle unit was last attacked
-	unsigned Blink : 3;     /// Let selection rectangle blink
-	unsigned Moving : 1;    /// The unit is moving
-	unsigned ReCast : 1;    /// Recast again next cycle
-	unsigned AutoRepair : 1;    /// True if unit tries to repair on still action.
-
-	unsigned Burning : 1;   /// unit is burning
-	unsigned Destroyed : 1; /// unit is destroyed pending reference
-	unsigned Removed : 1;   /// unit is removed (not on map)
-	unsigned Selected : 1;  /// unit is selected
-
-	unsigned Constructed : 1;    /// Unit is in construction
-	unsigned Active : 1;         /// Unit is active for AI
-	unsigned Boarded : 1;        /// Unit is on board a transporter.
-	unsigned CacheLock : 1;        /// Unit is on lock by unitcache operations.
-
-	/** set to random 1..100 when MakeUnit()
-	** used for fancy buildings
-	*/
-	unsigned Rs : 8;
-
-	unsigned TeamSelected;  /// unit is selected by a team member.
-	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
-	/// NULL if the unit was not rescued.
-	/* Seen stuff. */
-	int VisCount[PlayerMax];     /// Unit visibility counts
-	struct _seen_stuff_ {
-		_seen_stuff_() : CFrame(NULL), Type(NULL), tilePos(-1, -1) {}
-		const CConstructionFrame  *CFrame;  /// Seen construction frame
-		int         Frame;                  /// last seen frame/stage of buildings
-		const CUnitType  *Type;             /// Pointer to last seen unit-type
-		Vec2i       tilePos;                /// Last unit->tilePos Seen
-		signed char IX;                     /// Seen X image displacement to map position
-		signed char IY;                     /// seen Y image displacement to map position
-		unsigned    Constructed : 1;        /// Unit seen construction
-		unsigned    State : 3;              /// Unit seen build/upgrade state
-		unsigned    Destroyed : PlayerMax;  /// Unit seen destroyed or not
-		unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
-	} Seen;
-
-	CVariable *Variable; /// array of User Defined variables.
-
-	unsigned long TTL;  /// time to live
-
-	int GroupId;        /// unit belongs to this group id
-	int LastGroup;      /// unit belongs to this last group
-
-	unsigned int Wait;          /// action counter
-	int Threshold;              /// The counter while ai unit couldn't change target.
-
-	struct _unit_anim_ {
-		const CAnimation *Anim;      /// Anim
-		const CAnimation *CurrAnim;  /// CurrAnim
-		int Wait;                    /// Wait
-		int Unbreakable;             /// Unbreakable
-	} Anim;
-
-
-	std::vector<COrder *> Orders; /// orders to process
-	COrder *SavedOrder;         /// order to continue after current
-	COrder *NewOrder;           /// order for new trained units
-	COrder *CriticalOrder;      /// order to do as possible in breakable animation.
-
-	char *AutoCastSpell;        /// spells to auto cast
-
-	CUnit *Goal; /// Generic/Teleporter goal pointer
 
 	COrder *CurrentOrder() const { return Orders[0]; }
 
@@ -408,6 +298,129 @@ public:
 	int GetDrawLevel() const;
 
 	PixelPos GetMapPixelPosCenter() const;
+
+public:
+	class CUnitManagerData
+	{
+		friend class CUnitManager;
+	public:
+		CUnitManagerData() : slot(-1), unitSlot(-1) {}
+
+		int GetUnitId() const { return slot; }
+	private:
+		int slot;           /// index in UnitManager::unitSlots
+		int unitSlot;       /// index in UnitManager::units
+	};
+public:
+	// @note int is faster than shorts
+	unsigned int     Refs;         /// Reference counter
+	unsigned int     ReleaseCycle; /// When this unit could be recycled
+	CUnitManagerData UnitManagerData;
+	size_t PlayerSlot;  /// index in Player->Units
+
+	int    InsideCount;   /// Number of units inside.
+	int    BoardCount;    /// Number of units transported inside.
+	CUnit *UnitInside;    /// Pointer to one of the units inside.
+	CUnit *Container;     /// Pointer to the unit containing it (or 0)
+	CUnit *NextContained; /// Next unit in the container.
+	CUnit *PrevContained; /// Previous unit in the container.
+
+	CUnit *NextWorker; //pointer to next assigned worker to "Goal" resource.
+	struct {
+		CUnit *Workers; /// pointer to first assigned worker to this resource.
+		int Assigned; /// how many units are assigned to harvesting from the resource.
+		int Active; /// how many units are harvesting from the resource.
+	} Resource; /// Resource still
+
+	Vec2i tilePos; /// Map position X
+
+	unsigned int Offset;/// Map position as flat index offset (x + y * w)
+
+	const CUnitType  *Type;        /// Pointer to unit-type (peon,...)
+	CPlayer    *Player;            /// Owner of this unit
+	const CUnitStats *Stats;       /// Current unit stats
+	int         CurrentSightRange; /// Unit's Current Sight Range
+
+	// Pathfinding stuff:
+	PathFinderData *pathFinderData;
+
+	// DISPLAY:
+	int         Frame;      /// Image frame: <0 is mirrored
+	CUnitColors *Colors;    /// Player colors
+
+	signed char IX;         /// X image displacement to map position
+	signed char IY;         /// Y image displacement to map position
+	unsigned char Direction; //: 8; /// angle (0-255) unit looking
+	unsigned char CurrentResource;
+	int ResourcesHeld;      /// Resources Held by a unit
+
+	unsigned char DamagedType;   /// Index of damage type of unit which damaged this unit
+	unsigned long Attacked; /// gamecycle unit was last attacked
+	unsigned Blink : 3;     /// Let selection rectangle blink
+	unsigned Moving : 1;    /// The unit is moving
+	unsigned ReCast : 1;    /// Recast again next cycle
+	unsigned AutoRepair : 1;    /// True if unit tries to repair on still action.
+
+	unsigned Burning : 1;   /// unit is burning
+	unsigned Destroyed : 1; /// unit is destroyed pending reference
+	unsigned Removed : 1;   /// unit is removed (not on map)
+	unsigned Selected : 1;  /// unit is selected
+
+	unsigned Constructed : 1;    /// Unit is in construction
+	unsigned Active : 1;         /// Unit is active for AI
+	unsigned Boarded : 1;        /// Unit is on board a transporter.
+	unsigned CacheLock : 1;        /// Unit is on lock by unitcache operations.
+
+	/** set to random 1..100 when MakeUnit()
+	** used for fancy buildings
+	*/
+	unsigned Rs : 8;
+
+	unsigned TeamSelected;  /// unit is selected by a team member.
+	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
+	/// NULL if the unit was not rescued.
+	/* Seen stuff. */
+	int VisCount[PlayerMax];     /// Unit visibility counts
+	struct _seen_stuff_ {
+		_seen_stuff_() : CFrame(NULL), Type(NULL), tilePos(-1, -1) {}
+		const CConstructionFrame  *CFrame;  /// Seen construction frame
+		int         Frame;                  /// last seen frame/stage of buildings
+		const CUnitType  *Type;             /// Pointer to last seen unit-type
+		Vec2i       tilePos;                /// Last unit->tilePos Seen
+		signed char IX;                     /// Seen X image displacement to map position
+		signed char IY;                     /// seen Y image displacement to map position
+		unsigned    Constructed : 1;        /// Unit seen construction
+		unsigned    State : 3;              /// Unit seen build/upgrade state
+		unsigned    Destroyed : PlayerMax;  /// Unit seen destroyed or not
+		unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
+	} Seen;
+
+	CVariable *Variable; /// array of User Defined variables.
+
+	unsigned long TTL;  /// time to live
+
+	int GroupId;        /// unit belongs to this group id
+	int LastGroup;      /// unit belongs to this last group
+
+	unsigned int Wait;          /// action counter
+	int Threshold;              /// The counter while ai unit couldn't change target.
+
+	struct _unit_anim_ {
+		const CAnimation *Anim;      /// Anim
+		const CAnimation *CurrAnim;  /// CurrAnim
+		int Wait;                    /// Wait
+		int Unbreakable;             /// Unbreakable
+	} Anim;
+
+
+	std::vector<COrder *> Orders; /// orders to process
+	COrder *SavedOrder;         /// order to continue after current
+	COrder *NewOrder;           /// order for new trained units
+	COrder *CriticalOrder;      /// order to do as possible in breakable animation.
+
+	char *AutoCastSpell;        /// spells to auto cast
+
+	CUnit *Goal; /// Generic/Teleporter goal pointer
 };
 
 #define NoUnitP (CUnit *)0        /// return value: for no unit found
@@ -417,7 +430,7 @@ public:
 /**
 **  Returns unit number (unique to this unit)
 */
-#define UnitNumber(unit) ((unit).Slot)
+#define UnitNumber(unit) ((unit).UnitManagerData.GetUnitId())
 
 /**
 **  User preference.
