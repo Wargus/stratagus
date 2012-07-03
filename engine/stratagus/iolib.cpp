@@ -90,8 +90,9 @@ static int gzseek(CFile *file, unsigned offset, int whence)
 */
 int CFile::open(const char *name, long openflags)
 {
-	char buf[512];
 	const char *openstring;
+	std::string namedotgz;
+	unsigned char buf[2];
 
 	if ((openflags & CL_OPEN_READ) && (openflags & CL_OPEN_WRITE)) {
 		openstring = "rwb";
@@ -105,18 +106,21 @@ int CFile::open(const char *name, long openflags)
 		return -1;
 	}
 
+	namedotgz = name;
+	namedotgz += ".gz";
+
 	cl_type = CLF_TYPE_INVALID;
 
 	if (openflags & CL_OPEN_WRITE) {
 		if ((openflags & CL_WRITE_GZ) &&
-				(cl_gz = gzopen(strcat(strcpy(buf, name), ".gz"), openstring))) {
+				(cl_gz = gzopen(namedotgz.c_str(), openstring))) {
 			cl_type = CLF_TYPE_GZIP;
 		} else if ((cl_plain = fopen(name, openstring))) {
 			cl_type = CLF_TYPE_PLAIN;
 		}
 	} else {
 		if (!(cl_plain = fopen(name, openstring))) { // try plain first
-			if ((cl_gz = gzopen(strcat(strcpy(buf, name), ".gz"), "rb"))) {
+			if ((cl_gz = gzopen(namedotgz.c_str(), "rb"))) {
 				cl_type = CLF_TYPE_GZIP;
 			}
 		} else {
@@ -141,7 +145,6 @@ int CFile::open(const char *name, long openflags)
 	}
 
 	if (cl_type == CLF_TYPE_INVALID) {
-		//fprintf(stderr, "%s in ", buf);
 		return -1;
 	}
 
