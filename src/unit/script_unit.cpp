@@ -326,7 +326,7 @@ static int CclUnit(lua_State *l)
 			unit->Seen.Type = seentype;
 			unit->Active = 0;
 			unit->Removed = 0;
-			Assert(unit->Slot == slot);
+			Assert(UnitNumber(*unit) == slot);
 		} else if (!strcmp(value, "current-sight-range")) {
 			lua_rawgeti(l, 2, j + 1);
 			unit->CurrentSightRange = LuaToNumber(l, -1);
@@ -736,7 +736,7 @@ static int CclCreateUnit(lua_State *l)
 		}
 		UpdateForNewUnit(*unit, 0);
 
-		lua_pushnumber(l, unit->Slot);
+		lua_pushnumber(l, UnitNumber(*unit));
 		return 1;
 	}
 }
@@ -978,12 +978,12 @@ static int CclGetUnits(lua_State *l)
 		int i = 0;
 		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it, ++i) {
 			const CUnit &unit = **it;
-			lua_pushnumber(l, unit.Slot);
+			lua_pushnumber(l, UnitNumber(unit));
 			lua_rawseti(l, -2, i + 1);
 		}
 	} else {
 		for (int i = 0; i < Players[plynr].GetUnitCount(); ++i) {
-			lua_pushnumber(l, Players[plynr].GetUnit(i).Slot);
+			lua_pushnumber(l, UnitNumber(Players[plynr].GetUnit(i)));
 			lua_rawseti(l, -2, i + 1);
 		}
 	}

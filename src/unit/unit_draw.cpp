@@ -925,7 +925,7 @@ void CUnit::Draw(const CViewport *vp) const
 
 	if (!IsVisible && frame == UnitNotSeen) {
 		DebugPrint("FIXME: Something is wrong, unit %d not seen but drawn time %lu?.\n" _C_
-				   this->Slot _C_ GameCycle);
+				   UnitNumber(*this) _C_ GameCycle);
 		return;
 	}
 
@@ -1003,7 +1003,7 @@ static inline bool DrawLevelCompare(const CUnit *c1, const CUnit *c2)
 		const int pos1 = (c1->tilePos.y * PixelTileSize.y + c1->IY + c1->Type->Height);
 		const int pos2 = (c2->tilePos.y * PixelTileSize.y + c2->IY + c2->Type->Height);
 		return pos1 == pos2 ?
-			   (c1->tilePos.x != c2->tilePos.x ? c1->tilePos.x < c2->tilePos.x : c1->Slot < c2->Slot) : pos1 < pos2;
+			   (c1->tilePos.x != c2->tilePos.x ? c1->tilePos.x < c2->tilePos.x : UnitNumber(*c1) < UnitNumber(*c2)) : pos1 < pos2;
 	} else {
 		return drawlevel1 < drawlevel2;
 	}

@@ -73,7 +73,7 @@ std::string UnitReference(const CUnitPtr &unit)
 
 	std::ostringstream ss;
 	ss << "U" << std::setfill('0') << std::setw(4) << std::uppercase
-	   << std::hex << unit->Slot;
+	   << std::hex << UnitNumber(*unit);
 	return ss.str();
 }
 

@@ -607,7 +607,7 @@ void COrder_Resource::LoseResource(CUnit &unit, const CUnit &source)
 		this->DoneHarvesting = true;
 		UnitGotoGoal(unit, depot, SUB_MOVE_TO_DEPOT);
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Going to depot\n"
-				   _C_ unit.Player->Index _C_ unit.Slot);
+				   _C_ unit.Player->Index _C_ UnitNumber(unit));
 		return;
 	}
 	// No depot found, or harvester empty
@@ -622,12 +622,12 @@ void COrder_Resource::LoseResource(CUnit &unit, const CUnit &source)
 	depot = UnitFindResource(unit, unit, 15, this->CurrentResource, unit.Player->AiEnabled);
 	if (depot) {
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Found another resource.\n"
-				   _C_ unit.Player->Index _C_ unit.Slot);
+				   _C_ unit.Player->Index _C_ UnitNumber(unit));
 		this->State = SUB_START_RESOURCE;
 		this->SetGoal(depot);
 	} else {
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Just sits around confused.\n"
-				   _C_ unit.Player->Index _C_ unit.Slot);
+				   _C_ unit.Player->Index _C_ UnitNumber(unit));
 		this->Finished = true;
 	}
 }
@@ -724,7 +724,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				if (unit.Anim.Unbreakable) {
 					return 0;
 				}
-				DebugPrint("%d: Worker %d report: Resource is destroyed\n" _C_ unit.Player->Index _C_ unit.Slot);
+				DebugPrint("%d: Worker %d report: Resource is destroyed\n" _C_ unit.Player->Index _C_ UnitNumber(unit));
 				bool dead = source->IsAlive() == false;
 
 				// Improved version of DropOutAll that makes workers go to the depot.
@@ -832,9 +832,9 @@ int COrder_Resource::StopGathering(CUnit &unit)
 			if (next) {
 				if (!unit.Player->AiEnabled) {
 					DebugPrint("%d: Worker %d report: Unfreez resource gathering of %d <Wait %d> on %d [Assigned: %d Waiting %d].\n"
-							   _C_ unit.Player->Index _C_ unit.Slot
-							   _C_ next->Slot _C_ next->Wait
-							   _C_ source->Slot _C_ source->Resource.Assigned
+							   _C_ unit.Player->Index _C_ UnitNumber(unit)
+							   _C_ UnitNumber(*next) _C_ next->Wait
+							   _C_ UnitNumber(*source) _C_ source->Resource.Assigned
 							   _C_ count);
 				}
 				next->Wait = 0;
@@ -851,7 +851,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 
 #ifdef DEBUG
 	if (!unit.ResourcesHeld) {
-		DebugPrint("Unit %d is empty???\n" _C_ unit.Slot);
+		DebugPrint("Unit %d is empty???\n" _C_ UnitNumber(unit));
 	}
 #endif
 
@@ -870,7 +870,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		}
 
 		DebugPrint("%d: Worker %d report: Can't find a resource [%d] deposit.\n"
-				   _C_ unit.Player->Index _C_ unit.Slot _C_ unit.CurrentResource);
+				   _C_ unit.Player->Index _C_ UnitNumber(unit) _C_ unit.CurrentResource);
 		this->Finished = true;
 		return 0;
 	} else {
@@ -920,7 +920,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	// Target is dead, stop getting resources.
 	//
 	if (!goal.IsVisibleAsGoal(player)) {
-		DebugPrint("%d: Worker %d report: Destroyed depot\n" _C_ player.Index _C_ unit.Slot);
+		DebugPrint("%d: Worker %d report: Destroyed depot\n" _C_ player.Index _C_ UnitNumber(unit));
 
 		unit.CurrentOrder()->ClearGoal();
 
@@ -928,10 +928,10 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 
 		if (depot) {
 			UnitGotoGoal(unit, depot, SUB_MOVE_TO_DEPOT);
-			DebugPrint("%d: Worker %d report: Going to new deposit.\n" _C_ player.Index _C_ unit.Slot);
+			DebugPrint("%d: Worker %d report: Going to new deposit.\n" _C_ player.Index _C_ UnitNumber(unit));
 		} else {
 			DebugPrint("%d: Worker %d report: Can't find a new resource deposit.\n"
-					   _C_ player.Index _C_ unit.Slot);
+					   _C_ player.Index _C_ UnitNumber(unit));
 
 			// FIXME: perhaps we should choose an alternative
 			this->Finished = true;
@@ -1028,7 +1028,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 #ifdef DEBUG
 			const Vec2i &pos = mine ? mine->tilePos : unit.tilePos;
 			DebugPrint("%d: Worker %d report: [%d,%d] Resource gone near [%d,%d] in range %d. Sit and play dumb.\n"
-					   _C_ unit.Player->Index _C_ unit.Slot
+					   _C_ unit.Player->Index _C_ UnitNumber(unit)
 					   _C_ unit.tilePos.x _C_ unit.tilePos.y
 					   _C_ pos.x _C_ pos.y _C_ range);
 #endif // DEBUG
@@ -1075,7 +1075,7 @@ void COrder_Resource::DropResource(CUnit &unit)
 */
 void COrder_Resource::ResourceGiveUp(CUnit &unit)
 {
-	DebugPrint("%d: Worker %d report: Gave up on resource gathering.\n" _C_ unit.Player->Index _C_ unit.Slot);
+	DebugPrint("%d: Worker %d report: Gave up on resource gathering.\n" _C_ unit.Player->Index _C_ UnitNumber(unit));
 	if (this->HasGoal()) {
 		DropResource(unit);
 		this->ClearGoal();

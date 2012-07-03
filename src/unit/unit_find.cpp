@@ -978,7 +978,7 @@ struct CompareUnitDistance {
 		int d1 = c1->MapDistanceTo(*referenceunit);
 		int d2 = c2->MapDistanceTo(*referenceunit);
 		if (d1 == d2) {
-			return c1->Slot < c2->Slot;
+			return UnitNumber(*c1) < UnitNumber(*c2);
 		} else {
 			return d1 < d2;
 		}

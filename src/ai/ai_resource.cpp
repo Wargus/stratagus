@@ -413,7 +413,7 @@ void AiNewDepotRequest(CUnit &worker)
 		worker.Player->Ai->UnitTypeBuilt.push_back(queue);
 
 		DebugPrint("%d: Worker %d report: Requesting new depot near [%d,%d].\n"
-				   _C_ worker.Player->Index _C_ worker.Slot
+				   _C_ worker.Player->Index _C_ UnitNumber(worker)
 				   _C_ queue.Pos.x _C_ queue.Pos.y);
 		/*
 		} else {

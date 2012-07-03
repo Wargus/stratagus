@@ -674,10 +674,10 @@ void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
 	for (it = CommandsIn.begin(); it != CommandsIn.end(); ++it) {
 		ncq = *it;
 		if ((ncq->Type & 0x7F) == command
-			&& ncq->Data.Unit == htons(unit.Slot)
+			&& ncq->Data.Unit == htons(UnitNumber(unit))
 			&& ncq->Data.X == htons(x)
 			&& ncq->Data.Y == htons(y)) {
-			if (dest && ncq->Data.Dest == htons(dest->Slot)) {
+			if (dest && ncq->Data.Dest == htons(UnitNumber(*dest))) {
 				return;
 			} else if (type && ncq->Data.Dest == htons(type->Slot)) {
 				return;
@@ -695,12 +695,12 @@ void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
 	if (status) {
 		ncq->Type |= 0x80;
 	}
-	ncq->Data.Unit = htons(unit.Slot);
+	ncq->Data.Unit = htons(UnitNumber(unit));
 	ncq->Data.X = htons(x);
 	ncq->Data.Y = htons(y);
 	Assert(!dest || !type);  // Both together isn't allowed
 	if (dest) {
-		ncq->Data.Dest = htons(dest->Slot);
+		ncq->Data.Dest = htons(UnitNumber(*dest));
 	} else if (type) {
 		ncq->Data.Dest = htons(type->Slot);
 	} else {

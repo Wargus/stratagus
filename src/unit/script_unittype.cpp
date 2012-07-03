@@ -1715,7 +1715,7 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.Variable[RADARJAMMER_INDEX].Max = unit.Stats->Variables[RADARJAMMER_INDEX].Value;
 
 	// SlotNumber
-	unit.Variable[SLOT_INDEX].Value = unit.Slot;
+	unit.Variable[SLOT_INDEX].Value = UnitNumber(unit);
 	unit.Variable[SLOT_INDEX].Max = UnitManager.GetUsedSlotCount();
 
 	for (int i = 0; i < NVARALREADYDEFINED; i++) { // default values
@@ -1724,7 +1724,7 @@ void UpdateUnitVariables(CUnit &unit)
 		if (unit.Variable[i].Value > unit.Variable[i].Max) {
 			DebugPrint("Value out of range: '%s'(%d), for variable '%s',"
 					   " value = %d, max = %d\n"
-					   _C_ type->Ident.c_str() _C_ unit.Slot _C_ UnitTypeVar.VariableNameLookup[i]
+					   _C_ type->Ident.c_str() _C_ UnitNumber(unit) _C_ UnitTypeVar.VariableNameLookup[i]
 					   _C_ unit.Variable[i].Value _C_ unit.Variable[i].Max);
 			unit.Variable[i].Value = unit.Variable[i].Max;
 		} else
