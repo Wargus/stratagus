@@ -791,8 +791,8 @@ void AiForceManager::Update()
 				}
 			} else { // Find idle units and order them to defend
 				std::vector<CUnit *> idleUnits;
-				for (unsigned int i = 0; i != Size(); ++i) {
-					CUnit &aiunit = *Units[i];
+				for (unsigned int i = 0; i != force.Size(); ++i) {
+					CUnit &aiunit = *force.Units[i];
 
 					if (aiunit.IsIdle()) {
 						if (aiunit.IsAliveOnMap()) {
