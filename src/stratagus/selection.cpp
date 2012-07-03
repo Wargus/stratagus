@@ -558,16 +558,16 @@ int SelectGroup(int group_number, GroupSelectionMode mode)
 */
 int AddGroupFromUnitToSelection(CUnit &unit)
 {
-	int i;
-	int group;
+	int group = unit.LastGroup;
 
-	if (!(group = unit.LastGroup)) { // belongs to no group
+	if (!group) { // belongs to no group
 		return 0;
 	}
 
-	for (i = 0; i < NumUnits; ++i) {
-		if (Units[i]->LastGroup == group && !Units[i]->Removed) {
-			SelectUnit(*Units[i]);
+	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+		CUnit &unit = **it;
+		if (unit.LastGroup == group && !unit.Removed) {
+			SelectUnit(unit);
 			if (NumSelected == MaxSelectable) {
 				return NumSelected;
 			}
@@ -1101,7 +1101,7 @@ static int CclSelection(lua_State *l)
 		lua_rawgeti(l, 2, j + 1);
 		const char *str = LuaToString(l, -1);
 		lua_pop(l, 1);
-		Selected[j] = &UnitManager.GetUnit(strtol(str + 1, NULL, 16));
+		Selected[j] = &UnitManager.GetSlotUnit(strtol(str + 1, NULL, 16));
 	}
 	return 0;
 }

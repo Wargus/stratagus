@@ -39,7 +39,6 @@
 #include "actions.h"
 #include "commands.h"
 #include "construct.h"
-#include "cursor.h"
 #include "depend.h"
 #include "font.h"
 #include "interface.h"
@@ -54,15 +53,14 @@
 #include "player.h"
 #include "replay.h"
 #include "results.h"
-#include "script.h"
 #include "settings.h"
 #include "sound.h"
 #include "sound_server.h"
 #include "spells.h"
-#include "tileset.h"
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"
+#include "unit_manager.h"
 #include "unittype.h"
 #include "upgrade.h"
 
@@ -225,7 +223,6 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map, char *)
 int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 {
 	FileWriter *f = NULL;
-	int i, j;
 
 	try {
 		f = CreateFileWriter(mapSetup);
@@ -236,7 +233,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 		f->printf("-- File licensed under the GNU GPL version 2.\n\n");
 
 		f->printf("-- player configuration\n");
-		for (i = 0; i < PlayerMax; ++i) {
+		for (int i = 0; i < PlayerMax; ++i) {
 			if (Players[i].Type == PlayerNobody) {
 				continue;
 			}
@@ -262,12 +259,10 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 
 		if (writeTerrain) {
 			f->printf("-- Tiles Map\n");
-			for (i = 0; i < map.Info.MapHeight; ++i) {
-				for (j = 0; j < map.Info.MapWidth; ++j) {
-					int tile;
+			for (int i = 0; i < map.Info.MapHeight; ++i) {
+				for (int j = 0; j < map.Info.MapWidth; ++j) {
+					const int tile = map.Fields[j + i * map.Info.MapWidth].Tile;
 					int n;
-
-					tile = map.Fields[j + i * map.Info.MapWidth].Tile;
 					for (n = 0; n < map.Tileset.NumTiles && tile != map.Tileset.Table[n]; ++n) {
 					}
 					const int value = map.Fields[j + i * map.Info.MapWidth].Value;
@@ -277,13 +272,14 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 		}
 
 		f->printf("-- place units\n");
-		for (i = 0; i < NumUnits; ++i) {
+		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+			CUnit &unit = **it;
 			f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
-					  Units[i]->Type->Ident.c_str(),
-					  Units[i]->Player->Index,
-					  Units[i]->tilePos.x, Units[i]->tilePos.y);
-			if (Units[i]->Type->GivesResource) {
-				f->printf("SetResourcesHeld(unit, %d)\n", Units[i]->ResourcesHeld);
+					  unit.Type->Ident.c_str(),
+					  unit.Player->Index,
+					  unit.tilePos.x, unit.tilePos.y);
+			if (unit.Type->GivesResource) {
+				f->printf("SetResourcesHeld(unit, %d)\n", unit.ResourcesHeld);
 			}
 		}
 		f->printf("\n\n");
@@ -760,13 +756,13 @@ void CreateGame(const std::string &filename, CMap *map)
 	// FIXME: The palette is loaded after the units are created.
 	// FIXME: This loops fixes the colors of the units.
 	//
-	for (int i = 0; i < NumUnits; ++i) {
-		// I don't really think that there can be any rescued
-		// units at this point.
-		if (Units[i]->RescuedFrom) {
-			Units[i]->Colors = &Units[i]->RescuedFrom->UnitColors;
+	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+		CUnit &unit = **it;
+		// I don't really think that there can be any rescued units at this point.
+		if (unit.RescuedFrom) {
+			unit.Colors = &unit.RescuedFrom->UnitColors;
 		} else {
-			Units[i]->Colors = &Units[i]->Player->UnitColors;
+			unit.Colors = &unit.Player->UnitColors;
 		}
 	}
 

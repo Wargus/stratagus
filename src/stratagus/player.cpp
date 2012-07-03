@@ -903,35 +903,27 @@ bool CPlayer::CheckResource(int resource, int value)
 int CPlayer::CheckLimits(const CUnitType &type) const
 {
 	//  Check game limits.
-	if (NumUnits < UnitMax) {
-		if (type.Building && NumBuildings >= BuildingLimit) {
-			Notify("%s", _("Building Limit Reached"));
-			return -1;
-		}
-		if (!type.Building && (this->GetUnitCount() - NumBuildings) >= UnitLimit) {
-			Notify("%s", _("Unit Limit Reached"));
-			return -2;
-		}
-		if (this->Demand + type.Demand > this->Supply && type.Demand) {
-			Notify("%s", _("Insufficient Supply, increase Supply."));
-			return -3;
-		}
-		if (this->GetUnitCount() >= TotalUnitLimit) {
-			Notify("%s", _("Total Unit Limit Reached"));
-			return -4;
-		}
-		if (UnitTypesCount[type.Slot] >=  Allow.Units[type.Slot]) {
-			Notify(_("Limit of %d reached for this unit type"), Allow.Units[type.Slot]);
-			return -6;
-		}
-		return 1;
-	} else {
-		Notify("%s", _("Cannot create more units."));
-		if (AiEnabled) {
-			// AiNoMoreUnits(player, type);
-		}
-		return -5;
+	if (type.Building && NumBuildings >= BuildingLimit) {
+		Notify("%s", _("Building Limit Reached"));
+		return -1;
 	}
+	if (!type.Building && (this->GetUnitCount() - NumBuildings) >= UnitLimit) {
+		Notify("%s", _("Unit Limit Reached"));
+		return -2;
+	}
+	if (this->Demand + type.Demand > this->Supply && type.Demand) {
+		Notify("%s", _("Insufficient Supply, increase Supply."));
+		return -3;
+	}
+	if (this->GetUnitCount() >= TotalUnitLimit) {
+		Notify("%s", _("Total Unit Limit Reached"));
+		return -4;
+	}
+	if (UnitTypesCount[type.Slot] >=  Allow.Units[type.Slot]) {
+		Notify(_("Limit of %d reached for this unit type"), Allow.Units[type.Slot]);
+		return -6;
+	}
+	return 1;
 }
 
 /**

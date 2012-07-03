@@ -446,9 +446,6 @@ extern CPreference Preference;
 -- Variables
 ----------------------------------------------------------------------------*/
 
-extern CUnit *Units[MAX_UNIT_SLOTS]; /// Units used
-extern int NumUnits;                 /// Number of units used
-
 // in unit_draw.c
 /// @todo could be moved into the user interface ?
 extern unsigned long ShowOrdersCount;   /// Show orders for some time

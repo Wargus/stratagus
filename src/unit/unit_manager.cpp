@@ -47,16 +47,22 @@
 
 CUnitManager UnitManager;          /// Unit manager
 
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+CUnitManager::CUnitManager() : lastCreated(NULL)
+{
+}
 
 /**
 **  Initial memory allocation for units.
 */
 void CUnitManager::Init()
 {
+	lastCreated = NULL;
+	Assert(units.empty());
+	units.clear();
 	// Release memory of units in release list.
 	while (!releasedUnits.empty()) {
 		CUnit *unit = releasedUnits.front();
@@ -66,6 +72,7 @@ void CUnitManager::Init()
 
 	// Initialize the free unit slots
 	unitSlots.clear();
+
 }
 
 /**
@@ -85,10 +92,7 @@ CUnit *CUnitManager::AllocUnit()
 		return unit;
 	} else {
 		CUnit *unit = new CUnit;
-		if (!unit) {
-			fprintf(stderr, "Out of memory\n");
-			return NULL;
-		}
+
 		unit->Slot = unitSlots.size();
 		unitSlots.push_back(unit);
 		return unit;
@@ -102,12 +106,21 @@ CUnit *CUnitManager::AllocUnit()
 */
 void CUnitManager::ReleaseUnit(CUnit *unit)
 {
+	Assert(unit);
+	Assert(units[unit->UnitSlot] == unit);
+	if (lastCreated == unit) {
+		lastCreated = NULL;
+	}
+	CUnit *temp = units.back();
+	temp->UnitSlot = unit->UnitSlot;
+	units[unit->UnitSlot] = temp;
+	units.pop_back();
 	releasedUnits.push_back(unit);
 	unit->ReleaseCycle = GameCycle + 500; // can be reused after this time
 	//Refs = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
 }
 
-CUnit& CUnitManager::GetUnit(int index) const
+CUnit& CUnitManager::GetSlotUnit(int index) const
 {
 	return *unitSlots[index];
 }
@@ -115,6 +128,33 @@ CUnit& CUnitManager::GetUnit(int index) const
 unsigned int CUnitManager::GetUsedSlotCount() const
 {
 	return static_cast<unsigned int>(unitSlots.size());
+}
+
+CUnitManager::Iterator CUnitManager::begin()
+{
+	return units.begin();
+}
+
+CUnitManager::Iterator CUnitManager::end()
+{
+	return units.end();
+}
+
+bool CUnitManager::empty() const
+{
+	return units.empty();
+}
+
+CUnit* CUnitManager::lastCreatedUnit()
+{
+	return this->lastCreated;
+}
+
+void CUnitManager::Add(CUnit *unit)
+{
+	lastCreated = unit;
+	unit->UnitSlot = static_cast<int>(units.size());
+	units.push_back(unit);
 }
 
 /**
@@ -132,8 +172,9 @@ void CUnitManager::Save(CFile &file) const
 	}
 	file.printf(")\n");
 
-	for (CUnit **table = Units; table < &Units[NumUnits]; ++table) {
-		SaveUnit(**table, file);
+	for (std::vector<CUnit *>::const_iterator it = units.begin(); it != units.end(); ++it) {
+		const CUnit &unit = **it;
+		SaveUnit(unit, file);
 	}
 }
 

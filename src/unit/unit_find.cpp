@@ -46,6 +46,7 @@
 #include "player.h"
 #include "spells.h"
 #include "unit.h"
+#include "unit_manager.h"
 #include "unittype.h"
 
 /*----------------------------------------------------------------------------
@@ -458,8 +459,8 @@ CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 */
 void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units)
 {
-	for (int i = 0; i < NumUnits; ++i) {
-		CUnit &unit = *Units[i];
+	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+		CUnit &unit = **it;
 
 		if (unit.Type == &type && !unit.IsUnusable()) {
 			units.push_back(&unit);

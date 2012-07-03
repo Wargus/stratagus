@@ -1263,7 +1263,7 @@ static int CclDefineAiPlayer(lua_State *l)
 						UNUSED(ident);
 						lua_pop(l, 1);
 #endif
-						ai->Force[forceIdx].Units.Insert(&UnitManager.GetUnit(num));
+						ai->Force[forceIdx].Units.Insert(&UnitManager.GetSlotUnit(num));
 					}
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "state")) {

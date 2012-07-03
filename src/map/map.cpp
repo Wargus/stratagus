@@ -39,6 +39,7 @@
 #include "map.h"
 
 #include "tileset.h"
+#include "unit_manager.h"
 #include "ui.h"
 
 /*----------------------------------------------------------------------------
@@ -141,17 +142,18 @@ void CMap::Reveal()
 		}
 	}
 	//  Global seen recount. Simple and effective.
-	for (int i = 0; i < NumUnits; ++i) {
+	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+		CUnit &unit = **it;
 		//  Reveal neutral buildings. Gold mines:)
-		if (Units[i]->Player->Type == PlayerNeutral) {
+		if (unit.Player->Type == PlayerNeutral) {
 			for (int p = 0; p < PlayerMax; ++p) {
-				if (Players[p].Type != PlayerNobody && (!(Units[i]->Seen.ByPlayer & (1 << p)))) {
-					UnitGoesOutOfFog(*Units[i], Players[p]);
-					UnitGoesUnderFog(*Units[i], Players[p]);
+				if (Players[p].Type != PlayerNobody && (!(unit.Seen.ByPlayer & (1 << p)))) {
+					UnitGoesOutOfFog(unit, Players[p]);
+					UnitGoesUnderFog(unit, Players[p]);
 				}
 			}
 		}
-		UnitCountSeen(*Units[i]);
+		UnitCountSeen(unit);
 	}
 }
 

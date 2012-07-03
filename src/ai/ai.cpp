@@ -142,17 +142,18 @@
 #include "ai.h"
 #include "ai_local.h"
 
+#include "actions.h"
 #include "action/action_attack.h"
 #include "commands.h"
-#include "player.h"
-#include "unit.h"
-#include "unittype.h"
-#include "upgrade.h"
-#include "script.h"
-#include "actions.h"
+#include "iolib.h"
 #include "map.h"
 #include "pathfinder.h"
-#include "iolib.h"
+#include "player.h"
+#include "script.h"
+#include "unit.h"
+#include "unit_manager.h"
+#include "unittype.h"
+#include "upgrade.h"
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -850,8 +851,8 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 	movablenb = 0;
 
 	// Try to make some unit moves around it
-	for (int it = 0; it < NumUnits; ++it) {
-		CUnit &blocker = *Units[it];
+	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+		CUnit &blocker = **it;
 
 		if (blocker.IsUnusable()) {
 			continue;
@@ -887,13 +888,13 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 		}
 
 		// Move blocker in a rand dir
-		int i = SyncRand() & 7;
+		int r = SyncRand() & 7;
 		int trycount = 8;
 		while (trycount > 0) {
-			i = (i + 1) & 7;
+			r = (r + 1) & 7;
 			--trycount;
 
-			const Vec2i pos = blocker.tilePos + dirs[i];
+			const Vec2i pos = blocker.tilePos + dirs[r];
 
 			// Out of the map => no !
 			if (!Map.Info.IsPointOnMap(pos)) {

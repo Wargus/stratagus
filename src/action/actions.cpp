@@ -68,6 +68,7 @@
 #include "script.h"
 #include "unit.h"
 #include "unit_find.h"
+#include "unit_manager.h"
 #include "unittype.h"
 
 /*----------------------------------------------------------------------------
@@ -466,10 +467,8 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 void UnitActions()
 {
 	const bool isASecondCycle = !(GameCycle % CYCLES_PER_SECOND);
-	std::vector<CUnit *> table;
-
-	// Units may be modified during loop...
-	table.insert(table.begin(), Units, Units + NumUnits);
+	// Unit list may be modified during loop... so make a copy
+	std::vector<CUnit *> table(UnitManager.begin(), UnitManager.end());
 
 	// Check for things that only happen every second
 	if (isASecondCycle) {

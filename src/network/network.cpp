@@ -838,7 +838,7 @@ static void NetworkProcessSelection(CNetworkPacket *packet, int player)
 		CNetworkSelection *selection = reinterpret_cast<CNetworkSelection *>(&packet->Command[i]);
 
 		for (int j = 0; j < 4 && units.size() < count; ++j) {
-			units.push_back(Units[ntohs(selection->Unit[j])]);
+			units.push_back(&UnitManager.GetSlotUnit(ntohs(selection->Unit[j])));
 		}
 	}
 	Assert(count == units.size());
@@ -1032,7 +1032,7 @@ void NetworkEvent()
 				// Fall through!
 			default: {
 				const unsigned int slot = ntohs(nc->Unit);
-				const CUnit* unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetUnit(slot) : NULL;
+				const CUnit* unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : NULL;
 
 				if (unit && (unit->Player->Index == player
 						|| Players[player].IsTeamed(*unit))) {
@@ -1245,7 +1245,7 @@ static void NetworkSendCommands()
 				incommand = CommandsIn.front();
 #ifdef DEBUG
 				if (incommand->Type != MessageExtendedCommand) {
-					CUnit &unit = UnitManager.GetUnit(ntohs(ncq->Data.Unit));
+					CUnit &unit = UnitManager.GetSlotUnit(ntohs(ncq->Data.Unit));
 					// FIXME: we can send destoyed units over network :(
 					if (unit.Destroyed) {
 						DebugPrint("Sending destroyed unit %d over network!!!!!!\n" _C_
@@ -1409,3 +1409,4 @@ void NetworkRecover()
 }
 
 //@}
+

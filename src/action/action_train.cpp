@@ -194,12 +194,6 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 	this->Ticks = std::min(this->Ticks, cost);
 
-	// Check if there are still unit slots.
-	if (NumUnits >= UnitMax) {
-		unit.Wait = CYCLES_PER_SECOND / 6;
-		return ;
-	}
-
 	// Check if enough supply available.
 	const int food = player.CheckLimits(nType);
 	if (food < 0) {

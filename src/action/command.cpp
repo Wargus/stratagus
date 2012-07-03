@@ -46,6 +46,7 @@
 #include "upgrade.h"
 #include "ui.h"
 #include "unit.h"
+#include "unit_manager.h"
 #include "unittype.h"
 
 /*----------------------------------------------------------------------------
@@ -831,9 +832,10 @@ void CommandDiplomacy(int player, int state, int opponent)
 void CommandSharedVision(int player, bool state, int opponent)
 {
 	// Do a real hardcore seen recount. First we unmark EVERYTHING.
-	for (int i = 0; i < NumUnits; ++i) {
-		if (!Units[i]->Destroyed) {
-			MapUnmarkUnitSight(*Units[i]);
+	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+		CUnit &unit = **it;
+		if (!unit.Destroyed) {
+			MapUnmarkUnitSight(unit);
 		}
 	}
 
@@ -870,9 +872,10 @@ void CommandSharedVision(int player, bool state, int opponent)
 	}
 
 	// Do a real hardcore seen recount. Now we remark EVERYTHING
-	for (int i = 0; i < NumUnits; ++i) {
-		if (!Units[i]->Destroyed) {
-			MapMarkUnitSight(*Units[i]);
+	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+		CUnit &unit = **it;
+		if (!unit.Destroyed) {
+			MapMarkUnitSight(unit);
 		}
 	}
 }

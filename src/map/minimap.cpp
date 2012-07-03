@@ -43,6 +43,7 @@
 #include "map.h"
 #include "player.h"
 #include "unit.h"
+#include "unit_manager.h"
 #include "ui.h"
 #include "unittype.h"
 #include "video.h"
@@ -533,9 +534,10 @@ void CMinimap::Update()
 	//
 	// Draw units on map
 	//
-	for (int n = 0; n < NumUnits; ++n) {
-		if (Units[n]->IsVisibleOnMinimap()) {
-			DrawUnitOn(*Units[n], red_phase);
+	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+		CUnit &unit = **it;
+		if (unit.IsVisibleOnMinimap()) {
+			DrawUnitOn(unit, red_phase);
 		}
 	}
 	if (!UseOpenGL) {

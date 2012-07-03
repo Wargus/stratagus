@@ -125,7 +125,7 @@ static int CclResourcesMultiBuildersMultiplier(lua_State *l)
 */
 static CUnit *CclGetUnit(lua_State *l)
 {
-	return &UnitManager.GetUnit((int)LuaToNumber(l, -1));
+	return &UnitManager.GetSlotUnit((int)LuaToNumber(l, -1));
 }
 
 /**
@@ -140,7 +140,7 @@ CUnit *CclGetUnitFromRef(lua_State *l)
 	const char *const value = LuaToString(l, -1);
 	unsigned int slot = strtol(value + 1, NULL, 16);
 	Assert(slot < UnitManager.GetUsedSlotCount());
-	return &UnitManager.GetUnit(slot);
+	return &UnitManager.GetSlotUnit(slot);
 }
 
 
@@ -321,7 +321,7 @@ static int CclUnit(lua_State *l)
 			// unit->CurrentAction()==UnitActionDie so we have to wait
 			// until we parsed at least Unit::Orders[].
 			Assert(type);
-			unit = &UnitManager.GetUnit(slot);
+			unit = &UnitManager.GetSlotUnit(slot);
 			unit->Init(*type);
 			unit->Seen.Type = seentype;
 			unit->Active = 0;
@@ -595,7 +595,7 @@ static int CclUnit(lua_State *l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "goal")) {
 			lua_rawgeti(l, 2, j + 1);
-			unit->Goal = &UnitManager.GetUnit(LuaToNumber(l, -1));
+			unit->Goal = &UnitManager.GetSlotUnit(LuaToNumber(l, -1));
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "auto-cast")) {
 			lua_rawgeti(l, 2, j + 1);
@@ -881,9 +881,9 @@ static int CclKillUnit(lua_State *l)
 	lua_pop(l, 1);
 	const int plynr = TriggerGetPlayer(l);
 	if (plynr == -1) {
-		CUnit **it = std::find_if(Units, Units + NumUnits, HasSameUnitTypeAs(unittype));
+		CUnitManager::Iterator it = std::find_if(UnitManager.begin(), UnitManager.end(), HasSameUnitTypeAs(unittype));
 
-		if (it != Units + NumUnits) {
+		if (it != UnitManager.end()) {
 			LetUnitDie(**it);
 			lua_pushboolean(l, 1);
 			return 1;
@@ -975,8 +975,10 @@ static int CclGetUnits(lua_State *l)
 
 	lua_newtable(l);
 	if (plynr == -1) {
-		for (int i = 0; i < NumUnits; ++i) {
-			lua_pushnumber(l, Units[i]->Slot);
+		int i = 0;
+		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it, ++i) {
+			const CUnit &unit = **it;
+			lua_pushnumber(l, unit.Slot);
 			lua_rawseti(l, -2, i + 1);
 		}
 	} else {

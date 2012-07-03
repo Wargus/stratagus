@@ -781,8 +781,8 @@ static void DoNextReplay()
 	const Vec2i pos(ReplayStep->PosX, ReplayStep->PosY);
 	const int arg1 = ReplayStep->PosX;
 	const int arg2 = ReplayStep->PosY;
-	CUnit *unit = unitSlot != -1 ? &UnitManager.GetUnit(unitSlot) : NULL;
-	CUnit *dunit = (ReplayStep->DestUnitNumber != -1 ? &UnitManager.GetUnit(ReplayStep->DestUnitNumber) : NULL);
+	CUnit *unit = unitSlot != -1 ? &UnitManager.GetSlotUnit(unitSlot) : NULL;
+	CUnit *dunit = (ReplayStep->DestUnitNumber != -1 ? &UnitManager.GetSlotUnit(ReplayStep->DestUnitNumber) : NULL);
 	const char *val = ReplayStep->Value.c_str();
 	const int num = ReplayStep->Num;
 

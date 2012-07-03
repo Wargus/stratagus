@@ -50,18 +50,33 @@ struct lua_State;
 class CUnitManager
 {
 public:
+	typedef std::vector<CUnit*>::iterator Iterator;
+public:
+	CUnitManager();
 	void Init();
+
 	CUnit *AllocUnit();
 	void ReleaseUnit(CUnit *unit);
 	void Save(CFile &file) const;
 	void Load(lua_State *Lua);
 
-	CUnit& GetUnit(int slot) const;
+	// Following is for already allocated Unit (no specific order)
+	void Add(CUnit *unit);
+	Iterator begin();
+	Iterator end();
+	bool empty() const;
+
+	CUnit* lastCreatedUnit();
+
+	// Following is mainly for scripting
+	CUnit& GetSlotUnit(int index) const;
 	unsigned int GetUsedSlotCount() const;
 
 private:
+	std::vector<CUnit *> units;
 	std::vector<CUnit *> unitSlots;
 	std::list<CUnit *> releasedUnits;
+	CUnit* lastCreated;
 };
 
 

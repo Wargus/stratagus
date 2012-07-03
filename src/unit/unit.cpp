@@ -353,9 +353,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-CUnit *Units[MAX_UNIT_SLOTS];             /// Array of used slots
-int NumUnits;                             /// Number of slots used
-
 bool EnableTrainingQueue;                 /// Config: training queues enabled
 bool EnableBuildingCapture;               /// Config: capture buildings enabled
 bool RevealAttacker;                      /// Config: reveal attacker enabled
@@ -501,6 +498,10 @@ void CUnit::Release(bool final)
 			RemoveUnitFromContainer(*this);
 		}
 
+		while (Resource.Workers) {
+			Resource.Workers->DeAssignWorkerFromMine(*this);
+		}
+
 		if (--Refs > 0) {
 			return;
 		}
@@ -525,11 +526,6 @@ void CUnit::Release(bool final)
 	Orders.clear();
 
 	// Remove the unit from the global units table.
-	Assert(Units[UnitSlot] == this);
-	CUnit *temp = Units[--NumUnits];
-	temp->UnitSlot = UnitSlot;
-	Units[UnitSlot] = temp;
-	Units[NumUnits] = NULL;
 	UnitManager.ReleaseUnit(this);
 }
 
@@ -575,8 +571,7 @@ void CUnit::Init(const CUnitType &type)
 	Refs = 1;
 
 	//  Build all unit table
-	UnitSlot = NumUnits;
-	Units[NumUnits++] = this;
+	UnitManager.Add(this);
 
 	//  Initialise unit structure (must be zero filled!)
 	Type = &type;
@@ -735,12 +730,6 @@ void CUnit::AssignToPlayer(CPlayer &player)
 */
 CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 {
-	// Game unit limit reached.
-	if (NumUnits >= UnitMax) {
-		DebugPrint("Over all unit limit (%d) reached.\n" _C_ UnitMax);
-		return NULL;
-	}
-
 	CUnit *unit = UnitManager.AllocUnit();
 	if (unit == NULL) {
 		return NULL;
@@ -2296,55 +2285,54 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 	if (!ounit) { // no old on this position
 		flag = 1;
 	}
-	for (CUnit **table = Units; table < Units + NumUnits; ++table) {
-		CUnit *unit = *table;
-		if (!ReplayRevealMap && !unit->IsVisibleAsGoal(*ThisPlayer)) {
+	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+		CUnit &unit = **it;
+		if (!ReplayRevealMap && !unit.IsVisibleAsGoal(*ThisPlayer)) {
 			continue;
 		}
-		const CUnitType *type = unit->Type;
+		const CUnitType &type = *unit.Type;
 
 		//
 		// Check if mouse is over the unit.
 		//
-		int gx = unit->tilePos.x * PixelTileSize.x + unit->IX;
-
+		const int gx = unit.tilePos.x * PixelTileSize.x + unit.IX;
 		{
-			const int local_width = type->TileWidth * PixelTileSize.x;
-			if (x + (type->BoxWidth - local_width) / 2 < gx) {
+			const int local_width = type.TileWidth * PixelTileSize.x;
+			if (x + (type.BoxWidth - local_width) / 2 < gx) {
 				continue;
 			}
-			if (x > gx + (local_width + type->BoxWidth) / 2) {
+			if (x > gx + (local_width + type.BoxWidth) / 2) {
 				continue;
 			}
 		}
 
-		int gy = unit->tilePos.y * PixelTileSize.y + unit->IY;
+		const int gy = unit.tilePos.y * PixelTileSize.y + unit.IY;
 		{
-			const int local_height = type->TileHeight * PixelTileSize.y;
-			if (y + (type->BoxHeight - local_height) / 2 < gy) {
+			const int local_height = type.TileHeight * PixelTileSize.y;
+			if (y + (type.BoxHeight - local_height) / 2 < gy) {
 				continue;
 			}
-			if (y > gy + (local_height + type->BoxHeight) / 2) {
+			if (y > gy + (local_height + type.BoxHeight) / 2) {
 				continue;
 			}
 		}
 		// Check if better units are present on this location
-		if (unit->Type->IsNotSelectable) {
-			funit = unit;
+		if (unit.Type->IsNotSelectable) {
+			funit = &unit;
 			continue;
 		}
 		//
 		// This could be taken.
 		//
 		if (flag) {
-			return unit;
+			return &unit;
 		}
-		if (unit == ounit) {
+		if (&unit == ounit) {
 			flag = 1;
 		} else if (!funit) {
-			funit = unit;
+			funit = &unit;
 		}
-		nunit = unit;
+		nunit = &unit;
 	}
 
 	if (flag && funit) {
@@ -3088,7 +3076,6 @@ bool CUnit::IsUnusable(bool ignore_built_state) const
 void InitUnits()
 {
 	if (!SaveGameLoading) {
-		NumUnits = 0;
 		UnitManager.Init();
 	}
 }
@@ -3099,24 +3086,19 @@ void InitUnits()
 void CleanUnits()
 {
 	//  Free memory for all units in unit table.
-	while (NumUnits) {
-		int count = NumUnits;
-		do {
-			CUnit *unit = Units[count - 1];
+	std::vector<CUnit *> units(UnitManager.begin(), UnitManager.end());
 
-			if (unit == NULL) {
-				continue;
+	for (std::vector<CUnit *>::iterator it = units.begin(); it != units.end(); ++it) {
+		CUnit &unit = **it;
+
+		if (!unit.Destroyed) {
+			if (!unit.Removed) {
+				unit.Remove(NULL);
 			}
-			if (!unit->Destroyed) {
-				if (!unit->Removed) {
-					unit->Remove(NULL);
-				}
-				UnitClearOrders(*unit);
-			}
-			unit->Release(true);
-		} while (--count);
+			UnitClearOrders(unit);
+		}
+		unit.Release(true);
 	}
-	NumUnits = 0;
 
 	UnitManager.Init();
 

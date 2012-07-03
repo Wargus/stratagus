@@ -43,6 +43,7 @@
 #include "player.h"
 #include "tileset.h"
 #include "ui.h"
+#include "unit_manager.h"
 #include "../video/intern_video.h"
 
 /*----------------------------------------------------------------------------
@@ -324,8 +325,9 @@ void UpdateFogOfWarChange()
 	//
 	//  Global seen recount.
 	//
-	for (int x = 0; x < NumUnits; ++x) {
-		UnitCountSeen(*Units[x]);
+	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+		CUnit &unit = **it;
+		UnitCountSeen(unit);
 	}
 }
 

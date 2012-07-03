@@ -40,6 +40,7 @@
 #include "ui.h"
 #include "player.h"
 #include "unit.h"
+#include "unit_manager.h"
 #include "unittype.h"
 
 /*----------------------------------------------------------------------------
@@ -652,8 +653,8 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 */
 static void EditorDestroyAllUnits()
 {
-	while (NumUnits != 0) {
-		CUnit &unit = *Units[0];
+	while (UnitManager.empty() == false) {
+		CUnit &unit = **UnitManager.begin();
 
 		unit.Remove(NULL);
 		UnitLost(unit);

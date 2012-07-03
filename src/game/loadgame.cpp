@@ -34,31 +34,28 @@
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
-#include "icons.h"
-#include "cursor.h"
-#include "construct.h"
-#include "unittype.h"
-#include "upgrade.h"
-#include "depend.h"
-#include "interface.h"
-#include "missile.h"
-#include "tileset.h"
-#include "map.h"
-#include "script.h"
-#include "ui.h"
-#include "ai.h"
-#include "results.h"
-#include "trigger.h"
+
 #include "actions.h"
-#include "minimap.h"
+#include "ai.h"
 #include "commands.h"
+#include "construct.h"
+#include "depend.h"
+#include "font.h"
+#include "map.h"
+#include "minimap.h"
+#include "missile.h"
+#include "particle.h"
+#include "pathfinder.h"
+#include "replay.h"
+#include "script.h"
 #include "sound.h"
 #include "sound_server.h"
-#include "font.h"
-#include "pathfinder.h"
 #include "spells.h"
-#include "replay.h"
-#include "particle.h"
+#include "trigger.h"
+#include "ui.h"
+#include "unit_manager.h"
+#include "unittype.h"
+#include "upgrade.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -182,10 +179,11 @@ void LoadModules()
 
 static void PlaceUnits()
 {
-	for (int i = 0; i < NumUnits; ++i) {
-		if (!Units[i]->Removed) {
-			Units[i]->Removed = 1;
-			Units[i]->Place(Units[i]->tilePos);
+	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+		CUnit &unit = **it;
+		if (!unit.Removed) {
+			unit.Removed = 1;
+			unit.Place(unit.tilePos);
 		}
 	}
 }

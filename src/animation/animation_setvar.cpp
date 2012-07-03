@@ -39,6 +39,7 @@
 
 #include "actions.h"
 #include "unit.h"
+#include "unit_manager.h"
 
 //Modify types
 #define MOD_ADD 1
@@ -73,7 +74,7 @@
 	if (this->unitSlotStr.empty() == false) {
 		switch (this->unitSlotStr[0]) {
 			case 'l': // last created unit
-				goal = Units[NumUnits - 1];
+				goal = UnitManager.lastCreatedUnit();
 				break;
 			case 't': // target unit
 				goal = unit.CurrentOrder()->GetGoal();
