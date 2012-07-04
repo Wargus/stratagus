@@ -494,12 +494,8 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 			CUnit *newTarget = AttackUnitsInReactRange(unit);
 			if (newTarget && newTarget->IsAgressive()
 				&& ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal)) {
-				COrder *savedOrder = NULL;
 				if (unit.CanStoreOrder(this)) {
-					savedOrder = this->Clone();
-				}
-				if (savedOrder != NULL) {
-					unit.SavedOrder = savedOrder;
+					unit.SavedOrder = this->Clone();
 				}
 				goal = newTarget;
 				this->SetGoal(newTarget);
@@ -515,12 +511,8 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	if (dist > unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 		// towers don't chase after goal
 		if (unit.CanMove()) {
-			COrder *savedOrder = COrder::NewActionAttack(unit, this->goalPos);
-			if (unit.CanStoreOrder(savedOrder) == false) {
-				delete savedOrder;
-				savedOrder = NULL;
-			} else {
-				unit.SavedOrder = savedOrder;
+			if (unit.CanStoreOrder(this)) {
+				unit.SavedOrder = this->Clone();
 			}
 		}
 		unit.Frame = 0;
