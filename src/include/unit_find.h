@@ -32,6 +32,7 @@
 
 //@{
 
+#include "pathfinder.h"
 #include "unit.h"
 #include "unittype.h"
 
@@ -54,6 +55,24 @@ private:
 	const UnitTypeType unitTypeType;
 };
 
+
+class UnitFinder
+{
+public:
+	UnitFinder(const CPlayer &player, const std::vector<CUnit *>& units, int maxDist, int movemask, CUnit **unitP) :
+		player(player), units(units), maxDist(maxDist), movemask(movemask), unitP(unitP) {}
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+private:
+	CUnit *FindUnitAtPos(const Vec2i &pos) const;
+private:
+	const CPlayer &player;
+	const std::vector<CUnit *>& units;
+	int maxDist;
+	int movemask;
+	CUnit **unitP;
+};
+
+
 /// Find resource
 extern CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range,
 							   int resource, bool check_usage = false, const CUnit *deposit = NULL);
@@ -66,9 +85,6 @@ extern CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last);
 /// Find the neareast piece of terrain with specific flags.
 extern bool FindTerrainType(int movemask, int resmask, int range,
 							const CPlayer &player, const Vec2i &startPos, Vec2i *pos);
-
-
-// in unit_find.cpp
 
 extern void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units);
 

@@ -1145,16 +1145,6 @@ static bool IsReadyToRepair(const CUnit& unit)
 	return false;
 }
 
-class IndexSorter
-{
-public:
-	explicit IndexSorter(const std::vector<int> &cost) : cost(cost) {}
-
-	bool operator () (int lhs, int rhs) const { return cost[lhs] < cost[rhs]; }
-private:
-	const std::vector<int> &cost;
-};
-
 /**
 **  Check if we can repair the building.
 **
@@ -1163,7 +1153,7 @@ private:
 **
 **  @return          True if can repair, false if can't repair..
 */
-static bool AiRepairBuilding(const CUnitType &type, CUnit &building)
+static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit &building)
 {
 	if (type.RepairRange == 0) {
 		return false;
@@ -1189,31 +1179,28 @@ static bool AiRepairBuilding(const CUnitType &type, CUnit &building)
 		}
 	}
 	table.resize(num);
-	// Sort by distance
-	std::vector<int> distances;
-	std::vector<int> indexes;
-	distances.resize(num);
-	indexes.resize(num);
-	for (int i = 0; i < num; ++i) {
-		CUnit &unit = *table[i];
 
-		distances[i] = building.MapDistanceTo(unit);
-		indexes[i] = 0;
+	if (table.empty()) {
+		return false;
 	}
-	std::sort(indexes.begin(), indexes.end(), IndexSorter(distances));
+	TerrainTraversal terrainTraversal;
 
-	// Check if building is reachable
-	// Todo: [Optim] search from building using TerrainTraversal
-	for (int i = 0; i < num; ++i) {
-		CUnit &unit = *table[indexes[i]];
+	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	terrainTraversal.Init();
 
-		if (UnitReachable(unit, building, unit.Type->RepairRange)) {
-			const Vec2i invalidPos(-1, -1);
-			CommandRepair(unit, invalidPos, &building, FlushCommands);
-			return 1;
-		}
+	terrainTraversal.PushUnitPosAndNeighboor(building);
+
+	const int maxRange = 100;
+	const int movemask = type.MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
+	CUnit *unit = NULL;
+	UnitFinder unitFinder(player, table, maxRange, movemask, &unit);
+
+	if (terrainTraversal.Run(unitFinder) && unit != NULL) {
+		const Vec2i invalidPos(-1, -1);
+		CommandRepair(*unit, invalidPos, &building, FlushCommands);
+		return true;
 	}
-	return 0;
+	return false;
 }
 
 /**
@@ -1246,7 +1233,7 @@ static int AiRepairUnit(CUnit &unit)
 		// The type is available
 		//
 		if (unit_count[table[i]->Slot]) {
-			if (AiRepairBuilding(*table[i], unit)) {
+			if (AiRepairBuilding(*AiPlayer->Player, *table[i], unit)) {
 				return 1;
 			}
 		}

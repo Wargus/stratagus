@@ -53,6 +53,43 @@
   -- Finding units
   ----------------------------------------------------------------------------*/
 
+
+CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
+{
+	CUnitCache &cache = Map.Field(pos)->UnitCache;
+
+	for (CUnitCache::iterator it = cache.begin(); it != cache.end(); ++it) {
+		CUnit *unit = *it;
+
+		if (std::find(units.begin(), units.end(), unit) != units.end()) {
+			return unit;
+		}
+	}
+	return NULL;
+}
+
+VisitResult UnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+{
+	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
+		return VisitResult_DeadEnd;
+	}
+	// Look if found what was required.
+	CUnit *unit = FindUnitAtPos(pos);
+	if (unit) {
+		*unitP = unit;
+		return VisitResult_Finished;
+	}
+	if (CanMoveToMask(pos, movemask)) { // reachable
+		if (terrainTraversal.Get(pos) <= maxDist) {
+			return VisitResult_Ok;
+		} else {
+			return VisitResult_DeadEnd;
+		}
+	} else { // unreachable
+		return VisitResult_DeadEnd;
+	}
+}
+
 class TerrainFinder
 {
 public:
