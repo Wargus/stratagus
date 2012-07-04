@@ -120,7 +120,7 @@ void CUnitManager::ReleaseUnit(CUnit *unit)
 	//Refs = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
 }
 
-CUnit& CUnitManager::GetSlotUnit(int index) const
+CUnit &CUnitManager::GetSlotUnit(int index) const
 {
 	return *unitSlots[index];
 }
@@ -145,7 +145,7 @@ bool CUnitManager::empty() const
 	return units.empty();
 }
 
-CUnit* CUnitManager::lastCreatedUnit()
+CUnit *CUnitManager::lastCreatedUnit()
 {
 	return this->lastCreated;
 }

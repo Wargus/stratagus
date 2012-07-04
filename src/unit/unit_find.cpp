@@ -264,7 +264,8 @@ CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource)
 	return depot;
 }
 
-class CResourceFinder {
+class CResourceFinder
+{
 public:
 	CResourceFinder(int r, bool on_top) : resource(r), mine_on_top(on_top) {}
 	bool operator()(const CUnit *const unit) const {

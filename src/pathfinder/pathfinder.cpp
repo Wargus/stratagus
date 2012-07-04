@@ -94,7 +94,8 @@ void TerrainTraversal::PushPos(const Vec2i &pos)
 void TerrainTraversal::PushNeighboor(const Vec2i &pos)
 {
 	const Vec2i offsets[] = {Vec2i(0, -1), Vec2i(-1, 0), Vec2i(1, 0), Vec2i(0, 1),
-							 Vec2i(-1, -1), Vec2i(1, -1), Vec2i(-1, 1), Vec2i(1, 1)};
+							 Vec2i(-1, -1), Vec2i(1, -1), Vec2i(-1, 1), Vec2i(1, 1)
+							};
 
 	for (int i = 0; i != 8; ++i) {
 		const Vec2i newPos = pos + offsets[i];

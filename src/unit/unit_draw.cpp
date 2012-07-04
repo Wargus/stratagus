@@ -690,7 +690,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, int x, in
 
 	// For debug draw sight, react and attack range!
 	if (NumSelected == 1 && unit.Selected) {
-		const PixelPos center(x + type.TileWidth * PixelTileSize.x / 2, y + type.TileHeight *PixelTileSize.y / 2);
+		const PixelPos center(x + type.TileWidth * PixelTileSize.x / 2, y + type.TileHeight * PixelTileSize.y / 2);
 
 		if (Preference.ShowSightRange) {
 			const int value = stats.Variables[SIGHTRANGE_INDEX].Max;

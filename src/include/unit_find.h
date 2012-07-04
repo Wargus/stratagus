@@ -41,7 +41,8 @@
 ----------------------------------------------------------------------------*/
 
 //unit_find
-class CUnitTypeFinder {
+class CUnitTypeFinder
+{
 public:
 	explicit CUnitTypeFinder(const UnitTypeType t) : unitTypeType(t) {}
 	bool operator()(const CUnit *const unit) const {
@@ -59,14 +60,14 @@ private:
 class UnitFinder
 {
 public:
-	UnitFinder(const CPlayer &player, const std::vector<CUnit *>& units, int maxDist, int movemask, CUnit **unitP) :
+	UnitFinder(const CPlayer &player, const std::vector<CUnit *> &units, int maxDist, int movemask, CUnit **unitP) :
 		player(player), units(units), maxDist(maxDist), movemask(movemask), unitP(unitP) {}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
 	CUnit *FindUnitAtPos(const Vec2i &pos) const;
 private:
 	const CPlayer &player;
-	const std::vector<CUnit *>& units;
+	const std::vector<CUnit *> &units;
 	int maxDist;
 	int movemask;
 	CUnit **unitP;

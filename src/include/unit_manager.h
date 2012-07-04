@@ -50,7 +50,7 @@ struct lua_State;
 class CUnitManager
 {
 public:
-	typedef std::vector<CUnit*>::iterator Iterator;
+	typedef std::vector<CUnit *>::iterator Iterator;
 public:
 	CUnitManager();
 	void Init();
@@ -66,17 +66,17 @@ public:
 	Iterator end();
 	bool empty() const;
 
-	CUnit* lastCreatedUnit();
+	CUnit *lastCreatedUnit();
 
 	// Following is mainly for scripting
-	CUnit& GetSlotUnit(int index) const;
+	CUnit &GetSlotUnit(int index) const;
 	unsigned int GetUsedSlotCount() const;
 
 private:
 	std::vector<CUnit *> units;
 	std::vector<CUnit *> unitSlots;
 	std::list<CUnit *> releasedUnits;
-	CUnit* lastCreated;
+	CUnit *lastCreated;
 };
 
 

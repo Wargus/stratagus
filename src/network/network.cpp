@@ -1032,10 +1032,10 @@ void NetworkEvent()
 				// Fall through!
 			default: {
 				const unsigned int slot = ntohs(nc->Unit);
-				const CUnit* unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : NULL;
+				const CUnit *unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : NULL;
 
 				if (unit && (unit->Player->Index == player
-						|| Players[player].IsTeamed(*unit))) {
+							 || Players[player].IsTeamed(*unit))) {
 					validCommand = true;
 				} else {
 					validCommand = false;

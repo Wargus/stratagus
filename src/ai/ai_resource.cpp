@@ -1131,7 +1131,7 @@ static void AiCollectResources()
 --  WORKERS/REPAIR
 ----------------------------------------------------------------------------*/
 
-static bool IsReadyToRepair(const CUnit& unit)
+static bool IsReadyToRepair(const CUnit &unit)
 {
 	if (unit.IsIdle()) {
 		return true;
