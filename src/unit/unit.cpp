@@ -98,8 +98,6 @@
 **  units have the same slot number at the same time. The slot
 **  numbers are reused.
 **  This field could be accessed by the macro UnitNumber(Unit *).
-**  Maximal 65535 (=#MAX_UNIT_SLOTS) simultaneous units are
-**  supported.
 **
 **  CUnit::UnitSlot
 **
@@ -1249,9 +1247,6 @@ void UnitLost(CUnit &unit)
 			}
 		}
 	}
-	Assert(player.NumBuildings <= UnitMax);
-	Assert(player.GetUnitCount() <= UnitMax);
-	Assert(player.UnitTypesCount[type.Slot] <= UnitMax);
 }
 
 /**

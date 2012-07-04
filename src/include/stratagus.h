@@ -205,7 +205,6 @@ extern const char NameLine[];
 #define PlayerMax    16                 /// How many players are supported
 #define UnitTypeMax  2048                /// How many unit types supported
 #define UpgradeMax   2048                /// How many upgrades supported
-#define UnitMax      65536               /// How many units supported
 
 /*----------------------------------------------------------------------------
 --  Screen

@@ -50,7 +50,6 @@ $]
 #define MaxResourceInfo MaxCosts + 3
 #define PlayerMax 16
 #define PlayerNumNeutral (PlayerMax - 1)
-#define UnitMax 65536
 
 #define NoButton 0
 #define LeftButton 2

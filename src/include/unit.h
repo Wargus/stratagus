@@ -425,8 +425,6 @@ public:
 
 #define NoUnitP (CUnit *)0        /// return value: for no unit found
 
-#define MAX_UNIT_SLOTS 65535     /// Maximal number of used slots
-
 /**
 **  Returns unit number (unique to this unit)
 */

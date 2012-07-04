@@ -402,29 +402,23 @@ static int CclDefineUnitAllow(lua_State *l)
 */
 static int CclDefineAllow(lua_State *l)
 {
-	const char *ident;
-	const char *ids;
-	int i;
-	int n;
-	int args;
-	int j;
-	int id;
+	const int UnitMax = 65536; /// How many units supported
+	const int args = lua_gettop(l);
 
-	args = lua_gettop(l);
-	for (j = 0; j < args; ++j) {
-		ident = LuaToString(l, j + 1);
+	for (int j = 0; j < args; ++j) {
+		const char *ident = LuaToString(l, j + 1);
 		++j;
-		ids = LuaToString(l, j + 1);
+		const char *ids = LuaToString(l, j + 1);
 
-		n = strlen(ids);
+		int n = strlen(ids);
 		if (n > PlayerMax) {
 			fprintf(stderr, "%s: Allow string too long %d\n", ident, n);
 			n = PlayerMax;
 		}
 
 		if (!strncmp(ident, "unit-", 5)) {
-			id = UnitTypeIdByIdent(ident);
-			for (i = 0; i < n; ++i) {
+			int id = UnitTypeIdByIdent(ident);
+			for (int i = 0; i < n; ++i) {
 				if (ids[i] == 'A') {
 					AllowUnitId(Players[i], id, UnitMax);
 				} else if (ids[i] == 'F') {
@@ -432,15 +426,14 @@ static int CclDefineAllow(lua_State *l)
 				}
 			}
 		} else if (!strncmp(ident, "upgrade-", 8)) {
-			id = UpgradeIdByIdent(ident);
-			for (i = 0; i < n; ++i) {
+			int id = UpgradeIdByIdent(ident);
+			for (int i = 0; i < n; ++i) {
 				AllowUpgradeId(Players[i], id, ids[i]);
 			}
 		} else {
 			DebugPrint(" wrong ident %s\n" _C_ ident);
 		}
 	}
-
 	return 0;
 }
 
