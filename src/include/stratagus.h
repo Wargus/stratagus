@@ -107,8 +107,6 @@
 #define PRINTF_VAARG_ATTRIBUTE(a, b)
 #endif
 
-
-
 /*============================================================================
 ==  Debug definitions
 ============================================================================*/
@@ -205,19 +203,6 @@ extern const char NameLine[];
 #define PlayerMax    16                 /// How many players are supported
 #define UnitTypeMax  2048                /// How many unit types supported
 #define UpgradeMax   2048                /// How many upgrades supported
-
-/*----------------------------------------------------------------------------
---  Screen
-----------------------------------------------------------------------------*/
-
-/// Scrolling area (<= 15 y)
-#define SCROLL_UP     15
-/// Scrolling area (>= VideoHeight - 16 y)
-#define SCROLL_DOWN   (Video.Height - 16)
-/// Scrolling area (<= 15 y)
-#define SCROLL_LEFT   15
-/// Scrolling area (>= VideoWidth - 16 x)
-#define SCROLL_RIGHT  (Video.Width - 16)
 
 /// Frames per second to display (original 30-40)
 #define FRAMES_PER_SECOND  30  // 1/30s
