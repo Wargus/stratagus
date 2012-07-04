@@ -1131,6 +1131,30 @@ static void AiCollectResources()
 --  WORKERS/REPAIR
 ----------------------------------------------------------------------------*/
 
+static bool IsReadyToRepair(const CUnit& unit)
+{
+	if (unit.IsIdle()) {
+		return true;
+	} else if (unit.Orders.size() == 1 && unit.CurrentAction() == UnitActionResource) {
+		COrder_Resource &order = *static_cast<COrder_Resource *>(unit.CurrentOrder());
+
+		if (order.IsGatheringStarted() == false) {
+			return true;
+		}
+	}
+	return false;
+}
+
+class IndexSorter
+{
+public:
+	explicit IndexSorter(const std::vector<int> &cost) : cost(cost) {}
+
+	bool operator () (int lhs, int rhs) const { return cost[lhs] < cost[rhs]; }
+private:
+	const std::vector<int> &cost;
+};
+
 /**
 **  Check if we can repair the building.
 **
@@ -1139,8 +1163,12 @@ static void AiCollectResources()
 **
 **  @return          True if can repair, false if can't repair..
 */
-static int AiRepairBuilding(const CUnitType &type, CUnit &building)
+static bool AiRepairBuilding(const CUnitType &type, CUnit &building)
 {
+	if (type.RepairRange == 0) {
+		return false;
+	}
+
 	// Remove all workers not mining. on the way building something
 	// FIXME: It is not clever to use workers with gold
 	// Idea: Antonis: Put the rest of the workers in a table in case
@@ -1156,67 +1184,35 @@ static int AiRepairBuilding(const CUnitType &type, CUnit &building)
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
-		if (unit.Type->RepairRange && unit.Orders.size() == 1) {
-			if (unit.CurrentAction() == UnitActionStill) {
-				table[num++] = &unit;
-			} else if (unit.CurrentAction() == UnitActionResource) {
-				COrder_Resource &order = *static_cast<COrder_Resource *>(unit.CurrentOrder());
-
-				if (order.IsGatheringStarted() == false) {
-					table[num++] = &unit;
-				}
-			}
+		if (IsReadyToRepair(unit)) {
+			table[num++] = &unit;
 		}
 	}
 	table.resize(num);
-	// Sort by distance loops -Antonis-
-	std::vector<int> distance;
-	distance.resize(num);
+	// Sort by distance
+	std::vector<int> distances;
+	std::vector<int> indexes;
+	distances.resize(num);
+	indexes.resize(num);
 	for (int i = 0; i < num; ++i) {
 		CUnit &unit = *table[i];
-		int rX = unit.tilePos.x - building.tilePos.x;
-		int rY = unit.tilePos.y - building.tilePos.y;
 
-		// FIXME: Probably calculated from top left corner of building
-		rX = std::max<int>(rX, -rX);
-		rY = std::max<int>(rY, -rY);
-		distance[i] = std::min<int>(rX, rY);
+		distances[i] = building.MapDistanceTo(unit);
+		indexes[i] = 0;
 	}
+	std::sort(indexes.begin(), indexes.end(), IndexSorter(distances));
+
+	// Check if building is reachable
+	// Todo: [Optim] search from building using TerrainTraversal
 	for (int i = 0; i < num; ++i) {
-		int r_temp = distance[i];
-		int index_temp = i;
-		for (int j = i; j < num; ++j) {
-			if (distance[j] < r_temp) {
-				r_temp = distance[j];
-				index_temp = j;
-			}
-		}
-		if (index_temp > i) {
-			std::swap(distance[i], distance[index_temp]);
-			std::swap(table[i], table[index_temp]);
-		}
-	}
-
-	// Check if building is reachable and try next trio of workers
-
-	int nbworker = AiPlayer->TriedRepairWorkers[UnitNumber(building)];
-	if (nbworker > num) {
-		nbworker = AiPlayer->TriedRepairWorkers[UnitNumber(building)] = 0;
-	}
-
-	int k = nbworker;
-	for (int i = nbworker; i < num && i < nbworker + 3; ++i) {
-
-		CUnit &unit = *table[i];
+		CUnit &unit = *table[indexes[i]];
 
 		if (UnitReachable(unit, building, unit.Type->RepairRange)) {
 			const Vec2i invalidPos(-1, -1);
 			CommandRepair(unit, invalidPos, &building, FlushCommands);
 			return 1;
 		}
-		k = i;
 	}
-	AiPlayer->TriedRepairWorkers[UnitNumber(building)] = k + 1;
 	return 0;
 }
 

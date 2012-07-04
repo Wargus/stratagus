@@ -273,7 +273,6 @@ public:
 		memset(Used, 0, sizeof(Used));
 		memset(Needed, 0, sizeof(Needed));
 		memset(Collect, 0, sizeof(Collect));
-		memset(TriedRepairWorkers, 0, sizeof(TriedRepairWorkers));
 	}
 
 public:
@@ -302,7 +301,6 @@ public:
 	std::vector<CUpgrade *> ResearchRequests;     /// Upgrades requested and priority list
 	std::vector<AiBuildQueue> UnitTypeBuilt;      /// What the resource manager should build
 	int LastRepairBuilding;                       /// Last building checked for repair in this turn
-	unsigned int TriedRepairWorkers[UnitMax];     /// No. workers that failed trying to repair a building
 };
 
 /**

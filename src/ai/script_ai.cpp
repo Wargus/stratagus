@@ -1439,21 +1439,6 @@ static int CclDefineAiPlayer(lua_State *l)
 			CclParseBuildQueue(l, ai, j + 1);
 		} else if (!strcmp(value, "repair-building")) {
 			ai->LastRepairBuilding = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "repair-workers")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, j + 1);
-			for (int k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				const int num = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-				++k;
-				lua_rawgeti(l, j + 1, k + 1);
-				const int workers = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-				ai->TriedRepairWorkers[num] = workers;
-			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

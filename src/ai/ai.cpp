@@ -406,15 +406,9 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 	}
 	file.printf("},\n");
 
-	file.printf("  \"repair-building\", %u,\n", ai.LastRepairBuilding);
+	file.printf("  \"repair-building\", %u\n", ai.LastRepairBuilding);
 
-	file.printf("  \"repair-workers\", {");
-	for (int i = 0; i != UnitMax; ++i) {
-		if (ai.TriedRepairWorkers[i]) {
-			file.printf("%d, %d, ", i, ai.TriedRepairWorkers[i]);
-		}
-	}
-	file.printf("})\n\n");
+	file.printf(")\n\n");
 }
 
 /**
