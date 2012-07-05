@@ -41,6 +41,7 @@
 
 #include "actions.h"
 #include "ai.h"
+#include "iocompat.h"
 #include "iolib.h"
 #include "map.h"
 #include "missile.h"

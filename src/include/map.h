@@ -90,8 +90,6 @@
 #include "unit_cache.h"
 #endif
 
-#include "iocompat.h"
-
 #ifndef __TILESET_H__
 #include "tileset.h"
 #endif
