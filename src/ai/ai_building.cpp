@@ -67,7 +67,7 @@ static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit)
 		return false;
 	}
 	const unsigned int passableFlag = (MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldLandAllowed);
-	return (mf.Flags & passableFlag);
+	return ((mf.Flags & passableFlag) != 0);
 }
 
 /**
@@ -311,11 +311,11 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 **  @todo          FIXME: This is slow really slow, using
 **                 two flood fills, is not a perfect solution.
 */
-static int AiFindHallPlace(const CUnit &worker,
-						   const CUnitType &type,
-						   const Vec2i &startPos,
-						   int resource,
-						   Vec2i *resultPos)
+static bool AiFindHallPlace(const CUnit &worker,
+							const CUnitType &type,
+							const Vec2i &startPos,
+							int resource,
+							Vec2i *resultPos)
 {
 	TerrainTraversal terrainTraversal;
 
@@ -395,11 +395,11 @@ static bool AiFindLumberMillPlace(const CUnit &worker, const CUnitType &type, co
 	return terrainTraversal.Run(lumberMillPlaceFinder);
 }
 
-static int AiFindMiningPlace(const CUnit &worker,
-							 const CUnitType &type,
-							 const Vec2i &startPos,
-							 int resource,
-							 Vec2i *resultPos)
+static bool AiFindMiningPlace(const CUnit &worker,
+							  const CUnitType &type,
+							  const Vec2i &startPos,
+							  int resource,
+							  Vec2i *resultPos)
 {
 	// look near (mine = ResourceOnMap(pos, resource, false) ?
 	return AiFindBuildingPlace2(worker, type, startPos, NULL, false, resultPos);
