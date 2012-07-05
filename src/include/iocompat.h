@@ -62,10 +62,22 @@
 #define S_ISDIR(x) ((x) & _S_IFDIR)
 #define S_ISREG(x) ((x) & _S_IFREG)
 
+#define makedir(dir, permissions) _mkdir(dir)
+#define access _access
+#define write _write
+
 #endif // _MSC_VER
 
 #ifndef O_BINARY
 #define O_BINARY 0
+#endif
+
+#ifdef __GNUC__
+#ifdef USE_WIN32
+#define makedir(dir, permissions) mkdir(dir)
+#else
+#define makedir(dir, permissions) mkdir(dir, permissions)
+#endif
 #endif
 
 //@}

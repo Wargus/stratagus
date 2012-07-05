@@ -67,25 +67,12 @@
 #define strdup _strdup
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
-#include <io.h>
-#define access _access
-#define write _write
-#include <direct.h>
-#define makedir(dir, permissions) _mkdir(dir)
 
 #ifndef __func__
 #define __func__ __FUNCTION__
 #endif
 
 #endif  // } _MSC_VER
-
-#ifdef __GNUC__
-#ifdef USE_WIN32
-#define makedir(dir, permissions) mkdir(dir)
-#else
-#define makedir(dir, permissions) mkdir(dir, permissions)
-#endif
-#endif
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -233,8 +220,6 @@ private:
 public:
 	static Parameters Instance;
 };
-
-
 
 extern std::string StratagusLibPath;        /// Location of stratagus data
 extern std::string GameName;                /// Name of the game
