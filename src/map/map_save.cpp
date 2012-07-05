@@ -62,7 +62,7 @@ void CMap::Save(CFile &file) const
 	file.printf("\n--- -----------------------------------------\n");
 	file.printf("--- MODULE: map\n");
 
-	file.printf("LoadTileModels(\"%s\")\n\n", this->TileModelsFileName);
+	file.printf("LoadTileModels(\"%s\")\n\n", this->TileModelsFileName.c_str());
 
 	file.printf("StratagusMap(\n");
 

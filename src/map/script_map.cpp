@@ -528,8 +528,8 @@ static int CclLoadTileModels(lua_State *l)
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	strcpy_s(Map.TileModelsFileName, sizeof(Map.TileModelsFileName), LuaToString(l, 1));
-	LibraryFileName(Map.TileModelsFileName, buf, sizeof(buf));
+	Map.TileModelsFileName = LuaToString(l, 1);
+	LibraryFileName(Map.TileModelsFileName.c_str(), buf, sizeof(buf));
 	if (LuaLoadFile(buf) == -1) {
 		DebugPrint("Load failed: %s\n" _C_ LuaToString(l, 1));
 	}
