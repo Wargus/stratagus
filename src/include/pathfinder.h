@@ -55,6 +55,7 @@
 
 class CUnit;
 class CFile;
+struct lua_State;
 
 /**
 **  Result codes of the pathfinder.

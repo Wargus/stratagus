@@ -298,6 +298,7 @@ extern void SaveCcl(CFile &file);     /// Save CCL module
 extern void SavePreferences();        /// Save user preferences
 extern int CclCommand(const std::string &command, bool exitOnError = true);
 
+extern std::string SaveGlobal(lua_State *l); /// For saving lua state
 
 CUnit *CclGetUnitFromRef(lua_State *l);
 
