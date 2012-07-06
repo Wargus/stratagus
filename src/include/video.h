@@ -263,7 +263,7 @@ public:
 	void UnlockScreen();
 
 	void ClearScreen();
-	bool ResizeScreen(int x, int y);
+	bool ResizeScreen(int width, int height);
 
 	void DrawPixelClip(Uint32 color, int x, int y);
 	void DrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha);

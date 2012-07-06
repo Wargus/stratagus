@@ -73,7 +73,7 @@ class CFontColor;
 class CFont : public gcn::Font
 {
 private:
-	CFont(const std::string &ident) :
+	explicit CFont(const std::string &ident) :
 		Ident(ident),
 		CharWidth(NULL),
 		G(NULL)
@@ -92,9 +92,7 @@ public:
 
 	virtual int getHeight() const { return Height(); }
 	virtual int getWidth(const std::string &text) const { return Width(text); }
-	virtual void drawString(gcn::Graphics *graphics, const std::string &text,
-							int x, int y);
-
+	virtual void drawString(gcn::Graphics *graphics, const std::string &text, int x, int y);
 
 	void Load();
 	void Reload() const;
@@ -105,7 +103,6 @@ public:
 
 	template<bool CLIP>
 	unsigned int DrawChar(CGraphic *g, int utf8, int x, int y, const CFontColor *fc) const;
-
 
 	void DynamicLoad() const;
 
@@ -125,7 +122,7 @@ private:
 class CFontColor
 {
 public:
-	CFontColor(const std::string &ident);
+	explicit CFontColor(const std::string &ident);
 	~CFontColor();
 
 	static CFontColor *New(const std::string &ident);

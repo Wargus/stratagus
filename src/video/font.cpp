@@ -58,7 +58,7 @@ std::map<std::string, CFontColor *> FontColors; /// Map of ident to font color.
 
 static CFontColor *FontColor;                   /// Current font color
 
-static CFontColor *LastTextColor;          /// Last text color
+static const CFontColor *LastTextColor;          /// Last text color
 static CFontColor *DefaultTextColor;       /// Default text color
 static CFontColor *ReverseTextColor;       /// Reverse text color
 static std::string DefaultNormalColorIndex;     /// Default normal color index
@@ -296,7 +296,9 @@ bool CFont::IsLoaded() const
 int CFont::Width(const int number) const
 {
 	int width = 0;
-	//bool isformat = false;
+#if 0
+	bool isformat = false;
+#endif
 	int utf8;
 	size_t pos = 0;
 	char text[ sizeof(int) * 10 + 2];
@@ -325,709 +327,746 @@ int CFont::Width(const int number) const
 			}
 		}
 		if (!isformat) {
-#endif
 			width += this->CharWidth[utf8 - 32] + 1;
-			//}
 		}
-		return width;
-
+#else
+		width += this->CharWidth[utf8 - 32] + 1;
+#endif
 	}
+	return width;
+}
 
-	/**
-	**  Returns the pixel width of text.
-	**
-	**  @param text  Text to calculate the width of.
-	**
-	**  @return      The width in pixels of the text.
-	*/
-	int CFont::Width(const std::string & text) const {
-		int width = 0;
-		bool isformat = false;
-		int utf8;
-		size_t pos = 0;
+/**
+**  Returns the pixel width of text.
+**
+**  @param text  Text to calculate the width of.
+**
+**  @return      The width in pixels of the text.
+*/
+int CFont::Width(const std::string &text) const
+{
+	int width = 0;
+	bool isformat = false;
+	int utf8;
+	size_t pos = 0;
 
-		DynamicLoad();
-		while (GetUTF8(text, pos, utf8)) {
-			if (utf8 == '~') {
-				if (pos >= text.size()) {  // bad formatted string
-					break;
-				}
-				if (text[pos] == '<' || text[pos] == '>') {
-					isformat = false;
-					++pos;
-					continue;
-				}
-				if (text[pos] == '!') {
-					++pos;
-					continue;
-				}
-				if (text[pos] != '~') { // ~~ -> ~
-					isformat = !isformat;
-					continue;
-				}
+	DynamicLoad();
+	while (GetUTF8(text, pos, utf8)) {
+		if (utf8 == '~') {
+			if (pos >= text.size()) {  // bad formatted string
+				break;
 			}
-			if (!isformat) {
-				width += this->CharWidth[utf8 - 32] + 1;
+			if (text[pos] == '<' || text[pos] == '>') {
+				isformat = false;
+				++pos;
+				continue;
+			}
+			if (text[pos] == '!') {
+				++pos;
+				continue;
+			}
+			if (text[pos] != '~') { // ~~ -> ~
+				isformat = !isformat;
+				continue;
 			}
 		}
-		return width;
+		if (!isformat) {
+			width += this->CharWidth[utf8 - 32] + 1;
+		}
 	}
+	return width;
+}
 
-	extern int convertKey(const char * key);
+extern int convertKey(const char *key);
 
-	/**
-	**  Get the hot key from a string
-	*/
-	int GetHotKey(const std::string & text) {
-		int hotkey = 0;
-		int utf8;
-		size_t pos = 0;
+/**
+**  Get the hot key from a string
+*/
+int GetHotKey(const std::string &text)
+{
+	int hotkey = 0;
+	int utf8;
+	size_t pos = 0;
 
-		while (GetUTF8(text, pos, utf8)) {
-			if (utf8 == '~') {
+	while (GetUTF8(text, pos, utf8)) {
+		if (utf8 == '~') {
+			if (pos >= text.size()) {
+				break;
+			}
+			if (text[pos] == '<') {
+				++pos;
+				size_t endpos = pos;
+				while (endpos < text.size()) {
+					if (text[endpos] == '~') {
+						break;
+					}
+					++endpos;
+				}
+				std::string key = text.substr(pos, endpos - pos);
+				hotkey = convertKey(key.c_str());
+				break;
+			}
+			if (text[pos] == '!') {
+				++pos;
 				if (pos >= text.size()) {
 					break;
 				}
-				if (text[pos] == '<') {
-					++pos;
-					size_t endpos = pos;
-					while (endpos < text.size()) {
-						if (text[endpos] == '~') {
-							break;
-						}
-						++endpos;
-					}
-					std::string key = text.substr(pos, endpos - pos);
-					hotkey = convertKey(key.c_str());
-					break;
-				}
-				if (text[pos] == '!') {
-					++pos;
-					if (pos >= text.size()) {
-						break;
-					}
-					GetUTF8(text, pos, utf8);
-					hotkey = utf8;
-					break;
-				}
-			}
-		}
-
-		return hotkey;
-	}
-
-	CFont::~CFont() {
-		if (G) {
-			CGraphic::Free(G);
-		}
-		delete[] CharWidth;
-	}
-
-	/**
-	**  Draw character with current color clipped into 8 bit framebuffer.
-	**
-	**  @param g   Pointer to object
-	**  @param gx  X offset into object
-	**  @param gy  Y offset into object
-	**  @param w   width to display
-	**  @param h   height to display
-	**  @param x   X screen position
-	**  @param y   Y screen position
-	*/
-	static void VideoDrawCharClip(const CGraphic * g, int gx, int gy, int w, int h,
-								  int x, int y, const CFontColor * fc) {
-		int ox;
-		int oy;
-		int ex;
-		CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, ex);
-		UNUSED(ex);
-		VideoDrawChar(g, gx + ox, gy + oy, w, h, x, y, fc);
-	}
-
-
-	template<bool CLIP>
-	unsigned int CFont::DrawChar(CGraphic * g, int utf8, int x, int y, const CFontColor * fc) const {
-		const CFont *font = this;
-		int c = utf8 - 32;
-		Assert(c >= 0);
-		const int ipr = font->G->GraphicWidth / font->G->Width;
-
-		if (c < 0 || ipr * font->G->GraphicHeight / font->G->Height <= c) {
-			c = 0;
-		}
-		const int w = font->CharWidth[c];
-		const int gx = (c % ipr) * font->G->Width;
-		const int gy = (c / ipr) * font->G->Height;
-
-		if (CLIP) {
-			VideoDrawCharClip(g, gx, gy, w, font->G->Height, x , y, fc);
-		} else {
-			VideoDrawChar(g, gx, gy, w, font->G->Height, x, y, fc);
-		}
-		return w + 1;
-	}
-
-	CGraphic *CFont::GetFontColorGraphic(const CFontColor * fontColor) const {
-		if (!UseOpenGL) {
-			return this->G;
-		} else {
-			return FontColorGraphics[this][fontColor];
-		}
-	}
-
-
-	/**
-	**  Draw text with font at x,y clipped/unclipped.
-	**
-	**  ~    is special prefix.
-	**  ~~   is the ~ character self.
-	**  ~!   print next character reverse.
-	**  ~<   start reverse.
-	**  ~>   switch back to last used color.
-	**
-	**  @param x     X screen position
-	**  @param y     Y screen position
-	**  @param font  Font number
-	**  @param text  Text to be displayed.
-	**  @param clip  Flag if TRUE clip, otherwise not.
-	**
-	**  @return      The length of the printed text.
-	*/
-	template <const bool CLIP>
-	int CLabel::DoDrawText(int x, int y,
-						   const char * const text, const size_t len, const CFontColor * fc) const {
-		int widths = 0;
-		std::string color;
-		int utf8;
-		size_t pos = 0;
-		const CFontColor *backup = fc;
-		bool isReverse = false;
-		font->DynamicLoad();
-		CGraphic *g = font->GetFontColorGraphic(FontColor);
-
-		while (GetUTF8(text, len, pos, utf8)) {
-			if (utf8 == '~') {
-				switch (text[pos]) {
-					case '\0':  // wrong formatted string.
-						DebugPrint("oops, format your ~\n");
-						return widths;
-					case '~':
-						++pos;
-						break;
-					case '!':
-						if (fc != reverse) {
-							fc = reverse;
-							g = font->GetFontColorGraphic(fc);
-						}
-						++pos;
-						continue;
-					case '<':
-						LastTextColor = (CFontColor *)fc;
-						if (fc != reverse) {
-							isReverse = true;
-							fc = reverse;
-							g = font->GetFontColorGraphic(fc);
-						}
-						++pos;
-						continue;
-					case '>':
-						if (fc != LastTextColor) {
-							const CFontColor *rev = LastTextColor;  // swap last and current color
-							isReverse = false;
-							LastTextColor = (CFontColor *)fc;
-							fc = rev;
-							g = font->GetFontColorGraphic(fc);
-						}
-						++pos;
-						continue;
-
-					default: {
-						const char *p = text + pos;
-						while (*p && *p != '~') {
-							++p;
-						}
-						if (!*p) {
-							DebugPrint("oops, format your ~\n");
-							return widths;
-						}
-						color.insert(0, text + pos, p - (text + pos));
-						color[p - (text + pos)] = '\0';
-						pos = p - text + 1;
-						LastTextColor = (CFontColor *)fc;
-						const CFontColor *fc_tmp = CFontColor::Get(color);
-						if (fc_tmp) {
-							fc = fc_tmp;
-							g = font->GetFontColorGraphic(fc);
-						}
-						continue;
-					}
-				}
-			}
-
-			widths += font->DrawChar<CLIP>(g, utf8, x + widths, y, fc);
-
-			if (isReverse == false && fc != backup) {
-				fc = backup;
-				g = font->GetFontColorGraphic(fc);
-			}
-		}
-
-		return widths;
-	}
-
-
-	CLabel::CLabel(const CFont * f) :
-		normal(DefaultTextColor),
-		reverse(ReverseTextColor),
-		font(f) {
-	}
-
-	/// Draw text/number unclipped
-	int CLabel::Draw(int x, int y, const char * const text) const {
-		return DoDrawText<false>(x, y, text, strlen(text), normal);
-	}
-
-	int CLabel::Draw(int x, int y, const std::string & text) const {
-		return DoDrawText<false>(x, y, text.c_str(), text.size(), normal);
-	}
-
-	int CLabel::Draw(int x, int y, int number) const {
-		char buf[sizeof(int) * 10 + 2];
-		size_t len = FormatNumber(number, buf);
-		return DoDrawText<false>(x, y, buf, len, normal);
-	}
-
-	/// Draw text/number clipped
-	int CLabel::DrawClip(int x, int y, const char * const text) const {
-		return DoDrawText<true>(x, y, text, strlen(text), normal);
-	}
-
-	int CLabel::DrawClip(int x, int y, const std::string & text) const {
-		return DoDrawText<true>(x, y, text.c_str(), text.size(), normal);
-	}
-
-	int CLabel::DrawClip(int x, int y, int number) const {
-		char buf[sizeof(int) * 10 + 2];
-		size_t len = FormatNumber(number, buf);
-		return DoDrawText<true>(x, y, buf, len, normal);
-	}
-
-
-	/// Draw reverse text/number unclipped
-	int CLabel::DrawReverse(int x, int y, const char * const text) const {
-		return DoDrawText<false>(x, y, text, strlen(text), reverse);
-	}
-
-	int CLabel::DrawReverse(int x, int y, const std::string & text) const {
-		return DoDrawText<false>(x, y, text.c_str(), text.size(), reverse);
-	}
-
-	int CLabel::DrawReverse(int x, int y, int number) const {
-		char buf[sizeof(int) * 10 + 2];
-		size_t len = FormatNumber(number, buf);
-		return DoDrawText<false>(x, y, buf, len, reverse);
-	}
-
-	/// Draw reverse text/number clipped
-	int CLabel::DrawReverseClip(int x, int y, const char * const text) const {
-		return DoDrawText<true>(x, y, text, strlen(text), reverse);
-	}
-
-	int CLabel::DrawReverseClip(int x, int y, const std::string & text) const {
-		return DoDrawText<true>(x, y, text.c_str(), text.size(), reverse);
-	}
-
-	int CLabel::DrawReverseClip(int x, int y, int number) const {
-		char buf[sizeof(int) * 10 + 2];
-		size_t len = FormatNumber(number, buf);
-		return DoDrawText<true>(x, y, buf, len, reverse);
-	}
-
-	int CLabel::DrawCentered(int x, int y, const std::string & text) const {
-		int dx = font->Width(text);
-		DoDrawText<false>(x - dx / 2, y, text.c_str(), text.size(), normal);
-		return dx / 2;
-	}
-
-
-	/**
-	**  Format a number using commas
-	**
-	**  @param number  Number to be formatted
-	**  @param buf     Buffer to save the formatted number to
-	**
-	**  @return      The real length of the Formated Number.
-	*/
-	static int FormatNumber(int number, char * buf) {
-		const char sep = ',';
-		char bufs[sizeof(int) * 10 + 2];
-		int s = 0;
-		int d = number < 0 ? 1 : 0;
-		const int sl = snprintf(bufs, sizeof(bufs), "%d", abs(number));
-
-		while (s <= sl) {
-			if (s > 0 && s < sl && (s - (sl % 3)) % 3 == 0) {
-				buf[d++] = sep;
-			}
-			buf[d++] = bufs[s++];
-		}
-		buf[0] = number < 0 ? '-' : buf[0];
-		return d - 1;
-	}
-
-	/**
-	**  Return the index of first occurance of c in [s- s + maxlen]
-	**
-	**  @param s       original string.
-	**  @param c       character to find.
-	**  @param maxlen  size limit of the search. (0 means unlimited). (in char if font == NULL else in pixels).
-	**  @param font    if specified use font->Width() instead of strlen.
-	**
-	**  @return computed value.
-	*/
-	static int strchrlen(const std::string & s, char c, unsigned int maxlen, CFont * font) {
-		if (s.empty()) {
-			return 0;
-		}
-		int res = s.find(c);
-		res = (res == -1) ? s.size() : res - 1;
-
-		if (!maxlen || (!font && (unsigned int) res < maxlen) || (font && (unsigned int) font->Width(s.substr(0, res)) < maxlen)) {
-			return res;
-		}
-		if (!font) {
-			res = s.rfind(' ', maxlen);
-			if (res == -1) {
-				// line too long
-				return maxlen;
-			} else {
-				return res;
-			}
-		} else {
-			res = s.rfind(' ', res);
-			while (res != -1 && (unsigned int) font->Width(s.substr(0, res)) > maxlen) {
-				res = s.rfind(' ', res - 1);
-			}
-			if (res == -1) {
-				// Line too long.
-				// FIXME.
-			} else {
-				return res;
-			}
-		}
-		return res;
-	}
-
-	/**
-	**  Return the 'line' line of the string 's'.
-	**
-	**  @param line    line number.
-	**  @param s       multiline string.
-	**  @param maxlen  max length of the string (0 : unlimited) (in char if font == NULL else in pixels).
-	**  @param font    if specified use font->Width() instead of strlen.
-	**
-	**  @return computed value.
-	*/
-	std::string GetLineFont(unsigned int line, const std::string & s, unsigned int maxlen, CFont * font) {
-		unsigned int res;
-		std::string s1 = s;
-
-		Assert(0 < line);
-
-		for (unsigned int i = 1; i < line; ++i) {
-			res = strchrlen(s1, '\n', maxlen, font);
-			if (!res || res >= s1.size()) {
-				return "";
-			}
-			s1 = s1.substr(res + 1);
-		}
-		res = strchrlen(s1, '\n', maxlen, font);
-		return s1.substr(0, res);
-	}
-
-
-	/**
-	**  Calculate the width of each character
-	*/
-	void CFont::MeasureWidths() {
-		const int maxy = G->GraphicWidth / G->Width * G->GraphicHeight / G->Height;
-
-		delete[] CharWidth;
-		CharWidth = new char[maxy];
-		memset(CharWidth, 0, maxy);
-		CharWidth[0] = G->Width / 2;  // a reasonable value for SPACE
-		const Uint32 ckey = G->Surface->format->colorkey;
-		const int ipr = G->Surface->w / G->Width; // images per row
-
-		SDL_LockSurface(G->Surface);
-		for (int y = 1; y < maxy; ++y) {
-			const unsigned char *sp = (const unsigned char *)G->Surface->pixels +
-									  (y / ipr) * G->Surface->pitch * G->Height +
-									  (y % ipr) * G->Width - 1;
-			const unsigned char *gp = sp + G->Surface->pitch * G->Height;
-			// Bail out if no letters left
-			if (gp >= ((const unsigned char *)G->Surface->pixels +
-					   G->Surface->pitch * G->GraphicHeight)) {
+				GetUTF8(text, pos, utf8);
+				hotkey = utf8;
 				break;
 			}
-			while (sp < gp) {
-				const unsigned char *lp = sp + G->Width;
+		}
+	}
+	return hotkey;
+}
 
-				for (; sp < lp; --lp) {
-					if (*lp != ckey && *lp != 7) {
-						if (lp - sp > CharWidth[y]) {  // max width
-							CharWidth[y] = lp - sp;
-						}
+CFont::~CFont()
+{
+	if (G) {
+		CGraphic::Free(G);
+	}
+	delete[] CharWidth;
+}
+
+/**
+**  Draw character with current color clipped into 8 bit framebuffer.
+**
+**  @param g   Pointer to object
+**  @param gx  X offset into object
+**  @param gy  Y offset into object
+**  @param w   width to display
+**  @param h   height to display
+**  @param x   X screen position
+**  @param y   Y screen position
+*/
+static void VideoDrawCharClip(const CGraphic *g, int gx, int gy, int w, int h,
+							  int x, int y, const CFontColor *fc)
+{
+	int ox;
+	int oy;
+	int ex;
+	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, ex);
+	UNUSED(ex);
+	VideoDrawChar(g, gx + ox, gy + oy, w, h, x, y, fc);
+}
+
+
+template<bool CLIP>
+unsigned int CFont::DrawChar(CGraphic *g, int utf8, int x, int y, const CFontColor *fc) const
+{
+	const CFont *font = this;
+	int c = utf8 - 32;
+	Assert(c >= 0);
+	const int ipr = font->G->GraphicWidth / font->G->Width;
+
+	if (c < 0 || ipr * font->G->GraphicHeight / font->G->Height <= c) {
+		c = 0;
+	}
+	const int w = font->CharWidth[c];
+	const int gx = (c % ipr) * font->G->Width;
+	const int gy = (c / ipr) * font->G->Height;
+
+	if (CLIP) {
+		VideoDrawCharClip(g, gx, gy, w, font->G->Height, x , y, fc);
+	} else {
+		VideoDrawChar(g, gx, gy, w, font->G->Height, x, y, fc);
+	}
+	return w + 1;
+}
+
+CGraphic *CFont::GetFontColorGraphic(const CFontColor *fontColor) const
+{
+	if (!UseOpenGL) {
+		return this->G;
+	} else {
+		return FontColorGraphics[this][fontColor];
+	}
+}
+
+
+/**
+**  Draw text with font at x,y clipped/unclipped.
+**
+**  ~    is special prefix.
+**  ~~   is the ~ character self.
+**  ~!   print next character reverse.
+**  ~<   start reverse.
+**  ~>   switch back to last used color.
+**
+**  @param x     X screen position
+**  @param y     Y screen position
+**  @param font  Font number
+**  @param text  Text to be displayed.
+**  @param clip  Flag if TRUE clip, otherwise not.
+**
+**  @return      The length of the printed text.
+*/
+template <const bool CLIP>
+int CLabel::DoDrawText(int x, int y,
+					   const char *const text, const size_t len, const CFontColor *fc) const
+{
+	int widths = 0;
+	std::string color;
+	int utf8;
+	size_t pos = 0;
+	const CFontColor *backup = fc;
+	bool isReverse = false;
+	font->DynamicLoad();
+	CGraphic *g = font->GetFontColorGraphic(FontColor);
+
+	while (GetUTF8(text, len, pos, utf8)) {
+		if (utf8 == '~') {
+			switch (text[pos]) {
+				case '\0':  // wrong formatted string.
+					DebugPrint("oops, format your ~\n");
+					return widths;
+				case '~':
+					++pos;
+					break;
+				case '!':
+					if (fc != reverse) {
+						fc = reverse;
+						g = font->GetFontColorGraphic(fc);
+					}
+					++pos;
+					continue;
+				case '<':
+					LastTextColor = fc;
+					if (fc != reverse) {
+						isReverse = true;
+						fc = reverse;
+						g = font->GetFontColorGraphic(fc);
+					}
+					++pos;
+					continue;
+				case '>':
+					if (fc != LastTextColor) {
+						std::swap(fc, LastTextColor);
+						isReverse = false;
+						g = font->GetFontColorGraphic(fc);
+					}
+					++pos;
+					continue;
+
+				default: {
+					const char *p = text + pos;
+					while (*p && *p != '~') {
+						++p;
+					}
+					if (!*p) {
+						DebugPrint("oops, format your ~\n");
+						return widths;
+					}
+					color.insert(0, text + pos, p - (text + pos));
+					color[p - (text + pos)] = '\0';
+					pos = p - text + 1;
+					LastTextColor = fc;
+					const CFontColor *fc_tmp = CFontColor::Get(color);
+					if (fc_tmp) {
+						fc = fc_tmp;
+						g = font->GetFontColorGraphic(fc);
+					}
+					continue;
+				}
+			}
+		}
+		widths += font->DrawChar<CLIP>(g, utf8, x + widths, y, fc);
+
+		if (isReverse == false && fc != backup) {
+			fc = backup;
+			g = font->GetFontColorGraphic(fc);
+		}
+	}
+	return widths;
+}
+
+
+CLabel::CLabel(const CFont *f) :
+	normal(DefaultTextColor),
+	reverse(ReverseTextColor),
+	font(f)
+{
+}
+
+/// Draw text/number unclipped
+int CLabel::Draw(int x, int y, const char *const text) const
+{
+	return DoDrawText<false>(x, y, text, strlen(text), normal);
+}
+
+int CLabel::Draw(int x, int y, const std::string &text) const
+{
+	return DoDrawText<false>(x, y, text.c_str(), text.size(), normal);
+}
+
+int CLabel::Draw(int x, int y, int number) const
+{
+	char buf[sizeof(int) * 10 + 2];
+	size_t len = FormatNumber(number, buf);
+	return DoDrawText<false>(x, y, buf, len, normal);
+}
+
+/// Draw text/number clipped
+int CLabel::DrawClip(int x, int y, const char *const text) const
+{
+	return DoDrawText<true>(x, y, text, strlen(text), normal);
+}
+
+int CLabel::DrawClip(int x, int y, const std::string &text) const
+{
+	return DoDrawText<true>(x, y, text.c_str(), text.size(), normal);
+}
+
+int CLabel::DrawClip(int x, int y, int number) const
+{
+	char buf[sizeof(int) * 10 + 2];
+	size_t len = FormatNumber(number, buf);
+	return DoDrawText<true>(x, y, buf, len, normal);
+}
+
+
+/// Draw reverse text/number unclipped
+int CLabel::DrawReverse(int x, int y, const char *const text) const
+{
+	return DoDrawText<false>(x, y, text, strlen(text), reverse);
+}
+
+int CLabel::DrawReverse(int x, int y, const std::string &text) const
+{
+	return DoDrawText<false>(x, y, text.c_str(), text.size(), reverse);
+}
+
+int CLabel::DrawReverse(int x, int y, int number) const
+{
+	char buf[sizeof(int) * 10 + 2];
+	size_t len = FormatNumber(number, buf);
+	return DoDrawText<false>(x, y, buf, len, reverse);
+}
+
+/// Draw reverse text/number clipped
+int CLabel::DrawReverseClip(int x, int y, const char *const text) const
+{
+	return DoDrawText<true>(x, y, text, strlen(text), reverse);
+}
+
+int CLabel::DrawReverseClip(int x, int y, const std::string &text) const
+{
+	return DoDrawText<true>(x, y, text.c_str(), text.size(), reverse);
+}
+
+int CLabel::DrawReverseClip(int x, int y, int number) const
+{
+	char buf[sizeof(int) * 10 + 2];
+	size_t len = FormatNumber(number, buf);
+	return DoDrawText<true>(x, y, buf, len, reverse);
+}
+
+int CLabel::DrawCentered(int x, int y, const std::string &text) const
+{
+	int dx = font->Width(text);
+	DoDrawText<false>(x - dx / 2, y, text.c_str(), text.size(), normal);
+	return dx / 2;
+}
+
+
+/**
+**  Format a number using commas
+**
+**  @param number  Number to be formatted
+**  @param buf     Buffer to save the formatted number to
+**
+**  @return      The real length of the Formated Number.
+*/
+static int FormatNumber(int number, char *buf)
+{
+	const char sep = ',';
+	char bufs[sizeof(int) * 10 + 2];
+	int s = 0;
+	int d = number < 0 ? 1 : 0;
+	const int sl = snprintf(bufs, sizeof(bufs), "%d", abs(number));
+
+	while (s <= sl) {
+		if (s > 0 && s < sl && (s - (sl % 3)) % 3 == 0) {
+			buf[d++] = sep;
+		}
+		buf[d++] = bufs[s++];
+	}
+	buf[0] = number < 0 ? '-' : buf[0];
+	return d - 1;
+}
+
+/**
+**  Return the index of first occurance of c in [s- s + maxlen]
+**
+**  @param s       original string.
+**  @param c       character to find.
+**  @param maxlen  size limit of the search. (0 means unlimited). (in char if font == NULL else in pixels).
+**  @param font    if specified use font->Width() instead of strlen.
+**
+**  @return computed value.
+*/
+static int strchrlen(const std::string &s, char c, unsigned int maxlen, CFont *font)
+{
+	if (s.empty()) {
+		return 0;
+	}
+	int res = s.find(c);
+	res = (res == -1) ? s.size() : res - 1;
+
+	if (!maxlen || (!font && (unsigned int) res < maxlen) || (font && (unsigned int) font->Width(s.substr(0, res)) < maxlen)) {
+		return res;
+	}
+	if (!font) {
+		res = s.rfind(' ', maxlen);
+		if (res == -1) {
+			// line too long
+			return maxlen;
+		} else {
+			return res;
+		}
+	} else {
+		res = s.rfind(' ', res);
+		while (res != -1 && (unsigned int) font->Width(s.substr(0, res)) > maxlen) {
+			res = s.rfind(' ', res - 1);
+		}
+		if (res == -1) {
+			// Line too long.
+			// FIXME.
+		} else {
+			return res;
+		}
+	}
+	return res;
+}
+
+/**
+**  Return the 'line' line of the string 's'.
+**
+**  @param line    line number.
+**  @param s       multiline string.
+**  @param maxlen  max length of the string (0 : unlimited) (in char if font == NULL else in pixels).
+**  @param font    if specified use font->Width() instead of strlen.
+**
+**  @return computed value.
+*/
+std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, CFont *font)
+{
+	unsigned int res;
+	std::string s1 = s;
+
+	Assert(0 < line);
+
+	for (unsigned int i = 1; i < line; ++i) {
+		res = strchrlen(s1, '\n', maxlen, font);
+		if (!res || res >= s1.size()) {
+			return "";
+		}
+		s1 = s1.substr(res + 1);
+	}
+	res = strchrlen(s1, '\n', maxlen, font);
+	return s1.substr(0, res);
+}
+
+
+/**
+**  Calculate the width of each character
+*/
+void CFont::MeasureWidths()
+{
+	const int maxy = G->GraphicWidth / G->Width * G->GraphicHeight / G->Height;
+
+	delete[] CharWidth;
+	CharWidth = new char[maxy];
+	memset(CharWidth, 0, maxy);
+	CharWidth[0] = G->Width / 2;  // a reasonable value for SPACE
+	const Uint32 ckey = G->Surface->format->colorkey;
+	const int ipr = G->Surface->w / G->Width; // images per row
+
+	SDL_LockSurface(G->Surface);
+	for (int y = 1; y < maxy; ++y) {
+		const unsigned char *sp = (const unsigned char *)G->Surface->pixels +
+								  (y / ipr) * G->Surface->pitch * G->Height +
+								  (y % ipr) * G->Width - 1;
+		const unsigned char *gp = sp + G->Surface->pitch * G->Height;
+		// Bail out if no letters left
+		if (gp >= ((const unsigned char *)G->Surface->pixels +
+				   G->Surface->pitch * G->GraphicHeight)) {
+			break;
+		}
+		while (sp < gp) {
+			const unsigned char *lp = sp + G->Width;
+
+			for (; sp < lp; --lp) {
+				if (*lp != ckey && *lp != 7) {
+					if (lp - sp > CharWidth[y]) {  // max width
+						CharWidth[y] = lp - sp;
 					}
 				}
-				sp += G->Surface->pitch;
 			}
-		}
-		SDL_UnlockSurface(G->Surface);
-	}
-
-	/**
-	**  Make font bitmap.
-	*/
-	void CFont::MakeFontColorTextures() const {
-		if (!FontColorGraphics[this].empty()) {
-			// already loaded
-			return;
-		}
-		const CGraphic *g = this->G;
-		SDL_Surface *s = g->Surface;
-
-		for (unsigned int i = 0; i < AllFontColors.size(); ++i) {
-			CFontColor *fc = AllFontColors[i];
-			CGraphic *newg = FontColorGraphics[this][fc] = new CGraphic;
-
-			newg->Width = g->Width;
-			newg->Height = g->Height;
-			newg->NumFrames = g->NumFrames;
-			newg->GraphicWidth = g->GraphicWidth;
-			newg->GraphicHeight = g->GraphicHeight;
-			newg->Surface = g->Surface;
-
-			SDL_LockSurface(s);
-			for (int j = 0; j < MaxFontColors; ++j) {
-				s->format->palette->colors[j] = fc->Colors[j];
-			}
-			SDL_UnlockSurface(s);
-			MakeTexture(newg);
+			sp += G->Surface->pitch;
 		}
 	}
+	SDL_UnlockSurface(G->Surface);
+}
 
-	void CFont::Load() {
-		if (this->IsLoaded()) {
-			return;
+/**
+**  Make font bitmap.
+*/
+void CFont::MakeFontColorTextures() const
+{
+	if (!FontColorGraphics[this].empty()) {
+		// already loaded
+		return;
+	}
+	const CGraphic *g = this->G;
+	SDL_Surface *s = g->Surface;
+
+	for (unsigned int i = 0; i < AllFontColors.size(); ++i) {
+		CFontColor *fc = AllFontColors[i];
+		CGraphic *newg = FontColorGraphics[this][fc] = new CGraphic;
+
+		newg->Width = g->Width;
+		newg->Height = g->Height;
+		newg->NumFrames = g->NumFrames;
+		newg->GraphicWidth = g->GraphicWidth;
+		newg->GraphicHeight = g->GraphicHeight;
+		newg->Surface = g->Surface;
+
+		SDL_LockSurface(s);
+		for (int j = 0; j < MaxFontColors; ++j) {
+			s->format->palette->colors[j] = fc->Colors[j];
 		}
+		SDL_UnlockSurface(s);
+		MakeTexture(newg);
+	}
+}
 
-		if (this->G) {
-			//		ShowLoadProgress("Fonts %s", this->G->File.c_str());
-			this->G->Load();
-			this->MeasureWidths();
-
-			if (UseOpenGL) {
-				this->MakeFontColorTextures();
-			}
-		}
+void CFont::Load()
+{
+	if (this->IsLoaded()) {
+		return;
 	}
 
-	void CFont::DynamicLoad() const {
-		const_cast<CFont *>(this)->Load();
-		if (this->CharWidth == 0) {
-			const_cast<CFont *>(this)->MeasureWidths();
-		}
-	}
+	if (this->G) {
+		//ShowLoadProgress("Fonts %s", this->G->File.c_str());
+		this->G->Load();
+		this->MeasureWidths();
 
-
-	/**
-	**  Load all fonts.
-	*/
-	void LoadFonts() {
-		for (unsigned int i = 0; i < AllFonts.size(); ++i) {
-			AllFonts[i]->Load();
-		}
-
-		// TODO: remove this
-		SmallFont = CFont::Get("small");
-		GameFont = CFont::Get("game");
-	}
-
-	void CFont::FreeOpenGL() {
-		if (this->G) {
-			for (unsigned int j = 0; j < AllFontColors.size(); ++j) {
-				CGraphic *g = FontColorGraphics[this][AllFontColors[j]];
-				glDeleteTextures(g->NumTextures, g->Textures);
-			}
-		}
-	}
-
-	/**
-	**  Free OpenGL fonts
-	*/
-	void FreeOpenGLFonts() {
-		for (unsigned int i = 0; i < AllFonts.size(); ++i) {
-			CFont *font = AllFonts[i];
-
-			font->FreeOpenGL();
-		}
-	}
-
-
-	void CFont::Reload() const {
-		if (this->G) {
-			for (unsigned int j = 0; j < AllFontColors.size(); ++j) {
-				//CGraphic::Free(FontColorGraphics[this][AllFontColors[j]]);
-				CGraphic *g = FontColorGraphics[this][AllFontColors[j]];
-				delete[] g->Textures;
-				delete g;
-			}
-			FontColorGraphics[this].clear();
+		if (UseOpenGL) {
 			this->MakeFontColorTextures();
 		}
 	}
+}
+
+void CFont::DynamicLoad() const
+{
+	const_cast<CFont *>(this)->Load();
+	if (this->CharWidth == 0) {
+		const_cast<CFont *>(this)->MeasureWidths();
+	}
+}
 
 
-	/**
-	**  Reload OpenGL fonts
-	*/
-	void ReloadFonts() {
-		for (unsigned int i = 0; i < AllFonts.size(); ++i) {
-			const CFont *font = AllFonts[i];
+/**
+**  Load all fonts.
+*/
+void LoadFonts()
+{
+	for (unsigned int i = 0; i < AllFonts.size(); ++i) {
+		AllFonts[i]->Load();
+	}
 
-			font->Reload();
+	// TODO: remove this
+	SmallFont = CFont::Get("small");
+	GameFont = CFont::Get("game");
+}
+
+void CFont::FreeOpenGL()
+{
+	if (this->G) {
+		for (unsigned int j = 0; j < AllFontColors.size(); ++j) {
+			CGraphic *g = FontColorGraphics[this][AllFontColors[j]];
+			glDeleteTextures(g->NumTextures, g->Textures);
 		}
 	}
+}
 
-	/**
-	**  Create a new font
-	**
-	**  @param ident  Font identifier
-	**  @param g      Graphic
-	**
-	**  @return       New font
-	*/
-	CFont *CFont::New(const std::string & ident, CGraphic * g) {
-		CFont *font = Fonts[ident];
-		if (font) {
-			if (font->G != g) {
-				CGraphic::Free(font->G);
-			}
-			font->G = g;
-		} else {
-			font = new CFont(ident);
-			font->G = g;
-			AllFonts.push_back(font);
-			Fonts[ident] = font;
+/**
+**  Free OpenGL fonts
+*/
+void FreeOpenGLFonts()
+{
+	for (unsigned int i = 0; i < AllFonts.size(); ++i) {
+		CFont *font = AllFonts[i];
+
+		font->FreeOpenGL();
+	}
+}
+
+
+void CFont::Reload() const
+{
+	if (this->G) {
+		for (unsigned int j = 0; j < AllFontColors.size(); ++j) {
+			//CGraphic::Free(FontColorGraphics[this][AllFontColors[j]]);
+			CGraphic *g = FontColorGraphics[this][AllFontColors[j]];
+			delete[] g->Textures;
+			delete g;
 		}
-		return font;
+		FontColorGraphics[this].clear();
+		this->MakeFontColorTextures();
 	}
+}
 
-	/**
-	**  Get a font
-	**
-	**  @param ident  Font identifier
-	**
-	**  @return       The font
-	*/
-	CFont *CFont::Get(const std::string & ident) {
-		CFont *font = Fonts[ident];
-		if (!font) {
-			DebugPrint("font not found: %s\n" _C_ ident.c_str());
+
+/**
+**  Reload OpenGL fonts
+*/
+void ReloadFonts()
+{
+	for (unsigned int i = 0; i < AllFonts.size(); ++i) {
+		const CFont *font = AllFonts[i];
+
+		font->Reload();
+	}
+}
+
+/**
+**  Create a new font
+**
+**  @param ident  Font identifier
+**  @param g      Graphic
+**
+**  @return       New font
+*/
+CFont *CFont::New(const std::string &ident, CGraphic *g)
+{
+	CFont *font = Fonts[ident];
+	if (font) {
+		if (font->G != g) {
+			CGraphic::Free(font->G);
 		}
-		return font;
+		font->G = g;
+	} else {
+		font = new CFont(ident);
+		font->G = g;
+		AllFonts.push_back(font);
+		Fonts[ident] = font;
 	}
+	return font;
+}
 
-	/**
-	**  CFontColor constructor
-	*/
-	CFontColor::CFontColor(const std::string & ident) {
-		Ident = ident;
-		memset(Colors, 0, sizeof(Colors));
+/**
+**  Get a font
+**
+**  @param ident  Font identifier
+**
+**  @return       The font
+*/
+CFont *CFont::Get(const std::string &ident)
+{
+	CFont *font = Fonts[ident];
+	if (!font) {
+		DebugPrint("font not found: %s\n" _C_ ident.c_str());
 	}
+	return font;
+}
 
-	/**
-	**  CFontColor destructor
-	*/
-	CFontColor::~CFontColor() {
-	}
+/**
+**  CFontColor constructor
+*/
+CFontColor::CFontColor(const std::string &ident)
+{
+	Ident = ident;
+	memset(Colors, 0, sizeof(Colors));
+}
 
-	/**
-	**  Create a new font color
-	**
-	**  @param ident  Font color identifier
-	**
-	**  @return       New font color
-	*/
-	CFontColor *CFontColor::New(const std::string & ident) {
-		CFontColor *fc = FontColors[ident];
-		if (fc) {
-			return fc;
-		} else {
-			fc = new CFontColor(ident);
-			FontColors[ident] = fc;
-			AllFontColors.push_back(fc);
-			return fc;
-		}
-	}
+/**
+**  CFontColor destructor
+*/
+CFontColor::~CFontColor()
+{
+}
 
-	/**
-	**  Get a font color
-	**
-	**  @param ident  Font color identifier
-	**
-	**  @return       The font color
-	*/
-	CFontColor *CFontColor::Get(const std::string & ident) {
-		CFontColor *fc = FontColors[ident];
-		if (!fc) {
-			DebugPrint("font color not found: %s\n" _C_ ident.c_str());
-		}
+/**
+**  Create a new font color
+**
+**  @param ident  Font color identifier
+**
+**  @return       New font color
+*/
+CFontColor *CFontColor::New(const std::string &ident)
+{
+	CFontColor *fc = FontColors[ident];
+	if (fc) {
+		return fc;
+	} else {
+		fc = new CFontColor(ident);
+		FontColors[ident] = fc;
+		AllFontColors.push_back(fc);
 		return fc;
 	}
+}
 
-	void CFont::Clean() {
-		CFont *font = this;
+/**
+**  Get a font color
+**
+**  @param ident  Font color identifier
+**
+**  @return       The font color
+*/
+CFontColor *CFontColor::Get(const std::string &ident)
+{
+	CFontColor *fc = FontColors[ident];
+	if (!fc) {
+		DebugPrint("font color not found: %s\n" _C_ ident.c_str());
+	}
+	return fc;
+}
 
-		if (UseOpenGL) {
-			if (!FontColorGraphics[font].empty()) {
-				for (int j = 0; j < (int)AllFontColors.size(); ++j) {
-					CGraphic *g = FontColorGraphics[font][AllFontColors[j]];
-					glDeleteTextures(g->NumTextures, g->Textures);
-					delete[] g->Textures;
-					delete g;
-				}
-				FontColorGraphics[font].clear();
+void CFont::Clean()
+{
+	CFont *font = this;
+
+	if (UseOpenGL) {
+		if (!FontColorGraphics[font].empty()) {
+			for (int j = 0; j < (int)AllFontColors.size(); ++j) {
+				CGraphic *g = FontColorGraphics[font][AllFontColors[j]];
+				glDeleteTextures(g->NumTextures, g->Textures);
+				delete[] g->Textures;
+				delete g;
 			}
+			FontColorGraphics[font].clear();
 		}
 	}
+}
 
 
-	/**
-	**  Clean up the font module.
-	*/
-	void CleanFonts() {
-		for (unsigned int i = 0; i < AllFonts.size(); ++i) {
-			CFont *font = AllFonts[i];
+/**
+**  Clean up the font module.
+*/
+void CleanFonts()
+{
+	for (unsigned int i = 0; i < AllFonts.size(); ++i) {
+		CFont *font = AllFonts[i];
 
-			font->Clean();
-			delete font;
-		}
-		if (UseOpenGL) {
-			FontColorGraphics.clear();
-		}
-		AllFonts.clear();
-		Fonts.clear();
-
-		for (unsigned int i = 0; i < AllFontColors.size(); ++i) {
-			delete AllFontColors[i];
-		}
-		AllFontColors.clear();
-		FontColors.clear();
-
-		SmallFont = NULL;
-		GameFont = NULL;
+		font->Clean();
+		delete font;
 	}
+	if (UseOpenGL) {
+		FontColorGraphics.clear();
+	}
+	AllFonts.clear();
+	Fonts.clear();
 
-	//@}
+	for (unsigned int i = 0; i < AllFontColors.size(); ++i) {
+		delete AllFontColors[i];
+	}
+	AllFontColors.clear();
+	FontColors.clear();
+
+	SmallFont = NULL;
+	GameFont = NULL;
+}
+
+//@}
