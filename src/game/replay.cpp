@@ -851,7 +851,7 @@ static void DoNextReplay()
 	} else if (!strcmp(action, "cancel-upgrade-to")) {
 		SendCommandCancelUpgradeTo(*unit);
 	} else if (!strcmp(action, "research")) {
-		SendCommandResearch(*unit, CUpgrade::Get(val), flags);
+		SendCommandResearch(*unit, *CUpgrade::Get(val), flags);
 	} else if (!strcmp(action, "cancel-research")) {
 		SendCommandCancelResearch(*unit);
 	} else if (!strcmp(action, "spell-cast")) {

@@ -544,10 +544,10 @@ void CommandResource(CUnit &unit, CUnit &dest, int flush)
 **  Let unit returning goods.
 **
 **  @param unit   pointer to unit.
-**  @param goal   bring goods to this depot.
+**  @param depot  bring goods to this depot.
 **  @param flush  if true, flush command queue.
 */
-void CommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
+void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -568,7 +568,7 @@ void CommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
 			return;
 		}
 	}
-	*order = COrder::NewActionReturnGoods(unit, goal);
+	*order = COrder::NewActionReturnGoods(unit, depot);
 	ClearSavedAction(unit);
 }
 
@@ -718,20 +718,20 @@ void CommandCancelUpgradeTo(CUnit &unit)
 **  @param what   what to research.
 **  @param flush  if true, flush command queue.
 */
-void CommandResearch(CUnit &unit, CUpgrade *what, int flush)
+void CommandResearch(CUnit &unit, CUpgrade &what, int flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
 	// Check if enough resources remains? (NETWORK!)
-	if (unit.Player->CheckCosts(what->Costs)) {
+	if (unit.Player->CheckCosts(what.Costs)) {
 		return;
 	}
 	COrderPtr *order = GetNextOrder(unit, flush);
 	if (order == NULL) {
 		return;
 	}
-	*order = COrder::NewActionResearch(unit, *what);
+	*order = COrder::NewActionResearch(unit, what);
 	ClearSavedAction(unit);
 }
 
@@ -762,11 +762,11 @@ void CommandCancelResearch(CUnit &unit)
 **  @param spell  Spell type pointer.
 **  @param flush  If true, flush command queue.
 */
-void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, SpellType *spell, int flush)
+void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellType &spell, int flush)
 {
 	DebugPrint(": %d casts %s at %d %d on %d\n" _C_
-			   UnitNumber(unit) _C_ spell->Ident.c_str() _C_ pos.x _C_ pos.y _C_ dest ? UnitNumber(*dest) : 0);
-	Assert(unit.Type->CanCastSpell[spell->Slot]);
+			   UnitNumber(unit) _C_ spell.Ident.c_str() _C_ pos.x _C_ pos.y _C_ dest ? UnitNumber(*dest) : 0);
+	Assert(unit.Type->CanCastSpell[spell.Slot]);
 	Assert(Map.Info.IsPointOnMap(pos));
 
 	if (IsUnitValidForNetwork(unit) == false) {
@@ -778,7 +778,7 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, SpellType *spe
 		return;
 	}
 
-	*order = COrder::NewActionSpellCast(*spell, pos, dest);
+	*order = COrder::NewActionSpellCast(spell, pos, dest);
 	ClearSavedAction(unit);
 }
 

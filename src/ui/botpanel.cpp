@@ -1505,7 +1505,7 @@ void CButtonPanel::DoClicked(int button)
 			const int index = CurrentButtons[button].Value;
 			if (!Selected[0]->Player->CheckCosts(AllUpgrades[index]->Costs)) {
 				//PlayerSubCosts(player,Upgrades[i].Costs);
-				SendCommandResearch(*Selected[0], AllUpgrades[index], !(KeyModifiers & ModifierShift));
+				SendCommandResearch(*Selected[0], *AllUpgrades[index], !(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();
 				ClearCosts();
 			}

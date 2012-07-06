@@ -640,7 +640,7 @@ static bool AiResearchUpgrade(const CUnitType &type, CUpgrade &what)
 		CUnit &unit = *table[i];
 
 		if (unit.IsIdle()) {
-			CommandResearch(unit, &what, FlushCommands);
+			CommandResearch(unit, what, FlushCommands);
 			return true;
 		}
 	}

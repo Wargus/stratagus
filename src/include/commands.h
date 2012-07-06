@@ -89,7 +89,7 @@ extern void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush);
 /// Prepare command resource
 extern void CommandResource(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command return
-extern void CommandReturnGoods(CUnit &unit, CUnit *goal, int flush);
+extern void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush);
 /// Prepare command train
 extern void CommandTrainUnit(CUnit &unit, CUnitType &what, int flush);
 /// Prepare command cancel training
@@ -101,11 +101,11 @@ extern void CommandTransformIntoType(CUnit &unit, CUnitType &type);
 /// Prepare command cancel upgrade to
 extern void CommandCancelUpgradeTo(CUnit &unit);
 /// Prepare command research
-extern void CommandResearch(CUnit &unit, CUpgrade *what, int flush);
+extern void CommandResearch(CUnit &unit, CUpgrade &what, int flush);
 /// Prepare command cancel research
 extern void CommandCancelResearch(CUnit &unit);
 /// Prepare command spellcast
-extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, SpellType *spell, int flush);
+extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellType &spell, int flush);
 /// Prepare command auto spellcast
 extern void CommandAutoSpellCast(CUnit &unit, int spellid, int on);
 /// Prepare diplomacy command
@@ -165,7 +165,7 @@ extern void SendCommandUpgradeTo(CUnit &unit, CUnitType &what, int flush);
 /// Send cancel upgrade to command
 extern void SendCommandCancelUpgradeTo(CUnit &unit);
 /// Send research command
-extern void SendCommandResearch(CUnit &unit, CUpgrade *what, int flush);
+extern void SendCommandResearch(CUnit &unit, CUpgrade &what, int flush);
 /// Send cancel research command
 extern void SendCommandCancelResearch(CUnit &unit);
 /// Send spell cast command

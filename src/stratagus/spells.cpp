@@ -957,8 +957,7 @@ int AutoCastSpell(CUnit &caster, const SpellType *spell)
 	} else {
 		// Must move before ?
 		// FIXME: SpellType* of CommandSpellCast must be const.
-		CommandSpellCast(caster, target->targetPos, target->Unit,
-						 const_cast<SpellType *>(spell), FlushCommands);
+		CommandSpellCast(caster, target->targetPos, target->Unit, *spell, FlushCommands);
 		delete target;
 	}
 	return 1;

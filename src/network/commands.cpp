@@ -394,14 +394,14 @@ void SendCommandCancelUpgradeTo(CUnit &unit)
 ** @param what     research-type of the research.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandResearch(CUnit &unit, CUpgrade *what, int flush)
+void SendCommandResearch(CUnit &unit, CUpgrade &what, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("research", &unit, flush, -1, -1, NoUnitP, what->Ident.c_str(), -1);
+		CommandLog("research", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
 		CommandResearch(unit, what, flush);
 	} else {
 		NetworkSendCommand(MessageCommandResearch, unit,
-						   what->ID, 0, NoUnitP, NULL, flush);
+						   what.ID, 0, NoUnitP, NULL, flush);
 	}
 }
 
@@ -434,7 +434,7 @@ void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spelli
 {
 	if (!IsNetworkGame()) {
 		CommandLog("spell-cast", &unit, flush, pos.x, pos.y, dest, NULL, spellid);
-		CommandSpellCast(unit, pos, dest, SpellTypeTable[spellid], flush);
+		CommandSpellCast(unit, pos, dest, *SpellTypeTable[spellid], flush);
 	} else {
 		NetworkSendCommand(MessageCommandSpellCast + spellid,
 						   unit, pos.x, pos.y, dest, NULL, flush);
@@ -692,7 +692,7 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandResearch:
 			CommandLog("research", &unit, status, -1, -1, NoUnitP,
 					   AllUpgrades[arg1]->Ident.c_str(), -1);
-			CommandResearch(unit, AllUpgrades[arg1], status);
+			CommandResearch(unit, *AllUpgrades[arg1], status);
 			break;
 		case MessageCommandCancelResearch:
 			CommandLog("cancel-research", &unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
@@ -707,7 +707,7 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 					Assert(dest && dest->Type);
 				}
 				CommandLog("spell-cast", &unit, status, pos.x, pos.y, dest, NULL, id);
-				CommandSpellCast(unit, pos, dest, SpellTypeTable[id], status);
+				CommandSpellCast(unit, pos, dest, *SpellTypeTable[id], status);
 			} else {
 				CommandLog("auto-spell-cast", &unit, status, arg1, -1, NoUnitP, NULL, id);
 				CommandAutoSpellCast(unit, id, arg1);

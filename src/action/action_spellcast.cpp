@@ -59,7 +59,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder *COrder::NewActionSpellCast(SpellType &spell, const Vec2i &pos, CUnit *target)
+/* static */ COrder *COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target)
 {
 	COrder_SpellCast *order = new COrder_SpellCast;
 

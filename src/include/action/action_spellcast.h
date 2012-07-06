@@ -36,7 +36,7 @@
 
 class COrder_SpellCast : public COrder
 {
-	friend COrder *COrder::NewActionSpellCast(SpellType &spell, const Vec2i &pos, CUnit *target);
+	friend COrder *COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target);
 public:
 	COrder_SpellCast() : COrder(UnitActionSpellCast), Spell(NULL), State(0), Range(0) {
 		goalPos.x = -1;
@@ -57,12 +57,12 @@ public:
 	virtual void OnAnimationAttack(CUnit &unit);
 
 	const SpellType &GetSpell() const { return *Spell; }
-	void SetSpell(SpellType &spell) { Spell = &spell; }
+	void SetSpell(const SpellType &spell) { Spell = &spell; }
 private:
 	bool CheckForDeadGoal(CUnit &unit);
 	bool SpellMoveToTarget(CUnit &unit);
 private:
-	SpellType *Spell;
+	const SpellType *Spell;
 	int State;
 	int Range;
 	Vec2i goalPos;
