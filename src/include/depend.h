@@ -111,8 +111,8 @@ public:
 	unsigned char Count;      /// how many required
 	char Type;                /// an unit-type or upgrade
 	union {
-		CUnitType *UnitType;  /// unit-type pointer
-		CUpgrade  *Upgrade;   /// upgrade pointer
+		const CUnitType *UnitType;  /// unit-type pointer
+		const CUpgrade  *Upgrade;   /// upgrade pointer
 	} Kind;                   /// required object
 	DependRule *Rule;         /// requirements, and rule
 };

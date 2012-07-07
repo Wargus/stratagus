@@ -274,7 +274,7 @@ bool CheckDependByType(const CPlayer &player, const CUnitType &type)
 	}
 	DependRule rule;
 
-	rule.Kind.UnitType = const_cast<CUnitType *>(&type);
+	rule.Kind.UnitType = &type;
 	rule.Type = DependRuleUnitType;
 	return CheckDependByRule(player, rule);
 }
