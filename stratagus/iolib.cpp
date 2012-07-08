@@ -86,7 +86,8 @@ static int gzseek(CFile *file, unsigned offset, int whence)
 **  @param name       File name.
 **  @param openflags  Open read, or write and compression options
 **
-**  @return File Pointer
+**  @return 0 on success, -1 on error.  The value of errno does not
+**          reliably indicate the cause of the error.
 */
 int CFile::open(const char *name, long openflags)
 {
@@ -153,6 +154,11 @@ int CFile::open(const char *name, long openflags)
 
 /**
 **  CLclose Library file close
+**
+**  @return 0 on success, nonzero on error.  The resulting value of
+**          errno is best not relied on.  Callers that only read
+**          files, rather than write them, typically ignore the result
+**          anyway.
 */
 int CFile::close()
 {
@@ -163,9 +169,14 @@ int CFile::close()
 
 	if ((tp = cl_type) != CLF_TYPE_INVALID) {
 		if (tp == CLF_TYPE_PLAIN) {
+			// On success, returns 0.
+			// On error, returns EOF and sets errno.
 			ret = fclose(cl_plain);
 		}
 		if (tp == CLF_TYPE_GZIP) {
+			// On success, returns Z_OK=0.
+			// On error, returns a zlib error code, and
+			// sets errno if the code is Z_ERRNO=-1.
 			ret = gzclose(cl_gz);
 		}
 	} else {
