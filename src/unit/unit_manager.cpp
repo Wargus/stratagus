@@ -164,7 +164,7 @@ void CUnitManager::Add(CUnit *unit)
 */
 void CUnitManager::Save(CFile &file) const
 {
-	file.printf("SlotUsage(%d", unitSlots.size());
+	file.printf("SlotUsage(%lu", (long unsigned int)unitSlots.size());
 
 	for (std::list<CUnit *>::const_iterator it = releasedUnits.begin(); it != releasedUnits.end(); ++it) {
 		const CUnit &unit = **it;
