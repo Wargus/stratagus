@@ -930,8 +930,10 @@ int main(int argc, char **argv)
 
 	Parameters &parameters = Parameters::Instance;
 	parameters.SetDefaultValues();
-	parameters.applicationName = argv[0];
 	parameters.LocalPlayerName = GetLocalPlayerNameFromEnv();
+
+	if (argc > 0)
+		parameters.applicationName = argv[0];
 
 	// FIXME: Parse options before or after scripts?
 	ParseCommandLine(argc, argv, parameters);
