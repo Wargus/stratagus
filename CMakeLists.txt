@@ -621,11 +621,18 @@ set(SBINDIR "sbin" CACHE PATH "Where to install system binaries")
 set(GAMEDIR "games" CACHE PATH "Where to install games binaries")
 set(DOCDIR "share/doc/stratagus" CACHE PATH "Sets the doc directory to a non-default location.")
 set(MANDIR "share/man/man6" CACHE PATH "Sets the man directory to a non-default location.")
+set(PIXMAPSDIR "share/pixmaps" CACHE PATH "Sets the pixmaps directory to a non-default location.")
 set(STRATAGUS_HEADERS "include" CACHE PATH "Where to install stratagus headers.")
+
+if(NOT IS_ABSOLUTE "${PIXMAPSDIR}")
+	set(PIXMAPSDIRABS "${CMAKE_INSTALL_PREFIX}/${PIXMAPSDIR}")
+else()
+	set(PIXMAPSDIRABS "${PIXMAPSDIR}")
+endif()
 
 # Stratagus definitions
 
-add_definitions(${PNG_DEFINITIONS} -DUSE_ZLIB)
+add_definitions(${PNG_DEFINITIONS} -DUSE_ZLIB -DPIXMAPS=\"${PIXMAPSDIRABS}\")
 include_directories(${LUA_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
 set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES} ${PNG_LIBRARIES} ${SDL_LIBRARY} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES})
 
@@ -874,7 +881,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 if(WIN32 AND MINGW AND ENABLE_STATIC)
-	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc -Wl,--stack,10485760")
+	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc -static-libstdc++ -Wl,--stack,10485760")
 endif()
 
 ########### next target ###############
@@ -902,7 +909,7 @@ if(SQLITE_FOUND)
 	target_link_libraries(metaserver ${SDL_LIBRARY} ${SQLITE_LIBRARIES})
 
 	if(WIN32 AND MINGW AND ENABLE_STATIC)
-		set_target_properties(metaserver PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc")
+		set_target_properties(metaserver PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc -static-libstdc++")
 	endif()
 endif()
 
@@ -917,7 +924,7 @@ add_executable(png2stratagus ${png2stratagus_SRCS})
 target_link_libraries(png2stratagus ${PNG_LIBRARY} ${ZLIB_LIBRARIES})
 
 if(WIN32 AND MINGW AND ENABLE_STATIC)
-	set_target_properties(png2stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc")
+	set_target_properties(png2stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc -static-libstdc++")
 endif()
 
 

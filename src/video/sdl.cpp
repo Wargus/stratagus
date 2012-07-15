@@ -42,6 +42,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 
 #include <limits.h>
@@ -464,10 +465,12 @@ void InitVideoSdl()
 		signal(SIGABRT, CleanExit);
 #endif
 		// Set WindowManager Title
-		if (FullGameName.empty()) {
-			SDL_WM_SetCaption("Stratagus", "Stratagus");
-		} else {
+		if (!FullGameName.empty()) {
 			SDL_WM_SetCaption(FullGameName.c_str(), FullGameName.c_str());
+		} else if (!Parameters::Instance.applicationName.empty()) {
+			SDL_WM_SetCaption(Parameters::Instance.applicationName.c_str(), Parameters::Instance.applicationName.c_str());
+		} else {
+			SDL_WM_SetCaption("Stratagus", "Stratagus");
 		}
 
 #if ! defined(USE_WIN32) && ! defined(USE_MAEMO)
@@ -479,17 +482,33 @@ void InitVideoSdl()
 		CGraphic *g = NULL;
 		struct stat st;
 
-		char pixmaps[4][1024];
-		sprintf(pixmaps[0], "/usr/share/pixmaps/%s.png", FullGameName.c_str());
-		sprintf(pixmaps[1], "/usr/share/pixmaps/%s.png", FullGameName.c_str());
-		sprintf(pixmaps[2], "/usr/share/pixmaps/stratagus.png");
-		sprintf(pixmaps[3], "/usr/share/pixmaps/Stratagus.png");
-		pixmaps[1][19] = tolower(pixmaps[1][19]);
+		std::string FullGameNameL = FullGameName;
+		for (size_t i = 0; i < FullGameNameL.size(); ++i)
+			FullGameNameL[i] = tolower(FullGameNameL[i]);
 
-		for (int i = 0; i < 4; ++i) {
-			if (stat(pixmaps[i], &st) == 0) {
+		std::string ApplicationName = Parameters::Instance.applicationName;
+		std::string ApplicationNameL = ApplicationName;
+		for (size_t i = 0; i < ApplicationNameL.size(); ++i)
+			ApplicationNameL[i] = tolower(ApplicationNameL[i]);
+
+		std::vector <std::string> pixmaps;
+		pixmaps.push_back(std::string() + PIXMAPS + "/" + FullGameName + ".png");
+		pixmaps.push_back(std::string() + PIXMAPS + "/" + FullGameNameL + ".png");
+		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + FullGameName + ".png");
+		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + FullGameNameL + ".png");
+		pixmaps.push_back(std::string() + PIXMAPS + "/" + ApplicationName + ".png");
+		pixmaps.push_back(std::string() + PIXMAPS + "/" + ApplicationNameL + ".png");
+		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + ApplicationName + ".png");
+		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + ApplicationNameL + ".png");
+		pixmaps.push_back(std::string() + PIXMAPS + "/" + "Stratagus" + ".png");
+		pixmaps.push_back(std::string() + PIXMAPS + "/" + "stratagus" + ".png");
+		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + "Stratagus" + ".png");
+		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + "stratagus" + ".png");
+
+		for (size_t i = 0; i < pixmaps.size(); ++i) {
+			if (stat(pixmaps[i].c_str(), &st) == 0) {
 				if (g) { CGraphic::Free(g); }
-				g = CGraphic::New(pixmaps[i]);
+				g = CGraphic::New(pixmaps[i].c_str());
 				g->Load();
 				icon = g->Surface;
 				if (icon) { break; }
@@ -507,21 +526,17 @@ void InitVideoSdl()
 		UseOpenGL = UseOpenGL_orig;
 #endif
 #ifdef USE_WIN32
-		int argc = 0;
-		LPWSTR *argv = NULL;
 		HWND hwnd = NULL;
 		HICON hicon = NULL;
 		SDL_SysWMinfo info;
 		SDL_VERSION(&info.version);
 
-		argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-
 		if (SDL_GetWMInfo(&info)) {
 			hwnd = info.window;
 		}
 
-		if (hwnd && argc > 0 && argv) {
-			hicon = ExtractIconW(GetModuleHandle(NULL), argv[0], 0);
+		if (hwnd) {
+			hicon = ExtractIcon(GetModuleHandle(NULL), Parameters::Instance.applicationName.c_str(), 0);
 		}
 
 		if (hicon) {
