@@ -582,6 +582,181 @@ static inline int CostMoveTo(unsigned int index, const CUnit &unit)
 	return *c;
 }
 
+class AStarGoalMarker
+{
+public:
+	AStarGoalMarker(const CUnit &unit, bool *goal_reachable) :
+		unit(unit), goal_reachable(goal_reachable)
+	{}
+
+	void operator() (int offset) const
+	{
+		if (CostMoveTo(offset, unit) >= 0) {
+			AStarMatrix[offset].InGoal = 1;
+			*goal_reachable = true;
+		}
+		AStarAddToClose(offset);
+	}
+private:
+	const CUnit &unit;
+	bool *goal_reachable;
+};
+
+
+template <typename T>
+class MinMaxRangeVisitor
+{
+public:
+	explicit MinMaxRangeVisitor(const T& func) : func(func), minrange(0), maxrange(0) {}
+
+	void SetGoal(Vec2i goalTopLeft, Vec2i goalBottomRight) {
+		this->goalTopLeft = goalTopLeft;
+		this->goalBottomRight = goalBottomRight;
+	}
+
+	void SetRange(int minrange, int maxrange) {
+		this->minrange = minrange;
+		this->maxrange = maxrange;
+	}
+
+	void SetUnitSize(const Vec2i &tileSize)
+	{
+		this->unitExtraTileSize.x = tileSize.x - 1;
+		this->unitExtraTileSize.y = tileSize.y - 1;
+	}
+
+	void Visit() const
+	{
+		TopHemicycle();
+		TopHemicycleNoMinRange();
+		Center();
+		BottomHemicycleNoMinRange();
+		BottomHemicycle();
+	}
+
+private:
+	int GetMaxOffsetX(int dy, int range) const
+	{
+		return isqrt(square(range + 1) - square(dy) - 1);
+	}
+
+	// Distance are computed between bottom of unit and top of goal
+	void TopHemicycle() const
+	{
+		const int miny = std::max(0, goalTopLeft.y - maxrange - unitExtraTileSize.y);
+		const int maxy = std::min(goalTopLeft.y - minrange - unitExtraTileSize.y, goalTopLeft.y - 1 - unitExtraTileSize.y);
+		for (int y = miny; y <= maxy; ++y) {
+			const int offsetx = GetMaxOffsetX(y - goalTopLeft.y, maxrange);
+			const int minx = std::max(0, goalTopLeft.x - offsetx - unitExtraTileSize.x);
+			const int maxx = std::min(Map.Info.MapWidth - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetx);
+			Vec2i mpos(minx, y);
+			const unsigned int offset = mpos.y * Map.Info.MapWidth;
+
+			for (mpos.x = minx; mpos.x <= maxx; ++mpos.x) {
+				func(offset + mpos.x);
+			}
+		}
+	}
+
+	void HemiCycleRing(int y, int offsetminx, int offsetmaxx) const
+	{
+		const int minx = std::max(0, goalTopLeft.x - offsetmaxx - unitExtraTileSize.x);
+		const int maxx = std::min(Map.Info.MapWidth - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetmaxx);
+		Vec2i mpos(minx, y);
+		const unsigned int offset = mpos.y * Map.Info.MapWidth;
+
+		for (mpos.x = minx; mpos.x <= goalTopLeft.x - offsetminx - unitExtraTileSize.x; ++mpos.x) {
+			func(offset + mpos.x);
+		}
+		for (mpos.x = goalBottomRight.x + offsetminx; mpos.x <= maxx; ++mpos.x) {
+			func(offset + mpos.x);
+		}
+	}
+
+	void TopHemicycleNoMinRange() const
+	{
+		const int miny = std::max(0, goalTopLeft.y - (minrange - 1) - unitExtraTileSize.y);
+		const int maxy = goalTopLeft.y - 1 - unitExtraTileSize.y;
+		for (int y = miny; y <= maxy; ++y) {
+			const int offsetmaxx = GetMaxOffsetX(y - goalTopLeft.y, maxrange);
+			const int offsetminx = GetMaxOffsetX(y - goalTopLeft.y, minrange - 1) + 1;
+
+			HemiCycleRing(y, offsetminx, offsetmaxx);
+		}
+	}
+
+	void Center() const
+	{
+		const int miny = std::max(0, goalTopLeft.y - unitExtraTileSize.y);
+		const int maxy = std::min<int>(Map.Info.MapHeight - 1 - unitExtraTileSize.y, goalBottomRight.y);
+		const int minx = std::max(0, goalTopLeft.x - maxrange - unitExtraTileSize.x);
+		const int maxx = std::min<int>(Map.Info.MapWidth - 1 - unitExtraTileSize.x, goalBottomRight.x + maxrange);
+
+		if (minrange == 0) {
+			for (int y = miny; y <= maxy; ++y) {
+				Vec2i mpos(minx, y);
+				const unsigned int offset = mpos.y * Map.Info.MapWidth;
+
+				for (mpos.x = minx; mpos.x <= maxx; ++mpos.x) {
+					func(offset + mpos.x);
+				}
+			}
+		} else {
+			for (int y = miny; y <= maxy; ++y) {
+				Vec2i mpos(minx, y);
+				const unsigned int offset = mpos.y * Map.Info.MapWidth;
+
+				for (mpos.x = minx; mpos.x <= goalTopLeft.x - minrange - unitExtraTileSize.x; ++mpos.x) {
+					func(offset + mpos.x);
+				}
+				for (mpos.x = goalBottomRight.x + minrange; mpos.x <= maxx; ++mpos.x) {
+					func(offset + mpos.x);
+				}
+			}
+		}
+	}
+
+	void BottomHemicycleNoMinRange() const
+	{
+		const int miny = goalBottomRight.y + 1;
+		const int maxy = std::min(Map.Info.MapHeight - 1 - unitExtraTileSize.y, goalBottomRight.y + (minrange - 1));
+
+		for (int y = miny; y <= maxy; ++y) {
+			const int offsetmaxx = GetMaxOffsetX(y - goalBottomRight.y, maxrange);
+			const int offsetminx = GetMaxOffsetX(y - goalBottomRight.y, minrange - 1) + 1;
+
+			HemiCycleRing(y, offsetminx, offsetmaxx);
+		}
+	}
+
+	void BottomHemicycle() const
+	{
+		const int miny = std::max(goalBottomRight.y + minrange, goalBottomRight.y + 1);
+		const int maxy = std::min(Map.Info.MapHeight - 1 - unitExtraTileSize.y, goalBottomRight.y + maxrange);
+		for (int y = miny; y <= maxy; ++y) {
+			const int offsetx = GetMaxOffsetX(y - goalBottomRight.y, maxrange);
+			const int minx = std::max(0, goalTopLeft.x - offsetx - unitExtraTileSize.x);
+			const int maxx = std::min(Map.Info.MapWidth - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetx);
+			Vec2i mpos(minx, y);
+			const unsigned int offset = mpos.y * Map.Info.MapWidth;
+
+			for (mpos.x = minx; mpos.x <= maxx; ++mpos.x) {
+				func(offset + mpos.x);
+			}
+		}
+	}
+
+private:
+	T func;
+	Vec2i goalTopLeft;
+	Vec2i goalBottomRight;
+	Vec2i unitExtraTileSize;
+	int minrange;
+	int maxrange;
+};
+
+
+
 /**
 **  MarkAStarGoal
 */
@@ -606,149 +781,24 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 		}
 	}
 
+	bool goal_reachable = false;
+
 	gw = std::max(gw, 1);
 	gh = std::max(gh, 1);
 
-	bool goal_reachable = false;
+	AStarGoalMarker aStarGoalMarker(unit, &goal_reachable);
+	MinMaxRangeVisitor<AStarGoalMarker> visitor(aStarGoalMarker);
+
+	const Vec2i goalBottomRigth(goal.x + gw - 1, goal.y + gh - 1);
+	visitor.SetGoal(goal, goalBottomRigth);
+	visitor.SetRange(minrange, maxrange);
+	const Vec2i tileSize(tilesizex, tilesizey);
+	visitor.SetUnitSize(tileSize);
 
 	const Vec2i extratilesize(tilesizex - 1, tilesizey - 1);
 
-	// top hemi cycle
-	{
-		const int miny = std::max(-maxrange - extratilesize.y, 0 - goal.y);
-		for (int offsety = miny; offsety < -minrange - extratilesize.y; ++offsety) {
-			const int offsetx = isqrt(square(maxrange + 1) - square(-offsety) - 1);
-			const int minx = std::max(0, goal.x - offsetx - extratilesize.x);
-			const int maxx = std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + offsetx);
-			Vec2i mpos(minx, goal.y + offsety);
-			const unsigned int offset = mpos.y * Map.Info.MapWidth;
+	visitor.Visit();
 
-			for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
-				if (CostMoveTo(offset + mpos.x, unit) >= 0) {
-					AStarMatrix[offset + mpos.x].InGoal = 1;
-					goal_reachable = true;
-				}
-				AStarAddToClose(offset + mpos.x);
-			}
-		}
-	}
-	if (minrange == 0) {
-		// center
-		for (int offsety = -extratilesize.y; offsety < gh; ++offsety) {
-			const int minx = std::max(0, goal.x - maxrange - extratilesize.x);
-			const int maxx = std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + maxrange);
-			Vec2i mpos(minx, goal.y + offsety);
-			const unsigned int offset = mpos.y * Map.Info.MapWidth;
-
-			for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
-				if (CostMoveTo(offset + mpos.x, unit) >= 0) {
-					AStarMatrix[offset + mpos.x].InGoal = 1;
-					goal_reachable = true;
-				}
-				AStarAddToClose(offset + mpos.x);
-			}
-		}
-	} else {
-		{
-			// top hemi cycle excluding minRange
-			const int miny = std::max(-minrange - extratilesize.y, 0 - goal.y);
-			const int maxy = std::min(0, Map.Info.MapHeight - goal.y - extratilesize.y);
-			for (int offsety = miny; offsety < maxy; ++offsety) {
-				const int offsetx1 = isqrt(square(maxrange + 1) - square(-offsety) - 1);
-				const int offsetx2 = isqrt(square(minrange + 1) - square(-offsety) - 1);
-				const int minxs[2] = {std::max(0, goal.x - offsetx1 - extratilesize.x), std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + offsetx2)};
-				const int maxxs[2] = {std::max(0, goal.x - offsetx2 - extratilesize.x), std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + offsetx1)};
-
-				for (int i = 0; i < 2; ++i) {
-					const int minx = minxs[i];
-					const int maxx = maxxs[i];
-					Vec2i mpos(minx, goal.y + offsety);
-					const unsigned int offset = mpos.y * Map.Info.MapWidth;
-
-					for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
-						if (CostMoveTo(offset + mpos.x, unit) >= 0) {
-							AStarMatrix[offset + mpos.x].InGoal = 1;
-							goal_reachable = true;
-						}
-						AStarAddToClose(offset + mpos.x);
-					}
-				}
-			}
-		}
-		{
-			// center
-			const int mincenters[] = {std::max(0, goal.x - maxrange - extratilesize.x),
-									  std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + minrange)
-									 };
-			const int maxcenters[] = {std::max(0, goal.x - minrange - extratilesize.x),
-									  std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + maxrange)
-									 };
-
-			const int miny = std::max(0 - goal.y, -extratilesize.y);
-			const int maxy = std::min(Map.Info.MapHeight - goal.y - extratilesize.y, gh);
-
-			for (int i = 0; i < 2; ++i) {
-				for (int offsety = miny; offsety < maxy; ++offsety) {
-					const int minx = mincenters[i];
-					const int maxx = maxcenters[i];
-					Vec2i mpos(minx, goal.y + offsety);
-					const unsigned int offset = mpos.y * Map.Info.MapWidth;
-
-					for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
-						if (CostMoveTo(offset + mpos.x, unit) >= 0) {
-							AStarMatrix[offset + mpos.x].InGoal = 1;
-							goal_reachable = true;
-						}
-						AStarAddToClose(offset + mpos.x);
-					}
-				}
-			}
-		}
-		{
-			// bottom hemi cycle
-			const int maxy = std::min(minrange, Map.Info.MapHeight - goal.y - gh);
-			for (int offsety = 0; offsety < maxy; ++offsety) {
-				const int offsetx1 = isqrt(square(maxrange + 1) - square(offsety) - 1);
-				const int offsetx2 = isqrt(square(minrange + 1) - square(offsety) - 1);
-				const int minxs[2] = {std::max(0, goal.x - offsetx1) - extratilesize.x, std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + offsetx2)};
-				const int maxxs[2] = {std::max(0, goal.x - offsetx2) - extratilesize.x, std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + offsetx1)};
-
-				for (int i = 0; i < 2; ++i) {
-					const int minx = minxs[i];
-					const int maxx = maxxs[i];
-					Vec2i mpos(minx, goal.y + offsety);
-					const unsigned int offset = mpos.y * Map.Info.MapWidth;
-
-					for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
-						if (CostMoveTo(offset + mpos.x, unit) >= 0) {
-							AStarMatrix[offset + mpos.x].InGoal = 1;
-							goal_reachable = true;
-						}
-						AStarAddToClose(offset + mpos.x);
-					}
-				}
-			}
-		}
-	}
-	{
-		// bottom hemi-cycle
-		const int maxy = std::min(maxrange, Map.Info.MapHeight - goal.y - gh - extratilesize.y);
-		for (int offsety = minrange; offsety < maxy; ++offsety) {
-			const int offsetx = isqrt(square(maxrange + 1) - square(offsety + 1) - 1);
-			const int minx = std::max(0, goal.x - offsetx - extratilesize.x);
-			const int maxx = std::min(Map.Info.MapWidth - extratilesize.x, goal.x + gw + offsetx);
-			Vec2i mpos(minx, goal.y + gh + offsety);
-			const unsigned int offset = mpos.y * Map.Info.MapWidth;
-
-			for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
-				if (CostMoveTo(offset + mpos.x, unit) >= 0) {
-					AStarMatrix[offset + mpos.x].InGoal = 1;
-					goal_reachable = true;
-				}
-				AStarAddToClose(offset + mpos.x);
-			}
-		}
-	}
 	ProfileEnd("AStarMarkGoal");
 	return goal_reachable;
 }
