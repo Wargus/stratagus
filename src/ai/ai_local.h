@@ -152,6 +152,8 @@ public:
 	void RemoveDeadUnit();
 	int PlanAttack();
 
+	void ReturnToHome();
+
 private:
 	void CountTypes(unsigned int *counter, const size_t len);
 	bool IsBelongsTo(const CUnitType *type);

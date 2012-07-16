@@ -325,6 +325,22 @@ void AiForce::Attack(const Vec2i &pos)
 	}
 }
 
+void AiForce::ReturnToHome()
+{
+	if (Map.Info.IsPointOnMap(this->HomePos)) {
+		for (size_t i = 0; i != this->Units.size(); ++i) {
+			CUnit &unit = *this->Units[i];
+			CommandMove(unit, this->HomePos, FlushCommands);
+		}
+	}
+	const Vec2i invalidPos(-1, -1);
+
+	this->HomePos = invalidPos;
+	this->GoalPos = invalidPos;
+	this->Defending = false;
+	this->Attacking = false;
+}
+
 AiForceManager::AiForceManager()
 {
 	forces.resize(3);
@@ -771,33 +787,23 @@ void AiForceManager::Update()
 				continue;
 			}
 			const int nearDist = 5;
-			//  Check if some unit from force reached goal point
-			if (Map.Info.IsPointOnMap(force.GoalPos)
-				&& force.Units[0]->MapDistanceTo(force.GoalPos) <= nearDist) {
+
+			if (Map.Info.IsPointOnMap(force.GoalPos) == false) {
+				force.ReturnToHome();
+				//  Check if some unit from force reached goal point
+			} else if (force.Units[0]->MapDistanceTo(force.GoalPos) <= nearDist) {
 				//  Look if still enemies in attack range.
 				const CUnit *dummy = NULL;
 				if (!AiForceEnemyFinder<AIATTACK_RANGE>(force, &dummy).found()) {
-					if (Map.Info.IsPointOnMap(force.HomePos)) {
-						for (size_t i = 0; i != force.Units.size(); ++i) {
-							CUnit &unit = *force.Units[i];
-							CommandMove(unit, force.HomePos, FlushCommands);
-						}
-						const Vec2i invalidPos(-1, -1);
-
-						force.HomePos = invalidPos;
-					}
-					force.Defending = false;
-					force.Attacking = false;
+					force.ReturnToHome();
 				}
 			} else { // Find idle units and order them to defend
 				std::vector<CUnit *> idleUnits;
 				for (unsigned int i = 0; i != force.Size(); ++i) {
 					CUnit &aiunit = *force.Units[i];
 
-					if (aiunit.IsIdle()) {
-						if (aiunit.IsAliveOnMap()) {
-							idleUnits.push_back(&aiunit);
-						}
+					if (aiunit.IsIdle() && aiunit.IsAliveOnMap()) {
+						idleUnits.push_back(&aiunit);
 					}
 				}
 				for (unsigned int i = 0; i != idleUnits.size(); ++i) {
@@ -808,7 +814,7 @@ void AiForceManager::Update()
 
 						unit->Wait = delay;
 						if (unit->Type->CanAttack) {
-							CommandAttack(*unit, force.GoalPos,  NULL, FlushCommands);
+							CommandAttack(*unit, force.GoalPos, NULL, FlushCommands);
 						} else {
 							CommandMove(*unit, force.GoalPos, FlushCommands);
 						}
