@@ -178,8 +178,6 @@ inline char *new_strdup(const char *str)
 --  General
 ----------------------------------------------------------------------------*/
 
-#include "version.h"
-
 /// Text string: Name, Version, Copyright
 extern const char NameLine[];
 

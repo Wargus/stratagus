@@ -49,10 +49,11 @@
 #include "master.h"
 
 #include "iocompat.h"
-#include "network.h"
 #include "netconnect.h"
-#include "script.h"
+#include "network.h"
 #include "net_lowlevel.h"
+#include "script.h"
+#include "version.h"
 
 
 /*----------------------------------------------------------------------------

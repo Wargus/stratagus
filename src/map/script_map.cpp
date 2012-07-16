@@ -44,6 +44,7 @@
 #include "ui.h"
 #include "unit.h"
 #include "unittype.h"
+#include "version.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

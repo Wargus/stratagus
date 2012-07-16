@@ -219,6 +219,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "ui.h"
 #include "unit_manager.h"
 #include "util.h"
+#include "version.h"
 #include "video.h"
 #include "widgets.h"
 

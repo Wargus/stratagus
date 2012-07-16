@@ -53,6 +53,7 @@
 #include "unit_manager.h"
 #include "unittype.h"
 #include "upgrade.h"
+#include "version.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

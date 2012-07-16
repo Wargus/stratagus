@@ -36,21 +36,22 @@
 
 #include "stratagus.h"
 #include "replay.h"
-//#include "version.h"
-#include "iolib.h"
-#include "iocompat.h"
-#include "script.h"
-#include "unittype.h"
-#include "unit_manager.h"
-#include "settings.h"
+
+#include "actions.h"
 #include "commands.h"
-#include "player.h"
+#include "interface.h"
+#include "iocompat.h"
+#include "iolib.h"
 #include "map.h"
 #include "netconnect.h"
 #include "network.h"
-#include "interface.h"
-#include "actions.h"
+#include "player.h"
+#include "script.h"
+#include "settings.h"
 #include "sound.h"
+#include "unit_manager.h"
+#include "unittype.h"
+#include "version.h"
 
 //----------------------------------------------------------------------------
 // Structures

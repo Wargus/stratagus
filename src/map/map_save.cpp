@@ -33,16 +33,11 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <string.h>
-
 #include "stratagus.h"
 #include "map.h"
-#include "tileset.h"
-#include "player.h"
-#include "unit.h"
-#include "ui.h"
+
 #include "iolib.h"
+#include "version.h"
 
 /*----------------------------------------------------------------------------
 -- Variables
