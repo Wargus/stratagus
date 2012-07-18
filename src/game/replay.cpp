@@ -32,6 +32,7 @@
 // Includes
 //----------------------------------------------------------------------------
 
+#include <sstream>
 #include <time.h>
 
 #include "stratagus.h"
@@ -52,6 +53,9 @@
 #include "unit_manager.h"
 #include "unittype.h"
 #include "version.h"
+
+extern void ExpandPath(std::string &newpath, const std::string &path);
+extern void StartMap(const std::string &filename, bool clean);
 
 //----------------------------------------------------------------------------
 // Structures
@@ -954,6 +958,76 @@ void MultiPlayerReplayEachCycle()
 	if (ReplayGameType == ReplayMultiPlayer) {
 		ReplayEachCycle();
 	}
+}
+
+/**
+**  Save the replay
+**
+**  @param filename  Name of the file to save to
+**
+**  @return          0 for success, -1 for failure
+*/
+int SaveReplay(const std::string &filename)
+{
+	FILE *fd;
+	char *buf;
+	std::ostringstream logfile;
+	std::string destination;
+	struct stat sb;
+	size_t size;
+
+	if (filename.find_first_of("\\/") != std::string::npos) {
+		fprintf(stderr, "\\ or / not allowed in SaveReplay filename\n");
+		return -1;
+	}
+
+	destination = Parameters::Instance.GetUserDirectory() + "/logs/" + filename;
+
+	logfile << Parameters::Instance.GetUserDirectory() << "/logs/log_of_stratagus_" << ThisPlayer->Index << ".log";
+
+	if (stat(logfile.str().c_str(), &sb)) {
+		fprintf(stderr, "stat failed\n");
+		return -1;
+	}
+	buf = new char[sb.st_size];
+	if (!buf) {
+		fprintf(stderr, "Out of memory\n");
+		return -1;
+	}
+	fd = fopen(logfile.str().c_str(), "rb");
+	if (!fd) {
+		fprintf(stderr, "fopen failed\n");
+		delete[] buf;
+		return -1;
+	}
+	size = fread(buf, sb.st_size, 1, fd);
+	fclose(fd);
+
+	fd = fopen(destination.c_str(), "wb");
+	if (!fd) {
+		fprintf(stderr, "Can't save to `%s'\n", destination.c_str());
+		delete[] buf;
+		return -1;
+	}
+	fwrite(buf, size, 1, fd);
+	fclose(fd);
+
+	delete[] buf;
+
+	return 0;
+}
+
+void StartReplay(const std::string &filename, bool reveal)
+{
+	std::string replay;
+
+	CleanPlayers();
+	ExpandPath(replay, filename);
+	LoadReplay(replay);
+
+	ReplayRevealMap = reveal;
+
+	StartMap(CurrentMapPath, false);
 }
 
 /**

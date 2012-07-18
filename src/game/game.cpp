@@ -37,6 +37,7 @@
 #include "stratagus.h"
 
 #include "actions.h"
+#include "ai.h"
 #include "commands.h"
 #include "construct.h"
 #include "depend.h"
@@ -793,5 +794,33 @@ void InitSettings()
 	GameSettings.MapRichness = SettingsPresetMapDefault;
 	GameSettings.NetGameType = SettingsSinglePlayerGame;
 }
+
+/**
+**  Cleanup game.
+**
+**  Call each module to clean up.
+**  Contrary to CleanModules, maps can be restarted
+**  without reloading all lua files.
+*/
+void CleanGame()
+{
+	EndReplayLog();
+	CleanMessages();
+
+	CleanGame_Lua();
+	CleanTriggers();
+	CleanAi();
+	CleanGroups();
+	CleanMissiles();
+	CleanUnits();
+	CleanSelections();
+	CleanTilesets();
+	Map.Clean();
+	CleanReplayLog();
+	FreePathfinder();
+	CursorBuilding = NULL;
+	UnitUnderCursor = NULL;
+}
+
 
 //@}
