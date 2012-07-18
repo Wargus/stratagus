@@ -86,6 +86,11 @@ enum _cursor_on_ CursorOn = CursorOnUnknown; /// Cursor on field
 ----------------------------------------------------------------------------*/
 static void HandlePieMenuMouseSelection();
 
+CUnit *GetUnitUnderCursor()
+{
+	return UnitUnderCursor;
+}
+
 /**
 **  Cancel building cursor mode.
 */

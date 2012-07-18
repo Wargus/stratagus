@@ -105,11 +105,6 @@ bool CanAccessFile(const char *filename)
 	return false;
 }
 
-CUnit *GetUnitUnderCursor()
-{
-	return UnitUnderCursor;
-}
-
 /// Usefull for getComponent.
 typedef enum {
 	USTRINT_STR, USTRINT_INT
