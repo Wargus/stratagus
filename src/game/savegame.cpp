@@ -55,6 +55,9 @@
 #include "upgrade.h"
 #include "version.h"
 
+extern void StartMap(const std::string &filename, bool clean);
+
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -62,6 +65,20 @@
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+void ExpandPath(std::string &newpath, const std::string &path)
+{
+	if (path[0] == '~') {
+		newpath = Parameters::Instance.GetUserDirectory();
+		if (!GameName.empty()) {
+			newpath += "/";
+			newpath += GameName;
+		}
+		newpath += "/" + path.substr(1);
+	} else {
+		newpath = StratagusLibPath + "/" + path;
+	}
+}
 
 /**
 ** Get the save directory and create dirs if needed
@@ -169,6 +186,19 @@ void DeleteSaveGame(const std::string &filename)
 	if (unlink(fullpath.c_str()) == -1) {
 		fprintf(stderr, "delete failed for %s", fullpath.c_str());
 	}
+}
+
+void StartSavedGame(const std::string &filename)
+{
+	std::string path;
+
+	SaveGameLoading = true;
+	CleanPlayers();
+	ExpandPath(path, filename);
+	LoadGame(path);
+
+	StartMap(filename, false);
+	//SetDefaultTextColors(nc, rc);
 }
 
 //@}

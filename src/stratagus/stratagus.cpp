@@ -158,7 +158,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdarg.h>
 #include <ctype.h>
 
 #ifdef USE_BEOS
@@ -261,7 +260,6 @@ void Parameters::SetUserDirectory()
 #endif
 }
 
-
 /* static */ Parameters Parameters::Instance;
 
 
@@ -300,39 +298,6 @@ unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
 /*============================================================================
 ==  MAIN
 ============================================================================*/
-
-/**
-**  Show load progress.
-**
-**  @param fmt  printf format string.
-*/
-void ShowLoadProgress(const char *fmt, ...)
-{
-	va_list va;
-	char temp[4096];
-
-	va_start(va, fmt);
-	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
-	temp[sizeof(temp) - 1] = '\0';
-	va_end(va);
-
-	if (Video.Depth && GetGameFont() && GetGameFont()->IsLoaded()) {
-		// Remove non printable chars
-		for (char *s = temp; *s; ++s) {
-			if (*s < 32) {
-				*s = ' ';
-			}
-		}
-		Video.FillRectangle(ColorBlack, 5, Video.Height - 18, Video.Width - 10, 18);
-		CLabel(GetGameFont()).DrawCentered(Video.Width / 2, Video.Height - 16, temp);
-		InvalidateArea(5, Video.Height - 18, Video.Width - 10, 18);
-		RealizeVideoMemory();
-	} else {
-		DebugPrint("!!!!%s\n" _C_ temp);
-	}
-}
-
-//----------------------------------------------------------------------------
 
 /**
 **  Pre menu setup.
@@ -388,20 +353,6 @@ static int MenuLoop()
 	return status;
 }
 
-void ExpandPath(std::string &newpath, const std::string &path)
-{
-	if (path[0] == '~') {
-		newpath = Parameters::Instance.GetUserDirectory();
-		if (!GameName.empty()) {
-			newpath += "/";
-			newpath += GameName;
-		}
-		newpath += "/" + path.substr(1);
-	} else {
-		newpath = StratagusLibPath + "/" + path;
-	}
-}
-
 extern gcn::Gui *Gui;
 
 void StartMap(const std::string &filename, bool clean)
@@ -444,19 +395,6 @@ void StartMap(const std::string &filename, bool clean)
 	Gui->setTop(oldTop);
 	Containers.erase(std::find(Containers.begin(), Containers.end(), container));
 	delete container;
-}
-
-void StartSavedGame(const std::string &filename)
-{
-	std::string path;
-
-	SaveGameLoading = true;
-	CleanPlayers();
-	ExpandPath(path, filename);
-	LoadGame(path);
-
-	StartMap(filename, false);
-	//SetDefaultTextColors(nc, rc);
 }
 
 //----------------------------------------------------------------------------

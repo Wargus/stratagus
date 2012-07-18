@@ -40,6 +40,7 @@
 #include <vector>
 
 #include "script.h"
+#include "ui.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------

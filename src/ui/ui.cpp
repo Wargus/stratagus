@@ -34,6 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <stdarg.h>
+
 #include "stratagus.h"
 
 #include "ui.h"
@@ -66,6 +68,38 @@ CUserInterface UI;
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
+
+/**
+**  Show load progress.
+**
+**  @param fmt  printf format string.
+*/
+void ShowLoadProgress(const char *fmt, ...)
+{
+	va_list va;
+	char temp[4096];
+
+	va_start(va, fmt);
+	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
+	temp[sizeof(temp) - 1] = '\0';
+	va_end(va);
+
+	if (Video.Depth && GetGameFont() && GetGameFont()->IsLoaded()) {
+		// Remove non printable chars
+		for (char *s = temp; *s; ++s) {
+			if (*s < 32) {
+				*s = ' ';
+			}
+		}
+		Video.FillRectangle(ColorBlack, 5, Video.Height - 18, Video.Width - 10, 18);
+		CLabel(GetGameFont()).DrawCentered(Video.Width / 2, Video.Height - 16, temp);
+		InvalidateArea(5, Video.Height - 18, Video.Width - 10, 18);
+		RealizeVideoMemory();
+	} else {
+		DebugPrint("!!!!%s\n" _C_ temp);
+	}
+}
+
 
 CUserInterface::CUserInterface() :
 	MouseScroll(false), KeyScroll(false), MouseScrollSpeed(1),

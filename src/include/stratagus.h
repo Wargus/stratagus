@@ -252,9 +252,6 @@ extern void CleanModules();             /// Cleanup all modules
 extern void DrawMapArea();              /// Draw the map area
 extern void GameMainLoop();             /// Game main loop
 
-/// Show load progress
-extern void ShowLoadProgress(const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(1, 2);
-
 extern bool CanAccessFile(const char *filename);
 
 //@}
