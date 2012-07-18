@@ -38,9 +38,11 @@
 
 #include "actions.h"
 #include "ai.h"
+#include "animation.h"
 #include "commands.h"
 #include "construct.h"
 #include "depend.h"
+#include "editor.h"
 #include "font.h"
 #include "interface.h"
 #include "iocompat.h"
@@ -820,6 +822,34 @@ void CleanGame()
 	FreePathfinder();
 	CursorBuilding = NULL;
 	UnitUnderCursor = NULL;
+}
+
+
+void LuaRegisterModules()
+{
+	AiCclRegister();
+	AnimationCclRegister();
+	ConstructionCclRegister();
+	DecorationCclRegister();
+	DependenciesCclRegister();
+	EditorCclRegister();
+	GroupCclRegister();
+	IconCclRegister();
+	MapCclRegister();
+	MissileCclRegister();
+	PathfinderCclRegister();
+	PlayerCclRegister();
+	ReplayCclRegister();
+	ScriptRegister();
+	SelectionCclRegister();
+	SoundCclRegister();
+	SpellCclRegister();
+	TilesetCclRegister();
+	TriggerCclRegister();
+	UnitCclRegister();
+	UnitTypeCclRegister();
+	UpgradesCclRegister();
+	UserInterfaceCclRegister();
 }
 
 

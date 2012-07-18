@@ -2488,80 +2488,6 @@ void InitLua()
 	lua_settop(Lua, 0);  // discard any results
 }
 
-void LuaRegisterModules()
-{
-	lua_register(Lua, "LibraryPath", CclStratagusLibraryPath);
-	lua_register(Lua, "ListDirectory", CclListDirectory);
-	lua_register(Lua, "ListFilesInDirectory", CclListFilesInDirectory);
-	lua_register(Lua, "ListDirsInDirectory", CclListDirsInDirectory);
-	lua_register(Lua, "SetGameName", CclSetGameName);
-	lua_register(Lua, "SetFullGameName", CclSetFullGameName);
-	lua_register(Lua, "SetVideoSyncSpeed", CclSetVideoSyncSpeed);
-	lua_register(Lua, "SetLocalPlayerName", CclSetLocalPlayerName);
-	lua_register(Lua, "GetLocalPlayerName", CclGetLocalPlayerName);
-	lua_register(Lua, "SetGodMode", CclSetGodMode);
-	lua_register(Lua, "GetGodMode", CclGetGodMode);
-
-	lua_register(Lua, "SetSpeedResourcesHarvest", CclSetSpeedResourcesHarvest);
-	lua_register(Lua, "SetSpeedResourcesReturn", CclSetSpeedResourcesReturn);
-	lua_register(Lua, "SetSpeedBuild", CclSetSpeedBuild);
-	lua_register(Lua, "GetSpeedBuild", CclGetSpeedBuild);
-	lua_register(Lua, "SetSpeedTrain", CclSetSpeedTrain);
-	lua_register(Lua, "GetSpeedTrain", CclGetSpeedTrain);
-	lua_register(Lua, "SetSpeedUpgrade", CclSetSpeedUpgrade);
-	lua_register(Lua, "SetSpeedResearch", CclSetSpeedResearch);
-	lua_register(Lua, "SetSpeeds", CclSetSpeeds);
-	lua_register(Lua, "SetUseHPForXp", ScriptSetUseHPForXp);
-	lua_register(Lua, "SetDamageFormula", CclSetDamageFormula);
-
-	lua_register(Lua, "DefineDefaultIncomes", CclDefineDefaultIncomes);
-	lua_register(Lua, "DefineDefaultActions", CclDefineDefaultActions);
-	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
-	lua_register(Lua, "DefineDefaultResourceAmounts", CclDefineDefaultResourceAmounts);
-	lua_register(Lua, "DefineDefaultResourceMaxAmounts", CclDefineDefaultResourceMaxAmounts);
-	lua_register(Lua, "DefineExtraDeathTypes", CclDefineExtraDeathTypes);
-	lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);
-
-	lua_register(Lua, "SetMetaServer", CclSetMetaServer);
-
-	lua_register(Lua, "SavePreferences", CclSavePreferences);
-	lua_register(Lua, "Load", CclLoad);
-	lua_register(Lua, "LoadBuffer", CclLoadBuffer);
-	lua_register(Lua, "GetCurrentLuaPath", CclGetCurrentLuaPath);
-	lua_register(Lua, "SavedGameInfo", CclSavedGameInfo);
-	lua_register(Lua, "SetMenuRace", CclSetMenuRace);
-
-	lua_register(Lua, "GetStratagusVersion", CclGetStratagusVersion);
-	lua_register(Lua, "GetStratagusHomepage", CclGetStratagusHomepage);
-
-	lua_register(Lua, "DebugPrint", CclDebugPrint);
-
-	AliasRegister();
-	ReplayCclRegister();
-	IconCclRegister();
-	MissileCclRegister();
-	PlayerCclRegister();
-	TilesetCclRegister();
-	MapCclRegister();
-	PathfinderCclRegister();
-	ConstructionCclRegister();
-	DecorationCclRegister();
-	UnitTypeCclRegister();
-	AnimationCclRegister();
-	UpgradesCclRegister();
-	DependenciesCclRegister();
-	SelectionCclRegister();
-	GroupCclRegister();
-	UnitCclRegister();
-	SoundCclRegister();
-	UserInterfaceCclRegister();
-	AiCclRegister();
-	TriggerCclRegister();
-	SpellCclRegister();
-
-	EditorCclRegister();
-}
-
 /*
 static char *LuaEscape(const char *str)
 {
@@ -2849,7 +2775,56 @@ void SaveCcl(CFile &file)
 	file.printf("SetSpeedResearch(%d)\n", SpeedResearch);
 }
 
+void ScriptRegister()
+{
+	AliasRegister();
 
+	lua_register(Lua, "LibraryPath", CclStratagusLibraryPath);
+	lua_register(Lua, "ListDirectory", CclListDirectory);
+	lua_register(Lua, "ListFilesInDirectory", CclListFilesInDirectory);
+	lua_register(Lua, "ListDirsInDirectory", CclListDirsInDirectory);
+	lua_register(Lua, "SetGameName", CclSetGameName);
+	lua_register(Lua, "SetFullGameName", CclSetFullGameName);
+	lua_register(Lua, "SetVideoSyncSpeed", CclSetVideoSyncSpeed);
+	lua_register(Lua, "SetLocalPlayerName", CclSetLocalPlayerName);
+	lua_register(Lua, "GetLocalPlayerName", CclGetLocalPlayerName);
+	lua_register(Lua, "SetGodMode", CclSetGodMode);
+	lua_register(Lua, "GetGodMode", CclGetGodMode);
+
+	lua_register(Lua, "SetSpeedResourcesHarvest", CclSetSpeedResourcesHarvest);
+	lua_register(Lua, "SetSpeedResourcesReturn", CclSetSpeedResourcesReturn);
+	lua_register(Lua, "SetSpeedBuild", CclSetSpeedBuild);
+	lua_register(Lua, "GetSpeedBuild", CclGetSpeedBuild);
+	lua_register(Lua, "SetSpeedTrain", CclSetSpeedTrain);
+	lua_register(Lua, "GetSpeedTrain", CclGetSpeedTrain);
+	lua_register(Lua, "SetSpeedUpgrade", CclSetSpeedUpgrade);
+	lua_register(Lua, "SetSpeedResearch", CclSetSpeedResearch);
+	lua_register(Lua, "SetSpeeds", CclSetSpeeds);
+	lua_register(Lua, "SetUseHPForXp", ScriptSetUseHPForXp);
+	lua_register(Lua, "SetDamageFormula", CclSetDamageFormula);
+
+	lua_register(Lua, "DefineDefaultIncomes", CclDefineDefaultIncomes);
+	lua_register(Lua, "DefineDefaultActions", CclDefineDefaultActions);
+	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
+	lua_register(Lua, "DefineDefaultResourceAmounts", CclDefineDefaultResourceAmounts);
+	lua_register(Lua, "DefineDefaultResourceMaxAmounts", CclDefineDefaultResourceMaxAmounts);
+	lua_register(Lua, "DefineExtraDeathTypes", CclDefineExtraDeathTypes);
+	lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);
+
+	lua_register(Lua, "SetMetaServer", CclSetMetaServer);
+
+	lua_register(Lua, "SavePreferences", CclSavePreferences);
+	lua_register(Lua, "Load", CclLoad);
+	lua_register(Lua, "LoadBuffer", CclLoadBuffer);
+	lua_register(Lua, "GetCurrentLuaPath", CclGetCurrentLuaPath);
+	lua_register(Lua, "SavedGameInfo", CclSavedGameInfo);
+	lua_register(Lua, "SetMenuRace", CclSetMenuRace);
+
+	lua_register(Lua, "GetStratagusVersion", CclGetStratagusVersion);
+	lua_register(Lua, "GetStratagusHomepage", CclGetStratagusHomepage);
+
+	lua_register(Lua, "DebugPrint", CclDebugPrint);
+}
 
 void CleanGame_Lua()
 {
