@@ -384,6 +384,9 @@ extern bool GLTextureCompressionSupported;
 /// Use OpenGL texture compression
 extern bool UseGLTextureCompression;
 
+/// register lua function
+extern void VideoCclRegister();
+
 /// initialize the video part
 extern void InitVideo();
 

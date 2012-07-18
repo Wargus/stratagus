@@ -1640,7 +1640,24 @@ static int CclDefineDecorations(lua_State *l)
 	return 0;
 }
 
+/**
+**  Define default extra death types.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineExtraDeathTypes(lua_State *l)
+{
+	unsigned int args;
 
+	for (unsigned int i = 0; i < ANIMATIONS_DEATHTYPES; ++i) {
+		ExtraDeathTypes[i].clear();
+	}
+	args = lua_gettop(l);
+	for (unsigned int i = 0; i < ANIMATIONS_DEATHTYPES && i < args; ++i) {
+		ExtraDeathTypes[i] = LuaToString(l, i + 1);
+	}
+	return 0;
+}
 // ----------------------------------------------------------------------------
 
 /**
@@ -1743,6 +1760,8 @@ void UnitTypeCclRegister()
 	lua_register(Lua, "DefineBoolFlags", CclDefineBoolFlags);
 	lua_register(Lua, "DefineVariables", CclDefineVariables);
 	lua_register(Lua, "DefineDecorations", CclDefineDecorations);
+
+	lua_register(Lua, "DefineExtraDeathTypes", CclDefineExtraDeathTypes);
 
 	UnitTypeVar.Init();
 

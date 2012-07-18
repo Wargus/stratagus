@@ -79,6 +79,9 @@ GameResults GameResult;                      /// Outcome of the game
 std::string GameName;
 std::string FullGameName;
 
+bool UseHPForXp = false;              /// true if gain XP by dealing damage, false if by killing.
+
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -1123,6 +1126,111 @@ static int CclDefineDefaultResourceMaxAmounts(lua_State *l)
 	return 0;
 }
 
+/**
+**  Affect UseHPForXp.
+**
+**  @param l  Lua state.
+**
+**  @return 0.
+*/
+static int ScriptSetUseHPForXp(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	UseHPForXp = LuaToBoolean(l, 1);
+	return 0;
+}
+
+/**
+**  Set the local player name
+**
+**  @param l  Lua state.
+*/
+static int CclSetLocalPlayerName(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	Parameters::Instance.LocalPlayerName = LuaToString(l, 1);
+	return 0;
+}
+
+/**
+**  Get the local player name
+**
+**  @param l  Lua state.
+*/
+static int CclGetLocalPlayerName(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushstring(l, Parameters::Instance.LocalPlayerName.c_str());
+	return 1;
+}
+
+/**
+**  Get Stratagus Version
+*/
+static int CclGetStratagusVersion(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushstring(l, VERSION);
+	return 1;
+}
+
+/**
+**  Get Stratagus Homepage
+*/
+static int CclGetStratagusHomepage(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushstring(l, HOMEPAGE);
+	return 1;
+}
+
+static int CclSetMenuRace(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	MenuRace = LuaToString(l, 1);
+	return 0;
+}
+
+/**
+**  Load the SavedGameInfo Header
+**
+**  @param l  Lua state.
+*/
+static int CclSavedGameInfo(lua_State *l)
+{
+	const char *value;
+
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
+		LuaError(l, "incorrect argument");
+	}
+
+	lua_pushnil(l);
+	while (lua_next(l, 1)) {
+		value = LuaToString(l, -2);
+
+		if (!strcmp(value, "SaveFile")) {
+			if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), LuaToString(l, -1)) != 0) {
+				LuaError(l, "SaveFile too long");
+			}
+			std::string buf = StratagusLibPath;
+			buf += "/";
+			buf += LuaToString(l, -1);
+			if (LuaLoadFile(buf) == -1) {
+				DebugPrint("Load failed: %s\n" _C_ value);
+			}
+		} else if (!strcmp(value, "SyncHash")) {
+			SyncHash = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "SyncRandSeed")) {
+			SyncRandSeed = LuaToNumber(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+		lua_pop(l, 1);
+	}
+	return 0;
+}
+
 void LuaRegisterModules()
 {
 	lua_register(Lua, "SetGameName", CclSetGameName);
@@ -1146,6 +1254,17 @@ void LuaRegisterModules()
 	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
 	lua_register(Lua, "DefineDefaultResourceAmounts", CclDefineDefaultResourceAmounts);
 	lua_register(Lua, "DefineDefaultResourceMaxAmounts", CclDefineDefaultResourceMaxAmounts);
+
+	lua_register(Lua, "SetUseHPForXp", ScriptSetUseHPForXp);
+	lua_register(Lua, "SetLocalPlayerName", CclSetLocalPlayerName);
+	lua_register(Lua, "GetLocalPlayerName", CclGetLocalPlayerName);
+
+	lua_register(Lua, "SetMenuRace", CclSetMenuRace);
+
+	lua_register(Lua, "GetStratagusVersion", CclGetStratagusVersion);
+	lua_register(Lua, "GetStratagusHomepage", CclGetStratagusHomepage);
+
+	lua_register(Lua, "SavedGameInfo", CclSavedGameInfo);
 
 	AiCclRegister();
 	AnimationCclRegister();
@@ -1171,6 +1290,7 @@ void LuaRegisterModules()
 	UnitTypeCclRegister();
 	UpgradesCclRegister();
 	UserInterfaceCclRegister();
+	VideoCclRegister();
 }
 
 

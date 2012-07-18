@@ -294,7 +294,6 @@ extern bool LuaToBoolean(lua_State *l, int narg);
 extern void CclGarbageCollect(int fast);  /// Perform garbage collection
 extern void InitLua();                /// Initialise Lua
 extern void LoadCcl(const std::string &filename);  /// Load ccl config file
-extern void SaveCcl(CFile &file);     /// Save CCL module
 extern void SavePreferences();        /// Save user preferences
 extern int CclCommand(const std::string &command, bool exitOnError = true);
 
@@ -308,7 +307,7 @@ CUnit *CclGetUnitFromRef(lua_State *l);
 **  Get a position from lua state
 **
 **  @param l  Lua state.
-**  param x  pointer to output x position.
+**  @param x  pointer to output x position.
 **  @param y  pointer to output y position.
 **
 **  @return   The unit pointer

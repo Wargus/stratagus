@@ -41,15 +41,12 @@
 
 #include "script.h"
 
-#include "actions.h"
-#include "animation.h"
 #include "font.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "map.h"
 #include "trigger.h"
 #include "ui.h"
-#include "version.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -61,7 +58,6 @@ int CclInConfigFile;                  /// True while config file parsing
 bool SaveGameLoading;                 /// If a Saved Game is Loading
 std::string CurrentLuaFile;           /// Lua file currently being interpreted
 
-bool UseHPForXp = false;              /// true if gain XP by dealing damage, false if by killing.
 NumberDesc *Damage;                   /// Damage calculation for missile.
 
 static int NumberCounter = 0; /// Counter for lua function.
@@ -285,33 +281,6 @@ int LuaLoadFile(const std::string &file)
 }
 
 /**
-**  Get Stratagus Version
-*/
-static int CclGetStratagusVersion(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	lua_pushstring(l, VERSION);
-	return 1;
-}
-
-/**
-**  Get Stratagus Homepage
-*/
-static int CclGetStratagusHomepage(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	lua_pushstring(l, HOMEPAGE);
-	return 1;
-}
-
-static int CclSetMenuRace(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	MenuRace = LuaToString(l, 1);
-	return 0;
-}
-
-/**
 **  Get the directory of the current lua file
 */
 static int CclGetCurrentLuaPath(lua_State *l)
@@ -380,47 +349,6 @@ static int CclLoadBuffer(lua_State *l)
 		lua_pushstring(l, buf.c_str());
 		return 1;
 	}
-	return 0;
-}
-
-/**
-**  Load the SavedGameInfo Header
-**
-**  @param l  Lua state.
-*/
-static int CclSavedGameInfo(lua_State *l)
-{
-	const char *value;
-
-	LuaCheckArgs(l, 1);
-	if (!lua_istable(l, 1)) {
-		LuaError(l, "incorrect argument");
-	}
-
-	lua_pushnil(l);
-	while (lua_next(l, 1)) {
-		value = LuaToString(l, -2);
-
-		if (!strcmp(value, "SaveFile")) {
-			if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), LuaToString(l, -1)) != 0) {
-				LuaError(l, "SaveFile too long");
-			}
-			std::string buf = StratagusLibPath;
-			buf += "/";
-			buf += LuaToString(l, -1);
-			if (LuaLoadFile(buf) == -1) {
-				DebugPrint("Load failed: %s\n" _C_ value);
-			}
-		} else if (!strcmp(value, "SyncHash")) {
-			SyncHash = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "SyncRandSeed")) {
-			SyncRandSeed = LuaToNumber(l, -1);
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-		lua_pop(l, 1);
-	}
-
 	return 0;
 }
 
@@ -1993,58 +1921,6 @@ static int CclListDirsInDirectory(lua_State *l)
 	return CclFilteredListDirectory(l, 0x0, 0x1);
 }
 
-
-/**
-**  Set the video sync speed
-**
-**  @param l  Lua state.
-*/
-static int CclSetVideoSyncSpeed(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	VideoSyncSpeed = LuaToNumber(l, 1);
-	return 0;
-}
-
-/**
-**  Set the local player name
-**
-**  @param l  Lua state.
-*/
-static int CclSetLocalPlayerName(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	Parameters::Instance.LocalPlayerName = LuaToString(l, 1);
-	return 0;
-}
-
-/**
-**  Get the local player name
-**
-**  @param l  Lua state.
-*/
-static int CclGetLocalPlayerName(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	lua_pushstring(l, Parameters::Instance.LocalPlayerName.c_str());
-	return 1;
-}
-
-
-/**
-**  Affect UseHPForXp.
-**
-**  @param l  Lua state.
-**
-**  @return 0.
-*/
-static int ScriptSetUseHPForXp(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	UseHPForXp = LuaToBoolean(l, 1);
-	return 0;
-}
-
 /**
 **  Set damage computation method.
 **
@@ -2058,26 +1934,6 @@ static int CclSetDamageFormula(lua_State *l)
 		delete Damage;
 	}
 	Damage = CclParseNumberDesc(l);
-	return 0;
-}
-
-
-/**
-**  Define default extra death types.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineExtraDeathTypes(lua_State *l)
-{
-	unsigned int args;
-
-	for (unsigned int i = 0; i < ANIMATIONS_DEATHTYPES; ++i) {
-		ExtraDeathTypes[i].clear();
-	}
-	args = lua_gettop(l);
-	for (unsigned int i = 0; i < ANIMATIONS_DEATHTYPES && i < args; ++i) {
-		ExtraDeathTypes[i] = LuaToString(l, i + 1);
-	}
 	return 0;
 }
 
@@ -2425,26 +2281,6 @@ void LoadCcl(const std::string &filename)
 	CclGarbageCollect(0);  // Cleanup memory after load
 }
 
-/**
-**  Save CCL Module.
-**
-**  @param file  Save file.
-*/
-void SaveCcl(CFile &file)
-{
-	file.printf("SetGodMode(%s)\n", GodMode ? "true" : "false");
-
-	for (unsigned int i = 0; i < MaxCosts; ++i) {
-		file.printf("SetSpeedResourcesHarvest(\"%s\", %d)\n",
-					DefaultResourceNames[i].c_str(), SpeedResourcesHarvest[i]);
-		file.printf("SetSpeedResourcesReturn(\"%s\", %d)\n",
-					DefaultResourceNames[i].c_str(), SpeedResourcesReturn[i]);
-	}
-	file.printf("SetSpeedBuild(%d)\n", SpeedBuild);
-	file.printf("SetSpeedTrain(%d)\n", SpeedTrain);
-	file.printf("SetSpeedUpgrade(%d)\n", SpeedUpgrade);
-	file.printf("SetSpeedResearch(%d)\n", SpeedResearch);
-}
 
 void ScriptRegister()
 {
@@ -2454,24 +2290,13 @@ void ScriptRegister()
 	lua_register(Lua, "ListDirectory", CclListDirectory);
 	lua_register(Lua, "ListFilesInDirectory", CclListFilesInDirectory);
 	lua_register(Lua, "ListDirsInDirectory", CclListDirsInDirectory);
-	lua_register(Lua, "SetVideoSyncSpeed", CclSetVideoSyncSpeed);
-	lua_register(Lua, "SetLocalPlayerName", CclSetLocalPlayerName);
-	lua_register(Lua, "GetLocalPlayerName", CclGetLocalPlayerName);
 
-	lua_register(Lua, "SetUseHPForXp", ScriptSetUseHPForXp);
 	lua_register(Lua, "SetDamageFormula", CclSetDamageFormula);
-
-	lua_register(Lua, "DefineExtraDeathTypes", CclDefineExtraDeathTypes);
 
 	lua_register(Lua, "SavePreferences", CclSavePreferences);
 	lua_register(Lua, "Load", CclLoad);
 	lua_register(Lua, "LoadBuffer", CclLoadBuffer);
 	lua_register(Lua, "GetCurrentLuaPath", CclGetCurrentLuaPath);
-	lua_register(Lua, "SavedGameInfo", CclSavedGameInfo);
-	lua_register(Lua, "SetMenuRace", CclSetMenuRace);
-
-	lua_register(Lua, "GetStratagusVersion", CclGetStratagusVersion);
-	lua_register(Lua, "GetStratagusHomepage", CclGetStratagusHomepage);
 
 	lua_register(Lua, "DebugPrint", CclDebugPrint);
 }
