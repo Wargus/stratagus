@@ -44,7 +44,9 @@
 #include "map.h"
 #include "network.h"
 #include "interface.h"
+#include "master.h"
 #include "menus.h"
+#include "script.h"
 #include "settings.h"
 #include "version.h"
 
@@ -90,6 +92,8 @@ std::string NetworkMapName;             /// Name of the map recieved with ICMMap
 /// on the server to connect to. Should be selectable by advanced network menus.
 /// For now just specify with the -P port command line arg...
 static int NetworkServerPort = NetworkDefaultPort; /// Server network port to use
+
+int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
 
 /**
 ** Client and server selection state for Multiplayer clients
@@ -2112,6 +2116,23 @@ int NetworkParseSetupEvent(const unsigned char *buf, int size)
 	return 0;
 }
 
+/**
+**  Removes Randomization of Player position in Multiplayer mode
+**
+**  @param l  Lua state.
+*/
+static int CclNoRandomPlacementMultiplayer(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	NoRandomPlacementMultiplayer = 1;
+	return 0;
+}
+
+void NetworkCclRegister()
+{
+	lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);
+	lua_register(Lua, "SetMetaServer", CclSetMetaServer);
+}
 
 
 //@}

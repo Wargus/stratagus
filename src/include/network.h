@@ -243,7 +243,6 @@ extern int NetworkInSync;         /// Network is in sync
 extern int NetworkUpdates;        /// Network update each # game cycles
 extern int NetworkLag;            /// Network lag (# game cycles)
 extern unsigned long NetworkStatus[PlayerMax];  /// Network status
-extern int NoRandomPlacementMultiplayer;        /// Removes randomization of player placements
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -266,6 +265,8 @@ extern void NetworkSendExtendedCommand(int command, int arg1, int arg2,
 									   int arg3, int arg4, int status);
 /// Send Selections to Team
 extern void NetworkSendSelection(CUnit **units, int count);
+
+extern void NetworkCclRegister();
 
 //@}
 

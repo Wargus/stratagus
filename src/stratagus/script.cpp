@@ -42,32 +42,13 @@
 #include "script.h"
 
 #include "actions.h"
-#include "ai.h"
 #include "animation.h"
-#include "construct.h"
-#include "depend.h"
-#include "editor.h"
 #include "font.h"
-#include "interface.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "map.h"
-#include "master.h"
-#include "missile.h"
-#include "netconnect.h"
-#include "network.h"
-#include "pathfinder.h"
-#include "replay.h"
-#include "results.h"
-#include "script_sound.h"
-#include "settings.h"
-#include "sound.h"
-#include "spells.h"
 #include "trigger.h"
 #include "ui.h"
-#include "unit.h"
-#include "unittype.h"
-#include "upgrade.h"
 #include "version.h"
 
 /*----------------------------------------------------------------------------
@@ -76,13 +57,9 @@
 
 lua_State *Lua;                       /// Structure to work with lua files.
 
-std::string GameName;
-std::string FullGameName;
 int CclInConfigFile;                  /// True while config file parsing
 bool SaveGameLoading;                 /// If a Saved Game is Loading
 std::string CurrentLuaFile;           /// Lua file currently being interpreted
-
-int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
 
 bool UseHPForXp = false;              /// true if gain XP by dealing damage, false if by killing.
 NumberDesc *Damage;                   /// Damage calculation for missile.
@@ -2016,45 +1993,6 @@ static int CclListDirsInDirectory(lua_State *l)
 	return CclFilteredListDirectory(l, 0x0, 0x1);
 }
 
-/**
-**  Return of game name.
-**
-**  @param l  Lua state.
-*/
-static int CclSetGameName(lua_State *l)
-{
-	int args;
-
-	args = lua_gettop(l);
-	if (args > 1 || (args == 1 && (!lua_isnil(l, 1) && !lua_isstring(l, 1)))) {
-		LuaError(l, "incorrect argument");
-	}
-	if (args == 1 && !lua_isnil(l, 1)) {
-		GameName = lua_tostring(l, 1);
-	}
-
-	if (!GameName.empty()) {
-		std::string path = Parameters::Instance.GetUserDirectory() + "/" + GameName;
-		makedir(path.c_str(), 0777);
-	}
-
-	return 0;
-}
-
-static int CclSetFullGameName(lua_State *l)
-{
-	int args;
-
-	args = lua_gettop(l);
-	if (args > 1 || (args == 1 && (!lua_isnil(l, 1) && !lua_isstring(l, 1)))) {
-		LuaError(l, "incorrect argument");
-	}
-	if (args == 1 && !lua_isnil(l, 1)) {
-		FullGameName = lua_tostring(l, 1);
-	}
-
-	return 0;
-}
 
 /**
 **  Set the video sync speed
@@ -2108,18 +2046,6 @@ static int ScriptSetUseHPForXp(lua_State *l)
 }
 
 /**
-**  Removes Randomization of Player position in Multiplayer mode
-**
-**  @param l  Lua state.
-*/
-static int CclNoRandomPlacementMultiplayer(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	NoRandomPlacementMultiplayer = 1;
-	return 0;
-}
-
-/**
 **  Set damage computation method.
 **
 **  @param l  Lua state.
@@ -2135,261 +2061,6 @@ static int CclSetDamageFormula(lua_State *l)
 	return 0;
 }
 
-/**
-**  Set God mode.
-**
-**  @param l  Lua state.
-**
-**  @return   The old mode.
-*/
-static int CclSetGodMode(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	GodMode = LuaToBoolean(l, 1);
-	return 0;
-}
-
-/**
-**  Get God mode.
-**
-**  @param l  Lua state.
-**
-**  @return   God mode.
-*/
-static int CclGetGodMode(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	lua_pushboolean(l, GodMode);
-	return 1;
-}
-
-/**
-**  Set resource harvesting speed.
-**
-**  @param l  Lua state.
-*/
-static int CclSetSpeedResourcesHarvest(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-
-	const std::string resource = LuaToString(l, 1);
-	const int resId = GetResourceIdByName(l, resource.c_str());
-
-	SpeedResourcesHarvest[resId] = LuaToNumber(l, 2);
-	return 0;
-}
-
-/**
-**  Set resource returning speed.
-**
-**  @param l  Lua state.
-*/
-static int CclSetSpeedResourcesReturn(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-	const std::string resource = LuaToString(l, 1);
-	const int resId = GetResourceIdByName(l, resource.c_str());
-
-	SpeedResourcesReturn[resId] = LuaToNumber(l, 2);
-	return 0;
-}
-
-/**
-**  Set building speed.
-**
-**  @param l  Lua state.
-*/
-static int CclSetSpeedBuild(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	SpeedBuild = LuaToNumber(l, 1);
-	return 0;
-}
-
-/**
-**  Get building speed.
-**
-**  @param l  Lua state.
-**
-**  @return   Building speed.
-*/
-static int CclGetSpeedBuild(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	lua_pushnumber(l, SpeedBuild);
-	return 1;
-}
-
-/**
-**  Set training speed.
-**
-**  @param l  Lua state.
-*/
-static int CclSetSpeedTrain(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	SpeedTrain = LuaToNumber(l, 1);
-	return 0;
-}
-
-/**
-**  Get training speed.
-**
-**  @param l  Lua state.
-**
-**  @return   Training speed.
-*/
-static int CclGetSpeedTrain(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	lua_pushnumber(l, SpeedTrain);
-	return 1;
-}
-
-/**
-**  For debug increase upgrading speed.
-**
-**  @param l  Lua state.
-*/
-static int CclSetSpeedUpgrade(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	SpeedUpgrade = LuaToNumber(l, 1);
-
-	lua_pushnumber(l, SpeedUpgrade);
-	return 1;
-}
-
-/**
-**  For debug increase researching speed.
-**
-**  @param l  Lua state.
-*/
-static int CclSetSpeedResearch(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	SpeedResearch = LuaToNumber(l, 1);
-
-	lua_pushnumber(l, SpeedResearch);
-	return 1;
-}
-
-/**
-**  For debug increase all speeds.
-**
-**  @param l  Lua state.
-*/
-static int CclSetSpeeds(lua_State *l)
-{
-	int i;
-	int s;
-
-	LuaCheckArgs(l, 1);
-	s = LuaToNumber(l, 1);
-	for (i = 0; i < MaxCosts; ++i) {
-		SpeedResourcesHarvest[i] = s;
-		SpeedResourcesReturn[i] = s;
-	}
-	SpeedBuild = SpeedTrain = SpeedUpgrade = SpeedResearch = s;
-
-	lua_pushnumber(l, s);
-	return 1;
-}
-
-/**
-**  Define default incomes for a new player.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineDefaultIncomes(lua_State *l)
-{
-	int i;
-	int args;
-
-	args = lua_gettop(l);
-	for (i = 0; i < MaxCosts && i < args; ++i) {
-		DefaultIncomes[i] = LuaToNumber(l, i + 1);
-	}
-	return 0;
-}
-
-/**
-**  Define default action for the resources.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineDefaultActions(lua_State *l)
-{
-	unsigned int args;
-
-	for (unsigned int i = 0; i < MaxCosts; ++i) {
-		DefaultActions[i].clear();
-	}
-	args = lua_gettop(l);
-	for (unsigned int i = 0; i < MaxCosts && i < args; ++i) {
-		DefaultActions[i] = LuaToString(l, i + 1);
-	}
-	return 0;
-}
-
-/**
-**  Define default names for the resources.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineDefaultResourceNames(lua_State *l)
-{
-	unsigned int args;
-
-	for (unsigned int i = 0; i < MaxCosts; ++i) {
-		DefaultResourceNames[i].clear();
-	}
-	args = lua_gettop(l);
-	for (unsigned int i = 0; i < MaxCosts && i < args; ++i) {
-		DefaultResourceNames[i] = LuaToString(l, i + 1);
-	}
-	return 0;
-}
-
-/**
-**  Define default names for the resources.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineDefaultResourceAmounts(lua_State *l)
-{
-	const unsigned int args = lua_gettop(l);
-
-	if (args & 1) {
-		LuaError(l, "incorrect argument");
-	}
-	for (unsigned int j = 0; j < args; ++j) {
-		const std::string resource = LuaToString(l, j + 1);
-		const int resId = GetResourceIdByName(l, resource.c_str());
-
-		++j;
-		DefaultResourceAmounts[resId] = LuaToNumber(l, j + 1);
-	}
-	return 0;
-}
-
-/**
-**  Define max amounts for the resources.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineDefaultResourceMaxAmounts(lua_State *l)
-{
-	int args = std::min<int>(lua_gettop(l), MaxCosts);
-
-	for (int i = 0; i < args; ++i) {
-		DefaultResourceMaxAmounts[i] = LuaToNumber(l, i + 1);
-	}
-	for (int i = args; i < MaxCosts; ++i) {
-		DefaultResourceMaxAmounts[i] = -1;
-	}
-	return 0;
-}
 
 /**
 **  Define default extra death types.
@@ -2783,35 +2454,14 @@ void ScriptRegister()
 	lua_register(Lua, "ListDirectory", CclListDirectory);
 	lua_register(Lua, "ListFilesInDirectory", CclListFilesInDirectory);
 	lua_register(Lua, "ListDirsInDirectory", CclListDirsInDirectory);
-	lua_register(Lua, "SetGameName", CclSetGameName);
-	lua_register(Lua, "SetFullGameName", CclSetFullGameName);
 	lua_register(Lua, "SetVideoSyncSpeed", CclSetVideoSyncSpeed);
 	lua_register(Lua, "SetLocalPlayerName", CclSetLocalPlayerName);
 	lua_register(Lua, "GetLocalPlayerName", CclGetLocalPlayerName);
-	lua_register(Lua, "SetGodMode", CclSetGodMode);
-	lua_register(Lua, "GetGodMode", CclGetGodMode);
 
-	lua_register(Lua, "SetSpeedResourcesHarvest", CclSetSpeedResourcesHarvest);
-	lua_register(Lua, "SetSpeedResourcesReturn", CclSetSpeedResourcesReturn);
-	lua_register(Lua, "SetSpeedBuild", CclSetSpeedBuild);
-	lua_register(Lua, "GetSpeedBuild", CclGetSpeedBuild);
-	lua_register(Lua, "SetSpeedTrain", CclSetSpeedTrain);
-	lua_register(Lua, "GetSpeedTrain", CclGetSpeedTrain);
-	lua_register(Lua, "SetSpeedUpgrade", CclSetSpeedUpgrade);
-	lua_register(Lua, "SetSpeedResearch", CclSetSpeedResearch);
-	lua_register(Lua, "SetSpeeds", CclSetSpeeds);
 	lua_register(Lua, "SetUseHPForXp", ScriptSetUseHPForXp);
 	lua_register(Lua, "SetDamageFormula", CclSetDamageFormula);
 
-	lua_register(Lua, "DefineDefaultIncomes", CclDefineDefaultIncomes);
-	lua_register(Lua, "DefineDefaultActions", CclDefineDefaultActions);
-	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
-	lua_register(Lua, "DefineDefaultResourceAmounts", CclDefineDefaultResourceAmounts);
-	lua_register(Lua, "DefineDefaultResourceMaxAmounts", CclDefineDefaultResourceMaxAmounts);
 	lua_register(Lua, "DefineExtraDeathTypes", CclDefineExtraDeathTypes);
-	lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);
-
-	lua_register(Lua, "SetMetaServer", CclSetMetaServer);
 
 	lua_register(Lua, "SavePreferences", CclSavePreferences);
 	lua_register(Lua, "Load", CclLoad);
