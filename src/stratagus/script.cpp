@@ -33,9 +33,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <limits.h>
 #include <signal.h>
-#include <ctype.h>
 
 #include "stratagus.h"
 
@@ -62,20 +60,6 @@ NumberDesc *Damage;                   /// Damage calculation for missile.
 static int NumberCounter = 0; /// Counter for lua function.
 static int StringCounter = 0; /// Counter for lua function.
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-bool CanAccessFile(const char *filename)
-{
-	if (filename && filename[0] != '\0') {
-		char name[PATH_MAX];
-		name[0] = '\0';
-		LibraryFileName(filename, name, sizeof(name));
-		return (name[0] != '\0' && 0 == access(name, R_OK));
-	}
-	return false;
-}
 
 /// Usefull for getComponent.
 typedef enum {
@@ -89,6 +73,10 @@ typedef struct {
 extern UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t);
 /// Get component for unit type variable.
 extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
+
+/*----------------------------------------------------------------------------
+--  Functions
+----------------------------------------------------------------------------*/
 
 /**
 **  FIXME: docu

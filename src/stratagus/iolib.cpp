@@ -576,6 +576,17 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 	return buffer;
 }
 
+bool CanAccessFile(const char *filename)
+{
+	if (filename && filename[0] != '\0') {
+		char name[PATH_MAX];
+		name[0] = '\0';
+		LibraryFileName(filename, name, sizeof(name));
+		return (name[0] != '\0' && 0 == access(name, R_OK));
+	}
+	return false;
+}
+
 /**
 **  Generate a list of files within a specified directory
 **
