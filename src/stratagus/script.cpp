@@ -55,7 +55,6 @@
 lua_State *Lua;                       /// Structure to work with lua files.
 
 int CclInConfigFile;                  /// True while config file parsing
-bool SaveGameLoading;                 /// If a Saved Game is Loading
 std::string CurrentLuaFile;           /// Lua file currently being interpreted
 
 NumberDesc *Damage;                   /// Damage calculation for missile.
@@ -2300,17 +2299,5 @@ void ScriptRegister()
 
 	lua_register(Lua, "DebugPrint", CclDebugPrint);
 }
-
-void CleanGame_Lua()
-{
-	lua_getglobal(Lua, "CleanGame_Lua");
-	if (lua_isfunction(Lua, -1)) {
-		LuaCall(0, 1);
-	} else {
-		lua_pop(Lua, 1);
-	}
-}
-
-
 
 //@}

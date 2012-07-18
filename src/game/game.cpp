@@ -803,6 +803,17 @@ void InitSettings()
 	GameSettings.NetGameType = SettingsSinglePlayerGame;
 }
 
+// call the lua function: CleanGame_Lua.
+static void CleanGame_Lua()
+{
+	lua_getglobal(Lua, "CleanGame_Lua");
+	if (lua_isfunction(Lua, -1)) {
+		LuaCall(0, 1);
+	} else {
+		lua_pop(Lua, 1);
+	}
+}
+
 /**
 **  Cleanup game.
 **
