@@ -2589,7 +2589,9 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		//  prevents cheating by killing your own units.
 
 		//  Setting ai threshold counter to 0 so it can target other units
-		attacker->Threshold = 0;
+		if (attacker) {
+			attacker->Threshold = 0;
+		}
 		if (attacker && target.IsEnemy(*attacker)) {
 			attacker->Player->Score += target.Variable[POINTS_INDEX].Value;
 			if (type->Building) {

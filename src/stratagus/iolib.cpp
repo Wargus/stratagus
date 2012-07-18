@@ -599,55 +599,42 @@ bool CanAccessFile(const char *filename)
 int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *),
 					  std::vector<FileList> &fl)
 {
-#ifndef _MSC_VER
-	DIR *dirp;
-	struct dirent *dp;
-#endif
 	struct stat st;
-#ifdef _MSC_VER
-	struct _finddata_t fileinfo;
-	long hFile;
-#endif
-	int n;
-	int isdir = 0; // silence gcc..
-	char *np;
 	char buffer[PATH_MAX];
 	char *filename;
 
 	strcpy_s(buffer, sizeof(buffer), dirname);
-	n = strlen(buffer);
+	int n = strlen(buffer);
 	if (!n || buffer[n - 1] != '/') {
 		buffer[n++] = '/';
 		buffer[n] = 0;
 	}
-	np = buffer + n;
+	char *np = buffer + n;
 
 #ifndef _MSC_VER
-	dirp = opendir(dirname);
-#endif
+	DIR *dirp = opendir(dirname);
+	struct dirent *dp;
 
-#ifndef _MSC_VER
 	if (dirp) {
 		while ((dp = readdir(dirp)) != NULL) {
 			filename = dp->d_name;
 #else
 	strcat_s(buffer, sizeof(buffer), "*.*");
-	hFile = _findfirst(buffer, &fileinfo);
+	struct _finddata_t fileinfo;
+	long hFile = _findfirst(buffer, &fileinfo);
 	if (hFile != -1L) {
 		do {
 			filename = fileinfo.name;
 #endif
-
 			if (strcmp(filename, ".") == 0) {
 				continue;
 			}
 			if (strcmp(filename, "..") == 0) {
 				continue;
 			}
-
 			strcpy_s(np, sizeof(buffer) - (np - buffer), filename);
 			if (stat(buffer, &st) == 0) {
-				isdir = S_ISDIR(st.st_mode);
+				int isdir = S_ISDIR(st.st_mode);
 				if (isdir || S_ISREG(st.st_mode)) {
 					FileList nfl;
 					int i;

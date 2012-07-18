@@ -711,11 +711,8 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 */
 StringDesc *CclParseStringDesc(lua_State *l)
 {
-	StringDesc *res;      // Result.
-	int nargs;            // Size of table.
-	const char *key;      // Key.
+	StringDesc *res = new StringDesc;
 
-	res = new StringDesc;
 	if (lua_isstring(l, -1)) {
 		res->e = EString_Dir;
 		res->D.Val = new_strdup(LuaToString(l, -1));
@@ -723,12 +720,12 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		res->e = EString_Lua;
 		res->D.Index = ParseLuaFunction(l, "_stringfunction_", &StringCounter);
 	} else if (lua_istable(l, -1)) {
-		nargs = lua_rawlen(l, -1);
+		const int nargs = lua_rawlen(l, -1);
 		if (nargs != 2) {
 			LuaError(l, "Bad number of args in parse String table\n");
 		}
 		lua_rawgeti(l, -1, 1); // key
-		key = LuaToString(l, -1);
+		const char *key = LuaToString(l, -1);
 		lua_pop(l, 1);
 		lua_rawgeti(l, -1, 2); // table
 		if (!strcmp(key, "Concat")) {
@@ -1359,10 +1356,7 @@ static int CclActiveTypeVar(lua_State *l)
 */
 static int Alias(lua_State *l, const char *s)
 {
-	int i;     // iterator on argument.
-	int narg;  // number of argument
-
-	narg = lua_gettop(l);
+	const int narg = lua_gettop(l);
 	Assert(narg);
 	lua_newtable(l);
 	lua_pushnumber(l, 1);
@@ -1371,7 +1365,7 @@ static int Alias(lua_State *l, const char *s)
 	lua_pushnumber(l, 2);
 	if (narg > 1) {
 		lua_newtable(l);
-		for (i = 1; i <= narg; i++) {
+		for (int i = 1; i <= narg; i++) {
 			lua_pushnumber(l, i);
 			lua_pushvalue(l, i);
 			lua_rawset(l, -3);

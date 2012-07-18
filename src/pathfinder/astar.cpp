@@ -1076,7 +1076,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 }
 
 struct StatsNode {
-	StatsNode() : Direction(0), InGoal(0), CostFromStart(0), Costs(0) {}
+	StatsNode() : Direction(0), InGoal(0), CostFromStart(0), Costs(0), CostToGoal(0) {}
 
 	int Direction;
 	int InGoal;

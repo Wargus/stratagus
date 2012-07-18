@@ -240,20 +240,17 @@ int NetSocketAddr(const Socket sock)
 	DWORD bytesReturned;
 	SOCKADDR_IN *pAddrInet;
 	u_long SetFlags;
-	int nif;
-	int wsError;
-	int numLocalAddr;
+	int nif = 0;
 
-	nif = 0;
 	if (sock != static_cast<Socket>(-1)) {
-		wsError = WSAIoctl(sock, SIO_GET_INTERFACE_LIST, NULL, 0, &localAddr,
-						   sizeof(localAddr), &bytesReturned, NULL, NULL);
+		int wsError = WSAIoctl(sock, SIO_GET_INTERFACE_LIST, NULL, 0, &localAddr,
+							   sizeof(localAddr), &bytesReturned, NULL, NULL);
 		if (wsError == SOCKET_ERROR) {
 			DebugPrint("SIOCGIFCONF:WSAIoctl(SIO_GET_INTERFACE_LIST) - errno %d\n" _C_ WSAGetLastError());
 		}
 
 		// parse interface information
-		numLocalAddr = (bytesReturned / sizeof(INTERFACE_INFO));
+		int numLocalAddr = (bytesReturned / sizeof(INTERFACE_INFO));
 		for (int i = 0; i < numLocalAddr; ++i) {
 			SetFlags = localAddr[i].iiFlags;
 			if ((SetFlags & IFF_UP) == 0) {
@@ -287,10 +284,8 @@ int NetSocketAddr(const Socket sock)
 	struct ifreq *ifr;
 	struct sockaddr_in *sap;
 	struct sockaddr_in sa;
-	int i;
-	int nif;
+	int nif = 0;
 
-	nif = 0;
 	if (sock != static_cast<Socket>(-1)) {
 		ifc.ifc_len = sizeof(buf);
 		ifc.ifc_buf = buf;
@@ -336,6 +331,7 @@ int NetSocketAddr(const Socket sock)
 			}
 			// avoid p-t-p links with common src
 			if (nif) {
+				int i;
 				for (i = 0; i < nif; ++i) {
 					if (sa.sin_addr.s_addr == NetLocalAddrs[i]) {
 						i = -1;

@@ -315,24 +315,18 @@ done:   /* Clean up and return */
 */
 void SaveScreenshotPNG(const char *name)
 {
-	FILE *fp;
-	png_structp png_ptr;
-	png_infop info_ptr;
-	int i;
-	int j;
-
-	fp = fopen(name, "wb");
+	FILE *fp = fopen(name, "wb");
 	if (fp == NULL) {
 		return;
 	}
 
-	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (png_ptr == NULL) {
 		fclose(fp);
 		return;
 	}
 
-	info_ptr = png_create_info_struct(png_ptr);
+	png_infop info_ptr = png_create_info_struct(png_ptr);
 	if (info_ptr == NULL) {
 		fclose(fp);
 		png_destroy_write_struct(&png_ptr, NULL);
@@ -367,7 +361,7 @@ void SaveScreenshotPNG(const char *name)
 		glReadBuffer(GL_FRONT);
 #endif
 		glReadPixels(0, 0, Video.Width, Video.Height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-		for (i = 0; i < Video.Height; ++i) {
+		for (int i = 0; i < Video.Height; ++i) {
 			png_write_row(png_ptr, pixels + (Video.Height - 1 - i) * Video.Width * 3);
 		}
 		delete[] pixels;
@@ -375,13 +369,12 @@ void SaveScreenshotPNG(const char *name)
 		unsigned char *row = new unsigned char[Video.Width * 3];
 		SDL_PixelFormat *fmt = TheScreen->format;
 
-		for (i = 0; i < Video.Height; ++i) {
+		for (int i = 0; i < Video.Height; ++i) {
 			switch (Video.Depth) {
 				case 15:
 				case 16: {
-					Uint16 c;
-					for (j = 0; j < Video.Width; ++j) {
-						c = ((Uint16 *)TheScreen->pixels)[j + i * Video.Width];
+					for (int j = 0; j < Video.Width; ++j) {
+						Uint16 c = ((Uint16 *)TheScreen->pixels)[j + i * Video.Width];
 						row[j * 3 + 0] = ((c & fmt->Rmask) >> fmt->Rshift) << fmt->Rloss;
 						row[j * 3 + 1] = ((c & fmt->Gmask) >> fmt->Gshift) << fmt->Gloss;
 						row[j * 3 + 2] = ((c & fmt->Bmask) >> fmt->Bshift) << fmt->Bloss;
@@ -393,9 +386,8 @@ void SaveScreenshotPNG(const char *name)
 					break;
 				}
 				case 32: {
-					Uint32 c;
-					for (j = 0; j < Video.Width; ++j) {
-						c = ((Uint32 *)TheScreen->pixels)[j + i * Video.Width];
+					for (int j = 0; j < Video.Width; ++j) {
+						Uint32 c = ((Uint32 *)TheScreen->pixels)[j + i * Video.Width];
 						row[j * 3 + 0] = ((c & fmt->Rmask) >> fmt->Rshift);
 						row[j * 3 + 1] = ((c & fmt->Gmask) >> fmt->Gshift);
 						row[j * 3 + 2] = ((c & fmt->Bmask) >> fmt->Bshift);
@@ -405,7 +397,6 @@ void SaveScreenshotPNG(const char *name)
 			}
 			png_write_row(png_ptr, row);
 		}
-
 		delete[] row;
 	}
 

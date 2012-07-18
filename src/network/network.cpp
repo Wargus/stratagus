@@ -1104,12 +1104,10 @@ void NetworkChatMessage(const std::string &msg)
 {
 	CNetworkCommandQueue *ncq;
 	CNetworkChat *ncm;
-	const char *cp;
-	int n;
 
 	if (IsNetworkGame()) {
-		cp = msg.c_str();
-		n = msg.size();
+		const char *cp = msg.c_str();
+		int n = msg.size();
 		while (n >= (int)sizeof(ncm->Text)) {
 			ncq = AllocNCQ();
 			MsgCommandsIn.push_back(ncq);

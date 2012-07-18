@@ -402,11 +402,13 @@ CSample *LoadVorbis(const char *name, int flags)
 	}
 
 	if (flags & PlayAudioStream) {
-		sample = new CSampleVorbisStream;
-		data = &((CSampleVorbisStream *)sample)->Data;
+		CSampleVorbisStream *sampleVorbisStream = new CSampleVorbisStream;
+		sample = sampleVorbisStream;
+		data = &sampleVorbisStream->Data;
 	} else {
-		sample = new CSampleVorbis;
-		data = &((CSampleVorbis *)sample)->Data;
+		CSampleVorbis *sampleVorbis = new CSampleVorbis;
+		sample = sampleVorbis;
+		data = &sampleVorbis->Data;
 	}
 	memset(data, 0, sizeof(*data));
 
@@ -431,17 +433,14 @@ CSample *LoadVorbis(const char *name, int flags)
 		sample->Buffer = new unsigned char[SOUND_BUFFER_SIZE];
 	} else {
 		unsigned char *buf;
-		int pos;
-		int ret;
 		int total;
 		ogg_page pg;
 		ogg_sync_state sync;
-		int i;
 
 		// find total size
-		pos = f->tell();
+		int pos = f->tell();
 		ogg_sync_init(&sync);
-		for (i = 0; ; ++i) {
+		for (int i = 0; ; ++i) {
 			f->seek(-1 * i * 4096, SEEK_END);
 			buf = (unsigned char *)ogg_sync_buffer(&sync, 4096);
 			f->read(buf, 8192);
@@ -456,7 +455,8 @@ CSample *LoadVorbis(const char *name, int flags)
 		sample->Buffer = new unsigned char[total];
 		pos = 0;
 
-		while ((ret = VorbisStreamRead(sample, &((CSampleVorbis *)sample)->Data,
+		int ret;
+		while ((ret = VorbisStreamRead(sample, &(static_cast<CSampleVorbis *>(sample))->Data,
 									   sample->Buffer + pos, 8192))) {
 			pos += ret;
 		}

@@ -181,7 +181,7 @@ void InitUpgrades()
 void CleanUpgrades()
 {
 	//  Free the upgrades.
-	while (AllUpgrades.size()) {
+	while (AllUpgrades.empty() == false) {
 		CUpgrade *upgrade = AllUpgrades.back();
 		AllUpgrades.pop_back();
 		delete upgrade;

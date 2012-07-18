@@ -632,17 +632,13 @@ void NetworkServerStartGame()
 	} else {
 		for (i = 0; i < NetPlayers; ++i) {
 			if (j > 0) {
-				int k;
-				int o;
-				int chosen;
-
-				chosen = MyRand() % j;
+				int chosen = MyRand() % j;
 
 				n = num[chosen];
 				Hosts[i].PlyNr = n;
-				k = org[i];
+				int k = org[i];
 				if (k != n) {
-					for (o = 0; o < PlayerMax; ++o) {
+					for (int o = 0; o < PlayerMax; ++o) {
 						if (org[o] == n) {
 							org[o] = k;
 							break;

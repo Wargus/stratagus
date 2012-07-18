@@ -977,8 +977,6 @@ int AutoCastSpell(CUnit &caster, const SpellType *spell)
 int SpellCast(CUnit &caster, const SpellType *spell, CUnit *target, const Vec2i &goalPos)
 {
 	Vec2i pos = goalPos;
-	int cont;             // Should we recast the spell.
-	int mustSubtractMana; // false if action which have their own calculation is present.
 
 	caster.Variable[INVISIBLE_INDEX].Value = 0;// unit is invisible until attacks // FIXME: Must be configurable
 	if (target) {
@@ -994,8 +992,8 @@ int SpellCast(CUnit &caster, const SpellType *spell, CUnit *target, const Vec2i 
 	DebugPrint("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->Ident.c_str() _C_
 			   caster.Type->Name.c_str() _C_ target ? target->Type->Name.c_str() : "none" _C_ pos.x _C_ pos.y);
 	if (CanCastSpell(caster, spell, target, pos)) {
-		cont = 1;
-		mustSubtractMana = 1;
+		int cont = 1; // Should we recast the spell.
+		bool mustSubtractMana = true; // false if action which have their own calculation is present.
 		//
 		//  Ugly hack, CastAdjustVitals makes it's own mana calculation.
 		//
@@ -1003,7 +1001,7 @@ int SpellCast(CUnit &caster, const SpellType *spell, CUnit *target, const Vec2i 
 		for (std::vector<SpellActionType *>::const_iterator act = spell->Action.begin();
 			 act != spell->Action.end(); ++act) {
 			if ((*act)->ModifyManaCaster) {
-				mustSubtractMana = 0;
+				mustSubtractMana = false;
 			}
 			cont = cont & (*act)->Cast(caster, spell, target, pos);
 		}

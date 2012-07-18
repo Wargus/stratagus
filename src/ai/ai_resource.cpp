@@ -594,7 +594,7 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
 			continue;
 		}
 		std::vector<CUnitType *> &table = (*tablep)[type.Slot];
-		if (!table.size()) { // Oops not known.
+		if (table.empty()) { // Oops not known.
 			DebugPrint("%d: AiMakeUnit II: Nothing known about `%s'\n"
 					   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 			continue;
@@ -673,7 +673,7 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 		return;
 	}
 	std::vector<CUnitType *> &table = tablep[upgrade->ID];
-	if (!table.size()) { // Oops not known.
+	if (table.empty()) { // Oops not known.
 		DebugPrint("%d: AiAddResearchRequest II: Nothing known about `%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ upgrade->Ident.c_str());
 		return;
@@ -741,7 +741,7 @@ void AiAddUpgradeToRequest(CUnitType &type)
 		return;
 	}
 	std::vector<CUnitType *> &table = tablep[type.Slot];
-	if (!table.size()) { // Oops not known.
+	if (table.empty()) { // Oops not known.
 		DebugPrint("%d: AiAddUpgradeToRequest II: Nothing known about `%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 		return;
@@ -1221,7 +1221,7 @@ static int AiRepairUnit(CUnit &unit)
 		return 0;
 	}
 	std::vector<CUnitType *> &table = tablep[type.Slot];
-	if (!table.size()) { // Oops not known.
+	if (table.empty()) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit II: Nothing known about `%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 		return 0;

@@ -507,9 +507,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	Assert(unit.MapDistanceTo(*goal) <= 1);
 
 	// Update the heading of a harvesting unit to looks straight at the resource.
-	if (goal) {
-		UnitHeadingFromDeltaXY(unit, goal->tilePos - unit.tilePos + goal->Type->GetHalfTileSize());
-	}
+	UnitHeadingFromDeltaXY(unit, goal->tilePos - unit.tilePos + goal->Type->GetHalfTileSize());
 
 	// If resource is still under construction, wait!
 	if ((goal->Type->MaxOnBoard && goal->Resource.Active >= goal->Type->MaxOnBoard)
@@ -1050,12 +1048,7 @@ void COrder_Resource::DropResource(CUnit &unit)
 {
 	if (unit.CurrentResource) {
 		const ResourceInfo &resinfo = *unit.Type->ResInfo[unit.CurrentResource];
-		if (resinfo.LoseResources && unit.ResourcesHeld < resinfo.ResourceCapacity) {
-			unit.ResourcesHeld = 0;
-		} else {
-			//FIXME: Add support for droping resource on map
-			unit.ResourcesHeld = 0;
-		}
+
 		if (!resinfo.TerrainHarvester) {
 			CUnit *mine = this->Resource.Mine;
 			if (mine) {
@@ -1065,6 +1058,7 @@ void COrder_Resource::DropResource(CUnit &unit)
 		//fast clean both resource data: pos and mine
 		this->Resource.Mine = NULL;
 		unit.CurrentResource = 0;
+		unit.ResourcesHeld = 0;
 	}
 }
 

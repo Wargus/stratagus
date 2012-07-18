@@ -1089,9 +1089,7 @@ static void MakeTextures(CGraphic *g, int player, CUnitColors *colors)
 	g->TextureHeight = (GLfloat)h / PowerOf2(h);
 
 	g->NumTextures = tw * th;
-	if (g->NumTextures > 1) {
-		tw = tw;
-	}
+
 	CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
 	GLuint *textures;
 	if (!colors || !cg) {

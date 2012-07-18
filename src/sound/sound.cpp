@@ -202,17 +202,14 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 */
 static unsigned char VolumeForDistance(unsigned short d, unsigned char range)
 {
-	int d_tmp;
-	int range_tmp;
-
 	// FIXME: THIS IS SLOW!!!!!!!
 	if (d <= ViewPointOffset || range == INFINITE_SOUND_RANGE) {
 		return MaxVolume;
 	} else {
 		if (range) {
 			d -= ViewPointOffset;
-			d_tmp = d * MAX_SOUND_RANGE;
-			range_tmp = DistanceSilent * range;
+			int d_tmp = d * MAX_SOUND_RANGE;
+			int range_tmp = DistanceSilent * range;
 			if (d_tmp > range_tmp) {
 				return 0;
 			} else {
@@ -418,15 +415,13 @@ void SetSoundRange(CSound *sound, unsigned char range)
 */
 CSound *RegisterSound(const char *files[], unsigned number)
 {
-	unsigned i;
-	CSound *id;
+	CSound *id = new CSound;
 
-	id = new CSound;
 	if (number > 1) { // load a sound group
 		id->Sound.OneGroup = new CSample *[number];
 		memset(id->Sound.OneGroup, 0, sizeof(CSample *) * number);
 		id->Number = number;
-		for (i = 0; i < number; ++i) {
+		for (unsigned int i = 0; i < number; ++i) {
 			id->Sound.OneGroup[i] = LoadSample(files[i]);
 			if (!id->Sound.OneGroup[i]) {
 				//delete[] id->Sound.OneGroup;

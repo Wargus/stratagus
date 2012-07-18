@@ -241,8 +241,6 @@ static void InitGameCallbacks()
 
 static void GameLogicLoop()
 {
-	int player;
-
 	// Can't find a better place.
 	// FIXME: We need find better place!
 	SaveGameLoading = false;
@@ -273,7 +271,7 @@ static void GameLogicLoop()
 		switch (GameCycle % CYCLES_PER_SECOND) {
 			case 0: // At cycle 0, start all ai players...
 				if (GameCycle == 0) {
-					for (player = 0; player < NumPlayers; ++player) {
+					for (int player = 0; player < NumPlayers; ++player) {
 						PlayersEachSecond(player);
 					}
 				}
@@ -293,13 +291,14 @@ static void GameLogicLoop()
 			case 6: // overtaking units
 				RescueUnits();
 				break;
-			default:
+			default: {
 				// FIXME: assume that NumPlayers < (CYCLES_PER_SECOND - 7)
-				player = (GameCycle % CYCLES_PER_SECOND) - 7;
+				int player = (GameCycle % CYCLES_PER_SECOND) - 7;
 				Assert(player >= 0);
 				if (player < NumPlayers) {
 					PlayersEachSecond(player);
 				}
+			}
 		}
 	}
 

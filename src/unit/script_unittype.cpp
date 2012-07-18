@@ -1095,7 +1095,7 @@ static int CclDefineUnitType(lua_State *l)
 					const std::string name = LuaToString(l, -1);
 					lua_pop(l, 1);
 					++k;
-					const int resId = GetResourceIdByName(l, value);
+					const int resId = GetResourceIdByName(l, name.c_str());
 					lua_rawgeti(l, -1, k + 1);
 					type->Sound.Harvest[resId].Name = LuaToString(l, -1);
 					lua_pop(l, 1);

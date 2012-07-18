@@ -376,7 +376,7 @@ static void LoadMap(const std::string &filename, CMap &map)
 			}
 			Assert(!map.Info.Filename.empty());
 			map.Create();
-			LoadStratagusMap(filename, map.Info.Filename.c_str());
+			LoadStratagusMap(filename, map.Info.Filename);
 			return;
 		}
 	}

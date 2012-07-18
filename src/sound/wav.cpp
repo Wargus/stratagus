@@ -284,13 +284,15 @@ CSample *LoadWav(const char *name, int flags)
 	//  Read sample
 	//
 	if (flags & PlayAudioStream) {
-		sample = new CSampleWavStream;
-		((CSampleWavStream *)sample)->Data.WavFile = f;
-		data = &((CSampleWavStream *)sample)->Data;
+		CSampleWavStream *sampleWavStream = new CSampleWavStream;
+		sample = sampleWavStream;
+		sampleWavStream->Data.WavFile = f;
+		data = &sampleWavStream->Data;
 	} else {
-		sample = new CSampleWav;
-		((CSampleWav *)sample)->Data.WavFile = f;
-		data = &((CSampleWav *)sample)->Data;
+		CSampleWav *sampleWav = new CSampleWav;
+		sample = sampleWav;
+		sampleWav->Data.WavFile = f;
+		data = &sampleWav->Data;
 	}
 	sample->Channels = wavfmt.Channels;
 	sample->SampleSize = wavfmt.SampleSize * 8 / sample->Channels;
