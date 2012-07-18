@@ -100,24 +100,6 @@ static void laction(int i)
 }
 
 /**
-**  Print error message and possibly exit.
-**
-**  @param pname  Source of the error.
-**  @param msg    error message to print.
-**  @param exit   exit the program
-*/
-static void l_message(const char *pname, const char *msg, bool exit)
-{
-	if (pname) {
-		fprintf(stderr, "%s: ", pname);
-	}
-	fprintf(stderr, "%s\n", msg);
-	if (exit) {
-		::exit(1);
-	}
-}
-
-/**
 **  Check error status, and print error message and exit
 **  if status is different of 0.
 **
@@ -128,14 +110,15 @@ static void l_message(const char *pname, const char *msg, bool exit)
 */
 static int report(int status, bool exitOnError)
 {
-	const char *msg;
-
 	if (status) {
-		msg = lua_tostring(Lua, -1);
+		const char *msg = lua_tostring(Lua, -1);
 		if (msg == NULL) {
 			msg = "(error with no message)";
 		}
-		l_message(NULL, msg, exitOnError);
+		fprintf(stderr, "%s\n", msg);
+		if (exitOnError) {
+			::exit(1);
+		}
 		lua_pop(Lua, 1);
 	}
 	return status;
@@ -171,14 +154,11 @@ static int luatraceback(lua_State *L)
 */
 int LuaCall(int narg, int clear, bool exitOnError)
 {
-	int status;
-	int base;
-
-	base = lua_gettop(Lua) - narg;  // function index
+	const int base = lua_gettop(Lua) - narg;  // function index
 	lua_pushcfunction(Lua, luatraceback);  // push traceback function
 	lua_insert(Lua, base);  // put it under chunk and args
 	signal(SIGINT, laction);
-	status = lua_pcall(Lua, narg, (clear ? 0 : LUA_MULTRET), base);
+	const int status = lua_pcall(Lua, narg, (clear ? 0 : LUA_MULTRET), base);
 	signal(SIGINT, SIG_DFL);
 	lua_remove(Lua, base);  // remove traceback function
 
@@ -191,36 +171,29 @@ int LuaCall(int narg, int clear, bool exitOnError)
 static void LuaLoadBuffer(const std::string &file, std::string &buffer)
 {
 	CFile fp;
-	int size;
-	int oldsize;
-	int location;
-	int read;
-	char *buf;
 
 	buffer.clear();
-
 	if (fp.open(file.c_str(), CL_OPEN_READ) == -1) {
-		fprintf(stderr, "Can't open file '%s': %s\n",
-				file.c_str(), strerror(errno));
+		fprintf(stderr, "Can't open file '%s': %s\n", file.c_str(), strerror(errno));
 		return;
 	}
 
-	size = 10000;
-	buf = new char[size];
+	int size = 10000;
+	char *buf = new char[size];
 	if (!buf) {
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
-	location = 0;
+	int location = 0;
 	for (;;) {
-		read = fp.read(&buf[location], size - location);
+		int read = fp.read(&buf[location], size - location);
 		if (read != size - location) {
 			location += read;
 			break;
 		}
 		location += read;
-		oldsize = size;
-		size = size * 2;
+		int oldsize = size;
+		size *= 2;
 		char *newb = new char[size];
 		if (!newb) {
 			fprintf(stderr, "Out of memory\n");
@@ -245,25 +218,22 @@ static void LuaLoadBuffer(const std::string &file, std::string &buffer)
 */
 int LuaLoadFile(const std::string &file)
 {
-	int status;
-	std::string PreviousLuaFile;
-	std::string buf;
-
-	PreviousLuaFile = CurrentLuaFile;
+	const std::string PreviousLuaFile = CurrentLuaFile;
 	CurrentLuaFile = file;
 
+	std::string buf;
 	LuaLoadBuffer(file, buf);
 	if (buf.empty()) {
 		return -1;
 	}
+	const int status = luaL_loadbuffer(Lua, buf.c_str(), buf.size(), file.c_str());
 
-	if (!(status = luaL_loadbuffer(Lua, buf.c_str(), buf.size(), file.c_str()))) {
+	if (!status) {
 		LuaCall(0, 1);
 	} else {
 		report(status, true);
 	}
 	CurrentLuaFile = PreviousLuaFile;
-
 	return status;
 }
 
@@ -287,7 +257,7 @@ static int CclGetCurrentLuaPath(lua_State *l)
 }
 
 /**
-**	Save preferences
+**  Save preferences
 **
 **  @param l  Lua state.
 */
@@ -1834,19 +1804,11 @@ static int CclStratagusLibraryPath(lua_State *l)
 */
 static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 {
-	char directory[256];
-	const char *userdir;
-	std::vector<FileList> flp;
-	int n;
-	int i;
-	int j;
-	int pathtype;
-
 	LuaCheckArgs(l, 1);
-	userdir = lua_tostring(l, 1);
-	n = strlen(userdir);
+	const char *userdir = lua_tostring(l, 1);
+	int n = strlen(userdir);
 
-	pathtype = 0; // path relative to stratagus dir
+	int pathtype = 0; // path relative to stratagus dir
 	if (n > 0 && *userdir == '~') {
 		// path relative to user preferences directory
 		pathtype = 1;
@@ -1856,6 +1818,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	if (strpbrk(userdir, ":*?\"<>|") != 0 || strstr(userdir, "..") != 0) {
 		LuaError(l, "Forbidden directory");
 	}
+	char directory[256];
 
 	if (pathtype == 1) {
 		++userdir;
@@ -1870,8 +1833,10 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	}
 	lua_pop(l, 1);
 	lua_newtable(l);
+	std::vector<FileList> flp;
 	n = ReadDataDirectory(directory, NULL, flp);
-	for (i = 0, j = 0; i < n; ++i) {
+	int j = 0;
+	for (int i = 0; i < n; ++i) {
 		if ((flp[i].type & mask) == type) {
 			lua_pushnumber(l, j + 1);
 			lua_pushstring(l, flp[i].name);
@@ -1880,7 +1845,6 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 		}
 		delete[] flp[i].name;
 	}
-
 	return 1;
 }
 
@@ -1956,9 +1920,9 @@ static int CclDebugPrint(lua_State *l)
 */
 int CclCommand(const std::string &command, bool exitOnError)
 {
-	int status;
+	const int status = luaL_loadbuffer(Lua, command.c_str(), command.size(), command.c_str());
 
-	if (!(status = luaL_loadbuffer(Lua, command.c_str(), command.size(), command.c_str()))) {
+	if (!status) {
 		LuaCall(0, 1, exitOnError);
 	} else {
 		report(status, exitOnError);
@@ -1980,10 +1944,10 @@ void InitLua()
 	// For security we don't load all libs
 	static const luaL_Reg lualibs[] = {
 		{"", luaopen_base},
-		//		{LUA_LOADLIBNAME, luaopen_package},
+		//{LUA_LOADLIBNAME, luaopen_package},
 		{LUA_TABLIBNAME, luaopen_table},
-		//		{LUA_IOLIBNAME, luaopen_io},
-		//		{LUA_OSLIBNAME, luaopen_os},
+		//{LUA_IOLIBNAME, luaopen_io},
+		//{LUA_OSLIBNAME, luaopen_os},
 		{LUA_STRLIBNAME, luaopen_string},
 		{LUA_MATHLIBNAME, luaopen_math},
 		{LUA_DBLIBNAME, luaopen_debug},
@@ -1997,7 +1961,6 @@ void InitLua()
 		lua_pushstring(Lua, lib->name);
 		lua_call(Lua, 1, 0);
 	}
-
 	tolua_stratagus_open(Lua);
 	lua_settop(Lua, 0);  // discard any results
 }
