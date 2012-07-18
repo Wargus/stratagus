@@ -53,7 +53,6 @@
 lua_State *Lua;                       /// Structure to work with lua files.
 
 int CclInConfigFile;                  /// True while config file parsing
-std::string CurrentLuaFile;           /// Lua file currently being interpreted
 
 NumberDesc *Damage;                   /// Damage calculation for missile.
 
@@ -218,9 +217,6 @@ static void LuaLoadBuffer(const std::string &file, std::string &buffer)
 */
 int LuaLoadFile(const std::string &file)
 {
-	const std::string PreviousLuaFile = CurrentLuaFile;
-	CurrentLuaFile = file;
-
 	std::string buf;
 	LuaLoadBuffer(file, buf);
 	if (buf.empty()) {
@@ -233,27 +229,7 @@ int LuaLoadFile(const std::string &file)
 	} else {
 		report(status, true);
 	}
-	CurrentLuaFile = PreviousLuaFile;
 	return status;
-}
-
-/**
-**  Get the directory of the current lua file
-*/
-static int CclGetCurrentLuaPath(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-
-	std::string path = CurrentLuaFile;
-	size_t index = path.rfind('/');
-
-	if (index != std::string::npos) {
-		path = path.substr(0, index);
-		lua_pushstring(l, path.c_str());
-	} else {
-		lua_pushstring(l, "");
-	}
-	return 1;
 }
 
 /**
@@ -2246,7 +2222,6 @@ void ScriptRegister()
 	lua_register(Lua, "SavePreferences", CclSavePreferences);
 	lua_register(Lua, "Load", CclLoad);
 	lua_register(Lua, "LoadBuffer", CclLoadBuffer);
-	lua_register(Lua, "GetCurrentLuaPath", CclGetCurrentLuaPath);
 
 	lua_register(Lua, "DebugPrint", CclDebugPrint);
 }
