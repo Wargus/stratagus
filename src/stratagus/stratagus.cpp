@@ -782,7 +782,8 @@ int main(int argc, char **argv)
 	makedir(parameters.GetUserDirectory().c_str(), 0777);
 
 	// Init Lua and register lua functions!
-	InitCcl();
+	InitLua();
+	LuaRegisterModules();
 
 	// Initialise AI module
 	InitAiModule();

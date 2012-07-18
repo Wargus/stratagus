@@ -292,7 +292,7 @@ extern int LuaToNumber(lua_State *l, int narg);
 extern bool LuaToBoolean(lua_State *l, int narg);
 
 extern void CclGarbageCollect(int fast);  /// Perform garbage collection
-extern void InitCcl();                /// Initialise ccl
+extern void InitLua();                /// Initialise Lua
 extern void LoadCcl(const std::string &filename);  /// Load ccl config file
 extern void SaveCcl(CFile &file);     /// Save CCL module
 extern void SavePreferences();        /// Save user preferences

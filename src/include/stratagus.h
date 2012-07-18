@@ -247,6 +247,7 @@ extern void ExitFatal(int err);             /// Exit with fatal error
 
 extern void UpdateDisplay();            /// Game display update
 extern void InitModules();              /// Initialize all modules
+extern void LuaRegisterModules();       /// Register lua script of each modules
 extern void LoadModules();              /// Load all modules
 extern void CleanModules();             /// Cleanup all modules
 extern void DrawMapArea();              /// Draw the map area

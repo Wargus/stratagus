@@ -2461,7 +2461,7 @@ extern int tolua_stratagus_open(lua_State *tolua_S);
 /**
 **  Initialize Lua
 */
-static void InitLua()
+void InitLua()
 {
 	// For security we don't load all libs
 	static const luaL_Reg lualibs[] = {
@@ -2488,13 +2488,8 @@ static void InitLua()
 	lua_settop(Lua, 0);  // discard any results
 }
 
-/**
-**  Register some lua function.
-*/
-void InitCcl()
+void LuaRegisterModules()
 {
-	InitLua();
-
 	lua_register(Lua, "LibraryPath", CclStratagusLibraryPath);
 	lua_register(Lua, "ListDirectory", CclListDirectory);
 	lua_register(Lua, "ListFilesInDirectory", CclListFilesInDirectory);
