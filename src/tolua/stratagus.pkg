@@ -1,18 +1,20 @@
 $#include "stratagus.h"
-$#include "ui.h"
-$#include "minimap.h"
-$#include "player.h"
-$#include "unittype.h"
-$#include "unit.h"
-$#include "video.h"
+
+$#include "ai.h"
 $#include "font.h"
-$#include "widgets.h"
+$#include "iolib.h"
+$#include "map.h"
+$#include "minimap.h"
+$#include "movie.h"
+$#include "netconnect.h"
+$#include "player.h"
 $#include "sound.h"
 $#include "sound_server.h"
-$#include "netconnect.h"
-$#include "map.h"
-$#include "ai.h"
-$#include "movie.h"
+$#include "ui.h"
+$#include "unit.h"
+$#include "unittype.h"
+$#include "video.h"
+$#include "widgets.h"
 
 $#ifdef _MSC_VER
 $#pragma warning(disable:4800)
@@ -58,23 +60,26 @@ $]
 #define UpButton 16
 #define DownButton 32
 
-$pfile "minimap.pkg"
-$pfile "ui.pkg"
-$pfile "network.pkg"
-$pfile "video.pkg"
-$pfile "font.pkg"
-$pfile "upgrade.pkg"
-$pfile "player.pkg"
-$pfile "unittype.pkg"
-$pfile "unit.pkg"
-$pfile "sound.pkg"
+$using std::string;
+$using std::vector;
+
+$pfile "ai.pkg"
 $pfile "editor.pkg"
+$pfile "font.pkg"
 $pfile "game.pkg"
 $pfile "map.pkg"
-$pfile "ai.pkg"
-$pfile "pathfinder.pkg"
-$pfile "trigger.pkg"
+$pfile "minimap.pkg"
+$pfile "network.pkg"
 $pfile "particle.pkg"
+$pfile "pathfinder.pkg"
+$pfile "player.pkg"
+$pfile "sound.pkg"
+$pfile "trigger.pkg"
+$pfile "ui.pkg"
+$pfile "unit.pkg"
+$pfile "unittype.pkg"
+$pfile "upgrade.pkg"
+$pfile "video.pkg"
 
 extern const char *Translate(const char *str);
 extern void AddTranslation(const char *str1, const char *str2);

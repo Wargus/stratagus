@@ -253,8 +253,6 @@ extern void CleanModules();             /// Cleanup all modules
 extern void DrawMapArea();              /// Draw the map area
 extern void GameMainLoop();             /// Game main loop
 
-extern bool CanAccessFile(const char *filename);
-
 //@}
 
 #endif // !__STRATAGUS_H__

@@ -148,6 +148,8 @@ enum {
 /// Build libary path name
 extern char *LibraryFileName(const char *file, char *buffer, size_t buffersize);
 
+extern bool CanAccessFile(const char *filename);
+
 /// Read the contents of a directory
 extern int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *),
 							 std::vector<FileList> &flp);

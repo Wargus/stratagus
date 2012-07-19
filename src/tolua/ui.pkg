@@ -1,6 +1,3 @@
-$using std::string;
-$using std::vector;
-
 $using namespace gcn;
 
 
