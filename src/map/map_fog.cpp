@@ -260,7 +260,9 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 		const int minx = std::max(0, pos.x - offsetx);
 		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + offsetx);
 		Vec2i mpos(minx, pos.y + offsety);
+#ifdef MARKER_ON_INDEX
 		const unsigned int index = mpos.y * Map.Info.MapWidth;
+#endif
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
 #ifdef MARKER_ON_INDEX
@@ -274,7 +276,9 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 		const int minx = std::max(0, pos.x - range);
 		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + range);
 		Vec2i mpos(minx, pos.y + offsety);
+#ifdef MARKER_ON_INDEX
 		const unsigned int index = mpos.y * Map.Info.MapWidth;
+#endif
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
 #ifdef MARKER_ON_INDEX
