@@ -95,26 +95,6 @@ class COrderPointerPrinter:
             result = result + (" {%s}" % action)
         return result
 
-class CUnitPointerPrinter:
-    "Pretty-print a pointer to CUnit."
-
-    def __init__(self, val):
-        object.__init__(self)
-        self.val = val
-
-    def to_string(self):
-        "Called by GDB to find what to display as the value."
-        voidPointerType = gdb.lookup_type("void").pointer()
-        # str(self.val) would cause a recursive call; the cast avoids that.
-        result = str(self.val.cast(voidPointerType))
-        if self.val != 0:
-            unit = self.val.dereference()
-            unitTypePointer = unit["Type"]
-            if unitTypePointer != 0:
-                unitTypeIdent = unitTypePointer.dereference()["Ident"]
-                result = result + (" {%s}" % unitTypeIdent)
-        return result
-
 class CPatchPointerPrinter:
     "Pretty-print a pointer to CPatch."
 
@@ -140,10 +120,11 @@ class CPatchPointerPrinter:
 class StructPointerPrinter:
     "Pretty-print a pointer to a structure that has one important member."
 
-    def __init__(self, val, memberName):
+    def __init__(self, val, memberName, indirectMemberName = None):
         object.__init__(self)
         self.val = val
         self.memberName = memberName
+        self.indirectMemberName = indirectMemberName
 
     def to_string(self):
         "Called by GDB to find what to display as the value."
@@ -152,7 +133,11 @@ class StructPointerPrinter:
         result = str(self.val.cast(voidPointerType))
         if self.val != 0:
             memberValue = self.val.dereference()[self.memberName]
-            result = result + (" {%s}" % memberValue)
+            if self.indirectMemberName == None:
+                result = result + (" {%s}" % memberValue)
+            elif memberValue != 0:
+                memberValue = memberValue.dereference()[self.indirectMemberName]
+                result = result + (" {%s}" % memberValue)
         return result
 
 def lookup_printer(val):
@@ -181,9 +166,11 @@ def lookup_printer(val):
         elif tag == "CPlayerColorGraphic":
             return StructPointerPrinter(val, "File")
         elif tag == "CUnit":
-            return CUnitPointerPrinter(val)
+            return StructPointerPrinter(val, "Type", "Ident")
         elif tag == "CUnitType":
             return StructPointerPrinter(val, "Ident")
+        elif tag == "Missile":
+            return StructPointerPrinter(val, "Type", "Ident")
         elif tag == "MissileType":
             return StructPointerPrinter(val, "Ident")
 
