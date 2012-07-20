@@ -544,7 +544,8 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 void CMap::FixNeighbors(unsigned short type, int seen, const Vec2i &pos)
 {
 	const Vec2i offset[] = {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1),
-							Vec2i(-1, -1), Vec2i(-1, 1), Vec2i(1, -1), Vec2i(1, 1)};
+							Vec2i(-1, -1), Vec2i(-1, 1), Vec2i(1, -1), Vec2i(1, 1)
+						   };
 
 	for (unsigned int i = 0; i < sizeof(offset) / sizeof(*offset); ++i) {
 		FixTile(type, seen, pos + offset[i]);

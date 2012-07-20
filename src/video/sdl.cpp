@@ -483,13 +483,15 @@ void InitVideoSdl()
 		struct stat st;
 
 		std::string FullGameNameL = FullGameName;
-		for (size_t i = 0; i < FullGameNameL.size(); ++i)
+		for (size_t i = 0; i < FullGameNameL.size(); ++i) {
 			FullGameNameL[i] = tolower(FullGameNameL[i]);
+		}
 
 		std::string ApplicationName = Parameters::Instance.applicationName;
 		std::string ApplicationNameL = ApplicationName;
-		for (size_t i = 0; i < ApplicationNameL.size(); ++i)
+		for (size_t i = 0; i < ApplicationNameL.size(); ++i) {
 			ApplicationNameL[i] = tolower(ApplicationNameL[i]);
+		}
 
 		std::vector <std::string> pixmaps;
 		pixmaps.push_back(std::string() + PIXMAPS + "/" + FullGameName + ".png");

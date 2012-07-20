@@ -771,8 +771,9 @@ int main(int argc, char **argv)
 	parameters.SetDefaultValues();
 	parameters.LocalPlayerName = GetLocalPlayerNameFromEnv();
 
-	if (argc > 0)
+	if (argc > 0) {
 		parameters.applicationName = argv[0];
+	}
 
 	// FIXME: Parse options before or after scripts?
 	ParseCommandLine(argc, argv, parameters);
