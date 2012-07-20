@@ -154,7 +154,20 @@ public:
 	*/
 	CFont MarkupFont;
 
-	/// Real font width (starting with ' ')
+	/**
+	** How many Unicode characters the font supports.
+	** The first of them is always U+0020 SPACE.
+	** Each character corresponds to a glyph in the graphic.
+	** (This implementation does not support combining characters.)
+	*/
+	int GlyphCount;
+
+	/**
+	** The width of each Unicode character that the font supports.
+	** CharWidth[0] is the width of U+0020 SPACE,
+	** CharWidth[1] is the width of U+0021 EXCLAMATION MARK,
+	** and so on.  This array has GlyphCount elements.
+	*/
 	char *CharWidth;
 
 	/// Graphic object used to draw
@@ -244,6 +257,7 @@ CFontFamily::CFontFamily(const std::string &ident)
 {
 	this->PlainTextFont.Family = this;
 	this->MarkupFont.Family = this;
+	this->GlyphCount = 0;
 	this->CharWidth = NULL;
 }
 
@@ -451,7 +465,11 @@ int CFont::Width(const std::string &text) const
 			}
 		}
 		if (!isformat) {
-			width += this->Family->CharWidth[utf8 - 32] + 1;
+			int glyph = utf8 - 32;
+			if (glyph < 0 || glyph >= this->Family->GlyphCount) {
+				glyph = 0;
+			}
+			width += this->Family->CharWidth[glyph] + 1;
 		}
 	}
 	return width;
@@ -867,16 +885,16 @@ void CFontFamily::MeasureWidths()
 	Uint32 ckey;
 	int ipr;  // images per row
 
-	int maxy = G->GraphicWidth / G->Width * G->GraphicHeight / G->Height;
+	GlyphCount = G->GraphicWidth / G->Width * G->GraphicHeight / G->Height;
 	delete[] CharWidth;
-	CharWidth = new char[maxy];
-	memset(CharWidth, 0, maxy);
+	CharWidth = new char[GlyphCount];
+	memset(CharWidth, 0, GlyphCount);
 	CharWidth[0] = G->Width / 2;  // a reasonable value for SPACE
 	ckey = G->Surface->format->colorkey;
 	ipr = G->Surface->w / G->Width;
 
 	SDL_LockSurface(G->Surface);
-	for (int y = 1; y < maxy; ++y) {
+	for (int y = 1; y < GlyphCount; ++y) {
 		sp = (const unsigned char *)G->Surface->pixels +
 			(y / ipr) * G->Surface->pitch * G->Height +
 			(y % ipr) * G->Width - 1;
