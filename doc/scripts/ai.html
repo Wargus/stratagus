@@ -24,23 +24,23 @@
 </head>
 <body>
 <pre width=80>
-         _________ __                 __                               
+         _________ __                 __
         /   _____//  |_____________ _/  |______     ____  __ __  ______
         \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \
        /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-               \/                  \/          \//_____/            \/ 
+               \/                  \/          \//_____/            \/
     ______________________                           ______________________
-			  T H E   W A R   B E G I N S
-	   Stratagus - A free fantasy real time strategy game engine
+                          T H E   W A R   B E G I N S
+           Stratagus - A free fantasy real time strategy game engine
 </pre>
 <hr>
 <h1>Stratagus Configuration Language Description: Artificial Intelligence (AI)</h1>
 <hr>
-<a href="../index.html">Stratagus</a> 
-<a href="../faq.html">FAQ</a> 
-<a href="unittype.html">PREV</a> 
-<a href="config.html">NEXT</a> 
+<a href="../index.html">Stratagus</a>
+<a href="../faq.html">FAQ</a>
+<a href="unittype.html">PREV</a>
+<a href="config.html">NEXT</a>
 <a href="index.html">LUA Index</a>
 <hr>
 <a href="#DefineAi">DefineAi</a>
@@ -73,27 +73,27 @@
 Everything around the control of the Stratagus AI.
 
 <p>
-Warning: The AI documentation is slightly outdated. This documentation hasn't 
+Warning: The AI documentation is slightly outdated. This documentation hasn't
 been fully converted to the lua API yet.
 <p>
 
 <h2>How does it work</h2>
 
 AI in Stratagus is script based. Each AI player keeps executing scripts.
-There are two kinds of scripts : 
+There are two kinds of scripts :
 <ul>
   <li>The main script. It starts buildings, upgrades, ...</li>
   <li>The action/reaction scripts. They are started by the AI engine, under certain condition.<br>
   </li>
 </ul>
 Scripts can arrange and control units using forces : <br>
-A script can ask for some type of unit in a force (using <a href="#AiForce">AiForce</a>), 
+A script can ask for some type of unit in a force (using <a href="#AiForce">AiForce</a>),
 and then wait for them to be ready (using <a href="#AiWaitForce">AiWaitForce</a>).<br>
 <br>
 <br>
-The force 0 is a special case : it holds all the unassigned units, and is used to fill other forces. 
+The force 0 is a special case : it holds all the unassigned units, and is used to fill other forces.
 ( when needed, units are transfered from force 0 to others ). Attacker units in force 0 won't be used for attacks<br>
-Forces from 1 to 3 are also special : They are used as the attack reserve. 
+Forces from 1 to 3 are also special : They are used as the attack reserve.
 Attack forces will only be created using units available in those forces.<br>
 <br>
 The main script is responsible for setting minimums for the forces 0 and 1. This will influence the balance
@@ -270,18 +270,18 @@ FIXME:
 
 <a name="AiAttackWithForce"></a>
 <h3>AiAttackWithForce(force)</h3>
- 
-Attack the opponent with the given force. The place is choosen by the AI. If there 	 
-are flyers, ships and land units in the force they could attack different 	 
+
+Attack the opponent with the given force. The place is choosen by the AI. If there
+are flyers, ships and land units in the force they could attack different
 goals.
 
-<dl> 	 
+<dl>
 <dt>force</dt>
 <dd>ID of the force to which the attacking units belong. The force ids 0 to 9
 are currently supported.
 </dd>
 </dl>
- 
+
 <i>The force isn't moved as a single unit: faster units attacks first, than later the
 slower units will attack.</i>
 
@@ -463,7 +463,7 @@ Get the number of cycles to sleep.
 Tells the AI that it should have a unit of this unit-type. The AI builds or
 trains units in this order of the AiSet/AiNeed commands. If the unit or an
 equivalent unit already exists, the AI does nothing. If the unit is lost, it is
-automatically rebuilt. If the units are requested in wrong order, the AI could 
+automatically rebuilt. If the units are requested in wrong order, the AI could
 hang up. Resources are collected automatic and farms are automatic build, but
 additional could be requested.
 
@@ -709,8 +709,7 @@ Now wait unit we have a worker to build the next things.
 FIXME: need some complex examples.
 
 <hr>
-(C) Copyright 2002-2011 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project 
-under the <a href="../gpl.html">GNU General Public License</a>.<br>
+(C) Copyright 2002-2011 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project under the <a href="../gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>
 </html>

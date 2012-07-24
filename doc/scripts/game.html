@@ -24,23 +24,23 @@
 </head>
 <body>
 <pre width=80>
-         _________ __                 __                               
+         _________ __                 __
         /   _____//  |_____________ _/  |______     ____  __ __  ______
         \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \
        /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-               \/                  \/          \//_____/            \/ 
+               \/                  \/          \//_____/            \/
     ______________________                           ______________________
-			  T H E   W A R   B E G I N S
-	   Stratagus - A free fantasy real time strategy game engine
+                          T H E   W A R   B E G I N S
+           Stratagus - A free fantasy real time strategy game engine
 </pre>
 <hr>
 <h1>Stratagus Configuration Language Description: Game</h1>
 <hr>
-<a href="../index.html">Stratagus</a> 
-<a href="../faq.html">FAQ</a> 
-<a href="config.html">PREV</a> 
-<a href="magic.html">NEXT</a> 
+<a href="../index.html">Stratagus</a>
+<a href="../faq.html">FAQ</a>
+<a href="config.html">PREV</a>
+<a href="magic.html">NEXT</a>
 <a href="index.html">LUA Index</a>
 <hr>
 <a href="#AddKeystrokeHelp">AddKeystrokeHelp</a>
@@ -359,7 +359,7 @@ Define the campaign.
 <h3>DefineConstruction(ident ...)</h3>
 Defines a construction.<br>
 <br>
-Constructions can specify multiple files and shadow files.  Shadows are 
+Constructions can specify multiple files and shadow files.  Shadows are
 optional.<br>
 <br>
 The construction frames should be ordered by increasing percentages and the
@@ -433,7 +433,7 @@ DefineConstruction( ident
 <a name="DefineEditorUnitTypes"></a>
 <h3>DefineEditorUnitTypes({unit1, unit2, ...})</h3>
 
-Creates a sorted list of unit-types for the editor. 
+Creates a sorted list of unit-types for the editor.
 This is only a temporary hack for better sorted units.
 
 <dl>
@@ -844,7 +844,7 @@ Returns the Stratagus library path. The Stratagus library path points to the gam
 <a name="ListDirectory"></a>
 <h3>ListDirectory(path)</h3>
 
-Returns a list with all files and subdirectories found in the directory pointed by path. 
+Returns a list with all files and subdirectories found in the directory pointed by path.
 If the given path starts with '~', then the path is relative to the
 user stratagus preferences directory.
 The path cannot include any special character.
@@ -858,8 +858,8 @@ The path cannot include any special character.
 <a name="ListFilesInDirectory"></a>
 <h3>ListFilesInDirectory(path)</h3>
 
-Returns a list with all files found in the directory pointed by path. 
-The path is relative to the game directory. 
+Returns a list with all files found in the directory pointed by path.
+The path is relative to the game directory.
 If the given path starts with '~', then the path is relative to the
 stratagus' user preferences directory.
 The path cannot include any special character.
@@ -873,7 +873,7 @@ The path cannot include any special character.
 <a name="ListDirsInDirectory"></a>
 <h3>ListDirsInDirectory(path)</h3>
 
-Returns a list with all subdirectories found in the directory pointed by path. 
+Returns a list with all subdirectories found in the directory pointed by path.
 The path is relative to the game directory.
 If the given path starts with '~', then the path is relative to the
 user stratagus preferences directory.
@@ -912,7 +912,7 @@ Parse a log entry. Used in replay games.
 <h4>Example</h4>
 
 <pre>
-    Log({ GameCycle = 10420, UnitNumber = 252, UnitIdent = "unit-assault", 
+    Log({ GameCycle = 10420, UnitNumber = 252, UnitIdent = "unit-assault",
        Action = "move", Flush = 1, PosX = 113, PosY = 104, SyncRandSeed = 614148735 })
 </pre>
 
@@ -952,7 +952,7 @@ Change players colors.
 <a name="MoveUnit"></a>
 <h3>MoveUnit(unit-slot, {x, y})</h3>
 
-Place a unit on map. If the location is occupied, 
+Place a unit on map. If the location is occupied,
 the unit will be placed in the closest available spot.
 
 
@@ -986,7 +986,7 @@ Used when loading games.
 Player(0,
   "name", "feb",
   "type", "person", "race", "elites", "ai", 0,
-  "team", 2, "enemy", "_X______________", "allied", "________________", 
+  "team", 2, "enemy", "_X______________", "allied", "________________",
   "shared-vision", "________________",
   "start", {0, 0},
   "resources", {"time", 0, "titanium", 2100, "crystal", 1000,
@@ -1473,7 +1473,7 @@ Show an area on the map for the given player.
 <h3>SyncRand(number)</h3>
 
 Get a value from the Stratagus syncronized random number generator.
-Used to allow the AI to make syncronized choices with multiplayer, and 
+Used to allow the AI to make syncronized choices with multiplayer, and
 during replays.
 
 <dl>
@@ -1496,7 +1496,7 @@ during replays.
 <a name="Unit"></a>
 <h3>Unit()</h3>
 
-Needed to save/load games. 
+Needed to save/load games.
 
 <h4>Example</h4>
 
@@ -1529,16 +1529,15 @@ Unit(0, "type", "unit-vault", "player", 0,
     {"action-none", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {0, 0},},
     {"action-none", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {0, 0},},
     {"action-none", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {0, 0},},},
- "saved-order", 
+ "saved-order",
     {"action-still", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {-1, -1},},
- "new-order", 
+ "new-order",
     {"action-still", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {-1, -1},}
 )
 </pre>
 
 <hr>
-(C) Copyright 2002-2011 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project 
-under the <a href="../gpl.html">GNU General Public License</a>.<br>
+(C) Copyright 2002-2011 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project under the <a href="../gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>
 </html>

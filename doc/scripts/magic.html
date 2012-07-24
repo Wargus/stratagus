@@ -24,22 +24,22 @@
 </head>
 <body>
 <pre width=80>
-         _________ __                 __                               
+         _________ __                 __
         /   _____//  |_____________ _/  |______     ____  __ __  ______
         \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \
        /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-               \/                  \/          \//_____/            \/ 
+               \/                  \/          \//_____/            \/
     ______________________                           ______________________
-			  T H E   W A R   B E G I N S
-	   Stratagus - A free fantasy real time strategy game engine
+                          T H E   W A R   B E G I N S
+           Stratagus - A free fantasy real time strategy game engine
 </pre>
 <hr>
 <h1>Stratagus Configuration Language Description: Magic</h1>
 <hr>
-<a href="../index.html">Stratagus</a> 
-<a href="../faq.html">FAQ</a> 
-<a href="game.html">PREV</a> 
+<a href="../index.html">Stratagus</a>
+<a href="../faq.html">FAQ</a>
+<a href="game.html">PREV</a>
 <a href="mappresentation.html">NEXT</a>
 <a href="index.html">LUA Index</a>
 <hr>
@@ -90,7 +90,7 @@ value to determine the draw order.
 <dd>Name of the sound played when the missile hits it's target.
 </dd>
 <dt>Class = "class-type"</dt>
-<dd>Various missiles can have wierd behaviours. This tag is followed by an 
+<dd>Various missiles can have wierd behaviours. This tag is followed by an
 identifier that specifies some of that behaviour. Here is a list of currently
 supported missile classes:
 <dl>
@@ -231,14 +231,14 @@ let the spell be casted on the entire map.
 <ul>
     <li>"self": The spell will only affect the caster or the area around him, no targetting at all.
     <li>"position": The unit will target a position.
-    <li>"unit": The unit will target an unit. The spell will be aborted if the target dies. 
+    <li>"unit": The unit will target an unit. The spell will be aborted if the target dies.
 </ul>
 You can still use position spells on units, it will target the unit's position.
 If the unit dies however the caster will stop. (Some spells get casted until
 there is no more mana left).
 </dd>
 <dt>"conditions", {flag, value, ...}</dt>
-<dd>This is the condition for being able to cast the spell. Think of it as a 
+<dd>This is the condition for being able to cast the spell. Think of it as a
 function that takes an unit as a parameter and return either yes or no depending
 on the unit properties. Here is how a condition looks like:
 <pre>"condition", {
@@ -253,7 +253,7 @@ Here are the supported parameters:
     it's the default.), "false" parameter passes when the answer is NO, and "only"
     passes only when the answer is yes.<br>
     It doesn't really makes sense to ever say true, since you might just as well
-    ommit it. "alliance false" means the spell won't work on allied units. "alliance 
+    ommit it. "alliance false" means the spell won't work on allied units. "alliance
     only" will make a spell that works only on allied units (can't think of any though).
 	Your own units are considered allied too.
     </dd>
@@ -469,7 +469,7 @@ Here are the supported operations, their paramenters, and what they do.
 	</dl></dd>
     </dl></dd>
 	<dt>"capture", tag, ...</dt>
-	<dd>This will convert the target unit to the casters side. 
+	<dd>This will convert the target unit to the casters side.
 	Very useful for capturing enemy buildings and controling enemy units.
 	None of these tags need to be specified.
 	<dl><dt>"damage", number</dt>
@@ -539,7 +539,7 @@ is used for instance for cursor marks on the map. Either local or global must be
 local or global must be specified.
 </dd>
 <dt>frame</dt>
-<dd>Current sprite frame of the missile.  The range is from 0 to the 
+<dd>Current sprite frame of the missile.  The range is from 0 to the
 <a href="#FRAMES-Define-missile-type">type:frames</a>-1
 The topmost bit (128) is used as flag to mirror the sprites in the X direction.
 </dd>
@@ -589,8 +589,7 @@ controlling function. No parameters.
 -->
 
 <hr>
-(C) Copyright 2002-2011 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project 
-under the <a href="../gpl.html">GNU General Public License</a>.<br>
+(C) Copyright 2002-2011 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project under the <a href="../gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>
 </html>

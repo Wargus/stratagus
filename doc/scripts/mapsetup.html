@@ -21,24 +21,24 @@
 </head>
 <body>
 <pre width=80>
-         _________ __                 __                               
+         _________ __                 __
         /   _____//  |_____________ _/  |______     ____  __ __  ______
         \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \
        /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-               \/                  \/          \//_____/            \/ 
+               \/                  \/          \//_____/            \/
     ______________________                           ______________________
-			  T H E   W A R   B E G I N S
-	   Stratagus - A free fantasy real time strategy game engine
+                          T H E   W A R   B E G I N S
+           Stratagus - A free fantasy real time strategy game engine
 </pre>
 <hr>
 <h1>Stratagus Configuration Language Description: Map Setup</h1>
 <hr>
-<a href="../index.html">Stratagus</a> 
-<a href="../faq.html">FAQ</a> 
-<a href="mappresentation.html">PREV</a> 
-<a href="research.html">NEXT</a> 
-<a href="index.html">LUA Index</a> 
+<a href="../index.html">Stratagus</a>
+<a href="../faq.html">FAQ</a>
+<a href="mappresentation.html">PREV</a>
+<a href="research.html">NEXT</a>
+<a href="index.html">LUA Index</a>
 <hr>
 <a href="#SetStartView">SetStartView</a>
 <a href="#SetAiType">SetAiType</a>
@@ -48,26 +48,26 @@
 <hr>
 <h2>Intro - Introduction to functions to setup maps</h2>
 
-A map is defined in 2 steps. This page documents map setup functions 
-used in the second step. 
+A map is defined in 2 steps. This page documents map setup functions
+used in the second step.
 <p>
 The map setup functions load the actual map into the engine. This
-includes functions to load the tileset which 
+includes functions to load the tileset which
 are defined in the <a href="tileset.html">Tileset page</a>.
 <p>
 Other functions defined elsewhere are usefull in the map setup step:
-<a href="game.html#CreateUnit">CreateUnit</a> and 
+<a href="game.html#CreateUnit">CreateUnit</a> and
 SetPlayerData, SetSharedVision, SetDiplomacy.
 <p>
 
-Note: This is for the new map format. Not implemented yet. 
+Note: This is for the new map format. Not implemented yet.
 
 <h2>Functions</h2>
 
 <a name="SetStartView"></a>
 <h3>SetStartView(player, x, y)</h3>
 Set the location of the map stratagus will show to the given
-player when starting. This works a little bit like a special 
+player when starting. This works a little bit like a special
 CenterMap for each player.
 <dl>
 <dt>player</dt>
@@ -88,7 +88,7 @@ CenterMap for each player.
 <h3>SetAiType(player, ai-type)</h3>
 
 Set what kind of ai algorithm should be used. For example: an air based
-ai for a map with a lot of obstacles. Call this function only when creating 
+ai for a map with a lot of obstacles. Call this function only when creating
 a game, not during the game.
 
 <p>
@@ -115,12 +115,12 @@ function is optional. If the game doesn't need a height map, default
 values will be used.<p>
 <dl>
   <dt>imagepath</dt>
-  <dd>Filename of the grayscale image for the heightmap. 
+  <dd>Filename of the grayscale image for the heightmap.
    Black(0) is lowest level. White(255) is highest level.</dd>
 
 </dl>
 <p>
-Note: This is for the new map format. Not implemented yet. 
+Note: This is for the new map format. Not implemented yet.
 
 
 <h4>Example</h4>
@@ -159,7 +159,7 @@ Apply a tilemap from a compact tilemap file to our tilemap.
 </dl>
 
 <p>
-Note: This is for the new map format. Not implemented yet. 
+Note: This is for the new map format. Not implemented yet.
 
 <h4>Example</h4>
 
@@ -173,8 +173,7 @@ Note: This is for the new map format. Not implemented yet.
 <p>
 
 <hr>
-(C) Copyright 2002-2011 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project 
-under the <a href="../gpl.html">GNU General Public License</a>.<br>
+(C) Copyright 2002-2011 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project under the <a href="../gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>
 </html>

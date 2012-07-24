@@ -25,15 +25,15 @@
 <body>
 
 <pre width=80>
-         _________ __                 __                               
+         _________ __                 __
         /   _____//  |_____________ _/  |______     ____  __ __  ______
         \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \
        /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-               \/                  \/          \//_____/            \/ 
+               \/                  \/          \//_____/            \/
     ______________________                           ______________________
-			  T H E   W A R   B E G I N S
-	   Stratagus - A free fantasy real time strategy game engine
+                          T H E   W A R   B E G I N S
+           Stratagus - A free fantasy real time strategy game engine
 </pre>
 <hr>
 
@@ -42,50 +42,49 @@
 
     <h2>Graphics</h2>
 
-    Please take a look at <a href="graphics/palette.html">graphics/palette.html</a> 
+    Please take a look at <a href="graphics/palette.html">graphics/palette.html</a>
     before working on graphics to get an idea of the palette.<p>
 
     See also informations about <a href="graphics/tileset.html">tileset graphics format</a>.
 
     <h4>Buildings</h4>
 
-    Buildings are simple to do. Each graphic consists of a .png file using 
-    the palette format specified in the link above. The top half of the graphic 
-    is used for the main image, and the bottom half is for the construction. 
+    Buildings are simple to do. Each graphic consists of a .png file using
+    the palette format specified in the link above. The top half of the graphic
+    is used for the main image, and the bottom half is for the construction.
     Here is an example of 'farm.png'. Please also see the ccl files.<p>
 
     <img src="graphics/farm.png" alt=farm><br>
 
     <h4>Units</h4>
 
-    Units are a little more complex as there are more sections per graphic. 
-    The 5 columns represent the directions. The rows are varied among 
-    different type of graphics, see the ccl files for more info. Here is 
-    an example of 'peasant.png'. First 5 rows are used for movement, 
-    next 5 for chopping, and the next 3 for dieing. Note that the peasant 
+    Units are a little more complex as there are more sections per graphic.
+    The 5 columns represent the directions. The rows are varied among
+    different type of graphics, see the ccl files for more info. Here is
+    an example of 'peasant.png'. First 5 rows are used for movement,
+    next 5 for chopping, and the next 3 for dieing. Note that the peasant
     has 2 other graphics, one for carrying gold, another for carrying wood.<p>
 
     <img src="graphics/peasant.png" alt=peasant><br>
 
     <h2>Sounds</h2>
 
-    Any format of sound will work with Stratagus, although to save space it is 
-    recommended that you use 16 bit, 22050 kHz, mono format. To save more 
+    Any format of sound will work with Stratagus, although to save space it is
+    recommended that you use 16 bit, 22050 kHz, mono format. To save more
     space, it is recommended that you gzip the file too.<p>
 
-    All the sound entry data is in data/scripts/sound.lua, 
+    All the sound entry data is in data/scripts/sound.lua,
     Here is an example lua entry for: data/sounds/human/buildings/farm.wav.gz<p>
 
     <pre>MakeSound("farm-selected", "human/buildings/farm.wav")</pre><p>
 
-    Note how the '.gz' suffix isn't needed in the lua entry, 
+    Note how the '.gz' suffix isn't needed in the lua entry,
     the Stratagus engine detects this automatically.<p>
 
     You may look through the script files for existing media for more examples.<p>
 
 <hr>
-(C) Copyright 1998-2011 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project 
-under the <a href="gpl.html">GNU General Public License</a>.<br>
+(C) Copyright 1998-2011 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project under the <a href="gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>
 </html>

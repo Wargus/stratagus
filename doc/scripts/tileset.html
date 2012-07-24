@@ -24,23 +24,23 @@
 </head>
 <body>
 <pre width=80>
-         _________ __                 __                               
+         _________ __                 __
         /   _____//  |_____________ _/  |______     ____  __ __  ______
         \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \
        /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-               \/                  \/          \//_____/            \/ 
+               \/                  \/          \//_____/            \/
     ______________________                           ______________________
-			  T H E   W A R   B E G I N S
-	   Stratagus - A free fantasy real time strategy game engine
+                          T H E   W A R   B E G I N S
+           Stratagus - A free fantasy real time strategy game engine
 </pre>
 <hr>
 <h1>Stratagus Configuration Language Description: Tileset</h1>
 <hr>
-<a href="../index.html">Stratagus</a> 
-<a href="../faq.html">FAQ</a> 
-<a href="sound.html">PREV</a> 
-<a href="triggers.html">NEXT</a> 
+<a href="../index.html">Stratagus</a>
+<a href="../faq.html">FAQ</a>
+<a href="sound.html">PREV</a>
+<a href="triggers.html">NEXT</a>
 <a href="index.html">LUA Index</a>
 <hr>
 <a href="#DefineTileset">DefineTileset</a>
@@ -49,7 +49,7 @@
 <hr>
 <h2>Intro - Introduction to tileset functions and variables</h2>
 
-A Tileset defines a set of tilemodels that can be used in a tiled map. 
+A Tileset defines a set of tilemodels that can be used in a tiled map.
 The map is thus devided in tiles.
 <p>
 
@@ -65,18 +65,18 @@ Properties of tilemodels:
 </ul>
 
 <p>
-Note: This is the for the new map format. Not implented yet. 
+Note: This is the for the new map format. Not implented yet.
 
 <h2>Functions</h2>
 <a name="DefineTileset"></a>
 <h3>DefineTileSet(name, width, height)</h3>
 
-    Define a tileset to which tilemodels can be added. 
+    Define a tileset to which tilemodels can be added.
     The width and height define the size of each tile.
     <p>
 
     This could also be defined in own levels. <p>
-    
+
     Note: This is the for the new map format. Not implented yet.
 <dl>
 <dt>name</dt>
@@ -102,7 +102,7 @@ Note: This is the for the new map format. Not implented yet.
 
     Define a tile model which is used in the tilemap.
     <p>
-    
+
     <p>
     Note: This is the for the new map format. Not implented yet.
 <dl>
@@ -113,7 +113,7 @@ Note: This is the for the new map format. Not implented yet.
     <dt>imagepath<br>
     </dt>
     <dd>Filename of the image with graphics of tiles.</dd>
-    
+
     <dt>imageposition</dt>
       <dd>Position of the tile graphic in the graphic file.<br>
     </dd>
@@ -157,8 +157,8 @@ Note: This is the for the new map format. Not implented yet.
 <h4>Example</h4>
 
 <pre>
-    DefineTileModel("oily-sand", "desert", 
-        "graphics/tilesets/desert.png", 12, 
+    DefineTileModel("oily-sand", "desert",
+        "graphics/tilesets/desert.png", 12,
         categories = {"land", "buildable"},
         neighbours = {{"sand","beach-N"},{"sand","beach-E"},{"sand","beach-S"},{"sand","beach-W"}}
         accessmodier = {groundtroups=50, ships=0, camels=200},
@@ -172,9 +172,9 @@ Note: This is the for the new map format. Not implented yet.
 
     Load the configuration scripts for the tilemodels.
     <p>
-    Note: This function is used in the map files. 
+    Note: This function is used in the map files.
     <p>
-    
+
 <dl>
 <dt>luafile</dt>
 <dd>The path to the lua file to load which will define the tilemodels.
@@ -182,8 +182,7 @@ Note: This is the for the new map format. Not implented yet.
 </dl>
 
 <hr>
-(C) Copyright 2002-2011 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project 
-under the <a href="../gpl.html">GNU General Public License</a>.<br>
+(C) Copyright 2002-2011 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project under the <a href="../gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>
 </html>

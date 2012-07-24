@@ -37,7 +37,7 @@ def visitfile(file):
               command = part.split('"')[0]
               commands.append(command)
               reffiles[command] = file
-        
+
 if __name__ == '__main__':
     walktree(sys.argv[1], visitfile)
 

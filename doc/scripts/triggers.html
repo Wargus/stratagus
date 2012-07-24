@@ -23,23 +23,23 @@
 </head>
 <body>
 <pre width=80>
-         _________ __                 __                               
+         _________ __                 __
         /   _____//  |_____________ _/  |______     ____  __ __  ______
         \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \
        /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-               \/                  \/          \//_____/            \/ 
+               \/                  \/          \//_____/            \/
     ______________________                           ______________________
-			  T H E   W A R   B E G I N S
-	   Stratagus - A free fantasy real time strategy game engine
+                          T H E   W A R   B E G I N S
+           Stratagus - A free fantasy real time strategy game engine
 </pre>
 <hr>
 <h1>Stratagus Configuration Language Description: Triggers</h1>
 <hr>
-<a href="../index.html">Stratagus</a> 
-<a href="../faq.html">FAQ</a> 
-<a href="tileset.html">PREV</a> 
-<a href="ui.html">NEXT</a> 
+<a href="../index.html">Stratagus</a>
+<a href="../faq.html">FAQ</a>
+<a href="tileset.html">PREV</a>
+<a href="ui.html">NEXT</a>
 <a href="index.html">LUA Index</a>
 <hr>
 <a href="#ActionDefeat">ActionDefeat</a>
@@ -243,7 +243,7 @@ The condition player is set to victory.
 
 <h4>Example</h4>
 <pre>
--- Adds a trigger. If the player on the console has killed all his 
+-- Adds a trigger. If the player on the console has killed all his
 -- opponents he won.
 AddTrigger(
   function() return IfOpponents("this", "==", 0) end,
@@ -252,7 +252,7 @@ AddTrigger(
 
 <a name="ActionWait"></a>
 <h3>ActionWait(time-ms)</h3>
- 
+
 Causes the trigger to wait a number of milliseconds before reexamine this trigger.
 
 
@@ -264,7 +264,7 @@ Causes the trigger to wait a number of milliseconds before reexamine this trigge
 <!-- IT IS A BAD EXAMPLE NOW.
 <h4>Example</h4>
 <pre>
--- Adds a trigger. If the player on the console has killed all his 
+-- Adds a trigger. If the player on the console has killed all his
 -- opponents the message "Hello" appears then two seconds later the message
 -- "World" appears.
 AddTrigger(
@@ -296,7 +296,7 @@ Creates a new trigger.
 
 <h4>Example</h4>
 <pre>
--- Adds a trigger. If the player on the console has killed all his 
+-- Adds a trigger. If the player on the console has killed all his
 -- opponents he won.
 AddTrigger(
   function() return IfOpponents("this", "==", 0) end,
@@ -305,7 +305,7 @@ AddTrigger(
 
 <a name="IfNearUnit"></a>
 <h3>IfNearUnit(player, op, quantity, unit1, unit2)</h3>
- 
+
 Return true if the number of unit1 near of unit2 "op" quantity is true for the player.
 
 
@@ -365,7 +365,7 @@ if (GetNumOpponents(GetThisPlayer()) == 0) then
 
 <a name="IfRescuedNearUnit"></a>
 <h3>IfRescuedNearUnit(player, op, quantity, unit1, unit2)</h3>
- 
+
 Return true if the number of rescued-units of type unit1 which are currently near of unit2
 of the player "op" quantity is true.
 
@@ -407,9 +407,9 @@ IfRescuedNearUnit("this", "==", 1, "unit-archer", "unit-circle-of-power")
 
 <a name="GetTimer"></a>
 <h3>GetTimer()</h3>
- 
+
 Return the number of cycles the timer ran.
- 
+
 <h4>Example</h4>
 <pre>
 -- True when the timer is at 17 cycles.
@@ -418,7 +418,7 @@ time = GetTimer() == 17
 
 <a name="GetNumUnitsAt"></a>
 <h3>GetNumUnitsAt(player, unit-type, {x1, y1}, {x2, y2})</h3>
- 
+
 Return the number of units of type unit-type which are in the rectangle defined with (x1, y1, x2, y2)
 of the player.
 
@@ -449,8 +449,7 @@ GetNumUnitsAt(GetThisPlayer(), "unit-archer", {10, 10}, {12, 14}) >= 8
 </pre>
 
 <hr>
-(C) Copyright 2002-2011 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project 
-under the <a href="../gpl.html">GNU General Public License</a>.<br>
+(C) Copyright 2002-2011 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project under the <a href="../gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>
 </html>
