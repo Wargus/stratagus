@@ -198,7 +198,7 @@ static void error(char * title, char * text) {
 		gtk_widget_show(window);
 #endif
 
-		dialog = gtk_message_dialog_new(GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, text, NULL);
+		dialog = gtk_message_dialog_new(GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", text);
 		gtk_window_set_title(GTK_WINDOW(dialog), title);
 		gtk_window_set_skip_pager_hint(GTK_WINDOW(dialog), 0);
 		gtk_window_set_skip_taskbar_hint(GTK_WINDOW(dialog), 0);
