@@ -43,7 +43,8 @@
 <a href="#GetVideoResolution">GetVideoResolution</a>
 <a href="#MagmaCost">MagmaCost</a>
 <a href="#MaxCosts">MaxCosts</a>
-<a href="#Preferences">Preferences</a>
+<a href="#Preference">Preference</a>
+<a href="#preferences">preferences</a>
 <a href="#RevealMap">RevealMap</a>
 <a href="#RightButtonAttacks">RightButtonAttacks</a>
 <a href="#RightButtonMoves">RightButtonMoves</a>
@@ -290,7 +291,8 @@ This cancels any previous <a href="#RightButtonAttacks">RightButtonAttacks</a>.
 <a name="SavePreferences"></a>
 <h3>SavePreferences</h3>
 
-Save the user preferences
+Save the user preferences, i.e. the contents of
+the <a href="#preferences">preferences</a> variable.
 
 <dl>
   <dt><i>RETURNS</i></dt>
@@ -842,24 +844,24 @@ buildings.</p>
 <p>The value of this variable is a table in the same format as
 <a href="#AlliedUnitRecyclingEfficiency">AlliedUnitRecyclingEfficiency</a>.</p>
 
-<a name="Preferences"></a>
-<h3>Preferences</h3>
+<a name="Preference"></a>
+<h3>Preference</h3>
 
 <p>This variable refers to an object that has the following properties:</p>
 
 <dl>
-  <dt id="Preferences.ShowAttackRange">Preferences.ShowAttackRange = <var>boolean</var></dt>
+  <dt id="Preference.ShowAttackRange">Preference.ShowAttackRange = <var>boolean</var></dt>
   <dd>Whether to show the attack range of the selected unit as a red circle.
     See the <a href="unittype.html#variable.AttackRange">AttackRange</a> variable.</dd>
-  <dt id="Preferences.ShowReactionRange">Preferences.ShowReactionRange = <var>boolean</var></dt>
+  <dt id="Preference.ShowReactionRange">Preference.ShowReactionRange = <var>boolean</var></dt>
   <dd>Whether to show the reaction range of the selected unit as a blue circle.
     See the <a href="unittype.html#DefineUnitType.ComputerReactionRange">ComputerReactionRange</a>
     and <a href="unittype.html#DefineUnitType.PersonReactionRange">PersonReactionRange</a>
     parameters of DefineUnitType.</dd>
-  <dt id="Preferences.ShowSightRange">Preferences.ShowSightRange = <var>boolean</var></dt>
+  <dt id="Preference.ShowSightRange">Preference.ShowSightRange = <var>boolean</var></dt>
   <dd>Whether to show the sight range of the selected unit as a green circle.
     See the <a href="unittype.html#variable.SightRange">SightRange</a> variable.</dd>
-  <dt>Preferences.ShowOrders = <var>integer</var></dt>
+  <dt>Preference.ShowOrders = <var>integer</var></dt>
   <dd>How long to show the orders of selected units on the map,
     after the player gives an order.  Measured in seconds.
     If this is negative, or the player presses the Shift key,
@@ -870,6 +872,16 @@ buildings.</p>
 properties are false, the player can display the ranges by holding the
 left mouse button for a moment.  In any case, the game never shows
 ranges if the player has selected more than one unit.</p>
+
+<a name="preferences"></a>
+<h3>preferences</h3>
+
+This table contains the user preferences that
+<a href="#SavePreferences">SavePreferences</a> will save.
+The engine does not otherwise interpret the contents of this table.
+Instead, when the engine is starting up, a Lua script should read
+the preferences from this table and pass each preference to the
+appropriate function so that it takes effect.
 
 <hr>
 All trademarks and copyrights on this page are owned by their respective owners.
