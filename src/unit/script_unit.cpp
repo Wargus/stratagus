@@ -999,7 +999,8 @@ static int CclGetUnits(lua_State *l)
 */
 static int CclGetUnitVariable(lua_State *l)
 {
-	LuaCheckArgs(l, 2);
+	const int nargs = lua_gettop(l);
+	Assert(nargs == 2 || nargs == 3);
 
 	lua_pushvalue(l, 1);
 	const CUnit *unit = CclGetUnit(l);
@@ -1010,12 +1011,29 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushnumber(l, unit->Variable[HP_INDEX].Increase);
 	} else if (!strcmp(value, "Player")) {
 		lua_pushnumber(l, unit->Player->Index);
+	} else if (!strcmp(value, "ResourcesHeld")) {
+		lua_pushnumber(l, unit->ResourcesHeld);
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[value];// User variables
 		if (index == -1) {
 			LuaError(l, "Bad variable name '%s'\n" _C_ value);
 		}
-		lua_pushnumber(l, unit->Variable[index].Value);
+		if (nargs == 2) {
+			lua_pushnumber(l, unit->Variable[index].Value);
+		} else {
+			const char *const type = LuaToString(l, 3);
+			if (!strcmp(type, "Value")) {
+				lua_pushnumber(l, unit->Variable[index].Value);
+			} else if (!strcmp(type, "Max")) {
+				lua_pushnumber(l, unit->Variable[index].Max);
+			} else if (!strcmp(type, "Increase")) {
+				lua_pushnumber(l, unit->Variable[index].Increase);
+			} else if (!strcmp(type, "Enable")) {
+				lua_pushnumber(l, unit->Variable[index].Enable);
+			} else {
+				LuaError(l, "Bad variable type '%s'\n" _C_ type);
+			}
+		}
 	}
 	return 1;
 }
@@ -1029,7 +1047,8 @@ static int CclGetUnitVariable(lua_State *l)
 */
 static int CclSetUnitVariable(lua_State *l)
 {
-	LuaCheckArgs(l, 3);
+	const int nargs = lua_gettop(l);
+	Assert(nargs == 3 || nargs == 4);
 
 	lua_pushvalue(l, 1);
 	CUnit *unit = CclGetUnit(l);
@@ -1049,10 +1068,29 @@ static int CclSetUnitVariable(lua_State *l)
 			LuaError(l, "Bad variable name '%s'\n" _C_ name);
 		}
 		value = LuaToNumber(l, 3);
-		if (value > unit->Variable[index].Max) {
-			unit->Variable[index].Value = unit->Variable[index].Max;
+		if (nargs == 3) {
+			if (value > unit->Variable[index].Max) {
+				unit->Variable[index].Value = unit->Variable[index].Max;
+			} else {
+				unit->Variable[index].Value = value;
+			}
 		} else {
-			unit->Variable[index].Value = value;
+			const char *const type = LuaToString(l, 4);
+			if (!strcmp(type, "Value")) {
+				if (value > unit->Variable[index].Max) {
+					unit->Variable[index].Value = unit->Variable[index].Max;
+				} else {
+					unit->Variable[index].Value = value;
+				}
+			} else if (!strcmp(type, "Max")) {
+				unit->Variable[index].Max = value;
+			} else if (!strcmp(type, "Increase")) {
+				unit->Variable[index].Increase = value;
+			} else if (!strcmp(type, "Enable")) {
+				unit->Variable[index].Enable = value;
+			} else {
+				LuaError(l, "Bad variable type '%s'\n" _C_ type);
+			}
 		}
 	}
 	lua_pushnumber(l, value);

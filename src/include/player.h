@@ -144,13 +144,13 @@ public:
 	void RemoveUnit(CUnit &unit);
 
 	/// Get a resource of the player
-	int GetResource(int resource, int type);
+	int GetResource(const int resource, const int type);
 	/// Adds/subtracts some resources to/from the player store
-	void ChangeResource(int resource, int value, bool store = false);
+	void ChangeResource(const int resource, const int value, const bool store = false);
 	/// Set a resource of the player
-	void SetResource(int resource, int value, int type = STORE_OVERALL);
+	void SetResource(const int resource, const int value, const int type = STORE_OVERALL);
 	/// Check, if there enough resources for action.
-	bool CheckResource(int resource, int value);
+	bool CheckResource(const int resource, const int value);
 
 	/// Check if the unit-type didn't break any unit limits and supply/demand
 	int CheckLimits(const CUnitType &type) const;

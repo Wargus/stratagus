@@ -36,6 +36,7 @@
 #include "font.h"
 #include "map.h"
 #include "missile.h"
+#include "particle.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "tileset.h"
@@ -403,6 +404,8 @@ void CViewport::Draw() const
 			missiletable[j]->DrawMissile(*this);
 		}
 	}
+
+	ParticleManager.draw(this);
 
 	this->DrawMapFogOfWar();
 

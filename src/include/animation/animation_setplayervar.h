@@ -51,7 +51,7 @@ private:
 	std::string valueStr;
 };
 
-extern int GetPlayerData(int player, const char *prop, const char *arg);
+extern int GetPlayerData(const int player, const char *prop, const char *arg);
 
 //@}
 

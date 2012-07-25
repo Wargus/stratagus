@@ -56,7 +56,7 @@
 **
 **  @return  Returning value (only integer).
 */
-int GetPlayerData(int player, const char *prop, const char *arg)
+int GetPlayerData(const int player, const char *prop, const char *arg)
 {
 	if (!strcmp(prop, "RaceName")) {
 		return Players[player].Race;
@@ -128,7 +128,7 @@ int GetPlayerData(int player, const char *prop, const char *arg)
 /**
 **  Sets the player data.
 */
-static void SetPlayerData(int player, const char *prop, const char *arg, int value)
+static void SetPlayerData(const int player, const char *prop, const char *arg, int value)
 {
 	if (!strcmp(prop, "RaceName")) {
 		Players[player].Race = value;
@@ -182,7 +182,7 @@ static void SetPlayerData(int player, const char *prop, const char *arg, int val
 
 	const char *var = this->varStr.c_str();
 	const char *arg = this->argStr.c_str();
-	int playerId = ParseAnimInt(&unit, this->playerStr.c_str());
+	const int playerId = ParseAnimInt(&unit, this->playerStr.c_str());
 	int rop = ParseAnimInt(&unit, this->valueStr.c_str());
 	int data = GetPlayerData(playerId, var, arg);
 

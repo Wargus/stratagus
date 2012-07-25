@@ -477,7 +477,10 @@ void CUnit::Init()
 */
 void CUnit::Release(bool final)
 {
-	Assert(Type); // already free.
+	if (Type == NULL) {
+		DebugPrint("unit already free");
+		return;
+	}
 	Assert(Orders.size() == 1);
 	// Must be removed before here
 	Assert(Removed);
@@ -3086,6 +3089,9 @@ void CleanUnits()
 	for (std::vector<CUnit *>::iterator it = units.begin(); it != units.end(); ++it) {
 		CUnit &unit = **it;
 
+		if (&unit == NULL) {
+			continue;
+		}
 		if (!unit.Destroyed) {
 			if (!unit.Removed) {
 				unit.Remove(NULL);

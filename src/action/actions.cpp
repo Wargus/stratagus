@@ -372,7 +372,7 @@ static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		}
 
 		// OnEachSecond callback
-		if (unit.Type->OnEachSecond) {
+		if (unit.Type->OnEachSecond  && unit.IsUnusable(false) == false) {
 			unit.Type->OnEachSecond->pushPreamble();
 			unit.Type->OnEachSecond->pushInteger(UnitNumber(unit));
 			unit.Type->OnEachSecond->run();
@@ -439,7 +439,7 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		}
 
 		// OnEachCycle callback
-		if (unit.Type->OnEachCycle) {
+		if (unit.Type->OnEachCycle && unit.IsUnusable(false) == false) {
 			unit.Type->OnEachCycle->pushPreamble();
 			unit.Type->OnEachCycle->pushInteger(UnitNumber(unit));
 			unit.Type->OnEachCycle->run();

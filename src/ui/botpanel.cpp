@@ -1493,11 +1493,16 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonUpgradeTo: {
 			// FIXME: store pointer in button table!
 			CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
-			if (!Selected[0]->Player->CheckUnitType(type)) {
-				//PlayerSubUnitType(player,type);
-				SendCommandUpgradeTo(*Selected[0], type, !(KeyModifiers & ModifierShift));
-				UI.StatusLine.Clear();
-				ClearCosts();
+			for (int i = 0; i < NumSelected; ++i) {
+				if (!Selected[i]->Player->CheckUnitType(type)) {
+					if (Selected[i]->CurrentAction() != UnitActionUpgradeTo) {
+						SendCommandUpgradeTo(*Selected[i], type, !(KeyModifiers & ModifierShift));
+						UI.StatusLine.Clear();
+						ClearCosts();
+					}
+				} else {
+					break;
+				}
 			}
 			break;
 		}

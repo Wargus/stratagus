@@ -812,7 +812,7 @@ int CPlayer::GetUnitCount() const
 **
 **  @note Storing types: 0 - overall store, 1 - store buildings, 2 - both
 */
-int CPlayer::GetResource(int resource, int type)
+int CPlayer::GetResource(const int resource, const int type)
 {
 	switch (type) {
 		case STORE_OVERALL:
@@ -834,10 +834,10 @@ int CPlayer::GetResource(int resource, int type)
 **  @param value     How many of this resource (can be negative).
 **  @param store     If true, sets the building store resources, else the overall resources.
 */
-void CPlayer::ChangeResource(int resource, int value, bool store)
+void CPlayer::ChangeResource(const int resource, const int value, const bool store)
 {
 	if (value < 0) {
-		int fromStore = std::min(this->StoredResources[resource], abs(value));
+		const int fromStore = std::min(this->StoredResources[resource], abs(value));
 		this->StoredResources[resource] -= fromStore;
 		this->Resources[resource] -= abs(value) - fromStore;
 		if (this->Resources[resource] < 0) {
@@ -859,7 +859,7 @@ void CPlayer::ChangeResource(int resource, int value, bool store)
 **  @param value     How many of this resource.
 **  @param type      Resource types: 0 - overall store, 1 - store buildings, 2 - both
 */
-void CPlayer::SetResource(int resource, int value, int type)
+void CPlayer::SetResource(const int resource, const int value, const int type)
 {
 	if (type == STORE_BOTH) {
 		if (this->MaxResources[resource] != -1) {
@@ -882,7 +882,7 @@ void CPlayer::SetResource(int resource, int value, int type)
 **  @param resource  Resource to change.
 **  @param value     How many of this resource.
 */
-bool CPlayer::CheckResource(int resource, int value)
+bool CPlayer::CheckResource(const int resource, const int value)
 {
 	int result = this->Resources[resource];
 	if (this->MaxResources[resource] != -1) {

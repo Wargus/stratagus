@@ -39,8 +39,10 @@
 
 #include "luacallback.h"
 #include "script.h"
+#include "tileset.h"
 #include "unittype.h"
 #include "unit.h"
+#include "unit_manager.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -151,6 +153,8 @@ void MissileType::Load(lua_State *l)
 			this->Smoke.Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "ImpactParticle")) {
 			this->ImpactParticle = new LuaCallback(l, -1);
+		} else if (!strcmp(value, "SmokeParticle")) {
+			this->SmokeParticle = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "CanHitOwner")) {
 			this->CanHitOwner = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "AlwaysFire")) {
@@ -366,6 +370,68 @@ static int CclDefineBurningBuilding(lua_State *l)
 }
 
 /**
+**  Create a missile on the map
+**
+**  @param l  Lua state.
+**
+*/
+static int CclCreateMissile(lua_State *l)
+{
+	LuaCheckArgs(l, 5);
+
+	std::string name = LuaToString(l, 1);
+	MissileType *mtype = MissileTypeByIdent(name);
+	if (!mtype) {
+		LuaError(l, "Bad missile");
+	}
+	PixelPos startpos, endpos;
+	if (!lua_istable(l, 2) || lua_rawlen(l, 2) != 2) {
+		LuaError(l, "incorrect argument !!");
+	}
+	lua_rawgeti(l, 2, 1);
+	startpos.x = LuaToNumber(l, -1);
+	lua_pop(l, 1);
+	lua_rawgeti(l, 2, 2);
+	startpos.y = LuaToNumber(l, -1);
+	lua_pop(l, 1);
+	if (!lua_istable(l, 3) || lua_rawlen(l, 3) != 2) {
+		LuaError(l, "incorrect argument !!");
+	}
+	lua_rawgeti(l, 3, 1);
+	endpos.x = LuaToNumber(l, -1);
+	lua_pop(l, 1);
+	lua_rawgeti(l, 3, 2);
+	endpos.y = LuaToNumber(l, -1);
+	lua_pop(l, 1);
+
+	const int sourceUnit = LuaToNumber(l, 4);
+	const int destUnit = LuaToNumber(l, 5);
+	CUnit &startunit = UnitManager.GetSlotUnit(sourceUnit);
+	CUnit &destunit = UnitManager.GetSlotUnit(destUnit);
+
+	if (sourceUnit != -1) {
+		startpos.x += startunit.tilePos.x * PixelTileSize.x + startunit.IX;
+		startpos.y += startunit.tilePos.y * PixelTileSize.y + startunit.IY;
+	}
+	if (destUnit != -1) {
+		endpos.x += destunit.tilePos.x * PixelTileSize.x + destunit.IX;
+		endpos.y += destunit.tilePos.y * PixelTileSize.y + destunit.IY;
+	}
+
+	Missile *missile = MakeMissile(*mtype, startpos, endpos);
+	if (!missile) {
+		return 0;
+	}
+	if (sourceUnit != -1) {
+		missile->SourceUnit = &startunit;
+	}
+	if (destUnit != -1) {
+		missile->TargetUnit = &destunit;
+	}
+	return 0;
+}
+
+/**
 **  Register CCL features for missile-type.
 */
 void MissileCclRegister()
@@ -373,6 +439,7 @@ void MissileCclRegister()
 	lua_register(Lua, "DefineMissileType", CclDefineMissileType);
 	lua_register(Lua, "Missile", CclMissile);
 	lua_register(Lua, "DefineBurningBuilding", CclDefineBurningBuilding);
+	lua_register(Lua, "CreateMissile", CclCreateMissile);
 }
 
 //@}

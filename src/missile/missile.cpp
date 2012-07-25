@@ -653,6 +653,15 @@ bool PointToPointMissile(Missile &missile)
 		const PixelPos position = missile.position + missile.Type->size / 2;
 		MakeMissile(*missile.Type->Smoke.Missile, position, position);
 	}
+
+	if (missile.Type->SmokeParticle && missile.CurrentStep) {
+		const PixelPos position = missile.position + missile.Type->size / 2;
+		missile.Type->SmokeParticle->pushPreamble();
+		missile.Type->SmokeParticle->pushInteger(position.x);
+		missile.Type->SmokeParticle->pushInteger(position.y);
+		missile.Type->SmokeParticle->run();
+	}
+
 	return false;
 }
 
@@ -1088,7 +1097,7 @@ MissileType::MissileType(const std::string &ident) :
 	SpriteFrames(0), NumDirections(0), ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
 	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
 	AlwaysFire(false), Class(), NumBounces(0), StartDelay(0), Sleep(0), Speed(0),
-	Range(0), SplashFactor(0), ImpactParticle(NULL), G(NULL)
+	Range(0), SplashFactor(0), ImpactParticle(NULL), SmokeParticle(NULL), G(NULL)
 {
 	size.x = 0;
 	size.y = 0;
@@ -1101,6 +1110,7 @@ MissileType::~MissileType()
 {
 	CGraphic::Free(this->G);
 	delete ImpactParticle;
+	delete SmokeParticle;
 }
 
 /**

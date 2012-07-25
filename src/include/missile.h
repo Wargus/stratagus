@@ -385,6 +385,7 @@ public:
 	MissileConfig Impact;      /// missile produces an impact
 	MissileConfig Smoke;       /// Trailling missile
 	LuaCallback *ImpactParticle; /// impact particle
+	LuaCallback *SmokeParticle;  /// smoke particle
 
 	// --- FILLED UP ---
 	CGraphic *G;         /// missile graphic

@@ -544,7 +544,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		}
 	}
 
-	for (int z = 0; z < UnitTypeMax; ++z) {
+	for (size_t z = 0; z < UnitTypes.size(); ++z) {
 		CUnitStats &stat = UnitTypes[z]->Stats[pn];
 		// add/remove allowed units
 

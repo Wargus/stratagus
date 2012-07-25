@@ -39,6 +39,8 @@
 
 #include "missile.h"
 
+#include "luacallback.h"
+
 /**
 **  Calculate parabolic trajectories.
 **
@@ -76,6 +78,13 @@ static int ParabolicMissile(Missile &missile)
 	if (missile.Type->Smoke.Missile && missile.CurrentStep) {
 		const PixelPos position = missile.position + missile.Type->size / 2;
 		MakeMissile(*missile.Type->Smoke.Missile, position, position);
+	}
+	if (missile.Type->SmokeParticle && missile.CurrentStep) {
+		const PixelPos position = missile.position + missile.Type->size / 2;
+		missile.Type->SmokeParticle->pushPreamble();
+		missile.Type->SmokeParticle->pushInteger(position.x);
+		missile.Type->SmokeParticle->pushInteger(position.y);
+		missile.Type->SmokeParticle->run();
 	}
 	return 0;
 }

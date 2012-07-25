@@ -91,14 +91,12 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 {
 	COrder_Attack *order = new COrder_Attack(false);
 
-	if (target.Destroyed) {
-		order->goalPos = target.tilePos + target.Type->GetHalfTileSize();
-	} else {
-		// Removed, Dying handled by action routine.
-		order->SetGoal(&target);
-		order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
-		order->MinRange = attacker.Type->MinAttackRange;
-	}
+	order->goalPos = target.tilePos + target.Type->GetHalfTileSize();
+	// Removed, Dying handled by action routine.
+	order->SetGoal(&target);
+	order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
+	order->MinRange = attacker.Type->MinAttackRange;
+
 	return order;
 }
 
@@ -458,6 +456,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		return;
 	}
 	CUnit *goal = this->GetGoal();
+	bool dead = !goal || goal->IsAlive() == false;
 
 	// No target choose one.
 	if (!goal) {
@@ -512,7 +511,11 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		// towers don't chase after goal
 		if (unit.CanMove()) {
 			if (unit.CanStoreOrder(this)) {
-				unit.SavedOrder = this->Clone();
+				if (dead) {
+					unit.SavedOrder = COrder::NewActionAttack(unit, this->goalPos);
+				} else {
+					unit.SavedOrder = this->Clone();
+				}
 			}
 		}
 		unit.Frame = 0;
