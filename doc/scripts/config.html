@@ -393,7 +393,7 @@ Sets the missile to use for displaying when a player clicks on a location on the
 
 <dl>
   <dt>missile-type</dt>
-  <dd>The missile to use, as defined in the missiles section</dd>
+  <dd>The missile to use, as defined with <a href="magic.html#DefineMissileType">DefineMissileType</a>.</dd>
   <dt><i>RETURNS</i></dt>
   <dd>Nothing</dd>
 </dl>
@@ -410,7 +410,10 @@ Sets the missile to use for displaying the damage done to units.
 
 <dl>
   <dt>"missile-type"</dt>
-  <dd>missile name to use to display the damage</dd>
+  <dd>missile name to use to display the damage.  It must be defined with
+  <a href="magic.html#DefineMissileType">DefineMissileType</a> and should
+  have Class = <a href="magic.html#DefineMissileType.Class.hit">"missile-class-hit"</a>.
+</dd>
   <dt><i>RETURNS</i></dt>
   <dd>Nothing</dd>
 </dl>
