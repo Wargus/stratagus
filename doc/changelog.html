@@ -36,17 +36,19 @@
                           T H E   W A R   B E G I N S
                    Stratagus - A free fantasy real time strategy game engine
 </pre>
-<hr>
-
-<h1>ChangeLog: Stratagus Version 2.2.7</h1>
-<hr>
-
+<hr/>
+<h1>ChangeLog</h1>
+<hr/>
 
 <ul>
 <p/>
-	<li>trunk</li>
+	<li>2.2.7 Released</li>
 	<ul>
-	<li>Added OnHit Lua callback parameter for UnitType to create some effects if unit is hit (from Cybermind)</li>
+	<li>Added CclCreateMissile function to create missiles from Lua code. from Cybermind)</li>
+	<li>Added MissileType::SmokeParticle (same use as SmokeMissile).(from Cybermind)</li>
+	<li>Alllow same units to get upgrade-to in one click.(from Cybermind)</li>
+	<li>CclGetUnitVariable and CclSetUnitVariable now can get and set the Max, Increase and Enable fields.(from Cybermind)</li>
+	<li>Added OnHit Lua callback parameter for UnitType to create some effects if unit is hit. (from Cybermind)</li>
 	<li>Reworked the button's popup system to achieve more flexibility (from Cybermind)</li>
 	<li>Added Preference.ShowNameDelay and Preference.ShowNameTime to show a popup for unit under cursor (from Cybermind)</li>
 	<li>Code compile now with Lua 5.2 (from Joris Dauphin).</li>
@@ -73,8 +75,6 @@
 	<li>Activate AutocastSpell for non moving unit. (from Cybermind)</li>
 	<li>Disable buggy multithreading support. (from Pali Rohár)</li>
 	<li>Fixed mouse scroll speed (from Pali Rohár)</li>
-	<li>Fix bug #710187: OpenGL is slow (from Cybermind)</li>
-	<li>Fix bug #901393: Network out of sync in multiplayer mode (from Cybermind)</li>
 	<li>Fix bug #913621: Replace the abort and core dump by a lua_Error when unitType is unknown (from Joris Dauphin)</li>
 	<li>Fix bug #976937: Fix crashing issue when loadnig a game with more than 3 ai-forces (from Joris Dauphin)</li>
 	<li>Fix bug #993364: Fix compilation when using lua 5.2 (from Joris Dauphin)</li>
