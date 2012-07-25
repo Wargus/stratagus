@@ -672,8 +672,15 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
   <dd>Optional music to be played with the image or video.  Use "none" to stop
 previously playing music.
   </dd>
+  <dt>StretchImage = boolean</dt>
+  <dd>If true (default), stretch the image so it fills the screen,
+    possibly changing the aspect ratio.
+    If false, display the image in its original resolution
+    in the center of the screen.</dd>
   <dt>Timeout = number</dt>
-  <dd>The number of seconds we should show this title-screen.(20 by default)</dd>
+  <dd>The number of seconds we should show this title-screen
+    if the user does not dismiss it first.
+    If zero (default), then the timeout is very long.</dd>
   <dt>Label = { {Text = "text", Pos = {x, y}, Font = "font-name"}, ... }</dt>
   <dd>Optional text to be displayed. It's a list of elements with three tags:
   <dl>
