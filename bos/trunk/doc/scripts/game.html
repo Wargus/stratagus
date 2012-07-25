@@ -96,26 +96,24 @@ Add a message to be displayed.
 </pre>
 
 <a name="AddObjective"></a>
-<h3>AddObjective(objective position)</h3>
+<h3>AddObjective(objective)</h3>
 
-Add an objective to the scenario objectives text list.
+Add an objective to the end of the scenario objectives text list.
 
 
 <dl>
 <dt>objective</dt>
 <dd>Objective text.
 </dd>
-<dt>position</dt>
-<dd>Optional position (0 offset) to add the objective, default is at the end.
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    -- Adds the objective text "-Build a barracks" to the end of the objectives
-    -- list and adds the objective "-Destroy all enemies" to the first position.
+    -- Adds the objectives "-Build a barracks" and "-Destroy all enemies"
+    -- to the end of the objectives list.
     AddObjective("-Build a barracks")
-    AddObjective("-Destroy all enemies", 0)
+    AddObjective("-Destroy all enemies")
 </pre>
 
 <a name="AddTip"></a>
