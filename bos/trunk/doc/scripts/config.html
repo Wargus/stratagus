@@ -204,32 +204,15 @@ Define how to show variables.
 <dl>
   <dt>Index = variable</dt>
   <dd>
-  To which variable it applies. Variables could be
-  <dl>
-    <dt>Hitpoints</dt>
-    <dd>represent the HP of the unit.</dd>
-    <dt>Mana</dt>
-    <dd>represent the mana of the unit.</dd>
-    <dt>Transport</dt>
-    <dd>represent how many units are in the unit.</dd>
-    <dt>Ressources</dt>
-    <dd>represent ressource for gathering and gathered unit.</dd>
-    <dt>Training</dt>
-    <dd>represent the elapsed time of unit in training.</dd>
-    <dt>variable</dt>
-    <dd>variable defined with <a href="unittype.html#DefineVariables">DefineVariables()</a></dd>
-  </dl>
-  </dd>
+  Which variable's value this decoration will show.  It can be a
+  <a href="unittype.html#predefined-variables">predefined variable</a>,
+  or a custom variable defined with <a href="unittype.html#DefineVariables">DefineVariables</a>.</dd>
   <dt>Offset = {x, y}, OffsetPercent = {xp, yp}</dt>
   <dd>Decoration is placed at {x + weight(unit) * xp, y + height(unit) * yp} from the unit.</dd>
   <dt>CenterX = boolean, CenterY = boolean</dt>
   <dd>If set to true, use center of decoration instead of the upper-left corner.</dd>
   <dt id="DefineDecorations.ShowIfNotEnable">ShowIfNotEnable = boolean</dt>
   <dd>if false (default), show decoration only when variable is enable.</dd>
-  <dt>ShowWhenNull = boolean</dt>
-  <dd>if true, show also when variable value is 0.</dd>
-  <dt>HideHalf = boolean</dt>
-  <dd>if true, don't show when variable value is not 0 nor max.</dd>
   <dt>ShowWhenMax = boolean</dt>
   <dd>if false, don't show when variable value is max.</dd>
   <dt>ShowOnlySelected = boolean</dt>
@@ -242,34 +225,13 @@ Define how to show variables.
   <dd>if true, show also for opponent unit.</dd>
 
   <dt>Method = {method-name, {tag = value}}</dt>
-    <dd>Which method we use to show variable. It could be a bar, a sprite, a number...</dd>
+    <dd>Which method we use to show variable.
+      The current engine supports only one method:</dd>
     <dl>
-      <dt>"text", {}</dt>
-      <dd>Show the value with a number</dd>
-      <dt>"static-sprite", {"sprite-name", number}</dt>
-      <dd>Use the number icon of the sprite (defined by <a href="#DefineSprites">DefineSprites()</a>)</dd>
       <dt>"sprite", {"sprite-name"}</dt>
       <dd>Show the p-th icon of the sprite
 		(p depands of variable percent value: from full (left) to empty (right of th image)).
 		The sprite is defined by <a href="#DefineSprites">DefineSprites()</a>.</dd>
-      <dt>"bar", {tag, value}</dt>
-      <dd>Show like a rectangular bar.</dd>
-      <dl>
-        <dt>Orientation = "vertical" or "horizontal"</dt>
-        <dd>orientation of the bar, default is horizontal</dd>
-        <dt>SEToNW = boolean</dt>
-        <dd>
-        if true, bar is growing from bottom to uppper border (for vertical bar)
-        or right to left (for horizontal bar)
-        (South-Easth to Nord-Weast).
-        </dd>
-        <dt>Height = number, Width = number</dt>
-        <dd>size of the bar, 0 assume size of the unit.</dd>
-        <dt>BorderSize = number</dt>
-        <dd>bar is surroundded with a border.</dd>
-        <dt>ShowFullBackground</dt>
-        <dd>Show badgroung like if value is max</dd>
-      </dl>
     </dl>
 </dl>
 
