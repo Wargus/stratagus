@@ -135,22 +135,26 @@ and <a href="ui.html#UI.Resources">UI.Resources</a> tables.
 
 
 <a name="DefineSprites"></a>
-<h3>DefineSprite({tag = value}, ...)</h3>
+<h3>DefineSprites({tag = value, ...}, ...)</h3>
 
-Define sprite to be shown for variables.
-
+Define sprites to be shown for variables.
+You can define multiple sprites in the same DefineSprites call or
+each sprite in a separate call; the effect is the same either way.
 
 
 <dl>
   Tag could be :
   <dt>Name = "sprite-name"</dt>
-  <dd>name of the sprite</dd>
+  <dd>name of the sprite.  This is how the Method parameter of
+    <a href="#DefineDecorations">DefineDecorations</a> refers to the sprite.</dd>
   <dt>File = "filename"</dt>
   <dd>filename containing the sprite</dd>
   <dt>Offset = {x, y}</dt>
-  <dd>offset when drawing the sprite</dd>
+  <dd>offset when drawing the sprite.
+    Positive values move the sprite to the right or down.</dd>
   <dt>Size = {width, height}</dt>
-  <dd>Size of the sprite (!= of size of image)</dd>
+  <dd>Size of the sprite.
+    The graphic file may contain multiple frames of this size.</dd>
 </dl>
 
 <h4>Example</h4>
