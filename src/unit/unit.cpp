@@ -2337,11 +2337,16 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 	return nunit;
 }
 
+PixelPos CUnit::GetMapPixelPosTopLeft() const
+{
+	const PixelPos pos(tilePos.x * PixelTileSize.x + IX, tilePos.y * PixelTileSize.y + IY);
+	return pos;
+}
+
 PixelPos CUnit::GetMapPixelPosCenter() const
 {
-	const PixelPos center(tilePos.x * PixelTileSize.x + IX + Type->TileWidth * PixelTileSize.x / 2,
-						  tilePos.y * PixelTileSize.y + IY + Type->TileHeight * PixelTileSize.y / 2);
-	return center;
+	const PixelSize pixelSize(Type->TileWidth * PixelTileSize.x, Type->TileHeight * PixelTileSize.y);
+	return GetMapPixelPosTopLeft() + pixelSize / 2;
 }
 
 /**

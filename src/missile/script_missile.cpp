@@ -39,7 +39,6 @@
 
 #include "luacallback.h"
 #include "script.h"
-#include "tileset.h"
 #include "unittype.h"
 #include "unit.h"
 #include "unit_manager.h"
@@ -379,8 +378,8 @@ static int CclCreateMissile(lua_State *l)
 {
 	LuaCheckArgs(l, 5);
 
-	std::string name = LuaToString(l, 1);
-	MissileType *mtype = MissileTypeByIdent(name);
+	const std::string name = LuaToString(l, 1);
+	const MissileType *mtype = MissileTypeByIdent(name);
 	if (!mtype) {
 		LuaError(l, "Bad missile");
 	}
@@ -404,30 +403,24 @@ static int CclCreateMissile(lua_State *l)
 	endpos.y = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 
-	const int sourceUnit = LuaToNumber(l, 4);
-	const int destUnit = LuaToNumber(l, 5);
-	CUnit &startunit = UnitManager.GetSlotUnit(sourceUnit);
-	CUnit &destunit = UnitManager.GetSlotUnit(destUnit);
+	const int sourceUnitId = LuaToNumber(l, 4);
+	const int destUnitId = LuaToNumber(l, 5);
+	CUnit *sourceUnit = sourceUnitId != -1 ? &UnitManager.GetSlotUnit(sourceUnitId) : NULL;
+	CUnit *destUnit = destUnitId != -1 ? &UnitManager.GetSlotUnit(destUnitId) : NULL;
 
-	if (sourceUnit != -1) {
-		startpos.x += startunit.tilePos.x * PixelTileSize.x + startunit.IX;
-		startpos.y += startunit.tilePos.y * PixelTileSize.y + startunit.IY;
+	if (sourceUnit != NULL) {
+		startpos += sourceUnit->GetMapPixelPosTopLeft();
 	}
-	if (destUnit != -1) {
-		endpos.x += destunit.tilePos.x * PixelTileSize.x + destunit.IX;
-		endpos.y += destunit.tilePos.y * PixelTileSize.y + destunit.IY;
+	if (destUnit != NULL) {
+		endpos += destUnit->GetMapPixelPosTopLeft();
 	}
 
 	Missile *missile = MakeMissile(*mtype, startpos, endpos);
 	if (!missile) {
 		return 0;
 	}
-	if (sourceUnit != -1) {
-		missile->SourceUnit = &startunit;
-	}
-	if (destUnit != -1) {
-		missile->TargetUnit = &destunit;
-	}
+	missile->SourceUnit = sourceUnit;
+	missile->TargetUnit = destUnit;
 	return 0;
 }
 

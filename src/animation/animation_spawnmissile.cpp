@@ -115,23 +115,23 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 	}
 	if ((flags & ANIM_SM_TOTARGET)) {
 		CUnit *target = goal->CurrentOrder()->GetGoal();
-		if (!target  || goal->Destroyed) {
+		if (!target || goal->Destroyed) {
 			Assert(!unit.Type->Missile.Missile->AlwaysFire || unit.Type->Missile.Missile->Range);
 			if (!target || !unit.Type->Missile.Missile->AlwaysFire) {
 				return;
 			}
 		}
 		if (flags & ANIM_SM_PIXEL) {
-			dest.x = target->tilePos.x * PixelTileSize.x + target->IX + destx;
-			dest.y = target->tilePos.y * PixelTileSize.y + target->IY + desty;
+			dest.x = target->GetMapPixelPosTopLeft().x + destx;
+			dest.y = target->GetMapPixelPosTopLeft().y + desty;
 		} else {
 			dest.x = (target->tilePos.x + destx) * PixelTileSize.x + target->Type->TileWidth * PixelTileSize.x / 2;
 			dest.y = (target->tilePos.y + desty) * PixelTileSize.y + target->Type->TileHeight * PixelTileSize.y / 2;
 		}
 	} else {
 		if ((flags & ANIM_SM_PIXEL)) {
-			dest.x = goal->tilePos.x * PixelTileSize.x + goal->IX + destx;
-			dest.y = goal->tilePos.y * PixelTileSize.y + goal->IY + desty;
+			dest.x = goal->GetMapPixelPosTopLeft().x + destx;
+			dest.y = goal->GetMapPixelPosTopLeft().y + desty;
 		} else {
 			dest.x = (goal->tilePos.x + destx) * PixelTileSize.x + goal->Type->TileWidth * PixelTileSize.x / 2;
 			dest.y = (goal->tilePos.y + desty) * PixelTileSize.y + goal->Type->TileHeight * PixelTileSize.y / 2;

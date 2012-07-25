@@ -538,7 +538,7 @@ static void DrawDecoration(const CUnit &unit, const CUnitType *type, int x, int 
 {
 #ifdef REFS_DEBUG
 	// Show the number of references.
-	// VideoDrawNumberClip(x + 1, y + 1, GetGameFont(), unit.Refs);
+	VideoDrawNumberClip(x + 1, y + 1, GetGameFont(), unit.Refs);
 #endif
 
 	UpdateUnitVariables(const_cast<CUnit &>(unit));

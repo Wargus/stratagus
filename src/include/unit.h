@@ -297,6 +297,7 @@ public:
 
 	int GetDrawLevel() const;
 
+	PixelPos GetMapPixelPosTopLeft() const;
 	PixelPos GetMapPixelPosCenter() const;
 
 public:
