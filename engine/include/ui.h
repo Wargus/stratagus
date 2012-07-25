@@ -474,8 +474,6 @@ extern ButtonAction *CurrentButtons;    /// Current Selected Buttons
 
 extern std::string UiGroupKeys;         /// Up to 11 keys used for group selection
 
-// only exported to save them
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
