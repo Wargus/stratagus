@@ -363,6 +363,16 @@ and this function changes them all to the same value.
 <h3>SetBuildingCapture(boolean)</h3>
 
 Enable or disable building capture.
+When enabled, workers can capture low-HP enemy buildings by attacking them.
+Here, "worker" means the unit is able to repair something
+(its <a href="unittype.html#DefineUnitType.RepairRange">RepairRange</a> is not zero),
+and harvesting does not count as attacking.
+
+<p>SetBuildingCapture does not affect the other mechanisms
+with which units can be captured:
+the "capture" spell action in <a href="magic.html#DefineSpell">DefineSpell</a>,
+the <a href="game.html#ChangeUnitsOwner">ChangeUnitsOwner</a> function used in triggers,
+and the rescuable player types in <a href="mappresentation.html#DefinePlayerType">DefinePlayerType</a>.</p>
 
 <dl>
   <dt>boolean</dt>
