@@ -231,7 +231,6 @@ static int CclSetTitleScreens(lua_State *l)
 	for (j = 0; j < args; ++j) {
 		LuaCheckTable(l, j + 1);
 		TitleScreens[j] = new TitleScreen;
-		TitleScreens[j]->Iterations = 1;
 		lua_pushnil(l);
 		while (lua_next(l, j + 1)) {
 			value = LuaToString(l, -2);
@@ -243,8 +242,6 @@ static int CclSetTitleScreens(lua_State *l)
 				TitleScreens[j]->StretchImage = LuaToBoolean(l, -1);
 			} else if (!strcmp(value, "Timeout")) {
 				TitleScreens[j]->Timeout = LuaToNumber(l, -1);
-			} else if (!strcmp(value, "Iterations")) {
-				TitleScreens[j]->Iterations = LuaToNumber(l, -1);
 			} else if (!strcmp(value, "Labels")) {
 				LuaCheckTable(l, -1);
 				subargs = lua_objlen(l, -1);

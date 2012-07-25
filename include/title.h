@@ -52,7 +52,7 @@ public:
 
 class TitleScreen {
 public:
-	TitleScreen() : StretchImage(true), Timeout(0), Iterations(0), Labels(NULL) {}
+	TitleScreen() : StretchImage(true), Timeout(0), Labels(NULL) {}
 	~TitleScreen() {
 		if (this->Labels) {
 			for (int i = 0; this->Labels[i]; ++i) {
@@ -66,7 +66,6 @@ public:
 	std::string Music;
 	bool StretchImage;
 	int Timeout;
-	int Iterations;
 	TitleScreenLabel **Labels;
 };
 
