@@ -50,7 +50,7 @@
 <a href="#KillUnitAt">KillUnitAt</a>
 <a href="#LibraryPath">LibraryPath</a>
 <a href="#Log">Log</a>
-<a href="#Makeunit">MakeUnit</a>
+<a href="#MakeUnit">MakeUnit</a>
 <a href="#NewColors">NewColors</a>
 <a href="#MoveUnit">MoveUnit</a>
 <a href="#RemoveObjective">RemoveObjective</a>
@@ -68,7 +68,6 @@
 <a href="#SetUnitVariable">SetUnitVariable</a>
 <a href="#SharedVision">SharedVision</a>
 <a href="#SyncRand">SyncRand</a>
-<a href="#Unit">Unit</a>
 <hr>
 <h2>Intro - Introduction to game functions and variables</h2>
 
@@ -963,7 +962,7 @@ preferences, and a default used when the game is started.
 
 <dl>
 <dt>"name"</dt>
-<dd>The name of the player, limited to 16 characters"</dd>
+<dd>The name of the player, limited to 16 characters.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -1101,47 +1100,6 @@ during replays.
 	else
 		-- Do that
     end
-</pre>
-
-<a name="Unit"></a>
-<h3>Unit()</h3>
-
-Needed to save/load games. 
-
-<h4>Example</h4>
-
-<pre>
-Unit(0, "type", "unit-vault", "player", 0,
-  "tile", {116, 120}, "refs", 6, "stats", 0,
-  "pixel", {0, 0}, "seen-pixel", {0, 0}, "frame", 1, "not-seen", "direction", 0,
-  "attacked", 0,
-  "current-sight-range", 4, "seen-by-player", "X_______________",
-  "seen-destroyed", "________________",
-  "seen-state", 0,  "active", "mana", 0, "hp", 1800, "xp", 0, "kills", 0,
-  "ttl", 0, "bloodlust", 0, "haste", 0, "slow", 0,
-  "invisible", 0, "flame-shield", 0, "unholy-armor", 0,
-  "HitPoints", {Value = 1800, Max = 1800, Increase = 0, Enable = true},
-  "Mana", {Value = 0, Max = 0, Increase = 0, Enable = false},
-  "Transport", {Value = 0, Max = 0, Increase = 0, Enable = true},
-  "Training", {Value = 0, Max = 0, Increase = 0, Enable = true},
-  "Resource", {Value = 0, Max = 0, Increase = 0, Enable = true},
-  "group-id", 0,
-  "last-group", 0,
-  "value", 0,
-  "sub-action", 0, "wait", 2, "state", 2,
-  "blink", 0, "rs", 35, "units-boarded-count", 0,"order-count", 1,
-  "order-flush", 0,
-  "order-total", 4,
-        "orders", {
-    {"action-still", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {-1, -1},},
-    {"action-none", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {0, 0},},
-    {"action-none", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {0, 0},},
-    {"action-none", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {0, 0},},},
- "saved-order", 
-    {"action-still", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {-1, -1},},
- "new-order", 
-    {"action-still", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {-1, -1},}
-)
 </pre>
 
 
