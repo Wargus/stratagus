@@ -621,6 +621,9 @@ static void Usage(void)
 		"  -d datapath   Path to Bos Wars data\n"
 		"  -E file.lua   Load this script file when starting the map editor\n"
 		"                  (default scripts/editor.lua)\n"
+#ifdef DEBUG
+		"  -e            Show all events received from SDL (requires DEBUG)\n"
+#endif
 		"  -h            Help shows this page\n"
 		"  -l            Disable command log\n"
 		"  -P port       Network port to use\n"
@@ -746,7 +749,7 @@ int main(int argc, char **argv)
 	//  Parse commandline
 	//
 	for (;;) {
-		switch (getopt(argc, argv, "c:d:hln:P:v:D:N:E:FL:S:U:W?")) {
+		switch (getopt(argc, argv, "c:d:ehln:P:v:D:N:E:FL:S:U:W?")) {
 			case 'c':
 				CclStartFile = optarg;
 				continue;
@@ -756,6 +759,23 @@ int main(int argc, char **argv)
 				replace(StratagusLibPath.begin(), StratagusLibPath.end(), '\\', '/');
 				continue;
 			}
+			case 'e':
+				// DumpAllSdlEvents is intended for engine
+				// hackers, rather than scripters or players.
+				// Make it available in DEBUG builds only, so
+				// that we are more free to make incompatible
+				// changes to it, and so that players won't
+				// complain that the feature is cumbersome to
+				// use in Windows or Mac OS X.
+#ifdef DEBUG
+				DumpAllSdlEvents = true;
+#else
+				// The following string is not in _("...")
+				// because the translation files have not
+				// been loaded yet.
+				fprintf(stderr, "Warning: Option -e is available in DEBUG builds only.\n");
+#endif
+				continue;
 			case 'E':
 				EditorStartFile = optarg;
 				continue;
