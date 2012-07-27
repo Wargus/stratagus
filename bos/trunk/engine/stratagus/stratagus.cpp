@@ -615,22 +615,27 @@ static void Usage(void)
 {
 	PrintHeader();
 	printf(
-		"\n\nUsage: boswars [OPTIONS]\n\
-		\t-c file.lua\tconfiguration start file (default boswars.lua)\n\
-		\t-d datapath\tpath to Bos Wars data\n\
-		\t-h\t\tHelp shows this page\n\
-		\t-l\t\tDisable command log\n\
-		\t-P port\t\tNetwork port to use\n\
-		\t-n server\tNetwork server host preset\n\
-		\t-L lag\t\tNetwork lag in # frames (default 10 = 333ms)\n\
-		\t-U update\tNetwork update rate in # frames (default 5=6x per s)\n\
-		\t-v mode\t\tVideo mode (0=default,1=640x480,2=800x600,\n\
-		\t\t\t\t3=1024x768,4=1280x960,5=1600x1200)\n\
-		\t-D\t\tVideo mode depth = pixel per point (for Win32/TNT)\n\
-		\t-F\t\tFull screen video mode\n\
-		\t-S\t\tSync speed (100 = 30 frames/s)\n\
-		\t-W\t\tWindowed video mode\n\
-		");
+		"\n\n"
+		"Usage: boswars [OPTIONS] [MAP-PRESENTATION-FILE]\n"
+		"  -c file.lua   Configuration start file (default scripts/boswars.lua)\n"
+		"  -d datapath   Path to Bos Wars data\n"
+		"  -E file.lua   Load this script file when starting the map editor\n"
+		"                  (default scripts/editor.lua)\n"
+		"  -h            Help shows this page\n"
+		"  -l            Disable command log\n"
+		"  -P port       Network port to use\n"
+		"  -n server     Network server host preset\n"
+		"  -N name       Name of local player for network games\n"
+		"  -L lag        Network lag in # frames (default 10 = 333ms)\n"
+		"  -U update     Network update rate in # frames (default 5=6x per s)\n"
+		"  -v mode       Video mode (0=default, 1=640x480, 2=800x600, 3=1024x768,\n"
+		"                  4=1280x960, 5=1600x1200)\n"
+		"  -D bpp        Video mode depth = bits per pixel (for Win32/TNT)\n"
+		"  -F            Full screen video mode\n"
+		"  -S speed      Video sync speed (100 = 30 frames/s)\n"
+		"  -W            Windowed video mode\n"
+		"Specifying MAP-PRESENTATION-FILE starts a single-player game in that map.\n"
+		"Example: boswars maps/islandwar.map/presentation.smp\n");
 }
 
 #ifdef REDIRECT_OUTPUT
