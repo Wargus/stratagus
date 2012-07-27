@@ -43,6 +43,7 @@
 <a href="#DefineRanks">DefineRanks</a>
 <a href="#Diplomacy">Diplomacy</a>
 <a href="#StratagusMap">StratagusMap</a>
+<a href="#GetLocalPlayerName">GetLocalPlayerName</a>
 <a href="#GetUnitVariable">GetUnitVariable</a>
 <a href="#GetCurrentLuaPath">GetCurrentLuaPath</a>
 <a href="#Group">Group</a>
@@ -525,6 +526,22 @@ Returns the path of the currenly interpreted lua script.
     Load(GetCurrentLuaPath().."unit.lua")
 </pre>
 
+<a name="GetLocalPlayerName"></a>
+<h3>GetLocalPlayerName()</h3>
+
+Returns the name of the player playing on this computer.
+The name is used in both network games and single-player games.
+When the engine is starting up, it chooses a default name.
+Lua scripts can change the name by calling <a href="#SetLocalPlayerName">SetLocalPlayerName</a>.
+
+<dl>
+<dt><I>RETURNS</I></dt>
+<dd>The name of the local player: either set
+with <a href="#SetLocalPlayerName">SetLocalPlayerName</a>
+or chosen by the engine.
+</dd>
+</dl>
+
 <a name="GetUnitVariable"></a>
 <h3>GetUnitVariable(unit, VariableName)</h3>
 
@@ -957,12 +974,16 @@ Set the current group id. (Needed for load/save).
 <a name="SetLocalPlayerName"</a>
 <h3>SetLocalPlayerName("name")</h3>
 
-Sets the name of the player playing on this computer. Also saved in
-preferences, and a default used when the game is started.
+Sets the name of the player playing on this computer.  Does not save
+the name in <a href="config.html#preferences">preferences</a>; the
+caller can do that if desired.  Lua scripts can read the name back by
+calling <a href="#GetLocalPlayerName">GetLocalPlayerName</a>.
 
 <dl>
 <dt>"name"</dt>
 <dd>The name of the player, limited to 16 characters.</dd>
+<dt><I>RETURNS</I></dt>
+<dd>Nothing</dd>
 </dl>
 
 <h4>Example</h4>
