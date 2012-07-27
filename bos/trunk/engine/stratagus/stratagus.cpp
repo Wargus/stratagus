@@ -627,8 +627,6 @@ static void Usage(void)
 		"  -h            Help shows this page\n"
 		"  -l            Disable command log\n"
 		"  -P port       Network port to use\n"
-		"  -n server     Network server host preset\n"
-		"  -N name       Name of local player for network games\n"
 		"  -L lag        Network lag in # frames (default 10 = 333ms)\n"
 		"  -U update     Network update rate in # frames (default 5=6x per s)\n"
 		"  -v mode       Video mode (0=default, 1=640x480, 2=800x600, 3=1024x768,\n"
@@ -749,7 +747,7 @@ int main(int argc, char **argv)
 	//  Parse commandline
 	//
 	for (;;) {
-		switch (getopt(argc, argv, "c:d:ehln:P:v:D:N:E:FL:S:U:W?")) {
+		switch (getopt(argc, argv, "c:d:ehlP:v:D:E:FL:S:U:W?")) {
 			case 'c':
 				CclStartFile = optarg;
 				continue;
@@ -784,12 +782,6 @@ int main(int argc, char **argv)
 				continue;
 			case 'P':
 				NetworkPort = atoi(optarg);
-				continue;
-			case 'n':
-				NetworkArg = optarg;
-				continue;
-			case 'N':
-				LocalPlayerName = optarg;
 				continue;
 			case 'v':
 				switch (atoi(optarg)) {
