@@ -182,6 +182,10 @@ extern unsigned long FastForwardCycle;      /// Game Replay Fast Forward Counter
 extern std::string CompileOptions;          /// Compile options
 extern bool SaveGameLoading;                /// Save game is in progress of loading
 
+#ifdef DEBUG
+extern bool DumpAllSdlEvents;               /// Show all events received from SDL
+#endif
+
 extern void LoadGame(const std::string &filename); /// Load saved game
 extern void SaveGame(const std::string &filename); /// Save game
 

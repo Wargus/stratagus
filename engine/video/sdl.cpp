@@ -93,6 +93,10 @@ static int FrameFraction;  /// Frame fractional term
 
 const EventCallback *Callbacks;
 
+#ifdef DEBUG
+bool DumpAllSdlEvents;               /// Show all events received from SDL
+#endif
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -558,7 +562,7 @@ void Invalidate(void)
 }
 
 
-#if defined(DEBUG) && defined(DUMP_SDL_EVENTS)
+#ifdef DEBUG
 
 static void DumpSdlActiveEvent(const SDL_ActiveEvent &active, const char *type)
 {
@@ -741,7 +745,7 @@ static void DumpSdlEvent(const SDL_Event *event)
 	fflush(stdout);
 }
 
-#endif // DUMP_SDL_EVENTS
+#endif // DEBUG
 
 /**
 **  Handle interactive input event.
@@ -751,8 +755,10 @@ static void DumpSdlEvent(const SDL_Event *event)
 */
 static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 {
-#ifdef DUMP_SDL_EVENTS
-	DumpSdlEvent(event);
+#ifdef DEBUG
+	if (DumpAllSdlEvents) {
+		DumpSdlEvent(event);
+	}
 #endif
 
 	switch (event->type) {
