@@ -62,7 +62,6 @@
 // Variables
 //----------------------------------------------------------------------------
 
-std::string NetworkArg;                /// Network command line argument
 int NetPlayers;                        /// How many network players
 int NetworkPort = NetworkDefaultPort;  /// Local network port to use
 

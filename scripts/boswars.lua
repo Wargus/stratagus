@@ -186,7 +186,7 @@ if (preferences == nil) then
     VideoWidth = 800,
     VideoHeight = 600,
     VideoFullScreen = false,
-    PlayerName = "Player",
+    PlayerName = nil,
     FogOfWar = true,
     ShowCommandKey = true,
     GroupKeys = "0123456789`",
@@ -210,11 +210,16 @@ if (preferences.MaxOpenGLTexture == nil) then
    preferences.MaxOpenGLTexture = 512
 end
 
+-- If PlayerName is not in the preferences, then use
+-- whatever default the engine has chosen.
+if preferences.PlayerName ~= nil then
+  SetLocalPlayerName(preferences.PlayerName)
+end
+
 UseOpenGL = preferences.UseOpenGL
 SetVideoResolution(preferences.VideoWidth, preferences.VideoHeight)
 SetVideoFullScreen(preferences.VideoFullScreen)
 SetMaxOpenGLTexture(preferences.MaxOpenGLTexture)
-SetLocalPlayerName(preferences.PlayerName)
 SetFogOfWar(preferences.FogOfWar)
 UI.ButtonPanel.ShowCommandKey = preferences.ShowCommandKey
 SetGroupKeys(preferences.GroupKeys)

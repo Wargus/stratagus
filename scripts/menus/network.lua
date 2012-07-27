@@ -474,6 +474,11 @@ function RunMultiPlayerMenu(s)
   InitNetwork1()
   menu:addButton(_("~!Join Game"), x, Video.Height*11/20, 
     function(s)
+      -- If the player did not edit the name or undid edits, then do not
+      -- save the name as a preference.  If preferences.PlayerName is nil,
+      -- the name may be a default name chosen by the engine; not saving
+      -- the default name as a preference means the engine will be free to
+      -- choose a different default on the next run.
       if nick:getText() ~= GetLocalPlayerName() then
         SetLocalPlayerName(nick:getText())
         preferences.PlayerName = nick:getText()

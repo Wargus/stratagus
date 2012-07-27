@@ -205,7 +205,6 @@ enum _net_client_con_state_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern std::string NetworkArg;        /// Network command line argument
 extern int NetPlayers;                /// Network players
 extern int NetworkPort;               /// Local network port to use
 
