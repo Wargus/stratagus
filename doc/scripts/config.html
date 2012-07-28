@@ -708,15 +708,42 @@ background images might not cover everything they should.</p>
 </pre>
 
 <a name="SetGroupKeys"></a>
-<h3>SetGroupKeys("0123456789~")</h3>
+<h3>SetGroupKeys("0123456789`")</h3>
 
-Define the key to use for group on non-us keyborads. It should be placed in
-preferences1.lua, with the key to use for group 0, 1, 2, ... 9, and the key
-to unselect all groups ( on the left of the 1 key )
+<p>Define the keys to use for selecting groups of units.  Those should
+normally be the digit keys; however, at least the French AZERTY layout
+requires pressing Shift to get digits, and the engine then might not
+automatically recognize those keys as digit keys.  In such cases, you
+should use this function to tell the engine what characters the keys
+generate without Shift.</p>
+
+<p>On Windows, the default setting is reported to work correctly even
+with an AZERTY keyboard.</p>
+
+<p>On X11 with GNOME 3 and SDL 1.2.15, the default setting works if
+the first keyboard layout (i.e. first XKB group) uses unshifted
+digits, even if some other keyboard layout is active.</p>
+
+<p>We hope SetGroupKeys will become unnecessary when the engine
+is changed to use SDL 1.3 or 2.0.  The engine should then be able
+to recognize the digit keys from the scancodes provided by SDL.
+This cannot be easily done with SDL 1.2, which may use different
+scancodes for the same key on different operating systems or
+different X servers.</p>
+
+<p>There is no GetGroupKeys function.  Lua scripts that call
+SetGroupKeys should also save the new value of the setting
+in <a href="#preferences">preferences</a> so that the engine
+will save it to disk.</p>
 
 <dl>
 <dt>keys</dt>
-<dd>the keys to substitute to the 0 1 2 3 4... keys
+<dd>The keys to use for selecting groups of units.
+  The string should consist of 11 characters.
+  The first ten characters are for groups 0, 1, 2, ... 9.
+  The last character is for unselecting all groups;
+  typically, this is the key on the left of the 1 key.
+</dd>
 </dl>
 
 <h4>Example</h4>
