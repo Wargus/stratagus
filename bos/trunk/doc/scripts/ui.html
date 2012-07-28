@@ -350,9 +350,6 @@ Define a cursor.
 <dd>Unique identifier of the cursor, used to reference it in config files and
 during startup.
 </dd>
-<dt>Race = "race-name" or "any"</dt>
-<dd>Race to use this cursor with or "any" to use with any race.
-</dd>
 </dl>
 Possible tags:
 <dl>
@@ -377,7 +374,6 @@ Note: Name, File and Size must be filled.
 <pre>
 DefineCursor({
   Name = "cursor-cross",
-  Race = "any",
   File = "ui/cursors/small_green_cross.png",
   HotSpot = {8,  8},
   Size = {18, 18}})
