@@ -39,7 +39,6 @@
 <a href="#DefinePlayerColorIndex">DefinePlayerColorIndex</a>
 <a href="#DefinePlayerColors">DefinePlayerColors</a>
 <a href="#Diplomacy">Diplomacy</a>
-<a href="#StratagusMap">StratagusMap</a>
 <a href="#GetLocalPlayerName">GetLocalPlayerName</a>
 <a href="#GetUnitVariable">GetUnitVariable</a>
 <a href="#GetCurrentLuaPath">GetCurrentLuaPath</a>
@@ -383,33 +382,6 @@ Does the same as SetDiplomacy(currentplayer, state, enemy).
 
 See <a href="#SetDiplomacy">SetDiplomacy</a> for more details.
 
-
-<a name="StratagusMap"></a>
-<h3>StratagusMap()</h3>
-
-Needed to load/save games.
-
-<h4>Example</h4>
-
-<pre>
-StratagusMap(
-  "version", "2.1.0",
-  "description", "big brazilian forest",
-  "the-map", {
-  "terrain", {"tileset-desert", "desert"},
-  "size", {128, 128},
-  "fog-of-war",
-  "filename", "maps/braza.pud",
-  "map-fields", {
-  -- 0
-  {125, 125, "land", "block", "wood",},   {125, 125, "land", "block", "wood",},
-  {125, 125, "land", "block", "wood",},   {125, 125, "land", "block", "wood",},
-  {125, 125, "land", "block", "wood",},   {125, 125, "land", "block", "wood",},
-  {125, 125, "land", "block", "wood",},   {125, 125, "explored", 1, "land", "block", "wood",},
-  {125, 125, "explored", 1, "land", "block", "wood",}
-  .....
-}})
-</pre>
 
 <a name="GetCurrentLuaPath">
 <h3>GetCurrentLuaPath()</h3>
