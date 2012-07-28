@@ -33,6 +33,7 @@
 <a href="#Missile">Missile</a>
 <a href="#Player">Player</a>
 <a href="#SaveGame">SaveGame</a>
+<a href="#Selection">Selection</a>
 <a href="#SetGroupId">SetGroupId</a>
 <a href="#SlotUsage">SlotUsage</a>
 <a href="#StratagusMap">StratagusMap</a>
@@ -342,6 +343,27 @@ SaveGame({
 
 ---  "preview", "/home/devil/.stratagus/wc2/save/current-game.sav.pam",
 } )
+</pre>
+
+<a name="Selection"></a>
+<h3>Selection(numselected, unit0, ...)</h3>
+
+Define the current selection.
+
+
+<dl>
+<dt>numselected</dt>
+<dd>How many units are selected.
+</dd>
+<dt>unitX</dt>
+<dd>slot number of the unit to add in the selection.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    Selection(1, 0)
 </pre>
 
 <a name="SetGroupId"></a>
