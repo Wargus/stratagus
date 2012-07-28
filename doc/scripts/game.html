@@ -25,7 +25,7 @@
 <hr>
 <a href="../index.html">Bos Wars</a> 
 <a href="../faq.html">FAQ</a> 
-<a href="config.html">PREV</a> 
+<a href="editor.html">PREV</a> 
 <a href="magic.html">NEXT</a> 
 <a href="index.html">LUA Index</a>
 <hr>
@@ -36,7 +36,6 @@
 <a href="#CreateUnit">CreateUnit</a>
 <a href="#DefineBurningBuilding">DefineBurningBuilding</a>
 <a href="#DefineConstruction">DefineConstruction</a>
-<a href="#DefineEditorUnitTypes">DefineEditorUnitTypes</a>
 <a href="#DefinePlayerColorIndex">DefinePlayerColorIndex</a>
 <a href="#DefinePlayerColors">DefinePlayerColors</a>
 <a href="#DefineRaceNames">DefineRaceNames</a>
@@ -330,33 +329,6 @@ and you also want shadows for those frames.
                 File = "main",
                 Frame = 1}}
     })
-</pre>
-
-<a name="DefineEditorUnitTypes"></a>
-<h3>DefineEditorUnitTypes({unit1, unit2, ...})</h3>
-
-Creates a sorted list of unit-types for the editor. 
-This is only a temporary hack for better sorted units.
-
-<dl>
-<dt>unit</dt>
-<dd>identifier of the unit.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-DefineEditorUnitTypes({
-   "unit-vault",
-   "unit-apcs",
-   "unit-medic",
-   "unit-bazoo",
-   "unit-assault",
-   "unit-grenadier",
-   "unit-camp",
-   "unit-hosp"
-})
 </pre>
 
 <a name="DefinePlayerColorIndex"></a>
