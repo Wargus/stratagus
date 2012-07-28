@@ -34,6 +34,7 @@
 <a href="#Player">Player</a>
 <a href="#SaveGame">SaveGame</a>
 <a href="#SlotUsage">SlotUsage</a>
+<a href="#StratagusMap">StratagusMap</a>
 <a href="#Unit">Unit</a>
 <hr>
 <h2>Intro - Introduction to savegame functions and variables</h2>
@@ -360,6 +361,14 @@ units back into the queue they were in when a game was saved.
 <pre>
     SlotUsage(5, {2, 855})
 </pre>
+
+<a name="StratagusMap"></a>
+<h3>StratagusMap(...)</h3>
+
+<p>The state of the map, without units.
+Much of this information is redundant with the map setup file.
+However, the StratagusMap call also carries information on which parts of
+the map each player has explored; that is of course not in the map setup.</p>
 
 <a name="Unit"></a>
 <h3>Unit()</h3>
