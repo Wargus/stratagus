@@ -260,12 +260,12 @@ def CheckLibAlternatives(b, libs, header=''):
 
 def detectLua(b):
     libs = 'lua lua5.1 lua51'.split()
-    if CheckLibAlternatives(b, libs, header='lua.h'):
-        return
     if b.usepkgconfig:
         for i in libs:
             if pkgconfig(b, i):
                 return
+    if CheckLibAlternatives(b, libs, header='lua.h'):
+        return
     print('Did not find the Lua library, exiting !')
     sys.exit(1)
 
@@ -279,15 +279,16 @@ def detectOpenGl(b):
        sys.exit(1)
 
 def detectSdl(b):
+    if b.usepkgconfig and pkgconfig(b, 'sdl'):
+        return
     b.incpath('/usr/include/SDL')
     header = 'SDL.h'
     if '-DUSE_WIN32' in b.cflags:
         header = ''
     if CheckLib(b, 'SDL', header=header):
         return
-    if not b.usepkgconfig or not pkgconfig(b, 'sdl'):
-       print('Did not find the SDL library, exiting !')
-       sys.exit(1)
+    print('Did not find the SDL library, exiting !')
+    sys.exit(1)
 
 def detectAlwaysDynamic(b):
     RequireLib(b, 'png', 'png.h')
