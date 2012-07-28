@@ -760,7 +760,7 @@ calling <a href="#GetLocalPlayerName">GetLocalPlayerName</a>.
 </pre>
 
 <a name="SetObjectives"></a>
-<h3>SetObjectives(objective [objective ...])</h3>
+<h3>SetObjectives({ objective, ... })</h3>
 
 Set the mission objectives.  This will overwrite any previous objectives.
 
@@ -774,7 +774,7 @@ Set the mission objectives.  This will overwrite any previous objectives.
 
 <pre>
     -- Sets the mission objectives.
-    SetObjectives("Build 4 farms", "Mine 500 gold")
+    SetObjectives({"Build 4 farms", "Mine 500 gold"})
 </pre>
 
 <a name="SetSharedVision"></a>
