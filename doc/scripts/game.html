@@ -464,11 +464,13 @@ Kill a unit.
 </pre></dd>
 <dt>player</dt>
 <dd><pre>
-0 .. 16     Player number
+0 .. 8       Player number
 "any"        Matches any player
 "all"        All players (Not used)
 "this"       Player on the local computer, Human player in the campaign.
 </pre></dd>
+<dt><I>RETURNS</I></dt>
+<dd>true if it killed one unit; false if there is no matching unit.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -512,6 +514,8 @@ Kills units at a specific location.
 <dd><pre>
 {x2, y2}    Lower right corner
 </pre></dd>
+<dt><I>RETURNS</I></dt>
+<dd>integer: how many units it killed.</dd>
 </dl>
 
 <h4>Example</h4>
