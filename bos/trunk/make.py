@@ -259,7 +259,12 @@ def CheckLibAlternatives(b, libs, header=''):
          return True
 
 def detectLua(b):
-    libs = 'lua lua5.1 lua51'.split()
+    # lua5.1-c++ is what Debian calls a Lua library built to use C++
+    # exceptions rather than longjmp.  http://bugs.debian.org/560139
+    # Prefer that because it will call our C++ destructors on unwind.
+    # This avoids memory leaks that would be very cumbersome to fix in
+    # any other way.
+    libs = 'lua lua5.1-c++ lua5.1 lua51'.split()
     if b.usepkgconfig:
         for i in libs:
             if pkgconfig(b, i):
