@@ -52,7 +52,6 @@
 <a href="#ReplayLog">ReplayLog</a>
 <a href="#Selection">Selection</a>
 <a href="#SetDiplomacy">SetDiplomacy</a>
-<a href="#SetGameName">SetGameName</a>
 <a href="#SetGamePaused">SetGamePaused</a>
 <a href="#SetGroupId">SetGroupId</a>
 <a href="#SetLocalPlayerName">SetLocalPlayerName</a>
@@ -718,24 +717,6 @@ Alters the diplomacy setting between two players. eg enemy, allied
 <pre>
     -- Sets player 1 to be an enemy of player 0.
     SetDiplomacy(0, "enemy", 1)
-</pre>
-
-<a name="SetGameName"></a>
-<h3>SetGameName("name")</h3>
-
-Sets the name of the game so savegames, maps, settings and logs can be set
-differently for different games used.
-
-<dl>
-<dt>"name"</dt>
-<dd>The name the game has for loading and saving files</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    -- Set Name to bos, ~/.stratagus/bos is location of files
-	SetGameName("bos")
 </pre>
 
 <a name="SetGamePaused"></a>
