@@ -36,7 +36,6 @@
 <a href="#PlayFile">PlayFile</a>
 <a href="#PlayMusic">PlayMusic</a>
 <a href="#PlaySound">PlaySound</a>
-<a href="#SetCdMode">SetCdMode</a>
 <a href="#SetGlobalSoundRange">SetGlobalSoundRange</a>
 <a href="#SetMusicVolume">SetMusicVolume</a>
 <a href="#SetSoundRange">SetSoundRange</a>
@@ -205,28 +204,6 @@ Ask the sound system to play the specified sound.
 <pre>
 -- Play the sound "basic human voices ready".
 PlaySound("basic human voices ready")
-</pre>
-
-<a name="SetCdMode"></a>
-<h3>SetCdMode("mode")</h3>
-
-Set the cd mode.
-
-<dl>
-<dt>"all"</dt>
-<dd>plays all tracks</dd>
-<dt>"random"</dt>
-<dd>plays random tracks</dd>
-<dt>"defined"</dt>
-<dd>play according to playlist below. define before playlist = {"song1", "song2", ...}</dd>
-<dt>"off"</dt>
-<dd>turns cd player off</dd>
-</dl>
-
-<h4>Example</h4>
-<pre>
--- Set the cd mode to play songs in a random order.
-SetCdMode("random")
 </pre>
 
 <a name="SetGlobalSoundRange"></a>
