@@ -30,41 +30,53 @@
 <a href="index.html">LUA Index</a>
 <hr>
 <a href="#DefineGameSounds">DefineGameSounds</a>
+<a href="#GetEffectsVolume">GetEffectsVolume</a>
+<a href="#GetMusicVolume">GetMusicVolume</a>
+<a href="#IsEffectsEnabled">IsEffectsEnabled</a>
+<a href="#IsMusicEnabled">IsMusicEnabled</a>
 <a href="#MakeSound">MakeSound</a>
 <a href="#MakeSoundGroup">MakeSoundGroup</a>
 <a href="#MapSound">MapSound</a>
 <a href="#PlayFile">PlayFile</a>
 <a href="#PlayMusic">PlayMusic</a>
 <a href="#PlaySound">PlaySound</a>
+<a href="#PlaySoundFile">PlaySoundFile</a>
+<a href="#SetChannelStereo">SetChannelStereo</a>
+<a href="#SetChannelVolume">SetChannelVolume</a>
+<a href="#SetEffectsEnabled">SetEffectsEnabled</a>
 <a href="#SetEffectsVolume">SetEffectsVolume</a>
 <a href="#SetGlobalSoundRange">SetGlobalSoundRange</a>
+<a href="#SetMusicEnabled">SetMusicEnabled</a>
 <a href="#SetMusicVolume">SetMusicVolume</a>
 <a href="#SetSoundRange">SetSoundRange</a>
 <a href="#SoundForName">SoundForName</a>
-<a href="#SoundOff">SoundOff</a>
-<a href="#SoundOn">SoundOn</a>
+<a href="#StopAllChannels">StopAllChannels</a>
+<a href="#StopChannel">StopChannel</a>
 <a href="#StopMusic">StopMusic</a>
 <hr>
 <h2>Intro - Introduction to sound functions and variables</h2>
 
-Everything around sound.
+<p>Everything around sound.</p>
+
 <h2>Functions</h2>
+
 <a name="DefineGameSounds"></a>
 <h3>DefineGameSounds("name", arg, [[name2, arg] ...])</h3>
 
-Specify some global sounds.
-
+<p>Specify some global sounds.</p>
 
 <dl>
-<dt>"name", arg</dt>
-<dd>One of the following:
-<dl>"click", SoundId</dl>
-<dl>"placement-error", SoundId</dl>
-<dl>"placement-success", SoundId</dl>
-
-<dl>"rescue", SoundId</dl>
-</dd>
-<dt>Where Soundid is the sound to use</dt>
+  <dt>"name", arg</dt>
+  <dd>One of the following:
+    <ul>
+      <li>"click", SoundId</li>
+      <li>"placement-error", SoundId</li>
+      <li>"placement-success", SoundId</li>
+      <li>"rescue", SoundId</li>
+    </ul>
+    Where Soundid is the sound to use</dd>
+  <dt><I>RETURNS</I></dt>
+  <dd>Nothing</dd>
 </dl>
 
 <h4>Example</h4>
@@ -88,16 +100,16 @@ DefineGameSounds(
 <a name="MakeSound"></a>
 <h3>MakeSound("name", "file" or {"file1", "file2", ...})</h3>
 
-Asks the sound system to register a sound under a given name, with an 
-associated list of files (the list can be replaced by only one file).
+<p>Asks the sound system to register a sound under a given name, with an 
+  associated list of files (the list can be replaced by only one file).</p>
 
 <dl>
-<dt>name</dt>
-<dd>Name of the sound.
-</dd>
-<dt>file</dt>
-<dd>Name of the file or a list of files.
-</dd>
+  <dt>name</dt>
+  <dd>Name of the sound.</dd>
+  <dt>file</dt>
+  <dd>Name of the file or a list of files.</dd>
+  <dt><I>RETURNS</I></dt>
+  <dd>A SoundId object that represents the registered sound.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -116,16 +128,17 @@ MakeSound("basic human voices acknowledge",
 <a name="MakeSoundGroup"></a>
 <h3>MakeSoundGroup("name", "groupname1" or SoundId, "groupname2" or SoundId)</h3>
 
-Asks the sound system to build a special sound group.
-
+<p>Asks the sound system to build a special sound group.</p>
 
 <dl>
-<dt>name</dt>
-<dd>Name of the sound.
-</dd>
-<dt>group</dt>
-<dd>sound-id or string
-</dd>
+  <dt>name</dt>
+  <dd>Name of the sound.</dd>
+  <dt>group1</dt>
+  <dd>SoundId or string</dd>
+  <dt>group2</dt>
+  <dd>SoundId or string</dd>
+  <dt><I>RETURNS</I></dt>
+  <dd>A SoundId object that represents the sound group.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -139,15 +152,13 @@ MakeSoundGroup("footman-selected",
 <a name="MapSound"></a>
 <h3>MapSound("name", "sound")</h3>
 
-Ask the sound system to remap a sound id to a given name.
+<p>Asks the sound system to remap a sound id to a given name.</p>
 
 <dl>
-<dt>name</dt>
-<dd>Name of the sound.
-</dd>
-<dt>sound</dt>
-<dd>Sound to map to.
-</dd>
+  <dt>name</dt>
+  <dd>Name of the sound.</dd>
+  <dt>sound</dt>
+  <dd>Sound to map to: either a sound name (a string) or a SoundId.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -157,47 +168,65 @@ Ask the sound system to remap a sound id to a given name.
 MapSound("footman-acknowledge", "basic human voices acknowledge")
 </pre>
 
-<a name="PlayFile"></a>
-<h3>PlayFile("name")</h3>
-Play a sound file.
+<a name="PlaySoundFile"></a>
+<h3>PlaySoundFile("name" [, callback])</h3>
+
+<p>Plays a sound file.</p>
+
 <dl>
-<dt>name</dt>
-<dd>Name of the file to play.
-</dd>
+  <dt>name</dt>
+  <dd>Name of the file to play.</dd>
+  <dt>callback</dt>
+  <dd>An optional Lua function that the engine will call when the sound
+    finishes playing.</dd>
+  <dt><I>RETURNS</I></dt>
+  <dd>The channel number allocated for the sound, or -1 if no channels
+    are available.  The Lua script can pass this number to various
+    "Channel" functions to control the sound as it plays.</dd>
 </dl>
 
 <h4>Example</h4>
 <pre>
--- Play the file "spells/lightning.wav".
-PlayFile("spells/lightning.wav")
+-- Play the file "spells/lightning.wav", with no callback.
+PlaySoundFile("spells/lightning.wav")
 </pre>
 
-<a name="PlayMusic"></a>
-<h3>PlayMusic("name")</h3>
+<a name="PlayFile"></a>
+<h3>PlayFile("name" [, callback])</h3>
 
-Name of the music file to play.
+<p>Like <a href="#PlaySoundFile">PlaySoundFile</a>,
+  except the callback must be a LuaActionListener object.
+  Lua scripts should use PlaySoundFile instead.</p>
+
+<a name="PlayMusic"></a>
+<h3>PlayMusic("filename")</h3>
+
+<p>Plays music from the specified file.</p>
 
 <dl>
-<dt>name</dt>
-<dd>Name of the music file.
-</dd>
+  <dt>name</dt>
+  <dd>Name of the music file.</dd>
+  <dt><I>RETURNS</I></dt>
+  <dd>0 if it started playing music from the file.
+    -1 if music is disabled or an error occurred.</dd>
 </dl>
 
 <h4>Example</h4>
 <pre>
--- Plays the music file "music/default.mod".
-PlayMusic("music/default.mod")
+-- Plays the music file "music/default.ogg".
+PlayMusic("music/default.ogg")
 </pre>
 
 <a name="PlaySound"></a>
 <h3>PlaySound("name")</h3>
 
-Ask the sound system to play the specified sound.
+<p>Asks the sound system to play the specified sound.</p>
 
 <dl>
-<dt>"name"</dt>
-<dd>Name of the sound to play.
-</dd>
+  <dt>"name"</dt>
+  <dd>Name of the sound to play.</dd>
+  <dt><I>RETURNS</I></dt>
+  <dd>Nothing</dd>
 </dl>
 
 <h4>Example</h4>
@@ -209,11 +238,13 @@ PlaySound("basic human voices ready")
 <a name="SetGlobalSoundRange"></a>
 <h3>SetGlobalSoundRange(distance)</h3>
 
-Set the cut off distance.
+<p>Sets the cut off distance.</p>
+
 <dl>
-<dt>distance</dt>
-<dd>Max tile distance to hear sounds.
-</dd>
+  <dt>distance</dt>
+  <dd>Max tile distance to hear sounds.</dd>
+  <dt><I>RETURNS</I></dt>
+  <dd>Nothing</dd>
 </dl>
 
 <h4>Example</h4>
@@ -225,12 +256,14 @@ SetGlobalSoundRange(40)
 <a name="SetMusicVolume"></a>
 <h3>SetMusicVolume(volume)</h3>
 
-Set the music volume.
+<p>Sets the music volume.
+  <a href="#GetMusicVolume">GetMusicVolume</a> reads this setting back.</p>
 
 <dl>
-<dt>volume</dt>
-<dd>Number between 0 and MaxVolume.
-</dd>
+  <dt>volume</dt>
+  <dd>Number between 0 and MaxVolume.</dd>
+  <dt><I>RETURNS</I></dt>
+  <dd>Nothing</dd>
 </dl>
 
 <h4>Example</h4>
@@ -240,18 +273,29 @@ Set the music volume.
 SetMusicVolume(128)
 </pre>
 
+<a name="GetMusicVolume"></a>
+<h3>GetMusicVolume()</h3>
+
+<p>Gets the music volume.
+  <a href="#SetMusicVolume">SetMusicVolume</a> changes this setting.</p>
+
+<dl>
+  <dt><I>RETURNS</I></dt>
+  <dd>Number between 0 and MaxVolume.</dd>
+</dl>
+
 <a name="SetSoundRange"></a>
 <h3>SetSoundRange("name", distance)</h3>
 
-Set the range of a given sound.
+<p>Sets the range of a given sound.</p>
 
 <dl>
-<dt>name</dt>
-<dd>Name of the sound.
-</dd>
-<dt>distance</dt>
-<dd>Max tile distance to hear the sound.
-</dd>
+  <dt>name</dt>
+  <dd>Name or SoundId of the sound.</dd>
+  <dt>distance</dt>
+  <dd>Max tile distance to hear the sound.</dd>
+  <dt><I>RETURNS</I></dt>
+  <dd>The name or SoundId given as the first parameter.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -263,12 +307,14 @@ SetSoundRange("basic human voices ready", 20)
 <a name="SetEffectsVolume"></a>
 <h3>SetEffectsVolume(volume)</h3>
 
-Global volume support.
+<p>Sets the volume of sound effects.
+  <a href="#GetEffectsVolume">GetEffectsVolume</a> reads this setting back.</p>
 
 <dl>
-<dt>volume</dt>
-<dd>Number between 0 and MaxVolume.
-</dd>
+  <dt>volume</dt>
+  <dd>Number between 0 and MaxVolume.</dd>
+  <dt><I>RETURNS</I></dt>
+  <dd>Nothing</dd>
 </dl>
 
 <h4>Example</h4>
@@ -277,15 +323,27 @@ Global volume support.
 SetEffectsVolume(128)
 </pre>
 
+<a name="GetEffectsVolume"></a>
+<h3>GetEffectsVolume()</h3>
+
+<p>Gets the volume of sound effects.
+  <a href="#SetEffectsVolume">SetEffectsVolume</a> changes this setting.</p>
+
+<dl>
+  <dt><I>RETURNS</I></dt>
+  <dd>Number between 0 and MaxVolume.</dd>
+</dl>
+
 <a name="SoundForName"></a>
 <h3>SoundForName("name")</h3>
 
-Ask the sound system to associate a sound id to a sound name.
+<p>Asks the sound system to associate a sound id to a sound name.</p>
 
 <dl>
-<dt>name</dt>
-<dd>Name of the sound.
-</dd>
+  <dt>name</dt>
+  <dd>Name of the sound.</dd>
+  <dt><I>RETURNS</I></dt>
+  <dd>SoundId</dd>
 </dl>
 
 <h4>Example</h4>
@@ -293,40 +351,150 @@ Ask the sound system to associate a sound id to a sound name.
 <pre>
 SoundForName("peasant attack")
 </pre>
-<a name="SoundOff"></a>
-<h3>SoundOff()</h3>
 
-Turn off sound.
+<a name="SetEffectsEnabled"></a>
+<h3>SetEffectsEnabled(enabled)</h3>
 
-<h4>Example</h4>
+<p>Turns sound effects on or off.
+  <a href="#IsEffectsEnabled">IsEffectsEnabled</a> reads this setting back.</p>
 
-<pre>
--- Turns off sound.
-SoundOff()
-</pre>
-
-<a name="SoundOn"></a>
-<h3>SoundOn()</h3>
-
-Turn on sound.
+<dl>
+  <dt>enabled</dt>
+  <dd>true or false.</dd>
+  <dt><I>RETURNS</I></dt>
+  <dd>Nothing</dd>
+</dl>
 
 <h4>Example</h4>
 
 <pre>
--- Turns on sound.
-SoundOn()
+-- Turns on sound effects.
+SetEffectsEnabled(true)
 </pre>
+
+<a name="IsEffectsEnabled"></a>
+<h3>IsEffectsEnabled()</h3>
+
+<p>Checks whether sound effects are enabled.
+  <a href="#SetEffectsEnabled">SetEffectsEnabled</a> changes this setting.</p>
+
+<dl>
+  <dt><I>RETURNS</I></dt>
+  <dd>true or false</dd>
+</dl>
+
+<a name="SetMusicEnabled"></a>
+<h3>SetMusicEnabled(enabled)</h3>
+
+<p>Turns music on or off.
+  When music has been disabled with SetMusicEnabled(false),
+  <a href="#PlayMusic">PlayMusic</a> does nothing.
+  <a href="#IsMusicEnabled">IsMusicEnabled</a> reads this setting back.</p>
+
+<dl>
+  <dt>enabled</dt>
+  <dd>true or false.</dd>
+  <dt><I>RETURNS</I></dt>
+  <dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+-- Turns on music.
+SetMusicEnabled(true)
+</pre>
+
+<a name="IsMusicEnabled"></a>
+<h3>IsMusicEnabled()</h3>
+
+<p>Checks whether music is enabled.
+  <a href="#SetMusicEnabled">SetMusicEnabled</a> changes this setting.</p>
+
+<dl>
+  <dt><I>RETURNS</I></dt>
+  <dd>true or false</dd>
+</dl>
 
 <a name="StopMusic"></a>
 <h3>StopMusic()</h3>
 
-Stop playing music.
+<p>Stops playing music.
+  Unlike <a href="#SetMusicEnabled">SetMusicEnabled</a>(false), this
+  does not prevent <a href="#PlayMusic">PlayMusic</a> from starting
+  music again.</p>
+
+<dl>
+  <dt><I>RETURNS</I></dt>
+  <dd>Nothing</dd>
+</dl>
 
 <h4>Example</h4>
 <pre>
 -- Stop playing music.
 StopMusic()
 </pre>
+
+<a name="SetChannelVolume"></a>
+<h3>SetChannelVolume(channel, volume)</h3>
+
+<p>Sets the sound volume of the channel.</p>
+
+<dl>
+  <dt>channel</dt>
+  <dd>Channel number returned by <a href="#PlaySoundFile">PlaySoundFile</a>.</dd>
+  <dt>volume</dt>
+  <dd>The new sound volume of the channel.
+    Should be between 0 and MaxVolume.
+    If this parameter is negative, then SetChannelVolume
+    does not change the volume.
+    If this parameter is too large, then SetChannelVolume
+    uses MaxVolume instead.
+  <dt><I>RETURNS</I></dt>
+  <dd>The resulting sound volume of the channel,
+    or -1 if the channel number is out of range.</dd>
+</dl>
+
+
+<a name="SetChannelStereo"></a>
+<h3>SetChannelStereo(channel, stereo)</h3>
+
+<p>Sets the panning of the channel between the left and right outputs.</p>
+
+<dl>
+  <dt>channel</dt>
+  <dd>Channel number returned by <a href="#PlaySoundFile">PlaySoundFile</a>.</dd>
+  <dt>stereo</dt>
+  <dd>The new panning position of the channel.
+    -128 means left, 0 means center, and 127 means right.
+  <dt><I>RETURNS</I></dt>
+  <dd>The resulting panning position of the channel,
+    or -1 if the channel number is out of range.</dd>
+</dl>
+
+<a name="StopChannel"></a>
+<h3>StopChannel(channel)</h3>
+
+<p>Stops the sound playing in the specified channel.</p>
+
+<dl>
+  <dt>channel</dt>
+  <dd>Channel number returned by <a href="#PlaySoundFile">PlaySoundFile</a>.</dd>
+  <dt><I>RETURNS</I></dt>
+  <dd>Nothing</dd>
+</dl>
+
+<a name="StopAllChannels"></a>
+<h3>StopAllChannels()</h3>
+
+<p>Stops all sound effects currently playing.
+  Calls their callback functions, if any.
+  Does not stop music.</p>
+
+<dl>
+  <dt><I>RETURNS</I></dt>
+  <dd>Nothing</dd>
+</dl>
 
 <hr>
 All trademarks and copyrights on this page are owned by their respective owners.
