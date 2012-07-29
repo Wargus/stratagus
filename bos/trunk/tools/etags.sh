@@ -23,5 +23,5 @@
 # and "class GCN_EXTENSION_DECLSPEC SDLGraphics" unless we help it
 # with a regex.
 
-find . '(' -name "*.h" -o -name "*.cpp" -o -name "*.lua" ')' -print \
+find . -name mingwdeps -prune -o '(' -name "*.h" -o -name "*.cpp" -o -name "*.lua" ')' -print \
     | etags --regex='/[ \t]*class[ \t]+GCN_\w+_DECLSPEC[ \t]+\(\w+\)/\1/' -
