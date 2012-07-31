@@ -19,6 +19,7 @@
 -->
     <title>Bos Wars Scripting API: Config</title>
     <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <link rel="stylesheet" type="text/css" href="scripts.css">
 </head>
 <body>
     <h1>Bos Wars Scripting API: Config</h1>
@@ -125,10 +126,10 @@ and <a href="ui.html#UI.Resources">UI.Resources</a> tables.
 
 <h4>Example</h4>
 
-<pre>
-    -- Define Resource names
-    DefineDefaultResourceNames(
-        "energy", "magma")
+<pre class="lua">
+-- Define Resource names
+DefineDefaultResourceNames(
+  "energy", "magma")
 </pre>
 
 
@@ -156,9 +157,11 @@ each sprite in a separate call; the effect is the same either way.
 </dl>
 
 <h4>Example</h4>
-<pre>
-DefineSprites({Name = "sprite-health", File = "graphics/ui/health2.png", Offset = {0, -4}, Size = {31, 4}},
-    {Name = "sprite-mana", File = "graphics/ui/mana2.png", Offset = {0, -1}, Size = {31, 4}})
+
+<pre class="lua">
+DefineSprites(
+  {Name = "sprite-health", File = "graphics/ui/health2.png", Offset = {0, -4}, Size = {31, 4}},
+  {Name = "sprite-mana", File = "graphics/ui/mana2.png", Offset = {0, -1}, Size = {31, 4}})
 </pre>
 
 <a name="GetVideoFullScreen"></a>
@@ -173,9 +176,9 @@ Check if the game is in full screen or windowed mode.
 
 <h4>Example</h4>
 
-<pre>
-    -- Get Fullscreen
-    fullscreen = GetVideoFullScreen()
+<pre class="lua">
+-- Get Fullscreen
+fullscreen = GetVideoFullScreen()
 </pre>
 
 <a name="GetVideoResolution"></a>
@@ -190,9 +193,9 @@ Get the video resolution.
 
 <h4>Example</h4>
 
-<pre>
-    -- Get the video resolution
-    w,h = GetVideoResolution()
+<pre class="lua">
+-- Get the video resolution
+w,h = GetVideoResolution()
 </pre>
 
 <a name="DefineDecorations"></a>
@@ -234,12 +237,12 @@ Define how to show variables.
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 -- Equivalent of ShowHealthDot
 DefineDecorations({Index = "HitPoints", HideNeutral = true, CenterX = true,
   OffsetPercent = {50, 100}, Method = {"sprite", {"sprite-health"}}})
 </pre>
-
 
 <a name="RevealMap"></a>
 <h3>RevealMap()</h3>
@@ -250,9 +253,11 @@ Reveal the entire map.
 <dt><i>RETURNS</i></dt>
 <dd>Nothing</dd>
 </dl>
+
 <h4>Example</h4>
-<pre>
-    RevealMap()
+
+<pre class="lua">
+RevealMap()
 </pre>
 
 <a name="RightButtonAttacks"></a>
@@ -265,9 +270,11 @@ This cancels any previous <a href="#RightButtonMoves">RightButtonMoves</a>.
 <dt><i>RETURNS</i></dt>
 <dd>Nothing</dd>
 </dl>
+
 <h4>Example</h4>
-<pre>
-    RightButtonAttacks()
+
+<pre class="lua">
+RightButtonAttacks()
 </pre>
 
 <a name="RightButtonMoves"></a>
@@ -280,9 +287,11 @@ This cancels any previous <a href="#RightButtonAttacks">RightButtonAttacks</a>.
 <dt><i>RETURNS</i></dt>
 <dd>Nothing</dd>
 </dl>
+
 <h4>Example</h4>
-<pre>
-    RightButtonMoves()
+
+<pre class="lua">
+RightButtonMoves()
 </pre>
 
 <a name="SavePreferences"></a>
@@ -297,8 +306,9 @@ the <a href="#preferences">preferences</a> variable.
 </dl>
 
 <h4>Example</h4>
-<pre>
-    SavePreferences()
+
+<pre class="lua">
+SavePreferences()
 </pre>
 
 <a name="SetAllPlayersBuildingLimit"></a>
@@ -316,8 +326,9 @@ and this function changes them all to the same value.
 </dl>
 
 <h4>Example</h4>
-<pre>
-    SetAllPlayersBuildingLimit(200)
+
+<pre class="lua">
+SetAllPlayersBuildingLimit(200)
 </pre>
 
 <a name="SetAllPlayersUnitLimit"></a>
@@ -335,8 +346,9 @@ and this function changes them all to the same value.
 </dl>
 
 <h4>Example</h4>
-<pre>
-    SetAllPlayersUnitLimit(200)
+
+<pre class="lua">
+SetAllPlayersUnitLimit(200)
 </pre>
 
 <a name="SetAllPlayersTotalUnitLimit"></a>
@@ -354,8 +366,9 @@ and this function changes them all to the same value.
 </dl>
 
 <h4>Example</h4>
-<pre>
-    SetAllPlayersTotalUnitLimit(400)
+
+<pre class="lua">
+SetAllPlayersTotalUnitLimit(400)
 </pre>
 
 <a name="SetBuildingCapture"></a>
@@ -381,8 +394,9 @@ and the rescuable player types in <a href="mappresentation.html#DefinePlayerType
 </dl>
 
 <h4>Example</h4>
-<pre>
-  SetBuildingCapture(true)
+
+<pre class="lua">
+SetBuildingCapture(true)
 </pre>
 
 <a name="SetClickMissile"></a>
@@ -398,8 +412,9 @@ Sets the missile to use for displaying when a player clicks on a location on the
 </dl>
 
 <h4>Example</h4>
-<pre>
-    SetClickMissile("missile-green-cross")
+
+<pre class="lua">
+SetClickMissile("missile-green-cross")
 </pre>
 
 <a name="SetDamageMissile"></a>
@@ -418,8 +433,9 @@ Sets the missile to use for displaying the damage done to units.
 </dl>
 
 <h4>Example</h4>
-<pre>
-  SetDamageMissile("missile-hit")
+
+<pre class="lua">
+SetDamageMissile("missile-hit")
 </pre>
 
 <a name="SetDoubleClickDelay"></a>
@@ -433,7 +449,8 @@ Set the delay of double clicking the mouse.
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 SetDoubleClickDelay(300)
 </pre>
 
@@ -448,7 +465,8 @@ If true, enable fog of war.
 Set the graphics used to render the borders of the view of the units.
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
   SetFogOfWarGraphics("general/fog.png")
 </pre>
 
@@ -471,9 +489,9 @@ Enable/disable god Mode, you do 255 damage, and take 0 damage. You are still vul
 
 <h4>Example</h4>
 
-<pre>
-    -- Set God mode on
-    SetGodMode(true)
+<pre class="lua">
+-- Set God mode on
+SetGodMode(true)
 </pre>
 
 <a name="SetHoldClickDelay"></a>
@@ -482,8 +500,9 @@ Enable/disable god Mode, you do 255 damage, and take 0 damage. You are still vul
 for the wanted hold-click delay (in ms)..
 
 <h4>Example</h4>
-<pre>
-  SetHoldClickDelay(1000)
+
+<pre class="lua">
+SetHoldClickDelay(1000)
 </pre>
 
 <a name="SetKeyScroll"></a>
@@ -497,7 +516,8 @@ enable/disable keyboard scrolling.
 Enable/disable stopping scrolling on mouse leave.
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 SetLeaveStops(true)
 </pre>
 
@@ -518,7 +538,8 @@ on the next InitVideo call.</p>
 OpenGL, then Bos Wars uses the OpenGL limit instead.</p>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 SetMaxOpenGLTexture(512)
 </pre>
 
@@ -536,7 +557,8 @@ Set the maximum number of selectable units.
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 SetMaxSelectable(18)
 </pre>
 
@@ -564,9 +586,9 @@ Sets the speed of the mouse scrolling while control is pressed.
 
 <h4>Example</h4>
 
-<pre>
-    -- Set Mouse speed to 
-    SetMouseScrollSpeedControl(4)
+<pre class="lua">
+-- Set Mouse speed to 
+SetMouseScrollSpeedControl(4)
 </pre>
 
 <a name="SetMouseScrollSpeedDefault"></a>
@@ -583,9 +605,9 @@ Sets the speed of the mouse scrolling while the middle mouse button is pressed.
 
 <h4>Example</h4>
 
-<pre>
-    -- Set Speed Scroll to 5
-    SetMouseScrollSpeedDefault(5)
+<pre class="lua">
+-- Set Speed Scroll to 5
+SetMouseScrollSpeedDefault(5)
 </pre>
 
 <a name="SetSpeedBuild"></a>
@@ -603,9 +625,10 @@ Decrease the time to train a unit by this factor.
 
 Set all speeds.
 This is equivalent to
-<pre>
-  SetSpeedBuild(number)
-  SetSpeedTrain(number)
+
+<pre class="lua">
+SetSpeedBuild(number)
+SetSpeedTrain(number)
 </pre>
 
 <a name="SetTitleScreens"></a>
@@ -652,13 +675,13 @@ previously playing music.
 
 <h4>Example</h4>
 
-<pre>
-  -- This is the default title displayed.
-  SetTitleScreens(
-		{Image = "video/int_logo_stratagus.avi", Music =  "video/int_logo_stratagus.ogg",
-		Label = {{Text = "~white~Copyright &#xa9; 1998-2003 The Stratagus Project. All rights reserved.",
-                          Pos = {0, 45}, Flags = {"center"}}} },
-		{Image = "video/int_logo_bos.avi", Music =  "video/int_logo_bos.ogg"})
+<pre class="lua">
+-- This is the default title displayed.
+SetTitleScreens(
+  {Image = "video/int_logo_stratagus.avi", Music =  "video/int_logo_stratagus.ogg",
+   Label = {{Text = "~white~Copyright &#xa9; 1998-2003 The Stratagus Project. All rights reserved.",
+             Pos = {0, 45}, Flags = {"center"}}} },
+  {Image = "video/int_logo_bos.avi", Music =  "video/int_logo_bos.ogg"})
 </pre>
 
 <a name="SetVideoFullScreen"></a>
@@ -675,9 +698,9 @@ Sets the video to full screen or windowed mode
 
 <h4>Example</h4>
 
-<pre>
-    -- Set Fullscreen
-    SetVideoFullScreen(true)
+<pre class="lua">
+-- Set Fullscreen
+SetVideoFullScreen(true)
 </pre>
 
 <a name="SetVideoResolution"></a>
@@ -702,9 +725,9 @@ background images might not cover everything they should.</p>
 
 <h4>Example</h4>
 
-<pre>
-    -- Set Screen res to 1024x768
-    SetVideoResolution(1024, 768)
+<pre class="lua">
+-- Set Screen res to 1024x768
+SetVideoResolution(1024, 768)
 </pre>
 
 <a name="SetGroupKeys"></a>
@@ -748,12 +771,13 @@ will save it to disk.</p>
 
 <h4>Example</h4>
 For french azerty, use :
+
 <!-- Use &quot; rather than a plain double-quotation mark so that
      font-lock of GNU Emacs 23 won't think that the string ends
      there and that a new string begins at the real end.
      To browsers, it makes no difference.  -->
-<pre>
-    SetGroupKeys("&#xe0;&amp;&#xe9;\&quot;'(-&#xe8;_&#xe7;&#xb2;")
+<pre class="lua">
+SetGroupKeys("&#xe0;&amp;&#xe9;\&quot;'(-&#xe8;_&#xe7;&#xb2;")
 </pre>
 
 <h2>Variables</h2>
@@ -808,8 +832,8 @@ The values of the table are the percentages.</p>
 
 <h4>Example</h4>
 
-<pre>
-    AlliedUnitRecyclingEfficiency[MagmaCost] = 42
+<pre class="lua">
+AlliedUnitRecyclingEfficiency[MagmaCost] = 42
 </pre>
 
 <a name="EnemyUnitRecyclingEfficiency"></a>

@@ -19,6 +19,7 @@
 -->
     <title>Bos Wars Scripting API: Artificial Intelligence (AI)</title>
     <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <link rel="stylesheet" type="text/css" href="scripts.css">
 </head>
 <body>
     <h1>Bos Wars Scripting API: Artificial Intelligence (AI)</h1>
@@ -165,10 +166,10 @@ starting a new game.</p>
 <p>The engine does not currently preserve object identity when saving
 and loading a game.  That means, if the AI script does</p>
 
-<pre>
-   local x = {}
-   AiState[AiPlayer()].first = x
-   AiState[AiPlayer()].second = x
+<pre class="lua">
+local x = {}
+AiState[AiPlayer()].first = x
+AiState[AiPlayer()].second = x
 </pre>
 
 <p>then a comparison like
@@ -197,13 +198,13 @@ and reacts poorly to redefinitions.</p>
 
 <h4>Example</h4>
 
-<pre>
-    -- Defines the passive computer AI, which does nothing.
+<pre class="lua">
+-- Defines the passive computer AI, which does nothing.
 DefineAiType({
-	Ident = "ai-passive",
-	Name = _("Passive"),
-	Init = nil, -- which is the default anyway
-	EachSecond = function() end })
+  Ident = "ai-passive",
+  Name = _("Passive"),
+  Init = nil, -- which is the default anyway
+  EachSecond = function() end })
 </pre>
 
 <a name="DefineAiHelper"></a>
@@ -311,7 +312,7 @@ and what they can build and many other things that the AI must know.
 
 A minimal AI helper definition:
 
-<pre>
+<pre class="lua">
 DefineAiHelper(
   {"build", "unit-peasant", "unit-farm"},
   {"train", "unit-town-hall", "unit-peasant"},
@@ -347,15 +348,15 @@ slower units will attack.</i>
 
 <h4>Example</h4>
 
-<pre>
-   -- Force 0 is built with one assault unit. The script continues processing, when
-   -- the assault unit is ready. When ready, the script attacks the opponent
-   -- with force 0.
-   {
-     function() return AiForce(0, "unit-assault", 1) end,
-     function() return AiWaitForce(0) end,
-     function() return AiAttackWithForce(0) end
-   }
+<pre class="lua">
+-- Force 0 is built with one assault unit. The script continues processing, when
+-- the assault unit is ready. When ready, the script attacks the opponent
+-- with force 0.
+{
+  function() return AiForce(0, "unit-assault", 1) end,
+  function() return AiWaitForce(0) end,
+  function() return AiAttackWithForce(0) end
+}
 </pre>
 
 <a name="AiCheckForce"></a>
@@ -374,12 +375,12 @@ supported.
 
 <h4>Example</h4>
 
-<pre>
-    -- Force 0 is build with one assault. 
-    AiForce(0, "unit-assault", 1)
-    ...
-    -- If the force is ready, use it to attack.
-    if (AiCheckForce(0)) then AiAttackWithForce(0) end
+<pre class="lua">
+-- Force 0 is build with one assault. 
+AiForce(0, "unit-assault", 1)
+...
+-- If the force is ready, use it to attack.
+if (AiCheckForce(0)) then AiAttackWithForce(0) end
 </pre>
 
 <a name="AiDebug"></a>
@@ -400,9 +401,9 @@ Enable or disable the debug output of the AI script execution.
 
 <h4>Example</h4>
 
-<pre>
-    -- Prints now the commands of this computer player.
-    AiDebug(true)
+<pre class="lua">
+-- Prints now the commands of this computer player.
+AiDebug(true)
 </pre>
 
 <a name="AiDebugPlayer"></a>
@@ -418,8 +419,8 @@ Parameters are player number, or "self", for thisplayer.<br>
 
 <h4>Example</h4>
 
-<pre>
-    AiDebugPlayer("self")
+<pre class="lua">
+AiDebugPlayer("self")
 </pre>
 
 <a name="AiForce"></a>
@@ -460,11 +461,11 @@ each unit-type one after the other?</i>
 
 <h4>Example</h4>
 
-<pre>
-    -- First the force 0 is filled up with 4 assaults and 5 bazoos, after this
-    -- force 1 is filled with 3 assaults and 2 bazoos.
-    AiForce(0, "unit-assault", 4, "unit-bazoo", 5)
-    AiForce(1, "unit-assault", 3, "unit-bazoo", 2)
+<pre class="lua">
+-- First the force 0 is filled up with 4 assaults and 5 bazoos, after this
+-- force 1 is filled with 3 assaults and 2 bazoos.
+AiForce(0, "unit-assault", 4, "unit-bazoo", 5)
+AiForce(1, "unit-assault", 3, "unit-bazoo", 2)
 </pre>
 
 <a name="AiForceRole"></a>
@@ -489,9 +490,9 @@ supported.
 
 <h4>Example</h4>
 
-<pre>
-    -- Sets the role of force 0 to attack.
-    AiForceRole(0, "attack")
+<pre class="lua">
+-- Sets the role of force 0 to attack.
+AiForceRole(0, "attack")
 </pre>
 
 <a name="AiNeed"></a>
@@ -515,10 +516,10 @@ additional could be requested.
 
 <h4>Example</h4>
 
-<pre>
-  -- The magmapump must be build before a powerplant.
-  AiNeed("unit-magmapump")
-  AiNeed("unit-powerplant")
+<pre class="lua">
+-- The magmapump must be build before a powerplant.
+AiNeed("unit-magmapump")
+AiNeed("unit-powerplant")
 </pre>
 
 <a name="AiPlayer"></a>
@@ -529,13 +530,13 @@ This is often used for indexing the <a href="#AiState">AiState</a> table.
 
 <h4>Example</h4>
 
-<pre>
-    -- If the player of the running AI has insufficient magma
-    -- then build a magmapump:
-    player = AiPlayer()
-    if (Players[player].MagmaStored &lt; 300) then
-      AiNeed("unit-magmapump")
-    end
+<pre class="lua">
+-- If the player of the running AI has insufficient magma
+-- then build a magmapump:
+player = AiPlayer()
+if (Players[player].MagmaStored &lt; 300) then
+  AiNeed("unit-magmapump")
+end
 </pre>
 
 <a name="AiSet"></a>
@@ -564,9 +565,9 @@ modifies the last request to the new number.
 
 <h4>Example</h4>
 
-<pre>
-    --  Request two assault units.
-    AiSet("unit-assault", 2)
+<pre class="lua">
+-- Request two assault units.
+AiSet("unit-assault", 2)
 </pre>
 
 <a name="AiSleep"></a>
@@ -593,11 +594,11 @@ then "false" is returned.</p>
 
 <h4>Example</h4>
 
-<pre>
-    {
-      -- Wait 500 frames ~16s.
-      function() return AiSleep(500) end,
-    }
+<pre class="lua">
+{
+  -- Wait 500 frames ~16s.
+  function() return AiSleep(500) end,
+}
 </pre>
 
 <a name="AiWait"></a>
@@ -617,15 +618,15 @@ Don't forget to request a unit-type, before you wait on it.
 
 <h4>Example</h4>
 
-<pre>
-    {
-      -- Proceed only if an engineer is ready:
-      function() return AiNeed("unit-engineer") end,
-      function() return AiWait("unit-engineer") end,
-      -- Proceed only if two magmapumps are ready:
-      function() return AiSet("unit-magmapump", 2) end,
-      function() return AiWait("unit-magmapump") end,
-    }
+<pre class="lua">
+{
+  -- Proceed only if an engineer is ready:
+  function() return AiNeed("unit-engineer") end,
+  function() return AiWait("unit-engineer") end,
+  -- Proceed only if two magmapumps are ready:
+  function() return AiSet("unit-magmapump", 2) end,
+  function() return AiWait("unit-magmapump") end,
+}
 </pre>
 
 <a name="AiWaitForce"></a>
@@ -647,11 +648,11 @@ supported.
 
 <h4>Example</h4>
 
-<pre>
-    -- Force 0 is build with one assault unitn. The script continues processing, if the
-    -- unit is ready trained.
-    AiForce(0, "unit-assault", 1)
-    AiWaitForce(0)
+<pre class="lua">
+-- Force 0 is build with one assault unitn. The script continues processing, if the
+-- unit is ready trained.
+AiForce(0, "unit-assault", 1)
+AiWaitForce(0)
 </pre>
 
 <h2>Notes</h2>

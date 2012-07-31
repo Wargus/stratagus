@@ -19,6 +19,7 @@
 -->
     <title>Bos Wars Scripting API: Map Setup</title>
     <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <link rel="stylesheet" type="text/css" href="scripts.css">
 </head>
 <body>
     <h1>Bos Wars Scripting API: Map Setup</h1>
@@ -67,8 +68,8 @@ CenterMap for each player.
 
 <h4>Example</h4>
 
-<pre>
-    SetStartView(0, 20, 10)
+<pre class="lua">
+SetStartView(0, 20, 10)
 </pre>
 
 <a name="SetAiType"></a>
@@ -91,8 +92,8 @@ The name of the ai algorithm to use.
 
 <h4>Example</h4>
 
-<pre>
-    SetAiType(0, "ai-air")
+<pre class="lua">
+SetAiType(0, "ai-air")
 </pre>
 
 <a name="SetHeightMap"></a>
@@ -112,8 +113,8 @@ Note: This is for the new map format. Not implemented yet.
 
 <h4>Example</h4>
 
-<pre>
-    SetHeightMap("doomworld/doomworldheights.png")
+<pre class="lua">
+SetHeightMap("doomworld/doomworldheights.png")
 </pre>
 
 
@@ -125,13 +126,13 @@ by the x,y coordinates. SetTile can be called ingame for special effects.
 
 <h4>Example</h4>
 
-<pre>
-    -- Create a uniform desert of sand.
-    for i=0 to 32 do
-       for j=0 to 32 do
-          SetTile("sand", i, j)
-       end
-    end
+<pre class="lua">
+-- Create a uniform desert of sand.
+for i=0 to 32 do
+   for j=0 to 32 do
+      SetTile("sand", i, j)
+   end
+end
 </pre>
 
 
@@ -150,11 +151,11 @@ Note: This is for the new map format. Not implemented yet.
 
 <h4>Example</h4>
 
-<pre>
-   -- Load the full map from a file
-   SetTileMap("doomworld/doomworld.tmf", 0, 0, 64, 64)
-   -- Replace the middle square with a tilemap showing a volcano
-   SetTileMap("doomworld/volcano.tmf", 25, 25, 10, 10)
+<pre class="lua">
+-- Load the full map from a file
+SetTileMap("doomworld/doomworld.tmf", 0, 0, 64, 64)
+-- Replace the middle square with a tilemap showing a volcano
+SetTileMap("doomworld/volcano.tmf", 25, 25, 10, 10)
 </pre>
 
 <p>

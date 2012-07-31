@@ -19,6 +19,7 @@
 -->
     <title>Bos Wars Scripting API: Editor</title>
     <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <link rel="stylesheet" type="text/css" href="scripts.css">
 </head>
 <body>
     <h1>Bos Wars Scripting API: Editor</h1>
@@ -78,9 +79,10 @@ itself.</p>
 </dl>
 
 <h4>Example</h4>
-<pre>
-  -- Use "icon-editor-patch" for the map editor's patches icon.
-  SetEditorPatchIcon("unit-editor-patch")
+
+<pre class="lua">
+-- Use "icon-editor-patch" for the map editor's patches icon.
+SetEditorPatchIcon("unit-editor-patch")
 </pre>
 
 <a name="SetEditorSelectIcon"></a>
@@ -96,9 +98,10 @@ itself.</p>
 </dl>
 
 <h4>Example</h4>
-<pre>
-  -- Use "icon-human-patrol-land" for the editor's select icon.
-  SetEditorSelectIcon("icon-human-patrol-land")
+
+<pre class="lua">
+-- Use "icon-human-patrol-land" for the editor's select icon.
+SetEditorSelectIcon("icon-human-patrol-land")
 </pre>
 
 <a name="SetEditorUnitsIcon"></a>
@@ -117,9 +120,10 @@ itself.</p>
 </dl>
 
 <h4>Example</h4>
-<pre>
-  -- Use "icon-footman" for the map editor's units icon.
-  SetEditorUnitsIcon("unit-footman")
+
+<pre class="lua">
+-- Use "icon-footman" for the map editor's units icon.
+SetEditorUnitsIcon("unit-footman")
 </pre>
 
 <a name="SetEditorStartUnit"></a>
@@ -137,8 +141,9 @@ itself.</p>
 <p>See also <a href="#Editor.StartUnit">Editor.StartUnit</a>.</p>
 
 <h4>Example</h4>
-<pre>
-  SetEditorStartUnit("unit-start-location")
+
+<pre class="lua">
+SetEditorStartUnit("unit-start-location")
 </pre>
 
 <a name="StartEditor"></a>
@@ -234,16 +239,16 @@ itself.</p>
 
 <h5>Example</h5>
 
-<pre>
-  Editor.UnitTypes.clear()
-  Editor.UnitTypes.push_back("unit-vault")
-  Editor.UnitTypes.push_back("unit-apcs")
-  Editor.UnitTypes.push_back("unit-medic")
-  Editor.UnitTypes.push_back("unit-bazoo")
-  Editor.UnitTypes.push_back("unit-assault")
-  Editor.UnitTypes.push_back("unit-grenadier")
-  Editor.UnitTypes.push_back("unit-camp")
-  Editor.UnitTypes.push_back("unit-hosp")
+<pre class="lua">
+Editor.UnitTypes.clear()
+Editor.UnitTypes.push_back("unit-vault")
+Editor.UnitTypes.push_back("unit-apcs")
+Editor.UnitTypes.push_back("unit-medic")
+Editor.UnitTypes.push_back("unit-bazoo")
+Editor.UnitTypes.push_back("unit-assault")
+Editor.UnitTypes.push_back("unit-grenadier")
+Editor.UnitTypes.push_back("unit-camp")
+Editor.UnitTypes.push_back("unit-hosp")
 </pre>
 
 <a name="Editor.TileSelectedPatch"></a>

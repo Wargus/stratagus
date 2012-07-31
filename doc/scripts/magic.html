@@ -19,6 +19,7 @@
 -->
     <title>Bos Wars Scripting API: Magic</title>
     <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <link rel="stylesheet" type="text/css" href="scripts.css">
 </head>
 <body>
     <h1>Bos Wars: Magic</h1>
@@ -179,7 +180,7 @@ units belonging to the same player of the caster or to an ally.
 
 <h4>Example</h4>
 
-<pre>
+<pre class="lua">
 DefineMissileType("missile-fireball",
   { File = "missiles/fireball.png", Size = {32, 32}, Frames = 5, NumDirections = 5,
   ImpactSound = "fireball hit",
@@ -464,7 +465,8 @@ Here are the supported operations, their paramenters, and what they do.
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 DefineSpell("spell-healing",
 	"showname", "Healing",
 	"manacost", 6,

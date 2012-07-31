@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+n<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head>
 <!--
 ----	(c) Copyright 2002-2010 by Lutz Sammer, Russell Smith
@@ -19,6 +19,7 @@
 -->
     <title>Bos Wars Scripting API: User Interface (UI)</title>
     <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <link rel="stylesheet" type="text/css" href="scripts.css">
 </head>
 <body>
     <h1>Bos Wars Scripting API: User Interface (UI)</h1>
@@ -252,7 +253,8 @@ described in <a href="#text_formatting">Text formatting</a>.
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 DefineButton( { Pos = 8, Level = 0, Icon = "icon-build-advanced",
   Action = "button", Value = 2,
   Allowed = "check-units-or", AllowArg = {"unit-elven-lumber-mill", "unit-keep"},
@@ -308,7 +310,8 @@ Selected, Clicked, Disabled, or the Default setting. Possible tags:
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 DefineButtonStyle("main", {
   Size = {128, 20},
   Font = "game",
@@ -371,7 +374,8 @@ the engine how many milliseconds to hold each frame of the animation.
 Note: Name, File and Size must be filled.
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 DefineCursor({
   Name = "cursor-cross",
   File = "ui/cursors/small_green_cross.png",
@@ -394,7 +398,8 @@ scenarios.
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 -- Defines the viewports to use mode 1 (split horizontal) with the first
 -- viewport having map coordinates 82,31 and the second having coordinates 64,31.
 DefineViewports("mode", 1, "viewport", {82, 31},
@@ -410,7 +415,8 @@ Set the game cursor.
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 -- Set the game cursor to 'cursor-point'.
 SetGameCursor("cursor-point")
 </pre>

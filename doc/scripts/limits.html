@@ -19,6 +19,7 @@
 -->
     <title>Bos Wars Scripting API: Limits</title>
     <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <link rel="stylesheet" type="text/css" href="scripts.css">
 </head>
 <body>
     <h1>Bos Wars Scripting API: Limits</h1>
@@ -53,9 +54,9 @@ Define how many units of a given type each player can have.
 
 <h4>Example</h4>
 
-<pre>
-    -- Allow 1 assault unit for the 2nd player.
-    DefineUnitAllow("unit-assault", 0, 1, 0, 0, 0, 0, 0, 0, 0, 0)
+<pre class="lua">
+-- Allow 1 assault unit for the 2nd player.
+DefineUnitAllow("unit-assault", 0, 1, 0, 0, 0, 0, 0, 0, 0, 0)
 </pre>
 
 
@@ -82,9 +83,9 @@ Define which unit types are allowed for each player.
 
 <h4>Example</h4>
 
-<pre>
-    -- Allow assault units all players.
-    DefineAllow("unit-assault", "AAAAAAAAA")
+<pre class="lua">
+-- Allow assault units all players.
+DefineAllow("unit-assault", "AAAAAAAAA")
 </pre>
 
 
