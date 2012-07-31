@@ -19,6 +19,7 @@
 -->
     <title>Bos Wars Scripting API: UnitType</title>
     <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <link rel="stylesheet" type="text/css" href="scripts.css">
 </head>
 <body>
     <h1>Bos Wars Scripting API: UnitType</h1>
@@ -102,9 +103,11 @@ tries to automatically choose a frame that faces the correct direction.</p>
   </tr>
 </table>
 
-<blockquote><pre><a href="#DefineAnimations">DefineAnimations</a>("animations-example", {
+<pre class="lua">
+<a href="#DefineAnimations">DefineAnimations</a>("animations-example", {
     Still = {"frame 0", &hellip;},
-    Death = {&hellip;, "frame 8", &hellip;, "frame 16", &hellip;}})</pre></blockquote>
+    Death = {&hellip;, "frame 8", &hellip;, "frame 16", &hellip;}})
+</pre>
 
 <p>To save effort and memory, the frames that face the west can be
 omitted from the graphic file.  The engine will then generate them
@@ -174,9 +177,11 @@ Each flipped frame has a negative number that the engine computes as
   </tr>
 </table>
 
-<blockquote><pre><a href="#DefineAnimations">DefineAnimations</a>("animations-example", {
+<pre class="lua">
+<a href="#DefineAnimations">DefineAnimations</a>("animations-example", {
     Still = {"frame 0", &hellip;},
-    Death = {&hellip;, "frame 5", &hellip;, "frame 10", &hellip;}})</pre></blockquote>
+    Death = {&hellip;, "frame 5", &hellip;, "frame 10", &hellip;}})
+</pre>
 
 <p>In missiles, the engine always numbers frames as if
 <a href="magic.html#DefineMissileType.Flip">Flip</a> were true.</p>
@@ -236,11 +241,12 @@ Each flipped frame has a negative number that the engine computes as
   </tr>
 </table>
 
-<blockquote><pre><a href="magic.html#DefineMissileType">DefineMissileType</a>("missile-example", {
+<pre class="lua"><a href="magic.html#DefineMissileType">DefineMissileType</a>("missile-example", {
     Flip = false,
     NumDirections = 8,
     Frames = 3*5,       -- Not 3*8, even though all frames are in the file.
-    &hellip;})</pre></blockquote>
+    &hellip;})
+</pre>
 
 <h2>Functions</h2>
 <a name="DefineAnimations"></a>
@@ -288,7 +294,7 @@ animation.</dd>
 
 <h4>Example</h4>
 
-<pre>
+<pre class="lua">
 DefineAnimations("animations-footman", {
   Still = {"frame 0", "wait 4", "frame 0", "wait 1",},
   Move = {"unbreakable begin", "frame 0", "move 3", "wait 2", "frame 5", "move 3", "wait 1",
@@ -377,8 +383,9 @@ The predefined values are :
 </dl>
 
 <h4>Example</h4>
-<pre>
-    DefineVariable("cooldown", {Value = 0, Increase = -1, Max = 50, Enable = false})
+
+<pre class="lua">
+DefineVariable("cooldown", {Value = 0, Increase = -1, Max = 50, Enable = false})
 </pre>
 
 <a name="DefineUnitType"></a>
@@ -894,7 +901,8 @@ for the minimap color, and will force this. It takes a number from the palette h
 
 <h4>Example</h4>
 Sorry, but due to the huge number of available flags we can only show a limited example.
-<pre>
+
+<pre class="lua">
 DefineUnitType("unit-footman", { Name = "Footman",
   Image = {"file", "alliance/units/footman.png", "size", {72, 72}},
   Animations = "animations-footman", Icon = "icon-footman",

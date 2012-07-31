@@ -19,6 +19,7 @@
 -->
     <title>Bos Wars Scripting API: Icon</title>
     <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <link rel="stylesheet" type="text/css" href="scripts.css">
 </head>
 <body>
     <h1>Bos Wars Scripting API: Sound</h1>
@@ -81,7 +82,7 @@
 
 <h4>Example</h4>
 
-<pre>
+<pre class="lua">
 --	Define sounds used by game
 --
 DefineGameSounds(
@@ -114,7 +115,7 @@ DefineGameSounds(
 
 <h4>Example</h4>
 
-<pre>
+<pre class="lua">
 -- Makes the sounds "lightning" and "basic human voices acknowledge".
 MakeSound("lightning", "spells/lightning.wav")
 
@@ -143,7 +144,7 @@ MakeSound("basic human voices acknowledge",
 
 <h4>Example</h4>
 
-<pre>
+<pre class="lua">
 --	Define selection sound groups.
 MakeSoundGroup("footman-selected",
 	"basic human voices selected", "basic human voices annoyed")
@@ -163,7 +164,7 @@ MakeSoundGroup("footman-selected",
 
 <h4>Example</h4>
 
-<pre>
+<pre class="lua">
 -- Maps the name "footman-acknowledge" to "basic human voices acknowledge".
 MapSound("footman-acknowledge", "basic human voices acknowledge")
 </pre>
@@ -186,7 +187,8 @@ MapSound("footman-acknowledge", "basic human voices acknowledge")
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 -- Play the file "spells/lightning.wav", with no callback.
 PlaySoundFile("spells/lightning.wav")
 </pre>
@@ -212,7 +214,8 @@ PlaySoundFile("spells/lightning.wav")
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 -- Plays the music file "music/default.ogg".
 PlayMusic("music/default.ogg")
 </pre>
@@ -230,7 +233,8 @@ PlayMusic("music/default.ogg")
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 -- Play the sound "basic human voices ready".
 PlaySound("basic human voices ready")
 </pre>
@@ -248,7 +252,8 @@ PlaySound("basic human voices ready")
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 -- Set the sound range to 40.
 SetGlobalSoundRange(40)
 </pre>
@@ -268,7 +273,7 @@ SetGlobalSoundRange(40)
 
 <h4>Example</h4>
 
-<pre>
+<pre class="lua">
 -- Set the music volume to 128.
 SetMusicVolume(128)
 </pre>
@@ -299,7 +304,8 @@ SetMusicVolume(128)
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 -- Set the range of the sound "basic human voices ready" to 20.
 SetSoundRange("basic human voices ready", 20)
 </pre>
@@ -318,7 +324,8 @@ SetSoundRange("basic human voices ready", 20)
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 -- Set the sound volume to 128.
 SetEffectsVolume(128)
 </pre>
@@ -348,7 +355,7 @@ SetEffectsVolume(128)
 
 <h4>Example</h4>
 
-<pre>
+<pre class="lua">
 SoundForName("peasant attack")
 </pre>
 
@@ -367,7 +374,7 @@ SoundForName("peasant attack")
 
 <h4>Example</h4>
 
-<pre>
+<pre class="lua">
 -- Turns on sound effects.
 SetEffectsEnabled(true)
 </pre>
@@ -400,7 +407,7 @@ SetEffectsEnabled(true)
 
 <h4>Example</h4>
 
-<pre>
+<pre class="lua">
 -- Turns on music.
 SetMusicEnabled(true)
 </pre>
@@ -430,7 +437,8 @@ SetMusicEnabled(true)
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 -- Stop playing music.
 StopMusic()
 </pre>

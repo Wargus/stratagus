@@ -19,6 +19,7 @@
 -->
     <title>Bos Wars Spripting API: Map Presentation</title>
     <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <link rel="stylesheet" type="text/css" href="scripts.css">
 </head>
 <body>
     <h1>Bos Wars Scripting API: Map Presentation</h1>
@@ -69,8 +70,8 @@ This page documents map presentation functions.
 
 <h4>Example</h4>
 
-<pre>
-    PresentMap("Doom World", 4, 64, 64)
+<pre class="lua">
+PresentMap("Doom World", 4, 64, 64)
 </pre>
 
 <a name="SetMapMiniImage"></a>
@@ -89,8 +90,8 @@ Note: This is for the new map format. Not implemented yet.
 
 <h4>Example</h4>
 
-<pre>
-    SetMiniImage("doomworld/doomworld.png")
+<pre class="lua">
+SetMiniImage("doomworld/doomworld.png")
 </pre>
 
 <a name="DefinePlayerTypes"></a>
@@ -108,8 +109,8 @@ Define the number of players and their type on the map. Possible values for play
 
 <h4>Example</h4>
 
-<pre>
-    DefinePlayerTypes("person", "person")
+<pre class="lua">
+DefinePlayerTypes("person", "person")
 </pre>
 
 <a name="DefineMapSetup"></a>
@@ -119,8 +120,8 @@ Define the map setup file that will be loaded if the player starts a game with t
 
 <h4>Example</h4>
 
-<pre>
-    DefineMapSetup("doomworld/doomworld.map")
+<pre class="lua">
+DefineMapSetup("doomworld/doomworld.map")
 </pre>
 
 
@@ -137,8 +138,8 @@ Note: This is for the new map format. Not implemented yet.
 
 <h4>Example</h4>
 
-<pre>
-    tileset = GetMapOption("tileset")
+<pre class="lua">
+tileset = GetMapOption("tileset")
 </pre>
 
 
@@ -156,10 +157,10 @@ Note: This is for the new map format. Not implemented yet.
 
 <h4>Example</h4>
 
-<pre>
-   DefineMapOption("Resources", {"Map default", "Low", "Medium", "High"})
-   DefineMapOption("Difficulty", {"finger in the nose", "easy", "mission impossible"})
-   DefineMapOption("TileSet", {"desert", "winter", "forest"})
+<pre class="lua">
+DefineMapOption("Resources", {"Map default", "Low", "Medium", "High"})
+DefineMapOption("Difficulty", {"finger in the nose", "easy", "mission impossible"})
+DefineMapOption("TileSet", {"desert", "winter", "forest"})
 </pre>
 
 <p>

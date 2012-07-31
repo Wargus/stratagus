@@ -19,6 +19,7 @@
 -->
     <title>Bos Wars Scripting API: Triggers</title>
     <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <link rel="stylesheet" type="text/css" href="scripts.css">
 </head>
 <body>
     <h1>Bos Wars Scripting API: Triggers</h1>
@@ -60,7 +61,8 @@ The player lose the game.
 
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 -- Adds a trigger. If the player on the console has 0 units then he loses.
 AddTrigger(
   function() return IfUnit("this", "==", 0, "all") end,
@@ -87,7 +89,8 @@ Set the timer.
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 -- Sets the timer to 9000 cycles (300 seconds or 5 minutes) and decreasing.
 ActionSetTimer(9000, 0)
 </pre>
@@ -110,7 +113,8 @@ Stop the timer.
 The condition player is set to victory.
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 -- Adds a trigger. If the player on the console has killed all his 
 -- opponents he won.
 AddTrigger(
@@ -135,7 +139,8 @@ Creates a new trigger.
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 -- Adds a trigger. If the player on the console has killed all his 
 -- opponents he won.
 AddTrigger(
@@ -179,7 +184,8 @@ unit-name    Unit type of this name
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 -- true when the player on the console has 6 archers near one of his/her circle of power.
 IfNearUnit("this", "==", 6, "unit-archer", "unit-circle-of-power")
 </pre>
@@ -197,7 +203,8 @@ Returns the number of opponent's for the given player.
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 -- You win when you have no opponents left.
 if (GetNumOpponents(ThisPlayer.Index) == 0) then
      ActionVictory()
@@ -239,7 +246,8 @@ unit-name    Unit type of this name
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 -- True when The player on the console has 1 rescued archer near the circle of power.
 IfRescuedNearUnit("this", "==", 1, "unit-archer", "unit-circle-of-power")
 </pre>
@@ -251,7 +259,8 @@ IfRescuedNearUnit("this", "==", 1, "unit-archer", "unit-circle-of-power")
 Return the number of cycles the timer ran.
  
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 -- True when the timer is at 17 cycles.
 time = GetTimer() == 17
 </pre>
@@ -282,7 +291,8 @@ unit-name    Unit type of this name
 </dl>
 
 <h4>Example</h4>
-<pre>
+
+<pre class="lua">
 -- True when the player on the console has at least 8 archers in the rectangle
 -- (10 10) to (12 14).
 GetNumUnitsAt(ThisPlayer.Index, "unit-archer", {10, 10}, {12, 14}) >= 8
