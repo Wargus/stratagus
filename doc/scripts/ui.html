@@ -446,27 +446,37 @@ should try to handle the key in some other way.</dd>
 <a name="UI"></a>
 <h3>UI</h3>
 
-<p>This variable refers to an object that has at least the following properties:</p>
+<p>This variable refers to an object that has at least the following properties:
+<a href="#UI.ButtonPanel.ShowCommandKey">ButtonPanel.ShowCommandKey</a>
+<a href="#UI.ReverseFontColor">ReverseFontColor</a>
+<a href="#UI.Resources">Resources</a>
+</p>
 
-<dl>
-  <dt>UI.ButtonPanel.ShowCommandKey = boolean</dt>
-  <dd>Enable/disable the display of the command keys in buttons.</dd>
-  <dt id="UI.ReverseFontColor">UI.ReverseFontColor = string</dt>
-  <dd>The name of the font color generally used for highlighting
-    in <a href="#text_formatting">text formatting</a>.
-    The font color must be defined with
-    <a href="#CFontColor.New">CFontColor:New</a>.</dd>
-  <dt id="UI.Resources">UI.Resources = table</dt>
-  <dd>How the engine displays the resource costs of a command.
-    This table contains a <a href="#CCResourceInfo">CResourceInfo</a>
-    instance for each type of resource.
-    The indices of the table are resource type identifiers,
-    i.e. integers between 0 and <a href="#MaxCosts">MaxCosts</a>-1
-    (even though indices typically start from 1 in Lua).</dd>
-</dl>
+<p>Do not change the UI variable itself from Lua, even
+though the engine may allow that.</p>
 
-<p>Do not change the UI variable itself from Lua, even though the
-engine may allow that.</p>
+<a name="UI.ButtonPanel.ShowCommandKey"></a>
+<h4>UI.ButtonPanel.ShowCommandKey = boolean</h4>
+
+<p>Enable/disable the display of the command keys in buttons.</p>
+
+<a name="UI.ReverseFontColor"></a>
+<h4>UI.ReverseFontColor = string</h4>
+
+<p>The name of the font color generally used for highlighting
+in <a href="#text_formatting">text formatting</a>.
+The font color must be defined with
+<a href="#CFontColor.New">CFontColor:New</a>.</p>
+
+<a name="UI.Resources"></a>
+<h4>UI.Resources = table</h4>
+
+<p>How the engine displays the resource costs of a command.
+This table contains a <a href="#CResourceInfo">CResourceInfo</a>
+instance for each type of resource.  The indices of the table are
+<a href="config.html#resource_type_identifiers">resource type identifiers</a>,
+i.e. integers between 0 and <a href="config.html#MaxCosts">MaxCosts</a>-1
+(even though indices typically start from 1 in Lua).</p>
 
 <h2>Types</h2>
 
@@ -519,20 +529,23 @@ in <a href="#text_formatting">text formatting</a>.</p>
 <p>In the following subsections, <var>fontColor</var> denotes
 a CFontColor instance.</p>
 
-<h4 id="CFontColor.Colors"><var>fontColor</var>.Colors</h4>
+<a name="CFontColor.Colors"></a>
+<h4><var>fontColor</var>.Colors</h4>
 
 <p>An array of <a href="#CColor">CColor</a> instances.
 There are <a href="#MaxFontColors">MaxFontColors</a> elements in the array.
 The engine ignores the alpha component of these CColor instances.</p>
 
-<h4 id="CFontColor.Get">CFontColor:Get("name")</h4>
+<a name="CFontColor.Get"></a>
+<h4>CFontColor:Get("name")</h4>
 
 <p>Finds a font color by name.
 Returns a <a href="#CFontColor">CFontColor</a> instance if found.
 If no such font color has been defined, which indicates a bug,
 then this function returns nil instead.</p>
 
-<h4 id="CFontColor.New">CFontColor:New("name")</h4>
+<a name="CFontColor.New"></a>
+<h4>CFontColor:New("name")</h4>
 
 <p>Finds a font color by name, or allocates a new one.
 Returns a <a href="#CFontColor">CFontColor</a> instance.
@@ -556,28 +569,28 @@ instances.</p>
   a command.  Each CResourceInfo instance has the following properties:</p>
 
 <dl>
-  <dt>G</dt>
+  <dt><a name="CResourceInfo.G">G</a></dt>
   <dd>The <a href="#CGraphic">CGraphic</a> instance
     that contains the resource icon.</dd>
-  <dt>IconFrame</dt>
+  <dt><a name="CResourceInfo.IconFrame">IconFrame</a></dt>
   <dd>The frame number of the resource icon within the graphic.
     See <a href="unittype.html#frame_numbers">Frame numbers and flipping</a>.</dd>
-  <dt>IconX</dt>
+  <dt><a name="CResourceInfo.IconX">IconX</a></dt>
   <dd><em>Obsolete since r8638 (2007-03-28):
       The coordinates are hardcoded.</em>
     The X coordinate of the resource icon on the screen,
     for resources held by the player.</dd>
-  <dt>IconY</dt>
+  <dt><a name="CResourceInfo.IconY">IconY</a></dt>
   <dd><em>Obsolete since r8638 (2007-03-28):
       The coordinates are hardcoded.</em>
     The Y coordinate of the resource icon on the screen,
     for resources held by the player.</dd>
-  <dt>TextX</dt>
+  <dt><a name="CResourceInfo.TextX">TextX</a></dt>
   <dd><em>Obsolete since r8638 (2007-03-28):
       The coordinates are hardcoded.</em>
     The X coordinate of the text that describes the amount
     of resource held by the player.</dd>
-  <dt>TextY</dt>
+  <dt><a name="CResourceInfo.TextY">TextY</a></dt>
   <dd><em>Obsolete since r8638 (2007-03-28):
       The coordinates are hardcoded.</em>
     The Y coordinate of the text that describes the amount
@@ -596,7 +609,8 @@ instances.</p>
 <p>In the following subsections, <var>graphic</var> denotes
   a CGraphic instance.</p>
 
-<h4 id="CGraphic.New">CGraphic:New("filename", [width], [height])</h4>
+<a name="CGraphic.New"></a>
+<h4>CGraphic:New("filename", [width], [height])</h4>
 
 <p>Creates a CGraphic instance that refers to the specified image file,
   unless one exists already.</p>
@@ -620,7 +634,8 @@ instances.</p>
     will have to be called.</dd>
 </dl>
 
-<h4 id="CGraphic.Free">CGraphic:Free(graphic)</h4>
+<a name="CGraphic.Free"></a>
+<h4>CGraphic:Free(graphic)</h4>
 
 <p>Decrements the reference count of a CGraphic instance,
   and frees it if the reference count becomes zero.</p>
@@ -637,7 +652,8 @@ instances.</p>
   <dd>Nothing.</dd>
 </dl>
 
-<h4 id="CGraphic.Load"><var>graphic</var>:Load()</h4>
+<a name="CGraphic.Load"></a>
+<h4><var>graphic</var>:Load()</h4>
 
 <p>Loads the graphic from the image file whose name was given
   to <a href="#CGraphic.New">CGraphic:New</a>, unless it has
@@ -650,7 +666,8 @@ instances.</p>
   <dd>Nothing.</dd>
 </dl>
 
-<h4 id="CGraphic.Resize"><var>graphic</var>:Resize(width, height)</h4>
+<a name="CGraphic.Resize"></a>
+<h4><var>graphic</var>:Resize(width, height)</h4>
 
 <p>Resizes the graphic to the specified size.
   Because <a href="#CGraphic.New">CGraphic:New</a> returns
