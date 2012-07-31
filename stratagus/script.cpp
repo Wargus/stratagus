@@ -271,7 +271,10 @@ int LuaLoadFile(const std::string &file)
 		return -1;
 	}
 
-	if (!(status = luaL_loadbuffer(Lua, buf.c_str(), buf.size(), file.c_str()))) {
+	// "@" at the beginning of the chunk name makes Lua format
+	// it as a file name in backtraces.
+	if (!(status = luaL_loadbuffer(Lua, buf.c_str(), buf.size(),
+				       ('@' + file).c_str()))) {
 		LuaCall(0, 1);
 	} else {
 		report(status, true);
