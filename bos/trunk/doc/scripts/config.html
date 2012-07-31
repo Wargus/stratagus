@@ -824,31 +824,45 @@ buildings.</p>
 <a name="Preference"></a>
 <h3>Preference</h3>
 
-<p>This variable refers to an object that has the following properties:</p>
+<p>This variable refers to an object that has the following properties:
+<a href="#Preference.ShowAttackRange">ShowAttackRange</a>
+<a href="#Preference.ShowReactionRange">ShowReactionRange</a>
+<a href="#Preference.ShowSightRange">ShowSightRange</a>
+<a href="#Preference.ShowOrders">ShowOrders</a>
+</p>
 
-<dl>
-  <dt id="Preference.ShowAttackRange">Preference.ShowAttackRange = <var>boolean</var></dt>
-  <dd>Whether to show the attack range of the selected unit as a red circle.
-    See the <a href="unittype.html#variable.AttackRange">AttackRange</a> variable.</dd>
-  <dt id="Preference.ShowReactionRange">Preference.ShowReactionRange = <var>boolean</var></dt>
-  <dd>Whether to show the reaction range of the selected unit as a blue circle.
-    See the <a href="unittype.html#DefineUnitType.ComputerReactionRange">ComputerReactionRange</a>
-    and <a href="unittype.html#DefineUnitType.PersonReactionRange">PersonReactionRange</a>
-    parameters of DefineUnitType.</dd>
-  <dt id="Preference.ShowSightRange">Preference.ShowSightRange = <var>boolean</var></dt>
-  <dd>Whether to show the sight range of the selected unit as a green circle.
-    See the <a href="unittype.html#variable.SightRange">SightRange</a> variable.</dd>
-  <dt>Preference.ShowOrders = <var>integer</var></dt>
-  <dd>How long to show the orders of selected units on the map,
-    after the player gives an order.  Measured in seconds.
-    If this is negative, or the player presses the Shift key,
-    then the engine shows the orders no matter how old they are.</dd>
-</dl>
+<a name="Preference.ShowAttackRange"></a>
+<h4>Preference.ShowAttackRange = boolean</h4>
 
-<p>Even if the ShowSightRange, ShowReactionRange, and ShowAttackRange
+<p>Whether to show the attack range of the selected unit as a red circle.
+See the <a href="unittype.html#variable.AttackRange">AttackRange</a> variable.</p>
+
+<p>Even if the ShowAttackRange, ShowReactionRange, and ShowSightRange
 properties are false, the player can display the ranges by holding the
 left mouse button for a moment.  In any case, the game never shows
 ranges if the player has selected more than one unit.</p>
+
+<a name="Preference.ShowReactionRange"></a>
+<h4>Preference.ShowReactionRange = boolean</h4>
+
+<p>Whether to show the reaction range of the selected unit as a blue circle.
+See the <a href="unittype.html#DefineUnitType.ComputerReactionRange">ComputerReactionRange</a>
+and <a href="unittype.html#DefineUnitType.PersonReactionRange">PersonReactionRange</a>
+parameters of DefineUnitType.</p>
+
+<a name="Preference.ShowSightRange"></a>
+<h4>Preference.ShowSightRange = boolean</h4>
+
+<p>Whether to show the sight range of the selected unit as a green circle.
+See the <a href="unittype.html#variable.SightRange">SightRange</a> variable.</p>
+
+<a name="Preference.ShowOrders"></a>
+<h4>Preference.ShowOrders = integer</h4>
+
+<p>How long to show the orders of selected units on the map,
+after the player gives an order.  Measured in seconds.
+If this is negative, or the player presses the Shift key,
+then the engine shows the orders no matter how old they are.</p>
 
 <a name="preferences"></a>
 <h3>preferences</h3>
