@@ -127,11 +127,15 @@ function HandleCheats(str)
       count = 9
     end
 
-    local tilex = UI.MouseViewport:Viewport2MapX(CursorX)
-    local tiley = UI.MouseViewport:Viewport2MapY(CursorY)
+    if UI.MouseViewport == nil then
+      AddMessage("Cannot give you units until you point at a location.")
+    else
+      local tilex = UI.MouseViewport:Viewport2MapX(CursorX)
+      local tiley = UI.MouseViewport:Viewport2MapY(CursorY)
 
-    for i = 1, count do
-      CreateUnit(unittype, "this", {tilex, tiley})
+      for i = 1, count do
+        CreateUnit(unittype, "this", {tilex, tiley})
+      end
     end
 
     AddMessage("Cheater!")
