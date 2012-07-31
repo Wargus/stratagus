@@ -74,6 +74,7 @@ This page documents map presentation functions.
 PresentMap("Doom World", 4, 64, 64)
 </pre>
 
+<div class="nyi">
 <a name="SetMapMiniImage"></a>
 <h3>SetMapMiniImage(mapimage)</h3>
 
@@ -93,6 +94,7 @@ Note: This is for the new map format. Not implemented yet.
 <pre class="lua">
 SetMiniImage("doomworld/doomworld.png")
 </pre>
+</div>
 
 <a name="DefinePlayerTypes"></a>
 <h3>DefinePlayerTypes(player1, player2, ...)</h3>
@@ -124,7 +126,7 @@ Define the map setup file that will be loaded if the player starts a game with t
 DefineMapSetup("doomworld/doomworld.map")
 </pre>
 
-
+<div class="nyi">
 <a name="GetMapOption"></a>
 <h3>GetMapOption(name)</h3>
 
@@ -141,8 +143,9 @@ Note: This is for the new map format. Not implemented yet.
 <pre class="lua">
 tileset = GetMapOption("tileset")
 </pre>
+</div>
 
-
+<div class="nyi">
 <a name="DefineMapOption"></a>
 <h3>DefineMapOption(name, {possible-values})</h3>
 <dl>
@@ -162,8 +165,7 @@ DefineMapOption("Resources", {"Map default", "Low", "Medium", "High"})
 DefineMapOption("Difficulty", {"finger in the nose", "easy", "mission impossible"})
 DefineMapOption("TileSet", {"desert", "winter", "forest"})
 </pre>
-
-<p>
+</div>
 
 <hr>
 All trademarks and copyrights on this page are owned by their respective owners.

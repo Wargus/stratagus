@@ -219,8 +219,8 @@ and what they can build and many other things that the AI must know.
 <dt>list</dt>
 <dd>A list of features:
   <dl>
-    <dt><code>{"build", <var>builder-type</var>, <var>building-type-1</var>, ... <var>building-type-n</var>}</code></dt>
-    <dd>
+    <dt class="obsolete"><code>{"build", <var>builder-type</var>, <var>building-type-1</var>, ... <var>building-type-n</var>}</code></dt>
+    <dd class="obsolete">
       <em>Obsolete since r8101 (2006-06-21):
 	Ignored.  The AI instead gets this information from
 	<a href="ui.html#DefineButton">DefineButton</a> calls
@@ -237,8 +237,8 @@ and what they can build and many other things that the AI must know.
       <b>Note:</b> If more units can build the same buildings
       you need the same list for all units.
     </dd>
-    <dt><code>{"train", <var>trainer-type</var>, <var>unit-type-1</var>, ... <var>unit-type-n</var>}</code></dt>
-    <dd>
+    <dt class="obsolete"><code>{"train", <var>trainer-type</var>, <var>unit-type-1</var>, ... <var>unit-type-n</var>}</code></dt>
+    <dd class="obsolete">
       <em>Obsolete since r8101 (2006-06-21):
 	Ignored.  The AI instead gets this information from
 	<a href="ui.html#DefineButton">DefineButton</a> calls
@@ -255,8 +255,8 @@ and what they can build and many other things that the AI must know.
       <b>Note:</b> If more units can train the same unit
       you need the same list for all units.
     </dd>
-    <dt><code>{"repair", <var>worker-type</var>, <var>unit-type-1</var>, ... <var>unit-type-n</var>}</code></dt>
-    <dd>
+    <dt class="obsolete"><code>{"repair", <var>worker-type</var>, <var>unit-type-1</var>, ... <var>unit-type-n</var>}</code></dt>
+    <dd class="obsolete">
       <em>Obsolete since r8101 (2006-06-21):
 	Ignored.  The AI instead gets this information from
 	<a href="ui.html#DefineButton">DefineButton</a> calls
@@ -289,8 +289,8 @@ and what they can build and many other things that the AI must know.
 	</dd>
       </dl>
     </dd>
-    <dt><code>{"unit-limit", <var>unit-type</var>, <var>resource</var>}</code></dt>
-    <dd>
+    <dt class="obsolete"><code>{"unit-limit", <var>unit-type</var>, <var>resource</var>}</code></dt>
+    <dd class="obsolete">
       <em>Obsolete since r8101 (2006-06-21) and r8658 (2007-04-01):
 	Ignored.  The engine no longer limits the number of units
 	according to resources.</em>
@@ -383,6 +383,7 @@ AiForce(0, "unit-assault", 1)
 if (AiCheckForce(0)) then AiAttackWithForce(0) end
 </pre>
 
+<div class="obsolete">
 <a name="AiDebug"></a>
 <h3>AiDebug(flag)</h3>
 
@@ -405,7 +406,9 @@ Enable or disable the debug output of the AI script execution.
 -- Prints now the commands of this computer player.
 AiDebug(true)
 </pre>
+</div>
 
+<div class="obsolete">
 <a name="AiDebugPlayer"></a>
 <h3>AiDebugPlayer(1, 2, 3, ...)</h3>
 
@@ -422,6 +425,7 @@ Parameters are player number, or "self", for thisplayer.<br>
 <pre class="lua">
 AiDebugPlayer("self")
 </pre>
+</div>
 
 <a name="AiForce"></a>
 <h3>AiForce(force, unit-type-1, count-1, ... ,unit-type-N, count-N)</h3>
@@ -468,6 +472,7 @@ AiForce(0, "unit-assault", 4, "unit-bazoo", 5)
 AiForce(1, "unit-assault", 3, "unit-bazoo", 2)
 </pre>
 
+<div class="obsolete">
 <a name="AiForceRole"></a>
 <h3>AiForceRole(force, role)</h3>
 
@@ -494,6 +499,7 @@ supported.
 -- Sets the role of force 0 to attack.
 AiForceRole(0, "attack")
 </pre>
+</div>
 
 <a name="AiNeed"></a>
 <h3>AiNeed(unit-type)</h3>
