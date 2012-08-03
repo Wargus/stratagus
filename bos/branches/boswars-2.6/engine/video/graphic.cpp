@@ -52,11 +52,46 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
+static enum {
+	ModuleNotInitialized,
+	ModuleOK,
+	ModuleDeinitialized
+} GraphicsState;
+
 static int HashCount;
 
 static std::map<std::string, CGraphic *> GraphicHash;
 
 static std::list<CGraphic *> Graphics;
+
+struct CGraphicsModule {
+	CGraphicsModule() {
+		GraphicsState = ModuleOK;
+	}
+	~CGraphicsModule() {
+		GraphicsState = ModuleDeinitialized;
+	}
+	static void AssertOK() {
+#ifdef DEBUG
+		switch (GraphicsState) {
+		case ModuleNotInitialized:
+			fprintf(stderr, "The graphics module hasn't yet been initialized\n");
+			// Do not call ExitFatal, because that calls exit,
+			// which might attempt to call destructors again.
+			abort();
+		case ModuleOK:
+			break;
+		case ModuleDeinitialized:
+			fprintf(stderr, "The graphics module has already been deinitialized\n");
+			abort();
+		default:
+			abort();
+		}
+#endif	// DEBUG
+	}
+};
+
+static CGraphicsModule GraphicsModule;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -490,6 +525,8 @@ CGraphic *CGraphic::New(const std::string &file, int w, int h)
 		return new CGraphic;
 	}
 
+	CGraphicsModule::AssertOK();
+
 	CGraphic *g = GraphicHash[file];
 	if (!g) {
 		g = new CGraphic;
@@ -526,6 +563,8 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &file, int w, in
 		return new CPlayerColorGraphic;
 	}
 
+	CGraphicsModule::AssertOK();
+
 	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(GraphicHash[file]);
 	if (!g) {
 		g = new CPlayerColorGraphic;
@@ -558,6 +597,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &file, int w, in
 */
 CGraphic *CGraphic::ForceNew(const std::string &file, int w, int h)
 {
+	CGraphicsModule::AssertOK();
 	CGraphic *g = new CGraphic;
 	if (!g) {
 		fprintf(stderr, "Out of memory\n");
@@ -602,6 +642,7 @@ CGraphic *CGraphic::Clone() const
 */
 CPlayerColorGraphic *CPlayerColorGraphic::ForceNew(const std::string &file, int w, int h)
 {
+	CGraphicsModule::AssertOK();
 	CPlayerColorGraphic *g = new CPlayerColorGraphic;
 	if (!g) {
 		fprintf(stderr, "Out of memory\n");
@@ -628,6 +669,8 @@ void CGraphic::Load()
 	if (Surface) {
 		return;
 	}
+
+	CGraphicsModule::AssertOK();
 
 	// TODO: More formats?
 	if (LoadGraphicPNG(this) == -1) {
@@ -713,14 +756,18 @@ void CGraphic::Free(CGraphic *g)
 				}
 			}
 
-			Graphics.remove(g);
+			if (GraphicsState == ModuleOK) {
+				Graphics.remove(g);
+			}
 		}
 
 		FreeSurface(&g->Surface);
 		FreeSurface(&g->SurfaceFlip);
 
 		if (!g->HashFile.empty()) {
-			GraphicHash.erase(g->HashFile);
+			if (GraphicsState == ModuleOK) {
+				GraphicHash.erase(g->HashFile);
+			}
 		}
 		delete g;
 	}
@@ -731,6 +778,8 @@ void CGraphic::Free(CGraphic *g)
 */
 void FreeOpenGLGraphics()
 {
+	CGraphicsModule::AssertOK();
+
 	std::list<CGraphic *>::iterator i;
 	for (i = Graphics.begin(); i != Graphics.end(); ++i) {
 		if ((*i)->Textures) {
@@ -752,6 +801,7 @@ void FreeOpenGLGraphics()
 */
 void ReloadGraphics()
 {
+	CGraphicsModule::AssertOK();
 	std::list<CGraphic *>::iterator i;
 	for (i = Graphics.begin(); i != Graphics.end(); ++i) {
 		if ((*i)->Textures) {
@@ -1289,6 +1339,7 @@ void CGraphic::MakeShadow()
 
 void FreeGraphics()
 {
+	CGraphicsModule::AssertOK();
 	std::map<std::string, CGraphic *>::iterator i;
 	while (!GraphicHash.empty()) {
 		i = GraphicHash.begin();
