@@ -1,7 +1,8 @@
 Change log for Bos Wars
 -----------------------
 
-Version 2.6.2 (2010 xx xx):
+Version 2.6.2 (2012 xx xx):
+- Fixed crash in ExitFatal (Kalle Olavi Niemitalo)
 - Fixed bug #29274: Disabling command log crashes and doesn't always work as expected (Jimmy Salmon)
 - Fixed bug #29579: KillUnitAt takes 5 parameters (Jimmy Salmon)
 
