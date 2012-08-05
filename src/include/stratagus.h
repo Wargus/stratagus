@@ -67,8 +67,6 @@
 
 #endif  // } _MSC_VER
 
-#include <stdlib.h>
-#include <stdio.h>
 
 /*============================================================================
 ==  Macro
@@ -98,25 +96,27 @@
 */
 #define _C_  ,    /// Debug , to simulate vararg macros
 
-/// Print function in debug macros
-#define PrintFunction() \
-	do { fprintf(stdout, "%s:%d: %s: ", __FILE__, __LINE__, __func__); } while (0)
+extern void PrintLocation(const char *file, int line, const char *funcName);
 
+/// Print function in debug macros
+#define PrintFunction() PrintLocation(__FILE__, __LINE__, __func__);
 
 #ifdef DEBUG  // {
+
+extern void AbortAt(const char *file, int line, const char *funcName, const char *conditionStr);
+extern void PrintOnStdOut(const char *format, ...);
 
 /**
 **  Assert a condition. If cond is not true abort with file,line.
 */
-#define Assert(cond)  do { if (!(cond)) { \
-			fprintf(stderr, "Assertion failed at %s:%d: %s: %s\n", __FILE__, __LINE__, __func__, #cond); \
-			abort(); }} while (0)
+#define Assert(cond) \
+	do { if (!(cond)) { AbortAt(__FILE__, __LINE__, __func__, #cond); }} while (0)
 
 /**
 **  Print debug information with function name.
 */
 #define DebugPrint(args) \
-	do { PrintFunction(); fprintf(stdout, args); } while (0)
+	do { PrintFunction(); PrintOnStdOut(args); } while (0)
 
 #else  // }{ DEBUG
 
@@ -130,10 +130,8 @@
 /**
 **  Assert a condition for references
 */
-#define RefsAssert(cond)  do { if (!(cond)) { \
-			fprintf(stderr, "Assertion failed at %s:%d: %s\n", __FILE__, __LINE__, __func__); \
-			abort(); } } while (0)
-
+#define RefsAssert(cond) \
+	do { if (!(cond)) { AbortAt(__FILE__, __LINE__, __func__, #cond); } } while (0)
 #else  // }{ REFS_DEBUG
 
 #define RefsAssert(cond)      /* disabled */

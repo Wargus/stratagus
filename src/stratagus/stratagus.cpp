@@ -224,6 +224,10 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "missile.h" //for FreeBurningBuildingFrames
 #endif
 
+#include <stdlib.h>
+#include <stdio.h>
+
+
 #if defined(USE_WIN32) && ! defined(NO_STDIO_REDIRECT)
 #define REDIRECT_OUTPUT
 #endif
@@ -298,6 +302,29 @@ unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
 /*============================================================================
 ==  MAIN
 ============================================================================*/
+
+void PrintLocation(const char *file, int line, const char *funcName)
+{
+	fprintf(stdout, "%s:%d: %s: ", file, line, funcName);
+}
+
+#ifdef DEBUG
+
+void AbortAt(const char *file, int line, const char *funcName, const char *conditionStr)
+{
+	fprintf(stderr, "Assertion failed at %s:%d: %s: %s\n", file, line, funcName, conditionStr);
+	abort();
+}
+
+void PrintOnStdOut(const char *format, ...)
+{
+	va_list valist;
+	va_start(valist, format);
+	vprintf(format, valist);
+	va_end(valist);
+}
+
+#endif
 
 /**
 **  Pre menu setup.

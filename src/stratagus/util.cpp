@@ -29,6 +29,7 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include <stdio.h>
 
 #include "stratagus.h"
 #include "util.h"
