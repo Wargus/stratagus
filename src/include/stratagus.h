@@ -47,30 +47,23 @@
 
 #define WIN32_LEAN_AND_MEAN
 #define NOUSER
-
 #define NOMINMAX // do not use min, max as macro
-
-#define inline __inline
-#define alloca _alloca
 
 #pragma warning(disable:4244)               /// Conversion from double to uchar
 #pragma warning(disable:4761)               /// Integral size mismatch
 #pragma warning(disable:4786)               /// Truncated to 255 chars
-#include <stdlib.h>
-#include <crtdbg.h>
-#define abort() _ASSERT(0)
-#include <stdio.h>
-#define snprintf _snprintf
-#define vsnprintf _vsnprintf
-#define unlink _unlink
-#include <string.h>
-#define strdup _strdup
-#define strcasecmp _stricmp
-#define strncasecmp _strnicmp
 
+#define inline __inline
 #ifndef __func__
 #define __func__ __FUNCTION__
 #endif
+
+#define snprintf _snprintf
+#define vsnprintf _vsnprintf
+#define unlink _unlink
+#define strdup _strdup
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
 
 #endif  // } _MSC_VER
 
