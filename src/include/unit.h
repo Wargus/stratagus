@@ -92,24 +92,6 @@ extern void SelectedUnitChanged();
 extern int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1,
 								   const CUnitType &dst, const Vec2i &pos2);
 
-
-/**
-**  Voice groups for a unit
-*/
-enum UnitVoiceGroup {
-	VoiceSelected,          /// If selected
-	VoiceAcknowledging,     /// Acknowledge command
-	VoiceReady,             /// Command completed
-	VoiceHelpMe,            /// If attacked
-	VoiceDying,             /// If killed
-	VoiceWorkCompleted,     /// only worker, work completed
-	VoiceBuilding,          /// only for building under construction
-	VoiceDocking,           /// only for transport reaching coast
-	VoiceRepairing,         /// repairing
-	VoiceHarvesting,        /// harvesting
-	VoiceAttack             /// Attack command
-};
-
 /**
 **  Unit/Missile headings.
 **          N

@@ -728,7 +728,7 @@ void Missile::MissileHit()
 	const MissileType &mtype = *this->Type;
 
 	if (mtype.ImpactSound.Sound) {
-		PlayMissileSound(this, mtype.ImpactSound.Sound);
+		PlayMissileSound(*this, mtype.ImpactSound.Sound);
 	}
 	const PixelPos pixelPos = this->position + this->Type->size / 2;
 
