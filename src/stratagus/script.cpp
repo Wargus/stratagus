@@ -1804,16 +1804,15 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	lua_pop(l, 1);
 	lua_newtable(l);
 	std::vector<FileList> flp;
-	n = ReadDataDirectory(directory, NULL, flp);
+	n = ReadDataDirectory(directory, flp);
 	int j = 0;
 	for (int i = 0; i < n; ++i) {
 		if ((flp[i].type & mask) == type) {
 			lua_pushnumber(l, j + 1);
-			lua_pushstring(l, flp[i].name);
+			lua_pushstring(l, flp[i].name.c_str());
 			lua_settable(l, 1);
 			++j;
 		}
-		delete[] flp[i].name;
 	}
 	return 1;
 }

@@ -34,17 +34,19 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "stratagus.h"
+
+#include "iolib.h"
+
+#include "iocompat.h"
+#include "map.h"
+#include "util.h"
+
 #include <stdarg.h>
 
 #ifndef _MSC_VER
 #include <fcntl.h>
 #endif
-
-#include "stratagus.h"
-#include "iocompat.h"
-#include "map.h"
-#include "util.h"
-#include "iolib.h"
 
 #include <zlib.h>
 
@@ -231,12 +233,10 @@ int CFile::open(const char *name, long openflags)
 */
 int CFile::close()
 {
-	int tp;
-	int ret;
+	int ret = EOF;
+	int tp = cl_type;
 
-	ret = EOF;
-
-	if ((tp = cl_type) != CLF_TYPE_INVALID) {
+	if (tp != CLF_TYPE_INVALID) {
 		if (tp == CLF_TYPE_PLAIN) {
 			ret = fclose(cl_plain);
 		}
@@ -266,9 +266,7 @@ int CFile::close()
 */
 int CFile::read(void *buf, size_t len)
 {
-	int ret;
-
-	ret = 0;
+	int ret = 0;
 
 	if (cl_type != CLF_TYPE_INVALID) {
 		if (cl_type == CLF_TYPE_PLAIN) {
@@ -320,49 +318,40 @@ void CFile::flush()
 */
 int CFile::printf(const char *format, ...)
 {
-	int n;
-	int size;
-	int ret;
-	int tp;
-	char *p;
-	va_list ap;
-	char *newp;
-	int oldsize;
-
-	size = 500;
-	ret = -1;
-	if ((p = new char[size]) == NULL) {
+	int size = 500;
+	char *p = new char[size];
+	if (p == NULL) {
 		return -1;
 	}
 	while (1) {
 		// Try to print in the allocated space.
+		va_list ap;
 		va_start(ap, format);
-		n = vsnprintf(p, size, format, ap);
+		const int n = vsnprintf(p, size, format, ap);
 		va_end(ap);
 		// If that worked, string was processed.
 		if (n > -1 && n < size) {
 			break;
 		}
 		// Else try again with more space.
-		oldsize = size;
 		if (n > -1) { // glibc 2.1
 			size = n + 1; // precisely what is needed
 		} else {    /* glibc 2.0, vc++ */
 			size *= 2;  // twice the old size
 		}
-		if ((newp = new char[size]) == NULL) {
-			delete[] p;
+		delete[] p;
+		p = new char[size];
+		if (p == NULL) {
 			return -1;
 		}
-		memcpy(newp, p, oldsize);
-		delete[] p;
-		p = newp;
 	}
 
 	// Allocate the correct size
 	size = strlen(p);
+	int tp = cl_type;
+	int ret = -1;
 
-	if ((tp = cl_type) != CLF_TYPE_INVALID) {
+	if (tp != CLF_TYPE_INVALID) {
 		if (tp == CLF_TYPE_PLAIN) {
 			ret = fwrite(p, size, 1, cl_plain);
 		}
@@ -391,12 +380,10 @@ int CFile::printf(const char *format, ...)
 */
 int CFile::seek(long offset, int whence)
 {
-	int tp;
-	int ret;
+	int ret = -1;
+	int tp = cl_type;
 
-	ret = -1;
-
-	if ((tp = cl_type) != CLF_TYPE_INVALID) {
+	if (tp != CLF_TYPE_INVALID) {
 		if (tp == CLF_TYPE_PLAIN) {
 			ret = fseek(cl_plain, offset, whence);
 		}
@@ -422,12 +409,10 @@ int CFile::seek(long offset, int whence)
 */
 long CFile::tell()
 {
-	int tp;
-	int ret;
+	int ret = -1;
+	int tp = cl_type;
 
-	ret = -1;
-
-	if ((tp = cl_type) != CLF_TYPE_INVALID) {
+	if (tp != CLF_TYPE_INVALID) {
 		if (tp == CLF_TYPE_PLAIN) {
 			ret = ftell(cl_plain);
 		}
@@ -457,31 +442,30 @@ long CFile::tell()
 **                   is replaced by the full filename witht he correct extension.
 **  @param filesize  Size of the file buffer
 **
-**  @return 1 if the file has been found.
+**  @return true if the file has been found.
 */
-static int FindFileWithExtension(char *file, size_t filesize)
+static bool FindFileWithExtension(char *file, size_t filesize)
 {
 	char buf[PATH_MAX];
 
 	if (!access(file, R_OK)) {
-		return 1;
+		return true;
 	}
 #ifdef USE_ZLIB // gzip or bzip2 in global shared directory
 	sprintf(buf, "%s.gz", file);
 	if (!access(buf, R_OK)) {
 		strcpy_s(file, filesize, buf);
-		return 1;
+		return true;
 	}
 #endif
 #ifdef USE_BZ2LIB
 	sprintf(buf, "%s.bz2", file);
 	if (!access(buf, R_OK)) {
 		strcpy_s(file, filesize, buf);
-		return 1;
+		return true;
 	}
 #endif
-
-	return 0;
+	return false;
 }
 
 /**
@@ -498,8 +482,6 @@ static int FindFileWithExtension(char *file, size_t filesize)
 */
 char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 {
-	char *s;
-
 	// Absolute path or in current directory.
 	strcpy_s(buffer, buffersize, file);
 	if (*buffer == '/') {
@@ -513,7 +495,8 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 	if (*CurrentMapPath) {
 		if (*CurrentMapPath == '.' || *CurrentMapPath == '/') {
 			strcpy_s(buffer, buffersize, CurrentMapPath);
-			if ((s = strrchr(buffer, '/'))) {
+			char *s = strrchr(buffer, '/');
+			if (s) {
 				s[1] = '\0';
 			}
 			strcat_s(buffer, buffersize, file);
@@ -523,7 +506,8 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 				strcat_s(buffer, buffersize, "/");
 			}
 			strcat_s(buffer, buffersize, CurrentMapPath);
-			if ((s = strrchr(buffer, '/'))) {
+			char *s = strrchr(buffer, '/');
+			if (s) {
 				s[1] = '\0';
 			}
 			strcat_s(buffer, buffersize, file);
@@ -591,13 +575,11 @@ bool CanAccessFile(const char *filename)
 **  Generate a list of files within a specified directory
 **
 **  @param dirname  Directory to read.
-**  @param filter   Optional xdata-filter function.
 **  @param fl       Filelist pointer.
 **
 **  @return the number of entries added to FileList.
 */
-int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *),
-					  std::vector<FileList> &fl)
+int ReadDataDirectory(const char *dirname, std::vector<FileList> &fl)
 {
 	struct stat st;
 	char buffer[PATH_MAX];
@@ -637,30 +619,15 @@ int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *),
 				int isdir = S_ISDIR(st.st_mode);
 				if (isdir || S_ISREG(st.st_mode)) {
 					FileList nfl;
-					int i;
+
 					if (isdir) {
-						nfl.name = new_strdup(np);
+						nfl.name = np;
 					} else {
-						nfl.type = -1;
-						if (filter == NULL) {
-							nfl.name = new_strdup(np);
-							nfl.type = 1;
-						} else if ((*filter)(buffer, &nfl) == 0) {
-							continue;
-						}
+						nfl.name = np;
+						nfl.type = 1;
 					}
-					for (i = 0; i < (int)fl.size(); ++i) {
-						if (nfl.type == fl[i].type) {
-							if (strcmp(nfl.name, fl[i].name) < 0) {
-								break;
-							}
-						} else {
-							if (fl[i].type - nfl.type > 0) {
-								break;
-							}
-						}
-					}
-					fl.insert(fl.begin() + i, nfl);
+					// sorted instertion
+					fl.insert(std::lower_bound(fl.begin(), fl.end(), nfl), nfl);
 				}
 			}
 #ifndef _MSC_VER
@@ -673,8 +640,6 @@ int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *),
 	}
 	return fl.size();
 }
-
-
 
 void FileWriter::printf(const char *format, ...)
 {

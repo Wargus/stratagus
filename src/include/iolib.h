@@ -46,8 +46,6 @@
 #include <bzlib.h>
 #endif
 
-class CMapInfo;
-
 /*----------------------------------------------------------------------------
 --  Definitons
 ----------------------------------------------------------------------------*/
@@ -82,19 +80,23 @@ public:
 */
 FileWriter *CreateFileWriter(const std::string &filename);
 
-
-
 /**
 **  FileList struct used by directory access routine
 */
 class FileList
 {
 public:
-	FileList() : name(NULL), type(0), xdata(NULL) {}
+	FileList() : type(0) {}
 
-	char *name;              /// Name of the file
-	int type;                /// Type of the file
-	CMapInfo *xdata;          /// Extra data attached by high level
+	bool operator < (const FileList& rhs) const {
+		if (type != rhs.type) {
+			return type < rhs.type;
+		}
+		return name < rhs.name;
+	}
+public:
+	std::string name;  /// Name of the file
+	int type;          /// Type of the file
 };
 
 
@@ -151,8 +153,7 @@ extern char *LibraryFileName(const char *file, char *buffer, size_t buffersize);
 extern bool CanAccessFile(const char *filename);
 
 /// Read the contents of a directory
-extern int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *),
-							 std::vector<FileList> &flp);
+extern int ReadDataDirectory(const char *dirname, std::vector<FileList> &flp);
 
 //@}
 
