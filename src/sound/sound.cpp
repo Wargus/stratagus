@@ -404,9 +404,10 @@ void SetSoundRange(CSound *sound, unsigned char range)
 **
 **  @todo FIXME: Must handle the errors better.
 */
-CSound *RegisterSound(const char *files[], unsigned number)
+CSound *RegisterSound(const std::vector<std::string> &files)
 {
 	CSound *id = new CSound;
+	size_t number = files.size();
 
 	if (number > 1) { // load a sound group
 		id->Sound.OneGroup = new CSample *[number];

@@ -112,29 +112,25 @@ static CSound *CclGetSound(lua_State *l)
 */
 static int CclMakeSound(lua_State *l)
 {
-	CSound *id;
-
 	LuaCheckArgs(l, 2);
 
 	std::string c_name = LuaToString(l, 1);
+	std::vector<std::string> files;
+	CSound *id;
 	if (lua_isstring(l, 2)) {
 		// only one file
-		const char *c_file = LuaToString(l, 2);
-		id = MakeSound(c_name, &c_file, 1);
+		files.push_back(LuaToString(l, 2));
+		id = MakeSound(c_name, files);
 	} else if (lua_istable(l, 2)) {
 		// several files
 		const int args = lua_rawlen(l, 2);
-		char **c_files = new char *[args];
+		files.reserve(args);
 		for (int j = 0; j < args; ++j) {
 			lua_rawgeti(l, 2, j + 1);
-			c_files[j] = new_strdup(LuaToString(l, -1));
+			files.push_back(LuaToString(l, -1));
 			lua_pop(l, 1);
 		}
-		id = MakeSound(c_name, (const char **)c_files, args);
-		for (int j = 0; j < args; ++j) {
-			delete[] c_files[j];
-		}
-		delete[] c_files;
+		id = MakeSound(c_name, files);
 	} else {
 		LuaError(l, "string or table expected");
 		return 0;

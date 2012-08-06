@@ -178,7 +178,7 @@ extern int PlayFile(const std::string &name, LuaActionListener *listener = NULL)
 extern void SetSoundRange(CSound *sound, unsigned char range);
 
 /// Register a sound (can be a simple sound or a group)
-extern CSound *RegisterSound(const char *files[], unsigned int number);
+extern CSound *RegisterSound(const std::vector<std::string> &files);
 
 ///  Create a special sound group with two sounds
 extern CSound *RegisterTwoGroups(CSound *first, CSound *second);
@@ -210,7 +210,7 @@ extern void MapSound(const std::string &sound_name, CSound *id);
 /// Get the sound id bound to an identifier
 extern CSound *SoundForName(const std::string &sound_name);
 /// Make a sound bound to identifier
-extern CSound *MakeSound(const std::string &sound_name, const char *file[], int nb);
+extern CSound *MakeSound(const std::string &sound_name, const std::vector<std::string> &files);
 /// Make a sound group bound to identifier
 extern CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second);
 #ifdef DEBUG
