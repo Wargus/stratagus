@@ -1338,15 +1338,15 @@ static void EditorCallbackButtonDown(unsigned button)
 */
 static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 {
-	const char *ptr;
-
 	if (HandleKeyModifiersDown(key, keychar)) {
 		return;
 	}
 
 	// FIXME: don't handle unicode well. Should work on all latin keyboard.
-	if ((ptr = strchr(UiGroupKeys, key))) {
-		key = '0' + ptr - UiGroupKeys;
+	const char *ptr = strchr(UiGroupKeys.c_str(), key);
+
+	if (ptr) {
+		key = '0' + ptr - UiGroupKeys.c_str();
 		if (key > '9') {
 			key = SDLK_BACKQUOTE;
 		}

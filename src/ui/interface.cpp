@@ -78,7 +78,7 @@ static char Input[80];               /// line input for messages/long commands
 static int InputIndex;               /// current index into input
 static char InputStatusLine[99];     /// Last input status line
 const char DefaultGroupKeys[] = "0123456789`";/// Default group keys
-const char *UiGroupKeys = DefaultGroupKeys;/// Up to 11 keys, last unselect. Default for qwerty
+std::string UiGroupKeys = DefaultGroupKeys;/// Up to 11 keys, last unselect. Default for qwerty
 bool GameRunning;                    /// Current running state
 bool GamePaused;                     /// Current pause state
 bool GameObserve;                    /// Observe mode
@@ -525,11 +525,11 @@ extern void ToggleShowBuilListMessages();
 */
 static bool CommandKey(int key)
 {
-	const char *ptr;
+	const char *ptr = strchr(UiGroupKeys.c_str(), key);
 
 	// FIXME: don't handle unicode well. Should work on all latin keyboard.
-	if ((ptr = strchr(UiGroupKeys, key))) {
-		key = '0' + ptr - UiGroupKeys;
+	if (ptr) {
+		key = '0' + ptr - UiGroupKeys.c_str();
 		if (key > '9') {
 			key = SDLK_BACKQUOTE;
 		}
