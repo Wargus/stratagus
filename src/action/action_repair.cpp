@@ -45,6 +45,7 @@
 #include "player.h"
 #include "script.h"
 #include "sound.h"
+#include "translate.h"
 #include "unit.h"
 #include "ui.h"
 #include "unittype.h"

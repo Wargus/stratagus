@@ -43,6 +43,7 @@
 #include "script.h"
 #include "sound.h"
 #include "player.h"
+#include "translate.h"
 #include "unit.h"
 #include "unitsound.h"
 #include "unittype.h"

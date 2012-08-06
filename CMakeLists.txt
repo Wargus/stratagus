@@ -321,6 +321,7 @@ set(tolua_FILES
 	src/tolua/player.pkg
 	src/tolua/sound.pkg
 	src/tolua/stratagus.pkg
+	src/tolua/translate.pkg
 	src/tolua/trigger.pkg
 	src/tolua/ui.pkg
 	src/tolua/unit.pkg

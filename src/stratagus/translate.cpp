@@ -35,12 +35,12 @@
 
 #include "stratagus.h"
 
-#include <map>
-#include <string>
-
 #include "translate.h"
+
 #include "iolib.h"
 #include <cstdio>
+#include <map>
+#include <string>
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -48,8 +48,6 @@
 
 typedef std::map<std::string, std::string> EntriesType;
 static EntriesType Entries;
-std::string StratagusTranslation;
-std::string GameTranslation;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -81,13 +79,6 @@ void AddTranslation(const char *str1, const char *str2)
 */
 void LoadPO(const char *file)
 {
-	FILE *fd;
-	char buf[4096];
-	enum { MSGNONE, MSGID, MSGSTR } state;
-	char msgid[16 * 1024];
-	char msgstr[16 * 1024];
-	char *s;
-	char *currmsg = NULL;
 	char fullfile[1024];
 
 	if (!file || !*file) {
@@ -95,13 +86,16 @@ void LoadPO(const char *file)
 	}
 
 	LibraryFileName(file, fullfile, sizeof(fullfile));
-	fd = fopen(fullfile, "rb");
+	FILE *fd = fopen(fullfile, "rb");
 	if (!fd) {
 		fprintf(stderr, "Could not open file: %s\n", file);
 		return;
 	}
+	enum { MSGNONE, MSGID, MSGSTR } state = MSGNONE;
+	char msgid[16 * 1024];
+	char msgstr[16 * 1024];
+	char *currmsg = NULL;
 
-	state = MSGNONE;
 	msgid[0] = msgstr[0] = '\0';
 
 	// skip 0xEF utf8 intro if found
@@ -113,13 +107,13 @@ void LoadPO(const char *file)
 		rewind(fd);
 	}
 
+	char buf[4096];
 	while (fgets(buf, sizeof(buf), fd)) {
 		// Comment
 		if (buf[0] == '#') {
 			continue;
 		}
-
-		s = buf;
+		char *s = buf;
 
 		// msgid or msgstr
 		if (!strncmp(s, "msgid ", 6)) {
@@ -192,8 +186,6 @@ void SetTranslationsFiles(const char *stratagusfile, const char *gamefile)
 {
 	LoadPO(stratagusfile);
 	LoadPO(gamefile);
-	StratagusTranslation = stratagusfile;
-	GameTranslation = gamefile;
 }
 //@}
 

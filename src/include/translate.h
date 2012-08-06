@@ -30,15 +30,8 @@
 #ifndef __TRANSLATE_H__
 #define __TRANSLATE_H__
 
-#include <string>
-
 //@{
 
-/// The PO containing the translations for the stratagus engine
-extern std::string StratagusTranslation;
-
-/// The PO containing the translations for the game itself
-extern std::string GameTranslation;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -52,6 +45,8 @@ extern void LoadPO(const char *file);
 /// Set the stratagus and game translations
 extern void SetTranslationsFiles(const char *stratagusfile, const char *gamefile);
 
+#define _(str) Translate(str)
+#define N_(str) str
 
 //@}
 

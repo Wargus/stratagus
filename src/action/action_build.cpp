@@ -47,6 +47,7 @@
 #include "player.h"
 #include "script.h"
 #include "tileset.h"
+#include "translate.h"
 #include "ui.h"
 #include "unit.h"
 #include "unittype.h"

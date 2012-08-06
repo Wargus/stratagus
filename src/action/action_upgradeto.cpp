@@ -44,6 +44,7 @@
 #include "player.h"
 #include "script.h"
 #include "spells.h"
+#include "translate.h"
 #include "unit.h"
 #include "unittype.h"
 

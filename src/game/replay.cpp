@@ -50,6 +50,7 @@
 #include "script.h"
 #include "settings.h"
 #include "sound.h"
+#include "translate.h"
 #include "unit_manager.h"
 #include "unittype.h"
 #include "version.h"

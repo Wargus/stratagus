@@ -213,6 +213,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "sound.h"
 #include "sound_server.h"
 #include "title.h"
+#include "translate.h"
 #include "ui.h"
 #include "unit_manager.h"
 #include "util.h"

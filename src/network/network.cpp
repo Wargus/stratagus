@@ -228,6 +228,7 @@
 #include "player.h"
 #include "replay.h"
 #include "sound.h"
+#include "translate.h"
 #include "unit.h"
 #include "unit_manager.h"
 #include "unittype.h"

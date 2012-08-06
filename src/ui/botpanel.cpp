@@ -34,29 +34,31 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <ctype.h>
-#include <vector>
-#include <sstream>
-
 #include "stratagus.h"
 
+#include "ui.h"
+
+#include "actions.h"
+#include "commands.h"
+#include "depend.h"
+#include "font.h"
+#include "guichan/key.h"
+#include "guichan/sdl/sdlinput.h"
+#include "interface.h"
+#include "map.h"
+#include "player.h"
+#include "sound.h"
+#include "spells.h"
+#include "translate.h"
+#include "trigger.h"
 #include "unit.h"
 #include "unittype.h"
 #include "upgrade.h"
-#include "interface.h"
-#include "ui.h"
-#include "player.h"
-#include "spells.h"
-#include "depend.h"
-#include "sound.h"
-#include "map.h"
-#include "commands.h"
 #include "video.h"
-#include "font.h"
-#include "actions.h"
-#include "trigger.h"
-#include "guichan/key.h"
-#include "guichan/sdl/sdlinput.h"
+
+#include <ctype.h>
+#include <vector>
+#include <sstream>
 
 /*----------------------------------------------------------------------------
 --  Defines

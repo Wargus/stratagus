@@ -45,6 +45,7 @@
 #include "network.h"
 #include "netconnect.h"
 #include "sound.h"
+#include "translate.h"
 #include "unitsound.h"
 #include "unittype.h"
 #include "unit.h"

@@ -77,17 +77,17 @@
 #include "maemo.h"
 #endif
 
-#include "video.h"
+#include "editor.h"
 #include "font.h"
 #include "interface.h"
-#include "network.h"
-#include "ui.h"
-#include "sound_server.h"
-#include "sound.h"
-#include "interface.h"
 #include "minimap.h"
+#include "network.h"
+#include "sound.h"
+#include "sound_server.h"
+#include "translate.h"
+#include "ui.h"
+#include "video.h"
 #include "widgets.h"
-#include "editor.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations

@@ -33,11 +33,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <limits.h>
-#include <math.h>
-#include <sstream>
-#include <iomanip>
-
 #include "stratagus.h"
 
 #include "unit.h"
@@ -61,12 +56,16 @@
 #include "sound_server.h"
 #include "spells.h"
 #include "tileset.h"
+#include "translate.h"
 #include "ui.h"
 #include "unit_find.h"
 #include "unit_manager.h"
 #include "unitsound.h"
 #include "unittype.h"
 #include "video.h"
+
+#include <math.h>
+
 
 /*----------------------------------------------------------------------------
 -- Documentation

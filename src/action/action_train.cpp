@@ -42,6 +42,7 @@
 #include "iolib.h"
 #include "player.h"
 #include "sound.h"
+#include "translate.h"
 #include "ui.h"
 #include "unit.h"
 #include "unitsound.h"

@@ -34,10 +34,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdarg.h>
-#include <math.h>
-#include <sstream>
-
 #include "stratagus.h"
 
 #include "action/action_built.h"
@@ -54,6 +50,7 @@
 #include "sound.h"
 #include "spells.h"
 #include "tileset.h"
+#include "translate.h"
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"
@@ -66,6 +63,7 @@
 #include "../ai/ai_local.h"
 #endif
 
+#include <sstream>
 
 /*----------------------------------------------------------------------------
 --  MENU BUTTON

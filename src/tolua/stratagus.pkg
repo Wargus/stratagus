@@ -74,19 +74,13 @@ $pfile "particle.pkg"
 $pfile "pathfinder.pkg"
 $pfile "player.pkg"
 $pfile "sound.pkg"
+$pfile "translate.pkg"
 $pfile "trigger.pkg"
 $pfile "ui.pkg"
 $pfile "unit.pkg"
 $pfile "unittype.pkg"
 $pfile "upgrade.pkg"
 $pfile "video.pkg"
-
-extern const char *Translate(const char *str);
-extern void AddTranslation(const char *str1, const char *str2);
-extern void LoadPO(const char *file);
-extern void SetTranslationsFiles(const char *stratagusfile, const char *gamefile);
-extern std::string StratagusTranslation;
-extern std::string GameTranslation;
 
 extern int SaveGame(const std::string filename);
 extern void DeleteSaveGame(const std::string filename);

@@ -48,6 +48,7 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "tileset.h"
+#include "translate.h"
 #include "ui.h"
 #include "unit.h"
 #include "unit_find.h"
