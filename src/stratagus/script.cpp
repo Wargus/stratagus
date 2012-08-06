@@ -530,7 +530,7 @@ static int CallLuaNumberFunction(unsigned int handler)
 **
 **  @return         lua function result.
 */
-static char *CallLuaStringFunction(unsigned int handler)
+static std::string CallLuaStringFunction(unsigned int handler)
 {
 	const int narg = lua_gettop(Lua);
 	lua_getglobal(Lua, "_stringfunction_");
@@ -539,7 +539,7 @@ static char *CallLuaStringFunction(unsigned int handler)
 	if (lua_gettop(Lua) - narg != 2) {
 		LuaError(Lua, "Function must return one value.");
 	}
-	char *res = new_strdup(LuaToString(Lua, -1));
+	std::string res = LuaToString(Lua, -1);
 	lua_pop(Lua, 2);
 	return res;
 }
