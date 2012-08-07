@@ -34,7 +34,6 @@
 
 #include <vector>
 #include <string>
-#include "player.h"
 #include "icons.h"
 #ifndef __VEC2I_H__
 #include "vec2i.h"
@@ -63,14 +62,8 @@ enum EditorStateType {
 class CEditor
 {
 public:
-	CEditor() : TerrainEditable(true),
-		StartUnit(NULL),
-		UnitIndex(0), CursorUnitIndex(-1), SelectedUnitIndex(-1),
-		TileIndex(0), CursorTileIndex(-1), SelectedTileIndex(-1),
-		CursorPlayer(-1), SelectedPlayer(PlayerNumNeutral),
-		MapLoaded(false), WriteCompressedMaps(true), PopUpX(-1), PopUpY(-1)
-	{};
-	~CEditor() {};
+	CEditor();
+	~CEditor() {}
 
 	void Init();
 	/// Make random map
