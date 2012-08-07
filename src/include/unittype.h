@@ -905,6 +905,8 @@ public:
 		return res;
 	}
 
+	PixelSize GetPixelSize() const;
+
 	std::string Ident;              /// Identifier
 	std::string Name;               /// Pretty name shown from the engine
 	int Slot;                       /// Type as number

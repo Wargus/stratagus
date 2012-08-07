@@ -125,16 +125,18 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 			dest.x = target->GetMapPixelPosTopLeft().x + destx;
 			dest.y = target->GetMapPixelPosTopLeft().y + desty;
 		} else {
-			dest.x = (target->tilePos.x + destx) * PixelTileSize.x + target->Type->TileWidth * PixelTileSize.x / 2;
-			dest.y = (target->tilePos.y + desty) * PixelTileSize.y + target->Type->TileHeight * PixelTileSize.y / 2;
+			dest.x = (target->tilePos.x + destx) * PixelTileSize.x;
+			dest.y = (target->tilePos.y + desty) * PixelTileSize.y;
+			dest += target->Type->GetPixelSize() / 2;
 		}
 	} else {
 		if ((flags & ANIM_SM_PIXEL)) {
 			dest.x = goal->GetMapPixelPosTopLeft().x + destx;
 			dest.y = goal->GetMapPixelPosTopLeft().y + desty;
 		} else {
-			dest.x = (goal->tilePos.x + destx) * PixelTileSize.x + goal->Type->TileWidth * PixelTileSize.x / 2;
-			dest.y = (goal->tilePos.y + desty) * PixelTileSize.y + goal->Type->TileHeight * PixelTileSize.y / 2;
+			dest.x = (goal->tilePos.x + destx) * PixelTileSize.x;
+			dest.y = (goal->tilePos.y + desty) * PixelTileSize.y;
+			dest += goal->Type->GetPixelSize() / 2;
 		}
 	}
 	Vec2i destTilePos = Map.MapPixelPosToTilePos(dest);

@@ -216,9 +216,12 @@ CUnitType::~CUnitType()
 		delete[] this->Portrait.Files;
 	}
 #endif
-
 }
 
+PixelSize CUnitType::GetPixelSize() const
+{
+	return PixelSize(TileWidth * PixelTileSize.x, TileHeight * PixelTileSize.y);
+}
 
 bool CUnitType::CheckUserBoolFlags(const char *BoolFlags) const
 {

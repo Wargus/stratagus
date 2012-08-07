@@ -182,10 +182,9 @@ static void DrawBuildingCursor()
 	DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
 				 CursorBuilding->StillFrame, screenPos);
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
-		Video.DrawCircleClip(ColorRed,
-							 screenPos.x + CursorBuilding->TileWidth * PixelTileSize.x / 2,
-							 screenPos.y + CursorBuilding->TileHeight * PixelTileSize.y / 2,
-							 (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileWidth - 1)) * PixelTileSize.x + 1);
+		const PixelPos center(screenPos + CursorBuilding->GetPixelSize() / 2);
+		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileWidth - 1)) * PixelTileSize.x + 1;
+		Video.DrawCircleClip(ColorRed, center.x, center.y, radius);
 	}
 
 	//

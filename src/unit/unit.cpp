@@ -2344,8 +2344,7 @@ PixelPos CUnit::GetMapPixelPosTopLeft() const
 
 PixelPos CUnit::GetMapPixelPosCenter() const
 {
-	const PixelSize pixelSize(Type->TileWidth * PixelTileSize.x, Type->TileHeight * PixelTileSize.y);
-	return GetMapPixelPosTopLeft() + pixelSize / 2;
+	return GetMapPixelPosTopLeft() + Type->GetPixelSize() / 2;
 }
 
 /**

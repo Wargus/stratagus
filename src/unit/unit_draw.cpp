@@ -164,11 +164,9 @@ void DrawUnitSelection(const CViewport *vp, const CUnit &unit)
 	}
 
 	const CUnitType &type = *unit.Type;
-	const PixelPos screenPos = vp->TilePosToScreen_TopLeft(unit.tilePos);
-	const int x = screenPos.x + unit.IX + type.TileWidth * PixelTileSize.x / 2
-				  - type.BoxWidth / 2 - (type.Width - type.Sprite->Width) / 2;
-	const int y = screenPos.y + unit.IY + type.TileHeight * PixelTileSize.y / 2
-				  - type.BoxHeight / 2 - (type.Height - type.Sprite->Height) / 2;
+	const PixelPos screenPos = vp->MapToScreenPixelPos(unit.GetMapPixelPosCenter());
+	const int x = screenPos.x - type.BoxWidth / 2 - (type.Width - type.Sprite->Width) / 2;
+	const int y = screenPos.y - type.BoxHeight / 2 - (type.Height - type.Sprite->Height) / 2;
 
 	DrawSelection(color, x, y, x + type.BoxWidth, y + type.BoxHeight);
 }
@@ -692,7 +690,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 
 	// For debug draw sight, react and attack range!
 	if (NumSelected == 1 && unit.Selected) {
-		const PixelPos center(x + type.TileWidth * PixelTileSize.x / 2, y + type.TileHeight * PixelTileSize.y / 2);
+		const PixelPos center(screenPos + type.GetPixelSize() / 2);
 
 		if (Preference.ShowSightRange) {
 			const int value = stats.Variables[SIGHTRANGE_INDEX].Max;
@@ -965,8 +963,7 @@ void CUnit::Draw(const CViewport *vp) const
 	//
 	if (state == 1) {
 		if (constructed) {
-			const PixelPos pos(screenPos.x + (type->TileWidth * PixelTileSize.x) / 2,
-							   screenPos.y + (type->TileHeight * PixelTileSize.y) / 2);
+			const PixelPos pos(screenPos + (type->GetPixelSize()) / 2);
 			DrawConstruction(player, cframe, *type, frame, pos);
 		}
 		//
