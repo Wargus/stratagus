@@ -42,11 +42,11 @@
 #include "editor.h"
 #include "interface.h"
 #include "map.h"
-#include "player.h"
 #include "ui.h"
 #include "unit.h"
 #include "unittype.h"
-#include "video.h"
+
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -57,12 +57,12 @@
 **
 **  @todo FIXME: Should this be move to ui part?
 */
-std::vector<CCursor *> AllCursors;
+static std::vector<CCursor *> AllCursors;
 
 CursorStates CursorState;    /// current cursor state (point,...)
 int CursorAction;            /// action for selection
 int CursorValue;             /// value for CursorAction (spell type f.e.)
-std::string CustomCursor;             /// custom cursor for button
+std::string CustomCursor;    /// custom cursor for button
 
 // Event changed mouse position, can alter at any moment
 PixelPos CursorScreenPos;    /// cursor position on screen
@@ -200,7 +200,7 @@ static void DrawBuildingCursor()
 		}
 	} else {
 		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos)) != NULL);
-		if (!Editor.Running || (Editor.Running && ontop == (CUnit *)1)) {
+		if (!Editor.Running || ontop == (CUnit *)1) {
 			ontop = NULL;
 		}
 	}
@@ -342,5 +342,117 @@ void CleanCursors()
 	GameCursor = NULL;
 	UnitUnderCursor = NULL;
 }
+
+/**
+**  Define a cursor.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineCursor(lua_State *l)
+{
+	std::string name;
+	std::string race;
+	std::string file;
+	PixelPos hotpos(0, 0);
+	int w = 0;
+	int h = 0;
+	int rate = 0;
+
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
+		LuaError(l, "incorrect argument");
+	}
+	lua_pushnil(l);
+	while (lua_next(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		if (!strcmp(value, "Name")) {
+			name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Race")) {
+			race = LuaToString(l, -1);
+		} else if (!strcmp(value, "File")) {
+			file = LuaToString(l, -1);
+		} else if (!strcmp(value, "HotSpot")) {
+			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
+				LuaError(l, "incorrect argument");
+			}
+			lua_rawgeti(l, -1, 1);
+			hotpos.x = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			hotpos.y = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "Size")) {
+			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
+				LuaError(l, "incorrect argument");
+			}
+			lua_rawgeti(l, -1, 1);
+			w = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			h = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "Rate")) {
+			rate = LuaToNumber(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+		lua_pop(l, 1);
+	}
+
+	Assert(!name.empty() && !file.empty() && w && h);
+
+	if (race == "any") {
+		race.clear();
+	}
+
+	//
+	//  Look if this kind of cursor already exists.
+	//
+	CCursor *ct = NULL;
+	for (size_t i = 0; i < AllCursors.size(); ++i) {
+		//  Race not same, not found.
+		if (AllCursors[i]->Race != race) {
+			continue;
+		}
+		if (AllCursors[i]->Ident == name) {
+			ct = AllCursors[i];
+			break;
+		}
+	}
+
+	//
+	//  Not found, make a new slot.
+	//
+	if (!ct) {
+		ct = new CCursor();
+		AllCursors.push_back(ct);
+		ct->Ident = name;
+		ct->Race = race;
+	}
+	ct->G = CGraphic::New(file, w, h);
+	ct->HotPos = hotpos;
+	ct->FrameRate = rate;
+
+	return 0;
+}
+
+/**
+**  Set the current game cursor.
+**
+**  @param l  Lua state.
+*/
+static int CclSetGameCursor(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	GameCursor = CursorByIdent(LuaToString(l, 1));
+	return 0;
+}
+
+void CursorCclRegister()
+{
+	lua_register(Lua, "DefineCursor", CclDefineCursor);
+	lua_register(Lua, "SetGameCursor", CclSetGameCursor);
+}
+
 
 //@}

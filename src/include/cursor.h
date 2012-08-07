@@ -106,7 +106,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <vector>
+
 #include <vec2i.h>
 
 /*----------------------------------------------------------------------------
@@ -164,8 +164,6 @@ enum CursorStates {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern std::vector<CCursor *> AllCursors; /// cursor-types description
-
 extern CursorStates CursorState;  /// current cursor state (point,...)
 extern int CursorAction;          /// action for selection
 extern int CursorValue;           /// value for action (spell type f.e.)
@@ -198,6 +196,8 @@ extern void CursorAnimate(unsigned ticks);
 extern void InitVideoCursors();
 /// Cleanup the cursor module
 extern void CleanCursors();
+
+extern void CursorCclRegister();
 
 //@}
 
