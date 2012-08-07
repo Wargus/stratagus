@@ -110,8 +110,6 @@ CSound *SoundForName(const std::string &name)
 */
 CSound *MakeSound(const std::string &name, const std::vector<std::string> &files)
 {
-	Assert(nb <= 255);
-
 	CSound *sound = FindSound(name);
 
 	if (sound) {
