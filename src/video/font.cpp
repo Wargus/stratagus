@@ -35,16 +35,14 @@
 
 #include "stratagus.h"
 
-#include <string>
-#include <vector>
-#include <map>
-
 #include "font.h"
-#include "intern_video.h"
 
+#include "intern_video.h"
 #include "script.h"
 #include "video.h"
 
+#include <vector>
+#include <map>
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -77,20 +75,22 @@ static CFont *GameFont;        /// Normal font used in game
 static int FormatNumber(int number, char *buf);
 
 
-CFont *GetSmallFont()
+CFont &GetSmallFont()
 {
 	if (!SmallFont) {
 		SmallFont = CFont::Get("small");
 	}
-	return SmallFont;
+	Assert(SmallFont);
+	return *SmallFont;
 }
 
-CFont *GetGameFont()
+CFont &GetGameFont()
 {
 	if (!GameFont) {
 		GameFont = CFont::Get("game");
 	}
-	return GameFont;
+	Assert(GameFont);
+	return *GameFont;
 }
 
 
@@ -98,7 +98,7 @@ CFont *GetGameFont()
 --  Guichan Functions
 ----------------------------------------------------------------------------*/
 
-void CFont::drawString(gcn::Graphics *graphics, const std::string &txt, int x, int y)
+/* virtual */ void CFont::drawString(gcn::Graphics *graphics, const std::string &txt, int x, int y)
 {
 	DynamicLoad();
 	const gcn::ClipRectangle &r = graphics->getCurrentClipArea();
@@ -111,7 +111,7 @@ void CFont::drawString(gcn::Graphics *graphics, const std::string &txt, int x, i
 
 	PushClipping();
 	SetClipping(r.x, r.y, right, bottom);
-	CLabel(this).DrawClip(x + r.xOffset, y + r.yOffset, txt);
+	CLabel(*this).DrawClip(x + r.xOffset, y + r.yOffset, txt);
 	PopClipping();
 }
 
@@ -130,17 +130,17 @@ void CFont::drawString(gcn::Graphics *graphics, const std::string &txt, int x, i
 **  @param x   X screen position
 **  @param y   Y screen position
 */
-static void VideoDrawChar(const CGraphic *g,
-						  int gx, int gy, int w, int h, int x, int y, const CFontColor *fc)
+static void VideoDrawChar(const CGraphic &g,
+						  int gx, int gy, int w, int h, int x, int y, const CFontColor &fc)
 {
 	if (!UseOpenGL) {
 		SDL_Rect srect = {gx, gy, w, h};
 		SDL_Rect drect = {x, y, 0, 0};
 
-		SDL_SetColors(g->Surface, (SDL_Color *)fc->Colors, 0, MaxFontColors);
-		SDL_BlitSurface(g->Surface, &srect, TheScreen, &drect);
+		SDL_SetColors(g.Surface, const_cast<SDL_Color *>(fc.Colors), 0, MaxFontColors);
+		SDL_BlitSurface(g.Surface, &srect, TheScreen, &drect);
 	} else {
-		g->DrawSub(gx, gy, w, h, x, y);
+		g.DrawSub(gx, gy, w, h, x, y);
 	}
 }
 
@@ -218,12 +218,11 @@ static bool GetUTF8(const std::string &text, size_t &pos, int &utf8)
 		utf8 <<= 6;
 		utf8 |= (c & 0x3F);
 	}
-
 	return true;
 }
 
 /**
-**  Get the next utf8 character from a array of chars
+**  Get the next utf8 character from an array of chars
 */
 static inline bool GetUTF8(const char text[], const size_t len, size_t &pos, int &utf8)
 {
@@ -270,7 +269,6 @@ static inline bool GetUTF8(const char text[], const size_t len, size_t &pos, int
 		utf8 <<= 6;
 		utf8 |= (c & 0x3F);
 	}
-
 	return true;
 }
 
@@ -439,8 +437,8 @@ CFont::~CFont()
 **  @param x   X screen position
 **  @param y   Y screen position
 */
-static void VideoDrawCharClip(const CGraphic *g, int gx, int gy, int w, int h,
-							  int x, int y, const CFontColor *fc)
+static void VideoDrawCharClip(const CGraphic &g, int gx, int gy, int w, int h,
+							  int x, int y, const CFontColor &fc)
 {
 	int ox;
 	int oy;
@@ -452,37 +450,35 @@ static void VideoDrawCharClip(const CGraphic *g, int gx, int gy, int w, int h,
 
 
 template<bool CLIP>
-unsigned int CFont::DrawChar(CGraphic *g, int utf8, int x, int y, const CFontColor *fc) const
+unsigned int CFont::DrawChar(CGraphic &g, int utf8, int x, int y, const CFontColor &fc) const
 {
-	const CFont *font = this;
 	int c = utf8 - 32;
 	Assert(c >= 0);
-	const int ipr = font->G->GraphicWidth / font->G->Width;
+	const int ipr = this->G->GraphicWidth / this->G->Width;
 
-	if (c < 0 || ipr * font->G->GraphicHeight / font->G->Height <= c) {
+	if (c < 0 || ipr * this->G->GraphicHeight / this->G->Height <= c) {
 		c = 0;
 	}
-	const int w = font->CharWidth[c];
-	const int gx = (c % ipr) * font->G->Width;
-	const int gy = (c / ipr) * font->G->Height;
+	const int w = this->CharWidth[c];
+	const int gx = (c % ipr) * this->G->Width;
+	const int gy = (c / ipr) * this->G->Height;
 
 	if (CLIP) {
-		VideoDrawCharClip(g, gx, gy, w, font->G->Height, x , y, fc);
+		VideoDrawCharClip(g, gx, gy, w, this->G->Height, x , y, fc);
 	} else {
-		VideoDrawChar(g, gx, gy, w, font->G->Height, x, y, fc);
+		VideoDrawChar(g, gx, gy, w, this->G->Height, x, y, fc);
 	}
 	return w + 1;
 }
 
-CGraphic *CFont::GetFontColorGraphic(const CFontColor *fontColor) const
+CGraphic *CFont::GetFontColorGraphic(const CFontColor &fontColor) const
 {
 	if (!UseOpenGL) {
 		return this->G;
 	} else {
-		return FontColorGraphics[this][fontColor];
+		return FontColorGraphics[this][&fontColor];
 	}
 }
-
 
 /**
 **  Draw text with font at x,y clipped/unclipped.
@@ -512,7 +508,7 @@ int CLabel::DoDrawText(int x, int y,
 	const CFontColor *backup = fc;
 	bool isReverse = false;
 	font->DynamicLoad();
-	CGraphic *g = font->GetFontColorGraphic(FontColor);
+	CGraphic *g = font->GetFontColorGraphic(*FontColor);
 
 	while (GetUTF8(text, len, pos, utf8)) {
 		if (utf8 == '~') {
@@ -526,7 +522,7 @@ int CLabel::DoDrawText(int x, int y,
 				case '!':
 					if (fc != reverse) {
 						fc = reverse;
-						g = font->GetFontColorGraphic(fc);
+						g = font->GetFontColorGraphic(*fc);
 					}
 					++pos;
 					continue;
@@ -535,7 +531,7 @@ int CLabel::DoDrawText(int x, int y,
 					if (fc != reverse) {
 						isReverse = true;
 						fc = reverse;
-						g = font->GetFontColorGraphic(fc);
+						g = font->GetFontColorGraphic(*fc);
 					}
 					++pos;
 					continue;
@@ -543,7 +539,7 @@ int CLabel::DoDrawText(int x, int y,
 					if (fc != LastTextColor) {
 						std::swap(fc, LastTextColor);
 						isReverse = false;
-						g = font->GetFontColorGraphic(fc);
+						g = font->GetFontColorGraphic(*fc);
 					}
 					++pos;
 					continue;
@@ -564,27 +560,27 @@ int CLabel::DoDrawText(int x, int y,
 					const CFontColor *fc_tmp = CFontColor::Get(color);
 					if (fc_tmp) {
 						fc = fc_tmp;
-						g = font->GetFontColorGraphic(fc);
+						g = font->GetFontColorGraphic(*fc);
 					}
 					continue;
 				}
 			}
 		}
-		widths += font->DrawChar<CLIP>(g, utf8, x + widths, y, fc);
+		widths += font->DrawChar<CLIP>(*g, utf8, x + widths, y, *fc);
 
 		if (isReverse == false && fc != backup) {
 			fc = backup;
-			g = font->GetFontColorGraphic(fc);
+			g = font->GetFontColorGraphic(*fc);
 		}
 	}
 	return widths;
 }
 
 
-CLabel::CLabel(const CFont *f) :
+CLabel::CLabel(const CFont &f) :
 	normal(DefaultTextColor),
 	reverse(ReverseTextColor),
-	font(f)
+	font(&f)
 {
 }
 
@@ -818,19 +814,19 @@ void CFont::MakeFontColorTextures() const
 		// already loaded
 		return;
 	}
-	const CGraphic *g = this->G;
-	SDL_Surface *s = g->Surface;
+	const CGraphic &g = *this->G;
+	SDL_Surface *s = g.Surface;
 
 	for (unsigned int i = 0; i < AllFontColors.size(); ++i) {
 		CFontColor *fc = AllFontColors[i];
 		CGraphic *newg = FontColorGraphics[this][fc] = new CGraphic;
 
-		newg->Width = g->Width;
-		newg->Height = g->Height;
-		newg->NumFrames = g->NumFrames;
-		newg->GraphicWidth = g->GraphicWidth;
-		newg->GraphicHeight = g->GraphicHeight;
-		newg->Surface = g->Surface;
+		newg->Width = g.Width;
+		newg->Height = g.Height;
+		newg->NumFrames = g.NumFrames;
+		newg->GraphicWidth = g.GraphicWidth;
+		newg->GraphicHeight = g.GraphicHeight;
+		newg->Surface = g.Surface;
 
 		SDL_LockSurface(s);
 		for (int j = 0; j < MaxFontColors; ++j) {
@@ -896,10 +892,10 @@ void CFont::FreeOpenGL()
 */
 void FreeOpenGLFonts()
 {
-	for (unsigned int i = 0; i < AllFonts.size(); ++i) {
-		CFont *font = AllFonts[i];
+	for (size_t i = 0; i != AllFonts.size(); ++i) {
+		CFont &font = *AllFonts[i];
 
-		font->FreeOpenGL();
+		font.FreeOpenGL();
 	}
 }
 
@@ -907,7 +903,7 @@ void FreeOpenGLFonts()
 void CFont::Reload() const
 {
 	if (this->G) {
-		for (unsigned int j = 0; j < AllFontColors.size(); ++j) {
+		for (size_t j = 0; j != AllFontColors.size(); ++j) {
 			//CGraphic::Free(FontColorGraphics[this][AllFontColors[j]]);
 			CGraphic *g = FontColorGraphics[this][AllFontColors[j]];
 			delete[] g->Textures;
@@ -924,10 +920,10 @@ void CFont::Reload() const
 */
 void ReloadFonts()
 {
-	for (unsigned int i = 0; i < AllFonts.size(); ++i) {
-		const CFont *font = AllFonts[i];
+	for (size_t i = 0; i != AllFonts.size(); ++i) {
+		const CFont &font = *AllFonts[i];
 
-		font->Reload();
+		font.Reload();
 	}
 }
 
@@ -972,18 +968,12 @@ CFont *CFont::Get(const std::string &ident)
 	return font;
 }
 
-/**
-**  CFontColor constructor
-*/
 CFontColor::CFontColor(const std::string &ident)
 {
 	Ident = ident;
 	memset(Colors, 0, sizeof(Colors));
 }
 
-/**
-**  CFontColor destructor
-*/
 CFontColor::~CFontColor()
 {
 }
@@ -1030,7 +1020,7 @@ void CFont::Clean()
 
 	if (UseOpenGL) {
 		if (!FontColorGraphics[font].empty()) {
-			for (int j = 0; j < (int)AllFontColors.size(); ++j) {
+			for (size_t j = 0; j != AllFontColors.size(); ++j) {
 				CGraphic *g = FontColorGraphics[font][AllFontColors[j]];
 				glDeleteTextures(g->NumTextures, g->Textures);
 				delete[] g->Textures;
@@ -1047,7 +1037,7 @@ void CFont::Clean()
 */
 void CleanFonts()
 {
-	for (unsigned int i = 0; i < AllFonts.size(); ++i) {
+	for (size_t i = 0; i != AllFonts.size(); ++i) {
 		CFont *font = AllFonts[i];
 
 		font->Clean();
@@ -1059,7 +1049,7 @@ void CleanFonts()
 	AllFonts.clear();
 	Fonts.clear();
 
-	for (unsigned int i = 0; i < AllFontColors.size(); ++i) {
+	for (size_t i = 0; i != AllFontColors.size(); ++i) {
 		delete AllFontColors[i];
 	}
 	AllFontColors.clear();

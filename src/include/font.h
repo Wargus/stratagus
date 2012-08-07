@@ -99,10 +99,10 @@ public:
 	void FreeOpenGL();
 	void Clean();
 
-	CGraphic *GetFontColorGraphic(const CFontColor *fontColor) const;
+	CGraphic *GetFontColorGraphic(const CFontColor &fontColor) const;
 
 	template<bool CLIP>
-	unsigned int DrawChar(CGraphic *g, int utf8, int x, int y, const CFontColor *fc) const;
+	unsigned int DrawChar(CGraphic &g, int utf8, int x, int y, const CFontColor &fc) const;
 
 	void DynamicLoad() const;
 
@@ -155,8 +155,8 @@ public:
 **  Font selector for the font functions.
 **  FIXME: should be moved to lua
 */
-extern CFont *GetSmallFont();       /// Small font used in stats
-extern CFont *GetGameFont();        /// Normal font used in game
+extern CFont &GetSmallFont();       /// Small font used in stats
+extern CFont &GetGameFont();        /// Normal font used in game
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -183,24 +183,16 @@ extern void CleanFonts();
 
 class CLabel
 {
-	const CFontColor *normal;
-	const CFontColor *reverse;
-	const CFont *font;
-
-	template <const bool CLIP>
-	int DoDrawText(int x, int y, const char *const text,
-				   const size_t len, const CFontColor *fc) const;
-
 public:
-	CLabel(const CFont *f, const std::string &nc, const std::string &rc): font(f) {
+	CLabel(const CFont &f, const std::string &nc, const std::string &rc): font(&f) {
 		normal = CFontColor::Get(nc);
 		reverse = CFontColor::Get(rc);
 	}
-	CLabel(const CFont *f);
+	CLabel(const CFont &f);
 
 	int Height() const { return font->Height(); }
 
-	void SetFont(const CFont *f) { font = f; }
+	void SetFont(const CFont &f) { font = &f; }
 
 	void SetNormalColor(const std::string &nc) { normal = CFontColor::Get(nc); }
 
@@ -215,14 +207,21 @@ public:
 	/// Draw reverse text/number unclipped
 	int DrawReverse(int x, int y, const char *const text) const;
 	int DrawReverse(int x, int y, const std::string &text) const;
-	int DrawReverse(int x, int y, int number)const ;
+	int DrawReverse(int x, int y, int number) const ;
 	/// Draw reverse text/number clipped
 	int DrawReverseClip(int x, int y, const char *const text) const;
 	int DrawReverseClip(int x, int y, const std::string &text) const;
 	int DrawReverseClip(int x, int y, int number) const;
 
 	int DrawCentered(int x, int y, const std::string &text) const;
-
+private:
+	template <const bool CLIP>
+	int DoDrawText(int x, int y, const char *const text,
+				   const size_t len, const CFontColor *fc) const;
+private:
+	const CFontColor *normal;
+	const CFontColor *reverse;
+	const CFont *font;
 };
 
 //@}

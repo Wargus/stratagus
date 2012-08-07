@@ -110,7 +110,7 @@ void TitleScreen::ShowLabels()
 		// offsets are for 640x480, scale up to actual resolution
 		const int x = labels[i]->Xofs * Video.Width / 640;
 		const int y = labels[i]->Yofs * Video.Height / 480;
-		CLabel label(labels[i]->Font);
+		CLabel label(*labels[i]->Font);
 
 		if (labels[i]->Flags & TitleFlagCenter) {
 			label.DrawCentered(x, y, labels[i]->Text);

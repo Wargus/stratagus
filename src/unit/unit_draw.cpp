@@ -460,7 +460,7 @@ void CDecoVarText::Draw(int x, int y,
 	if (this->IsCenteredInY) {
 		y -= this->Font->Height() / 2;
 	}
-	CLabel(this->Font).DrawClip(x, y, Variable.Value);
+	CLabel(*this->Font).DrawClip(x, y, Variable.Value);
 }
 
 /**
@@ -577,9 +577,9 @@ static void DrawDecoration(const CUnit &unit, const CUnitType *type, int x, int 
 			for (groupId = 0; !(unit.GroupId & (1 << groupId)); ++groupId) {
 			}
 		}
-		const int width = GetGameFont()->Width(groupId);
+		const int width = GetGameFont().Width(groupId);
 		x += (unit.Type->TileWidth * PixelTileSize.x + unit.Type->BoxWidth) / 2 - width;
-		const int height = GetGameFont()->Height();
+		const int height = GetGameFont().Height();
 		y += (unit.Type->TileHeight * PixelTileSize.y + unit.Type->BoxHeight) / 2 - height;
 		CLabel(GetGameFont()).DrawClip(x, y, groupId);
 	}

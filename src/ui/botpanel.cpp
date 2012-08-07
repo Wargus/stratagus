@@ -328,7 +328,7 @@ static int GetButtonStatus(const ButtonAction *button, int UnderCursor)
 
 int CPopupContentTypeButtonInfo::GetWidth(const ButtonAction *button, int *) const
 {
-	CFont *font = this->Font ? this->Font : GetSmallFont();
+	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	std::string draw("");
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
@@ -338,13 +338,13 @@ int CPopupContentTypeButtonInfo::GetWidth(const ButtonAction *button, int *) con
 			draw = button->Description;
 			break;
 	}
-	return this->MaxWidth ? std::min((unsigned int)font->getWidth(draw), this->MaxWidth) : font->getWidth(draw);
+	return this->MaxWidth ? std::min((unsigned int)font.getWidth(draw), this->MaxWidth) : font.getWidth(draw);
 }
 
 int CPopupContentTypeButtonInfo::GetHeight(const ButtonAction *button, int *) const
 {
-	CFont *font = this->Font ? this->Font : GetSmallFont();
-	int height = font->Height();
+	CFont &font = this->Font ? *this->Font : GetSmallFont();
+	int height = font.Height();
 	std::string draw("");
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
@@ -356,8 +356,8 @@ int CPopupContentTypeButtonInfo::GetHeight(const ButtonAction *button, int *) co
 	}
 	if (this->MaxWidth && draw.length()) {
 		int i = 1;
-		while ((GetLineFont(i++, draw, this->MaxWidth, font)).length()) {
-			height += font->Height() + 2;
+		while ((GetLineFont(i++, draw, this->MaxWidth, &font)).length()) {
+			height += font.Height() + 2;
 		}
 	}
 	return height;
@@ -365,7 +365,7 @@ int CPopupContentTypeButtonInfo::GetHeight(const ButtonAction *button, int *) co
 
 void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction *button, int *) const
 {
-	CFont *font = this->Font ? this->Font : GetSmallFont();
+	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, "white", "red");
 	std::string draw("");
 	switch (this->InfoType) {
@@ -381,9 +381,9 @@ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup *popup, const 
 		int i = 0;
 		int y_off = y;
 		unsigned int width = std::min(this->MaxWidth, popupWidth - 2 * popup->MarginX);
-		while ((sub = GetLineFont(++i, draw, width, font)).length()) {
+		while ((sub = GetLineFont(++i, draw, width, &font)).length()) {
 			label.Draw(x, y_off, sub);
-			y_off += font->Height() + 2;
+			y_off += font.Height() + 2;
 		}
 		return;
 	}
@@ -393,7 +393,7 @@ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup *popup, const 
 int CPopupContentTypeCosts::GetWidth(const ButtonAction *button, int *Costs) const
 {
 	int popupWidth = 0;
-	CFont *font = this->Font ? this->Font : GetSmallFont();
+	CFont &font = this->Font ? *this->Font : GetSmallFont();
 
 	for (unsigned int i = 1; i < MaxCosts; ++i) {
 		if (Costs[i]) {
@@ -405,7 +405,7 @@ int CPopupContentTypeCosts::GetWidth(const ButtonAction *button, int *Costs) con
 					popupWidth += (G->Width + 5);
 				}
 			}
-			popupWidth += (font->Width(Costs[i]) + 5);
+			popupWidth += (font.Width(Costs[i]) + 5);
 		}
 	}
 	if (Costs[MaxCosts]) {
@@ -421,10 +421,10 @@ int CPopupContentTypeCosts::GetWidth(const ButtonAction *button, int *Costs) con
 					popupWidth += (G->Width + 5);
 				}
 			}
-			popupWidth += font->Width(spell->ManaCost);
-			popupWidth = std::max<int>(popupWidth, font->Width(spell->Name) + 10);
+			popupWidth += font.Width(spell->ManaCost);
+			popupWidth = std::max<int>(popupWidth, font.Width(spell->Name) + 10);
 		} else {
-			popupWidth = font->Width(button->Hint) + 10;
+			popupWidth = font.Width(button->Hint) + 10;
 		}
 		popupWidth = std::max<int>(popupWidth, 100);
 	}
@@ -434,19 +434,19 @@ int CPopupContentTypeCosts::GetWidth(const ButtonAction *button, int *Costs) con
 int CPopupContentTypeCosts::GetHeight(const ButtonAction *button, int *Costs) const
 {
 	int popupHeight = 0;
-	CFont *font = this->Font ? this->Font : GetSmallFont();
+	CFont &font = this->Font ? *this->Font : GetSmallFont();
 
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i] && UI.Resources[i].G) {
 			popupHeight = std::max(UI.Resources[i].G->Height, popupHeight);
 		}
 	}
-	return std::max(popupHeight, font->Height());
+	return std::max(popupHeight, font.Height());
 }
 
 void CPopupContentTypeCosts::Draw(int x, int y, const CPopup *, const unsigned int, const ButtonAction *button, int *Costs) const
 {
-	CFont *font = this->Font ? this->Font : GetSmallFont();
+	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, "white", "red");
 
 	for (unsigned int i = 1; i < MaxCosts; ++i) {
@@ -476,7 +476,7 @@ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup *, const unsigned i
 				G->DrawFrameClip(UI.Resources[ManaResCost].IconFrame, x, y);
 				x += ((x_offset != -1 ? x_offset : G->Width) + 5);
 				y_offset = G->Height;
-				y_offset -= font->Height();
+				y_offset -= font.Height();
 				y_offset /= 2;
 			}
 			label.Draw(x, y + y_offset, spell->ManaCost);
@@ -502,25 +502,24 @@ void CPopupContentTypeLine::Draw(int x, int y, const CPopup *popup, const unsign
 
 int CPopupContentTypeVariable::GetWidth(const ButtonAction *button, int *) const
 {
-	CFont *font = this->Font ? this->Font : GetSmallFont();
+	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	TriggerData.Type = UnitTypes[button->Value];
 	std::string text = EvalString(this->Text);
 	TriggerData.Type = NULL;
-	return font->getWidth(text);
+	return font.getWidth(text);
 }
 
 int CPopupContentTypeVariable::GetHeight(const ButtonAction *, int *) const
 {
-	CFont *font = this->Font ? this->Font : GetSmallFont();
-	return font->Height();
+	CFont &font = this->Font ? *this->Font : GetSmallFont();
+	return font.Height();
 }
 
 void CPopupContentTypeVariable::Draw(int x, int y, const CPopup *, const unsigned int, const ButtonAction *button, int *) const
 {
 	std::string text;										// Optional text to display.
-	CFont *font = this->Font ? this->Font : GetSmallFont(); // Font to use.
+	CFont &font = this->Font ? *this->Font : GetSmallFont(); // Font to use.
 
-	Assert(font);
 	Assert(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.GetNumberVariable()));
 
 	CLabel label(font, "white", "red");

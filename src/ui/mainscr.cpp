@@ -362,15 +362,11 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 void CContentTypeText::Draw(const CUnit &unit, CFont *defaultfont) const
 {
 	std::string text;       // Optional text to display.
-	CFont *font;            // Font to use.
-	int x;                  // X coordinate to display.
-	int y;                  // Y coordinate to display.
+	int x = this->PosX;
+	int y = this->PosY;
+	CFont &font = this->Font ? *this->Font : *defaultfont;
 
-	x = this->PosX;
-	y = this->PosY;
-	font = this->Font ? this->Font : defaultfont;
-
-	Assert(font);
+	Assert(&font);
 	Assert(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.GetNumberVariable()));
 
 	CLabel label(font);
@@ -433,12 +429,11 @@ void CContentTypeText::Draw(const CUnit &unit, CFont *defaultfont) const
 */
 void CContentTypeFormattedText::Draw(const CUnit &unit, CFont *defaultfont) const
 {
-	CFont *font;
 	char buf[256];
 	UStrInt usi1;
 
-	font = this->Font ? this->Font : defaultfont;
-	Assert(font);
+	CFont &font = this->Font ? *this->Font : *defaultfont;
+	Assert(&font);
 
 	CLabel label(font);
 
@@ -469,12 +464,11 @@ void CContentTypeFormattedText::Draw(const CUnit &unit, CFont *defaultfont) cons
 */
 void CContentTypeFormattedText2::Draw(const CUnit &unit, CFont *defaultfont) const
 {
-	CFont *font;
 	char buf[256];
 	UStrInt usi1, usi2;
 
-	font = this->Font ? this->Font : defaultfont;
-	Assert(font);
+	CFont &font = this->Font ? *this->Font : *defaultfont;
+	Assert(&font);
 	CLabel label(font);
 
 	usi1 = GetComponent(unit, this->Index1, this->Component1, 0);
@@ -633,7 +627,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 {
 	if (unit.Orders.size() == 1 || unit.Orders[1]->Action != UnitActionTrain) {
 		if (!UI.SingleTrainingText.empty()) {
-			CLabel label(UI.SingleTrainingFont);
+			CLabel label(*UI.SingleTrainingFont);
 			label.Draw(UI.SingleTrainingTextX, UI.SingleTrainingTextY, UI.SingleTrainingText);
 		}
 		if (UI.SingleTrainingButton) {
@@ -647,7 +641,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 		}
 	} else {
 		if (!UI.TrainingText.empty()) {
-			CLabel label(UI.TrainingFont);
+			CLabel label(*UI.TrainingFont);
 			label.Draw(UI.TrainingTextX, UI.TrainingTextY, UI.TrainingText);
 		}
 		if (!UI.TrainingButtons.empty()) {
@@ -944,7 +938,7 @@ void MessagesDisplay::UpdateMessages()
 void MessagesDisplay::DrawMessages()
 {
 	if (show && Preference.ShowMessages) {
-		CLabel label(UI.MessageFont);
+		CLabel label(*UI.MessageFont);
 #ifdef DEBUG
 		if (showBuilList && ThisPlayer->Ai) {
 			char buffer[256];
@@ -1280,7 +1274,7 @@ void CStatusLine::Draw()
 		PushClipping();
 		SetClipping(this->TextX, this->TextY,
 					this->TextX + this->Width - 1, Video.Height - 1);
-		CLabel(this->Font).DrawClip(this->TextX, this->TextY, this->StatusLine);
+		CLabel(*this->Font).DrawClip(this->TextX, this->TextY, this->StatusLine);
 		PopClipping();
 	}
 }
@@ -1528,7 +1522,7 @@ static void DrawInfoPanelMultipleSelected()
 		std::ostringstream os;
 		os << "+" << (unsigned)(NumSelected - UI.SelectedButtons.size());
 
-		CLabel(UI.MaxSelectedFont).Draw(UI.MaxSelectedTextX, UI.MaxSelectedTextY, os.str());
+		CLabel(*UI.MaxSelectedFont).Draw(UI.MaxSelectedTextX, UI.MaxSelectedTextY, os.str());
 	}
 }
 
@@ -1568,7 +1562,7 @@ static void DrawInfoPanelNoneSelected()
 	label.Draw(x + 110, y, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
 	y += 20;
 
-	if (y + PlayerMax * GetGameFont()->Height() > Video.Height) {
+	if (y + PlayerMax * GetGameFont().Height() > Video.Height) {
 		x = 16;
 		y = 30;
 	}
@@ -1636,7 +1630,7 @@ void DrawTimer()
 	} else {
 		snprintf(buf, sizeof(buf), "%d:%02d", min, sec);
 	}
-	CLabel(UI.Timer.Font).Draw(UI.Timer.X, UI.Timer.Y, buf);
+	CLabel(*UI.Timer.Font).Draw(UI.Timer.X, UI.Timer.Y, buf);
 }
 
 /**
