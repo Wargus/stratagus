@@ -51,6 +51,7 @@
 #define STORE_BUILDING 1
 #define STORE_BOTH 2
 
+#define SPEEDUP_FACTOR 100
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -96,6 +97,13 @@ public:
 	int LastResources[MaxCosts];  /// last values for revenue
 	int Incomes[MaxCosts];        /// income of the resources
 	int Revenue[MaxCosts];        /// income rate of the resources
+
+	int SpeedResourcesHarvest[MaxCosts]; /// speed factor for harvesting resources
+	int SpeedResourcesReturn[MaxCosts];  /// speed factor for returning resources
+	int SpeedBuild;                  /// speed factor for building
+	int SpeedTrain;                  /// speed factor for training
+	int SpeedUpgrade;                /// speed factor for upgrading
+	int SpeedResearch;               /// speed factor for researching
 
 	// FIXME: shouldn't use the constant
 	int UnitTypesCount[UnitTypeMax];  /// total units of unit-type

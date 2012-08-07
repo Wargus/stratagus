@@ -42,6 +42,7 @@
 #include "luacallback.h"
 #include "map.h"
 #include "unit.h"
+#include "unit_find.h"
 
 /**
 **  Handle tracer missile.
@@ -75,6 +76,14 @@ static int TracerMissile(Missile &missile)
 		missile.Type->SmokeParticle->pushInteger(position.x);
 		missile.Type->SmokeParticle->pushInteger(position.y);
 		missile.Type->SmokeParticle->run();
+	}
+	if (missile.Type->Pierce) {
+		Assert(missile.SourceUnit);
+		CUnit *unit = UnitOnMapTile(Map.MapPixelPosToTilePos(missile.position), -1);
+		if (unit && unit->IsAliveOnMap()
+			&& (missile.Type->FriendlyFire || unit->IsEnemy(*missile.SourceUnit->Player))) {
+				missile.MissileHit();
+		}
 	}
 	return 0;
 }

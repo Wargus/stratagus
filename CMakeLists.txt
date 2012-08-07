@@ -213,6 +213,7 @@ set(particle_SRCS
 	src/particle/graphicanimation.cpp
 	src/particle/chunkparticle.cpp
 	src/particle/particlemanager.cpp
+	src/particle/radialparticle.cpp
 	src/particle/smokeparticle.cpp
 	src/particle/staticparticle.cpp
 )

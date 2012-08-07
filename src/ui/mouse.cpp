@@ -278,7 +278,7 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	const int action = type.MouseAction;
 
 	if (dest != NULL && unit.CurrentAction() != UnitActionBuilt) {
-		if (unit.IsEnemy(*dest)) {
+		if (action == MouseActionSpellCast || unit.IsEnemy(*dest)) {
 			dest->Blink = 4;
 			if (!acknowledged) {
 				PlayUnitSound(unit, VoiceAttack);

@@ -43,6 +43,13 @@ class CPlayer
 	int TotalRazings;
 	int TotalKills;
 
+	int SpeedResourcesHarvest[MaxCosts];
+	int SpeedResourcesReturn[MaxCosts];
+	int SpeedBuild;
+	int SpeedTrain;
+	int SpeedUpgrade;
+	int SpeedResearch;
+
 	CUnit& GetUnit(int index) const;
 	int GetUnitCount() const;
 

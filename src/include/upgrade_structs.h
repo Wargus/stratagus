@@ -75,16 +75,6 @@ enum CostType {
 #define ManaResCost (MaxCosts + 2)
 
 /**
-**  Speed factor for harvesting resources
-*/
-extern int SpeedResourcesHarvest[MaxCosts];
-
-/**
-**  Speed factor for returning resources
-*/
-extern int SpeedResourcesReturn[MaxCosts];
-
-/**
 **  Default resources for a new player.
 */
 extern int DefaultResources[MaxCosts];
@@ -187,15 +177,19 @@ public:
 class CUpgradeModifier
 {
 public:
-	CUpgradeModifier() : UpgradeId(0), ConvertTo(NULL) {
+	CUpgradeModifier() : UpgradeId(0), ConvertTo(NULL), ModifyPercent(NULL) {
 		memset(ChangeUnits, 0, sizeof(ChangeUnits));
 		memset(ChangeUpgrades, 0, sizeof(ChangeUpgrades));
 		memset(ApplyTo, 0, sizeof(ApplyTo));
 	}
+	~CUpgradeModifier() {
+		delete [] this->ModifyPercent;
+	}
 
 	int UpgradeId;                      /// used to filter required modifier
 
-	CUnitStats Modifier;                 /// modifier of unit stats.
+	CUnitStats Modifier;                /// modifier of unit stats.
+	int *ModifyPercent;                /// use for percent modifiers
 
 	// allow/forbid bitmaps -- used as chars for example:
 	// `?' -- leave as is, `F' -- forbid, `A' -- allow

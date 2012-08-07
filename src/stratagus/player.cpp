@@ -512,6 +512,27 @@ void CPlayer::Save(CFile &file) const
 	file.printf("\n  \"total-razings\", %d,", p.TotalRazings);
 	file.printf("\n  \"total-kills\", %d,", p.TotalKills);
 
+	file.printf("\n  \"speed-resource-harvest\", {");
+	for (int j = 0; j < MaxCosts; ++j) {
+		if (j) {
+			file.printf(" ");
+		}
+		file.printf("%d,", p.SpeedResourcesHarvest[j]);
+	}
+	file.printf("},");
+	file.printf("\n  \"speed-resource-return\", {");
+	for (int j = 0; j < MaxCosts; ++j) {
+		if (j) {
+			file.printf(" ");
+		}
+		file.printf("%d,", p.SpeedResourcesReturn[j]);
+	}
+	file.printf("},");
+	file.printf("\n  \"speed-build\", %d,", p.SpeedBuild);
+	file.printf("\n  \"speed-train\", %d,", p.SpeedTrain);
+	file.printf("\n  \"speed-upgrade\", %d,", p.SpeedUpgrade);
+	file.printf("\n  \"speed-research\", %d,", p.SpeedResearch);
+
 	Uint8 r, g, b;
 
 	SDL_GetRGB(p.Color, TheScreen->format, &r, &g, &b);
@@ -739,6 +760,14 @@ void CPlayer::Clear()
 	TotalKills = 0;
 	Color = 0;
 	UpgradeTimers.Clear();
+	for (int i = 0; i < MaxCosts; ++i) {
+		SpeedResourcesHarvest[i] = SPEEDUP_FACTOR;
+		SpeedResourcesReturn[i] = SPEEDUP_FACTOR;
+	}
+	SpeedBuild = SPEEDUP_FACTOR;
+	SpeedTrain = SPEEDUP_FACTOR;
+	SpeedUpgrade = SPEEDUP_FACTOR;
+	SpeedResearch = SPEEDUP_FACTOR;
 }
 
 

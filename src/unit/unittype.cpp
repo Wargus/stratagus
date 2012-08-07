@@ -165,6 +165,7 @@ CUnitType::CUnitType() :
 	memset(ResInfo, 0, sizeof(ResInfo));
 	memset(&NeutralMinimapColorRGB, 0, sizeof(NeutralMinimapColorRGB));
 	memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
+	memset(MissileOffsets, 0, sizeof(MissileOffsets));
 }
 
 CUnitType::~CUnitType()

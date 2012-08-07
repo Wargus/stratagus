@@ -552,6 +552,9 @@ class Mng;
 #endif
 class LuaCallback;
 
+#define UnitSides 8
+#define MaxAttackPos 5
+
 CUnitType *UnitTypeByIdent(const std::string &ident);
 
 enum GroupSelectionMode {
@@ -913,15 +916,16 @@ public:
 	std::string File;               /// Sprite files
 	std::string ShadowFile;         /// Shadow file
 
-	int Width;                      /// Sprite width
-	int Height;                     /// Sprite height
-	int OffsetX;                    /// Sprite horizontal offset
-	int OffsetY;                    /// Sprite vertical offset
-	int DrawLevel;                  /// Level to Draw UnitType at
-	int ShadowWidth;                /// Shadow sprite width
-	int ShadowHeight;               /// Shadow sprite height
-	int ShadowOffsetX;              /// Shadow horizontal offset
-	int ShadowOffsetY;              /// Shadow vertical offset
+	int Width;                                            /// Sprite width
+	int Height;                                           /// Sprite height
+	int OffsetX;                                          /// Sprite horizontal offset
+	int OffsetY;                                          /// Sprite vertical offset
+	int DrawLevel;                                        /// Level to Draw UnitType at
+	int ShadowWidth;                                      /// Shadow sprite width
+	int ShadowHeight;                                     /// Shadow sprite height
+	int ShadowOffsetX;                                    /// Shadow horizontal offset
+	int ShadowOffsetY;                                    /// Shadow vertical offset
+	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
 
 	CAnimations *Animations;        /// Animation scripts
 	int StillFrame;                 /// Still frame

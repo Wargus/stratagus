@@ -49,6 +49,7 @@
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"
+#include "unit_find.h"
 #include "unitsound.h"
 #include "unittype.h"
 
@@ -376,7 +377,9 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 
 	// If Firing from inside a Bunker
 	CUnit *from = GetFirstContainer(unit);
-	const PixelPos startPixelPos = Map.TilePosToMapPixelPos_Center(from->tilePos);
+	const int dir = ((unit.Direction + NextDirection / 2) & 0xFF) / NextDirection;
+	const PixelPos startPixelPos = Map.TilePosToMapPixelPos_Center(from->tilePos)
+		+ unit.Type->MissileOffsets[dir][0];
 
 	Vec2i dpos;
 	if (goal) {
@@ -391,7 +394,12 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 		}
 		// Fire to nearest point of the unit!
 		// If Firing from inside a Bunker
-		NearestOfUnit(*goal, GetFirstContainer(unit)->tilePos, &dpos);
+		if (unit.Container) {
+			NearestOfUnit(*goal, GetFirstContainer(unit)->tilePos, &dpos);
+		} else {
+			dpos.x = goal->tilePos.x + goal->Type->TileWidth / 2;
+			dpos.y = goal->tilePos.y + goal->Type->TileHeight / 2;
+		}
 	} else {
 		dpos = newgoalPos;
 		// FIXME: Can this be too near??
@@ -660,6 +668,14 @@ bool PointToPointMissile(Missile &missile)
 		missile.Type->SmokeParticle->pushInteger(position.x);
 		missile.Type->SmokeParticle->pushInteger(position.y);
 		missile.Type->SmokeParticle->run();
+	}
+
+	if (missile.Type->Pierce) {
+		CUnit *unit = UnitOnMapTile(Map.MapPixelPosToTilePos(missile.position), -1);
+		if (unit && unit->IsAliveOnMap() 
+			&& (missile.Type->FriendlyFire || unit->IsEnemy(*missile.SourceUnit->Player))) {
+				missile.MissileHit();
+		}
 	}
 
 	return false;
@@ -1096,8 +1112,8 @@ MissileType::MissileType(const std::string &ident) :
 	Ident(ident), Transparency(0), DrawLevel(0),
 	SpriteFrames(0), NumDirections(0), ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
 	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
-	AlwaysFire(false), Class(), NumBounces(0), StartDelay(0), Sleep(0), Speed(0),
-	Range(0), SplashFactor(0), ImpactParticle(NULL), SmokeParticle(NULL), G(NULL)
+	AlwaysFire(false), Pierce(false), Class(), NumBounces(0), StartDelay(0), Sleep(0),
+	Speed(0), Range(0), SplashFactor(0), ImpactParticle(NULL), SmokeParticle(NULL), G(NULL)
 {
 	size.x = 0;
 	size.y = 0;

@@ -125,7 +125,8 @@ protected:
 class CChunkParticle : public CParticle
 {
 public:
-	CChunkParticle(CPosition position, Animation *smokeAnimation);
+	CChunkParticle(CPosition position, Animation *smokeAnimation, Animation *debrisAnimation,
+		int minVelocity, int maxVelocity, int minTrajectoryAngle);
 	virtual ~CChunkParticle();
 
 	virtual void draw();
@@ -139,7 +140,11 @@ protected:
 	int nextSmokeTicks;
 	int lifetime;
 	int age;
+	int minVelocity;
+	int maxVelocity;
+	int minTrajectoryAngle;
 	float height;
+	Animation *debrisAnimation;
 	Animation *smokeAnimation;
 
 	struct {
@@ -162,6 +167,23 @@ public:
 
 protected:
 	Animation *puff;
+};
+
+class CRadialParticle : public CParticle
+{
+public:
+	CRadialParticle(CPosition position, Animation *animation, int maxSpeed);
+	virtual ~CRadialParticle();
+
+	virtual void draw();
+	virtual void update(int ticks);
+	virtual CParticle *clone();
+
+protected:
+	Animation *animation;
+	float direction;
+	int speed;
+	int maxSpeed;
 };
 
 

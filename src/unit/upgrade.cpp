@@ -252,6 +252,8 @@ static int CclDefineModifier(lua_State *l)
 	memset(um->ChangeUpgrades, '?', sizeof(um->ChangeUpgrades));
 	memset(um->ApplyTo, '?', sizeof(um->ApplyTo));
 	um->Modifier.Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
+	um->ModifyPercent = new int[UnitTypeVar.GetNumberVariable()];
+	memset(um->ModifyPercent, 0, UnitTypeVar.GetNumberVariable() * sizeof(int));
 
 	um->UpgradeId = UpgradeIdByIdent(LuaToString(l, 1));
 
@@ -338,17 +340,28 @@ static int CclDefineModifier(lua_State *l)
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[key]; // variable index;
 			if (index != -1) {
-				lua_rawgeti(l, j + 1, 2);
-				if (lua_istable(l, -1)) {
-					DefineVariableField(l, um->Modifier.Variables + index, -1);
-				} else if (lua_isnumber(l, -1)) {
-					um->Modifier.Variables[index].Enable = 1;
-					um->Modifier.Variables[index].Value = LuaToNumber(l, -1);
-					um->Modifier.Variables[index].Max = LuaToNumber(l, -1);
+				if (lua_rawlen(l, j + 1) == 3) {
+					lua_rawgeti(l, j + 1, 3);
+					const char *value = LuaToString(l, -1);
+					lua_pop(l, 1);
+					if (!strcmp(value, "Percent")) {
+						lua_rawgeti(l, j + 1, 2);
+						um->ModifyPercent[index] = LuaToNumber(l, -1);
+						lua_pop(l, 1);
+					}
 				} else {
-					LuaError(l, "bad argument type for '%s'\n" _C_ key);
+					lua_rawgeti(l, j + 1, 2);
+					if (lua_istable(l, -1)) {
+						DefineVariableField(l, um->Modifier.Variables + index, -1);
+					} else if (lua_isnumber(l, -1)) {
+						um->Modifier.Variables[index].Enable = 1;
+						um->Modifier.Variables[index].Value = LuaToNumber(l, -1);
+						um->Modifier.Variables[index].Max = LuaToNumber(l, -1);
+					} else {
+						LuaError(l, "bad argument type for '%s'\n" _C_ key);
+					}
+					lua_pop(l, 1);
 				}
-				lua_pop(l, 1);
 			} else {
 				LuaError(l, "wrong tag: %s" _C_ key);
 			}
@@ -583,19 +596,28 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
 				varModified |= um->Modifier.Variables[j].Value
 							   | um->Modifier.Variables[j].Max
-							   | um->Modifier.Variables[j].Increase;
-				stat.Variables[j].Value += um->Modifier.Variables[j].Value;
+							   | um->Modifier.Variables[j].Increase
+							   | um->Modifier.Variables[j].Enable
+							   | um->ModifyPercent[j];
+				stat.Variables[j].Enable = um->Modifier.Variables[j].Enable;
+				if (um->ModifyPercent[j]) {
+					stat.Variables[j].Value += stat.Variables[j].Value * um->ModifyPercent[j] / 100;
+					stat.Variables[j].Max += stat.Variables[j].Max * um->ModifyPercent[j] / 100;
+				} else {
+					stat.Variables[j].Value += um->Modifier.Variables[j].Value;
+					stat.Variables[j].Max += um->Modifier.Variables[j].Max;
+					stat.Variables[j].Increase += um->Modifier.Variables[j].Increase;
+				}
+
 				if (stat.Variables[j].Value < 0) {
 					stat.Variables[j].Value = 0;
 				}
-				stat.Variables[j].Max += um->Modifier.Variables[j].Max;
 				if (stat.Variables[j].Max < 0) {
 					stat.Variables[j].Max = 0;
 				}
 				if (stat.Variables[j].Value > stat.Variables[j].Max) {
 					stat.Variables[j].Value = stat.Variables[j].Max;
 				}
-				stat.Variables[j].Increase += um->Modifier.Variables[j].Increase;
 			}
 
 			// And now modify ingame units
@@ -610,7 +632,15 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						continue;
 					}
 					for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
-						unit.Variable[j].Value += um->Modifier.Variables[j].Value;
+						unit.Variable[j].Enable = um->Modifier.Variables[j].Enable;
+						if (um->ModifyPercent[j]) {
+							unit.Variable[j].Value += unit.Variable[j].Value * um->ModifyPercent[j] / 100;
+							unit.Variable[j].Max += unit.Variable[j].Max * um->ModifyPercent[j] / 100;
+						} else {
+							unit.Variable[j].Value += um->Modifier.Variables[j].Value;
+							unit.Variable[j].Increase += um->Modifier.Variables[j].Increase;
+						}
+
 						if (unit.Variable[j].Value < 0) {
 							unit.Variable[j].Value = 0;
 						}
@@ -621,7 +651,6 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						if (unit.Variable[j].Value > unit.Variable[j].Max) {
 							unit.Variable[j].Value = unit.Variable[j].Max;
 						}
-						unit.Variable[j].Increase += um->Modifier.Variables[j].Increase;
 					}
 				}
 			}

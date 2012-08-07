@@ -27,11 +27,19 @@ public:
 class CChunkParticle : public CParticle
 {
 public:
-	CChunkParticle(CPosition position, Animation *smokeAnimation);
+	CChunkParticle(CPosition position, Animation *smokeAnimation, Animation *debrisAnimation, int minVelocity = 0, int maxVelocity = 400, int minTrajectoryAngle = 77);
 };
 
 class CSmokeParticle : public CParticle
 {
+public:
+	CSmokeParticle(CPosition position, Animation *animation);
+};
+
+class CRadialParticle : public CParticle
+{
+public:
+	CRadialParticle(CPosition position, Animation *smokeAnimation, int maxSpeed);
 };
 
 class CParticleManager

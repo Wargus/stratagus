@@ -36,8 +36,6 @@
 
 #include "stratagus.h"
 
-#include "iolib.h"
-
 #include "iocompat.h"
 #include "map.h"
 #include "util.h"
@@ -47,6 +45,8 @@
 #ifndef _MSC_VER
 #include <fcntl.h>
 #endif
+
+#include "iolib.h"
 
 #include <zlib.h>
 

@@ -283,6 +283,7 @@ static void HandleBuffs(CUnit &unit, int amount)
 		unit.Variable[HP_INDEX].Value -= amount;
 		if (unit.Variable[HP_INDEX].Value <= 0) {
 			LetUnitDie(unit);
+			return;
 		}
 	}
 
@@ -343,7 +344,7 @@ static void HandleUnitAction(CUnit &unit)
 		// o Or the order queue should be flushed.
 		if ((unit.Orders[0]->Action == UnitActionStandGround || unit.Orders[0]->Finished)
 			&& unit.Orders.size() > 1) {
-			if (unit.Removed) { // FIXME: johns I see this as an error
+			if (unit.Removed && unit.Orders[0]->Action != UnitActionBoard) { // FIXME: johns I see this as an error
 				DebugPrint("Flushing removed unit\n");
 				// This happens, if building with ALT+SHIFT.
 				return;

@@ -991,6 +991,31 @@ static int CclGetUnits(lua_State *l)
 }
 
 /**
+**
+**  Get the value of the unit bool-flag.
+**
+**  @param l  Lua state.
+**
+**  @return   The value of the bool-flag of the unit.
+*/
+static int CclGetUnitBoolFlag(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+
+	lua_pushvalue(l, 1);
+	const CUnit *unit = CclGetUnit(l);
+	lua_pop(l, 1);
+
+	const char *const value = LuaToString(l, 2);
+	int index = UnitTypeVar.BoolFlagNameLookup[value];// User bool flags
+	if (index == -1) {
+		LuaError(l, "Bad bool-flag name '%s'\n" _C_ value);
+	}
+	lua_pushboolean(l, unit->Type->BoolFlag[index].value);
+	return 1;
+}
+
+/**
 **  Get the value of the unit variable.
 **
 **  @param l  Lua state.
@@ -1130,6 +1155,7 @@ void UnitCclRegister()
 	lua_register(Lua, "GetUnits", CclGetUnits);
 
 	// unit member access functions
+	lua_register(Lua, "GetUnitBoolFlag", CclGetUnitBoolFlag);
 	lua_register(Lua, "GetUnitVariable", CclGetUnitVariable);
 	lua_register(Lua, "SetUnitVariable", CclSetUnitVariable);
 

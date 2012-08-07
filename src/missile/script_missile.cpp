@@ -158,6 +158,8 @@ void MissileType::Load(lua_State *l)
 			this->CanHitOwner = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "AlwaysFire")) {
 			this->AlwaysFire = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Pierce")) {
+			this->Pierce = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "FriendlyFire")) {
 			this->FriendlyFire = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SplashFactor")) {
@@ -376,7 +378,7 @@ static int CclDefineBurningBuilding(lua_State *l)
 */
 static int CclCreateMissile(lua_State *l)
 {
-	LuaCheckArgs(l, 5);
+	LuaCheckArgs(l, 6);
 
 	const std::string name = LuaToString(l, 1);
 	const MissileType *mtype = MissileTypeByIdent(name);
@@ -405,6 +407,7 @@ static int CclCreateMissile(lua_State *l)
 
 	const int sourceUnitId = LuaToNumber(l, 4);
 	const int destUnitId = LuaToNumber(l, 5);
+	const bool dealDamage = LuaToBoolean(l, 6);
 	CUnit *sourceUnit = sourceUnitId != -1 ? &UnitManager.GetSlotUnit(sourceUnitId) : NULL;
 	CUnit *destUnit = destUnitId != -1 ? &UnitManager.GetSlotUnit(destUnitId) : NULL;
 
@@ -419,7 +422,9 @@ static int CclCreateMissile(lua_State *l)
 	if (!missile) {
 		return 0;
 	}
-	missile->SourceUnit = sourceUnit;
+	if (dealDamage) {
+		missile->SourceUnit = sourceUnit;
+	}
 	missile->TargetUnit = destUnit;
 	return 0;
 }

@@ -85,6 +85,15 @@ public:
 	bool UpdateCache;
 };
 
+// Minimap surface with units (for OpenGL)
+extern unsigned char *MinimapSurfaceGL;
+// Minimap surface with terrain only (for OpenGL)
+extern unsigned char *MinimapTerrainSurfaceGL;
+// Minimap surface with units (for software)
+extern SDL_Surface *MinimapSurface;
+// Minimap surface with terrain only (for software)
+extern SDL_Surface *MinimapTerrainSurface;
+
 //@}
 
 #endif // !__MINIMAP_H__

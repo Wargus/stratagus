@@ -639,6 +639,31 @@ static int CclDefineUnitType(lua_State *l)
 			} else {
 				LuaError(l, "Unsupported Type: %s" _C_ value);
 			}
+		} else if (!strcmp(value, "MissileOffsets")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, -1, k + 1);
+				if (!lua_istable(l, -1) || lua_rawlen(l, -1) != UnitSides) {
+					LuaError(l, "incorrect argument");
+				}
+				for (int m = 0; m < UnitSides; ++m) {
+					lua_rawgeti(l, -1, m + 1);
+					if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
+						LuaError(l, "incorrect argument");
+					}
+					lua_rawgeti(l, -1, 1);
+					type->MissileOffsets[m][k].x = LuaToNumber(l, -1);
+					lua_pop(l, 1);
+					lua_rawgeti(l, -1, 2);
+					type->MissileOffsets[m][k].y = LuaToNumber(l, -1);
+					lua_pop(l, 1);
+					lua_pop(l, 1);
+				}
+				lua_pop(l, 1);
+			}
 		} else if (!strcmp(value, "Impact")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

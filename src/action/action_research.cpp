@@ -133,7 +133,7 @@
 	}
 #endif
 	CPlayer &player = *unit.Player;
-	player.UpgradeTimers.Upgrades[upgrade.ID] += SpeedResearch;
+	player.UpgradeTimers.Upgrades[upgrade.ID] += player.SpeedResearch / SPEEDUP_FACTOR;
 	if (player.UpgradeTimers.Upgrades[upgrade.ID] >= upgrade.Costs[TimeCost]) {
 		player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.Name.c_str());
 		if (&player == ThisPlayer) {

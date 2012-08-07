@@ -351,7 +351,7 @@ void COrder_Built::Progress(CUnit &unit, int amount)
 	Boost(unit, amount, HP_INDEX);
 	Boost(unit, amount, SHIELD_INDEX);
 
-	this->ProgressCounter += amount * SpeedBuild;
+	this->ProgressCounter += amount * unit.Player->SpeedBuild / SPEEDUP_FACTOR;
 	UpdateConstructionFrame(unit);
 }
 
@@ -359,7 +359,7 @@ void COrder_Built::ProgressHp(CUnit &unit, int amount)
 {
 	Boost(unit, amount, HP_INDEX);
 
-	this->ProgressCounter += amount * SpeedBuild;
+	this->ProgressCounter += amount * unit.Player->SpeedBuild / SPEEDUP_FACTOR;
 	UpdateConstructionFrame(unit);
 }
 
@@ -370,7 +370,7 @@ void COrder_Built::Boost(CUnit &building, int amount, int varIndex) const
 
 	const int costs = building.Stats->Costs[TimeCost] * 600;
 	const int progress = this->ProgressCounter;
-	const int newProgress = progress + amount * SpeedBuild;
+	const int newProgress = progress + amount * building.Player->SpeedBuild / SPEEDUP_FACTOR;
 	const int maxValue = building.Variable[varIndex].Max;
 
 	int &currentValue = building.Variable[varIndex].Value;

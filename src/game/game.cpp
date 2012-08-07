@@ -34,6 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <png.h>
+
 #include "stratagus.h"
 
 #include "actions.h"
@@ -168,6 +170,115 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 	Map.Info.Filename = mapname;
 }
 
+// Write a small image of map preview
+static void WriteMapPreview(const char *mapname, CMap &map)
+{
+	FILE *fp = fopen(mapname, "wb");
+	if (fp == NULL) {
+		return;
+	}
+
+	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	if (png_ptr == NULL) {
+		fclose(fp);
+		return;
+	}
+
+	png_infop info_ptr = png_create_info_struct(png_ptr);
+	if (info_ptr == NULL) {
+		fclose(fp);
+		png_destroy_write_struct(&png_ptr, NULL);
+		return;
+	}
+
+	if (setjmp(png_jmpbuf(png_ptr))) {
+		/* If we get here, we had a problem reading the file */
+		fclose(fp);
+		png_destroy_write_struct(&png_ptr, &info_ptr);
+		return;
+	}
+
+	/* set up the output control if you are using standard C streams */
+	png_init_io(png_ptr, fp);
+
+	png_set_IHDR(png_ptr, info_ptr, UI.Minimap.W, UI.Minimap.H, 8,
+		PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+		PNG_FILTER_TYPE_DEFAULT);
+
+	png_write_info(png_ptr, info_ptr);
+
+	if (UseOpenGL) {
+		unsigned char *pixels = new unsigned char[UI.Minimap.W * UI.Minimap.H * 3];
+		if (!pixels) {
+			fprintf(stderr, "Out of memory\n");
+			exit(1);
+		}
+#ifndef USE_GLES
+		glReadBuffer(GL_FRONT);
+#endif
+		glReadPixels(UI.Minimap.X, UI.Minimap.Y, UI.Minimap.W, UI.Minimap.H, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+		for (int i = 0; i < UI.Minimap.H; ++i) {
+			png_write_row(png_ptr, pixels + (UI.Minimap.H - 1 - i) * UI.Minimap.W * 3);
+		}
+		delete[] pixels;
+	} else {
+		unsigned char *row = new unsigned char[UI.Minimap.W * 3];
+		const SDL_PixelFormat *fmt = MinimapSurface->format;
+		SDL_Surface *preview = SDL_CreateRGBSurface(SDL_SWSURFACE,
+			UI.Minimap.W, UI.Minimap.H, 32, fmt->Rmask, fmt->Gmask, fmt->Bmask, 0);
+		SDL_BlitSurface(MinimapSurface, NULL, preview, NULL);
+
+		SDL_LockSurface(preview);
+
+		SDL_Rect rect;
+		const unsigned int rectSize = 5;
+		for (int i = 0; i < PlayerMax - 1; ++i) {
+			if (Players[i].Type != PlayerNobody) {
+				rect.x = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidth - rectSize / 2;
+				rect.y = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeight - rectSize / 2;
+				rect.w = rect.h = rectSize;
+				SDL_FillRect(preview, &rect, Players[i].Color);
+			}
+		}
+
+		for (int i = 0; i < UI.Minimap.H; ++i) {
+			switch (preview->format->BytesPerPixel) {
+				case 1:
+					for (int j = 0; j < UI.Minimap.W; ++j) {
+						Uint8 c = ((Uint8 *)preview->pixels)[j + i * UI.Minimap.W];
+						row[j * 3 + 0] = fmt->palette->colors[c].r;
+						row[j * 3 + 1] = fmt->palette->colors[c].g;
+						row[j * 3 + 2] = fmt->palette->colors[c].b;
+					}
+					break;
+				case 3:
+					memcpy(row, (char *)preview->pixels + i * UI.Minimap.W, UI.Minimap.W * 3);
+					break;
+				case 4:
+					for (int j = 0; j < UI.Minimap.W; ++j) {
+						Uint32 c = ((Uint32 *)preview->pixels)[j + i * UI.Minimap.W];
+						row[j * 3 + 0] = ((c & fmt->Rmask) >> fmt->Rshift);
+						row[j * 3 + 1] = ((c & fmt->Gmask) >> fmt->Gshift);
+						row[j * 3 + 2] = ((c & fmt->Bmask) >> fmt->Bshift);
+					}
+					break;
+			}
+			png_write_row(png_ptr, row);
+		}
+		delete[] row;
+
+		SDL_UnlockSurface(preview);
+		SDL_FreeSurface(preview);
+	}
+
+	png_write_end(png_ptr, info_ptr);
+
+	/* clean up after the write, and free any memory allocated */
+	png_destroy_write_struct(&png_ptr, &info_ptr);
+
+	fclose(fp);
+}
+
 
 // Write the map presentation file
 static int WriteMapPresentation(const std::string &mapname, CMap &map, char *)
@@ -282,6 +393,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 		}
 
 		f->printf("-- place units\n");
+		f->printf("if (MapUnitsInit ~= nil) then MapUnitsInit() end\n");
 		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 			CUnit &unit = **it;
 			f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
@@ -315,7 +427,9 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain)
 {
 	char mapSetup[PATH_MAX];
-	char *extension;
+	char previewName[PATH_MAX];
+	char *setupExtension;
+	char *previewExtension;
 
 	if (!map.Info.MapWidth || !map.Info.MapHeight) {
 		fprintf(stderr, "%s: invalid Stratagus map\n", mapName.c_str());
@@ -323,12 +437,17 @@ int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain)
 	}
 
 	strcpy_s(mapSetup, sizeof(mapSetup), mapName.c_str());
-	extension = strstr(mapSetup, ".smp");
-	if (!extension) {
+	setupExtension = strstr(mapSetup, ".smp");
+	if (!setupExtension) {
 		fprintf(stderr, "%s: invalid Statagus map filename\n", mapName.c_str());
 	}
-	memcpy(extension, ".sms", 4 * sizeof(char));
 
+	strcpy_s(previewName, sizeof(previewName), mapName.c_str());
+	previewExtension = strstr(previewName, ".smp");
+	memcpy(previewExtension, ".png\0", 5 * sizeof(char));
+	WriteMapPreview(previewName, map);
+
+	memcpy(setupExtension, ".sms", 4 * sizeof(char));
 	if (WriteMapPresentation(mapName, map, mapSetup) == -1) {
 		return -1;
 	}
@@ -910,50 +1029,54 @@ static int CclGetGodMode(lua_State *l)
 }
 
 /**
-**  Set resource harvesting speed.
+**  Set resource harvesting speed (deprecated).
 **
 **  @param l  Lua state.
 */
 static int CclSetSpeedResourcesHarvest(lua_State *l)
 {
-	LuaCheckArgs(l, 2);
+	LuaCheckArgs(l, 3);
 
-	const std::string resource = LuaToString(l, 1);
+	const int player = LuaToNumber(l, 1);
+	const std::string resource = LuaToString(l, 2);
 	const int resId = GetResourceIdByName(l, resource.c_str());
 
-	SpeedResourcesHarvest[resId] = LuaToNumber(l, 2);
+	Players[player].SpeedResourcesHarvest[resId] = LuaToNumber(l, 3);
 	return 0;
 }
 
 /**
-**  Set resource returning speed.
+**  Set resource returning speed (deprecated).
 **
 **  @param l  Lua state.
 */
 static int CclSetSpeedResourcesReturn(lua_State *l)
 {
-	LuaCheckArgs(l, 2);
-	const std::string resource = LuaToString(l, 1);
+	LuaCheckArgs(l, 3);
+
+	const int player = LuaToNumber(l, 1);
+	const std::string resource = LuaToString(l, 2);
 	const int resId = GetResourceIdByName(l, resource.c_str());
 
-	SpeedResourcesReturn[resId] = LuaToNumber(l, 2);
+	Players[player].SpeedResourcesReturn[resId] = LuaToNumber(l, 3);
 	return 0;
 }
 
 /**
-**  Set building speed.
+**  Set building speed (deprecated).
 **
 **  @param l  Lua state.
 */
 static int CclSetSpeedBuild(lua_State *l)
 {
-	LuaCheckArgs(l, 1);
-	SpeedBuild = LuaToNumber(l, 1);
+	LuaCheckArgs(l, 2);
+	const int player = LuaToNumber(l, 1);
+	Players[player].SpeedBuild = LuaToNumber(l, 2);
 	return 0;
 }
 
 /**
-**  Get building speed.
+**  Get building speed (deprecated).
 **
 **  @param l  Lua state.
 **
@@ -961,25 +1084,27 @@ static int CclSetSpeedBuild(lua_State *l)
 */
 static int CclGetSpeedBuild(lua_State *l)
 {
-	LuaCheckArgs(l, 0);
-	lua_pushnumber(l, SpeedBuild);
+	LuaCheckArgs(l, 1);
+	const int player = LuaToNumber(l, 1);
+	lua_pushnumber(l, Players[player].SpeedBuild);
 	return 1;
 }
 
 /**
-**  Set training speed.
+**  Set training speed (deprecated).
 **
 **  @param l  Lua state.
 */
 static int CclSetSpeedTrain(lua_State *l)
 {
-	LuaCheckArgs(l, 1);
-	SpeedTrain = LuaToNumber(l, 1);
+	LuaCheckArgs(l, 2);
+	const int player = LuaToNumber(l, 1);
+	Players[player].SpeedTrain = LuaToNumber(l, 2);
 	return 0;
 }
 
 /**
-**  Get training speed.
+**  Get training speed (deprecated).
 **
 **  @param l  Lua state.
 **
@@ -987,58 +1112,60 @@ static int CclSetSpeedTrain(lua_State *l)
 */
 static int CclGetSpeedTrain(lua_State *l)
 {
-	LuaCheckArgs(l, 0);
-	lua_pushnumber(l, SpeedTrain);
+	LuaCheckArgs(l, 1);
+	const int player = LuaToNumber(l, 1);
+	lua_pushnumber(l, Players[player].SpeedTrain);
 	return 1;
 }
 
 /**
-**  For debug increase upgrading speed.
+**  For debug increase upgrading speed (deprecated).
 **
 **  @param l  Lua state.
 */
 static int CclSetSpeedUpgrade(lua_State *l)
 {
-	LuaCheckArgs(l, 1);
-	SpeedUpgrade = LuaToNumber(l, 1);
+	LuaCheckArgs(l, 2);
+	const int player = LuaToNumber(l, 1);
+	Players[player].SpeedUpgrade = LuaToNumber(l, 2);
 
-	lua_pushnumber(l, SpeedUpgrade);
+	lua_pushnumber(l, Players[player].SpeedUpgrade);
 	return 1;
 }
 
 /**
-**  For debug increase researching speed.
+**  For debug increase researching speed (deprecated).
 **
 **  @param l  Lua state.
 */
 static int CclSetSpeedResearch(lua_State *l)
 {
-	LuaCheckArgs(l, 1);
-	SpeedResearch = LuaToNumber(l, 1);
+	LuaCheckArgs(l, 2);
+	const int player = LuaToNumber(l, 1);
+	Players[player].SpeedResearch = LuaToNumber(l, 2);
 
-	lua_pushnumber(l, SpeedResearch);
+	lua_pushnumber(l, Players[player].SpeedResearch);
 	return 1;
 }
 
 /**
-**  For debug increase all speeds.
+**  For debug increase all speeds (deprecated).
 **
 **  @param l  Lua state.
 */
 static int CclSetSpeeds(lua_State *l)
 {
-	int i;
-	int s;
-
 	LuaCheckArgs(l, 1);
-	s = LuaToNumber(l, 1);
-	for (i = 0; i < MaxCosts; ++i) {
-		SpeedResourcesHarvest[i] = s;
-		SpeedResourcesReturn[i] = s;
+	const int speed = LuaToNumber(l, 1);
+	for (int i = 0; i < PlayerMax; ++i) {
+		for (int j = 0; j < MaxCosts; ++j) {
+			Players[i].SpeedResourcesHarvest[j] = speed;
+			Players[i].SpeedResourcesReturn[j] = speed;
+		}
+		Players[i].SpeedBuild = Players[i].SpeedTrain = Players[i].SpeedUpgrade = Players[i].SpeedResearch = speed;
 	}
-	SpeedBuild = SpeedTrain = SpeedUpgrade = SpeedResearch = s;
 
-	lua_pushnumber(l, s);
+	lua_pushnumber(l, speed);
 	return 1;
 }
 

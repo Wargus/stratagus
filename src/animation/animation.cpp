@@ -177,7 +177,14 @@ int ParseAnimInt(const CUnit *unit, const char *parseint)
 			return goal->Variable[index].Value * 100 / goal->Variable[index].Max;
 		}
 		return 0;
-	} else if ((s[0] == 'b') && unit != NULL) { //unit bool flag detected
+	} else if ((s[0] == 'b' || s[0] == 'g') && unit != NULL) { //unit bool flag detected
+		if (s[0] == 'g') {
+			if (unit->CurrentOrder()->HasGoal()) {
+				goal = unit->CurrentOrder()->GetGoal();
+			} else {
+				return 0;
+			}
+		}
 		const int index = UnitTypeVar.BoolFlagNameLookup[cur];// User bool flags
 		if (index == -1) {
 			fprintf(stderr, "Bad bool-flag name '%s'\n", cur);
@@ -209,10 +216,11 @@ int ParseAnimInt(const CUnit *unit, const char *parseint)
 	} else if (s[0] == 'r') { //random value
 		char *next = strchr(cur, '.');
 		if (next == NULL) {
-			return SyncRand(atoi(cur));
+			return SyncRand(atoi(cur) + 1);
 		} else {
 			*next = '\0';
-			return atoi(cur) + SyncRand(atoi(next + 1));
+			const int min = atoi(cur);
+			return min + SyncRand(atoi(next + 1) - min + 1);
 		}
 	} else if (s[0] == 'l') { //player number
 		return ParseAnimPlayer(*unit, cur);

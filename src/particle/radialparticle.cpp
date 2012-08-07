@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_spawnmissile.h - The animation SpawnMissile headerfile. */
+/**@name radialparticle.cpp - The radial particle. */
 //
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 2012 by cybermind
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,32 +27,52 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_SPAWNMISSILE_H
-#define ANIMATION_SPAWNMISSILE_H
-
 //@{
 
-#include <string>
-#include "animation.h"
+#include <math.h>
 
-class CAnimation_SpawnMissile : public CAnimation
+#include "stratagus.h"
+#include "particle.h"
+
+CRadialParticle::CRadialParticle(CPosition position, Animation *animation, int maxSpeed) :
+CParticle(position)
 {
-public:
-	CAnimation_SpawnMissile() : CAnimation(AnimationSpawnMissile) {}
+	Assert(animation);
+	this->animation = animation->clone();
 
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s);
+	const int speedReduction = 10;
 
-private:
-	std::string missileTypeStr;
-	std::string startXStr;
-	std::string startYStr;
-	std::string destXStr;
-	std::string destYStr;
-	std::string flagsStr;
-	std::string offsetNumStr;
-};
+	this->direction = (float)(MyRand() % 360);
+	this->speed = (MyRand() % maxSpeed) / speedReduction;
+	this->maxSpeed = maxSpeed;
+}
+
+CRadialParticle::~CRadialParticle()
+{
+	delete animation;
+}
+
+void CRadialParticle::draw()
+{
+	CPosition screenPos = ParticleManager.getScreenPos(pos);
+	animation->draw(static_cast<int>(screenPos.x), static_cast<int>(screenPos.y));
+}
+
+void CRadialParticle::update(int ticks)
+{
+	this->pos.x += this->speed * sin(this->direction);
+	this->pos.y += this->speed * cos(this->direction);
+
+	animation->update(ticks);
+	if (animation->isFinished()) {
+		destroy();
+	}
+}
+
+CParticle *CRadialParticle::clone()
+{
+	CParticle *p = new CRadialParticle(pos, animation, maxSpeed);
+	return p;
+}
 
 //@}
-
-#endif // ANIMATION_SPAWNMISSILE_H

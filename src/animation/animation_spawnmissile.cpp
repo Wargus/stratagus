@@ -99,7 +99,10 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 	const int destx = ParseAnimInt(&unit, this->destXStr.c_str());
 	const int desty = ParseAnimInt(&unit, this->destYStr.c_str());
 	const int flags = ParseAnimFlags(unit, this->flagsStr.c_str());
+	const int offsetnum = ParseAnimInt(&unit, this->offsetNumStr.c_str());
 	const CUnit *goal = flags & ANIM_SM_RELTARGET ? unit.CurrentOrder()->GetGoal() : &unit;
+	const int dir = ((goal->Direction + NextDirection / 2) & 0xFF) / NextDirection;
+	const PixelPos moff = goal->Type->MissileOffsets[dir][!offsetnum ? 0 : offsetnum - 1];
 	PixelPos start;
 	PixelPos dest;
 
@@ -107,11 +110,11 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 		return;
 	}
 	if ((flags & ANIM_SM_PIXEL)) {
-		start.x = goal->tilePos.x * PixelTileSize.x + goal->IX + startx;
-		start.y = goal->tilePos.y * PixelTileSize.y + goal->IY + starty;
+		start.x = goal->tilePos.x * PixelTileSize.x + goal->IX + moff.x + startx;
+		start.y = goal->tilePos.y * PixelTileSize.y + goal->IY + moff.y + starty;
 	} else {
-		start.x = (goal->tilePos.x + startx) * PixelTileSize.x + PixelTileSize.x / 2;
-		start.y = (goal->tilePos.y + starty) * PixelTileSize.y + PixelTileSize.y / 2;
+		start.x = (goal->tilePos.x + startx) * PixelTileSize.x + PixelTileSize.x / 2 + moff.x;
+		start.y = (goal->tilePos.y + starty) * PixelTileSize.y + PixelTileSize.y / 2 + moff.y;
 	}
 	if ((flags & ANIM_SM_TOTARGET)) {
 		CUnit *target = goal->CurrentOrder()->GetGoal();
@@ -186,6 +189,10 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));
 	this->flagsStr.assign(str, begin, end - begin);
+
+	begin = std::min(len, str.find_first_not_of(' ', end));
+	end = std::min(len, str.find(' ', begin));
+	this->offsetNumStr.assign(str, begin, end - begin);
 }
 
 //@}

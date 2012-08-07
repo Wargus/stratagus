@@ -66,13 +66,14 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
+unsigned char *MinimapSurfaceGL;
+unsigned char *MinimapTerrainSurfaceGL;
+SDL_Surface *MinimapSurface;        /// generated minimap
+SDL_Surface *MinimapTerrainSurface; /// generated minimap terrain
+
 static GLuint MinimapTexture;
-static unsigned char *MinimapSurfaceGL;
-static unsigned char *MinimapTerrainSurfaceGL;
 static int MinimapTextureWidth;
 static int MinimapTextureHeight;
-static SDL_Surface *MinimapSurface;        /// generated minimap
-static SDL_Surface *MinimapTerrainSurface; /// generated minimap terrain
 
 static int *Minimap2MapX;                  /// fast conversion table
 static int *Minimap2MapY;                  /// fast conversion table

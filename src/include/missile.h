@@ -373,6 +373,7 @@ public:
 	bool CanHitOwner;          /// missile can hit the owner
 	bool FriendlyFire;         /// missile can't hit own units
 	bool AlwaysFire;           /// missile will always fire (even if target is dead)
+	bool Pierce;               /// missile will hit every unit on his way
 
 	int Class;                 /// missile class
 	int NumBounces;            /// number of bounces

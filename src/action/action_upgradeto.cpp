@@ -266,7 +266,7 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	const CUnitType &newtype = *this->Type;
 	const CUnitStats &newstats = newtype.Stats[player.Index];
 
-	this->Ticks += SpeedUpgrade;
+	this->Ticks += player.SpeedUpgrade / SPEEDUP_FACTOR;
 	if (this->Ticks < newstats.Costs[TimeCost]) {
 		unit.Wait = CYCLES_PER_SECOND / 6;
 		return ;

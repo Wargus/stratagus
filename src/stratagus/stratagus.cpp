@@ -281,17 +281,6 @@ std::string CliMapName;          /// Filename of the map given on the command li
 static std::vector<gcn::Container *> Containers;
 std::string MenuRace;
 
-/*----------------------------------------------------------------------------
---  Speedups FIXME: Move to some other more logic place
-----------------------------------------------------------------------------*/
-
-int SpeedResourcesHarvest[MaxCosts]; /// speed factor for harvesting resources
-int SpeedResourcesReturn[MaxCosts];  /// speed factor for returning resources
-int SpeedBuild = 1;                  /// speed factor for building
-int SpeedTrain = 1;                  /// speed factor for training
-int SpeedUpgrade = 1;                /// speed factor for upgrading
-int SpeedResearch = 1;               /// speed factor for researching
-
 /*============================================================================
 ==  DISPLAY
 ============================================================================*/

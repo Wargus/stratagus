@@ -59,7 +59,9 @@
 #endif
 
 #define snprintf _snprintf
+#if !(_MSC_VER >= 1500 && _MSC_VER < 1600)
 #define vsnprintf _vsnprintf
+#endif
 #define unlink _unlink
 #define strdup _strdup
 #define strcasecmp _stricmp
@@ -207,11 +209,6 @@ extern std::string FullGameName;            /// Full Name of the game
 extern std::string ClickMissile;            /// Missile to show when you click
 extern std::string DamageMissile;           /// Missile to show damage caused
 extern std::string MenuRace;
-
-extern int SpeedBuild;                      /// Speed factor for building
-extern int SpeedTrain;                      /// Speed factor for training
-extern int SpeedUpgrade;                    /// Speed factor for upgrading
-extern int SpeedResearch;                   /// Speed factor for researching
 
 extern bool UseHPForXp;                     /// true if gain XP by dealing damage, false if by killing.
 

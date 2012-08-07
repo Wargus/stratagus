@@ -477,7 +477,7 @@ void CUnit::Init()
 void CUnit::Release(bool final)
 {
 	if (Type == NULL) {
-		DebugPrint("unit already free");
+		DebugPrint("unit already free\n");
 		return;
 	}
 	Assert(Orders.size() == 1);
@@ -492,6 +492,9 @@ void CUnit::Release(bool final)
 		Destroyed = 1; // mark as destroyed
 
 		if (Container && !final) {
+			if (Boarded) {
+				Container->BoardCount--;
+			}
 			MapUnmarkUnitSight(*this);
 			RemoveUnitFromContainer(*this);
 		}
@@ -2938,10 +2941,7 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 	if (transporter.BoardCount >= transporter.Type->MaxOnBoard) { // full
 		return 0;
 	}
-	// FIXME: remove UnitTypeLand requirement
-	if (unit.Type->UnitType != UnitTypeLand) {
-		return 0;
-	}
+
 	// Can transport only allied unit.
 	// FIXME : should be parametrable.
 	if (!transporter.IsTeamed(unit)) {

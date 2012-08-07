@@ -40,6 +40,8 @@
 #include "missile.h"
 
 #include "luacallback.h"
+#include "map.h"
+#include "unit_find.h"
 
 /**
 **  Calculate parabolic trajectories.
@@ -85,6 +87,13 @@ static int ParabolicMissile(Missile &missile)
 		missile.Type->SmokeParticle->pushInteger(position.x);
 		missile.Type->SmokeParticle->pushInteger(position.y);
 		missile.Type->SmokeParticle->run();
+	}
+	if (missile.Type->Pierce) {
+		CUnit *unit = UnitOnMapTile(Map.MapPixelPosToTilePos(missile.position), -1);
+		if (unit && unit->IsAliveOnMap() 
+			&& (missile.Type->FriendlyFire || unit->IsEnemy(*missile.SourceUnit->Player))) {
+				missile.MissileHit();
+		}
 	}
 	return 0;
 }
