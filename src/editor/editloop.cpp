@@ -940,7 +940,7 @@ static void DrawStartLocations()
 				const PixelPos startScreenPos = vp->TilePosToScreen_TopLeft(Players[i].StartPos);
 
 				if (type) {
-					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos.x, startScreenPos.y);
+					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos);
 				} else { // Draw a cross
 					const PixelPos lt = startScreenPos;
 					const PixelPos lb(startScreenPos.x, startScreenPos.y + PixelTileSize.y);

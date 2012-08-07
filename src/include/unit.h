@@ -595,7 +595,7 @@ extern void LoadDecorations();
 extern void CleanDecorations();
 
 /// Draw unit's shadow
-extern void DrawShadow(const CUnitType &type, int frame, int x, int y);
+extern void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos);
 /// Draw all units visible on map in viewport
 extern int FindAndSortUnits(const CViewport *vp, std::vector<CUnit *> &table);
 

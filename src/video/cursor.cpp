@@ -178,9 +178,9 @@ static void DrawBuildingCursor()
 #endif
 	PushClipping();
 	vp.SetClipping();
-	DrawShadow(*CursorBuilding, CursorBuilding->StillFrame, screenPos.x, screenPos.y);
+	DrawShadow(*CursorBuilding, CursorBuilding->StillFrame, screenPos);
 	DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
-				 CursorBuilding->StillFrame, screenPos.x, screenPos.y);
+				 CursorBuilding->StillFrame, screenPos);
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
 		Video.DrawCircleClip(ColorRed,
 							 screenPos.x + CursorBuilding->TileWidth * PixelTileSize.x / 2,

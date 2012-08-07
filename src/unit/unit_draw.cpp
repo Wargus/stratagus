@@ -592,27 +592,27 @@ static void DrawDecoration(const CUnit &unit, const CUnitType *type, int x, int 
 **
 **  @param type   Pointer to the unit type.
 **  @param frame  Frame number
-**  @param x      Screen X position of the unit.
-**  @param y      Screen Y position of the unit.
+**  @param screenPos  Screen position of the unit.
 **
 **  @todo FIXME: combine new shadow code with old shadow code.
 */
-void DrawShadow(const CUnitType &type, int frame, int x, int y)
+void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos)
 {
 	// Draw normal shadow sprite if available
 	if (!type.ShadowSprite) {
 		return;
 	}
-	x -= (type.ShadowWidth - type.TileWidth * PixelTileSize.x) / 2;
-	y -= (type.ShadowHeight - type.TileHeight * PixelTileSize.y) / 2;
-	x += type.OffsetX + type.ShadowOffsetX;
-	y += type.OffsetY + type.ShadowOffsetY;
+	PixelPos pos = screenPos;
+	pos.x -= (type.ShadowWidth - type.TileWidth * PixelTileSize.x) / 2;
+	pos.y -= (type.ShadowHeight - type.TileHeight * PixelTileSize.y) / 2;
+	pos.x += type.OffsetX + type.ShadowOffsetX;
+	pos.y += type.OffsetY + type.ShadowOffsetY;
 
 	if (type.Flip) {
 		if (frame < 0) {
-			type.ShadowSprite->DrawFrameClipX(-frame - 1, x, y);
+			type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 		} else {
-			type.ShadowSprite->DrawFrameClip(frame, x, y);
+			type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
 		}
 	} else {
 		int row = type.NumDirections / 2 + 1;
@@ -621,7 +621,7 @@ void DrawShadow(const CUnitType &type, int frame, int x, int y)
 		} else {
 			frame = (frame / row) * type.NumDirections + frame % row;
 		}
-		type.ShadowSprite->DrawFrameClip(frame, x, y);
+		type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
 	}
 }
 
@@ -670,13 +670,15 @@ void ShowOrder(const CUnit &unit)
 **
 **  @param unit  Unit pointer of drawn unit.
 **  @param type  Unit-type pointer.
-**  @param x     X screen pixel position of unit.
-**  @param y     Y screen pixel position of unit.
+**  @param screenPos  screen pixel (top left) position of unit.
 **
 **  @todo FIXME: The different styles should become a function call.
 */
-static void DrawInformations(const CUnit &unit, const CUnitType &type, int x, int y)
+static void DrawInformations(const CUnit &unit, const CUnitType &type, const PixelPos &screenPos)
 {
+	int x = screenPos.x;
+	int y = screenPos.y;
+
 #if 0 && DEBUG // This is for showing vis counts and refs.
 	char buf[10];
 	sprintf(buf, "%d%c%c%d", unit.VisCount[ThisPlayer->Index],
@@ -790,34 +792,34 @@ void DrawUnitPlayerColor(const CUnitType *type, CGraphic *sprite,
 **  @param unit    Unit pointer.
 **  @param cframe  Construction frame
 **  @param frame   Frame number to draw.
-**  @param x       X position.
-**  @param y       Y position.
+**  @param screenPos  screen (top left) position of the unit.
 */
 static void DrawConstructionShadow(const CUnitType &type, const CConstructionFrame *cframe,
-								   int frame, int x, int y)
+								   int frame, const PixelPos &screenPos)
 {
+	PixelPos pos = screenPos;
 	if (cframe->File == ConstructionFileConstruction) {
 		if (type.Construction->ShadowSprite) {
-			x -= (type.Construction->Width - type.TileWidth * PixelTileSize.x) / 2;
-			x += type.OffsetX;
-			y -= (type.Construction->Height - type.TileHeight * PixelTileSize.y) / 2;
-			y += type.OffsetY;
+			pos.x -= (type.Construction->Width - type.TileWidth * PixelTileSize.x) / 2;
+			pos.x += type.OffsetX;
+			pos.y -= (type.Construction->Height - type.TileHeight * PixelTileSize.y) / 2;
+			pos.y += type.OffsetY;
 			if (frame < 0) {
-				type.Construction->ShadowSprite->DrawFrameClipX(-frame - 1, x, y);
+				type.Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 			} else {
-				type.Construction->ShadowSprite->DrawFrameClip(frame, x, y);
+				type.Construction->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
 			}
 		}
 	} else {
 		if (type.ShadowSprite) {
-			x -= (type.ShadowWidth - type.TileWidth * PixelTileSize.x) / 2;
-			x += type.ShadowOffsetX + type.OffsetX;
-			y -= (type.ShadowHeight - type.TileHeight * PixelTileSize.y) / 2;
-			y += type.ShadowOffsetY + type.OffsetY;
+			pos.x -= (type.ShadowWidth - type.TileWidth * PixelTileSize.x) / 2;
+			pos.x += type.ShadowOffsetX + type.OffsetX;
+			pos.y -= (type.ShadowHeight - type.TileHeight * PixelTileSize.y) / 2;
+			pos.y += type.ShadowOffsetY + type.OffsetY;
 			if (frame < 0) {
-				type.ShadowSprite->DrawFrameClipX(-frame - 1, x, y);
+				type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 			} else {
-				type.ShadowSprite->DrawFrameClip(frame, x, y);
+				type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
 			}
 		}
 	}
@@ -830,28 +832,28 @@ static void DrawConstructionShadow(const CUnitType &type, const CConstructionFra
 **  @param cframe  Construction frame to draw.
 **  @param type    Unit type.
 **  @param frame   Frame number.
-**  @param x       X position.
-**  @param y       Y position.
+**  @param screenPos  screen (top left) position of the unit.
 */
 static void DrawConstruction(const int player, const CConstructionFrame *cframe,
-							 const CUnitType &type, int frame, int x, int y)
+							 const CUnitType &type, int frame, const PixelPos &screenPos)
 {
+	PixelPos pos = screenPos;
 	if (cframe->File == ConstructionFileConstruction) {
 		const CConstruction &construction = *type.Construction;
-		x -= construction.Width / 2;
-		y -= construction.Height / 2;
+		pos.x -= construction.Width / 2;
+		pos.y -= construction.Height / 2;
 		if (frame < 0) {
-			construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, x, y);
+			construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y);
 		} else {
-			construction.Sprite->DrawPlayerColorFrameClip(player, frame, x, y);
+			construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 		}
 	} else {
-		x += type.OffsetX - type.Width / 2;
-		y += type.OffsetY - type.Height / 2;
+		pos.x += type.OffsetX - type.Width / 2;
+		pos.y += type.OffsetY - type.Height / 2;
 		if (frame < 0) {
 			frame = -frame - 1;
 		}
-		type.Sprite->DrawPlayerColorFrameClip(player, frame, x, y);
+		type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 	}
 }
 
@@ -864,8 +866,6 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 */
 void CUnit::Draw(const CViewport *vp) const
 {
-	int x;
-	int y;
 	int frame;
 	int state;
 	int constructed;
@@ -883,12 +883,11 @@ void CUnit::Draw(const CViewport *vp) const
 
 	int player = this->RescuedFrom ? this->RescuedFrom->Index : this->Player->Index;
 	int action = this->CurrentAction();
+	PixelPos screenPos;
 	if (ReplayRevealMap || IsVisible) {
-		const PixelPos &screenPos = vp->TilePosToScreen_TopLeft(this->tilePos);
+		screenPos = vp->MapToScreenPixelPos(this->GetMapPixelPosTopLeft());
 		type = this->Type;
 		frame = this->Frame;
-		x = screenPos.x + this->IX;
-		y = screenPos.y + this->IY;
 		state = (action == UnitActionBuilt) | ((action == UnitActionUpgradeTo) << 1);
 		constructed = this->Constructed;
 		// Reset Type to the type being upgraded to
@@ -906,10 +905,10 @@ void CUnit::Draw(const CViewport *vp) const
 			cframe = NULL;
 		}
 	} else {
-		const PixelPos &screenPos = vp->TilePosToScreen_TopLeft(this->Seen.tilePos);
+		screenPos = vp->TilePosToScreen_TopLeft(this->Seen.tilePos);
 
-		x = screenPos.x + this->Seen.IX;
-		y = screenPos.y + this->Seen.IY;
+		screenPos.x += this->Seen.IX;
+		screenPos.y += this->Seen.IY;
 		frame = this->Seen.Frame;
 		type = this->Seen.Type;
 		constructed = this->Seen.Constructed;
@@ -931,10 +930,10 @@ void CUnit::Draw(const CViewport *vp) const
 
 
 	if (state == 1 && constructed) {
-		DrawConstructionShadow(*type, cframe, frame, x, y);
+		DrawConstructionShadow(*type, cframe, frame, screenPos);
 	} else {
 		if (action != UnitActionDie) {
-			DrawShadow(*type, frame, x, y);
+			DrawShadow(*type, frame, screenPos);
 		}
 	}
 
@@ -966,22 +965,22 @@ void CUnit::Draw(const CViewport *vp) const
 	//
 	if (state == 1) {
 		if (constructed) {
-			DrawConstruction(player, cframe, *type, frame,
-							 x + (type->TileWidth * PixelTileSize.x) / 2,
-							 y + (type->TileHeight * PixelTileSize.y) / 2);
+			const PixelPos pos(screenPos.x + (type->TileWidth * PixelTileSize.x) / 2,
+							   screenPos.y + (type->TileHeight * PixelTileSize.y) / 2);
+			DrawConstruction(player, cframe, *type, frame, pos);
 		}
 		//
 		// Draw the future unit type, if upgrading to it.
 		//
 	} else if (state == 2) {
 		// FIXME: this frame is hardcoded!!!
-		DrawUnitType(*type, sprite, player, frame < 0 ? /*-1*/ - 1 : 1, x, y);
+		DrawUnitType(*type, sprite, player, frame < 0 ? /*-1*/ - 1 : 1, screenPos);
 	} else {
-		DrawUnitType(*type, sprite, player, frame, x, y);
+		DrawUnitType(*type, sprite, player, frame, screenPos);
 	}
 
 	// Unit's extras not fully supported.. need to be decorations themselves.
-	DrawInformations(*this, *type, x, y);
+	DrawInformations(*this, *type, screenPos);
 }
 
 /**

@@ -471,36 +471,35 @@ CUnitType *NewUnitTypeSlot(const std::string &ident)
 **  @param sprite  Sprite to use for drawing
 **  @param player  Player number for color substitution.
 **  @param frame   Animation frame of unit-type.
-**  @param x       Screen X pixel postion to draw unit-type.
-**  @param y       Screen Y pixel postion to draw unit-type.
+**  @param screenPos  Screen pixel (top left) postion to draw unit-type.
 **
 **  @todo  Do screen position caculation in high level.
 **         Better way to handle in x mirrored sprites.
 */
-void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, int x, int y)
+void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos)
 {
+	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
-	x -= (type.Width - type.TileWidth * PixelTileSize.x) / 2;
-	y -= (type.Height - type.TileHeight * PixelTileSize.y) / 2;
-	x += type.OffsetX;
-	y += type.OffsetY;
+	pos.x -= (type.Width - type.TileWidth * PixelTileSize.x) / 2;
+	pos.y -= (type.Height - type.TileHeight * PixelTileSize.y) / 2;
+	pos.x += type.OffsetX;
+	pos.y += type.OffsetY;
 
 	if (type.Flip) {
 		if (frame < 0) {
-			sprite->DrawPlayerColorFrameClipX(player, -frame - 1, x, y);
+			sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y);
 		} else {
-			sprite->DrawPlayerColorFrameClip(player, frame, x, y);
+			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 		}
 	} else {
-		int row;
+		int row = type.NumDirections / 2 + 1;
 
-		row = type.NumDirections / 2 + 1;
 		if (frame < 0) {
 			frame = ((-frame - 1) / row) * type.NumDirections + type.NumDirections - (-frame - 1) % row;
 		} else {
 			frame = (frame / row) * type.NumDirections + frame % row;
 		}
-		sprite->DrawPlayerColorFrameClip(player, frame, x, y);
+		sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 	}
 }
 

@@ -1215,7 +1215,7 @@ extern void SaveUnitTypes(CFile &file);              /// Save the unit-type tabl
 extern CUnitType *NewUnitTypeSlot(const std::string &ident);/// Allocate an empty unit-type slot
 /// Draw the sprite frame of unit-type
 extern void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite,
-						 int player, int frame, int x, int y);
+						 int player, int frame, const PixelPos &screenPos);
 
 extern void InitUnitTypes(int reset_player_stats);   /// Init unit-type table
 extern void LoadUnitTypeSprite(CUnitType &unittype); /// Load the sprite for a unittype
