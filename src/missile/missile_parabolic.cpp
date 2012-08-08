@@ -89,11 +89,7 @@ static int ParabolicMissile(Missile &missile)
 		missile.Type->SmokeParticle->run();
 	}
 	if (missile.Type->Pierce) {
-		CUnit *unit = UnitOnMapTile(Map.MapPixelPosToTilePos(missile.position), -1);
-		if (unit && unit->IsAliveOnMap()
-			&& (missile.Type->FriendlyFire || unit->IsEnemy(*missile.SourceUnit->Player))) {
-			missile.MissileHit();
-		}
+		MissileHandlePierce(missile, Map.MapPixelPosToTilePos(missile.position));
 	}
 	return 0;
 }

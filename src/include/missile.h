@@ -374,6 +374,7 @@ public:
 	bool FriendlyFire;         /// missile can't hit own units
 	bool AlwaysFire;           /// missile will always fire (even if target is dead)
 	bool Pierce;               /// missile will hit every unit on his way
+	bool PierceOnce;           /// pierce every target only once
 
 	int Class;                 /// missile class
 	int NumBounces;            /// number of bounces
@@ -403,7 +404,7 @@ protected:
 	Missile();
 
 public:
-	virtual ~Missile() {};
+	virtual ~Missile();
 
 	static Missile *Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
 
@@ -411,7 +412,7 @@ public:
 
 	void DrawMissile(const CViewport &vp) const;
 	void SaveMissile(CFile &file) const;
-	void MissileHit();
+	void MissileHit(CUnit *unit = NULL);
 	bool NextMissileFrame(char sign, char longAnimation);
 	void NextMissileFrameCycle();
 	void MissileNewHeadingFromXY(const PixelPos &delta);
@@ -431,6 +432,8 @@ public:
 	CUnitPtr SourceUnit;  /// unit that fires (could be killed)
 	CUnitPtr TargetUnit;  /// target unit, used for spells
 
+	std::vector<CUnit *> PiercedUnits;	/// Units which are already pierced by this missile
+
 	int Damage;  /// direct damage that missile applies
 
 	int TTL;     /// time to live (ticks) used for spells
@@ -448,6 +451,7 @@ public:
 
 extern bool MissileInitMove(Missile &missile);
 extern bool PointToPointMissile(Missile &missile);
+extern void MissileHandlePierce(Missile &missile, const Vec2i &pos);
 
 class MissileNone : public Missile
 {

@@ -160,6 +160,8 @@ void MissileType::Load(lua_State *l)
 			this->AlwaysFire = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Pierce")) {
 			this->Pierce = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "PierceOnce")) {
+			this->PierceOnce = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "FriendlyFire")) {
 			this->FriendlyFire = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SplashFactor")) {

@@ -637,6 +637,15 @@ bool MissileInitMove(Missile &missile)
 	return false;
 }
 
+void MissileHandlePierce(Missile &missile, const Vec2i &pos)
+{
+	CUnit *unit = UnitOnMapTile(pos, -1);
+	if (unit && unit->IsAliveOnMap()
+		&& (missile.Type->FriendlyFire || unit->IsEnemy(*missile.SourceUnit->Player))) {
+			missile.MissileHit(unit);
+	}
+}
+
 /**
 **  Handle point to point missile.
 **
@@ -670,11 +679,7 @@ bool PointToPointMissile(Missile &missile)
 	}
 
 	if (missile.Type->Pierce) {
-		CUnit *unit = UnitOnMapTile(Map.MapPixelPosToTilePos(missile.position), -1);
-		if (unit && unit->IsAliveOnMap()
-			&& (missile.Type->FriendlyFire || unit->IsEnemy(*missile.SourceUnit->Player))) {
-			missile.MissileHit();
-		}
+		MissileHandlePierce(missile, Map.MapPixelPosToTilePos(missile.position));
 	}
 
 	return false;
@@ -738,9 +743,24 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 /**
 **  Work for missile hit.
 */
-void Missile::MissileHit()
+void Missile::MissileHit(CUnit *unit)
 {
 	const MissileType &mtype = *this->Type;
+
+	if (unit == NULL) {
+		unit = this->TargetUnit;
+	}
+
+	if (mtype.Pierce && mtype.PierceOnce) {
+		for (std::vector<CUnit *>::iterator it = this->PiercedUnits.begin();
+			it != this->PiercedUnits.end(); ++it) {
+				CUnit &punit = **it;
+				if (UnitNumber(*unit) == UnitNumber(punit)) {
+					return;
+				}
+		}
+		PiercedUnits.insert(this->PiercedUnits.begin(), unit);
+	}
 
 	if (mtype.ImpactSound.Sound) {
 		PlayMissileSound(*this, mtype.ImpactSound.Sound);
@@ -1111,8 +1131,9 @@ MissileType::MissileType(const std::string &ident) :
 	Ident(ident), Transparency(0), DrawLevel(0),
 	SpriteFrames(0), NumDirections(0), ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
 	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
-	AlwaysFire(false), Pierce(false), Class(), NumBounces(0), StartDelay(0), Sleep(0),
-	Speed(0), Range(0), SplashFactor(0), ImpactParticle(NULL), SmokeParticle(NULL), G(NULL)
+	AlwaysFire(false), Pierce(false), PierceOnce(false), Class(), NumBounces(0), StartDelay(0), 
+	Sleep(0), Speed(0), Range(0), SplashFactor(0), ImpactParticle(NULL), SmokeParticle(NULL),
+	G(NULL)
 {
 	size.x = 0;
 	size.y = 0;
@@ -1144,6 +1165,13 @@ void CleanMissileTypes()
 */
 void InitMissiles()
 {
+}
+
+/**
+**  Missile destructior.
+*/
+Missile::~Missile() {
+	PiercedUnits.clear();
 }
 
 /**

@@ -995,9 +995,8 @@ static inline bool DrawLevelCompare(const CUnit *c1, const CUnit *c2)
 	if (drawlevel1 == drawlevel2) {
 		// diffpos compares unit's Y positions (bottom of sprite) on the map
 		// and uses X position in case Y positions are equal.
-		// FIXME: Use BoxHeight?
-		const int pos1 = (c1->tilePos.y * PixelTileSize.y + c1->IY + c1->Type->Height);
-		const int pos2 = (c2->tilePos.y * PixelTileSize.y + c2->IY + c2->Type->Height);
+		const int pos1 = (c1->tilePos.y + c1->Type->TileHeight - 1) * PixelTileSize.y + c1->IY;
+		const int pos2 = (c2->tilePos.y + c2->Type->TileHeight - 1) * PixelTileSize.y + c2->IY;
 		return pos1 == pos2 ?
 			   (c1->tilePos.x != c2->tilePos.x ? c1->tilePos.x < c2->tilePos.x : UnitNumber(*c1) < UnitNumber(*c2)) : pos1 < pos2;
 	} else {

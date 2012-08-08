@@ -474,7 +474,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 #endif
 		UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
 		if (resinfo.WaitAtResource) {
-			this->TimeToHarvest = resinfo.WaitAtResource / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId] / SPEEDUP_FACTOR;
+			this->TimeToHarvest = resinfo.WaitAtResource / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId] * SPEEDUP_FACTOR;
 		} else {
 			this->TimeToHarvest = 1;
 		}
@@ -542,7 +542,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	goal->Resource.Active++;
 
 	if (resinfo.WaitAtResource) {
-		this->TimeToHarvest = resinfo.WaitAtResource / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId] / SPEEDUP_FACTOR;
+		this->TimeToHarvest = resinfo.WaitAtResource / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId] * SPEEDUP_FACTOR;
 	} else {
 		this->TimeToHarvest = 1;
 	}
@@ -674,7 +674,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 	while (!this->DoneHarvesting && this->TimeToHarvest < 0) {
 		//FIXME: rb - how should it look for WaitAtResource == 0
 		if (resinfo.WaitAtResource) {
-			this->TimeToHarvest += resinfo.WaitAtResource / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId] / SPEEDUP_FACTOR;
+			this->TimeToHarvest += resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId];
 		} else {
 			this->TimeToHarvest += 1;
 		}
