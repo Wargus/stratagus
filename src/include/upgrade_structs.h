@@ -177,7 +177,7 @@ public:
 class CUpgradeModifier
 {
 public:
-	CUpgradeModifier() : UpgradeId(0), ConvertTo(NULL), ModifyPercent(NULL) {
+	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), ConvertTo(NULL) {
 		memset(ChangeUnits, 0, sizeof(ChangeUnits));
 		memset(ChangeUpgrades, 0, sizeof(ChangeUpgrades));
 		memset(ApplyTo, 0, sizeof(ApplyTo));
@@ -200,7 +200,6 @@ public:
 	char ApplyTo[UnitTypeMax];          /// which unit types are affected
 
 	CUnitType *ConvertTo;               /// convert to this unit-type.
-
 };
 
 /**
