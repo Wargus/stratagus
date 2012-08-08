@@ -629,8 +629,8 @@ static void Usage(void)
 		"  -P port       Network port to use\n"
 		"  -L lag        Network lag in # frames (default 10 = 333ms)\n"
 		"  -U update     Network update rate in # frames (default 5=6x per s)\n"
-		"  -v mode       Video mode (0=default, 1=640x480, 2=800x600, 3=1024x768,\n"
-		"                  4=1280x960, 5=1600x1200)\n"
+		"  -v mode       Video mode WIDTHxHEIGHT, at least 640x480.  Abbreviations:\n"
+		"                  1=640x480, 2=800x600, 3=1024x768, 4=1280x960, 5=1600x1200.\n"
 		"  -D bpp        Video mode depth = bits per pixel (for Win32/TNT)\n"
 		"  -F            Full screen video mode\n"
 		"  -S speed      Video sync speed (100 = 30 frames/s)\n"
@@ -681,6 +681,64 @@ static void RedirectOutput()
 	atexit(CleanupOutput);
 }
 #endif
+
+/**
+**  Parses the "-v mode" command-line option.
+**
+**  @param arg  The "mode" argument of the "-v mode" option.
+*/
+static void VideoModeOption(const char *arg)
+{
+	int abbrev = 0;
+	int width = 0;
+	int height = 0;
+	char garbage;
+
+	if (sscanf(arg, "%d %c", &abbrev, &garbage) == 1) {
+		switch (abbrev) {
+			case 0:
+				Video.Width = 0;
+				Video.Height = 0;
+				return;
+			case 1:
+				Video.Width = 640;
+				Video.Height = 480;
+				return;
+			case 2:
+				Video.Width = 800;
+				Video.Height = 600;
+				return;
+			case 3:
+				Video.Width = 1024;
+				Video.Height = 768;
+				return;
+			case 4:
+				Video.Width = 1280;
+				Video.Height = 960;
+				return;
+			case 5:
+				Video.Width = 1600;
+				Video.Height = 1200;
+				return;
+		}
+	}
+			
+	if (sscanf(arg, "%d%*[Xx]%d %c", &width, &height, &garbage) == 2) {
+		// Too small resolutions can cause segmentation faults
+		// when the engine tries to draw outside the screen.
+		if (width < 640 || height < 480) {
+			fprintf(stderr, "Video mode must be at least 640x480.\n");
+			ExitFatal(-1);
+		}
+
+		Video.Width = width;
+		Video.Height = height;
+		return;
+	} 
+	
+	Usage();
+	ExitFatal(-1);
+}
 
 /**
 **  The main program: initialise, parse options and arguments.
@@ -784,35 +842,8 @@ int main(int argc, char **argv)
 				NetworkPort = atoi(optarg);
 				continue;
 			case 'v':
-				switch (atoi(optarg)) {
-					case 0:
-						continue;
-					case 1:
-						Video.Width = 640;
-						Video.Height = 480;
-						continue;
-					case 2:
-						Video.Width = 800;
-						Video.Height = 600;
-						continue;
-					case 3:
-						Video.Width = 1024;
-						Video.Height = 768;
-						continue;
-					case 4:
-						Video.Width = 1280;
-						Video.Height = 960;
-						continue;
-					case 5:
-						Video.Width = 1600;
-						Video.Height = 1200;
-						continue;
-					default:
-						Usage();
-						ExitFatal(-1);
-				}
+				VideoModeOption(optarg);
 				continue;
-
 			case 'L':
 				NetworkLag = atoi(optarg);
 				if (!NetworkLag) {
