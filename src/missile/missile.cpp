@@ -397,8 +397,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 		if (unit.Container) {
 			NearestOfUnit(*goal, GetFirstContainer(unit)->tilePos, &dpos);
 		} else {
-			dpos.x = goal->tilePos.x + goal->Type->TileWidth / 2;
-			dpos.y = goal->tilePos.y + goal->Type->TileHeight / 2;
+			dpos = goal->tilePos + goal->Type->GetHalfTileSize();
 		}
 	} else {
 		dpos = newgoalPos;
@@ -672,7 +671,7 @@ bool PointToPointMissile(Missile &missile)
 
 	if (missile.Type->Pierce) {
 		CUnit *unit = UnitOnMapTile(Map.MapPixelPosToTilePos(missile.position), -1);
-		if (unit && unit->IsAliveOnMap() 
+		if (unit && unit->IsAliveOnMap()
 			&& (missile.Type->FriendlyFire || unit->IsEnemy(*missile.SourceUnit->Player))) {
 				missile.MissileHit();
 		}
