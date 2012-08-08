@@ -33,142 +33,21 @@
 //@{
 
 /*----------------------------------------------------------------------------
---  Threads
-----------------------------------------------------------------------------*/
-
-#ifndef __unix
-#undef NOUSER
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0400
-#endif
-#include <winsock2.h>
-#include <windows.h>
-#elif defined(__hpux)
-#include <sys/mpctl.h>
-#ifndef MPC_GETNUMSPUS_SYS
-#define MPC_GETNUMSPUS_SYS MPC_GETNUMSPUS
-#endif
-#else
-#include <unistd.h>
-#include <pthread.h>
-#endif
-
-inline int get_cpu_count()
-{
-#ifndef __unix
-	SYSTEM_INFO info;
-	GetSystemInfo(&info);
-	return info.dwNumberOfProcessors;
-#elif defined(__linux) || defined (__sun)
-	return sysconf(_SC_NPROCESSORS_ONLN);
-#elif defined(__hpux)
-	return mpctl(MPC_GETNUMSPUS_SYS, 0, 0);
-#else
-	return 1;
-#endif
-}
-
-
-class CMutex
-{
-	CMutex(const CMutex &); // prohibited
-	CMutex &operator= (const CMutex &); // prohibited
-
-#if !defined (__unix)
-	CRITICAL_SECTION _mut;
-#else
-	pthread_mutexattr_t _attr;
-	pthread_mutex_t _mut;
-#endif
-public:
-	CMutex();
-	~CMutex();
-
-	void Lock() {
-#if !defined (__unix)
-		EnterCriticalSection(&_mut);
-#else
-		pthread_mutex_lock(&_mut);
-#endif
-	}
-
-	void UnLock() {
-#if !defined (__unix)
-		LeaveCriticalSection(&_mut);
-#else
-		pthread_mutex_unlock(&_mut);
-#endif
-	}
-
-	bool TryLock() {
-#if !defined (__unix)
-		return 0 != TryEnterCriticalSection(&_mut);
-#else
-		return 0 == pthread_mutex_trylock(&_mut);
-#endif
-	}
-};
-
-
-class CThread
-{
-	CThread(const CThread &); // prohibited
-	CThread &operator= (const CThread &); // prohibited
-
-	bool m_bRunning;
-	int m_dExitFlag;
-
-#if !defined (__unix)
-	unsigned long m_dThreadID;
-	static unsigned long WINAPI threadFun(void *pThread);
-	HANDLE m_hndlThread;
-#else
-	pthread_t m_dThreadID;
-	static void *threadFun(void *pThread);
-#endif
-
-public:
-	CThread() : m_bRunning(false), m_dExitFlag(0) {};
-	virtual ~CThread();
-
-	virtual void Run() = 0;
-	int Start();
-	int Wait();
-	void Exit();
-	void Terminate();
-
-	bool IsRunning() const { return m_bRunning; }
-
-	void SetExitFlag(int dExitCode = 1) { m_dExitFlag = dExitCode; }
-
-	int GetExitFlag() const { return m_dExitFlag; }
-
-#if !defined (__unix)
-	static unsigned long GetThreadID() { return GetCurrentThreadId(); }
-#else
-	static pthread_t GetThreadID() { return pthread_self(); }
-#endif
-
-};
-
-
-
-/*----------------------------------------------------------------------------
 --  Random
 ----------------------------------------------------------------------------*/
 
-extern unsigned SyncRandSeed;               /// Sync random seed value
+extern unsigned SyncRandSeed;           /// Sync random seed value
 
 extern void InitSyncRand();             /// Initialize the syncron rand
 extern int SyncRand();                  /// Syncron rand
-extern int SyncRand(int max);               /// Syncron rand
+extern int SyncRand(int max);           /// Syncron rand
+
+///  rand only used on this computer.
+extern int MyRand();
 
 /*----------------------------------------------------------------------------
 --  Math
 ----------------------------------------------------------------------------*/
-
-///  rand only used on this computer.
-#define MyRand() rand()
 
 /// Compute a square root using ints
 extern long isqrt(long num);

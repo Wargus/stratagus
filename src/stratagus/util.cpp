@@ -27,12 +27,18 @@
 //      02111-1307, USA.
 //
 
+#include "stratagus.h"
+
+#include "util.h"
+
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-#include "stratagus.h"
-#include "util.h"
+#ifdef WIN32
+#include <windows.h>
+#endif
 
 #ifdef HAVE_X
 #include <X11/Xlib.h>
@@ -80,6 +86,12 @@ int SyncRand(int max)
 	return SyncRand() % max;
 }
 
+
+
+int MyRand()
+{
+	return rand();
+}
 
 /*----------------------------------------------------------------------------
 --  Math
@@ -470,132 +482,5 @@ int UTF8GetNext(const std::string &text, int curpos)
 	}
 	fprintf(stderr, "Invalid UTF8.\n");
 	return text.size();
-}
-
-/*----------------------------------------------------------------------------
---  Threads
-----------------------------------------------------------------------------*/
-
-
-CMutex::CMutex()
-{
-#if !defined (__unix)
-	InitializeCriticalSection(&_mut);
-#else
-	if (pthread_mutexattr_init(&_attr) == 0) {
-#if defined (__linux)
-		if (pthread_mutexattr_settype(&_attr, PTHREAD_MUTEX_RECURSIVE_NP) == 0)
-#elif defined (USE_BSD)
-		if (pthread_mutexattr_settype(&_attr, PTHREAD_MUTEX_RECURSIVE) == 0)
-#else // HP & SUN
-		if (pthread_mutexattr_settype(&_attr, PTHREAD_MUTEX_RECURSIVE) == 0 &&
-			pthread_mutexattr_setpshared(&_attr, PTHREAD_PROCESS_PRIVATE) == 0)
-#endif
-		{
-			pthread_mutex_init(&_mut, &_attr);
-		}
-	}
-#endif
-}
-
-CMutex::~CMutex()
-{
-#if !defined (__unix)
-	DeleteCriticalSection(&_mut);
-#else
-	pthread_mutex_destroy(&_mut);
-	pthread_mutexattr_destroy(&_attr);
-#endif
-}
-
-#if !defined (__unix)
-unsigned long WINAPI CThread::threadFun(void *pThread)
-{
-	CThread *ptr = static_cast<CThread *>(pThread);
-	if (ptr) {
-		ptr->Run();
-	}
-	return 0;
-}
-#else
-void *CThread::threadFun(void *pThread)
-{
-	CThread *ptr = static_cast<CThread *>(pThread);
-	if (ptr) {
-		ptr->Run();
-	}
-	return NULL;
-}
-#endif
-
-void CThread::Terminate()
-{
-	if (m_bRunning) {
-#if !defined (__unix)
-		TerminateThread(m_hndlThread, 0);
-#else
-		pthread_cancel(m_dThreadID);
-#endif
-		m_bRunning = false;
-	}
-}
-
-CThread::~CThread()
-{
-	Terminate();
-}
-
-int CThread::Start()
-{
-	if (m_bRunning) {
-		return -1;
-	}
-
-#if !defined (__unix)
-	m_hndlThread = CreateThread(NULL, 0, CThread::threadFun, (LPVOID)this, 0, &m_dThreadID);
-	if (m_hndlThread == NULL) {
-		return -2;
-	}
-#else
-	int result = pthread_create(&m_dThreadID, NULL, CThread::threadFun, (void *)this);
-	if (result != 0) {
-		return -2;
-	}
-#endif
-
-	m_bRunning = true;
-	return 0;
-}
-
-int CThread::Wait()
-{
-	if (m_bRunning) {
-#if !defined (__unix)
-		if (::WaitForSingleObject(m_hndlThread, INFINITE) == WAIT_FAILED) {
-			return -1;
-		}
-		if (::CloseHandle(m_hndlThread) == 0) {
-			return -2;
-		}
-#else
-		if (pthread_join(m_dThreadID, NULL) != 0) {
-			return -1;
-		}
-#endif
-		m_bRunning = false;
-	}
-	return 0;
-}
-
-void CThread::Exit()
-{
-	if (m_bRunning) {
-		m_bRunning = false;
-#if !defined (__unix)
-		ExitThread(0);
-#else
-		pthread_exit(0);
-#endif
-	}
 }
 
