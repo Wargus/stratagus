@@ -202,8 +202,8 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 	png_init_io(png_ptr, fp);
 
 	png_set_IHDR(png_ptr, info_ptr, UI.Minimap.W, UI.Minimap.H, 8,
-		PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
-		PNG_FILTER_TYPE_DEFAULT);
+				 PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+				 PNG_FILTER_TYPE_DEFAULT);
 
 	png_write_info(png_ptr, info_ptr);
 
@@ -225,7 +225,7 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 		unsigned char *row = new unsigned char[UI.Minimap.W * 3];
 		const SDL_PixelFormat *fmt = MinimapSurface->format;
 		SDL_Surface *preview = SDL_CreateRGBSurface(SDL_SWSURFACE,
-			UI.Minimap.W, UI.Minimap.H, 32, fmt->Rmask, fmt->Gmask, fmt->Bmask, 0);
+													UI.Minimap.W, UI.Minimap.H, 32, fmt->Rmask, fmt->Gmask, fmt->Bmask, 0);
 		SDL_BlitSurface(MinimapSurface, NULL, preview, NULL);
 
 		SDL_LockSurface(preview);

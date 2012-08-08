@@ -126,7 +126,7 @@ class CChunkParticle : public CParticle
 {
 public:
 	CChunkParticle(CPosition position, Animation *smokeAnimation, Animation *debrisAnimation,
-		int minVelocity, int maxVelocity, int minTrajectoryAngle);
+				   int minVelocity, int maxVelocity, int minTrajectoryAngle);
 	virtual ~CChunkParticle();
 
 	virtual void draw();

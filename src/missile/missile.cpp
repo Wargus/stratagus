@@ -379,7 +379,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 	CUnit *from = GetFirstContainer(unit);
 	const int dir = ((unit.Direction + NextDirection / 2) & 0xFF) / NextDirection;
 	const PixelPos startPixelPos = Map.TilePosToMapPixelPos_Center(from->tilePos)
-		+ unit.Type->MissileOffsets[dir][0];
+								   + unit.Type->MissileOffsets[dir][0];
 
 	Vec2i dpos;
 	if (goal) {
@@ -673,7 +673,7 @@ bool PointToPointMissile(Missile &missile)
 		CUnit *unit = UnitOnMapTile(Map.MapPixelPosToTilePos(missile.position), -1);
 		if (unit && unit->IsAliveOnMap()
 			&& (missile.Type->FriendlyFire || unit->IsEnemy(*missile.SourceUnit->Player))) {
-				missile.MissileHit();
+			missile.MissileHit();
 		}
 	}
 

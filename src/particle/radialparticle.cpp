@@ -35,7 +35,7 @@
 #include "particle.h"
 
 CRadialParticle::CRadialParticle(CPosition position, Animation *animation, int maxSpeed) :
-CParticle(position)
+	CParticle(position)
 {
 	Assert(animation);
 	this->animation = animation->clone();

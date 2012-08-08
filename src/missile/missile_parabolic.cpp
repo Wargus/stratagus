@@ -90,9 +90,9 @@ static int ParabolicMissile(Missile &missile)
 	}
 	if (missile.Type->Pierce) {
 		CUnit *unit = UnitOnMapTile(Map.MapPixelPosToTilePos(missile.position), -1);
-		if (unit && unit->IsAliveOnMap() 
+		if (unit && unit->IsAliveOnMap()
 			&& (missile.Type->FriendlyFire || unit->IsEnemy(*missile.SourceUnit->Player))) {
-				missile.MissileHit();
+			missile.MissileHit();
 		}
 	}
 	return 0;

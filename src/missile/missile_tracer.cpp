@@ -82,7 +82,7 @@ static int TracerMissile(Missile &missile)
 		CUnit *unit = UnitOnMapTile(Map.MapPixelPosToTilePos(missile.position), -1);
 		if (unit && unit->IsAliveOnMap()
 			&& (missile.Type->FriendlyFire || unit->IsEnemy(*missile.SourceUnit->Player))) {
-				missile.MissileHit();
+			missile.MissileHit();
 		}
 	}
 	return 0;
