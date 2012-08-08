@@ -599,7 +599,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							   | um->Modifier.Variables[j].Increase
 							   | um->Modifier.Variables[j].Enable
 							   | um->ModifyPercent[j];
-				stat.Variables[j].Enable = um->Modifier.Variables[j].Enable;
+				stat.Variables[j].Enable |= um->Modifier.Variables[j].Enable;
 				if (um->ModifyPercent[j]) {
 					stat.Variables[j].Value += stat.Variables[j].Value * um->ModifyPercent[j] / 100;
 					stat.Variables[j].Max += stat.Variables[j].Max * um->ModifyPercent[j] / 100;
@@ -632,7 +632,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						continue;
 					}
 					for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
-						unit.Variable[j].Enable = um->Modifier.Variables[j].Enable;
+						unit.Variable[j].Enable |= um->Modifier.Variables[j].Enable;
 						if (um->ModifyPercent[j]) {
 							unit.Variable[j].Value += unit.Variable[j].Value * um->ModifyPercent[j] / 100;
 							unit.Variable[j].Max += unit.Variable[j].Max * um->ModifyPercent[j] / 100;
