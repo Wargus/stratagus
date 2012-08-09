@@ -476,11 +476,11 @@ public:
 	virtual ~CPopupContentType() { delete Condition; }
 
 	/// Tell how show the variable Index.
-	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction *button, int *Costs) const = 0;
+	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const = 0;
 	/// Get the content's width
-	virtual int GetWidth(const ButtonAction *button, int *Costs) const = 0;
+	virtual int GetWidth(const ButtonAction &button, int *Costs) const = 0;
 	/// Get the content's height
-	virtual int GetHeight(const ButtonAction *button, int *Costs) const = 0;
+	virtual int GetHeight(const ButtonAction &button, int *Costs) const = 0;
 
 	int PosX;                   /// X position to draw.
 	int PosY;                   /// X position to draw.
@@ -504,10 +504,10 @@ public:
 	CPopupContentTypeButtonInfo() : InfoType(0), MaxWidth(0), Font(NULL), Centered(0) {}
 	virtual ~CPopupContentTypeButtonInfo() {}
 
-	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction *button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
 
-	virtual int GetWidth(const ButtonAction *button, int *Costs) const;
-	virtual int GetHeight(const ButtonAction *button, int *Costs) const;
+	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
+	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
 
 	int InfoType;                /// Type of information to show.
 	unsigned int MaxWidth;       /// Maximum width of multilined information.
@@ -521,10 +521,10 @@ public:
 	CPopupContentTypeCosts() : Font(NULL), Centered(0) {}
 	virtual ~CPopupContentTypeCosts() {}
 
-	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction *button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
 
-	virtual int GetWidth(const ButtonAction *button, int *Costs) const;
-	virtual int GetHeight(const ButtonAction *button, int *Costs) const;
+	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
+	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
 
 	CFont *Font;                 /// Font to use.
 	char Centered;               /// if true, center the display.
@@ -536,10 +536,10 @@ public:
 	CPopupContentTypeLine() : Color(ColorWhite), Width(0), Height(1) {}
 	virtual ~CPopupContentTypeLine() {}
 
-	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction *button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
 
-	virtual int GetWidth(const ButtonAction *button, int *Costs) const;
-	virtual int GetHeight(const ButtonAction *button, int *Costs) const;
+	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
+	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
 
 	Uint32 Color;  /// Color used for line.
 	unsigned int Width;     /// line height
@@ -555,10 +555,10 @@ public:
 		delete Text;
 	}
 
-	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction *button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
 
-	virtual int GetWidth(const ButtonAction *button, int *Costs) const;
-	virtual int GetHeight(const ButtonAction *button, int *Costs) const;
+	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
+	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
 
 	StringDesc *Text;            /// Text to display.
 	CFont *Font;                 /// Font to use.

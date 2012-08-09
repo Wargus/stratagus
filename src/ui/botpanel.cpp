@@ -85,8 +85,8 @@ ButtonActionProxy CurrentButtons;
 void InitButtons()
 {
 	// Resolve the icon names.
-	for (int z = 0; z < (int)UnitButtonTable.size(); ++z) {
-		UnitButtonTable[z]->Icon.Load();
+	for (size_t i = 0; i != UnitButtonTable.size(); ++i) {
+		UnitButtonTable[i]->Icon.Load();
 	}
 	CurrentButtons.Reset();
 }
@@ -104,9 +104,7 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 			  const std::string &sound, const std::string &cursor, const std::string &umask, const std::string &popup)
 {
 	char buf[2048];
-	ButtonAction *ba;
-
-	ba = new ButtonAction;
+	ButtonAction *ba = new ButtonAction;
 	Assert(ba);
 
 	ba->Pos = pos;
@@ -191,9 +189,8 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 void CleanButtons()
 {
 	// Free the allocated buttons.
-	for (int z = 0; z < (int)UnitButtonTable.size(); ++z) {
-		Assert(UnitButtonTable[z]);
-		delete UnitButtonTable[z];
+	for (size_t i = 0; i != UnitButtonTable.size(); ++i) {
+		delete UnitButtonTable[i];
 	}
 	UnitButtonTable.clear();
 
@@ -213,13 +210,10 @@ void CleanButtons()
 **  @todo FIXME : add IconDisabled when needed.
 **  @todo FIXME : Should show the rally action for training unit ? (NewOrder)
 */
-static int GetButtonStatus(const ButtonAction *button, int UnderCursor)
+static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 {
 	int res = 0;
 	int i;
-
-	Assert(button);
-	//Assert(NumSelected);
 
 	/* parallel drawing */
 	if (!NumSelected) {
@@ -227,7 +221,7 @@ static int GetButtonStatus(const ButtonAction *button, int UnderCursor)
 	}
 
 	// cursor is on that button
-	if (ButtonAreaUnderCursor == ButtonAreaButton && UnderCursor == button->Pos - 1) {
+	if (ButtonAreaUnderCursor == ButtonAreaButton && UnderCursor == button.Pos - 1) {
 		res |= IconActive;
 		if (MouseButtons & LeftButton) {
 			// Overwrite IconActive.
@@ -236,7 +230,7 @@ static int GetButtonStatus(const ButtonAction *button, int UnderCursor)
 	}
 
 	unsigned int action = UnitActionNone;
-	switch (button->Action) {
+	switch (button.Action) {
 		case ButtonStop:
 			action = UnitActionStill;
 			break;
@@ -272,7 +266,7 @@ static int GetButtonStatus(const ButtonAction *button, int UnderCursor)
 		return res;
 	}
 	// other cases : manage AutoCast and different possible action.
-	switch (button->Action) {
+	switch (button.Action) {
 		case ButtonMove:
 			for (i = 0; i < NumSelected; ++i) {
 				int saction = Selected[i]->CurrentAction();
@@ -292,7 +286,7 @@ static int GetButtonStatus(const ButtonAction *button, int UnderCursor)
 			// Autocast
 			for (i = 0; i < NumSelected; ++i) {
 				Assert(Selected[i]->AutoCastSpell);
-				if (Selected[i]->AutoCastSpell[button->Value] != 1) {
+				if (Selected[i]->AutoCastSpell[button.Value] != 1) {
 					break;
 				}
 			}
@@ -326,32 +320,32 @@ static int GetButtonStatus(const ButtonAction *button, int UnderCursor)
 	return res;
 }
 
-int CPopupContentTypeButtonInfo::GetWidth(const ButtonAction *button, int *) const
+/* virtual */ int CPopupContentTypeButtonInfo::GetWidth(const ButtonAction &button, int *) const
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	std::string draw("");
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
-			draw = button->Hint;
+			draw = button.Hint;
 			break;
 		case PopupButtonInfo_Description:
-			draw = button->Description;
+			draw = button.Description;
 			break;
 	}
 	return this->MaxWidth ? std::min((unsigned int)font.getWidth(draw), this->MaxWidth) : font.getWidth(draw);
 }
 
-int CPopupContentTypeButtonInfo::GetHeight(const ButtonAction *button, int *) const
+/* virtual */ int CPopupContentTypeButtonInfo::GetHeight(const ButtonAction &button, int *) const
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	int height = font.Height();
 	std::string draw("");
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
-			draw = button->Hint;
+			draw = button.Hint;
 			break;
 		case PopupButtonInfo_Description:
-			draw = button->Description;
+			draw = button.Description;
 			break;
 	}
 	if (this->MaxWidth && draw.length()) {
@@ -363,17 +357,17 @@ int CPopupContentTypeButtonInfo::GetHeight(const ButtonAction *button, int *) co
 	return height;
 }
 
-void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction *button, int *) const
+/* virtual */ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *) const
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, "white", "red");
 	std::string draw("");
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
-			draw = button->Hint;
+			draw = button.Hint;
 			break;
 		case PopupButtonInfo_Description:
-			draw = button->Description;
+			draw = button.Description;
 			break;
 	}
 	std::string sub(draw);
@@ -390,7 +384,7 @@ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup *popup, const 
 	label.Draw(x, y, sub);
 }
 
-int CPopupContentTypeCosts::GetWidth(const ButtonAction *button, int *Costs) const
+/* virtual */ int CPopupContentTypeCosts::GetWidth(const ButtonAction &button, int *Costs) const
 {
 	int popupWidth = 0;
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
@@ -410,7 +404,7 @@ int CPopupContentTypeCosts::GetWidth(const ButtonAction *button, int *Costs) con
 	}
 	if (Costs[MaxCosts]) {
 		const CGraphic *G = UI.Resources[ManaResCost].G;
-		const SpellType *spell = SpellTypeTable[button->Value];
+		const SpellType *spell = SpellTypeTable[button.Value];
 
 		if (spell->ManaCost) {
 			popupWidth = 10;
@@ -424,14 +418,14 @@ int CPopupContentTypeCosts::GetWidth(const ButtonAction *button, int *Costs) con
 			popupWidth += font.Width(spell->ManaCost);
 			popupWidth = std::max<int>(popupWidth, font.Width(spell->Name) + 10);
 		} else {
-			popupWidth = font.Width(button->Hint) + 10;
+			popupWidth = font.Width(button.Hint) + 10;
 		}
 		popupWidth = std::max<int>(popupWidth, 100);
 	}
 	return popupWidth;
 }
 
-int CPopupContentTypeCosts::GetHeight(const ButtonAction *button, int *Costs) const
+/* virtual */ int CPopupContentTypeCosts::GetHeight(const ButtonAction &button, int *Costs) const
 {
 	int popupHeight = 0;
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
@@ -444,7 +438,7 @@ int CPopupContentTypeCosts::GetHeight(const ButtonAction *button, int *Costs) co
 	return std::max(popupHeight, font.Height());
 }
 
-void CPopupContentTypeCosts::Draw(int x, int y, const CPopup *, const unsigned int, const ButtonAction *button, int *Costs) const
+/* virtual */ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup *, const unsigned int, const ButtonAction &button, int *Costs) const
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, "white", "red");
@@ -466,7 +460,7 @@ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup *, const unsigned i
 		}
 	}
 	if (Costs[MaxCosts]) {
-		const SpellType *spell = SpellTypeTable[button->Value];
+		const SpellType *spell = SpellTypeTable[button.Value];
 		const CGraphic *G = UI.Resources[ManaResCost].G;
 		if (spell->ManaCost) {
 			int y_offset = 0;
@@ -484,38 +478,38 @@ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup *, const unsigned i
 	}
 }
 
-int CPopupContentTypeLine::GetWidth(const ButtonAction *button, int *Costs) const
+/* virtual */ int CPopupContentTypeLine::GetWidth(const ButtonAction &button, int *Costs) const
 {
 	return this->Width;
 }
 
-int CPopupContentTypeLine::GetHeight(const ButtonAction *button, int *Costs) const
+/* virtual */ int CPopupContentTypeLine::GetHeight(const ButtonAction &button, int *Costs) const
 {
 	return this->Height;
 }
 
-void CPopupContentTypeLine::Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction *button, int *Costs) const
+/* virtual */ void CPopupContentTypeLine::Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const
 {
 	Video.FillRectangle(this->Color, x - popup->MarginX - this->MarginX + 1,
 						y, this->Width && Width < popupWidth ? Width : popupWidth - 2, Height);
 }
 
-int CPopupContentTypeVariable::GetWidth(const ButtonAction *button, int *) const
+/* virtual */ int CPopupContentTypeVariable::GetWidth(const ButtonAction &button, int *) const
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
-	TriggerData.Type = UnitTypes[button->Value];
+	TriggerData.Type = UnitTypes[button.Value];
 	std::string text = EvalString(this->Text);
 	TriggerData.Type = NULL;
 	return font.getWidth(text);
 }
 
-int CPopupContentTypeVariable::GetHeight(const ButtonAction *, int *) const
+/* virtual */ int CPopupContentTypeVariable::GetHeight(const ButtonAction &, int *) const
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	return font.Height();
 }
 
-void CPopupContentTypeVariable::Draw(int x, int y, const CPopup *, const unsigned int, const ButtonAction *button, int *) const
+/* virtual */ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup *, const unsigned int, const ButtonAction &button, int *) const
 {
 	std::string text;										// Optional text to display.
 	CFont &font = this->Font ? *this->Font : GetSmallFont(); // Font to use.
@@ -525,7 +519,7 @@ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup *, const unsigne
 	CLabel label(font, "white", "red");
 
 	if (this->Text) {
-		TriggerData.Type = UnitTypes[button->Value];
+		TriggerData.Type = UnitTypes[button.Value];
 		text = EvalString(this->Text);
 		TriggerData.Type = NULL;
 		if (this->Centered) {
@@ -536,7 +530,7 @@ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup *, const unsigne
 	}
 
 	if (this->Index != -1) {
-		CUnitType &type = *UnitTypes[button->Value];
+		CUnitType &type = *UnitTypes[button.Value];
 		int value = type.DefaultStat.Variables[this->Index].Value;
 		int diff = type.Stats[ThisPlayer->Index].Variables[this->Index].Value - value;
 
@@ -560,18 +554,18 @@ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup *, const unsigne
 **  @return            0 if we can't show the content, else 1.
 */
 static bool CanShowPopupContent(const PopupConditionPanel *condition,
-								const ButtonAction *button,
+								const ButtonAction &button,
 								CUnitType *type)
 {
 	if (!condition) {
 		return true;
 	}
 
-	if (condition->HasHint && button->Hint.empty()) {
+	if (condition->HasHint && button.Hint.empty()) {
 		return false;
 	}
 
-	if (condition->HasDescription && button->Description.empty()) {
+	if (condition->HasDescription && button.Description.empty()) {
 		return false;
 	}
 
@@ -591,7 +585,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	return true;
 }
 
-static void GetPopupSize(const CPopup &popup, const ButtonAction *button, const CUIButton *uibutton,
+static void GetPopupSize(const CPopup &popup, const ButtonAction &button,
 						 int &popupWidth, int &popupHeight, int *Costs)
 {
 	int contentWidth = popup.MarginX;
@@ -606,7 +600,7 @@ static void GetPopupSize(const CPopup &popup, const ButtonAction *button, const 
 		 ++it) {
 		CPopupContentType &content = **it;
 
-		if (CanShowPopupContent(content.Condition, button, UnitTypes[button->Value])) {
+		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
 			// Automatically write the calculated coordinates.
 			content.PosX = contentWidth + content.MarginX;
 			content.PosY = popupHeight + content.MarginY;
@@ -754,9 +748,9 @@ void DrawPopupUnitInfo(const CUnitType *type,
 /**
 **  Draw popup
 */
-void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
+static void DrawPopup(const ButtonAction &button, const CUIButton *uibutton)
 {
-	CPopup *popup = PopupByIdent(button->Popup);
+	CPopup *popup = PopupByIdent(button.Popup);
 
 	if (!popup) {
 		return;
@@ -766,24 +760,24 @@ void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 	int Costs[MaxCosts + 1];
 	memset(Costs, 0, sizeof(Costs));
 
-	switch (button->Action) {
+	switch (button.Action) {
 		case ButtonResearch:
-			memcpy(Costs, AllUpgrades[button->Value]->Costs, sizeof(AllUpgrades[button->Value]->Costs));
+			memcpy(Costs, AllUpgrades[button.Value]->Costs, sizeof(AllUpgrades[button.Value]->Costs));
 			break;
 		case ButtonSpellCast:
-			Costs[MaxCosts] = SpellTypeTable[button->Value]->ManaCost;
+			Costs[MaxCosts] = SpellTypeTable[button.Value]->ManaCost;
 			break;
 		case ButtonBuild:
 		case ButtonTrain:
 		case ButtonUpgradeTo:
-			memcpy(Costs, UnitTypes[button->Value]->Stats[ThisPlayer->Index].Costs,
-				   sizeof(UnitTypes[button->Value]->Stats[ThisPlayer->Index].Costs));
+			memcpy(Costs, UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs,
+				   sizeof(UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs));
 			break;
 		default:
 			break;
 	}
 
-	GetPopupSize(*popup, button, uibutton, popupWidth, popupHeight, Costs);
+	GetPopupSize(*popup, button, popupWidth, popupHeight, Costs);
 	popupWidth = std::max(popupWidth, popup->MinWidth);
 	popupHeight = std::max(popupHeight, popup->MinHeight);
 	int x = std::min<int>(uibutton->X, Video.Width - 1 - popupWidth);
@@ -796,13 +790,13 @@ void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 	// Contents
 	for (std::vector<CPopupContentType *>::const_iterator content = popup->Contents.begin();
 		 content != popup->Contents.end(); ++content) {
-		if (CanShowPopupContent((*content)->Condition, button, UnitTypes[button->Value])) {
+		if (CanShowPopupContent((*content)->Condition, button, UnitTypes[button.Value])) {
 			(*content)->Draw(x + (*content)->PosX, y + (*content)->PosY, popup, popupWidth, button, Costs);
 		}
 	}
 
 #if 0 // Fixme: need to remove soon
-	switch (button->Action) {
+	switch (button.Action) {
 		case ButtonResearch: {
 			CLabel label(font, "white", "red");
 			int *Costs = AllUpgrades[button->Value]->Costs;
@@ -884,7 +878,7 @@ void DrawPopup(const ButtonAction *button, const CUIButton *uibutton)
 				label.Draw(x, y + y_offset, spell->ManaCost);
 			} else {
 				// Only Hint
-				label.Draw(x + 5, y + (popupHeight - font_height) / 2, 	button->Hint);
+				label.Draw(x + 5, y + (popupHeight - font_height) / 2, button->Hint);
 			}
 		}
 		break;
@@ -964,7 +958,7 @@ void CButtonPanel::Draw()
 		// Draw main Icon.
 		//
 		buttons[i].Icon.Icon->DrawUnitIcon(UI.ButtonPanel.Buttons[i].Style,
-										   GetButtonStatus(&buttons[i], ButtonUnderCursor),
+										   GetButtonStatus(buttons[i], ButtonUnderCursor),
 										   UI.ButtonPanel.Buttons[i].X, UI.ButtonPanel.Buttons[i].Y, buf);
 
 		//
@@ -972,8 +966,8 @@ void CButtonPanel::Draw()
 		//
 		if (ButtonAreaUnderCursor == ButtonAreaButton &&
 			ButtonUnderCursor == i && KeyState != KeyStateInput) {
-			DrawPopup(&buttons[i], &UI.ButtonPanel.Buttons[i]);
-			UpdateStatusLineForButton(&buttons[i]);
+			DrawPopup(buttons[i], &UI.ButtonPanel.Buttons[i]);
+			UpdateStatusLineForButton(buttons[i]);
 		}
 	}
 }
@@ -983,29 +977,27 @@ void CButtonPanel::Draw()
 **
 **  @param button  Button
 */
-void UpdateStatusLineForButton(const ButtonAction *button)
+void UpdateStatusLineForButton(const ButtonAction &button)
 {
-	const CUnitStats *stats;
-	Assert(button);
-	UI.StatusLine.Set(button->Hint);
-	switch (button->Action) {
+	UI.StatusLine.Set(button.Hint);
+	switch (button.Action) {
 		case ButtonBuild:
 		case ButtonTrain:
-		case ButtonUpgradeTo:
+		case ButtonUpgradeTo: {
 			// FIXME: store pointer in button table!
-			stats = &UnitTypes[button->Value]->Stats[ThisPlayer->Index];
-			SetCosts(0, UnitTypes[button->Value]->Demand, stats->Costs);
+			const CUnitStats &stats = UnitTypes[button.Value]->Stats[ThisPlayer->Index];
+			SetCosts(0, UnitTypes[button.Value]->Demand, stats.Costs);
 			break;
+		}
 		case ButtonResearch:
-			SetCosts(0, 0, AllUpgrades[button->Value]->Costs);
+			SetCosts(0, 0, AllUpgrades[button.Value]->Costs);
 			break;
 		case ButtonSpellCast:
-			SetCosts(SpellTypeTable[button->Value]->ManaCost, 0, NULL);
+			SetCosts(SpellTypeTable[button.Value]->ManaCost, 0, NULL);
 			break;
 		default:
 			ClearCosts();
 			break;
-
 	}
 }
 /*----------------------------------------------------------------------------
@@ -1023,21 +1015,17 @@ void UpdateStatusLineForButton(const ButtonAction *button)
 **  @todo FIXME: better check. (dependancy, resource, ...)
 **  @todo FIXME: make difference with impossible and not yet researched.
 */
-static bool IsButtonAllowed(const CUnit &unit, const ButtonAction *buttonaction)
+static bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 {
-	bool res;
-
-	Assert(buttonaction);
-
-	if (buttonaction->Allowed) {
-		return buttonaction->Allowed(unit, buttonaction);
+	if (buttonaction.Allowed) {
+		return buttonaction.Allowed(unit, buttonaction);
 	}
 
-	res = false;
+	bool res = false;
 	// FIXME: we have to check and if these unit buttons are available
 	//    i.e. if button action is ButtonTrain for example check if
 	// required unit is not restricted etc...
-	switch (buttonaction->Action) {
+	switch (buttonaction.Action) {
 		case ButtonStop:
 		case ButtonStandGround:
 		case ButtonButton:
@@ -1083,13 +1071,13 @@ static bool IsButtonAllowed(const CUnit &unit, const ButtonAction *buttonaction)
 		case ButtonUpgradeTo:
 		case ButtonResearch:
 		case ButtonBuild:
-			res = CheckDependByIdent(*unit.Player, buttonaction->ValueStr);
-			if (res && !strncmp(buttonaction->ValueStr.c_str(), "upgrade-", 8)) {
-				res = UpgradeIdentAllowed(*unit.Player, buttonaction->ValueStr) == 'A';
+			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr);
+			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
+				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A';
 			}
 			break;
 		case ButtonSpellCast:
-			res = SpellIsAvailable(*unit.Player, buttonaction->Value);
+			res = SpellIsAvailable(*unit.Player, buttonaction.Value);
 			break;
 		case ButtonUnload:
 			res = (Selected[0]->Type->CanTransport() && Selected[0]->BoardCount);
@@ -1110,8 +1098,8 @@ static bool IsButtonAllowed(const CUnit &unit, const ButtonAction *buttonaction)
 	}
 #if 0
 	// there is a additional check function -- call it
-	if (res && buttonaction->Disabled) {
-		return buttonaction->Disabled(unit, buttonaction);
+	if (res && buttonaction.Disabled) {
+		return buttonaction.Disabled(unit, buttonaction);
 	}
 #endif
 	return res;
@@ -1147,7 +1135,7 @@ static ButtonAction *UpdateButtonPanelMultipleUnits()
 		}
 		bool allow = true;
 		for (int i = 0; i < NumSelected; i++) {
-			if (!IsButtonAllowed(*Selected[i], UnitButtonTable[z])) {
+			if (!IsButtonAllowed(*Selected[i], *UnitButtonTable[z])) {
 				allow = false;
 				break;
 			}
@@ -1178,8 +1166,8 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit &unit)
 {
 	ButtonAction *res = new ButtonAction[UI.ButtonPanel.Buttons.size()];
 
-	for (unsigned int z = 0; z < UI.ButtonPanel.Buttons.size(); ++z) {
-		res[z].Pos = -1;
+	for (size_t i = 0; i != UI.ButtonPanel.Buttons.size(); ++i) {
+		res[i].Pos = -1;
 	}
 	char unit_ident[128];
 
@@ -1198,30 +1186,27 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit &unit)
 	} else {
 		sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
 	}
-	for (unsigned int z = 0; z < UnitButtonTable.size(); ++z) {
-		int pos; // keep position, modified if alt-buttons required
-
-		ButtonAction *buttonaction = UnitButtonTable[z];
-		Assert(0 < buttonaction->Pos && buttonaction->Pos <= (int)UI.ButtonPanel.Buttons.size());
+	for (size_t i = 0; i != UnitButtonTable.size(); ++i) {
+		ButtonAction &buttonaction = *UnitButtonTable[i];
+		Assert(0 < buttonaction.Pos && buttonaction.Pos <= (int)UI.ButtonPanel.Buttons.size());
 
 		// Same level
-		if (buttonaction->Level != CurrentButtonLevel) {
+		if (buttonaction.Level != CurrentButtonLevel) {
 			continue;
 		}
 
 		// any unit or unit in list
-		if (buttonaction->UnitMask[0] != '*' &&
-			!strstr(buttonaction->UnitMask.c_str(), unit_ident)) {
+		if (buttonaction.UnitMask[0] != '*'
+			&& !strstr(buttonaction.UnitMask.c_str(), unit_ident)) {
 			continue;
 		}
 		int allow = IsButtonAllowed(unit, buttonaction);
-
-		pos = buttonaction->Pos;
+		int pos = buttonaction.Pos;
 
 		// is button allowed after all?
 		if (allow) {
 			// OverWrite, So take last valid button.
-			res[pos - 1] = *buttonaction;
+			res[pos - 1] = buttonaction;
 		}
 	}
 	return res;

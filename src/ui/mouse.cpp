@@ -2025,7 +2025,7 @@ void DrawPieMenu()
 
 	int i = GetPieUnderCursor();
 	if (i != -1 && KeyState != KeyStateInput && buttons[i].Pos != -1) {
-		UpdateStatusLineForButton(&buttons[i]);
+		UpdateStatusLineForButton(buttons[i]);
 	}
 }
 
