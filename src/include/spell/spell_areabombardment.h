@@ -38,10 +38,10 @@
 
 #include "spells.h"
 
-class AreaBombardment : public SpellActionType
+class Spell_AreaBombardment : public SpellActionType
 {
 public:
-	AreaBombardment() : Fields(0), Shards(0), Damage(0),
+	Spell_AreaBombardment() : Fields(0), Shards(0), Damage(0),
 		StartOffsetX(0), StartOffsetY(0), Missile(NULL) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);

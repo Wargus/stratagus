@@ -38,10 +38,10 @@
 
 #include "spells.h"
 
-class SpawnPortal : public SpellActionType
+class Spell_SpawnPortal : public SpellActionType
 {
 public:
-	SpawnPortal() : PortalType(0) {};
+	Spell_SpawnPortal() : PortalType(0) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);

@@ -74,25 +74,25 @@ static SpellActionType *CclSpellAction(lua_State *l)
 
 	SpellActionType *spellaction = NULL;
 	if (!strcmp(value, "adjust-variable")) {
-		spellaction = new AdjustVariable;
+		spellaction = new Spell_AdjustVariable;
 	} else if (!strcmp(value, "adjust-vitals")) {
-		spellaction = new AdjustVital;
+		spellaction = new Spell_AdjustVital;
 	} else if (!strcmp(value, "area-adjust-vitals")) {
-		spellaction = new AreaAdjustVital;
+		spellaction = new Spell_AreaAdjustVital;
 	} else if (!strcmp(value, "area-bombardment")) {
-		spellaction = new AreaBombardment;
+		spellaction = new Spell_AreaBombardment;
 	} else if (!strcmp(value, "capture")) {
-		spellaction = new Capture;
+		spellaction = new Spell_Capture;
 	} else if (!strcmp(value, "demolish")) {
-		spellaction = new Demolish;
+		spellaction = new Spell_Demolish;
 	} else if (!strcmp(value, "polymorph")) {
-		spellaction = new Polymorph;
+		spellaction = new Spell_Polymorph;
 	} else if (!strcmp(value, "spawn-missile")) {
-		spellaction = new SpawnMissile;
+		spellaction = new Spell_SpawnMissile;
 	} else if (!strcmp(value, "spawn-portal")) {
-		spellaction = new SpawnPortal;
+		spellaction = new Spell_SpawnPortal;
 	} else if (!strcmp(value, "summon")) {
-		spellaction = new Summon;
+		spellaction = new Spell_Summon;
 	} else {
 		LuaError(l, "Unsupported action type: %s" _C_ value);
 	}

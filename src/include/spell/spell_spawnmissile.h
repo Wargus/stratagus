@@ -65,10 +65,10 @@ public:
 	int AddRandY;       /// Random add to the X coordinate
 };
 
-class SpawnMissile : public SpellActionType
+class Spell_SpawnMissile : public SpellActionType
 {
 public:
-	SpawnMissile() : Damage(0), TTL(-1), Delay(0), UseUnitVar(false),
+	Spell_SpawnMissile() : Damage(0), TTL(-1), Delay(0), UseUnitVar(false),
 		StartPoint(LocBaseCaster), EndPoint(LocBaseTarget), Missile(0) {}
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);

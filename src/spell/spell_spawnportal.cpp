@@ -37,7 +37,7 @@
 #include "script.h"
 #include "unit.h"
 
-/* virtual */ void SpawnPortal::Parse(lua_State *l, int startIndex, int endIndex)
+/* virtual */ void Spell_SpawnPortal::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
 		lua_rawgeti(l, -1, j + 1);
@@ -73,7 +73,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int SpawnPortal::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
+/* virtual */ int Spell_SpawnPortal::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
 {
 	// FIXME: vladi: cop should be placed only on explored land
 	CUnit *portal = caster.Goal;

@@ -37,7 +37,7 @@
 #include "script.h"
 #include "map.h"
 
-/* virtual */ void Demolish::Parse(lua_State *l, int startIndex, int endIndex)
+/* virtual */ void Spell_Demolish::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
 		lua_rawgeti(l, -1, j + 1);
@@ -67,7 +67,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Demolish::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
+/* virtual */ int Spell_Demolish::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
 {
 	// Allow error margins. (Lame, I know)
 	const Vec2i offset(this->Range + 2, this->Range + 2);

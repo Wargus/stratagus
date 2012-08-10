@@ -65,11 +65,11 @@ public:
 };
 
 
-class AdjustVariable : public SpellActionType
+class Spell_AdjustVariable : public SpellActionType
 {
 public:
-	AdjustVariable() : Var(NULL) {};
-	~AdjustVariable() { delete [](this->Var); };
+	Spell_AdjustVariable() : Var(NULL) {};
+	~Spell_AdjustVariable() { delete [](this->Var); };
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);

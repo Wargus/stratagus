@@ -38,7 +38,7 @@
 #include "unit.h"
 
 
-/* virtual */ void AdjustVariable::Parse(lua_State *l, int startIndex, int endIndex)
+/* virtual */ void Spell_AdjustVariable::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	int j = startIndex;
 	lua_rawgeti(l, -1, j + 1);
@@ -116,7 +116,7 @@
 **
 **  @return        =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int AdjustVariable::Cast(CUnit &caster, const SpellType &, CUnit *target, const Vec2i &/*goalPos*/)
+/* virtual */ int Spell_AdjustVariable::Cast(CUnit &caster, const SpellType &, CUnit *target, const Vec2i &/*goalPos*/)
 {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		CUnit *unit = (this->Var[i].TargetIsCaster) ? &caster : target;

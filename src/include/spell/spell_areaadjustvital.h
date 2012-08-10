@@ -38,10 +38,10 @@
 
 #include "spells.h"
 
-class AreaAdjustVital : public SpellActionType
+class Spell_AreaAdjustVital : public SpellActionType
 {
 public:
-	AreaAdjustVital() : HP(0), Mana(0) {};
+	Spell_AreaAdjustVital() : HP(0), Mana(0) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
