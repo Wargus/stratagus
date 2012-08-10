@@ -185,7 +185,7 @@
 	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		unit.ReCast = 0;
 	} else {
-		unit.ReCast = SpellCast(unit, this->Spell, goal, goalPos);
+		unit.ReCast = SpellCast(unit, *this->Spell, goal, goalPos);
 	}
 	UnHideUnit(unit); // unit is invisible until attacks
 }
@@ -297,7 +297,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	switch (this->State) {
 		case 0:
 			// Check if we can cast the spell.
-			if (!CanCastSpell(unit, &spell, order.GetGoal(), order.goalPos)) {
+			if (!CanCastSpell(unit, spell, order.GetGoal(), order.goalPos)) {
 				// Notify player about this problem
 				if (unit.Variable[MANA_INDEX].Value < spell.ManaCost) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
@@ -345,7 +345,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				if (goal && goal != &unit && !goal->IsVisibleAsGoal(*unit.Player)) {
 					unit.ReCast = 0;
 				} else {
-					unit.ReCast = SpellCast(unit, &spell, goal, order.goalPos);
+					unit.ReCast = SpellCast(unit, spell, goal, order.goalPos);
 				}
 			}
 

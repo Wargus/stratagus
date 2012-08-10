@@ -216,7 +216,7 @@ bool AutoCast(CUnit &unit)
 		for (unsigned int i = 0; i < SpellTypeTable.size(); ++i) {
 			if (unit.AutoCastSpell[i]
 				&& (SpellTypeTable[i]->AutoCast || SpellTypeTable[i]->AICast)
-				&& AutoCastSpell(unit, SpellTypeTable[i])) {
+				&& AutoCastSpell(unit, *SpellTypeTable[i])) {
 				return true;
 			}
 		}
@@ -309,7 +309,7 @@ bool COrder_Still::AutoCastStand(CUnit &unit)
 		for (unsigned int i = 0; i < SpellTypeTable.size(); ++i) {
 			if (unit.AutoCastSpell[i]
 				&& (SpellTypeTable[i]->AutoCast || SpellTypeTable[i]->AICast)
-				&& AutoCastSpell(unit, SpellTypeTable[i])) {
+				&& AutoCastSpell(unit, *SpellTypeTable[i])) {
 				return true;
 			}
 		}
