@@ -179,7 +179,7 @@ static SpellActionType *CclSpellAction(lua_State *l)
 		}
 		return spellaction;
 	} else if (!strcmp(value, "area-adjust-vitals")) {
-		AreaAdjustVitals *spellaction = new AreaAdjustVitals;
+		AreaAdjustVital *spellaction = new AreaAdjustVital;
 		for (; j < args; ++j) {
 			lua_rawgeti(l, -1, j + 1);
 			value = LuaToString(l, -1);
@@ -439,7 +439,7 @@ static SpellActionType *CclSpellAction(lua_State *l)
 		}
 		return spellaction;
 	} else if (!strcmp(value, "adjust-vitals")) {
-		AdjustVitals *spellaction = new AdjustVitals;
+		AdjustVital *spellaction = new AdjustVital;
 		for (; j < args; ++j) {
 			lua_rawgeti(l, -1, j + 1);
 			value = LuaToString(l, -1);

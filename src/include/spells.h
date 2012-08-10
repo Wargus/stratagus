@@ -138,10 +138,10 @@ public:
 //  Specific spells.
 //
 
-class AreaAdjustVitals : public SpellActionType
+class AreaAdjustVital : public SpellActionType
 {
 public:
-	AreaAdjustVitals() : HP(0), Mana(0) {};
+	AreaAdjustVital() : HP(0), Mana(0) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
 
@@ -214,10 +214,10 @@ public:
 	SpellActionTypeAdjustVariable *Var;
 };
 
-class AdjustVitals : public SpellActionType
+class AdjustVital : public SpellActionType
 {
 public:
-	AdjustVitals() : SpellActionType(1), HP(0), Mana(0), MaxMultiCast(0) {};
+	AdjustVital() : SpellActionType(1), HP(0), Mana(0), MaxMultiCast(0) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
 

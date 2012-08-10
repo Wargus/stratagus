@@ -226,12 +226,6 @@ set(pathfinder_SRCS
 )
 source_group(pathfinder FILES ${pathfinder_SRCS})
 
-set(spell_SRCS
-	src/spell/script_spell.cpp
-	src/spell/spells.cpp
-)
-source_group(spell FILES ${spell_SRCS})
-
 set(sound_SRCS
 	src/sound/mikmod.cpp
 	src/sound/music.cpp
@@ -244,6 +238,22 @@ set(sound_SRCS
 	src/sound/wav.cpp
 )
 source_group(sound FILES ${sound_SRCS})
+
+set(spell_SRCS
+	src/spell/script_spell.cpp
+	src/spell/spell_adjustvariable.cpp
+	src/spell/spell_adjustvital.cpp
+	src/spell/spell_areaadjustvital.cpp
+	src/spell/spell_areabombardment.cpp
+	src/spell/spell_capture.cpp
+	src/spell/spell_demolish.cpp
+	src/spell/spell_polymorph.cpp
+	src/spell/spell_spawnmissile.cpp
+	src/spell/spell_spawnportal.cpp
+	src/spell/spell_summon.cpp
+	src/spell/spells.cpp
+)
+source_group(spell FILES ${spell_SRCS})
 
 set(stratagusmain_SRCS
 	src/stratagus/construct.cpp
@@ -349,8 +359,8 @@ set(stratagus_SRCS
 	${network_SRCS}
 	${particle_SRCS}
 	${pathfinder_SRCS}
-	${spell_SRCS}
 	${sound_SRCS}
+	${spell_SRCS}
 	${stratagusmain_SRCS}
 	${ui_SRCS}
 	${unit_SRCS}
