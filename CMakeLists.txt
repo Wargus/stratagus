@@ -226,6 +226,12 @@ set(pathfinder_SRCS
 )
 source_group(pathfinder FILES ${pathfinder_SRCS})
 
+set(spell_SRCS
+	src/spell/script_spell.cpp
+	src/spell/spells.cpp
+)
+source_group(spell FILES ${spell_SRCS})
+
 set(sound_SRCS
 	src/sound/mikmod.cpp
 	src/sound/music.cpp
@@ -248,9 +254,7 @@ set(stratagusmain_SRCS
 	src/stratagus/player.cpp
 	src/stratagus/script.cpp
 	src/stratagus/script_player.cpp
-	src/stratagus/script_spell.cpp
 	src/stratagus/selection.cpp
-	src/stratagus/spells.cpp
 	src/stratagus/stratagus.cpp
 	src/stratagus/title.cpp
 	src/stratagus/translate.cpp
@@ -345,6 +349,7 @@ set(stratagus_SRCS
 	${network_SRCS}
 	${particle_SRCS}
 	${pathfinder_SRCS}
+	${spell_SRCS}
 	${sound_SRCS}
 	${stratagusmain_SRCS}
 	${ui_SRCS}
