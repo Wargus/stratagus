@@ -36,7 +36,41 @@
 
 #include "actions.h"
 #include "map.h"
+#include "script.h"
 #include "unit.h"
+
+/* virtual */ void Summon::Parse(lua_State *l, int startIndex, int endIndex)
+{
+	for (int j = startIndex; j < endIndex; ++j) {
+		lua_rawgeti(l, -1, j + 1);
+		const char *value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++j;
+		if (!strcmp(value, "unit-type")) {
+			lua_rawgeti(l, -1, j + 1);
+			value = LuaToString(l, -1);
+			lua_pop(l, 1);
+			this->UnitType = UnitTypeByIdent(value);
+			if (!this->UnitType) {
+				this->UnitType = 0;
+				DebugPrint("unit type \"%s\" not found for summon spell.\n" _C_ value);
+			}
+		} else if (!strcmp(value, "time-to-live")) {
+			lua_rawgeti(l, -1, j + 1);
+			this->TTL = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "require-corpse")) {
+			this->RequireCorpse = 1;
+			--j;
+		} else {
+			LuaError(l, "Unsupported summon tag: %s" _C_ value);
+		}
+	}
+	// Now, checking value.
+	if (this->UnitType == NULL) {
+		LuaError(l, "Use a unittype for summon (with unit-type)");
+	}
+}
 
 class IsDyingAndNotABuilding
 {
@@ -57,7 +91,7 @@ public:
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int Summon::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos)
+/* virtual */ int Summon::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos)
 {
 	Vec2i pos = goalPos;
 	bool cansummon;

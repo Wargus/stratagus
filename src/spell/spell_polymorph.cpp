@@ -35,7 +35,41 @@
 #include "spells.h"
 
 #include "map.h"
+#include "script.h"
 #include "unit.h"
+
+/* virtual */ void Polymorph::Parse(lua_State *l, int startIndex, int endIndex)
+{
+	for (int j = startIndex; j < endIndex; ++j) {
+		lua_rawgeti(l, -1, j + 1);
+		const char *value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++j;
+		if (!strcmp(value, "new-form")) {
+			lua_rawgeti(l, -1, j + 1);
+			value = LuaToString(l, -1);
+			lua_pop(l, 1);
+			this->NewForm = UnitTypeByIdent(value);
+			if (!this->NewForm) {
+				this->NewForm = 0;
+				DebugPrint("unit type \"%s\" not found for polymorph spell.\n" _C_ value);
+			}
+			// FIXME: temp polymorphs? hard to do.
+		} else if (!strcmp(value, "player-neutral")) {
+			this->PlayerNeutral = 1;
+			--j;
+		} else if (!strcmp(value, "player-caster")) {
+			this->PlayerNeutral = 2;
+			--j;
+		} else {
+			LuaError(l, "Unsupported polymorph tag: %s" _C_ value);
+		}
+	}
+	// Now, checking value.
+	if (this->NewForm == NULL) {
+		LuaError(l, "Use a unittype for polymorph (with new-form)");
+	}
+}
 
 /**
 ** Cast polymorph.
@@ -47,7 +81,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int Polymorph::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos)
+/* virtual */ int Polymorph::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos)
 {
 	if (!target) {
 		return 0;

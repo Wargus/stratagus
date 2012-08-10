@@ -34,7 +34,33 @@
 
 #include "spells.h"
 
+#include "script.h"
 #include "unit.h"
+
+/* virtual */ void AdjustVital::Parse(lua_State *l, int startIndex, int endIndex)
+{
+	for (int j = startIndex; j < endIndex; ++j) {
+		lua_rawgeti(l, -1, j + 1);
+		const char *value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++j;
+		if (!strcmp(value, "hit-points")) {
+			lua_rawgeti(l, -1, j + 1);
+			this->HP = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "mana-points")) {
+			lua_rawgeti(l, -1, j + 1);
+			this->Mana = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "max-multi-cast")) {
+			lua_rawgeti(l, -1, j + 1);
+			this->MaxMultiCast = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else {
+			LuaError(l, "Unsupported adjust-vitals tag: %s" _C_ value);
+		}
+	}
+}
 
 
 /**
@@ -47,7 +73,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int AdjustVital::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &/*goalPos*/)
+/* virtual */ int AdjustVital::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &/*goalPos*/)
 {
 	if (!target) {
 		return 0;

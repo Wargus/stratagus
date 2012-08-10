@@ -34,8 +34,77 @@
 
 #include "spells.h"
 
+#include "script.h"
 #include "unit.h"
 
+
+/* virtual */ void AdjustVariable::Parse(lua_State *l, int startIndex, int endIndex)
+{
+	int j = startIndex;
+	lua_rawgeti(l, -1, j + 1);
+	if (!lua_istable(l, -1)) {
+		LuaError(l, "Table expected for adjust-variable.");
+	}
+	this->Var = new SpellActionTypeAdjustVariable[UnitTypeVar.GetNumberVariable()];
+	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+		const char *const name = LuaToString(l, -2);
+		int i = UnitTypeVar.VariableNameLookup[name];
+
+		if (i == -1) {
+			LuaError(l, "in adjust-variable : Bad variable index : '%s'" _C_ LuaToString(l, -2));
+		}
+		if (lua_isnumber(l, -1)) {
+			this->Var[i].Enable = (LuaToNumber(l, -1) != 0);
+			this->Var[i].ModifEnable = 1;
+			this->Var[i].Value = LuaToNumber(l, -1);
+			this->Var[i].ModifValue = 1;
+			this->Var[i].Max = LuaToNumber(l, -1);
+			this->Var[i].ModifMax = 1;
+		} else if (lua_istable(l, -1)) {
+			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+				const char *const key = LuaToString(l, -2);
+				if (!strcmp(key, "Enable")) {
+					this->Var[i].Enable = LuaToBoolean(l, -1);
+					this->Var[i].ModifEnable = 1;
+				} else if (!strcmp(key, "Value")) {
+					this->Var[i].Value = LuaToNumber(l, -1);
+					this->Var[i].ModifValue = 1;
+				} else if (!strcmp(key, "Max")) {
+					this->Var[i].Max = LuaToNumber(l, -1);
+					this->Var[i].ModifMax = 1;
+				} else if (!strcmp(key, "Increase")) {
+					this->Var[i].Increase = LuaToNumber(l, -1);
+					this->Var[i].ModifIncrease = 1;
+				} else if (!strcmp(key, "InvertEnable")) {
+					this->Var[i].InvertEnable = LuaToBoolean(l, -1);
+				} else if (!strcmp(key, "AddValue")) {
+					this->Var[i].AddValue = LuaToNumber(l, -1);
+				} else if (!strcmp(key, "AddMax")) {
+					this->Var[i].AddMax = LuaToNumber(l, -1);
+				} else if (!strcmp(key, "AddIncrease")) {
+					this->Var[i].AddIncrease = LuaToNumber(l, -1);
+				} else if (!strcmp(key, "IncreaseTime")) {
+					this->Var[i].IncreaseTime = LuaToNumber(l, -1);
+				} else if (!strcmp(key, "TargetIsCaster")) {
+					const char *value = LuaToString(l, -1);
+					if (!strcmp(value, "caster")) {
+						this->Var[i].TargetIsCaster = 1;
+					} else if (!strcmp(value, "target")) {
+						this->Var[i].TargetIsCaster = 0;
+					} else { // Error
+						LuaError(l, "key '%s' not valid for TargetIsCaster in adjustvariable" _C_ value);
+					}
+				} else { // Error
+					LuaError(l, "key '%s' not valid for adjustvariable" _C_ key);
+				}
+			}
+		} else {
+			LuaError(l, "in adjust-variable : Bad variable value");
+		}
+	}
+	lua_pop(l, 1); // pop table
+
+}
 
 /**
 **  Adjust User Variables.
@@ -47,7 +116,7 @@
 **
 **  @return        =!0 if spell should be repeated, 0 if not
 */
-int AdjustVariable::Cast(CUnit &caster, const SpellType &, CUnit *target, const Vec2i &/*goalPos*/)
+/* virtual */ int AdjustVariable::Cast(CUnit &caster, const SpellType &, CUnit *target, const Vec2i &/*goalPos*/)
 {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		CUnit *unit = (this->Var[i].TargetIsCaster) ? &caster : target;

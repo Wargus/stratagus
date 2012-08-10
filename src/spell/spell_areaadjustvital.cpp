@@ -35,8 +35,29 @@
 #include "spells.h"
 
 #include "map.h"
+#include "script.h"
 #include "unit.h"
 
+/* virtual */ void AreaAdjustVital::Parse(lua_State *l, int startIndex, int endIndex)
+{
+	for (int j = startIndex; j < endIndex; ++j) {
+		lua_rawgeti(l, -1, j + 1);
+		const char *value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++j;
+		if (!strcmp(value, "hit-points")) {
+			lua_rawgeti(l, -1, j + 1);
+			this->HP = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "mana-points")) {
+			lua_rawgeti(l, -1, j + 1);
+			this->Mana = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else {
+			LuaError(l, "Unsupported area-adjust-vitals tag: %s" _C_ value);
+		}
+	}
+}
 
 /**
 ** Cast Area Adjust Vital on all valid units in range.
@@ -48,7 +69,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int AreaAdjustVital::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos)
+/* virtual */ int AreaAdjustVital::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos)
 {
 	const Vec2i range(spell.Range, spell.Range);
 	const Vec2i typeSize(caster.Type->Width, caster.Type->Height);

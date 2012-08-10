@@ -130,6 +130,7 @@ public:
 
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos) = 0;
+	virtual void Parse(lua_State *l, int startIndex, int endIndex) = 0;
 
 	const int ModifyManaCaster;
 };
@@ -144,7 +145,9 @@ public:
 	AreaAdjustVital() : HP(0), Mana(0) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
+	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
+private:
 	int HP;         /// Target HP gain.(can be negative)
 	int Mana;       /// Target Mana gain.(can be negative)
 } ;
@@ -156,7 +159,9 @@ public:
 		StartPoint(LocBaseCaster), EndPoint(LocBaseTarget), Missile(0) {}
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
+	virtual void Parse(lua_State *lua, int startIndex, int endIndex);
 
+private:
 	int Damage;                             /// Missile damage.
 	int TTL;                                /// Missile TTL.
 	int Delay;                              /// Missile original delay.
@@ -172,7 +177,9 @@ public:
 	Demolish() : Damage(0), Range(0) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
+	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
+private:
 	int Damage; /// Damage for every unit in range.
 	int Range;  /// Range of the explosion.
 };
@@ -184,7 +191,9 @@ public:
 		StartOffsetX(0), StartOffsetY(0), Missile(NULL) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
+	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
+private:
 	int Fields;             /// The size of the affected square.
 	int Shards;             /// Number of shards thrown.
 	int Damage;             /// Damage for every shard.
@@ -199,7 +208,9 @@ public:
 	SpawnPortal() : PortalType(0) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
+	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
+private:
 	CUnitType *PortalType;   /// The unit type spawned
 };
 
@@ -210,7 +221,9 @@ public:
 	~AdjustVariable() { delete [](this->Var); };
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
+	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
+private:
 	SpellActionTypeAdjustVariable *Var;
 };
 
@@ -220,7 +233,9 @@ public:
 	AdjustVital() : SpellActionType(1), HP(0), Mana(0), MaxMultiCast(0) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
+	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
+private:
 	int HP;         /// Target HP gain.(can be negative)
 	int Mana;       /// Target Mana gain.(can be negative)
 	/// This spell is designed to be used wit very small amounts. The spell
@@ -234,7 +249,9 @@ public:
 	Polymorph() : SpellActionType(1), NewForm(NULL), PlayerNeutral(0) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
+	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
+private:
 	CUnitType *NewForm;         /// The new form
 	int PlayerNeutral;          /// Convert the unit to the neutral player, or to the caster's player.
 	// TODO: temporary polymorphs would be awesome, but hard to implement
@@ -246,7 +263,9 @@ public:
 	Summon() : SpellActionType(1), UnitType(NULL), TTL(0), RequireCorpse(0) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
+	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
+private:
 	CUnitType *UnitType;    /// Type of unit to be summoned.
 	int TTL;                /// Time to live for summoned unit. 0 means infinite
 	int RequireCorpse;      /// Corpse consumed while summoning.
@@ -258,7 +277,9 @@ public:
 	Capture() : SacrificeEnable(0), Damage(0), DamagePercent(0) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
+	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
+private:
 	char SacrificeEnable; /// true if the caster dies after casting.
 	int Damage;           /// damage the spell does if unable to caputre
 	int DamagePercent;    /// percent the target must be damaged for a

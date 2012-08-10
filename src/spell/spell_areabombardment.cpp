@@ -36,7 +36,54 @@
 
 #include "map.h"
 #include "missile.h"
+#include "script.h"
 #include "unit.h"
+
+/* virtual */ void AreaBombardment::Parse(lua_State *l, int startIndex, int endIndex)
+{
+	for (int j = startIndex; j < endIndex; ++j) {
+		lua_rawgeti(l, -1, j + 1);
+		const char *value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++j;
+		if (!strcmp(value, "fields")) {
+			lua_rawgeti(l, -1, j + 1);
+			this->Fields = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "shards")) {
+			lua_rawgeti(l, -1, j + 1);
+			this->Shards = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "damage")) {
+			lua_rawgeti(l, -1, j + 1);
+			this->Damage = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "start-offset-x")) {
+			lua_rawgeti(l, -1, j + 1);
+			this->StartOffsetX = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "start-offset-y")) {
+			lua_rawgeti(l, -1, j + 1);
+			this->StartOffsetY = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "missile")) {
+			lua_rawgeti(l, -1, j + 1);
+			value = LuaToString(l, -1);
+			this->Missile = MissileTypeByIdent(value);
+			if (this->Missile == NULL) {
+				DebugPrint("in area-bombardement : missile %s does not exist\n" _C_ value);
+			}
+			lua_pop(l, 1);
+		} else {
+			LuaError(l, "Unsupported area-bombardment tag: %s" _C_ value);
+		}
+	}
+	// Now, checking value.
+	if (this->Missile == NULL) {
+		LuaError(l, "Use a missile for area-bombardment (with missile)");
+	}
+}
+
 
 /**
 ** Cast area bombardment.
@@ -50,7 +97,7 @@
 **  @internal: vladi: blizzard differs than original in this way:
 **   original: launches 50 shards at 5 random spots x 10 for 25 mana.
 */
-int AreaBombardment::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
+/* virtual */ int AreaBombardment::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
 {
 	int fields = this->Fields;
 	const int shards = this->Shards;

@@ -34,7 +34,34 @@
 
 #include "spells.h"
 
+#include "script.h"
 #include "unit.h"
+
+/* virtual */ void SpawnPortal::Parse(lua_State *l, int startIndex, int endIndex)
+{
+	for (int j = startIndex; j < endIndex; ++j) {
+		lua_rawgeti(l, -1, j + 1);
+		const char *value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++j;
+		if (!strcmp(value, "portal-type")) {
+			lua_rawgeti(l, -1, j + 1);
+			value = LuaToString(l, -1);
+			lua_pop(l, 1);
+			this->PortalType = UnitTypeByIdent(value);
+			if (!this->PortalType) {
+				this->PortalType = 0;
+				DebugPrint("unit type \"%s\" not found for spawn-portal.\n" _C_ value);
+			}
+		} else {
+			LuaError(l, "Unsupported spawn-portal tag: %s" _C_ value);
+		}
+	}
+	// Now, checking value.
+	if (this->PortalType == NULL) {
+		LuaError(l, "Use a unittype for spawn-portal (with portal-type)");
+	}
+}
 
 /**
 ** Cast circle of power.
@@ -46,7 +73,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int SpawnPortal::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
+/* virtual */ int SpawnPortal::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
 {
 	// FIXME: vladi: cop should be placed only on explored land
 	CUnit *portal = caster.Goal;

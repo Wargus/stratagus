@@ -34,7 +34,29 @@
 
 #include "spells.h"
 
+#include "script.h"
 #include "map.h"
+
+/* virtual */ void Demolish::Parse(lua_State *l, int startIndex, int endIndex)
+{
+	for (int j = startIndex; j < endIndex; ++j) {
+		lua_rawgeti(l, -1, j + 1);
+		const char *value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++j;
+		if (!strcmp(value, "range")) {
+			lua_rawgeti(l, -1, j + 1);
+			this->Range = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "damage")) {
+			lua_rawgeti(l, -1, j + 1);
+			this->Damage = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else {
+			LuaError(l, "Unsupported demolish tag: %s" _C_ value);
+		}
+	}
+}
 
 /**
 **  Cast demolish
@@ -45,7 +67,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int Demolish::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
+/* virtual */ int Demolish::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
 {
 	// Allow error margins. (Lame, I know)
 	const Vec2i offset(this->Range + 2, this->Range + 2);
