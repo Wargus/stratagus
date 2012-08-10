@@ -76,13 +76,13 @@ private:
 class ImageWidget : public gcn::Icon
 {
 public:
-	ImageWidget(gcn::Image *img) : gcn::Icon(img) {}
+	explicit ImageWidget(gcn::Image *img) : gcn::Icon(img) {}
 };
 
 class ButtonWidget : public gcn::Button
 {
 public:
-	ButtonWidget(const std::string &caption) : Button(caption) {
+	explicit ButtonWidget(const std::string &caption) : Button(caption) {
 		this->setHotKey(GetHotKey(caption));
 	}
 };
@@ -91,7 +91,7 @@ class ImageButton : public gcn::Button
 {
 public:
 	ImageButton();
-	ImageButton(const std::string &caption);
+	explicit ImageButton(const std::string &caption);
 
 	virtual void draw(gcn::Graphics *graphics);
 	virtual void adjustSize();
@@ -161,7 +161,7 @@ public:
 class ImageSlider : public gcn::Slider
 {
 public:
-	ImageSlider(double scaleEnd = 1.0);
+	explicit ImageSlider(double scaleEnd = 1.0);
 	ImageSlider(double scaleStart, double scaleEnd);
 
 	virtual void drawMarker(gcn::Graphics *graphics);
@@ -178,7 +178,7 @@ class MultiLineLabel : public gcn::Widget
 {
 public:
 	MultiLineLabel();
-	MultiLineLabel(const std::string &caption);
+	explicit MultiLineLabel(const std::string &caption);
 
 	virtual void setCaption(const std::string &caption);
 	virtual const std::string &getCaption() const;
@@ -217,7 +217,7 @@ public:
 	void add(gcn::Widget *widget, int x, int y);
 	void restart();
 	void setSpeed(float speed) { this->speedY = speed; }
-	float getSpeed() { return this->speedY; }
+	float getSpeed() const { return this->speedY; }
 private:
 	virtual void logic();
 private:
@@ -310,7 +310,7 @@ public:
 	virtual void draw(gcn::Graphics *graphics);
 	virtual void logic();
 	void setDrawMenusUnder(bool drawUnder) { this->drawUnder = drawUnder; }
-	bool getDrawMenusUnder() { return this->drawUnder; }
+	bool getDrawMenusUnder() const { return this->drawUnder; }
 
 private:
 	bool runLoop;
@@ -321,4 +321,3 @@ private:
 };
 
 #endif
-

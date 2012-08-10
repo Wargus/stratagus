@@ -748,7 +748,7 @@ void DrawPopupUnitInfo(const CUnitType *type,
 /**
 **  Draw popup
 */
-static void DrawPopup(const ButtonAction &button, const CUIButton *uibutton)
+static void DrawPopup(const ButtonAction &button, const CUIButton &uibutton)
 {
 	CPopup *popup = PopupByIdent(button.Popup);
 
@@ -780,8 +780,8 @@ static void DrawPopup(const ButtonAction &button, const CUIButton *uibutton)
 	GetPopupSize(*popup, button, popupWidth, popupHeight, Costs);
 	popupWidth = std::max(popupWidth, popup->MinWidth);
 	popupHeight = std::max(popupHeight, popup->MinHeight);
-	int x = std::min<int>(uibutton->X, Video.Width - 1 - popupWidth);
-	int y = uibutton->Y - popupHeight - 10;
+	int x = std::min<int>(uibutton.X, Video.Width - 1 - popupWidth);
+	int y = uibutton.Y - popupHeight - 10;
 
 	// Background
 	Video.FillTransRectangle(popup->BackgroundColor, x, y, popupWidth, popupHeight, popup->BackgroundColor >> ASHIFT);
@@ -966,7 +966,7 @@ void CButtonPanel::Draw()
 		//
 		if (ButtonAreaUnderCursor == ButtonAreaButton &&
 			ButtonUnderCursor == i && KeyState != KeyStateInput) {
-			DrawPopup(buttons[i], &UI.ButtonPanel.Buttons[i]);
+			DrawPopup(buttons[i], UI.ButtonPanel.Buttons[i]);
 			UpdateStatusLineForButton(buttons[i]);
 		}
 	}

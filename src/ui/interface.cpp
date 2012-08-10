@@ -1270,17 +1270,13 @@ static unsigned LastMouseTicks;          /// Ticks of last mouse event
 **  @param ticks      Denotes time-stamp of video-system
 **  @param button     Mouse button pressed.
 */
-void InputMouseButtonPress(const EventCallback *callbacks,
+void InputMouseButtonPress(const EventCallback &callbacks,
 						   unsigned ticks, unsigned button)
 {
-	//
 	//  Button new pressed.
-	//
 	if (!(MouseButtons & (1 << button))) {
 		MouseButtons |= (1 << button);
-		//
 		//  Detect double click
-		//
 		if (MouseState == ClickedMouseState && button == LastMouseButton
 			&& ticks < StartMouseTicks + DoubleClickDelay) {
 			MouseButtons |= (1 << button) << MouseDoubleShift;
@@ -1293,7 +1289,7 @@ void InputMouseButtonPress(const EventCallback *callbacks,
 	}
 	LastMouseTicks = ticks;
 
-	callbacks->ButtonPressed(button);
+	callbacks.ButtonPressed(button);
 }
 
 /**
@@ -1303,14 +1299,10 @@ void InputMouseButtonPress(const EventCallback *callbacks,
 **  @param ticks      Denotes time-stamp of video-system
 **  @param button     Mouse button released.
 */
-void InputMouseButtonRelease(const EventCallback *callbacks,
+void InputMouseButtonRelease(const EventCallback &callbacks,
 							 unsigned ticks, unsigned button)
 {
-	unsigned mask;
-
-	//
 	//  Same button before pressed.
-	//
 	if (button == LastMouseButton && MouseState == InitialMouseState) {
 		MouseState = ClickedMouseState;
 	} else {
@@ -1319,7 +1311,7 @@ void InputMouseButtonRelease(const EventCallback *callbacks,
 	}
 	LastMouseTicks = ticks;
 
-	mask = 0;
+	unsigned mask = 0;
 	if (MouseButtons & ((1 << button) << MouseDoubleShift)) {
 		mask |= button << MouseDoubleShift;
 	}
@@ -1331,7 +1323,7 @@ void InputMouseButtonRelease(const EventCallback *callbacks,
 	}
 	MouseButtons &= ~(0x01010101 << button);
 
-	callbacks->ButtonReleased(button | mask);
+	callbacks.ButtonReleased(button | mask);
 }
 
 /**
@@ -1342,7 +1334,7 @@ void InputMouseButtonRelease(const EventCallback *callbacks,
 **  @param x          X movement
 **  @param y          Y movement
 */
-void InputMouseMove(const EventCallback *callbacks,
+void InputMouseMove(const EventCallback &callbacks,
 					unsigned ticks, int x, int y)
 {
 	// Don't reset the mouse state unless we really moved
@@ -1366,7 +1358,7 @@ void InputMouseMove(const EventCallback *callbacks,
 	}
 #endif
 	const PixelPos pos(x, y);
-	callbacks->MouseMoved(pos);
+	callbacks.MouseMoved(pos);
 }
 
 /**
@@ -1376,11 +1368,11 @@ void InputMouseMove(const EventCallback *callbacks,
 **  @param ticks      Denotes time-stamp of video-system
 **
 */
-void InputMouseExit(const EventCallback *callbacks, unsigned)
+void InputMouseExit(const EventCallback &callbacks, unsigned /* ticks */)
 {
 	// FIXME: should we do anything here with ticks? don't know, but conform others
 	// JOHNS: called by callback HandleMouseExit();
-	callbacks->MouseExit();
+	callbacks.MouseExit();
 }
 
 /**
@@ -1389,7 +1381,7 @@ void InputMouseExit(const EventCallback *callbacks, unsigned)
 **  @param callbacks  Callback structure for events.
 **  @param ticks      Denotes time-stamp of video-system
 */
-void InputMouseTimeout(const EventCallback *callbacks, unsigned ticks)
+void InputMouseTimeout(const EventCallback &callbacks, unsigned ticks)
 {
 	if (MouseButtons & (1 << LastMouseButton)) {
 		if (ticks > StartMouseTicks + DoubleClickDelay) {
@@ -1398,14 +1390,14 @@ void InputMouseTimeout(const EventCallback *callbacks, unsigned ticks)
 		if (ticks > LastMouseTicks + HoldClickDelay) {
 			LastMouseTicks = ticks;
 			MouseButtons |= (1 << LastMouseButton) << MouseHoldShift;
-			callbacks->ButtonPressed(LastMouseButton | (LastMouseButton << MouseHoldShift));
+			callbacks.ButtonPressed(LastMouseButton | (LastMouseButton << MouseHoldShift));
 		}
 	}
 }
 
 
-static int HoldKeyDelay = 250;               /// Time to detect hold key
-static int HoldKeyAdditionalDelay = 50;      /// Time to detect additional hold key
+static const int HoldKeyDelay = 250;          /// Time to detect hold key
+static const int HoldKeyAdditionalDelay = 50; /// Time to detect additional hold key
 
 static unsigned LastIKey;                    /// last key handled
 static unsigned LastIKeyChar;                /// last keychar handled
@@ -1420,7 +1412,7 @@ static unsigned DoubleKey;                   /// last key pressed
 **  @param ikey       Key scancode.
 **  @param ikeychar   Character code.
 */
-void InputKeyButtonPress(const EventCallback *callbacks,
+void InputKeyButtonPress(const EventCallback &callbacks,
 						 unsigned ticks, unsigned ikey, unsigned ikeychar)
 {
 	if (!LastIKey && DoubleKey == ikey && ticks < LastKeyTicks + DoubleClickDelay) {
@@ -1430,7 +1422,7 @@ void InputKeyButtonPress(const EventCallback *callbacks,
 	LastIKey = ikey;
 	LastIKeyChar = ikeychar;
 	LastKeyTicks = ticks;
-	callbacks->KeyPressed(ikey, ikeychar);
+	callbacks.KeyPressed(ikey, ikeychar);
 	KeyModifiers &= ~ModifierDoublePress;
 }
 
@@ -1442,14 +1434,14 @@ void InputKeyButtonPress(const EventCallback *callbacks,
 **  @param ikey       Key scancode.
 **  @param ikeychar   Character code.
 */
-void InputKeyButtonRelease(const EventCallback *callbacks,
+void InputKeyButtonRelease(const EventCallback &callbacks,
 						   unsigned ticks, unsigned ikey, unsigned ikeychar)
 {
 	if (ikey == LastIKey) {
 		LastIKey = 0;
 	}
 	LastKeyTicks = ticks;
-	callbacks->KeyReleased(ikey, ikeychar);
+	callbacks.KeyReleased(ikey, ikeychar);
 }
 
 /**
@@ -1458,11 +1450,11 @@ void InputKeyButtonRelease(const EventCallback *callbacks,
 **  @param callbacks  Callback structure for events.
 **  @param ticks      Denotes time-stamp of video-system
 */
-void InputKeyTimeout(const EventCallback *callbacks, unsigned ticks)
+void InputKeyTimeout(const EventCallback &callbacks, unsigned ticks)
 {
 	if (LastIKey && ticks > LastKeyTicks + HoldKeyDelay) {
 		LastKeyTicks = ticks - (HoldKeyDelay - HoldKeyAdditionalDelay);
-		callbacks->KeyRepeated(LastIKey, LastIKeyChar);
+		callbacks.KeyRepeated(LastIKey, LastIKeyChar);
 	}
 }
 

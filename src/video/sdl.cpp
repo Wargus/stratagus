@@ -702,25 +702,24 @@ void Invalidate()
 **  @param callbacks  Callback structure for events.
 **  @param event      SDL event structure pointer.
 */
-static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
+static void SdlDoEvent(const EventCallback &callbacks, const SDL_Event &event)
 {
-	switch (event->type) {
+	switch (event.type) {
 		case SDL_MOUSEBUTTONDOWN:
-			InputMouseButtonPress(callbacks, SDL_GetTicks(), event->button.button);
+			InputMouseButtonPress(callbacks, SDL_GetTicks(), event.button.button);
 			break;
 
 		case SDL_MOUSEBUTTONUP:
-			InputMouseButtonRelease(callbacks, SDL_GetTicks(), event->button.button);
+			InputMouseButtonRelease(callbacks, SDL_GetTicks(), event.button.button);
 			break;
 
 			// FIXME: check if this is only useful for the cursor
 			// FIXME: if this is the case we don't need this.
 		case SDL_MOUSEMOTION:
-			InputMouseMove(callbacks, SDL_GetTicks(),
-						   event->motion.x, event->motion.y);
+			InputMouseMove(callbacks, SDL_GetTicks(), event.motion.x, event.motion.y);
 			// FIXME: Same bug fix from X11
 			if ((UI.MouseWarpPos.x != -1 || UI.MouseWarpPos.y != -1)
-				&& (event->motion.x != UI.MouseWarpPos.x || event->motion.y != UI.MouseWarpPos.y)) {
+				&& (event.motion.x != UI.MouseWarpPos.x || event.motion.y != UI.MouseWarpPos.y)) {
 				int xw = UI.MouseWarpPos.x;
 				int yw = UI.MouseWarpPos.y;
 				UI.MouseWarpPos.x = -1;
@@ -730,24 +729,24 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 			break;
 
 		case SDL_ACTIVEEVENT:
-			if (event->active.state & SDL_APPMOUSEFOCUS) {
+			if (event.active.state & SDL_APPMOUSEFOCUS) {
 				static bool InMainWindow = true;
 
-				if (InMainWindow && !event->active.gain) {
+				if (InMainWindow && !event.active.gain) {
 					InputMouseExit(callbacks, SDL_GetTicks());
 				}
-				InMainWindow = (event->active.gain != 0);
+				InMainWindow = (event.active.gain != 0);
 			}
-			if (event->active.state & SDL_APPACTIVE || SDL_GetAppState() & SDL_APPACTIVE) {
+			if (event.active.state & SDL_APPACTIVE || SDL_GetAppState() & SDL_APPACTIVE) {
 				static bool DoTogglePause = false;
 
-				if (IsSDLWindowVisible && !event->active.gain) {
+				if (IsSDLWindowVisible && !event.active.gain) {
 					IsSDLWindowVisible = false;
 					if (!GamePaused) {
 						DoTogglePause = true;
 						UiTogglePause();
 					}
-				} else if (!IsSDLWindowVisible && event->active.gain) {
+				} else if (!IsSDLWindowVisible && event.active.gain) {
 					IsSDLWindowVisible = true;
 					if (GamePaused && DoTogglePause) {
 						DoTogglePause = false;
@@ -759,12 +758,12 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 
 		case SDL_KEYDOWN:
 			InputKeyButtonPress(callbacks, SDL_GetTicks(),
-								event->key.keysym.sym, event->key.keysym.unicode);
+								event.key.keysym.sym, event.key.keysym.unicode);
 			break;
 
 		case SDL_KEYUP:
 			InputKeyButtonRelease(callbacks, SDL_GetTicks(),
-								  event->key.keysym.sym, event->key.keysym.unicode);
+								  event.key.keysym.sym, event.key.keysym.unicode);
 			break;
 
 		case SDL_QUIT:
@@ -772,8 +771,8 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 			break;
 	}
 
-	if (callbacks == GetCallbacks()) {
-		handleInput(event);
+	if (&callbacks == GetCallbacks()) {
+		handleInput(&event);
 	}
 }
 
@@ -830,8 +829,8 @@ void WaitEventsOneFrame()
 		++SlowFrameCounter;
 	}
 
-	InputMouseTimeout(GetCallbacks(), ticks);
-	InputKeyTimeout(GetCallbacks(), ticks);
+	InputMouseTimeout(*GetCallbacks(), ticks);
+	InputKeyTimeout(*GetCallbacks(), ticks);
 	CursorAnimate(ticks);
 
 	interrupts = 0;
@@ -889,7 +888,7 @@ void WaitEventsOneFrame()
 #endif
 
 		if (i) { // Handle SDL event
-			SdlDoEvent(GetCallbacks(), event);
+			SdlDoEvent(*GetCallbacks(), *event);
 		}
 
 		if (s > 0) {
