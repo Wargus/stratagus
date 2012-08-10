@@ -328,14 +328,14 @@ void CViewport::DrawMapBackgroundInViewport() const
 **  @param hidden  If true, write "Unrevealed terrain"
 **
 */
-static void ShowUnitName(const CViewport *vp, PixelPos pos, CUnit *unit, bool hidden = false)
+static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hidden = false)
 {
 	CFont &font = GetSmallFont();
 	int width;
 	int height = font.Height() + 6;
 	CLabel label(font, "white", "red");
 	int x;
-	int y = std::min<int>(pos.y + 10, vp->BottomRightPos.y - 1 - height);
+	int y = std::min<int>(pos.y + 10, vp.BottomRightPos.y - 1 - height);
 	const CPlayer *tplayer = ThisPlayer;
 
 	if (unit) {
@@ -350,14 +350,14 @@ static void ShowUnitName(const CViewport *vp, PixelPos pos, CUnit *unit, bool hi
 			backgroundColor = Video.MapRGB(TheScreen->format, 176, 176, 176);
 		}
 		width = font.getWidth(unit->Type->Name) + 10;
-		x = std::min<int>(pos.x, vp->BottomRightPos.x - 1 - width);
+		x = std::min<int>(pos.x, vp.BottomRightPos.x - 1 - width);
 		Video.FillTransRectangle(backgroundColor, x, y, width, height, 128);
 		Video.DrawRectangle(ColorWhite, x, y, width, height);
 		label.DrawCentered(x + width / 2, y + 3, unit->Type->Name);
 	} else if (hidden) {
 		const std::string str("Unrevealed terrain");
 		width = font.getWidth(str) + 10;
-		x = std::min<int>(pos.x, vp->BottomRightPos.x - 1 - width);
+		x = std::min<int>(pos.x, vp.BottomRightPos.x - 1 - width);
 		Video.FillTransRectangle(ColorBlue, x, y, width, height, 128);
 		Video.DrawRectangle(ColorWhite, x, y, width, height);
 		label.DrawCentered(x + width / 2, y + 3, str);
@@ -381,7 +381,7 @@ void CViewport::Draw() const
 		std::vector<Missile *> missiletable;
 
 		// We find and sort units after draw level.
-		FindAndSortUnits(this, unittable);
+		FindAndSortUnits(*this, unittable);
 		const size_t nunits = unittable.size();
 		FindAndSortMissiles(*this, missiletable);
 		const size_t nmissiles = missiletable.size();
@@ -390,7 +390,7 @@ void CViewport::Draw() const
 
 		while (i < nunits && j < nmissiles) {
 			if (unittable[i]->Type->DrawLevel <= missiletable[j]->Type->DrawLevel) {
-				unittable[i]->Draw(this);
+				unittable[i]->Draw(*this);
 				++i;
 			} else {
 				missiletable[j]->DrawMissile(*this);
@@ -398,14 +398,14 @@ void CViewport::Draw() const
 			}
 		}
 		for (; i < nunits; ++i) {
-			unittable[i]->Draw(this);
+			unittable[i]->Draw(*this);
 		}
 		for (; j < nmissiles; ++j) {
 			missiletable[j]->DrawMissile(*this);
 		}
 	}
 
-	ParticleManager.draw(this);
+	ParticleManager.draw(*this);
 
 	this->DrawMapFogOfWar();
 
@@ -428,9 +428,9 @@ void CViewport::Draw() const
 		const Vec2i tilePos = this->ScreenToTilePos(CursorScreenPos);
 		if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos)
 			&& (Map.IsFieldVisible(*ThisPlayer, tilePos) || ReplayRevealMap)) {
-			ShowUnitName(this, CursorScreenPos, UnitUnderCursor);
+			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
 		} else if (!Map.IsFieldVisible(*ThisPlayer, tilePos)) {
-			ShowUnitName(this, CursorScreenPos, NULL, true);
+			ShowUnitName(*this, CursorScreenPos, NULL, true);
 		}
 	}
 

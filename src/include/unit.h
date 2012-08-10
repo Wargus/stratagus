@@ -141,7 +141,7 @@ public:
 	void AssignToPlayer(CPlayer &player);
 
 	/// Draw a single unit
-	void Draw(const CViewport *vp) const;
+	void Draw(const CViewport &vp) const;
 	/// Place a unit on map
 	void Place(const Vec2i &pos);
 
@@ -240,8 +240,8 @@ public:
 	// Returns true if unit is visible under radar (By player, or by shared vision)
 	bool IsVisibleOnRadar(const CPlayer &pradar) const;
 
-	/// Returns true if unit is visible in an viewport. Only for ThisPlayer.
-	bool IsVisibleInViewport(const CViewport *vp) const;
+	/// Returns true if unit is visible in a viewport. Only for ThisPlayer.
+	bool IsVisibleInViewport(const CViewport &vp) const;
 
 	bool IsEnemy(const CPlayer &player) const;
 	bool IsEnemy(const CUnit &unit) const;
@@ -450,7 +450,7 @@ extern bool EnableBuildingCapture;             /// Config: building capture enab
 extern bool RevealAttacker;				       /// Config: reveal attacker enabled
 extern int ResourcesMultiBuildersMultiplier;   /// Config: spend resources for building with multiple workers
 extern const CViewport *CurrentViewport; /// CurrentViewport
-extern void DrawUnitSelection(const CViewport *vp, const CUnit &unit);
+extern void DrawUnitSelection(const CViewport &vp, const CUnit &unit);
 extern void (*DrawSelection)(Uint32, int, int, int, int);
 extern int MaxSelectable;                  /// How many units could be selected
 
@@ -597,7 +597,7 @@ extern void CleanDecorations();
 /// Draw unit's shadow
 extern void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos);
 /// Draw all units visible on map in viewport
-extern int FindAndSortUnits(const CViewport *vp, std::vector<CUnit *> &table);
+extern int FindAndSortUnits(const CViewport &vp, std::vector<CUnit *> &table);
 
 /// Show a unit's orders.
 extern void ShowOrder(const CUnit &unit);

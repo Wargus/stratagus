@@ -124,7 +124,7 @@ const CViewport *CurrentViewport;  /// FIXME: quick hack for split screen
 **
 **  @param unit  Pointer to unit.
 */
-void DrawUnitSelection(const CViewport *vp, const CUnit &unit)
+void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 {
 	Uint32 color;
 
@@ -141,17 +141,12 @@ void DrawUnitSelection(const CViewport *vp, const CUnit &unit)
 		} else if (ThisPlayer->IsEnemy(unit)) {
 			color = ColorRed;
 		} else {
-			int i;
+			color = unit.Player->Color;
 
-			for (i = 0; i < PlayerMax; ++i) {
+			for (int i = 0; i < PlayerMax; ++i) {
 				if (unit.TeamSelected & (1 << i)) {
-					break;
+					color = Players[i].Color;
 				}
-			}
-			if (i == PlayerMax) {
-				color = unit.Player->Color;
-			} else {
-				color = Players[i].Color;
 			}
 		}
 	} else if (CursorBuilding && unit.Type->Building
@@ -164,7 +159,7 @@ void DrawUnitSelection(const CViewport *vp, const CUnit &unit)
 	}
 
 	const CUnitType &type = *unit.Type;
-	const PixelPos screenPos = vp->MapToScreenPixelPos(unit.GetMapPixelPosCenter());
+	const PixelPos screenPos = vp.MapToScreenPixelPos(unit.GetMapPixelPosCenter());
 	const int x = screenPos.x - type.BoxWidth / 2 - (type.Width - type.Sprite->Width) / 2;
 	const int y = screenPos.y - type.BoxHeight / 2 - (type.Height - type.Sprite->Height) / 2;
 
@@ -862,7 +857,7 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 /**
 **  Draw unit on map.
 */
-void CUnit::Draw(const CViewport *vp) const
+void CUnit::Draw(const CViewport &vp) const
 {
 	int frame;
 	int state;
@@ -883,7 +878,7 @@ void CUnit::Draw(const CViewport *vp) const
 	int action = this->CurrentAction();
 	PixelPos screenPos;
 	if (ReplayRevealMap || IsVisible) {
-		screenPos = vp->MapToScreenPixelPos(this->GetMapPixelPosTopLeft());
+		screenPos = vp.MapToScreenPixelPos(this->GetMapPixelPosTopLeft());
 		type = this->Type;
 		frame = this->Frame;
 		state = (action == UnitActionBuilt) | ((action == UnitActionUpgradeTo) << 1);
@@ -903,7 +898,7 @@ void CUnit::Draw(const CViewport *vp) const
 			cframe = NULL;
 		}
 	} else {
-		screenPos = vp->TilePosToScreen_TopLeft(this->Seen.tilePos);
+		screenPos = vp.TilePosToScreen_TopLeft(this->Seen.tilePos);
 
 		screenPos.x += this->Seen.IX;
 		screenPos.y += this->Seen.IY;
@@ -1011,13 +1006,13 @@ static inline bool DrawLevelCompare(const CUnit *c1, const CUnit *c2)
 **  @param table  Table of units to return in sorted order
 **
 */
-int FindAndSortUnits(const CViewport *vp, std::vector<CUnit *> &table)
+int FindAndSortUnits(const CViewport &vp, std::vector<CUnit *> &table)
 {
 	//  Select all units touching the viewpoint.
 	const Vec2i offset(1, 1);
-	const Vec2i vpSize(vp->MapWidth, vp->MapHeight);
-	const Vec2i minPos = vp->MapPos - offset;
-	const Vec2i maxPos = vp->MapPos + vpSize + offset;
+	const Vec2i vpSize(vp.MapWidth, vp.MapHeight);
+	const Vec2i minPos = vp.MapPos - offset;
+	const Vec2i maxPos = vp.MapPos + vpSize + offset;
 
 	Map.Select(minPos, maxPos, table);
 

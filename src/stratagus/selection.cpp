@@ -716,7 +716,7 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 		// Unit visible FIXME: write function UnitSelectable
-		if (!unit.IsVisibleInViewport(UI.SelectedViewport)) {
+		if (!unit.IsVisibleInViewport(*UI.SelectedViewport)) {
 			continue;
 		}
 		const CUnitType &type = *unit.Type;
@@ -734,7 +734,7 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 		// Unit visible FIXME: write function UnitSelectable
-		if (!unit.IsVisibleInViewport(UI.SelectedViewport)) {
+		if (!unit.IsVisibleInViewport(*UI.SelectedViewport)) {
 			continue;
 		}
 		// Buildings are visible but not selectable

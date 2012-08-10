@@ -196,7 +196,7 @@ public:
 	static void init();
 	static void exit();
 
-	void draw(const CViewport *vp);
+	void draw(const CViewport &vp);
 	void update();
 
 	void add(CParticle *particle);

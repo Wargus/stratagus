@@ -70,9 +70,9 @@ void CParticleManager::clear()
 	new_particles.clear();
 }
 
-void CParticleManager::draw(const CViewport *vp)
+void CParticleManager::draw(const CViewport &vp)
 {
-	this->vp = vp;
+	this->vp = &vp;
 
 	std::vector<CParticle *>::iterator i;
 	for (i = particles.begin(); i != particles.end(); ++i) {
