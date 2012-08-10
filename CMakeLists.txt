@@ -457,6 +457,19 @@ set(stratagus_animation_HDRS
 	src/include/animation/animation_wait.h
 )
 
+set(stratagus_spell_HDRS
+	src/include/spell/spell_adjustvariable.h
+	src/include/spell/spell_adjustvital.h
+	src/include/spell/spell_areaadjustvital.h
+	src/include/spell/spell_areabombardment.h
+	src/include/spell/spell_capture.h
+	src/include/spell/spell_demolish.h
+	src/include/spell/spell_polymorph.h
+	src/include/spell/spell_spawnmissile.h
+	src/include/spell/spell_spawnportal.h
+	src/include/spell/spell_summon.h
+)
+
 set(stratagus_generic_HDRS
 	src/ai/ai_local.h
 	src/video/intern_video.h
@@ -528,8 +541,10 @@ source_group(include FILES ${stratagus_generic_HDRS})
 source_group(include\\action FILES ${stratagus_action_HDRS})
 source_group(include\\animation FILES ${stratagus_animation_HDRS})
 source_group(include\\guichan FILES ${stratagus_guichan_HDRS})
+source_group(include\\spell FILES ${stratagus_spell_HDRS})
 
-set (stratagus_HDRS ${stratagus_generic_HDRS} ${stratagus_action_HDRS} ${stratagus_animation_HDRS} ${stratagus_guichan_HDRS})
+
+set (stratagus_HDRS ${stratagus_generic_HDRS} ${stratagus_action_HDRS} ${stratagus_animation_HDRS} ${stratagus_guichan_HDRS} ${stratagus_spell_HDRS})
 
 # Additional platform checks
 

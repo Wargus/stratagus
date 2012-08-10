@@ -32,7 +32,7 @@
 
 #include "stratagus.h"
 
-#include "spells.h"
+#include "spell/spell_demolish.h"
 
 #include "script.h"
 #include "map.h"

@@ -32,7 +32,7 @@
 
 #include "stratagus.h"
 
-#include "spells.h"
+#include "spell/spell_adjustvariable.h"
 
 #include "script.h"
 #include "unit.h"

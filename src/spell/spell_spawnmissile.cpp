@@ -32,7 +32,7 @@
 
 #include "stratagus.h"
 
-#include "spells.h"
+#include "spell/spell_spawnmissile.h"
 
 #include "map.h"
 #include "missile.h"

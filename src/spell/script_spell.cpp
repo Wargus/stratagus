@@ -36,6 +36,16 @@
 
 #include "spells.h"
 
+#include "spell/spell_adjustvariable.h"
+#include "spell/spell_adjustvital.h"
+#include "spell/spell_areaadjustvital.h"
+#include "spell/spell_areabombardment.h"
+#include "spell/spell_capture.h"
+#include "spell/spell_demolish.h"
+#include "spell/spell_polymorph.h"
+#include "spell/spell_spawnmissile.h"
+#include "spell/spell_spawnportal.h"
+#include "spell/spell_summon.h"
 #include "script_sound.h"
 #include "script.h"
 #include "unittype.h"
