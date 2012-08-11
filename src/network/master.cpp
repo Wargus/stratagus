@@ -48,6 +48,7 @@
 
 #include "master.h"
 
+#include "game.h"
 #include "iocompat.h"
 #include "netconnect.h"
 #include "network.h"

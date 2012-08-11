@@ -483,6 +483,7 @@ set(stratagus_generic_HDRS
 	src/include/depend.h
 	src/include/editor.h
 	src/include/font.h
+	src/include/game.h
 	src/include/icons.h
 	src/include/interface.h
 	src/include/iocompat.h

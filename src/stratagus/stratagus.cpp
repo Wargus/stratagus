@@ -196,6 +196,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "cursor.h"
 #include "editor.h"
 #include "font.h"
+#include "game.h"
 #include "guichan.h"
 #include "interface.h"
 #include "iocompat.h"

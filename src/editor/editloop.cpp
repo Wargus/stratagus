@@ -41,6 +41,7 @@
 
 #include "commands.h"
 #include "font.h"
+#include "game.h"
 #include "guichan.h"
 #include "interface.h"
 #include "iocompat.h"

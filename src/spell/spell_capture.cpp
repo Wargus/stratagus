@@ -34,6 +34,7 @@
 
 #include "spell/spell_capture.h"
 
+#include "game.h"
 #include "script.h"
 #include "unit.h"
 

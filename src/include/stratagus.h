@@ -204,31 +204,16 @@ public:
 };
 
 extern std::string StratagusLibPath;        /// Location of stratagus data
-extern std::string GameName;                /// Name of the game
-extern std::string FullGameName;            /// Full Name of the game
-extern std::string ClickMissile;            /// Missile to show when you click
-extern std::string DamageMissile;           /// Missile to show damage caused
 extern std::string MenuRace;
-
-extern bool UseHPForXp;                     /// true if gain XP by dealing damage, false if by killing.
 
 extern unsigned long GameCycle;             /// Game simulation cycle counter
 extern unsigned long ResultGameCycle;       /// Used in game result
 extern unsigned long FastForwardCycle;      /// Game Replay Fast Forward Counter
 
-extern void LoadGame(const std::string &filename); /// Load saved game
-extern int SaveGame(const std::string &filename); /// Save game
-extern void DeleteSaveGame(const std::string &filename); /// Delete save game
-extern bool SaveGameLoading;                 /// Save game is in progress of loading
-
 extern void Exit(int err);                  /// Exit
 extern void ExitFatal(int err);             /// Exit with fatal error
 
 extern void UpdateDisplay();            /// Game display update
-extern void InitModules();              /// Initialize all modules
-extern void LuaRegisterModules();       /// Register lua script of each modules
-extern void LoadModules();              /// Load all modules
-extern void CleanModules();             /// Cleanup all modules
 extern void DrawMapArea();              /// Draw the map area
 extern void GameMainLoop();             /// Game main loop
 

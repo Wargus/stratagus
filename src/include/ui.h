@@ -848,6 +848,10 @@ extern ButtonActionProxy CurrentButtons;    /// Current Selected Buttons
 
 extern CUserInterface UI;                           /// The user interface
 
+extern std::string ClickMissile;            /// Missile to show when you click
+extern std::string DamageMissile;           /// Missile to show damage caused
+
+
 /// Hash table of all the button styles
 extern std::map<std::string, ButtonStyle *> ButtonStyleHash;
 

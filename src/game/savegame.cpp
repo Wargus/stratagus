@@ -33,11 +33,9 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <time.h>
-#include <ctype.h>
-#include <string>
-
 #include "stratagus.h"
+
+#include "game.h"
 
 #include "actions.h"
 #include "ai.h"
@@ -54,6 +52,8 @@
 #include "unittype.h"
 #include "upgrade.h"
 #include "version.h"
+
+#include <time.h>
 
 extern void StartMap(const std::string &filename, bool clean);
 

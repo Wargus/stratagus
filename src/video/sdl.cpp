@@ -79,6 +79,7 @@
 
 #include "editor.h"
 #include "font.h"
+#include "game.h"
 #include "interface.h"
 #include "minimap.h"
 #include "network.h"

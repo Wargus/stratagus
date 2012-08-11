@@ -38,6 +38,8 @@
 
 #include "stratagus.h"
 
+#include "game.h"
+
 #include "actions.h"
 #include "ai.h"
 #include "animation.h"

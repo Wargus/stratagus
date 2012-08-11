@@ -2,6 +2,7 @@ $#include "stratagus.h"
 
 $#include "ai.h"
 $#include "font.h"
+$#include "game.h"
 $#include "iolib.h"
 $#include "map.h"
 $#include "minimap.h"

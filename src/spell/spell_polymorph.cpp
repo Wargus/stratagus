@@ -34,6 +34,7 @@
 
 #include "spell/spell_polymorph.h"
 
+#include "game.h"
 #include "map.h"
 #include "script.h"
 #include "unit.h"
