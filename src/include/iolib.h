@@ -38,14 +38,6 @@
 
 #include <vector>
 
-#ifdef USE_ZLIB
-#include <zlib.h>
-#endif
-
-#ifdef USE_BZ2LIB
-#include <bzlib.h>
-#endif
-
 /*----------------------------------------------------------------------------
 --  Definitons
 ----------------------------------------------------------------------------*/
@@ -119,16 +111,12 @@ public:
 	long tell();
 
 	int printf(const char *format, ...) PRINTF_VAARG_ATTRIBUTE(2, 3); // Don't forget to count this
-
 private:
-	int   cl_type;   /// type of CFile
-	FILE *cl_plain;  /// standard file pointer
-#ifdef USE_ZLIB
-	gzFile cl_gz;    /// gzip file pointer
-#endif // !USE_ZLIB
-#ifdef USE_BZ2LIB
-	BZFILE *cl_bz;   /// bzip2 file pointer
-#endif // !USE_BZ2LIB
+	CFile(const CFile &rhs); // No implementation
+	const CFile& operator = (const CFile &rhs); // No implementation
+private:
+	class PImpl;
+	PImpl *pimpl;
 };
 
 enum {

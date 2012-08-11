@@ -64,7 +64,7 @@
 
 #define makedir(dir, permissions) _mkdir(dir)
 #define access _access
-#define write _write
+//#define write _write
 
 #endif // _MSC_VER
 

@@ -36,48 +36,172 @@
 
 #include "stratagus.h"
 
+#include "iolib.h"
+
 #include "iocompat.h"
 #include "map.h"
 #include "util.h"
 
-#include <stdarg.h>
-
-#ifndef _MSC_VER
-#include <fcntl.h>
+#ifdef USE_ZLIB
+#include <zlib.h>
 #endif
 
-#include "iolib.h"
+#ifdef USE_BZ2LIB
+#include <bzlib.h>
+#endif
 
-#include <zlib.h>
+class CFile::PImpl
+{
+public:
+	PImpl();
+	~PImpl();
 
-/*----------------------------------------------------------------------------
---  Defines
-----------------------------------------------------------------------------*/
+	int open(const char *name, long flags);
+	int close();
+	void flush();
+	int read(void *buf, size_t len);
+	int seek(long offset, int whence);
+	long tell();
+	int write(const void *buf, size_t len);
+
+private:
+	PImpl(const PImpl&rhs); // No implementation
+	const PImpl& operator = (const PImpl &rhs); // No implementation
+
+private:
+	int   cl_type;   /// type of CFile
+	FILE *cl_plain;  /// standard file pointer
+#ifdef USE_ZLIB
+	gzFile cl_gz;    /// gzip file pointer
+#endif // !USE_ZLIB
+#ifdef USE_BZ2LIB
+	BZFILE *cl_bz;   /// bzip2 file pointer
+#endif // !USE_BZ2LIB
+};
+
+CFile::CFile() : pimpl(new CFile::PImpl)
+{
+}
+
+CFile::~CFile()
+{
+	delete pimpl;
+}
 
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
+/**
+**  CLopen Library file open
+**
+**  @param name       File name.
+**  @param openflags  Open read, or write and compression options
+**
+**  @return File Pointer
+*/
+int CFile::open(const char *name, long flags)
+{
+	return pimpl->open(name, flags);
+}
 
+/**
+**  CLclose Library file close
+*/
+int CFile::close()
+{
+	return pimpl->close();
+}
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+void CFile::flush()
+{
+	pimpl->flush();
+}
 
+/**
+**  CLread Library file read
+**
+**  @param buf  Pointer to read the data to.
+**  @param len  number of bytes to read.
+*/
+int CFile::read(void *buf, size_t len)
+{
+	return pimpl->read(buf, len);
+}
 
-CFile::CFile()
+/**
+**  CLseek Library file seek
+**
+**  @param offset  Seek position
+**  @param whence  How to seek
+*/
+int CFile::seek(long offset, int whence)
+{
+	return pimpl->seek(offset, whence);
+}
+
+/**
+**  CLtell Library file tell
+*/
+long CFile::tell()
+{
+	return pimpl->tell();
+}
+
+/**
+**  CLprintf Library file write
+**
+**  @param format  String Format.
+**  @param ...     Parameter List.
+*/
+int CFile::printf(const char *format, ...)
+{
+	int size = 500;
+	char *p = new char[size];
+	if (p == NULL) {
+		return -1;
+	}
+	while (1) {
+		// Try to print in the allocated space.
+		va_list ap;
+		va_start(ap, format);
+		const int n = vsnprintf(p, size, format, ap);
+		va_end(ap);
+		// If that worked, string was processed.
+		if (n > -1 && n < size) {
+			break;
+		}
+		// Else try again with more space.
+		if (n > -1) { // glibc 2.1
+			size = n + 1; // precisely what is needed
+		} else {    /* glibc 2.0, vc++ */
+			size *= 2;  // twice the old size
+		}
+		delete[] p;
+		p = new char[size];
+		if (p == NULL) {
+			return -1;
+		}
+	}
+	size = strlen(p);
+	int ret = pimpl->write(p, size);
+	delete[] p;
+	return ret;
+}
+
+//
+//  Implementation.
+//
+
+CFile::PImpl::PImpl()
 {
 	cl_type = CLF_TYPE_INVALID;
 }
 
-CFile::~CFile()
+CFile::PImpl::~PImpl()
 {
 	if (cl_type != CLF_TYPE_INVALID) {
 		DebugPrint("File wasn't closed\n");
 		close();
 	}
 }
-
 
 #ifdef USE_ZLIB
 
@@ -127,17 +251,7 @@ static void bzseek(BZFILE *file, unsigned offset, int)
 
 #endif // USE_BZ2LIB
 
-#if defined(USE_ZLIB) || defined(USE_BZ2LIB)
-
-/**
-**  CLopen Library file open
-**
-**  @param name       File name.
-**  @param openflags  Open read, or write and compression options
-**
-**  @return File Pointer
-*/
-int CFile::open(const char *name, long openflags)
+int CFile::PImpl::open(const char *name, long openflags)
 {
 	char buf[512];
 	const char *openstring;
@@ -228,10 +342,7 @@ int CFile::open(const char *name, long openflags)
 	return 0;
 }
 
-/**
-**  CLclose Library file close
-*/
-int CFile::close()
+int CFile::PImpl::close()
 {
 	int ret = EOF;
 	int tp = cl_type;
@@ -258,13 +369,7 @@ int CFile::close()
 	return ret;
 }
 
-/**
-**  CLread Library file read
-**
-**  @param buf  Pointer to read the data to.
-**  @param len  number of bytes to read.
-*/
-int CFile::read(void *buf, size_t len)
+int CFile::PImpl::read(void *buf, size_t len)
 {
 	int ret = 0;
 
@@ -288,7 +393,7 @@ int CFile::read(void *buf, size_t len)
 	return ret;
 }
 
-void CFile::flush()
+void CFile::PImpl::flush()
 {
 	if (cl_type != CLF_TYPE_INVALID) {
 		if (cl_type == CLF_TYPE_PLAIN) {
@@ -309,76 +414,32 @@ void CFile::flush()
 	}
 }
 
-
-/**
-**  CLprintf Library file write
-**
-**  @param format  String Format.
-**  @param ...     Parameter List.
-*/
-int CFile::printf(const char *format, ...)
+int CFile::PImpl::write(const void *buf, size_t size)
 {
-	int size = 500;
-	char *p = new char[size];
-	if (p == NULL) {
-		return -1;
-	}
-	while (1) {
-		// Try to print in the allocated space.
-		va_list ap;
-		va_start(ap, format);
-		const int n = vsnprintf(p, size, format, ap);
-		va_end(ap);
-		// If that worked, string was processed.
-		if (n > -1 && n < size) {
-			break;
-		}
-		// Else try again with more space.
-		if (n > -1) { // glibc 2.1
-			size = n + 1; // precisely what is needed
-		} else {    /* glibc 2.0, vc++ */
-			size *= 2;  // twice the old size
-		}
-		delete[] p;
-		p = new char[size];
-		if (p == NULL) {
-			return -1;
-		}
-	}
-
-	// Allocate the correct size
-	size = strlen(p);
 	int tp = cl_type;
 	int ret = -1;
 
 	if (tp != CLF_TYPE_INVALID) {
 		if (tp == CLF_TYPE_PLAIN) {
-			ret = fwrite(p, size, 1, cl_plain);
+			ret = fwrite(buf, size, 1, cl_plain);
 		}
 #ifdef USE_ZLIB
 		if (tp == CLF_TYPE_GZIP) {
-			ret = gzwrite(cl_gz, p, size);
+			ret = gzwrite(cl_gz, buf, size);
 		}
 #endif // USE_ZLIB
 #ifdef USE_BZ2LIB
 		if (tp == CLF_TYPE_BZIP2) {
-			ret = BZ2_bzwrite(cl_bz, p, size);
+			ret = BZ2_bzwrite(cl_bz, const_cast<void *>(buf), size);
 		}
 #endif // USE_BZ2LIB
 	} else {
 		errno = EBADF;
 	}
-	delete[] p;
 	return ret;
 }
 
-/**
-**  CLseek Library file seek
-**
-**  @param offset  Seek position
-**  @param whence  How to seek
-*/
-int CFile::seek(long offset, int whence)
+int CFile::PImpl::seek(long offset, int whence)
 {
 	int ret = -1;
 	int tp = cl_type;
@@ -404,10 +465,7 @@ int CFile::seek(long offset, int whence)
 	return ret;
 }
 
-/**
-**  CLtell Library file tell
-*/
-long CFile::tell()
+long CFile::PImpl::tell()
 {
 	int ret = -1;
 	int tp = cl_type;
@@ -433,7 +491,6 @@ long CFile::tell()
 	return ret;
 }
 
-#endif // USE_ZLIB || USE_BZ2LIB
 
 /**
 **  Find a file with its correct extension ("", ".gz" or ".bz2")
