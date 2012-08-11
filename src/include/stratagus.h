@@ -207,7 +207,6 @@ extern std::string StratagusLibPath;        /// Location of stratagus data
 extern std::string MenuRace;
 
 extern unsigned long GameCycle;             /// Game simulation cycle counter
-extern unsigned long ResultGameCycle;       /// Used in game result
 extern unsigned long FastForwardCycle;      /// Game Replay Fast Forward Counter
 
 extern void Exit(int err);                  /// Exit
