@@ -10,7 +10,7 @@
 //
 /**@name icons.cpp - The icons. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -35,23 +35,21 @@
 
 #include "stratagus.h"
 
-#include <string>
-#include <vector>
-#include <map>
-
 #include "icons.h"
+
 #include "menus.h"
 #include "player.h"
 #include "ui.h"
 #include "video.h"
 
+#include <map>
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static std::vector<CIcon *> AllIcons;          /// Vector of all icons.
-std::map<std::string, CIcon *> Icons;          /// Map of ident to icon.
+typedef std::map<std::string, CIcon *> IconMap;
+static IconMap Icons;   /// Map of ident to icon.
 
 
 /*----------------------------------------------------------------------------
@@ -80,7 +78,7 @@ CIcon::~CIcon()
 **
 **  @return       New icon
 */
-CIcon *CIcon::New(const std::string &ident)
+/* static */ CIcon *CIcon::New(const std::string &ident)
 {
 	CIcon *icon = Icons[ident];
 	if (icon) {
@@ -88,7 +86,6 @@ CIcon *CIcon::New(const std::string &ident)
 	} else {
 		icon = new CIcon(ident);
 		Icons[ident] = icon;
-		AllIcons.push_back(icon);
 		return icon;
 	}
 }
@@ -100,7 +97,7 @@ CIcon *CIcon::New(const std::string &ident)
 **
 **  @return       The icon
 */
-CIcon *CIcon::Get(const std::string &ident)
+/* static */ CIcon *CIcon::Get(const std::string &ident)
 {
 	CIcon *icon = Icons[ident];
 	if (!icon) {
@@ -109,10 +106,57 @@ CIcon *CIcon::Get(const std::string &ident)
 	return icon;
 }
 
+void CIcon::Load()
+{
+	Assert(G);
+	G->Load();
+	if (Frame >= G->NumFrames) {
+		DebugPrint("Invalid icon frame: %s - %d\n" _C_ Ident.c_str() _C_ Frame);
+		Frame = 0;
+	}
+}
+
+/**
+**  Draw icon at pos.
+**
+**  @param player  Player pointer used for icon colors
+**  @param pos     display pixel position
+*/
+void CIcon::DrawIcon(const CPlayer &player, const PixelPos &pos) const
+{
+	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(this->G);
+	if (g) {
+		g->DrawPlayerColorFrameClip(player.Index, this->Frame, pos.x, pos.y);
+	} else {
+		this->G->DrawFrameClip(this->Frame, pos.x, pos.y);
+	}
+}
+
+/**
+**  Draw unit icon 'icon' with border on x,y
+**
+**  @param style   Button style
+**  @param flags   State of icon (clicked, mouse over...)
+**  @param pos     display pixel position
+**  @param text    Optional text to display
+*/
+void CIcon::DrawUnitIcon(const ButtonStyle &style,
+						 unsigned flags, const PixelPos &pos, const std::string &text) const
+{
+	ButtonStyle s(style);
+
+	s.Default.Sprite = s.Hover.Sprite = s.Clicked.Sprite = this->G;
+	s.Default.Frame = s.Hover.Frame = s.Clicked.Frame = this->Frame;
+	if (!(flags & IconSelected) && (flags & IconAutoCast)) {
+		s.Default.BorderColorRGB = UI.ButtonPanel.AutoCastBorderColorRGB;
+		s.Default.BorderColor = 0;
+	}
+	// FIXME: player colors
+	DrawMenuButton(&s, flags, pos.x, pos.y, text);
+}
+
 /**
 **  Load the Icon
-**
-**
 */
 void IconConfig::Load()
 {
@@ -128,28 +172,15 @@ void IconConfig::Load()
 }
 
 /**
-**  Init the icons.
-**
-**  Add the short name and icon aliases to hash table.
-*/
-void InitIcons()
-{
-}
-
-/**
 **  Load the graphics for the icons.
 */
 void LoadIcons()
 {
-	for (std::vector<CIcon *>::size_type i = 0; i < AllIcons.size(); ++i) {
-		CIcon *icon = AllIcons[i];
-		icon->G->Load();
-		ShowLoadProgress("Icons %s", icon->G->File.c_str());
-		if (icon->Frame >= icon->G->NumFrames) {
-			DebugPrint("Invalid icon frame: %s - %d\n" _C_
-					   icon->GetIdent().c_str() _C_ icon->Frame);
-			icon->Frame = 0;
-		}
+	for (IconMap::iterator it = Icons.begin(); it != Icons.end(); ++it) {
+		CIcon &icon = *(*it).second;
+
+		ShowLoadProgress("Icons %s", icon.G->File.c_str());
+		icon.Load();
 	}
 }
 
@@ -158,60 +189,11 @@ void LoadIcons()
 */
 void CleanIcons()
 {
-	std::vector<CIcon *>::iterator i;
-	for (i = AllIcons.begin(); i != AllIcons.end(); ++i) {
-		delete *i;
+	for (IconMap::iterator it = Icons.begin(); it != Icons.end(); ++it) {
+		CIcon *icon = (*it).second;
+		delete icon;
 	}
-	AllIcons.clear();
 	Icons.clear();
-}
-
-/**
-**  Draw icon on x,y.
-**
-**  @param player  Player pointer used for icon colors
-**  @param x       X display pixel position
-**  @param y       Y display pixel position
-*/
-void CIcon::DrawIcon(const CPlayer &player, int x, int y) const
-{
-	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(this->G);
-	if (g) {
-		g->DrawPlayerColorFrameClip(player.Index, this->Frame, x, y);
-	} else {
-		this->G->DrawFrameClip(this->Frame, x, y);
-	}
-}
-
-/**
-**  Draw unit icon 'icon' with border on x,y
-**
-**  @param style   Button style
-**  @param flags   State of icon (clicked, mouse over...)
-**  @param x       X display pixel position
-**  @param y       Y display pixel position
-**  @param text    Optional text to display
-*/
-void CIcon::DrawUnitIcon(ButtonStyle *style,
-						 unsigned flags, int x, int y, const std::string &text) const
-{
-	ButtonStyle s(*style);
-
-	s.Default.Sprite = s.Hover.Sprite = s.Clicked.Sprite = this->G;
-	s.Default.Frame = s.Hover.Frame = s.Clicked.Frame = this->Frame;
-	if (!(flags & IconSelected) && (flags & IconAutoCast)) {
-		s.Default.BorderColorRGB = UI.ButtonPanel.AutoCastBorderColorRGB;
-		s.Default.BorderColor = 0;
-	}
-	// FIXME: player colors
-	DrawMenuButton(&s, flags, x, y, text);
-}
-
-/**
-**  Register CCL features for icons.
-*/
-void IconCclRegister()
-{
 }
 
 //@}

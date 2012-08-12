@@ -2002,9 +2002,9 @@ void DrawPieMenu()
 		if (buttons[i].Pos != -1) {
 			int x = CursorStartScreenPos.x - ICON_SIZE_X / 2 + UI.PieMenu.X[i];
 			int y = CursorStartScreenPos.y - ICON_SIZE_Y / 2 + UI.PieMenu.Y[i];
-
+			const PixelPos pos(x, y);
 			// Draw icon
-			buttons[i].Icon.Icon->DrawIcon(player, x, y);
+			buttons[i].Icon.Icon->DrawIcon(player, pos);
 
 			// Tutorial show command key in icons
 			if (UI.ButtonPanel.ShowCommandKey) {

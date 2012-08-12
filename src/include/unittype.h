@@ -517,6 +517,7 @@
 #include <SDL.h>
 #include <vector>
 #include <algorithm>
+#include <map>
 
 #ifndef __UPGRADE_STRUCTS_H__
 #include "upgrade_structs.h"

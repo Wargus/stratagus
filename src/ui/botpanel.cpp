@@ -935,7 +935,7 @@ void CButtonPanel::Draw()
 	char buf[8];
 
 	//  Draw all buttons.
-	for (int i = 0; i < (int)UI.ButtonPanel.Buttons.size(); ++i) {
+	for (int i = 0; i < (int) UI.ButtonPanel.Buttons.size(); ++i) {
 		if (buttons[i].Pos == -1) {
 			continue;
 		}
@@ -957,9 +957,10 @@ void CButtonPanel::Draw()
 		//
 		// Draw main Icon.
 		//
-		buttons[i].Icon.Icon->DrawUnitIcon(UI.ButtonPanel.Buttons[i].Style,
+		const PixelPos pos(UI.ButtonPanel.Buttons[i].X, UI.ButtonPanel.Buttons[i].Y);
+		buttons[i].Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 										   GetButtonStatus(buttons[i], ButtonUnderCursor),
-										   UI.ButtonPanel.Buttons[i].X, UI.ButtonPanel.Buttons[i].Y, buf);
+										   pos, buf);
 
 		//
 		//  Update status line for this button

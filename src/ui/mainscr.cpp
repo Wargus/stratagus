@@ -504,7 +504,8 @@ void CContentTypeIcon::Draw(const CUnit &unit, CFont *) const
 	const CUnit *unitToDraw = GetUnitRef(unit, this->UnitRef);
 
 	if (unitToDraw && unitToDraw->Type->Icon.Icon) {
-		unitToDraw->Type->Icon.Icon->DrawIcon(*unitToDraw->Player, this->PosX, this->PosY);
+		const PixelPos pos(this->PosX, this->PosY);
+		unitToDraw->Type->Icon.Icon->DrawIcon(*unitToDraw->Player, pos);
 	}
 }
 
@@ -632,12 +633,11 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 		}
 		if (UI.SingleTrainingButton) {
 			const COrder_Train &order = *static_cast<COrder_Train *>(unit.CurrentOrder());
+			CIcon &icon = *order.GetUnitType().Icon.Icon;
 			const unsigned int flags = (ButtonAreaUnderCursor == ButtonAreaTraining && ButtonUnderCursor == 0) ?
 									   (IconActive | (MouseButtons & LeftButton)) : 0;
-
-			order.GetUnitType().Icon.Icon->DrawUnitIcon(
-				UI.SingleTrainingButton->Style, flags,
-				UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y, "");
+			const PixelPos pos(UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y);
+			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "");
 		}
 	} else {
 		if (!UI.TrainingText.empty()) {
@@ -649,14 +649,12 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 				 && i < UI.TrainingButtons.size(); ++i) {
 				if (unit.Orders[i]->Action == UnitActionTrain) {
 					const COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[i]);
-
+					CIcon &icon = *order.GetUnitType().Icon.Icon;
 					const int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
 									  && static_cast<size_t>(ButtonUnderCursor) == i) ?
 									 (IconActive | (MouseButtons & LeftButton)) : 0;
-
-					order.GetUnitType().Icon.Icon->DrawUnitIcon(
-						UI.TrainingButtons[i].Style, flag,
-						UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y, "");
+					const PixelPos pos(UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y);
+					icon.DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "");
 				}
 			}
 		}
@@ -707,12 +705,11 @@ static void DrawUnitInfo(CUnit &unit)
 	} else
 #endif
 		if (UI.SingleSelectedButton) {
-			const int x = UI.SingleSelectedButton->X;
-			const int y = UI.SingleSelectedButton->Y;
+			const PixelPos pos(UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
 			const int flag = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
 							 (IconActive | (MouseButtons & LeftButton)) : 0;
 
-			type.Icon.Icon->DrawUnitIcon(UI.SingleSelectedButton->Style, flag, x, y, "");
+			type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "");
 		}
 
 	if (unit.Player != ThisPlayer && !ThisPlayer->IsAllied(*unit.Player)) {
@@ -731,25 +728,24 @@ static void DrawUnitInfo(CUnit &unit)
 			case UnitActionUpgradeTo: { //  Building upgrading to better type.
 				if (UI.UpgradingButton) {
 					const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(unit.CurrentOrder());
-					order.GetUnitType().Icon.Icon->DrawUnitIcon(
-						UI.UpgradingButton->Style,
-						(ButtonAreaUnderCursor == ButtonAreaUpgrading
+					CIcon &icon = *order.GetUnitType().Icon.Icon;
+					unsigned int flag = (ButtonAreaUnderCursor == ButtonAreaUpgrading
 						 && ButtonUnderCursor == 0) ?
-						(IconActive | (MouseButtons & LeftButton)) : 0,
-						UI.UpgradingButton->X, UI.UpgradingButton->Y, "");
+						(IconActive | (MouseButtons & LeftButton)) : 0;
+					const PixelPos pos(UI.UpgradingButton->X, UI.UpgradingButton->Y);
+					icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "");
 				}
 				return;
 			}
 			case UnitActionResearch: { //  Building research new technology.
 				if (UI.ResearchingButton) {
 					COrder_Research &order = *static_cast<COrder_Research *>(unit.CurrentOrder());
-
-					order.GetUpgrade().Icon->DrawUnitIcon(
-						UI.ResearchingButton->Style,
-						(ButtonAreaUnderCursor == ButtonAreaResearching
+					CIcon &icon = *order.GetUpgrade().Icon;
+					int flag = (ButtonAreaUnderCursor == ButtonAreaResearching
 						 && ButtonUnderCursor == 0) ?
-						(IconActive | (MouseButtons & LeftButton)) : 0,
-						UI.ResearchingButton->X, UI.ResearchingButton->Y, "");
+						(IconActive | (MouseButtons & LeftButton)) : 0;
+					PixelPos pos(UI.ResearchingButton->X, UI.ResearchingButton->Y);
+					icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "");
 				}
 				return;
 			}
@@ -767,13 +763,14 @@ static void DrawUnitInfo(CUnit &unit)
 
 		for (int i = 0; i < unit.InsideCount; ++i, uins = uins->NextContained) {
 			if (uins->Boarded && j < UI.TransportingButtons.size()) {
-				uins->Type->Icon.Icon->DrawUnitIcon(UI.TransportingButtons[j].Style,
-													(ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
-													(IconActive | (MouseButtons & LeftButton)) : 0,
-													UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y, "");
-				UiDrawLifeBar(*uins, UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
+				CIcon &icon = *uins->Type->Icon.Icon;
+				int flag = (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
+													(IconActive | (MouseButtons & LeftButton)) : 0;
+				const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
+				icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "");
+				UiDrawLifeBar(*uins, pos.x, pos.y);
 				if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
-					UiDrawManaBar(*uins, UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
+					UiDrawManaBar(*uins, pos.x, pos.y);
 				}
 				if (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) {
 					UI.StatusLine.Set(uins->Type->Name);
@@ -1506,11 +1503,11 @@ static void DrawInfoPanelMultipleSelected()
 	for (int i = 0; i < std::min<int>(NumSelected, (int)UI.SelectedButtons.size()); ++i) {
 		CUIButton *button = &UI.SelectedButtons[i];
 		bool mouseOver = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i);
-
-		Selected[i]->Type->Icon.Icon->DrawUnitIcon(button->Style,
-												   mouseOver ? (IconActive | (MouseButtons & LeftButton)) : 0,
-												   button->X, button->Y, "");
-		UiDrawLifeBar(*Selected[i], button->X, button->Y);
+		CIcon &icon = *Selected[i]->Type->Icon.Icon;
+		int flag = mouseOver ? (IconActive | (MouseButtons & LeftButton)) : 0;
+		const PixelPos pos(button->X, button->Y);
+		icon.DrawUnitIcon(*button->Style, flag, pos, "");
+		UiDrawLifeBar(*Selected[i], pos.x, pos.y);
 
 		if (mouseOver) {
 			UI.StatusLine.Set(Selected[i]->Type->Name);

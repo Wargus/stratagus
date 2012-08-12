@@ -121,7 +121,6 @@ void InitModules()
 
 	CallbackMusicOn();
 	InitSyncRand();
-	InitIcons();
 	InitVideoCursors();
 	InitUserInterface();
 	InitPlayers();

@@ -32,8 +32,8 @@
 
 //@{
 
+#include "vec2i.h"
 #include <string>
-#include <map>
 
 /*----------------------------------------------------------------------------
 --  Documentation
@@ -112,14 +112,17 @@ public:
 	static CIcon *New(const std::string &ident);
 	static CIcon *Get(const std::string &ident);
 
+	void Load();
+
 	/// Draw icon
-	void DrawIcon(const CPlayer &player, int x, int y) const;
+	void DrawIcon(const CPlayer &player, const PixelPos &pos) const;
 	/// Draw icon of a unit
-	void DrawUnitIcon(ButtonStyle *style,
-					  unsigned flags, int x, int y, const std::string &text) const;
+	void DrawUnitIcon(const ButtonStyle &style,
+					  unsigned flags, const PixelPos &pos, const std::string &text) const;
 
-	inline const std::string &GetIdent() { return this->Ident; }
+	const std::string &GetIdent() const { return this->Ident; }
 
+public:
 	CGraphic *G;              /// Graphic data
 	int Frame;                /// Frame number in graphic
 private:
@@ -133,23 +136,17 @@ public:
 	IconConfig() : Icon(NULL) {}
 
 	void Load();
-
+public:
 	std::string Name;    /// config icon name
 	CIcon *Icon;         /// icon pointer to use to run time
 };
-
-extern std::map<std::string, CIcon *> Icons;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void InitIcons();   /// Init icons
 extern void LoadIcons();   /// Load icons
 extern void CleanIcons();  /// Cleanup icons
-
-/// Register CCL features
-extern void IconCclRegister();
 
 //@}
 

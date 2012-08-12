@@ -645,17 +645,18 @@ static void DrawUnitIcons()
 			if (i >= (int) Editor.ShownUnitTypes.size()) {
 				return;
 			}
-			CIcon *icon = Editor.ShownUnitTypes[i]->Icon.Icon;
-			icon->DrawIcon(Players[Editor.SelectedPlayer], x, y);
+			CIcon &icon = *Editor.ShownUnitTypes[i]->Icon.Icon;
+			const PixelPos pos(x, y);
+			icon.DrawIcon(Players[Editor.SelectedPlayer], pos);
 
-			Video.DrawRectangleClip(ColorGray, x, y, icon->G->Width, icon->G->Height);
+			Video.DrawRectangleClip(ColorGray, x, y, icon.G->Width, icon.G->Height);
 			if (i == Editor.SelectedUnitIndex) {
 				Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
-										icon->G->Width - 2, icon->G->Height - 2);
+										icon.G->Width - 2, icon.G->Height - 2);
 			}
 			if (i == Editor.CursorUnitIndex) {
 				Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
-										icon->G->Width + 2, icon->G->Height + 2);
+										icon.G->Width + 2, icon.G->Height + 2);
 				Editor.PopUpX = x;
 				Editor.PopUpY = y;
 			}
@@ -779,51 +780,43 @@ static void DrawTileIcons()
 	}
 }
 
-/**
-**  Draw the editor panels.
-*/
-static void DrawEditorPanel()
+static void DrawEditorPanel_SelectIcon()
 {
-	int x;
-	int y;
-	CIcon *icon;
-
-	x = UI.InfoPanel.X + 4;
-	y = UI.InfoPanel.Y + 4;
-
-	//
-	// Select / Units / Tiles / Start
-	//
-	icon = Editor.Select.Icon;
+	const PixelPos pos(UI.InfoPanel.X + 4, UI.InfoPanel.Y + 4);
+	CIcon *icon = Editor.Select.Icon;
 	Assert(icon);
+	unsigned int flag = (ButtonUnderCursor == SelectButton ? IconActive : 0)
+						| (Editor.State == EditorSelecting ? IconSelected : 0);
 	// FIXME: wrong button style
-	icon->DrawUnitIcon(UI.SingleSelectedButton->Style,
-					   (ButtonUnderCursor == SelectButton ? IconActive : 0) |
-					   (Editor.State == EditorSelecting ? IconSelected : 0),
-					   x, y, "");
-	icon = Editor.Units.Icon;
-	Assert(icon);
-	// FIXME: wrong button style
-	icon->DrawUnitIcon(UI.SingleSelectedButton->Style,
-					   (ButtonUnderCursor == UnitButton ? IconActive : 0) |
-					   (Editor.State == EditorEditUnit ? IconSelected : 0),
-					   x + UNIT_ICON_X, y + UNIT_ICON_Y, "");
+	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "");
+}
 
-	if (Editor.TerrainEditable) {
-		DrawTileIcon(0x10 + 4 * 16, x + TILE_ICON_X, y + TILE_ICON_Y,
-					 (ButtonUnderCursor == TileButton ? IconActive : 0) |
-					 (Editor.State == EditorEditTile ? IconSelected : 0));
-	}
+static void DrawEditorPanel_UnitsIcon()
+{
+	const PixelPos pos(UI.InfoPanel.X + 4 + UNIT_ICON_X, UI.InfoPanel.Y + 4 + UNIT_ICON_Y);
+	CIcon *icon = Editor.Units.Icon;
+	Assert(icon);
+	unsigned int flag = (ButtonUnderCursor == UnitButton ? IconActive : 0)
+						| (Editor.State == EditorEditUnit ? IconSelected : 0);
+	// FIXME: wrong button style
+	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "");
+}
+
+static void DrawEditorPanel_StartIcon()
+{
+	int x = UI.InfoPanel.X + 4;
+	int y = UI.InfoPanel.Y + 4;
 
 	if (Editor.StartUnit) {
-		icon = Editor.StartUnit->Icon.Icon;
+		CIcon *icon = Editor.StartUnit->Icon.Icon;
 		Assert(icon);
-		icon->DrawUnitIcon(UI.SingleSelectedButton->Style,
-						   (ButtonUnderCursor == StartButton ? IconActive : 0) |
-						   (Editor.State == EditorSetStartLocation ? IconSelected : 0),
-						   x + START_ICON_X, y + START_ICON_Y, "");
+		const PixelPos pos(x + START_ICON_X, y + START_ICON_Y);
+		int flag = (ButtonUnderCursor == StartButton ? IconActive : 0)
+					| (Editor.State == EditorSetStartLocation ? IconSelected : 0);
+
+		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "");
 	} else {
-		//  No unit specified.
+		//  No unit specified : draw a cross.
 		//  Todo : FIXME Should we just warn user to define Start unit ?
 		PushClipping();
 		x += START_ICON_X + 1;
@@ -843,6 +836,25 @@ static void DrawEditorPanel()
 		Video.DrawLineClip(color, rt, lb);
 		PopClipping();
 	}
+}
+
+/**
+**  Draw the editor panels.
+*/
+static void DrawEditorPanel()
+{
+	DrawEditorPanel_SelectIcon();
+	DrawEditorPanel_UnitsIcon();
+
+	if (Editor.TerrainEditable) {
+		int x = UI.InfoPanel.X + 4;
+		int y = UI.InfoPanel.Y + 4;
+
+		DrawTileIcon(0x10 + 4 * 16, x + TILE_ICON_X, y + TILE_ICON_Y,
+					 (ButtonUnderCursor == TileButton ? IconActive : 0) |
+					 (Editor.State == EditorEditTile ? IconSelected : 0));
+	}
+	DrawEditorPanel_StartIcon();
 
 	switch (Editor.State) {
 		case EditorSelecting:

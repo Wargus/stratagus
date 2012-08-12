@@ -800,7 +800,6 @@ void CreateGame(const std::string &filename, CMap *map)
 	// Graphic part
 	//
 	SetPlayersPalette();
-	InitIcons();
 	LoadIcons();
 
 	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
@@ -1413,7 +1412,6 @@ void LuaRegisterModules()
 	DependenciesCclRegister();
 	EditorCclRegister();
 	GroupCclRegister();
-	IconCclRegister();
 	MapCclRegister();
 	MissileCclRegister();
 	NetworkCclRegister();
