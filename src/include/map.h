@@ -84,10 +84,6 @@
 
 #include <string>
 
-#ifndef __UNIT_CACHE_H__
-#include "unit_cache.h"
-#endif
-
 #ifndef __TILESET_H__
 #include "tileset.h"
 #endif
