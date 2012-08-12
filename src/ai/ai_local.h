@@ -38,9 +38,9 @@
 
 #include <vector>
 
-#include "upgrade_structs.h"
-#include "unit.h"
+#include "upgrade_structs.h" // MaxCost
 #include "unit_cache.h"
+#include "vec2i.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -157,17 +157,11 @@ public:
 private:
 	void CountTypes(unsigned int *counter, const size_t len);
 	bool IsBelongsTo(const CUnitType *type);
-	void Insert(CUnit &unit) {
-		Units.Insert(&unit);
-		unit.RefsIncrease();
-	}
+	void Insert(CUnit &unit);
 
 	void Update();
 
-	static void InternalRemoveUnit(CUnit *unit) {
-		unit->GroupId = 0;
-		unit->RefsDecrease();
-	}
+	static void InternalRemoveUnit(CUnit *unit);
 
 public:
 	bool Completed;    /// Flag saying force is complete build

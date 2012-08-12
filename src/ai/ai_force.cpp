@@ -254,6 +254,18 @@ bool AiForce::IsBelongsTo(const CUnitType *type)
 	return flag;
 }
 
+void AiForce::Insert(CUnit &unit) {
+	Units.Insert(&unit);
+	unit.RefsIncrease();
+}
+
+/* static */ void AiForce::InternalRemoveUnit(CUnit *unit)
+{
+	unit->GroupId = 0;
+	unit->RefsDecrease();
+}
+
+
 /**
 **  Ai clean units in a force.
 */
