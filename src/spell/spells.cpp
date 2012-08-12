@@ -49,6 +49,8 @@
 #include "commands.h"
 #include "map.h"
 #include "sound.h"
+#include "unit.h"
+#include "unit_find.h"
 #include "upgrade.h"
 
 /*----------------------------------------------------------------------------
@@ -208,7 +210,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 	// Select all units aroung the caster
 
 	std::vector<CUnit *> table;
-	Map.SelectAroundUnit(caster, range, table);
+	SelectAroundUnit(caster, range, table);
 
 	//  Check every unit if it is hostile
 	bool inCombat = false;

@@ -44,6 +44,7 @@
 #include "script.h"
 #include "unittype.h"
 #include "unit.h"
+#include "unit_find.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -393,7 +394,7 @@ static int CclChangeUnitsOwner(lua_State *l)
 	const int newp = LuaToNumber(l, 4);
 	std::vector<CUnit *> table;
 
-	Map.Select(pos1, pos2, table, HasSamePlayerAs(Players[oldp]));
+	Select(pos1, pos2, table, HasSamePlayerAs(Players[oldp]));
 	for (size_t i = 0; i != table.size(); ++i) {
 		table[i]->ChangeOwner(Players[newp]);
 	}

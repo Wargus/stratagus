@@ -43,6 +43,9 @@
 #include "map.h"
 #include "util.h"
 
+#include <stdarg.h>
+#include <stdio.h>
+
 #ifdef USE_ZLIB
 #include <zlib.h>
 #endif

@@ -819,7 +819,7 @@ void Missile::MissileHit(CUnit *unit)
 		//
 		const Vec2i range(mtype.Range - 1, mtype.Range - 1);
 		std::vector<CUnit *> table;
-		Map.Select(pos - range, pos + range, table);
+		Select(pos - range, pos + range, table);
 		Assert(this->SourceUnit != NULL);
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &goal = *table[i];
@@ -1131,7 +1131,7 @@ MissileType::MissileType(const std::string &ident) :
 	Ident(ident), Transparency(0), DrawLevel(0),
 	SpriteFrames(0), NumDirections(0), ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
 	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
-	AlwaysFire(false), Pierce(false), PierceOnce(false), Class(), NumBounces(0), StartDelay(0), 
+	AlwaysFire(false), Pierce(false), PierceOnce(false), Class(), NumBounces(0), StartDelay(0),
 	Sleep(0), Speed(0), Range(0), SplashFactor(0), ImpactParticle(NULL), SmokeParticle(NULL),
 	G(NULL)
 {

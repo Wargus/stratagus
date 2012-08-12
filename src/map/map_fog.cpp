@@ -43,6 +43,7 @@
 #include "player.h"
 #include "tileset.h"
 #include "ui.h"
+#include "unit.h"
 #include "unit_manager.h"
 #include "../video/intern_video.h"
 

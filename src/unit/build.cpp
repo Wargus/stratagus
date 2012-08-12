@@ -41,6 +41,7 @@
 #include "map.h"
 #include "player.h"
 #include "unit.h"
+#include "unit_find.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -131,7 +132,7 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 		distance = this->Distance - 1;
 	}
 	std::vector<CUnit *> table;
-	Map.Select(pos1, pos2, table);
+	Select(pos1, pos2, table);
 
 	switch (this->DistanceType) {
 		case GreaterThan :

@@ -1936,7 +1936,7 @@ void RescueUnits()
 				}
 				std::vector<CUnit *> around;
 
-				Map.SelectAroundUnit(unit, 1, around);
+				SelectAroundUnit(unit, 1, around);
 				//  Look if ally near the unit.
 				for (size_t i = 0; i != around.size(); ++i) {
 					if (around[i]->Type->CanAttack && unit.IsAllied(*around[i])) {

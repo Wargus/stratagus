@@ -36,6 +36,8 @@
 
 #include "script.h"
 #include "map.h"
+#include "unit.h"
+#include "unit_find.h"
 
 /* virtual */ void Spell_Demolish::Parse(lua_State *l, int startIndex, int endIndex)
 {
@@ -101,7 +103,7 @@
 	//
 	if (this->Damage) {
 		std::vector<CUnit *> table;
-		Map.SelectFixed(minpos, maxpos, table);
+		SelectFixed(minpos, maxpos, table);
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &unit = *table[i];
 			if (unit.Type->UnitType != UnitTypeFly && unit.IsAlive()

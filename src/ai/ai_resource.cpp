@@ -209,13 +209,13 @@ int AiEnemyUnitsInDistance(const CPlayer &player,
 	std::vector<CUnit *> units;
 
 	if (type == NULL) {
-		Map.Select(pos - offset, pos + offset, units, IsAEnemyUnitOf(player));
+		Select(pos - offset, pos + offset, units, IsAEnemyUnitOf(player));
 		return static_cast<int>(units.size());
 	} else {
 		const Vec2i typeSize(type->TileWidth - 1, type->TileHeight - 1);
 		const IsAEnemyUnitWhichCanCounterAttackOf pred(player, *type);
 
-		Map.Select(pos - offset, pos + typeSize + offset, units, pred);
+		Select(pos - offset, pos + typeSize + offset, units, pred);
 		return static_cast<int>(units.size());
 	}
 }

@@ -35,9 +35,9 @@
 #include "spell/spell_summon.h"
 
 #include "actions.h"
-#include "map.h"
 #include "script.h"
 #include "unit.h"
+#include "unit_find.h"
 
 /* virtual */ void Spell_Summon::Parse(lua_State *l, int startIndex, int endIndex)
 {
@@ -103,7 +103,7 @@ public:
 		const Vec2i minPos = pos - offset;
 		const Vec2i maxPos = pos + offset;
 
-		CUnit *unit = Map.Find_If(minPos, maxPos, IsDyingAndNotABuilding());
+		CUnit *unit = FindUnit_If(minPos, maxPos, IsDyingAndNotABuilding());
 		cansummon = false;
 
 		if (unit != NULL) { //  Found a corpse. eliminate it and proceed to summoning.

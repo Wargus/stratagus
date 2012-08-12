@@ -83,8 +83,6 @@
 ----------------------------------------------------------------------------*/
 
 #include <string>
-#include <vector>
-#include <algorithm>
 
 #ifndef __UNIT_CACHE_H__
 #include "unit_cache.h"
@@ -94,16 +92,8 @@
 #include "tileset.h"
 #endif
 
-#ifndef __PLAYER_H__
-#include "player.h"
-#endif
-
 #ifndef __MAP_TILE_H__
 #include "tile.h"
-#endif
-
-#ifndef __UNIT_H__
-#include "unit.h"
 #endif
 
 #include "vec2i.h"
@@ -153,15 +143,7 @@ class CUnitType;
 class CMapInfo
 {
 public:
-	std::string Description;     /// Map description
-	std::string Filename;        /// Map filename
-	int MapWidth;          /// Map width
-	int MapHeight;         /// Map height
-	int PlayerType[PlayerMax];  /// Same player->Type
-	int PlayerSide[PlayerMax];  /// Same player->Side
-	unsigned int MapUID;   /// Unique Map ID (hash)
-
-	inline bool IsPointOnMap(int x, int y) const {
+	bool IsPointOnMap(int x, int y) const {
 		return (x >= 0 && y >= 0 && x < MapWidth && y < MapHeight);
 	}
 
@@ -171,120 +153,15 @@ public:
 
 	void Clear();
 
-};
-
-//
-//  Some predicates
-//
-
-class HasSameTypeAs
-{
 public:
-	explicit HasSameTypeAs(const CUnitType &_type) : type(&_type) {}
-	bool operator()(const CUnit *unit) const { return unit->Type == type; }
-private:
-	const CUnitType *type;
+	std::string Description;    /// Map description
+	std::string Filename;       /// Map filename
+	int MapWidth;               /// Map width
+	int MapHeight;              /// Map height
+	int PlayerType[PlayerMax];  /// Same player->Type
+	int PlayerSide[PlayerMax];  /// Same player->Side
+	unsigned int MapUID;        /// Unique Map ID (hash)
 };
-
-class HasSamePlayerAs
-{
-public:
-	explicit HasSamePlayerAs(const CPlayer &_player) : player(&_player) {}
-	bool operator()(const CUnit *unit) const { return unit->Player == player; }
-private:
-	const CPlayer *player;
-};
-
-class HasNotSamePlayerAs
-{
-public:
-	explicit HasNotSamePlayerAs(const CPlayer &_player) : player(&_player) {}
-	bool operator()(const CUnit *unit) const { return unit->Player != player; }
-private:
-	const CPlayer *player;
-};
-
-class IsAlliedWith
-{
-public:
-	explicit IsAlliedWith(const CPlayer &_player) : player(&_player) {}
-	bool operator()(const CUnit *unit) const { return unit->IsAllied(*player); }
-private:
-	const CPlayer *player;
-};
-
-class IsEnemyWith
-{
-public:
-	explicit IsEnemyWith(const CPlayer &_player) : player(&_player) {}
-	bool operator()(const CUnit *unit) const { return unit->IsEnemy(*player); }
-private:
-	const CPlayer *player;
-};
-
-class HasSamePlayerAndTypeAs
-{
-public:
-	explicit HasSamePlayerAndTypeAs(const CUnit &unit) :
-		player(unit.Player), type(unit.Type)
-	{}
-	HasSamePlayerAndTypeAs(const CPlayer &_player, const CUnitType &_type) :
-		player(&_player), type(&_type)
-	{}
-
-	bool operator()(const CUnit *unit) const {
-		return (unit->Player == player && unit->Type == type);
-	}
-
-private:
-	const CPlayer *player;
-	const CUnitType *type;
-};
-
-class IsNotTheSameUnitAs
-{
-public:
-	explicit IsNotTheSameUnitAs(const CUnit &unit) : forbidden(&unit) {}
-	bool operator()(const CUnit *unit) const { return unit != forbidden; }
-private:
-	const CUnit *forbidden;
-};
-
-class IsBuildingType
-{
-public:
-	bool operator()(const CUnit *unit) const { return unit->Type->Building; }
-};
-
-
-template <typename Pred>
-class NotPredicate
-{
-public:
-	explicit NotPredicate(Pred _pred) : pred(_pred) {}
-	bool operator()(const CUnit *unit) const { return pred(unit) == false; }
-private:
-	Pred pred;
-};
-
-template <typename Pred>
-NotPredicate<Pred> MakeNotPredicate(Pred pred) { return NotPredicate<Pred>(pred); }
-
-template <typename Pred1, typename Pred2>
-class AndPredicate
-{
-public:
-	AndPredicate(Pred1 _pred1, Pred2 _pred2) : pred1(_pred1), pred2(_pred2) {}
-	bool operator()(const CUnit *unit) const { return pred1(unit) && pred2(unit); }
-private:
-	Pred1 pred1;
-	Pred2 pred2;
-};
-
-template <typename Pred1, typename Pred2>
-AndPredicate<Pred1, Pred2> MakeAndPredicate(Pred1 pred1, Pred2 pred2) { return AndPredicate<Pred1, Pred2>(pred1, pred2); }
-
-
 
 /*----------------------------------------------------------------------------
 --  Map itself
@@ -332,28 +209,7 @@ public:
 	**
 	**  @return        0 unexplored, 1 explored, > 1 visible.
 	*/
-	unsigned short IsTileVisible(const CPlayer &player, const unsigned int index) const {
-		const CMapField *const mf = &this->Fields[index];
-		unsigned short visiontype = mf->Visible[player.Index];
-
-		if (visiontype > 1) {
-			return visiontype;
-		}
-		if (player.IsVisionSharing()) {
-			for (int i = 0; i < PlayerMax ; ++i) {
-				if (player.IsBothSharedVision(Players[i])) {
-					if (mf->Visible[i] > 1) {
-						return 2;
-					}
-					visiontype |= mf->Visible[i];
-				}
-			}
-		}
-		if (visiontype) {
-			return visiontype + (NoFogOfWar ? 1 : 0);
-		}
-		return 0;
-	}
+	unsigned short IsTileVisible(const CPlayer &player, const unsigned int index) const;
 
 	/// Check if a field flags.
 	bool CheckMask(const unsigned int index, const int mask) const {
@@ -365,9 +221,7 @@ public:
 	}
 
 	/// Check if a field for the user is explored.
-	bool IsFieldExplored(const CPlayer &player, const unsigned int index) const {
-		return this->Fields[index].IsExplored(player.Index);
-	}
+	bool IsFieldExplored(const CPlayer &player, const unsigned int index) const;
 
 	/// Check if a field for the user is visible.
 	bool IsFieldVisible(const CPlayer &player, const unsigned int index) const {
@@ -384,12 +238,10 @@ public:
 		return IsFieldExplored(player, getIndex(pos));
 	}
 
-
 	/// Check if a field for the user is visible.
 	bool IsFieldVisible(const CPlayer &player, const Vec2i &pos) {
 		return IsTileVisible(player, getIndex(pos)) > 1;
 	}
-
 
 	/// Mark a tile as seen by the player.
 	void MarkSeenTile(const unsigned int index);
@@ -399,7 +251,6 @@ public:
 		Assert(Info.IsPointOnMap(pos));
 		MarkSeenTile(getIndex(pos));
 	}
-
 
 	/// Regenerate the forest.
 	void RegenerateForest();
@@ -495,82 +346,6 @@ public:
 		maxpos.y = std::min<short>(maxpos.y, Info.MapHeight - 1);
 	}
 
-	void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units);
-	void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units);
-	void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around);
-
-	template <typename Pred>
-	void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred) {
-		Assert(Info.IsPointOnMap(ltPos));
-		Assert(Info.IsPointOnMap(rbPos));
-		Assert(units.empty());
-
-		for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
-			for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
-				const CMapField &mf = *Field(posIt);
-				const CUnitCache &cache = mf.UnitCache;
-
-				for (size_t i = 0; i != cache.size(); ++i) {
-					CUnit &unit = *cache[i];
-
-					if (unit.CacheLock == 0 && pred(&unit)) {
-						unit.CacheLock = 1;
-						units.push_back(&unit);
-					}
-				}
-			}
-		}
-		for (size_t i = 0; i != units.size(); ++i) {
-			units[i]->CacheLock = 0;
-		}
-	}
-
-	template <typename Pred>
-	void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, Pred pred) {
-		const Vec2i offset(range, range);
-		const Vec2i typeSize(unit.Type->TileWidth - 1, unit.Type->TileHeight - 1);
-
-		Select(unit.tilePos - offset,
-			   unit.tilePos + typeSize + offset, around,
-			   MakeAndPredicate(IsNotTheSameUnitAs(unit), pred));
-	}
-
-	template <typename Pred>
-	void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred) {
-		Vec2i minPos = ltPos;
-		Vec2i maxPos = rbPos;
-
-		FixSelectionArea(minPos, maxPos);
-		SelectFixed(minPos, maxPos, units, pred);
-	}
-
-	template <typename Pred>
-	CUnit *Find_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, Pred pred) {
-		Assert(Info.IsPointOnMap(ltPos));
-		Assert(Info.IsPointOnMap(rbPos));
-
-		for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
-			for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
-				const CMapField &mf = *Field(posIt);
-				const CUnitCache &cache = mf.UnitCache;
-
-				CUnitCache::const_iterator it = std::find_if(cache.begin(), cache.end(), pred);
-				if (it != cache.end()) {
-					return *it;
-				}
-			}
-		}
-		return NULL;
-	}
-
-	template <typename Pred>
-	CUnit *Find_If(const Vec2i &ltPos, const Vec2i &rbPos, Pred pred) {
-		Vec2i minPos = ltPos;
-		Vec2i maxPos = rbPos;
-
-		FixSelectionArea(minPos, maxPos);
-		return Find_IfFixed(minPos, maxPos, pred);
-	}
 private:
 
 	/// Returns true, if forest on the map tile field
@@ -631,7 +406,6 @@ public:
 
 	CMapInfo Info;             /// descriptive information
 };
-
 
 
 /*----------------------------------------------------------------------------

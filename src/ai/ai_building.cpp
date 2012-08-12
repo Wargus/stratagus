@@ -242,7 +242,7 @@ bool HallPlaceFinder::IsAUsableMine(const CUnit &mine) const
 	const Vec2i maxpos = mine.tilePos + typeSize + offset;
 	std::vector<CUnit *> units;
 
-	Map.Select(minpos, maxpos, units);
+	Select(minpos, maxpos, units);
 
 	const size_t nunits = units.size();
 	int buildings = 0;

@@ -172,7 +172,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 
 	std::vector<CUnit *> units;
 
-	Map.Select(minPos, maxPos, units);
+	Select(minPos, maxPos, units);
 
 	int s = 0;
 	for (size_t i = 0; i != units.size(); ++i) {
@@ -228,7 +228,7 @@ static int CclIfNearUnit(lua_State *l)
 		const CUnit &centerUnit = *unitsOfType[i];
 
 		std::vector<CUnit *> around;
-		Map.SelectAroundUnit(centerUnit, 1, around);
+		SelectAroundUnit(centerUnit, 1, around);
 
 		// Count the requested units
 		int s = 0;
@@ -288,7 +288,7 @@ static int CclIfRescuedNearUnit(lua_State *l)
 		CUnit &centerUnit = *table[i];
 		std::vector<CUnit *> around;
 
-		Map.SelectAroundUnit(centerUnit, 1, around);
+		SelectAroundUnit(centerUnit, 1, around);
 		// Count the requested units
 		int s = 0;
 		for (size_t j = 0; j != around.size(); ++j) {

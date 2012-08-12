@@ -38,7 +38,9 @@
 
 #include "map.h"
 
+#include "player.h"
 #include "tileset.h"
+#include "unit.h"
 #include "unit_manager.h"
 #include "ui.h"
 
@@ -198,6 +200,36 @@ bool CMap::IsTerrainResourceOnMap(const Vec2i &pos) const
 	}
 	return false;
 }
+
+unsigned short CMap::IsTileVisible(const CPlayer &player, const unsigned int index) const
+{
+	const CMapField &mf = this->Fields[index];
+	unsigned short visiontype = mf.Visible[player.Index];
+
+	if (visiontype > 1) {
+		return visiontype;
+	}
+	if (player.IsVisionSharing()) {
+		for (int i = 0; i < PlayerMax ; ++i) {
+			if (player.IsBothSharedVision(Players[i])) {
+				if (mf.Visible[i] > 1) {
+					return 2;
+				}
+				visiontype |= mf.Visible[i];
+			}
+		}
+	}
+	if (visiontype) {
+		return visiontype + (NoFogOfWar ? 1 : 0);
+	}
+	return 0;
+}
+
+bool CMap::IsFieldExplored(const CPlayer &player, const unsigned int index) const
+{
+	return this->Fields[index].IsExplored(player.Index);
+}
+
 
 /**
 **  Wall on map tile.

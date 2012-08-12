@@ -52,6 +52,7 @@
 #include "sound.h"
 #include "tileset.h"
 #include "unit.h"
+#include "unit_find.h"
 #include "unitsound.h"
 #include "unittype.h"
 #include "ui.h"
@@ -1014,7 +1015,7 @@ int FindAndSortUnits(const CViewport &vp, std::vector<CUnit *> &table)
 	const Vec2i minPos = vp.MapPos - offset;
 	const Vec2i maxPos = vp.MapPos + vpSize + offset;
 
-	Map.Select(minPos, maxPos, table);
+	Select(minPos, maxPos, table);
 
 	size_t n = table.size();
 	for (size_t i = 0; i < table.size(); ++i) {

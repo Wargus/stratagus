@@ -46,6 +46,7 @@
 #include "map.h"
 #include "trigger.h"
 #include "ui.h"
+#include "unit.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

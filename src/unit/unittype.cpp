@@ -518,11 +518,11 @@ static int GetStillFrame(CUnitType *type)
 		if (anim->Type == AnimationFrame) {
 			CAnimation_Frame &a_frame = *static_cast<CAnimation_Frame *>(anim);
 			// Use the frame facing down
-			return a_frame.ParseAnimInt(NoUnitP) + type->NumDirections / 2;
+			return a_frame.ParseAnimInt(NULL) + type->NumDirections / 2;
 		} else if (anim->Type == AnimationExactFrame) {
 			CAnimation_ExactFrame &a_frame = *static_cast<CAnimation_ExactFrame *>(anim);
 
-			return a_frame.ParseAnimInt(NoUnitP);
+			return a_frame.ParseAnimInt(NULL);
 		}
 		anim = anim->Next;
 	}

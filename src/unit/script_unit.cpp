@@ -825,7 +825,7 @@ static int CclOrderUnit(lua_State *l)
 	}
 	const char *order = LuaToString(l, 5);
 	std::vector<CUnit *> table;
-	Map.Select(pos1, pos2, table);
+	Select(pos1, pos2, table);
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
@@ -940,7 +940,7 @@ static int CclKillUnitAt(lua_State *l)
 
 	std::vector<CUnit *> table;
 
-	Map.Select(pos1, pos2, table);
+	Select(pos1, pos2, table);
 
 	int s = 0;
 	for (size_t j = 0; j < table.size() && s < q; ++j) {

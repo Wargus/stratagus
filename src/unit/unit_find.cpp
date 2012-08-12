@@ -53,6 +53,26 @@
   -- Finding units
   ----------------------------------------------------------------------------*/
 
+class NoFilter
+{
+public:
+	bool operator()(const CUnit *) const { return true; }
+};
+
+void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units)
+{
+	Select(ltPos, rbPos, units, NoFilter());
+}
+
+void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units)
+{
+	Select(ltPos, rbPos, units, NoFilter());
+}
+
+void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around)
+{
+	SelectAroundUnit(unit, range, around, NoFilter());
+}
 
 CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
 {
@@ -577,7 +597,7 @@ CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2)
 {
 	std::vector<CUnit *> table;
 
-	Map.Select(pos1, pos2, table);
+	Select(pos1, pos2, table);
 	CUnit *best = NULL;
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
@@ -1051,11 +1071,11 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool onlyBuildings)
 		const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
 		std::vector<CUnit *> table;
 		if (onlyBuildings) {
-			Map.SelectAroundUnit(*firstContainer, missile_range, table,
-								 MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), IsBuildingType()));
+			SelectAroundUnit(*firstContainer, missile_range, table,
+							 MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), IsBuildingType()));
 		} else {
-			Map.SelectAroundUnit(*firstContainer, missile_range, table,
-								 MakeNotPredicate(HasSamePlayerAs(Players[PlayerNumNeutral])));
+			SelectAroundUnit(*firstContainer, missile_range, table,
+							 MakeNotPredicate(HasSamePlayerAs(Players[PlayerNumNeutral])));
 		}
 
 		if (table.empty() == false) {
@@ -1066,11 +1086,11 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool onlyBuildings)
 		std::vector<CUnit *> table;
 
 		if (onlyBuildings) {
-			Map.SelectAroundUnit(unit, range, table,
-								 MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), IsBuildingType()));
+			SelectAroundUnit(unit, range, table,
+							 MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), IsBuildingType()));
 		} else {
-			Map.SelectAroundUnit(unit, range, table,
-								 MakeNotPredicate(HasSamePlayerAs(Players[PlayerNumNeutral])));
+			SelectAroundUnit(unit, range, table,
+							 MakeNotPredicate(HasSamePlayerAs(Players[PlayerNumNeutral])));
 		}
 
 		const int n = static_cast<int>(table.size());

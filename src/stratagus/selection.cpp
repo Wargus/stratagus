@@ -45,6 +45,7 @@
 #include "ui.h"
 #include "unittype.h"
 #include "unit.h"
+#include "unit_find.h"
 #include "unit_manager.h"
 
 /*----------------------------------------------------------------------------
@@ -407,7 +408,7 @@ int SelectUnitsByType(CUnit &base)
 	const Vec2i minPos = vp->MapPos - offset;
 	const Vec2i vpSize(vp->MapWidth, vp->MapHeight);
 	const Vec2i maxPos = vp->MapPos + vpSize + offset;
-	Map.Select(minPos, maxPos, table, HasSameTypeAs(type));
+	Select(minPos, maxPos, table, HasSameTypeAs(type));
 
 	// FIXME: peon/peasant with gold/wood & co are considered from
 	//   different type... idem for tankers
@@ -486,7 +487,7 @@ int ToggleUnitsByType(CUnit &base)
 	const Vec2i maxPos = vp->MapPos + vpSize + offset;
 	std::vector<CUnit *> table;
 
-	Map.Select(minPos, maxPos, table, HasSameTypeAs(*type));
+	Select(minPos, maxPos, table, HasSameTypeAs(*type));
 
 	// FIXME: peon/peasant with gold/wood & co are considered from
 	// different type... idem for tankers
@@ -688,7 +689,7 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
-	Map.Select(t0 - range, t1 + range, table);
+	Select(t0 - range, t1 + range, table);
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
 	// 1) search for the player units selectable with rectangle
@@ -776,7 +777,7 @@ int AddSelectedUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
-	Map.Select(tilePos0 - range, tilePos1 + range, table);
+	Select(tilePos0 - range, tilePos1 + range, table);
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 	// If no unit in rectangle area... do nothing
 	if (table.empty()) {
@@ -810,7 +811,7 @@ int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos 
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
-	Map.Select(t0 - range, t1 + range, table);
+	Select(t0 - range, t1 + range, table);
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
 	int n = 0;
@@ -855,7 +856,7 @@ int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &co
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
-	Map.Select(t0 - range, t1 + range, table);
+	Select(t0 - range, t1 + range, table);
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 	int n = 0;
 	for (size_t i = 0; i != table.size(); ++i) {
@@ -913,7 +914,7 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
-	Map.Select(t0 - range, t1 + range, table);
+	Select(t0 - range, t1 + range, table);
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
 	int n = 0;
@@ -975,7 +976,7 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
-	Map.Select(t0 - range, t1 + range, table);
+	Select(t0 - range, t1 + range, table);
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 	int n = 0;
 	for (size_t i = 0; i < table.size(); ++i) {

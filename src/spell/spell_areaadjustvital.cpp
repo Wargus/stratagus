@@ -34,9 +34,9 @@
 
 #include "spell/spell_areaadjustvital.h"
 
-#include "map.h"
 #include "script.h"
 #include "unit.h"
+#include "unit_find.h"
 
 /* virtual */ void Spell_AreaAdjustVital::Parse(lua_State *l, int startIndex, int endIndex)
 {
@@ -76,7 +76,7 @@
 	std::vector<CUnit *> units;
 
 	// Get all the units around the unit
-	Map.Select(goalPos - range, goalPos + typeSize + range, units);
+	Select(goalPos - range, goalPos + typeSize + range, units);
 	int hp = this->HP;
 	int mana = this->Mana;
 	caster.Variable[MANA_INDEX].Value -= spell.ManaCost;

@@ -253,7 +253,7 @@ static CUnit *UnitToRepairInRange(const CUnit &unit, int range)
 {
 	const Vec2i offset(range, range);
 
-	return Map.Find_If(unit.tilePos - offset, unit.tilePos + offset, IsAReparableUnitBy(unit));
+	return FindUnit_If(unit.tilePos - offset, unit.tilePos + offset, IsAReparableUnitBy(unit));
 }
 
 /**

@@ -38,8 +38,8 @@
 #include "missile.h"
 
 #include "actions.h"
-#include "map.h"
 #include "unit.h"
+#include "unit_find.h"
 
 /**
 **  FlameShield controller
@@ -90,7 +90,7 @@ void MissileFlameShield::Action()
 	}
 
 	std::vector<CUnit *> table;
-	Map.SelectAroundUnit(*unit, 1, table);
+	SelectAroundUnit(*unit, 1, table);
 	for (size_t i = 0; i != table.size(); ++i) {
 		if (table[i]->CurrentAction() != UnitActionDie) {
 			HitUnit(this->SourceUnit, *table[i], this->Damage);
