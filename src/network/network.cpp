@@ -806,6 +806,7 @@ void NetworkSendSelection(CUnit **units, int count)
 			NetSendUDP(NetworkFildes, Hosts[teammates[i]].Host, Hosts[teammates[i]].Port,
 					   buf, CNetworkPacketHeader::Size() + CNetworkSelection::Size() * numcommands);
 		}
+		delete [] buf;
 	}
 
 }
