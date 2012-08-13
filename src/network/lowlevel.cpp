@@ -33,8 +33,13 @@
 //  Includes
 //----------------------------------------------------------------------------
 
+#include "stratagus.h"
 
-#include <stddef.h>
+#include "net_lowlevel.h"
+
+#include "network.h"
+
+#include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
 
@@ -42,9 +47,6 @@
 #include <signal.h>
 #endif
 
-#include "stratagus.h"
-#include "net_lowlevel.h"
-#include "network.h"
 
 //----------------------------------------------------------------------------
 //  Declarations

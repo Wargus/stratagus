@@ -35,7 +35,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <SDL_stdinc.h>
+#include <stdint.h>
 #include "net_lowlevel.h"
 
 /*----------------------------------------------------------------------------
@@ -120,13 +120,13 @@ public:
 	void Clear() { this->Unit = this->X = this->Y = this->Dest = 0; }
 
 	void Serialize(unsigned char *p) const;
-	void Deserialize(unsigned char *p);
+	void Deserialize(const unsigned char *p);
 	static size_t Size() { return 2 + 2 + 2 + 2; }
 
-	Uint16 Unit;         /// Command for unit
-	Uint16 X;            /// Map position X
-	Uint16 Y;            /// Map position Y
-	Uint16 Dest;         /// Destination unit
+	uint16_t Unit;         /// Command for unit
+	uint16_t X;            /// Map position X
+	uint16_t Y;            /// Map position Y
+	uint16_t Dest;         /// Destination unit
 };
 
 /**
@@ -137,15 +137,15 @@ class CNetworkExtendedCommand
 public:
 	CNetworkExtendedCommand() : ExtendedType(0), Arg1(0), Arg2(0), Arg3(0), Arg4(0) {}
 
-	void Serialize(unsigned char *p);
-	void Deserialize(unsigned char *p);
+	void Serialize(unsigned char *p) const;
+	void Deserialize(const unsigned char *p);
 	static size_t Size() { return 1 + 1 + 2 + 2 + 2; }
 
-	Uint8  ExtendedType;  /// Extended network command type
-	Uint8  Arg1;          /// Argument 1
-	Uint16 Arg2;          /// Argument 2
-	Uint16 Arg3;          /// Argument 3
-	Uint16 Arg4;          /// Argument 4
+	uint8_t  ExtendedType;  /// Extended network command type
+	uint8_t  Arg1;          /// Argument 1
+	uint16_t Arg2;          /// Argument 2
+	uint16_t Arg3;          /// Argument 3
+	uint16_t Arg4;          /// Argument 4
 };
 
 /**
@@ -159,11 +159,11 @@ public:
 		memset(Text, 0, sizeof(Text));
 	}
 
-	void Serialize(unsigned char *p);
-	void Deserialize(unsigned char *p);
+	void Serialize(unsigned char *p) const ;
+	void Deserialize(const unsigned char *p);
 	static size_t Size() { return 1 + 7; }
 
-	Uint8 Player;   /// Sending player
+	uint8_t Player;   /// Sending player
 	char  Text[7];  /// Message bytes
 };
 
@@ -187,11 +187,11 @@ public:
 		memset(Unit, 0, sizeof(Unit));
 	}
 
-	void Serialize(unsigned char *p);
-	void Deserialize(unsigned char *p);
+	void Serialize(unsigned char *p) const;
+	void Deserialize(const unsigned char *p);
 	static size_t Size() { return 2 * 4; }
 
-	Uint16 Unit[4];  /// Selection Units
+	uint16_t Unit[4];  /// Selection Units
 };
 
 /**
@@ -208,11 +208,11 @@ public:
 	}
 
 	void Serialize(unsigned char *p) const;
-	void Deserialize(unsigned char *p);
+	void Deserialize(const unsigned char *p);
 	static size_t Size() { return 1 + 1 * MaxNetworkCommands; }
 
-	Uint8 Cycle;                     /// Destination game cycle
-	Uint8 Type[MaxNetworkCommands];  /// Commands in packet
+	uint8_t Cycle;                     /// Destination game cycle
+	uint8_t Type[MaxNetworkCommands];  /// Commands in packet
 };
 
 /**
@@ -224,7 +224,7 @@ class CNetworkPacket
 {
 public:
 	unsigned char *Serialize(int numcommands) const;
-	int Deserialize(unsigned char *p, unsigned int len);
+	int Deserialize(const unsigned char *p, unsigned int len);
 	static size_t Size(int numcommands) {
 		return CNetworkPacketHeader::Size() + numcommands * CNetworkCommand::Size();
 	}
