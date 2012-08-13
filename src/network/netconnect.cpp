@@ -33,23 +33,19 @@
 // Includes
 //----------------------------------------------------------------------------
 
-#include <stddef.h>
-
 #include "stratagus.h"
 
 #include "netconnect.h"
 
-#include "net_lowlevel.h"
-#include "player.h"
-#include "map.h"
-#include "network.h"
 #include "interface.h"
+#include "map.h"
 #include "master.h"
-#include "menus.h"
+#include "net_lowlevel.h"
+#include "network.h"
+#include "player.h"
 #include "script.h"
 #include "settings.h"
 #include "version.h"
-
 
 //----------------------------------------------------------------------------
 // Declaration
@@ -107,11 +103,11 @@ unsigned char *CNetworkHost::Serialize() const
 	unsigned char *buf = new unsigned char[CNetworkHost::Size()];
 	unsigned char *p = buf;
 
-	*(Uint32 *)p = this->Host;
+	*(uint32_t *)p = this->Host;
 	p += 4;
-	*(Uint16 *)p = this->Port;
+	*(uint16_t *)p = this->Port;
 	p += 2;
-	*(Uint16 *)p = this->PlyNr;
+	*(uint16_t *)p = this->PlyNr;
 	p += 2;
 	memcpy(p, this->PlyName, sizeof(this->PlyName));
 
@@ -120,11 +116,11 @@ unsigned char *CNetworkHost::Serialize() const
 
 void CNetworkHost::Deserialize(const unsigned char *p)
 {
-	this->Host = *(Uint32 *)p;
+	this->Host = *(uint32_t *)p;
 	p += 4;
-	this->Port = *(Uint16 *)p;
+	this->Port = *(uint16_t *)p;
 	p += 2;
-	this->PlyNr = *(Uint16 *)p;
+	this->PlyNr = *(uint16_t *)p;
 	p += 2;
 	memcpy(this->PlyName, p, sizeof(this->PlyName));
 }
@@ -133,7 +129,6 @@ unsigned char *CServerSetup::Serialize() const
 {
 	unsigned char *buf = new unsigned char[CServerSetup::Size()];
 	unsigned char *p = buf;
-	int i;
 
 	*p++ = this->ResourcesOption;
 	*p++ = this->UnitsOption;
@@ -143,27 +138,24 @@ unsigned char *CServerSetup::Serialize() const
 	*p++ = this->GameTypeOption;
 	*p++ = this->Difficulty;
 	*p++ = this->MapRichness;
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		*p++ = this->CompOpt[i];
 	}
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		*p++ = this->Ready[i];
 	}
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		*p++ = this->Race[i];
 	}
-	for (i = 0; i < PlayerMax; ++i) {
-		*(Uint32 *)p = this->LastFrame[i];
+	for (int i = 0; i < PlayerMax; ++i) {
+		*(uint32_t *)p = this->LastFrame[i];
 		p += 4;
 	}
-
 	return buf;
 }
 
 void CServerSetup::Deserialize(const unsigned char *p)
 {
-	int i;
-
 	this->ResourcesOption = *p++;
 	this->UnitsOption = *p++;
 	this->FogOfWar = *p++;
@@ -172,16 +164,16 @@ void CServerSetup::Deserialize(const unsigned char *p)
 	this->GameTypeOption = *p++;
 	this->Difficulty = *p++;
 	this->MapRichness = *p++;
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		this->CompOpt[i] = *p++;
 	}
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		this->Ready[i] = *p++;
 	}
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		this->Race[i] = *p++;
 	}
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		this->LastFrame[i] = *(Uint32 *)p;
 		p += 4;
 	}
@@ -191,21 +183,20 @@ unsigned char *CInitMessage::Serialize() const
 {
 	unsigned char *buf = new unsigned char[CInitMessage::Size()];
 	unsigned char *p = buf;
-	unsigned char *x;
 
 	*p++ = this->Type;
 	*p++ = this->SubType;
-	*(Sint32 *)p = this->Stratagus;
+	*(int32_t *)p = this->Stratagus;
 	p += 4;
-	*(Sint32 *)p = this->Version;
+	*(int32_t *)p = this->Version;
 	p += 4;
 	*(Uint32 *)p = this->ConfUID;
 	p += 4;
-	*(Uint32 *)p = this->MapUID;
+	*(uint32_t *)p = this->MapUID;
 	p += 4;
-	*(Sint32 *)p = this->Lag;
+	*(int32_t *)p = this->Lag;
 	p += 4;
-	*(Sint32 *)p = this->Updates;
+	*(int32_t *)p = this->Updates;
 	p += 4;
 	*p++ = this->HostsCount;
 
@@ -216,7 +207,7 @@ unsigned char *CInitMessage::Serialize() const
 		case ICMResync:
 		case ICMGo:
 			for (int i = 0; i < PlayerMax; ++i) {
-				x = this->u.Hosts[i].Serialize();
+				unsigned char *x = this->u.Hosts[i].Serialize();
 				memcpy(p, x, CNetworkHost::Size());
 				p += CNetworkHost::Size();
 				delete[] x;
@@ -226,14 +217,14 @@ unsigned char *CInitMessage::Serialize() const
 			memcpy(p, this->u.MapPath, sizeof(this->u.MapPath));
 			p += sizeof(this->u.MapPath);
 			break;
-		case ICMState:
-			x = this->u.State.Serialize();
+		case ICMState: {
+			unsigned char *x = this->u.State.Serialize();
 			memcpy(p, x, CServerSetup::Size());
 			p += CServerSetup::Size();
 			delete[] x;
 			break;
+		}
 	}
-
 	return buf;
 }
 
@@ -241,17 +232,17 @@ void CInitMessage::Deserialize(const unsigned char *p)
 {
 	this->Type = *p++;
 	this->SubType = *p++;
-	this->Stratagus = *(Sint32 *)p;
+	this->Stratagus = *(int32_t *)p;
 	p += 4;
-	this->Version = *(Sint32 *)p;
+	this->Version = *(int32_t *)p;
 	p += 4;
-	this->ConfUID = *(Uint32 *)p;
+	this->ConfUID = *(uint32_t *)p;
 	p += 4;
-	this->MapUID = *(Uint32 *)p;
+	this->MapUID = *(uint32_t *)p;
 	p += 4;
-	this->Lag = *(Sint32 *)p;
+	this->Lag = *(int32_t *)p;
 	p += 4;
-	this->Updates = *(Sint32 *)p;
+	this->Updates = *(int32_t *)p;
 	p += 4;
 	this->HostsCount = *p++;
 
@@ -514,10 +505,6 @@ void NetworkServerResyncClients()
 */
 void NetworkServerStartGame()
 {
-	int h;
-	int i;
-	int j;
-	int n;
 	int num[PlayerMax];
 	int org[PlayerMax];
 	int rev[PlayerMax];
@@ -532,7 +519,8 @@ void NetworkServerStartGame()
 	LocalSetupState = ServerSetupState;
 
 	// Make a list of the available player slots.
-	for (h = i = 0; i < PlayerMax; ++i) {
+	int h = 0;
+	for (int i = 0; i < PlayerMax; ++i) {
 		if (Map.Info.PlayerType[i] == PlayerPerson) {
 			rev[i] = h;
 			num[h++] = i;
@@ -540,15 +528,15 @@ void NetworkServerStartGame()
 		}
 	}
 	// Make a list of the available computer slots.
-	n = h;
-	for (i = 0; i < PlayerMax; ++i) {
+	int n = h;
+	for (int i = 0; i < PlayerMax; ++i) {
 		if (Map.Info.PlayerType[i] == PlayerComputer) {
 			rev[i] = n++;
 			DebugPrint("Slot %d is available for an ai computer player (%d)\n" _C_ i _C_ rev[i]);
 		}
 	}
 	// Make a list of the remaining slots.
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		if (Map.Info.PlayerType[i] != PlayerPerson
 			&& Map.Info.PlayerType[i] != PlayerComputer) {
 			rev[i] = n++;
@@ -558,7 +546,7 @@ void NetworkServerStartGame()
 
 #if 0
 	printf("INITIAL ServerSetupState:\n");
-	for (i = 0; i < PlayerMax - 1; ++i) {
+	for (int i = 0; i < PlayerMax - 1; ++i) {
 		printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
 		if (ServerSetupState.CompOpt[i] == 0) {
 			printf(" %d.%d.%d.%d:%d %s", NIPQUAD(ntohl(Hosts[i].Host)), ntohs(Hosts[i].Port), Hosts[i].PlyName);
@@ -568,9 +556,9 @@ void NetworkServerStartGame()
 #endif
 
 	// Reverse to assign slots to menu setup state positions.
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		org[i] = -1;
-		for (j = 0; j < PlayerMax; ++j) {
+		for (int j = 0; j < PlayerMax; ++j) {
 			if (rev[j] == i) {
 				org[i] = j;
 				break;
@@ -580,7 +568,7 @@ void NetworkServerStartGame()
 
 	// Calculate NetPlayers
 	NetPlayers = h;
-	for (i = 1; i < h; ++i) {
+	for (int i = 1; i < h; ++i) {
 		if (Hosts[i].PlyNr == 0 && ServerSetupState.CompOpt[i] != 0) {
 			NetPlayers--;
 		} else if (Hosts[i].PlyName[0] == 0) {
@@ -592,23 +580,18 @@ void NetworkServerStartGame()
 	}
 
 	// Compact host list.. (account for computer/closed slots in the middle..)
-	for (i = 1; i < h; ++i) {
+	for (int i = 1; i < h; ++i) {
 		if (Hosts[i].PlyNr == 0) {
+			int j;
 			for (j = i + 1; j < PlayerMax - 1; ++j) {
 				if (Hosts[j].PlyNr) {
 					DebugPrint("Compact: Hosts %d -> Hosts %d\n" _C_ j _C_ i);
 					Hosts[i] = Hosts[j];
 					Hosts[j].PlyNr = 0;
 					Hosts[j].Host = Hosts[j].Port = 0;
-					n = LocalSetupState.CompOpt[i];
-					LocalSetupState.CompOpt[i] = LocalSetupState.CompOpt[j];
-					LocalSetupState.CompOpt[j] = n;
-					n = LocalSetupState.Race[i];
-					LocalSetupState.Race[i] = LocalSetupState.Race[j];
-					LocalSetupState.Race[j] = n;
-					n = LocalSetupState.LastFrame[i];
-					LocalSetupState.LastFrame[i] = LocalSetupState.LastFrame[j];
-					LocalSetupState.LastFrame[j] = n;
+					std::swap(LocalSetupState.CompOpt[i], LocalSetupState.CompOpt[j]);
+					std::swap(LocalSetupState.Race[i], LocalSetupState.Race[j]);
+					std::swap(LocalSetupState.LastFrame[i], LocalSetupState.LastFrame[j]);
 					break;
 				}
 			}
@@ -622,15 +605,15 @@ void NetworkServerStartGame()
 	// It can be disabled by writing NoRandomPlacementMultiplayer() in lua files.
 	// Players slots are then mapped to players numbers(and colors).
 
-	j = h;
+	int j = h;
 	if (NoRandomPlacementMultiplayer == 1) {
-		for (i = 0; i < PlayerMax; ++i) {
+		for (int i = 0; i < PlayerMax; ++i) {
 			if (Map.Info.PlayerType[i] != PlayerComputer) {
 				org[i] = Hosts[i].PlyNr;
 			}
 		}
 	} else {
-		for (i = 0; i < NetPlayers; ++i) {
+		for (int i = 0; i < NetPlayers; ++i) {
 			if (j > 0) {
 				int chosen = MyRand() % j;
 
@@ -662,7 +645,7 @@ void NetworkServerStartGame()
 	}
 
 	// Complete all setup states for the assigned slots.
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		num[i] = 1;
 		n = org[i];
 		ServerSetupState.CompOpt[n] = LocalSetupState.CompOpt[i];
@@ -692,7 +675,7 @@ void NetworkServerStartGame()
 	message.SubType = ICMConfig;
 	message.HostsCount = NetPlayers;
 	message.MapUID = htonl(Map.Info.MapUID);
-	for (i = 0; i < NetPlayers; ++i) {
+	for (int i = 0; i < NetPlayers; ++i) {
 		message.u.Hosts[i].Host = Hosts[i].Host;
 		message.u.Hosts[i].Port = Hosts[i].Port;
 		memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, sizeof(message.u.Hosts[i].PlyName) - 1);
@@ -714,13 +697,10 @@ void NetworkServerStartGame()
 
 breakout:
 		// Send to all clients.
-		for (i = 0; i < HostsCount; ++i) {
-			unsigned long host;
-			int port;
-
+		for (int i = 0; i < HostsCount; ++i) {
 			if (num[Hosts[i].PlyNr] == 1) { // not acknowledged yet
-				host = message.u.Hosts[i].Host;
-				port = message.u.Hosts[i].Port;
+				unsigned long host = message.u.Hosts[i].Host;
+				int port = message.u.Hosts[i].Port;
 				message.u.Hosts[i].Host = message.u.Hosts[i].Port = 0;
 				n = NetworkSendICMessage(host, port, &message);
 				DebugPrint("Sending InitConfig Message Config (%d) to %d.%d.%d.%d:%d\n" _C_
@@ -728,8 +708,8 @@ breakout:
 				message.u.Hosts[i].Host = host;
 				message.u.Hosts[i].Port = port;
 			} else if (num[Hosts[i].PlyNr] == 2) {
-				host = message.u.Hosts[i].Host;
-				port = message.u.Hosts[i].Port;
+				unsigned long host = message.u.Hosts[i].Host;
+				int port = message.u.Hosts[i].Port;
 				n = NetworkSendICMessage(host, port, &statemsg);
 				DebugPrint("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n" _C_
 						   n _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
@@ -757,7 +737,7 @@ breakout:
 						DebugPrint("Got ack for InitConfig: (%d) from %d.%d.%d.%d:%d\n" _C_
 								   n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
 
-						for (i = 0; i < HostsCount; ++i) {
+						for (int i = 0; i < HostsCount; ++i) {
 							if (NetLastHost == Hosts[i].Host && NetLastPort == Hosts[i].Port) {
 								if (num[Hosts[i].PlyNr] == 1) {
 									num[Hosts[i].PlyNr]++;
@@ -771,7 +751,7 @@ breakout:
 						DebugPrint("Got ack for InitState: (%d) from %d.%d.%d.%d:%d\n" _C_
 								   n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
 
-						for (i = 0; i < HostsCount; ++i) {
+						for (int i = 0; i < HostsCount; ++i) {
 							if (NetLastHost == Hosts[i].Host && NetLastPort == Hosts[i].Port) {
 								if (num[Hosts[i].PlyNr] == 2) {
 									num[Hosts[i].PlyNr] = 0;
@@ -797,12 +777,9 @@ breakout:
 
 	// Give clients a quick-start kick..
 	message.SubType = ICMGo;
-	for (i = 0; i < HostsCount; ++i) {
-		unsigned long host;
-		int port;
-
-		host = message.u.Hosts[i].Host;
-		port = message.u.Hosts[i].Port;
+	for (int i = 0; i < HostsCount; ++i) {
+		unsigned long host = message.u.Hosts[i].Host;
+		int port = message.u.Hosts[i].Port;
 		n = NetworkSendICMessage(host, port, &message);
 		DebugPrint("Sending InitReply Message Go: (%d) to %d.%d.%d.%d:%d\n" _C_
 				   n _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
@@ -814,22 +791,15 @@ breakout:
 */
 void NetworkGamePrepareGameSettings()
 {
-	int c;
-	int h;
-	int i;
-	int num[PlayerMax];
-	int comp[PlayerMax];
-	int v;
-
 	DebugPrint("NetPlayers = %d\n" _C_ NetPlayers);
 
 	GameSettings.NetGameType = SettingsMultiPlayerGame;
 
 #ifdef DEBUG
-	for (i = 0; i < PlayerMax - 1; i++) {
+	for (int i = 0; i < PlayerMax - 1; i++) {
 		printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
 		if (ServerSetupState.CompOpt[i] == 0) {
-			for (h = 0; h < NetPlayers; h++) {
+			for (int h = 0; h < NetPlayers; h++) {
 				if (Hosts[h].PlyNr == i) {
 					printf("%s", Hosts[h].PlyName);
 				}
@@ -840,7 +810,11 @@ void NetworkGamePrepareGameSettings()
 #endif
 
 	// Make a list of the available player slots.
-	for (c = h = i = 0; i < PlayerMax; i++) {
+	int num[PlayerMax];
+	int comp[PlayerMax];
+	int c = 0;
+	int h = 0;
+	for (int i = 0; i < PlayerMax; i++) {
 		if (Map.Info.PlayerType[i] == PlayerPerson) {
 			num[h++] = i;
 		}
@@ -848,11 +822,11 @@ void NetworkGamePrepareGameSettings()
 			comp[c++] = i; // available computer player slots
 		}
 	}
-	for (i = 0; i < h; i++) {
+	for (int i = 0; i < h; i++) {
 		switch (ServerSetupState.CompOpt[num[i]]) {
-			case 0:
+			case 0: {
 				GameSettings.Presets[num[i]].Type = PlayerPerson;
-				v = ServerSetupState.Race[num[i]];
+				int v = ServerSetupState.Race[num[i]];
 				if (v != 0) {
 					int x = 0;
 
@@ -869,6 +843,7 @@ void NetworkGamePrepareGameSettings()
 					GameSettings.Presets[num[i]].Race = SettingsPresetMapDefault;
 				}
 				break;
+			}
 			case 1:
 				GameSettings.Presets[num[i]].Type = PlayerComputer;
 				break;
@@ -878,7 +853,7 @@ void NetworkGamePrepareGameSettings()
 				break;
 		}
 	}
-	for (i = 0; i < c; i++) {
+	for (int i = 0; i < c; i++) {
 		if (ServerSetupState.CompOpt[comp[i]] == 2) { // closed..
 			GameSettings.Presets[comp[i]].Type = PlayerNobody;
 			DebugPrint("Settings[%d].Type == Closed\n" _C_ comp[i]);
@@ -886,9 +861,8 @@ void NetworkGamePrepareGameSettings()
 	}
 
 #ifdef DEBUG
-	for (i = 0; i < NetPlayers; i++) {
+	for (int i = 0; i < NetPlayers; i++) {
 		Assert(GameSettings.Presets[Hosts[i].PlyNr].Type == PlayerPerson);
-		;
 	}
 #endif
 }
@@ -1125,9 +1099,9 @@ void NetworkProcessServerRequest()
 **
 ** @param msg message received
 */
-static void ClientParseDisconnected(const CInitMessage *msg)
+static void ClientParseDisconnected(const CInitMessage &msg)
 {
-	DebugPrint("ccs_disconnected: Server sending GoodBye dups %d\n" _C_ msg->SubType);
+	DebugPrint("ccs_disconnected: Server sending GoodBye dups %d\n" _C_ msg.SubType);
 }
 #endif
 
@@ -1136,9 +1110,9 @@ static void ClientParseDisconnected(const CInitMessage *msg)
 **
 ** @param msg message received
 */
-static void ClientParseDetaching(const CInitMessage *msg)
+static void ClientParseDetaching(const CInitMessage &msg)
 {
-	switch (msg->SubType) {
+	switch (msg.SubType) {
 
 		case ICMGoodBye: // Server has let us go
 			NetLocalState = ccs_disconnected;
@@ -1146,7 +1120,7 @@ static void ClientParseDetaching(const CInitMessage *msg)
 			break;
 
 		default:
-			DebugPrint("ccs_detaching: Unhandled subtype %d\n" _C_ msg->SubType);
+			DebugPrint("ccs_detaching: Unhandled subtype %d\n" _C_ msg.SubType);
 			break;
 	}
 }
@@ -1156,16 +1130,16 @@ static void ClientParseDetaching(const CInitMessage *msg)
 **
 ** @param msg message received
 */
-static void ClientParseConnecting(const CInitMessage *msg)
+static void ClientParseConnecting(const CInitMessage &msg)
 {
-	switch (msg->SubType) {
+	switch (msg.SubType) {
 
 		case ICMEngineMismatch: // Stratagus engine version doesn't match
 			fprintf(stderr, "Incompatible Stratagus version "
 					StratagusFormatString " <-> "
 					StratagusFormatString "\n"
 					"from %d.%d.%d.%d:%d\n",
-					StratagusFormatArgs((int)ntohl(msg->Stratagus)),
+					StratagusFormatArgs((int)ntohl(msg.Stratagus)),
 					StratagusFormatArgs(StratagusVersion),
 					NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 			NetLocalState = ccs_incompatibleengine;
@@ -1177,7 +1151,7 @@ static void ClientParseConnecting(const CInitMessage *msg)
 					NetworkProtocolFormatString " <-> "
 					NetworkProtocolFormatString "\n"
 					"from %d.%d.%d.%d:%d\n",
-					NetworkProtocolFormatArgs((int)ntohl(msg->Version)),
+					NetworkProtocolFormatArgs((int)ntohl(msg.Version)),
 					NetworkProtocolFormatArgs(NetworkProtocolVersion),
 					NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 			NetLocalState = ccs_incompatiblenetwork;
@@ -1194,20 +1168,20 @@ static void ClientParseConnecting(const CInitMessage *msg)
 		case ICMWelcome: // Server has accepted us
 			NetLocalState = ccs_connected;
 			NetStateMsgCnt = 0;
-			NetLocalHostsSlot = ntohs(msg->u.Hosts[0].PlyNr);
-			memcpy(Hosts[0].PlyName, msg->u.Hosts[0].PlyName, sizeof(Hosts[0].PlyName) - 1); // Name of server player
-			NetworkLag = ntohl(msg->Lag);
-			NetworkUpdates = ntohl(msg->Updates);
+			NetLocalHostsSlot = ntohs(msg.u.Hosts[0].PlyNr);
+			memcpy(Hosts[0].PlyName, msg.u.Hosts[0].PlyName, sizeof(Hosts[0].PlyName) - 1); // Name of server player
+			NetworkLag = ntohl(msg.Lag);
+			NetworkUpdates = ntohl(msg.Updates);
 
 			Hosts[0].Host = NetworkServerIP;
 			Hosts[0].Port = htons(NetworkServerPort);
 			for (int i = 1; i < PlayerMax; ++i) {
 				if (i != NetLocalHostsSlot) {
-					Hosts[i].Host = msg->u.Hosts[i].Host;
-					Hosts[i].Port = msg->u.Hosts[i].Port;
-					Hosts[i].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
+					Hosts[i].Host = msg.u.Hosts[i].Host;
+					Hosts[i].Port = msg.u.Hosts[i].Port;
+					Hosts[i].PlyNr = ntohs(msg.u.Hosts[i].PlyNr);
 					if (Hosts[i].PlyNr) {
-						memcpy(Hosts[i].PlyName, msg->u.Hosts[i].PlyName, sizeof(Hosts[i].PlyName) - 1);
+						memcpy(Hosts[i].PlyName, msg.u.Hosts[i].PlyName, sizeof(Hosts[i].PlyName) - 1);
 					}
 				} else {
 					Hosts[i].PlyNr = i;
@@ -1220,9 +1194,8 @@ static void ClientParseConnecting(const CInitMessage *msg)
 			break;
 
 		default:
-			DebugPrint("ccs_connecting: Unhandled subtype %d\n" _C_ msg->SubType);
+			DebugPrint("ccs_connecting: Unhandled subtype %d\n" _C_ msg.SubType);
 			break;
-
 	}
 }
 
@@ -1266,23 +1239,23 @@ static bool IsSafeMapName(const char *mapname)
 **
 ** @param msg message received
 */
-static void ClientParseConnected(const CInitMessage *msg)
+static void ClientParseConnected(const CInitMessage &msg)
 {
-	switch (msg->SubType) {
+	switch (msg.SubType) {
 		case ICMMap: { // Server has sent us new map info
-			if (!IsSafeMapName(msg->u.MapPath)) {
+			if (!IsSafeMapName(msg.u.MapPath)) {
 				fprintf(stderr, "Unsecure map name!\n");
 				NetLocalState = ccs_badmap;
 				break;
 			}
-			NetworkMapName = std::string(msg->u.MapPath, sizeof(msg->u.MapPath));
+			NetworkMapName = std::string(msg.u.MapPath, sizeof(msg.u.MapPath));
 			std::string mappath = StratagusLibPath + "/" + NetworkMapName;
 			LoadStratagusMapInfo(mappath);
-			if (ntohl(msg->MapUID) != Map.Info.MapUID) {
+			if (ntohl(msg.MapUID) != Map.Info.MapUID) {
 				NetLocalState = ccs_badmap;
 				fprintf(stderr, "Stratagus maps do not match (0x%08x) <-> (0x%08x)\n",
 						(unsigned int)Map.Info.MapUID,
-						(unsigned int)ntohl(msg->MapUID));
+						(unsigned int)ntohl(msg.MapUID));
 				break;
 			}
 			NetLocalState = ccs_mapinfo;
@@ -1294,7 +1267,7 @@ static void ClientParseConnected(const CInitMessage *msg)
 			break;
 
 		default:
-			DebugPrint("ccs_connected: Unhandled subtype %d\n" _C_ msg->SubType);
+			DebugPrint("ccs_connected: Unhandled subtype %d\n" _C_ msg.SubType);
 			break;
 	}
 }
@@ -1304,18 +1277,18 @@ static void ClientParseConnected(const CInitMessage *msg)
 **
 ** @param msg message received
 */
-static void ClientParseMapInfo(const CInitMessage *msg)
+static void ClientParseMapInfo(const CInitMessage &msg)
 {
-	switch (msg->SubType) {
+	switch (msg.SubType) {
 
 		case ICMState: // Server has sent us first state info
-			ServerSetupState = msg->u.State;
+			ServerSetupState = msg.u.State;
 			NetLocalState = ccs_synced;
 			NetStateMsgCnt = 0;
 			break;
 
 		default:
-			DebugPrint("ccs_mapinfo: Unhandled subtype %d\n" _C_ msg->SubType);
+			DebugPrint("ccs_mapinfo: Unhandled subtype %d\n" _C_ msg.SubType);
 			break;
 	}
 }
@@ -1325,53 +1298,52 @@ static void ClientParseMapInfo(const CInitMessage *msg)
 **
 ** @param msg message received
 */
-static void ClientParseSynced(const CInitMessage *msg)
+static void ClientParseSynced(const CInitMessage &msg)
 {
-	int i;
-
-	switch (msg->SubType) {
+	switch (msg.SubType) {
 
 		case ICMState: // Server has sent us new state info
 			DebugPrint("ccs_synced: ICMState recieved\n");
-			ServerSetupState = msg->u.State;
+			ServerSetupState = msg.u.State;
 			NetLocalState = ccs_async;
 			NetStateMsgCnt = 0;
 			break;
 
-		case ICMConfig: // Server gives the go ahead.. - start game
-			DebugPrint("ccs_synced: Config subtype %d received - starting\n" _C_ msg->SubType);
+		case ICMConfig: { // Server gives the go ahead.. - start game
+			DebugPrint("ccs_synced: Config subtype %d received - starting\n" _C_ msg.SubType);
 			HostsCount = 0;
-			for (i = 0; i < msg->HostsCount - 1; ++i) {
-				if (msg->u.Hosts[i].Host || msg->u.Hosts[i].Port) {
-					Hosts[HostsCount].Host = msg->u.Hosts[i].Host;
-					Hosts[HostsCount].Port = msg->u.Hosts[i].Port;
-					Hosts[HostsCount].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
-					memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[i].PlyName, sizeof(Hosts[HostsCount].PlyName) - 1);
+			int i;
+			for (i = 0; i < msg.HostsCount - 1; ++i) {
+				if (msg.u.Hosts[i].Host || msg.u.Hosts[i].Port) {
+					Hosts[HostsCount].Host = msg.u.Hosts[i].Host;
+					Hosts[HostsCount].Port = msg.u.Hosts[i].Port;
+					Hosts[HostsCount].PlyNr = ntohs(msg.u.Hosts[i].PlyNr);
+					memcpy(Hosts[HostsCount].PlyName, msg.u.Hosts[i].PlyName, sizeof(Hosts[HostsCount].PlyName) - 1);
 					HostsCount++;
 					DebugPrint("Client %d = %d.%d.%d.%d:%d [%.*s]\n" _C_
-							   ntohs(ntohs(msg->u.Hosts[i].PlyNr)) _C_ NIPQUAD(ntohl(msg->u.Hosts[i].Host)) _C_
-							   ntohs(msg->u.Hosts[i].Port) _C_
-							   static_cast<int>(sizeof(msg->u.Hosts[i].PlyName)) _C_
-							   msg->u.Hosts[i].PlyName);
+							   ntohs(ntohs(msg.u.Hosts[i].PlyNr)) _C_ NIPQUAD(ntohl(msg.u.Hosts[i].Host)) _C_
+							   ntohs(msg.u.Hosts[i].Port) _C_
+							   static_cast<int>(sizeof(msg.u.Hosts[i].PlyName)) _C_
+							   msg.u.Hosts[i].PlyName);
 				} else { // Own client
-					NetLocalPlayerNumber = ntohs(msg->u.Hosts[i].PlyNr);
-					DebugPrint("SELF %d [%.*s]\n" _C_ ntohs(msg->u.Hosts[i].PlyNr) _C_
-							   static_cast<int>(sizeof(msg->u.Hosts[i].PlyName)) _C_
-							   msg->u.Hosts[i].PlyName);
+					NetLocalPlayerNumber = ntohs(msg.u.Hosts[i].PlyNr);
+					DebugPrint("SELF %d [%.*s]\n" _C_ ntohs(msg.u.Hosts[i].PlyNr) _C_
+							   static_cast<int>(sizeof(msg.u.Hosts[i].PlyName)) _C_
+							   msg.u.Hosts[i].PlyName);
 				}
 			}
 			// server is last:
 			Hosts[HostsCount].Host = NetLastHost;
 			Hosts[HostsCount].Port = NetLastPort;
-			Hosts[HostsCount].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
-			memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[i].PlyName, sizeof(Hosts[HostsCount].PlyName) - 1);
+			Hosts[HostsCount].PlyNr = ntohs(msg.u.Hosts[i].PlyNr);
+			memcpy(Hosts[HostsCount].PlyName, msg.u.Hosts[i].PlyName, sizeof(Hosts[HostsCount].PlyName) - 1);
 			++HostsCount;
 			NetPlayers = HostsCount + 1;
 			DebugPrint("Server %d = %d.%d.%d.%d:%d [%.*s]\n" _C_
-					   ntohs(msg->u.Hosts[i].PlyNr) _C_ NIPQUAD(ntohl(NetLastHost)) _C_
+					   ntohs(msg.u.Hosts[i].PlyNr) _C_ NIPQUAD(ntohl(NetLastHost)) _C_
 					   ntohs(NetLastPort) _C_
-					   static_cast<int>(sizeof(msg->u.Hosts[i].PlyName)) _C_
-					   msg->u.Hosts[i].PlyName);
+					   static_cast<int>(sizeof(msg.u.Hosts[i].PlyName)) _C_
+					   msg.u.Hosts[i].PlyName);
 
 			// put ourselves to the end, like on the server..
 			Hosts[HostsCount].Host = 0;
@@ -1384,9 +1356,9 @@ static void ClientParseSynced(const CInitMessage *msg)
 			NetLocalState = ccs_goahead;
 			NetStateMsgCnt = 0;
 			break;
-
+		}
 		default:
-			DebugPrint("ccs_synced: Unhandled subtype %d\n" _C_ msg->SubType);
+			DebugPrint("ccs_synced: Unhandled subtype %d\n" _C_ msg.SubType);
 			break;
 	}
 }
@@ -1396,22 +1368,22 @@ static void ClientParseSynced(const CInitMessage *msg)
 **
 ** @param msg message received
 */
-static void ClientParseAsync(const CInitMessage *msg)
+static void ClientParseAsync(const CInitMessage &msg)
 {
-	switch (msg->SubType) {
+	switch (msg.SubType) {
 
 		case ICMResync: // Server has resynced with us and sends resync data
 			DebugPrint("ccs_async: ICMResync\n");
 			for (int i = 1; i < PlayerMax - 1; ++i) {
 				if (i != NetLocalHostsSlot) {
-					Hosts[i].Host = msg->u.Hosts[i].Host;
-					Hosts[i].Port = msg->u.Hosts[i].Port;
-					Hosts[i].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
+					Hosts[i].Host = msg.u.Hosts[i].Host;
+					Hosts[i].Port = msg.u.Hosts[i].Port;
+					Hosts[i].PlyNr = ntohs(msg.u.Hosts[i].PlyNr);
 					if (Hosts[i].PlyNr) {
-						memcpy(Hosts[i].PlyName, msg->u.Hosts[i].PlyName, sizeof(Hosts[i].PlyName) - 1);
+						memcpy(Hosts[i].PlyName, msg.u.Hosts[i].PlyName, sizeof(Hosts[i].PlyName) - 1);
 					}
 				} else {
-					Hosts[i].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
+					Hosts[i].PlyNr = ntohs(msg.u.Hosts[i].PlyNr);
 					strncpy_s(Hosts[i].PlyName,
 							  sizeof(Hosts[i].PlyName),
 							  Parameters::Instance.LocalPlayerName.c_str(),
@@ -1423,7 +1395,7 @@ static void ClientParseAsync(const CInitMessage *msg)
 			break;
 
 		default:
-			DebugPrint("ccs_async: Unhandled subtype %d\n" _C_ msg->SubType);
+			DebugPrint("ccs_async: Unhandled subtype %d\n" _C_ msg.SubType);
 			break;
 	}
 }
@@ -1433,22 +1405,22 @@ static void ClientParseAsync(const CInitMessage *msg)
 **
 ** @param msg message received
 */
-static void ClientParseGoAhead(const CInitMessage *msg)
+static void ClientParseGoAhead(const CInitMessage &msg)
 {
-	switch (msg->SubType) {
+	switch (msg.SubType) {
 
 		case ICMConfig: // Server go ahead dup - ignore..
 			break;
 
 		case ICMState: // Server has sent final state info
-			DebugPrint("ccs_goahead: Final State subtype %d received - starting\n" _C_ msg->SubType);
-			ServerSetupState = msg->u.State;
+			DebugPrint("ccs_goahead: Final State subtype %d received - starting\n" _C_ msg.SubType);
+			ServerSetupState = msg.u.State;
 			NetLocalState = ccs_started;
 			NetStateMsgCnt = 0;
 			break;
 
 		default:
-			DebugPrint("ccs_goahead: Unhandled subtype %d\n" _C_ msg->SubType);
+			DebugPrint("ccs_goahead: Unhandled subtype %d\n" _C_ msg.SubType);
 			break;
 	}
 }
@@ -1458,9 +1430,9 @@ static void ClientParseGoAhead(const CInitMessage *msg)
 **
 ** @param msg message received
 */
-static void ClientParseStarted(const CInitMessage *msg)
+static void ClientParseStarted(const CInitMessage &msg)
 {
-	switch (msg->SubType) {
+	switch (msg.SubType) {
 
 		case ICMGo: // Server's final go ..
 			DebugPrint("ClientParseStarted ICMGo !!!!!\n");
@@ -1468,7 +1440,7 @@ static void ClientParseStarted(const CInitMessage *msg)
 			break;
 
 		default:
-			DebugPrint("ccs_started: Unhandled subtype %d\n" _C_ msg->SubType);
+			DebugPrint("ccs_started: Unhandled subtype %d\n" _C_ msg.SubType);
 			break;
 	}
 }
@@ -1478,7 +1450,7 @@ static void ClientParseStarted(const CInitMessage *msg)
 **
 ** @param msg message received
 */
-static void ClientParseAreYouThere(const CInitMessage *)
+static void ClientParseAreYouThere()
 {
 	CInitMessage message;
 
@@ -1489,10 +1461,8 @@ static void ClientParseAreYouThere(const CInitMessage *)
 
 /**
 ** Parse a network menu Bad Map reply from server.
-**
-** @param msg message received
 */
-static void ClientParseBadMap(const CInitMessage *)
+static void ClientParseBadMap()
 {
 	CInitMessage message;
 
@@ -1512,7 +1482,7 @@ static void ClientParseBadMap(const CInitMessage *)
 ** @param h slot number of host msg originates from
 ** @param msg message received
 */
-static void ServerParseHello(int h, const CInitMessage *msg)
+static void ServerParseHello(int h, const CInitMessage &msg)
 {
 	if (h == -1) { // it is a new client
 		for (int i = 1; i < PlayerMax - 1; ++i) {
@@ -1528,7 +1498,7 @@ static void ServerParseHello(int h, const CInitMessage *msg)
 			Hosts[h].Host = NetLastHost;
 			Hosts[h].Port = NetLastPort;
 			Hosts[h].PlyNr = h;
-			memcpy(Hosts[h].PlyName, msg->u.Hosts[0].PlyName, sizeof(Hosts[h].PlyName) - 1);
+			memcpy(Hosts[h].PlyName, msg.u.Hosts[0].PlyName, sizeof(Hosts[h].PlyName) - 1);
 			DebugPrint("New client %d.%d.%d.%d:%d [%s]\n" _C_
 					   NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort) _C_ Hosts[h].PlyName);
 			NetStates[h].State = ccs_connecting;
@@ -1770,7 +1740,7 @@ static void ServerParseMap(const int h)
 ** @param h slot number of host msg originates from
 ** @param msg message received
 */
-static void ServerParseState(const int h, const CInitMessage *msg)
+static void ServerParseState(const int h, const CInitMessage &msg)
 {
 	CInitMessage message;
 
@@ -1784,8 +1754,8 @@ static void ServerParseState(const int h, const CInitMessage *msg)
 			// NetStates[h].State = ccs_async;
 			NetStates[h].MsgCnt = 0;
 			// Use information supplied by the client:
-			ServerSetupState.Ready[h] = msg->u.State.Ready[h];
-			ServerSetupState.Race[h] = msg->u.State.Race[h];
+			ServerSetupState.Ready[h] = msg.u.State.Ready[h];
+			ServerSetupState.Race[h] = msg.u.State.Race[h];
 			// Add additional info usage here!
 
 			// Resync other clients (and us..)
@@ -1893,16 +1863,16 @@ static void ServerParseIAmHere(const int h)
 **
 ** @return 0 if the versions match, -1 otherwise
 */
-static int CheckVersions(const CInitMessage *msg)
+static int CheckVersions(const CInitMessage &msg)
 {
 	CInitMessage message;
 
-	if (ntohl(msg->Stratagus) != StratagusVersion) {
+	if (ntohl(msg.Stratagus) != StratagusVersion) {
 		fprintf(stderr, "Incompatible Stratagus version "
 				StratagusFormatString " <-> "
 				StratagusFormatString "\n"
 				"from %d.%d.%d.%d:%d\n",
-				StratagusFormatArgs((int)ntohl(msg->Stratagus)),
+				StratagusFormatArgs((int)ntohl(msg.Stratagus)),
 				StratagusFormatArgs(StratagusVersion),
 				NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 
@@ -1917,12 +1887,12 @@ static int CheckVersions(const CInitMessage *msg)
 		return -1;
 	}
 
-	if (ntohl(msg->Version) != NetworkProtocolVersion) {
+	if (ntohl(msg.Version) != NetworkProtocolVersion) {
 		fprintf(stderr, "Incompatible network protocol version "
 				NetworkProtocolFormatString " <-> "
 				NetworkProtocolFormatString "\n"
 				"from %d.%d.%d.%d:%d\n",
-				NetworkProtocolFormatArgs((int)ntohl(msg->Version)),
+				NetworkProtocolFormatArgs((int)ntohl(msg.Version)),
 				NetworkProtocolFormatArgs(NetworkProtocolVersion),
 				NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 
@@ -1936,7 +1906,6 @@ static int CheckVersions(const CInitMessage *msg)
 				   n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
 		return -1;
 	}
-
 	return 0;
 }
 
@@ -1945,22 +1914,22 @@ static int CheckVersions(const CInitMessage *msg)
 **
 ** @param msg message received
 */
-static void NetworkParseMenuPacket(const CInitMessage *msg)
+static void NetworkParseMenuPacket(const CInitMessage &msg)
 {
 	DebugPrint("Received %s Init Message %d:%d from %d.%d.%d.%d:%d (%ld)\n" _C_
-			   icmsgsubtypenames[msg->SubType] _C_ msg->Type _C_ msg->SubType _C_ NIPQUAD(ntohl(NetLastHost)) _C_
+			   icmsgsubtypenames[msg.SubType] _C_ msg.Type _C_ msg.SubType _C_ NIPQUAD(ntohl(NetLastHost)) _C_
 			   ntohs(NetLastPort) _C_ FrameCounter);
 
 	if (NetConnectRunning == 2) { // client
-		if (msg->Type == MessageInitReply) {
-			if (msg->SubType == ICMServerQuit) { // Server user canceled, should work in all states
+		if (msg.Type == MessageInitReply) {
+			if (msg.SubType == ICMServerQuit) { // Server user canceled, should work in all states
 				NetLocalState = ccs_serverquits;
 				NetConnectRunning = 0; // End the menu..
 				// No ack here - Server will spew out a few Quit msgs, which has to be enough
 				return;
 			}
-			if (msg->SubType == ICMAYT) { // Server is checking for our presence
-				ClientParseAreYouThere(msg);
+			if (msg.SubType == ICMAYT) { // Server is checking for our presence
+				ClientParseAreYouThere();
 				return;
 			}
 			switch (NetLocalState) {
@@ -2000,7 +1969,7 @@ static void NetworkParseMenuPacket(const CInitMessage *msg)
 					break;
 
 				case ccs_badmap:
-					ClientParseBadMap(msg);
+					ClientParseBadMap();
 					break;
 
 				case ccs_started:
@@ -2023,7 +1992,7 @@ static void NetworkParseMenuPacket(const CInitMessage *msg)
 		// look up the host - avoid last player slot (15) which is special
 		for (i = 0; i < PlayerMax - 1; ++i) {
 			if (Hosts[i].Host == NetLastHost && Hosts[i].Port == NetLastPort) {
-				switch (msg->SubType) {
+				switch (msg.SubType) {
 					case ICMHello: // a new client has arrived
 						ServerParseHello(i, msg);
 						break;
@@ -2058,13 +2027,13 @@ static void NetworkParseMenuPacket(const CInitMessage *msg)
 						break;
 
 					default:
-						DebugPrint("Server: Unhandled subtype %d from host %d\n" _C_ msg->SubType _C_ i);
+						DebugPrint("Server: Unhandled subtype %d from host %d\n" _C_ msg.SubType _C_ i);
 						break;
 				}
 				break;
 			}
 		}
-		if (i == PlayerMax - 1 && msg->SubType == ICMHello) {
+		if (i == PlayerMax - 1 && msg.SubType == ICMHello) {
 			// Special case: a new client has arrived
 			ServerParseHello(-1, msg);
 		}
@@ -2106,7 +2075,7 @@ int NetworkParseSetupEvent(const unsigned char *buf, int size)
 	}
 
 	if (InterfaceState == IfaceStateMenu) {
-		NetworkParseMenuPacket(&msg);
+		NetworkParseMenuPacket(msg);
 		return 1;
 	}
 	return 0;

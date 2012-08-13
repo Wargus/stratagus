@@ -32,7 +32,7 @@
 //@{
 
 #include <string>
-#include "SDL.h"
+#include <stdint.h>
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -76,10 +76,10 @@ public:
 	void Deserialize(const unsigned char *p);
 	static size_t Size() { return 4 + 2 + 2 + NetPlayerNameSize; }
 
-	Uint32 Host;         /// Host address
-	Uint16 Port;         /// Port on host
-	Uint16 PlyNr;        /// Player nummer
-	char   PlyName[NetPlayerNameSize];  /// Name of player
+	uint32_t Host;         /// Host address
+	uint16_t Port;         /// Port on host
+	uint16_t PlyNr;        /// Player number
+	char PlyName[NetPlayerNameSize];  /// Name of player
 };
 
 /**
@@ -108,18 +108,18 @@ public:
 		memset(LastFrame, 0, sizeof(LastFrame));
 	}
 
-	Uint32  ResourcesOption;       /// Resources option
-	Uint32  UnitsOption;           /// Unit # option
-	Uint32  FogOfWar;              /// Fog of war option
-	Uint32  RevealMap;             /// Reveal all the map
-	Uint32  TilesetSelection;      /// Tileset select option
-	Uint32  GameTypeOption;        /// Game type option
-	Uint32  Difficulty;            /// Difficulty option
-	Uint32  MapRichness;           /// Map richness option
-	Uint32  CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
-	Uint32  Ready[PlayerMax];      /// Client ready state
-	Uint32  Race[PlayerMax];       /// Client race selection
-	Uint32  LastFrame[PlayerMax];  /// Last message received
+	uint32_t  ResourcesOption;       /// Resources option
+	uint32_t  UnitsOption;           /// Unit # option
+	uint32_t  FogOfWar;              /// Fog of war option
+	uint32_t  RevealMap;             /// Reveal all the map
+	uint32_t  TilesetSelection;      /// Tileset select option
+	uint32_t  GameTypeOption;        /// Game type option
+	uint32_t  Difficulty;            /// Difficulty option
+	uint32_t  MapRichness;           /// Map richness option
+	uint32_t  CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
+	uint32_t  Ready[PlayerMax];      /// Client ready state
+	uint32_t  Race[PlayerMax];       /// Client race selection
+	uint32_t  LastFrame[PlayerMax];  /// Last message received
 	// Fill in here...
 };
 
@@ -136,15 +136,15 @@ public:
 	void Deserialize(const unsigned char *p);
 	static size_t Size() { return 1 + 1 + 4 + 4 + 4 + 4 + 4 + 4 + 1 + 256 + CNetworkHost::Size() * PlayerMax + CServerSetup::Size(); }
 
-	Uint8  Type;        /// Init message type
-	Uint8  SubType;     /// Init message subtype
-	Sint32 Stratagus;   /// Stratagus engine version
-	Sint32 Version;     /// Network protocol version
-	Uint32 ConfUID;     /// Engine configuration UID (Checksum) FIXME: not available yet
-	Uint32 MapUID;      /// UID of map to play. FIXME: add MAP name, path, etc
-	Sint32 Lag;         /// Lag time
-	Sint32 Updates;     /// Update frequency
-	Uint8  HostsCount;  /// Number of hosts
+	uint8_t  Type;        /// Init message type
+	uint8_t  SubType;     /// Init message subtype
+	int32_t Stratagus;    /// Stratagus engine version
+	int32_t Version;      /// Network protocol version
+	uint32_t ConfUID;     /// Engine configuration UID (Checksum) FIXME: not available yet
+	uint32_t MapUID;      /// UID of map to play. FIXME: add MAP name, path, etc
+	int32_t Lag;          /// Lag time
+	int32_t Updates;      /// Update frequency
+	uint8_t HostsCount;   /// Number of hosts
 
 	union {
 		CNetworkHost Hosts[PlayerMax]; /// Participant information
