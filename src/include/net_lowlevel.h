@@ -134,9 +134,9 @@ extern unsigned long NetResolveHost(const std::string &host);
 /// Get local IP from network file descriptor
 extern int NetSocketAddr(const Socket sock);
 /// Open a UDP Socket port.
-extern Socket NetOpenUDP(char *addr, int port);
+extern Socket NetOpenUDP(const char *addr, int port);
 /// Open a TCP Socket port.
-extern Socket NetOpenTCP(char *addr, int port);
+extern Socket NetOpenTCP(const char *addr, int port);
 /// Close a UDP socket port.
 extern void NetCloseUDP(Socket sockfd);
 /// Close a TCP socket port.
