@@ -234,7 +234,6 @@ private:
 **  Races for the player
 **  Mapped with #PlayerRaces to a symbolic name.
 */
-#define MAX_RACES 8
 class PlayerRace
 {
 public:

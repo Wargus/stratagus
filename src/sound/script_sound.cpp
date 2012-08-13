@@ -35,8 +35,10 @@
 
 #include "stratagus.h"
 
-#include "script.h"
 #include "sound.h"
+
+#include "player.h"
+#include "script.h"
 #include "sound_server.h"
 
 /*----------------------------------------------------------------------------

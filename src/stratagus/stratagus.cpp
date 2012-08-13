@@ -201,6 +201,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "map.h"
 #include "netconnect.h"
 #include "network.h"
+#include "player.h"
 #include "replay.h"
 #include "results.h"
 #include "settings.h"

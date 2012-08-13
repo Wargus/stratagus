@@ -37,12 +37,12 @@
 
 #include "stratagus.h"
 
-#include "SDL.h"
-
 #include "sound_server.h"
-#include "iolib.h"
-#include "iocompat.h"
 
+#include "iocompat.h"
+#include "iolib.h"
+
+#include "SDL.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -506,6 +506,29 @@ void StopAllChannels()
 	SDL_UnlockAudio();
 }
 
+static CSample *LoadSample(const char *name, enum _play_audio_flags_ flag)
+{
+	CSample *sampleWav = LoadWav(name, flag);
+
+	if (sampleWav) {
+		return sampleWav;
+	}
+#ifdef USE_VORBIS
+	CSample *sampleVorbis = LoadVorbis(name, flag);
+	if (sampleVorbis) {
+		return sampleVorbis;
+	}
+#endif
+#ifdef USE_MIKMOD
+	CSample *sampleMikMod = LoadMikMod(name, flag);
+	if (sampleMikMod) {
+		return sampleMikMod;
+	}
+#endif
+	return NULL;
+}
+
+
 /**
 **  Load a sample
 **
@@ -520,24 +543,11 @@ CSample *LoadSample(const std::string &name)
 	char buf[PATH_MAX];
 
 	LibraryFileName(name.c_str(), buf, sizeof(buf));
-	CSample *sample = LoadWav(buf, PlayAudioLoadInMemory);
+	CSample *sample = LoadSample(buf, PlayAudioLoadInMemory);
 
-	if (sample) {
-		return sample;
+	if (sample == NULL) {
+		fprintf(stderr, "Can't load the sound `%s'\n", name.c_str());
 	}
-#ifdef USE_VORBIS
-	sample = LoadVorbis(buf, PlayAudioLoadInMemory);
-	if (sample) {
-		return sample;
-	}
-#endif
-#ifdef USE_MIKMOD
-	sample = LoadMikMod(buf, PlayAudioLoadInMemory);
-	if (sample) {
-		return sample;
-	}
-#endif
-	fprintf(stderr, "Can't load the sound `%s'\n", name.c_str());
 	return sample;
 }
 
@@ -658,21 +668,8 @@ int PlayMusic(const std::string &file)
 	char name[PATH_MAX];
 
 	LibraryFileName(file.c_str(), name, sizeof(name));
-
 	DebugPrint("play music %s\n" _C_ name);
-
-	CSample *sample = LoadWav(name, PlayAudioStream);
-
-#ifdef USE_VORBIS
-	if (!sample) {
-		sample = LoadVorbis(name, PlayAudioStream);
-	}
-#endif
-#ifdef USE_MIKMOD
-	if (!sample) {
-		sample = LoadMikMod(name, PlayAudioStream);
-	}
-#endif
+	CSample *sample = LoadSample(name, PlayAudioStream);
 
 	if (sample) {
 		StopMusic();

@@ -172,6 +172,7 @@ extern const char NameLine[];
 #define PlayerMax    16                 /// How many players are supported
 #define UnitTypeMax  2048                /// How many unit types supported
 #define UpgradeMax   2048                /// How many upgrades supported
+#define MAX_RACES 8
 
 /// Frames per second to display (original 30-40)
 #define FRAMES_PER_SECOND  30  // 1/30s
