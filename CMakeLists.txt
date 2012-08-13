@@ -202,7 +202,7 @@ source_group(missile FILES ${missile_SRCS})
 
 set(network_SRCS
 	src/network/commands.cpp
-	src/network/lowlevel.cpp
+	src/network/net_lowlevel.cpp
 	src/network/master.cpp
 	src/network/netconnect.cpp
 	src/network/network.cpp
@@ -925,7 +925,7 @@ set(metaserver_SRCS
 	metaserver/games.cpp
 	metaserver/main.cpp
 	metaserver/netdriver.cpp
-	src/network/lowlevel.cpp
+	src/network/net_lowlevel.cpp
 )
 
 set(metaserver_HDRS
