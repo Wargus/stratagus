@@ -304,6 +304,7 @@ set(unit_SRCS
 source_group(unit FILES ${unit_SRCS})
 
 set(video_SRCS
+	src/video/color.cpp
 	src/video/cursor.cpp
 	src/video/font.cpp
 	src/video/graphic.cpp
@@ -477,6 +478,7 @@ set(stratagus_generic_HDRS
 	src/include/actions.h
 	src/include/ai.h
 	src/include/animation.h
+	src/include/color.h
 	src/include/commands.h
 	src/include/construct.h
 	src/include/cursor.h

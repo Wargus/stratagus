@@ -40,9 +40,10 @@
 #else
 #include "SDL_opengl.h"
 #endif
+
 #include "guichan.h"
 
-
+#include "color.h"
 #include "vec2i.h"
 
 class CFont;
@@ -176,25 +177,6 @@ public:
 	GLuint texture_name;     /// Texture name
 };
 #endif
-
-/// A platform independent color
-class CColor
-{
-public:
-	CColor(unsigned char r = 0, unsigned char g = 0, unsigned char b = 0,
-		   unsigned char a = 0) : R(r), G(g), B(b), A(a) {}
-
-	/// Cast to a SDL_Color
-	operator SDL_Color() const {
-		SDL_Color c = { R, G, B, A };
-		return c;
-	};
-
-	unsigned char R;       /// Red
-	unsigned char G;       /// Green
-	unsigned char B;       /// Blue
-	unsigned char A;       /// Alpha
-};
 
 class CUnitColors
 {

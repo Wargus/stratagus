@@ -60,7 +60,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <string>
-#include "SDL.h"
+#include "color.h"
 #include "guichan/font.h"
 
 /*----------------------------------------------------------------------------
@@ -129,14 +129,12 @@ public:
 	static CFontColor *Get(const std::string &ident);
 
 	std::string Ident;
-	SDL_Color Colors[MaxFontColors];
+	CColor Colors[MaxFontColors];
 };
 
 /*----------------------------------------------------------------------------
 --  Definitions
 ----------------------------------------------------------------------------*/
-
-#define MaxFonts 15  /// Number of fonts supported
 
 /**
 **  FIXME: should be moved to lua
@@ -188,7 +186,7 @@ public:
 		normal = CFontColor::Get(nc);
 		reverse = CFontColor::Get(rc);
 	}
-	CLabel(const CFont &f);
+	explicit CLabel(const CFont &f);
 
 	int Height() const { return font->Height(); }
 

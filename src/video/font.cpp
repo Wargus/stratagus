@@ -38,7 +38,6 @@
 #include "font.h"
 
 #include "intern_video.h"
-#include "script.h"
 #include "video.h"
 
 #include <vector>
@@ -48,8 +47,8 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static std::vector<CFont *> AllFonts;           /// Vector of all fonts
-static std::map<std::string, CFont *> Fonts;    /// Font mappings
+typedef std::map<std::string, CFont *> FontMap;
+static FontMap Fonts;    /// Font mappings
 
 static std::vector<CFontColor *> AllFontColors; /// Vector of all font colors.
 std::map<std::string, CFontColor *> FontColors; /// Map of ident to font color.
@@ -136,8 +135,8 @@ static void VideoDrawChar(const CGraphic &g,
 	if (!UseOpenGL) {
 		SDL_Rect srect = {gx, gy, w, h};
 		SDL_Rect drect = {x, y, 0, 0};
-
-		SDL_SetColors(g.Surface, const_cast<SDL_Color *>(fc.Colors), 0, MaxFontColors);
+		std::vector<SDL_Color> sdlColors(fc.Colors, fc.Colors + MaxFontColors);
+		SDL_SetColors(g.Surface, &sdlColors[0], 0, MaxFontColors);
 		SDL_BlitSurface(g.Surface, &srect, TheScreen, &drect);
 	} else {
 		g.DrawSub(gx, gy, w, h, x, y);
@@ -868,8 +867,9 @@ void CFont::DynamicLoad() const
 */
 void LoadFonts()
 {
-	for (unsigned int i = 0; i < AllFonts.size(); ++i) {
-		AllFonts[i]->Load();
+	for (FontMap::iterator it = Fonts.begin(); it != Fonts.end(); ++it) {
+		CFont &font = *it->second;
+		font.Load();
 	}
 
 	// TODO: remove this
@@ -892,8 +892,8 @@ void CFont::FreeOpenGL()
 */
 void FreeOpenGLFonts()
 {
-	for (size_t i = 0; i != AllFonts.size(); ++i) {
-		CFont &font = *AllFonts[i];
+	for (FontMap::iterator it = Fonts.begin(); it != Fonts.end(); ++it) {
+		CFont &font = *it->second;
 
 		font.FreeOpenGL();
 	}
@@ -920,8 +920,8 @@ void CFont::Reload() const
 */
 void ReloadFonts()
 {
-	for (size_t i = 0; i != AllFonts.size(); ++i) {
-		const CFont &font = *AllFonts[i];
+	for (FontMap::iterator it = Fonts.begin(); it != Fonts.end(); ++it) {
+		CFont &font = *it->second;
 
 		font.Reload();
 	}
@@ -946,7 +946,6 @@ CFont *CFont::New(const std::string &ident, CGraphic *g)
 	} else {
 		font = new CFont(ident);
 		font->G = g;
-		AllFonts.push_back(font);
 		Fonts[ident] = font;
 	}
 	return font;
@@ -971,7 +970,6 @@ CFont *CFont::Get(const std::string &ident)
 CFontColor::CFontColor(const std::string &ident)
 {
 	Ident = ident;
-	memset(Colors, 0, sizeof(Colors));
 }
 
 CFontColor::~CFontColor()
@@ -1037,8 +1035,8 @@ void CFont::Clean()
 */
 void CleanFonts()
 {
-	for (size_t i = 0; i != AllFonts.size(); ++i) {
-		CFont *font = AllFonts[i];
+	for (FontMap::iterator it = Fonts.begin(); it != Fonts.end(); ++it) {
+		CFont *font = it->second;
 
 		font->Clean();
 		delete font;
@@ -1046,7 +1044,6 @@ void CleanFonts()
 	if (UseOpenGL) {
 		FontColorGraphics.clear();
 	}
-	AllFonts.clear();
 	Fonts.clear();
 
 	for (size_t i = 0; i != AllFontColors.size(); ++i) {
