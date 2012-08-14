@@ -48,28 +48,29 @@
 ----------------------------------------------------------------------------*/
 
 typedef std::map<std::string, CFont *> FontMap;
-static FontMap Fonts;    /// Font mappings
+static FontMap Fonts;  /// Font mappings
 
-static std::vector<CFontColor *> AllFontColors; /// Vector of all font colors.
-std::map<std::string, CFontColor *> FontColors; /// Map of ident to font color.
+typedef std::map<std::string, CFontColor *> FontColorMap;
+static FontColorMap FontColors;  /// Map of ident to font color.
 
-static CFontColor *FontColor;                   /// Current font color
+static CFontColor *FontColor;                /// Current font color
 
-static const CFontColor *LastTextColor;          /// Last text color
-static CFontColor *DefaultTextColor;       /// Default text color
-static CFontColor *ReverseTextColor;       /// Reverse text color
-static std::string DefaultNormalColorIndex;     /// Default normal color index
-static std::string DefaultReverseColorIndex;    /// Default reverse color index
+static const CFontColor *LastTextColor;      /// Last text color
+static CFontColor *DefaultTextColor;         /// Default text color
+static CFontColor *ReverseTextColor;         /// Reverse text color
+static std::string DefaultNormalColorIndex;  /// Default normal color index
+static std::string DefaultReverseColorIndex; /// Default reverse color index
 
 /**
 **  Font color graphics
 **  Usage: FontColorGraphics[CFont *font][CFontColor *color]
 */
-static std::map< const CFont *, std::map<const CFontColor *, CGraphic *> > FontColorGraphics;
+typedef std::map<const CFontColor *, CGraphic *> FontColorGraphicMap;
+static std::map<const CFont *, FontColorGraphicMap> FontColorGraphics;
 
 // FIXME: remove these
-static CFont *SmallFont;       /// Small font used in stats
-static CFont *GameFont;        /// Normal font used in game
+static CFont *SmallFont;  /// Small font used in stats
+static CFont *GameFont;   /// Normal font used in game
 
 static int FormatNumber(int number, char *buf);
 
@@ -223,7 +224,7 @@ static bool GetUTF8(const std::string &text, size_t &pos, int &utf8)
 /**
 **  Get the next utf8 character from an array of chars
 */
-static inline bool GetUTF8(const char text[], const size_t len, size_t &pos, int &utf8)
+static bool GetUTF8(const char text[], const size_t len, size_t &pos, int &utf8)
 {
 	// end of string
 	if (pos >= len) {
@@ -816,8 +817,8 @@ void CFont::MakeFontColorTextures() const
 	const CGraphic &g = *this->G;
 	SDL_Surface *s = g.Surface;
 
-	for (unsigned int i = 0; i < AllFontColors.size(); ++i) {
-		CFontColor *fc = AllFontColors[i];
+	for (FontColorMap::iterator it = FontColors.begin(); it != FontColors.end(); ++it) {
+		CFontColor *fc = it->second;
 		CGraphic *newg = FontColorGraphics[this][fc] = new CGraphic;
 
 		newg->Width = g.Width;
@@ -880,9 +881,10 @@ void LoadFonts()
 void CFont::FreeOpenGL()
 {
 	if (this->G) {
-		for (unsigned int j = 0; j < AllFontColors.size(); ++j) {
-			CGraphic *g = FontColorGraphics[this][AllFontColors[j]];
-			glDeleteTextures(g->NumTextures, g->Textures);
+		for (FontColorGraphicMap::iterator it = FontColorGraphics[this].begin();
+			 it != FontColorGraphics[this].end(); ++it) {
+			CGraphic &g = *it->second;
+			glDeleteTextures(g.NumTextures, g.Textures);
 		}
 	}
 }
@@ -903,13 +905,14 @@ void FreeOpenGLFonts()
 void CFont::Reload() const
 {
 	if (this->G) {
-		for (size_t j = 0; j != AllFontColors.size(); ++j) {
-			//CGraphic::Free(FontColorGraphics[this][AllFontColors[j]]);
-			CGraphic *g = FontColorGraphics[this][AllFontColors[j]];
+		FontColorGraphicMap &fontColorGraphicMap = FontColorGraphics[this];
+		for (FontColorGraphicMap::iterator it = fontColorGraphicMap.begin();
+			 it != fontColorGraphicMap.end(); ++it) {
+			CGraphic *g = it->second;
 			delete[] g->Textures;
 			delete g;
 		}
-		FontColorGraphics[this].clear();
+		fontColorGraphicMap.clear();
 		this->MakeFontColorTextures();
 	}
 }
@@ -935,19 +938,17 @@ void ReloadFonts()
 **
 **  @return       New font
 */
-CFont *CFont::New(const std::string &ident, CGraphic *g)
+/* static */ CFont *CFont::New(const std::string &ident, CGraphic *g)
 {
-	CFont *font = Fonts[ident];
+	CFont *&font = Fonts[ident];
 	if (font) {
 		if (font->G != g) {
 			CGraphic::Free(font->G);
 		}
-		font->G = g;
 	} else {
 		font = new CFont(ident);
-		font->G = g;
-		Fonts[ident] = font;
 	}
+	font->G = g;
 	return font;
 }
 
@@ -958,7 +959,7 @@ CFont *CFont::New(const std::string &ident, CGraphic *g)
 **
 **  @return       The font
 */
-CFont *CFont::Get(const std::string &ident)
+/* static */ CFont *CFont::Get(const std::string &ident)
 {
 	CFont *font = Fonts[ident];
 	if (!font) {
@@ -983,17 +984,14 @@ CFontColor::~CFontColor()
 **
 **  @return       New font color
 */
-CFontColor *CFontColor::New(const std::string &ident)
+/* static */ CFontColor *CFontColor::New(const std::string &ident)
 {
-	CFontColor *fc = FontColors[ident];
-	if (fc) {
-		return fc;
-	} else {
+	CFontColor *&fc = FontColors[ident];
+
+	if (fc == NULL) {
 		fc = new CFontColor(ident);
-		FontColors[ident] = fc;
-		AllFontColors.push_back(fc);
-		return fc;
 	}
+	return fc;
 }
 
 /**
@@ -1003,7 +1001,7 @@ CFontColor *CFontColor::New(const std::string &ident)
 **
 **  @return       The font color
 */
-CFontColor *CFontColor::Get(const std::string &ident)
+/* static */ CFontColor *CFontColor::Get(const std::string &ident)
 {
 	CFontColor *fc = FontColors[ident];
 	if (!fc) {
@@ -1017,18 +1015,19 @@ void CFont::Clean()
 	CFont *font = this;
 
 	if (UseOpenGL) {
-		if (!FontColorGraphics[font].empty()) {
-			for (size_t j = 0; j != AllFontColors.size(); ++j) {
-				CGraphic *g = FontColorGraphics[font][AllFontColors[j]];
+		FontColorGraphicMap &fontColorGraphicMap = FontColorGraphics[font];
+		if (!fontColorGraphicMap.empty()) {
+			for (FontColorGraphicMap::iterator it = fontColorGraphicMap.begin();
+				 it != fontColorGraphicMap.end(); ++it) {
+				CGraphic *g = it->second;
 				glDeleteTextures(g->NumTextures, g->Textures);
 				delete[] g->Textures;
 				delete g;
 			}
-			FontColorGraphics[font].clear();
+			fontColorGraphicMap.clear();
 		}
 	}
 }
-
 
 /**
 **  Clean up the font module.
@@ -1046,10 +1045,9 @@ void CleanFonts()
 	}
 	Fonts.clear();
 
-	for (size_t i = 0; i != AllFontColors.size(); ++i) {
-		delete AllFontColors[i];
+	for (FontColorMap::iterator it = FontColors.begin(); it != FontColors.end(); ++it) {
+		delete it->second;
 	}
-	AllFontColors.clear();
 	FontColors.clear();
 
 	SmallFont = NULL;
