@@ -66,6 +66,33 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 /// @todo Needs compatibility checks.
 /// @todo Needs error message unification.
 
+#if 1 // from stratagus.cpp, to avoid link issues.
+
+void PrintLocation(const char *file, int line, const char *funcName)
+{
+	fprintf(stdout, "%s:%d: %s: ", file, line, funcName);
+}
+
+#ifdef DEBUG
+
+void AbortAt(const char *file, int line, const char *funcName, const char *conditionStr)
+{
+	fprintf(stderr, "Assertion failed at %s:%d: %s: %s\n", file, line, funcName, conditionStr);
+	abort();
+}
+
+void PrintOnStdOut(const char *format, ...)
+{
+	va_list valist;
+	va_start(valist, format);
+	vprintf(format, valist);
+	va_end(valist);
+}
+
+#endif
+#endif
+
+
 
 /**
 **  Main loop

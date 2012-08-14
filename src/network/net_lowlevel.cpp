@@ -274,6 +274,8 @@ int NetSocketAddr(const Socket sock)
 	if (sock == static_cast<Socket>(-1)) {
 		return 0;
 	}
+	char buf[4096];
+	struct ifconf ifc;
 	ifc.ifc_len = sizeof(buf);
 	ifc.ifc_buf = buf;
 	if (ioctl(sock, SIOCGIFCONF, (char *)&ifc) < 0) {
@@ -281,8 +283,6 @@ int NetSocketAddr(const Socket sock)
 		return 0;
 	}
 	// with some inspiration from routed..
-	char buf[4096];
-	struct ifconf ifc;
 	int nif = 0;
 	struct ifreq *ifr = ifc.ifc_req;
 	char *cplim = buf + ifc.ifc_len; // skip over if's with big ifr_addr's
