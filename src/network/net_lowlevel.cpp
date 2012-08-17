@@ -289,8 +289,8 @@ int NetSocketAddr(const Socket sock)
 
 	for (char *cp = buf; cp < cplim;
 		cp += sizeof(ifr->ifr_name) + sizeof(ifr->ifr_ifru)) {
-		struct ifreq ifr = (struct ifreq *)cp;
-		ifreq = *ifr;
+		ifr = (struct ifreq *)cp;
+		struct ifreq ifreq = *ifr;
 		if (ioctl(sock, SIOCGIFFLAGS, (char *)&ifreq) < 0) {
 			DebugPrint("%s: SIOCGIFFLAGS - errno %d\n" _C_
 					   ifr->ifr_name _C_ errno);
