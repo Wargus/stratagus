@@ -314,8 +314,8 @@ bool NoRescueCheck;               /// Disable rescue check
 /**
 **  Colors used for minimap.
 */
-SDL_Color *PlayerColorsRGB[PlayerMax];
-Uint32 *PlayerColors[PlayerMax];
+std::vector<CColor> PlayerColorsRGB[PlayerMax];
+std::vector<Uint32> PlayerColors[PlayerMax];
 
 std::string PlayerColorNames[PlayerMax];
 
@@ -340,9 +340,7 @@ void InitPlayers()
 			Players[p].Type = PlayerNobody;
 		}
 		for (int x = 0; x < PlayerColorIndexCount; ++x) {
-			PlayerColors[p][x] = Video.MapRGB(TheScreen->format,
-											  PlayerColorsRGB[p][x].r,
-											  PlayerColorsRGB[p][x].g, PlayerColorsRGB[p][x].b);
+			PlayerColors[p][x] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[p][x]);
 		}
 	}
 }
@@ -364,11 +362,9 @@ void CleanPlayers()
 void FreePlayerColors()
 {
 	for (int i = 0; i < PlayerMax; ++i) {
-		delete[] Players[i].UnitColors.Colors;
-		delete[] PlayerColorsRGB[i];
-		PlayerColorsRGB[i] = NULL;
-		delete[] PlayerColors[i];
-		PlayerColors[i] = NULL;
+		Players[i].UnitColors.Colors.clear();
+		PlayerColorsRGB[i].clear();
+		PlayerColors[i].clear();
 	}
 }
 #endif
@@ -1153,9 +1149,10 @@ void GraphicPlayerPixels(CPlayer &player, const CGraphic &sprite)
 	Assert(PlayerColorIndexCount);
 
 	SDL_LockSurface(sprite.Surface);
-	SDL_SetColors(sprite.Surface, player.UnitColors.Colors, PlayerColorIndexStart, PlayerColorIndexCount);
+	std::vector<SDL_Color> sdlColors(player.UnitColors.Colors.begin(), player.UnitColors.Colors.end());
+	SDL_SetColors(sprite.Surface, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
 	if (sprite.SurfaceFlip) {
-		SDL_SetColors(sprite.SurfaceFlip, player.UnitColors.Colors, PlayerColorIndexStart, PlayerColorIndexCount);
+		SDL_SetColors(sprite.SurfaceFlip, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
 	}
 	SDL_UnlockSurface(sprite.Surface);
 }
@@ -1168,9 +1165,7 @@ void GraphicPlayerPixels(CPlayer &player, const CGraphic &sprite)
 void SetPlayersPalette()
 {
 	for (int i = 0; i < PlayerMax; ++i) {
-		delete[] Players[i].UnitColors.Colors;
-		Players[i].UnitColors.Colors = new SDL_Color[PlayerColorIndexCount];
-		memcpy(Players[i].UnitColors.Colors, PlayerColorsRGB[i], sizeof(SDL_Color) * PlayerColorIndexCount);
+		Players[i].UnitColors.Colors = PlayerColorsRGB[i];
 	}
 }
 

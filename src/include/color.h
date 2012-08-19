@@ -52,6 +52,19 @@ public:
 	unsigned char A;       /// Alpha
 };
 
+
+#include <vector>
+
+class CUnitColors
+{
+public:
+	CUnitColors() {}
+
+public:
+	std::vector<CColor> Colors;
+};
+
+
 //@}
 
 #endif

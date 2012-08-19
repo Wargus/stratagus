@@ -38,10 +38,14 @@
 
 #include <string>
 
+#include "color.h"
 #include "upgrade_structs.h"
-#include "video.h"
 
 #include "vec2i.h"
+
+#include "SDL.h"
+
+class CGraphic;
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -319,8 +323,8 @@ extern int NumPlayers;             /// How many player slots used
 extern CPlayer Players[PlayerMax];  /// All players
 extern CPlayer *ThisPlayer;         /// Player on local computer
 extern bool NoRescueCheck;          /// Disable rescue check
-extern SDL_Color *PlayerColorsRGB[PlayerMax]; /// Player colors
-extern Uint32 *PlayerColors[PlayerMax];       /// Player colors
+extern std::vector<CColor> PlayerColorsRGB[PlayerMax]; /// Player colors
+extern std::vector<Uint32> PlayerColors[PlayerMax]; /// Player colors
 extern std::string PlayerColorNames[PlayerMax];  /// Player color names
 
 extern PlayerRace PlayerRaces;  /// Player races

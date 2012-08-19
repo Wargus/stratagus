@@ -45,6 +45,7 @@
 #include "unittype.h"
 #include "unit.h"
 #include "unit_find.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -644,18 +645,13 @@ static int CclDefineRaceNames(lua_State *l)
 */
 static int CclDefinePlayerColors(lua_State *l)
 {
-	int i;
-	int args;
-	int j;
-	int numcolors;
-
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
 
-	args = lua_rawlen(l, 1);
-	for (i = 0; i < args; ++i) {
+	const int args = lua_rawlen(l, 1);
+	for (int i = 0; i < args; ++i) {
 		lua_rawgeti(l, 1, i + 1);
 		PlayerColorNames[i / 2] = LuaToString(l, -1);
 		lua_pop(l, 1);
@@ -664,11 +660,11 @@ static int CclDefinePlayerColors(lua_State *l)
 		if (!lua_istable(l, -1)) {
 			LuaError(l, "incorrect argument");
 		}
-		numcolors = lua_rawlen(l, -1);
+		const int numcolors = lua_rawlen(l, -1);
 		if (numcolors != PlayerColorIndexCount) {
 			LuaError(l, "You should use %d colors (See DefinePlayerColorIndex())" _C_ PlayerColorIndexCount);
 		}
-		for (j = 0; j < numcolors; ++j) {
+		for (int j = 0; j < numcolors; ++j) {
 			lua_rawgeti(l, -1, j + 1);
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 3) {
 				LuaError(l, "incorrect argument");
@@ -676,9 +672,9 @@ static int CclDefinePlayerColors(lua_State *l)
 			lua_rawgeti(l, -1, 1);
 			lua_rawgeti(l, -2, 2);
 			lua_rawgeti(l, -3, 3);
-			PlayerColorsRGB[i / 2][j].r = LuaToNumber(l, -3);
-			PlayerColorsRGB[i / 2][j].g = LuaToNumber(l, -2);
-			PlayerColorsRGB[i / 2][j].b = LuaToNumber(l, -1);
+			PlayerColorsRGB[i / 2][j].R = LuaToNumber(l, -3);
+			PlayerColorsRGB[i / 2][j].G = LuaToNumber(l, -2);
+			PlayerColorsRGB[i / 2][j].B = LuaToNumber(l, -1);
 			lua_pop(l, 3 + 1);
 		}
 	}
@@ -706,19 +702,15 @@ static int CclNewPlayerColors(lua_State *l)
 */
 static int CclDefinePlayerColorIndex(lua_State *l)
 {
-	int i;
-
 	LuaCheckArgs(l, 2);
 	PlayerColorIndexStart = LuaToNumber(l, 1);
 	PlayerColorIndexCount = LuaToNumber(l, 2);
 
-	for (i = 0; i < PlayerMax; ++i) {
-		delete[] PlayerColorsRGB[i];
-		PlayerColorsRGB[i] = new SDL_Color[PlayerColorIndexCount];
-		memset(PlayerColorsRGB[i], 0, PlayerColorIndexCount * sizeof(SDL_Color));
-		delete[] PlayerColors[i];
-		PlayerColors[i] = new Uint32[PlayerColorIndexCount];
-		memset(PlayerColorsRGB[i], 0, PlayerColorIndexCount * sizeof(Uint32));
+	for (int i = 0; i < PlayerMax; ++i) {
+		PlayerColorsRGB[i].clear();
+		PlayerColorsRGB[i].resize(PlayerColorIndexCount);
+		PlayerColors[i].clear();
+		PlayerColors[i].resize(PlayerColorIndexCount, 0);
 	}
 	return 0;
 }

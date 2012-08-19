@@ -46,6 +46,7 @@
 #include "script.h"
 #include "settings.h"
 #include "version.h"
+#include "video.h"
 
 //----------------------------------------------------------------------------
 // Declaration

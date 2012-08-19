@@ -232,6 +232,7 @@
 #include "unit.h"
 #include "unit_manager.h"
 #include "unittype.h"
+#include "video.h"
 
 
 //----------------------------------------------------------------------------

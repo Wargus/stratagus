@@ -49,6 +49,7 @@
 #include "unit.h"
 #include "unit_find.h"
 #include "unittype.h"
+#include "video.h"
 
 enum {
 	SUB_STILL_STANDBY = 0,

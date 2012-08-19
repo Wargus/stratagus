@@ -1028,9 +1028,9 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 					b = (c & f->Bmask) >> f->Bshift;
 					if (b && ((c & f->Rmask) >> f->Rshift) == 0 &&
 						((c & f->Gmask) >> f->Gshift) == b) {
-						pc = ((colors->Colors[0].r * b / 255) << f->Rshift) |
-							 ((colors->Colors[0].g * b / 255) << f->Gshift) |
-							 ((colors->Colors[0].b * b / 255) << f->Bshift);
+						pc = ((colors->Colors[0].R * b / 255) << f->Rshift) |
+							 ((colors->Colors[0].G * b / 255) << f->Gshift) |
+							 ((colors->Colors[0].B * b / 255) << f->Bshift);
 						if (bpp == 4) {
 							pc |= (c & f->Amask);
 						} else {

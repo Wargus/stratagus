@@ -178,14 +178,6 @@ public:
 };
 #endif
 
-class CUnitColors
-{
-public:
-	CUnitColors() : Colors(NULL) {}
-
-	SDL_Color *Colors;
-};
-
 /**
 **  Event call back.
 **
@@ -292,12 +284,18 @@ public:
 			return MapRGBA(f, r, g, b, 0xFF);
 		}
 	}
+	inline Uint32 MapRGB(SDL_PixelFormat *f, const CColor &color) {
+		return MapRGB(f, color.R, color.G, color.B);
+	}
 	inline Uint32 MapRGBA(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
 		if (!UseOpenGL) {
 			return SDL_MapRGBA(f, r, g, b, a);
 		} else {
 			return ((r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT) | (a << ASHIFT));
 		}
+	}
+	inline Uint32 MapRGBA(SDL_PixelFormat *f, const CColor &color) {
+		return MapRGBA(f, color.R, color.G, color.B, color.A);
 	}
 	inline void GetRGB(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b) {
 		if (!UseOpenGL) {
