@@ -194,19 +194,43 @@ int main(int argc, char * argv[]) {
 	if ( file ) {
 
 		char act_version[20];
-		fgets(act_version, 20, file);
+		int have_version = 0;
+
+		if ( fgets(act_version, 20, file) )
+			have_version = 1;
+
 		fclose(file);
 
-		file = popen(EXTRACT_BIN " -V", "r");
+		if ( have_version ) {
 
-		if ( file ) {
+			file = popen(EXTRACT_BIN " -V", "r");
 
-			char new_version[20];
-			fgets(new_version, 20, file);
-			pclose(file);
+			if ( file ) {
 
-			if ( strncmp(act_version, new_version, 19) == 0 )
-				return 0;
+				int i;
+				char new_version[20];
+				have_version = 0;
+
+				if ( fgets(new_version, 20, file) )
+					have_version = 1;
+
+				pclose(file);
+
+				if ( have_version ) {
+
+					for ( i = 0; i < 20; ++i ) {
+						if ( new_version[i] == '\n' ) {
+							new_version[i] = 0;
+							break;
+						}
+					}
+
+					if ( strcmp(act_version, new_version) == 0 )
+						return 0;
+
+				}
+
+			}
 
 		}
 
