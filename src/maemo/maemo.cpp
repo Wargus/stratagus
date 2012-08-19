@@ -39,6 +39,8 @@
 #include <SDL.h>
 
 #include "stratagus.h"
+#include "version.h"
+#include "game.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
