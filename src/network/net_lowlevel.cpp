@@ -288,7 +288,7 @@ int NetSocketAddr(const Socket sock)
 	char *cplim = buf + ifc.ifc_len; // skip over if's with big ifr_addr's
 
 	for (char *cp = buf; cp < cplim;
-		cp += sizeof(ifr->ifr_name) + sizeof(ifr->ifr_ifru)) {
+		 cp += sizeof(ifr->ifr_name) + sizeof(ifr->ifr_ifru)) {
 		ifr = (struct ifreq *)cp;
 		struct ifreq ifreq = *ifr;
 		if (ioctl(sock, SIOCGIFFLAGS, (char *)&ifreq) < 0) {

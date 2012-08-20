@@ -812,7 +812,7 @@ static void DrawEditorPanel_StartIcon()
 		Assert(icon);
 		const PixelPos pos(x + START_ICON_X, y + START_ICON_Y);
 		int flag = (ButtonUnderCursor == StartButton ? IconActive : 0)
-					| (Editor.State == EditorSetStartLocation ? IconSelected : 0);
+				   | (Editor.State == EditorSetStartLocation ? IconSelected : 0);
 
 		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "");
 	} else {

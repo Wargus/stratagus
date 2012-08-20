@@ -191,7 +191,8 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around);
 
 template <typename Pred>
-void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred) {
+void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
+{
 	Assert(Map.Info.IsPointOnMap(ltPos));
 	Assert(Map.Info.IsPointOnMap(rbPos));
 	Assert(units.empty());
@@ -217,7 +218,8 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 }
 
 template <typename Pred>
-void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, Pred pred) {
+void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, Pred pred)
+{
 	const Vec2i offset(range, range);
 	const Vec2i typeSize(unit.Type->TileWidth - 1, unit.Type->TileHeight - 1);
 
@@ -227,7 +229,8 @@ void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around
 }
 
 template <typename Pred>
-void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred) {
+void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
+{
 	Vec2i minPos = ltPos;
 	Vec2i maxPos = rbPos;
 
@@ -236,7 +239,8 @@ void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units,
 }
 
 template <typename Pred>
-CUnit *FindUnit_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, Pred pred) {
+CUnit *FindUnit_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, Pred pred)
+{
 	Assert(Map.Info.IsPointOnMap(ltPos));
 	Assert(Map.Info.IsPointOnMap(rbPos));
 
@@ -255,7 +259,8 @@ CUnit *FindUnit_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, Pred pred) {
 }
 
 template <typename Pred>
-CUnit *FindUnit_If(const Vec2i &ltPos, const Vec2i &rbPos, Pred pred) {
+CUnit *FindUnit_If(const Vec2i &ltPos, const Vec2i &rbPos, Pred pred)
+{
 	Vec2i minPos = ltPos;
 	Vec2i maxPos = rbPos;
 

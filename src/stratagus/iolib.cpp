@@ -69,8 +69,8 @@ public:
 	int write(const void *buf, size_t len);
 
 private:
-	PImpl(const PImpl&rhs); // No implementation
-	const PImpl& operator = (const PImpl &rhs); // No implementation
+	PImpl(const PImpl &rhs); // No implementation
+	const PImpl &operator = (const PImpl &rhs); // No implementation
 
 private:
 	int   cl_type;   /// type of CFile

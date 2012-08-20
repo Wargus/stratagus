@@ -113,7 +113,7 @@ public:
 	int printf(const char *format, ...) PRINTF_VAARG_ATTRIBUTE(2, 3); // Don't forget to count this
 private:
 	CFile(const CFile &rhs); // No implementation
-	const CFile& operator = (const CFile &rhs); // No implementation
+	const CFile &operator = (const CFile &rhs); // No implementation
 private:
 	class PImpl;
 	PImpl *pimpl;

@@ -730,8 +730,8 @@ static void DrawUnitInfo(CUnit &unit)
 					const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(unit.CurrentOrder());
 					CIcon &icon = *order.GetUnitType().Icon.Icon;
 					unsigned int flag = (ButtonAreaUnderCursor == ButtonAreaUpgrading
-						 && ButtonUnderCursor == 0) ?
-						(IconActive | (MouseButtons & LeftButton)) : 0;
+										 && ButtonUnderCursor == 0) ?
+										(IconActive | (MouseButtons & LeftButton)) : 0;
 					const PixelPos pos(UI.UpgradingButton->X, UI.UpgradingButton->Y);
 					icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "");
 				}
@@ -742,8 +742,8 @@ static void DrawUnitInfo(CUnit &unit)
 					COrder_Research &order = *static_cast<COrder_Research *>(unit.CurrentOrder());
 					CIcon &icon = *order.GetUpgrade().Icon;
 					int flag = (ButtonAreaUnderCursor == ButtonAreaResearching
-						 && ButtonUnderCursor == 0) ?
-						(IconActive | (MouseButtons & LeftButton)) : 0;
+								&& ButtonUnderCursor == 0) ?
+							   (IconActive | (MouseButtons & LeftButton)) : 0;
 					PixelPos pos(UI.ResearchingButton->X, UI.ResearchingButton->Y);
 					icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "");
 				}
@@ -765,7 +765,7 @@ static void DrawUnitInfo(CUnit &unit)
 			if (uins->Boarded && j < UI.TransportingButtons.size()) {
 				CIcon &icon = *uins->Type->Icon.Icon;
 				int flag = (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
-													(IconActive | (MouseButtons & LeftButton)) : 0;
+						   (IconActive | (MouseButtons & LeftButton)) : 0;
 				const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 				icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "");
 				UiDrawLifeBar(*uins, pos.x, pos.y);

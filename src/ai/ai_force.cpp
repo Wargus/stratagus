@@ -254,7 +254,8 @@ bool AiForce::IsBelongsTo(const CUnitType *type)
 	return flag;
 }
 
-void AiForce::Insert(CUnit &unit) {
+void AiForce::Insert(CUnit &unit)
+{
 	Units.Insert(&unit);
 	unit.RefsIncrease();
 }

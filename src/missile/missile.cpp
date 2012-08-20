@@ -642,7 +642,7 @@ void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 	CUnit *unit = UnitOnMapTile(pos, -1);
 	if (unit && unit->IsAliveOnMap()
 		&& (missile.Type->FriendlyFire || unit->IsEnemy(*missile.SourceUnit->Player))) {
-			missile.MissileHit(unit);
+		missile.MissileHit(unit);
 	}
 }
 
@@ -753,11 +753,11 @@ void Missile::MissileHit(CUnit *unit)
 
 	if (mtype.Pierce && mtype.PierceOnce) {
 		for (std::vector<CUnit *>::iterator it = this->PiercedUnits.begin();
-			it != this->PiercedUnits.end(); ++it) {
-				CUnit &punit = **it;
-				if (UnitNumber(*unit) == UnitNumber(punit)) {
-					return;
-				}
+			 it != this->PiercedUnits.end(); ++it) {
+			CUnit &punit = **it;
+			if (UnitNumber(*unit) == UnitNumber(punit)) {
+				return;
+			}
 		}
 		PiercedUnits.insert(this->PiercedUnits.begin(), unit);
 	}
@@ -1170,7 +1170,8 @@ void InitMissiles()
 /**
 **  Missile destructior.
 */
-Missile::~Missile() {
+Missile::~Missile()
+{
 	PiercedUnits.clear();
 }
 
