@@ -1,3 +1,46 @@
+stratagus (2.2.7-1) unstable; urgency=low
+
+  * Added CclCreateMissile function to create missiles from Lua code. from Cybermind)
+  * Added MissileType::SmokeParticle (same use as SmokeMissile).(from Cybermind)
+  * Alllow same units to get upgrade-to in one click.(from Cybermind)
+  * CclGetUnitVariable and CclSetUnitVariable now can get and set the Max, Increase and Enable fields.(from Cybermind)
+  * Added OnHit Lua callback parameter for UnitType to create some effects if unit is hit. (from Cybermind)
+  * Reworked the button's popup system to achieve more flexibility (from Cybermind)
+  * Added Preference.ShowNameDelay and Preference.ShowNameTime to show a popup for unit under cursor (from Cybermind)
+  * Code compile now with Lua 5.2 (from Joris Dauphin).
+  * Fix bug #901393: Always "network out of sync" in multiplayer mode (from Cybermind)
+  * Fix bug #710187: OpenGL is slower than without OpenGL (from Cybermind)
+  * Fix bug #909454: compile errors on OpenBSD. (from Pali Rohár)
+  * Fix compilation for maemo. (from Pali Rohár)
+  * Fix bug #910078: worker unable to do anything after building structure. (patch from Neil Tan)
+  * Fix bug #912904: Fix pathfinfing problem with unit near of goal. (patch from Neil Tan)
+  * Fix bug #911062: Fix segfault. (patch from Neil Tan)
+  * Fix bug #841133: Fix Action resource and DeassignWorkerFromMine. (from Joris Dauphin)
+  * Fix some regression in pathFinding. (from Joris Dauphin)
+  * Rearchitecturing of COrder and CAnimation. (from Joris Dauphin)
+  * Add DefineDefaultResourceMaxAmounts() to define max value per resource (like tiberium from C&C). Add "Storing" in UnitType to increase MaxResourceAmount (from Cybermind)
+  * New unitType flag:"Wall" which create "connection" with its neighboors. (from Cybermind)
+  * New unitType flag:"NonSolid" for unit which don't forbid other unit to be in the same place. (from Cybermind)
+  * New missile class "missile-class-treacer" which seek towards its target. (from Cybermind)
+  * New missile class "missile-class-clip-to-target" which is clipped to the target, then animate once before deal the damege. (from Cybermind)
+  * Add parameter "use-unit-var" to "spawn-missile" spell to use caster's damage. (from Cybermind)
+  * Rework animation parser to have access to some variables. (from Cybermind)
+  * Add impact by type. (from Cybermind)
+  * Add "AlwaysFire" flag to missile to shoot even if target is dead.(from Cybermind)
+  * Fix some saving issues.(from Joris Dauphin)
+  * Activate AutocastSpell for non moving unit. (from Cybermind)
+  * Disable buggy multithreading support. (from Pali Rohár)
+  * Fixed mouse scroll speed (from Pali Rohár)
+  * Fix bug #913621: Replace the abort and core dump by a lua_Error when unitType is unknown (from Joris Dauphin)
+  * Fix bug #976937: Fix crashing issue when loadnig a game with more than 3 ai-forces (from Joris Dauphin)
+  * Fix bug #993364: Fix compilation when using lua 5.2 (from Joris Dauphin)
+  * Fix bug #1001999: Do not overwrite CMAKE_CXX_FLAGS and CMAKE_EXE_LINKER_FLAGS variables, make install paths configurable (from hasufell)
+  * Fix bug #1013694: Fix compilation when MNG support is active (from Joris Dauphin)
+  * Fix bug #1020858: Fix Assert in Action_Attack (from Joris Dauphin)
+  * Fix bug #1022272: Fix Assert in pathfinding (from Joris Dauphin)
+
+ -- Pali Rohár <pali.rohar@gmail.com>  Mon, 20 Aug 2012 13:33:38 +0200
+
 stratagus (2.2.6-1) unstable; urgency=low
 
   * Changed directory structure for CMake, DoxyGen and platform code (from Pali Rohár)

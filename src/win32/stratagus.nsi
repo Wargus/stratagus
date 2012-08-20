@@ -9,7 +9,7 @@
 ;         Stratagus - A free fantasy real time strategy game engine
 ;
 ;    stratagus.nsi - Windows NSIS Installer for Stratagus
-;    Copyright (C) 2010-2011  Pali Rohár <pali.rohar@gmail.com>
+;    Copyright (C) 2010-2012  Pali Rohár <pali.rohar@gmail.com>
 ;
 ;    This program is free software: you can redistribute it and/or modify
 ;    it under the terms of the GNU General Public License as published by
@@ -45,11 +45,11 @@
 
 !define NAME "Stratagus"
 !define DESCRIPTION "Strategy Gaming Engine"
-!define VERSION "2.2.6"
+!define VERSION "2.2.7"
 !define VIVERSION "${VERSION}.0"
 !define HOMEPAGE "https://launchpad.net/stratagus"
 !define LICENSE "GPL v2"
-!define COPYRIGHT "Copyright (c) 1998-2011 by The Stratagus Project"
+!define COPYRIGHT "Copyright (c) 1998-2012 by The Stratagus Project"
 
 ;--------------------------------
 

@@ -16,7 +16,7 @@ Upstream Author(s):
 
 Copyright:
 
-    (C) 1998-2011 by The Stratagus Project and Pali Rohár
+    (C) 1998-2012 by The Stratagus Project and Pali Rohár
 
 License:
 
@@ -37,7 +37,7 @@ License:
 The Debian packaging is:
 
     Copyright (C) 2004 David Martínez Moreno <ender@debian.org>
-    Copyright (C) 2010-2011 Pali Rohár <pali.rohar@gmail.com>
+    Copyright (C) 2010-2012 Pali Rohár <pali.rohar@gmail.com>
 
 and is licensed under the GPL version 2,
 see "/usr/share/common-licenses/GPL-2".

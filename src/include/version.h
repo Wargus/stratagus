@@ -9,7 +9,7 @@
 #define DESCRIPTION NAME " - Strategy Gaming Engine"
 
 /// Engine version shown
-#define VERSION  "2.2.6"
+#define VERSION  "2.2.7"
 
 /// Stratagus major version
 #define StratagusMajorVersion  2
@@ -18,7 +18,7 @@
 #define StratagusMinorVersion  2
 
 /// Stratagus patch level (maximal 99)
-#define StratagusPatchLevel    6
+#define StratagusPatchLevel    7
 
 /// Stratagus patch level 2
 #define StratagusPatchLevel2   0
@@ -39,4 +39,4 @@
 #define LICENSE "GPL v2"
 
 /// Copyright
-#define COPYRIGHT "Copyright (c) 1998-2011 by The Stratagus Project and Pali Rohar"
+#define COPYRIGHT "Copyright (c) 1998-2012 by The Stratagus Project and Pali Rohar"

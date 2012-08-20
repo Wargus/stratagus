@@ -9,7 +9,7 @@
 #         Stratagus - A free fantasy real time strategy game engine
 #
 #    CMakeLists.txt
-#    Copyright (C) 2011  Pali Rohár <pali.rohar@gmail.com>
+#    Copyright (C) 2011-2012  Pali Rohár <pali.rohar@gmail.com>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 
 project(stratagus)
 cmake_minimum_required(VERSION 2.6)
-set(STRATAGUS_VERSION 2.2.6)
+set(STRATAGUS_VERSION 2.2.7)
 
 # Stratagus sources
 
