@@ -286,7 +286,7 @@ int main(int argc, char * argv[]) {
 	if ( chdir(stratagus_path) != 0 ) {
 		error(TITLE, STRATAGUS_NOT_FOUND);
 	}
-	strcpy(scripts_path, data_path);
+	sprintf(scripts_path, "\"%s\"", data_path);
 	sprintf(stratagus_bin, "%s\\stratagus.exe", stratagus_path);
 #else
 	strcpy(data_path, DATA_PATH);
