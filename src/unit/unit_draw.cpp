@@ -107,7 +107,7 @@ unsigned long ShowNameTime;                  /// Show unit's name for some time
 **  @param x1,y1    Coordinates of the top left corner.
 **  @param x2,y2    Coordinates of the bottom right corner.
 */
-void (*DrawSelection)(Uint32 color, int x1, int y1, int x2, int y2) = DrawSelectionNone;
+void (*DrawSelection)(IntColor color, int x1, int y1, int x2, int y2) = DrawSelectionNone;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -127,7 +127,7 @@ const CViewport *CurrentViewport;  /// FIXME: quick hack for split screen
 */
 void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 {
-	Uint32 color;
+	IntColor color;
 
 	// FIXME: make these colors customizable with scripts.
 
@@ -174,7 +174,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionNone(Uint32, int, int, int, int)
+void DrawSelectionNone(IntColor, int, int, int, int)
 {
 }
 
@@ -185,7 +185,7 @@ void DrawSelectionNone(Uint32, int, int, int, int)
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionCircle(Uint32 color, int x1, int y1, int x2, int y2)
+void DrawSelectionCircle(IntColor color, int x1, int y1, int x2, int y2)
 {
 	Video.DrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
 						 std::min((x2 - x1) / 2, (y2 - y1) / 2) + 2);
@@ -198,7 +198,7 @@ void DrawSelectionCircle(Uint32 color, int x1, int y1, int x2, int y2)
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1, int x2, int y2)
+void DrawSelectionCircleWithTrans(IntColor color, int x1, int y1, int x2, int y2)
 {
 	Video.FillTransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
 							  std::min((x2 - x1) / 2, (y2 - y1) / 2), 95);
@@ -213,7 +213,7 @@ void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1, int x2, int y2)
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionRectangle(Uint32 color, int x1, int y1, int x2, int y2)
+void DrawSelectionRectangle(IntColor color, int x1, int y1, int x2, int y2)
 {
 	Video.DrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
 }
@@ -225,7 +225,7 @@ void DrawSelectionRectangle(Uint32 color, int x1, int y1, int x2, int y2)
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1, int x2, int y2)
+void DrawSelectionRectangleWithTrans(IntColor color, int x1, int y1, int x2, int y2)
 {
 	Video.DrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
 	Video.FillTransRectangleClip(color, x1 + 1, y1 + 1,
@@ -239,7 +239,7 @@ void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1, int x2, int y
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionCorners(Uint32 color, int x1, int y1, int x2, int y2)
+void DrawSelectionCorners(IntColor color, int x1, int y1, int x2, int y2)
 {
 	const int CORNER_PIXELS = 6;
 
@@ -417,8 +417,8 @@ void CDecoVarBar::Draw(int x, int y,
 	char b = this->BorderSize; // BorderSize.
 	// Could depend of (value / max)
 	int f = Variable.Value * 100 / Variable.Max;
-	Uint32 bcolor = ColorBlack; // Deco->Data.Bar.BColor  // Border color.
-	Uint32 color = f > 50 ? (f > 75 ? ColorGreen : ColorYellow) : (f > 25 ? ColorOrange : ColorRed);// inside color.
+	IntColor bcolor = ColorBlack; // Deco->Data.Bar.BColor  // Border color.
+	IntColor color = f > 50 ? (f > 75 ? ColorGreen : ColorYellow) : (f > 25 ? ColorOrange : ColorRed);// inside color.
 	// Deco->Data.Bar.Color
 	if (b) {
 		if (this->ShowFullBackground) {

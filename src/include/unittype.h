@@ -530,7 +530,6 @@
 #include "missileconfig.h"
 #include "vec2i.h"
 
-#include <SDL.h>
 #include <vector>
 #include <algorithm>
 #include <map>
@@ -740,8 +739,8 @@ public:
 	bool ShowFullBackground;    /// if true, show background like value equal to max.
 	char BorderSize;            /// Size of the border, 0 for no border.
 	// FIXME color depend of percent (red, Orange, Yellow, Green...)
-	Uint32 Color;               /// Color of bar.
-	Uint32 BColor;              /// Color of background.
+	IntColor Color;             /// Color of bar.
+	IntColor BColor;            /// Color of background.
 };
 
 class CDecoVarText : public CDecoVar

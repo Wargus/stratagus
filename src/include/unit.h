@@ -451,7 +451,7 @@ extern bool RevealAttacker;				       /// Config: reveal attacker enabled
 extern int ResourcesMultiBuildersMultiplier;   /// Config: spend resources for building with multiple workers
 extern const CViewport *CurrentViewport; /// CurrentViewport
 extern void DrawUnitSelection(const CViewport &vp, const CUnit &unit);
-extern void (*DrawSelection)(Uint32, int, int, int, int);
+extern void (*DrawSelection)(IntColor, int, int, int, int);
 extern int MaxSelectable;                  /// How many units could be selected
 
 extern CUnit **Selected;                    /// currently selected units
@@ -575,17 +575,17 @@ extern void CleanUnits();
 // in unit_draw.c
 //--------------------
 /// Draw nothing around unit
-extern void DrawSelectionNone(Uint32, int, int, int, int);
+extern void DrawSelectionNone(IntColor, int, int, int, int);
 /// Draw circle around unit
-extern void DrawSelectionCircle(Uint32, int, int, int, int);
+extern void DrawSelectionCircle(IntColor, int, int, int, int);
 /// Draw circle filled with alpha around unit
-extern void DrawSelectionCircleWithTrans(Uint32, int, int, int, int);
+extern void DrawSelectionCircleWithTrans(IntColor, int, int, int, int);
 /// Draw rectangle around unit
-extern void DrawSelectionRectangle(Uint32, int, int, int, int);
+extern void DrawSelectionRectangle(IntColor, int, int, int, int);
 /// Draw rectangle filled with alpha around unit
-extern void DrawSelectionRectangleWithTrans(Uint32, int, int, int, int);
+extern void DrawSelectionRectangleWithTrans(IntColor, int, int, int, int);
 /// Draw corners around unit
-extern void DrawSelectionCorners(Uint32, int, int, int, int);
+extern void DrawSelectionCorners(IntColor, int, int, int, int);
 
 /// Register CCL decorations features
 extern void DecorationCclRegister();

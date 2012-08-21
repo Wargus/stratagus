@@ -41,6 +41,8 @@
 #include "unit.h"
 #include "unit_manager.h"
 
+#include <stdio.h>
+
 //Modify types
 #define MOD_ADD 1
 #define MOD_SUB 2

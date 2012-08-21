@@ -40,6 +40,8 @@
 #include "animation.h"
 #include "unit.h"
 
+#include <stdio.h>
+
 //Modify types
 #define MOD_ADD 1
 #define MOD_SUB 2
