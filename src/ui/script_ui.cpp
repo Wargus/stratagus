@@ -1182,13 +1182,13 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 						LuaError(l, "incorrect argument");
 					}
 					lua_rawgeti(l, -1, 1);
-					p->BorderColorRGB.r = LuaToNumber(l, -1);
+					p->BorderColorRGB.R = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 					lua_rawgeti(l, -1, 2);
-					p->BorderColorRGB.g = LuaToNumber(l, -1);
+					p->BorderColorRGB.G = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 					lua_rawgeti(l, -1, 3);
-					p->BorderColorRGB.b = LuaToNumber(l, -1);
+					p->BorderColorRGB.B = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "Size")) {
 					p->BorderSize = LuaToNumber(l, -1);

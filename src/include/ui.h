@@ -39,15 +39,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <vector>
-#include <string>
-#include <map>
-
-#include "SDL.h"
-
-#ifndef __UPGRADE_STRUCTS_H__
-#include "upgrade_structs.h"
-#endif
 #ifndef __CURSOR_H__
 #include "cursor.h"
 #endif
@@ -61,8 +52,15 @@
 #include "minimap.h"
 #endif
 
-#include "video.h"
+#include "color.h"
 #include "viewport.h"
+
+#include <vector>
+#include <string>
+#include <map>
+
+#include "SDL.h"
+
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -90,13 +88,12 @@ class ButtonStyleProperties
 public:
 	ButtonStyleProperties() : Sprite(NULL), Frame(0), BorderColor(0),
 		BorderSize(0), TextAlign(TextAlignUndefined),
-		TextPos(0, 0) {
-		BorderColorRGB.r = BorderColorRGB.g = BorderColorRGB.b = 0;
-	}
+		TextPos(0, 0)
+	{}
 
 	CGraphic *Sprite;
 	int Frame;
-	SDL_Color BorderColorRGB;
+	CColor BorderColorRGB;
 	Uint32 BorderColor;
 	int BorderSize;
 	TextAlignment TextAlign;        /// Text alignment
@@ -404,11 +401,8 @@ public:
 class CButtonPanel
 {
 public:
-	CButtonPanel() : G(NULL), X(0), Y(0), ShowCommandKey(true) {
-		AutoCastBorderColorRGB.r = 0;
-		AutoCastBorderColorRGB.g = 0;
-		AutoCastBorderColorRGB.b = 0;
-	}
+	CButtonPanel() : G(NULL), X(0), Y(0), ShowCommandKey(true)
+	{}
 
 	void Draw();
 	void Update();
@@ -419,7 +413,7 @@ public:
 	int X;
 	int Y;
 	std::vector<CUIButton> Buttons;
-	SDL_Color AutoCastBorderColorRGB;
+	CColor AutoCastBorderColorRGB;
 	bool ShowCommandKey;
 };
 
@@ -708,7 +702,7 @@ public:
 	std::vector<CUIButton> TransportingButtons;/// Button info for transporting
 
 	// Completed bar
-	SDL_Color CompletedBarColorRGB;     /// color for completed bar
+	CColor CompletedBarColorRGB;     /// color for completed bar
 	Uint32 CompletedBarColor;           /// color for completed bar
 	bool CompletedBarShadow;             /// should complete bar have shadow
 

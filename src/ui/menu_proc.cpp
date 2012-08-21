@@ -114,8 +114,7 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 	//  Border
 	//
 	if (!p->BorderColor) {
-		p->BorderColor = Video.MapRGB(TheScreen->format,
-									  p->BorderColorRGB.r, p->BorderColorRGB.g, p->BorderColorRGB.b);
+		p->BorderColor = Video.MapRGB(TheScreen->format, p->BorderColorRGB);
 	}
 	if (p->BorderSize) {
 		for (int i = 0; i < p->BorderSize; ++i) {

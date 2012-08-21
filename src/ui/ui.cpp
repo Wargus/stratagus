@@ -34,8 +34,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdarg.h>
-
 #include "stratagus.h"
 
 #include "ui.h"
@@ -49,6 +47,8 @@
 #include "title.h"
 #include "unit.h"
 #include "video.h"
+
+#include <stdarg.h>
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -117,7 +117,6 @@ CUserInterface::CUserInterface() :
 	VictoryBackgroundG(NULL), DefeatBackgroundG(NULL)
 {
 	MouseWarpPos.x = MouseWarpPos.y = 0;
-	memset(&CompletedBarColorRGB, 0, sizeof(CompletedBarColorRGB));
 
 	Point.Name = "cursor-point";
 	Glass.Name = "cursor-glass";
@@ -177,10 +176,7 @@ void InitUserInterface()
 
 	SetViewportMode(VIEWPORT_SINGLE);
 
-	UI.CompletedBarColor = Video.MapRGB(TheScreen->format,
-										UI.CompletedBarColorRGB.r,
-										UI.CompletedBarColorRGB.g,
-										UI.CompletedBarColorRGB.b);
+	UI.CompletedBarColor = Video.MapRGB(TheScreen->format, UI.CompletedBarColorRGB);
 	UI.ViewportCursorColor = ColorWhite;
 }
 
