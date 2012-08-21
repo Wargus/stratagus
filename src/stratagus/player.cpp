@@ -50,6 +50,7 @@
 #include "unittype.h"
 #include "unit.h"
 #include "ui.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --  Documentation
@@ -315,7 +316,7 @@ bool NoRescueCheck;               /// Disable rescue check
 **  Colors used for minimap.
 */
 std::vector<CColor> PlayerColorsRGB[PlayerMax];
-std::vector<Uint32> PlayerColors[PlayerMax];
+std::vector<IntColor> PlayerColors[PlayerMax];
 
 std::string PlayerColorNames[PlayerMax];
 

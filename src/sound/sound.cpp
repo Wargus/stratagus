@@ -43,6 +43,7 @@
 #include "sound_server.h"
 #include "ui.h"
 #include "unit.h"
+#include "video.h"
 #include "widgets.h"
 
 /*----------------------------------------------------------------------------

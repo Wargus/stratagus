@@ -49,6 +49,7 @@
 #include "unit.h"
 #include "ui.h"
 #include "unittype.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

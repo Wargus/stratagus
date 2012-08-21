@@ -57,6 +57,7 @@
 #include "unit_manager.h"
 #include "unittype.h"
 #include "upgrade.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

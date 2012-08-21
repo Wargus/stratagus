@@ -51,6 +51,7 @@
 #include "ui.h"
 #include "unit.h"
 #include "unittype.h"
+#include "video.h"
 
 extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 

@@ -32,10 +32,12 @@
 
 //@{
 
+#include "color.h"
 #include "vec2i.h"
-#include "video.h"
 
 class CViewport;
+
+struct SDL_Surface;
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -66,7 +68,7 @@ public:
 	void Destroy();
 	void Draw() const;
 	void DrawViewportArea(const CViewport &viewport) const;
-	void AddEvent(const Vec2i &pos, Uint32 color);
+	void AddEvent(const Vec2i &pos, IntColor color);
 
 	Vec2i ScreenToTilePos(const PixelPos &screenPos) const;
 	PixelPos TilePosToScreenPos(const Vec2i &tilePos) const;

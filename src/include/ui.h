@@ -527,7 +527,7 @@ public:
 class CPopupContentTypeLine : public CPopupContentType
 {
 public:
-	CPopupContentTypeLine() : Color(ColorWhite), Width(0), Height(1) {}
+	CPopupContentTypeLine();
 	virtual ~CPopupContentTypeLine() {}
 
 	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
@@ -563,14 +563,8 @@ public:
 class CPopup
 {
 public:
-	CPopup() : Contents(), MarginX(MARGIN_X), MarginY(MARGIN_Y), MinWidth(0), MinHeight(0),
-		DefaultFont(NULL), BackgroundColor(ColorBlue), BorderColor(ColorWhite) {}
-	~CPopup() {
-		for (std::vector<CPopupContentType *>::iterator content = Contents.begin();
-			 content != Contents.end(); ++content) {
-			delete *content;
-		}
-	}
+	CPopup();
+	~CPopup();
 
 	std::vector<CPopupContentType *> Contents; /// Array of contents to display.
 	std::string Ident;                         /// Ident of the popup.

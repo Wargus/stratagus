@@ -52,6 +52,7 @@
 #include "unit_find.h"
 #include "unitsound.h"
 #include "unittype.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations

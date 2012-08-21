@@ -48,6 +48,7 @@
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"
+#include "video.h"
 
 #include <guichan.h>
 void DrawGuichanWidgets();

@@ -478,6 +478,11 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 	}
 }
 
+CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), Height(1)
+{
+
+}
+
 /* virtual */ int CPopupContentTypeLine::GetWidth(const ButtonAction &button, int *Costs) const
 {
 	return this->Width;
@@ -541,6 +546,19 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 			snprintf(buf, sizeof(buf), diff > 0 ? "%d~<+%d~>" : "%d~<-%d~>", value, diff);
 			label.Draw(x, y, buf);
 		}
+	}
+}
+
+CPopup::CPopup() :
+	Contents(), MarginX(MARGIN_X), MarginY(MARGIN_Y), MinWidth(0), MinHeight(0),
+	DefaultFont(NULL), BackgroundColor(ColorBlue), BorderColor(ColorWhite)
+{}
+
+CPopup::~CPopup()
+{
+	for (std::vector<CPopupContentType *>::iterator content = Contents.begin();
+		 content != Contents.end(); ++content) {
+		delete *content;
 	}
 }
 

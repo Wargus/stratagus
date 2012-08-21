@@ -65,6 +65,11 @@ public:
 };
 
 
+#include <stdint.h>
+
+typedef uint32_t IntColor; // Uint32 in SDL
+
+
 //@}
 
 #endif

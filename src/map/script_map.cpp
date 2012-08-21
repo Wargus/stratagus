@@ -45,6 +45,7 @@
 #include "unit.h"
 #include "unittype.h"
 #include "version.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

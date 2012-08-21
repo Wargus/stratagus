@@ -55,6 +55,7 @@
 #include "unit.h"
 #include "unit_find.h"
 #include "unittype.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --  Defines

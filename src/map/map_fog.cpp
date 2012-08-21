@@ -45,6 +45,7 @@
 #include "ui.h"
 #include "unit.h"
 #include "unit_manager.h"
+#include "video.h"
 #include "../video/intern_video.h"
 
 /*----------------------------------------------------------------------------

@@ -71,6 +71,7 @@
 #include "unittype.h"
 #include "upgrade.h"
 #include "version.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

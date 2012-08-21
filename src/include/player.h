@@ -43,8 +43,6 @@
 
 #include "vec2i.h"
 
-#include "SDL.h"
-
 class CGraphic;
 
 /*----------------------------------------------------------------------------
@@ -130,7 +128,7 @@ public:
 	int    TotalRazings;
 	int    TotalKills;      /// How many unit killed
 
-	Uint32 Color;           /// color of units on minimap
+	IntColor Color;           /// color of units on minimap
 
 	CUnitColors UnitColors; /// Unit colors for new units
 
@@ -324,7 +322,7 @@ extern CPlayer Players[PlayerMax];  /// All players
 extern CPlayer *ThisPlayer;         /// Player on local computer
 extern bool NoRescueCheck;          /// Disable rescue check
 extern std::vector<CColor> PlayerColorsRGB[PlayerMax]; /// Player colors
-extern std::vector<Uint32> PlayerColors[PlayerMax]; /// Player colors
+extern std::vector<IntColor> PlayerColors[PlayerMax]; /// Player colors
 extern std::string PlayerColorNames[PlayerMax];  /// Player color names
 
 extern PlayerRace PlayerRaces;  /// Player races
