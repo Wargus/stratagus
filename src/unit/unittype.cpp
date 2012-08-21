@@ -33,12 +33,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <ctype.h>
-
 #include "stratagus.h"
-
-#include <string>
-#include <map>
 
 #include "unittype.h"
 
@@ -59,6 +54,11 @@
 #include "unitsound.h"
 #include "util.h"
 #include "video.h"
+
+#include <ctype.h>
+
+#include <string>
+#include <map>
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -163,7 +163,6 @@ CUnitType::CUnitType() :
 	memset(RepairCosts, 0, sizeof(RepairCosts));
 	memset(CanStore, 0, sizeof(CanStore));
 	memset(ResInfo, 0, sizeof(ResInfo));
-	memset(&NeutralMinimapColorRGB, 0, sizeof(NeutralMinimapColorRGB));
 	memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
 	memset(MissileOffsets, 0, sizeof(MissileOffsets));
 }

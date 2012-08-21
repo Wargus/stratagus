@@ -562,13 +562,13 @@ static int CclDefineUnitType(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
-			type->NeutralMinimapColorRGB.r = LuaToNumber(l, -1);
+			type->NeutralMinimapColorRGB.R = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, -1, 2);
-			type->NeutralMinimapColorRGB.g = LuaToNumber(l, -1);
+			type->NeutralMinimapColorRGB.G = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, -1, 3);
-			type->NeutralMinimapColorRGB.b = LuaToNumber(l, -1);
+			type->NeutralMinimapColorRGB.B = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "BoxSize")) {
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {

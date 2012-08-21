@@ -415,10 +415,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 
 	Uint32 color;
 	if (unit.Player->Index == PlayerNumNeutral) {
-		color = Video.MapRGB(TheScreen->format,
-							 type->NeutralMinimapColorRGB.r,
-							 type->NeutralMinimapColorRGB.g,
-							 type->NeutralMinimapColorRGB.b);
+		color = Video.MapRGB(TheScreen->format, type->NeutralMinimapColorRGB);
 	} else if (unit.Player == ThisPlayer && !Editor.Running) {
 		if (unit.Attacked && unit.Attacked + ATTACK_BLINK_DURATION > GameCycle &&
 			(red_phase || unit.Attacked + ATTACK_RED_DURATION > GameCycle)) {

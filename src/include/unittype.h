@@ -514,17 +514,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <SDL.h>
-#include <vector>
-#include <algorithm>
-#include <map>
-
 #ifndef __UPGRADE_STRUCTS_H__
 #include "upgrade_structs.h"
-#endif
-
-#ifndef __UTIL_H__
-#include "util.h"
 #endif
 
 #ifndef __UNITSOUND_H__
@@ -535,8 +526,14 @@
 #include "icons.h"
 #endif
 
+#include "color.h"
 #include "missileconfig.h"
 #include "vec2i.h"
+
+#include <SDL.h>
+#include <vector>
+#include <algorithm>
+#include <map>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -1042,7 +1039,7 @@ public:
 	ResourceInfo *ResInfo[MaxCosts];    /// Resource information.
 	std::vector<CBuildRestriction *> BuildingRules;   /// Rules list for building a building.
 	std::vector<CBuildRestriction *> AiBuildingRules; /// Rules list for for AI to build a building.
-	SDL_Color NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
+	CColor NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 
 	CUnitSound Sound;               /// Sounds for events
 
