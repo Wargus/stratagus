@@ -59,9 +59,6 @@
 #include <string>
 #include <map>
 
-#include "SDL.h"
-
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -94,7 +91,7 @@ public:
 	CGraphic *Sprite;
 	int Frame;
 	CColor BorderColorRGB;
-	Uint32 BorderColor;
+	IntColor BorderColor;
 	int BorderSize;
 	TextAlignment TextAlign;        /// Text alignment
 	PixelPos TextPos;               /// Text location
@@ -535,7 +532,7 @@ public:
 	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
 	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
 
-	Uint32 Color;  /// Color used for line.
+	IntColor Color;  /// Color used for line.
 	unsigned int Width;     /// line height
 	unsigned int Height;    /// line height
 };
@@ -573,8 +570,8 @@ public:
 	int MinWidth;                              /// Minimal width covered by popup.
 	int MinHeight;                             /// Minimal height covered by popup.
 	CFont *DefaultFont;                        /// Default font for content.
-	Uint32 BackgroundColor;                    /// Color used for popup's background.
-	Uint32 BorderColor;                        /// Color used for popup's borders.
+	IntColor BackgroundColor;                  /// Color used for popup's background.
+	IntColor BorderColor;                      /// Color used for popup's borders.
 };
 
 class CResourceInfo
@@ -697,8 +694,8 @@ public:
 
 	// Completed bar
 	CColor CompletedBarColorRGB;     /// color for completed bar
-	Uint32 CompletedBarColor;           /// color for completed bar
-	bool CompletedBarShadow;             /// should complete bar have shadow
+	IntColor CompletedBarColor;      /// color for completed bar
+	bool CompletedBarShadow;         /// should complete bar have shadow
 
 	// Button panel
 	CButtonPanel ButtonPanel;
@@ -723,7 +720,7 @@ public:
 
 	// The minimap
 	CMinimap Minimap;                   /// minimap
-	Uint32 ViewportCursorColor;         /// minimap cursor color
+	IntColor ViewportCursorColor;       /// minimap cursor color
 
 	// The status line
 	CStatusLine StatusLine;             /// status line
