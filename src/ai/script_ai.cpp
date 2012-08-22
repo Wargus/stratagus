@@ -1176,7 +1176,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			const char *aiName = LuaToString(l, j + 1);
 			CAiType *ait = GetAiTypesByName(aiName);
 			if (ait == NULL) {
-				lua_pushfstring(l, "ai-type not found: %s", aiName);
+				LuaError(l, "ai-type not found: %s" _C_ aiName);
 			}
 			ai->AiType = ait;
 			ai->Script = ait->Script;
