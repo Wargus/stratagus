@@ -92,6 +92,7 @@
 #include "tile.h"
 #endif
 
+#include "color.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
@@ -413,8 +414,8 @@ extern char CurrentMapPath[1024]; /// Path to the current map
 
 /// Contrast of fog of war
 extern int FogOfWarOpacity;
-/// RGB triplet (0-255) of fog of war color
-extern int FogOfWarColor[3];
+/// fog of war color
+extern CColor FogOfWarColor;
 /// Forest regeneration
 extern int ForestRegeneration;
 /// Flag must reveal the map
