@@ -107,14 +107,19 @@ CUnit *CUnitManager::AllocUnit()
 void CUnitManager::ReleaseUnit(CUnit *unit)
 {
 	Assert(unit);
-	Assert(units[unit->UnitManagerData.unitSlot] == unit);
+
 	if (lastCreated == unit) {
 		lastCreated = NULL;
 	}
-	CUnit *temp = units.back();
-	temp->UnitManagerData.unitSlot = unit->UnitManagerData.unitSlot;
-	units[unit->UnitManagerData.unitSlot] = temp;
-	units.pop_back();
+	if (unit->UnitManagerData.unitSlot != -1) { // == -1 when loading.
+		Assert(units[unit->UnitManagerData.unitSlot] == unit);
+
+		CUnit *temp = units.back();
+		temp->UnitManagerData.unitSlot = unit->UnitManagerData.unitSlot;
+		units[unit->UnitManagerData.unitSlot] = temp;
+		unit->UnitManagerData.unitSlot = -1;
+		units.pop_back();
+	}
 	releasedUnits.push_back(unit);
 	unit->ReleaseCycle = GameCycle + 500; // can be reused after this time
 	//Refs = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
