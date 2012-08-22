@@ -58,7 +58,7 @@
 
 int FogOfWarOpacity;                 /// Fog of war Opacity.
 Uint32 FogOfWarColorSDL;
-int FogOfWarColor[3];
+CColor FogOfWarColor;
 
 CGraphic *CMap::FogGraphic;
 
@@ -581,7 +581,7 @@ void CViewport::DrawMapFogOfWar() const
 void CMap::InitFogOfWar()
 {
 	//calculate this once from the settings and store it
-	FogOfWarColorSDL = Video.MapRGB(TheScreen->format, FogOfWarColor[0], FogOfWarColor[1], FogOfWarColor[2]);
+	FogOfWarColorSDL = Video.MapRGB(TheScreen->format, FogOfWarColor);
 
 	Uint8 r, g, b;
 	SDL_Surface *s;
