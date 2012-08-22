@@ -34,8 +34,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <png.h>
-
 #include "stratagus.h"
 
 #include "game.h"
@@ -72,6 +70,8 @@
 #include "upgrade.h"
 #include "version.h"
 #include "video.h"
+
+#include <png.h>
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -287,16 +287,14 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 static int WriteMapPresentation(const std::string &mapname, CMap &map, char *)
 {
 	FileWriter *f = NULL;
-	int i;
-	int topplayer;
-	int numplayers;
+
 	//	char *mapsetupname;
 	const char *type[] = {"", "", "neutral", "nobody",
 						  "computer", "person", "rescue-passive", "rescue-active"
 						 };
 
-	numplayers = 0;
-	topplayer = PlayerMax - 2;
+	int numplayers = 0;
+	int topplayer = PlayerMax - 2;
 
 	try {
 		f = CreateFileWriter(mapname);
@@ -309,7 +307,7 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map, char *)
 		while (topplayer > 0 && map.Info.PlayerType[topplayer] == PlayerNobody) {
 			--topplayer;
 		}
-		for (i = 0; i <= topplayer; ++i) {
+		for (int i = 0; i <= topplayer; ++i) {
 			f->printf("%s\"%s\"", (i ? ", " : ""), type[map.Info.PlayerType[i]]);
 			if (map.Info.PlayerType[i] == PlayerPerson) {
 				++numplayers;
@@ -398,7 +396,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 		f->printf("-- place units\n");
 		f->printf("if (MapUnitsInit ~= nil) then MapUnitsInit() end\n");
 		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-			CUnit &unit = **it;
+			const CUnit &unit = **it;
 			f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
 					  unit.Type->Ident.c_str(),
 					  unit.Player->Index,
@@ -429,24 +427,21 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 */
 int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain)
 {
-	char mapSetup[PATH_MAX];
-	char previewName[PATH_MAX];
-	char *setupExtension;
-	char *previewExtension;
-
 	if (!map.Info.MapWidth || !map.Info.MapHeight) {
 		fprintf(stderr, "%s: invalid Stratagus map\n", mapName.c_str());
 		ExitFatal(-1);
 	}
 
+	char mapSetup[PATH_MAX];
 	strcpy_s(mapSetup, sizeof(mapSetup), mapName.c_str());
-	setupExtension = strstr(mapSetup, ".smp");
+	char *setupExtension = strstr(mapSetup, ".smp");
 	if (!setupExtension) {
-		fprintf(stderr, "%s: invalid Statagus map filename\n", mapName.c_str());
+		fprintf(stderr, "%s: invalid Stratagus map filename\n", mapName.c_str());
 	}
 
+	char previewName[PATH_MAX];
 	strcpy_s(previewName, sizeof(previewName), mapName.c_str());
-	previewExtension = strstr(previewName, ".smp");
+	char *previewExtension = strstr(previewName, ".smp");
 	memcpy(previewExtension, ".png\0", 5 * sizeof(char));
 	WriteMapPreview(previewName, map);
 
@@ -467,10 +462,8 @@ int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain)
 */
 static void LoadMap(const std::string &filename, CMap &map)
 {
-	const char *tmp;
 	const char *name = filename.c_str();
-
-	tmp = strrchr(name, '.');
+	const char *tmp = strrchr(name, '.');
 	if (tmp) {
 #ifdef USE_ZLIB
 		if (!strcmp(tmp, ".gz")) {
@@ -969,9 +962,7 @@ void CleanGame()
 */
 static int CclSetGameName(lua_State *l)
 {
-	int args;
-
-	args = lua_gettop(l);
+	const int args = lua_gettop(l);
 	if (args > 1 || (args == 1 && (!lua_isnil(l, 1) && !lua_isstring(l, 1)))) {
 		LuaError(l, "incorrect argument");
 	}
@@ -983,22 +974,18 @@ static int CclSetGameName(lua_State *l)
 		std::string path = Parameters::Instance.GetUserDirectory() + "/" + GameName;
 		makedir(path.c_str(), 0777);
 	}
-
 	return 0;
 }
 
 static int CclSetFullGameName(lua_State *l)
 {
-	int args;
-
-	args = lua_gettop(l);
+	const int args = lua_gettop(l);
 	if (args > 1 || (args == 1 && (!lua_isnil(l, 1) && !lua_isstring(l, 1)))) {
 		LuaError(l, "incorrect argument");
 	}
 	if (args == 1 && !lua_isnil(l, 1)) {
 		FullGameName = lua_tostring(l, 1);
 	}
-
 	return 0;
 }
 
@@ -1178,11 +1165,8 @@ static int CclSetSpeeds(lua_State *l)
 */
 static int CclDefineDefaultIncomes(lua_State *l)
 {
-	int i;
-	int args;
-
-	args = lua_gettop(l);
-	for (i = 0; i < MaxCosts && i < args; ++i) {
+	const int args = lua_gettop(l);
+	for (int i = 0; i < MaxCosts && i < args; ++i) {
 		DefaultIncomes[i] = LuaToNumber(l, i + 1);
 	}
 	return 0;
@@ -1195,12 +1179,10 @@ static int CclDefineDefaultIncomes(lua_State *l)
 */
 static int CclDefineDefaultActions(lua_State *l)
 {
-	unsigned int args;
-
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
 		DefaultActions[i].clear();
 	}
-	args = lua_gettop(l);
+	const unsigned int args = lua_gettop(l);
 	for (unsigned int i = 0; i < MaxCosts && i < args; ++i) {
 		DefaultActions[i] = LuaToString(l, i + 1);
 	}
@@ -1214,12 +1196,10 @@ static int CclDefineDefaultActions(lua_State *l)
 */
 static int CclDefineDefaultResourceNames(lua_State *l)
 {
-	unsigned int args;
-
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
 		DefaultResourceNames[i].clear();
 	}
-	args = lua_gettop(l);
+	const unsigned int args = lua_gettop(l);
 	for (unsigned int i = 0; i < MaxCosts && i < args; ++i) {
 		DefaultResourceNames[i] = LuaToString(l, i + 1);
 	}
@@ -1255,7 +1235,7 @@ static int CclDefineDefaultResourceAmounts(lua_State *l)
 */
 static int CclDefineDefaultResourceMaxAmounts(lua_State *l)
 {
-	int args = std::min<int>(lua_gettop(l), MaxCosts);
+	const int args = std::min<int>(lua_gettop(l), MaxCosts);
 
 	for (int i = 0; i < args; ++i) {
 		DefaultResourceMaxAmounts[i] = LuaToNumber(l, i + 1);
@@ -1338,16 +1318,13 @@ static int CclSetMenuRace(lua_State *l)
 */
 static int CclSavedGameInfo(lua_State *l)
 {
-	const char *value;
-
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
 
-	lua_pushnil(l);
-	while (lua_next(l, 1)) {
-		value = LuaToString(l, -2);
+	for (lua_pushnil(l); lua_next(l, 1); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
 
 		if (!strcmp(value, "SaveFile")) {
 			if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), LuaToString(l, -1)) != 0) {
@@ -1366,7 +1343,6 @@ static int CclSavedGameInfo(lua_State *l)
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
-		lua_pop(l, 1);
 	}
 	return 0;
 }

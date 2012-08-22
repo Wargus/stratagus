@@ -198,10 +198,6 @@ static void PlaceUnits()
 */
 void LoadGame(const std::string &filename)
 {
-	unsigned long game_cycle;
-	unsigned syncrand;
-	unsigned synchash;
-
 	// log will be enabled if found in the save game
 	CommandLogDisabled = true;
 	SaveGameLoading = true;
@@ -216,9 +212,9 @@ void LoadGame(const std::string &filename)
 
 	PlaceUnits();
 
-	game_cycle = GameCycle;
-	syncrand = SyncRandSeed;
-	synchash = SyncHash;
+	const unsigned long game_cycle = GameCycle;
+	const unsigned syncrand = SyncRandSeed;
+	const unsigned synchash = SyncHash;
 
 	InitModules();
 	LoadModules();
