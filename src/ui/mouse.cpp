@@ -260,7 +260,11 @@ static bool DoRightButton_Harvest(CUnit &unit, CUnit *dest, const Vec2i &pos, in
 			PlayUnitSound(unit, VoiceAcknowledging);
 			acknowledged = 1;
 		}
-		SendCommandFollow(unit, *dest, flush);
+		if (dest->Type->CanMove() == false) {
+			SendCommandMove(unit, pos, flush);
+		} else {
+			SendCommandFollow(unit, *dest, flush);
+		}
 		return true;
 	}
 	// Move
@@ -306,7 +310,11 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 				PlayUnitSound(unit, VoiceAcknowledging);
 				acknowledged = 1;
 			}
-			SendCommandFollow(unit, *dest, flush);
+			if (dest->Type->CanMove() == false) {
+				SendCommandMove(unit, pos, flush);
+			} else {
+				SendCommandFollow(unit, *dest, flush);
+			}
 			return;
 		}
 	}
@@ -362,7 +370,11 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 			PlayUnitSound(unit, VoiceAcknowledging);
 			acknowledged = 1;
 		}
-		SendCommandFollow(unit, dest, flush);
+		if (dest.Type->CanMove() == false) {
+			SendCommandMove(unit, dest.tilePos, flush);
+		} else {
+			SendCommandFollow(unit, dest, flush);
+		}
 		return true;
 	}
 	return false;
@@ -878,7 +890,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 		if (show) {
 			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(cursorPos);
-			UnitUnderCursor = UnitOnScreen(NULL, mapPixelPos.x, mapPixelPos.y);
+			UnitUnderCursor = UnitOnScreen(mapPixelPos.x, mapPixelPos.y);
 		}
 	} else if (CursorOn == CursorOnMinimap) {
 		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(cursorPos);
@@ -1866,7 +1878,7 @@ void UIHandleButtonUp(unsigned button)
 			if (Map.IsFieldVisible(*ThisPlayer, cursorTilePos) || ReplayRevealMap) {
 				const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 
-				unit = UnitOnScreen(unit, cursorMapPos.x, cursorMapPos.y);
+				unit = UnitOnScreen(cursorMapPos.x, cursorMapPos.y);
 			}
 			if (unit) {
 				// FIXME: Not nice coded, button number hardcoded!
@@ -1960,7 +1972,7 @@ static int GetPieUnderCursor()
 {
 	int x = CursorScreenPos.x - (CursorStartScreenPos.x - ICON_SIZE_X / 2);
 	int y = CursorScreenPos.y - (CursorStartScreenPos.y - ICON_SIZE_Y / 2);
-	for (int i = 0; i < 8; ++i) {
+	for (int i = 0; i < 9; ++i) {
 		if (x > UI.PieMenu.X[i] && x < UI.PieMenu.X[i] + ICON_SIZE_X
 			&& y > UI.PieMenu.Y[i] && y < UI.PieMenu.Y[i] + ICON_SIZE_Y) {
 			return i;
@@ -1998,7 +2010,7 @@ void DrawPieMenu()
 	}
 	CPlayer &player = *Selected[0]->Player;
 
-	for (int i = 0; i < (int)UI.ButtonPanel.Buttons.size() && i < 8; ++i) {
+	for (int i = 0; i < (int)UI.ButtonPanel.Buttons.size() && i < 9; ++i) {
 		if (buttons[i].Pos != -1) {
 			int x = CursorStartScreenPos.x - ICON_SIZE_X / 2 + UI.PieMenu.X[i];
 			int y = CursorStartScreenPos.y - ICON_SIZE_Y / 2 + UI.PieMenu.Y[i];
@@ -2026,6 +2038,7 @@ void DrawPieMenu()
 	int i = GetPieUnderCursor();
 	if (i != -1 && KeyState != KeyStateInput && buttons[i].Pos != -1) {
 		UpdateStatusLineForButton(buttons[i]);
+		DrawPopup(buttons[i], UI.ButtonPanel.Buttons[i]);
 	}
 }
 

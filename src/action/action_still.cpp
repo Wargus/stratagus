@@ -380,8 +380,7 @@ bool AutoAttack(CUnit &unit)
 			this->AutoAttackStand(unit);
 		}
 	} else {
-		if ((unit.IsAgressive() && AutoAttack(unit))
-			|| AutoCast(unit)
+		if (AutoCast(unit) || (unit.IsAgressive() && AutoAttack(unit))
 			|| AutoRepair(unit)
 			|| MoveRandomly(unit)) {
 		}

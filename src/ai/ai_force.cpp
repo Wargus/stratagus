@@ -291,6 +291,7 @@ void AiForce::Attack(const Vec2i &pos)
 
 	if (Units.size() == 0) {
 		this->Attacking = false;
+		this->State = AiForceAttackingState_Waiting;
 		return;
 	}
 	if (!this->Attacking) {
@@ -352,6 +353,7 @@ void AiForce::ReturnToHome()
 	this->GoalPos = invalidPos;
 	this->Defending = false;
 	this->Attacking = false;
+	this->State = AiForceAttackingState_Waiting;
 }
 
 AiForceManager::AiForceManager()
@@ -758,6 +760,7 @@ void AiForce::Update()
 				DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
 						   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
 				Attacking = false;
+				State = AiForceAttackingState_Waiting;
 				return;
 			}
 			GoalPos = unit->tilePos;
@@ -797,6 +800,7 @@ void AiForceManager::Update()
 			if (force.Size() == 0) {
 				force.Attacking = false;
 				force.Defending = false;
+				force.State = AiForceAttackingState_Waiting;
 				continue;
 			}
 			const int nearDist = 5;

@@ -68,6 +68,7 @@ static const char *MissileClassNames[] = {
 	"missile-class-death-coil",
 	"missile-class-tracer",
 	"missile-class-clip-to-target",
+	"missile-class-continious",
 	NULL
 };
 
@@ -143,6 +144,10 @@ void MissileType::Load(lua_State *l)
 			this->Sleep = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Speed")) {
 			this->Speed = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "TTL")) {
+			this->TTL = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Damage")) {
+			this->Damage = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DrawLevel")) {
 			this->DrawLevel = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Range")) {

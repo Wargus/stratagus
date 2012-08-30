@@ -35,10 +35,15 @@
 
 
 
-CSmokeParticle::CSmokeParticle(CPosition position, Animation *smoke) :
-	CParticle(position), puff(smoke)
+CSmokeParticle::CSmokeParticle(CPosition position, Animation *smoke,
+							   float speedx, float speedy) :
+	CParticle(position)
 {
 	Assert(smoke);
+	this->puff = smoke->clone();
+
+	speedVector.x = speedx;
+	speedVector.y = speedy;
 }
 
 CSmokeParticle::~CSmokeParticle()
@@ -61,13 +66,13 @@ void CSmokeParticle::update(int ticks)
 	}
 
 	// smoke rises
-	const int smokeRisePerSecond = 22;
-	pos.y -= ticks / 1000.f * smokeRisePerSecond;
+	pos.x += ticks / 1000.f * speedVector.x;
+	pos.y += ticks / 1000.f * speedVector.y;
 }
 
 CParticle *CSmokeParticle::clone()
 {
-	return new CSmokeParticle(pos, puff);
+	return new CSmokeParticle(pos, puff, speedVector.x, speedVector.y);
 }
 
 //@}

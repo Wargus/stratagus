@@ -981,9 +981,9 @@ int SaveReplay(const std::string &filename)
 		return -1;
 	}
 
-	destination = Parameters::Instance.GetUserDirectory() + "/logs/" + filename;
+	destination = Parameters::Instance.GetUserDirectory() + "/" + GameName + "/logs/" + filename;
 
-	logfile << Parameters::Instance.GetUserDirectory() << "/logs/log_of_stratagus_" << ThisPlayer->Index << ".log";
+	logfile << Parameters::Instance.GetUserDirectory() << "/" << GameName << "/logs/log_of_stratagus_" << ThisPlayer->Index << ".log";
 
 	if (stat(logfile.str().c_str(), &sb)) {
 		fprintf(stderr, "stat failed\n");
@@ -1009,7 +1009,7 @@ int SaveReplay(const std::string &filename)
 		delete[] buf;
 		return -1;
 	}
-	fwrite(buf, size, 1, fd);
+	fwrite(buf, sb.st_size, size, fd);
 	fclose(fd);
 
 	delete[] buf;

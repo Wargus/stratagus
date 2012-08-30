@@ -643,6 +643,7 @@ enum {
 	SAVECARGO_INDEX,
 	NONSOLID_INDEX,
 	WALL_INDEX,
+	NORANDOMPLACING_INDEX,
 	NBARALREADYDEFINED
 };
 
@@ -946,7 +947,7 @@ public:
 	LuaCallback *OnEachCycle;       /// lua function called every cycle
 	LuaCallback *OnEachSecond;      /// lua function called every second
 
-	std::string DamageType;         /// DamageType (used for extra death animations and impacts)
+	mutable std::string DamageType;         /// DamageType (used for extra death animations and impacts)
 
 	std::string CorpseName;         /// Corpse type name
 	CUnitType *CorpseType;          /// Corpse unit-type
@@ -960,6 +961,8 @@ public:
 	int TileHeight;                 /// Tile size on map height
 	int BoxWidth;                   /// Selected box size width
 	int BoxHeight;                  /// Selected box size height
+	int BoxOffsetX;                 /// Selected box size horizontal offset
+	int BoxOffsetY;                 /// Selected box size vertical offset
 	int NumDirections;              /// Number of directions unit can face
 	int MinAttackRange;             /// Minimal attack range
 	int ReactRangeComputer;         /// Reacts on enemy for computer
@@ -1023,6 +1026,7 @@ public:
 	unsigned SaveCargo : 1;             /// Unit unloads his passengers after death.
 	unsigned NonSolid : 1;              /// Unit can be entered by other units.
 	unsigned Wall : 1;                  /// Use special logic for Direction field.
+	unsigned NoRandomPlacing : 1;       /// Don't use random frame rotation
 
 	CUnitStats DefaultStat;
 	struct BoolFlags {

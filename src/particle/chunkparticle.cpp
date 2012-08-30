@@ -45,9 +45,9 @@ static inline float deg2rad(int degrees)
 
 
 CChunkParticle::CChunkParticle(CPosition position, Animation *smokeAnimation, Animation *debrisAnimation,
-							   int minVelocity = 0, int maxVelocity = 400, int minTrajectoryAngle = 77) :
+							   int minVelocity, int maxVelocity, int minTrajectoryAngle, int maxTTL) :
 	CParticle(position), initialPos(position), nextSmokeTicks(0), age(0),
-	height(0.f)
+		maxTTL(maxTTL), height(0.f)
 {
 	float radians = deg2rad(MyRand() % 360);
 	direction.x = cos(radians);
@@ -59,6 +59,9 @@ CChunkParticle::CChunkParticle(CPosition position, Animation *smokeAnimation, An
 	this->initialVelocity = this->minVelocity + MyRand() % (this->maxVelocity - this->minVelocity + 1);
 	this->trajectoryAngle = deg2rad(MyRand() % (90 - this->minTrajectoryAngle) + this->minTrajectoryAngle);
 	this->lifetime = (int)(1000 * (initialVelocity * sin(trajectoryAngle) / gravity) * 2);
+	if (maxTTL) {
+		this->lifetime = std::min(maxTTL, this->lifetime);
+	}
 
 	this->smokeAnimation = smokeAnimation->clone();
 	this->debrisAnimation = debrisAnimation->clone();
@@ -132,7 +135,7 @@ void CChunkParticle::update(int ticks)
 
 CParticle *CChunkParticle::clone()
 {
-	return new CChunkParticle(pos, smokeAnimation, debrisAnimation, minVelocity, maxVelocity, minTrajectoryAngle);
+	return new CChunkParticle(pos, smokeAnimation, debrisAnimation, minVelocity, maxVelocity, minTrajectoryAngle, maxTTL);
 }
 
 //@}

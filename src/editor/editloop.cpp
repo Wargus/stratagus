@@ -977,16 +977,16 @@ static void DrawStartLocations()
 */
 static void DrawEditorInfo()
 {
-#if 0
-	Vec2i pos = {0, 0};
+#if 1
+	Vec2i pos(0, 0);
 
 	if (UI.MouseViewport) {
-		pos = UI.MouseViewport.ScreenToTilePos(CursorScreenPos);
+		pos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 	}
 
 	char buf[256];
 	snprintf(buf, sizeof(buf), "Editor (%d %d)", pos.x, pos.y);
-	CLabel(GetGameFont()).Draw(UI.ResourceX + 2, UI.ResourceY + 2, buf);
+	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 2, UI.StatusLine.TextY, buf);
 	const CMapField *mf = Map.Field(pos);
 	//
 	// Flags info
@@ -1007,7 +1007,7 @@ static void DrawEditorInfo()
 			flags & MapFieldAirUnit      ? 'a' : '-',
 			flags & MapFieldSeaUnit      ? 's' : '-',
 			flags & MapFieldBuilding     ? 'b' : '-');
-	CLabel(GetGameFont()).Draw(UI.ResourceX + 118, UI.ResourceY + 2, buf);
+	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY, buf);
 
 	//
 	// Tile info
@@ -1022,13 +1022,12 @@ static void DrawEditorInfo()
 
 	Assert(i != Map.Tileset.NumTiles);
 
-	snprintf(buf, sizeof(buf), "%d %s %s", tile,
+	/*snprintf(buf, sizeof(buf), "%d %s %s", tile,
 			 Map.Tileset.SolidTerrainTypes[Map.Tileset.Tiles[i].BaseTerrain].TerrainName,
 			 Map.Tileset.Tiles[i].MixTerrain
 			 ? Map.Tileset.SolidTerrainTypes[Map.Tileset.Tiles[i].MixTerrain].TerrainName
-			 : "");
+			 : "");*/
 
-	CLabel(GetGameFont()).Draw(UI.ResourceX + 252, UI.ResourceY + 2, buf);
 #endif
 }
 
@@ -1838,7 +1837,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		// Look if there is an unit under the cursor.
 		//
 		const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
-		UnitUnderCursor = UnitOnScreen(NULL, cursorMapPos.x, cursorMapPos.y);
+		UnitUnderCursor = UnitOnScreen(cursorMapPos.x, cursorMapPos.y);
 
 		if (UnitUnderCursor != NULL) {
 			ShowUnitInfo(*UnitUnderCursor);

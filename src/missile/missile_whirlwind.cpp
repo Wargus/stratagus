@@ -61,38 +61,9 @@ void MissileWhirlwind::Action()
 	const PixelPos centerOffset(PixelTileSize.x / 2, PixelTileSize.y);
 	const Vec2i center = Map.MapPixelPosToTilePos(pixelCenter + centerOffset);
 
-#if 0
-	if (!(this->TTL % 4)) { // Every 4 cycles 4 points damage in tornado center
-		CUnitCache &cache = Map.Field(center)->UnitCache;
-
-		for (CUnitCache::iterator it = cache.begin(); it != cache.end(); ++it) {
-			CUnit &unit = **it;
-
-			if (unit.CurrentAction() != UnitActionDie) {
-				// should be missile damage ?
-				HitUnit(this->SourceUnit, unit, WHIRLWIND_DAMAGE1);
-			}
-		}
-	}
-	if (!(this->TTL % (CYCLES_PER_SECOND / 10))) { // Every 1/10s 1 points damage on tornado periphery
-		std::vector<CUnit *> table;
-		// we should parameter this
-		const Vec2i offset = {1, 1};
-		Map.Select(center - offset, center + offset, table);
-		for (size_t i = 0; i < table.size(); ++i) {
-			CUnit &unit = *table[i];
-
-			if (unit.tilePos != center && unit.CurrentAction() != UnitActionDie) {
-				// should be in missile
-				HitUnit(this->SourceUnit, unit, WHIRLWIND_DAMAGE2);
-			}
-		}
-	}
-#else
 	if (!(this->TTL % CYCLES_PER_SECOND / 10)) {
 		this->MissileHit();
 	}
-#endif
 	// Changes direction every 3 seconds (approx.)
 	if (!(this->TTL % 100)) { // missile has reached target unit/spot
 		Vec2i newPos;

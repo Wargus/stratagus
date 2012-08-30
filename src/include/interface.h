@@ -47,6 +47,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CUIButton;
 class CUnit;
 struct EventCallback;
 
@@ -368,6 +369,8 @@ extern void UpdateTimer();
 extern void UpdateStatusLineForButton(const ButtonAction &button);
 /// Draw the Pie Menu
 extern void DrawPieMenu();
+/// Draw the button popup
+extern void DrawPopup(const ButtonAction &button, const CUIButton &uibutton);
 
 /// Handle the mouse in scroll area
 extern bool HandleMouseScrollArea(const PixelPos &mousePos);
@@ -381,6 +384,8 @@ extern bool ButtonCheckTrue(const CUnit &unit, const ButtonAction &button);
 extern bool ButtonCheckFalse(const CUnit &unit, const ButtonAction &button);
 /// Check if allowed upgrade is ready
 extern bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction &button);
+/// Check if unit's variables pass the condition check
+extern bool ButtonCheckUnitVariable(const CUnit &unit, const ButtonAction &button);
 /// Check if allowed units exists
 extern bool ButtonCheckUnitsOr(const CUnit &unit, const ButtonAction &button);
 /// Check if allowed units exists

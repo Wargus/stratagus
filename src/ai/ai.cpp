@@ -640,7 +640,6 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type)
 		DebugPrint("My guess is that you built something under ai me. naughty boy!\n");
 		return;
 	}
-	Assert(0);
 }
 
 /*----------------------------------------------------------------------------
@@ -691,14 +690,13 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 			// FIXME ad support for help from Coward type units
 			if (aiunit.IsAgressive() && CanTarget(aiunit.Type, attacker->Type)
 				&& aiunit.CurrentOrder()->GetGoal() != attacker) {
-				bool shouldAttack = aiunit.IsIdle();
+				bool shouldAttack = aiunit.IsIdle() && aiunit.Threshold == 0;
 
 				if (aiunit.CurrentAction() == UnitActionAttack) {
 					const COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
 					const CUnit *oldGoal = orderAttack.GetGoal();
 
-					if (oldGoal == NULL || oldGoal->IsAgressive() == false
-						|| (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
+					if (oldGoal == NULL || (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
 							&& aiunit.MapDistanceTo(defender) <= aiunit.Stats->Variables[ATTACKRANGE_INDEX].Max)) {
 						shouldAttack = true;
 					}

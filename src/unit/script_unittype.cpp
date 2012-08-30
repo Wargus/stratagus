@@ -89,6 +89,7 @@ static const char SHIELDPIERCE_KEY[] = "ShieldPiercing";
 static const char SAVECARGO_KEY[] = "LoseCargo";
 static const char NONSOLID_KEY[] = "NonSolid";
 static const char WALL_KEY[] = "Wall";
+static const char NORANDOMPLACING_KEY[] = "NoRandomPlacing";
 
 // names of the variable.
 static const char HITPOINTS_KEY[] = "HitPoints";
@@ -139,7 +140,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   SHOREBUILDING_KEY, CANATTACK_KEY, BUILDEROUTSIDE_KEY,
 							   BUILDERLOST_KEY, CANHARVEST_KEY, HARVESTER_KEY, SELECTABLEBYRECTANGLE_KEY,
 							   ISNOTSELECTABLE_KEY, DECORATION_KEY, INDESTRUCTIBLE_KEY, TELEPORTER_KEY, SHIELDPIERCE_KEY,
-							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY
+							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY
 							  };
 
 	for (int i = 0; i < NBARALREADYDEFINED; ++i) {
@@ -332,6 +333,7 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 	type.BoolFlag[SAVECARGO_INDEX].value             = type.SaveCargo;
 	type.BoolFlag[NONSOLID_INDEX].value              = type.NonSolid;
 	type.BoolFlag[WALL_INDEX].value                  = type.Wall;
+	type.BoolFlag[NORANDOMPLACING_INDEX].value       = type.NoRandomPlacing;
 }
 
 /**
@@ -580,6 +582,16 @@ static int CclDefineUnitType(lua_State *l)
 			lua_rawgeti(l, -1, 2);
 			type->BoxHeight = LuaToNumber(l, -1);
 			lua_pop(l, 1);
+		} else if (!strcmp(value, "BoxOffset")) {
+			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
+				LuaError(l, "incorrect argument");
+			}
+			lua_rawgeti(l, -1, 1);
+			type->BoxOffsetX = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			type->BoxOffsetY = LuaToNumber(l, -1);
+			lua_pop(l, 1);
 		} else if (!strcmp(value, "NumDirections")) {
 			type->NumDirections = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Revealer")) {
@@ -671,33 +683,29 @@ static int CclDefineUnitType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
-				value = LuaToString(l, -1);
+				const char *dtype = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
 
-				if (!strcmp(value, "general")) {
+				if (!strcmp(dtype, "general")) {
 					lua_rawgeti(l, -1, k + 1);
 					type->Impact[ANIMATIONS_DEATHTYPES].Name = LuaToString(l, -1);
 					type->Impact[ANIMATIONS_DEATHTYPES].Missile = NULL;
 					lua_pop(l, 1);
-				} else if (!strcmp(value, "shield")) {
+				} else if (!strcmp(dtype, "shield")) {
 					lua_rawgeti(l, -1, k + 1);
 					type->Impact[ANIMATIONS_DEATHTYPES + 1].Name = LuaToString(l, -1);
 					type->Impact[ANIMATIONS_DEATHTYPES + 1].Missile = NULL;
 					lua_pop(l, 1);
 				} else {
-					lua_rawgeti(l, -1, k + 1);
-					const std::string name = LuaToString(l, -1);
-					lua_pop(l, 1);
 					int num = 0;
 					for (; num < ANIMATIONS_DEATHTYPES; ++num) {
-						if (name == ExtraDeathTypes[num]) {
-							++k;
+						if (dtype == ExtraDeathTypes[num]) {
 							break;
 						}
 					}
 					if (num == ANIMATIONS_DEATHTYPES) {
-						LuaError(l, "Death type not found: %s" _C_ name.c_str());
+						LuaError(l, "Death type not found: %s" _C_ dtype);
 					} else {
 						lua_rawgeti(l, -1, k + 1);
 						type->Impact[num].Name = LuaToString(l, -1);
@@ -1084,6 +1092,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->NonSolid = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Wall")) {
 			type->Wall = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "NoRandomPlacing")) {
+			type->NoRandomPlacing = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Sounds")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

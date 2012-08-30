@@ -122,7 +122,7 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	const CUnitStats &newstats = newtype.Stats[player.Index];
 
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
-		if (unit.Variable[i].Max) {
+		if (unit.Variable[i].Max && unit.Variable[i].Value) {
 			unit.Variable[i].Value = newstats.Variables[i].Max *
 									 unit.Variable[i].Value / unit.Variable[i].Max;
 		} else {
@@ -278,7 +278,7 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	}
 
 	if (TransformUnitIntoType(unit, newtype) == 0) {
-		player.Notify(NotifyGreen, unit.tilePos, _("Upgrade to %s canceled"), newtype.Name.c_str());
+		player.Notify(NotifyYellow, unit.tilePos, _("Upgrade to %s canceled"), newtype.Name.c_str());
 		this->Finished = true;
 		return ;
 	}

@@ -164,7 +164,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	const int x = screenPos.x - type.BoxWidth / 2 - (type.Width - type.Sprite->Width) / 2;
 	const int y = screenPos.y - type.BoxHeight / 2 - (type.Height - type.Sprite->Height) / 2;
 
-	DrawSelection(color, x, y, x + type.BoxWidth, y + type.BoxHeight);
+	DrawSelection(color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX, y + type.BoxHeight + type.BoxOffsetY);
 }
 
 /**
@@ -961,13 +961,12 @@ void CUnit::Draw(const CViewport &vp) const
 		if (constructed) {
 			const PixelPos pos(screenPos + (type->GetPixelSize()) / 2);
 			DrawConstruction(player, cframe, *type, frame, pos);
+		} else {
+			DrawUnitType(*type, sprite, player, frame, screenPos);
 		}
 		//
 		// Draw the future unit type, if upgrading to it.
 		//
-	} else if (state == 2) {
-		// FIXME: this frame is hardcoded!!!
-		DrawUnitType(*type, sprite, player, frame < 0 ? /*-1*/ - 1 : 1, screenPos);
 	} else {
 		DrawUnitType(*type, sprite, player, frame, screenPos);
 	}

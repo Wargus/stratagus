@@ -939,7 +939,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	}
 
 	// Not ready
-	if (player.AiEnabled && unit.pathFinderData->output.Cycles > 300) {
+	if (player.AiEnabled && unit.pathFinderData->output.Cycles > 500) {
 		AiNewDepotRequest(unit);
 	}
 

@@ -851,6 +851,8 @@ static CPopupContentType *CclParsePopupContent(lua_State *l)
 	int marginY = MARGIN_Y;
 	int minWidth = 0;
 	int minHeight = 0;
+	std::string textColor("white");
+	std::string highColor("red");
 	PopupConditionPanel *condition;
 
 	Assert(lua_istable(l, -1));
@@ -860,6 +862,10 @@ static CPopupContentType *CclParsePopupContent(lua_State *l)
 		key = LuaToString(l, -2);
 		if (!strcmp(key, "Wrap")) {
 			wrap = LuaToBoolean(l, -1);
+		} else if (!strcmp(key, "TextColor")) {
+			textColor = LuaToString(l, -1);
+		} else if (!strcmp(key, "HighlightColor")) {
+			highColor = LuaToString(l, -1);
 		} else if (!strcmp(key, "Margin")) {
 			Assert(lua_istable(l, -1));
 			lua_rawgeti(l, -1, 1); // X
@@ -981,6 +987,8 @@ static CPopupContentType *CclParsePopupContent(lua_State *l)
 	content->MinWidth = minWidth;
 	content->MinHeight = minHeight;
 	content->Condition = condition;
+	content->TextColor = textColor;
+	content->HighlightColor = highColor;
 	return content;
 }
 
@@ -1460,6 +1468,8 @@ static int CclDefineButton(lua_State *l)
 				ba.Allowed = ButtonCheckFalse;
 			} else if (!strcmp(value, "check-upgrade")) {
 				ba.Allowed = ButtonCheckUpgrade;
+			} else if (!strcmp(value, "check-unit-variable")) {
+				ba.Allowed = ButtonCheckUnitVariable;
 			} else if (!strcmp(value, "check-units-or")) {
 				ba.Allowed = ButtonCheckUnitsOr;
 			} else if (!strcmp(value, "check-units-and")) {

@@ -593,7 +593,7 @@ void CUnit::Init(const CUnitType &type)
 	// Set a heading for the unit if it Handles Directions
 	// Don't set a building heading, as only 1 construction direction
 	//   is allowed.
-	if (type.NumDirections > 1 && type.Sprite && !type.Building) {
+	if (type.NumDirections > 1 && type.NoRandomPlacing == false && type.Sprite && !type.Building) {
 		Direction = (MyRand() >> 8) & 0xFF; // random heading
 		UnitUpdateHeading(*this);
 	}
@@ -745,7 +745,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 		//
 		//  fancy buildings: mirror buildings (but shadows not correct)
 		//
-		if (FancyBuildings && unit->Rs > 50) {
+		if (FancyBuildings && unit->Type->NoRandomPlacing == false && unit->Rs > 50) {
 			unit->Frame = -unit->Frame - 1;
 		}
 	}
@@ -2266,23 +2266,17 @@ void DropOutAll(const CUnit &source)
 **  Not GAMEPLAY safe, uses ReplayRevealMap
 **
 **  More units on same position.
-**    Cycle through units. ounit is the old one.
+**    Cycle through units.
 **    First take highest unit.
 **
-**  @param ounit  Old selected unit.
 **  @param x      X pixel position.
 **  @param y      Y pixel position.
 **
 **  @return       An unit on x, y position.
 */
-CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
+CUnit *UnitOnScreen(int x, int y)
 {
-	CUnit *funit = NULL; // first possible unit
-	CUnit *nunit = NULL;
-	int flag = 0; // flag take next unit
-	if (!ounit) { // no old on this position
-		flag = 1;
-	}
+	CUnit *candidate = NULL;
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 		CUnit &unit = **it;
 		if (!ReplayRevealMap && !unit.IsVisibleAsGoal(*ThisPlayer)) {
@@ -2293,50 +2287,26 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 		//
 		// Check if mouse is over the unit.
 		//
-		const int gx = unit.tilePos.x * PixelTileSize.x + unit.IX;
-		{
-			const int local_width = type.TileWidth * PixelTileSize.x;
-			if (x + (type.BoxWidth - local_width) / 2 < gx) {
-				continue;
-			}
-			if (x > gx + (local_width + type.BoxWidth) / 2) {
-				continue;
-			}
-		}
-
-		const int gy = unit.tilePos.y * PixelTileSize.y + unit.IY;
-		{
-			const int local_height = type.TileHeight * PixelTileSize.y;
-			if (y + (type.BoxHeight - local_height) / 2 < gy) {
-				continue;
-			}
-			if (y > gy + (local_height + type.BoxHeight) / 2) {
-				continue;
-			}
-		}
-		// Check if better units are present on this location
-		if (unit.Type->IsNotSelectable) {
-			funit = &unit;
+		PixelPos unitSpritePos = unit.GetMapPixelPosCenter();
+		unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
+			(type.Width - type.Sprite->Width) / 2 + type.BoxOffsetX;
+		unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
+			(type.Height - type.Sprite->Height) / 2 + type.BoxOffsetY;
+		if (x >= unitSpritePos.x && x < unitSpritePos.x + type.BoxWidth
+			&& y >= unitSpritePos.y  && y < unitSpritePos.y + type.BoxHeight) {
+				// Check if there are other units on this place
+				candidate = &unit;
+				if ((candidate == Selected[0] && NumSelected == 1)
+					|| candidate->Type->IsNotSelectable) {
+						continue;
+				} else {
+					break;
+				}
+		} else {
 			continue;
 		}
-		//
-		// This could be taken.
-		//
-		if (flag) {
-			return &unit;
-		}
-		if (&unit == ounit) {
-			flag = 1;
-		} else if (!funit) {
-			funit = &unit;
-		}
-		nunit = &unit;
 	}
-
-	if (flag && funit) {
-		return funit;
-	}
-	return nunit;
+	return candidate;
 }
 
 PixelPos CUnit::GetMapPixelPosTopLeft() const
@@ -2481,6 +2451,15 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 	const CUnitType &type = *unit.Type;
 	const CUnitType &dtype = *dest.Type;
 	int cost = 0;
+
+	// Buildings and non-aggressive units have the lowest priority
+	if (dest.IsAgressive() == false) {
+		if (dest.Type->CanMove() == false) {
+			return INT_MAX;
+		} else {
+			return INT_MAX / 2;
+		}
+	}
 
 	// Priority 0-255
 	cost -= dtype.Priority * PRIORITY_FACTOR;
@@ -2763,22 +2742,16 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		}
 
 		// Calculate the best target we could attack
-		if (!best || (goal && ((goal->IsAgressive() && best->IsAgressive() == false)
-							   || (ThreatCalculate(target, *goal) < ThreatCalculate(target, *best))))) {
+		if (!best || (goal && (ThreatCalculate(target, *goal) < ThreatCalculate(target, *best)))) {
 			best = goal;
 		}
 		if (CanTarget(target.Type, attacker->Type)
 			&& (!best || (attacker && goal != attacker
-						  && ((attacker->IsAgressive() && best->IsAgressive() == false)
-							  || (ThreatCalculate(target, *attacker) < ThreatCalculate(target, *best)))))) {
-			best = attacker;
+				&& (ThreatCalculate(target, *attacker) < ThreatCalculate(target, *best))))) {
+					best = attacker;
 		}
 		if (best && best != oldgoal) {
-			if (target.MapDistanceTo(*best) <= target.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-				CommandAttack(target, best->tilePos, best, FlushCommands);
-			} else {
-				CommandAttack(target, best->tilePos, NoUnitP, FlushCommands);
-			}
+			CommandAttack(target, best->tilePos, best, FlushCommands);
 			// Set threshold value only for agressive units
 			if (best->IsAgressive()) {
 				target.Threshold = threshold;

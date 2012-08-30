@@ -133,6 +133,9 @@ public:
 			if (ttl) {
 				target->TTL = GameCycle + ttl;
 			}
+			if (caster.GroupId && caster.Player->AiEnabled) {
+				target->GroupId = caster.GroupId;
+			}
 
 			caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
 		} else {

@@ -286,6 +286,29 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 		}
 	}
 
+	// Check special rules for AI players
+	if (unit && unit->Player->AiEnabled) {
+		bool aiChecked = true;
+		size_t count = type.AiBuildingRules.size();
+		if (count > 0) {
+			CUnit *ontoptarget = NULL;
+			for (unsigned int i = 0; i < count; ++i) {
+				CBuildRestriction *rule = type.AiBuildingRules[i];
+				// All checks processed, did we really have success
+				if (rule->Check(unit, type, pos, ontoptarget)) {
+					// We passed a full ruleset
+					aiChecked = true;
+					break;
+				} else {
+					aiChecked = false;
+				}
+			}
+		}
+		if (aiChecked == false) {
+			return NULL;
+		}
+	}
+
 	size_t count = type.BuildingRules.size();
 	if (count > 0) {
 		for (unsigned int i = 0; i < count; ++i) {
@@ -304,26 +327,6 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 		return NULL;
 	}
 
-	// Check special rules for AI players
-	if (unit && unit->Player->AiEnabled) {
-		size_t count = type.AiBuildingRules.size();
-		if (count > 0) {
-			CUnit *ontoptarget = NULL;
-			for (unsigned int i = 0; i < count; ++i) {
-				CBuildRestriction *rule = type.AiBuildingRules[i];
-				// All checks processed, did we really have success
-				if (rule->Check(unit, type, pos, ontoptarget)) {
-					// We passed a full ruleset return
-					if (unit == NULL) {
-						return ontoptarget ? ontoptarget : (CUnit *)1;
-					} else {
-						return ontoptarget ? ontoptarget : const_cast<CUnit *>(unit);
-					}
-				}
-			}
-			return NULL;
-		}
-	}
 	return (unit == NULL) ? (CUnit *)1 : const_cast<CUnit *>(unit);
 }
 

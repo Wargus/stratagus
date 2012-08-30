@@ -360,7 +360,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 /* virtual */ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *) const
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
-	CLabel label(font, "white", "red");
+	CLabel label(font, this->TextColor, this->HighlightColor);
 	std::string draw("");
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
@@ -441,7 +441,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 /* virtual */ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup *, const unsigned int, const ButtonAction &button, int *Costs) const
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
-	CLabel label(font, "white", "red");
+	CLabel label(font, this->TextColor, this->HighlightColor);
 
 	for (unsigned int i = 1; i < MaxCosts; ++i) {
 		if (Costs[i]) {
@@ -521,7 +521,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 
 	Assert(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.GetNumberVariable()));
 
-	CLabel label(font, "white", "red");
+	CLabel label(font, this->TextColor, this->HighlightColor);
 
 	if (this->Text) {
 		TriggerData.Type = UnitTypes[button.Value];
@@ -766,7 +766,7 @@ void DrawPopupUnitInfo(const CUnitType *type,
 /**
 **  Draw popup
 */
-static void DrawPopup(const ButtonAction &button, const CUIButton &uibutton)
+void DrawPopup(const ButtonAction &button, const CUIButton &uibutton)
 {
 	CPopup *popup = PopupByIdent(button.Popup);
 

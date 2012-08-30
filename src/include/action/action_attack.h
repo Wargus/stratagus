@@ -55,6 +55,7 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 
+	const Vec2i GetGoalPos() const { return goalPos; }
 	bool IsWeakTargetSelected() const;
 
 private:

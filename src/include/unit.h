@@ -537,8 +537,8 @@ extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const V
 /// Get the suitable animation frame depends of unit's damaged type.
 extern int ExtraDeathIndex(const char *death);
 
-/// @todo more docu
-extern CUnit *UnitOnScreen(CUnit *unit, int x, int y);
+/// Get unit under cursor
+extern CUnit *UnitOnScreen(int x, int y);
 
 /// Let a unit die
 extern void LetUnitDie(CUnit &unit);

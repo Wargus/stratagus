@@ -333,7 +333,8 @@ enum {
 	MissileClassFlameShield, /// Missile surround x,y
 	MissileClassDeathCoil, /// Missile is death coil.
 	MissileClassTracer, /// Missile seeks towards to target unit
-	MissileClassClipToTarget /// Missile remains clipped to target's current goal and plays his animation once
+	MissileClassClipToTarget, /// Missile remains clipped to target's current goal and plays his animation once
+	MissileClassContinious /// Missile stays and plays it's animation several times
 };
 
 /// Base structure of missile-types
@@ -381,6 +382,8 @@ public:
 	int StartDelay;            /// missile start delay
 	int Sleep;                 /// missile sleep
 	int Speed;                 /// missile speed
+	int TTL;                   /// missile time-to-live
+	int Damage;                /// missile damage (used for non-direct missiles, e.g. impacts)
 
 	int Range;                 /// missile damage range
 	int SplashFactor;          /// missile splash divisor
@@ -531,6 +534,12 @@ public:
 };
 
 class MissileClipToTarget : public Missile
+{
+public:
+	virtual void Action();
+};
+
+class MissileContinious : public Missile
 {
 public:
 	virtual void Action();

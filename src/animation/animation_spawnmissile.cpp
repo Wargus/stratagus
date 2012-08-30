@@ -37,6 +37,9 @@
 
 #include "animation/animation_spawnmissile.h"
 
+#include "action/action_attack.h"
+#include "action/action_spellcast.h"
+
 #include "actions.h"
 #include "map.h"
 #include "missile.h"
@@ -105,6 +108,10 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 	const PixelPos moff = goal->Type->MissileOffsets[dir][!offsetnum ? 0 : offsetnum - 1];
 	PixelPos start;
 	PixelPos dest;
+	MissileType *mtype = MissileTypeByIdent(this->missileTypeStr);
+	if (mtype == NULL) {
+		return;
+	}
 
 	if (!goal || goal->Destroyed) {
 		return;
@@ -118,15 +125,30 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 	}
 	if ((flags & ANIM_SM_TOTARGET)) {
 		CUnit *target = goal->CurrentOrder()->GetGoal();
-		if (!target || goal->Destroyed) {
-			Assert(!unit.Type->Missile.Missile->AlwaysFire || unit.Type->Missile.Missile->Range);
-			if (!target || !unit.Type->Missile.Missile->AlwaysFire) {
+		if (!target || target->Destroyed) {
+			Assert(!mtype->AlwaysFire || mtype->Range);
+			if (!target && mtype->AlwaysFire == false) {
 				return;
 			}
 		}
-		if (flags & ANIM_SM_PIXEL) {
-			dest.x = target->GetMapPixelPosTopLeft().x + destx;
-			dest.y = target->GetMapPixelPosTopLeft().y + desty;
+		if (!target) {
+			if (goal->CurrentAction() == UnitActionAttack || goal->CurrentAction() == UnitActionAttackGround) {
+				COrder_Attack &order = *static_cast<COrder_Attack *>(goal->CurrentOrder());
+				dest = Map.TilePosToMapPixelPos_Center(order.GetGoalPos());
+			} else if (goal->CurrentAction() == UnitActionSpellCast) {
+				COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
+				dest = Map.TilePosToMapPixelPos_Center(order.GetGoalPos());
+			}
+			if (flags & ANIM_SM_PIXEL) {
+				dest.x += destx;
+				dest.y += desty;
+			} else {
+				dest.x += destx * PixelTileSize.x;
+				dest.y += desty * PixelTileSize.y;
+			}
+		} else if (flags & ANIM_SM_PIXEL) {
+			dest.x = target->GetMapPixelPosCenter().x + destx;
+			dest.y = target->GetMapPixelPosCenter().y + desty;
 		} else {
 			dest.x = (target->tilePos.x + destx) * PixelTileSize.x;
 			dest.y = (target->tilePos.y + desty) * PixelTileSize.y;
@@ -134,8 +156,8 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 		}
 	} else {
 		if ((flags & ANIM_SM_PIXEL)) {
-			dest.x = goal->GetMapPixelPosTopLeft().x + destx;
-			dest.y = goal->GetMapPixelPosTopLeft().y + desty;
+			dest.x = goal->GetMapPixelPosCenter().x + destx;
+			dest.y = goal->GetMapPixelPosCenter().y + desty;
 		} else {
 			dest.x = (goal->tilePos.x + destx) * PixelTileSize.x;
 			dest.y = (goal->tilePos.y + desty) * PixelTileSize.y;
@@ -148,7 +170,7 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 		&& dist > goal->Stats->Variables[ATTACKRANGE_INDEX].Max
 		&& dist < goal->Type->MinAttackRange) {
 	} else {
-		Missile *missile = MakeMissile(*MissileTypeByIdent(this->missileTypeStr.c_str()), start, dest);
+		Missile *missile = MakeMissile(*mtype, start, dest);
 		if (flags & ANIM_SM_DAMAGE) {
 			missile->SourceUnit = &unit;
 		}
@@ -159,7 +181,7 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 }
 
 /*
-**  s = "missileType startX startY destX destY [flag1[.flagN]]"
+**  s = "missileType startX startY destX destY [flag1[.flagN]] [missileoffset]"
 */
 /* virtual */ void CAnimation_SpawnMissile::Init(const char *s)
 {

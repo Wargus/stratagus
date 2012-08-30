@@ -424,13 +424,13 @@ public:
 
 	CGraphic *G;         /// Optional background image
 	int MouseButton;     /// Which mouse button pops up the piemenu, deactivate with NoButton
-	int X[8];            /// X position of the pies
-	int Y[8];            /// Y position of the pies
+	int X[9];            /// X position of the pies
+	int Y[9];            /// Y position of the pies
 
 	void SetRadius(int radius) {
-		const int coeffX[] = {    0,  193, 256, 193,   0, -193, -256, -193};
-		const int coeffY[] = { -256, -193,   0, 193, 256,  193,    0, -193};
-		for (int i = 0; i < 8; ++i) {
+		const int coeffX[] = {    0,  193, 256, 193,   0, -193, -256, -193, 0};
+		const int coeffY[] = { -256, -193,   0, 193, 256,  193,    0, -193, 0};
+		for (int i = 0; i < 9; ++i) {
 			this->X[i] = (coeffX[i] * radius) >> 8;
 			this->Y[i] = (coeffY[i] * radius) >> 8;
 		}
@@ -474,12 +474,15 @@ public:
 	virtual int GetHeight(const ButtonAction &button, int *Costs) const = 0;
 
 	int PosX;                   /// X position to draw.
-	int PosY;                   /// X position to draw.
+	int PosY;                   /// Y position to draw.
 	int MarginX;                /// Left and right margin width.
 	int MarginY;                /// Upper and lower margin height.
 	int MinWidth;               /// Minimal width covered by content type.
 	int MinHeight;              /// Minimal height covered by content type.
 	bool Wrap;                  /// If true, the next content will be placed on the next "line".
+
+	std::string TextColor;      /// Color used for plain text in content.
+	std::string HighlightColor; /// Color used for highlighted letters.
 
 	PopupConditionPanel *Condition; /// Condition to show the content; if NULL, no condition.
 };

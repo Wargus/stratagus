@@ -39,6 +39,7 @@
 
 #include "missile.h"
 
+#include "action/action_spellcast.h"
 #include "actions.h"
 #include "font.h"
 #include "iolib.h"
@@ -46,6 +47,7 @@
 #include "map.h"
 #include "player.h"
 #include "sound.h"
+#include "spells.h"
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"
@@ -219,6 +221,9 @@ Missile::Missile() :
 		case MissileClassClipToTarget :
 			missile = new MissileClipToTarget;
 			break;
+		case MissileClassContinious :
+			missile = new MissileContinious;
+			break;
 	}
 	const PixelPos halfSize = mtype.size / 2;
 	missile->position = startPos - halfSize;
@@ -227,6 +232,8 @@ Missile::Missile() :
 	missile->Type = &mtype;
 	missile->Wait = mtype.Sleep;
 	missile->Delay = mtype.StartDelay;
+	missile->TTL = mtype.TTL;
+	missile->Damage = mtype.Damage;
 
 	return missile;
 }
@@ -405,7 +412,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 		// FIXME: Can this be too near??
 	}
 
-	const PixelPos destPixelPos = Map.TilePosToMapPixelPos_Center(dpos);
+	PixelPos destPixelPos = Map.TilePosToMapPixelPos_Center(dpos);
 	Missile *missile = MakeMissile(*unit.Type->Missile.Missile, startPixelPos, destPixelPos);
 	//
 	// Damage of missile
@@ -752,7 +759,7 @@ void Missile::MissileHit(CUnit *unit)
 		unit = this->TargetUnit;
 	}
 
-	if (mtype.Pierce && mtype.PierceOnce) {
+	if (unit && mtype.Pierce && mtype.PierceOnce) {
 		for (std::vector<CUnit *>::iterator it = this->PiercedUnits.begin();
 			 it != this->PiercedUnits.end(); ++it) {
 			CUnit &punit = **it;
@@ -834,7 +841,14 @@ void Missile::MissileHit(CUnit *unit)
 				bool shouldHit = true;
 
 				if (mtype.CorrectSphashDamage == true) {
-					if (this->SourceUnit->CurrentAction() == UnitActionAttackGround) {
+					bool isPositionSpell = false;
+					if (this->TargetUnit == NULL && this->SourceUnit->CurrentAction() == UnitActionSpellCast) {
+						const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(this->SourceUnit->CurrentOrder());
+						if (order.GetSpell().Target == TargetPosition) {
+							isPositionSpell = true;
+						}
+					}
+					if (isPositionSpell || this->SourceUnit->CurrentAction() == UnitActionAttackGround) {
 						if (goal.Type->UnitType != this->SourceUnit->Type->UnitType) {
 							shouldHit = false;
 						}
@@ -1132,8 +1146,9 @@ MissileType::MissileType(const std::string &ident) :
 	Ident(ident), Transparency(0), DrawLevel(0),
 	SpriteFrames(0), NumDirections(0), ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
 	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
-	AlwaysFire(false), Pierce(false), PierceOnce(false), Class(), NumBounces(0), StartDelay(0),
-	Sleep(0), Speed(0), Range(0), SplashFactor(0), ImpactParticle(NULL), SmokeParticle(NULL),
+	AlwaysFire(false), Pierce(false), PierceOnce(false), Class(), NumBounces(0), StartDelay(0), 
+	Sleep(0), Speed(0), TTL(-1), Damage(0), Range(0), SplashFactor(0), 
+	ImpactParticle(NULL), SmokeParticle(NULL),
 	G(NULL)
 {
 	size.x = 0;

@@ -102,7 +102,7 @@ SDL_Surface *TheScreen; /// Internal screen
 
 static SDL_Rect Rects[100];
 static int NumRects;
-GLint GLMaxTextureSize;   /// Max texture size supported on the video card
+GLint GLMaxTextureSize = 256;   /// Max texture size supported on the video card
 GLint GLMaxTextureSizeOverride;     /// User-specified limit for ::GLMaxTextureSize
 bool GLTextureCompressionSupported; /// Is OpenGL texture compression supported
 bool UseGLTextureCompression;       /// Use OpenGL texture compression

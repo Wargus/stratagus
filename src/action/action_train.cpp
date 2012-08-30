@@ -231,7 +231,7 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 
 	DropOutOnSide(*newUnit, LookingW, &unit);
-	player.Notify(NotifyYellow, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
+	player.Notify(NotifyGreen, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
 	if (&player == ThisPlayer) {
 		PlayUnitSound(*newUnit, VoiceReady);
 	}

@@ -220,7 +220,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	UpdateForNewUnit(unit, 0);
 
 	// Set the direction of the building if it supports them
-	if (type.NumDirections > 1) {
+	if (type.NumDirections > 1 && type.NoRandomPlacing == false) {
 		if (type.Wall) { // Special logic for walls
 			CorrectWallDirections(unit);
 			CorrectWallNeighBours(unit);
