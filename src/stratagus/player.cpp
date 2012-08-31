@@ -331,6 +331,30 @@ int PlayerColorIndexCount;
 ----------------------------------------------------------------------------*/
 
 /**
+**  Clean up the PlayerRaces names.
+*/
+void PlayerRace::Clean()
+{
+	for (unsigned int i = 0; i != this->Count; ++i) {
+		this->Name[i].clear();
+		this->Display[i].clear();
+		this->Visible[i] = false;
+	}
+	this->Count = 0;
+}
+
+int PlayerRace::GetRaceIndexByName(const char *raceName) const
+{
+	for (unsigned int i = 0; i != this->Count; ++i) {
+		if (this->Name[i].compare(raceName) == 0) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+
+/**
 **  Init players.
 */
 void InitPlayers()
@@ -369,18 +393,6 @@ void FreePlayerColors()
 	}
 }
 #endif
-
-/**
-**  Clean up the PlayerRaces names.
-*/
-void CleanRaces()
-{
-	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
-		PlayerRaces.Name[i].clear();
-		PlayerRaces.Display[i].clear();
-	}
-	PlayerRaces.Count = 0;
-}
 
 /**
 **  Save state of players to file.

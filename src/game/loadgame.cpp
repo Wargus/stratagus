@@ -86,7 +86,7 @@ void CleanModules()
 	CleanFonts();
 	CleanTriggers();
 	FreeAi();
-	CleanRaces();
+	PlayerRaces.Clean();
 	CleanConstructions();
 	CleanDecorations();
 	CleanMissiles();

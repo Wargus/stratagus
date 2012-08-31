@@ -243,10 +243,14 @@ public:
 		memset(Visible, 0, sizeof(Visible));
 	}
 
+	void Clean();
+	int GetRaceIndexByName(const char *raceName) const;
+
+public:
 	bool Visible[MAX_RACES];        /// race should be visible in pulldown
-	std::string Name[MAX_RACES];     /// race names
-	std::string Display[MAX_RACES];  /// text to display in pulldown
-	unsigned int   Count;            /// number of races
+	std::string Name[MAX_RACES];    /// race names
+	std::string Display[MAX_RACES]; /// text to display in pulldown
+	unsigned int Count;             /// number of races
 };
 
 
@@ -341,8 +345,6 @@ extern int PlayerColorIndexCount;
 extern void InitPlayers();
 /// Clean up players
 extern void CleanPlayers();
-/// Clean up races
-extern void CleanRaces();
 /// Save players
 extern void SavePlayers(CFile &file);
 
