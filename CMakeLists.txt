@@ -180,6 +180,7 @@ source_group(map FILES ${map_SRCS})
 set(missile_SRCS
 	src/missile/missile.cpp
 	src/missile/missile_cliptotarget.cpp
+	src/missile/missile_continuous.cpp
 	src/missile/missile_cycleonce.cpp
 	src/missile/missile_deathcoil.cpp
 	src/missile/missile_fire.cpp

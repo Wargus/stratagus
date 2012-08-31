@@ -102,6 +102,7 @@ enum AiForceAttackingState {
 	AiForceAttackingState_Free = -1,
 	AiForceAttackingState_Waiting = 0,
 	AiForceAttackingState_Boarding,
+	AiForceAttackingState_GoingToRallyPoint,
 	AiForceAttackingState_AttackingWithTransporter,
 	AiForceAttackingState_Attacking,
 };
@@ -153,6 +154,7 @@ public:
 	int PlanAttack();
 
 	void ReturnToHome();
+	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos);
 
 private:
 	void CountTypes(unsigned int *counter, const size_t len);

@@ -259,7 +259,6 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.Type->Name.c_str());
 
 		CancelBuilt(*this, unit);
-		this->Finished = true;
 		return ;
 	}
 

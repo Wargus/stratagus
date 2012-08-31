@@ -876,13 +876,13 @@ static int CclSetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "TotalKills")) {
 		p->TotalKills = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "SpeedResourcesHarvest")) {
-		LuaCheckArgs(l, 3);
+		LuaCheckArgs(l, 4);
 
 		const std::string res = LuaToString(l, 3);
 		const int resId = GetResourceIdByName(l, res.c_str());
 		p->SpeedResourcesHarvest[resId] = LuaToNumber(l, 4);
 	} else if (!strcmp(data, "SpeedResourcesReturn")) {
-		LuaCheckArgs(l, 3);
+		LuaCheckArgs(l, 4);
 
 		const std::string res = LuaToString(l, 3);
 		const int resId = GetResourceIdByName(l, res.c_str());
