@@ -44,6 +44,7 @@
 #include "unittype.h"
 #include "upgrade.h"
 
+#include <stdio.h>
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -99,7 +100,6 @@ bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction &button)
 */
 bool ButtonCheckUnitVariable(const CUnit &unit, const ButtonAction &button)
 {
-	CPlayer *player = unit.Player;
 	char *buf = new_strdup(button.AllowStr.c_str());
 
 	for (const char *var = strtok(buf, ","); var; var = strtok(NULL, ",")) {

@@ -46,8 +46,8 @@ static inline float deg2rad(int degrees)
 
 CChunkParticle::CChunkParticle(CPosition position, Animation *smokeAnimation, Animation *debrisAnimation,
 							   int minVelocity, int maxVelocity, int minTrajectoryAngle, int maxTTL) :
-	CParticle(position), initialPos(position), nextSmokeTicks(0), age(0),
-		maxTTL(maxTTL), height(0.f)
+	CParticle(position), initialPos(position), maxTTL(maxTTL), nextSmokeTicks(0),
+	age(0), height(0.f)
 {
 	float radians = deg2rad(MyRand() % 360);
 	direction.x = cos(radians);
