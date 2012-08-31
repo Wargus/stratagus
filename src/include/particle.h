@@ -126,7 +126,7 @@ class CChunkParticle : public CParticle
 {
 public:
 	CChunkParticle(CPosition position, Animation *smokeAnimation, Animation *debrisAnimation,
-				   int minVelocity = 0, int maxVelocity = 400, 
+				   int minVelocity = 0, int maxVelocity = 400,
 				   int minTrajectoryAngle = 77, int maxTTL = 0);
 	virtual ~CChunkParticle();
 
@@ -160,7 +160,7 @@ protected:
 class CSmokeParticle : public CParticle
 {
 public:
-	CSmokeParticle(CPosition position, Animation *animation, float speedx = 0, float speedy = -22.0);
+	CSmokeParticle(CPosition position, Animation *animation, float speedx = 0, float speedy = -22.0f);
 	virtual ~CSmokeParticle();
 
 	virtual void draw();

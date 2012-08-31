@@ -1827,7 +1827,6 @@ void UIHandleButtonUp(unsigned button)
 	// ALT takes group of unit
 	// CTRL takes all units of same type (st*rcr*ft)
 	if (CursorState == CursorStateRectangle && !(MouseButtons & LeftButton)) { // leave select mode
-		CUnit *unit = NULL;
 		int num = 0;
 		//
 		//  Little threshold
@@ -1874,7 +1873,7 @@ void UIHandleButtonUp(unsigned button)
 			// cade: cannot select unit on invisible space
 			// FIXME: johns: only complete invisibile units
 			const Vec2i cursorTilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
-
+			CUnit *unit = NULL;
 			if (Map.IsFieldVisible(*ThisPlayer, cursorTilePos) || ReplayRevealMap) {
 				const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 
