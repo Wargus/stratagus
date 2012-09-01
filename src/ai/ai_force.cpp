@@ -288,11 +288,12 @@ void AiForce::RemoveDeadUnit()
 class AiForceRallyPointFinder
 {
 public:
-	AiForceRallyPointFinder(const CUnit &startUnit, const int distance, const Vec2i &startPos,
-		Vec2i *resultPos) :
-	  startUnit(startUnit), distance(distance), startPos(startPos), resultPos(resultPos),
-		  movemask(startUnit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit | MapFieldBuilding)) {}
-	  VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+	AiForceRallyPointFinder(const CUnit &startUnit, int distance, const Vec2i &startPos, Vec2i *resultPos) :
+		startUnit(startUnit), distance(distance), startPos(startPos),
+		movemask(startUnit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit | MapFieldBuilding)),
+		resultPos(resultPos)
+	{}
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
 	const CUnit &startUnit;
 	const int distance;
