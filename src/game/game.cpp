@@ -951,6 +951,7 @@ void CleanGame()
 	Map.Clean();
 	CleanReplayLog();
 	FreePathfinder();
+	RestoreColorCyclingSurface();
 	CursorBuilding = NULL;
 	UnitUnderCursor = NULL;
 }
