@@ -120,7 +120,7 @@ void CPlayer::Load(lua_State *l)
 				LuaError(l, "Unsupported tag: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "race")) {
-			const char* raceName = LuaToString(l, j + 1);
+			const char *raceName = LuaToString(l, j + 1);
 			this->Race = PlayerRaces.GetRaceIndexByName(raceName);
 			if (this->Race == -1) {
 				LuaError(l, "Unsupported race: %s" _C_ raceName);

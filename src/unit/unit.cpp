@@ -2289,19 +2289,19 @@ CUnit *UnitOnScreen(int x, int y)
 		//
 		PixelPos unitSpritePos = unit.GetMapPixelPosCenter();
 		unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
-			(type.Width - type.Sprite->Width) / 2 + type.BoxOffsetX;
+						  (type.Width - type.Sprite->Width) / 2 + type.BoxOffsetX;
 		unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
-			(type.Height - type.Sprite->Height) / 2 + type.BoxOffsetY;
+						  (type.Height - type.Sprite->Height) / 2 + type.BoxOffsetY;
 		if (x >= unitSpritePos.x && x < unitSpritePos.x + type.BoxWidth
 			&& y >= unitSpritePos.y  && y < unitSpritePos.y + type.BoxHeight) {
-				// Check if there are other units on this place
-				candidate = &unit;
-				if ((candidate == Selected[0] && NumSelected == 1)
-					|| candidate->Type->IsNotSelectable) {
-						continue;
-				} else {
-					break;
-				}
+			// Check if there are other units on this place
+			candidate = &unit;
+			if ((candidate == Selected[0] && NumSelected == 1)
+				|| candidate->Type->IsNotSelectable) {
+				continue;
+			} else {
+				break;
+			}
 		} else {
 			continue;
 		}
@@ -2747,8 +2747,8 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		}
 		if (CanTarget(target.Type, attacker->Type)
 			&& (!best || (attacker && goal != attacker
-				&& (ThreatCalculate(target, *attacker) < ThreatCalculate(target, *best))))) {
-					best = attacker;
+						  && (ThreatCalculate(target, *attacker) < ThreatCalculate(target, *best))))) {
+			best = attacker;
 		}
 		if (best && best != oldgoal) {
 			CommandAttack(target, best->tilePos, best, FlushCommands);

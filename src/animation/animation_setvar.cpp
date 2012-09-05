@@ -101,7 +101,7 @@
 		Exit(1);
 		return;
 	}
-	
+
 	const int rop = ParseAnimInt(&unit, this->valueStr.c_str());
 	int value = 0;
 	if (!strcmp(next + 1, "Value")) {

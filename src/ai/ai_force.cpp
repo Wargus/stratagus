@@ -306,8 +306,8 @@ VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, c
 {
 	if (AiEnemyUnitsInDistance(*startUnit.Player, NULL, pos, 20) == false
 		&& Distance(pos, startPos) <= distance) {
-			*resultPos = pos;
-			return VisitResult_Finished;
+		*resultPos = pos;
+		return VisitResult_Finished;
 	}
 	if (CanMoveToMask(pos, movemask)) { // reachable
 		return VisitResult_Ok;
@@ -808,7 +808,7 @@ void AiForce::Update()
 				// No enemy found, give up
 				// FIXME: should the force go home or keep trying to attack?
 				DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
-					_C_ AiPlayer->Player->Index _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
+						   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
 				Attacking = false;
 				State = AiForceAttackingState_Waiting;
 				return;
