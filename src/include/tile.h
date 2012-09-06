@@ -136,6 +136,7 @@
 #include "unit_cache.h"
 #endif
 
+class CFile;
 
 /*----------------------------------------------------------------------------
 --  Map - field
@@ -176,6 +177,9 @@ public:
 #endif
 	{}
 
+	void Save(CFile &file) const;
+
+public:
 	unsigned short Tile;       /// graphic tile number
 	unsigned short Flags;      /// field flags
 	unsigned char Cost;        /// unit cost to move in this tile
