@@ -112,24 +112,6 @@ class CUnitType;
 #define MaxMapWidth  256  /// max map width supported
 #define MaxMapHeight 256  /// max map height supported
 
-// Not used until now:
-#define MapFieldSpeedMask 0x0007  /// Move faster on this tile
-
-#define MapFieldHuman 0x0008  /// Human is owner of the field (walls)
-
-#define MapFieldLandAllowed  0x0010  /// Land units allowed
-#define MapFieldCoastAllowed 0x0020  /// Coast (transporter) units allowed
-#define MapFieldWaterAllowed 0x0040  /// Water units allowed
-#define MapFieldNoBuilding   0x0080  /// No buildings allowed
-
-#define MapFieldUnpassable 0x0100  /// Field is movement blocked
-//#define MapFieldWall       0x0200  /// defined in tileset.h
-
-#define MapFieldLandUnit 0x1000  /// Land unit on field
-#define MapFieldAirUnit  0x2000  /// Air unit on field
-#define MapFieldSeaUnit  0x4000  /// Water unit on field
-#define MapFieldBuilding 0x8000  /// Building on field
-
 /*----------------------------------------------------------------------------
 --  Map info structure
 ----------------------------------------------------------------------------*/
@@ -208,15 +190,6 @@ public:
 	*/
 	unsigned short IsTileVisible(const CPlayer &player, const unsigned int index) const;
 
-	/// Check if a field flags.
-	bool CheckMask(const unsigned int index, const int mask) const {
-		return (this->Fields[index].Flags & mask) != 0;
-	}
-
-	bool CheckMask(const Vec2i &pos, int mask) const {
-		return CheckMask(getIndex(pos), mask);
-	}
-
 	/// Check if a field for the user is explored.
 	bool IsFieldExplored(const CPlayer &player, const unsigned int index) const;
 
@@ -284,45 +257,6 @@ public:
 	bool HumanWallOnMap(const Vec2i &pos) const;
 	/// Returns true, if orc wall on the map tile field
 	bool OrcWallOnMap(const Vec2i &pos) const;
-
-
-	//
-	//  Tile type.
-	//
-
-	/// Returns true, if water on the map tile field
-	bool WaterOnMap(const unsigned int index) const {
-		return CheckMask(index, MapFieldWaterAllowed);
-	};
-
-	/**
-	**  Water on map tile.
-	**
-	**  @param pos  map tile position.
-	**
-	**  @return    True if water, false otherwise.
-	*/
-	bool WaterOnMap(const Vec2i &pos) const {
-		Assert(Info.IsPointOnMap(pos));
-		return WaterOnMap(getIndex(pos));
-	}
-
-	/// Returns true, if coast on the map tile field
-	bool CoastOnMap(const unsigned int index) const {
-		return CheckMask(index, MapFieldCoastAllowed);
-	};
-
-	/**
-	**  Coast on map tile.
-	**
-	**  @param pos  map tile position.
-	**
-	**  @return    True if coast, false otherwise.
-	*/
-	bool CoastOnMap(const Vec2i &pos) const {
-		Assert(Info.IsPointOnMap(pos));
-		return CoastOnMap(getIndex(pos));
-	}
 
 	//UnitCache
 
@@ -495,7 +429,7 @@ void MapUnmarkUnitSight(CUnit &unit);
 /// Can a unit with 'mask' enter the field
 inline bool CanMoveToMask(const Vec2i &pos, int mask)
 {
-	return !Map.CheckMask(pos, mask);
+	return !Map.Field(pos)->CheckMask(mask);
 }
 
 /// Handle Marking and Unmarking of radar vision

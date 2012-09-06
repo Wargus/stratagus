@@ -340,7 +340,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 */
 bool CanBuildOn(const Vec2i &pos, int mask)
 {
-	return (Map.Info.IsPointOnMap(pos) && !Map.CheckMask(pos, mask));
+	return (Map.Info.IsPointOnMap(pos) && !Map.Field(pos)->CheckMask(mask));
 }
 
 /**
@@ -393,7 +393,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 				testmask = type.MovementMask;
 			}
 			/*secound part of if (!CanBuildOn(x + w, y + h, testmask)) */
-			if (Map.CheckMask(index + pos.x + w, testmask)) {
+			if (Map.Field(index + pos.x + w)->CheckMask(testmask)) {
 				h = type.TileHeight;
 				ontop = NULL;
 				break;

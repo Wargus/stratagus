@@ -95,7 +95,7 @@ VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal
 		}
 		return VisitResult_Finished;
 	}
-	if (Map.CheckMask(pos, resmask)) { // reachable
+	if (Map.Field(pos)->CheckMask(resmask)) { // reachable
 		if (terrainTraversal.Get(pos) <= maxDist) {
 			return VisitResult_Ok;
 		} else {
@@ -114,7 +114,7 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
 	terrainTraversal.Init();
 
-	Assert(Map.CheckMask(startPos, resmask));
+	Assert(Map.Field(startPos)->CheckMask(resmask));
 	terrainTraversal.PushPos(startPos);
 
 	NearReachableTerrainFinder nearReachableTerrainFinder(player, range, movemask, resmask, terrainPos);

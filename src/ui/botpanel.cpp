@@ -1304,7 +1304,7 @@ void CButtonPanel::DoClicked(int button)
 			//  That or a bunker.
 			//
 			if ((NumSelected == 1 && Selected[0]->CurrentAction() == UnitActionStill
-				 && Map.CoastOnMap(Selected[0]->tilePos))
+				 && Map.Field(Selected[0]->tilePos)->CoastOnMap())
 				|| !Selected[0]->CanMove()) {
 				SendCommandUnload(*Selected[0], Selected[0]->tilePos, NoUnitP, flush);
 				break;

@@ -58,31 +58,6 @@ char CurrentMapPath[1024];       /// Path of the current map
 --  Visible and explored handling
 ----------------------------------------------------------------------------*/
 
-/// Returns true, if forest on the map tile field
-static bool ForestOnMap(const unsigned int index)
-{
-	return Map.CheckMask(index, MapFieldForest);
-}
-
-static bool ForestOnMap(const Vec2i &pos)
-{
-	Assert(Map.Info.IsPointOnMap(pos));
-	return ForestOnMap(Map.getIndex(pos));
-}
-
-/// Returns true, if rock on the map tile field
-static bool RockOnMap(const unsigned int index)
-{
-	return Map.CheckMask(index, MapFieldRocks);
-}
-#if 0
-static bool RockOnMap(const Vec2i &pos)
-{
-	Assert(Map.Info.IsPointOnMap(pos));
-	return RockOnMap(Map.getIndex(pos));
-}
-#endif
-
 /**
 **  Marks seen tile -- used mainly for the Fog Of War
 **
@@ -123,7 +98,7 @@ void CMap::MarkSeenTile(const unsigned int index)
 			FixNeighbors(MapFieldForest, 1, pos);
 		} else if (seentile == this->Tileset.RemovedTree && tile != this->Tileset.RemovedTree) {
 			FixTile(MapFieldForest, 1, pos);
-		} else if (ForestOnMap(index)) {
+		} else if (mf.ForestOnMap()) {
 			FixTile(MapFieldForest, 1, pos);
 			FixNeighbors(MapFieldForest, 1, pos);
 
@@ -132,7 +107,7 @@ void CMap::MarkSeenTile(const unsigned int index)
 			FixNeighbors(MapFieldRocks, 1, pos);
 		} else if (seentile == this->Tileset.RemovedRock && tile != Map.Tileset.RemovedRock) {
 			FixTile(MapFieldRocks, 1, pos);
-		} else if (RockOnMap(index)) {
+		} else if (mf.RockOnMap()) {
 			FixTile(MapFieldRocks, 1, pos);
 			FixNeighbors(MapFieldRocks, 1, pos);
 
@@ -210,7 +185,7 @@ bool CMap::IsTerrainResourceOnMap(const Vec2i &pos, int resource) const
 {
 	// TODO: Hard coded stuff.
 	if (resource == WoodCost) {
-		return ForestOnMap(pos);
+		return Field(pos)->ForestOnMap();
 	}
 	return false;
 }
@@ -266,7 +241,6 @@ bool CMap::WallOnMap(const Vec2i &pos) const
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 	return (Field(pos)->Flags & MapFieldWall) != 0;
-
 }
 
 /**
@@ -305,7 +279,7 @@ bool CMap::OrcWallOnMap(const Vec2i &pos) const
 */
 bool CheckedCanMoveToMask(const Vec2i &pos, int mask)
 {
-	return Map.Info.IsPointOnMap(pos) && !Map.CheckMask(pos, mask);
+	return Map.Info.IsPointOnMap(pos) && CanMoveToMask(pos, mask);
 }
 
 /**
@@ -324,7 +298,7 @@ bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos)
 	for (int addy = 0; addy < type.TileHeight; ++addy) {
 		for (int addx = 0; addx < type.TileWidth; ++addx) {
 			if (Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy) == false
-				|| Map.CheckMask(pos.x + addx + index, mask) == true) {
+				|| Map.Field(pos.x + addx + index)->CheckMask(mask) == true) {
 				return false;
 			}
 		}

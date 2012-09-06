@@ -130,7 +130,7 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 		return VisitResult_DeadEnd;
 	}
 	// Look if found what was required.
-	if (Map.CheckMask(pos, resmask)) {
+	if (Map.Field(pos)->CheckMask(resmask)) {
 		if (resPos) {
 			*resPos = pos;
 		}

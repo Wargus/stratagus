@@ -143,7 +143,7 @@ VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 		}
 		return VisitResult_Finished;
 	}
-	if (Map.CheckMask(pos, movemask)) { // reachable
+	if (Map.Field(pos)->CheckMask(movemask)) { // reachable
 		if (terrainTraversal.Get(pos) <= maxDist) {
 			return VisitResult_Ok;
 		} else {
