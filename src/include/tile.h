@@ -41,6 +41,30 @@
 **  @class CMapField tile.h
 **
 **  \#include "tile.h"
+*
+**  CMapFieldPlayerInfo::Visible[]
+**
+**    Counter how many units of the player can see this field. 0 the
+**    field is not explored, 1 explored, n-1 unit see it. Currently
+**    no more than 253 units can see a field.
+**
+**  CMapFieldPlayerInfo::VisCloak[]
+**
+**    Visiblity for cloaking.
+**
+**  CMapFieldPlayerInfo::Radar[]
+**
+**    Visiblity for radar.
+**
+**  CMapFieldPlayerInfo::RadarJammer[]
+**
+**    Jamming capabilities.
+*/
+
+/**
+**  @class CMapField tile.h
+**
+**  \#include "tile.h"
 **
 **  This class contains all information about a field on map.
 **  It contains its look, properties and content.
@@ -68,11 +92,9 @@
 **
 **    ::MapFieldVisible field is visible.
 **    ::MapFieldExplored field is explored.
-**    ::MapFieldHuman human player is the owner of the field used for
-**      walls.
+**    ::MapFieldHuman human player is the owner of the field used for walls.
 **    ::MapFieldLandAllowed land units are allowed.
-**    ::MapFieldCoastAllowed coast units (transporter) and coast
-**      buildings (shipyard) are allowed.
+**    ::MapFieldCoastAllowed coast units (transporter) and coast buildings (shipyard) are allowed.
 **    ::MapFieldWaterAllowed water units allowed.
 **    ::MapFieldNoBuilding no buildings allowed.
 **    ::MapFieldUnpassable field is movement blocked.
@@ -97,24 +119,6 @@
 **    walls, contains the remaining hit points of the wall and
 **    for forest, contains the frames until they grow.
 **
-**  CMapField::Visible[]
-**
-**    Counter how many units of the player can see this field. 0 the
-**    field is not explored, 1 explored, n-1 unit see it. Currently
-**    no more than 253 units can see a field.
-**
-**  CMapField::VisCloak[]
-**
-**    Visiblity for cloaking.
-**
-**  CMapField::Radar[]
-**
-**    Visiblity for radar.
-**
-**  CMapField::RadarJammer[]
-**
-**    Jamming capabilities.
-**
 **  CMapField::UnitCache
 **
 **    Contains a vector of all units currently on this field.
@@ -137,15 +141,10 @@
 --  Map - field
 ----------------------------------------------------------------------------*/
 
-/// Describes a field of the map
-class CMapField
+class CMapFieldPlayerInfo
 {
 public:
-
-	CMapField() : Tile(0), SeenTile(0), Flags(0), Cost(0), Value(0), UnitCache()
-#ifdef DEBUG
-		, TilesetTile(0)
-#endif
+	CMapFieldPlayerInfo()
 	{
 		memset(Visible, 0, sizeof(Visible));
 		memset(VisCloak, 0, sizeof(VisCloak));
@@ -153,29 +152,42 @@ public:
 		memset(RadarJammer, 0, sizeof(RadarJammer));
 	}
 
-	unsigned short Tile;      /// graphic tile number
-	unsigned short SeenTile;  /// last seen tile (FOW)
-	unsigned short Flags;     /// field flags
-	unsigned char Cost;       /// unit cost to move in this tile
-	// FIXME: Value can be removed, walls and regeneration can be handled
-	//        different.
-	unsigned char Value;                  /// HP for walls/ Wood Regeneration
+	/// Check if a field for the user is explored.
+	bool IsExplored(unsigned int player_index) const {
+		return Visible[player_index] != 0;
+	}
+
+public:
 	unsigned short Visible[PlayerMax];    /// Seen counter 0 unexplored
 	unsigned char VisCloak[PlayerMax];    /// Visiblity for cloaking.
 	unsigned char Radar[PlayerMax];       /// Visiblity for radar.
 	unsigned char RadarJammer[PlayerMax]; /// Jamming capabilities.
-	CUnitCache		UnitCache;			/// A unit on the map field.
-#ifdef DEBUG
-	unsigned int TilesetTile;      /// tileset tile number
-#endif
-
-	/// Check if a field for the user is explored.
-	bool IsExplored(const unsigned int player_index) const {
-		return !!Visible[player_index];
-	};
-
 };
 
+
+/// Describes a field of the map
+class CMapField
+{
+public:
+	CMapField() : Tile(0), SeenTile(0), Flags(0), Cost(0), Value(0), UnitCache()
+#ifdef DEBUG
+		, TilesetTile(0)
+#endif
+	{}
+
+	unsigned short Tile;       /// graphic tile number
+	unsigned short SeenTile;  /// last seen tile (FOW)
+	unsigned short Flags;      /// field flags
+	unsigned char Cost;        /// unit cost to move in this tile
+	// FIXME: Value should be removed, walls and regeneration can be handled differently.
+	unsigned char Value;       /// HP for walls/ Wood Regeneration
+	CUnitCache UnitCache;      /// A unit on the map field.
+#ifdef DEBUG
+	unsigned int TilesetTile;  /// tileset tile number
+#endif
+
+	CMapFieldPlayerInfo playerInfo; /// stuff related to player
+};
 
 //@}
 

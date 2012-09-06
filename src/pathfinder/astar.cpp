@@ -525,7 +525,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 		int i = w;
 		do {
 			const int flag = mf->Flags & mask;
-			if (flag && (AStarKnowUnseenTerrain || mf->IsExplored(player_index))) {
+			if (flag && (AStarKnowUnseenTerrain || mf->playerInfo.IsExplored(player_index))) {
 				if (flag & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)) {
 					// we can't cross fixed units and other unpassable things
 					return -1;
@@ -549,7 +549,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 				}
 			}
 			// Add cost of crossing unknown tiles if required
-			if (!AStarKnowUnseenTerrain && !mf->IsExplored(player_index)) {
+			if (!AStarKnowUnseenTerrain && !mf->playerInfo.IsExplored(player_index)) {
 				// Tend against unknown tiles.
 				cost += AStarUnknownTerrainCost;
 			}

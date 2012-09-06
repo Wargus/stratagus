@@ -1617,12 +1617,12 @@ void UnitCountSeen(CUnit &unit)
 				int x = width;
 				do {
 					if (unit.Type->PermanentCloak && unit.Player != &Players[p]) {
-						if (mf->VisCloak[p]) {
+						if (mf->playerInfo.VisCloak[p]) {
 							newv++;
 						}
 					} else {
 						//  Icky ugly code trick. With NoFogOfWar we haveto be > 0;
-						if (mf->Visible[p] > 1 - (Map.NoFogOfWar ? 1 : 0)) {
+						if (mf->playerInfo.Visible[p] > 1 - (Map.NoFogOfWar ? 1 : 0)) {
 							newv++;
 						}
 					}

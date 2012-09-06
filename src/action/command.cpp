@@ -854,16 +854,16 @@ void CommandSharedVision(int player, bool state, int opponent)
 		Vec2i pos;
 		for (pos.x = 0; pos.x < Map.Info.MapWidth; ++pos.x) {
 			for (pos.y = 0; pos.y < Map.Info.MapHeight; ++pos.y) {
-				CMapField &mf = *Map.Field(pos);
+				CMapFieldPlayerInfo &mfp = Map.Field(pos)->playerInfo;
 
-				if (mf.Visible[player] && !mf.Visible[opponent]) {
-					mf.Visible[opponent] = 1;
+				if (mfp.Visible[player] && !mfp.Visible[opponent]) {
+					mfp.Visible[opponent] = 1;
 					if (opponent == ThisPlayer->Index) {
 						Map.MarkSeenTile(pos);
 					}
 				}
-				if (mf.Visible[opponent] && !mf.Visible[player]) {
-					mf.Visible[player] = 1;
+				if (mfp.Visible[opponent] && !mfp.Visible[player]) {
+					mfp.Visible[player] = 1;
 					if (player == ThisPlayer->Index) {
 						Map.MarkSeenTile(pos);
 					}

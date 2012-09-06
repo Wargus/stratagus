@@ -135,10 +135,9 @@ void CMap::Reveal()
 	Vec2i pos;
 	for (pos.x = 0; pos.x < this->Info.MapWidth; ++pos.x) {
 		for (pos.y = 0; pos.y < this->Info.MapHeight; ++pos.y) {
+			CMapFieldPlayerInfo& playerInfo = this->Field(pos)->playerInfo;
 			for (int p = 0; p < PlayerMax; ++p) {
-				if (!this->Field(pos)->Visible[p]) {
-					this->Field(pos)->Visible[p] = 1;
-				}
+				playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
 			}
 			MarkSeenTile(pos);
 		}
@@ -203,8 +202,8 @@ bool CMap::IsTerrainResourceOnMap(const Vec2i &pos) const
 
 unsigned short CMap::IsTileVisible(const CPlayer &player, const unsigned int index) const
 {
-	const CMapField &mf = this->Fields[index];
-	unsigned short visiontype = mf.Visible[player.Index];
+	const CMapFieldPlayerInfo &mfp = this->Fields[index].playerInfo;
+	unsigned short visiontype = mfp.Visible[player.Index];
 
 	if (visiontype > 1) {
 		return visiontype;
@@ -212,10 +211,10 @@ unsigned short CMap::IsTileVisible(const CPlayer &player, const unsigned int ind
 	if (player.IsVisionSharing()) {
 		for (int i = 0; i < PlayerMax ; ++i) {
 			if (player.IsBothSharedVision(Players[i])) {
-				if (mf.Visible[i] > 1) {
+				if (mfp.Visible[i] > 1) {
 					return 2;
 				}
-				visiontype |= mf.Visible[i];
+				visiontype |= mfp.Visible[i];
 			}
 		}
 	}
@@ -227,7 +226,7 @@ unsigned short CMap::IsTileVisible(const CPlayer &player, const unsigned int ind
 
 bool CMap::IsFieldExplored(const CPlayer &player, const unsigned int index) const
 {
-	return this->Fields[index].IsExplored(player.Index);
+	return this->Fields[index].playerInfo.IsExplored(player.Index);
 }
 
 

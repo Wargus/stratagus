@@ -133,7 +133,7 @@ int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask)
 void MapMarkTileSight(const CPlayer &player, const unsigned int index)
 {
 	//v = &Map.Field(x, y)->Visible[player.Index];
-	unsigned short *v = &(Map.Field(index)->Visible[player.Index]);
+	unsigned short *v = &(Map.Field(index)->playerInfo.Visible[player.Index]);
 	if (*v == 0 || *v == 1) { // Unexplored or unseen
 		// When there is no fog only unexplored tiles are marked.
 		if (!Map.NoFogOfWar || *v == 0) {
@@ -165,7 +165,7 @@ void MapMarkTileSight(const CPlayer &player, const Vec2i &pos)
 */
 void MapUnmarkTileSight(const CPlayer &player, const unsigned int index)
 {
-	unsigned short *v = &(Map.Field(index)->Visible[player.Index]);
+	unsigned short *v = &(Map.Field(index)->playerInfo.Visible[player.Index]);
 	switch (*v) {
 		case 0:  // Unexplored
 		case 1:
@@ -202,7 +202,7 @@ void MapUnmarkTileSight(const CPlayer &player, const Vec2i &pos)
 */
 void MapMarkTileDetectCloak(const CPlayer &player, const unsigned int index)
 {
-	unsigned char *v = &(Map.Field(index)->VisCloak[player.Index]);
+	unsigned char *v = &(Map.Field(index)->playerInfo.VisCloak[player.Index]);
 	if (*v == 0) {
 		UnitsOnTileMarkSeen(player, index, 1);
 	}
@@ -226,7 +226,7 @@ void MapMarkTileDetectCloak(const CPlayer &player, const Vec2i &pos)
 void
 MapUnmarkTileDetectCloak(const CPlayer &player, const unsigned int index)
 {
-	unsigned char *v = &(Map.Field(index)->VisCloak[player.Index]);
+	unsigned char *v = &(Map.Field(index)->playerInfo.VisCloak[player.Index]);
 	Assert(*v != 0);
 	if (*v == 1) {
 		UnitsOnTileUnmarkSeen(player, index, 1);

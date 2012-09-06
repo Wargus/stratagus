@@ -110,30 +110,23 @@ static int CclStratagusMap(lua_State *l)
 					Map.Info.Filename = LuaToString(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "map-fields")) {
-					int i;
-					int subsubargs;
-					int subk;
-
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
 					}
 
-					subsubargs = lua_rawlen(l, -1);
+					const int subsubargs = lua_rawlen(l, -1);
 					if (subsubargs != Map.Info.MapWidth * Map.Info.MapHeight) {
 						fprintf(stderr, "Wrong tile table length: %d\n", subsubargs);
 					}
-					i = 0;
-					for (subk = 0; subk < subsubargs; ++subk) {
-						int args2;
-						int j2;
-
+					int i = 0;
+					for (int subk = 0; subk < subsubargs; ++subk) {
 						lua_rawgeti(l, -1, subk + 1);
 						if (!lua_istable(l, -1)) {
 							LuaError(l, "incorrect argument");
 						}
-						args2 = lua_rawlen(l, -1);
-						j2 = 0;
+						int args2 = lua_rawlen(l, -1);
+						int j2 = 0;
 
 						lua_rawgeti(l, -1, j2 + 1);
 						Map.Fields[i].Tile = LuaToNumber(l, -1);
@@ -158,7 +151,7 @@ static int CclStratagusMap(lua_State *l)
 							if (!strcmp(value, "explored")) {
 								++j2;
 								lua_rawgeti(l, -1, j2 + 1);
-								Map.Fields[i].Visible[(int)LuaToNumber(l, -1)] = 1;
+								Map.Fields[i].playerInfo.Visible[LuaToNumber(l, -1)] = 1;
 								lua_pop(l, 1);
 							} else if (!strcmp(value, "human")) {
 								Map.Fields[i].Flags |= MapFieldHuman;
