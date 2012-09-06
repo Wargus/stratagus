@@ -346,7 +346,7 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 				break;
 			}
 
-			int tile = Map.Fields[x + y].SeenTile;
+			int tile = Map.Fields[x + y].playerInfo.SeenTile;
 			if (!tile) {
 				tile = Map.Fields[x + y].Tile;
 			}

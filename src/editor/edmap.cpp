@@ -393,7 +393,8 @@ void ChangeTile(const Vec2i &pos, int tile)
 	Assert(tile >= 0 && tile < Map.Tileset.NumTiles);
 
 	CMapField *mf = Map.Field(pos);
-	mf->Tile = mf->SeenTile = Map.Tileset.Table[tile];
+	mf->Tile = Map.Tileset.Table[tile];
+	mf->playerInfo.SeenTile = mf->Tile;
 }
 
 #define DIR_UP     8 /// Go up allowed

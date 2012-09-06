@@ -1934,9 +1934,8 @@ void CEditor::Init()
 		const int defaultTile = 0x50;
 
 		for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
-			Map.Fields[i].Tile = Map.Fields[i].SeenTile = 0;
-			Map.Fields[i].Tile = Map.Fields[i].SeenTile =
-									 Map.Tileset.Table[defaultTile];
+			Map.Fields[i].Tile = Map.Tileset.Table[defaultTile];
+			Map.Fields[i].playerInfo.SeenTile = Map.Fields[i].Tile;
 			Map.Fields[i].Flags = Map.Tileset.FlagsTable[defaultTile];
 		}
 		GameSettings.Resources = SettingsPresetMapDefault;

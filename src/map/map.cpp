@@ -68,7 +68,7 @@ void CMap::MarkSeenTile(const unsigned int index)
 {
 	CMapField &mf = *this->Field(index);
 	const int tile = mf.Tile;
-	const int seentile = mf.SeenTile;
+	const int seentile = mf.playerInfo.SeenTile;
 
 	//
 	//  Nothing changed? Seeing already the correct tile.
@@ -76,7 +76,7 @@ void CMap::MarkSeenTile(const unsigned int index)
 	if (tile == seentile) {
 		return;
 	}
-	mf.SeenTile = tile;
+	mf.playerInfo.SeenTile = tile;
 
 #ifdef MINIMAP_UPDATE
 	//rb - GRRRRRRRRRRRR
@@ -331,7 +331,7 @@ void PreprocessMap()
 	for (int ix = 0; ix < Map.Info.MapWidth; ++ix) {
 		for (int iy = 0; iy < Map.Info.MapHeight; ++iy) {
 			CMapField *mf = Map.Field(ix, iy);
-			mf->SeenTile = mf->Tile;
+			mf->playerInfo.SeenTile = mf->Tile;
 		}
 	}
 	// it is required for fixing the wood that all tiles are marked as seen!
@@ -422,7 +422,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	unsigned int index = getIndex(pos);
 	CMapField *mf = this->Field(index);
 
-	if (seen && !Tileset.IsSeenTile(type, mf->SeenTile)) {
+	if (seen && !Tileset.IsSeenTile(type, mf->playerInfo.SeenTile)) {
 		return;
 	} else if (!seen && !(mf->Flags & type)) {
 		return;
@@ -462,7 +462,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	} else {
 		CMapField *new_mf = (mf - this->Info.MapWidth);
 		if (seen) {
-			ttup = this->Tileset.MixedLookupTable[new_mf->SeenTile];
+			ttup = this->Tileset.MixedLookupTable[new_mf->playerInfo.SeenTile];
 		} else {
 			ttup = this->Tileset.MixedLookupTable[new_mf->Tile];
 		}
@@ -472,7 +472,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	} else {
 		CMapField *new_mf = (mf + 1);
 		if (seen) {
-			ttright = this->Tileset.MixedLookupTable[new_mf->SeenTile];
+			ttright = this->Tileset.MixedLookupTable[new_mf->playerInfo.SeenTile];
 		} else {
 			ttright = this->Tileset.MixedLookupTable[new_mf->Tile];
 		}
@@ -482,7 +482,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	} else {
 		CMapField *new_mf = (mf + this->Info.MapWidth);
 		if (seen) {
-			ttdown = this->Tileset.MixedLookupTable[new_mf->SeenTile];
+			ttdown = this->Tileset.MixedLookupTable[new_mf->playerInfo.SeenTile];
 		} else {
 			ttdown = this->Tileset.MixedLookupTable[new_mf->Tile];
 		}
@@ -492,7 +492,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	} else {
 		CMapField *new_mf = (mf - 1);
 		if (seen) {
-			ttleft = this->Tileset.MixedLookupTable[new_mf->SeenTile];
+			ttleft = this->Tileset.MixedLookupTable[new_mf->playerInfo.SeenTile];
 		} else {
 			ttleft = this->Tileset.MixedLookupTable[new_mf->Tile];
 		}
@@ -537,7 +537,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	//Update seen tile.
 	if (tile == -1) { // No valid wood remove it.
 		if (seen) {
-			mf->SeenTile = removedtile;
+			mf->playerInfo.SeenTile = removedtile;
 			this->FixNeighbors(type, seen, pos);
 		} else {
 			mf->Tile = removedtile;
@@ -545,12 +545,12 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 			mf->Value = 0;
 			UI.Minimap.UpdateXY(pos);
 		}
-	} else if (seen && this->Tileset.MixedLookupTable[mf->SeenTile] ==
+	} else if (seen && this->Tileset.MixedLookupTable[mf->playerInfo.SeenTile] ==
 			   this->Tileset.MixedLookupTable[tile]) { //Same Type
 		return;
 	} else {
 		if (seen) {
-			mf->SeenTile = tile;
+			mf->playerInfo.SeenTile = tile;
 		} else {
 			mf->Tile = tile;
 		}

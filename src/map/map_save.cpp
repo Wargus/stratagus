@@ -77,7 +77,7 @@ void CMap::Save(CFile &file) const
 		for (int w = 0; w < this->Info.MapWidth; ++w) {
 			const CMapField &mf = *this->Field(w, h);
 
-			file.printf("  {%3d, %3d, %2d, %2d,", mf.Tile, mf.SeenTile, mf.Value, mf.Cost);
+			file.printf("  {%3d, %3d, %2d, %2d,", mf.Tile, mf.playerInfo.SeenTile, mf.Value, mf.Cost);
 			for (int i = 0; i < PlayerMax; ++i) {
 				if (mf.playerInfo.Visible[i] == 1) {
 					file.printf(" \"explored\", %d,", i);

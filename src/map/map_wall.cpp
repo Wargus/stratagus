@@ -77,7 +77,7 @@
 */
 static int MapIsSeenTileWall(int x, int y, int walltype)
 {
-	int t = Map.Tileset.TileTypeTable[Map.Field(x, y)->SeenTile];
+	int t = Map.Tileset.TileTypeTable[Map.Field(x, y)->playerInfo.SeenTile];
 
 	if (walltype == -1) {
 		return t == TileTypeHumanWall || t == TileTypeOrcWall;
@@ -97,7 +97,7 @@ void MapFixSeenWallTile(const Vec2i &pos)
 		return;
 	}
 	CMapField *mf = Map.Field(pos);
-	int t = Map.Tileset.TileTypeTable[mf->SeenTile];
+	int t = Map.Tileset.TileTypeTable[mf->playerInfo.SeenTile];
 	if (t != TileTypeHumanWall && t != TileTypeOrcWall) {
 		return;
 	}
@@ -150,8 +150,8 @@ void MapFixSeenWallTile(const Vec2i &pos)
 	}
 	tile = Map.Tileset.Table[tile];
 
-	if (mf->SeenTile != tile) { // Already there!
-		mf->SeenTile = tile;
+	if (mf->playerInfo.SeenTile != tile) { // Already there!
+		mf->playerInfo.SeenTile = tile;
 
 		// FIXME: can this only happen if seen?
 		if (Map.IsFieldVisible(*ThisPlayer, pos)) {

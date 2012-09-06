@@ -41,7 +41,12 @@
 **  @class CMapField tile.h
 **
 **  \#include "tile.h"
-*
+**
+**  CMapFieldPlayerInfo::SeenTile
+**
+**    This is the tile number, that the player sitting on the computer
+**    currently knows. Idea: Can be uses for illusions.
+**
 **  CMapFieldPlayerInfo::Visible[]
 **
 **    Counter how many units of the player can see this field. 0 the
@@ -77,11 +82,6 @@
 **    map-field. 65535 different tiles are supported. A tile is
 **    currently 32x32 pixels. In the future is planned to support
 **    animated tiles.
-**
-**  CMapField::SeenTile
-**
-**    This is the tile number, that the player sitting on the computer
-**    currently knows. Idea: Can be uses for illusions.
 **
 **  CMapField::Flags
 **
@@ -144,7 +144,7 @@
 class CMapFieldPlayerInfo
 {
 public:
-	CMapFieldPlayerInfo()
+	CMapFieldPlayerInfo() : SeenTile(0)
 	{
 		memset(Visible, 0, sizeof(Visible));
 		memset(VisCloak, 0, sizeof(VisCloak));
@@ -158,6 +158,7 @@ public:
 	}
 
 public:
+	unsigned short SeenTile;              /// last seen tile (FOW)
 	unsigned short Visible[PlayerMax];    /// Seen counter 0 unexplored
 	unsigned char VisCloak[PlayerMax];    /// Visiblity for cloaking.
 	unsigned char Radar[PlayerMax];       /// Visiblity for radar.
@@ -169,14 +170,13 @@ public:
 class CMapField
 {
 public:
-	CMapField() : Tile(0), SeenTile(0), Flags(0), Cost(0), Value(0), UnitCache()
+	CMapField() : Tile(0), Flags(0), Cost(0), Value(0), UnitCache()
 #ifdef DEBUG
 		, TilesetTile(0)
 #endif
 	{}
 
 	unsigned short Tile;       /// graphic tile number
-	unsigned short SeenTile;  /// last seen tile (FOW)
 	unsigned short Flags;      /// field flags
 	unsigned char Cost;        /// unit cost to move in this tile
 	// FIXME: Value should be removed, walls and regeneration can be handled differently.

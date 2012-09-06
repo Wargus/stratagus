@@ -133,7 +133,7 @@ static int CclStratagusMap(lua_State *l)
 						lua_pop(l, 1);
 						++j2;
 						lua_rawgeti(l, -1, j2 + 1);
-						Map.Fields[i].SeenTile = LuaToNumber(l, -1);
+						Map.Fields[i].playerInfo.SeenTile = LuaToNumber(l, -1);
 						lua_pop(l, 1);
 						++j2;
 						lua_rawgeti(l, -1, j2 + 1);

@@ -273,7 +273,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			if (ReplayRevealMap) {
 				tile = Map.Fields[sx].Tile;
 			} else {
-				tile = Map.Fields[sx].SeenTile;
+				tile = Map.Fields[sx].playerInfo.SeenTile;
 			}
 			Map.TileGraphic->DrawFrameClip(tile, dx, dy);
 
