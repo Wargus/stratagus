@@ -131,7 +131,6 @@ int DoActionMove(CUnit &unit)
 {
 	Vec2i posd; // movement in tile.
 	int d;
-	Vec2i pos;
 
 	Assert(unit.CanMove());
 
@@ -168,19 +167,18 @@ int DoActionMove(CUnit &unit)
 				unit.Moving = 1;
 				break;
 		}
-		pos = unit.tilePos;
-		int off = unit.Offset;
-		//
-		// Transporter (un)docking?
-		//
-		// FIXME: This is an ugly hack
-		if (unit.Type->CanTransport()
-			&& ((Map.Field(off)->WaterOnMap() && Map.Field(pos + posd)->CoastOnMap())
-				|| (Map.Field(off)->CoastOnMap() && Map.Field(pos + posd)->WaterOnMap()))) {
-			PlayUnitSound(unit, VoiceDocking);
-		}
 
-		pos = unit.tilePos + posd;
+		if (unit.Type->UnitType == UnitTypeNaval) { // Boat (un)docking?
+			const CMapField& mf_cur = *Map.Field(unit.Offset);
+			const CMapField& mf_next = *Map.Field(unit.tilePos + posd);
+
+			if (mf_cur.WaterOnMap() && mf_next.CoastOnMap()) {
+				PlayUnitSound(unit, VoiceDocking);
+			} else if (mf_cur.CoastOnMap() && mf_next.WaterOnMap()) {
+				PlayUnitSound(unit, VoiceDocking); // undocking
+			}
+		}
+		Vec2i pos = unit.tilePos + posd;
 		unit.MoveToXY(pos);
 
 		// Remove unit from the current selection
