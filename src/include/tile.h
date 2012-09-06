@@ -223,6 +223,9 @@ public:
 		return CheckMask(MapFieldRocks);
 	}
 
+	bool IsTerrainResourceOnMap(int resource) const;
+	bool IsTerrainResourceOnMap() const;
+
 public:
 	unsigned short Tile;       /// graphic tile number
 	unsigned short Flags;      /// field flags

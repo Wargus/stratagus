@@ -238,7 +238,7 @@ static bool DoRightButton_Harvest(CUnit &unit, CUnit *dest, const Vec2i &pos, in
 				for (int res = 0; res < MaxCosts; ++res) {
 					if (type.ResInfo[res]
 						&& type.ResInfo[res]->TerrainHarvester
-						&& Map.IsTerrainResourceOnMap(pos, res)
+						&& Map.Field(pos)->IsTerrainResourceOnMap(res)
 						&& ((unit.CurrentResource != res)
 							|| (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity))) {
 						if (!acknowledged) {
@@ -424,7 +424,7 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 		return true;
 	}
 	// FIXME: support harvesting more types of terrain.
-	if (Map.IsFieldExplored(*unit.Player, pos) && Map.IsTerrainResourceOnMap(pos)) {
+	if (Map.IsFieldExplored(*unit.Player, pos) && Map.Field(pos)->IsTerrainResourceOnMap()) {
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAcknowledging);
 			acknowledged = 1;
@@ -1167,7 +1167,7 @@ static int SendResource(const Vec2i &pos)
 					if (unit.Type->ResInfo[res]
 						&& unit.Type->ResInfo[res]->TerrainHarvester
 						&& Map.IsFieldExplored(*unit.Player, pos)
-						&& Map.IsTerrainResourceOnMap(pos, res)
+						&& Map.Field(pos)->IsTerrainResourceOnMap(res)
 						&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
 						&& (unit.CurrentResource != res || unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity)) {
 						SendCommandResourceLoc(unit, pos, flush);
@@ -1187,7 +1187,7 @@ static int SendResource(const Vec2i &pos)
 				ret = 1;
 				continue;
 			}
-			if (Map.IsFieldExplored(*unit.Player, pos) && Map.IsTerrainResourceOnMap(pos)) {
+			if (Map.IsFieldExplored(*unit.Player, pos) && Map.Field(pos)->IsTerrainResourceOnMap()) {
 				SendCommandResourceLoc(unit, pos, flush);
 				ret = 1;
 				continue;

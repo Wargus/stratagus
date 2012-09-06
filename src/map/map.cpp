@@ -181,19 +181,19 @@ PixelPos CMap::TilePosToMapPixelPos_Center(const Vec2i &tilePos) const
 	return TilePosToMapPixelPos_TopLeft(tilePos) + PixelTileSize / 2;
 }
 
-bool CMap::IsTerrainResourceOnMap(const Vec2i &pos, int resource) const
+bool CMapField::IsTerrainResourceOnMap(int resource) const
 {
 	// TODO: Hard coded stuff.
 	if (resource == WoodCost) {
-		return Field(pos)->ForestOnMap();
+		return this->ForestOnMap();
 	}
 	return false;
 }
 
-bool CMap::IsTerrainResourceOnMap(const Vec2i &pos) const
+bool CMapField::IsTerrainResourceOnMap() const
 {
 	for (int i = 0; i != MaxCosts; ++i) {
-		if (IsTerrainResourceOnMap(pos, i)) {
+		if (IsTerrainResourceOnMap(i)) {
 			return true;
 		}
 	}

@@ -237,10 +237,6 @@ public:
 		return Field(pos.x, pos.y);
 	}
 
-	// return true if there is the specified (terrain) resource on map.
-	bool IsTerrainResourceOnMap(const Vec2i &pos, int resource) const;
-	bool IsTerrainResourceOnMap(const Vec2i &pos) const;
-
 	//
 	// Wall
 	//

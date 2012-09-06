@@ -366,7 +366,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 	Vec2i pos = this->goalPos;
 
 	// Wood gone, look somewhere else.
-	if ((Map.Info.IsPointOnMap(pos) == false || Map.IsTerrainResourceOnMap(pos, CurrentResource) == false)
+	if ((Map.Info.IsPointOnMap(pos) == false || Map.Field(pos)->IsTerrainResourceOnMap(CurrentResource) == false)
 		&& (!unit.IX) && (!unit.IY)) {
 		if (!FindTerrainType(unit.Type->MovementMask, MapFieldForest, 16, *unit.Player, this->goalPos, &pos)) {
 			// no wood in range
@@ -660,7 +660,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 	}
 
 	// Target gone?
-	if (resinfo.TerrainHarvester && !Map.IsTerrainResourceOnMap(this->goalPos, this->CurrentResource)) {
+	if (resinfo.TerrainHarvester && !Map.Field(this->goalPos)->IsTerrainResourceOnMap(this->CurrentResource)) {
 		if (!unit.Anim.Unbreakable) {
 			// Action now breakable, move to resource again.
 			this->State = SUB_MOVE_TO_RESOURCE;
