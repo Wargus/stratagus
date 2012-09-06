@@ -344,41 +344,6 @@ public:
 	}
 
 private:
-
-	/// Returns true, if forest on the map tile field
-	bool ForestOnMap(const unsigned int index) const {
-		return CheckMask(index, MapFieldForest);
-	}
-
-	/**
-	**  Forest on map tile.
-	**
-	**  @param pos  map tile position.
-	**
-	**  @return    True if forest, false otherwise.
-	*/
-	bool ForestOnMap(const Vec2i &pos) const {
-		Assert(Info.IsPointOnMap(pos));
-		return ForestOnMap(getIndex(pos));
-	}
-
-	/// Returns true, if rock on the map tile field
-	bool RockOnMap(const unsigned int index) const {
-		return CheckMask(index, MapFieldRocks);
-	}
-
-	/**
-	**  Rock on map tile.
-	**
-	**  @param pos  map tile position.
-	**
-	**  @return    True if rock, false otherwise.
-	*/
-	bool RockOnMap(const Vec2i &pos) const {
-		Assert(Info.IsPointOnMap(pos));
-		return RockOnMap(getIndex(pos));
-	}
-
 	/// Build tables for fog of war
 	void InitFogOfWar();
 
@@ -389,7 +354,6 @@ private:
 
 	/// Regenerate the forest.
 	void RegenerateForestTile(const Vec2i &pos);
-
 
 public:
 	CMapField *Fields;              /// fields on map

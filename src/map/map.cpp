@@ -58,6 +58,31 @@ char CurrentMapPath[1024];       /// Path of the current map
 --  Visible and explored handling
 ----------------------------------------------------------------------------*/
 
+/// Returns true, if forest on the map tile field
+static bool ForestOnMap(const unsigned int index)
+{
+	return Map.CheckMask(index, MapFieldForest);
+}
+
+static bool ForestOnMap(const Vec2i &pos)
+{
+	Assert(Map.Info.IsPointOnMap(pos));
+	return ForestOnMap(Map.getIndex(pos));
+}
+
+/// Returns true, if rock on the map tile field
+static bool RockOnMap(const unsigned int index)
+{
+	return Map.CheckMask(index, MapFieldRocks);
+}
+#if 0
+static bool RockOnMap(const Vec2i &pos)
+{
+	Assert(Map.Info.IsPointOnMap(pos));
+	return RockOnMap(Map.getIndex(pos));
+}
+#endif
+
 /**
 **  Marks seen tile -- used mainly for the Fog Of War
 **
