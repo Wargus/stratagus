@@ -150,15 +150,22 @@ public:
 class CMap
 {
 public:
-	inline unsigned int getIndex(int x, int y) const {
+	unsigned int getIndex(int x, int y) const {
 		return x + y * this->Info.MapWidth;
 	}
-
 	unsigned int getIndex(const Vec2i &pos) const {
 		return getIndex(pos.x, pos.y);
 	}
-	inline CMapField *Field(unsigned int index) const {
+
+	CMapField *Field(unsigned int index) const {
 		return &this->Fields[index];
+	}
+	/// Get the MapField at location x,y
+	CMapField *Field(int x, int y) const {
+		return &this->Fields[x + y * this->Info.MapWidth];
+	}
+	CMapField *Field(const Vec2i &pos) const {
+		return Field(pos.x, pos.y);
 	}
 
 	/// Alocate and initialise map table.
@@ -194,14 +201,6 @@ public:
 	void Reveal();
 	/// Save the map.
 	void Save(CFile &file) const;
-
-	/// Get the MapField at location x,y
-	inline CMapField *Field(int x, int y) const {
-		return &this->Fields[x + y * this->Info.MapWidth];
-	}
-	CMapField *Field(const Vec2i &pos) const {
-		return Field(pos.x, pos.y);
-	}
 
 	//
 	// Wall
@@ -253,7 +252,6 @@ private:
 
 public:
 	CMapField *Fields;              /// fields on map
-
 	bool NoFogOfWar;           /// fog of war disabled
 
 	CTileset Tileset;          /// tileset data
