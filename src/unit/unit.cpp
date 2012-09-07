@@ -1621,8 +1621,7 @@ void UnitCountSeen(CUnit &unit)
 							newv++;
 						}
 					} else {
-						//  Icky ugly code trick. With NoFogOfWar we haveto be > 0;
-						if (mf->playerInfo.Visible[p] > 1 - (Map.NoFogOfWar ? 1 : 0)) {
+						if (mf->playerInfo.IsVisible(Players[p])) {
 							newv++;
 						}
 					}

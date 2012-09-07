@@ -96,8 +96,8 @@ void MapFixSeenWallTile(const Vec2i &pos)
 	if (!Map.Info.IsPointOnMap(pos)) {
 		return;
 	}
-	CMapField *mf = Map.Field(pos);
-	int t = Map.Tileset.TileTypeTable[mf->playerInfo.SeenTile];
+	CMapField &mf = *Map.Field(pos);
+	int t = Map.Tileset.TileTypeTable[mf.playerInfo.SeenTile];
 	if (t != TileTypeHumanWall && t != TileTypeOrcWall) {
 		return;
 	}
@@ -121,7 +121,7 @@ void MapFixSeenWallTile(const Vec2i &pos)
 
 	if (t == TileTypeHumanWall) {
 		tile = Map.Tileset.HumanWallTable[tile];
-		if (UnitTypeHumanWall && mf->Value <= UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
+		if (UnitTypeHumanWall && mf.Value <= UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
 			while (Map.Tileset.Table[tile]) { // Skip good tiles
 				++tile;
 			}
@@ -131,7 +131,7 @@ void MapFixSeenWallTile(const Vec2i &pos)
 		}
 	} else {
 		tile = Map.Tileset.OrcWallTable[tile];
-		if (UnitTypeOrcWall && mf->Value <= UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
+		if (UnitTypeOrcWall && mf.Value <= UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
 			while (Map.Tileset.Table[tile]) { // Skip good tiles
 				++tile;
 			}
@@ -140,7 +140,7 @@ void MapFixSeenWallTile(const Vec2i &pos)
 			}
 		}
 	}
-	if (mf->Value == 0) {
+	if (mf.Value == 0) {
 		while (Map.Tileset.Table[tile]) { // Skip good tiles
 			++tile;
 		}
@@ -150,11 +150,11 @@ void MapFixSeenWallTile(const Vec2i &pos)
 	}
 	tile = Map.Tileset.Table[tile];
 
-	if (mf->playerInfo.SeenTile != tile) { // Already there!
-		mf->playerInfo.SeenTile = tile;
+	if (mf.playerInfo.SeenTile != tile) { // Already there!
+		mf.playerInfo.SeenTile = tile;
 
 		// FIXME: can this only happen if seen?
-		if (Map.IsFieldVisible(*ThisPlayer, pos)) {
+		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 			UI.Minimap.UpdateSeenXY(pos);
 		}
 	}
@@ -185,12 +185,12 @@ void MapFixWallTile(const Vec2i &pos)
 	if (!Map.Info.IsPointOnMap(pos)) {
 		return;
 	}
-	CMapField *mf = Map.Field(pos);
-	if (!(mf->Flags & MapFieldWall)) {
+	CMapField &mf = *Map.Field(pos);
+	if (!(mf.Flags & MapFieldWall)) {
 		return;
 	}
 
-	int t = mf->Flags & (MapFieldHuman | MapFieldWall);
+	int t = mf.Flags & (MapFieldHuman | MapFieldWall);
 	//
 	//  Calculate the correct tile. Depends on the surrounding.
 	//
@@ -214,7 +214,7 @@ void MapFixWallTile(const Vec2i &pos)
 
 	if (t & MapFieldHuman) {
 		tile = Map.Tileset.HumanWallTable[tile];
-		if (UnitTypeHumanWall && mf->Value <= UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
+		if (UnitTypeHumanWall && mf.Value <= UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
 			while (Map.Tileset.Table[tile]) { // Skip good tiles
 				++tile;
 			}
@@ -224,7 +224,7 @@ void MapFixWallTile(const Vec2i &pos)
 		}
 	} else {
 		tile = Map.Tileset.OrcWallTable[tile];
-		if (UnitTypeOrcWall && mf->Value <= UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
+		if (UnitTypeOrcWall && mf.Value <= UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
 			while (Map.Tileset.Table[tile]) { // Skip good tiles
 				++tile;
 			}
@@ -233,7 +233,7 @@ void MapFixWallTile(const Vec2i &pos)
 			}
 		}
 	}
-	if (mf->Value == 0) {
+	if (mf.Value == 0) {
 		while (Map.Tileset.Table[tile]) { // Skip good tiles
 			++tile;
 		}
@@ -243,11 +243,11 @@ void MapFixWallTile(const Vec2i &pos)
 	}
 	tile = Map.Tileset.Table[tile];
 
-	if (mf->Tile != tile) {
-		mf->Tile = tile;
+	if (mf.Tile != tile) {
+		mf.Tile = tile;
 		UI.Minimap.UpdateXY(pos);
 
-		if (Map.IsFieldVisible(*ThisPlayer, pos)) {
+		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 			UI.Minimap.UpdateSeenXY(pos);
 			Map.MarkSeenTile(pos);
 		}
@@ -275,17 +275,17 @@ static void MapFixWallNeighbors(const Vec2i &pos)
 */
 void CMap::RemoveWall(const Vec2i &pos)
 {
-	CMapField *mf = Field(pos);
+	CMapField &mf = *Field(pos);
 
-	mf->Value = 0;
+	mf.Value = 0;
 	// FIXME: support more walls of different races.
-	mf->Flags &= ~(MapFieldHuman | MapFieldWall | MapFieldUnpassable);
+	mf.Flags &= ~(MapFieldHuman | MapFieldWall | MapFieldUnpassable);
 
 	UI.Minimap.UpdateXY(pos);
 	MapFixWallTile(pos);
 	MapFixWallNeighbors(pos);
 
-	if (Map.IsFieldVisible(*ThisPlayer, pos)) {
+	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 		UI.Minimap.UpdateSeenXY(pos);
 		this->MarkSeenTile(pos);
 	}
@@ -301,26 +301,26 @@ void CMap::RemoveWall(const Vec2i &pos)
 */
 void CMap::SetWall(const Vec2i &pos, int humanwall)
 {
-	CMapField *mf = Field(pos);
+	CMapField &mf = *Field(pos);
 
 	// FIXME: support more walls of different races.
 	if (humanwall) {
 		// FIXME: Set random walls
-		mf->Tile = this->Tileset.Table[this->Tileset.HumanWallTable[0]];
-		mf->Flags |= MapFieldWall | MapFieldUnpassable | MapFieldHuman;
-		mf->Value = UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max;
+		mf.Tile = this->Tileset.Table[this->Tileset.HumanWallTable[0]];
+		mf.Flags |= MapFieldWall | MapFieldUnpassable | MapFieldHuman;
+		mf.Value = UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max;
 	} else {
 		// FIXME: Set random walls
-		mf->Tile = this->Tileset.Table[this->Tileset.OrcWallTable[0]];
-		mf->Flags |= MapFieldWall | MapFieldUnpassable;
-		mf->Value = UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max;
+		mf.Tile = this->Tileset.Table[this->Tileset.OrcWallTable[0]];
+		mf.Flags |= MapFieldWall | MapFieldUnpassable;
+		mf.Value = UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max;
 	}
 
 	UI.Minimap.UpdateXY(pos);
 	MapFixWallTile(pos);
 	MapFixWallNeighbors(pos);
 
-	if (Map.IsFieldVisible(*ThisPlayer, pos)) {
+	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 		UI.Minimap.UpdateSeenXY(pos);
 		this->MarkSeenTile(pos);
 	}

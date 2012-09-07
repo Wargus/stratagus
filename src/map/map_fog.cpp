@@ -140,7 +140,7 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index)
 			UnitsOnTileMarkSeen(player, index, 0);
 		}
 		*v = 2;
-		if (Map.IsTileVisible(*ThisPlayer, index) > 1) {
+		if (Map.Field(index)->playerInfo.IsTeamVisible(*ThisPlayer)) {
 			Map.MarkSeenTile(index);
 		}
 		return;
@@ -177,7 +177,7 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index)
 				UnitsOnTileUnmarkSeen(player, index, 0);
 			}
 			// Check visible Tile, then deduct...
-			if (Map.IsTileVisible(*ThisPlayer, index) > 1) {
+			if (Map.Field(index)->playerInfo.IsTeamVisible(*ThisPlayer)) {
 				Map.MarkSeenTile(index);
 			}
 		default:  // seen -> seen
@@ -546,7 +546,7 @@ void CViewport::DrawMapFogOfWar() const
 	unsigned int my_index = my * Map.Info.MapWidth;
 	for (; my < ey; ++my) {
 		for (int mx = sx; mx < ex; ++mx) {
-			VisibleTable[my_index + mx] = Map.IsTileVisible(*ThisPlayer, mx + my_index);
+			VisibleTable[my_index + mx] = Map.Field(mx + my_index)->playerInfo.TeamVisibilityState(*ThisPlayer);
 		}
 		my_index += Map.Info.MapWidth;
 	}

@@ -176,6 +176,19 @@ public:
 	/// Check if a field for the user is explored.
 	bool IsExplored(const CPlayer &player) const;
 
+	/// @note Manage Map.NoFogOfWar
+	bool IsVisible(const CPlayer &player) const;
+	bool IsTeamVisible(const CPlayer &player) const;
+	/**
+	**  Find out how a field is seen (By player, or by shared vision)
+	**
+	**  @param player   Player to check for.
+	**  @note manage fogOfWar (using Map.NoFogOfWar)
+	**
+	**  @return        0 unexplored, 1 explored, 2 visible.
+	*/
+	unsigned char TeamVisibilityState(const CPlayer &player) const;
+
 public:
 	unsigned short SeenTile;              /// last seen tile (FOW)
 	unsigned short Visible[PlayerMax];    /// Seen counter 0 unexplored

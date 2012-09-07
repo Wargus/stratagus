@@ -200,33 +200,43 @@ bool CMapField::IsTerrainResourceOnMap() const
 	return false;
 }
 
-unsigned short CMap::IsTileVisible(const CPlayer &player, const unsigned int index) const
+unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) const
 {
-	const CMapFieldPlayerInfo &mfp = this->Fields[index].playerInfo;
-	unsigned short visiontype = mfp.Visible[player.Index];
+	const bool fogOfWar = !Map.NoFogOfWar;
 
-	if (visiontype > 1) {
-		return visiontype;
+	if (IsVisible(player)) {
+		return 2;
 	}
-	if (player.IsVisionSharing()) {
-		for (int i = 0; i < PlayerMax ; ++i) {
-			if (player.IsBothSharedVision(Players[i])) {
-				if (mfp.Visible[i] > 1) {
-					return 2;
-				}
-				visiontype |= mfp.Visible[i];
-			}
+	if (IsExplored(player) == false) {
+		return 0;
+	}
+	if (player.IsVisionSharing() == false) {
+		return 1;
+	}
+	const int minValueRequired = fogOfWar ? 2 : 1;
+
+	for (int i = 0; i != PlayerMax ; ++i) {
+		if (Visible[i] >= minValueRequired && player.IsBothSharedVision(Players[i])) {
+			return 2;
 		}
 	}
-	if (visiontype) {
-		return visiontype + (NoFogOfWar ? 1 : 0);
-	}
-	return 0;
+	return 1;
 }
 
 bool CMapFieldPlayerInfo::IsExplored(const CPlayer &player) const
 {
 	return Visible[player.Index] != 0;
+}
+
+bool CMapFieldPlayerInfo::IsVisible(const CPlayer &player) const
+{
+	const bool fogOfWar = !Map.NoFogOfWar;
+	return Visible[player.Index] >= 2 || (!fogOfWar && IsExplored(player));
+}
+
+bool CMapFieldPlayerInfo::IsTeamVisible(const CPlayer &player) const
+{
+	return TeamVisibilityState(player) == 2;
 }
 
 /**
@@ -555,7 +565,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	}
 
 	//maybe isExplored
-	if (IsTileVisible(*ThisPlayer, index) > 0) {
+	if (mf->playerInfo.IsExplored(*ThisPlayer)) {
 		UI.Minimap.UpdateSeenXY(pos);
 		if (!seen) {
 			MarkSeenTile(pos);
@@ -592,8 +602,7 @@ void CMap::ClearTile(unsigned short type, const Vec2i &pos)
 	int removedtile;
 	int flags;
 
-	unsigned int index = getIndex(pos);
-	CMapField &mf = *this->Field(index);
+	CMapField &mf = *this->Field(pos);
 
 	// Select Table to lookup
 	switch (type) {
@@ -616,7 +625,7 @@ void CMap::ClearTile(unsigned short type, const Vec2i &pos)
 	FixNeighbors(type, 0, pos);
 
 	//maybe isExplored
-	if (IsTileVisible(*ThisPlayer, index) > 0) {
+	if (mf.playerInfo.IsExplored(*ThisPlayer)) {
 		UI.Minimap.UpdateSeenXY(pos);
 		MarkSeenTile(pos);
 	}
@@ -662,11 +671,11 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		mf.Tile = this->Tileset.BotOneTree;
 		mf.Value = 0;
 		mf.Flags |= MapFieldForest | MapFieldUnpassable;
-		if (Map.IsFieldVisible(*ThisPlayer, pos)) {
+		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 			MarkSeenTile(pos);
 		}
 		const Vec2i offset(0, -1);
-		if (Map.IsFieldVisible(*ThisPlayer, pos + offset)) {
+		if (Map.Field(pos + offset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
 			MarkSeenTile(pos);
 		}
 	}

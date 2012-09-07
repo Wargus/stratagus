@@ -508,7 +508,7 @@ void CMinimap::Update()
 				visiontype = 2;
 			} else {
 				const Vec2i tilePos(Minimap2MapX[mx], Minimap2MapY[my] / Map.Info.MapWidth);
-				visiontype = Map.IsTileVisible(*ThisPlayer, tilePos);
+				visiontype = Map.Field(tilePos)->playerInfo.TeamVisibilityState(*ThisPlayer);
 			}
 
 			if (visiontype == 0 || (visiontype == 1 && ((mx & 1) != (my & 1)))) {

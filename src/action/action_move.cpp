@@ -182,7 +182,7 @@ int DoActionMove(CUnit &unit)
 		unit.MoveToXY(pos);
 
 		// Remove unit from the current selection
-		if (unit.Selected && !Map.IsFieldVisible(*ThisPlayer, pos)) {
+		if (unit.Selected && !Map.Field(pos)->playerInfo.IsTeamVisible(*ThisPlayer)) {
 			if (NumSelected == 1) { //  Remove building cursor
 				CancelBuildingMode();
 			}

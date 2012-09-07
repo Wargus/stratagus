@@ -179,31 +179,6 @@ public:
 	/// convert tilepos coordonates into map pixel pos (take the center of the tile)
 	PixelPos TilePosToMapPixelPos_Center(const Vec2i &tilePos) const;
 
-	/**
-	**  Find out if a field is seen (By player, or by shared vision)
-	**  This function will return > 1 with no fog of war.
-	**
-	**  @param player  Player to check for.
-	**  @param index   flat tile index adress.
-	**
-	**  @return        0 unexplored, 1 explored, > 1 visible.
-	*/
-	unsigned short IsTileVisible(const CPlayer &player, const unsigned int index) const;
-
-	/// Check if a field for the user is visible.
-	bool IsFieldVisible(const CPlayer &player, const unsigned int index) const {
-		return IsTileVisible(player, index) > 1;
-	}
-
-	unsigned short IsTileVisible(const CPlayer &player, const Vec2i &pos) const {
-		return IsTileVisible(player, getIndex(pos));
-	}
-
-	/// Check if a field for the user is visible.
-	bool IsFieldVisible(const CPlayer &player, const Vec2i &pos) {
-		return IsTileVisible(player, getIndex(pos)) > 1;
-	}
-
 	/// Mark a tile as seen by the player.
 	void MarkSeenTile(const unsigned int index);
 

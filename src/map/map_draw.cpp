@@ -426,10 +426,12 @@ void CViewport::Draw() const
 	//
 	if (CursorOn == CursorOnMap && Preference.ShowNameDelay && (ShowNameDelay < GameCycle) && (GameCycle < ShowNameTime)) {
 		const Vec2i tilePos = this->ScreenToTilePos(CursorScreenPos);
+		const bool isMapFieldVisile = Map.Field(tilePos)->playerInfo.IsTeamVisible(*ThisPlayer);
+
 		if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos)
-			&& (Map.IsFieldVisible(*ThisPlayer, tilePos) || ReplayRevealMap)) {
+			&& (isMapFieldVisile || ReplayRevealMap)) {
 			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
-		} else if (!Map.IsFieldVisible(*ThisPlayer, tilePos)) {
+		} else if (!isMapFieldVisile) {
 			ShowUnitName(*this, CursorScreenPos, NULL, true);
 		}
 	}
