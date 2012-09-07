@@ -233,7 +233,7 @@ static bool DoRightButton_Harvest(CUnit &unit, CUnit *dest, const Vec2i &pos, in
 				return true;
 			}
 		} else {
-			if (Map.IsFieldExplored(*unit.Player, pos)) {
+			if (Map.Field(pos)->playerInfo.IsExplored(*unit.Player)) {
 				// FIXME: support harvesting more types of terrain.
 				for (int res = 0; res < MaxCosts; ++res) {
 					if (type.ResInfo[res]
@@ -424,7 +424,8 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 		return true;
 	}
 	// FIXME: support harvesting more types of terrain.
-	if (Map.IsFieldExplored(*unit.Player, pos) && Map.Field(pos)->IsTerrainResourceOnMap()) {
+	const CMapField &mf = *Map.Field(pos);
+	if (mf.playerInfo.IsExplored(*unit.Player) && mf.IsTerrainResourceOnMap()) {
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAcknowledging);
 			acknowledged = 1;
@@ -879,8 +880,9 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 		bool show = ReplayRevealMap ? true : false;
 		if (show == false) {
+			CMapField &mf = *Map.Field(tilePos);
 			for (int i = 0; i < PlayerMax; ++i) {
-				if (Map.IsFieldExplored(Players[i], tilePos)
+				if (mf.playerInfo.IsExplored(Players[i])
 					&& (i == ThisPlayer->Index || Players[i].IsBothSharedVision(*ThisPlayer))) {
 					show = true;
 					break;
@@ -895,7 +897,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	} else if (CursorOn == CursorOnMinimap) {
 		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(cursorPos);
 
-		if (Map.IsFieldExplored(*ThisPlayer, tilePos) || ReplayRevealMap) {
+		if (Map.Field(tilePos)->playerInfo.IsExplored(*ThisPlayer) || ReplayRevealMap) {
 			UnitUnderCursor = UnitOnMapTile(tilePos, -1);
 		}
 	}
@@ -1147,6 +1149,7 @@ static int SendResource(const Vec2i &pos)
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
 	const int flush = !(KeyModifiers & ModifierShift);
+	const CMapField &mf = *Map.Field(pos);
 
 	for (int i = 0; i < NumSelected; ++i) {
 		CUnit &unit = *Selected[i];
@@ -1166,8 +1169,8 @@ static int SendResource(const Vec2i &pos)
 				for (res = 0; res < MaxCosts; ++res) {
 					if (unit.Type->ResInfo[res]
 						&& unit.Type->ResInfo[res]->TerrainHarvester
-						&& Map.IsFieldExplored(*unit.Player, pos)
-						&& Map.Field(pos)->IsTerrainResourceOnMap(res)
+						&& mf.playerInfo.IsExplored(*unit.Player)
+						&& mf.IsTerrainResourceOnMap(res)
 						&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
 						&& (unit.CurrentResource != res || unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity)) {
 						SendCommandResourceLoc(unit, pos, flush);
@@ -1187,7 +1190,7 @@ static int SendResource(const Vec2i &pos)
 				ret = 1;
 				continue;
 			}
-			if (Map.IsFieldExplored(*unit.Player, pos) && Map.Field(pos)->IsTerrainResourceOnMap()) {
+			if (mf.playerInfo.IsExplored(*unit.Player) && mf.IsTerrainResourceOnMap()) {
 				SendCommandResourceLoc(unit, pos, flush);
 				ret = 1;
 				continue;
@@ -1561,7 +1564,7 @@ void UIHandleButtonDown(unsigned button)
 				for (int j = 0; explored && j < Selected[0]->Type->TileHeight; ++j) {
 					for (int i = 0; i < Selected[0]->Type->TileWidth; ++i) {
 						const Vec2i tempPos(i, j);
-						if (!Map.IsFieldExplored(*ThisPlayer, tilePos + tempPos)) {
+						if (!Map.Field(tilePos + tempPos)->playerInfo.IsExplored(*ThisPlayer)) {
 							explored = 0;
 							break;
 						}

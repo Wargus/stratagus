@@ -223,7 +223,7 @@ static void DrawBuildingCursor()
 					  CanBuildOn(posIt, MapFogFilterFlags(*ThisPlayer, posIt,
 														  mask & ((NumSelected && Selected[0]->tilePos == posIt) ?
 																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1))))
-				&& Map.IsFieldExplored(*ThisPlayer, posIt)) {
+				&& Map.Field(posIt)->playerInfo.IsExplored(*ThisPlayer)) {
 				color = ColorGreen;
 			} else {
 				color = ColorRed;

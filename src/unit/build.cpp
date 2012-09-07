@@ -393,12 +393,13 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 				testmask = type.MovementMask;
 			}
 			/*secound part of if (!CanBuildOn(x + w, y + h, testmask)) */
-			if (Map.Field(index + pos.x + w)->CheckMask(testmask)) {
+			const CMapField &mf = *Map.Field(index + pos.x + w);
+			if (mf.CheckMask(testmask)) {
 				h = type.TileHeight;
 				ontop = NULL;
 				break;
 			}
-			if (player && !Map.IsFieldExplored(*player, index + pos.x + w)) {
+			if (player && !mf.playerInfo.IsExplored(*player)) {
 				h = type.TileHeight;
 				ontop = NULL;
 				break;

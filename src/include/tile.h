@@ -137,6 +137,7 @@
 #endif
 
 class CFile;
+class CPlayer;
 
 /*----------------------------------------------------------------------------
 --  Map - field
@@ -173,9 +174,7 @@ public:
 	}
 
 	/// Check if a field for the user is explored.
-	bool IsExplored(unsigned int player_index) const {
-		return Visible[player_index] != 0;
-	}
+	bool IsExplored(const CPlayer &player) const;
 
 public:
 	unsigned short SeenTile;              /// last seen tile (FOW)

@@ -90,7 +90,7 @@ CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
 
 VisitResult UnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
+	if (!player.AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(player)) {
 		return VisitResult_DeadEnd;
 	}
 	// Look if found what was required.
@@ -126,7 +126,7 @@ private:
 
 VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
+	if (!player.AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(player)) {
 		return VisitResult_DeadEnd;
 	}
 	// Look if found what was required.
@@ -378,7 +378,7 @@ void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, con
 
 VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!worker.Player->AiEnabled && !Map.IsFieldExplored(*worker.Player, pos)) {
+	if (!worker.Player->AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(*worker.Player)) {
 		return VisitResult_DeadEnd;
 	}
 

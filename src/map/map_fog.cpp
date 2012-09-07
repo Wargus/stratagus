@@ -321,14 +321,12 @@ void UpdateFogOfWarChange()
 	//  Mark all explored fields as visible again.
 	//
 	if (Map.NoFogOfWar) {
-		unsigned int index = 0;
-		int w = Map.Info.MapHeight * Map.Info.MapWidth;
-		do {
-			if (Map.IsFieldExplored(*ThisPlayer, index)) {
+		const unsigned int w = Map.Info.MapHeight * Map.Info.MapWidth;
+		for (unsigned int index = 0; index != w; ++index) {
+			if (Map.Field(index)->playerInfo.IsExplored(*ThisPlayer)) {
 				Map.MarkSeenTile(index);
 			}
-			index++;
-		} while (--w);
+		}
 	}
 	//
 	//  Global seen recount.

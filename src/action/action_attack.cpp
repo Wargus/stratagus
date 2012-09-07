@@ -107,7 +107,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 
 	COrder_Attack *order = new COrder_Attack(false);
 
-	if (Map.WallOnMap(dest) && Map.IsFieldExplored(*attacker.Player, dest)) {
+	if (Map.WallOnMap(dest) && Map.Field(dest)->playerInfo.IsExplored(*attacker.Player)) {
 		// FIXME: look into action_attack.cpp about this ugly problem
 		order->goalPos = dest;
 		order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;

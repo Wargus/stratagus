@@ -190,9 +190,6 @@ public:
 	*/
 	unsigned short IsTileVisible(const CPlayer &player, const unsigned int index) const;
 
-	/// Check if a field for the user is explored.
-	bool IsFieldExplored(const CPlayer &player, const unsigned int index) const;
-
 	/// Check if a field for the user is visible.
 	bool IsFieldVisible(const CPlayer &player, const unsigned int index) const {
 		return IsTileVisible(player, index) > 1;
@@ -200,12 +197,6 @@ public:
 
 	unsigned short IsTileVisible(const CPlayer &player, const Vec2i &pos) const {
 		return IsTileVisible(player, getIndex(pos));
-	}
-
-	/// Check if a field for the user is explored.
-	bool IsFieldExplored(const CPlayer &player, const Vec2i &pos) {
-		Assert(Info.IsPointOnMap(pos));
-		return IsFieldExplored(player, getIndex(pos));
 	}
 
 	/// Check if a field for the user is visible.

@@ -433,7 +433,7 @@ static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)
 		pos->y = center.y + SyncRand() % (2 * ray + 1) - ray;
 
 		if (Map.Info.IsPointOnMap(*pos)
-			&& Map.IsFieldExplored(*AiPlayer->Player, *pos) == false) {
+			&& Map.Field(*pos)->playerInfo.IsExplored(*AiPlayer->Player) == false) {
 			return true;
 		}
 		ray = 3 * ray / 2;

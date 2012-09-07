@@ -224,11 +224,10 @@ unsigned short CMap::IsTileVisible(const CPlayer &player, const unsigned int ind
 	return 0;
 }
 
-bool CMap::IsFieldExplored(const CPlayer &player, const unsigned int index) const
+bool CMapFieldPlayerInfo::IsExplored(const CPlayer &player) const
 {
-	return this->Fields[index].playerInfo.IsExplored(player.Index);
+	return Visible[player.Index] != 0;
 }
-
 
 /**
 **  Wall on map tile.

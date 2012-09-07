@@ -85,7 +85,7 @@ private:
 
 VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
+	if (!player.AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(player)) {
 		return VisitResult_DeadEnd;
 	}
 	// Look if found what was required.
