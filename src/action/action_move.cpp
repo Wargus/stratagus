@@ -169,8 +169,8 @@ int DoActionMove(CUnit &unit)
 		}
 
 		if (unit.Type->UnitType == UnitTypeNaval) { // Boat (un)docking?
-			const CMapField& mf_cur = *Map.Field(unit.Offset);
-			const CMapField& mf_next = *Map.Field(unit.tilePos + posd);
+			const CMapField &mf_cur = *Map.Field(unit.Offset);
+			const CMapField &mf_next = *Map.Field(unit.tilePos + posd);
 
 			if (mf_cur.WaterOnMap() && mf_next.CoastOnMap()) {
 				PlayUnitSound(unit, VoiceDocking);

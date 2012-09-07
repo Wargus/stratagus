@@ -135,7 +135,7 @@ void CMap::Reveal()
 	Vec2i pos;
 	for (pos.x = 0; pos.x < this->Info.MapWidth; ++pos.x) {
 		for (pos.y = 0; pos.y < this->Info.MapHeight; ++pos.y) {
-			CMapFieldPlayerInfo& playerInfo = this->Field(pos)->playerInfo;
+			CMapFieldPlayerInfo &playerInfo = this->Field(pos)->playerInfo;
 			for (int p = 0; p < PlayerMax; ++p) {
 				playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
 			}
