@@ -57,6 +57,7 @@ class CBuildRestrictionOnTop;
 class CConstructionFrame;
 class CFile;
 class Missile;
+class CMapField;
 class COrder;
 class CPlayer;
 class CUnit;
@@ -489,12 +490,10 @@ extern void UnitGoesUnderFog(CUnit &unit, const CPlayer &player);
 /// Call when an Unit goes out of fog.
 extern void UnitGoesOutOfFog(CUnit &unit, const CPlayer &player);
 /// Marks a unit as seen
-extern void UnitsOnTileMarkSeen(const CPlayer &player, int x, int y, int p);
-extern void UnitsOnTileMarkSeen(const CPlayer &player, unsigned int index, int p);
+extern void UnitsOnTileMarkSeen(const CPlayer &player, CMapField &mf, int p);
 
 /// Unmarks a unit as seen
-extern void UnitsOnTileUnmarkSeen(const CPlayer &player, int x, int y, int p);
-extern void UnitsOnTileUnmarkSeen(const CPlayer &player, unsigned int index, int p);
+extern void UnitsOnTileUnmarkSeen(const CPlayer &player, CMapField &mf, int p);
 
 /// Does a recount for VisCount
 extern void UnitCountSeen(CUnit &unit);

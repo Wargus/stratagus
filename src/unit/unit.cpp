@@ -1543,42 +1543,27 @@ private:
 **  Mark all units on a tile as now visible.
 **
 **  @param player  The player this is for.
-**  @param x       x location to check
-**  @param y       y location to check
+**  @param mf      field location to check
 **  @param cloak   If we mark cloaked units too.
 */
-void UnitsOnTileMarkSeen(const CPlayer &player, const unsigned int index, int cloak)
+void UnitsOnTileMarkSeen(const CPlayer &player, CMapField &mf, int cloak)
 {
 	_TileSeen<true> seen(player, cloak);
-	Map.Field(index)->UnitCache.for_each(seen);
+	mf.UnitCache.for_each(seen);
 }
-
-void UnitsOnTileMarkSeen(const CPlayer &player, int x, int y, int cloak)
-{
-	UnitsOnTileMarkSeen(player, Map.getIndex(x, y), cloak);
-}
-
 
 /**
 **  This function unmarks units on x, y as seen. It uses a reference count.
 **
 **  @param player    The player to mark for.
-**  @param x         x location to check if building is on, and mark as seen
-**  @param y         y location to check if building is on, and mark as seen
+**  @param mf        field to check if building is on, and mark as seen
 **  @param cloak     If this is for cloaked units.
 */
-void UnitsOnTileUnmarkSeen(const CPlayer &player,
-						   const unsigned int index, int cloak)
+void UnitsOnTileUnmarkSeen(const CPlayer &player, CMapField &mf, int cloak)
 {
 	_TileSeen<false> seen(player, cloak);
-	Map.Field(index)->UnitCache.for_each(seen);
+	mf.UnitCache.for_each(seen);
 }
-
-void UnitsOnTileUnmarkSeen(const CPlayer &player, int x, int y, int cloak)
-{
-	UnitsOnTileUnmarkSeen(player, Map.getIndex(x, y), cloak);
-}
-
 
 /**
 **  Recalculates a units visiblity count. This happens really often,
