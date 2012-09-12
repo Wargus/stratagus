@@ -39,6 +39,7 @@
 
 #include "map.h"
 
+#include "actions.h"
 #include "minimap.h"
 #include "player.h"
 #include "tileset.h"
@@ -122,6 +123,93 @@ int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask)
 	}
 	return mask;
 }
+
+template<bool MARK>
+class _TileSeen
+{
+public:
+	_TileSeen(const CPlayer &p , int c) : player(&p), cloak(c)
+	{}
+
+	void operator()(CUnit *const unit) const {
+		if (cloak != (int)unit->Type->PermanentCloak) {
+			return ;
+		}
+		const int p = player->Index;
+		if (MARK) {
+			//  If the unit goes out of fog, this can happen for any player that
+			//  this player shares vision with, and can't YET see the unit.
+			//  It will be able to see the unit after the Unit->VisCount ++
+			if (!unit->VisCount[p]) {
+				for (int pi = 0; pi < PlayerMax; ++pi) {
+					if ((pi == p /*player->Index*/)
+						|| player->IsBothSharedVision(Players[pi])) {
+						if (!unit->IsVisible(Players[pi])) {
+							UnitGoesOutOfFog(*unit, Players[pi]);
+						}
+					}
+				}
+			}
+			unit->VisCount[p/*player->Index*/]++;
+		} else {
+			/*
+			 * HACK: UGLY !!!
+			 * There is bug in Seen code conneded with
+			 * UnitActionDie and Cloacked units.
+			 */
+			if (!unit->VisCount[p] && unit->CurrentAction() == UnitActionDie) {
+				return;
+			}
+
+			Assert(unit->VisCount[p]);
+			unit->VisCount[p]--;
+			//  If the unit goes under of fog, this can happen for any player that
+			//  this player shares vision to. First of all, before unmarking,
+			//  every player that this player shares vision to can see the unit.
+			//  Now we have to check who can't see the unit anymore.
+			if (!unit->VisCount[p]) {
+				for (int pi = 0; pi < PlayerMax; ++pi) {
+					if (pi == p/*player->Index*/ ||
+						player->IsBothSharedVision(Players[pi])) {
+						if (!unit->IsVisible(Players[pi])) {
+							UnitGoesUnderFog(*unit, Players[pi]);
+						}
+					}
+				}
+			}
+		}
+	}
+private:
+	const CPlayer *player;
+	int cloak;
+};
+
+/**
+**  Mark all units on a tile as now visible.
+**
+**  @param player  The player this is for.
+**  @param mf      field location to check
+**  @param cloak   If we mark cloaked units too.
+*/
+static void UnitsOnTileMarkSeen(const CPlayer &player, CMapField &mf, int cloak)
+{
+	_TileSeen<true> seen(player, cloak);
+	mf.UnitCache.for_each(seen);
+}
+
+/**
+**  This function unmarks units on x, y as seen. It uses a reference count.
+**
+**  @param player    The player to mark for.
+**  @param mf        field to check if building is on, and mark as seen
+**  @param cloak     If this is for cloaked units.
+*/
+static void UnitsOnTileUnmarkSeen(const CPlayer &player, CMapField &mf, int cloak)
+{
+	_TileSeen<false> seen(player, cloak);
+	mf.UnitCache.for_each(seen);
+}
+
 
 /**
 **  Mark a tile's sight. (Explore and make visible.)
