@@ -851,22 +851,21 @@ void CommandSharedVision(int player, bool state, int opponent)
 
 	if (before && !after) {
 		// Don't share vision anymore. Give each other explored terrain for good-bye.
-		Vec2i pos;
-		for (pos.x = 0; pos.x < Map.Info.MapWidth; ++pos.x) {
-			for (pos.y = 0; pos.y < Map.Info.MapHeight; ++pos.y) {
-				CMapFieldPlayerInfo &mfp = Map.Field(pos)->playerInfo;
 
-				if (mfp.Visible[player] && !mfp.Visible[opponent]) {
-					mfp.Visible[opponent] = 1;
-					if (opponent == ThisPlayer->Index) {
-						Map.MarkSeenTile(pos);
-					}
+		for (int i = 0; i != this->Info.MapWidth * this->Info.MapHeight; ++i) {
+			CMapField &mf = *this->Field(i);
+			CMapFieldPlayerInfo &mfp = mf.playerInfo;
+
+			if (mfp.Visible[player] && !mfp.Visible[opponent]) {
+				mfp.Visible[opponent] = 1;
+				if (opponent == ThisPlayer->Index) {
+					Map.MarkSeenTile(mf);
 				}
-				if (mfp.Visible[opponent] && !mfp.Visible[player]) {
-					mfp.Visible[player] = 1;
-					if (player == ThisPlayer->Index) {
-						Map.MarkSeenTile(pos);
-					}
+			}
+			if (mfp.Visible[opponent] && !mfp.Visible[player]) {
+				mfp.Visible[player] = 1;
+				if (player == ThisPlayer->Index) {
+					Map.MarkSeenTile(mf);
 				}
 			}
 		}

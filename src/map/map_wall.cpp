@@ -249,7 +249,7 @@ void MapFixWallTile(const Vec2i &pos)
 
 		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 			UI.Minimap.UpdateSeenXY(pos);
-			Map.MarkSeenTile(pos);
+			Map.MarkSeenTile(mf);
 		}
 	}
 }
@@ -287,7 +287,7 @@ void CMap::RemoveWall(const Vec2i &pos)
 
 	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 		UI.Minimap.UpdateSeenXY(pos);
-		this->MarkSeenTile(pos);
+		this->MarkSeenTile(mf);
 	}
 }
 
@@ -322,7 +322,7 @@ void CMap::SetWall(const Vec2i &pos, int humanwall)
 
 	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 		UI.Minimap.UpdateSeenXY(pos);
-		this->MarkSeenTile(pos);
+		this->MarkSeenTile(mf);
 	}
 }
 

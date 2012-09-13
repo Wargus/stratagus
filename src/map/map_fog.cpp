@@ -229,7 +229,7 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index)
 		}
 		*v = 2;
 		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-			Map.MarkSeenTile(index);
+			Map.MarkSeenTile(mf);
 		}
 		return;
 	}
@@ -267,7 +267,7 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index)
 			}
 			// Check visible Tile, then deduct...
 			if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-				Map.MarkSeenTile(index);
+				Map.MarkSeenTile(mf);
 			}
 		default:  // seen -> seen
 			--*v;
@@ -407,20 +407,17 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 void UpdateFogOfWarChange()
 {
 	DebugPrint("::UpdateFogOfWarChange\n");
-	//
 	//  Mark all explored fields as visible again.
-	//
 	if (Map.NoFogOfWar) {
 		const unsigned int w = Map.Info.MapHeight * Map.Info.MapWidth;
 		for (unsigned int index = 0; index != w; ++index) {
-			if (Map.Field(index)->playerInfo.IsExplored(*ThisPlayer)) {
-				Map.MarkSeenTile(index);
+			CMapField &mf = *Map.Field(index);
+			if (mf.playerInfo.IsExplored(*ThisPlayer)) {
+				Map.MarkSeenTile(mf);
 			}
 		}
 	}
-	//
 	//  Global seen recount.
-	//
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 		CUnit &unit = **it;
 		UnitCountSeen(unit);

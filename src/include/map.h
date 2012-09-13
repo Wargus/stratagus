@@ -187,13 +187,7 @@ public:
 	PixelPos TilePosToMapPixelPos_Center(const Vec2i &tilePos) const;
 
 	/// Mark a tile as seen by the player.
-	void MarkSeenTile(const unsigned int index);
-
-	/// Mark a tile as seen by the player.
-	void MarkSeenTile(const Vec2i &pos) {
-		Assert(Info.IsPointOnMap(pos));
-		MarkSeenTile(getIndex(pos));
-	}
+	void MarkSeenTile(CMapField &mf);
 
 	/// Regenerate the forest.
 	void RegenerateForest();

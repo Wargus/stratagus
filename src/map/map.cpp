@@ -64,9 +64,8 @@ char CurrentMapPath[1024];       /// Path of the current map
 **  @param x  Map X tile-position.
 **  @param y  Map Y tile-position.
 */
-void CMap::MarkSeenTile(const unsigned int index)
+void CMap::MarkSeenTile(CMapField &mf)
 {
-	CMapField &mf = *this->Field(index);
 	const int tile = mf.Tile;
 	const int seentile = mf.playerInfo.SeenTile;
 
@@ -80,6 +79,7 @@ void CMap::MarkSeenTile(const unsigned int index)
 
 #ifdef MINIMAP_UPDATE
 	//rb - GRRRRRRRRRRRR
+	const unsigned int index = &mf - Map.Fields;
 	const int y = index / Info.MapWidth;
 	const int x = index - (y * Info.MapWidth);
 	const Vec2i pos = {x, y}
@@ -88,6 +88,7 @@ void CMap::MarkSeenTile(const unsigned int index)
 	if (this->Tileset.TileTypeTable) {
 #ifndef MINIMAP_UPDATE
 		//rb - GRRRRRRRRRRRR
+		const unsigned int index = &mf - Map.Fields;
 		const int y = index / Info.MapWidth;
 		const int x = index - (y * Info.MapWidth);
 		const Vec2i pos(x, y);
@@ -132,15 +133,13 @@ void CMap::MarkSeenTile(const unsigned int index)
 void CMap::Reveal()
 {
 	//  Mark every explored tile as visible. 1 turns into 2.
-	Vec2i pos;
-	for (pos.x = 0; pos.x < this->Info.MapWidth; ++pos.x) {
-		for (pos.y = 0; pos.y < this->Info.MapHeight; ++pos.y) {
-			CMapFieldPlayerInfo &playerInfo = this->Field(pos)->playerInfo;
-			for (int p = 0; p < PlayerMax; ++p) {
-				playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
-			}
-			MarkSeenTile(pos);
+	for (int i = 0; i != this->Info.MapWidth * this->Info.MapHeight; ++i) {
+		CMapField &mf = *this->Field(i);
+		CMapFieldPlayerInfo &playerInfo = mf.playerInfo;
+		for (int p = 0; p < PlayerMax; ++p) {
+			playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
 		}
+		MarkSeenTile(mf);
 	}
 	//  Global seen recount. Simple and effective.
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
@@ -428,11 +427,11 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 		return;
 	}
 	unsigned int index = getIndex(pos);
-	CMapField *mf = this->Field(index);
+	CMapField &mf = *this->Field(index);
 
-	if (seen && !Tileset.IsSeenTile(type, mf->playerInfo.SeenTile)) {
+	if (seen && !Tileset.IsSeenTile(type, mf.playerInfo.SeenTile)) {
 		return;
-	} else if (!seen && !(mf->Flags & type)) {
+	} else if (!seen && !(mf.Flags & type)) {
 		return;
 	}
 
@@ -468,41 +467,41 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	if (pos.y - 1 < 0) {
 		ttup = 15; //Assign trees in all directions
 	} else {
-		CMapField *new_mf = (mf - this->Info.MapWidth);
+		CMapField &new_mf = *(&mf - this->Info.MapWidth);
 		if (seen) {
-			ttup = this->Tileset.MixedLookupTable[new_mf->playerInfo.SeenTile];
+			ttup = this->Tileset.MixedLookupTable[new_mf.playerInfo.SeenTile];
 		} else {
-			ttup = this->Tileset.MixedLookupTable[new_mf->Tile];
+			ttup = this->Tileset.MixedLookupTable[new_mf.Tile];
 		}
 	}
 	if (pos.x + 1 >= this->Info.MapWidth) {
 		ttright = 15; //Assign trees in all directions
 	} else {
-		CMapField *new_mf = (mf + 1);
+		CMapField &new_mf = *(&mf + 1);
 		if (seen) {
-			ttright = this->Tileset.MixedLookupTable[new_mf->playerInfo.SeenTile];
+			ttright = this->Tileset.MixedLookupTable[new_mf.playerInfo.SeenTile];
 		} else {
-			ttright = this->Tileset.MixedLookupTable[new_mf->Tile];
+			ttright = this->Tileset.MixedLookupTable[new_mf.Tile];
 		}
 	}
 	if (pos.y + 1 >= this->Info.MapHeight) {
 		ttdown = 15; //Assign trees in all directions
 	} else {
-		CMapField *new_mf = (mf + this->Info.MapWidth);
+		CMapField &new_mf = *(&mf + this->Info.MapWidth);
 		if (seen) {
-			ttdown = this->Tileset.MixedLookupTable[new_mf->playerInfo.SeenTile];
+			ttdown = this->Tileset.MixedLookupTable[new_mf.playerInfo.SeenTile];
 		} else {
-			ttdown = this->Tileset.MixedLookupTable[new_mf->Tile];
+			ttdown = this->Tileset.MixedLookupTable[new_mf.Tile];
 		}
 	}
 	if (pos.x - 1 < 0) {
 		ttleft = 15; //Assign trees in all directions
 	} else {
-		CMapField *new_mf = (mf - 1);
+		CMapField &new_mf = *(&mf - 1);
 		if (seen) {
-			ttleft = this->Tileset.MixedLookupTable[new_mf->playerInfo.SeenTile];
+			ttleft = this->Tileset.MixedLookupTable[new_mf.playerInfo.SeenTile];
 		} else {
-			ttleft = this->Tileset.MixedLookupTable[new_mf->Tile];
+			ttleft = this->Tileset.MixedLookupTable[new_mf.Tile];
 		}
 	}
 
@@ -545,30 +544,30 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	//Update seen tile.
 	if (tile == -1) { // No valid wood remove it.
 		if (seen) {
-			mf->playerInfo.SeenTile = removedtile;
+			mf.playerInfo.SeenTile = removedtile;
 			this->FixNeighbors(type, seen, pos);
 		} else {
-			mf->Tile = removedtile;
-			mf->Flags &= ~flags;
-			mf->Value = 0;
+			mf.Tile = removedtile;
+			mf.Flags &= ~flags;
+			mf.Value = 0;
 			UI.Minimap.UpdateXY(pos);
 		}
-	} else if (seen && this->Tileset.MixedLookupTable[mf->playerInfo.SeenTile] ==
+	} else if (seen && this->Tileset.MixedLookupTable[mf.playerInfo.SeenTile] ==
 			   this->Tileset.MixedLookupTable[tile]) { //Same Type
 		return;
 	} else {
 		if (seen) {
-			mf->playerInfo.SeenTile = tile;
+			mf.playerInfo.SeenTile = tile;
 		} else {
-			mf->Tile = tile;
+			mf.Tile = tile;
 		}
 	}
 
 	//maybe isExplored
-	if (mf->playerInfo.IsExplored(*ThisPlayer)) {
+	if (mf.playerInfo.IsExplored(*ThisPlayer)) {
 		UI.Minimap.UpdateSeenXY(pos);
 		if (!seen) {
-			MarkSeenTile(pos);
+			MarkSeenTile(mf);
 		}
 	}
 }
@@ -627,7 +626,7 @@ void CMap::ClearTile(unsigned short type, const Vec2i &pos)
 	//maybe isExplored
 	if (mf.playerInfo.IsExplored(*ThisPlayer)) {
 		UI.Minimap.UpdateSeenXY(pos);
-		MarkSeenTile(pos);
+		MarkSeenTile(mf);
 	}
 }
 
@@ -672,11 +671,11 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		mf.Value = 0;
 		mf.Flags |= MapFieldForest | MapFieldUnpassable;
 		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(pos);
+			MarkSeenTile(mf);
 		}
 		const Vec2i offset(0, -1);
 		if (Map.Field(pos + offset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(pos);
+			MarkSeenTile(mf);
 		}
 	}
 }
