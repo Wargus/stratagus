@@ -852,8 +852,8 @@ void CommandSharedVision(int player, bool state, int opponent)
 	if (before && !after) {
 		// Don't share vision anymore. Give each other explored terrain for good-bye.
 
-		for (int i = 0; i != this->Info.MapWidth * this->Info.MapHeight; ++i) {
-			CMapField &mf = *this->Field(i);
+		for (int i = 0; i != Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
+			CMapField &mf = *Map.Field(i);
 			CMapFieldPlayerInfo &mfp = mf.playerInfo;
 
 			if (mfp.Visible[player] && !mfp.Visible[opponent]) {
