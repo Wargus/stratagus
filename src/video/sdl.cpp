@@ -738,7 +738,6 @@ static void SdlDoEvent(const EventCallback &callbacks, const SDL_Event &event)
 				}
 				InMainWindow = (event.active.gain != 0);
 			}
-#if 0
 			if (event.active.state & SDL_APPACTIVE || SDL_GetAppState() & SDL_APPACTIVE) {
 				static bool DoTogglePause = false;
 
@@ -756,7 +755,6 @@ static void SdlDoEvent(const EventCallback &callbacks, const SDL_Event &event)
 					}
 				}
 			}
-#endif
 			break;
 
 		case SDL_KEYDOWN:
