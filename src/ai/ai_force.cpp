@@ -120,10 +120,10 @@ void AiResetUnitTypeEquiv()
 **  @param a  the first unittype
 **  @param b  the second unittype
 */
-void AiNewUnitTypeEquiv(CUnitType *a, CUnitType *b)
+void AiNewUnitTypeEquiv(const CUnitType &a, const CUnitType &b)
 {
-	int find = UnitTypeEquivs[a->Slot];
-	int replace = UnitTypeEquivs[b->Slot];
+	int find = UnitTypeEquivs[a.Slot];
+	int replace = UnitTypeEquivs[b.Slot];
 
 	// Always record equivalences with the lowest unittype.
 	if (find < replace) {
@@ -226,7 +226,7 @@ void AiForce::CountTypes(unsigned int *counter, const size_t len)
 **
 **  @return       True if it fits, false otherwise.
 */
-bool AiForce::IsBelongsTo(const CUnitType *type)
+bool AiForce::IsBelongsTo(const CUnitType &type)
 {
 	bool flag = false;
 	unsigned int counter[UnitTypeMax + 1];
@@ -241,7 +241,7 @@ bool AiForce::IsBelongsTo(const CUnitType *type)
 		const int slot = aitype.Type->Slot;
 
 		if (counter[slot] < aitype.Want) {
-			if (UnitTypeEquivs[type->Slot] == slot) {
+			if (UnitTypeEquivs[type.Slot] == slot) {
 				if (counter[slot] < aitype.Want - 1) {
 					Completed = false;
 				}
@@ -465,7 +465,7 @@ bool AiForceManager::Assign(CUnit &unit)
 		if (force.IsAttacking()) {
 			continue;
 		}
-		if (force.IsBelongsTo(unit.Type)) {
+		if (force.IsBelongsTo(*unit.Type)) {
 			force.Insert(unit);
 			unit.GroupId = i + 1;
 			return true;

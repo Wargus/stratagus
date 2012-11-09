@@ -236,11 +236,11 @@ static void InitAiHelper(AiHelper &aiHelper)
 		}
 
 		for (std::vector<CUnitType *>::const_iterator d = UnitTypes.begin(); d != UnitTypes.end(); ++d) {
-			CUnitType *type = *d;
+			CUnitType &type = **d;
 
-			if (type->CanStore[i] > 0) {
+			if (type.CanStore[i] > 0) {
 				/* HACK : we can't store TIME then use 0 as 1 */
-				AiHelperInsert(aiHelper.Depots, i - 1, **d);
+				AiHelperInsert(aiHelper.Depots, i - 1, type);
 			}
 		}
 	}
@@ -370,7 +370,7 @@ static int CclDefineAiHelper(lua_State *l)
 				LuaError(l, "unknown unittype: %s" _C_ value);
 			}
 			AiHelperInsert(AiHelpers.Equiv, base->Slot, *type);
-			AiNewUnitTypeEquiv(base, type);
+			AiNewUnitTypeEquiv(*base, *type);
 		}
 	}
 	return 0;

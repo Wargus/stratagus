@@ -726,10 +726,9 @@ static int CclGetPlayerData(lua_State *l)
 		lua_pushnumber(l, p->MaxResources[resId]);
 		return 1;
 	} else if (!strcmp(data, "UnitTypesCount")) {
-		CUnitType *type;
-
 		LuaCheckArgs(l, 3);
-		type = CclGetUnitType(l);
+		CUnitType *type = CclGetUnitType(l);
+		Assert(type);
 		lua_pushnumber(l, p->UnitTypesCount[type->Slot]);
 		return 1;
 	} else if (!strcmp(data, "AiEnabled")) {

@@ -158,7 +158,7 @@ public:
 
 private:
 	void CountTypes(unsigned int *counter, const size_t len);
-	bool IsBelongsTo(const CUnitType *type);
+	bool IsBelongsTo(const CUnitType &type);
 	void Insert(CUnit &unit);
 
 	void Update();
@@ -388,7 +388,7 @@ extern void AiResourceManager();
 /// Ask the ai to explore around pos
 extern void AiExplore(const Vec2i &pos, int exploreMask);
 /// Make two unittypes be considered equals
-extern void AiNewUnitTypeEquiv(CUnitType *a, CUnitType *b);
+extern void AiNewUnitTypeEquiv(const CUnitType &a, const CUnitType &b);
 /// Remove any equivalence between unittypes
 extern void AiResetUnitTypeEquiv();
 /// Finds all equivalents units to a given one

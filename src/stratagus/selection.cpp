@@ -456,7 +456,7 @@ int SelectUnitsByType(CUnit &base)
 */
 int ToggleUnitsByType(CUnit &base)
 {
-	const CUnitType *type = base.Type;
+	const CUnitType &type = *base.Type;
 
 	// if unit is a cadaver or hidden (not on map)
 	// no unit can be selected.
@@ -465,7 +465,7 @@ int ToggleUnitsByType(CUnit &base)
 	}
 	// if unit isn't belonging to the player, or is a static unit
 	// (like a building), only 1 unit can be selected at the same time.
-	if (!CanSelectMultipleUnits(*base.Player) || !type->SelectableByRectangle) {
+	if (!CanSelectMultipleUnits(*base.Player) || !type.SelectableByRectangle) {
 		return 0;
 	}
 
@@ -487,7 +487,7 @@ int ToggleUnitsByType(CUnit &base)
 	const Vec2i maxPos = vp->MapPos + vpSize + offset;
 	std::vector<CUnit *> table;
 
-	Select(minPos, maxPos, table, HasSameTypeAs(*type));
+	Select(minPos, maxPos, table, HasSameTypeAs(type));
 
 	// FIXME: peon/peasant with gold/wood & co are considered from
 	// different type... idem for tankers
