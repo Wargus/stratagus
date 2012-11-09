@@ -62,6 +62,484 @@
 #include <map>
 
 /*----------------------------------------------------------------------------
+-- Documentation
+----------------------------------------------------------------------------*/
+
+/**
+**  @class CUnitType unittype.h
+**
+**  \#include "unittype.h"
+**
+**  This class contains the information that is shared between all
+**  units of the same type and determins if a unit is a building,
+**  a person, ...
+**
+**  The unit-type class members:
+**
+**  CUnitType::Ident
+**
+**    Unique identifier of the unit-type, used to reference it in
+**    config files and during startup. As convention they start with
+**    "unit-" fe. "unit-farm".
+**  @note Don't use this member in game, use instead the pointer
+**  to this structure. See UnitTypeByIdent().
+**
+**  CUnitType::Name
+**
+**    Pretty name shown by the engine. The name should be shorter
+**    than 17 characters and no word can be longer than 8 characters.
+**
+**  CUnitType::File
+**
+**    Path file name of the sprite file.
+**
+**  CUnitType::ShadowFile
+**
+**    Path file name of shadow sprite file.
+**
+**  CUnitType::DrawLevel
+**
+**    The Level/Order to draw this type of unit in. 0-255 usually.
+**
+**  CUnitType::Width CUnitType::Height
+**
+**    Size of a sprite frame in pixels. All frames of a sprite have
+**    the same size. Also all sprites (tilesets) must have the same
+**    size.
+**
+**  CUnitType::ShadowWidth CUnitType::ShadowHeight
+**
+**    Size of a shadow sprite frame in pixels. All frames of a sprite
+**    have the same size. Also all sprites (tilesets) must have the
+**    same size.
+**
+**  CUnitType::ShadowOffsetX CUnitType::ShadowOffsetY
+**
+**    Vertical offset to draw the shadow in pixels.
+**
+**  CUnitType::Animations
+**
+**    Animation scripts for the different actions. Currently the
+**    animations still, move, attack and die are supported.
+**  @see CAnimations
+**  @see CAnimation
+**
+**  CUnitType::Icon
+**
+**    Icon to display for this unit-type. Contains configuration and
+**    run time variable.
+**  @note This icon can be used for training, but isn't used.
+**
+**  CUnitType::Missile
+**
+**    Configuration and run time variable of the missile weapon.
+**  @note It is planned to support more than one weapons.
+**  And the sound of the missile should be used as fire sound.
+**
+**  CUnitType::Explosion
+**
+**    Configuration and run time variable of the missile explosion.
+**    This is the explosion that happens if unit is set to
+**    ExplodeWhenKilled
+**
+**  CUnitType::CorpseName
+**
+**    Corpse unit-type name, should only be used during setup.
+**
+**  CUnitType::CorpseType
+**
+**    Corpse unit-type pointer, only this should be used during run
+**    time. Many unit-types can share the same corpse.
+**
+**
+**  @todo continue this documentation
+**
+**  CUnitType::Construction
+**
+**    What is shown in construction phase.
+**
+**  CUnitType::SightRange
+**
+**    Sight range
+**
+**  CUnitType::_HitPoints
+**
+**    Maximum hit points
+**
+**
+**  CUnitType::_Costs[::MaxCosts]
+**
+**    How many resources needed
+**
+**  CUnitType::RepairHP
+**
+**    The HP given to a unit each cycle it's repaired.
+**    If zero, unit cannot be repaired
+**
+**    CUnitType::RepairCosts[::MaxCosts]
+**
+**    Costs per repair cycle to fix a unit.
+**
+**  CUnitType::TileWidth
+**
+**    Tile size on map width
+**
+**  CUnitType::TileHeight
+**
+**    Tile size on map height
+**
+**  CUnitType::BoxWidth
+**
+**    Selected box size width
+**
+**  CUnitType::BoxHeight
+**
+**    Selected box size height
+**
+**  CUnitType::NumDirections
+**
+**    Number of directions the unit can face
+**
+**  CUnitType::MinAttackRange
+**
+**    Minimal attack range
+**
+**  CUnitType::ReactRangeComputer
+**
+**    Reacts on enemy for computer
+**
+**  CUnitType::ReactRangePerson
+**
+**    Reacts on enemy for person player
+**
+**  CUnitType::Priority
+**
+**    Priority value / AI Treatment
+**
+**  CUnitType::BurnPercent
+**
+**    The burning limit in percents. If the unit has lees than
+**    this it will start to burn.
+**
+**  CUnitType::BurnDamageRate
+**
+**    Burn rate in HP per second
+**
+**  CUnitType::UnitType
+**
+**    Land / fly / naval
+**
+**  @note original only visual effect, we do more with this!
+**
+**  CUnitType::DecayRate
+**
+**    Decay rate in 1/6 seconds
+**
+**  CUnitType::AnnoyComputerFactor
+**
+**    How much this annoys the computer
+**
+**  @todo not used
+**
+**  CUnitType::MouseAction
+**
+**    Right click action
+**
+**  CUnitType::Points
+**
+**    How many points you get for unit. Used in the final score table.
+**
+**  CUnitType::CanTarget
+**
+**    Which units can it attack
+**
+**  Unit::Revealer
+**
+**    A special unit used to reveal the map for a time. This unit
+**    has active sight even when Removed. It's used for Reveal map
+**    type of spells.
+**
+**  CUnitType::LandUnit
+**
+**    Land animated
+**
+**  CUnitType::AirUnit
+**
+**    Air animated
+**
+**  CUnitType::SeaUnit
+**
+**    Sea animated
+**
+**  CUnitType::ExplodeWhenKilled
+**
+**    Death explosion animated
+**
+**  CUnitType::RandomMovementProbability
+**
+**    When the unit is idle this is the probability that it will
+**    take a step in a random direction, in percents.
+**
+**  CUnitType::ClicksToExplode
+**
+**    If this is non-zero, then after that many clicks the unit will
+**    commit suicide. Doesn't work with resource workers/resources.
+**
+**  CUnitType::Building
+**
+**    Unit is a Building
+**
+**  CUnitType::VisibleUnderFog
+**
+**    Unit is visible under fog of war.
+**
+**  CUnitType::PermanentCloak
+**
+**    Unit is permanently cloaked.
+**
+**  CUnitType::DetectCloak
+**
+**    These units can detect Cloaked units.
+**
+**  CUnitType::Coward
+**
+**    Unit is a coward, and acts defensively. it will not attack
+**    at will and auto-casters will not buff it(bloodlust).
+**
+**  CUnitType::Transporter
+**
+**    Can transport units
+**
+**  CUnitType::AttackFromTransporter
+**
+**    Units inside this transporter can attack with missiles.
+**
+**  CUnitType::MaxOnBoard
+**
+**    Maximum units on board (for transporters), and resources
+**
+**  CUnitType::StartingResources
+**    Amount of Resources a unit has when It's Built
+**
+**  CUnitType::DamageType
+**    Unit's missile damage type (used for extra death animations)
+**
+**  CUnitType::GivesResource
+**
+**    This equals to the resource Id of the resource given
+**    or 0 (TimeCost) for other buildings.
+**
+**  CUnitType::CanHarvest
+**
+**    Resource can be harvested. It's false for things like
+**    oil patches.
+**  @todo crappy name.
+**
+**  CUnitType::Harvester
+**
+**    Unit is a resource worker. Faster than examining ResInfo
+**
+**  CUnitType::ResInfo[::MaxCosts]
+**
+**    Information about resource harvesting. If NULL, it can't
+**    harvest it.
+**
+**  CUnitType::NeutralMinimapColorRGB
+**
+**    Says what color a unit will have when it's neutral and
+**    is displayed on the minimap.
+**
+**  CUnitType::CanStore[::MaxCosts]
+**
+**    What resource types we can store here.
+**
+**  CUnitType::Vanishes
+**
+**    Corpes & destroyed places
+**
+**  CUnitType::GroundAttack
+**
+**    Can do command ground attack
+**
+**  CUnitType::ShoreBuilding
+**
+**    Building must be build on coast
+**
+**  CUnitType::CanCastSpell
+**
+**    Unit is able to use spells
+**
+**  CUnitType::CanAttack
+**
+**    Unit is able to attack.
+**
+**  CUnitType::RepairRange
+**
+**    Unit can repair buildings. It will use the actack animation.
+**    It will heal 4 points for every repair cycle, and cost 1 of
+**    each resource, alternatively(1 cycle wood, 1 cycle gold)
+**  @todo The above should be more configurable.
+**    If units have a repair range, they can repair, and this is the
+**    distance.
+**
+**  CUnitType::BuilderOutside
+**
+**    Only valid for buildings. When building the worker will
+**    remain outside inside the building.
+**
+**  @warning Workers that can build buildings with the
+**  @warning BuilderOutside flag must have the CanRepair flag.
+**
+**  CUnitType::BuilderLost
+**
+**    Only valid for buildings without the BuilderOutside flag.
+**    The worker is lost when the building is completed.
+**
+**  CUnitType::SelectableByRectangle
+**
+**    Selectable with mouse rectangle
+**
+**    CUnitType::Teleporter
+**
+**    Can teleport other units.
+**
+**    CUnitType::ShieldPiercing
+**
+**    Can directly damage shield-protected units, without shield damaging.
+**
+**    CUnitType::SaveCargo
+**
+**    Unit unloads his passengers after death.
+**
+**  CUnitType::Sound
+**
+**    Sounds for events
+**
+**  CUnitType::Weapon
+**
+**    Current sound for weapon
+**
+**  @todo temporary solution
+**
+**  CUnitType::Supply
+**
+**    How much food does this unit supply.
+**
+**  CUnitType::Demand
+**
+**    Food demand
+**
+**  CUnitType::ImproveIncomes[::MaxCosts]
+**
+**    Gives the player an improved income.
+**
+**  CUnitType::FieldFlags
+**
+**    Flags that are set, if a unit enters a map field or cleared, if
+**    a unit leaves a map field.
+**
+**  CUnitType::MovementMask
+**
+**    Movement mask, this value is and'ed to the map field flags, to
+**    see if a unit can enter or placed on the map field.
+**
+**  CUnitType::Stats[::PlayerMax]
+**
+**    Unit status for each player
+**  @todo This stats should? be moved into the player struct
+**
+**  CUnitType::Type
+**
+**    Type as number
+**  @todo Should us a general name f.e. Slot here?
+**
+**  CUnitType::Sprite
+**
+**    Sprite images
+**
+**  CUnitType::ShadowSprite
+**
+**    Shadow sprite images
+**
+**  CUnitType::PlayerColorSprite
+**
+**    Sprite images of the player colors.  This image is drawn
+**    over CUnitType::Sprite.  Used with OpenGL only.
+**
+**
+*/
+/**
+**
+**  @class ResourceInfo unittype.h
+**
+** \#include "unittype.h"
+**
+**    This class contains information about how a unit will harvest a resource.
+**
+**  ResourceInfo::FileWhenLoaded
+**
+**    The harvester's animation file will change when it's loaded.
+**
+**  ResourceInfo::FileWhenEmpty;
+**
+**    The harvester's animation file will change when it's empty.
+**    The standard animation is used only when building/repairing.
+**
+**
+**  ResourceInfo::HarvestFromOutside
+**
+**    Unit will harvest from the outside. The unit will use it's
+**    Attack animation (seems it turned into a generic Action anim.)
+**
+**  ResourceInfo::ResourceId
+**
+**    The resource this is for. Mostly redundant.
+**
+**  ResourceInfo::FinalResource
+**
+**    The resource is converted to this at the depot. Usefull for
+**    a fisherman who harvests fish, but it all turns to food at the
+**    depot.
+**
+**  ResourceInfo::WaitAtResource
+**
+**    Cycles the unit waits while inside a resource.
+**
+**  ResourceInfo::ResourceStep
+**
+**    The unit makes so-caled mining cycles. Each mining cycle
+**    it does some sort of animation and gains ResourceStep
+**    resources. You can stop after any number of steps.
+**    when the quantity in the harvester reaches the maximum
+**    (ResourceCapacity) it will return home. I this is 0 then
+**    it's considered infinity, and ResourceCapacity will now
+**    be the limit.
+**
+**  ResourceInfo::ResourceCapacity
+**
+**    Maximum amount of resources a harvester can carry. The
+**    actual amount can be modified while unloading.
+**
+**  ResourceInfo::LoseResources
+**
+**    Special lossy behaviour for loaded harvesters. Harvesters
+**    with loads other than 0 and ResourceCapacity will lose their
+**    cargo on any new order.
+**
+**  ResourceInfo::WaitAtDepot
+**
+**    Cycles the unit waits while inside the depot to unload.
+**
+**  ResourceInfo::TerrainHarvester
+**
+**    The unit will harvest terrain. For now this only works
+**    for wood. maybe it could be made to work for rocks, but
+**    more than that requires a tileset rewrite.
+**  @todo more configurable.
+**
+*/
+
+/*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
@@ -128,9 +606,6 @@ int GetResourceIdByName(lua_State *l, const char *resourceName)
 	}
 	return res;
 }
-
-/// Parse integer in animation frame.
-extern int ParseAnimInt(CUnit *unit, const char *parseint);
 
 CUnitType::CUnitType() :
 	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
@@ -208,8 +683,7 @@ CUnitType::~CUnitType()
 	CGraphic::Free(ShadowSprite);
 #ifdef USE_MNG
 	if (this->Portrait.Num) {
-		int j;
-		for (j = 0; j < this->Portrait.Num; ++j) {
+		for (int j = 0; j < this->Portrait.Num; ++j) {
 			delete this->Portrait.Mngs[j];
 			// delete[] this->Portrait.Files[j];
 		}
@@ -240,6 +714,20 @@ bool CUnitType::CanMove() const
 	return Animations && Animations->Move;
 }
 
+bool CUnitType::CanSelect(GroupSelectionMode mode) const
+{
+	if (!IsNotSelectable) {
+		switch (mode) {
+			case SELECTABLE_BY_RECTANGLE_ONLY:
+				return SelectableByRectangle;
+			case NON_SELECTABLE_BY_RECTANGLE_ONLY:
+				return !SelectableByRectangle;
+			default:
+				return true;
+		}
+	}
+	return false;
+}
 
 
 /**
@@ -248,9 +736,7 @@ bool CUnitType::CanMove() const
 */
 void UpdateStats(int reset)
 {
-	//
-	//  Update players stats
-	//
+	// Update players stats
 	for (std::vector<CUnitType *>::size_type j = 0; j < UnitTypes.size(); ++j) {
 		CUnitType &type = *UnitTypes[j];
 		if (reset) {
@@ -277,9 +763,7 @@ void UpdateStats(int reset)
 			continue;
 		}
 
-		//
 		//  As side effect we calculate the movement flags/mask here.
-		//
 		switch (type.UnitType) {
 			case UnitTypeLand:                              // on land
 				type.MovementMask =
@@ -447,10 +931,9 @@ CUnitType *UnitTypeByIdent(const std::string &ident)
 */
 CUnitType *NewUnitTypeSlot(const std::string &ident)
 {
-	CUnitType *type;
 	size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
+	CUnitType *type = new CUnitType;
 
-	type = new CUnitType;
 	if (!type) {
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
@@ -496,7 +979,7 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 		}
 	} else {
-		int row = type.NumDirections / 2 + 1;
+		const int row = type.NumDirections / 2 + 1;
 
 		if (frame < 0) {
 			frame = ((-frame - 1) / row) * type.NumDirections + type.NumDirections - (-frame - 1) % row;
@@ -563,13 +1046,6 @@ void InitUnitTypes(int reset_player_stats)
 
 	// LUDO : called after game is loaded -> don't reset stats !
 	UpdateStats(reset_player_stats); // Calculate the stats
-
-	//
-	// Setup hardcoded unit types. FIXME: should be moved to some configs.
-	// Temporary fix: UnitTypeHumanWall and UnitTypeOrcWall are exported to lua
-	//
-	//UnitTypeHumanWall = UnitTypeByIdent("unit-human-wall");
-	//UnitTypeOrcWall = UnitTypeByIdent("unit-orc-wall");
 }
 
 /**
@@ -688,19 +1164,15 @@ void CUnitTypeVar::Clear()
 	DecoVar.clear();
 }
 
-extern void FreeAnimations();
-
 /**
 **  Cleanup the unit-type module.
 */
 void CleanUnitTypes()
 {
-
 	DebugPrint("FIXME: icon, sounds not freed.\n");
 	FreeAnimations();
 
 	// Clean all unit-types
-
 	for (size_t i = 0; i < UnitTypes.size(); ++i) {
 		delete UnitTypes[i];
 	}
@@ -708,9 +1180,7 @@ void CleanUnitTypes()
 	UnitTypeMap.clear();
 	UnitTypeVar.Clear();
 
-	//
 	// Clean hardcoded unit types.
-	//
 	UnitTypeHumanWall = NULL;
 	UnitTypeOrcWall = NULL;
 }

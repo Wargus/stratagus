@@ -155,6 +155,9 @@ extern int UnitShowAnimation(CUnit &unit, const CAnimation *anim);
 extern int ParseAnimInt(const CUnit *unit, const char *parseint);
 
 extern void FindLabelLater(CAnimation **anim, const std::string &name);
+
+extern void FreeAnimations();
+
 //@}
 
 #endif // !__ANIMATIONS_H__
