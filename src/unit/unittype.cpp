@@ -50,6 +50,7 @@
 #include "sound.h"
 #include "spells.h"
 #include "tileset.h"
+#include "translate.h"
 #include "ui.h"
 #include "unitsound.h"
 #include "util.h"
@@ -509,15 +510,15 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 /**
 **  Get the still animation frame
 */
-static int GetStillFrame(CUnitType *type)
+static int GetStillFrame(const CUnitType &type)
 {
-	CAnimation *anim = type->Animations->Still;
+	CAnimation *anim = type.Animations->Still;
 
 	while (anim) {
 		if (anim->Type == AnimationFrame) {
 			CAnimation_Frame &a_frame = *static_cast<CAnimation_Frame *>(anim);
 			// Use the frame facing down
-			return a_frame.ParseAnimInt(NULL) + type->NumDirections / 2;
+			return a_frame.ParseAnimInt(NULL) + type.NumDirections / 2;
 		} else if (anim->Type == AnimationExactFrame) {
 			CAnimation_ExactFrame &a_frame = *static_cast<CAnimation_ExactFrame *>(anim);
 
@@ -525,7 +526,7 @@ static int GetStillFrame(CUnitType *type)
 		}
 		anim = anim->Next;
 	}
-	return type->NumDirections / 2;
+	return type.NumDirections / 2;
 }
 
 /**
@@ -533,27 +534,29 @@ static int GetStillFrame(CUnitType *type)
 */
 void InitUnitTypes(int reset_player_stats)
 {
-	CUnitType *type;
-
 	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		type = UnitTypes[i];
-		Assert(type->Slot == (int)i);
+		CUnitType &type = *UnitTypes[i];
+		Assert(type.Slot == (int)i);
 
+		if (type.Animations == NULL) {
+			DebugPrint(_("unit-type '%s' without animations, ignored.\n") _C_ type.Ident.c_str());
+			continue;
+		}
 		//  Add idents to hash.
-		UnitTypeMap[type->Ident] = UnitTypes[i];
+		UnitTypeMap[type.Ident] = UnitTypes[i];
 
 		// Determine still frame
-		type->StillFrame = GetStillFrame(type);
+		type.StillFrame = GetStillFrame(type);
 
 		// Lookup BuildingTypes
-		for (std::vector<CBuildRestriction *>::iterator b = type->BuildingRules.begin();
-			 b < type->BuildingRules.end(); ++b) {
+		for (std::vector<CBuildRestriction *>::iterator b = type.BuildingRules.begin();
+			 b < type.BuildingRules.end(); ++b) {
 			(*b)->Init();
 		}
 
 		// Lookup AiBuildingTypes
-		for (std::vector<CBuildRestriction *>::iterator b = type->AiBuildingRules.begin();
-			 b < type->AiBuildingRules.end(); ++b) {
+		for (std::vector<CBuildRestriction *>::iterator b = type.AiBuildingRules.begin();
+			 b < type.AiBuildingRules.end(); ++b) {
 			(*b)->Init();
 		}
 	}
