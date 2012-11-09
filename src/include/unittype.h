@@ -225,7 +225,7 @@ public:
 	};
 
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const CUnitType *Type, const CVariable &var) const = 0;
+	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const = 0;
 
 	unsigned int Index;     /// Index of the variable. @see DefineVariables
 
@@ -253,7 +253,7 @@ class CDecoVarBar : public CDecoVar
 {
 public:
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const CUnitType *type, const CVariable &var) const;
+	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
 
 	bool IsVertical;            /// if true, vertical bar, else horizontal.
 	bool SEToNW;                /// (SouthEastToNorthWest), if false value 0 is on the left or up of the bar.
@@ -271,7 +271,7 @@ class CDecoVarText : public CDecoVar
 public:
 	CDecoVarText() : Font(NULL) {};
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const CUnitType *type, const CVariable &var) const;
+	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
 
 	CFont *Font;  /// Font to use to display value.
 	// FIXME : Add Color, format
@@ -284,7 +284,7 @@ public:
 	CDecoVarSpriteBar() : NSprite(-1) {};
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y,
-					  const CUnitType *Type, const CVariable &Variable) const;
+					  const CUnitType &type, const CVariable &var) const;
 
 	char NSprite; /// Index of number. (@see DefineSprites and @see GetSpriteIndex)
 	// FIXME Sprite info. better way ?
@@ -296,7 +296,7 @@ class CDecoVarStaticSprite : public CDecoVar
 public:
 	CDecoVarStaticSprite() : NSprite(-1), n(0) {}
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const CUnitType *type, const CVariable &var) const;
+	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
 
 	// FIXME Sprite info. and Replace n with more appropriate var.
 	char NSprite;  /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)

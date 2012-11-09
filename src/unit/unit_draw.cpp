@@ -385,26 +385,25 @@ void CleanDecorations()
 **  @todo fix color configuration.
 */
 void CDecoVarBar::Draw(int x, int y,
-					   const CUnitType *Type, const CVariable &Variable) const
+					   const CUnitType &type, const CVariable &var) const
 {
-	Assert(Type);
-	Assert(Variable.Max);
+	Assert(var.Max);
 
 	int height = this->Height;
 	if (height == 0) { // Default value
-		height = Type->BoxHeight; // Better size ? {,Box, Tile}
+		height = type.BoxHeight; // Better size ? {,Box, Tile}
 	}
 	int width = this->Width;
 	if (width == 0) { // Default value
-		width = Type->BoxWidth; // Better size ? {,Box, Tile}
+		width = type.BoxWidth; // Better size ? {,Box, Tile}
 	}
 	int h;
 	int w;
 	if (this->IsVertical)  { // Vertical
 		w = width;
-		h = Variable.Value * height / Variable.Max;
+		h = var.Value * height / var.Max;
 	} else {
-		w = Variable.Value * width / Variable.Max;
+		w = var.Value * width / var.Max;
 		h = height;
 	}
 	if (this->IsCenteredInX) {
@@ -416,7 +415,7 @@ void CDecoVarBar::Draw(int x, int y,
 
 	char b = this->BorderSize; // BorderSize.
 	// Could depend of (value / max)
-	int f = Variable.Value * 100 / Variable.Max;
+	int f = var.Value * 100 / var.Max;
 	IntColor bcolor = ColorBlack; // Deco->Data.Bar.BColor  // Border color.
 	IntColor color = f > 50 ? (f > 75 ? ColorGreen : ColorYellow) : (f > 25 ? ColorOrange : ColorRed);// inside color.
 	// Deco->Data.Bar.Color
@@ -447,8 +446,7 @@ void CDecoVarBar::Draw(int x, int y,
 **  @param unit    Unit pointer
 **  @todo fix font/color configuration.
 */
-void CDecoVarText::Draw(int x, int y,
-						const CUnitType *, const CVariable &Variable) const
+void CDecoVarText::Draw(int x, int y, const CUnitType &/*type*/, const CVariable &var) const
 {
 	if (this->IsCenteredInX) {
 		x -= 2; // GetGameFont()->Width(buf) / 2, with buf = str(Value)
@@ -456,7 +454,7 @@ void CDecoVarText::Draw(int x, int y,
 	if (this->IsCenteredInY) {
 		y -= this->Font->Height() / 2;
 	}
-	CLabel(*this->Font).DrawClip(x, y, Variable.Value);
+	CLabel(*this->Font).DrawClip(x, y, var.Value);
 }
 
 /**
@@ -467,10 +465,9 @@ void CDecoVarText::Draw(int x, int y,
 **  @param unit    Unit pointer
 **  @todo fix sprite configuration.
 */
-void CDecoVarSpriteBar::Draw(int x, int y,
-							 const CUnitType *, const CVariable &Variable) const
+void CDecoVarSpriteBar::Draw(int x, int y, const CUnitType &/*type*/, const CVariable &var) const
 {
-	Assert(Variable.Max);
+	Assert(var.Max);
 	Assert(this->NSprite != -1);
 
 	Decoration &decosprite = DecoSprite.SpriteArray[(int)this->NSprite];
@@ -479,7 +476,7 @@ void CDecoVarSpriteBar::Draw(int x, int y,
 	y += decosprite.HotPos.y; // in addition of OffsetY... Usefull ?
 
 	int n = sprite.NumFrames - 1; // frame of the sprite to show.
-	n -= (n * Variable.Value) / Variable.Max;
+	n -= (n * var.Value) / var.Max;
 
 	if (this->IsCenteredInX) {
 		x -= sprite.Width / 2;
@@ -499,8 +496,7 @@ void CDecoVarSpriteBar::Draw(int x, int y,
 **
 **  @todo fix sprite configuration configuration.
 */
-void CDecoVarStaticSprite::Draw(int x, int y,
-								const CUnitType *, const CVariable &) const
+void CDecoVarStaticSprite::Draw(int x, int y, const CUnitType &/*type*/, const CVariable &/*var*/) const
 {
 	Decoration &decosprite = DecoSprite.SpriteArray[(int)this->NSprite];
 	CGraphic &sprite = *decosprite.Sprite;
@@ -516,20 +512,17 @@ void CDecoVarStaticSprite::Draw(int x, int y,
 	sprite.DrawFrameClip(this->n, x, y);
 }
 
-
-extern void UpdateUnitVariables(CUnit &unit);
-
-
 /**
 **  Draw decoration (invis, for the unit.)
 **
-**  @param unit  Pointer to the unit.
-**  @param type  Type of the unit.
-**  @param x     Screen X position of the unit.
-**  @param y     Screen Y position of the unit.
+**  @param unit       Pointer to the unit.
+**  @param type       Type of the unit.
+**  @param screenPos  Screen position of the unit.
 */
-static void DrawDecoration(const CUnit &unit, const CUnitType *type, int x, int y)
+static void DrawDecoration(const CUnit &unit, const CUnitType &type, const PixelPos &screenPos)
 {
+	int x = screenPos.x;
+	int y = screenPos.y;
 #ifdef REFS_DEBUG
 	// Show the number of references.
 	VideoDrawNumberClip(x + 1, y + 1, GetGameFont(), unit.Refs);
@@ -670,16 +663,13 @@ void ShowOrder(const CUnit &unit)
 */
 static void DrawInformations(const CUnit &unit, const CUnitType &type, const PixelPos &screenPos)
 {
-	int x = screenPos.x;
-	int y = screenPos.y;
-
 #if 0 && DEBUG // This is for showing vis counts and refs.
 	char buf[10];
 	sprintf(buf, "%d%c%c%d", unit.VisCount[ThisPlayer->Index],
 			unit.Seen.ByPlayer & (1 << ThisPlayer->Index) ? 'Y' : 'N',
 			unit.Seen.Destroyed & (1 << ThisPlayer->Index) ? 'Y' : 'N',
 			unit.Refs);
-	CLabel(GetSmallFont()).Draw(x + 10, y + 10, buf);
+	CLabel(GetSmallFont()).Draw(screenPos.x + 10, screenPos.y + 10, buf);
 #endif
 
 	const CUnitStats &stats = *unit.Stats;
@@ -720,65 +710,9 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 
 	// FIXME: johns: ugly check here, should be removed!
 	if (unit.CurrentAction() != UnitActionDie && unit.IsVisible(*ThisPlayer)) {
-		DrawDecoration(unit, &type, x, y);
+		DrawDecoration(unit, type, screenPos);
 	}
 }
-
-#if 0
-/**
-**  Draw the sprite with the player colors
-**
-**  @param type      Unit type
-**  @param sprite    Original sprite
-**  @param player    Player number
-**  @param frame     Frame number to draw.
-**  @param x         X position.
-**  @param y         Y position.
-*/
-void DrawUnitPlayerColor(const CUnitType *type, CGraphic *sprite,
-						 int player, int frame, int x, int y)
-{
-	int f;
-
-	if (type->Flip) {
-		if (frame < 0) {
-			f = -frame - 1;
-		} else {
-			f = frame;
-		}
-	} else {
-		const int row = type->NumDirections / 2 + 1;
-		if (frame < 0) {
-			f = ((-frame - 1) / row) * type->NumDirections + type->NumDirections - (-frame - 1) % row;
-		} else {
-			f = (frame / row) * type->NumDirections + frame % row;
-		}
-	}
-	if (!sprite->PlayerColorTextures[player]) {
-		MakePlayerColorTexture(sprite, player, &Players[player].UnitColors);
-	}
-
-	// FIXME: move this calculation to high level.
-	x -= (type->Width - type->TileWidth * PixelTileSize.x) / 2;
-	y -= (type->Height - type->TileHeight * PixelTileSize.y) / 2;
-
-	if (type->Flip) {
-		if (frame < 0) {
-			VideoDrawClipX(glsprite[player], -frame - 1, x, y);
-		} else {
-			VideoDrawClip(glsprite[player], frame, x, y);
-		}
-	} else {
-		const int row = type->NumDirections / 2 + 1;
-		if (frame < 0) {
-			frame = ((-frame - 1) / row) * type->NumDirections + type->NumDirections - (-frame - 1) % row;
-		} else {
-			frame = (frame / row) * type->NumDirections + frame % row;
-		}
-		VideoDrawClip(glsprite[player], frame, x, y);
-	}
-}
-#endif
 
 /**
 **  Draw construction shadow.
