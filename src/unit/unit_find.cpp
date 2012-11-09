@@ -605,7 +605,7 @@ CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2)
 		if (!unit.IsVisibleAsGoal(*source.Player)) {
 			continue;
 		}
-		if (!CanTarget(source.Type, unit.Type)) {
+		if (!CanTarget(*source.Type, *unit.Type)) {
 			continue;
 		}
 
@@ -703,7 +703,7 @@ private:
 
 		if (!player.IsEnemy(*dest) // a friend or neutral
 			|| !dest->IsVisibleAsGoal(player)
-			|| !CanTarget(&type, &dtype)) {
+			|| !CanTarget(type, dtype)) {
 			return INT_MAX;
 		}
 		// Unit in range ?
@@ -743,7 +743,7 @@ private:
 		}
 
 		// Unit can attack back.
-		if (CanTarget(&dtype, &type)) {
+		if (CanTarget(dtype, type)) {
 			cost -= CANATTACK_BONUS;
 		}
 		return cost;
@@ -810,7 +810,7 @@ public:
 			const CUnitType &type =  *attacker->Type;
 			const CUnitType &dtype = *dest->Type;
 			// won't be a target...
-			if (!CanTarget(&type, &dtype)) { // can't be attacked.
+			if (!CanTarget(type, dtype)) { // can't be attacked.
 				dest->CacheLock = 1;
 				return;
 			}
@@ -876,7 +876,7 @@ public:
 				cost += -effective_hp * HEALTH_FACTOR;
 
 				//  Unit can attack back.
-				if (CanTarget(&dtype, &type)) {
+				if (CanTarget(dtype, type)) {
 					cost += CANATTACK_BONUS;
 				}
 

@@ -185,7 +185,7 @@ public:
 	bool operator()(const CUnit *unit) const {
 		return unit->IsVisibleAsGoal(*player)
 			   && unit->IsEnemy(*player)
-			   && CanTarget(unit->Type, type);
+			   && CanTarget(*unit->Type, *type);
 	}
 private:
 	const CPlayer *player;

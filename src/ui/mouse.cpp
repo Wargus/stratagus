@@ -296,7 +296,7 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 				}
 				SendCommandSpellCast(unit, pos, dest, spellnum, flush);
 			} else {
-				if (CanTarget(&type, dest->Type)) {
+				if (CanTarget(type, *dest->Type)) {
 					SendCommandAttack(unit, pos, dest, flush);
 				} else { // No valid target
 					SendCommandAttack(unit, pos, NoUnitP, flush);
@@ -1080,7 +1080,7 @@ static int SendAttack(const Vec2i &tilePos)
 		CUnit &unit = *Selected[i];
 
 		if (unit.Type->CanAttack) {
-			if (!dest || (dest != &unit && CanTarget(unit.Type, dest->Type))) {
+			if (!dest || (dest != &unit && CanTarget(*unit.Type, *dest->Type))) {
 				if (dest) {
 					dest->Blink = 4;
 				}

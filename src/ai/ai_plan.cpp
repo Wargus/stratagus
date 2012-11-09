@@ -76,7 +76,7 @@ public:
 			|| pos.y < unit->tilePos.y || pos.y >= unit->tilePos.y + type.TileHeight) {
 			return;
 		}
-		if (!CanTarget(source->Type, &type)) {
+		if (!CanTarget(*source->Type, type)) {
 			return;
 		}
 		if (!source->Player->IsEnemy(*unit)) { // a friend or neutral

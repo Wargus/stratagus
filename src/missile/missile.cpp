@@ -832,11 +832,11 @@ void Missile::MissileHit(CUnit *unit)
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &goal = *table[i];
 			//
-			// Can the unit attack the this unit-type?
+			// Can the unit attack this unit-type?
 			// NOTE: perhaps this should be come a property of the missile.
 			// Also check CorrectSphashDamage so land explosions can't hit the air units
 			//
-			if (CanTarget(this->SourceUnit->Type, goal.Type)
+			if (CanTarget(*this->SourceUnit->Type, *goal.Type)
 				&& (mtype.FriendlyFire == false || goal.Player->Index != this->SourceUnit->Player->Index)) {
 				bool shouldHit = true;
 

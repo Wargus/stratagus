@@ -2385,7 +2385,7 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 	}
 
 	// Unit can attack back.
-	if (CanTarget(&dtype, &type)) {
+	if (CanTarget(dtype, type)) {
 		cost -= CANATTACK_BONUS;
 	}
 	return cost;
@@ -2627,7 +2627,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		CUnit *oldgoal = target.CurrentOrder()->GetGoal();
 		CUnit *goal, *best = oldgoal;
 
-		if (RevealAttacker && CanTarget(target.Type, attacker->Type)) {
+		if (RevealAttacker && CanTarget(*target.Type, *attacker->Type)) {
 			// Reveal Unit that is attacking
 			goal = attacker;
 		} else {
@@ -2643,7 +2643,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		if (!best || (goal && (ThreatCalculate(target, *goal) < ThreatCalculate(target, *best)))) {
 			best = goal;
 		}
-		if (CanTarget(target.Type, attacker->Type)
+		if (CanTarget(*target.Type, *attacker->Type)
 			&& (!best || (attacker && goal != attacker
 						  && (ThreatCalculate(target, *attacker) < ThreatCalculate(target, *best))))) {
 			best = attacker;
@@ -2765,27 +2765,27 @@ int ViewPointDistanceToUnit(const CUnit &dest)
 **
 **  @return        0 if attacker can't target the unit, else a positive number.
 */
-int CanTarget(const CUnitType *source, const CUnitType *dest)
+int CanTarget(const CUnitType &source, const CUnitType &dest)
 {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
-		if (source->BoolFlag[i].CanTargetFlag != CONDITION_TRUE) {
-			if ((source->BoolFlag[i].CanTargetFlag == CONDITION_ONLY) ^
-				(dest->BoolFlag[i].value)) {
+		if (source.BoolFlag[i].CanTargetFlag != CONDITION_TRUE) {
+			if ((source.BoolFlag[i].CanTargetFlag == CONDITION_ONLY) ^
+				(dest.BoolFlag[i].value)) {
 				return 0;
 			}
 		}
 	}
-	if (dest->UnitType == UnitTypeLand) {
-		if (dest->ShoreBuilding) {
-			return source->CanTarget & (CanTargetLand | CanTargetSea);
+	if (dest.UnitType == UnitTypeLand) {
+		if (dest.ShoreBuilding) {
+			return source.CanTarget & (CanTargetLand | CanTargetSea);
 		}
-		return source->CanTarget & CanTargetLand;
+		return source.CanTarget & CanTargetLand;
 	}
-	if (dest->UnitType == UnitTypeFly) {
-		return source->CanTarget & CanTargetAir;
+	if (dest.UnitType == UnitTypeFly) {
+		return source.CanTarget & CanTargetAir;
 	}
-	if (dest->UnitType == UnitTypeNaval) {
-		return source->CanTarget & CanTargetSea;
+	if (dest.UnitType == UnitTypeNaval) {
+		return source.CanTarget & CanTargetSea;
 	}
 	return 0;
 }
