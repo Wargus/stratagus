@@ -132,6 +132,8 @@ public:
 
 	CUnitColors UnitColors; /// Unit colors for new units
 
+	std::vector<CUnit *> FreeWorkers;	/// Container for free workers
+
 	// Upgrades/Allows:
 	CAllow Allow;                 /// Allowed for player
 	CUpgradeTimers UpgradeTimers; /// Timer for the upgrades
@@ -152,6 +154,7 @@ public:
 
 	void AddUnit(CUnit &unit);
 	void RemoveUnit(CUnit &unit);
+	void UpdateFreeWorkers();
 
 	/// Get a resource of the player
 	int GetResource(const int resource, const int type);

@@ -94,6 +94,7 @@ void CPlayer::Load(lua_State *l)
 	const int args = lua_gettop(l);
 
 	this->Units.resize(0);
+	this->FreeWorkers.resize(0);
 
 	// j = 0 represent player Index.
 	for (int j = 1; j < args; ++j) {
@@ -891,7 +892,7 @@ static int CclSetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "SpeedTrain")) {
 		p->SpeedTrain = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "SpeedUpgrade")) {
-		p->SpeedTrain = LuaToNumber(l, 3);
+		p->SpeedUpgrade = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "SpeedResearch")) {
 		p->SpeedResearch = LuaToNumber(l, 3);
 	} else {

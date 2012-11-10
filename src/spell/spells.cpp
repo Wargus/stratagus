@@ -215,9 +215,10 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 	//  Check every unit if it is hostile
 	bool inCombat = false;
 	for (size_t i = 0; i < table.size(); ++i) {
-		if (caster.IsEnemy(*table[i]) && !table[i]->Type->Coward) {
-			inCombat = true;
-			break;
+		if (table[i]->IsVisibleAsGoal(*caster.Player) && caster.IsEnemy(*table[i])
+			&& CanTarget(caster.Type, table[i]->Type)) {
+				inCombat = true;
+				break;
 		}
 	}
 

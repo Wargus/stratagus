@@ -86,11 +86,12 @@ typedef bool (*ButtonCheckFunc)(const CUnit &, const ButtonAction &);
 class ButtonAction
 {
 public:
-	ButtonAction() : Pos(0), Level(0), Action(ButtonMove), Value(0),
+	ButtonAction() : Pos(0), Level(0), Action(ButtonMove), Value(0), AlwaysShow(false),
 		Allowed(NULL), Key(0) {}
 
 	int Pos;          /// button position in the grid
 	int Level;        /// requires button level
+	bool AlwaysShow;  /// button is always shown but drawn grayscale if not available
 	ButtonCmd Action; /// command on button press
 	int Value;        /// extra value for command
 	std::string ValueStr;    /// keep original value string
@@ -261,7 +262,9 @@ extern int AddButton(int pos, int level, const std::string &IconIdent,
 					 ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
 					 const std::string &arg, const std::string &hint, const std::string &descr,
 					 const std::string &sound, const std::string &cursor, const std::string &umask,
-					 const std::string &popup);
+					 const std::string &popup, bool alwaysShow);
+// Check if the button is allowed for the unit.
+extern bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction);
 
 //
 // in mouse.cpp

@@ -48,6 +48,7 @@
 #include "sound.h"
 #include "spells.h"
 #include "tileset.h"
+#include "ui.h"
 #include "unit.h"
 #include "unitsound.h"
 #include "unit_manager.h"
@@ -1783,6 +1784,7 @@ void UpdateUnitVariables(CUnit &unit)
 #endif
 			Assert(unit.Variable[i].Value <= unit.Variable[i].Max);
 	}
+	UI.ButtonPanel.Update();
 }
 
 /**

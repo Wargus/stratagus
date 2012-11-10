@@ -796,7 +796,7 @@ void DrawResources()
 	CLabel label(GetGameFont());
 
 	// Draw all icons of resource.
-	for (int i = 0; i <= ManaResCost; ++i) {
+	for (int i = 0; i <= FreeWorkersCount; ++i) {
 		if (UI.Resources[i].G) {
 			UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame,
 											 UI.Resources[i].IconX, UI.Resources[i].IconY);
@@ -835,6 +835,12 @@ void DrawResources()
 
 		label.SetFont(score > 99999 ? GetSmallFont() : GetGameFont());
 		label.Draw(UI.Resources[ScoreCost].TextX, UI.Resources[ScoreCost].TextY + (score > 99999) * 3, score);
+	}
+	if (UI.Resources[FreeWorkersCount].TextX != -1) {
+		const int workers = ThisPlayer->FreeWorkers.size();
+
+		label.SetFont(GetGameFont());
+		label.Draw(UI.Resources[FreeWorkersCount].TextX, UI.Resources[FreeWorkersCount].TextY, workers);
 	}
 }
 

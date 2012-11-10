@@ -707,7 +707,7 @@ static int strchrlen(const std::string &s, char c, unsigned int maxlen, CFont *f
 		return 0;
 	}
 	int res = s.find(c);
-	res = (res == -1) ? s.size() : res - 1;
+	res = (res == -1) ? s.size() : res;
 
 	if (!maxlen || (!font && (unsigned int) res < maxlen) || (font && (unsigned int) font->Width(s.substr(0, res)) < maxlen)) {
 		return res;

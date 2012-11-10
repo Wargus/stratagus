@@ -94,6 +94,18 @@ private:
 	const CUnit **enemy;
 };
 
+class IsAnAlliedUnitOf
+{
+public:
+	explicit IsAnAlliedUnitOf(const CPlayer &_player) : player(&_player) {}
+	bool operator()(const CUnit *unit) const {
+		return unit->IsVisibleAsGoal(*player) && (unit->Player->Index == player->Index
+			|| unit->IsAllied(*player));
+	}
+private:
+	const CPlayer *player;
+};
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -305,9 +317,9 @@ private:
 VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	if (AiEnemyUnitsInDistance(*startUnit.Player, NULL, pos, 20) == false
-		&& Distance(pos, startPos) <= distance) {
-		*resultPos = pos;
-		return VisitResult_Finished;
+		&& Distance(pos, startPos) <= abs(distance - 20)) {
+			*resultPos = pos;
+			return VisitResult_Finished;
 	}
 	if (CanMoveToMask(pos, movemask)) { // reachable
 		return VisitResult_Ok;
@@ -330,7 +342,7 @@ bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos)
 	Assert(Map.Info.IsPointOnMap(startPos));
 	terrainTraversal.PushPos(startPos);
 
-	AiForceRallyPointFinder aiForceRallyPointFinder(leader, distance, startPos, resultPos);
+	AiForceRallyPointFinder aiForceRallyPointFinder(leader, distance, leader.tilePos, resultPos);
 
 	return terrainTraversal.Run(aiForceRallyPointFinder);
 }
@@ -797,21 +809,42 @@ void AiForce::Update()
 		return;
 	}
 
+	const int thresholdDist = 5; // Hard coded value
 	Assert(Map.Info.IsPointOnMap(GoalPos));
 	if (State == AiForceAttackingState_GoingToRallyPoint) {
 		// Check if we are near the goalpos
-		if (Units[0]->MapDistanceTo(GoalPos) <= 20) {
+		int maxDist, minDist;
+		maxDist = minDist = Units[0]->MapDistanceTo(this->GoalPos);
+
+		// We must put away all units which are too far from main group
+		for (size_t i = 0; i != Size(); ++i) {
+			const int distance = Units[i]->MapDistanceTo(this->GoalPos);
+			minDist = std::min(minDist, Units[i]->MapDistanceTo(this->GoalPos));
+		}
+
+		for (size_t i = 0; i != Size(); ++i) {
+			const int distance = Units[i]->MapDistanceTo(this->GoalPos);
+			// Don't count units which are too far away from main group
+			if (abs(minDist - distance) > thresholdDist * 8) {
+				continue;
+			}
+			maxDist = std::max(maxDist, Units[i]->MapDistanceTo(this->GoalPos));
+		}
+		if (maxDist <= thresholdDist) {
 			const CUnit *unit = NULL;
 
 			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
 			if (!unit) {
-				// No enemy found, give up
-				// FIXME: should the force go home or keep trying to attack?
-				DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
-						   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
-				Attacking = false;
-				State = AiForceAttackingState_Waiting;
-				return;
+				AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit);
+				if (!unit) {
+					// No enemy found, give up
+					// FIXME: should the force go home or keep trying to attack?
+					DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
+							   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
+					Attacking = false;
+					State = AiForceAttackingState_Waiting;
+					return;
+				}
 			}
 			this->GoalPos = unit->tilePos;
 			State = AiForceAttackingState_Attacking;
@@ -839,7 +872,6 @@ void AiForce::Update()
 	}
 
 	if (State == AiForceAttackingState_Attacking) {
-		const int thresholdDist = 5; // Hard coded value
 		int maxDist = 0;
 
 		for (size_t i = 0; i != Size(); ++i) {
@@ -894,25 +926,35 @@ void AiForceManager::Update()
 					force.ReturnToHome();
 				}
 			} else { // Find idle units and order them to defend
-				std::vector<CUnit *> idleUnits;
-				for (unsigned int i = 0; i != force.Size(); ++i) {
-					CUnit &aiunit = *force.Units[i];
+				// Don't attack if there aren't our units near goal point
+				std::vector<CUnit *> nearGoal;
+				const int range = force.Units[0]->Type->ReactRangeComputer;
+				const Vec2i offset(15, 15);
+				Select(force.GoalPos - offset, force.GoalPos + offset, nearGoal,
+					IsAnAlliedUnitOf(*force.Units[0]->Player));
+				if (nearGoal.empty()) {
+					force.ReturnToHome();
+				} else {
+					std::vector<CUnit *> idleUnits;
+					for (unsigned int i = 0; i != force.Size(); ++i) {
+						CUnit &aiunit = *force.Units[i];
 
-					if (aiunit.IsIdle() && aiunit.IsAliveOnMap()) {
-						idleUnits.push_back(&aiunit);
+						if (aiunit.IsIdle() && aiunit.IsAliveOnMap()) {
+							idleUnits.push_back(&aiunit);
+						}
 					}
-				}
-				for (unsigned int i = 0; i != idleUnits.size(); ++i) {
-					CUnit *const unit = idleUnits[i];
+					for (unsigned int i = 0; i != idleUnits.size(); ++i) {
+						CUnit *const unit = idleUnits[i];
 
-					if (unit->Container == NULL) {
-						const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
+						if (unit->Container == NULL) {
+							const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
 
-						unit->Wait = delay;
-						if (unit->Type->CanAttack) {
-							CommandAttack(*unit, force.GoalPos, NULL, FlushCommands);
-						} else {
-							CommandMove(*unit, force.GoalPos, FlushCommands);
+							unit->Wait = delay;
+							if (unit->Type->CanAttack) {
+								CommandAttack(*unit, force.GoalPos, NULL, FlushCommands);
+							} else {
+								CommandMove(*unit, force.GoalPos, FlushCommands);
+							}
 						}
 					}
 				}

@@ -38,8 +38,10 @@
 
 #include "depend.h"
 
+#include "interface.h"
 #include "player.h"
 #include "script.h"
+#include "unit.h"
 #include "unittype.h"
 #include "upgrade_structs.h"
 #include "upgrade.h"
@@ -151,18 +153,18 @@ static void AddDependency(const std::string &target, const std::string &required
 	}
 
 #ifdef neverDEBUG
-	printf("New rules are :");
+	fprintf(stdout, "New rules are :");
 	node = node->Rule;
 	while (node) {
 		temp = node;
 		while (temp) {
-			printf("temp->Kind.UnitType=%p ", temp->Kind.UnitType);
+			fprintf(stdout, "temp->Kind.UnitType=%s ", temp->Kind.UnitType->Ident.c_str());
 			temp = temp->Rule;
 		}
 		node = node->Next;
-		printf("\n or ... ");
+		fprintf(stdout, "\n or ... ");
 	}
-	printf("\n");
+	fprintf(stdout, "\n");
 #endif
 }
 
@@ -219,6 +221,95 @@ try_or:
 		node = node->Next;
 	}
 	return false;  // no rule matches
+}
+
+/**
+**  Check if this upgrade or unit is available.
+**
+**  @param player  For this player available.
+**  @param target  Unit or Upgrade.
+**
+**  @return        True if available, false otherwise.
+*/
+std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
+{
+	DependRule rule;
+	std::string rules("");
+
+	//
+	//  first have to check, if target is allowed itself
+	//
+	if (!strncmp(button.ValueStr.c_str(), "unit-", 5)) {
+		// target string refers to unit-XXX
+		rule.Kind.UnitType = UnitTypeByIdent(button.ValueStr);
+		rule.Type = DependRuleUnitType;
+	} else if (!strncmp(button.ValueStr.c_str(), "upgrade-", 8)) {
+		// target string refers to upgrade-XXX
+		rule.Kind.Upgrade = CUpgrade::Get(button.ValueStr);
+		rule.Type = DependRuleUpgrade;
+	} else if (!strncmp(button.ValueStr.c_str(), "spell-", 6)) {
+		// Special case for spells
+		if (button.Allowed && IsButtonAllowed(*Selected[0], button) == false) {
+			if (!strncmp(button.AllowStr.c_str(), "upgrade-", 8)) {
+				rules.insert(0, "Requirements:\n");
+				rules.append("-");
+				rules.append(AllUpgrades[UpgradeIdByIdent(button.AllowStr)]->Name);
+				rules.append("\n");
+			}
+		}
+		return rules;
+	} else {
+		DebugPrint("target `%s' should be unit-type or upgrade\n" _C_ button.ValueStr.c_str());
+		return rules;
+	}
+
+	//  Find rule
+	int i = (int)((intptr_t)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
+	const DependRule *node = DependHash[i];
+
+	if (node) {  // find correct entry
+		while (node->Type != rule.Type || node->Kind.Upgrade != rule.Kind.Upgrade) {
+			if (!node->Next) {  // end of list
+				return rules;
+			}
+			node = node->Next;
+		}
+	} else {
+		return rules;
+	}
+
+	//  Prove the rules
+	node = node->Rule;
+
+	while (node) {
+		const DependRule *temp = node;
+		std::string subrules("");
+		while (temp) {
+			if (temp->Type == DependRuleUnitType) {
+				i = player.HaveUnitTypeByType(*temp->Kind.UnitType);
+				if (temp->Count ? i < temp->Count : i) {
+					subrules.append("-");
+					subrules.append(temp->Kind.UnitType->Name.c_str());
+					subrules.append("\n");
+				}
+			} else if (temp->Type == DependRuleUpgrade) {
+				i = UpgradeIdAllowed(player, temp->Kind.Upgrade->ID) != 'R';
+				if (temp->Count ? i : !i) {
+					subrules.append("-");
+					subrules.append(temp->Kind.Upgrade->Name.c_str());
+					subrules.append("\n");
+				}
+			}
+			temp = temp->Rule;
+		}
+		if (subrules.empty()) {
+			return subrules;
+		}
+		rules.append(subrules);
+		node = node->Next;
+	}
+	rules.insert(0, "Requirements:\n");
+	return rules;
 }
 
 /**

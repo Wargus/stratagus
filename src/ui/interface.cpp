@@ -440,13 +440,12 @@ static void UiToggleTerrain()
 */
 static void UiFindIdleWorker()
 {
-	// FIXME: static variable, is not needed.
-	static CUnit *LastIdleWorker = NULL;
-
-	CUnit *unit = FindIdleWorker(*ThisPlayer, LastIdleWorker);
+	if (ThisPlayer->FreeWorkers.empty()) {
+		return;
+	}
+	CUnit *unit = ThisPlayer->FreeWorkers[0];
 
 	if (unit != NULL) {
-		LastIdleWorker = unit;
 		SelectSingleUnit(*unit);
 		UI.StatusLine.Clear();
 		ClearCosts();

@@ -815,6 +815,55 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			condition->HasHint = LuaToBoolean(l, -1);
 		} else if (!strcmp(key, "HasDescription")) {
 			condition->HasDescription = LuaToBoolean(l, -1);
+		} else if (!strcmp(key, "HasDependencies")) {
+			condition->HasDependencies = LuaToBoolean(l, -1);
+		} else if (!strcmp(key, "ButtonValue")) {
+			condition->ButtonValue = LuaToString(l, -1);
+		} else if (!strcmp(key, "ButtonAction")) {
+			const char *value = LuaToString(l, -1);
+			if (!strcmp(value, "move")) {
+				condition->ButtonAction = ButtonMove;
+			} else if (!strcmp(value, "stop")) {
+				condition->ButtonAction = ButtonStop;
+			} else if (!strcmp(value, "attack")) {
+				condition->ButtonAction = ButtonAttack;
+			} else if (!strcmp(value, "repair")) {
+				condition->ButtonAction = ButtonRepair;
+			} else if (!strcmp(value, "harvest")) {
+				condition->ButtonAction = ButtonHarvest;
+			} else if (!strcmp(value, "button")) {
+				condition->ButtonAction = ButtonButton;
+			} else if (!strcmp(value, "build")) {
+				condition->ButtonAction = ButtonBuild;
+			} else if (!strcmp(value, "train-unit")) {
+				condition->ButtonAction = ButtonTrain;
+			} else if (!strcmp(value, "patrol")) {
+				condition->ButtonAction = ButtonPatrol;
+			} else if (!strcmp(value, "stand-ground")) {
+				condition->ButtonAction = ButtonStandGround;
+			} else if (!strcmp(value, "attack-ground")) {
+				condition->ButtonAction = ButtonAttackGround;
+			} else if (!strcmp(value, "return-goods")) {
+				condition->ButtonAction = ButtonReturn;
+			} else if (!strcmp(value, "cast-spell")) {
+				condition->ButtonAction = ButtonSpellCast;
+			} else if (!strcmp(value, "research")) {
+				condition->ButtonAction = ButtonResearch;
+			} else if (!strcmp(value, "upgrade-to")) {
+				condition->ButtonAction = ButtonUpgradeTo;
+			} else if (!strcmp(value, "unload")) {
+				condition->ButtonAction = ButtonUnload;
+			} else if (!strcmp(value, "cancel")) {
+				condition->ButtonAction = ButtonCancel;
+			} else if (!strcmp(value, "cancel-upgrade")) {
+				condition->ButtonAction = ButtonCancelUpgrade;
+			} else if (!strcmp(value, "cancel-train-unit")) {
+				condition->ButtonAction = ButtonCancelTrain;
+			} else if (!strcmp(value, "cancel-build")) {
+				condition->ButtonAction = ButtonCancelBuild;
+			} else {
+				LuaError(l, "Unsupported button action: %s" _C_ value);
+			}
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[key];
 			if (index != -1) {
@@ -894,18 +943,35 @@ static CPopupContentType *CclParsePopupContent(lua_State *l)
 							contentbtype->InfoType = PopupButtonInfo_Hint;
 						} else if (temp == "Description") {
 							contentbtype->InfoType = PopupButtonInfo_Description;
+						} else if (temp == "Dependencies") {
+							contentbtype->InfoType = PopupButtonInfo_Dependencies;
 						}
 					} else if (!strcmp(key, "MaxWidth")) {
 						contentbtype->MaxWidth = LuaToNumber(l, -1);
 					} else if (!strcmp(key, "Font")) {
 						contentbtype->Font = CFont::Get(LuaToString(l, -1));
-					} else if (!strcmp(key, "Centered")) {
-						contentbtype->Centered = LuaToBoolean(l, -1);
 					} else {
 						LuaError(l, "'%s' invalid for method 'Name' in DefinePopups" _C_ key);
 					}
 				}
 				content = contentbtype;
+			} else if (!strcmp(key, "Text")) {
+				CPopupContentTypeText *contenttext = new CPopupContentTypeText;
+
+				Assert(lua_istable(l, -1));
+				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+					key = LuaToString(l, -2);
+					if (!strcmp(key, "Text")) {
+						contenttext->Text = LuaToString(l, -1);
+					} else if (!strcmp(key, "MaxWidth")) {
+						contenttext->MaxWidth = LuaToNumber(l, -1);
+					} else if (!strcmp(key, "Font")) {
+						contenttext->Font = CFont::Get(LuaToString(l, -1));
+					} else {
+						LuaError(l, "'%s' invalid for method 'Text' in DefinePopups" _C_ key);
+					}
+				}
+				content = contenttext;
 			} else if (!strcmp(key, "Costs")) {
 				CPopupContentTypeCosts *contentcosts = new CPopupContentTypeCosts;
 
@@ -1402,6 +1468,8 @@ static int CclDefineButton(lua_State *l)
 			ba.Pos = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Level")) {
 			ba.Level = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "AlwaysShow")) {
+			ba.AlwaysShow = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
 			ba.Icon.Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Action")) {
@@ -1547,7 +1615,7 @@ static int CclDefineButton(lua_State *l)
 	}
 	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr,
 			  ba.Allowed, ba.AllowStr, /*ba.Key,*/ ba.Hint, ba.Description, ba.CommentSound.Name,
-			  ba.ButtonCursor, ba.UnitMask, ba.Popup);
+			  ba.ButtonCursor, ba.UnitMask, ba.Popup, ba.AlwaysShow);
 	return 0;
 }
 

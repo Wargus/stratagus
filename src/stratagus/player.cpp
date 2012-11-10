@@ -39,6 +39,7 @@
 
 #include "player.h"
 
+#include "actions.h"
 #include "ai.h"
 #include "iolib.h"
 #include "map.h"
@@ -583,6 +584,7 @@ void CreatePlayer(int type)
 void CPlayer::Init(/* PlayerTypes */ int type)
 {
 	this->Units.resize(0);
+	this->FreeWorkers.resize(0);
 
 	//  Take first slot for person on this computer,
 	//  fill other with computer players.
@@ -754,6 +756,7 @@ void CPlayer::Clear()
 	AiEnabled = false;
 	Ai = 0;
 	this->Units.resize(0);
+	this->FreeWorkers.resize(0);
 	NumBuildings = 0;
 	Supply = 0;
 	Demand = 0;
@@ -805,6 +808,20 @@ void CPlayer::RemoveUnit(CUnit &unit)
 	Assert(last == &unit || this->Units[last->PlayerSlot] == last);
 }
 
+void CPlayer::UpdateFreeWorkers()
+{
+	FreeWorkers.clear();
+	const int nunits = this->GetUnitCount();
+
+	for (int i = 0; i < nunits; ++i) {
+		CUnit &unit = this->GetUnit(i);
+		if (unit.Type->Harvester && unit.Type->ResInfo && !unit.Removed) {
+			if (unit.CurrentAction() == UnitActionStill) {
+				FreeWorkers.push_back(&unit);
+			}
+		}
+	}
+}
 
 
 std::vector<CUnit *>::const_iterator CPlayer::UnitBegin() const
@@ -1147,6 +1164,8 @@ void PlayersEachSecond(int playerIdx)
 	if (player.AiEnabled) {
 		AiEachSecond(player);
 	}
+
+	player.UpdateFreeWorkers();
 }
 
 /**

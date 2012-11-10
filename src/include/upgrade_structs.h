@@ -73,6 +73,7 @@ enum CostType {
 #define FoodCost MaxCosts
 #define ScoreCost (MaxCosts + 1)
 #define ManaResCost (MaxCosts + 2)
+#define FreeWorkersCount (MaxCosts + 3)
 
 /**
 **  Default resources for a new player.
@@ -159,6 +160,7 @@ public:
 	void SetIcon(CIcon *icon);
 
 	std::string Ident;                /// identifier
+	std::string Name;                 /// upgrade label
 	int   ID;                         /// numerical id
 	int   Costs[MaxCosts];            /// costs for the upgrade
 	// TODO: not used by buttons

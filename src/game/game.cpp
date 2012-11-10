@@ -940,6 +940,7 @@ void CleanGame()
 	EndReplayLog();
 	CleanMessages();
 
+	RestoreColorCyclingSurface();
 	CleanGame_Lua();
 	CleanTriggers();
 	CleanAi();
@@ -951,7 +952,6 @@ void CleanGame()
 	Map.Clean();
 	CleanReplayLog();
 	FreePathfinder();
-	RestoreColorCyclingSurface();
 	CursorBuilding = NULL;
 	UnitUnderCursor = NULL;
 }

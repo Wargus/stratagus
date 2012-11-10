@@ -204,7 +204,7 @@ void CUserInterface::Load()
 		Fillers[i].Load();
 	}
 
-	for (int i = 0; i <= ManaResCost; ++i) {
+	for (int i = 0; i <= FreeWorkersCount; ++i) {
 		if (Resources[i].G) {
 			Resources[i].G->Load();
 			Resources[i].G->UseDisplayFormat();
@@ -297,7 +297,7 @@ void CleanUserInterface()
 	UI.Fillers.clear();
 
 	// Resource Icons
-	for (int i = 0; i <= ManaResCost; ++i) {
+	for (int i = 0; i <= FreeWorkersCount; ++i) {
 		CGraphic::Free(UI.Resources[i].G);
 	}
 

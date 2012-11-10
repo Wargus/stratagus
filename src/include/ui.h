@@ -445,7 +445,8 @@ public:
 class PopupConditionPanel
 {
 public:
-	PopupConditionPanel() :  HasHint(false), HasDescription(false), BoolFlags(NULL), Variables(NULL) {}
+	PopupConditionPanel() :  HasHint(false), HasDescription(false), HasDependencies(false),
+		ButtonAction(-1), BoolFlags(NULL), Variables(NULL) {}
 	~PopupConditionPanel() {
 		delete[] BoolFlags;
 		delete[] Variables;
@@ -453,6 +454,9 @@ public:
 
 	bool HasHint;               /// check if button has hint.
 	bool HasDescription;        /// check if button has description.
+	bool HasDependencies;       /// check if button has dependencies or restrictions.
+	int ButtonAction;           /// action type of button
+	std::string ButtonValue;    /// value used in ValueStr field of button
 
 	char *BoolFlags;            /// array of condition about user flags.
 	char *Variables;            /// array of variable to verify (enable and max > 0)
@@ -489,13 +493,14 @@ public:
 
 enum PopupButtonInfo_Types {
 	PopupButtonInfo_Hint,
-	PopupButtonInfo_Description
+	PopupButtonInfo_Description,
+	PopupButtonInfo_Dependencies
 };
 
 class CPopupContentTypeButtonInfo : public CPopupContentType
 {
 public:
-	CPopupContentTypeButtonInfo() : InfoType(0), MaxWidth(0), Font(NULL), Centered(0) {}
+	CPopupContentTypeButtonInfo() : InfoType(0), MaxWidth(0), Font(NULL) {}
 	virtual ~CPopupContentTypeButtonInfo() {}
 
 	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
@@ -506,7 +511,22 @@ public:
 	int InfoType;                /// Type of information to show.
 	unsigned int MaxWidth;       /// Maximum width of multilined information.
 	CFont *Font;                 /// Font to use.
-	char Centered;               /// if true, center the display.
+};
+
+class CPopupContentTypeText : public CPopupContentType
+{
+public:
+	CPopupContentTypeText() : MaxWidth(0), Font(NULL) {}
+	virtual ~CPopupContentTypeText() {}
+
+	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
+
+	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
+	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
+
+	std::string Text;            /// Text to display
+	unsigned int MaxWidth;       /// Maximum width of multilined text.
+	CFont *Font;                 /// Font to use.
 };
 
 class CPopupContentTypeCosts : public CPopupContentType
@@ -591,7 +611,7 @@ public:
 	int TextX;     /// text X position
 	int TextY;     /// text Y position
 };
-#define MaxResourceInfo  MaxCosts + 3 /// +3 for food and score and mana
+#define MaxResourceInfo  MaxCosts + 4 /// +4 for food and score and mana and free workers count
 
 class CInfoPanel
 {
