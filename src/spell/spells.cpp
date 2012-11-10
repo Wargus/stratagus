@@ -216,7 +216,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 	bool inCombat = false;
 	for (size_t i = 0; i < table.size(); ++i) {
 		if (table[i]->IsVisibleAsGoal(*caster.Player) && caster.IsEnemy(*table[i])
-			&& CanTarget(caster.Type, table[i]->Type)) {
+			&& CanTarget(*caster.Type, *table[i]->Type)) {
 				inCombat = true;
 				break;
 		}
