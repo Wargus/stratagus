@@ -819,7 +819,7 @@ void AiForce::Update()
 		// We must put away all units which are too far from main group
 		for (size_t i = 0; i != Size(); ++i) {
 			const int distance = Units[i]->MapDistanceTo(this->GoalPos);
-			minDist = std::min(minDist, Units[i]->MapDistanceTo(this->GoalPos));
+			minDist = std::min(minDist, distance);
 		}
 
 		for (size_t i = 0; i != Size(); ++i) {
@@ -928,7 +928,6 @@ void AiForceManager::Update()
 			} else { // Find idle units and order them to defend
 				// Don't attack if there aren't our units near goal point
 				std::vector<CUnit *> nearGoal;
-				const int range = force.Units[0]->Type->ReactRangeComputer;
 				const Vec2i offset(15, 15);
 				Select(force.GoalPos - offset, force.GoalPos + offset, nearGoal,
 					IsAnAlliedUnitOf(*force.Units[0]->Player));
