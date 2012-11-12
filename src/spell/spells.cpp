@@ -208,22 +208,23 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 	int range = autocast->Range;
 
 	// Select all units aroung the caster
-
 	std::vector<CUnit *> table;
 	SelectAroundUnit(caster, range, table);
 
-	//  Check every unit if it is hostile
-	bool inCombat = false;
-	for (size_t i = 0; i < table.size(); ++i) {
-		if (table[i]->IsVisibleAsGoal(*caster.Player) && caster.IsEnemy(*table[i])
-			&& CanTarget(*caster.Type, *table[i]->Type)) {
-			inCombat = true;
-			break;
-		}
-	}
-
 	// Check generic conditions. FIXME: a better way to do this?
 	if (autocast->Combat != CONDITION_TRUE) {
+		// Check each unit if it is hostile.
+		bool inCombat = false;
+		for (size_t i = 0; i < table.size(); ++i) {
+			const CUnit &target = *table[i];
+
+			// Note that CanTarget doesn't take into account (offensive) spells...
+			if (target.IsVisibleAsGoal(*caster.Player) && caster.IsEnemy(target)
+				&& (CanTarget(*caster.Type, *target.Type) || CanTarget(*target.Type, *caster.Type))) {
+				inCombat = true;
+				break;
+			}
+		}
 		if ((autocast->Combat == CONDITION_ONLY) ^ (inCombat)) {
 			return NULL;
 		}
