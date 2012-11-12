@@ -813,8 +813,8 @@ void AiForce::Update()
 	Assert(Map.Info.IsPointOnMap(GoalPos));
 	if (State == AiForceAttackingState_GoingToRallyPoint) {
 		// Check if we are near the goalpos
-		int maxDist, minDist;
-		maxDist = minDist = Units[0]->MapDistanceTo(this->GoalPos);
+		int minDist = Units[0]->MapDistanceTo(this->GoalPos);
+		int maxDist = minDist;
 
 		// We must put away all units which are too far from main group
 		for (size_t i = 0; i != Size(); ++i) {
@@ -825,10 +825,10 @@ void AiForce::Update()
 		for (size_t i = 0; i != Size(); ++i) {
 			const int distance = Units[i]->MapDistanceTo(this->GoalPos);
 			// Don't count units which are too far away from main group
-			if (abs(minDist - distance) > thresholdDist * 8) {
+			if (distance - minDist > thresholdDist * 8) {
 				continue;
 			}
-			maxDist = std::max(maxDist, Units[i]->MapDistanceTo(this->GoalPos));
+			maxDist = std::max(maxDist, distance);
 		}
 		if (maxDist <= thresholdDist) {
 			const CUnit *unit = NULL;
