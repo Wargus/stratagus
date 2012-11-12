@@ -701,7 +701,7 @@ static int FormatNumber(int number, char *buf)
 **
 **  @return computed value.
 */
-static int strchrlen(const std::string &s, char c, unsigned int maxlen, CFont *font)
+static int strchrlen(const std::string &s, char c, unsigned int maxlen, const CFont *font)
 {
 	if (s.empty()) {
 		return 0;
@@ -745,7 +745,7 @@ static int strchrlen(const std::string &s, char c, unsigned int maxlen, CFont *f
 **
 **  @return computed value.
 */
-std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, CFont *font)
+std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, const CFont *font)
 {
 	unsigned int res;
 	std::string s1 = s;

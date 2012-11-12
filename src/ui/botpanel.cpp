@@ -324,7 +324,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 
 /* virtual */ int CPopupContentTypeButtonInfo::GetWidth(const ButtonAction &button, int *) const
 {
-	CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	std::string draw("");
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
@@ -353,9 +353,9 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 
 /* virtual */ int CPopupContentTypeButtonInfo::GetHeight(const ButtonAction &button, int *) const
 {
-	CFont &font = this->Font ? *this->Font : GetSmallFont();
-	int height = 0;
-	std::string draw("");
+	const CFont &font = this->Font ? *this->Font : GetSmallFont();
+	std::string draw;
+
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
 			draw = button.Hint;
@@ -367,6 +367,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 			draw = PrintDependencies(*ThisPlayer, button);
 			break;
 	}
+	int height = 0;
 	if (draw.length()) {
 		int i = 1;
 		while ((GetLineFont(i++, draw, this->MaxWidth, &font)).length()) {
@@ -378,7 +379,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 
 /* virtual */ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *) const
 {
-	CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, this->TextColor, this->HighlightColor);
 	std::string draw("");
 	switch (this->InfoType) {
@@ -409,13 +410,13 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 
 /* virtual */ int CPopupContentTypeText::GetWidth(const ButtonAction &button, int *) const
 {
-	CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 
-	int width = 0;
-	std::string sub;
 	if (this->MaxWidth) {
 		return std::min((unsigned int)font.getWidth(this->Text), this->MaxWidth);
 	}
+	int width = 0;
+	std::string sub;
 	int i = 1;
 	while (!(sub = GetLineFont(i++, this->Text, 0, &font)).empty()) {
 		width = std::max(width, font.getWidth(sub));
@@ -436,7 +437,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 
 /* virtual */ void CPopupContentTypeText::Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *) const
 {
-	CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, this->TextColor, this->HighlightColor);
 	std::string sub;
 	int i = 0;
@@ -453,7 +454,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 /* virtual */ int CPopupContentTypeCosts::GetWidth(const ButtonAction &button, int *Costs) const
 {
 	int popupWidth = 0;
-	CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 
 	for (unsigned int i = 1; i < MaxCosts; ++i) {
 		if (Costs[i]) {
@@ -494,7 +495,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 /* virtual */ int CPopupContentTypeCosts::GetHeight(const ButtonAction &button, int *Costs) const
 {
 	int popupHeight = 0;
-	CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i] && UI.Resources[i].G) {
@@ -506,7 +507,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 
 /* virtual */ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup *, const unsigned int, const ButtonAction &button, int *Costs) const
 {
-	CFont &font = this->Font ? *this->Font : GetSmallFont();
+	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, this->TextColor, this->HighlightColor);
 
 	for (unsigned int i = 1; i < MaxCosts; ++i) {
@@ -526,9 +527,9 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 		}
 	}
 	if (Costs[MaxCosts]) {
-		const SpellType *spell = SpellTypeTable[button.Value];
+		const SpellType &spell = *SpellTypeTable[button.Value];
 		const CGraphic *G = UI.Resources[ManaResCost].G;
-		if (spell->ManaCost) {
+		if (spell.ManaCost) {
 			int y_offset = 0;
 			if (G) {
 				int x_offset =  UI.Resources[ManaResCost].IconWidth;
@@ -539,7 +540,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 				y_offset -= font.Height();
 				y_offset /= 2;
 			}
-			label.Draw(x, y + y_offset, spell->ManaCost);
+			label.Draw(x, y + y_offset, spell.ManaCost);
 		}
 	}
 }

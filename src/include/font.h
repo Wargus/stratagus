@@ -165,7 +165,7 @@ extern void SetDefaultTextColors(const std::string &normal, const std::string &r
 /// Get the default text colors for normal and reverse text
 extern void GetDefaultTextColors(std::string &normalp, std::string &reversep);
 ///  Return the 'line' line of the string 's'.
-extern std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, CFont *font);
+extern std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, const CFont *font);
 
 /// Get the hot key from a string
 extern int GetHotKey(const std::string &text);
