@@ -144,7 +144,7 @@ void CIcon::DrawGrayscaleIcon(const PixelPos &pos) const
 	SDL_Color colors[256], backup[256];
 	SDL_Palette &pal = *this->G->Surface->format->palette;
 	memcpy(backup, pal.colors, sizeof(SDL_Color) * 256);
-	for(int i = 0; i < 256; ++i){
+	for (int i = 0; i < 256; ++i) {
 		int gray = 0.2 * pal.colors[i].r + 0.4 * pal.colors[i].g + 0.12 * pal.colors[i].b;
 		colors[i].r = colors[i].g = colors[i].b = gray;
 	}

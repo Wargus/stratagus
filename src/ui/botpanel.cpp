@@ -397,8 +397,8 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 		int i = 0;
 		int y_off = y;
 		unsigned int width = this->MaxWidth
-			? std::min(this->MaxWidth, popupWidth - 2 * popup->MarginX)
-			: 0;
+							 ? std::min(this->MaxWidth, popupWidth - 2 * popup->MarginX)
+							 : 0;
 		while ((sub = GetLineFont(++i, draw, width, &font)).length()) {
 			label.Draw(x, y_off, sub);
 			y_off += font.Height() + 2;
@@ -410,7 +410,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 /* virtual */ int CPopupContentTypeText::GetWidth(const ButtonAction &button, int *) const
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
-	
+
 	int width = 0;
 	std::string sub;
 	if (this->MaxWidth) {
@@ -442,8 +442,8 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 	int i = 0;
 	int y_off = y;
 	unsigned int width = this->MaxWidth
-		? std::min(this->MaxWidth, popupWidth - 2 * popup->MarginX)
-		: 0;
+						 ? std::min(this->MaxWidth, popupWidth - 2 * popup->MarginX)
+						 : 0;
 	while ((sub = GetLineFont(++i, this->Text, width, &font)).length()) {
 		label.Draw(x, y_off, sub);
 		y_off += font.Height() + 2;

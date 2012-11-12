@@ -100,7 +100,7 @@ public:
 	explicit IsAnAlliedUnitOf(const CPlayer &_player) : player(&_player) {}
 	bool operator()(const CUnit *unit) const {
 		return unit->IsVisibleAsGoal(*player) && (unit->Player->Index == player->Index
-			|| unit->IsAllied(*player));
+												  || unit->IsAllied(*player));
 	}
 private:
 	const CPlayer *player;
@@ -318,8 +318,8 @@ VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, c
 {
 	if (AiEnemyUnitsInDistance(*startUnit.Player, NULL, pos, 20) == false
 		&& Distance(pos, startPos) <= abs(distance - 20)) {
-			*resultPos = pos;
-			return VisitResult_Finished;
+		*resultPos = pos;
+		return VisitResult_Finished;
 	}
 	if (CanMoveToMask(pos, movemask)) { // reachable
 		return VisitResult_Ok;
@@ -930,7 +930,7 @@ void AiForceManager::Update()
 				std::vector<CUnit *> nearGoal;
 				const Vec2i offset(15, 15);
 				Select(force.GoalPos - offset, force.GoalPos + offset, nearGoal,
-					IsAnAlliedUnitOf(*force.Units[0]->Player));
+					   IsAnAlliedUnitOf(*force.Units[0]->Player));
 				if (nearGoal.empty()) {
 					force.ReturnToHome();
 				} else {
