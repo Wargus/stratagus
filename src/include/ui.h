@@ -465,8 +465,8 @@ public:
 class CPopupContentType
 {
 public:
-	CPopupContentType() : PosX(0), PosY(0),
-		MarginX(MARGIN_X), MarginY(MARGIN_Y), MinWidth(0), MinHeight(0),
+	CPopupContentType() : pos(0, 0),
+		MarginX(MARGIN_X), MarginY(MARGIN_Y), minSize(0, 0),
 		Wrap(true), Condition(NULL) {}
 	virtual ~CPopupContentType() { delete Condition; }
 
@@ -482,13 +482,11 @@ public:
 	static CPopupContentType *ParsePopupContent(lua_State *l);
 
 public:
-	int PosX;                   /// X position to draw.
-	int PosY;                   /// Y position to draw.
+	PixelPos pos;               /// position to draw.
 
 	int MarginX;                /// Left and right margin width.
 	int MarginY;                /// Upper and lower margin height.
-	int MinWidth;               /// Minimal width covered by content type.
-	int MinHeight;              /// Minimal height covered by content type.
+	PixelSize minSize;          /// Minimal size covered by content type.
 	bool Wrap;                  /// If true, the next content will be placed on the next "line".
 protected:
 	std::string TextColor;      /// Color used for plain text in content.

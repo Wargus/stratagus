@@ -1039,8 +1039,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 	content->Wrap = wrap;
 	content->MarginX = marginX;
 	content->MarginY = marginY;
-	content->MinWidth = minWidth;
-	content->MinHeight = minHeight;
+	content->minSize.x = minWidth;
+	content->minSize.y = minHeight;
 	content->Condition = condition;
 	content->TextColor = textColor;
 	content->HighlightColor = highColor;

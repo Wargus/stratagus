@@ -699,13 +699,11 @@ static void GetPopupSize(const CPopup &popup, const ButtonAction &button,
 
 		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
 			// Automatically write the calculated coordinates.
-			content.PosX = contentWidth + content.MarginX;
-			content.PosY = popupHeight + content.MarginY;
+			content.pos.x = contentWidth + content.MarginX;
+			content.pos.y = popupHeight + content.MarginY;
 
-			contentWidth += std::max(content.MinWidth, 2 * content.MarginX
-									 + content.GetWidth(button, Costs));
-			contentHeight = std::max(content.MinHeight, 2 * content.MarginY
-									 + content.GetHeight(button, Costs));
+			contentWidth += std::max(content.minSize.x, 2 * content.MarginX + content.GetWidth(button, Costs));
+			contentHeight = std::max(content.minSize.y, 2 * content.MarginY + content.GetHeight(button, Costs));
 			maxContentHeight = std::max(contentHeight, maxContentHeight);
 			if (content.Wrap) {
 				popupWidth += contentWidth - maxContentWidth > 0 ? contentWidth - maxContentWidth : 0;
@@ -890,7 +888,7 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton)
 		const CPopupContentType &content = **it;
 
 		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
-			content.Draw(x + content.PosX, y + content.PosY, *popup, popupWidth, button, Costs);
+			content.Draw(x + content.pos.x, y + content.pos.y, *popup, popupWidth, button, Costs);
 		}
 	}
 
