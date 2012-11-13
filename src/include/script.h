@@ -303,8 +303,6 @@ CUnit *CclGetUnitFromRef(lua_State *l);
 **  @param l  Lua state.
 **  @param x  pointer to output x position.
 **  @param y  pointer to output y position.
-**
-**  @return   The unit pointer
 */
 template <typename T>
 static void CclGetPos(lua_State *l, T *x , T *y, const int offset = -1)
