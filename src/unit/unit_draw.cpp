@@ -296,23 +296,9 @@ static int CclDefineSprites(lua_State *l)
 			} else if (!strcmp(key, "File")) {
 				deco.File = LuaToString(l, -1);
 			} else if (!strcmp(key, "Offset")) {
-				if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
-					LuaError(l, "incorrect argument");
-				}
-				lua_rawgeti(l, -1, 1); // offsetX
-				lua_rawgeti(l, -2, 2); // offsetY
-				deco.HotPos.x = LuaToNumber(l, -2);
-				deco.HotPos.y = LuaToNumber(l, -1);
-				lua_pop(l, 2); // Pop offsetX and Y
+				CclGetPos(l, &deco.HotPos.x, &deco.HotPos.y);
 			} else if (!strcmp(key, "Size")) {
-				if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
-					LuaError(l, "incorrect argument");
-				}
-				lua_rawgeti(l, -1, 1); // Width
-				lua_rawgeti(l, -2, 2); // Height
-				deco.Width = LuaToNumber(l, -2);
-				deco.Height = LuaToNumber(l, -1);
-				lua_pop(l, 2); // Pop Width and Height
+				CclGetPos(l, &deco.Width, &deco.Height);
 			} else { // Error.
 				LuaError(l, "incorrect field '%s' for the DefineSprite." _C_ key);
 			}

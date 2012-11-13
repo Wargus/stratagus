@@ -1545,19 +1545,9 @@ static int CclDefineDecorations(lua_State *l)
 				tmp.Index = UnitTypeVar.VariableNameLookup[value];// User variables
 				Assert(tmp.Index != -1);
 			} else if (!strcmp(key, "Offset")) {
-				Assert(lua_istable(l, -1));
-				lua_rawgeti(l, -1, 1); // X
-				lua_rawgeti(l, -2, 2); // Y
-				tmp.OffsetX = LuaToNumber(l, -2);
-				tmp.OffsetY = LuaToNumber(l, -1);
-				lua_pop(l, 2); // Pop X and Y
+				CclGetPos(l, &tmp.OffsetX, &tmp.OffsetY);
 			} else if (!strcmp(key, "OffsetPercent")) {
-				Assert(lua_istable(l, -1));
-				lua_rawgeti(l, -1, 1); // X
-				lua_rawgeti(l, -2, 2); // Y
-				tmp.OffsetXPercent = LuaToNumber(l, -2);
-				tmp.OffsetYPercent = LuaToNumber(l, -1);
-				lua_pop(l, 2); // Pop X and Y
+				CclGetPos(l, &tmp.OffsetXPercent, &tmp.OffsetYPercent);
 			} else if (!strcmp(key, "CenterX")) {
 				tmp.IsCenteredInX = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "CenterY")) {

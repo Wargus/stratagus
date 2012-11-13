@@ -686,12 +686,7 @@ static CContentType *CclParseContent(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const char *key = LuaToString(l, -2);
 		if (!strcmp(key, "Pos")) {
-			Assert(lua_istable(l, -1));
-			lua_rawgeti(l, -1, 1); // X
-			lua_rawgeti(l, -2, 2); // Y
-			posX = LuaToNumber(l, -2);
-			posY = LuaToNumber(l, -1);
-			lua_pop(l, 2); // Pop X and Y
+			CclGetPos(l, &posX, &posY);
 		} else if (!strcmp(key, "More")) {
 			Assert(lua_istable(l, -1));
 			lua_rawgeti(l, -1, 1); // Method name
@@ -748,12 +743,7 @@ static int CclDefinePanelContents(lua_State *l)
 			if (!strcmp(key, "Ident")) {
 				infopanel->Name = LuaToString(l, -1);
 			} else if (!strcmp(key, "Pos")) {
-				Assert(lua_istable(l, -1));
-				lua_rawgeti(l, -1, 1); // X
-				lua_rawgeti(l, -2, 2); // Y
-				infopanel->PosX = LuaToNumber(l, -2);
-				infopanel->PosY = LuaToNumber(l, -1);
-				lua_pop(l, 2); // Pop X and Y
+				CclGetPos(l, &infopanel->PosX, &infopanel->PosY);
 			} else if (!strcmp(key, "DefaultFont")) {
 				infopanel->DefaultFont = CFont::Get(LuaToString(l, -1));
 			} else if (!strcmp(key, "Condition")) {
@@ -1017,12 +1007,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 		} else if (!strcmp(key, "HighlightColor")) {
 			highColor = LuaToString(l, -1);
 		} else if (!strcmp(key, "Margin")) {
-			Assert(lua_istable(l, -1));
-			lua_rawgeti(l, -1, 1); // X
-			lua_rawgeti(l, -2, 2); // Y
-			marginX = LuaToNumber(l, -2);
-			marginY = LuaToNumber(l, -1);
-			lua_pop(l, 2); // Pop X and Y
+			CclGetPos(l, &marginX, &marginY);
 		} else if (!strcmp(key, "MinWidth")) {
 			minWidth = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "MinHeight")) {
@@ -1089,12 +1074,7 @@ static int CclDefinePopup(lua_State *l)
 		} else if (!strcmp(key, "BorderColor")) {
 			popup->BorderColor = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "Margin")) {
-			Assert(lua_istable(l, -1));
-			lua_rawgeti(l, -1, 1); // X
-			lua_rawgeti(l, -2, 2); // Y
-			popup->MarginX = LuaToNumber(l, -2);
-			popup->MarginY = LuaToNumber(l, -1);
-			lua_pop(l, 2); // Pop X and Y
+			CclGetPos(l, &popup->MarginX, &popup->MarginY);
 		} else if (!strcmp(key, "MinWidth")) {
 			popup->MinWidth = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "MinHeight")) {
