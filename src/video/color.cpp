@@ -33,12 +33,31 @@
 
 #include "color.h"
 
+#include "script.h"
+
 #include "SDL.h"
 
 CColor::operator SDL_Color() const
 {
 	SDL_Color c = { R, G, B, A };
 	return c;
+}
+
+void CColor::Parse(lua_State *l, const int offset)
+{
+	if (!lua_istable(l, offset) || lua_rawlen(l, offset) != 3) {
+		LuaError(l, "incorrect argument");
+	}
+	lua_rawgeti(l, offset, 1);
+	this->R = LuaToNumber(l, -1);
+	lua_pop(l, 1);
+	lua_rawgeti(l, offset, 2);
+	this->G = LuaToNumber(l, -1);
+	lua_pop(l, 1);
+	lua_rawgeti(l, offset, 3);
+	this->B = LuaToNumber(l, -1);
+	lua_pop(l, 1);
+	this->A = 0;
 }
 
 //@}

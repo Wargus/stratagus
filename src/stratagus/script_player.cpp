@@ -633,16 +633,8 @@ static int CclDefinePlayerColors(lua_State *l)
 		}
 		for (int j = 0; j < numcolors; ++j) {
 			lua_rawgeti(l, -1, j + 1);
-			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 3) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			lua_rawgeti(l, -2, 2);
-			lua_rawgeti(l, -3, 3);
-			PlayerColorsRGB[i / 2][j].R = LuaToNumber(l, -3);
-			PlayerColorsRGB[i / 2][j].G = LuaToNumber(l, -2);
-			PlayerColorsRGB[i / 2][j].B = LuaToNumber(l, -1);
-			lua_pop(l, 3 + 1);
+			PlayerColorsRGB[i / 2][j].Parse(l);
+			lua_pop(l, 1);
 		}
 	}
 

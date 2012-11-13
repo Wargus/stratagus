@@ -521,18 +521,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Decoration")) {
 			type->Decoration = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NeutralMinimapColor")) {
-			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 3) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			type->NeutralMinimapColorRGB.R = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			type->NeutralMinimapColorRGB.G = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 3);
-			type->NeutralMinimapColorRGB.B = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			type->NeutralMinimapColorRGB.Parse(l);
 		} else if (!strcmp(value, "BoxSize")) {
 			CclGetPos(l, &type->BoxWidth, &type->BoxHeight);
 		} else if (!strcmp(value, "BoxOffset")) {
