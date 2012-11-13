@@ -49,14 +49,23 @@ void CColor::Parse(lua_State *l, const int offset)
 		LuaError(l, "incorrect argument");
 	}
 	lua_rawgeti(l, offset, 1);
-	this->R = LuaToNumber(l, -1);
+	const int r = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 	lua_rawgeti(l, offset, 2);
-	this->G = LuaToNumber(l, -1);
+	const int g = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 	lua_rawgeti(l, offset, 3);
-	this->B = LuaToNumber(l, -1);
+	const int b = LuaToNumber(l, -1);
 	lua_pop(l, 1);
+
+	if (!(0 <= r && r <= 255
+		&& 0 <= g && g <= 255
+		&& 0 <= b && b <= 255)) {
+		LuaError(l, "Arguments must be in the range 0-255");
+	}
+	this->R = r;
+	this->G = g;
+	this->B = b;
 	this->A = 0;
 }
 
