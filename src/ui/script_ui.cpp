@@ -469,6 +469,211 @@ static ConditionPanel *ParseConditionPanel(lua_State *l)
 	return condition;
 }
 
+/* virtual */ void CContentTypeText::Parse(lua_State *l)
+{
+	Assert(lua_istable(l, -1) || lua_isstring(l, -1));
+
+	if (lua_isstring(l, -1)) {
+		this->Text = CclParseStringDesc(l);
+		lua_pushnil(l); // ParseStringDesc eat token
+	} else {
+		for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+			const char *key = LuaToString(l, -2);
+			if (!strcmp(key, "Text")) {
+				this->Text = CclParseStringDesc(l);
+				lua_pushnil(l); // ParseStringDesc eat token
+			} else if (!strcmp(key, "Font")) {
+				this->Font = CFont::Get(LuaToString(l, -1));
+			} else if (!strcmp(key, "Centered")) {
+				this->Centered = LuaToBoolean(l, -1);
+			} else if (!strcmp(key, "Variable")) {
+				const char *const name = LuaToString(l, -1);
+				this->Index = UnitTypeVar.VariableNameLookup[name];
+				if (this->Index == -1) {
+					LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
+				}
+			} else if (!strcmp(key, "Component")) {
+				this->Component = Str2EnumVariable(l, LuaToString(l, -1));
+			} else if (!strcmp(key, "Stat")) {
+				this->Stat = LuaToBoolean(l, -1);
+			} else if (!strcmp(key, "ShowName")) {
+				this->ShowName = LuaToBoolean(l, -1);
+			} else {
+				LuaError(l, "'%s' invalid for method 'Text' in DefinePanels" _C_ key);
+			}
+		}
+	}
+}
+
+/* virtual */ void CContentTypeFormattedText::Parse(lua_State *l)
+{
+	Assert(lua_istable(l, -1));
+
+	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+		const char *key = LuaToString(l, -2);
+		if (!strcmp(key, "Format")) {
+			this->Format = LuaToString(l, -1);
+		} else if (!strcmp(key, "Font")) {
+			this->Font = CFont::Get(LuaToString(l, -1));
+		} else if (!strcmp(key, "Variable")) {
+			const char *const name = LuaToString(l, -1);
+			this->Index = UnitTypeVar.VariableNameLookup[name];
+			if (this->Index == -1) {
+				LuaError(l, "unknown variable '%s'" _C_ name);
+			}
+		} else if (!strcmp(key, "Component")) {
+			this->Component = Str2EnumVariable(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "Centered")) {
+			this->Centered = LuaToBoolean(l, -1);
+		} else {
+			LuaError(l, "'%s' invalid for method 'FormattedText' in DefinePanels" _C_ key);
+		}
+	}
+}
+
+/* virtual */ void CContentTypeFormattedText2::Parse(lua_State *l)
+{
+	Assert(lua_istable(l, -1));
+	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+		const char *key = LuaToString(l, -2);
+		if (!strcmp(key, "Format")) {
+			this->Format = LuaToString(l, -1);
+		} else if (!strcmp(key, "Font")) {
+			this->Font = CFont::Get(LuaToString(l, -1));
+		} else if (!strcmp(key, "Variable")) {
+			const char *const name = LuaToString(l, -1);
+			this->Index1 = UnitTypeVar.VariableNameLookup[name];
+			this->Index2 = this->Index1;
+			if (this->Index1 == -1) {
+				LuaError(l, "unknown variable '%s'" _C_ name);
+			}
+		} else if (!strcmp(key, "Component")) {
+			this->Component1 = Str2EnumVariable(l, LuaToString(l, -1));
+			this->Component2 = Str2EnumVariable(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "Variable1")) {
+			const char *const name = LuaToString(l, -1);
+			this->Index1 = UnitTypeVar.VariableNameLookup[name];
+			if (this->Index1 == -1) {
+				LuaError(l, "unknown variable '%s'" _C_ name);
+			}
+		} else if (!strcmp(key, "Component1")) {
+			this->Component1 = Str2EnumVariable(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "Variable2")) {
+			const char *const name = LuaToString(l, -1);
+			this->Index2 = UnitTypeVar.VariableNameLookup[name];
+			if (this->Index2 == -1) {
+				LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
+			}
+		} else if (!strcmp(key, "Component2")) {
+			this->Component2 = Str2EnumVariable(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "Centered")) {
+			this->Centered = LuaToBoolean(l, -1);
+		} else {
+			LuaError(l, "'%s' invalid for method 'FormattedText2' in DefinePanels" _C_ key);
+		}
+	}
+
+}
+
+/* virtual */ void CContentTypeIcon::Parse(lua_State *l)
+{
+	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+		const char *key = LuaToString(l, -2);
+		if (!strcmp(key, "Unit")) {
+			this->UnitRef = Str2EnumUnit(l, LuaToString(l, -1));
+		} else {
+			LuaError(l, "'%s' invalid for method 'Icon' in DefinePanels" _C_ key);
+		}
+	}
+}
+
+/* virtual */ void CContentTypeLifeBar::Parse(lua_State *l)
+{
+	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+		const char *key = LuaToString(l, -2);
+		if (!strcmp(key, "Variable")) {
+			const char *const name = LuaToString(l, -1);
+			this->Index = UnitTypeVar.VariableNameLookup[name];
+			if (this->Index == -1) {
+				LuaError(l, "unknown variable '%s'" _C_ name);
+			}
+		} else if (!strcmp(key, "Height")) {
+			this->Height = LuaToNumber(l, -1);
+		} else if (!strcmp(key, "Width")) {
+			this->Width = LuaToNumber(l, -1);
+		} else {
+			LuaError(l, "'%s' invalid for method 'LifeBar' in DefinePanels" _C_ key);
+		}
+	}
+	// Default value and checking errors.
+	if (this->Height <= 0) {
+		this->Height = 5; // Default value.
+	}
+	if (this->Width <= 0) {
+		this->Width = 50; // Default value.
+	}
+	if (this->Index == -1) {
+		LuaError(l, "variable undefined for LifeBar");
+	}
+}
+
+/* virtual */ void CContentTypeCompleteBar::Parse(lua_State *l)
+{
+	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+		const char *key = LuaToString(l, -2);
+
+		if (!strcmp(key, "Variable")) {
+			const char *const name = LuaToString(l, -1);
+			this->Index = UnitTypeVar.VariableNameLookup[name];
+			if (this->Index == -1) {
+				LuaError(l, "unknown variable '%s'" _C_ name);
+			}
+		} else if (!strcmp(key, "Height")) {
+			this->Height = LuaToNumber(l, -1);
+		} else if (!strcmp(key, "Width")) {
+			this->Width = LuaToNumber(l, -1);
+		} else if (!strcmp(key, "Border")) {
+			this->Border = LuaToBoolean(l, -1);
+		} else if (!strcmp(key, "Color")) {
+			//FIXME: need more general way
+			const char *const color = LuaToString(l, -1);
+			if (!strcmp(color, "red")) {
+				this->Color = 1;
+			} else if (!strcmp(color, "yellow")) {
+				this->Color = 2;
+			} else if (!strcmp(color, "green")) {
+				this->Color = 3;
+			} else if (!strcmp(color, "gray")) {
+				this->Color = 4;
+			} else if (!strcmp(color, "white")) {
+				this->Color = 5;
+			} else if (!strcmp(color, "orange")) {
+				this->Color = 6;
+			} else if (!strcmp(color, "blue")) {
+				this->Color = 7;
+			} else if (!strcmp(color, "dark-green")) {
+				this->Color = 8;
+			} else if (!strcmp(color, "black")) {
+				this->Color = 9;
+			} else {
+				LuaError(l, "incorrect color: '%s' " _C_ color);
+			}
+		} else {
+			LuaError(l, "'%s' invalid for method 'CompleteBar' in DefinePanels" _C_ key);
+		}
+	}
+	// Default value and checking errors.
+	if (this->Height <= 0) {
+		this->Height = 5; // Default value.
+	}
+	if (this->Width <= 0) {
+		this->Width = 50; // Default value.
+	}
+	if (this->Index == -1) {
+		LuaError(l, "variable undefined for CompleteBar");
+	}
+}
+
 static CContentType *CclParseContent(lua_State *l)
 {
 	Assert(lua_istable(l, -1));
@@ -493,209 +698,21 @@ static CContentType *CclParseContent(lua_State *l)
 			lua_rawgeti(l, -2, 2); // Method data
 			key = LuaToString(l, -2);
 			if (!strcmp(key, "Text")) {
-				CContentTypeText *contenttext = new CContentTypeText;
-
-				Assert(lua_istable(l, -1) || lua_isstring(l, -1));
-				if (lua_isstring(l, -1)) {
-					contenttext->Text = CclParseStringDesc(l);
-					lua_pushnil(l); // ParseStringDesc eat token
-				} else {
-					for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-						key = LuaToString(l, -2);
-						if (!strcmp(key, "Text")) {
-							contenttext->Text = CclParseStringDesc(l);
-							lua_pushnil(l); // ParseStringDesc eat token
-						} else if (!strcmp(key, "Font")) {
-							contenttext->Font = CFont::Get(LuaToString(l, -1));
-						} else if (!strcmp(key, "Centered")) {
-							contenttext->Centered = LuaToBoolean(l, -1);
-						} else if (!strcmp(key, "Variable")) {
-							const char *const name = LuaToString(l, -1);
-							contenttext->Index = UnitTypeVar.VariableNameLookup[name];
-							if (contenttext->Index == -1) {
-								LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
-							}
-						} else if (!strcmp(key, "Component")) {
-							contenttext->Component = Str2EnumVariable(l, LuaToString(l, -1));
-						} else if (!strcmp(key, "Stat")) {
-							contenttext->Stat = LuaToBoolean(l, -1);
-						} else if (!strcmp(key, "ShowName")) {
-							contenttext->ShowName = LuaToBoolean(l, -1);
-						} else {
-							LuaError(l, "'%s' invalid for method 'Text' in DefinePanels" _C_ key);
-						}
-					}
-				}
-				content = contenttext;
+				content = new CContentTypeText;
 			} else if (!strcmp(key, "FormattedText")) {
-				CContentTypeFormattedText *contentformattedtext = new CContentTypeFormattedText;
-
-				Assert(lua_istable(l, -1));
-				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-					key = LuaToString(l, -2);
-					if (!strcmp(key, "Format")) {
-						contentformattedtext->Format = LuaToString(l, -1);
-					} else if (!strcmp(key, "Font")) {
-						contentformattedtext->Font = CFont::Get(LuaToString(l, -1));
-					} else if (!strcmp(key, "Variable")) {
-						const char *const name = LuaToString(l, -1);
-						contentformattedtext->Index = UnitTypeVar.VariableNameLookup[name];
-						if (contentformattedtext->Index == -1) {
-							LuaError(l, "unknown variable '%s'" _C_ name);
-						}
-					} else if (!strcmp(key, "Component")) {
-						contentformattedtext->Component = Str2EnumVariable(l, LuaToString(l, -1));
-					} else if (!strcmp(key, "Centered")) {
-						contentformattedtext->Centered = LuaToBoolean(l, -1);
-					} else {
-						LuaError(l, "'%s' invalid for method 'FormattedText' in DefinePanels" _C_ key);
-					}
-				}
-				content = contentformattedtext;
+				content = new CContentTypeFormattedText;
 			} else if (!strcmp(key, "FormattedText2")) {
-				CContentTypeFormattedText2 *contentformattedtext2 = new CContentTypeFormattedText2;
-
-				Assert(lua_istable(l, -1));
-				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-					key = LuaToString(l, -2);
-					if (!strcmp(key, "Format")) {
-						contentformattedtext2->Format = LuaToString(l, -1);
-					} else if (!strcmp(key, "Font")) {
-						contentformattedtext2->Font = CFont::Get(LuaToString(l, -1));
-					} else if (!strcmp(key, "Variable")) {
-						const char *const name = LuaToString(l, -1);
-						contentformattedtext2->Index1 = UnitTypeVar.VariableNameLookup[name];
-						contentformattedtext2->Index2 = contentformattedtext2->Index1;
-						if (contentformattedtext2->Index1 == -1) {
-							LuaError(l, "unknown variable '%s'" _C_ name);
-						}
-					} else if (!strcmp(key, "Component")) {
-						contentformattedtext2->Component1 = Str2EnumVariable(l, LuaToString(l, -1));
-						contentformattedtext2->Component2 = Str2EnumVariable(l, LuaToString(l, -1));
-					} else if (!strcmp(key, "Variable1")) {
-						const char *const name = LuaToString(l, -1);
-						contentformattedtext2->Index1 = UnitTypeVar.VariableNameLookup[name];
-						if (contentformattedtext2->Index1 == -1) {
-							LuaError(l, "unknown variable '%s'" _C_ name);
-						}
-					} else if (!strcmp(key, "Component1")) {
-						contentformattedtext2->Component1 = Str2EnumVariable(l, LuaToString(l, -1));
-					} else if (!strcmp(key, "Variable2")) {
-						const char *const name = LuaToString(l, -1);
-						contentformattedtext2->Index2 = UnitTypeVar.VariableNameLookup[name];
-						if (contentformattedtext2->Index2 == -1) {
-							LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
-						}
-					} else if (!strcmp(key, "Component2")) {
-						contentformattedtext2->Component2 = Str2EnumVariable(l, LuaToString(l, -1));
-					} else if (!strcmp(key, "Centered")) {
-						contentformattedtext2->Centered = LuaToBoolean(l, -1);
-					} else {
-						LuaError(l, "'%s' invalid for method 'FormattedText2' in DefinePanels" _C_ key);
-					}
-				}
-				content = contentformattedtext2;
+				content = new CContentTypeFormattedText2;
 			} else if (!strcmp(key, "Icon")) {
-				CContentTypeIcon *contenticon = new CContentTypeIcon;
-
-				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-					key = LuaToString(l, -2);
-					if (!strcmp(key, "Unit")) {
-						contenticon->UnitRef = Str2EnumUnit(l, LuaToString(l, -1));
-					} else {
-						LuaError(l, "'%s' invalid for method 'Icon' in DefinePanels" _C_ key);
-					}
-				}
-				content = contenticon;
+				content = new CContentTypeIcon;
 			} else if (!strcmp(key, "LifeBar")) {
-				CContentTypeLifeBar *contentlifebar = new CContentTypeLifeBar;
-
-				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-					key = LuaToString(l, -2);
-					if (!strcmp(key, "Variable")) {
-						const char *const name = LuaToString(l, -1);
-						contentlifebar->Index = UnitTypeVar.VariableNameLookup[name];
-						if (contentlifebar->Index == -1) {
-							LuaError(l, "unknown variable '%s'" _C_ name);
-						}
-					} else if (!strcmp(key, "Height")) {
-						contentlifebar->Height = LuaToNumber(l, -1);
-					} else if (!strcmp(key, "Width")) {
-						contentlifebar->Width = LuaToNumber(l, -1);
-					} else {
-						LuaError(l, "'%s' invalid for method 'LifeBar' in DefinePanels" _C_ key);
-					}
-				}
-				// Default value and checking errors.
-				if (contentlifebar->Height <= 0) {
-					contentlifebar->Height = 5; // Default value.
-				}
-				if (contentlifebar->Width <= 0) {
-					contentlifebar->Width = 50; // Default value.
-				}
-				if (contentlifebar->Index == -1) {
-					LuaError(l, "variable undefined for LifeBar");
-				}
-				content = contentlifebar;
+				content = new CContentTypeLifeBar;
 			} else if (!strcmp(key, "CompleteBar")) {
-				CContentTypeCompleteBar *contenttypecompletebar = new CContentTypeCompleteBar;
-
-				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-					key = LuaToString(l, -2);
-					if (!strcmp(key, "Variable")) {
-						const char *const name = LuaToString(l, -1);
-						contenttypecompletebar->Index = UnitTypeVar.VariableNameLookup[name];
-						if (contenttypecompletebar->Index == -1) {
-							LuaError(l, "unknown variable '%s'" _C_ name);
-						}
-					} else if (!strcmp(key, "Height")) {
-						contenttypecompletebar->Height = LuaToNumber(l, -1);
-					} else if (!strcmp(key, "Width")) {
-						contenttypecompletebar->Width = LuaToNumber(l, -1);
-					} else if (!strcmp(key, "Border")) {
-						contenttypecompletebar->Border = LuaToBoolean(l, -1);
-					} else if (!strcmp(key, "Color")) {
-						//FIXME: need more general way
-						const char *const color = LuaToString(l, -1);
-						if (!strcmp(color, "red")) {
-							contenttypecompletebar->Color = 1;
-						} else if (!strcmp(color, "yellow")) {
-							contenttypecompletebar->Color = 2;
-						} else if (!strcmp(color, "green")) {
-							contenttypecompletebar->Color = 3;
-						} else if (!strcmp(color, "gray")) {
-							contenttypecompletebar->Color = 4;
-						} else if (!strcmp(color, "white")) {
-							contenttypecompletebar->Color = 5;
-						} else if (!strcmp(color, "orange")) {
-							contenttypecompletebar->Color = 6;
-						} else if (!strcmp(color, "blue")) {
-							contenttypecompletebar->Color = 7;
-						} else if (!strcmp(color, "dark-green")) {
-							contenttypecompletebar->Color = 8;
-						} else if (!strcmp(color, "black")) {
-							contenttypecompletebar->Color = 9;
-						} else {
-							LuaError(l, "incorrect color: '%s' " _C_ color);
-						}
-					} else {
-						LuaError(l, "'%s' invalid for method 'CompleteBar' in DefinePanels" _C_ key);
-					}
-				}
-				// Default value and checking errors.
-				if (contenttypecompletebar->Height <= 0) {
-					contenttypecompletebar->Height = 5; // Default value.
-				}
-				if (contenttypecompletebar->Width <= 0) {
-					contenttypecompletebar->Width = 50; // Default value.
-				}
-				if (contenttypecompletebar->Index == -1) {
-					LuaError(l, "variable undefined for CompleteBar");
-				}
-				content = contenttypecompletebar;
+				content = new CContentTypeCompleteBar;
 			} else {
 				LuaError(l, "Invalid drawing method '%s' in DefinePanels" _C_ key);
 			}
+			content->Parse(l);
 			lua_pop(l, 2); // Pop Variable Name and Method
 		} else if (!strcmp(key, "Condition")) {
 			condition = ParseConditionPanel(l);

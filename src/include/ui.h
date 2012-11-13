@@ -207,6 +207,8 @@ public:
 	/// Tell how show the variable Index.
 	virtual void Draw(const CUnit &unit, CFont *defaultfont) const = 0;
 
+	virtual void Parse(lua_State *l) = 0;
+
 	int PosX;             /// X coordinate where to display.
 	int PosY;             /// Y coordinate where to display.
 
@@ -227,7 +229,9 @@ public:
 	}
 
 	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
+	virtual void Parse(lua_State *l);
 
+private:
 	StringDesc *Text;            /// Text to display.
 	CFont *Font;                 /// Font to use.
 	char Centered;               /// if true, center the display.
@@ -248,7 +252,9 @@ public:
 	virtual ~CContentTypeFormattedText() {}
 
 	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
+	virtual void Parse(lua_State *l);
 
+private:
 	std::string Format;          /// Text to display
 	CFont *Font;                 /// Font to use.
 	bool Centered;               /// if true, center the display.
@@ -267,7 +273,9 @@ public:
 	virtual ~CContentTypeFormattedText2() {}
 
 	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
+	virtual void Parse(lua_State *l);
 
+private:
 	std::string Format;          /// Text to display
 	CFont *Font;                 /// Font to use.
 	bool Centered;               /// if true, center the display.
@@ -284,7 +292,9 @@ class CContentTypeIcon : public CContentType
 {
 public:
 	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
+	virtual void Parse(lua_State *l);
 
+private:
 	EnumUnit UnitRef;           /// Which unit icon to display.(itself, container, ...)
 };
 
@@ -297,7 +307,9 @@ public:
 	CContentTypeLifeBar() : Index(-1), Width(0), Height(0) {}
 
 	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
+	virtual void Parse(lua_State *l);
 
+private:
 	int Index;           /// Index of the variable to show, -1 if not.
 	int Width;           /// Width of the bar.
 	int Height;          /// Height of the bar.
@@ -316,7 +328,9 @@ public:
 	CContentTypeCompleteBar() : Index(-1), Width(0), Height(0), Border(0), Color(0) {}
 
 	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
+	virtual void Parse(lua_State *l);
 
+private:
 	int Index;           /// Index of the variable to show, -1 if not.
 	int Width;           /// Width of the bar.
 	int Height;          /// Height of the bar.
