@@ -471,7 +471,7 @@ public:
 	virtual ~CPopupContentType() { delete Condition; }
 
 	/// Tell how show the variable Index.
-	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const = 0;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const = 0;
 	/// Get the content's width
 	virtual int GetWidth(const ButtonAction &button, int *Costs) const = 0;
 	/// Get the content's height
@@ -503,7 +503,7 @@ public:
 	CPopupContentTypeButtonInfo() : InfoType(0), MaxWidth(0), Font(NULL) {}
 	virtual ~CPopupContentTypeButtonInfo() {}
 
-	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
 
 	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
 	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
@@ -519,7 +519,7 @@ public:
 	CPopupContentTypeText() : MaxWidth(0), Font(NULL) {}
 	virtual ~CPopupContentTypeText() {}
 
-	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
 
 	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
 	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
@@ -535,7 +535,7 @@ public:
 	CPopupContentTypeCosts() : Font(NULL), Centered(0) {}
 	virtual ~CPopupContentTypeCosts() {}
 
-	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
 
 	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
 	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
@@ -550,7 +550,7 @@ public:
 	CPopupContentTypeLine();
 	virtual ~CPopupContentTypeLine() {}
 
-	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
 
 	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
 	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
@@ -569,7 +569,7 @@ public:
 		delete Text;
 	}
 
-	virtual void Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
+	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
 
 	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
 	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
@@ -688,7 +688,7 @@ public:
 	CInfoPanel InfoPanel;               /// Info panel
 	std::vector<CUnitInfoPanel *> InfoPanelContents;/// Info panel contents
 
-	std::vector<CPopup *> ButtonPopups;	/// Popup windows for buttons
+	std::vector<CPopup *> ButtonPopups; /// Popup windows for buttons
 
 	CUIButton *SingleSelectedButton;    /// Button for single selected unit
 

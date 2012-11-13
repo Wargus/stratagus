@@ -377,7 +377,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 	return height;
 }
 
-/* virtual */ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *) const
+/* virtual */ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *) const
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, this->TextColor, this->HighlightColor);
@@ -398,7 +398,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 		int i = 0;
 		int y_off = y;
 		unsigned int width = this->MaxWidth
-							 ? std::min(this->MaxWidth, popupWidth - 2 * popup->MarginX)
+							 ? std::min(this->MaxWidth, popupWidth - 2 * popup.MarginX)
 							 : 0;
 		while ((sub = GetLineFont(++i, draw, width, &font)).length()) {
 			label.Draw(x, y_off, sub);
@@ -435,7 +435,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 	return height;
 }
 
-/* virtual */ void CPopupContentTypeText::Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *) const
+/* virtual */ void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *) const
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, this->TextColor, this->HighlightColor);
@@ -443,7 +443,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 	int i = 0;
 	int y_off = y;
 	unsigned int width = this->MaxWidth
-						 ? std::min(this->MaxWidth, popupWidth - 2 * popup->MarginX)
+						 ? std::min(this->MaxWidth, popupWidth - 2 * popup.MarginX)
 						 : 0;
 	while ((sub = GetLineFont(++i, this->Text, width, &font)).length()) {
 		label.Draw(x, y_off, sub);
@@ -505,7 +505,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 	return std::max(popupHeight, font.Height());
 }
 
-/* virtual */ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup *, const unsigned int, const ButtonAction &button, int *Costs) const
+/* virtual */ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned int, const ButtonAction &button, int *Costs) const
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, this->TextColor, this->HighlightColor);
@@ -560,9 +560,9 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	return this->Height;
 }
 
-/* virtual */ void CPopupContentTypeLine::Draw(int x, int y, const CPopup *popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const
+/* virtual */ void CPopupContentTypeLine::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const
 {
-	Video.FillRectangle(this->Color, x - popup->MarginX - this->MarginX + 1,
+	Video.FillRectangle(this->Color, x - popup.MarginX - this->MarginX + 1,
 						y, this->Width && Width < popupWidth ? Width : popupWidth - 2, Height);
 }
 
@@ -581,7 +581,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	return font.Height();
 }
 
-/* virtual */ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup *, const unsigned int, const ButtonAction &button, int *) const
+/* virtual */ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigned int, const ButtonAction &button, int *) const
 {
 	std::string text;										// Optional text to display.
 	CFont &font = this->Font ? *this->Font : GetSmallFont(); // Font to use.
@@ -885,10 +885,12 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton)
 	Video.DrawRectangle(popup->BorderColor, x, y, popupWidth, popupHeight);
 
 	// Contents
-	for (std::vector<CPopupContentType *>::const_iterator content = popup->Contents.begin();
-		 content != popup->Contents.end(); ++content) {
-		if (CanShowPopupContent((*content)->Condition, button, UnitTypes[button.Value])) {
-			(*content)->Draw(x + (*content)->PosX, y + (*content)->PosY, popup, popupWidth, button, Costs);
+	for (std::vector<CPopupContentType *>::const_iterator it = popup->Contents.begin();
+		 it != popup->Contents.end(); ++it) {
+		const CPopupContentType &content = **it;
+
+		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
+			content.Draw(x + content.PosX, y + content.PosY, *popup, popupWidth, button, Costs);
 		}
 	}
 
