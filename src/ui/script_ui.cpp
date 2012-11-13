@@ -146,9 +146,7 @@ static int CclGetMouseScrollSpeedControl(lua_State *l)
 */
 static int CclSetClickMissile(lua_State *l)
 {
-	int args;
-
-	args = lua_gettop(l);
+	const int args = lua_gettop(l);
 	if (args > 1 || (args == 1 && (!lua_isnil(l, 1) && !lua_isstring(l, 1)))) {
 		LuaError(l, "incorrect argument");
 	}
@@ -156,7 +154,6 @@ static int CclSetClickMissile(lua_State *l)
 	if (args == 1 && !lua_isnil(l, 1)) {
 		ClickMissile = lua_tostring(l, 1);
 	}
-
 	return 0;
 }
 
@@ -167,9 +164,8 @@ static int CclSetClickMissile(lua_State *l)
 */
 static int CclSetDamageMissile(lua_State *l)
 {
-	int args;
+	const int args = lua_gettop(l);
 
-	args = lua_gettop(l);
 	if (args > 1 || (args == 1 && (!lua_isnil(l, 1) && !lua_isstring(l, 1)))) {
 		LuaError(l, "incorrect argument");
 	}
@@ -177,7 +173,6 @@ static int CclSetDamageMissile(lua_State *l)
 	if (args == 1 && !lua_isnil(l, 1)) {
 		DamageMissile = lua_tostring(l, 1);
 	}
-
 	return 0;
 }
 
@@ -187,10 +182,8 @@ static int CclSetMaxOpenGLTexture(lua_State *l)
 	if (CclInConfigFile) {
 		GLMaxTextureSizeOverride = LuaToNumber(l, 1);
 	}
-
 	return 0;
 }
-
 
 static int CclSetUseOpenGL(lua_State *l)
 {
@@ -271,26 +264,19 @@ static int CclGetVideoFullScreen(lua_State *l)
 */
 static int CclSetTitleScreens(lua_State *l)
 {
-	const char *value;
-	int i;
-	int args;
-	int j;
-	int subargs;
-	int k;
-
 	if (TitleScreens) {
-		for (i = 0; TitleScreens[i]; ++i) {
+		for (int i = 0; TitleScreens[i]; ++i) {
 			delete TitleScreens[i];
 		}
 		delete[] TitleScreens;
 		TitleScreens = NULL;
 	}
 
-	args = lua_gettop(l);
+	const int args = lua_gettop(l);
 	TitleScreens = new TitleScreen *[args + 1];
 	memset(TitleScreens, 0, (args + 1) * sizeof(TitleScreen *));
 
-	for (j = 0; j < args; ++j) {
+	for (int j = 0; j < args; ++j) {
 		if (!lua_istable(l, j + 1)) {
 			LuaError(l, "incorrect argument");
 		}
@@ -298,7 +284,7 @@ static int CclSetTitleScreens(lua_State *l)
 		TitleScreens[j]->Iterations = 1;
 		lua_pushnil(l);
 		while (lua_next(l, j + 1)) {
-			value = LuaToString(l, -2);
+			const char *value = LuaToString(l, -2);
 			if (!strcmp(value, "Image")) {
 				TitleScreens[j]->File = LuaToString(l, -1);
 			} else if (!strcmp(value, "Music")) {
@@ -313,10 +299,10 @@ static int CclSetTitleScreens(lua_State *l)
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument");
 				}
-				subargs = lua_rawlen(l, -1);
+				const int subargs = lua_rawlen(l, -1);
 				TitleScreens[j]->Labels = new TitleScreenLabel *[subargs + 1];
 				memset(TitleScreens[j]->Labels, 0, (subargs + 1) * sizeof(TitleScreenLabel *));
-				for (k = 0; k < subargs; ++k) {
+				for (int k = 0; k < subargs; ++k) {
 					lua_rawgeti(l, -1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
@@ -324,7 +310,7 @@ static int CclSetTitleScreens(lua_State *l)
 					TitleScreens[j]->Labels[k] = new TitleScreenLabel;
 					lua_pushnil(l);
 					while (lua_next(l, -2)) {
-						value = LuaToString(l, -2);
+						const char *value = LuaToString(l, -2);
 						if (!strcmp(value, "Text")) {
 							TitleScreens[j]->Labels[k]->Text = LuaToString(l, -1);
 						} else if (!strcmp(value, "Font")) {
@@ -340,16 +326,13 @@ static int CclSetTitleScreens(lua_State *l)
 							TitleScreens[j]->Labels[k]->Yofs = LuaToNumber(l, -1);
 							lua_pop(l, 1);
 						} else if (!strcmp(value, "Flags")) {
-							int subsubargs;
-							int subk;
-
 							if (!lua_istable(l, -1)) {
 								LuaError(l, "incorrect argument");
 							}
-							subsubargs = lua_rawlen(l, -1);
-							for (subk = 0; subk < subsubargs; ++subk) {
+							const int subsubargs = lua_rawlen(l, -1);
+							for (int subk = 0; subk < subsubargs; ++subk) {
 								lua_rawgeti(l, -1, subk + 1);
-								value = LuaToString(l, -1);
+								const char *value = LuaToString(l, -1);
 								lua_pop(l, 1);
 								if (!strcmp(value, "center")) {
 									TitleScreens[j]->Labels[k]->Flags |= TitleFlagCenter;
@@ -370,7 +353,6 @@ static int CclSetTitleScreens(lua_State *l)
 			lua_pop(l, 1);
 		}
 	}
-
 	return 0;
 }
 
@@ -397,9 +379,8 @@ EnumVariable Str2EnumVariable(lua_State *l, const char *s)
 		{"Name", VariableName},
 		{0, VariableValue}
 	}; // List of possible values.
-	int i; // Iterator.
 
-	for (i = 0; list[i].s; i++) {
+	for (int i = 0; list[i].s; ++i) {
 		if (!strcmp(s, list[i].s)) {
 			return list[i].e;
 		}
@@ -430,9 +411,8 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 		{"Goal", UnitRefGoal},
 		{0, UnitRefItSelf}
 	}; // List of possible values.
-	int i; // Iterator.
 
-	for (i = 0; list[i].s; i++) {
+	for (int i = 0; list[i].s; ++i) {
 		if (!strcmp(s, list[i].s)) {
 			return list[i].e;
 		}
@@ -448,14 +428,12 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 */
 static ConditionPanel *ParseConditionPanel(lua_State *l)
 {
-	ConditionPanel *condition; // Condition parsed
-	const char *key;           // key of lua table.
-
 	Assert(lua_istable(l, -1));
 
-	condition = new ConditionPanel;
+	ConditionPanel *condition = new ConditionPanel;
+
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-		key = LuaToString(l, -2);
+		const char *key = LuaToString(l, -2);
 		if (!strcmp(key, "ShowOnlySelected")) {
 			condition->ShowOnlySelected = LuaToBoolean(l, -1);
 		} else if (!strcmp(key, "HideNeutral")) {
@@ -493,17 +471,15 @@ static ConditionPanel *ParseConditionPanel(lua_State *l)
 
 static CContentType *CclParseContent(lua_State *l)
 {
-	CContentType *content;
-	const char *key;
+	Assert(lua_istable(l, -1));
+
+	CContentType *content = NULL;
+	ConditionPanel *condition = NULL;
 	int posX = 0;
 	int posY = 0;
-	ConditionPanel *condition;
 
-	Assert(lua_istable(l, -1));
-	content = NULL;
-	condition = NULL;
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-		key = LuaToString(l, -2);
+		const char *key = LuaToString(l, -2);
 		if (!strcmp(key, "Pos")) {
 			Assert(lua_istable(l, -1));
 			lua_rawgeti(l, -1, 1); // X
@@ -803,14 +779,12 @@ static int CclDefinePanelContents(lua_State *l)
 */
 static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 {
-	PopupConditionPanel *condition; // Condition parsed
-	const char *key;				// key of lua table.
-
 	Assert(lua_istable(l, -1));
 
-	condition = new PopupConditionPanel;
+	PopupConditionPanel *condition = new PopupConditionPanel;
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-		key = LuaToString(l, -2);
+		const char *key = LuaToString(l, -2);
+
 		if (!strcmp(key, "HasHint")) {
 			condition->HasHint = LuaToBoolean(l, -1);
 		} else if (!strcmp(key, "HasDescription")) {
@@ -893,8 +867,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 
 static CPopupContentType *CclParsePopupContent(lua_State *l)
 {
-	CPopupContentType *content;
-	const char *key;
+	Assert(lua_istable(l, -1));
+
 	bool wrap = true;
 	int marginX = MARGIN_X;
 	int marginY = MARGIN_Y;
@@ -902,13 +876,12 @@ static CPopupContentType *CclParsePopupContent(lua_State *l)
 	int minHeight = 0;
 	std::string textColor("white");
 	std::string highColor("red");
-	PopupConditionPanel *condition;
+	CPopupContentType* content = NULL;
+	PopupConditionPanel *condition = NULL;
 
-	Assert(lua_istable(l, -1));
-	content = NULL;
-	condition = NULL;
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-		key = LuaToString(l, -2);
+		const char *key = LuaToString(l, -2);
+
 		if (!strcmp(key, "Wrap")) {
 			wrap = LuaToBoolean(l, -1);
 		} else if (!strcmp(key, "TextColor")) {
@@ -1122,18 +1095,14 @@ static int CclDefinePopup(lua_State *l)
 */
 static int CclDefineViewports(lua_State *l)
 {
-	const char *value;
-	int i;
-	int args;
-	int slot;
+	int i = 0;
+	const int args = lua_gettop(l);
 
-	i = 0;
-	args = lua_gettop(l);
 	for (int j = 0; j < args; ++j) {
-		value = LuaToString(l, j + 1);
+		const char *value = LuaToString(l, j + 1);
 		++j;
 		if (!strcmp(value, "mode")) {
-			UI.ViewportMode = (ViewportModeType)(int)LuaToNumber(l, j + 1);
+			UI.ViewportMode = (ViewportModeType)LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "viewport")) {
 			if (!lua_istable(l, j + 1) && lua_rawlen(l, j + 1) != 3) {
 				LuaError(l, "incorrect argument");
@@ -1145,7 +1114,7 @@ static int CclDefineViewports(lua_State *l)
 			UI.Viewports[i].MapPos.y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, j + 1, 3);
-			slot = (int)LuaToNumber(l, -1);
+			const int slot = LuaToNumber(l, -1);
 			if (slot != -1) {
 				UI.Viewports[i].Unit = &UnitManager.GetSlotUnit(slot);
 			}
@@ -1156,7 +1125,6 @@ static int CclDefineViewports(lua_State *l)
 		}
 	}
 	UI.NumViewports = i;
-
 	return 0;
 }
 
@@ -1216,20 +1184,16 @@ ButtonStyle *FindButtonStyle(const std::string &style)
 */
 static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 {
-	const char *value;
-	std::string file;
-	int w;
-	int h;
-
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-
-	w = h = 0;
+	std::string file;
+	int w = 0;
+	int h = 0;
 
 	lua_pushnil(l);
 	while (lua_next(l, -2)) {
-		value = LuaToString(l, -2);
+		const char *value = LuaToString(l, -2);
 		if (!strcmp(value, "File")) {
 			file = LuaToString(l, -1);
 		} else if (!strcmp(value, "Size")) {
@@ -1314,26 +1278,22 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 */
 static int CclDefineButtonStyle(lua_State *l)
 {
-	const char *style;
-	const char *value;
-	ButtonStyle *b;
-
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
-
-	style = LuaToString(l, 1);
-	b = ButtonStyleHash[style];
+	const char *style = LuaToString(l, 1);
+	ButtonStyle *&b = ButtonStyleHash[style];
 	if (!b) {
-		b = ButtonStyleHash[style] = new ButtonStyle;
+		b = new ButtonStyle;
 		// Set to bogus value to see if it was set later
 		b->Default.TextPos.x = b->Hover.TextPos.x = b->Clicked.TextPos.x = 0xFFFFFF;
 	}
 
 	lua_pushnil(l);
 	while (lua_next(l, 2)) {
-		value = LuaToString(l, -2);
+		const char *value = LuaToString(l, -2);
+
 		if (!strcmp(value, "Size")) {
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
@@ -1405,7 +1365,6 @@ static int CclDefineButtonStyle(lua_State *l)
 	if (b->Clicked.TextAlign == TextAlignUndefined) {
 		b->Clicked.TextAlign = b->TextAlign;
 	}
-
 	return 0;
 }
 
@@ -1448,22 +1407,18 @@ void CallHandler(unsigned int handle, int value)
 */
 static int CclDefineButton(lua_State *l)
 {
-	char buf[64];
-	const char *value;
-	const char *s2;
-	ButtonAction ba;
-
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
+	ButtonAction ba;
 
 	//
 	// Parse the arguments
 	//
 	lua_pushnil(l);
 	while (lua_next(l, 1)) {
-		value = LuaToString(l, -2);
+		const char *value = LuaToString(l, -2);
 		if (!strcmp(value, "Pos")) {
 			ba.Pos = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Level")) {
@@ -1521,6 +1476,9 @@ static int CclDefineButton(lua_State *l)
 			if (!lua_isnumber(l, -1) && !lua_isstring(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
+			char buf[64];
+			const char *s2;
+
 			if (lua_isnumber(l, -1)) {
 				snprintf(buf, sizeof(buf), "%ld", (long int)lua_tonumber(l, -1));
 				s2 = buf;
@@ -1570,7 +1528,7 @@ static int CclDefineButton(lua_State *l)
 
 			for (unsigned int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
-				s2 = LuaToString(l, -1);
+				const char *s2 = LuaToString(l, -1);
 				lua_pop(l, 1);
 				allowstr += s2;
 				if (k != subargs - 1) {
@@ -1599,7 +1557,7 @@ static int CclDefineButton(lua_State *l)
 			const unsigned subargs = lua_rawlen(l, -1);
 			for (unsigned int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
-				s2 = LuaToString(l, -1);
+				const char *s2 = LuaToString(l, -1);
 				lua_pop(l, 1);
 				umask += s2;
 				umask += ",";
@@ -1650,11 +1608,9 @@ void SelectedUnitChanged()
 */
 static int CclSetSelectionStyle(lua_State *l)
 {
-	const char *style;
-
 	LuaCheckArgs(l, 1);
 
-	style = LuaToString(l, 1);
+	const char *style = LuaToString(l, 1);
 	if (!strcmp(style, "rectangle")) {
 		DrawSelection = DrawSelectionRectangle;
 	} else if (!strcmp(style, "alpha-rectangle")) {
@@ -1668,7 +1624,6 @@ static int CclSetSelectionStyle(lua_State *l)
 	} else {
 		LuaError(l, "Unsupported selection style");
 	}
-
 	return 0;
 }
 
