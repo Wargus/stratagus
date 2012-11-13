@@ -85,15 +85,7 @@ static int CclStratagusMap(lua_State *l)
 
 				if (!strcmp(value, "size")) {
 					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
-					}
-					lua_rawgeti(l, -1, 1);
-					Map.Info.MapWidth = LuaToNumber(l, -1);
-					lua_pop(l, 1);
-					lua_rawgeti(l, -1, 2);
-					Map.Info.MapHeight = LuaToNumber(l, -1);
-					lua_pop(l, 1);
+					CclGetPos(l, &Map.Info.MapWidth, &Map.Info.MapHeight);
 					lua_pop(l, 1);
 
 					delete[] Map.Fields;

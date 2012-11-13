@@ -316,15 +316,7 @@ static int CclSetTitleScreens(lua_State *l)
 						} else if (!strcmp(value, "Font")) {
 							TitleScreens[j]->Labels[k]->Font = CFont::Get(LuaToString(l, -1));
 						} else if (!strcmp(value, "Pos")) {
-							if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
-								LuaError(l, "incorrect argument");
-							}
-							lua_rawgeti(l, -1, 1);
-							TitleScreens[j]->Labels[k]->Xofs = LuaToNumber(l, -1);
-							lua_pop(l, 1);
-							lua_rawgeti(l, -1, 2);
-							TitleScreens[j]->Labels[k]->Yofs = LuaToNumber(l, -1);
-							lua_pop(l, 1);
+							CclGetPos(l, &TitleScreens[j]->Labels[k]->Xofs, &TitleScreens[j]->Labels[k]->Yofs);
 						} else if (!strcmp(value, "Flags")) {
 							if (!lua_istable(l, -1)) {
 								LuaError(l, "incorrect argument");
@@ -1210,15 +1202,7 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 		if (!strcmp(value, "File")) {
 			file = LuaToString(l, -1);
 		} else if (!strcmp(value, "Size")) {
-			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			w = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			h = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			CclGetPos(l, &w, &h);
 		} else if (!strcmp(value, "Frame")) {
 			p->Frame = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Border")) {
@@ -1249,15 +1233,7 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "TextPos")) {
-			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			p->TextPos.x = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			p->TextPos.y = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			CclGetPos(l, &p->TextPos.x, &p->TextPos.y);
 		} else if (!strcmp(value, "TextAlign")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "Center")) {
@@ -1308,15 +1284,7 @@ static int CclDefineButtonStyle(lua_State *l)
 		const char *value = LuaToString(l, -2);
 
 		if (!strcmp(value, "Size")) {
-			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			b->Width = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			b->Height = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			CclGetPos(l, &b->Width, &b->Height);
 		} else if (!strcmp(value, "Font")) {
 			b->Font = CFont::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextNormalColor")) {
@@ -1324,15 +1292,7 @@ static int CclDefineButtonStyle(lua_State *l)
 		} else if (!strcmp(value, "TextReverseColor")) {
 			b->TextReverseColor = LuaToString(l, -1);
 		} else if (!strcmp(value, "TextPos")) {
-			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			b->TextX = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			b->TextY = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			CclGetPos(l, &b->TextX, &b->TextY);
 		} else if (!strcmp(value, "TextAlign")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "Center")) {

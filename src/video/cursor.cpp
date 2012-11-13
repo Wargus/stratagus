@@ -373,25 +373,9 @@ static int CclDefineCursor(lua_State *l)
 		} else if (!strcmp(value, "File")) {
 			file = LuaToString(l, -1);
 		} else if (!strcmp(value, "HotSpot")) {
-			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			hotpos.x = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			hotpos.y = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			CclGetPos(l, &hotpos.x, &hotpos.y);
 		} else if (!strcmp(value, "Size")) {
-			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			w = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			h = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			CclGetPos(l, &w, &h);
 		} else if (!strcmp(value, "Rate")) {
 			rate = LuaToNumber(l, -1);
 		} else {

@@ -91,15 +91,7 @@ void MissileType::Load(lua_State *l)
 		if (!strcmp(value, "File")) {
 			file = LuaToString(l, -1);
 		} else if (!strcmp(value, "Size")) {
-			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			this->size.x = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			this->size.y = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			CclGetPos(l, &this->size.x, &this->size.y);
 		} else if (!strcmp(value, "Frames")) {
 			this->SpriteFrames = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Flip")) {

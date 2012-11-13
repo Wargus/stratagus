@@ -385,15 +385,7 @@ static int CclDefineUnitType(lua_State *l)
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "size")) {
 					lua_rawgeti(l, -1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
-					}
-					lua_rawgeti(l, -1, 1);
-					type->Width = LuaToNumber(l, -1);
-					lua_pop(l, 1);
-					lua_rawgeti(l, -1, 2);
-					type->Height = LuaToNumber(l, -1);
-					lua_pop(l, 1);
+					CclGetPos(l, &type->Width, &type->Height);
 					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported image tag: %s" _C_ value);
@@ -420,27 +412,11 @@ static int CclDefineUnitType(lua_State *l)
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "size")) {
 					lua_rawgeti(l, -1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
-					}
-					lua_rawgeti(l, -1, 1);
-					type->ShadowWidth = LuaToNumber(l, -1);
-					lua_pop(l, 1);
-					lua_rawgeti(l, -1, 2);
-					type->ShadowHeight = LuaToNumber(l, -1);
-					lua_pop(l, 1);
+					CclGetPos(l, &type->ShadowWidth, &type->ShadowHeight);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "offset")) {
 					lua_rawgeti(l, -1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
-					}
-					lua_rawgeti(l, -1, 1);
-					type->ShadowOffsetX = LuaToNumber(l, -1);
-					lua_pop(l, 1);
-					lua_rawgeti(l, -1, 2);
-					type->ShadowOffsetY = LuaToNumber(l, -1);
-					lua_pop(l, 1);
+					CclGetPos(l, &type->ShadowOffsetX, &type->ShadowOffsetY);
 					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported shadow tag: %s" _C_ value);
@@ -451,15 +427,7 @@ static int CclDefineUnitType(lua_State *l)
 				type->ShadowSprite = NULL;
 			}
 		} else if (!strcmp(value, "Offset")) {
-			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			type->OffsetX = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			type->OffsetY = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			CclGetPos(l, &type->OffsetX, &type->OffsetY);
 		} else if (!strcmp(value, "Flip")) {
 			type->Flip = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Animations")) {
@@ -549,15 +517,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->DefaultStat.Variables[SHIELD_INDEX].Increase = 1;
 			type->DefaultStat.Variables[SHIELD_INDEX].Enable = 1;
 		} else if (!strcmp(value, "TileSize")) {
-			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			type->TileWidth = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			type->TileHeight = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			CclGetPos(l, &type->TileWidth, &type->TileHeight);
 		} else if (!strcmp(value, "Decoration")) {
 			type->Decoration = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NeutralMinimapColor")) {
@@ -574,25 +534,9 @@ static int CclDefineUnitType(lua_State *l)
 			type->NeutralMinimapColorRGB.B = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "BoxSize")) {
-			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			type->BoxWidth = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			type->BoxHeight = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			CclGetPos(l, &type->BoxWidth, &type->BoxHeight);
 		} else if (!strcmp(value, "BoxOffset")) {
-			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			type->BoxOffsetX = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			type->BoxOffsetY = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			CclGetPos(l, &type->BoxOffsetX, &type->BoxOffsetY);
 		} else if (!strcmp(value, "NumDirections")) {
 			type->NumDirections = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Revealer")) {
@@ -664,15 +608,7 @@ static int CclDefineUnitType(lua_State *l)
 				}
 				for (int m = 0; m < UnitSides; ++m) {
 					lua_rawgeti(l, -1, m + 1);
-					if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
-						LuaError(l, "incorrect argument");
-					}
-					lua_rawgeti(l, -1, 1);
-					type->MissileOffsets[m][k].x = LuaToNumber(l, -1);
-					lua_pop(l, 1);
-					lua_rawgeti(l, -1, 2);
-					type->MissileOffsets[m][k].y = LuaToNumber(l, -1);
-					lua_pop(l, 1);
+					CclGetPos(l, &type->MissileOffsets[m][k].x, &type->MissileOffsets[m][k].y);
 					lua_pop(l, 1);
 				}
 				lua_pop(l, 1);
