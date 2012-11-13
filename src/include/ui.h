@@ -477,17 +477,23 @@ public:
 	/// Get the content's height
 	virtual int GetHeight(const ButtonAction &button, int *Costs) const = 0;
 
+	virtual void Parse(lua_State *l) = 0;
+
+	static CPopupContentType *ParsePopupContent(lua_State *l);
+
+public:
 	int PosX;                   /// X position to draw.
 	int PosY;                   /// Y position to draw.
+
 	int MarginX;                /// Left and right margin width.
 	int MarginY;                /// Upper and lower margin height.
 	int MinWidth;               /// Minimal width covered by content type.
 	int MinHeight;              /// Minimal height covered by content type.
 	bool Wrap;                  /// If true, the next content will be placed on the next "line".
-
+protected:
 	std::string TextColor;      /// Color used for plain text in content.
 	std::string HighlightColor; /// Color used for highlighted letters.
-
+public:
 	PopupConditionPanel *Condition; /// Condition to show the content; if NULL, no condition.
 };
 
@@ -508,6 +514,9 @@ public:
 	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
 	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
 
+	virtual void Parse(lua_State *l);
+
+private:
 	int InfoType;                /// Type of information to show.
 	unsigned int MaxWidth;       /// Maximum width of multilined information.
 	CFont *Font;                 /// Font to use.
@@ -524,6 +533,9 @@ public:
 	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
 	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
 
+	virtual void Parse(lua_State *l);
+
+private:
 	std::string Text;            /// Text to display
 	unsigned int MaxWidth;       /// Maximum width of multilined text.
 	CFont *Font;                 /// Font to use.
@@ -540,6 +552,9 @@ public:
 	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
 	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
 
+	virtual void Parse(lua_State *l);
+
+private:
 	CFont *Font;                 /// Font to use.
 	char Centered;               /// if true, center the display.
 };
@@ -555,6 +570,9 @@ public:
 	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
 	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
 
+	virtual void Parse(lua_State *l);
+
+private:
 	IntColor Color;  /// Color used for line.
 	unsigned int Width;     /// line height
 	unsigned int Height;    /// line height
@@ -574,6 +592,9 @@ public:
 	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
 	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
 
+	virtual void Parse(lua_State *l);
+
+private:
 	StringDesc *Text;            /// Text to display.
 	CFont *Font;                 /// Font to use.
 	char Centered;               /// if true, center the display.
