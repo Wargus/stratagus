@@ -986,7 +986,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 	int minHeight = 0;
 	std::string textColor("white");
 	std::string highColor("red");
-	CPopupContentType* content = NULL;
+	CPopupContentType *content = NULL;
 	PopupConditionPanel *condition = NULL;
 
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {

@@ -59,8 +59,8 @@ void CColor::Parse(lua_State *l, const int offset)
 	lua_pop(l, 1);
 
 	if (!(0 <= r && r <= 255
-		&& 0 <= g && g <= 255
-		&& 0 <= b && b <= 255)) {
+		  && 0 <= g && g <= 255
+		  && 0 <= b && b <= 255)) {
 		LuaError(l, "Arguments must be in the range 0-255");
 	}
 	this->R = r;
