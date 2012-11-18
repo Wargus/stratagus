@@ -423,6 +423,61 @@ void AiNewDepotRequest(CUnit &worker)
 	}
 }
 
+class IsADepositForResource
+{
+public:
+	explicit IsADepositForResource(const int r) : resource(r) {}
+	bool operator()(const CUnit *const unit) const {
+		return (unit->Type->CanStore[resource] && !unit->IsUnusable());
+	}
+private:
+	const int resource;
+};
+
+class IsAWorker
+{
+public:
+	explicit IsAWorker() {}
+	bool operator()(const CUnit *const unit) const {
+		return (unit->Type->Harvester && unit->Type->ResInfo && !unit->Removed);
+	}
+};
+
+/**
+**  Request a depot change for better resource harvesting.
+**
+**  @param worker    Worker itself.
+**
+**  @return          true if changed, false otherwise.
+*/
+bool AiRequestChangeDepot(CUnit &worker)
+{
+	Assert(worker.CurrentAction() == UnitActionResource);
+	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
+	const int resource = order.GetCurrentResource();
+	std::vector<CUnit *> depots;
+	const Vec2i offset(40, 40);
+
+	Select(worker.tilePos - offset, worker.tilePos + offset, depots, IsADepositForResource(resource));
+
+	if (!depots.empty()) {
+		for (std::vector<CUnit *>::iterator it = depots.begin(); it != depots.end(); ++it) {
+			CUnit &unit = **it;
+			
+			const Vec2i workOff(15, 15);
+			const int range = 15;
+			const int maxWorkers = 10;
+			std::vector<CUnit *> workers;
+			Select(unit.tilePos - workOff, unit.tilePos + workOff, workers, IsAWorker());
+			if (workers.size() <= maxWorkers && !AiEnemyUnitsInDistance(unit, range)) {
+				CommandReturnGoods(worker, &unit, FlushCommands);
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 /**
 **  Build new units to reduce the food shortage.
 */

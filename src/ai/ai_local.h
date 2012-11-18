@@ -107,6 +107,8 @@ enum AiForceAttackingState {
 	AiForceAttackingState_Attacking,
 };
 
+#define AI_WAIT_ON_RALLY_POINT 30          /// Max seconds AI units will wait on rally point
+
 /**
 **  Define an AI force.
 **
@@ -118,7 +120,8 @@ class AiForce
 public:
 	AiForce() :
 		Completed(false), Defending(false), Attacking(false),
-		Role(AiForceRoleDefault), State(AiForceAttackingState_Free) {
+		Role(AiForceRoleDefault), State(AiForceAttackingState_Free),
+		WaitOnRallyPoint(AI_WAIT_ON_RALLY_POINT) {
 		HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
 	}
 
@@ -135,6 +138,7 @@ public:
 		Completed = false;
 		Defending = false;
 		Attacking = false;
+		WaitOnRallyPoint = AI_WAIT_ON_RALLY_POINT;
 		if (types) {
 			UnitTypes.clear();
 			State = AiForceAttackingState_Free;
@@ -178,6 +182,7 @@ public:
 	AiForceAttackingState State; /// Attack state
 	Vec2i GoalPos; /// Attack point tile map position
 	Vec2i HomePos; /// Return after attack tile map position
+	int WaitOnRallyPoint; /// Counter for waiting on rally point
 };
 
 // forces
@@ -398,6 +403,7 @@ extern int AiFindAvailableUnitTypeEquiv(const CUnitType &type, int *result);
 extern int AiGetBuildRequestsCount(const PlayerAi &pai, int (&counter)[UnitTypeMax]);
 
 extern void AiNewDepotRequest(CUnit &worker);
+extern bool AiRequestChangeDepot(CUnit &worker);
 
 //
 // Buildings

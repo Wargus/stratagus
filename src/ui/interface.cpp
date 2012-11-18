@@ -223,7 +223,7 @@ static void UiAddGroupToSelection(unsigned group)
 static void UiDefineGroup(unsigned group)
 {
 	for (int i = 0; i < NumSelected; ++i) {
-		if (Selected[i]->GroupId) {
+		if (Selected[i]->Player == ThisPlayer && Selected[i]->GroupId) {
 			RemoveUnitFromGroups(*Selected[i]);
 		}
 	}

@@ -51,6 +51,8 @@
 #include "unittype.h"
 #include "video.h"
 
+#include "../ai/ai_local.h"
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -887,8 +889,6 @@ int COrder_Resource::StopGathering(CUnit &unit)
 #endif
 }
 
-extern void AiNewDepotRequest(CUnit &worker);
-
 /**
 **  Move to resource depot
 **
@@ -940,7 +940,12 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 
 	// Not ready
 	if (player.AiEnabled && unit.pathFinderData->output.Cycles > 500) {
-		AiNewDepotRequest(unit);
+		if (AiRequestChangeDepot(unit)) {
+			this->Finished = true;
+			return 0;	
+		} else {
+			AiNewDepotRequest(unit);
+		}
 	}
 
 	// If resource depot is still under construction, wait!

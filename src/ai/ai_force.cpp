@@ -316,10 +316,11 @@ private:
 
 VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (AiEnemyUnitsInDistance(*startUnit.Player, NULL, pos, 20) == false
-		&& Distance(pos, startPos) <= abs(distance - 20)) {
-		*resultPos = pos;
-		return VisitResult_Finished;
+	const int minDist = 15;
+	if (AiEnemyUnitsInDistance(*startUnit.Player, NULL, pos, minDist) == false
+		&& Distance(pos, startPos) <= abs(distance - minDist)) {
+			*resultPos = pos;
+			return VisitResult_Finished;
 	}
 	if (CanMoveToMask(pos, movemask)) { // reachable
 		return VisitResult_Ok;
@@ -333,6 +334,8 @@ bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos)
 	Assert(this->Units.size() > 0);
 	const CUnit &leader = *(this->Units[0]);
 	const int distance = leader.MapDistanceTo(startPos);
+
+	WaitOnRallyPoint = AI_WAIT_ON_RALLY_POINT;
 
 	TerrainTraversal terrainTraversal;
 
@@ -816,21 +819,16 @@ void AiForce::Update()
 		int minDist = Units[0]->MapDistanceTo(this->GoalPos);
 		int maxDist = minDist;
 
-		// We must put away all units which are too far from main group
 		for (size_t i = 0; i != Size(); ++i) {
 			const int distance = Units[i]->MapDistanceTo(this->GoalPos);
 			minDist = std::min(minDist, distance);
-		}
-
-		for (size_t i = 0; i != Size(); ++i) {
-			const int distance = Units[i]->MapDistanceTo(this->GoalPos);
-			// Don't count units which are too far away from main group
-			if (distance - minDist > thresholdDist * 8) {
-				continue;
-			}
 			maxDist = std::max(maxDist, distance);
 		}
-		if (maxDist <= thresholdDist) {
+
+		if (WaitOnRallyPoint > 0 && minDist <= thresholdDist) {
+			--WaitOnRallyPoint;
+		}
+		if (maxDist <= thresholdDist || !WaitOnRallyPoint) {
 			const CUnit *unit = NULL;
 
 			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
