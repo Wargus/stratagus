@@ -650,7 +650,7 @@ void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 	CUnit *unit = UnitOnMapTile(pos, -1);
 	if (unit && unit->IsAliveOnMap()
 		&& (missile.Type->FriendlyFire || unit->IsEnemy(*missile.SourceUnit->Player))) {
-		missile.MissileHit(unit);
+			missile.MissileHit(unit);
 	}
 }
 
@@ -673,12 +673,12 @@ bool PointToPointMissile(Missile &missile)
 	const PixelPos diff = (missile.destination - missile.source);
 	missile.position = missile.source + diff * missile.CurrentStep / missile.TotalStep;
 
-	if (missile.Type->Smoke.Missile && missile.CurrentStep) {
+	if (missile.Type->Smoke.Missile && (missile.CurrentStep || missile.State > 1)) {
 		const PixelPos position = missile.position + missile.Type->size / 2;
 		MakeMissile(*missile.Type->Smoke.Missile, position, position);
 	}
 
-	if (missile.Type->SmokeParticle && missile.CurrentStep) {
+	if (missile.Type->SmokeParticle && (missile.CurrentStep || missile.State > 1)) {
 		const PixelPos position = missile.position + missile.Type->size / 2;
 		missile.Type->SmokeParticle->pushPreamble();
 		missile.Type->SmokeParticle->pushInteger(position.x);
@@ -707,13 +707,21 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 	}
 
 	if (goal.CurrentAction() != UnitActionDie) {
+		int damage;
+
 		if (missile.Damage) {  // direct damage, spells mostly
-			HitUnit(missile.SourceUnit, goal, missile.Damage / splash);
+			damage = missile.Damage / splash;
 		} else {
 			Assert(missile.SourceUnit != NULL);
-			HitUnit(missile.SourceUnit, goal,
-					CalculateDamage(*missile.SourceUnit, goal) / splash, &missile);
+			damage = CalculateDamage(*missile.SourceUnit, goal) / splash;
 		}
+		if (missile.Type->Pierce) {  // Handle pierce factor
+			for (size_t i = 0; i < (missile.PiercedUnits.size() - 1); ++i) {
+				damage *= (double)missile.Type->ReduceFactor / 100;
+			}
+		}
+
+		HitUnit(missile.SourceUnit, goal, damage, &missile);
 	}
 }
 
@@ -749,26 +757,32 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 }
 
 /**
+**  Check if missle has already pierced that unit
+**
+**  @param missile  Current missile.
+**  @param unit     Target unit.
+**
+**  @return         true if goal is pierced, false else.
+*/
+
+static bool IsPiercedUnit(const Missile &missile, const CUnit &unit)
+{
+	for (std::vector<CUnit *>::const_iterator it = missile.PiercedUnits.begin();
+		it != missile.PiercedUnits.end(); ++it) {
+			CUnit &punit = **it;
+			if (UnitNumber(unit) == UnitNumber(punit)) {
+				return true;
+			}
+	}
+	return false;
+}
+
+/**
 **  Work for missile hit.
 */
 void Missile::MissileHit(CUnit *unit)
 {
 	const MissileType &mtype = *this->Type;
-
-	if (unit == NULL) {
-		unit = this->TargetUnit;
-	}
-
-	if (unit && mtype.Pierce && mtype.PierceOnce) {
-		for (std::vector<CUnit *>::iterator it = this->PiercedUnits.begin();
-			 it != this->PiercedUnits.end(); ++it) {
-			CUnit &punit = **it;
-			if (UnitNumber(*unit) == UnitNumber(punit)) {
-				return;
-			}
-		}
-		PiercedUnits.insert(this->PiercedUnits.begin(), unit);
-	}
 
 	if (mtype.ImpactSound.Sound) {
 		PlayMissileSound(*this, mtype.ImpactSound.Sound);
@@ -803,6 +817,20 @@ void Missile::MissileHit(CUnit *unit)
 	//
 	// Choose correct goal.
 	//
+	if (unit) {
+		if (unit->Destroyed) {
+			return;
+		}
+		if (mtype.Pierce && mtype.PierceOnce) {
+			if (IsPiercedUnit(*this, *unit)) {
+				return;
+			} else {
+				PiercedUnits.insert(this->PiercedUnits.begin(), unit);
+			}
+		}
+		MissileHitsGoal(*this, *unit, 1);
+		return;
+	}
 	if (!mtype.Range) {
 		if (this->TargetUnit && (mtype.FriendlyFire == false
 								 || this->TargetUnit->Player->Index != this->SourceUnit->Player->Index)) {
@@ -810,6 +838,13 @@ void Missile::MissileHit(CUnit *unit)
 			// Missiles without range only hits the goal always.
 			//
 			CUnit &goal = *this->TargetUnit;
+			if (mtype.Pierce && mtype.PierceOnce) {
+				if (IsPiercedUnit(*this, goal)) {
+					return;
+				} else {
+					PiercedUnits.insert(this->PiercedUnits.begin(), &goal);
+				}
+			}
 			if (goal.Destroyed) {
 				this->TargetUnit = NULL;
 				return;
@@ -839,6 +874,14 @@ void Missile::MissileHit(CUnit *unit)
 			if (CanTarget(*this->SourceUnit->Type, *goal.Type)
 				&& (mtype.FriendlyFire == false || goal.Player->Index != this->SourceUnit->Player->Index)) {
 				bool shouldHit = true;
+
+				if (mtype.Pierce && mtype.PierceOnce) {
+					if (IsPiercedUnit(*this, goal)) {
+						shouldHit = false;
+					} else {
+						PiercedUnits.insert(this->PiercedUnits.begin(), &goal);
+					}
+				}
 
 				if (mtype.CorrectSphashDamage == true) {
 					bool isPositionSpell = false;
@@ -1147,7 +1190,7 @@ MissileType::MissileType(const std::string &ident) :
 	SpriteFrames(0), NumDirections(0), ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
 	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
 	AlwaysFire(false), Pierce(false), PierceOnce(false), Class(), NumBounces(0), StartDelay(0),
-	Sleep(0), Speed(0), TTL(-1), Damage(0), Range(0), SplashFactor(0),
+	Sleep(0), Speed(0), TTL(-1), Damage(0), ReduceFactor(100), Range(0), SplashFactor(0),
 	ImpactParticle(NULL), SmokeParticle(NULL),
 	G(NULL)
 {

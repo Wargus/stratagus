@@ -384,6 +384,7 @@ public:
 	int Speed;                 /// missile speed
 	int TTL;                   /// missile time-to-live
 	int Damage;                /// missile damage (used for non-direct missiles, e.g. impacts)
+	int ReduceFactor;          /// Multiplier for reduce or increase damage dealt to the next unit
 
 	int Range;                 /// missile damage range
 	int SplashFactor;          /// missile splash divisor

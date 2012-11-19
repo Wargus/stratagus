@@ -1018,7 +1018,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			} else if (!strcmp(key, "Line")) {
 				content = new CPopupContentTypeLine;
 			} else if (!strcmp(key, "Variable")) {
-				content = new CPopupContentTypeLine;
+				content = new CPopupContentTypeVariable;
 			} else {
 				LuaError(l, "Invalid drawing method '%s' in DefinePopups" _C_ key);
 			}
