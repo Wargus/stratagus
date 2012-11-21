@@ -2546,8 +2546,12 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		const int var = missile->Type->ChangeVariable;
 		target.Variable[var].Enable = 1;
 		target.Variable[var].Value += missile->Type->ChangeAmount;
-		if (target.Variable[var].Value > target.Variable[var].Max && missile->Type->ChangeMax) {
-			target.Variable[var].Max = target.Variable[var].Value;
+		if (target.Variable[var].Value > target.Variable[var].Max) {
+			if (missile->Type->ChangeMax) {
+				target.Variable[var].Max = target.Variable[var].Value;
+			} else {
+				target.Variable[var].Value = target.Variable[var].Max;
+			}
 		}
 	}
 

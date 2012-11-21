@@ -126,8 +126,9 @@ class CChunkParticle : public CParticle
 {
 public:
 	CChunkParticle(CPosition position, Animation *smokeAnimation, Animation *debrisAnimation,
-				   int minVelocity = 0, int maxVelocity = 400,
-				   int minTrajectoryAngle = 77, int maxTTL = 0);
+		Animation *destroyAnimation,
+		int minVelocity = 0, int maxVelocity = 400,
+		int minTrajectoryAngle = 77, int maxTTL = 0);
 	virtual ~CChunkParticle();
 
 	virtual void draw();
@@ -148,6 +149,7 @@ protected:
 	float height;
 	Animation *debrisAnimation;
 	Animation *smokeAnimation;
+	Animation *destroyAnimation;
 
 	struct {
 		float x;

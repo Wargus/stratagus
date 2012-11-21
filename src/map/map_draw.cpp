@@ -335,7 +335,7 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 	int height = font.Height() + 6;
 	CLabel label(font, "white", "red");
 	int x;
-	int y = std::min<int>(pos.y + 10, vp.BottomRightPos.y - 1 - height);
+	int y = std::min<int>(GameCursor->G->Height + pos.y + 10, vp.BottomRightPos.y - 1 - height);
 	const CPlayer *tplayer = ThisPlayer;
 
 	if (unit) {
@@ -350,14 +350,14 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 			backgroundColor = Video.MapRGB(TheScreen->format, 176, 176, 176);
 		}
 		width = font.getWidth(unit->Type->Name) + 10;
-		x = std::min<int>(pos.x, vp.BottomRightPos.x - 1 - width);
+		x = std::min<int>(GameCursor->G->Width + pos.x, vp.BottomRightPos.x - 1 - width);
 		Video.FillTransRectangle(backgroundColor, x, y, width, height, 128);
 		Video.DrawRectangle(ColorWhite, x, y, width, height);
 		label.DrawCentered(x + width / 2, y + 3, unit->Type->Name);
 	} else if (hidden) {
 		const std::string str("Unrevealed terrain");
 		width = font.getWidth(str) + 10;
-		x = std::min<int>(pos.x, vp.BottomRightPos.x - 1 - width);
+		x = std::min<int>(GameCursor->G->Width + pos.x, vp.BottomRightPos.x - 1 - width);
 		Video.FillTransRectangle(ColorBlue, x, y, width, height, 128);
 		Video.DrawRectangle(ColorWhite, x, y, width, height);
 		label.DrawCentered(x + width / 2, y + 3, str);

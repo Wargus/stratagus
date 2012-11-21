@@ -201,25 +201,27 @@ bool CMapField::IsTerrainResourceOnMap() const
 
 unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) const
 {
-	const bool fogOfWar = !Map.NoFogOfWar;
-
 	if (IsVisible(player)) {
 		return 2;
 	}
-	if (IsExplored(player) == false) {
-		return 0;
+
+	unsigned char maxVision = 0;
+	if (IsExplored(player)){
+		maxVision = 1;
 	}
-	if (player.IsVisionSharing() == false) {
-		return 1;
-	}
-	const int minValueRequired = fogOfWar ? 2 : 1;
 
 	for (int i = 0; i != PlayerMax ; ++i) {
-		if (Visible[i] >= minValueRequired && player.IsBothSharedVision(Players[i])) {
-			return 2;
+		if (player.IsBothSharedVision(Players[i])) {
+			maxVision = std::max<unsigned char>(maxVision, Visible[i]);
+			if (maxVision >= 2) {
+				return 2;
+			}
 		}
 	}
-	return 1;
+	if (maxVision == 1 && Map.NoFogOfWar) {
+		return 2;
+	}
+	return maxVision;
 }
 
 bool CMapFieldPlayerInfo::IsExplored(const CPlayer &player) const

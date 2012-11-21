@@ -43,6 +43,7 @@
 #include "actions.h"
 #include "map.h"
 #include "missile.h"
+#include "pathfinder.h"
 #include "unit.h"
 
 //SpawnMissile flags
@@ -51,6 +52,7 @@
 #define ANIM_SM_PIXEL 4
 #define ANIM_SM_RELTARGET 8
 #define ANIM_SM_RANGED 16
+#define ANIM_SM_SETDIRECTION 32
 
 /**
 **  Parse flags list in animation frame.
@@ -85,6 +87,8 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 				flags |= ANIM_SM_RELTARGET;
 			} else if (!strcmp(cur, "ranged")) {
 				flags |= ANIM_SM_RANGED;
+			}  else if (!strcmp(cur, "setdirection")) {
+				flags |= ANIM_SM_SETDIRECTION;
 			}
 		}
 		cur = next;
@@ -171,6 +175,12 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 		&& dist < goal->Type->MinAttackRange) {
 	} else {
 		Missile *missile = MakeMissile(*mtype, start, dest);
+		if (flags & ANIM_SM_SETDIRECTION) {
+			PixelPos posd;
+			posd.x = Heading2X[goal->Direction / NextDirection];
+			posd.y = Heading2Y[goal->Direction / NextDirection];
+			missile->MissileNewHeadingFromXY(posd);
+		}
 		if (flags & ANIM_SM_DAMAGE) {
 			missile->SourceUnit = &unit;
 		}
