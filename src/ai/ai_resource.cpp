@@ -463,7 +463,7 @@ bool AiRequestChangeDepot(CUnit &worker)
 	if (!depots.empty()) {
 		for (std::vector<CUnit *>::iterator it = depots.begin(); it != depots.end(); ++it) {
 			CUnit &unit = **it;
-			
+
 			const Vec2i workOff(15, 15);
 			const int range = 15;
 			const int maxWorkers = 10;

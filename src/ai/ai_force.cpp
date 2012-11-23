@@ -319,8 +319,8 @@ VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, c
 	const int minDist = 15;
 	if (AiEnemyUnitsInDistance(*startUnit.Player, NULL, pos, minDist) == false
 		&& Distance(pos, startPos) <= abs(distance - minDist)) {
-			*resultPos = pos;
-			return VisitResult_Finished;
+		*resultPos = pos;
+		return VisitResult_Finished;
 	}
 	if (CanMoveToMask(pos, movemask)) { // reachable
 		return VisitResult_Ok;

@@ -206,7 +206,7 @@ unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) co
 	}
 
 	unsigned char maxVision = 0;
-	if (IsExplored(player)){
+	if (IsExplored(player)) {
 		maxVision = 1;
 	}
 

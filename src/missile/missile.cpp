@@ -650,7 +650,7 @@ void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 	CUnit *unit = UnitOnMapTile(pos, -1);
 	if (unit && unit->IsAliveOnMap()
 		&& (missile.Type->FriendlyFire || unit->IsEnemy(*missile.SourceUnit->Player))) {
-			missile.MissileHit(unit);
+		missile.MissileHit(unit);
 	}
 }
 
@@ -768,11 +768,11 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 static bool IsPiercedUnit(const Missile &missile, const CUnit &unit)
 {
 	for (std::vector<CUnit *>::const_iterator it = missile.PiercedUnits.begin();
-		it != missile.PiercedUnits.end(); ++it) {
-			CUnit &punit = **it;
-			if (UnitNumber(unit) == UnitNumber(punit)) {
-				return true;
-			}
+		 it != missile.PiercedUnits.end(); ++it) {
+		CUnit &punit = **it;
+		if (UnitNumber(unit) == UnitNumber(punit)) {
+			return true;
+		}
 	}
 	return false;
 }

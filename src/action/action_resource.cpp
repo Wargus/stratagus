@@ -942,7 +942,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	if (player.AiEnabled && unit.pathFinderData->output.Cycles > 300) {
 		if (AiRequestChangeDepot(unit)) {
 			this->Finished = true;
-			return 0;	
+			return 0;
 		} else if (unit.pathFinderData->output.Cycles > 500) {
 			AiNewDepotRequest(unit);
 		}
