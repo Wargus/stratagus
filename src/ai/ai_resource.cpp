@@ -460,19 +460,17 @@ bool AiRequestChangeDepot(CUnit &worker)
 
 	Select(worker.tilePos - offset, worker.tilePos + offset, depots, IsADepositForResource(resource));
 
-	if (!depots.empty()) {
-		for (std::vector<CUnit *>::iterator it = depots.begin(); it != depots.end(); ++it) {
-			CUnit &unit = **it;
+	for (std::vector<CUnit *>::iterator it = depots.begin(); it != depots.end(); ++it) {
+		CUnit &unit = **it;
 
-			const Vec2i workOff(15, 15);
-			const int range = 15;
-			const int maxWorkers = 10;
-			std::vector<CUnit *> workers;
-			Select(unit.tilePos - workOff, unit.tilePos + workOff, workers, IsAWorker());
-			if (workers.size() <= maxWorkers && !AiEnemyUnitsInDistance(unit, range)) {
-				CommandReturnGoods(worker, &unit, FlushCommands);
-				return true;
-			}
+		const int range = 15;
+		const Vec2i workOff(range, range);
+		const size_t maxWorkers = 10;
+		std::vector<CUnit *> workers;
+		Select(unit.tilePos - workOff, unit.tilePos + workOff, workers, IsAWorker());
+		if (workers.size() <= maxWorkers && !AiEnemyUnitsInDistance(unit, range)) {
+			CommandReturnGoods(worker, &unit, FlushCommands);
+			return true;
 		}
 	}
 	return false;
