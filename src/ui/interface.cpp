@@ -515,6 +515,48 @@ bool HandleCommandKey(int key)
 extern void ToggleShowBuilListMessages();
 #endif
 
+static void CommandKey_Group(int group)
+{
+	if (KeyModifiers & ModifierShift) {
+		if (KeyModifiers & (ModifierAlt | ModifierDoublePress)) {
+			if (KeyModifiers & ModifierDoublePress) {
+				UiCenterOnGroup(group, SELECT_ALL);
+			} else {
+				UiSelectGroup(group, SELECT_ALL);
+			}
+		} else if (KeyModifiers & ModifierControl) {
+			UiAddToGroup(group);
+		} else {
+			UiAddGroupToSelection(group);
+		}
+	} else {
+		if (KeyModifiers & (ModifierAlt | ModifierDoublePress)) {
+			if (KeyModifiers & ModifierAlt) {
+				if (KeyModifiers & ModifierDoublePress) {
+					UiCenterOnGroup(group, NON_SELECTABLE_BY_RECTANGLE_ONLY);
+				} else {
+					UiSelectGroup(group, NON_SELECTABLE_BY_RECTANGLE_ONLY);
+				}
+			} else {
+				UiCenterOnGroup(group);
+			}
+		} else if (KeyModifiers & ModifierControl) {
+			UiDefineGroup(group);
+		} else {
+			UiSelectGroup(group);
+		}
+	}
+}
+
+static void CommandKey_MapPosition(int index)
+{
+	if (KeyModifiers & ModifierShift) {
+		UiSaveMapPosition(index);
+	} else {
+		UiRecallMapPosition(index);
+	}
+}
+
 /**
 **  Handle keys in command mode.
 **
@@ -552,45 +594,13 @@ static bool CommandKey(int key)
 		case '3': case '4': case '5':
 		case '6': case '7': case '8':
 		case '9':
-			if (KeyModifiers & ModifierShift) {
-				if (KeyModifiers & (ModifierAlt | ModifierDoublePress)) {
-					if (KeyModifiers & ModifierDoublePress) {
-						UiCenterOnGroup(key - '0', SELECT_ALL);
-					} else {
-						UiSelectGroup(key - '0', SELECT_ALL);
-					}
-				} else if (KeyModifiers & ModifierControl) {
-					UiAddToGroup(key - '0');
-				} else {
-					UiAddGroupToSelection(key - '0');
-				}
-			} else {
-				if (KeyModifiers & (ModifierAlt | ModifierDoublePress)) {
-					if (KeyModifiers & ModifierAlt) {
-						if (KeyModifiers & ModifierDoublePress) {
-							UiCenterOnGroup(key - '0', NON_SELECTABLE_BY_RECTANGLE_ONLY);
-						} else {
-							UiSelectGroup(key - '0', NON_SELECTABLE_BY_RECTANGLE_ONLY);
-						}
-					} else {
-						UiCenterOnGroup(key - '0');
-					}
-				} else if (KeyModifiers & ModifierControl) {
-					UiDefineGroup(key - '0');
-				} else {
-					UiSelectGroup(key - '0');
-				}
-			}
+			CommandKey_Group(key - '0');
 			break;
 
 		case SDLK_F2:
 		case SDLK_F3:
 		case SDLK_F4: // Set/Goto place
-			if (KeyModifiers & ModifierShift) {
-				UiSaveMapPosition(key - SDLK_F2);
-			} else {
-				UiRecallMapPosition(key - SDLK_F2);
-			}
+			CommandKey_MapPosition(key - SDLK_F2);
 			break;
 
 		case SDLK_SPACE: // center on last action
