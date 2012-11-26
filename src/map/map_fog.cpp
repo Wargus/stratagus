@@ -467,6 +467,125 @@ void VideoDrawOnlyFog(int x, int y)
 --  Old version correct working but not 100% original
 ----------------------------------------------------------------------------*/
 
+static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile)
+{
+#define IsMapFieldExploredTable(index) (VisibleTable[(index)])
+#define IsMapFieldVisibleTable(index) (VisibleTable[(index)] > 1)
+
+	int w = Map.Info.MapWidth;
+	int fogTileIndex = 0;
+	int blackFogTileIndex = 0;
+	int x = sx - sy;
+
+	if (ReplayRevealMap) {
+		*fogTile = 0;
+		*blackFogTile = 0;
+		return;
+	}
+
+	//
+	//  Which Tile to draw for fog
+	//
+	// Investigate tiles around current tile
+	// 1 2 3
+	// 4 * 5
+	// 6 7 8
+
+//    2  3 1
+//   10 ** 5
+//    8 12 4
+
+	if (sy) {
+		unsigned int index = sy - Map.Info.MapWidth;//(y-1) * Map.Info.MapWidth;
+		if (sx != sy) {
+			//if (!IsMapFieldExploredTable(x - 1, y - 1)) {
+			if (!IsMapFieldExploredTable(x - 1 + index)) {
+				blackFogTileIndex |= 2;
+				fogTileIndex |= 2;
+				//} else if (!IsMapFieldVisibleTable(x - 1, y - 1)) {
+			} else if (!IsMapFieldVisibleTable(x - 1 + index)) {
+				fogTileIndex |= 2;
+			}
+		}
+		//if (!IsMapFieldExploredTable(x, y - 1)) {
+		if (!IsMapFieldExploredTable(x + index)) {
+			blackFogTileIndex |= 3;
+			fogTileIndex |= 3;
+			//} else if (!IsMapFieldVisibleTable(x, y - 1)) {
+		} else if (!IsMapFieldVisibleTable(x + index)) {
+			fogTileIndex |= 3;
+		}
+		if (sx != sy + w - 1) {
+			//if (!IsMapFieldExploredTable(x + 1, y - 1)) {
+			if (!IsMapFieldExploredTable(x + 1 + index)) {
+				blackFogTileIndex |= 1;
+				fogTileIndex |= 1;
+				//} else if (!IsMapFieldVisibleTable(x + 1, y - 1)) {
+			} else if (!IsMapFieldVisibleTable(x + 1 + index)) {
+				fogTileIndex |= 1;
+			}
+		}
+	}
+
+	if (sx != sy) {
+		unsigned int index = sy;//(y) * Map.Info.MapWidth;
+		//if (!IsMapFieldExploredTable(x - 1, y)) {
+		if (!IsMapFieldExploredTable(x - 1 + index)) {
+			blackFogTileIndex |= 10;
+			fogTileIndex |= 10;
+			//} else if (!IsMapFieldVisibleTable(x - 1, y)) {
+		} else if (!IsMapFieldVisibleTable(x - 1 + index)) {
+			fogTileIndex |= 10;
+		}
+	}
+	if (sx != sy + w - 1) {
+		unsigned int index = sy;//(y) * Map.Info.MapWidth;
+		//if (!IsMapFieldExploredTable(x + 1, y)) {
+		if (!IsMapFieldExploredTable(x + 1 + index)) {
+			blackFogTileIndex |= 5;
+			fogTileIndex |= 5;
+			//} else if (!IsMapFieldVisibleTable(x + 1, y)) {
+		} else if (!IsMapFieldVisibleTable(x + 1 + index)) {
+			fogTileIndex |= 5;
+		}
+	}
+
+	if (sy + w < Map.Info.MapHeight * w) {
+		unsigned int index = sy + Map.Info.MapWidth;//(y+1) * Map.Info.MapWidth;
+		if (sx != sy) {
+			//if (!IsMapFieldExploredTable(x - 1, y + 1)) {
+			if (!IsMapFieldExploredTable(x - 1 + index)) {
+				blackFogTileIndex |= 8;
+				fogTileIndex |= 8;
+				//} else if (!IsMapFieldVisibleTable(x - 1, y + 1)) {
+			} else if (!IsMapFieldVisibleTable(x - 1 + index)) {
+				fogTileIndex |= 8;
+			}
+		}
+		//if (!IsMapFieldExploredTable(x, y + 1)) {
+		if (!IsMapFieldExploredTable(x + index)) {
+			blackFogTileIndex |= 12;
+			fogTileIndex |= 12;
+			//} else if (!IsMapFieldVisibleTable(x, y + 1)) {
+		} else if (!IsMapFieldVisibleTable(x + index)) {
+			fogTileIndex |= 12;
+		}
+		if (sx != sy + w - 1) {
+			//if (!IsMapFieldExploredTable(x + 1, y + 1)) {
+			if (!IsMapFieldExploredTable(x + 1 + index)) {
+				blackFogTileIndex |= 4;
+				fogTileIndex |= 4;
+				//} else if (!IsMapFieldVisibleTable(x + 1, y + 1)) {
+			} else if (!IsMapFieldVisibleTable(x + 1 + index)) {
+				fogTileIndex |= 4;
+			}
+		}
+	}
+
+	*fogTile = FogTable[fogTileIndex];
+	*blackFogTile = FogTable[blackFogTileIndex];
+}
+
 /**
 **  Draw fog of war tile.
 **
@@ -477,135 +596,24 @@ void VideoDrawOnlyFog(int x, int y)
 */
 static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 {
+	int fogTile = 0;
+	int blackFogTile = 0;
 
-#define IsMapFieldExploredTable(index) \
-	(VisibleTable[(index)])
-#define IsMapFieldVisibleTable(index) \
-	(VisibleTable[(index)] > 1)
+	GetFogOfWarTile(sx, sy, &fogTile, &blackFogTile);
 
-
-	int w = Map.Info.MapWidth;
-	int tile = 0, tile2 = 0;
-	int x = sx - sy;
-	//int y = sy / Map.Info.MapWidth;
-
-	//
-	//  Which Tile to draw for fog
-	//
-	// Investigate tiles around current tile
-	// 1 2 3
-	// 4 * 5
-	// 6 7 8
-
-	if (sy) {
-		unsigned int index = sy - Map.Info.MapWidth;//(y-1) * Map.Info.MapWidth;
-		if (sx != sy) {
-			//if (!IsMapFieldExploredTable(x - 1, y - 1)) {
-			if (!IsMapFieldExploredTable(x - 1 + index)) {
-				tile2 |= 2;
-				tile |= 2;
-				//} else if (!IsMapFieldVisibleTable(x - 1, y - 1)) {
-			} else if (!IsMapFieldVisibleTable(x - 1 + index)) {
-				tile |= 2;
-			}
-		}
-		//if (!IsMapFieldExploredTable(x, y - 1)) {
-		if (!IsMapFieldExploredTable(x + index)) {
-			tile2 |= 3;
-			tile |= 3;
-			//} else if (!IsMapFieldVisibleTable(x, y - 1)) {
-		} else if (!IsMapFieldVisibleTable(x + index)) {
-			tile |= 3;
-		}
-		if (sx != sy + w - 1) {
-			//if (!IsMapFieldExploredTable(x + 1, y - 1)) {
-			if (!IsMapFieldExploredTable(x + 1 + index)) {
-				tile2 |= 1;
-				tile |= 1;
-				//} else if (!IsMapFieldVisibleTable(x + 1, y - 1)) {
-			} else if (!IsMapFieldVisibleTable(x + 1 + index)) {
-				tile |= 1;
-			}
-		}
-	}
-
-	if (sx != sy) {
-		unsigned int index = sy;//(y) * Map.Info.MapWidth;
-		//if (!IsMapFieldExploredTable(x - 1, y)) {
-		if (!IsMapFieldExploredTable(x - 1 + index)) {
-			tile2 |= 10;
-			tile |= 10;
-			//} else if (!IsMapFieldVisibleTable(x - 1, y)) {
-		} else if (!IsMapFieldVisibleTable(x - 1 + index)) {
-			tile |= 10;
-		}
-	}
-	if (sx != sy + w - 1) {
-		unsigned int index = sy;//(y) * Map.Info.MapWidth;
-		//if (!IsMapFieldExploredTable(x + 1, y)) {
-		if (!IsMapFieldExploredTable(x + 1 + index)) {
-			tile2 |= 5;
-			tile |= 5;
-			//} else if (!IsMapFieldVisibleTable(x + 1, y)) {
-		} else if (!IsMapFieldVisibleTable(x + 1 + index)) {
-			tile |= 5;
-		}
-	}
-
-	if (sy + w < Map.Info.MapHeight * w) {
-		unsigned int index = sy + Map.Info.MapWidth;//(y+1) * Map.Info.MapWidth;
-		if (sx != sy) {
-			//if (!IsMapFieldExploredTable(x - 1, y + 1)) {
-			if (!IsMapFieldExploredTable(x - 1 + index)) {
-				tile2 |= 8;
-				tile |= 8;
-				//} else if (!IsMapFieldVisibleTable(x - 1, y + 1)) {
-			} else if (!IsMapFieldVisibleTable(x - 1 + index)) {
-				tile |= 8;
-			}
-		}
-		//if (!IsMapFieldExploredTable(x, y + 1)) {
-		if (!IsMapFieldExploredTable(x + index)) {
-			tile2 |= 12;
-			tile |= 12;
-			//} else if (!IsMapFieldVisibleTable(x, y + 1)) {
-		} else if (!IsMapFieldVisibleTable(x + index)) {
-			tile |= 12;
-		}
-		if (sx != sy + w - 1) {
-			//if (!IsMapFieldExploredTable(x + 1, y + 1)) {
-			if (!IsMapFieldExploredTable(x + 1 + index)) {
-				tile2 |= 4;
-				tile |= 4;
-				//} else if (!IsMapFieldVisibleTable(x + 1, y + 1)) {
-			} else if (!IsMapFieldVisibleTable(x + 1 + index)) {
-				tile |= 4;
-			}
-		}
-	}
-
-	tile = FogTable[tile];
-	tile2 = FogTable[tile2];
-
-	if (ReplayRevealMap) {
-		tile2 = 0;
-		tile = 0;
-	}
-
-	//if (IsMapFieldVisibleTable(x, y) || ReplayRevealMap) {
 	if (IsMapFieldVisibleTable(sx) || ReplayRevealMap) {
-		if (tile && tile != tile2) {
+		if (fogTile && fogTile != blackFogTile) {
 			if (UseOpenGL) {
-				Map.FogGraphic->DrawFrameClipTrans(tile, dx, dy, FogOfWarOpacity);
+				Map.FogGraphic->DrawFrameClipTrans(fogTile, dx, dy, FogOfWarOpacity);
 			} else {
-				AlphaFogG->DrawFrameClip(tile, dx, dy);
+				AlphaFogG->DrawFrameClip(fogTile, dx, dy);
 			}
 		}
 	} else {
 		VideoDrawOnlyFog(dx, dy);
 	}
-	if (tile2) {
-		Map.FogGraphic->DrawFrameClip(tile2, dx, dy);
+	if (blackFogTile) {
+		Map.FogGraphic->DrawFrameClip(blackFogTile, dx, dy);
 	}
 
 #undef IsMapFieldExploredTable
