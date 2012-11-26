@@ -76,6 +76,63 @@ public:
 --  Functions
 ----------------------------------------------------------------------------*/
 
+static void swapEndianness(WavHeader *wavHeader)
+{
+	wavHeader->MagicRiff = SDL_SwapLE32(wavHeader->MagicRiff);
+	wavHeader->Length = SDL_SwapLE32(wavHeader->Length);
+	wavHeader->MagicWave = SDL_SwapLE32(wavHeader->MagicWave);
+}
+
+static bool Check(const WavHeader &wavHeader)
+{
+	if (wavHeader.MagicRiff != RIFF) {
+		return false;
+	}
+	if (wavHeader.MagicWave != WAVE) {
+		printf("Wrong magic %x (not %x)\n", wavHeader.MagicWave, WAVE);
+		return false;
+	}
+	return true;
+}
+
+static void swapEndianness(WavChunk *chunk)
+{
+	chunk->Magic = SDL_SwapLE32(chunk->Magic);
+	chunk->Length = SDL_SwapLE32(chunk->Length);
+}
+
+static void swapEndianness(WavFMT *wavfmt)
+{
+	wavfmt->Encoding = SDL_SwapLE16(wavfmt->Encoding);
+	wavfmt->Channels = SDL_SwapLE16(wavfmt->Channels);
+	wavfmt->Frequency = SDL_SwapLE32(wavfmt->Frequency);
+	wavfmt->ByteRate = SDL_SwapLE32(wavfmt->ByteRate);
+	wavfmt->SampleSize = SDL_SwapLE16(wavfmt->SampleSize);
+	wavfmt->BitsPerSample = SDL_SwapLE16(wavfmt->BitsPerSample);
+}
+
+static bool IsWavFormatSupported(const WavFMT &wavfmt)
+{
+	if (wavfmt.Encoding != WAV_PCM_CODE) {
+		printf("Unsupported encoding %d\n", wavfmt.Encoding);
+		return false;
+	}
+	if (wavfmt.Channels != WAV_MONO && wavfmt.Channels != WAV_STEREO) {
+		printf("Unsupported channels %d\n", wavfmt.Channels);
+		return false;
+	}
+	if (wavfmt.SampleSize != 1 && wavfmt.SampleSize != 2 && wavfmt.SampleSize != 4) {
+		printf("Unsupported sample size %d\n", wavfmt.SampleSize);
+		return false;
+	}
+	if (wavfmt.BitsPerSample != 8 && wavfmt.BitsPerSample != 16) {
+		printf("Unsupported bits per sample %d\n", wavfmt.BitsPerSample);
+		return false;
+	}
+	Assert(wavfmt.Frequency == 44100 || wavfmt.Frequency == 22050 || wavfmt.Frequency == 11025);
+	return true;
+}
+
 int CSampleWavStream::Read(void *buf, int len)
 {
 	WavChunk chunk;
@@ -101,8 +158,7 @@ int CSampleWavStream::Read(void *buf, int len)
 				break;
 			}
 
-			chunk.Magic = SDL_SwapLE32(chunk.Magic);
-			chunk.Length = SDL_SwapLE32(chunk.Length);
+			swapEndianness(&chunk);
 			if (chunk.Magic != DATA) {
 				this->Data.WavFile->seek(chunk.Length, SEEK_CUR);
 				continue;
@@ -169,7 +225,6 @@ CSampleWav::~CSampleWav()
 	delete[] this->Buffer;
 }
 
-
 /**
 **  Load wav.
 **
@@ -182,104 +237,89 @@ CSampleWav::~CSampleWav()
 */
 CSample *LoadWav(const char *name, int flags)
 {
-	CSample *sample;
-	WavData *data;
-	CFile *f;
-	WavChunk chunk;
-	WavFMT wavfmt;
-	unsigned int t;
+	CFile *f = new CFile;
 
-	f = new CFile;
 	if (f->open(name, CL_OPEN_READ) == -1) {
 		printf("Can't open file `%s'\n", name);
 		delete f;
 		return NULL;
 	}
-	f->read(&chunk, sizeof(chunk));
-
+	WavHeader wavHeader;
+	if (f->read(&wavHeader, sizeof(wavHeader)) != sizeof(wavHeader)) {
+		f->close();
+		delete f;
+		return NULL;
+	}
 	// Convert to native format
+	swapEndianness(&wavHeader);
 
-	chunk.Magic = SDL_SwapLE32(chunk.Magic);
-	chunk.Length = SDL_SwapLE32(chunk.Length);
-
-	if (chunk.Magic != RIFF) {
+	if (Check(wavHeader) == false) {
 		f->close();
 		delete f;
 		return NULL;
 	}
 
-	f->read(&t, sizeof(t));
-	t = SDL_SwapLE32(t);
-	if (t != WAVE) {
-		printf("Wrong magic %x (not %x)\n", t, WAVE);
+	WavChunk chunk;
+	if (f->read(&chunk, sizeof(chunk)) != sizeof(chunk)) {
 		f->close();
 		delete f;
 		return NULL;
 	}
-
-	f->read(&wavfmt, sizeof(wavfmt));
-
 	// Convert to native format
+	swapEndianness(&chunk);
 
-	wavfmt.FMTchunk = SDL_SwapLE32(wavfmt.FMTchunk);
-	wavfmt.FMTlength = SDL_SwapLE32(wavfmt.FMTlength);
-	wavfmt.Encoding = SDL_SwapLE16(wavfmt.Encoding);
-	wavfmt.Channels = SDL_SwapLE16(wavfmt.Channels);
-	wavfmt.Frequency = SDL_SwapLE32(wavfmt.Frequency);
-	wavfmt.ByteRate = SDL_SwapLE32(wavfmt.ByteRate);
-	wavfmt.SampleSize = SDL_SwapLE16(wavfmt.SampleSize);
-	wavfmt.BitsPerSample = SDL_SwapLE16(wavfmt.BitsPerSample);
+	while (chunk.Magic != FMT)
+	{
+		printf("Discard wavChunk '%x'\n", chunk.Magic);
+		std::vector<char> buffer;
 
-	if (wavfmt.FMTchunk != FMT) {
-		printf("Wrong magic %x (not %x)\n", wavfmt.FMTchunk, FMT);
+		buffer.resize(chunk.Length);
+		if (f->read(&buffer[0], chunk.Length) != static_cast<int>(chunk.Length)
+			|| f->read(&chunk, sizeof(chunk)) != sizeof(chunk)) {
+			f->close();
+			delete f;
+			return NULL;
+		}
+		// Convert to native format
+		swapEndianness(&chunk);
+	}
+	if (chunk.Length < 16) {
+		printf("Wrong length %d (not %d)\n", chunk.Length, 16);
 		f->close();
 		delete f;
 		return NULL;
 	}
-	if (wavfmt.FMTlength != 16 && wavfmt.FMTlength != 18) {
-		printf("Wrong length %d (not %d)\n", wavfmt.FMTlength, 16);
+	WavFMT wavfmt;
+
+	if (f->read(&wavfmt, sizeof(wavfmt)) != sizeof(wavfmt)) {
 		f->close();
 		delete f;
 		return NULL;
 	}
+	// Convert to native format
+	swapEndianness(&wavfmt);
 
-	if (wavfmt.FMTlength == 18) {
-		if (f->read(&chunk, 2) != 2) {
+	if (chunk.Length != 16) {
+		std::vector<char> buffer;
+		const int extraSize = chunk.Length - 16;
+
+		buffer.resize(extraSize);
+		if (f->read(&buffer[0], extraSize) != extraSize) {
 			f->close();
 			delete f;
 			return NULL;
 		}
 	}
 
-	//
 	//  Check if supported
-	//
-	if (wavfmt.Encoding != WAV_PCM_CODE) {
-		printf("Unsupported encoding %d\n", wavfmt.Encoding);
+	if (IsWavFormatSupported(wavfmt) == false) {
 		f->close();
 		delete f;
 		return NULL;
 	}
-	if (wavfmt.Channels != WAV_MONO && wavfmt.Channels != WAV_STEREO) {
-		printf("Unsupported channels %d\n", wavfmt.Channels);
-		f->close();
-		delete f;
-		return NULL;
-	}
-	if (wavfmt.SampleSize != 1 && wavfmt.SampleSize != 2 && wavfmt.SampleSize != 4) {
-		printf("Unsupported sample size %d\n", wavfmt.SampleSize);
-		f->close();
-		delete f;
-		return NULL;
-	}
-	if (wavfmt.BitsPerSample != 8 && wavfmt.BitsPerSample != 16) {
-		printf("Unsupported bits per sample %d\n", wavfmt.BitsPerSample);
-		f->close();
-		delete f;
-		return NULL;
-	}
-	Assert(wavfmt.Frequency == 44100 || wavfmt.Frequency == 22050 || wavfmt.Frequency == 11025);
 
+	CSample *sample;
+	WavData *data;
 	//
 	//  Read sample
 	//
@@ -305,28 +345,21 @@ CSample *LoadWav(const char *name, int flags)
 		data->ChunkRem = 0;
 		sample->Buffer = new unsigned char[SOUND_BUFFER_SIZE];
 	} else {
-		int comp; // number of compressed bytes actually read
-		int i;
-		int rem;
-		int read;
-		int bufrem;
 		char sndbuf[SOUND_BUFFER_SIZE];
 
 		sample->Buffer = NULL;
-		read = 0;
-		rem = 0;
+		int read = 0;
+		int rem = 0;
 		while (1) {
 			if (!rem) {
 				// read next chunk
-				comp = f->read(&chunk, sizeof(chunk));
+				const int comp = f->read(&chunk, sizeof(chunk));
 
 				if (!comp) {
 					// EOF
 					break;
 				}
-
-				chunk.Magic = SDL_SwapLE32(chunk.Magic);
-				chunk.Length = SDL_SwapLE32(chunk.Length);
+				swapEndianness(&chunk);
 				if (chunk.Magic != DATA) {
 					f->seek(chunk.Length, SEEK_CUR);
 					continue;
@@ -334,7 +367,7 @@ CSample *LoadWav(const char *name, int flags)
 				rem = chunk.Length;
 			}
 
-			bufrem = SOUND_BUFFER_SIZE;
+			const int bufrem = SOUND_BUFFER_SIZE;
 			if (rem > bufrem) {
 				read = bufrem;
 			} else {
@@ -348,12 +381,12 @@ CSample *LoadWav(const char *name, int flags)
 			delete[] sample->Buffer;
 			sample->Buffer = b;
 
-			comp = data->WavFile->read(sndbuf, read);
+			const int comp = data->WavFile->read(sndbuf, read);
 			Assert(comp == read);
 
 			if (sample->SampleSize == 16) {
 				read >>= 1;
-				for (i = 0; i < read; ++i) {
+				for (int i = 0; i < read; ++i) {
 					((unsigned short *)(sample->Buffer + sample->Pos + sample->Len))[i] =
 						SDL_SwapLE16(((unsigned short *)sndbuf)[i]);
 				}

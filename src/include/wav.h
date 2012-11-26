@@ -65,11 +65,18 @@
 #define WAV_STEREO 2
 
 /**
+**  General chunk found in the WAV file
+*/
+struct WavHeader {
+	unsigned int MagicRiff;
+	unsigned int Length;
+	unsigned int MagicWave;
+};
+
+/**
 **  Wav format
 */
 struct WavFMT {
-	unsigned int   FMTchunk;
-	unsigned int   FMTlength;
 	unsigned short Encoding;       /// 1 = PCM
 	unsigned short Channels;       /// 1 = mono, 2 = stereo
 	unsigned int   Frequency;      /// One of 11025, 22050, or 44100 Hz
@@ -82,10 +89,9 @@ struct WavFMT {
 **  General chunk found in the WAV file
 */
 struct WavChunk {
-	unsigned int  Magic;
-	unsigned int  Length;
+	unsigned int Magic;
+	unsigned int Length;
 };
-
 //@}
 
 #endif // !__WAV_H__
