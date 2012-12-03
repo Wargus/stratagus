@@ -97,7 +97,7 @@ function ConquestBriefingMenu(data)
   return menu:run()
 end
 
-function CreateMapStep(data)
+local function CreateMapStep(data)
   function RunCampaignMap()
     if (ConquestBriefingMenu(data) ~= 0) then
       GameResult = GameQuitToMenu
