@@ -549,6 +549,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->Priority = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "AnnoyComputerFactor")) {
 			type->AnnoyComputerFactor = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "AiAdjacentRange")) {
+			type->AiAdjacentRange = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DecayRate")) {
 			type->DecayRate = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Demand")) {

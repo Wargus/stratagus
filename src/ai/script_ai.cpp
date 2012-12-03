@@ -1036,58 +1036,66 @@ static int CclAiSetCollect(lua_State *l)
 static int CclAiDump(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	//
-	// Script
-	//
-	printf("------\n");
-	for (int i = 0; i < MaxCosts; ++i) {
-		printf("%s(%4d) ", DefaultResourceNames[i].c_str(), AiPlayer->Player->Resources[i]);
-	}
-	printf("\n");
-	printf("%d:", AiPlayer->Player->Index);
-#if 0
-	gh_display(gh_car(AiPlayer->Script));
-#endif
-	//
-	// Requests
-	//
-	size_t n = AiPlayer->UnitTypeRequests.size();
-	printf("UnitTypeRequests(%u):\n", static_cast<unsigned int>(n));
-	for (size_t i = 0; i < n; ++i) {
-		printf("%s ", AiPlayer->UnitTypeRequests[i].Type->Ident.c_str());
-	}
-	printf("\n");
-	n = AiPlayer->UpgradeToRequests.size();
-	printf("UpgradeToRequests(%u):\n", static_cast<unsigned int>(n));
-	for (size_t i = 0; i < n; ++i) {
-		printf("%s ", AiPlayer->UpgradeToRequests[i]->Ident.c_str());
-	}
-	printf("\n");
-	n = AiPlayer->ResearchRequests.size();
-	printf("ResearchRequests(%u):\n", static_cast<unsigned int>(n));
-	for (size_t i = 0; i < n; ++i) {
-		printf("%s ", AiPlayer->ResearchRequests[i]->Ident.c_str());
-	}
-	printf("\n");
+	for (int p = 0; p < PlayerMax - 1; ++p) {
+		CPlayer &aip = Players[p];
+		if (aip.AiEnabled) {
+			//
+			// Script
+			//
+			
+			printf("------\n");
+			for (int i = 0; i < MaxCosts; ++i) {
+				printf("%s(%4d, %4d/%4d) ", DefaultResourceNames[i].c_str(),
+					aip.Resources[i], aip.StoredResources[i], aip.MaxResources[i]);
+			}
+			printf("\n");
+			printf("Player %d:", aip.Index);
+		#if 0
+			gh_display(gh_car(AiPlayer->Script));
+		#endif
+			//
+			// Requests
+			//
+			size_t n = aip.Ai->UnitTypeRequests.size();
+			printf("UnitTypeRequests(%u):\n", static_cast<unsigned int>(n));
+			for (size_t i = 0; i < n; ++i) {
+				printf("%s ", aip.Ai->UnitTypeRequests[i].Type->Ident.c_str());
+			}
+			printf("\n");
+			n = aip.Ai->UpgradeToRequests.size();
+			printf("UpgradeToRequests(%u):\n", static_cast<unsigned int>(n));
+			for (size_t i = 0; i < n; ++i) {
+				printf("%s ", aip.Ai->UpgradeToRequests[i]->Ident.c_str());
+			}
+			printf("\n");
+			n = aip.Ai->ResearchRequests.size();
+			printf("ResearchRequests(%u):\n", static_cast<unsigned int>(n));
+			for (size_t i = 0; i < n; ++i) {
+				printf("%s ", aip.Ai->ResearchRequests[i]->Ident.c_str());
+			}
+			printf("\n");
 
-	// Building queue
-	printf("Building queue:\n");
-	for (size_t i = 0; i < AiPlayer->UnitTypeBuilt.size(); ++i) {
-		const AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[i];
-		printf("%s(%d/%d) ", queue.Type->Ident.c_str(), queue.Made, queue.Want);
-	}
-	printf("\n");
+			// Building queue
+			printf("Building queue:\n");
+			for (size_t i = 0; i < aip.Ai->UnitTypeBuilt.size(); ++i) {
+				const AiBuildQueue &queue = aip.Ai->UnitTypeBuilt[i];
+				printf("%s(%d/%d) ", queue.Type->Ident.c_str(), queue.Made, queue.Want);
+			}
+			printf("\n");
 
-	// PrintForce
-	for (size_t i = 0; i < AiPlayer->Force.Size(); ++i) {
-		printf("Force(%u%s%s):\n", static_cast<unsigned int>(i),
-			   AiPlayer->Force[i].Completed ? ",complete" : ",recruit",
-			   AiPlayer->Force[i].Attacking ? ",attack" : "");
-		for (size_t j = 0; j < AiPlayer->Force[i].UnitTypes.size(); ++j) {
-			const AiUnitType &aut = AiPlayer->Force[i].UnitTypes[j];
-			printf("%s(%d) ", aut.Type->Ident.c_str(), aut.Want);
+			// PrintForce
+			for (size_t i = 0; i < aip.Ai->Force.Size(); ++i) {
+				printf("Force(%u%s%s):\n", static_cast<unsigned int>(i),
+					   aip.Ai->Force[i].Completed ? ",complete" : ",recruit",
+					   aip.Ai->Force[i].Attacking ? ",attack" : "");
+				for (size_t j = 0; j < aip.Ai->Force[i].UnitTypes.size(); ++j) {
+					const AiUnitType &aut = aip.Ai->Force[i].UnitTypes[j];
+					printf("%s(%d) ", aut.Type->Ident.c_str(), aut.Want);
+				}
+				printf("\n");
+			}
+			printf("\n");
 		}
-		printf("\n");
 	}
 	lua_pushboolean(l, 0);
 	return 1;

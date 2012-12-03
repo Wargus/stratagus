@@ -1604,7 +1604,7 @@ void CButtonPanel::DoClicked(int button)
 			// FIXME: store pointer in button table!
 			CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
 			for (int i = 0; i < NumSelected; ++i) {
-				if (!Selected[i]->Player->CheckUnitType(type)) {
+				if (Selected[0]->Player->CheckLimits(type) != -6 && !Selected[i]->Player->CheckUnitType(type)) {
 					if (Selected[i]->CurrentAction() != UnitActionUpgradeTo) {
 						SendCommandUpgradeTo(*Selected[i], type, !(KeyModifiers & ModifierShift));
 						UI.StatusLine.Clear();

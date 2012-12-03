@@ -107,7 +107,7 @@ enum AiForceAttackingState {
 	AiForceAttackingState_Attacking,
 };
 
-#define AI_WAIT_ON_RALLY_POINT 30          /// Max seconds AI units will wait on rally point
+#define AI_WAIT_ON_RALLY_POINT 60          /// Max seconds AI units will wait on rally point
 
 /**
 **  Define an AI force.

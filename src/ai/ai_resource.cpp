@@ -423,15 +423,17 @@ void AiNewDepotRequest(CUnit &worker)
 	}
 }
 
-class IsADepositForResource
+class IsAResourceDepositForWorker
 {
 public:
-	explicit IsADepositForResource(const int r) : resource(r) {}
+	explicit IsAResourceDepositForWorker(const int r, const CUnit &worker) : resource(r), worker(worker) {}
 	bool operator()(const CUnit *const unit) const {
-		return (unit->Type->CanStore[resource] && !unit->IsUnusable());
+		return (unit->Type->CanStore[resource]
+			&& (unit->Player == worker.Player || unit->IsAllied(worker)) && !unit->IsUnusable());
 	}
 private:
 	const int resource;
+	const CUnit &worker;
 };
 
 class IsAWorker
@@ -441,6 +443,17 @@ public:
 	bool operator()(const CUnit *const unit) const {
 		return (unit->Type->Harvester && unit->Type->ResInfo && !unit->Removed);
 	}
+};
+
+class CompareDepotsByDistance
+{
+public:
+	explicit CompareDepotsByDistance(const CUnit &worker) : worker(worker) {}
+	bool operator()(const CUnit *lhs, const CUnit *rhs) const {
+		return lhs->MapDistanceTo(worker) > rhs->MapDistanceTo(worker);
+	}
+private:
+	const CUnit &worker;
 };
 
 /**
@@ -458,7 +471,8 @@ bool AiRequestChangeDepot(CUnit &worker)
 	std::vector<CUnit *> depots;
 	const Vec2i offset(40, 40);
 
-	Select(worker.tilePos - offset, worker.tilePos + offset, depots, IsADepositForResource(resource));
+	Select(worker.tilePos - offset, worker.tilePos + offset, depots, IsAResourceDepositForWorker(resource, worker));
+	std::sort(depots.begin(), depots.end(), CompareDepotsByDistance(worker));
 
 	for (std::vector<CUnit *>::iterator it = depots.begin(); it != depots.end(); ++it) {
 		CUnit &unit = **it;

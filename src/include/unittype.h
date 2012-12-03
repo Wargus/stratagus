@@ -466,7 +466,7 @@ public:
 	LuaCallback *OnEachCycle;       /// lua function called every cycle
 	LuaCallback *OnEachSecond;      /// lua function called every second
 
-	mutable std::string DamageType;         /// DamageType (used for extra death animations and impacts)
+	mutable std::string DamageType; /// DamageType (used for extra death animations and impacts)
 
 	std::string CorpseName;         /// Corpse type name
 	CUnitType *CorpseType;          /// Corpse unit-type
@@ -502,6 +502,7 @@ public:
 	int DecayRate;                  /// Decay rate in 1/6 seconds
 	// TODO: not used
 	int AnnoyComputerFactor;        /// How much this annoys the computer
+	int AiAdjacentRange;            /// Min radius for AI build surroundings checking
 	int MouseAction;                /// Right click action
 #define MouseActionNone      0      /// Nothing
 #define MouseActionAttack    1      /// Attack

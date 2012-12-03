@@ -2652,7 +2652,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 						  && (ThreatCalculate(target, *attacker) < ThreatCalculate(target, *best))))) {
 			best = attacker;
 		}
-		if (best && best != oldgoal) {
+		if (best && best != oldgoal && best->Player != target.Player && best->IsAllied(target) == false) {
 			CommandAttack(target, best->tilePos, best, FlushCommands);
 			// Set threshold value only for agressive units
 			if (best->IsAgressive()) {

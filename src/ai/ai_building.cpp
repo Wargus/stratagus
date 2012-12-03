@@ -86,8 +86,10 @@ static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit)
 */
 static bool AiCheckSurrounding(const CUnit &worker, const CUnitType &type, const Vec2i &pos, bool &backupok)
 {
-	const Vec2i pos_topLeft(pos.x - 1, pos.y - 1);
-	const Vec2i pos_bottomRight(pos.x + type.TileWidth, pos.y + type.TileWidth);
+	const int surroundRange = type.AiAdjacentRange != -1 ? type.AiAdjacentRange : 1;
+	const Vec2i pos_topLeft(pos.x - surroundRange, pos.y - surroundRange);
+	const Vec2i pos_bottomRight(pos.x + type.TileWidth + surroundRange - 1,
+		pos.y + type.TileHeight + surroundRange - 1);
 	Vec2i it = pos_topLeft;
 	const bool firstVal = IsPosFree(it, worker);
 	bool lastval = firstVal;
