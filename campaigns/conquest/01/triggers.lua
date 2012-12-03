@@ -14,7 +14,7 @@ AddTrigger(
     AddMessage("The outpost is now under your control.")
     AddMessage("You must finish constructing the base by building a gun turret and a training camp.")
     AddObjective("Build a gun turret")
-    AddObjective("Build a training")
+    AddObjective("Build a training camp")
     DefineAllow("unit-engineer", AllowAll)
     DefineAllow("unit-gturret", AllowAll)
     DefineAllow("unit-camp", AllowAll)
