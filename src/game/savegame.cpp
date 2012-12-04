@@ -126,6 +126,17 @@ int SaveGame(const std::string &filename)
 	const struct tm *timeinfo = localtime(&now);
 	strftime(dateStr, sizeof(dateStr), "%c", timeinfo);
 
+	// Load initial level // Without units
+	file.printf("local oldCreateUnit = CreateUnit\n");
+	file.printf("local oldSetResourcesHeld = SetResourcesHeld\n");
+	file.printf("local oldSetTile = SetTile\n");
+	file.printf("function CreateUnit() end\n");
+	file.printf("function SetResourcesHeld() end\n");
+	file.printf("function SetTile() end\n");
+	file.printf("Load(\"%s\")\n", Map.Info.Filename.c_str());
+	file.printf("CreateUnit = oldCreateUnit\n");
+	file.printf("SetResourcesHeld = oldSetResourcesHeld\n");
+	file.printf("SetTile = oldSetTile\n");
 	//
 	// Parseable header
 	//
