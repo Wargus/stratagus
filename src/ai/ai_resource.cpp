@@ -429,7 +429,7 @@ public:
 	explicit IsAResourceDepositForWorker(const int r, const CUnit &worker) : resource(r), worker(worker) {}
 	bool operator()(const CUnit *const unit) const {
 		return (unit->Type->CanStore[resource]
-			&& (unit->Player == worker.Player || unit->IsAllied(worker)) && !unit->IsUnusable());
+				&& (unit->Player == worker.Player || unit->IsAllied(worker)) && !unit->IsUnusable());
 	}
 private:
 	const int resource;

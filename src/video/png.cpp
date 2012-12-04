@@ -243,7 +243,7 @@ int LoadGraphicPNG(CGraphic *g)
 	row_pointers.resize(height);
 
 	for (int i = 0; i < (int)height; ++i) {
-		row_pointers[i] = (png_bytep) (Uint8 *)surface->pixels + i * surface->pitch;
+		row_pointers[i] = (png_bytep)(Uint8 *)surface->pixels + i * surface->pitch;
 	}
 
 	/* Read the entire image in one go */

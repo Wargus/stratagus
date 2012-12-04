@@ -89,7 +89,7 @@ static bool AiCheckSurrounding(const CUnit &worker, const CUnitType &type, const
 	const int surroundRange = type.AiAdjacentRange != -1 ? type.AiAdjacentRange : 1;
 	const Vec2i pos_topLeft(pos.x - surroundRange, pos.y - surroundRange);
 	const Vec2i pos_bottomRight(pos.x + type.TileWidth + surroundRange - 1,
-		pos.y + type.TileHeight + surroundRange - 1);
+								pos.y + type.TileHeight + surroundRange - 1);
 	Vec2i it = pos_topLeft;
 	const bool firstVal = IsPosFree(it, worker);
 	bool lastval = firstVal;

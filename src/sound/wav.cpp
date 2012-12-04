@@ -268,8 +268,7 @@ CSample *LoadWav(const char *name, int flags)
 	// Convert to native format
 	swapEndianness(&chunk);
 
-	while (chunk.Magic != FMT)
-	{
+	while (chunk.Magic != FMT) {
 		printf("Discard wavChunk '%x'\n", chunk.Magic);
 		std::vector<char> buffer;
 

@@ -1042,17 +1042,17 @@ static int CclAiDump(lua_State *l)
 			//
 			// Script
 			//
-			
+
 			printf("------\n");
 			for (int i = 0; i < MaxCosts; ++i) {
 				printf("%s(%4d, %4d/%4d) ", DefaultResourceNames[i].c_str(),
-					aip.Resources[i], aip.StoredResources[i], aip.MaxResources[i]);
+					   aip.Resources[i], aip.StoredResources[i], aip.MaxResources[i]);
 			}
 			printf("\n");
 			printf("Player %d:", aip.Index);
-		#if 0
+#if 0
 			gh_display(gh_car(AiPlayer->Script));
-		#endif
+#endif
 			//
 			// Requests
 			//

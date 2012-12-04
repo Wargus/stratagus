@@ -491,9 +491,9 @@ static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile)
 	// 4 * 5
 	// 6 7 8
 
-//    2  3 1
-//   10 ** 5
-//    8 12 4
+	//    2  3 1
+	//   10 ** 5
+	//    8 12 4
 
 	if (sy) {
 		unsigned int index = sy - Map.Info.MapWidth;//(y-1) * Map.Info.MapWidth;
