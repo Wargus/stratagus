@@ -1371,6 +1371,235 @@ void CButtonPanel::Update()
 	}
 }
 
+void CButtonPanel::DoClicked_SelectTarget(int button)
+{
+	// Select target.
+	CursorState = CursorStateSelect;
+	if (CurrentButtons[button].ButtonCursor.length() && CursorByIdent(CurrentButtons[button].ButtonCursor)) {
+		GameCursor = CursorByIdent(CurrentButtons[button].ButtonCursor);
+		CustomCursor = CurrentButtons[button].ButtonCursor;
+	} else {
+		GameCursor = UI.YellowHair.Cursor;
+	}
+	CursorAction = CurrentButtons[button].Action;
+	CursorValue = CurrentButtons[button].Value;
+	CurrentButtonLevel = 9; // level 9 is cancel-only
+	UI.ButtonPanel.Update();
+	UI.StatusLine.Set(_("Select Target"));
+}
+
+void CButtonPanel::DoClicked_Unload(int button)
+{
+	const int flush = !(KeyModifiers & ModifierShift);
+	//
+	//  Unload on coast, transporter standing, unload all units right now.
+	//  That or a bunker.
+	//
+	if ((NumSelected == 1 && Selected[0]->CurrentAction() == UnitActionStill
+		 && Map.Field(Selected[0]->tilePos)->CoastOnMap())
+		|| !Selected[0]->CanMove()) {
+		SendCommandUnload(*Selected[0], Selected[0]->tilePos, NoUnitP, flush);
+		return ;
+	}
+	DoClicked_SelectTarget(button);
+}
+
+void CButtonPanel::DoClicked_SpellCast(int button)
+{
+	const int spellId = CurrentButtons[button].Value;
+	if (KeyModifiers & ModifierControl) {
+		int autocast = 0;
+
+		if (!SpellTypeTable[spellId]->AutoCast) {
+			PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound, MaxSampleVolume);
+			return;
+		}
+
+		//autocast = 0;
+		// If any selected unit doesn't have autocast on turn it on
+		// for everyone
+		for (int i = 0; i < NumSelected; ++i) {
+			if (Selected[i]->AutoCastSpell[spellId] == 0) {
+				autocast = 1;
+				break;
+			}
+		}
+		for (int i = 0; i < NumSelected; ++i) {
+			if (Selected[i]->AutoCastSpell[spellId] != autocast) {
+				SendCommandAutoSpellCast(*Selected[i], spellId, autocast);
+			}
+		}
+		return;
+	}
+	if (SpellTypeTable[spellId]->IsCasterOnly()) {
+		const int flush = !(KeyModifiers & ModifierShift);
+
+		for (int i = 0; i < NumSelected; ++i) {
+			CUnit &unit = *Selected[i];
+			// CursorValue here holds the spell type id
+			SendCommandSpellCast(unit, unit.tilePos, &unit, spellId, flush);
+		}
+		return;
+	}
+	DoClicked_SelectTarget(button);
+}
+
+void CButtonPanel::DoClicked_Repair(int button)
+{
+	if (KeyModifiers & ModifierControl) {
+		unsigned autorepair = 0;
+		// If any selected unit doesn't have autocast on turn it on
+		// for everyone
+		for (int i = 0; i < NumSelected; ++i) {
+			if (Selected[i]->AutoRepair == 0) {
+				autorepair = 1;
+				break;
+			}
+		}
+		for (int i = 0; i < NumSelected; ++i) {
+			if (Selected[i]->AutoRepair != autorepair) {
+				SendCommandAutoRepair(*Selected[i], autorepair);
+			}
+		}
+		return;
+	}
+	DoClicked_SelectTarget(button);
+
+}
+
+void CButtonPanel::DoClicked_Return()
+{
+	for (int i = 0; i < NumSelected; ++i) {
+		SendCommandReturnGoods(*Selected[i], NoUnitP, !(KeyModifiers & ModifierShift));
+	}
+}
+
+void CButtonPanel::DoClicked_Stop()
+{
+	for (int i = 0; i < NumSelected; ++i) {
+		SendCommandStopUnit(*Selected[i]);
+	}
+}
+
+void CButtonPanel::DoClicked_StandGround()
+{
+	for (int i = 0; i < NumSelected; ++i) {
+		SendCommandStandGround(*Selected[i], !(KeyModifiers & ModifierShift));
+	}
+}
+
+void CButtonPanel::DoClicked_Button(int button)
+{
+	CurrentButtonLevel = CurrentButtons[button].Value;
+	UI.ButtonPanel.Update();
+}
+
+void CButtonPanel::DoClicked_CancelUpgrade()
+{
+	if (NumSelected == 1) {
+		switch (Selected[0]->CurrentAction()) {
+			case UnitActionUpgradeTo:
+				SendCommandCancelUpgradeTo(*Selected[0]);
+				break;
+			case UnitActionResearch:
+				SendCommandCancelResearch(*Selected[0]);
+				break;
+			default:
+				break;
+		}
+	}
+	UI.StatusLine.Clear();
+	ClearCosts();
+	CurrentButtonLevel = 0;
+	UI.ButtonPanel.Update();
+	GameCursor = UI.Point.Cursor;
+	CursorBuilding = NULL;
+	CursorState = CursorStatePoint;
+}
+
+void CButtonPanel::DoClicked_CancelTrain()
+{
+	Assert(Selected[0]->CurrentAction() == UnitActionTrain);
+	SendCommandCancelTraining(*Selected[0], -1, NULL);
+	UI.StatusLine.Clear();
+	ClearCosts();
+}
+
+void CButtonPanel::DoClicked_CancelBuild()
+{
+	// FIXME: johns is this not sure, only building should have this?
+	Assert(Selected[0]->CurrentAction() == UnitActionBuilt);
+	if (NumSelected == 1) {
+		SendCommandDismiss(*Selected[0]);
+	}
+	UI.StatusLine.Clear();
+	ClearCosts();
+}
+
+void CButtonPanel::DoClicked_Build(int button)
+{
+	// FIXME: store pointer in button table!
+	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
+	if (!Selected[0]->Player->CheckUnitType(type)) {
+		UI.StatusLine.Set(_("Select Location"));
+		ClearCosts();
+		CursorBuilding = &type;
+		// FIXME: check is this =9 necessary?
+		CurrentButtonLevel = 9; // level 9 is cancel-only
+		UI.ButtonPanel.Update();
+	}
+}
+
+void CButtonPanel::DoClicked_Train(int button)
+{
+	// FIXME: store pointer in button table!
+	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
+	// FIXME: Johns: I want to place commands in queue, even if not
+	// FIXME:        enough resources are available.
+	// FIXME: training queue full check is not correct for network.
+	// FIXME: this can be correct written, with a little more code.
+	if (Selected[0]->CurrentAction() == UnitActionTrain && !EnableTrainingQueue) {
+		Selected[0]->Player->Notify(NotifyYellow, Selected[0]->tilePos, "%s", _("Unit training queue is full"));
+	} else if (Selected[0]->Player->CheckLimits(type) >= 0 && !Selected[0]->Player->CheckUnitType(type)) {
+		//PlayerSubUnitType(player,type);
+		SendCommandTrainUnit(*Selected[0], type, !(KeyModifiers & ModifierShift));
+		UI.StatusLine.Clear();
+		ClearCosts();
+	} else if (Selected[0]->Player->CheckLimits(type) == -3) {
+		if (GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound) {
+			PlayGameSound(GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound, MaxSampleVolume);
+		}
+	}
+}
+
+void CButtonPanel::DoClicked_UpgradeTo(int button)
+{
+	// FIXME: store pointer in button table!
+	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
+	for (int i = 0; i < NumSelected; ++i) {
+		if (Selected[0]->Player->CheckLimits(type) != -6 && !Selected[i]->Player->CheckUnitType(type)) {
+			if (Selected[i]->CurrentAction() != UnitActionUpgradeTo) {
+				SendCommandUpgradeTo(*Selected[i], type, !(KeyModifiers & ModifierShift));
+				UI.StatusLine.Clear();
+				ClearCosts();
+			}
+		} else {
+			break;
+		}
+	}
+}
+
+void CButtonPanel::DoClicked_Research(int button)
+{
+	const int index = CurrentButtons[button].Value;
+	if (!Selected[0]->Player->CheckCosts(AllUpgrades[index]->Costs)) {
+		//PlayerSubCosts(player,Upgrades[i].Costs);
+		SendCommandResearch(*Selected[0], *AllUpgrades[index], !(KeyModifiers & ModifierShift));
+		UI.StatusLine.Clear();
+		ClearCosts();
+	}
+}
+
 /**
 **  Handle bottom button clicked.
 **
@@ -1398,234 +1627,28 @@ void CButtonPanel::DoClicked(int button)
 		PlayGameSound(CurrentButtons[button].CommentSound.Sound, MaxSampleVolume);
 	}
 
-	//
 	//  Handle action on button.
-	//
 	switch (CurrentButtons[button].Action) {
-		case ButtonUnload: {
-			const int flush = !(KeyModifiers & ModifierShift);
-			//
-			//  Unload on coast, transporter standing, unload all units right now.
-			//  That or a bunker.
-			//
-			if ((NumSelected == 1 && Selected[0]->CurrentAction() == UnitActionStill
-				 && Map.Field(Selected[0]->tilePos)->CoastOnMap())
-				|| !Selected[0]->CanMove()) {
-				SendCommandUnload(*Selected[0], Selected[0]->tilePos, NoUnitP, flush);
-				break;
-			}
-			CursorState = CursorStateSelect;
-			if (CurrentButtons[button].ButtonCursor.length() && CursorByIdent(CurrentButtons[button].ButtonCursor)) {
-				GameCursor = CursorByIdent(CurrentButtons[button].ButtonCursor);
-				CustomCursor = CurrentButtons[button].ButtonCursor;
-			} else {
-				GameCursor = UI.YellowHair.Cursor;
-			}
-			CursorAction = CurrentButtons[button].Action;
-			CursorValue = CurrentButtons[button].Value;
-			CurrentButtonLevel = 9; // level 9 is cancel-only
-			UI.ButtonPanel.Update();
-			UI.StatusLine.Set(_("Select Target"));
-			break;
-		}
-		case ButtonSpellCast: {
-			int spellId = CurrentButtons[button].Value;
-			if (KeyModifiers & ModifierControl) {
-				int autocast = 0;
-
-				if (!SpellTypeTable[spellId]->AutoCast) {
-					PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound,
-								  MaxSampleVolume);
-					break;
-				}
-
-				//autocast = 0;
-				// If any selected unit doesn't have autocast on turn it on
-				// for everyone
-				for (int i = 0; i < NumSelected; ++i) {
-					if (Selected[i]->AutoCastSpell[spellId] == 0) {
-						autocast = 1;
-						break;
-					}
-				}
-				for (int i = 0; i < NumSelected; ++i) {
-					if (Selected[i]->AutoCastSpell[spellId] != autocast) {
-						SendCommandAutoSpellCast(*Selected[i], spellId, autocast);
-					}
-				}
-				break;
-			}
-			if (SpellTypeTable[spellId]->IsCasterOnly()) {
-				const int flush = !(KeyModifiers & ModifierShift);
-
-				for (int i = 0; i < NumSelected; ++i) {
-					CUnit &unit = *Selected[i];
-					// CursorValue here holds the spell type id
-					SendCommandSpellCast(unit, unit.tilePos, &unit, spellId, flush);
-				}
-				break;
-			}
-		}
-		// Follow Next -> Select target.
-		case ButtonRepair:
-			if (KeyModifiers & ModifierControl) {
-				unsigned autorepair;
-
-				autorepair = 0;
-				// If any selected unit doesn't have autocast on turn it on
-				// for everyone
-				for (int i = 0; i < NumSelected; ++i) {
-					if (Selected[i]->AutoRepair == 0) {
-						autorepair = 1;
-						break;
-					}
-				}
-				for (int i = 0; i < NumSelected; ++i) {
-					if (Selected[i]->AutoRepair != autorepair) {
-						SendCommandAutoRepair(*Selected[i], autorepair);
-					}
-				}
-				break;
-			}
-			// Follow Next -> Select target.
-		case ButtonMove:
-		case ButtonPatrol:
-		case ButtonHarvest:
-		case ButtonAttack:
-		case ButtonAttackGround:
-			// Select target.
-			CursorState = CursorStateSelect;
-			if (CurrentButtons[button].ButtonCursor.length() && CursorByIdent(CurrentButtons[button].ButtonCursor)) {
-				GameCursor = CursorByIdent(CurrentButtons[button].ButtonCursor);
-				CustomCursor = CurrentButtons[button].ButtonCursor;
-			} else {
-				GameCursor = UI.YellowHair.Cursor;
-			}
-			CursorAction = CurrentButtons[button].Action;
-			CursorValue = CurrentButtons[button].Value;
-			CurrentButtonLevel = 9; // level 9 is cancel-only
-			UI.ButtonPanel.Update();
-			UI.StatusLine.Set(_("Select Target"));
-			break;
-		case ButtonReturn:
-			for (int i = 0; i < NumSelected; ++i) {
-				SendCommandReturnGoods(*Selected[i], NoUnitP, !(KeyModifiers & ModifierShift));
-			}
-			break;
-		case ButtonStop:
-			for (int i = 0; i < NumSelected; ++i) {
-				SendCommandStopUnit(*Selected[i]);
-			}
-			break;
-		case ButtonStandGround:
-			for (int i = 0; i < NumSelected; ++i) {
-				SendCommandStandGround(*Selected[i], !(KeyModifiers & ModifierShift));
-			}
-			break;
-		case ButtonButton:
-			CurrentButtonLevel = CurrentButtons[button].Value;
-			UI.ButtonPanel.Update();
-			break;
-
-		case ButtonCancel:
-		case ButtonCancelUpgrade:
-			if (NumSelected == 1) {
-				switch (Selected[0]->CurrentAction()) {
-					case UnitActionUpgradeTo:
-						SendCommandCancelUpgradeTo(*Selected[0]);
-						break;
-					case UnitActionResearch:
-						SendCommandCancelResearch(*Selected[0]);
-						break;
-					default:
-						break;
-				}
-			}
-			UI.StatusLine.Clear();
-			ClearCosts();
-			CurrentButtonLevel = 0;
-			UI.ButtonPanel.Update();
-			GameCursor = UI.Point.Cursor;
-			CursorBuilding = NULL;
-			CursorState = CursorStatePoint;
-			break;
-
-		case ButtonCancelTrain:
-			Assert(Selected[0]->CurrentAction() == UnitActionTrain);
-			SendCommandCancelTraining(*Selected[0], -1, NULL);
-			UI.StatusLine.Clear();
-			ClearCosts();
-			break;
-
-		case ButtonCancelBuild:
-			// FIXME: johns is this not sure, only building should have this?
-			Assert(Selected[0]->CurrentAction() == UnitActionBuilt);
-			if (NumSelected == 1) {
-				SendCommandDismiss(*Selected[0]);
-			}
-			UI.StatusLine.Clear();
-			ClearCosts();
-			break;
-
-		case ButtonBuild: {
-			// FIXME: store pointer in button table!
-			CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
-			if (!Selected[0]->Player->CheckUnitType(type)) {
-				UI.StatusLine.Set(_("Select Location"));
-				ClearCosts();
-				CursorBuilding = &type;
-				// FIXME: check is this =9 necessary?
-				CurrentButtonLevel = 9; // level 9 is cancel-only
-				UI.ButtonPanel.Update();
-			}
-			break;
-		}
-		case ButtonTrain: {
-			// FIXME: store pointer in button table!
-			CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
-			// FIXME: Johns: I want to place commands in queue, even if not
-			// FIXME:        enough resources are available.
-			// FIXME: training queue full check is not correct for network.
-			// FIXME: this can be correct written, with a little more code.
-			if (Selected[0]->CurrentAction() == UnitActionTrain && !EnableTrainingQueue) {
-				Selected[0]->Player->Notify(NotifyYellow, Selected[0]->tilePos, "%s", _("Unit training queue is full"));
-			} else if (Selected[0]->Player->CheckLimits(type) >= 0 && !Selected[0]->Player->CheckUnitType(type)) {
-				//PlayerSubUnitType(player,type);
-				SendCommandTrainUnit(*Selected[0], type, !(KeyModifiers & ModifierShift));
-				UI.StatusLine.Clear();
-				ClearCosts();
-			} else if (Selected[0]->Player->CheckLimits(type) == -3)
-				if (GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound) {
-					PlayGameSound(GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound, MaxSampleVolume);
-				}
-			break;
-		}
-		case ButtonUpgradeTo: {
-			// FIXME: store pointer in button table!
-			CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
-			for (int i = 0; i < NumSelected; ++i) {
-				if (Selected[0]->Player->CheckLimits(type) != -6 && !Selected[i]->Player->CheckUnitType(type)) {
-					if (Selected[i]->CurrentAction() != UnitActionUpgradeTo) {
-						SendCommandUpgradeTo(*Selected[i], type, !(KeyModifiers & ModifierShift));
-						UI.StatusLine.Clear();
-						ClearCosts();
-					}
-				} else {
-					break;
-				}
-			}
-			break;
-		}
-		case ButtonResearch: {
-			const int index = CurrentButtons[button].Value;
-			if (!Selected[0]->Player->CheckCosts(AllUpgrades[index]->Costs)) {
-				//PlayerSubCosts(player,Upgrades[i].Costs);
-				SendCommandResearch(*Selected[0], *AllUpgrades[index], !(KeyModifiers & ModifierShift));
-				UI.StatusLine.Clear();
-				ClearCosts();
-			}
-			break;
-		}
+		case ButtonUnload: { DoClicked_Unload(button); break; }
+		case ButtonSpellCast: { DoClicked_SpellCast(button); break; }
+		case ButtonRepair: { DoClicked_Repair(button); break; }
+		case ButtonMove:    // Follow Next
+		case ButtonPatrol:  // Follow Next
+		case ButtonHarvest: // Follow Next
+		case ButtonAttack:  // Follow Next
+		case ButtonAttackGround: { DoClicked_SelectTarget(button); break; }
+		case ButtonReturn: { DoClicked_Return(); break; }
+		case ButtonStop: { DoClicked_Stop(); break; }
+		case ButtonStandGround: { DoClicked_StandGround(); break; }
+		case ButtonButton: { DoClicked_Button(button); break; }
+		case ButtonCancel: // Follow Next
+		case ButtonCancelUpgrade: { DoClicked_CancelUpgrade(); break; }
+		case ButtonCancelTrain: { DoClicked_CancelTrain(); break; }
+		case ButtonCancelBuild: { DoClicked_CancelBuild(); break; }
+		case ButtonBuild: { DoClicked_Build(button); break; }
+		case ButtonTrain: { DoClicked_Train(button); break; }
+		case ButtonUpgradeTo: { DoClicked_UpgradeTo(button); break; }
+		case ButtonResearch: { DoClicked_Research(button); break; }
 	}
 }
 

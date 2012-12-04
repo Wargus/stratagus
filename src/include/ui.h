@@ -420,6 +420,26 @@ public:
 	void DoClicked(int button);
 	int DoKey(int key);
 
+private:
+	void DoClicked_SelectTarget(int button);
+
+	void DoClicked_Unload(int button);
+	void DoClicked_SpellCast(int button);
+	void DoClicked_Repair(int button);
+	void DoClicked_Return();
+	void DoClicked_Stop();
+	void DoClicked_StandGround();
+	void DoClicked_Button(int button);
+	void DoClicked_CancelUpgrade();
+	void DoClicked_CancelTrain();
+	void DoClicked_CancelBuild();
+	void DoClicked_Build(int button);
+	void DoClicked_Train(int button);
+	void DoClicked_UpgradeTo(int button);
+	void DoClicked_Research(int button);
+
+
+public:
 	CGraphic *G;
 	int X;
 	int Y;
