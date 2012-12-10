@@ -46,6 +46,7 @@ class MissileConfig
 public:
 	MissileConfig() : Missile(NULL) {}
 
+	bool MapMissileNoLog();
 	bool MapMissile();
 
 public:

@@ -34,11 +34,30 @@
 #include "missileconfig.h"
 
 #include "missile.h"
+#include "translate.h"
+#include "ui.h"
+
+bool MissileConfig::MapMissileNoLog()
+{
+	if (this->Name.empty()) {
+		this->Missile = NULL;
+		return true;
+	}
+	this->Missile = MissileTypeByIdent(this->Name);
+	return this->Missile != NULL;
+}
 
 bool MissileConfig::MapMissile()
 {
-	this->Missile = MissileTypeByIdent(this->Name);
-	return this->Missile != NULL;
+	if (MapMissileNoLog() == true) {
+		if (this->Name.empty() == false) {
+			ShowLoadProgress(_("Missile %s"), this->Name.c_str());
+		}
+		return true;
+	} else {
+		fprintf(stderr, _("Can't find missile %s\n"), this->Name.c_str());
+		return false;
+	}
 }
 
 //@}
