@@ -1176,7 +1176,8 @@ void MissileType::Init()
 	this->ImpactSound.MapSound();
 	for (std::vector<MissileConfig *>::iterator it = this->Impact.begin(); it != this->Impact.end(); ++it) {
 		MissileConfig &mc = **it;
-		Assert(mc.MapMissile());
+
+		mc.MapMissile();
 	}
 	this->Smoke.MapMissile();
 }
