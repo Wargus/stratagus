@@ -39,6 +39,7 @@
 
 #include "menus.h"
 #include "player.h"
+#include "translate.h"
 #include "ui.h"
 #include "video.h"
 
@@ -186,17 +187,26 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style,
 /**
 **  Load the Icon
 */
-void IconConfig::Load()
+bool IconConfig::LoadNoLog()
 {
 	Assert(!Name.empty());
 
 	Icon = CIcon::Get(Name);
-#if 0
-	if (!Icon) {
-		fprintf(stderr, "Can't find icon %s\n", Name.c_str());
-		ExitFatal(-1);
+	return Icon != NULL;
+}
+
+/**
+**  Load the Icon
+*/
+bool IconConfig::Load()
+{
+	if (LoadNoLog() == true) {
+		ShowLoadProgress(_("Icon %s"), this->Name.c_str());
+		return true;
+	} else {
+		fprintf(stderr, _("Can't find icon %s\n"), this->Name.c_str());
+		return false;
 	}
-#endif
 }
 
 /**

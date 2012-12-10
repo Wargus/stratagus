@@ -137,7 +137,8 @@ class IconConfig
 public:
 	IconConfig() : Icon(NULL) {}
 
-	void Load();
+	bool LoadNoLog();
+	bool Load();
 public:
 	std::string Name;    /// config icon name
 	CIcon *Icon;         /// icon pointer to use to run time
