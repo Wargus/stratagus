@@ -469,14 +469,21 @@ bool AiRequestChangeDepot(CUnit &worker)
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
 	const int resource = order.GetCurrentResource();
 	std::vector<CUnit *> depots;
-	const Vec2i offset(40, 40);
+	const Vec2i offset(MaxMapWidth, MaxMapHeight);
 
 	Select(worker.tilePos - offset, worker.tilePos + offset, depots, IsAResourceDepositForWorker(resource, worker));
+	// If there aren't any alternatives, exit
+	if (depots.size() < 2) {
+		return false;
+	}
 	std::sort(depots.begin(), depots.end(), CompareDepotsByDistance(worker));
 
 	for (std::vector<CUnit *>::iterator it = depots.begin(); it != depots.end(); ++it) {
 		CUnit &unit = **it;
 
+		if (order.GetGoal() == &unit) {
+			continue;
+		}
 		const int range = 15;
 		const Vec2i workOff(range, range);
 		const size_t maxWorkers = 10;
@@ -484,6 +491,10 @@ bool AiRequestChangeDepot(CUnit &worker)
 		Select(unit.tilePos - workOff, unit.tilePos + workOff, workers, IsAWorker());
 		if (workers.size() <= maxWorkers && !AiEnemyUnitsInDistance(unit, range)) {
 			CommandReturnGoods(worker, &unit, FlushCommands);
+			CUnit *res = UnitFindResource(worker, unit, range, resource, unit.Player->AiEnabled);
+			if (res) {
+				CommandResource(worker, *res, FlushCommands);
+			}
 			return true;
 		}
 	}

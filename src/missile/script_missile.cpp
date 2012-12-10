@@ -147,7 +147,20 @@ void MissileType::Load(lua_State *l)
 		} else if (!strcmp(value, "Range")) {
 			this->Range = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ImpactMissile")) {
-			this->Impact.Name = LuaToString(l, -1);
+			if (!lua_istable(l, -1)) {
+				MissileConfig *mc = new MissileConfig();
+				mc->Name = LuaToString(l, -1);
+				this->Impact.push_back(mc);
+			} else {
+				const int impacts = lua_rawlen(l, -1);
+				for (int i = 0; i < impacts; ++i) {
+					lua_rawgeti(l, -1, i + 1);
+					MissileConfig *mc = new MissileConfig();
+					mc->Name = LuaToString(l, -1);
+					this->Impact.push_back(mc);
+					lua_pop(l, 1);
+				}
+			}
 		} else if (!strcmp(value, "SmokeMissile")) {
 			this->Smoke.Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "ImpactParticle")) {

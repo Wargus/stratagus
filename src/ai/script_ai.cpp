@@ -711,15 +711,26 @@ static int CclAiWait(lua_State *l)
 */
 static int CclAiForce(lua_State *l)
 {
-	LuaCheckArgs(l, 2);
+	bool resetForce = false;
+	const int arg = lua_gettop(l);
+	Assert(0 < arg && arg <= 3);
 	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
+	}
+	if (arg == 3) {
+		resetForce = LuaToBoolean(l, 3);
 	}
 	int force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCES) {
 		LuaError(l, "Force out of range: %d" _C_ force);
 	}
 	AiForce &aiforce = AiPlayer->Force[AiPlayer->Force.getScriptForce(force)];
+	if (resetForce) {
+		AiForceRole role = aiforce.Role;
+		aiforce.Reset(true);
+		aiforce.State = AiForceAttackingState_Waiting;
+		aiforce.Role = role;
+	}
 
 	int args = lua_rawlen(l, 2);
 	for (int j = 0; j < args; ++j) {
@@ -737,27 +748,36 @@ static int CclAiForce(lua_State *l)
 
 		// Use the equivalent unittype.
 		type = UnitTypes[UnitTypeEquivs[type->Slot]];
-
-		// Look if already in force.
-		size_t i;
-		for (i = 0; i < aiforce.UnitTypes.size(); ++i) {
-			AiUnitType *aiut = &aiforce.UnitTypes[i];
-			if (aiut->Type->Slot == type->Slot) { // found
-				if (count) {
-					aiut->Want = count;
-				} else {
-					aiforce.UnitTypes.erase(aiforce.UnitTypes.begin() + i);
-				}
-				break;
-			}
-		}
-		// New type append it.
-		if (i == aiforce.UnitTypes.size()) {
+		
+		if (resetForce) {
+			// Append it.
 			AiUnitType newaiut;
 			newaiut.Want = count;
 			newaiut.Type = type;
 			aiforce.UnitTypes.push_back(newaiut);
+		} else {
+			// Look if already in force.
+			size_t i;
+			for (i = 0; i < aiforce.UnitTypes.size(); ++i) {
+				AiUnitType *aiut = &aiforce.UnitTypes[i];
+				if (aiut->Type->Slot == type->Slot) { // found
+					if (count) {
+						aiut->Want = count;
+					} else {
+						aiforce.UnitTypes.erase(aiforce.UnitTypes.begin() + i);
+					}
+					break;
+				}
+			}
+			// New type append it.
+			if (i == aiforce.UnitTypes.size()) {
+				AiUnitType newaiut;
+				newaiut.Want = count;
+				newaiut.Type = type;
+				aiforce.UnitTypes.push_back(newaiut);
+			}
 		}
+		
 	}
 	AiAssignFreeUnitsToForce();
 	lua_pushboolean(l, 0);

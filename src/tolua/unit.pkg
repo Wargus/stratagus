@@ -31,3 +31,4 @@ class CPreference
 CPreference Preference;
 
 CUnit *GetUnitUnderCursor();
+int UnitNumber(CUnit &unit);

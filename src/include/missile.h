@@ -386,12 +386,12 @@ public:
 	int Damage;                /// missile damage (used for non-direct missiles, e.g. impacts)
 	int ReduceFactor;          /// Multiplier for reduce or increase damage dealt to the next unit
 
-	int Range;                 /// missile damage range
-	int SplashFactor;          /// missile splash divisor
-	MissileConfig Impact;      /// missile produces an impact
-	MissileConfig Smoke;       /// Trailling missile
-	LuaCallback *ImpactParticle; /// impact particle
-	LuaCallback *SmokeParticle;  /// smoke particle
+	int Range;                             /// missile damage range
+	int SplashFactor;                      /// missile splash divisor
+	std::vector <MissileConfig *> Impact;  /// missile produces an impact
+	MissileConfig Smoke;                   /// trailing missile
+	LuaCallback *ImpactParticle;           /// impact particle
+	LuaCallback *SmokeParticle;            /// smoke particle
 
 	// --- FILLED UP ---
 	CGraphic *G;         /// missile graphic

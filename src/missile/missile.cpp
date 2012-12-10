@@ -792,8 +792,14 @@ void Missile::MissileHit(CUnit *unit)
 	//
 	// The impact generates a new missile.
 	//
-	if (mtype.Impact.Missile) {
-		MakeMissile(*mtype.Impact.Missile, pixelPos, pixelPos);
+	if (mtype.Impact.empty() == false) {
+		for (std::vector<MissileConfig *>::const_iterator it = mtype.Impact.begin(); it != mtype.Impact.end(); ++it) {
+			const MissileConfig &mc = **it;
+			Missile *impact = MakeMissile(*mc.Missile, pixelPos, pixelPos);
+			if (impact && impact->Type->Damage) {
+				impact->SourceUnit = this->SourceUnit;
+			}
+		}
 	}
 	if (mtype.ImpactParticle) {
 		mtype.ImpactParticle->pushPreamble();
@@ -1168,7 +1174,10 @@ void MissileType::Init()
 	// Resolve impact missiles and sounds.
 	this->FiredSound.MapSound();
 	this->ImpactSound.MapSound();
-	this->Impact.MapMissile();
+	for (std::vector<MissileConfig *>::iterator it = this->Impact.begin(); it != this->Impact.end(); ++it) {
+		MissileConfig &mc = **it;
+		Assert(mc.MapMissile());
+	}
 	this->Smoke.MapMissile();
 }
 
@@ -1204,6 +1213,7 @@ MissileType::MissileType(const std::string &ident) :
 MissileType::~MissileType()
 {
 	CGraphic::Free(this->G);
+	Impact.clear();
 	delete ImpactParticle;
 	delete SmokeParticle;
 }
