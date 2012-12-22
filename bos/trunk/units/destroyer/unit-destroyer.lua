@@ -9,7 +9,7 @@
 --
 --	unit-destroyer.lua	-	Define the destroyer unit.
 --
---	(c) Copyright 2005-2010 by Francois Beerten.
+--	(c) Copyright 2005-2012 by Francois Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -50,6 +50,12 @@ DefineIcon({
     Frame = 0,
     File = "units/destroyer/destroyer_i.png"})
 
+MakeSound("destroyer-selected", GetCurrentLuaPath().."/destroyer.select.wav")
+MakeSound("destroyer-acknowledge", GetCurrentLuaPath().."/destroyer.action.wav")
+MakeSound("destroyer-dead", GetCurrentLuaPath().."/destroyer.die.wav")
+MakeSound("destroyer-ready", GetCurrentLuaPath().."/destroyer.ready.wav")
+MakeSound("destroyer-help", GetCurrentLuaPath().."/destroyer.underattack.wav")
+
 DefineUnitType("unit-destroyer", {
     Name = "Destroyer",
     Image = {"file", "units/destroyer/destroyer.png", "size", {128, 96}},
@@ -83,6 +89,13 @@ DefineUnitType("unit-destroyer", {
     NumDirections = 8,
     Missile = "missile-bazoo",
     MaxAttackRange = 6,
+    Sounds = {
+        "ready", "destroyer-ready",
+        "acknowledge", "destroyer-acknowledge",
+        "selected", "destroyer-selected",
+        "help", "destroyer-help",
+        "dead", "destroyer-dead",
+        }
 })
 
 DefineAllow("unit-destroyer", AllowAll)

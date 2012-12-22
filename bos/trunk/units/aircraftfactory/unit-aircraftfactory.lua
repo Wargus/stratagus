@@ -9,7 +9,7 @@
 --
 --	unit-aircraftfactory.lua	-	Define the aircraft factory
 --
---	(c) Copyright 2001 - 2007 by Loïs Taulelle, Francois Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2012 by Loïs Taulelle, Francois Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ DefineAnimations("animations-aircraftfactory", {
 })
 
 -- TODO make new sounds for aircraftfactory
---MakeSound("aircraftfactory-selected", GetCurrentLuaPath().."/sfx_fort.select.wav")
+MakeSound("aircraftfactory-selected", GetCurrentLuaPath().."/aircraftfactory.select.wav")
 --MakeSound("aircraftfactory-dead", GetCurrentLuaPath().."/sfx_fort.die.wav")
 MakeSound("aircraftfactory-ready", GetCurrentLuaPath().."/aircraftfactory.completed.wav")
 MakeSound("aircraftfactory-help", GetCurrentLuaPath().."/aircraftfactory.underattack.wav")
@@ -62,8 +62,7 @@ MakeSound("aircraftfactory-help", GetCurrentLuaPath().."/aircraftfactory.underat
 DefineUnitType("unit-aircraftfactory", {
     Name = "Aircraft Factory",
     Image = {"file", GetCurrentLuaPath() .. "/aircraftfactory.png", "size", {256, 256}},
-    Shadow = {"file", GetCurrentLuaPath().."/aircraftfactory_s.png", "size",
- {256, 256}},
+    Shadow = {"file", GetCurrentLuaPath().."/aircraftfactory_s.png", "size", {256, 256}},
     Animations = "animations-aircraftfactory",
     Icon = "icon-dev",
     EnergyValue = 12000,
@@ -91,7 +90,7 @@ DefineUnitType("unit-aircraftfactory", {
     MaxMagmaUtilizationRate = 30,
     CanHarvestFrom = true,
     Sounds = {
---        "selected", "aircraftfactory-selected",
+        "selected", "aircraftfactory-selected",
 --        "dead", "aircraftfactory-dead",
         "ready", "aircraftfactory-ready",
         "help", "aircraftfactory-help"}
