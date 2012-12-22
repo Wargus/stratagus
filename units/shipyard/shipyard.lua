@@ -9,7 +9,7 @@
 --
 --	shipyard.lua	-	Define the ship yard
 --
---	(c) Copyright 2001 - 2010 by Francois Beerten
+--	(c) Copyright 2001 - 2012 by Francois Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -54,6 +54,11 @@ DefineAnimations("animations-shipyard", {
     Train = {"frame 18", "wait 5", "frame 19", "wait 5", "frame 20", "wait 5", "frame 21", 
         "wait 5", "frame 22", "wait 5", "frame 23", "wait 5"},
     })
+
+MakeSound("shipyard-selected", GetCurrentLuaPath().."/shipyard.select.wav")
+--MakeSound("shipyard-dead", GetCurrentLuaPath().."/shipyard.die.wav")
+--MakeSound("shipyard-ready", GetCurrentLuaPath().."/shipyard.completed.wav")
+--MakeSound("shipyard-help", GetCurrentLuaPath().."/shipyard.underattack.wav")
 
 DefineUnitType("unit-shipyard", {
     Name = "Shipyard",
@@ -102,6 +107,12 @@ DefineUnitType("unit-shipyard", {
     MaxEnergyUtilizationRate = 60,
     MaxMagmaUtilizationRate = 30,
     CanHarvestFrom = true,
+    Sounds = {
+        "selected", "shipyard-selected",
+--        "dead", "shipyard-dead",
+--        "ready", "shipyard-ready",
+--        "help", "shipyard-help"
+}
 })
 
 DefineAllow("unit-shipyard", AllowAll)

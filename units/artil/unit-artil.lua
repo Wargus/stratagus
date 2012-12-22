@@ -9,7 +9,7 @@
 --
 --	unit-artil.lua	-	Define the artil unit.
 --
---	(c) Copyright 2005-2010 by Francois Beerten.
+--	(c) Copyright 2005-2012 by Francois Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -60,6 +60,9 @@ DefineIcon({
 	Frame = 0,
 	File = "units/artil/ico_artil.png"})
 
+MakeSound("artil-selected", GetCurrentLuaPath().."/artil.select.wav")
+MakeSound("artil-acknowledge", GetCurrentLuaPath().."/artil.action.wav")
+MakeSound("artil-dead", GetCurrentLuaPath().."/artil.die.wav")
 MakeSound("artil-ready", GetCurrentLuaPath().."/artil.ready.wav")
 MakeSound("artil-help", GetCurrentLuaPath().."/artil.underattack.wav")
 
@@ -98,7 +101,10 @@ DefineUnitType("unit-artil", {
     MaxAttackRange = 8,
     Sounds = {
         "ready", "artil-ready",
-        "help", "artil-help"
+        "acknowledge", "artil-acknowledge",
+        "selected", "artil-selected",
+        "help", "artil-help",
+        "dead", "artil-dead",
         }
 })
 
