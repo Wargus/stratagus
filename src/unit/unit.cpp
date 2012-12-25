@@ -2433,8 +2433,8 @@ static void HitUnit_lastAttack(const CUnit *attacker, CUnit &target)
 static bool HitUnit_IsUnitWillDie(const CUnit *attacker, const CUnit &target, int damage)
 {
 	return (target.Variable[HP_INDEX].Value <= damage && attacker && attacker->Type->ShieldPiercing)
-		|| (target.Variable[HP_INDEX].Value <= damage - target.Variable[SHIELD_INDEX].Value)
-		|| (target.Variable[HP_INDEX].Value == 0);
+		   || (target.Variable[HP_INDEX].Value <= damage - target.Variable[SHIELD_INDEX].Value)
+		   || (target.Variable[HP_INDEX].Value == 0);
 }
 
 static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)

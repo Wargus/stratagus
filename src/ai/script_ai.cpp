@@ -748,7 +748,7 @@ static int CclAiForce(lua_State *l)
 
 		// Use the equivalent unittype.
 		type = UnitTypes[UnitTypeEquivs[type->Slot]];
-		
+
 		if (resetForce) {
 			// Append it.
 			AiUnitType newaiut;
@@ -777,7 +777,7 @@ static int CclAiForce(lua_State *l)
 				aiforce.UnitTypes.push_back(newaiut);
 			}
 		}
-		
+
 	}
 	AiAssignFreeUnitsToForce();
 	lua_pushboolean(l, 0);
