@@ -2391,6 +2391,218 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 	return cost;
 }
 
+static void HitUnit_lastAttack(const CUnit *attacker, CUnit &target)
+{
+	const unsigned long lastattack = target.Attacked;
+
+	target.Attacked = GameCycle ? GameCycle : 1;
+	if (target.Type->Wall || (lastattack && GameCycle <= lastattack + 2 * CYCLES_PER_SECOND)) {
+		return;
+	}
+	// NOTE: perhaps this should also be moved into the notify?
+	if (target.Player == ThisPlayer) {
+		// FIXME: Problem with load+save.
+
+		//
+		// One help cry each 2 second is enough
+		// If on same area ignore it for 2 minutes.
+		//
+		if (HelpMeLastCycle < GameCycle) {
+			if (!HelpMeLastCycle
+				|| HelpMeLastCycle + CYCLES_PER_SECOND * 120 < GameCycle
+				|| target.tilePos.x < HelpMeLastX - 14
+				|| target.tilePos.x > HelpMeLastX + 14
+				|| target.tilePos.y < HelpMeLastY - 14
+				|| target.tilePos.y > HelpMeLastY + 14) {
+				HelpMeLastCycle = GameCycle + CYCLES_PER_SECOND * 2;
+				HelpMeLastX = target.tilePos.x;
+				HelpMeLastY = target.tilePos.y;
+				PlayUnitSound(target, VoiceHelpMe);
+			}
+		}
+	}
+	target.Player->Notify(NotifyRed, target.tilePos, _("%s attacked"), target.Type->Name.c_str());
+
+	if (attacker && !target.Type->Building) {
+		if (target.Player->AiEnabled) {
+			AiHelpMe(attacker, target);
+		}
+	}
+}
+
+static bool HitUnit_IsUnitWillDie(const CUnit *attacker, const CUnit &target, int damage)
+{
+	return (target.Variable[HP_INDEX].Value <= damage && attacker && attacker->Type->ShieldPiercing)
+		|| (target.Variable[HP_INDEX].Value <= damage - target.Variable[SHIELD_INDEX].Value)
+		|| (target.Variable[HP_INDEX].Value == 0);
+}
+
+static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
+{
+	attacker.Player->Score += target.Variable[POINTS_INDEX].Value;
+	if (target.Type->Building) {
+		attacker.Player->TotalRazings++;
+	} else {
+		attacker.Player->TotalKills++;
+	}
+	if (UseHPForXp) {
+		attacker.Variable[XP_INDEX].Max += target.Variable[HP_INDEX].Value;
+	} else {
+		attacker.Variable[XP_INDEX].Max += target.Variable[POINTS_INDEX].Value;
+	}
+	attacker.Variable[XP_INDEX].Value = attacker.Variable[XP_INDEX].Max;
+	attacker.Variable[KILL_INDEX].Value++;
+	attacker.Variable[KILL_INDEX].Max++;
+	attacker.Variable[KILL_INDEX].Enable = 1;
+}
+
+static void HitUnit_applyDamage(CUnit *attacker, CUnit &target, int damage)
+{
+	if (attacker && attacker->Type->ShieldPiercing) {
+		target.Variable[HP_INDEX].Value -= damage;
+	} else if (target.Variable[SHIELD_INDEX].Value >= damage) {
+		target.Variable[SHIELD_INDEX].Value -= damage;
+	} else {
+		target.Variable[HP_INDEX].Value -= damage - target.Variable[SHIELD_INDEX].Value;
+		target.Variable[SHIELD_INDEX].Value = 0;
+	}
+	if (UseHPForXp && attacker && target.IsEnemy(*attacker)) {
+		attacker->Variable[XP_INDEX].Value += damage;
+		attacker->Variable[XP_INDEX].Max += damage;
+	}
+}
+
+static void HitUnit_BuildingCapture(CUnit *attacker, CUnit &target, int damage)
+{
+	// FIXME: this is dumb. I made repairers capture. crap.
+	// david: capture enemy buildings
+	// Only worker types can capture.
+	// Still possible to destroy building if not careful (too many attackers)
+	if (EnableBuildingCapture && attacker
+		&& target.Type->Building && target.Variable[HP_INDEX].Value <= damage * 3
+		&& attacker->IsEnemy(target)
+		&& attacker->Type->RepairRange) {
+		target.ChangeOwner(*attacker->Player);
+		CommandStopUnit(*attacker); // Attacker shouldn't continue attack!
+	}
+}
+
+static void HitUnit_ShowDamageMissile(const CUnit &target, int damage)
+{
+	const PixelPos targetPixelCenter = target.GetMapPixelPosCenter();
+
+	if ((target.IsVisibleOnMap(*ThisPlayer) || ReplayRevealMap) && !DamageMissile.empty()) {
+		const MissileType *mtype = MissileTypeByIdent(DamageMissile);
+		const PixelDiff offset(3, -mtype->Range);
+
+		MakeLocalMissile(*mtype, targetPixelCenter, targetPixelCenter + offset)->Damage = -damage;
+	}
+}
+
+static void HitUnit_ShowImpactMissile(const CUnit &target)
+{
+	const PixelPos targetPixelCenter = target.GetMapPixelPosCenter();
+	const CUnitType &type = *target.Type;
+
+	if (target.Variable[SHIELD_INDEX].Value > 0
+		&& !type.Impact[ANIMATIONS_DEATHTYPES + 1].Name.empty()) { // shield impact
+		MakeMissile(*type.Impact[ANIMATIONS_DEATHTYPES + 1].Missile, targetPixelCenter, targetPixelCenter);
+	} else if (target.DamagedType && !type.Impact[target.DamagedType].Name.empty()) { // specific to damage type impact
+		MakeMissile(*type.Impact[target.DamagedType].Missile, targetPixelCenter, targetPixelCenter);
+	} else if (!type.Impact[ANIMATIONS_DEATHTYPES].Name.empty()) { // generic impact
+		MakeMissile(*type.Impact[ANIMATIONS_DEATHTYPES].Missile, targetPixelCenter, targetPixelCenter);
+	}
+}
+
+static void HitUnit_ChangeVariable(CUnit &target, const Missile &missile)
+{
+	const int var = missile.Type->ChangeVariable;
+
+	target.Variable[var].Enable = 1;
+	target.Variable[var].Value += missile.Type->ChangeAmount;
+	if (target.Variable[var].Value > target.Variable[var].Max) {
+		if (missile.Type->ChangeMax) {
+			target.Variable[var].Max = target.Variable[var].Value;
+		} else {
+			target.Variable[var].Value = target.Variable[var].Max;
+		}
+	}
+}
+
+
+static void HitUnit_Burning(CUnit &target)
+{
+	const int f = (100 * target.Variable[HP_INDEX].Value) / target.Variable[HP_INDEX].Max;
+	MissileType *fire = MissileBurningBuilding(f);
+
+	if (fire) {
+		const PixelPos targetPixelCenter = target.GetMapPixelPosCenter();
+		const PixelDiff offset(0, -PixelTileSize.y);
+		Missile *missile = MakeMissile(*fire, targetPixelCenter + offset, targetPixelCenter + offset);
+
+		missile->SourceUnit = &target;
+		target.Burning = 1;
+	}
+}
+
+static void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
+{
+	Vec2i pos = target.tilePos - attacker.tilePos;
+	int d = isqrt(pos.x * pos.x + pos.y * pos.y);
+
+	if (!d) {
+		d = 1;
+	}
+	pos.x = target.tilePos.x + (pos.x * 5) / d + (SyncRand() & 3);
+	pos.y = target.tilePos.y + (pos.y * 5) / d + (SyncRand() & 3);
+	Map.Clamp(pos);
+	CommandStopUnit(target);
+	CommandMove(target, pos, 0);
+}
+
+static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
+{
+	const int threshold = 30;
+	COrder *savedOrder = NULL;
+	if (target.CanStoreOrder(target.CurrentOrder())) {
+		savedOrder = target.CurrentOrder()->Clone();
+	}
+	CUnit *oldgoal = target.CurrentOrder()->GetGoal();
+	CUnit *goal, *best = oldgoal;
+
+	if (RevealAttacker && CanTarget(*target.Type, *attacker.Type)) {
+		// Reveal Unit that is attacking
+		goal = &attacker;
+	} else {
+		if (target.CurrentAction() == UnitActionStandGround) {
+			goal = AttackUnitsInRange(target);
+		} else {
+			// Check for any other units in range
+			goal = AttackUnitsInReactRange(target);
+		}
+	}
+
+	// Calculate the best target we could attack
+	if (!best || (goal && (ThreatCalculate(target, *goal) < ThreatCalculate(target, *best)))) {
+		best = goal;
+	}
+	if (CanTarget(*target.Type, *attacker.Type)
+		&& (!best || (goal != &attacker
+					  && (ThreatCalculate(target, attacker) < ThreatCalculate(target, *best))))) {
+		best = &attacker;
+	}
+	if (best && best != oldgoal && best->Player != target.Player && best->IsAllied(target) == false) {
+		CommandAttack(target, best->tilePos, best, FlushCommands);
+		// Set threshold value only for agressive units
+		if (best->IsAgressive()) {
+			target.Threshold = threshold;
+		}
+		if (savedOrder != NULL) {
+			target.SavedOrder = savedOrder;
+		}
+	}
+}
+
 /**
 **  Unit is hit by missile or other damage.
 **
@@ -2401,9 +2613,9 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 */
 void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 {
-	// Can now happen by splash damage
-	// Multiple places send x/y as damage, which may be zero
 	if (!damage) {
+		// Can now happen by splash damage
+		// Multiple places send x/y as damage, which may be zero
 		return;
 	}
 
@@ -2426,111 +2638,31 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 			damage = 0;
 		}
 	}
+	HitUnit_lastAttack(attacker, target);
 	const CUnitType *type = target.Type;
-	const unsigned long lastattack = target.Attacked;
-	target.Attacked = GameCycle ? GameCycle : 1;
 	if (attacker) {
 		target.DamagedType = ExtraDeathIndex(attacker->Type->DamageType.c_str());
-	}
-	if (!target.Type->Wall && (!lastattack || lastattack + 2 * CYCLES_PER_SECOND < GameCycle)) {
-		// NOTE: perhaps this should also be moved into the notify?
-		if (target.Player == ThisPlayer) {
-			// FIXME: Problem with load+save.
-
-			//
-			// One help cry each 2 second is enough
-			// If on same area ignore it for 2 minutes.
-			//
-			if (HelpMeLastCycle < GameCycle) {
-				if (!HelpMeLastCycle
-					|| HelpMeLastCycle + CYCLES_PER_SECOND * 120 < GameCycle
-					|| target.tilePos.x < HelpMeLastX - 14
-					|| target.tilePos.x > HelpMeLastX + 14
-					|| target.tilePos.y < HelpMeLastY - 14
-					|| target.tilePos.y > HelpMeLastY + 14) {
-					HelpMeLastCycle = GameCycle + CYCLES_PER_SECOND * 2;
-					HelpMeLastX = target.tilePos.x;
-					HelpMeLastY = target.tilePos.y;
-					PlayUnitSound(target, VoiceHelpMe);
-				}
-			}
-		}
-		target.Player->Notify(NotifyRed, target.tilePos, _("%s attacked"), target.Type->Name.c_str());
-
-		if (attacker && !target.Type->Building) {
-			if (target.Player->AiEnabled) {
-				AiHelpMe(attacker, target);
-			}
-		}
 	}
 
 	if (attacker && !target.Type->Wall && target.Player->AiEnabled) {
 		AiHelpMe(attacker, target);
 	}
 
-	if ((target.Variable[HP_INDEX].Value <= damage && attacker && attacker->Type->ShieldPiercing) ||
-		(target.Variable[HP_INDEX].Value <= damage - target.Variable[SHIELD_INDEX].Value) ||
-		(target.Variable[HP_INDEX].Value == 0)) { // unit is killed or destroyed
-		//  increase scores of the attacker, but not if attacking it's own units.
-		//  prevents cheating by killing your own units.
-
-		//  Setting ai threshold counter to 0 so it can target other units
+	if (HitUnit_IsUnitWillDie(attacker, target, damage)) { // unit is killed or destroyed
 		if (attacker) {
+			//  Setting ai threshold counter to 0 so it can target other units
 			attacker->Threshold = 0;
-		}
-		if (attacker && target.IsEnemy(*attacker)) {
-			attacker->Player->Score += target.Variable[POINTS_INDEX].Value;
-			if (type->Building) {
-				attacker->Player->TotalRazings++;
-			} else {
-				attacker->Player->TotalKills++;
+			if (target.IsEnemy(*attacker)) {
+				HitUnit_IncreaseScoreForKill(*attacker, target);
 			}
-			if (UseHPForXp) {
-				attacker->Variable[XP_INDEX].Max += target.Variable[HP_INDEX].Value;
-			} else {
-				attacker->Variable[XP_INDEX].Max += target.Variable[POINTS_INDEX].Value;
-			}
-			attacker->Variable[XP_INDEX].Value = attacker->Variable[XP_INDEX].Max;
-			attacker->Variable[KILL_INDEX].Value++;
-			attacker->Variable[KILL_INDEX].Max++;
-			attacker->Variable[KILL_INDEX].Enable = 1;
 		}
 		LetUnitDie(target);
 		return;
 	}
-	if (attacker && attacker->Type->ShieldPiercing) {
-		target.Variable[HP_INDEX].Value -= damage;
-	} else if (target.Variable[SHIELD_INDEX].Value >= damage) {
-		target.Variable[SHIELD_INDEX].Value -= damage;
-	} else {
-		target.Variable[HP_INDEX].Value -= damage - target.Variable[SHIELD_INDEX].Value;
-		target.Variable[SHIELD_INDEX].Value = 0;
-	}
-	if (UseHPForXp && attacker && target.IsEnemy(*attacker)) {
-		attacker->Variable[XP_INDEX].Value += damage;
-		attacker->Variable[XP_INDEX].Max += damage;
-	}
 
-	// FIXME: this is dumb. I made repairers capture. crap.
-	// david: capture enemy buildings
-	// Only worker types can capture.
-	// Still possible to destroy building if not careful (too many attackers)
-	if (EnableBuildingCapture && attacker
-		&& type->Building && target.Variable[HP_INDEX].Value <= damage * 3
-		&& attacker->IsEnemy(target)
-		&& attacker->Type->RepairRange) {
-		target.ChangeOwner(*attacker->Player);
-		CommandStopUnit(*attacker); // Attacker shouldn't continue attack!
-	}
-
-	const PixelPos targetPixelCenter = target.GetMapPixelPosCenter();
-
-	if ((target.IsVisibleOnMap(*ThisPlayer) || ReplayRevealMap) && !DamageMissile.empty()) {
-		MissileType *mtype = MissileTypeByIdent(DamageMissile);
-		const PixelDiff offset(3, -mtype->Range);
-
-		MakeLocalMissile(*mtype, targetPixelCenter, targetPixelCenter + offset)->Damage = -damage;
-	}
+	HitUnit_applyDamage(attacker, target, damage);
+	HitUnit_BuildingCapture(attacker, target, damage);
+	HitUnit_ShowDamageMissile(target, damage);
 
 	// OnHit callback
 	if (type->OnHit) {
@@ -2543,39 +2675,13 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 
 	// Increase variables
 	if (missile && missile->Type->ChangeVariable != -1) {
-		const int var = missile->Type->ChangeVariable;
-		target.Variable[var].Enable = 1;
-		target.Variable[var].Value += missile->Type->ChangeAmount;
-		if (target.Variable[var].Value > target.Variable[var].Max) {
-			if (missile->Type->ChangeMax) {
-				target.Variable[var].Max = target.Variable[var].Value;
-			} else {
-				target.Variable[var].Value = target.Variable[var].Max;
-			}
-		}
+		HitUnit_ChangeVariable(target, *missile);
 	}
 
-	// Show impact missiles
-	if (target.Variable[SHIELD_INDEX].Value > 0
-		&& !target.Type->Impact[ANIMATIONS_DEATHTYPES + 1].Name.empty()) { // shield impact
-		MakeMissile(*target.Type->Impact[ANIMATIONS_DEATHTYPES + 1].Missile, targetPixelCenter, targetPixelCenter);
-	} else if (target.DamagedType && !target.Type->Impact[target.DamagedType].Name.empty()) { // specific to damage type impact
-		MakeMissile(*target.Type->Impact[target.DamagedType].Missile, targetPixelCenter, targetPixelCenter);
-	} else if (!target.Type->Impact[ANIMATIONS_DEATHTYPES].Name.empty()) { // generic impact
-		MakeMissile(*target.Type->Impact[ANIMATIONS_DEATHTYPES].Missile, targetPixelCenter, targetPixelCenter);
-	}
+	HitUnit_ShowImpactMissile(target);
 
 	if (type->Building && !target.Burning) {
-		const int f = (100 * target.Variable[HP_INDEX].Value) / target.Variable[HP_INDEX].Max;
-		MissileType *fire = MissileBurningBuilding(f);
-
-		if (fire) {
-			const PixelDiff offset(0, -PixelTileSize.y);
-			Missile *missile = MakeMissile(*fire, targetPixelCenter + offset, targetPixelCenter + offset);
-
-			missile->SourceUnit = &target;
-			target.Burning = 1;
-		}
+		HitUnit_Burning(target);
 	}
 
 	/* Target Reaction on Hit */
@@ -2591,17 +2697,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 
 	// Can't attack run away.
 	if (!target.IsAgressive() && target.CanMove() && target.CurrentAction() == UnitActionStill) {
-		Vec2i pos = target.tilePos - attacker->tilePos;
-		int d = isqrt(pos.x * pos.x + pos.y * pos.y);
-
-		if (!d) {
-			d = 1;
-		}
-		pos.x = target.tilePos.x + (pos.x * 5) / d + (SyncRand() & 3);
-		pos.y = target.tilePos.y + (pos.y * 5) / d + (SyncRand() & 3);
-		Map.Clamp(pos);
-		CommandStopUnit(target);
-		CommandMove(target, pos, 0);
+		HitUnit_RunAway(target, *attacker);
 	}
 
 	// The rest instructions is only for AI units.
@@ -2615,61 +2711,15 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		target.Threshold = threshold;
 		return;
 	}
-
-	// If the threshold counter is not zero, ignoring
-	if (target.Threshold) {
-		return;
+	if (target.Threshold == 0 && target.IsAgressive() && target.CanMove() && !target.ReCast) {
+		// Attack units in range (which or the attacker?)
+		// Don't bother unit if it casting repeatable spell
+		HitUnit_AttackBack(*attacker, target);
 	}
 
-	// Attack units in range (which or the attacker?)
-	// Don't bother unit if it casting repeatable spell
-	if (target.IsAgressive() && target.CanMove() && !target.ReCast) {
-		COrder *savedOrder = NULL;
-		if (target.CanStoreOrder(target.CurrentOrder())) {
-			savedOrder = target.CurrentOrder()->Clone();
-		}
-		CUnit *oldgoal = target.CurrentOrder()->GetGoal();
-		CUnit *goal, *best = oldgoal;
-
-		if (RevealAttacker && CanTarget(*target.Type, *attacker->Type)) {
-			// Reveal Unit that is attacking
-			goal = attacker;
-		} else {
-			if (target.CurrentAction() == UnitActionStandGround) {
-				goal = AttackUnitsInRange(target);
-			} else {
-				// Check for any other units in range
-				goal = AttackUnitsInReactRange(target);
-			}
-		}
-
-		// Calculate the best target we could attack
-		if (!best || (goal && (ThreatCalculate(target, *goal) < ThreatCalculate(target, *best)))) {
-			best = goal;
-		}
-		if (CanTarget(*target.Type, *attacker->Type)
-			&& (!best || (attacker && goal != attacker
-						  && (ThreatCalculate(target, *attacker) < ThreatCalculate(target, *best))))) {
-			best = attacker;
-		}
-		if (best && best != oldgoal && best->Player != target.Player && best->IsAllied(target) == false) {
-			CommandAttack(target, best->tilePos, best, FlushCommands);
-			// Set threshold value only for agressive units
-			if (best->IsAgressive()) {
-				target.Threshold = threshold;
-			}
-			if (savedOrder != NULL) {
-				target.SavedOrder = savedOrder;
-			}
-		}
-	}
-
-	/*
-		What should we do with workers on :
-		case UnitActionRepair:
-
-		Drop orders and run away or return after escape?
-	*/
+	// What should we do with workers on :
+	// case UnitActionRepair:
+	// Drop orders and run away or return after escape?
 }
 
 /*----------------------------------------------------------------------------
