@@ -167,47 +167,35 @@ int LuaCall(int narg, int clear, bool exitOnError)
 }
 
 /**
-**  Load a file into a buffer
+**  Get the (uncompressed) content of the file into a string
 */
-static void LuaLoadBuffer(const std::string &file, std::string &buffer)
+static bool GetFileContent(const std::string &file, std::string &content)
 {
 	CFile fp;
 
-	buffer.clear();
+	content.clear();
 	if (fp.open(file.c_str(), CL_OPEN_READ) == -1) {
+		DebugPrint("Can't open file '%s': %s\n" _C_ file.c_str());
 		fprintf(stderr, "Can't open file '%s': %s\n", file.c_str(), strerror(errno));
-		return;
+		return false;
 	}
 
-	int size = 10000;
-	char *buf = new char[size];
-	if (!buf) {
-		fprintf(stderr, "Out of memory\n");
-		ExitFatal(-1);
-	}
+	const int size = 10000;
+	std::vector<char> buf;
+	buf.resize(size);
 	int location = 0;
 	for (;;) {
-		int read = fp.read(&buf[location], size - location);
-		if (read != size - location) {
+		int read = fp.read(&buf[location], size);
+		if (read != size) {
 			location += read;
 			break;
 		}
 		location += read;
-		int oldsize = size;
-		size *= 2;
-		char *newb = new char[size];
-		if (!newb) {
-			fprintf(stderr, "Out of memory\n");
-			ExitFatal(-1);
-		}
-		memcpy(newb, buf, oldsize);
-		delete[] buf;
-		buf = newb;
+		buf.resize(buf.size() + size);
 	}
 	fp.close();
-
-	buffer.assign(buf, location);
-	delete[] buf;
+	content.assign(&buf[0], location);
+	return true;
 }
 
 /**
@@ -219,12 +207,13 @@ static void LuaLoadBuffer(const std::string &file, std::string &buffer)
 */
 int LuaLoadFile(const std::string &file)
 {
-	std::string buf;
-	LuaLoadBuffer(file, buf);
-	if (buf.empty()) {
+	DebugPrint("Loading '%s'\n" _C_ file.c_str());
+
+	std::string content;
+	if (GetFileContent(file, content) == false) {
 		return -1;
 	}
-	const int status = luaL_loadbuffer(Lua, buf.c_str(), buf.size(), file.c_str());
+	const int status = luaL_loadbuffer(Lua, content.c_str(), content.size(), file.c_str());
 
 	if (!status) {
 		LuaCall(0, 1);
@@ -275,16 +264,16 @@ static int CclLoad(lua_State *l)
 static int CclLoadBuffer(lua_State *l)
 {
 	char file[1024];
-	std::string buf;
+	std::string content;
 
 	LuaCheckArgs(l, 1);
 	LibraryFileName(LuaToString(l, 1), file, sizeof(file));
-	LuaLoadBuffer(file, buf);
-	if (!buf.empty()) {
-		lua_pushstring(l, buf.c_str());
-		return 1;
+	DebugPrint("Loading '%s'\n" _C_ file);
+	if (GetFileContent(file, content) == false) {
+		return 0;
 	}
-	return 0;
+	lua_pushstring(l, content.c_str());
+	return 1;
 }
 
 /**
