@@ -329,7 +329,10 @@ static bool AiFindHallPlace(const CUnit &worker,
 
 	HallPlaceFinder hallPlaceFinder(worker, type, resource, resultPos);
 
-	return terrainTraversal.Run(hallPlaceFinder);
+	if (terrainTraversal.Run(hallPlaceFinder)) {
+		return true;
+	}
+	return AiFindBuildingPlace2(worker, type, startPos, NULL, true, resultPos);
 }
 
 class LumberMillPlaceFinder
