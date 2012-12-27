@@ -911,47 +911,38 @@ static int CclKillUnit(lua_State *l)
 */
 static int CclKillUnitAt(lua_State *l)
 {
-	LuaCheckArgs(l, 2);
+	LuaCheckArgs(l, 5);
 
+	lua_pushvalue(l, 1);
+	const CUnitType *unittype = TriggerGetUnitType(l);
+	lua_pop(l, 1);
 	lua_pushvalue(l, 2);
 	int plynr = TriggerGetPlayer(l);
 	lua_pop(l, 1);
 	int q = LuaToNumber(l, 3);
-	lua_pushvalue(l, 1);
-	const CUnitType *unittype = TriggerGetUnitType(l);
-	lua_pop(l, 1);
-	if (!lua_istable(l, 4)) {
+
+	if (!lua_istable(l, 4) || !lua_istable(l, 5)) {
 		LuaError(l, "incorrect argument");
 	}
 	Vec2i pos1;
 	Vec2i pos2;
-	lua_rawgeti(l, 4, 1);
-	pos1.x = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, 4, 2);
-	pos1.y = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, 4, 3);
-	pos2.x = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, 4, 4);
-	pos2.y = LuaToNumber(l, -1);
-	lua_pop(l, 1);
+	CclGetPos(l, &pos1.x, &pos1.y, 4);
+	CclGetPos(l, &pos2.x, &pos2.y, 5);
 
 	std::vector<CUnit *> table;
 
 	Select(pos1, pos2, table);
 
 	int s = 0;
-	for (size_t j = 0; j < table.size() && s < q; ++j) {
-		CUnit *unit = table[j];
+	for (std::vector<CUnit *>::iterator it = table.begin(); it != table.end() && s < q; ++it) {
+		CUnit &unit = **it;
 
 		if (unittype == ANY_UNIT
-			|| (unittype == ALL_FOODUNITS && !unit->Type->Building)
-			|| (unittype == ALL_BUILDINGS && unit->Type->Building)
-			|| unittype == unit->Type) {
-			if (plynr == -1 || plynr == unit->Player->Index) {
-				LetUnitDie(*unit);
+			|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
+			|| (unittype == ALL_BUILDINGS && unit.Type->Building)
+			|| unittype == unit.Type) {
+			if (plynr == -1 || plynr == unit.Player->Index) {
+				LetUnitDie(unit);
 				++s;
 			}
 		}

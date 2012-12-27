@@ -43,6 +43,7 @@ set(action_SRCS
 	src/action/action_board.cpp
 	src/action/action_build.cpp
 	src/action/action_built.cpp
+	src/action/action_defend.cpp
 	src/action/action_die.cpp
 	src/action/action_follow.cpp
 	src/action/action_move.cpp
@@ -422,6 +423,7 @@ set(stratagus_action_HDRS
 	src/include/action/action_board.h
 	src/include/action/action_build.h
 	src/include/action/action_built.h
+	src/include/action/action_defend.h
 	src/include/action/action_die.h
 	src/include/action/action_follow.h
 	src/include/action/action_move.h

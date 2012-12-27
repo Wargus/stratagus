@@ -274,7 +274,8 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 				int saction = Selected[i]->CurrentAction();
 				if (saction != UnitActionMove &&
 					saction != UnitActionBuild &&
-					saction != UnitActionFollow) {
+					saction != UnitActionFollow &&
+					saction != UnitActionDefend) {
 					break;
 				}
 			}

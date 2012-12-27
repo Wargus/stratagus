@@ -62,6 +62,8 @@ extern void CommandQuit(int player);
 extern void CommandStopUnit(CUnit &unit);
 /// Prepare command stand ground
 extern void CommandStandGround(CUnit &unit, int flush);
+/// Prepare command defend
+extern void CommandDefend(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command follow
 extern void CommandFollow(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command move
@@ -128,6 +130,8 @@ typedef unsigned short UnitRef;
 extern void SendCommandStopUnit(CUnit &unit);
 /// Send stand ground command
 extern void SendCommandStandGround(CUnit &unit, int flush);
+/// Send defend command
+extern void SendCommandDefend(CUnit &unit, CUnit &dest, int flush);
 /// Send follow command
 extern void SendCommandFollow(CUnit &unit, CUnit &dest, int flush);
 /// Send move command

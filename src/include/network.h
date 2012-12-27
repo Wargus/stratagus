@@ -75,6 +75,7 @@ enum _message_type_ {
 
 	MessageCommandStop,            /// Unit command stop
 	MessageCommandStand,           /// Unit command stand ground
+	MessageCommandDefend,          /// Unit command defend
 	MessageCommandFollow,          /// Unit command follow
 	MessageCommandMove,            /// Unit command move
 	MessageCommandRepair,          /// Unit command repair

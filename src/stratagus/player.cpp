@@ -815,7 +815,7 @@ void CPlayer::UpdateFreeWorkers()
 
 	for (int i = 0; i < nunits; ++i) {
 		CUnit &unit = this->GetUnit(i);
-		if (unit.Type->Harvester && unit.Type->ResInfo && !unit.Removed) {
+		if (unit.IsAlive() && unit.Type->Harvester && unit.Type->ResInfo && !unit.Removed) {
 			if (unit.CurrentAction() == UnitActionStill) {
 				FreeWorkers.push_back(&unit);
 			}

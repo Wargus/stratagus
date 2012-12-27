@@ -183,6 +183,33 @@ void CommandStandGround(CUnit &unit, int flush)
 }
 
 /**
+**  Follow unit and defend it
+**
+**  @param unit   pointer to unit.
+**  @param dest   unit to follow
+**  @param flush  if true, flush command queue.
+*/
+void CommandDefend(CUnit &unit, CUnit &dest, int flush)
+{
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
+	COrderPtr *order;
+
+	if (!unit.CanMove()) {
+		ClearNewAction(unit);
+		order = &unit.NewOrder;
+	} else {
+		order = GetNextOrder(unit, flush);
+		if (order == NULL) {
+			return;
+		}
+	}
+	*order = COrder::NewActionDefend(dest);
+	ClearSavedAction(unit);
+}
+
+/**
 **  Follow unit to new position
 **
 **  @param unit   pointer to unit.

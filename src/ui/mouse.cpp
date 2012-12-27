@@ -458,6 +458,17 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 		return;
 	}
 
+	//  Alt + right click on unit is defend anything.
+	if ((KeyModifiers & ModifierAlt) && dest) {
+		dest->Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		SendCommandDefend(unit, *dest, flush);
+		return;
+	}
+
 	if (DoRightButton_Transporter(unit, dest, flush, acknowledged)) {
 		return;
 	}
@@ -1014,39 +1025,49 @@ static int SendRepair(const Vec2i &tilePos)
 */
 static int SendMove(const Vec2i &tilePos)
 {
-	CUnit *transporter = UnitUnderCursor;
+	CUnit *goal = UnitUnderCursor;
 	int ret = 0;
-
-	// Move to a transporter.
-	if (transporter && transporter->Type->CanTransport()) {
-		int i;
-		for (i = 0; i < NumSelected; ++i) {
-			if (CanTransport(*transporter, *Selected[i])) {
-				SendCommandStopUnit(*transporter);
-				ret = 1;
-				break;
-			}
-		}
-		if (i == NumSelected) {
-			transporter = NULL;
-		}
-	} else {
-		transporter = NULL;
-	}
-
 	const int flush = !(KeyModifiers & ModifierShift);
 
-	for (int i = 0; i < NumSelected; ++i) {
-		CUnit *unit = Selected[i];
+	// Alt makes unit to defend goal
+	if (goal && (KeyModifiers & ModifierAlt)) {
+		for (int i = 0; i < NumSelected; ++i) {
+			CUnit *unit = Selected[i];
 
-		if (transporter && CanTransport(*transporter, *unit)) {
-			transporter->Blink = 4;
-			SendCommandFollow(*transporter, *unit, 0);
-			SendCommandBoard(*unit, *transporter, flush);
+			goal->Blink = 4;
+			SendCommandDefend(*unit, *goal, flush);
 			ret = 1;
+		}
+	} else {
+		// Move to a transporter.
+		if (goal && goal->Type->CanTransport()) {
+			int i;
+			for (i = 0; i < NumSelected; ++i) {
+				if (CanTransport(*goal, *Selected[i])) {
+					SendCommandStopUnit(*goal);
+					ret = 1;
+					break;
+				}
+			}
+			if (i == NumSelected) {
+				goal = NULL;
+			}
 		} else {
-			SendCommandMove(*unit, tilePos, flush);
-			ret = 1;
+			goal = NULL;
+		}
+
+		for (int i = 0; i < NumSelected; ++i) {
+			CUnit *unit = Selected[i];
+
+			if (goal && CanTransport(*goal, *unit)) {
+				goal->Blink = 4;
+				SendCommandFollow(*goal, *unit, 0);
+				SendCommandBoard(*unit, *goal, flush);
+				ret = 1;
+			} else {
+				SendCommandMove(*unit, tilePos, flush);
+				ret = 1;
+			}
 		}
 	}
 	return ret;

@@ -79,6 +79,23 @@ void SendCommandStandGround(CUnit &unit, int flush)
 }
 
 /**
+** Send command: Defend some unit.
+**
+** @param unit    pointer to unit.
+** @param dest    defend this unit.
+** @param flush   Flag flush all pending commands.
+*/
+void SendCommandDefend(CUnit &unit, CUnit &dest, int flush)
+{
+	if (!IsNetworkGame()) {
+		CommandLog("defend", &unit, flush, -1, -1, &dest, NULL, -1);
+		CommandDefend(unit, dest, flush);
+	} else {
+		NetworkSendCommand(MessageCommandDefend, unit, 0, 0, &dest, 0, flush);
+	}
+}
+
+/**
 ** Send command: Follow unit to position.
 **
 ** @param unit    pointer to unit.
@@ -571,6 +588,15 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 			CommandLog("stand-ground", &unit, status, -1, -1, NoUnitP, NULL, -1);
 			CommandStandGround(unit, status);
 			break;
+		case MessageCommandDefend: {
+			if (dstnr != (unsigned short)0xFFFF) {
+				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
+				Assert(dest.Type);
+				CommandLog("defend", &unit, status, -1, -1, &dest, NULL, -1);
+				CommandDefend(unit, dest, status);
+			}
+			break;
+		}
 		case MessageCommandFollow: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = UnitManager.GetSlotUnit(dstnr);

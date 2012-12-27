@@ -184,6 +184,7 @@ void LoadPO(const char *file)
 **/
 void SetTranslationsFiles(const char *stratagusfile, const char *gamefile)
 {
+	Entries.clear();
 	LoadPO(stratagusfile);
 	LoadPO(gamefile);
 }

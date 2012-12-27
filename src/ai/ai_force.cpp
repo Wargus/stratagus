@@ -399,6 +399,15 @@ void AiForce::Attack(const Vec2i &pos)
 	}
 	//  Send all units in the force to enemy.
 
+	CUnit *leader = NULL;
+	for (size_t i = 0; i != this->Units.size(); ++i) {
+		CUnit *const unit = this->Units[i];
+
+		if (unit->IsAgressive()) {
+			leader = unit;
+			break;
+		}
+	}
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		CUnit *const unit = this->Units[i];
 
@@ -406,10 +415,14 @@ void AiForce::Attack(const Vec2i &pos)
 			const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
 
 			unit->Wait = delay;
-			if (unit->Type->CanAttack) {
+			if (unit->IsAgressive()) {
 				CommandAttack(*unit, this->GoalPos,  NULL, FlushCommands);
 			} else {
-				CommandMove(*unit, this->GoalPos, FlushCommands);
+				if (leader) {
+					CommandDefend(*unit, *leader, FlushCommands);
+				} else {
+					CommandMove(*unit, this->GoalPos, FlushCommands);
+				}
 			}
 		}
 	}
@@ -800,9 +813,13 @@ void AiForce::Update()
 	}
 
 	std::vector<CUnit *> idleUnits;
+	CUnit *leader = NULL;
 	for (unsigned int i = 0; i != Size(); ++i) {
 		CUnit &aiunit = *Units[i];
 
+		if (aiunit.IsAgressive()) {
+			leader = &aiunit;
+		}
 		if (aiunit.IsIdle() && aiunit.IsAliveOnMap()) {
 			idleUnits.push_back(&aiunit);
 		}
@@ -854,7 +871,7 @@ void AiForce::Update()
 		const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
 
 		aiunit.Wait = delay;
-		if (aiunit.Type->CanAttack) {
+		if (aiunit.IsAgressive()) {
 			CommandAttack(aiunit, this->GoalPos, NULL, FlushCommands);
 		} else if (aiunit.Type->CanTransport()) {
 			if (aiunit.BoardCount != 0) {
@@ -865,7 +882,11 @@ void AiForce::Update()
 				this->Remove(aiunit);
 			}
 		} else {
-			CommandMove(aiunit, this->GoalPos, FlushCommands);
+			if (leader) {
+				CommandDefend(aiunit, *leader, FlushCommands);
+			} else {
+				CommandMove(aiunit, this->GoalPos, FlushCommands);
+			}
 		}
 	}
 

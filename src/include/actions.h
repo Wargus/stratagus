@@ -52,6 +52,7 @@ enum UnitAction {
 	UnitActionStill,        /// unit stand still, does nothing
 	UnitActionStandGround,  /// unit stands ground
 	UnitActionFollow,       /// unit follows units
+	UnitActionDefend,       /// unit defends unit
 	UnitActionMove,         /// unit moves to position/unit
 	UnitActionAttack,       /// unit attacks position/unit
 	UnitActionAttackGround, /// unit attacks ground
@@ -128,6 +129,7 @@ public:
 	static COrder *NewActionBoard(CUnit &unit);
 	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
 	static COrder *NewActionBuilt(CUnit &builder, CUnit &unit);
+	static COrder *NewActionDefend(CUnit &dest);
 	static COrder *NewActionDie();
 	static COrder *NewActionFollow(CUnit &dest);
 	static COrder *NewActionMove(const Vec2i &pos);

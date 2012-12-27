@@ -819,6 +819,8 @@ static void DoNextReplay()
 		SendCommandStopUnit(*unit);
 	} else if (!strcmp(action, "stand-ground")) {
 		SendCommandStandGround(*unit, flags);
+	} else if (!strcmp(action, "defend")) {
+		SendCommandDefend(*unit, *dunit, flags);
 	} else if (!strcmp(action, "follow")) {
 		SendCommandFollow(*unit, *dunit, flags);
 	} else if (!strcmp(action, "move")) {

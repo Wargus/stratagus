@@ -45,6 +45,7 @@
 #include "action/action_board.h"
 #include "action/action_build.h"
 #include "action/action_built.h"
+#include "action/action_defend.h"
 #include "action/action_die.h"
 #include "action/action_follow.h"
 #include "action/action_move.h"
@@ -185,6 +186,8 @@ void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 		*orderPtr = new COrder_Build;
 	} else if (!strcmp(actiontype, "action-built")) {
 		*orderPtr = new COrder_Built;
+	} else if (!strcmp(actiontype, "action-defend")) {
+		*orderPtr = new COrder_Defend;
 	} else if (!strcmp(actiontype, "action-die")) {
 		*orderPtr = new COrder_Die;
 	} else if (!strcmp(actiontype, "action-follow")) {

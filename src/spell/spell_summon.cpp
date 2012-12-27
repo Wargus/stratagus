@@ -32,9 +32,12 @@
 
 #include "stratagus.h"
 
+#include "action/action_defend.h"
+
 #include "spell/spell_summon.h"
 
 #include "actions.h"
+#include "commands.h"
 #include "script.h"
 #include "unit.h"
 #include "unit_find.h"
@@ -133,8 +136,15 @@ public:
 			if (ttl) {
 				target->TTL = GameCycle + ttl;
 			}
-			if (caster.GroupId && caster.Player->AiEnabled) {
-				target->GroupId = caster.GroupId;
+
+			// To avoid defending summoned unit for AI
+			if (caster.Player->AiEnabled) {
+				if (caster.GroupId) {
+					target->GroupId = caster.GroupId;
+					CommandDefend(*target, caster, FlushCommands);
+				} else {
+					target->GroupId = -1;
+				}
 			}
 
 			caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
