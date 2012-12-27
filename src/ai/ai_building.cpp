@@ -358,7 +358,7 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 	}
 #endif
 	if (Map.Field(pos)->IsTerrainResourceOnMap(resource)) {
-		if (AiFindBuildingPlace2(worker, type, pos, NULL, true, resultPos)) {
+		if (AiFindBuildingPlace2(worker, type, from, NULL, true, resultPos)) {
 			return VisitResult_Finished;
 		}
 	}
