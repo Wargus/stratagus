@@ -194,7 +194,7 @@ enum {
 		default:
 			break;
 	}
-	
+
 	// Target destroyed?
 	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		DebugPrint("Goal gone\n");
