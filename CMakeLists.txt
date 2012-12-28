@@ -558,10 +558,9 @@ if(UNIX AND CMAKE_SYSTEM_NAME MATCHES BSD)
 	set(BSD true)
 endif()
 
-find_package(PkgConfig QUIET REQUIRED)
-
 # Check if platform is Maemo
 if(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux)
+	find_package(PkgConfig QUIET REQUIRED)
 	pkg_check_modules(MAEMO_VERSION maemo-version)
 	if(MAEMO_VERSION_FOUND)
 		set(MAEMO true)
