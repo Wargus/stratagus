@@ -867,6 +867,9 @@ static int InputKey(int key)
 			UI.StatusLine.Clear();
 			return 1;
 
+#ifdef USE_MAC
+		case SDLK_DELETE:
+#endif
 		case SDLK_BACKSPACE:
 			if (InputIndex) {
 				if (Input[InputIndex - 1] == '~') {
