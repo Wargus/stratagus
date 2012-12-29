@@ -83,22 +83,22 @@ AI in Stratagus is script based. Each AI player keeps executing scripts.
 There are two kinds of scripts :
 <ul>
   <li>The main script. It starts buildings, upgrades, ...</li>
-  <li>The action/reaction scripts. They are started by the AI engine, under certain condition.<br>
+  <li>The action/reaction scripts. They are started by the AI engine, under certain condition.<br/>
   </li>
 </ul>
-Scripts can arrange and control units using forces : <br>
+Scripts can arrange and control units using forces : <br/>
 A script can ask for some type of unit in a force (using <a href="#AiForce">AiForce</a>),
-and then wait for them to be ready (using <a href="#AiWaitForce">AiWaitForce</a>).<br>
-<br>
-<br>
+and then wait for them to be ready (using <a href="#AiWaitForce">AiWaitForce</a>).<br/>
+<br/>
+<br/>
 The force 0 is a special case : it holds all the unassigned units, and is used to fill other forces.
-( when needed, units are transfered from force 0 to others ). Attacker units in force 0 won't be used for attacks<br>
+( when needed, units are transfered from force 0 to others ). Attacker units in force 0 won't be used for attacks<br/>
 Forces from 1 to 3 are also special : They are used as the attack reserve.
-Attack forces will only be created using units available in those forces.<br>
-<br>
+Attack forces will only be created using units available in those forces.<br/>
+<br/>
 The main script is responsible for setting minimums for the forces 0 and 1. This will influence the balance
-between defend and attack for an AI player.<br>
-<br>
+between defend and attack for an AI player.<br/>
+<br/>
 
 <h2>Functions</h2>
 <a name="DefineAi"></a>
@@ -107,9 +107,7 @@ between defend and attack for an AI player.<br>
 This defines how a special AI works. Each level can use his own AI definition.
 
 <dl>
-<dt>name</dt>
-<dd>Unique name of this AI definitions.
-</dd>
+<dt>name</dt><dd>Unique name of this AI definitions.</dd>
 <dt>race</dt>
 <dd>Name of the race for what this definition can be used, if the definition
     can be used for any race use "*".
@@ -120,9 +118,7 @@ The puds contains numbers which are mapped by the C table AiTypeWcNames into
 internal names. Some common used names are "passive", "land-attack",
 "sea-attack", "air-attack".
 </dd>
-<dt>script</dt>
-<dd>A lua function.<p>
-</dd>
+<dt>script</dt><dd>A lua function.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -139,85 +135,67 @@ The AI is complete configurable, nothing is hardcoded. The AI knows nothing
 about any units without this table. This table defines F.E. what unit can build
 and what they can build and many other things that the AI must know.
 
-
 <dl>
-<dt>list</dt>
-<dd>A list of features:
+<dt>list</dt><dd>A list of features:
  <ul>
  <li><code>{"build", "builder", "building-1", ... "building-n"}</code>
   <dl>
   <dt>builder</dt>
-  <dd>Name of the unit-type that can build.
-  </dd>
+  <dd>Name of the unit-type that can build.</dd>
   <dt>building-1</dt>
   <dt>building-n</dt>
-  <dd>Names of the unit-types that can be builded by the builder.
-  </dd>
+  <dd>Names of the unit-types that can be builded by the builder.</dd>
   </dl>
-  <b>Note:</b> If more units can build the same buildings you need the same list
-	for all units.
+  <b>Note:</b> If more units can build the same buildings you need the same list for all units.
  <li><code>{"train", "trainer", "unit-1", ... "unit-n"}</code>
   <dl>
   <dt>trainer</dt>
-  <dd>Name of the unit-type that can train the units.
-  </dd>
+  <dd>Name of the unit-type that can train the units.</dd>
   <dt>unit-1</dt>
   <dt>unit-n</dt>
-  <dd>Names of the unit-types that can be trained by the trainer.
-  </dd>
+  <dd>Names of the unit-types that can be trained by the trainer.</dd>
   </dl>
-  <b>Note:</b> If more units can train the same unit you need the same list
-	for all units.
+  <b>Note:</b> If more units can train the same unit you need the same list for all units.
  <li><code>{"upgrade", "unit", "upgraded-unit-1", ... "upgraded-unit-n"}</code>
   <dl>
   <dt>unit</dt>
-  <dd>Name of the unit-type that can be upgraded.
-  </dd>
+  <dd>Name of the unit-type that can be upgraded.</dd>
   <dt>upgraded-unit-1</dt>
   <dt>upgraded-unit-n</dt>
-  <dd>Names of the unit-types to that the unit can be upgraded.
-  </dd>
+  <dd>Names of the unit-types to that the unit can be upgraded.</dd>
   </dl>
  <li><code>{"research", "researcher", "upgrade-1", ... "spell-n"}</code>
   <dl>
   <dt>researcher</dt>
-  <dd>Name of the unit-type that can reasearch upgrades or spells.
-  </dd>
+  <dd>Name of the unit-type that can reasearch upgrades or spells.</dd>
   <dt>upgrade-1</dt>
   <dt>spell-n</dt>
-  <dd>Names of the upgrades or spells that can be researched by the researcher.
-  </dd>
+  <dd>Names of the upgrades or spells that can be researched by the researcher.</dd>
   </dl>
  <li><code>{"repair", "worker", "unit-1", ... "unit-n"}</code>
   <dl>
   <dt>worker</dt>
-  <dd>Name of the unit-type that can repair other units.
-  </dd>
+  <dd>Name of the unit-type that can repair other units.</dd>
   <dt>unit-1</dt>
   <dt>unit-n</dt>
   <dd>Names of the unit-types that can be repaired by the worker.
   </dd>
   </dl>
-  <b>Note:</b> If more units can repair the same units you need the same list
-	for all units.
+  <b>Note:</b> If more units can repair the same units you need the same list for all units.
  <li><code>{"equiv", "unit", "unit-1", ... "unit-n"}</code>
   <dl>
   <dt>unit</dt>
-  <dd>Name of the unit-type that have equilvalent units.
-  </dd>
+  <dd>Name of the unit-type that have equilvalent units.</dd>
   <dt>unit-1</dt>
   <dt>unit-n</dt>
-  <dd>Names of the unit-types that can be uses by the AI equivalent.
-  </dd>
+  <dd>Names of the unit-types that can be uses by the AI equivalent.</dd>
   </dl>
  <li><code>{"unit-limit", "unit", "resource"}</code>
   <dl>
   <dt>unit</dt>
-  <dd>Name of the unit-type that must be produced to reduce the unit limit.
-  </dd>
+  <dd>Name of the unit-type that must be produced to reduce the unit limit.</dd>
   <dt>resource</dt>
-  <dd>Name of the resource producing the shortage.
-  </dd>
+  <dd>Name of the resource producing the shortage.</dd>
   </dl>
   <i>I think we should swap the arguments: "resource" "unit".</i>
  </ul>
@@ -305,10 +283,7 @@ Check if a force is ready.
 
 
 <dl>
-<dt>force</dt>
-<dd>Number of the force to which the units should belong. 0 - 9 is currently
-supported.
-</dd>
+<dt>force</dt><dd>Number of the force to which the units should belong. 0 - 9 is currently supported.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -325,11 +300,8 @@ supported.
 
 Enable or disable the debug output of the AI script execution.
 
-
 <dl>
-<dt>flag</dt>
-<dd>If true enables printing of the AI commands, if false disables it.
-</dd>
+<dt>flag</dt><dd>If true enables printing of the AI commands, if false disables it.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -342,8 +314,8 @@ Enable or disable the debug output of the AI script execution.
 <a name="AiDebugPlayer"></a>
 <h3>AiDebugPlayer(1, 2, 3, ...)</h3>
 
-Activate dump of AI forces and strategy on stdout.<br>
-Parameters are player number, or "self", for thisplayer.<br>
+Activate dump of AI forces and strategy on stdout.<br/>
+Parameters are player number, or "self", for thisplayer.<br/>
 "none" will stop all AI debug output.
 
 <h4>Example</h4>
@@ -357,7 +329,6 @@ Parameters are player number, or "self", for thisplayer.<br>
 
 Dump some AI debug information.
 
-
 <h4>Example</h4>
 
 <pre>
@@ -370,31 +341,26 @@ Dump some AI debug information.
 
 Define a force, what and how many units should belong to a force. Up to 10
 forces are currently supported.
-<br>
+<br/>
 Force 0 is currently fixed to be the defence force. Send to a building or
 unit under attack.
-<br>
+<br/>
 If there are any unassigned units of the requested unit-type, than they are
 assigned to the force.
-<br>
+<br/>
 Note: The low-level didn't support the reduce of a force.
 
 
 <dl>
 <dt>force</dt>
-<dd>Number of the force to which the units should belong. 0 - 9 is currently
-supported.
-</dd>
+<dd>Number of the force to which the units should belong. 0 - 9 is currently supported.</dd>
 <dt>unit-type-1</dt>
 <dt>unit-type-N</dt>
-<dd>Unit-type that should be in the force. Currently only mobile (trained) units
-are allowed.
-</dd>
+<dd>Unit-type that should be in the force. Currently only mobile (trained) units are allowed.</dd>
 </dl>
 <dt>count-1</dt>
 <dt>count-N</dt>
-<dd>How many of this units should be in the force.
-</dd>
+<dd>How many of this units should be in the force.</dd>
 </dl>
 
 <i>The unit-types should be build in a fixed order. From left to right? or from
@@ -417,12 +383,9 @@ Define the role of a force.
 
 <dl>
 <dt>force</dt>
-<dd>Number of the force to which the units belong. 0 - 9 is currently
-supported.
-</dd>
+<dd>Number of the force to which the units belong. 0 - 9 is currently supported.</dd>
 <dt>role</dt>
-<dd>The role of the force.  Can be either "attack" or "defend".
-</dd>
+<dd>The role of the force.  Can be either "attack" or "defend".</dd>
 </dl>
 
 <h4>Example</h4>
@@ -470,8 +433,7 @@ additional could be requested.
 
 <dl>
 <dt>unit-type</dt>
-<dd>Name of the unit-type required.
-</dd>
+<dd>Name of the unit-type required.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -506,8 +468,7 @@ AI could hang up.
 
 <dl>
 <dt>upgrade</dt>
-<dd>Upgrade name to be researched.
-</dd>
+<dd>Upgrade name to be researched.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -532,11 +493,9 @@ modifies the last request to the new number.
 
 <dl>
 <dt>unit-type</dt>
-<dd>Name of the unit-type(s) required.
-</dd>
+<dd>Name of the unit-type(s) required.</dd>
 <dt>count</dt>
-<dd>Number of unit-types(s) required.
-</dd>
+<dd>Number of unit-types(s) required.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -547,47 +506,38 @@ modifies the last request to the new number.
 </pre>
 
 <a name="AiSetCollect"></a>
-<h3>AiSetCollect(time, resource1, resource2, ...)</h3>
+<h3>AiSetCollect({time, resource1, resource2, ...})</h3>
 
 Set AI player resource collect percent.
 
 
 <dl>
-<dt>time</dt>
-<dd>Time in game cycles.
-</dd>
-<dt>resource1</dt>
-<dd>Percentage needed for the first resource.
-</dd>
+<dt>time</dt><dd>unused parameter.</dd>
+<dt>resource1</dt><dd>Percentage needed for the first resource.</dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
     -- Set the collect percent to 50% gold and 50% wood.
-    AiSetCollect(0, 50, 50, 0, 0, 0, 0)
+    AiSetCollect({0, 50, 50, 0, 0, 0, 0})
 </pre>
 
 <a name="AiSetReserve"></a>
-<h3>AiSetReserve(time, resource1, ...)</h3>
+<h3>AiSetReserve({time, resource1, ...})</h3>
 
 Set AI player resource reserve.
 
-
 <dl>
-<dt>time</dt>
-<dd>Time in game cycles.
-</dd>
-<dt>reource1</dt>
-<dd>first resource.
-</dd>
+<dt>time</dt><dd>unused parameter.</dd>
+<dt>reource1</dt><dd>first resource.</dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
     -- Set all of the reserves to 0.
-    AiSetReserve(0, 0, 0, 0, 0, 0, 0)
+    AiSetReserve({0, 0, 0, 0, 0, 0, 0})
 </pre>
 
 <a name="AiSleep"></a>
@@ -598,8 +548,7 @@ Wait some frames, to let the opponent (you) recover.
 
 <dl>
 <dt>frames</dt>
-<dd>How many frames (~1/30s) the AI shouldn't proceed with the script.
-</dd>
+<dd>How many frames (~1/30s) the AI shouldn't proceed with the script.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -621,8 +570,7 @@ upgrades.
 
 <dl>
 <dt>unit-type</dt>
-<dd>Unit type to that a unit should be upgraded.
-</dd>
+<dd>Unit type to that a unit should be upgraded.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -640,8 +588,7 @@ Don't forget to request a unit-type, before you wait on it.
 
 <dl>
 <dt>type</dt>
-<dd>Wait for this unit type.
-</dd>
+<dd>Wait for this unit type.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -661,9 +608,7 @@ First 0, than 1, last 9.
 
 <dl>
 <dt>force</dt>
-<dd>Number of the force to which the units should belong. 0 - 9 is currently
-supported.
-</dd>
+<dd>Number of the force to which the units should belong. 0 - 9 is currently supported.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -709,7 +654,7 @@ Now wait unit we have a worker to build the next things.
 FIXME: need some complex examples.
 
 <hr>
-(C) Copyright 2002-2012 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project under the <a href="../gpl.html">GNU General Public License</a>.<br>
-All trademarks and copyrights on this page are owned by their respective owners.<br>
+(C) Copyright 2002-2012 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project under the <a href="../gpl.html">GNU General Public License</a>.<br/>
+All trademarks and copyrights on this page are owned by their respective owners.<br/>
 </body>
 </html>
