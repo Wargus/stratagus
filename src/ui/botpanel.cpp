@@ -73,7 +73,7 @@ int CurrentButtonLevel;
 /// All buttons for units
 std::vector<ButtonAction *> UnitButtonTable;
 /// Pointer to current buttons
-ButtonActionProxy CurrentButtons;
+std::vector<ButtonAction> CurrentButtons;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -88,7 +88,7 @@ void InitButtons()
 	for (size_t i = 0; i != UnitButtonTable.size(); ++i) {
 		UnitButtonTable[i]->Icon.Load();
 	}
-	CurrentButtons.Reset();
+	CurrentButtons.clear();
 }
 
 /*----------------------------------------------------------------------------
@@ -197,7 +197,7 @@ void CleanButtons()
 	UnitButtonTable.clear();
 
 	CurrentButtonLevel = 0;
-	CurrentButtons.Reset();
+	CurrentButtons.clear();
 }
 
 /**
@@ -1024,10 +1024,10 @@ void CButtonPanel::Draw()
 	}
 
 	// No buttons
-	if (!CurrentButtons.IsValid()) {
+	if (CurrentButtons.empty()) {
 		return;
 	}
-	ButtonActionProxy buttons(CurrentButtons);
+	std::vector<ButtonAction>& buttons(CurrentButtons);
 
 	Assert(NumSelected > 0);
 	char buf[8];
@@ -1224,11 +1224,11 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 **  @todo FIXME : make UpdateButtonPanelMultipleUnits more configurable.
 **  @todo show all possible buttons or just same button...
 */
-static ButtonAction *UpdateButtonPanelMultipleUnits()
+static void UpdateButtonPanelMultipleUnits(std::vector<ButtonAction> *buttonActions)
 {
-	ButtonAction *res = new ButtonAction[UI.ButtonPanel.Buttons.size()];
+	buttonActions->resize(UI.ButtonPanel.Buttons.size());
 	for (size_t z = 0; z < UI.ButtonPanel.Buttons.size(); ++z) {
-		res[z].Pos = -1;
+		(*buttonActions)[z].Pos = -1;
 	}
 	char unit_ident[128];
 
@@ -1261,10 +1261,9 @@ static ButtonAction *UpdateButtonPanelMultipleUnits()
 		// is button allowed after all?
 		if (allow) {
 			// OverWrite, So take last valid button.
-			res[UnitButtonTable[z]->Pos - 1] = *UnitButtonTable[z];
+			(*buttonActions)[UnitButtonTable[z]->Pos - 1] = *UnitButtonTable[z];
 		}
 	}
-	return res;
 }
 
 /**
@@ -1277,12 +1276,12 @@ static ButtonAction *UpdateButtonPanelMultipleUnits()
 **
 **  @todo FIXME : Remove Hack for cancel button.
 */
-static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit &unit)
+static void UpdateButtonPanelSingleUnit(const CUnit &unit, std::vector<ButtonAction> *buttonActions)
 {
-	ButtonAction *res = new ButtonAction[UI.ButtonPanel.Buttons.size()];
+	buttonActions->resize(UI.ButtonPanel.Buttons.size());
 
 	for (size_t i = 0; i != UI.ButtonPanel.Buttons.size(); ++i) {
-		res[i].Pos = -1;
+		(*buttonActions)[i].Pos = -1;
 	}
 	char unit_ident[128];
 
@@ -1326,12 +1325,11 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit &unit)
 		}
 
 		// is button allowed after all?
-		if ((buttonaction.AlwaysShow && res[pos - 1].Pos == -1 && researchCheck) || allow) {
+		if ((buttonaction.AlwaysShow && (*buttonActions)[pos - 1].Pos == -1 && researchCheck) || allow) {
 			// OverWrite, So take last valid button.
-			res[pos - 1] = buttonaction;
+			(*buttonActions)[pos - 1] = buttonaction;
 		}
 	}
-	return res;
 }
 
 /**
@@ -1342,14 +1340,14 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit &unit)
 void CButtonPanel::Update()
 {
 	if (!NumSelected) {
-		CurrentButtons.Reset();
+		CurrentButtons.clear();
 		return;
 	}
 
 	CUnit &unit = *Selected[0];
 	// foreign unit
 	if (unit.Player != ThisPlayer && !ThisPlayer->IsTeamed(unit)) {
-		CurrentButtons.Reset();
+		CurrentButtons.clear();
 		return;
 	}
 
@@ -1364,11 +1362,11 @@ void CButtonPanel::Update()
 
 	// We have selected different units types
 	if (!sameType) {
-		CurrentButtons = UpdateButtonPanelMultipleUnits();
+		UpdateButtonPanelMultipleUnits(&CurrentButtons);
 	} else {
 		// We have same type units selected
 		// -- continue with setting buttons as for the first unit
-		CurrentButtons = UpdateButtonPanelSingleUnit(unit);
+		UpdateButtonPanelSingleUnit(unit, &CurrentButtons);
 	}
 }
 
@@ -1610,7 +1608,7 @@ void CButtonPanel::DoClicked(int button)
 {
 	Assert(0 <= button && button < (int)UI.ButtonPanel.Buttons.size());
 	// no buttons
-	if (!CurrentButtons.IsValid()) {
+	if (CurrentButtons.empty()) {
 		return;
 	}
 	if (IsButtonAllowed(*Selected[0], CurrentButtons[button]) == false) {
@@ -1669,7 +1667,7 @@ int CButtonPanel::DoKey(int key)
 	gcn::Key k = gcn::SDLInput::convertKeyCharacter(keysym);
 	key = k.getValue();
 
-	if (CurrentButtons.IsValid()) {
+	if (!CurrentButtons.empty()) {
 		// This is required for action queues SHIFT+M should be `m'
 		if (isascii(key) && isupper(key)) {
 			key = tolower(key);

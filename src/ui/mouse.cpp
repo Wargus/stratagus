@@ -633,7 +633,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 	for (unsigned int j = 0; j < buttonCount; ++j) {
 		if (UI.ButtonPanel.Buttons[j].Contains(screenPos)) {
 			ButtonAreaUnderCursor = ButtonAreaButton;
-			if (CurrentButtons.IsValid() && CurrentButtons[j].Pos != -1) {
+			if (!CurrentButtons.empty() && CurrentButtons[j].Pos != -1) {
 				ButtonUnderCursor = j;
 				CursorOn = CursorOnButton;
 				return;
@@ -2015,11 +2015,11 @@ void DrawPieMenu()
 		return;
 	}
 
-	if (!CurrentButtons.IsValid()) { // no buttons
+	if (CurrentButtons.empty()) { // no buttons
 		CursorState = CursorStatePoint;
 		return;
 	}
-	ButtonActionProxy buttons(CurrentButtons);
+	std::vector<ButtonAction> &buttons(CurrentButtons);
 	CLabel label(GetGameFont());
 	CViewport *vp = UI.SelectedViewport;
 	PushClipping();
@@ -2070,7 +2070,7 @@ void DrawPieMenu()
 */
 static void HandlePieMenuMouseSelection()
 {
-	if (!CurrentButtons.IsValid()) {  // no buttons
+	if (CurrentButtons.empty()) {  // no buttons
 		return;
 	}
 
