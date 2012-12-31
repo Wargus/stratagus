@@ -961,46 +961,6 @@ void ToggleShowBuilListMessages()
 #endif
 
 /*----------------------------------------------------------------------------
---  STATUS LINE
-----------------------------------------------------------------------------*/
-
-/**
-**  Draw status line.
-*/
-void CStatusLine::Draw()
-{
-	if (!this->StatusLine.empty()) {
-		PushClipping();
-		SetClipping(this->TextX, this->TextY,
-					this->TextX + this->Width - 1, Video.Height - 1);
-		CLabel(*this->Font).DrawClip(this->TextX, this->TextY, this->StatusLine);
-		PopClipping();
-	}
-}
-
-/**
-**  Change status line to new text.
-**
-**  @param status  New status line information.
-*/
-void CStatusLine::Set(const std::string &status)
-{
-	if (KeyState != KeyStateInput) {
-		this->StatusLine = status;
-	}
-}
-
-/**
-**  Clear status line.
-*/
-void CStatusLine::Clear()
-{
-	if (KeyState != KeyStateInput) {
-		this->StatusLine.clear();
-	}
-}
-
-/*----------------------------------------------------------------------------
 --  COSTS
 ----------------------------------------------------------------------------*/
 
@@ -1319,17 +1279,8 @@ void DrawTimer()
 		return;
 	}
 
-	int sec = GameTimer.Cycles / CYCLES_PER_SECOND % 60;
-	int min = (GameTimer.Cycles / CYCLES_PER_SECOND / 60) % 60;
-	int hour = (GameTimer.Cycles / CYCLES_PER_SECOND / 3600);
-	char buf[30];
-
-	if (hour) {
-		snprintf(buf, sizeof(buf), "%d:%02d:%02d", hour, min, sec);
-	} else {
-		snprintf(buf, sizeof(buf), "%d:%02d", min, sec);
-	}
-	CLabel(*UI.Timer.Font).Draw(UI.Timer.X, UI.Timer.Y, buf);
+	int sec = GameTimer.Cycles / CYCLES_PER_SECOND;
+	UI.Timer.Draw(sec);
 }
 
 /**

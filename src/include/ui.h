@@ -54,7 +54,8 @@
 
 #include "color.h"
 #include "viewport.h"
-
+#include "ui/statusline.h"
+#include "ui/uitimer.h"
 #include <vector>
 #include <string>
 #include <map>
@@ -529,36 +530,6 @@ public:
 	int X;
 	int Y;
 };
-
-class CStatusLine
-{
-public:
-	CStatusLine() : Width(0), TextX(0), TextY(0), Font(0) {}
-
-	void Draw();
-	void Set(const std::string &status);
-	inline const std::string &Get() { return this->StatusLine; }
-	void Clear();
-
-	int Width;
-	int TextX;
-	int TextY;
-	CFont *Font;
-
-private:
-	std::string StatusLine;
-};
-
-class CUITimer
-{
-public:
-	CUITimer() : X(0), Y(0), Font(NULL) {}
-
-	int X;
-	int Y;
-	CFont *Font;
-};
-
 
 /**
 **  Defines the user interface.

@@ -284,7 +284,9 @@ set(ui_SRCS
 	src/ui/menu_proc.cpp
 	src/ui/mouse.cpp
 	src/ui/script_ui.cpp
+	src/ui/statusline.cpp
 	src/ui/ui.cpp
+	src/ui/uitimer.cpp
 	src/ui/widgets.cpp
 )
 source_group(ui FILES ${ui_SRCS})
@@ -525,6 +527,8 @@ set(stratagus_generic_HDRS
 	src/include/translate.h
 	src/include/trigger.h
 	src/include/ui/contenttype.h
+	src/include/ui/statusline.h
+	src/include/ui/uitimer.h
 	src/include/ui.h
 	src/include/unit.h
 	src/include/unit_cache.h
