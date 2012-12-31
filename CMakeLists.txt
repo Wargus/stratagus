@@ -277,6 +277,7 @@ source_group(stratagusmain FILES ${stratagus_SRCS})
 set(ui_SRCS
 	src/ui/botpanel.cpp
 	src/ui/button_checks.cpp
+	src/ui/contenttype.cpp
 	src/ui/icons.cpp
 	src/ui/interface.cpp
 	src/ui/mainscr.cpp
@@ -523,6 +524,7 @@ set(stratagus_generic_HDRS
 	src/include/title.h
 	src/include/translate.h
 	src/include/trigger.h
+	src/include/ui/contenttype.h
 	src/include/ui.h
 	src/include/unit.h
 	src/include/unit_cache.h

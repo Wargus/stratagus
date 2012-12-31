@@ -53,7 +53,6 @@
 #endif
 
 #include "color.h"
-#include "ui/contenttype.h"
 #include "viewport.h"
 
 #include <vector>
@@ -64,6 +63,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CContentType;
 class CUnit;
 class CFile;
 class CFont;
@@ -204,15 +204,9 @@ class CUnitInfoPanel
 public:
 	CUnitInfoPanel() : PosX(0), PosY(0), DefaultFont(0),
 		Contents(), Condition(NULL) {}
-	~CUnitInfoPanel() {
-		for (std::vector<CContentType *>::iterator content = Contents.begin();
-			 content != Contents.end(); ++content) {
-			delete *content;
-		}
-		delete Condition;
-	}
+	~CUnitInfoPanel();
 
-
+public:
 	std::string Name;      /// Ident of the panel.
 	int PosX;              /// X coordinate of the panel.
 	int PosY;              /// Y coordinate of the panel.

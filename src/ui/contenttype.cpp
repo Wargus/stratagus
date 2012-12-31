@@ -70,8 +70,8 @@ CContentType::~CContentType()
 void CContentTypeText::Draw(const CUnit &unit, CFont *defaultfont) const
 {
 	std::string text;       // Optional text to display.
-	int x = this->PosX;
-	int y = this->PosY;
+	int x = this->Pos.x;
+	int y = this->Pos.y;
 	CFont &font = this->Font ? *this->Font : *defaultfont;
 
 	Assert(&font);
@@ -154,9 +154,9 @@ void CContentTypeFormattedText::Draw(const CUnit &unit, CFont *defaultfont) cons
 	}
 
 	if (this->Centered) {
-		label.DrawCentered(this->PosX, this->PosY, buf);
+		label.DrawCentered(this->Pos.x, this->Pos.y, buf);
 	} else {
-		label.Draw(this->PosX, this->PosY, buf);
+		label.Draw(this->Pos.x, this->Pos.y, buf);
 	}
 }
 
@@ -195,9 +195,9 @@ void CContentTypeFormattedText2::Draw(const CUnit &unit, CFont *defaultfont) con
 		}
 	}
 	if (this->Centered) {
-		label.DrawCentered(this->PosX, this->PosY, buf);
+		label.DrawCentered(this->Pos.x, this->Pos.y, buf);
 	} else {
-		label.Draw(this->PosX, this->PosY, buf);
+		label.Draw(this->Pos.x, this->Pos.y, buf);
 	}
 }
 
@@ -246,8 +246,7 @@ void CContentTypeIcon::Draw(const CUnit &unit, CFont *) const
 	const CUnit *unitToDraw = GetUnitRef(unit, this->UnitRef);
 
 	if (unitToDraw && unitToDraw->Type->Icon.Icon) {
-		const PixelPos pos(this->PosX, this->PosY);
-		unitToDraw->Type->Icon.Icon->DrawIcon(*unitToDraw->Player, pos);
+		unitToDraw->Type->Icon.Icon->DrawIcon(*unitToDraw->Player, this->Pos);
 	}
 }
 
@@ -281,10 +280,10 @@ void CContentTypeLifeBar::Draw(const CUnit &unit, CFont *) const
 	}
 
 	// Border
-	Video.FillRectangleClip(ColorBlack, this->PosX - 1, this->PosY - 1,
+	Video.FillRectangleClip(ColorBlack, this->Pos.x - 1, this->Pos.y - 1,
 							this->Width + 2, this->Height + 2);
 
-	Video.FillRectangleClip(color, this->PosX, this->PosY,
+	Video.FillRectangleClip(color, this->Pos.x, this->Pos.y,
 							(f * this->Width) / 100, this->Height);
 }
 
@@ -299,53 +298,24 @@ void CContentTypeLifeBar::Draw(const CUnit &unit, CFont *) const
 */
 void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
 {
-	Uint32 color;
 	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
 	if (!unit.Variable[this->Index].Max) {
 		return;
 	}
 
-	int x = this->PosX;
-	int y = this->PosY;
+	int x = this->Pos.x;
+	int y = this->Pos.y;
 	int w = this->Width;
 	int h = this->Height;
 
 	Assert(w > 0);
 	Assert(h > 4);
 
-	//FIXME: ugly
-	switch (this->Color) {
-		case 1:
-			color = ColorRed;
-			break;
-		case 2:
-			color = ColorYellow;
-			break;
-		case 3:
-			color = ColorGreen;
-			break;
-		case 4:
-			color = ColorGray;
-			break;
-		case 5:
-			color = ColorWhite;
-			break;
-		case 6:
-			color = ColorOrange;
-			break;
-		case 7:
-			color = ColorBlue;
-			break;
-		case 8:
-			color = ColorDarkGreen;
-			break;
-		case 9:
-			color = ColorBlack;
-			break;
-		default:
-			color = UI.CompletedBarColor;
-			break;
-	}
+	const Uint32 colors[] = {ColorRed, ColorYellow, ColorGreen,
+							ColorGray, ColorWhite, ColorOrange,
+							ColorBlue, ColorDarkGreen, ColorBlack};
+	const Uint32 color = (1 <= Color && Color <= 9) ?
+		colors[this->Color - 1] : UI.CompletedBarColor;
 
 	int f = (100 * unit.Variable[this->Index].Value) / unit.Variable[this->Index].Max;
 	if (!this->Border) {
@@ -398,7 +368,7 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
 			} else if (!strcmp(key, "ShowName")) {
 				this->ShowName = LuaToBoolean(l, -1);
 			} else {
-				LuaError(l, "'%s' invalid for method 'Text' in DefinePanels" _C_ key);
+				LuaError(l, "'%s' invalid for method 'Text' in DefinePanelContents" _C_ key);
 			}
 		}
 	}
@@ -425,7 +395,7 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
 		} else if (!strcmp(key, "Centered")) {
 			this->Centered = LuaToBoolean(l, -1);
 		} else {
-			LuaError(l, "'%s' invalid for method 'FormattedText' in DefinePanels" _C_ key);
+			LuaError(l, "'%s' invalid for method 'FormattedText' in DefinePanelContents" _C_ key);
 		}
 	}
 }
@@ -468,7 +438,7 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
 		} else if (!strcmp(key, "Centered")) {
 			this->Centered = LuaToBoolean(l, -1);
 		} else {
-			LuaError(l, "'%s' invalid for method 'FormattedText2' in DefinePanels" _C_ key);
+			LuaError(l, "'%s' invalid for method 'FormattedText2' in DefinePanelContents" _C_ key);
 		}
 	}
 }
@@ -512,7 +482,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 		if (!strcmp(key, "Unit")) {
 			this->UnitRef = Str2EnumUnit(l, LuaToString(l, -1));
 		} else {
-			LuaError(l, "'%s' invalid for method 'Icon' in DefinePanels" _C_ key);
+			LuaError(l, "'%s' invalid for method 'Icon' in DefinePanelContents" _C_ key);
 		}
 	}
 }
@@ -532,7 +502,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 		} else if (!strcmp(key, "Width")) {
 			this->Width = LuaToNumber(l, -1);
 		} else {
-			LuaError(l, "'%s' invalid for method 'LifeBar' in DefinePanels" _C_ key);
+			LuaError(l, "'%s' invalid for method 'LifeBar' in DefinePanelContents" _C_ key);
 		}
 	}
 	// Default value and checking errors.
@@ -589,7 +559,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 				LuaError(l, "incorrect color: '%s' " _C_ color);
 			}
 		} else {
-			LuaError(l, "'%s' invalid for method 'CompleteBar' in DefinePanels" _C_ key);
+			LuaError(l, "'%s' invalid for method 'CompleteBar' in DefinePanelContents" _C_ key);
 		}
 	}
 	// Default value and checking errors.
@@ -603,8 +573,5 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 		LuaError(l, "variable undefined for CompleteBar");
 	}
 }
-
-
-
 
 //@}

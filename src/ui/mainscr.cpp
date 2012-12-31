@@ -52,6 +52,7 @@
 #include "tileset.h"
 #include "translate.h"
 #include "trigger.h"
+#include "ui/contenttype.h"
 #include "ui.h"
 #include "unit.h"
 #include "unitsound.h"

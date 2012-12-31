@@ -45,6 +45,7 @@
 #include "menus.h"
 #include "tileset.h"
 #include "title.h"
+#include "ui/contenttype.h"
 #include "unit.h"
 #include "video.h"
 
@@ -98,6 +99,14 @@ void ShowLoadProgress(const char *fmt, ...)
 	} else {
 		DebugPrint("!!!!%s\n" _C_ temp);
 	}
+}
+
+CUnitInfoPanel::~CUnitInfoPanel() {
+	for (std::vector<CContentType *>::iterator content = Contents.begin();
+		 content != Contents.end(); ++content) {
+		delete *content;
+	}
+	delete Condition;
 }
 
 

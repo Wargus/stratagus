@@ -33,13 +33,12 @@
 //@{
 
 #include "script.h"
+#include "vec2i.h"
 #include <vector>
 
 class CUnit;
 class CFont;
 class ConditionPanel;
-//class StringDesc;
-//struct lua_State;
 
 /**
 **  Infos to display the contents of panel.
@@ -47,7 +46,7 @@ class ConditionPanel;
 class CContentType
 {
 public:
-	CContentType() : PosX(0), PosY(0), Condition(NULL) {}
+	CContentType() : Pos(0, 0), Condition(NULL) {}
 	virtual ~CContentType();
 
 	/// Tell how show the variable Index.
@@ -55,9 +54,8 @@ public:
 
 	virtual void Parse(lua_State *l) = 0;
 
-	int PosX;             /// X coordinate where to display.
-	int PosY;             /// Y coordinate where to display.
-
+public:
+	PixelPos Pos;             /// Coordinate where to display.
 	ConditionPanel *Condition; /// Condition to show the content; if NULL, no condition.
 };
 

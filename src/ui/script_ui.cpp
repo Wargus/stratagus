@@ -45,6 +45,7 @@
 #include "spells.h"
 #include "title.h"
 #include "util.h"
+#include "ui/contenttype.h"
 #include "unit.h"
 #include "unit_manager.h"
 #include "unittype.h"
@@ -423,7 +424,7 @@ static ConditionPanel *ParseConditionPanel(lua_State *l)
 				condition->Variables[index] = Ccl2Condition(l, LuaToString(l, -1));
 				continue;
 			}
-			LuaError(l, "'%s' invalid for Condition in DefinePanels" _C_ key);
+			LuaError(l, "'%s' invalid for Condition in DefinePanelContents" _C_ key);
 		}
 	}
 	return condition;
@@ -435,13 +436,12 @@ static CContentType *CclParseContent(lua_State *l)
 
 	CContentType *content = NULL;
 	ConditionPanel *condition = NULL;
-	int posX = 0;
-	int posY = 0;
+	PixelPos pos(0, 0);
 
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const char *key = LuaToString(l, -2);
 		if (!strcmp(key, "Pos")) {
-			CclGetPos(l, &posX, &posY);
+			CclGetPos(l, &pos.x, &pos.y);
 		} else if (!strcmp(key, "More")) {
 			Assert(lua_istable(l, -1));
 			lua_rawgeti(l, -1, 1); // Method name
@@ -460,18 +460,17 @@ static CContentType *CclParseContent(lua_State *l)
 			} else if (!strcmp(key, "CompleteBar")) {
 				content = new CContentTypeCompleteBar;
 			} else {
-				LuaError(l, "Invalid drawing method '%s' in DefinePanels" _C_ key);
+				LuaError(l, "Invalid drawing method '%s' in DefinePanelContents" _C_ key);
 			}
 			content->Parse(l);
 			lua_pop(l, 2); // Pop Variable Name and Method
 		} else if (!strcmp(key, "Condition")) {
 			condition = ParseConditionPanel(l);
 		} else {
-			LuaError(l, "'%s' invalid for Contents in DefinePanels" _C_ key);
+			LuaError(l, "'%s' invalid for Contents in DefinePanelContents" _C_ key);
 		}
 	}
-	content->PosX = posX;
-	content->PosY = posY;
+	content->Pos = pos;
 	content->Condition = condition;
 	return content;
 }
@@ -510,13 +509,13 @@ static int CclDefinePanelContents(lua_State *l)
 					infopanel->Contents.push_back(CclParseContent(l));
 				}
 			} else {
-				LuaError(l, "'%s' invalid for DefinePanels" _C_ key);
+				LuaError(l, "'%s' invalid for DefinePanelContents" _C_ key);
 			}
 		}
 		for (std::vector<CContentType *>::iterator content = infopanel->Contents.begin();
 			 content != infopanel->Contents.end(); ++content) { // Default value for invalid value.
-			(*content)->PosX += infopanel->PosX;
-			(*content)->PosY += infopanel->PosY;
+			(*content)->Pos.x += infopanel->PosX;
+			(*content)->Pos.y += infopanel->PosY;
 		}
 		size_t j;
 		for (j = 0; j < UI.InfoPanelContents.size(); ++j) {
