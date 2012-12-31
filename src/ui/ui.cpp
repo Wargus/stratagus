@@ -46,6 +46,7 @@
 #include "tileset.h"
 #include "title.h"
 #include "ui/contenttype.h"
+#include "ui/popup.h"
 #include "unit.h"
 #include "video.h"
 

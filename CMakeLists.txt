@@ -283,6 +283,7 @@ set(ui_SRCS
 	src/ui/mainscr.cpp
 	src/ui/menu_proc.cpp
 	src/ui/mouse.cpp
+	src/ui/popup.cpp
 	src/ui/script_ui.cpp
 	src/ui/statusline.cpp
 	src/ui/ui.cpp
@@ -527,6 +528,7 @@ set(stratagus_generic_HDRS
 	src/include/translate.h
 	src/include/trigger.h
 	src/include/ui/contenttype.h
+	src/include/ui/popup.h
 	src/include/ui/statusline.h
 	src/include/ui/uitimer.h
 	src/include/ui.h

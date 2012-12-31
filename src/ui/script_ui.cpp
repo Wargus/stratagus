@@ -46,6 +46,7 @@
 #include "title.h"
 #include "util.h"
 #include "ui/contenttype.h"
+#include "ui/popup.h"
 #include "unit.h"
 #include "unit_manager.h"
 #include "unittype.h"
