@@ -312,10 +312,11 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
 	Assert(h > 4);
 
 	const Uint32 colors[] = {ColorRed, ColorYellow, ColorGreen,
-							ColorGray, ColorWhite, ColorOrange,
-							ColorBlue, ColorDarkGreen, ColorBlack};
+							 ColorGray, ColorWhite, ColorOrange,
+							 ColorBlue, ColorDarkGreen, ColorBlack
+							};
 	const Uint32 color = (1 <= Color && Color <= 9) ?
-		colors[this->Color - 1] : UI.CompletedBarColor;
+						 colors[this->Color - 1] : UI.CompletedBarColor;
 
 	int f = (100 * unit.Variable[this->Index].Value) / unit.Variable[this->Index].Max;
 	if (!this->Border) {

@@ -102,7 +102,8 @@ void ShowLoadProgress(const char *fmt, ...)
 	}
 }
 
-CUnitInfoPanel::~CUnitInfoPanel() {
+CUnitInfoPanel::~CUnitInfoPanel()
+{
 	for (std::vector<CContentType *>::iterator content = Contents.begin();
 		 content != Contents.end(); ++content) {
 		delete *content;

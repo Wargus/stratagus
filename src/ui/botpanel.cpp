@@ -721,7 +721,7 @@ void CButtonPanel::Draw()
 	if (CurrentButtons.empty()) {
 		return;
 	}
-	std::vector<ButtonAction>& buttons(CurrentButtons);
+	std::vector<ButtonAction> &buttons(CurrentButtons);
 
 	Assert(NumSelected > 0);
 	char buf[8];
