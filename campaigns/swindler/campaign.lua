@@ -9,7 +9,7 @@
 --
 --      campaign.lua  -  Define the Swindler campaign.
 --
---      (c) Copyright 2010 by François Beerten
+--      (c) Copyright 2010-2013 by François Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -38,12 +38,27 @@ local briefingtext01 =
  "Lahen knows of the danger and now tries to escape in the "..
  "mountains."
 
+ 
+local briefingtext02 = 
+ "Chapter Two\n"..
+ "Lahen escaped in the mountains and arrives in a small valley.\n"..
+ "There he founds some abandoned resources and makes a few friends."..
+ "He builds a small army to defend himself since there is a small outpost of the Obersims very near..."
+ 
+ local briefingtext03 = 
+ "Chapter Three\n"..
+ "Lahen beat the small group of Obersims, with some friends.\n"..
+ "But they are all scared of the main force of the Obersims, so they decide ".. 
+ " to run. Now they have to cross a desert. To increase their chances, they decide to split. "..
+ "Someone thinks there are oasis in the desert with resources - who knows he is right?"..
+ "From now on, it is everybody fighting for his own..."
+ 
 function DisplayEnding()
   t =
    "The End ?\n"..
-   "Lehan managed to escape in the mountains.\n"..
-   "But the Obersims are searching him.\n\n"..
-   "How will this end ? Will the Obersims find Lehan ? "..
+   "Lahen managed to escape so far.\n"..
+   "But the Obersims are still searching him.\n\n"..
+   "How will this end ? Will the Obersims find Lahen ? "..
    "How will the Tubbies react ?\n"..
    "To find out and to play the rest of the campaign, "..
    "help us finish it. There is a big need for new maps."
@@ -55,6 +70,16 @@ campaign_steps = {
   CreateMapStep("campaigns/swindler/level01.smp",
       {"Get to the upper mountains without being seen."}, 
       briefingtext01,
+      nil,
+      "campaigns/swindler/swindler.png"),
+  CreateMapStep("campaigns/swindler/level02.smp",
+      {"Find some abandoned resources in a small valley, build some troops and defend yourself."}, 
+      briefingtext02,
+      nil,
+      "campaigns/swindler/swindler.png"),
+  CreateMapStep("campaigns/swindler/level03.smp",
+      {"Split up, find resources, dig in and defend your self."}, 
+      briefingtext03,
       nil,
       "campaigns/swindler/swindler.png"),
   DisplayEnding,
