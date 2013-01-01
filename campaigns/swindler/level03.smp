@@ -4,4 +4,4 @@
 
 DefinePlayerTypes("person", "person", "person", "person")
 PresentMap("Where are you?", 4, 128, 128, 2)
-DefineMapSetup(GetCurrentLuaPath().."/setup.sms")
+DefineMapSetup(GetCurrentLuaPath().."/level03.sms")

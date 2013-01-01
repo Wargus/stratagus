@@ -50,7 +50,7 @@ local briefingtext02 =
  "Lahen beat the small group of Obersims, with some friends.\n"..
  "But they are all scared of the main force of the Obersims, so they decide ".. 
  " to run. Now they have to cross a desert. To increase their chances, they decide to split. "..
- "Someone thinks there are oasis in the desert with resources - who knows he is right?"..
+ "Someone thinks there are oasis in the desert with resources - who knows he is right?\n"..
  "From now on, it is everybody fighting for his own..."
  
 function DisplayEnding()
