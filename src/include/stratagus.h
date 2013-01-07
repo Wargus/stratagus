@@ -53,7 +53,6 @@
 #pragma warning(disable:4761)               /// Integral size mismatch
 #pragma warning(disable:4786)               /// Truncated to 255 chars
 
-#define inline __inline
 #ifndef __func__
 #define __func__ __FUNCTION__
 #endif
