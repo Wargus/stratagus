@@ -53,11 +53,20 @@ local briefingtext02 =
  "Someone thinks there are oasis in the desert with resources - who knows he is right?\n"..
  "From now on, it is everybody fighting for his own..."
  
+ local briefingtext04 = 
+ "Chapter Four\n"..
+ "Lahen survived the fights with the tribes in the desert, and even gained many resources.\n"..
+ "At the other side of the desert, he has to pass some lowlands, close to the sea. "..
+ "This is the only way to pass - but it is Tubbies territory. "..
+ "The Tubbies want him dead, since he massacred their allies, one of the desert tribes. "..
+ "And they have a strong army..."
+ 
 function DisplayEnding()
   t =
    "The End ?\n"..
    "Lahen managed to escape so far.\n"..
-   "But the Obersims are still searching him.\n\n"..
+   "But the Obersims are still searching him.\n"..
+   "And the Tubbies are now decimated, but remain dangerous.\n\n"..
    "How will this end ? Will the Obersims find Lahen ? "..
    "How will the Tubbies react ?\n"..
    "To find out and to play the rest of the campaign, "..
@@ -80,6 +89,11 @@ campaign_steps = {
   CreateMapStep("campaigns/swindler/level03.smp",
       {"Split up, find resources, dig in and defend your self."}, 
       briefingtext03,
+      nil,
+      "campaigns/swindler/swindler.png"),
+  CreateMapStep("campaigns/swindler/level04.smp",
+      {"Train many soldiers, go east, attack the Tubbies in their trenches, you have to pass or die."}, 
+      briefingtext04,
       nil,
       "campaigns/swindler/swindler.png"),
   DisplayEnding,
