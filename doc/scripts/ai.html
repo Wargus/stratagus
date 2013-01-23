@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head>
 <!--
-----	(c) Copyright 2002-2011 by Lutz Sammer, Russell Smith
+----	(c) Copyright 2002-2013 by Lutz Sammer, Russell Smith, Joris Dauphin
 
 ----    This program is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ Everything around the control of the Stratagus AI.
 <p>
 Warning: The AI documentation is slightly outdated. This documentation hasn't
 been fully converted to the lua API yet.
-<p>
+</p>
 
 <h2>How does it work</h2>
 
@@ -131,58 +131,12 @@ DefineAi("passive-ai", "*", "passive", function() AiSleep(10000) end)
 <a name="DefineAiHelper"></a>
 <h3>DefineAiHelper(list)</h3>
 
-The AI is complete configurable, nothing is hardcoded. The AI knows nothing
-about any units without this table. This table defines F.E. what unit can build
-and what they can build and many other things that the AI must know.
+Define the 'equivalent' unit type for the AI.
 
 <dl>
 <dt>list</dt><dd>A list of features:
  <ul>
- <li><code>{"build", "builder", "building-1", ... "building-n"}</code>
-  <dl>
-  <dt>builder</dt>
-  <dd>Name of the unit-type that can build.</dd>
-  <dt>building-1</dt>
-  <dt>building-n</dt>
-  <dd>Names of the unit-types that can be builded by the builder.</dd>
-  </dl>
-  <b>Note:</b> If more units can build the same buildings you need the same list for all units.
- <li><code>{"train", "trainer", "unit-1", ... "unit-n"}</code>
-  <dl>
-  <dt>trainer</dt>
-  <dd>Name of the unit-type that can train the units.</dd>
-  <dt>unit-1</dt>
-  <dt>unit-n</dt>
-  <dd>Names of the unit-types that can be trained by the trainer.</dd>
-  </dl>
-  <b>Note:</b> If more units can train the same unit you need the same list for all units.
- <li><code>{"upgrade", "unit", "upgraded-unit-1", ... "upgraded-unit-n"}</code>
-  <dl>
-  <dt>unit</dt>
-  <dd>Name of the unit-type that can be upgraded.</dd>
-  <dt>upgraded-unit-1</dt>
-  <dt>upgraded-unit-n</dt>
-  <dd>Names of the unit-types to that the unit can be upgraded.</dd>
-  </dl>
- <li><code>{"research", "researcher", "upgrade-1", ... "spell-n"}</code>
-  <dl>
-  <dt>researcher</dt>
-  <dd>Name of the unit-type that can reasearch upgrades or spells.</dd>
-  <dt>upgrade-1</dt>
-  <dt>spell-n</dt>
-  <dd>Names of the upgrades or spells that can be researched by the researcher.</dd>
-  </dl>
- <li><code>{"repair", "worker", "unit-1", ... "unit-n"}</code>
-  <dl>
-  <dt>worker</dt>
-  <dd>Name of the unit-type that can repair other units.</dd>
-  <dt>unit-1</dt>
-  <dt>unit-n</dt>
-  <dd>Names of the unit-types that can be repaired by the worker.
-  </dd>
-  </dl>
-  <b>Note:</b> If more units can repair the same units you need the same list for all units.
- <li><code>{"equiv", "unit", "unit-1", ... "unit-n"}</code>
+  <li><code>{"equiv", "unit", "unit-1", ... "unit-n"}</code>
   <dl>
   <dt>unit</dt>
   <dd>Name of the unit-type that have equilvalent units.</dd>
@@ -190,14 +144,7 @@ and what they can build and many other things that the AI must know.
   <dt>unit-n</dt>
   <dd>Names of the unit-types that can be uses by the AI equivalent.</dd>
   </dl>
- <li><code>{"unit-limit", "unit", "resource"}</code>
-  <dl>
-  <dt>unit</dt>
-  <dd>Name of the unit-type that must be produced to reduce the unit limit.</dd>
-  <dt>resource</dt>
-  <dd>Name of the resource producing the shortage.</dd>
-  </dl>
-  <i>I think we should swap the arguments: "resource" "unit".</i>
+  </li>
  </ul>
 </dd>
 </dl>
@@ -207,35 +154,23 @@ and what they can build and many other things that the AI must know.
 A minimal AI helper definition:
 
 <pre>
-DefineAiHelper(
-  {"build", "unit-peasant", "unit-farm"},
-  {"train", "unit-town-hall", "unit-peasant"},
-  {"upgrade", "unit-town-hall", "unit-keep"},
-  {"research", "unit-human-blacksmith", "upgrade-sword1"},
-  {"repair", "unit-peasant", "unit-town-hall"},
-  {"unit-limit", "unit-farm", "food"},
-  {"unit-equiv", "unit-town-hall", "unit-keep"})
+DefineAiHelper({"unit-equiv", "unit-town-hall", "unit-keep"})
 </pre>
 
-<p>A peasant can build a farm.
-<p>The town hall can train a peasant.
-<p>A town hall can be upgraded to a keep.
-<p>The blacksmith can reasearch the upgrade sword1.
-<p>A peasant can repair the town hall.
-<p>To fix the food shortage the AI must build farms.
-<p>For the AI is a keep equivalent to a town hall.
+<p>For the AI, a keep is equivalent to a town hall.</p>
 
 <a name="DefineAiPlayer"></a>
 <h3>DefineAiPlayer(list, ...)</h3>
 
 Define an AI player. (NOT SUPPORTED)
 
-
+<!--
 <dl>
 <dt></dt>
 <dd>
 </dd>
 </dl>
+-->
 
 <h4>Example</h4>
 
@@ -357,7 +292,6 @@ Note: The low-level didn't support the reduce of a force.
 <dt>unit-type-1</dt>
 <dt>unit-type-N</dt>
 <dd>Unit-type that should be in the force. Currently only mobile (trained) units are allowed.</dd>
-</dl>
 <dt>count-1</dt>
 <dt>count-N</dt>
 <dd>How many of this units should be in the force.</dd>
