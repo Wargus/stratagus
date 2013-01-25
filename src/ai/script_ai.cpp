@@ -234,7 +234,6 @@ static void InitAiHelper(AiHelper &aiHelper)
 				AiHelperInsert(aiHelper.Refinery, i - 1, **j);
 			}
 		}
-
 		for (std::vector<CUnitType *>::const_iterator d = UnitTypes.begin(); d != UnitTypes.end(); ++d) {
 			CUnitType &type = **d;
 
@@ -312,62 +311,38 @@ static int CclDefineAiHelper(lua_State *l)
 			LuaError(l, "incorrect argument");
 		}
 		const int subargs = lua_rawlen(l, j + 1);
-		int k = 0;
-		lua_rawgeti(l, j + 1, k + 1);
+		lua_rawgeti(l, j + 1, 1);
 		const char *value = LuaToString(l, -1);
 		lua_pop(l, 1);
-		++k;
-
-		//
-		// Type build,train,research/upgrade.
-		//
-		int what;
-
-		if (!strcmp(value, "build")) {
-			what = -1;
-		} else if (!strcmp(value, "train")) {
-			what = -1;
-		} else if (!strcmp(value, "upgrade")) {
-			what = -1;
-		} else if (!strcmp(value, "research")) {
-			what = -1;
-		} else if (!strcmp(value, "unit-limit")) {
-			what = -1;
+		if (!strcmp(value, "build")
+			|| !strcmp(value, "train")
+			|| !strcmp(value, "upgrade")
+			|| !strcmp(value, "research")
+			|| !strcmp(value, "unit-limit")
+			|| !strcmp(value, "repair")) {
+			fprintf(stderr, "DefineAiHelper: Relation is computed from buttons, you may remove safely the block begining with '\"%s\"'", value);
+			continue;
 		} else if (!strcmp(value, "unit-equiv")) {
-			what = 5;
-		} else if (!strcmp(value, "repair")) {
-			what = -1;
 		} else {
 			LuaError(l, "unknown tag: %s" _C_ value);
-			what = -1;
 		}
-		if (what == -1) {
-			continue;
-		}
-		//
 		// Get the base unit type, which could handle the action.
-		//
-
-		// FIXME: support value as list!
-		lua_rawgeti(l, j + 1, k + 1);
-		value = LuaToString(l, -1);
+		lua_rawgeti(l, j + 1, 2);
+		const char *baseTypeName = LuaToString(l, -1);
 		lua_pop(l, 1);
-		++k;
-		CUnitType *base = UnitTypeByIdent(value);
+		const CUnitType *base = UnitTypeByIdent(baseTypeName);
 		if (!base) {
-			LuaError(l, "unknown unittype: %s" _C_ value);
+			LuaError(l, "unknown unittype: %s" _C_ baseTypeName);
 		}
 
-		//
 		// Get the unit types, which could be produced
-		//
-		for (; k < subargs; ++k) {
+		for (int k = 2; k < subargs; ++k) {
 			lua_rawgeti(l, j + 1, k + 1);
-			value = LuaToString(l, -1);
+			const char *equivTypeName = LuaToString(l, -1);
 			lua_pop(l, 1);
-			CUnitType *type = UnitTypeByIdent(value);
+			CUnitType *type = UnitTypeByIdent(equivTypeName);
 			if (!type) {
-				LuaError(l, "unknown unittype: %s" _C_ value);
+				LuaError(l, "unknown unittype: %s" _C_ equivTypeName);
 			}
 			AiHelperInsert(AiHelpers.Equiv, base->Slot, *type);
 			AiNewUnitTypeEquiv(*base, *type);
