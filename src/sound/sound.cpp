@@ -261,7 +261,7 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 	}
 
 	bool selection = (voice == VoiceSelected || voice == VoiceBuilding);
-	Origin source = {&unit, UnitNumber(unit)};
+	Origin source = {&unit, unsigned(UnitNumber(unit))};
 
 	if (UnitSoundIsPlaying(&source)) {
 		return;
@@ -285,7 +285,7 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 */
 void PlayUnitSound(const CUnit &unit, CSound *sound)
 {
-	Origin source = {&unit, UnitNumber(unit)};
+	Origin source = {&unit, unsigned(UnitNumber(unit))};
 
 	int channel = PlaySample(ChooseSample(sound, false, source));
 	if (channel == -1) {

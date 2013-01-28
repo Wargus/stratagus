@@ -90,8 +90,8 @@ void CGraphic::DrawClip(int x, int y) const
 void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y) const
 {
 	if (!UseOpenGL) {
-		SDL_Rect srect = {gx, gy, w, h};
-		SDL_Rect drect = {x, y, 0, 0};
+		SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
+		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 
 		SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
 	} else {

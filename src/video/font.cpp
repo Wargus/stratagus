@@ -134,8 +134,8 @@ static void VideoDrawChar(const CGraphic &g,
 						  int gx, int gy, int w, int h, int x, int y, const CFontColor &fc)
 {
 	if (!UseOpenGL) {
-		SDL_Rect srect = {gx, gy, w, h};
-		SDL_Rect drect = {x, y, 0, 0};
+		SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
+		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 		std::vector<SDL_Color> sdlColors(fc.Colors, fc.Colors + MaxFontColors);
 		SDL_SetColors(g.Surface, &sdlColors[0], 0, MaxFontColors);
 		SDL_BlitSurface(g.Surface, &srect, TheScreen, &drect);

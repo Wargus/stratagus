@@ -565,7 +565,7 @@ void DrawTransRectangleClip(Uint32 color, int x, int y,
 */
 void FillRectangle(Uint32 color, int x, int y, int w, int h)
 {
-	SDL_Rect drect = {x, y, w, h};
+	SDL_Rect drect = {Sint16(x), Sint16(y), Uint16(w), Uint16(h)};
 	SDL_FillRect(TheScreen, &drect, color);
 }
 
