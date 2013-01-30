@@ -42,7 +42,7 @@ local briefingtext01 =
 local briefingtext02 = 
  "Chapter Two\n"..
  "Lahen escaped in the mountains and arrives in a small valley.\n"..
- "There he founds some abandoned resources and makes a few friends."..
+ "There he founds some abandoned resources and makes a few friends. "..
  "He builds a small army to defend himself since there is a small outpost of the Obersims very near..."
  
  local briefingtext03 = 
@@ -60,6 +60,16 @@ local briefingtext02 =
  "This is the only way to pass - but it is Tubbies territory. "..
  "The Tubbies want him dead, since he massacred their allies, one of the desert tribes. "..
  "And they have a strong army..."
+ 
+  local briefingtext05 = 
+ "Chapter Five\n"..
+ "The Tubbies are decimated and will leave you alone for now.\n"..
+ "You reached the waterside. You better build some defenses, since "..
+ "there are some places where you can cross the water, and nobody knows "..
+ "who lives across this rough terrain...\n"..
+ "Or maybe you should plan a surprise attack?"
+
+ 
  
 function DisplayEnding()
   t =
@@ -94,6 +104,11 @@ campaign_steps = {
   CreateMapStep("campaigns/swindler/level04.smp",
       {"Train many soldiers, go east, attack the Tubbies in their trenches, you have to pass or die."}, 
       briefingtext04,
+      nil,
+      "campaigns/swindler/swindler.png"),
+  CreateMapStep("campaigns/swindler/level05.smp",
+      {"Take your time to build an attack force and then go east, cross the water."}, 
+      briefingtext05,
       nil,
       "campaigns/swindler/swindler.png"),
   DisplayEnding,
