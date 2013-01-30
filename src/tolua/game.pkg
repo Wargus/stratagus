@@ -56,7 +56,6 @@ class Settings {
 	int Resources;
 	int NumUnits;
 	int Opponents;
-	int Difficulty;
 	int GameType;
 	bool NoFogOfWar;
 	int RevealMap;

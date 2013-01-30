@@ -137,7 +137,6 @@ unsigned char *CServerSetup::Serialize() const
 	*p++ = this->RevealMap;
 	*p++ = this->TilesetSelection;
 	*p++ = this->GameTypeOption;
-	*p++ = this->Difficulty;
 	*p++ = this->MapRichness;
 	for (int i = 0; i < PlayerMax; ++i) {
 		*p++ = this->CompOpt[i];
@@ -163,7 +162,6 @@ void CServerSetup::Deserialize(const unsigned char *p)
 	this->RevealMap = *p++;
 	this->TilesetSelection = *p++;
 	this->GameTypeOption = *p++;
-	this->Difficulty = *p++;
 	this->MapRichness = *p++;
 	for (int i = 0; i < PlayerMax; ++i) {
 		this->CompOpt[i] = *p++;

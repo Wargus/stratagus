@@ -72,7 +72,6 @@ struct Settings {
 	int Resources;   /// Preset resource factor
 	int NumUnits;    /// Preset # of units
 	int Opponents;   /// Preset # of ai-opponents
-	int Difficulty;  /// Terrain type (summer,winter,...)
 	int GameType;    /// Game type (melee, free for all,...)
 	bool NoFogOfWar; /// No fog of war
 	int RevealMap;   /// Reveal map

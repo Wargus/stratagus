@@ -21,7 +21,6 @@ class CServerSetup {
 	unsigned int FogOfWar;
 	unsigned int RevealMap;
 	unsigned int GameTypeOption;
-	unsigned int Difficulty;
 	unsigned int MapRichness;
 	unsigned CompOpt[PlayerMax];
 	unsigned Ready[PlayerMax];

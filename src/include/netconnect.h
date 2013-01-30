@@ -99,10 +99,9 @@ class CServerSetup
 public:
 	unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 * PlayerMax + 4 * PlayerMax + 4 * PlayerMax + 4 * PlayerMax; }
+	static size_t Size() { return 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 * PlayerMax + 4 * PlayerMax + 4 * PlayerMax + 4 * PlayerMax; }
 	void Clear() {
-		ResourcesOption = UnitsOption = FogOfWar = RevealMap = TilesetSelection =
-																   GameTypeOption = Difficulty = MapRichness = 0;
+		ResourcesOption = UnitsOption = FogOfWar = RevealMap = TilesetSelection = GameTypeOption = MapRichness = 0;
 		memset(CompOpt, 0, sizeof(CompOpt));
 		memset(Ready, 0, sizeof(Ready));
 		memset(LastFrame, 0, sizeof(LastFrame));
@@ -114,7 +113,6 @@ public:
 	uint32_t  RevealMap;             /// Reveal all the map
 	uint32_t  TilesetSelection;      /// Tileset select option
 	uint32_t  GameTypeOption;        /// Game type option
-	uint32_t  Difficulty;            /// Difficulty option
 	uint32_t  MapRichness;           /// Map richness option
 	uint32_t  CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
 	uint32_t  Ready[PlayerMax];      /// Client ready state
