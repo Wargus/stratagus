@@ -325,12 +325,12 @@ private:
 	public:
 		void SetFrom(const CUnit &mine, const CUnit *deposit, bool check_usage);
 		bool operator < (const ResourceUnitFinder_Cost &rhs) const {
-			if (assigned != rhs.assigned) {
-				return assigned < rhs.assigned;
-			} else if (waiting != rhs.waiting) {
+			if (waiting != rhs.waiting) {
 				return waiting < rhs.waiting;
-			} else {
+			} else if (distance != rhs.distance) {
 				return distance < rhs.distance;
+			} else {
+				return assigned < rhs.assigned;
 			}
 		}
 		void SetToMax() { assigned = waiting = distance = UINT_MAX; }
@@ -447,8 +447,6 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 **  Find deposit. This will find a deposit for a resource
 **
 **  @param unit        The unit that wants to find a resource.
-**  @param x           Closest to x
-**  @param y           Closest to y
 **  @param range       Maximum distance to the deposit.
 **  @param resource    Resource to find deposit from.
 **
