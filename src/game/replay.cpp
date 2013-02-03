@@ -112,7 +112,7 @@ class FullReplay
 public:
 	FullReplay() :
 		MapId(0), Type(0), Race(0), LocalPlayer(0),
-		Resource(0), NumUnits(0), NoFow(false), RevealMap(0),
+		Resource(0), NumUnits(0), Difficulty(0), NoFow(false), RevealMap(0),
 		MapRichness(0), GameType(0), Opponents(0), Commands(NULL) {
 		memset(Engine, 0, sizeof(Engine));
 		memset(Network, 0, sizeof(Network));
@@ -132,6 +132,7 @@ public:
 
 	int Resource;
 	int NumUnits;
+	int Difficulty;
 	bool NoFow;
 	int RevealMap;
 	int MapRichness;
@@ -204,6 +205,7 @@ static FullReplay *StartReplay()
 	replay->MapPath = CurrentMapPath;
 	replay->Resource = GameSettings.Resources;
 	replay->NumUnits = GameSettings.NumUnits;
+	replay->Difficulty = GameSettings.Difficulty;
 	replay->NoFow = GameSettings.NoFogOfWar;
 	replay->GameType = GameSettings.GameType;
 	replay->RevealMap = GameSettings.RevealMap;
@@ -250,6 +252,7 @@ static void ApplyReplaySettings()
 	}
 	GameSettings.Resources = CurrentReplay->Resource;
 	GameSettings.NumUnits = CurrentReplay->NumUnits;
+	GameSettings.Difficulty = CurrentReplay->Difficulty;
 	Map.NoFogOfWar = GameSettings.NoFogOfWar = CurrentReplay->NoFow;
 	GameSettings.GameType = CurrentReplay->GameType;
 	FlagRevealMap = GameSettings.RevealMap = CurrentReplay->RevealMap;
@@ -341,6 +344,7 @@ static void SaveFullLog(CFile &file)
 	file.printf("  },\n");
 	file.printf("  Resource = %d,\n", CurrentReplay->Resource);
 	file.printf("  NumUnits = %d,\n", CurrentReplay->NumUnits);
+	file.printf("  Difficulty = %d,\n", CurrentReplay->Difficulty);
 	file.printf("  NoFow = %s,\n", CurrentReplay->NoFow ? "true" : "false");
 	file.printf("  RevealMap = %d,\n", CurrentReplay->RevealMap);
 	file.printf("  GameType = %d,\n", CurrentReplay->GameType);
@@ -630,7 +634,7 @@ static int CclReplayLog(lua_State *l)
 		} else if (!strcmp(value, "NumUnits")) {
 			replay->NumUnits = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Difficulty")) {
-			// Obsolete flag
+			replay->Difficulty = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "NoFow")) {
 			replay->NoFow = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "RevealMap")) {

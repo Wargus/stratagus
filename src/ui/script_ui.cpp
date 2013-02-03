@@ -555,9 +555,9 @@ static int CclDefinePopup(lua_State *l)
 		} else if (!strcmp(key, "DefaultFont")) {
 			popup->DefaultFont = CFont::Get(LuaToString(l, -1));
 		} else if (!strcmp(key, "BackgroundColor")) {
-			popup->BackgroundColor = LuaToNumber(l, -1);
+			popup->BackgroundColor = static_cast<IntColor>(LuaToNumber(l, -1));
 		} else if (!strcmp(key, "BorderColor")) {
-			popup->BorderColor = LuaToNumber(l, -1);
+			popup->BorderColor = static_cast<IntColor>(LuaToNumber(l, -1));
 		} else if (!strcmp(key, "Margin")) {
 			CclGetPos(l, &popup->MarginX, &popup->MarginY);
 		} else if (!strcmp(key, "MinWidth")) {
