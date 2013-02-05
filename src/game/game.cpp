@@ -34,6 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <png.h>
+
 #include "stratagus.h"
 
 #include "game.h"
@@ -70,8 +72,6 @@
 #include "upgrade.h"
 #include "version.h"
 #include "video.h"
-
-#include <png.h>
 
 /*----------------------------------------------------------------------------
 --  Variables
