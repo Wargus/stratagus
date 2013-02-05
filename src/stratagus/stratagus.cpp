@@ -724,18 +724,19 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 
 std::string GetLocalPlayerNameFromEnv()
 {
-	//  Default player name to username on unix systems.
-#if defined(USE_WIN32) || defined(USE_MAEMO)
-	return "Anonymous";
-#else
-	const char *userName = getenv("USER");
+	const char *userName = NULL;
 
-	if (userName) {
+#ifdef USE_WIN32
+	userName = getenv("USERNAME");
+#elif !defined(USE_MAEMO)
+	userName = getenv("USER");
+#endif
+
+	if (userName && userName[0]) {
 		return userName;
 	} else {
 		return "Anonymous";
 	}
-#endif
 }
 
 /**
