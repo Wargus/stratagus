@@ -36,48 +36,42 @@
 --  Platform dependant IO-related Includes and Definitions
 ----------------------------------------------------------------------------*/
 
-#ifndef _MSC_VER
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
 #include <string.h>
-#include <unistd.h>
+#include <stdlib.h>
 #include <limits.h>
 #include <errno.h>
 
-#else // _MSC_VER
+#ifdef _MSC_VER
+
+#include <io.h>
+#include <fcntl.h>
 
 #define R_OK 4
 #define F_OK 0
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <direct.h>
-#include <string.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <io.h>
-#include <fcntl.h>
 #define PATH_MAX _MAX_PATH
 #define S_ISDIR(x) ((x) & _S_IFDIR)
 #define S_ISREG(x) ((x) & _S_IFREG)
 
-#define makedir(dir, permissions) _mkdir(dir)
+#define mkdir _mkdir
 #define access _access
-//#define write _write
 
-#endif // _MSC_VER
+#else
+
+#include <unistd.h>
+
+#endif
 
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
 
-#ifdef __GNUC__
 #ifdef USE_WIN32
 #define makedir(dir, permissions) mkdir(dir)
 #else
 #define makedir(dir, permissions) mkdir(dir, permissions)
-#endif
 #endif
 
 //@}

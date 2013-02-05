@@ -38,10 +38,6 @@
 #include <ctype.h>
 #include <limits.h>
 
-#ifndef _MSC_VER
-#include <fcntl.h>
-#endif
-
 #include "stratagus.h"
 
 #include "SDL.h"

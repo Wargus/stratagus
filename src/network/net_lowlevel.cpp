@@ -43,18 +43,13 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#ifndef _MSC_VER
-#include <signal.h>
-#endif
-
-
 //----------------------------------------------------------------------------
 //  Declarations
 //----------------------------------------------------------------------------
 
 #define MAX_LOC_IP 10
 
-#if defined(_MSC_VER) || defined(__MINGW32__)
+#ifdef USE_WIN32
 typedef const char *setsockopttype;
 typedef char *recvfrombuftype;
 typedef char *recvbuftype;

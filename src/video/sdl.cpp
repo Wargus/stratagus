@@ -47,11 +47,9 @@
 
 #include <limits.h>
 
-#ifndef _MSC_VER
-#include <sys/time.h>
+#ifndef USE_WIN32
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #endif
 
 #include "SDL.h"

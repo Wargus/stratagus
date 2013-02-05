@@ -37,13 +37,8 @@
 
 #include <vector>
 
-#ifndef _MSC_VER
-#include <errno.h>
-#include <time.h>
-#endif
-
 // Include system network headers
-#if defined(__WIN32__) || defined(WIN32) || defined(_WIN32)
+#ifdef USE_WIN32
 
 #define USE_WINSOCK
 

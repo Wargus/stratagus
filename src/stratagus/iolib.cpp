@@ -654,7 +654,7 @@ int ReadDataDirectory(const char *dirname, std::vector<FileList> &fl)
 	}
 	char *np = buffer + n;
 
-#ifndef _MSC_VER
+#ifndef USE_WIN32
 	DIR *dirp = opendir(dirname);
 	struct dirent *dp;
 
@@ -691,7 +691,7 @@ int ReadDataDirectory(const char *dirname, std::vector<FileList> &fl)
 					fl.insert(std::lower_bound(fl.begin(), fl.end(), nfl), nfl);
 				}
 			}
-#ifndef _MSC_VER
+#ifndef USE_WIN32
 		}
 		closedir(dirp);
 #else

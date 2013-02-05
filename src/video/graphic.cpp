@@ -826,12 +826,10 @@ void CGraphic::Flip()
 			unsigned int p0 = s->pitch;
 			unsigned int p1 = Surface->pitch;
 			const int width = s->w;
-#ifndef _MSC_VER
 			int j = 0;
-#endif
 			for (int i = 0; i < s->h; ++i) {
 #ifdef _MSC_VER
-				for (int j = 0; j < width; ++j) {
+				for (j = 0; j < width; ++j) {
 					*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
 						*(Uint32 *) & ((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
 				}
