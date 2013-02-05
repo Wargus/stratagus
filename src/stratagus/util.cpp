@@ -40,7 +40,7 @@
 #include <windows.h>
 #endif
 
-#ifdef HAVE_X
+#ifdef USE_X11
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #endif
@@ -351,12 +351,12 @@ int getopt(int argc, char *const *argv, const char *opts)
 */
 int GetClipboard(std::string &str)
 {
-#if defined(USE_WIN32) || defined(HAVE_X)
+#if defined(USE_WIN32) || defined(USE_X11)
 	int i;
 	unsigned char *clipboard;
 #ifdef USE_WIN32
 	HGLOBAL handle;
-#elif defined(HAVE_X)
+#elif defined(USE_X11)
 	Display *display;
 	Window window;
 	Atom rettype;
@@ -380,7 +380,7 @@ int GetClipboard(std::string &str)
 		CloseClipboard();
 		return -1;
 	}
-#elif defined(HAVE_X)
+#elif defined(USE_X11)
 	if (!(display = XOpenDisplay(NULL))) {
 		return -1;
 	}
@@ -428,7 +428,7 @@ int GetClipboard(std::string &str)
 #ifdef USE_WIN32
 	GlobalUnlock(handle);
 	CloseClipboard();
-#elif defined(HAVE_X)
+#elif defined(USE_X11)
 	if (clipboard != NULL) {
 		XFree(clipboard);
 	}

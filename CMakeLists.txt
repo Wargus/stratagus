@@ -722,7 +722,7 @@ if(WITH_THEORA AND THEORA_FOUND)
 endif()
 
 if(WITH_X11 AND X11_FOUND)
-	add_definitions(-DHAVE_X11)
+	add_definitions(-DUSE_X11)
 	include_directories(${X11_INCLUDE_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${X11_X11_LIB})
 endif()
