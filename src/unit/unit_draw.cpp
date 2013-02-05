@@ -509,9 +509,9 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 {
 	int x = screenPos.x;
 	int y = screenPos.y;
-#ifdef REFS_DEBUG
+#ifdef DEBUG
 	// Show the number of references.
-	VideoDrawNumberClip(x + 1, y + 1, GetGameFont(), unit.Refs);
+	CLabel(GetGameFont()).DrawClip(x + 1, y + 1, unit.Refs);
 #endif
 
 	UpdateUnitVariables(const_cast<CUnit &>(unit));

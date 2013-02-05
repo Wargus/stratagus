@@ -126,18 +126,18 @@ extern void PrintOnStdOut(const char *format, ...);
 
 #endif
 
-#ifdef REFS_DEBUG  // {
+#ifdef DEBUG  // {
 
 /**
 **  Assert a condition for references
 */
 #define RefsAssert(cond) \
 	do { if (!(cond)) { AbortAt(__FILE__, __LINE__, __func__, #cond); } } while (0)
-#else  // }{ REFS_DEBUG
+#else  // }{ DEBUG
 
 #define RefsAssert(cond)      /* disabled */
 
-#endif  // } !REFS_DEBUG
+#endif  // } !DEBUG
 
 /*============================================================================
 ==  Definitions
