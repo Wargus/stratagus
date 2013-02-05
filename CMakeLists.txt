@@ -833,7 +833,10 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 if(ENABLE_STRIP)
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s")
+	if(CMAKE_COMPILER_IS_GNUCXX)
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s")
+	endif()
+	# TODO: Add support for other compilers
 endif()
 
 if(ENABLE_TOUCHSCREEN)
