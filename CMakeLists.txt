@@ -26,9 +26,27 @@
 #
 #
 
+#########################
+# Version configuration #
+#########################
+# Stratagus major version
+set(STRATAGUS_MAJOR_VERSION 2)
+# Stratagus minor version (maximal 99)
+set(STRATAGUS_MINOR_VERSION 2)
+# Stratagus patch level (maximal 99)
+set(STRATAGUS_PATCH_LEVEL 7)
+# Stratagus patch level 2
+set(STRATAGUS_PATCH_LEVEL2 0)
+#########################
+
 project(stratagus)
 cmake_minimum_required(VERSION 2.6)
-set(STRATAGUS_VERSION 2.2.7)
+
+set(STRATAGUS_VERSION "${STRATAGUS_MAJOR_VERSION}.${STRATAGUS_MINOR_VERSION}.${STRATAGUS_PATCH_LEVEL}")
+
+if(${STRATAGUS_PATCH_LEVEL2} GREATER 0)
+	set(STRATAGUS_VERSION "${STRATAGUS_VERSION}.${STRATAGUS_PATCH_LEVEL2}")
+endif()
 
 # Stratagus sources
 
@@ -36,6 +54,7 @@ include_directories(
 	src/include
 	src/guichan/include
 	src/guichan/include/guichan
+	${CMAKE_CURRENT_BINARY_DIR}
 )
 
 set(action_SRCS
@@ -954,13 +973,32 @@ message("==================================")
 
 # Compile Stratagus
 
+set(genversion_SRCS tools/genversion.cpp)
+source_group(genversion FILES ${genversion_SRCS})
+add_executable(genversion ${genversion_SRCS})
+
+########### next target ###############
+
+add_custom_target(version-generated.h ALL
+	${CMAKE_CURRENT_BINARY_DIR}/genversion ${CMAKE_CURRENT_BINARY_DIR}/version-generated.h "${STRATAGUS_VERSION}"
+	DEPENDS genversion
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+	VERBATIM
+)
+set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES version-generated.h)
+
+########### next target ###############
+
 add_custom_command(OUTPUT tolua.cpp
 	COMMAND ${TOLUA++_APP} ARGS -L stratagus.lua -o ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp stratagus.pkg
 	DEPENDS ${tolua_FILES}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/tolua
 )
 
+########### next target ###############
+
 add_executable(stratagus WIN32 ${stratagus_SRCS} ${stratagus_HDRS})
+add_dependencies(stratagus version-generated.h)
 target_link_libraries(stratagus ${stratagus_LIBS})
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

@@ -1137,11 +1137,10 @@ static void ClientParseConnecting(const CInitMessage &msg)
 
 		case ICMEngineMismatch: // Stratagus engine version doesn't match
 			fprintf(stderr, "Incompatible Stratagus version "
-					StratagusFormatString " <-> "
-					StratagusFormatString "\n"
+					"%d <-> %d\n"
 					"from %d.%d.%d.%d:%d\n",
-					StratagusFormatArgs((int)ntohl(msg.Stratagus)),
-					StratagusFormatArgs(StratagusVersion),
+					(int)ntohl(msg.Stratagus),
+					StratagusVersion,
 					NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 			NetLocalState = ccs_incompatibleengine;
 			NetConnectRunning = 0; // End the menu..
@@ -1870,11 +1869,10 @@ static int CheckVersions(const CInitMessage &msg)
 
 	if (ntohl(msg.Stratagus) != StratagusVersion) {
 		fprintf(stderr, "Incompatible Stratagus version "
-				StratagusFormatString " <-> "
-				StratagusFormatString "\n"
+				"%d <-> %d\n"
 				"from %d.%d.%d.%d:%d\n",
-				StratagusFormatArgs((int)ntohl(msg.Stratagus)),
-				StratagusFormatArgs(StratagusVersion),
+				(int)ntohl(msg.Stratagus),
+				StratagusVersion,
 				NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 
 		message.Type = MessageInitReply;

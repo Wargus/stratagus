@@ -116,8 +116,8 @@ void CMap::Save(CFile &file) const
 
 	file.printf("StratagusMap(\n");
 
-	file.printf("  \"version\", \"" StratagusFormatString "\",\n",
-				StratagusFormatArgs(StratagusVersion));
+	file.printf("  \"version\", \"%s\",\n", VERSION);
+
 	file.printf("  \"description\", \"%s\",\n", this->Info.Description.c_str());
 
 	file.printf("  \"the-map\", {\n");

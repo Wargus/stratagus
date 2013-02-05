@@ -64,7 +64,7 @@ static int CclStratagusMap(lua_State *l)
 			char buf[32];
 
 			const char *version = LuaToString(l, j + 1);
-			snprintf(buf, sizeof(buf), StratagusFormatString, StratagusFormatArgs(StratagusVersion));
+			strncpy(buf, VERSION, sizeof(buf));
 			if (strcmp(buf, version)) {
 				fprintf(stderr, "Warning not saved with this version.\n");
 			}
