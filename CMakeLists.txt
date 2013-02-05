@@ -578,7 +578,14 @@ source_group(include\\guichan FILES ${stratagus_guichan_HDRS})
 source_group(include\\spell FILES ${stratagus_spell_HDRS})
 
 
-set (stratagus_HDRS ${stratagus_generic_HDRS} ${stratagus_action_HDRS} ${stratagus_animation_HDRS} ${stratagus_guichan_HDRS} ${stratagus_spell_HDRS})
+set(stratagus_HDRS
+	${stratagus_generic_HDRS}
+	${stratagus_action_HDRS}
+	${stratagus_animation_HDRS}
+	${stratagus_guichan_HDRS}
+	${stratagus_spell_HDRS}
+	${CMAKE_CURRENT_BINARY_DIR}/version-generated.h
+)
 
 # Additional platform checks
 
@@ -980,12 +987,13 @@ add_executable(genversion ${genversion_SRCS})
 
 ########### next target ###############
 
-add_custom_target(version-generated.h ALL
+add_custom_target(version ALL
 	${CMAKE_CURRENT_BINARY_DIR}/genversion ${CMAKE_CURRENT_BINARY_DIR}/version-generated.h "${STRATAGUS_VERSION}"
 	DEPENDS genversion
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 	VERBATIM
 )
+add_custom_command(OUTPUT version-generated.h DEPENDS version)
 set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES version-generated.h)
 
 ########### next target ###############
