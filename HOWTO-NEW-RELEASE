@@ -1,0 +1,84 @@
+Here is small HOWTO release new version of Stratagus
+
+You need some linux machine (ideally ubuntu) with:
+ bzr, debhelper, devscripts, cmake, make, nsis, upx, gnupg
+
+For windows installers you need:
+ cmake toolchain file (see example)
+ windows gcc cross compiler: g++-mingw-w64
+ windows stratagus dependencies (from https://launchpad.net/~mingw-packages/+archive/ppa):
+  libmikmod-mingw-w64-cross, libogg-mingw-w64-cross, libpng-mingw-w64-cross, libpthread-mingw-w64-cross, libsdl1.2-mingw-w64-cross,
+  libtheora-mingw-w64-cross, libvorbis-mingw-w64-cross, lua5.1-mingw-w64-cross, tolua++-mingw-w64-cross, zlib-mingw-w64-cross
+
+Download source code:
+ bzr branch lp:stratagus && cd stratagus
+
+Increase version in files:
+ CMakeLists.txt
+ doc/Doxyfile.in
+ doc/changelog.html
+ doc/stratagus.6
+ src/include/version.h
+ src/win32/stratagus.nsi
+
+Update changelog in file:
+ doc/changelog.html
+
+Increase version and update changelog for debian:
+ dch -i
+
+Commit changes to bzr and create tag:
+ bzr ci -m "Release version <version>"
+ bzr tag <version>
+ bzr push lp:stratagus
+
+Create orig tarball + sign:
+ bzr export ../stratagus_*.orig.tar.gz
+ gpg --armor --sign --detach-sig ../stratagus_*.orig.tar.gz
+
+Create ubuntu dsc packages:
+ for release in karmic lucid maverick natty oneiric precise quantal; do \
+ sed "0,/(\(.*\)) unstable;/s//(\1ubuntu1~$release) $release;/" -i debian/changelog; \
+ bzr builddeb -S --builder="debuild -sa"; \
+ sed "0,/(\(.*\)ubuntu.*) $release;/s//(\1) unstable;/" -i debian/changelog; \
+ done
+
+Create maemo dsc package:
+ sed "0,/(\(.*\)) unstable;/s//(\1maemo1~fremantle) fremantle;/" -i debian/changelog
+ bzr builddeb -S --builder="debuild -sa"
+ sed "0,/(\(.*\)maemo.*) fremantle;/s//(\1) unstable;/" -i debian/changelog
+
+Create win32 installer + sign:
+ rm -rf build && mkdir build && cd build
+ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/path/to/win32/toolchain/file -DENABLE_STATIC=ON -DENABLE_NSIS=ON -DENABLE_UPX=ON -DENABLE_STRIP=ON ..
+ make && mv Stratagus-*.exe ../../ && cd ..
+ gpg --armor --sign --detach-sig ../Stratagus-*.exe
+
+Create win64 installer + sign:
+ rm -rf build && mkdir build && cd build
+ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/path/to/win64/toolchain/file -DENABLE_STATIC=ON -DENABLE_NSIS=ON -DENABLE_STRIP=ON ..
+ make && mv Stratagus-*-x86_64.exe ../../ && cd ..
+ gpg --armor --sign --detach-sig Stratagus-*-x86_64.exe
+
+Create new version on launchpad:
+ via web interface on https://launchpad.net/stratagus/trunk/+addrelease
+
+Upload orig tarball and windows installers with signatures:
+ via web interface on https://launchpad.net/stratagus/+download
+
+Upload ubuntu dsc packages to stratagus PPA:
+ dput ppa:stratagus/ppa ../stratagus_*ubuntu*_source.changes
+
+Upload maemo dsc package to Maemo Extras-devel:
+ scp ../stratagus_*.orig.tar.gz ../stratagus_*maemo*.debian.tar.gz ../stratagus_*maemo*_source.changes ../stratagus_*maemo*.dsc drop.maemo.org:/var/www/extras-devel/incoming-builder/fremantle/
+
+Example of cmake win32 toolchain file for windows:
+ SET(CMAKE_SYSTEM_NAME Windows)
+ SET(CMAKE_C_COMPILER i686-w64-mingw32-gcc)
+ SET(CMAKE_CXX_COMPILER i686-w64-mingw32-g++)
+ SET(CMAKE_RC_COMPILER i686-w64-mingw32-windres)
+ SET(CMAKE_FIND_ROOT_PATH /usr/i686-w64-mingw32)
+ SET(CMAKE_PREFIX_PATH /usr/i686-w64-mingw32)
+ SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+ SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+ SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
