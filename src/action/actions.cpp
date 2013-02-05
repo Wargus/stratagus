@@ -33,11 +33,12 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#ifdef DEBUG_LOG
+#ifdef DEBUG
 #include <time.h>
 #endif
 
 #include "stratagus.h"
+#include "version.h"
 
 #include "actions.h"
 
@@ -394,7 +395,7 @@ static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 	}
 }
 
-#ifdef DEBUG_LOG
+#ifdef DEBUG
 
 static void DumpUnitInfo(CUnit &unit)
 {
@@ -417,9 +418,8 @@ static void DumpUnitInfo(CUnit &unit)
 	}
 
 	fprintf(logf, "%lu: ", GameCycle);
-	fprintf(logf, "%d %s S%d-%d P%d Refs %d: %X %d,%d %d,%d\n",
+	fprintf(logf, "%d %s %d P%d Refs %d: %X %d,%d %d,%d\n",
 			UnitNumber(unit), unit.Type ? unit.Type->Ident.c_str() : "unit-killed",
-			unit.State,
 			!unit.Orders.empty() ? unit.CurrentAction() : -1,
 			unit.Player ? unit.Player->Index : -1, unit.Refs, SyncRandSeed,
 			unit.tilePos.x, unit.tilePos.y, unit.IX, unit.IY);
@@ -429,7 +429,7 @@ static void DumpUnitInfo(CUnit &unit)
 	fflush(NULL);
 }
 
-#endif // DEBUG_LOG
+#endif // DEBUG
 
 
 template <typename UNITP_ITERATOR>
@@ -454,7 +454,7 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		} catch (AnimationDie_Exception &) {
 			AnimationDie_OnCatch(unit);
 		}
-#ifdef DEBUG_LOG
+#ifdef DEBUG
 		DumpUnitInfo(unit);
 #endif
 		// Calculate some hash.
