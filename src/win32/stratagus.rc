@@ -1,4 +1,4 @@
-#include "../include/version.h"
+#include "version.h"
 
 #define ICO "stratagus.ico"
 #define EXE "stratagus.exe"
