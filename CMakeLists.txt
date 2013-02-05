@@ -993,6 +993,7 @@ add_custom_command(OUTPUT tolua.cpp
 	COMMAND ${TOLUA++_APP} ARGS -L stratagus.lua -o ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp stratagus.pkg
 	DEPENDS ${tolua_FILES}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/tolua
+	VERBATIM
 )
 
 ########### next target ###############
@@ -1082,7 +1083,8 @@ if(ENABLE_DOC AND DOXYGEN_FOUND)
 		COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
 		DEPENDS ${doxygen_FILES}
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-		COMMENT "Generating Stratagus souce code documentation with Doxygen" VERBATIM
+		COMMENT "Generating Stratagus souce code documentation with Doxygen"
+		VERBATIM
 	)
 	add_custom_target(doc ALL DEPENDS doxygen/index.html)
 	set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES doxygen)
@@ -1098,6 +1100,7 @@ macro(self_packer PACKER_TARGET)
 	add_custom_command(TARGET ${PACKER_TARGET} POST_BUILD
 		COMMAND ${SELF_PACKER_FOR_EXECUTABLE}
 		ARGS ${SELF_PACKER_FOR_EXECUTABLE_FLAGS} ${PACKER_NAME}${CMAKE_EXECUTABLE_SUFFIX}
+		VERBATIM
 	)
 endmacro()
 
@@ -1117,7 +1120,8 @@ if(WIN32 AND ENABLE_NSIS AND MAKENSIS_FOUND)
 	add_custom_command(OUTPUT Stratagus-${STRATAGUS_VERSION}${MAKENSIS_SUFFIX}
 		COMMAND ${MAKENSIS} ARGS ${MAKENSIS_FLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/stratagus.nsi
 		DEPENDS src/win32/stratagus.nsi stratagus COPYING
-		COMMENT "Generating Stratagus Windows NSIS Installer" VERBATIM
+		COMMENT "Generating Stratagus Windows NSIS Installer"
+		VERBATIM
 	)
 	add_custom_target(nsis ALL DEPENDS Stratagus-${STRATAGUS_VERSION}${MAKENSIS_SUFFIX})
 endif()
