@@ -269,6 +269,8 @@ char *strcasestr(const char *a, const char *b)
 --  Getopt
 ----------------------------------------------------------------------------*/
 
+#ifndef HAVE_GETOPT
+
 /**
 **  Standard implementation of getopt(3).
 **
@@ -278,9 +280,6 @@ char *strcasestr(const char *a, const char *b)
 **  an 'argument required' error.
 */
 
-#if defined(_MSC_VER)
-
-#include <io.h>
 #include <string.h>
 
 int opterr = 1;
@@ -288,22 +287,16 @@ int optind = 1;
 int optopt;
 char *optarg;
 
-static void getopt_err(char *argv0, char *str, char opt)
+static void getopt_err(const char *argv0, const char *str, char opt)
 {
 	if (opterr) {
-		char errbuf[2];
-		char *x;
-
-		errbuf[0] = opt;
-		errbuf[1] = '\n';
+		const char *x;
 
 		while ((x = strchr(argv0, '/'))) {
 			argv0 = x + 1;
 		}
 
-		write(2, argv0, strlen(argv0));
-		write(2, str, strlen(str));
-		write(2, errbuf, 2);
+		fprintf(stderr, "%s%s%c\n", argv0, str, opt);
 	}
 }
 
@@ -346,7 +339,7 @@ int getopt(int argc, char *const *argv, const char *opts)
 	return c;
 }
 
-#endif /* _MSC_VER */
+#endif
 
 
 /*----------------------------------------------------------------------------

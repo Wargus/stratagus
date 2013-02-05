@@ -114,6 +114,18 @@ extern size_t strnlen(const char *str, size_t strsize);
 #endif // !HAVE_STRNLEN
 
 /*----------------------------------------------------------------------------
+--  Getopt
+----------------------------------------------------------------------------*/
+
+#ifdef HAVE_GETOPT
+#include <unistd.h>
+#else
+extern char *optarg;
+extern int optind, opterr, optopt;
+int getopt(int argc, char * const argv[], const char *optstring);
+#endif
+
+/*----------------------------------------------------------------------------
 --  Clipboard
 ----------------------------------------------------------------------------*/
 

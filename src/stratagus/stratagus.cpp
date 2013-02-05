@@ -169,18 +169,6 @@ extern void beos_init(int argc, char **argv);
 
 #endif
 
-#ifndef _MSC_VER
-#include <unistd.h>
-#endif
-#ifdef __CYGWIN__
-#include <getopt.h>
-#endif
-#if defined(_MSC_VER) || defined(__MINGW32__)
-extern char *optarg;
-extern int optind;
-extern int getopt(int argc, char *const *argv, const char *opt);
-#endif
-
 #ifdef MAC_BUNDLE
 #define Button ButtonOSX
 #include <Carbon/Carbon.h>
@@ -213,6 +201,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "version.h"
 #include "video.h"
 #include "widgets.h"
+#include "util.h"
 
 #ifdef DEBUG
 #include "missile.h" //for FreeBurningBuildingFrames

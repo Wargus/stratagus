@@ -788,6 +788,7 @@ check_function_exists("strcpy_s" HAVE_STRCPYS)
 check_function_exists("strncpy_s" HAVE_STRNCPYS)
 check_function_exists("strcasestr" HAVE_STRCASESTR)
 check_function_exists("strnlen" HAVE_STRNLEN)
+check_function_exists("getopt" HAVE_GETOPT)
 
 # mingw-w64 does not have strcat_s in any include file, but function symbol in library exists
 # so rather check if we have strcat_s in string.h file
@@ -815,6 +816,10 @@ endif()
 
 if(HAVE_STRNLEN)
 	add_definitions(-DHAVE_STRNLEN)
+endif()
+
+if(HAVE_GETOPT)
+	add_definitions(-DHAVE_GETOPT)
 endif()
 
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG")
