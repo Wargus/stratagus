@@ -13,13 +13,8 @@ For windows installers you need:
 Download source code:
  bzr branch lp:stratagus && cd stratagus
 
-Increase version in files:
+Increase version in file:
  CMakeLists.txt
- doc/Doxyfile.in
- doc/changelog.html
- doc/stratagus.6
- src/include/version.h
- src/win32/stratagus.nsi
 
 Update changelog in file:
  doc/changelog.html
@@ -51,12 +46,14 @@ Create maemo dsc package:
 Create win32 installer + sign:
  rm -rf build && mkdir build && cd build
  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/path/to/win32/toolchain/file -DENABLE_STATIC=ON -DENABLE_NSIS=ON -DENABLE_UPX=ON -DENABLE_STRIP=ON ..
+ g++ ../tools/genversion.cpp -o genversion
  make && mv Stratagus-*.exe ../../ && cd ..
  gpg --armor --sign --detach-sig ../Stratagus-*.exe
 
 Create win64 installer + sign:
  rm -rf build && mkdir build && cd build
  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/path/to/win64/toolchain/file -DENABLE_STATIC=ON -DENABLE_NSIS=ON -DENABLE_STRIP=ON ..
+ g++ ../tools/genversion.cpp -o genversion
  make && mv Stratagus-*-x86_64.exe ../../ && cd ..
  gpg --armor --sign --detach-sig Stratagus-*-x86_64.exe
 
