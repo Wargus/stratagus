@@ -150,8 +150,8 @@ long isqrt(long num)
 --  Strings
 ----------------------------------------------------------------------------*/
 
-#if !defined(_MSC_VER) || _MSC_VER < 1400
-unsigned int strcpy_s(char *dst, size_t dstsize, const char *src)
+#ifndef HAVE_STRCPYS
+errno_t strcpy_s(char *dst, size_t dstsize, const char *src)
 {
 	if (dst == NULL || src == NULL) {
 		return EINVAL;
@@ -162,6 +162,7 @@ unsigned int strcpy_s(char *dst, size_t dstsize, const char *src)
 	strcpy(dst, src);
 	return 0;
 }
+#endif
 
 #ifndef HAVE_STRNLEN
 size_t strnlen(const char *str, size_t strsize)
@@ -178,7 +179,8 @@ size_t strnlen(const char *str, size_t strsize)
 }
 #endif
 
-unsigned int strncpy_s(char *dst, size_t dstsize, const char *src, size_t count)
+#ifndef HAVE_STRNCPYS
+errno_t strncpy_s(char *dst, size_t dstsize, const char *src, size_t count)
 {
 	if (dst == NULL || src == NULL || dstsize == 0) {
 		return EINVAL;
@@ -204,8 +206,10 @@ unsigned int strncpy_s(char *dst, size_t dstsize, const char *src, size_t count)
 	*dst = '\0';
 	return 0;
 }
+#endif
 
-unsigned int strcat_s(char *dst, size_t dstsize, const char *src)
+#ifndef STRCATS
+errno_t strcat_s(char *dst, size_t dstsize, const char *src)
 {
 	if (dst == NULL || src == NULL) {
 		return EINVAL;

@@ -81,11 +81,26 @@ void clamp(T *value, T minValue, T maxValue)
 --  Strings
 ----------------------------------------------------------------------------*/
 
-#if !defined(_MSC_VER) || _MSC_VER < 1400
+#include <string.h>
+
+#ifndef _TRUNCATE
 #define _TRUNCATE ((size_t)-1)
-extern unsigned int strcpy_s(char *dst, size_t dstsize, const char *src);
-extern unsigned int strncpy_s(char *dst, size_t dstsize, const char *src, size_t count);
-extern unsigned int strcat_s(char *dst, size_t dstsize, const char *src);
+#endif
+
+#ifndef HAVE_ERRNOT
+typedef int errno_t;
+#endif
+
+#ifndef HAVE_STRCPYS
+extern errno_t strcpy_s(char *dst, size_t dstsize, const char *src);
+#endif
+
+#ifndef HAVE_STRNCPYS
+extern errno_t strncpy_s(char *dst, size_t dstsize, const char *src, size_t count);
+#endif
+
+#ifndef HAVE_STRCATS
+extern errno_t strcat_s(char *dst, size_t dstsize, const char *src);
 #endif
 
 #ifndef HAVE_STRCASESTR

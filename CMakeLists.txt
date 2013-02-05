@@ -614,7 +614,9 @@ find_package(Sqlite)
 find_package(Doxygen)
 find_package(SelfPackers)
 
+include(CheckTypeSize)
 include(CheckFunctionExists)
+include(CheckSymbolExists)
 
 # Windows RC compiler definitions
 
@@ -781,8 +783,31 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsigned-char")
 endif()
 
+check_type_size(errno_t ERRNOT)
+check_function_exists("strcpy_s" HAVE_STRCPYS)
+check_function_exists("strncpy_s" HAVE_STRNCPYS)
 check_function_exists("strcasestr" HAVE_STRCASESTR)
 check_function_exists("strnlen" HAVE_STRNLEN)
+
+# mingw-w64 does not have strcat_s in any include file, but function symbol in library exists
+# so rather check if we have strcat_s in string.h file
+check_symbol_exists("strcat_s" "string.h" HAVE_STRCATS)
+
+if(HAVE_ERRNOT)
+	add_definitions(-DHAVE_ERRNOT)
+endif()
+
+if(HAVE_STRCPYS)
+	add_definitions(-DHAVE_STRCPYS)
+endif()
+
+if(HAVE_STRNCPYS)
+	add_definitions(-DHAVE_STRNCPYS)
+endif()
+
+if(HAVE_STRCATS)
+	add_definitions(-DHAVE_STRCATS)
+endif()
 
 if(HAVE_STRCASESTR)
 	add_definitions(-DHAVE_STRCASESTR)
