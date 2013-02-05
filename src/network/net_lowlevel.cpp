@@ -259,8 +259,7 @@ int NetSocketAddr(const Socket sock)
 	}
 	return nif;
 }
-#else // } { !USE_WINSOCK
-#ifdef unix // {
+#elif USE_LINUX // } {
 // ARI: I knew how to write this for a unix environment,
 // but am quite certain that porting this can cause you
 // trouble..
@@ -335,15 +334,14 @@ int NetSocketAddr(const Socket sock)
 	}
 	return nif;
 }
-#else // } !unix
+#else // } {
 // Beos?? Mac??
 int NetSocketAddr(const Socket sock)
 {
 	NetLocalAddrs[0] = htonl(0x7f000001);
 	return 1;
 }
-#endif
-#endif // } !USE_WINSOCK
+#endif // }
 
 /**
 **  Open an UDP Socket port.

@@ -566,8 +566,12 @@ if(UNIX AND CMAKE_SYSTEM_NAME MATCHES BSD)
 	set(BSD true)
 endif()
 
-# Check if platform is Maemo
 if(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux)
+	set(LINUX true)
+endif()
+
+# Check if platform is Maemo
+if(LINUX)
 	find_package(PkgConfig QUIET REQUIRED)
 	pkg_check_modules(MAEMO_VERSION maemo-version)
 	if(MAEMO_VERSION_FOUND)
@@ -755,12 +759,14 @@ endif()
 
 if(APPLE)
 	add_definitions(-DUSE_MAC)
-	add_definitions(-D__unix)
 endif()
 
 if(BSD)
 	add_definitions(-DUSE_BSD)
-	add_definitions(-D__unix)
+endif()
+
+if(LINUX)
+	add_definitions(-DUSE_LINUX)
 endif()
 
 if(BEOS)
@@ -879,6 +885,8 @@ elseif(BEOS)
 	message("Platform: BEOS")
 elseif(MAEMO)
 	message("Platform: Maemo")
+elseif(LINUX)
+	message("Platform: Linux")
 else()
 	message("Platform: Other/No platform code")
 endif()

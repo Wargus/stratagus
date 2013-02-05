@@ -433,6 +433,9 @@ static void PrintHeader()
 #ifdef USE_WIN32
 		"WIN32 "
 #endif
+#ifdef USE_LINUX
+		"LINUX "
+#endif
 #ifdef USE_BSD
 		"BSD "
 #endif

@@ -155,9 +155,11 @@ extern unsigned inline _FetchLE32(unsigned char **pp)
 #if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN
 #include <byteswap.h>
 #endif
-#if defined(__APPLE__)
+
+#if defined(USE_MAC)
 #include <architecture/byte_order.h>
 #endif
+
 #endif
 
 /*----------------------------------------------------------------------------
@@ -178,7 +180,7 @@ extern unsigned inline _FetchLE32(unsigned char **pp)
 
 #else
 
-#if defined(__APPLE__)
+#if defined(USE_MAC)
 
 /**
 **  Convert a 16 bit value in little endian and return it in native format.
@@ -202,7 +204,7 @@ extern unsigned inline _FetchLE32(unsigned char **pp)
 */
 #define ConvertLE32(v) (v)
 
-#endif  // defined(__APPLE__)
+#endif  // defined(USE_MAC)
 
 #endif // ! defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN
 
