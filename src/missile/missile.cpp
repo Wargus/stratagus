@@ -675,7 +675,10 @@ bool PointToPointMissile(Missile &missile)
 
 	if (missile.Type->Smoke.Missile && (missile.CurrentStep || missile.State > 1)) {
 		const PixelPos position = missile.position + missile.Type->size / 2;
-		MakeMissile(*missile.Type->Smoke.Missile, position, position);
+		Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position);
+		if (smoke && smoke->Type->NumDirections > 1) {
+			smoke->MissileNewHeadingFromXY(diff);
+		}
 	}
 
 	if (missile.Type->SmokeParticle && (missile.CurrentStep || missile.State > 1)) {

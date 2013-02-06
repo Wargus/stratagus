@@ -112,6 +112,8 @@
 		value = goal->Variable[index].Increase;
 	} else if (!strcmp(next + 1, "Enable")) {
 		value = goal->Variable[index].Enable;
+	} else if (!strcmp(next + 1, "Percent")) {
+		value = goal->Variable[index].Value * 100 / goal->Variable[index].Max;
 	}
 	switch (this->mod) {
 		case MOD_ADD:
@@ -150,7 +152,10 @@
 		goal->Variable[index].Increase = value;
 	} else if (!strcmp(next + 1, "Enable")) {
 		goal->Variable[index].Enable = value;
+	} else if (!strcmp(next + 1, "Percent")) {
+		goal->Variable[index].Value = goal->Variable[index].Max * value / 100;
 	}
+	clamp(&goal->Variable[index].Value, 0, unit.Variable[index].Max);
 }
 
 /*

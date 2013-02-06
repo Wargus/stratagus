@@ -251,70 +251,89 @@ void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 */
 static void HandleRegenerations(CUnit &unit)
 {
-	int f = 0;
+	bool burn = false, poison = false;
 
-	// Burn
+	// Burn & poison
 	if (!unit.Removed && !unit.Destroyed && unit.Variable[HP_INDEX].Max
 		&& unit.CurrentAction() != UnitActionBuilt
 		&& unit.CurrentAction() != UnitActionDie) {
-		f = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
-		if (f <= unit.Type->BurnPercent && unit.Type->BurnDamageRate) {
-			HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate);
-			f = 1;
-		} else {
-			f = 0;
+		if (((100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max) <= unit.Type->BurnPercent
+			&& unit.Type->BurnDamageRate) {
+				HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate);
+				burn = true;
+		}
+
+		if (unit.Variable[POISON_INDEX].Value && unit.Type->PoisonDrain) {
+			HitUnit(NoUnitP, unit, unit.Type->PoisonDrain);
+			poison = true;
 		}
 	}
 
-	// Health doesn't regenerate while burning.
-	unit.Variable[HP_INDEX].Increase = f ? 0 : unit.Stats->Variables[HP_INDEX].Increase;
+	// Health doesn't regenerate while burning or poisoned.
+	unit.Variable[HP_INDEX].Increase = (burn || poison) ? 0 : unit.Stats->Variables[HP_INDEX].Increase;
+}
+
+static inline void IncreaseVariable(CUnit &unit, int index)
+{
+	unit.Variable[index].Value += unit.Variable[index].Increase;
+	clamp(&unit.Variable[index].Value, 0, unit.Variable[index].Max);
 }
 
 /**
-**  Handle things about the unit that decay over time
+**  Handle things about the unit that decay over time each cycle
 **
 **  @param unit    The unit that the decay is handled for
-**  @param amount  The amount of time to make up for.(in cycles)
 */
-static void HandleBuffs(CUnit &unit, int amount)
+static void HandleBuffsEachCycle(CUnit &unit)
 {
 	// Look if the time to live is over.
-
 	if (unit.TTL && unit.TTL < GameCycle) {
 		DebugPrint("Unit must die %lu %lu!\n" _C_ unit.TTL _C_ GameCycle);
 
 		// Hit unit does some funky stuff...
-		unit.Variable[HP_INDEX].Value -= amount;
+		--unit.Variable[HP_INDEX].Value;
 		if (unit.Variable[HP_INDEX].Value <= 0) {
 			LetUnitDie(unit);
 			return;
 		}
 	}
 
-	unit.Threshold -= amount;
-	if (unit.Threshold < 0) {
+	if (--unit.Threshold < 0) {
 		unit.Threshold = 0;
 	}
-
+	
+	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX};
 	//  decrease spells effects time.
-	unit.Variable[BLOODLUST_INDEX].Increase = -amount;
-	unit.Variable[HASTE_INDEX].Increase = -amount;
-	unit.Variable[SLOW_INDEX].Increase = -amount;
-	unit.Variable[INVISIBLE_INDEX].Increase = -amount;
-	unit.Variable[UNHOLYARMOR_INDEX].Increase = -amount;
-
-	unit.Variable[SHIELD_INDEX].Increase = 1;
+	for (int i = 0; i < sizeof(SpellEffects) / sizeof(int); ++i) {
+		unit.Variable[SpellEffects[i]].Increase = -1;
+		IncreaseVariable(unit, SpellEffects[i]);
+	}
 
 	const bool lastStatusIsHidden = unit.Variable[INVISIBLE_INDEX].Value > 0;
-	// User defined variables
-	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
-		if (unit.Variable[i].Enable && unit.Variable[i].Increase) {
-			unit.Variable[i].Value += unit.Variable[i].Increase;
-			clamp(&unit.Variable[i].Value, 0, unit.Variable[i].Max);
-		}
-	}
 	if (lastStatusIsHidden && unit.Variable[INVISIBLE_INDEX].Value == 0) {
 		UnHideUnit(unit);
+	}
+}
+
+
+/**
+**  Handle things about the unit that decay over time each second
+**
+**  @param unit    The unit that the decay is handled for
+*/
+static void HandleBuffsEachSecond(CUnit &unit)
+{
+	unit.Variable[SHIELD_INDEX].Increase = 1;
+
+	// User defined variables
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
+		if (i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
+			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX) {
+				continue;
+		}
+		if (unit.Variable[i].Enable && unit.Variable[i].Increase) {
+			IncreaseVariable(unit, i);
+		}
 	}
 }
 
@@ -388,7 +407,7 @@ static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 			--unit.Blink;
 		}
 		// 2) Buffs...
-		HandleBuffs(unit, CYCLES_PER_SECOND);
+		HandleBuffsEachSecond(unit);
 
 		// 3) Increase health mana, burn and stuff
 		HandleRegenerations(unit);
@@ -448,6 +467,9 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 			unit.Type->OnEachCycle->pushInteger(UnitNumber(unit));
 			unit.Type->OnEachCycle->run();
 		}
+
+		// Handle each cycle buffs
+		HandleBuffsEachCycle(unit);
 
 		try {
 			HandleUnitAction(unit);

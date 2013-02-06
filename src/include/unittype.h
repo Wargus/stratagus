@@ -203,6 +203,7 @@ enum {
 	SHIELD_INDEX,
 	POINTS_INDEX,
 	MAXHARVESTERS_INDEX,
+	POISON_INDEX,
 	NVARALREADYDEFINED
 };
 
@@ -294,13 +295,14 @@ public:
 class CDecoVarStaticSprite : public CDecoVar
 {
 public:
-	CDecoVarStaticSprite() : NSprite(-1), n(0) {}
+	CDecoVarStaticSprite() : NSprite(-1), n(0), FadeValue(0) {}
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
 
 	// FIXME Sprite info. and Replace n with more appropriate var.
 	char NSprite;  /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
 	int n;         /// identifiant in SpellSprite
+	int FadeValue; /// if variable's value is below than FadeValue, it drawn transparent.
 };
 
 enum UnitTypeType {
@@ -568,6 +570,8 @@ public:
 
 	int Supply;                     /// Food supply
 	int Demand;                     /// Food demand
+
+	int PoisonDrain;                /// How much health is drained every second when poisoned
 
 	// --- FILLED UP ---
 

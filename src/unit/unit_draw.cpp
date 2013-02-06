@@ -482,7 +482,7 @@ void CDecoVarSpriteBar::Draw(int x, int y, const CUnitType &/*type*/, const CVar
 **
 **  @todo fix sprite configuration configuration.
 */
-void CDecoVarStaticSprite::Draw(int x, int y, const CUnitType &/*type*/, const CVariable &/*var*/) const
+void CDecoVarStaticSprite::Draw(int x, int y, const CUnitType &/*type*/, const CVariable &var) const
 {
 	Decoration &decosprite = DecoSprite.SpriteArray[(int)this->NSprite];
 	CGraphic &sprite = *decosprite.Sprite;
@@ -495,7 +495,12 @@ void CDecoVarStaticSprite::Draw(int x, int y, const CUnitType &/*type*/, const C
 	if (this->IsCenteredInY) {
 		y -= sprite.Height / 2;
 	}
-	sprite.DrawFrameClip(this->n, x, y);
+	if (this->FadeValue && var.Value < this->FadeValue) {
+		int alpha = var.Value * 255 / this->FadeValue;
+		sprite.DrawFrameClipTrans(this->n, x, y, alpha);
+	} else {
+		sprite.DrawFrameClip(this->n, x, y);
+	}
 }
 
 /**

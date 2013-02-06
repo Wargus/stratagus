@@ -309,6 +309,21 @@ int LuaToNumber(lua_State *l, int narg)
 }
 
 /**
+**  Convert lua number in C unsigned int.
+**  It checks also type and exit in case of error.
+**
+**  @param l     Lua state.
+**  @param narg  Argument number.
+**
+**  @return      C number from lua.
+*/
+unsigned int LuaToUnsignedNumber(lua_State *l, int narg)
+{
+	luaL_checktype(l, narg, LUA_TNUMBER);
+	return static_cast<unsigned int>(lua_tonumber(l, narg));
+}
+
+/**
 **  Convert lua boolean to bool.
 **  It also checks type and exits in case of error.
 **

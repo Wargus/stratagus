@@ -125,7 +125,7 @@ static const char SLOT_KEY[] = "Slot";
 static const char SHIELD_KEY[] = "ShieldPoints";
 static const char POINTS_KEY[] = "Points";
 static const char MAXHARVESTERS_KEY[] = "MaxHarvesters";
-static const char AITHRESHOLD_KEY[] = "AiThreshold";
+static const char POISON_KEY[] = "Poison";
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -162,7 +162,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   BASICDAMAGE_KEY, POSX_KEY, POSY_KEY, RADARRANGE_KEY,
 							   RADARJAMMERRANGE_KEY, AUTOREPAIRRANGE_KEY, BLOODLUST_KEY, HASTE_KEY,
 							   SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY, SHIELD_KEY, POINTS_KEY,
-							   MAXHARVESTERS_KEY, AITHRESHOLD_KEY
+							   MAXHARVESTERS_KEY, POISON_KEY
 							  };
 
 	for (int i = 0; i < NVARALREADYDEFINED; ++i) {
@@ -511,6 +511,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->BurnPercent = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "BurnDamageRate")) {
 			type->BurnDamageRate = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "PoisonDrain")) {
+			type->PoisonDrain = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ShieldPoints")) {
 			type->DefaultStat.Variables[SHIELD_INDEX].Max = LuaToNumber(l, -1);
 			type->DefaultStat.Variables[SHIELD_INDEX].Value = 0;
@@ -1557,11 +1559,21 @@ static int CclDefineDecorations(lua_State *l)
 					decovar = decovarspritebar;
 				} else if (!strcmp(key, "static-sprite")) {
 					CDecoVarStaticSprite *decovarstaticsprite = new CDecoVarStaticSprite;
-					lua_rawgeti(l, -1, 1); // sprite
-					lua_rawgeti(l, -2, 2); // frame
-					decovarstaticsprite->NSprite = GetSpriteIndex(LuaToString(l, -2));
-					decovarstaticsprite->n = LuaToNumber(l, -1);
-					lua_pop(l, 2);
+					if (lua_rawlen(l, -1) == 2) {
+						lua_rawgeti(l, -1, 1); // sprite
+						lua_rawgeti(l, -2, 2); // frame
+						decovarstaticsprite->NSprite = GetSpriteIndex(LuaToString(l, -2));
+						decovarstaticsprite->n = LuaToNumber(l, -1);
+						lua_pop(l, 2);
+					} else {
+						lua_rawgeti(l, -1, 1); // sprite
+						lua_rawgeti(l, -2, 2); // frame
+						lua_rawgeti(l, -3, 3); // fade value
+						decovarstaticsprite->NSprite = GetSpriteIndex(LuaToString(l, -3));
+						decovarstaticsprite->n = LuaToNumber(l, -2);
+						decovarstaticsprite->FadeValue = LuaToNumber(l, -1);
+						lua_pop(l, 3);
+					}					
 					decovar = decovarstaticsprite;
 				} else { // Error
 					LuaError(l, "invalid method '%s' for Method in DefineDecorations" _C_ key);
@@ -1625,7 +1637,8 @@ void UpdateUnitVariables(CUnit &unit)
 			|| i == MANA_INDEX || i == KILL_INDEX || i == XP_INDEX
 			|| i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
 			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == HP_INDEX
-			|| i == SHIELD_INDEX || i == POINTS_INDEX || i == MAXHARVESTERS_INDEX) {
+			|| i == SHIELD_INDEX || i == POINTS_INDEX || i == MAXHARVESTERS_INDEX
+			|| i == POISON_INDEX) {
 			continue;
 		}
 		unit.Variable[i].Value = 0;
