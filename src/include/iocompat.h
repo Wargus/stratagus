@@ -38,7 +38,11 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifndef _MSC_VER
 #include <dirent.h>
+#else
+#include <direct.h>
+#endif
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>

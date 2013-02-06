@@ -208,7 +208,7 @@ errno_t strncpy_s(char *dst, size_t dstsize, const char *src, size_t count)
 }
 #endif
 
-#ifndef STRCATS
+#ifndef HAVE_STRCATS
 errno_t strcat_s(char *dst, size_t dstsize, const char *src)
 {
 	if (dst == NULL || src == NULL) {
