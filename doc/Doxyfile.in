@@ -612,6 +612,7 @@ WARN_LOGFILE           =
 
 INPUT                  = src \
                          ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp \
+                         ${CMAKE_CURRENT_BINARY_DIR}/version-generated.h \
                          gameheaders \
                          metaserver \
                          tools
