@@ -38,11 +38,6 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifndef _MSC_VER
-#include <dirent.h>
-#else
-#include <direct.h>
-#endif
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -52,6 +47,7 @@
 
 #include <io.h>
 #include <fcntl.h>
+#include <direct.h>
 
 #define R_OK 4
 #define F_OK 0
@@ -65,6 +61,7 @@
 #else
 
 #include <unistd.h>
+#include <dirent.h>
 
 #endif
 
