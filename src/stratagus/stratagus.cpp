@@ -215,9 +215,6 @@ extern void beos_init(int argc, char **argv);
 #define REDIRECT_OUTPUT
 #endif
 
-
-extern void CleanGame();
-
 void Parameters::SetDefaultValues()
 {
 	applicationName = "stratagus";
@@ -260,15 +257,7 @@ std::string StratagusLibPath;        /// Path for data directory
 const char NameLine[] = NAME " V" VERSION ", " COPYRIGHT;
 
 std::string CliMapName;          /// Filename of the map given on the command line
-static std::vector<gcn::Container *> Containers;
 std::string MenuRace;
-
-/*============================================================================
-==  DISPLAY
-============================================================================*/
-
-unsigned long GameCycle;             /// Game simulation cycle counter
-unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
 
 /*============================================================================
 ==  MAIN
@@ -349,50 +338,6 @@ static int MenuLoop()
 
 	// We clean up later in Exit
 	return status;
-}
-
-extern gcn::Gui *Gui;
-
-void StartMap(const std::string &filename, bool clean)
-{
-	std::string nc, rc;
-
-	gcn::Widget *oldTop = Gui->getTop();
-	gcn::Container *container = new gcn::Container();
-	Containers.push_back(container);
-	container->setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
-	container->setOpaque(false);
-	Gui->setTop(container);
-
-	NetConnectRunning = 0;
-	InterfaceState = IfaceStateNormal;
-
-	//  Create the game.
-	DebugPrint("Creating game with map: %s\n" _C_ filename.c_str());
-	if (clean) {
-		CleanPlayers();
-	}
-	GetDefaultTextColors(nc, rc);
-
-	CreateGame(filename.c_str(), &Map);
-
-	UI.StatusLine.Set(NameLine);
-	SetMessage("%s", _("Do it! Do it now!"));
-
-	//  Play the game.
-	GameMainLoop();
-
-	//  Clear screen
-	Video.ClearScreen();
-	Invalidate();
-
-	CleanGame();
-	InterfaceState = IfaceStateMenu;
-	SetDefaultTextColors(nc, rc);
-
-	Gui->setTop(oldTop);
-	Containers.erase(std::find(Containers.begin(), Containers.end(), container));
-	delete container;
 }
 
 //----------------------------------------------------------------------------
@@ -504,9 +449,7 @@ void Exit(int err)
 	FreeGraphics();
 	FreePlayerColors();
 	FreeButtonStyles();
-	for (size_t i = 0; i < Containers.size(); ++i) {
-		delete Containers[i];
-	}
+	FreeAllContainers();
 	freeGuichan();
 	DebugPrint("Frames %lu, Slow frames %d = %ld%%\n" _C_
 			   FrameCounter _C_ SlowFrameCounter _C_

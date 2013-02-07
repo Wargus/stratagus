@@ -41,7 +41,7 @@ extern void LuaRegisterModules();       /// Register lua script of each modules
 extern void LoadModules();              /// Load all modules
 extern void CleanModules();             /// Cleanup all modules
 
-
+extern void FreeAllContainers();
 
 extern std::string GameName;                /// Name of the game
 extern std::string FullGameName;            /// Full Name of the game

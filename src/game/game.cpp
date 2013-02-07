@@ -64,6 +64,7 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "spells.h"
+#include "translate.h"
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"
@@ -72,6 +73,9 @@
 #include "upgrade.h"
 #include "version.h"
 #include "video.h"
+
+
+extern void CleanGame();
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -84,12 +88,66 @@ GameResults GameResult;                      /// Outcome of the game
 std::string GameName;
 std::string FullGameName;
 
-bool UseHPForXp = false;              /// true if gain XP by dealing damage, false if by killing.
+unsigned long GameCycle;             /// Game simulation cycle counter
+unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
 
+bool UseHPForXp = false;              /// true if gain XP by dealing damage, false if by killing.
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+extern gcn::Gui *Gui;
+static std::vector<gcn::Container *> Containers;
+
+void StartMap(const std::string &filename, bool clean)
+{
+	std::string nc, rc;
+
+	gcn::Widget *oldTop = Gui->getTop();
+	gcn::Container *container = new gcn::Container();
+	Containers.push_back(container);
+	container->setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
+	container->setOpaque(false);
+	Gui->setTop(container);
+
+	NetConnectRunning = 0;
+	InterfaceState = IfaceStateNormal;
+
+	//  Create the game.
+	DebugPrint("Creating game with map: %s\n" _C_ filename.c_str());
+	if (clean) {
+		CleanPlayers();
+	}
+	GetDefaultTextColors(nc, rc);
+
+	CreateGame(filename.c_str(), &Map);
+
+	UI.StatusLine.Set(NameLine);
+	SetMessage("%s", _("Do it! Do it now!"));
+
+	//  Play the game.
+	GameMainLoop();
+
+	//  Clear screen
+	Video.ClearScreen();
+	Invalidate();
+
+	CleanGame();
+	InterfaceState = IfaceStateMenu;
+	SetDefaultTextColors(nc, rc);
+
+	Gui->setTop(oldTop);
+	Containers.erase(std::find(Containers.begin(), Containers.end(), container));
+	delete container;
+}
+
+void FreeAllContainers()
+{
+	for (size_t i = 0; i != Containers.size(); ++i) {
+		delete Containers[i];
+	}
+}
 
 /*----------------------------------------------------------------------------
 --  Map loading/saving
