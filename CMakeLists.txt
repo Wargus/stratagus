@@ -815,6 +815,10 @@ endif()
 if(CMAKE_COMPILER_IS_GNUCXX)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsigned-char")
 endif()
+if(CMAKE_COMPILER_IS_GNUC)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsigned-char")
+endif()
+# TODO: Add support for other compilers
 
 check_type_size(errno_t ERRNOT)
 check_function_exists("strcpy_s" HAVE_STRCPYS)
@@ -860,7 +864,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 if(ENABLE_STRIP)
-	if(CMAKE_COMPILER_IS_GNUCXX)
+	if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_GNUC)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s")
 	endif()
 	# TODO: Add support for other compilers
