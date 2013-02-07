@@ -414,7 +414,7 @@ static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 	}
 }
 
-#ifdef DEBUG
+#if 0
 
 static void DumpUnitInfo(CUnit &unit)
 {
@@ -448,7 +448,7 @@ static void DumpUnitInfo(CUnit &unit)
 	fflush(NULL);
 }
 
-#endif // DEBUG
+#endif
 
 
 template <typename UNITP_ITERATOR>
@@ -476,7 +476,7 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		} catch (AnimationDie_Exception &) {
 			AnimationDie_OnCatch(unit);
 		}
-#ifdef DEBUG
+#if 0
 		DumpUnitInfo(unit);
 #endif
 		// Calculate some hash.
