@@ -10,7 +10,6 @@
 /// Description
 #define DESCRIPTION NAME " - Strategy Gaming Engine"
 
-/// Engine version string
 #define _version_stringify_(s) #s
 #define _version_stringify(s) _version_stringify_(s)
 
@@ -22,6 +21,7 @@
 #define _version_str2 _version_str1
 #endif
 
+/// Engine version string
 #ifdef StratagusBzrRev
 #define VERSION _version_str2 "-bzr" _version_stringify(StratagusBzrRev)
 #else
