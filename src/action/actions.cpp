@@ -301,10 +301,10 @@ static void HandleBuffsEachCycle(CUnit &unit)
 	if (--unit.Threshold < 0) {
 		unit.Threshold = 0;
 	}
-	
+
 	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX};
 	//  decrease spells effects time.
-	for (int i = 0; i < sizeof(SpellEffects) / sizeof(int); ++i) {
+	for (unsigned int i = 0; i < sizeof(SpellEffects) / sizeof(int); ++i) {
 		unit.Variable[SpellEffects[i]].Increase = -1;
 		IncreaseVariable(unit, SpellEffects[i]);
 	}

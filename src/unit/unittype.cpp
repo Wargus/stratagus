@@ -618,7 +618,7 @@ CUnitType::CUnitType() :
 	BurnPercent(0), BurnDamageRate(0), RepairRange(0),
 	CanCastSpell(NULL), AutoCastActive(NULL),
 	AutoBuildRate(0), RandomMovementProbability(0), ClicksToExplode(0),
-	MaxOnBoard(0), StartingResources(0), PoisonDrain(0),
+	MaxOnBoard(0), StartingResources(0),
 	UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0), AiAdjacentRange(-1),
 	MouseAction(0), CanTarget(0),
 	Flip(0), Revealer(0), LandUnit(0), AirUnit(0), SeaUnit(0),
@@ -630,7 +630,7 @@ CUnitType::CUnitType() :
 	Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
 	Indestructible(0), Teleporter(0), ShieldPiercing(0), SaveCargo(0),
 	NonSolid(0), Wall(0), NoRandomPlacing(0),
-	GivesResource(0), Supply(0), Demand(0), FieldFlags(0), MovementMask(0),
+	GivesResource(0), Supply(0), Demand(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
 	Sprite(NULL), ShadowSprite(NULL)
 {
 #ifdef USE_MNG
