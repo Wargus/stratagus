@@ -547,7 +547,7 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton)
 	}
 
 	int popupWidth, popupHeight;
-	int Costs[MaxCosts + 1];
+	int Costs[ManaResCost + 1];
 	memset(Costs, 0, sizeof(Costs));
 
 	switch (button.Action) {
@@ -555,7 +555,8 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton)
 			memcpy(Costs, AllUpgrades[button.Value]->Costs, sizeof(AllUpgrades[button.Value]->Costs));
 			break;
 		case ButtonSpellCast:
-			Costs[MaxCosts] = SpellTypeTable[button.Value]->ManaCost;
+			memcpy(Costs, SpellTypeTable[button.Value]->Costs, sizeof(SpellTypeTable[button.Value]->Costs));
+			Costs[ManaResCost] = SpellTypeTable[button.Value]->ManaCost;
 			break;
 		case ButtonBuild:
 		case ButtonTrain:

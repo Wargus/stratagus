@@ -984,6 +984,10 @@ message("==================================")
 set(genversion_SRCS tools/genversion.cpp)
 source_group(genversion FILES ${genversion_SRCS})
 add_executable(genversion ${genversion_SRCS})
+set_target_properties(genversion PROPERTIES
+  OUTPUT_NAME "genversion"
+  RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_BINARY_DIR}"
+  RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_BINARY_DIR}")
 
 ########### next target ###############
 

@@ -104,6 +104,10 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 	if (caster.Variable[MANA_INDEX].Value < spell.ManaCost) { // Check caster mana.
 		return false;
 	}
+	// Check caster's resources
+	if (caster.Player->CheckCosts(spell.Costs)) {
+		return false;
+	}
 	if (spell.Target == TargetUnit) { // Casting a unit spell without a target.
 		if ((!target) || target->IsAlive() == false) {
 			return false;
@@ -426,6 +430,7 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 		if (mustSubtractMana) {
 			caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
 		}
+		caster.Player->SubCosts(spell.Costs);
 		//
 		// Spells like blizzard are casted again.
 		// This is sort of confusing, we do the test again, to
@@ -453,6 +458,7 @@ SpellType::SpellType(int slot, const std::string &ident) :
 	DependencyId(-1), Condition(NULL),
 	AutoCast(NULL), AICast(NULL)
 {
+	memset(Costs, 0, sizeof(Costs));
 }
 
 /**

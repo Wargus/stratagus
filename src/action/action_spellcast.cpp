@@ -304,6 +304,10 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
 										_("%s: not enough mana for spell: %s"),
 										unit.Type->Name.c_str(), spell.Name.c_str());
+				} else if (unit.Player->CheckCosts(spell.Costs)) {
+					unit.Player->Notify(NotifyYellow, unit.tilePos,
+						_("%s: not enough resources to cast spell: %s"),
+						unit.Type->Name.c_str(), spell.Name.c_str());
 				} else {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
 										_("%s: can't cast spell: %s"),

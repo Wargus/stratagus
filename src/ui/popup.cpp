@@ -264,7 +264,7 @@
 	int popupHeight = 0;
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 
-	for (unsigned int i = 1; i <= MaxCosts; ++i) {
+	for (unsigned int i = 1; i <= ManaResCost; ++i) {
 		if (Costs[i] && UI.Resources[i].G) {
 			popupHeight = std::max(UI.Resources[i].G->Height, popupHeight);
 		}
@@ -293,7 +293,7 @@
 			x += 5;
 		}
 	}
-	if (Costs[MaxCosts]) {
+	if (Costs[ManaResCost]) {
 		const SpellType &spell = *SpellTypeTable[button.Value];
 		const CGraphic *G = UI.Resources[ManaResCost].G;
 		if (spell.ManaCost) {

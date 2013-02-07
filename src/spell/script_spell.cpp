@@ -294,6 +294,21 @@ static int CclDefineSpell(lua_State *l)
 			spell->Name = LuaToString(l, i + 1);
 		} else if (!strcmp(value, "manacost")) {
 			spell->ManaCost = LuaToNumber(l, i + 1);
+		} else if (!strcmp(value, "res-cost")) {
+			lua_pushvalue(l, i + 1);
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int len = lua_rawlen(l, -1);
+			if (len != MaxCosts) {
+				LuaError(l, "resource table size isn't correct");
+			}
+			for (int j = 1; j < len; ++j) { // exclude the time
+				lua_rawgeti(l, -1,  j + 1);
+				spell->Costs[j] = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+			}
+			lua_pop(l, 1);
 		} else if (!strcmp(value, "range")) {
 			if (!lua_isstring(l, i + 1) && !lua_isnumber(l, i + 1)) {
 				LuaError(l, "incorrect argument");
