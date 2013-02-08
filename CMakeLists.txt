@@ -587,6 +587,7 @@ set(stratagus_HDRS
 	${stratagus_guichan_HDRS}
 	${stratagus_spell_HDRS}
 	${CMAKE_CURRENT_BINARY_DIR}/version-generated.h
+	version-generated.h # This line is needed for CMake when generating Doxygen documentation
 )
 
 # Additional platform checks
@@ -1004,13 +1005,14 @@ if(NOT CMAKE_CROSSCOMPILING)
 	set(genversion_SRCS tools/genversion.cpp)
 	source_group(genversion FILES ${genversion_SRCS})
 	add_executable(genversion ${genversion_SRCS})
-	add_custom_target(version ALL
+	add_custom_target(version-generated.h ALL
 		genversion ${CMAKE_CURRENT_BINARY_DIR}/version-generated.h "${STRATAGUS_VERSION}"
 		DEPENDS genversion
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		VERBATIM
 	)
-	add_custom_command(OUTPUT version-generated.h DEPENDS version)
+	set_source_files_properties(version-generated.h PROPERTIES GENERATED true)
+	set_source_files_properties(src/include/version.h PROPERTIES OBJECT_DEPENDS version-generated.h) # This is needed for old CMake which does not generate correct dependences
 	list(APPEND CLEAN_FILES version-generated.h)
 else()
 	# Generate header file version-generated.h without bzr revision
@@ -1037,7 +1039,6 @@ add_custom_command(OUTPUT tolua.cpp
 )
 
 add_executable(stratagus WIN32 ${stratagus_SRCS} ${stratagus_HDRS})
-add_dependencies(stratagus version-generated.h)
 target_link_libraries(stratagus ${stratagus_LIBS})
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
