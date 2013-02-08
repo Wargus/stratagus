@@ -253,8 +253,8 @@ struct _StringDesc_ {
 		UnitDesc *Unit;      /// Unit desciption.
 		struct {
 			NumberDesc *Cond;  /// Branch condition.
-			StringDesc *True;  /// String if Cond is true.
-			StringDesc *False; /// String if Cond is false.
+			StringDesc *BTrue;  /// String if Cond is true.
+			StringDesc *BFalse; /// String if Cond is false.
 		} If; /// conditional string.
 		struct {
 			StringDesc *String;  /// Original string.

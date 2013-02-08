@@ -766,10 +766,10 @@ StringDesc *CclParseStringDesc(lua_State *l)
 			lua_rawgeti(l, -1, 1); // Condition.
 			res->D.If.Cond = CclParseNumberDesc(l);
 			lua_rawgeti(l, -1, 2); // Then.
-			res->D.If.True = CclParseStringDesc(l);
+			res->D.If.BTrue = CclParseStringDesc(l);
 			if (lua_rawlen(l, -1) == 3) {
 				lua_rawgeti(l, -1, 3); // Else.
-				res->D.If.False = CclParseStringDesc(l);
+				res->D.If.BFalse = CclParseStringDesc(l);
 			}
 			lua_pop(l, 1); // table.
 		} else if (!strcmp(key, "SubString")) {
@@ -996,9 +996,9 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_If : // cond ? True : False;
 			if (EvalNumber(s->D.If.Cond)) {
-				return EvalString(s->D.If.True);
-			} else if (s->D.If.False) {
-				return EvalString(s->D.If.False);
+				return EvalString(s->D.If.BTrue);
+			} else if (s->D.If.BFalse) {
+				return EvalString(s->D.If.BFalse);
 			} else {
 				return std::string("");
 			}
@@ -1164,10 +1164,10 @@ void FreeStringDesc(StringDesc *s)
 		case EString_If : // cond ? True : False;
 			FreeNumberDesc(s->D.If.Cond);
 			delete s->D.If.Cond;
-			FreeStringDesc(s->D.If.True);
-			delete s->D.If.True;
-			FreeStringDesc(s->D.If.False);
-			delete s->D.If.False;
+			FreeStringDesc(s->D.If.BTrue);
+			delete s->D.If.BTrue;
+			FreeStringDesc(s->D.If.BFalse);
+			delete s->D.If.BFalse;
 			break;
 		case EString_SubString : // substring(s, begin, end)
 			FreeStringDesc(s->D.SubString.String);
