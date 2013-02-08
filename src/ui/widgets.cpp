@@ -94,9 +94,12 @@ void initGuichan()
 {
 	gcn::Graphics *graphics;
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		graphics = new MyOpenGLGraphics();
-	} else {
+	} else
+#endif
+	{
 		graphics = new gcn::SDLGraphics();
 
 		// Set the target for the graphics object to be the screen.
@@ -111,7 +114,12 @@ void initGuichan()
 	Gui->setGraphics(graphics);
 	Gui->setInput(Input);
 	Gui->setTop(NULL);
+
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	Gui->setUseDirtyDrawing(!UseOpenGL);
+#else
+	Gui->setUseDirtyDrawing(1);
+#endif
 
 	GuichanCallbacks.ButtonPressed = &MenuHandleButtonDown;
 	GuichanCallbacks.ButtonReleased = &MenuHandleButtonUp;
@@ -165,7 +173,11 @@ void handleInput(const SDL_Event *event)
 void DrawGuichanWidgets()
 {
 	if (Gui) {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running);
+#else
+		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running);
+#endif
 		Gui->draw();
 	}
 }
@@ -208,11 +220,11 @@ LuaActionListener::~LuaActionListener()
 {
 }
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
 
 /*----------------------------------------------------------------------------
 --  MyOpenGLGraphics
 ----------------------------------------------------------------------------*/
-
 
 void MyOpenGLGraphics::_beginDraw()
 {
@@ -309,6 +321,8 @@ void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle &rectangle)
 	Video.FillTransRectangle(Video.MapRGB(0, c.r, c.g, c.b),
 							 x1, y1, x2 - x1, y2 - y1, c.a);
 }
+
+#endif
 
 /*----------------------------------------------------------------------------
 --  ImageButton

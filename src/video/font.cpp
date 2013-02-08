@@ -133,14 +133,17 @@ CFont &GetGameFont()
 static void VideoDrawChar(const CGraphic &g,
 						  int gx, int gy, int w, int h, int x, int y, const CFontColor &fc)
 {
-	if (!UseOpenGL) {
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+		g.DrawSub(gx, gy, w, h, x, y);
+	} else
+#endif
+	{
 		SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
 		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 		std::vector<SDL_Color> sdlColors(fc.Colors, fc.Colors + MaxFontColors);
 		SDL_SetColors(g.Surface, &sdlColors[0], 0, MaxFontColors);
 		SDL_BlitSurface(g.Surface, &srect, TheScreen, &drect);
-	} else {
-		g.DrawSub(gx, gy, w, h, x, y);
 	}
 }
 
@@ -473,10 +476,13 @@ unsigned int CFont::DrawChar(CGraphic &g, int utf8, int x, int y, const CFontCol
 
 CGraphic *CFont::GetFontColorGraphic(const CFontColor &fontColor) const
 {
-	if (!UseOpenGL) {
-		return this->G;
-	} else {
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
 		return FontColorGraphics[this][&fontColor];
+	} else
+#endif
+	{
+		return this->G;
 	}
 }
 
@@ -805,6 +811,7 @@ void CFont::MeasureWidths()
 	SDL_UnlockSurface(G->Surface);
 }
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
 /**
 **  Make font bitmap.
 */
@@ -836,6 +843,7 @@ void CFont::MakeFontColorTextures() const
 		MakeTexture(newg);
 	}
 }
+#endif
 
 void CFont::Load()
 {
@@ -848,9 +856,11 @@ void CFont::Load()
 		this->G->Load();
 		this->MeasureWidths();
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
 		if (UseOpenGL) {
 			this->MakeFontColorTextures();
 		}
+#endif
 	}
 }
 
@@ -878,6 +888,7 @@ void LoadFonts()
 	GameFont = CFont::Get("game");
 }
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
 void CFont::FreeOpenGL()
 {
 	if (this->G) {
@@ -900,7 +911,7 @@ void FreeOpenGLFonts()
 		font.FreeOpenGL();
 	}
 }
-
+#endif
 
 void CFont::Reload() const
 {
@@ -909,11 +920,17 @@ void CFont::Reload() const
 		for (FontColorGraphicMap::iterator it = fontColorGraphicMap.begin();
 			 it != fontColorGraphicMap.end(); ++it) {
 			CGraphic *g = it->second;
+#if defined(USE_OPENGL) || defined(USE_GLES)
 			delete[] g->Textures;
+#endif
 			delete g;
 		}
 		fontColorGraphicMap.clear();
-		this->MakeFontColorTextures();
+#if defined(USE_OPENGL) || defined(USE_GLES)
+		if (UseOpenGL) {
+			this->MakeFontColorTextures();
+		}
+#endif
 	}
 }
 
@@ -1014,6 +1031,7 @@ void CFont::Clean()
 {
 	CFont *font = this;
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		FontColorGraphicMap &fontColorGraphicMap = FontColorGraphics[font];
 		if (!fontColorGraphicMap.empty()) {
@@ -1027,6 +1045,7 @@ void CFont::Clean()
 			fontColorGraphicMap.clear();
 		}
 	}
+#endif
 }
 
 /**
@@ -1040,9 +1059,11 @@ void CleanFonts()
 		font->Clean();
 		delete font;
 	}
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		FontColorGraphics.clear();
 	}
+#endif
 	Fonts.clear();
 
 	for (FontColorMap::iterator it = FontColors.begin(); it != FontColors.end(); ++it) {

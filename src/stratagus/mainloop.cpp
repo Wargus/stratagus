@@ -318,10 +318,12 @@ static void DisplayLoop()
 	}
 #endif
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		/* update only if screen changed */
 		ValidateOpenGLScreen();
 	}
+#endif
 
 	/* update only if viewmode changed */
 	CheckViewportMode();
@@ -367,7 +369,10 @@ static void DisplayLoop()
 	}
 #endif
 
-	if (!UseOpenGL) {
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (!UseOpenGL)
+#endif
+	{
 		if ((GameRunning || Editor.Running) && (FastForwardCycle <= GameCycle || !(GameCycle & 0x3f))) {
 			Video.ClearScreen();
 		}

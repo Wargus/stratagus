@@ -269,13 +269,14 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 
 	png_write_info(png_ptr, info_ptr);
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		unsigned char *pixels = new unsigned char[UI.Minimap.W * UI.Minimap.H * 3];
 		if (!pixels) {
 			fprintf(stderr, "Out of memory\n");
 			exit(1);
 		}
-#ifndef USE_GLES
+#ifdef USE_OPENGL
 		glReadBuffer(GL_FRONT);
 #endif
 		glReadPixels(UI.Minimap.X, UI.Minimap.Y, UI.Minimap.W, UI.Minimap.H, GL_RGB, GL_UNSIGNED_BYTE, pixels);
@@ -283,7 +284,9 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 			png_write_row(png_ptr, pixels + (UI.Minimap.H - 1 - i) * UI.Minimap.W * 3);
 		}
 		delete[] pixels;
-	} else {
+	} else
+#endif
+	{
 		unsigned char *row = new unsigned char[UI.Minimap.W * 3];
 		const SDL_PixelFormat *fmt = MinimapSurface->format;
 		SDL_Surface *preview = SDL_CreateRGBSurface(SDL_SWSURFACE,

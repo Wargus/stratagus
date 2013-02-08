@@ -28,6 +28,8 @@
 //      02111-1307, USA.
 //
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
+
 //@{
 
 /*----------------------------------------------------------------------------
@@ -178,6 +180,7 @@ void DrawTexture(const CGraphic *g, GLuint *textures,
 			Assert(texture >= 0 && texture < g->NumTextures);
 
 			glBindTexture(GL_TEXTURE_2D, textures[texture]);
+
 #ifdef USE_GLES
 			float texCoord[] = {
 				clip_tx_beg, clip_ty_beg,
@@ -202,7 +205,9 @@ void DrawTexture(const CGraphic *g, GLuint *textures,
 
 			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 			glDisableClientState(GL_VERTEX_ARRAY);
-#else
+#endif
+
+#ifdef USE_OPENGL
 			glBegin(GL_QUADS);
 			glTexCoord2f(clip_tx_beg, clip_ty_beg);
 			glVertex2i(clip_sx_beg, clip_sy_beg);
@@ -214,8 +219,11 @@ void DrawTexture(const CGraphic *g, GLuint *textures,
 			glVertex2i(clip_sx_end, clip_sy_beg);
 			glEnd();
 #endif
+
 		}
 	}
 }
 
 //@}
+
+#endif

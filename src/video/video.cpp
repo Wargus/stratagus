@@ -165,8 +165,10 @@ extern void SdlUnlockScreen();      /// Do SDL hardware unlock
 CVideo Video;
 /*static*/ CColorCycling *CColorCycling::s_instance = NULL;
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
 char ForceUseOpenGL;
 bool UseOpenGL;                      /// Use OpenGL
+#endif
 
 char VideoForceFullScreen;           /// fullscreen set from commandline
 
@@ -277,18 +279,22 @@ void CVideo::ClearScreen()
 bool CVideo::ResizeScreen(int w, int h)
 {
 	if (VideoValidResolution(w, h)) {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 		if (UseOpenGL) {
 			FreeOpenGLGraphics();
 			FreeOpenGLFonts();
 			UI.Minimap.FreeOpenGL();
 		}
+#endif
 		Width = w;
 		Height = h;
 		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
 		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
+#if defined(USE_OPENGL) || defined(USE_GLES)
 		if (UseOpenGL) {
 			ReloadOpenGL();
 		}
+#endif
 		return true;
 	}
 	return false;

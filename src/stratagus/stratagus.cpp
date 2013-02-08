@@ -440,8 +440,10 @@ static void Usage()
 		"\t-L lag\t\tNetwork lag in # frames (default 10 = 333ms)\n"
 		"\t-n server\tNetwork server host preset\n"
 		"\t-N name\t\tName of the player\n"
+#if defined(USE_OPENGL) || defined(USE_GLES)
 		"\t-o\t\tDo not use OpenGL or OpenGL ES 1.1\n"
 		"\t-O\t\tUse OpenGL or OpenGL ES 1.1\n"
+#endif
 		"\t-P port\t\tNetwork port to use\n"
 		"\t-s sleep\tNumber of frames for the AI to sleep before it starts\n"
 		"\t-S speed\tSync speed (100 = 30 frames/s)\n"
@@ -543,6 +545,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 			case 'N':
 				parameters.LocalPlayerName = optarg;
 				continue;
+#if defined(USE_OPENGL) || defined(USE_GLES)
 			case 'o':
 				ForceUseOpenGL = 1;
 				UseOpenGL = 0;
@@ -551,6 +554,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				ForceUseOpenGL = 1;
 				UseOpenGL = 1;
 				continue;
+#endif
 			case 'P':
 				NetworkPort = atoi(optarg);
 				continue;

@@ -899,6 +899,9 @@ void InitLineDraw()
 }
 
 }
+
+#if defined(USE_OPENGL) || defined(USE_GLES)
+
 namespace linedraw_gl
 {
 
@@ -927,7 +930,8 @@ void DrawPixel(Uint32 color, int x, int y)
 	glDrawArrays(GL_POINTS, 0, 1);
 
 	glDisableClientState(GL_VERTEX_ARRAY);
-#else
+#endif
+#ifdef USE_OPENGL
 	glBegin(GL_POINTS);
 	glVertex2i(x, y);
 	glEnd();
@@ -1011,7 +1015,8 @@ void DrawHLine(Uint32 color, int x, int y, int width)
 	glDrawArrays(GL_LINES, 0, 2);
 
 	glDisableClientState(GL_VERTEX_ARRAY);
-#else
+#endif
+#ifdef USE_OPENGL
 	glBegin(GL_LINES);
 	glVertex2i(x, y);
 	glVertex2i(x + width, y);
@@ -1113,7 +1118,8 @@ void DrawVLine(Uint32 color, int x, int y, int height)
 	glDrawArrays(GL_LINES, 0, 2);
 
 	glDisableClientState(GL_VERTEX_ARRAY);
-#else
+#endif
+#ifdef USE_OPENGL
 	glBegin(GL_LINES);
 	glVertex2i(x, y);
 	glVertex2i(x, y + height);
@@ -1232,7 +1238,8 @@ void DrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 	glDrawArrays(GL_LINES, 0, 2);
 
 	glDisableClientState(GL_VERTEX_ARRAY);
-#else
+#endif
+#ifdef USE_OPENGL
 	glBegin(GL_LINES);
 	glVertex2f(xx1, yy1);
 	glVertex2f(xx2, yy2);
@@ -1406,7 +1413,8 @@ void DrawRectangle(Uint32 color, int x, int y, int w, int h)
 	glDrawArrays(GL_LINES, 0, 8);
 
 	glDisableClientState(GL_VERTEX_ARRAY);
-#else
+#endif
+#ifdef USE_OPENGL
 	glBegin(GL_LINES);
 	glVertex2i(x, y);
 	glVertex2i(x + w, y);
@@ -1577,7 +1585,8 @@ void FillRectangle(Uint32 color, int x, int y,
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 	glDisableClientState(GL_VERTEX_ARRAY);
-#else
+#endif
+#ifdef USE_OPENGL
 	glBegin(GL_TRIANGLE_STRIP);
 	glVertex2i(x, y);
 	glVertex2i(x + w, y);
@@ -1912,259 +1921,354 @@ void InitLineDraw()
 
 }
 
+#endif
+
 void CVideo::DrawPixelClip(Uint32 color, int x, int y)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawPixelClip(color, x, y);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawPixelClip(color, x, y);
 	}
 }
 void CVideo::DrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawTransPixelClip(color, x, y, alpha);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawTransPixelClip(color, x, y, alpha);
 	}
 }
 
 void CVideo::DrawVLine(Uint32 color, int x, int y, int height)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawVLine(color, x, y, height);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawVLine(color, x, y, height);
 	}
 }
 void CVideo::DrawTransVLine(Uint32 color, int x, int y, int height, unsigned char alpha)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawTransVLine(color, x, y, height, alpha);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawTransVLine(color, x, y, height, alpha);
 	}
 }
 void CVideo::DrawVLineClip(Uint32 color, int x, int y, int height)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawVLineClip(color, x, y, height);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawVLineClip(color, x, y, height);
 	}
 }
 void CVideo::DrawTransVLineClip(Uint32 color, int x, int y, int height, unsigned char alpha)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawTransVLineClip(color, x, y, height, alpha);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawTransVLineClip(color, x, y, height, alpha);
 	}
 }
 
 void CVideo::DrawHLine(Uint32 color, int x, int y, int width)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawHLine(color, x, y, width);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawHLine(color, x, y, width);
 	}
 }
 void CVideo::DrawTransHLine(Uint32 color, int x, int y, int width, unsigned char alpha)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawTransHLine(color, x, y, width, alpha);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawTransHLine(color, x, y, width, alpha);
 	}
 }
 void CVideo::DrawHLineClip(Uint32 color, int x, int y, int width)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawHLineClip(color, x, y, width);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawHLineClip(color, x, y, width);
 	}
 }
 void CVideo::DrawTransHLineClip(Uint32 color, int x, int y, int width, unsigned char alpha)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawTransHLineClip(color, x, y, width, alpha);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawTransHLineClip(color, x, y, width, alpha);
 	}
 }
 
 void CVideo::DrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawLine(color, sx, sy, dx, dy);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawLine(color, sx, sy, dx, dy);
 	}
 }
 void CVideo::DrawTransLine(Uint32 color, int sx, int sy, int dx, int dy, unsigned char alpha)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawTransLine(color, sx, sy, dx, dy, alpha);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawTransLine(color, sx, sy, dx, dy, alpha);
 	}
 }
 void CVideo::DrawLineClip(Uint32 color, const PixelPos &pos1, const PixelPos &pos2)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawLineClip(color, pos1.x, pos1.y, pos2.x, pos2.y);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawLineClip(color, pos1.x, pos1.y, pos2.x, pos2.y);
 	}
 }
 void CVideo::DrawTransLineClip(Uint32 color, int sx, int sy, int dx, int dy, unsigned char alpha)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawTransLineClip(color, sx, sy, dx, dy, alpha);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawTransLineClip(color, sx, sy, dx, dy, alpha);
 	}
 }
 
 void CVideo::DrawRectangle(Uint32 color, int x, int y, int w, int h)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawRectangle(color, x, y, w, h);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawRectangle(color, x, y, w, h);
 	}
 }
 void CVideo::DrawTransRectangle(Uint32 color, int x, int y, int w, int h, unsigned char alpha)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawTransRectangle(color, x, y, w, h, alpha);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawTransRectangle(color, x, y, w, h, alpha);
 	}
 }
 void CVideo::DrawRectangleClip(Uint32 color, int x, int y, int w, int h)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawRectangleClip(color, x, y, w, h);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawRectangleClip(color, x, y, w, h);
 	}
 }
 void CVideo::DrawTransRectangleClip(Uint32 color, int x, int y, int w, int h, unsigned char alpha)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawTransRectangleClip(color, x, y, w, h, alpha);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawTransRectangleClip(color, x, y, w, h, alpha);
 	}
 }
 
 void CVideo::FillRectangle(Uint32 color, int x, int y, int w, int h)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::FillRectangle(color, x, y, w, h);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::FillRectangle(color, x, y, w, h);
 	}
 }
 void CVideo::FillTransRectangle(Uint32 color, int x, int y, int w, int h, unsigned char alpha)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::FillTransRectangle(color, x, y, w, h, alpha);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::FillTransRectangle(color, x, y, w, h, alpha);
 	}
 }
 void CVideo::FillRectangleClip(Uint32 color, int x, int y, int w, int h)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::FillRectangleClip(color, x, y, w, h);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::FillRectangleClip(color, x, y, w, h);
 	}
 }
 void CVideo::FillTransRectangleClip(Uint32 color, int x, int y, int w, int h, unsigned char alpha)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::FillTransRectangleClip(color, x, y, w, h, alpha);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::FillTransRectangleClip(color, x, y, w, h, alpha);
 	}
 }
 
 void CVideo::DrawCircle(Uint32 color, int x, int y, int r)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawCircle(color, x, y, r);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawCircle(color, x, y, r);
 	}
 }
 void CVideo::DrawTransCircle(Uint32 color, int x, int y, int r, unsigned char alpha)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawTransCircle(color, x, y, r, alpha);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawTransCircle(color, x, y, r, alpha);
 	}
 }
 void CVideo::DrawCircleClip(Uint32 color, int x, int y, int r)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawCircleClip(color, x, y, r);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawCircleClip(color, x, y, r);
 	}
 }
 void CVideo::DrawTransCircleClip(Uint32 color, int x, int y, int r, unsigned char alpha)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::DrawTransCircleClip(color, x, y, r, alpha);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::DrawTransCircleClip(color, x, y, r, alpha);
 	}
 }
 
 void CVideo::FillCircle(Uint32 color, int x, int y, int r)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::FillCircle(color, x, y, r);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::FillCircle(color, x, y, r);
 	}
 }
 void CVideo::FillTransCircle(Uint32 color, int x, int y, int r, unsigned char alpha)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::FillTransCircle(color, x, y, r, alpha);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::FillTransCircle(color, x, y, r, alpha);
 	}
 }
 void CVideo::FillCircleClip(Uint32 color, const PixelPos &screenPos, int r)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::FillCircleClip(color, screenPos.x, screenPos.y, r);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::FillCircleClip(color, screenPos.x, screenPos.y, r);
 	}
 }
 void CVideo::FillTransCircleClip(Uint32 color, int x, int y, int r, unsigned char alpha)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::FillTransCircleClip(color, x, y, r, alpha);
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::FillTransCircleClip(color, x, y, r, alpha);
 	}
 }
 
 void InitLineDraw()
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		linedraw_gl::InitLineDraw();
-	} else {
+	} else
+#endif
+	{
 		linedraw_sdl::InitLineDraw();
 	}
 }

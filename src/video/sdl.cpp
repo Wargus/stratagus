@@ -57,7 +57,9 @@
 #ifdef USE_GLES
 #include "SDL_gles.h"
 #include "GLES/gl.h"
-#else
+#endif
+
+#ifdef USE_OPENGL
 #include "SDL_opengl.h"
 #endif
 
@@ -101,10 +103,13 @@ SDL_Surface *TheScreen; /// Internal screen
 
 static SDL_Rect Rects[100];
 static int NumRects;
+
+#if defined(USE_OPENGL) || defined(USE_GLES)
 GLint GLMaxTextureSize = 256;   /// Max texture size supported on the video card
 GLint GLMaxTextureSizeOverride;     /// User-specified limit for ::GLMaxTextureSize
 bool GLTextureCompressionSupported; /// Is OpenGL texture compression supported
 bool UseGLTextureCompression;       /// Use OpenGL texture compression
+#endif
 
 static std::map<int, std::string> Key2Str;
 static std::map<std::string, int> Str2Key;
@@ -123,7 +128,7 @@ bool IsSDLWindowVisible = true;
 ----------------------------------------------------------------------------*/
 
 // ARB_texture_compression
-#ifndef USE_GLES
+#ifdef USE_OPENGL
 PFNGLCOMPRESSEDTEXIMAGE3DARBPROC    glCompressedTexImage3DARB;
 PFNGLCOMPRESSEDTEXIMAGE2DARBPROC    glCompressedTexImage2DARB;
 PFNGLCOMPRESSEDTEXIMAGE1DARBPROC    glCompressedTexImage1DARB;
@@ -167,7 +172,7 @@ void SetVideoSync()
 --  Video
 ----------------------------------------------------------------------------*/
 
-#ifndef USE_GLES
+#ifdef USE_OPENGL
 /**
 **  Check if an extension is supported
 */
@@ -205,13 +210,15 @@ static bool IsExtensionSupported(const char *extension)
 }
 #endif
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
+
 /**
 **  Initialize OpenGL extensions
 */
 static void InitOpenGLExtensions()
 {
 	// ARB_texture_compression
-#ifndef USE_GLES
+#ifdef USE_OPENGL
 	if (IsExtensionSupported("GL_ARB_texture_compression")) {
 		glCompressedTexImage3DARB =
 			(PFNGLCOMPRESSEDTEXIMAGE3DARBPROC)(uintptr_t)SDL_GL_GetProcAddress("glCompressedTexImage3DARB");
@@ -254,21 +261,23 @@ static void InitOpenGL()
 
 	glViewport(0, 0, (GLsizei)Video.Width, (GLsizei)Video.Height);
 
-#ifndef USE_GLES
+#ifdef USE_OPENGL
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 #endif
 
 #ifdef USE_GLES
 	glOrthof(0.0f, (GLfloat)Video.Width, (GLfloat)Video.Height, 0.0f, -1.0f, 1.0f);
-#else
+#endif
+
+#ifdef USE_OPENGL
 	glOrtho(0, Video.Width, Video.Height, 0, -1, 1);
 #endif
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-#ifndef USE_GLES
+#ifdef USE_OPENGL
 	glTranslatef(0.375, 0.375, 0.);
 #endif
 
@@ -276,7 +285,9 @@ static void InitOpenGL()
 
 #ifdef USE_GLES
 	glClearDepthf(1.0f);
-#else
+#endif
+
+#ifdef USE_OPENGL
 	glClearDepth(1.0f);
 #endif
 
@@ -314,6 +325,8 @@ void ReloadOpenGL()
 	ReloadFonts();
 	UI.Minimap.Reload();
 }
+
+#endif
 
 #if defined(DEBUG) && !defined(USE_WIN32)
 static void CleanExit(int)
@@ -474,9 +487,12 @@ void InitVideoSdl()
 		}
 
 #if ! defined(USE_WIN32) && ! defined(USE_MAEMO)
+
+#if defined(USE_OPENGL) || defined(USE_GLES)
 		// Make sure, that we not create OpenGL textures (and do not call OpenGL functions), when creating icon surface
 		bool UseOpenGL_orig = UseOpenGL;
 		UseOpenGL = false;
+#endif
 
 		SDL_Surface *icon = NULL;
 		CGraphic *g = NULL;
@@ -525,7 +541,10 @@ void InitVideoSdl()
 			CGraphic::Free(g);
 		}
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
 		UseOpenGL = UseOpenGL_orig;
+#endif
+
 #endif
 #ifdef USE_WIN32
 		HWND hwnd = NULL;
@@ -568,6 +587,8 @@ void InitVideoSdl()
 	if (Video.FullScreen) {
 		flags |= SDL_FULLSCREEN;
 	}
+
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 #ifdef USE_GLES
 		if (SDL_GLES_Init(SDL_GLES_VERSION_1_1) < 0) {
@@ -579,10 +600,12 @@ void InitVideoSdl()
 		atexit(SDL_GLES_Quit);
 
 		flags |= SDL_SWSURFACE;
-#else
+#endif
+#ifdef USE_OPENGL
 		flags |= SDL_OPENGL;
 #endif
 	}
+#endif
 
 	if (!Video.Width || !Video.Height) {
 		Video.Width = 640;
@@ -614,6 +637,7 @@ void InitVideoSdl()
 	// Make default character translation easier
 	SDL_EnableUNICODE(1);
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 #ifdef USE_GLES
 		SDL_GLES_Context *context = SDL_GLES_CreateContext();
@@ -629,6 +653,7 @@ void InitVideoSdl()
 #endif
 		InitOpenGL();
 	}
+#endif
 
 	InitKey2Str();
 
@@ -671,7 +696,10 @@ int VideoValidResolution(int w, int h)
 */
 void InvalidateArea(int x, int y, int w, int h)
 {
-	if (!UseOpenGL) {
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (!UseOpenGL)
+#endif
+	{
 		Assert(NumRects != sizeof(Rects) / sizeof(*Rects));
 		Assert(x >= 0 && y >= 0 && x + w <= Video.Width && y + h <= Video.Height);
 		Rects[NumRects].x = x;
@@ -687,7 +715,10 @@ void InvalidateArea(int x, int y, int w, int h)
 */
 void Invalidate()
 {
-	if (!UseOpenGL) {
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (!UseOpenGL)
+#endif
+	{
 		Rects[0].x = 0;
 		Rects[0].y = 0;
 		Rects[0].w = Video.Width;
@@ -920,14 +951,18 @@ void WaitEventsOneFrame()
 */
 void RealizeVideoMemory()
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 #ifdef USE_GLES
 		SDL_GLES_SwapBuffers();
-#else
+#endif
+#ifdef USE_OPENGL
 		SDL_GL_SwapBuffers();
 #endif
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	} else {
+	} else
+#endif
+	{
 		if (NumRects) {
 			SDL_UpdateRects(TheScreen, NumRects, Rects);
 			NumRects = 0;
@@ -941,7 +976,10 @@ void RealizeVideoMemory()
 */
 void SdlLockScreen()
 {
-	if (!UseOpenGL) {
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (!UseOpenGL)
+#endif
+	{
 		if (SDL_MUSTLOCK(TheScreen)) {
 			SDL_LockSurface(TheScreen);
 		}
@@ -953,7 +991,10 @@ void SdlLockScreen()
 */
 void SdlUnlockScreen()
 {
-	if (!UseOpenGL) {
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (!UseOpenGL)
+#endif
+	{
 		if (SDL_MUSTLOCK(TheScreen)) {
 			SDL_UnlockSurface(TheScreen);
 		}
@@ -1052,7 +1093,10 @@ void ToggleFullScreen()
 	// save the contents of the screen.
 	framesize = w * h * TheScreen->format->BytesPerPixel;
 
-	if (!UseOpenGL) {
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (!UseOpenGL)
+#endif
+	{
 		if (!(pixels = new unsigned char[framesize])) { // out of memory
 			return;
 		}
@@ -1075,7 +1119,10 @@ void ToggleFullScreen()
 	if (!TheScreen) {
 		TheScreen = SDL_SetVideoMode(w, h, bpp, flags);
 		if (!TheScreen) { // completely screwed.
-			if (!UseOpenGL) {
+#if defined(USE_OPENGL) || defined(USE_GLES)
+			if (!UseOpenGL)
+#endif
+			{
 				delete[] pixels;
 				delete[] palette;
 			}
@@ -1089,9 +1136,12 @@ void ToggleFullScreen()
 	SDL_ShowCursor(SDL_ENABLE);
 	SDL_ShowCursor(SDL_DISABLE);
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		ReloadOpenGL();
-	} else {
+	} else
+#endif
+	{
 		SDL_LockSurface(TheScreen);
 		memcpy(TheScreen->pixels, pixels, framesize);
 		delete[] pixels;

@@ -5,8 +5,6 @@ void InitVideo();
 extern int PlayMovie(const std::string name);
 extern void ShowFullImage(const std::string name, unsigned int timeOutInSecond);
 
-extern bool UseOpenGL;
-
 class CVideo
 {
 public:

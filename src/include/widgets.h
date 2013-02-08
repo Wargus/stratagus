@@ -52,6 +52,7 @@ public:
 	virtual ~LuaActionListener();
 };
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
 class MyOpenGLGraphics : public gcn::Graphics
 {
 public:
@@ -72,6 +73,7 @@ public:
 private:
 	gcn::Color mColor;
 };
+#endif
 
 class ImageWidget : public gcn::Icon
 {

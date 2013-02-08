@@ -181,21 +181,25 @@ static int CclSetDamageMissile(lua_State *l)
 static int CclSetMaxOpenGLTexture(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (CclInConfigFile) {
 		GLMaxTextureSizeOverride = LuaToNumber(l, 1);
 	}
+#endif
 	return 0;
 }
 
 static int CclSetUseOpenGL(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (CclInConfigFile) {
 		// May have been set from the command line
 		if (!ForceUseOpenGL) {
 			UseOpenGL = LuaToBoolean(l, 1);
 		}
 	}
+#endif
 	return 0;
 }
 

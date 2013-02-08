@@ -102,6 +102,7 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 
 	Mng *mng = (Mng *)mng_get_userdata(handle);
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		unsigned w;
 		unsigned h;
@@ -119,6 +120,7 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	}
+#endif
 
 	// Allocate the SDL surface to hold the image
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
@@ -164,11 +166,13 @@ static mng_bool MNG_DECL my_refresh(mng_handle handle, mng_uint32, mng_uint32,
 		memcpy((char *)mng->surface->pixels + i * mng->surface->pitch,
 			   mng->buffer + i * mng->surface->w * 3, mng->surface->w * 3);
 	}
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		glBindTexture(GL_TEXTURE_2D, mng->texture_name);
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mng->surface->w, mng->surface->h,
 						GL_RGB, GL_UNSIGNED_BYTE, mng->surface->pixels);
 	}
+#endif
 	SDL_UnlockSurface(mng->surface);
 
 	return MNG_TRUE;
@@ -218,9 +222,11 @@ Mng::Mng() :
 	name(NULL), fd(NULL), handle(NULL), surface(NULL), buffer(NULL),
 	ticks(0), iteration(0)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		texture_width = texture_height = texture_name = 0;
 	}
+#endif
 }
 
 
@@ -234,9 +240,11 @@ Mng::~Mng()
 		SDL_FreeSurface(surface);
 	}
 	delete[] buffer;
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL && texture_width) {
 		glDeleteTextures(1, &texture_name);
 	}
+#endif
 }
 
 
@@ -252,10 +260,8 @@ void Mng::Draw(int x, int y)
 		mng_display_resume(handle);
 	}
 
-	if (!UseOpenGL) {
-		SDL_Rect rect = {x, y, surface->w, surface->h};
-		SDL_BlitSurface(surface, NULL, TheScreen, &rect);
-	} else {
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
 		GLint sx = x;
 		GLint ex = sx + surface->w;
 		GLint sy = y;
@@ -285,7 +291,8 @@ void Mng::Draw(int x, int y)
 
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);
-#else
+#endif
+#ifdef USE_OPENGL
 		glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 0.0f);
 		glVertex2i(sx, sy);
@@ -297,6 +304,11 @@ void Mng::Draw(int x, int y)
 		glVertex2i(ex, sy);
 		glEnd();
 #endif
+	} else
+#endif
+	{
+		SDL_Rect rect = {x, y, surface->w, surface->h};
+		SDL_BlitSurface(surface, NULL, TheScreen, &rect);
 	}
 }
 

@@ -436,7 +436,13 @@ void UpdateFogOfWarChange()
 */
 void VideoDrawOnlyFog(int x, int y)
 {
-	if (!UseOpenGL) {
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+		Video.FillRectangleClip(Video.MapRGBA(0, 0, 0, 0, FogOfWarOpacity),
+								x, y, PixelTileSize.x, PixelTileSize.y);
+	} else
+#endif
+	{
 		int oldx;
 		int oldy;
 		SDL_Rect srect;
@@ -457,9 +463,6 @@ void VideoDrawOnlyFog(int x, int y)
 		drect.y = y;
 
 		SDL_BlitSurface(OnlyFogSurface, &srect, TheScreen, &drect);
-	} else {
-		Video.FillRectangleClip(Video.MapRGBA(0, 0, 0, 0, FogOfWarOpacity),
-								x, y, PixelTileSize.x, PixelTileSize.y);
 	}
 }
 
@@ -603,9 +606,12 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 
 	if (IsMapFieldVisibleTable(sx) || ReplayRevealMap) {
 		if (fogTile && fogTile != blackFogTile) {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 			if (UseOpenGL) {
 				Map.FogGraphic->DrawFrameClipTrans(fogTile, dx, dy, FogOfWarOpacity);
-			} else {
+			} else
+#endif
+			{
 				AlphaFogG->DrawFrameClip(fogTile, dx, dy);
 			}
 		}
@@ -681,7 +687,10 @@ void CMap::InitFogOfWar()
 
 	FogGraphic->Load();
 
-	if (!UseOpenGL) {
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (!UseOpenGL)
+#endif
+	{
 		//
 		// Generate Only Fog surface.
 		//
@@ -760,7 +769,10 @@ void CMap::CleanFogOfWar()
 	CGraphic::Free(Map.FogGraphic);
 	FogGraphic = NULL;
 
-	if (!UseOpenGL) {
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (!UseOpenGL)
+#endif
+	{
 		if (OnlyFogSurface) {
 			VideoPaletteListRemove(OnlyFogSurface);
 			SDL_FreeSurface(OnlyFogSurface);

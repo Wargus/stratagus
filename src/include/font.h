@@ -96,7 +96,9 @@ public:
 
 	void Load();
 	void Reload() const;
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	void FreeOpenGL();
+#endif
 	void Clean();
 
 	CGraphic *GetFontColorGraphic(const CFontColor &fontColor) const;
@@ -107,7 +109,9 @@ public:
 	void DynamicLoad() const;
 
 private:
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	void MakeFontColorTextures() const;
+#endif
 	void MeasureWidths();
 
 private:
@@ -172,10 +176,14 @@ extern int GetHotKey(const std::string &text);
 
 /// Load and initialize the fonts
 extern void LoadFonts();
+
+#if defined(USE_OPENGL) || defined(USE_GLES)
 /// Free OpenGL fonts
 extern void FreeOpenGLFonts();
 /// Reload OpenGL fonts
 extern void ReloadFonts();
+#endif
+
 /// Cleanup the font module
 extern void CleanFonts();
 
