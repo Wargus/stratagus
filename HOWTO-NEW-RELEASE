@@ -46,16 +46,14 @@ Create maemo dsc package:
 Create win32 installer + sign:
  rm -rf build && mkdir build && cd build
  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/path/to/win32/toolchain/file -DENABLE_STATIC=ON -DENABLE_NSIS=ON -DENABLE_UPX=ON -DENABLE_STRIP=ON ..
- g++ ../tools/genversion.cpp -o genversion
  make && mv Stratagus-*.exe ../../ && cd ..
  gpg --armor --sign --detach-sig ../Stratagus-*.exe
 
 Create win64 installer + sign:
  rm -rf build && mkdir build && cd build
  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/path/to/win64/toolchain/file -DENABLE_STATIC=ON -DENABLE_NSIS=ON -DENABLE_STRIP=ON ..
- g++ ../tools/genversion.cpp -o genversion
  make && mv Stratagus-*-x86_64.exe ../../ && cd ..
- gpg --armor --sign --detach-sig Stratagus-*-x86_64.exe
+ gpg --armor --sign --detach-sig ../Stratagus-*-x86_64.exe
 
 Create new version on launchpad:
  via web interface on https://launchpad.net/stratagus/trunk/+addrelease
