@@ -26,14 +26,11 @@ if(SDLGLES_TYPE)
 else()
 	if (NOT SDLGLES_FOUND)
 		# Check for Native support
-		include(CMakePushCheckState)
 		include(CheckTypeSize)
 
-		cmake_push_check_state()
 		set(CMAKE_REQUIRED_INCLUDES SDL include/SDL)
 		set(CMAKE_EXTRA_INCLUDE_FILES SDL_video.h)
 		check_type_size(SDL_OPENGLES, SDLGLES_NATIVE)
-		cmake_pop_check_state()
 
 		if(HAVE_SDLGLES_NATIVE)
 			set(SDLGLES_FOUND true)
