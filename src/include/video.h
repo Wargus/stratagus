@@ -36,7 +36,6 @@
 #include "SDL.h"
 
 #ifdef USE_GLES
-#include "SDL_gles.h"
 #include "GLES/gl.h"
 #endif
 

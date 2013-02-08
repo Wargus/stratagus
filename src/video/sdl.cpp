@@ -53,9 +53,17 @@
 #endif
 
 #include "SDL.h"
+#include "SDL_syswm.h"
+
+#ifdef USE_GLES_MAEMO
+#include "SDL_gles.h"
+#endif
+
+#ifdef USE_GLES_EGL
+#include "EGL/egl.h"
+#endif
 
 #ifdef USE_GLES
-#include "SDL_gles.h"
 #include "GLES/gl.h"
 #endif
 
@@ -69,7 +77,6 @@
 
 #ifdef USE_WIN32
 #include "net_lowlevel.h"
-#include "SDL_syswm.h"
 #include <shellapi.h>
 #endif
 
@@ -98,6 +105,11 @@
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
+
+#ifdef USE_GLES_EGL
+static EGLDisplay eglDisplay;
+static EGLSurface eglSurface;
+#endif
 
 SDL_Surface *TheScreen; /// Internal screen
 
@@ -590,7 +602,10 @@ void InitVideoSdl()
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
-#ifdef USE_GLES
+#ifdef USE_GLES_NATIVE
+		flags |= SDL_OPENGLES;
+#endif
+#ifdef USE_GLES_MAEMO
 		if (SDL_GLES_Init(SDL_GLES_VERSION_1_1) < 0) {
 			fprintf(stderr, "Couldn't initialize SDL_GLES: %s\n", SDL_GetError());
 			exit(1);
@@ -639,7 +654,7 @@ void InitVideoSdl()
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
-#ifdef USE_GLES
+#ifdef USE_GLES_MAEMO
 		SDL_GLES_Context *context = SDL_GLES_CreateContext();
 		if (!context) {
 			fprintf(stderr, "Couldn't initialize SDL_GLES_CreateContext: %s\n", SDL_GetError());
@@ -650,6 +665,55 @@ void InitVideoSdl()
 			exit(1);
 		}
 		// atexit(GLES_DeleteContext(context));
+#endif
+#ifdef USE_GLES_EGL
+		// Get the SDL window handle
+		SDL_SysWMinfo sysInfo; //Will hold our Window information
+		SDL_VERSION(&sysInfo.version); //Set SDL version
+		if(SDL_GetWMInfo(&sysInfo) <= 0) {
+			fprintf(stderr, "Unable to get window handle\n");
+			exit(1);
+		}
+
+		eglDisplay = eglGetDisplay((EGLNativeDisplayType)sysInfo.info.x11.display);
+		if (!eglDisplay) {
+			fprintf(stderr, "Couldn't open EGL Display\n");
+			exit(1);
+		}
+
+		if (!eglInitialize(eglDisplay, NULL, NULL)) {
+			fprintf(stderr, "Couldn't initialize EGL Display\n");
+			exit(1);
+		}
+
+		// Find a matching config
+		EGLint configAttribs[] = {EGL_SURFACE_TYPE, EGL_WINDOW_BIT, EGL_NONE};
+		EGLint numConfigsOut = 0;
+		EGLConfig eglConfig;
+		if (eglChooseConfig(eglDisplay, configAttribs, &eglConfig, 1, &numConfigsOut) != EGL_TRUE || numConfigsOut == 0) {
+			fprintf(stderr, "Unable to find appropriate EGL config\n");
+			exit(1);
+		}
+
+		eglSurface = eglCreateWindowSurface(eglDisplay, eglConfig, (EGLNativeWindowType)sysInfo.info.x11.window, 0);
+		if (eglSurface == EGL_NO_SURFACE) {
+			fprintf(stderr, "Unable to create EGL surface\n");
+			exit(1);
+		}
+
+		// Bind GLES and create the context
+		eglBindAPI(EGL_OPENGL_ES_API);
+		EGLint contextParams[] = {EGL_CONTEXT_CLIENT_VERSION, 1, EGL_NONE};
+		EGLContext eglContext = eglCreateContext(eglDisplay, eglConfig, NULL, NULL);
+		if (eglContext == EGL_NO_CONTEXT) {
+			fprintf(stderr, "Unable to create GLES context\n");
+			exit(1);
+		}
+
+		if (eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext) == EGL_FALSE) {
+			fprintf(stderr, "Unable to make GLES context current\n");
+			exit(1);
+		}
 #endif
 		InitOpenGL();
 	}
@@ -953,10 +1017,13 @@ void RealizeVideoMemory()
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
-#ifdef USE_GLES
+#ifdef USE_GLES_MAEMO
 		SDL_GLES_SwapBuffers();
 #endif
-#ifdef USE_OPENGL
+#ifdef USE_GLES_EGL
+		eglSwapBuffers(eglDisplay, eglSurface);
+#endif
+#if defined(USE_OPENGL) || defined(USE_GLES_NATIVE)
 		SDL_GL_SwapBuffers();
 #endif
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
