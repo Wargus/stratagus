@@ -50,6 +50,7 @@
 #include "menus.h"
 #include "minimap.h"
 #include "network.h"
+#include "parameters.h"
 #include "replay.h"
 #include "script.h"
 #include "settings.h"

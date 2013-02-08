@@ -283,6 +283,7 @@ set(stratagusmain_SRCS
 	src/stratagus/iolib.cpp
 	src/stratagus/luacallback.cpp
 	src/stratagus/mainloop.cpp
+	src/stratagus/parameters.cpp
 	src/stratagus/player.cpp
 	src/stratagus/script.cpp
 	src/stratagus/script_player.cpp
@@ -530,6 +531,7 @@ set(stratagus_generic_HDRS
 	src/include/netconnect.h
 	src/include/net_lowlevel.h
 	src/include/network.h
+	src/include/parameters.h
 	src/include/particle.h
 	src/include/pathfinder.h
 	src/include/player.h

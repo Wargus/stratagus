@@ -44,6 +44,7 @@
 #include "iocompat.h"
 #include "iolib.h"
 #include "map.h"
+#include "parameters.h"
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"

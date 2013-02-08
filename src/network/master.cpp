@@ -49,6 +49,7 @@
 #include "netconnect.h"
 #include "network.h"
 #include "net_lowlevel.h"
+#include "parameters.h"
 #include "script.h"
 #include "version.h"
 

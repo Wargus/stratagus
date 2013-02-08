@@ -43,6 +43,7 @@
 #include "iolib.h"
 #include "map.h"
 #include "missile.h"
+#include "parameters.h"
 #include "player.h"
 #include "replay.h"
 #include "spells.h"

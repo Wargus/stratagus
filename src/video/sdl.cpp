@@ -81,6 +81,7 @@
 #include "interface.h"
 #include "minimap.h"
 #include "network.h"
+#include "parameters.h"
 #include "sound.h"
 #include "sound_server.h"
 #include "translate.h"

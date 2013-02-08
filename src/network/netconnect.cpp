@@ -42,6 +42,7 @@
 #include "master.h"
 #include "net_lowlevel.h"
 #include "network.h"
+#include "parameters.h"
 #include "player.h"
 #include "script.h"
 #include "settings.h"

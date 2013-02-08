@@ -481,3 +481,31 @@ int UTF8GetNext(const std::string &text, int curpos)
 	return text.size();
 }
 
+
+/*----------------------------------------------------------------------------
+--  others
+----------------------------------------------------------------------------*/
+
+void PrintLocation(const char *file, int line, const char *funcName)
+{
+	fprintf(stdout, "%s:%d: %s: ", file, line, funcName);
+}
+
+#ifdef DEBUG
+
+void AbortAt(const char *file, int line, const char *funcName, const char *conditionStr)
+{
+	fprintf(stderr, "Assertion failed at %s:%d: %s: %s\n", file, line, funcName, conditionStr);
+	abort();
+}
+
+void PrintOnStdOut(const char *format, ...)
+{
+	va_list valist;
+	va_start(valist, format);
+	vprintf(format, valist);
+	va_end(valist);
+}
+
+#endif
+

@@ -189,6 +189,7 @@ extern void beos_init(int argc, char **argv);
 #include "map.h"
 #include "netconnect.h"
 #include "network.h"
+#include "parameters.h"
 #include "player.h"
 #include "replay.h"
 #include "results.h"
@@ -215,38 +216,6 @@ extern void beos_init(int argc, char **argv);
 #define REDIRECT_OUTPUT
 #endif
 
-void Parameters::SetDefaultValues()
-{
-	applicationName = "stratagus";
-	luaStartFilename = "scripts/stratagus.lua";
-	luaEditorStartFilename = "scripts/editor.lua";
-	SetUserDirectory();
-}
-
-void Parameters::SetUserDirectory()
-{
-#ifdef USE_WIN32
-	UserDirectory = getenv("APPDATA");
-#else
-	UserDirectory = getenv("HOME");
-#endif
-
-	if (!UserDirectory.empty()) {
-		UserDirectory += "/";
-	}
-
-#ifdef USE_WIN32
-	UserDirectory += "Stratagus";
-#elif defined(USE_MAC)
-	UserDirectory += "Library/Stratagus";
-#else
-	UserDirectory += ".stratagus";
-#endif
-}
-
-/* static */ Parameters Parameters::Instance;
-
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -262,29 +231,6 @@ std::string MenuRace;
 /*============================================================================
 ==  MAIN
 ============================================================================*/
-
-void PrintLocation(const char *file, int line, const char *funcName)
-{
-	fprintf(stdout, "%s:%d: %s: ", file, line, funcName);
-}
-
-#ifdef DEBUG
-
-void AbortAt(const char *file, int line, const char *funcName, const char *conditionStr)
-{
-	fprintf(stderr, "Assertion failed at %s:%d: %s: %s\n", file, line, funcName, conditionStr);
-	abort();
-}
-
-void PrintOnStdOut(const char *format, ...)
-{
-	va_list valist;
-	va_start(valist, format);
-	vprintf(format, valist);
-	va_end(valist);
-}
-
-#endif
 
 /**
 **  Pre menu setup.
@@ -661,24 +607,6 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 		while ((index = CliMapName.find('\\')) != std::string::npos) {
 			CliMapName[index] = '/';
 		}
-		--argc;
-	}
-}
-
-std::string GetLocalPlayerNameFromEnv()
-{
-	const char *userName = NULL;
-
-#ifdef USE_WIN32
-	userName = getenv("USERNAME");
-#elif !defined(USE_MAEMO)
-	userName = getenv("USER");
-#endif
-
-	if (userName && userName[0]) {
-		return userName;
-	} else {
-		return "Anonymous";
 	}
 }
 
@@ -717,7 +645,7 @@ int main(int argc, char **argv)
 
 	Parameters &parameters = Parameters::Instance;
 	parameters.SetDefaultValues();
-	parameters.LocalPlayerName = GetLocalPlayerNameFromEnv();
+	parameters.SetLocalPlayerNameFromEnv();
 
 	if (argc > 0) {
 		parameters.applicationName = argv[0];

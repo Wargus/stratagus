@@ -41,6 +41,7 @@
 #include "game.h"
 #include "iocompat.h"
 #include "map.h"
+#include "parameters.h"
 #include "util.h"
 
 #include <stdarg.h>

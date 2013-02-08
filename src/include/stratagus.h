@@ -182,27 +182,6 @@ extern const char NameLine[];
 --  stratagus.c
 ----------------------------------------------------------------------------*/
 
-class Parameters
-{
-public:
-	void SetDefaultValues();
-
-	const std::string &GetUserDirectory() { return UserDirectory; }
-
-private:
-	void SetUserDirectory();
-
-public:
-	std::string applicationName;
-	std::string luaStartFilename;
-	std::string luaEditorStartFilename;
-	std::string LocalPlayerName;        /// Name of local player
-private:
-	std::string UserDirectory;          /// Directory containing user settings and data
-public:
-	static Parameters Instance;
-};
-
 extern std::string StratagusLibPath;        /// Location of stratagus data
 extern std::string MenuRace;
 

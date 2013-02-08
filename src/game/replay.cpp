@@ -45,6 +45,7 @@
 #include "map.h"
 #include "netconnect.h"
 #include "network.h"
+#include "parameters.h"
 #include "player.h"
 #include "script.h"
 #include "settings.h"

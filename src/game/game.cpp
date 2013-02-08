@@ -56,6 +56,7 @@
 #include "missile.h"
 #include "netconnect.h"
 #include "network.h"
+#include "parameters.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "replay.h"
