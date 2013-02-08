@@ -62,7 +62,7 @@ else()
 			/usr/include
 		)
 
-		find_library(OPENGLES_GL_LIBRARY NAMES GLES_CM PATHS
+		find_library(OPENGLES_GL_LIBRARY NAMES GLES_CM GLESv1_CM PATHS
 			/usr/openwin/lib
 			/opt/graphics/OpenGL/lib
 			/usr/shlib
@@ -84,7 +84,7 @@ else()
 
 		find_package(X11)
 
-	      	if(X11_FOUND)
+		if(X11_FOUND)
 			set(OPENGLES_LIBRARIES ${OPENGLES_LIBRARIES} ${X11_LIBRARIES})
 		endif()
 
@@ -95,6 +95,8 @@ else()
 		set(OPENGLES_FOUND true)
 		message(STATUS "Found OpenGL ES 1.1 libraries: ${OPENGLES_LIBRARIES}")
 	else()
+		unset(OPENGLES_LIBRARIES)
+		unset(OPENGLES_INCLUDE_DIR)
 		set(OPENGLES_FOUND false)
 		message(STATUS "Could not find OpenGL ES 1.1 libraries")
 	endif()
