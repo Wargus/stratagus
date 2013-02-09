@@ -1029,9 +1029,9 @@ CFontColor::~CFontColor()
 
 void CFont::Clean()
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	CFont *font = this;
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		FontColorGraphicMap &fontColorGraphicMap = FontColorGraphics[font];
 		if (!fontColorGraphicMap.empty()) {

@@ -982,6 +982,8 @@ void CGraphic::UseDisplayFormat()
 	}
 }
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
+
 /**
 **  Find the next power of 2 >= x
 */
@@ -991,8 +993,6 @@ static int PowerOf2(int x)
 	for (i = 1; i < x; i <<= 1) ;
 	return i;
 }
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
 
 /**
 **  Make an OpenGL texture or textures out of a graphic object.
