@@ -187,6 +187,32 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 	return true;
 }
 
+class AutoCastPrioritySort
+{
+public:
+	explicit AutoCastPrioritySort(const CUnit &caster, const int var, const bool reverse) :
+		caster(caster), variable(var), reverse(reverse) {}
+	bool operator()(const CUnit *lhs, const CUnit *rhs) const {
+		if (variable == ACP_DISTANCE) {
+			if (reverse) {
+				return lhs->MapDistanceTo(caster) > rhs->MapDistanceTo(caster);
+			} else {
+				return lhs->MapDistanceTo(caster) < rhs->MapDistanceTo(caster);
+			}
+		} else {
+			if (reverse) {
+				return lhs->Variable[variable].Value > rhs->Variable[variable].Value;
+			} else {
+				return lhs->Variable[variable].Value < rhs->Variable[variable].Value;
+			}
+		}
+	}
+private:
+	const CUnit &caster;
+	const int variable;
+	const bool reverse;
+};
+
 /**
 **  Select the target for the autocast.
 **
@@ -263,21 +289,17 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 				}
 			}
 			// Now select the best unit to target.
-			// FIXME: Some really smart way to do this.
-			// FIXME: Heal the unit with the lowest hit-points
-			// FIXME: Bloodlust the unit with the highest hit-point
-			// FIMXE: it will survive more
 			if (n != 0) {
-#if 0
 				// For the best target???
-				sort(table, n, spell.autocast->f_order);
-				return NewTargetUnit(*table[0]);
-#else
-				// Best unit, random unit, oh well, same stuff.
-				int index = SyncRand() % n;
-				return NewTargetUnit(*table[index]);
-#endif
-			}
+				if (autocast->PriorytyVar != ACP_NOVALUE) {
+					std::sort(table.begin(), table.begin() + n,
+						AutoCastPrioritySort(caster, autocast->PriorytyVar, autocast->ReverseSort));
+					return NewTargetUnit(*table[0]);
+				} else { // Use the old behavior
+					return NewTargetUnit(*table[SyncRand() % n]);
+				}
+				
+			} 
 			break;
 		}
 		default:

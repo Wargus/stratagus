@@ -242,6 +242,30 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 			lua_rawgeti(l, -1, j + 1);
 			autocast->Combat = Ccl2Condition(l, LuaToString(l, -1));
 			lua_pop(l, 1);
+		} else if (!strcmp(value, "priority")) {
+			lua_rawgeti(l, -1, j + 1);
+			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
+				LuaError(l, "incorrect argument");
+			}
+			lua_rawgeti(l, -1, 1);
+			std::string var = LuaToString(l, -1);
+			int index = UnitTypeVar.VariableNameLookup[var.c_str()];// User variables
+			if (index == -1) {
+				if (!strcmp(var.c_str(), "Distance")) {
+					index = ACP_DISTANCE;
+				} else {
+					fprintf(stderr, "Bad variable name '%s'\n", var.c_str());
+					Exit(1);
+				}
+			}
+			autocast->PriorytyVar = index;
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			autocast->ReverseSort = LuaToBoolean(l, -1);
+			lua_pop(l, 1);
+
+			lua_pop(l, 1);
+			
 		} else if (!strcmp(value, "condition")) {
 			if (!autocast->Condition) {
 				autocast->Condition = new ConditionInfo;

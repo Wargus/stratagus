@@ -164,10 +164,16 @@ public:
 class AutoCastInfo
 {
 public:
-	AutoCastInfo() : Range(0), Condition(0), Combat(0) {};
+	// Special flags for priority sorting
+#define ACP_NOVALUE -1
+#define ACP_DISTANCE -2
+	AutoCastInfo() : Range(0), Condition(0), Combat(0), PriorytyVar(ACP_NOVALUE), ReverseSort(false) {};
 	~AutoCastInfo() { delete Condition; };
 	/// @todo this below is SQUARE!!!
 	int Range;                   /// Max range of the target.
+
+	int PriorytyVar;             /// Variable to sort autocast targets by priority.
+	bool ReverseSort;            /// If true, small values have the highest priority.
 
 	ConditionInfo *Condition;    /// Conditions to cast the spell.
 
