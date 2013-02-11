@@ -167,7 +167,7 @@ public:
 	// Special flags for priority sorting
 #define ACP_NOVALUE -1
 #define ACP_DISTANCE -2
-	AutoCastInfo() : Range(0), Condition(0), Combat(0), PriorytyVar(ACP_NOVALUE), ReverseSort(false) {};
+	AutoCastInfo() : Range(0), PriorytyVar(ACP_NOVALUE), ReverseSort(false), Condition(NULL), Combat(0) {};
 	~AutoCastInfo() { delete Condition; };
 	/// @todo this below is SQUARE!!!
 	int Range;                   /// Max range of the target.
@@ -177,7 +177,7 @@ public:
 
 	ConditionInfo *Condition;    /// Conditions to cast the spell.
 
-	/// Detalied generic conditions (not per-target, where Condition is evaluated.)
+	/// Detailed generic conditions (not per-target, where Condition is evaluated.)
 	/// Combat mode is when there are hostile non-coward units around
 	int Combat;                  /// If it should be casted in combat
 
