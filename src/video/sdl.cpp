@@ -670,7 +670,7 @@ void InitVideoSdl()
 		// Get the SDL window handle
 		SDL_SysWMinfo sysInfo; //Will hold our Window information
 		SDL_VERSION(&sysInfo.version); //Set SDL version
-		if(SDL_GetWMInfo(&sysInfo) <= 0) {
+		if (SDL_GetWMInfo(&sysInfo) <= 0) {
 			fprintf(stderr, "Unable to get window handle\n");
 			exit(1);
 		}

@@ -102,7 +102,7 @@ public:
 	static size_t Size() { return 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 * PlayerMax + 4 * PlayerMax + 4 * PlayerMax + 4 * PlayerMax; }
 	void Clear() {
 		ResourcesOption = UnitsOption = FogOfWar = RevealMap = TilesetSelection =
-			GameTypeOption = Difficulty = MapRichness = 0;
+																   GameTypeOption = Difficulty = MapRichness = 0;
 		memset(CompOpt, 0, sizeof(CompOpt));
 		memset(Ready, 0, sizeof(Ready));
 		memset(LastFrame, 0, sizeof(LastFrame));

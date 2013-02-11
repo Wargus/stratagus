@@ -293,13 +293,12 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 				// For the best target???
 				if (autocast->PriorytyVar != ACP_NOVALUE) {
 					std::sort(table.begin(), table.begin() + n,
-						AutoCastPrioritySort(caster, autocast->PriorytyVar, autocast->ReverseSort));
+							  AutoCastPrioritySort(caster, autocast->PriorytyVar, autocast->ReverseSort));
 					return NewTargetUnit(*table[0]);
 				} else { // Use the old behavior
 					return NewTargetUnit(*table[SyncRand() % n]);
 				}
-				
-			} 
+			}
 			break;
 		}
 		default:

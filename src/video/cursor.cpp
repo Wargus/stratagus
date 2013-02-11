@@ -263,7 +263,7 @@ void DrawCursor()
 #else
 	if (
 #endif
-			!GameRunning && !Editor.Running) {
+		!GameRunning && !Editor.Running) {
 		if (!HiddenSurface
 			|| HiddenSurface->w != GameCursor->G->getWidth()
 			|| HiddenSurface->h != GameCursor->G->getHeight()) {
@@ -303,7 +303,7 @@ void HideCursor()
 #else
 	if (
 #endif
-			!GameRunning && !Editor.Running && GameCursor) {
+		!GameRunning && !Editor.Running && GameCursor) {
 		const PixelPos pos = CursorScreenPos - GameCursor->HotPos;
 		SDL_Rect dstRect = {Sint16(pos.x), Sint16(pos.y), 0, 0 };
 		SDL_BlitSurface(HiddenSurface, NULL, TheScreen, &dstRect);

@@ -265,7 +265,6 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 			lua_pop(l, 1);
 
 			lua_pop(l, 1);
-			
 		} else if (!strcmp(value, "condition")) {
 			if (!autocast->Condition) {
 				autocast->Condition = new ConditionInfo;

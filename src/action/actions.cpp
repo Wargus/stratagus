@@ -259,8 +259,8 @@ static void HandleRegenerations(CUnit &unit)
 		&& unit.CurrentAction() != UnitActionDie) {
 		if (((100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max) <= unit.Type->BurnPercent
 			&& unit.Type->BurnDamageRate) {
-				HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate);
-				burn = true;
+			HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate);
+			burn = true;
 		}
 
 		if (unit.Variable[POISON_INDEX].Value && unit.Type->PoisonDrain) {
@@ -329,7 +329,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
 		if (i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
 			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX) {
-				continue;
+			continue;
 		}
 		if (unit.Variable[i].Enable && unit.Variable[i].Increase) {
 			IncreaseVariable(unit, i);

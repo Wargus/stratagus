@@ -298,11 +298,11 @@ public:
 	void FillTransCircleClip(Uint32 color, int x, int y, int radius, unsigned char alpha);
 
 	inline Uint32 MapRGB(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b) {
-		#if defined(USE_OPENGL) || defined(USE_GLES)
+#if defined(USE_OPENGL) || defined(USE_GLES)
 		if (UseOpenGL) {
 			return MapRGBA(f, r, g, b, 0xFF);
 		} else
-		#endif
+#endif
 		{
 			return SDL_MapRGB(f, r, g, b);
 		}
@@ -311,11 +311,11 @@ public:
 		return MapRGB(f, color.R, color.G, color.B);
 	}
 	inline Uint32 MapRGBA(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
-		#if defined(USE_OPENGL) || defined(USE_GLES)
+#if defined(USE_OPENGL) || defined(USE_GLES)
 		if (UseOpenGL) {
 			return ((r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT) | (a << ASHIFT));
 		} else
-		#endif
+#endif
 		{
 			return SDL_MapRGBA(f, r, g, b, a);
 		}
@@ -324,26 +324,26 @@ public:
 		return MapRGBA(f, color.R, color.G, color.B, color.A);
 	}
 	inline void GetRGB(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b) {
-		#if defined(USE_OPENGL) || defined(USE_GLES)
+#if defined(USE_OPENGL) || defined(USE_GLES)
 		if (UseOpenGL) {
 			*r = (c >> RSHIFT) & 0xff;
 			*g = (c >> GSHIFT) & 0xff;
 			*b = (c >> BSHIFT) & 0xff;
 		} else
-		#endif
+#endif
 		{
 			SDL_GetRGB(c, f, r, g, b);
 		}
 	}
 	inline void GetRGBA(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a) {
-		#if defined(USE_OPENGL) || defined(USE_GLES)
+#if defined(USE_OPENGL) || defined(USE_GLES)
 		if (UseOpenGL) {
 			*r = (c >> RSHIFT) & 0xff;
 			*g = (c >> GSHIFT) & 0xff;
 			*b = (c >> BSHIFT) & 0xff;
 			*a = (c >> ASHIFT) & 0xff;
 		} else
-		#endif
+#endif
 		{
 			SDL_GetRGBA(c, f, r, g, b, a);
 		}

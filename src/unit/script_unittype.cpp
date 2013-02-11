@@ -1573,7 +1573,7 @@ static int CclDefineDecorations(lua_State *l)
 						decovarstaticsprite->n = LuaToNumber(l, -2);
 						decovarstaticsprite->FadeValue = LuaToNumber(l, -1);
 						lua_pop(l, 3);
-					}					
+					}
 					decovar = decovarstaticsprite;
 				} else { // Error
 					LuaError(l, "invalid method '%s' for Method in DefineDecorations" _C_ key);
