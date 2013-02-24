@@ -238,6 +238,8 @@ extern enum _cursor_on_ CursorOn;
 
 /// vladi: used for unit buttons sub-menus etc
 extern int CurrentButtonLevel;
+/// Last drawn popup : used to speed up drawing
+extern ButtonAction *LastDrawnButtonPopup;
 
 /// Time to detect double clicks
 extern int DoubleClickDelay;

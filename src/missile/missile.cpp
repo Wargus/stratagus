@@ -893,14 +893,18 @@ void Missile::MissileHit(CUnit *unit)
 				}
 
 				if (mtype.CorrectSphashDamage == true) {
-					bool isPositionSpell = false;
-					if (this->TargetUnit == NULL && this->SourceUnit->CurrentAction() == UnitActionSpellCast) {
-						const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(this->SourceUnit->CurrentOrder());
-						if (order.GetSpell().Target == TargetPosition) {
-							isPositionSpell = true;
+					bool isPosition = false;
+					if (this->TargetUnit == NULL) {
+						if (this->SourceUnit->CurrentAction() == UnitActionSpellCast) {
+							const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(this->SourceUnit->CurrentOrder());
+							if (order.GetSpell().Target == TargetPosition) {
+								isPosition = true;
+							}
+						} else {
+							isPosition = true;
 						}
 					}
-					if (isPositionSpell || this->SourceUnit->CurrentAction() == UnitActionAttackGround) {
+					if (isPosition || this->SourceUnit->CurrentAction() == UnitActionAttackGround) {
 						if (goal.Type->UnitType != this->SourceUnit->Type->UnitType) {
 							shouldHit = false;
 						}

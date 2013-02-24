@@ -69,6 +69,8 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
+/// Last drawn popup : used to speed up drawing
+ButtonAction *LastDrawnButtonPopup;
 /// for unit buttons sub-menus etc.
 int CurrentButtonLevel;
 /// All buttons for units
@@ -198,6 +200,7 @@ void CleanButtons()
 	UnitButtonTable.clear();
 
 	CurrentButtonLevel = 0;
+	LastDrawnButtonPopup = NULL;
 	CurrentButtons.clear();
 }
 
@@ -535,15 +538,25 @@ void DrawPopupUnitInfo(const CUnitType *type,
 }
 #endif
 
+static struct PopupDrawCache {
+	int popupWidth;
+	int popupHeight;
+} popupCache;
+
 /**
 **  Draw popup
 */
 void DrawPopup(const ButtonAction &button, const CUIButton &uibutton)
 {
 	CPopup *popup = PopupByIdent(button.Popup);
+	bool useCache = false;
 
 	if (!popup) {
 		return;
+	} else if (&button == LastDrawnButtonPopup) {
+		useCache = true;
+	} else {
+		LastDrawnButtonPopup = const_cast<ButtonAction *>(&button);
 	}
 
 	int popupWidth, popupHeight;
@@ -568,9 +581,17 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton)
 			break;
 	}
 
-	GetPopupSize(*popup, button, popupWidth, popupHeight, Costs);
-	popupWidth = std::max(popupWidth, popup->MinWidth);
-	popupHeight = std::max(popupHeight, popup->MinHeight);
+	if (useCache) {
+		popupWidth = popupCache.popupWidth;
+		popupHeight = popupCache.popupHeight;
+	} else {
+		GetPopupSize(*popup, button, popupWidth, popupHeight, Costs);
+		popupWidth = std::max(popupWidth, popup->MinWidth);
+		popupHeight = std::max(popupHeight, popup->MinHeight);
+		popupCache.popupWidth = popupWidth;
+		popupCache.popupHeight = popupHeight;
+	}
+	
 	int x = std::min<int>(uibutton.X, Video.Width - 1 - popupWidth);
 	int y = uibutton.Y - popupHeight - 10;
 
@@ -1185,6 +1206,7 @@ void CButtonPanel::DoClicked_StandGround()
 void CButtonPanel::DoClicked_Button(int button)
 {
 	CurrentButtonLevel = CurrentButtons[button].Value;
+	LastDrawnButtonPopup = NULL;
 	UI.ButtonPanel.Update();
 }
 

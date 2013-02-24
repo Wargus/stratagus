@@ -184,8 +184,9 @@ static int ParseAnimFlags(CUnit &unit, const char *parseflag)
 		if (flags & ANIM_SM_DAMAGE) {
 			missile->SourceUnit = &unit;
 		}
-		if (flags & ANIM_SM_TOTARGET) {
-			missile->TargetUnit = goal->CurrentOrder()->GetGoal();
+		CUnit *target = goal->CurrentOrder()->GetGoal();
+		if (flags & ANIM_SM_TOTARGET && target && target->IsAlive()) {
+			missile->TargetUnit = target;
 		}
 	}
 }

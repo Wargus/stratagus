@@ -287,7 +287,7 @@ static inline void IncreaseVariable(CUnit &unit, int index)
 static void HandleBuffsEachCycle(CUnit &unit)
 {
 	// Look if the time to live is over.
-	if (unit.TTL && unit.TTL < GameCycle) {
+	if (unit.TTL && unit.IsAlive() && unit.TTL < GameCycle) {
 		DebugPrint("Unit must die %lu %lu!\n" _C_ unit.TTL _C_ GameCycle);
 
 		// Hit unit does some funky stuff...

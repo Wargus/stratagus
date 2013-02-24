@@ -176,7 +176,7 @@ static bool GetFileContent(const std::string &file, std::string &content)
 
 	content.clear();
 	if (fp.open(file.c_str(), CL_OPEN_READ) == -1) {
-		DebugPrint("Can't open file '%s': %s\n" _C_ file.c_str());
+		DebugPrint("Can't open file '%s\n" _C_ file.c_str());
 		fprintf(stderr, "Can't open file '%s': %s\n", file.c_str(), strerror(errno));
 		return false;
 	}

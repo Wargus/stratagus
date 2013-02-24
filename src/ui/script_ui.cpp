@@ -1045,6 +1045,8 @@ void SelectionChanged()
 	UI.StatusLine.Clear();
 	ClearCosts();
 	CurrentButtonLevel = 0;
+	LastDrawnButtonPopup = NULL;
+
 	UI.ButtonPanel.Update();
 	GameCursor = UI.Point.Cursor;
 	CursorBuilding = NULL;

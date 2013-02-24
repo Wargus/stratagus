@@ -190,8 +190,8 @@ void UpdateDisplay()
 			UI.Minimap.DrawViewportArea(*UI.SelectedViewport);
 
 			UI.InfoPanel.Draw();
-			UI.ButtonPanel.Draw();
 			DrawResources();
+			UI.ButtonPanel.Draw();
 			UI.StatusLine.Draw();
 		}
 

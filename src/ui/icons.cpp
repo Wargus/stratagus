@@ -136,7 +136,6 @@ void CIcon::DrawIcon(const CPlayer &player, const PixelPos &pos) const
 /**
 **  Draw icon at pos.
 **
-**  @param player  Player pointer used for icon colors
 **  @param pos     display pixel position
 */
 void CIcon::DrawGrayscaleIcon(const PixelPos &pos) const
@@ -146,7 +145,7 @@ void CIcon::DrawGrayscaleIcon(const PixelPos &pos) const
 	SDL_Palette &pal = *this->G->Surface->format->palette;
 	memcpy(backup, pal.colors, sizeof(SDL_Color) * 256);
 	for (int i = 0; i < 256; ++i) {
-		int gray = 0.2 * pal.colors[i].r + 0.4 * pal.colors[i].g + 0.12 * pal.colors[i].b;
+		int gray = 0.21 * pal.colors[i].r + 0.72 * pal.colors[i].g + 0.07 * pal.colors[i].b;
 		colors[i].r = colors[i].g = colors[i].b = gray;
 	}
 	SDL_SetColors(this->G->Surface, &colors[0], 0, 256);
