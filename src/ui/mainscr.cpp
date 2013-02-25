@@ -67,7 +67,7 @@
 #include <sstream>
 
 /*----------------------------------------------------------------------------
---  MENU BUTTON
+--  UI BUTTONS
 ----------------------------------------------------------------------------*/
 
 /**
@@ -77,7 +77,7 @@ void DrawMenuButtonArea()
 {
 	if (!IsNetworkGame()) {
 		if (UI.MenuButton.X != -1) {
-			DrawMenuButton(UI.MenuButton.Style,
+			DrawUIButton(UI.MenuButton.Style,
 						   (ButtonAreaUnderCursor == ButtonAreaMenu
 							&& ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0) |
 						   (GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
@@ -86,7 +86,7 @@ void DrawMenuButtonArea()
 		}
 	} else {
 		if (UI.NetworkMenuButton.X != -1) {
-			DrawMenuButton(UI.NetworkMenuButton.Style,
+			DrawUIButton(UI.NetworkMenuButton.Style,
 						   (ButtonAreaUnderCursor == ButtonAreaMenu
 							&& ButtonUnderCursor == ButtonUnderNetworkMenu ? MI_FLAGS_ACTIVE : 0) |
 						   (GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
@@ -94,12 +94,28 @@ void DrawMenuButtonArea()
 						   UI.NetworkMenuButton.Text);
 		}
 		if (UI.NetworkDiplomacyButton.X != -1) {
-			DrawMenuButton(UI.NetworkDiplomacyButton.Style,
+			DrawUIButton(UI.NetworkDiplomacyButton.Style,
 						   (ButtonAreaUnderCursor == ButtonAreaMenu
 							&& ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MI_FLAGS_ACTIVE : 0) |
 						   (GameDiplomacyButtonClicked ? MI_FLAGS_CLICKED : 0),
 						   UI.NetworkDiplomacyButton.X, UI.NetworkDiplomacyButton.Y,
 						   UI.NetworkDiplomacyButton.Text);
+		}
+	}
+}
+
+void DrawUserDefinedButtons()
+{
+	for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
+		const CUIUserButton &button = UI.UserButtons[i];
+
+		if (button.Button.X != -1) {
+			DrawUIButton(button.Button.Style,
+				(ButtonAreaUnderCursor == ButtonAreaUser
+				&& ButtonUnderCursor == i ? MI_FLAGS_ACTIVE : 0) |
+				(button.Clicked ? MI_FLAGS_CLICKED : 0),
+				button.Button.X, button.Button.Y,
+				button.Button.Text);
 		}
 	}
 }

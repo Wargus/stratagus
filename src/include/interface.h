@@ -116,7 +116,8 @@ enum _button_area_ {
 	ButtonAreaResearching,   /// Researching button
 	ButtonAreaTransporting,  /// Transporting button
 	ButtonAreaButton,        /// Button panel button
-	ButtonAreaMenu           /// Menu button
+	ButtonAreaMenu,          /// Menu button
+	ButtonAreaUser           /// User buttons
 };
 
 /// Menu button under cursor
@@ -342,6 +343,8 @@ extern void CancelBuildingMode();
 
 /// Draw menu button area
 extern void DrawMenuButtonArea();
+/// Draw user defined buttons
+extern void DrawUserDefinedButtons();
 /// Update messages
 extern void UpdateMessages();
 /// Draw messages as overlay over of the map
@@ -375,7 +378,7 @@ extern void UpdateStatusLineForButton(const ButtonAction &button);
 /// Draw the Pie Menu
 extern void DrawPieMenu();
 /// Draw the button popup
-extern void DrawPopup(const ButtonAction &button, const CUIButton &uibutton);
+extern void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x = 0, int y = 0);
 
 /// Handle the mouse in scroll area
 extern bool HandleMouseScrollArea(const PixelPos &mousePos);

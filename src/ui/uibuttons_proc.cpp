@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name menu_proc.cpp - The menu processing code. */
+/**@name uibuttons_proc.cpp - The UI buttons processing code. */
 //
 //      (c) Copyright 1999-2006 by Andreas Arens, Jimmy Salmon, Nehal Mistry
 //
@@ -44,11 +44,11 @@
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
--- Menu operation functions
+-- UI buttons operation functions
 ----------------------------------------------------------------------------*/
 
 /**
-**  Draw menu button 'button' on x,y
+**  Draw UI button 'button' on x,y
 **
 **  @param style  Button style
 **  @param flags  State of Button (clicked, mouse over...)
@@ -56,7 +56,7 @@
 **  @param y      Y display position
 **  @param text   text to print on button
 */
-void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
+void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 					const std::string &text)
 {
 	ButtonStyleProperties *p;

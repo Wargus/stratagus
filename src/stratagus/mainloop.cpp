@@ -185,6 +185,7 @@ void UpdateDisplay()
 											 UI.Fillers[i].X, UI.Fillers[i].Y);
 			}
 			DrawMenuButtonArea();
+			DrawUserDefinedButtons();
 
 			UI.Minimap.Draw();
 			UI.Minimap.DrawViewportArea(*UI.SelectedViewport);

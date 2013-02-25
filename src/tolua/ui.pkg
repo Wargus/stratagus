@@ -52,7 +52,7 @@ class CFiller
 
 class vector
 {
-	TOLUA_TEMPLATE_BIND(T, CFiller, CUIButton, string)
+	TOLUA_TEMPLATE_BIND(T, CFiller, CUIButton, CUIUserButton, string)
 
 	vector();
 	~vector();
@@ -113,6 +113,14 @@ class CInfoPanel
 	int Y;
 };
 
+class CUIUserButton
+{
+	CUIUserButton(); 
+
+	bool Clicked;
+	CUIButton Button;
+};
+
 class CStatusLine
 {
 	void Set(const std::string status);
@@ -170,6 +178,8 @@ class CUserInterface
 	CUIButton MenuButton;
 	CUIButton NetworkMenuButton;
 	CUIButton NetworkDiplomacyButton;
+
+	vector<CUIUserButton> UserButtons;
 
 	CMinimap Minimap;
 	CStatusLine StatusLine;

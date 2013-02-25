@@ -546,7 +546,7 @@ static struct PopupDrawCache {
 /**
 **  Draw popup
 */
-void DrawPopup(const ButtonAction &button, const CUIButton &uibutton)
+void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int y)
 {
 	CPopup *popup = PopupByIdent(button.Popup);
 	bool useCache = false;
@@ -592,8 +592,10 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton)
 		popupCache.popupHeight = popupHeight;
 	}
 	
-	int x = std::min<int>(uibutton.X, Video.Width - 1 - popupWidth);
-	int y = uibutton.Y - popupHeight - 10;
+	x = std::min<int>(x, Video.Width - 1 - popupWidth);
+	clamp<int>(&x, 0, Video.Width - 1);
+	y = y - popupHeight - 10;
+	clamp<int>(&y, 0, Video.Height - 1);
 
 	// Background
 	Video.FillTransRectangle(popup->BackgroundColor, x, y, popupWidth, popupHeight, popup->BackgroundColor >> ASHIFT);
@@ -793,7 +795,8 @@ void CButtonPanel::Draw()
 		//
 		if (ButtonAreaUnderCursor == ButtonAreaButton &&
 			ButtonUnderCursor == i && KeyState != KeyStateInput) {
-			DrawPopup(buttons[i], UI.ButtonPanel.Buttons[i]);
+			DrawPopup(buttons[i], UI.ButtonPanel.Buttons[i], UI.ButtonPanel.Buttons[i].X,
+				UI.ButtonPanel.Buttons[i].Y);
 			UpdateStatusLineForButton(buttons[i]);
 		}
 	}

@@ -302,7 +302,7 @@ set(ui_SRCS
 	src/ui/icons.cpp
 	src/ui/interface.cpp
 	src/ui/mainscr.cpp
-	src/ui/menu_proc.cpp
+	src/ui/uibuttons_proc.cpp
 	src/ui/mouse.cpp
 	src/ui/popup.cpp
 	src/ui/script_ui.cpp

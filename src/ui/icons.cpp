@@ -180,7 +180,7 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style,
 		s.Default.BorderColor = 0;
 	}
 	// FIXME: player colors
-	DrawMenuButton(&s, flags, pos.x, pos.y, text);
+	DrawUIButton(&s, flags, pos.x, pos.y, text);
 }
 
 /**

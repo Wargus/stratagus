@@ -352,6 +352,15 @@ public:
 	int Y;
 };
 
+class CUIUserButton
+{
+public:
+	CUIUserButton() : Clicked(false) {}
+
+	bool Clicked;            // true if button is clicked, false otherwise
+	CUIButton Button;        // User button
+};
+
 /**
 **  Defines the user interface.
 */
@@ -437,6 +446,9 @@ public:
 	CUIButton MenuButton;               /// menu button
 	CUIButton NetworkMenuButton;        /// network menu button
 	CUIButton NetworkDiplomacyButton;   /// network diplomacy button
+
+	// Used defined buttons
+	std::vector<CUIUserButton> UserButtons; /// User buttons
 
 	// The minimap
 	CMinimap Minimap;                   /// minimap

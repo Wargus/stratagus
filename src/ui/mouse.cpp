@@ -629,6 +629,19 @@ static void HandleMouseOn(const PixelPos screenPos)
 			}
 		}
 	}
+	for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
+			const CUIUserButton &button = UI.UserButtons[i];
+			
+			if (button.Button.X != -1) {
+				if (button.Button.Contains(screenPos)) {
+					ButtonAreaUnderCursor = ButtonAreaUser;
+					ButtonUnderCursor = i;
+					CursorOn = CursorOnButton;
+					return;
+				}
+			}
+
+	}
 	const size_t buttonCount = UI.ButtonPanel.Buttons.size();
 	for (unsigned int j = 0; j < buttonCount; ++j) {
 		if (UI.ButtonPanel.Buttons[j].Contains(screenPos)) {
@@ -868,6 +881,14 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	//
 	if (GameMenuButtonClicked || GameDiplomacyButtonClicked) {
 		return;
+	} else {
+		for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
+			const CUIUserButton &button = UI.UserButtons[i];
+
+			if (button.Clicked) {
+				return;
+			}
+		}
 	}
 
 	// This is forbidden for unexplored and not visible space
@@ -1681,6 +1702,20 @@ void UIHandleButtonDown(unsigned button)
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 					GameDiplomacyButtonClicked = true;
 				}
+			//
+			//  clicked on user buttons
+			//
+			} else if (ButtonAreaUnderCursor == ButtonAreaUser) {
+				if (ButtonAreaUnderCursor == ButtonAreaUser) {
+					for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
+						CUIUserButton &button = UI.UserButtons[i];
+
+						if (i == ButtonUnderCursor && !button.Clicked) {
+							PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+							button.Clicked = true;
+						}
+					}
+				}
 				//
 				//  clicked on selected button
 				//
@@ -1796,42 +1831,61 @@ void UIHandleButtonUp(unsigned button)
 		}
 	}
 
-	//
-	//  Menu (F10) button
-	//
-	if ((1 << button) == LeftButton && GameMenuButtonClicked) {
-		GameMenuButtonClicked = false;
-		if (ButtonAreaUnderCursor == ButtonAreaMenu) {
-			if (ButtonUnderCursor == ButtonUnderMenu || ButtonUnderCursor == ButtonUnderNetworkMenu) {
-				// FIXME: Not if, in input mode.
-				if (!IsNetworkGame()) {
-					GamePaused = true;
-					UI.StatusLine.Set(_("Game Paused"));
+	if ((1 << button) == LeftButton) {
+		//
+		//  Menu (F10) button
+		//
+		if (GameMenuButtonClicked) {
+			GameMenuButtonClicked = false;
+			if (ButtonAreaUnderCursor == ButtonAreaMenu) {
+				if (ButtonUnderCursor == ButtonUnderMenu || ButtonUnderCursor == ButtonUnderNetworkMenu) {
+					// FIXME: Not if, in input mode.
+					if (!IsNetworkGame()) {
+						GamePaused = true;
+						UI.StatusLine.Set(_("Game Paused"));
+					}
+					if (ButtonUnderCursor == ButtonUnderMenu) {
+						if (UI.MenuButton.Callback) {
+							UI.MenuButton.Callback->action("");
+						}
+					} else {
+						if (UI.NetworkMenuButton.Callback) {
+							UI.NetworkMenuButton.Callback->action("");
+						}
+					}
+					return;
 				}
-				if (ButtonUnderCursor == ButtonUnderMenu) {
-					if (UI.MenuButton.Callback) {
-						UI.MenuButton.Callback->action("");
-					}
-				} else {
-					if (UI.NetworkMenuButton.Callback) {
-						UI.NetworkMenuButton.Callback->action("");
-					}
+			}
+		}
+
+		//
+		//  Diplomacy button
+		//
+		if (GameDiplomacyButtonClicked) {
+			GameDiplomacyButtonClicked = false;
+			if (ButtonAreaUnderCursor == ButtonAreaMenu && ButtonUnderCursor == ButtonUnderNetworkDiplomacy) {
+				if (UI.NetworkDiplomacyButton.Callback) {
+					UI.NetworkDiplomacyButton.Callback->action("");
 				}
 				return;
 			}
 		}
-	}
 
-	//
-	//  Diplomacy button
-	//
-	if ((1 << button) == LeftButton && GameDiplomacyButtonClicked) {
-		GameDiplomacyButtonClicked = false;
-		if (ButtonAreaUnderCursor == ButtonAreaMenu && ButtonUnderCursor == ButtonUnderNetworkDiplomacy) {
-			if (UI.NetworkDiplomacyButton.Callback) {
-				UI.NetworkDiplomacyButton.Callback->action("");
+		//
+		//  User buttons
+		//
+		for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
+			CUIUserButton &button = UI.UserButtons[i];
+
+			if (button.Clicked) {
+				button.Clicked = false;
+				if (ButtonAreaUnderCursor == ButtonAreaUser) {
+					if (button.Button.Callback) {
+						button.Button.Callback->action("");
+					}
+					return;
+				}
 			}
-			return;
 		}
 	}
 
@@ -2030,8 +2084,20 @@ void DrawPieMenu()
 			int x = CursorStartScreenPos.x - ICON_SIZE_X / 2 + UI.PieMenu.X[i];
 			int y = CursorStartScreenPos.y - ICON_SIZE_Y / 2 + UI.PieMenu.Y[i];
 			const PixelPos pos(x, y);
+
+			bool gray = false;
+			for (int j = 0; j < NumSelected; ++j) {
+				if (!IsButtonAllowed(*Selected[j], buttons[i])) {
+					gray = true;
+					break;
+				}
+			}
 			// Draw icon
-			buttons[i].Icon.Icon->DrawIcon(player, pos);
+			if (gray) {
+				buttons[i].Icon.Icon->DrawGrayscaleIcon(pos);
+			} else {
+				buttons[i].Icon.Icon->DrawIcon(player, pos);
+			}
 
 			// Tutorial show command key in icons
 			if (UI.ButtonPanel.ShowCommandKey) {
@@ -2053,7 +2119,8 @@ void DrawPieMenu()
 	int i = GetPieUnderCursor();
 	if (i != -1 && KeyState != KeyStateInput && buttons[i].Pos != -1) {
 		UpdateStatusLineForButton(buttons[i]);
-		DrawPopup(buttons[i], UI.ButtonPanel.Buttons[i]);
+		DrawPopup(buttons[i], UI.ButtonPanel.Buttons[i], 
+			CursorStartScreenPos.x + UI.PieMenu.X[i], CursorStartScreenPos.y + UI.PieMenu.Y[i]);
 	}
 }
 
