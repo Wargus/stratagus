@@ -2135,8 +2135,9 @@ static void HandlePieMenuMouseSelection()
 
 	int pie = GetPieUnderCursor();
 	if (pie != -1) {
+		const ButtonCmd action = CurrentButtons[pie].Action;
 		UI.ButtonPanel.DoClicked(pie);
-		if (CurrentButtons[pie].Action == ButtonButton) {
+		if (action == ButtonButton) {
 			// there is a submenu => stay in piemenu mode
 			// and recenter the piemenu around the cursor
 			CursorStartScreenPos = CursorScreenPos;

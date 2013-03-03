@@ -336,6 +336,7 @@ void CleanUserInterface()
 	delete UI.UpgradingButton;
 	delete UI.ResearchingButton;
 	UI.TransportingButtons.clear();
+	UI.UserButtons.clear();
 
 	// Button Panel
 	CGraphic::Free(UI.ButtonPanel.G);

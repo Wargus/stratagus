@@ -329,6 +329,13 @@ extern void SetHoldClickDelay(int delay);
 extern void UiTogglePause();
 /// Toggle big map
 extern void UiToggleBigMap();
+/// Toggle terrain display on/off.
+extern void UiToggleTerrain();
+/// Find the next idle worker
+extern void UiFindIdleWorker();
+/// Track unit, the viewport follows the unit.
+extern void UiTrackUnit();
+
 /// Handle cheats
 extern int HandleCheats(const std::string &input);
 

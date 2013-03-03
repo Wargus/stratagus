@@ -572,3 +572,9 @@ function MenuScreen()
 end
 $]
 
+void CenterOnMessage();
+void ToggleShowMessages();
+void UiFindIdleWorker();
+void CycleViewportMode(int step);
+void UiToggleTerrain();
+void UiTrackUnit();

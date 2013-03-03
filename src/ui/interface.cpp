@@ -87,6 +87,7 @@ char BigMapMode;                     /// Show only the map
 enum _iface_state_ InterfaceState;   /// Current interface state
 bool GodMode;                        /// Invincibility cheat
 enum _key_state_ KeyState;           /// current key state
+CUnit *LastIdleWorker;               /// Last called idle worker
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -425,7 +426,7 @@ static void UiRecallMapPosition(unsigned position)
 /**
 **  Toggle terrain display on/off.
 */
-static void UiToggleTerrain()
+void UiToggleTerrain()
 {
 	UI.Minimap.WithTerrain ^= 1;
 	if (UI.Minimap.WithTerrain) {
@@ -438,14 +439,24 @@ static void UiToggleTerrain()
 /**
 **  Find the next idle worker, select it, and center on it
 */
-static void UiFindIdleWorker()
+void UiFindIdleWorker()
 {
 	if (ThisPlayer->FreeWorkers.empty()) {
 		return;
 	}
 	CUnit *unit = ThisPlayer->FreeWorkers[0];
+	if (LastIdleWorker) {
+		std::vector<CUnit *>::const_iterator it = std::find(ThisPlayer->FreeWorkers.begin(),
+			ThisPlayer->FreeWorkers.end(), LastIdleWorker);
+		if (it != ThisPlayer->FreeWorkers.end()) {
+			if (*it != ThisPlayer->FreeWorkers.back()) {
+				unit = *(++it);
+			}	
+		}
+	}
 
 	if (unit != NULL) {
+		LastIdleWorker = unit;
 		SelectSingleUnit(*unit);
 		UI.StatusLine.Clear();
 		ClearCosts();
@@ -469,7 +480,7 @@ static void UiToggleGrabMouse()
 /**
 **  Track unit, the viewport follows the unit.
 */
-static void UiTrackUnit()
+void UiTrackUnit()
 {
 	//Check if player has selected at least 1 unit
 	if (!Selected[0]) {
