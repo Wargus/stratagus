@@ -631,7 +631,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 	}
 	for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
 			const CUIUserButton &button = UI.UserButtons[i];
-			
+
 			if (button.Button.X != -1) {
 				if (button.Button.Contains(screenPos)) {
 					ButtonAreaUnderCursor = ButtonAreaUser;
@@ -1710,7 +1710,7 @@ void UIHandleButtonDown(unsigned button)
 					for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
 						CUIUserButton &button = UI.UserButtons[i];
 
-						if (i == ButtonUnderCursor && !button.Clicked) {
+						if (i == size_t(ButtonUnderCursor) && !button.Clicked) {
 							PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 							button.Clicked = true;
 						}
@@ -2119,7 +2119,7 @@ void DrawPieMenu()
 	int i = GetPieUnderCursor();
 	if (i != -1 && KeyState != KeyStateInput && buttons[i].Pos != -1) {
 		UpdateStatusLineForButton(buttons[i]);
-		DrawPopup(buttons[i], UI.ButtonPanel.Buttons[i], 
+		DrawPopup(buttons[i], UI.ButtonPanel.Buttons[i],
 			CursorStartScreenPos.x + UI.PieMenu.X[i], CursorStartScreenPos.y + UI.PieMenu.Y[i]);
 	}
 }

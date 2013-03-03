@@ -112,7 +112,7 @@ void DrawUserDefinedButtons()
 		if (button.Button.X != -1) {
 			DrawUIButton(button.Button.Style,
 				(ButtonAreaUnderCursor == ButtonAreaUser
-				&& ButtonUnderCursor == i ? MI_FLAGS_ACTIVE : 0) |
+				&& size_t(ButtonUnderCursor) == i ? MI_FLAGS_ACTIVE : 0) |
 				(button.Clicked ? MI_FLAGS_CLICKED : 0),
 				button.Button.X, button.Button.Y,
 				button.Button.Text);
