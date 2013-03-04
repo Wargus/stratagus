@@ -1706,14 +1706,12 @@ void UIHandleButtonDown(unsigned button)
 			//  clicked on user buttons
 			//
 			} else if (ButtonAreaUnderCursor == ButtonAreaUser) {
-				if (ButtonAreaUnderCursor == ButtonAreaUser) {
-					for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
-						CUIUserButton &button = UI.UserButtons[i];
+				for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
+					CUIUserButton &button = UI.UserButtons[i];
 
-						if (i == size_t(ButtonUnderCursor) && !button.Clicked) {
-							PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-							button.Clicked = true;
-						}
+					if (i == size_t(ButtonUnderCursor) && !button.Clicked) {
+						PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+						button.Clicked = true;
 					}
 				}
 				//
