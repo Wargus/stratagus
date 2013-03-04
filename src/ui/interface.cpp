@@ -447,11 +447,11 @@ void UiFindIdleWorker()
 	CUnit *unit = ThisPlayer->FreeWorkers[0];
 	if (LastIdleWorker) {
 		std::vector<CUnit *>::const_iterator it = std::find(ThisPlayer->FreeWorkers.begin(),
-			ThisPlayer->FreeWorkers.end(), LastIdleWorker);
+															ThisPlayer->FreeWorkers.end(), LastIdleWorker);
 		if (it != ThisPlayer->FreeWorkers.end()) {
 			if (*it != ThisPlayer->FreeWorkers.back()) {
 				unit = *(++it);
-			}	
+			}
 		}
 	}
 

@@ -591,7 +591,7 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 		popupCache.popupWidth = popupWidth;
 		popupCache.popupHeight = popupHeight;
 	}
-	
+
 	x = std::min<int>(x, Video.Width - 1 - popupWidth);
 	clamp<int>(&x, 0, Video.Width - 1);
 	y = y - popupHeight - 10;
@@ -796,7 +796,7 @@ void CButtonPanel::Draw()
 		if (ButtonAreaUnderCursor == ButtonAreaButton &&
 			ButtonUnderCursor == i && KeyState != KeyStateInput) {
 			DrawPopup(buttons[i], UI.ButtonPanel.Buttons[i], UI.ButtonPanel.Buttons[i].X,
-				UI.ButtonPanel.Buttons[i].Y);
+					  UI.ButtonPanel.Buttons[i].Y);
 			UpdateStatusLineForButton(buttons[i]);
 		}
 	}

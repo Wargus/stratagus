@@ -78,28 +78,28 @@ void DrawMenuButtonArea()
 	if (!IsNetworkGame()) {
 		if (UI.MenuButton.X != -1) {
 			DrawUIButton(UI.MenuButton.Style,
-						   (ButtonAreaUnderCursor == ButtonAreaMenu
-							&& ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0) |
-						   (GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
-						   UI.MenuButton.X, UI.MenuButton.Y,
-						   UI.MenuButton.Text);
+						 (ButtonAreaUnderCursor == ButtonAreaMenu
+						  && ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0) |
+						 (GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
+						 UI.MenuButton.X, UI.MenuButton.Y,
+						 UI.MenuButton.Text);
 		}
 	} else {
 		if (UI.NetworkMenuButton.X != -1) {
 			DrawUIButton(UI.NetworkMenuButton.Style,
-						   (ButtonAreaUnderCursor == ButtonAreaMenu
-							&& ButtonUnderCursor == ButtonUnderNetworkMenu ? MI_FLAGS_ACTIVE : 0) |
-						   (GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
-						   UI.NetworkMenuButton.X, UI.NetworkMenuButton.Y,
-						   UI.NetworkMenuButton.Text);
+						 (ButtonAreaUnderCursor == ButtonAreaMenu
+						  && ButtonUnderCursor == ButtonUnderNetworkMenu ? MI_FLAGS_ACTIVE : 0) |
+						 (GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
+						 UI.NetworkMenuButton.X, UI.NetworkMenuButton.Y,
+						 UI.NetworkMenuButton.Text);
 		}
 		if (UI.NetworkDiplomacyButton.X != -1) {
 			DrawUIButton(UI.NetworkDiplomacyButton.Style,
-						   (ButtonAreaUnderCursor == ButtonAreaMenu
-							&& ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MI_FLAGS_ACTIVE : 0) |
-						   (GameDiplomacyButtonClicked ? MI_FLAGS_CLICKED : 0),
-						   UI.NetworkDiplomacyButton.X, UI.NetworkDiplomacyButton.Y,
-						   UI.NetworkDiplomacyButton.Text);
+						 (ButtonAreaUnderCursor == ButtonAreaMenu
+						  && ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MI_FLAGS_ACTIVE : 0) |
+						 (GameDiplomacyButtonClicked ? MI_FLAGS_CLICKED : 0),
+						 UI.NetworkDiplomacyButton.X, UI.NetworkDiplomacyButton.Y,
+						 UI.NetworkDiplomacyButton.Text);
 		}
 	}
 }
@@ -111,11 +111,11 @@ void DrawUserDefinedButtons()
 
 		if (button.Button.X != -1) {
 			DrawUIButton(button.Button.Style,
-				(ButtonAreaUnderCursor == ButtonAreaUser
-				&& size_t(ButtonUnderCursor) == i ? MI_FLAGS_ACTIVE : 0) |
-				(button.Clicked ? MI_FLAGS_CLICKED : 0),
-				button.Button.X, button.Button.Y,
-				button.Button.Text);
+						 (ButtonAreaUnderCursor == ButtonAreaUser
+						  && size_t(ButtonUnderCursor) == i ? MI_FLAGS_ACTIVE : 0) |
+						 (button.Clicked ? MI_FLAGS_CLICKED : 0),
+						 button.Button.X, button.Button.Y,
+						 button.Button.Text);
 		}
 	}
 }

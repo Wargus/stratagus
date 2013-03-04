@@ -1078,11 +1078,11 @@ void EditorUpdateDisplay()
 	// Menu button
 	//
 	DrawUIButton(UI.MenuButton.Style,
-				   (ButtonAreaUnderCursor == ButtonAreaMenu
-					&& ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0) |
-				   (GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
-				   UI.MenuButton.X, UI.MenuButton.Y,
-				   UI.MenuButton.Text);
+				 (ButtonAreaUnderCursor == ButtonAreaMenu
+				  && ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0) |
+				 (GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
+				 UI.MenuButton.X, UI.MenuButton.Y,
+				 UI.MenuButton.Text);
 
 	//
 	// Minimap

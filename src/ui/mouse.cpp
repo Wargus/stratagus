@@ -630,16 +630,16 @@ static void HandleMouseOn(const PixelPos screenPos)
 		}
 	}
 	for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
-			const CUIUserButton &button = UI.UserButtons[i];
+		const CUIUserButton &button = UI.UserButtons[i];
 
-			if (button.Button.X != -1) {
-				if (button.Button.Contains(screenPos)) {
-					ButtonAreaUnderCursor = ButtonAreaUser;
-					ButtonUnderCursor = i;
-					CursorOn = CursorOnButton;
-					return;
-				}
+		if (button.Button.X != -1) {
+			if (button.Button.Contains(screenPos)) {
+				ButtonAreaUnderCursor = ButtonAreaUser;
+				ButtonUnderCursor = i;
+				CursorOn = CursorOnButton;
+				return;
 			}
+		}
 
 	}
 	const size_t buttonCount = UI.ButtonPanel.Buttons.size();
@@ -1702,9 +1702,9 @@ void UIHandleButtonDown(unsigned button)
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 					GameDiplomacyButtonClicked = true;
 				}
-			//
-			//  clicked on user buttons
-			//
+				//
+				//  clicked on user buttons
+				//
 			} else if (ButtonAreaUnderCursor == ButtonAreaUser) {
 				for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
 					CUIUserButton &button = UI.UserButtons[i];
@@ -2118,7 +2118,7 @@ void DrawPieMenu()
 	if (i != -1 && KeyState != KeyStateInput && buttons[i].Pos != -1) {
 		UpdateStatusLineForButton(buttons[i]);
 		DrawPopup(buttons[i], UI.ButtonPanel.Buttons[i],
-			CursorStartScreenPos.x + UI.PieMenu.X[i], CursorStartScreenPos.y + UI.PieMenu.Y[i]);
+				  CursorStartScreenPos.x + UI.PieMenu.X[i], CursorStartScreenPos.y + UI.PieMenu.Y[i]);
 	}
 }
 
