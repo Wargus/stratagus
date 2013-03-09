@@ -47,9 +47,7 @@ This file should give you some information to help with development of Stratagus
 
 You can find <a
 href="https://bugs.launchpad.net/stratagus">known bugs</a>
-on the <a
-href="https://launchpad.net/stratagus">Launchpad pages
-for Stratagus</a>.<p>
+on the <a href="https://launchpad.net/stratagus">Launchpad pages for Stratagus</a>.<p>
 
 <h2>Building Stratagus</h2>
 
@@ -103,29 +101,16 @@ If you are viewing installed stratagus documentation, Doxygen documentation is h
 <h3>Tags used in source code</h3>
 
 We use the doc++ tags:<p>
-
-Multi line source code documentation:<p>
-/** ... */<p>
-
-Single line source code documentation:<p>
-/// ... <p>
-
-Start grouping:<p>
-//@{ or /*@{*/<p>
-
-End grouping:<p>
-//@} or /*@}*/<p>
-
+Multi line source code documentation: /** ... */<br/>
+Single line source code documentation: /// ... <br/>
+Start grouping: //@{ or /*@{*/<br/>
+End grouping: //@} or /*@}*/<br/>
 
 <ul>
-    <li>@name
-    <br>Name of file or group.
-    <li>@param
-    <br>Describes function/macro parameter
-    <li>@return
-    <br>Describes function return
-    <li>@see
-    <br>Links to other section
+    <li>@name Name of file or group.</li>
+    <li>@param Describes function/macro parameter</li>
+    <li>@return Describes function return</li>
+    <li>@see Links to other section</li>
 </ul><p>
 
 Please read the doxygen/doc++ documentation.
@@ -164,9 +149,8 @@ Please read the doxygen/doc++ documentation.
 
 //@{
 
-#include &lt;stdio.h&gt;
-
 #include "stratagus.h"
+
 // More game includes.
 
 // Global and local variables of this module.
@@ -178,73 +162,18 @@ Please read the doxygen/doc++ documentation.
 
 <h2>Coding style</h2>
 
-You can use your own coding style in your own modules.
-If you fix in other modules, please imitate the coding style of the original coder.
-
-<p>We suggest the
-<a href="/usr/src/linux/Documentation/CodingStyle">Linux kernel coding style</a> (also
-found online <a href="http://lwn.net/2001/1115/a/CodingStyle.php3">here</a>).
-<ul>
-    <li>Write ANSI C++.
-    <li>All Tabs (Developers use 4 columns for a tab).
-    <li>No line should be longer than 78 characters.
-	<li>All comments should be on their own line.
-    <li>Use { } even for one statement blocks.
-</ul>
-
-<b>Coding Examples:</b>
-<pre>
-    // Example for statement with i incremented
-    for (i = 0; i < sample->Length &gt;&gt; 1; ++i) {
-        ...
-    }
-
-    // if statement with brackets and functions.
-    if ((i = CLread(f, &amp;chunk, sizeof(chunk))) != sizeof(chunk)) {
-        ...
-    }
-
-    // function with variables defined.
-    int function(int a, int b)
-    {
-        int x;
-        int y;
-
-        x = a;
-        y = b;
-
-        return 0;
-    }
-
-    // Example of a function
-    static int CclLoadPud(lua_State* l)
-    {
-        const char* name;
-
-        if (SaveGameLoading) {
-            return 0;
-        }
-
-        if (lua_gettop(l) != 1) {
-            LuaError(l, "incorrect argument");
-        }
-        name = LuaToString(l, 1);
-        LoadPud(name, &amp;TheMap);
-
-        // FIXME: LoadPud should return an error
-        return 0;
-    }
-</pre>
-
-NOTE: If you make big changes please always extend the copyright with your name,
-and always update the copyright year if required.<p>
+We use <a href="http://astyle.sourceforge.net/">AStyle</a> to harmonize style in the code.<br/>
+<code>AStyle --options=tools/astylerc --recursive "src/*.cpp" "src/*.h"</code>
 
 <h2>Sending a patch</h2>
 
 Use Stratagus launchpad <a href="https://bugs.launchpad.net/stratagus">bug tracker</a>
+<br/>
+NOTE: If you make big changes please always extend the copyright with your name,
+and always update the copyright year if required.<p>
 
 <hr>
-(C) Copyright 1998-2012 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project under the <a href="gpl.html">GNU General Public License</a>.<br>
+(C) Copyright 1998-2013 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project under the <a href="gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>
 </html>
