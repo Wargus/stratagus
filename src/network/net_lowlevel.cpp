@@ -68,7 +68,6 @@ typedef const void *sendbuftype;
 //  Variables
 //----------------------------------------------------------------------------
 
-int NetLastSocket;         /// Last socket
 unsigned long NetLastHost; /// Last host number (net format)
 int NetLastPort;           /// Last port number (net format)
 
@@ -420,7 +419,6 @@ Socket NetOpenTCP(const char *addr, int port)
 		NetLastHost = sock_addr.sin_addr.s_addr;
 		NetLastPort = sock_addr.sin_port;
 	}
-	NetLastSocket = sockfd;
 	return sockfd;
 }
 
@@ -598,7 +596,6 @@ int NetRecvUDP(Socket sockfd, void *buf, int len)
 */
 int NetRecvTCP(Socket sockfd, void *buf, int len)
 {
-	NetLastSocket = sockfd;
 	int ret = recv(sockfd, (recvbuftype)buf, len, 0);
 	if (ret > 0) {
 		return ret;
@@ -678,10 +675,10 @@ Socket NetAcceptTCP(Socket sockfd)
 	struct sockaddr_in sa;
 	socklen_t len = sizeof(struct sockaddr_in);
 
-	NetLastSocket = accept(sockfd, (struct sockaddr *)&sa, &len);
+	Socket socket = accept(sockfd, (struct sockaddr *)&sa, &len);
 	NetLastHost = sa.sin_addr.s_addr;
 	NetLastPort = sa.sin_port;
-	return NetLastSocket;
+	return socket;
 }
 
 /**
