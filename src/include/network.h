@@ -83,7 +83,7 @@ enum _message_type_ {
 	MessageCommandAttack,          /// Unit command attack
 	MessageCommandGround,          /// Unit command attack ground
 	MessageCommandPatrol,          /// Unit command patrol
-	MessageCommandBoard,           /// Unit command borad
+	MessageCommandBoard,           /// Unit command board
 	MessageCommandUnload,          /// Unit command unload
 	MessageCommandBuild,           /// Unit command build building
 	MessageCommandDismiss,         /// Unit command dismiss unit

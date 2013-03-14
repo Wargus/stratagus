@@ -37,8 +37,6 @@
 
 #include "net_lowlevel.h"
 
-#include "network.h"
-
 #include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -497,58 +495,54 @@ int NetSocketReady(Socket sockfd, int timeout)
 /**
 **  Wait for socket set ready.
 **
-**  @param set      Socket set to probe.
 **  @param timeout  Timeout in 1/1000 seconds.
 **
 **  @return 1 if data is available, 0 if not, -1 if failure.
 */
-int NetSocketSetReady(SocketSet *set, int timeout)
+int SocketSet::Select(int timeout)
 {
 	int retval;
-	struct timeval tv;
 	fd_set mask;
 
 	// Check the file descriptors for available data
 	do {
 		// Set up the mask of file descriptors
 		FD_ZERO(&mask);
-		for (size_t i = 0; i < set->Sockets.size(); ++i) {
-			FD_SET(set->Sockets[i], &mask);
+		for (size_t i = 0; i < this->Sockets.size(); ++i) {
+			FD_SET(this->Sockets[i], &mask);
 		}
 
 		// Set up the timeout
+		struct timeval tv;
 		tv.tv_sec = timeout / 1000;
 		tv.tv_usec = (timeout % 1000) * 1000;
 
 		// Data available?
-		retval = select(set->MaxSockFD + 1, &mask, NULL, NULL, &tv);
+		retval = select(this->MaxSockFD + 1, &mask, NULL, NULL, &tv);
 #ifdef USE_WINSOCK
 	} while (retval == SOCKET_ERROR && WSAGetLastError() == WSAEINTR);
 #else
 	} while (retval == -1 && errno == EINTR);
 #endif
 
-	for (size_t i = 0; i < set->Sockets.size(); ++i)
-	{
-		set->SocketReady[i] = FD_ISSET(set->Sockets[i], &mask);
+	for (size_t i = 0; i != this->Sockets.size(); ++i) {
+		this->SocketReady[i] = FD_ISSET(this->Sockets[i], &mask);
 	}
-
 	return retval;
 }
 
 /**
 **  Check if a socket in a socket set is ready.
 **
-**  @param set     Socket set
 **  @param socket  Socket to check
 **
 **  @return        Non-zero if socket is ready
 */
-int NetSocketSetSocketReady(SocketSet *set, Socket socket)
+int SocketSet::HasDataToRead(Socket socket) const
 {
-	for (size_t i = 0; i < set->Sockets.size(); ++i) {
-		if (set->Sockets[i] == socket) {
-			return set->SocketReady[i];
+	for (size_t i = 0; i < this->Sockets.size(); ++i) {
+		if (this->Sockets[i] == socket) {
+			return this->SocketReady[i];
 		}
 	}
 	DebugPrint("Socket not found in socket set\n");

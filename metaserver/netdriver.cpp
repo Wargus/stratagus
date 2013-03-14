@@ -272,13 +272,10 @@ static void KickIdlers(void)
 /**
 **  Read data
 */
-static int ReadData(void)
+static int ReadData()
 {
-	Session *session;
-	Session *next;
-	int result;
+	int result = Pool->Sockets->Select(0);
 
-	result = NetSocketSetReady(Pool->Sockets, 0);
 	if (result == 0) {
 		// No sockets ready
 		return 0;
@@ -289,14 +286,12 @@ static int ReadData(void)
 	}
 
 	// ready sockets
-	for (session = Pool->First; session; ) {
-		next = session->Next;
-		if (NetSocketSetSocketReady(Pool->Sockets, session->Sock)) {
-			int clen;
-
+	for (Session *session = Pool->First; session; ) {
+		Session *next = session->Next;
+		if (Pool->Sockets->HasDataToRead(session->Sock)) {
 			// socket ready
 			session->Idle = time(0);
-			clen = strlen(session->Buffer);
+			int clen = strlen(session->Buffer);
 			result = NetRecvTCP(session->Sock, session->Buffer + clen,
 				sizeof(session->Buffer) - clen);
 			if (result < 0) {

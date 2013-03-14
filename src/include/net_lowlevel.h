@@ -96,12 +96,20 @@ typedef int Socket;
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct SocketSet {
+class SocketSet
+{
+public:
 	SocketSet() : MaxSockFD(0) {}
 
 	void AddSocket(Socket socket);
 	void DelSocket(Socket socket);
 
+	/// Wait for socket set ready.
+	int Select(int timeout);
+	/// Check if a socket in a socket set is ready.
+	int HasDataToRead(Socket socket) const;
+
+private:
 	std::vector<Socket> Sockets;
 	std::vector<int> SocketReady;
 	Socket MaxSockFD;
@@ -123,35 +131,29 @@ extern unsigned long NetLocalAddrs[];  /// Local IP-Addrs of this host (net form
 extern int NetInit();
 /// Hardware dependend network exit.
 extern void NetExit();
+
 /// Resolve host in name or or colon dot notation.
 extern unsigned long NetResolveHost(const std::string &host);
 /// Get local IP from network file descriptor
 extern int NetSocketAddr(const Socket sock);
+
 /// Open a UDP Socket port.
 extern Socket NetOpenUDP(const char *addr, int port);
-/// Open a TCP Socket port.
-extern Socket NetOpenTCP(const char *addr, int port);
 /// Close a UDP socket port.
 extern void NetCloseUDP(Socket sockfd);
-/// Close a TCP socket port.
-extern void NetCloseTCP(Socket sockfd);
-/// Set socket to non-blocking
-extern int NetSetNonBlocking(Socket sockfd);
-/// Open a TCP connection.
-extern int NetConnectTCP(Socket sockfd, unsigned long addr, int port);
 /// Send through a UPD socket to a host:port.
-extern int NetSendUDP(Socket sockfd, unsigned long host, int port,
-					  const void *buf, int len);
-/// Send through a TCP socket
-extern int NetSendTCP(Socket sockfd, const void *buf, int len);
-/// Wait for socket ready.
-extern int NetSocketReady(Socket sockfd, int timeout);
-/// Wait for socket set ready.
-extern int NetSocketSetReady(SocketSet *sockfd, int timeout);
-/// Check if a socket in a socket set is ready.
-extern int NetSocketSetSocketReady(SocketSet *set, Socket socket);
+extern int NetSendUDP(Socket sockfd, unsigned long host, int port, const void *buf, int len);
 /// Receive from a UDP socket.
 extern int NetRecvUDP(Socket sockfd, void *buf, int len);
+
+/// Open a TCP Socket port.
+extern Socket NetOpenTCP(const char *addr, int port);
+/// Close a TCP socket port.
+extern void NetCloseTCP(Socket sockfd);
+/// Open a TCP connection.
+extern int NetConnectTCP(Socket sockfd, unsigned long addr, int port);
+/// Send through a TCP socket
+extern int NetSendTCP(Socket sockfd, const void *buf, int len);
 /// Receive from a TCP socket.
 extern int NetRecvTCP(Socket sockfd, void *buf, int len);
 /// Listen for connections on a TCP socket
@@ -159,10 +161,10 @@ extern int NetListenTCP(Socket sockfd);
 /// Accept a connection on a TCP socket
 extern Socket NetAcceptTCP(Socket sockfd);
 
-/// Add a socket to a socket set
-extern void NetAddSocket(SocketSet *set, Socket socket);
-/// Delete a socket from a socket set
-extern void NetDelSocket(SocketSet *set, Socket socket);
+/// Set socket to non-blocking
+extern int NetSetNonBlocking(Socket sockfd);
+/// Wait for socket ready.
+extern int NetSocketReady(Socket sockfd, int timeout);
 
 //@}
 
