@@ -268,10 +268,6 @@ int NetworkTimeout = 45;                   /// Number of seconds until player ti
 
 static char NetMsgBuf[PlayerMax][128];     /// Chat message buffers
 static int NetMsgBufLen[PlayerMax];        /// Stored chat message length
-#ifdef DEBUG
-unsigned long MyHost;                      /// My host number.
-int MyPort;                                /// My port number.
-#endif
 static unsigned long NetworkDelay;         /// Delay counter for recover.
 static int NetworkSyncSeeds[256];          /// Network sync seeds.
 static int NetworkSyncHashs[256];          /// Network sync hashs.
@@ -517,6 +513,7 @@ void InitNetwork1()
 	for (i = 0; i < 10; ++i) {
 		NetworkFildes = NetOpenUDP(NetworkAddr, port + i);
 		if (NetworkFildes != static_cast<Socket>(-1)) {
+			port = port + i;
 			break;
 		}
 	}
@@ -549,10 +546,10 @@ void InitNetwork1()
 
 		gethostname(buf, sizeof(buf));
 		DebugPrint("%s\n" _C_ buf);
-		MyHost = NetResolveHost(buf);
-		MyPort = NetLastPort;
+		const unsigned long myHost = NetResolveHost(buf);
+		const int myPort = port;
 		DebugPrint("My host:port %d.%d.%d.%d:%d\n" _C_
-				   NIPQUAD(ntohl(MyHost)) _C_ ntohs(MyPort));
+				   NIPQUAD(ntohl(myHost)) _C_ ntohs(myPort));
 	}
 #endif
 
@@ -882,7 +879,9 @@ void NetworkEvent()
 	//
 	// Read the packet.
 	//
-	if ((i = NetRecvUDP(NetworkFildes, &buf, sizeof(buf))) < 0) {
+	unsigned long host;
+	int port;
+	if ((i = NetRecvUDP(NetworkFildes, &buf, sizeof(buf), &host, &port)) < 0) {
 		//
 		// Server or client gone?
 		//
@@ -900,7 +899,7 @@ void NetworkEvent()
 	// Setup messages
 	//
 	if (NetConnectRunning) {
-		if (NetworkParseSetupEvent(buf, i)) {
+		if (NetworkParseSetupEvent(buf, i, host, port)) {
 			return;
 		}
 	}
@@ -912,14 +911,14 @@ void NetworkEvent()
 	}
 
 	for (i = 0; i < HostsCount; ++i) {
-		if (Hosts[i].Host == NetLastHost && Hosts[i].Port == NetLastPort &&
-			!PlayerQuit[Hosts[i].PlyNr]) {
+		if (Hosts[i].Host == host && Hosts[i].Port == port
+			&& !PlayerQuit[Hosts[i].PlyNr]) {
 			break;
 		}
 	}
 	if (i == HostsCount) {
 		DebugPrint("Not a host in play: %d.%d.%d.%d:%d\n" _C_
-				   NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+				   NIPQUAD(ntohl(host)) _C_ ntohs(port));
 		return;
 	}
 	player = Hosts[i].PlyNr;

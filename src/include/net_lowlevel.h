@@ -119,8 +119,6 @@ private:
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern unsigned long NetLastHost;      /// Last host number (net format)
-extern int NetLastPort;                /// Last port number (net format)
 extern unsigned long NetLocalAddrs[];  /// Local IP-Addrs of this host (net format)
 
 /*----------------------------------------------------------------------------
@@ -144,7 +142,8 @@ extern void NetCloseUDP(Socket sockfd);
 /// Send through a UPD socket to a host:port.
 extern int NetSendUDP(Socket sockfd, unsigned long host, int port, const void *buf, int len);
 /// Receive from a UDP socket.
-extern int NetRecvUDP(Socket sockfd, void *buf, int len);
+extern int NetRecvUDP(Socket sockfd, void *buf, int len, unsigned long *hostFrom, int *portFrom);
+
 
 /// Open a TCP Socket port.
 extern Socket NetOpenTCP(const char *addr, int port);
@@ -159,7 +158,8 @@ extern int NetRecvTCP(Socket sockfd, void *buf, int len);
 /// Listen for connections on a TCP socket
 extern int NetListenTCP(Socket sockfd);
 /// Accept a connection on a TCP socket
-extern Socket NetAcceptTCP(Socket sockfd);
+extern Socket NetAcceptTCP(Socket sockfd, unsigned long *clientHost, int *clientPort);
+
 
 /// Set socket to non-blocking
 extern int NetSetNonBlocking(Socket sockfd);

@@ -72,6 +72,15 @@ private:
 	pthread_t tid;
 };
 
+static unsigned long GetMyIP()
+{
+	char buf[128];
+
+	gethostname(buf, sizeof(buf));
+	//DebugPrint("%s\n" _C_ buf);
+	return NetResolveHost(buf);
+}
+
 template<typename T>
 void TCPWrite(Socket socket, const T &obj)
 {
@@ -101,14 +110,19 @@ public:
 	~ServerTCP() { NetCloseTCP(socket); }
 
 	bool Listen() { return NetListenTCP(socket) != -1; }
-	void Accept() { clientSocket = NetAcceptTCP(socket); }
+	void Accept() { clientSocket = NetAcceptTCP(socket, &clientHost, &clientPort); }
 
 	template <typename T>
 	void Write(const T &obj) { TCPWrite(clientSocket, obj); }
 
+	unsigned long GetClientHost() const { return clientHost; }
+	int GetClientPort() const { return clientPort; }
+
 private:
 	Socket socket;
 	Socket clientSocket;
+	unsigned long clientHost;
+	int clientPort;
 };
 
 class ClientTCP
@@ -193,18 +207,26 @@ private:
 
 TEST_FIXTURE(AutoNetwork, ExchangeTCP)
 {
-	ServerTCP server(6500);
+	const int serverPort = 6500;
+	const int clientPort = 6501;
+
+	ServerTCP server(serverPort);
 	SenderTCPJob sender(server);
 	sender.Run();
 
-	ClientTCP client(6501);
-	client.Connect("localhost", 6500);
+	ClientTCP client(clientPort);
+	client.Connect("localhost", serverPort);
 	ReceiverTCPJob receiver(client);
 	receiver.Run();
 
 	receiver.Wait();
 	sender.Wait();
 	CHECK(receiver.Check());
+	CHECK_EQUAL(clientPort, htons(server.GetClientPort()));
+	const unsigned long localhost = 0x7F000001; // 127.0.0.1
+
+	CHECK(GetMyIP() == ntohl(server.GetClientHost())
+		|| localhost == ntohl(server.GetClientHost()));
 }
 
 template<typename T>
@@ -222,12 +244,12 @@ void UDPWrite(Socket socket, const char *hostname, int port, const T &obj)
 }
 
 template<typename T>
-void UDPRead(Socket socket, T *obj)
+void UDPRead(Socket socket, T *obj, unsigned long *hostFrom, int *portFrom)
 {
 	char *buf = reinterpret_cast<char *>(obj);
 	size_t s = 0;
 	while (s != sizeof(T)) {
-		s += NetRecvUDP(socket, buf + s, sizeof(T) - s);
+		s += NetRecvUDP(socket, buf + s, sizeof(T) - s, hostFrom, portFrom);
 	}
 }
 
@@ -238,13 +260,18 @@ public:
 	~ClientUDP() { NetCloseUDP(socket); }
 
 	template <typename T>
-	void Read(T *obj) { UDPRead(socket, obj); }
+	void Read(T *obj) { UDPRead(socket, obj, &hostFrom, &portFrom); }
 
 	template <typename T>
 	void Write(const char *hostname, long port, const T &obj) { UDPWrite(socket, hostname, port, obj); }
 
+	unsigned long GetHostFrom() const { return hostFrom; }
+	int GetPortFrom() const { return portFrom; }
+
 private:
 	Socket socket;
+	unsigned long hostFrom;
+	int portFrom;
 };
 
 class ReceiverUDPJob : public Job
@@ -292,15 +319,23 @@ private:
 
 TEST_FIXTURE(AutoNetwork, ExchangeUDP)
 {
-	ClientUDP client(6501);
+	const int receiverPort = 6501;
+	const int senderPort = 6500;
+
+	ClientUDP client(receiverPort);
 	ReceiverUDPJob receiver(client);
 	receiver.Run();
 
-	ClientUDP server(6500);
-	SenderUDPJob sender(server, "localhost", 6501);
+	ClientUDP server(senderPort);
+	SenderUDPJob sender(server, "localhost", receiverPort);
 	sender.Run();
 
 	receiver.Wait();
 	sender.Wait();
 	CHECK(receiver.Check());
+	CHECK_EQUAL(senderPort, htons(client.GetPortFrom()));
+	const unsigned long localhost = 0x7F000001; // 127.0.0.1
+
+	CHECK(GetMyIP() == ntohl(client.GetHostFrom())
+		|| localhost == ntohl(client.GetHostFrom()));
 }

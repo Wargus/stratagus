@@ -240,7 +240,7 @@ extern void NetworkInitClientConnect();     /// Setup network connect state mach
 extern void NetworkExitClientConnect();     /// Terminate network connect state machine for clients
 extern void NetworkInitServerConnect(int openslots); /// Setup network connect state machine for the server
 extern void NetworkExitServerConnect();     /// Terminate network connect state machine for the server
-extern int NetworkParseSetupEvent(const unsigned char *buf, int size);  /// Parse a network connect event
+extern int NetworkParseSetupEvent(const unsigned char *buf, int size, unsigned long host, int port);  /// Parse a network connect event
 extern int NetworkSetupServerAddress(const std::string &serveraddr);  /// Menu: Setup the server IP
 extern void NetworkProcessClientRequest();  /// Menu Loop: Send out client request messages
 extern void NetworkProcessServerRequest();  /// Menu Loop: Send out server request messages

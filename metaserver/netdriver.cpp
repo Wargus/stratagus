@@ -217,12 +217,13 @@ static int KillSession(Session *session)
 /**
 **  Accept new connections
 */
-static void AcceptConnections(void)
+static void AcceptConnections()
 {
 	Session *new_session;
 	Socket new_socket;
-
-	while ((new_socket = NetAcceptTCP(MasterSocket)) != (Socket)-1) {
+	unsigned long host;
+	int port;
+	while ((new_socket = NetAcceptTCP(MasterSocket, &host, &port)) != (Socket)-1) {
 		// Check if we're at MaxConnections
 		if (Pool->Count == Server.MaxConnections) {
 			NetSendTCP(new_socket, "Server Full\n", 12);
@@ -239,16 +240,14 @@ static void AcceptConnections(void)
 		new_session->Sock = new_socket;
 		new_session->Idle = time(0);
 
-		new_session->AddrData.Host = NetLastHost;
-		sprintf(new_session->AddrData.IPStr, "%d.%d.%d.%d",
-			NIPQUAD(ntohl(NetLastHost)));
-		new_session->AddrData.Port = NetLastPort;
+		new_session->AddrData.Host = host;
+		sprintf(new_session->AddrData.IPStr, "%d.%d.%d.%d", NIPQUAD(ntohl(host)));
+		new_session->AddrData.Port = port;
 		DebugPrint("New connection from '%s'\n" _C_ new_session->AddrData.IPStr);
 
 		LINK(Pool->First, new_session, Pool->Last, Pool->Count);
 		Pool->Sockets->AddSocket(new_socket);
 	}
-
 }
 
 /**

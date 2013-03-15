@@ -66,9 +66,6 @@ typedef const void *sendbuftype;
 //  Variables
 //----------------------------------------------------------------------------
 
-unsigned long NetLastHost; /// Last host number (net format)
-int NetLastPort;           /// Last port number (net format)
-
 unsigned long NetLocalAddrs[MAX_LOC_IP]; /// Local IP-Addrs of this host (net format)
 
 //----------------------------------------------------------------------------
@@ -373,8 +370,6 @@ Socket NetOpenUDP(const char *addr, int port)
 			NetCloseUDP(sockfd);
 			return static_cast<Socket>(-1);
 		}
-		NetLastHost = sock_addr.sin_addr.s_addr;
-		NetLastPort = sock_addr.sin_port;
 	}
 	return sockfd;
 }
@@ -414,8 +409,6 @@ Socket NetOpenTCP(const char *addr, int port)
 			NetCloseTCP(sockfd);
 			return static_cast<Socket>(-1);
 		}
-		NetLastHost = sock_addr.sin_addr.s_addr;
-		NetLastPort = sock_addr.sin_port;
 	}
 	return sockfd;
 }
@@ -453,7 +446,6 @@ int NetConnectTCP(Socket sockfd, unsigned long addr, int port)
 				NIPQUAD(ntohl(addr)), port);
 		return -1;
 	}
-
 	return sockfd;
 }
 
@@ -552,13 +544,15 @@ int SocketSet::HasDataToRead(Socket socket) const
 /**
 **  Receive from a UDP socket.
 **
-**  @param sockfd  Socket
-**  @param buf     Receive message buffer.
-**  @param len     Receive message buffer length.
+**  @param sockfd    Socket
+**  @param buf       Receive message buffer.
+**  @param len       Receive message buffer length.
+**  @param hostFrom  host of the sender.
+**  @param portFrom  port of the sender.
 **
 **  @return Number of bytes placed in buffer, or -1 if failure.
 */
-int NetRecvUDP(Socket sockfd, void *buf, int len)
+int NetRecvUDP(Socket sockfd, void *buf, int len, unsigned long *hostFrom, int *portFrom)
 {
 	struct sockaddr_in sock_addr;
 	socklen_t n = sizeof(struct sockaddr_in);
@@ -573,8 +567,8 @@ int NetRecvUDP(Socket sockfd, void *buf, int len)
 	// Packet check for validness is done higher up, we don't know who should be
 	// sending us packets at this level
 
-	NetLastHost = sock_addr.sin_addr.s_addr;
-	NetLastPort = sock_addr.sin_port;
+	*hostFrom = sock_addr.sin_addr.s_addr;
+	*portFrom = sock_addr.sin_port;
 
 	return l;
 }
@@ -660,18 +654,20 @@ int NetListenTCP(Socket sockfd)
 /**
 **  Accept a connection on a TCP socket.
 **
-**  @param sockfd  Socket
+**  @param sockfd      Socket
+**  @param clientHost  host of the client connected.
+**  @param clientPort  port of the client connected.
 **
 **  @return If success the new socket fildes, -1 otherwise.
 */
-Socket NetAcceptTCP(Socket sockfd)
+Socket NetAcceptTCP(Socket sockfd, unsigned long *clientHost, int *clientPort)
 {
 	struct sockaddr_in sa;
 	socklen_t len = sizeof(struct sockaddr_in);
 
 	Socket socket = accept(sockfd, (struct sockaddr *)&sa, &len);
-	NetLastHost = sa.sin_addr.s_addr;
-	NetLastPort = sa.sin_port;
+	*clientHost = sa.sin_addr.s_addr;
+	*clientPort = sa.sin_port;
 	return socket;
 }
 

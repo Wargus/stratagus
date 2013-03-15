@@ -66,11 +66,6 @@ int NetPlayers;                        /// How many network players
 char *NetworkAddr = NULL;              /// Local network address to use
 int NetworkPort = NetworkDefaultPort;  /// Local network port to use
 
-#ifdef DEBUG
-extern unsigned long MyHost;           /// My host number.
-extern int MyPort;                     /// My port number.
-#endif
-
 int HostsCount;                        /// Number of hosts.
 CNetworkHost Hosts[PlayerMax];         /// Host and ports of all players.
 
@@ -720,9 +715,11 @@ breakout:
 
 		// Wait for acknowledge
 		while (j && NetSocketReady(NetworkFildes, 1000)) {
-			if ((n = NetRecvUDP(NetworkFildes, buf, sizeof(buf))) < 0) {
+			unsigned long host;
+			int port;
+			if ((n = NetRecvUDP(NetworkFildes, buf, sizeof(buf), &host, &port)) < 0) {
 				DebugPrint("*Receive ack failed: (%d) from %d.%d.%d.%d:%d\n" _C_
-						   n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+						   n _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
 				continue;
 			}
 
@@ -737,10 +734,10 @@ breakout:
 
 					case ICMConfig:
 						DebugPrint("Got ack for InitConfig: (%d) from %d.%d.%d.%d:%d\n" _C_
-								   n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+								   n _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
 
 						for (int i = 0; i < HostsCount; ++i) {
-							if (NetLastHost == Hosts[i].Host && NetLastPort == Hosts[i].Port) {
+							if (host == Hosts[i].Host && port == Hosts[i].Port) {
 								if (num[Hosts[i].PlyNr] == 1) {
 									num[Hosts[i].PlyNr]++;
 								}
@@ -751,10 +748,10 @@ breakout:
 
 					case ICMGo:
 						DebugPrint("Got ack for InitState: (%d) from %d.%d.%d.%d:%d\n" _C_
-								   n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+								   n _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
 
 						for (int i = 0; i < HostsCount; ++i) {
-							if (NetLastHost == Hosts[i].Host && NetLastPort == Hosts[i].Port) {
+							if (host == Hosts[i].Host && port == Hosts[i].Port) {
 								if (num[Hosts[i].PlyNr] == 2) {
 									num[Hosts[i].PlyNr] = 0;
 									--j;
@@ -1128,11 +1125,13 @@ static void ClientParseDetaching(const CInitMessage &msg)
 }
 
 /**
-** Parse a network menu packet in client connecting state.
+**  Parse a network menu packet in client connecting state.
 **
-** @param msg message received
+**  @param msg   message received
+**  @param host  host which send the message
+**  @param port  port from where the messahe nas been sent
 */
-static void ClientParseConnecting(const CInitMessage &msg)
+static void ClientParseConnecting(const CInitMessage &msg, unsigned long host, int port)
 {
 	switch (msg.SubType) {
 
@@ -1142,7 +1141,7 @@ static void ClientParseConnecting(const CInitMessage &msg)
 					"from %d.%d.%d.%d:%d\n",
 					(int)ntohl(msg.Stratagus),
 					StratagusVersion,
-					NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
+					NIPQUAD(ntohl(host)), ntohs(port));
 			NetLocalState = ccs_incompatibleengine;
 			NetConnectRunning = 0; // End the menu..
 			return;
@@ -1154,14 +1153,14 @@ static void ClientParseConnecting(const CInitMessage &msg)
 					"from %d.%d.%d.%d:%d\n",
 					NetworkProtocolFormatArgs((int)ntohl(msg.Version)),
 					NetworkProtocolFormatArgs(NetworkProtocolVersion),
-					NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
+					NIPQUAD(ntohl(host)), ntohs(port));
 			NetLocalState = ccs_incompatiblenetwork;
 			NetConnectRunning = 0; // End the menu..
 			return;
 
 		case ICMGameFull: // Game is full - server rejected connnection
 			fprintf(stderr, "Server at %d.%d.%d.%d:%d is full!\n",
-					NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
+					NIPQUAD(ntohl(host)), ntohs(port));
 			NetLocalState = ccs_nofreeslots;
 			NetConnectRunning = 0; // End the menu..
 			return;
@@ -1295,14 +1294,15 @@ static void ClientParseMapInfo(const CInitMessage &msg)
 }
 
 /**
-** Parse a network menu packet in client synced state.
+**  Parse a network menu packet in client synced state.
 **
-** @param msg message received
+**  @param msg   message received
+**  @param host  host which send the message
+**  @param port  port from where the messahe nas been sent
 */
-static void ClientParseSynced(const CInitMessage &msg)
+static void ClientParseSynced(const CInitMessage &msg, unsigned long host, int port)
 {
 	switch (msg.SubType) {
-
 		case ICMState: // Server has sent us new state info
 			DebugPrint("ccs_synced: ICMState recieved\n");
 			ServerSetupState = msg.u.State;
@@ -1334,15 +1334,15 @@ static void ClientParseSynced(const CInitMessage &msg)
 				}
 			}
 			// server is last:
-			Hosts[HostsCount].Host = NetLastHost;
-			Hosts[HostsCount].Port = NetLastPort;
+			Hosts[HostsCount].Host = host;
+			Hosts[HostsCount].Port = port;
 			Hosts[HostsCount].PlyNr = ntohs(msg.u.Hosts[i].PlyNr);
 			memcpy(Hosts[HostsCount].PlyName, msg.u.Hosts[i].PlyName, sizeof(Hosts[HostsCount].PlyName) - 1);
 			++HostsCount;
 			NetPlayers = HostsCount + 1;
 			DebugPrint("Server %d = %d.%d.%d.%d:%d [%.*s]\n" _C_
-					   ntohs(msg.u.Hosts[i].PlyNr) _C_ NIPQUAD(ntohl(NetLastHost)) _C_
-					   ntohs(NetLastPort) _C_
+					   ntohs(msg.u.Hosts[i].PlyNr) _C_ NIPQUAD(ntohl(host)) _C_
+					   ntohs(port) _C_
 					   static_cast<int>(sizeof(msg.u.Hosts[i].PlyName)) _C_
 					   msg.u.Hosts[i].PlyName);
 
@@ -1478,12 +1478,14 @@ static void ClientParseBadMap()
 
 
 /**
-** Parse the initial 'Hello' message of new client that wants to join the game
+**  Parse the initial 'Hello' message of new client that wants to join the game
 **
-** @param h slot number of host msg originates from
-** @param msg message received
+**  @param h slot number of host msg originates from
+**  @param msg message received
+**  @param host  host which send the message
+**  @param port  port from where the messahe nas been sent
 */
-static void ServerParseHello(int h, const CInitMessage &msg)
+static void ServerParseHello(int h, const CInitMessage &msg, unsigned long host, int port)
 {
 	if (h == -1) { // it is a new client
 		for (int i = 1; i < PlayerMax - 1; ++i) {
@@ -1496,12 +1498,12 @@ static void ServerParseHello(int h, const CInitMessage &msg)
 			}
 		}
 		if (h != -1) {
-			Hosts[h].Host = NetLastHost;
-			Hosts[h].Port = NetLastPort;
+			Hosts[h].Host = host;
+			Hosts[h].Port = port;
 			Hosts[h].PlyNr = h;
 			memcpy(Hosts[h].PlyName, msg.u.Hosts[0].PlyName, sizeof(Hosts[h].PlyName) - 1);
 			DebugPrint("New client %d.%d.%d.%d:%d [%s]\n" _C_
-					   NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort) _C_ Hosts[h].PlyName);
+					   NIPQUAD(ntohl(host)) _C_ ntohs(port) _C_ Hosts[h].PlyName);
 			NetStates[h].State = ccs_connecting;
 			NetStates[h].MsgCnt = 0;
 		} else {
@@ -1510,11 +1512,11 @@ static void ServerParseHello(int h, const CInitMessage &msg)
 			message.Type = MessageInitReply;
 			message.SubType = ICMGameFull; // Game is full - reject connnection
 			message.MapUID = 0L;
-			const int n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+			const int n = NetworkSendICMessage(host, port, &message);
 
 			UNUSED(n); // unused in release
 			DebugPrint("Sending InitReply Message GameFull: (%d) to %d.%d.%d.%d:%d\n" _C_
-					   n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+					   n _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
 			return;
 		}
 	}
@@ -1542,11 +1544,11 @@ static void ServerParseHello(int h, const CInitMessage &msg)
 			}
 		}
 	}
-	const int n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+	const int n = NetworkSendICMessage(host, port, &message);
 
 	UNUSED(n); // unused in release
 	DebugPrint("Sending InitReply Message Welcome: (%d) [PlyNr: %d] to %d.%d.%d.%d:%d\n" _C_
-			   n _C_ h _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+			   n _C_ h _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
 	NetStates[h].MsgCnt++;
 	if (NetStates[h].MsgCnt > 48) {
 		// Detects UDP input firewalled or behind NAT firewall clients
@@ -1556,13 +1558,14 @@ static void ServerParseHello(int h, const CInitMessage &msg)
 }
 
 /**
-** Parse client resync request after client user has changed menu selection
+**  Parse client resync request after client user has changed menu selection
 **
-** @param h slot number of host msg originates from
+**  @param h slot number of host msg originates from
+**  @param host  host which send the message
+**  @param port  port from where the messahe nas been sent
 */
-static void ServerParseResync(const int h)
+static void ServerParseResync(const int h, unsigned long host, int port)
 {
-
 	ServerSetupState.LastFrame[h] = FrameCounter;
 	switch (NetStates[h].State) {
 		case ccs_mapinfo:
@@ -1593,11 +1596,11 @@ static void ServerParseResync(const int h)
 					}
 				}
 			}
-			const int n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+			const int n = NetworkSendICMessage(host, port, &message);
 
 			UNUSED(n); // unused in release
 			DebugPrint("Sending InitReply Message Resync: (%d) to %d.%d.%d.%d:%d\n" _C_
-					   n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+					   n _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
 			NetStates[h].MsgCnt++;
 			if (NetStates[h].MsgCnt > 50) {
 				// FIXME: Client sends resync, but doesn't receive our resync ack....
@@ -1613,11 +1616,13 @@ static void ServerParseResync(const int h)
 
 
 /**
-** Parse client heart beat waiting message
+**  Parse client heart beat waiting message
 **
-** @param h slot number of host msg originates from
+**  @param h slot number of host msg originates from
+**  @param host  host which send the message
+**  @param port  port from where the message nas been sent
 */
-static void ServerParseWaiting(const int h)
+static void ServerParseWaiting(const int h, unsigned long host, int port)
 {
 	CInitMessage message;
 
@@ -1639,11 +1644,11 @@ static void ServerParseWaiting(const int h)
 			message.SubType = ICMMap; // Send Map info to the client
 			strncpy_s(message.u.MapPath, sizeof(message.u.MapPath), NetworkMapName.c_str(), NetworkMapName.size());
 			message.MapUID = htonl(Map.Info.MapUID);
-			const int n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+			const int n = NetworkSendICMessage(host, port, &message);
 
 			UNUSED(n); // unused in release
 			DebugPrint("Sending InitReply Message Map: (%d) to %d.%d.%d.%d:%d\n" _C_
-					   n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+					   n _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
 			NetStates[h].MsgCnt++;
 			if (NetStates[h].MsgCnt > 50) {
 				// FIXME: Client sends waiting, but doesn't receive our map....
@@ -1676,11 +1681,11 @@ static void ServerParseWaiting(const int h)
 			message.SubType = ICMState; // Send new state info to the client
 			message.u.State = ServerSetupState;
 			message.MapUID = htonl(Map.Info.MapUID);
-			const int n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+			const int n = NetworkSendICMessage(host, port, &message);
 
 			UNUSED(n); // unused in release
 			DebugPrint("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n" _C_
-					   n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+					   n _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
 			NetStates[h].MsgCnt++;
 			if (NetStates[h].MsgCnt > 50) {
 				// FIXME: Client sends waiting, but doesn't receive our state info....
@@ -1695,11 +1700,13 @@ static void ServerParseWaiting(const int h)
 }
 
 /**
-** Parse client map info acknoledge message
+**  Parse client map info acknoledge message
 **
-** @param h slot number of host msg originates from
+**  @param h slot number of host msg originates from
+**  @param host  host which send the message
+**  @param port  port from where the message nas been sent
 */
-static void ServerParseMap(const int h)
+static void ServerParseMap(const int h, unsigned long host, int port)
 {
 	CInitMessage message;
 
@@ -1717,11 +1724,11 @@ static void ServerParseMap(const int h)
 			message.SubType = ICMState; // Send State info to the client
 			message.u.State = ServerSetupState;
 			message.MapUID = htonl(Map.Info.MapUID);
-			const int n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+			const int n = NetworkSendICMessage(host, port, &message);
 
 			UNUSED(n); // unused in release
 			DebugPrint("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n" _C_
-					   n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+					   n _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
 			NetStates[h].MsgCnt++;
 			if (NetStates[h].MsgCnt > 50) {
 				// FIXME: Client sends mapinfo, but doesn't receive our state info....
@@ -1736,12 +1743,14 @@ static void ServerParseMap(const int h)
 }
 
 /**
-** Parse locate state change notifiction or initial state info request of client
+**  Parse locate state change notifiction or initial state info request of client
 **
-** @param h slot number of host msg originates from
-** @param msg message received
+**  @param h slot number of host msg originates from
+**  @param msg message received
+**  @param host  host which send the message
+**  @param port  port from where the message nas been sent
 */
-static void ServerParseState(const int h, const CInitMessage &msg)
+static void ServerParseState(const int h, const CInitMessage &msg, unsigned long host, int port)
 {
 	CInitMessage message;
 
@@ -1773,11 +1782,11 @@ static void ServerParseState(const int h, const CInitMessage &msg)
 			message.SubType = ICMState; // Send new state info to the client
 			message.u.State = ServerSetupState;
 			message.MapUID = htonl(Map.Info.MapUID);
-			const int n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+			const int n = NetworkSendICMessage(host, port, &message);
 
 			UNUSED(n); // unused in release
 			DebugPrint("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n" _C_
-					   n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+					   n _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
 			NetStates[h].MsgCnt++;
 			if (NetStates[h].MsgCnt > 50) {
 				// FIXME: Client sends State, but doesn't receive our state info....
@@ -1792,11 +1801,13 @@ static void ServerParseState(const int h, const CInitMessage &msg)
 }
 
 /**
-** Parse the disconnect request of a client by sending out good bye
+**  Parse the disconnect request of a client by sending out good bye
 **
-** @param h slot number of host msg originates from
+**  @param h slot number of host msg originates from
+**  @param host  host which send the message
+**  @param port  port from where the message nas been sent
 */
-static void ServerParseGoodBye(const int h)
+static void ServerParseGoodBye(const int h, unsigned long host, int port)
 {
 	CInitMessage message;
 
@@ -1812,11 +1823,11 @@ static void ServerParseGoodBye(const int h)
 			// by sending ICMSeeYou;
 			message.Type = MessageInitReply;
 			message.SubType = ICMGoodBye;
-			const int n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+			const int n = NetworkSendICMessage(host, port, &message);
 
 			UNUSED(n); // unused in release
 			DebugPrint("Sending InitReply Message GoodBye: (%d) to %d.%d.%d.%d:%d\n" _C_
-					   n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+					   n _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
 			NetStates[h].MsgCnt++;
 			if (NetStates[h].MsgCnt > 10) {
 				// FIXME: Client sends GoodBye, but doesn't receive our GoodBye....
@@ -1858,13 +1869,15 @@ static void ServerParseIAmHere(const int h)
 }
 
 /**
-** Check if the Stratagus version and Network Protocol match
+**  Check if the Stratagus version and Network Protocol match
 **
-** @param msg message received
+**  @param msg message received
+**  @param host  host which send the message
+**  @param port  port from where the message nas been sent
 **
-** @return 0 if the versions match, -1 otherwise
+**  @return 0 if the versions match, -1 otherwise
 */
-static int CheckVersions(const CInitMessage &msg)
+static int CheckVersions(const CInitMessage &msg, unsigned long host, int port)
 {
 	CInitMessage message;
 
@@ -1874,16 +1887,16 @@ static int CheckVersions(const CInitMessage &msg)
 				"from %d.%d.%d.%d:%d\n",
 				(int)ntohl(msg.Stratagus),
 				StratagusVersion,
-				NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
+				NIPQUAD(ntohl(host)), ntohs(port));
 
 		message.Type = MessageInitReply;
 		message.SubType = ICMEngineMismatch; // Stratagus engine version doesn't match
 		message.MapUID = 0L;
-		const int n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+		const int n = NetworkSendICMessage(host, port, &message);
 
 		UNUSED(n); // unused in release
 		DebugPrint("Sending InitReply Message EngineMismatch: (%d) to %d.%d.%d.%d:%d\n" _C_
-				   n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+				   n _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
 		return -1;
 	}
 
@@ -1894,31 +1907,33 @@ static int CheckVersions(const CInitMessage &msg)
 				"from %d.%d.%d.%d:%d\n",
 				NetworkProtocolFormatArgs((int)ntohl(msg.Version)),
 				NetworkProtocolFormatArgs(NetworkProtocolVersion),
-				NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
+				NIPQUAD(ntohl(host)), ntohs(port));
 
 		message.Type = MessageInitReply;
 		message.SubType = ICMProtocolMismatch; // Network protocol version doesn't match
 		message.MapUID = 0L;
-		const int n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+		const int n = NetworkSendICMessage(host, port, &message);
 
 		UNUSED(n); // unused in release
 		DebugPrint("Sending InitReply Message ProtocolMismatch: (%d) to %d.%d.%d.%d:%d\n" _C_
-				   n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+				   n _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
 		return -1;
 	}
 	return 0;
 }
 
 /**
-** Parse a Network menu packet.
+**  Parse a Network menu packet.
 **
-** @param msg message received
+**  @param msg message received
+**  @param host  host which send the message
+**  @param port  port from where the message nas been sent
 */
-static void NetworkParseMenuPacket(const CInitMessage &msg)
+static void NetworkParseMenuPacket(const CInitMessage &msg, unsigned long host, int port)
 {
 	DebugPrint("Received %s Init Message %d:%d from %d.%d.%d.%d:%d (%ld)\n" _C_
-			   icmsgsubtypenames[msg.SubType] _C_ msg.Type _C_ msg.SubType _C_ NIPQUAD(ntohl(NetLastHost)) _C_
-			   ntohs(NetLastPort) _C_ FrameCounter);
+			   icmsgsubtypenames[msg.SubType] _C_ msg.Type _C_ msg.SubType _C_ NIPQUAD(ntohl(host)) _C_
+			   ntohs(port) _C_ FrameCounter);
 
 	if (NetConnectRunning == 2) { // client
 		if (msg.Type == MessageInitReply) {
@@ -1944,7 +1959,7 @@ static void NetworkParseMenuPacket(const CInitMessage &msg)
 					break;
 
 				case ccs_connecting:
-					ClientParseConnecting(msg);
+					ClientParseConnecting(msg, host, port);
 					break;
 
 				case ccs_connected:
@@ -1957,7 +1972,7 @@ static void NetworkParseMenuPacket(const CInitMessage &msg)
 
 				case ccs_changed:
 				case ccs_synced:
-					ClientParseSynced(msg);
+					ClientParseSynced(msg, host, port);
 					break;
 
 				case ccs_async:
@@ -1981,41 +1996,40 @@ static void NetworkParseMenuPacket(const CInitMessage &msg)
 					break;
 			}
 		}
-
 	} else if (NetConnectRunning == 1) { // server
 		int i;
 
-		if (CheckVersions(msg)) {
+		if (CheckVersions(msg, host, port)) {
 			return;
 		}
 
 		// look up the host - avoid last player slot (15) which is special
 		for (i = 0; i < PlayerMax - 1; ++i) {
-			if (Hosts[i].Host == NetLastHost && Hosts[i].Port == NetLastPort) {
+			if (Hosts[i].Host == host && Hosts[i].Port == port) {
 				switch (msg.SubType) {
 					case ICMHello: // a new client has arrived
-						ServerParseHello(i, msg);
+						ServerParseHello(i, msg, host, port);
 						break;
 
 					case ICMResync:
-						ServerParseResync(i);
+						ServerParseResync(i, host, port);
 						break;
 
 					case ICMWaiting:
-						ServerParseWaiting(i);
+						ServerParseWaiting(i, host, port);
 						break;
 
 					case ICMMap:
-						ServerParseMap(i);
+						ServerParseMap(i, host, port);
 						break;
 
 					case ICMState:
-						ServerParseState(i, msg);
+						ServerParseState(i, msg, host, port);
 						break;
 
 					case ICMMapUidMismatch:
 					case ICMGoodBye:
-						ServerParseGoodBye(i);
+						ServerParseGoodBye(i, host, port);
 						break;
 
 					case ICMSeeYou:
@@ -2035,20 +2049,22 @@ static void NetworkParseMenuPacket(const CInitMessage &msg)
 		}
 		if (i == PlayerMax - 1 && msg.SubType == ICMHello) {
 			// Special case: a new client has arrived
-			ServerParseHello(-1, msg);
+			ServerParseHello(-1, msg, host, port);
 		}
 	}
 }
 
 /**
-** Parse a setup event. (Command type <= MessageInitEvent)
+**  Parse a setup event. (Command type <= MessageInitEvent)
 **
-** @param buf Packet received
-** @param size size of the received packet.
+**  @param buf Packet received
+**  @param size size of the received packet.
+**  @param host  host which send the message
+**  @param port  port from where the message nas been sent
 **
-** @return 1 if packet is an InitConfig message, 0 otherwise
+**  @return 1 if packet is an InitConfig message, 0 otherwise
 */
-int NetworkParseSetupEvent(const unsigned char *buf, int size)
+int NetworkParseSetupEvent(const unsigned char *buf, int size, unsigned long host, int port)
 {
 	CInitMessage msg;
 
@@ -2075,7 +2091,7 @@ int NetworkParseSetupEvent(const unsigned char *buf, int size)
 	}
 
 	if (InterfaceState == IfaceStateMenu) {
-		NetworkParseMenuPacket(msg);
+		NetworkParseMenuPacket(msg, host, port);
 		return 1;
 	}
 	return 0;
