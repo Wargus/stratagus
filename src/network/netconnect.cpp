@@ -122,6 +122,14 @@ void CNetworkHost::Deserialize(const unsigned char *p)
 	memcpy(this->PlyName, p, sizeof(this->PlyName));
 }
 
+void CNetworkHost::Clear()
+{
+	this->Host = 0;
+	this->Port = 0;
+	this->PlyNr = 0;
+	memset(this->PlyName, 0, sizeof(this->PlyName));
+}
+
 unsigned char *CServerSetup::Serialize() const
 {
 	unsigned char *buf = new unsigned char[CServerSetup::Size()];
@@ -402,10 +410,7 @@ void NetworkInitClientConnect()
 	NetworkServerPort = NetworkPort;
 	LastStateMsgType = ICMServerQuit;
 	for (int i = 0; i < PlayerMax; ++i) {
-		Hosts[i].Host = 0;
-		Hosts[i].Port = 0;
-		Hosts[i].PlyNr = 0;
-		memset(Hosts[i].PlyName, 0, sizeof(Hosts[i].PlyName));
+		Hosts[i].Clear();
 	}
 	ServerSetupState.Clear();
 	LocalSetupState.Clear();
@@ -439,10 +444,7 @@ void NetworkInitServerConnect(int openslots)
 	// Cannot use NetPlayers here, as map change might modify the number!!
 	for (int i = 0; i < PlayerMax; ++i) {
 		NetStates[i].State = ccs_unused;
-		Hosts[i].Host = 0;
-		Hosts[i].Port = 0;
-		Hosts[i].PlyNr = 0; // slotnr until final cfg msg
-		memset(Hosts[i].PlyName, 0, sizeof(Hosts[i].PlyName));
+		Hosts[i].Clear();
 	}
 
 	// preset the server (initially always slot 0)
@@ -584,8 +586,7 @@ void NetworkServerStartGame()
 				if (Hosts[j].PlyNr) {
 					DebugPrint("Compact: Hosts %d -> Hosts %d\n" _C_ j _C_ i);
 					Hosts[i] = Hosts[j];
-					Hosts[j].PlyNr = 0;
-					Hosts[j].Host = Hosts[j].Port = 0;
+					Hosts[j].Clear();
 					std::swap(LocalSetupState.CompOpt[i], LocalSetupState.CompOpt[j]);
 					std::swap(LocalSetupState.Race[i], LocalSetupState.Race[j]);
 					std::swap(LocalSetupState.LastFrame[i], LocalSetupState.LastFrame[j]);
@@ -659,13 +660,8 @@ void NetworkServerStartGame()
 	NetLocalPlayerNumber = Hosts[0].PlyNr;
 	HostsCount = NetPlayers - 1;
 
-	//
 	// Move ourselves (server slot 0) to the end of the list
-	//
-	Hosts[PlayerMax - 1] = Hosts[0]; // last slot unused (special), use as tempstore..
-	Hosts[0] = Hosts[HostsCount];
-	Hosts[HostsCount] = Hosts[PlayerMax - 1];
-	Hosts[PlayerMax - 1].PlyNr = 0;
+	std::swap(Hosts[0], Hosts[HostsCount]);
 
 	// Prepare the final config message:
 	message.Type = MessageInitReply;
@@ -673,9 +669,7 @@ void NetworkServerStartGame()
 	message.HostsCount = NetPlayers;
 	message.MapUID = htonl(Map.Info.MapUID);
 	for (int i = 0; i < NetPlayers; ++i) {
-		message.u.Hosts[i].Host = Hosts[i].Host;
-		message.u.Hosts[i].Port = Hosts[i].Port;
-		memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, sizeof(message.u.Hosts[i].PlyName) - 1);
+		message.u.Hosts[i] = Hosts[i];
 		message.u.Hosts[i].PlyNr = htons(Hosts[i].PlyNr);
 	}
 
@@ -1042,10 +1036,7 @@ static void KickDeadClient(int c)
 {
 	DebugPrint("kicking client %d\n" _C_ Hosts[c].PlyNr);
 	NetStates[c].State = ccs_unused;
-	Hosts[c].Host = 0;
-	Hosts[c].Port = 0;
-	Hosts[c].PlyNr = 0;
-	memset(Hosts[c].PlyName, 0, sizeof(Hosts[c].PlyName));
+	Hosts[c].Clear();
 	ServerSetupState.Ready[c] = 0;
 	ServerSetupState.Race[c] = 0;
 	ServerSetupState.LastFrame[c] = 0L;
@@ -1280,7 +1271,6 @@ static void ClientParseConnected(const CInitMessage &msg)
 static void ClientParseMapInfo(const CInitMessage &msg)
 {
 	switch (msg.SubType) {
-
 		case ICMState: // Server has sent us first state info
 			ServerSetupState = msg.u.State;
 			NetLocalState = ccs_synced;
@@ -1316,10 +1306,8 @@ static void ClientParseSynced(const CInitMessage &msg, unsigned long host, int p
 			int i;
 			for (i = 0; i < msg.HostsCount - 1; ++i) {
 				if (msg.u.Hosts[i].Host || msg.u.Hosts[i].Port) {
-					Hosts[HostsCount].Host = msg.u.Hosts[i].Host;
-					Hosts[HostsCount].Port = msg.u.Hosts[i].Port;
+					Hosts[HostsCount] = msg.u.Hosts[i];
 					Hosts[HostsCount].PlyNr = ntohs(msg.u.Hosts[i].PlyNr);
-					memcpy(Hosts[HostsCount].PlyName, msg.u.Hosts[i].PlyName, sizeof(Hosts[HostsCount].PlyName) - 1);
 					HostsCount++;
 					DebugPrint("Client %d = %d.%d.%d.%d:%d [%.*s]\n" _C_
 							   ntohs(ntohs(msg.u.Hosts[i].PlyNr)) _C_ NIPQUAD(ntohl(msg.u.Hosts[i].Host)) _C_
@@ -1372,7 +1360,6 @@ static void ClientParseSynced(const CInitMessage &msg, unsigned long host, int p
 static void ClientParseAsync(const CInitMessage &msg)
 {
 	switch (msg.SubType) {
-
 		case ICMResync: // Server has resynced with us and sends resync data
 			DebugPrint("ccs_async: ICMResync\n");
 			for (int i = 1; i < PlayerMax - 1; ++i) {
@@ -1533,10 +1520,8 @@ static void ServerParseHello(int h, const CInitMessage &msg, unsigned long host,
 	for (int i = 1; i < PlayerMax - 1; ++i) { // Info about other clients
 		if (i != h) {
 			if (Hosts[i].PlyNr) {
-				message.u.Hosts[i].Host = Hosts[i].Host;
-				message.u.Hosts[i].Port = Hosts[i].Port;
+				message.u.Hosts[i] = Hosts[i];
 				message.u.Hosts[i].PlyNr = htons(Hosts[i].PlyNr);
-				memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, sizeof(message.u.Hosts[i].PlyName) - 1);
 			} else {
 				message.u.Hosts[i].Host = 0;
 				message.u.Hosts[i].Port = 0;
@@ -1585,10 +1570,8 @@ static void ServerParseResync(const int h, unsigned long host, int port)
 			for (int i = 1; i < PlayerMax - 1; ++i) { // Info about other clients
 				if (i != h) {
 					if (Hosts[i].PlyNr) {
-						message.u.Hosts[i].Host = Hosts[i].Host;
-						message.u.Hosts[i].Port = Hosts[i].Port;
+						message.u.Hosts[i] = Hosts[i];
 						message.u.Hosts[i].PlyNr = htons(Hosts[i].PlyNr);
-						memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, sizeof(message.u.Hosts[i].PlyName) - 1);
 					} else {
 						message.u.Hosts[i].Host = 0;
 						message.u.Hosts[i].Port = 0;

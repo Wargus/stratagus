@@ -74,6 +74,7 @@ class CNetworkHost
 public:
 	unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
+	void Clear();
 	static size_t Size() { return 4 + 2 + 2 + NetPlayerNameSize; }
 
 	uint32_t Host;         /// Host address
