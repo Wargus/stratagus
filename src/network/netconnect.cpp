@@ -61,7 +61,6 @@
 // Variables
 //----------------------------------------------------------------------------
 
-std::string NetworkArg;                /// Network command line argument
 int NetPlayers;                        /// How many network players
 char *NetworkAddr = NULL;              /// Local network address to use
 int NetworkPort = NetworkDefaultPort;  /// Local network port to use
@@ -86,7 +85,7 @@ std::string NetworkMapName;             /// Name of the map recieved with ICMMap
 /// For now just specify with the -P port command line arg...
 static int NetworkServerPort = NetworkDefaultPort; /// Server network port to use
 
-int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
+static int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
 
 /**
 ** Client and server selection state for Multiplayer clients

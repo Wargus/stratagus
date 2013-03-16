@@ -45,8 +45,6 @@
 //  Declarations
 //----------------------------------------------------------------------------
 
-#define MAX_LOC_IP 10
-
 #ifdef USE_WIN32
 typedef const char *setsockopttype;
 typedef char *recvfrombuftype;
@@ -61,12 +59,6 @@ typedef void *recvbuftype;
 typedef const void *sendtobuftype;
 typedef const void *sendbuftype;
 #endif
-
-//----------------------------------------------------------------------------
-//  Variables
-//----------------------------------------------------------------------------
-
-unsigned long NetLocalAddrs[MAX_LOC_IP]; /// Local IP-Addrs of this host (net format)
 
 //----------------------------------------------------------------------------
 //  Low level functions
@@ -209,9 +201,10 @@ unsigned long NetResolveHost(const std::string &host)
 
 /**
 **  Get IP-addrs of local interfaces from Network file descriptor
-**  and store them in the NetLocalAddrs array.
 **
-**  @param sock local socket.
+**  @param sock     local socket.
+**  @param ips      where to stock ip addrs.
+**  @param maxAddr  size of ips.
 **
 **  @return number of IP-addrs found.
 */
@@ -220,9 +213,9 @@ unsigned long NetResolveHost(const std::string &host)
 // I also found a way for winsock1.1 (= win95), but
 // that one was too complex to start with.. -> trouble
 // Lookout for INTRFC.EXE on the MS web site...
-int NetSocketAddr(const Socket sock)
+int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 {
-	INTERFACE_INFO localAddr[MAX_LOC_IP];  // Assume there will be no more than MAX_LOC_IP interfaces
+	INTERFACE_INFO localAddr[maxAddr];  // Assume there will be no more than maxAddr interfaces
 	int nif = 0;
 
 	if (sock != static_cast<Socket>(-1)) {
@@ -244,9 +237,9 @@ int NetSocketAddr(const Socket sock)
 				continue;
 			}
 			SOCKADDR_IN *pAddrInet = (SOCKADDR_IN *)&localAddr[i].iiAddress;
-			NetLocalAddrs[nif] = pAddrInet->sin_addr.s_addr;
+			ips[nif] = pAddrInet->sin_addr.s_addr;
 			++nif;
-			if (nif == MAX_LOC_IP) {
+			if (nif == maxAddr) {
 				break;
 			}
 		}
@@ -257,7 +250,7 @@ int NetSocketAddr(const Socket sock)
 // ARI: I knew how to write this for a unix environment,
 // but am quite certain that porting this can cause you
 // trouble..
-int NetSocketAddr(const Socket sock)
+int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 {
 	if (sock == static_cast<Socket>(-1)) {
 		return 0;
@@ -296,7 +289,7 @@ int NetSocketAddr(const Socket sock)
 		}
 		struct sockaddr_in *sap = (struct sockaddr_in *)&ifr->ifr_addr;
 		struct sockaddr_in sa = *sap;
-		NetLocalAddrs[nif] = sap->sin_addr.s_addr;
+		ips[nif] = sap->sin_addr.s_addr;
 		if (ifreq.ifr_flags & IFF_POINTOPOINT) {
 			if (ioctl(sock, SIOCGIFDSTADDR, (char *)&ifreq) < 0) {
 				DebugPrint("%s: SIOCGIFDSTADDR - errno %d\n" _C_
@@ -312,7 +305,7 @@ int NetSocketAddr(const Socket sock)
 		if (nif) {
 			int i;
 			for (i = 0; i < nif; ++i) {
-				if (sa.sin_addr.s_addr == NetLocalAddrs[i]) {
+				if (sa.sin_addr.s_addr == ips[i]) {
 					i = -1;
 					break;
 				}
@@ -322,7 +315,7 @@ int NetSocketAddr(const Socket sock)
 			}
 		}
 		++nif;
-		if (nif == MAX_LOC_IP) {
+		if (nif == maxAddr) {
 			break;
 		}
 	}
@@ -330,9 +323,9 @@ int NetSocketAddr(const Socket sock)
 }
 #else // } {
 // Beos?? Mac??
-int NetSocketAddr(const Socket sock)
+int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 {
-	NetLocalAddrs[0] = htonl(0x7f000001);
+	ips[0] = htonl(0x7f000001);
 	return 1;
 }
 #endif // }

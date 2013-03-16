@@ -438,7 +438,6 @@ static void Usage()
 		"\t-I addr\t\tNetwork address to use\n"
 		"\t-l\t\tDisable command log\n"
 		"\t-L lag\t\tNetwork lag in # frames (default 10 = 333ms)\n"
-		"\t-n server\tNetwork server host preset\n"
 		"\t-N name\t\tName of the player\n"
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		"\t-o\t\tDo not use OpenGL or OpenGL ES 1.1\n"
@@ -500,7 +499,7 @@ static void RedirectOutput()
 void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
 	for (;;) {
-		switch (getopt(argc, argv, "c:d:D:eE:FhI:lL:n:N:oOP:s:S:U:v:W?")) {
+		switch (getopt(argc, argv, "c:d:D:eE:FhI:lL:N:oOP:s:S:U:v:W?")) {
 			case 'c':
 				parameters.luaStartFilename = optarg;
 				continue;
@@ -538,9 +537,6 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 					Usage();
 					ExitFatal(-1);
 				}
-				continue;
-			case 'n':
-				NetworkArg = optarg;
 				continue;
 			case 'N':
 				parameters.LocalPlayerName = optarg;

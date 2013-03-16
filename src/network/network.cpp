@@ -256,12 +256,10 @@ public:
 //  Variables
 //----------------------------------------------------------------------------
 
-static int NetworkNumInterfaces;                  /// Network number of interfaces
 Socket NetworkFildes = static_cast<Socket>(-1);   /// Network file descriptor
 int NetworkInSync = 1;                     /// Network is in sync
 int NetworkUpdates = 5;                    /// Network update each # game cycles
 int NetworkLag = 10;                       /// Network lag in # game cycles
-static unsigned long NetworkStatus[PlayerMax];    /// Network status
 static unsigned long NetworkLastFrame[PlayerMax]; /// Last frame received packet
 static const int NetworkTimeout = 45;             /// Number of seconds until player times out
 
@@ -492,7 +490,6 @@ void InitNetwork1()
 {
 	NetworkFildes = static_cast<Socket>(-1);
 	NetworkInSync = 1;
-	NetworkNumInterfaces = 0;
 
 	NetInit(); // machine dependent setup
 
@@ -522,15 +519,13 @@ void InitNetwork1()
 		return;
 	}
 
-#if 1
-	// FIXME: need a working interface check
-	NetworkNumInterfaces = 1;
-#else
-	NetworkNumInterfaces = NetSocketAddr(NetworkFildes);
-	if (NetworkNumInterfaces) {
-		DebugPrint("Num IP: %d\n" _C_ NetworkNumInterfaces);
-		for (int i = 0; i < NetworkNumInterfaces; ++i) {
-			DebugPrint("IP: %d.%d.%d.%d\n" _C_ NIPQUAD(ntohl(NetLocalAddrs[i])));
+#if 0 // FIXME: need a working interface check
+	unsigned long ips[10];
+	int networkNumInterfaces = NetSocketAddr(NetworkFildes, ips, 10);
+	if (networkNumInterfaces) {
+		DebugPrint("Num IP: %d\n" _C_ networkNumInterfaces);
+		for (int i = 0; i < networkNumInterfaces; ++i) {
+			DebugPrint("IP: %d.%d.%d.%d\n" _C_ NIPQUAD(ntohl(ips[i])));
 		}
 	} else {
 		fprintf(stderr, "NETWORK: Not connected to any external IPV4-network, aborting\n");
@@ -609,7 +604,6 @@ void InitNetwork2()
 	memset(NetworkSyncSeeds, 0, sizeof(NetworkSyncSeeds));
 	memset(NetworkSyncHashs, 0, sizeof(NetworkSyncHashs));
 	memset(PlayerQuit, 0, sizeof(PlayerQuit));
-	memset(NetworkStatus, 0, sizeof(NetworkStatus));
 	memset(NetworkLastFrame, 0, sizeof(NetworkLastFrame));
 }
 
@@ -979,9 +973,6 @@ void NetworkEvent()
 		}
 
 		// Receive statistic
-		if (n > NetworkStatus[player]) {
-			NetworkStatus[player] = n;
-		}
 		NetworkLastFrame[player] = FrameCounter;
 
 		// Place in network in
