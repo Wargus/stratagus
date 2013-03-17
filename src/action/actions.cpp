@@ -470,6 +470,10 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 
 		// Handle each cycle buffs
 		HandleBuffsEachCycle(unit);
+		// Unit could be dead after TTL kill
+		if (unit.Destroyed) {
+			continue;
+		}
 
 		try {
 			HandleUnitAction(unit);

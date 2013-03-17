@@ -647,10 +647,18 @@ bool MissileInitMove(Missile &missile)
 
 void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 {
-	CUnit *unit = UnitOnMapTile(pos, -1);
-	if (unit && unit->IsAliveOnMap()
-		&& (missile.Type->FriendlyFire || unit->IsEnemy(*missile.SourceUnit->Player))) {
-		missile.MissileHit(unit);
+	if (Map.Info.IsPointOnMap(pos) == false) {
+		return;
+	}
+	std::vector<CUnit *> units;
+	Select(pos, pos, units);
+	for (std::vector<CUnit *>::iterator it = units.begin(); it != units.end(); ++it) {
+		CUnit &unit = **it;
+
+		if (unit.IsAliveOnMap()
+			&& (missile.Type->FriendlyFire || unit.IsEnemy(*missile.SourceUnit->Player))) {
+			missile.MissileHit(&unit);
+		}
 	}
 }
 

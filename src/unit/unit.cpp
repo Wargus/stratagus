@@ -665,7 +665,7 @@ bool CUnit::CanStoreOrder(COrder *order)
 {
 	Assert(order);
 
-	if (order && order->Finished == true && order->IsValid() == false) {
+	if ((order && order->Finished == true) || order->IsValid() == false) {
 		return false;
 	}
 	if (this->SavedOrder != NULL) {
@@ -1661,6 +1661,11 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	// This shouldn't happen
 	if (oldplayer == &newplayer) {
 		DebugPrint("Change the unit owner to the same player???\n");
+		return;
+	}
+
+	// Can't change owner for dead units
+	if (this->IsAlive() == false) {
 		return;
 	}
 

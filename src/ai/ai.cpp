@@ -655,7 +655,7 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type)
 */
 void AiHelpMe(const CUnit *attacker, CUnit &defender)
 {
-	/* Freandly Fire - typical splash */
+	/* Friendly Fire - typical splash */
 	if (!attacker || attacker->Player->Index == defender.Player->Index) {
 		//FIXME - try react somehow
 		return;
@@ -669,10 +669,13 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 	if (!defender.Type->CanAttack && defender.Type->UnitType == UnitTypeFly) {
 		return;
 	}
+	// Summoned unit, don't help
+	if (defender.GroupId == -1) {
+		return;
+	}
 
 	PlayerAi &pai = *defender.Player->Ai;
 	AiPlayer = &pai;
-
 
 	//  If unit belongs to an attacking force, check if force members can help.
 	if (defender.GroupId) {
