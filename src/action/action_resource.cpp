@@ -1000,7 +1000,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			return false;
 		}
 	} else {
-		const int tooManyWorkers = 15;
+		const unsigned int tooManyWorkers = 15;
 		CUnit *mine = this->Resource.Mine;
 		const int range = 15;
 		CUnit *newdepot = NULL;

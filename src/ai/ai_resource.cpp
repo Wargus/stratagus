@@ -478,7 +478,7 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit *res
 	for (std::vector<CUnit *>::iterator it = depots.begin(); it != depots.end(); ++it) {
 		CUnit &unit = **it;
 
-		const int tooManyWorkers = 15;
+		const unsigned int tooManyWorkers = 15;
 		const int range = 15;
 
 		if (&oldDepot == &unit) {
