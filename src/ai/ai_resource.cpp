@@ -357,10 +357,12 @@ void AiNewDepotRequest(CUnit &worker)
 #endif
 	Assert(worker.CurrentAction() == UnitActionResource);
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
+	const int resource = order.GetCurrentResource();
 
 	const Vec2i pos = order.GetHarvestLocation();
+	const int range = 15;
 
-	if (pos.x != -1 && NULL != FindDepositNearLoc(*worker.Player, pos, 10, worker.CurrentResource)) {
+	if (pos.x != -1 && NULL != FindDepositNearLoc(*worker.Player, pos, range, resource)) {
 		/*
 		 * New Depot has just be finished and worker just return to old depot
 		 * (far away) from new Deopt.
@@ -375,10 +377,10 @@ void AiNewDepotRequest(CUnit &worker)
 
 	AiGetBuildRequestsCount(*worker.Player->Ai, counter);
 
-	const int n = AiHelpers.Depots[worker.CurrentResource - 1].size();
+	const int n = AiHelpers.Depots[resource - 1].size();
 
 	for (int i = 0; i < n; ++i) {
-		CUnitType &type = *AiHelpers.Depots[worker.CurrentResource - 1][i];
+		CUnitType &type = *AiHelpers.Depots[resource - 1][i];
 
 		if (counter[type.Slot]) { // Already ordered.
 			return;
@@ -423,19 +425,6 @@ void AiNewDepotRequest(CUnit &worker)
 	}
 }
 
-class IsAResourceDepositForWorker
-{
-public:
-	explicit IsAResourceDepositForWorker(const int r, const CUnit &worker) : resource(r), worker(worker) {}
-	bool operator()(const CUnit *const unit) const {
-		return (unit->Type->CanStore[resource]
-				&& (unit->Player == worker.Player || unit->IsAllied(worker)) && !unit->IsUnusable());
-	}
-private:
-	const int resource;
-	const CUnit &worker;
-};
-
 class IsAWorker
 {
 public:
@@ -450,20 +439,22 @@ class CompareDepotsByDistance
 public:
 	explicit CompareDepotsByDistance(const CUnit &worker) : worker(worker) {}
 	bool operator()(const CUnit *lhs, const CUnit *rhs) const {
-		return lhs->MapDistanceTo(worker) > rhs->MapDistanceTo(worker);
+		return lhs->MapDistanceTo(worker) < rhs->MapDistanceTo(worker);
 	}
 private:
 	const CUnit &worker;
 };
 
 /**
-**  Request a depot change for better resource harvesting.
+**  Get a suitable depot for better resource harvesting.
 **
 **  @param worker    Worker itself.
+**  @param oldDepot  Old assigned depot.
+**  @param resUnit   Resource to harvest from, if succeed
 **
-**  @return          true if changed, false otherwise.
+**  @return          new depot if found, NULL otherwise.
 */
-bool AiRequestChangeDepot(CUnit &worker)
+CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit *resUnit)
 {
 	Assert(worker.CurrentAction() == UnitActionResource);
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
@@ -471,34 +462,41 @@ bool AiRequestChangeDepot(CUnit &worker)
 	std::vector<CUnit *> depots;
 	const Vec2i offset(MaxMapWidth, MaxMapHeight);
 
-	Select(worker.tilePos - offset, worker.tilePos + offset, depots, IsAResourceDepositForWorker(resource, worker));
+	for (std::vector<CUnit *>::iterator it = worker.Player->UnitBegin(); it != worker.Player->UnitEnd(); ++it) {
+		CUnit &unit = **it;
+
+		if (unit.Type->CanStore[resource] && !unit.IsUnusable()) {
+			depots.push_back(&unit);
+		}
+	}
 	// If there aren't any alternatives, exit
 	if (depots.size() < 2) {
-		return false;
+		return NULL;
 	}
 	std::sort(depots.begin(), depots.end(), CompareDepotsByDistance(worker));
 
 	for (std::vector<CUnit *>::iterator it = depots.begin(); it != depots.end(); ++it) {
 		CUnit &unit = **it;
 
-		if (order.GetGoal() == &unit) {
+		const int tooManyWorkers = 15;
+		const int range = 15;
+
+		if (&oldDepot == &unit) {
 			continue;
 		}
-		const int range = 15;
-		const Vec2i workOff(range, range);
-		const size_t maxWorkers = 10;
-		std::vector<CUnit *> workers;
-		Select(unit.tilePos - workOff, unit.tilePos + workOff, workers, IsAWorker());
-		if (workers.size() <= maxWorkers && !AiEnemyUnitsInDistance(unit, range)) {
-			CommandReturnGoods(worker, &unit, FlushCommands);
-			CUnit *res = UnitFindResource(worker, unit, range, resource, unit.Player->AiEnabled);
-			if (res) {
-				CommandResource(worker, *res, FlushCommands);
-			}
-			return true;
+		if (unit.Refs > tooManyWorkers) {
+			continue;
+		}
+		if (AiEnemyUnitsInDistance(worker, range)) {
+			continue;
+		}
+		CUnit *res = UnitFindResource(worker, unit, range, resource, unit.Player->AiEnabled);
+		if (res) {
+			resUnit = res;
+			return &unit;
 		}
 	}
-	return false;
+	return NULL;
 }
 
 /**

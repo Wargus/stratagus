@@ -403,7 +403,7 @@ extern int AiFindAvailableUnitTypeEquiv(const CUnitType &type, int *result);
 extern int AiGetBuildRequestsCount(const PlayerAi &pai, int (&counter)[UnitTypeMax]);
 
 extern void AiNewDepotRequest(CUnit &worker);
-extern bool AiRequestChangeDepot(CUnit &worker);
+extern CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit *resUnit);
 
 //
 // Buildings

@@ -938,16 +938,6 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 		return 0;
 	}
 
-	// Not ready
-	if (player.AiEnabled && unit.pathFinderData->output.Cycles > 150) {
-		if (AiRequestChangeDepot(unit)) {
-			this->Finished = true;
-			return 0;
-		} else if (unit.pathFinderData->output.Cycles > 300) {
-			AiNewDepotRequest(unit);
-		}
-	}
-
 	// If resource depot is still under construction, wait!
 	if (goal.CurrentAction() == UnitActionBuilt) {
 		unit.Wait = 10;
@@ -1010,9 +1000,30 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			return false;
 		}
 	} else {
+		const int tooManyWorkers = 15;
 		CUnit *mine = this->Resource.Mine;
-		const int range = (mine ? 15 : 1000);
-		CUnit *goal = UnitFindResource(unit, mine ? *mine : unit, range, this->CurrentResource, unit.Player->AiEnabled, depot);
+		const int range = 15;
+		CUnit *newdepot = NULL;
+		CUnit *goal = NULL;
+		const bool longWay = unit.pathFinderData->output.Cycles > 500;
+
+		if (unit.Player->AiEnabled) {
+			// If the depot is overused, we need first to try to switch into another depot
+			// Use depot's ref counter for that
+			if (longWay || !mine || (depot->Refs > tooManyWorkers)) {
+				newdepot = AiGetSuitableDepot(unit, *depot, goal);
+				if (newdepot == NULL && longWay) {
+					// We need a new depot
+					AiNewDepotRequest(unit);
+				}
+			}
+		}
+
+		// If goal is not NULL, then we got it in AiGetSuitableDepot
+		if (!goal) {
+			goal = UnitFindResource(unit, newdepot ? *newdepot : (mine ? *mine : unit), mine ? range : 1000,
+									this->CurrentResource, unit.Player->AiEnabled, newdepot ? newdepot : depot);
+		}
 
 		if (goal) {
 			if (depot) {
