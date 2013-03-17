@@ -108,13 +108,15 @@ public:
 class ConditionInfoVariable
 {
 public:
-	ConditionInfoVariable() : Enable(0), Check(false), MinValue(0), MaxValue(0),
-		MinMax(0), MinValuePercent(0), MaxValuePercent(0),
+	ConditionInfoVariable() : Enable(0), Check(false), ExactValue(0), ExceptValue(0),
+		MinValue(0), MaxValue(0), MinMax(0), MinValuePercent(0), MaxValuePercent(0),
 		ConditionApplyOnCaster(0) {};
 
 	char Enable;                /// Target is 'user defined variable'.
 	bool Check;                 /// True if need to check that variable.
 
+	int ExactValue;             /// Target must have exactly ExactValue of it's value.
+	int ExceptValue;            /// Target mustn't have ExceptValue of it's value.
 	int MinValue;               /// Target must have more Value than that.
 	int MaxValue;               /// Target must have less Value than that.
 	int MinMax;                 /// Target must have more Max than that.

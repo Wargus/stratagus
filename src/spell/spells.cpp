@@ -134,6 +134,14 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 			}
 		}
 		// Value and Max
+		if (condition->Variable[i].ExactValue != -1 &&
+			condition->Variable[i].ExactValue != unit->Variable[i].Value) {
+			return false;
+		}
+		if (condition->Variable[i].ExceptValue != -1 &&
+			condition->Variable[i].ExceptValue == unit->Variable[i].Value) {
+			return false;
+		}
 		if (condition->Variable[i].MinValue >= unit->Variable[i].Value) {
 			return false;
 		}
