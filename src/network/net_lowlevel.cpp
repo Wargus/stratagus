@@ -215,13 +215,13 @@ unsigned long NetResolveHost(const std::string &host)
 // Lookout for INTRFC.EXE on the MS web site...
 int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 {
-	INTERFACE_INFO localAddr[maxAddr];  // Assume there will be no more than maxAddr interfaces
+	INTERFACE_INFO *localAddr = new INTERFACE_INFO[maxAddr];  // Assume there will be no more than maxAddr interfaces
 	int nif = 0;
 
 	if (sock != static_cast<Socket>(-1)) {
 		DWORD bytesReturned;
 		int wsError = WSAIoctl(sock, SIO_GET_INTERFACE_LIST, NULL, 0, &localAddr,
-							   sizeof(localAddr), &bytesReturned, NULL, NULL);
+							   sizeof(INTERFACE_INFO) * maxAddr, &bytesReturned, NULL, NULL);
 		if (wsError == SOCKET_ERROR) {
 			DebugPrint("SIOCGIFCONF:WSAIoctl(SIO_GET_INTERFACE_LIST) - errno %d\n" _C_ WSAGetLastError());
 		}
@@ -244,6 +244,7 @@ int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 			}
 		}
 	}
+	delete localAddr;
 	return nif;
 }
 #elif USE_LINUX // } {

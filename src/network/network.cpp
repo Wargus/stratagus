@@ -1064,11 +1064,10 @@ void NetworkQuit()
 */
 void NetworkChatMessage(const std::string &msg)
 {
-
 	if (IsNetworkGame()) {
 		const char *cp = msg.c_str();
 		size_t n = msg.size();
-		while (n >= sizeof(CNetworkChat::Text)) {
+		while (n >= sizeof(char) * 7) {
 			CNetworkCommandQueue *ncq = AllocNCQ();
 			MsgCommandsIn.push_back(ncq);
 			ncq->Type = MessageChat;
@@ -1108,7 +1107,7 @@ static void ParseNetworkCommand_Chat(const CNetworkCommandQueue &ncq)
 	const CNetworkChat &ncm = reinterpret_cast<const CNetworkChat &>(ncq.Data);
 	int ply = ncm.Player;
 
-	if (NetMsgBufLen[ply] + sizeof(CNetworkChat::Text) < 128) {
+	if (NetMsgBufLen[ply] + sizeof(char) * 7 < 128) {
 		memcpy(NetMsgBuf[ply] + NetMsgBufLen[ply], ncm.Text, sizeof(ncm.Text));
 	}
 	NetMsgBufLen[ply] += sizeof(ncm.Text);
