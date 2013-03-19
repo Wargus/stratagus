@@ -454,7 +454,7 @@ private:
 **
 **  @return          new depot if found, NULL otherwise.
 */
-CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit *resUnit)
+CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **resUnit)
 {
 	Assert(worker.CurrentAction() == UnitActionResource);
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
@@ -492,7 +492,7 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit *res
 		}
 		CUnit *res = UnitFindResource(worker, unit, range, resource, unit.Player->AiEnabled);
 		if (res) {
-			resUnit = res;
+			*resUnit = res;
 			return &unit;
 		}
 	}

@@ -1011,7 +1011,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			// If the depot is overused, we need first to try to switch into another depot
 			// Use depot's ref counter for that
 			if (longWay || !mine || (depot->Refs > tooManyWorkers)) {
-				newdepot = AiGetSuitableDepot(unit, *depot, goal);
+				newdepot = AiGetSuitableDepot(unit, *depot, &goal);
 				if (newdepot == NULL && longWay) {
 					// We need a new depot
 					AiNewDepotRequest(unit);
