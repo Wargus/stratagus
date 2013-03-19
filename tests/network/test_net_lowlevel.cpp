@@ -44,7 +44,7 @@ public:
 
 TEST_FIXTURE(AutoNetwork, NetResolveHost)
 {
-	const unsigned long localhost = ntohl(0x7F000001); // 127.0.0.1
+	const unsigned long localhost = htonl(0x7F000001); // 127.0.0.1
 
 	CHECK_EQUAL(localhost, NetResolveHost("127.0.0.1"));
 	CHECK_EQUAL(localhost, NetResolveHost("localhost"));
@@ -84,9 +84,7 @@ static unsigned long GetMyIP()
 template<typename T>
 void TCPWrite(Socket socket, const T &obj)
 {
-	T dup(obj);
-
-	const char *buf = reinterpret_cast<const char *>(&dup);
+	const char *buf = reinterpret_cast<const char *>(&obj);
 	size_t s = 0;
 	while (s != sizeof(T)) {
 		s += NetSendTCP(socket, buf + s, sizeof(T) - s);
@@ -232,15 +230,10 @@ TEST_FIXTURE(AutoNetwork, ExchangeTCP)
 template<typename T>
 void UDPWrite(Socket socket, const char *hostname, int port, const T &obj)
 {
-	T dup(obj);
-
 	const long host = NetResolveHost(hostname);
-	const char *buf = reinterpret_cast<const char *>(&dup);
+	const char *buf = reinterpret_cast<const char *>(&obj);
 	port = htons(port);
-	size_t s = 0;
-	while (s != sizeof(T)) {
-		s += NetSendUDP(socket, host, port, buf + s, sizeof(T) - s);
-	}
+	NetSendUDP(socket, host, port, buf, sizeof(T));
 }
 
 template<typename T>

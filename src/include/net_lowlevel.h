@@ -40,42 +40,27 @@
 // Include system network headers
 #ifdef USE_WIN32
 
-#define USE_WINSOCK
+# define USE_WINSOCK
 
-#include <winsock2.h>
-
-#include <windows.h>
-#include <winsock.h>
-//#include <ws2tcpip.h>
-
-// MS Knowledge base fix for SIO_GET_INTERFACE_LIST with NT4.0 ++
-#define SIO_GET_INTERFACE_LIST 0x4004747F
-#define IFF_UP 1
-#define IFF_LOOPBACK 4
-typedef struct _OLD_INTERFACE_INFO {
-	unsigned long iiFlags; /* Interface flags */
-	SOCKADDR   iiAddress;  /* Interface address */
-	SOCKADDR   iiBroadcastAddress; /* Broadcast address */
-	SOCKADDR   iiNetmask;  /* Network mask */
-} OLD_INTERFACE_INFO;
-#define INTERFACE_INFO OLD_INTERFACE_INFO
+# include <winsock2.h>
 
 #else // UNIX
-#include <sys/time.h>
-#include <unistd.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#ifndef __BEOS__
-#include <net/if.h>
-#include <arpa/inet.h>
-#endif
-#define INVALID_SOCKET -1
+# include <sys/time.h>
+# include <unistd.h>
+# include <netinet/in.h>
+# include <netdb.h>
+# include <sys/socket.h>
+# include <sys/ioctl.h>
+# ifndef __BEOS__
+#  include <net/if.h>
+#  include <arpa/inet.h>
+# endif
+# define INVALID_SOCKET -1
+
 #endif // !WIN32
 
 #ifndef INADDR_NONE
-#define INADDR_NONE -1
+# define INADDR_NONE -1
 #endif
 
 /*----------------------------------------------------------------------------
