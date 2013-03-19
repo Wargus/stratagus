@@ -508,7 +508,6 @@ int CLabel::DoDrawText(int x, int y,
 					   const char *const text, const size_t len, const CFontColor *fc) const
 {
 	int widths = 0;
-	std::string color;
 	int utf8;
 	size_t pos = 0;
 	const CFontColor *backup = fc;
@@ -559,8 +558,9 @@ int CLabel::DoDrawText(int x, int y,
 						DebugPrint("oops, format your ~\n");
 						return widths;
 					}
+					std::string color;
+
 					color.insert(0, text + pos, p - (text + pos));
-					color[p - (text + pos)] = '\0';
 					pos = p - text + 1;
 					LastTextColor = fc;
 					const CFontColor *fc_tmp = CFontColor::Get(color);
