@@ -49,9 +49,6 @@ class ButtonStyle;
 extern void DrawUIButton(ButtonStyle *style, unsigned flags,
 						 int x, int y, const std::string &text);
 
-/// Compare Local State <-> Server's state, force Update when changes
-extern void NetClientCheckLocalState();
-
 /// Pre menu setup
 extern void PreMenuSetup();
 

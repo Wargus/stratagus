@@ -543,7 +543,7 @@ void InitNetwork1()
 		const unsigned long myHost = NetResolveHost(buf);
 		const int myPort = port;
 		DebugPrint("My host:port %d.%d.%d.%d:%d\n" _C_
-				   NIPQUAD(ntohl(myHost)) _C_ ntohs(myPort));
+				   NIPQUAD(ntohl(myHost)) _C_ myPort);
 	}
 #endif
 
@@ -864,11 +864,8 @@ void NetworkEvent()
 	unsigned char buf[1024];
 	unsigned long host;
 	int port;
-	int i;
-	if ((i = NetRecvUDP(NetworkFildes, &buf, sizeof(buf), &host, &port)) < 0) {
-		//
-		// Server or client gone?
-		//
+	int len = NetRecvUDP(NetworkFildes, &buf, sizeof(buf), &host, &port);
+	if (len < 0) {
 		DebugPrint("Server/Client gone?\n");
 		// just hope for an automatic recover right now..
 		NetworkInSync = 0;
@@ -881,31 +878,25 @@ void NetworkEvent()
 
 	// Setup messages
 	if (NetConnectRunning) {
-		if (NetworkParseSetupEvent(buf, i, host, port)) {
+		if (NetworkParseSetupEvent(buf, len, host, port)) {
 			return;
 		}
 	}
 
 	CNetworkPacket packet;
-	int commands = packet.Deserialize(buf, i);
+	int commands = packet.Deserialize(buf, len);
 	if (commands < 0) {
 		DebugPrint("Bad packet read\n");
 		return;
 	}
 
-	for (i = 0; i < HostsCount; ++i) {
-		if (Hosts[i].Host == host && Hosts[i].Port == port
-			&& !PlayerQuit[Hosts[i].PlyNr]) {
-			break;
-		}
-	}
-	if (i == HostsCount) {
+	const int index = FindHostIndexBy(host, port);
+	if (index == -1 || PlayerQuit[Hosts[index].PlyNr]) {
 		DebugPrint("Not a host in play: %d.%d.%d.%d:%d\n" _C_
 				   NIPQUAD(ntohl(host)) _C_ ntohs(port));
 		return;
 	}
-
-	const int player = Hosts[i].PlyNr;
+	const int player = Hosts[index].PlyNr;
 
 	// In a normal packet there is a least sync, selection may not have that
 	if (packet.Header.Type[0] == MessageSelection || commands == 0) {
@@ -914,13 +905,13 @@ void NetworkEvent()
 	}
 
 	// Parse the packet commands.
-	for (i = 0; i < commands; ++i) {
-		const CNetworkCommand *nc = &packet.Command[i];
+	for (int i = 0; i != commands; ++i) {
+		const CNetworkCommand &nc = packet.Command[i];
 		bool validCommand = false;
 
 		// Handle some messages.
 		if (packet.Header.Type[i] == MessageQuit) {
-			int playerNum = ntohs(nc->X);
+			int playerNum = ntohs(nc.X);
 
 			if (playerNum >= 0 && playerNum < NumPlayers) {
 				PlayerQuit[playerNum] = 1;
@@ -996,7 +987,7 @@ void NetworkEvent()
 			case MessageCommandDismiss:
 				// Fall through!
 			default: {
-				const unsigned int slot = ntohs(nc->Unit);
+				const unsigned int slot = ntohs(nc.Unit);
 				const CUnit *unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : NULL;
 
 				if (unit && (unit->Player->Index == player
@@ -1012,7 +1003,7 @@ void NetworkEvent()
 		if (validCommand) {
 			NetworkIn[packet.Header.Cycle][player][i].Time = n;
 			NetworkIn[packet.Header.Cycle][player][i].Type = packet.Header.Type[i];
-			NetworkIn[packet.Header.Cycle][player][i].Data = *nc;
+			NetworkIn[packet.Header.Cycle][player][i].Data = nc;
 		} else {
 			SetMessage(_("%s sent bad command"), Players[player].Name.c_str());
 			DebugPrint("%s sent bad command: 0x%x\n" _C_ Players[player].Name.c_str()
@@ -1020,7 +1011,7 @@ void NetworkEvent()
 		}
 	}
 
-	for (; i < MaxNetworkCommands; ++i) {
+	for (int i = commands; i != MaxNetworkCommands; ++i) {
 		NetworkIn[packet.Header.Cycle][player][i].Time = 0;
 	}
 
@@ -1067,11 +1058,12 @@ void NetworkChatMessage(const std::string &msg)
 	if (IsNetworkGame()) {
 		const char *cp = msg.c_str();
 		size_t n = msg.size();
-		while (n >= sizeof(char) * 7) {
+		CNetworkChat *ncm = NULL;
+		while (n >= sizeof(ncm->Text)) {
 			CNetworkCommandQueue *ncq = AllocNCQ();
 			MsgCommandsIn.push_back(ncq);
 			ncq->Type = MessageChat;
-			CNetworkChat *ncm = (CNetworkChat *)(&ncq->Data);
+			ncm = (CNetworkChat *)(&ncq->Data);
 			ncm->Player = ThisPlayer->Index;
 			memcpy(ncm->Text, cp, sizeof(ncm->Text));
 			cp += sizeof(ncm->Text);
@@ -1080,7 +1072,7 @@ void NetworkChatMessage(const std::string &msg)
 		CNetworkCommandQueue *ncq = AllocNCQ();
 		MsgCommandsIn.push_back(ncq);
 		ncq->Type = MessageChatTerm;
-		CNetworkChat *ncm = (CNetworkChat *)(&ncq->Data);
+		ncm = (CNetworkChat *)(&ncq->Data);
 		ncm->Player = ThisPlayer->Index;
 		memcpy(ncm->Text, cp, n + 1); // see >= above :)
 	}
@@ -1107,7 +1099,7 @@ static void ParseNetworkCommand_Chat(const CNetworkCommandQueue &ncq)
 	const CNetworkChat &ncm = reinterpret_cast<const CNetworkChat &>(ncq.Data);
 	int ply = ncm.Player;
 
-	if (NetMsgBufLen[ply] + sizeof(char) * 7 < 128) {
+	if (NetMsgBufLen[ply] + sizeof(ncm.Text) < 128) {
 		memcpy(NetMsgBuf[ply] + NetMsgBufLen[ply], ncm.Text, sizeof(ncm.Text));
 	}
 	NetMsgBufLen[ply] += sizeof(ncm.Text);

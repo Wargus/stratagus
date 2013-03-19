@@ -76,20 +76,14 @@ public:
 	void Clear();
 	static size_t Size() { return 4 + 2 + 2 + NetPlayerNameSize; }
 
+	void SetName(const char *name);
+
 	uint32_t Host;         /// Host address
 	uint16_t Port;         /// Port on host
 	uint16_t PlyNr;        /// Player number
 	char PlyName[NetPlayerNameSize];  /// Name of player
 };
 
-/**
-**  Connect state information of network systems active in current game.
-*/
-typedef struct _network_state_ {
-	unsigned char  State;   /// Menu: ConnectState
-	unsigned short MsgCnt;  /// Menu: Counter for state msg of same type (detect unreachable)
-	// Fill in here...
-} NetworkState;
 
 /**
 **  Multiplayer game setup menu state
@@ -99,27 +93,34 @@ class CServerSetup
 public:
 	unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 * PlayerMax + 4 * PlayerMax + 4 * PlayerMax + 4 * PlayerMax; }
+	static size_t Size() { return 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 * PlayerMax + 1 * PlayerMax + 1 * PlayerMax + 4 * PlayerMax; }
 	void Clear() {
-		ResourcesOption = UnitsOption = FogOfWar = RevealMap = TilesetSelection =
-																   GameTypeOption = Difficulty = MapRichness = 0;
+		ResourcesOption = 0;
+		UnitsOption = 0;
+		FogOfWar = 0;
+		RevealMap = 0;
+		TilesetSelection = 0;
+		GameTypeOption = 0;
+		Difficulty = 0;
+		MapRichness = 0;
 		memset(CompOpt, 0, sizeof(CompOpt));
 		memset(Ready, 0, sizeof(Ready));
+		memset(Race, 0, sizeof(Race));
 		memset(LastFrame, 0, sizeof(LastFrame));
 	}
 
-	uint32_t  ResourcesOption;       /// Resources option
-	uint32_t  UnitsOption;           /// Unit # option
-	uint32_t  FogOfWar;              /// Fog of war option
-	uint32_t  RevealMap;             /// Reveal all the map
-	uint32_t  TilesetSelection;      /// Tileset select option
-	uint32_t  GameTypeOption;        /// Game type option
-	uint32_t  Difficulty;            /// Difficulty option
-	uint32_t  MapRichness;           /// Map richness option
-	uint32_t  CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
-	uint32_t  Ready[PlayerMax];      /// Client ready state
-	uint32_t  Race[PlayerMax];       /// Client race selection
-	uint32_t  LastFrame[PlayerMax];  /// Last message received
+	uint8_t ResourcesOption;       /// Resources option
+	uint8_t UnitsOption;           /// Unit # option
+	uint8_t FogOfWar;              /// Fog of war option
+	uint8_t RevealMap;             /// Reveal all the map
+	uint8_t TilesetSelection;      /// Tileset select option
+	uint8_t GameTypeOption;        /// Game type option
+	uint8_t Difficulty;            /// Difficulty option
+	uint8_t MapRichness;           /// Map richness option
+	uint8_t CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
+	uint8_t Ready[PlayerMax];      /// Client ready state
+	uint8_t Race[PlayerMax];       /// Client race selection
+	uint32_t LastFrame[PlayerMax]; /// Last message received
 	// Fill in here...
 };
 
@@ -132,24 +133,25 @@ public:
 class CInitMessage
 {
 public:
+	CInitMessage();
 	unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 1 + 1 + 4 + 4 + 4 + 4 + 4 + 4 + 1 + 256 + CNetworkHost::Size() * PlayerMax + CServerSetup::Size(); }
+	static size_t Size() { return 1 + 1 + 1 + 1 + 4 + 4 + 4 + 4 + 4 + 4 + std::max(256u, std::max(CNetworkHost::Size() * PlayerMax, CServerSetup::Size())); }
 
-	uint8_t  Type;        /// Init message type
-	uint8_t  SubType;     /// Init message subtype
-	int32_t Stratagus;    /// Stratagus engine version
-	int32_t Version;      /// Network protocol version
-	uint32_t ConfUID;     /// Engine configuration UID (Checksum) FIXME: not available yet
-	uint32_t MapUID;      /// UID of map to play. FIXME: add MAP name, path, etc
-	int32_t Lag;          /// Lag time
-	int32_t Updates;      /// Update frequency
-	uint8_t HostsCount;   /// Number of hosts
+	uint8_t Type;       /// Init message type
+	uint8_t SubType;    /// Init message subtype
+	uint8_t HostsCount; /// Number of hosts
+	uint8_t padding;    /// padding for alignment
+	int32_t Stratagus;  /// Stratagus engine version
+	int32_t Version;    /// Network protocol version
+	uint32_t MapUID;    /// UID of map to play. FIXME: add MAP name, path, etc
+	int32_t Lag;        /// Lag time
+	int32_t Updates;    /// Update frequency
 
 	union {
 		CNetworkHost Hosts[PlayerMax]; /// Participant information
 		char         MapPath[256];
-		CServerSetup State;             /// Server Setup State information
+		CServerSetup State;            /// Server Setup State information
 	} u;
 };
 
@@ -219,7 +221,6 @@ extern int HostsCount;                /// Number of hosts.
 extern CNetworkHost Hosts[PlayerMax]; /// Host, port, and number of all players.
 
 extern int NetConnectRunning;              /// Network menu: Setup mode active
-extern NetworkState NetStates[PlayerMax];  /// Network menu: Server: Client Host states
 extern unsigned char NetLocalState;        /// Network menu: Local Server/Client connect state
 extern int NetLocalHostsSlot;              /// Network menu: Slot # in Hosts array of local client
 extern int NetLocalPlayerNumber;           /// Player number of local client
@@ -231,6 +232,7 @@ extern CServerSetup LocalSetupState;       /// Network menu: Multiplayer Client 
 --  Functions
 ----------------------------------------------------------------------------*/
 
+extern int FindHostIndexBy(unsigned long ip, int port);
 extern void NetworkServerStartGame();       /// Server user has finally hit the start game button
 extern void NetworkGamePrepareGameSettings();
 extern void NetworkConnectSetupGame();      /// Assign Player slot, evaluate Setup state..
@@ -240,7 +242,7 @@ extern void NetworkExitClientConnect();     /// Terminate network connect state 
 extern void NetworkInitServerConnect(int openslots); /// Setup network connect state machine for the server
 extern void NetworkExitServerConnect();     /// Terminate network connect state machine for the server
 extern int NetworkParseSetupEvent(const unsigned char *buf, int size, unsigned long host, int port);  /// Parse a network connect event
-extern int NetworkSetupServerAddress(const std::string &serveraddr);  /// Menu: Setup the server IP
+extern int NetworkSetupServerAddress(const std::string &serveraddr, int port);  /// Menu: Setup the server IP
 extern void NetworkProcessClientRequest();  /// Menu Loop: Send out client request messages
 extern void NetworkProcessServerRequest();  /// Menu Loop: Send out server request messages
 extern void NetworkServerResyncClients();   /// Menu Loop: Server: Mark clients state to send stateinfo message
