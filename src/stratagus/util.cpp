@@ -497,6 +497,8 @@ void PrintLocation(const char *file, int line, const char *funcName)
 void AbortAt(const char *file, int line, const char *funcName, const char *conditionStr)
 {
 	fprintf(stderr, "Assertion failed at %s:%d: %s: %s\n", file, line, funcName, conditionStr);
+	fflush(stdout);
+	fflush(stderr);
 	abort();
 }
 
@@ -506,6 +508,7 @@ void PrintOnStdOut(const char *format, ...)
 	va_start(valist, format);
 	vprintf(format, valist);
 	va_end(valist);
+	fflush(stdout);
 }
 
 #endif
