@@ -62,9 +62,6 @@ void FillCustomValue(CServerSetup *obj)
 	for (int i = 0; i != PlayerMax; ++i) {
 		obj->Race[i] = i + 21;
 	}
-	for (int i = 0; i != PlayerMax; ++i) {
-		obj->LastFrame[i] = 0x22334455 + i * 0x01020304;
-	}
 }
 
 void FillCustomValue(CInitMessage *obj)

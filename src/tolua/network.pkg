@@ -10,7 +10,6 @@ void NetworkInitClientConnect(void);
 void NetworkInitServerConnect(int openslots);
 void NetworkServerStartGame(void);
 void NetworkProcessClientRequest(void);
-$int GetNetworkState() {return (int)NetLocalState;}
 int GetNetworkState();
 void NetworkServerResyncClients(void);
 void NetworkDetachFromServer(void);
@@ -26,7 +25,6 @@ class CServerSetup {
 	unsigned short CompOpt[PlayerMax]; // cannot use char since tolua interpret variable as string else.
 	unsigned short Ready[PlayerMax];   // cannot use char since tolua interpret variable as string else.
 	unsigned short Race[PlayerMax];    // cannot use char since tolua interpret variable as string else.
-	unsigned long LastFrame[PlayerMax];
 };
 extern CServerSetup LocalSetupState;
 extern CServerSetup ServerSetupState;

@@ -91,7 +91,7 @@ class CServerSetup
 public:
 	const unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 * PlayerMax + 1 * PlayerMax + 1 * PlayerMax + 4 * PlayerMax; }
+	static size_t Size() { return 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 * PlayerMax + 1 * PlayerMax + 1 * PlayerMax; }
 	void Clear() {
 		ResourcesOption = 0;
 		UnitsOption = 0;
@@ -104,7 +104,6 @@ public:
 		memset(CompOpt, 0, sizeof(CompOpt));
 		memset(Ready, 0, sizeof(Ready));
 		memset(Race, 0, sizeof(Race));
-		memset(LastFrame, 0, sizeof(LastFrame));
 	}
 
 	uint8_t ResourcesOption;       /// Resources option
@@ -118,7 +117,6 @@ public:
 	uint8_t CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
 	uint8_t Ready[PlayerMax];      /// Client ready state
 	uint8_t Race[PlayerMax];       /// Client race selection
-	uint32_t LastFrame[PlayerMax]; /// Last message received
 	// Fill in here...
 };
 
@@ -219,7 +217,6 @@ extern int HostsCount;                /// Number of hosts.
 extern CNetworkHost Hosts[PlayerMax]; /// Host, port, and number of all players.
 
 extern int NetConnectRunning;              /// Network menu: Setup mode active
-extern unsigned char NetLocalState;        /// Network menu: Local Server/Client connect state
 extern int NetLocalHostsSlot;              /// Network menu: Slot # in Hosts array of local client
 extern int NetLocalPlayerNumber;           /// Player number of local client
 
@@ -234,6 +231,8 @@ extern int FindHostIndexBy(unsigned long ip, int port);
 extern void NetworkServerStartGame();       /// Server user has finally hit the start game button
 extern void NetworkGamePrepareGameSettings();
 extern void NetworkConnectSetupGame();      /// Assign Player slot, evaluate Setup state..
+
+extern int GetNetworkState();
 
 extern void NetworkInitClientConnect();     /// Setup network connect state machine for clients
 extern void NetworkExitClientConnect();     /// Terminate network connect state machine for clients
