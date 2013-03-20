@@ -53,6 +53,8 @@
 // Declaration
 //----------------------------------------------------------------------------
 
+#define NetworkDefaultPort 6660  /// Default communication port
+
 // received nothing from client for xx frames?
 #define CLIENT_LIVE_BEAT 60
 #define CLIENT_IS_DEAD 300
@@ -71,15 +73,17 @@ struct NetworkState
 // Variables
 //----------------------------------------------------------------------------
 
-int NetPlayers;                        /// How many network players
 char *NetworkAddr = NULL;              /// Local network address to use
 int NetworkPort = NetworkDefaultPort;  /// Local network port to use
+
+static unsigned long NetworkServerIP;   /// Network Client: IP of server to join
+static int NetworkServerPort = NetworkDefaultPort; /// Server network port to use
 
 int HostsCount;                        /// Number of hosts.
 CNetworkHost Hosts[PlayerMax];         /// Host and ports of all players.
 
 int NetConnectRunning;                 /// Network menu: Setup mode active
-static NetworkState NetStates[PlayerMax];     /// Network menu: Server: Client Host states
+static NetworkState NetStates[PlayerMax]; /// Network menu: Server: Client Host states
 unsigned char NetLocalState;           /// Network menu: Local Server/Client connect state;
 int NetLocalHostsSlot;                 /// Network menu: Slot # in Hosts array of local client
 int NetLocalPlayerNumber;              /// Player number of local client
@@ -87,24 +91,16 @@ int NetLocalPlayerNumber;              /// Player number of local client
 static int NetStateMsgCnt;              /// Number of consecutive msgs of same type sent
 static unsigned char LastStateMsgType;  /// Subtype of last InitConfig message sent
 static unsigned long NetLastPacketSent; /// Tick the last network packet was sent
-static unsigned long NetworkServerIP;   /// Network Client: IP of server to join
-std::string NetworkMapName;             /// Name of the map recieved with ICMMap
 
-/// FIXME ARI: The following is a kludge to have some way to override the default port
-/// on the server to connect to. Should be selectable by advanced network menus.
-/// For now just specify with the -P port command line arg...
-static int NetworkServerPort = NetworkDefaultPort; /// Server network port to use
-
+int NetPlayers;                         /// How many network players
+std::string NetworkMapName;             /// Name of the map received with ICMMap
 static int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
 
-/**
-** Client and server selection state for Multiplayer clients
-*/
-CServerSetup ServerSetupState;
-CServerSetup LocalSetupState;
+CServerSetup ServerSetupState; // Server selection state for Multiplayer clients
+CServerSetup LocalSetupState;  // Local selection state for Multiplayer clients
 
 
-unsigned char *CNetworkHost::Serialize() const
+const unsigned char *CNetworkHost::Serialize() const
 {
 	unsigned char *buf = new unsigned char[CNetworkHost::Size()];
 	unsigned char *p = buf;
@@ -144,7 +140,7 @@ void CNetworkHost::SetName(const char *name)
 	strncpy_s(this->PlyName, sizeof(this->PlyName), name, _TRUNCATE);
 }
 
-unsigned char *CServerSetup::Serialize() const
+const unsigned char *CServerSetup::Serialize() const
 {
 	unsigned char *buf = new unsigned char[CServerSetup::Size()];
 	unsigned char *p = buf;
@@ -208,7 +204,7 @@ CInitMessage::CInitMessage()
 	this->Updates = NetworkUpdates;
 }
 
-unsigned char *CInitMessage::Serialize() const
+const unsigned char *CInitMessage::Serialize() const
 {
 	unsigned char *buf = new unsigned char[CInitMessage::Size()];
 	unsigned char *p = buf;
@@ -235,7 +231,7 @@ unsigned char *CInitMessage::Serialize() const
 		case ICMResync:
 		case ICMGo:
 			for (int i = 0; i < PlayerMax; ++i) {
-				unsigned char *x = this->u.Hosts[i].Serialize();
+				const unsigned char *x = this->u.Hosts[i].Serialize();
 				memcpy(p, x, CNetworkHost::Size());
 				p += CNetworkHost::Size();
 				delete[] x;
@@ -246,7 +242,7 @@ unsigned char *CInitMessage::Serialize() const
 			p += sizeof(this->u.MapPath);
 			break;
 		case ICMState: {
-			unsigned char *x = this->u.State.Serialize();
+			const unsigned char *x = this->u.State.Serialize();
 			memcpy(p, x, CServerSetup::Size());
 			p += CServerSetup::Size();
 			delete[] x;
@@ -321,7 +317,7 @@ int FindHostIndexBy(unsigned long ip, int port)
 */
 static int NetworkSendICMessage(unsigned long host, int port, const CInitMessage &msg)
 {
-	unsigned char *buf = msg.Serialize();
+	const unsigned char *buf = msg.Serialize();
 	int ret = NetSendUDP(NetworkFildes, host, port, buf, CInitMessage::Size());
 	delete[] buf;
 	return ret;
@@ -633,7 +629,6 @@ void NetworkServerStartGame()
 	// It can be disabled by writing NoRandomPlacementMultiplayer() in lua files.
 	// Players slots are then mapped to players numbers(and colors).
 
-	int j = h;
 	if (NoRandomPlacementMultiplayer == 1) {
 		for (int i = 0; i < PlayerMax; ++i) {
 			if (Map.Info.PlayerType[i] != PlayerComputer) {
@@ -641,28 +636,26 @@ void NetworkServerStartGame()
 			}
 		}
 	} else {
+		int j = h;
 		for (int i = 0; i < NetPlayers; ++i) {
-			if (j > 0) {
-				int chosen = MyRand() % j;
+			Assert(j > 0);
+			int chosen = MyRand() % j;
 
-				n = num[chosen];
-				Hosts[i].PlyNr = n;
-				int k = org[i];
-				if (k != n) {
-					for (int o = 0; o < PlayerMax; ++o) {
-						if (org[o] == n) {
-							org[o] = k;
-							break;
-						}
+			n = num[chosen];
+			Hosts[i].PlyNr = n;
+			int k = org[i];
+			if (k != n) {
+				for (int o = 0; o < PlayerMax; ++o) {
+					if (org[o] == n) {
+						org[o] = k;
+						break;
 					}
-					org[i] = n;
 				}
-				DebugPrint("Assigning player %d to slot %d (%d)\n" _C_ i _C_ n _C_ org[i]);
-
-				num[chosen] = num[--j];
-			} else {
-				Assert(0);
+				org[i] = n;
 			}
+			DebugPrint("Assigning player %d to slot %d (%d)\n" _C_ i _C_ n _C_ org[i]);
+
+			num[chosen] = num[--j];
 		}
 	}
 
@@ -707,10 +700,8 @@ void NetworkServerStartGame()
 	statemsg.MapUID = Map.Info.MapUID;
 
 	DebugPrint("Ready, sending InitConfig to %d host(s)\n" _C_ HostsCount);
-	//
 	// Send all clients host:ports to all clients.
-	//
-	for (j = HostsCount; j;) {
+	for (int j = HostsCount; j;) {
 
 breakout:
 		// Send to all clients.
@@ -734,13 +725,14 @@ breakout:
 		while (j && NetSocketReady(NetworkFildes, 1000)) {
 			unsigned long host;
 			int port;
-			if ((n = NetRecvUDP(NetworkFildes, buf, sizeof(buf), &host, &port)) < 0) {
+			const int len = NetRecvUDP(NetworkFildes, buf, sizeof(buf), &host, &port);
+			if (len < 0) {
 				DebugPrint("*Receive ack failed: (%d) from %d.%d.%d.%d:%d\n" _C_
-						   n _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
+						   len _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
 				continue;
 			}
 
-			if (n != (int)CInitMessage::Size()) {
+			if (len != (int)CInitMessage::Size()) {
 				DebugPrint("Unexpected message size\n");
 				continue;
 			}
@@ -750,8 +742,8 @@ breakout:
 			if (msg.Type == MessageInitHello) {
 				switch (msg.SubType) {
 					case ICMConfig: {
-						DebugPrint("Got ack for InitConfig: (%d) from %d.%d.%d.%d:%d\n" _C_
-								   n _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
+						DebugPrint("Got ack for InitConfig from %d.%d.%d.%d:%d\n"
+								   _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
 
 						const int index = FindHostIndexBy(host, port);
 						if (index != -1) {
@@ -763,8 +755,8 @@ breakout:
 						break;
 					}
 					case ICMGo: {
-						DebugPrint("Got ack for InitState: (%d) from %d.%d.%d.%d:%d\n" _C_
-								   n _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
+						DebugPrint("Got ack for InitState from %d.%d.%d.%d:%d\n"
+								   _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
 
 						const int index = FindHostIndexBy(host, port);
 						if (index != -1) {
@@ -791,8 +783,8 @@ breakout:
 	// Give clients a quick-start kick..
 	message.SubType = ICMGo;
 	for (int i = 0; i < HostsCount; ++i) {
-		unsigned long host = message.u.Hosts[i].Host;
-		int port = message.u.Hosts[i].Port;
+		const unsigned long host = message.u.Hosts[i].Host;
+		const int port = message.u.Hosts[i].Port;
 		NetworkSendICMessage_Log(host, port, message);
 	}
 }
@@ -1309,8 +1301,7 @@ static void ClientParseSynced(const CInitMessage &msg, unsigned long host, int p
 		case ICMConfig: { // Server gives the go ahead.. - start game
 			DebugPrint("ccs_synced: Config subtype %d received - starting\n" _C_ msg.SubType);
 			HostsCount = 0;
-			int i;
-			for (i = 0; i < msg.HostsCount - 1; ++i) {
+			for (int i = 0; i < msg.HostsCount - 1; ++i) {
 				if (msg.u.Hosts[i].Host || msg.u.Hosts[i].Port) {
 					Hosts[HostsCount] = msg.u.Hosts[i];
 					HostsCount++;
@@ -1329,8 +1320,8 @@ static void ClientParseSynced(const CInitMessage &msg, unsigned long host, int p
 			// server is last:
 			Hosts[HostsCount].Host = host;
 			Hosts[HostsCount].Port = port;
-			Hosts[HostsCount].PlyNr = msg.u.Hosts[i].PlyNr;
-			Hosts[HostsCount].SetName(msg.u.Hosts[i].PlyName);
+			Hosts[HostsCount].PlyNr = msg.u.Hosts[msg.HostsCount - 1].PlyNr;
+			Hosts[HostsCount].SetName(msg.u.Hosts[msg.HostsCount - 1].PlyName);
 			++HostsCount;
 			NetPlayers = HostsCount + 1;
 			DebugPrint("Server %d = %d.%d.%d.%d:%d [%.*s]\n" _C_
@@ -2002,7 +1993,7 @@ static void NetworkParseMenuPacket(const CInitMessage &msg, unsigned long host, 
 */
 int NetworkParseSetupEvent(const unsigned char *buf, int size, unsigned long host, int port)
 {
-	CInitMessage msg;
+	Assert(NetConnectRunning != 0);
 
 	if (size != (int)CInitMessage::Size()) {
 		// FIXME: could be a bad packet
@@ -2014,6 +2005,7 @@ int NetworkParseSetupEvent(const unsigned char *buf, int size, unsigned long hos
 		}
 		return 0;
 	}
+	CInitMessage msg;
 
 	msg.Deserialize(buf);
 	if (msg.Type > MessageInitConfig) {
@@ -2026,11 +2018,8 @@ int NetworkParseSetupEvent(const unsigned char *buf, int size, unsigned long hos
 		return 0;
 	}
 
-	if (InterfaceState == IfaceStateMenu) {
-		NetworkParseMenuPacket(msg, host, port);
-		return 1;
-	}
-	return 0;
+	NetworkParseMenuPacket(msg, host, port);
+	return 1;
 }
 
 /**

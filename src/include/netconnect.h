@@ -53,8 +53,6 @@
 /// Network protocol printf format arguments
 #define NetworkProtocolFormatArgs(v) (v) / 10000, ((v) / 100) % 100, (v) % 100
 
-#define NetworkDefaultPort 6660  /// Default communication port
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -71,7 +69,7 @@
 class CNetworkHost
 {
 public:
-	unsigned char *Serialize() const;
+	const unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
 	void Clear();
 	static size_t Size() { return 4 + 2 + 2 + NetPlayerNameSize; }
@@ -91,7 +89,7 @@ public:
 class CServerSetup
 {
 public:
-	unsigned char *Serialize() const;
+	const unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
 	static size_t Size() { return 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 * PlayerMax + 1 * PlayerMax + 1 * PlayerMax + 4 * PlayerMax; }
 	void Clear() {
@@ -134,7 +132,7 @@ class CInitMessage
 {
 public:
 	CInitMessage();
-	unsigned char *Serialize() const;
+	const unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
 	static size_t Size() { return 1 + 1 + 1 + 1 + 4 + 4 + 4 + 4 + 4 + 4 + std::max(256u, std::max(CNetworkHost::Size() * PlayerMax, CServerSetup::Size())); }
 

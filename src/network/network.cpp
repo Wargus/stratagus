@@ -749,9 +749,7 @@ void NetworkSendSelection(CUnit **units, int count)
 		return;
 	}
 
-	//
 	//  Build and send packets to cover all units.
-	//
 	CNetworkPacket packet;
 	int unitcount = 0;
 	while (unitcount < count) {
@@ -785,15 +783,15 @@ void NetworkSendSelection(CUnit **units, int count)
 			packet.Header.Type[i] = MessageNone;
 		}
 
-		//
 		// Send the Constructed packet to team members
-		//
-		int numcommands = (nosent + 3) / 4;
-		unsigned char *buf = packet.Serialize(numcommands);
+		const int numcommands = (nosent + 3) / 4;
+		const unsigned char *buf = packet.Serialize(numcommands);
+		const int len = CNetworkPacketHeader::Size() + CNetworkSelection::Size() * numcommands;
 
 		for (int i = 0; i < numteammates; ++i) {
-			NetSendUDP(NetworkFildes, Hosts[teammates[i]].Host, Hosts[teammates[i]].Port,
-					   buf, CNetworkPacketHeader::Size() + CNetworkSelection::Size() * numcommands);
+			const unsigned long ip = Hosts[teammates[i]].Host;
+			const int port = Hosts[teammates[i]].Port;
+			NetSendUDP(NetworkFildes, ip, port, buf, len);
 		}
 		delete [] buf;
 	}
