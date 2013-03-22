@@ -132,7 +132,7 @@ public:
 	CInitMessage();
 	const unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 1 + 1 + 1 + 1 + 4 + 4 + 4 + 4 + 4 + 4 + std::max(256u, std::max(CNetworkHost::Size() * PlayerMax, CServerSetup::Size())); }
+	static size_t Size() { return 1 + 1 + 1 + 1 + 4 + 4 + 4 + 4 + 4 + 4 + std::max<size_t>(256u, std::max(CNetworkHost::Size() * PlayerMax, CServerSetup::Size())); }
 
 	uint8_t Type;       /// Init message type
 	uint8_t SubType;    /// Init message subtype
