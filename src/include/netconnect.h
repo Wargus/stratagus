@@ -230,14 +230,11 @@ extern CServerSetup LocalSetupState;       /// Network menu: Multiplayer Client 
 extern int FindHostIndexBy(unsigned long ip, int port);
 extern void NetworkServerStartGame();       /// Server user has finally hit the start game button
 extern void NetworkGamePrepareGameSettings();
-extern void NetworkConnectSetupGame();      /// Assign Player slot, evaluate Setup state..
 
 extern int GetNetworkState();
 
 extern void NetworkInitClientConnect();     /// Setup network connect state machine for clients
-extern void NetworkExitClientConnect();     /// Terminate network connect state machine for clients
 extern void NetworkInitServerConnect(int openslots); /// Setup network connect state machine for the server
-extern void NetworkExitServerConnect();     /// Terminate network connect state machine for the server
 extern int NetworkParseSetupEvent(const unsigned char *buf, int size, unsigned long host, int port);  /// Parse a network connect event
 extern int NetworkSetupServerAddress(const std::string &serveraddr, int port);  /// Menu: Setup the server IP
 extern void NetworkProcessClientRequest();  /// Menu Loop: Send out client request messages

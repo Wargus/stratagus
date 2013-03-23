@@ -224,6 +224,7 @@
 #include "map.h"
 #include "netconnect.h"
 #include "net_lowlevel.h"
+#include "parameters.h"
 #include "player.h"
 #include "replay.h"
 #include "sound.h"
@@ -584,7 +585,10 @@ void ExitNetwork1()
 */
 void InitNetwork2()
 {
-	NetworkConnectSetupGame();
+	ThisPlayer->SetName(Parameters::Instance.LocalPlayerName);
+	for (int i = 0; i < HostsCount; ++i) {
+		Players[Hosts[i].PlyNr].SetName(Hosts[i].PlyName);
+	}
 
 	DebugPrint("Lag %d, Updates %d, Hosts %d\n" _C_ NetworkLag _C_ NetworkUpdates _C_ HostsCount);
 
