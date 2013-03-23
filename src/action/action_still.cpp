@@ -77,9 +77,6 @@ enum {
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
 	}
-	if (this->AutoTarget != NULL) {
-		file.printf(" \"auto-target\", \"%s\",", UnitReference(AutoTarget).c_str());
-	}
 	if (this->State != 0) { // useless to write default value
 		file.printf("\"state\", %d", this->State);
 	}
@@ -92,11 +89,6 @@ enum {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->State = LuaToNumber(l, -1);
-		lua_pop(l, 1);
-	} else if (!strcmp("auto-target", value)) {
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		this->AutoTarget = CclGetUnitFromRef(l);
 		lua_pop(l, 1);
 	} else {
 		return false;
@@ -140,16 +132,17 @@ private:
 
 /* virtual */ void COrder_Still::OnAnimationAttack(CUnit &unit)
 {
-	if (this->AutoTarget == NULL) {
+	CUnit *goal = this->GetGoal();
+	if (goal == NULL) {
 		return;
 	}
-	if (IsTargetInRange(unit)(this->AutoTarget) == false) {
-		this->AutoTarget = NULL;
+	if (IsTargetInRange(unit)(goal) == false) {
+		this->ClearGoal();
 		return;
 	}
 	const Vec2i invalidPos(-1, -1);
 
-	FireMissile(unit, AutoTarget, invalidPos);
+	FireMissile(unit, goal, invalidPos);
 	UnHideUnit(unit);
 }
 
@@ -294,13 +287,14 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 		return false;
 	}
 	// Removed units can only attack in AttackRange, from bunker
-	this->AutoTarget = AttackUnitsInRange(unit);
+	CUnit *autoAttackUnit = AttackUnitsInRange(unit);
 
-	if (this->AutoTarget == NULL) {
+	if (autoAttackUnit == NULL) {
 		return false;
 	}
 	this->State = SUB_STILL_ATTACK; // Mark attacking.
-	UnitHeadingFromDeltaXY(unit, this->AutoTarget->tilePos + this->AutoTarget->Type->GetHalfTileSize() - unit.tilePos);
+	this->SetGoal(autoAttackUnit);
+	UnitHeadingFromDeltaXY(unit, autoAttackUnit->tilePos + autoAttackUnit->Type->GetHalfTileSize() - unit.tilePos);
 	return true;
 }
 

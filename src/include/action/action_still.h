@@ -54,7 +54,6 @@ private:
 	bool AutoAttackStand(CUnit &unit);
 	bool AutoCastStand(CUnit &unit);
 private:
-	CUnitPtr AutoTarget;
 	int State;
 };
 
