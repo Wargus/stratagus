@@ -122,7 +122,7 @@ void StartMap(const std::string &filename, bool clean)
 	}
 	GetDefaultTextColors(nc, rc);
 
-	CreateGame(filename.c_str(), &Map);
+	CreateGame(filename, &Map);
 
 	UI.StatusLine.Set(NameLine);
 	SetMessage("%s", _("Do it! Do it now!"));

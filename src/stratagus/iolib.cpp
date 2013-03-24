@@ -508,11 +508,12 @@ long CFile::PImpl::tell()
 */
 static bool FindFileWithExtension(char *file, size_t filesize)
 {
-	char buf[PATH_MAX];
-
 	if (!access(file, R_OK)) {
 		return true;
 	}
+#if defined(USE_ZLIB) || defined(USE_BZ2LIB)
+	char buf[PATH_MAX];
+#endif
 #ifdef USE_ZLIB // gzip or bzip2 in global shared directory
 	sprintf(buf, "%s.gz", file);
 	if (!access(buf, R_OK)) {
