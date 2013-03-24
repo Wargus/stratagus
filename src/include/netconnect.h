@@ -32,6 +32,7 @@
 //@{
 
 #include <stdint.h>
+#include "net_message.h"
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -56,130 +57,6 @@
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
-
-/**
- * Number of bytes in the name of a network player,
- * including the terminating null character.
- */
-#define NetPlayerNameSize 16
-
-/**
-**  Network systems active in current game.
-*/
-class CNetworkHost
-{
-public:
-	const unsigned char *Serialize() const;
-	void Deserialize(const unsigned char *p);
-	void Clear();
-	static size_t Size() { return 4 + 2 + 2 + NetPlayerNameSize; }
-
-	void SetName(const char *name);
-
-	uint32_t Host;         /// Host address
-	uint16_t Port;         /// Port on host
-	uint16_t PlyNr;        /// Player number
-	char PlyName[NetPlayerNameSize];  /// Name of player
-};
-
-
-/**
-**  Multiplayer game setup menu state
-*/
-class CServerSetup
-{
-public:
-	const unsigned char *Serialize() const;
-	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 * PlayerMax + 1 * PlayerMax + 1 * PlayerMax; }
-	void Clear() {
-		ResourcesOption = 0;
-		UnitsOption = 0;
-		FogOfWar = 0;
-		RevealMap = 0;
-		TilesetSelection = 0;
-		GameTypeOption = 0;
-		Difficulty = 0;
-		MapRichness = 0;
-		memset(CompOpt, 0, sizeof(CompOpt));
-		memset(Ready, 0, sizeof(Ready));
-		memset(Race, 0, sizeof(Race));
-	}
-
-	uint8_t ResourcesOption;       /// Resources option
-	uint8_t UnitsOption;           /// Unit # option
-	uint8_t FogOfWar;              /// Fog of war option
-	uint8_t RevealMap;             /// Reveal all the map
-	uint8_t TilesetSelection;      /// Tileset select option
-	uint8_t GameTypeOption;        /// Game type option
-	uint8_t Difficulty;            /// Difficulty option
-	uint8_t MapRichness;           /// Map richness option
-	uint8_t CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
-	uint8_t Ready[PlayerMax];      /// Client ready state
-	uint8_t Race[PlayerMax];       /// Client race selection
-	// Fill in here...
-};
-
-/**
-**  Network init message.
-**
-**  @todo Transfering the same data in each message is waste of bandwidth.
-**  I mean the versions and the UID ...
-*/
-class CInitMessage
-{
-public:
-	CInitMessage();
-	const unsigned char *Serialize() const;
-	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 1 + 1 + 1 + 1 + 4 + 4 + 4 + 4 + 4 + 4 + std::max<size_t>(256u, std::max(CNetworkHost::Size() * PlayerMax, CServerSetup::Size())); }
-
-	uint8_t Type;       /// Init message type
-	uint8_t SubType;    /// Init message subtype
-	uint8_t HostsCount; /// Number of hosts
-	uint8_t padding;    /// padding for alignment
-	int32_t Stratagus;  /// Stratagus engine version
-	int32_t Version;    /// Network protocol version
-	uint32_t MapUID;    /// UID of map to play. FIXME: add MAP name, path, etc
-	int32_t Lag;        /// Lag time
-	int32_t Updates;    /// Update frequency
-
-	union {
-		CNetworkHost Hosts[PlayerMax]; /// Participant information
-		char         MapPath[256];
-		CServerSetup State;            /// Server Setup State information
-	} u;
-};
-
-/**
-**  Network init config message subtypes (menu state machine).
-*/
-enum _ic_message_subtype_ {
-	ICMHello,               /// Client Request
-	ICMConfig,              /// Setup message configure clients
-
-	ICMEngineMismatch,      /// Stratagus engine version doesn't match
-	ICMProtocolMismatch,    /// Network protocol version doesn't match
-	ICMEngineConfMismatch,  /// Engine configuration isn't identical
-	ICMMapUidMismatch,      /// MAP UID doesn't match
-
-	ICMGameFull,            /// No player slots available
-	ICMWelcome,             /// Acknowledge for new client connections
-
-	ICMWaiting,             /// Client has received Welcome and is waiting for Map/State
-	ICMMap,                 /// MapInfo (and Mapinfo Ack)
-	ICMState,               /// StateInfo
-	ICMResync,              /// Ack StateInfo change
-
-	ICMServerQuit,          /// Server has quit game
-	ICMGoodBye,             /// Client wants to leave game
-	ICMSeeYou,              /// Client has left game
-
-	ICMGo,                  /// Client is ready to run
-
-	ICMAYT,                 /// Server asks are you there
-	ICMIAH                  /// Client answers I am here
-};
 
 /**
 **  Network Client connect states
@@ -210,8 +87,6 @@ enum _net_client_con_state_ {
 ----------------------------------------------------------------------------*/
 
 extern int NetPlayers;                /// Network players
-extern char *NetworkAddr;             /// Local network address to use
-extern int NetworkPort;               /// Local network port to use
 
 extern int HostsCount;                /// Number of hosts.
 extern CNetworkHost Hosts[PlayerMax]; /// Host, port, and number of all players.

@@ -31,7 +31,7 @@
 
 #include "stratagus.h"
 #include "network.h"
-
+#include "net_message.h"
 
 void FillCustomValue(CNetworkCommand *obj)
 {

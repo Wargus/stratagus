@@ -34,14 +34,17 @@
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
+
 #include "commands.h"
+
+#include "actions.h"
+#include "net_message.h"
+#include "network.h"
+#include "replay.h"
+#include "spells.h"
 #include "unit.h"
 #include "unit_manager.h"
 #include "unittype.h"
-#include "actions.h"
-#include "network.h"
-#include "spells.h"
-#include "replay.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

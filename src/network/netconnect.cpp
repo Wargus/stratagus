@@ -53,8 +53,6 @@
 // Declaration
 //----------------------------------------------------------------------------
 
-#define NetworkDefaultPort 6660  /// Default communication port
-
 // received nothing from client for xx frames?
 #define CLIENT_LIVE_BEAT 60
 #define CLIENT_IS_DEAD 300
@@ -80,9 +78,6 @@ struct NetworkState
 //----------------------------------------------------------------------------
 // Variables
 //----------------------------------------------------------------------------
-
-char *NetworkAddr = NULL;              /// Local network address to use
-int NetworkPort = NetworkDefaultPort;  /// Local network port to use
 
 int HostsCount;                        /// Number of hosts.
 CNetworkHost Hosts[PlayerMax];         /// Host and ports of all players.
@@ -160,209 +155,11 @@ private:
 	unsigned long serverIP;  /// IP of server to join
 	int serverPort;   /// Server network port to use
 	NetworkState LocalNetState;
-	unsigned char LastStateMsgType;  /// Subtype of last InitConfig message sent
+	unsigned char lastMsgTypeSent;  /// Subtype of last InitConfig message sent
 };
 
 static CServer Server;
 static CClient Client;
-
-//
-// CNetworkHost
-//
-
-const unsigned char *CNetworkHost::Serialize() const
-{
-	unsigned char *buf = new unsigned char[CNetworkHost::Size()];
-	unsigned char *p = buf;
-
-	*(uint32_t *)p = htonl(this->Host);
-	p += 4;
-	*(uint16_t *)p = htons(this->Port);
-	p += 2;
-	*(uint16_t *)p = htons(this->PlyNr);
-	p += 2;
-	memcpy(p, this->PlyName, sizeof(this->PlyName));
-
-	return buf;
-}
-
-void CNetworkHost::Deserialize(const unsigned char *p)
-{
-	this->Host = ntohl(*(uint32_t *)p);
-	p += 4;
-	this->Port = ntohs(*(uint16_t *)p);
-	p += 2;
-	this->PlyNr = ntohs(*(uint16_t *)p);
-	p += 2;
-	memcpy(this->PlyName, p, sizeof(this->PlyName));
-}
-
-void CNetworkHost::Clear()
-{
-	this->Host = 0;
-	this->Port = 0;
-	this->PlyNr = 0;
-	memset(this->PlyName, 0, sizeof(this->PlyName));
-}
-
-void CNetworkHost::SetName(const char *name)
-{
-	strncpy_s(this->PlyName, sizeof(this->PlyName), name, _TRUNCATE);
-}
-
-
-//
-// CServerSetup
-//
-
-const unsigned char *CServerSetup::Serialize() const
-{
-	unsigned char *buf = new unsigned char[CServerSetup::Size()];
-	unsigned char *p = buf;
-
-	*p++ = this->ResourcesOption;
-	*p++ = this->UnitsOption;
-	*p++ = this->FogOfWar;
-	*p++ = this->RevealMap;
-	*p++ = this->TilesetSelection;
-	*p++ = this->GameTypeOption;
-	*p++ = this->Difficulty;
-	*p++ = this->MapRichness;
-	for (int i = 0; i < PlayerMax; ++i) {
-		*p++ = this->CompOpt[i];
-	}
-	for (int i = 0; i < PlayerMax; ++i) {
-		*p++ = this->Ready[i];
-	}
-	for (int i = 0; i < PlayerMax; ++i) {
-		*p++ = this->Race[i];
-	}
-	return buf;
-}
-
-void CServerSetup::Deserialize(const unsigned char *p)
-{
-	this->ResourcesOption = *p++;
-	this->UnitsOption = *p++;
-	this->FogOfWar = *p++;
-	this->RevealMap = *p++;
-	this->TilesetSelection = *p++;
-	this->GameTypeOption = *p++;
-	this->Difficulty = *p++;
-	this->MapRichness = *p++;
-	for (int i = 0; i < PlayerMax; ++i) {
-		this->CompOpt[i] = *p++;
-	}
-	for (int i = 0; i < PlayerMax; ++i) {
-		this->Ready[i] = *p++;
-	}
-	for (int i = 0; i < PlayerMax; ++i) {
-		this->Race[i] = *p++;
-	}
-}
-
-
-//
-// CInitMessage
-//
-
-CInitMessage::CInitMessage()
-{
-	memset(this, 0, sizeof(CInitMessage));
-
-	this->Stratagus = StratagusVersion;
-	this->Version = NetworkProtocolVersion;
-	this->Lag = NetworkLag;
-	this->Updates = NetworkUpdates;
-}
-
-const unsigned char *CInitMessage::Serialize() const
-{
-	unsigned char *buf = new unsigned char[CInitMessage::Size()];
-	unsigned char *p = buf;
-
-	*p++ = this->Type;
-	*p++ = this->SubType;
-	*p++ = this->HostsCount;
-	*p++ = this->padding;
-	*(int32_t *)p = htonl(this->Stratagus);
-	p += 4;
-	*(int32_t *)p = htonl(this->Version);
-	p += 4;
-	*(uint32_t *)p = htonl(this->MapUID);
-	p += 4;
-	*(int32_t *)p = htonl(this->Lag);
-	p += 4;
-	*(int32_t *)p = htonl(this->Updates);
-	p += 4;
-
-	switch (this->SubType) {
-		case ICMHello:
-		case ICMConfig:
-		case ICMWelcome:
-		case ICMResync:
-		case ICMGo:
-			for (int i = 0; i < PlayerMax; ++i) {
-				const unsigned char *x = this->u.Hosts[i].Serialize();
-				memcpy(p, x, CNetworkHost::Size());
-				p += CNetworkHost::Size();
-				delete[] x;
-			}
-			break;
-		case ICMMap:
-			memcpy(p, this->u.MapPath, sizeof(this->u.MapPath));
-			p += sizeof(this->u.MapPath);
-			break;
-		case ICMState: {
-			const unsigned char *x = this->u.State.Serialize();
-			memcpy(p, x, CServerSetup::Size());
-			p += CServerSetup::Size();
-			delete[] x;
-			break;
-		}
-	}
-	return buf;
-}
-
-void CInitMessage::Deserialize(const unsigned char *p)
-{
-	this->Type = *p++;
-	this->SubType = *p++;
-	this->HostsCount = *p++;
-	this->padding = *p++;
-	this->Stratagus = ntohl(*(int32_t *)p);
-	p += 4;
-	this->Version = ntohl(*(int32_t *)p);
-	p += 4;
-	this->MapUID = ntohl(*(uint32_t *)p);
-	p += 4;
-	this->Lag = ntohl(*(int32_t *)p);
-	p += 4;
-	this->Updates = ntohl(*(int32_t *)p);
-	p += 4;
-
-	switch (this->SubType) {
-		case ICMHello:
-		case ICMConfig:
-		case ICMWelcome:
-		case ICMResync:
-		case ICMGo:
-			for (int i = 0; i < PlayerMax; ++i) {
-				this->u.Hosts[i].Deserialize(p);
-				p += CNetworkHost::Size();
-			}
-			break;
-		case ICMMap:
-			memcpy(this->u.MapPath, p, sizeof(this->u.MapPath));
-			p += sizeof(this->u.MapPath);
-			break;
-		case ICMState:
-			this->u.State.Deserialize(p);
-			p += CServerSetup::Size();
-			break;
-	}
-}
-
 
 //
 // CClient
@@ -456,11 +253,11 @@ void CClient::NetworkSendRateLimitedClientMessage(const CInitMessage &msg, unsig
 	const unsigned long now = GetTicks();
 	if (now - LocalNetState.LastFrame >= msecs) {
 		LocalNetState.LastFrame = now;
-		if (msg.SubType == LastStateMsgType) {
+		if (msg.SubType == lastMsgTypeSent) {
 			++LocalNetState.MsgCnt;
 		} else {
 			LocalNetState.MsgCnt = 0;
-			LastStateMsgType = msg.SubType;
+			lastMsgTypeSent = msg.SubType;
 		}
 		const int n = NetworkSendICMessage(serverIP, serverPort, msg);
 		UNUSED(n); // not used in release
@@ -491,7 +288,7 @@ void CClient::Init()
 	LocalNetState.LastFrame = GetTicks();
 	LocalNetState.State = ccs_connecting;
 	LocalNetState.MsgCnt = 0;
-	LastStateMsgType = ICMServerQuit;
+	lastMsgTypeSent = ICMServerQuit;
 }
 
 void CClient::DetachFromServer()
@@ -1073,7 +870,6 @@ void CClient::ParseBadMap()
 	NetConnectRunning = 0; // End the menu..
 }
 
-
 //
 // CServer
 //
@@ -1262,7 +1058,6 @@ void CServer::ParseResync(const int h, unsigned long host, int port)
 			break;
 	}
 }
-
 
 /**
 **  Parse client heart beat waiting message
@@ -1590,30 +1385,9 @@ void CServer::NetworkParseMenuPacket(const CInitMessage &msg, unsigned long host
 	}
 }
 
-
 //
 // Functions
 //
-
-/**
-**  Parse a Network menu packet.
-**
-**  @param msg message received
-**  @param host  host which send the message
-**  @param port  port from where the message nas been sent
-*/
-static void NetworkParseMenuPacket(const CInitMessage &msg, unsigned long host, int port)
-{
-	DebugPrint("Received %s Init Message %d:%d from %d.%d.%d.%d:%d (%ld)\n" _C_
-			   icmsgsubtypenames[msg.SubType] _C_ msg.Type _C_ msg.SubType _C_ NIPQUAD(ntohl(host)) _C_
-			   ntohs(port) _C_ FrameCounter);
-
-	if (NetConnectRunning == 2) { // client
-		Client.NetworkParseMenuPacket(msg, host, port);
-	} else if (NetConnectRunning == 1) { // server
-		Server.NetworkParseMenuPacket(msg, host, port);
-	}
-}
 
 /**
 **  Parse a setup event. (Command type <= MessageInitEvent)
@@ -1652,7 +1426,15 @@ int NetworkParseSetupEvent(const unsigned char *buf, int size, unsigned long hos
 		return 0;
 	}
 
-	NetworkParseMenuPacket(msg, host, port);
+	DebugPrint("Received %s Init Message %d:%d from %d.%d.%d.%d:%d (%ld)\n" _C_
+			   icmsgsubtypenames[msg.SubType] _C_ msg.Type _C_ msg.SubType _C_ NIPQUAD(ntohl(host)) _C_
+			   ntohs(port) _C_ FrameCounter);
+
+	if (NetConnectRunning == 2) { // client
+		Client.NetworkParseMenuPacket(msg, host, port);
+	} else if (NetConnectRunning == 1) { // server
+		Server.NetworkParseMenuPacket(msg, host, port);
+	}
 	return 1;
 }
 
@@ -1663,7 +1445,6 @@ void NetworkProcessClientRequest()
 {
 	Client.Update();
 }
-
 
 int GetNetworkState()
 {

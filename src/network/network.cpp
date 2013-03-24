@@ -222,8 +222,9 @@
 #include "commands.h"
 #include "interface.h"
 #include "map.h"
-#include "netconnect.h"
 #include "net_lowlevel.h"
+#include "net_message.h"
+#include "netconnect.h"
 #include "parameters.h"
 #include "player.h"
 #include "replay.h"
@@ -233,7 +234,6 @@
 #include "unit_manager.h"
 #include "unittype.h"
 #include "video.h"
-
 
 //----------------------------------------------------------------------------
 //  Declaration
@@ -253,10 +253,24 @@ public:
 	CNetworkCommand Data;   /// command content
 };
 
+
+/**
+**  Network Selection Info
+*/
+struct NetworkSelectionHeader
+{
+	unsigned NumberSent : 6;   /// New Number Selected
+	unsigned Add : 1;          /// Adding to Selection
+	unsigned Remove : 1;       /// Removing from Selection
+	unsigned char Type[MaxNetworkCommands];  /// Command
+};
+
 //----------------------------------------------------------------------------
 //  Variables
 //----------------------------------------------------------------------------
 
+char *NetworkAddr = NULL;                  /// Local network address to use
+int NetworkPort = NetworkDefaultPort;      /// Local network port to use
 Socket NetworkFildes = static_cast<Socket>(-1);   /// Network file descriptor
 int NetworkInSync = 1;                     /// Network is in sync
 int NetworkUpdates = 5;                    /// Network update each # game cycles
@@ -290,142 +304,6 @@ static int PlayerQuit[PlayerMax];          /// Player quit
 static CNetworkCommandQueue NCQs[MAX_NCQS]; /// CNetworkCommandQueues
 static int NumNCQs;                         /// Number of NCQs in use
 
-
-//----------------------------------------------------------------------------
-//  Serialize/Deserialize
-//----------------------------------------------------------------------------
-
-void CNetworkCommand::Serialize(unsigned char *p) const
-{
-	*(uint16_t *)p = this->Unit;
-	p += 2;
-	*(uint16_t *)p = this->X;
-	p += 2;
-	*(uint16_t *)p = this->Y;
-	p += 2;
-	*(uint16_t *)p = this->Dest;
-	p += 2;
-}
-
-void CNetworkCommand::Deserialize(const unsigned char *p)
-{
-	this->Unit = *(uint16_t *)p;
-	p += 2;
-	this->X = *(uint16_t *)p;
-	p += 2;
-	this->Y = *(uint16_t *)p;
-	p += 2;
-	this->Dest = *(uint16_t *)p;
-	p += 2;
-}
-
-void CNetworkExtendedCommand::Serialize(unsigned char *p) const
-{
-	*p++ = this->ExtendedType;
-	*p++ = this->Arg1;
-	*(uint16_t *)p = this->Arg2;
-	p += 2;
-	*(uint16_t *)p = this->Arg3;
-	p += 2;
-	*(uint16_t *)p = this->Arg4;
-	p += 2;
-}
-
-void CNetworkExtendedCommand::Deserialize(const unsigned char *p)
-{
-	this->ExtendedType = *p++;
-	this->Arg1 = *p++;
-	this->Arg2 = *(uint16_t *)p;
-	p += 2;
-	this->Arg3 = *(uint16_t *)p;
-	p += 2;
-	this->Arg4 = *(uint16_t *)p;
-	p += 2;
-}
-
-void CNetworkChat::Serialize(unsigned char *p) const
-{
-	*p++ = this->Player;
-	memcpy(p, this->Text, 7);
-	p += 7;
-}
-
-void CNetworkChat::Deserialize(const unsigned char *p)
-{
-	this->Player = *p++;
-	memcpy(this->Text, p, 7);
-	p += 7;
-}
-
-void CNetworkPacketHeader::Serialize(unsigned char *p) const
-{
-	*p++ = this->Cycle;
-	for (int i = 0; i < MaxNetworkCommands; ++i) {
-		*p++ = this->Type[i];
-	}
-}
-
-void CNetworkPacketHeader::Deserialize(const unsigned char *p)
-{
-	this->Cycle = *p++;
-	for (int i = 0; i < MaxNetworkCommands; ++i) {
-		this->Type[i] = *p++;
-	}
-}
-
-unsigned char *CNetworkPacket::Serialize(int numcommands) const
-{
-	unsigned char *buf = new unsigned char[CNetworkPacket::Size(numcommands)];
-	unsigned char *p = buf;
-
-	this->Header.Serialize(p);
-	p += CNetworkPacketHeader::Size();
-
-	for (int i = 0; i < numcommands; ++i) {
-		if (this->Header.Type[i] == MessageExtendedCommand) {
-			((CNetworkExtendedCommand *)&this->Command[i])->Serialize(p);
-		} else if (this->Header.Type[i] == MessageChat) {
-			((CNetworkChat *)&this->Command[i])->Serialize(p);
-		} else {
-			this->Command[i].Serialize(p);
-		}
-		p += CNetworkCommand::Size();
-	}
-
-	return buf;
-}
-
-int CNetworkPacket::Deserialize(const unsigned char *p, unsigned int len)
-{
-	// check min and max size
-	if (len < CNetworkPacket::Size(1)
-		|| len > CNetworkPacket::Size(MaxNetworkCommands)) {
-		return -1;
-	}
-
-	// can't have partial commands
-	len -= CNetworkPacketHeader::Size();
-	if ((len / CNetworkCommand::Size()) * CNetworkCommand::Size() != len) {
-		return -1;
-	}
-
-	this->Header.Deserialize(p);
-	p += CNetworkPacketHeader::Size();
-
-	int commands = len / CNetworkCommand::Size();
-
-	for (int i = 0; i < commands; ++i) {
-		if (this->Header.Type[i] == MessageExtendedCommand) {
-			((CNetworkExtendedCommand *)&this->Command[i])->Deserialize(p);
-		} else if (this->Header.Type[i] == MessageChat) {
-			((CNetworkChat *)&this->Command[i])->Deserialize(p);
-		} else {
-			this->Command[i].Deserialize(p);
-		}
-		p += CNetworkCommand::Size();
-	}
-	return commands;
-}
 
 //----------------------------------------------------------------------------
 //  Mid-Level api functions

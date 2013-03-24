@@ -30,6 +30,7 @@
 #include <UnitTest++.h>
 #include <TestReporterStdout.h>
 
+#include <SDL.h>
 
 int main(int argc, char* argv[])
 {

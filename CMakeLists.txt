@@ -225,6 +225,7 @@ source_group(missile FILES ${missile_SRCS})
 set(network_SRCS
 	src/network/commands.cpp
 	src/network/net_lowlevel.cpp
+	src/network/net_message.cpp
 	src/network/master.cpp
 	src/network/netconnect.cpp
 	src/network/network.cpp
@@ -528,8 +529,9 @@ set(stratagus_generic_HDRS
 	src/include/missileconfig.h
 	src/include/movie.h
 	src/include/myendian.h
-	src/include/netconnect.h
 	src/include/net_lowlevel.h
+	src/include/net_message.h
+	src/include/netconnect.h
 	src/include/network.h
 	src/include/parameters.h
 	src/include/particle.h
