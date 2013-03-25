@@ -45,7 +45,6 @@
 
 #define MaxNetworkCommands 9  /// Max Commands In A Packet
 
-
 /**
 **  Network systems active in current game.
 */
@@ -171,9 +170,8 @@ public:
 */
 enum _message_type_ {
 	MessageNone,                   /// When Nothing Is Happening
-	MessageInitHello,              /// Start connection
-	MessageInitReply,              /// Connection reply
-	MessageInitConfig,             /// Setup message configure clients
+	MessageInit_FromClient,        /// Start connection
+	MessageInit_FromServer,        /// Connection reply
 
 	MessageSync,                   /// Heart beat
 	MessageSelection,              /// Update a Selection from Team Player
@@ -313,8 +311,8 @@ public:
 	void Deserialize(const unsigned char *p);
 	static size_t Size() { return 1 + 1 * MaxNetworkCommands; }
 
-	uint8_t Cycle;                     /// Destination game cycle
 	uint8_t Type[MaxNetworkCommands];  /// Commands in packet
+	uint8_t Cycle;                     /// Destination game cycle
 };
 
 /**
@@ -325,7 +323,7 @@ public:
 class CNetworkPacket
 {
 public:
-	unsigned char *Serialize(int numcommands) const;
+	void Serialize(unsigned char *buf, int numcommands) const;
 	int Deserialize(const unsigned char *p, unsigned int len);
 	static size_t Size(int numcommands) {
 		return CNetworkPacketHeader::Size() + numcommands * CNetworkCommand::Size();

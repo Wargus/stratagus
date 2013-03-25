@@ -42,6 +42,80 @@
 #include "network.h"
 #include "version.h"
 
+int serialize32(unsigned char *buf, uint32_t data)
+{
+	if (buf) {
+		*reinterpret_cast<uint32_t *>(buf) = htonl(data);
+	}
+	return sizeof(data);
+}
+int serialize32(unsigned char *buf, int32_t data)
+{
+	if (buf) {
+		*reinterpret_cast<int32_t *>(buf) = htonl(data);
+	}
+	return sizeof(data);
+}
+int serialize16(unsigned char *buf, uint16_t data)
+{
+	if (buf) {
+		*reinterpret_cast<uint16_t *>(buf) = htons(data);
+	}
+	return sizeof(data);
+}
+int serialize16(unsigned char *buf, int16_t data)
+{
+	if (buf) {
+		*reinterpret_cast<int16_t *>(buf) = htons(data);
+	}
+	return sizeof(data);
+}
+int serialize8(unsigned char *buf, uint8_t data)
+{
+	if (buf) {
+		*buf = data;
+	}
+	return sizeof(data);
+}
+int serialize8(unsigned char *buf, int8_t data)
+{
+	if (buf) {
+		*buf = data;
+	}
+	return sizeof(data);
+}
+
+int deserialize32(const unsigned char *buf, uint32_t *data)
+{
+	*data = ntohl(*reinterpret_cast<const uint32_t *>(buf));
+	return sizeof(*data);
+}
+int deserialize32(const unsigned char *buf, int32_t *data)
+{
+	*data = ntohl(*reinterpret_cast<const int32_t *>(buf));
+	return sizeof(*data);
+}
+int deserialize16(const unsigned char *buf, uint16_t *data)
+{
+	*data = ntohs(*reinterpret_cast<const uint16_t *>(buf));
+	return sizeof(*data);
+}
+int deserialize16(const unsigned char *buf, int16_t *data)
+{
+	*data = ntohs(*reinterpret_cast<const int16_t *>(buf));
+	return sizeof(*data);
+}
+int deserialize8(const unsigned char *buf, uint8_t *data)
+{
+	*data = *buf;
+	return sizeof(*data);
+}
+int deserialize8(const unsigned char *buf, int8_t *data)
+{
+	*data = *buf;
+	return sizeof(*data);
+}
+
 //
 // CNetworkHost
 //
@@ -51,12 +125,9 @@ const unsigned char *CNetworkHost::Serialize() const
 	unsigned char *buf = new unsigned char[CNetworkHost::Size()];
 	unsigned char *p = buf;
 
-	*(uint32_t *)p = htonl(this->Host);
-	p += 4;
-	*(uint16_t *)p = htons(this->Port);
-	p += 2;
-	*(uint16_t *)p = htons(this->PlyNr);
-	p += 2;
+	p += serialize32(p, this->Host);
+	p += serialize16(p, this->Port);
+	p += serialize16(p, this->PlyNr);
 	memcpy(p, this->PlyName, sizeof(this->PlyName));
 
 	return buf;
@@ -64,12 +135,9 @@ const unsigned char *CNetworkHost::Serialize() const
 
 void CNetworkHost::Deserialize(const unsigned char *p)
 {
-	this->Host = ntohl(*(uint32_t *)p);
-	p += 4;
-	this->Port = ntohs(*(uint16_t *)p);
-	p += 2;
-	this->PlyNr = ntohs(*(uint16_t *)p);
-	p += 2;
+	p += deserialize32(p, &Host);
+	p += deserialize16(p, &Port);
+	p += deserialize16(p, &PlyNr);
 	memcpy(this->PlyName, p, sizeof(this->PlyName));
 }
 
@@ -95,44 +163,44 @@ const unsigned char *CServerSetup::Serialize() const
 	unsigned char *buf = new unsigned char[CServerSetup::Size()];
 	unsigned char *p = buf;
 
-	*p++ = this->ResourcesOption;
-	*p++ = this->UnitsOption;
-	*p++ = this->FogOfWar;
-	*p++ = this->RevealMap;
-	*p++ = this->TilesetSelection;
-	*p++ = this->GameTypeOption;
-	*p++ = this->Difficulty;
-	*p++ = this->MapRichness;
+	p += serialize8(p, this->ResourcesOption);
+	p += serialize8(p, this->UnitsOption);
+	p += serialize8(p, this->FogOfWar);
+	p += serialize8(p, this->RevealMap);
+	p += serialize8(p, this->TilesetSelection);
+	p += serialize8(p, this->GameTypeOption);
+	p += serialize8(p, this->Difficulty);
+	p += serialize8(p, this->MapRichness);
 	for (int i = 0; i < PlayerMax; ++i) {
-		*p++ = this->CompOpt[i];
+		p += serialize8(p, this->CompOpt[i]);
 	}
 	for (int i = 0; i < PlayerMax; ++i) {
-		*p++ = this->Ready[i];
+		p += serialize8(p, this->Ready[i]);
 	}
 	for (int i = 0; i < PlayerMax; ++i) {
-		*p++ = this->Race[i];
+		p += serialize8(p, this->Race[i]);
 	}
 	return buf;
 }
 
 void CServerSetup::Deserialize(const unsigned char *p)
 {
-	this->ResourcesOption = *p++;
-	this->UnitsOption = *p++;
-	this->FogOfWar = *p++;
-	this->RevealMap = *p++;
-	this->TilesetSelection = *p++;
-	this->GameTypeOption = *p++;
-	this->Difficulty = *p++;
-	this->MapRichness = *p++;
+	p += deserialize8(p, &this->ResourcesOption);
+	p += deserialize8(p, &this->UnitsOption);
+	p += deserialize8(p, &this->FogOfWar);
+	p += deserialize8(p, &this->RevealMap);
+	p += deserialize8(p, &this->TilesetSelection);
+	p += deserialize8(p, &this->GameTypeOption);
+	p += deserialize8(p, &this->Difficulty);
+	p += deserialize8(p, &this->MapRichness);
 	for (int i = 0; i < PlayerMax; ++i) {
-		this->CompOpt[i] = *p++;
+		p += deserialize8(p, &this->CompOpt[i]);
 	}
 	for (int i = 0; i < PlayerMax; ++i) {
-		this->Ready[i] = *p++;
+		p += deserialize8(p, &this->Ready[i]);
 	}
 	for (int i = 0; i < PlayerMax; ++i) {
-		this->Race[i] = *p++;
+		p += deserialize8(p, &this->Race[i]);
 	}
 }
 
@@ -155,20 +223,15 @@ const unsigned char *CInitMessage::Serialize() const
 	unsigned char *buf = new unsigned char[CInitMessage::Size()];
 	unsigned char *p = buf;
 
-	*p++ = this->Type;
-	*p++ = this->SubType;
-	*p++ = this->HostsCount;
-	*p++ = this->padding;
-	*(int32_t *)p = htonl(this->Stratagus);
-	p += 4;
-	*(int32_t *)p = htonl(this->Version);
-	p += 4;
-	*(uint32_t *)p = htonl(this->MapUID);
-	p += 4;
-	*(int32_t *)p = htonl(this->Lag);
-	p += 4;
-	*(int32_t *)p = htonl(this->Updates);
-	p += 4;
+	p += serialize8(p, this->Type);
+	p += serialize8(p, this->SubType);
+	p += serialize8(p, this->HostsCount);
+	p += serialize8(p, this->padding);
+	p += serialize32(p, this->Stratagus);
+	p += serialize32(p, this->Version);
+	p += serialize32(p, this->MapUID);
+	p += serialize32(p, this->Lag);
+	p += serialize32(p, this->Updates);
 
 	switch (this->SubType) {
 		case ICMHello:
@@ -200,20 +263,15 @@ const unsigned char *CInitMessage::Serialize() const
 
 void CInitMessage::Deserialize(const unsigned char *p)
 {
-	this->Type = *p++;
-	this->SubType = *p++;
-	this->HostsCount = *p++;
-	this->padding = *p++;
-	this->Stratagus = ntohl(*(int32_t *)p);
-	p += 4;
-	this->Version = ntohl(*(int32_t *)p);
-	p += 4;
-	this->MapUID = ntohl(*(uint32_t *)p);
-	p += 4;
-	this->Lag = ntohl(*(int32_t *)p);
-	p += 4;
-	this->Updates = ntohl(*(int32_t *)p);
-	p += 4;
+	p += deserialize8(p, &this->Type);
+	p += deserialize8(p, &this->SubType);
+	p += deserialize8(p, &this->HostsCount);
+	p += deserialize8(p, &this->padding);
+	p += deserialize32(p, &this->Stratagus);
+	p += deserialize32(p, &this->Version);
+	p += deserialize32(p, &this->MapUID);
+	p += deserialize32(p, &this->Lag);
+	p += deserialize32(p, &this->Updates);
 
 	switch (this->SubType) {
 		case ICMHello:
@@ -236,7 +294,6 @@ void CInitMessage::Deserialize(const unsigned char *p)
 			break;
 	}
 }
-
 
 //
 // CNetworkCommand
@@ -265,7 +322,6 @@ void CNetworkCommand::Deserialize(const unsigned char *p)
 	this->Dest = *(uint16_t *)p;
 	p += 2;
 }
-
 
 //
 // CNetworkExtendedCommand
@@ -321,18 +377,18 @@ void CNetworkChat::Deserialize(const unsigned char *p)
 
 void CNetworkPacketHeader::Serialize(unsigned char *p) const
 {
-	*p++ = this->Cycle;
 	for (int i = 0; i < MaxNetworkCommands; ++i) {
 		*p++ = this->Type[i];
 	}
+	*p++ = this->Cycle;
 }
 
 void CNetworkPacketHeader::Deserialize(const unsigned char *p)
 {
-	this->Cycle = *p++;
 	for (int i = 0; i < MaxNetworkCommands; ++i) {
 		this->Type[i] = *p++;
 	}
+	this->Cycle = *p++;
 }
 
 
@@ -340,9 +396,8 @@ void CNetworkPacketHeader::Deserialize(const unsigned char *p)
 // CNetworkPacket
 //
 
-unsigned char *CNetworkPacket::Serialize(int numcommands) const
+void CNetworkPacket::Serialize(unsigned char *buf, int numcommands) const
 {
-	unsigned char *buf = new unsigned char[CNetworkPacket::Size(numcommands)];
 	unsigned char *p = buf;
 
 	this->Header.Serialize(p);
@@ -358,8 +413,6 @@ unsigned char *CNetworkPacket::Serialize(int numcommands) const
 		}
 		p += CNetworkCommand::Size();
 	}
-
-	return buf;
 }
 
 int CNetworkPacket::Deserialize(const unsigned char *p, unsigned int len)

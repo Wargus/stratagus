@@ -259,10 +259,10 @@ public:
 */
 struct NetworkSelectionHeader
 {
+	unsigned char Type[MaxNetworkCommands];  /// Command
 	unsigned NumberSent : 6;   /// New Number Selected
 	unsigned Add : 1;          /// Adding to Selection
 	unsigned Remove : 1;       /// Removing from Selection
-	unsigned char Type[MaxNetworkCommands];  /// Command
 };
 
 //----------------------------------------------------------------------------
@@ -317,7 +317,8 @@ static int NumNCQs;                         /// Number of NCQs in use
 */
 static void NetworkBroadcast(const CNetworkPacket &packet, int numcommands)
 {
-	unsigned char *buf = packet.Serialize(numcommands);
+	unsigned char *buf = new unsigned char[CNetworkPacket::Size(numcommands)];
+	packet.Serialize(buf, numcommands);
 
 	// Send to all clients.
 	for (int i = 0; i < HostsCount; ++i) {
@@ -667,7 +668,8 @@ void NetworkSendSelection(CUnit **units, int count)
 
 		// Send the Constructed packet to team members
 		const int numcommands = (nosent + 3) / 4;
-		const unsigned char *buf = packet.Serialize(numcommands);
+		unsigned char *buf = new unsigned char [CNetworkPacket::Size(numcommands)];
+		packet.Serialize(buf, numcommands);
 		const int len = CNetworkPacketHeader::Size() + CNetworkSelection::Size() * numcommands;
 
 		for (int i = 0; i < numteammates; ++i) {
