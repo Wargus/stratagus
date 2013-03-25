@@ -99,19 +99,18 @@ public:
 	void Init();
 
 	void Update(unsigned long frameCounter);
-	void NetworkParseMenuPacket(const CInitMessage &msg, unsigned long host, int port);
+	void NetworkParseMenuPacket(unsigned long frameCounter, const CInitMessage &msg, unsigned long host, int port);
 
 	void MarkClientsAsResync();
 	void KickClient(int c);
 private:
-	void ParseHello(int h, const CInitMessage &msg, unsigned long host, int port);
+	int ParseHello(int h, const CInitMessage &msg, unsigned long host, int port);
 	void ParseResync(const int h, unsigned long host, int port);
 	void ParseWaiting(const int h, unsigned long host, int port);
 	void ParseMap(const int h, unsigned long host, int port);
 	void ParseState(const int h, const CInitMessage &msg, unsigned long host, int port);
 	void ParseGoodBye(const int h, unsigned long host, int port);
 	void ParseSeeYou(const int h);
-	void ParseIAmHere(const int h);
 private:
 	NetworkState networkStates[PlayerMax]; /// Client Host states
 };
@@ -147,6 +146,9 @@ private:
 
 	void NetworkSendRateLimitedClientMessage(const CInitMessage &msg, unsigned long tick, unsigned long msecs);
 	void NetClientCheckLocalState();
+
+	void ParseMsgConfig(const CInitMessage &msg, unsigned long host, int port);
+	void ParseMsgState(const CInitMessage &msg);
 
 #ifdef DEBUG
 	void ParseDisconnected(const CInitMessage &msg);
@@ -543,6 +545,50 @@ bool CClient::Update(unsigned long tick)
 	return true;
 }
 
+void CClient::ParseMsgState(const CInitMessage &msg)
+{
+	ServerSetupState = msg.u.State;
+}
+
+void CClient::ParseMsgConfig(const CInitMessage &msg, unsigned long host, int port)
+{
+	HostsCount = 0;
+	for (int i = 0; i < msg.HostsCount - 1; ++i) {
+		if (msg.u.Hosts[i].Host || msg.u.Hosts[i].Port) {
+			Hosts[HostsCount] = msg.u.Hosts[i];
+			HostsCount++;
+			DebugPrint("Client %d = %d.%d.%d.%d:%d [%.*s]\n" _C_
+					   msg.u.Hosts[i].PlyNr _C_ NIPQUAD(ntohl(msg.u.Hosts[i].Host)) _C_
+					   ntohs(msg.u.Hosts[i].Port) _C_
+					   static_cast<int>(sizeof(msg.u.Hosts[i].PlyName)) _C_
+					   msg.u.Hosts[i].PlyName);
+		} else { // Own client
+			NetLocalPlayerNumber = msg.u.Hosts[i].PlyNr;
+			DebugPrint("SELF %d [%.*s]\n" _C_ msg.u.Hosts[i].PlyNr _C_
+					   static_cast<int>(sizeof(msg.u.Hosts[i].PlyName)) _C_
+					   msg.u.Hosts[i].PlyName);
+		}
+	}
+	// server is last:
+	Hosts[HostsCount].Host = host;
+	Hosts[HostsCount].Port = port;
+	Hosts[HostsCount].PlyNr = msg.u.Hosts[msg.HostsCount - 1].PlyNr;
+	Hosts[HostsCount].SetName(msg.u.Hosts[msg.HostsCount - 1].PlyName);
+	++HostsCount;
+	NetPlayers = HostsCount + 1;
+	DebugPrint("Server %d = %d.%d.%d.%d:%d [%.*s]\n" _C_
+			   msg.u.Hosts[msg.HostsCount - 1].PlyNr _C_ NIPQUAD(ntohl(host)) _C_
+			   ntohs(port) _C_
+			   static_cast<int>(sizeof(msg.u.Hosts[msg.HostsCount - 1].PlyName)) _C_
+			   msg.u.Hosts[msg.HostsCount - 1].PlyName);
+
+	// put ourselves to the end, like on the server..
+	Hosts[HostsCount].Host = 0;
+	Hosts[HostsCount].Port = 0;
+	Hosts[HostsCount].PlyNr = NetLocalPlayerNumber;
+	Hosts[HostsCount].SetName(Parameters::Instance.LocalPlayerName.c_str());
+}
+
 bool CClient::NetworkParseMenuPacket(const CInitMessage &msg, unsigned long host, int port)
 {
 	if (msg.Type != MessageInitReply) {
@@ -764,7 +810,7 @@ void CClient::ParseMapInfo(const CInitMessage &msg)
 {
 	switch (msg.SubType) {
 		case ICMState: // Server has sent us first state info
-			ServerSetupState = msg.u.State;
+			ParseMsgState(msg);
 			networkState.State = ccs_synced;
 			networkState.MsgCnt = 0;
 			break;
@@ -787,49 +833,14 @@ void CClient::ParseSynced(const CInitMessage &msg, unsigned long host, int port)
 	switch (msg.SubType) {
 		case ICMState: // Server has sent us new state info
 			DebugPrint("ccs_synced: ICMState received\n");
-			ServerSetupState = msg.u.State;
+			ParseMsgState(msg);
 			networkState.State = ccs_async;
 			networkState.MsgCnt = 0;
 			break;
 
 		case ICMConfig: { // Server gives the go ahead.. - start game
 			DebugPrint("ccs_synced: Config subtype %d received - starting\n" _C_ msg.SubType);
-			HostsCount = 0;
-			for (int i = 0; i < msg.HostsCount - 1; ++i) {
-				if (msg.u.Hosts[i].Host || msg.u.Hosts[i].Port) {
-					Hosts[HostsCount] = msg.u.Hosts[i];
-					HostsCount++;
-					DebugPrint("Client %d = %d.%d.%d.%d:%d [%.*s]\n" _C_
-							   msg.u.Hosts[i].PlyNr _C_ NIPQUAD(ntohl(msg.u.Hosts[i].Host)) _C_
-							   ntohs(msg.u.Hosts[i].Port) _C_
-							   static_cast<int>(sizeof(msg.u.Hosts[i].PlyName)) _C_
-							   msg.u.Hosts[i].PlyName);
-				} else { // Own client
-					NetLocalPlayerNumber = msg.u.Hosts[i].PlyNr;
-					DebugPrint("SELF %d [%.*s]\n" _C_ msg.u.Hosts[i].PlyNr _C_
-							   static_cast<int>(sizeof(msg.u.Hosts[i].PlyName)) _C_
-							   msg.u.Hosts[i].PlyName);
-				}
-			}
-			// server is last:
-			Hosts[HostsCount].Host = host;
-			Hosts[HostsCount].Port = port;
-			Hosts[HostsCount].PlyNr = msg.u.Hosts[msg.HostsCount - 1].PlyNr;
-			Hosts[HostsCount].SetName(msg.u.Hosts[msg.HostsCount - 1].PlyName);
-			++HostsCount;
-			NetPlayers = HostsCount + 1;
-			DebugPrint("Server %d = %d.%d.%d.%d:%d [%.*s]\n" _C_
-					   msg.u.Hosts[msg.HostsCount - 1].PlyNr _C_ NIPQUAD(ntohl(host)) _C_
-					   ntohs(port) _C_
-					   static_cast<int>(sizeof(msg.u.Hosts[msg.HostsCount - 1].PlyName)) _C_
-					   msg.u.Hosts[msg.HostsCount - 1].PlyName);
-
-			// put ourselves to the end, like on the server..
-			Hosts[HostsCount].Host = 0;
-			Hosts[HostsCount].Port = 0;
-			Hosts[HostsCount].PlyNr = NetLocalPlayerNumber;
-			Hosts[HostsCount].SetName(Parameters::Instance.LocalPlayerName.c_str());
-
+			ParseMsgConfig(msg, host, port);
 			networkState.State = ccs_goahead;
 			networkState.MsgCnt = 0;
 			break;
@@ -881,7 +892,7 @@ void CClient::ParseGoAhead(const CInitMessage &msg)
 
 		case ICMState: // Server has sent final state info
 			DebugPrint("ccs_goahead: Final State subtype %d received - starting\n" _C_ msg.SubType);
-			ServerSetupState = msg.u.State;
+			ParseMsgState(msg);
 			networkState.State = ccs_started;
 			networkState.MsgCnt = 0;
 			break;
@@ -997,7 +1008,7 @@ void CServer::Update(unsigned long frameCounter)
 					UNUSED(n); // unused in release
 					DebugPrint("Sending InitReply Message AreYouThere: (%d) to %d.%d.%d.%d:%d (%ld:%ld)\n" _C_
 							   n _C_ NIPQUAD(ntohl(Hosts[i].Host)) _C_ ntohs(Hosts[i].Port) _C_
-							   FrameCounter _C_ networkStates[i].LastFrame);
+							   frameCounter _C_ networkStates[i].LastFrame);
 				}
 			}
 		}
@@ -1020,8 +1031,10 @@ void CServer::MarkClientsAsResync()
 **  @param msg message received
 **  @param host  host which send the message
 **  @param port  port from where the messahe nas been sent
+**
+**  @return host index
 */
-void CServer::ParseHello(int h, const CInitMessage &msg, unsigned long host, int port)
+int CServer::ParseHello(int h, const CInitMessage &msg, unsigned long host, int port)
 {
 	if (h == -1) { // it is a new client
 		for (int i = 1; i < PlayerMax - 1; ++i) {
@@ -1048,11 +1061,10 @@ void CServer::ParseHello(int h, const CInitMessage &msg, unsigned long host, int
 			message.Type = MessageInitReply;
 			message.SubType = ICMGameFull; // Game is full - reject connnection
 			NetworkSendICMessage_Log(host, port, message);
-			return;
+			return -1;
 		}
 	}
 	// this code path happens until client sends waiting (= has received this message)
-	networkStates[h].LastFrame = FrameCounter;
 	CInitMessage message;
 
 	message.Type = MessageInitReply;
@@ -1075,7 +1087,9 @@ void CServer::ParseHello(int h, const CInitMessage &msg, unsigned long host, int
 		// Detects UDP input firewalled or behind NAT firewall clients
 		// If packets are missed, clients are kicked by AYT check later..
 		KickDeadClient(h);
+		return -1;
 	}
+	return h;
 }
 
 /**
@@ -1087,7 +1101,6 @@ void CServer::ParseHello(int h, const CInitMessage &msg, unsigned long host, int
 */
 void CServer::ParseResync(const int h, unsigned long host, int port)
 {
-	networkStates[h].LastFrame = FrameCounter;
 	switch (networkStates[h].State) {
 		case ccs_mapinfo:
 			// a delayed ack - fall through..
@@ -1138,7 +1151,6 @@ void CServer::ParseResync(const int h, unsigned long host, int port)
 */
 void CServer::ParseWaiting(const int h, unsigned long host, int port)
 {
-	networkStates[h].LastFrame = FrameCounter;
 	switch (networkStates[h].State) {
 			// client has recvd welcome and is waiting for info
 		case ccs_connecting:
@@ -1209,7 +1221,6 @@ void CServer::ParseWaiting(const int h, unsigned long host, int port)
 */
 void CServer::ParseMap(const int h, unsigned long host, int port)
 {
-	networkStates[h].LastFrame = FrameCounter;
 	switch (networkStates[h].State) {
 			// client has recvd map info waiting for state info
 		case ccs_connected:
@@ -1229,7 +1240,6 @@ void CServer::ParseMap(const int h, unsigned long host, int port)
 			networkStates[h].MsgCnt++;
 			if (networkStates[h].MsgCnt > 50) {
 				// FIXME: Client sends mapinfo, but doesn't receive our state info....
-				;
 			}
 			break;
 		}
@@ -1249,7 +1259,6 @@ void CServer::ParseMap(const int h, unsigned long host, int port)
 */
 void CServer::ParseState(const int h, const CInitMessage &msg, unsigned long host, int port)
 {
-	networkStates[h].LastFrame = FrameCounter;
 	switch (networkStates[h].State) {
 		case ccs_mapinfo:
 			// User State Change right after connect - should not happen, but..
@@ -1303,7 +1312,6 @@ void CServer::ParseState(const int h, const CInitMessage &msg, unsigned long hos
 */
 void CServer::ParseGoodBye(const int h, unsigned long host, int port)
 {
-	networkStates[h].LastFrame = FrameCounter;
 	switch (networkStates[h].State) {
 		default:
 			// We can enter here from _ANY_ state!
@@ -1344,17 +1352,6 @@ void CServer::ParseSeeYou(const int h)
 					   networkStates[h].State _C_ h);
 			break;
 	}
-}
-
-/**
-** Parse the 'I am Here' reply to the servers' 'Are you there' msg
-**
-** @param h slot number of host msg originates from
-*/
-void CServer::ParseIAmHere(const int h)
-{
-	// client found us again - update timestamp
-	networkStates[h].LastFrame = FrameCounter;
 }
 
 /**
@@ -1400,54 +1397,43 @@ static int CheckVersions(const CInitMessage &msg, unsigned long host, int port)
 	return 0;
 }
 
-void CServer::NetworkParseMenuPacket(const CInitMessage &msg, unsigned long host, int port)
+void CServer::NetworkParseMenuPacket(unsigned long frameCounter, const CInitMessage &msg, unsigned long host, int port)
 {
 	if (CheckVersions(msg, host, port)) {
 		return;
 	}
-	const int index = FindHostIndexBy(host, port);
+	int index = FindHostIndexBy(host, port);
 
 	if (index == -1) {
 		if (msg.SubType == ICMHello) {
 			// Special case: a new client has arrived
-			ParseHello(-1, msg, host, port);
+			index = ParseHello(-1, msg, host, port);
+			networkStates[index].LastFrame = frameCounter;
 		}
 		return;
 	}
+	networkStates[index].LastFrame = frameCounter;
 
 	switch (msg.SubType) {
 		case ICMHello: // a new client has arrived
 			ParseHello(index, msg, host, port);
 			break;
 
-		case ICMResync:
-			ParseResync(index, host, port);
-			break;
+		case ICMResync: ParseResync(index, host, port); break;
+		case ICMWaiting: ParseWaiting(index, host, port); break;
 
-		case ICMWaiting:
-			ParseWaiting(index, host, port);
-			break;
+		case ICMMap: ParseMap(index, host, port); break;
 
-		case ICMMap:
-			ParseMap(index, host, port);
-			break;
-
-		case ICMState:
-			ParseState(index, msg, host, port);
-			break;
+		case ICMState: ParseState(index, msg, host, port); break;
 
 		case ICMMapUidMismatch:
 		case ICMGoodBye:
 			ParseGoodBye(index, host, port);
 			break;
 
-		case ICMSeeYou:
-			ParseSeeYou(index);
-			break;
+		case ICMSeeYou: ParseSeeYou(index); break;
 
-		case ICMIAH:
-			ParseIAmHere(index);
-			break;
+		case ICMIAH: break;
 
 		default:
 			DebugPrint("Server: Unhandled subtype %d from host %d\n" _C_ msg.SubType _C_ index);
@@ -1505,7 +1491,7 @@ int NetworkParseSetupEvent(const unsigned char *buf, int size, unsigned long hos
 			NetConnectRunning = 0;
 		}
 	} else if (NetConnectRunning == 1) { // server
-		Server.NetworkParseMenuPacket(msg, host, port);
+		Server.NetworkParseMenuPacket(FrameCounter, msg, host, port);
 	}
 	return 1;
 }
