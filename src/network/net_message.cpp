@@ -211,7 +211,12 @@ void CServerSetup::Deserialize(const unsigned char *p)
 CInitMessage::CInitMessage()
 {
 	memset(this, 0, sizeof(CInitMessage));
+}
 
+CInitMessage::CInitMessage(uint8_t type, uint8_t subtype)
+{
+	this->Type = type;
+	this->SubType = subtype;
 	this->Stratagus = StratagusVersion;
 	this->Version = NetworkProtocolVersion;
 	this->Lag = NetworkLag;
