@@ -101,6 +101,30 @@ bool UseHPForXp = false;              /// true if gain XP by dealing damage, fal
 extern gcn::Gui *Gui;
 static std::vector<gcn::Container *> Containers;
 
+/**
+**  Save game settings.
+**
+**  @param file  Save file handle
+*/
+void SaveGameSettings(CFile &file)
+{
+	file.printf("\nGameSettings.NetGameType = %d\n", GameSettings.NetGameType);
+	for (int i = 0; i < PlayerMax - 1; ++i) {
+		file.printf("GameSettings.Presets[%d].Race = %d\n", i, GameSettings.Presets[i].Race);
+		file.printf("GameSettings.Presets[%d].Team = %d\n", i, GameSettings.Presets[i].Team);
+		file.printf("GameSettings.Presets[%d].Type = %d\n", i, GameSettings.Presets[i].Type);
+	}
+	file.printf("GameSettings.Resources = %d\n", GameSettings.Resources);
+	file.printf("GameSettings.Difficulty = %d\n", GameSettings.Difficulty);
+	file.printf("GameSettings.NumUnits = %d\n", GameSettings.NumUnits);
+	file.printf("GameSettings.Opponents = %d\n", GameSettings.Opponents);
+	file.printf("GameSettings.GameType = %d\n", GameSettings.GameType);
+	file.printf("GameSettings.NoFogOfWar = %s\n", GameSettings.NoFogOfWar ? "true" : "false");
+	file.printf("GameSettings.RevealMap = %d\n", GameSettings.RevealMap);
+	file.printf("GameSettings.MapRichness = %d\n", GameSettings.MapRichness);
+	file.printf("\n");
+}
+
 void StartMap(const std::string &filename, bool clean)
 {
 	std::string nc, rc;

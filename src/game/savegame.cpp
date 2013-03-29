@@ -172,6 +172,7 @@ int SaveGame(const std::string &filename)
 	SaveGroups(file);
 	SaveMissiles(file);
 	SaveReplayList(file);
+	SaveGameSettings(file);
 	// FIXME: find all state information which must be saved.
 	const std::string s = SaveGlobal(Lua);
 	if (!s.empty()) {

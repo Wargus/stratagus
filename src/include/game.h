@@ -31,6 +31,8 @@
 
 #include <string>
 
+class CFile;
+
 extern void LoadGame(const std::string &filename); /// Load saved game
 extern int SaveGame(const std::string &filename); /// Save game
 extern void DeleteSaveGame(const std::string &filename); /// Delete save game
@@ -42,6 +44,8 @@ extern void LoadModules();              /// Load all modules
 extern void CleanModules();             /// Cleanup all modules
 
 extern void FreeAllContainers();
+
+extern void SaveGameSettings(CFile &file);             /// Save game settings
 
 extern std::string GameName;                /// Name of the game
 extern std::string FullGameName;            /// Full Name of the game
