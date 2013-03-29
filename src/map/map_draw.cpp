@@ -338,7 +338,7 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 	int y = std::min<int>(GameCursor->G->Height + pos.y + 10, vp.BottomRightPos.y - 1 - height);
 	const CPlayer *tplayer = ThisPlayer;
 
-	if (unit) {
+	if (unit && unit->IsAliveOnMap()) {
 		int backgroundColor;
 		if (unit->Player->Index == (*tplayer).Index) {
 			backgroundColor = Video.MapRGB(TheScreen->format, 0, 0, 252);
