@@ -571,7 +571,7 @@ static void AnimateActionHarvest(CUnit &unit)
 **  @param unit    pointer to harvester unit.
 **  @param source  pointer to resource unit.
 */
-void COrder_Resource::LoseResource(CUnit &unit, const CUnit &source)
+void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 {
 	CUnit *depot;
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
@@ -581,6 +581,7 @@ void COrder_Resource::LoseResource(CUnit &unit, const CUnit &source)
 
 	if (resinfo.HarvestFromOutside) {
 		this->ClearGoal();
+		--source.Resource.Active;
 	}
 
 	// Continue to harvest if we aren't fully loaded
@@ -730,14 +731,13 @@ int COrder_Resource::GatherResource(CUnit &unit)
 
 				// Improved version of DropOutAll that makes workers go to the depot.
 				LoseResource(unit, *source);
-				int i;
-				CUnit *uins;
-				for (i = source->InsideCount, uins = source->UnitInside;
-					 i; --i, uins = uins->NextContained) {
-					if (uins->CurrentOrder()->Action == UnitActionResource) {
+				for (CUnit *uins = source->Resource.Workers;
+					 uins; uins = uins->NextWorker) {
+					if (uins != &unit && uins->CurrentOrder()->Action == UnitActionResource) {
 						COrder_Resource &order = *static_cast<COrder_Resource *>(uins->CurrentOrder());
-
-						order.LoseResource(*uins, *source);
+						if (!uins->Anim.Unbreakable && order.State == SUB_GATHER_RESOURCE) {
+							order.LoseResource(*uins, *source);
+						}
 					}
 				}
 				// Don't destroy the resource twice.

@@ -73,7 +73,7 @@ private:
 	int MoveToResource(CUnit &unit);
 	void UnitGotoGoal(CUnit &unit, CUnit *const goal, int state);
 	int StartGathering(CUnit &unit);
-	void LoseResource(CUnit &unit, const CUnit &source);
+	void LoseResource(CUnit &unit, CUnit &source);
 	int GatherResource(CUnit &unit);
 	int StopGathering(CUnit &unit);
 	int MoveToDepot(CUnit &unit);
