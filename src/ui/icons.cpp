@@ -60,7 +60,7 @@ static IconMap Icons;   /// Map of ident to icon.
 /**
 **  CIcon constructor
 */
-CIcon::CIcon(const std::string &ident) : G(NULL), Frame(0), Ident(ident)
+CIcon::CIcon(const std::string &ident) : G(NULL), GrayScale(NULL), Frame(0), Ident(ident)
 {
 }
 
@@ -70,6 +70,7 @@ CIcon::CIcon(const std::string &ident) : G(NULL), Frame(0), Ident(ident)
 CIcon::~CIcon()
 {
 	CGraphic::Free(this->G);
+	CGraphic::Free(this->GrayScale);
 }
 
 /**
@@ -111,6 +112,7 @@ void CIcon::Load()
 {
 	Assert(G);
 	G->Load();
+	GrayScale = G->Clone(true);
 	if (Frame >= G->NumFrames) {
 		DebugPrint("Invalid icon frame: %s - %d\n" _C_ Ident.c_str() _C_ Frame);
 		Frame = 0;
@@ -134,30 +136,13 @@ void CIcon::DrawIcon(const CPlayer &player, const PixelPos &pos) const
 }
 
 /**
-**  Draw icon at pos.
+**  Draw grayscale icon at pos.
 **
 **  @param pos     display pixel position
 */
 void CIcon::DrawGrayscaleIcon(const PixelPos &pos) const
 {
-	SDL_LockSurface(this->G->Surface);
-	SDL_Color colors[256], backup[256];
-	SDL_Palette &pal = *this->G->Surface->format->palette;
-	memcpy(backup, pal.colors, sizeof(SDL_Color) * 256);
-	for (int i = 0; i < 256; ++i) {
-		int gray = 0.21 * pal.colors[i].r + 0.72 * pal.colors[i].g + 0.07 * pal.colors[i].b;
-		colors[i].r = colors[i].g = colors[i].b = gray;
-	}
-	SDL_SetColors(this->G->Surface, &colors[0], 0, 256);
-	if (this->G->SurfaceFlip) {
-		SDL_SetColors(this->G->SurfaceFlip, &colors[0], 0, 256);
-	}
-	SDL_UnlockSurface(this->G->Surface);
-	this->G->DrawFrameClip(this->Frame, pos.x, pos.y);
-	SDL_LockSurface(this->G->Surface);
-	SDL_SetColors(this->G->Surface, &backup[0], 0, 256);
-	SDL_UnlockSurface(this->G->Surface);
-
+	this->GrayScale->DrawFrameClip(this->Frame, pos.x, pos.y);
 }
 
 /**

@@ -107,11 +107,11 @@ public:
 	static CGraphic *New(const std::string &file, int w = 0, int h = 0);
 	static CGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
 
-	CGraphic *Clone() const;
+	CGraphic *Clone(bool grayscale = false) const;
 
 	static void Free(CGraphic *g);
 
-	void Load();
+	void Load(bool grayscale = false);
 	void Flip();
 	void UseDisplayFormat();
 	void Resize(int w, int h);

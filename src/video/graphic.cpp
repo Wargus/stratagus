@@ -587,13 +587,15 @@ CGraphic *CGraphic::ForceNew(const std::string &file, int w, int h)
 
 /**
 **  Clone a graphic
+**
+**  @param grayscale  Make grayscale texture
 */
-CGraphic *CGraphic::Clone() const
+CGraphic *CGraphic::Clone(bool grayscale) const
 {
 	CGraphic *g = CGraphic::ForceNew(this->File, this->Width, this->Height);
 
 	if (this->IsLoaded()) {
-		g->Load();
+		g->Load(grayscale);
 	}
 
 	return g;
@@ -664,8 +666,10 @@ void CGraphic::GenFramesMap()
 
 /**
 **  Load a graphic
+**
+**  @param grayscale  Make a grayscale surface
 */
-void CGraphic::Load()
+void CGraphic::Load(bool grayscale)
 {
 	if (Surface) {
 		return;
@@ -699,6 +703,42 @@ void CGraphic::Load()
 	}
 
 	NumFrames = GraphicWidth / Width * GraphicHeight / Height;
+
+	if (grayscale) {
+		SDL_LockSurface(Surface);
+		const SDL_PixelFormat *f = Surface->format;
+		const int bpp = Surface->format->BytesPerPixel;
+		const double redGray = 0.21;
+		const double greenGray = 0.72;
+		const double blueGray = 0.07;
+		switch (bpp) {
+			case 1: {
+				SDL_Color colors[256];
+				SDL_Palette &pal = *Surface->format->palette;
+				for (int i = 0; i < 256; ++i) {
+					const int gray = redGray * pal.colors[i].r + greenGray * pal.colors[i].g + blueGray * pal.colors[i].b;
+					colors[i].r = colors[i].g = colors[i].b = gray;
+				}
+				SDL_SetColors(Surface, &colors[0], 0, 256);
+				break;
+			}
+			case 4: {
+				Uint32* p;
+				for (int i = 0; i < Height; ++i) {
+					for (int j = 0; j < Width; ++j) {
+						p = (Uint32 *)(Surface->pixels) + i * Width + j * bpp;
+						const Uint32 gray = ((Uint8)((*p) * redGray) >> f->Rshift) +
+							((Uint8)(*(p + 1) * greenGray) >> f->Gshift) +
+							((Uint8)(*(p + 2) * blueGray) >> f->Bshift) +
+							((Uint8)(*(p + 3)) >> f->Ashift);
+						*p = gray;
+					}
+				}
+				break;
+			}
+		}
+		SDL_UnlockSurface(Surface);
+	}
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {

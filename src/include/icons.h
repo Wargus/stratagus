@@ -126,6 +126,7 @@ public:
 
 public:
 	CGraphic *G;              /// Graphic data
+	CGraphic *GrayScale;      /// Icon when drawn grayscaled
 	int Frame;                /// Frame number in graphic
 private:
 	std::string Ident;        /// Icon identifier
