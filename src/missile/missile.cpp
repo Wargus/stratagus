@@ -536,7 +536,9 @@ void Missile::DrawMissile(const CViewport &vp) const
 			CLabel(GetGameFont()).DrawClip(screenPixelPos.x, screenPixelPos.y, this->Damage);
 			break;
 		default:
-			this->Type->DrawMissileType(this->SpriteFrame, screenPixelPos);
+			if (Type->G) {
+				this->Type->DrawMissileType(this->SpriteFrame, screenPixelPos);
+			}
 			break;
 	}
 }
