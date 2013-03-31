@@ -458,7 +458,7 @@ static void InitKey2Str()
 */
 void InitVideoSdl()
 {
-	Uint32 flags;
+	Uint32 flags = 0;
 
 	if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
 #ifndef USE_WIN32
@@ -588,10 +588,8 @@ void InitVideoSdl()
 	Video.Height = 480;
 #endif
 
-#ifdef USE_WIN32
+#if !defined(USE_OPENGL) && !defined(USE_GLES)
 	flags = SDL_HWSURFACE | SDL_HWPALETTE;
-#else
-	flags = 0;
 #endif
 
 	// Sam said: better for windows.
@@ -617,7 +615,7 @@ void InitVideoSdl()
 		flags |= SDL_SWSURFACE;
 #endif
 #ifdef USE_OPENGL
-		flags |= SDL_OPENGL;
+		flags |= SDL_OPENGL | SDL_GL_DOUBLEBUFFER;
 #endif
 	}
 #endif
