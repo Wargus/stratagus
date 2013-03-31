@@ -84,7 +84,7 @@ void CParticleManager::draw(const CViewport &vp)
 
 void CParticleManager::update()
 {
-	unsigned long ticks = GetTicks() - lastTicks;
+	unsigned long ticks = GameCycle - lastTicks;
 	std::vector<CParticle *>::iterator i;
 
 	particles.insert(particles.end(), new_particles.begin(), new_particles.end());
@@ -92,7 +92,7 @@ void CParticleManager::update()
 
 	i = particles.begin();
 	while (i != particles.end()) {
-		(*i)->update(ticks);
+		(*i)->update(1000.0f / CYCLES_PER_SECOND * ticks);
 		if ((*i)->isDestroyed()) {
 			delete *i;
 			i = particles.erase(i);
