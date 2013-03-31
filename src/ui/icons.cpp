@@ -60,7 +60,7 @@ static IconMap Icons;   /// Map of ident to icon.
 /**
 **  CIcon constructor
 */
-CIcon::CIcon(const std::string &ident) : G(NULL), GrayScale(NULL), Frame(0), Ident(ident)
+CIcon::CIcon(const std::string &ident) : G(NULL), GScale(NULL), Frame(0), Ident(ident)
 {
 }
 
@@ -70,7 +70,7 @@ CIcon::CIcon(const std::string &ident) : G(NULL), GrayScale(NULL), Frame(0), Ide
 CIcon::~CIcon()
 {
 	CGraphic::Free(this->G);
-	CGraphic::Free(this->GrayScale);
+	CGraphic::Free(this->GScale);
 }
 
 /**
@@ -112,7 +112,7 @@ void CIcon::Load()
 {
 	Assert(G);
 	G->Load();
-	GrayScale = G->Clone(true);
+	GScale = G->Clone(true);
 	if (Frame >= G->NumFrames) {
 		DebugPrint("Invalid icon frame: %s - %d\n" _C_ Ident.c_str() _C_ Frame);
 		Frame = 0;
@@ -142,7 +142,7 @@ void CIcon::DrawIcon(const CPlayer &player, const PixelPos &pos) const
 */
 void CIcon::DrawGrayscaleIcon(const PixelPos &pos) const
 {
-	this->GrayScale->DrawFrameClip(this->Frame, pos.x, pos.y);
+	this->GScale->DrawFrameClip(this->Frame, pos.x, pos.y);
 }
 
 /**
