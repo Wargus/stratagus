@@ -37,7 +37,7 @@ void FillCustomValue(CNetworkHost *obj)
 {
 	obj->Host = 0x12345678;
 	obj->Port = 0x9ABC;
-	for (int i = 0; i != sizeof(CNetworkHost::PlyName); ++i) {
+	for (int i = 0; i != sizeof(obj->PlyName); ++i) {
 		obj->PlyName[i] = i + 1;
 	}
 	obj->PlyNr = 0xDEF0;
@@ -64,20 +64,64 @@ void FillCustomValue(CServerSetup *obj)
 	}
 }
 
-void FillCustomValue(CInitMessage *obj)
+void FillCustomValue(CInitMessage_Header *obj)
 {
-	obj->Type = 0x22;
-	obj->SubType = ICMHello;
-	obj->HostsCount = 0x04;
-	obj->padding = 0x33;
+	*obj = CInitMessage_Header(0x12, 0x34);
+}
+
+void FillCustomValue(CInitMessage_Hello *obj)
+{
+	for (int i = 0; i != sizeof(obj->PlyName); ++i) {
+		obj->PlyName[i] = i + 1;
+	}
 	obj->Stratagus = 0x12345678;
 	obj->Version = 0x90ABCDEF;
-	obj->MapUID = 0x09BADCFE;
-	obj->Lag = 0x13245768;
-	obj->Updates = 0x9A0BCEDF;
-	// it is the biggest data size.
+}
+
+void FillCustomValue(CInitMessage_Config *obj)
+{
+	obj->HostsCount = PlayerMax;
 	for (int i = 0; i != PlayerMax; ++i) {
-		FillCustomValue(&obj->u.Hosts[i]);
+		FillCustomValue(&obj->Hosts[i]);
+	}
+}
+
+void FillCustomValue(CInitMessage_EngineMismatch *obj)
+{
+	obj->Stratagus = 0x01020304;
+}
+
+void FillCustomValue(CInitMessage_ProtocolMismatch *obj)
+{
+	obj->Version = 0x01020304;
+}
+
+void FillCustomValue(CInitMessage_Welcome *obj)
+{
+	obj->Lag = 0x01020304;
+	obj->Updates = 0x05060708;
+	for (int i = 0; i != PlayerMax; ++i) {
+		FillCustomValue(&obj->hosts[i]);
+	}
+}
+
+void FillCustomValue(CInitMessage_Map *obj)
+{
+	obj->MapUID = 0x01234567;
+	for (int i = 0; i != sizeof(obj->MapPath); ++i) {
+		obj->MapPath[i] = 1 + i;
+	}
+}
+
+void FillCustomValue(CInitMessage_State *obj)
+{
+	FillCustomValue(&obj->State);
+}
+
+void FillCustomValue(CInitMessage_Resync *obj)
+{
+	for (int i = 0; i != PlayerMax; ++i) {
+		FillCustomValue(&obj->hosts[i]);
 	}
 }
 
@@ -87,14 +131,34 @@ bool CheckSerialization()
 	T obj1;
 
 	FillCustomValue(&obj1);
+
+	unsigned char *buffer = new unsigned char [obj1.Size()];
+	unsigned char *end = buffer + obj1.Serialize(buffer);
+	bool res = size_t(end - buffer) == obj1.Size();
+	T obj2;
+	obj2.Deserialize(buffer);
+	delete [] buffer;
+	res &= memcmp(&obj1, &obj2, sizeof(T)) == 0; // may fail with padding
+	return res;
+}
+
+template <typename T>
+bool CheckSerialization_return()
+{
+	T obj1;
+
+	memset(&obj1, 0, sizeof(T));
+	FillCustomValue(&obj1);
 	const unsigned char *buffer = obj1.Serialize();
 
 	T obj2;
+	memset(&obj2, 0, sizeof(T));
 	obj2.Deserialize(buffer);
-	bool res = memcmp(&obj1, &obj2, sizeof(T)) == 0;
+	bool res = memcmp(&obj1, &obj2, sizeof(T)) == 0; // may fail with padding
 	delete [] buffer;
 	return res;
 }
+
 
 TEST(CNetworkHost)
 {
@@ -106,7 +170,47 @@ TEST(CServerSetup)
 	CHECK(CheckSerialization<CServerSetup>());
 }
 
-TEST(CInitMessage)
+TEST(CInitMessage_Header)
 {
-	CHECK(CheckSerialization<CInitMessage>());
+	CHECK(CheckSerialization<CInitMessage_Header>());
+}
+
+TEST(CInitMessage_Hello)
+{
+	CHECK(CheckSerialization_return<CInitMessage_Hello>());
+}
+
+TEST(CInitMessage_Config)
+{
+	CHECK(CheckSerialization_return<CInitMessage_Config>());
+}
+
+TEST(CInitMessage_EngineMismatch)
+{
+	CHECK(CheckSerialization_return<CInitMessage_EngineMismatch>());
+}
+
+TEST(CInitMessage_ProtocolMismatch)
+{
+	CHECK(CheckSerialization_return<CInitMessage_ProtocolMismatch>());
+}
+
+TEST(CInitMessage_Welcome)
+{
+	CHECK(CheckSerialization_return<CInitMessage_Welcome>());
+}
+
+TEST(CInitMessage_Map)
+{
+	CHECK(CheckSerialization_return<CInitMessage_Map>());
+}
+
+TEST(CInitMessage_State)
+{
+	CHECK(CheckSerialization_return<CInitMessage_State>());
+}
+
+TEST(CInitMessage_Resync)
+{
+	CHECK(CheckSerialization_return<CInitMessage_Resync>());
 }

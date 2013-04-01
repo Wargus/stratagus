@@ -51,8 +51,9 @@
 class CNetworkHost
 {
 public:
-	const unsigned char *Serialize() const;
-	void Deserialize(const unsigned char *p);
+	CNetworkHost() { Clear(); }
+	size_t Serialize(unsigned char *) const;
+	size_t Deserialize(const unsigned char *p);
 	void Clear();
 	static size_t Size() { return 4 + 2 + 2 + NetPlayerNameSize; }
 
@@ -64,15 +65,15 @@ public:
 	char PlyName[NetPlayerNameSize];  /// Name of player
 };
 
-
 /**
 **  Multiplayer game setup menu state
 */
 class CServerSetup
 {
 public:
-	const unsigned char *Serialize() const;
-	void Deserialize(const unsigned char *p);
+	CServerSetup() { Clear(); }
+	size_t Serialize(unsigned char *p) const;
+	size_t Deserialize(const unsigned char *p);
 	static size_t Size() { return 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 * PlayerMax + 1 * PlayerMax + 1 * PlayerMax; }
 	void Clear() {
 		ResourcesOption = 0;
@@ -111,7 +112,7 @@ enum _ic_message_subtype_ {
 
 	ICMEngineMismatch,      /// Stratagus engine version doesn't match
 	ICMProtocolMismatch,    /// Network protocol version doesn't match
-	ICMEngineConfMismatch,  /// Engine configuration isn't identical
+	ICMEngineConfMismatch,  /// UNUSED:Engine configuration isn't identical
 	ICMMapUidMismatch,      /// MAP UID doesn't match
 
 	ICMGameFull,            /// No player slots available
@@ -132,36 +133,145 @@ enum _ic_message_subtype_ {
 	ICMIAH                  /// Client answers I am here
 };
 
-/**
-**  Network init message.
-**
-**  @todo Transfering the same data in each message is waste of bandwidth.
-**  I mean the versions and the UID ...
-*/
-class CInitMessage
+class CInitMessage_Header
 {
 public:
-	CInitMessage();
-	CInitMessage(uint8_t type, uint8_t subtype);
+	CInitMessage_Header() {}
+	CInitMessage_Header(unsigned char type, unsigned char subtype) :
+		type(type),
+		subtype(subtype)
+	{}
+
+	unsigned char GetType() const { return type; }
+	unsigned char GetSubType() const { return subtype; }
+
+	size_t Serialize(unsigned char *p) const;
+	size_t Deserialize(const unsigned char *p);
+	static size_t Size() { return 2; }
+private:
+	unsigned char type;
+	unsigned char subtype;
+};
+
+class CInitMessage_Hello
+{
+public:
+	CInitMessage_Hello() {}
+	explicit CInitMessage_Hello(const char *name);
+	const CInitMessage_Header &GetHeader() const { return header; }
 	const unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 1 + 1 + 1 + 1 + 4 + 4 + 4 + 4 + 4 + 4 + std::max<size_t>(256u, std::max(CNetworkHost::Size() * PlayerMax, CServerSetup::Size())); }
-
-	uint8_t Type;       /// Init message type
-	uint8_t SubType;    /// Init message subtype
-	uint8_t HostsCount; /// Number of hosts
-	uint8_t padding;    /// padding for alignment
+	static size_t Size() { return CInitMessage_Header::Size() + NetPlayerNameSize + 2 * 4; }
+private:
+	CInitMessage_Header header;
+public:
+	char PlyName[NetPlayerNameSize];  /// Name of player
 	int32_t Stratagus;  /// Stratagus engine version
 	int32_t Version;    /// Network protocol version
-	uint32_t MapUID;    /// UID of map to play. FIXME: add MAP name, path, etc
+};
+
+class CInitMessage_Config
+{
+public:
+	CInitMessage_Config();
+	const CInitMessage_Header &GetHeader() const { return header; }
+	const unsigned char *Serialize() const;
+	void Deserialize(const unsigned char *p);
+	static size_t Size() { return CInitMessage_Header::Size() + 4 + PlayerMax * CNetworkHost::Size(); }
+private:
+	CInitMessage_Header header;
+public:
+	int32_t HostsCount; /// Number of hosts
+	CNetworkHost Hosts[PlayerMax]; /// Participant information
+};
+
+class CInitMessage_EngineMismatch
+{
+public:
+	CInitMessage_EngineMismatch();
+	const CInitMessage_Header &GetHeader() const { return header; }
+	const unsigned char *Serialize() const;
+	void Deserialize(const unsigned char *p);
+	static size_t Size() { return CInitMessage_Header::Size() + 4; }
+private:
+	CInitMessage_Header header;
+public:
+	int32_t Stratagus;  /// Stratagus engine version
+};
+
+class CInitMessage_ProtocolMismatch
+{
+public:
+	CInitMessage_ProtocolMismatch();
+	const CInitMessage_Header &GetHeader() const { return header; }
+	const unsigned char *Serialize() const;
+	void Deserialize(const unsigned char *p);
+	static size_t Size() { return CInitMessage_Header::Size() + 4; }
+private:
+	CInitMessage_Header header;
+public:
+	int32_t Version;  /// Network protocol version
+};
+
+class CInitMessage_Welcome
+{
+public:
+	CInitMessage_Welcome();
+	const CInitMessage_Header &GetHeader() const { return header; }
+	const unsigned char *Serialize() const;
+	void Deserialize(const unsigned char *p);
+	static size_t Size() { return CInitMessage_Header::Size() + PlayerMax * CNetworkHost::Size() + 2 * 4; }
+private:
+	CInitMessage_Header header;
+public:
+	CNetworkHost hosts[PlayerMax]; /// Participant information
 	int32_t Lag;        /// Lag time
 	int32_t Updates;    /// Update frequency
+};
 
-	union {
-		CNetworkHost Hosts[PlayerMax]; /// Participant information
-		char         MapPath[256];
-		CServerSetup State;            /// Server Setup State information
-	} u;
+class CInitMessage_Map
+{
+public:
+	CInitMessage_Map() {}
+	CInitMessage_Map(const char *path, uint32_t mapUID);
+	const CInitMessage_Header &GetHeader() const { return header; }
+	const unsigned char *Serialize() const;
+	void Deserialize(const unsigned char *p);
+	static size_t Size() { return CInitMessage_Header::Size() + 256 + 4; }
+private:
+	CInitMessage_Header header;
+public:
+	char MapPath[256];
+	uint32_t MapUID;  /// UID of map to play.
+};
+
+class CInitMessage_State
+{
+public:
+	CInitMessage_State() {}
+	CInitMessage_State(int type, const CServerSetup &data);
+	const CInitMessage_Header &GetHeader() const { return header; }
+	const unsigned char *Serialize() const;
+	void Deserialize(const unsigned char *p);
+	static size_t Size() { return CInitMessage_Header::Size() + CServerSetup::Size(); }
+private:
+	CInitMessage_Header header;
+public:
+	CServerSetup State;  /// Server Setup State information
+};
+
+class CInitMessage_Resync
+{
+public:
+	CInitMessage_Resync();
+	const CInitMessage_Header &GetHeader() const { return header; }
+	const unsigned char *Serialize() const;
+	void Deserialize(const unsigned char *p);
+	static size_t Size() { return CInitMessage_Header::Size() + CNetworkHost::Size() * PlayerMax; }
+private:
+	CInitMessage_Header header;
+public:
+	CNetworkHost hosts[PlayerMax]; /// Participant information
 };
 
 /**

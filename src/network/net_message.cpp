@@ -84,6 +84,14 @@ int serialize8(unsigned char *buf, int8_t data)
 	}
 	return sizeof(data);
 }
+template <int N>
+int serialize(unsigned char *buf, const char (&data)[N])
+{
+	if (buf) {
+		memcpy(buf, data, N);
+	}
+	return N;
+}
 
 int deserialize32(const unsigned char *buf, uint32_t *data)
 {
@@ -115,30 +123,38 @@ int deserialize8(const unsigned char *buf, int8_t *data)
 	*data = *buf;
 	return sizeof(*data);
 }
+template <int N>
+int deserialize(const unsigned char *buf, char (&data)[N])
+{
+	memcpy(data, buf, N);
+	return N;
+}
 
 //
 // CNetworkHost
 //
 
-const unsigned char *CNetworkHost::Serialize() const
+size_t CNetworkHost::Serialize(unsigned char *buf) const
 {
-	unsigned char *buf = new unsigned char[CNetworkHost::Size()];
 	unsigned char *p = buf;
 
 	p += serialize32(p, this->Host);
 	p += serialize16(p, this->Port);
 	p += serialize16(p, this->PlyNr);
-	memcpy(p, this->PlyName, sizeof(this->PlyName));
+	p += serialize(p, this->PlyName);
 
-	return buf;
+	return p - buf;
 }
 
-void CNetworkHost::Deserialize(const unsigned char *p)
+size_t CNetworkHost::Deserialize(const unsigned char *p)
 {
+	const unsigned char *buf = p;
+
 	p += deserialize32(p, &Host);
 	p += deserialize16(p, &Port);
 	p += deserialize16(p, &PlyNr);
-	memcpy(this->PlyName, p, sizeof(this->PlyName));
+	p += deserialize(p, this->PlyName);
+	return p - buf;
 }
 
 void CNetworkHost::Clear()
@@ -158,9 +174,8 @@ void CNetworkHost::SetName(const char *name)
 // CServerSetup
 //
 
-const unsigned char *CServerSetup::Serialize() const
+size_t CServerSetup::Serialize(unsigned char *buf) const
 {
-	unsigned char *buf = new unsigned char[CServerSetup::Size()];
 	unsigned char *p = buf;
 
 	p += serialize8(p, this->ResourcesOption);
@@ -180,11 +195,12 @@ const unsigned char *CServerSetup::Serialize() const
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += serialize8(p, this->Race[i]);
 	}
-	return buf;
+	return p - buf;
 }
 
-void CServerSetup::Deserialize(const unsigned char *p)
+size_t CServerSetup::Deserialize(const unsigned char *p)
 {
+	const unsigned char *buf = p;
 	p += deserialize8(p, &this->ResourcesOption);
 	p += deserialize8(p, &this->UnitsOption);
 	p += deserialize8(p, &this->FogOfWar);
@@ -202,101 +218,260 @@ void CServerSetup::Deserialize(const unsigned char *p)
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += deserialize8(p, &this->Race[i]);
 	}
+	return p - buf;
 }
 
 //
-// CInitMessage
+//  CInitMessage_Header
 //
 
-CInitMessage::CInitMessage()
+size_t CInitMessage_Header::Serialize(unsigned char *p) const
 {
-	memset(this, 0, sizeof(CInitMessage));
+	unsigned char *buf = p;
+	p += serialize8(p, type);
+	p += serialize8(p, subtype);
+	return p - buf;
 }
 
-CInitMessage::CInitMessage(uint8_t type, uint8_t subtype)
+size_t CInitMessage_Header::Deserialize(const unsigned char *p)
 {
-	this->Type = type;
-	this->SubType = subtype;
+	const unsigned char *buf = p;
+	p += deserialize8(p, &type);
+	p += deserialize8(p, &subtype);
+	return p - buf;
+}
+
+//
+// CInitMessage_Hello
+//
+
+CInitMessage_Hello::CInitMessage_Hello(const char *name) :
+	header(MessageInit_FromClient, ICMHello)
+{
+	strncpy_s(this->PlyName, sizeof(this->PlyName), name, _TRUNCATE);
 	this->Stratagus = StratagusVersion;
 	this->Version = NetworkProtocolVersion;
-	this->Lag = NetworkLag;
-	this->Updates = NetworkUpdates;
 }
 
-const unsigned char *CInitMessage::Serialize() const
+const unsigned char *CInitMessage_Hello::Serialize() const
 {
-	unsigned char *buf = new unsigned char[CInitMessage::Size()];
+	unsigned char *buf = new unsigned char[Size()];
 	unsigned char *p = buf;
 
-	p += serialize8(p, this->Type);
-	p += serialize8(p, this->SubType);
-	p += serialize8(p, this->HostsCount);
-	p += serialize8(p, this->padding);
+	p += header.Serialize(p);
+	p += serialize(p, this->PlyName);
 	p += serialize32(p, this->Stratagus);
 	p += serialize32(p, this->Version);
-	p += serialize32(p, this->MapUID);
-	p += serialize32(p, this->Lag);
-	p += serialize32(p, this->Updates);
+	return buf;
+}
 
-	switch (this->SubType) {
-		case ICMHello:
-		case ICMConfig:
-		case ICMWelcome:
-		case ICMResync:
-		case ICMGo:
-			for (int i = 0; i < PlayerMax; ++i) {
-				const unsigned char *x = this->u.Hosts[i].Serialize();
-				memcpy(p, x, CNetworkHost::Size());
-				p += CNetworkHost::Size();
-				delete[] x;
-			}
-			break;
-		case ICMMap:
-			memcpy(p, this->u.MapPath, sizeof(this->u.MapPath));
-			p += sizeof(this->u.MapPath);
-			break;
-		case ICMState: {
-			const unsigned char *x = this->u.State.Serialize();
-			memcpy(p, x, CServerSetup::Size());
-			p += CServerSetup::Size();
-			delete[] x;
-			break;
-		}
+void CInitMessage_Hello::Deserialize(const unsigned char *p)
+{
+	p += header.Deserialize(p);
+	p += deserialize(p, this->PlyName);
+	p += deserialize32(p, &this->Stratagus);
+	p += deserialize32(p, &this->Version);
+}
+
+//
+// CInitMessage_Config
+//
+
+CInitMessage_Config::CInitMessage_Config() :
+	header(MessageInit_FromServer, ICMConfig)
+{
+}
+
+const unsigned char *CInitMessage_Config::Serialize() const
+{
+	unsigned char *buf = new unsigned char[Size()];
+	unsigned char *p = buf;
+
+	p += header.Serialize(p);
+	p += serialize32(p, this->HostsCount);
+	for (int i = 0; i != PlayerMax; ++i) {
+		p += this->Hosts[i].Serialize(p);
 	}
 	return buf;
 }
 
-void CInitMessage::Deserialize(const unsigned char *p)
+void CInitMessage_Config::Deserialize(const unsigned char *p)
 {
-	p += deserialize8(p, &this->Type);
-	p += deserialize8(p, &this->SubType);
-	p += deserialize8(p, &this->HostsCount);
-	p += deserialize8(p, &this->padding);
+	p += header.Deserialize(p);
+	p += deserialize32(p, &this->HostsCount);
+	for (int i = 0; i != PlayerMax; ++i) {
+		p += this->Hosts[i].Deserialize(p);
+	}
+}
+
+//
+// CInitMessage_EngineMismatch
+//
+
+CInitMessage_EngineMismatch::CInitMessage_EngineMismatch() :
+	header(MessageInit_FromServer, ICMEngineMismatch)
+{
+	this->Stratagus = StratagusVersion;
+}
+
+const unsigned char *CInitMessage_EngineMismatch::Serialize() const
+{
+	unsigned char *buf = new unsigned char[Size()];
+	unsigned char *p = buf;
+
+	p += header.Serialize(p);
+	p += serialize32(p, this->Stratagus);
+	return buf;
+}
+
+void CInitMessage_EngineMismatch::Deserialize(const unsigned char *p)
+{
+	p += header.Deserialize(p);
 	p += deserialize32(p, &this->Stratagus);
+}
+
+//
+// CInitMessage_ProtocolMismatch
+//
+
+CInitMessage_ProtocolMismatch::CInitMessage_ProtocolMismatch() :
+	header(MessageInit_FromServer, ICMProtocolMismatch)
+{
+	this->Version = NetworkProtocolVersion;
+}
+
+const unsigned char *CInitMessage_ProtocolMismatch::Serialize() const
+{
+	unsigned char *buf = new unsigned char[Size()];
+	unsigned char *p = buf;
+
+	p += header.Serialize(p);
+	p += serialize32(p, this->Version);
+	return buf;
+}
+
+void CInitMessage_ProtocolMismatch::Deserialize(const unsigned char *p)
+{
+	p += header.Deserialize(p);
 	p += deserialize32(p, &this->Version);
-	p += deserialize32(p, &this->MapUID);
+}
+
+//
+// CInitMessage_Welcome
+//
+
+CInitMessage_Welcome::CInitMessage_Welcome() :
+	header(MessageInit_FromServer, ICMWelcome)
+{
+	this->Lag = NetworkLag;
+	this->Updates = NetworkUpdates;
+}
+
+const unsigned char *CInitMessage_Welcome::Serialize() const
+{
+	unsigned char *buf = new unsigned char[Size()];
+	unsigned char *p = buf;
+
+	p += header.Serialize(p);
+	for (int i = 0; i < PlayerMax; ++i) {
+		p += this->hosts[i].Serialize(p);
+	}
+	p += serialize32(p, this->Lag);
+	p += serialize32(p, this->Updates);
+	return buf;
+}
+
+void CInitMessage_Welcome::Deserialize(const unsigned char *p)
+{
+	p += header.Deserialize(p);
+	for (int i = 0; i < PlayerMax; ++i) {
+		p += this->hosts[i].Deserialize(p);
+	}
 	p += deserialize32(p, &this->Lag);
 	p += deserialize32(p, &this->Updates);
+}
 
-	switch (this->SubType) {
-		case ICMHello:
-		case ICMConfig:
-		case ICMWelcome:
-		case ICMResync:
-		case ICMGo:
-			for (int i = 0; i < PlayerMax; ++i) {
-				this->u.Hosts[i].Deserialize(p);
-				p += CNetworkHost::Size();
-			}
-			break;
-		case ICMMap:
-			memcpy(this->u.MapPath, p, sizeof(this->u.MapPath));
-			p += sizeof(this->u.MapPath);
-			break;
-		case ICMState:
-			this->u.State.Deserialize(p);
-			p += CServerSetup::Size();
-			break;
+//
+// CInitMessage_Map
+//
+
+CInitMessage_Map::CInitMessage_Map(const char *path, uint32_t mapUID) :
+	header(MessageInit_FromServer, ICMMap),
+	MapUID(mapUID)
+{
+	strncpy_s(MapPath, sizeof(MapPath), path, _TRUNCATE);
+}
+
+const unsigned char *CInitMessage_Map::Serialize() const
+{
+	unsigned char *buf = new unsigned char[Size()];
+	unsigned char *p = buf;
+
+	p += header.Serialize(p);
+	p += serialize(p, MapPath);
+	p += serialize32(p, this->MapUID);
+	return buf;
+}
+
+void CInitMessage_Map::Deserialize(const unsigned char *p)
+{
+	p += header.Deserialize(p);
+	p += deserialize(p, this->MapPath);
+	p += deserialize32(p, &this->MapUID);
+}
+
+//
+// CInitMessage_State
+//
+
+CInitMessage_State::CInitMessage_State(int type, const CServerSetup &data) :
+	header(type, ICMState),
+	State(data)
+{
+}
+
+const unsigned char *CInitMessage_State::Serialize() const
+{
+	unsigned char *buf = new unsigned char[Size()];
+	unsigned char *p = buf;
+
+	p += header.Serialize(p);
+	p += this->State.Serialize(p);
+	return buf;
+}
+
+void CInitMessage_State::Deserialize(const unsigned char *p)
+{
+	p += header.Deserialize(p);
+	p += this->State.Deserialize(p);
+}
+
+//
+// CInitMessage_Resync
+//
+
+CInitMessage_Resync::CInitMessage_Resync() :
+	header(MessageInit_FromServer, ICMResync)
+{
+}
+
+const unsigned char *CInitMessage_Resync::Serialize() const
+{
+	unsigned char *buf = new unsigned char[Size()];
+	unsigned char *p = buf;
+
+	p += header.Serialize(p);
+	for (int i = 0; i < PlayerMax; ++i) {
+		p += this->hosts[i].Serialize(p);
+	}
+	return buf;
+}
+
+void CInitMessage_Resync::Deserialize(const unsigned char *p)
+{
+	p += header.Deserialize(p);
+	for (int i = 0; i < PlayerMax; ++i) {
+		p += this->hosts[i].Deserialize(p);
 	}
 }
 
