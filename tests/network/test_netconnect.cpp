@@ -80,9 +80,10 @@ void FillCustomValue(CInitMessage_Hello *obj)
 
 void FillCustomValue(CInitMessage_Config *obj)
 {
-	obj->HostsCount = PlayerMax;
+	obj->hostsCount = PlayerMax;
+	obj->clientIndex = 3;
 	for (int i = 0; i != PlayerMax; ++i) {
-		FillCustomValue(&obj->Hosts[i]);
+		FillCustomValue(&obj->hosts[i]);
 	}
 }
 

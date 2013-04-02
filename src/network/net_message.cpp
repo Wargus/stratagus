@@ -221,6 +221,36 @@ size_t CServerSetup::Deserialize(const unsigned char *p)
 	return p - buf;
 }
 
+void CServerSetup::Clear()
+{
+	ResourcesOption = 0;
+	UnitsOption = 0;
+	FogOfWar = 0;
+	RevealMap = 0;
+	TilesetSelection = 0;
+	GameTypeOption = 0;
+	Difficulty = 0;
+	MapRichness = 0;
+	memset(CompOpt, 0, sizeof(CompOpt));
+	memset(Ready, 0, sizeof(Ready));
+	memset(Race, 0, sizeof(Race));
+}
+
+bool CServerSetup::operator == (const CServerSetup &rhs) const
+{
+	return (ResourcesOption == rhs.ResourcesOption
+			&& UnitsOption == rhs.UnitsOption
+			&& FogOfWar == rhs.FogOfWar
+			&& RevealMap == rhs.RevealMap
+			&& TilesetSelection == rhs.TilesetSelection
+			&& GameTypeOption == rhs.GameTypeOption
+			&& Difficulty == rhs.Difficulty
+			&& MapRichness == rhs.MapRichness
+			&& memcmp(CompOpt, rhs.CompOpt, sizeof(CompOpt)) == 0
+			&& memcmp(Ready, rhs.Ready, sizeof(Ready)) == 0
+			&& memcmp(Race, rhs.Race, sizeof(Race)) == 0);
+}
+
 //
 //  CInitMessage_Header
 //
@@ -288,9 +318,10 @@ const unsigned char *CInitMessage_Config::Serialize() const
 	unsigned char *p = buf;
 
 	p += header.Serialize(p);
-	p += serialize32(p, this->HostsCount);
+	p += serialize8(p, this->clientIndex);
+	p += serialize8(p, this->hostsCount);
 	for (int i = 0; i != PlayerMax; ++i) {
-		p += this->Hosts[i].Serialize(p);
+		p += this->hosts[i].Serialize(p);
 	}
 	return buf;
 }
@@ -298,9 +329,10 @@ const unsigned char *CInitMessage_Config::Serialize() const
 void CInitMessage_Config::Deserialize(const unsigned char *p)
 {
 	p += header.Deserialize(p);
-	p += deserialize32(p, &this->HostsCount);
+	p += deserialize8(p, &this->clientIndex);
+	p += deserialize8(p, &this->hostsCount);
 	for (int i = 0; i != PlayerMax; ++i) {
-		p += this->Hosts[i].Deserialize(p);
+		p += this->hosts[i].Deserialize(p);
 	}
 }
 

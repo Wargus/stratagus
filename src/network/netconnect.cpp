@@ -96,7 +96,7 @@ CServerSetup LocalSetupState;  // Local selection state for Multiplayer clients
 class CServer
 {
 public:
-	void Init();
+	void Init(CServerSetup *serverSetup);
 
 	void Update(unsigned long frameCounter);
 	void Parse(unsigned long frameCounter, const unsigned char *buf, unsigned long host, int port);
@@ -121,12 +121,13 @@ private:
 	void Send_GoodBye(const CNetworkHost &host);
 private:
 	NetworkState networkStates[PlayerMax]; /// Client Host states
+	CServerSetup *serverSetup;
 };
 
 class CClient
 {
 public:
-	void Init(unsigned long tick);
+	void Init(unsigned long tick, CServerSetup *serverSetup, CServerSetup *localSetup);
 	bool SetupServerAddress(const std::string &serveraddr, int port);
 
 	bool Parse(const unsigned char *buf, unsigned long host, int port);
@@ -164,16 +165,14 @@ private:
 
 	template <typename T>
 	void SendRateLimited(const T &msg, unsigned long tick, unsigned long msecs);
-	void NetClientCheckLocalState();
 
-	void SetConfig(const CInitMessage_Config &msg, unsigned long host, int port);
-	void SetState(const CInitMessage_State &msg);
+	void SetConfig(const CInitMessage_Config &msg);
 
 	void Parse_GameFull();
 	void Parse_ProtocolMismatch(const unsigned char *buf);
 	void Parse_EngineMismatch(const unsigned char *buf);
 	void Parse_Resync(const unsigned char *buf);
-	void Parse_Config(const unsigned char *buf, unsigned long ip, int port);
+	void Parse_Config(const unsigned char *buf);
 	void Parse_State(const unsigned char *buf);
 	void Parse_Welcome(const unsigned char *buf);
 	void Parse_Map(const unsigned char *buf);
@@ -184,6 +183,8 @@ private:
 	int serverPort;   /// Server network port to use
 	NetworkState networkState;
 	unsigned char lastMsgTypeSent;  /// Subtype of last InitConfig message sent
+	CServerSetup *serverSetup;
+	CServerSetup *localSetup;
 };
 
 static CServer Server;
@@ -345,35 +346,20 @@ bool CClient::SetupServerAddress(const std::string &serveraddr, int port)
 	return true;
 }
 
-void CClient::Init(unsigned long tick)
+void CClient::Init(unsigned long tick, CServerSetup *serverSetup, CServerSetup *localSetup)
 {
 	networkState.LastFrame = tick;
 	networkState.State = ccs_connecting;
 	networkState.MsgCnt = 0;
 	lastMsgTypeSent = ICMServerQuit;
+	this->serverSetup = serverSetup;
+	this->localSetup = localSetup;
 }
 
 void CClient::DetachFromServer()
 {
 	networkState.State = ccs_detaching;
 	networkState.MsgCnt = 0;
-}
-
-/**
-** Callback from netconnect loop in Client-Sync state:
-** Compare local state with server's information
-** and force update when changes have occured.
-*/
-void CClient::NetClientCheckLocalState()
-{
-	if (LocalSetupState.Ready[NetLocalHostsSlot] != ServerSetupState.Ready[NetLocalHostsSlot]) {
-		networkState.State = ccs_changed;
-		return;
-	}
-	if (LocalSetupState.Race[NetLocalHostsSlot] != ServerSetupState.Race[NetLocalHostsSlot]) {
-		networkState.State = ccs_changed;
-		return;
-	}
 }
 
 bool CClient::Update_disconnected()
@@ -431,12 +417,18 @@ bool CClient::Update_connected(unsigned long tick)
 	}
 }
 
+static bool IsLocalSetupInSync(const CServerSetup &state1, const CServerSetup &state2, int index)
+{
+	return (state1.Race[index] == state2.Race[index]
+			&& state1.Ready[index] == state2.Ready[index]);
+}
+
 bool CClient::Update_synced(unsigned long tick)
 {
 	Assert(networkState.State == ccs_synced);
 
-	NetClientCheckLocalState();
-	if (networkState.State != ccs_synced) {
+	if (IsLocalSetupInSync(*serverSetup, *localSetup, NetLocalHostsSlot) == false) {
+		networkState.State = ccs_changed;
 		networkState.MsgCnt = 0;
 		return Update(tick);
 	}
@@ -564,7 +556,7 @@ void CClient::Send_Resync(unsigned long tick)
 
 void CClient::Send_State(unsigned long tick)
 {
-	const CInitMessage_State message(MessageInit_FromClient, LocalSetupState);
+	const CInitMessage_State message(MessageInit_FromClient, *localSetup);
 
 	SendRateLimited(message, tick, 450);
 }
@@ -612,48 +604,37 @@ bool CClient::Update(unsigned long tick)
 	return true;
 }
 
-void CClient::SetState(const CInitMessage_State &msg)
-{
-	ServerSetupState = msg.State;
-}
-
-void CClient::SetConfig(const CInitMessage_Config &msg, unsigned long host, int port)
+void CClient::SetConfig(const CInitMessage_Config &msg)
 {
 	HostsCount = 0;
-	for (int i = 0; i < msg.HostsCount - 1; ++i) {
-		if (msg.Hosts[i].Host || msg.Hosts[i].Port) {
-			Hosts[HostsCount] = msg.Hosts[i];
+	for (int i = 0; i < msg.hostsCount - 1; ++i) {
+		if (i != msg.clientIndex) {
+			Hosts[HostsCount] = msg.hosts[i];
 			HostsCount++;
 			DebugPrint("Client %d = %d.%d.%d.%d:%d [%.*s]\n" _C_
-					   msg.Hosts[i].PlyNr _C_ NIPQUAD(ntohl(msg.Hosts[i].Host)) _C_
-					   ntohs(msg.Hosts[i].Port) _C_
-					   static_cast<int>(sizeof(msg.Hosts[i].PlyName)) _C_
-					   msg.Hosts[i].PlyName);
+					   msg.hosts[i].PlyNr _C_ NIPQUAD(ntohl(msg.hosts[i].Host)) _C_
+					   ntohs(msg.hosts[i].Port) _C_
+					   static_cast<int>(sizeof(msg.hosts[i].PlyName)) _C_
+					   msg.hosts[i].PlyName);
 		} else { // Own client
-			NetLocalPlayerNumber = msg.Hosts[i].PlyNr;
-			DebugPrint("SELF %d [%.*s]\n" _C_ msg.Hosts[i].PlyNr _C_
-					   static_cast<int>(sizeof(msg.Hosts[i].PlyName)) _C_
-					   msg.Hosts[i].PlyName);
+			NetLocalPlayerNumber = msg.hosts[i].PlyNr;
+			DebugPrint("SELF %d [%.*s]\n" _C_ msg.hosts[i].PlyNr _C_
+					   static_cast<int>(sizeof(msg.hosts[i].PlyName)) _C_
+					   msg.hosts[i].PlyName);
 		}
 	}
 	// server is last:
-	Hosts[HostsCount].Host = host;
-	Hosts[HostsCount].Port = port;
-	Hosts[HostsCount].PlyNr = msg.Hosts[msg.HostsCount - 1].PlyNr;
-	Hosts[HostsCount].SetName(msg.Hosts[msg.HostsCount - 1].PlyName);
+	Hosts[HostsCount].Host = serverIP;
+	Hosts[HostsCount].Port = serverPort;
+	Hosts[HostsCount].PlyNr = msg.hosts[msg.hostsCount - 1].PlyNr;
+	Hosts[HostsCount].SetName(msg.hosts[msg.hostsCount - 1].PlyName);
 	++HostsCount;
 	NetPlayers = HostsCount + 1;
 	DebugPrint("Server %d = %d.%d.%d.%d:%d [%.*s]\n" _C_
-			   msg.Hosts[msg.HostsCount - 1].PlyNr _C_ NIPQUAD(ntohl(host)) _C_
-			   ntohs(port) _C_
-			   static_cast<int>(sizeof(msg.Hosts[msg.HostsCount - 1].PlyName)) _C_
-			   msg.Hosts[msg.HostsCount - 1].PlyName);
-
-	// put ourselves to the end, like on the server..
-	Hosts[HostsCount].Host = 0;
-	Hosts[HostsCount].Port = 0;
-	Hosts[HostsCount].PlyNr = NetLocalPlayerNumber;
-	Hosts[HostsCount].SetName(Parameters::Instance.LocalPlayerName.c_str());
+			   msg.hosts[msg.hostsCount - 1].PlyNr _C_
+			   NIPQUAD(GetServerIP()) _C_ GetServerPort() _C_
+			   static_cast<int>(sizeof(msg.hosts[msg.hostsCount - 1].PlyName)) _C_
+			   msg.hosts[msg.hostsCount - 1].PlyName);
 }
 
 bool CClient::Parse(const unsigned char *buf, unsigned long host, int port)
@@ -713,7 +694,7 @@ bool CClient::Parse(const unsigned char *buf, unsigned long host, int port)
 			break;
 		}
 		case ICMConfig: { // Server gives the go ahead.. - start game
-			Parse_Config(buf, host, port);
+			Parse_Config(buf);
 			break;
 		}
 		case ICMResync: { // Server has resynced with us and sends resync data
@@ -825,23 +806,23 @@ void CClient::Parse_State(const unsigned char *buf)
 	msg.Deserialize(buf);
 	if (networkState.State == ccs_mapinfo) {
 		// Server has sent us first state info
-		SetState(msg);
+		*serverSetup = msg.State;
 		networkState.State = ccs_synced;
 		networkState.MsgCnt = 0;
 	} else if (networkState.State == ccs_synced
 			   || networkState.State == ccs_changed) {
-		SetState(msg);
+		*serverSetup = msg.State;
 		networkState.State = ccs_async;
 		networkState.MsgCnt = 0;
 	} else if (networkState.State == ccs_goahead) {
 		// Server has sent final state info
-		SetState(msg);
+		*serverSetup = msg.State;
 		networkState.State = ccs_started;
 		networkState.MsgCnt = 0;
 	}
 }
 
-void CClient::Parse_Config(const unsigned char *buf, unsigned long ip, int port)
+void CClient::Parse_Config(const unsigned char *buf)
 {
 	if (networkState.State != ccs_synced) {
 		return;
@@ -849,7 +830,7 @@ void CClient::Parse_Config(const unsigned char *buf, unsigned long ip, int port)
 	CInitMessage_Config msg;
 
 	msg.Deserialize(buf);
-	SetConfig(msg, ip, port);
+	SetConfig(msg);
 	networkState.State = ccs_goahead;
 	networkState.MsgCnt = 0;
 }
@@ -957,12 +938,13 @@ void CServer::KickClient(int c)
 	}
 }
 
-void CServer::Init()
+void CServer::Init(CServerSetup *serverSetup)
 {
 	for (int i = 0; i < PlayerMax; ++i) {
 		networkStates[i].Clear();
 		//Hosts[i].Clear();
 	}
+	this->serverSetup = serverSetup;
 }
 
 void CServer::Send_AreYouThere(const CNetworkHost &host)
@@ -1014,7 +996,7 @@ void CServer::Send_Map(const CNetworkHost& host)
 
 void CServer::Send_State(const CNetworkHost& host)
 {
-	const CInitMessage_State message(MessageInit_FromServer, ServerSetupState);
+	const CInitMessage_State message(MessageInit_FromServer, *serverSetup);
 
 	NetworkSendICMessage_Log(host.Host, host.Port, message);
 }
@@ -1067,7 +1049,7 @@ int CServer::Parse_Hello(int h, const CInitMessage_Hello &msg, unsigned long hos
 	if (h == -1) { // it is a new client
 		for (int i = 1; i < PlayerMax - 1; ++i) {
 			// occupy first available slot
-			if (ServerSetupState.CompOpt[i] == 0) {
+			if (serverSetup->CompOpt[i] == 0) {
 				if (Hosts[i].PlyNr == 0) {
 					h = i;
 					break;
@@ -1239,8 +1221,8 @@ void CServer::Parse_State(const int h, const CInitMessage_State &msg)
 			// networkStates[h].State = ccs_async;
 			networkStates[h].MsgCnt = 0;
 			// Use information supplied by the client:
-			ServerSetupState.Ready[h] = msg.State.Ready[h];
-			ServerSetupState.Race[h] = msg.State.Race[h];
+			serverSetup->Ready[h] = msg.State.Ready[h];
+			serverSetup->Race[h] = msg.State.Race[h];
 			// Add additional info usage here!
 
 			// Resync other clients (and us..)
@@ -1251,7 +1233,7 @@ void CServer::Parse_State(const int h, const CInitMessage_State &msg)
 			}
 			/* Fall through */
 		case ccs_async: {
-			// this code path happens until client acknoledges the state change reply
+			// this code path happens until client acknowledges the state change reply
 			// by sending ICMResync
 			Send_State(Hosts[h]);
 
@@ -1492,12 +1474,13 @@ void NetworkProcessServerRequest()
 void NetworkInitClientConnect()
 {
 	NetConnectRunning = 2;
-	Client.Init(GetTicks());
+
 	for (int i = 0; i < PlayerMax; ++i) {
 		Hosts[i].Clear();
 	}
 	ServerSetupState.Clear();
 	LocalSetupState.Clear();
+	Client.Init(GetTicks(), &ServerSetupState, &LocalSetupState);
 }
 
 /**
@@ -1650,10 +1633,10 @@ void NetworkServerStartGame()
 
 	// Prepare the final config message:
 	CInitMessage_Config message;
-	message.HostsCount = NetPlayers;
+	message.hostsCount = NetPlayers;
 	for (int i = 0; i < NetPlayers; ++i) {
-		message.Hosts[i] = Hosts[i];
-		message.Hosts[i].PlyNr = Hosts[i].PlyNr;
+		message.hosts[i] = Hosts[i];
+		message.hosts[i].PlyNr = Hosts[i].PlyNr;
 	}
 
 	// Prepare the final state message:
@@ -1666,16 +1649,13 @@ void NetworkServerStartGame()
 breakout:
 		// Send to all clients.
 		for (int i = 0; i < HostsCount; ++i) {
+			const unsigned long host = message.hosts[i].Host;
+			const int port = message.hosts[i].Port;
+
 			if (num[Hosts[i].PlyNr] == 1) { // not acknowledged yet
-				unsigned long host = message.Hosts[i].Host;
-				int port = message.Hosts[i].Port;
-				message.Hosts[i].Host = message.Hosts[i].Port = 0;
+				message.clientIndex = i;
 				NetworkSendICMessage_Log(host, port, message);
-				message.Hosts[i].Host = host;
-				message.Hosts[i].Port = port;
 			} else if (num[Hosts[i].PlyNr] == 2) {
-				unsigned long host = message.Hosts[i].Host;
-				int port = message.Hosts[i].Port;
 				NetworkSendICMessage_Log(host, port, statemsg);
 			}
 		}
@@ -1778,18 +1758,17 @@ void NetworkDetachFromServer()
 void NetworkInitServerConnect(int openslots)
 {
 	NetConnectRunning = 1;
-	Server.Init();
 
-	// Cannot use NetPlayers here, as map change might modify the number!!
 	for (int i = 0; i < PlayerMax; ++i) {
 		Hosts[i].Clear();
 	}
+	ServerSetupState.Clear();
+	LocalSetupState.Clear(); // Unused when we are server
+	Server.Init(&ServerSetupState);
 
 	// preset the server (initially always slot 0)
 	Hosts[0].SetName(Parameters::Instance.LocalPlayerName.c_str());
 
-	ServerSetupState.Clear();
-	LocalSetupState.Clear();
 	for (int i = openslots; i < PlayerMax - 1; ++i) {
 		ServerSetupState.CompOpt[i] = 1;
 	}
@@ -1816,12 +1795,15 @@ void NetworkGamePrepareGameSettings()
 
 #ifdef DEBUG
 	for (int i = 0; i < PlayerMax - 1; i++) {
-		printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
+		printf("%02d: CO: %d   Race: %d   Name: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
 		if (ServerSetupState.CompOpt[i] == 0) {
-			for (int h = 0; h < NetPlayers; h++) {
+			for (int h = 0; h != HostsCount; ++h) {
 				if (Hosts[h].PlyNr == i) {
 					printf("%s", Hosts[h].PlyName);
 				}
+			}
+			if (i == NetLocalPlayerNumber) {
+				printf("%s (localhost)", Parameters::Instance.LocalPlayerName.c_str());
 			}
 		}
 		printf("\n");
@@ -1880,9 +1862,10 @@ void NetworkGamePrepareGameSettings()
 	}
 
 #ifdef DEBUG
-	for (int i = 0; i < NetPlayers; i++) {
+	for (int i = 0; i != HostsCount; ++i) {
 		Assert(GameSettings.Presets[Hosts[i].PlyNr].Type == PlayerPerson);
 	}
+	Assert(GameSettings.Presets[NetLocalPlayerNumber].Type == PlayerPerson);
 #endif
 }
 

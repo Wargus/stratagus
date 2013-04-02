@@ -75,20 +75,11 @@ public:
 	size_t Serialize(unsigned char *p) const;
 	size_t Deserialize(const unsigned char *p);
 	static size_t Size() { return 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 * PlayerMax + 1 * PlayerMax + 1 * PlayerMax; }
-	void Clear() {
-		ResourcesOption = 0;
-		UnitsOption = 0;
-		FogOfWar = 0;
-		RevealMap = 0;
-		TilesetSelection = 0;
-		GameTypeOption = 0;
-		Difficulty = 0;
-		MapRichness = 0;
-		memset(CompOpt, 0, sizeof(CompOpt));
-		memset(Ready, 0, sizeof(Ready));
-		memset(Race, 0, sizeof(Race));
-	}
+	void Clear();
 
+	bool operator == (const CServerSetup &rhs) const;
+	bool operator != (const CServerSetup &rhs) const { return !(*this == rhs); }
+public:
 	uint8_t ResourcesOption;       /// Resources option
 	uint8_t UnitsOption;           /// Unit # option
 	uint8_t FogOfWar;              /// Fog of war option
@@ -181,8 +172,9 @@ public:
 private:
 	CInitMessage_Header header;
 public:
-	int32_t HostsCount; /// Number of hosts
-	CNetworkHost Hosts[PlayerMax]; /// Participant information
+	uint8_t clientIndex; /// index of receiver in hosts[]
+	uint8_t hostsCount;  /// Number of hosts
+	CNetworkHost hosts[PlayerMax]; /// Participant information
 };
 
 class CInitMessage_EngineMismatch
