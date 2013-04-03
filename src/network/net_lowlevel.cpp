@@ -528,7 +528,8 @@ int SocketSet::Select(int timeout)
 	} while (retval == -1 && errno == EINTR);
 #endif
 
-	for (size_t i = 0; i != this->Sockets.size(); ++i) {
+	for (size_t i = 0; i != this->Sockets.size(); ++i)
+	{
 		this->SocketReady[i] = FD_ISSET(this->Sockets[i], &mask);
 	}
 	return retval;

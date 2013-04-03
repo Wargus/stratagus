@@ -723,14 +723,14 @@ void CGraphic::Load(bool grayscale)
 				break;
 			}
 			case 4: {
-				Uint32* p;
+				Uint32 *p;
 				for (int i = 0; i < Height; ++i) {
 					for (int j = 0; j < Width; ++j) {
 						p = (Uint32 *)(Surface->pixels) + i * Width + j * bpp;
 						const Uint32 gray = ((Uint8)((*p) * redGray) >> f->Rshift) +
-							((Uint8)(*(p + 1) * greenGray) >> f->Gshift) +
-							((Uint8)(*(p + 2) * blueGray) >> f->Bshift) +
-							((Uint8)(*(p + 3)) >> f->Ashift);
+											((Uint8)(*(p + 1) * greenGray) >> f->Gshift) +
+											((Uint8)(*(p + 2) * blueGray) >> f->Bshift) +
+											((Uint8)(*(p + 3)) >> f->Ashift);
 						*p = gray;
 					}
 				}

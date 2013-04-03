@@ -257,8 +257,7 @@ public:
 /**
 **  Network Selection Info
 */
-struct NetworkSelectionHeader
-{
+struct NetworkSelectionHeader {
 	unsigned char Type[MaxNetworkCommands];  /// Command
 	unsigned NumberSent : 6;   /// New Number Selected
 	unsigned Add : 1;          /// Adding to Selection
@@ -1188,7 +1187,7 @@ void NetworkRecover()
 				continue;
 			}
 			int secs = (FrameCounter - NetworkLastFrame[Hosts[i].PlyNr]) /
-				   (FRAMES_PER_SECOND * VideoSyncSpeed / 100);
+					   (FRAMES_PER_SECOND * VideoSyncSpeed / 100);
 			// FIXME: display a menu while we wait
 			if (secs >= 3 && secs < NetworkTimeout) {
 				if (FrameCounter % FRAMES_PER_SECOND < (unsigned long)NetworkUpdates) {

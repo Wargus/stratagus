@@ -85,7 +85,7 @@ int serialize8(unsigned char *buf, int8_t data)
 	return sizeof(data);
 }
 template <int N>
-int serialize(unsigned char *buf, const char (&data)[N])
+int serialize(unsigned char *buf, const char(&data)[N])
 {
 	if (buf) {
 		memcpy(buf, data, N);
@@ -124,7 +124,7 @@ int deserialize8(const unsigned char *buf, int8_t *data)
 	return sizeof(*data);
 }
 template <int N>
-int deserialize(const unsigned char *buf, char (&data)[N])
+int deserialize(const unsigned char *buf, char(&data)[N])
 {
 	memcpy(data, buf, N);
 	return N;
