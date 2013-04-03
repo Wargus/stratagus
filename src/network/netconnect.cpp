@@ -60,10 +60,8 @@
 /**
 **  Connect state information of network systems active in current game.
 */
-struct NetworkState
-{
-	void Clear()
-	{
+struct NetworkState {
+	void Clear() {
 		State = ccs_unused;
 		MsgCnt = 0;
 		LastFrame = 0;
@@ -96,7 +94,7 @@ CServerSetup LocalSetupState;  // Local selection state for Multiplayer clients
 class CServer
 {
 public:
-	void Init(CServerSetup *serverSetup);
+	void Init(const std::string &name, CServerSetup *serverSetup);
 
 	void Update(unsigned long frameCounter);
 	void Parse(unsigned long frameCounter, const unsigned char *buf, unsigned long host, int port);
@@ -120,6 +118,7 @@ private:
 	void Send_State(const CNetworkHost &host);
 	void Send_GoodBye(const CNetworkHost &host);
 private:
+	std::string name;
 	NetworkState networkStates[PlayerMax]; /// Client Host states
 	CServerSetup *serverSetup;
 };
@@ -127,7 +126,7 @@ private:
 class CClient
 {
 public:
-	void Init(unsigned long tick, CServerSetup *serverSetup, CServerSetup *localSetup);
+	void Init(const std::string &name, CServerSetup *serverSetup, CServerSetup *localSetup, unsigned long tick);
 	bool SetupServerAddress(const std::string &serveraddr, int port);
 
 	bool Parse(const unsigned char *buf, unsigned long host, int port);
@@ -179,6 +178,7 @@ private:
 	void Parse_AreYouThere();
 
 private:
+	std::string name;
 	unsigned long serverIP;  /// IP of server to join
 	int serverPort;   /// Server network port to use
 	NetworkState networkState;
@@ -346,7 +346,7 @@ bool CClient::SetupServerAddress(const std::string &serveraddr, int port)
 	return true;
 }
 
-void CClient::Init(unsigned long tick, CServerSetup *serverSetup, CServerSetup *localSetup)
+void CClient::Init(const std::string &name, CServerSetup *serverSetup, CServerSetup *localSetup, unsigned long tick)
 {
 	networkState.LastFrame = tick;
 	networkState.State = ccs_connecting;
@@ -354,6 +354,7 @@ void CClient::Init(unsigned long tick, CServerSetup *serverSetup, CServerSetup *
 	lastMsgTypeSent = ICMServerQuit;
 	this->serverSetup = serverSetup;
 	this->localSetup = localSetup;
+	this->name = name;
 }
 
 void CClient::DetachFromServer()
@@ -542,7 +543,7 @@ void CClient::Send_MapUidMismatch(unsigned long tick)
 
 void CClient::Send_Map(unsigned long tick)
 {
-	CInitMessage_Header message(MessageInit_FromClient, ICMMap);
+	const CInitMessage_Header message(MessageInit_FromClient, ICMMap);
 
 	SendRateLimited(message, tick, 650);
 }
@@ -570,7 +571,7 @@ void CClient::Send_Waiting(unsigned long tick, unsigned long msec)
 
 void CClient::Send_Hello(unsigned long tick)
 {
-	const CInitMessage_Hello message(Parameters::Instance.LocalPlayerName.c_str());
+	const CInitMessage_Hello message(name.c_str());
 
 	SendRateLimited(message, tick, 500);
 }
@@ -760,12 +761,12 @@ void CClient::Parse_Map(const unsigned char *buf)
 		return;
 	}
 	NetworkMapName = std::string(msg.MapPath, sizeof(msg.MapPath));
-	std::string mappath = StratagusLibPath + "/" + NetworkMapName;
+	const std::string mappath = StratagusLibPath + "/" + NetworkMapName;
 	LoadStratagusMapInfo(mappath);
 	if (msg.MapUID != Map.Info.MapUID) {
 		networkState.State = ccs_badmap;
 		fprintf(stderr, "Stratagus maps do not match (0x%08x) <-> (0x%08x)\n",
-				(unsigned int)Map.Info.MapUID, (unsigned int)msg.MapUID);
+				Map.Info.MapUID, static_cast<unsigned int>(msg.MapUID));
 		return;
 	}
 	networkState.State = ccs_mapinfo;
@@ -794,7 +795,7 @@ void CClient::Parse_Welcome(const unsigned char *buf)
 			Hosts[i] = msg.hosts[i];
 		} else {
 			Hosts[i].PlyNr = i;
-			Hosts[i].SetName(Parameters::Instance.LocalPlayerName.c_str());
+			Hosts[i].SetName(name.c_str());
 		}
 	}
 }
@@ -848,7 +849,7 @@ void CClient::Parse_Resync(const unsigned char *buf)
 			Hosts[i] = msg.hosts[i];
 		} else {
 			Hosts[i].PlyNr = msg.hosts[i].PlyNr;
-			Hosts[i].SetName(Parameters::Instance.LocalPlayerName.c_str());
+			Hosts[i].SetName(name.c_str());
 		}
 	}
 	networkState.State = ccs_synced;
@@ -912,23 +913,12 @@ void CClient::Parse_AreYouThere()
 // CServer
 //
 
-/**
-** Kick a client that doesn't answer to our packets
-**
-** @param c The client (host slot) to kick
-*/
-static void KickDeadClient(int c)
+void CServer::KickClient(int c)
 {
 	DebugPrint("kicking client %d\n" _C_ Hosts[c].PlyNr);
 	Hosts[c].Clear();
-	ServerSetupState.Ready[c] = 0;
-	ServerSetupState.Race[c] = 0;
-
-	Server.KickClient(c);
-}
-
-void CServer::KickClient(int c)
-{
+	serverSetup->Ready[c] = 0;
+	serverSetup->Race[c] = 0;
 	networkStates[c].Clear();
 	// Resync other clients
 	for (int n = 1; n < PlayerMax - 1; ++n) {
@@ -938,13 +928,14 @@ void CServer::KickClient(int c)
 	}
 }
 
-void CServer::Init(CServerSetup *serverSetup)
+void CServer::Init(const std::string &name, CServerSetup *serverSetup)
 {
 	for (int i = 0; i < PlayerMax; ++i) {
 		networkStates[i].Clear();
 		//Hosts[i].Clear();
 	}
 	this->serverSetup = serverSetup;
+	this->name = name;
 }
 
 void CServer::Send_AreYouThere(const CNetworkHost &host)
@@ -966,7 +957,7 @@ void CServer::Send_Welcome(const CNetworkHost &host, int index)
 	CInitMessage_Welcome message;
 
 	message.hosts[0].PlyNr = index; // Host array slot number
-	message.hosts[0].SetName(Parameters::Instance.LocalPlayerName.c_str()); // Name of server player
+	message.hosts[0].SetName(name.c_str()); // Name of server player
 	for (int i = 1; i < PlayerMax - 1; ++i) { // Info about other clients
 		if (i != index && Hosts[i].PlyNr) {
 			message.hosts[i] = Hosts[i];
@@ -987,21 +978,21 @@ void CServer::Send_Resync(const CNetworkHost &host, int hostIndex)
 	NetworkSendICMessage_Log(host.Host, host.Port, message);
 }
 
-void CServer::Send_Map(const CNetworkHost& host)
+void CServer::Send_Map(const CNetworkHost &host)
 {
 	const CInitMessage_Map message(NetworkMapName.c_str(), Map.Info.MapUID);
 
 	NetworkSendICMessage_Log(host.Host, host.Port, message);
 }
 
-void CServer::Send_State(const CNetworkHost& host)
+void CServer::Send_State(const CNetworkHost &host)
 {
 	const CInitMessage_State message(MessageInit_FromServer, *serverSetup);
 
 	NetworkSendICMessage_Log(host.Host, host.Port, message);
 }
 
-void CServer::Send_GoodBye(const CNetworkHost& host)
+void CServer::Send_GoodBye(const CNetworkHost &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMGoodBye);
 
@@ -1015,7 +1006,7 @@ void CServer::Update(unsigned long frameCounter)
 			const unsigned long fcd = frameCounter - networkStates[i].LastFrame;
 			if (fcd >= CLIENT_LIVE_BEAT) {
 				if (fcd > CLIENT_IS_DEAD) {
-					KickDeadClient(i);
+					KickClient(i);
 				} else if (fcd % 5 == 0) {
 					// Probe for the client
 					Send_AreYouThere(Hosts[i]);
@@ -1078,7 +1069,7 @@ int CServer::Parse_Hello(int h, const CInitMessage_Hello &msg, unsigned long hos
 	if (networkStates[h].MsgCnt > 48) {
 		// Detects UDP input firewalled or behind NAT firewall clients
 		// If packets are missed, clients are kicked by AYT check later..
-		KickDeadClient(h);
+		KickClient(h);
 		return -1;
 	}
 	return h;
@@ -1285,7 +1276,7 @@ void CServer::Parse_SeeYou(const int h)
 {
 	switch (networkStates[h].State) {
 		case ccs_detaching:
-			KickDeadClient(h);
+			KickClient(h);
 			break;
 
 		default:
@@ -1480,7 +1471,7 @@ void NetworkInitClientConnect()
 	}
 	ServerSetupState.Clear();
 	LocalSetupState.Clear();
-	Client.Init(GetTicks(), &ServerSetupState, &LocalSetupState);
+	Client.Init(Parameters::Instance.LocalPlayerName, &ServerSetupState, &LocalSetupState, GetTicks());
 }
 
 /**
@@ -1764,7 +1755,7 @@ void NetworkInitServerConnect(int openslots)
 	}
 	ServerSetupState.Clear();
 	LocalSetupState.Clear(); // Unused when we are server
-	Server.Init(&ServerSetupState);
+	Server.Init(Parameters::Instance.LocalPlayerName, &ServerSetupState);
 
 	// preset the server (initially always slot 0)
 	Hosts[0].SetName(Parameters::Instance.LocalPlayerName.c_str());
