@@ -179,7 +179,7 @@ extern const char NameLine[];
 #define CYCLES_PER_SECOND  30  // 1/30s 0.33ms
 
 /*----------------------------------------------------------------------------
---  stratagus.c
+--  stratagus.cpp
 ----------------------------------------------------------------------------*/
 
 extern std::string StratagusLibPath;        /// Location of stratagus data
@@ -194,6 +194,7 @@ extern void ExitFatal(int err);             /// Exit with fatal error
 extern void UpdateDisplay();            /// Game display update
 extern void DrawMapArea();              /// Draw the map area
 extern void GameMainLoop();             /// Game main loop
+extern int stratagusMain(int argc, char **argv); /// main entry
 
 //@}
 

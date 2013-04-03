@@ -283,6 +283,7 @@ set(stratagusmain_SRCS
 	src/stratagus/groups.cpp
 	src/stratagus/iolib.cpp
 	src/stratagus/luacallback.cpp
+	src/stratagus/main.cpp
 	src/stratagus/mainloop.cpp
 	src/stratagus/parameters.cpp
 	src/stratagus/player.cpp

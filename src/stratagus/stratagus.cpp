@@ -616,7 +616,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 **  @param argc  Number of arguments.
 **  @param argv  Vector of arguments.
 */
-int main(int argc, char **argv)
+int stratagusMain(int argc, char **argv)
 {
 #ifdef REDIRECT_OUTPUT
 	RedirectOutput();
