@@ -76,7 +76,6 @@
 #endif
 
 #ifdef USE_WIN32
-#include "net_lowlevel.h"
 #include <shellapi.h>
 #endif
 
@@ -905,19 +904,9 @@ const EventCallback *GetCallbacks()
 */
 void WaitEventsOneFrame()
 {
-	struct timeval tv;
-	fd_set rfds;
-	fd_set wfds;
-	Socket maxfd;
-	int i;
-	int s;
-	SDL_Event event[1];
-	Uint32 ticks;
-	int interrupts;
-
 	++FrameCounter;
 
-	ticks = SDL_GetTicks();
+	Uint32 ticks = SDL_GetTicks();
 	if (ticks > NextFrameTicks) { // We are too slow :(
 		++SlowFrameCounter;
 	}
@@ -926,12 +915,10 @@ void WaitEventsOneFrame()
 	InputKeyTimeout(*GetCallbacks(), ticks);
 	CursorAnimate(ticks);
 
-	interrupts = 0;
+	int interrupts = 0;
 
 	for (;;) {
-		//
 		// Time of frame over? This makes the CPU happy. :(
-		//
 		ticks = SDL_GetTicks();
 		if (!interrupts && ticks < NextFrameTicks) {
 			SDL_Delay(NextFrameTicks - ticks);
@@ -947,55 +934,21 @@ void WaitEventsOneFrame()
 			NextFrameTicks += FrameTicks;
 		}
 
-		//
-		// Prepare select
-		//
-		maxfd = 0;
-		tv.tv_sec = tv.tv_usec = 0;
-		FD_ZERO(&rfds);
-		FD_ZERO(&wfds);
-
-		//
-		// Network
-		//
-		if (IsNetworkGame()) {
-			if (NetworkFildes > maxfd) {
-				maxfd = NetworkFildes;
-			}
-			FD_SET(NetworkFildes, &rfds);
-		}
-
-#if 0
-		s = select(maxfd + 1, &rfds, &wfds, NULL,
-				   (i = SDL_PollEvent(event)) ? &tv : NULL);
-#else
-		// QUICK HACK to fix the event/timer problem
-		// The timer code didn't interrupt the select call.
-		// Perhaps I could send a signal to the process
-		// Not very nice, but this is the problem if you use other libraries
-		// The event handling of SDL is wrong designed = polling only.
-		// There is hope on SDL 1.3 which will have this fixed.
-
-		s = select(maxfd + 1, &rfds, &wfds, NULL, &tv);
-		i = SDL_PollEvent(event);
-#endif
-
+		SDL_Event event[1];
+		const int i = SDL_PollEvent(event);
 		if (i) { // Handle SDL event
 			SdlDoEvent(*GetCallbacks(), *event);
 		}
 
-		if (s > 0) {
-			//
-			// Network
-			//
-			if (IsNetworkGame() && FD_ISSET(NetworkFildes, &rfds)) {
+		// Network
+		int s = 0;
+		if (IsNetworkGame()) {
+			s = NetSocketReady(NetworkFildes, 0);
+			if (s > 0) {
 				GetCallbacks()->NetworkEvent();
 			}
 		}
-
-		//
 		// No more input and time for frame over: return
-		//
 		if (!i && s <= 0 && interrupts) {
 			break;
 		}
@@ -1005,7 +958,6 @@ void WaitEventsOneFrame()
 	if (!SkipGameCycle--) {
 		SkipGameCycle = SkipFrames;
 	}
-
 }
 
 /**
