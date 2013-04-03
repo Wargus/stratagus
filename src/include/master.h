@@ -33,34 +33,23 @@
 //@{
 
 /*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---  Defines
-----------------------------------------------------------------------------*/
-struct lua_State;
-
-/*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
+
+struct lua_State;
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern int MetaServerInUse;
-
-extern std::string MasterHost;
-extern int MasterPort;
-
 extern int MetaInit();
 extern int MetaClose();
-extern int MetaServerOK(char *reply);
+extern int MetaServerOK(const char *reply);
 extern int SendMetaCommand(const char *command, const char *format, ...);
 extern int RecvMetaReply(char **reply);
 extern int GetMetaParameter(char *reply, int pos, char **value);
 extern int CclSetMetaServer(lua_State *l);
+
 //@}
 
 #endif // !__MASTER_H__

@@ -40,13 +40,9 @@
 
 #include "stratagus.h"
 
-#include "SDL.h"
-
 #include "master.h"
 
 #include "game.h"
-#include "iocompat.h"
-#include "netconnect.h"
 #include "network.h"
 #include "net_lowlevel.h"
 #include "parameters.h"
@@ -59,10 +55,9 @@
 ----------------------------------------------------------------------------*/
 
 static Socket MetaServerFildes;  // This is a TCP socket.
-int MetaServerInUse;
 
-std::string MasterHost; /// Metaserver Address
-int MasterPort;         /// Metaserver Port
+static std::string MasterHost; /// Metaserver Address
+static int MasterPort;         /// Metaserver Port
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -82,7 +77,6 @@ int CclSetMetaServer(lua_State *l)
 	return 0;
 }
 
-
 /**
 **  Initialize the TCP connection to the Meta Server.
 **
@@ -91,24 +85,19 @@ int CclSetMetaServer(lua_State *l)
 */
 int MetaInit()
 {
-	int i;
-	char *reply;
-	int port_range_min;
-	int port_range_max;
+	const int port_range_min = 1234;
+	const int port_range_max = 1244;
 
-	port_range_min = 1234;
-	port_range_max = 1244;
-	reply = NULL;
-	MetaServerFildes = NetworkFildes;
-	for (i = port_range_min; i < port_range_max; ++i) {
+	for (int i = port_range_min; i < port_range_max; ++i) {
 		MetaServerFildes = NetOpenTCP(NetworkAddr, i);  //FIXME: need to make a dynamic port allocation there...if (!MetaServerFildes) {...}
 		if (MetaServerFildes != static_cast<Socket>(-1)) {
 			if (NetConnectTCP(MetaServerFildes, NetResolveHost(MasterHost), MasterPort) != -1) {
 				break;
 			}
+			MetaServerFildes = static_cast<Socket>(-1);
 		}
 	}
-	if (i == port_range_max) {
+	if (MetaServerFildes == static_cast<Socket>(-1)) {
 		return -1;
 	}
 
@@ -116,19 +105,17 @@ int MetaInit()
 		return -1;
 	}
 
+	char *reply = NULL;
 	if (RecvMetaReply(&reply) == -1) {
 		return -1;
-	} else {
-		if (MetaServerOK(reply)) {
-			delete[] reply;
-			return 0;
-		} else {
-			delete[] reply;
-			return -1;
-		}
 	}
-
-	return 0;
+	if (MetaServerOK(reply)) {
+		delete[] reply;
+		return 0;
+	} else {
+		delete[] reply;
+		return -1;
+	}
 }
 
 /**
@@ -147,7 +134,7 @@ int MetaClose()
 **
 **  @return 1 OK, 0 Error.
 */
-int MetaServerOK(char *reply)
+int MetaServerOK(const char *reply)
 {
 	return !strcmp("OK\r\n", reply) || !strcmp("OK\n", reply);
 }
@@ -163,8 +150,6 @@ int MetaServerOK(char *reply)
 */
 int GetMetaParameter(char *reply, int pos, char **value)
 {
-	char *endline;
-
 	// Take Care for OK/ERR
 	*value = strchr(reply, '\n');
 	(*value)++;
@@ -185,7 +170,7 @@ int GetMetaParameter(char *reply, int pos, char **value)
 		(*value)++;
 	}
 
-	endline = strchr(*value, '\n');
+	char *endline = strchr(*value, '\n');
 
 	if (!endline) {
 		return -1;
@@ -209,20 +194,14 @@ int GetMetaParameter(char *reply, int pos, char **value)
 */
 int SendMetaCommand(const char *command, const char *format, ...)
 {
-	int n;
-	int size;
-	int ret;
-	char *p;
-	char *newp;
-	char *s;
-	va_list ap;
-
-	size = GameName.size() + Parameters::Instance.LocalPlayerName.size() + strlen(command) + 100;
-	ret = -1;
-	if ((p = new char[size]) == NULL) {
+	int size = GameName.size() + Parameters::Instance.LocalPlayerName.size() + strlen(command) + 100;
+	int ret = -1;
+	char *p = new char[size];
+	if (p == NULL) {
 		return -1;
 	}
-	if ((s = new char[size]) == NULL) {
+	char *s = new char[size];
+	if (s == NULL) {
 		delete[] p;
 		return -1;
 	}
@@ -245,10 +224,12 @@ int SendMetaCommand(const char *command, const char *format, ...)
 	// PlayerScore - Player,Score,Win (Add razings...)
 	// EndGame - Called after PlayerScore.
 	// AbandonGame - 0
+	char *newp;
+	va_list ap;
 	while (1) {
 		/* Try to print in the allocated space. */
 		va_start(ap, format);
-		n = vsnprintf(p, size, format, ap);
+		int n = vsnprintf(p, size, format, ap);
 		va_end(ap);
 		/* If that worked, string was processed. */
 		if (n > -1 && n < size) {
@@ -295,19 +276,15 @@ int SendMetaCommand(const char *command, const char *format, ...)
 */
 int RecvMetaReply(char **reply)
 {
-	int n;
-	char *p;
-	char buf[1024];
-
 	if (NetSocketReady(MetaServerFildes, 5000) == -1) {
 		return -1;
 	}
 
-	p = NULL;
-
 	// FIXME: Allow for large packets
-	n = NetRecvTCP(MetaServerFildes, &buf, 1024);
-	if (!(p = new char[n + 1])) {
+	char buf[1024];
+	int n = NetRecvTCP(MetaServerFildes, &buf, 1024);
+	char *p = new char[n + 1];
+	if (!p) {
 		return -1;
 	}
 
