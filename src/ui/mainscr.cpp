@@ -1046,7 +1046,7 @@ void ClearCosts()
 /*----------------------------------------------------------------------------
 --  INFO PANEL
 ----------------------------------------------------------------------------*/
-//FIXME rb biger change requre review.
+//FIXME rb biger change require review.
 #if 0
 /**
 **  Draw info panel background.
@@ -1078,10 +1078,12 @@ void CInfoPanel::Draw()
 			//
 			DrawInfoPanelBackground(0);
 			for (int i = 0; i < std::min<int>(NumSelected, UI.SelectedButtons.size()); ++i) {
-				Selected[i]->Type->Icon.Icon->DrawUnitIcon(UI.SelectedButtons[i].Style,
-														   (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?
-														   (IconActive | (MouseButtons & LeftButton)) : 0,
-														   UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y, "");
+				const CIcon& icon = *Selected[i]->Type->Icon.Icon;
+				const PixelPos pos(UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
+				icon.DrawUnitIcon(*UI.SelectedButtons[i].Style,
+								  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?
+								  (IconActive | (MouseButtons & LeftButton)) : 0,
+								  pos, "");
 				UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 
 				if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) {
@@ -1092,7 +1094,7 @@ void CInfoPanel::Draw()
 				char buf[5];
 
 				sprintf(buf, "+%u", static_cast<unsigned int>(NumSelected - UI.SelectedButtons.size()));
-				CLabel(UI.MaxSelectedFont).Draw(UI.MaxSelectedTextX, UI.MaxSelectedTextY, buf);
+				CLabel(*UI.MaxSelectedFont).Draw(UI.MaxSelectedTextX, UI.MaxSelectedTextY, buf);
 			}
 			return;
 		} else {
