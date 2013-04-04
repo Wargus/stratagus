@@ -351,11 +351,12 @@ int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 /**
 **  Open an UDP Socket port.
 **
+**  @param ip !=0 Ip to bind in host notation.
 **  @param port !=0 Port to bind in host notation.
 **
 **  @return If success the socket fildes, -1 otherwise.
 */
-Socket NetOpenUDP(const char *addr, int port)
+Socket NetOpenUDP(unsigned long ip, int port)
 {
 	// open the socket
 	Socket sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -369,12 +370,8 @@ Socket NetOpenUDP(const char *addr, int port)
 
 		memset(&sock_addr, 0, sizeof(sock_addr));
 		sock_addr.sin_family = AF_INET;
-		if (addr) {
-			sock_addr.sin_addr.s_addr = inet_addr(addr);
-		} else {
-			sock_addr.sin_addr.s_addr = INADDR_ANY;
-		}
-		sock_addr.sin_port = htons(port);
+		sock_addr.sin_addr.s_addr = ip;
+		sock_addr.sin_port = port;
 		// Bind the socket for listening
 		if (bind(sockfd, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0) {
 			fprintf(stderr, "Couldn't bind to local port\n");

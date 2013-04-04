@@ -249,7 +249,7 @@ void UDPRead(Socket socket, T *obj, unsigned long *hostFrom, int *portFrom)
 class ClientUDP
 {
 public:
-	explicit ClientUDP(int port) { socket = NetOpenUDP(NULL, port); }
+	explicit ClientUDP(int port) { socket = NetOpenUDP(htonl(0x7F000001), htons(port)); }
 	~ClientUDP() { NetCloseUDP(socket); }
 
 	template <typename T>

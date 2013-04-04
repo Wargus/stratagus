@@ -35,14 +35,11 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdint.h>
-#include "net_lowlevel.h"
+#include "network/udpsocket.h"
 
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
-
-#define IsNetworkGame() (NetworkFildes != (Socket)-1)
 
 #define NetworkDefaultPort 6660  /// Default communication port
 
@@ -59,7 +56,7 @@ class CUnitType;
 
 extern char *NetworkAddr;         /// Local network address to use
 extern int NetworkPort;           /// Local network port to use
-extern Socket NetworkFildes;      /// Network file descriptor
+extern CUDPSocket NetworkFildes;  /// Network file descriptor
 extern int NetworkInSync;         /// Network is in sync
 extern int NetworkUpdates;        /// Network update each # game cycles
 extern int NetworkLag;            /// Network lag (# game cycles)
@@ -68,6 +65,7 @@ extern int NetworkLag;            /// Network lag (# game cycles)
 --  Functions
 ----------------------------------------------------------------------------*/
 
+extern inline bool IsNetworkGame() { return NetworkFildes.IsValid(); }
 extern void InitNetwork1();  /// Initialise network part 1 (ports)
 extern void InitNetwork2();  /// Initialise network part 2
 extern void ExitNetwork1();  /// Cleanup network part 1 (ports)

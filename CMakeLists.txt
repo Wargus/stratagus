@@ -229,6 +229,7 @@ set(network_SRCS
 	src/network/master.cpp
 	src/network/netconnect.cpp
 	src/network/network.cpp
+	src/network/udpsocket.cpp
 )
 source_group(network FILES ${network_SRCS})
 
@@ -534,6 +535,7 @@ set(stratagus_generic_HDRS
 	src/include/net_message.h
 	src/include/netconnect.h
 	src/include/network.h
+	src/include/network/udpsocket.h
 	src/include/parameters.h
 	src/include/particle.h
 	src/include/pathfinder.h

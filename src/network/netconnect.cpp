@@ -40,7 +40,6 @@
 #include "interface.h"
 #include "map.h"
 #include "master.h"
-#include "net_lowlevel.h"
 #include "network.h"
 #include "parameters.h"
 #include "player.h"
@@ -97,12 +96,12 @@ public:
 	void Init(const std::string &name, CServerSetup *serverSetup);
 
 	void Update(unsigned long frameCounter);
-	void Parse(unsigned long frameCounter, const unsigned char *buf, unsigned long host, int port);
+	void Parse(unsigned long frameCounter, const unsigned char *buf, const CHost &host);
 
 	void MarkClientsAsResync();
 	void KickClient(int c);
 private:
-	int Parse_Hello(int h, const CInitMessage_Hello &msg, unsigned long host, int port);
+	int Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host);
 	void Parse_Resync(const int h);
 	void Parse_Waiting(const int h);
 	void Parse_Map(const int h);
@@ -111,7 +110,7 @@ private:
 	void Parse_SeeYou(const int h);
 
 	void Send_AreYouThere(const CNetworkHost &host);
-	void Send_GameFull(unsigned long host, int port);
+	void Send_GameFull(const CHost &host);
 	void Send_Welcome(const CNetworkHost &host, int hostIndex);
 	void Send_Resync(const CNetworkHost &host, int hostIndex);
 	void Send_Map(const CNetworkHost &host);
@@ -127,17 +126,14 @@ class CClient
 {
 public:
 	void Init(const std::string &name, CServerSetup *serverSetup, CServerSetup *localSetup, unsigned long tick);
-	bool SetupServerAddress(const std::string &serveraddr, int port);
+	void SetServerHost(const CHost &host) { serverHost = host; }
 
-	bool Parse(const unsigned char *buf, unsigned long host, int port);
+	bool Parse(const unsigned char *buf, const CHost &host);
 	bool Update(unsigned long tick);
 
 	void DetachFromServer();
 
 	int GetNetworkState() const { return networkState.State; }
-
-	unsigned long GetServerIP() const { return ntohl(serverIP); }
-	int GetServerPort() const { return ntohs(serverPort); }
 
 private:
 	bool Update_disconnected();
@@ -179,8 +175,7 @@ private:
 
 private:
 	std::string name;
-	unsigned long serverIP;  /// IP of server to join
-	int serverPort;   /// Server network port to use
+	CHost serverHost;  /// IP:port of server to join
 	NetworkState networkState;
 	unsigned char lastMsgTypeSent;  /// Subtype of last InitConfig message sent
 	CServerSetup *serverSetup;
@@ -202,18 +197,18 @@ static CClient Client;
 ** @param msg The message to send
 */
 template <typename T>
-static void NetworkSendICMessage(unsigned long host, int port, const T &msg)
+static void NetworkSendICMessage(const CHost &host, const T &msg)
 {
 	const unsigned char *buf = msg.Serialize();
-	NetSendUDP(NetworkFildes, host, port, buf, msg.Size());
+	NetworkFildes.Send(host, buf, msg.Size());
 	delete[] buf;
 }
 
-void NetworkSendICMessage(unsigned long host, int port, const CInitMessage_Header &msg)
+void NetworkSendICMessage(const CHost &host, const CInitMessage_Header &msg)
 {
 	unsigned char *buf = new unsigned char [msg.Size()];
 	msg.Serialize(buf);
-	NetSendUDP(NetworkFildes, host, port, buf, msg.Size());
+	NetworkFildes.Send(host, buf, msg.Size());
 	delete[] buf;
 }
 
@@ -267,22 +262,26 @@ static const char *icmsgsubtypenames[] = {
 #endif
 
 template <typename T>
-static void NetworkSendICMessage_Log(unsigned long ip, int port, const T &msg)
+static void NetworkSendICMessage_Log(const CHost &host, const T &msg)
 {
-	NetworkSendICMessage(ip, port, msg);
+	NetworkSendICMessage(host, msg);
 
-	DebugPrint("Sending to %d.%d.%d.%d:%d -> %s\n"
-			   _C_ NIPQUAD(ntohl(ip)) _C_ ntohs(port)
+#ifdef DEBUG
+	const std::string hostStr = host.toString();
+	DebugPrint("Sending to %s -> %s\n" _C_ hostStr.c_str()
 			   _C_ icmsgsubtypenames[msg.GetHeader().GetSubType()]);
+#endif
 }
 
-static void NetworkSendICMessage_Log(unsigned long ip, int port, const CInitMessage_Header &msg)
+static void NetworkSendICMessage_Log(const CHost &host, const CInitMessage_Header &msg)
 {
-	NetworkSendICMessage(ip, port, msg);
+	NetworkSendICMessage(host, msg);
 
-	DebugPrint("Sending to %d.%d.%d.%d:%d -> %s\n"
-			   _C_ NIPQUAD(ntohl(ip)) _C_ ntohs(port)
+#ifdef DEBUG
+	const std::string hostStr = host.toString();
+	DebugPrint("Sending to %s -> %s\n" _C_ hostStr.c_str()
 			   _C_ icmsgsubtypenames[msg.GetSubType()]);
+#endif
 }
 
 /**
@@ -307,7 +306,7 @@ void CClient::SendRateLimited(const T &msg, unsigned long tick, unsigned long ms
 		networkState.MsgCnt = 0;
 		lastMsgTypeSent = subtype;
 	}
-	NetworkSendICMessage(serverIP, serverPort, msg);
+	NetworkSendICMessage(serverHost, msg);
 	DebugPrint("[%s] Sending (%s:#%d)\n" _C_
 			   ncconstatenames[networkState.State] _C_
 			   icmsgsubtypenames[subtype] _C_ networkState.MsgCnt);
@@ -328,22 +327,10 @@ void CClient::SendRateLimited<CInitMessage_Header>(const CInitMessage_Header &ms
 		networkState.MsgCnt = 0;
 		lastMsgTypeSent = subtype;
 	}
-	NetworkSendICMessage(serverIP, serverPort, msg);
+	NetworkSendICMessage(serverHost, msg);
 	DebugPrint("[%s] Sending (%s:#%d)\n" _C_
 			   ncconstatenames[networkState.State] _C_
 			   icmsgsubtypenames[subtype] _C_ networkState.MsgCnt);
-}
-
-bool CClient::SetupServerAddress(const std::string &serveraddr, int port)
-{
-	unsigned long addr = NetResolveHost(serveraddr);
-
-	if (addr == INADDR_NONE) {
-		return false;
-	}
-	serverIP = addr;
-	serverPort = htons(port);
-	return true;
 }
 
 void CClient::Init(const std::string &name, CServerSetup *serverSetup, CServerSetup *localSetup, unsigned long tick)
@@ -370,7 +357,7 @@ bool CClient::Update_disconnected()
 
 	// Spew out 5 and trust in God that they arrive
 	for (int i = 0; i < 5; ++i) {
-		NetworkSendICMessage(serverIP, serverPort, message);
+		NetworkSendICMessage(serverHost, message);
 	}
 	networkState.State = ccs_usercanceled;
 	return false;
@@ -612,11 +599,13 @@ void CClient::SetConfig(const CInitMessage_Config &msg)
 		if (i != msg.clientIndex) {
 			Hosts[HostsCount] = msg.hosts[i];
 			HostsCount++;
-			DebugPrint("Client %d = %d.%d.%d.%d:%d [%.*s]\n" _C_
-					   msg.hosts[i].PlyNr _C_ NIPQUAD(ntohl(msg.hosts[i].Host)) _C_
-					   ntohs(msg.hosts[i].Port) _C_
+#ifdef DEBUG
+			const std::string hostStr = CHost(msg.hosts[i].Host, msg.hosts[i].Port).toString();
+			DebugPrint("Client %d = %s [%.*s]\n" _C_
+					   msg.hosts[i].PlyNr _C_ hostStr.c_str() _C_
 					   static_cast<int>(sizeof(msg.hosts[i].PlyName)) _C_
 					   msg.hosts[i].PlyName);
+#endif
 		} else { // Own client
 			NetLocalPlayerNumber = msg.hosts[i].PlyNr;
 			DebugPrint("SELF %d [%.*s]\n" _C_ msg.hosts[i].PlyNr _C_
@@ -625,20 +614,23 @@ void CClient::SetConfig(const CInitMessage_Config &msg)
 		}
 	}
 	// server is last:
-	Hosts[HostsCount].Host = serverIP;
-	Hosts[HostsCount].Port = serverPort;
+	Hosts[HostsCount].Host = serverHost.getIp();
+	Hosts[HostsCount].Port = serverHost.getPort();
 	Hosts[HostsCount].PlyNr = msg.hosts[msg.hostsCount - 1].PlyNr;
 	Hosts[HostsCount].SetName(msg.hosts[msg.hostsCount - 1].PlyName);
 	++HostsCount;
 	NetPlayers = HostsCount + 1;
-	DebugPrint("Server %d = %d.%d.%d.%d:%d [%.*s]\n" _C_
+#ifdef DEBUG
+	const std::string serverHostStr = serverHost.toString();
+	DebugPrint("Server %d = %s [%.*s]\n" _C_
 			   msg.hosts[msg.hostsCount - 1].PlyNr _C_
-			   NIPQUAD(GetServerIP()) _C_ GetServerPort() _C_
+			   serverHostStr.c_str() _C_
 			   static_cast<int>(sizeof(msg.hosts[msg.hostsCount - 1].PlyName)) _C_
 			   msg.hosts[msg.hostsCount - 1].PlyName);
+#endif
 }
 
-bool CClient::Parse(const unsigned char *buf, unsigned long host, int port)
+bool CClient::Parse(const unsigned char *buf, const CHost &host)
 {
 	CInitMessage_Header header;
 	header.Deserialize(buf);
@@ -646,8 +638,7 @@ bool CClient::Parse(const unsigned char *buf, unsigned long host, int port)
 	if (header.GetType() != MessageInit_FromServer) {
 		return true;
 	}
-	// Assert(host == this->serverIP);
-	// Assert(port == this->serverPort);
+	// Assert(host == this->serverHost);
 	const unsigned char msgsubtype = header.GetSubType();
 
 	DebugPrint("Received %s in state %s\n" _C_ icmsgsubtypenames[msgsubtype]
@@ -788,8 +779,8 @@ void CClient::Parse_Welcome(const unsigned char *buf)
 	NetworkLag = msg.Lag;
 	NetworkUpdates = msg.Updates;
 
-	Hosts[0].Host = serverIP;
-	Hosts[0].Port = serverPort;
+	Hosts[0].Host = serverHost.getIp();
+	Hosts[0].Port = serverHost.getPort();
 	for (int i = 1; i < PlayerMax; ++i) {
 		if (i != NetLocalHostsSlot) {
 			Hosts[i] = msg.hosts[i];
@@ -861,8 +852,8 @@ void CClient::Parse_GameFull()
 	if (networkState.State != ccs_connecting) {
 		return;
 	}
-	fprintf(stderr, "Server at %d.%d.%d.%d:%d is full!\n",
-			NIPQUAD(GetServerIP()), GetServerPort());
+	const std::string serverHostStr = serverHost.toString();
+	fprintf(stderr, "Server at %s is full!\n", serverHostStr.c_str());
 	networkState.State = ccs_nofreeslots;
 }
 
@@ -874,11 +865,12 @@ void CClient::Parse_ProtocolMismatch(const unsigned char *buf)
 	CInitMessage_ProtocolMismatch msg;
 
 	msg.Deserialize(buf);
+	const std::string serverHostStr = serverHost.toString();
 	fprintf(stderr, "Incompatible network protocol version "
 			NetworkProtocolFormatString " <-> " NetworkProtocolFormatString "\n"
-			"from %d.%d.%d.%d:%d\n",
+			"from %s\n",
 			NetworkProtocolFormatArgs(NetworkProtocolVersion), NetworkProtocolFormatArgs(msg.Version),
-			NIPQUAD(GetServerIP()), GetServerPort());
+			serverHostStr.c_str());
 	networkState.State = ccs_incompatiblenetwork;
 }
 
@@ -890,10 +882,9 @@ void CClient::Parse_EngineMismatch(const unsigned char *buf)
 	CInitMessage_EngineMismatch msg;
 
 	msg.Deserialize(buf);
-	fprintf(stderr, "Incompatible Stratagus version %d <-> %d\n"
-			"from %d.%d.%d.%d:%d\n",
-			StratagusVersion, msg.Stratagus,
-			NIPQUAD(GetServerIP()), GetServerPort());
+	const std::string serverHostStr = serverHost.toString();
+	fprintf(stderr, "Incompatible Stratagus version %d <-> %d\nfrom %s\n",
+			StratagusVersion, msg.Stratagus, serverHostStr.c_str());
 	networkState.State = ccs_incompatibleengine;
 }
 
@@ -906,7 +897,7 @@ void CClient::Parse_AreYouThere()
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMIAH); // IAmHere
 
-	NetworkSendICMessage(serverIP, serverPort, message);
+	NetworkSendICMessage(serverHost, message);
 }
 
 //
@@ -942,14 +933,14 @@ void CServer::Send_AreYouThere(const CNetworkHost &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMAYT); // AreYouThere
 
-	NetworkSendICMessage(host.Host, host.Port, message);
+	NetworkSendICMessage(CHost(host.Host, host.Port), message);
 }
 
-void CServer::Send_GameFull(unsigned long host, int port)
+void CServer::Send_GameFull(const CHost &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMGameFull);
 
-	NetworkSendICMessage_Log(host, port, message);
+	NetworkSendICMessage_Log(host, message);
 }
 
 void CServer::Send_Welcome(const CNetworkHost &host, int index)
@@ -963,7 +954,7 @@ void CServer::Send_Welcome(const CNetworkHost &host, int index)
 			message.hosts[i] = Hosts[i];
 		}
 	}
-	NetworkSendICMessage_Log(host.Host, host.Port, message);
+	NetworkSendICMessage_Log(CHost(host.Host, host.Port), message);
 }
 
 void CServer::Send_Resync(const CNetworkHost &host, int hostIndex)
@@ -975,28 +966,28 @@ void CServer::Send_Resync(const CNetworkHost &host, int hostIndex)
 			message.hosts[i] = Hosts[i];
 		}
 	}
-	NetworkSendICMessage_Log(host.Host, host.Port, message);
+	NetworkSendICMessage_Log(CHost(host.Host, host.Port), message);
 }
 
 void CServer::Send_Map(const CNetworkHost &host)
 {
 	const CInitMessage_Map message(NetworkMapName.c_str(), Map.Info.MapUID);
 
-	NetworkSendICMessage_Log(host.Host, host.Port, message);
+	NetworkSendICMessage_Log(CHost(host.Host, host.Port), message);
 }
 
 void CServer::Send_State(const CNetworkHost &host)
 {
 	const CInitMessage_State message(MessageInit_FromServer, *serverSetup);
 
-	NetworkSendICMessage_Log(host.Host, host.Port, message);
+	NetworkSendICMessage_Log(CHost(host.Host, host.Port), message);
 }
 
 void CServer::Send_GoodBye(const CNetworkHost &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMGoodBye);
 
-	NetworkSendICMessage_Log(host.Host, host.Port, message);
+	NetworkSendICMessage_Log(CHost(host.Host, host.Port), message);
 }
 
 void CServer::Update(unsigned long frameCounter)
@@ -1031,11 +1022,10 @@ void CServer::MarkClientsAsResync()
 **  @param h slot number of host msg originates from
 **  @param msg message received
 **  @param host  host which send the message
-**  @param port  port from where the messahe nas been sent
 **
 **  @return host index
 */
-int CServer::Parse_Hello(int h, const CInitMessage_Hello &msg, unsigned long host, int port)
+int CServer::Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host)
 {
 	if (h == -1) { // it is a new client
 		for (int i = 1; i < PlayerMax - 1; ++i) {
@@ -1048,17 +1038,19 @@ int CServer::Parse_Hello(int h, const CInitMessage_Hello &msg, unsigned long hos
 			}
 		}
 		if (h != -1) {
-			Hosts[h].Host = host;
-			Hosts[h].Port = port;
+			Hosts[h].Host = host.getIp();
+			Hosts[h].Port = host.getPort();
 			Hosts[h].PlyNr = h;
 			Hosts[h].SetName(msg.PlyName);
-			DebugPrint("New client %d.%d.%d.%d:%d [%s]\n" _C_
-					   NIPQUAD(ntohl(host)) _C_ ntohs(port) _C_ Hosts[h].PlyName);
+#ifdef DEBUG
+			const std::string hostStr = host.toString();
+			DebugPrint("New client %s [%s]\n" _C_ hostStr.c_str() _C_ Hosts[h].PlyName);
+#endif
 			networkStates[h].State = ccs_connecting;
 			networkStates[h].MsgCnt = 0;
 		} else {
 			// Game is full - reject connnection
-			Send_GameFull(host, port);
+			Send_GameFull(host);
 			return -1;
 		}
 	}
@@ -1291,55 +1283,53 @@ void CServer::Parse_SeeYou(const int h)
 **
 **  @param msg message received
 **  @param host  host which send the message
-**  @param port  port from where the message nas been sent
 **
 **  @return 0 if the versions match, -1 otherwise
 */
-static int CheckVersions(const CInitMessage_Hello &msg, unsigned long host, int port)
+static int CheckVersions(const CInitMessage_Hello &msg, const CHost &host)
 {
 	if (msg.Stratagus != StratagusVersion) {
-		fprintf(stderr, "Incompatible Stratagus version "
-				"%d <-> %d\n"
-				"from %d.%d.%d.%d:%d\n",
-				StratagusVersion, msg.Stratagus,
-				NIPQUAD(ntohl(host)), ntohs(port));
+		const std::string hostStr = host.toString();
+		fprintf(stderr, "Incompatible Stratagus version %d <-> %d from %s\n",
+				StratagusVersion, msg.Stratagus, hostStr.c_str());
 
 		const CInitMessage_EngineMismatch message;
-		NetworkSendICMessage_Log(host, port, message);
+		NetworkSendICMessage_Log(host, message);
 		return -1;
 	}
 
 	if (msg.Version != NetworkProtocolVersion) {
+		const std::string hostStr = host.toString();
 		fprintf(stderr, "Incompatible network protocol version "
 				NetworkProtocolFormatString " <-> "
 				NetworkProtocolFormatString "\n"
-				"from %d.%d.%d.%d:%d\n",
+				"from %s\n",
 				NetworkProtocolFormatArgs(NetworkProtocolVersion),
 				NetworkProtocolFormatArgs(msg.Version),
-				NIPQUAD(ntohl(host)), ntohs(port));
+				hostStr.c_str());
 
 		const CInitMessage_ProtocolMismatch message;
-		NetworkSendICMessage_Log(host, port, message);
+		NetworkSendICMessage_Log(host, message);
 		return -1;
 	}
 	return 0;
 }
 
-void CServer::Parse(unsigned long frameCounter, const unsigned char *buf, unsigned long host, int port)
+void CServer::Parse(unsigned long frameCounter, const unsigned char *buf, const CHost &host)
 {
 	const unsigned char msgsubtype = buf[1];
-	int index = FindHostIndexBy(host, port);
+	int index = FindHostIndexBy(host);
 
 	if (index == -1) {
 		if (msgsubtype == ICMHello) {
 			CInitMessage_Hello msg;
 
 			msg.Deserialize(buf);
-			if (CheckVersions(msg, host, port)) {
+			if (CheckVersions(msg, host)) {
 				return;
 			}
 			// Special case: a new client has arrived
-			index = Parse_Hello(-1, msg, host, port);
+			index = Parse_Hello(-1, msg, host);
 			networkStates[index].LastFrame = frameCounter;
 		}
 		return;
@@ -1350,7 +1340,7 @@ void CServer::Parse(unsigned long frameCounter, const unsigned char *buf, unsign
 			CInitMessage_Hello msg;
 
 			msg.Deserialize(buf);
-			Parse_Hello(index, msg, host, port);
+			Parse_Hello(index, msg, host);
 			break;
 		}
 		case ICMResync: Parse_Resync(index); break;
@@ -1385,11 +1375,10 @@ void CServer::Parse(unsigned long frameCounter, const unsigned char *buf, unsign
 **  @param buf Packet received
 **  @param size size of the received packet.
 **  @param host  host which send the message
-**  @param port  port from where the message nas been sent
 **
 **  @return 1 if packet is an InitConfig message, 0 otherwise
 */
-int NetworkParseSetupEvent(const unsigned char *buf, int size, unsigned long host, int port)
+int NetworkParseSetupEvent(const unsigned char *buf, int size, const CHost &host)
 {
 	Assert(NetConnectRunning != 0);
 
@@ -1408,16 +1397,18 @@ int NetworkParseSetupEvent(const unsigned char *buf, int size, unsigned long hos
 	}
 	const unsigned char msgsubtype = header.GetSubType();
 
-	DebugPrint("Received %s (%d) from %d.%d.%d.%d:%d\n" _C_
+#ifdef DEBUG
+	const std::string hostStr = host.toString();
+	DebugPrint("Received %s (%d) from %s\n" _C_
 			   icmsgsubtypenames[int(msgsubtype)] _C_ msgsubtype _C_
-			   NIPQUAD(ntohl(host)) _C_ ntohs(port));
-
+			   hostStr.c_str());
+#endif
 	if (NetConnectRunning == 2) { // client
-		if (Client.Parse(buf, host, port) == false) {
+		if (Client.Parse(buf, host) == false) {
 			NetConnectRunning = 0;
 		}
 	} else if (NetConnectRunning == 1) { // server
-		Server.Parse(FrameCounter, buf, host, port);
+		Server.Parse(FrameCounter, buf, host);
 	}
 	return 1;
 }
@@ -1437,10 +1428,10 @@ int GetNetworkState()
 	return Client.GetNetworkState();
 }
 
-int FindHostIndexBy(unsigned long ip, int port)
+int FindHostIndexBy(const CHost &host)
 {
 	for (int i = 0; i != PlayerMax; ++i) {
-		if (Hosts[i].Host == ip && Hosts[i].Port == port) {
+		if (Hosts[i].Host == host.getIp() && Hosts[i].Port == host.getPort()) {
 			return i;
 		}
 	}
@@ -1517,7 +1508,8 @@ void NetworkServerStartGame()
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
 		if (ServerSetupState.CompOpt[i] == 0) {
-			printf(" %d.%d.%d.%d:%d %s", NIPQUAD(ntohl(Hosts[i].Host)), ntohs(Hosts[i].Port), Hosts[i].PlyName);
+			const std::string hostStr = CHost(Hosts[i].Host, Hosts[i].Port).toString();
+			printf(" %s %s", hostStr.c_str(), Hosts[i].PlyName);
 		}
 		printf("\n");
 	}
@@ -1640,26 +1632,26 @@ void NetworkServerStartGame()
 breakout:
 		// Send to all clients.
 		for (int i = 0; i < HostsCount; ++i) {
-			const unsigned long host = message.hosts[i].Host;
-			const int port = message.hosts[i].Port;
+			const CHost host(message.hosts[i].Host, message.hosts[i].Port);
 
 			if (num[Hosts[i].PlyNr] == 1) { // not acknowledged yet
 				message.clientIndex = i;
-				NetworkSendICMessage_Log(host, port, message);
+				NetworkSendICMessage_Log(host, message);
 			} else if (num[Hosts[i].PlyNr] == 2) {
-				NetworkSendICMessage_Log(host, port, statemsg);
+				NetworkSendICMessage_Log(host, statemsg);
 			}
 		}
 
 		// Wait for acknowledge
 		unsigned char buf[1024];
-		while (j && NetSocketReady(NetworkFildes, 1000)) {
-			unsigned long host;
-			int port;
-			const int len = NetRecvUDP(NetworkFildes, buf, sizeof(buf), &host, &port);
+		while (j && NetworkFildes.HasDataToRead(1000)) {
+			CHost host;
+			const int len = NetworkFildes.Recv(buf, sizeof(buf), &host);
 			if (len < 0) {
-				DebugPrint("*Receive ack failed: (%d) from %d.%d.%d.%d:%d\n" _C_
-						   len _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
+#ifdef DEBUG
+				const std::string hostStr = host.toString();
+				DebugPrint("*Receive ack failed: (%d) from %s\n" _C_ len _C_ hostStr.c_str());
+#endif
 				continue;
 			}
 			CInitMessage_Header header;
@@ -1670,10 +1662,11 @@ breakout:
 			if (type == MessageInit_FromClient) {
 				switch (subtype) {
 					case ICMConfig: {
-						DebugPrint("Got ack for InitConfig from %d.%d.%d.%d:%d\n"
-								   _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
-
-						const int index = FindHostIndexBy(host, port);
+#ifdef DEBUG
+						const std::string hostStr = host.toString();
+						DebugPrint("Got ack for InitConfig from %s\n" _C_ hostStr.c_str());
+#endif
+						const int index = FindHostIndexBy(host);
 						if (index != -1) {
 							if (num[Hosts[index].PlyNr] == 1) {
 								num[Hosts[index].PlyNr]++;
@@ -1683,10 +1676,11 @@ breakout:
 						break;
 					}
 					case ICMGo: {
-						DebugPrint("Got ack for InitState from %d.%d.%d.%d:%d\n"
-								   _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
-
-						const int index = FindHostIndexBy(host, port);
+#ifdef DEBUG
+						const std::string hostStr = host.toString();
+						DebugPrint("Got ack for InitState from %s\n" _C_ hostStr.c_str());
+#endif
+						const int index = FindHostIndexBy(host);
 						if (index != -1) {
 							if (num[Hosts[index].PlyNr] == 2) {
 								num[Hosts[index].PlyNr] = 0;
@@ -1710,9 +1704,8 @@ breakout:
 	// Give clients a quick-start kick..
 	const CInitMessage_Header message_go(MessageInit_FromServer, ICMGo);
 	for (int i = 0; i < HostsCount; ++i) {
-		const unsigned long host = Hosts[i].Host;
-		const int port = Hosts[i].Port;
-		NetworkSendICMessage_Log(host, port, message_go);
+		const CHost host(Hosts[i].Host, Hosts[i].Port);
+		NetworkSendICMessage_Log(host, message_go);
 	}
 }
 
@@ -1728,10 +1721,15 @@ int NetworkSetupServerAddress(const std::string &serveraddr, int port)
 	if (port == 0) {
 		port = NetworkDefaultPort;
 	}
-	if (Client.SetupServerAddress(serveraddr, port) == false) {
+	CHost host(serveraddr.c_str(), port);
+	if (host.isValid() == false) {
 		return 1;
 	}
-	DebugPrint("SELECTED SERVER: %s:%d (%d.%d.%d.%d)\n" _C_ serveraddr.c_str() _C_ Client.GetServerPort() _C_ NIPQUAD(Client.GetServerIP()));
+	Client.SetServerHost(host);
+#ifdef DEBUG
+	const std::string hostStr = host.toString();
+	DebugPrint("SELECTED SERVER: %s [%s]\n" _C_ hostStr.c_str() _C_ serveraddr.c_str());
+#endif
 	return 0;
 }
 

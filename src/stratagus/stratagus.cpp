@@ -213,6 +213,7 @@ extern void beos_init(int argc, char **argv);
 
 
 #if defined(USE_WIN32) && ! defined(NO_STDIO_REDIRECT)
+#include "windows.h"
 #define REDIRECT_OUTPUT
 #endif
 

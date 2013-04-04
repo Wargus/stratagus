@@ -943,7 +943,7 @@ void WaitEventsOneFrame()
 		// Network
 		int s = 0;
 		if (IsNetworkGame()) {
-			s = NetSocketReady(NetworkFildes, 0);
+			s = NetworkFildes.HasDataToRead(0);
 			if (s > 0) {
 				GetCallbacks()->NetworkEvent();
 			}

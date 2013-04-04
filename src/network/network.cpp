@@ -270,7 +270,7 @@ struct NetworkSelectionHeader {
 
 char *NetworkAddr = NULL;                  /// Local network address to use
 int NetworkPort = NetworkDefaultPort;      /// Local network port to use
-Socket NetworkFildes = static_cast<Socket>(-1);   /// Network file descriptor
+CUDPSocket NetworkFildes;                  /// Network file descriptor
 int NetworkInSync = 1;                     /// Network is in sync
 int NetworkUpdates = 5;                    /// Network update each # game cycles
 int NetworkLag = 10;                       /// Network lag in # game cycles
@@ -321,7 +321,8 @@ static void NetworkBroadcast(const CNetworkPacket &packet, int numcommands)
 
 	// Send to all clients.
 	for (int i = 0; i < HostsCount; ++i) {
-		NetSendUDP(NetworkFildes, Hosts[i].Host, Hosts[i].Port, buf, CNetworkPacket::Size(numcommands));
+		const CHost host(Hosts[i].Host, Hosts[i].Port);
+		NetworkFildes.Send(host, buf, CNetworkPacket::Size(numcommands));
 	}
 	delete[] buf;
 }
@@ -367,7 +368,7 @@ static void NetworkSendPacket(const CNetworkCommandQueue ncq[])
 */
 void InitNetwork1()
 {
-	NetworkFildes = static_cast<Socket>(-1);
+	NetworkFildes.Close();
 	NetworkInSync = 1;
 
 	NetInit(); // machine dependent setup
@@ -384,16 +385,15 @@ void InitNetwork1()
 
 	// Our communication port
 	int port = NetworkPort;
-	int i;
-	for (i = 0; i < 10; ++i) {
-		NetworkFildes = NetOpenUDP(NetworkAddr, port + i);
-		if (NetworkFildes != static_cast<Socket>(-1)) {
+	for (int i = 0; i < 10; ++i) {
+		NetworkFildes.Open(CHost(NetworkAddr, port + i));
+		if (NetworkFildes.IsValid()) {
 			port = port + i;
 			break;
 		}
 	}
-	if (i == 10) {
-		fprintf(stderr, "NETWORK: No free ports %d-%d available, aborting\n", port, port + i);
+	if (NetworkFildes.IsValid() == false) {
+		fprintf(stderr, "NETWORK: No free ports %d-%d available, aborting\n", port, port + 10);
 		NetExit(); // machine dependent network exit
 		return;
 	}
@@ -419,10 +419,8 @@ void InitNetwork1()
 
 		gethostname(buf, sizeof(buf));
 		DebugPrint("%s\n" _C_ buf);
-		const unsigned long myHost = NetResolveHost(buf);
-		const int myPort = port;
-		DebugPrint("My host:port %d.%d.%d.%d:%d\n" _C_
-				   NIPQUAD(ntohl(myHost)) _C_ myPort);
+		const std::string hostStr = CHost(buf, port).toString();
+		DebugPrint("My host:port %s\n" _C_ hostStr.c_str());
 	}
 #endif
 
@@ -449,10 +447,9 @@ void ExitNetwork1()
 			   NetworkSendPackets _C_ NetworkSendResend);
 #endif
 
-	NetCloseUDP(NetworkFildes);
+	NetworkFildes.Close();
 	NetExit(); // machine dependent setup
 
-	NetworkFildes = static_cast<Socket>(-1);
 	NetworkInSync = 1;
 	NetPlayers = 0;
 	HostsCount = 0;
@@ -672,9 +669,8 @@ void NetworkSendSelection(CUnit **units, int count)
 		const int len = CNetworkPacketHeader::Size() + CNetworkSelection::Size() * numcommands;
 
 		for (int i = 0; i < numteammates; ++i) {
-			const unsigned long ip = Hosts[teammates[i]].Host;
-			const int port = Hosts[teammates[i]].Port;
-			NetSendUDP(NetworkFildes, ip, port, buf, len);
+			const CHost host(Hosts[teammates[i]].Host, Hosts[teammates[i]].Port);
+			NetworkFildes.Send(host, buf, len);
 		}
 		delete [] buf;
 	}
@@ -743,9 +739,8 @@ void NetworkEvent()
 	}
 	// Read the packet.
 	unsigned char buf[1024];
-	unsigned long host;
-	int port;
-	int len = NetRecvUDP(NetworkFildes, &buf, sizeof(buf), &host, &port);
+	CHost host;
+	int len = NetworkFildes.Recv(&buf, sizeof(buf), &host);
 	if (len < 0) {
 		DebugPrint("Server/Client gone?\n");
 		// just hope for an automatic recover right now..
@@ -759,7 +754,7 @@ void NetworkEvent()
 
 	// Setup messages
 	if (NetConnectRunning) {
-		if (NetworkParseSetupEvent(buf, len, host, port)) {
+		if (NetworkParseSetupEvent(buf, len, host)) {
 			return;
 		}
 	}
@@ -771,10 +766,12 @@ void NetworkEvent()
 		return;
 	}
 
-	const int index = FindHostIndexBy(host, port);
+	const int index = FindHostIndexBy(host);
 	if (index == -1 || PlayerQuit[Hosts[index].PlyNr]) {
-		DebugPrint("Not a host in play: %d.%d.%d.%d:%d\n" _C_
-				   NIPQUAD(ntohl(host)) _C_ ntohs(port));
+#ifdef DEBUG
+		const std::string hostStr = host.toString();
+		DebugPrint("Not a host in play: %s\n" _C_ hostStr.c_str());
+#endif
 		return;
 	}
 	const int player = Hosts[index].PlyNr;
