@@ -93,7 +93,7 @@ CServerSetup LocalSetupState;  // Local selection state for Multiplayer clients
 class CServer
 {
 public:
-	void Init(const std::string &name, CServerSetup *serverSetup);
+	void Init(const std::string &name, CUDPSocket *socket, CServerSetup *serverSetup);
 
 	void Update(unsigned long frameCounter);
 	void Parse(unsigned long frameCounter, const unsigned char *buf, const CHost &host);
@@ -119,13 +119,14 @@ private:
 private:
 	std::string name;
 	NetworkState networkStates[PlayerMax]; /// Client Host states
+	CUDPSocket *socket;
 	CServerSetup *serverSetup;
 };
 
 class CClient
 {
 public:
-	void Init(const std::string &name, CServerSetup *serverSetup, CServerSetup *localSetup, unsigned long tick);
+	void Init(const std::string &name, CUDPSocket *socket, CServerSetup *serverSetup, CServerSetup *localSetup, unsigned long tick);
 	void SetServerHost(const CHost &host) { serverHost = host; }
 
 	bool Parse(const unsigned char *buf, const CHost &host);
@@ -178,6 +179,7 @@ private:
 	CHost serverHost;  /// IP:port of server to join
 	NetworkState networkState;
 	unsigned char lastMsgTypeSent;  /// Subtype of last InitConfig message sent
+	CUDPSocket *socket;
 	CServerSetup *serverSetup;
 	CServerSetup *localSetup;
 };
@@ -197,18 +199,18 @@ static CClient Client;
 ** @param msg The message to send
 */
 template <typename T>
-static void NetworkSendICMessage(const CHost &host, const T &msg)
+static void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const T &msg)
 {
 	const unsigned char *buf = msg.Serialize();
-	NetworkFildes.Send(host, buf, msg.Size());
+	socket.Send(host, buf, msg.Size());
 	delete[] buf;
 }
 
-void NetworkSendICMessage(const CHost &host, const CInitMessage_Header &msg)
+void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg)
 {
 	unsigned char *buf = new unsigned char [msg.Size()];
 	msg.Serialize(buf);
-	NetworkFildes.Send(host, buf, msg.Size());
+	socket.Send(host, buf, msg.Size());
 	delete[] buf;
 }
 
@@ -262,9 +264,9 @@ static const char *icmsgsubtypenames[] = {
 #endif
 
 template <typename T>
-static void NetworkSendICMessage_Log(const CHost &host, const T &msg)
+static void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const T &msg)
 {
-	NetworkSendICMessage(host, msg);
+	NetworkSendICMessage(socket, host, msg);
 
 #ifdef DEBUG
 	const std::string hostStr = host.toString();
@@ -273,9 +275,9 @@ static void NetworkSendICMessage_Log(const CHost &host, const T &msg)
 #endif
 }
 
-static void NetworkSendICMessage_Log(const CHost &host, const CInitMessage_Header &msg)
+static void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg)
 {
-	NetworkSendICMessage(host, msg);
+	NetworkSendICMessage(socket, host, msg);
 
 #ifdef DEBUG
 	const std::string hostStr = host.toString();
@@ -306,7 +308,7 @@ void CClient::SendRateLimited(const T &msg, unsigned long tick, unsigned long ms
 		networkState.MsgCnt = 0;
 		lastMsgTypeSent = subtype;
 	}
-	NetworkSendICMessage(serverHost, msg);
+	NetworkSendICMessage(*socket, serverHost, msg);
 	DebugPrint("[%s] Sending (%s:#%d)\n" _C_
 			   ncconstatenames[networkState.State] _C_
 			   icmsgsubtypenames[subtype] _C_ networkState.MsgCnt);
@@ -327,13 +329,13 @@ void CClient::SendRateLimited<CInitMessage_Header>(const CInitMessage_Header &ms
 		networkState.MsgCnt = 0;
 		lastMsgTypeSent = subtype;
 	}
-	NetworkSendICMessage(serverHost, msg);
+	NetworkSendICMessage(*socket, serverHost, msg);
 	DebugPrint("[%s] Sending (%s:#%d)\n" _C_
 			   ncconstatenames[networkState.State] _C_
 			   icmsgsubtypenames[subtype] _C_ networkState.MsgCnt);
 }
 
-void CClient::Init(const std::string &name, CServerSetup *serverSetup, CServerSetup *localSetup, unsigned long tick)
+void CClient::Init(const std::string &name, CUDPSocket *socket, CServerSetup *serverSetup, CServerSetup *localSetup, unsigned long tick)
 {
 	networkState.LastFrame = tick;
 	networkState.State = ccs_connecting;
@@ -342,6 +344,7 @@ void CClient::Init(const std::string &name, CServerSetup *serverSetup, CServerSe
 	this->serverSetup = serverSetup;
 	this->localSetup = localSetup;
 	this->name = name;
+	this->socket = socket;
 }
 
 void CClient::DetachFromServer()
@@ -357,7 +360,7 @@ bool CClient::Update_disconnected()
 
 	// Spew out 5 and trust in God that they arrive
 	for (int i = 0; i < 5; ++i) {
-		NetworkSendICMessage(serverHost, message);
+		NetworkSendICMessage(*socket, serverHost, message);
 	}
 	networkState.State = ccs_usercanceled;
 	return false;
@@ -897,7 +900,7 @@ void CClient::Parse_AreYouThere()
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMIAH); // IAmHere
 
-	NetworkSendICMessage(serverHost, message);
+	NetworkSendICMessage(*socket, serverHost, message);
 }
 
 //
@@ -919,7 +922,7 @@ void CServer::KickClient(int c)
 	}
 }
 
-void CServer::Init(const std::string &name, CServerSetup *serverSetup)
+void CServer::Init(const std::string &name, CUDPSocket *socket, CServerSetup *serverSetup)
 {
 	for (int i = 0; i < PlayerMax; ++i) {
 		networkStates[i].Clear();
@@ -927,20 +930,21 @@ void CServer::Init(const std::string &name, CServerSetup *serverSetup)
 	}
 	this->serverSetup = serverSetup;
 	this->name = name;
+	this->socket = socket;
 }
 
 void CServer::Send_AreYouThere(const CNetworkHost &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMAYT); // AreYouThere
 
-	NetworkSendICMessage(CHost(host.Host, host.Port), message);
+	NetworkSendICMessage(*socket, CHost(host.Host, host.Port), message);
 }
 
 void CServer::Send_GameFull(const CHost &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMGameFull);
 
-	NetworkSendICMessage_Log(host, message);
+	NetworkSendICMessage_Log(*socket, host, message);
 }
 
 void CServer::Send_Welcome(const CNetworkHost &host, int index)
@@ -954,7 +958,7 @@ void CServer::Send_Welcome(const CNetworkHost &host, int index)
 			message.hosts[i] = Hosts[i];
 		}
 	}
-	NetworkSendICMessage_Log(CHost(host.Host, host.Port), message);
+	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
 void CServer::Send_Resync(const CNetworkHost &host, int hostIndex)
@@ -966,28 +970,28 @@ void CServer::Send_Resync(const CNetworkHost &host, int hostIndex)
 			message.hosts[i] = Hosts[i];
 		}
 	}
-	NetworkSendICMessage_Log(CHost(host.Host, host.Port), message);
+	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
 void CServer::Send_Map(const CNetworkHost &host)
 {
 	const CInitMessage_Map message(NetworkMapName.c_str(), Map.Info.MapUID);
 
-	NetworkSendICMessage_Log(CHost(host.Host, host.Port), message);
+	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
 void CServer::Send_State(const CNetworkHost &host)
 {
 	const CInitMessage_State message(MessageInit_FromServer, *serverSetup);
 
-	NetworkSendICMessage_Log(CHost(host.Host, host.Port), message);
+	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
 void CServer::Send_GoodBye(const CNetworkHost &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMGoodBye);
 
-	NetworkSendICMessage_Log(CHost(host.Host, host.Port), message);
+	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
 void CServer::Update(unsigned long frameCounter)
@@ -1286,7 +1290,7 @@ void CServer::Parse_SeeYou(const int h)
 **
 **  @return 0 if the versions match, -1 otherwise
 */
-static int CheckVersions(const CInitMessage_Hello &msg, const CHost &host)
+static int CheckVersions(const CInitMessage_Hello &msg, CUDPSocket &socket, const CHost &host)
 {
 	if (msg.Stratagus != StratagusVersion) {
 		const std::string hostStr = host.toString();
@@ -1294,7 +1298,7 @@ static int CheckVersions(const CInitMessage_Hello &msg, const CHost &host)
 				StratagusVersion, msg.Stratagus, hostStr.c_str());
 
 		const CInitMessage_EngineMismatch message;
-		NetworkSendICMessage_Log(host, message);
+		NetworkSendICMessage_Log(socket, host, message);
 		return -1;
 	}
 
@@ -1309,7 +1313,7 @@ static int CheckVersions(const CInitMessage_Hello &msg, const CHost &host)
 				hostStr.c_str());
 
 		const CInitMessage_ProtocolMismatch message;
-		NetworkSendICMessage_Log(host, message);
+		NetworkSendICMessage_Log(socket, host, message);
 		return -1;
 	}
 	return 0;
@@ -1325,7 +1329,7 @@ void CServer::Parse(unsigned long frameCounter, const unsigned char *buf, const 
 			CInitMessage_Hello msg;
 
 			msg.Deserialize(buf);
-			if (CheckVersions(msg, host)) {
+			if (CheckVersions(msg, *socket, host)) {
 				return;
 			}
 			// Special case: a new client has arrived
@@ -1462,7 +1466,7 @@ void NetworkInitClientConnect()
 	}
 	ServerSetupState.Clear();
 	LocalSetupState.Clear();
-	Client.Init(Parameters::Instance.LocalPlayerName, &ServerSetupState, &LocalSetupState, GetTicks());
+	Client.Init(Parameters::Instance.LocalPlayerName, &NetworkFildes, &ServerSetupState, &LocalSetupState, GetTicks());
 }
 
 /**
@@ -1636,9 +1640,9 @@ breakout:
 
 			if (num[Hosts[i].PlyNr] == 1) { // not acknowledged yet
 				message.clientIndex = i;
-				NetworkSendICMessage_Log(host, message);
+				NetworkSendICMessage_Log(NetworkFildes, host, message);
 			} else if (num[Hosts[i].PlyNr] == 2) {
-				NetworkSendICMessage_Log(host, statemsg);
+				NetworkSendICMessage_Log(NetworkFildes, host, statemsg);
 			}
 		}
 
@@ -1705,7 +1709,7 @@ breakout:
 	const CInitMessage_Header message_go(MessageInit_FromServer, ICMGo);
 	for (int i = 0; i < HostsCount; ++i) {
 		const CHost host(Hosts[i].Host, Hosts[i].Port);
-		NetworkSendICMessage_Log(host, message_go);
+		NetworkSendICMessage_Log(NetworkFildes, host, message_go);
 	}
 }
 
@@ -1753,7 +1757,7 @@ void NetworkInitServerConnect(int openslots)
 	}
 	ServerSetupState.Clear();
 	LocalSetupState.Clear(); // Unused when we are server
-	Server.Init(Parameters::Instance.LocalPlayerName, &ServerSetupState);
+	Server.Init(Parameters::Instance.LocalPlayerName, &NetworkFildes, &ServerSetupState);
 
 	// preset the server (initially always slot 0)
 	Hosts[0].SetName(Parameters::Instance.LocalPlayerName.c_str());
