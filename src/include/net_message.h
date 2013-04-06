@@ -336,6 +336,13 @@ public:
 	void Deserialize(const unsigned char *p);
 	static size_t Size() { return 2 + 2 + 2 + 2; }
 
+	bool operator == (const CNetworkCommand &rhs) const
+	{
+		return Unit == rhs.Unit && X == rhs.X && Y == rhs.Y && Dest == rhs.Dest;
+	}
+	bool operator != (const CNetworkCommand &rhs) const { return !(*this == rhs); }
+
+public:
 	uint16_t Unit;         /// Command for unit
 	uint16_t X;            /// Map position X
 	uint16_t Y;            /// Map position Y
