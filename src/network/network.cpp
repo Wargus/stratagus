@@ -262,7 +262,6 @@ public:
 	CNetworkCommand Data;  /// command content
 };
 
-
 /**
 **  Network Selection Info
 */
@@ -277,12 +276,28 @@ struct NetworkSelectionHeader {
 //  Variables
 //----------------------------------------------------------------------------
 
-char *NetworkAddr = NULL;                  /// Local network address to use
-int NetworkPort = NetworkDefaultPort;      /// Local network port to use
-CUDPSocket NetworkFildes;                  /// Network file descriptor
+/* static */ CNetworkParameter CNetworkParameter::Instance;
+
+CNetworkParameter::CNetworkParameter()
+{
+	localHost = "127.0.0.1";
+	localPort = defaultPort;
+	NetworkUpdates = 5;
+	NetworkLag = 10;
+}
+
+void CNetworkParameter::FixValues()
+{
+	NetworkUpdates = std::max(NetworkUpdates, 1);
+	NetworkLag = std::max(NetworkLag, 2 * NetworkUpdates);
+	// Lag must be multiple of updates
+	NetworkLag = (NetworkLag / NetworkUpdates) * NetworkUpdates;
+}
+
 int NetworkInSync = 1;                     /// Network is in sync
-int NetworkUpdates = 5;                    /// Network update each # game cycles
-int NetworkLag = 10;                       /// Network lag in # game cycles
+
+CUDPSocket NetworkFildes;                  /// Network file descriptor
+
 static unsigned long NetworkLastFrame[PlayerMax]; /// Last frame received packet
 static const int NetworkTimeout = 45;             /// Number of seconds until player times out
 
@@ -373,6 +388,8 @@ static void NetworkSendPacket(const CNetworkCommandQueue (&ncq)[MaxNetworkComman
 */
 void InitNetwork1()
 {
+	CNetworkParameter::Instance.FixValues();
+
 	CommandsIn.clear();
 	MsgCommandsIn.clear();
 	NumNCQs = 0;
@@ -385,14 +402,11 @@ void InitNetwork1()
 	for (int i = 0; i < PlayerMax; ++i) {
 		NetMsgBufLen[i] = 0;
 	}
-	NetworkUpdates = std::max(NetworkUpdates, 1);
-	// Lag must be multiple of updates
-	NetworkLag = (NetworkLag / NetworkUpdates) * NetworkUpdates;
 
 	// Our communication port
-	int port = NetworkPort;
+	int port = CNetworkParameter::Instance.localPort;
 	for (int i = 0; i < 10; ++i) {
-		NetworkFildes.Open(CHost(NetworkAddr, port + i));
+		NetworkFildes.Open(CHost(CNetworkParameter::Instance.localHost.c_str(), port + i));
 		if (NetworkFildes.IsValid()) {
 			port = port + i;
 			break;
@@ -463,15 +477,19 @@ void InitNetwork2()
 	for (int i = 0; i < HostsCount; ++i) {
 		Players[Hosts[i].PlyNr].SetName(Hosts[i].PlyName);
 	}
-	DebugPrint("Lag %d, Updates %d, Hosts %d\n" _C_ NetworkLag _C_ NetworkUpdates _C_ HostsCount);
+	DebugPrint("Updates %d, Lag %d, Hosts %d\n" _C_
+			   CNetworkParameter::Instance.NetworkUpdates _C_
+			   CNetworkParameter::Instance.NetworkLag _C_ HostsCount);
 	// Prepare first time without syncs.
 	memset(NetworkIn, 0, sizeof(NetworkIn));
-	for (int i = 0; i <= NetworkLag; i += NetworkUpdates) {
+	for (int i = 0; i <= CNetworkParameter::Instance.NetworkLag; i += CNetworkParameter::Instance.NetworkUpdates) {
 		for (int n = 0; n < HostsCount; ++n) {
-			for (int c = 0; c < MaxNetworkCommands; ++c) {
-				NetworkIn[i][Hosts[n].PlyNr][c].Time = i;
-				NetworkIn[i][Hosts[n].PlyNr][c].Type = MessageSync;
-			}
+			CNetworkCommandQueue (&ncqs)[MaxNetworkCommands] = NetworkIn[i][Hosts[n].PlyNr];
+
+			ncqs[0].Time = i;
+			ncqs[0].Type = MessageSync;
+			ncqs[1].Time = i;
+			ncqs[1].Type = MessageNone;
 		}
 	}
 	memset(NetworkSyncSeeds, 0, sizeof(NetworkSyncSeeds));
@@ -841,7 +859,8 @@ static void NetworkParseInGameEvent(unsigned char *buf, int len, const CHost &ho
 	}
 	// Waiting for this time slot
 	if (!NetworkInSync) {
-		unsigned long n = (GameCycle / NetworkUpdates) * NetworkUpdates + NetworkUpdates;
+		const int networkUpdates = CNetworkParameter::Instance.NetworkUpdates;
+		unsigned long n = ((GameCycle / networkUpdates) + 1) * networkUpdates;
 		if (IsNetworkCommandReady(n) == true) {
 			NetworkInSync = 1;
 		}
@@ -892,6 +911,8 @@ void NetworkQuit()
 	if (!ThisPlayer) {
 		return;
 	}
+	const int NetworkUpdates = CNetworkParameter::Instance.NetworkUpdates;
+	const int NetworkLag = CNetworkParameter::Instance.NetworkLag;
 	const int n = (GameCycle + NetworkUpdates) / NetworkUpdates * NetworkUpdates + NetworkLag;
 	CNetworkCommandQueue (&ncqs)[MaxNetworkCommands] = NetworkIn[n & 0xFF][ThisPlayer->Index];
 	ncqs[0].Type = MessageQuit;
@@ -1091,15 +1112,15 @@ void NetworkCommands()
 	if (!IsNetworkGame()) {
 		return;
 	}
-	if ((GameCycle % NetworkUpdates) != 0) {
+	if ((GameCycle % CNetworkParameter::Instance.NetworkUpdates) != 0) {
 		return;
 	}
 	// Send messages to all clients (other players)
-	NetworkSendCommands(GameCycle + NetworkLag);
+	NetworkSendCommands(GameCycle + CNetworkParameter::Instance.NetworkLag);
 	NetworkExecCommands(GameCycle);
-	if (IsNetworkCommandReady(GameCycle + NetworkUpdates) == false) {
+	if (IsNetworkCommandReady(GameCycle + CNetworkParameter::Instance.NetworkUpdates) == false) {
 		NetworkInSync = 0;
-		NetworkDelay = FrameCounter + NetworkUpdates;
+		NetworkDelay = FrameCounter + CNetworkParameter::Instance.NetworkUpdates;
 		// FIXME: should send a resend request.
 	}
 }
@@ -1117,12 +1138,13 @@ static void NetworkResendCommands()
 	++NetworkSendResend;
 #endif
 
+	const int NetworkUpdates = CNetworkParameter::Instance.NetworkUpdates;
+	const int gameCycle = ((GameCycle / NetworkUpdates) + 1) * NetworkUpdates;
 	// Build packet
 	CNetworkPacket packet;
 	packet.Header.Type[0] = MessageResend;
 	packet.Header.Type[1] = MessageNone;
-	packet.Header.Cycle =
-		(uint8_t)((GameCycle / NetworkUpdates) * NetworkUpdates + NetworkUpdates);
+	packet.Header.Cycle = uint8_t(gameCycle & 0xFF);
 
 	NetworkBroadcast(packet, 1);
 }
@@ -1139,18 +1161,19 @@ void NetworkRecover()
 	if (FrameCounter <= NetworkDelay) {
 		return;
 	}
-	NetworkDelay += NetworkUpdates;
+	NetworkDelay += CNetworkParameter::Instance.NetworkUpdates;
 
 	// Check for players that timed out
 	for (int i = 0; i < HostsCount; ++i) {
-		if (!NetworkLastFrame[Hosts[i].PlyNr]) {
+		const unsigned long lastFrame = NetworkLastFrame[Hosts[i].PlyNr];
+		if (!lastFrame) {
 			continue;
 		}
-		int secs = (FrameCounter - NetworkLastFrame[Hosts[i].PlyNr]) /
-				   (FRAMES_PER_SECOND * VideoSyncSpeed / 100);
+		const int secs = (FrameCounter - lastFrame) /
+						 (FRAMES_PER_SECOND * VideoSyncSpeed / 100);
 		// FIXME: display a menu while we wait
-		if (secs >= 3 && secs < NetworkTimeout) {
-			if (FrameCounter % FRAMES_PER_SECOND < (unsigned long)NetworkUpdates) {
+		if (3 <= secs && secs < NetworkTimeout) {
+			if (FrameCounter % FRAMES_PER_SECOND < (unsigned long)CNetworkParameter::Instance.NetworkUpdates) {
 				SetMessage(_("Waiting for player \"%s\": %d:%02d"), Hosts[i].PlyName,
 						   (NetworkTimeout - secs) / 60, (NetworkTimeout - secs) % 60);
 			}
@@ -1159,7 +1182,7 @@ void NetworkRecover()
 			CNetworkCommand nc;
 			CNetworkPacket np;
 
-			unsigned long n = GameCycle + NetworkUpdates;
+			const unsigned long n = GameCycle + CNetworkParameter::Instance.NetworkUpdates;
 			nc.X = Hosts[i].PlyNr;
 			NetworkIn[n & 0xFF][Hosts[i].PlyNr][0].Time = n;
 			NetworkIn[n & 0xFF][Hosts[i].PlyNr][0].Type = MessageQuit;
@@ -1174,9 +1197,9 @@ void NetworkRecover()
 
 			NetworkBroadcast(np, 1);
 
-			if (IsNetworkCommandReady(GameCycle + NetworkUpdates) == false) {
+			if (IsNetworkCommandReady(GameCycle + CNetworkParameter::Instance.NetworkUpdates) == false) {
 				NetworkInSync = 0;
-				NetworkDelay = FrameCounter + NetworkUpdates;
+				NetworkDelay = FrameCounter + CNetworkParameter::Instance.NetworkUpdates;
 				// FIXME: should send a resend request.
 			}
 		}

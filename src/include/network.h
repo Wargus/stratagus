@@ -38,28 +38,34 @@
 #include "network/udpsocket.h"
 
 /*----------------------------------------------------------------------------
---  Defines
-----------------------------------------------------------------------------*/
-
-#define NetworkDefaultPort 6660  /// Default communication port
-
-/*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
 class CUnit;
 class CUnitType;
 
+class CNetworkParameter
+{
+public:
+	CNetworkParameter();
+	void FixValues();
+public:
+	std::string localHost;  /// Local network address to use
+	int localPort;          /// Local network port to use
+	int NetworkUpdates;  /// Network update each # game cycles
+	int NetworkLag;      /// Network lag (# game cycles) (multiple of NetworkUpdates)
+public:
+	static const int defaultPort = 6660; /// Default communication port
+public:
+	static CNetworkParameter Instance;
+};
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern char *NetworkAddr;         /// Local network address to use
-extern int NetworkPort;           /// Local network port to use
 extern CUDPSocket NetworkFildes;  /// Network file descriptor
 extern int NetworkInSync;         /// Network is in sync
-extern int NetworkUpdates;        /// Network update each # game cycles
-extern int NetworkLag;            /// Network lag (# game cycles)
 
 /*----------------------------------------------------------------------------
 --  Functions

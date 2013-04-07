@@ -438,7 +438,6 @@ static void Usage()
 		"\t-h\t\tHelp shows this page\n"
 		"\t-I addr\t\tNetwork address to use\n"
 		"\t-l\t\tDisable command log\n"
-		"\t-L lag\t\tNetwork lag in # frames (default 10 = 333ms)\n"
 		"\t-N name\t\tName of the player\n"
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		"\t-o\t\tDo not use OpenGL or OpenGL ES 1.1\n"
@@ -447,7 +446,6 @@ static void Usage()
 		"\t-P port\t\tNetwork port to use\n"
 		"\t-s sleep\tNumber of frames for the AI to sleep before it starts\n"
 		"\t-S speed\tSync speed (100 = 30 frames/s)\n"
-		"\t-U update\tNetwork update rate in # frames (default 5=6x per s)\n"
 		"\t-v mode\t\tVideo mode resolution in format <xres>x<yres>\n"
 		"\t-W\t\tWindowed video mode\n"
 		"map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n",
@@ -500,7 +498,7 @@ static void RedirectOutput()
 void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
 	for (;;) {
-		switch (getopt(argc, argv, "c:d:D:eE:FhI:lL:N:oOP:s:S:U:v:W?")) {
+		switch (getopt(argc, argv, "c:d:D:eE:FhI:lN:oOP:s:S:v:W?")) {
 			case 'c':
 				parameters.luaStartFilename = optarg;
 				continue;
@@ -526,18 +524,10 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				Video.FullScreen = 1;
 				continue;
 			case 'I':
-				NetworkAddr = optarg;
+				CNetworkParameter::Instance.localHost = optarg;
 				continue;
 			case 'l':
 				CommandLogDisabled = true;
-				continue;
-			case 'L':
-				NetworkLag = atoi(optarg);
-				if (!NetworkLag) {
-					fprintf(stderr, "%s: zero lag not supported\n", argv[0]);
-					Usage();
-					ExitFatal(-1);
-				}
 				continue;
 			case 'N':
 				parameters.LocalPlayerName = optarg;
@@ -553,16 +543,13 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				continue;
 #endif
 			case 'P':
-				NetworkPort = atoi(optarg);
+				CNetworkParameter::Instance.localPort = atoi(optarg);
 				continue;
 			case 's':
 				AiSleepCycles = atoi(optarg);
 				continue;
 			case 'S':
 				VideoSyncSpeed = atoi(optarg);
-				continue;
-			case 'U':
-				NetworkUpdates = atoi(optarg);
 				continue;
 			case 'v': {
 				char *sep = strchr(optarg, 'x');

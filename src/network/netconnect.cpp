@@ -779,8 +779,8 @@ void CClient::Parse_Welcome(const unsigned char *buf)
 	networkState.MsgCnt = 0;
 	NetLocalHostsSlot = msg.hosts[0].PlyNr;
 	Hosts[0].SetName(msg.hosts[0].PlyName); // Name of server player
-	NetworkLag = msg.Lag;
-	NetworkUpdates = msg.Updates;
+	CNetworkParameter::Instance.NetworkLag = msg.Lag;
+	CNetworkParameter::Instance.NetworkUpdates = msg.Updates;
 
 	Hosts[0].Host = serverHost.getIp();
 	Hosts[0].Port = serverHost.getPort();
@@ -1723,7 +1723,7 @@ breakout:
 int NetworkSetupServerAddress(const std::string &serveraddr, int port)
 {
 	if (port == 0) {
-		port = NetworkDefaultPort;
+		port = CNetworkParameter::Instance.defaultPort;
 	}
 	CHost host(serveraddr.c_str(), port);
 	if (host.isValid() == false) {

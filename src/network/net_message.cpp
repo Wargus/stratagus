@@ -395,8 +395,8 @@ void CInitMessage_ProtocolMismatch::Deserialize(const unsigned char *p)
 CInitMessage_Welcome::CInitMessage_Welcome() :
 	header(MessageInit_FromServer, ICMWelcome)
 {
-	this->Lag = NetworkLag;
-	this->Updates = NetworkUpdates;
+	this->Lag = CNetworkParameter::Instance.NetworkLag;
+	this->Updates = CNetworkParameter::Instance.NetworkUpdates;
 }
 
 const unsigned char *CInitMessage_Welcome::Serialize() const

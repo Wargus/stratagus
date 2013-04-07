@@ -89,7 +89,7 @@ int MetaInit()
 	const int port_range_max = 1244;
 
 	for (int i = port_range_min; i < port_range_max; ++i) {
-		MetaServerFildes = NetOpenTCP(NetworkAddr, i);  //FIXME: need to make a dynamic port allocation there...if (!MetaServerFildes) {...}
+		MetaServerFildes = NetOpenTCP(CNetworkParameter::Instance.localHost.c_str(), i);
 		if (MetaServerFildes != static_cast<Socket>(-1)) {
 			if (NetConnectTCP(MetaServerFildes, NetResolveHost(MasterHost), MasterPort) != -1) {
 				break;
