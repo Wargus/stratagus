@@ -735,14 +735,81 @@ static bool IsNetworkCommandReady(unsigned long gameCycle)
 	return true;
 }
 
-static void NetworkParseInGameEvent(unsigned char *buf, int len, const CHost &host)
+static void ParseResendCommand(const CNetworkPacket &packet)
 {
-	CNetworkPacket packet;
-	int commands = packet.Deserialize(buf, len);
-	if (commands < 0) {
-		DebugPrint("Bad packet read\n");
+	// Destination cycle (time to execute).
+	unsigned long n = ((GameCycle + 128) & ~0xFF) | packet.Header.Cycle;
+	if (n > GameCycle + 128) {
+		n -= 0x100;
+	}
+	// FIXME: not necessary to send this packet multiple times!!!!
+	// other side sends re-send until it gets an answer.
+	if (n != NetworkIn[n & 0xFF][ThisPlayer->Index][0].Time) {
+		// Asking for a cycle we haven't gotten to yet, ignore for now
 		return;
 	}
+	NetworkSendPacket(NetworkIn[n & 0xFF][ThisPlayer->Index]);
+	// Check if a player quit this cycle
+	for (int j = 0; j < HostsCount; ++j) {
+		for (int c = 0; c < MaxNetworkCommands; ++c) {
+			const CNetworkCommandQueue *ncq;
+			ncq = &NetworkIn[n & 0xFF][Hosts[j].PlyNr][c];
+			if (ncq->Time && ncq->Type == MessageQuit) {
+				CNetworkPacket np;
+				np.Header.Cycle = ncq->Time & 0xFF;
+				np.Header.Type[0] = ncq->Type;
+				np.Command[0] = ncq->Data;
+				for (int k = 1; k < MaxNetworkCommands; ++k) {
+					np.Header.Type[k] = MessageNone;
+				}
+				NetworkBroadcast(np, 1);
+			}
+		}
+	}
+}
+
+static bool IsAValidCommand(const CNetworkPacket &packet, int index, const CNetworkCommand &nc)
+{
+	const int player = Hosts[index].PlyNr;
+
+	switch (packet.Header.Type[index] & 0x7F) {
+		case MessageExtendedCommand: // FIXME: ensure the sender is part of the command
+			return true;
+		case MessageSync: // Sync does not matter
+			return true;
+		case MessageQuit:
+		case MessageQuitAck:
+		case MessageResend:
+		case MessageChat:
+		case MessageChatTerm:
+			// FIXME: ensure it's from the right player
+			return true;
+		case MessageCommandDismiss: {
+			const unsigned int slot = ntohs(nc.Unit);
+			const CUnit *unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : NULL;
+
+			if (unit && unit->Type->ClicksToExplode) {
+				return true;
+			}
+		}
+		// Fall through!
+		default: {
+			const unsigned int slot = ntohs(nc.Unit);
+			const CUnit *unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : NULL;
+
+			if (unit && (unit->Player->Index == player
+						 || Players[player].IsTeamed(*unit))) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+	// FIXME: not all values in nc have been validated
+}
+
+static void NetworkParseInGameEvent(unsigned char *buf, int len, const CHost &host)
+{
 	const int index = FindHostIndexBy(host);
 	if (index == -1 || PlayerQuit[Hosts[index].PlyNr]) {
 #ifdef DEBUG
@@ -753,6 +820,12 @@ static void NetworkParseInGameEvent(unsigned char *buf, int len, const CHost &ho
 	}
 	const int player = Hosts[index].PlyNr;
 
+	CNetworkPacket packet;
+	int commands = packet.Deserialize(buf, len);
+	if (commands < 0) {
+		DebugPrint("Bad packet read\n");
+		return;
+	}
 	// In a normal packet there is a least sync, selection may not have that
 	if (packet.Header.Type[0] == MessageSelection || commands == 0) {
 		NetworkProcessSelection(packet, player);
@@ -761,7 +834,6 @@ static void NetworkParseInGameEvent(unsigned char *buf, int len, const CHost &ho
 	// Parse the packet commands.
 	for (int i = 0; i != commands; ++i) {
 		const CNetworkCommand &nc = packet.Command[i];
-		bool validCommand = false;
 
 		// Handle some messages.
 		if (packet.Header.Type[i] == MessageQuit) {
@@ -769,82 +841,23 @@ static void NetworkParseInGameEvent(unsigned char *buf, int len, const CHost &ho
 
 			if (playerNum >= 0 && playerNum < NumPlayers) {
 				PlayerQuit[playerNum] = 1;
-				validCommand = true;
 			}
 		}
 		if (packet.Header.Type[i] == MessageResend) {
+			ParseResendCommand(packet);
+			return;
+		}
+		// Receive statistic
+		NetworkLastFrame[player] = FrameCounter;
+
+		bool validCommand = IsAValidCommand(packet, i, nc);
+		// Place in network in
+		if (validCommand) {
 			// Destination cycle (time to execute).
 			unsigned long n = ((GameCycle + 128) & ~0xFF) | packet.Header.Cycle;
 			if (n > GameCycle + 128) {
 				n -= 0x100;
 			}
-			// FIXME: not necessary to send this packet multiple times!!!!
-			// other side sends re-send until it gets an answer.
-			if (n != NetworkIn[n & 0xFF][ThisPlayer->Index][0].Time) {
-				// Asking for a cycle we haven't gotten to yet, ignore for now
-				return;
-			}
-			NetworkSendPacket(NetworkIn[n & 0xFF][ThisPlayer->Index]);
-			// Check if a player quit this cycle
-			for (int j = 0; j < HostsCount; ++j) {
-				for (int c = 0; c < MaxNetworkCommands; ++c) {
-					const CNetworkCommandQueue *ncq;
-					ncq = &NetworkIn[n & 0xFF][Hosts[j].PlyNr][c];
-					if (ncq->Time && ncq->Type == MessageQuit) {
-						CNetworkPacket np;
-						np.Header.Cycle = ncq->Time & 0xFF;
-						np.Header.Type[0] = ncq->Type;
-						np.Command[0] = ncq->Data;
-						for (int k = 1; k < MaxNetworkCommands; ++k) {
-							np.Header.Type[k] = MessageNone;
-						}
-						NetworkBroadcast(np, 1);
-					}
-				}
-			}
-			return;
-		}
-		// Destination cycle (time to execute).
-		unsigned long n = ((GameCycle + 128) & ~0xFF) | packet.Header.Cycle;
-		if (n > GameCycle + 128) {
-			n -= 0x100;
-		}
-		// Receive statistic
-		NetworkLastFrame[player] = FrameCounter;
-
-		// Place in network in
-		switch (packet.Header.Type[i] & 0x7F) {
-			case MessageExtendedCommand:
-				// FIXME: ensure the sender is part of the command
-				validCommand = true;
-				break;
-			case MessageSync:
-				// Sync does not matter
-				validCommand = true;
-				break;
-			case MessageQuit:
-			case MessageQuitAck:
-			case MessageResend:
-			case MessageChat:
-			case MessageChatTerm:
-				// FIXME: ensure it's from the right player
-				validCommand = true;
-				break;
-			case MessageCommandDismiss: // Fall through!
-			default: {
-				const unsigned int slot = ntohs(nc.Unit);
-				const CUnit *unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : NULL;
-
-				if (unit && (unit->Player->Index == player
-							 || Players[player].IsTeamed(*unit))) {
-					validCommand = true;
-				} else {
-					validCommand = false;
-				}
-			}
-		}
-		// FIXME: not all values in nc have been validated
-		if (validCommand) {
 			NetworkIn[packet.Header.Cycle][player][i].Time = n;
 			NetworkIn[packet.Header.Cycle][player][i].Type = packet.Header.Type[i];
 			NetworkIn[packet.Header.Cycle][player][i].Data = nc;
