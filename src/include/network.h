@@ -65,7 +65,7 @@ public:
 ----------------------------------------------------------------------------*/
 
 extern CUDPSocket NetworkFildes;  /// Network file descriptor
-extern int NetworkInSync;         /// Network is in sync
+extern bool NetworkInSync;        /// Network is in sync
 
 /*----------------------------------------------------------------------------
 --  Functions
