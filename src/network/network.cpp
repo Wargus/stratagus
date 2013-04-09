@@ -238,6 +238,8 @@
 #include "unittype.h"
 #include "video.h"
 
+#include <deque>
+
 //----------------------------------------------------------------------------
 //  Declaration
 //----------------------------------------------------------------------------
@@ -305,8 +307,8 @@ static unsigned long NetworkDelay;         /// Delay counter for recover.
 static int NetworkSyncSeeds[256];          /// Network sync seeds.
 static int NetworkSyncHashs[256];          /// Network sync hashs.
 static CNetworkCommandQueue NetworkIn[256][PlayerMax][MaxNetworkCommands]; /// Per-player network packet input queue
-static std::list<CNetworkCommandQueue *> CommandsIn;    /// Network command input queue
-static std::list<CNetworkCommandQueue *> MsgCommandsIn; /// Network message input queue
+static std::deque<CNetworkCommandQueue> CommandsIn;    /// Network command input queue
+static std::deque<CNetworkCommandQueue> MsgCommandsIn; /// Network message input queue
 
 #ifdef DEBUG
 static int NetworkReceivedPackets;         /// Packets received packets
@@ -320,11 +322,6 @@ static int NetworkSendResend;              /// Packets send to resend
 #endif
 
 static int PlayerQuit[PlayerMax];          /// Player quit
-
-#define MAX_NCQS 100
-static CNetworkCommandQueue NCQs[MAX_NCQS]; /// CNetworkCommandQueues
-static int NumNCQs;                         /// Number of NCQs in use
-
 
 //----------------------------------------------------------------------------
 //  Mid-Level api functions
@@ -390,7 +387,6 @@ void InitNetwork1()
 
 	CommandsIn.clear();
 	MsgCommandsIn.clear();
-	NumNCQs = 0;
 
 	NetworkFildes.Close();
 	NetworkInSync = true;
@@ -497,33 +493,6 @@ void InitNetwork2()
 }
 
 //----------------------------------------------------------------------------
-//  Memory management for CNetworkCommandQueues
-//----------------------------------------------------------------------------
-
-/**
-**  Allocate a CNetworkCommandQueue
-**
-**  @return  CNetworkCommandQueue
-*/
-static CNetworkCommandQueue *AllocNCQ()
-{
-	Assert(NumNCQs != MAX_NCQS);
-	CNetworkCommandQueue *ncq = &NCQs[NumNCQs++];
-	ncq->Clear();
-	return ncq;
-}
-
-/**
-**  Free a CNetworkCommandQueue
-**
-**  @param ncq  CNetworkCommandQueue to free
-*/
-static void FreeNCQ(CNetworkCommandQueue *ncq)
-{
-	NCQs[ncq - NCQs] = NCQs[--NumNCQs];
-}
-
-//----------------------------------------------------------------------------
 //  Commands input
 //----------------------------------------------------------------------------
 
@@ -564,15 +533,10 @@ void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
 		ncq.Data.Dest = htons(0xFFFF); // -1
 	}
 	// Check for duplicate command in queue
-	std::list<CNetworkCommandQueue *>::iterator it;
-	for (it = CommandsIn.begin(); it != CommandsIn.end(); ++it) {
-		if (**it == ncq) {
-			return;
-		}
+	if (std::find(CommandsIn.begin(), CommandsIn.end(), ncq) != CommandsIn.end()) {
+		return;
 	}
-	CNetworkCommandQueue *pncq = AllocNCQ();
-	*pncq = ncq;
-	CommandsIn.push_back(pncq);
+	CommandsIn.push_back(ncq);
 }
 
 /**
@@ -590,21 +554,21 @@ void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
 void NetworkSendExtendedCommand(int command, int arg1, int arg2, int arg3,
 								int arg4, int status)
 {
-	CNetworkCommandQueue *ncq = AllocNCQ();
-	CommandsIn.push_back(ncq);
+	CNetworkCommandQueue ncq;
 
-	ncq->Time = GameCycle;
-	CNetworkExtendedCommand *nec = (CNetworkExtendedCommand *)&ncq->Data;
+	ncq.Time = GameCycle;
+	CNetworkExtendedCommand *nec = reinterpret_cast<CNetworkExtendedCommand *>(&ncq.Data);
 
-	ncq->Type = MessageExtendedCommand;
+	ncq.Type = MessageExtendedCommand;
 	if (status) {
-		ncq->Type |= 0x80;
+		ncq.Type |= 0x80;
 	}
 	nec->ExtendedType = command;
 	nec->Arg1 = arg1;
 	nec->Arg2 = htons(arg2);
 	nec->Arg3 = htons(arg3);
 	nec->Arg4 = htons(arg4);
+	CommandsIn.push_back(ncq);
 }
 
 /**
@@ -953,21 +917,21 @@ void NetworkChatMessage(const std::string &msg)
 	size_t n = msg.size();
 	CNetworkChat *ncm = NULL;
 	while (n >= sizeof(ncm->Text)) {
-		CNetworkCommandQueue *ncq = AllocNCQ();
-		MsgCommandsIn.push_back(ncq);
-		ncq->Type = MessageChat;
-		ncm = (CNetworkChat *)(&ncq->Data);
+		CNetworkCommandQueue ncq;
+		ncq.Type = MessageChat;
+		ncm = reinterpret_cast<CNetworkChat *>(&ncq.Data);
 		ncm->Player = ThisPlayer->Index;
 		memcpy(ncm->Text, cp, sizeof(ncm->Text));
 		cp += sizeof(ncm->Text);
 		n -= sizeof(ncm->Text);
+		MsgCommandsIn.push_back(ncq);
 	}
-	CNetworkCommandQueue *ncq = AllocNCQ();
-	MsgCommandsIn.push_back(ncq);
-	ncq->Type = MessageChatTerm;
-	ncm = (CNetworkChat *)(&ncq->Data);
+	CNetworkCommandQueue ncq;
+	ncq.Type = MessageChatTerm;
+	ncm = reinterpret_cast<CNetworkChat *>(&ncq.Data);
 	ncm->Player = ThisPlayer->Index;
 	memcpy(ncm->Text, cp, n + 1); // see >= above :)
+	MsgCommandsIn.push_back(ncq);
 }
 
 static void ParseNetworkCommand_Sync(const CNetworkCommandQueue &ncq)
@@ -1047,7 +1011,7 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 	// No command available, send sync.
 	int numcommands = 0;
 	CNetworkCommandQueue (&ncq)[MaxNetworkCommands] = NetworkIn[gameNetCycle & 0xFF][ThisPlayer->Index];
-	ncq->Clear();
+	ncq[0].Clear();
 	if (CommandsIn.empty() && MsgCommandsIn.empty()) {
 		ncq[0].Type = MessageSync;
 		ncq[0].Data.Unit = htons(SyncHash & 0xFFFF);
@@ -1057,30 +1021,28 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 		numcommands = 1;
 	} else {
 		while (!CommandsIn.empty() && numcommands < MaxNetworkCommands) {
-			CNetworkCommandQueue *incommand = CommandsIn.front();
+			const CNetworkCommandQueue &incommand = CommandsIn.front();
 #ifdef DEBUG
-			if (incommand->Type != MessageExtendedCommand) {
-				CUnit &unit = UnitManager.GetSlotUnit(ntohs(ncq->Data.Unit));
+			if (incommand.Type != MessageExtendedCommand) {
+				const CUnit &unit = UnitManager.GetSlotUnit(ntohs(incommand.Data.Unit));
 				// FIXME: we can send destoyed units over network :(
 				if (unit.Destroyed) {
 					DebugPrint("Sending destroyed unit %d over network!!!!!!\n" _C_
-							   ntohs(incommand->Data.Unit));
+							   ntohs(incommand.Data.Unit));
 				}
 			}
 #endif
-			ncq[numcommands] = *incommand;
+			ncq[numcommands] = incommand;
 			ncq[numcommands].Time = gameNetCycle * CNetworkParameter::Instance.NetworkUpdates;
 			++numcommands;
 			CommandsIn.pop_front();
-			FreeNCQ(incommand);
 		}
 		while (!MsgCommandsIn.empty() && numcommands < MaxNetworkCommands) {
-			CNetworkCommandQueue *incommand = MsgCommandsIn.front();
-			MsgCommandsIn.pop_front();
-			ncq[numcommands] = *incommand;
+			const CNetworkCommandQueue &incommand = MsgCommandsIn.front();
+			ncq[numcommands] = incommand;
 			ncq[numcommands].Time = gameNetCycle * CNetworkParameter::Instance.NetworkUpdates;
 			++numcommands;
-			FreeNCQ(incommand);
+			MsgCommandsIn.pop_front();
 		}
 	}
 	if (numcommands != MaxNetworkCommands) {
