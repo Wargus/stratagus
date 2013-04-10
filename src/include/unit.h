@@ -635,7 +635,7 @@ extern void RestoreSelection();
 /// Clear current selection
 extern void UnSelectAll();
 /// Changed TeamUnit Selection
-extern void ChangeTeamSelectedUnits(CPlayer &player, const std::vector<CUnit *> &units, int adjust);
+extern void ChangeTeamSelectedUnits(CPlayer &player, const std::vector<CUnit *> &units);
 /// Add a unit to selection
 extern int SelectUnit(CUnit &unit);
 /// Select one unit as selection

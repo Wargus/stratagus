@@ -52,16 +52,21 @@ void FillCustomValue(CNetworkExtendedCommand *obj)
 
 void FillCustomValue(CNetworkChat *obj)
 {
-	obj->Player = 42;
-	for (int i = 0; i != sizeof(obj->Text); ++i) {
-		obj->Text[i] = 1 + i;
-	}
+	obj->Text = "abcdefghijklmnopqrstuvwxyz";
 }
-
+void FillCustomValue(CNetworkCommandSync *obj)
+{
+	obj->syncSeed = 0x01234567;
+	obj->syncHash = 0x89ABCDEF;
+}
+void FillCustomValue(CNetworkCommandQuit *obj)
+{
+	obj->player = 0x0123;
+}
 void FillCustomValue(CNetworkSelection *obj)
 {
-	for (int i = 0; i != 4; ++i) {
-		obj->Unit[i] = 0x1234 * i;
+	for (int i = 0; i != 10; ++i) {
+		obj->Units.push_back(0x0123 * i);
 	}
 }
 
@@ -73,7 +78,22 @@ void FillCustomValue(CNetworkPacketHeader *obj)
 	}
 }
 
-// CNetworkPacket
+template <typename T>
+bool Comp(const T &lhs, const T &rhs)
+{
+	return memcmp(&lhs, &rhs, sizeof(T)) == 0;
+}
+
+bool Comp(const CNetworkChat &lhs, const CNetworkChat &rhs)
+{
+	return lhs.Text == rhs.Text;
+}
+
+bool Comp(const CNetworkSelection &lhs, const CNetworkSelection &rhs)
+{
+	return lhs.Units == rhs.Units;
+}
+
 
 template <typename T>
 bool CheckSerialization()
@@ -81,12 +101,12 @@ bool CheckSerialization()
 	T obj1;
 
 	FillCustomValue(&obj1);
-	unsigned char *buffer = new unsigned char [T::Size()];
+	unsigned char *buffer = new unsigned char [obj1.Size()];
 	obj1.Serialize(buffer);
 
 	T obj2;
 	obj2.Deserialize(buffer);
-	bool res = memcmp(&obj1, &obj2, sizeof(T)) == 0;
+	bool res = Comp(obj1, obj2);
 	delete [] buffer;
 	return res;
 }
@@ -103,13 +123,21 @@ TEST(CNetworkChat)
 {
 	CHECK(CheckSerialization<CNetworkChat>());
 }
-#if 0
+TEST(CNetworkCommandSync)
+{
+	CHECK(CheckSerialization<CNetworkCommandSync>());
+}
+TEST(CNetworkCommandQuit)
+{
+	CHECK(CheckSerialization<CNetworkCommandQuit>());
+}
 TEST(CNetworkSelection)
 {
 	CHECK(CheckSerialization<CNetworkSelection>());
 }
-#endif
 TEST(CNetworkPacketHeader)
 {
 	CHECK(CheckSerialization<CNetworkPacketHeader>());
 }
+//TEST(CNetworkPacket)
+

@@ -42,42 +42,42 @@
 #include "network.h"
 #include "version.h"
 
-int serialize32(unsigned char *buf, uint32_t data)
+unsigned int serialize32(unsigned char *buf, uint32_t data)
 {
 	if (buf) {
 		*reinterpret_cast<uint32_t *>(buf) = htonl(data);
 	}
 	return sizeof(data);
 }
-int serialize32(unsigned char *buf, int32_t data)
+unsigned int serialize32(unsigned char *buf, int32_t data)
 {
 	if (buf) {
 		*reinterpret_cast<int32_t *>(buf) = htonl(data);
 	}
 	return sizeof(data);
 }
-int serialize16(unsigned char *buf, uint16_t data)
+unsigned int serialize16(unsigned char *buf, uint16_t data)
 {
 	if (buf) {
 		*reinterpret_cast<uint16_t *>(buf) = htons(data);
 	}
 	return sizeof(data);
 }
-int serialize16(unsigned char *buf, int16_t data)
+unsigned int serialize16(unsigned char *buf, int16_t data)
 {
 	if (buf) {
 		*reinterpret_cast<int16_t *>(buf) = htons(data);
 	}
 	return sizeof(data);
 }
-int serialize8(unsigned char *buf, uint8_t data)
+unsigned int serialize8(unsigned char *buf, uint8_t data)
 {
 	if (buf) {
 		*buf = data;
 	}
 	return sizeof(data);
 }
-int serialize8(unsigned char *buf, int8_t data)
+unsigned int serialize8(unsigned char *buf, int8_t data)
 {
 	if (buf) {
 		*buf = data;
@@ -85,49 +85,92 @@ int serialize8(unsigned char *buf, int8_t data)
 	return sizeof(data);
 }
 template <int N>
-int serialize(unsigned char *buf, const char(&data)[N])
+unsigned int serialize(unsigned char *buf, const char(&data)[N])
 {
 	if (buf) {
 		memcpy(buf, data, N);
 	}
 	return N;
 }
+unsigned int serialize(unsigned char *buf, const std::string &s)
+{
+	if (buf) {
+		buf += serialize16(buf, uint16_t(s.size()));
+		memcpy(buf, s.c_str(), s.size());
+		buf += s.size();
+		if ((s.size() & 0x03) != 0) {
+			memset(buf, 0, s.size() & 0x03);
+		}
+	}
+	return 2 + ((s.size() + 3) & ~0x03); // round up to multiple of 4 for alignment.
+}
+unsigned int serialize(unsigned char *buf, const std::vector<unsigned char> &data)
+{
+	if (buf) {
+		if (data.empty()) {
+			return serialize16(buf, uint16_t(data.size()));
+		}
+		buf += serialize16(buf, uint16_t(data.size()));
+		memcpy(buf, &data[0], data.size());
+		buf += data.size();
+		if ((data.size() & 0x03) != 0) {
+			memset(buf, 0, data.size() & 0x03);
+		}
+	}
+	return 2 + ((data.size() + 3) & ~0x03); // round up to multiple of 4 for alignment.
+}
 
-int deserialize32(const unsigned char *buf, uint32_t *data)
+unsigned int deserialize32(const unsigned char *buf, uint32_t *data)
 {
 	*data = ntohl(*reinterpret_cast<const uint32_t *>(buf));
 	return sizeof(*data);
 }
-int deserialize32(const unsigned char *buf, int32_t *data)
+unsigned int deserialize32(const unsigned char *buf, int32_t *data)
 {
 	*data = ntohl(*reinterpret_cast<const int32_t *>(buf));
 	return sizeof(*data);
 }
-int deserialize16(const unsigned char *buf, uint16_t *data)
+unsigned int deserialize16(const unsigned char *buf, uint16_t *data)
 {
 	*data = ntohs(*reinterpret_cast<const uint16_t *>(buf));
 	return sizeof(*data);
 }
-int deserialize16(const unsigned char *buf, int16_t *data)
+unsigned int deserialize16(const unsigned char *buf, int16_t *data)
 {
 	*data = ntohs(*reinterpret_cast<const int16_t *>(buf));
 	return sizeof(*data);
 }
-int deserialize8(const unsigned char *buf, uint8_t *data)
+unsigned int deserialize8(const unsigned char *buf, uint8_t *data)
 {
 	*data = *buf;
 	return sizeof(*data);
 }
-int deserialize8(const unsigned char *buf, int8_t *data)
+unsigned int deserialize8(const unsigned char *buf, int8_t *data)
 {
 	*data = *buf;
 	return sizeof(*data);
 }
 template <int N>
-int deserialize(const unsigned char *buf, char(&data)[N])
+unsigned int deserialize(const unsigned char *buf, char(&data)[N])
 {
 	memcpy(data, buf, N);
 	return N;
+}
+unsigned int deserialize(const unsigned char *buf, std::string &s)
+{
+	uint16_t size;
+
+	buf += deserialize16(buf, &size);
+	s = std::string(reinterpret_cast<const char *>(buf), size);
+	return 2 + ((s.size() + 3) & ~0x03); // round up to multiple of 4 for alignment.
+}
+unsigned int deserialize(const unsigned char *buf, std::vector<unsigned char> &data)
+{
+	uint16_t size;
+
+	buf += deserialize16(buf, &size);
+	data.assign(buf, buf + size);
+	return 2 + ((data.size() + 3) & ~0x03); // round up to multiple of 4 for alignment.
 }
 
 //
@@ -511,153 +554,212 @@ void CInitMessage_Resync::Deserialize(const unsigned char *p)
 // CNetworkCommand
 //
 
-void CNetworkCommand::Serialize(unsigned char *p) const
+unsigned int CNetworkCommand::Serialize(unsigned char *buf) const
 {
-	*(uint16_t *)p = this->Unit;
-	p += 2;
-	*(uint16_t *)p = this->X;
-	p += 2;
-	*(uint16_t *)p = this->Y;
-	p += 2;
-	*(uint16_t *)p = this->Dest;
-	p += 2;
+	unsigned char *p = buf;
+	p += serialize16(p, this->Unit);
+	p += serialize16(p, this->X);
+	p += serialize16(p, this->Y);
+	p += serialize16(p, this->Dest);
+	return p - buf;
 }
 
-void CNetworkCommand::Deserialize(const unsigned char *p)
+unsigned int CNetworkCommand::Deserialize(const unsigned char *buf)
 {
-	this->Unit = *(uint16_t *)p;
-	p += 2;
-	this->X = *(uint16_t *)p;
-	p += 2;
-	this->Y = *(uint16_t *)p;
-	p += 2;
-	this->Dest = *(uint16_t *)p;
-	p += 2;
+	const unsigned char *p = buf;
+	p += deserialize16(p, &this->Unit);
+	p += deserialize16(p, &this->X);
+	p += deserialize16(p, &this->Y);
+	p += deserialize16(p, &this->Dest);
+	return p - buf;
 }
 
 //
 // CNetworkExtendedCommand
 //
 
-void CNetworkExtendedCommand::Serialize(unsigned char *p) const
+unsigned int CNetworkExtendedCommand::Serialize(unsigned char *buf) const
 {
-	*p++ = this->ExtendedType;
-	*p++ = this->Arg1;
-	*(uint16_t *)p = this->Arg2;
-	p += 2;
-	*(uint16_t *)p = this->Arg3;
-	p += 2;
-	*(uint16_t *)p = this->Arg4;
-	p += 2;
+	unsigned char *p = buf;
+	p += serialize8(p, this->ExtendedType);
+	p += serialize8(p, this->Arg1);
+	p += serialize16(p, this->Arg2);
+	p += serialize16(p, this->Arg3);
+	p += serialize16(p, this->Arg4);
+	return p - buf;
 }
 
-void CNetworkExtendedCommand::Deserialize(const unsigned char *p)
+unsigned int CNetworkExtendedCommand::Deserialize(const unsigned char *buf)
 {
-	this->ExtendedType = *p++;
-	this->Arg1 = *p++;
-	this->Arg2 = *(uint16_t *)p;
-	p += 2;
-	this->Arg3 = *(uint16_t *)p;
-	p += 2;
-	this->Arg4 = *(uint16_t *)p;
-	p += 2;
+	const unsigned char *p = buf;
+	p += deserialize8(p, &this->ExtendedType);
+	p += deserialize8(p, &this->Arg1);
+	p += deserialize16(p, &this->Arg2);
+	p += deserialize16(p, &this->Arg3);
+	p += deserialize16(p, &this->Arg4);
+	return p - buf;
 }
-
 
 //
 // CNetworkChat
 //
 
-void CNetworkChat::Serialize(unsigned char *p) const
+unsigned int CNetworkChat::Serialize(unsigned char *buf) const
 {
-	*p++ = this->Player;
-	memcpy(p, this->Text, 7);
-	p += 7;
+	unsigned char *p = buf;
+	p += serialize(p, this->Text);
+	return p - buf;
 }
 
-void CNetworkChat::Deserialize(const unsigned char *p)
+unsigned int CNetworkChat::Deserialize(const unsigned char *buf)
 {
-	this->Player = *p++;
-	memcpy(this->Text, p, 7);
-	p += 7;
+	const unsigned char *p = buf;
+	p += deserialize(p, this->Text);
+	return p - buf;
 }
 
+unsigned int CNetworkChat::Size() const
+{
+	unsigned int size = 0;
+	size += serialize(NULL, this->Text);
+	return size;
+}
+
+//
+// CNetworkCommandSync
+//
+
+unsigned int CNetworkCommandSync::Serialize(unsigned char *buf) const
+{
+	unsigned char *p = buf;
+	p += serialize32(p, this->syncSeed);
+	p += serialize32(p, this->syncHash);
+	return p - buf;
+}
+
+unsigned int CNetworkCommandSync::Deserialize(const unsigned char *buf)
+{
+	const unsigned char *p = buf;
+	p += deserialize32(p, &this->syncSeed);
+	p += deserialize32(p, &this->syncHash);
+	return p - buf;
+}
+
+//
+// CNetworkCommandQuit
+//
+
+unsigned int CNetworkCommandQuit::Serialize(unsigned char *buf) const
+{
+	unsigned char *p = buf;
+	p += serialize16(p, this->player);
+	return p - buf;
+}
+
+unsigned int CNetworkCommandQuit::Deserialize(const unsigned char *buf)
+{
+	const unsigned char *p = buf;
+	p += deserialize16(p, &this->player);
+	return p - buf;
+}
+
+//
+// CNetworkSelection
+//
+
+unsigned int CNetworkSelection::Serialize(unsigned char *buf) const
+{
+	unsigned char *p = buf;
+
+	p += serialize16(p, this->player);
+	p += serialize16(p, uint16_t(this->Units.size()));
+	for (size_t i = 0; i != this->Units.size(); ++i) {
+		p += serialize16(p, Units[i]);
+	}
+	return p - buf;
+}
+
+unsigned int CNetworkSelection::Deserialize(const unsigned char *buf)
+{
+	const unsigned char *p = buf;
+
+	uint16_t size;
+	p += deserialize16(p, &this->player);
+	p += deserialize16(p, &size);
+	this->Units.resize(size);
+	for (size_t i = 0; i != this->Units.size(); ++i) {
+		p += deserialize16(p, &Units[i]);
+	}
+	return p - buf;
+}
+
+size_t CNetworkSelection::Size() const
+{
+	return 2 + 2 + 2 * Units.size();
+}
 
 //
 // CNetworkPacketHeader
 //
 
-void CNetworkPacketHeader::Serialize(unsigned char *p) const
+unsigned int CNetworkPacketHeader::Serialize(unsigned char *p) const
 {
-	for (int i = 0; i < MaxNetworkCommands; ++i) {
-		*p++ = this->Type[i];
+	if (p != NULL) {
+		for (int i = 0; i != MaxNetworkCommands; ++i) {
+			p += serialize8(p, this->Type[i]);
+		}
+		p += serialize8(p, this->Cycle);
 	}
-	*p++ = this->Cycle;
+	return MaxNetworkCommands + 1;
 }
 
-void CNetworkPacketHeader::Deserialize(const unsigned char *p)
+unsigned int CNetworkPacketHeader::Deserialize(const unsigned char *buf)
 {
-	for (int i = 0; i < MaxNetworkCommands; ++i) {
-		this->Type[i] = *p++;
-	}
-	this->Cycle = *p++;
-}
+	const unsigned char *p = buf;
 
+	for (int i = 0; i != MaxNetworkCommands; ++i) {
+		p += deserialize8(p, &this->Type[i]);
+	}
+	p += deserialize8(p, &this->Cycle);
+	return p - buf;
+}
 
 //
 // CNetworkPacket
 //
 
-void CNetworkPacket::Serialize(unsigned char *buf, int numcommands) const
+unsigned CNetworkPacket::Serialize(unsigned char *buf, int numcommands) const
 {
 	unsigned char *p = buf;
 
-	this->Header.Serialize(p);
-	p += CNetworkPacketHeader::Size();
-
-	for (int i = 0; i < numcommands; ++i) {
-		if (this->Header.Type[i] == MessageExtendedCommand) {
-			((CNetworkExtendedCommand *)&this->Command[i])->Serialize(p);
-		} else if (this->Header.Type[i] == MessageChat) {
-			((CNetworkChat *)&this->Command[i])->Serialize(p);
-		} else {
-			this->Command[i].Serialize(p);
-		}
-		p += CNetworkCommand::Size();
+	p += this->Header.Serialize(p);
+	for (int i = 0; i != numcommands; ++i) {
+		p += serialize(p, this->Command[i]);
 	}
+	return p - buf;
 }
 
-int CNetworkPacket::Deserialize(const unsigned char *p, unsigned int len)
+void CNetworkPacket::Deserialize(const unsigned char *p, unsigned int len, int *commandCount)
 {
-	// check min and max size
-	if (len < CNetworkPacket::Size(1)
-		|| len > CNetworkPacket::Size(MaxNetworkCommands)) {
-		return -1;
-	}
-
-	// can't have partial commands
-	len -= CNetworkPacketHeader::Size();
-	if ((len / CNetworkCommand::Size()) * CNetworkCommand::Size() != len) {
-		return -1;
-	}
-
 	this->Header.Deserialize(p);
 	p += CNetworkPacketHeader::Size();
+	len -= CNetworkPacketHeader::Size();
 
-	int commands = len / CNetworkCommand::Size();
-
-	for (int i = 0; i < commands; ++i) {
-		if (this->Header.Type[i] == MessageExtendedCommand) {
-			((CNetworkExtendedCommand *)&this->Command[i])->Deserialize(p);
-		} else if (this->Header.Type[i] == MessageChat) {
-			((CNetworkChat *)&this->Command[i])->Deserialize(p);
-		} else {
-			this->Command[i].Deserialize(p);
-		}
-		p += CNetworkCommand::Size();
+	for (*commandCount = 0; len != 0; ++*commandCount) {
+		const unsigned int r = deserialize(p, this->Command[*commandCount]);
+		p += r;
+		len -= r;
 	}
-	return commands;
 }
 
+size_t CNetworkPacket::Size(int numcommands) const {
+	size_t size = 0;
+
+	size += this->Header.Serialize(NULL);
+	for (int i = 0; i != numcommands; ++i) {
+		size += serialize(NULL, this->Command[i]);
+	}
+	return size;
+}
 
 //@}

@@ -32,6 +32,7 @@
 //@{
 
 #include <stdint.h>
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -279,11 +280,9 @@ enum _message_type_ {
 	MessageSync,                   /// Heart beat
 	MessageSelection,              /// Update a Selection from Team Player
 	MessageQuit,                   /// Quit game
-	MessageQuitAck,                /// Quit reply - UNUSED YET - Protocol Version 2 - Reserved for menus
 	MessageResend,                 /// Resend message
 
 	MessageChat,                   /// Chat message
-	MessageChatTerm,               /// Chat message termination -  Protocol Version 2
 
 	MessageCommandStop,            /// Unit command stop
 	MessageCommandStand,           /// Unit command stand ground
@@ -332,15 +331,9 @@ public:
 	CNetworkCommand() : Unit(0), X(0), Y(0), Dest(0) {}
 	void Clear() { this->Unit = this->X = this->Y = this->Dest = 0; }
 
-	void Serialize(unsigned char *p) const;
-	void Deserialize(const unsigned char *p);
+	unsigned int Serialize(unsigned char *buf) const;
+	unsigned int Deserialize(const unsigned char *buf);
 	static size_t Size() { return 2 + 2 + 2 + 2; }
-
-	bool operator == (const CNetworkCommand &rhs) const
-	{
-		return Unit == rhs.Unit && X == rhs.X && Y == rhs.Y && Dest == rhs.Dest;
-	}
-	bool operator != (const CNetworkCommand &rhs) const { return !(*this == rhs); }
 
 public:
 	uint16_t Unit;         /// Command for unit
@@ -357,8 +350,8 @@ class CNetworkExtendedCommand
 public:
 	CNetworkExtendedCommand() : ExtendedType(0), Arg1(0), Arg2(0), Arg3(0), Arg4(0) {}
 
-	void Serialize(unsigned char *p) const;
-	void Deserialize(const unsigned char *p);
+	unsigned int Serialize(unsigned char *buf) const;
+	unsigned int Deserialize(const unsigned char *buf);
 	static size_t Size() { return 1 + 1 + 2 + 2 + 2; }
 
 	uint8_t  ExtendedType;  /// Extended network command type
@@ -374,17 +367,43 @@ public:
 class CNetworkChat
 {
 public:
-	CNetworkChat() {
-		Player = 0;
-		memset(Text, 0, sizeof(Text));
-	}
+	unsigned int Serialize(unsigned char *buf) const;
+	unsigned int Deserialize(const unsigned char *buf);
+	size_t Size() const;
 
-	void Serialize(unsigned char *p) const ;
-	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 1 + 7; }
+public:
+	std::string Text;  /// Message bytes
+};
 
-	uint8_t Player;  /// Sending player
-	char Text[7];    /// Message bytes
+/**
+**  Network sync message.
+*/
+class CNetworkCommandSync
+{
+public:
+	CNetworkCommandSync() : syncSeed(0), syncHash(0) {}
+	unsigned int Serialize(unsigned char *buf) const;
+	unsigned int Deserialize(const unsigned char *buf);
+	static size_t Size() { return 4 + 4; };
+
+public:
+	uint32_t syncSeed;
+	uint32_t syncHash;
+};
+
+/**
+**  Network quit message.
+*/
+class CNetworkCommandQuit
+{
+public:
+	CNetworkCommandQuit() : player(0) {}
+	unsigned int Serialize(unsigned char *buf) const;
+	unsigned int Deserialize(const unsigned char *buf);
+	static size_t Size() { return 2; };
+
+public:
+	uint16_t player;
 };
 
 /**
@@ -393,15 +412,15 @@ public:
 class CNetworkSelection
 {
 public:
-	CNetworkSelection() {
-		memset(Unit, 0, sizeof(Unit));
-	}
+	CNetworkSelection() : player(0) {}
 
-	void Serialize(unsigned char *p) const;
-	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 2 * 4; }
+	unsigned int Serialize(unsigned char *buf) const;
+	unsigned int Deserialize(const unsigned char *buf);
+	size_t Size() const;
 
-	uint16_t Unit[4];  /// Selection Units
+public:
+	uint16_t player;
+	std::vector<uint16_t> Units;  /// Selection Units
 };
 
 /**
@@ -417,8 +436,8 @@ public:
 		memset(Type, 0, sizeof(Type));
 	}
 
-	void Serialize(unsigned char *p) const;
-	void Deserialize(const unsigned char *p);
+	unsigned int Serialize(unsigned char *buf) const;
+	unsigned int Deserialize(const unsigned char *buf);
 	static size_t Size() { return 1 + 1 * MaxNetworkCommands; }
 
 	uint8_t Type[MaxNetworkCommands];  /// Commands in packet
@@ -433,14 +452,12 @@ public:
 class CNetworkPacket
 {
 public:
-	void Serialize(unsigned char *buf, int numcommands) const;
-	int Deserialize(const unsigned char *p, unsigned int len);
-	static size_t Size(int numcommands) {
-		return CNetworkPacketHeader::Size() + numcommands * CNetworkCommand::Size();
-	}
+	unsigned int Serialize(unsigned char *buf, int numcommands) const;
+	void Deserialize(const unsigned char *buf, unsigned int len, int *numcommands);
+	size_t Size(int numcommands) const;
 
 	CNetworkPacketHeader Header;  /// Packet Header Info
-	CNetworkCommand Command[MaxNetworkCommands];
+	std::vector<unsigned char> Command[MaxNetworkCommands];
 };
 
 //@}
