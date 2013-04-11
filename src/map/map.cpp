@@ -522,14 +522,14 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	tile += ((ttleft & 0x02) && (ttdown & 0x08)) * 1;
 
 	//Test if we have top tree, or bottom tree, they are special
-	if ((ttdown & 0x10) && 1) {
-		tile |= ((ttleft & 0x06) && 1) * 1;
-		tile |= ((ttright & 0x09) && 1) * 2;
+	if ((ttdown & 0x10) != 0) {
+		tile |= (ttleft & 0x06) != 0 ? 1 : 0;
+		tile |= (ttright & 0x09) != 0 ? 2 : 0;
 	}
 
-	if ((ttup & 0x20) && 1) {
-		tile |= ((ttleft & 0x06) && 1) * 8;
-		tile |= ((ttright & 0x09) && 1) * 4;
+	if ((ttup & 0x20) != 0) {
+		tile |= (ttleft & 0x06) != 0 ? 8 : 0;
+		tile |= (ttright & 0x09) != 0 ? 4 : 0;
 	}
 
 	tile = lookuptable[tile];
