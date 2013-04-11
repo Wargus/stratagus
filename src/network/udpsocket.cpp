@@ -93,6 +93,27 @@ private:
 // CUDPSocket
 //
 
+#ifdef DEBUG
+
+CUDPSocket::CStatistic::CStatistic()
+{
+	clear();
+}
+
+void CUDPSocket::CStatistic::clear()
+{
+	receivedBytesCount = 0;
+	receivedBytesExpectedCount = 0;
+	receivedErrorCount = 0;
+	receivedPacketsCount = 0;
+	sentBytesCount = 0;
+	sentPacketsCount = 0;
+	biggestReceivedPacketSize = 0;
+	biggestSentPacketSize = 0;
+}
+
+#endif
+
 CUDPSocket::CUDPSocket()
 {
 	m_impl = new CUDPSocket_Impl();
@@ -115,12 +136,28 @@ void CUDPSocket::Close()
 
 void CUDPSocket::Send(const CHost &host, const void *buf, unsigned int len)
 {
-	return m_impl->Send(host, buf, len);
+#ifdef DEBUG
+	++m_statistic.sentPacketsCount;
+	m_statistic.sentBytesCount += len;
+	m_statistic.biggestSentPacketSize = std::max(m_statistic.biggestSentPacketSize, len);
+#endif
+	m_impl->Send(host, buf, len);
 }
 
 int CUDPSocket::Recv(void *buf, int len, CHost *hostFrom)
 {
-	return m_impl->Recv(buf, len, hostFrom);
+	const int res = m_impl->Recv(buf, len, hostFrom);
+#ifdef DEBUG
+	m_statistic.receivedBytesExpectedCount += len;
+	if (res == -1) {
+		++m_statistic.receivedErrorCount;
+	} else {
+		++m_statistic.receivedPacketsCount;
+		m_statistic.receivedBytesCount += res;
+		m_statistic.biggestReceivedPacketSize = std::max(m_statistic.biggestReceivedPacketSize, (unsigned int)res);
+	}
+#endif
+	return res;
 }
 
 void CUDPSocket::SetNonBlocking()

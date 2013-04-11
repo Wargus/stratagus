@@ -273,12 +273,13 @@ CNetworkParameter::CNetworkParameter()
 	localPort = defaultPort;
 	NetworkUpdates = 5;
 	NetworkLag = 2;
+	timeoutInS = 45;
 }
 
 void CNetworkParameter::FixValues()
 {
-	NetworkUpdates = std::max(NetworkUpdates, 1);
-	NetworkLag = std::max(NetworkLag, 2);
+	NetworkUpdates = std::max(NetworkUpdates, 1u);
+	NetworkLag = std::max(NetworkLag, 2u);
 }
 
 bool NetworkInSync = true;                 /// Network is in sync
@@ -286,7 +287,6 @@ bool NetworkInSync = true;                 /// Network is in sync
 CUDPSocket NetworkFildes;                  /// Network file descriptor
 
 static unsigned long NetworkLastFrame[PlayerMax]; /// Last frame received packet
-static const int NetworkTimeout = 45;             /// Number of seconds until player times out
 
 static unsigned long NetworkDelay;         /// Delay counter for recover.
 static int NetworkSyncSeeds[256];          /// Network sync seeds.
@@ -296,14 +296,34 @@ static std::deque<CNetworkCommandQueue> CommandsIn;    /// Network command input
 static std::deque<CNetworkCommandQueue> MsgCommandsIn; /// Network message input queue
 
 #ifdef DEBUG
-static int NetworkReceivedPackets;         /// Packets received packets
-static int NetworkReceivedEarly;           /// Packets received too early
-static int NetworkReceivedLate;            /// Packets received too late
-static int NetworkReceivedDups;            /// Packets received as duplicates
-static int NetworkReceivedLost;            /// Packets received packet lost
+class CNetworkStat
+{
+public:
+	CNetworkStat() :
+		resentPacketCount(0)
+	{}
 
-static int NetworkSendPackets;             /// Packets send packets
-static int NetworkSendResend;              /// Packets send to resend
+	void print() const
+	{
+		DebugPrint("resent: %d packets\n" _C_ resentPacketCount);
+	}
+
+public:
+	unsigned int resentPacketCount;
+};
+
+static void printStatistic(const CUDPSocket::CStatistic &statistic)
+{
+	DebugPrint("Sent: %d packets %d bytes (max %d bytes).\n"
+			   _C_ statistic.sentPacketsCount _C_ statistic.sentBytesCount
+			   _C_ statistic.biggestSentPacketSize);
+	DebugPrint("Received: %d packets %d bytes (max %d bytes).\n" _C_
+			   statistic.receivedPacketsCount _C_ statistic.receivedBytesCount
+			   _C_ statistic.biggestReceivedPacketSize);
+	DebugPrint("Received: %d error(s).\n" _C_ statistic.receivedErrorCount);
+}
+
+static CNetworkStat NetworkStat;
 #endif
 
 static int PlayerQuit[PlayerMax];          /// Player quit
@@ -340,10 +360,6 @@ static void NetworkBroadcast(const CNetworkPacket &packet, int numcommands)
 static void NetworkSendPacket(const CNetworkCommandQueue (&ncq)[MaxNetworkCommands])
 {
 	CNetworkPacket packet;
-
-#ifdef DEBUG
-	++NetworkSendPackets;
-#endif
 
 	// Build packet of up to MaxNetworkCommands messages.
 	int numcommands = 0;
@@ -430,10 +446,9 @@ void ExitNetwork1()
 	}
 
 #ifdef DEBUG
-	DebugPrint("Received: %d packets, %d early, %d late, %d dups, %d lost.\n" _C_
-			   NetworkReceivedPackets _C_ NetworkReceivedEarly _C_ NetworkReceivedLate _C_
-			   NetworkReceivedDups _C_ NetworkReceivedLost);
-	DebugPrint("Send: %d packets, %d resend\n" _C_ NetworkSendPackets _C_ NetworkSendResend);
+	printStatistic(NetworkFildes.getStatistic());
+	NetworkFildes.clearStatistic();
+	NetworkStat.print();
 #endif
 
 	NetworkFildes.Close();
@@ -468,7 +483,7 @@ void InitNetwork2()
 	//nc.syncHash = SyncHash;
 	//nc.syncSeed = SyncRandSeed;
 
-	for (int i = 0; i <= CNetworkParameter::Instance.NetworkLag; ++i) {
+	for (unsigned int i = 0; i <= CNetworkParameter::Instance.NetworkLag; ++i) {
 		for (int n = 0; n < HostsCount; ++n) {
 			CNetworkCommandQueue (&ncqs)[MaxNetworkCommands] = NetworkIn[i][Hosts[n].PlyNr];
 
@@ -834,9 +849,6 @@ void NetworkEvent()
 		NetworkInSync = false;
 		return;
 	}
-#ifdef DEBUG
-	++NetworkReceivedPackets;
-#endif
 
 	// Setup messages
 	if (NetConnectRunning) {
@@ -1076,11 +1088,11 @@ void NetworkCommands()
 static void NetworkResendCommands()
 {
 #ifdef DEBUG
-	++NetworkSendResend;
+	++NetworkStat.resentPacketCount;
 #endif
 
-	const int NetworkUpdates = CNetworkParameter::Instance.NetworkUpdates;
-	const int nextGameCycle = ((GameCycle / NetworkUpdates) + 1) * NetworkUpdates;
+	const int networkUpdates = CNetworkParameter::Instance.NetworkUpdates;
+	const int nextGameCycle = ((GameCycle / networkUpdates) + 1) * networkUpdates;
 	// Build packet
 	CNetworkPacket packet;
 	packet.Header.Type[0] = MessageResend;
@@ -1111,16 +1123,17 @@ void NetworkRecover()
 		if (!lastFrame) {
 			continue;
 		}
-		const int secs = (FrameCounter - lastFrame) /
-						 (FRAMES_PER_SECOND * VideoSyncSpeed / 100);
+		const int framesPerSecond = FRAMES_PER_SECOND * VideoSyncSpeed / 100;
+		const int secs = (FrameCounter - lastFrame) / framesPerSecond;
 		// FIXME: display a menu while we wait
-		if (3 <= secs && secs < NetworkTimeout) {
-			if (FrameCounter % FRAMES_PER_SECOND < (unsigned long)CNetworkParameter::Instance.NetworkUpdates) {
+		const int timeoutInS = CNetworkParameter::Instance.timeoutInS;
+		if (3 <= secs && secs < timeoutInS) {
+			if (FrameCounter % framesPerSecond == 0) {
 				SetMessage(_("Waiting for player \"%s\": %d:%02d"), Hosts[i].PlyName,
-						   (NetworkTimeout - secs) / 60, (NetworkTimeout - secs) % 60);
+						   (timeoutInS - secs) / 60, (timeoutInS - secs) % 60);
 			}
 		}
-		if (secs >= NetworkTimeout) {
+		if (secs >= timeoutInS) {
 			const unsigned int nextGameNetCycle = GameCycle / CNetworkParameter::Instance.NetworkUpdates + 1;
 			CNetworkCommandQuit nc;
 			nc.player = playerIndex;
@@ -1140,7 +1153,7 @@ void NetworkRecover()
 			NetworkBroadcast(np, 1);
 
 			if (IsNetworkCommandReady(nextGameNetCycle) == false) {
-				NetworkInSync = 0;
+				NetworkInSync = false;
 				NetworkDelay = FrameCounter + CNetworkParameter::Instance.NetworkUpdates;
 				// FIXME: should send a resend request.
 			}

@@ -51,9 +51,11 @@ public:
 	void FixValues();
 public:
 	std::string localHost;  /// Local network address to use
-	int localPort;          /// Local network port to use
-	int NetworkUpdates;  /// Network update each # game cycles
-	int NetworkLag;      /// Network lag (# game cycles) (multiple of NetworkUpdates)
+	unsigned int localPort;       /// Local network port to use
+	unsigned int NetworkUpdates;  /// Network update each # game cycles
+	unsigned int NetworkLag;      /// Network lag (# game cycles) (multiple of NetworkUpdates)
+	unsigned int timeoutInS;      /// Number of seconds until player times out
+
 public:
 	static const int defaultPort = 6660; /// Default communication port
 public:

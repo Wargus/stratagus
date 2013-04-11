@@ -66,6 +66,32 @@ public:
 	//
 	int HasDataToRead(int timeout);
 	bool IsValid() const;
+
+#ifdef DEBUG
+
+	class CStatistic
+	{
+		friend class CUDPSocket;
+	public:
+		CStatistic();
+		void clear();
+	public:
+		unsigned int sentPacketsCount;
+		unsigned int receivedPacketsCount;
+		unsigned int sentBytesCount;
+		unsigned int receivedBytesCount;
+		unsigned int receivedErrorCount;
+		unsigned int receivedBytesExpectedCount;
+		unsigned int biggestSentPacketSize;
+		unsigned int biggestReceivedPacketSize;
+	};
+
+	void clearStatistic() { m_statistic.clear(); }
+	const CStatistic &getStatistic() const { return m_statistic; }
+private:
+	CStatistic m_statistic;
+#endif
+
 private:
 	CUDPSocket_Impl *m_impl;
 };
