@@ -100,7 +100,7 @@ void FillCustomValue(CInitMessage_ProtocolMismatch *obj)
 void FillCustomValue(CInitMessage_Welcome *obj)
 {
 	obj->Lag = 0x01020304;
-	obj->Updates = 0x05060708;
+	obj->gameCyclesPerUpdate = 0x05060708;
 	for (int i = 0; i != PlayerMax; ++i) {
 		FillCustomValue(&obj->hosts[i]);
 	}
