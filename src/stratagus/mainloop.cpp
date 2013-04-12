@@ -301,7 +301,6 @@ static void GameLogicLoop()
 	if (!NetworkInSync) {
 		NetworkRecover(); // recover network
 	}
-
 }
 
 //#define REALVIDEO
@@ -436,7 +435,7 @@ void GameMainLoop()
 		VideoSyncSpeed = RealVideoSyncSpeed;
 	}
 #endif
-	NetworkQuit();
+	NetworkQuitGame();
 	EndReplayLog();
 
 	GameCycle = 0;//????

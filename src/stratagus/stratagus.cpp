@@ -386,7 +386,7 @@ void Exit(int err)
 
 	StopMusic();
 	QuitSound();
-	NetworkQuit();
+	NetworkQuitGame();
 
 	ExitNetwork1();
 #ifdef DEBUG

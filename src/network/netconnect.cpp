@@ -780,7 +780,7 @@ void CClient::Parse_Welcome(const unsigned char *buf)
 	NetLocalHostsSlot = msg.hosts[0].PlyNr;
 	Hosts[0].SetName(msg.hosts[0].PlyName); // Name of server player
 	CNetworkParameter::Instance.NetworkLag = msg.Lag;
-	CNetworkParameter::Instance.NetworkUpdates = msg.Updates;
+	CNetworkParameter::Instance.gameCyclesPerUpdate = msg.gameCyclesPerUpdate;
 
 	Hosts[0].Host = serverHost.getIp();
 	Hosts[0].Port = serverHost.getPort();

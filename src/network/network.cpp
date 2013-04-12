@@ -133,31 +133,31 @@
 **
 ** @subsection internals Putting it together
 **
-** All computers in play must run absolute syncron. Only user commands
-** are send over the network to the other computers. The command needs
-** some time to reach the other clients (lag), so the command is not
-** executed immediatly on the local computer, it is stored in a delay
-** queue and send to all other clients. After a delay of ::NetworkLag
-** game cycles the commands of the other players are received and executed
-** together with the local command. Each ::NetworkUpdates game cycles there
-** must a package send, to keep the clients in sync, if there is no user
-** command, a dummy sync package is send.
+** All computers in play must run absolute syncron.
+** Only user commands are send over the network to the other computers.
+** To reduce network traffic, commands are sent/executed every gameCyclesPerUpdate
+** gameCycles. The command needs some time to reach the other clients (lag),
+** so the command is not executed immediatly on the local computer,
+** but a delay (NetworkLag NetUpdates) later. Commands are stored
+** in a circular array indexed by update time. Once each other players commands
+** are received for a specified gameNetCycle, all commands of this gameNetCycle
+** Each gameNetCycle, a package must be send. if there is no user command,
+** a "dummy" sync package is send (which checks that all players are still in sync).
 ** If there are missing packages, the game is paused and old commands
 ** are resend to all clients.
 **
 ** @section missing What features are missing
 **
-** @li The recover from lost packets can be improved, if the server knows
-** which packets the clients have received.
+** @li The recover from lost packets can be improved, as the player knows
+** which packets is missing.
 **
 ** @li The UDP protocol isn't good for firewalls, we need also support
 ** for the TCP protocol.
 **
-** @li Add a server / client protocol, which allows more players per game.
+** @li Add a server/client protocol, which allows more players per game.
 **
-** @li Lag (latency) and bandwidth are set over the commandline. This
-** should be automatic detected during game setup and later during
-** game automatic adapted.
+** @li Lag (latency) and bandwidth should be automatic detected during game setup
+** and later during game automatic adapted.
 **
 ** @li Also it would be nice, if we support viewing clients. This means
 ** other people can view the game in progress.
@@ -174,37 +174,45 @@
 ** @li password protection the login process (optional), to prevent that
 ** the wrong player join an open network game.
 **
-** @li add meta server support, i have planned to use bnetd and its protocol.
+** @li add meta server support, I have planned to use bnetd and its protocol.
 **
 ** @section api API How should it be used.
 **
 ** ::InitNetwork1()
-**
-** ::InitNetwork2()
+** Open port. Must be called by Lua
 **
 ** ::ExitNetwork1()
+** Close port. Called internally and by Lua
 **
-** ::NetworkSendCommand()
-**
-** ::NetworkSendExtendedCommand()
-**
-** ::NetworkEvent()
-**
-** ::NetworkQuit()
-**
-** ::NetworkChatMessage()
+** ::NetworkOnGameStart()
+** Initialize msg stuff for ingame communication.
 **
 ** ::NetworkEvent()
+** Manage network event (preparation room + ingame).
 **
 ** ::NetworkRecover()
+** Do stuff to have again NetworkInSync == true
 **
 ** ::NetworkCommands()
+** Network Updates : exec current command, and send commands to other players
 **
 ** ::NetworkFildes
+** UDP Socket for communication.
 **
 ** ::NetworkInSync
+** false when commands of the next gameNetCycle of the other player are not ready.
 **
-** @todo FIXME: continue docu
+** ::NetworkSendCommand()
+** Send a normal unit order.
+**
+** ::NetworkSendExtendedCommand()
+** Send special command (diplomacy, ...)
+**
+** ::NetworkSendChatMessage()
+** Send a chat message to others player
+**
+** ::NetworkQuitGame()
+** Warn other users that we leave.
 */
 
 //----------------------------------------------------------------------------
@@ -271,14 +279,14 @@ CNetworkParameter::CNetworkParameter()
 {
 	localHost = "127.0.0.1";
 	localPort = defaultPort;
-	NetworkUpdates = 5;
+	gameCyclesPerUpdate = 5;
 	NetworkLag = 2;
 	timeoutInS = 45;
 }
 
 void CNetworkParameter::FixValues()
 {
-	NetworkUpdates = std::max(NetworkUpdates, 1u);
+	gameCyclesPerUpdate = std::max(gameCyclesPerUpdate, 1u);
 	NetworkLag = std::max(NetworkLag, 2u);
 }
 
@@ -288,7 +296,6 @@ CUDPSocket NetworkFildes;                  /// Network file descriptor
 
 static unsigned long NetworkLastFrame[PlayerMax]; /// Last frame received packet
 
-static unsigned long NetworkDelay;         /// Delay counter for recover.
 static int NetworkSyncSeeds[256];          /// Network sync seeds.
 static int NetworkSyncHashs[256];          /// Network sync hashs.
 static CNetworkCommandQueue NetworkIn[256][PlayerMax][MaxNetworkCommands]; /// Per-player network packet input queue
@@ -381,43 +388,26 @@ static void NetworkSendPacket(const CNetworkCommandQueue (&ncq)[MaxNetworkComman
 //----------------------------------------------------------------------------
 
 /**
-**  Initialize network part 1.
+**  Initialize network port.
 */
 void InitNetwork1()
 {
 	CNetworkParameter::Instance.FixValues();
 
-	CommandsIn.clear();
-	MsgCommandsIn.clear();
-
-	NetworkFildes.Close();
-	NetworkInSync = true;
-
 	NetInit(); // machine dependent setup
 
 	// Our communication port
-	int port = CNetworkParameter::Instance.localPort;
-	for (int i = 0; i < 10; ++i) {
-		NetworkFildes.Open(CHost(CNetworkParameter::Instance.localHost.c_str(), port + i));
-		if (NetworkFildes.IsValid()) {
-			port = port + i;
-			break;
-		}
-	}
+	const int port = CNetworkParameter::Instance.localPort;
+	const CHost host(CNetworkParameter::Instance.localHost.c_str(), port);
+	NetworkFildes.Open(host);
 	if (NetworkFildes.IsValid() == false) {
-		fprintf(stderr, "NETWORK: No free ports %d-%d available, aborting\n", port, port + 10);
+		fprintf(stderr, "NETWORK: No free port %d available, aborting\n", port);
 		NetExit(); // machine dependent network exit
 		return;
 	}
 #ifdef DEBUG
-	{
-		char buf[128];
-
-		gethostname(buf, sizeof(buf));
-		DebugPrint("%s\n" _C_ buf);
-		const std::string hostStr = CHost(buf, port).toString();
-		DebugPrint("My host:port %s\n" _C_ hostStr.c_str());
-	}
+	const std::string hostStr = host.toString();
+	DebugPrint("My host:port %s\n" _C_ hostStr.c_str());
 #endif
 
 #if 0 // FIXME: need a working interface check
@@ -437,7 +427,7 @@ void InitNetwork1()
 }
 
 /**
-**  Cleanup network part 1. (to be called _AFTER_ part 2 :)
+**  Cleanup network.
 */
 void ExitNetwork1()
 {
@@ -460,17 +450,21 @@ void ExitNetwork1()
 }
 
 /**
-**  Initialize network part 2.
+**  Game will start now.
 */
-void InitNetwork2()
+void NetworkOnStartGame()
 {
 	ThisPlayer->SetName(Parameters::Instance.LocalPlayerName);
 	for (int i = 0; i < HostsCount; ++i) {
 		Players[Hosts[i].PlyNr].SetName(Hosts[i].PlyName);
 	}
 	DebugPrint("Updates %d, Lag %d, Hosts %d\n" _C_
-			   CNetworkParameter::Instance.NetworkUpdates _C_
+			   CNetworkParameter::Instance.gameCyclesPerUpdate _C_
 			   CNetworkParameter::Instance.NetworkLag _C_ HostsCount);
+
+	NetworkInSync = true;
+	CommandsIn.clear();
+	MsgCommandsIn.clear();
 	// Prepare first time without syncs.
 	for (int i = 0; i != 256; ++i) {
 		for (int p = 0; p != PlayerMax; ++p) {
@@ -487,11 +481,11 @@ void InitNetwork2()
 		for (int n = 0; n < HostsCount; ++n) {
 			CNetworkCommandQueue (&ncqs)[MaxNetworkCommands] = NetworkIn[i][Hosts[n].PlyNr];
 
-			ncqs[0].Time = i * CNetworkParameter::Instance.NetworkUpdates;
+			ncqs[0].Time = i * CNetworkParameter::Instance.gameCyclesPerUpdate;
 			ncqs[0].Type = MessageSync;
 			ncqs[0].Data.resize(nc.Size());
 			nc.Serialize(&ncqs[0].Data[0]);
-			ncqs[1].Time = i * CNetworkParameter::Instance.NetworkUpdates;
+			ncqs[1].Time = i * CNetworkParameter::Instance.gameCyclesPerUpdate;
 			ncqs[1].Type = MessageNone;
 		}
 	}
@@ -619,26 +613,22 @@ void NetworkSendSelection(CUnit **units, int count)
 }
 
 /**
-**  Process Received Unit Selection
+**  Send chat message. (Message is sent with low priority)
 **
-**  @param ncq  Network Packet to Process
+**  @param msg  Text message to send.
 */
-static void ParseNetworkCommand_Selection(const CNetworkCommandQueue &ncq)
+void NetworkSendChatMessage(const std::string &msg)
 {
-	Assert((ncq.Type & 0x7F) == MessageSelection);
-
-	CNetworkSelection ns;
-
-	ns.Deserialize(&ncq.Data[0]);
-	if (Players[ns.player].Team != ThisPlayer->Team) {
+	if (!IsNetworkGame()) {
 		return;
 	}
-	std::vector<CUnit *> units;
-
-	for (size_t i = 0; i != ns.Units.size(); ++i) {
-		units.push_back(&UnitManager.GetSlotUnit(ns.Units[i]));
-	}
-	ChangeTeamSelectedUnits(Players[ns.player], units);
+	CNetworkChat nc;
+	nc.Text = msg;
+	CNetworkCommandQueue ncq;
+	ncq.Type = MessageChat;
+	ncq.Data.resize(nc.Size());
+	nc.Serialize(&ncq.Data[0]);
+	MsgCommandsIn.push_back(ncq);
 }
 
 /**
@@ -663,14 +653,22 @@ static void NetworkRemovePlayer(int player)
 	}
 }
 
+static bool IsNetworkCommandReady(int hostIndex, unsigned long gameNetCycle)
+{
+	const int ply = Hosts[hostIndex].PlyNr;
+	const CNetworkCommandQueue &ncq = NetworkIn[gameNetCycle & 0xFF][ply][0];
+
+	if (ncq.Time != gameNetCycle * CNetworkParameter::Instance.gameCyclesPerUpdate) {
+		return false;
+	}
+	return true;
+}
+
 static bool IsNetworkCommandReady(unsigned long gameNetCycle)
 {
 	// Check if all next messages are available.
-	const CNetworkCommandQueue (&ncqs)[PlayerMax][MaxNetworkCommands] = NetworkIn[gameNetCycle & 0xFF];
 	for (int i = 0; i < HostsCount; ++i) {
-		const CNetworkCommandQueue *ncq = ncqs[Hosts[i].PlyNr];
-
-		if (ncq[0].Time != gameNetCycle * CNetworkParameter::Instance.NetworkUpdates) {
+		if (IsNetworkCommandReady(i, gameNetCycle) == false) {
 			return false;
 		}
 	}
@@ -684,7 +682,7 @@ static void ParseResendCommand(const CNetworkPacket &packet)
 	if (n > GameCycle + 128) {
 		n -= 0x100;
 	}
-	const unsigned long gameNetCycle = n / CNetworkParameter::Instance.NetworkUpdates;
+	const unsigned long gameNetCycle = n / CNetworkParameter::Instance.gameCyclesPerUpdate;
 	// FIXME: not necessary to send this packet multiple times!!!!
 	// other side sends re-send until it gets an answer.
 	if (n != NetworkIn[gameNetCycle & 0xFF][ThisPlayer->Index][0].Time) {
@@ -700,58 +698,59 @@ static void ParseResendCommand(const CNetworkPacket &packet)
 			if (ncq->Time && ncq->Type == MessageQuit) {
 				CNetworkPacket np;
 				np.Header.Cycle = ncq->Time & 0xFF;
-				np.Header.Type[0] = ncq->Type;
+				np.Header.Type[0] = MessageQuit;
 				np.Command[0] = ncq->Data;
 				for (int k = 1; k < MaxNetworkCommands; ++k) {
 					np.Header.Type[k] = MessageNone;
 				}
-				// FIXME : BUG? : order may differ when send alone
 				NetworkBroadcast(np, 1);
+				break;
 			}
 		}
 	}
 }
 
-static bool IsAValidCommand(const CNetworkPacket &packet, int index)
+static bool IsAValidCommand_Command(const CNetworkPacket &packet, int index)
 {
+	CNetworkCommand nc;
+	nc.Deserialize(&packet.Command[index][0]);
+	const unsigned int slot = nc.Unit;
+	const CUnit *unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : NULL;
 	const int player = Hosts[index].PlyNr;
 
+	if (unit && (unit->Player->Index == player
+				 || Players[player].IsTeamed(*unit))) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+static bool IsAValidCommand_Dismiss(const CNetworkPacket &packet, int index)
+{
+	CNetworkCommand nc;
+	nc.Deserialize(&packet.Command[index][0]);
+	const unsigned int slot = nc.Unit;
+	const CUnit *unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : NULL;
+
+	if (unit && unit->Type->ClicksToExplode) {
+		return true;
+	}
+	return IsAValidCommand_Command(packet, index);
+}
+
+static bool IsAValidCommand(const CNetworkPacket &packet, int index)
+{
 	switch (packet.Header.Type[index] & 0x7F) {
 		case MessageExtendedCommand: // FIXME: ensure the sender is part of the command
-			return true;
 		case MessageSync: // Sync does not matter
+		case MessageSelection: // FIXME: ensure it's from the right player
+		case MessageQuit:      // FIXME: ensure it's from the right player
+		case MessageResend:    // FIXME: ensure it's from the right player
+		case MessageChat:      // FIXME: ensure it's from the right player
 			return true;
-		case MessageSelection:
-			return true;
-		case MessageQuit:
-		case MessageResend:
-		case MessageChat:
-			// FIXME: ensure it's from the right player
-			return true;
-		case MessageCommandDismiss: {
-			CNetworkCommand nc;
-			nc.Deserialize(&packet.Command[index][0]);
-			const unsigned int slot = nc.Unit;
-			const CUnit *unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : NULL;
-
-			if (unit && unit->Type->ClicksToExplode) {
-				return true;
-			}
-		}
-		// Fall through!
-		default: {
-			CNetworkCommand nc;
-			nc.Deserialize(&packet.Command[index][0]);
-			const unsigned int slot = nc.Unit;
-			const CUnit *unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : NULL;
-
-			if (unit && (unit->Player->Index == player
-						 || Players[player].IsTeamed(*unit))) {
-				return true;
-			} else {
-				return false;
-			}
-		}
+		case MessageCommandDismiss: return IsAValidCommand_Dismiss(packet, index);
+		default: return IsAValidCommand_Command(packet, index);
 	}
 	// FIXME: not all values in nc have been validated
 }
@@ -802,7 +801,7 @@ static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHo
 			if (n > GameCycle + 128) {
 				n -= 0x100;
 			}
-			const unsigned long gameNetCycle = n / CNetworkParameter::Instance.NetworkUpdates;
+			const unsigned long gameNetCycle = n / CNetworkParameter::Instance.gameCyclesPerUpdate;
 			NetworkIn[gameNetCycle & 0xFF][player][i].Time = n;
 			NetworkIn[gameNetCycle & 0xFF][player][i].Type = packet.Header.Type[i];
 			NetworkIn[gameNetCycle & 0xFF][player][i].Data = packet.Command[i];
@@ -817,7 +816,7 @@ static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHo
 	}
 	// Waiting for this time slot
 	if (!NetworkInSync) {
-		const int networkUpdates = CNetworkParameter::Instance.NetworkUpdates;
+		const int networkUpdates = CNetworkParameter::Instance.gameCyclesPerUpdate;
 		const unsigned long nextGameNetCycle = (GameCycle / networkUpdates) + 1;
 		if (IsNetworkCommandReady(nextGameNetCycle) == true) {
 			NetworkInSync = true;
@@ -828,10 +827,6 @@ static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHo
 /**
 **  Called if message for the network is ready.
 **  (by WaitEventsOneFrame)
-**
-**  @todo
-**  NetworkReceivedEarly NetworkReceivedLate NetworkReceivedDups
-**  Must be calculated.
 */
 void NetworkEvent()
 {
@@ -866,20 +861,20 @@ void NetworkEvent()
 /**
 **  Quit the game.
 */
-void NetworkQuit()
+void NetworkQuitGame()
 {
-	if (!ThisPlayer) {
+	if (!ThisPlayer || IsNetworkGame() == false) {
 		return;
 	}
-	const int NetworkUpdates = CNetworkParameter::Instance.NetworkUpdates;
+	const int gameCyclesPerUpdate = CNetworkParameter::Instance.gameCyclesPerUpdate;
 	const int NetworkLag = CNetworkParameter::Instance.NetworkLag;
-	const int gameNetCycle = GameCycle / NetworkUpdates;
+	const int gameNetCycle = GameCycle / gameCyclesPerUpdate;
 	const int n = gameNetCycle + 1 + NetworkLag;
 	CNetworkCommandQueue (&ncqs)[MaxNetworkCommands] = NetworkIn[n & 0xFF][ThisPlayer->Index];
 	CNetworkCommandQuit nc;
 	nc.player = ThisPlayer->Index;
 	ncqs[0].Type = MessageQuit;
-	ncqs[0].Time = n * CNetworkParameter::Instance.NetworkUpdates;
+	ncqs[0].Time = n * CNetworkParameter::Instance.gameCyclesPerUpdate;
 	ncqs[0].Data.resize(nc.Size());
 	nc.Serialize(&ncqs[0].Data[0]);
 	for (int i = 1; i < MaxNetworkCommands; ++i) {
@@ -889,32 +884,13 @@ void NetworkQuit()
 	NetworkSendPacket(ncqs);
 }
 
-/**
-**  Send chat message. (Message is sent with low priority)
-**
-**  @param msg  Text message to send.
-*/
-void NetworkChatMessage(const std::string &msg)
-{
-	if (!IsNetworkGame()) {
-		return;
-	}
-	CNetworkChat nc;
-	nc.Text = msg;
-	CNetworkCommandQueue ncq;
-	ncq.Type = MessageChat;
-	ncq.Data.resize(nc.Size());
-	nc.Serialize(&ncq.Data[0]);
-	MsgCommandsIn.push_back(ncq);
-}
-
-static void ParseNetworkCommand_Sync(const CNetworkCommandQueue &ncq)
+static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
 {
 	Assert((ncq.Type & 0x7F) == MessageSync);
 
 	CNetworkCommandSync nc;
 	nc.Deserialize(&ncq.Data[0]);
-	const unsigned long gameNetCycle = GameCycle / CNetworkParameter::Instance.NetworkUpdates;
+	const unsigned long gameNetCycle = GameCycle / CNetworkParameter::Instance.gameCyclesPerUpdate;
 	const int syncSeed = nc.syncSeed;
 	const int syncHash = nc.syncHash;
 
@@ -927,7 +903,25 @@ static void ParseNetworkCommand_Sync(const CNetworkCommandQueue &ncq)
 	}
 }
 
-static void ParseNetworkCommand_Chat(const CNetworkCommandQueue &ncq)
+static void NetworkExecCommand_Selection(const CNetworkCommandQueue &ncq)
+{
+	Assert((ncq.Type & 0x7F) == MessageSelection);
+
+	CNetworkSelection ns;
+
+	ns.Deserialize(&ncq.Data[0]);
+	if (Players[ns.player].Team != ThisPlayer->Team) {
+		return;
+	}
+	std::vector<CUnit *> units;
+
+	for (size_t i = 0; i != ns.Units.size(); ++i) {
+		units.push_back(&UnitManager.GetSlotUnit(ns.Units[i]));
+	}
+	ChangeTeamSelectedUnits(Players[ns.player], units);
+}
+
+static void NetworkExecCommand_Chat(const CNetworkCommandQueue &ncq)
 {
 	Assert((ncq.Type & 0x7F) == MessageChat);
 
@@ -939,43 +933,53 @@ static void ParseNetworkCommand_Chat(const CNetworkCommandQueue &ncq)
 	CommandLog("chat", NoUnitP, FlushCommands, -1, -1, NoUnitP, nc.Text.c_str(), -1);
 }
 
+static void NetworkExecCommand_Quit(const CNetworkCommandQueue &ncq)
+{
+	Assert((ncq.Type & 0x7F) == MessageQuit);
+	CNetworkCommandQuit nc;
+
+	nc.Deserialize(&ncq.Data[0]);
+	NetworkRemovePlayer(nc.player);
+	CommandLog("quit", NoUnitP, FlushCommands, nc.player, -1, NoUnitP, NULL, -1);
+	CommandQuit(nc.player);
+}
+
+static void NetworkExecCommand_ExtendedCommand(const CNetworkCommandQueue &ncq)
+{
+	Assert((ncq.Type & 0x7F) == MessageExtendedCommand);
+	CNetworkExtendedCommand nec;
+
+	nec.Deserialize(&ncq.Data[0]);
+	ExecExtendedCommand(nec.ExtendedType, (ncq.Type & 0x80) >> 7,
+						nec.Arg1, nec.Arg2, nec.Arg3, nec.Arg4);
+}
+
+static void NetworkExecCommand_Command(const CNetworkCommandQueue &ncq)
+{
+	CNetworkCommand nc;
+
+	nc.Deserialize(&ncq.Data[0]);
+	ExecCommand(ncq.Type, nc.Unit, nc.X, nc.Y, nc.Dest);
+}
+
 /**
-**  Parse a network command.
+**  Execute a network command.
 **
 **  @param ncq  Network command from queue
 */
-static void ParseNetworkCommand(const CNetworkCommandQueue &ncq)
+static void NetworkExecCommand(const CNetworkCommandQueue &ncq)
 {
 	switch (ncq.Type & 0x7F) {
-		case MessageSync: ParseNetworkCommand_Sync(ncq); break;
-		case MessageSelection: ParseNetworkCommand_Selection(ncq); break;
-		case MessageChat: ParseNetworkCommand_Chat(ncq); break;
-
-		case MessageQuit: {
-			CNetworkCommandQuit nc;
-			nc.Deserialize(&ncq.Data[0]);
-			NetworkRemovePlayer(nc.player);
-			CommandLog("quit", NoUnitP, FlushCommands, nc.player, -1, NoUnitP, NULL, -1);
-			CommandQuit(nc.player);
-			break;
-		}
-		case MessageExtendedCommand: {
-			CNetworkExtendedCommand nec;
-			nec.Deserialize(&ncq.Data[0]);
-			ParseExtendedCommand(nec.ExtendedType, (ncq.Type & 0x80) >> 7,
-								 nec.Arg1, nec.Arg2, nec.Arg3, nec.Arg4);
-		}
-		break;
+		case MessageSync: NetworkExecCommand_Sync(ncq); break;
+		case MessageSelection: NetworkExecCommand_Selection(ncq); break;
+		case MessageChat: NetworkExecCommand_Chat(ncq); break;
+		case MessageQuit: NetworkExecCommand_Quit(ncq); break;
+		case MessageExtendedCommand: NetworkExecCommand_ExtendedCommand(ncq); break;
 		case MessageNone:
 			// Nothing to Do, This Message Should Never be Executed
 			Assert(0);
 			break;
-		default: {
-			CNetworkCommand nc;
-			nc.Deserialize(&ncq.Data[0]);
-			ParseCommand(ncq.Type, nc.Unit, nc.X, nc.Y, nc.Dest);
-			break;
-		}
+		default: NetworkExecCommand_Command(ncq); break;
 	}
 }
 
@@ -995,7 +999,7 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 		nc.syncSeed = SyncRandSeed;
 		ncq[0].Data.resize(nc.Size());
 		nc.Serialize(&ncq[0].Data[0]);
-		ncq[0].Time = gameNetCycle * CNetworkParameter::Instance.NetworkUpdates;
+		ncq[0].Time = gameNetCycle * CNetworkParameter::Instance.gameCyclesPerUpdate;
 		numcommands = 1;
 	} else {
 		while (!CommandsIn.empty() && numcommands < MaxNetworkCommands) {
@@ -1013,14 +1017,14 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 			}
 #endif
 			ncq[numcommands] = incommand;
-			ncq[numcommands].Time = gameNetCycle * CNetworkParameter::Instance.NetworkUpdates;
+			ncq[numcommands].Time = gameNetCycle * CNetworkParameter::Instance.gameCyclesPerUpdate;
 			++numcommands;
 			CommandsIn.pop_front();
 		}
 		while (!MsgCommandsIn.empty() && numcommands < MaxNetworkCommands) {
 			const CNetworkCommandQueue &incommand = MsgCommandsIn.front();
 			ncq[numcommands] = incommand;
-			ncq[numcommands].Time = gameNetCycle * CNetworkParameter::Instance.NetworkUpdates;
+			ncq[numcommands].Time = gameNetCycle * CNetworkParameter::Instance.gameCyclesPerUpdate;
 			++numcommands;
 			MsgCommandsIn.pop_front();
 		}
@@ -1028,10 +1032,9 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 	if (numcommands != MaxNetworkCommands) {
 		ncq[numcommands].Type = MessageNone;
 	}
-	NetworkSendPacket(ncq);
-
 	NetworkSyncSeeds[gameNetCycle & 0xFF] = SyncRandSeed;
 	NetworkSyncHashs[gameNetCycle & 0xFF] = SyncHash;
+	NetworkSendPacket(ncq);
 }
 
 /**
@@ -1041,7 +1044,6 @@ static void NetworkExecCommands(unsigned long gameNetCycle)
 {
 	// Must execute commands on all computers in the same order.
 	for (int i = 0; i < NumPlayers; ++i) {
-		// Remove commands.
 		const CNetworkCommandQueue *ncqs = NetworkIn[gameNetCycle & 0xFF][i];
 		for (int c = 0; c < MaxNetworkCommands; ++c) {
 			const CNetworkCommandQueue &ncq = ncqs[c];
@@ -1049,8 +1051,8 @@ static void NetworkExecCommands(unsigned long gameNetCycle)
 				break;
 			}
 			if (ncq.Time) {
-				Assert(ncq.Time == gameNetCycle * CNetworkParameter::Instance.NetworkUpdates);
-				ParseNetworkCommand(ncq);
+				Assert(ncq.Time == gameNetCycle * CNetworkParameter::Instance.gameCyclesPerUpdate);
+				NetworkExecCommand(ncq);
 			}
 		}
 	}
@@ -1064,17 +1066,49 @@ void NetworkCommands()
 	if (!IsNetworkGame()) {
 		return;
 	}
-	if ((GameCycle % CNetworkParameter::Instance.NetworkUpdates) != 0) {
+	if ((GameCycle % CNetworkParameter::Instance.gameCyclesPerUpdate) != 0) {
 		return;
 	}
-	const unsigned long gameNetCycle = GameCycle / CNetworkParameter::Instance.NetworkUpdates;
+	const unsigned long gameNetCycle = GameCycle / CNetworkParameter::Instance.gameCyclesPerUpdate;
 	// Send messages to all clients (other players)
 	NetworkSendCommands(gameNetCycle + CNetworkParameter::Instance.NetworkLag);
 	NetworkExecCommands(gameNetCycle);
-	if (IsNetworkCommandReady(gameNetCycle + 1) == false) {
-		NetworkInSync = false;
-		NetworkDelay = FrameCounter + CNetworkParameter::Instance.NetworkUpdates;
-		// FIXME: should send a resend request.
+	NetworkInSync = IsNetworkCommandReady(gameNetCycle + 1);
+}
+
+static void CheckPlayerThatTimeOut(int hostIndex)
+{
+	const int playerIndex = Hosts[hostIndex].PlyNr;
+	const unsigned long lastFrame = NetworkLastFrame[playerIndex];
+	if (!lastFrame) {
+		return;
+	}
+	const int framesPerSecond = FRAMES_PER_SECOND * VideoSyncSpeed / 100;
+	const int secs = (FrameCounter - lastFrame) / framesPerSecond;
+	// FIXME: display a menu while we wait
+	const int timeoutInS = CNetworkParameter::Instance.timeoutInS;
+	if (3 <= secs && secs < timeoutInS && FrameCounter % framesPerSecond == 0) {
+		SetMessage(_("Waiting for player \"%s\": %d:%02d"), Hosts[hostIndex].PlyName,
+				   (timeoutInS - secs) / 60, (timeoutInS - secs) % 60);
+	}
+	if (secs >= timeoutInS) {
+		const unsigned int nextGameNetCycle = GameCycle / CNetworkParameter::Instance.gameCyclesPerUpdate + 1;
+		CNetworkCommandQuit nc;
+		nc.player = playerIndex;
+		CNetworkCommandQueue *ncq = &NetworkIn[nextGameNetCycle & 0xFF][playerIndex][0];
+		ncq->Time = nextGameNetCycle * CNetworkParameter::Instance.gameCyclesPerUpdate;
+		ncq->Type = MessageQuit;
+		ncq->Data.resize(nc.Size());
+		nc.Serialize(&ncq->Data[0]);
+		PlayerQuit[playerIndex] = 1;
+		SetMessage("%s", _("Timed out"));
+
+		CNetworkPacket np;
+		np.Header.Cycle = ncq->Time & 0xFF;
+		np.Header.Type[0] = ncq->Type;
+		np.Header.Type[1] = MessageNone;
+
+		NetworkBroadcast(np, 1);
 	}
 }
 
@@ -1091,7 +1125,7 @@ static void NetworkResendCommands()
 	++NetworkStat.resentPacketCount;
 #endif
 
-	const int networkUpdates = CNetworkParameter::Instance.NetworkUpdates;
+	const int networkUpdates = CNetworkParameter::Instance.gameCyclesPerUpdate;
 	const int nextGameCycle = ((GameCycle / networkUpdates) + 1) * networkUpdates;
 	// Build packet
 	CNetworkPacket packet;
@@ -1111,56 +1145,15 @@ void NetworkRecover()
 		NetworkInSync = true;
 		return;
 	}
-	if (FrameCounter <= NetworkDelay) {
+	if (FrameCounter % CNetworkParameter::Instance.gameCyclesPerUpdate != 0) {
 		return;
 	}
-	NetworkDelay += CNetworkParameter::Instance.NetworkUpdates;
-
-	// Check for players that timed out
-	for (int i = 0; i < HostsCount; ++i) {
-		const int playerIndex = Hosts[i].PlyNr;
-		const unsigned long lastFrame = NetworkLastFrame[playerIndex];
-		if (!lastFrame) {
-			continue;
-		}
-		const int framesPerSecond = FRAMES_PER_SECOND * VideoSyncSpeed / 100;
-		const int secs = (FrameCounter - lastFrame) / framesPerSecond;
-		// FIXME: display a menu while we wait
-		const int timeoutInS = CNetworkParameter::Instance.timeoutInS;
-		if (3 <= secs && secs < timeoutInS) {
-			if (FrameCounter % framesPerSecond == 0) {
-				SetMessage(_("Waiting for player \"%s\": %d:%02d"), Hosts[i].PlyName,
-						   (timeoutInS - secs) / 60, (timeoutInS - secs) % 60);
-			}
-		}
-		if (secs >= timeoutInS) {
-			const unsigned int nextGameNetCycle = GameCycle / CNetworkParameter::Instance.NetworkUpdates + 1;
-			CNetworkCommandQuit nc;
-			nc.player = playerIndex;
-			CNetworkCommandQueue *ncq = &NetworkIn[nextGameNetCycle & 0xFF][playerIndex][0];
-			ncq->Time = nextGameNetCycle * CNetworkParameter::Instance.NetworkUpdates;
-			ncq->Type = MessageQuit;
-			ncq->Data.resize(nc.Size());
-			nc.Serialize(&ncq->Data[0]);
-			PlayerQuit[playerIndex] = 1;
-			SetMessage("%s", _("Timed out"));
-
-			CNetworkPacket np;
-			np.Header.Cycle = ncq->Time & 0xFF;
-			np.Header.Type[0] = ncq->Type;
-			np.Header.Type[1] = MessageNone;
-
-			NetworkBroadcast(np, 1);
-
-			if (IsNetworkCommandReady(nextGameNetCycle) == false) {
-				NetworkInSync = false;
-				NetworkDelay = FrameCounter + CNetworkParameter::Instance.NetworkUpdates;
-				// FIXME: should send a resend request.
-			}
-		}
+	for (int i = 0; i != HostsCount; ++i) {
+		CheckPlayerThatTimeOut(i);
 	}
-	// Resend old commands
 	NetworkResendCommands();
+	const unsigned int nextGameNetCycle = GameCycle / CNetworkParameter::Instance.gameCyclesPerUpdate + 1;
+	NetworkInSync = IsNetworkCommandReady(nextGameNetCycle);
 }
 
 //@}

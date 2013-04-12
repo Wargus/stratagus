@@ -813,8 +813,7 @@ void CreateGame(const std::string &filename, CMap *map)
 	InitSyncRand();
 
 	if (IsNetworkGame()) { // Prepare network play
-		DebugPrint("Client setup: Calling InitNetwork2\n");
-		InitNetwork2();
+		NetworkOnStartGame();
 	} else {
 		const std::string &localPlayerName = Parameters::Instance.LocalPlayerName;
 

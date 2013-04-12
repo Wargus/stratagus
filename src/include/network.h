@@ -51,9 +51,9 @@ public:
 	void FixValues();
 public:
 	std::string localHost;  /// Local network address to use
-	unsigned int localPort;       /// Local network port to use
-	unsigned int NetworkUpdates;  /// Network update each # game cycles
-	unsigned int NetworkLag;      /// Network lag (# game cycles) (multiple of NetworkUpdates)
+	unsigned int localPort; /// Local network port to use
+	unsigned int gameCyclesPerUpdate;  /// Network update each # game cycles
+	unsigned int NetworkLag;      /// Network lag (# update cycles)
 	unsigned int timeoutInS;      /// Number of seconds until player times out
 
 public:
@@ -74,15 +74,15 @@ extern bool NetworkInSync;        /// Network is in sync
 ----------------------------------------------------------------------------*/
 
 extern inline bool IsNetworkGame() { return NetworkFildes.IsValid(); }
-extern void InitNetwork1();  /// Initialise network part 1 (ports)
-extern void InitNetwork2();  /// Initialise network part 2
-extern void ExitNetwork1();  /// Cleanup network part 1 (ports)
+extern void InitNetwork1();  /// Initialise network
+extern void ExitNetwork1();  /// Cleanup network (port)
+extern void NetworkOnStartGame();  /// Initialise network data for ingame communication
 extern void NetworkEvent();  /// Handle network events
 extern void NetworkSync();   /// Hold in sync
-extern void NetworkQuit();   /// Quit game
+extern void NetworkQuitGame();  /// Quit game: warn other users
 extern void NetworkRecover();   /// Recover network
 extern void NetworkCommands();  /// Get all network commands
-extern void NetworkChatMessage(const std::string &msg);  /// Send chat message
+extern void NetworkSendChatMessage(const std::string &msg);  /// Send chat message
 /// Send network command.
 extern void NetworkSendCommand(int command, const CUnit &unit, int x,
 							   int y, const CUnit *dest, const CUnitType *type, int status);

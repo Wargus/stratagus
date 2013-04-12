@@ -439,7 +439,7 @@ CInitMessage_Welcome::CInitMessage_Welcome() :
 	header(MessageInit_FromServer, ICMWelcome)
 {
 	this->Lag = CNetworkParameter::Instance.NetworkLag;
-	this->Updates = CNetworkParameter::Instance.NetworkUpdates;
+	this->gameCyclesPerUpdate = CNetworkParameter::Instance.gameCyclesPerUpdate;
 }
 
 const unsigned char *CInitMessage_Welcome::Serialize() const
@@ -452,7 +452,7 @@ const unsigned char *CInitMessage_Welcome::Serialize() const
 		p += this->hosts[i].Serialize(p);
 	}
 	p += serialize32(p, this->Lag);
-	p += serialize32(p, this->Updates);
+	p += serialize32(p, this->gameCyclesPerUpdate);
 	return buf;
 }
 
@@ -463,7 +463,7 @@ void CInitMessage_Welcome::Deserialize(const unsigned char *p)
 		p += this->hosts[i].Deserialize(p);
 	}
 	p += deserialize32(p, &this->Lag);
-	p += deserialize32(p, &this->Updates);
+	p += deserialize32(p, &this->gameCyclesPerUpdate);
 }
 
 //

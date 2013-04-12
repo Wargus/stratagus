@@ -217,9 +217,9 @@ public:
 private:
 	CInitMessage_Header header;
 public:
-	CNetworkHost hosts[PlayerMax]; /// Participant information
-	int32_t Lag;        /// Lag time
-	int32_t Updates;    /// Update frequency
+	CNetworkHost hosts[PlayerMax]; /// Participants information
+	int32_t Lag;                   /// Lag time
+	int32_t gameCyclesPerUpdate;   /// Update frequency
 };
 
 class CInitMessage_Map

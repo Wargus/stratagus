@@ -548,7 +548,7 @@ void SendCommandSharedVision(int player, bool state, int opponent)
 //@{
 
 /**
-** Parse a command (from network).
+** Execute a command (from network).
 **
 ** @param msgnr    Network message type
 ** @param unum     Unit number (slot) that receive the command.
@@ -556,8 +556,8 @@ void SendCommandSharedVision(int player, bool state, int opponent)
 ** @param y        optional y map position.
 ** @param dstnr    optional destination unit.
 */
-void ParseCommand(unsigned char msgnr, UnitRef unum,
-				  unsigned short x, unsigned short y, UnitRef dstnr)
+void ExecCommand(unsigned char msgnr, UnitRef unum,
+				 unsigned short x, unsigned short y, UnitRef dstnr)
 {
 	CUnit &unit = UnitManager.GetSlotUnit(unum);
 	const Vec2i pos(x, y);
@@ -746,8 +746,16 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 	}
 }
 
+static const char *GetDiplomacyName(enum _diplomacy_ e)
+{
+	Assert(int(e) < 4);
+	const char *diplomacyNames[] = {"allied", "neutral", "enemy", "crazy"};
+
+	return diplomacyNames[int(e)];
+}
+
 /**
-** Parse an extended command (from network).
+** Execute an extended command (from network).
 **
 ** @param type     Network extended message type
 ** @param status   Bit 7 of message type
@@ -756,41 +764,24 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 ** @param arg3     Messe argument 3
 ** @param arg4     Messe argument 4
 */
-void ParseExtendedCommand(unsigned char type, int status,
-						  unsigned char arg1, unsigned short arg2, unsigned short arg3,
-						  unsigned short arg4)
+void ExecExtendedCommand(unsigned char type, int status,
+						 unsigned char arg1, unsigned short arg2, unsigned short arg3,
+						 unsigned short arg4)
 {
 	// Note: destroyed units are handled by the action routines.
 
 	switch (type) {
-		case ExtendedMessageDiplomacy:
-			switch (arg3) {
-				case DiplomacyNeutral:
-					CommandLog("diplomacy", NoUnitP, 0, arg2, arg4,
-							   NoUnitP, "neutral", -1);
-					break;
-				case DiplomacyAllied:
-					CommandLog("diplomacy", NoUnitP, 0, arg2, arg4,
-							   NoUnitP, "allied", -1);
-					break;
-				case DiplomacyEnemy:
-					CommandLog("diplomacy", NoUnitP, 0, arg2, arg4,
-							   NoUnitP, "enemy", -1);
-					break;
-				case DiplomacyCrazy:
-					CommandLog("diplomacy", NoUnitP, 0, arg2, arg4,
-							   NoUnitP, "crazy", -1);
-					break;
-			}
+		case ExtendedMessageDiplomacy: {
+			const char *diplomacyName = GetDiplomacyName(_diplomacy_(arg3));
+			CommandLog("diplomacy", NoUnitP, 0, arg2, arg4, NoUnitP, diplomacyName, -1);
 			CommandDiplomacy(arg2, arg3, arg4);
 			break;
+		}
 		case ExtendedMessageSharedVision:
 			if (arg3 == 0) {
-				CommandLog("shared-vision", NoUnitP, 0, arg2, arg4,
-						   NoUnitP, "0", -1);
+				CommandLog("shared-vision", NoUnitP, 0, arg2, arg4, NoUnitP, "0", -1);
 			} else {
-				CommandLog("shared-vision", NoUnitP, 0, arg2, arg4,
-						   NoUnitP, "1", -1);
+				CommandLog("shared-vision", NoUnitP, 0, arg2, arg4, NoUnitP, "1", -1);
 			}
 			CommandSharedVision(arg2, arg3 ? true : false, arg4);
 			break;

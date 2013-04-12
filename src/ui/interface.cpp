@@ -811,7 +811,6 @@ int HandleCheats(const std::string &input)
 */
 static int InputKey(int key)
 {
-	char ChatMessage[sizeof(Input) + 40];
 	int i;
 	char *namestart;
 	char *p;
@@ -819,7 +818,7 @@ static int InputKey(int key)
 
 	switch (key) {
 		case SDLK_RETURN:
-		case SDLK_KP_ENTER: // RETURN
+		case SDLK_KP_ENTER: { // RETURN
 			// Replace ~~ with ~
 			for (p = q = Input; *p;) {
 				if (*p == '~') {
@@ -866,12 +865,14 @@ static int InputKey(int key)
 						++p;
 					}
 				}
-				snprintf(ChatMessage, sizeof(ChatMessage), "~%s~<%s>~> %s",
+				char chatMessage[sizeof(Input) + 40];
+				snprintf(chatMessage, sizeof(chatMessage), "~%s~<%s>~> %s",
 						 PlayerColorNames[ThisPlayer->Index].c_str(),
 						 ThisPlayer->Name.c_str(), Input);
 				// FIXME: only to selected players ...
-				NetworkChatMessage(ChatMessage);
+				NetworkSendChatMessage(chatMessage);
 			}
+		}
 			// FALL THROUGH
 		case SDLK_ESCAPE:
 			KeyState = KeyStateCommand;

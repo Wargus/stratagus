@@ -181,15 +181,13 @@ extern void SendCommandDiplomacy(int player, int state, int opponent);
 /// Send shared vision command
 extern void SendCommandSharedVision(int player, bool state, int opponent);
 
-/// Parse a command (from network).
-extern void ParseCommand(unsigned char type, UnitRef unum, unsigned short x,
-						 unsigned short y, UnitRef dest);
-/// Parse an extended command (from network).
-extern void ParseExtendedCommand(unsigned char type, int status,
-								 unsigned char arg1, unsigned short arg2, unsigned short arg3,
-								 unsigned short arg4);
-
-
+/// Execute a command (from network).
+extern void ExecCommand(unsigned char type, UnitRef unum, unsigned short x,
+						unsigned short y, UnitRef dest);
+/// Execute an extended command (from network).
+extern void ExecExtendedCommand(unsigned char type, int status, unsigned char arg1,
+								unsigned short arg2, unsigned short arg3,
+								unsigned short arg4);
 
 #define FlushCommands 1          /// Flush commands in queue
 
