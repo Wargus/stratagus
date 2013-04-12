@@ -686,12 +686,9 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		}
 		case MessageCommandReturn: {
-			if (dstnr != (unsigned short)0xFFFF) {
-				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
-				Assert(dest.Type);
-				CommandLog("return", &unit, status, -1, -1, &dest, NULL, -1);
-				CommandReturnGoods(unit, &dest, status);
-			}
+			CUnit *dest = (dstnr != (unsigned short)0xFFFF) ? &UnitManager.GetSlotUnit(dstnr) : NULL;
+			CommandLog("return", &unit, status, -1, -1, dest, NULL, -1);
+			CommandReturnGoods(unit, dest, status);
 			break;
 		}
 		case MessageCommandTrain:
