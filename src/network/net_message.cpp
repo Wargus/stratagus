@@ -728,7 +728,7 @@ size_t CNetworkPacketHeader::Deserialize(const unsigned char *buf)
 // CNetworkPacket
 //
 
-unsigned CNetworkPacket::Serialize(unsigned char *buf, int numcommands) const
+size_t CNetworkPacket::Serialize(unsigned char *buf, int numcommands) const
 {
 	unsigned char *p = buf;
 
