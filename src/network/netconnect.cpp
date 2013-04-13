@@ -1399,9 +1399,8 @@ int NetworkParseSetupEvent(const unsigned char *buf, int size, const CHost &host
 		}
 		return 0;
 	}
-	const unsigned char msgsubtype = header.GetSubType();
-
 #ifdef DEBUG
+	const unsigned char msgsubtype = header.GetSubType();
 	const std::string hostStr = host.toString();
 	DebugPrint("Received %s (%d) from %s\n" _C_
 			   icmsgsubtypenames[int(msgsubtype)] _C_ msgsubtype _C_
