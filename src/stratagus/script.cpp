@@ -340,28 +340,18 @@ bool LuaToBoolean(lua_State *l, int narg)
 }
 
 /**
-**  Perform CCL garbage collection
-**
-**  @param fast  set this flag to disable slow GC (during game)
+**  Perform lua garbage collection
 */
-void CclGarbageCollect(int)
+void LuaGarbageCollect()
 {
 #if LUA_VERSION_NUM >= 501
-	DebugPrint("Garbage collect (before): %d\n" _C_
-			   lua_gc(Lua, LUA_GCCOUNT, 0));
-
+	DebugPrint("Garbage collect (before): %d\n" _C_ lua_gc(Lua, LUA_GCCOUNT, 0));
 	lua_gc(Lua, LUA_GCCOLLECT, 0);
-
-	DebugPrint("Garbage collect (after): %d\n" _C_
-			   lua_gc(Lua, LUA_GCCOUNT, 0));
+	DebugPrint("Garbage collect (after): %d\n" _C_ lua_gc(Lua, LUA_GCCOUNT, 0));
 #else
-	DebugPrint("Garbage collect (before): %d/%d\n" _C_
-			   lua_getgccount(Lua) _C_ lua_getgcthreshold(Lua));
-
+	DebugPrint("Garbage collect (before): %d/%d\n" _C_  lua_getgccount(Lua) _C_ lua_getgcthreshold(Lua));
 	lua_setgcthreshold(Lua, 0);
-
-	DebugPrint("Garbage collect (after): %d/%d\n" _C_
-			   lua_getgccount(Lua) _C_ lua_getgcthreshold(Lua));
+	DebugPrint("Garbage collect (after): %d/%d\n" _C_ lua_getgccount(Lua) _C_ lua_getgcthreshold(Lua));
 #endif
 }
 
@@ -636,7 +626,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 				} else if (!strcmp(key, "Loc")) {
 					res->D.UnitStat.Loc = LuaToNumber(l, -1);
 					if (res->D.UnitStat.Loc < 0 || 2 < res->D.UnitStat.Loc) {
-						LuaError(l, "Bad Loc number :'%d'" _C_(int) LuaToNumber(l, -1));
+						LuaError(l, "Bad Loc number :'%d'" _C_ LuaToNumber(l, -1));
 					}
 				} else {
 					LuaError(l, "Bad param %s for Unit" _C_ key);
@@ -2204,7 +2194,7 @@ void LoadCcl(const std::string &filename)
 	ShowLoadProgress("Script %s\n", buf);
 	LuaLoadFile(buf);
 	CclInConfigFile = 0;
-	CclGarbageCollect(0);  // Cleanup memory after load
+	LuaGarbageCollect();
 }
 
 

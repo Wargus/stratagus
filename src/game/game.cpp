@@ -370,11 +370,10 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 
 
 // Write the map presentation file
-static int WriteMapPresentation(const std::string &mapname, CMap &map, char *)
+static int WriteMapPresentation(const std::string &mapname, CMap &map)
 {
 	FileWriter *f = NULL;
 
-	//	char *mapsetupname;
 	const char *type[] = {"", "", "neutral", "nobody",
 						  "computer", "person", "rescue-passive", "rescue-active"
 						 };
@@ -532,7 +531,7 @@ int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain)
 	WriteMapPreview(previewName, map);
 
 	memcpy(setupExtension, ".sms", 4 * sizeof(char));
-	if (WriteMapPresentation(mapName, map, mapSetup) == -1) {
+	if (WriteMapPresentation(mapName, map) == -1) {
 		return -1;
 	}
 

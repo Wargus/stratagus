@@ -125,7 +125,7 @@ static int CclResourcesMultiBuildersMultiplier(lua_State *l)
 */
 static CUnit *CclGetUnit(lua_State *l)
 {
-	return &UnitManager.GetSlotUnit((int)LuaToNumber(l, -1));
+	return &UnitManager.GetSlotUnit(LuaToNumber(l, -1));
 }
 
 /**
@@ -307,7 +307,7 @@ static int CclUnit(lua_State *l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "player")) {
 			lua_rawgeti(l, 2, j + 1);
-			player = &Players[(int)LuaToNumber(l, -1)];
+			player = &Players[LuaToNumber(l, -1)];
 			lua_pop(l, 1);
 
 			// During a unit's death animation (when action is "die" but the
@@ -374,7 +374,7 @@ static int CclUnit(lua_State *l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "stats")) {
 			lua_rawgeti(l, 2, j + 1);
-			unit->Stats = &type->Stats[(int)LuaToNumber(l, -1)];
+			unit->Stats = &type->Stats[LuaToNumber(l, -1)];
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "pixel")) {
 			lua_rawgeti(l, 2, j + 1);
@@ -425,7 +425,7 @@ static int CclUnit(lua_State *l)
 			--j;
 		} else if (!strcmp(value, "rescued-from")) {
 			lua_rawgeti(l, 2, j + 1);
-			unit->RescuedFrom = &Players[(int)LuaToNumber(l, -1)];
+			unit->RescuedFrom = &Players[LuaToNumber(l, -1)];
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "seen-by-player")) {
 			lua_rawgeti(l, 2, j + 1);

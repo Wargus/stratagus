@@ -452,7 +452,7 @@ static inline int AStarAddNode(const Vec2i &pos, int o, int costs)
 **  Can be further optimised knowing that the new cost MUST BE LOWER
 **  than the old one.
 */
-static void AStarReplaceNode(int pos, int)
+static void AStarReplaceNode(int pos)
 {
 	ProfileBegin("AStarReplaceNode");
 
@@ -847,7 +847,7 @@ static int AStarSavePath(const Vec2i &startPos, const Vec2i &endPos, char *path,
 */
 static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw, int gh,
 							   int, int, int minrange, int maxrange,
-							   char *path, int, const CUnit &unit)
+							   char *path, const CUnit &unit)
 {
 	ProfileBegin("AStarFindSimplePath");
 	// At exact destination point already
@@ -905,7 +905,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 
 	//  Check for simple cases first
 	int ret = AStarFindSimplePath(startPos, goalPos, gw, gh, tilesizex, tilesizey,
-								  minrange, maxrange, path, pathlen, unit);
+								  minrange, maxrange, path, unit);
 	if (ret != PF_FAILED) {
 		ProfileEnd("AStarFindPath");
 		return ret;
@@ -1046,7 +1046,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 				} else {
 					costToGoal = AStarCosts(endPos, goalPos);
 					AStarMatrix[eo].CostToGoal = costToGoal;
-					AStarReplaceNode(j, AStarMatrix[eo].CostFromStart + costToGoal);
+					AStarReplaceNode(j);
 				}
 				// we don't have to add this point to the close set
 			}

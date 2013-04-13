@@ -385,7 +385,7 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 /**
 **  Add a label
 */
-static void AddLabel(lua_State *, CAnimation *anim, const std::string &name)
+static void AddLabel(CAnimation *anim, const std::string &name)
 {
 	LabelsStruct label;
 
@@ -482,7 +482,7 @@ static CAnimation *ParseAnimationFrame(lua_State *l, const char *str)
 		anim = new CAnimation_Unbreakable;
 	} else if (op1 == "label") {
 		anim = new CAnimation_Label;
-		AddLabel(l, anim, extraArg);
+		AddLabel(anim, extraArg);
 	} else if (op1 == "goto") {
 		anim = new CAnimation_Goto;
 	} else if (op1 == "random-goto") {

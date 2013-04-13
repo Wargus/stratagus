@@ -49,13 +49,13 @@ enum EIfVarBinOp {
 	IF_NOT_EQUAL,
 };
 
-bool binOpGreaterEqual(int lhs, int rhs) { return lhs >= rhs; }
-bool binOpGreater(int lhs, int rhs) { return lhs > rhs; }
-bool binOpLessEqual(int lhs, int rhs) { return lhs <= rhs; }
-bool binOpLess(int lhs, int rhs) { return lhs < rhs; }
-bool binOpEqual(int lhs, int rhs) { return lhs == rhs; }
-bool binOpNotEqual(int lhs, int rhs) { return lhs != rhs; }
-bool returnFalse(int , int) { return false; }
+static bool binOpGreaterEqual(int lhs, int rhs) { return lhs >= rhs; }
+static bool binOpGreater(int lhs, int rhs) { return lhs > rhs; }
+static bool binOpLessEqual(int lhs, int rhs) { return lhs <= rhs; }
+static bool binOpLess(int lhs, int rhs) { return lhs < rhs; }
+static bool binOpEqual(int lhs, int rhs) { return lhs == rhs; }
+static bool binOpNotEqual(int lhs, int rhs) { return lhs != rhs; }
+static bool returnFalse(int, int) { return false; }
 
 /* virtual */ void CAnimation_IfVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {

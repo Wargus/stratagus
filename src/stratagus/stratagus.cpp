@@ -609,7 +609,6 @@ int stratagusMain(int argc, char **argv)
 #ifdef REDIRECT_OUTPUT
 	RedirectOutput();
 #endif
-
 #ifdef USE_BEOS
 	//  Parse arguments for BeOS
 	beos_init(argc, argv);

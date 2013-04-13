@@ -1905,7 +1905,7 @@ void CEditor::Init()
 
 	ShowLoadProgress("Script %s", buf);
 	LuaLoadFile(buf);
-	CclGarbageCollect(0); // Cleanup memory after load
+	LuaGarbageCollect();
 
 	ThisPlayer = &Players[0];
 

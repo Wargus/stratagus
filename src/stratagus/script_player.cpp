@@ -66,7 +66,7 @@ extern CUnit *CclGetUnitFromRef(lua_State *l);
 */
 static CPlayer *CclGetPlayer(lua_State *l)
 {
-	return &Players[(int)LuaToNumber(l, -1)];
+	return &Players[LuaToNumber(l, -1)];
 }
 
 /**

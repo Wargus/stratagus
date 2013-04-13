@@ -53,8 +53,8 @@ class CNetworkHost
 {
 public:
 	CNetworkHost() { Clear(); }
-	size_t Serialize(unsigned char *) const;
-	size_t Deserialize(const unsigned char *p);
+	size_t Serialize(unsigned char *buf) const;
+	size_t Deserialize(const unsigned char *buf);
 	void Clear();
 	static size_t Size() { return 4 + 2 + 2 + NetPlayerNameSize; }
 
