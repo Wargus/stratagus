@@ -311,9 +311,9 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
 	Assert(w > 0);
 	Assert(h > 4);
 
-	const Uint32 colors[] = {ColorRed, ColorYellow, ColorGreen,
-							 ColorGray, ColorWhite, ColorOrange,
-							 ColorBlue, ColorDarkGreen, ColorBlack
+	const Uint32 colors[] = {ColorRed, ColorYellow, ColorGreen, ColorLightGray,
+							 ColorGray, ColorDarkGray, ColorWhite, ColorOrange,
+							 ColorLightBlue, ColorBlue, ColorDarkGreen, ColorBlack
 							};
 	const Uint32 color = (1 <= Color && Color <= 9) ?
 						 colors[this->Color - 1] : UI.CompletedBarColor;
@@ -331,7 +331,7 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
 			Video.DrawHLine(ColorWhite, x, y, f * w / 100);
 		}
 	} else {
-		Video.DrawRectangleClip(ColorGray,  x,     y,     w + 4, h);
+		Video.DrawRectangleClip(ColorWhite,  x,     y,     w + 4, h);
 		Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, w + 2, h - 2);
 		Video.FillRectangleClip(color, x + 2, y + 2, f * w / 100, h - 4);
 	}
@@ -544,18 +544,24 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 				this->Color = 2;
 			} else if (!strcmp(color, "green")) {
 				this->Color = 3;
-			} else if (!strcmp(color, "gray")) {
+			} else if (!strcmp(color, "light-gray")) {
 				this->Color = 4;
-			} else if (!strcmp(color, "white")) {
+			} else if (!strcmp(color, "gray")) {
 				this->Color = 5;
-			} else if (!strcmp(color, "orange")) {
+			} else if (!strcmp(color, "dark-gray")) {
 				this->Color = 6;
-			} else if (!strcmp(color, "blue")) {
+			} else if (!strcmp(color, "white")) {
 				this->Color = 7;
-			} else if (!strcmp(color, "dark-green")) {
+			} else if (!strcmp(color, "orange")) {
 				this->Color = 8;
-			} else if (!strcmp(color, "black")) {
+			} else if (!strcmp(color, "light-blue")) {
 				this->Color = 9;
+			} else if (!strcmp(color, "blue")) {
+				this->Color = 10;
+			} else if (!strcmp(color, "dark-green")) {
+				this->Color = 11;
+			} else if (!strcmp(color, "black")) {
+				this->Color = 12;
 			} else {
 				LuaError(l, "incorrect color: '%s' " _C_ color);
 			}

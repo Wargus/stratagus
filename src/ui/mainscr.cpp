@@ -154,7 +154,7 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 		}
 
 		f = (f * (unit.Type->Icon.Icon->G->Width)) / 100;
-		Video.FillRectangleClip(color, x + 1, y + 1, f, 5);
+		Video.FillRectangleClip(color, x + 1, y + 1, f - 2, 5);
 	}
 }
 
@@ -1047,7 +1047,7 @@ void ClearCosts()
 --  INFO PANEL
 ----------------------------------------------------------------------------*/
 //FIXME rb biger change require review.
-#if 0
+#if 1
 /**
 **  Draw info panel background.
 **
@@ -1056,7 +1056,7 @@ void ClearCosts()
 static void DrawInfoPanelBackground(unsigned frame)
 {
 	if (UI.InfoPanel.G) {
-		UI.InfoPanel.G->DrawFrameClip(frame, UI.InfoPanel.X, UI.InfoPanel.Y);
+		UI.InfoPanel.G->DrawFrame(frame, UI.InfoPanel.X, UI.InfoPanel.Y);
 	}
 }
 

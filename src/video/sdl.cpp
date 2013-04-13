@@ -720,10 +720,13 @@ void InitVideoSdl()
 
 	ColorBlack = Video.MapRGB(TheScreen->format, 0, 0, 0);
 	ColorDarkGreen = Video.MapRGB(TheScreen->format, 48, 100, 4);
+	ColorLightBlue = Video.MapRGB(TheScreen->format, 52, 113, 166);
 	ColorBlue = Video.MapRGB(TheScreen->format, 0, 0, 252);
 	ColorOrange = Video.MapRGB(TheScreen->format, 248, 140, 20);
 	ColorWhite = Video.MapRGB(TheScreen->format, 252, 248, 240);
+	ColorLightGray = Video.MapRGB(TheScreen->format, 192, 192, 192);
 	ColorGray = Video.MapRGB(TheScreen->format, 128, 128, 128);
+	ColorDarkGray = Video.MapRGB(TheScreen->format, 64, 64, 64);
 	ColorRed = Video.MapRGB(TheScreen->format, 252, 0, 0);
 	ColorGreen = Video.MapRGB(TheScreen->format, 0, 252, 0);
 	ColorYellow = Video.MapRGB(TheScreen->format, 252, 252, 0);

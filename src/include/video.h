@@ -488,10 +488,13 @@ extern EventCallback EditorCallbacks; /// Editor callbacks
 
 extern Uint32 ColorBlack;
 extern Uint32 ColorDarkGreen;
+extern Uint32 ColorLightBlue;
 extern Uint32 ColorBlue;
 extern Uint32 ColorOrange;
 extern Uint32 ColorWhite;
+extern Uint32 ColorLightGray;
 extern Uint32 ColorGray;
+extern Uint32 ColorDarkGray;
 extern Uint32 ColorRed;
 extern Uint32 ColorGreen;
 extern Uint32 ColorYellow;
