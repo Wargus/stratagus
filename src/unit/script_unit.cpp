@@ -542,10 +542,6 @@ static int CclUnit(lua_State *l)
 			lua_pushvalue(l, -1);
 			unit->Resource.Active = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "rs")) {
-			lua_rawgeti(l, 2, j + 1);
-			unit->Rs = LuaToNumber(l, -1);
-			lua_pop(l, 1);
 		} else if (!strcmp(value, "units-boarded-count")) {
 			lua_rawgeti(l, 2, j + 1);
 			unit->BoardCount = LuaToNumber(l, -1);

@@ -266,7 +266,6 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		Assert(unit.Resource.Active == 0);
 		Assert(unit.Resource.Assigned == 0);
 	}
-	file.printf(" \"rs\", %d,", unit.Rs);
 	file.printf(" \"units-boarded-count\", %d,", unit.BoardCount);
 
 	if (unit.UnitInside) {

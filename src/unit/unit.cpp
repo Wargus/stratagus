@@ -612,8 +612,6 @@ void CUnit::Init(const CUnitType &type)
 	// Has StartingResources, Use those
 	this->ResourcesHeld = type.StartingResources;
 
-	Rs = MyRand() % 100; // used for fancy buildings and others
-
 	Assert(Orders.empty());
 
 	Orders.push_back(COrder::NewActionStill());
@@ -741,13 +739,10 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 		unit->AssignToPlayer(*player);
 	}
 
-	if (type.Building) {
-		//
-		//  fancy buildings: mirror buildings (but shadows not correct)
-		//
-		if (FancyBuildings && unit->Type->NoRandomPlacing == false && unit->Rs > 50) {
-			unit->Frame = -unit->Frame - 1;
-		}
+	//  fancy buildings: mirror buildings (but shadows not correct)
+	if (type.Building && FancyBuildings
+		&& unit->Type->NoRandomPlacing == false && (MyRand() & 1) != 0) {
+		unit->Frame = -unit->Frame - 1;
 	}
 	return unit;
 }
