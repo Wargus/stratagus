@@ -36,10 +36,11 @@ public:
 	void SetDefaultValues();
 	void SetLocalPlayerNameFromEnv();
 
-	const std::string &GetUserDirectory() const { return UserDirectory; }
+	void SetUserDirectory(const std::string &path) { userDirectory = path; }
+	const std::string &GetUserDirectory() const { return userDirectory; }
 
 private:
-	void SetUserDirectory();
+	void SetDefaultUserDirectory();
 
 public:
 	std::string applicationName;
@@ -47,7 +48,7 @@ public:
 	std::string luaEditorStartFilename;
 	std::string LocalPlayerName;        /// Name of local player
 private:
-	std::string UserDirectory;          /// Directory containing user settings and data
+	std::string userDirectory;          /// Directory containing user settings and data
 public:
 	static Parameters Instance;
 };

@@ -43,27 +43,27 @@ void Parameters::SetDefaultValues()
 	applicationName = "stratagus";
 	luaStartFilename = "scripts/stratagus.lua";
 	luaEditorStartFilename = "scripts/editor.lua";
-	SetUserDirectory();
+	SetDefaultUserDirectory();
 }
 
-void Parameters::SetUserDirectory()
+void Parameters::SetDefaultUserDirectory()
 {
 #ifdef USE_WIN32
-	UserDirectory = getenv("APPDATA");
+	userDirectory = getenv("APPDATA");
 #else
-	UserDirectory = getenv("HOME");
+	userDirectory = getenv("HOME");
 #endif
 
-	if (!UserDirectory.empty()) {
-		UserDirectory += "/";
+	if (!userDirectory.empty()) {
+		userDirectory += "/";
 	}
 
 #ifdef USE_WIN32
-	UserDirectory += "Stratagus";
+	userDirectory += "Stratagus";
 #elif defined(USE_MAC)
-	UserDirectory += "Library/Stratagus";
+	userDirectory += "Library/Stratagus";
 #else
-	UserDirectory += ".stratagus";
+	userDirectory += ".stratagus";
 #endif
 }
 
