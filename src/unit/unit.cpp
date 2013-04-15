@@ -2073,9 +2073,9 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 	int bestd = 99999;
 	int addx = 0;
 	int addy = 0;
-	Assert(unit.Removed);
 
 	if (container) {
+		Assert(unit.Removed);
 		pos = container->tilePos;
 		pos.x -= unit.Type->TileWidth - 1;
 		pos.y -= unit.Type->TileHeight - 1;

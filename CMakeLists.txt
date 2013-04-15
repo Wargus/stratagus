@@ -275,6 +275,7 @@ set(spell_SRCS
 	src/spell/spell_spawnmissile.cpp
 	src/spell/spell_spawnportal.cpp
 	src/spell/spell_summon.cpp
+	src/spell/spell_teleport.cpp
 	src/spell/spells.cpp
 )
 source_group(spell FILES ${spell_SRCS})
@@ -500,6 +501,7 @@ set(stratagus_spell_HDRS
 	src/include/spell/spell_spawnmissile.h
 	src/include/spell/spell_spawnportal.h
 	src/include/spell/spell_summon.h
+	src/include/spell/spell_teleport.h
 )
 
 set(stratagus_generic_HDRS

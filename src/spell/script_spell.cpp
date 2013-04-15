@@ -46,6 +46,7 @@
 #include "spell/spell_spawnmissile.h"
 #include "spell/spell_spawnportal.h"
 #include "spell/spell_summon.h"
+#include "spell/spell_teleport.h"
 #include "script_sound.h"
 #include "script.h"
 #include "unittype.h"
@@ -93,6 +94,8 @@ static SpellActionType *CclSpellAction(lua_State *l)
 		spellaction = new Spell_SpawnPortal;
 	} else if (!strcmp(value, "summon")) {
 		spellaction = new Spell_Summon;
+	} else if (!strcmp(value, "teleport")) {
+		spellaction = new Spell_Teleport;
 	} else {
 		LuaError(l, "Unsupported action type: %s" _C_ value);
 	}
