@@ -142,6 +142,8 @@ void MissileType::Load(lua_State *l)
 			this->Damage = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ReduceFactor")) {
 			this->ReduceFactor = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "SmokePrecision")) {
+			this->SmokePrecision = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DrawLevel")) {
 			this->DrawLevel = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Range")) {
@@ -167,6 +169,8 @@ void MissileType::Load(lua_State *l)
 			this->ImpactParticle = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "SmokeParticle")) {
 			this->SmokeParticle = new LuaCallback(l, -1);
+		} else if (!strcmp(value, "OnImpact")) {
+			this->OnImpact = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "CanHitOwner")) {
 			this->CanHitOwner = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "AlwaysFire")) {
@@ -186,6 +190,9 @@ void MissileType::Load(lua_State *l)
 		}
 	}
 
+	if (!this->SmokePrecision) {
+		this->SmokePrecision = this->Speed;
+	}
 	if (!file.empty()) {
 		this->G = CGraphic::New(file, this->Width(), this->Height());
 	}

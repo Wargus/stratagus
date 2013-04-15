@@ -385,6 +385,7 @@ public:
 	int TTL;                   /// missile time-to-live
 	int Damage;                /// missile damage (used for non-direct missiles, e.g. impacts)
 	int ReduceFactor;          /// Multiplier for reduce or increase damage dealt to the next unit
+	int SmokePrecision;        /// How frequently the smoke missile will generate itself 
 
 	int Range;                             /// missile damage range
 	int SplashFactor;                      /// missile splash divisor
@@ -392,6 +393,7 @@ public:
 	MissileConfig Smoke;                   /// trailing missile
 	LuaCallback *ImpactParticle;           /// impact particle
 	LuaCallback *SmokeParticle;            /// smoke particle
+	LuaCallback *OnImpact;                 /// called when 
 
 	// --- FILLED UP ---
 	CGraphic *G;         /// missile graphic

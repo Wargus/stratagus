@@ -2673,10 +2673,21 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		type->OnHit->run();
 	}
 
-	// Increase variables
-	if (missile && missile->Type->ChangeVariable != -1) {
-		HitUnit_ChangeVariable(target, *missile);
-	}
+	// Increase variables and call OnImpact
+	if (missile && missile->Type) {
+		if (missile->Type->ChangeVariable != -1) {
+			HitUnit_ChangeVariable(target, *missile);
+		}
+		if (missile->Type->OnImpact) {
+			const int attackerSlot = attacker ? UnitNumber(*attacker) : -1;
+			const int targetSlot = UnitNumber(target);
+			missile->Type->OnImpact->pushPreamble();
+			missile->Type->OnImpact->pushInteger(attackerSlot);
+			missile->Type->OnImpact->pushInteger(targetSlot);
+			missile->Type->OnImpact->pushInteger(damage);
+			missile->Type->OnImpact->run();
+		}
+	}	
 
 	HitUnit_ShowImpactMissile(target);
 

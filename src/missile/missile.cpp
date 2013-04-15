@@ -641,8 +641,8 @@ bool MissileInitMove(Missile &missile)
 	Assert(missile.TotalStep != 0);
 	missile.CurrentStep += missile.Type->Speed;
 	if (missile.CurrentStep >= missile.TotalStep) {
-		missile.position = missile.destination;
-		return true;
+		missile.CurrentStep = missile.TotalStep;
+		// we need to draw the smoke first before stopping
 	}
 	return false;
 }
@@ -681,26 +681,41 @@ bool PointToPointMissile(Missile &missile)
 	Assert(missile.TotalStep != 0);
 
 	const PixelPos diff = (missile.destination - missile.source);
+	const PixelPrecise sign(diff.x >= 0 ? 1.0 : -1.0, diff.y >= 0 ? 1.0 : -1.0); // Remember sign to move into correct direction
+	PixelPrecise pos((double)missile.position.x, (double)missile.position.y); // Remember old position
 	missile.position = missile.source + diff * missile.CurrentStep / missile.TotalStep;
 
-	if (missile.Type->Smoke.Missile && (missile.CurrentStep || missile.State > 1)) {
-		const PixelPos position = missile.position + missile.Type->size / 2;
-		Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position);
-		if (smoke && smoke->Type->NumDirections > 1) {
-			smoke->MissileNewHeadingFromXY(diff);
+	for (; pos.x * sign.x <= missile.position.x * sign.x
+		&& pos.y * sign.y <= missile.position.y * sign.y; 
+		pos.x += (double)diff.x * missile.Type->SmokePrecision / missile.TotalStep,
+		pos.y += (double)diff.y * missile.Type->SmokePrecision / missile.TotalStep) {
+		if (missile.Type->Smoke.Missile && (missile.CurrentStep || missile.State > 1)) {
+			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
+				(int)pos.y + missile.Type->size.x / 2);
+			Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position);
+			if (smoke && smoke->Type->NumDirections > 1) {
+				smoke->MissileNewHeadingFromXY(diff);
+			}
+		}
+
+		if (missile.Type->SmokeParticle && (missile.CurrentStep || missile.State > 1)) {
+			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
+				(int)pos.y + missile.Type->size.x / 2);
+			missile.Type->SmokeParticle->pushPreamble();
+			missile.Type->SmokeParticle->pushInteger(position.x);
+			missile.Type->SmokeParticle->pushInteger(position.y);
+			missile.Type->SmokeParticle->run();
+		}
+
+		if (missile.Type->Pierce) {
+			const PixelPos position((int)pos.x, (int)pos.y);
+			MissileHandlePierce(missile, Map.MapPixelPosToTilePos(position));
 		}
 	}
 
-	if (missile.Type->SmokeParticle && (missile.CurrentStep || missile.State > 1)) {
-		const PixelPos position = missile.position + missile.Type->size / 2;
-		missile.Type->SmokeParticle->pushPreamble();
-		missile.Type->SmokeParticle->pushInteger(position.x);
-		missile.Type->SmokeParticle->pushInteger(position.y);
-		missile.Type->SmokeParticle->run();
-	}
-
-	if (missile.Type->Pierce) {
-		MissileHandlePierce(missile, Map.MapPixelPosToTilePos(missile.position));
+	if (missile.CurrentStep == missile.TotalStep) {
+		missile.position = missile.destination;
+		return true;
 	}
 
 	return false;
@@ -1217,8 +1232,9 @@ MissileType::MissileType(const std::string &ident) :
 	SpriteFrames(0), NumDirections(0), ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
 	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
 	AlwaysFire(false), Pierce(false), PierceOnce(false), Class(), NumBounces(0), StartDelay(0),
-	Sleep(0), Speed(0), TTL(-1), Damage(0), ReduceFactor(100), Range(0), SplashFactor(0),
-	ImpactParticle(NULL), SmokeParticle(NULL),
+	Sleep(0), Speed(0), TTL(-1), Damage(0), ReduceFactor(100), SmokePrecision(0),
+	Range(0), SplashFactor(0),
+	ImpactParticle(NULL), SmokeParticle(NULL), OnImpact(NULL),
 	G(NULL)
 {
 	size.x = 0;
@@ -1234,6 +1250,7 @@ MissileType::~MissileType()
 	Impact.clear();
 	delete ImpactParticle;
 	delete SmokeParticle;
+	delete OnImpact;
 }
 
 /**
