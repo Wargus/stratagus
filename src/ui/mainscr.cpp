@@ -562,7 +562,7 @@ void DrawResources()
 
 #define MESSAGES_MAX  10                         /// How many can be displayed
 
-static char MessagesEvent[MESSAGES_MAX][64];     /// Array of event messages
+static char MessagesEvent[MESSAGES_MAX][128];    /// Array of event messages
 static int  MessagesEventX[MESSAGES_MAX];        /// X coordinate of event
 static int  MessagesEventY[MESSAGES_MAX];        /// Y coordinate of event
 static int  MessagesEventCount;                  /// Number of event messages

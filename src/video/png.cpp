@@ -235,7 +235,7 @@ int LoadGraphicPNG(CGraphic *g)
 			/* FIXME: Should these be truncated or shifted down? */
 			ckey = SDL_MapRGB(surface->format, (Uint8)transv->red, (Uint8)transv->green, (Uint8)transv->blue);
 		}
-		SDL_SetColorKey(surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ckey);
+		SDL_SetColorKey(surface, SDL_SRCCOLORKEY, ckey);
 	}
 
 	/* Create the array of pointers to image data */
