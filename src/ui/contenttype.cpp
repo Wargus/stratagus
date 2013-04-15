@@ -315,7 +315,7 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
 							 ColorGray, ColorDarkGray, ColorWhite, ColorOrange,
 							 ColorLightBlue, ColorBlue, ColorDarkGreen, ColorBlack
 							};
-	const Uint32 color = (1 <= Color && Color <= 9) ?
+	const Uint32 color = (1 <= Color && Color <= (sizeof(colors) / sizeof(Uint32))) ?
 						 colors[this->Color - 1] : UI.CompletedBarColor;
 
 	int f = (100 * unit.Variable[this->Index].Value) / unit.Variable[this->Index].Max;
