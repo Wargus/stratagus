@@ -42,7 +42,6 @@
 #include "actions.h"
 #include "minimap.h"
 #include "player.h"
-#include "tileset.h"
 #include "ui.h"
 #include "unit.h"
 #include "unit_manager.h"

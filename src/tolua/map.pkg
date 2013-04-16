@@ -1,3 +1,5 @@
+$#include "tileset.h"
+
 class CMapInfo
 {
 	string Description;
@@ -15,7 +17,7 @@ class CTileset
 class CMap
 {
 	CMapInfo Info;
-	CTileset Tileset;
+	CTileset *Tileset;
 };
 
 extern CMap Map;

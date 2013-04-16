@@ -136,6 +136,8 @@
 #include "unit_cache.h"
 #endif
 
+#include <vec2i.h>
+
 class CFile;
 class CPlayer;
 
@@ -154,7 +156,9 @@ class CPlayer;
 #define MapFieldNoBuilding   0x0080  /// No buildings allowed
 
 #define MapFieldUnpassable 0x0100  /// Field is movement blocked
-//#define MapFieldWall       0x0200  /// defined in tileset.h
+#define MapFieldWall       0x0200  /// Field contains wall
+#define MapFieldRocks      0x0400  /// Field contains rocks
+#define MapFieldForest     0x0800  /// Field contains forest
 
 #define MapFieldLandUnit 0x1000  /// Land unit on field
 #define MapFieldAirUnit  0x2000  /// Air unit on field
@@ -250,6 +254,8 @@ public:
 
 	CMapFieldPlayerInfo playerInfo; /// stuff related to player
 };
+
+extern PixelSize PixelTileSize; /// Size of a tile in pixels
 
 //@}
 

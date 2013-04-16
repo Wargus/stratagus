@@ -89,25 +89,17 @@ static void ExtendTilesetTables(CTileset *tileset, unsigned int oldtiles, unsign
 */
 static int TilesetParseName(lua_State *l, CTileset *tileset)
 {
-	unsigned int i;
-
 	const char *ident = LuaToString(l, -1);
-	for (i = 0; i < tileset->NumTerrainTypes; ++i) {
-		if (!strcmp(ident, tileset->SolidTerrainTypes[i].TerrainName.c_str())) {
+	for (size_t i = 0; i != tileset->SolidTerrainTypes.size(); ++i) {
+		if (tileset->SolidTerrainTypes[i].TerrainName == ident) {
 			return i;
 		}
 	}
-
 	// Can't find it, then we add another solid terrain type.
-	SolidTerrainInfo *s = new SolidTerrainInfo[tileset->NumTerrainTypes + 1];
-	for (unsigned int j = 0; j < tileset->NumTerrainTypes; ++j) {
-		s[j] = tileset->SolidTerrainTypes[j];
-	}
-	delete[] tileset->SolidTerrainTypes;
-	tileset->SolidTerrainTypes = s;
-	tileset->SolidTerrainTypes[tileset->NumTerrainTypes].TerrainName = ident;
-	++tileset->NumTerrainTypes;
-	return i;
+	SolidTerrainInfo s;
+	s.TerrainName = ident;
+	tileset->SolidTerrainTypes.push_back(s);
+	return tileset->SolidTerrainTypes.size() - 1;
 }
 
 /**
@@ -435,9 +427,9 @@ static void DefineTilesetParseSlot(lua_State *l, CTileset *tileset, int t)
 	tileset->Table = new unsigned short[16];
 	tileset->FlagsTable = new unsigned short[16];
 	tileset->Tiles = new TileInfo[16];
-	tileset->SolidTerrainTypes = new SolidTerrainInfo[1];
-	tileset->SolidTerrainTypes[0].TerrainName = "unused";
-	tileset->NumTerrainTypes = 1;
+	SolidTerrainInfo solidTerrainInfo;
+	solidTerrainInfo.TerrainName = "unused";
+	tileset->SolidTerrainTypes.push_back(solidTerrainInfo);
 
 	//  Parse the list: (still everything could be changed!)
 	const int args = lua_rawlen(l, t);
@@ -482,10 +474,10 @@ static void DefineTilesetParseSlot(lua_State *l, CTileset *tileset, int t)
 */
 static int CclDefineTileset(lua_State *l)
 {
-	Map.Tileset.Clear();
+	Map.Tileset->Clear();
 
-	Map.Tileset.PixelTileSize.x = 32;
-	Map.Tileset.PixelTileSize.y = 32;
+	Map.Tileset->PixelTileSize.x = 32;
+	Map.Tileset->PixelTileSize.y = 32;
 
 	//
 	//  Parse the list: (still everything could be changed!)
@@ -496,24 +488,24 @@ static int CclDefineTileset(lua_State *l)
 		++j;
 
 		if (!strcmp(value, "name")) {
-			Map.Tileset.Name = LuaToString(l, j);
+			Map.Tileset->Name = LuaToString(l, j);
 		} else if (!strcmp(value, "image")) {
-			Map.Tileset.ImageFile = LuaToString(l, j);
+			Map.Tileset->ImageFile = LuaToString(l, j);
 		} else if (!strcmp(value, "size")) {
 			if (!lua_istable(l, j)) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j, 1);
-			Map.Tileset.PixelTileSize.x = LuaToNumber(l, -1);
+			Map.Tileset->PixelTileSize.x = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, j, 2);
-			Map.Tileset.PixelTileSize.y = LuaToNumber(l, -1);
+			Map.Tileset->PixelTileSize.y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "slots")) {
 			if (!lua_istable(l, j)) {
 				LuaError(l, "incorrect argument");
 			}
-			DefineTilesetParseSlot(l, &Map.Tileset, j);
+			DefineTilesetParseSlot(l, Map.Tileset, j);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -531,111 +523,107 @@ static int CclDefineTileset(lua_State *l)
 */
 static int CclBuildTilesetTables(lua_State *l)
 {
-	int n;
-	int tile;
-	int solid;
-	int mixed;
-	const unsigned short *table;
-	int i;
-
 	LuaCheckArgs(l, 0);
 
 	//  Calculate number of tiles in graphic tile
-	n = Map.Tileset.NumTiles;
+	int n = Map.Tileset->NumTiles;
 
-	Map.Tileset.MixedLookupTable = new int[n];
-	memset(Map.Tileset.MixedLookupTable, 0, n * sizeof(int));
+	Map.Tileset->MixedLookupTable = new int[n];
+	memset(Map.Tileset->MixedLookupTable, 0, n * sizeof(int));
 
 	//  Build the TileTypeTable
-	Map.Tileset.TileTypeTable = new unsigned char[n];
-	memset(Map.Tileset.TileTypeTable, 0, n * sizeof(unsigned char));
+	Map.Tileset->TileTypeTable = new unsigned char[n];
+	memset(Map.Tileset->TileTypeTable, 0, n * sizeof(unsigned char));
 
-	table = Map.Tileset.Table;
-	for (i = 0; i < n; ++i) {
+	const unsigned short *table = Map.Tileset->Table;
+	int tile;
+	for (int i = 0; i < n; ++i) {
 		if ((tile = table[i])) {
 			unsigned flags;
 
 			//Initialize all Lookup Items to zero
-			Map.Tileset.MixedLookupTable[table[i]] = 0;
+			Map.Tileset->MixedLookupTable[table[i]] = 0;
 
-			flags = Map.Tileset.FlagsTable[i];
+			flags = Map.Tileset->FlagsTable[i];
 			if (flags & MapFieldWaterAllowed) {
-				Map.Tileset.TileTypeTable[tile] = TileTypeWater;
+				Map.Tileset->TileTypeTable[tile] = TileTypeWater;
 			} else if (flags & MapFieldCoastAllowed) {
-				Map.Tileset.TileTypeTable[tile] = TileTypeCoast;
+				Map.Tileset->TileTypeTable[tile] = TileTypeCoast;
 			} else if (flags & MapFieldWall) {
 				if (flags & MapFieldHuman) {
-					Map.Tileset.TileTypeTable[tile] = TileTypeHumanWall;
+					Map.Tileset->TileTypeTable[tile] = TileTypeHumanWall;
 				} else {
-					Map.Tileset.TileTypeTable[tile] = TileTypeOrcWall;
+					Map.Tileset->TileTypeTable[tile] = TileTypeOrcWall;
 				}
 			} else if (flags & MapFieldRocks) {
-				Map.Tileset.TileTypeTable[tile] = TileTypeRock;
+				Map.Tileset->TileTypeTable[tile] = TileTypeRock;
 			} else if (flags & MapFieldForest) {
-				Map.Tileset.TileTypeTable[tile] = TileTypeWood;
+				Map.Tileset->TileTypeTable[tile] = TileTypeWood;
 			}
 		}
 	}
 
 	//  mark the special tiles
-	if ((tile = Map.Tileset.TopOneTree)) {
-		Map.Tileset.TileTypeTable[tile] = TileTypeWood;
+	if ((tile = Map.Tileset->TopOneTree)) {
+		Map.Tileset->TileTypeTable[tile] = TileTypeWood;
 	}
-	if ((tile = Map.Tileset.MidOneTree)) {
-		Map.Tileset.TileTypeTable[tile] = TileTypeWood;
+	if ((tile = Map.Tileset->MidOneTree)) {
+		Map.Tileset->TileTypeTable[tile] = TileTypeWood;
 	}
-	if ((tile = Map.Tileset.BotOneTree)) {
-		Map.Tileset.TileTypeTable[tile] = TileTypeWood;
+	if ((tile = Map.Tileset->BotOneTree)) {
+		Map.Tileset->TileTypeTable[tile] = TileTypeWood;
 	}
-	if ((tile = Map.Tileset.TopOneRock)) {
-		Map.Tileset.TileTypeTable[tile] = TileTypeRock;
+	if ((tile = Map.Tileset->TopOneRock)) {
+		Map.Tileset->TileTypeTable[tile] = TileTypeRock;
 	}
-	if ((tile = Map.Tileset.MidOneRock)) {
-		Map.Tileset.TileTypeTable[tile] = TileTypeRock;
+	if ((tile = Map.Tileset->MidOneRock)) {
+		Map.Tileset->TileTypeTable[tile] = TileTypeRock;
 	}
-	if ((tile = Map.Tileset.BotOneRock)) {
-		Map.Tileset.TileTypeTable[tile] = TileTypeRock;
+	if ((tile = Map.Tileset->BotOneRock)) {
+		Map.Tileset->TileTypeTable[tile] = TileTypeRock;
 	}
 
 	//  Build wood removement table.
-	n = Map.Tileset.NumTiles;
-	for (mixed = solid = i = 0; i < n;) {
-		if (Map.Tileset.Tiles[i].BaseTerrain
-			&& Map.Tileset.Tiles[i].MixTerrain) {
-			if (Map.Tileset.FlagsTable[i] & MapFieldForest) {
+	int solid = 0;
+	int mixed = 0;
+	n = Map.Tileset->NumTiles;
+	for (int i = 0; i < n;) {
+		if (Map.Tileset->Tiles[i].BaseTerrain
+			&& Map.Tileset->Tiles[i].MixTerrain) {
+			if (Map.Tileset->FlagsTable[i] & MapFieldForest) {
 				mixed = i;
 			}
 			i += 256;
 		} else {
-			if (Map.Tileset.Tiles[i].BaseTerrain != 0 &&
-				Map.Tileset.Tiles[i].MixTerrain == 0) {
-				if (Map.Tileset.FlagsTable[i] & MapFieldForest) {
+			if (Map.Tileset->Tiles[i].BaseTerrain != 0 &&
+				Map.Tileset->Tiles[i].MixTerrain == 0) {
+				if (Map.Tileset->FlagsTable[i] & MapFieldForest) {
 					solid = i;
 				}
 			}
 			i += 16;
 		}
 	}
-	Map.Tileset.WoodTable[ 0] = -1;
-	Map.Tileset.WoodTable[ 1] = table[mixed + 0x30];
-	Map.Tileset.WoodTable[ 2] = table[mixed + 0x70];
-	Map.Tileset.WoodTable[ 3] = table[mixed + 0xB0];
-	Map.Tileset.WoodTable[ 4] = table[mixed + 0x10];
-	Map.Tileset.WoodTable[ 5] = table[mixed + 0x50];
-	Map.Tileset.WoodTable[ 6] = table[mixed + 0x90];
-	Map.Tileset.WoodTable[ 7] = table[mixed + 0xD0];
-	Map.Tileset.WoodTable[ 8] = table[mixed + 0x00];
-	Map.Tileset.WoodTable[ 9] = table[mixed + 0x40];
-	Map.Tileset.WoodTable[10] = table[mixed + 0x80];
-	Map.Tileset.WoodTable[11] = table[mixed + 0xC0];
-	Map.Tileset.WoodTable[12] = table[mixed + 0x20];
-	Map.Tileset.WoodTable[13] = table[mixed + 0x60];
-	Map.Tileset.WoodTable[14] = table[mixed + 0xA0];
-	Map.Tileset.WoodTable[15] = table[solid];
-	Map.Tileset.WoodTable[16] = -1;
-	Map.Tileset.WoodTable[17] = Map.Tileset.BotOneTree;
-	Map.Tileset.WoodTable[18] = Map.Tileset.TopOneTree;
-	Map.Tileset.WoodTable[19] = Map.Tileset.MidOneTree;
+	Map.Tileset->WoodTable[ 0] = -1;
+	Map.Tileset->WoodTable[ 1] = table[mixed + 0x30];
+	Map.Tileset->WoodTable[ 2] = table[mixed + 0x70];
+	Map.Tileset->WoodTable[ 3] = table[mixed + 0xB0];
+	Map.Tileset->WoodTable[ 4] = table[mixed + 0x10];
+	Map.Tileset->WoodTable[ 5] = table[mixed + 0x50];
+	Map.Tileset->WoodTable[ 6] = table[mixed + 0x90];
+	Map.Tileset->WoodTable[ 7] = table[mixed + 0xD0];
+	Map.Tileset->WoodTable[ 8] = table[mixed + 0x00];
+	Map.Tileset->WoodTable[ 9] = table[mixed + 0x40];
+	Map.Tileset->WoodTable[10] = table[mixed + 0x80];
+	Map.Tileset->WoodTable[11] = table[mixed + 0xC0];
+	Map.Tileset->WoodTable[12] = table[mixed + 0x20];
+	Map.Tileset->WoodTable[13] = table[mixed + 0x60];
+	Map.Tileset->WoodTable[14] = table[mixed + 0xA0];
+	Map.Tileset->WoodTable[15] = table[solid];
+	Map.Tileset->WoodTable[16] = -1;
+	Map.Tileset->WoodTable[17] = Map.Tileset->BotOneTree;
+	Map.Tileset->WoodTable[18] = Map.Tileset->TopOneTree;
+	Map.Tileset->WoodTable[19] = Map.Tileset->MidOneTree;
 
 	//Mark which corners of each tile has tree in it.
 	//All corners for solid tiles. (Same for rocks)
@@ -645,80 +633,82 @@ static int CclBuildTilesetTables(lua_State *l)
 	//8 Top Left
 	//16 Bottom Tree Tile
 	//32 Top Tree Tile
-	for (i = solid; i < solid + 16; ++i) {
-		Map.Tileset.MixedLookupTable[table[i]] = 15;
+	for (int i = solid; i < solid + 16; ++i) {
+		Map.Tileset->MixedLookupTable[table[i]] = 15;
 	}
-	for (i = mixed; i < mixed + 256; ++i) {
+	for (int i = mixed; i < mixed + 256; ++i) {
 		int check;
 
 		check = (int)((i - mixed) / 16);
 		switch (check) {
 			case 0:
-				Map.Tileset.MixedLookupTable[table[i]] = 8;
+				Map.Tileset->MixedLookupTable[table[i]] = 8;
 				break;
 			case 1:
-				Map.Tileset.MixedLookupTable[table[i]] = 4;
+				Map.Tileset->MixedLookupTable[table[i]] = 4;
 				break;
 			case 2:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 4;
+				Map.Tileset->MixedLookupTable[table[i]] = 8 + 4;
 				break;
 			case 3:
-				Map.Tileset.MixedLookupTable[table[i]] = 1;
+				Map.Tileset->MixedLookupTable[table[i]] = 1;
 				break;
 			case 4:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 1;
+				Map.Tileset->MixedLookupTable[table[i]] = 8 + 1;
 				break;
 			case 5:
-				Map.Tileset.MixedLookupTable[table[i]] = 4 + 1;
+				Map.Tileset->MixedLookupTable[table[i]] = 4 + 1;
 				break;
 			case 6:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 4 + 1;
+				Map.Tileset->MixedLookupTable[table[i]] = 8 + 4 + 1;
 				break;
 			case 7:
-				Map.Tileset.MixedLookupTable[table[i]] = 2;
+				Map.Tileset->MixedLookupTable[table[i]] = 2;
 				break;
 			case 8:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 2;
+				Map.Tileset->MixedLookupTable[table[i]] = 8 + 2;
 				break;
 			case 9:
-				Map.Tileset.MixedLookupTable[table[i]] = 4 + 2;
+				Map.Tileset->MixedLookupTable[table[i]] = 4 + 2;
 				break;
 			case 10:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 4 + 2;
+				Map.Tileset->MixedLookupTable[table[i]] = 8 + 4 + 2;
 				break;
 			case 11:
-				Map.Tileset.MixedLookupTable[table[i]] = 2 + 1;
+				Map.Tileset->MixedLookupTable[table[i]] = 2 + 1;
 				break;
 			case 12:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 2 + 1;
+				Map.Tileset->MixedLookupTable[table[i]] = 8 + 2 + 1;
 				break;
 			case 13:
-				Map.Tileset.MixedLookupTable[table[i]] = 4 + 2 + 1;
+				Map.Tileset->MixedLookupTable[table[i]] = 4 + 2 + 1;
 				break;
 			default:
-				Map.Tileset.MixedLookupTable[table[i]] = 0;
+				Map.Tileset->MixedLookupTable[table[i]] = 0;
 				break;
 		}
 	}
 	//16 Bottom Tree Special
 	//32 Top Tree Special
 	//64 Mid tree special - differentiate with mixed tiles.
-	Map.Tileset.MixedLookupTable[Map.Tileset.BotOneTree] = 12 + 16;
-	Map.Tileset.MixedLookupTable[Map.Tileset.TopOneTree] = 3 + 32;
-	Map.Tileset.MixedLookupTable[Map.Tileset.MidOneTree] = 15 + 48;
+	Map.Tileset->MixedLookupTable[Map.Tileset->BotOneTree] = 12 + 16;
+	Map.Tileset->MixedLookupTable[Map.Tileset->TopOneTree] = 3 + 32;
+	Map.Tileset->MixedLookupTable[Map.Tileset->MidOneTree] = 15 + 48;
 
 	//  Build rock removement table.
-	for (mixed = solid = i = 0; i < n;) {
-		if (Map.Tileset.Tiles[i].BaseTerrain
-			&& Map.Tileset.Tiles[i].MixTerrain) {
-			if (Map.Tileset.FlagsTable[i] & MapFieldRocks) {
+	mixed = 0;
+	solid = 0;
+	for (int i = 0; i < n;) {
+		if (Map.Tileset->Tiles[i].BaseTerrain
+			&& Map.Tileset->Tiles[i].MixTerrain) {
+			if (Map.Tileset->FlagsTable[i] & MapFieldRocks) {
 				mixed = i;
 			}
 			i += 256;
 		} else {
-			if (Map.Tileset.Tiles[i].BaseTerrain != 0 &&
-				Map.Tileset.Tiles[i].MixTerrain == 0) {
-				if (Map.Tileset.FlagsTable[i] & MapFieldRocks) {
+			if (Map.Tileset->Tiles[i].BaseTerrain != 0 &&
+				Map.Tileset->Tiles[i].MixTerrain == 0) {
+				if (Map.Tileset->FlagsTable[i] & MapFieldRocks) {
 					solid = i;
 				}
 			}
@@ -732,145 +722,143 @@ static int CclBuildTilesetTables(lua_State *l)
 	//2 Bottom Right
 	//4 Top Right
 	//8 Top Left
-	for (i = solid; i < solid + 16; ++i) {
-		Map.Tileset.MixedLookupTable[table[i]] = 15;
+	for (int i = solid; i < solid + 16; ++i) {
+		Map.Tileset->MixedLookupTable[table[i]] = 15;
 	}
-	for (i = mixed; i < mixed + 256; ++i) {
-		int check;
-
-		check = (int)((i - mixed) / 16);
+	for (int i = mixed; i < mixed + 256; ++i) {
+		int check = (int)((i - mixed) / 16);
 		switch (check) {
 			case 0:
-				Map.Tileset.MixedLookupTable[table[i]] = 8;
+				Map.Tileset->MixedLookupTable[table[i]] = 8;
 				break;
 			case 1:
-				Map.Tileset.MixedLookupTable[table[i]] = 4;
+				Map.Tileset->MixedLookupTable[table[i]] = 4;
 				break;
 			case 2:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 4;
+				Map.Tileset->MixedLookupTable[table[i]] = 8 + 4;
 				break;
 			case 3:
-				Map.Tileset.MixedLookupTable[table[i]] = 1;
+				Map.Tileset->MixedLookupTable[table[i]] = 1;
 				break;
 			case 4:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 1;
+				Map.Tileset->MixedLookupTable[table[i]] = 8 + 1;
 				break;
 			case 5:
-				Map.Tileset.MixedLookupTable[table[i]] = 4 + 1;
+				Map.Tileset->MixedLookupTable[table[i]] = 4 + 1;
 				break;
 			case 6:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 4 + 1;
+				Map.Tileset->MixedLookupTable[table[i]] = 8 + 4 + 1;
 				break;
 			case 7:
-				Map.Tileset.MixedLookupTable[table[i]] = 2;
+				Map.Tileset->MixedLookupTable[table[i]] = 2;
 				break;
 			case 8:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 2;
+				Map.Tileset->MixedLookupTable[table[i]] = 8 + 2;
 				break;
 			case 9:
-				Map.Tileset.MixedLookupTable[table[i]] = 4 + 2;
+				Map.Tileset->MixedLookupTable[table[i]] = 4 + 2;
 				break;
 			case 10:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 4 + 2;
+				Map.Tileset->MixedLookupTable[table[i]] = 8 + 4 + 2;
 				break;
 			case 11:
-				Map.Tileset.MixedLookupTable[table[i]] = 2 + 1;
+				Map.Tileset->MixedLookupTable[table[i]] = 2 + 1;
 				break;
 			case 12:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 2 + 1;
+				Map.Tileset->MixedLookupTable[table[i]] = 8 + 2 + 1;
 				break;
 			case 13:
-				Map.Tileset.MixedLookupTable[table[i]] = 4 + 2 + 1;
+				Map.Tileset->MixedLookupTable[table[i]] = 4 + 2 + 1;
 				break;
 			default:
-				Map.Tileset.MixedLookupTable[table[i]] = 0;
+				Map.Tileset->MixedLookupTable[table[i]] = 0;
 				break;
 		}
 	}
 
-	Map.Tileset.MixedLookupTable[Map.Tileset.BotOneRock] = 12 + 16;
-	Map.Tileset.MixedLookupTable[Map.Tileset.TopOneRock] = 3 + 32;
-	Map.Tileset.MixedLookupTable[Map.Tileset.MidOneRock] = 15 + 48;
+	Map.Tileset->MixedLookupTable[Map.Tileset->BotOneRock] = 12 + 16;
+	Map.Tileset->MixedLookupTable[Map.Tileset->TopOneRock] = 3 + 32;
+	Map.Tileset->MixedLookupTable[Map.Tileset->MidOneRock] = 15 + 48;
 
-	Map.Tileset.RockTable[ 0] = -1;
-	Map.Tileset.RockTable[ 1] = table[mixed + 0x30];
-	Map.Tileset.RockTable[ 2] = table[mixed + 0x70];
-	Map.Tileset.RockTable[ 3] = table[mixed + 0xB0];
-	Map.Tileset.RockTable[ 4] = table[mixed + 0x10];
-	Map.Tileset.RockTable[ 5] = table[mixed + 0x50];
-	Map.Tileset.RockTable[ 6] = table[mixed + 0x90];
-	Map.Tileset.RockTable[ 7] = table[mixed + 0xD0];
-	Map.Tileset.RockTable[ 8] = table[mixed + 0x00];
-	Map.Tileset.RockTable[ 9] = table[mixed + 0x40];
-	Map.Tileset.RockTable[10] = table[mixed + 0x80];
-	Map.Tileset.RockTable[11] = table[mixed + 0xC0];
-	Map.Tileset.RockTable[12] = table[mixed + 0x20];
-	Map.Tileset.RockTable[13] = table[mixed + 0x60];
-	Map.Tileset.RockTable[14] = table[mixed + 0xA0];
-	Map.Tileset.RockTable[15] = table[solid];
-	Map.Tileset.RockTable[16] = -1;
-	Map.Tileset.RockTable[17] = Map.Tileset.BotOneRock;
-	Map.Tileset.RockTable[18] = Map.Tileset.TopOneRock;
-	Map.Tileset.RockTable[19] = Map.Tileset.MidOneRock;
+	Map.Tileset->RockTable[ 0] = -1;
+	Map.Tileset->RockTable[ 1] = table[mixed + 0x30];
+	Map.Tileset->RockTable[ 2] = table[mixed + 0x70];
+	Map.Tileset->RockTable[ 3] = table[mixed + 0xB0];
+	Map.Tileset->RockTable[ 4] = table[mixed + 0x10];
+	Map.Tileset->RockTable[ 5] = table[mixed + 0x50];
+	Map.Tileset->RockTable[ 6] = table[mixed + 0x90];
+	Map.Tileset->RockTable[ 7] = table[mixed + 0xD0];
+	Map.Tileset->RockTable[ 8] = table[mixed + 0x00];
+	Map.Tileset->RockTable[ 9] = table[mixed + 0x40];
+	Map.Tileset->RockTable[10] = table[mixed + 0x80];
+	Map.Tileset->RockTable[11] = table[mixed + 0xC0];
+	Map.Tileset->RockTable[12] = table[mixed + 0x20];
+	Map.Tileset->RockTable[13] = table[mixed + 0x60];
+	Map.Tileset->RockTable[14] = table[mixed + 0xA0];
+	Map.Tileset->RockTable[15] = table[solid];
+	Map.Tileset->RockTable[16] = -1;
+	Map.Tileset->RockTable[17] = Map.Tileset->BotOneRock;
+	Map.Tileset->RockTable[18] = Map.Tileset->TopOneRock;
+	Map.Tileset->RockTable[19] = Map.Tileset->MidOneRock;
 
 	// FIXME: Build wall replacement tables
-	Map.Tileset.HumanWallTable[ 0] = 0x090;
-	Map.Tileset.HumanWallTable[ 1] = 0x830;
-	Map.Tileset.HumanWallTable[ 2] = 0x810;
-	Map.Tileset.HumanWallTable[ 3] = 0x850;
-	Map.Tileset.HumanWallTable[ 4] = 0x800;
-	Map.Tileset.HumanWallTable[ 5] = 0x840;
-	Map.Tileset.HumanWallTable[ 6] = 0x820;
-	Map.Tileset.HumanWallTable[ 7] = 0x860;
-	Map.Tileset.HumanWallTable[ 8] = 0x870;
-	Map.Tileset.HumanWallTable[ 9] = 0x8B0;
-	Map.Tileset.HumanWallTable[10] = 0x890;
-	Map.Tileset.HumanWallTable[11] = 0x8D0;
-	Map.Tileset.HumanWallTable[12] = 0x880;
-	Map.Tileset.HumanWallTable[13] = 0x8C0;
-	Map.Tileset.HumanWallTable[14] = 0x8A0;
-	Map.Tileset.HumanWallTable[15] = 0x0B0;
+	Map.Tileset->HumanWallTable[ 0] = 0x090;
+	Map.Tileset->HumanWallTable[ 1] = 0x830;
+	Map.Tileset->HumanWallTable[ 2] = 0x810;
+	Map.Tileset->HumanWallTable[ 3] = 0x850;
+	Map.Tileset->HumanWallTable[ 4] = 0x800;
+	Map.Tileset->HumanWallTable[ 5] = 0x840;
+	Map.Tileset->HumanWallTable[ 6] = 0x820;
+	Map.Tileset->HumanWallTable[ 7] = 0x860;
+	Map.Tileset->HumanWallTable[ 8] = 0x870;
+	Map.Tileset->HumanWallTable[ 9] = 0x8B0;
+	Map.Tileset->HumanWallTable[10] = 0x890;
+	Map.Tileset->HumanWallTable[11] = 0x8D0;
+	Map.Tileset->HumanWallTable[12] = 0x880;
+	Map.Tileset->HumanWallTable[13] = 0x8C0;
+	Map.Tileset->HumanWallTable[14] = 0x8A0;
+	Map.Tileset->HumanWallTable[15] = 0x0B0;
 
-	Map.Tileset.OrcWallTable[ 0] = 0x0A0;
-	Map.Tileset.OrcWallTable[ 1] = 0x930;
-	Map.Tileset.OrcWallTable[ 2] = 0x910;
-	Map.Tileset.OrcWallTable[ 3] = 0x950;
-	Map.Tileset.OrcWallTable[ 4] = 0x900;
-	Map.Tileset.OrcWallTable[ 5] = 0x940;
-	Map.Tileset.OrcWallTable[ 6] = 0x920;
-	Map.Tileset.OrcWallTable[ 7] = 0x960;
-	Map.Tileset.OrcWallTable[ 8] = 0x970;
-	Map.Tileset.OrcWallTable[ 9] = 0x9B0;
-	Map.Tileset.OrcWallTable[10] = 0x990;
-	Map.Tileset.OrcWallTable[11] = 0x9D0;
-	Map.Tileset.OrcWallTable[12] = 0x980;
-	Map.Tileset.OrcWallTable[13] = 0x9C0;
-	Map.Tileset.OrcWallTable[14] = 0x9A0;
-	Map.Tileset.OrcWallTable[15] = 0x0C0;
+	Map.Tileset->OrcWallTable[ 0] = 0x0A0;
+	Map.Tileset->OrcWallTable[ 1] = 0x930;
+	Map.Tileset->OrcWallTable[ 2] = 0x910;
+	Map.Tileset->OrcWallTable[ 3] = 0x950;
+	Map.Tileset->OrcWallTable[ 4] = 0x900;
+	Map.Tileset->OrcWallTable[ 5] = 0x940;
+	Map.Tileset->OrcWallTable[ 6] = 0x920;
+	Map.Tileset->OrcWallTable[ 7] = 0x960;
+	Map.Tileset->OrcWallTable[ 8] = 0x970;
+	Map.Tileset->OrcWallTable[ 9] = 0x9B0;
+	Map.Tileset->OrcWallTable[10] = 0x990;
+	Map.Tileset->OrcWallTable[11] = 0x9D0;
+	Map.Tileset->OrcWallTable[12] = 0x980;
+	Map.Tileset->OrcWallTable[13] = 0x9C0;
+	Map.Tileset->OrcWallTable[14] = 0x9A0;
+	Map.Tileset->OrcWallTable[15] = 0x0C0;
 
 	// Set destroyed walls to TileTypeUnknown
-	for (i = 0; i < 16; ++i) {
+	for (int i = 0; i < 16; ++i) {
 		n = 0;
-		tile = Map.Tileset.HumanWallTable[i];
-		while (Map.Tileset.Table[tile]) { // Skip good tiles
+		tile = Map.Tileset->HumanWallTable[i];
+		while (Map.Tileset->Table[tile]) { // Skip good tiles
 			++tile;
 			++n;
 		}
-		while (!Map.Tileset.Table[tile]) { // Skip separator
+		while (!Map.Tileset->Table[tile]) { // Skip separator
 			++tile;
 			++n;
 		}
-		while (Map.Tileset.Table[tile]) { // Skip good tiles
+		while (Map.Tileset->Table[tile]) { // Skip good tiles
 			++tile;
 			++n;
 		}
-		while (!Map.Tileset.Table[tile]) { // Skip separator
+		while (!Map.Tileset->Table[tile]) { // Skip separator
 			++tile;
 			++n;
 		}
-		while (n < 16 && Map.Tileset.Table[tile]) {
-			Map.Tileset.TileTypeTable[
-				Map.Tileset.Table[tile]] = TileTypeUnknown;
+		while (n < 16 && Map.Tileset->Table[tile]) {
+			Map.Tileset->TileTypeTable[
+				Map.Tileset->Table[tile]] = TileTypeUnknown;
 			++tile;
 			++n;
 		}
@@ -896,12 +884,12 @@ static int CclSetTileFlags(lua_State *l)
 
 	tilenumber = LuaToNumber(l, 1);
 
-	if (tilenumber >= Map.Tileset.NumTiles) {
+	if (tilenumber >= Map.Tileset->NumTiles) {
 		LuaError(l, "Accessed a tile that's not defined");
 	}
 
 	ParseTilesetTileFlags(l, &flags, &j);
-	Map.Tileset.FlagsTable[tilenumber] = flags;
+	Map.Tileset->FlagsTable[tilenumber] = flags;
 
 	return 0;
 }

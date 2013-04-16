@@ -43,7 +43,6 @@
 #include "iolib.h"
 #include "map.h"
 #include "menus.h"
-#include "tileset.h"
 #include "title.h"
 #include "ui/contenttype.h"
 #include "ui/popup.h"

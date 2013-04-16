@@ -84,10 +84,6 @@
 
 #include <string>
 
-#ifndef __TILESET_H__
-#include "tileset.h"
-#endif
-
 #ifndef __MAP_TILE_H__
 #include "tile.h"
 #endif
@@ -102,6 +98,7 @@
 class CGraphic;
 class CPlayer;
 class CFile;
+class CTileset;
 class CUnit;
 class CUnitType;
 
@@ -150,6 +147,9 @@ public:
 class CMap
 {
 public:
+	CMap();
+	~CMap();
+
 	unsigned int getIndex(int x, int y) const {
 		return x + y * this->Info.MapWidth;
 	}
@@ -248,7 +248,7 @@ public:
 	CMapField *Fields;              /// fields on map
 	bool NoFogOfWar;           /// fog of war disabled
 
-	CTileset Tileset;          /// tileset data
+	CTileset *Tileset;          /// tileset data
 	std::string TileModelsFileName; /// lua filename that loads all tilemodels
 	CGraphic *TileGraphic;     /// graphic for all the tiles
 	static CGraphic *FogGraphic;      /// graphic for fog of war

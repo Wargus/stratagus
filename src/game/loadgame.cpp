@@ -51,6 +51,7 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "spells.h"
+#include "tileset.h"
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"

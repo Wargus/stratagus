@@ -191,7 +191,7 @@ static int GetTileNumber(int basic, int random, int filler)
 	if (random) {
 		int i, n;
 		for (n = i = 0; i < 16; ++i) {
-			if (!Map.Tileset.Table[tile + i]) {
+			if (!Map.Tileset->Table[tile + i]) {
 				if (!filler) {
 					break;
 				}
@@ -202,7 +202,7 @@ static int GetTileNumber(int basic, int random, int filler)
 		n = MyRand() % n;
 		i = -1;
 		do {
-			while (++i < 16 && !Map.Tileset.Table[tile + i]) {
+			while (++i < 16 && !Map.Tileset->Table[tile + i]) {
 			}
 		} while (i < 16 && n--);
 		Assert(i != 16);
@@ -210,9 +210,9 @@ static int GetTileNumber(int basic, int random, int filler)
 	}
 	if (filler) {
 		int i = 0;
-		for (; i < 16 && Map.Tileset.Table[tile + i]; ++i) {
+		for (; i < 16 && Map.Tileset->Table[tile + i]; ++i) {
 		}
-		for (; i < 16 && !Map.Tileset.Table[tile + i]; ++i) {
+		for (; i < 16 && !Map.Tileset->Table[tile + i]; ++i) {
 		}
 		if (i != 16) {
 			return tile + i;
@@ -241,7 +241,7 @@ void EditTile(const Vec2i &pos, int tile)
 				   MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 				   MapFieldWall | MapFieldRocks | MapFieldForest);
 
-	mf->Flags |= Map.Tileset.FlagsTable[GetTileNumber(tile, 0, 0)];
+	mf->Flags |= Map.Tileset->FlagsTable[GetTileNumber(tile, 0, 0)];
 
 	UI.Minimap.UpdateSeenXY(pos);
 	UI.Minimap.UpdateXY(pos);
@@ -701,7 +701,7 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 
 	x += 4;
 	y += 4;
-	Map.TileGraphic->DrawFrameClip(Map.Tileset.Table[tilenum], x, y);
+	Map.TileGraphic->DrawFrameClip(Map.Tileset->Table[tilenum], x, y);
 
 	if (flags & IconSelected) {
 		Video.DrawRectangleClip(ColorGreen, x, y, PixelTileSize.x, PixelTileSize.y);
@@ -760,7 +760,7 @@ static void DrawTileIcons()
 			}
 			tile = Editor.ShownTileTypes[i];
 
-			Map.TileGraphic->DrawFrameClip(Map.Tileset.Table[tile], x, y);
+			Map.TileGraphic->DrawFrameClip(Map.Tileset->Table[tile], x, y);
 			Video.DrawRectangleClip(ColorGray, x, y, PixelTileSize.x, PixelTileSize.y);
 
 			if (i == Editor.SelectedTileIndex) {
@@ -906,7 +906,7 @@ static void DrawMapCursor()
 		const PixelPos screenPos = UI.MouseViewport->TilePosToScreen_TopLeft(tilePos);
 
 		if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
-			const unsigned short frame = Map.Tileset.Table[Editor.ShownTileTypes[Editor.SelectedTileIndex]];
+			const unsigned short frame = Map.Tileset->Table[Editor.ShownTileTypes[Editor.SelectedTileIndex]];
 			PushClipping();
 			UI.MouseViewport->SetClipping();
 
@@ -1015,13 +1015,13 @@ static void DrawEditorInfo()
 	//
 	const int tile = mf->Tile;
 	int i;
-	for (i = 0; i < Map.Tileset.NumTiles; ++i) {
-		if (tile == Map.Tileset.Table[i]) {
+	for (i = 0; i < Map.Tileset->NumTiles; ++i) {
+		if (tile == Map.Tileset->Table[i]) {
 			break;
 		}
 	}
 
-	Assert(i != Map.Tileset.NumTiles);
+	Assert(i != Map.Tileset->NumTiles);
 
 	/*snprintf(buf, sizeof(buf), "%d %s %s", tile,
 			 Map.Tileset.SolidTerrainTypes[Map.Tileset.Tiles[i].BaseTerrain].TerrainName,
@@ -1746,8 +1746,8 @@ static void EditorCallbackMouse(const PixelPos &pos)
 				}
 				if (bx < screenPos.x && screenPos.x < bx + PixelTileSize.x
 					&& by < screenPos.y && screenPos.y < by + PixelTileSize.y) {
-					int base = Map.Tileset.Tiles[Editor.ShownTileTypes[i]].BaseTerrain;
-					UI.StatusLine.Set(Map.Tileset.SolidTerrainTypes[base].TerrainName);
+					int base = Map.Tileset->Tiles[Editor.ShownTileTypes[i]].BaseTerrain;
+					UI.StatusLine.Set(Map.Tileset->SolidTerrainTypes[base].TerrainName);
 					Editor.CursorTileIndex = i;
 					return;
 				}
@@ -1869,8 +1869,8 @@ static void EditorCallbackExit()
 */
 static void CreateTileIcons()
 {
-	for (int i = 0; 0x10 + i < Map.Tileset.NumTiles; i += 16) {
-		TileInfo *info = &Map.Tileset.Tiles[0x10 + i];
+	for (int i = 0; 0x10 + i < Map.Tileset->NumTiles; i += 16) {
+		TileInfo *info = &Map.Tileset->Tiles[0x10 + i];
 		if (info->BaseTerrain && !info->MixTerrain) {
 			Editor.ShownTileTypes.push_back(0x10 + i);
 		}
@@ -1935,9 +1935,9 @@ void CEditor::Init()
 		const int defaultTile = 0x50;
 
 		for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
-			Map.Fields[i].Tile = Map.Tileset.Table[defaultTile];
+			Map.Fields[i].Tile = Map.Tileset->Table[defaultTile];
 			Map.Fields[i].playerInfo.SeenTile = Map.Fields[i].Tile;
-			Map.Fields[i].Flags = Map.Tileset.FlagsTable[defaultTile];
+			Map.Fields[i].Flags = Map.Tileset->FlagsTable[defaultTile];
 		}
 		GameSettings.Resources = SettingsPresetMapDefault;
 		CreateGame("", &Map);

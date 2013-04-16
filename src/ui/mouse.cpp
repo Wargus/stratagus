@@ -56,7 +56,6 @@
 #include "player.h"
 #include "sound.h"
 #include "spells.h"
-#include "tileset.h"
 #include "translate.h"
 #include "unit.h"
 #include "unit_find.h"

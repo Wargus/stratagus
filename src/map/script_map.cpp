@@ -39,6 +39,7 @@
 
 #include "iolib.h"
 #include "script.h"
+#include "tileset.h"
 #include "ui.h"
 #include "unit.h"
 #include "version.h"
@@ -409,7 +410,7 @@ void SetTile(int tile, const Vec2i &pos, int value)
 		fprintf(stderr, "Invalid map coordonate : (%d, %d)\n", pos.x, pos.y);
 		return;
 	}
-	if (tile < 0 || tile >= Map.Tileset.NumTiles) {
+	if (tile < 0 || tile >= Map.Tileset->NumTiles) {
 		fprintf(stderr, "Invalid tile number: %d\n", tile);
 		return;
 	}
@@ -421,10 +422,10 @@ void SetTile(int tile, const Vec2i &pos, int value)
 	if (Map.Fields) {
 		CMapField &mf = *Map.Field(pos);
 
-		mf.Tile = Map.Tileset.Table[tile];
+		mf.Tile = Map.Tileset->Table[tile];
 		mf.Value = value;
-		mf.Flags = Map.Tileset.FlagsTable[tile];
-		mf.Cost = 1 << (Map.Tileset.FlagsTable[tile] & MapFieldSpeedMask);
+		mf.Flags = Map.Tileset->FlagsTable[tile];
+		mf.Cost = 1 << (Map.Tileset->FlagsTable[tile] & MapFieldSpeedMask);
 #ifdef DEBUG
 		mf.TilesetTile = tile;
 #endif

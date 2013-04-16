@@ -42,7 +42,6 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "spells.h"
-#include "tileset.h"
 #include "translate.h"
 #include "upgrade.h"
 #include "ui.h"

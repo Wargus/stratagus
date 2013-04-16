@@ -39,7 +39,6 @@
 #include "particle.h"
 #include "pathfinder.h"
 #include "player.h"
-#include "tileset.h"
 #include "unit.h"
 #include "unittype.h"
 #include "ui.h"

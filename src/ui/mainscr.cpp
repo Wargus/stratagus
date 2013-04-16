@@ -49,7 +49,6 @@
 #include "player.h"
 #include "sound.h"
 #include "spells.h"
-#include "tileset.h"
 #include "translate.h"
 #include "trigger.h"
 #include "ui/contenttype.h"

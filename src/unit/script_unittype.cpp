@@ -47,7 +47,6 @@
 #include "script.h"
 #include "sound.h"
 #include "spells.h"
-#include "tileset.h"
 #include "ui.h"
 #include "unit.h"
 #include "unitsound.h"

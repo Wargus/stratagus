@@ -43,7 +43,6 @@
 #include "player.h"
 #include "sound.h"
 #include "sound_server.h"
-#include "tileset.h"
 #include "unit.h"
 #include "unittype.h"
 #include "video.h"

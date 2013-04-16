@@ -55,7 +55,6 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "spells.h"
-#include "tileset.h"
 #include "translate.h"
 #include "ui.h"
 #include "unit_find.h"
@@ -2687,7 +2686,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 			missile->Type->OnImpact->pushInteger(damage);
 			missile->Type->OnImpact->run();
 		}
-	}	
+	}
 
 	HitUnit_ShowImpactMissile(target);
 
