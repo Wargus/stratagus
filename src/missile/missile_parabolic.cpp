@@ -48,29 +48,28 @@
 **
 **  @param missile  Missile pointer.
 **
-**  @return         1 if target is reached, 0 otherwise
+**  @return         true if target is reached, false otherwise
 **
 **  @todo Find good values for ZprojToX and Y
 */
-static int ParabolicMissile(Missile &missile)
+static bool ParabolicMissile(Missile &missile)
 {
-	int k;        // Coefficient of the parabol.
-	int zprojToX; // Projection of Z axis on axis X.
-	int zprojToY; // Projection of Z axis on axis Y.
+	// Should be initialised by an other method (computed with distance...)
+	const int k = -2048; //-1024; // Coefficient of the parabol.
+	const int zprojToX = 4;    // Projection of Z axis on axis X.
+	const int zprojToY = 1024; // Projection of Z axis on axis Y.
 	int z;        // should be missile.Z later.
 
-	k = -2048; //-1024; // Should be initialised by an other method (computed with distance...)
-	zprojToX = 4;
-	zprojToY = 1024;
-	if (MissileInitMove(missile) == 1) {
-		return 1;
+	MissileInitMove(missile);
+	if (missile.TotalStep == 0) {
+		return true;
 	}
 	Assert(missile.Type != NULL);
 	const PixelPos orig_pos = missile.position;
 	Assert(missile.TotalStep != 0);
 	const PixelPos diff = (missile.destination - missile.source);
 	const PixelPrecise sign(diff.x >= 0 ? 1 : -1, diff.y >= 0 ? 1 : -1); // Remember sign to move into correct direction
-	PixelPrecise pos((double)missile.position.x, (double)missile.position.y); // Remember old position
+	PixelPrecise pos(missile.position.x, missile.position.y); // Remember old position
 	missile.position = missile.source + diff * missile.CurrentStep / missile.TotalStep;
 
 	Assert(k != 0);
@@ -83,35 +82,36 @@ static int ParabolicMissile(Missile &missile)
 		&& pos.y * sign.y <= missile.position.y * sign.y;
 		pos.x += (double)diff.x * missile.Type->SmokePrecision / missile.TotalStep,
 		pos.y += (double)diff.y * missile.Type->SmokePrecision / missile.TotalStep) {
-			if (missile.Type->Smoke.Missile && missile.CurrentStep) {
-				const PixelPos position((int)pos.x + missile.Type->size.x / 2,
-					(int)pos.y + missile.Type->size.x / 2);
-				Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position);
-				if (smoke && smoke->Type->NumDirections > 1) {
-					smoke->MissileNewHeadingFromXY(diff);
-				}
-			}
 
-			if (missile.Type->SmokeParticle && missile.CurrentStep) {
-				const PixelPos position((int)pos.x + missile.Type->size.x / 2,
-					(int)pos.y + missile.Type->size.x / 2);
-				missile.Type->SmokeParticle->pushPreamble();
-				missile.Type->SmokeParticle->pushInteger(position.x);
-				missile.Type->SmokeParticle->pushInteger(position.y);
-				missile.Type->SmokeParticle->run();
+		if (missile.Type->Smoke.Missile && missile.CurrentStep) {
+			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
+				(int)pos.y + missile.Type->size.y / 2);
+			Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position);
+			if (smoke && smoke->Type->NumDirections > 1) {
+				smoke->MissileNewHeadingFromXY(diff);
 			}
+		}
 
-			if (missile.Type->Pierce) {
-				const PixelPos position((int)pos.x, (int)pos.y);
-				MissileHandlePierce(missile, Map.MapPixelPosToTilePos(position));
-			}
+		if (missile.Type->SmokeParticle && missile.CurrentStep) {
+			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
+				(int)pos.y + missile.Type->size.y / 2);
+			missile.Type->SmokeParticle->pushPreamble();
+			missile.Type->SmokeParticle->pushInteger(position.x);
+			missile.Type->SmokeParticle->pushInteger(position.y);
+			missile.Type->SmokeParticle->run();
+		}
+
+		if (missile.Type->Pierce) {
+			const PixelPos position((int)pos.x, (int)pos.y);
+			MissileHandlePierce(missile, Map.MapPixelPosToTilePos(position));
+		}
 	}
 
 	if (missile.CurrentStep == missile.TotalStep) {
 		missile.position = missile.destination;
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
 /**

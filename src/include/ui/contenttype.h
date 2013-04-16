@@ -169,17 +169,17 @@ private:
 class CContentTypeCompleteBar : public CContentType
 {
 public:
-	CContentTypeCompleteBar() : Index(-1), Width(0), Height(0), Border(0), Color(0) {}
+	CContentTypeCompleteBar() : varIndex(-1), width(0), height(0), hasBorder(false), colorIndex(-1) {}
 
 	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
 	virtual void Parse(lua_State *l);
 
 private:
-	int Index;           /// Index of the variable to show, -1 if not.
-	int Width;           /// Width of the bar.
-	int Height;          /// Height of the bar.
-	char Border;         /// True for additional border.
-	char Color;          /// Color to show
+	int varIndex;    /// Index of the variable to show, -1 if not.
+	int width;       /// Width of the bar.
+	int height;      /// Height of the bar.
+	bool hasBorder;  /// True for additional border.
+	int colorIndex;  /// Index of Color to show.
 };
 
 

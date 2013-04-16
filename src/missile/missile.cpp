@@ -642,7 +642,7 @@ bool MissileInitMove(Missile &missile)
 	missile.CurrentStep += missile.Type->Speed;
 	if (missile.CurrentStep >= missile.TotalStep) {
 		missile.CurrentStep = missile.TotalStep;
-		// we need to draw the smoke first before stopping
+		return true;
 	}
 	return false;
 }
@@ -673,25 +673,26 @@ void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 */
 bool PointToPointMissile(Missile &missile)
 {
-	if (MissileInitMove(missile) == true) {
+	MissileInitMove(missile);
+	if (missile.TotalStep == 0) {
 		return true;
 	}
-
 	Assert(missile.Type != NULL);
 	Assert(missile.TotalStep != 0);
 
 	const PixelPos diff = (missile.destination - missile.source);
 	const PixelPrecise sign(diff.x >= 0 ? 1.0 : -1.0, diff.y >= 0 ? 1.0 : -1.0); // Remember sign to move into correct direction
-	PixelPrecise pos((double)missile.position.x, (double)missile.position.y); // Remember old position
+	PixelPrecise pos(missile.position.x, missile.position.y); // Remember old position
 	missile.position = missile.source + diff * missile.CurrentStep / missile.TotalStep;
 
 	for (; pos.x * sign.x <= missile.position.x * sign.x
-		&& pos.y * sign.y <= missile.position.y * sign.y; 
+		&& pos.y * sign.y <= missile.position.y * sign.y;
 		pos.x += (double)diff.x * missile.Type->SmokePrecision / missile.TotalStep,
 		pos.y += (double)diff.y * missile.Type->SmokePrecision / missile.TotalStep) {
+
 		if (missile.Type->Smoke.Missile && (missile.CurrentStep || missile.State > 1)) {
 			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
-				(int)pos.y + missile.Type->size.x / 2);
+				(int)pos.y + missile.Type->size.y / 2);
 			Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position);
 			if (smoke && smoke->Type->NumDirections > 1) {
 				smoke->MissileNewHeadingFromXY(diff);
@@ -700,7 +701,7 @@ bool PointToPointMissile(Missile &missile)
 
 		if (missile.Type->SmokeParticle && (missile.CurrentStep || missile.State > 1)) {
 			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
-				(int)pos.y + missile.Type->size.x / 2);
+				(int)pos.y + missile.Type->size.y / 2);
 			missile.Type->SmokeParticle->pushPreamble();
 			missile.Type->SmokeParticle->pushInteger(position.x);
 			missile.Type->SmokeParticle->pushInteger(position.y);
@@ -717,7 +718,6 @@ bool PointToPointMissile(Missile &missile)
 		missile.position = missile.destination;
 		return true;
 	}
-
 	return false;
 }
 

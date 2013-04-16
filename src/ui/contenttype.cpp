@@ -55,7 +55,7 @@ typedef struct {
 extern UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t);
 extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 
-CContentType::~CContentType()
+/* virtual */ CContentType::~CContentType()
 {
 	delete Condition;
 }
@@ -67,7 +67,7 @@ CContentType::~CContentType()
 **  @param unit         unit with variable to show.
 **  @param defaultfont  default font if no specific font in extra data.
 */
-void CContentTypeText::Draw(const CUnit &unit, CFont *defaultfont) const
+/* virtual */ void CContentTypeText::Draw(const CUnit &unit, CFont *defaultfont) const
 {
 	std::string text;       // Optional text to display.
 	int x = this->Pos.x;
@@ -135,7 +135,7 @@ void CContentTypeText::Draw(const CUnit &unit, CFont *defaultfont) const
 **  @note text must have exactly 1 %d.
 **  @bug if text format is incorrect.
 */
-void CContentTypeFormattedText::Draw(const CUnit &unit, CFont *defaultfont) const
+/* virtual */ void CContentTypeFormattedText::Draw(const CUnit &unit, CFont *defaultfont) const
 {
 	char buf[256];
 	UStrInt usi1;
@@ -170,7 +170,7 @@ void CContentTypeFormattedText::Draw(const CUnit &unit, CFont *defaultfont) cons
 **  @note text must have exactly 2 %d.
 **  @bug if text format is incorrect.
 */
-void CContentTypeFormattedText2::Draw(const CUnit &unit, CFont *defaultfont) const
+/* virtual */ void CContentTypeFormattedText2::Draw(const CUnit &unit, CFont *defaultfont) const
 {
 	char buf[256];
 	UStrInt usi1, usi2;
@@ -241,7 +241,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 **  @param unit         unit with icon to show.
 **  @param defaultfont  unused.
 */
-void CContentTypeIcon::Draw(const CUnit &unit, CFont *) const
+/* virtual */ void CContentTypeIcon::Draw(const CUnit &unit, CFont *) const
 {
 	const CUnit *unitToDraw = GetUnitRef(unit, this->UnitRef);
 
@@ -259,7 +259,7 @@ void CContentTypeIcon::Draw(const CUnit &unit, CFont *) const
 **
 **  @todo Color and percent value Parametrisation.
 */
-void CContentTypeLifeBar::Draw(const CUnit &unit, CFont *) const
+/* virtual */ void CContentTypeLifeBar::Draw(const CUnit &unit, CFont *) const
 {
 	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
 	if (!unit.Variable[this->Index].Max) {
@@ -296,30 +296,26 @@ void CContentTypeLifeBar::Draw(const CUnit &unit, CFont *) const
 **
 **  @todo Color and percent value Parametrisation.
 */
-void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
+/* virtual */ void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
 {
-	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
-	if (!unit.Variable[this->Index].Max) {
+	Assert((unsigned int) this->varIndex < UnitTypeVar.GetNumberVariable());
+	if (!unit.Variable[this->varIndex].Max) {
 		return;
 	}
-
 	int x = this->Pos.x;
 	int y = this->Pos.y;
-	int w = this->Width;
-	int h = this->Height;
-
+	int w = this->width;
+	int h = this->height;
 	Assert(w > 0);
 	Assert(h > 4);
-
 	const Uint32 colors[] = {ColorRed, ColorYellow, ColorGreen, ColorLightGray,
 							 ColorGray, ColorDarkGray, ColorWhite, ColorOrange,
 							 ColorLightBlue, ColorBlue, ColorDarkGreen, ColorBlack
 							};
-	const Uint32 color = (1 <= Color && Color <= (sizeof(colors) / sizeof(Uint32))) ?
-						 colors[this->Color - 1] : UI.CompletedBarColor;
+	const Uint32 color = (colorIndex != -1) ? colors[colorIndex] : UI.CompletedBarColor;
+	const int f = (100 * unit.Variable[this->varIndex].Value) / unit.Variable[this->varIndex].Max;
 
-	int f = (100 * unit.Variable[this->Index].Value) / unit.Variable[this->Index].Max;
-	if (!this->Border) {
+	if (!this->hasBorder) {
 		Video.FillRectangleClip(color, x, y, f * w / 100, h);
 		if (UI.CompletedBarShadow) {
 			// Shadow
@@ -336,8 +332,6 @@ void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
 		Video.FillRectangleClip(color, x + 2, y + 2, f * w / 100, h - 4);
 	}
 }
-
-
 
 /* virtual */ void CContentTypeText::Parse(lua_State *l)
 {
@@ -518,6 +512,22 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 	}
 }
 
+static int GetColorIndexByName(const char *colorName)
+{
+	//FIXME: need more general way
+	const char *names[] = {
+		"red", "yellow", "green", "light-gray", "gray", "dark-gray",
+		"white", "orange", "light-blue", "blue", "dark-green", "black"
+	};
+
+	for (unsigned int i = 0; i != sizeof(names) / sizeof(names[0]); ++i) {
+		if (!strcmp(colorName, names[i])) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 /* virtual */ void CContentTypeCompleteBar::Parse(lua_State *l)
 {
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
@@ -525,58 +535,34 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 
 		if (!strcmp(key, "Variable")) {
 			const char *const name = LuaToString(l, -1);
-			this->Index = UnitTypeVar.VariableNameLookup[name];
-			if (this->Index == -1) {
+			this->varIndex = UnitTypeVar.VariableNameLookup[name];
+			if (this->varIndex == -1) {
 				LuaError(l, "unknown variable '%s'" _C_ name);
 			}
 		} else if (!strcmp(key, "Height")) {
-			this->Height = LuaToNumber(l, -1);
+			this->height = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "Width")) {
-			this->Width = LuaToNumber(l, -1);
+			this->width = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "Border")) {
-			this->Border = LuaToBoolean(l, -1);
+			this->hasBorder = LuaToBoolean(l, -1);
 		} else if (!strcmp(key, "Color")) {
-			//FIXME: need more general way
-			const char *const color = LuaToString(l, -1);
-			if (!strcmp(color, "red")) {
-				this->Color = 1;
-			} else if (!strcmp(color, "yellow")) {
-				this->Color = 2;
-			} else if (!strcmp(color, "green")) {
-				this->Color = 3;
-			} else if (!strcmp(color, "light-gray")) {
-				this->Color = 4;
-			} else if (!strcmp(color, "gray")) {
-				this->Color = 5;
-			} else if (!strcmp(color, "dark-gray")) {
-				this->Color = 6;
-			} else if (!strcmp(color, "white")) {
-				this->Color = 7;
-			} else if (!strcmp(color, "orange")) {
-				this->Color = 8;
-			} else if (!strcmp(color, "light-blue")) {
-				this->Color = 9;
-			} else if (!strcmp(color, "blue")) {
-				this->Color = 10;
-			} else if (!strcmp(color, "dark-green")) {
-				this->Color = 11;
-			} else if (!strcmp(color, "black")) {
-				this->Color = 12;
-			} else {
-				LuaError(l, "incorrect color: '%s' " _C_ color);
+			const char *const colorName = LuaToString(l, -1);
+			this->colorIndex = GetColorIndexByName(colorName);
+			if (colorIndex == -1) {
+				LuaError(l, "incorrect color: '%s' " _C_ colorName);
 			}
 		} else {
 			LuaError(l, "'%s' invalid for method 'CompleteBar' in DefinePanelContents" _C_ key);
 		}
 	}
 	// Default value and checking errors.
-	if (this->Height <= 0) {
-		this->Height = 5; // Default value.
+	if (this->height <= 0) {
+		this->height = 5; // Default value.
 	}
-	if (this->Width <= 0) {
-		this->Width = 50; // Default value.
+	if (this->width <= 0) {
+		this->width = 50; // Default value.
 	}
-	if (this->Index == -1) {
+	if (this->varIndex == -1) {
 		LuaError(l, "variable undefined for CompleteBar");
 	}
 }

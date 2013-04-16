@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __VEC2I_H__
-#define __VEC2I_H__
+#ifndef VEC2I_H
+#define VEC2I_H
 
 //@{
 
@@ -44,28 +44,28 @@ public:
 };
 
 
-template <typename T, typename T2>
-inline bool operator == (const Vec2T<T> &lhs, const Vec2T<T2> &rhs)
+template <typename T>
+inline bool operator == (const Vec2T<T> &lhs, const Vec2T<T> &rhs)
 {
 	return lhs.x == rhs.x && lhs.y == rhs.y;
 }
 
-template <typename T, typename T2>
-inline bool operator != (const Vec2T<T> &lhs, const Vec2T<T2> &rhs)
+template <typename T>
+inline bool operator != (const Vec2T<T> &lhs, const Vec2T<T> &rhs)
 {
 	return !(lhs == rhs);
 }
 
-template <typename T, typename T2>
-inline const Vec2T<T> &operator += (Vec2T<T> &lhs, const Vec2T<T2> &rhs)
+template <typename T>
+inline const Vec2T<T> &operator += (Vec2T<T> &lhs, const Vec2T<T> &rhs)
 {
 	lhs.x += rhs.x;
 	lhs.y += rhs.y;
 	return lhs;
 }
 
-template <typename T, typename T2>
-inline const Vec2T<T> &operator -= (Vec2T<T> &lhs, const Vec2T<T2> &rhs)
+template <typename T>
+inline const Vec2T<T> &operator -= (Vec2T<T> &lhs, const Vec2T<T> &rhs)
 {
 	lhs.x -= rhs.x;
 	lhs.y -= rhs.y;
@@ -88,8 +88,8 @@ inline const Vec2T<T> &operator /= (Vec2T<T> &lhs, int rhs)
 	return lhs;
 }
 
-template <typename T, typename T2>
-inline Vec2T<T> operator + (const Vec2T<T> &lhs, const Vec2T<T2> &rhs)
+template <typename T>
+inline Vec2T<T> operator + (const Vec2T<T> &lhs, const Vec2T<T> &rhs)
 {
 	Vec2T<T> res(lhs);
 
@@ -97,8 +97,8 @@ inline Vec2T<T> operator + (const Vec2T<T> &lhs, const Vec2T<T2> &rhs)
 	return res;
 }
 
-template <typename T, typename T2>
-inline Vec2T<T> operator - (const Vec2T<T> &lhs, const Vec2T<T2> &rhs)
+template <typename T>
+inline Vec2T<T> operator - (const Vec2T<T> &lhs, const Vec2T<T> &rhs)
 {
 	Vec2T<T> res(lhs);
 
@@ -133,16 +133,16 @@ inline Vec2T<T> operator / (const Vec2T<T> &lhs, int rhs)
 	return res;
 }
 
-template <typename T, typename T2>
-inline int SquareDistance(const Vec2T<T> &pos1, const Vec2T<T2> &pos2)
+template <typename T>
+inline int SquareDistance(const Vec2T<T> &pos1, const Vec2T<T> &pos2)
 {
 	const Vec2T<T> diff = pos2 - pos1;
 
 	return diff.x * diff.x + diff.y * diff.y;
 }
 
-template <typename T, typename T2>
-inline int Distance(const Vec2T<T> &pos1, const Vec2T<T2> &pos2)
+template <typename T>
+inline int Distance(const Vec2T<T> &pos1, const Vec2T<T> &pos2)
 {
 	return isqrt(SquareDistance(pos1, pos2));
 }
@@ -155,4 +155,4 @@ typedef Vec2T<double> PixelPrecise;
 
 //@}
 
-#endif // !__VEC2I_H__
+#endif // !VEC2I_H
