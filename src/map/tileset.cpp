@@ -203,7 +203,6 @@
 #include "tileset.h"
 
 #include "map.h"
-#include "ui.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------
@@ -221,23 +220,6 @@ PixelSize PixelTileSize(32, 32);
 ----------------------------------------------------------------------------*/
 
 /**
-** Load tileset and setup ::Map for this tileset.
-**
-** @see Map @see Map.Tileset.
-*/
-void LoadTileset()
-{
-	//  Load and prepare the tileset
-	PixelTileSize = Map.Tileset->PixelTileSize;
-
-	ShowLoadProgress("Tileset `%s'", Map.Tileset->ImageFile.c_str());
-	//Map.TileGraphic = CGraphic::New(Map.Tileset->ImageFile);
-	Map.TileGraphic = CGraphic::New(Map.Tileset->ImageFile, PixelTileSize.x, PixelTileSize.y);
-	Map.TileGraphic->Load();
-}
-
-
-/**
 ** Cleanup the tileset module.
 **
 ** @note this didn't frees the configuration memory.
@@ -246,9 +228,7 @@ void CleanTilesets()
 {
 	Map.Tileset->Clear();
 
-	//
 	// Should this be done by the map?
-	//
 	CGraphic::Free(Map.TileGraphic);
 	Map.TileGraphic = NULL;
 }
@@ -293,6 +273,20 @@ bool CTileset::IsSeenTile(unsigned short type, unsigned short seen) const
 		}
 	}
 	return false;
+}
+
+unsigned int CTileset::getOrAddSolidTileIndexByName(const std::string &name)
+{
+	for (size_t i = 0; i != SolidTerrainTypes.size(); ++i) {
+		if (SolidTerrainTypes[i].TerrainName == name) {
+			return i;
+		}
+	}
+	// Can't find it, then we add another solid terrain type.
+	SolidTerrainInfo s;
+	s.TerrainName = name;
+	SolidTerrainTypes.push_back(s);
+	return SolidTerrainTypes.size() - 1;
 }
 
 unsigned CTileset::getHumanWallTile(int index) const

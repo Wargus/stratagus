@@ -39,6 +39,8 @@
 #include "vec2i.h"
 #include <vector>
 
+struct lua_State;
+
 /**
 **  These are used for lookup tiles types
 **  mainly used for the FOW implementation of the seen woods/rocks
@@ -75,12 +77,25 @@ public:
 	void Clear();
 	bool IsSeenTile(unsigned short type, unsigned short seen) const;
 
+	unsigned int getOrAddSolidTileIndexByName(const std::string &name);
+
+
+	unsigned getBottomOneTreeTile() const { return BotOneTree; }
+	unsigned getTopOneTreeTile() const { return TopOneTree; }
+
 	unsigned getHumanWallTile(int index) const;
 	unsigned getOrcWallTile(int index) const;
 	unsigned getHumanWallTile_broken(int index) const;
 	unsigned getOrcWallTile_broken(int index) const;
 	unsigned getHumanWallTile_destroyed(int index) const;
 	unsigned getOrcWallTile_destroyed(int index) const;
+public:
+	void parse(lua_State *l);
+	void buildTable(lua_State *l);
+
+//private:
+	void buildWallReplacementTable();
+	void parseSpecial(lua_State *l);
 public:
 	std::string Name;           /// Nice name to display
 	std::string ImageFile;      /// File containing image data
@@ -95,20 +110,23 @@ public:
 	std::vector<unsigned char> TileTypeTable;   /// For fast lookup of tile type
 
 	std::vector<SolidTerrainInfo> SolidTerrainTypes; /// Information about solid terrains.
-
+	std::vector<int> MixedLookupTable;   /// Lookup for what part of tile used
+private:
 	unsigned TopOneTree;     /// Tile for one tree top
 	unsigned MidOneTree;     /// Tile for one tree middle
 	unsigned BotOneTree;     /// Tile for one tree bottom
+public:
 	int RemovedTree;         /// Tile placed where trees are gone
 	unsigned GrowingTree[2]; /// Growing tree tiles
 	int WoodTable[20];       /// Table for tree removable
-	std::vector<int> MixedLookupTable;   /// Lookup for what part of tile used
+private:
 	unsigned TopOneRock;     /// Tile for one rock top
 	unsigned MidOneRock;     /// Tile for one rock middle
 	unsigned BotOneRock;     /// Tile for one rock bottom
+public:
 	int RemovedRock;         /// Tile placed where rocks are gone
 	int RockTable[20];       /// Removed rock placement table
-//private:
+private:
 	unsigned HumanWallTable[16];    /// Human wall placement table
 	unsigned OrcWallTable[16];      /// Orc wall placement table
 };
@@ -117,7 +135,6 @@ public:
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void LoadTileset();   /// Load tileset definition
 extern void CleanTilesets(); /// Cleanup the tileset module
 extern void TilesetCclRegister(); /// Register CCL features for tileset
 

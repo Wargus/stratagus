@@ -104,9 +104,9 @@ void CMap::MarkSeenTile(CMapField &mf)
 			FixNeighbors(MapFieldForest, 1, pos);
 
 			// Handle rock changes.
-		} else if (seentile != this->Tileset->RemovedRock && tile == Map.Tileset->RemovedRock) {
+		} else if (seentile != Tileset->RemovedRock && tile == Tileset->RemovedRock) {
 			FixNeighbors(MapFieldRocks, 1, pos);
-		} else if (seentile == this->Tileset->RemovedRock && tile != Map.Tileset->RemovedRock) {
+		} else if (seentile == Tileset->RemovedRock && tile != Tileset->RemovedRock) {
 			FixTile(MapFieldRocks, 1, pos);
 		} else if (mf.RockOnMap()) {
 			FixTile(MapFieldRocks, 1, pos);
@@ -675,11 +675,11 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		&& topMf.Value >= ForestRegeneration
 		&& !(topMf.Flags & occupedFlag)) {
 		DebugPrint("Real place wood\n");
-		topMf.Tile = this->Tileset->TopOneTree;
+		topMf.Tile = this->Tileset->getTopOneTreeTile();
 		topMf.Value = 0;
 		topMf.Flags |= MapFieldForest | MapFieldUnpassable;
 
-		mf.Tile = this->Tileset->BotOneTree;
+		mf.Tile = this->Tileset->getBottomOneTreeTile();
 		mf.Value = 0;
 		mf.Flags |= MapFieldForest | MapFieldUnpassable;
 		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
