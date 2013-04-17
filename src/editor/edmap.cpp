@@ -153,12 +153,11 @@ static unsigned QuadFromTile(const Vec2i &pos)
 **  @param marks   Already visited tile types.
 **  @param tile    Tile pointer.
 */
-static int FindTilePath(int base, int goal, int length, char *marks, int *tile)
+static int FindTilePath(int base, int goal, int length, std::vector<char> &marks, int *tile)
 {
 	int n;
-	//
+
 	// Find any mixed tile
-	//
 	int l = INT_MAX;
 	for (int i = 0; i < Map.Tileset->NumTiles;) {
 		// goal found.
@@ -266,9 +265,9 @@ find_solid:
 			return i;
 		}
 	} else {
-		char *marks = new char[Map.Tileset->SolidTerrainTypes.size()];
+		std::vector<char> marks;
+		marks.resize(Map.Tileset->SolidTerrainTypes.size(), 0);
 
-		memset(marks, 0, Map.Tileset->SolidTerrainTypes.size());
 		marks[type1] = type1;
 		marks[type2] = type2;
 
@@ -312,21 +311,16 @@ find_solid:
 				quad |= type2 << 24;
 			}
 		}
-		delete[] marks;
 	}
 
-	//
 	// Need a mixed tile
-	//
 	for (i = 0; i <  Map.Tileset->NumTiles;) {
 		if (type1 == Map.Tileset->Tiles[i].BaseTerrain && type2 == Map.Tileset->Tiles[i].MixTerrain) {
 			break;
 		}
 		if (type2 == Map.Tileset->Tiles[i].BaseTerrain && type1 == Map.Tileset->Tiles[i].MixTerrain) {
 			// Other mixed
-			type1 ^= type2;
-			type2 ^= type1;
-			type1 ^= type2;
+			std::swap(type1, type2);
 			break;
 		}
 		// Advance solid or mixed.
@@ -338,25 +332,18 @@ find_solid:
 	}
 
 	if (i >= Map.Tileset->NumTiles) {
-		//
 		// Find the best tile path.
-		//
-		char *marks = new char[Map.Tileset->SolidTerrainTypes.size()];
-		memset(marks, 0, Map.Tileset->SolidTerrainTypes.size());
+		std::vector<char> marks;
+		marks.resize(Map.Tileset->SolidTerrainTypes.size(), 0);
 		marks[type1] = type1;
 		if (FindTilePath(type1, type2, 0, marks, &i) == INT_MAX) {
 			DebugPrint("Huch, no mix found!!!!!!!!!!!\n");
-			delete[] marks;
 			goto find_solid;
 		}
 		if (type1 == Map.Tileset->Tiles[i].MixTerrain) {
 			// Other mixed
-			type1 ^= type2;
-			type2 ^= type1;
-			type1 ^= type2;
+			std::swap(type1, type2);
 		}
-
-		delete[] marks;
 	}
 
 	int base = i;

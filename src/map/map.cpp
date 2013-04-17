@@ -85,7 +85,7 @@ void CMap::MarkSeenTile(CMapField &mf)
 	const Vec2i pos = {x, y}
 #endif
 
-	if (this->Tileset->TileTypeTable) {
+	if (this->Tileset->TileTypeTable.empty() == false) {
 #ifndef MINIMAP_UPDATE
 		//rb - GRRRRRRRRRRRR
 		const unsigned int index = &mf - Map.Fields;
@@ -344,7 +344,7 @@ void PreprocessMap()
 		}
 	}
 	// it is required for fixing the wood that all tiles are marked as seen!
-	if (Map.Tileset->TileTypeTable) {
+	if (Map.Tileset->TileTypeTable.empty() == false) {
 		Vec2i pos;
 		for (pos.x = 0; pos.x < Map.Info.MapWidth; ++pos.x) {
 			for (pos.y = 0; pos.y < Map.Info.MapHeight; ++pos.y) {

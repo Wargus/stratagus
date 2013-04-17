@@ -259,14 +259,10 @@ void CTileset::Clear()
 	ImageFile.clear();
 	NumTiles = 0;
 	PixelTileSize.x = PixelTileSize.y = 0;
-	delete[] Table;
-	Table = NULL;
-	delete[] FlagsTable;
-	FlagsTable = NULL;
-	delete[] Tiles;
-	Tiles = NULL;
-	delete[] TileTypeTable;
-	TileTypeTable = NULL;
+	Table.clear();
+	FlagsTable.clear();
+	Tiles.clear();
+	TileTypeTable.clear();
 	SolidTerrainTypes.clear();
 	TopOneTree = 0;
 	MidOneTree = 0;
@@ -274,8 +270,7 @@ void CTileset::Clear()
 	RemovedTree = 0;
 	memset(GrowingTree, 0, sizeof(GrowingTree));
 	memset(WoodTable, 0, sizeof(WoodTable));
-	delete[] MixedLookupTable;
-	MixedLookupTable = NULL;
+	MixedLookupTable.clear();
 	TopOneRock = 0;
 	MidOneRock = 0;
 	BotOneRock = 0;
@@ -287,7 +282,7 @@ void CTileset::Clear()
 
 bool CTileset::IsSeenTile(unsigned short type, unsigned short seen) const
 {
-	if (TileTypeTable) {
+	if (TileTypeTable.empty() == false) {
 		switch (type) {
 			case MapFieldForest:
 				return TileTypeTable[seen] == TileTypeWood;
@@ -298,6 +293,62 @@ bool CTileset::IsSeenTile(unsigned short type, unsigned short seen) const
 		}
 	}
 	return false;
+}
+
+unsigned CTileset::getHumanWallTile(int index) const
+{
+	unsigned tile = HumanWallTable[index];
+	tile = Table[tile];
+	return tile;
+}
+unsigned CTileset::getOrcWallTile(int index) const
+{
+	unsigned tile = OrcWallTable[index];
+	tile = Table[tile];
+	return tile;
+}
+
+
+static unsigned int NextSection(const CTileset &tileset, unsigned int tile)
+{
+	while (tileset.Table[tile]) { // Skip good tiles
+		++tile;
+	}
+	while (!tileset.Table[tile]) { // Skip separator
+		++tile;
+	}
+	return tile;
+}
+
+unsigned CTileset::getHumanWallTile_broken(int index) const
+{
+	unsigned tile = HumanWallTable[index];
+	tile = NextSection(*this, tile);
+	tile = Table[tile];
+	return tile;
+}
+unsigned CTileset::getOrcWallTile_broken(int index) const
+{
+	unsigned tile = OrcWallTable[index];
+	tile = NextSection(*this, tile);
+	tile = Table[tile];
+	return tile;
+}
+unsigned CTileset::getHumanWallTile_destroyed(int index) const
+{
+	unsigned tile = HumanWallTable[index];
+	tile = NextSection(*this, tile);
+	tile = NextSection(*this, tile);
+	tile = Table[tile];
+	return tile;
+}
+unsigned CTileset::getOrcWallTile_destroyed(int index) const
+{
+	unsigned tile = OrcWallTable[index];
+	tile = NextSection(*this, tile);
+	tile = NextSection(*this, tile);
+	tile = Table[tile];
+	return tile;
 }
 
 //@}

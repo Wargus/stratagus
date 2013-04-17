@@ -85,6 +85,28 @@ static int MapIsSeenTileWall(int x, int y, int walltype)
 	return t == walltype;
 }
 
+static unsigned int getWallTile(const CTileset &tileset, bool humanWall, int index, int value)
+{
+	if (humanWall) {
+		if (value == 0) {
+			return tileset.getHumanWallTile_destroyed(index);
+		} else if (UnitTypeHumanWall && value <= UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
+			return tileset.getHumanWallTile_broken(index);
+		} else {
+			return tileset.getHumanWallTile(index);
+		}
+	} else { // orcWall
+		if (value == 0) {
+			return tileset.getOrcWallTile_destroyed(index);
+		} else if (UnitTypeOrcWall && value <= UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
+			return tileset.getOrcWallTile_broken(index);
+		} else {
+			return tileset.getOrcWallTile(index);
+		}
+	}
+}
+
+
 /**
 ** Correct the seen wall field, depending on the surrounding.
 **
@@ -97,14 +119,13 @@ void MapFixSeenWallTile(const Vec2i &pos)
 		return;
 	}
 	CMapField &mf = *Map.Field(pos);
-	int t = Map.Tileset->TileTypeTable[mf.playerInfo.SeenTile];
+	const CTileset &tileset = *Map.Tileset;
+	const TileType t = TileType(tileset.TileTypeTable[mf.playerInfo.SeenTile]);
 	if (t != TileTypeHumanWall && t != TileTypeOrcWall) {
 		return;
 	}
 
-	//
 	//  Calculate the correct tile. Depends on the surrounding.
-	//
 	int tile = 0;
 	if ((pos.y - 1) < 0 || MapIsSeenTileWall(pos.x, pos.y - 1, t)) {
 		tile |= 1 << 0;
@@ -119,36 +140,7 @@ void MapFixSeenWallTile(const Vec2i &pos)
 		tile |= 1 << 3;
 	}
 
-	if (t == TileTypeHumanWall) {
-		tile = Map.Tileset->HumanWallTable[tile];
-		if (UnitTypeHumanWall && mf.Value <= UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
-			while (Map.Tileset->Table[tile]) { // Skip good tiles
-				++tile;
-			}
-			while (!Map.Tileset->Table[tile]) { // Skip separator
-				++tile;
-			}
-		}
-	} else {
-		tile = Map.Tileset->OrcWallTable[tile];
-		if (UnitTypeOrcWall && mf.Value <= UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
-			while (Map.Tileset->Table[tile]) { // Skip good tiles
-				++tile;
-			}
-			while (!Map.Tileset->Table[tile]) { // Skip separator
-				++tile;
-			}
-		}
-	}
-	if (mf.Value == 0) {
-		while (Map.Tileset->Table[tile]) { // Skip good tiles
-			++tile;
-		}
-		while (!Map.Tileset->Table[tile]) { // Skip separator
-			++tile;
-		}
-	}
-	tile = Map.Tileset->Table[tile];
+	tile = getWallTile(tileset, t == TileTypeHumanWall, tile, mf.Value);
 
 	if (mf.playerInfo.SeenTile != tile) { // Already there!
 		mf.playerInfo.SeenTile = tile;
@@ -212,36 +204,7 @@ void MapFixWallTile(const Vec2i &pos)
 		tile |= 1 << 3;
 	}
 
-	if (t & MapFieldHuman) {
-		tile = Map.Tileset->HumanWallTable[tile];
-		if (UnitTypeHumanWall && mf.Value <= UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
-			while (Map.Tileset->Table[tile]) { // Skip good tiles
-				++tile;
-			}
-			while (!Map.Tileset->Table[tile]) { // Skip separator
-				++tile;
-			}
-		}
-	} else {
-		tile = Map.Tileset->OrcWallTable[tile];
-		if (UnitTypeOrcWall && mf.Value <= UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
-			while (Map.Tileset->Table[tile]) { // Skip good tiles
-				++tile;
-			}
-			while (!Map.Tileset->Table[tile]) { // Skip separator
-				++tile;
-			}
-		}
-	}
-	if (mf.Value == 0) {
-		while (Map.Tileset->Table[tile]) { // Skip good tiles
-			++tile;
-		}
-		while (!Map.Tileset->Table[tile]) { // Skip separator
-			++tile;
-		}
-	}
-	tile = Map.Tileset->Table[tile];
+	tile = getWallTile(*Map.Tileset, (t & MapFieldHuman) != 0, tile, mf.Value);
 
 	if (mf.Tile != tile) {
 		mf.Tile = tile;
@@ -306,12 +269,12 @@ void CMap::SetWall(const Vec2i &pos, int humanwall)
 	// FIXME: support more walls of different races.
 	if (humanwall) {
 		// FIXME: Set random walls
-		mf.Tile = this->Tileset->Table[this->Tileset->HumanWallTable[0]];
+		mf.Tile = this->Tileset->getHumanWallTile(0);
 		mf.Flags |= MapFieldWall | MapFieldUnpassable | MapFieldHuman;
 		mf.Value = UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max;
 	} else {
 		// FIXME: Set random walls
-		mf.Tile = this->Tileset->Table[this->Tileset->OrcWallTable[0]];
+		mf.Tile = this->Tileset->getOrcWallTile(0);
 		mf.Flags |= MapFieldWall | MapFieldUnpassable;
 		mf.Value = UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max;
 	}

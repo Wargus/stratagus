@@ -75,19 +75,24 @@ public:
 	void Clear();
 	bool IsSeenTile(unsigned short type, unsigned short seen) const;
 
+	unsigned getHumanWallTile(int index) const;
+	unsigned getOrcWallTile(int index) const;
+	unsigned getHumanWallTile_broken(int index) const;
+	unsigned getOrcWallTile_broken(int index) const;
+	unsigned getHumanWallTile_destroyed(int index) const;
+	unsigned getOrcWallTile_destroyed(int index) const;
 public:
 	std::string Name;           /// Nice name to display
 	std::string ImageFile;      /// File containing image data
 
 	int NumTiles;               /// Number of tiles in the tables
 	PixelSize PixelTileSize;    /// Size of a tile in pixel
-	unsigned short *Table;      /// Pud to Internal conversion table
-	unsigned short *FlagsTable; /// Flag table for editor
-
-	TileInfo *Tiles; /// Tile descriptions
+	std::vector<unsigned short> Table;      /// Pud to Internal conversion table
+	std::vector<unsigned short> FlagsTable; /// Flag table for editor
+	std::vector<TileInfo> Tiles; /// Tile descriptions
 
 	// TODO: currently hardcoded
-	unsigned char *TileTypeTable;   /// For fast lookup of tile type
+	std::vector<unsigned char> TileTypeTable;   /// For fast lookup of tile type
 
 	std::vector<SolidTerrainInfo> SolidTerrainTypes; /// Information about solid terrains.
 
@@ -97,13 +102,13 @@ public:
 	int RemovedTree;         /// Tile placed where trees are gone
 	unsigned GrowingTree[2]; /// Growing tree tiles
 	int WoodTable[20];       /// Table for tree removable
-	int *MixedLookupTable;   /// Lookup for what part of tile used
+	std::vector<int> MixedLookupTable;   /// Lookup for what part of tile used
 	unsigned TopOneRock;     /// Tile for one rock top
 	unsigned MidOneRock;     /// Tile for one rock middle
 	unsigned BotOneRock;     /// Tile for one rock bottom
 	int RemovedRock;         /// Tile placed where rocks are gone
 	int RockTable[20];       /// Removed rock placement table
-
+//private:
 	unsigned HumanWallTable[16];    /// Human wall placement table
 	unsigned OrcWallTable[16];      /// Orc wall placement table
 };
