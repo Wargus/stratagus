@@ -93,9 +93,13 @@ public:
 	void parse(lua_State *l);
 	void buildTable(lua_State *l);
 
-//private:
+private:
 	void buildWallReplacementTable();
+	void parseSlots(lua_State *l, int t);
 	void parseSpecial(lua_State *l);
+	void parseSolid(lua_State *l);
+	void parseMixed(lua_State *l);
+
 public:
 	std::string Name;           /// Nice name to display
 	std::string ImageFile;      /// File containing image data

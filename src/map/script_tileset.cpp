@@ -49,15 +49,62 @@
 /**
 **  Extend tables of the tileset.
 **
-**  @param tileset   Tileset to be extended.
-**  @param oldtiles  Number of old tiles.
-**  @param newtiles  Number of new tiles.
+**  @param tileset  Tileset to be extended.
+**  @param newsize  New total number of tiles.
 */
-static void ExtendTilesetTables(CTileset *tileset, unsigned int oldtiles, unsigned int newtiles)
+static void ExtendTilesetTables(CTileset *tileset, unsigned int newsize)
 {
-	tileset->Table.resize(oldtiles + newtiles);
-	tileset->FlagsTable.resize(oldtiles + newtiles);
-	tileset->Tiles.resize(oldtiles + newtiles);
+	tileset->Table.resize(newsize);
+	tileset->FlagsTable.resize(newsize);
+	tileset->Tiles.resize(newsize);
+}
+
+static bool ModifyFlag(const char *flagName, unsigned int *flag)
+{
+	const struct {
+		const char *name;
+		unsigned int flag;
+	} flags[] = {
+		{"water", MapFieldWaterAllowed},
+		{"land", MapFieldLandAllowed},
+		{"coast", MapFieldCoastAllowed},
+		{"no-building", MapFieldNoBuilding},
+		{"unpassable", MapFieldUnpassable},
+		{"wall", MapFieldWall},
+		{"rock", MapFieldRocks},
+		{"forest", MapFieldForest},
+		{"land-unit", MapFieldLandUnit},
+		{"air-unit", MapFieldAirUnit},
+		{"sea-unit", MapFieldSeaUnit},
+		{"building", MapFieldBuilding},
+		{"human", MapFieldHuman}
+	};
+
+	for (unsigned int i = 0; i != sizeof(flags) / sizeof(*flags); ++i) {
+		if (!strcmp(flagName, flags[i].name)) {
+			*flag |= flags[i].flag;
+			return true;
+		}
+	}
+
+	const struct {
+		const char *name;
+		unsigned int speed;
+	} speeds[] = {
+		{"fastest", 0},
+		{"fast", 1},
+		{"slow", 4},
+		{"slower", 5},
+		{"slowest", 7},
+	};
+
+	for (unsigned int i = 0; i != sizeof(speeds) / sizeof(*speeds); ++i) {
+		if (!strcmp(flagName, speeds[i].name)) {
+			*flag = (*flag & ~MapFieldSpeedMask) | speeds[i].speed;
+			return true;
+		}
+	}
+	return false;
 }
 
 /**
@@ -70,7 +117,7 @@ static void ExtendTilesetTables(CTileset *tileset, unsigned int oldtiles, unsign
 */
 static void ParseTilesetTileFlags(lua_State *l, int *back, int *j)
 {
-	int flags = 3;
+	unsigned int flags = 3;
 
 	//  Parse the list: flags of the slot
 	while (1) {
@@ -84,43 +131,7 @@ static void ParseTilesetTileFlags(lua_State *l, int *back, int *j)
 		lua_pop(l, 1);
 
 		//  Flags are only needed for the editor
-		if (!strcmp(value, "water")) {
-			flags |= MapFieldWaterAllowed;
-		} else if (!strcmp(value, "land")) {
-			flags |= MapFieldLandAllowed;
-		} else if (!strcmp(value, "coast")) {
-			flags |= MapFieldCoastAllowed;
-		} else if (!strcmp(value, "no-building")) {
-			flags |= MapFieldNoBuilding;
-		} else if (!strcmp(value, "unpassable")) {
-			flags |= MapFieldUnpassable;
-		} else if (!strcmp(value, "wall")) {
-			flags |= MapFieldWall;
-		} else if (!strcmp(value, "rock")) {
-			flags |= MapFieldRocks;
-		} else if (!strcmp(value, "forest")) {
-			flags |= MapFieldForest;
-		} else if (!strcmp(value, "land-unit")) {
-			flags |= MapFieldLandUnit;
-		} else if (!strcmp(value, "air-unit")) {
-			flags |= MapFieldAirUnit;
-		} else if (!strcmp(value, "sea-unit")) {
-			flags |= MapFieldSeaUnit;
-		} else if (!strcmp(value, "building")) {
-			flags |= MapFieldBuilding;
-		} else if (!strcmp(value, "human")) {
-			flags |= MapFieldHuman;
-		} else if (!strcmp(value, "fastest")) {
-			flags = (flags & ~MapFieldSpeedMask);
-		} else if (!strcmp(value, "fast")) {
-			flags = (flags & ~MapFieldSpeedMask) | 1;
-		} else if (!strcmp(value, "slow")) {
-			flags = (flags & ~MapFieldSpeedMask) | 4;
-		} else if (!strcmp(value, "slower")) {
-			flags = (flags & ~MapFieldSpeedMask) | 5;
-		} else if (!strcmp(value, "slowest")) {
-			flags = (flags & ~MapFieldSpeedMask) | 7;
-		} else {
+		if (ModifyFlag(value, &flags) == false) {
 			LuaError(l, "solid: unsupported tag: %s" _C_ value);
 		}
 	}
@@ -209,27 +220,24 @@ void CTileset::parseSpecial(lua_State *l)
 **  Parse the solid slot part of a tileset definition
 **
 **  @param l        Lua state.
-**  @param tileset  Tileset to be filled.
-**  @param index    Current table index.
 */
-static int DefineTilesetParseSolid(lua_State *l, CTileset *tileset, int index)
+void CTileset::parseSolid(lua_State *l)
 {
-	int f = 0;
+	const int index = NumTiles;
 	int j = 0;
 
-	ExtendTilesetTables(tileset, index, 16);
-
+	ExtendTilesetTables(this, index + 16);
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
 
 	lua_rawgeti(l, -1, j + 1);
 	++j;
-	const int basic_name = tileset->getOrAddSolidTileIndexByName(LuaToString(l, -1));
+	const int basic_name = getOrAddSolidTileIndexByName(LuaToString(l, -1));
 	lua_pop(l, 1);
 
+	int f = 0;
 	ParseTilesetTileFlags(l, &f, &j);
-
 	//  Vector: the tiles.
 	lua_rawgeti(l, -1, j + 1);
 	if (!lua_istable(l, -1)) {
@@ -239,7 +247,6 @@ static int DefineTilesetParseSolid(lua_State *l, CTileset *tileset, int index)
 
 	j = 0;
 	for (int i = 0; i < len; ++i, ++j) {
-
 		lua_rawgeti(l, -1, i + 1);
 		if (lua_istable(l, -1)) {
 			int k = 0;
@@ -247,50 +254,43 @@ static int DefineTilesetParseSolid(lua_State *l, CTileset *tileset, int index)
 			ParseTilesetTileFlags(l, &tile_flag, &k);
 			--j;
 			lua_pop(l, 1);
-			tileset->FlagsTable[index + j] = tile_flag;
+			FlagsTable[index + j] = tile_flag;
 			continue;
 		}
-
 		const int pud = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 
 		// ugly hack for sc tilesets, remove when fixed
 		if (j > 15) {
-			ExtendTilesetTables(tileset, index, j);
+			ExtendTilesetTables(this, index + j);
 		}
-
-		tileset->Table[index + j] = pud;
-		tileset->FlagsTable[index + j] = f;
-		tileset->Tiles[index + j].BaseTerrain = basic_name;
-		tileset->Tiles[index + j].MixTerrain = 0;
+		Table[index + j] = pud;
+		FlagsTable[index + j] = f;
+		Tiles[index + j].BaseTerrain = basic_name;
+		Tiles[index + j].MixTerrain = 0;
 	}
 	lua_pop(l, 1);
 
 	for (int i = j; i < 16; ++i) {
-		tileset->Table[index + i] = 0;
-		tileset->FlagsTable[index + i] = 0;
-		tileset->Tiles[index + i].BaseTerrain = 0;
-		tileset->Tiles[index + i].MixTerrain = 0;
+		Table[index + i] = 0;
+		FlagsTable[index + i] = 0;
+		Tiles[index + i].BaseTerrain = 0;
+		Tiles[index + i].MixTerrain = 0;
 	}
-
-	if (j < 16) {
-		return index + 16;
-	}
-	return index + j;
+	NumTiles = index + std::max(16, j);
 }
 
 /**
 **  Parse the mixed slot part of a tileset definition
 **
 **  @param l        Lua state.
-**  @param tileset  Tileset to be filled.
-**  @param index    Current table index.
 */
-static int DefineTilesetParseMixed(lua_State *l, CTileset *tileset, int index)
+void CTileset::parseMixed(lua_State *l)
 {
-	int f = 0;
+	int index = NumTiles;
 	const int new_index = index + 256;
-	ExtendTilesetTables(tileset, index, 256);
+	NumTiles = new_index;
+	ExtendTilesetTables(this, index + 256);
 
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
@@ -299,13 +299,14 @@ static int DefineTilesetParseMixed(lua_State *l, CTileset *tileset, int index)
 	const int args = lua_rawlen(l, -1);
 	lua_rawgeti(l, -1, j + 1);
 	++j;
-	const int basic_name = tileset->getOrAddSolidTileIndexByName(LuaToString(l, -1));;
+	const int basic_name = getOrAddSolidTileIndexByName(LuaToString(l, -1));;
 	lua_pop(l, 1);
 	lua_rawgeti(l, -1, j + 1);
 	++j;
-	const int mixed_name = tileset->getOrAddSolidTileIndexByName(LuaToString(l, -1));;
+	const int mixed_name = getOrAddSolidTileIndexByName(LuaToString(l, -1));;
 	lua_pop(l, 1);
 
+	int f = 0;
 	ParseTilesetTileFlags(l, &f, &j);
 
 	for (; j < args; ++j) {
@@ -319,48 +320,39 @@ static int DefineTilesetParseMixed(lua_State *l, CTileset *tileset, int index)
 			lua_rawgeti(l, -1, i + 1);
 			const int pud = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-			tileset->Table[index + i] = pud;
-			tileset->FlagsTable[index + i] = f;
-			tileset->Tiles[index + i].BaseTerrain = basic_name;
-			tileset->Tiles[index + i].MixTerrain = mixed_name;
+			Table[index + i] = pud;
+			FlagsTable[index + i] = f;
+			Tiles[index + i].BaseTerrain = basic_name;
+			Tiles[index + i].MixTerrain = mixed_name;
 		}
 		// Fill missing slots
 		for (int i = len; i < 16; ++i) {
-			tileset->Table[index + i] = 0;
-			tileset->FlagsTable[index + i] = 0;
-			tileset->Tiles[index + i].BaseTerrain = 0;
-			tileset->Tiles[index + i].MixTerrain = 0;
+			Table[index + i] = 0;
+			FlagsTable[index + i] = 0;
+			Tiles[index + i].BaseTerrain = 0;
+			Tiles[index + i].MixTerrain = 0;
 		}
 		index += 16;
 		lua_pop(l, 1);
 	}
 	while (index < new_index) {
-		tileset->Table[index] = 0;
-		tileset->FlagsTable[index] = 0;
-		tileset->Tiles[index].BaseTerrain = 0;
-		tileset->Tiles[index].MixTerrain = 0;
+		Table[index] = 0;
+		FlagsTable[index] = 0;
+		Tiles[index].BaseTerrain = 0;
+		Tiles[index].MixTerrain = 0;
 		++index;
 	}
-	return new_index;
 }
 
 /**
 **  Parse the slot part of a tileset definition
 **
 **  @param l        Lua state.
-**  @param tileset  Tileset to be filled.
 **  @param t        FIXME: docu
 */
-static void DefineTilesetParseSlot(lua_State *l, CTileset *tileset, int t)
+void CTileset::parseSlots(lua_State *l, int t)
 {
-	int index = 0;
-
-	tileset->Table.resize(16);
-	tileset->FlagsTable.resize(16);
-	tileset->Tiles.resize(16);
-	SolidTerrainInfo solidTerrainInfo;
-	solidTerrainInfo.TerrainName = "unused";
-	tileset->SolidTerrainTypes.push_back(solidTerrainInfo);
+	NumTiles = 0;
 
 	//  Parse the list: (still everything could be changed!)
 	const int args = lua_rawlen(l, t);
@@ -372,21 +364,20 @@ static void DefineTilesetParseSlot(lua_State *l, CTileset *tileset, int t)
 
 		if (!strcmp(value, "special")) {
 			lua_rawgeti(l, t, j + 1);
-			tileset->parseSpecial(l);
+			parseSpecial(l);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "solid")) {
 			lua_rawgeti(l, t, j + 1);
-			index = DefineTilesetParseSolid(l, tileset, index);
+			parseSolid(l);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "mixed")) {
 			lua_rawgeti(l, t, j + 1);
-			index = DefineTilesetParseMixed(l, tileset, index);
+			parseMixed(l);
 			lua_pop(l, 1);
 		} else {
 			LuaError(l, "slots: unsupported tag: %s" _C_ value);
 		}
 	}
-	tileset->NumTiles = index;
 }
 
 /**
@@ -402,7 +393,6 @@ static int CclDefineTileset(lua_State *l)
 	PixelTileSize = Map.Tileset->PixelTileSize;
 
 	ShowLoadProgress("Tileset `%s'", Map.Tileset->ImageFile.c_str());
-	//Map.TileGraphic = CGraphic::New(Map.Tileset->ImageFile);
 	Map.TileGraphic = CGraphic::New(Map.Tileset->ImageFile, PixelTileSize.x, PixelTileSize.y);
 	Map.TileGraphic->Load();
 	return 0;
@@ -426,20 +416,12 @@ void CTileset::parse(lua_State *l)
 		} else if (!strcmp(value, "image")) {
 			this->ImageFile = LuaToString(l, j);
 		} else if (!strcmp(value, "size")) {
-			if (!lua_istable(l, j)) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, j, 1);
-			this->PixelTileSize.x = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j, 2);
-			this->PixelTileSize.y = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			CclGetPos(l, &this->PixelTileSize.x, &this->PixelTileSize.x, j);
 		} else if (!strcmp(value, "slots")) {
 			if (!lua_istable(l, j)) {
 				LuaError(l, "incorrect argument");
 			}
-			DefineTilesetParseSlot(l, this, j);
+			parseSlots(l, j);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

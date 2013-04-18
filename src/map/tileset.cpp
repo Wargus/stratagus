@@ -302,7 +302,6 @@ unsigned CTileset::getOrcWallTile(int index) const
 	return tile;
 }
 
-
 static unsigned int NextSection(const CTileset &tileset, unsigned int tile)
 {
 	while (tileset.Table[tile]) { // Skip good tiles
