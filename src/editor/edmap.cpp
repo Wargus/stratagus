@@ -88,9 +88,7 @@ static unsigned QuadFromTile(const Vec2i &pos)
 {
 	int i;
 
-	//
 	// find the abstact tile number
-	//
 	const int tile = Map.Field(pos)->Tile;
 	for (i = 0; i < Map.Tileset->NumTiles; ++i) {
 		if (tile == Map.Tileset->Table[i]) {
@@ -105,9 +103,7 @@ static unsigned QuadFromTile(const Vec2i &pos)
 	if (!mix) { // a solid tile
 		return base | (base << 8) | (base << 16) | (base << 24);
 	}
-	//
 	// Mixed tiles, mix together
-	//
 	switch ((i & 0x00F0) >> 4) {
 		case 0:
 			return (base << 24) | (mix << 16) | (mix << 8) | mix;
@@ -155,31 +151,26 @@ static unsigned QuadFromTile(const Vec2i &pos)
 */
 static int FindTilePath(int base, int goal, int length, std::vector<char> &marks, int *tile)
 {
-	int n;
+	int tileres = Map.Tileset->findTileIndex(base, goal);
+	if (tileres == -1) {
+		tileres = Map.Tileset->findTileIndex(goal, base);
+	}
+	if (tileres != -1) {
+		*tile = tileres;
+		return length;
+	}
 
 	// Find any mixed tile
 	int l = INT_MAX;
 	for (int i = 0; i < Map.Tileset->NumTiles;) {
-		// goal found.
-		if (base == Map.Tileset->Tiles[i].BaseTerrain
-			&& goal == Map.Tileset->Tiles[i].MixTerrain) {
-			*tile = i;
-			return length;
-		}
-		// goal found.
-		if (goal == Map.Tileset->Tiles[i].BaseTerrain
-			&& base == Map.Tileset->Tiles[i].MixTerrain) {
-			*tile = i;
-			return length;
-		}
-
 		// possible path found
 		if (base == Map.Tileset->Tiles[i].BaseTerrain
 			&& Map.Tileset->Tiles[i].MixTerrain) {
 			const int j = Map.Tileset->Tiles[i].MixTerrain;
 			if (!marks[j]) {
 				marks[j] = j;
-				n = FindTilePath(j, goal, length + 1, marks, &n);
+				int dummytile;
+				const int n = FindTilePath(j, goal, length + 1, marks, &dummytile);
 				marks[j] = 0;
 				if (n < l) {
 					*tile = i;
@@ -192,7 +183,8 @@ static int FindTilePath(int base, int goal, int length, std::vector<char> &marks
 			const int j = Map.Tileset->Tiles[i].BaseTerrain;
 			if (!marks[j]) {
 				marks[j] = j;
-				n = FindTilePath(j, goal, length + 1, marks, &n);
+				int dummytile;
+				const int n = FindTilePath(j, goal, length + 1, marks, &dummytile);
 				marks[j] = 0;
 				if (n < l) {
 					*tile = i;
@@ -219,13 +211,10 @@ static int FindTilePath(int base, int goal, int length, std::vector<char> &marks
 */
 static int TileFromQuad(unsigned fixed, unsigned quad)
 {
-	int i;
 	unsigned type1;
 	unsigned type2;
 
-	//
 	// Get tile type from fixed.
-	//
 	while (!(type1 = (fixed & 0xFF))) {
 		fixed >>= 8;
 		if (!fixed) {
@@ -236,49 +225,32 @@ static int TileFromQuad(unsigned fixed, unsigned quad)
 	while (!(type2 = (fixed & 0xFF)) && fixed) {
 		fixed >>= 8;
 	}
-	//
 	// Need an second type.
-	//
 	if (!type2 || type2 == type1) {
 		fixed = quad;
 		while ((type2 = (fixed & 0xFF)) == type1 && fixed) {
 			fixed >>= 8;
 		}
 		if (type1 == type2) { // Oooh a solid tile.
-find_solid:
-			//
-			// Find the solid tile
-			//
-			for (i = 0; i < Map.Tileset->NumTiles;) {
-				if (type1 == Map.Tileset->Tiles[i].BaseTerrain &&
-					!Map.Tileset->Tiles[i].MixTerrain) {
-					break;
-				}
-				// Advance solid or mixed.
-				if (!Map.Tileset->Tiles[i].MixTerrain) {
-					i += 16;
-				} else {
-					i += 256;
-				}
-			}
-			Assert(i < Map.Tileset->NumTiles);
-			return i;
+			const int res = Map.Tileset->findTileIndex(type1);
+			Assert(res != -1);
+			return res;
 		}
 	} else {
 		std::vector<char> marks;
+		int dummytile;
+
 		marks.resize(Map.Tileset->SolidTerrainTypes.size(), 0);
 
 		marks[type1] = type1;
 		marks[type2] = type2;
 
-		//
 		// What fixed tile-type should replace the non useable tile-types.
 		// FIXME: write a loop.
-		//
 		fixed = (quad >> 0) & 0xFF;
 		if (fixed != type1 && fixed != type2) {
 			quad &= 0xFFFFFF00;
-			if (FindTilePath(type1, fixed, 0, marks, &i) < FindTilePath(type2, fixed, 0, marks, &i)) {
+			if (FindTilePath(type1, fixed, 0, marks, &dummytile) < FindTilePath(type2, fixed, 0, marks, &dummytile)) {
 				quad |= type1 << 0;
 			} else {
 				quad |= type2 << 0;
@@ -287,7 +259,7 @@ find_solid:
 		fixed = (quad >> 8) & 0xFF;
 		if (fixed != type1 && fixed != type2) {
 			quad &= 0xFFFF00FF;
-			if (FindTilePath(type1, fixed, 0, marks, &i) < FindTilePath(type2, fixed, 0, marks, &i)) {
+			if (FindTilePath(type1, fixed, 0, marks, &dummytile) < FindTilePath(type2, fixed, 0, marks, &dummytile)) {
 				quad |= type1 << 8;
 			} else {
 				quad |= type2 << 8;
@@ -296,7 +268,7 @@ find_solid:
 		fixed = (quad >> 16) & 0xFF;
 		if (fixed != type1 && fixed != type2) {
 			quad &= 0xFF00FFFF;
-			if (FindTilePath(type1, fixed, 0, marks, &i) < FindTilePath(type2, fixed, 0, marks, &i)) {
+			if (FindTilePath(type1, fixed, 0, marks, &dummytile) < FindTilePath(type2, fixed, 0, marks, &dummytile)) {
 				quad |= type1 << 16;
 			} else {
 				quad |= type2 << 16;
@@ -305,7 +277,7 @@ find_solid:
 		fixed = (quad >> 24) & 0xFF;
 		if (fixed != type1 && fixed != type2) {
 			quad &= 0x00FFFFFF;
-			if (FindTilePath(type1, fixed, 0, marks, &i) < FindTilePath(type2, fixed, 0, marks, &i)) {
+			if (FindTilePath(type1, fixed, 0, marks, &dummytile) < FindTilePath(type2, fixed, 0, marks, &dummytile)) {
 				quad |= type1 << 24;
 			} else {
 				quad |= type2 << 24;
@@ -314,39 +286,32 @@ find_solid:
 	}
 
 	// Need a mixed tile
-	for (i = 0; i <  Map.Tileset->NumTiles;) {
-		if (type1 == Map.Tileset->Tiles[i].BaseTerrain && type2 == Map.Tileset->Tiles[i].MixTerrain) {
-			break;
-		}
-		if (type2 == Map.Tileset->Tiles[i].BaseTerrain && type1 == Map.Tileset->Tiles[i].MixTerrain) {
-			// Other mixed
+	int tile = Map.Tileset->findTileIndex(type1, type2);
+	if (tile == -1) {
+		tile = Map.Tileset->findTileIndex(type1, type2);
+		if (tile != -1) {
 			std::swap(type1, type2);
-			break;
-		}
-		// Advance solid or mixed.
-		if (!Map.Tileset->Tiles[i].MixTerrain) {
-			i += 16;
-		} else {
-			i += 256;
 		}
 	}
 
-	if (i >= Map.Tileset->NumTiles) {
+	if (tile == -1) {
 		// Find the best tile path.
 		std::vector<char> marks;
 		marks.resize(Map.Tileset->SolidTerrainTypes.size(), 0);
 		marks[type1] = type1;
-		if (FindTilePath(type1, type2, 0, marks, &i) == INT_MAX) {
+		if (FindTilePath(type1, type2, 0, marks, &tile) == INT_MAX) {
 			DebugPrint("Huch, no mix found!!!!!!!!!!!\n");
-			goto find_solid;
+			const int res = Map.Tileset->findTileIndex(type1);
+			Assert(res != -1);
+			return res;
 		}
-		if (type1 == Map.Tileset->Tiles[i].MixTerrain) {
+		if (type1 == Map.Tileset->Tiles[tile].MixTerrain) {
 			// Other mixed
 			std::swap(type1, type2);
 		}
 	}
 
-	int base = i;
+	int base = tile;
 
 	int direction = 0;
 	if (((quad >> 24) & 0xFF) == type1) {

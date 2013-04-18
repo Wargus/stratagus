@@ -289,6 +289,34 @@ unsigned int CTileset::getOrAddSolidTileIndexByName(const std::string &name)
 	return SolidTerrainTypes.size() - 1;
 }
 
+int CTileset::findTileIndex(unsigned char baseTerrain, unsigned char mixTerrain) const
+{
+	const TileInfo tileInfo = {baseTerrain, mixTerrain};
+
+	for (int i = 0; i != NumTiles;) {
+		if (Tiles[i] == tileInfo) {
+			return i;
+		}
+		// Advance solid or mixed.
+		if (!Tiles[i].MixTerrain) {
+			i += 16;
+		} else {
+			i += 256;
+		}
+	}
+	return -1;
+}
+
+int CTileset::findTileIndexByTile(unsigned int tile) const
+{
+	for (int i = 0; i != NumTiles; ++i) {
+		if (tile == Table[i]) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 unsigned CTileset::getHumanWallTile(int index) const
 {
 	unsigned tile = HumanWallTable[index];

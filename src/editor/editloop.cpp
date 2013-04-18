@@ -1010,25 +1010,15 @@ static void DrawEditorInfo()
 			flags & MapFieldBuilding     ? 'b' : '-');
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY, buf);
 
-	//
 	// Tile info
-	//
-	const int tile = mf->Tile;
-	int i;
-	for (i = 0; i < Map.Tileset->NumTiles; ++i) {
-		if (tile == Map.Tileset->Table[i]) {
-			break;
-		}
-	}
-
-	Assert(i != Map.Tileset->NumTiles);
-
-	/*snprintf(buf, sizeof(buf), "%d %s %s", tile,
-			 Map.Tileset.SolidTerrainTypes[Map.Tileset.Tiles[i].BaseTerrain].TerrainName,
-			 Map.Tileset.Tiles[i].MixTerrain
-			 ? Map.Tileset.SolidTerrainTypes[Map.Tileset.Tiles[i].MixTerrain].TerrainName
-			 : "");*/
-
+	const int index = Map.Tileset->findTileIndexByTile(mf->Tile);
+	Assert(index != -1);
+	const int baseTerrainIdx = Map.Tileset->Tiles[index].BaseTerrain;
+	const char *baseTerrainStr = Map.Tileset->SolidTerrainTypes[baseTerrainIdx].TerrainName.c_str();
+	const int mixTerrainIdx = Map.Tileset->Tiles[index].MixTerrain;
+	const char *mixTerrainStr = mixTerrainIdx ? Map.Tileset->SolidTerrainTypes[mixTerrainIdx].TerrainName.c_str() : "";
+	snprintf(buf, sizeof(buf), "%s %s", baseTerrainStr, mixTerrainStr);
+	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 250, UI.StatusLine.TextY, buf);
 #endif
 }
 

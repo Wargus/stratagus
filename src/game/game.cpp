@@ -470,9 +470,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 			for (int i = 0; i < map.Info.MapHeight; ++i) {
 				for (int j = 0; j < map.Info.MapWidth; ++j) {
 					const int tile = map.Fields[j + i * map.Info.MapWidth].Tile;
-					int n;
-					for (n = 0; n < map.Tileset->NumTiles && tile != map.Tileset->Table[n]; ++n) {
-					}
+					const int n = map.Tileset->findTileIndexByTile(tile);
 					const int value = map.Fields[j + i * map.Info.MapWidth].Value;
 					f->printf("SetTile(%3d, %d, %d, %d)\n", n, j, i, value);
 				}

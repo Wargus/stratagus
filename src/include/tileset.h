@@ -60,6 +60,14 @@ enum TileType {
 
 /// Single tile definition
 struct TileInfo {
+public:
+	bool operator ==(const TileInfo &rhs) const
+	{
+		return BaseTerrain == rhs.BaseTerrain && MixTerrain == rhs.MixTerrain;
+	}
+	bool operator !=(const TileInfo &rhs) const { return !(*this == rhs); }
+
+public:
 	unsigned char BaseTerrain; /// Basic terrain of the tile
 	unsigned char MixTerrain;  /// Terrain mixed with this
 };
@@ -77,9 +85,6 @@ public:
 	void Clear();
 	bool IsSeenTile(unsigned short type, unsigned short seen) const;
 
-	unsigned int getOrAddSolidTileIndexByName(const std::string &name);
-
-
 	unsigned getBottomOneTreeTile() const { return BotOneTree; }
 	unsigned getTopOneTreeTile() const { return TopOneTree; }
 
@@ -89,6 +94,12 @@ public:
 	unsigned getOrcWallTile_broken(int index) const;
 	unsigned getHumanWallTile_destroyed(int index) const;
 	unsigned getOrcWallTile_destroyed(int index) const;
+
+public:
+	unsigned int getOrAddSolidTileIndexByName(const std::string &name);
+	int findTileIndex(unsigned char baseTerrain, unsigned char mixTerrain = 0) const;
+	int findTileIndexByTile(unsigned int tile) const;
+
 public:
 	void parse(lua_State *l);
 	void buildTable(lua_State *l);
