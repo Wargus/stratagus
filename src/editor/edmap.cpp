@@ -43,14 +43,6 @@
 #include "unit_manager.h"
 #include "unittype.h"
 
-/*----------------------------------------------------------------------------
---  Defines
-----------------------------------------------------------------------------*/
-
-#define TH_QUAD_M 0xFFFF0000 /// Top half quad mask
-#define BH_QUAD_M 0x0000FFFF /// Bottom half quad mask
-#define LH_QUAD_M 0xFF00FF00 /// Left half quad mask
-#define RH_QUAD_M 0x00FF00FF /// Right half quad mask
 
 /// Callback for changed tile (with direction mask)
 static void EditorChangeSurrounding(const Vec2i &pos, int d);
@@ -62,61 +54,6 @@ static void EditorChangeSurrounding(const Vec2i &pos, int d);
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**  Get quad from tile.
-**
-**  A quad is a 32 bit value defining the content of the tile.
-**
-**  A tile is split into 4 parts, the basic tile type of this part
-**    is stored as 8bit value in the quad.
-**
-**  ab
-**  cd -> abcd
-**
-**  If the tile is 100% light grass the value is 0x5555.
-**  If the tile is 3/4 light grass and dark grass in upper left corner
-**    the value is 0x6555.
-**
-**  @param pos  map tile position
-**
-**  @return   the 'quad' of the tile.
-**
-**  @todo     Make a lookup table to speed up the things.
-*/
-static unsigned QuadFromTile(const Vec2i &pos)
-{
-	// find the abstact tile number
-	const int tile = Map.Field(pos)->Tile;
-	const int tileIndex = Map.Tileset->findTileIndexByTile(tile);
-	Assert(tileIndex != -1);
-
-	unsigned base = Map.Tileset->Tiles[tileIndex].BaseTerrain;
-	unsigned mix = Map.Tileset->Tiles[tileIndex].MixTerrain;
-
-	if (!mix) { // a solid tile
-		return base | (base << 8) | (base << 16) | (base << 24);
-	}
-	// Mixed tiles, mix together
-	switch ((tileIndex & 0x00F0) >> 4) {
-		case 0: return (base << 24) | (mix << 16) | (mix << 8) | mix;
-		case 1: return (mix << 24) | (base << 16) | (mix << 8) | mix;
-		case 2: return (base << 24) | (base << 16) | (mix << 8) | mix;
-		case 3: return (mix << 24) | (mix << 16) | (base << 8) | mix;
-		case 4: return (base << 24) | (mix << 16) | (base << 8) | mix;
-		case 5: return (base << 24) | (base << 16) | (base << 8) | mix;
-		case 6: return (base << 24) | (base << 16) | (base << 8) | mix;
-		case 7: return (mix << 24) | (mix << 16) | (mix << 8) | base;
-		case 8: return (base << 24) | (mix << 16) | (mix << 8) | base;
-		case 9: return (mix << 24) | (base << 16) | (mix << 8) | base;
-		case 10: return (base << 24) | (base << 16) | (mix << 8) | base;
-		case 11: return (mix << 24) | (mix << 16) | (base << 8) | base;
-		case 12: return (base << 24) | (mix << 16) | (base << 8) | base;
-		case 13: return (mix << 24) | (base << 16) | (base << 8) | base;
-	}
-	Assert(0);
-	return base | (base << 8) | (base << 16) | (base << 24);
-}
 
 /**
 **  Find a tile path.
@@ -285,10 +222,24 @@ void ChangeTile(const Vec2i &pos, int tile)
 	mf.playerInfo.SeenTile = tile;
 }
 
-#define DIR_UP     8 /// Go up allowed
-#define DIR_DOWN   4 /// Go down allowed
-#define DIR_LEFT   2 /// Go left allowed
-#define DIR_RIGHT  1 /// Go right allowed
+
+/**
+**  Get quad from tile.
+**
+**  A quad is a 32 bit value defining the content of the tile.
+**
+**  A tile is split into 4 parts, the basic tile type of this part
+**    is stored as 8bit value in the quad.
+**
+**  ab
+**  cd -> abcd
+*/
+static unsigned QuadFromTile(const Vec2i &pos)
+{
+	// find the abstact tile number
+	const int tile = Map.Field(pos)->Tile;
+	return Map.Tileset->getQuadFromTile(tile);
+}
 
 /**
 **  Editor change tile.
@@ -325,12 +276,6 @@ static void EditorChangeTile(const Vec2i &pos, int tileIndex, int d)
 */
 static void EditorChangeSurrounding(const Vec2i &pos, int d)
 {
-	unsigned quad = QuadFromTile(pos);
-
-	//
-	// Change the surrounding
-	//
-
 	// Special case 1) Walls.
 	CMapField &mf = *Map.Field(pos);
 	if (mf.Flags & MapFieldWall) {
@@ -338,11 +283,21 @@ static void EditorChangeSurrounding(const Vec2i &pos, int d)
 		return;
 	}
 
+	const unsigned int quad = QuadFromTile(pos);
+	const unsigned int TH_QUAD_M = 0xFFFF0000; // Top half quad mask
+	const unsigned int BH_QUAD_M = 0x0000FFFF; // Bottom half quad mask
+	const unsigned int LH_QUAD_M = 0xFF00FF00; // Left half quad mask
+	const unsigned int RH_QUAD_M = 0x00FF00FF; // Right half quad mask
+	const unsigned int DIR_UP =    8; // Go up allowed
+	const unsigned int DIR_DOWN =  4; // Go down allowed
+	const unsigned int DIR_LEFT =  2; // Go left allowed
+	const unsigned int DIR_RIGHT = 1; // Go right allowed
+
 	// How this works:
-	//  first get the quad of the neighbouring tile, then
-	//  check if the margin matches. otherwise, call
-	//  EditorChangeTile again.
-	if (d & DIR_UP && pos.y) {
+	//  first get the quad of the neighbouring tile,
+	//  then check if the margin matches.
+	//  Otherwise, call EditorChangeTile again.
+	if ((d & DIR_UP) && pos.y) {
 		const Vec2i offset(0, -1);
 		// Insert into the bottom the new tile.
 		unsigned q2 = QuadFromTile(pos + offset);
@@ -352,7 +307,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int d)
 			EditorChangeTile(pos + offset, tile, d & ~DIR_DOWN);
 		}
 	}
-	if (d & DIR_DOWN && pos.y < Map.Info.MapHeight - 1) {
+	if ((d & DIR_DOWN) && pos.y < Map.Info.MapHeight - 1) {
 		const Vec2i offset(0, 1);
 		// Insert into the top the new tile.
 		unsigned q2 = QuadFromTile(pos + offset);
@@ -362,7 +317,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int d)
 			EditorChangeTile(pos + offset, tile, d & ~DIR_UP);
 		}
 	}
-	if (d & DIR_LEFT && pos.x) {
+	if ((d & DIR_LEFT) && pos.x) {
 		const Vec2i offset(-1, 0);
 		// Insert into the left the new tile.
 		unsigned q2 = QuadFromTile(pos + offset);
@@ -372,7 +327,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int d)
 			EditorChangeTile(pos + offset, tile, d & ~DIR_RIGHT);
 		}
 	}
-	if (d & DIR_RIGHT && pos.x < Map.Info.MapWidth - 1) {
+	if ((d & DIR_RIGHT) && pos.x < Map.Info.MapWidth - 1) {
 		const Vec2i offset(1, 0);
 		// Insert into the right the new tile.
 		unsigned q2 = QuadFromTile(pos + offset);

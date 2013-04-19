@@ -368,11 +368,11 @@ unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
 		n = MyRand() % n;
 		int i = -1;
 		do {
-			while (++i < 16 && !Map.Tileset->Table[tile + i]) {
+			while (++i < 16 && !Table[tile + i]) {
 			}
 		} while (i < 16 && n--);
 		Assert(i != 16);
-		return tile + i;
+		return Table[tile + i];
 	}
 	if (filler) {
 		int i = 0;
@@ -385,6 +385,53 @@ unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
 		}
 	}
 	return Table[tile];
+}
+
+/**
+**  Get quad from tile.
+**
+**  A quad is a 32 bit value defining the content of the tile.
+**
+**  A tile is split into 4 parts, the basic tile type of this part
+**    is stored as 8bit value in the quad.
+**
+**  ab
+**  cd -> abcd
+**
+**  If the tile is 100% light grass(0x05) the value is 0x05050505.
+**  If the tile is 3/4 light grass and dark grass(0x06) in upper left corner
+**    the value is 0x06050505.
+*/
+unsigned CTileset::getQuadFromTile(unsigned int tile) const
+{
+	const int tileIndex = findTileIndexByTile(tile);
+	Assert(tileIndex != -1);
+
+	unsigned base = Tiles[tileIndex].BaseTerrain;
+	unsigned mix = Tiles[tileIndex].MixTerrain;
+
+	if (mix == 0) { // a solid tile
+		return base | (base << 8) | (base << 16) | (base << 24);
+	}
+	// Mixed tiles, mix together
+	switch ((tileIndex & 0x00F0) >> 4) {
+		case 0: return (base << 24) | (mix << 16) | (mix << 8) | mix;
+		case 1: return (mix << 24) | (base << 16) | (mix << 8) | mix;
+		case 2: return (base << 24) | (base << 16) | (mix << 8) | mix;
+		case 3: return (mix << 24) | (mix << 16) | (base << 8) | mix;
+		case 4: return (base << 24) | (mix << 16) | (base << 8) | mix;
+		case 5: return (mix << 24) | (base << 16) | (base << 8) | mix;
+		case 6: return (base << 24) | (base << 16) | (base << 8) | mix;
+		case 7: return (mix << 24) | (mix << 16) | (mix << 8) | base;
+		case 8: return (base << 24) | (mix << 16) | (mix << 8) | base;
+		case 9: return (mix << 24) | (base << 16) | (mix << 8) | base;
+		case 10: return (base << 24) | (base << 16) | (mix << 8) | base;
+		case 11: return (mix << 24) | (mix << 16) | (base << 8) | base;
+		case 12: return (base << 24) | (mix << 16) | (base << 8) | base;
+		case 13: return (mix << 24) | (base << 16) | (base << 8) | base;
+	}
+	Assert(0);
+	return base | (base << 8) | (base << 16) | (base << 24);
 }
 
 void CTileset::fillSolidTiles(std::vector<unsigned int> *tiles) const

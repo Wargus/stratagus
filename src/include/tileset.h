@@ -103,6 +103,11 @@ public:
 	int findTileIndexByTile(unsigned int tile) const;
 	unsigned int getTileNumber(int basic, bool random, bool filler) const;
 	void fillSolidTiles(std::vector<unsigned int> *tiles) const;
+
+
+	unsigned getQuadFromTile(unsigned int tile) const;
+
+
 public:
 	void parse(lua_State *l);
 	void buildTable(lua_State *l);
