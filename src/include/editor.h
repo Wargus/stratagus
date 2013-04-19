@@ -127,11 +127,6 @@ extern int EditorSaveMap(const std::string &file);
 /// Register ccl features
 extern void EditorCclRegister();
 
-/// Edit tile
-extern void EditTile(const Vec2i &pos, int tile);
-/// Edit tiles
-extern void EditTiles(const Vec2i &pos, int tile, int size);
-
 /// Change the view of a tile
 extern void ChangeTile(const Vec2i &pos, int tile);
 /// Update surroundings for tile changes

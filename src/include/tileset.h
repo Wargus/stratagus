@@ -98,8 +98,11 @@ public:
 public:
 	unsigned int getOrAddSolidTileIndexByName(const std::string &name);
 	int findTileIndex(unsigned char baseTerrain, unsigned char mixTerrain = 0) const;
-	int findTileIndexByTile(unsigned int tile) const;
+	int getTileIndex(unsigned char baseTerrain, unsigned char mixTerrain, unsigned int quad) const;
 
+	int findTileIndexByTile(unsigned int tile) const;
+	unsigned int getTileNumber(int basic, bool random, bool filler) const;
+	void fillSolidTiles(std::vector<unsigned int> *tiles) const;
 public:
 	void parse(lua_State *l);
 	void buildTable(lua_State *l);

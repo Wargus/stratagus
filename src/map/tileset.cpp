@@ -307,6 +307,29 @@ int CTileset::findTileIndex(unsigned char baseTerrain, unsigned char mixTerrain)
 	return -1;
 }
 
+int CTileset::getTileIndex(unsigned char baseTerrain, unsigned char mixTerrain, unsigned int quad) const
+{
+	int tileIndex = findTileIndex(baseTerrain, mixTerrain);
+	if (tileIndex == -1) {
+		tileIndex = findTileIndex(mixTerrain, baseTerrain);
+		if (tileIndex == -1) {
+			return -1;
+		}
+		std::swap(baseTerrain, mixTerrain);
+	}
+	int base = tileIndex;
+
+	int direction = 0;
+	for (int i = 0; i != 4; ++i) {
+		if (((quad >> (8 * i)) & 0xFF) == baseTerrain) {
+			direction |= 1 << i;
+		}
+	}
+	//                       0  1  2  3   4  5  6  7   8  9  A   B  C   D  E  F
+	const char table[16] = { 0, 7, 3, 11, 1, 9, 5, 13, 0, 8, 4, 12, 2, 10, 6, 0 };
+	return base | (table[direction] << 4);
+}
+
 int CTileset::findTileIndexByTile(unsigned int tile) const
 {
 	for (int i = 0; i != NumTiles; ++i) {
@@ -316,6 +339,65 @@ int CTileset::findTileIndexByTile(unsigned int tile) const
 	}
 	return -1;
 }
+
+/**
+**  Get tile number.
+**
+**  @param basic   Basic tile number
+**  @param random  Return random tile
+**  @param filler  Get a decorated tile.
+**
+**  @return        Tile number.
+**
+**  @todo  FIXME: Solid tiles are here still hardcoded.
+*/
+unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
+{
+	int tile = basic;
+	if (random) {
+		int n = 0;
+		for (int i = 0; i < 16; ++i) {
+			if (!Table[tile + i]) {
+				if (!filler) {
+					break;
+				}
+			} else {
+				++n;
+			}
+		}
+		n = MyRand() % n;
+		int i = -1;
+		do {
+			while (++i < 16 && !Map.Tileset->Table[tile + i]) {
+			}
+		} while (i < 16 && n--);
+		Assert(i != 16);
+		return tile + i;
+	}
+	if (filler) {
+		int i = 0;
+		for (; i < 16 && Table[tile + i]; ++i) {
+		}
+		for (; i < 16 && !Table[tile + i]; ++i) {
+		}
+		if (i != 16) {
+			return Table[tile + i];
+		}
+	}
+	return Table[tile];
+}
+
+void CTileset::fillSolidTiles(std::vector<unsigned int> *tiles) const
+{
+	for (int i = 16; i < Map.Tileset->NumTiles; i += 16) {
+		const TileInfo &info = Map.Tileset->Tiles[i];
+
+		if (info.BaseTerrain && info.MixTerrain == 0) {
+			tiles->push_back(Map.Tileset->Table[i]);
+		}
+	}
+}
+
 
 unsigned CTileset::getHumanWallTile(int index) const
 {

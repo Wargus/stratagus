@@ -53,7 +53,7 @@
 #define RH_QUAD_M 0x00FF00FF /// Right half quad mask
 
 /// Callback for changed tile (with direction mask)
-static void EditorTileChanged2(const Vec2i &pos, int d);
+static void EditorChangeSurrounding(const Vec2i &pos, int d);
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -86,57 +86,35 @@ static void EditorTileChanged2(const Vec2i &pos, int d);
 */
 static unsigned QuadFromTile(const Vec2i &pos)
 {
-	int i;
-
 	// find the abstact tile number
 	const int tile = Map.Field(pos)->Tile;
-	for (i = 0; i < Map.Tileset->NumTiles; ++i) {
-		if (tile == Map.Tileset->Table[i]) {
-			break;
-		}
-	}
-	Assert(i != Map.Tileset->NumTiles);
+	const int tileIndex = Map.Tileset->findTileIndexByTile(tile);
+	Assert(tileIndex != -1);
 
-	unsigned base = Map.Tileset->Tiles[i].BaseTerrain;
-	unsigned mix = Map.Tileset->Tiles[i].MixTerrain;
+	unsigned base = Map.Tileset->Tiles[tileIndex].BaseTerrain;
+	unsigned mix = Map.Tileset->Tiles[tileIndex].MixTerrain;
 
 	if (!mix) { // a solid tile
 		return base | (base << 8) | (base << 16) | (base << 24);
 	}
 	// Mixed tiles, mix together
-	switch ((i & 0x00F0) >> 4) {
-		case 0:
-			return (base << 24) | (mix << 16) | (mix << 8) | mix;
-		case 1:
-			return (mix << 24) | (base << 16) | (mix << 8) | mix;
-		case 2:
-			return (base << 24) | (base << 16) | (mix << 8) | mix;
-		case 3:
-			return (mix << 24) | (mix << 16) | (base << 8) | mix;
-		case 4:
-			return (base << 24) | (mix << 16) | (base << 8) | mix;
-		case 5:
-			return (base << 24) | (base << 16) | (base << 8) | mix;
-		case 6:
-			return (base << 24) | (base << 16) | (base << 8) | mix;
-		case 7:
-			return (mix << 24) | (mix << 16) | (mix << 8) | base;
-		case 8:
-			return (base << 24) | (mix << 16) | (mix << 8) | base;
-		case 9:
-			return (mix << 24) | (base << 16) | (mix << 8) | base;
-		case 10:
-			return (base << 24) | (base << 16) | (mix << 8) | base;
-		case 11:
-			return (mix << 24) | (mix << 16) | (base << 8) | base;
-		case 12:
-			return (base << 24) | (mix << 16) | (base << 8) | base;
-		case 13:
-			return (mix << 24) | (base << 16) | (base << 8) | base;
+	switch ((tileIndex & 0x00F0) >> 4) {
+		case 0: return (base << 24) | (mix << 16) | (mix << 8) | mix;
+		case 1: return (mix << 24) | (base << 16) | (mix << 8) | mix;
+		case 2: return (base << 24) | (base << 16) | (mix << 8) | mix;
+		case 3: return (mix << 24) | (mix << 16) | (base << 8) | mix;
+		case 4: return (base << 24) | (mix << 16) | (base << 8) | mix;
+		case 5: return (base << 24) | (base << 16) | (base << 8) | mix;
+		case 6: return (base << 24) | (base << 16) | (base << 8) | mix;
+		case 7: return (mix << 24) | (mix << 16) | (mix << 8) | base;
+		case 8: return (base << 24) | (mix << 16) | (mix << 8) | base;
+		case 9: return (mix << 24) | (base << 16) | (mix << 8) | base;
+		case 10: return (base << 24) | (base << 16) | (mix << 8) | base;
+		case 11: return (mix << 24) | (mix << 16) | (base << 8) | base;
+		case 12: return (base << 24) | (mix << 16) | (base << 8) | base;
+		case 13: return (mix << 24) | (base << 16) | (base << 8) | base;
 	}
-
 	Assert(0);
-
 	return base | (base << 8) | (base << 16) | (base << 24);
 }
 
@@ -147,16 +125,16 @@ static unsigned QuadFromTile(const Vec2i &pos)
 **  @param goal    Goal tile type.
 **  @param length  Best found path length.
 **  @param marks   Already visited tile types.
-**  @param tile    Tile pointer.
+**  @param tileIndex    Tile pointer.
 */
-static int FindTilePath(int base, int goal, int length, std::vector<char> &marks, int *tile)
+static int FindTilePath(int base, int goal, int length, std::vector<char> &marks, int *tileIndex)
 {
 	int tileres = Map.Tileset->findTileIndex(base, goal);
 	if (tileres == -1) {
 		tileres = Map.Tileset->findTileIndex(goal, base);
 	}
 	if (tileres != -1) {
-		*tile = tileres;
+		*tileIndex = tileres;
 		return length;
 	}
 
@@ -169,11 +147,11 @@ static int FindTilePath(int base, int goal, int length, std::vector<char> &marks
 			const int j = Map.Tileset->Tiles[i].MixTerrain;
 			if (!marks[j]) {
 				marks[j] = j;
-				int dummytile;
-				const int n = FindTilePath(j, goal, length + 1, marks, &dummytile);
+				int dummytileIndex;
+				const int n = FindTilePath(j, goal, length + 1, marks, &dummytileIndex);
 				marks[j] = 0;
 				if (n < l) {
-					*tile = i;
+					*tileIndex = i;
 					l = n;
 				}
 			}
@@ -183,11 +161,11 @@ static int FindTilePath(int base, int goal, int length, std::vector<char> &marks
 			const int j = Map.Tileset->Tiles[i].BaseTerrain;
 			if (!marks[j]) {
 				marks[j] = j;
-				int dummytile;
-				const int n = FindTilePath(j, goal, length + 1, marks, &dummytile);
+				int dummytileIndex;
+				const int n = FindTilePath(j, goal, length + 1, marks, &dummytileIndex);
 				marks[j] = 0;
 				if (n < l) {
-					*tile = i;
+					*tileIndex = i;
 					l = n;
 				}
 			}
@@ -238,7 +216,7 @@ static int TileFromQuad(unsigned fixed, unsigned quad)
 		}
 	} else {
 		std::vector<char> marks;
-		int dummytile;
+		int dummytileIndex;
 
 		marks.resize(Map.Tileset->SolidTerrainTypes.size(), 0);
 
@@ -246,85 +224,44 @@ static int TileFromQuad(unsigned fixed, unsigned quad)
 		marks[type2] = type2;
 
 		// What fixed tile-type should replace the non useable tile-types.
-		// FIXME: write a loop.
-		fixed = (quad >> 0) & 0xFF;
-		if (fixed != type1 && fixed != type2) {
-			quad &= 0xFFFFFF00;
-			if (FindTilePath(type1, fixed, 0, marks, &dummytile) < FindTilePath(type2, fixed, 0, marks, &dummytile)) {
-				quad |= type1 << 0;
-			} else {
-				quad |= type2 << 0;
-			}
-		}
-		fixed = (quad >> 8) & 0xFF;
-		if (fixed != type1 && fixed != type2) {
-			quad &= 0xFFFF00FF;
-			if (FindTilePath(type1, fixed, 0, marks, &dummytile) < FindTilePath(type2, fixed, 0, marks, &dummytile)) {
-				quad |= type1 << 8;
-			} else {
-				quad |= type2 << 8;
-			}
-		}
-		fixed = (quad >> 16) & 0xFF;
-		if (fixed != type1 && fixed != type2) {
-			quad &= 0xFF00FFFF;
-			if (FindTilePath(type1, fixed, 0, marks, &dummytile) < FindTilePath(type2, fixed, 0, marks, &dummytile)) {
-				quad |= type1 << 16;
-			} else {
-				quad |= type2 << 16;
-			}
-		}
-		fixed = (quad >> 24) & 0xFF;
-		if (fixed != type1 && fixed != type2) {
-			quad &= 0x00FFFFFF;
-			if (FindTilePath(type1, fixed, 0, marks, &dummytile) < FindTilePath(type2, fixed, 0, marks, &dummytile)) {
-				quad |= type1 << 24;
-			} else {
-				quad |= type2 << 24;
+		for (int i = 0; i != 4; ++i) {
+			unsigned int type3 = (quad >> (8 * i)) & 0xFF;
+			if (type3 != type1 && type3 != type2) {
+				quad &= ~(0xFF << (8 * i));
+				if (FindTilePath(type1, type3, 0, marks, &dummytileIndex) < FindTilePath(type2, fixed, 0, marks, &dummytileIndex)) {
+					quad |= type1 << (8 * i);
+				} else {
+					quad |= type2 << (8 * i);
+				}
 			}
 		}
 	}
 
 	// Need a mixed tile
-	int tile = Map.Tileset->findTileIndex(type1, type2);
-	if (tile == -1) {
-		tile = Map.Tileset->findTileIndex(type1, type2);
-		if (tile != -1) {
-			std::swap(type1, type2);
-		}
+	int tileIndex = Map.Tileset->getTileIndex(type1, type2, quad);
+	if (tileIndex != -1) {
+		return tileIndex;
 	}
-
-	if (tile == -1) {
-		// Find the best tile path.
-		std::vector<char> marks;
-		marks.resize(Map.Tileset->SolidTerrainTypes.size(), 0);
-		marks[type1] = type1;
-		if (FindTilePath(type1, type2, 0, marks, &tile) == INT_MAX) {
-			DebugPrint("Huch, no mix found!!!!!!!!!!!\n");
-			const int res = Map.Tileset->findTileIndex(type1);
-			Assert(res != -1);
-			return res;
-		}
-		if (type1 == Map.Tileset->Tiles[tile].MixTerrain) {
-			// Other mixed
-			std::swap(type1, type2);
-		}
+	// Find the best tile path.
+	std::vector<char> marks;
+	marks.resize(Map.Tileset->SolidTerrainTypes.size(), 0);
+	marks[type1] = type1;
+	if (FindTilePath(type1, type2, 0, marks, &tileIndex) == INT_MAX) {
+		DebugPrint("Huch, no mix found!!!!!!!!!!!\n");
+		const int res = Map.Tileset->findTileIndex(type1);
+		Assert(res != -1);
+		return res;
 	}
-
-	int base = tile;
-
+	if (type1 == Map.Tileset->Tiles[tileIndex].MixTerrain) {
+		// Other mixed
+		std::swap(type1, type2);
+	}
+	int base = tileIndex;
 	int direction = 0;
-	if (((quad >> 24) & 0xFF) == type1) {
-		direction |= 8;
-	}
-	if (((quad >> 16) & 0xFF) == type1) {
-		direction |= 4;
-	}
-	if (((quad >> 8) & 0xFF) == type1) {
-		direction |= 2;
-	}
-	if (((quad >> 0) & 0xFF) == type1) {
-		direction |= 1;
+	for (int i = 0; i != 4; ++i) {
+		if (((quad >> (8 * i)) & 0xFF) == type1) {
+			direction |= 1 << i;
+		}
 	}
 	//                       0  1  2  3   4  5  6  7   8  9  A   B  C   D  E  F
 	const char table[16] = { 0, 7, 3, 11, 1, 9, 5, 13, 0, 8, 4, 12, 2, 10, 6, 0 };
@@ -335,18 +272,17 @@ static int TileFromQuad(unsigned fixed, unsigned quad)
 **  Change tile from abstract tile-type.
 **
 **  @param pos   map tile coordinate.
-**  @param tile  Abstract tile type to edit.
+**  @param tile  tile type to edit.
 **
 **  @note  this is a rather dumb function, doesn't do any tile fixing.
 */
 void ChangeTile(const Vec2i &pos, int tile)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
-	Assert(tile >= 0 && tile < Map.Tileset->NumTiles);
 
-	CMapField *mf = Map.Field(pos);
-	mf->Tile = Map.Tileset->Table[tile];
-	mf->playerInfo.SeenTile = mf->Tile;
+	CMapField &mf = *Map.Field(pos);
+	mf.Tile = tile;
+	mf.playerInfo.SeenTile = tile;
 }
 
 #define DIR_UP     8 /// Go up allowed
@@ -358,29 +294,27 @@ void ChangeTile(const Vec2i &pos, int tile)
 **  Editor change tile.
 **
 **  @param pos   map tile coordinate.
-**  @param tile  Tile type to edit.
+**  @param tileIndex  Tile type to edit.
 **  @param d     Fix direction flag 8 up, 4 down, 2 left, 1 right.
 */
-static void EditorChangeTile(const Vec2i &pos, int tile, int d)
+static void EditorChangeTile(const Vec2i &pos, int tileIndex, int d)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
-	ChangeTile(pos, tile);
+	ChangeTile(pos, Map.Tileset->Table[tileIndex]);
 
-	//
 	// Change the flags
-	//
-	CMapField *mf = Map.Field(pos);
-	mf->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed
-				   | MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable
-				   | MapFieldWall | MapFieldRocks | MapFieldForest);
+	CMapField &mf = *Map.Field(pos);
+	mf.Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed
+				  | MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable
+				  | MapFieldWall | MapFieldRocks | MapFieldForest);
 
-	mf->Flags |= Map.Tileset->FlagsTable[tile];
+	mf.Flags |= Map.Tileset->FlagsTable[tileIndex];
 
 	UI.Minimap.UpdateSeenXY(pos);
 	UI.Minimap.UpdateXY(pos);
 
-	EditorTileChanged2(pos, d);
+	EditorChangeSurrounding(pos, d);
 }
 
 /**
@@ -389,7 +323,7 @@ static void EditorChangeTile(const Vec2i &pos, int tile, int d)
 **  @param pos  Map tile position of change.
 **  @param d  Fix direction flag 8 up, 4 down, 2 left, 1 right.
 */
-static void EditorTileChanged2(const Vec2i &pos, int d)
+static void EditorChangeSurrounding(const Vec2i &pos, int d)
 {
 	unsigned quad = QuadFromTile(pos);
 
@@ -397,26 +331,20 @@ static void EditorTileChanged2(const Vec2i &pos, int d)
 	// Change the surrounding
 	//
 
-	//
 	// Special case 1) Walls.
-	//
-	CMapField *mf = Map.Field(pos);
-	if (mf->Flags & MapFieldWall) {
-		Map.SetWall(pos, mf->Flags & MapFieldHuman);
+	CMapField &mf = *Map.Field(pos);
+	if (mf.Flags & MapFieldWall) {
+		Map.SetWall(pos, mf.Flags & MapFieldHuman);
 		return;
 	}
 
-	//
 	// How this works:
 	//  first get the quad of the neighbouring tile, then
 	//  check if the margin matches. otherwise, call
 	//  EditorChangeTile again.
-	//
 	if (d & DIR_UP && pos.y) {
 		const Vec2i offset(0, -1);
-		//
 		// Insert into the bottom the new tile.
-		//
 		unsigned q2 = QuadFromTile(pos + offset);
 		unsigned u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
 		if (u != q2) {
@@ -426,9 +354,7 @@ static void EditorTileChanged2(const Vec2i &pos, int d)
 	}
 	if (d & DIR_DOWN && pos.y < Map.Info.MapHeight - 1) {
 		const Vec2i offset(0, 1);
-		//
 		// Insert into the top the new tile.
-		//
 		unsigned q2 = QuadFromTile(pos + offset);
 		unsigned u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
 		if (u != q2) {
@@ -438,9 +364,7 @@ static void EditorTileChanged2(const Vec2i &pos, int d)
 	}
 	if (d & DIR_LEFT && pos.x) {
 		const Vec2i offset(-1, 0);
-		//
 		// Insert into the left the new tile.
-		//
 		unsigned q2 = QuadFromTile(pos + offset);
 		unsigned u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
 		if (u != q2) {
@@ -450,9 +374,7 @@ static void EditorTileChanged2(const Vec2i &pos, int d)
 	}
 	if (d & DIR_RIGHT && pos.x < Map.Info.MapWidth - 1) {
 		const Vec2i offset(1, 0);
-		//
 		// Insert into the right the new tile.
-		//
 		unsigned q2 = QuadFromTile(pos + offset);
 		unsigned u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
 		if (u != q2) {
@@ -469,7 +391,7 @@ static void EditorTileChanged2(const Vec2i &pos, int d)
 */
 void EditorTileChanged(const Vec2i &pos)
 {
-	EditorTileChanged2(pos, 0xF);
+	EditorChangeSurrounding(pos, 0x0F);
 }
 
 /**
