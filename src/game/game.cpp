@@ -1490,6 +1490,7 @@ void LuaRegisterModules()
 	UpgradesCclRegister();
 	UserInterfaceCclRegister();
 	VideoCclRegister();
+	VideoModesRegister();
 }
 
 

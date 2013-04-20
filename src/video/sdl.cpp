@@ -453,17 +453,40 @@ static void InitKey2Str()
 }
 
 /**
+ *	Preinit Sdl so sdl infos can be queried by lua
+ */
+
+void PreInitVideoSdl()
+{
+	int res = SDL_Init(
+#ifdef DEBUG
+				  SDL_INIT_NOPARACHUTE |
+#endif
+				  SDL_INIT_AUDIO | SDL_INIT_VIDEO |
+				  SDL_INIT_TIMER);
+	if (res < 0) {
+		fprintf(stderr, "Couldn't initialize SDL: %s\n", SDL_GetError());
+		exit(1);
+	}
+	
+	// Clean up on exit
+	atexit(SDL_Quit);
+}
+
+/**
 **  Initialize the video part for SDL.
 */
 void InitVideoSdl()
 {
 	Uint32 flags = 0;
 
-	if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
 #ifndef USE_WIN32
-		// Fix tablet input in full-screen mode
-		SDL_putenv(strdup("SDL_MOUSE_RELATIVE=0"));
+	// Fix tablet input in full-screen mode
+	SDL_putenv(strdup("SDL_MOUSE_RELATIVE=0"));
 #endif
+
+	if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
+
 		int res = SDL_Init(
 #ifdef DEBUG
 					  SDL_INIT_NOPARACHUTE |
@@ -477,106 +500,106 @@ void InitVideoSdl()
 
 		// Clean up on exit
 		atexit(SDL_Quit);
+	}
 
 #ifdef USE_MAEMO
-		maemo_init();
+	maemo_init();
 #endif
 
-		// If debug is enabled, Stratagus disable SDL Parachute.
-		// So we need gracefully handle segfaults and aborts.
+	// If debug is enabled, Stratagus disable SDL Parachute.
+	// So we need gracefully handle segfaults and aborts.
 #if defined(DEBUG) && !defined(USE_WIN32)
-		signal(SIGSEGV, CleanExit);
-		signal(SIGABRT, CleanExit);
+	signal(SIGSEGV, CleanExit);
+	signal(SIGABRT, CleanExit);
 #endif
-		// Set WindowManager Title
-		if (!FullGameName.empty()) {
-			SDL_WM_SetCaption(FullGameName.c_str(), FullGameName.c_str());
-		} else if (!Parameters::Instance.applicationName.empty()) {
-			SDL_WM_SetCaption(Parameters::Instance.applicationName.c_str(), Parameters::Instance.applicationName.c_str());
-		} else {
-			SDL_WM_SetCaption("Stratagus", "Stratagus");
-		}
+	// Set WindowManager Title
+	if (!FullGameName.empty()) {
+		SDL_WM_SetCaption(FullGameName.c_str(), FullGameName.c_str());
+	} else if (!Parameters::Instance.applicationName.empty()) {
+		SDL_WM_SetCaption(Parameters::Instance.applicationName.c_str(), Parameters::Instance.applicationName.c_str());
+	} else {
+		SDL_WM_SetCaption("Stratagus", "Stratagus");
+	}
 
 #if ! defined(USE_WIN32) && ! defined(USE_MAEMO)
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
-		// Make sure, that we not create OpenGL textures (and do not call OpenGL functions), when creating icon surface
-		bool UseOpenGL_orig = UseOpenGL;
-		UseOpenGL = false;
+	// Make sure, that we not create OpenGL textures (and do not call OpenGL functions), when creating icon surface
+	bool UseOpenGL_orig = UseOpenGL;
+	UseOpenGL = false;
 #endif
 
-		SDL_Surface *icon = NULL;
-		CGraphic *g = NULL;
-		struct stat st;
+	SDL_Surface *icon = NULL;
+	CGraphic *g = NULL;
+	struct stat st;
 
-		std::string FullGameNameL = FullGameName;
-		for (size_t i = 0; i < FullGameNameL.size(); ++i) {
-			FullGameNameL[i] = tolower(FullGameNameL[i]);
+	std::string FullGameNameL = FullGameName;
+	for (size_t i = 0; i < FullGameNameL.size(); ++i) {
+		FullGameNameL[i] = tolower(FullGameNameL[i]);
+	}
+
+	std::string ApplicationName = Parameters::Instance.applicationName;
+	std::string ApplicationNameL = ApplicationName;
+	for (size_t i = 0; i < ApplicationNameL.size(); ++i) {
+		ApplicationNameL[i] = tolower(ApplicationNameL[i]);
+	}
+
+	std::vector <std::string> pixmaps;
+	pixmaps.push_back(std::string() + PIXMAPS + "/" + FullGameName + ".png");
+	pixmaps.push_back(std::string() + PIXMAPS + "/" + FullGameNameL + ".png");
+	pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + FullGameName + ".png");
+	pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + FullGameNameL + ".png");
+	pixmaps.push_back(std::string() + PIXMAPS + "/" + ApplicationName + ".png");
+	pixmaps.push_back(std::string() + PIXMAPS + "/" + ApplicationNameL + ".png");
+	pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + ApplicationName + ".png");
+	pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + ApplicationNameL + ".png");
+	pixmaps.push_back(std::string() + PIXMAPS + "/" + "Stratagus" + ".png");
+	pixmaps.push_back(std::string() + PIXMAPS + "/" + "stratagus" + ".png");
+	pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + "Stratagus" + ".png");
+	pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + "stratagus" + ".png");
+
+	for (size_t i = 0; i < pixmaps.size(); ++i) {
+		if (stat(pixmaps[i].c_str(), &st) == 0) {
+			if (g) { CGraphic::Free(g); }
+			g = CGraphic::New(pixmaps[i].c_str());
+			g->Load();
+			icon = g->Surface;
+			if (icon) { break; }
 		}
+	}
 
-		std::string ApplicationName = Parameters::Instance.applicationName;
-		std::string ApplicationNameL = ApplicationName;
-		for (size_t i = 0; i < ApplicationNameL.size(); ++i) {
-			ApplicationNameL[i] = tolower(ApplicationNameL[i]);
-		}
+	if (icon) {
+		SDL_WM_SetIcon(icon, 0);
+	}
 
-		std::vector <std::string> pixmaps;
-		pixmaps.push_back(std::string() + PIXMAPS + "/" + FullGameName + ".png");
-		pixmaps.push_back(std::string() + PIXMAPS + "/" + FullGameNameL + ".png");
-		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + FullGameName + ".png");
-		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + FullGameNameL + ".png");
-		pixmaps.push_back(std::string() + PIXMAPS + "/" + ApplicationName + ".png");
-		pixmaps.push_back(std::string() + PIXMAPS + "/" + ApplicationNameL + ".png");
-		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + ApplicationName + ".png");
-		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + ApplicationNameL + ".png");
-		pixmaps.push_back(std::string() + PIXMAPS + "/" + "Stratagus" + ".png");
-		pixmaps.push_back(std::string() + PIXMAPS + "/" + "stratagus" + ".png");
-		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + "Stratagus" + ".png");
-		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + "stratagus" + ".png");
-
-		for (size_t i = 0; i < pixmaps.size(); ++i) {
-			if (stat(pixmaps[i].c_str(), &st) == 0) {
-				if (g) { CGraphic::Free(g); }
-				g = CGraphic::New(pixmaps[i].c_str());
-				g->Load();
-				icon = g->Surface;
-				if (icon) { break; }
-			}
-		}
-
-		if (icon) {
-			SDL_WM_SetIcon(icon, 0);
-		}
-
-		if (g) {
-			CGraphic::Free(g);
-		}
+	if (g) {
+		CGraphic::Free(g);
+	}
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
-		UseOpenGL = UseOpenGL_orig;
+	UseOpenGL = UseOpenGL_orig;
 #endif
 
 #endif
 #ifdef USE_WIN32
-		HWND hwnd = NULL;
-		HICON hicon = NULL;
-		SDL_SysWMinfo info;
-		SDL_VERSION(&info.version);
+	HWND hwnd = NULL;
+	HICON hicon = NULL;
+	SDL_SysWMinfo info;
+	SDL_VERSION(&info.version);
 
-		if (SDL_GetWMInfo(&info)) {
-			hwnd = info.window;
-		}
-
-		if (hwnd) {
-			hicon = ExtractIcon(GetModuleHandle(NULL), Parameters::Instance.applicationName.c_str(), 0);
-		}
-
-		if (hicon) {
-			SendMessage(hwnd, (UINT)WM_SETICON, ICON_SMALL, (LPARAM)hicon);
-			SendMessage(hwnd, (UINT)WM_SETICON, ICON_BIG, (LPARAM)hicon);
-		}
-#endif
+	if (SDL_GetWMInfo(&info)) {
+		hwnd = info.window;
 	}
+
+	if (hwnd) {
+		hicon = ExtractIcon(GetModuleHandle(NULL), Parameters::Instance.applicationName.c_str(), 0);
+	}
+
+	if (hicon) {
+		SendMessage(hwnd, (UINT)WM_SETICON, ICON_SMALL, (LPARAM)hicon);
+		SendMessage(hwnd, (UINT)WM_SETICON, ICON_BIG, (LPARAM)hicon);
+	}
+#endif
 
 	// Initialize the display
 

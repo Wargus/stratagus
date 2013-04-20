@@ -480,3 +480,116 @@ void RestoreColorCyclingSurface()
 #endif
 
 //@}
+
+/*
+ * Lua queries for video information
+ */
+ 
+static Uint32 GetVideoFlags(){
+	Uint32 flags = 0;
+	
+#if !defined(USE_OPENGL) && !defined(USE_GLES)
+	flags = SDL_HWSURFACE | SDL_HWPALETTE;
+#endif
+
+	if (Video.FullScreen) {
+		flags |= SDL_FULLSCREEN;
+	}
+
+#if defined(USE_OPENGL) || defined(USE_GLES)
+#ifdef USE_GLES_NATIVE
+	flags |= SDL_OPENGLES;
+#endif
+#ifdef USE_GLES_MAEMO
+	flags |= SDL_SWSURFACE;
+#endif
+#ifdef USE_OPENGL
+	flags |= SDL_OPENGL | SDL_GL_DOUBLEBUFFER;
+#endif
+#endif
+	
+	return flags;
+}
+
+static int GetVideoResolutionsNr(lua_State *l)
+{	
+
+	SDL_Rect** modes = SDL_ListModes(NULL, GetVideoFlags());
+	if (modes == (SDL_Rect**)-1) {
+		lua_pushnumber(l, lua_Number(-1));
+	}
+	else {
+		int i = 0;
+		while(modes[i]){
+			i++;
+		}
+		lua_pushnumber(l, lua_Number(i));
+	}
+	
+	return 1;
+}
+
+static int GetResolutionsWidth(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	
+	SDL_Rect** modes = SDL_ListModes(NULL, GetVideoFlags());
+	
+	if (modes == (SDL_Rect**)-1) {
+		lua_pushnumber(l, lua_Number(0));
+	}
+	else{
+		if(modes[LuaToNumber(l, 1)]){
+			lua_pushnumber(l, lua_Number(modes[LuaToNumber(l, 1)]->w));
+		}
+		else{
+			lua_pushnumber(l, lua_Number(-1));
+		}
+	}
+	
+	return 1;
+}
+
+static int GetResolutionsHeight(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	
+	SDL_Rect** modes = SDL_ListModes(NULL, GetVideoFlags());
+	
+	if (modes == (SDL_Rect**)-1) {
+		lua_pushnumber(l, lua_Number(0));
+	}
+	else{
+		if(modes[LuaToNumber(l, 1)]){
+			lua_pushnumber(l, lua_Number(modes[LuaToNumber(l, 1)]->h));
+		}
+		else{
+			lua_pushnumber(l, lua_Number(-1));
+		}
+	}
+	
+	return 1;
+}
+
+static int GetCurrentResolutionsWidth(lua_State *l)
+{
+	lua_pushnumber(l, lua_Number(SDL_GetVideoInfo()->current_w));
+	
+	return 1;
+}
+
+static int GetCurrentResolutionsHeight(lua_State *l)
+{
+	lua_pushnumber(l, lua_Number(SDL_GetVideoInfo()->current_h));
+	
+	return 1;
+}
+
+void VideoModesRegister()
+{
+	lua_register(Lua, "GetVideoResolutionsNr", GetVideoResolutionsNr);
+	lua_register(Lua, "GetResolutionsWidth", GetResolutionsWidth);
+	lua_register(Lua, "GetResolutionsHeight", GetResolutionsHeight);
+	lua_register(Lua, "GetCurrentResolutionsWidth", GetCurrentResolutionsWidth);
+	lua_register(Lua, "GetCurrentResolutionsHeight", GetCurrentResolutionsHeight);
+}

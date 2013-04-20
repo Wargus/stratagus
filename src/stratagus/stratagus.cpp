@@ -649,6 +649,9 @@ int stratagusMain(int argc, char **argv)
 
 	makedir(parameters.GetUserDirectory().c_str(), 0777);
 
+	// Preinit SDL_Video so video infos can be queried
+	PreInitVideoSdl();
+
 	// Init Lua and register lua functions!
 	InitLua();
 	LuaRegisterModules();
