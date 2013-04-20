@@ -270,7 +270,7 @@ static void InitOpenGL()
 
 	InitOpenGLExtensions();
 
-	glViewport(0, 0, (GLsizei)Video.Width, (GLsizei)Video.Height);
+	glViewport(0, 0, (GLsizei)Video.ViewportWidth, (GLsizei)Video.ViewportHeight);
 
 #ifdef USE_OPENGL
 	glMatrixMode(GL_PROJECTION);
@@ -627,6 +627,11 @@ void InitVideoSdl()
 	if (!Video.Depth) {
 		Video.Depth = 32;
 	}
+
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	Video.ViewportWidth = Video.Width;
+	Video.ViewportHeight = Video.Height;
+#endif
 
 	TheScreen = SDL_SetVideoMode(Video.Width, Video.Height, Video.Depth, flags);
 	if (TheScreen && (TheScreen->format->BitsPerPixel != 16

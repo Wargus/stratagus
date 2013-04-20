@@ -289,14 +289,21 @@ bool CVideo::ResizeScreen(int w, int h)
 			UI.Minimap.FreeOpenGL();
 		}
 #endif
-		Width = w;
-		Height = h;
 		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
-		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
 #if defined(USE_OPENGL) || defined(USE_GLES)
+		ViewportWidth = w;
+		ViewportHeight = h;
 		if (UseOpenGL) {
 			ReloadOpenGL();
+		} else {
+			Width = w;
+			Height = h;
+			SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
 		}
+#else
+		Width = w;
+		Height = h;
+		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
 #endif
 		return true;
 	}
