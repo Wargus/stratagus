@@ -84,6 +84,11 @@ CFont &GetSmallFont()
 	return *SmallFont;
 }
 
+bool IsGameFontReady()
+{
+	return GameFont != NULL || CFont::Get("game") != NULL;
+}
+
 CFont &GetGameFont()
 {
 	if (!GameFont) {
@@ -978,9 +983,15 @@ void ReloadFonts()
 */
 /* static */ CFont *CFont::Get(const std::string &ident)
 {
-	CFont *font = Fonts[ident];
-	if (!font) {
+	std::map<std::string, CFont *>::iterator it = Fonts.find(ident);
+	if (it == Fonts.end()) {
 		DebugPrint("font not found: %s\n" _C_ ident.c_str());
+		return NULL;
+	}
+	CFont *font = it->second;
+	if (font == NULL) {
+		DebugPrint("font not found: %s\n" _C_ ident.c_str());
+		return NULL;
 	}
 	return font;
 }

@@ -150,19 +150,17 @@ public:
 #define FontGrey "grey"
 
 /*----------------------------------------------------------------------------
---  Variables
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
 **  Font selector for the font functions.
 **  FIXME: should be moved to lua
 */
-extern CFont &GetSmallFont();       /// Small font used in stats
-extern CFont &GetGameFont();        /// Normal font used in game
+extern CFont &GetSmallFont();  /// Small font used in stats
+extern CFont &GetGameFont();   /// Normal font used in game
+extern bool IsGameFontReady(); /// true when GameFont is provided
 
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /// Set the default text colors for normal and reverse text
 extern void SetDefaultTextColors(const std::string &normal, const std::string &reverse);
