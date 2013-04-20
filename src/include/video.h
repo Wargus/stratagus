@@ -53,6 +53,7 @@ class CFont;
 #if defined(USE_OPENGL) || defined(USE_GLES)
 extern char ForceUseOpenGL;
 extern bool UseOpenGL;
+extern bool ZoomNoResize;
 #endif
 
 class CGraphic : public gcn::Image

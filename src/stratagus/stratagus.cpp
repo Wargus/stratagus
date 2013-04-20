@@ -449,6 +449,7 @@ static void Usage()
 		"\t-u userpath\tPath where stratagus saves preferences, log and savegame\n"
 		"\t-v mode\t\tVideo mode resolution in format <xres>x<yres>\n"
 		"\t-W\t\tWindowed video mode\n"
+		"\t-Z\t\tUse OpenGL to scale the screen to the viewport (retro-style)\n"
 		"map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n",
 		Parameters::Instance.applicationName.c_str());
 }
@@ -499,7 +500,7 @@ static void RedirectOutput()
 void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
 	for (;;) {
-		switch (getopt(argc, argv, "c:d:D:eE:FhI:lN:oOP:s:S:u:v:W?")) {
+		switch (getopt(argc, argv, "c:d:D:eE:FhI:lN:oOP:s:S:u:v:WZ?")) {
 			case 'c':
 				parameters.luaStartFilename = optarg;
 				continue;
@@ -576,6 +577,13 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				VideoForceFullScreen = 1;
 				Video.FullScreen = 0;
 				continue;
+#if defined(USE_OPENGL) || defined(USE_GLES)
+		        case 'Z':
+				ForceUseOpenGL = 1;
+				UseOpenGL = 1;
+				ZoomNoResize = 1;
+				continue;
+#endif
 			case -1:
 				break;
 			case '?':
