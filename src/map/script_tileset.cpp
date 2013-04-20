@@ -177,19 +177,8 @@ void CTileset::parseSpecial(lua_State *l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "growing-tree")) {
 			++j;
-			lua_rawgeti(l, -1, j + 1);
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			if (lua_rawlen(l, -1) != 2) {
-				LuaError(l, "growing-tree: Wrong table length");
-			}
-			for (int i = 0; i < 2; ++i) {
-				lua_rawgeti(l, -1, i + 1);
-				GrowingTree[i] = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-			}
-			lua_pop(l, 1);
+			// keep for retro compatibility.
+			// TODO : remove when game data are updated.
 		} else if (!strcmp(value, "top-one-rock")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);

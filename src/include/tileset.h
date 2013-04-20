@@ -85,6 +85,8 @@ public:
 	void Clear();
 	bool IsSeenTile(unsigned short type, unsigned short seen) const;
 
+	unsigned getRemovedRockTile() const { return RemovedRock; }
+	unsigned getRemovedTreeTile() const { return RemovedTree; }
 	unsigned getBottomOneTreeTile() const { return BotOneTree; }
 	unsigned getTopOneTreeTile() const { return TopOneTree; }
 
@@ -96,7 +98,9 @@ public:
 	unsigned getOrcWallTile_destroyed(int index) const;
 
 public:
-	unsigned int getOrAddSolidTileIndexByName(const std::string &name);
+	unsigned int getSolidTerrainCount() const;
+
+	const std::string &getTerrainName(int solidTerrainIndex) const;
 	int findTileIndex(unsigned char baseTerrain, unsigned char mixTerrain = 0) const;
 	int getTileIndex(unsigned char baseTerrain, unsigned char mixTerrain, unsigned int quad) const;
 
@@ -104,15 +108,17 @@ public:
 	unsigned int getTileNumber(int basic, bool random, bool filler) const;
 	void fillSolidTiles(std::vector<unsigned int> *tiles) const;
 
-
 	unsigned getQuadFromTile(unsigned int tile) const;
-
+	int getTileIndexBySurrounding(unsigned short type,
+								  unsigned int up, unsigned int right,
+								  unsigned int bottom, unsigned int left) const;
 
 public:
 	void parse(lua_State *l);
 	void buildTable(lua_State *l);
 
 private:
+	unsigned int getOrAddSolidTileIndexByName(const std::string &name);
 	void buildWallReplacementTable();
 	void parseSlots(lua_State *l, int t);
 	void parseSpecial(lua_State *l);
@@ -131,25 +137,21 @@ public:
 
 	// TODO: currently hardcoded
 	std::vector<unsigned char> TileTypeTable;   /// For fast lookup of tile type
-
+private:
 	std::vector<SolidTerrainInfo> SolidTerrainTypes; /// Information about solid terrains.
+public:
 	std::vector<int> MixedLookupTable;   /// Lookup for what part of tile used
 private:
 	unsigned TopOneTree;     /// Tile for one tree top
 	unsigned MidOneTree;     /// Tile for one tree middle
 	unsigned BotOneTree;     /// Tile for one tree bottom
-public:
 	int RemovedTree;         /// Tile placed where trees are gone
-	unsigned GrowingTree[2]; /// Growing tree tiles
 	int WoodTable[20];       /// Table for tree removable
-private:
 	unsigned TopOneRock;     /// Tile for one rock top
 	unsigned MidOneRock;     /// Tile for one rock middle
 	unsigned BotOneRock;     /// Tile for one rock bottom
-public:
 	int RemovedRock;         /// Tile placed where rocks are gone
 	int RockTable[20];       /// Removed rock placement table
-private:
 	unsigned HumanWallTable[16];    /// Human wall placement table
 	unsigned OrcWallTable[16];      /// Orc wall placement table
 };

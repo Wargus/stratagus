@@ -61,17 +61,14 @@ char CurrentMapPath[1024];       /// Path of the current map
 /**
 **  Marks seen tile -- used mainly for the Fog Of War
 **
-**  @param x  Map X tile-position.
-**  @param y  Map Y tile-position.
+**  @param mf  MapField-position.
 */
 void CMap::MarkSeenTile(CMapField &mf)
 {
-	const int tile = mf.Tile;
-	const int seentile = mf.playerInfo.SeenTile;
+	const unsigned int tile = mf.Tile;
+	const unsigned int seentile = mf.playerInfo.SeenTile;
 
-	//
 	//  Nothing changed? Seeing already the correct tile.
-	//
 	if (tile == seentile) {
 		return;
 	}
@@ -95,18 +92,18 @@ void CMap::MarkSeenTile(CMapField &mf)
 #endif
 
 		//  Handle wood changes. FIXME: check if for growing wood correct?
-		if (seentile != this->Tileset->RemovedTree && tile == this->Tileset->RemovedTree) {
+		if (seentile != this->Tileset->getRemovedTreeTile() && tile == this->Tileset->getRemovedTreeTile()) {
 			FixNeighbors(MapFieldForest, 1, pos);
-		} else if (seentile == this->Tileset->RemovedTree && tile != this->Tileset->RemovedTree) {
+		} else if (seentile == this->Tileset->getRemovedTreeTile() && tile != this->Tileset->getRemovedTreeTile()) {
 			FixTile(MapFieldForest, 1, pos);
 		} else if (mf.ForestOnMap()) {
 			FixTile(MapFieldForest, 1, pos);
 			FixNeighbors(MapFieldForest, 1, pos);
 
 			// Handle rock changes.
-		} else if (seentile != Tileset->RemovedRock && tile == Tileset->RemovedRock) {
+		} else if (seentile != Tileset->getRemovedRockTile() && tile == Tileset->getRemovedRockTile()) {
 			FixNeighbors(MapFieldRocks, 1, pos);
-		} else if (seentile == Tileset->RemovedRock && tile != Tileset->RemovedRock) {
+		} else if (seentile == Tileset->getRemovedRockTile() && tile != Tileset->getRemovedRockTile()) {
 			FixTile(MapFieldRocks, 1, pos);
 		} else if (mf.RockOnMap()) {
 			FixTile(MapFieldRocks, 1, pos);
@@ -428,12 +425,14 @@ void CMap::Clean()
 /**
 **  Correct the seen wood field, depending on the surrounding.
 **
-**  @param type  type fo tile to update
+**  @param type  type of tile to update
 **  @param seen  1 if updating seen value, 0 for real
 **  @param pos   Map tile-position.
 */
 void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 {
+	Assert(type == MapFieldForest || type == MapFieldRocks);
+
 	//  Outside of map or no wood.
 	if (!Info.IsPointOnMap(pos)) {
 		return;
@@ -448,29 +447,16 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	}
 
 	// Select Table to lookup
-	int *lookuptable;
 	int removedtile;
 	int flags;
-	switch (type) {
-		case MapFieldForest:
-			lookuptable = this->Tileset->WoodTable;
-			removedtile = this->Tileset->RemovedTree;
-			flags = (MapFieldForest | MapFieldUnpassable);
-			break;
-		case MapFieldRocks:
-			lookuptable = this->Tileset->RockTable;
-			removedtile = this->Tileset->RemovedRock;
-			flags = (MapFieldRocks | MapFieldUnpassable);
-			break;
-		default:
-			lookuptable = NULL;
-			removedtile = 0;
-			flags = 0;
+	if (type == MapFieldForest) {
+		removedtile = this->Tileset->getRemovedTreeTile();
+		flags = (MapFieldForest | MapFieldUnpassable);
+	} else { // (type == MapFieldRocks)
+		removedtile = this->Tileset->getRemovedRockTile();
+		flags = (MapFieldRocks | MapFieldUnpassable);
 	}
-	//
 	//  Find out what each tile has with respect to wood, or grass.
-	//
-	int tile = 0;
 	int ttup;
 	int ttdown;
 	int ttleft;
@@ -479,79 +465,32 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	if (pos.y - 1 < 0) {
 		ttup = 15; //Assign trees in all directions
 	} else {
-		CMapField &new_mf = *(&mf - this->Info.MapWidth);
-		if (seen) {
-			ttup = this->Tileset->MixedLookupTable[new_mf.playerInfo.SeenTile];
-		} else {
-			ttup = this->Tileset->MixedLookupTable[new_mf.Tile];
-		}
+		const CMapField &new_mf = *(&mf - this->Info.MapWidth);
+		ttup = seen ? new_mf.playerInfo.SeenTile : new_mf.Tile;
+		ttup = this->Tileset->MixedLookupTable[ttup];
 	}
 	if (pos.x + 1 >= this->Info.MapWidth) {
 		ttright = 15; //Assign trees in all directions
 	} else {
-		CMapField &new_mf = *(&mf + 1);
-		if (seen) {
-			ttright = this->Tileset->MixedLookupTable[new_mf.playerInfo.SeenTile];
-		} else {
-			ttright = this->Tileset->MixedLookupTable[new_mf.Tile];
-		}
+		const CMapField &new_mf = *(&mf + 1);
+		ttright = seen ? new_mf.playerInfo.SeenTile : new_mf.Tile;
+		ttright = this->Tileset->MixedLookupTable[ttright];
 	}
 	if (pos.y + 1 >= this->Info.MapHeight) {
 		ttdown = 15; //Assign trees in all directions
 	} else {
-		CMapField &new_mf = *(&mf + this->Info.MapWidth);
-		if (seen) {
-			ttdown = this->Tileset->MixedLookupTable[new_mf.playerInfo.SeenTile];
-		} else {
-			ttdown = this->Tileset->MixedLookupTable[new_mf.Tile];
-		}
+		const CMapField &new_mf = *(&mf + this->Info.MapWidth);
+		ttdown = seen ? new_mf.playerInfo.SeenTile : new_mf.Tile;
+		ttdown = this->Tileset->MixedLookupTable[ttdown];
 	}
 	if (pos.x - 1 < 0) {
 		ttleft = 15; //Assign trees in all directions
 	} else {
-		CMapField &new_mf = *(&mf - 1);
-		if (seen) {
-			ttleft = this->Tileset->MixedLookupTable[new_mf.playerInfo.SeenTile];
-		} else {
-			ttleft = this->Tileset->MixedLookupTable[new_mf.Tile];
-		}
+		const CMapField &new_mf = *(&mf - 1);
+		ttleft = seen ? new_mf.playerInfo.SeenTile : new_mf.Tile;
+		ttleft = this->Tileset->MixedLookupTable[ttleft];
 	}
-
-	//
-	//  Check each of the corners to ensure it has both connecting
-	//  ?**?
-	//  *mm*
-	//  *mm*
-	//  ?**?
-	//  *
-	//   *  type asterixs must match for wood to be present
-
-	tile += ((ttup & 0x01) && (ttleft & 0x04)) * 8;
-	tile += ((ttup & 0x02) && (ttright & 0x08)) * 4;
-	tile += ((ttright & 0x01) && (ttdown & 0x04)) * 2;
-	tile += ((ttleft & 0x02) && (ttdown & 0x08)) * 1;
-
-	//Test if we have top tree, or bottom tree, they are special
-	if ((ttdown & 0x10) != 0) {
-		tile |= (ttleft & 0x06) != 0 ? 1 : 0;
-		tile |= (ttright & 0x09) != 0 ? 2 : 0;
-	}
-
-	if ((ttup & 0x20) != 0) {
-		tile |= (ttleft & 0x06) != 0 ? 8 : 0;
-		tile |= (ttright & 0x09) != 0 ? 4 : 0;
-	}
-
-	tile = lookuptable[tile];
-
-	//If tile is -1, then we should check if we are to draw just one tree
-	//Check for tile about, or below or both...
-	if (tile == -1) {
-		tile = 16;
-		tile += ((ttup & 0x01) || (ttup & 0x02)) * 1;
-		tile += ((ttdown & 0x04) || (ttdown & 0x08)) * 2;
-		tile = lookuptable[tile];
-	}
+	int tile = this->Tileset->getTileIndexBySurrounding(type, ttup, ttright, ttdown, ttleft);
 
 	//Update seen tile.
 	if (tile == -1) { // No valid wood remove it.
@@ -618,15 +557,15 @@ void CMap::ClearTile(unsigned short type, const Vec2i &pos)
 	// Select Table to lookup
 	switch (type) {
 		case MapFieldForest:
-			removedtile = this->Tileset->RemovedTree;
+			removedtile = this->Tileset->getRemovedTreeTile();
 			flags = (MapFieldForest | MapFieldUnpassable);
 			break;
 		case MapFieldRocks:
-			removedtile = this->Tileset->RemovedRock;
+			removedtile = this->Tileset->getRemovedRockTile();
 			flags = (MapFieldRocks | MapFieldUnpassable);
 			break;
 		default:
-			removedtile = flags = 0;
+			return;
 	}
 	mf.Tile = removedtile;
 	mf.Flags &= ~flags;
@@ -652,7 +591,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 	Assert(Map.Info.IsPointOnMap(pos));
 	CMapField &mf = *this->Field(pos);
 
-	if (mf.Tile != this->Tileset->RemovedTree) {
+	if (mf.Tile != this->Tileset->getRemovedTreeTile()) {
 		return;
 	}
 
@@ -671,7 +610,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		return;
 	}
 	CMapField &topMf = *(&mf - this->Info.MapWidth);
-	if (topMf.Tile == this->Tileset->RemovedTree
+	if (topMf.Tile == this->Tileset->getRemovedTreeTile()
 		&& topMf.Value >= ForestRegeneration
 		&& !(topMf.Flags & occupedFlag)) {
 		DebugPrint("Real place wood\n");

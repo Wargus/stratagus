@@ -938,13 +938,13 @@ static void DrawEditorInfo()
 	char buf[256];
 	snprintf(buf, sizeof(buf), "Editor (%d %d)", pos.x, pos.y);
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 2, UI.StatusLine.TextY, buf);
-	const CMapField *mf = Map.Field(pos);
+	const CMapField &mf = *Map.Field(pos);
 	//
 	// Flags info
 	//
-	unsigned flags = mf->Flags;
+	unsigned flags = mf.Flags;
 	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
-			mf->Value, flags,
+			mf.Value, flags,
 			flags & MapFieldUnpassable   ? 'u' : '-',
 			flags & MapFieldNoBuilding   ? 'n' : '-',
 			flags & MapFieldHuman        ? 'h' : '-',
@@ -961,12 +961,13 @@ static void DrawEditorInfo()
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY, buf);
 
 	// Tile info
-	const int index = Map.Tileset->findTileIndexByTile(mf->Tile);
+	const CTileset &tileset = *Map.Tileset;
+	const int index = tileset.findTileIndexByTile(mf.Tile);
 	Assert(index != -1);
-	const int baseTerrainIdx = Map.Tileset->Tiles[index].BaseTerrain;
-	const char *baseTerrainStr = Map.Tileset->SolidTerrainTypes[baseTerrainIdx].TerrainName.c_str();
-	const int mixTerrainIdx = Map.Tileset->Tiles[index].MixTerrain;
-	const char *mixTerrainStr = mixTerrainIdx ? Map.Tileset->SolidTerrainTypes[mixTerrainIdx].TerrainName.c_str() : "";
+	const int baseTerrainIdx = tileset.Tiles[index].BaseTerrain;
+	const char *baseTerrainStr = tileset.getTerrainName(baseTerrainIdx).c_str();
+	const int mixTerrainIdx = tileset.Tiles[index].MixTerrain;
+	const char *mixTerrainStr = mixTerrainIdx ? tileset.getTerrainName(mixTerrainIdx).c_str() : "";
 	snprintf(buf, sizeof(buf), "%s %s", baseTerrainStr, mixTerrainStr);
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 250, UI.StatusLine.TextY, buf);
 #endif
@@ -1563,7 +1564,7 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 				const int tile = Editor.ShownTileTypes[i];
 				const int tileindex = Map.Tileset->findTileIndexByTile(tile);
 				const int base = Map.Tileset->Tiles[tileindex].BaseTerrain;
-				UI.StatusLine.Set(Map.Tileset->SolidTerrainTypes[base].TerrainName);
+				UI.StatusLine.Set(Map.Tileset->getTerrainName(base));
 				Editor.CursorTileIndex = i;
 				return true;
 			}

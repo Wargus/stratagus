@@ -155,7 +155,7 @@ static int TileFromQuad(unsigned fixed, unsigned quad)
 		std::vector<char> marks;
 		int dummytileIndex;
 
-		marks.resize(Map.Tileset->SolidTerrainTypes.size(), 0);
+		marks.resize(Map.Tileset->getSolidTerrainCount(), 0);
 
 		marks[type1] = type1;
 		marks[type2] = type2;
@@ -181,7 +181,7 @@ static int TileFromQuad(unsigned fixed, unsigned quad)
 	}
 	// Find the best tile path.
 	std::vector<char> marks;
-	marks.resize(Map.Tileset->SolidTerrainTypes.size(), 0);
+	marks.resize(Map.Tileset->getSolidTerrainCount(), 0);
 	marks[type1] = type1;
 	if (FindTilePath(type1, type2, 0, marks, &tileIndex) == INT_MAX) {
 		DebugPrint("Huch, no mix found!!!!!!!!!!!\n");

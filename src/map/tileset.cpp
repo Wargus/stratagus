@@ -125,11 +125,6 @@
 **      The tile number of the tile placed where trees are removed.
 **      Is created on the map by lumber chopping.
 **
-**  CTileset::GrowingTree[2]
-**
-**      Contains the tile numbers of a growing tree from small to big.
-**      @note Not yet used.
-**
 **  CTilset::WoodTable[20]
 **
 **      Table for wood removable. This table contains the tile which
@@ -248,7 +243,6 @@ void CTileset::Clear()
 	MidOneTree = 0;
 	BotOneTree = 0;
 	RemovedTree = 0;
-	memset(GrowingTree, 0, sizeof(GrowingTree));
 	memset(WoodTable, 0, sizeof(WoodTable));
 	MixedLookupTable.clear();
 	TopOneRock = 0;
@@ -287,6 +281,16 @@ unsigned int CTileset::getOrAddSolidTileIndexByName(const std::string &name)
 	s.TerrainName = name;
 	SolidTerrainTypes.push_back(s);
 	return SolidTerrainTypes.size() - 1;
+}
+
+const std::string &CTileset::getTerrainName(int solidTerrainIndex) const
+{
+	return SolidTerrainTypes[solidTerrainIndex].TerrainName;
+}
+
+unsigned int CTileset::getSolidTerrainCount() const
+{
+	return SolidTerrainTypes.size();
 }
 
 int CTileset::findTileIndex(unsigned char baseTerrain, unsigned char mixTerrain) const
@@ -328,6 +332,50 @@ int CTileset::getTileIndex(unsigned char baseTerrain, unsigned char mixTerrain, 
 	//                       0  1  2  3   4  5  6  7   8  9  A   B  C   D  E  F
 	const char table[16] = { 0, 7, 3, 11, 1, 9, 5, 13, 0, 8, 4, 12, 2, 10, 6, 0 };
 	return base | (table[direction] << 4);
+}
+
+int CTileset::getTileIndexBySurrounding(unsigned short type,
+										unsigned int ttup, unsigned int ttright,
+										unsigned int ttdown, unsigned int ttleft) const
+{
+	//  Check each of the corners to ensure it has both connecting
+	//  ?**?
+	//  *mm*
+	//  *mm*
+	//  ?**?
+	//
+	//   *  type asterixs must match for wood to be present
+
+	int tile = 0;
+	tile += ((ttup & 0x01) && (ttleft & 0x04)) * 8;
+	tile += ((ttup & 0x02) && (ttright & 0x08)) * 4;
+	tile += ((ttright & 0x01) && (ttdown & 0x04)) * 2;
+	tile += ((ttleft & 0x02) && (ttdown & 0x08)) * 1;
+
+	//Test if we have top tree, or bottom tree, they are special
+	if ((ttdown & 0x10) != 0) {
+		tile |= (ttleft & 0x06) != 0 ? 1 : 0;
+		tile |= (ttright & 0x09) != 0 ? 2 : 0;
+	}
+
+	if ((ttup & 0x20) != 0) {
+		tile |= (ttleft & 0x06) != 0 ? 8 : 0;
+		tile |= (ttright & 0x09) != 0 ? 4 : 0;
+	}
+
+	Assert(type == MapFieldForest || type == MapFieldRocks);
+	const int (&lookuptable)[20] = (type == MapFieldForest) ? WoodTable : RockTable;
+	tile = lookuptable[tile];
+
+	//If tile is -1, then we should check if we are to draw just one tree
+	//Check for tile about, or below or both...
+	if (tile == -1) {
+		tile = 16;
+		tile += ((ttup & 0x01) || (ttup & 0x02)) * 1;
+		tile += ((ttdown & 0x04) || (ttdown & 0x08)) * 2;
+		tile = lookuptable[tile];
+	}
+	return tile;
 }
 
 int CTileset::findTileIndexByTile(unsigned int tile) const
