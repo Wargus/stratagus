@@ -87,7 +87,7 @@ end
 
 campaign_steps = {
   CreateMapStep("campaigns/swindler/level01.smp",
-      {"Get to the upper mountains without being seen."}, 
+      {"Help Lahen to get to the upper mountains without being seen."}, 
       briefingtext01,
       nil,
       "campaigns/swindler/swindler.png"),
