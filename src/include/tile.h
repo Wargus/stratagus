@@ -140,6 +140,8 @@
 
 class CFile;
 class CPlayer;
+class CTileset;
+struct lua_State;
 
 /*----------------------------------------------------------------------------
 --  Map - field
@@ -200,18 +202,16 @@ public:
 	unsigned char RadarJammer[PlayerMax]; /// Jamming capabilities.
 };
 
-
 /// Describes a field of the map
 class CMapField
 {
 public:
-	CMapField() : Tile(0), Flags(0), Cost(0), Value(0), UnitCache()
-#ifdef DEBUG
-		, TilesetTile(0)
-#endif
-	{}
+	CMapField();
 
 	void Save(CFile &file) const;
+	void parse(lua_State *l);
+
+	void setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value);
 
 	/// Check if a field flags.
 	bool CheckMask(int mask) const {

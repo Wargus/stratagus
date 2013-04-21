@@ -9,7 +9,7 @@
 #         Stratagus - A free fantasy real time strategy game engine
 #
 #    CMakeLists.txt
-#    Copyright (C) 2011-2012  Pali Rohár <pali.rohar@gmail.com>
+#    Copyright (C) 2011-2013  Pali Rohár <pali.rohar@gmail.com>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -189,8 +189,8 @@ set(map_SRCS
 	src/map/map_draw.cpp
 	src/map/map_fog.cpp
 	src/map/map_radar.cpp
-	src/map/map_save.cpp
 	src/map/map_wall.cpp
+	src/map/mapfield.cpp
 	src/map/minimap.cpp
 	src/map/script_map.cpp
 	src/map/script_tileset.cpp

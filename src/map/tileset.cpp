@@ -523,7 +523,7 @@ int CTileset::findTileIndexByTile(unsigned int tile) const
 **  @param random  Return random tile
 **  @param filler  Get a decorated tile.
 **
-**  @return        Tile number.
+**  @return        Tile index number.
 **
 **  @todo  FIXME: Solid tiles are here still hardcoded.
 */
@@ -548,7 +548,7 @@ unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
 			}
 		} while (i < 16 && n--);
 		Assert(i != 16);
-		return Table[tile + i];
+		return tile + i;
 	}
 	if (filler) {
 		int i = 0;
@@ -557,10 +557,10 @@ unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
 		for (; i < 16 && !Table[tile + i]; ++i) {
 		}
 		if (i != 16) {
-			return Table[tile + i];
+			return tile + i;
 		}
 	}
-	return Table[tile];
+	return tile;
 }
 
 /**

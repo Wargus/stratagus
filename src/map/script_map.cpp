@@ -107,82 +107,17 @@ static int CclStratagusMap(lua_State *l)
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
 					}
-
 					const int subsubargs = lua_rawlen(l, -1);
 					if (subsubargs != Map.Info.MapWidth * Map.Info.MapHeight) {
 						fprintf(stderr, "Wrong tile table length: %d\n", subsubargs);
 					}
-					int i = 0;
-					for (int subk = 0; subk < subsubargs; ++subk) {
-						lua_rawgeti(l, -1, subk + 1);
+					for (int i = 0; i < subsubargs; ++i) {
+						lua_rawgeti(l, -1, i + 1);
 						if (!lua_istable(l, -1)) {
 							LuaError(l, "incorrect argument");
 						}
-						int args2 = lua_rawlen(l, -1);
-						int j2 = 0;
-
-						lua_rawgeti(l, -1, j2 + 1);
-						Map.Fields[i].Tile = LuaToNumber(l, -1);
+						Map.Fields[i].parse(l);
 						lua_pop(l, 1);
-						++j2;
-						lua_rawgeti(l, -1, j2 + 1);
-						Map.Fields[i].playerInfo.SeenTile = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-						++j2;
-						lua_rawgeti(l, -1, j2 + 1);
-						Map.Fields[i].Value = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-						++j2;
-						lua_rawgeti(l, -1, j2 + 1);
-						Map.Fields[i].Cost = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-						++j2;
-						for (; j2 < args2; ++j2) {
-							lua_rawgeti(l, -1, j2 + 1);
-							value = LuaToString(l, -1);
-							lua_pop(l, 1);
-							if (!strcmp(value, "explored")) {
-								++j2;
-								lua_rawgeti(l, -1, j2 + 1);
-								Map.Fields[i].playerInfo.Visible[LuaToNumber(l, -1)] = 1;
-								lua_pop(l, 1);
-							} else if (!strcmp(value, "human")) {
-								Map.Fields[i].Flags |= MapFieldHuman;
-
-							} else if (!strcmp(value, "land")) {
-								Map.Fields[i].Flags |= MapFieldLandAllowed;
-							} else if (!strcmp(value, "coast")) {
-								Map.Fields[i].Flags |= MapFieldCoastAllowed;
-							} else if (!strcmp(value, "water")) {
-								Map.Fields[i].Flags |= MapFieldWaterAllowed;
-
-							} else if (!strcmp(value, "mud")) {
-								Map.Fields[i].Flags |= MapFieldNoBuilding;
-							} else if (!strcmp(value, "block")) {
-								Map.Fields[i].Flags |= MapFieldUnpassable;
-
-							} else if (!strcmp(value, "wall")) {
-								Map.Fields[i].Flags |= MapFieldWall;
-							} else if (!strcmp(value, "rock")) {
-								Map.Fields[i].Flags |= MapFieldRocks;
-							} else if (!strcmp(value, "wood")) {
-								Map.Fields[i].Flags |= MapFieldForest;
-
-							} else if (!strcmp(value, "ground")) {
-								Map.Fields[i].Flags |= MapFieldLandUnit;
-							} else if (!strcmp(value, "air")) {
-								Map.Fields[i].Flags |= MapFieldAirUnit;
-							} else if (!strcmp(value, "sea")) {
-								Map.Fields[i].Flags |= MapFieldSeaUnit;
-							} else if (!strcmp(value, "building")) {
-								Map.Fields[i].Flags |= MapFieldBuilding;
-
-							} else {
-								LuaError(l, "Unsupported tag: %s" _C_ value);
-							}
-						}
-						lua_pop(l, 1);
-						++i;
 					}
 					lua_pop(l, 1);
 				} else {
@@ -400,35 +335,29 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 /**
 **  Set a tile
 **
-**  @param tile   Tile number
+**  @param tileIndex   Tile number
 **  @param pos    coordinate
 **  @param value  Value of the tile
 */
-void SetTile(int tile, const Vec2i &pos, int value)
+void SetTile(int tileIndex, const Vec2i &pos, int value)
 {
 	if (!Map.Info.IsPointOnMap(pos)) {
 		fprintf(stderr, "Invalid map coordonate : (%d, %d)\n", pos.x, pos.y);
 		return;
 	}
-	if (tile < 0 || tile >= Map.Tileset->NumTiles) {
-		fprintf(stderr, "Invalid tile number: %d\n", tile);
+	if (tileIndex < 0 || tileIndex >= Map.Tileset->NumTiles) {
+		fprintf(stderr, "Invalid tile number: %d\n", tileIndex);
 		return;
 	}
 	if (value < 0 || value >= 256) {
-		fprintf(stderr, "Invalid tile number: %d\n", tile);
+		fprintf(stderr, "Invalid tile number: %d\n", tileIndex);
 		return;
 	}
 
 	if (Map.Fields) {
 		CMapField &mf = *Map.Field(pos);
 
-		mf.Tile = Map.Tileset->Table[tile];
-		mf.Value = value;
-		mf.Flags = Map.Tileset->FlagsTable[tile];
-		mf.Cost = 1 << (Map.Tileset->FlagsTable[tile] & MapFieldSpeedMask);
-#ifdef DEBUG
-		mf.TilesetTile = tile;
-#endif
+		mf.setTileIndex(*Map.Tileset, tileIndex, value);
 	}
 }
 

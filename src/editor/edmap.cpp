@@ -98,15 +98,9 @@ static void EditorChangeTile(const Vec2i &pos, int tileIndex, int d)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
-	ChangeTile(pos, Map.Tileset->Table[tileIndex]);
-
 	// Change the flags
 	CMapField &mf = *Map.Field(pos);
-	mf.Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed
-				  | MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable
-				  | MapFieldWall | MapFieldRocks | MapFieldForest);
-
-	mf.Flags |= Map.Tileset->FlagsTable[tileIndex];
+	mf.setTileIndex(*Map.Tileset, tileIndex, 0);
 
 	UI.Minimap.UpdateSeenXY(pos);
 	UI.Minimap.UpdateXY(pos);

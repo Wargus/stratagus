@@ -38,11 +38,13 @@
 
 #include "map.h"
 
+#include "iolib.h"
 #include "player.h"
 #include "tileset.h"
 #include "unit.h"
 #include "unit_manager.h"
 #include "ui.h"
+#include "version.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------
@@ -176,66 +178,6 @@ PixelPos CMap::TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos) const
 PixelPos CMap::TilePosToMapPixelPos_Center(const Vec2i &tilePos) const
 {
 	return TilePosToMapPixelPos_TopLeft(tilePos) + PixelTileSize / 2;
-}
-
-bool CMapField::IsTerrainResourceOnMap(int resource) const
-{
-	// TODO: Hard coded stuff.
-	if (resource == WoodCost) {
-		return this->ForestOnMap();
-	}
-	return false;
-}
-
-bool CMapField::IsTerrainResourceOnMap() const
-{
-	for (int i = 0; i != MaxCosts; ++i) {
-		if (IsTerrainResourceOnMap(i)) {
-			return true;
-		}
-	}
-	return false;
-}
-
-unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) const
-{
-	if (IsVisible(player)) {
-		return 2;
-	}
-
-	unsigned char maxVision = 0;
-	if (IsExplored(player)) {
-		maxVision = 1;
-	}
-
-	for (int i = 0; i != PlayerMax ; ++i) {
-		if (player.IsBothSharedVision(Players[i])) {
-			maxVision = std::max<unsigned char>(maxVision, Visible[i]);
-			if (maxVision >= 2) {
-				return 2;
-			}
-		}
-	}
-	if (maxVision == 1 && Map.NoFogOfWar) {
-		return 2;
-	}
-	return maxVision;
-}
-
-bool CMapFieldPlayerInfo::IsExplored(const CPlayer &player) const
-{
-	return Visible[player.Index] != 0;
-}
-
-bool CMapFieldPlayerInfo::IsVisible(const CPlayer &player) const
-{
-	const bool fogOfWar = !Map.NoFogOfWar;
-	return Visible[player.Index] >= 2 || (!fogOfWar && IsExplored(player));
-}
-
-bool CMapFieldPlayerInfo::IsTeamVisible(const CPlayer &player) const
-{
-	return TeamVisibilityState(player) == 2;
 }
 
 /**
@@ -419,6 +361,41 @@ void CMap::Clean()
 	UI.Minimap.Destroy();
 }
 
+
+
+/**
+** Save the complete map.
+**
+** @param file Output file.
+*/
+void CMap::Save(CFile &file) const
+{
+	file.printf("\n--- -----------------------------------------\n");
+	file.printf("--- MODULE: map\n");
+	file.printf("LoadTileModels(\"%s\")\n\n", this->TileModelsFileName.c_str());
+	file.printf("StratagusMap(\n");
+	file.printf("  \"version\", \"%s\",\n", VERSION);
+	file.printf("  \"description\", \"%s\",\n", this->Info.Description.c_str());
+	file.printf("  \"the-map\", {\n");
+	file.printf("  \"size\", {%d, %d},\n", this->Info.MapWidth, this->Info.MapHeight);
+	file.printf("  \"%s\",\n", this->NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
+	file.printf("  \"filename\", \"%s\",\n", this->Info.Filename.c_str());
+	file.printf("  \"map-fields\", {\n");
+	for (int h = 0; h < this->Info.MapHeight; ++h) {
+		file.printf("  -- %d\n", h);
+		for (int w = 0; w < this->Info.MapWidth; ++w) {
+			const CMapField &mf = *this->Field(w, h);
+
+			mf.Save(file);
+			if (w & 1) {
+				file.printf(",\n");
+			} else {
+				file.printf(", ");
+			}
+		}
+	}
+	file.printf("}})\n");
+}
 
 /*----------------------------------------------------------------------------
 -- Map Tile Update Functions
