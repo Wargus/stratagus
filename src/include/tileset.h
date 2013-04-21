@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __TILESET_H__
-#define __TILESET_H__
+#ifndef TILESET_H
+#define TILESET_H
 
 //@{
 
@@ -112,6 +112,7 @@ public:
 	int getTileIndexBySurrounding(unsigned short type,
 								  unsigned int up, unsigned int right,
 								  unsigned int bottom, unsigned int left) const;
+	int tileFromQuad(unsigned fixed, unsigned quad) const;
 
 public:
 	void parse(lua_State *l);
@@ -124,7 +125,7 @@ private:
 	void parseSpecial(lua_State *l);
 	void parseSolid(lua_State *l);
 	void parseMixed(lua_State *l);
-
+	int findTilePath(int base, int goal, int length, std::vector<char> &marks, int *tileIndex) const;
 public:
 	std::string Name;           /// Nice name to display
 	std::string ImageFile;      /// File containing image data
@@ -136,33 +137,32 @@ public:
 	std::vector<TileInfo> Tiles; /// Tile descriptions
 
 	// TODO: currently hardcoded
-	std::vector<unsigned char> TileTypeTable;   /// For fast lookup of tile type
+	std::vector<unsigned char> TileTypeTable;  /// For fast lookup of tile type
 private:
 	std::vector<SolidTerrainInfo> SolidTerrainTypes; /// Information about solid terrains.
 public:
-	std::vector<int> MixedLookupTable;   /// Lookup for what part of tile used
+	std::vector<int> MixedLookupTable;  /// Lookup for what part of tile used
 private:
-	unsigned TopOneTree;     /// Tile for one tree top
-	unsigned MidOneTree;     /// Tile for one tree middle
-	unsigned BotOneTree;     /// Tile for one tree bottom
-	int RemovedTree;         /// Tile placed where trees are gone
-	int WoodTable[20];       /// Table for tree removable
-	unsigned TopOneRock;     /// Tile for one rock top
-	unsigned MidOneRock;     /// Tile for one rock middle
-	unsigned BotOneRock;     /// Tile for one rock bottom
-	int RemovedRock;         /// Tile placed where rocks are gone
-	int RockTable[20];       /// Removed rock placement table
-	unsigned HumanWallTable[16];    /// Human wall placement table
-	unsigned OrcWallTable[16];      /// Orc wall placement table
+	unsigned TopOneTree;   /// Tile for one tree top
+	unsigned MidOneTree;   /// Tile for one tree middle
+	unsigned BotOneTree;   /// Tile for one tree bottom
+	unsigned RemovedTree;  /// Tile placed where trees are gone
+	int WoodTable[20];     /// Table for tree removable
+	unsigned TopOneRock;   /// Tile for one rock top
+	unsigned MidOneRock;   /// Tile for one rock middle
+	unsigned BotOneRock;   /// Tile for one rock bottom
+	unsigned RemovedRock;  /// Tile placed where rocks are gone
+	int RockTable[20];     /// Removed rock placement table
+	unsigned HumanWallTable[16];  /// Human wall placement table
+	unsigned OrcWallTable[16];    /// Orc wall placement table
 };
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void CleanTilesets(); /// Cleanup the tileset module
 extern void TilesetCclRegister(); /// Register CCL features for tileset
 
 //@}
 
-#endif // !__TILESET_H__
+#endif // !TILESET_H

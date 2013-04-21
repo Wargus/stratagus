@@ -1031,7 +1031,6 @@ void CleanGame()
 	CleanMissiles();
 	CleanUnits();
 	CleanSelections();
-	CleanTilesets();
 	Map.Clean();
 	CleanReplayLog();
 	FreePathfinder();

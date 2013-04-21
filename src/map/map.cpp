@@ -43,6 +43,7 @@
 #include "unit.h"
 #include "unit_manager.h"
 #include "ui.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -409,6 +410,7 @@ void CMap::Clean()
 	this->NoFogOfWar = false;
 	this->Tileset->Clear();
 	this->TileModelsFileName.clear();
+	CGraphic::Free(this->TileGraphic);
 	this->TileGraphic = NULL;
 
 	FlagRevealMap = 0;
