@@ -243,7 +243,6 @@ void CViewport::DrawMapBackgroundInViewport() const
 	int sy = this->MapPos.y;
 	int dy = this->TopLeftPos.y - this->Offset.y;
 	const int map_max = Map.Info.MapWidth * Map.Info.MapHeight;
-	unsigned short int tile;
 
 	while (sy  < 0) {
 		sy++;
@@ -252,14 +251,6 @@ void CViewport::DrawMapBackgroundInViewport() const
 	sy *=  Map.Info.MapWidth;
 
 	while (dy <= ey && sy  < map_max) {
-
-		/*
-			if (sy / Map.Info.MapWidth < 0) {
-				sy += Map.Info.MapWidth;
-				dy += PixelTileSize.y;
-				continue;
-			}
-		*/
 		int sx = this->MapPos.x + sy;
 		int dx = this->TopLeftPos.x - this->Offset.x;
 		while (dx <= ex && (sx - sy < Map.Info.MapWidth)) {
@@ -268,49 +259,14 @@ void CViewport::DrawMapBackgroundInViewport() const
 				dx += PixelTileSize.x;
 				continue;
 			}
-
+			const CMapField &mf = Map.Fields[sx];
+			unsigned short int tile;
 			if (ReplayRevealMap) {
-				tile = Map.Fields[sx].Tile;
+				tile = mf.Tile;
 			} else {
-				tile = Map.Fields[sx].playerInfo.SeenTile;
+				tile = mf.playerInfo.SeenTile;
 			}
 			Map.TileGraphic->DrawFrameClip(tile, dx, dy);
-
-#ifdef DEBUG
-#ifdef DEBUGMAPDRAW
-			int my_mask = 0;
-			unsigned int color = 0;
-			if (Map.CheckMask(sx, MapFieldUnpassable)) {
-				my_mask = 1;
-			}
-			if (Map.CheckMask(sx, MapFieldNoBuilding)) {
-				my_mask |= 2;
-			}
-			switch (my_mask) {
-				case 1://tile only Unpassable
-					color = 0xFF0000;
-					break;
-				case 2://tile only NoBuilding
-					color = 0x00FF00;
-					break;
-				case 3://tile Unpassable and NoBuilding
-					color = 0xFF;
-					break;
-				default:
-					break;
-			}
-
-			Video.DrawHLineClip(color, dx, dy, PixelTileSize.x);
-			Video.DrawVLineClip(color, dx, dy, PixelTileSize.y);
-			if (0 && my_mask) {
-				CLabel label(GetSmallFont());
-				label.Draw(dx + 2, dy + 2, tile);
-				label.Draw(dx + 2, dy + GetSmallFont()->Height() + 4,
-						   Map.Fields[sx].TilesetTile);
-
-			}
-#endif
-#endif
 			++sx;
 			dx += PixelTileSize.x;
 		}

@@ -49,10 +49,6 @@
 #include "../video/intern_video.h"
 
 /*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
@@ -69,7 +65,7 @@ static const int FogTable[16] = {
 	0, 11, 10, 2,  13, 6, 14, 3,  12, 15, 4, 1,  8, 9, 7, 0,
 };
 
-static unsigned short *VisibleTable;
+static std::vector<unsigned short> VisibleTable;
 
 static SDL_Surface *OnlyFogSurface;
 static CGraphic *AlphaFogG;
@@ -77,7 +73,6 @@ static CGraphic *AlphaFogG;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
 
 class _filter_flags
 {
@@ -100,8 +95,7 @@ private:
 **  Find out what the tile flags are a tile is covered by fog
 **
 **  @param player  player who is doing operation
-**  @param x       X map location
-**  @param y       Y map location
+**  @param index   map location
 **  @param mask    input mask to filter
 **
 **  @return        Filtered mask after taking fog into account
@@ -214,8 +208,7 @@ static void UnitsOnTileUnmarkSeen(const CPlayer &player, CMapField &mf, int cloa
 **  Mark a tile's sight. (Explore and make visible.)
 **
 **  @param player  Player to mark sight.
-**  @param x       X tile to mark.
-**  @param y       Y tile to mark.
+**  @param index   tile to mark.
 */
 void MapMarkTileSight(const CPlayer &player, const unsigned int index)
 {
@@ -242,13 +235,11 @@ void MapMarkTileSight(const CPlayer &player, const Vec2i &pos)
 	MapMarkTileSight(player, Map.getIndex(pos));
 }
 
-
 /**
 **  Unmark a tile's sight. (Explore and make visible.)
 **
 **  @param player  Player to mark sight.
-**  @param x       X tile to mark.
-**  @param y       Y tile to mark.
+**  @param indexx  tile to mark.
 */
 void MapUnmarkTileSight(const CPlayer &player, const unsigned int index)
 {
@@ -280,13 +271,11 @@ void MapUnmarkTileSight(const CPlayer &player, const Vec2i &pos)
 	MapUnmarkTileSight(player, Map.getIndex(pos));
 }
 
-
 /**
 **  Mark a tile for cloak detection.
 **
 **  @param player  Player to mark sight.
-**  @param x       X tile to mark.
-**  @param y       Y tile to mark.
+**  @param index   Tile to mark.
 */
 void MapMarkTileDetectCloak(const CPlayer &player, const unsigned int index)
 {
@@ -304,13 +293,11 @@ void MapMarkTileDetectCloak(const CPlayer &player, const Vec2i &pos)
 	MapMarkTileDetectCloak(player, Map.getIndex(pos));
 }
 
-
 /**
 **  Unmark a tile for cloak detection.
 **
 **  @param player  Player to mark sight.
-**  @param x       X tile to mark.
-**  @param y       Y tile to mark.
+**  @param index   tile to mark.
 */
 void MapUnmarkTileDetectCloak(const CPlayer &player, const unsigned int index)
 {
@@ -753,8 +740,8 @@ void CMap::InitFogOfWar()
 		AlphaFogG->UseDisplayFormat();
 	}
 
-	delete[] VisibleTable;
-	VisibleTable = new unsigned short[Info.MapWidth * Info.MapHeight];
+	VisibleTable.clear();
+	VisibleTable.resize(Info.MapWidth * Info.MapHeight);
 }
 
 /**
@@ -762,8 +749,7 @@ void CMap::InitFogOfWar()
 */
 void CMap::CleanFogOfWar()
 {
-	delete[] VisibleTable;
-	VisibleTable = NULL;
+	VisibleTable.clear();
 
 	CGraphic::Free(Map.FogGraphic);
 	FogGraphic = NULL;
