@@ -488,7 +488,11 @@ int CTileset::getTileIndexBySurrounding(unsigned short type,
 	}
 
 	Assert(type == MapFieldForest || type == MapFieldRocks);
+#ifdef _MSC_VER
+	const int *lookuptable = (type == MapFieldForest) ? WoodTable : RockTable;
+#else
 	const int (&lookuptable)[20] = (type == MapFieldForest) ? WoodTable : RockTable;
+#endif
 	tile = lookuptable[tile];
 
 	//If tile is -1, then we should check if we are to draw just one tree
