@@ -7,10 +7,10 @@ struct CPosition
 	float y;
 };
 
-class GraphicAnimation : public Animation
+class GraphicAnimation
 {
 	GraphicAnimation(CGraphic *g, int ticksPerFrame);
-	virtual Animation * clone();
+	virtual GraphicAnimation * clone();
 };
 
 class CParticle
@@ -21,25 +21,25 @@ class CParticle
 class StaticParticle : public CParticle
 {
 public:
-	StaticParticle(CPosition position, Animation *animation);
+	StaticParticle(CPosition position, GraphicAnimation *animation);
 };
 
 class CChunkParticle : public CParticle
 {
 public:
-	CChunkParticle(CPosition position, Animation *smokeAnimation, Animation *debrisAnimation, Animation *destroyAnimation, int minVelocity = 0, int maxVelocity = 400, int minTrajectoryAngle = 77, int maxTTL = 0);
+	CChunkParticle(CPosition position, GraphicAnimation *smokeAnimation, GraphicAnimation *debrisAnimation, GraphicAnimation *destroyAnimation, int minVelocity = 0, int maxVelocity = 400, int minTrajectoryAngle = 77, int maxTTL = 0);
 };
 
 class CSmokeParticle : public CParticle
 {
 public:
-	CSmokeParticle(CPosition position, Animation *animation, float speedx = 0, float speedy = -22.0);
+	CSmokeParticle(CPosition position, GraphicAnimation *animation, float speedx = 0, float speedy = -22.0);
 };
 
 class CRadialParticle : public CParticle
 {
 public:
-	CRadialParticle(CPosition position, Animation *smokeAnimation, int maxSpeed);
+	CRadialParticle(CPosition position, GraphicAnimation *smokeAnimation, int maxSpeed);
 };
 
 class CParticleManager

@@ -31,8 +31,8 @@
 
 #include "stratagus.h"
 #include "particle.h"
-#include "video.h"
 #include "ui.h"
+#include "video.h"
 
 
 CParticleManager ParticleManager;
@@ -76,7 +76,9 @@ void CParticleManager::draw(const CViewport &vp)
 
 	std::vector<CParticle *>::iterator i;
 	for (i = particles.begin(); i != particles.end(); ++i) {
-		(*i)->draw();
+		if ((*i)->isVisible(vp)) {
+			(*i)->draw();
+		}
 	}
 
 	this->vp = NULL;
