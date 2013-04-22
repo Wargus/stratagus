@@ -197,8 +197,10 @@
 
 #include "tileset.h"
 
-#include "map.h"
+#include "tile.h"
 #include "video.h"
+
+#include <limits.h>
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -213,20 +215,6 @@ PixelSize PixelTileSize(32, 32);
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
-
-/**
-** Cleanup the tileset module.
-**
-** @note this didn't frees the configuration memory.
-*/
-void CleanTilesets()
-{
-	Map.Tileset->Clear();
-
-	// Should this be done by the map?
-	CGraphic::Free(Map.TileGraphic);
-	Map.TileGraphic = NULL;
-}
 
 void CTileset::Clear()
 {
@@ -334,6 +322,142 @@ int CTileset::getTileIndex(unsigned char baseTerrain, unsigned char mixTerrain, 
 	return base | (table[direction] << 4);
 }
 
+/**
+**  Find a tile path.
+**
+**  @param base    Start tile type.
+**  @param goal    Goal tile type.
+**  @param length  Best found path length.
+**  @param marks   Already visited tile types.
+**  @param tileIndex    Tile pointer.
+*/
+int CTileset::findTilePath(int base, int goal, int length, std::vector<char> &marks, int *tileIndex) const
+{
+	int tileres = findTileIndex(base, goal);
+	if (tileres == -1) {
+		tileres = findTileIndex(goal, base);
+	}
+	if (tileres != -1) {
+		*tileIndex = tileres;
+		return length;
+	}
+	// Find any mixed tile
+	int l = INT_MAX;
+	for (int i = 0; i < NumTiles;) {
+		int j = 0;
+		if (base == Tiles[i].BaseTerrain) {
+			j = Tiles[i].MixTerrain;
+		} else if (base == Tiles[i].MixTerrain) {
+			j = Tiles[i].BaseTerrain;
+		}
+		if (j != 0 && marks[j] == 0) { // possible path found
+			marks[j] = j;
+			int dummytileIndex;
+			const int n = findTilePath(j, goal, length + 1, marks, &dummytileIndex);
+			marks[j] = 0;
+			if (n < l) {
+				*tileIndex = i;
+				l = n;
+			}
+		}
+		// Advance solid or mixed.
+		if (Tiles[i].MixTerrain == 0) {
+			i += 16;
+		} else {
+			i += 256;
+		}
+	}
+	return l;
+}
+
+/**
+**  Get tile from quad.
+**
+**  @param fixed  Part can't be changed.
+**  @param quad   Quad of the tile type.
+**  @return       Best matching tile.
+*/
+int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
+{
+	unsigned type1;
+	unsigned type2;
+
+	// Get tile type from fixed.
+	while (!(type1 = (fixed & 0xFF))) {
+		fixed >>= 8;
+		if (!fixed) {
+			abort();
+		}
+	}
+	fixed >>= 8;
+	while (!(type2 = (fixed & 0xFF)) && fixed) {
+		fixed >>= 8;
+	}
+	// Need an second type.
+	if (!type2 || type2 == type1) {
+		fixed = quad;
+		while ((type2 = (fixed & 0xFF)) == type1 && fixed) {
+			fixed >>= 8;
+		}
+		if (type1 == type2) { // Oooh a solid tile.
+			const int res = findTileIndex(type1);
+			Assert(res != -1);
+			return res;
+		}
+	} else {
+		std::vector<char> marks;
+		int dummytileIndex;
+
+		marks.resize(getSolidTerrainCount(), 0);
+
+		marks[type1] = type1;
+		marks[type2] = type2;
+
+		// What fixed tile-type should replace the non useable tile-types.
+		for (int i = 0; i != 4; ++i) {
+			unsigned int type3 = (quad >> (8 * i)) & 0xFF;
+			if (type3 != type1 && type3 != type2) {
+				quad &= ~(0xFF << (8 * i));
+				if (findTilePath(type1, type3, 0, marks, &dummytileIndex) < findTilePath(type2, fixed, 0, marks, &dummytileIndex)) {
+					quad |= type1 << (8 * i);
+				} else {
+					quad |= type2 << (8 * i);
+				}
+			}
+		}
+	}
+
+	// Need a mixed tile
+	int tileIndex = getTileIndex(type1, type2, quad);
+	if (tileIndex != -1) {
+		return tileIndex;
+	}
+	// Find the best tile path.
+	std::vector<char> marks;
+	marks.resize(getSolidTerrainCount(), 0);
+	marks[type1] = type1;
+	if (findTilePath(type1, type2, 0, marks, &tileIndex) == INT_MAX) {
+		DebugPrint("Huch, no mix found!!!!!!!!!!!\n");
+		const int res = findTileIndex(type1);
+		Assert(res != -1);
+		return res;
+	}
+	if (type1 == Tiles[tileIndex].MixTerrain) {
+		// Other mixed
+		std::swap(type1, type2);
+	}
+	int base = tileIndex;
+	int direction = 0;
+	for (int i = 0; i != 4; ++i) {
+		if (((quad >> (8 * i)) & 0xFF) == type1) {
+			direction |= 1 << i;
+		}
+	}
+	//                       0  1  2  3   4  5  6  7   8  9  A   B  C   D  E  F
+	const char table[16] = { 0, 7, 3, 11, 1, 9, 5, 13, 0, 8, 4, 12, 2, 10, 6, 0 };
+	return base | (table[direction] << 4);
+}
+
 int CTileset::getTileIndexBySurrounding(unsigned short type,
 										unsigned int ttup, unsigned int ttright,
 										unsigned int ttdown, unsigned int ttleft) const
@@ -364,7 +488,11 @@ int CTileset::getTileIndexBySurrounding(unsigned short type,
 	}
 
 	Assert(type == MapFieldForest || type == MapFieldRocks);
+#ifdef _MSC_VER
+	const int *lookuptable = (type == MapFieldForest) ? WoodTable : RockTable;
+#else
 	const int (&lookuptable)[20] = (type == MapFieldForest) ? WoodTable : RockTable;
+#endif
 	tile = lookuptable[tile];
 
 	//If tile is -1, then we should check if we are to draw just one tree
@@ -395,7 +523,7 @@ int CTileset::findTileIndexByTile(unsigned int tile) const
 **  @param random  Return random tile
 **  @param filler  Get a decorated tile.
 **
-**  @return        Tile number.
+**  @return        Tile index number.
 **
 **  @todo  FIXME: Solid tiles are here still hardcoded.
 */
@@ -420,7 +548,7 @@ unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
 			}
 		} while (i < 16 && n--);
 		Assert(i != 16);
-		return Table[tile + i];
+		return tile + i;
 	}
 	if (filler) {
 		int i = 0;
@@ -429,10 +557,10 @@ unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
 		for (; i < 16 && !Table[tile + i]; ++i) {
 		}
 		if (i != 16) {
-			return Table[tile + i];
+			return tile + i;
 		}
 	}
-	return Table[tile];
+	return tile;
 }
 
 /**
@@ -484,11 +612,11 @@ unsigned CTileset::getQuadFromTile(unsigned int tile) const
 
 void CTileset::fillSolidTiles(std::vector<unsigned int> *tiles) const
 {
-	for (int i = 16; i < Map.Tileset->NumTiles; i += 16) {
-		const TileInfo &info = Map.Tileset->Tiles[i];
+	for (int i = 16; i < NumTiles; i += 16) {
+		const TileInfo &info = Tiles[i];
 
 		if (info.BaseTerrain && info.MixTerrain == 0) {
-			tiles->push_back(Map.Tileset->Table[i]);
+			tiles->push_back(Table[i]);
 		}
 	}
 }
@@ -548,5 +676,4 @@ unsigned CTileset::getOrcWallTile_destroyed(int index) const
 	tile = Table[tile];
 	return tile;
 }
-
 //@}

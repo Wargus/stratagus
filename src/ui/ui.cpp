@@ -85,7 +85,7 @@ void ShowLoadProgress(const char *fmt, ...)
 	temp[sizeof(temp) - 1] = '\0';
 	va_end(va);
 
-	if (Video.Depth && GetGameFont().IsLoaded()) {
+	if (Video.Depth && IsGameFontReady() && GetGameFont().IsLoaded()) {
 		// Remove non printable chars
 		for (char *s = temp; *s; ++s) {
 			if (*s < 32) {
