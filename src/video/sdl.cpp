@@ -629,15 +629,22 @@ void InitVideoSdl()
 	}
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	Video.ViewportWidth = Video.Width;
-	Video.ViewportHeight = Video.Height;
-#endif
-
+	if (!Video.ViewportWidth || !Video.ViewportHeight) {
+		Video.ViewportWidth = Video.Width;
+		Video.ViewportHeight = Video.Height;
+	}
+	TheScreen = SDL_SetVideoMode(Video.ViewportWidth, Video.ViewportHeight, Video.Depth, flags);
+#else
 	TheScreen = SDL_SetVideoMode(Video.Width, Video.Height, Video.Depth, flags);
+#endif
 	if (TheScreen && (TheScreen->format->BitsPerPixel != 16
 					  && TheScreen->format->BitsPerPixel != 32)) {
 		// Only support 16 and 32 bpp, default to 16
+#if defined(USE_OPENGL) || defined(USE_GLES)
+		TheScreen = SDL_SetVideoMode(Video.ViewportWidth, Video.ViewportHeight, 16, flags);
+#else
 		TheScreen = SDL_SetVideoMode(Video.Width, Video.Height, 16, flags);
+#endif
 	}
 	if (TheScreen == NULL) {
 		fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
@@ -802,8 +809,15 @@ void Invalidate()
 **  @param callbacks  Callback structure for events.
 **  @param event      SDL event structure pointer.
 */
-static void SdlDoEvent(const EventCallback &callbacks, const SDL_Event &event)
+static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 {
+#if (defined(USE_OPENGL) || defined(USE_GLES)) && defined(USE_TOUCHSCREEN)
+	// Translate touch-coordinates
+	if (ZoomNoResize && (event.type & (SDL_MOUSEBUTTONUP | SDL_MOUSEBUTTONDOWN | SDL_MOUSEMOTION))) {
+		event.button.x = (Uint16)floor(event.button.x * float(Video.Width) / Video.ViewportWidth);
+		event.button.y = (Uint16)floor(event.button.y * float(Video.Height) / Video.ViewportHeight);
+	}
+#endif
 	switch (event.type) {
 		case SDL_MOUSEBUTTONDOWN:
 			InputMouseButtonPress(callbacks, SDL_GetTicks(), event.button.button);

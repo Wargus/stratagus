@@ -571,6 +571,14 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 					Usage();
 					ExitFatal(-1);
 				}
+#if defined(USE_OPENGL) || defined(USE_GLES)
+				if (ZoomNoResize) {
+					Video.ViewportHeight = Video.Height;
+					Video.ViewportWidth = Video.Width;
+					Video.Height = 0;
+					Video.Width = 0;
+				}
+#endif
 				continue;
 			}
 			case 'W':
@@ -582,6 +590,10 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				ForceUseOpenGL = 1;
 				UseOpenGL = 1;
 				ZoomNoResize = 1;
+				Video.ViewportHeight = Video.Height;
+				Video.ViewportWidth = Video.Width;
+				Video.Height = 0;
+				Video.Width = 0;
 				continue;
 #endif
 			case -1:
