@@ -113,10 +113,8 @@ void CMap::MarkSeenTile(CMapField &mf)
 			FixNeighbors(MapFieldRocks, 1, pos);
 
 			//  Handle Walls changes.
-		} else if (this->Tileset->TileTypeTable[tile] == TileTypeHumanWall
-				   || this->Tileset->TileTypeTable[tile] == TileTypeOrcWall
-				   || this->Tileset->TileTypeTable[seentile] == TileTypeHumanWall
-				   || this->Tileset->TileTypeTable[seentile] == TileTypeOrcWall) {
+		} else if (this->Tileset->isAWallTile(tile)
+				   || this->Tileset->isAWallTile(seentile)) {
 			MapFixSeenWallTile(pos);
 			MapFixSeenWallNeighbors(pos);
 		}
@@ -350,7 +348,7 @@ void CMap::Clean()
 	this->Info.Clear();
 	this->Fields = NULL;
 	this->NoFogOfWar = false;
-	this->Tileset->Clear();
+	this->Tileset->clear();
 	this->TileModelsFileName.clear();
 	CGraphic::Free(this->TileGraphic);
 	this->TileGraphic = NULL;
@@ -419,9 +417,13 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	unsigned int index = getIndex(pos);
 	CMapField &mf = *this->Field(index);
 
-	if (seen && !Tileset->IsSeenTile(type, mf.playerInfo.SeenTile)) {
-		return;
-	} else if (!seen && !(mf.Flags & type)) {
+	if (!((type == MapFieldForest && Tileset->isAWoodTile(mf.playerInfo.SeenTile))
+		|| (type == MapFieldRocks && Tileset->isARockTile(mf.playerInfo.SeenTile)))) {
+		if (seen) {
+			return;
+		}
+	}
+	if (!seen && !(mf.Flags & type)) {
 		return;
 	}
 
@@ -442,32 +444,28 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	int ttright;
 
 	if (pos.y - 1 < 0) {
-		ttup = 15; //Assign trees in all directions
+		ttup = -1; //Assign trees in all directions
 	} else {
 		const CMapField &new_mf = *(&mf - this->Info.MapWidth);
 		ttup = seen ? new_mf.playerInfo.SeenTile : new_mf.Tile;
-		ttup = this->Tileset->MixedLookupTable[ttup];
 	}
 	if (pos.x + 1 >= this->Info.MapWidth) {
-		ttright = 15; //Assign trees in all directions
+		ttright = -1; //Assign trees in all directions
 	} else {
 		const CMapField &new_mf = *(&mf + 1);
 		ttright = seen ? new_mf.playerInfo.SeenTile : new_mf.Tile;
-		ttright = this->Tileset->MixedLookupTable[ttright];
 	}
 	if (pos.y + 1 >= this->Info.MapHeight) {
-		ttdown = 15; //Assign trees in all directions
+		ttdown = -1; //Assign trees in all directions
 	} else {
 		const CMapField &new_mf = *(&mf + this->Info.MapWidth);
 		ttdown = seen ? new_mf.playerInfo.SeenTile : new_mf.Tile;
-		ttdown = this->Tileset->MixedLookupTable[ttdown];
 	}
 	if (pos.x - 1 < 0) {
-		ttleft = 15; //Assign trees in all directions
+		ttleft = -1; //Assign trees in all directions
 	} else {
 		const CMapField &new_mf = *(&mf - 1);
 		ttleft = seen ? new_mf.playerInfo.SeenTile : new_mf.Tile;
-		ttleft = this->Tileset->MixedLookupTable[ttleft];
 	}
 	int tile = this->Tileset->getTileIndexBySurrounding(type, ttup, ttright, ttdown, ttleft);
 
@@ -482,8 +480,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 			mf.Value = 0;
 			UI.Minimap.UpdateXY(pos);
 		}
-	} else if (seen && this->Tileset->MixedLookupTable[mf.playerInfo.SeenTile] ==
-			   this->Tileset->MixedLookupTable[tile]) { //Same Type
+	} else if (seen && this->Tileset->isEquivalentTile(tile, mf.playerInfo.SeenTile)) { //Same Type
 		return;
 	} else {
 		if (seen) {

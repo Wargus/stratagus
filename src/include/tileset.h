@@ -82,13 +82,17 @@ struct SolidTerrainInfo {
 class CTileset
 {
 public:
-	void Clear();
-	bool IsSeenTile(unsigned short type, unsigned short seen) const;
+	void clear();
+	bool isAWallTile(unsigned tileIndex) const;
+	bool isAWoodTile(unsigned tileIndex) const;
+	bool isARockTile(unsigned tileIndex) const;
 
-	unsigned getRemovedRockTile() const { return RemovedRock; }
-	unsigned getRemovedTreeTile() const { return RemovedTree; }
-	unsigned getBottomOneTreeTile() const { return BotOneTree; }
-	unsigned getTopOneTreeTile() const { return TopOneTree; }
+	const PixelSize &getPixelTileSize() const { return pixelTileSize; }
+
+	unsigned getRemovedRockTile() const { return removedRockTile; }
+	unsigned getRemovedTreeTile() const { return removedTreeTile; }
+	unsigned getBottomOneTreeTile() const { return botOneTreeTile; }
+	unsigned getTopOneTreeTile() const { return topOneTreeTile; }
 
 	unsigned getHumanWallTile(int index) const;
 	unsigned getOrcWallTile(int index) const;
@@ -97,7 +101,6 @@ public:
 	unsigned getHumanWallTile_destroyed(int index) const;
 	unsigned getOrcWallTile_destroyed(int index) const;
 
-public:
 	unsigned int getSolidTerrainCount() const;
 
 	const std::string &getTerrainName(int solidTerrainIndex) const;
@@ -110,11 +113,11 @@ public:
 
 	unsigned getQuadFromTile(unsigned int tile) const;
 	int getTileIndexBySurrounding(unsigned short type,
-								  unsigned int up, unsigned int right,
-								  unsigned int bottom, unsigned int left) const;
+								  int up, int right,
+								  int bottom, int left) const;
 	int tileFromQuad(unsigned fixed, unsigned quad) const;
+	bool isEquivalentTile(unsigned int tile1, unsigned int tile2) const;
 
-public:
 	void parse(lua_State *l);
 	void buildTable(lua_State *l);
 
@@ -131,7 +134,6 @@ public:
 	std::string ImageFile;      /// File containing image data
 
 	int NumTiles;               /// Number of tiles in the tables
-	PixelSize PixelTileSize;    /// Size of a tile in pixel
 	std::vector<unsigned short> Table;      /// Pud to Internal conversion table
 	std::vector<unsigned short> FlagsTable; /// Flag table for editor
 	std::vector<TileInfo> Tiles; /// Tile descriptions
@@ -139,22 +141,21 @@ public:
 	// TODO: currently hardcoded
 	std::vector<unsigned char> TileTypeTable;  /// For fast lookup of tile type
 private:
-	std::vector<SolidTerrainInfo> SolidTerrainTypes; /// Information about solid terrains.
-public:
-	std::vector<int> MixedLookupTable;  /// Lookup for what part of tile used
-private:
-	unsigned TopOneTree;   /// Tile for one tree top
-	unsigned MidOneTree;   /// Tile for one tree middle
-	unsigned BotOneTree;   /// Tile for one tree bottom
-	unsigned RemovedTree;  /// Tile placed where trees are gone
-	int WoodTable[20];     /// Table for tree removable
-	unsigned TopOneRock;   /// Tile for one rock top
-	unsigned MidOneRock;   /// Tile for one rock middle
-	unsigned BotOneRock;   /// Tile for one rock bottom
-	unsigned RemovedRock;  /// Tile placed where rocks are gone
-	int RockTable[20];     /// Removed rock placement table
-	unsigned HumanWallTable[16];  /// Human wall placement table
-	unsigned OrcWallTable[16];    /// Orc wall placement table
+	PixelSize pixelTileSize;    /// Size of a tile in pixel
+	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
+	std::vector<int> mixedLookupTable;  /// Lookup for what part of tile used
+	unsigned topOneTreeTile;   /// Tile for one tree top
+	unsigned midOneTreeTile;   /// Tile for one tree middle
+	unsigned botOneTreeTile;   /// Tile for one tree bottom
+	unsigned removedTreeTile;  /// Tile placed where trees are gone
+	int woodTable[20];     /// Table for tree removable
+	unsigned topOneRockTile;   /// Tile for one rock top
+	unsigned midOneRockTile;   /// Tile for one rock middle
+	unsigned botOneRockTile;   /// Tile for one rock bottom
+	unsigned removedRockTile;  /// Tile placed where rocks are gone
+	int rockTable[20];     /// Removed rock placement table
+	unsigned humanWallTable[16];  /// Human wall placement table
+	unsigned orcWallTable[16];    /// Orc wall placement table
 };
 
 /*----------------------------------------------------------------------------

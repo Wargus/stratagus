@@ -69,11 +69,12 @@
 */
 static int MapIsSeenTileWall(int x, int y, int walltype)
 {
-	int t = Map.Tileset->TileTypeTable[Map.Field(x, y)->playerInfo.SeenTile];
+	unsigned int tileIndex = Map.Field(x, y)->playerInfo.SeenTile;
 
 	if (walltype == -1) {
-		return t == TileTypeHumanWall || t == TileTypeOrcWall;
+		return Map.Tileset->isAWallTile(tileIndex);
 	}
+	int t = Map.Tileset->TileTypeTable[tileIndex];
 	return t == walltype;
 }
 
@@ -112,10 +113,11 @@ void MapFixSeenWallTile(const Vec2i &pos)
 	}
 	CMapField &mf = *Map.Field(pos);
 	const CTileset &tileset = *Map.Tileset;
-	const TileType t = TileType(tileset.TileTypeTable[mf.playerInfo.SeenTile]);
-	if (t != TileTypeHumanWall && t != TileTypeOrcWall) {
+	const unsigned tileIndex = mf.playerInfo.SeenTile;
+	if (!tileset.isAWallTile(tileIndex)) {
 		return;
 	}
+	const TileType t = TileType(tileset.TileTypeTable[tileIndex]);
 
 	//  Calculate the correct tile. Depends on the surrounding.
 	int tile = 0;

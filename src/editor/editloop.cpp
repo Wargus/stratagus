@@ -1865,9 +1865,7 @@ void CEditor::Init()
 		const int defaultTile = 0x50;
 
 		for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
-			Map.Fields[i].Tile = Map.Tileset->Table[defaultTile];
-			Map.Fields[i].playerInfo.SeenTile = Map.Fields[i].Tile;
-			Map.Fields[i].Flags = Map.Tileset->FlagsTable[defaultTile];
+			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
 		}
 		GameSettings.Resources = SettingsPresetMapDefault;
 		CreateGame("", &Map);
