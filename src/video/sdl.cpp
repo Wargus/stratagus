@@ -655,8 +655,17 @@ void InitVideoSdl()
 	Video.FullScreen = (TheScreen->flags & SDL_FULLSCREEN) ? 1 : 0;
 	Video.Depth = TheScreen->format->BitsPerPixel;
 
+#if defined(USE_TOUCHSCREEN) && defined(USE_WIN32)
+	// Must not allow SDL to switch to relative mouse coordinates
+	// with touchscreen when going fullscreen. So we don't hide the
+	// cursor, but instead set a transparent 1px cursor
+	Uint8 emptyCursor[] = {'\0'};
+	Video.blankCursor = SDL_CreateCursor(emptyCursor, emptyCursor, 1, 1, 0, 0);
+	SDL_SetCursor(Video.blankCursor);
+#else
 	// Turn cursor off, we use our own.
-	SDL_ShowCursor(0);
+	SDL_ShowCursor(SDL_DISABLE);
+#endif
 
 	// Make default character translation easier
 	SDL_EnableUNICODE(1);
@@ -1170,10 +1179,16 @@ void ToggleFullScreen()
 		}
 	}
 
+#ifndef USE_TOUCHSCREEN
+	// Cannot hide cursor on Windows with touchscreen, as it switches
+	// to relative mouse coordinates in fullscreen. See above initial
+	// call to ShowCursor
+	//
 	// Windows shows the SDL cursor when starting in fullscreen mode
 	// then switching to window mode.  This hides the cursor again.
 	SDL_ShowCursor(SDL_ENABLE);
 	SDL_ShowCursor(SDL_DISABLE);
+#endif
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
