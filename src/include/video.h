@@ -402,13 +402,6 @@ extern bool UseGLTextureCompression;
 extern void VideoCclRegister();
 extern void VideoModesRegister();
 
-static Uint32 GetVideoFlags();
-static int GetVideoResolutionsNr();
-static int GetResolutionsWidth();
-static int GetResolutionsHeight();
-static int GetCurrentResolutionsWidth();
-static int GetCurrentResolutionsHeight();
-
 /// initialize the video part
 extern void InitVideo();
 extern void PreInitVideoSdl();

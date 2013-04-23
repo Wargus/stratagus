@@ -511,85 +511,46 @@ static Uint32 GetVideoFlags(){
 	return flags;
 }
 
-static int GetVideoResolutionsNr(lua_State *l)
-{	
-
+int GetAvailableResolutions(lua_State *l)
+{
 	SDL_Rect** modes = SDL_ListModes(NULL, GetVideoFlags());
-	if (modes == (SDL_Rect**)-1) {
-		lua_pushnumber(l, lua_Number(-1));
+	if (modes == (SDL_Rect**)-1 || modes == (SDL_Rect**)0) {
+		lua_pushnil(l);
 	}
 	else {
-		int i = 0;
-		while(modes[i]){
-			i++;
-		}
-		lua_pushnumber(l, lua_Number(i));
-	}
-	
-	return 1;
-}
-
-static int GetResolutionsWidth(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	
-	SDL_Rect** modes = SDL_ListModes(NULL, GetVideoFlags());
-	
-	if (modes == (SDL_Rect**)-1) {
-		lua_pushnumber(l, lua_Number(0));
-	}
-	else{
-		if(modes[LuaToNumber(l, 1)]){
-			lua_pushnumber(l, lua_Number(modes[LuaToNumber(l, 1)]->w));
-		}
-		else{
-			lua_pushnumber(l, lua_Number(-1));
+		lua_newtable(l);
+		int mainTable = lua_gettop(l);
+		int index = 0;
+		
+		for(int i=0;modes[i];++i){
+			lua_newtable(l);
+			int subTable = lua_gettop(l);
+			lua_pushnumber(l, lua_Number(modes[i]->w));
+			lua_rawseti(l, subTable, 1);
+			lua_pushnumber(l, lua_Number(modes[i]->h));
+			lua_rawseti(l, subTable, 2);
+			
+			lua_rawseti(l, mainTable, ++index);
 		}
 	}
 	
 	return 1;
 }
 
-static int GetResolutionsHeight(lua_State *l)
+int GetCurrentResolution(lua_State *l)
 {
-	LuaCheckArgs(l, 1);
-	
-	SDL_Rect** modes = SDL_ListModes(NULL, GetVideoFlags());
-	
-	if (modes == (SDL_Rect**)-1) {
-		lua_pushnumber(l, lua_Number(0));
-	}
-	else{
-		if(modes[LuaToNumber(l, 1)]){
-			lua_pushnumber(l, lua_Number(modes[LuaToNumber(l, 1)]->h));
-		}
-		else{
-			lua_pushnumber(l, lua_Number(-1));
-		}
-	}
-	
-	return 1;
-}
-
-static int GetCurrentResolutionsWidth(lua_State *l)
-{
+	lua_newtable(l);
+	int mainTable = lua_gettop(l);
 	lua_pushnumber(l, lua_Number(SDL_GetVideoInfo()->current_w));
-	
-	return 1;
-}
-
-static int GetCurrentResolutionsHeight(lua_State *l)
-{
+	lua_rawseti(l, mainTable, 1);
 	lua_pushnumber(l, lua_Number(SDL_GetVideoInfo()->current_h));
+	lua_rawseti(l, mainTable, 2);
 	
 	return 1;
 }
 
 void VideoModesRegister()
 {
-	lua_register(Lua, "GetVideoResolutionsNr", GetVideoResolutionsNr);
-	lua_register(Lua, "GetResolutionsWidth", GetResolutionsWidth);
-	lua_register(Lua, "GetResolutionsHeight", GetResolutionsHeight);
-	lua_register(Lua, "GetCurrentResolutionsWidth", GetCurrentResolutionsWidth);
-	lua_register(Lua, "GetCurrentResolutionsHeight", GetCurrentResolutionsHeight);
+	lua_register(Lua, "GetAvailableResolutions", GetAvailableResolutions);
+	lua_register(Lua, "GetCurrentResolution", GetCurrentResolution);
 }
