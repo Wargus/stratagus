@@ -415,7 +415,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	CMapField &mf = *this->Field(index);
 
 	if (!((type == MapFieldForest && Tileset->isAWoodTile(mf.playerInfo.SeenTile))
-		|| (type == MapFieldRocks && Tileset->isARockTile(mf.playerInfo.SeenTile)))) {
+		  || (type == MapFieldRocks && Tileset->isARockTile(mf.playerInfo.SeenTile)))) {
 		if (seen) {
 			return;
 		}

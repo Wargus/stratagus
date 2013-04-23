@@ -958,7 +958,7 @@ static void DrawEditorInfo()
 
 	// Tile info
 	const CTileset &tileset = *Map.Tileset;
-	const int index = tileset.findTileIndexByTile(mf.Tile);
+	const int index = tileset.findTileIndexByTile(mf.TilesetTile);
 	Assert(index != -1);
 	const int baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
 	const char *baseTerrainStr = tileset.getTerrainName(baseTerrainIdx).c_str();
@@ -1862,8 +1862,7 @@ void CEditor::Init()
 
 		Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
 
-		// Hard coded
-		const int defaultTile = 0x50;
+		const int defaultTile = Map.Tileset->getDefaultTileIndex();
 
 		for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
 			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);

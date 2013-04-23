@@ -66,8 +66,7 @@ public:
 	CTileInfo(unsigned char base, unsigned char mix) : BaseTerrain(base), MixTerrain(mix)
 	{}
 
-	bool operator ==(const CTileInfo &rhs) const
-	{
+	bool operator ==(const CTileInfo &rhs) const {
 		return BaseTerrain == rhs.BaseTerrain && MixTerrain == rhs.MixTerrain;
 	}
 	bool operator !=(const CTileInfo &rhs) const { return !(*this == rhs); }
@@ -99,10 +98,12 @@ public:
 
 	unsigned int getTileCount() const { return tiles.size(); }
 
-	bool isAWallTile(unsigned tileIndex) const;
-	bool isARaceWallTile(unsigned tileIndex, bool human) const;
-	bool isAWoodTile(unsigned tileIndex) const;
-	bool isARockTile(unsigned tileIndex) const;
+	unsigned int getDefaultTileIndex() const;
+
+	bool isAWallTile(unsigned tile) const;
+	bool isARaceWallTile(unsigned tile, bool human) const;
+	bool isAWoodTile(unsigned tile) const;
+	bool isARockTile(unsigned tile) const;
 
 	const PixelSize &getPixelTileSize() const { return pixelTileSize; }
 
@@ -111,22 +112,20 @@ public:
 	unsigned getBottomOneTreeTile() const { return botOneTreeTile; }
 	unsigned getTopOneTreeTile() const { return topOneTreeTile; }
 
-	unsigned getHumanWallTile(int index) const;
-	unsigned getOrcWallTile(int index) const;
-	unsigned getHumanWallTile_broken(int index) const;
-	unsigned getOrcWallTile_broken(int index) const;
-	unsigned getHumanWallTile_destroyed(int index) const;
-	unsigned getOrcWallTile_destroyed(int index) const;
+	unsigned getHumanWallTile(int dirFlag) const;
+	unsigned getOrcWallTile(int dirFlag) const;
+	unsigned getHumanWallTile_broken(int dirFlag) const;
+	unsigned getOrcWallTile_broken(int dirFlag) const;
+	unsigned getHumanWallTile_destroyed(int dirFlag) const;
+	unsigned getOrcWallTile_destroyed(int dirFlag) const;
 
 	unsigned int getSolidTerrainCount() const;
 
 	const std::string &getTerrainName(int solidTerrainIndex) const;
-	int findTileIndex(unsigned char baseTerrain, unsigned char mixTerrain = 0) const;
-	int getTileIndex(unsigned char baseTerrain, unsigned char mixTerrain, unsigned int quad) const;
 
 	int findTileIndexByTile(unsigned int tile) const;
 	unsigned int getTileNumber(int basic, bool random, bool filler) const;
-	void fillSolidTiles(std::vector<unsigned int> *tiles) const;
+	void fillSolidTiles(std::vector<unsigned int> *solidTiles) const;
 
 	unsigned getQuadFromTile(unsigned int tile) const;
 	int getTileIndexBySurrounding(unsigned short type,
@@ -140,6 +139,8 @@ public:
 
 private:
 	unsigned int getOrAddSolidTileIndexByName(const std::string &name);
+	int findTileIndex(unsigned char baseTerrain, unsigned char mixTerrain = 0) const;
+	int getTileIndex(unsigned char baseTerrain, unsigned char mixTerrain, unsigned int quad) const;
 	void buildWallReplacementTable();
 	void parseSlots(lua_State *l, int t);
 	void parseSpecial(lua_State *l);

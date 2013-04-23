@@ -60,23 +60,23 @@
   For the connecting new walls -- all's fine.
 */
 
-static unsigned int getWallTile(const CTileset &tileset, bool humanWall, int index, int value)
+static unsigned int getWallTile(const CTileset &tileset, bool humanWall, int dirFlag, int value)
 {
 	if (humanWall) {
 		if (value == 0) {
-			return tileset.getHumanWallTile_destroyed(index);
+			return tileset.getHumanWallTile_destroyed(dirFlag);
 		} else if (UnitTypeHumanWall && value <= UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
-			return tileset.getHumanWallTile_broken(index);
+			return tileset.getHumanWallTile_broken(dirFlag);
 		} else {
-			return tileset.getHumanWallTile(index);
+			return tileset.getHumanWallTile(dirFlag);
 		}
 	} else { // orcWall
 		if (value == 0) {
-			return tileset.getOrcWallTile_destroyed(index);
+			return tileset.getOrcWallTile_destroyed(dirFlag);
 		} else if (UnitTypeOrcWall && value <= UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
-			return tileset.getOrcWallTile_broken(index);
+			return tileset.getOrcWallTile_broken(dirFlag);
 		} else {
-			return tileset.getOrcWallTile(index);
+			return tileset.getOrcWallTile(dirFlag);
 		}
 	}
 }
@@ -88,23 +88,23 @@ static unsigned int getWallTile(const CTileset &tileset, bool humanWall, int ind
 static int GetDirectionFromSurrounding(const Vec2i &pos, bool human, bool seen)
 {
 	const Vec2i offsets[4] = {Vec2i(0, -1), Vec2i(1, 0), Vec2i(0, 1), Vec2i(-1, 0)};
-	int dir = 0;
+	int dirFlag = 0;
 
 	for (int i = 0; i != 4; ++i) {
 		const Vec2i newpos = pos + offsets[i];
 
 		if (!Map.Info.IsPointOnMap(newpos)) {
-			dir |= 1 << i;
+			dirFlag |= 1 << i;
 		} else {
 			const CMapField &mf = *Map.Field(newpos);
-			const unsigned int tileIndex = seen ? mf.playerInfo.SeenTile : mf.Tile;
+			const unsigned int tile = seen ? mf.playerInfo.SeenTile : mf.Tile;
 
-			if (Map.Tileset->isARaceWallTile(tileIndex, human)) {
-				dir |= 1 << i;
+			if (Map.Tileset->isARaceWallTile(tile, human)) {
+				dirFlag |= 1 << i;
 			}
 		}
 	}
-	return dir;
+	return dirFlag;
 }
 
 /**
@@ -120,16 +120,16 @@ void MapFixSeenWallTile(const Vec2i &pos)
 	}
 	CMapField &mf = *Map.Field(pos);
 	const CTileset &tileset = *Map.Tileset;
-	const unsigned tileIndex = mf.playerInfo.SeenTile;
-	if (!tileset.isAWallTile(tileIndex)) {
+	const unsigned tile = mf.playerInfo.SeenTile;
+	if (!tileset.isAWallTile(tile)) {
 		return;
 	}
-	const bool human = tileset.isARaceWallTile(tileIndex, true);
-	const int dir = GetDirectionFromSurrounding(pos, human, true);
-	const int tile = getWallTile(tileset, human, dir, mf.Value);
+	const bool human = tileset.isARaceWallTile(tile, true);
+	const int dirFlag = GetDirectionFromSurrounding(pos, human, true);
+	const int wallTile = getWallTile(tileset, human, dirFlag, mf.Value);
 
-	if (mf.playerInfo.SeenTile != tile) { // Already there!
-		mf.playerInfo.SeenTile = tile;
+	if (mf.playerInfo.SeenTile != wallTile) { // Already there!
+		mf.playerInfo.SeenTile = wallTile;
 		// FIXME: can this only happen if seen?
 		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 			UI.Minimap.UpdateSeenXY(pos);
@@ -164,16 +164,16 @@ void MapFixWallTile(const Vec2i &pos)
 	}
 	CMapField &mf = *Map.Field(pos);
 	const CTileset &tileset = *Map.Tileset;
-	const unsigned tileIndex = mf.Tile;
-	if (!tileset.isAWallTile(tileIndex)) {
+	const int tile = mf.Tile;
+	if (!tileset.isAWallTile(tile)) {
 		return;
 	}
-	const bool human = tileset.isARaceWallTile(tileIndex, true);
-	const int dir = GetDirectionFromSurrounding(pos, human, false);
-	const int tile = getWallTile(tileset, human, dir, mf.Value);
+	const bool human = tileset.isARaceWallTile(tile, true);
+	const int dirFlag = GetDirectionFromSurrounding(pos, human, false);
+	const int wallTile = getWallTile(tileset, human, dirFlag, mf.Value);
 
-	if (mf.Tile != tile) {
-		mf.Tile = tile;
+	if (mf.Tile != wallTile) {
+		mf.Tile = wallTile;
 		UI.Minimap.UpdateXY(pos);
 
 		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
@@ -259,9 +259,8 @@ void CMap::SetWall(const Vec2i &pos, bool humanwall)
 */
 void CMap::HitWall(const Vec2i &pos, unsigned damage)
 {
-	unsigned v;
+	const unsigned v = this->Field(pos)->Value;
 
-	v = this->Field(pos)->Value;
 	if (v <= damage) {
 		RemoveWall(pos);
 	} else {

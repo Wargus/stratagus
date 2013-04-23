@@ -650,26 +650,26 @@ void CTileset::buildWallReplacementTable()
 	// Set destroyed walls to TileTypeUnknown
 	for (int i = 0; i < 16; ++i) {
 		int n = 0;
-		unsigned int tile = humanWallTable[i];
-		while (tiles[tile].tile) { // Skip good tiles
-			++tile;
+		unsigned int tileIndex = humanWallTable[i];
+		while (tiles[tileIndex].tile) { // Skip good tiles
+			++tileIndex;
 			++n;
 		}
-		while (!tiles[tile].tile) { // Skip separator
-			++tile;
+		while (!tiles[tileIndex].tile) { // Skip separator
+			++tileIndex;
 			++n;
 		}
-		while (tiles[tile].tile) { // Skip good tiles
-			++tile;
+		while (tiles[tileIndex].tile) { // Skip good tiles
+			++tileIndex;
 			++n;
 		}
-		while (!tiles[tile].tile) { // Skip separator
-			++tile;
+		while (!tiles[tileIndex].tile) { // Skip separator
+			++tileIndex;
 			++n;
 		}
-		while (n < 16 && tiles[tile].tile) {
-			TileTypeTable[tiles[tile].tile] = TileTypeUnknown;
-			++tile;
+		while (n < 16 && tiles[tileIndex].tile) {
+			TileTypeTable[tiles[tileIndex].tile] = TileTypeUnknown;
+			++tileIndex;
 			++n;
 		}
 	}

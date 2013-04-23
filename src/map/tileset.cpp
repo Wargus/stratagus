@@ -227,44 +227,48 @@ void CTileset::clear()
 	memset(orcWallTable, 0, sizeof(orcWallTable));
 }
 
-bool CTileset::isAWallTile(unsigned tileIndex) const
+unsigned int CTileset::getDefaultTileIndex() const
+{
+	// TODO: remove hardcoded value.
+	return 0x50;
+}
+
+bool CTileset::isAWallTile(unsigned tile) const
 {
 	if (TileTypeTable.empty() == false) {
-		return (TileTypeTable[tileIndex] == TileTypeHumanWall
-				|| TileTypeTable[tileIndex] == TileTypeOrcWall);
+		return (TileTypeTable[tile] == TileTypeHumanWall
+				|| TileTypeTable[tile] == TileTypeOrcWall);
 	}
 	return false;
 }
 
-bool CTileset::isARaceWallTile(unsigned tileIndex, bool human) const
+bool CTileset::isARaceWallTile(unsigned tile, bool human) const
 {
 	if (TileTypeTable.empty() == false) {
 		if (human) {
-			return TileTypeTable[tileIndex] == TileTypeHumanWall;
+			return TileTypeTable[tile] == TileTypeHumanWall;
 		} else {
-			return TileTypeTable[tileIndex] == TileTypeOrcWall;
+			return TileTypeTable[tile] == TileTypeOrcWall;
 		}
 	}
 	return false;
 }
 
 
-bool CTileset::isAWoodTile(unsigned tileIndex) const
+bool CTileset::isAWoodTile(unsigned tile) const
 {
 	if (TileTypeTable.empty() == false) {
-		return TileTypeTable[tileIndex] == TileTypeWood;
+		return TileTypeTable[tile] == TileTypeWood;
 	}
 	return false;
 }
-bool CTileset::isARockTile(unsigned tileIndex) const
+bool CTileset::isARockTile(unsigned tile) const
 {
 	if (TileTypeTable.empty() == false) {
-		return TileTypeTable[tileIndex] == TileTypeRock;
+		return TileTypeTable[tile] == TileTypeRock;
 	}
 	return false;
 }
-
-
 
 unsigned int CTileset::getOrAddSolidTileIndexByName(const std::string &name)
 {
@@ -523,7 +527,7 @@ int CTileset::getTileIndexBySurrounding(unsigned short type,
 
 bool CTileset::isEquivalentTile(unsigned int tile1, unsigned int tile2) const
 {
-//	Assert(type == MapFieldForest || type == MapFieldRocks);
+	//Assert(type == MapFieldForest || type == MapFieldRocks);
 
 	return mixedLookupTable[tile1] == mixedLookupTable[tile2];
 }
@@ -644,15 +648,15 @@ void CTileset::fillSolidTiles(std::vector<unsigned int> *solidTiles) const
 }
 
 
-unsigned CTileset::getHumanWallTile(int index) const
+unsigned CTileset::getHumanWallTile(int dirFlag) const
 {
-	unsigned tile = humanWallTable[index];
+	unsigned tile = humanWallTable[dirFlag];
 	tile = tiles[tile].tile;
 	return tile;
 }
-unsigned CTileset::getOrcWallTile(int index) const
+unsigned CTileset::getOrcWallTile(int dirFlag) const
 {
-	unsigned tile = orcWallTable[index];
+	unsigned tile = orcWallTable[dirFlag];
 	tile = tiles[tile].tile;
 	return tile;
 }
@@ -668,31 +672,31 @@ static unsigned int NextSection(const CTileset &tileset, unsigned int tile)
 	return tile;
 }
 
-unsigned CTileset::getHumanWallTile_broken(int index) const
+unsigned CTileset::getHumanWallTile_broken(int dirFlag) const
 {
-	unsigned tile = humanWallTable[index];
+	unsigned tile = humanWallTable[dirFlag];
 	tile = NextSection(*this, tile);
 	tile = tiles[tile].tile;
 	return tile;
 }
-unsigned CTileset::getOrcWallTile_broken(int index) const
+unsigned CTileset::getOrcWallTile_broken(int dirFlag) const
 {
-	unsigned tile = orcWallTable[index];
+	unsigned tile = orcWallTable[dirFlag];
 	tile = NextSection(*this, tile);
 	tile = tiles[tile].tile;
 	return tile;
 }
-unsigned CTileset::getHumanWallTile_destroyed(int index) const
+unsigned CTileset::getHumanWallTile_destroyed(int dirFlag) const
 {
-	unsigned tile = humanWallTable[index];
+	unsigned tile = humanWallTable[dirFlag];
 	tile = NextSection(*this, tile);
 	tile = NextSection(*this, tile);
 	tile = tiles[tile].tile;
 	return tile;
 }
-unsigned CTileset::getOrcWallTile_destroyed(int index) const
+unsigned CTileset::getOrcWallTile_destroyed(int dirFlag) const
 {
-	unsigned tile = orcWallTable[index];
+	unsigned tile = orcWallTable[dirFlag];
 	tile = NextSection(*this, tile);
 	tile = NextSection(*this, tile);
 	tile = tiles[tile].tile;
