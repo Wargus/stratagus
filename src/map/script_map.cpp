@@ -339,13 +339,13 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 **  @param pos    coordinate
 **  @param value  Value of the tile
 */
-void SetTile(int tileIndex, const Vec2i &pos, int value)
+void SetTile(unsigned int tileIndex, const Vec2i &pos, int value)
 {
 	if (!Map.Info.IsPointOnMap(pos)) {
 		fprintf(stderr, "Invalid map coordonate : (%d, %d)\n", pos.x, pos.y);
 		return;
 	}
-	if (tileIndex < 0 || tileIndex >= Map.Tileset->NumTiles) {
+	if (Map.Tileset->getTileCount() <= tileIndex) {
 		fprintf(stderr, "Invalid tile number: %d\n", tileIndex);
 		return;
 	}

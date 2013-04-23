@@ -335,12 +335,11 @@ extern void MapFixSeenWallNeighbors(const Vec2i &pos);
 extern void MapFixWallTile(const Vec2i &pos);
 
 //
-// in script_map.c
+// in script_map.cpp
 //
 /// Set a tile
-extern void SetTile(int tile, const Vec2i &pos, int value = 0);
-
-inline void SetTile(int tile, int x, int y, int value = 0)
+extern void SetTile(unsigned int tile, const Vec2i &pos, int value = 0);
+inline void SetTile(unsigned int tile, int x, int y, int value = 0)
 {
 	const Vec2i pos(x, y);
 	SetTile(tile, pos, value);

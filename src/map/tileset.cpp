@@ -54,17 +54,13 @@
 **
 **      Name of the graphic file, containing all tiles.
 **
-**  CTileset::NumTiles
-**
-**      The number of different tiles in the tables.
-**
 **  CTileset::Table
 **
 **      Table to map the abstract level (PUD) tile numbers, to tile
 **      numbers in the graphic file (CTileset::File).
 **      FE. 16 (solid light water) in pud to 328 in png.
 **
-**  CTileset::FlagsTable
+**  CTileset::Flags
 **
 **      Table of the tile flags used by the editor.
 **      @see CMapField::Flags
@@ -212,11 +208,8 @@ void CTileset::clear()
 {
 	Name.clear();
 	ImageFile.clear();
-	NumTiles = 0;
 	pixelTileSize.x = pixelTileSize.y = 0;
-	Table.clear();
-	FlagsTable.clear();
-	Tiles.clear();
+	tiles.clear();
 	TileTypeTable.clear();
 	solidTerrainTypes.clear();
 	topOneTreeTile = 0;
@@ -299,14 +292,14 @@ unsigned int CTileset::getSolidTerrainCount() const
 
 int CTileset::findTileIndex(unsigned char baseTerrain, unsigned char mixTerrain) const
 {
-	const TileInfo tileInfo = {baseTerrain, mixTerrain};
+	const CTileInfo tileInfo(baseTerrain, mixTerrain);
 
-	for (int i = 0; i != NumTiles;) {
-		if (Tiles[i] == tileInfo) {
+	for (size_t i = 0; i != tiles.size();) {
+		if (tiles[i].tileinfo == tileInfo) {
 			return i;
 		}
 		// Advance solid or mixed.
-		if (!Tiles[i].MixTerrain) {
+		if (!tiles[i].tileinfo.MixTerrain) {
 			i += 16;
 		} else {
 			i += 256;
@@ -359,12 +352,12 @@ int CTileset::findTilePath(int base, int goal, int length, std::vector<char> &ma
 	}
 	// Find any mixed tile
 	int l = INT_MAX;
-	for (int i = 0; i < NumTiles;) {
+	for (size_t i = 0; i != tiles.size();) {
 		int j = 0;
-		if (base == Tiles[i].BaseTerrain) {
-			j = Tiles[i].MixTerrain;
-		} else if (base == Tiles[i].MixTerrain) {
-			j = Tiles[i].BaseTerrain;
+		if (base == tiles[i].tileinfo.BaseTerrain) {
+			j = tiles[i].tileinfo.MixTerrain;
+		} else if (base == tiles[i].tileinfo.MixTerrain) {
+			j = tiles[i].tileinfo.BaseTerrain;
 		}
 		if (j != 0 && marks[j] == 0) { // possible path found
 			marks[j] = j;
@@ -377,7 +370,7 @@ int CTileset::findTilePath(int base, int goal, int length, std::vector<char> &ma
 			}
 		}
 		// Advance solid or mixed.
-		if (Tiles[i].MixTerrain == 0) {
+		if (tiles[i].tileinfo.MixTerrain == 0) {
 			i += 16;
 		} else {
 			i += 256;
@@ -458,7 +451,7 @@ int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
 		Assert(res != -1);
 		return res;
 	}
-	if (type1 == Tiles[tileIndex].MixTerrain) {
+	if (type1 == tiles[tileIndex].tileinfo.MixTerrain) {
 		// Other mixed
 		std::swap(type1, type2);
 	}
@@ -537,8 +530,8 @@ bool CTileset::isEquivalentTile(unsigned int tile1, unsigned int tile2) const
 
 int CTileset::findTileIndexByTile(unsigned int tile) const
 {
-	for (int i = 0; i != NumTiles; ++i) {
-		if (tile == Table[i]) {
+	for (size_t i = 0; i != tiles.size(); ++i) {
+		if (tile == tiles[i].tile) {
 			return i;
 		}
 	}
@@ -562,7 +555,7 @@ unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
 	if (random) {
 		int n = 0;
 		for (int i = 0; i < 16; ++i) {
-			if (!Table[tile + i]) {
+			if (!tiles[tile + i].tile) {
 				if (!filler) {
 					break;
 				}
@@ -573,7 +566,7 @@ unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
 		n = MyRand() % n;
 		int i = -1;
 		do {
-			while (++i < 16 && !Table[tile + i]) {
+			while (++i < 16 && !tiles[tile + i].tile) {
 			}
 		} while (i < 16 && n--);
 		Assert(i != 16);
@@ -581,9 +574,9 @@ unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
 	}
 	if (filler) {
 		int i = 0;
-		for (; i < 16 && Table[tile + i]; ++i) {
+		for (; i < 16 && tiles[tile + i].tile; ++i) {
 		}
-		for (; i < 16 && !Table[tile + i]; ++i) {
+		for (; i < 16 && !tiles[tile + i].tile; ++i) {
 		}
 		if (i != 16) {
 			return tile + i;
@@ -612,8 +605,8 @@ unsigned CTileset::getQuadFromTile(unsigned int tile) const
 	const int tileIndex = findTileIndexByTile(tile);
 	Assert(tileIndex != -1);
 
-	unsigned base = Tiles[tileIndex].BaseTerrain;
-	unsigned mix = Tiles[tileIndex].MixTerrain;
+	const unsigned base = tiles[tileIndex].tileinfo.BaseTerrain;
+	const unsigned mix = tiles[tileIndex].tileinfo.MixTerrain;
 
 	if (mix == 0) { // a solid tile
 		return base | (base << 8) | (base << 16) | (base << 24);
@@ -639,13 +632,13 @@ unsigned CTileset::getQuadFromTile(unsigned int tile) const
 	return base | (base << 8) | (base << 16) | (base << 24);
 }
 
-void CTileset::fillSolidTiles(std::vector<unsigned int> *tiles) const
+void CTileset::fillSolidTiles(std::vector<unsigned int> *solidTiles) const
 {
-	for (int i = 16; i < NumTiles; i += 16) {
-		const TileInfo &info = Tiles[i];
+	for (size_t i = 16; i < tiles.size(); i += 16) {
+		const CTileInfo &info = tiles[i].tileinfo;
 
 		if (info.BaseTerrain && info.MixTerrain == 0) {
-			tiles->push_back(Table[i]);
+			solidTiles->push_back(tiles[i].tile);
 		}
 	}
 }
@@ -654,22 +647,22 @@ void CTileset::fillSolidTiles(std::vector<unsigned int> *tiles) const
 unsigned CTileset::getHumanWallTile(int index) const
 {
 	unsigned tile = humanWallTable[index];
-	tile = Table[tile];
+	tile = tiles[tile].tile;
 	return tile;
 }
 unsigned CTileset::getOrcWallTile(int index) const
 {
 	unsigned tile = orcWallTable[index];
-	tile = Table[tile];
+	tile = tiles[tile].tile;
 	return tile;
 }
 
 static unsigned int NextSection(const CTileset &tileset, unsigned int tile)
 {
-	while (tileset.Table[tile]) { // Skip good tiles
+	while (tileset.tiles[tile].tile) { // Skip good tiles
 		++tile;
 	}
-	while (!tileset.Table[tile]) { // Skip separator
+	while (!tileset.tiles[tile].tile) { // Skip separator
 		++tile;
 	}
 	return tile;
@@ -679,14 +672,14 @@ unsigned CTileset::getHumanWallTile_broken(int index) const
 {
 	unsigned tile = humanWallTable[index];
 	tile = NextSection(*this, tile);
-	tile = Table[tile];
+	tile = tiles[tile].tile;
 	return tile;
 }
 unsigned CTileset::getOrcWallTile_broken(int index) const
 {
 	unsigned tile = orcWallTable[index];
 	tile = NextSection(*this, tile);
-	tile = Table[tile];
+	tile = tiles[tile].tile;
 	return tile;
 }
 unsigned CTileset::getHumanWallTile_destroyed(int index) const
@@ -694,7 +687,7 @@ unsigned CTileset::getHumanWallTile_destroyed(int index) const
 	unsigned tile = humanWallTable[index];
 	tile = NextSection(*this, tile);
 	tile = NextSection(*this, tile);
-	tile = Table[tile];
+	tile = tiles[tile].tile;
 	return tile;
 }
 unsigned CTileset::getOrcWallTile_destroyed(int index) const
@@ -702,7 +695,7 @@ unsigned CTileset::getOrcWallTile_destroyed(int index) const
 	unsigned tile = orcWallTable[index];
 	tile = NextSection(*this, tile);
 	tile = NextSection(*this, tile);
-	tile = Table[tile];
+	tile = tiles[tile].tile;
 	return tile;
 }
 //@}

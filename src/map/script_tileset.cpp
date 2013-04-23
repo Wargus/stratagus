@@ -46,19 +46,6 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/**
-**  Extend tables of the tileset.
-**
-**  @param tileset  Tileset to be extended.
-**  @param newsize  New total number of tiles.
-*/
-static void ExtendTilesetTables(CTileset *tileset, unsigned int newsize)
-{
-	tileset->Table.resize(newsize);
-	tileset->FlagsTable.resize(newsize);
-	tileset->Tiles.resize(newsize);
-}
-
 static bool ModifyFlag(const char *flagName, unsigned int *flag)
 {
 	const struct {
@@ -212,10 +199,10 @@ void CTileset::parseSpecial(lua_State *l)
 */
 void CTileset::parseSolid(lua_State *l)
 {
-	const int index = NumTiles;
+	const int index = tiles.size();
 	int j = 0;
 
-	ExtendTilesetTables(this, index + 16);
+	this->tiles.resize(index + 16);
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
@@ -243,7 +230,7 @@ void CTileset::parseSolid(lua_State *l)
 			ParseTilesetTileFlags(l, &tile_flag, &k);
 			--j;
 			lua_pop(l, 1);
-			FlagsTable[index + j] = tile_flag;
+			tiles[index + j].flag = tile_flag;
 			continue;
 		}
 		const int pud = LuaToNumber(l, -1);
@@ -251,22 +238,16 @@ void CTileset::parseSolid(lua_State *l)
 
 		// ugly hack for sc tilesets, remove when fixed
 		if (j > 15) {
-			ExtendTilesetTables(this, index + j);
+			this->tiles.resize(index + j);
 		}
-		Table[index + j] = pud;
-		FlagsTable[index + j] = f;
-		Tiles[index + j].BaseTerrain = basic_name;
-		Tiles[index + j].MixTerrain = 0;
+		CTile &tile = tiles[index + j];
+
+		tile.tile = pud;
+		tile.flag = f;
+		tile.tileinfo.BaseTerrain = basic_name;
+		tile.tileinfo.MixTerrain = 0;
 	}
 	lua_pop(l, 1);
-
-	for (int i = j; i < 16; ++i) {
-		Table[index + i] = 0;
-		FlagsTable[index + i] = 0;
-		Tiles[index + i].BaseTerrain = 0;
-		Tiles[index + i].MixTerrain = 0;
-	}
-	NumTiles = index + std::max(16, j);
 }
 
 /**
@@ -276,10 +257,8 @@ void CTileset::parseSolid(lua_State *l)
 */
 void CTileset::parseMixed(lua_State *l)
 {
-	int index = NumTiles;
-	const int new_index = index + 256;
-	NumTiles = new_index;
-	ExtendTilesetTables(this, index + 256);
+	int index = tiles.size();
+	tiles.resize(index + 256);
 
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
@@ -309,27 +288,15 @@ void CTileset::parseMixed(lua_State *l)
 			lua_rawgeti(l, -1, i + 1);
 			const int pud = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-			Table[index + i] = pud;
-			FlagsTable[index + i] = f;
-			Tiles[index + i].BaseTerrain = basic_name;
-			Tiles[index + i].MixTerrain = mixed_name;
-		}
-		// Fill missing slots
-		for (int i = len; i < 16; ++i) {
-			Table[index + i] = 0;
-			FlagsTable[index + i] = 0;
-			Tiles[index + i].BaseTerrain = 0;
-			Tiles[index + i].MixTerrain = 0;
+			CTile &tile = tiles[index + i];
+
+			tile.tile = pud;
+			tile.flag = f;
+			tile.tileinfo.BaseTerrain = basic_name;
+			tile.tileinfo.MixTerrain = mixed_name;
 		}
 		index += 16;
 		lua_pop(l, 1);
-	}
-	while (index < new_index) {
-		Table[index] = 0;
-		FlagsTable[index] = 0;
-		Tiles[index].BaseTerrain = 0;
-		Tiles[index].MixTerrain = 0;
-		++index;
 	}
 }
 
@@ -341,7 +308,7 @@ void CTileset::parseMixed(lua_State *l)
 */
 void CTileset::parseSlots(lua_State *l, int t)
 {
-	NumTiles = 0;
+	tiles.clear();
 
 	//  Parse the list: (still everything could be changed!)
 	const int args = lua_rawlen(l, t);
@@ -435,33 +402,32 @@ static int CclBuildTilesetTables(lua_State *l)
 void CTileset::buildTable(lua_State *l)
 {
 	//  Calculate number of tiles in graphic tile
-	const int n = NumTiles;
+	const int n = tiles.size();
 
 	mixedLookupTable.clear();
 	mixedLookupTable.resize(n, 0);
 	//  Build the TileTypeTable
 	TileTypeTable.resize(n, 0);
 
-	const std::vector<unsigned short> &table = Table;
 	for (int i = 0; i < n; ++i) {
-		const int tile = table[i];
+		const int tile = tiles[i].tile;
 		if (tile == 0) {
 			continue;
 		}
-		unsigned flags = FlagsTable[i];
-		if (flags & MapFieldWaterAllowed) {
+		const unsigned flag = tiles[i].flag;
+		if (flag & MapFieldWaterAllowed) {
 			TileTypeTable[tile] = TileTypeWater;
-		} else if (flags & MapFieldCoastAllowed) {
+		} else if (flag & MapFieldCoastAllowed) {
 			TileTypeTable[tile] = TileTypeCoast;
-		} else if (flags & MapFieldWall) {
-			if (flags & MapFieldHuman) {
+		} else if (flag & MapFieldWall) {
+			if (flag & MapFieldHuman) {
 				TileTypeTable[tile] = TileTypeHumanWall;
 			} else {
 				TileTypeTable[tile] = TileTypeOrcWall;
 			}
-		} else if (flags & MapFieldRocks) {
+		} else if (flag & MapFieldRocks) {
 			TileTypeTable[tile] = TileTypeRock;
-		} else if (flags & MapFieldForest) {
+		} else if (flag & MapFieldForest) {
 			TileTypeTable[tile] = TileTypeWood;
 		}
 	}
@@ -489,14 +455,16 @@ void CTileset::buildTable(lua_State *l)
 	int solid = 0;
 	int mixed = 0;
 	for (int i = 0; i < n;) {
-		if (Tiles[i].BaseTerrain && Tiles[i].MixTerrain) {
-			if (FlagsTable[i] & MapFieldForest) {
+		const CTile &tile = tiles[i];
+		const CTileInfo &tileinfo = tile.tileinfo;
+		if (tileinfo.BaseTerrain && tileinfo.MixTerrain) {
+			if (tile.flag & MapFieldForest) {
 				mixed = i;
 			}
 			i += 256;
 		} else {
-			if (Tiles[i].BaseTerrain != 0 && Tiles[i].MixTerrain == 0) {
-				if (FlagsTable[i] & MapFieldForest) {
+			if (tileinfo.BaseTerrain != 0 && tileinfo.MixTerrain == 0) {
+				if (tile.flag & MapFieldForest) {
 					solid = i;
 				}
 			}
@@ -504,21 +472,21 @@ void CTileset::buildTable(lua_State *l)
 		}
 	}
 	woodTable[ 0] = -1;
-	woodTable[ 1] = table[mixed + 0x30];
-	woodTable[ 2] = table[mixed + 0x70];
-	woodTable[ 3] = table[mixed + 0xB0];
-	woodTable[ 4] = table[mixed + 0x10];
-	woodTable[ 5] = table[mixed + 0x50];
-	woodTable[ 6] = table[mixed + 0x90];
-	woodTable[ 7] = table[mixed + 0xD0];
-	woodTable[ 8] = table[mixed + 0x00];
-	woodTable[ 9] = table[mixed + 0x40];
-	woodTable[10] = table[mixed + 0x80];
-	woodTable[11] = table[mixed + 0xC0];
-	woodTable[12] = table[mixed + 0x20];
-	woodTable[13] = table[mixed + 0x60];
-	woodTable[14] = table[mixed + 0xA0];
-	woodTable[15] = table[solid];
+	woodTable[ 1] = tiles[mixed + 0x30].tile;
+	woodTable[ 2] = tiles[mixed + 0x70].tile;
+	woodTable[ 3] = tiles[mixed + 0xB0].tile;
+	woodTable[ 4] = tiles[mixed + 0x10].tile;
+	woodTable[ 5] = tiles[mixed + 0x50].tile;
+	woodTable[ 6] = tiles[mixed + 0x90].tile;
+	woodTable[ 7] = tiles[mixed + 0xD0].tile;
+	woodTable[ 8] = tiles[mixed + 0x00].tile;
+	woodTable[ 9] = tiles[mixed + 0x40].tile;
+	woodTable[10] = tiles[mixed + 0x80].tile;
+	woodTable[11] = tiles[mixed + 0xC0].tile;
+	woodTable[12] = tiles[mixed + 0x20].tile;
+	woodTable[13] = tiles[mixed + 0x60].tile;
+	woodTable[14] = tiles[mixed + 0xA0].tile;
+	woodTable[15] = tiles[solid].tile;
 	woodTable[16] = -1;
 	woodTable[17] = botOneTreeTile;
 	woodTable[18] = topOneTreeTile;
@@ -533,27 +501,27 @@ void CTileset::buildTable(lua_State *l)
 	//16 Bottom Tree Tile
 	//32 Top Tree Tile
 	for (int i = solid; i < solid + 16; ++i) {
-		mixedLookupTable[table[i]] = 15;
+		mixedLookupTable[tiles[i].tile] = 15;
 	}
 	for (int i = mixed; i < mixed + 256; ++i) {
 		int check = (int)((i - mixed) / 16);
 
 		switch (check) {
-			case 0: mixedLookupTable[table[i]] = 8; break;
-			case 1: mixedLookupTable[table[i]] = 4; break;
-			case 2: mixedLookupTable[table[i]] = 8 + 4; break;
-			case 3: mixedLookupTable[table[i]] = 1; break;
-			case 4: mixedLookupTable[table[i]] = 8 + 1; break;
-			case 5: mixedLookupTable[table[i]] = 4 + 1; break;
-			case 6: mixedLookupTable[table[i]] = 8 + 4 + 1; break;
-			case 7: mixedLookupTable[table[i]] = 2; break;
-			case 8: mixedLookupTable[table[i]] = 8 + 2; break;
-			case 9: mixedLookupTable[table[i]] = 4 + 2; break;
-			case 10: mixedLookupTable[table[i]] = 8 + 4 + 2; break;
-			case 11: mixedLookupTable[table[i]] = 2 + 1; break;
-			case 12: mixedLookupTable[table[i]] = 8 + 2 + 1; break;
-			case 13:  mixedLookupTable[table[i]] = 4 + 2 + 1; break;
-			default: mixedLookupTable[table[i]] = 0; break;
+			case 0: mixedLookupTable[tiles[i].tile] = 8; break;
+			case 1: mixedLookupTable[tiles[i].tile] = 4; break;
+			case 2: mixedLookupTable[tiles[i].tile] = 8 + 4; break;
+			case 3: mixedLookupTable[tiles[i].tile] = 1; break;
+			case 4: mixedLookupTable[tiles[i].tile] = 8 + 1; break;
+			case 5: mixedLookupTable[tiles[i].tile] = 4 + 1; break;
+			case 6: mixedLookupTable[tiles[i].tile] = 8 + 4 + 1; break;
+			case 7: mixedLookupTable[tiles[i].tile] = 2; break;
+			case 8: mixedLookupTable[tiles[i].tile] = 8 + 2; break;
+			case 9: mixedLookupTable[tiles[i].tile] = 4 + 2; break;
+			case 10: mixedLookupTable[tiles[i].tile] = 8 + 4 + 2; break;
+			case 11: mixedLookupTable[tiles[i].tile] = 2 + 1; break;
+			case 12: mixedLookupTable[tiles[i].tile] = 8 + 2 + 1; break;
+			case 13:  mixedLookupTable[tiles[i].tile] = 4 + 2 + 1; break;
+			default: mixedLookupTable[tiles[i].tile] = 0; break;
 		}
 	}
 	//16 Bottom Tree Special
@@ -567,14 +535,16 @@ void CTileset::buildTable(lua_State *l)
 	mixed = 0;
 	solid = 0;
 	for (int i = 0; i < n;) {
-		if (Tiles[i].BaseTerrain && Tiles[i].MixTerrain) {
-			if (FlagsTable[i] & MapFieldRocks) {
+		const CTile &tile = tiles[i];
+		const CTileInfo &tileinfo = tile.tileinfo;
+		if (tileinfo.BaseTerrain && tileinfo.MixTerrain) {
+			if (tile.flag & MapFieldRocks) {
 				mixed = i;
 			}
 			i += 256;
 		} else {
-			if (Tiles[i].BaseTerrain != 0 && Tiles[i].MixTerrain == 0) {
-				if (FlagsTable[i] & MapFieldRocks) {
+			if (tileinfo.BaseTerrain != 0 && tileinfo.MixTerrain == 0) {
+				if (tile.flag & MapFieldRocks) {
 					solid = i;
 				}
 			}
@@ -589,26 +559,26 @@ void CTileset::buildTable(lua_State *l)
 	//4 Top Right
 	//8 Top Left
 	for (int i = solid; i < solid + 16; ++i) {
-		mixedLookupTable[table[i]] = 15;
+		mixedLookupTable[tiles[i].tile] = 15;
 	}
 	for (int i = mixed; i < mixed + 256; ++i) {
 		int check = (int)((i - mixed) / 16);
 		switch (check) {
-			case 0: mixedLookupTable[table[i]] = 8; break;
-			case 1: mixedLookupTable[table[i]] = 4; break;
-			case 2: mixedLookupTable[table[i]] = 8 + 4; break;
-			case 3: mixedLookupTable[table[i]] = 1; break;
-			case 4: mixedLookupTable[table[i]] = 8 + 1; break;
-			case 5: mixedLookupTable[table[i]] = 4 + 1; break;
-			case 6: mixedLookupTable[table[i]] = 8 + 4 + 1; break;
-			case 7: mixedLookupTable[table[i]] = 2; break;
-			case 8: mixedLookupTable[table[i]] = 8 + 2; break;
-			case 9: mixedLookupTable[table[i]] = 4 + 2; break;
-			case 10: mixedLookupTable[table[i]] = 8 + 4 + 2; break;
-			case 11: mixedLookupTable[table[i]] = 2 + 1; break;
-			case 12: mixedLookupTable[table[i]] = 8 + 2 + 1; break;
-			case 13: mixedLookupTable[table[i]] = 4 + 2 + 1; break;
-			default: mixedLookupTable[table[i]] = 0; break;
+			case 0: mixedLookupTable[tiles[i].tile] = 8; break;
+			case 1: mixedLookupTable[tiles[i].tile] = 4; break;
+			case 2: mixedLookupTable[tiles[i].tile] = 8 + 4; break;
+			case 3: mixedLookupTable[tiles[i].tile] = 1; break;
+			case 4: mixedLookupTable[tiles[i].tile] = 8 + 1; break;
+			case 5: mixedLookupTable[tiles[i].tile] = 4 + 1; break;
+			case 6: mixedLookupTable[tiles[i].tile] = 8 + 4 + 1; break;
+			case 7: mixedLookupTable[tiles[i].tile] = 2; break;
+			case 8: mixedLookupTable[tiles[i].tile] = 8 + 2; break;
+			case 9: mixedLookupTable[tiles[i].tile] = 4 + 2; break;
+			case 10: mixedLookupTable[tiles[i].tile] = 8 + 4 + 2; break;
+			case 11: mixedLookupTable[tiles[i].tile] = 2 + 1; break;
+			case 12: mixedLookupTable[tiles[i].tile] = 8 + 2 + 1; break;
+			case 13: mixedLookupTable[tiles[i].tile] = 4 + 2 + 1; break;
+			default: mixedLookupTable[tiles[i].tile] = 0; break;
 		}
 	}
 
@@ -617,21 +587,21 @@ void CTileset::buildTable(lua_State *l)
 	mixedLookupTable[midOneRockTile] = 15 + 48;
 
 	rockTable[ 0] = -1;
-	rockTable[ 1] = table[mixed + 0x30];
-	rockTable[ 2] = table[mixed + 0x70];
-	rockTable[ 3] = table[mixed + 0xB0];
-	rockTable[ 4] = table[mixed + 0x10];
-	rockTable[ 5] = table[mixed + 0x50];
-	rockTable[ 6] = table[mixed + 0x90];
-	rockTable[ 7] = table[mixed + 0xD0];
-	rockTable[ 8] = table[mixed + 0x00];
-	rockTable[ 9] = table[mixed + 0x40];
-	rockTable[10] = table[mixed + 0x80];
-	rockTable[11] = table[mixed + 0xC0];
-	rockTable[12] = table[mixed + 0x20];
-	rockTable[13] = table[mixed + 0x60];
-	rockTable[14] = table[mixed + 0xA0];
-	rockTable[15] = table[solid];
+	rockTable[ 1] = tiles[mixed + 0x30].tile;
+	rockTable[ 2] = tiles[mixed + 0x70].tile;
+	rockTable[ 3] = tiles[mixed + 0xB0].tile;
+	rockTable[ 4] = tiles[mixed + 0x10].tile;
+	rockTable[ 5] = tiles[mixed + 0x50].tile;
+	rockTable[ 6] = tiles[mixed + 0x90].tile;
+	rockTable[ 7] = tiles[mixed + 0xD0].tile;
+	rockTable[ 8] = tiles[mixed + 0x00].tile;
+	rockTable[ 9] = tiles[mixed + 0x40].tile;
+	rockTable[10] = tiles[mixed + 0x80].tile;
+	rockTable[11] = tiles[mixed + 0xC0].tile;
+	rockTable[12] = tiles[mixed + 0x20].tile;
+	rockTable[13] = tiles[mixed + 0x60].tile;
+	rockTable[14] = tiles[mixed + 0xA0].tile;
+	rockTable[15] = tiles[solid].tile;
 	rockTable[16] = -1;
 	rockTable[17] = botOneRockTile;
 	rockTable[18] = topOneRockTile;
@@ -681,24 +651,24 @@ void CTileset::buildWallReplacementTable()
 	for (int i = 0; i < 16; ++i) {
 		int n = 0;
 		unsigned int tile = humanWallTable[i];
-		while (Table[tile]) { // Skip good tiles
+		while (tiles[tile].tile) { // Skip good tiles
 			++tile;
 			++n;
 		}
-		while (!Table[tile]) { // Skip separator
+		while (!tiles[tile].tile) { // Skip separator
 			++tile;
 			++n;
 		}
-		while (Table[tile]) { // Skip good tiles
+		while (tiles[tile].tile) { // Skip good tiles
 			++tile;
 			++n;
 		}
-		while (!Table[tile]) { // Skip separator
+		while (!tiles[tile].tile) { // Skip separator
 			++tile;
 			++n;
 		}
-		while (n < 16 && Table[tile]) {
-			TileTypeTable[Table[tile]] = TileTypeUnknown;
+		while (n < 16 && tiles[tile].tile) {
+			TileTypeTable[tiles[tile].tile] = TileTypeUnknown;
 			++tile;
 			++n;
 		}
@@ -715,16 +685,16 @@ static int CclSetTileFlags(lua_State *l)
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "No flags defined");
 	}
-	const int tilenumber = LuaToNumber(l, 1);
+	const unsigned int tilenumber = LuaToNumber(l, 1);
 
-	if (tilenumber >= Map.Tileset->NumTiles) {
+	if (tilenumber >= Map.Tileset->tiles.size()) {
 		LuaError(l, "Accessed a tile that's not defined");
 	}
 	int j = 0;
 	int flags = 0;
 
 	ParseTilesetTileFlags(l, &flags, &j);
-	Map.Tileset->FlagsTable[tilenumber] = flags;
+	Map.Tileset->tiles[tilenumber].flag = flags;
 	return 0;
 }
 

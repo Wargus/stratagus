@@ -59,13 +59,18 @@ enum TileType {
 };
 
 /// Single tile definition
-struct TileInfo {
+struct CTileInfo {
 public:
-	bool operator ==(const TileInfo &rhs) const
+	CTileInfo() : BaseTerrain(0), MixTerrain(0)
+	{}
+	CTileInfo(unsigned char base, unsigned char mix) : BaseTerrain(base), MixTerrain(mix)
+	{}
+
+	bool operator ==(const CTileInfo &rhs) const
 	{
 		return BaseTerrain == rhs.BaseTerrain && MixTerrain == rhs.MixTerrain;
 	}
-	bool operator !=(const TileInfo &rhs) const { return !(*this == rhs); }
+	bool operator !=(const CTileInfo &rhs) const { return !(*this == rhs); }
 
 public:
 	unsigned char BaseTerrain; /// Basic terrain of the tile
@@ -78,11 +83,22 @@ struct SolidTerrainInfo {
 	// TODO: When drawing with the editor add some kind fo probabilities for every tile.
 };
 
+class CTile
+{
+public:
+	unsigned short tile;  /// graphical pos
+	unsigned short flag;  /// Flag
+	CTileInfo tileinfo;   /// Tile descriptions
+};
+
 /// Tileset definition
 class CTileset
 {
 public:
 	void clear();
+
+	unsigned int getTileCount() const { return tiles.size(); }
+
 	bool isAWallTile(unsigned tileIndex) const;
 	bool isARaceWallTile(unsigned tileIndex, bool human) const;
 	bool isAWoodTile(unsigned tileIndex) const;
@@ -134,16 +150,15 @@ public:
 	std::string Name;           /// Nice name to display
 	std::string ImageFile;      /// File containing image data
 
-	int NumTiles;               /// Number of tiles in the tables
-	std::vector<unsigned short> Table;      /// Pud to Internal conversion table
-	std::vector<unsigned short> FlagsTable; /// Flag table for editor
-	std::vector<TileInfo> Tiles; /// Tile descriptions
+public:
+	std::vector<CTile> tiles;
 
 	// TODO: currently hardcoded
 	std::vector<unsigned char> TileTypeTable;  /// For fast lookup of tile type
 private:
 	PixelSize pixelTileSize;    /// Size of a tile in pixel
 	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
+#if 1
 	std::vector<int> mixedLookupTable;  /// Lookup for what part of tile used
 	unsigned topOneTreeTile;   /// Tile for one tree top
 	unsigned midOneTreeTile;   /// Tile for one tree middle
@@ -157,6 +172,7 @@ private:
 	int rockTable[20];     /// Removed rock placement table
 	unsigned humanWallTable[16];  /// Human wall placement table
 	unsigned orcWallTable[16];    /// Orc wall placement table
+#endif
 };
 
 /*----------------------------------------------------------------------------

@@ -77,17 +77,18 @@ bool CMapField::IsTerrainResourceOnMap() const
 
 void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value)
 {
-	this->Tile = tileset.Table[tileIndex];
+	const CTile &tile = tileset.tiles[tileIndex];
+	this->Tile = tile.tile;
 	this->Value = value;
 #if 0
-	this->Flags = tileset.FlagsTable[tileIndex];
+	this->Flags = tile.flag;
 #else
 	this->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
 					 MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 					 MapFieldWall | MapFieldRocks | MapFieldForest);
-	this->Flags |= tileset.FlagsTable[tileIndex];
+	this->Flags |= tile.flag;
 #endif
-	this->Cost = 1 << (tileset.FlagsTable[tileIndex] & MapFieldSpeedMask);
+	this->Cost = 1 << (tile.flag & MapFieldSpeedMask);
 #ifdef DEBUG
 	this->TilesetTile = tileIndex;
 #endif

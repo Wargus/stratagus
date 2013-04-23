@@ -189,6 +189,7 @@ static void EditTile(const Vec2i &pos, int tile)
 	const int tileIndex = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
 	CMapField &mf = *Map.Field(pos);
 	mf.setTileIndex(tileset, tileIndex, 0);
+	mf.playerInfo.SeenTile = mf.Tile;
 
 	UI.Minimap.UpdateSeenXY(pos);
 	UI.Minimap.UpdateXY(pos);
@@ -648,7 +649,7 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 
 	x += 4;
 	y += 4;
-	Map.TileGraphic->DrawFrameClip(Map.Tileset->Table[tilenum], x, y);
+	Map.TileGraphic->DrawFrameClip(Map.Tileset->tiles[tilenum].tile, x, y);
 
 	if (flags & IconSelected) {
 		Video.DrawRectangleClip(ColorGreen, x, y, PixelTileSize.x, PixelTileSize.y);
@@ -959,9 +960,9 @@ static void DrawEditorInfo()
 	const CTileset &tileset = *Map.Tileset;
 	const int index = tileset.findTileIndexByTile(mf.Tile);
 	Assert(index != -1);
-	const int baseTerrainIdx = tileset.Tiles[index].BaseTerrain;
+	const int baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
 	const char *baseTerrainStr = tileset.getTerrainName(baseTerrainIdx).c_str();
-	const int mixTerrainIdx = tileset.Tiles[index].MixTerrain;
+	const int mixTerrainIdx = tileset.tiles[index].tileinfo.MixTerrain;
 	const char *mixTerrainStr = mixTerrainIdx ? tileset.getTerrainName(mixTerrainIdx).c_str() : "";
 	snprintf(buf, sizeof(buf), "%s %s", baseTerrainStr, mixTerrainStr);
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 250, UI.StatusLine.TextY, buf);
@@ -1558,7 +1559,7 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 				&& by < screenPos.y && screenPos.y < by + PixelTileSize.y) {
 				const int tile = Editor.ShownTileTypes[i];
 				const int tileindex = Map.Tileset->findTileIndexByTile(tile);
-				const int base = Map.Tileset->Tiles[tileindex].BaseTerrain;
+				const int base = Map.Tileset->tiles[tileindex].tileinfo.BaseTerrain;
 				UI.StatusLine.Set(Map.Tileset->getTerrainName(base));
 				Editor.CursorTileIndex = i;
 				return true;
