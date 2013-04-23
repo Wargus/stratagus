@@ -243,6 +243,19 @@ bool CTileset::isAWallTile(unsigned tileIndex) const
 	return false;
 }
 
+bool CTileset::isARaceWallTile(unsigned tileIndex, bool human) const
+{
+	if (TileTypeTable.empty() == false) {
+		if (human) {
+			return TileTypeTable[tileIndex] == TileTypeHumanWall;
+		} else {
+			return TileTypeTable[tileIndex] == TileTypeOrcWall;
+		}
+	}
+	return false;
+}
+
+
 bool CTileset::isAWoodTile(unsigned tileIndex) const
 {
 	if (TileTypeTable.empty() == false) {

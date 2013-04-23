@@ -84,6 +84,7 @@ class CTileset
 public:
 	void clear();
 	bool isAWallTile(unsigned tileIndex) const;
+	bool isARaceWallTile(unsigned tileIndex, bool human) const;
 	bool isAWoodTile(unsigned tileIndex) const;
 	bool isARockTile(unsigned tileIndex) const;
 

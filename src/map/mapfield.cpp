@@ -78,8 +78,6 @@ bool CMapField::IsTerrainResourceOnMap() const
 void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value)
 {
 	this->Tile = tileset.Table[tileIndex];
-	this->playerInfo.SeenTile = Tile;
-
 	this->Value = value;
 #if 0
 	this->Flags = tileset.FlagsTable[tileIndex];

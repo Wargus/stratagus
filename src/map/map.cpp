@@ -51,11 +51,11 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-CMap Map;                        /// The current map
-int FlagRevealMap;               /// Flag must reveal the map
-int ReplayRevealMap;             /// Reveal Map is replay
-int ForestRegeneration;          /// Forest regeneration
-char CurrentMapPath[1024];       /// Path of the current map
+CMap Map;                   /// The current map
+int FlagRevealMap;          /// Flag must reveal the map
+int ReplayRevealMap;        /// Reveal Map is replay
+int ForestRegeneration;     /// Forest regeneration
+char CurrentMapPath[1024];  /// Path of the current map
 
 /*----------------------------------------------------------------------------
 --  Visible and explored handling
@@ -95,18 +95,18 @@ void CMap::MarkSeenTile(CMapField &mf)
 #endif
 
 		//  Handle wood changes. FIXME: check if for growing wood correct?
-		if (seentile != this->Tileset->getRemovedTreeTile() && tile == this->Tileset->getRemovedTreeTile()) {
+		if (tile == this->Tileset->getRemovedTreeTile()) {
 			FixNeighbors(MapFieldForest, 1, pos);
-		} else if (seentile == this->Tileset->getRemovedTreeTile() && tile != this->Tileset->getRemovedTreeTile()) {
+		} else if (seentile == this->Tileset->getRemovedTreeTile()) {
 			FixTile(MapFieldForest, 1, pos);
 		} else if (mf.ForestOnMap()) {
 			FixTile(MapFieldForest, 1, pos);
 			FixNeighbors(MapFieldForest, 1, pos);
 
 			// Handle rock changes.
-		} else if (seentile != Tileset->getRemovedRockTile() && tile == Tileset->getRemovedRockTile()) {
+		} else if (tile == Tileset->getRemovedRockTile()) {
 			FixNeighbors(MapFieldRocks, 1, pos);
-		} else if (seentile == Tileset->getRemovedRockTile() && tile != Tileset->getRemovedRockTile()) {
+		} else if (seentile == Tileset->getRemovedRockTile()) {
 			FixTile(MapFieldRocks, 1, pos);
 		} else if (mf.RockOnMap()) {
 			FixTile(MapFieldRocks, 1, pos);
@@ -335,7 +335,6 @@ void CMap::Init()
 	InitFogOfWar();
 }
 
-
 /**
 **  Cleanup the map module.
 */
@@ -358,8 +357,6 @@ void CMap::Clean()
 
 	UI.Minimap.Destroy();
 }
-
-
 
 /**
 ** Save the complete map.

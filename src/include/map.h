@@ -204,7 +204,7 @@ public:
 	/// Set wall on field.
 	void RemoveWall(const Vec2i &pos);
 	/// Set wall on field.
-	void SetWall(const Vec2i &pos, int humanwall);
+	void SetWall(const Vec2i &pos, bool humanwall);
 
 	/// Returns true, if wall on the map tile field
 	bool WallOnMap(const Vec2i &pos) const;
