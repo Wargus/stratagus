@@ -647,59 +647,50 @@ void CTileset::fillSolidTiles(std::vector<unsigned int> *solidTiles) const
 	}
 }
 
-
-unsigned CTileset::getHumanWallTile(int dirFlag) const
+unsigned CTileset::getHumanWallTileIndex(int dirFlag) const
 {
-	unsigned tile = humanWallTable[dirFlag];
-	tile = tiles[tile].tile;
-	return tile;
+	return humanWallTable[dirFlag];
 }
-unsigned CTileset::getOrcWallTile(int dirFlag) const
+unsigned CTileset::getOrcWallTileIndex(int dirFlag) const
 {
-	unsigned tile = orcWallTable[dirFlag];
-	tile = tiles[tile].tile;
-	return tile;
+	return orcWallTable[dirFlag];
 }
 
-static unsigned int NextSection(const CTileset &tileset, unsigned int tile)
+static unsigned int NextSection(const CTileset &tileset, unsigned int tileIndex)
 {
-	while (tileset.tiles[tile].tile) { // Skip good tiles
-		++tile;
+	while (tileset.tiles[tileIndex].tile) { // Skip good tiles
+		++tileIndex;
 	}
-	while (!tileset.tiles[tile].tile) { // Skip separator
-		++tile;
+	while (!tileset.tiles[tileIndex].tile) { // Skip separator
+		++tileIndex;
 	}
-	return tile;
+	return tileIndex;
 }
 
-unsigned CTileset::getHumanWallTile_broken(int dirFlag) const
+unsigned CTileset::getHumanWallTileIndex_broken(int dirFlag) const
 {
-	unsigned tile = humanWallTable[dirFlag];
-	tile = NextSection(*this, tile);
-	tile = tiles[tile].tile;
-	return tile;
+	unsigned tileIndex = humanWallTable[dirFlag];
+	tileIndex = NextSection(*this, tileIndex);
+	return tileIndex;
 }
-unsigned CTileset::getOrcWallTile_broken(int dirFlag) const
+unsigned CTileset::getOrcWallTileIndex_broken(int dirFlag) const
 {
-	unsigned tile = orcWallTable[dirFlag];
-	tile = NextSection(*this, tile);
-	tile = tiles[tile].tile;
-	return tile;
+	unsigned tileIndex = orcWallTable[dirFlag];
+	tileIndex = NextSection(*this, tileIndex);
+	return tileIndex;
 }
-unsigned CTileset::getHumanWallTile_destroyed(int dirFlag) const
+unsigned CTileset::getHumanWallTileIndex_destroyed(int dirFlag) const
 {
-	unsigned tile = humanWallTable[dirFlag];
-	tile = NextSection(*this, tile);
-	tile = NextSection(*this, tile);
-	tile = tiles[tile].tile;
-	return tile;
+	unsigned tileIndex = humanWallTable[dirFlag];
+	tileIndex = NextSection(*this, tileIndex);
+	tileIndex = NextSection(*this, tileIndex);
+	return tileIndex;
 }
-unsigned CTileset::getOrcWallTile_destroyed(int dirFlag) const
+unsigned CTileset::getOrcWallTileIndex_destroyed(int dirFlag) const
 {
-	unsigned tile = orcWallTable[dirFlag];
-	tile = NextSection(*this, tile);
-	tile = NextSection(*this, tile);
-	tile = tiles[tile].tile;
-	return tile;
+	unsigned tileIndex = orcWallTable[dirFlag];
+	tileIndex = NextSection(*this, tileIndex);
+	tileIndex = NextSection(*this, tileIndex);
+	return tileIndex;
 }
 //@}

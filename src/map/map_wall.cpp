@@ -62,23 +62,25 @@
 
 static unsigned int getWallTile(const CTileset &tileset, bool humanWall, int dirFlag, int value)
 {
+	unsigned int tileIndex;
 	if (humanWall) {
 		if (value == 0) {
-			return tileset.getHumanWallTile_destroyed(dirFlag);
+			tileIndex = tileset.getHumanWallTileIndex_destroyed(dirFlag);
 		} else if (UnitTypeHumanWall && value <= UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
-			return tileset.getHumanWallTile_broken(dirFlag);
+			tileIndex = tileset.getHumanWallTileIndex_broken(dirFlag);
 		} else {
-			return tileset.getHumanWallTile(dirFlag);
+			tileIndex = tileset.getHumanWallTileIndex(dirFlag);
 		}
 	} else { // orcWall
 		if (value == 0) {
-			return tileset.getOrcWallTile_destroyed(dirFlag);
+			tileIndex = tileset.getOrcWallTileIndex_destroyed(dirFlag);
 		} else if (UnitTypeOrcWall && value <= UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
-			return tileset.getOrcWallTile_broken(dirFlag);
+			tileIndex = tileset.getOrcWallTileIndex_broken(dirFlag);
 		} else {
-			return tileset.getOrcWallTile(dirFlag);
+			tileIndex = tileset.getOrcWallTileIndex(dirFlag);
 		}
 	}
+	return tileset.tiles[tileIndex].tile;
 }
 
 
@@ -235,10 +237,10 @@ void CMap::SetWall(const Vec2i &pos, bool humanwall)
 
 	if (humanwall) {
 		const int value = UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max;
-		mf.setTileIndex(*Tileset, Tileset->getHumanWallTile(0), value);
+		mf.setTileIndex(*Tileset, Tileset->getHumanWallTileIndex(0), value);
 	} else {
 		const int value = UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max;
-		mf.setTileIndex(*Tileset, Tileset->getOrcWallTile(0), value);
+		mf.setTileIndex(*Tileset, Tileset->getOrcWallTileIndex(0), value);
 	}
 
 	UI.Minimap.UpdateXY(pos);

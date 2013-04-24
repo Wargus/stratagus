@@ -85,6 +85,9 @@ struct SolidTerrainInfo {
 class CTile
 {
 public:
+	CTile() : tile(0), flag(0) {}
+
+public:
 	unsigned short tile;  /// graphical pos
 	unsigned short flag;  /// Flag
 	CTileInfo tileinfo;   /// Tile descriptions
@@ -112,12 +115,12 @@ public:
 	unsigned getBottomOneTreeTile() const { return botOneTreeTile; }
 	unsigned getTopOneTreeTile() const { return topOneTreeTile; }
 
-	unsigned getHumanWallTile(int dirFlag) const;
-	unsigned getOrcWallTile(int dirFlag) const;
-	unsigned getHumanWallTile_broken(int dirFlag) const;
-	unsigned getOrcWallTile_broken(int dirFlag) const;
-	unsigned getHumanWallTile_destroyed(int dirFlag) const;
-	unsigned getOrcWallTile_destroyed(int dirFlag) const;
+	unsigned getHumanWallTileIndex(int dirFlag) const;
+	unsigned getOrcWallTileIndex(int dirFlag) const;
+	unsigned getHumanWallTileIndex_broken(int dirFlag) const;
+	unsigned getOrcWallTileIndex_broken(int dirFlag) const;
+	unsigned getHumanWallTileIndex_destroyed(int dirFlag) const;
+	unsigned getOrcWallTileIndex_destroyed(int dirFlag) const;
 
 	unsigned int getSolidTerrainCount() const;
 

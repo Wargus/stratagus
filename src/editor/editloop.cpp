@@ -958,7 +958,7 @@ static void DrawEditorInfo()
 
 	// Tile info
 	const CTileset &tileset = *Map.Tileset;
-	const int index = tileset.findTileIndexByTile(mf.TilesetTile);
+	const int index = tileset.findTileIndexByTile(mf.Tile);
 	Assert(index != -1);
 	const int baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
 	const char *baseTerrainStr = tileset.getTerrainName(baseTerrainIdx).c_str();
