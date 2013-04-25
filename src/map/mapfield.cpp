@@ -160,28 +160,17 @@ void CMapField::parse(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	lua_rawgeti(l, -1, 1);
-	this->Tile = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, -1, 2);
-	this->playerInfo.SeenTile = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, -1, 3);
-	this->Value = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, -1, 4);
-	this->Cost = LuaToNumber(l, -1);
-	lua_pop(l, 1);
+	this->Tile = LuaToNumber(l, -1, 1);
+	this->playerInfo.SeenTile = LuaToNumber(l, -1, 2);
+	this->Value = LuaToNumber(l, -1, 3);
+	this->Cost = LuaToNumber(l, -1, 4);
 
 	for (int j = 4; j < len; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		const char *value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *value = LuaToString(l, -1, j + 1);
+
 		if (!strcmp(value, "explored")) {
 			++j;
-			lua_rawgeti(l, -1, j + 1);
-			this->playerInfo.Visible[LuaToNumber(l, -1)] = 1;
-			lua_pop(l, 1);
+			this->playerInfo.Visible[LuaToNumber(l, -1, j + 1)] = 1;
 		} else if (!strcmp(value, "human")) {
 			this->Flags |= MapFieldHuman;
 		} else if (!strcmp(value, "land")) {

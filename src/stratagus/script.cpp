@@ -339,6 +339,43 @@ bool LuaToBoolean(lua_State *l, int narg)
 	return lua_toboolean(l, narg) != 0;
 }
 
+const char *LuaToString(lua_State *l, int index, int subIndex)
+{
+	luaL_checktype(l, index, LUA_TTABLE);
+	lua_rawgeti(l, index, subIndex);
+	const char *res = LuaToString(l, -1);
+	lua_pop(l, 1);
+	return res;
+}
+
+int LuaToNumber(lua_State *l, int index, int subIndex)
+{
+	luaL_checktype(l, index, LUA_TTABLE);
+	lua_rawgeti(l, index, subIndex);
+	const int res = LuaToNumber(l, -1);
+	lua_pop(l, 1);
+	return res;
+}
+
+unsigned int LuaToUnsignedNumber(lua_State *l, int index, int subIndex)
+{
+	luaL_checktype(l, index, LUA_TTABLE);
+	lua_rawgeti(l, index, subIndex);
+	const unsigned int res = LuaToUnsignedNumber(l, -1);
+	lua_pop(l, 1);
+	return res;
+}
+
+bool LuaToBoolean(lua_State *l, int index, int subIndex)
+{
+	luaL_checktype(l, index, LUA_TTABLE);
+	lua_rawgeti(l, index, subIndex);
+	const bool res = LuaToBoolean(l, -1);
+	lua_pop(l, 1);
+	return res;
+}
+
+
 /**
 **  Perform lua garbage collection
 */

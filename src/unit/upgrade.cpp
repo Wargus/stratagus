@@ -261,9 +261,7 @@ static int CclDefineModifier(lua_State *l)
 		if (!lua_istable(l, j + 1)) {
 			LuaError(l, "incorrect argument");
 		}
-		lua_rawgeti(l, j + 1, 1);
-		const char *key = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *key = LuaToString(l, j + 1, 1);
 #if 0 // To be removed. must modify lua file.
 		if (!strcmp(key, "attack-range")) {
 			key = "AttackRange";
@@ -280,74 +278,49 @@ static int CclDefineModifier(lua_State *l)
 		}
 #endif
 		if (!strcmp(key, "regeneration-rate")) {
-			lua_rawgeti(l, j + 1, 2);
-			um->Modifier.Variables[HP_INDEX].Increase = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			um->Modifier.Variables[HP_INDEX].Increase = LuaToNumber(l, j + 1, 2);
 		} else if (!strcmp(key, "cost")) {
 			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
-			lua_rawgeti(l, j + 1, 1);
-			const char *value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			const char *value = LuaToString(l, j + 1, 1);
 			const int resId = GetResourceIdByName(l, value);
-			lua_rawgeti(l, j + 1, 2);
-			um->Modifier.Costs[resId] = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			um->Modifier.Costs[resId] = LuaToNumber(l, j + 1, 2);
 		} else if (!strcmp(key, "storing")) {
 			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
-			lua_rawgeti(l, j + 1, 1);
-			const char *value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			const char *value = LuaToString(l, j + 1, 1);
 			const int resId = GetResourceIdByName(l, value);
-			lua_rawgeti(l, j + 1, 2);
-			um->Modifier.Storing[resId] = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			um->Modifier.Storing[resId] = LuaToNumber(l, j + 1, 2);
 		} else if (!strcmp(key, "allow-unit")) {
-			lua_rawgeti(l, j + 1, 2);
-			const char *value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			const char *value = LuaToString(l, j + 1, 2);
+
 			if (!strncmp(value, "unit-", 5)) {
-				lua_rawgeti(l, j + 1, 3);
-				um->ChangeUnits[UnitTypeIdByIdent(value)] = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				um->ChangeUnits[UnitTypeIdByIdent(value)] = LuaToNumber(l, j + 1, 3);
 			} else {
 				LuaError(l, "unit expected");
 			}
 		} else if (!strcmp(key, "allow")) {
-			lua_rawgeti(l, j + 1, 2);
-			const char *value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			const char *value = LuaToString(l, j + 1, 2);
 			if (!strncmp(value, "upgrade-", 8)) {
-				lua_rawgeti(l, j + 1, 3);
-				um->ChangeUpgrades[UpgradeIdByIdent(value)] = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				um->ChangeUpgrades[UpgradeIdByIdent(value)] = LuaToNumber(l, j + 1, 3);
 			} else {
 				LuaError(l, "upgrade expected");
 			}
 		} else if (!strcmp(key, "apply-to")) {
-			lua_rawgeti(l, j + 1, 2);
-			const char *value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			const char *value = LuaToString(l, j + 1, 2);
 			um->ApplyTo[UnitTypeIdByIdent(value)] = 'X';
 		} else if (!strcmp(key, "convert-to")) {
-			lua_rawgeti(l, j + 1, 2);
-			const char *value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			const char *value = LuaToString(l, j + 1, 2);
 			um->ConvertTo = UnitTypeByIdent(value);
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[key]; // variable index;
 			if (index != -1) {
 				if (lua_rawlen(l, j + 1) == 3) {
-					lua_rawgeti(l, j + 1, 3);
-					const char *value = LuaToString(l, -1);
-					lua_pop(l, 1);
+					const char *value = LuaToString(l, j + 1, 3);
 					if (!strcmp(value, "Percent")) {
-						lua_rawgeti(l, j + 1, 2);
-						um->ModifyPercent[index] = LuaToNumber(l, -1);
-						lua_pop(l, 1);
+						um->ModifyPercent[index] = LuaToNumber(l, j + 1, 2);
 					}
 				} else {
 					lua_rawgeti(l, j + 1, 2);

@@ -1250,16 +1250,11 @@ void Windows::setBaseColor(const gcn::Color &color)
 */
 void LuaListModel::setList(lua_State *lua, lua_Object *lo)
 {
-	int args;
-	int j;
-
 	list.clear();
 
-	args = lua_rawlen(lua, *lo);
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(lua, *lo, j + 1);
-		list.push_back(std::string(LuaToString(lua, -1)));
-		lua_pop(lua, 1);
+	const int args = lua_rawlen(lua, *lo);
+	for (int j = 0; j < args; ++j) {
+		list.push_back(std::string(LuaToString(lua, *lo, j + 1)));
 	}
 }
 

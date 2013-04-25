@@ -79,9 +79,7 @@ static int CclStratagusMap(lua_State *l)
 			}
 			int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				const char *value = LuaToString(l, -1);
-				lua_pop(l, 1);
+				const char *value = LuaToString(l, j + 1, k + 1);
 				++k;
 
 				if (!strcmp(value, "size")) {
@@ -99,9 +97,7 @@ static int CclStratagusMap(lua_State *l)
 					Map.NoFogOfWar = true;
 					--k;
 				} else if (!strcmp(value, "filename")) {
-					lua_rawgeti(l, j + 1, k + 1);
-					Map.Info.Filename = LuaToString(l, -1);
-					lua_pop(l, 1);
+					Map.Info.Filename = LuaToString(l, j + 1, k + 1);
 				} else if (!strcmp(value, "map-fields")) {
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {

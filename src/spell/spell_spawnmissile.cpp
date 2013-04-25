@@ -57,14 +57,10 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 	}
 	const int args = lua_rawlen(l, -1);
 	for (int j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		const char *value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *value = LuaToString(l, -1, j + 1);
 		++j;
 		if (!strcmp(value, "base")) {
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			value = LuaToString(l, -1, j + 1);
 			if (!strcmp(value, "caster")) {
 				location->Base = LocBaseCaster;
 			} else if (!strcmp(value, "target")) {
@@ -73,21 +69,13 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 				LuaError(l, "Unsupported missile location base flag: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "add-x")) {
-			lua_rawgeti(l, -1, j + 1);
-			location->AddX = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			location->AddX = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "add-y")) {
-			lua_rawgeti(l, -1, j + 1);
-			location->AddY = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			location->AddY = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "add-rand-x")) {
-			lua_rawgeti(l, -1, j + 1);
-			location->AddRandX = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			location->AddRandX = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "add-rand-y")) {
-			lua_rawgeti(l, -1, j + 1);
-			location->AddRandY = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			location->AddRandY = LuaToNumber(l, -1, j + 1);
 		} else {
 			LuaError(l, "Unsupported missile location description flag: %s" _C_ value);
 		}
@@ -97,25 +85,17 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 /* virtual */ void Spell_SpawnMissile::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		const char *value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *value = LuaToString(l, -1, j + 1);
 		++j;
 		if (!strcmp(value, "damage")) {
-			lua_rawgeti(l, -1, j + 1);
-			this->Damage = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			this->Damage = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "use-unit-var")) {
 			this->UseUnitVar = true;
 			--j;
 		} else if (!strcmp(value, "delay")) {
-			lua_rawgeti(l, -1, j + 1);
-			this->Delay = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			this->Delay = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "ttl")) {
-			lua_rawgeti(l, -1, j + 1);
-			this->TTL = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			this->TTL = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "start-point")) {
 			lua_rawgeti(l, -1, j + 1);
 			CclSpellMissileLocation(l, &this->StartPoint);
@@ -125,13 +105,11 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 			CclSpellMissileLocation(l, &this->EndPoint);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "missile")) {
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
+			value = LuaToString(l, -1, j + 1);
 			this->Missile = MissileTypeByIdent(value);
 			if (this->Missile == NULL) {
 				DebugPrint("in spawn-missile : missile %s does not exist\n" _C_ value);
 			}
-			lua_pop(l, 1);
 		} else {
 			LuaError(l, "Unsupported spawn-missile tag: %s" _C_ value);
 		}

@@ -650,28 +650,16 @@ static int CclReplayLog(lua_State *l)
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
-			lua_rawgeti(l, -1, 1);
-			replay->Engine[0] = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			replay->Engine[1] = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 3);
-			replay->Engine[2] = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			replay->Engine[0] = LuaToNumber(l, -1, 1);
+			replay->Engine[1] = LuaToNumber(l, -1, 2);
+			replay->Engine[2] = LuaToNumber(l, -1, 3);
 		} else if (!strcmp(value, "Network")) {
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
-			lua_rawgeti(l, -1, 1);
-			replay->Network[0] = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			replay->Network[1] = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 3);
-			replay->Network[2] = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			replay->Network[0] = LuaToNumber(l, -1, 1);
+			replay->Network[1] = LuaToNumber(l, -1, 2);
+			replay->Network[2] = LuaToNumber(l, -1, 3);
 		} else {
 			LuaError(l, "Unsupported key: %s" _C_ value);
 		}

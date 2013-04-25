@@ -172,10 +172,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 {
 	const int args = lua_rawlen(l, -1);
-
-	lua_rawgeti(l, -1, 1);
-	const char *actiontype = LuaToString(l, -1);
-	lua_pop(l, 1);
+	const char *actiontype = LuaToString(l, -1, 1);
 
 	if (!strcmp(actiontype, "action-attack")) {
 		*orderPtr = new COrder_Attack(false);
@@ -224,9 +221,7 @@ void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 	COrder &order = **orderPtr;
 
 	for (int j = 1; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		const char *value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *value = LuaToString(l, -1, j + 1);
 
 		if (order.ParseGenericData(l, j, value)) {
 			continue;

@@ -354,25 +354,17 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 	const int nargs = lua_rawlen(l, luaIndex);
 
 	for (int j = 0; j != nargs; ++j) {
-		lua_rawgeti(l, luaIndex, j + 1);
-		const char *value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *value = LuaToString(l, luaIndex, j + 1);
 		++j;
 
 		if (!strcmp(value, "anim-wait")) {
-			lua_rawgeti(l, luaIndex, j + 1);
-			unit.Anim.Wait = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			unit.Anim.Wait = LuaToNumber(l, luaIndex, j + 1);
 		} else if (!strcmp(value, "curr-anim")) {
-			lua_rawgeti(l, luaIndex, j + 1);
-			const int animIndex = LuaToNumber(l, -1);
+			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
 			unit.Anim.CurrAnim = AnimationsArray[animIndex];
-			lua_pop(l, 1);
 		} else if (!strcmp(value, "anim")) {
-			lua_rawgeti(l, luaIndex, j + 1);
-			const int animIndex = LuaToNumber(l, -1);
+			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
 			unit.Anim.Anim = Advance(unit.Anim.CurrAnim, animIndex);
-			lua_pop(l, 1);
 		} else if (!strcmp(value, "unbreakable")) {
 			unit.Anim.Unbreakable = 1;
 			--j;
@@ -510,16 +502,12 @@ static CAnimation *ParseAnimation(lua_State *l, int idx)
 	Labels.clear();
 	LabelsLater.clear();
 
-	lua_rawgeti(l, idx, 1);
-	const char *str = LuaToString(l, -1);
-	lua_pop(l, 1);
+	const char *str = LuaToString(l, idx, 1);
 
 	CAnimation *firstAnim = ParseAnimationFrame(l, str);
 	CAnimation *prev = firstAnim;
 	for (int j = 1; j < args; ++j) {
-		lua_rawgeti(l, idx, j + 1);
-		const char *str = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *str = LuaToString(l, idx, j + 1);
 		CAnimation *anim = ParseAnimationFrame(l, str);
 		prev->Next = anim;
 		prev = anim;

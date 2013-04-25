@@ -138,54 +138,36 @@ void CTileset::parseSpecial(lua_State *l)
 	const int args = lua_rawlen(l, -1);
 
 	for (int j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		const char *value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *value = LuaToString(l, -1, j + 1);
 
 		if (!strcmp(value, "top-one-tree")) {
 			++j;
-			lua_rawgeti(l, -1, j + 1);
-			topOneTreeTile = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			topOneTreeTile = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "mid-one-tree")) {
 			++j;
-			lua_rawgeti(l, -1, j + 1);
-			midOneTreeTile = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			midOneTreeTile = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "bot-one-tree")) {
 			++j;
-			lua_rawgeti(l, -1, j + 1);
-			botOneTreeTile = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			botOneTreeTile = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "removed-tree")) {
 			++j;
-			lua_rawgeti(l, -1, j + 1);
-			removedTreeTile = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			removedTreeTile = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "growing-tree")) {
 			++j;
 			// keep for retro compatibility.
 			// TODO : remove when game data are updated.
 		} else if (!strcmp(value, "top-one-rock")) {
 			++j;
-			lua_rawgeti(l, -1, j + 1);
-			topOneRockTile = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			topOneRockTile = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "mid-one-rock")) {
 			++j;
-			lua_rawgeti(l, -1, j + 1);
-			midOneRockTile = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			midOneRockTile = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "bot-one-rock")) {
 			++j;
-			lua_rawgeti(l, -1, j + 1);
-			botOneRockTile = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			botOneRockTile = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "removed-rock")) {
 			++j;
-			lua_rawgeti(l, -1, j + 1);
-			removedRockTile = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			removedRockTile = LuaToNumber(l, -1, j + 1);
 		} else {
 			LuaError(l, "special: unsupported tag: %s" _C_ value);
 		}
@@ -200,17 +182,15 @@ void CTileset::parseSpecial(lua_State *l)
 void CTileset::parseSolid(lua_State *l)
 {
 	const int index = tiles.size();
-	int j = 0;
 
 	this->tiles.resize(index + 16);
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
 
-	lua_rawgeti(l, -1, j + 1);
+	int j = 0;
+	const int basic_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
 	++j;
-	const int basic_name = getOrAddSolidTileIndexByName(LuaToString(l, -1));
-	lua_pop(l, 1);
 
 	int f = 0;
 	ParseTilesetTileFlags(l, &f, &j);
@@ -265,14 +245,10 @@ void CTileset::parseMixed(lua_State *l)
 	}
 	int j = 0;
 	const int args = lua_rawlen(l, -1);
-	lua_rawgeti(l, -1, j + 1);
+	const int basic_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
 	++j;
-	const int basic_name = getOrAddSolidTileIndexByName(LuaToString(l, -1));;
-	lua_pop(l, 1);
-	lua_rawgeti(l, -1, j + 1);
+	const int mixed_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
 	++j;
-	const int mixed_name = getOrAddSolidTileIndexByName(LuaToString(l, -1));;
-	lua_pop(l, 1);
 
 	int f = 0;
 	ParseTilesetTileFlags(l, &f, &j);
@@ -285,9 +261,7 @@ void CTileset::parseMixed(lua_State *l)
 		//  Vector: the tiles.
 		const int len = lua_rawlen(l, -1);
 		for (int i = 0; i < len; ++i) {
-			lua_rawgeti(l, -1, i + 1);
-			const int pud = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			const int pud = LuaToNumber(l, -1, i + 1);
 			CTile &tile = tiles[index + i];
 
 			tile.tile = pud;
@@ -313,9 +287,7 @@ void CTileset::parseSlots(lua_State *l, int t)
 	//  Parse the list: (still everything could be changed!)
 	const int args = lua_rawlen(l, t);
 	for (int j = 0; j < args; ++j) {
-		lua_rawgeti(l, t, j + 1);
-		const char *value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *value = LuaToString(l, t, j + 1);
 		++j;
 
 		if (!strcmp(value, "special")) {

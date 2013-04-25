@@ -41,9 +41,7 @@
 /* virtual */ void Spell_Teleport::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		const char *value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *value = LuaToString(l, -1, j + 1);
 		++j;
 		LuaError(l, "Unsupported Teleport tag: %s" _C_ value);
 	}

@@ -329,9 +329,7 @@ static int CclSetTitleScreens(lua_State *l)
 							}
 							const int subsubargs = lua_rawlen(l, -1);
 							for (int subk = 0; subk < subsubargs; ++subk) {
-								lua_rawgeti(l, -1, subk + 1);
-								const char *value = LuaToString(l, -1);
-								lua_pop(l, 1);
+								const char *value = LuaToString(l, -1, subk + 1);
 								if (!strcmp(value, "center")) {
 									TitleScreens[j]->Labels[k]->Flags |= TitleFlagCenter;
 								} else {
@@ -609,18 +607,12 @@ static int CclDefineViewports(lua_State *l)
 			if (!lua_istable(l, j + 1) && lua_rawlen(l, j + 1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
-			lua_rawgeti(l, j + 1, 1);
-			UI.Viewports[i].MapPos.x = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
-			UI.Viewports[i].MapPos.y = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 3);
-			const int slot = LuaToNumber(l, -1);
+			UI.Viewports[i].MapPos.x = LuaToNumber(l, j + 1, 1);
+			UI.Viewports[i].MapPos.y = LuaToNumber(l, j + 1, 2);
+			const int slot = LuaToNumber(l, j + 1, 3);
 			if (slot != -1) {
 				UI.Viewports[i].Unit = &UnitManager.GetSlotUnit(slot);
 			}
-			lua_pop(l, 1);
 			++i;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -986,9 +978,7 @@ static int CclDefineButton(lua_State *l)
 			const unsigned int subargs = lua_rawlen(l, -1);
 
 			for (unsigned int k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, -1, k + 1);
-				const char *s2 = LuaToString(l, -1);
-				lua_pop(l, 1);
+				const char *s2 = LuaToString(l, -1, k + 1);
 				allowstr += s2;
 				if (k != subargs - 1) {
 					allowstr += ",";
@@ -1015,9 +1005,7 @@ static int CclDefineButton(lua_State *l)
 			std::string umask = ",";
 			const unsigned subargs = lua_rawlen(l, -1);
 			for (unsigned int k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, -1, k + 1);
-				const char *s2 = LuaToString(l, -1);
-				lua_pop(l, 1);
+				const char *s2 = LuaToString(l, -1, k + 1);
 				umask += s2;
 				umask += ",";
 			}

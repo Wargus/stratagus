@@ -69,9 +69,7 @@ static SpellActionType *CclSpellAction(lua_State *l)
 	}
 	const int args = lua_rawlen(l, -1);
 
-	lua_rawgeti(l, -1, 1);
-	const char *value = LuaToString(l, -1);
-	lua_pop(l, 1);
+	const char *value = LuaToString(l, -1, 1);
 
 	SpellActionType *spellaction = NULL;
 	if (!strcmp(value, "adjust-variable")) {
@@ -161,28 +159,18 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 	}
 	const int args = lua_rawlen(l, -1);
 	for (int j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		const char *value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *value = LuaToString(l, -1, j + 1);
 		++j;
 		if (!strcmp(value, "alliance")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->Alliance = Ccl2Condition(l, LuaToString(l, -1));
-			lua_pop(l, 1);
+			condition->Alliance = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else if (!strcmp(value, "opponent")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->Opponent = Ccl2Condition(l, LuaToString(l, -1));
-			lua_pop(l, 1);
+			condition->Opponent = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else if (!strcmp(value, "self")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->TargetSelf = Ccl2Condition(l, LuaToString(l, -1));
-			lua_pop(l, 1);
+			condition->TargetSelf = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[value];
 			if (index != -1) {
-				lua_rawgeti(l, -1, j + 1);
-				condition->BoolFlag[index] = Ccl2Condition(l, LuaToString(l, -1));
-				lua_pop(l, 1);
+				condition->BoolFlag[index] = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 				continue;
 			}
 			index = UnitTypeVar.VariableNameLookup[value];
@@ -239,18 +227,12 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 	}
 	const int args = lua_rawlen(l, -1);
 	for (int j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		const char *value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *value = LuaToString(l, -1, j + 1);
 		++j;
 		if (!strcmp(value, "range")) {
-			lua_rawgeti(l, -1, j + 1);
-			autocast->Range = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			autocast->Range = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "combat")) {
-			lua_rawgeti(l, -1, j + 1);
-			autocast->Combat = Ccl2Condition(l, LuaToString(l, -1));
-			lua_pop(l, 1);
+			autocast->Combat = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else if (!strcmp(value, "priority")) {
 			lua_rawgeti(l, -1, j + 1);
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
@@ -269,9 +251,7 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 			}
 			autocast->PriorytyVar = index;
 			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			autocast->ReverseSort = LuaToBoolean(l, -1);
-			lua_pop(l, 1);
+			autocast->ReverseSort = LuaToBoolean(l, -1, 2);
 
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "condition")) {
@@ -336,9 +316,7 @@ static int CclDefineSpell(lua_State *l)
 				LuaError(l, "resource table size isn't correct");
 			}
 			for (int j = 1; j < len; ++j) { // exclude the time
-				lua_rawgeti(l, -1,  j + 1);
-				spell->Costs[j] = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				spell->Costs[j] = LuaToNumber(l, -1, j + 1);
 			}
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "range")) {

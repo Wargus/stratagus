@@ -286,6 +286,11 @@ extern int LuaToNumber(lua_State *l, int narg);
 extern unsigned int LuaToUnsignedNumber(lua_State *l, int narg);
 extern bool LuaToBoolean(lua_State *l, int narg);
 
+extern const char *LuaToString(lua_State *l, int index, int subIndex);
+extern int LuaToNumber(lua_State *l, int index, int subIndex);
+extern unsigned int LuaToUnsignedNumber(lua_State *l, int index, int subIndex);
+extern bool LuaToBoolean(lua_State *l, int index, int subIndex);
+
 extern void LuaGarbageCollect();  /// Perform garbage collection
 extern void InitLua();                /// Initialise Lua
 extern void LoadCcl(const std::string &filename);  /// Load ccl config file
@@ -311,12 +316,8 @@ static void CclGetPos(lua_State *l, T *x , T *y, const int offset = -1)
 	if (!lua_istable(l, offset) || lua_rawlen(l, offset) != 2) {
 		LuaError(l, "incorrect argument");
 	}
-	lua_rawgeti(l, offset, 1);
-	*x = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, offset, 2);
-	*y = LuaToNumber(l, -1);
-	lua_pop(l, 1);
+	*x = LuaToNumber(l, offset, 1);
+	*y = LuaToNumber(l, offset, 2);
 }
 
 extern NumberDesc *Damage;  /// Damage calculation for missile.

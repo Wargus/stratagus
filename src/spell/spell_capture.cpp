@@ -41,20 +41,14 @@
 /* virtual */ void Spell_Capture::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		const char *value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *value = LuaToString(l, -1, j + 1);
 		++j;
 		if (!strcmp(value, "sacrifice")) {
 			this->SacrificeEnable = 1;
 		} else if (!strcmp(value, "damage")) {
-			lua_rawgeti(l, -1, j + 1);
-			this->Damage = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			this->Damage = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "percent")) {
-			lua_rawgeti(l, -1, j + 1);
-			this->DamagePercent = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			this->DamagePercent = LuaToNumber(l, -1, j + 1);
 		} else {
 			LuaError(l, "Unsupported Capture tag: %s" _C_ value);
 		}
