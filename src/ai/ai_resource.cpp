@@ -45,6 +45,7 @@
 #include "map.h"
 #include "pathfinder.h"
 #include "player.h"
+#include "tileset.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unittype.h"

@@ -45,6 +45,7 @@
 #include "player.h"
 #include "script.h"
 #include "sound.h"
+#include "tileset.h"
 #include "ui.h"
 #include "unit.h"
 #include "unit_find.h"
@@ -690,7 +691,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			unit.ResourcesHeld += addload;
 
 			if (addload && unit.ResourcesHeld == resinfo.ResourceCapacity) {
-				Map.ClearTile(MapFieldForest, this->goalPos);
+				Map.ClearWoodTile(this->goalPos);
 			}
 		} else {
 			if (resinfo.HarvestFromOutside) {

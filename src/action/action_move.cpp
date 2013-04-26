@@ -201,7 +201,7 @@ int DoActionMove(CUnit &unit)
 	}
 
 	unit.pathFinderData->output.Cycles++;//reset have to be manualy controled by caller.
-	int move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move, Map.Field(unit.Offset)->Cost);
+	int move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move, Map.Field(unit.Offset)->getCost());
 
 	unit.IX += posd.x * move;
 	unit.IY += posd.y * move;

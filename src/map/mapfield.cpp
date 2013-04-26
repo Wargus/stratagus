@@ -46,14 +46,14 @@
 #include "unit_manager.h"
 
 CMapField::CMapField() :
-	Tile(0),
+#ifdef DEBUG
+	tilesetTile(0),
+#endif
+	tile(0),
 	Flags(0),
-	Cost(0),
+	cost(0),
 	Value(0),
 	UnitCache()
-#ifdef DEBUG
-	, TilesetTile(0)
-#endif
 {}
 
 bool CMapField::IsTerrainResourceOnMap(int resource) const
@@ -78,7 +78,7 @@ bool CMapField::IsTerrainResourceOnMap() const
 void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value)
 {
 	const CTile &tile = tileset.tiles[tileIndex];
-	this->Tile = tile.tile;
+	this->tile = tile.tile;
 	this->Value = value;
 #if 0
 	this->Flags = tile.flag;
@@ -88,15 +88,15 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 					 MapFieldWall | MapFieldRocks | MapFieldForest);
 	this->Flags |= tile.flag;
 #endif
-	this->Cost = 1 << (tile.flag & MapFieldSpeedMask);
+	this->cost = 1 << (tile.flag & MapFieldSpeedMask);
 #ifdef DEBUG
-	this->TilesetTile = tileIndex;
+	this->tilesetTile = tileIndex;
 #endif
 }
 
 void CMapField::Save(CFile &file) const
 {
-	file.printf("  {%3d, %3d, %2d, %2d", Tile, playerInfo.SeenTile, Value, Cost);
+	file.printf("  {%3d, %3d, %2d, %2d", tile, playerInfo.SeenTile, Value, cost);
 	for (int i = 0; i != PlayerMax; ++i) {
 		if (playerInfo.Visible[i] == 1) {
 			file.printf(", \"explored\", %d", i);
@@ -160,10 +160,10 @@ void CMapField::parse(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	this->Tile = LuaToNumber(l, -1, 1);
+	this->tile = LuaToNumber(l, -1, 1);
 	this->playerInfo.SeenTile = LuaToNumber(l, -1, 2);
 	this->Value = LuaToNumber(l, -1, 3);
-	this->Cost = LuaToNumber(l, -1, 4);
+	this->cost = LuaToNumber(l, -1, 4);
 
 	for (int j = 4; j < len; ++j) {
 		const char *value = LuaToString(l, -1, j + 1);
@@ -201,6 +201,56 @@ void CMapField::parse(lua_State *l)
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
+}
+
+/// Check if a field flags.
+bool CMapField::CheckMask(int mask) const
+{
+	return (this->Flags & mask) != 0;
+}
+
+/// Returns true, if water on the map tile field
+bool CMapField::WaterOnMap() const
+{
+	return CheckMask(MapFieldWaterAllowed);
+}
+
+/// Returns true, if coast on the map tile field
+bool CMapField::CoastOnMap() const
+{
+	return CheckMask(MapFieldCoastAllowed);
+}
+
+/// Returns true, if water on the map tile field
+bool CMapField::ForestOnMap() const
+{
+	return CheckMask(MapFieldForest);
+}
+
+/// Returns true, if coast on the map tile field
+bool CMapField::RockOnMap() const
+{
+	return CheckMask(MapFieldRocks);
+}
+
+bool CMapField::isAWall() const
+{
+	return Flags & MapFieldWall;
+}
+bool CMapField::isHuman() const
+{
+	return Flags & MapFieldHuman;
+}
+
+bool CMapField::isAHumanWall() const
+{
+	const unsigned int humanWallFlag = (MapFieldWall | MapFieldHuman);
+	return (Flags & humanWallFlag) == humanWallFlag;
+}
+bool CMapField::isAOrcWall() const
+{
+	const unsigned int humanWallFlag = (MapFieldWall | MapFieldHuman);
+	return (Flags & humanWallFlag) == MapFieldWall;
 }
 
 //

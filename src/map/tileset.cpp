@@ -185,9 +185,6 @@
 
 #include "tileset.h"
 
-#include "tile.h"
-#include "video.h"
-
 #include <limits.h>
 
 /*----------------------------------------------------------------------------
@@ -399,7 +396,7 @@ int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
 	while (!(type1 = (fixed & 0xFF))) {
 		fixed >>= 8;
 		if (!fixed) {
-			abort();
+			ExitFatal(-1);
 		}
 	}
 	fixed >>= 8;
@@ -471,9 +468,9 @@ int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
 	return base | (table[direction] << 4);
 }
 
-int CTileset::getTileIndexBySurrounding(unsigned short type,
-										int ttup, int ttright,
-										int ttdown, int ttleft) const
+int CTileset::getTileBySurrounding(unsigned short type,
+								   int ttup, int ttright,
+								   int ttdown, int ttleft) const
 {
 	ttup = ttup == -1 ? 15 : mixedLookupTable[ttup];
 	ttright = ttright == -1 ? 15 : mixedLookupTable[ttright];

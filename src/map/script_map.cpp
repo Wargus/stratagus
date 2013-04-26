@@ -421,6 +421,60 @@ static int CclLoadTileModels(lua_State *l)
 }
 
 /**
+**  Define tileset
+**
+**  @param l  Lua state.
+*/
+static int CclDefineTileset(lua_State *l)
+{
+	Map.Tileset->parse(l);
+
+	//  Load and prepare the tileset
+	PixelTileSize = Map.Tileset->getPixelTileSize();
+
+	ShowLoadProgress("Tileset `%s'", Map.Tileset->ImageFile.c_str());
+	Map.TileGraphic = CGraphic::New(Map.Tileset->ImageFile, PixelTileSize.x, PixelTileSize.y);
+	Map.TileGraphic->Load();
+	return 0;
+}
+/**
+** Build tileset tables like humanWallTable or mixedLookupTable
+**
+** Called after DefineTileset and only for tilesets that have wall,
+** trees and rocks. This function will be deleted when removing
+** support of walls and alike in the tileset.
+*/
+static int CclBuildTilesetTables(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+
+	Map.Tileset->buildTable(l);
+	return 0;
+}
+/**
+**  Set the flags like "water" for a tile of a tileset
+**
+**  @param l  Lua state.
+*/
+static int CclSetTileFlags(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "No flags defined");
+	}
+	const unsigned int tilenumber = LuaToNumber(l, 1);
+
+	if (tilenumber >= Map.Tileset->tiles.size()) {
+		LuaError(l, "Accessed a tile that's not defined");
+	}
+	int j = 0;
+	int flags = 0;
+
+	ParseTilesetTileFlags(l, &flags, &j);
+	Map.Tileset->tiles[tilenumber].flag = flags;
+	return 0;
+}
+
+/**
 **  Register CCL features for map.
 */
 void MapCclRegister()
@@ -443,6 +497,10 @@ void MapCclRegister()
 
 	lua_register(Lua, "LoadTileModels", CclLoadTileModels);
 	lua_register(Lua, "DefinePlayerTypes", CclDefinePlayerTypes);
+
+	lua_register(Lua, "DefineTileset", CclDefineTileset);
+	lua_register(Lua, "SetTileFlags", CclSetTileFlags);
+	lua_register(Lua, "BuildTilesetTables", CclBuildTilesetTables);
 }
 
 //@}

@@ -78,16 +78,16 @@
 	Vec2i ipos;
 	for (ipos.x = minpos.x; ipos.x <= maxpos.x; ++ipos.x) {
 		for (ipos.y = minpos.y; ipos.y <= maxpos.y; ++ipos.y) {
-			const int flag = Map.Field(ipos)->Flags;
+			const CMapField &mf = *Map.Field(ipos);
 			if (SquareDistance(ipos, goalPos) > square(this->Range)) {
 				// Not in circle range
 				continue;
-			} else if (flag & MapFieldWall) {
+			} else if (mf.isAWall()) {
 				Map.RemoveWall(ipos);
-			} else if (flag & MapFieldRocks) {
-				Map.ClearTile(MapFieldRocks, ipos);
-			} else if (flag & MapFieldForest) {
-				Map.ClearTile(MapFieldForest, ipos);
+			} else if (mf.RockOnMap()) {
+				Map.ClearRockTile(ipos);
+			} else if (mf.ForestOnMap()) {
+				Map.ClearWoodTile(ipos);
 			}
 		}
 	}

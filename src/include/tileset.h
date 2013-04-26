@@ -41,6 +41,26 @@
 
 struct lua_State;
 
+// Not used until now:
+#define MapFieldSpeedMask 0x0007  /// Move faster on this tile
+
+#define MapFieldHuman 0x0008  /// Human is owner of the field (walls)
+
+#define MapFieldLandAllowed  0x0010  /// Land units allowed
+#define MapFieldCoastAllowed 0x0020  /// Coast (transporter) units allowed
+#define MapFieldWaterAllowed 0x0040  /// Water units allowed
+#define MapFieldNoBuilding   0x0080  /// No buildings allowed
+
+#define MapFieldUnpassable 0x0100  /// Field is movement blocked
+#define MapFieldWall       0x0200  /// Field contains wall
+#define MapFieldRocks      0x0400  /// Field contains rocks
+#define MapFieldForest     0x0800  /// Field contains forest
+
+#define MapFieldLandUnit 0x1000  /// Land unit on field
+#define MapFieldAirUnit  0x2000  /// Air unit on field
+#define MapFieldSeaUnit  0x4000  /// Water unit on field
+#define MapFieldBuilding 0x8000  /// Building on field
+
 /**
 **  These are used for lookup tiles types
 **  mainly used for the FOW implementation of the seen woods/rocks
@@ -131,9 +151,9 @@ public:
 	void fillSolidTiles(std::vector<unsigned int> *solidTiles) const;
 
 	unsigned getQuadFromTile(unsigned int tile) const;
-	int getTileIndexBySurrounding(unsigned short type,
-								  int up, int right,
-								  int bottom, int left) const;
+	int getTileBySurrounding(unsigned short type,
+							 int up, int right,
+							 int bottom, int left) const;
 	int tileFromQuad(unsigned fixed, unsigned quad) const;
 	bool isEquivalentTile(unsigned int tile1, unsigned int tile2) const;
 
@@ -183,7 +203,7 @@ private:
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void TilesetCclRegister(); /// Register CCL features for tileset
+extern void ParseTilesetTileFlags(lua_State *l, int *back, int *j);
 
 //@}
 

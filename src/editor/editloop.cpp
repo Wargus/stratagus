@@ -189,7 +189,7 @@ static void EditTile(const Vec2i &pos, int tile)
 	const int tileIndex = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
 	CMapField &mf = *Map.Field(pos);
 	mf.setTileIndex(tileset, tileIndex, 0);
-	mf.playerInfo.SeenTile = mf.Tile;
+	mf.playerInfo.SeenTile = mf.getGraphicTile();
 
 	UI.Minimap.UpdateSeenXY(pos);
 	UI.Minimap.UpdateXY(pos);
@@ -916,27 +916,27 @@ static void DrawEditorInfo()
 	//
 	// Flags info
 	//
-	const unsigned flags = mf.Flags;
+	const unsigned flag = mf.getFlag();
 	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
-			mf.Value, flags,
-			flags & MapFieldUnpassable   ? 'u' : '-',
-			flags & MapFieldNoBuilding   ? 'n' : '-',
-			flags & MapFieldHuman        ? 'h' : '-',
-			flags & MapFieldWall         ? 'w' : '-',
-			flags & MapFieldRocks        ? 'r' : '-',
-			flags & MapFieldForest       ? 'f' : '-',
-			flags & MapFieldLandAllowed  ? 'L' : '-',
-			flags & MapFieldCoastAllowed ? 'C' : '-',
-			flags & MapFieldWaterAllowed ? 'W' : '-',
-			flags & MapFieldLandUnit     ? 'l' : '-',
-			flags & MapFieldAirUnit      ? 'a' : '-',
-			flags & MapFieldSeaUnit      ? 's' : '-',
-			flags & MapFieldBuilding     ? 'b' : '-');
+			mf.Value, flag,
+			flag & MapFieldUnpassable   ? 'u' : '-',
+			flag & MapFieldNoBuilding   ? 'n' : '-',
+			flag & MapFieldHuman        ? 'h' : '-',
+			flag & MapFieldWall         ? 'w' : '-',
+			flag & MapFieldRocks        ? 'r' : '-',
+			flag & MapFieldForest       ? 'f' : '-',
+			flag & MapFieldLandAllowed  ? 'L' : '-',
+			flag & MapFieldCoastAllowed ? 'C' : '-',
+			flag & MapFieldWaterAllowed ? 'W' : '-',
+			flag & MapFieldLandUnit     ? 'l' : '-',
+			flag & MapFieldAirUnit      ? 'a' : '-',
+			flag & MapFieldSeaUnit      ? 's' : '-',
+			flag & MapFieldBuilding     ? 'b' : '-');
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY, buf);
 
 	// Tile info
 	const CTileset &tileset = *Map.Tileset;
-	const int index = tileset.findTileIndexByTile(mf.Tile);
+	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
 	Assert(index != -1);
 	const int baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
 	const char *baseTerrainStr = tileset.getTerrainName(baseTerrainIdx).c_str();

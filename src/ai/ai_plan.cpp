@@ -42,6 +42,7 @@
 #include "map.h"
 #include "missile.h"
 #include "pathfinder.h"
+#include "tileset.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unittype.h"

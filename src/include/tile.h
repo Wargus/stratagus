@@ -147,27 +147,6 @@ struct lua_State;
 --  Map - field
 ----------------------------------------------------------------------------*/
 
-// Not used until now:
-#define MapFieldSpeedMask 0x0007  /// Move faster on this tile
-
-#define MapFieldHuman 0x0008  /// Human is owner of the field (walls)
-
-#define MapFieldLandAllowed  0x0010  /// Land units allowed
-#define MapFieldCoastAllowed 0x0020  /// Coast (transporter) units allowed
-#define MapFieldWaterAllowed 0x0040  /// Water units allowed
-#define MapFieldNoBuilding   0x0080  /// No buildings allowed
-
-#define MapFieldUnpassable 0x0100  /// Field is movement blocked
-#define MapFieldWall       0x0200  /// Field contains wall
-#define MapFieldRocks      0x0400  /// Field contains rocks
-#define MapFieldForest     0x0800  /// Field contains forest
-
-#define MapFieldLandUnit 0x1000  /// Land unit on field
-#define MapFieldAirUnit  0x2000  /// Air unit on field
-#define MapFieldSeaUnit  0x4000  /// Water unit on field
-#define MapFieldBuilding 0x8000  /// Building on field
-
-
 class CMapFieldPlayerInfo
 {
 public:
@@ -213,44 +192,47 @@ public:
 
 	void setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value);
 
+	unsigned int getGraphicTile() const { return tile; }
+
 	/// Check if a field flags.
-	bool CheckMask(int mask) const {
-		return (this->Flags & mask) != 0;
-	}
+	bool CheckMask(int mask) const;
 
 	/// Returns true, if water on the map tile field
-	bool WaterOnMap() const {
-		return CheckMask(MapFieldWaterAllowed);
-	}
+	bool WaterOnMap() const;
 
 	/// Returns true, if coast on the map tile field
-	bool CoastOnMap() const {
-		return CheckMask(MapFieldCoastAllowed);
-	}
+	bool CoastOnMap() const;
 
 	/// Returns true, if water on the map tile field
-	bool ForestOnMap() const {
-		return CheckMask(MapFieldForest);
-	}
+	bool ForestOnMap() const;
 
 	/// Returns true, if coast on the map tile field
-	bool RockOnMap() const {
-		return CheckMask(MapFieldRocks);
-	}
+	bool RockOnMap() const;
+
+	bool isAWall() const;
+	bool isHuman() const;
+	bool isAHumanWall() const;
+	bool isAOrcWall() const;
 
 	bool IsTerrainResourceOnMap(int resource) const;
 	bool IsTerrainResourceOnMap() const;
 
+	unsigned char getCost() const { return cost; }
+	unsigned int getFlag() const { return Flags; }
+	void setGraphicTile(unsigned int tile) { this->tile = tile; }
+private:
+#ifdef DEBUG
+	unsigned int tilesetTile;  /// tileset tile number
+#endif
+	unsigned short tile;       /// graphic tile number
 public:
-	unsigned short Tile;       /// graphic tile number
 	unsigned short Flags;      /// field flags
-	unsigned char Cost;        /// unit cost to move in this tile
+private:
+	unsigned char cost;        /// unit cost to move in this tile
+public:
 	// FIXME: Value should be removed, walls and regeneration can be handled differently.
 	unsigned char Value;       /// HP for walls/ Wood Regeneration
 	CUnitCache UnitCache;      /// A unit on the map field.
-#ifdef DEBUG
-	unsigned int TilesetTile;  /// tileset tile number
-#endif
 
 	CMapFieldPlayerInfo playerInfo; /// stuff related to player
 };

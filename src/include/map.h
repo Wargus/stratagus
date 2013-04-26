@@ -176,8 +176,11 @@ public:
 	void Clean();
 	/// Cleanup memory for fog of war tables
 	void CleanFogOfWar();
-	/// Remove wood/rock from the map.
-	void ClearTile(unsigned short type, const Vec2i &pos);
+
+	/// Remove wood from the map.
+	void ClearWoodTile(const Vec2i &pos);
+	/// Remove rock from the map.
+	void ClearRockTile(const Vec2i &pos);
 
 	/// convert map pixelpos coordonates into tilepos
 	Vec2i MapPixelPosToTilePos(const PixelPos &mapPos) const;

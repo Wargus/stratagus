@@ -37,6 +37,7 @@
 #include "stratagus.h"
 
 #include "map.h"
+#include "tileset.h"
 #include "unit.h"
 #include "unit_find.h"
 
@@ -553,7 +554,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 				cost += AStarUnknownTerrainCost;
 			}
 			// Add tile movement cost
-			cost += mf->Cost;
+			cost += mf->getCost();
 			++mf;
 		} while (--i);
 		index += AStarMapWidth;

@@ -262,7 +262,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			const CMapField &mf = Map.Fields[sx];
 			unsigned short int tile;
 			if (ReplayRevealMap) {
-				tile = mf.Tile;
+				tile = mf.getGraphicTile();
 			} else {
 				tile = mf.playerInfo.SeenTile;
 			}

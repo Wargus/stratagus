@@ -99,7 +99,7 @@ static int GetDirectionFromSurrounding(const Vec2i &pos, bool human, bool seen)
 			dirFlag |= 1 << i;
 		} else {
 			const CMapField &mf = *Map.Field(newpos);
-			const unsigned int tile = seen ? mf.playerInfo.SeenTile : mf.Tile;
+			const unsigned int tile = seen ? mf.playerInfo.SeenTile : mf.getGraphicTile();
 
 			if (Map.Tileset->isARaceWallTile(tile, human)) {
 				dirFlag |= 1 << i;
@@ -166,16 +166,16 @@ void MapFixWallTile(const Vec2i &pos)
 	}
 	CMapField &mf = *Map.Field(pos);
 	const CTileset &tileset = *Map.Tileset;
-	const int tile = mf.Tile;
+	const int tile = mf.getGraphicTile();
 	if (!tileset.isAWallTile(tile)) {
 		return;
 	}
 	const bool human = tileset.isARaceWallTile(tile, true);
 	const int dirFlag = GetDirectionFromSurrounding(pos, human, false);
-	const int wallTile = getWallTile(tileset, human, dirFlag, mf.Value);
+	const unsigned int wallTile = getWallTile(tileset, human, dirFlag, mf.Value);
 
-	if (mf.Tile != wallTile) {
-		mf.Tile = wallTile;
+	if (mf.getGraphicTile() != wallTile) {
+		mf.setGraphicTile(wallTile);
 		UI.Minimap.UpdateXY(pos);
 
 		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
