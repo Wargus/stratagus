@@ -368,15 +368,6 @@ static void DisplayLoop()
 		VideoSyncSpeed = RealVideoSyncSpeed;
 	}
 #endif
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		if ((GameRunning || Editor.Running) && (FastForwardCycle <= GameCycle || !(GameCycle & 0x3f))) {
-			Video.ClearScreen();
-		}
-	}
 }
 
 static void SingleGameLoop()
