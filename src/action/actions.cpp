@@ -398,8 +398,6 @@ static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 	}
 }
 
-#if 0
-
 static void DumpUnitInfo(CUnit &unit)
 {
 	// Dump the unit to find the network sync bugs.
@@ -432,9 +430,6 @@ static void DumpUnitInfo(CUnit &unit)
 	fflush(NULL);
 }
 
-#endif
-
-
 template <typename UNITP_ITERATOR>
 static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 {
@@ -464,9 +459,10 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		} catch (AnimationDie_Exception &) {
 			AnimationDie_OnCatch(unit);
 		}
-#if 0
-		DumpUnitInfo(unit);
-#endif
+
+		if (EnableUnitDebug) {
+			DumpUnitInfo(unit);
+		}
 		// Calculate some hash.
 		SyncHash = (SyncHash << 5) | (SyncHash >> 27);
 		SyncHash ^= unit.Orders.empty() == false ? unit.CurrentAction() << 18 : 0;

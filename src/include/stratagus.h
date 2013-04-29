@@ -104,6 +104,8 @@ extern void PrintLocation(const char *file, int line, const char *funcName);
 
 extern bool EnableDebugPrint;
 extern bool EnableAssert;
+extern bool EnableUnitDebug;
+
 extern void AbortAt(const char *file, int line, const char *funcName, const char *conditionStr);
 extern void PrintOnStdOut(const char *format, ...);
 

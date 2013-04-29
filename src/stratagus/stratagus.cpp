@@ -231,6 +231,7 @@ std::string MenuRace;
 
 bool EnableDebugPrint;           /// if enabled, print the debug messages
 bool EnableAssert;               /// if enabled, halt on assertion failures
+bool EnableUnitDebug;            /// if enabled, a unit info dump will be created
 
 /*============================================================================
 ==  MAIN
@@ -502,7 +503,7 @@ static void RedirectOutput()
 void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
 	for (;;) {
-		switch (getopt(argc, argv, "ac:d:D:eE:FhI:lN:oOP:ps:S:u:v:W?")) {
+		switch (getopt(argc, argv, "ac:d:D:eE:FhiI:lN:oOP:ps:S:u:v:W?")) {
 			case 'a':
 				EnableAssert = true;
 				continue;
@@ -529,6 +530,9 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 			case 'F':
 				VideoForceFullScreen = 1;
 				Video.FullScreen = 1;
+				continue;
+			case 'i':
+				EnableUnitDebug = true;
 				continue;
 			case 'I':
 				CNetworkParameter::Instance.localHost = optarg;
