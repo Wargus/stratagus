@@ -968,9 +968,9 @@ static int CclSetUnitVariable(lua_State *l)
 	if (!strcmp(name, "RegenerationRate")) {
 		value = LuaToNumber(l, 3);
 		if (value > unit->Variable[HP_INDEX].Max) {
-			unit->Stats->Variables[HP_INDEX].Increase = unit->Variable[HP_INDEX].Max;
+			unit->Variable[HP_INDEX].Increase = unit->Variable[HP_INDEX].Max;
 		} else {
-			unit->Stats->Variables[HP_INDEX].Increase = value;
+			unit->Variable[HP_INDEX].Increase = value;
 		}
 	} else {
 		const int index = UnitTypeVar.VariableNameLookup[name];// User variables

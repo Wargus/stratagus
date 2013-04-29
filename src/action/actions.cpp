@@ -239,35 +239,6 @@ void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 --  Actions
 ----------------------------------------------------------------------------*/
 
-/**
-**  Increment a unit's health
-**
-**  @param unit  the unit to operate on
-*/
-static void HandleRegenerations(CUnit &unit)
-{
-	bool burn = false, poison = false;
-
-	// Burn & poison
-	if (!unit.Removed && !unit.Destroyed && unit.Variable[HP_INDEX].Max
-		&& unit.CurrentAction() != UnitActionBuilt
-		&& unit.CurrentAction() != UnitActionDie) {
-		if (((100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max) <= unit.Type->BurnPercent
-			&& unit.Type->BurnDamageRate) {
-			HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate);
-			burn = true;
-		}
-
-		if (unit.Variable[POISON_INDEX].Value && unit.Type->PoisonDrain) {
-			HitUnit(NoUnitP, unit, unit.Type->PoisonDrain);
-			poison = true;
-		}
-	}
-
-	// Health doesn't regenerate while burning or poisoned.
-	unit.Variable[HP_INDEX].Increase = (burn || poison) ? 0 : unit.Stats->Variables[HP_INDEX].Increase;
-}
-
 static inline void IncreaseVariable(CUnit &unit, int index)
 {
 	unit.Variable[index].Value += unit.Variable[index].Increase;
@@ -325,6 +296,27 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		if (i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
 			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX) {
 			continue;
+		}
+
+		if (i == HP_INDEX) {
+			bool burn = false, poison = false;
+
+			// Burn & poison
+			// Health doesn't regenerate while burning or poisoned.
+			if (!unit.Removed && !unit.Destroyed && unit.Variable[HP_INDEX].Max
+				&& unit.CurrentAction() != UnitActionBuilt
+				&& unit.CurrentAction() != UnitActionDie) {
+					if (((100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max) <= unit.Type->BurnPercent
+						&& unit.Type->BurnDamageRate) {
+							HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate);
+							continue;
+					}
+
+					if (unit.Variable[POISON_INDEX].Value && unit.Type->PoisonDrain) {
+						HitUnit(NoUnitP, unit, unit.Type->PoisonDrain);
+						continue;
+					}
+			}
 		}
 		if (unit.Variable[i].Enable && unit.Variable[i].Increase) {
 			IncreaseVariable(unit, i);
@@ -403,9 +395,6 @@ static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		}
 		// 2) Buffs...
 		HandleBuffsEachSecond(unit);
-
-		// 3) Increase health mana, burn and stuff
-		HandleRegenerations(unit);
 	}
 }
 
