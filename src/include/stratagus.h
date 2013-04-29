@@ -102,8 +102,8 @@ extern void PrintLocation(const char *file, int line, const char *funcName);
 /// Print function in debug macros
 #define PrintFunction() PrintLocation(__FILE__, __LINE__, __func__);
 
-#ifdef DEBUG  // {
-
+extern bool EnableDebugPrint;
+extern bool EnableAssert;
 extern void AbortAt(const char *file, int line, const char *funcName, const char *conditionStr);
 extern void PrintOnStdOut(const char *format, ...);
 
@@ -111,33 +111,13 @@ extern void PrintOnStdOut(const char *format, ...);
 **  Assert a condition. If cond is not true abort with file,line.
 */
 #define Assert(cond) \
-	do { if (!(cond)) { AbortAt(__FILE__, __LINE__, __func__, #cond); }} while (0)
+	if (EnableAssert) do { if (!(cond)) { AbortAt(__FILE__, __LINE__, __func__, #cond); }} while (0)
 
 /**
 **  Print debug information with function name.
 */
 #define DebugPrint(args) \
-	do { PrintFunction(); PrintOnStdOut(args); } while (0)
-
-#else  // }{ DEBUG
-
-#define Assert(cond)        /* disabled */
-#define DebugPrint(args)    /* disabled */
-
-#endif
-
-#ifdef DEBUG  // {
-
-/**
-**  Assert a condition for references
-*/
-#define RefsAssert(cond) \
-	do { if (!(cond)) { AbortAt(__FILE__, __LINE__, __func__, #cond); } } while (0)
-#else  // }{ DEBUG
-
-#define RefsAssert(cond)      /* disabled */
-
-#endif  // } !DEBUG
+	if (EnableDebugPrint) do { PrintFunction(); PrintOnStdOut(args); } while (0)
 
 /*============================================================================
 ==  Definitions

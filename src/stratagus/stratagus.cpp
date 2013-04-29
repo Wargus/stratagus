@@ -229,6 +229,9 @@ const char NameLine[] = NAME " V" VERSION ", " COPYRIGHT;
 std::string CliMapName;          /// Filename of the map given on the command line
 std::string MenuRace;
 
+bool EnableDebugPrint;           /// if enabled, print the debug messages
+bool EnableAssert;               /// if enabled, halt on assertion failures
+
 /*============================================================================
 ==  MAIN
 ============================================================================*/
@@ -499,7 +502,10 @@ static void RedirectOutput()
 void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
 	for (;;) {
-		switch (getopt(argc, argv, "c:d:D:eE:FhI:lN:oOP:s:S:u:v:W?")) {
+		switch (getopt(argc, argv, "ac:d:D:eE:FhI:lN:oOP:ps:S:u:v:W?")) {
+			case 'a':
+				EnableAssert = true;
+				continue;
 			case 'c':
 				parameters.luaStartFilename = optarg;
 				continue;
@@ -545,6 +551,9 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 #endif
 			case 'P':
 				CNetworkParameter::Instance.localPort = atoi(optarg);
+				continue;
+			case 'p':
+				EnableDebugPrint = true;
 				continue;
 			case 's':
 				AiSleepCycles = atoi(optarg);
