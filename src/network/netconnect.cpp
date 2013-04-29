@@ -1532,10 +1532,11 @@ void NetworkServerStartGame()
 
 	// Calculate NetPlayers
 	NetPlayers = h;
+	int compPlayers = ServerSetupState.Opponents;
 	for (int i = 1; i < h; ++i) {
 		if (Hosts[i].PlyNr == 0 && ServerSetupState.CompOpt[i] != 0) {
 			NetPlayers--;
-		} else if (Hosts[i].PlyName[0] == 0) {
+		} else if (Hosts[i].PlyName[0] == 0 && --compPlayers >= 0) {
 			// Unused slot gets a computer player
 			ServerSetupState.CompOpt[i] = 1;
 			LocalSetupState.CompOpt[i] = 1;

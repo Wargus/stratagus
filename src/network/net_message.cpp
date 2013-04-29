@@ -229,6 +229,7 @@ size_t CServerSetup::Serialize(unsigned char *buf) const
 	p += serialize8(p, this->GameTypeOption);
 	p += serialize8(p, this->Difficulty);
 	p += serialize8(p, this->MapRichness);
+	p += serialize8(p, this->Opponents);
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += serialize8(p, this->CompOpt[i]);
 	}
@@ -252,6 +253,7 @@ size_t CServerSetup::Deserialize(const unsigned char *p)
 	p += deserialize8(p, &this->GameTypeOption);
 	p += deserialize8(p, &this->Difficulty);
 	p += deserialize8(p, &this->MapRichness);
+	p += deserialize8(p, &this->Opponents);
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += deserialize8(p, &this->CompOpt[i]);
 	}
@@ -274,6 +276,7 @@ void CServerSetup::Clear()
 	GameTypeOption = 0;
 	Difficulty = 0;
 	MapRichness = 0;
+	Opponents = 0;
 	memset(CompOpt, 0, sizeof(CompOpt));
 	memset(Ready, 0, sizeof(Ready));
 	memset(Race, 0, sizeof(Race));
@@ -289,6 +292,7 @@ bool CServerSetup::operator == (const CServerSetup &rhs) const
 			&& GameTypeOption == rhs.GameTypeOption
 			&& Difficulty == rhs.Difficulty
 			&& MapRichness == rhs.MapRichness
+			&& Opponents == rhs.Opponents
 			&& memcmp(CompOpt, rhs.CompOpt, sizeof(CompOpt)) == 0
 			&& memcmp(Ready, rhs.Ready, sizeof(Ready)) == 0
 			&& memcmp(Race, rhs.Race, sizeof(Race)) == 0);
