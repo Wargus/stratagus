@@ -433,6 +433,7 @@ static void Usage()
 	PrintHeader();
 	printf(
 		"\n\nUsage: %s [OPTIONS] [map.smp|map.smp.gz]\n"
+		"\t-a\t\tEnables asserts check in engine code (for debugging)\n"
 		"\t-c file.lua\tConfiguration start file (default stratagus.lua)\n"
 		"\t-d datapath\tPath to stratagus data (default current directory)\n"
 		"\t-D depth\tVideo mode depth = pixel per point\n"
@@ -440,6 +441,7 @@ static void Usage()
 		"\t-E file.lua\tEditor configuration start file (default editor.lua)\n"
 		"\t-F\t\tFull screen video mode\n"
 		"\t-h\t\tHelp shows this page\n"
+		"\t-i\t\tEnables unit info dumping into log (for debugging)\n"
 		"\t-I addr\t\tNetwork address to use\n"
 		"\t-l\t\tDisable command log\n"
 		"\t-N name\t\tName of the player\n"
@@ -447,6 +449,7 @@ static void Usage()
 		"\t-o\t\tDo not use OpenGL or OpenGL ES 1.1\n"
 		"\t-O\t\tUse OpenGL or OpenGL ES 1.1\n"
 #endif
+		"\t-p\t\tEnables debug messages printing in console\n"
 		"\t-P port\t\tNetwork port to use\n"
 		"\t-s sleep\tNumber of frames for the AI to sleep before it starts\n"
 		"\t-S speed\tSync speed (100 = 30 frames/s)\n"
