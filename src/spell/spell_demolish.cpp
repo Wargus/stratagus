@@ -42,18 +42,12 @@
 /* virtual */ void Spell_Demolish::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		const char *value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *value = LuaToString(l, -1, j + 1);
 		++j;
 		if (!strcmp(value, "range")) {
-			lua_rawgeti(l, -1, j + 1);
-			this->Range = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			this->Range = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "damage")) {
-			lua_rawgeti(l, -1, j + 1);
-			this->Damage = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			this->Damage = LuaToNumber(l, -1, j + 1);
 		} else {
 			LuaError(l, "Unsupported demolish tag: %s" _C_ value);
 		}
@@ -84,16 +78,16 @@
 	Vec2i ipos;
 	for (ipos.x = minpos.x; ipos.x <= maxpos.x; ++ipos.x) {
 		for (ipos.y = minpos.y; ipos.y <= maxpos.y; ++ipos.y) {
-			const int flag = Map.Field(ipos)->Flags;
+			const CMapField &mf = *Map.Field(ipos);
 			if (SquareDistance(ipos, goalPos) > square(this->Range)) {
 				// Not in circle range
 				continue;
-			} else if (flag & MapFieldWall) {
+			} else if (mf.isAWall()) {
 				Map.RemoveWall(ipos);
-			} else if (flag & MapFieldRocks) {
-				Map.ClearTile(MapFieldRocks, ipos);
-			} else if (flag & MapFieldForest) {
-				Map.ClearTile(MapFieldForest, ipos);
+			} else if (mf.RockOnMap()) {
+				Map.ClearRockTile(ipos);
+			} else if (mf.ForestOnMap()) {
+				Map.ClearWoodTile(ipos);
 			}
 		}
 	}

@@ -258,7 +258,7 @@ void CMinimap::UpdateTerrain()
 	//
 	for (int my = YOffset; my < H - YOffset; ++my) {
 		for (int mx = XOffset; mx < W - XOffset; ++mx) {
-			const int tile = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].Tile;
+			const int tile = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].getGraphicTile();
 			const int xofs = PixelTileSize.x * (tile % tilepitch);
 			const int yofs = PixelTileSize.y * (tile / tilepitch);
 
@@ -374,7 +374,7 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 
 			int tile = Map.Fields[x + y].playerInfo.SeenTile;
 			if (!tile) {
-				tile = Map.Fields[x + y].Tile;
+				tile = Map.Fields[x + y].getGraphicTile();
 			}
 
 			const int xofs = PixelTileSize.x * (tile % tilepitch);

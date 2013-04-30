@@ -45,23 +45,17 @@
 /* virtual */ void Spell_Summon::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		const char *value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *value = LuaToString(l, -1, j + 1);
 		++j;
 		if (!strcmp(value, "unit-type")) {
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			value = LuaToString(l, -1, j + 1);
 			this->UnitType = UnitTypeByIdent(value);
 			if (!this->UnitType) {
 				this->UnitType = 0;
 				DebugPrint("unit type \"%s\" not found for summon spell.\n" _C_ value);
 			}
 		} else if (!strcmp(value, "time-to-live")) {
-			lua_rawgeti(l, -1, j + 1);
-			this->TTL = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			this->TTL = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "require-corpse")) {
 			this->RequireCorpse = 1;
 			--j;

@@ -128,9 +128,7 @@ static int CclMakeSound(lua_State *l)
 		const int args = lua_rawlen(l, 2);
 		files.reserve(args);
 		for (int j = 0; j < args; ++j) {
-			lua_rawgeti(l, 2, j + 1);
-			files.push_back(LuaToString(l, -1));
-			lua_pop(l, 1);
+			files.push_back(LuaToString(l, 2, j + 1));
 		}
 		id = MakeSound(c_name, files);
 	} else {
@@ -214,9 +212,7 @@ static void SetSoundConfigRace(lua_State *l, int j, SoundConfig soundConfigs[])
 	if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 		LuaError(l, "incorrect argument");
 	}
-	lua_rawgeti(l, j + 1, 1);
-	const char *raceName = LuaToString(l, -1);
-	lua_pop(l, 1);
+	const char *raceName = LuaToString(l, j + 1, 1);
 	const int raceIndex = PlayerRaces.GetRaceIndexByName(raceName);
 	if (raceIndex == -1) {
 		LuaError(l, "Unknown race: %s" _C_ raceName);
@@ -273,13 +269,9 @@ static int CclDefineGameSounds(lua_State *l)
 			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
-			lua_rawgeti(l, j + 1, 1);
-			const char *resName = LuaToString(l, -1);
-			lua_pop(l, 1);
+			const char *resName = LuaToString(l, j + 1, 1);
 			const int resId = GetResourceIdByName(l, resName);
-			lua_rawgeti(l, j + 1, 2);
-			const char *raceName = LuaToString(l, -1);
-			lua_pop(l, 1);
+			const char *raceName = LuaToString(l, j + 1, 2);
 			const int raceIndex = PlayerRaces.GetRaceIndexByName(raceName);
 			if (raceIndex == -1) {
 				LuaError(l, "Unknown race: %s" _C_ raceName);

@@ -229,6 +229,10 @@ const char NameLine[] = NAME " V" VERSION ", " COPYRIGHT;
 std::string CliMapName;          /// Filename of the map given on the command line
 std::string MenuRace;
 
+bool EnableDebugPrint;           /// if enabled, print the debug messages
+bool EnableAssert;               /// if enabled, halt on assertion failures
+bool EnableUnitDebug;            /// if enabled, a unit info dump will be created
+
 /*============================================================================
 ==  MAIN
 ============================================================================*/
@@ -429,6 +433,7 @@ static void Usage()
 	PrintHeader();
 	printf(
 		"\n\nUsage: %s [OPTIONS] [map.smp|map.smp.gz]\n"
+		"\t-a\t\tEnables asserts check in engine code (for debugging)\n"
 		"\t-c file.lua\tConfiguration start file (default stratagus.lua)\n"
 		"\t-d datapath\tPath to stratagus data (default current directory)\n"
 		"\t-D depth\tVideo mode depth = pixel per point\n"
@@ -436,6 +441,7 @@ static void Usage()
 		"\t-E file.lua\tEditor configuration start file (default editor.lua)\n"
 		"\t-F\t\tFull screen video mode\n"
 		"\t-h\t\tHelp shows this page\n"
+		"\t-i\t\tEnables unit info dumping into log (for debugging)\n"
 		"\t-I addr\t\tNetwork address to use\n"
 		"\t-l\t\tDisable command log\n"
 		"\t-N name\t\tName of the player\n"
@@ -443,6 +449,7 @@ static void Usage()
 		"\t-o\t\tDo not use OpenGL or OpenGL ES 1.1\n"
 		"\t-O\t\tUse OpenGL or OpenGL ES 1.1\n"
 #endif
+		"\t-p\t\tEnables debug messages printing in console\n"
 		"\t-P port\t\tNetwork port to use\n"
 		"\t-s sleep\tNumber of frames for the AI to sleep before it starts\n"
 		"\t-S speed\tSync speed (100 = 30 frames/s)\n"
@@ -500,7 +507,10 @@ static void RedirectOutput()
 void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
 	for (;;) {
-		switch (getopt(argc, argv, "c:d:D:eE:FhI:lN:oOP:s:S:u:v:WZ?")) {
+		switch (getopt(argc, argv, "ac:d:D:eE:FhiI:lN:oOP:ps:S:u:v:WZ?")) {
+			case 'a':
+				EnableAssert = true;
+				continue;
 			case 'c':
 				parameters.luaStartFilename = optarg;
 				continue;
@@ -525,6 +535,9 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				VideoForceFullScreen = 1;
 				Video.FullScreen = 1;
 				continue;
+			case 'i':
+				EnableUnitDebug = true;
+				continue;
 			case 'I':
 				CNetworkParameter::Instance.localHost = optarg;
 				continue;
@@ -546,6 +559,9 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 #endif
 			case 'P':
 				CNetworkParameter::Instance.localPort = atoi(optarg);
+				continue;
+			case 'p':
+				EnableDebugPrint = true;
 				continue;
 			case 's':
 				AiSleepCycles = atoi(optarg);

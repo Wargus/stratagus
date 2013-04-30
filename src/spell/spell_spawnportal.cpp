@@ -40,19 +40,20 @@
 /* virtual */ void Spell_SpawnPortal::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		const char *value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *value = LuaToString(l, -1, j + 1);
 		++j;
 		if (!strcmp(value, "portal-type")) {
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			value = LuaToString(l, -1, j + 1);
 			this->PortalType = UnitTypeByIdent(value);
 			if (!this->PortalType) {
 				this->PortalType = 0;
 				DebugPrint("unit type \"%s\" not found for spawn-portal.\n" _C_ value);
 			}
+		} else if (!strcmp(value, "time-to-live")) {
+			this->TTL = LuaToNumber(l, -1, j + 1);
+		} else if (!strcmp(value, "current-player")) {
+			this->CurrentPlayer = true;
+			--j;
 		} else {
 			LuaError(l, "Unsupported spawn-portal tag: %s" _C_ value);
 		}
@@ -79,11 +80,13 @@
 	CUnit *portal = caster.Goal;
 
 	DebugPrint("Spawning a portal exit.\n");
-	if (portal) {
+	if (portal && portal->IsAlive()) {
 		portal->MoveToXY(goalPos);
 	} else {
-		portal = MakeUnitAndPlace(goalPos, *this->PortalType, &Players[PlayerNumNeutral]);
+		portal = MakeUnitAndPlace(goalPos, *this->PortalType,
+			CurrentPlayer ? caster.Player : &Players[PlayerNumNeutral]);
 	}
+	portal->TTL = GameCycle + this->TTL;
 	//  Goal is used to link to destination circle of power
 	caster.Goal = portal;
 	//FIXME: setting destination circle of power should use mana

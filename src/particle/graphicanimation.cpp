@@ -30,7 +30,12 @@
 //@{
 
 #include "stratagus.h"
+
 #include "particle.h"
+
+#include "map.h"
+#include "player.h"
+#include "ui.h"
 #include "video.h"
 
 GraphicAnimation::GraphicAnimation(CGraphic *g, int ticksPerFrame) :
@@ -61,7 +66,37 @@ bool GraphicAnimation::isFinished()
 	return currentFrame >= g->NumFrames;
 }
 
-Animation *GraphicAnimation::clone()
+bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos)
+{
+	// invisible graphics always invisible
+	if (!g) {
+		return false;
+	}
+
+	PixelSize graphicSize(g->Width, g->Height);
+	PixelDiff margin(PixelTileSize.x - 1, PixelTileSize.y - 1);
+	PixelPos position(pos.x, pos.y);
+	Vec2i minPos = Map.MapPixelPosToTilePos(position);
+	Vec2i maxPos = Map.MapPixelPosToTilePos(position + graphicSize + margin);
+	Map.Clamp(minPos);
+	Map.Clamp(maxPos);
+
+	if (!vp.AnyMapAreaVisibleInViewport(minPos, maxPos)) {
+		return false;
+	}
+
+	Vec2i p;
+	for (p.x = minPos.x; p.x <= maxPos.x; ++p.x) {
+		for (p.y = minPos.y; p.y <= maxPos.y; ++p.y) {
+			if (ReplayRevealMap || Map.Field(p)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+GraphicAnimation *GraphicAnimation::clone()
 {
 	return new GraphicAnimation(g, ticksPerFrame);
 }

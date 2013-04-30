@@ -259,7 +259,7 @@ static bool DoRightButton_Harvest(CUnit &unit, CUnit *dest, const Vec2i &pos, in
 			PlayUnitSound(unit, VoiceAcknowledging);
 			acknowledged = 1;
 		}
-		if (dest->Type->CanMove() == false) {
+		if (dest->Type->CanMove() == false && !dest->Type->Teleporter) {
 			SendCommandMove(unit, pos, flush);
 		} else {
 			SendCommandFollow(unit, *dest, flush);
@@ -309,7 +309,7 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 				PlayUnitSound(unit, VoiceAcknowledging);
 				acknowledged = 1;
 			}
-			if (dest->Type->CanMove() == false) {
+			if (dest->Type->CanMove() == false && !dest->Type->Teleporter) {
 				SendCommandMove(unit, pos, flush);
 			} else {
 				SendCommandFollow(unit, *dest, flush);
@@ -369,7 +369,7 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 			PlayUnitSound(unit, VoiceAcknowledging);
 			acknowledged = 1;
 		}
-		if (dest.Type->CanMove() == false) {
+		if (dest.Type->CanMove() == false && !dest.Type->Teleporter) {
 			SendCommandMove(unit, dest.tilePos, flush);
 		} else {
 			SendCommandFollow(unit, dest, flush);

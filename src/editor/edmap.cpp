@@ -64,7 +64,7 @@ void ChangeTile(const Vec2i &pos, int tile)
 	Assert(Map.Info.IsPointOnMap(pos));
 
 	CMapField &mf = *Map.Field(pos);
-	mf.Tile = tile;
+	mf.setGraphicTile(tile);
 	mf.playerInfo.SeenTile = tile;
 }
 
@@ -83,7 +83,7 @@ void ChangeTile(const Vec2i &pos, int tile)
 static unsigned QuadFromTile(const Vec2i &pos)
 {
 	// find the abstact tile number
-	const int tile = Map.Field(pos)->Tile;
+	const int tile = Map.Field(pos)->getGraphicTile();
 	return Map.Tileset->getQuadFromTile(tile);
 }
 
@@ -101,6 +101,7 @@ static void EditorChangeTile(const Vec2i &pos, int tileIndex, int d)
 	// Change the flags
 	CMapField &mf = *Map.Field(pos);
 	mf.setTileIndex(*Map.Tileset, tileIndex, 0);
+	mf.playerInfo.SeenTile = mf.getGraphicTile();
 
 	UI.Minimap.UpdateSeenXY(pos);
 	UI.Minimap.UpdateXY(pos);
@@ -118,8 +119,8 @@ static void EditorChangeSurrounding(const Vec2i &pos, int d)
 {
 	// Special case 1) Walls.
 	CMapField &mf = *Map.Field(pos);
-	if (mf.Flags & MapFieldWall) {
-		Map.SetWall(pos, mf.Flags & MapFieldHuman);
+	if (mf.isAWall()) {
+		Map.SetWall(pos, mf.isHuman());
 		return;
 	}
 
@@ -220,12 +221,6 @@ static void TileFill(const Vec2i &pos, int tile, int size)
 	}
 }
 
-#define WATER_TILE  0x10
-#define COAST_TILE  0x30
-#define GRASS_TILE  0x50
-#define WOOD_TILE   0x70
-#define ROCK_TILE   0x80
-
 /**
 **  Randomize tiles and fill in map
 **
@@ -250,6 +245,12 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 		TileFill(mirror, tile, rz);
 	}
 }
+
+#define WATER_TILE  0x10
+#define COAST_TILE  0x30
+#define GRASS_TILE  0x50
+#define WOOD_TILE   0x70
+#define ROCK_TILE   0x80
 
 /**
 **  Add a unit to random locations on the map, unit will be neutral

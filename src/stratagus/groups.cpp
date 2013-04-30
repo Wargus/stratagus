@@ -273,9 +273,7 @@ static int CclGroup(lua_State *l)
 	int i = 0;
 	const int args = lua_rawlen(l, 3);
 	for (int j = 0; j < args; ++j) {
-		lua_rawgeti(l, 3, j + 1);
-		const char *str = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *str = LuaToString(l, 3, j + 1);
 		grp.Units[i++] = &UnitManager.GetSlotUnit(strtol(str + 1, NULL, 16));
 	}
 	return 0;

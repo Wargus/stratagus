@@ -270,11 +270,10 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 		// Need at least one coast tile
 		unsigned int index = Map.getIndex(pos);
 		do {
-			CMapField *mf = Map.Field(index);
+			const CMapField *mf = Map.Field(index);
 			int w = width;
 			do {
-				//if (Map.CoastOnMap(pos)) {
-				if ((mf->Flags & MapFieldCoastAllowed) == MapFieldCoastAllowed) {
+				if (mf->CoastOnMap()) {
 					success = true;
 				}
 				++mf;

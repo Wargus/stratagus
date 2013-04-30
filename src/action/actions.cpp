@@ -33,9 +33,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#ifdef DEBUG
 #include <time.h>
-#endif
 
 #include "stratagus.h"
 #include "version.h"
@@ -172,10 +170,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 {
 	const int args = lua_rawlen(l, -1);
-
-	lua_rawgeti(l, -1, 1);
-	const char *actiontype = LuaToString(l, -1);
-	lua_pop(l, 1);
+	const char *actiontype = LuaToString(l, -1, 1);
 
 	if (!strcmp(actiontype, "action-attack")) {
 		*orderPtr = new COrder_Attack(false);
@@ -224,9 +219,7 @@ void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 	COrder &order = **orderPtr;
 
 	for (int j = 1; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		const char *value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *value = LuaToString(l, -1, j + 1);
 
 		if (order.ParseGenericData(l, j, value)) {
 			continue;
@@ -243,35 +236,6 @@ void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 /*----------------------------------------------------------------------------
 --  Actions
 ----------------------------------------------------------------------------*/
-
-/**
-**  Increment a unit's health
-**
-**  @param unit  the unit to operate on
-*/
-static void HandleRegenerations(CUnit &unit)
-{
-	bool burn = false, poison = false;
-
-	// Burn & poison
-	if (!unit.Removed && !unit.Destroyed && unit.Variable[HP_INDEX].Max
-		&& unit.CurrentAction() != UnitActionBuilt
-		&& unit.CurrentAction() != UnitActionDie) {
-		if (((100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max) <= unit.Type->BurnPercent
-			&& unit.Type->BurnDamageRate) {
-			HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate);
-			burn = true;
-		}
-
-		if (unit.Variable[POISON_INDEX].Value && unit.Type->PoisonDrain) {
-			HitUnit(NoUnitP, unit, unit.Type->PoisonDrain);
-			poison = true;
-		}
-	}
-
-	// Health doesn't regenerate while burning or poisoned.
-	unit.Variable[HP_INDEX].Increase = (burn || poison) ? 0 : unit.Stats->Variables[HP_INDEX].Increase;
-}
 
 static inline void IncreaseVariable(CUnit &unit, int index)
 {
@@ -315,6 +279,30 @@ static void HandleBuffsEachCycle(CUnit &unit)
 	}
 }
 
+/**
+**  Modify unit's health according to burn and poison
+**
+**  @param unit  the unit to operate on
+*/
+static bool HandleBurnAndPoison(CUnit &unit)
+{
+	if (unit.Removed || unit.Destroyed || unit.Variable[HP_INDEX].Max == 0
+		|| unit.CurrentAction() == UnitActionBuilt
+		|| unit.CurrentAction() == UnitActionDie) {
+		return false;
+	}
+	// Burn & poison
+	const int hpPercent = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
+	if (hpPercent <= unit.Type->BurnPercent && unit.Type->BurnDamageRate) {
+		HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate);
+		return true;
+	}
+	if (unit.Variable[POISON_INDEX].Value && unit.Type->PoisonDrain) {
+		HitUnit(NoUnitP, unit, unit.Type->PoisonDrain);
+		return true;
+	}
+	return false;
+}
 
 /**
 **  Handle things about the unit that decay over time each second
@@ -331,12 +319,14 @@ static void HandleBuffsEachSecond(CUnit &unit)
 			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX) {
 			continue;
 		}
+		if (i == HP_INDEX && HandleBurnAndPoison(unit)) {
+			continue;
+		}
 		if (unit.Variable[i].Enable && unit.Variable[i].Increase) {
 			IncreaseVariable(unit, i);
 		}
 	}
 }
-
 
 /**
 **  Handle the action of a unit.
@@ -408,13 +398,8 @@ static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		}
 		// 2) Buffs...
 		HandleBuffsEachSecond(unit);
-
-		// 3) Increase health mana, burn and stuff
-		HandleRegenerations(unit);
 	}
 }
-
-#if 0
 
 static void DumpUnitInfo(CUnit &unit)
 {
@@ -448,9 +433,6 @@ static void DumpUnitInfo(CUnit &unit)
 	fflush(NULL);
 }
 
-#endif
-
-
 template <typename UNITP_ITERATOR>
 static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 {
@@ -480,9 +462,10 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		} catch (AnimationDie_Exception &) {
 			AnimationDie_OnCatch(unit);
 		}
-#if 0
-		DumpUnitInfo(unit);
-#endif
+
+		if (EnableUnitDebug) {
+			DumpUnitInfo(unit);
+		}
 		// Calculate some hash.
 		SyncHash = (SyncHash << 5) | (SyncHash >> 27);
 		SyncHash ^= unit.Orders.empty() == false ? unit.CurrentAction() << 18 : 0;

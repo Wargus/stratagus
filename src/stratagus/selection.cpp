@@ -1080,9 +1080,7 @@ static int CclSelection(lua_State *l)
 	NumSelected = LuaToNumber(l, 1);
 	const int args = lua_rawlen(l, 2);
 	for (int j = 0; j < args; ++j) {
-		lua_rawgeti(l, 2, j + 1);
-		const char *str = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *str = LuaToString(l, 2, j + 1);
 		Selected[j] = &UnitManager.GetSlotUnit(strtol(str + 1, NULL, 16));
 	}
 	return 0;

@@ -35,7 +35,7 @@
 
 
 
-CSmokeParticle::CSmokeParticle(CPosition position, Animation *smoke,
+CSmokeParticle::CSmokeParticle(CPosition position, GraphicAnimation *smoke,
 							   float speedx, float speedy) :
 	CParticle(position)
 {
@@ -49,6 +49,11 @@ CSmokeParticle::CSmokeParticle(CPosition position, Animation *smoke,
 CSmokeParticle::~CSmokeParticle()
 {
 	delete puff;
+}
+
+bool CSmokeParticle::isVisible(const CViewport &vp) const
+{
+	return puff && puff->isVisible(vp, pos);
 }
 
 void CSmokeParticle::draw()

@@ -372,7 +372,7 @@ extern int ExtraDeathIndex(const char *death);
 */
 void CUnit::RefsIncrease()
 {
-	RefsAssert(Refs && !Destroyed);
+	Assert(Refs && !Destroyed);
 	if (!SaveGameLoading) {
 		++Refs;
 	}
@@ -383,7 +383,7 @@ void CUnit::RefsIncrease()
 */
 void CUnit::RefsDecrease()
 {
-	RefsAssert(Refs);
+	Assert(Refs);
 	if (!SaveGameLoading) {
 		if (Destroyed) {
 			if (!--Refs) {
@@ -391,7 +391,7 @@ void CUnit::RefsDecrease()
 			}
 		} else {
 			--Refs;
-			RefsAssert(Refs);
+			Assert(Refs);
 		}
 	}
 }
@@ -507,7 +507,7 @@ void CUnit::Release(bool final)
 		}
 	}
 
-	RefsAssert(!Refs);
+	Assert(!Refs);
 
 	//
 	// No more references remaining, but the network could have an order

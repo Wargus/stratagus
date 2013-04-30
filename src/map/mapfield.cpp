@@ -46,14 +46,14 @@
 #include "unit_manager.h"
 
 CMapField::CMapField() :
-	Tile(0),
+#ifdef DEBUG
+	tilesetTile(0),
+#endif
+	tile(0),
 	Flags(0),
-	Cost(0),
+	cost(0),
 	Value(0),
 	UnitCache()
-#ifdef DEBUG
-	, TilesetTile(0)
-#endif
 {}
 
 bool CMapField::IsTerrainResourceOnMap(int resource) const
@@ -77,27 +77,26 @@ bool CMapField::IsTerrainResourceOnMap() const
 
 void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value)
 {
-	this->Tile = tileset.Table[tileIndex];
-	this->playerInfo.SeenTile = Tile;
-
+	const CTile &tile = tileset.tiles[tileIndex];
+	this->tile = tile.tile;
 	this->Value = value;
 #if 0
-	this->Flags = tileset.FlagsTable[tileIndex];
+	this->Flags = tile.flag;
 #else
 	this->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
 					 MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 					 MapFieldWall | MapFieldRocks | MapFieldForest);
-	this->Flags |= tileset.FlagsTable[tileIndex];
+	this->Flags |= tile.flag;
 #endif
-	this->Cost = 1 << (tileset.FlagsTable[tileIndex] & MapFieldSpeedMask);
+	this->cost = 1 << (tile.flag & MapFieldSpeedMask);
 #ifdef DEBUG
-	this->TilesetTile = tileIndex;
+	this->tilesetTile = tileIndex;
 #endif
 }
 
 void CMapField::Save(CFile &file) const
 {
-	file.printf("  {%3d, %3d, %2d, %2d", Tile, playerInfo.SeenTile, Value, Cost);
+	file.printf("  {%3d, %3d, %2d, %2d", tile, playerInfo.SeenTile, Value, cost);
 	for (int i = 0; i != PlayerMax; ++i) {
 		if (playerInfo.Visible[i] == 1) {
 			file.printf(", \"explored\", %d", i);
@@ -161,28 +160,17 @@ void CMapField::parse(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	lua_rawgeti(l, -1, 1);
-	this->Tile = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, -1, 2);
-	this->playerInfo.SeenTile = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, -1, 3);
-	this->Value = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, -1, 4);
-	this->Cost = LuaToNumber(l, -1);
-	lua_pop(l, 1);
+	this->tile = LuaToNumber(l, -1, 1);
+	this->playerInfo.SeenTile = LuaToNumber(l, -1, 2);
+	this->Value = LuaToNumber(l, -1, 3);
+	this->cost = LuaToNumber(l, -1, 4);
 
 	for (int j = 4; j < len; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		const char *value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *value = LuaToString(l, -1, j + 1);
+
 		if (!strcmp(value, "explored")) {
 			++j;
-			lua_rawgeti(l, -1, j + 1);
-			this->playerInfo.Visible[LuaToNumber(l, -1)] = 1;
-			lua_pop(l, 1);
+			this->playerInfo.Visible[LuaToNumber(l, -1, j + 1)] = 1;
 		} else if (!strcmp(value, "human")) {
 			this->Flags |= MapFieldHuman;
 		} else if (!strcmp(value, "land")) {
@@ -213,6 +201,56 @@ void CMapField::parse(lua_State *l)
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
+}
+
+/// Check if a field flags.
+bool CMapField::CheckMask(int mask) const
+{
+	return (this->Flags & mask) != 0;
+}
+
+/// Returns true, if water on the map tile field
+bool CMapField::WaterOnMap() const
+{
+	return CheckMask(MapFieldWaterAllowed);
+}
+
+/// Returns true, if coast on the map tile field
+bool CMapField::CoastOnMap() const
+{
+	return CheckMask(MapFieldCoastAllowed);
+}
+
+/// Returns true, if water on the map tile field
+bool CMapField::ForestOnMap() const
+{
+	return CheckMask(MapFieldForest);
+}
+
+/// Returns true, if coast on the map tile field
+bool CMapField::RockOnMap() const
+{
+	return CheckMask(MapFieldRocks);
+}
+
+bool CMapField::isAWall() const
+{
+	return Flags & MapFieldWall;
+}
+bool CMapField::isHuman() const
+{
+	return Flags & MapFieldHuman;
+}
+
+bool CMapField::isAHumanWall() const
+{
+	const unsigned int humanWallFlag = (MapFieldWall | MapFieldHuman);
+	return (Flags & humanWallFlag) == humanWallFlag;
+}
+bool CMapField::isAOrcWall() const
+{
+	const unsigned int humanWallFlag = (MapFieldWall | MapFieldHuman);
+	return (Flags & humanWallFlag) == MapFieldWall;
 }
 
 //

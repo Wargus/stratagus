@@ -75,7 +75,7 @@ public:
 	CServerSetup() { Clear(); }
 	size_t Serialize(unsigned char *p) const;
 	size_t Deserialize(const unsigned char *p);
-	static size_t Size() { return 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 * PlayerMax + 1 * PlayerMax + 1 * PlayerMax; }
+	static size_t Size() { return 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 * PlayerMax + 1 * PlayerMax + 1 * PlayerMax; }
 	void Clear();
 
 	bool operator == (const CServerSetup &rhs) const;
@@ -89,6 +89,7 @@ public:
 	uint8_t GameTypeOption;        /// Game type option
 	uint8_t Difficulty;            /// Difficulty option
 	uint8_t MapRichness;           /// Map richness option
+	uint8_t Opponents;             /// Number of AI opponents
 	uint8_t CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
 	uint8_t Ready[PlayerMax];      /// Client ready state
 	uint8_t Race[PlayerMax];       /// Client race selection

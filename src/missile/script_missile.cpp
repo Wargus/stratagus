@@ -156,11 +156,9 @@ void MissileType::Load(lua_State *l)
 			} else {
 				const int impacts = lua_rawlen(l, -1);
 				for (int i = 0; i < impacts; ++i) {
-					lua_rawgeti(l, -1, i + 1);
 					MissileConfig *mc = new MissileConfig();
-					mc->Name = LuaToString(l, -1);
+					mc->Name = LuaToString(l, -1, i + 1);
 					this->Impact.push_back(mc);
-					lua_pop(l, 1);
 				}
 			}
 		} else if (!strcmp(value, "SmokeMissile")) {
@@ -247,35 +245,11 @@ static int CclMissile(lua_State *l)
 		if (!strcmp(value, "type")) {
 			type = MissileTypeByIdent(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "pos")) {
-			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, j + 1, 1);
-			position.x = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
-			position.y = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			CclGetPos(l, &position.x, &position.y, j + 1);
 		} else if (!strcmp(value, "origin-pos")) {
-			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, j + 1, 1);
-			source.x = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
-			source.y = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			CclGetPos(l, &source.x, &source.y, j + 1);
 		} else if (!strcmp(value, "goal")) {
-			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, j + 1, 1);
-			destination.x = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
-			destination.y = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			CclGetPos(l, &destination.x, &destination.y, j + 1);
 		} else if (!strcmp(value, "local")) {
 			Assert(type);
 			missile = MakeLocalMissile(*type, position, destination);
@@ -329,12 +303,8 @@ static int CclMissile(lua_State *l)
 			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
-			lua_rawgeti(l, j + 1, 1);
-			missile->CurrentStep = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
-			missile->TotalStep = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			missile->CurrentStep = LuaToNumber(l, j + 1, 1);
+			missile->TotalStep = LuaToNumber(l, j + 1, 2);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -372,19 +342,13 @@ static int CclDefineBurningBuilding(lua_State *l)
 		const int subargs = lua_rawlen(l, j + 1);
 
 		for (int k = 0; k < subargs; ++k) {
-			lua_rawgeti(l, j + 1, k + 1);
-			const char *value = LuaToString(l, -1);
-			lua_pop(l, 1);
+			const char *value = LuaToString(l, j + 1, k + 1);
 			++k;
 
 			if (!strcmp(value, "percent")) {
-				lua_rawgeti(l, j + 1, k + 1);
-				ptr->Percent = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				ptr->Percent = LuaToNumber(l, j + 1, k + 1);
 			} else if (!strcmp(value, "missile")) {
-				lua_rawgeti(l, j + 1, k + 1);
-				ptr->Missile = MissileTypeByIdent(LuaToString(l, -1));
-				lua_pop(l, 1);
+				ptr->Missile = MissileTypeByIdent(LuaToString(l, j + 1, k + 1));
 			}
 		}
 		BurningBuildingFrames.insert(BurningBuildingFrames.begin(), ptr);
@@ -408,24 +372,8 @@ static int CclCreateMissile(lua_State *l)
 		LuaError(l, "Bad missile");
 	}
 	PixelPos startpos, endpos;
-	if (!lua_istable(l, 2) || lua_rawlen(l, 2) != 2) {
-		LuaError(l, "incorrect argument !!");
-	}
-	lua_rawgeti(l, 2, 1);
-	startpos.x = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, 2, 2);
-	startpos.y = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	if (!lua_istable(l, 3) || lua_rawlen(l, 3) != 2) {
-		LuaError(l, "incorrect argument !!");
-	}
-	lua_rawgeti(l, 3, 1);
-	endpos.x = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, 3, 2);
-	endpos.y = LuaToNumber(l, -1);
-	lua_pop(l, 1);
+	CclGetPos(l, &startpos.x, &startpos.y, 2);
+	CclGetPos(l, &endpos.x, &endpos.y, 3);
 
 	const int sourceUnitId = LuaToNumber(l, 4);
 	const int destUnitId = LuaToNumber(l, 5);

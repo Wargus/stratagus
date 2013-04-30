@@ -575,9 +575,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			minHeight = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "More")) {
 			Assert(lua_istable(l, -1));
-			lua_rawgeti(l, -1, 1); // Method name
-			lua_rawgeti(l, -2, 2); // Method data
-			key = LuaToString(l, -2);
+			key = LuaToString(l, -1, 1); // Method name
+			lua_rawgeti(l, -1, 2); // Method data
 			if (!strcmp(key, "ButtonInfo")) {
 				content = new CPopupContentTypeButtonInfo;
 			} else if (!strcmp(key, "Text")) {
@@ -592,7 +591,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 				LuaError(l, "Invalid drawing method '%s' in DefinePopups" _C_ key);
 			}
 			content->Parse(l);
-			lua_pop(l, 2); // Pop Variable Name and Method
+			lua_pop(l, 1); // Pop Variable Method data
 		} else if (!strcmp(key, "Condition")) {
 			condition = ParsePopupConditions(l);
 		} else {

@@ -41,18 +41,12 @@
 /* virtual */ void Spell_AreaAdjustVital::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		const char *value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *value = LuaToString(l, -1, j + 1);
 		++j;
 		if (!strcmp(value, "hit-points")) {
-			lua_rawgeti(l, -1, j + 1);
-			this->HP = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			this->HP = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "mana-points")) {
-			lua_rawgeti(l, -1, j + 1);
-			this->Mana = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			this->Mana = LuaToNumber(l, -1, j + 1);
 		} else {
 			LuaError(l, "Unsupported area-adjust-vitals tag: %s" _C_ value);
 		}

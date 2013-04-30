@@ -176,8 +176,11 @@ public:
 	void Clean();
 	/// Cleanup memory for fog of war tables
 	void CleanFogOfWar();
-	/// Remove wood/rock from the map.
-	void ClearTile(unsigned short type, const Vec2i &pos);
+
+	/// Remove wood from the map.
+	void ClearWoodTile(const Vec2i &pos);
+	/// Remove rock from the map.
+	void ClearRockTile(const Vec2i &pos);
 
 	/// convert map pixelpos coordonates into tilepos
 	Vec2i MapPixelPosToTilePos(const PixelPos &mapPos) const;
@@ -204,7 +207,7 @@ public:
 	/// Set wall on field.
 	void RemoveWall(const Vec2i &pos);
 	/// Set wall on field.
-	void SetWall(const Vec2i &pos, int humanwall);
+	void SetWall(const Vec2i &pos, bool humanwall);
 
 	/// Returns true, if wall on the map tile field
 	bool WallOnMap(const Vec2i &pos) const;
@@ -335,12 +338,11 @@ extern void MapFixSeenWallNeighbors(const Vec2i &pos);
 extern void MapFixWallTile(const Vec2i &pos);
 
 //
-// in script_map.c
+// in script_map.cpp
 //
 /// Set a tile
-extern void SetTile(int tile, const Vec2i &pos, int value = 0);
-
-inline void SetTile(int tile, int x, int y, int value = 0)
+extern void SetTile(unsigned int tile, const Vec2i &pos, int value = 0);
+inline void SetTile(unsigned int tile, int x, int y, int value = 0)
 {
 	const Vec2i pos(x, y);
 	SetTile(tile, pos, value);

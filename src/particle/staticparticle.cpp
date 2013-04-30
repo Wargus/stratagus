@@ -33,7 +33,7 @@
 #include "particle.h"
 
 
-StaticParticle::StaticParticle(CPosition position, Animation *animation) :
+StaticParticle::StaticParticle(CPosition position, GraphicAnimation *animation) :
 	CParticle(position)
 {
 	Assert(animation);
@@ -43,6 +43,11 @@ StaticParticle::StaticParticle(CPosition position, Animation *animation) :
 StaticParticle::~StaticParticle()
 {
 	delete animation;
+}
+
+bool StaticParticle::isVisible(const CViewport &vp) const
+{
+	return animation && animation->isVisible(vp, pos);
 }
 
 void StaticParticle::draw()

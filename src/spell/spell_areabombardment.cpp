@@ -43,38 +43,24 @@
 /* virtual */ void Spell_AreaBombardment::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		const char *value = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const char *value = LuaToString(l, -1, j + 1);
 		++j;
 		if (!strcmp(value, "fields")) {
-			lua_rawgeti(l, -1, j + 1);
-			this->Fields = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			this->Fields = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "shards")) {
-			lua_rawgeti(l, -1, j + 1);
-			this->Shards = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			this->Shards = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "damage")) {
-			lua_rawgeti(l, -1, j + 1);
-			this->Damage = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			this->Damage = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "start-offset-x")) {
-			lua_rawgeti(l, -1, j + 1);
-			this->StartOffsetX = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			this->StartOffsetX = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "start-offset-y")) {
-			lua_rawgeti(l, -1, j + 1);
-			this->StartOffsetY = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			this->StartOffsetY = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "missile")) {
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
+			value = LuaToString(l, -1, j + 1);
 			this->Missile = MissileTypeByIdent(value);
 			if (this->Missile == NULL) {
 				DebugPrint("in area-bombardement : missile %s does not exist\n" _C_ value);
 			}
-			lua_pop(l, 1);
 		} else {
 			LuaError(l, "Unsupported area-bombardment tag: %s" _C_ value);
 		}

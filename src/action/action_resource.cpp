@@ -45,6 +45,7 @@
 #include "player.h"
 #include "script.h"
 #include "sound.h"
+#include "tileset.h"
 #include "ui.h"
 #include "unit.h"
 #include "unit_find.h"
@@ -255,13 +256,9 @@ COrder_Resource::~COrder_Resource()
 {
 	if (!strcmp(value, "current-res")) {
 		++j;
-		lua_rawgeti(l, -1, j + 1);
-		this->CurrentResource = LuaToNumber(l, -1);
-		lua_pop(l, 1);
+		this->CurrentResource = LuaToNumber(l, -1, j + 1);
 	} else if (!strcmp(value, "done-harvesting")) {
-		lua_rawgeti(l, -1, j + 1);
 		this->DoneHarvesting = true;
-		lua_pop(l, 1);
 	} else if (!strcmp(value, "res-depot")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
@@ -279,14 +276,10 @@ COrder_Resource::~COrder_Resource()
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "state")) {
 		++j;
-		lua_rawgeti(l, -1, j + 1);
-		this->State = LuaToNumber(l, -1);
-		lua_pop(l, 1);
+		this->State = LuaToNumber(l, -1, j + 1);
 	} else if (!strcmp(value, "timetoharvest")) {
 		++j;
-		lua_rawgeti(l, -1, j + 1);
-		this->TimeToHarvest = LuaToNumber(l, -1);
-		lua_pop(l, 1);
+		this->TimeToHarvest = LuaToNumber(l, -1, j + 1);
 	} else if (!strcmp(value, "worker")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
@@ -698,7 +691,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			unit.ResourcesHeld += addload;
 
 			if (addload && unit.ResourcesHeld == resinfo.ResourceCapacity) {
-				Map.ClearTile(MapFieldForest, this->goalPos);
+				Map.ClearWoodTile(this->goalPos);
 			}
 		} else {
 			if (resinfo.HarvestFromOutside) {

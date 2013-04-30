@@ -86,9 +86,7 @@
 {
 	if (!strcmp(value, "upgrade")) {
 		++j;
-		lua_rawgeti(l, -1, j + 1);
-		this->Upgrade = CUpgrade::Get(LuaToString(l, -1));
-		lua_pop(l, 1);
+		this->Upgrade = CUpgrade::Get(LuaToString(l, -1, j + 1));
 	} else {
 		return false;
 	}

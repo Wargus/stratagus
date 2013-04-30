@@ -54,26 +54,21 @@
 **
 **      Name of the graphic file, containing all tiles.
 **
-**  CTileset::NumTiles
-**
-**      The number of different tiles in the tables.
-**
 **  CTileset::Table
 **
 **      Table to map the abstract level (PUD) tile numbers, to tile
 **      numbers in the graphic file (CTileset::File).
 **      FE. 16 (solid light water) in pud to 328 in png.
 **
-**  CTileset::FlagsTable
+**  CTileset::Flags
 **
 **      Table of the tile flags used by the editor.
 **      @see CMapField::Flags
 **
-**  CTileset::BasicNameTable
+**  CTileset::solidTerrainTypes
 **
 **      Index to name of the basic tile type. FE. "light-water".
 **      If the index is 0, the tile is not used.
-**      @see CTileset::TileNames
 **
 **  CTileset::MixedNameTable
 **
@@ -89,73 +84,66 @@
 **
 **      @note The creation of this table is currently hardcoded in
 **      the engine. It should be calculated from the flags in the
-**      tileset configuration (CCL). And it is created for the map
+**      tileset configuration. And it is created for the map
 **      and not for the tileset.
 **
 **      @note I'm not sure if this table is needed in the future.
 **
 **      @see TileType.
 **
-**  CTileset::NumNames
 **
-**      Number of different tile names.
-**
-**  CTileset::TileNames
-**
-**      The different tile names. FE "light-grass", "dark-water".
-**
-**  CTileset::TopOneTree
+**  CTileset::topOneTreeTile
 **
 **      The tile number of tile only containing the top part of a tree.
 **      Is created on the map by lumber chopping.
 **
-**  CTileset::MidOneTree
+**  CTileset::midOneTreeTile
 **
 **      The tile number of tile only containing the connection of
 **      the top part to the bottom part of tree.
 **      Is created on the map by lumber chopping.
 **
-**  CTileset::BotOneTree
+**  CTileset::botOneTreeTile
 **
 **      The tile number of tile only containing the bottom part of a
 **      tree. Is created on the map by lumber chopping.
 **
-**  CTileset::RemovedTree
+**  CTileset::removedTreeTile
 **
 **      The tile number of the tile placed where trees are removed.
 **      Is created on the map by lumber chopping.
 **
-**  CTilset::WoodTable[20]
+**  CTilset::woodTable[20]
 **
 **      Table for wood removable. This table contains the tile which
 **      is placed after a tree removement, depending on the surrounding.
 **
-**  CTileset::MixedLookupTable[]
+**  CTileset::mixedLookupTable[]
 **      Table for finding what part of the tile contains wood/rock,
 **      and which part is grass or bare ground.
 **
-**  CTileset::TopOneRock
+**  CTileset::topOneRockTile
 **
 **      The tile number of tile only containing the top part of a rock.
 **      Is created on the map by destroying rocks.
 **
-**  CTileset::MidOneRock
+**  CTileset::midOneRockTile
 **
 **      The tile number of tile only containing the connection of
 **      the top part to the bottom part of a rock.
 **      Is created on the map by destroying rocks.
 **
-**  CTileset::BotOneRock
+**  CTileset::botOneRockTile
 **
 **      The tile number of tile only containing the bottom part of a
 **      rock. Is created on the map by destroying rocks.
 **
-**  CTileset::RemovedRock
+**  CTileset::removedRockTile
 **
 **      The tile number of the tile placed where rocks are removed.
 **      Is created on the map by destroying rocks.
 **
-**  CTileset::RockTable[20]
+**  CTileset::rockTable[20]
 **
 **      Table for rock removable. Depending on the surrinding this
 **      table contains the new tile to be placed.
@@ -163,11 +151,11 @@
 **      @todo Johns: I don't think this table or routines look correct.
 **      But they work correct.
 **
-**  CTileset::HumanWallTable
+**  CTileset::humanWallTable
 **
 **      Table of human wall tiles, index depends on the surroundings.
 **
-**  CTileset::OrcWallTable
+**  CTileset::orcWallTable
 **
 **      Table of orc wall tiles, index depends on the surroundings.
 **
@@ -197,9 +185,6 @@
 
 #include "tileset.h"
 
-#include "tile.h"
-#include "video.h"
-
 #include <limits.h>
 
 /*----------------------------------------------------------------------------
@@ -216,81 +201,106 @@ PixelSize PixelTileSize(32, 32);
 -- Functions
 ----------------------------------------------------------------------------*/
 
-void CTileset::Clear()
+void CTileset::clear()
 {
 	Name.clear();
 	ImageFile.clear();
-	NumTiles = 0;
-	PixelTileSize.x = PixelTileSize.y = 0;
-	Table.clear();
-	FlagsTable.clear();
-	Tiles.clear();
+	pixelTileSize.x = pixelTileSize.y = 0;
+	tiles.clear();
 	TileTypeTable.clear();
-	SolidTerrainTypes.clear();
-	TopOneTree = 0;
-	MidOneTree = 0;
-	BotOneTree = 0;
-	RemovedTree = 0;
-	memset(WoodTable, 0, sizeof(WoodTable));
-	MixedLookupTable.clear();
-	TopOneRock = 0;
-	MidOneRock = 0;
-	BotOneRock = 0;
-	RemovedRock = 0;
-	memset(RockTable, 0, sizeof(RockTable));
-	memset(HumanWallTable, 0, sizeof(HumanWallTable));
-	memset(OrcWallTable, 0, sizeof(OrcWallTable));
+	solidTerrainTypes.clear();
+	topOneTreeTile = 0;
+	midOneTreeTile = 0;
+	botOneTreeTile = 0;
+	removedTreeTile = 0;
+	memset(woodTable, 0, sizeof(woodTable));
+	mixedLookupTable.clear();
+	topOneRockTile = 0;
+	midOneRockTile = 0;
+	botOneRockTile = 0;
+	removedRockTile = 0;
+	memset(rockTable, 0, sizeof(rockTable));
+	memset(humanWallTable, 0, sizeof(humanWallTable));
+	memset(orcWallTable, 0, sizeof(orcWallTable));
 }
 
-bool CTileset::IsSeenTile(unsigned short type, unsigned short seen) const
+unsigned int CTileset::getDefaultTileIndex() const
+{
+	// TODO: remove hardcoded value.
+	return 0x50;
+}
+
+bool CTileset::isAWallTile(unsigned tile) const
 {
 	if (TileTypeTable.empty() == false) {
-		switch (type) {
-			case MapFieldForest:
-				return TileTypeTable[seen] == TileTypeWood;
-			case MapFieldRocks:
-				return TileTypeTable[seen] == TileTypeRock;
-			default:
-				return false;
+		return (TileTypeTable[tile] == TileTypeHumanWall
+				|| TileTypeTable[tile] == TileTypeOrcWall);
+	}
+	return false;
+}
+
+bool CTileset::isARaceWallTile(unsigned tile, bool human) const
+{
+	if (TileTypeTable.empty() == false) {
+		if (human) {
+			return TileTypeTable[tile] == TileTypeHumanWall;
+		} else {
+			return TileTypeTable[tile] == TileTypeOrcWall;
 		}
+	}
+	return false;
+}
+
+
+bool CTileset::isAWoodTile(unsigned tile) const
+{
+	if (TileTypeTable.empty() == false) {
+		return TileTypeTable[tile] == TileTypeWood;
+	}
+	return false;
+}
+bool CTileset::isARockTile(unsigned tile) const
+{
+	if (TileTypeTable.empty() == false) {
+		return TileTypeTable[tile] == TileTypeRock;
 	}
 	return false;
 }
 
 unsigned int CTileset::getOrAddSolidTileIndexByName(const std::string &name)
 {
-	for (size_t i = 0; i != SolidTerrainTypes.size(); ++i) {
-		if (SolidTerrainTypes[i].TerrainName == name) {
+	for (size_t i = 0; i != solidTerrainTypes.size(); ++i) {
+		if (solidTerrainTypes[i].TerrainName == name) {
 			return i;
 		}
 	}
 	// Can't find it, then we add another solid terrain type.
 	SolidTerrainInfo s;
 	s.TerrainName = name;
-	SolidTerrainTypes.push_back(s);
-	return SolidTerrainTypes.size() - 1;
+	solidTerrainTypes.push_back(s);
+	return solidTerrainTypes.size() - 1;
 }
 
 const std::string &CTileset::getTerrainName(int solidTerrainIndex) const
 {
-	return SolidTerrainTypes[solidTerrainIndex].TerrainName;
+	return solidTerrainTypes[solidTerrainIndex].TerrainName;
 }
 
 unsigned int CTileset::getSolidTerrainCount() const
 {
-	return SolidTerrainTypes.size();
+	return solidTerrainTypes.size();
 }
 
 int CTileset::findTileIndex(unsigned char baseTerrain, unsigned char mixTerrain) const
 {
-	const TileInfo tileInfo = {baseTerrain, mixTerrain};
+	const CTileInfo tileInfo(baseTerrain, mixTerrain);
 
-	for (int i = 0; i != NumTiles;) {
-		if (Tiles[i] == tileInfo) {
+	for (size_t i = 0; i != tiles.size();) {
+		if (tiles[i].tileinfo == tileInfo) {
 			return i;
 		}
 		// Advance solid or mixed.
-		if (!Tiles[i].MixTerrain) {
+		if (!tiles[i].tileinfo.MixTerrain) {
 			i += 16;
 		} else {
 			i += 256;
@@ -343,12 +353,12 @@ int CTileset::findTilePath(int base, int goal, int length, std::vector<char> &ma
 	}
 	// Find any mixed tile
 	int l = INT_MAX;
-	for (int i = 0; i < NumTiles;) {
+	for (size_t i = 0; i != tiles.size();) {
 		int j = 0;
-		if (base == Tiles[i].BaseTerrain) {
-			j = Tiles[i].MixTerrain;
-		} else if (base == Tiles[i].MixTerrain) {
-			j = Tiles[i].BaseTerrain;
+		if (base == tiles[i].tileinfo.BaseTerrain) {
+			j = tiles[i].tileinfo.MixTerrain;
+		} else if (base == tiles[i].tileinfo.MixTerrain) {
+			j = tiles[i].tileinfo.BaseTerrain;
 		}
 		if (j != 0 && marks[j] == 0) { // possible path found
 			marks[j] = j;
@@ -361,7 +371,7 @@ int CTileset::findTilePath(int base, int goal, int length, std::vector<char> &ma
 			}
 		}
 		// Advance solid or mixed.
-		if (Tiles[i].MixTerrain == 0) {
+		if (tiles[i].tileinfo.MixTerrain == 0) {
 			i += 16;
 		} else {
 			i += 256;
@@ -386,7 +396,7 @@ int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
 	while (!(type1 = (fixed & 0xFF))) {
 		fixed >>= 8;
 		if (!fixed) {
-			abort();
+			ExitFatal(-1);
 		}
 	}
 	fixed >>= 8;
@@ -442,7 +452,7 @@ int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
 		Assert(res != -1);
 		return res;
 	}
-	if (type1 == Tiles[tileIndex].MixTerrain) {
+	if (type1 == tiles[tileIndex].tileinfo.MixTerrain) {
 		// Other mixed
 		std::swap(type1, type2);
 	}
@@ -458,10 +468,15 @@ int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
 	return base | (table[direction] << 4);
 }
 
-int CTileset::getTileIndexBySurrounding(unsigned short type,
-										unsigned int ttup, unsigned int ttright,
-										unsigned int ttdown, unsigned int ttleft) const
+int CTileset::getTileBySurrounding(unsigned short type,
+								   int ttup, int ttright,
+								   int ttdown, int ttleft) const
 {
+	ttup = ttup == -1 ? 15 : mixedLookupTable[ttup];
+	ttright = ttright == -1 ? 15 : mixedLookupTable[ttright];
+	ttdown = ttdown == -1 ? 15 : mixedLookupTable[ttdown];
+	ttleft = ttleft == -1 ? 15 : mixedLookupTable[ttleft];
+
 	//  Check each of the corners to ensure it has both connecting
 	//  ?**?
 	//  *mm*
@@ -489,9 +504,9 @@ int CTileset::getTileIndexBySurrounding(unsigned short type,
 
 	Assert(type == MapFieldForest || type == MapFieldRocks);
 #ifdef _MSC_VER
-	const int *lookuptable = (type == MapFieldForest) ? WoodTable : RockTable;
+	const int *lookuptable = (type == MapFieldForest) ? woodTable : rockTable;
 #else
-	const int (&lookuptable)[20] = (type == MapFieldForest) ? WoodTable : RockTable;
+	const int (&lookuptable)[20] = (type == MapFieldForest) ? woodTable : rockTable;
 #endif
 	tile = lookuptable[tile];
 
@@ -506,10 +521,18 @@ int CTileset::getTileIndexBySurrounding(unsigned short type,
 	return tile;
 }
 
+
+bool CTileset::isEquivalentTile(unsigned int tile1, unsigned int tile2) const
+{
+	//Assert(type == MapFieldForest || type == MapFieldRocks);
+
+	return mixedLookupTable[tile1] == mixedLookupTable[tile2];
+}
+
 int CTileset::findTileIndexByTile(unsigned int tile) const
 {
-	for (int i = 0; i != NumTiles; ++i) {
-		if (tile == Table[i]) {
+	for (size_t i = 0; i != tiles.size(); ++i) {
+		if (tile == tiles[i].tile) {
 			return i;
 		}
 	}
@@ -533,7 +556,7 @@ unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
 	if (random) {
 		int n = 0;
 		for (int i = 0; i < 16; ++i) {
-			if (!Table[tile + i]) {
+			if (!tiles[tile + i].tile) {
 				if (!filler) {
 					break;
 				}
@@ -544,7 +567,7 @@ unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
 		n = MyRand() % n;
 		int i = -1;
 		do {
-			while (++i < 16 && !Table[tile + i]) {
+			while (++i < 16 && !tiles[tile + i].tile) {
 			}
 		} while (i < 16 && n--);
 		Assert(i != 16);
@@ -552,9 +575,9 @@ unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
 	}
 	if (filler) {
 		int i = 0;
-		for (; i < 16 && Table[tile + i]; ++i) {
+		for (; i < 16 && tiles[tile + i].tile; ++i) {
 		}
-		for (; i < 16 && !Table[tile + i]; ++i) {
+		for (; i < 16 && !tiles[tile + i].tile; ++i) {
 		}
 		if (i != 16) {
 			return tile + i;
@@ -583,8 +606,8 @@ unsigned CTileset::getQuadFromTile(unsigned int tile) const
 	const int tileIndex = findTileIndexByTile(tile);
 	Assert(tileIndex != -1);
 
-	unsigned base = Tiles[tileIndex].BaseTerrain;
-	unsigned mix = Tiles[tileIndex].MixTerrain;
+	const unsigned base = tiles[tileIndex].tileinfo.BaseTerrain;
+	const unsigned mix = tiles[tileIndex].tileinfo.MixTerrain;
 
 	if (mix == 0) { // a solid tile
 		return base | (base << 8) | (base << 16) | (base << 24);
@@ -610,70 +633,61 @@ unsigned CTileset::getQuadFromTile(unsigned int tile) const
 	return base | (base << 8) | (base << 16) | (base << 24);
 }
 
-void CTileset::fillSolidTiles(std::vector<unsigned int> *tiles) const
+void CTileset::fillSolidTiles(std::vector<unsigned int> *solidTiles) const
 {
-	for (int i = 16; i < NumTiles; i += 16) {
-		const TileInfo &info = Tiles[i];
+	for (size_t i = 16; i < tiles.size(); i += 16) {
+		const CTileInfo &info = tiles[i].tileinfo;
 
 		if (info.BaseTerrain && info.MixTerrain == 0) {
-			tiles->push_back(Table[i]);
+			solidTiles->push_back(tiles[i].tile);
 		}
 	}
 }
 
-
-unsigned CTileset::getHumanWallTile(int index) const
+unsigned CTileset::getHumanWallTileIndex(int dirFlag) const
 {
-	unsigned tile = HumanWallTable[index];
-	tile = Table[tile];
-	return tile;
+	return humanWallTable[dirFlag];
 }
-unsigned CTileset::getOrcWallTile(int index) const
+unsigned CTileset::getOrcWallTileIndex(int dirFlag) const
 {
-	unsigned tile = OrcWallTable[index];
-	tile = Table[tile];
-	return tile;
+	return orcWallTable[dirFlag];
 }
 
-static unsigned int NextSection(const CTileset &tileset, unsigned int tile)
+static unsigned int NextSection(const CTileset &tileset, unsigned int tileIndex)
 {
-	while (tileset.Table[tile]) { // Skip good tiles
-		++tile;
+	while (tileset.tiles[tileIndex].tile) { // Skip good tiles
+		++tileIndex;
 	}
-	while (!tileset.Table[tile]) { // Skip separator
-		++tile;
+	while (!tileset.tiles[tileIndex].tile) { // Skip separator
+		++tileIndex;
 	}
-	return tile;
+	return tileIndex;
 }
 
-unsigned CTileset::getHumanWallTile_broken(int index) const
+unsigned CTileset::getHumanWallTileIndex_broken(int dirFlag) const
 {
-	unsigned tile = HumanWallTable[index];
-	tile = NextSection(*this, tile);
-	tile = Table[tile];
-	return tile;
+	unsigned tileIndex = humanWallTable[dirFlag];
+	tileIndex = NextSection(*this, tileIndex);
+	return tileIndex;
 }
-unsigned CTileset::getOrcWallTile_broken(int index) const
+unsigned CTileset::getOrcWallTileIndex_broken(int dirFlag) const
 {
-	unsigned tile = OrcWallTable[index];
-	tile = NextSection(*this, tile);
-	tile = Table[tile];
-	return tile;
+	unsigned tileIndex = orcWallTable[dirFlag];
+	tileIndex = NextSection(*this, tileIndex);
+	return tileIndex;
 }
-unsigned CTileset::getHumanWallTile_destroyed(int index) const
+unsigned CTileset::getHumanWallTileIndex_destroyed(int dirFlag) const
 {
-	unsigned tile = HumanWallTable[index];
-	tile = NextSection(*this, tile);
-	tile = NextSection(*this, tile);
-	tile = Table[tile];
-	return tile;
+	unsigned tileIndex = humanWallTable[dirFlag];
+	tileIndex = NextSection(*this, tileIndex);
+	tileIndex = NextSection(*this, tileIndex);
+	return tileIndex;
 }
-unsigned CTileset::getOrcWallTile_destroyed(int index) const
+unsigned CTileset::getOrcWallTileIndex_destroyed(int dirFlag) const
 {
-	unsigned tile = OrcWallTable[index];
-	tile = NextSection(*this, tile);
-	tile = NextSection(*this, tile);
-	tile = Table[tile];
-	return tile;
+	unsigned tileIndex = orcWallTable[dirFlag];
+	tileIndex = NextSection(*this, tileIndex);
+	tileIndex = NextSection(*this, tileIndex);
+	return tileIndex;
 }
 //@}

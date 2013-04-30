@@ -45,6 +45,7 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "spells.h"
+#include "tileset.h"
 #include "unit.h"
 #include "unit_manager.h"
 #include "unittype.h"

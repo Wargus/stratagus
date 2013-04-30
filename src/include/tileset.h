@@ -41,6 +41,26 @@
 
 struct lua_State;
 
+// Not used until now:
+#define MapFieldSpeedMask 0x0007  /// Move faster on this tile
+
+#define MapFieldHuman 0x0008  /// Human is owner of the field (walls)
+
+#define MapFieldLandAllowed  0x0010  /// Land units allowed
+#define MapFieldCoastAllowed 0x0020  /// Coast (transporter) units allowed
+#define MapFieldWaterAllowed 0x0040  /// Water units allowed
+#define MapFieldNoBuilding   0x0080  /// No buildings allowed
+
+#define MapFieldUnpassable 0x0100  /// Field is movement blocked
+#define MapFieldWall       0x0200  /// Field contains wall
+#define MapFieldRocks      0x0400  /// Field contains rocks
+#define MapFieldForest     0x0800  /// Field contains forest
+
+#define MapFieldLandUnit 0x1000  /// Land unit on field
+#define MapFieldAirUnit  0x2000  /// Air unit on field
+#define MapFieldSeaUnit  0x4000  /// Water unit on field
+#define MapFieldBuilding 0x8000  /// Building on field
+
 /**
 **  These are used for lookup tiles types
 **  mainly used for the FOW implementation of the seen woods/rocks
@@ -59,13 +79,17 @@ enum TileType {
 };
 
 /// Single tile definition
-struct TileInfo {
+struct CTileInfo {
 public:
-	bool operator ==(const TileInfo &rhs) const
-	{
+	CTileInfo() : BaseTerrain(0), MixTerrain(0)
+	{}
+	CTileInfo(unsigned char base, unsigned char mix) : BaseTerrain(base), MixTerrain(mix)
+	{}
+
+	bool operator ==(const CTileInfo &rhs) const {
 		return BaseTerrain == rhs.BaseTerrain && MixTerrain == rhs.MixTerrain;
 	}
-	bool operator !=(const TileInfo &rhs) const { return !(*this == rhs); }
+	bool operator !=(const CTileInfo &rhs) const { return !(*this == rhs); }
 
 public:
 	unsigned char BaseTerrain; /// Basic terrain of the tile
@@ -78,48 +102,68 @@ struct SolidTerrainInfo {
 	// TODO: When drawing with the editor add some kind fo probabilities for every tile.
 };
 
+class CTile
+{
+public:
+	CTile() : tile(0), flag(0) {}
+
+public:
+	unsigned short tile;  /// graphical pos
+	unsigned short flag;  /// Flag
+	CTileInfo tileinfo;   /// Tile descriptions
+};
+
 /// Tileset definition
 class CTileset
 {
 public:
-	void Clear();
-	bool IsSeenTile(unsigned short type, unsigned short seen) const;
+	void clear();
 
-	unsigned getRemovedRockTile() const { return RemovedRock; }
-	unsigned getRemovedTreeTile() const { return RemovedTree; }
-	unsigned getBottomOneTreeTile() const { return BotOneTree; }
-	unsigned getTopOneTreeTile() const { return TopOneTree; }
+	unsigned int getTileCount() const { return tiles.size(); }
 
-	unsigned getHumanWallTile(int index) const;
-	unsigned getOrcWallTile(int index) const;
-	unsigned getHumanWallTile_broken(int index) const;
-	unsigned getOrcWallTile_broken(int index) const;
-	unsigned getHumanWallTile_destroyed(int index) const;
-	unsigned getOrcWallTile_destroyed(int index) const;
+	unsigned int getDefaultTileIndex() const;
 
-public:
+	bool isAWallTile(unsigned tile) const;
+	bool isARaceWallTile(unsigned tile, bool human) const;
+	bool isAWoodTile(unsigned tile) const;
+	bool isARockTile(unsigned tile) const;
+
+	const PixelSize &getPixelTileSize() const { return pixelTileSize; }
+
+	unsigned getRemovedRockTile() const { return removedRockTile; }
+	unsigned getRemovedTreeTile() const { return removedTreeTile; }
+	unsigned getBottomOneTreeTile() const { return botOneTreeTile; }
+	unsigned getTopOneTreeTile() const { return topOneTreeTile; }
+
+	unsigned getHumanWallTileIndex(int dirFlag) const;
+	unsigned getOrcWallTileIndex(int dirFlag) const;
+	unsigned getHumanWallTileIndex_broken(int dirFlag) const;
+	unsigned getOrcWallTileIndex_broken(int dirFlag) const;
+	unsigned getHumanWallTileIndex_destroyed(int dirFlag) const;
+	unsigned getOrcWallTileIndex_destroyed(int dirFlag) const;
+
 	unsigned int getSolidTerrainCount() const;
 
 	const std::string &getTerrainName(int solidTerrainIndex) const;
-	int findTileIndex(unsigned char baseTerrain, unsigned char mixTerrain = 0) const;
-	int getTileIndex(unsigned char baseTerrain, unsigned char mixTerrain, unsigned int quad) const;
 
 	int findTileIndexByTile(unsigned int tile) const;
 	unsigned int getTileNumber(int basic, bool random, bool filler) const;
-	void fillSolidTiles(std::vector<unsigned int> *tiles) const;
+	void fillSolidTiles(std::vector<unsigned int> *solidTiles) const;
 
 	unsigned getQuadFromTile(unsigned int tile) const;
-	int getTileIndexBySurrounding(unsigned short type,
-								  unsigned int up, unsigned int right,
-								  unsigned int bottom, unsigned int left) const;
+	int getTileBySurrounding(unsigned short type,
+							 int up, int right,
+							 int bottom, int left) const;
 	int tileFromQuad(unsigned fixed, unsigned quad) const;
+	bool isEquivalentTile(unsigned int tile1, unsigned int tile2) const;
 
-public:
 	void parse(lua_State *l);
 	void buildTable(lua_State *l);
 
 private:
 	unsigned int getOrAddSolidTileIndexByName(const std::string &name);
+	int findTileIndex(unsigned char baseTerrain, unsigned char mixTerrain = 0) const;
+	int getTileIndex(unsigned char baseTerrain, unsigned char mixTerrain, unsigned int quad) const;
 	void buildWallReplacementTable();
 	void parseSlots(lua_State *l, int t);
 	void parseSpecial(lua_State *l);
@@ -130,38 +174,36 @@ public:
 	std::string Name;           /// Nice name to display
 	std::string ImageFile;      /// File containing image data
 
-	int NumTiles;               /// Number of tiles in the tables
-	PixelSize PixelTileSize;    /// Size of a tile in pixel
-	std::vector<unsigned short> Table;      /// Pud to Internal conversion table
-	std::vector<unsigned short> FlagsTable; /// Flag table for editor
-	std::vector<TileInfo> Tiles; /// Tile descriptions
+public:
+	std::vector<CTile> tiles;
 
 	// TODO: currently hardcoded
 	std::vector<unsigned char> TileTypeTable;  /// For fast lookup of tile type
 private:
-	std::vector<SolidTerrainInfo> SolidTerrainTypes; /// Information about solid terrains.
-public:
-	std::vector<int> MixedLookupTable;  /// Lookup for what part of tile used
-private:
-	unsigned TopOneTree;   /// Tile for one tree top
-	unsigned MidOneTree;   /// Tile for one tree middle
-	unsigned BotOneTree;   /// Tile for one tree bottom
-	unsigned RemovedTree;  /// Tile placed where trees are gone
-	int WoodTable[20];     /// Table for tree removable
-	unsigned TopOneRock;   /// Tile for one rock top
-	unsigned MidOneRock;   /// Tile for one rock middle
-	unsigned BotOneRock;   /// Tile for one rock bottom
-	unsigned RemovedRock;  /// Tile placed where rocks are gone
-	int RockTable[20];     /// Removed rock placement table
-	unsigned HumanWallTable[16];  /// Human wall placement table
-	unsigned OrcWallTable[16];    /// Orc wall placement table
+	PixelSize pixelTileSize;    /// Size of a tile in pixel
+	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
+#if 1
+	std::vector<int> mixedLookupTable;  /// Lookup for what part of tile used
+	unsigned topOneTreeTile;   /// Tile for one tree top
+	unsigned midOneTreeTile;   /// Tile for one tree middle
+	unsigned botOneTreeTile;   /// Tile for one tree bottom
+	unsigned removedTreeTile;  /// Tile placed where trees are gone
+	int woodTable[20];     /// Table for tree removable
+	unsigned topOneRockTile;   /// Tile for one rock top
+	unsigned midOneRockTile;   /// Tile for one rock middle
+	unsigned botOneRockTile;   /// Tile for one rock bottom
+	unsigned removedRockTile;  /// Tile placed where rocks are gone
+	int rockTable[20];     /// Removed rock placement table
+	unsigned humanWallTable[16];  /// Human wall placement table
+	unsigned orcWallTable[16];    /// Orc wall placement table
+#endif
 };
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void TilesetCclRegister(); /// Register CCL features for tileset
+extern void ParseTilesetTileFlags(lua_State *l, int *back, int *j);
 
 //@}
 

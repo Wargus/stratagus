@@ -48,15 +48,9 @@ void CColor::Parse(lua_State *l, const int offset)
 	if (!lua_istable(l, offset) || lua_rawlen(l, offset) != 3) {
 		LuaError(l, "incorrect argument");
 	}
-	lua_rawgeti(l, offset, 1);
-	const int r = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, offset, 2);
-	const int g = LuaToNumber(l, -1);
-	lua_pop(l, 1);
-	lua_rawgeti(l, offset, 3);
-	const int b = LuaToNumber(l, -1);
-	lua_pop(l, 1);
+	const int r = LuaToNumber(l, offset, 1);
+	const int g = LuaToNumber(l, offset, 2);
+	const int b = LuaToNumber(l, offset, 3);
 
 	if (!(0 <= r && r <= 255
 		  && 0 <= g && g <= 255

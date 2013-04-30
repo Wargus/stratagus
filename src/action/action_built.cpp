@@ -101,16 +101,12 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "progress")) {
 		++j;
-		lua_rawgeti(l, -1, j + 1);
-		this->ProgressCounter = LuaToNumber(l, -1);
-		lua_pop(l, 1);
+		this->ProgressCounter = LuaToNumber(l, -1, j + 1);
 	} else if (!strcmp(value, "cancel")) {
 		this->IsCancelled = true;
 	} else if (!strcmp(value, "frame")) {
 		++j;
-		lua_rawgeti(l, -1, j + 1);
-		int frame = LuaToNumber(l, -1);
-		lua_pop(l, 1);
+		int frame = LuaToNumber(l, -1, j + 1);
 		CConstructionFrame *cframe = unit.Type->Construction->Frames;
 		while (frame-- && cframe->Next != NULL) {
 			cframe = cframe->Next;

@@ -97,14 +97,10 @@ enum {
 {
 	if (!strcmp(value, "state")) {
 		++j;
-		lua_rawgeti(l, -1, j + 1);
-		this->State = LuaToNumber(l, -1);
-		lua_pop(l, 1);
+		this->State = LuaToNumber(l, -1, j + 1);
 	} else if (!strcmp(value, "range")) {
 		++j;
-		lua_rawgeti(l, -1, j + 1);
-		this->Range = LuaToNumber(l, -1);
-		lua_pop(l, 1);
+		this->Range = LuaToNumber(l, -1, j + 1);
 	} else if (!strcmp(value, "tile")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
@@ -207,41 +203,43 @@ enum {
 			}
 			// Handle Teleporter Units
 			// FIXME: BAD HACK
-			if (goal->Type->Teleporter && goal->Goal && unit.MapDistanceTo(*goal) <= 1) {
-				// Teleport the unit
-				unit.Remove(NULL);
-				unit.tilePos = goal->Goal->tilePos;
-				DropOutOnSide(unit, unit.Direction, NULL);
+			// goal shouldn't be busy and portal should be alive
+			if (goal->Type->Teleporter && goal->IsIdle() && goal->Goal
+				&& goal->Goal->IsAlive() && unit.MapDistanceTo(*goal) <= 1) {
+					// Teleport the unit
+					unit.Remove(NULL);
+					unit.tilePos = goal->Goal->tilePos;
+					DropOutOnSide(unit, unit.Direction, NULL);
 #if 0
-				// FIXME: SoundForName() should be called once
-				PlayGameSound(SoundForName("invisibility"), MaxSampleVolume);
-				// FIXME: MissileTypeByIdent() should be called once
-				MakeMissile(MissileTypeByIdent("missile-normal-spell"),
-							unit.GetMapPixelPosCenter(),
-							unit.GetMapPixelPosCenter());
+					// FIXME: SoundForName() should be called once
+					PlayGameSound(SoundForName("invisibility"), MaxSampleVolume);
+					// FIXME: MissileTypeByIdent() should be called once
+					MakeMissile(MissileTypeByIdent("missile-normal-spell"),
+								unit.GetMapPixelPosCenter(),
+								unit.GetMapPixelPosCenter());
 #endif
-				// FIXME: we must check if the units supports the new order.
-				CUnit &dest = *goal->Goal;
+					// FIXME: we must check if the units supports the new order.
+					CUnit &dest = *goal->Goal;
 
-				if (dest.NewOrder == NULL
-					|| (dest.NewOrder->Action == UnitActionResource && !unit.Type->Harvester)
-					|| (dest.NewOrder->Action == UnitActionAttack && !unit.Type->CanAttack)
-					|| (dest.NewOrder->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand)) {
-					this->Finished = true;
-					return ;
-				} else {
-					if (dest.NewOrder->HasGoal()) {
-						if (dest.NewOrder->GetGoal()->Destroyed) {
-							delete dest.NewOrder;
-							dest.NewOrder = NULL;
-							this->Finished = true;
-							return ;
+					if (dest.NewOrder == NULL
+						|| (dest.NewOrder->Action == UnitActionResource && !unit.Type->Harvester)
+						|| (dest.NewOrder->Action == UnitActionAttack && !unit.Type->CanAttack)
+						|| (dest.NewOrder->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand)) {
+						this->Finished = true;
+						return ;
+					} else {
+						if (dest.NewOrder->HasGoal()) {
+							if (dest.NewOrder->GetGoal()->Destroyed) {
+								delete dest.NewOrder;
+								dest.NewOrder = NULL;
+								this->Finished = true;
+								return ;
+							}
 						}
+						unit.Orders.insert(unit.Orders.begin() + 1, dest.NewOrder->Clone());
+						this->Finished = true;
+						return ;
 					}
-					unit.Orders.insert(unit.Orders.begin() + 1, dest.NewOrder->Clone());
-					this->Finished = true;
-					return ;
-				}
 			}
 			this->goalPos = goal->tilePos;
 			this->State = State_TargetReached;

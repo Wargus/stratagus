@@ -214,7 +214,6 @@ void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMess
 	delete[] buf;
 }
 
-#ifdef DEBUG
 static const char *ncconstatenames[] = {
 	"ccs_unused",
 	"ccs_connecting",          // new client
@@ -261,7 +260,6 @@ static const char *icmsgsubtypenames[] = {
 	"AreYouThere",             // Server asks are you there
 	"IAmHere",                 // Client answers I am here
 };
-#endif
 
 template <typename T>
 static void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const T &msg)
@@ -1532,10 +1530,11 @@ void NetworkServerStartGame()
 
 	// Calculate NetPlayers
 	NetPlayers = h;
+	int compPlayers = ServerSetupState.Opponents;
 	for (int i = 1; i < h; ++i) {
 		if (Hosts[i].PlyNr == 0 && ServerSetupState.CompOpt[i] != 0) {
 			NetPlayers--;
-		} else if (Hosts[i].PlyName[0] == 0) {
+		} else if (Hosts[i].PlyName[0] == 0 && --compPlayers >= 0) {
 			// Unused slot gets a computer player
 			ServerSetupState.CompOpt[i] = 1;
 			LocalSetupState.CompOpt[i] = 1;

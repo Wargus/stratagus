@@ -435,9 +435,7 @@ static int CclDefineDependency(lua_State *l)
 		const int subargs = lua_rawlen(l, j + 1);
 
 		for (int k = 0; k < subargs; ++k) {
-			lua_rawgeti(l, j + 1, k + 1);
-			const char *required = LuaToString(l, -1);
-			lua_pop(l, 1);
+			const char *required = LuaToString(l, j + 1, k + 1);
 			int count = 1;
 			if (k + 1 < subargs) {
 				lua_rawgeti(l, j + 1, k + 2);

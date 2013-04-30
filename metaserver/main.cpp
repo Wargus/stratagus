@@ -68,12 +68,14 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 
 #if 1 // from stratagus.cpp, to avoid link issues.
 
+bool EnableDebugPrint;           /// if enabled, print the debug messages
+bool EnableAssert;               /// if enabled, halt on assertion failures
+bool EnableUnitDebug;            /// if enabled, a unit info dump will be created
+
 void PrintLocation(const char *file, int line, const char *funcName)
 {
 	fprintf(stdout, "%s:%d: %s: ", file, line, funcName);
 }
-
-#ifdef DEBUG
 
 void AbortAt(const char *file, int line, const char *funcName, const char *conditionStr)
 {
@@ -87,6 +89,67 @@ void PrintOnStdOut(const char *format, ...)
 	va_start(valist, format);
 	vprintf(format, valist);
 	va_end(valist);
+}
+
+// from util.cpp
+
+#ifndef HAVE_GETOPT
+
+int opterr = 1;
+int optind = 1;
+int optopt;
+char *optarg;
+
+static void getopt_err(const char *argv0, const char *str, char opt)
+{
+	if (opterr) {
+		const char *x;
+
+		while ((x = strchr(argv0, '/'))) {
+			argv0 = x + 1;
+		}
+
+		fprintf(stderr, "%s%s%c\n", argv0, str, opt);
+	}
+}
+
+int getopt(int argc, char *const *argv, const char *opts)
+{
+	static int sp = 1;
+	register int c;
+	register const char *cp;
+
+	optarg = NULL;
+
+	if (sp == 1) {
+		if (optind >= argc || argv[optind][0] != '-' || argv[optind][1] == '\0') {
+			return EOF;
+		} else if (!strcmp(argv[optind], "--")) {
+			optind++;
+			return EOF;
+		}
+	}
+	optopt = c = argv[optind][sp];
+	if (c == ':' || (cp = strchr(opts, c)) == NULL) {
+		getopt_err(argv[0], ": illegal option -", (char)c);
+		cp = "xx"; /* make the next if false */
+		c = '?';
+	}
+	if (*++cp == ':') {
+		if (argv[optind][++sp] != '\0') {
+			optarg = &argv[optind++][sp];
+		} else if (++optind < argc) {
+			optarg = argv[optind++];
+		} else {
+			getopt_err(argv[0], ": option requires an argument -", (char)c);
+			c = (*opts == ':') ? ':' : '?';
+		}
+		sp = 1;
+	} else if (argv[optind][++sp] == '\0') {
+		optind++;
+		sp = 1;
+	}
+	return c;
 }
 
 #endif
