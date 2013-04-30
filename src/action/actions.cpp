@@ -33,9 +33,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#ifdef DEBUG
 #include <time.h>
-#endif
 
 #include "stratagus.h"
 #include "version.h"
