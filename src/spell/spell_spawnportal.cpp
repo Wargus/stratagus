@@ -49,6 +49,11 @@
 				this->PortalType = 0;
 				DebugPrint("unit type \"%s\" not found for spawn-portal.\n" _C_ value);
 			}
+		} else if (!strcmp(value, "time-to-live")) {
+			this->TTL = LuaToNumber(l, -1, j + 1);
+		} else if (!strcmp(value, "current-player")) {
+			this->CurrentPlayer = true;
+			--j;
 		} else {
 			LuaError(l, "Unsupported spawn-portal tag: %s" _C_ value);
 		}
@@ -75,11 +80,13 @@
 	CUnit *portal = caster.Goal;
 
 	DebugPrint("Spawning a portal exit.\n");
-	if (portal) {
+	if (portal && portal->IsAlive()) {
 		portal->MoveToXY(goalPos);
 	} else {
-		portal = MakeUnitAndPlace(goalPos, *this->PortalType, &Players[PlayerNumNeutral]);
+		portal = MakeUnitAndPlace(goalPos, *this->PortalType,
+			CurrentPlayer ? caster.Player : &Players[PlayerNumNeutral]);
 	}
+	portal->TTL = GameCycle + this->TTL;
 	//  Goal is used to link to destination circle of power
 	caster.Goal = portal;
 	//FIXME: setting destination circle of power should use mana
