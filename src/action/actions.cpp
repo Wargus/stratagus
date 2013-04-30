@@ -279,6 +279,30 @@ static void HandleBuffsEachCycle(CUnit &unit)
 	}
 }
 
+/**
+**  Modify unit's health according to burn and poison
+**
+**  @param unit  the unit to operate on
+*/
+static bool HandleBurnAndPoison(CUnit &unit)
+{
+	if (unit.Removed || unit.Destroyed || unit.Variable[HP_INDEX].Max == 0
+		|| unit.CurrentAction() == UnitActionBuilt
+		|| unit.CurrentAction() == UnitActionDie) {
+		return false;
+	}
+	// Burn & poison
+	const int hpPercent = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
+	if (hpPercent <= unit.Type->BurnPercent && unit.Type->BurnDamageRate) {
+		HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate);
+		return true;
+	}
+	if (unit.Variable[POISON_INDEX].Value && unit.Type->PoisonDrain) {
+		HitUnit(NoUnitP, unit, unit.Type->PoisonDrain);
+		return true;
+	}
+	return false;
+}
 
 /**
 **  Handle things about the unit that decay over time each second
@@ -295,33 +319,14 @@ static void HandleBuffsEachSecond(CUnit &unit)
 			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX) {
 			continue;
 		}
-
-		if (i == HP_INDEX) {
-			bool burn = false, poison = false;
-
-			// Burn & poison
-			// Health doesn't regenerate while burning or poisoned.
-			if (!unit.Removed && !unit.Destroyed && unit.Variable[HP_INDEX].Max
-				&& unit.CurrentAction() != UnitActionBuilt
-				&& unit.CurrentAction() != UnitActionDie) {
-					if (((100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max) <= unit.Type->BurnPercent
-						&& unit.Type->BurnDamageRate) {
-							HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate);
-							continue;
-					}
-
-					if (unit.Variable[POISON_INDEX].Value && unit.Type->PoisonDrain) {
-						HitUnit(NoUnitP, unit, unit.Type->PoisonDrain);
-						continue;
-					}
-			}
+		if (i == HP_INDEX && HandleBurnAndPoison(unit)) {
+			continue;
 		}
 		if (unit.Variable[i].Enable && unit.Variable[i].Increase) {
 			IncreaseVariable(unit, i);
 		}
 	}
 }
-
 
 /**
 **  Handle the action of a unit.
