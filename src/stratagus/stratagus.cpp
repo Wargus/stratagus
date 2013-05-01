@@ -456,7 +456,9 @@ static void Usage()
 		"\t-u userpath\tPath where stratagus saves preferences, log and savegame\n"
 		"\t-v mode\t\tVideo mode resolution in format <xres>x<yres>\n"
 		"\t-W\t\tWindowed video mode\n"
-		"\t-Z\t\tUse OpenGL to scale the screen to the viewport (retro-style)\n"
+#if defined(USE_OPENGL) || defined(USE_GLES)
+		"\t-Z\t\tUse OpenGL to scale the screen to the viewport (retro-style). Implies -O.\n"
+#endif
 		"map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n",
 		Parameters::Instance.applicationName.c_str());
 }
@@ -551,6 +553,11 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 			case 'o':
 				ForceUseOpenGL = 1;
 				UseOpenGL = 0;
+				if (ZoomNoResize) {
+					fprintf(stdout, "Error: -Z only works with OpenGL enabled\n");
+					Usage();
+					ExitFatal(-1);
+				}
 				continue;
 			case 'O':
 				ForceUseOpenGL = 1;
