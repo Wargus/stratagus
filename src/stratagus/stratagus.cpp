@@ -554,7 +554,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				ForceUseOpenGL = 1;
 				UseOpenGL = 0;
 				if (ZoomNoResize) {
-					fprintf(stdout, "Error: -Z only works with OpenGL enabled\n");
+					fprintf(stderr, "Error: -Z only works with OpenGL enabled\n");
 					Usage();
 					ExitFatal(-1);
 				}
