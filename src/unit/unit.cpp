@@ -738,6 +738,12 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 		unit->AssignToPlayer(*player);
 	}
 
+	if (unit->Type->OnInit) {
+		unit->Type->OnInit->pushPreamble();
+		unit->Type->OnInit->pushInteger(UnitNumber(*unit));
+		unit->Type->OnInit->run();
+	}
+
 	//  fancy buildings: mirror buildings (but shadows not correct)
 	if (type.Building && FancyBuildings
 		&& unit->Type->NoRandomPlacing == false && (MyRand() & 1) != 0) {

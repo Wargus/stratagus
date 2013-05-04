@@ -559,6 +559,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->OnEachCycle = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "OnEachSecond")) {
 			type->OnEachSecond = new LuaCallback(l, -1);
+		} else if (!strcmp(value, "OnInit")) {
+			type->OnInit = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "land")) {

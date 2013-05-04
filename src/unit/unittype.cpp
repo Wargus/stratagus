@@ -611,7 +611,7 @@ CUnitType::CUnitType() :
 	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	Animations(NULL), StillFrame(0),
-	DeathExplosion(NULL), OnHit(NULL), OnEachCycle(NULL), OnEachSecond(NULL),
+	DeathExplosion(NULL), OnHit(NULL), OnEachCycle(NULL), OnEachSecond(NULL), OnInit(NULL),
 	CorpseType(NULL), Construction(NULL), RepairHP(0), TileWidth(0), TileHeight(0),
 	BoxWidth(0), BoxHeight(0), BoxOffsetX(0), BoxOffsetY(0), NumDirections(0),
 	MinAttackRange(0), ReactRangeComputer(0), ReactRangePerson(0), Priority(0),
@@ -649,6 +649,7 @@ CUnitType::~CUnitType()
 	delete OnHit;
 	delete OnEachCycle;
 	delete OnEachSecond;
+	delete OnInit;
 
 	BoolFlag.clear();
 
