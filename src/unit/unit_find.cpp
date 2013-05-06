@@ -310,7 +310,6 @@ public:
 		resinfo(*worker.Type->ResInfo[resource]),
 		deposit(deposit),
 		movemask(worker.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
-		resource(resource),
 		maxRange(maxRange),
 		check_usage(check_usage),
 		res_finder(resource, 1),
@@ -348,7 +347,6 @@ private:
 	const ResourceInfo &resinfo;
 	const CUnit *deposit;
 	unsigned int movemask;
-	int resource;
 	int maxRange;
 	bool check_usage;
 	CResourceFinder res_finder;

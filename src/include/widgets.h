@@ -294,8 +294,6 @@ public:
 	int getPercent() const;
 
 private:
-	int width;            /// width of the widget.
-	int height;           /// height of the widget.
 	std::string caption;  /// caption of the widget.
 	unsigned int percent; /// percent value of the widget.
 };
