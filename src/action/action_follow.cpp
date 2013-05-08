@@ -38,6 +38,7 @@
 #include "action/action_follow.h"
 
 #include "iolib.h"
+#include "missile.h"
 #include "pathfinder.h"
 #include "script.h"
 #include "ui.h"
@@ -168,6 +169,12 @@ enum {
 			return ;
 		}
 
+		// Don't follow after immobile units
+		if (goal && goal->CanMove() == false) {
+			this->Finished = true;
+			return;
+		}
+
 		if (goal->tilePos == this->goalPos) {
 			// Move to the next order
 			if (unit.Orders.size() > 1) {
@@ -204,42 +211,51 @@ enum {
 			// Handle Teleporter Units
 			// FIXME: BAD HACK
 			// goal shouldn't be busy and portal should be alive
-			if (goal->Type->Teleporter && goal->IsIdle() && goal->Goal
-				&& goal->Goal->IsAlive() && unit.MapDistanceTo(*goal) <= 1) {
-					// Teleport the unit
-					unit.Remove(NULL);
-					unit.tilePos = goal->Goal->tilePos;
-					DropOutOnSide(unit, unit.Direction, NULL);
-#if 0
-					// FIXME: SoundForName() should be called once
-					PlayGameSound(SoundForName("invisibility"), MaxSampleVolume);
-					// FIXME: MissileTypeByIdent() should be called once
-					MakeMissile(MissileTypeByIdent("missile-normal-spell"),
-								unit.GetMapPixelPosCenter(),
-								unit.GetMapPixelPosCenter());
-#endif
-					// FIXME: we must check if the units supports the new order.
-					CUnit &dest = *goal->Goal;
+			if (goal->Type->Teleporter && goal->Goal && goal->Goal->IsAlive() && unit.MapDistanceTo(*goal) <= 1) {
+				if (!goal->IsIdle()) { // wait
+					unit.Wait = 10;
+					return;
+				}
+				// Check if we have enough mana
+				if (goal->Goal->Type->TeleportCost > goal->Variable[MANA_INDEX].Value) {
+					this->Finished = true;
+					return;
+				} else {
+					goal->Variable[MANA_INDEX].Value -= goal->Goal->Type->TeleportCost;
+				}
+				// Everything is OK, now teleport the unit
+				unit.Remove(NULL);
+				if (goal->Type->TeleportEffect.Missile) {
+					MakeMissile(*goal->Type->TeleportEffect.Missile, unit.GetMapPixelPosCenter(), unit.GetMapPixelPosCenter());
+				}
+				unit.tilePos = goal->Goal->tilePos;
+				DropOutOnSide(unit, unit.Direction, NULL);
 
-					if (dest.NewOrder == NULL
-						|| (dest.NewOrder->Action == UnitActionResource && !unit.Type->Harvester)
-						|| (dest.NewOrder->Action == UnitActionAttack && !unit.Type->CanAttack)
-						|| (dest.NewOrder->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand)) {
-						this->Finished = true;
-						return ;
-					} else {
-						if (dest.NewOrder->HasGoal()) {
-							if (dest.NewOrder->GetGoal()->Destroyed) {
-								delete dest.NewOrder;
-								dest.NewOrder = NULL;
-								this->Finished = true;
-								return ;
-							}
+				// FIXME: we must check if the units supports the new order.
+				CUnit &dest = *goal->Goal;
+				if (dest.Type->TeleportEffect.Missile) {
+					MakeMissile(*dest.Type->TeleportEffect.Missile, unit.GetMapPixelPosCenter(), unit.GetMapPixelPosCenter());
+				}
+
+				if (dest.NewOrder == NULL
+					|| (dest.NewOrder->Action == UnitActionResource && !unit.Type->Harvester)
+					|| (dest.NewOrder->Action == UnitActionAttack && !unit.Type->CanAttack)
+					|| (dest.NewOrder->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand)) {
+					this->Finished = true;
+					return ;
+				} else {
+					if (dest.NewOrder->HasGoal()) {
+						if (dest.NewOrder->GetGoal()->Destroyed) {
+							delete dest.NewOrder;
+							dest.NewOrder = NULL;
+							this->Finished = true;
+							return ;
 						}
 						unit.Orders.insert(unit.Orders.begin() + 1, dest.NewOrder->Clone());
 						this->Finished = true;
 						return ;
 					}
+				}
 			}
 			this->goalPos = goal->tilePos;
 			this->State = State_TargetReached;
