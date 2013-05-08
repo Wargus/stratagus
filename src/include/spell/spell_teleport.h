@@ -40,7 +40,7 @@
 class Spell_Teleport : public SpellActionType
 {
 public:
-	Spell_Teleport() : SpellActionType(1) {}
+	Spell_Teleport() : SpellActionType(0) {}
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
