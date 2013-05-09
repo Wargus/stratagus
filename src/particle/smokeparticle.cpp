@@ -36,8 +36,8 @@
 
 
 CSmokeParticle::CSmokeParticle(CPosition position, GraphicAnimation *smoke,
-							   float speedx, float speedy) :
-	CParticle(position)
+							   float speedx, float speedy, int drawlevel) :
+	CParticle(position, drawlevel)
 {
 	Assert(smoke);
 	this->puff = smoke->clone();
@@ -77,7 +77,7 @@ void CSmokeParticle::update(int ticks)
 
 CParticle *CSmokeParticle::clone()
 {
-	return new CSmokeParticle(pos, puff, speedVector.x, speedVector.y);
+	return new CSmokeParticle(pos, puff, speedVector.x, speedVector.y, drawLevel);
 }
 
 //@}

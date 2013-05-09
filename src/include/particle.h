@@ -77,8 +77,8 @@ public:
 class CParticle
 {
 public:
-	CParticle(CPosition position) :
-		pos(position), destroyed(false)
+	CParticle(CPosition position, int drawlevel = 0) :
+		pos(position), destroyed(false), drawLevel(drawlevel)
 	{}
 	virtual ~CParticle() {}
 
@@ -91,16 +91,20 @@ public:
 
 	virtual CParticle *clone() = 0;
 
+	int getDrawLevel() const { return drawLevel; }
+	void setDrawLevel(int value) { drawLevel = value; }
+
 protected:
 	CPosition pos;
 	bool destroyed;
+	int drawLevel;
 };
 
 
 class StaticParticle : public CParticle
 {
 public:
-	StaticParticle(CPosition position, GraphicAnimation *flame);
+	StaticParticle(CPosition position, GraphicAnimation *flame, int drawlevel = 0);
 	virtual ~StaticParticle();
 
 	virtual bool isVisible(const CViewport &vp) const;
@@ -120,13 +124,17 @@ public:
 	CChunkParticle(CPosition position, GraphicAnimation *smokeAnimation, GraphicAnimation *debrisAnimation,
 				   GraphicAnimation *destroyAnimation,
 				   int minVelocity = 0, int maxVelocity = 400,
-				   int minTrajectoryAngle = 77, int maxTTL = 0);
+				   int minTrajectoryAngle = 77, int maxTTL = 0, int drawlevel = 0);
 	virtual ~CChunkParticle();
 
 	virtual bool isVisible(const CViewport &vp) const;
 	virtual void draw();
 	virtual void update(int ticks);
 	virtual CParticle *clone();
+	int getSmokeDrawLevel() const { return smokeDrawLevel; }
+	int getDestroyDrawLevel() const { return destroyDrawLevel; }
+	void setSmokeDrawLevel(int value) { smokeDrawLevel = value; }
+	void setDestroyDrawLevel(int value) { destroyDrawLevel = value; }
 
 protected:
 	CPosition initialPos;
@@ -140,6 +148,8 @@ protected:
 	int maxVelocity;
 	int minTrajectoryAngle;
 	float height;
+	int smokeDrawLevel;
+	int destroyDrawLevel;
 	GraphicAnimation *debrisAnimation;
 	GraphicAnimation *smokeAnimation;
 	GraphicAnimation *destroyAnimation;
@@ -155,7 +165,7 @@ protected:
 class CSmokeParticle : public CParticle
 {
 public:
-	CSmokeParticle(CPosition position, GraphicAnimation *animation, float speedx = 0, float speedy = -22.0f);
+	CSmokeParticle(CPosition position, GraphicAnimation *animation, float speedx = 0, float speedy = -22.0f, int drawlevel = 0);
 	virtual ~CSmokeParticle();
 
 	virtual bool isVisible(const CViewport &vp) const;
@@ -174,7 +184,7 @@ protected:
 class CRadialParticle : public CParticle
 {
 public:
-	CRadialParticle(CPosition position, GraphicAnimation *animation, int maxSpeed);
+	CRadialParticle(CPosition position, GraphicAnimation *animation, int maxSpeed, int drawlevel = 0);
 	virtual ~CRadialParticle();
 
 	virtual bool isVisible(const CViewport &vp) const;
@@ -199,7 +209,9 @@ public:
 	static void init();
 	static void exit();
 
-	void draw(const CViewport &vp);
+	void prepareToDraw(const CViewport &vp, std::vector<CParticle *> &table);
+	void endDraw();
+
 	void update();
 
 	void add(CParticle *particle);
