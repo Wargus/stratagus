@@ -70,7 +70,7 @@ void UnitRotate(CUnit &unit, int rotate)
 	}
 }
 
-/* virtual */ void CAnimation_Rotate::Init(const char *s)
+/* virtual */ void CAnimation_Rotate::Init(const char *s, lua_State *)
 {
 	this->rotateStr = s;
 }

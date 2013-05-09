@@ -49,7 +49,7 @@
 	}
 }
 
-/* virtual */ void CAnimation_Sound::Init(const char *s)
+/* virtual */ void CAnimation_Sound::Init(const char *s, lua_State *)
 {
 	this->sound.Name = s;
 }

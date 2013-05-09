@@ -46,6 +46,7 @@
 #include "animation/animation_goto.h"
 #include "animation/animation_ifvar.h"
 #include "animation/animation_label.h"
+#include "animation/animation_luacallback.h"
 #include "animation/animation_move.h"
 #include "animation/animation_randomgoto.h"
 #include "animation/animation_randomrotate.h"
@@ -479,10 +480,12 @@ static CAnimation *ParseAnimationFrame(lua_State *l, const char *str)
 		anim = new CAnimation_Goto;
 	} else if (op1 == "random-goto") {
 		anim = new CAnimation_RandomGoto;
+	} else if (op1 == "lua-callback") {
+		anim = new CAnimation_LuaCallback;
 	} else {
 		LuaError(l, "Unknown animation: %s" _C_ op1.c_str());
 	}
-	anim->Init(extraArg.c_str());
+	anim->Init(extraArg.c_str(), l);
 	return anim;
 }
 

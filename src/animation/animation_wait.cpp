@@ -54,7 +54,7 @@
 	}
 }
 
-/* virtual */ void CAnimation_Wait::Init(const char *s)
+/* virtual */ void CAnimation_Wait::Init(const char *s, lua_State *)
 {
 	this->wait = s;
 }

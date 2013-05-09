@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_randomwait.cpp - The animation RandomWait. */
+/**@name animation_luacallback.cpp - The animation LuaCallback. */
 //
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 2013 by cybermind
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -35,35 +35,50 @@
 
 #include "stratagus.h"
 
-#include "animation/animation_randomwait.h"
+#include "animation/animation_luacallback.h"
 
+#include "script.h"
 #include "unit.h"
 
-/* virtual */ void CAnimation_RandomWait::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+
+/* virtual */ void CAnimation_LuaCallback::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
+	Assert(cb);
 
-	const int arg1 = ParseAnimInt(&unit, this->minWait.c_str());
-	const int arg2 = ParseAnimInt(&unit, this->maxWait.c_str());
+	cb->pushPreamble();
+	for (std::vector<std::string>::const_iterator it = cbArgs.begin(); it != cbArgs.end(); ++it) {
+		const std::string str = *it;
 
-	unit.Anim.Wait = arg1 + SyncRand() % (arg2 - arg1 + 1);
+		const int arg = ParseAnimInt(&unit, str.c_str());
+		cb->pushInteger(arg);
+	}
+	cb->run();
 }
 
 /*
-** s = "minWait MaxWait"
+** s = "cbName cbArg1 [cbArgN ...]"
 */
-/* virtual */ void CAnimation_RandomWait::Init(const char *s, lua_State *)
+/* virtual */ void CAnimation_LuaCallback::Init(const char *s, lua_State *l)
 {
 	const std::string str(s);
 	const size_t len = str.size();
 
 	size_t begin = 0;
 	size_t end = str.find(' ', begin);
-	this->minWait.assign(str, begin, end - begin);
+	this->cbName.assign(str, begin, end - begin);
 
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->maxWait.assign(str, begin, end - begin);
+	lua_getglobal(l, cbName.c_str());
+	cb = new LuaCallback(l, -1);
+	lua_pop(l, 1);
+
+	for (size_t begin = std::min(len, str.find_first_not_of(' ', end));
+		begin != std::string::npos;) {
+			end = std::min(len, str.find(' ', begin));
+
+			this->cbArgs.push_back(str.substr(begin, end - begin));
+			begin = str.find_first_not_of(' ', end);
+	}
 }
 
 //@}

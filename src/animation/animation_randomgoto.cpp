@@ -51,7 +51,7 @@
 /*
 **  s : "percent label"
 */
-/* virtual */ void CAnimation_RandomGoto::Init(const char *s)
+/* virtual */ void CAnimation_RandomGoto::Init(const char *s, lua_State *)
 {
 	const std::string str(s);
 	const size_t len = str.size();

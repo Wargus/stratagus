@@ -47,7 +47,7 @@
 	unit.Anim.Unbreakable = this->state;
 }
 
-/* virtual */ void CAnimation_Unbreakable::Init(const char *s)
+/* virtual */ void CAnimation_Unbreakable::Init(const char *s, lua_State *)
 {
 	if (!strcmp(s, "begin")) {
 		this->state = 1;

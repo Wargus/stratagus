@@ -130,7 +130,7 @@ found:
 /*
 **  s = "unitType offX offY range player"
 */
-/* virtual */ void CAnimation_SpawnUnit::Init(const char *s)
+/* virtual */ void CAnimation_SpawnUnit::Init(const char *s, lua_State *)
 {
 	const std::string str(s);
 	const size_t len = str.size();

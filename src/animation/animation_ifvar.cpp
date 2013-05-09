@@ -73,7 +73,7 @@ static bool returnFalse(int, int) { return false; }
 /*
 ** s = "leftOp Op rigthOp gotoLabel"
 */
-/* virtual */ void CAnimation_IfVar::Init(const char *s)
+/* virtual */ void CAnimation_IfVar::Init(const char *s, lua_State *)
 {
 	const std::string str(s);
 	const size_t len = str.size();

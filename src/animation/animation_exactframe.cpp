@@ -45,7 +45,7 @@
 	unit.Frame = ParseAnimInt(&unit);
 }
 
-/* virtual */ void CAnimation_ExactFrame::Init(const char *s)
+/* virtual */ void CAnimation_ExactFrame::Init(const char *s, lua_State *)
 {
 	this->frame = s;
 }

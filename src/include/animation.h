@@ -72,7 +72,8 @@ enum AnimationType {
 	AnimationIfVar,
 	AnimationSetVar,
 	AnimationSetPlayerVar,
-	AnimationDie
+	AnimationDie,
+	AnimationLuaCallback
 };
 
 class CAnimation
@@ -83,7 +84,7 @@ public:
 	virtual ~CAnimation() {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const = 0;
-	virtual void Init(const char *s) {}
+	virtual void Init(const char *s, lua_State *l = NULL) {}
 
 	const AnimationType Type;
 	CAnimation *Next;
