@@ -44,7 +44,7 @@ public:
 	virtual void Init(const char *s, lua_State *l);
 
 private:
-	int mod;
+	SetVar_ModifyTypes mod;
 	std::string playerStr;
 	std::string varStr;
 	std::string argStr;

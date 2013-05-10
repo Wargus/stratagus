@@ -76,6 +76,20 @@ enum AnimationType {
 	AnimationLuaCallback
 };
 
+//Modify types
+enum SetVar_ModifyTypes {
+	modSet = 0,      /// Set value to this
+	modAdd,          /// Addition
+	modSub,          /// Subtraction 
+	modMul,          /// Multiplication
+	modDiv,          /// Division
+	modMod,          /// Modulo
+	modAnd,          /// Bitwise AND
+	modOr,           /// Bitwise OR
+	modXor,          /// Bitwise XOR
+	modNot,          /// Bitwise NOT
+};
+
 class CAnimation
 {
 public:
