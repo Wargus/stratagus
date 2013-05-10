@@ -168,6 +168,7 @@ CVideo Video;
 #if defined(USE_OPENGL) || defined(USE_GLES)
 char ForceUseOpenGL;
 bool UseOpenGL;                      /// Use OpenGL
+bool ZoomNoResize;
 #endif
 
 char VideoForceFullScreen;           /// fullscreen set from commandline
@@ -289,14 +290,24 @@ bool CVideo::ResizeScreen(int w, int h)
 			UI.Minimap.FreeOpenGL();
 		}
 #endif
+		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
+#if defined(USE_OPENGL) || defined(USE_GLES)
+		ViewportWidth = w;
+		ViewportHeight = h;
+		if (ZoomNoResize) {
+			ReloadOpenGL();
+		} else {
+			Width = w;
+			Height = h;
+			SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
+			if (UseOpenGL) {
+				ReloadOpenGL();
+			}
+		}
+#else
 		Width = w;
 		Height = h;
-		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
 		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			ReloadOpenGL();
-		}
 #endif
 		return true;
 	}

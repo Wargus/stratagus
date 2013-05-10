@@ -1367,6 +1367,13 @@ void InputMouseMove(const EventCallback &callbacks,
 		|| ((y - buff) <= MouseY && MouseY <= (y + buff)) == 0) {
 		MouseState = InitialMouseState;
 		LastMouseTicks = ticks;
+		// Reset rectangle select cursor state if we moved by a lot
+		// - rectangle select should be a drag, not a tap
+		if (CursorState == CursorStateRectangle
+			&& (((x - buff * 2) <= MouseX && MouseX <= (x + buff * 2)) == 0
+				|| ((y - buff * 2) <= MouseY && MouseY <= (y + buff * 2)) == 0)) {
+			CursorState = CursorStatePoint;
+		}
 	}
 	if (MouseX != x || MouseY != y) {
 		MouseX = x;

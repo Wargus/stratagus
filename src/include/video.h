@@ -53,6 +53,7 @@ class CFont;
 #if defined(USE_OPENGL) || defined(USE_GLES)
 extern char ForceUseOpenGL;
 extern bool UseOpenGL;
+extern bool ZoomNoResize;
 #endif
 
 class CGraphic : public gcn::Image
@@ -351,6 +352,13 @@ public:
 
 	int Width;
 	int Height;
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	int ViewportWidth;         /// Actual width of the window
+	int ViewportHeight;        /// Actual height of the window
+#endif
+#if defined(USE_TOUCHSCREEN) && defined(USE_WIN32)
+	SDL_Cursor *blankCursor;
+#endif
 	int Depth;
 	bool FullScreen;
 };

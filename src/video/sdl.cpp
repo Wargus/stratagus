@@ -270,7 +270,7 @@ static void InitOpenGL()
 
 	InitOpenGLExtensions();
 
-	glViewport(0, 0, (GLsizei)Video.Width, (GLsizei)Video.Height);
+	glViewport(0, 0, (GLsizei)Video.ViewportWidth, (GLsizei)Video.ViewportHeight);
 
 #ifdef USE_OPENGL
 	glMatrixMode(GL_PROJECTION);
@@ -628,11 +628,23 @@ void InitVideoSdl()
 		Video.Depth = 32;
 	}
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (!Video.ViewportWidth || !Video.ViewportHeight) {
+		Video.ViewportWidth = Video.Width;
+		Video.ViewportHeight = Video.Height;
+	}
+	TheScreen = SDL_SetVideoMode(Video.ViewportWidth, Video.ViewportHeight, Video.Depth, flags);
+#else
 	TheScreen = SDL_SetVideoMode(Video.Width, Video.Height, Video.Depth, flags);
+#endif
 	if (TheScreen && (TheScreen->format->BitsPerPixel != 16
 					  && TheScreen->format->BitsPerPixel != 32)) {
 		// Only support 16 and 32 bpp, default to 16
+#if defined(USE_OPENGL) || defined(USE_GLES)
+		TheScreen = SDL_SetVideoMode(Video.ViewportWidth, Video.ViewportHeight, 16, flags);
+#else
 		TheScreen = SDL_SetVideoMode(Video.Width, Video.Height, 16, flags);
+#endif
 	}
 	if (TheScreen == NULL) {
 		fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
@@ -643,8 +655,17 @@ void InitVideoSdl()
 	Video.FullScreen = (TheScreen->flags & SDL_FULLSCREEN) ? 1 : 0;
 	Video.Depth = TheScreen->format->BitsPerPixel;
 
+#if defined(USE_TOUCHSCREEN) && defined(USE_WIN32)
+	// Must not allow SDL to switch to relative mouse coordinates
+	// with touchscreen when going fullscreen. So we don't hide the
+	// cursor, but instead set a transparent 1px cursor
+	Uint8 emptyCursor[] = {'\0'};
+	Video.blankCursor = SDL_CreateCursor(emptyCursor, emptyCursor, 1, 1, 0, 0);
+	SDL_SetCursor(Video.blankCursor);
+#else
 	// Turn cursor off, we use our own.
-	SDL_ShowCursor(0);
+	SDL_ShowCursor(SDL_DISABLE);
+#endif
 
 	// Make default character translation easier
 	SDL_EnableUNICODE(1);
@@ -797,8 +818,15 @@ void Invalidate()
 **  @param callbacks  Callback structure for events.
 **  @param event      SDL event structure pointer.
 */
-static void SdlDoEvent(const EventCallback &callbacks, const SDL_Event &event)
+static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 {
+#if (defined(USE_OPENGL) || defined(USE_GLES))
+	// Scale mouse-coordinates to viewport
+	if (ZoomNoResize && (event.type & (SDL_MOUSEBUTTONUP | SDL_MOUSEBUTTONDOWN | SDL_MOUSEMOTION))) {
+		event.button.x = (Uint16)floor(event.button.x * float(Video.Width) / Video.ViewportWidth);
+		event.button.y = (Uint16)floor(event.button.y * float(Video.Height) / Video.ViewportHeight);
+	}
+#endif
 	switch (event.type) {
 		case SDL_MOUSEBUTTONDOWN:
 			InputMouseButtonPress(callbacks, SDL_GetTicks(), event.button.button);
@@ -1151,10 +1179,16 @@ void ToggleFullScreen()
 		}
 	}
 
+#ifndef USE_TOUCHSCREEN
+	// Cannot hide cursor on Windows with touchscreen, as it switches
+	// to relative mouse coordinates in fullscreen. See above initial
+	// call to ShowCursor
+	//
 	// Windows shows the SDL cursor when starting in fullscreen mode
 	// then switching to window mode.  This hides the cursor again.
 	SDL_ShowCursor(SDL_ENABLE);
 	SDL_ShowCursor(SDL_DISABLE);
+#endif
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {

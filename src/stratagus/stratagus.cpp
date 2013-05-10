@@ -456,6 +456,9 @@ static void Usage()
 		"\t-u userpath\tPath where stratagus saves preferences, log and savegame\n"
 		"\t-v mode\t\tVideo mode resolution in format <xres>x<yres>\n"
 		"\t-W\t\tWindowed video mode\n"
+#if defined(USE_OPENGL) || defined(USE_GLES)
+		"\t-Z\t\tUse OpenGL to scale the screen to the viewport (retro-style). Implies -O.\n"
+#endif
 		"map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n",
 		Parameters::Instance.applicationName.c_str());
 }
@@ -506,7 +509,7 @@ static void RedirectOutput()
 void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
 	for (;;) {
-		switch (getopt(argc, argv, "ac:d:D:eE:FhiI:lN:oOP:ps:S:u:v:W?")) {
+		switch (getopt(argc, argv, "ac:d:D:eE:FhiI:lN:oOP:ps:S:u:v:WZ?")) {
 			case 'a':
 				EnableAssert = true;
 				continue;
@@ -550,6 +553,11 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 			case 'o':
 				ForceUseOpenGL = 1;
 				UseOpenGL = 0;
+				if (ZoomNoResize) {
+					fprintf(stderr, "Error: -Z only works with OpenGL enabled\n");
+					Usage();
+					ExitFatal(-1);
+				}
 				continue;
 			case 'O':
 				ForceUseOpenGL = 1;
@@ -586,12 +594,31 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 					Usage();
 					ExitFatal(-1);
 				}
+#if defined(USE_OPENGL) || defined(USE_GLES)
+				if (ZoomNoResize) {
+					Video.ViewportHeight = Video.Height;
+					Video.ViewportWidth = Video.Width;
+					Video.Height = 0;
+					Video.Width = 0;
+				}
+#endif
 				continue;
 			}
 			case 'W':
 				VideoForceFullScreen = 1;
 				Video.FullScreen = 0;
 				continue;
+#if defined(USE_OPENGL) || defined(USE_GLES)
+		        case 'Z':
+				ForceUseOpenGL = 1;
+				UseOpenGL = 1;
+				ZoomNoResize = 1;
+				Video.ViewportHeight = Video.Height;
+				Video.ViewportWidth = Video.Width;
+				Video.Height = 0;
+				Video.Width = 0;
+				continue;
+#endif
 			case -1:
 				break;
 			case '?':
