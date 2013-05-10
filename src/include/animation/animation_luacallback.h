@@ -40,7 +40,7 @@
 class CAnimation_LuaCallback : public CAnimation
 {
 public:
-	CAnimation_LuaCallback::CAnimation_LuaCallback() : CAnimation(AnimationLuaCallback), cb(NULL) {}
+	CAnimation_LuaCallback() : CAnimation(AnimationLuaCallback), cb(NULL) {}
 	~CAnimation_LuaCallback() { delete cb; }
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
