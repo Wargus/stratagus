@@ -224,6 +224,7 @@ public:
 	bool IsCasterOnly() const {
 		return !Range && Target == TargetSelf;
 	}
+	bool ForceUseAnimation;
 
 };
 

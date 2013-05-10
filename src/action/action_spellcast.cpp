@@ -333,7 +333,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 			}
 			// FALL THROUGH
 		case 2:                         // Cast spell on the target.
-			if (!spell.IsCasterOnly()) {
+			if (!spell.IsCasterOnly() || spell.ForceUseAnimation) {
 				AnimateActionSpellCast(unit, *this);
 				if (unit.Anim.Unbreakable) {
 					return ;
