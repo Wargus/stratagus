@@ -1103,9 +1103,11 @@ bool COrder_Resource::ActionResourceInit(CUnit &unit)
 		unit.DeAssignWorkerFromMine(*mine);
 		this->Resource.Mine = NULL;
 	}
-	if (goal && goal->CurrentAction() != UnitActionBuilt) {
+	if (goal && goal->IsAlive() && goal->CurrentAction() != UnitActionBuilt) {
 		unit.AssignWorkerToMine(*goal);
 		this->Resource.Mine = goal;
+	} else {
+		return false;
 	}
 
 	UnitGotoGoal(unit, goal, SUB_MOVE_TO_RESOURCE);
@@ -1133,6 +1135,7 @@ void COrder_Resource::Execute(CUnit &unit)
 	// Let's start mining.
 	if (this->State == SUB_START_RESOURCE) {
 		if (ActionResourceInit(unit) == false) {
+			ResourceGiveUp(unit);
 			return;
 		}
 	}
