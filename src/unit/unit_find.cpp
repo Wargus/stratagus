@@ -509,15 +509,16 @@ CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 /**
 **  Find all units of type.
 **
-**  @param type   type of unit requested
-**  @param units  array in which we have to store the units
+**  @param type       type of unit requested
+**  @param units      array in which we have to store the units
+**  @param everybody  if true, include all units
 */
-void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units)
+void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool everybody)
 {
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 		CUnit &unit = **it;
 
-		if (unit.Type == &type && !unit.IsUnusable()) {
+		if (unit.Type == &type && !unit.IsUnusable(everybody)) {
 			units.push_back(&unit);
 		}
 	}

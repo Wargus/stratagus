@@ -597,7 +597,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			if (varModified) {
 				std::vector<CUnit *> unitupgrade;
 
-				FindUnitsByType(*UnitTypes[z], unitupgrade);
+				FindUnitsByType(*UnitTypes[z], unitupgrade, true);
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
 

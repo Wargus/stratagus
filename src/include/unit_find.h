@@ -281,7 +281,7 @@ extern CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last);
 extern bool FindTerrainType(int movemask, int resmask, int range,
 							const CPlayer &player, const Vec2i &startPos, Vec2i *pos);
 
-extern void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units);
+extern void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool everybody = false);
 
 /// Find all units of this type of the player
 extern void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *> &units);
