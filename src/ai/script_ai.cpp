@@ -692,7 +692,7 @@ static int CclAiForce(lua_State *l)
 		resetForce = LuaToBoolean(l, 3);
 	}
 	int force = LuaToNumber(l, 1);
-	if (force < 0 || force >= AI_MAX_FORCES) {
+	if (force < 0 || force >= AI_MAX_FORCE_INTERNAL) {
 		LuaError(l, "Force out of range: %d" _C_ force);
 	}
 	AiForce &aiforce = AiPlayer->Force[AiPlayer->Force.getScriptForce(force)];
@@ -762,7 +762,7 @@ static int CclAiForceRole(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	int force = LuaToNumber(l, 1);
-	if (force < 0 || force >= AI_MAX_FORCES) {
+	if (force < 0 || force >= AI_MAX_FORCE_INTERNAL) {
 		LuaError(l, "Force %i out of range" _C_ force);
 	}
 
@@ -789,7 +789,7 @@ static int CclAiCheckForce(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	int force = LuaToNumber(l, 1);
-	if (force < 0 || force >= AI_MAX_FORCES) {
+	if (force < 0 || force >= AI_MAX_FORCE_INTERNAL) {
 		lua_pushfstring(l, "Force out of range: %d", force);
 	}
 	if (AiPlayer->Force[AiPlayer->Force.getScriptForce(force)].Completed) {
@@ -809,7 +809,7 @@ static int CclAiWaitForce(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	int force = LuaToNumber(l, 1);
-	if (force < 0 || force >= AI_MAX_FORCES) {
+	if (force < 0 || force >= AI_MAX_FORCE_INTERNAL) {
 		lua_pushfstring(l, "Force out of range: %d", force);
 	}
 	if (AiPlayer->Force[AiPlayer->Force.getScriptForce(force)].Completed) {
@@ -834,7 +834,7 @@ static int CclAiAttackWithForce(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	int force = LuaToNumber(l, 1);
-	if (force < 0 || force >= AI_MAX_FORCES) {
+	if (force < 0 || force >= AI_MAX_FORCE_INTERNAL) {
 		LuaError(l, "Force out of range: %d" _C_ force);
 	}
 	AiAttackWithForce(AiPlayer->Force.getScriptForce(force));
@@ -857,7 +857,7 @@ static int CclAiWaitForces(lua_State *l)
 	for (int i = 0; i < args; ++i) {
 		const int force = LuaToNumber(l, 1, i + 1);
 
-		if (force < 0 || force >= AI_MAX_FORCES) {
+		if (force < 0 || force >= AI_MAX_FORCE_INTERNAL) {
 			lua_pushfstring(l, "Force out of range: %d", force);
 		}
 		if (!AiPlayer->Force[AiPlayer->Force.getScriptForce(force)].Completed) {
@@ -876,7 +876,7 @@ static int CclAiWaitForces(lua_State *l)
 */
 static int CclAiAttackWithForces(lua_State *l)
 {
-	int Forces[AI_MAX_FORCES + 1];
+	int Forces[AI_MAX_FORCE_INTERNAL + 1];
 
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
@@ -886,7 +886,7 @@ static int CclAiAttackWithForces(lua_State *l)
 	for (int i = 0; i < args; ++i) {
 		const int force = LuaToNumber(l, 1, i + 1);
 
-		if (force < 0 || force >= AI_MAX_FORCES) {
+		if (force < 0 || force >= AI_MAX_FORCE_INTERNAL) {
 			lua_pushfstring(l, "Force out of range: %d", force);
 		}
 		Forces[i] = AiPlayer->Force.getScriptForce(force);
