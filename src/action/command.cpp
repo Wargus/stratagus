@@ -36,7 +36,10 @@
 #include "stratagus.h"
 
 #include "actions.h"
+#include "action/action_built.h"
+#include "action/action_research.h"
 #include "action/action_train.h"
+#include "action/action_upgradeto.h"
 #include "commands.h"
 #include "map.h"
 #include "pathfinder.h"
@@ -63,8 +66,19 @@ static void ReleaseOrders(CUnit &unit)
 	Assert(unit.Orders.empty() == false);
 
 	// Order 0 must be stopped in the action loop.
-	for (size_t i = 1; i != unit.Orders.size(); ++i) {
-		delete unit.Orders[i];
+	for (size_t i = 0; i != unit.Orders.size(); ++i) {
+		if (unit.Orders[i]->Action == UnitActionBuilt) {
+			(dynamic_cast<COrder_Built *>(unit.Orders[i]))->Cancel(unit);
+		} else if (unit.Orders[i]->Action == UnitActionResearch) {
+			(dynamic_cast<COrder_Research *>(unit.Orders[i]))->Cancel(unit);
+		} else if (unit.Orders[i]->Action == UnitActionTrain) {
+			(dynamic_cast<COrder_Train *>(unit.Orders[i]))->Cancel(unit);
+		} else if (unit.Orders[i]->Action == UnitActionUpgradeTo) {
+			(dynamic_cast<COrder_UpgradeTo *>(unit.Orders[i]))->Cancel(unit);
+		}
+		if (i > 0) {
+			delete unit.Orders[i];
+		}
 	}
 	unit.Orders.resize(1);
 	unit.Orders[0]->Finished = true;
