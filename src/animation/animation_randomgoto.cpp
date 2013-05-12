@@ -43,7 +43,7 @@
 {
 	Assert(unit.Anim.Anim == this);
 
-	if (SyncRand() % 100 < ParseAnimInt(&unit, this->randomStr.c_str())) {
+	if (SyncRand() % 100 < ParseAnimInt(unit, this->randomStr.c_str())) {
 		unit.Anim.Anim = this->gotoLabel;
 	}
 }

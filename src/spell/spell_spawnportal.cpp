@@ -85,6 +85,7 @@
 	} else {
 		portal = MakeUnitAndPlace(goalPos, *this->PortalType,
 			CurrentPlayer ? caster.Player : &Players[PlayerNumNeutral]);
+		portal->Summoned = 1;
 	}
 	portal->TTL = GameCycle + this->TTL;
 	//  Goal is used to link to destination circle of power

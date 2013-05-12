@@ -53,7 +53,11 @@
 
 int CAnimation_Frame::ParseAnimInt(const CUnit *unit) const
 {
-	return ::ParseAnimInt(unit, this->frame.c_str());
+	if (unit == NULL) {
+		return atoi(this->frame.c_str());
+	} else {
+		return ::ParseAnimInt(*unit, this->frame.c_str());
+	}
 }
 
 //@}

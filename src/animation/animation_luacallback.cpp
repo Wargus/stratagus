@@ -50,7 +50,7 @@
 	for (std::vector<std::string>::const_iterator it = cbArgs.begin(); it != cbArgs.end(); ++it) {
 		const std::string str = *it;
 
-		const int arg = ParseAnimInt(&unit, str.c_str());
+		const int arg = ParseAnimInt(unit, str.c_str());
 		cb->pushInteger(arg);
 	}
 	cb->run();

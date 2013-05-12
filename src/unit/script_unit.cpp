@@ -377,6 +377,9 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "selected")) {
 			unit->Selected = 1;
 			--j;
+		} else if (!strcmp(value, "summoned")) {
+			unit->Summoned = 1;
+			--j;
 		} else if (!strcmp(value, "rescued-from")) {
 			unit->RescuedFrom = &Players[LuaToNumber(l, 2, j + 1)];
 		} else if (!strcmp(value, "seen-by-player")) {

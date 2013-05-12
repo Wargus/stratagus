@@ -670,7 +670,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 		return;
 	}
 	// Summoned unit, don't help
-	if (defender.GroupId == -1) {
+	if (defender.Summoned) {
 		return;
 	}
 

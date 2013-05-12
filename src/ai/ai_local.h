@@ -159,12 +159,12 @@ public:
 
 	void ReturnToHome();
 	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos);
+	void Insert(CUnit &unit);
 
 private:
 	void CountTypes(unsigned int *counter, const size_t len);
 	bool IsBelongsTo(const CUnitType &type);
-	void Insert(CUnit &unit);
-
+	
 	void Update();
 
 	static void InternalRemoveUnit(CUnit *unit);
@@ -220,6 +220,7 @@ public:
 		return script[index];
 	}
 
+	int GetForce(const CUnit &unit);
 	void RemoveDeadUnit();
 	bool Assign(CUnit &unit);
 	void Update();

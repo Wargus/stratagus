@@ -134,17 +134,17 @@ static int ParseAnimPlayer(const CUnit &unit, const char *parseint)
 **  @return  The parsed value.
 */
 
-int ParseAnimInt(const CUnit *unit, const char *parseint)
+int ParseAnimInt(const CUnit &unit, const char *parseint)
 {
 	char s[100];
-	const CUnit *goal = unit;
+	const CUnit *goal = &unit;
 
 	strcpy(s, parseint);
 	char *cur = &s[2];
-	if ((s[0] == 'v' || s[0] == 't') && unit != NULL) { //unit variable detected
+	if (s[0] == 'v' || s[0] == 't') { //unit variable detected
 		if (s[0] == 't') {
-			if (unit->CurrentOrder()->HasGoal()) {
-				goal = unit->CurrentOrder()->GetGoal();
+			if (unit.CurrentOrder()->HasGoal()) {
+				goal = unit.CurrentOrder()->GetGoal();
 			} else {
 				return 0;
 			}
@@ -152,7 +152,7 @@ int ParseAnimInt(const CUnit *unit, const char *parseint)
 		char *next = strchr(cur, '.');
 		if (next == NULL) {
 			fprintf(stderr, "Need also specify the variable '%s' tag \n", cur);
-			Exit(1);
+			ExitFatal(1);
 		} else {
 			*next = '\0';
 		}
@@ -164,7 +164,7 @@ int ParseAnimInt(const CUnit *unit, const char *parseint)
 				return goal->Resource.Active;
 			}
 			fprintf(stderr, "Bad variable name '%s'\n", cur);
-			Exit(1);
+			ExitFatal(1);
 		}
 		if (!strcmp(next + 1, "Value")) {
 			return goal->Variable[index].Value;
@@ -178,10 +178,10 @@ int ParseAnimInt(const CUnit *unit, const char *parseint)
 			return goal->Variable[index].Value * 100 / goal->Variable[index].Max;
 		}
 		return 0;
-	} else if ((s[0] == 'b' || s[0] == 'g') && unit != NULL) { //unit bool flag detected
+	} else if (s[0] == 'b' || s[0] == 'g') { //unit bool flag detected
 		if (s[0] == 'g') {
-			if (unit->CurrentOrder()->HasGoal()) {
-				goal = unit->CurrentOrder()->GetGoal();
+			if (unit.CurrentOrder()->HasGoal()) {
+				goal = unit.CurrentOrder()->GetGoal();
 			} else {
 				return 0;
 			}
@@ -189,11 +189,10 @@ int ParseAnimInt(const CUnit *unit, const char *parseint)
 		const int index = UnitTypeVar.BoolFlagNameLookup[cur];// User bool flags
 		if (index == -1) {
 			fprintf(stderr, "Bad bool-flag name '%s'\n", cur);
-			Exit(1);
-			return 0;
+			ExitFatal(1);
 		}
 		return goal->Type->BoolFlag[index].value;
-	} else if ((s[0] == 's') && unit != NULL) { //spell type detected
+	} else if (s[0] == 's') { //spell type detected
 		Assert(goal->CurrentAction() == UnitActionSpellCast);
 		const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
 		const SpellType &spell = order.GetSpell();
@@ -201,11 +200,11 @@ int ParseAnimInt(const CUnit *unit, const char *parseint)
 			return 1;
 		}
 		return 0;
-	} else if (s[0] == 'p' && unit != NULL) { //player variable detected
+	} else if (s[0] == 'p') { //player variable detected
 		char *next = strchr(cur, '.');
 		if (next == NULL) {
 			fprintf(stderr, "Need also specify the %s player's property\n", cur);
-			Exit(1);
+			ExitFatal(1);
 		} else {
 			*next = '\0';
 		}
@@ -213,7 +212,7 @@ int ParseAnimInt(const CUnit *unit, const char *parseint)
 		if (arg != NULL) {
 			*arg = '\0';
 		}
-		return GetPlayerData(ParseAnimPlayer(*unit, cur), next + 1, arg + 1);
+		return GetPlayerData(ParseAnimPlayer(unit, cur), next + 1, arg + 1);
 	} else if (s[0] == 'r') { //random value
 		char *next = strchr(cur, '.');
 		if (next == NULL) {
@@ -224,10 +223,70 @@ int ParseAnimInt(const CUnit *unit, const char *parseint)
 			return min + SyncRand(atoi(next + 1) - min + 1);
 		}
 	} else if (s[0] == 'l') { //player number
-		return ParseAnimPlayer(*unit, cur);
+		return ParseAnimPlayer(unit, cur);
 
 	}
 	return atoi(parseint);
+}
+
+/**
+**  Parse flags list in animation frame.
+**
+**  @param unit       Unit of the animation.
+**  @param parseflag  Flag list to parse.
+**
+**  @return The parsed value.
+*/
+int ParseAnimFlags(const CUnit &unit, const char *parseflag)
+{
+	char s[100];
+	int flags = 0;
+
+	strcpy(s, parseflag);
+	char *cur = s;
+	char *next = s;
+	while (next) {
+		next = strchr(cur, '.');
+		if (next) {
+			*next = '\0';
+			++next;
+		}
+		if (unit.Anim.Anim->Type == AnimationSpawnMissile) {
+			if (!strcmp(cur, "none")) {
+				flags = SM_None;
+				return flags;
+			} else if (!strcmp(cur, "damage")) {
+				flags |= SM_Damage;
+			} else if (!strcmp(cur, "totarget")) {
+				flags |= SM_ToTarget;
+			} else if (!strcmp(cur, "pixel")) {
+				flags |= SM_Pixel;
+			} else if (!strcmp(cur, "reltarget")) {
+				flags |= SM_RelTarget;
+			} else if (!strcmp(cur, "ranged")) {
+				flags |= SM_Ranged;
+			}  else if (!strcmp(cur, "setdirection")) {
+				flags |= SM_SetDirection;
+			} else {
+				fprintf(stderr, "Unknown animation flag: %s\n", cur);
+				ExitFatal(1);
+			}
+		} else if (unit.Anim.Anim->Type == AnimationSpawnUnit) {
+			if (!strcmp(cur, "none")) {
+				flags = SU_None;
+				return flags;
+			} else if (!strcmp(cur, "summoned")) {
+				flags |= SU_Summoned;
+			} else if (!strcmp(cur, "jointoai")) {
+				flags |= SU_JoinToAIForce;
+			} else {
+				fprintf(stderr, "Unknown animation flag: %s\n", cur);
+				ExitFatal(1);
+			}
+		}
+		cur = next;
+	}
+	return flags;
 }
 
 

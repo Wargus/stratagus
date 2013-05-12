@@ -178,8 +178,8 @@ static void SetPlayerData(const int player, const char *prop, const char *arg, i
 
 	const char *var = this->varStr.c_str();
 	const char *arg = this->argStr.c_str();
-	const int playerId = ParseAnimInt(&unit, this->playerStr.c_str());
-	int rop = ParseAnimInt(&unit, this->valueStr.c_str());
+	const int playerId = ParseAnimInt(unit, this->playerStr.c_str());
+	int rop = ParseAnimInt(unit, this->valueStr.c_str());
 	int data = GetPlayerData(playerId, var, arg);
 
 	switch (this->mod) {

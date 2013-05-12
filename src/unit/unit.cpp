@@ -453,6 +453,7 @@ void CUnit::Init()
 	Moving = 0;
 	ReCast = 0;
 	CacheLock = 0;
+	Summoned = 0;
 	memset(&Anim, 0, sizeof(Anim));
 	CurrentResource = 0;
 	Orders.clear();
