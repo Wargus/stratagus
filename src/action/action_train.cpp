@@ -183,7 +183,7 @@ static void AnimateActionTrain(CUnit &unit)
 	CPlayer &player = *unit.Player;
 	const CUnitType &nType = *this->Type;
 	const int cost = nType.Stats[player.Index].Costs[TimeCost];
-	this->Ticks += player.SpeedTrain / SPEEDUP_FACTOR;
+	this->Ticks += std::max(1, player.SpeedTrain / SPEEDUP_FACTOR);
 
 	if (this->Ticks < cost) {
 		unit.Wait = CYCLES_PER_SECOND / 6;
