@@ -22,6 +22,7 @@ class CPreference
 	bool ShowAttackRange;
 	bool ShowMessages;
 	bool BigScreen;
+	bool PauseOnLeave;
 
 	unsigned int ShowOrders;
 	unsigned int  ShowNameDelay;
