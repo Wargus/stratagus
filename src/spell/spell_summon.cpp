@@ -59,7 +59,10 @@
 		} else if (!strcmp(value, "time-to-live")) {
 			this->TTL = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "require-corpse")) {
-			this->RequireCorpse = 1;
+			this->RequireCorpse = true;
+			--j;
+		} else if (!strcmp(value, "join-to-ai-force")) {
+			this->JoinToAiForce = true;
 			--j;
 		} else {
 			LuaError(l, "Unsupported summon tag: %s" _C_ value);
@@ -136,7 +139,7 @@ public:
 			}
 
 			// Insert summoned unit to AI force so it will help them in battle
-			if (caster.Player->AiEnabled) {
+			if (this->JoinToAiForce && caster.Player->AiEnabled) {
 				int force = caster.Player->Ai->Force.GetForce(caster);
 				if (force != -1) {
 					caster.Player->Ai->Force[force].Insert(*target);

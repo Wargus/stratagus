@@ -144,7 +144,7 @@ found:
 }
 
 /*
-**  s = "unitType offX offY range player flags"
+**  s = "unitType offX offY range player [flags]"
 */
 /* virtual */ void CAnimation_SpawnUnit::Init(const char *s, lua_State *)
 {
@@ -173,7 +173,9 @@ found:
 
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));
-	this->flagsStr.assign(str, begin, end - begin);
+	if (begin != end) {
+		this->flagsStr.assign(str, begin, end - begin);
+	}
 }
 
 //@}

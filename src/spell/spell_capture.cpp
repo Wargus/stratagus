@@ -34,6 +34,9 @@
 
 #include "spell/spell_capture.h"
 
+#include "../ai/ai_local.h"
+
+#include "commands.h"
 #include "game.h"
 #include "script.h"
 #include "unit.h"
@@ -44,7 +47,9 @@
 		const char *value = LuaToString(l, -1, j + 1);
 		++j;
 		if (!strcmp(value, "sacrifice")) {
-			this->SacrificeEnable = 1;
+			this->SacrificeEnable = true;
+		} else if (!strcmp(value, "join-to-ai-force")) {
+			this->JoinToAIForce = true;
 		} else if (!strcmp(value, "damage")) {
 			this->Damage = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "percent")) {
@@ -79,8 +84,7 @@
 			if (this->SacrificeEnable) {
 				// No corpse.
 				caster.Remove(NULL);
-				UnitLost(caster);
-				UnitClearOrders(caster);
+				caster.Release();
 			}
 			return 1;
 		}
@@ -103,15 +107,24 @@
 		caster.Variable[KILL_INDEX].Enable = 1;
 	}
 	target->ChangeOwner(*caster.Player);
+	UnitClearOrders(*target);
+	if (this->JoinToAIForce && caster.Player->AiEnabled) {
+		int force = caster.Player->Ai->Force.GetForce(caster);
+		if (force != -1) {
+			caster.Player->Ai->Force[force].Insert(*target);
+			target->GroupId = caster.GroupId;
+			CommandDefend(*target, caster, FlushCommands);
+		}
+	}
 	if (this->SacrificeEnable) {
 		// No corpse.
 		caster.Remove(NULL);
-		UnitLost(caster);
-		UnitClearOrders(caster);
+		caster.Release();
 	} else {
 		caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
 	}
-	UnitClearOrders(*target);
+	
+	
 	return 0;
 }
 

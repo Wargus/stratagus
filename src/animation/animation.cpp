@@ -245,7 +245,7 @@ int ParseAnimFlags(const CUnit &unit, const char *parseflag)
 	strcpy(s, parseflag);
 	char *cur = s;
 	char *next = s;
-	while (next) {
+	while (next && *next) {
 		next = strchr(cur, '.');
 		if (next) {
 			*next = '\0';
