@@ -1007,9 +1007,7 @@ private:
 		}
 
 		// don't consider small damages...
-		if (sgood < 20) {
-			sgood = 20;
-		}
+		sgood = std::max(sgood, 20);
 
 		int cost = sbad / sgood;
 		if (cost > best_cost) {

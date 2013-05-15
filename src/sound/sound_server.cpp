@@ -438,14 +438,7 @@ int SetChannelStereo(int channel, int stereo)
 		stereo = Channels[channel].Stereo;
 	} else {
 		SDL_LockAudio();
-
-		if (stereo > 127) {
-			stereo = 127;
-		} else if (stereo < -128) {
-			stereo = -128;
-		}
 		Channels[channel].Stereo = stereo;
-
 		SDL_UnlockAudio();
 	}
 	return stereo;
