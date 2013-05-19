@@ -3,7 +3,7 @@
 #
 #  Build script for the Bos Wars engine.
 #
-#  (c) Copyright 2010 by Francois Beerten.
+#  (c) Copyright 2010-2013 by Francois Beerten.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
