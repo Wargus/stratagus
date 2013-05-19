@@ -247,7 +247,7 @@ function DisplayEnding()
    "into territory their mortal foes once held.\n"..
    "You have proved to the world that, when their very survival "..
    "is at stake, your nation will win the battle."
-obj = "nil"
+obj = {_("nil")}
   RunBriefingMenu(obj, t, nil, "campaigns/islands/crescents.png")
 end
 
