@@ -36,6 +36,8 @@
 
 #include "spell/spell_summon.h"
 
+#include "../ai/ai_local.h"
+
 #include "actions.h"
 #include "commands.h"
 #include "script.h"
@@ -57,7 +59,10 @@
 		} else if (!strcmp(value, "time-to-live")) {
 			this->TTL = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "require-corpse")) {
-			this->RequireCorpse = 1;
+			this->RequireCorpse = true;
+			--j;
+		} else if (!strcmp(value, "join-to-ai-force")) {
+			this->JoinToAiForce = true;
 			--j;
 		} else {
 			LuaError(l, "Unsupported summon tag: %s" _C_ value);
@@ -124,6 +129,8 @@ public:
 		if (target != NULL) {
 			target->tilePos = pos;
 			DropOutOnSide(*target, LookingW, NULL);
+			// To avoid defending summoned unit for AI
+			target->Summoned = 1;
 			//
 			//  set life span. ttl=0 results in a permanent unit.
 			//
@@ -131,13 +138,13 @@ public:
 				target->TTL = GameCycle + ttl;
 			}
 
-			// To avoid defending summoned unit for AI
-			if (caster.Player->AiEnabled) {
-				if (caster.GroupId) {
+			// Insert summoned unit to AI force so it will help them in battle
+			if (this->JoinToAiForce && caster.Player->AiEnabled) {
+				int force = caster.Player->Ai->Force.GetForce(caster);
+				if (force != -1) {
+					caster.Player->Ai->Force[force].Insert(*target);
 					target->GroupId = caster.GroupId;
 					CommandDefend(*target, caster, FlushCommands);
-				} else {
-					target->GroupId = -1;
 				}
 			}
 

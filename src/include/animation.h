@@ -72,7 +72,22 @@ enum AnimationType {
 	AnimationIfVar,
 	AnimationSetVar,
 	AnimationSetPlayerVar,
-	AnimationDie
+	AnimationDie,
+	AnimationLuaCallback
+};
+
+//Modify types
+enum SetVar_ModifyTypes {
+	modSet = 0,      /// Set value to this
+	modAdd,          /// Addition
+	modSub,          /// Subtraction 
+	modMul,          /// Multiplication
+	modDiv,          /// Division
+	modMod,          /// Modulo
+	modAnd,          /// Bitwise AND
+	modOr,           /// Bitwise OR
+	modXor,          /// Bitwise XOR
+	modNot,          /// Bitwise NOT
 };
 
 class CAnimation
@@ -83,7 +98,7 @@ public:
 	virtual ~CAnimation() {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const = 0;
-	virtual void Init(const char *s) {}
+	virtual void Init(const char *s, lua_State *l = NULL) {}
 
 	const AnimationType Type;
 	CAnimation *Next;
@@ -152,7 +167,8 @@ extern int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scal
 extern int UnitShowAnimation(CUnit &unit, const CAnimation *anim);
 
 
-extern int ParseAnimInt(const CUnit *unit, const char *parseint);
+extern int ParseAnimInt(const CUnit &unit, const char *parseint);
+extern int ParseAnimFlags(const CUnit &unit, const char *parseflag);
 
 extern void FindLabelLater(CAnimation **anim, const std::string &name);
 

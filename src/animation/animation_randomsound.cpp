@@ -54,7 +54,7 @@
 /*
 **  s = "Sound1 [SoundN ...]"
 */
-/* virtual */ void CAnimation_RandomSound::Init(const char *s)
+/* virtual */ void CAnimation_RandomSound::Init(const char *s, lua_State *)
 {
 	const std::string str(s);
 	const size_t len = str.size();

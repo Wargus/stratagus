@@ -551,6 +551,11 @@ static int CclDefineUnitType(lua_State *l)
 			type->ExplodeWhenKilled = 1;
 			type->Explosion.Name = LuaToString(l, -1);
 			type->Explosion.Missile = NULL;
+		} else if (!strcmp(value, "TeleportCost")) {
+			type->TeleportCost = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "TeleportEffect")) {
+			type->TeleportEffect.Name = LuaToString(l, -1);
+			type->TeleportEffect.Missile = NULL;
 		} else if (!strcmp(value, "DeathExplosion")) {
 			type->DeathExplosion = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "OnHit")) {
@@ -559,6 +564,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->OnEachCycle = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "OnEachSecond")) {
 			type->OnEachSecond = new LuaCallback(l, -1);
+		} else if (!strcmp(value, "OnInit")) {
+			type->OnInit = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "land")) {

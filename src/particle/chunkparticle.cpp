@@ -46,8 +46,8 @@ static inline float deg2rad(int degrees)
 
 CChunkParticle::CChunkParticle(CPosition position, GraphicAnimation *smokeAnimation, GraphicAnimation *debrisAnimation,
 							   GraphicAnimation *destroyAnimation,
-							   int minVelocity, int maxVelocity, int minTrajectoryAngle, int maxTTL) :
-	CParticle(position), initialPos(position), maxTTL(maxTTL), nextSmokeTicks(0),
+							   int minVelocity, int maxVelocity, int minTrajectoryAngle, int maxTTL, int drawlevel) :
+	CParticle(position, drawlevel), initialPos(position), maxTTL(maxTTL), nextSmokeTicks(0),
 	age(0), height(0.f)
 {
 	float radians = deg2rad(MyRand() % 360);
@@ -112,7 +112,7 @@ void CChunkParticle::update(int ticks)
 		if (destroyAnimation) {
 			CPosition p(pos.x, calculateScreenPos(pos.y, height));
 			GraphicAnimation *destroyanimation = destroyAnimation->clone();
-			StaticParticle *destroy = new StaticParticle(p, destroyanimation);
+			StaticParticle *destroy = new StaticParticle(p, destroyanimation, destroyDrawLevel);
 			ParticleManager.add(destroy);
 		}
 
@@ -126,7 +126,7 @@ void CChunkParticle::update(int ticks)
 	if (age > nextSmokeTicks) {
 		CPosition p(pos.x, calculateScreenPos(pos.y, height));
 		GraphicAnimation *smokeanimation = smokeAnimation->clone();
-		CSmokeParticle *smoke = new CSmokeParticle(p, smokeanimation);
+		CSmokeParticle *smoke = new CSmokeParticle(p, smokeanimation, 0, -22.0f, smokeDrawLevel);
 		ParticleManager.add(smoke);
 
 		nextSmokeTicks += MyRand() % randSmokeTicks + minSmokeTicks;
@@ -151,7 +151,10 @@ void CChunkParticle::update(int ticks)
 
 CParticle *CChunkParticle::clone()
 {
-	return new CChunkParticle(pos, smokeAnimation, debrisAnimation, destroyAnimation, minVelocity, maxVelocity, minTrajectoryAngle, maxTTL);
+	CChunkParticle *particle = new CChunkParticle(pos, smokeAnimation, debrisAnimation, destroyAnimation, minVelocity, maxVelocity, minTrajectoryAngle, maxTTL, drawLevel);
+	particle->smokeDrawLevel = smokeDrawLevel;
+	particle->destroyDrawLevel = destroyDrawLevel;
+	return particle;
 }
 
 //@}

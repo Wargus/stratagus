@@ -159,12 +159,12 @@ public:
 
 	void ReturnToHome();
 	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos);
+	void Insert(CUnit &unit);
 
 private:
 	void CountTypes(unsigned int *counter, const size_t len);
 	bool IsBelongsTo(const CUnitType &type);
-	void Insert(CUnit &unit);
-
+	
 	void Update();
 
 	static void InternalRemoveUnit(CUnit *unit);
@@ -186,7 +186,8 @@ public:
 };
 
 // forces
-#define AI_MAX_FORCES 50                    /// How many forces are supported
+#define AI_MAX_FORCES 50                           /// How many forces are supported
+#define AI_MAX_FORCE_INTERNAL (AI_MAX_FORCES / 2)  /// The forces after AI_MAX_FORCE_INTERNAL are for internal use
 
 /**
 **  AI force manager.
@@ -219,10 +220,11 @@ public:
 		return script[index];
 	}
 
+	int GetForce(const CUnit &unit);
 	void RemoveDeadUnit();
 	bool Assign(CUnit &unit);
 	void Update();
-	unsigned int FindFreeForce(AiForceRole role = AiForceRoleDefault);
+	unsigned int FindFreeForce(AiForceRole role = AiForceRoleDefault, int begin = 0);
 	void CheckUnits(int *counter);
 private:
 	std::vector<AiForce> forces;

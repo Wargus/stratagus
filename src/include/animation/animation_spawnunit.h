@@ -35,13 +35,20 @@
 #include <string>
 #include "animation.h"
 
+//SpawnUnit flags
+enum SpawnUnit_Flags {
+	SU_None = 0,           /// Clears all flags
+	SU_Summoned = 1,       /// Unit is marked as "summoned"
+	SU_JoinToAIForce = 2   /// Unit is included into spawner's AI force, if available
+};
+
 class CAnimation_SpawnUnit : public CAnimation
 {
 public:
 	CAnimation_SpawnUnit() : CAnimation(AnimationSpawnUnit) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s);
+	virtual void Init(const char *s, lua_State *l);
 
 private:
 	std::string unitTypeStr;
@@ -49,6 +56,7 @@ private:
 	std::string offYStr;
 	std::string rangeStr;
 	std::string playerStr;
+	std::string flagsStr;
 };
 
 //@}

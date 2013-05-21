@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_sound.h - The animation Sound headerfile. */
+/**@name animation_luacallback.h - The animation LuaCallback headerfile. */
 //
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 2013 by cybermind
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,29 +27,31 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_SOUND_H
-#define ANIMATION_SOUND_H
+#ifndef ANIMATION_LUACALLBACK_H
+#define ANIMATION_LUACALLBACK_H
 
 //@{
 
+#include <string>
 #include "animation.h"
-#include "unitsound.h"
 
+#include "luacallback.h"
 
-class CAnimation_Sound : public CAnimation
+class CAnimation_LuaCallback : public CAnimation
 {
 public:
-	CAnimation_Sound() : CAnimation(AnimationSound) {}
+	CAnimation_LuaCallback() : CAnimation(AnimationLuaCallback), cb(NULL) {}
+	~CAnimation_LuaCallback() { delete cb; }
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
 
-	void MapSound();
-
 private:
-	SoundConfig sound;
+	LuaCallback *cb;
+	std::string cbName;
+	std::vector<std::string> cbArgs;
 };
 
 //@}
 
-#endif // ANIMATION_SOUND_H
+#endif // ANIMATION_LUACALLBACK_H

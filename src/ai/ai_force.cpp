@@ -448,14 +448,14 @@ void AiForce::ReturnToHome()
 
 AiForceManager::AiForceManager()
 {
-	forces.resize(3);
+	forces.resize(AI_MAX_FORCES);
 	memset(script, -1, AI_MAX_FORCES * sizeof(char));
 }
 
-unsigned int AiForceManager::FindFreeForce(AiForceRole role)
+unsigned int AiForceManager::FindFreeForce(AiForceRole role, int begin)
 {
 	/* find free force */
-	unsigned int f = 0;
+	unsigned int f = begin;
 	while (f < forces.size() && (forces[f].State > AiForceAttackingState_Free)) {
 		++f;
 	};
@@ -465,6 +465,30 @@ unsigned int AiForceManager::FindFreeForce(AiForceRole role)
 	forces[f].State = AiForceAttackingState_Waiting;
 	forces[f].Role = role;
 	return f;
+}
+
+/**
+**  Find unit in force
+**
+**  @param    unit  Unit to search for.
+**
+**  @return   Force number, or -1 if not found
+*/
+
+int AiForceManager::GetForce(const CUnit &unit)
+{
+	for (unsigned int i = 0; i < forces.size(); ++i) {
+		AiForce &force = forces[i];
+		
+		for (unsigned int j = 0; j < force.Units.size(); ++j) {
+			CUnit &aiunit = *force.Units[j];
+
+			if (UnitNumber(unit) == UnitNumber(aiunit)) {
+				return i;
+			}
+		}
+	}
+	return -1;
 }
 
 /**
@@ -591,7 +615,7 @@ void AiAttackWithForceAt(unsigned int force, int x, int y)
 {
 	const Vec2i pos(x, y);
 
-	if (!(force < AI_MAX_FORCES)) {
+	if (!(force < AI_MAX_FORCE_INTERNAL)) {
 		DebugPrint("Force out of range: %d" _C_ force);
 		return ;
 	}
@@ -611,7 +635,7 @@ void AiAttackWithForceAt(unsigned int force, int x, int y)
 */
 void AiAttackWithForce(unsigned int force)
 {
-	if (!(force < AI_MAX_FORCES)) {
+	if (!(force < AI_MAX_FORCE_INTERNAL)) {
 		DebugPrint("Force out of range: %d" _C_ force);
 		return ;
 	}
@@ -620,7 +644,7 @@ void AiAttackWithForce(unsigned int force)
 	// the first force, so we can reuse it
 	if (!AiPlayer->Force[force].Defending) {
 		unsigned int top;
-		unsigned int f = AiPlayer->Force.FindFreeForce();
+		unsigned int f = AiPlayer->Force.FindFreeForce(AiForceRoleDefault, AI_MAX_FORCE_INTERNAL);
 		AiPlayer->Force[f].Reset();
 
 		AiPlayer->Force[f].Role = AiPlayer->Force[force].Role;
@@ -658,7 +682,7 @@ void AiAttackWithForces(int *forces)
 	const Vec2i invalidPos(-1, -1);
 	bool found = false;
 	unsigned int top;
-	unsigned int f = AiPlayer->Force.FindFreeForce();
+	unsigned int f = AiPlayer->Force.FindFreeForce(AiForceRoleDefault, AI_MAX_FORCE_INTERNAL);
 
 	AiPlayer->Force[f].Reset();
 

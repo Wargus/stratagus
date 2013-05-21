@@ -153,7 +153,7 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 		}
 
 		f = (f * (unit.Type->Icon.Icon->G->Width)) / 100;
-		Video.FillRectangleClip(color, x + 1, y + 1, f - 2, 5);
+		Video.FillRectangleClip(color, x + 1, y + 1, f > 1 ? f - 2 : 0, 5);
 	}
 }
 

@@ -41,7 +41,8 @@
 class Spell_Summon : public SpellActionType
 {
 public:
-	Spell_Summon() : SpellActionType(1), UnitType(NULL), TTL(0), RequireCorpse(0) {};
+	Spell_Summon() : SpellActionType(1), UnitType(NULL), TTL(0),
+		RequireCorpse(false), JoinToAiForce(false) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
@@ -50,6 +51,7 @@ private:
 	CUnitType *UnitType;    /// Type of unit to be summoned.
 	int TTL;                /// Time to live for summoned unit. 0 means infinite
 	int RequireCorpse;      /// Corpse consumed while summoning.
+	bool JoinToAiForce;     /// if true, captured unit is joined into caster's AI force, if available
 };
 
 

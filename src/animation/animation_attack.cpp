@@ -47,7 +47,7 @@
 }
 
 
-/* virtual */ void CAnimation_Attack::Init(const char *s)
+/* virtual */ void CAnimation_Attack::Init(const char *s, lua_State *)
 {
 }
 

@@ -310,7 +310,6 @@ public:
 		resinfo(*worker.Type->ResInfo[resource]),
 		deposit(deposit),
 		movemask(worker.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
-		resource(resource),
 		maxRange(maxRange),
 		check_usage(check_usage),
 		res_finder(resource, 1),
@@ -348,7 +347,6 @@ private:
 	const ResourceInfo &resinfo;
 	const CUnit *deposit;
 	unsigned int movemask;
-	int resource;
 	int maxRange;
 	bool check_usage;
 	CResourceFinder res_finder;
@@ -511,15 +509,16 @@ CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 /**
 **  Find all units of type.
 **
-**  @param type   type of unit requested
-**  @param units  array in which we have to store the units
+**  @param type       type of unit requested
+**  @param units      array in which we have to store the units
+**  @param everybody  if true, include all units
 */
-void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units)
+void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool everybody)
 {
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 		CUnit &unit = **it;
 
-		if (unit.Type == &type && !unit.IsUnusable()) {
+		if (unit.Type == &type && !unit.IsUnusable(everybody)) {
 			units.push_back(&unit);
 		}
 	}
@@ -1008,9 +1007,7 @@ private:
 		}
 
 		// don't consider small damages...
-		if (sgood < 20) {
-			sgood = 20;
-		}
+		sgood = std::max(sgood, 20);
 
 		int cost = sbad / sgood;
 		if (cost > best_cost) {

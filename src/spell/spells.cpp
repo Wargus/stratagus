@@ -485,7 +485,7 @@ SpellType::SpellType(int slot, const std::string &ident) :
 	Ident(ident), Slot(slot), Target(), Action(),
 	Range(0), ManaCost(0), RepeatCast(0),
 	DependencyId(-1), Condition(NULL),
-	AutoCast(NULL), AICast(NULL)
+	AutoCast(NULL), AICast(NULL), ForceUseAnimation(false)
 {
 	memset(Costs, 0, sizeof(Costs));
 }

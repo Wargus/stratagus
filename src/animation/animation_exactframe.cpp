@@ -45,14 +45,18 @@
 	unit.Frame = ParseAnimInt(&unit);
 }
 
-/* virtual */ void CAnimation_ExactFrame::Init(const char *s)
+/* virtual */ void CAnimation_ExactFrame::Init(const char *s, lua_State *)
 {
 	this->frame = s;
 }
 
 int CAnimation_ExactFrame::ParseAnimInt(const CUnit *unit) const
 {
-	return ::ParseAnimInt(unit, this->frame.c_str());
+	if (unit == NULL) {
+		return atoi(this->frame.c_str());
+	} else {
+		return ::ParseAnimInt(*unit, this->frame.c_str());
+	}
 }
 
 //@}

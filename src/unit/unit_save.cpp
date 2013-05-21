@@ -177,6 +177,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.Selected) {
 		file.printf(" \"selected\",");
 	}
+	if (unit.Summoned) {
+		file.printf(" \"summoned\",");
+	}
 	if (unit.RescuedFrom) {
 		file.printf(" \"rescued-from\", %d,", unit.RescuedFrom->Index);
 	}

@@ -453,6 +453,7 @@ void CUnit::Init()
 	Moving = 0;
 	ReCast = 0;
 	CacheLock = 0;
+	Summoned = 0;
 	memset(&Anim, 0, sizeof(Anim));
 	CurrentResource = 0;
 	Orders.clear();
@@ -736,6 +737,12 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 	// Only Assign if a Player was specified
 	if (player) {
 		unit->AssignToPlayer(*player);
+	}
+
+	if (unit->Type->OnInit) {
+		unit->Type->OnInit->pushPreamble();
+		unit->Type->OnInit->pushInteger(UnitNumber(*unit));
+		unit->Type->OnInit->run();
 	}
 
 	//  fancy buildings: mirror buildings (but shadows not correct)

@@ -333,6 +333,9 @@ static int CclDefineSpell(lua_State *l)
 		} else if (!strcmp(value, "repeat-cast")) {
 			spell->RepeatCast = 1;
 			--i;
+		} else if (!strcmp(value, "force-use-animation")) {
+			spell->ForceUseAnimation = true;
+			--i;
 		} else if (!strcmp(value, "target")) {
 			value = LuaToString(l, i + 1);
 			if (!strcmp(value, "self")) {

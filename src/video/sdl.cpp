@@ -94,6 +94,7 @@
 #include "sound_server.h"
 #include "translate.h"
 #include "ui.h"
+#include "unit.h"
 #include "video.h"
 #include "widgets.h"
 
@@ -860,7 +861,7 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 				}
 				InMainWindow = (event.active.gain != 0);
 			}
-			if (event.active.state & SDL_APPACTIVE || SDL_GetAppState() & SDL_APPACTIVE) {
+			if (Preference.PauseOnLeave && (event.active.state & SDL_APPACTIVE || SDL_GetAppState() & SDL_APPACTIVE)) {
 				static bool DoTogglePause = false;
 
 				if (IsSDLWindowVisible && !event.active.gain) {

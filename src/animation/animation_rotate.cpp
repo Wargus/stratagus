@@ -66,11 +66,11 @@ void UnitRotate(CUnit &unit, int rotate)
 		const Vec2i pos = target.tilePos + target.Type->GetHalfTileSize() - unit.tilePos;
 		UnitHeadingFromDeltaXY(unit, pos);
 	} else {
-		UnitRotate(unit, ParseAnimInt(&unit, this->rotateStr.c_str()));
+		UnitRotate(unit, ParseAnimInt(unit, this->rotateStr.c_str()));
 	}
 }
 
-/* virtual */ void CAnimation_Rotate::Init(const char *s)
+/* virtual */ void CAnimation_Rotate::Init(const char *s, lua_State *)
 {
 	this->rotateStr = s;
 }

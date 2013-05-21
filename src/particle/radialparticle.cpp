@@ -34,8 +34,8 @@
 #include "stratagus.h"
 #include "particle.h"
 
-CRadialParticle::CRadialParticle(CPosition position, GraphicAnimation *animation, int maxSpeed) :
-	CParticle(position)
+CRadialParticle::CRadialParticle(CPosition position, GraphicAnimation *animation, int maxSpeed, int drawlevel) :
+	CParticle(position, drawlevel)
 {
 	Assert(animation);
 	this->animation = animation->clone();
@@ -76,7 +76,7 @@ void CRadialParticle::update(int ticks)
 
 CParticle *CRadialParticle::clone()
 {
-	CParticle *p = new CRadialParticle(pos, animation, maxSpeed);
+	CParticle *p = new CRadialParticle(pos, animation, maxSpeed, drawLevel);
 	return p;
 }
 

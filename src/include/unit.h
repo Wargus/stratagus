@@ -339,21 +339,23 @@ public:
 	int ResourcesHeld;      /// Resources Held by a unit
 
 	unsigned char DamagedType;   /// Index of damage type of unit which damaged this unit
-	unsigned long Attacked; /// gamecycle unit was last attacked
-	unsigned Blink : 3;     /// Let selection rectangle blink
-	unsigned Moving : 1;    /// The unit is moving
-	unsigned ReCast : 1;    /// Recast again next cycle
-	unsigned AutoRepair : 1;    /// True if unit tries to repair on still action.
+	unsigned long Attacked;      /// gamecycle unit was last attacked
+	unsigned Blink : 3;          /// Let selection rectangle blink
+	unsigned Moving : 1;         /// The unit is moving
+	unsigned ReCast : 1;         /// Recast again next cycle
+	unsigned AutoRepair : 1;     /// True if unit tries to repair on still action.
 
-	unsigned Burning : 1;   /// unit is burning
-	unsigned Destroyed : 1; /// unit is destroyed pending reference
-	unsigned Removed : 1;   /// unit is removed (not on map)
-	unsigned Selected : 1;  /// unit is selected
+	unsigned Burning : 1;        /// unit is burning
+	unsigned Destroyed : 1;      /// unit is destroyed pending reference
+	unsigned Removed : 1;        /// unit is removed (not on map)
+	unsigned Selected : 1;       /// unit is selected
 
 	unsigned Constructed : 1;    /// Unit is in construction
 	unsigned Active : 1;         /// Unit is active for AI
 	unsigned Boarded : 1;        /// Unit is on board a transporter.
-	unsigned CacheLock : 1;        /// Unit is on lock by unitcache operations.
+	unsigned CacheLock : 1;      /// Unit is on lock by unitcache operations.
+
+	unsigned Summoned : 1;       /// Unit is summoned using spells. 
 
 	unsigned TeamSelected;  /// unit is selected by a team member.
 	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
@@ -417,13 +419,15 @@ class CPreference
 public:
 	CPreference() : ShowSightRange(false), ShowReactionRange(false),
 		ShowAttackRange(false), ShowMessages(true),
-		BigScreen(false), ShowOrders(0), ShowNameDelay(0), ShowNameTime(0) {};
+		BigScreen(false), PauseOnLeave(true),  ShowOrders(0), ShowNameDelay(0),
+		ShowNameTime(0) {};
 
 	bool ShowSightRange;     /// Show sight range.
 	bool ShowReactionRange;  /// Show reaction range.
 	bool ShowAttackRange;    /// Show attack range.
 	bool ShowMessages;		 /// Show messages.
 	bool BigScreen;			 /// If true, shows the big screen(without panels)
+	bool PauseOnLeave;       /// If true, game pauses when cursor is gone
 
 	int  ShowOrders;         /// How many second show orders of unit on map.
 	int  ShowNameDelay;      /// How many cycles need to wait until unit's name popup will appear.

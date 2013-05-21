@@ -41,7 +41,7 @@ public:
 	CAnimation_Unbreakable() : CAnimation(AnimationUnbreakable), state(0) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s);
+	virtual void Init(const char *s, lua_State *l);
 
 private:
 	int state;

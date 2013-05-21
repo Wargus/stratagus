@@ -332,25 +332,68 @@ void CViewport::Draw() const
 
 	CurrentViewport = this;
 	{
+		// Now we need to sort units, missiles, particles by draw level and draw them 
 		std::vector<CUnit *> unittable;
 		std::vector<Missile *> missiletable;
+		std::vector<CParticle *> particletable;
 
-		// We find and sort units after draw level.
 		FindAndSortUnits(*this, unittable);
 		const size_t nunits = unittable.size();
 		FindAndSortMissiles(*this, missiletable);
 		const size_t nmissiles = missiletable.size();
+		ParticleManager.prepareToDraw(*this, particletable);
+		const size_t nparticles = particletable.size();
+
 		size_t i = 0;
 		size_t j = 0;
+		size_t k = 0;
 
-		while (i < nunits && j < nmissiles) {
-			if (unittable[i]->Type->DrawLevel <= missiletable[j]->Type->DrawLevel) {
-				unittable[i]->Draw(*this);
-				++i;
-			} else {
-				missiletable[j]->DrawMissile(*this);
-				++j;
-			}
+
+		while ((i < nunits && j < nmissiles) || (i < nunits && k < nparticles)
+			|| (j < nmissiles && k < nparticles)) {
+				if (i == nunits) {
+					if (missiletable[j]->Type->DrawLevel < particletable[k]->getDrawLevel()) {
+						missiletable[j]->DrawMissile(*this);
+						++j;
+					} else {
+						particletable[k]->draw();
+						++k;
+					}	
+				} else if (j == nmissiles) {
+					if (unittable[i]->Type->DrawLevel < particletable[k]->getDrawLevel()) {
+						unittable[i]->Draw(*this);
+						++i;
+					} else {
+						particletable[k]->draw();
+						++k;
+					}	
+				} else if (k == nparticles) {
+					if (unittable[i]->Type->DrawLevel < missiletable[j]->Type->DrawLevel) {
+						unittable[i]->Draw(*this);
+						++i;
+					} else {
+						missiletable[j]->DrawMissile(*this);
+						++j;
+					}
+				} else {
+					if (unittable[i]->Type->DrawLevel <= missiletable[j]->Type->DrawLevel) {
+						if (unittable[i]->Type->DrawLevel < particletable[k]->getDrawLevel()) {
+							unittable[i]->Draw(*this);
+							++i;
+						} else {
+							particletable[k]->draw();
+							++k;
+						}
+					} else {
+						if (missiletable[j]->Type->DrawLevel < particletable[k]->getDrawLevel()) {
+							missiletable[j]->DrawMissile(*this);
+							++j;
+						} else {
+							particletable[k]->draw();
+							++k;
+						}	
+					}
+				}
 		}
 		for (; i < nunits; ++i) {
 			unittable[i]->Draw(*this);
@@ -358,9 +401,11 @@ void CViewport::Draw() const
 		for (; j < nmissiles; ++j) {
 			missiletable[j]->DrawMissile(*this);
 		}
+		for (; k < nparticles; ++k) {
+			particletable[k]->draw();
+		}
+		ParticleManager.endDraw();
 	}
-
-	ParticleManager.draw(*this);
 
 	this->DrawMapFogOfWar();
 

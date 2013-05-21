@@ -470,7 +470,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 #endif
 		UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
 		if (resinfo.WaitAtResource) {
-			this->TimeToHarvest = resinfo.WaitAtResource / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId] * SPEEDUP_FACTOR;
+			this->TimeToHarvest = std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
 		} else {
 			this->TimeToHarvest = 1;
 		}
@@ -538,7 +538,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	goal->Resource.Active++;
 
 	if (resinfo.WaitAtResource) {
-		this->TimeToHarvest = resinfo.WaitAtResource / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId] * SPEEDUP_FACTOR;
+		this->TimeToHarvest = std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
 	} else {
 		this->TimeToHarvest = 1;
 	}
@@ -671,7 +671,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 	while (!this->DoneHarvesting && this->TimeToHarvest < 0) {
 		//FIXME: rb - how should it look for WaitAtResource == 0
 		if (resinfo.WaitAtResource) {
-			this->TimeToHarvest += resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId];
+			this->TimeToHarvest += std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
 		} else {
 			this->TimeToHarvest += 1;
 		}
@@ -954,7 +954,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	unit.CurrentResource = 0;
 
 	if (unit.Wait) {
-		unit.Wait /= unit.Player->SpeedResourcesReturn[resinfo.ResourceId] / SPEEDUP_FACTOR;
+		unit.Wait /= std::max(1, unit.Player->SpeedResourcesReturn[resinfo.ResourceId] / SPEEDUP_FACTOR);
 		if (unit.Wait) {
 			unit.Wait--;
 		}
@@ -1103,6 +1103,9 @@ bool COrder_Resource::ActionResourceInit(CUnit &unit)
 		unit.DeAssignWorkerFromMine(*mine);
 		this->Resource.Mine = NULL;
 	}
+	if (goal && goal->IsAlive() == false) {
+		return false;
+	}
 	if (goal && goal->CurrentAction() != UnitActionBuilt) {
 		unit.AssignWorkerToMine(*goal);
 		this->Resource.Mine = goal;
@@ -1133,6 +1136,7 @@ void COrder_Resource::Execute(CUnit &unit)
 	// Let's start mining.
 	if (this->State == SUB_START_RESOURCE) {
 		if (ActionResourceInit(unit) == false) {
+			ResourceGiveUp(unit);
 			return;
 		}
 	}

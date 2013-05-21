@@ -847,14 +847,17 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 */
 bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 {
+	bool res = false;
 	if (buttonaction.Allowed) {
-		return buttonaction.Allowed(unit, buttonaction);
+		res = buttonaction.Allowed(unit, buttonaction);
+		if (!res) {
+			return false;
+		} else {
+			res = false;
+		}
 	}
 
-	bool res = false;
-	// FIXME: we have to check and if these unit buttons are available
-	//    i.e. if button action is ButtonTrain for example check if
-	// required unit is not restricted etc...
+	// Check button-specific cases
 	switch (buttonaction.Action) {
 		case ButtonStop:
 		case ButtonStandGround:

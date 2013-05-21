@@ -33,8 +33,8 @@
 #include "particle.h"
 
 
-StaticParticle::StaticParticle(CPosition position, GraphicAnimation *animation) :
-	CParticle(position)
+StaticParticle::StaticParticle(CPosition position, GraphicAnimation *animation, int drawlevel) :
+	CParticle(position, drawlevel)
 {
 	Assert(animation);
 	this->animation = animation->clone();
@@ -66,7 +66,7 @@ void StaticParticle::update(int ticks)
 
 CParticle *StaticParticle::clone()
 {
-	CParticle *p = new StaticParticle(pos, animation);
+	CParticle *p = new StaticParticle(pos, animation, drawLevel);
 	return p;
 }
 

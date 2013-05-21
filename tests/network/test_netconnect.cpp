@@ -53,6 +53,7 @@ void FillCustomValue(CServerSetup *obj)
 	obj->GameTypeOption = 52;
 	obj->Difficulty = 54;
 	obj->MapRichness = 56;
+	obj->Opponents = 58;
 	for (int i = 0; i != PlayerMax; ++i) {
 		obj->CompOpt[i] = i + 1;
 	}

@@ -37,6 +37,9 @@
 
 #include "animation/animation_spawnunit.h"
 
+#include "../ai/ai_local.h"
+
+#include "commands.h"
 #include "map.h"
 #include "unit.h"
 
@@ -104,10 +107,12 @@ found:
 {
 	Assert(unit.Anim.Anim == this);
 
-	const int offX = ParseAnimInt(&unit, this->offXStr.c_str());
-	const int offY = ParseAnimInt(&unit, this->offYStr.c_str());
-	const int range = ParseAnimInt(&unit, this->rangeStr.c_str());
-	const int playerId = ParseAnimInt(&unit, this->playerStr.c_str());
+	const int offX = ParseAnimInt(unit, this->offXStr.c_str());
+	const int offY = ParseAnimInt(unit, this->offYStr.c_str());
+	const int range = ParseAnimInt(unit, this->rangeStr.c_str());
+	const int playerId = ParseAnimInt(unit, this->playerStr.c_str());
+	const SpawnUnit_Flags flags = (SpawnUnit_Flags)(ParseAnimFlags(unit, this->flagsStr.c_str()));
+
 	CPlayer &player = Players[playerId];
 	const Vec2i pos(unit.tilePos.x + offX, unit.tilePos.y + offY);
 	CUnitType *type = UnitTypeByIdent(this->unitTypeStr.c_str());
@@ -120,6 +125,17 @@ found:
 		if (target != NULL) {
 			target->tilePos = resPos;
 			target->Place(resPos);
+			if (flags & SU_Summoned) {
+				target->Summoned = 1;
+			}
+			if ((flags & SU_JoinToAIForce) && unit.Player->AiEnabled) {
+				int force = unit.Player->Ai->Force.GetForce(unit);
+				if (force != -1) {
+					unit.Player->Ai->Force[force].Insert(*target);
+					target->GroupId = unit.GroupId;
+					CommandDefend(*target, unit, FlushCommands);
+				}
+			}
 			//DropOutOnSide(*target, LookingW, NULL);
 		} else {
 			DebugPrint("Unable to allocate Unit");
@@ -128,9 +144,9 @@ found:
 }
 
 /*
-**  s = "unitType offX offY range player"
+**  s = "unitType offX offY range player [flags]"
 */
-/* virtual */ void CAnimation_SpawnUnit::Init(const char *s)
+/* virtual */ void CAnimation_SpawnUnit::Init(const char *s, lua_State *)
 {
 	const std::string str(s);
 	const size_t len = str.size();
@@ -154,6 +170,12 @@ found:
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));
 	this->playerStr.assign(str, begin, end - begin);
+
+	begin = std::min(len, str.find_first_not_of(' ', end));
+	end = std::min(len, str.find(' ', begin));
+	if (begin != end) {
+		this->flagsStr.assign(str, begin, end - begin);
+	}
 }
 
 //@}

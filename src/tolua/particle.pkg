@@ -16,30 +16,35 @@ class GraphicAnimation
 class CParticle
 {
 	virtual CParticle* clone();
+	void setDrawLevel(int value);
 };
 
 class StaticParticle : public CParticle
 {
 public:
-	StaticParticle(CPosition position, GraphicAnimation *animation);
+	StaticParticle(CPosition position, GraphicAnimation *animation, int drawlevel = 0);
 };
 
 class CChunkParticle : public CParticle
 {
 public:
-	CChunkParticle(CPosition position, GraphicAnimation *smokeAnimation, GraphicAnimation *debrisAnimation, GraphicAnimation *destroyAnimation, int minVelocity = 0, int maxVelocity = 400, int minTrajectoryAngle = 77, int maxTTL = 0);
+	CChunkParticle(CPosition position, GraphicAnimation *smokeAnimation, GraphicAnimation *debrisAnimation, GraphicAnimation *destroyAnimation, int minVelocity = 0, int maxVelocity = 400, int minTrajectoryAngle = 77, int maxTTL = 0, int drawlevel = 0);
+	int getSmokeDrawLevel() const;
+	int getDestroyDrawLevel() const;
+	void setSmokeDrawLevel(int value);
+	void setDestroyDrawLevel(int value);
 };
 
 class CSmokeParticle : public CParticle
 {
 public:
-	CSmokeParticle(CPosition position, GraphicAnimation *animation, float speedx = 0, float speedy = -22.0);
+	CSmokeParticle(CPosition position, GraphicAnimation *animation, float speedx = 0, float speedy = -22.0, int drawlevel = 0);
 };
 
 class CRadialParticle : public CParticle
 {
 public:
-	CRadialParticle(CPosition position, GraphicAnimation *smokeAnimation, int maxSpeed);
+	CRadialParticle(CPosition position, GraphicAnimation *smokeAnimation, int maxSpeed, int drawlevel = 0);
 };
 
 class CParticleManager

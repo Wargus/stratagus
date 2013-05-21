@@ -42,13 +42,6 @@
 
 #include <stdio.h>
 
-//Modify types
-#define MOD_ADD 1
-#define MOD_SUB 2
-#define MOD_MUL 3
-#define MOD_DIV 4
-#define MOD_MOD 5
-
 /**
 **  Gets the player data.
 **
@@ -185,33 +178,45 @@ static void SetPlayerData(const int player, const char *prop, const char *arg, i
 
 	const char *var = this->varStr.c_str();
 	const char *arg = this->argStr.c_str();
-	const int playerId = ParseAnimInt(&unit, this->playerStr.c_str());
-	int rop = ParseAnimInt(&unit, this->valueStr.c_str());
+	const int playerId = ParseAnimInt(unit, this->playerStr.c_str());
+	int rop = ParseAnimInt(unit, this->valueStr.c_str());
 	int data = GetPlayerData(playerId, var, arg);
 
 	switch (this->mod) {
-		case MOD_ADD:
+		case modAdd:
 			data += rop;
 			break;
-		case MOD_SUB:
+		case modSub:
 			data -= rop;
 			break;
-		case MOD_MUL:
+		case modMul:
 			data *= rop;
 			break;
-		case MOD_DIV:
+		case modDiv:
 			if (!rop) {
 				fprintf(stderr, "Division by zero in AnimationSetPlayerVar\n");
 				Exit(1);
 			}
 			data /= rop;
 			break;
-		case MOD_MOD:
+		case modMod:
 			if (!rop) {
 				fprintf(stderr, "Division by zero in AnimationSetPlayerVar\n");
 				Exit(1);
 			}
 			data %= rop;
+			break;
+		case modAnd:
+			data &= rop;
+			break;
+		case modOr:
+			data |= rop;
+			break;
+		case modXor:
+			data ^= rop;
+			break;
+		case modNot:
+			data = !data;
 			break;
 		default:
 			data = rop;
@@ -223,7 +228,7 @@ static void SetPlayerData(const int player, const char *prop, const char *arg, i
 /*
 **  s = "player var mod value [arg2]"
 */
-/* virtual */ void CAnimation_SetPlayerVar::Init(const char *s)
+/* virtual */ void CAnimation_SetPlayerVar::Init(const char *s, lua_State *)
 {
 	const std::string str(s);
 	const size_t len = str.size();
@@ -239,7 +244,29 @@ static void SetPlayerData(const int player, const char *prop, const char *arg, i
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));
 	const std::string modStr(str, begin, end - begin);
-	this->mod = atoi(modStr.c_str());
+	if (modStr == "=") {
+		this->mod = modSet;
+	} else if (modStr == "+=") {
+		this->mod = modAdd;
+	} else if (modStr == "-=") {
+		this->mod = modSub;
+	} else if (modStr == "*=") {
+		this->mod = modMul;
+	} else if (modStr == "/=") {
+		this->mod = modDiv;
+	} else if (modStr == "%=") {
+		this->mod = modMod;
+	} else if (modStr == "&=") {
+		this->mod = modAnd;
+	} else if (modStr == "|=") {
+		this->mod = modOr;
+	} else if (modStr == "^=") {
+		this->mod = modXor;
+	} else if (modStr == "!") {
+		this->mod = modNot;
+	} else {
+		this->mod = (SetVar_ModifyTypes)(atoi(modStr.c_str()));
+	}
 
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));

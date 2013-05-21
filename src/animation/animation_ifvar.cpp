@@ -61,8 +61,8 @@ static bool returnFalse(int, int) { return false; }
 {
 	Assert(unit.Anim.Anim == this);
 
-	const int lop = ParseAnimInt(&unit, this->leftVar.c_str());
-	const int rop = ParseAnimInt(&unit, this->rightVar.c_str());
+	const int lop = ParseAnimInt(unit, this->leftVar.c_str());
+	const int rop = ParseAnimInt(unit, this->rightVar.c_str());
 	const bool cond = this->binOpFunc(lop, rop);
 
 	if (cond) {
@@ -73,7 +73,7 @@ static bool returnFalse(int, int) { return false; }
 /*
 ** s = "leftOp Op rigthOp gotoLabel"
 */
-/* virtual */ void CAnimation_IfVar::Init(const char *s)
+/* virtual */ void CAnimation_IfVar::Init(const char *s, lua_State *)
 {
 	const std::string str(s);
 	const size_t len = str.size();

@@ -43,7 +43,7 @@
 {
 	Assert(unit.Anim.Anim == this);
 
-	if (SyncRand() % 100 < ParseAnimInt(&unit, this->randomStr.c_str())) {
+	if (SyncRand() % 100 < ParseAnimInt(unit, this->randomStr.c_str())) {
 		unit.Anim.Anim = this->gotoLabel;
 	}
 }
@@ -51,7 +51,7 @@
 /*
 **  s : "percent label"
 */
-/* virtual */ void CAnimation_RandomGoto::Init(const char *s)
+/* virtual */ void CAnimation_RandomGoto::Init(const char *s, lua_State *)
 {
 	const std::string str(s);
 	const size_t len = str.size();

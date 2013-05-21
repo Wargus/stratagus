@@ -34,6 +34,8 @@
 #include "ui.h"
 #include "video.h"
 
+#include <algorithm>
+
 
 CParticleManager ParticleManager;
 
@@ -70,17 +72,27 @@ void CParticleManager::clear()
 	new_particles.clear();
 }
 
-void CParticleManager::draw(const CViewport &vp)
+static inline bool DrawLevelCompare(const CParticle *lhs, const CParticle *rhs)
+{
+	return lhs->getDrawLevel() < rhs->getDrawLevel();
+}
+
+void CParticleManager::prepareToDraw(const CViewport &vp, std::vector<CParticle *> &table)
 {
 	this->vp = &vp;
 
-	std::vector<CParticle *>::iterator i;
-	for (i = particles.begin(); i != particles.end(); ++i) {
-		if ((*i)->isVisible(vp)) {
-			(*i)->draw();
+	for (std::vector<CParticle *>::iterator it = particles.begin(); it != particles.end(); ++it) {
+		CParticle &particle = **it;
+		if (particle.isVisible(vp)) {
+			table.push_back(&particle);
 		}
 	}
 
+	std::sort(table.begin(), table.end(), DrawLevelCompare);
+}
+
+void CParticleManager::endDraw()
+{
 	this->vp = NULL;
 }
 

@@ -116,14 +116,14 @@ class WallFinder
 {
 public:
 	WallFinder(const CUnit &unit, int maxDist, Vec2i *resultPos) :
-		unit(unit),
+//		unit(unit),
 		maxDist(maxDist),
 		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		resultPos(resultPos)
 	{}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
-	const CUnit &unit;
+//	const CUnit &unit;
 	int maxDist;
 	int movemask;
 	Vec2i *resultPos;
@@ -213,12 +213,12 @@ class ReachableTerrainMarker
 {
 public:
 	ReachableTerrainMarker(const CUnit &unit) :
-		unit(unit),
+//		unit(unit),
 		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit))
 	{}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
-	const CUnit &unit;
+//	const CUnit &unit;
 	int movemask;
 };
 

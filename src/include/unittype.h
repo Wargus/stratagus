@@ -467,6 +467,10 @@ public:
 	LuaCallback *OnHit;             /// lua function called when unit is hit
 	LuaCallback *OnEachCycle;       /// lua function called every cycle
 	LuaCallback *OnEachSecond;      /// lua function called every second
+	LuaCallback *OnInit;            /// lua function called on unit init
+
+	int TeleportCost;               /// mana used for teleportation
+	MissileConfig TeleportEffect;   /// missile created when teleported
 
 	mutable std::string DamageType; /// DamageType (used for extra death animations and impacts)
 

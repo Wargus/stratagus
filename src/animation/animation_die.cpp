@@ -54,7 +54,7 @@
 	throw AnimationDie_Exception();
 }
 
-/* virtual */ void CAnimation_Die::Init(const char *s)
+/* virtual */ void CAnimation_Die::Init(const char *s, lua_State *)
 {
 	this->DeathType = s;
 }
