@@ -203,6 +203,19 @@ bool ButtonCheckUnitsAnd(const CUnit &unit, const ButtonAction &button)
 }
 
 /**
+**  Check for button enabled, if no unit is available.
+**
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if enabled.
+*/
+bool ButtonCheckUnitsNot(const CUnit &unit, const ButtonAction &button)
+{
+    return !ButtonCheckUnitsAnd(unit, button);
+}
+
+/**
 **  Check if network play is enabled.
 **
 **  @param unit    Pointer to unit for button.
