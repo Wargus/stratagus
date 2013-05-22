@@ -486,7 +486,7 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int fl
 	}
 	COrderPtr *order;
 
-	if (unit.Type->Building) {
+	if (unit.Type->Building && !what.BuilderOutside && unit.MapDistanceTo(pos) > unit.Type->RepairRange) {
 		ClearNewAction(unit);
 		order = &unit.NewOrder;
 	} else {
