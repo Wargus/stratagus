@@ -1066,9 +1066,7 @@ std::string EvalString(const StringDesc *s)
 				}
 				if (s->D.Line.MaxLen) {
 					maxlen = EvalNumber(s->D.Line.MaxLen);
-					if (maxlen < 0) {
-						maxlen = 0;
-					}
+					maxlen = std::max(maxlen, 0);
 				} else {
 					maxlen = 0;
 				}

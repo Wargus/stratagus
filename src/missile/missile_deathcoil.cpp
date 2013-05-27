@@ -50,54 +50,51 @@
 void MissileDeathCoil::Action()
 {
 	this->Wait = this->Type->Sleep;
-	if (PointToPointMissile(*this)) {
-		Assert(this->SourceUnit != NULL);
-		CUnit &source = *this->SourceUnit;
+	if (PointToPointMissile(*this) == false) {
+		return;
+	}
+	Assert(this->SourceUnit != NULL);
+	CUnit &source = *this->SourceUnit;
 
-		if (source.Destroyed) {
+	if (source.Destroyed) {
+		return;
+	}
+	// source unit still exists
+	//
+	// Target unit still exists and casted on a special target
+	//
+	if (this->TargetUnit && !this->TargetUnit->Destroyed
+		&& this->TargetUnit->CurrentAction() == UnitActionDie) {
+		HitUnit(&source, *this->TargetUnit, this->Damage);
+		if (source.CurrentAction() != UnitActionDie) {
+			source.Variable[HP_INDEX].Value += this->Damage;
+			source.Variable[HP_INDEX].Value = std::min(source.Variable[HP_INDEX].Max, source.Variable[HP_INDEX].Value);
+		}
+	} else {
+		//
+		// No target unit -- try enemies in range 5x5 // Must be parametrable
+		//
+		std::vector<CUnit *> table;
+		const Vec2i destPos = Map.MapPixelPosToTilePos(this->destination);
+		const Vec2i range(2, 2);
+		Select(destPos - range, destPos + range, table, IsEnemyWith(*source.Player));
+
+		if (table.empty()) {
 			return;
 		}
-		// source unit still exists
-		//
-		// Target unit still exists and casted on a special target
-		//
-		if (this->TargetUnit && !this->TargetUnit->Destroyed
-			&& this->TargetUnit->CurrentAction() == UnitActionDie) {
-			HitUnit(&source, *this->TargetUnit, this->Damage);
-			if (source.CurrentAction() != UnitActionDie) {
-				source.Variable[HP_INDEX].Value += this->Damage;
-				if (source.Variable[HP_INDEX].Value > source.Variable[HP_INDEX].Max) {
-					source.Variable[HP_INDEX].Value = source.Variable[HP_INDEX].Max;
-				}
-			}
-		} else {
-			//
-			// No target unit -- try enemies in range 5x5 // Must be parametrable
-			//
-			std::vector<CUnit *> table;
-			const Vec2i destPos = Map.MapPixelPosToTilePos(this->destination);
-			const Vec2i range(2, 2);
-			Select(destPos - range, destPos + range, table, IsEnemyWith(*source.Player));
+		const size_t n = table.size();  // enemy count
+		const int damage = std::min<int>(1, this->Damage / n);
 
-			if (table.empty()) {
-				return;
-			}
-			const size_t n = table.size();  // enemy count
-			const int damage = std::min<int>(1, this->Damage / n);
-
-			// disperse damage between them
-			for (size_t i = 0; i != n; ++i) {
-				HitUnit(&source, *table[i], damage);
-			}
-			if (source.CurrentAction() != UnitActionDie) {
-				source.Variable[HP_INDEX].Value += this->Damage;
-				if (source.Variable[HP_INDEX].Value > source.Variable[HP_INDEX].Max) {
-					source.Variable[HP_INDEX].Value = source.Variable[HP_INDEX].Max;
-				}
-			}
+		// disperse damage between them
+		for (size_t i = 0; i != n; ++i) {
+			HitUnit(&source, *table[i], damage);
 		}
-		this->TTL = 0;
+		if (source.CurrentAction() != UnitActionDie) {
+			source.Variable[HP_INDEX].Value += this->Damage;
+			source.Variable[HP_INDEX].Value = std::min(source.Variable[HP_INDEX].Max, source.Variable[HP_INDEX].Value);
+		}
 	}
+	this->TTL = 0;
 }
 
 //@}

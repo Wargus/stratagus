@@ -114,23 +114,15 @@
 			HitUnit(&caster, *target, -(castcount * hp));
 		} else {
 			target->Variable[HP_INDEX].Value += castcount * hp;
-			if (target->Variable[HP_INDEX].Value < 0) {
-				target->Variable[HP_INDEX].Value = 0;
-			}
+			target->Variable[HP_INDEX].Value = std::max(target->Variable[HP_INDEX].Value, 0);
 		}
 	} else {
 		target->Variable[HP_INDEX].Value += castcount * hp;
-		if (target->Variable[HP_INDEX].Value > target->Variable[HP_INDEX].Max) {
-			target->Variable[HP_INDEX].Value = target->Variable[HP_INDEX].Max;
-		}
+		target->Variable[HP_INDEX].Value = std::min(target->Variable[HP_INDEX].Max, target->Variable[HP_INDEX].Value);
 	}
 	target->Variable[MANA_INDEX].Value += castcount * mana;
-	if (target->Variable[MANA_INDEX].Value < 0) {
-		target->Variable[MANA_INDEX].Value = 0;
-	}
-	if (target->Variable[MANA_INDEX].Value > target->Variable[MANA_INDEX].Max) {
-		target->Variable[MANA_INDEX].Value = target->Variable[MANA_INDEX].Max;
-	}
+	clamp(&target->Variable[MANA_INDEX].Value, 0, target->Variable[MANA_INDEX].Max);
+
 	if (spell.RepeatCast) {
 		return 1;
 	}

@@ -281,10 +281,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	// This should happen when building unit with several peons
 	// Maybe also with only one.
 	// FIXME : Should be better to fix it in action_{build,repair}.c ?
-	if (unit.Variable[BUILD_INDEX].Value > unit.Variable[BUILD_INDEX].Max) {
-		// assume value is wrong.
-		unit.Variable[BUILD_INDEX].Value = unit.Variable[BUILD_INDEX].Max;
-	}
+	unit.Variable[BUILD_INDEX].Value = std::min(unit.Variable[BUILD_INDEX].Max, unit.Variable[BUILD_INDEX].Value);
 }
 
 /* virtual */ void COrder_Built::FillSeenValues(CUnit &unit) const

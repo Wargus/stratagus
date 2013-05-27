@@ -504,10 +504,8 @@ void InitAiModule()
 void CleanAi()
 {
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (Players[p].Ai) {
-			delete Players[p].Ai;
-			Players[p].Ai = NULL;
-		}
+		delete Players[p].Ai;
+		Players[p].Ai = NULL;
 	}
 }
 

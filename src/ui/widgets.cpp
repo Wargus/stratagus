@@ -142,10 +142,8 @@ void freeGuichan()
 		Gui = NULL;
 	}
 
-	if (Input) {
-		delete Input;
-		Input = NULL;
-	}
+	delete Input;
+	Input = NULL;
 }
 
 /**
@@ -548,9 +546,7 @@ void ImageRadioButton::adjustSize()
 	if (uncheckedNormalImage) {
 		width = uncheckedNormalImage->getWidth();
 		width += width / 2;
-		if (uncheckedNormalImage->getHeight() > height) {
-			height = uncheckedNormalImage->getHeight();
-		}
+		height = std::max(height, uncheckedNormalImage->getHeight());
 	} else {
 		width = getFont()->getHeight();
 		width += width / 2;
@@ -683,9 +679,7 @@ void ImageCheckBox::adjustSize()
 	if (uncheckedNormalImage) {
 		width = uncheckedNormalImage->getWidth();
 		width += width / 2;
-		if (uncheckedNormalImage->getHeight() > height) {
-			height = uncheckedNormalImage->getHeight();
-		}
+		height = std::max(height, uncheckedNormalImage->getHeight());
 	} else {
 		width = getFont()->getHeight();
 		width += width / 2;

@@ -896,9 +896,7 @@ void CPlayer::ChangeResource(const int resource, const int value, const bool sto
 		const int fromStore = std::min(this->StoredResources[resource], abs(value));
 		this->StoredResources[resource] -= fromStore;
 		this->Resources[resource] -= abs(value) - fromStore;
-		if (this->Resources[resource] < 0) {
-			this->Resources[resource] = 0;
-		}
+		this->Resources[resource] = std::max(this->Resources[resource], 0);
 	} else {
 		if (store && this->MaxResources[resource] != -1) {
 			this->StoredResources[resource] += std::min(value, this->MaxResources[resource] - this->StoredResources[resource]);

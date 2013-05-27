@@ -805,9 +805,7 @@ void CFont::MeasureWidths()
 
 			for (; sp < lp; --lp) {
 				if (*lp != ckey && *lp != 7) {
-					if (lp - sp > CharWidth[y]) {  // max width
-						CharWidth[y] = lp - sp;
-					}
+					CharWidth[y] = std::max<char>(CharWidth[y], lp - sp);
 				}
 			}
 			sp += G->Surface->pitch;

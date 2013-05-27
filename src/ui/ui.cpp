@@ -432,9 +432,7 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 	//  Update the viewport pointers
 	//
 	UI.MouseViewport = GetViewport(CursorScreenPos);
-	if (UI.SelectedViewport > UI.Viewports + UI.NumViewports - 1) {
-		UI.SelectedViewport = UI.Viewports + UI.NumViewports - 1;
-	}
+	UI.SelectedViewport = std::min(UI.Viewports + UI.NumViewports - 1, UI.SelectedViewport);
 }
 
 /**

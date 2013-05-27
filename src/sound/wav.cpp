@@ -189,9 +189,7 @@ int CSampleWavStream::Read(void *buf, int len)
 		this->Len += comp;
 	}
 
-	if (this->Len < len) {
-		len = this->Len;
-	}
+	len = std::min(this->Len, len);
 
 	memcpy(buf, this->Buffer + this->Pos, len);
 	this->Pos += len;
@@ -209,9 +207,7 @@ CSampleWavStream::~CSampleWavStream()
 
 int CSampleWav::Read(void *buf, int len)
 {
-	if (len > this->Len) {
-		len = this->Len;
-	}
+	len = std::min(this->Len, len);
 
 	memcpy(buf, this->Buffer + this->Pos, len);
 	this->Pos += len;

@@ -206,9 +206,7 @@ static int MixSampleToStereo32(CSample *sample, int index, unsigned char volume,
 
 	Assert(!(index & 1));
 
-	if (size >= (sample->Len - index) * div / 2) {
-		size = (sample->Len - index) * div / 2;
-	}
+	size = std::min((sample->Len - index) * div / 2, size);
 
 	size = ConvertToStereo32((char *)(sample->Buffer + index), (char *)buf, sample->Frequency,
 							 sample->SampleSize / 8, sample->Channels,
@@ -410,9 +408,7 @@ int SetChannelVolume(int channel, int volume)
 	} else {
 		SDL_LockAudio();
 
-		if (volume > MaxVolume) {
-			volume = MaxVolume;
-		}
+		volume = std::min(MaxVolume, volume);
 		Channels[channel].Volume = volume;
 
 		SDL_UnlockAudio();

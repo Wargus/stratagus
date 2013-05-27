@@ -1310,9 +1310,7 @@ void UpdateTimer()
 			GameTimer.Cycles += GameCycle - GameTimer.LastUpdate;
 		} else {
 			GameTimer.Cycles -= GameCycle - GameTimer.LastUpdate;
-			if (GameTimer.Cycles < 0) {
-				GameTimer.Cycles = 0;
-			}
+			GameTimer.Cycles = std::max(GameTimer.Cycles, 0l);
 		}
 		GameTimer.LastUpdate = GameCycle;
 	}

@@ -84,17 +84,10 @@
 			HitUnit(&caster, *target, -hp);
 		} else {
 			target->Variable[HP_INDEX].Value += hp;
-			if (target->Variable[HP_INDEX].Value > target->Variable[HP_INDEX].Max) {
-				target->Variable[HP_INDEX].Value = target->Variable[HP_INDEX].Max;
-			}
+			target->Variable[HP_INDEX].Value = std::min(target->Variable[HP_INDEX].Max, target->Variable[HP_INDEX].Value);
 		}
 		target->Variable[MANA_INDEX].Value += mana;
-		if (target->Variable[MANA_INDEX].Value < 0) {
-			target->Variable[MANA_INDEX].Value = 0;
-		}
-		if (target->Variable[MANA_INDEX].Value > target->Variable[MANA_INDEX].Max) {
-			target->Variable[MANA_INDEX].Value = target->Variable[MANA_INDEX].Max;
-		}
+		clamp(&target->Variable[MANA_INDEX].Value, 0, target->Variable[MANA_INDEX].Max);
 	}
 	return 0;
 }

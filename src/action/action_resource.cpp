@@ -706,9 +706,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			// Target is not dead, getting resources.
 			if (is_visible) {
 				// Don't load more that there is.
-				if (addload > source->ResourcesHeld) {
-					addload = source->ResourcesHeld;
-				}
+				addload = std::min(source->ResourcesHeld, addload);
 				unit.ResourcesHeld += addload;
 				source->ResourcesHeld -= addload;
 			}

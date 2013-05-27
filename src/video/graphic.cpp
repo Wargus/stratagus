@@ -645,7 +645,7 @@ void CGraphic::GenFramesMap()
 	Assert(Width != 0);
 	Assert(Height != 0);
 
-	if (frame_map) { delete[] frame_map; }
+	delete[] frame_map;
 
 	frame_map = new frame_pos_t[NumFrames];
 
@@ -818,10 +818,8 @@ void CGraphic::Free(CGraphic *g)
 #endif
 		{
 			FreeSurface(&g->SurfaceFlip);
-			if (g->frameFlip_map) {
-				delete[] g->frameFlip_map;
-				g->frameFlip_map = NULL;
-			}
+			delete[] g->frameFlip_map;
+			g->frameFlip_map = NULL;
 		}
 
 		if (!g->HashFile.empty()) {
@@ -979,7 +977,7 @@ void CGraphic::Flip()
 	SDL_UnlockSurface(Surface);
 	SDL_UnlockSurface(s);
 
-	if (frameFlip_map) { delete[] frameFlip_map; }
+	delete[] frameFlip_map;
 
 	frameFlip_map = new frame_pos_t[NumFrames];
 
@@ -1267,10 +1265,8 @@ void CGraphic::Resize(int w, int h)
 			FreeSurface(&Surface);
 			Surface = NULL;
 		}
-		if (frame_map) {
-			delete[] frame_map;
-			frame_map = NULL;
-		}
+		delete[] frame_map;
+		frame_map = NULL;
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		if (!UseOpenGL)
 #endif
@@ -1279,10 +1275,8 @@ void CGraphic::Resize(int w, int h)
 				FreeSurface(&SurfaceFlip);
 				SurfaceFlip = NULL;
 			}
-			if (frameFlip_map) {
-				delete[] frameFlip_map;
-				frameFlip_map = NULL;
-			}
+			delete[] frameFlip_map;
+			frameFlip_map = NULL;
 		}
 
 #if defined(USE_OPENGL) || defined(USE_GLES)

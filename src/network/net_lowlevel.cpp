@@ -689,9 +689,7 @@ void SocketSet::AddSocket(Socket socket)
 {
 	Sockets.push_back(socket);
 	SocketReady.push_back(0);
-	if (socket > MaxSockFD) {
-		MaxSockFD = socket;
-	}
+	MaxSockFD = std::max(MaxSockFD, socket);
 }
 
 /**
@@ -714,9 +712,7 @@ void SocketSet::DelSocket(Socket socket)
 	if (socket == MaxSockFD) {
 		MaxSockFD = 0;
 		for (i = Sockets.begin(); i != Sockets.end(); ++i) {
-			if (*i > MaxSockFD) {
-				MaxSockFD = *i;
-			}
+			MaxSockFD = std::max(this->MaxSockFD, *i);
 		}
 	}
 }

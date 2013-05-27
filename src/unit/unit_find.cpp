@@ -833,10 +833,8 @@ public:
 				cost = HEALTH_FACTOR * (2 * hp_damage_evaluate -
 										dest->Variable[HP_INDEX].Value) /
 					   (dtype.TileWidth * dtype.TileWidth);
-				if (cost < 1) {
-					cost = 1;
-				}
-				cost = (-cost);
+				cost = std::max(cost, 1);
+				cost = -cost;
 			} else {
 				//  Priority 0-255
 				cost += dtype.Priority * PRIORITY_FACTOR;
@@ -860,14 +858,8 @@ public:
 				int effective_hp = (dest->Variable[HP_INDEX].Value - 2 * hp_damage_evaluate);
 
 				// Unit we won't kill are evaluated the same
-				if (effective_hp > 0) {
-					effective_hp = 0;
-				}
-
 				// Unit we are sure to kill are all evaluated the same (except PRIORITY)
-				if (effective_hp < -hp_damage_evaluate) {
-					effective_hp = -hp_damage_evaluate;
-				}
+				clamp(&effective_hp, 0, -hp_damage_evaluate);
 
 				// Here, effective_hp vary from -hp_damage_evaluate (unit will be killed) to 0 (unit can't be killed)
 				// => we prefer killing rather than only hitting...
@@ -880,9 +872,7 @@ public:
 
 				// the cost may be divided accros multiple cells
 				cost = cost / (dtype.TileWidth * dtype.TileWidth);
-				if (cost < 1) {
-					cost = 1;
-				}
+				cost = std::max(cost, 1);
 
 				// Removed Unit's are in bunkers
 				int d;
