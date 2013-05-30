@@ -583,8 +583,8 @@ void CreatePlayer(int type)
 
 void CPlayer::Init(/* PlayerTypes */ int type)
 {
-	this->Units.resize(0);
-	this->FreeWorkers.resize(0);
+	std::vector<CUnit *>().swap(this->Units);
+	std::vector<CUnit *>().swap(this->FreeWorkers);
 
 	//  Take first slot for person on this computer,
 	//  fill other with computer players.
