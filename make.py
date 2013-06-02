@@ -264,7 +264,7 @@ def detectLua(b):
     # Prefer that because it will call our C++ destructors on unwind.
     # This avoids memory leaks that would be very cumbersome to fix in
     # any other way.
-    libs = 'lua lua5.1-c++ lua5.1 lua51'.split()
+    libs = 'lua5.1-c++ lua5.1 lua51 lua'.split()
     if b.usepkgconfig:
         for i in libs:
             if pkgconfig(b, i):
@@ -296,7 +296,6 @@ def detectSdl(b):
     sys.exit(1)
 
 def detectAlwaysDynamic(b):
-    RequireLib(b, 'png', 'png.h')
     RequireLib(b, 'z', 'zlib.h')
     detectOpenGl(b)
     detectSdl(b)
@@ -313,6 +312,7 @@ def detectAlwaysDynamic(b):
 
 def detectEmbedable(b):
     detectLua(b)
+    RequireLib(b, 'png', 'png.h')
     if CheckLib(b, 'vorbis'):
        b.define('USE_VORBIS')
     if CheckLib(b, 'theora'):
