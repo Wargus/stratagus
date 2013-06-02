@@ -437,7 +437,7 @@ def static(builddir='fbuild/static', **kwargs):
     
     mkdir(builddir)
     detectAlwaysDynamic(b)
-    b = StaticGcc(b.cflags,b.ldflags, b.cc,b.builddir)
+    b = StaticGcc(b.cflags,b.ldflags, b.cc,b.builddir, usepkgconfig=False)
     detectEmbedable(b)
     b.optimize()
     b.libpath('.')
