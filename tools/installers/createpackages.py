@@ -90,7 +90,7 @@ def buildVersionName():
 def filterDirectories(files):
    return [x for x in files if not x.endswith('/')]
 def filterSources(files):
-   buildfiles = ['SConstruct', 'bos.sln']
+   buildfiles = ['SConstruct', 'bos.sln', 'make.py', 'fabricate.py']
    def isGoodFile(f):
      return (not f.startswith('engine/') and not f.startswith('tools/') and
              f not in buildfiles)
