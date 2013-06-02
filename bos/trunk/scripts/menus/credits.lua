@@ -9,7 +9,7 @@
 --
 --      credits.lua - Credits menu.
 --
---      (c) Copyright 2005-2007 by Francois Beerten
+--      (c) Copyright 2005-2013 by Francois Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -45,6 +45,8 @@ function RunCreditsMenu(s)
      "  Lois Taulelle",
      "",
      _("Maps and campaigns:"),
+     "  Michiel van der Wulp",
+     "  Connor MacKay",
      "  Lois Taulelle",
      "  Francois Beerten",
      "",
@@ -58,6 +60,7 @@ function RunCreditsMenu(s)
      "  Edgar 'Froese' Toernig",
      "  Jimmy Salmon",
      "  Nehal Mistry",
+     "  Kalle Olavi Niemitalo",
      "  Russell Smith",
      "  Francois Beerten",
      "  Joris Dauphin",
