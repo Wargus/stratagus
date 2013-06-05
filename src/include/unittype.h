@@ -408,6 +408,7 @@ public:
 	int Distance;        /// distance to build (circle)
 	DistanceTypeType DistanceType;
 	std::string RestrictTypeName;
+	std::string RestrictTypeOwner;
 	CUnitType *RestrictType;
 };
 

@@ -134,43 +134,45 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 	std::vector<CUnit *> table;
 	Select(pos1, pos2, table);
 
-	switch (this->DistanceType) {
-		case GreaterThan :
-		case GreaterThanEqual :
-			for (size_t i = 0; i != table.size(); ++i) {
-				if (builder != table[i] && this->RestrictType == table[i]->Type &&
-					MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
+	for (size_t i = 0; i != table.size(); ++i) {
+		if (builder != table[i] &&
+		    // unit has RestrictType or no RestrictType was set, but a RestrictTypeOwner
+		    (this->RestrictType == table[i]->Type || !this->RestrictType && this->RestrictTypeOwner.size() > 0) &&
+		    // RestrictTypeOwner is not set or unit belongs to a suitable player
+		    (this->RestrictTypeOwner.size() == 0 ||
+		     !this->RestrictTypeOwner.compare("self") && ThisPlayer == table[i]->Player ||
+		     !this->RestrictTypeOwner.compare("allied") && (ThisPlayer == table[i]->Player || ThisPlayer->IsAllied(*table[i]->Player)) ||
+		     !this->RestrictTypeOwner.compare("enemy") && ThisPlayer->IsEnemy(*table[i]->Player))) {
+
+			switch (this->DistanceType) {
+			case GreaterThan :
+			case GreaterThanEqual :
+				if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
 					return false;
 				}
-			}
-			return true;
-		case LessThan :
-		case LessThanEqual :
-			for (size_t i = 0; i != table.size(); ++i) {
-				if (builder != table[i] && this->RestrictType == table[i]->Type &&
-					MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
+				break;
+		        case LessThan :
+		        case LessThanEqual :
+				if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
 					return true;
 				}
-			}
-			return false;
-		case Equal :
-			for (size_t i = 0; i != table.size(); ++i) {
-				if (builder != table[i] && this->RestrictType == table[i]->Type &&
-					MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
+				break;
+			case Equal :
+				if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
 					return true;
 				}
-			}
-			return false;
-		case NotEqual :
-			for (size_t i = 0; i != table.size(); ++i) {
-				if (builder != table[i] && this->RestrictType == table[i]->Type &&
-					MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
+				break;
+			case NotEqual :
+				if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
 					return false;
 				}
+				break;
 			}
-			return true;
+		}
 	}
-	return false;
+	return (this->DistanceType == GreaterThan ||
+		this->DistanceType == GreaterThanEqual ||
+		this->DistanceType == NotEqual);
 }
 
 inline bool CBuildRestrictionAddOn::functor::operator()(const CUnit *const unit) const
