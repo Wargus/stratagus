@@ -404,7 +404,7 @@ static void GetPopupSize(const CPopup &popup, const ButtonAction &button,
 			contentHeight = std::max(content.minSize.y, 2 * content.MarginY + content.GetHeight(button, Costs));
 			maxContentHeight = std::max(contentHeight, maxContentHeight);
 			if (content.Wrap) {
-				popupWidth += contentWidth - maxContentWidth > 0 ? contentWidth - maxContentWidth : 0;
+				popupWidth += std::max(0, contentWidth - maxContentWidth);
 				popupHeight += maxContentHeight;
 				maxContentWidth = std::max(maxContentWidth, contentWidth);
 				contentWidth = popup.MarginX;
