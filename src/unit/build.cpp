@@ -136,13 +136,13 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 
 	for (size_t i = 0; i != table.size(); ++i) {
 		if (builder != table[i] &&
-		    // unit has RestrictType or no RestrictType was set, but a RestrictTypeOwner
-		    (this->RestrictType == table[i]->Type || !this->RestrictType && this->RestrictTypeOwner.size() > 0) &&
-		    // RestrictTypeOwner is not set or unit belongs to a suitable player
-		    (this->RestrictTypeOwner.size() == 0 ||
-		     !this->RestrictTypeOwner.compare("self") && ThisPlayer == table[i]->Player ||
-		     !this->RestrictTypeOwner.compare("allied") && (ThisPlayer == table[i]->Player || ThisPlayer->IsAllied(*table[i]->Player)) ||
-		     !this->RestrictTypeOwner.compare("enemy") && ThisPlayer->IsEnemy(*table[i]->Player))) {
+			// unit has RestrictType or no RestrictType was set, but a RestrictTypeOwner
+			(this->RestrictType == table[i]->Type || (!this->RestrictType && this->RestrictTypeOwner.size() > 0)) &&
+			// RestrictTypeOwner is not set or unit belongs to a suitable player
+			(this->RestrictTypeOwner.size() == 0 ||
+			 (!this->RestrictTypeOwner.compare("self") && ThisPlayer == table[i]->Player) ||
+			 (!this->RestrictTypeOwner.compare("allied") && (ThisPlayer == table[i]->Player || ThisPlayer->IsAllied(*table[i]->Player))) ||
+			 (!this->RestrictTypeOwner.compare("enemy") && ThisPlayer->IsEnemy(*table[i]->Player)))) {
 
 			switch (this->DistanceType) {
 			case GreaterThan :
@@ -151,8 +151,8 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 					return false;
 				}
 				break;
-		        case LessThan :
-		        case LessThanEqual :
+				case LessThan :
+				case LessThanEqual :
 				if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
 					return true;
 				}
