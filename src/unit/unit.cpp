@@ -1306,23 +1306,12 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 */
 void NearestOfUnit(const CUnit &unit, const Vec2i &pos, Vec2i *dpos)
 {
-	int x = unit.tilePos.x;
-	int y = unit.tilePos.y;
+	const int x = unit.tilePos.x;
+	const int y = unit.tilePos.y;
 
-	if (pos.x >= x + unit.Type->TileWidth) {
-		dpos->x = x + unit.Type->TileWidth - 1;
-	} else if (pos.x < x) {
-		dpos->x = x;
-	} else {
-		dpos->x = pos.x;
-	}
-	if (pos.y >= y + unit.Type->TileHeight) {
-		dpos->y = y + unit.Type->TileHeight - 1;
-	} else if (pos.y < y) {
-		dpos->y = y;
-	} else {
-		dpos->y = pos.y;
-	}
+	*dpos = pos;
+	clamp<short int>(&dpos->x, x, x + unit.Type->TileWidth - 1);
+	clamp<short int>(&dpos->y, y, y + unit.Type->TileHeight - 1);
 }
 
 /**

@@ -339,9 +339,7 @@ static void EditorDestroyAllUnits()
 */
 void CEditor::CreateRandomMap() const
 {
-	int mz;
-
-	mz = Map.Info.MapWidth > Map.Info.MapHeight ? Map.Info.MapWidth : Map.Info.MapHeight;
+	const int mz = std::max(Map.Info.MapHeight, Map.Info.MapWidth);
 
 	// make water-base
 	const Vec2i zeros(0, 0);
@@ -354,7 +352,7 @@ void CEditor::CreateRandomMap() const
 	EditorRandomizeTile(WOOD_TILE,  60,  4);
 	EditorRandomizeTile(ROCK_TILE,  30,  2);
 
-	EditorRandomizeUnit("unit-gold-mine",  5,  50000);
+	EditorRandomizeUnit("unit-gold-mine", 5, 50000);
 }
 
 //@}

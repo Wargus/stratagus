@@ -167,11 +167,7 @@ int CSampleWavStream::Read(void *buf, int len)
 		}
 
 		bufrem = SOUND_BUFFER_SIZE - (this->Pos + this->Len);
-		if (this->Data.ChunkRem > bufrem) {
-			read = bufrem;
-		} else {
-			read = this->Data.ChunkRem;
-		}
+		read = std::min(bufrem, this->Data.ChunkRem);
 		this->Data.ChunkRem -= read;
 
 		sndbuf = this->Buffer + this->Pos + this->Len;
@@ -363,11 +359,7 @@ CSample *LoadWav(const char *name, int flags)
 			}
 
 			const int bufrem = SOUND_BUFFER_SIZE;
-			if (rem > bufrem) {
-				read = bufrem;
-			} else {
-				read = rem;
-			}
+			read = std::min(bufrem, rem);
 			rem -= read;
 
 			unsigned char *b = new unsigned char[sample->Len + read];

@@ -947,28 +947,16 @@ private:
 			dest->CacheLock = 0;
 			return;
 		}
-		const CUnitType &type =  *attacker->Type;
+		const CUnitType &type = *attacker->Type;
 		const CUnitType &dtype = *dest->Type;
 		const int missile_range = type.Missile.Missile->Range + range - 1;
-		int x, y;
+		int x = attacker->tilePos.x;
+		int y = attacker->tilePos.y;
 
 		// put in x-y the real point which will be hit...
 		// (only meaningful when dtype->TileWidth > 1)
-		if (attacker->tilePos.x < dest->tilePos.x) {
-			x = dest->tilePos.x;
-		} else if (attacker->tilePos.x > dest->tilePos.x + dtype.TileWidth - 1) {
-			x = dest->tilePos.x + dtype.TileWidth - 1;
-		} else {
-			x = attacker->tilePos.x;
-		}
-
-		if (attacker->tilePos.y < dest->tilePos.y) {
-			y = dest->tilePos.y;
-		} else if (attacker->tilePos.y > dest->tilePos.y + dtype.TileHeight - 1) {
-			y = dest->tilePos.y + dtype.TileHeight - 1;
-		} else {
-			y = attacker->tilePos.y;
-		}
+		clamp<int>(&x, dest->tilePos.x, dest->tilePos.x + dtype.TileWidth - 1);
+		clamp<int>(&y, dest->tilePos.y, dest->tilePos.y + dtype.TileHeight - 1);
 
 		// Make x,y relative to u->x...
 

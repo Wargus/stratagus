@@ -868,11 +868,7 @@ void MultiLineLabel::adjustSize()
 	for (int i = 0; i < (int)this->mTextRows.size(); ++i) {
 		int w = this->getFont()->getWidth(this->mTextRows[i]);
 		if (width < w) {
-			if (w <= this->mLineWidth) {
-				width = w;
-			} else {
-				width = this->mLineWidth;
-			}
+			width = std::min(w, this->mLineWidth);
 		}
 	}
 	this->setWidth(width);

@@ -970,11 +970,7 @@ static int CclSetUnitVariable(lua_State *l)
 	int value;
 	if (!strcmp(name, "RegenerationRate")) {
 		value = LuaToNumber(l, 3);
-		if (value > unit->Variable[HP_INDEX].Max) {
-			unit->Variable[HP_INDEX].Increase = unit->Variable[HP_INDEX].Max;
-		} else {
-			unit->Variable[HP_INDEX].Increase = value;
-		}
+		unit->Variable[HP_INDEX].Increase = std::min(unit->Variable[HP_INDEX].Max, value);
 	} else {
 		const int index = UnitTypeVar.VariableNameLookup[name];// User variables
 		if (index == -1) {
@@ -982,19 +978,11 @@ static int CclSetUnitVariable(lua_State *l)
 		}
 		value = LuaToNumber(l, 3);
 		if (nargs == 3) {
-			if (value > unit->Variable[index].Max) {
-				unit->Variable[index].Value = unit->Variable[index].Max;
-			} else {
-				unit->Variable[index].Value = value;
-			}
+			unit->Variable[index].Value = std::min(unit->Variable[index].Max, value);
 		} else {
 			const char *const type = LuaToString(l, 4);
 			if (!strcmp(type, "Value")) {
-				if (value > unit->Variable[index].Max) {
-					unit->Variable[index].Value = unit->Variable[index].Max;
-				} else {
-					unit->Variable[index].Value = value;
-				}
+				unit->Variable[index].Value = std::min(unit->Variable[index].Max, value);
 			} else if (!strcmp(type, "Max")) {
 				unit->Variable[index].Max = value;
 			} else if (!strcmp(type, "Increase")) {

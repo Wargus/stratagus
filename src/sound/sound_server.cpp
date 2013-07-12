@@ -264,13 +264,8 @@ static void ClipMixToStereo16(const int *mix, int size, short *output)
 
 	while (mix < end) {
 		int s = (*mix++);
-		if (s > SHRT_MAX) {
-			*output++ = SHRT_MAX;
-		} else if (s < SHRT_MIN) {
-			*output++ = SHRT_MIN;
-		} else {
-			*output++ = s;
-		}
+		clamp(&s, SHRT_MIN, SHRT_MAX);
+		*output++ = s;
 	}
 }
 
