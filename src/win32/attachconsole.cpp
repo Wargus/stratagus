@@ -150,7 +150,7 @@ static void WINAPI_AttachConsole(void)
 	version = (osvi.dwMajorVersion << 8) | osvi.dwMinorVersion;
 
 	// We need Windows 2000 or new
-	if (version < 0x0500) {
+	if (version < _WIN32_WINNT_WIN2K) {
 		return;
 	}
 
