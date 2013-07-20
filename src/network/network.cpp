@@ -711,13 +711,12 @@ static void ParseResendCommand(const CNetworkPacket &packet)
 	}
 }
 
-static bool IsAValidCommand_Command(const CNetworkPacket &packet, int index)
+static bool IsAValidCommand_Command(const CNetworkPacket &packet, int index, const int player)
 {
 	CNetworkCommand nc;
 	nc.Deserialize(&packet.Command[index][0]);
 	const unsigned int slot = nc.Unit;
 	const CUnit *unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : NULL;
-	const int player = Hosts[index].PlyNr;
 
 	if (unit && (unit->Player->Index == player
 				 || Players[player].IsTeamed(*unit))) {
@@ -727,7 +726,7 @@ static bool IsAValidCommand_Command(const CNetworkPacket &packet, int index)
 	}
 }
 
-static bool IsAValidCommand_Dismiss(const CNetworkPacket &packet, int index)
+static bool IsAValidCommand_Dismiss(const CNetworkPacket &packet, int index, const int player)
 {
 	CNetworkCommand nc;
 	nc.Deserialize(&packet.Command[index][0]);
@@ -737,10 +736,10 @@ static bool IsAValidCommand_Dismiss(const CNetworkPacket &packet, int index)
 	if (unit && unit->Type->ClicksToExplode) {
 		return true;
 	}
-	return IsAValidCommand_Command(packet, index);
+	return IsAValidCommand_Command(packet, index, player);
 }
 
-static bool IsAValidCommand(const CNetworkPacket &packet, int index)
+static bool IsAValidCommand(const CNetworkPacket &packet, int index, const int player)
 {
 	switch (packet.Header.Type[index] & 0x7F) {
 		case MessageExtendedCommand: // FIXME: ensure the sender is part of the command
@@ -750,8 +749,8 @@ static bool IsAValidCommand(const CNetworkPacket &packet, int index)
 		case MessageResend:    // FIXME: ensure it's from the right player
 		case MessageChat:      // FIXME: ensure it's from the right player
 			return true;
-		case MessageCommandDismiss: return IsAValidCommand_Dismiss(packet, index);
-		default: return IsAValidCommand_Command(packet, index);
+		case MessageCommandDismiss: return IsAValidCommand_Dismiss(packet, index, player);
+		default: return IsAValidCommand_Command(packet, index, player);
 	}
 	// FIXME: not all values in nc have been validated
 }
@@ -794,7 +793,7 @@ static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHo
 		// Receive statistic
 		NetworkLastFrame[player] = FrameCounter;
 
-		bool validCommand = IsAValidCommand(packet, i);
+		bool validCommand = IsAValidCommand(packet, i, player);
 		// Place in network in
 		if (validCommand) {
 			// Destination cycle (time to execute).
