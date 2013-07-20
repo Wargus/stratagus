@@ -46,7 +46,7 @@
 
 CHost::CHost(const char *name, int port)
 {
-	this->ip = NetResolveHost(name ? name : "127.0.0.1");
+	this->ip = name ? NetResolveHost(name) : INADDR_ANY;
 	this->port = htons(port);
 }
 
