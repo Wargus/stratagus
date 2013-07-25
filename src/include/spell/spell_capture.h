@@ -51,7 +51,7 @@ private:
 	bool JoinToAIForce;   /// if true, captured unit is joined into caster's AI force, if available
 	int Damage;           /// damage the spell does if unable to caputre
 	int DamagePercent;    /// percent the target must be damaged for a
-	/// capture to suceed.
+	/// capture to succeed.
 };
 
 //@}
