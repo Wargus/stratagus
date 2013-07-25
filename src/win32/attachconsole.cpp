@@ -28,6 +28,10 @@
 #include <iostream>
 #endif
 
+#ifndef _WIN32_WINNT_WIN2K
+#define _WIN32_WINNT_WIN2K 0x0500
+#endif
+
 static int fixmode = 0;
 
 static HINSTANCE lib_kernel32 = NULL;
