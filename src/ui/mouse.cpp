@@ -437,7 +437,7 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 
 static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i &pos, int &acknowledged)
 {
-	// don't self targetting.
+	// don't self targeting.
 	if (dest == &unit) {
 		return;
 	}

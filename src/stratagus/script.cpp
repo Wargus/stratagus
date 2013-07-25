@@ -63,7 +63,7 @@ static int NumberCounter = 0; /// Counter for lua function.
 static int StringCounter = 0; /// Counter for lua function.
 
 
-/// Usefull for getComponent.
+/// Useful for getComponent.
 typedef enum {
 	USTRINT_STR, USTRINT_INT
 } UStrIntType;
@@ -823,7 +823,7 @@ StringDesc *CclParseStringDesc(lua_State *l)
 			lua_rawgeti(l, -1, 2); // String.
 			res->D.Line.String = CclParseStringDesc(l);
 			if (lua_rawlen(l, -1) >= 3) {
-				lua_rawgeti(l, -1, 3); // Lenght.
+				lua_rawgeti(l, -1, 3); // Length.
 				res->D.Line.MaxLen = CclParseNumberDesc(l);
 			}
 			res->D.Line.Font = NULL;
@@ -2079,7 +2079,7 @@ static bool LuaValueToString(lua_State *l, std::string &value)
 		case LUA_TFUNCTION:
 			// Could be done with string.dump(function)
 			// and debug.getinfo(function).name (could be nil for anonymous function)
-			// But not usefull yet.
+			// But not useful yet.
 			value = "";
 			return false;
 		case LUA_TUSERDATA:

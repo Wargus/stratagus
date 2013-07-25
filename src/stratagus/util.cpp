@@ -121,7 +121,7 @@ long isqrt(long num)
 	//
 	//  Load the binary constant 01 00 00 ... 00, where the number
 	//  of zero bits to the right of the single one bit
-	//  is even, and the one bit is as far left as is consistant
+	//  is even, and the one bit is as far left as is consistent
 	//  with that condition.)
 	//
 	//  This portable load replaces the loop that used to be
@@ -239,7 +239,7 @@ errno_t strcat_s(char *dst, size_t dstsize, const char *src)
 **  @param a  String to search in
 **  @param b  Substring to search for
 **
-**  @return   Pointer to first occurence of b or NULL if not found.
+**  @return   Pointer to first occurrence of b or NULL if not found.
 */
 char *strcasestr(const char *a, const char *b)
 {

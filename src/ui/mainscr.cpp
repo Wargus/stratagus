@@ -128,8 +128,8 @@ void DrawUserDefinedButtons()
 **  Placed under icons on top-panel.
 **
 **  @param unit  Pointer to unit.
-**  @param x     Screen X postion of icon
-**  @param y     Screen Y postion of icon
+**  @param x     Screen X position of icon
+**  @param y     Screen Y position of icon
 */
 static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 {
@@ -162,8 +162,8 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 **  Placed under icons on top-panel.
 **
 **  @param unit  Pointer to unit.
-**  @param x     Screen X postion of icon
-**  @param y     Screen Y postion of icon
+**  @param x     Screen X position of icon
+**  @param y     Screen Y position of icon
 */
 static void UiDrawManaBar(const CUnit &unit, int x, int y)
 {
@@ -831,7 +831,7 @@ bool MessagesDisplay::CheckRepeatMessage(const char *msg)
 }
 
 /**
-**  Add a new message to display only if it differs from the preceeding one.
+**  Add a new message to display only if it differs from the preceding one.
 */
 void MessagesDisplay::AddUniqueMessage(const char *s)
 {

@@ -123,7 +123,7 @@
 **  Pointer to the last unit added inside. Order doesn't really
 **  matter. All units inside are kept in a circular linked list.
 **  This is NULL if there are no units inside. Multiple levels
-**  of inclusion are allowed, though not very usefull right now
+**  of inclusion are allowed, though not very useful right now
 **
 **  CUnit::NextContained, CUnit::PrevContained
 **
@@ -293,7 +293,7 @@
 **
 **  CUnit::Wait
 **
-**  The unit is forced too wait for that many cycles. Be carefull,
+**  The unit is forced too wait for that many cycles. Be careful,
 **  setting this to 0 will lock the unit.
 **
 **  CUnit::State
@@ -685,7 +685,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	if (!type.Vanishes && CurrentAction() != UnitActionDie) {
 		player.AddUnit(*this);
 		if (!SaveGameLoading) {
-			// If unit is dieing, it's already been lost by all players
+			// If unit is dying, it's already been lost by all players
 			// don't count again
 			if (type.Building) {
 				// FIXME: support more races
@@ -700,7 +700,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		player.Demand += type.Demand; // food needed
 	}
 
-	// Don't Add the building if it's dieing, used to load a save game
+	// Don't Add the building if it's dying, used to load a save game
 	if (type.Building && CurrentAction() != UnitActionDie) {
 		// FIXME: support more races
 		if (!type.Wall && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
@@ -1301,8 +1301,8 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 **  Find nearest point of unit.
 **
 **  @param unit  Pointer to unit.
-**  @param pos   tile map postion.
-**  @param dpos  Out: nearest point tile map postion to (tx,ty).
+**  @param pos   tile map position.
+**  @param dpos  Out: nearest point tile map position to (tx,ty).
 */
 void NearestOfUnit(const CUnit &unit, const Vec2i &pos, Vec2i *dpos)
 {
@@ -1430,7 +1430,7 @@ void UnitGoesUnderFog(CUnit &unit, const CPlayer &player)
 		// configurations.
 		// A unit does NOT get a reference when it goes under fog if it's
 		// Destroyed. Furthermore, it shouldn't lose a reference if it was
-		// Seen destroyed. That only happend with complex shared vision, and
+		// Seen destroyed. That only happened with complex shared vision, and
 		// it's sort of the whole point of this tracking.
 		//
 		if (unit.Destroyed) {
@@ -2588,7 +2588,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 	}
 	if (best && best != oldgoal && best->Player != target.Player && best->IsAllied(target) == false) {
 		CommandAttack(target, best->tilePos, best, FlushCommands);
-		// Set threshold value only for agressive units
+		// Set threshold value only for aggressive units
 		if (best->IsAgressive()) {
 			target.Threshold = threshold;
 		}

@@ -105,7 +105,7 @@ static CSound *CclGetSound(lua_State *l)
 **  Create a sound.
 **
 **  Glue between c and scheme. This function asks the sound system to
-**  register a sound under a given name, wiht an associated list of files
+**  register a sound under a given name, with an associated list of files
 **  (the list can be replaced by only one file).
 **
 **  @param l  Lua state.

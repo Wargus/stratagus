@@ -57,7 +57,7 @@ static int MusicVolume = 128;    /// music volume
 static bool MusicEnabled = true;
 static bool EffectsEnabled = true;
 
-/// Channels for sound effects and unit speach
+/// Channels for sound effects and unit speech
 struct SoundChannel {
 	CSample *Sample;       /// sample to play
 	Origin *Unit;          /// pointer to unit, who plays the sound, if any

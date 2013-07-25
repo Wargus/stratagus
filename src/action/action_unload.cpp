@@ -203,7 +203,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 }
 
 /**
-**  Return true is possition is a correct place to drop out units.
+**  Return true if position is a correct place to drop out units.
 **
 **  @param transporter  Transporter unit.
 **  @param pos          position to drop out units.

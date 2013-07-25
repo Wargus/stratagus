@@ -123,7 +123,7 @@ void InitConstructions()
 **  Load the graphics for the constructions.
 **
 **  HELPME: who make this better terrain depended and extendable
-**  HELPME: filename constuction.
+**  HELPME: filename construction.
 */
 void LoadConstructions()
 {

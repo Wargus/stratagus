@@ -842,7 +842,7 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 **
 **  @return 1 if button is allowed, 0 else.
 **
-**  @todo FIXME: better check. (dependancy, resource, ...)
+**  @todo FIXME: better check. (dependency, resource, ...)
 **  @todo FIXME: make difference with impossible and not yet researched.
 */
 bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)

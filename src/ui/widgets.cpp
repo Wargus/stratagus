@@ -198,9 +198,9 @@ LuaActionListener::LuaActionListener(lua_State *l, lua_Object f) :
 }
 
 /**
-**  Called when an action is recieved from a Widget. It is used
-**  to be able to recieve a notification that an action has
-**  occured.
+**  Called when an action is received from a Widget. It is used
+**  to be able to receive a notification that an action has
+**  occurred.
 **
 **  @param eventId  the identifier of the Widget
 */
@@ -1145,7 +1145,7 @@ void Windows::add(gcn::Widget *widget, int x, int y)
 **  @param y   Y coordinate of the mouse relative to the widndow.
 **
 **  @note Once dragged, without release the mouse,
-**    if you go virtualy outside the container then go back,
+**    if you go virtually outside the container then go back,
 **    you have to wait the virtual cursor are in the container.
 **    It is because x, y argument refer to a virtual cursor :(
 **  @note An another thing is strange
@@ -1201,7 +1201,7 @@ void Windows::mouseMotion(int x, int y)
 	setPosition(x, y);
 
 	// Move the cursor.
-	// Usefull only when window reachs the limit.
+	// Useful only when window reachs the limit.
 	getAbsolutePosition(absx, absy);
 	CursorScreenPos.x = absx + mMouseXOffset;
 	CursorScreenPos.y = absy + mMouseYOffset;

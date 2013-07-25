@@ -74,7 +74,7 @@
 ** package 3 before package 1. Even a package can come duplicate.
 ** @li UDP is connectionless and therefore has problems with firewalls.
 **
-** I have choosen UDP. Additional support for the TCP protocol is welcome.
+** I have chosen UDP. Additional support for the TCP protocol is welcome.
 **
 ** @subsection sc_vs_p2p server/client vs. peer to peer
 **
@@ -90,7 +90,7 @@
 ** p2p has the advantage of a smaller lag, but needs a higher bandwidth
 ** by the clients.
 **
-** p2p has been choosen for in-game.
+** p2p has been chosen for in-game.
 ** s/c for the preparing room.
 **
 ** @subsection bandwidth bandwidth
@@ -137,7 +137,7 @@
 ** Only user commands are send over the network to the other computers.
 ** To reduce network traffic, commands are sent/executed every gameCyclesPerUpdate
 ** gameCycles. The command needs some time to reach the other clients (lag),
-** so the command is not executed immediatly on the local computer,
+** so the command is not executed immediately on the local computer,
 ** but a delay (NetworkLag NetUpdates) later. Commands are stored
 ** in a circular array indexed by update time. Once each other players commands
 ** are received for a specified gameNetCycle, all commands of this gameNetCycle
@@ -1038,7 +1038,7 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 }
 
 /**
-**  Network excecute commands.
+**  Network execute commands.
 */
 static void NetworkExecCommands(unsigned long gameNetCycle)
 {

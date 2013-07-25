@@ -185,7 +185,7 @@ public:
 
 /**
 **  Find All unittypes equivalent to a given one, and which are available
-**  UnitType are returned in the prefered order ( ie palladin >> knight... )
+**  UnitType are returned in the preferred order (ie palladin >> knight...)
 **
 **  @param unittype     The unittype to find equivalence for
 **  @param usableTypes  int array which will hold the result. (Size UnitTypeMax+1)
@@ -479,7 +479,7 @@ int AiForceManager::GetForce(const CUnit &unit)
 {
 	for (unsigned int i = 0; i < forces.size(); ++i) {
 		AiForce &force = forces[i];
-		
+
 		for (unsigned int j = 0; j < force.Units.size(); ++j) {
 			CUnit &aiunit = *force.Units[j];
 

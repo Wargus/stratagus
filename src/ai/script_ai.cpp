@@ -319,7 +319,7 @@ static int CclDefineAiHelper(lua_State *l)
 			|| !strcmp(value, "unit-limit")
 			|| !strcmp(value, "repair")) {
 #ifdef DEBUG
-			fprintf(stderr, "DefineAiHelper: Relation is computed from buttons, you may remove safely the block begining with '\"%s\"'\n", value);
+			fprintf(stderr, "DefineAiHelper: Relation is computed from buttons, you may remove safely the block beginning with '\"%s\"'\n", value);
 #endif
 			continue;
 		} else if (!strcmp(value, "unit-equiv")) {

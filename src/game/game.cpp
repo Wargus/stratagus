@@ -724,7 +724,7 @@ static void GameTypeManVsMachine()
 }
 
 /**
-**  Man vs Machine whith Humans on a Team
+**  Man vs Machine with Humans on a Team
 */
 static void GameTypeManTeamVsMachine()
 {
@@ -956,7 +956,7 @@ void CreateGame(const std::string &filename, CMap *map)
 	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos));
 
 	//
-	// Various hacks wich must be done after the map is loaded.
+	// Various hacks which must be done after the map is loaded.
 	//
 	// FIXME: must be done after map is loaded
 	InitPathfinder();

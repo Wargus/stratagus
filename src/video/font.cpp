@@ -703,7 +703,7 @@ static int FormatNumber(int number, char *buf)
 }
 
 /**
-**  Return the index of first occurance of c in [s- s + maxlen]
+**  Return the index of first occurrence of c in [s- s + maxlen]
 **
 **  @param s       original string.
 **  @param c       character to find.

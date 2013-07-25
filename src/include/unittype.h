@@ -134,7 +134,7 @@ public:
 	char Enable;    /// True if the unit doesn't have this variable. (f.e shield)
 };
 
-// Index for boolflag aready defined
+// Index for boolflag already defined
 enum {
 	COWARD_INDEX = 0,
 	BUILDING_INDEX,

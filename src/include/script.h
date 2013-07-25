@@ -232,7 +232,7 @@ struct _NumberDesc_ {
 struct _UnitDesc_ {
 	EUnit e;       /// which unit;
 	union {
-		CUnit **AUnit; /// Adress of the unit.
+		CUnit **AUnit; /// Address of the unit.
 	} D;
 };
 
@@ -264,7 +264,7 @@ struct _StringDesc_ {
 		struct {
 			StringDesc *String;  /// Original string.
 			NumberDesc *Line;    /// Line number.
-			NumberDesc *MaxLen;  /// Max lenght of line.
+			NumberDesc *MaxLen;  /// Max length of line.
 			CFont *Font;         /// Font to consider (else (-1) consider just char).
 		} Line; /// For specific line.
 		ES_GameInfo GameInfoType;

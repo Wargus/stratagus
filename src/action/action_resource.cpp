@@ -461,7 +461,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	Assert(!unit.IY);
 
 	if (resinfo.TerrainHarvester) {
-		// This shouldn't happend?
+		// This shouldn't happened?
 #if 0
 		if (!Map.IsTerrainResourceOnMap(unit.Orders->goalPos, this->CurrentResource)) {
 			DebugPrint("Wood gone, just like that?\n");

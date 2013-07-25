@@ -785,7 +785,7 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 }
 
 /**
-**  Check if missle has already pierced that unit
+**  Check if missile has already pierced that unit
 **
 **  @param missile  Current missile.
 **  @param unit     Target unit.
@@ -1103,7 +1103,7 @@ void MissileActions()
 }
 
 /**
-**  Calculate distance from view-point to missle.
+**  Calculate distance from view-point to missile.
 **
 **  @param missile  Missile pointer for distance.
 **

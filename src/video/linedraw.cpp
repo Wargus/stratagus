@@ -45,7 +45,7 @@
 ----------------------------------------------------------------------------*/
 
 /**
-** Bitmask, denoting a postion left/right/above/below clip rectangle
+** Bitmask, denoting a position left/right/above/below clip rectangle
 ** (mainly used by VideoDrawLineClip)
 */
 #define ClipCodeInside 0 /// Clipping inside rectangle

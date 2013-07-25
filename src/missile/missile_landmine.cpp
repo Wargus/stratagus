@@ -59,7 +59,7 @@ struct LandMineTargetFinder {
 /**
 **  Land mine controller.
 **  @todo start-finish-start cyclic animation.(anim scripts!)
-**  @todo missile should dissapear for a while.
+**  @todo missile should disappear for a while.
 */
 void MissileLandMine::Action()
 {

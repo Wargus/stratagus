@@ -497,7 +497,7 @@
 **
 **  ResourceInfo::FinalResource
 **
-**    The resource is converted to this at the depot. Usefull for
+**    The resource is converted to this at the depot. Useful for
 **    a fisherman who harvests fish, but it all turns to food at the
 **    depot.
 **
@@ -960,7 +960,7 @@ CUnitType *NewUnitTypeSlot(const std::string &ident)
 **  @param sprite  Sprite to use for drawing
 **  @param player  Player number for color substitution.
 **  @param frame   Animation frame of unit-type.
-**  @param screenPos  Screen pixel (top left) postion to draw unit-type.
+**  @param screenPos  Screen pixel (top left) position to draw unit-type.
 **
 **  @todo  Do screen position caculation in high level.
 **         Better way to handle in x mirrored sprites.

@@ -90,7 +90,7 @@
 	}
 
 	//  When harming cast again to send the hp to negative values.
-	//  Carefull, a perfect 0 target hp kills too.
+	//  Careful, a perfect 0 target hp kills too.
 	//  Avoid div by 0 errors too!
 	int castcount = 1;
 	if (hp) {

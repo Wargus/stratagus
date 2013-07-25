@@ -164,7 +164,7 @@ public:
 private:
 	void CountTypes(unsigned int *counter, const size_t len);
 	bool IsBelongsTo(const CUnitType &type);
-	
+
 	void Update();
 
 	static void InternalRemoveUnit(CUnit *unit);
@@ -400,7 +400,7 @@ extern void AiNewUnitTypeEquiv(const CUnitType &a, const CUnitType &b);
 extern void AiResetUnitTypeEquiv();
 /// Finds all equivalents units to a given one
 extern int AiFindUnitTypeEquiv(const CUnitType &type, int *result);
-/// Finds all available equivalents units to a given one, in the prefered order
+/// Finds all available equivalents units to a given one, in the preferred order
 extern int AiFindAvailableUnitTypeEquiv(const CUnitType &type, int *result);
 extern int AiGetBuildRequestsCount(const PlayerAi &pai, int (&counter)[UnitTypeMax]);
 

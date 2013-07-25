@@ -40,7 +40,7 @@
 **
 ** Any help to improve this documention is welcome. If you didn't
 ** understand something or you found an error or a wrong spelling
-** or wrong grammer please write an email (including a patch :).
+** or wrong grammar please write an email (including a patch :).
 **
 ** @section Informations Informations
 **

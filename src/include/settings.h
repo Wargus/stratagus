@@ -57,7 +57,7 @@ struct SettingsPresets {
 **
 **  This structure one day should contain all common game settings,
 **  in-game, or pre-start, and the individual (per player) presets.
-**  This allows central maintainance, easy (network-)negotiation,
+**  This allows central maintenance, easy (network-)negotiation,
 **  simplifies load/save/reinitialization, etc...
 **
 */

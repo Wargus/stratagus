@@ -33,7 +33,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---  Platform dependant IO-related Includes and Definitions
+--  Platform dependent IO-related Includes and Definitions
 ----------------------------------------------------------------------------*/
 
 #include <sys/types.h>

@@ -1069,7 +1069,7 @@ void CPlayer::SubCosts(const int *costs)
 }
 
 /**
-**  Substract the costs of new unit from resources
+**  Subtract the costs of new unit from resources
 **
 **  @param type    Type of unit.
 */
@@ -1079,7 +1079,7 @@ void CPlayer::SubUnitType(const CUnitType &type)
 }
 
 /**
-**  Substract a factor of costs from the resources
+**  Subtract a factor of costs from the resources
 **
 **  @param costs   How many costs.
 **  @param factor  Factor of the costs to apply.

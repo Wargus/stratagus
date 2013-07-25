@@ -271,7 +271,7 @@ enum PlayerRacesOld {
 **
 **  #PlayerNobody
 **
-**    This player is unused. Nobody controlls this player.
+**    This player is unused. Nobody controls this player.
 **
 **  #PlayerComputer
 **

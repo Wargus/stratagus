@@ -141,7 +141,7 @@
 **
 **    Determines the range in which a projectile will deal its damage.
 **    A range of 0 will mean that the damage will be limited to the
-**    targetted unit only.  So if you shot a missile at a unit, it
+**    targeted unit only.  So if you shot a missile at a unit, it
 **    would only damage that unit.  A value of 1 only affects the
 **    field where the missile hits.  A value of 2  would mean that
 **    the damage for that particular missile would be dealt for a range
@@ -385,7 +385,7 @@ public:
 	int TTL;                   /// missile time-to-live
 	int Damage;                /// missile damage (used for non-direct missiles, e.g. impacts)
 	int ReduceFactor;          /// Multiplier for reduce or increase damage dealt to the next unit
-	int SmokePrecision;        /// How frequently the smoke missile will generate itself 
+	int SmokePrecision;        /// How frequently the smoke missile will generate itself
 
 	int Range;                             /// missile damage range
 	int SplashFactor;                      /// missile splash divisor
@@ -393,7 +393,7 @@ public:
 	MissileConfig Smoke;                   /// trailing missile
 	LuaCallback *ImpactParticle;           /// impact particle
 	LuaCallback *SmokeParticle;            /// smoke particle
-	LuaCallback *OnImpact;                 /// called when 
+	LuaCallback *OnImpact;                 /// called when
 
 	// --- FILLED UP ---
 	CGraphic *G;         /// missile graphic

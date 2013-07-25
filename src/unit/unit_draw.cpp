@@ -457,8 +457,8 @@ void CDecoVarSpriteBar::Draw(int x, int y, const CUnitType &/*type*/, const CVar
 
 	Decoration &decosprite = DecoSprite.SpriteArray[(int)this->NSprite];
 	CGraphic &sprite = *decosprite.Sprite;
-	x += decosprite.HotPos.x; // in addition of OffsetX... Usefull ?
-	y += decosprite.HotPos.y; // in addition of OffsetY... Usefull ?
+	x += decosprite.HotPos.x; // in addition of OffsetX... Useful ?
+	y += decosprite.HotPos.y; // in addition of OffsetY... Useful ?
 
 	int n = sprite.NumFrames - 1; // frame of the sprite to show.
 	n -= (n * var.Value) / var.Max;
@@ -486,8 +486,8 @@ void CDecoVarStaticSprite::Draw(int x, int y, const CUnitType &/*type*/, const C
 	Decoration &decosprite = DecoSprite.SpriteArray[(int)this->NSprite];
 	CGraphic &sprite = *decosprite.Sprite;
 
-	x += decosprite.HotPos.x; // in addition of OffsetX... Usefull ?
-	y += decosprite.HotPos.y; // in addition of OffsetY... Usefull ?
+	x += decosprite.HotPos.x; // in addition of OffsetX... Useful ?
+	y += decosprite.HotPos.y; // in addition of OffsetY... Useful ?
 	if (this->IsCenteredInX) {
 		x -= sprite.Width / 2;
 	}

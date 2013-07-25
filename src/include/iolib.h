@@ -135,7 +135,7 @@ enum {
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/// Build libary path name
+/// Build library path name
 extern char *LibraryFileName(const char *file, char *buffer, size_t buffersize);
 
 extern bool CanAccessFile(const char *filename);

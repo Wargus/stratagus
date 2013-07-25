@@ -501,7 +501,7 @@ long CFile::PImpl::tell()
 **  Find a file with its correct extension ("", ".gz" or ".bz2")
 **
 **  @param file      The string with the file path. Upon success, the string
-**                   is replaced by the full filename witht he correct extension.
+**                   is replaced by the full filename with the correct extension.
 **  @param filesize  Size of the file buffer
 **
 **  @return true if the file has been found.

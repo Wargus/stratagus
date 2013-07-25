@@ -96,7 +96,7 @@ void DoScrollArea(int state, bool fast)
 	if (fast) {
 		stepx = (int)(UI.MouseScrollSpeed * vp->MapWidth / 2 * PixelTileSize.x * FRAMES_PER_SECOND / 4);
 		stepy = (int)(UI.MouseScrollSpeed * vp->MapHeight / 2 * PixelTileSize.y * FRAMES_PER_SECOND / 4);
-	} else {// dynamic: let these variables increase upto fast..
+	} else {// dynamic: let these variables increase up to fast..
 		// FIXME: pixels per second should be configurable
 		stepx = (int)(UI.MouseScrollSpeed * PixelTileSize.x * FRAMES_PER_SECOND / 4);
 		stepy = (int)(UI.MouseScrollSpeed * PixelTileSize.y * FRAMES_PER_SECOND / 4);

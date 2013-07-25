@@ -202,7 +202,7 @@ public:
 	int Slot;             /// Spell numeric identifier
 
 	// Spell Specifications
-	TargetType Target;          /// Targetting information. See TargetType.
+	TargetType Target;          /// Targeting information. See TargetType.
 	std::vector<SpellActionType *> Action; /// More arguments for spell (damage, delay, additional sounds...).
 
 	int Range;                  /// Max range of the target.
@@ -251,7 +251,7 @@ extern void InitSpells();
 /// done spell tables
 extern void CleanSpells();
 
-/// return 1 if spell is availible, 0 if not (must upgrade)
+/// return 1 if spell is available, 0 if not (must upgrade)
 extern bool SpellIsAvailable(const CPlayer &player, int SpellId);
 
 /// returns true if spell can be casted (enough mana, valid target)

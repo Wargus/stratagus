@@ -842,7 +842,7 @@ void AiAddUpgradeToRequest(CUnitType &type)
 */
 static void AiCheckingWork()
 {
-	// Suppy has the highest priority
+	// Supply has the highest priority
 	if (AiPlayer->NeedSupply) {
 		if (AiPlayer->UnitTypeBuilt.empty() || AiPlayer->UnitTypeBuilt[0].Type->Supply == 0) {
 			AiPlayer->NeedSupply = false;
