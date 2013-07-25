@@ -825,8 +825,8 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 #if (defined(USE_OPENGL) || defined(USE_GLES))
 	// Scale mouse-coordinates to viewport
 	if (ZoomNoResize && (event.type & (SDL_MOUSEBUTTONUP | SDL_MOUSEBUTTONDOWN | SDL_MOUSEMOTION))) {
-		event.button.x = (Uint16)floor(event.button.x * float(Video.Width) / Video.ViewportWidth);
-		event.button.y = (Uint16)floor(event.button.y * float(Video.Height) / Video.ViewportHeight);
+		event.button.x = (Uint16)floorf(event.button.x * float(Video.Width) / Video.ViewportWidth);
+		event.button.y = (Uint16)floorf(event.button.y * float(Video.Height) / Video.ViewportHeight);
 	}
 #endif
 	switch (event.type) {
