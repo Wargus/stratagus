@@ -287,7 +287,7 @@ CNetworkParameter::CNetworkParameter()
 void CNetworkParameter::FixValues()
 {
 	gameCyclesPerUpdate = std::max(gameCyclesPerUpdate, 1u);
-	NetworkLag = std::max(NetworkLag, 2u);
+	NetworkLag = std::max(NetworkLag, 2u * gameCyclesPerUpdate);
 }
 
 bool NetworkInSync = true;                 /// Network is in sync
@@ -478,15 +478,15 @@ void NetworkOnStartGame()
 	//nc.syncHash = SyncHash;
 	//nc.syncSeed = SyncRandSeed;
 
-	for (unsigned int i = 0; i <= CNetworkParameter::Instance.NetworkLag; ++i) {
+	for (unsigned int i = 0; i <= CNetworkParameter::Instance.NetworkLag; i += CNetworkParameter::Instance.gameCyclesPerUpdate) {
 		for (int n = 0; n < HostsCount; ++n) {
 			CNetworkCommandQueue (&ncqs)[MaxNetworkCommands] = NetworkIn[i][Hosts[n].PlyNr];
 
-			ncqs[0].Time = i * CNetworkParameter::Instance.gameCyclesPerUpdate;
+			ncqs[0].Time = i;
 			ncqs[0].Type = MessageSync;
 			ncqs[0].Data.resize(nc.Size());
 			nc.Serialize(&ncqs[0].Data[0]);
-			ncqs[1].Time = i * CNetworkParameter::Instance.gameCyclesPerUpdate;
+			ncqs[1].Time = i;
 			ncqs[1].Type = MessageNone;
 		}
 	}
@@ -659,7 +659,7 @@ static bool IsNetworkCommandReady(int hostIndex, unsigned long gameNetCycle)
 	const int ply = Hosts[hostIndex].PlyNr;
 	const CNetworkCommandQueue &ncq = NetworkIn[gameNetCycle & 0xFF][ply][0];
 
-	if (ncq.Time != gameNetCycle * CNetworkParameter::Instance.gameCyclesPerUpdate) {
+	if (ncq.Time != gameNetCycle) {
 		return false;
 	}
 	return true;
@@ -683,7 +683,7 @@ static void ParseResendCommand(const CNetworkPacket &packet)
 	if (n > GameCycle + 128) {
 		n -= 0x100;
 	}
-	const unsigned long gameNetCycle = n / CNetworkParameter::Instance.gameCyclesPerUpdate;
+	const unsigned long gameNetCycle = n;
 	// FIXME: not necessary to send this packet multiple times!!!!
 	// other side sends re-send until it gets an answer.
 	if (n != NetworkIn[gameNetCycle & 0xFF][ThisPlayer->Index][0].Time) {
@@ -802,9 +802,9 @@ static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHo
 				n -= 0x100;
 			}
 			const unsigned long gameNetCycle = n / CNetworkParameter::Instance.gameCyclesPerUpdate;
-			NetworkIn[gameNetCycle & 0xFF][player][i].Time = n;
-			NetworkIn[gameNetCycle & 0xFF][player][i].Type = packet.Header.Type[i];
-			NetworkIn[gameNetCycle & 0xFF][player][i].Data = packet.Command[i];
+			NetworkIn[packet.Header.Cycle][player][i].Time = n;
+			NetworkIn[packet.Header.Cycle][player][i].Type = packet.Header.Type[i];
+			NetworkIn[packet.Header.Cycle][player][i].Data = packet.Command[i];
 		} else {
 			SetMessage(_("%s sent bad command"), Players[player].Name.c_str());
 			DebugPrint("%s sent bad command: 0x%x\n" _C_ Players[player].Name.c_str()
@@ -817,8 +817,8 @@ static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHo
 	// Waiting for this time slot
 	if (!NetworkInSync) {
 		const int networkUpdates = CNetworkParameter::Instance.gameCyclesPerUpdate;
-		const unsigned long nextGameNetCycle = (GameCycle / networkUpdates) + 1;
-		if (IsNetworkCommandReady(nextGameNetCycle) == true) {
+		unsigned long n = ((GameCycle / networkUpdates) + 1) * networkUpdates;
+		if (IsNetworkCommandReady(n) == true) {
 			NetworkInSync = true;
 		}
 	}
@@ -868,13 +868,12 @@ void NetworkQuitGame()
 	}
 	const int gameCyclesPerUpdate = CNetworkParameter::Instance.gameCyclesPerUpdate;
 	const int NetworkLag = CNetworkParameter::Instance.NetworkLag;
-	const int gameNetCycle = GameCycle / gameCyclesPerUpdate;
-	const int n = gameNetCycle + 1 + NetworkLag;
+	const int n = (GameCycle + gameCyclesPerUpdate) / gameCyclesPerUpdate * gameCyclesPerUpdate + NetworkLag;
 	CNetworkCommandQueue (&ncqs)[MaxNetworkCommands] = NetworkIn[n & 0xFF][ThisPlayer->Index];
 	CNetworkCommandQuit nc;
 	nc.player = ThisPlayer->Index;
 	ncqs[0].Type = MessageQuit;
-	ncqs[0].Time = n * CNetworkParameter::Instance.gameCyclesPerUpdate;
+	ncqs[0].Time = n;
 	ncqs[0].Data.resize(nc.Size());
 	nc.Serialize(&ncqs[0].Data[0]);
 	for (int i = 1; i < MaxNetworkCommands; ++i) {
@@ -890,7 +889,7 @@ static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
 
 	CNetworkCommandSync nc;
 	nc.Deserialize(&ncq.Data[0]);
-	const unsigned long gameNetCycle = GameCycle / CNetworkParameter::Instance.gameCyclesPerUpdate;
+	const unsigned long gameNetCycle = GameCycle;
 	const int syncSeed = nc.syncSeed;
 	const int syncHash = nc.syncHash;
 
@@ -999,7 +998,7 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 		nc.syncSeed = SyncRandSeed;
 		ncq[0].Data.resize(nc.Size());
 		nc.Serialize(&ncq[0].Data[0]);
-		ncq[0].Time = gameNetCycle * CNetworkParameter::Instance.gameCyclesPerUpdate;
+		ncq[0].Time = gameNetCycle;
 		numcommands = 1;
 	} else {
 		while (!CommandsIn.empty() && numcommands < MaxNetworkCommands) {
@@ -1017,14 +1016,14 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 			}
 #endif
 			ncq[numcommands] = incommand;
-			ncq[numcommands].Time = gameNetCycle * CNetworkParameter::Instance.gameCyclesPerUpdate;
+			ncq[numcommands].Time = gameNetCycle;
 			++numcommands;
 			CommandsIn.pop_front();
 		}
 		while (!MsgCommandsIn.empty() && numcommands < MaxNetworkCommands) {
 			const CNetworkCommandQueue &incommand = MsgCommandsIn.front();
 			ncq[numcommands] = incommand;
-			ncq[numcommands].Time = gameNetCycle * CNetworkParameter::Instance.gameCyclesPerUpdate;
+			ncq[numcommands].Time = gameNetCycle;
 			++numcommands;
 			MsgCommandsIn.pop_front();
 		}
@@ -1069,11 +1068,11 @@ void NetworkCommands()
 	if ((GameCycle % CNetworkParameter::Instance.gameCyclesPerUpdate) != 0) {
 		return;
 	}
-	const unsigned long gameNetCycle = GameCycle / CNetworkParameter::Instance.gameCyclesPerUpdate;
+	const unsigned long gameNetCycle = GameCycle;
 	// Send messages to all clients (other players)
 	NetworkSendCommands(gameNetCycle + CNetworkParameter::Instance.NetworkLag);
 	NetworkExecCommands(gameNetCycle);
-	NetworkInSync = IsNetworkCommandReady(gameNetCycle + 1);
+	NetworkInSync = IsNetworkCommandReady(gameNetCycle + CNetworkParameter::Instance.gameCyclesPerUpdate);
 }
 
 static void CheckPlayerThatTimeOut(int hostIndex)
