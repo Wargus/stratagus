@@ -125,6 +125,7 @@ static const char SHIELD_KEY[] = "ShieldPoints";
 static const char POINTS_KEY[] = "Points";
 static const char MAXHARVESTERS_KEY[] = "MaxHarvesters";
 static const char POISON_KEY[] = "Poison";
+static const char SHIELDPERMEABILITY_KEY[] = "ShieldPermeability";
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -161,7 +162,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   BASICDAMAGE_KEY, POSX_KEY, POSY_KEY, RADARRANGE_KEY,
 							   RADARJAMMERRANGE_KEY, AUTOREPAIRRANGE_KEY, BLOODLUST_KEY, HASTE_KEY,
 							   SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY, SHIELD_KEY, POINTS_KEY,
-							   MAXHARVESTERS_KEY, POISON_KEY
+							   MAXHARVESTERS_KEY, POISON_KEY, SHIELDPERMEABILITY_KEY
 							  };
 
 	for (int i = 0; i < NVARALREADYDEFINED; ++i) {
@@ -497,10 +498,14 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "PoisonDrain")) {
 			type->PoisonDrain = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ShieldPoints")) {
-			type->DefaultStat.Variables[SHIELD_INDEX].Max = LuaToNumber(l, -1);
-			type->DefaultStat.Variables[SHIELD_INDEX].Value = 0;
-			type->DefaultStat.Variables[SHIELD_INDEX].Increase = 1;
-			type->DefaultStat.Variables[SHIELD_INDEX].Enable = 1;
+			if (lua_istable(l, -1)) {
+				DefineVariableField(l, type->DefaultStat.Variables + SHIELD_INDEX, -1);
+			} else if (lua_isnumber(l, -1)) {
+				type->DefaultStat.Variables[SHIELD_INDEX].Max = LuaToNumber(l, -1);
+				type->DefaultStat.Variables[SHIELD_INDEX].Value = 0;
+				type->DefaultStat.Variables[SHIELD_INDEX].Increase = 1;
+				type->DefaultStat.Variables[SHIELD_INDEX].Enable = 1;
+			}
 		} else if (!strcmp(value, "TileSize")) {
 			CclGetPos(l, &type->TileWidth, &type->TileHeight);
 		} else if (!strcmp(value, "Decoration")) {
@@ -1540,13 +1545,16 @@ void UpdateUnitVariables(CUnit &unit)
 			|| i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
 			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == HP_INDEX
 			|| i == SHIELD_INDEX || i == POINTS_INDEX || i == MAXHARVESTERS_INDEX
-			|| i == POISON_INDEX) {
+			|| i == POISON_INDEX || i == SHIELDPERMEABILITY_INDEX) {
 			continue;
 		}
 		unit.Variable[i].Value = 0;
 		unit.Variable[i].Max = 0;
 		unit.Variable[i].Enable = 1;
 	}
+
+	// Shield permeability
+	unit.Variable[SHIELDPERMEABILITY_INDEX].Max = 100;
 
 	// Transport
 	unit.Variable[TRANSPORT_INDEX].Value = unit.BoardCount;

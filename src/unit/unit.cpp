@@ -2386,7 +2386,7 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 	return cost;
 }
 
-static void HitUnit_lastAttack(const CUnit *attacker, CUnit &target)
+static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 {
 	const unsigned long lastattack = target.Attacked;
 
@@ -2427,8 +2427,11 @@ static void HitUnit_lastAttack(const CUnit *attacker, CUnit &target)
 
 static bool HitUnit_IsUnitWillDie(const CUnit *attacker, const CUnit &target, int damage)
 {
+	int shieldDamage = target.Variable[SHIELDPERMEABILITY_INDEX].Value < 100
+		? std::min(target.Variable[SHIELD_INDEX].Value, damage * (100 - target.Variable[SHIELDPERMEABILITY_INDEX].Value) / 100) 
+		: 0;
 	return (target.Variable[HP_INDEX].Value <= damage && attacker && attacker->Type->ShieldPiercing)
-		   || (target.Variable[HP_INDEX].Value <= damage - target.Variable[SHIELD_INDEX].Value)
+		   || (target.Variable[HP_INDEX].Value <= damage - shieldDamage)
 		   || (target.Variable[HP_INDEX].Value == 0);
 }
 
@@ -2451,15 +2454,19 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 	attacker.Variable[KILL_INDEX].Enable = 1;
 }
 
-static void HitUnit_applyDamage(CUnit *attacker, CUnit &target, int damage)
+static void HitUnit_ApplyDamage(CUnit *attacker, CUnit &target, int damage)
 {
 	if (attacker && attacker->Type->ShieldPiercing) {
 		target.Variable[HP_INDEX].Value -= damage;
-	} else if (target.Variable[SHIELD_INDEX].Value >= damage) {
-		target.Variable[SHIELD_INDEX].Value -= damage;
 	} else {
-		target.Variable[HP_INDEX].Value -= damage - target.Variable[SHIELD_INDEX].Value;
-		target.Variable[SHIELD_INDEX].Value = 0;
+		int shieldDamage = target.Variable[SHIELDPERMEABILITY_INDEX].Value < 100
+			? std::min(target.Variable[SHIELD_INDEX].Value, damage * (100 - target.Variable[SHIELDPERMEABILITY_INDEX].Value) / 100) 
+			: 0;
+		if (shieldDamage) {
+			target.Variable[SHIELD_INDEX].Value -= shieldDamage;
+			clamp(&target.Variable[SHIELD_INDEX].Value, 0, target.Variable[SHIELD_INDEX].Max);
+		}
+		target.Variable[HP_INDEX].Value -= damage - shieldDamage;
 	}
 	if (UseHPForXp && attacker && target.IsEnemy(*attacker)) {
 		attacker->Variable[XP_INDEX].Value += damage;
@@ -2633,7 +2640,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 			damage = 0;
 		}
 	}
-	HitUnit_lastAttack(attacker, target);
+	HitUnit_LastAttack(attacker, target);
 	const CUnitType *type = target.Type;
 	if (attacker) {
 		target.DamagedType = ExtraDeathIndex(attacker->Type->DamageType.c_str());
@@ -2655,7 +2662,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		return;
 	}
 
-	HitUnit_applyDamage(attacker, target, damage);
+	HitUnit_ApplyDamage(attacker, target, damage);
 	HitUnit_BuildingCapture(attacker, target, damage);
 	HitUnit_ShowDamageMissile(target, damage);
 

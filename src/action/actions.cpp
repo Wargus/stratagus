@@ -311,8 +311,6 @@ static bool HandleBurnAndPoison(CUnit &unit)
 */
 static void HandleBuffsEachSecond(CUnit &unit)
 {
-	unit.Variable[SHIELD_INDEX].Increase = 1;
-
 	// User defined variables
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
 		if (i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
