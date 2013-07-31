@@ -126,6 +126,7 @@ static const char POINTS_KEY[] = "Points";
 static const char MAXHARVESTERS_KEY[] = "MaxHarvesters";
 static const char POISON_KEY[] = "Poison";
 static const char SHIELDPERMEABILITY_KEY[] = "ShieldPermeability";
+static const char SHIELDPIERCING_KEY[] = "ShieldPiercing";
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -162,7 +163,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   BASICDAMAGE_KEY, POSX_KEY, POSY_KEY, RADARRANGE_KEY,
 							   RADARJAMMERRANGE_KEY, AUTOREPAIRRANGE_KEY, BLOODLUST_KEY, HASTE_KEY,
 							   SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY, SHIELD_KEY, POINTS_KEY,
-							   MAXHARVESTERS_KEY, POISON_KEY, SHIELDPERMEABILITY_KEY
+							   MAXHARVESTERS_KEY, POISON_KEY, SHIELDPERMEABILITY_KEY, SHIELDPIERCING_KEY
 							  };
 
 	for (int i = 0; i < NVARALREADYDEFINED; ++i) {
@@ -330,7 +331,6 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 	type.BoolFlag[DECORATION_INDEX].value            = type.Decoration;
 	type.BoolFlag[INDESTRUCTIBLE_INDEX].value        = type.Indestructible;
 	type.BoolFlag[TELEPORTER_INDEX].value            = type.Teleporter;
-	type.BoolFlag[SHIELDPIERCE_INDEX].value          = type.ShieldPiercing;
 	type.BoolFlag[SAVECARGO_INDEX].value             = type.SaveCargo;
 	type.BoolFlag[NONSOLID_INDEX].value              = type.NonSolid;
 	type.BoolFlag[WALL_INDEX].value                  = type.Wall;
@@ -964,8 +964,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->SelectableByRectangle = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Teleporter")) {
 			type->Teleporter = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "ShieldPiercing")) {
-			type->ShieldPiercing = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SaveCargo")) {
 			type->SaveCargo = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NonSolid")) {
@@ -1545,7 +1543,7 @@ void UpdateUnitVariables(CUnit &unit)
 			|| i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
 			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == HP_INDEX
 			|| i == SHIELD_INDEX || i == POINTS_INDEX || i == MAXHARVESTERS_INDEX
-			|| i == POISON_INDEX || i == SHIELDPERMEABILITY_INDEX) {
+			|| i == POISON_INDEX || i == SHIELDPERMEABILITY_INDEX || i == SHIELDPIERCING_INDEX) {
 			continue;
 		}
 		unit.Variable[i].Value = 0;
