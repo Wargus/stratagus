@@ -694,6 +694,7 @@ option(ENABLE_DOC "Generate Stratagus source code documentation with Doxygen" OF
 option(ENABLE_DEV "Install Stratagus game development headers files" OFF)
 option(ENABLE_UPX "Compress Stratagus executable binary with UPX packer" OFF)
 option(ENABLE_STRIP "Strip all symbols from executables" OFF)
+option(ENABLE_USEGAMEDIR "Place all files created by Stratagus(logs, savegames) in game directory(old behavior), otherwise place everything in user directory(new behavior)" OFF)
 
 if(NOT WITH_RENDERER)
 	if(OPENGL_FOUND)
@@ -893,6 +894,10 @@ if(ENABLE_STRIP)
 	# TODO: Add support for other compilers
 endif()
 
+if(ENABLE_USEGAMEDIR)
+	add_definitions(-DUSE_GAME_DIR)
+endif()
+
 if(ENABLE_TOUCHSCREEN)
 	add_definitions(-DUSE_TOUCHSCREEN)
 endif()
@@ -927,6 +932,12 @@ if(ENABLE_STATIC)
 	message("Static linking: Yes (Disable by param -DENABLE_STATIC=OFF)")
 else()
 	message("Static linking: No (Enable by param -DENABLE_STATIC=ON)")
+endif()
+
+if(ENABLE_USEGAMEDIR)
+	message("Place game files in: game directory (Place in user directory with -DENABLE_USEGAMEDIR=OFF)")
+else()
+	message("Place game files in: user directory (Place in game directory with -DENABLE_USEGAMEDIR=ON)")
 endif()
 
 if(WIN32 AND MSVC)

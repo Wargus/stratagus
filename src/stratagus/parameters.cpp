@@ -48,7 +48,9 @@ void Parameters::SetDefaultValues()
 
 void Parameters::SetDefaultUserDirectory()
 {
-#ifdef USE_WIN32
+#ifdef USE_GAME_DIR
+	userDirectory = StratagusLibPath;
+#elif USE_WIN32
 	userDirectory = getenv("APPDATA");
 #else
 	userDirectory = getenv("HOME");
@@ -58,7 +60,8 @@ void Parameters::SetDefaultUserDirectory()
 		userDirectory += "/";
 	}
 
-#ifdef USE_WIN32
+#ifdef USE_GAME_DIR
+#elif USE_WIN32
 	userDirectory += "Stratagus";
 #elif defined(USE_MAC)
 	userDirectory += "Library/Stratagus";
