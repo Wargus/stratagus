@@ -296,19 +296,21 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
-		unsigned char *pixels = new unsigned char[UI.Minimap.W * UI.Minimap.H * 3];
-		if (!pixels) {
+		unsigned char *row = new unsigned char[UI.Minimap.W * 3];
+		if (!row) {
 			fprintf(stderr, "Out of memory\n");
 			exit(1);
 		}
-#ifdef USE_OPENGL
-		glReadBuffer(GL_FRONT);
-#endif
-		glReadPixels(UI.Minimap.X, UI.Minimap.Y, UI.Minimap.W, UI.Minimap.H, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 		for (int i = 0; i < UI.Minimap.H; ++i) {
-			png_write_row(png_ptr, pixels + (UI.Minimap.H - 1 - i) * UI.Minimap.W * 3);
+			for (int j = 0; j < UI.Minimap.W; ++j) {
+				Uint32 c = ((Uint32 *)MinimapSurfaceGL)[j + i * UI.Minimap.W];
+				row[j * 3 + 0] = ((c & RMASK) >> RSHIFT);
+				row[j * 3 + 1] = ((c & GMASK) >> GSHIFT);
+				row[j * 3 + 2] = ((c & BMASK) >> BSHIFT);
+			}
+			png_write_row(png_ptr, row);
 		}
-		delete[] pixels;
+		delete[] row;
 	} else
 #endif
 	{
