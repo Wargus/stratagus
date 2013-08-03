@@ -294,23 +294,53 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 
 	png_write_info(png_ptr, info_ptr);
 
+	const int rectSize = 5; // size of rectange used for player start spots
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
-		unsigned char *row = new unsigned char[UI.Minimap.W * 3];
-		if (!row) {
+		unsigned char *pixels = new unsigned char[UI.Minimap.W * UI.Minimap.H * 3];
+		if (!pixels) {
 			fprintf(stderr, "Out of memory\n");
 			exit(1);
 		}
+		// Copy GL map surface to pixel array
 		for (int i = 0; i < UI.Minimap.H; ++i) {
 			for (int j = 0; j < UI.Minimap.W; ++j) {
 				Uint32 c = ((Uint32 *)MinimapSurfaceGL)[j + i * UI.Minimap.W];
-				row[j * 3 + 0] = ((c & RMASK) >> RSHIFT);
-				row[j * 3 + 1] = ((c & GMASK) >> GSHIFT);
-				row[j * 3 + 2] = ((c & BMASK) >> BSHIFT);
+				const int offset = (i * UI.Minimap.W + j) * 3;
+				pixels[offset + 0] = ((c & RMASK) >> RSHIFT);
+				pixels[offset + 1] = ((c & GMASK) >> GSHIFT);
+				pixels[offset + 2] = ((c & BMASK) >> BSHIFT);
 			}
-			png_write_row(png_ptr, row);
 		}
-		delete[] row;
+		// Add player start spots
+		for (int i = 0; i < PlayerMax - 1; ++i) {
+			if (Players[i].Type != PlayerNobody) {
+				for (int j = -rectSize / 2; j <= rectSize / 2; ++j) {
+					for (int k = -rectSize / 2; k <= rectSize / 2; ++k) {
+						const int miniMapX = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidth;
+						const int miniMapY = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeight;
+						if (miniMapX + j < 0 || miniMapX + j >= UI.Minimap.W) {
+							continue;
+						}
+						if (miniMapY + k < 0 || miniMapY + k >= UI.Minimap.H) {
+							continue;
+						}
+						const int offset = ((miniMapX + j) * UI.Minimap.W + miniMapY + k) * 3;
+						pixels[offset + 0] = ((Players[i].Color & RMASK) >> RSHIFT);
+						pixels[offset + 1] = ((Players[i].Color & GMASK) >> GSHIFT);
+						pixels[offset + 2] = ((Players[i].Color & BMASK) >> BSHIFT);
+					}
+				}
+			}
+		}
+		// Write everything in PNG
+		for (int i = 0; i < UI.Minimap.H; ++i) {
+			unsigned char *row = new unsigned char[UI.Minimap.W * 3];
+			memcpy(row, pixels + i * UI.Minimap.W * 3, UI.Minimap.W * 3);
+			png_write_row(png_ptr, row);
+			delete[] row;
+		}
+		delete[] pixels;
 	} else
 #endif
 	{
@@ -323,7 +353,6 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 		SDL_LockSurface(preview);
 
 		SDL_Rect rect;
-		const unsigned int rectSize = 5;
 		for (int i = 0; i < PlayerMax - 1; ++i) {
 			if (Players[i].Type != PlayerNobody) {
 				rect.x = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidth - rectSize / 2;
