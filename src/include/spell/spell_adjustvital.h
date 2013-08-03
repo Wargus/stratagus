@@ -41,7 +41,7 @@
 class Spell_AdjustVital : public SpellActionType
 {
 public:
-	Spell_AdjustVital() : SpellActionType(1), HP(0), Mana(0), MaxMultiCast(0) {};
+	Spell_AdjustVital() : SpellActionType(1), HP(0), Mana(0), Shield(0), MaxMultiCast(0) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
@@ -49,6 +49,7 @@ public:
 private:
 	int HP;         /// Target HP gain.(can be negative)
 	int Mana;       /// Target Mana gain.(can be negative)
+	int Shield;     /// Target SP gain.(can be negative)
 	/// This spell is designed to be used wit very small amounts. The spell
 	/// can scale up to MaxMultiCast times. Use 0 for infinite.
 	int MaxMultiCast;

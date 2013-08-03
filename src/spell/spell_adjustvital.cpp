@@ -46,6 +46,8 @@
 			this->HP = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "mana-points")) {
 			this->Mana = LuaToNumber(l, -1, j + 1);
+		} else if (!strcmp(value, "shield-points")) {
+			this->Shield = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "max-multi-cast")) {
 			this->MaxMultiCast = LuaToNumber(l, -1, j + 1);
 		} else {
@@ -73,9 +75,11 @@
 
 	const int hp = this->HP;
 	const int mana = this->Mana;
+	const int shield = this->Shield;
 	const int manacost = spell.ManaCost;
 	int diffHP;
 	int diffMana;
+	int diffShield;
 
 	//  Healing and harming
 	if (hp > 0) {
@@ -89,6 +93,12 @@
 		diffMana = target->Variable[MANA_INDEX].Value;
 	}
 
+	if (shield > 0) {
+		diffShield = target->Stats->Variables[SHIELD_INDEX].Max - target->Variable[SHIELD_INDEX].Value;
+	} else {
+		diffShield = target->Variable[SHIELD_INDEX].Value;
+	}
+
 	//  When harming cast again to send the hp to negative values.
 	//  Careful, a perfect 0 target hp kills too.
 	//  Avoid div by 0 errors too!
@@ -100,6 +110,10 @@
 	if (mana) {
 		castcount = std::max<int>(castcount,
 								  diffMana / abs(mana) + (((mana < 0) && (diffMana % (-mana) > 0)) ? 1 : 0));
+	}
+	if (shield) {
+		castcount = std::max<int>(castcount,
+			diffShield / abs(shield) + (((shield < 0) && (diffShield % (-shield) > 0)) ? 1 : 0));
 	}
 	if (manacost) {
 		castcount = std::min<int>(castcount, caster.Variable[MANA_INDEX].Value / manacost);
@@ -122,6 +136,8 @@
 	}
 	target->Variable[MANA_INDEX].Value += castcount * mana;
 	clamp(&target->Variable[MANA_INDEX].Value, 0, target->Variable[MANA_INDEX].Max);
+	target->Variable[SHIELD_INDEX].Value += castcount * shield;
+	clamp(&target->Variable[SHIELD_INDEX].Value, 0, target->Variable[SHIELD_INDEX].Max);
 
 	if (spell.RepeatCast) {
 		return 1;

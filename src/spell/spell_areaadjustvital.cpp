@@ -47,6 +47,10 @@
 			this->HP = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "mana-points")) {
 			this->Mana = LuaToNumber(l, -1, j + 1);
+		} else if (!strcmp(value, "shield-points")) {
+			this->Shield = LuaToNumber(l, -1, j + 1);
+		} else if (!strcmp(value, "range")) {
+			this->Range = LuaToNumber(l, -1, j + 1);
 		} else {
 			LuaError(l, "Unsupported area-adjust-vitals tag: %s" _C_ value);
 		}
@@ -65,7 +69,7 @@
 */
 /* virtual */ int Spell_AreaAdjustVital::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos)
 {
-	const Vec2i range(spell.Range, spell.Range);
+	const Vec2i range(this->Range, this->Range);
 	const Vec2i typeSize(caster.Type->Width, caster.Type->Height);
 	std::vector<CUnit *> units;
 
@@ -73,6 +77,7 @@
 	Select(goalPos - range, goalPos + typeSize + range, units);
 	int hp = this->HP;
 	int mana = this->Mana;
+	int shield = this->Shield;
 	caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
 	for (size_t j = 0; j != units.size(); ++j) {
 		target = units[j];
@@ -88,6 +93,8 @@
 		}
 		target->Variable[MANA_INDEX].Value += mana;
 		clamp(&target->Variable[MANA_INDEX].Value, 0, target->Variable[MANA_INDEX].Max);
+		target->Variable[SHIELD_INDEX].Value += shield;
+		clamp(&target->Variable[SHIELD_INDEX].Value, 0, target->Variable[SHIELD_INDEX].Max);
 	}
 	return 0;
 }

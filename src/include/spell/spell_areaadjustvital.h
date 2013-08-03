@@ -41,7 +41,7 @@
 class Spell_AreaAdjustVital : public SpellActionType
 {
 public:
-	Spell_AreaAdjustVital() : HP(0), Mana(0) {};
+	Spell_AreaAdjustVital() : HP(0), Mana(0), Shield(0), Range(1) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
@@ -49,6 +49,8 @@ public:
 private:
 	int HP;         /// Target HP gain.(can be negative)
 	int Mana;       /// Target Mana gain.(can be negative)
+	int Shield;     /// Target SP gain.(can be negative)
+	int Range;      /// Range of spell
 };
 
 //@}
