@@ -576,6 +576,7 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 		case ButtonUpgradeTo:
 			memcpy(Costs, UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs,
 				   sizeof(UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs));
+			Costs[FoodCost] = UnitTypes[button.Value]->Demand;
 			break;
 		default:
 			break;

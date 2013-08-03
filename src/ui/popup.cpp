@@ -223,7 +223,7 @@
 	int popupWidth = 0;
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 
-	for (unsigned int i = 1; i < MaxCosts; ++i) {
+	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
 			if (UI.Resources[i].IconWidth != -1)	{
 				popupWidth += (UI.Resources[i].IconWidth + 5);
@@ -236,7 +236,7 @@
 			popupWidth += (font.Width(Costs[i]) + 5);
 		}
 	}
-	if (Costs[MaxCosts]) {
+	if (Costs[ManaResCost]) {
 		const CGraphic *G = UI.Resources[ManaResCost].G;
 		const SpellType *spell = SpellTypeTable[button.Value];
 
@@ -277,7 +277,7 @@
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, this->TextColor, this->HighlightColor);
 
-	for (unsigned int i = 1; i < MaxCosts; ++i) {
+	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
 			int y_offset = 0;
 			const CGraphic *G = UI.Resources[i].G;
