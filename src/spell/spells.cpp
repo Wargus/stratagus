@@ -46,6 +46,7 @@
 
 #include "spells.h"
 
+#include "actions.h"
 #include "commands.h"
 #include "map.h"
 #include "sound.h"
@@ -408,9 +409,19 @@ int AutoCastSpell(CUnit &caster, const SpellType &spell)
 	if (target == NULL) {
 		return 0;
 	} else {
+		// Save previous order
+		COrder *savedOrder = NULL;
+		if (caster.CurrentAction() == UnitActionStill) {
+			savedOrder = COrder::NewActionAttack(caster, caster.tilePos);
+		} else if (caster.CanStoreOrder(caster.CurrentOrder())) {
+			savedOrder = caster.CurrentOrder()->Clone();
+		}
 		// Must move before ?
 		CommandSpellCast(caster, target->targetPos, target->Unit, spell, FlushCommands);
 		delete target;
+		if (savedOrder != NULL) {
+			caster.SavedOrder = savedOrder;
+		}
 	}
 	return 1;
 }

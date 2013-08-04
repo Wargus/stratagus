@@ -311,7 +311,9 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				if (unit.Player->AiEnabled) {
 					DebugPrint("FIXME: do we need an AI callback?\n");
 				}
-				this->Finished = true;
+				if (!unit.RestoreOrder()) {
+					this->Finished = true;
+				}
 				return ;
 			}
 			if (CheckForDeadGoal(unit)) {
@@ -324,7 +326,9 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		case 1:                         // Move to the target.
 			if (spell.Range && spell.Range != INFINITE_RANGE) {
 				if (SpellMoveToTarget(unit) == true) {
-					this->Finished = true;
+					if (!unit.RestoreOrder()) {
+						this->Finished = true;
+					}
 					return ;
 				}
 				return ;
@@ -359,7 +363,9 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				return;
 			}
 			if (!unit.ReCast && unit.CurrentAction() != UnitActionDie) {
-				this->Finished = true;
+				if (!unit.RestoreOrder()) {
+					this->Finished = true;
+				}
 				return ;
 			}
 			break;
