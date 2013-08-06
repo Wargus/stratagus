@@ -212,7 +212,7 @@ bool ButtonCheckUnitsAnd(const CUnit &unit, const ButtonAction &button)
 */
 bool ButtonCheckUnitsNot(const CUnit &unit, const ButtonAction &button)
 {
-    return !ButtonCheckUnitsAnd(unit, button);
+	return !ButtonCheckUnitsAnd(unit, button);
 }
 
 /**

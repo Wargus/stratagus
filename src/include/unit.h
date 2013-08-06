@@ -355,7 +355,7 @@ public:
 	unsigned Boarded : 1;        /// Unit is on board a transporter.
 	unsigned CacheLock : 1;      /// Unit is on lock by unitcache operations.
 
-	unsigned Summoned : 1;       /// Unit is summoned using spells. 
+	unsigned Summoned : 1;       /// Unit is summoned using spells.
 
 	unsigned TeamSelected;  /// unit is selected by a team member.
 	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.

@@ -222,7 +222,7 @@ static unsigned char VolumeForDistance(unsigned short d, unsigned char range)
 static unsigned char CalculateVolume(bool isVolume, int power, unsigned char range)
 {
 	if (isVolume) {
-		return std::min (MaxVolume, power);
+		return std::min(MaxVolume, power);
 	} else {
 		// map distance to volume
 		return VolumeForDistance(power, range);

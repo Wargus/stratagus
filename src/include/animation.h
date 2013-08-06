@@ -80,7 +80,7 @@ enum AnimationType {
 enum SetVar_ModifyTypes {
 	modSet = 0,      /// Set value to this
 	modAdd,          /// Addition
-	modSub,          /// Subtraction 
+	modSub,          /// Subtraction
 	modMul,          /// Multiplication
 	modDiv,          /// Division
 	modMod,          /// Modulo

@@ -756,7 +756,8 @@ void CNetworkPacket::Deserialize(const unsigned char *p, unsigned int len, int *
 	}
 }
 
-size_t CNetworkPacket::Size(int numcommands) const {
+size_t CNetworkPacket::Size(int numcommands) const
+{
 	size_t size = 0;
 
 	size += this->Header.Serialize(NULL);

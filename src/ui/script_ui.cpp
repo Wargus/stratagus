@@ -212,7 +212,7 @@ static int CclSetZoomNoResize(lua_State *l)
 		if (!ForceUseOpenGL) {
 			ZoomNoResize = LuaToBoolean(l, 1);
 			if (ZoomNoResize) {
-			    UseOpenGL = true;
+				UseOpenGL = true;
 			}
 		}
 	}

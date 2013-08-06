@@ -862,7 +862,7 @@ static void DrawMapCursor()
 static void DrawCross(const PixelPos &topleft_pos, const PixelSize &size, Uint32 color)
 {
 	const PixelPos lt = topleft_pos;
-	const PixelPos lb(topleft_pos.x,topleft_pos.y + size.y);
+	const PixelPos lb(topleft_pos.x, topleft_pos.y + size.y);
 	const PixelPos rt(topleft_pos.x + size.x, topleft_pos.y);
 	const PixelPos rb = topleft_pos + size;
 
@@ -957,8 +957,8 @@ static void ShowUnitInfo(const CUnit &unit)
 	char buf[256];
 
 	int n = sprintf(buf, "#%d '%s' Player:#%d %s", UnitNumber(unit),
-				unit.Type->Name.c_str(), unit.Player->Index,
-				unit.Active ? "active" : "passive");
+					unit.Type->Name.c_str(), unit.Player->Index,
+					unit.Active ? "active" : "passive");
 	if (unit.Type->GivesResource) {
 		sprintf(buf + n, " Amount %d", unit.ResourcesHeld);
 	}

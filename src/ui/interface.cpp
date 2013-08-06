@@ -872,7 +872,7 @@ static int InputKey(int key)
 				NetworkSendChatMessage(chatMessage);
 			}
 		}
-			// FALL THROUGH
+		// FALL THROUGH
 		case SDLK_ESCAPE:
 			KeyState = KeyStateCommand;
 			UI.StatusLine.Clear();

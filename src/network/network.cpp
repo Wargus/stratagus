@@ -258,8 +258,7 @@ public:
 	CNetworkCommandQueue() : Time(0), Type(0) {}
 	void Clear() { this->Time = this->Type = 0; Data.clear(); }
 
-	bool operator == (const CNetworkCommandQueue &rhs) const
-	{
+	bool operator == (const CNetworkCommandQueue &rhs) const {
 		return Time == rhs.Time && Type == rhs.Type && Data == rhs.Data;
 	}
 	bool operator != (const CNetworkCommandQueue &rhs) const { return !(*this == rhs); }
@@ -310,8 +309,7 @@ public:
 		resentPacketCount(0)
 	{}
 
-	void print() const
-	{
+	void print() const {
 		DebugPrint("resent: %d packets\n" _C_ resentPacketCount);
 	}
 
@@ -364,7 +362,7 @@ static void NetworkBroadcast(const CNetworkPacket &packet, int numcommands)
 **
 **  @param ncq  Outgoing network queue start.
 */
-static void NetworkSendPacket(const CNetworkCommandQueue (&ncq)[MaxNetworkCommands])
+static void NetworkSendPacket(const CNetworkCommandQueue(&ncq)[MaxNetworkCommands])
 {
 	CNetworkPacket packet;
 
@@ -480,7 +478,7 @@ void NetworkOnStartGame()
 
 	for (unsigned int i = 0; i <= CNetworkParameter::Instance.NetworkLag; i += CNetworkParameter::Instance.gameCyclesPerUpdate) {
 		for (int n = 0; n < HostsCount; ++n) {
-			CNetworkCommandQueue (&ncqs)[MaxNetworkCommands] = NetworkIn[i][Hosts[n].PlyNr];
+			CNetworkCommandQueue(&ncqs)[MaxNetworkCommands] = NetworkIn[i][Hosts[n].PlyNr];
 
 			ncqs[0].Time = i;
 			ncqs[0].Type = MessageSync;
@@ -868,7 +866,7 @@ void NetworkQuitGame()
 	const int gameCyclesPerUpdate = CNetworkParameter::Instance.gameCyclesPerUpdate;
 	const int NetworkLag = CNetworkParameter::Instance.NetworkLag;
 	const int n = (GameCycle + gameCyclesPerUpdate) / gameCyclesPerUpdate * gameCyclesPerUpdate + NetworkLag;
-	CNetworkCommandQueue (&ncqs)[MaxNetworkCommands] = NetworkIn[n & 0xFF][ThisPlayer->Index];
+	CNetworkCommandQueue(&ncqs)[MaxNetworkCommands] = NetworkIn[n & 0xFF][ThisPlayer->Index];
 	CNetworkCommandQuit nc;
 	nc.player = ThisPlayer->Index;
 	ncqs[0].Type = MessageQuit;
@@ -988,7 +986,7 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 {
 	// No command available, send sync.
 	int numcommands = 0;
-	CNetworkCommandQueue (&ncq)[MaxNetworkCommands] = NetworkIn[gameNetCycle & 0xFF][ThisPlayer->Index];
+	CNetworkCommandQueue(&ncq)[MaxNetworkCommands] = NetworkIn[gameNetCycle & 0xFF][ThisPlayer->Index];
 	ncq[0].Clear();
 	if (CommandsIn.empty() && MsgCommandsIn.empty()) {
 		CNetworkCommandSync nc;

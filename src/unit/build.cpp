@@ -145,34 +145,34 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 			 (!this->RestrictTypeOwner.compare("enemy") && ThisPlayer->IsEnemy(*table[i]->Player)))) {
 
 			switch (this->DistanceType) {
-			case GreaterThan :
-			case GreaterThanEqual :
-				if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
-					return false;
-				}
-				break;
+				case GreaterThan :
+				case GreaterThanEqual :
+					if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
+						return false;
+					}
+					break;
 				case LessThan :
 				case LessThanEqual :
-				if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
-					return true;
-				}
-				break;
-			case Equal :
-				if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
-					return true;
-				}
-				break;
-			case NotEqual :
-				if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
-					return false;
-				}
-				break;
+					if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
+						return true;
+					}
+					break;
+				case Equal :
+					if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
+						return true;
+					}
+					break;
+				case NotEqual :
+					if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
+						return false;
+					}
+					break;
 			}
 		}
 	}
 	return (this->DistanceType == GreaterThan ||
-		this->DistanceType == GreaterThanEqual ||
-		this->DistanceType == NotEqual);
+			this->DistanceType == GreaterThanEqual ||
+			this->DistanceType == NotEqual);
 }
 
 inline bool CBuildRestrictionAddOn::functor::operator()(const CUnit *const unit) const

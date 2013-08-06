@@ -2428,8 +2428,8 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 static bool HitUnit_IsUnitWillDie(const CUnit *attacker, const CUnit &target, int damage)
 {
 	int shieldDamage = target.Variable[SHIELDPERMEABILITY_INDEX].Value < 100
-		? std::min(target.Variable[SHIELD_INDEX].Value, damage * (100 - target.Variable[SHIELDPERMEABILITY_INDEX].Value) / 100) 
-		: 0;
+					   ? std::min(target.Variable[SHIELD_INDEX].Value, damage * (100 - target.Variable[SHIELDPERMEABILITY_INDEX].Value) / 100)
+					   : 0;
 	return (target.Variable[HP_INDEX].Value <= damage && attacker && attacker->Variable[SHIELDPIERCING_INDEX].Value)
 		   || (target.Variable[HP_INDEX].Value <= damage - shieldDamage)
 		   || (target.Variable[HP_INDEX].Value == 0);
@@ -2460,8 +2460,8 @@ static void HitUnit_ApplyDamage(CUnit *attacker, CUnit &target, int damage)
 		target.Variable[HP_INDEX].Value -= damage;
 	} else {
 		int shieldDamage = target.Variable[SHIELDPERMEABILITY_INDEX].Value < 100
-			? std::min(target.Variable[SHIELD_INDEX].Value, damage * (100 - target.Variable[SHIELDPERMEABILITY_INDEX].Value) / 100) 
-			: 0;
+						   ? std::min(target.Variable[SHIELD_INDEX].Value, damage * (100 - target.Variable[SHIELDPERMEABILITY_INDEX].Value) / 100)
+						   : 0;
 		if (shieldDamage) {
 			target.Variable[SHIELD_INDEX].Value -= shieldDamage;
 			clamp(&target.Variable[SHIELD_INDEX].Value, 0, target.Variable[SHIELD_INDEX].Max);

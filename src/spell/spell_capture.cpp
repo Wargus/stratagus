@@ -123,8 +123,6 @@
 	} else {
 		caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
 	}
-	
-	
 	return 0;
 }
 

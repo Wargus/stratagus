@@ -1077,7 +1077,7 @@ void CInfoPanel::Draw()
 			//
 			DrawInfoPanelBackground(0);
 			for (int i = 0; i < std::min<int>(NumSelected, UI.SelectedButtons.size()); ++i) {
-				const CIcon& icon = *Selected[i]->Type->Icon.Icon;
+				const CIcon &icon = *Selected[i]->Type->Icon.Icon;
 				const PixelPos pos(UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 				icon.DrawUnitIcon(*UI.SelectedButtons[i].Style,
 								  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?

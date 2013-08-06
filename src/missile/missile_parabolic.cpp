@@ -79,13 +79,13 @@ static bool ParabolicMissile(Missile &missile)
 	missile.position.y += z * zprojToY / 64;
 	missile.MissileNewHeadingFromXY(missile.position - orig_pos);
 	for (; pos.x * sign.x <= missile.position.x * sign.x
-		&& pos.y * sign.y <= missile.position.y * sign.y;
-		pos.x += (double)diff.x * missile.Type->SmokePrecision / missile.TotalStep,
-		pos.y += (double)diff.y * missile.Type->SmokePrecision / missile.TotalStep) {
+		 && pos.y * sign.y <= missile.position.y * sign.y;
+		 pos.x += (double)diff.x * missile.Type->SmokePrecision / missile.TotalStep,
+		 pos.y += (double)diff.y * missile.Type->SmokePrecision / missile.TotalStep) {
 
 		if (missile.Type->Smoke.Missile && missile.CurrentStep) {
 			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
-				(int)pos.y + missile.Type->size.y / 2);
+									(int)pos.y + missile.Type->size.y / 2);
 			Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position);
 			if (smoke && smoke->Type->NumDirections > 1) {
 				smoke->MissileNewHeadingFromXY(diff);
@@ -94,7 +94,7 @@ static bool ParabolicMissile(Missile &missile)
 
 		if (missile.Type->SmokeParticle && missile.CurrentStep) {
 			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
-				(int)pos.y + missile.Type->size.y / 2);
+									(int)pos.y + missile.Type->size.y / 2);
 			missile.Type->SmokeParticle->pushPreamble();
 			missile.Type->SmokeParticle->pushInteger(position.x);
 			missile.Type->SmokeParticle->pushInteger(position.y);

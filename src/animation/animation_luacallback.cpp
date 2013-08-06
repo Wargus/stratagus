@@ -73,11 +73,11 @@
 	lua_pop(l, 1);
 
 	for (size_t begin = std::min(len, str.find_first_not_of(' ', end));
-		begin != std::string::npos;) {
-			end = std::min(len, str.find(' ', begin));
+		 begin != std::string::npos;) {
+		end = std::min(len, str.find(' ', begin));
 
-			this->cbArgs.push_back(str.substr(begin, end - begin));
-			begin = str.find_first_not_of(' ', end);
+		this->cbArgs.push_back(str.substr(begin, end - begin));
+		begin = str.find_first_not_of(' ', end);
 	}
 }
 

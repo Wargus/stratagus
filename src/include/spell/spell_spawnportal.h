@@ -49,7 +49,7 @@ public:
 private:
 	CUnitType *PortalType;   /// The unit type spawned
 	int TTL;                 /// Time to live for summoned portal. 0 means infinite
-	bool CurrentPlayer;      /// If true, summon portal for caster's player rather than neutral 
+	bool CurrentPlayer;      /// If true, summon portal for caster's player rather than neutral
 };
 
 

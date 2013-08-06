@@ -84,7 +84,7 @@
 		portal->MoveToXY(goalPos);
 	} else {
 		portal = MakeUnitAndPlace(goalPos, *this->PortalType,
-			CurrentPlayer ? caster.Player : &Players[PlayerNumNeutral]);
+								  CurrentPlayer ? caster.Player : &Players[PlayerNumNeutral]);
 		portal->Summoned = 1;
 	}
 	portal->TTL = GameCycle + this->TTL;
