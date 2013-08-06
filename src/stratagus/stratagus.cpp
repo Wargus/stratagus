@@ -609,7 +609,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				Video.FullScreen = 0;
 				continue;
 #if defined(USE_OPENGL) || defined(USE_GLES)
-		        case 'Z':
+			case 'Z':
 				ForceUseOpenGL = 1;
 				UseOpenGL = 1;
 				ZoomNoResize = 1;
