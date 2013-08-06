@@ -801,7 +801,6 @@ static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHo
 			if (n > GameCycle + 128) {
 				n -= 0x100;
 			}
-			const unsigned long gameNetCycle = n / CNetworkParameter::Instance.gameCyclesPerUpdate;
 			NetworkIn[packet.Header.Cycle][player][i].Time = n;
 			NetworkIn[packet.Header.Cycle][player][i].Type = packet.Header.Type[i];
 			NetworkIn[packet.Header.Cycle][player][i].Data = packet.Command[i];
