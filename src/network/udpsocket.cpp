@@ -69,13 +69,12 @@ bool CHost::isValid() const
 class CUDPSocket_Impl
 {
 public:
-	CUDPSocket_Impl() : socket((Socket)-1) {}
+	CUDPSocket_Impl() : socket(Socket(-1) {}
 	~CUDPSocket_Impl() { if (IsValid()) { Close(); } }
 	bool Open(const CHost &host) { socket = NetOpenUDP(host.getIp(), host.getPort()); return socket != INVALID_SOCKET; }
-	void Close() { NetCloseUDP(socket); socket = ((Socket)-1); }
+	void Close() { NetCloseUDP(socket); socket = Socket(-1); }
 	void Send(const CHost &host, const void *buf, unsigned int len) { NetSendUDP(socket, host.getIp(), host.getPort(), buf, len); }
-	int Recv(void *buf, int len, CHost *hostFrom)
-	{
+	int Recv(void *buf, int len, CHost *hostFrom) {
 		unsigned long ip;
 		int port;
 		int res = NetRecvUDP(socket, buf, len, &ip, &port);
@@ -84,7 +83,7 @@ public:
 	}
 	void SetNonBlocking() { NetSetNonBlocking(socket); }
 	int HasDataToRead(int timeout) { return NetSocketReady(socket, timeout); }
-	bool IsValid() const { return socket != (Socket)-1; }
+	bool IsValid() const { return socket != Socket(-1); }
 private:
 	Socket socket;
 };
