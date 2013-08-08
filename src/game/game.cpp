@@ -325,7 +325,7 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 						if (miniMapY + k < 0 || miniMapY + k >= UI.Minimap.H) {
 							continue;
 						}
-						const int offset = ((miniMapX + j) * UI.Minimap.W + miniMapY + k) * 3;
+						const int offset = ((miniMapY + k) * UI.Minimap.H + miniMapX + j) * 3;
 						pixels[offset + 0] = ((Players[i].Color & RMASK) >> RSHIFT);
 						pixels[offset + 1] = ((Players[i].Color & GMASK) >> GSHIFT);
 						pixels[offset + 2] = ((Players[i].Color & BMASK) >> BSHIFT);
