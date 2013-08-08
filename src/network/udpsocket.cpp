@@ -69,7 +69,7 @@ bool CHost::isValid() const
 class CUDPSocket_Impl
 {
 public:
-	CUDPSocket_Impl() : socket(Socket(-1) {}
+	CUDPSocket_Impl() : socket(Socket(-1)) {}
 	~CUDPSocket_Impl() { if (IsValid()) { Close(); } }
 	bool Open(const CHost &host) { socket = NetOpenUDP(host.getIp(), host.getPort()); return socket != INVALID_SOCKET; }
 	void Close() { NetCloseUDP(socket); socket = Socket(-1); }
