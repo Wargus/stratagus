@@ -51,6 +51,8 @@
 			this->Shield = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "range")) {
 			this->Range = LuaToNumber(l, -1, j + 1);
+		} else if (!strcmp(value, "use-mana")) {
+			this->UseMana = LuaToBoolean(l, -1, j + 1);
 		} else {
 			LuaError(l, "Unsupported area-adjust-vitals tag: %s" _C_ value);
 		}
@@ -78,7 +80,6 @@
 	int hp = this->HP;
 	int mana = this->Mana;
 	int shield = this->Shield;
-	caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
 	for (size_t j = 0; j != units.size(); ++j) {
 		target = units[j];
 		// if (!PassCondition(caster, spell, target, goalPos) {
@@ -95,6 +96,9 @@
 		clamp(&target->Variable[MANA_INDEX].Value, 0, target->Variable[MANA_INDEX].Max);
 		target->Variable[SHIELD_INDEX].Value += shield;
 		clamp(&target->Variable[SHIELD_INDEX].Value, 0, target->Variable[SHIELD_INDEX].Max);
+	}
+	if (UseMana) {
+		caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
 	}
 	return 0;
 }
