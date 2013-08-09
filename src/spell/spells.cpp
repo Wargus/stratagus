@@ -411,9 +411,7 @@ int AutoCastSpell(CUnit &caster, const SpellType &spell)
 	} else {
 		// Save previous order
 		COrder *savedOrder = NULL;
-		if (caster.CurrentAction() == UnitActionStill) {
-			savedOrder = COrder::NewActionAttack(caster, caster.tilePos);
-		} else if (caster.CanStoreOrder(caster.CurrentOrder())) {
+		if (caster.CurrentAction() != UnitActionStill && caster.CanStoreOrder(caster.CurrentOrder())) {
 			savedOrder = caster.CurrentOrder()->Clone();
 		}
 		// Must move before ?
