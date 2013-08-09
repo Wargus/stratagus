@@ -41,6 +41,7 @@
 #include "interface.h"
 #include "player.h"
 #include "script.h"
+#include "translate.h"
 #include "unit.h"
 #include "unittype.h"
 #include "upgrade_structs.h"
@@ -251,7 +252,7 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 		// Special case for spells
 		if (button.Allowed && IsButtonAllowed(*Selected[0], button) == false) {
 			if (!strncmp(button.AllowStr.c_str(), "upgrade-", 8)) {
-				rules.insert(0, "Requirements:\n");
+				rules.insert(0, _("Requirements:\n"));
 				rules.append("-");
 				rules.append(AllUpgrades[UpgradeIdByIdent(button.AllowStr)]->Name);
 				rules.append("\n");
@@ -305,10 +306,12 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 		if (subrules.empty()) {
 			return subrules;
 		}
+		rules.clear();
 		rules.append(subrules);
 		node = node->Next;
+
 	}
-	rules.insert(0, "Requirements:\n");
+	rules.insert(0, _("Requirements:\n"));
 	return rules;
 }
 
