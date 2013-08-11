@@ -836,6 +836,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 				lua_pop(l, 1); // font name.
 			}
 			lua_pop(l, 1); // table.
+		} else if (!strcmp(key, "PlayerName")) {
+			res->e = EString_PlayerName;
+			res->D.PlayerName = CclParseNumberDesc(l);
 		} else {
 			lua_pop(l, 1);
 			LuaError(l, "unknow condition '%s'"_C_ key);
@@ -1074,6 +1077,8 @@ std::string EvalString(const StringDesc *s)
 				res = GetLineFont(line, tmp1, maxlen, font);
 				return res;
 			}
+		case EString_PlayerName : // player name
+			return std::string(Players[EvalNumber(s->D.PlayerName)].Name);
 	}
 	return std::string("");
 }
@@ -1209,6 +1214,10 @@ void FreeStringDesc(StringDesc *s)
 			delete s->D.Line.Line;
 			FreeNumberDesc(s->D.Line.MaxLen);
 			delete s->D.Line.MaxLen;
+			break;
+		case EString_PlayerName : // player name
+			FreeNumberDesc(s->D.PlayerName);
+			delete s->D.PlayerName;
 			break;
 	}
 }
@@ -1742,6 +1751,20 @@ static int CclStringFind(lua_State *l)
 	return Alias(l, "StringFind");
 }
 
+/**
+**  Return equivalent lua table for PlayerName.
+**  {"PlayerName", {arg1}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclPlayerName(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	return Alias(l, "PlayerName");
+}
+
 
 static void AliasRegister()
 {
@@ -1780,6 +1803,7 @@ static void AliasRegister()
 	lua_register(Lua, "SubString", CclSubString);
 	lua_register(Lua, "Line", CclLine);
 	lua_register(Lua, "GameInfo", CclGameInfo);
+	lua_register(Lua, "PlayerName", CclPlayerName);
 
 	lua_register(Lua, "If", CclIf);
 }

@@ -135,8 +135,9 @@ typedef enum {
 	EString_If,           /// If cond then String1 else String2.
 	EString_UnitName,     /// UnitType Name.
 	EString_SubString,    /// SubString.
-	EString_Line          /// line n of the string.
-	// FIXME: add others.
+	EString_Line,         /// line n of the string.
+	EString_PlayerName    /// player name.
+	// add more...
 } EString; /// All possible value for a string.
 
 typedef enum {
@@ -268,6 +269,7 @@ struct _StringDesc_ {
 			CFont *Font;         /// Font to consider (else (-1) consider just char).
 		} Line; /// For specific line.
 		ES_GameInfo GameInfoType;
+		NumberDesc *PlayerName;  /// Player name.
 	} D;
 };
 
