@@ -725,6 +725,20 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 			lua_pop(l, 1); // pop the char
 
 			lua_pop(l, 1); // pop the table.
+		} else if (!strcmp(key, "NumIf")) {
+			res->e = ENumber_NumIf;
+			if (lua_rawlen(l, -1) != 2 && lua_rawlen(l, -1) != 3) {
+				LuaError(l, "Bad number of args in NumIf\n");
+			}
+			lua_rawgeti(l, -1, 1); // Condition.
+			res->D.NumIf.Cond = CclParseNumberDesc(l);
+			lua_rawgeti(l, -1, 2); // Then.
+			res->D.NumIf.BTrue = CclParseNumberDesc(l);
+			if (lua_rawlen(l, -1) == 3) {
+				lua_rawgeti(l, -1, 3); // Else.
+				res->D.NumIf.BFalse = CclParseNumberDesc(l);
+			}
+			lua_pop(l, 1); // table.
 		} else {
 			lua_pop(l, 1);
 			LuaError(l, "unknow condition '%s'"_C_ key);
@@ -976,6 +990,14 @@ int EvalNumber(const NumberDesc *number)
 			} else { // ERROR.
 				return 0;
 			}
+		case ENumber_NumIf : // cond ? True : False;
+			if (EvalNumber(number->D.NumIf.Cond)) {
+				return EvalNumber(number->D.NumIf.BTrue);
+			} else if (number->D.NumIf.BFalse) {
+				return EvalNumber(number->D.NumIf.BFalse);
+			} else {
+				return 0;
+			}
 	}
 	return 0;
 }
@@ -1148,6 +1170,14 @@ void FreeNumberDesc(NumberDesc *number)
 		case ENumber_StringFind : // strchr(s, c) - s.
 			FreeStringDesc(number->D.StringFind.String);
 			delete number->D.StringFind.String;
+			break;
+		case ENumber_NumIf : // cond ? True : False;
+			FreeNumberDesc(number->D.NumIf.Cond);
+			delete number->D.NumIf.Cond;
+			FreeNumberDesc(number->D.NumIf.BTrue);
+			delete number->D.NumIf.BTrue;
+			FreeNumberDesc(number->D.NumIf.BFalse);
+			delete number->D.NumIf.BFalse;
 			break;
 	}
 }
@@ -1752,6 +1782,22 @@ static int CclStringFind(lua_State *l)
 }
 
 /**
+**  Return equivalent lua table for NumIf.
+**  {"NumIf", {arg1}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclNumIf(lua_State *l)
+{
+	if (lua_gettop(l) != 2 && lua_gettop(l) != 3) {
+		LuaError(l, "Bad number of arg for NumIf()\n");
+	}
+	return Alias(l, "NumIf");
+}
+
+/**
 **  Return equivalent lua table for PlayerName.
 **  {"PlayerName", {arg1}}
 **
@@ -1806,6 +1852,7 @@ static void AliasRegister()
 	lua_register(Lua, "PlayerName", CclPlayerName);
 
 	lua_register(Lua, "If", CclIf);
+	lua_register(Lua, "NumIf", CclNumIf);
 }
 
 /*............................................................................

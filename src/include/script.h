@@ -117,7 +117,9 @@ typedef enum {
 	ENumber_StringFind,      /// strchr(string, char) - s.
 
 	ENumber_UnitStat,    /// Property of Unit.
-	ENumber_TypeStat     /// Property of UnitType.
+	ENumber_TypeStat,    /// Property of UnitType.
+
+	ENumber_NumIf           /// If cond then Number1 else Number2.
 } ENumber; /// All possible value for a number.
 
 
@@ -223,7 +225,11 @@ struct _NumberDesc_ {
 			StringDesc *String; /// String.
 			char C;             /// Char.
 		} StringFind;
-
+		struct {
+			NumberDesc *Cond;   /// Branch condition.
+			NumberDesc *BTrue;  /// Number if Cond is true.
+			NumberDesc *BFalse; /// Number if Cond is false.
+		} NumIf; /// conditional string.
 	} D;
 };
 
