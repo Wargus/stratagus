@@ -116,12 +116,12 @@ int UnitShowAnimation(CUnit &unit, const CAnimation *anim)
 **  @return  The parsed value.
 */
 
-static int ParseAnimPlayer(const CUnit &unit, const char *parseint)
+static int ParseAnimPlayer(const CUnit &unit, char *parseint)
 {
 	if (!strcmp(parseint, "this")) {
 		return unit.Player->Index;
 	}
-	return atoi(parseint);
+	return ParseAnimInt(unit, parseint);
 }
 
 
@@ -201,7 +201,19 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		}
 		return 0;
 	} else if (s[0] == 'p') { //player variable detected
-		char *next = strchr(cur, '.');
+		char *next;
+		if (*cur == '(') {
+			++cur;
+			char *end = strchr(cur, ')');
+			if (end == NULL) {
+				fprintf(stderr, "ParseAnimInt: expected ')'\n");
+				ExitFatal(1);
+			}
+			*end = NULL;
+			next = end + 1;
+		} else {
+			next = strchr(cur, '.');
+		}
 		if (next == NULL) {
 			fprintf(stderr, "Need also specify the %s player's property\n", cur);
 			ExitFatal(1);
@@ -226,6 +238,8 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		return ParseAnimPlayer(unit, cur);
 
 	}
+	// Check if we trying to parse a number
+	Assert(isdigit(s[0]) || s[0] == '-');
 	return atoi(parseint);
 }
 
