@@ -989,22 +989,24 @@ int CPlayer::CheckLimits(const CUnitType &type) const
 **
 **  @note The return values of the PlayerCheck functions are inconsistent.
 */
-int CPlayer::CheckCosts(const int *costs) const
+int CPlayer::CheckCosts(const int *costs, bool notify) const
 {
 	int err = 0;
 	for (int i = 1; i < MaxCosts; ++i) {
 		if (this->Resources[i] + this->StoredResources[i] >= costs[i]) {
 			continue;
 		}
-		const char *name = DefaultResourceNames[i].c_str();
-		const char *actionName = DefaultActions[i].c_str();
+		if (notify) {
+			const char *name = DefaultResourceNames[i].c_str();
+			const char *actionName = DefaultActions[i].c_str();
 
-		Notify(_("Not enough %s...%s more %s."), name, actionName, name);
+			Notify(_("Not enough %s...%s more %s."), name, actionName, name);
 
-		err |= 1 << i;
-		if (this == ThisPlayer && GameSounds.NotEnoughRes[this->Race][i].Sound) {
-			PlayGameSound(GameSounds.NotEnoughRes[this->Race][i].Sound, MaxSampleVolume);
+			if (this == ThisPlayer && GameSounds.NotEnoughRes[this->Race][i].Sound) {
+				PlayGameSound(GameSounds.NotEnoughRes[this->Race][i].Sound, MaxSampleVolume);
+			}
 		}
+		err |= 1 << i;
 	}
 	return err;
 }

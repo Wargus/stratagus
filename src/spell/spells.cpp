@@ -106,7 +106,7 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 		return false;
 	}
 	// Check caster's resources
-	if (caster.Player->CheckCosts(spell.Costs)) {
+	if (caster.Player->CheckCosts(spell.Costs, false)) {
 		return false;
 	}
 	if (spell.Target == TargetUnit) { // Casting a unit spell without a target.
