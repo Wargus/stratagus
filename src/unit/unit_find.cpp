@@ -859,7 +859,7 @@ public:
 
 				// Unit we won't kill are evaluated the same
 				// Unit we are sure to kill are all evaluated the same (except PRIORITY)
-				clamp(&effective_hp, 0, -hp_damage_evaluate);
+				clamp(&effective_hp, -hp_damage_evaluate, 0);
 
 				// Here, effective_hp vary from -hp_damage_evaluate (unit will be killed) to 0 (unit can't be killed)
 				// => we prefer killing rather than only hitting...
