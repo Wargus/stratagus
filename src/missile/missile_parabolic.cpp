@@ -55,10 +55,10 @@
 static bool ParabolicMissile(Missile &missile)
 {
 	// Should be initialised by an other method (computed with distance...)
-	const int k = -2048; //-1024; // Coefficient of the parabol.
-	const int zprojToX = 4;    // Projection of Z axis on axis X.
-	const int zprojToY = 1024; // Projection of Z axis on axis Y.
-	int z;        // should be missile.Z later.
+	const double k = -missile.Type->ParabolCoefficient; // Coefficient of the parabol.
+	const double zprojToX = 4.0;    // Projection of Z axis on axis X.
+	const double zprojToY = 1024.0; // Projection of Z axis on axis Y.
+	double z;        // should be missile.Z later.
 
 	MissileInitMove(missile);
 	if (missile.TotalStep == 0) {
@@ -73,10 +73,10 @@ static bool ParabolicMissile(Missile &missile)
 	missile.position = missile.source + diff * missile.CurrentStep / missile.TotalStep;
 
 	Assert(k != 0);
-	z = missile.CurrentStep * (missile.TotalStep - missile.CurrentStep) / k;
+	z = (double)missile.CurrentStep * (missile.TotalStep - missile.CurrentStep) / k;
 	// Until Z is used for drawing, modify X and Y.
-	missile.position.x += z * zprojToX / 64;
-	missile.position.y += z * zprojToY / 64;
+	missile.position.x += (int)(z * zprojToX / 64.0);
+	missile.position.y += (int)(z * zprojToY / 64.0);
 	missile.MissileNewHeadingFromXY(missile.position - orig_pos);
 	for (; pos.x * sign.x <= missile.position.x * sign.x
 		 && pos.y * sign.y <= missile.position.y * sign.y;

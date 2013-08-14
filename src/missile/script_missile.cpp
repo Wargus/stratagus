@@ -130,6 +130,8 @@ void MissileType::Load(lua_State *l)
 			}
 		} else if (!strcmp(value, "NumBounces")) {
 			this->NumBounces = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "ParabolCoefficient")) {
+			this->ParabolCoefficient = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Delay")) {
 			this->StartDelay = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Sleep")) {

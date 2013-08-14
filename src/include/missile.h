@@ -379,6 +379,7 @@ public:
 
 	int Class;                 /// missile class
 	int NumBounces;            /// number of bounces
+	int ParabolCoefficient;    /// parabol coefficient in parabolic missile
 	int StartDelay;            /// missile start delay
 	int Sleep;                 /// missile sleep
 	int Speed;                 /// missile speed
