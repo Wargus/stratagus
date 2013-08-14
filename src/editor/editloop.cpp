@@ -910,7 +910,7 @@ static void DrawEditorInfo()
 	}
 
 	char buf[256];
-	snprintf(buf, sizeof(buf), "Editor (%d %d)", pos.x, pos.y);
+	snprintf(buf, sizeof(buf), _("Editor (%d %d)"), pos.x, pos.y);
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 2, UI.StatusLine.TextY, buf);
 	const CMapField &mf = *Map.Field(pos);
 	//
@@ -956,11 +956,11 @@ static void ShowUnitInfo(const CUnit &unit)
 {
 	char buf[256];
 
-	int n = sprintf(buf, "#%d '%s' Player:#%d %s", UnitNumber(unit),
+	int n = sprintf(buf, _("#%d '%s' Player:#%d %s"), UnitNumber(unit),
 					unit.Type->Name.c_str(), unit.Player->Index,
 					unit.Active ? "active" : "passive");
 	if (unit.Type->GivesResource) {
-		sprintf(buf + n, " Amount %d", unit.ResourcesHeld);
+		sprintf(buf + n, _(" Amount %d"), unit.ResourcesHeld);
 	}
 	UI.StatusLine.Set(buf);
 }
@@ -1419,7 +1419,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 		if (bx < screenPos.x && screenPos.x < bx + 20 && by < screenPos.y && screenPos.y < by + 20) {
 			if (Map.Info.PlayerType[i] != PlayerNobody) {
 				char buf[256];
-				snprintf(buf, sizeof(buf), "Select player #%d", i);
+				snprintf(buf, sizeof(buf), _("Select player #%d"), i);
 				UI.StatusLine.Set(buf);
 			} else {
 				UI.StatusLine.Clear();
@@ -1755,7 +1755,7 @@ void CEditor::Init()
 		ExitFatal(-1);
 	}
 
-	ShowLoadProgress("Script %s", buf);
+	ShowLoadProgress(_("Script %s"), buf);
 	LuaLoadFile(buf);
 	LuaGarbageCollect();
 

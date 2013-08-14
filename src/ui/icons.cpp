@@ -201,7 +201,7 @@ void LoadIcons()
 	for (IconMap::iterator it = Icons.begin(); it != Icons.end(); ++it) {
 		CIcon &icon = *(*it).second;
 
-		ShowLoadProgress("Icons %s", icon.G->File.c_str());
+		ShowLoadProgress(_("Icons %s"), icon.G->File.c_str());
 		icon.Load();
 	}
 }

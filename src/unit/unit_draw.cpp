@@ -50,6 +50,7 @@
 #include "player.h"
 #include "script.h"
 #include "sound.h"
+#include "translate.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unitsound.h"
@@ -342,7 +343,7 @@ void LoadDecorations()
 {
 	std::vector<Decoration>::iterator i;
 	for (i = DecoSprite.SpriteArray.begin(); i != DecoSprite.SpriteArray.end(); ++i) {
-		ShowLoadProgress("Decorations `%s'", (*i).File.c_str());
+		ShowLoadProgress(_("Decorations `%s'"), (*i).File.c_str());
 		(*i).Sprite = CGraphic::New((*i).File, (*i).Width, (*i).Height);
 		(*i).Sprite->Load();
 	}

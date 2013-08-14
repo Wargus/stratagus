@@ -45,6 +45,7 @@
 #include "iolib.h"
 #include "map.h"
 #include "parameters.h"
+#include "translate.h"
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"
@@ -2297,7 +2298,7 @@ void LoadCcl(const std::string &filename)
 		ExitFatal(-1);
 	}
 
-	ShowLoadProgress("Script %s\n", buf);
+	ShowLoadProgress(_("Script %s\n"), buf);
 	LuaLoadFile(buf);
 	CclInConfigFile = 0;
 	LuaGarbageCollect();

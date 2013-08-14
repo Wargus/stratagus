@@ -1140,7 +1140,7 @@ void CInfoPanel::Draw()
 		CLabel label(GetGameFont());
 		label.Draw(x, y, "Stratagus");
 		y += 16;
-		label.Draw(x, y,  "Cycle:");
+		label.Draw(x, y,  _("Cycle:"));
 		label.Draw(x + 48, y, GameCycle);
 		label.Draw(x + 110, y, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
 		y += 20;

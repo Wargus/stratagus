@@ -40,6 +40,7 @@
 #include "iolib.h"
 #include "script.h"
 #include "tileset.h"
+#include "translate.h"
 #include "ui.h"
 #include "unit.h"
 #include "version.h"
@@ -432,7 +433,7 @@ static int CclDefineTileset(lua_State *l)
 	//  Load and prepare the tileset
 	PixelTileSize = Map.Tileset->getPixelTileSize();
 
-	ShowLoadProgress("Tileset `%s'", Map.Tileset->ImageFile.c_str());
+	ShowLoadProgress(_("Tileset `%s'"), Map.Tileset->ImageFile.c_str());
 	Map.TileGraphic = CGraphic::New(Map.Tileset->ImageFile, PixelTileSize.x, PixelTileSize.y);
 	Map.TileGraphic->Load();
 	return 0;

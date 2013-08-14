@@ -43,6 +43,7 @@
 #include "interface.h"
 #include "map.h"
 #include "tileset.h"
+#include "translate.h"
 #include "ui.h"
 #include "unit.h"
 #include "unittype.h"
@@ -100,7 +101,7 @@ void LoadCursors(const std::string &race)
 		}
 
 		if (cursor.G && !cursor.G->IsLoaded()) {
-			ShowLoadProgress("Cursor %s", cursor.G->File.c_str());
+			ShowLoadProgress(_("Cursor %s"), cursor.G->File.c_str());
 			cursor.G->Load();
 			cursor.G->UseDisplayFormat();
 		}
