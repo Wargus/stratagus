@@ -139,6 +139,10 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 	char s[100];
 	const CUnit *goal = &unit;
 
+	if (!strlen(parseint)) {
+		return 0;
+	}
+
 	strcpy(s, parseint);
 	char *cur = &s[2];
 	if (s[0] == 'v' || s[0] == 't') { //unit variable detected

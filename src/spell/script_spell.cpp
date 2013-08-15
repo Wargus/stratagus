@@ -306,6 +306,8 @@ static int CclDefineSpell(lua_State *l)
 			spell->Name = LuaToString(l, i + 1);
 		} else if (!strcmp(value, "manacost")) {
 			spell->ManaCost = LuaToNumber(l, i + 1);
+		} else if (!strcmp(value, "cooldown")) {
+			spell->CoolDown = LuaToNumber(l, i + 1);
 		} else if (!strcmp(value, "res-cost")) {
 			lua_pushvalue(l, i + 1);
 			if (!lua_istable(l, -1)) {

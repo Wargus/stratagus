@@ -66,6 +66,7 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
+#include "spells.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unit_manager.h"
@@ -264,6 +265,15 @@ static void HandleBuffsEachCycle(CUnit &unit)
 
 	if (--unit.Threshold < 0) {
 		unit.Threshold = 0;
+	}
+
+	if (unit.Type->CanCastSpell) {
+		// decrease spell countdown timers
+		for (unsigned int i = 0; i < SpellTypeTable.size(); ++i) {
+			if (unit.SpellCoolDownTimers[i] > 0) {
+				--unit.SpellCoolDownTimers[i];
+			}
+		}
 	}
 
 	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX};

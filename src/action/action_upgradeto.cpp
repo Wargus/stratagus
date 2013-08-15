@@ -138,7 +138,9 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 
 	if (newtype.CanCastSpell && !unit.AutoCastSpell) {
 		unit.AutoCastSpell = new char[SpellTypeTable.size()];
+		unit.SpellCoolDownTimers = new int[SpellTypeTable.size()];
 		memset(unit.AutoCastSpell, 0, SpellTypeTable.size() * sizeof(char));
+		memset(unit.SpellCoolDownTimers, 0, SpellTypeTable.size() * sizeof(int));
 	}
 
 	UpdateForNewUnit(unit, 1);

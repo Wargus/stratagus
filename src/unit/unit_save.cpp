@@ -313,6 +313,16 @@ void SaveUnit(const CUnit &unit, CFile &file)
 			}
 		}
 	}
+	if (unit.SpellCoolDownTimers) {
+		file.printf(",\n  \"spell-cooldown\", {");
+		for (size_t i = 0; i < SpellTypeTable.size(); ++i) {
+			if (i) {
+				file.printf(" ,");
+			}
+			file.printf("%d", unit.SpellCoolDownTimers[i]);
+		}
+		file.printf("}");
+	}
 
 	file.printf("})\n");
 }

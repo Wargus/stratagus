@@ -758,10 +758,17 @@ void CButtonPanel::Draw()
 		}
 		Assert(buttons[i].Pos == i + 1);
 		bool gray = false;
+		bool cooldownSpell = false;
+		int maxCooldown = 0;
 		for (int j = 0; j < NumSelected; ++j) {
 			if (!IsButtonAllowed(*Selected[j], buttons[i])) {
 				gray = true;
 				break;
+			} else if (buttons[i].Action == ButtonSpellCast
+				&& (*Selected[j]).SpellCoolDownTimers[SpellTypeTable[buttons[i].Value]->Slot]) {
+					Assert(SpellTypeTable[buttons[i].Value]->CoolDown > 0);
+					cooldownSpell = true;
+					maxCooldown = std::max(maxCooldown, (*Selected[j]).SpellCoolDownTimers[SpellTypeTable[buttons[i].Value]->Slot]);
 			}
 		}
 		//
@@ -783,7 +790,10 @@ void CButtonPanel::Draw()
 		//
 		const PixelPos pos(UI.ButtonPanel.Buttons[i].X, UI.ButtonPanel.Buttons[i].Y);
 
-		if (gray) {
+		if (cooldownSpell) {
+			buttons[i].Icon.Icon->DrawCooldownSpellIcon(pos, 
+				maxCooldown * 100 / SpellTypeTable[buttons[i].Value]->CoolDown);
+		} else if (gray) {
 			buttons[i].Icon.Icon->DrawGrayscaleIcon(pos);
 		} else {
 			buttons[i].Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,

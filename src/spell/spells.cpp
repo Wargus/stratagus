@@ -105,6 +105,10 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 	if (caster.Variable[MANA_INDEX].Value < spell.ManaCost) { // Check caster mana.
 		return false;
 	}
+	// check countdown timer
+	if (caster.SpellCoolDownTimers[spell.Slot]) { // Check caster mana.
+		return false;
+	}
 	// Check caster's resources
 	if (caster.Player->CheckCosts(spell.Costs, false)) {
 		return false;
@@ -400,10 +404,11 @@ bool CanCastSpell(const CUnit &caster, const SpellType &spell,
 */
 int AutoCastSpell(CUnit &caster, const SpellType &spell)
 {
-	//  Check for mana, trivial optimization.
+	//  Check for mana and cooldown time, trivial optimization.
 	if (!SpellIsAvailable(*caster.Player, spell.Slot)
-		|| caster.Variable[MANA_INDEX].Value < spell.ManaCost) {
-		return 0;
+		|| caster.Variable[MANA_INDEX].Value < spell.ManaCost
+		|| caster.SpellCoolDownTimers[spell.Slot]) {
+			return 0;
 	}
 	Target *target = SelectTargetUnitsOfAutoCast(caster, spell);
 	if (target == NULL) {
@@ -469,6 +474,7 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 			caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
 		}
 		caster.Player->SubCosts(spell.Costs);
+		caster.SpellCoolDownTimers[spell.Slot] = spell.CoolDown;
 		//
 		// Spells like blizzard are casted again.
 		// This is sort of confusing, we do the test again, to
@@ -492,7 +498,7 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 */
 SpellType::SpellType(int slot, const std::string &ident) :
 	Ident(ident), Slot(slot), Target(), Action(),
-	Range(0), ManaCost(0), RepeatCast(0),
+	Range(0), ManaCost(0), RepeatCast(0), CoolDown(0),
 	DependencyId(-1), Condition(NULL),
 	AutoCast(NULL), AICast(NULL), ForceUseAnimation(false)
 {

@@ -532,6 +532,15 @@ static int CclUnit(lua_State *l)
 				memset(unit->AutoCastSpell, 0, SpellTypeTable.size());
 			}
 			unit->AutoCastSpell[SpellTypeByIdent(s)->Slot] = 1;
+		} else if (!strcmp(value, "spell-cooldown")) {
+			lua_rawgeti(l, 2, j + 1);
+			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != SpellTypeTable.size()) {
+				LuaError(l, "incorrect argument");
+			}
+			for (size_t k = 0; k < SpellTypeTable.size(); ++k) {
+				unit->SpellCoolDownTimers[k] = LuaToNumber(l, -1, k + 1);
+			}
+			lua_pop(l, 1);
 		} else {
 			const int index = UnitTypeVar.VariableNameLookup[value];// User variables
 			if (index != -1) { // Valid index

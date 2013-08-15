@@ -146,6 +146,21 @@ void CIcon::DrawGrayscaleIcon(const PixelPos &pos) const
 }
 
 /**
+**  Draw cooldown spell effect on icon at pos.
+**
+**  @param pos       display pixel position
+**  @param percent   cooldown percent
+*/
+void CIcon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
+{
+	// TO-DO: implement more effect types (clock-like)
+	this->GScale->DrawFrameClip(this->Frame, pos.x, pos.y);
+	const int height = (G->Height * (100 - percent)) / 100;
+	this->G->DrawSubClip(G->frame_map[Frame].x, G->frame_map[Frame].y + G->Height - height, G->Width,
+		height, pos.x, pos.y + G->Height - height);
+}
+
+/**
 **  Draw unit icon 'icon' with border on x,y
 **
 **  @param style   Button style

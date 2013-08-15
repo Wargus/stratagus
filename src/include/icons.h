@@ -118,6 +118,8 @@ public:
 	void DrawIcon(const CPlayer &player, const PixelPos &pos) const;
 	/// Draw grayscale icon
 	void DrawGrayscaleIcon(const PixelPos &pos) const;
+	/// Draw cooldown spell
+	void DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const;
 	/// Draw icon of a unit
 	void DrawUnitIcon(const ButtonStyle &style,
 					  unsigned flags, const PixelPos &pos, const std::string &text) const;

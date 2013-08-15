@@ -464,6 +464,7 @@ void CUnit::Init()
 	delete CriticalOrder;
 	CriticalOrder = NULL;
 	AutoCastSpell = NULL;
+	SpellCoolDownTimers = NULL;
 	AutoRepair = 0;
 	Goal = NULL;
 }
@@ -520,6 +521,7 @@ void CUnit::Release(bool final)
 
 	delete pathFinderData;
 	delete[] AutoCastSpell;
+	delete[] SpellCoolDownTimers;
 	delete[] Variable;
 	for (std::vector<COrder *>::iterator order = Orders.begin(); order != Orders.end(); ++order) {
 		delete *order;
@@ -598,8 +600,11 @@ void CUnit::Init(const CUnitType &type)
 		UnitUpdateHeading(*this);
 	}
 
+	// Create AutoCastSpell and SpellCoolDownTimers arrays for casters
 	if (type.CanCastSpell) {
 		AutoCastSpell = new char[SpellTypeTable.size()];
+		SpellCoolDownTimers = new int[SpellTypeTable.size()];
+		memset(SpellCoolDownTimers, 0, SpellTypeTable.size() * sizeof(int));
 		if (Type->AutoCastActive) {
 			memcpy(AutoCastSpell, Type->AutoCastActive, SpellTypeTable.size());
 		} else {

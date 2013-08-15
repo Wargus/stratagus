@@ -400,6 +400,7 @@ public:
 	COrder *CriticalOrder;      /// order to do as possible in breakable animation.
 
 	char *AutoCastSpell;        /// spells to auto cast
+	int *SpellCoolDownTimers;   /// how much time unit need to wait before spell will be ready
 
 	CUnit *Goal; /// Generic/Teleporter goal pointer
 };
