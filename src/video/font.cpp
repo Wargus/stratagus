@@ -675,6 +675,13 @@ int CLabel::DrawCentered(int x, int y, const std::string &text) const
 	return dx / 2;
 }
 
+int CLabel::DrawReverseCentered(int x, int y, const std::string &text) const
+{
+	int dx = font->Width(text);
+	DoDrawText<false>(x - dx / 2, y, text.c_str(), text.size(), reverse);
+	return dx / 2;
+}
+
 
 /**
 **  Format a number using commas

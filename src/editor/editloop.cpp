@@ -416,6 +416,7 @@ static void EditorAddUndoAction(EditorAction action)
 */
 static int CalculateVisibleIcons(bool tiles = false)
 {
+#if 0
 	int w;
 	int h;
 
@@ -430,6 +431,8 @@ static int CalculateVisibleIcons(bool tiles = false)
 	const int i = (ButtonPanelHeight - h - 24) / (h + 2);
 	const int count = i * (ButtonPanelWidth - w - 10) / (w + 8);
 	return count;
+#endif
+	return UI.ButtonPanel.Buttons.size();
 }
 
 /**
@@ -562,31 +565,28 @@ static void DrawUnitIcons()
 	const int maxy = UI.ButtonPanel.Y + ButtonPanelHeight - IconHeight;
 	int i = Editor.UnitIndex;
 
-	for (int y = UI.ButtonPanel.Y + 24; y < maxy; y += IconHeight + 2) {
+	for (size_t j = 0; j < UI.ButtonPanel.Buttons.size(); ++j) {
+		const int x = UI.ButtonPanel.Buttons[j].X;
+		const int y = UI.ButtonPanel.Buttons[j].Y;
 		if (i >= (int) Editor.ShownUnitTypes.size()) {
 			return;
 		}
-		for (int x = UI.ButtonPanel.X + 10; x < maxx; x += IconWidth + 8) {
-			if (i >= (int) Editor.ShownUnitTypes.size()) {
-				return;
-			}
-			CIcon &icon = *Editor.ShownUnitTypes[i]->Icon.Icon;
-			const PixelPos pos(x, y);
-			icon.DrawIcon(Players[Editor.SelectedPlayer], pos);
+		CIcon &icon = *Editor.ShownUnitTypes[i]->Icon.Icon;
+		const PixelPos pos(x, y);
+		icon.DrawIcon(Players[Editor.SelectedPlayer], pos);
 
-			Video.DrawRectangleClip(ColorGray, x, y, icon.G->Width, icon.G->Height);
-			if (i == Editor.SelectedUnitIndex) {
-				Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
-										icon.G->Width - 2, icon.G->Height - 2);
-			}
-			if (i == Editor.CursorUnitIndex) {
-				Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
-										icon.G->Width + 2, icon.G->Height + 2);
-				Editor.PopUpX = x;
-				Editor.PopUpY = y;
-			}
-			++i;
+		Video.DrawRectangleClip(ColorGray, x, y, icon.G->Width, icon.G->Height);
+		if (i == Editor.SelectedUnitIndex) {
+			Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
+				icon.G->Width - 2, icon.G->Height - 2);
 		}
+		if (i == Editor.CursorUnitIndex) {
+			Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
+				icon.G->Width + 2, icon.G->Height + 2);
+			Editor.PopUpX = x;
+			Editor.PopUpY = y;
+		}
+		++i;
 	}
 }
 
@@ -647,23 +647,41 @@ static void DrawTileIcons()
 		Video.DrawRectangle(ColorGray, x - 42, y - 3 + (ButtonUnderCursor - 300) * 20, 100, 20);
 	}
 
-	label.DrawCentered(x, y, "1x1");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 1 ? 2 : 0), x + 40, y - 3);
+	if (TileCursorSize == 1) {
+		label.DrawReverseCentered(x, y, "1x1");
+	} else {
+		label.DrawCentered(x, y, "1x1");
+	}
 	y += 20;
-	label.DrawCentered(x, y, "2x2");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 2 ? 2 : 0), x + 40, y - 3);
+	if (TileCursorSize == 2) {
+		label.DrawReverseCentered(x, y, "2x2");
+	} else {
+		label.DrawCentered(x, y, "2x2");
+	}	
 	y += 20;
-	label.DrawCentered(x, y, "3x3");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 3 ? 2 : 0), x + 40, y - 3);
+	if (TileCursorSize == 3) {
+		label.DrawReverseCentered(x, y, "3x3");
+	} else {
+		label.DrawCentered(x, y, "3x3");
+	}
 	y += 20;
-	label.DrawCentered(x, y, "4x4");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 4 ? 2 : 0), x + 40, y - 3);
+	if (TileCursorSize == 4) {
+		label.DrawReverseCentered(x, y, "4x4");
+	} else {
+		label.DrawCentered(x, y, "4x4");
+	}
 	y += 20;
-	label.DrawCentered(x, y, "Random");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileToolRandom ? 2 : 0), x + 40, y - 3);
+	if (TileToolRandom) {
+		label.DrawReverseCentered(x, y, "Random");
+	} else {
+		label.DrawCentered(x, y, "Random");
+	}
 	y += 20;
-	label.DrawCentered(x, y, "Filler");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileToolDecoration ? 2 : 0), x + 40, y - 3);
+	if (TileToolDecoration) {
+		label.DrawReverseCentered(x, y, "Filler");
+	} else {
+		label.DrawCentered(x, y, "Filler");
+	}
 	y += 20;
 
 	int i = Editor.TileIndex;
@@ -1436,33 +1454,23 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 
 	int i = Editor.UnitIndex;
 	by = UI.ButtonPanel.Y + 24;
-	while (by < UI.ButtonPanel.Y + ButtonPanelHeight - IconHeight) {
-		if (i >= (int)Editor.ShownUnitTypes.size()) {
+	for (size_t j = 0; j < UI.ButtonPanel.Buttons.size(); ++j) {
+		const int x = UI.ButtonPanel.Buttons[j].X;
+		const int y = UI.ButtonPanel.Buttons[j].Y;
+		if (i >= (int) Editor.ShownUnitTypes.size()) {
 			break;
 		}
-		bx = UI.ButtonPanel.X + 10;
-		while (bx < UI.ButtonPanel.X + ButtonPanelWidth - IconWidth) {
-			if (i >= (int)Editor.ShownUnitTypes.size()) {
-				break;
-			}
-			if (bx < screenPos.x && screenPos.x < bx + IconWidth
-				&& by < screenPos.y && screenPos.y < by + IconHeight) {
+		if (x < screenPos.x && screenPos.x < x + IconWidth
+			&& y < screenPos.y && screenPos.y < y + IconHeight) {
 				char buf[256];
 				snprintf(buf, sizeof(buf), "%s \"%s\"",
-						 Editor.ShownUnitTypes[i]->Ident.c_str(),
-						 Editor.ShownUnitTypes[i]->Name.c_str());
+					Editor.ShownUnitTypes[i]->Ident.c_str(),
+					Editor.ShownUnitTypes[i]->Name.c_str());
 				UI.StatusLine.Set(buf);
 				Editor.CursorUnitIndex = i;
-#if 0
-				ButtonUnderCursor = i + 100;
-				CursorOn = CursorOnButton;
-#endif
 				return true;
-			}
-			bx += IconWidth + 8;
-			i++;
 		}
-		by += IconHeight + 2;
+		++i;
 	}
 	return false;
 }
@@ -1914,8 +1922,8 @@ void EditorMainLoop()
 			first_init = false;
 			editorUnitSlider->setSize(ButtonPanelWidth/*176*/, 16);
 			editorSlider->setSize(ButtonPanelWidth/*176*/, 16);
-			editorContainer->add(editorUnitSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y + 4);
-			editorContainer->add(editorSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y + 4);
+			editorContainer->add(editorUnitSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 16);
+			editorContainer->add(editorSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 16);
 		}
 		//ProcessMenu("menu-editor-tips", 1);
 		InterfaceState = IfaceStateNormal;

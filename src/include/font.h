@@ -218,6 +218,7 @@ public:
 	int DrawReverseClip(int x, int y, int number) const;
 
 	int DrawCentered(int x, int y, const std::string &text) const;
+	int DrawReverseCentered(int x, int y, const std::string &text) const;
 private:
 	template <const bool CLIP>
 	int DoDrawText(int x, int y, const char *const text,
