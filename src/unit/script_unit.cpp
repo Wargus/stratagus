@@ -886,6 +886,30 @@ static int CclGetUnits(lua_State *l)
 }
 
 /**
+**  Get a player's units in rectangle box specified with 2 coordinates
+**
+**  @param l  Lua state.
+**
+**  @return   Array of units.
+*/
+static int CclGetUnitsAroundUnit(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+
+	const int slot = LuaToNumber(l, 1);
+	const CUnit &unit = UnitManager.GetSlotUnit(slot);
+	const int range = LuaToNumber(l, 2);
+	lua_newtable(l);
+	std::vector<CUnit *> table;
+	SelectAroundUnit(unit, range, table, HasSamePlayerAs(*unit.Player));
+	for (size_t i = 0; i < table.size(); ++i) {
+		lua_pushnumber(l, UnitNumber(*table[i]));
+		lua_rawseti(l, -2, i + 1);
+	}
+	return 1;
+}
+
+/**
 **
 **  Get the value of the unit bool-flag.
 **
@@ -1038,6 +1062,7 @@ void UnitCclRegister()
 	lua_register(Lua, "KillUnitAt", CclKillUnitAt);
 
 	lua_register(Lua, "GetUnits", CclGetUnits);
+	lua_register(Lua, "GetUnitsAroundUnit", CclGetUnitsAroundUnit);
 
 	// unit member access functions
 	lua_register(Lua, "GetUnitBoolFlag", CclGetUnitBoolFlag);
