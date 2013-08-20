@@ -505,6 +505,8 @@ public:
 	int RandomMovementProbability;  /// Probability to move randomly.
 	int ClicksToExplode;            /// Number of consecutive clicks until unit suicides.
 	int MaxOnBoard;                 /// Number of Transporter slots.
+	int BoardSize;                  /// How much "cells" unit occupies inside transporter
+	int ButtonLevelForTransporter;  /// On which button level game will show units inside transporter
 	int StartingResources;          /// Amount of Resources on build
 	/// originally only visual effect, we do more with this!
 	UnitTypeType UnitType;          /// Land / fly / naval

@@ -619,7 +619,7 @@ CUnitType::CUnitType() :
 	BurnPercent(0), BurnDamageRate(0), RepairRange(0),
 	CanCastSpell(NULL), AutoCastActive(NULL),
 	AutoBuildRate(0), RandomMovementProbability(0), ClicksToExplode(0),
-	MaxOnBoard(0), StartingResources(0),
+	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(0), StartingResources(0),
 	UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0), AiAdjacentRange(-1),
 	MouseAction(0), CanTarget(0),
 	Flip(0), Revealer(0), LandUnit(0), AirUnit(0), SeaUnit(0),

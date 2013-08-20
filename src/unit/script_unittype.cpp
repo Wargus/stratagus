@@ -487,6 +487,10 @@ static int CclDefineUnitType(lua_State *l)
 			type->DrawLevel = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxOnBoard")) {
 			type->MaxOnBoard = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "BoardSize")) {
+			type->BoardSize = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "ButtonLevelForTransporter")) {
+			type->ButtonLevelForTransporter = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "StartingResources")) {
 			type->StartingResources = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "RegenerationRate")) {

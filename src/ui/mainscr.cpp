@@ -468,7 +468,7 @@ static void DrawUnitInfo(CUnit &unit)
 	//
 	//  Transporting units.
 	//
-	if (type.CanTransport() && unit.BoardCount) {
+	if (type.CanTransport() && unit.BoardCount && CurrentButtonLevel == unit.Type->ButtonLevelForTransporter) {
 		CUnit *uins = unit.UnitInside;
 		size_t j = 0;
 

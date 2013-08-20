@@ -198,7 +198,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 	}
 	unit.Boarded = 0;
 	unit.Place(pos);
-	transporter.BoardCount--;
+	transporter.BoardCount -= unit.Type->BoardSize;
 	return true;
 }
 
@@ -297,6 +297,7 @@ static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int ma
 		return 0;
 	}
 	const bool isTransporterRemoved = transporter.Removed;
+	const bool selected = transporter.Selected;
 
 	if (!isTransporterRemoved) {
 		// Remove transporter to avoid "collision" with itself.
@@ -305,6 +306,10 @@ static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int ma
 	const bool res = ClosestFreeDropZone_internal(transporter, startPos, maxRange, resPos);
 	if (!isTransporterRemoved) {
 		transporter.Place(transporter.tilePos);
+		if (selected) {
+			SelectUnit(transporter);
+			SelectionChanged();
+		}
 	}
 	return res;
 }

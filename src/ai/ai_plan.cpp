@@ -392,7 +392,7 @@ int AiForce::PlanAttack()
 			CUnit &unit = *Units[i];
 
 			if (CanTransport(*transporter, unit)) {
-				totalBoardCapacity--;
+				totalBoardCapacity -= unit.Type->BoardSize;
 			}
 		}
 		if (totalBoardCapacity < 0) { // Not enough transporter.

@@ -1126,9 +1126,10 @@ void CButtonPanel::DoClicked_Unload(int button)
 	//
 	//  Unload on coast, transporter standing, unload all units right now.
 	//  That or a bunker.
+	//  Unload on coast valid only for sea units
 	//
 	if ((NumSelected == 1 && Selected[0]->CurrentAction() == UnitActionStill
-		 && Map.Field(Selected[0]->tilePos)->CoastOnMap())
+		&& Selected[0]->Type->UnitType == UnitTypeNaval && Map.Field(Selected[0]->tilePos)->CoastOnMap())
 		|| !Selected[0]->CanMove()) {
 		SendCommandUnload(*Selected[0], Selected[0]->tilePos, NoUnitP, flush);
 		return ;

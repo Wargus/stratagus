@@ -2889,6 +2889,10 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 		return 0;
 	}
 
+	if (transporter.BoardCount + unit.Type->BoardSize > transporter.Type->MaxOnBoard) { // too big unit
+		return 0;
+	}
+
 	// Can transport only allied unit.
 	// FIXME : should be parametrable.
 	if (!transporter.IsTeamed(unit)) {

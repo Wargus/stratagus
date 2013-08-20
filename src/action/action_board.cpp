@@ -233,7 +233,7 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 	if (transporter->BoardCount < transporter->Type->MaxOnBoard) {
 		// Place the unit inside the transporter.
 		unit.Remove(transporter);
-		transporter->BoardCount++;
+		transporter->BoardCount += unit.Type->BoardSize;
 		unit.Boarded = 1;
 		if (!unit.Player->AiEnabled) {
 			// Don't make anything funny after going out of the transporter.
