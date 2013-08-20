@@ -436,11 +436,9 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map)
 				  map.Info.Description.c_str(), numplayers, map.Info.MapWidth, map.Info.MapHeight,
 				  map.Info.MapUID + 1);
 
-		//		mapsetupname = strrchr(mapsetup, '/');
-		//		if (!mapsetupname) {
-		//			mapsetupname = mapsetup;
-		//		}
-		//		f->printf("DefineMapSetup(GetCurrentLuaPath()..\"%s\")\n", mapsetupname);
+		if (map.Info.Filename.find(".sms") == std::string::npos) {
+			f->printf("DefineMapSetup(\"%s\")\n", map.Info.Filename.c_str());
+		}
 	} catch (const FileException &) {
 		fprintf(stderr, "ERROR: cannot write the map presentation\n");
 		delete f;
