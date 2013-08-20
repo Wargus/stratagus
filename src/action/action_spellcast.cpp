@@ -176,13 +176,13 @@
 */
 /* virtual */ void COrder_SpellCast::OnAnimationAttack(CUnit &unit)
 {
+	UnHideUnit(unit); // unit is invisible until attacks
 	CUnit *goal = GetGoal();
 	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		unit.ReCast = 0;
 	} else {
 		unit.ReCast = SpellCast(unit, *this->Spell, goal, goalPos);
 	}
-	UnHideUnit(unit); // unit is invisible until attacks
 }
 
 
