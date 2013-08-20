@@ -2181,6 +2181,9 @@ CUnit *UnitOnScreen(int x, int y)
 			continue;
 		}
 		const CUnitType &type = *unit.Type;
+		if (!type.Sprite) {
+			continue;
+		}
 
 		//
 		// Check if mouse is over the unit.
