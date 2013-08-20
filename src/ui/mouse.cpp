@@ -42,6 +42,7 @@
 
 #include "ui.h"
 
+#include "action/action_build.h"
 #include "action/action_train.h"
 #include "actions.h"
 #include "commands.h"
@@ -101,6 +102,21 @@ void CancelBuildingMode()
 	ClearCosts();
 	CurrentButtonLevel = 0;
 	UI.ButtonPanel.Update();
+}
+
+static bool CanBuildOnArea(const CUnit &unit, const Vec2i &pos)
+{
+	bool result = true;
+	for (int j = 0; result && j < unit.Type->TileHeight; ++j) {
+		for (int i = 0; i < unit.Type->TileWidth; ++i) {
+			const Vec2i tempPos(i, j);
+			if (!Map.Field(pos + tempPos)->playerInfo.IsExplored(*ThisPlayer)) {
+				result = false;
+				break;
+			}
+		}
+	}
+	return result;
 }
 
 static void DoRightButton_ForForeignUnit(CUnit *dest)
@@ -896,6 +912,40 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		const CViewport &vp = *UI.MouseViewport;
 		const Vec2i tilePos = vp.ScreenToTilePos(cursorPos);
 
+		if (CursorBuilding && (MouseButtons & LeftButton) && Selected[0]
+			&& (KeyModifiers & (ModifierAlt | ModifierShift))) {
+				const CUnit &unit = *Selected[0];
+				const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
+				bool explored = CanBuildOnArea(*Selected[0], tilePos);
+
+				// We now need to check if there are another build commands on this build spot
+				bool buildable = true;
+				for (std::vector<COrderPtr>::const_iterator it = unit.Orders.begin();
+					it != unit.Orders.end(); ++it) {
+						COrder &order = **it;
+						if (order.Action == UnitActionBuild) {
+							COrder_Build &build = dynamic_cast<COrder_Build &>(order);
+							if (tilePos.x >= build.GetGoalPos().x 
+								&& tilePos.x < build.GetGoalPos().x + build.GetUnitType().TileWidth
+								&& tilePos.y >= build.GetGoalPos().y 
+								&& tilePos.y < build.GetGoalPos().y + build.GetUnitType().TileHeight) {
+									buildable = false;
+									break;
+							}
+						}
+				}
+
+				// 0 Test build, don't really build
+				if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && buildable && (explored || ReplayRevealMap)) {
+					const int flush = !(KeyModifiers & ModifierShift);
+					for (int i = 0; i < NumSelected; ++i) {
+						SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush);
+					}
+					if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
+						CancelBuildingMode();
+					}
+				}
+		}
 		if (Preference.ShowNameDelay) {
 			ShowNameDelay = GameCycle + Preference.ShowNameDelay;
 			ShowNameTime = GameCycle + Preference.ShowNameDelay + Preference.ShowNameTime;
@@ -1512,19 +1562,9 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 		// need to make sure there is a unit to build
 		if (Selected[0] && (MouseButtons & LeftButton)
 			&& UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {// enter select mode
-			int explored = 1;
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
-			// FIXME: error messages
-
-			for (int j = 0; explored && j < Selected[0]->Type->TileHeight; ++j) {
-				for (int i = 0; i < Selected[0]->Type->TileWidth; ++i) {
-					const Vec2i tempPos(i, j);
-					if (!Map.Field(tilePos + tempPos)->playerInfo.IsExplored(*ThisPlayer)) {
-						explored = 0;
-						break;
-					}
-				}
-			}
+			bool explored = CanBuildOnArea(*Selected[0], tilePos);
+			
 			// 0 Test build, don't really build
 			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && (explored || ReplayRevealMap)) {
 				const int flush = !(KeyModifiers & ModifierShift);

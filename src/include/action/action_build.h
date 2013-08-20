@@ -57,6 +57,7 @@ public:
 	virtual void AiUnitKilled(CUnit &unit);
 
 	const CUnitType &GetUnitType() const { return *Type; }
+	const Vec2i &GetGoalPos() const { return goalPos; }
 
 private:
 	bool MoveToLocation(CUnit &unit);
