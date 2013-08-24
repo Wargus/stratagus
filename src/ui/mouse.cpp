@@ -1338,7 +1338,12 @@ static int SendSpellCast(const Vec2i &tilePos)
 			continue;
 		}
 		// CursorValue here holds the spell type id
-		SendCommandSpellCast(unit, tilePos, dest, CursorValue, flush);
+		const SpellType *spell = SpellTypeTable[CursorValue];
+		if (!spell) {
+			fprintf(stderr, "unknown spell-id: %d\n", CursorValue);
+			ExitFatal(1);
+		}
+		SendCommandSpellCast(unit, tilePos, spell->Target == TargetPosition ? NULL : dest , CursorValue, flush);
 		ret = 1;
 	}
 	return ret;
