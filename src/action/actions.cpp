@@ -163,6 +163,18 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 }
 
 /**
+**  Get goal position
+*/
+/* virtual */ const Vec2i COrder::GetGoalPos() const
+{
+	const Vec2i invalidPos(-1, -1);
+	if (this->HasGoal()) {
+		return this->GetGoal()->tilePos;
+	}
+	return invalidPos;
+}
+
+/**
 **  Parse order
 **
 **  @param l      Lua state.

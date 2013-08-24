@@ -56,7 +56,7 @@ public:
 
 	virtual void OnAnimationAttack(CUnit &unit);
 
-	const Vec2i &GetGoalPos() const { return goalPos; }
+	virtual const Vec2i GetGoalPos() const;
 	const SpellType &GetSpell() const { return *Spell; }
 	void SetSpell(const SpellType &spell) { Spell = &spell; }
 private:

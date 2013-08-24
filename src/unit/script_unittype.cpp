@@ -112,6 +112,8 @@ static const char PIERCINGDAMAGE_KEY[] = "PiercingDamage";
 static const char BASICDAMAGE_KEY[] = "BasicDamage";
 static const char POSX_KEY[] = "PosX";
 static const char POSY_KEY[] = "PosY";
+static const char TARGETPOSX_KEY[] = "TargetPosX";
+static const char TARGETPOSY_KEY[] = "TargetPosY";
 static const char RADARRANGE_KEY[] = "RadarRange";
 static const char RADARJAMMERRANGE_KEY[] = "RadarJammerRange";
 static const char AUTOREPAIRRANGE_KEY[] = "AutoRepairRange";
@@ -160,7 +162,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   RESEARCH_KEY, TRAINING_KEY, UPGRADETO_KEY, GIVERESOURCE_KEY,
 							   CARRYRESOURCE_KEY, XP_KEY, KILL_KEY,	SUPPLY_KEY, DEMAND_KEY, ARMOR_KEY,
 							   SIGHTRANGE_KEY, ATTACKRANGE_KEY, PIERCINGDAMAGE_KEY,
-							   BASICDAMAGE_KEY, POSX_KEY, POSY_KEY, RADARRANGE_KEY,
+							   BASICDAMAGE_KEY, POSX_KEY, POSY_KEY, TARGETPOSX_KEY, TARGETPOSY_KEY, RADARRANGE_KEY,
 							   RADARJAMMERRANGE_KEY, AUTOREPAIRRANGE_KEY, BLOODLUST_KEY, HASTE_KEY,
 							   SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY, SHIELD_KEY, POINTS_KEY,
 							   MAXHARVESTERS_KEY, POISON_KEY, SHIELDPERMEABILITY_KEY, SHIELDPIERCING_KEY
@@ -1600,6 +1602,13 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.Variable[POSX_INDEX].Max = Map.Info.MapWidth;
 	unit.Variable[POSY_INDEX].Value = unit.tilePos.y;
 	unit.Variable[POSY_INDEX].Max = Map.Info.MapHeight;
+
+	// Target Position
+	const Vec2i goalPos = unit.CurrentOrder()->GetGoalPos();
+	unit.Variable[TARGETPOSX_INDEX].Value = goalPos.x;
+	unit.Variable[TARGETPOSX_INDEX].Max = Map.Info.MapWidth;
+	unit.Variable[TARGETPOSY_INDEX].Value = goalPos.y;
+	unit.Variable[TARGETPOSY_INDEX].Max = Map.Info.MapHeight;
 
 	// RadarRange
 	unit.Variable[RADAR_INDEX].Value = unit.Stats->Variables[RADAR_INDEX].Value;
