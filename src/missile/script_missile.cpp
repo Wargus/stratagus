@@ -366,7 +366,10 @@ static int CclDefineBurningBuilding(lua_State *l)
 */
 static int CclCreateMissile(lua_State *l)
 {
-	LuaCheckArgs(l, 6);
+	const int arg = lua_gettop(l);
+	if (arg < 6 || arg > 7) {
+		LuaError(l, "incorrect argument");
+	}
 
 	const std::string name = LuaToString(l, 1);
 	const MissileType *mtype = MissileTypeByIdent(name);
@@ -380,14 +383,17 @@ static int CclCreateMissile(lua_State *l)
 	const int sourceUnitId = LuaToNumber(l, 4);
 	const int destUnitId = LuaToNumber(l, 5);
 	const bool dealDamage = LuaToBoolean(l, 6);
+	const bool mapRelative = arg == 7 ? LuaToBoolean(l, 7) : false;
 	CUnit *sourceUnit = sourceUnitId != -1 ? &UnitManager.GetSlotUnit(sourceUnitId) : NULL;
 	CUnit *destUnit = destUnitId != -1 ? &UnitManager.GetSlotUnit(destUnitId) : NULL;
 
-	if (sourceUnit != NULL) {
-		startpos += sourceUnit->GetMapPixelPosTopLeft();
-	}
-	if (destUnit != NULL) {
-		endpos += destUnit->GetMapPixelPosTopLeft();
+	if (mapRelative == false) {
+		if (sourceUnit != NULL) {
+			startpos += sourceUnit->GetMapPixelPosTopLeft();
+		}
+		if (destUnit != NULL) {
+			endpos += destUnit->GetMapPixelPosTopLeft();
+		}
 	}
 
 	Missile *missile = MakeMissile(*mtype, startpos, endpos);
