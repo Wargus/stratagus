@@ -77,7 +77,7 @@ typedef COrder *COrderPtr;
 /*
 ** Configuration of the small (unit) AI.
 */
-#define PRIORITY_FACTOR   0x00001000
+#define PRIORITY_FACTOR   0x10000000
 #define HEALTH_FACTOR     0x00000001
 #define DISTANCE_FACTOR   0x00010000
 #define INRANGE_FACTOR    0x00001000
@@ -89,7 +89,7 @@ typedef COrder *COrderPtr;
 /// Called whenever the selected unit was updated
 extern void SelectedUnitChanged();
 
-/// Returns the map diestance between to unittype as locations
+/// Returns the map distance between to unittype as locations
 extern int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1,
 								   const CUnitType &dst, const Vec2i &pos2);
 

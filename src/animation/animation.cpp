@@ -166,6 +166,8 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 				return goal->ResourcesHeld;
 			} else if (!strcmp(cur, "ResourceActive")) {
 				return goal->Resource.Active;
+			} else if (!strcmp(cur, "_Distance")) {
+				return unit.MapDistanceTo(*goal);
 			}
 			fprintf(stderr, "Bad variable name '%s'\n", cur);
 			ExitFatal(1);
@@ -201,6 +203,16 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
 		const SpellType &spell = order.GetSpell();
 		if (!strcmp(spell.Ident.c_str(), cur)) {
+			return 1;
+		}
+		return 0;
+	} else if (s[0] == 'S') { // check if autocast for this spell available
+		const SpellType *spell = SpellTypeByIdent(cur);
+		if (!spell) {
+			fprintf(stderr, "Invalid spell: '%s'\n", cur);
+			ExitFatal(1);
+		}
+		if (unit.AutoCastSpell[spell->Slot]) {
 			return 1;
 		}
 		return 0;

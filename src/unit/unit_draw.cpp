@@ -700,7 +700,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 	}
 
 	// FIXME: johns: ugly check here, should be removed!
-	if (unit.CurrentAction() != UnitActionDie && unit.IsVisible(*ThisPlayer)) {
+	if (unit.CurrentAction() != UnitActionDie && (unit.IsVisible(*ThisPlayer) || ReplayRevealMap)) {
 		DrawDecoration(unit, type, screenPos);
 	}
 }
