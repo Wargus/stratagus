@@ -436,7 +436,7 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map)
 				  map.Info.Description.c_str(), numplayers, map.Info.MapWidth, map.Info.MapHeight,
 				  map.Info.MapUID + 1);
 
-		if (map.Info.Filename.find(".sms") == std::string::npos) {
+		if (map.Info.Filename.find(".sms") == std::string::npos && !map.Info.Filename.empty()) {
 			f->printf("DefineMapSetup(\"%s\")\n", map.Info.Filename.c_str());
 		}
 	} catch (const FileException &) {
