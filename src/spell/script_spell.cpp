@@ -233,6 +233,8 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 			autocast->Range = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "combat")) {
 			autocast->Combat = Ccl2Condition(l, LuaToString(l, -1, j + 1));
+		} else if (!strcmp(value, "attacker")) {
+			autocast->Attacker = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else if (!strcmp(value, "priority")) {
 			lua_rawgeti(l, -1, j + 1);
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {

@@ -294,8 +294,14 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 
 			int n = 0;
 			for (size_t i = 0; i != table.size(); ++i) {
-				//  FIXME: autocast conditions should include normal conditions.
-				//  FIXME: no, really, they should.
+				// Check if unit in battle
+				if (autocast->Attacker == CONDITION_ONLY) {
+					if (table[i]->CurrentAction() != UnitActionAttack
+						&& table[i]->CurrentAction() != UnitActionAttackGround
+						&& table[i]->CurrentAction() != UnitActionSpellCast) {
+							continue;
+					}
+				}
 				if (PassCondition(caster, spell, table[i], pos, spell.Condition)
 					&& PassCondition(caster, spell, table[i], pos, autocast->Condition)) {
 					table[n++] = table[i];

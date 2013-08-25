@@ -169,7 +169,8 @@ public:
 	// Special flags for priority sorting
 #define ACP_NOVALUE -1
 #define ACP_DISTANCE -2
-	AutoCastInfo() : Range(0), PriorytyVar(ACP_NOVALUE), ReverseSort(false), Condition(NULL), Combat(0) {};
+	AutoCastInfo() : Range(0), PriorytyVar(ACP_NOVALUE), ReverseSort(false), Condition(NULL),
+		Combat(0), Attacker(0) {};
 	~AutoCastInfo() { delete Condition; };
 	/// @todo this below is SQUARE!!!
 	int Range;                   /// Max range of the target.
@@ -182,6 +183,7 @@ public:
 	/// Detailed generic conditions (not per-target, where Condition is evaluated.)
 	/// Combat mode is when there are hostile non-coward units around
 	int Combat;                  /// If it should be casted in combat
+	int Attacker;                /// If it should be casted on unit which attacks
 
 	/// @todo Add stuff here for target preference.
 	/// @todo Heal units with the lowest hit points first.
