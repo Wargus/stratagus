@@ -106,7 +106,7 @@ static bool TracerMissile(Missile &missile)
 			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
 				(int)pos.y + missile.Type->size.y / 2);
 			if (Map.MapPixelPosToTilePos(position) != mapPos) {
-				if (MissileHandleWallBlocking(missile, position)) {
+				if (MissileHandleBlocking(missile, position)) {
 					return true;
 				}
 				mapPos = Map.MapPixelPosToTilePos(position);

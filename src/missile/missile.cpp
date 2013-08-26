@@ -658,33 +658,46 @@ void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 		CUnit &unit = **it;
 
 		if (unit.IsAliveOnMap()
-			&& (missile.Type->FriendlyFire || unit.IsEnemy(*missile.SourceUnit->Player))) {
-			missile.MissileHit(&unit);
+			&& (missile.Type->FriendlyFire == false || unit.IsEnemy(*missile.SourceUnit->Player))) {
+				missile.MissileHit(&unit);
 		}
 	}
 }
 
-bool MissileHandleWallBlocking(Missile &missile, const PixelPos &position)
+bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 {
-	// If land unit shoots at land unit, missile can be blocked by Wall units
-	if (!missile.Type->IgnoreWalls && missile.SourceUnit && missile.SourceUnit->Type->UnitType != UnitTypeFly
-		&& (missile.SourceUnit->CurrentAction() == UnitActionAttackGround
-		|| (missile.TargetUnit && missile.TargetUnit->Type->UnitType != UnitTypeFly))) {
-			// search for Wall units
-			std::vector<CUnit *> walls;
+	if (missile.SourceUnit && (missile.SourceUnit->CurrentAction() == UnitActionAttackGround
+		|| (missile.TargetUnit && missile.SourceUnit->Type->UnitType == missile.TargetUnit->Type->UnitType))) {
+			// search for blocking units
+			std::vector<CUnit *> blockingUnits;
 			const Vec2i missilePos = Map.MapPixelPosToTilePos(position);
-			Select(missilePos, missilePos, walls);
-			for (std::vector<CUnit *>::iterator it = walls.begin();	it != walls.end(); ++it) {
+			Select(missilePos, missilePos, blockingUnits);
+			for (std::vector<CUnit *>::iterator it = blockingUnits.begin();	it != blockingUnits.end(); ++it) {
 				CUnit &unit = **it;
-				if (&unit != missile.SourceUnit && unit.Type->BoolFlag[WALL_INDEX].value 
-					&& unit.Player != missile.SourceUnit->Player && unit.IsAllied(*missile.SourceUnit) == false) {
-						if (missile.TargetUnit) {
-							missile.TargetUnit = &unit;
+				// If land unit shoots at land unit, missile can be blocked by Wall units
+				if (!missile.Type->IgnoreWalls && missile.SourceUnit->Type->UnitType == UnitTypeLand) {
+					if (&unit != missile.SourceUnit && unit.Type->BoolFlag[WALL_INDEX].value 
+						&& unit.Player != missile.SourceUnit->Player && unit.IsAllied(*missile.SourceUnit) == false) {
+							if (missile.TargetUnit) {
+								missile.TargetUnit = &unit;
+								if (unit.Type->TileWidth == 1 || unit.Type->TileHeight == 1) {
+									missile.position = Map.TilePosToMapPixelPos_TopLeft(unit.tilePos);
+								}
+							} else {
+								missile.position = position;
+							}
+							return true;
+					}
+				}
+				// missile can kill any unit on it's way
+				if (missile.Type->KillFirstUnit && &unit != missile.SourceUnit) {
+					if (missile.Type->FriendlyFire == false || unit.IsEnemy(*missile.SourceUnit->Player)) {
+						missile.TargetUnit = &unit;
+						if (unit.Type->TileWidth == 1 || unit.Type->TileHeight == 1) {
 							missile.position = Map.TilePosToMapPixelPos_TopLeft(unit.tilePos);
-						} else {
-							missile.position = position;
 						}
 						return true;
+					}
 				}
 			}
 	}
@@ -741,7 +754,7 @@ bool PointToPointMissile(Missile &missile)
 			}
 	}
 
-	// Handle wall blocking
+	// Handle wall blocking and kill first enemy
 	mapPos = Map.MapPixelPosToTilePos(missile.position);
 	for (pos = oldPos; pos.x * sign.x <= missile.position.x * sign.x
 		&& pos.y * sign.y <= missile.position.y * sign.y;
@@ -750,7 +763,7 @@ bool PointToPointMissile(Missile &missile)
 			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
 				(int)pos.y + missile.Type->size.y / 2);
 			if (Map.MapPixelPosToTilePos(position) != mapPos) {
-				if (MissileHandleWallBlocking(missile, position)) {
+				if (MissileHandleBlocking(missile, position)) {
 					return true;
 				}
 				mapPos = Map.MapPixelPosToTilePos(position);
@@ -1274,8 +1287,8 @@ MissileType::MissileType(const std::string &ident) :
 	Ident(ident), Transparency(0), DrawLevel(0),
 	SpriteFrames(0), NumDirections(0), ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
 	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
-	AlwaysFire(false), Pierce(false), PierceOnce(false), IgnoreWalls(true), Class(), NumBounces(0),
-	ParabolCoefficient(2048), StartDelay(0),
+	AlwaysFire(false), Pierce(false), PierceOnce(false), IgnoreWalls(true), KillFirstUnit(false),
+	Class(), NumBounces(0),	ParabolCoefficient(2048), StartDelay(0),
 	Sleep(0), Speed(0), TTL(-1), Damage(0), ReduceFactor(100), SmokePrecision(0),
 	Range(0), SplashFactor(0),
 	ImpactParticle(NULL), SmokeParticle(NULL), OnImpact(NULL),

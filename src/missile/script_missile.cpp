@@ -181,6 +181,8 @@ void MissileType::Load(lua_State *l)
 			this->PierceOnce = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "IgnoreWalls")) {
 			this->IgnoreWalls = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "KillFirstUnit")) {
+			this->KillFirstUnit = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "FriendlyFire")) {
 			this->FriendlyFire = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SplashFactor")) {

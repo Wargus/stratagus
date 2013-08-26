@@ -377,6 +377,7 @@ public:
 	bool Pierce;               /// missile will hit every unit on his way
 	bool PierceOnce;           /// pierce every target only once
 	bool IgnoreWalls;          /// missile ignores Wall units on it's way
+	bool KillFirstUnit;        /// missile kills first unit blocking it's way
 
 	int Class;                 /// missile class
 	int NumBounces;            /// number of bounces
@@ -460,7 +461,7 @@ public:
 extern bool MissileInitMove(Missile &missile);
 extern bool PointToPointMissile(Missile &missile);
 extern void MissileHandlePierce(Missile &missile, const Vec2i &pos);
-extern bool MissileHandleWallBlocking(Missile &missile, const PixelPos &position);
+extern bool MissileHandleBlocking(Missile &missile, const PixelPos &position);
 
 class MissileNone : public Missile
 {
