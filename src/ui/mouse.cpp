@@ -462,6 +462,17 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	//  Right mouse with SHIFT appends command to old commands.
 	const int flush = !(KeyModifiers & ModifierShift);
 
+	//  Control + alt click - ground attack
+	if ((KeyModifiers & ModifierControl) && (KeyModifiers & ModifierAlt)) {
+		if (unit.Type->GroundAttack) {
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceAttack);
+				acknowledged = 1;
+			}
+			SendCommandAttackGround(unit, pos, flush);
+			return;
+		}
+	}
 	//  Control + right click on unit is follow anything.
 	if ((KeyModifiers & ModifierControl) && dest) {
 		dest->Blink = 4;
