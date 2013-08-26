@@ -1067,6 +1067,11 @@ static int CclDefineUnitType(lua_State *l)
 		LuaError(l, "Unit-type `%s': right-attack is set, but can-attack is not\n" _C_ type->Name.c_str());
 	}
 	UpdateDefaultBoolFlags(*type);
+	if (!CclInConfigFile) {
+		for (int player = 0; player < PlayerMax; ++player) {
+			type->Stats[player] = type->DefaultStat;
+		}
+	}
 	return 0;
 }
 
