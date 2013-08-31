@@ -561,8 +561,6 @@ static void DrawPopup()
 */
 static void DrawUnitIcons()
 {
-	const int maxx = UI.ButtonPanel.X + ButtonPanelWidth - IconWidth;
-	const int maxy = UI.ButtonPanel.Y + ButtonPanelHeight - IconHeight;
 	int i = Editor.UnitIndex;
 
 	for (size_t j = 0; j < UI.ButtonPanel.Buttons.size(); ++j) {
@@ -657,7 +655,7 @@ static void DrawTileIcons()
 		label.DrawReverseCentered(x, y, "2x2");
 	} else {
 		label.DrawCentered(x, y, "2x2");
-	}	
+	}
 	y += 20;
 	if (TileCursorSize == 3) {
 		label.DrawReverseCentered(x, y, "3x3");

@@ -225,7 +225,7 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 				fprintf(stderr, "ParseAnimInt: expected ')'\n");
 				ExitFatal(1);
 			}
-			*end = NULL;
+			*end = '\0';
 			next = end + 1;
 		} else {
 			next = strchr(cur, '.');
