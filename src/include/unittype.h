@@ -729,6 +729,7 @@ extern CUnitTypeVar UnitTypeVar;
 extern CUnitType *CclGetUnitType(lua_State *l);  /// Access unit-type object
 extern void UnitTypeCclRegister();               /// Register ccl features
 
+extern void UpdateUnitStats(CUnitType &type, int reset_to_default);       /// Update unit stats
 extern void UpdateStats(int reset_to_default);       /// Update unit stats
 extern CUnitType *UnitTypeByIdent(const std::string &ident);/// Get unit-type by ident
 

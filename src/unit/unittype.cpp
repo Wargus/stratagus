@@ -731,42 +731,34 @@ bool CUnitType::CanSelect(GroupSelectionMode mode) const
 	return false;
 }
 
-
-/**
-**  Update the player stats for changed unit types.
-**  @param reset indicates wether default value should be set to each stat (level, upgrades)
-*/
-void UpdateStats(int reset)
+void UpdateUnitStats(CUnitType &type, int reset)
 {
-	// Update players stats
-	for (std::vector<CUnitType *>::size_type j = 0; j < UnitTypes.size(); ++j) {
-		CUnitType &type = *UnitTypes[j];
-		if (reset) {
-			for (int player = 0; player < PlayerMax; ++player) {
-				type.Stats[player] = type.DefaultStat;
-			}
+	if (reset) {
+		for (int player = 0; player < PlayerMax; ++player) {
+			type.Stats[player] = type.DefaultStat;
 		}
+	}
 
-		// Non-solid units can always be entered and they don't block anything
-		if (type.NonSolid) {
-			if (type.Building) {
-				type.MovementMask = MapFieldLandUnit |
-									MapFieldSeaUnit |
-									MapFieldBuilding |
-									MapFieldCoastAllowed |
-									MapFieldWaterAllowed |
-									MapFieldNoBuilding |
-									MapFieldUnpassable;
-				type.FieldFlags = MapFieldNoBuilding;
-			} else {
-				type.MovementMask = 0;
-				type.FieldFlags = 0;
-			}
-			continue;
+	// Non-solid units can always be entered and they don't block anything
+	if (type.NonSolid) {
+		if (type.Building) {
+			type.MovementMask = MapFieldLandUnit |
+				MapFieldSeaUnit |
+				MapFieldBuilding |
+				MapFieldCoastAllowed |
+				MapFieldWaterAllowed |
+				MapFieldNoBuilding |
+				MapFieldUnpassable;
+			type.FieldFlags = MapFieldNoBuilding;
+		} else {
+			type.MovementMask = 0;
+			type.FieldFlags = 0;
 		}
+		return;
+	}
 
-		//  As side effect we calculate the movement flags/mask here.
-		switch (type.UnitType) {
+	//  As side effect we calculate the movement flags/mask here.
+	switch (type.UnitType) {
 			case UnitTypeLand:                              // on land
 				type.MovementMask =
 					MapFieldLandUnit |
@@ -801,28 +793,28 @@ void UpdateStats(int reset)
 				DebugPrint("Where moves this unit?\n");
 				type.MovementMask = 0;
 				break;
+	}
+	if (type.Building || type.ShoreBuilding) {
+		// Shore building is something special.
+		if (type.ShoreBuilding) {
+			type.MovementMask =
+				MapFieldLandUnit |
+				MapFieldSeaUnit |
+				MapFieldBuilding | // already occuppied
+				MapFieldLandAllowed; // can't build on this
 		}
-		if (type.Building || type.ShoreBuilding) {
-			// Shore building is something special.
-			if (type.ShoreBuilding) {
-				type.MovementMask =
-					MapFieldLandUnit |
-					MapFieldSeaUnit |
-					MapFieldBuilding | // already occuppied
-					MapFieldLandAllowed; // can't build on this
-			}
-			type.MovementMask |= MapFieldNoBuilding;
-			//
-			// A little chaos, buildings without HP can be entered.
-			// The oil-patch is a very special case.
-			//
-			if (type.DefaultStat.Variables[HP_INDEX].Max) {
-				type.FieldFlags = MapFieldBuilding;
-			} else {
-				type.FieldFlags = MapFieldNoBuilding;
-			}
+		type.MovementMask |= MapFieldNoBuilding;
+		//
+		// A little chaos, buildings without HP can be entered.
+		// The oil-patch is a very special case.
+		//
+		if (type.DefaultStat.Variables[HP_INDEX].Max) {
+			type.FieldFlags = MapFieldBuilding;
 		} else {
-			switch (type.UnitType) {
+			type.FieldFlags = MapFieldNoBuilding;
+		}
+	} else {
+		switch (type.UnitType) {
 				case UnitTypeLand: // on land
 					type.FieldFlags = MapFieldLandUnit;
 					break;
@@ -836,8 +828,21 @@ void UpdateStats(int reset)
 					DebugPrint("Where moves this unit?\n");
 					type.FieldFlags = 0;
 					break;
-			}
 		}
+	}
+}
+
+
+/**
+**  Update the player stats for changed unit types.
+**  @param reset indicates wether default value should be set to each stat (level, upgrades)
+*/
+void UpdateStats(int reset)
+{
+	// Update players stats
+	for (std::vector<CUnitType *>::size_type j = 0; j < UnitTypes.size(); ++j) {
+		CUnitType &type = *UnitTypes[j];
+		UpdateUnitStats(type, reset);
 	}
 }
 

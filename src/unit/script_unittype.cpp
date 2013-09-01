@@ -1068,9 +1068,7 @@ static int CclDefineUnitType(lua_State *l)
 	}
 	UpdateDefaultBoolFlags(*type);
 	if (!CclInConfigFile) {
-		for (int player = 0; player < PlayerMax; ++player) {
-			type->Stats[player] = type->DefaultStat;
-		}
+		UpdateUnitStats(*type, 1);
 	}
 	return 0;
 }
