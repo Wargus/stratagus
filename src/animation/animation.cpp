@@ -69,7 +69,7 @@
 #include "unit.h"
 #include "unittype.h"
 
-#define ANIMATIONS_MAXANIM 1024
+#define ANIMATIONS_MAXANIM 4096
 
 struct LabelsStruct {
 	CAnimation *Anim;
