@@ -429,7 +429,7 @@ void CViewport::Draw() const
 		const bool isMapFieldVisile = Map.Field(tilePos)->playerInfo.IsTeamVisible(*ThisPlayer);
 
 		if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos)
-			&& (isMapFieldVisile || ReplayRevealMap)) {
+			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap)) {
 			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
 		} else if (!isMapFieldVisile) {
 			ShowUnitName(*this, CursorScreenPos, NULL, true);
