@@ -157,7 +157,7 @@ void CIcon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
 	this->GScale->DrawFrameClip(this->Frame, pos.x, pos.y);
 	const int height = (G->Height * (100 - percent)) / 100;
 	this->G->DrawSubClip(G->frame_map[Frame].x, G->frame_map[Frame].y + G->Height - height, G->Width,
-		height, pos.x, pos.y + G->Height - height);
+						 height, pos.x, pos.y + G->Height - height);
 }
 
 /**

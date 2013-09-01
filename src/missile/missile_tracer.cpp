@@ -71,41 +71,41 @@ static bool TracerMissile(Missile &missile)
 	missile.position = missile.source + diff * missile.CurrentStep / missile.TotalStep;
 
 	for (; pos.x * sign.x <= missile.position.x * sign.x
-		&& pos.y * sign.y <= missile.position.y * sign.y;
-		pos.x += (double)diff.x * missile.Type->SmokePrecision / missile.TotalStep,
-		pos.y += (double)diff.y * missile.Type->SmokePrecision / missile.TotalStep) {
-			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
-				(int)pos.y + missile.Type->size.y / 2);
-			if (missile.Type->Smoke.Missile && missile.CurrentStep) {
-				Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position);
-				if (smoke && smoke->Type->NumDirections > 1) {
-					smoke->MissileNewHeadingFromXY(diff);
-				}
+		 && pos.y * sign.y <= missile.position.y * sign.y;
+		 pos.x += (double)diff.x * missile.Type->SmokePrecision / missile.TotalStep,
+		 pos.y += (double)diff.y * missile.Type->SmokePrecision / missile.TotalStep) {
+		const PixelPos position((int)pos.x + missile.Type->size.x / 2,
+								(int)pos.y + missile.Type->size.y / 2);
+		if (missile.Type->Smoke.Missile && missile.CurrentStep) {
+			Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position);
+			if (smoke && smoke->Type->NumDirections > 1) {
+				smoke->MissileNewHeadingFromXY(diff);
 			}
+		}
 
-			if (missile.Type->SmokeParticle && missile.CurrentStep) {
-				missile.Type->SmokeParticle->pushPreamble();
-				missile.Type->SmokeParticle->pushInteger(position.x);
-				missile.Type->SmokeParticle->pushInteger(position.y);
-				missile.Type->SmokeParticle->run();
-			}
+		if (missile.Type->SmokeParticle && missile.CurrentStep) {
+			missile.Type->SmokeParticle->pushPreamble();
+			missile.Type->SmokeParticle->pushInteger(position.x);
+			missile.Type->SmokeParticle->pushInteger(position.y);
+			missile.Type->SmokeParticle->run();
+		}
 
-			if (missile.Type->Pierce) {
-				const PixelPos posInt((int)pos.x, (int)pos.y);
-				MissileHandlePierce(missile, Map.MapPixelPosToTilePos(posInt));
-			}
+		if (missile.Type->Pierce) {
+			const PixelPos posInt((int)pos.x, (int)pos.y);
+			MissileHandlePierce(missile, Map.MapPixelPosToTilePos(posInt));
+		}
 	}
 
 	// Handle wall blocking
 	for (pos = oldPos; pos.x * sign.x <= missile.position.x * sign.x
-		&& pos.y * sign.y <= missile.position.y * sign.y;
-		pos.x += (double)diff.x / missile.TotalStep,
-		pos.y += (double)diff.y / missile.TotalStep) {
-			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
-				(int)pos.y + missile.Type->size.y / 2);
-			if (MissileHandleBlocking(missile, position)) {
-				return true;
-			}
+		 && pos.y * sign.y <= missile.position.y * sign.y;
+		 pos.x += (double)diff.x / missile.TotalStep,
+		 pos.y += (double)diff.y / missile.TotalStep) {
+		const PixelPos position((int)pos.x + missile.Type->size.x / 2,
+								(int)pos.y + missile.Type->size.y / 2);
+		if (MissileHandleBlocking(missile, position)) {
+			return true;
+		}
 	}
 
 	if (missile.CurrentStep == missile.TotalStep) {

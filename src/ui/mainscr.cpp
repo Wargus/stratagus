@@ -1130,8 +1130,8 @@ void CInfoPanel::Draw()
 	DrawInfoPanelBackground(0);
 	if (UnitUnderCursor && UnitUnderCursor->IsVisible(*ThisPlayer)
 		&& !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
-			// FIXME: not correct for enemies units
-			DrawUnitInfo(*UnitUnderCursor);
+		// FIXME: not correct for enemies units
+		DrawUnitInfo(*UnitUnderCursor);
 	} else {
 		// FIXME: need some cool ideas for this.
 

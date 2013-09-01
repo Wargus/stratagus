@@ -576,11 +576,11 @@ static void DrawUnitIcons()
 		Video.DrawRectangleClip(ColorGray, x, y, icon.G->Width, icon.G->Height);
 		if (i == Editor.SelectedUnitIndex) {
 			Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
-				icon.G->Width - 2, icon.G->Height - 2);
+									icon.G->Width - 2, icon.G->Height - 2);
 		}
 		if (i == Editor.CursorUnitIndex) {
 			Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
-				icon.G->Width + 2, icon.G->Height + 2);
+									icon.G->Width + 2, icon.G->Height + 2);
 			Editor.PopUpX = x;
 			Editor.PopUpY = y;
 		}
@@ -1460,13 +1460,13 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 		}
 		if (x < screenPos.x && screenPos.x < x + IconWidth
 			&& y < screenPos.y && screenPos.y < y + IconHeight) {
-				char buf[256];
-				snprintf(buf, sizeof(buf), "%s \"%s\"",
-					Editor.ShownUnitTypes[i]->Ident.c_str(),
-					Editor.ShownUnitTypes[i]->Name.c_str());
-				UI.StatusLine.Set(buf);
-				Editor.CursorUnitIndex = i;
-				return true;
+			char buf[256];
+			snprintf(buf, sizeof(buf), "%s \"%s\"",
+					 Editor.ShownUnitTypes[i]->Ident.c_str(),
+					 Editor.ShownUnitTypes[i]->Name.c_str());
+			UI.StatusLine.Set(buf);
+			Editor.CursorUnitIndex = i;
+			return true;
 		}
 		++i;
 	}

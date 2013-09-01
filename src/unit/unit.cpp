@@ -2356,11 +2356,11 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 	// Buildings, non-aggressive and invincible units have the lowest priority
 	if (dest.IsAgressive() == false || dest.Variable[UNHOLYARMOR_INDEX].Value > 0
 		|| dest.Type->Indestructible) {
-			if (dest.Type->CanMove() == false) {
-				return INT_MAX;
-			} else {
-				return INT_MAX / 2;
-			}
+		if (dest.Type->CanMove() == false) {
+			return INT_MAX;
+		} else {
+			return INT_MAX / 2;
+		}
 	}
 
 	// Priority 0-255

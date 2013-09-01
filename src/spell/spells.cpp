@@ -299,7 +299,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 					if (table[i]->CurrentAction() != UnitActionAttack
 						&& table[i]->CurrentAction() != UnitActionAttackGround
 						&& table[i]->CurrentAction() != UnitActionSpellCast) {
-							continue;
+						continue;
 					}
 				}
 				if (PassCondition(caster, spell, table[i], pos, spell.Condition)
@@ -414,7 +414,7 @@ int AutoCastSpell(CUnit &caster, const SpellType &spell)
 	if (!SpellIsAvailable(*caster.Player, spell.Slot)
 		|| caster.Variable[MANA_INDEX].Value < spell.ManaCost
 		|| caster.SpellCoolDownTimers[spell.Slot]) {
-			return 0;
+		return 0;
 	}
 	Target *target = SelectTargetUnitsOfAutoCast(caster, spell);
 	if (target == NULL) {

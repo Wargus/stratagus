@@ -743,12 +743,12 @@ void UpdateUnitStats(CUnitType &type, int reset)
 	if (type.NonSolid) {
 		if (type.Building) {
 			type.MovementMask = MapFieldLandUnit |
-				MapFieldSeaUnit |
-				MapFieldBuilding |
-				MapFieldCoastAllowed |
-				MapFieldWaterAllowed |
-				MapFieldNoBuilding |
-				MapFieldUnpassable;
+								MapFieldSeaUnit |
+								MapFieldBuilding |
+								MapFieldCoastAllowed |
+								MapFieldWaterAllowed |
+								MapFieldNoBuilding |
+								MapFieldUnpassable;
 			type.FieldFlags = MapFieldNoBuilding;
 		} else {
 			type.MovementMask = 0;
@@ -759,40 +759,40 @@ void UpdateUnitStats(CUnitType &type, int reset)
 
 	//  As side effect we calculate the movement flags/mask here.
 	switch (type.UnitType) {
-			case UnitTypeLand:                              // on land
+		case UnitTypeLand:                              // on land
+			type.MovementMask =
+				MapFieldLandUnit |
+				MapFieldSeaUnit |
+				MapFieldBuilding | // already occuppied
+				MapFieldCoastAllowed |
+				MapFieldWaterAllowed | // can't move on this
+				MapFieldUnpassable;
+			break;
+		case UnitTypeFly:                               // in air
+			type.MovementMask = MapFieldAirUnit; // already occuppied
+			break;
+		case UnitTypeNaval:                             // on water
+			if (type.CanTransport()) {
+				type.MovementMask =
+					MapFieldLandUnit |
+					MapFieldSeaUnit |
+					MapFieldBuilding | // already occuppied
+					MapFieldLandAllowed; // can't move on this
+				// Johns: MapFieldUnpassable only for land units?
+			} else {
 				type.MovementMask =
 					MapFieldLandUnit |
 					MapFieldSeaUnit |
 					MapFieldBuilding | // already occuppied
 					MapFieldCoastAllowed |
-					MapFieldWaterAllowed | // can't move on this
+					MapFieldLandAllowed | // can't move on this
 					MapFieldUnpassable;
-				break;
-			case UnitTypeFly:                               // in air
-				type.MovementMask = MapFieldAirUnit; // already occuppied
-				break;
-			case UnitTypeNaval:                             // on water
-				if (type.CanTransport()) {
-					type.MovementMask =
-						MapFieldLandUnit |
-						MapFieldSeaUnit |
-						MapFieldBuilding | // already occuppied
-						MapFieldLandAllowed; // can't move on this
-					// Johns: MapFieldUnpassable only for land units?
-				} else {
-					type.MovementMask =
-						MapFieldLandUnit |
-						MapFieldSeaUnit |
-						MapFieldBuilding | // already occuppied
-						MapFieldCoastAllowed |
-						MapFieldLandAllowed | // can't move on this
-						MapFieldUnpassable;
-				}
-				break;
-			default:
-				DebugPrint("Where moves this unit?\n");
-				type.MovementMask = 0;
-				break;
+			}
+			break;
+		default:
+			DebugPrint("Where moves this unit?\n");
+			type.MovementMask = 0;
+			break;
 	}
 	if (type.Building || type.ShoreBuilding) {
 		// Shore building is something special.
@@ -815,19 +815,19 @@ void UpdateUnitStats(CUnitType &type, int reset)
 		}
 	} else {
 		switch (type.UnitType) {
-				case UnitTypeLand: // on land
-					type.FieldFlags = MapFieldLandUnit;
-					break;
-				case UnitTypeFly: // in air
-					type.FieldFlags = MapFieldAirUnit;
-					break;
-				case UnitTypeNaval: // on water
-					type.FieldFlags = MapFieldSeaUnit;
-					break;
-				default:
-					DebugPrint("Where moves this unit?\n");
-					type.FieldFlags = 0;
-					break;
+			case UnitTypeLand: // on land
+				type.FieldFlags = MapFieldLandUnit;
+				break;
+			case UnitTypeFly: // in air
+				type.FieldFlags = MapFieldAirUnit;
+				break;
+			case UnitTypeNaval: // on water
+				type.FieldFlags = MapFieldSeaUnit;
+				break;
+			default:
+				DebugPrint("Where moves this unit?\n");
+				type.FieldFlags = 0;
+				break;
 		}
 	}
 }

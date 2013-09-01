@@ -212,7 +212,7 @@ public:
 	int ManaCost;               /// Required mana for each cast.
 	int RepeatCast;             /// If the spell will be cast again until out of targets.
 	int Costs[MaxCosts];        /// Resource costs of spell.
-	int CoolDown;               /// How much time spell needs to be cast again.       
+	int CoolDown;               /// How much time spell needs to be cast again.
 
 	int DependencyId;           /// Id of upgrade, -1 if no upgrade needed for cast the spell.
 	ConditionInfo *Condition;   /// Conditions to cast the spell. (generic (no test for each target))

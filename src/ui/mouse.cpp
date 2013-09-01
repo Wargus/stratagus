@@ -925,37 +925,37 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 		if (CursorBuilding && (MouseButtons & LeftButton) && Selected[0]
 			&& (KeyModifiers & (ModifierAlt | ModifierShift))) {
-				const CUnit &unit = *Selected[0];
-				const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
-				bool explored = CanBuildOnArea(*Selected[0], tilePos);
+			const CUnit &unit = *Selected[0];
+			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
+			bool explored = CanBuildOnArea(*Selected[0], tilePos);
 
-				// We now need to check if there are another build commands on this build spot
-				bool buildable = true;
-				for (std::vector<COrderPtr>::const_iterator it = unit.Orders.begin();
-					it != unit.Orders.end(); ++it) {
-						COrder &order = **it;
-						if (order.Action == UnitActionBuild) {
-							COrder_Build &build = dynamic_cast<COrder_Build &>(order);
-							if (tilePos.x >= build.GetGoalPos().x 
-								&& tilePos.x < build.GetGoalPos().x + build.GetUnitType().TileWidth
-								&& tilePos.y >= build.GetGoalPos().y 
-								&& tilePos.y < build.GetGoalPos().y + build.GetUnitType().TileHeight) {
-									buildable = false;
-									break;
-							}
-						}
-				}
-
-				// 0 Test build, don't really build
-				if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && buildable && (explored || ReplayRevealMap)) {
-					const int flush = !(KeyModifiers & ModifierShift);
-					for (int i = 0; i < NumSelected; ++i) {
-						SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush);
-					}
-					if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
-						CancelBuildingMode();
+			// We now need to check if there are another build commands on this build spot
+			bool buildable = true;
+			for (std::vector<COrderPtr>::const_iterator it = unit.Orders.begin();
+				 it != unit.Orders.end(); ++it) {
+				COrder &order = **it;
+				if (order.Action == UnitActionBuild) {
+					COrder_Build &build = dynamic_cast<COrder_Build &>(order);
+					if (tilePos.x >= build.GetGoalPos().x
+						&& tilePos.x < build.GetGoalPos().x + build.GetUnitType().TileWidth
+						&& tilePos.y >= build.GetGoalPos().y
+						&& tilePos.y < build.GetGoalPos().y + build.GetUnitType().TileHeight) {
+						buildable = false;
+						break;
 					}
 				}
+			}
+
+			// 0 Test build, don't really build
+			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && buildable && (explored || ReplayRevealMap)) {
+				const int flush = !(KeyModifiers & ModifierShift);
+				for (int i = 0; i < NumSelected; ++i) {
+					SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush);
+				}
+				if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
+					CancelBuildingMode();
+				}
+			}
 		}
 		if (Preference.ShowNameDelay) {
 			ShowNameDelay = GameCycle + Preference.ShowNameDelay;
@@ -1580,7 +1580,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 			&& UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {// enter select mode
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 			bool explored = CanBuildOnArea(*Selected[0], tilePos);
-			
+
 			// 0 Test build, don't really build
 			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && (explored || ReplayRevealMap)) {
 				const int flush = !(KeyModifiers & ModifierShift);

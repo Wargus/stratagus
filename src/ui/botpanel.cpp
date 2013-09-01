@@ -765,10 +765,10 @@ void CButtonPanel::Draw()
 				gray = true;
 				break;
 			} else if (buttons[i].Action == ButtonSpellCast
-				&& (*Selected[j]).SpellCoolDownTimers[SpellTypeTable[buttons[i].Value]->Slot]) {
-					Assert(SpellTypeTable[buttons[i].Value]->CoolDown > 0);
-					cooldownSpell = true;
-					maxCooldown = std::max(maxCooldown, (*Selected[j]).SpellCoolDownTimers[SpellTypeTable[buttons[i].Value]->Slot]);
+					   && (*Selected[j]).SpellCoolDownTimers[SpellTypeTable[buttons[i].Value]->Slot]) {
+				Assert(SpellTypeTable[buttons[i].Value]->CoolDown > 0);
+				cooldownSpell = true;
+				maxCooldown = std::max(maxCooldown, (*Selected[j]).SpellCoolDownTimers[SpellTypeTable[buttons[i].Value]->Slot]);
 			}
 		}
 		//
@@ -791,8 +791,8 @@ void CButtonPanel::Draw()
 		const PixelPos pos(UI.ButtonPanel.Buttons[i].X, UI.ButtonPanel.Buttons[i].Y);
 
 		if (cooldownSpell) {
-			buttons[i].Icon.Icon->DrawCooldownSpellIcon(pos, 
-				maxCooldown * 100 / SpellTypeTable[buttons[i].Value]->CoolDown);
+			buttons[i].Icon.Icon->DrawCooldownSpellIcon(pos,
+														maxCooldown * 100 / SpellTypeTable[buttons[i].Value]->CoolDown);
 		} else if (gray) {
 			buttons[i].Icon.Icon->DrawGrayscaleIcon(pos);
 		} else {
@@ -1129,7 +1129,7 @@ void CButtonPanel::DoClicked_Unload(int button)
 	//  Unload on coast valid only for sea units
 	//
 	if ((NumSelected == 1 && Selected[0]->CurrentAction() == UnitActionStill
-		&& Selected[0]->Type->UnitType == UnitTypeNaval && Map.Field(Selected[0]->tilePos)->CoastOnMap())
+		 && Selected[0]->Type->UnitType == UnitTypeNaval && Map.Field(Selected[0]->tilePos)->CoastOnMap())
 		|| !Selected[0]->CanMove()) {
 		SendCommandUnload(*Selected[0], Selected[0]->tilePos, NoUnitP, flush);
 		return ;

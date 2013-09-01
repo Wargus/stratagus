@@ -662,7 +662,7 @@ void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 
 		if (unit.IsAliveOnMap()
 			&& (missile.Type->FriendlyFire == false || unit.IsEnemy(*missile.SourceUnit->Player))) {
-				missile.MissileHit(&unit);
+			missile.MissileHit(&unit);
 		}
 	}
 }
@@ -687,18 +687,18 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 				CUnit &unit = **it;
 				// If land unit shoots at land unit, missile can be blocked by Wall units
 				if (!missile.Type->IgnoreWalls && missile.SourceUnit->Type->UnitType == UnitTypeLand) {
-					if (&unit != missile.SourceUnit && unit.Type->BoolFlag[WALL_INDEX].value 
+					if (&unit != missile.SourceUnit && unit.Type->BoolFlag[WALL_INDEX].value
 						&& unit.Player != missile.SourceUnit->Player && unit.IsAllied(*missile.SourceUnit) == false) {
-							if (missile.TargetUnit) {
-								missile.TargetUnit = &unit;
-								if (unit.Type->TileWidth == 1 || unit.Type->TileHeight == 1) {
-									missile.position = Map.TilePosToMapPixelPos_TopLeft(unit.tilePos);
-								}
-							} else {
-								missile.position = position;
+						if (missile.TargetUnit) {
+							missile.TargetUnit = &unit;
+							if (unit.Type->TileWidth == 1 || unit.Type->TileHeight == 1) {
+								missile.position = Map.TilePosToMapPixelPos_TopLeft(unit.tilePos);
 							}
-							missile.DestroyMissile = 1;
-							return true;
+						} else {
+							missile.position = position;
+						}
+						missile.DestroyMissile = 1;
+						return true;
 					}
 				}
 				// missile can kill any unit on it's way
@@ -745,57 +745,57 @@ bool PointToPointMissile(Missile &missile)
 	missile.position = missile.source + diff * missile.CurrentStep / missile.TotalStep;
 
 	for (; pos.x * sign.x <= missile.position.x * sign.x
-		&& pos.y * sign.y <= missile.position.y * sign.y;
-		pos.x += (double)diff.x * missile.Type->SmokePrecision / missile.TotalStep,
-		pos.y += (double)diff.y * missile.Type->SmokePrecision / missile.TotalStep) {
-			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
-				(int)pos.y + missile.Type->size.y / 2);
+		 && pos.y * sign.y <= missile.position.y * sign.y;
+		 pos.x += (double)diff.x * missile.Type->SmokePrecision / missile.TotalStep,
+		 pos.y += (double)diff.y * missile.Type->SmokePrecision / missile.TotalStep) {
+		const PixelPos position((int)pos.x + missile.Type->size.x / 2,
+								(int)pos.y + missile.Type->size.y / 2);
 
-			if (missile.Type->Smoke.Missile && (missile.CurrentStep || missile.State > 1)) {
-				Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position);
-				if (smoke && smoke->Type->NumDirections > 1) {
-					smoke->MissileNewHeadingFromXY(diff);
-				}
+		if (missile.Type->Smoke.Missile && (missile.CurrentStep || missile.State > 1)) {
+			Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position);
+			if (smoke && smoke->Type->NumDirections > 1) {
+				smoke->MissileNewHeadingFromXY(diff);
 			}
+		}
 
-			if (missile.Type->SmokeParticle && (missile.CurrentStep || missile.State > 1)) {
-				missile.Type->SmokeParticle->pushPreamble();
-				missile.Type->SmokeParticle->pushInteger(position.x);
-				missile.Type->SmokeParticle->pushInteger(position.y);
-				missile.Type->SmokeParticle->run();
-			}
+		if (missile.Type->SmokeParticle && (missile.CurrentStep || missile.State > 1)) {
+			missile.Type->SmokeParticle->pushPreamble();
+			missile.Type->SmokeParticle->pushInteger(position.x);
+			missile.Type->SmokeParticle->pushInteger(position.y);
+			missile.Type->SmokeParticle->run();
+		}
 
-			if (missile.Type->Pierce) {
-				const PixelPos posInt((int)pos.x, (int)pos.y);
-				MissileHandlePierce(missile, Map.MapPixelPosToTilePos(posInt));
-			}
+		if (missile.Type->Pierce) {
+			const PixelPos posInt((int)pos.x, (int)pos.y);
+			MissileHandlePierce(missile, Map.MapPixelPosToTilePos(posInt));
+		}
 	}
 
 	// Handle wall blocking and kill first enemy
 	for (pos = oldPos; pos.x * sign.x <= missile.position.x * sign.x
-		&& pos.y * sign.y <= missile.position.y * sign.y;
-		pos.x += (double)diff.x / missile.TotalStep,
-		pos.y += (double)diff.y / missile.TotalStep) {
-			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
-				(int)pos.y + missile.Type->size.y / 2);
-			const Vec2i tilePos(Map.MapPixelPosToTilePos(position));
+		 && pos.y * sign.y <= missile.position.y * sign.y;
+		 pos.x += (double)diff.x / missile.TotalStep,
+		 pos.y += (double)diff.y / missile.TotalStep) {
+		const PixelPos position((int)pos.x + missile.Type->size.x / 2,
+								(int)pos.y + missile.Type->size.y / 2);
+		const Vec2i tilePos(Map.MapPixelPosToTilePos(position));
 
-			if (MissileHandleBlocking(missile, position)) {
-				return true;
+		if (MissileHandleBlocking(missile, position)) {
+			return true;
+		}
+		if (missile.Type->MissileStopFlags) {
+			if (!Map.Info.IsPointOnMap(tilePos)) { // gone outside
+				missile.TTL = 0;
+				return false;
 			}
-			if (missile.Type->MissileStopFlags) {
-				if (!Map.Info.IsPointOnMap(tilePos)) { // gone outside
-					missile.TTL = 0;
-					return false;
-				}
-				const CMapField &mf = *Map.Field(tilePos);
-				if (missile.Type->MissileStopFlags & mf.Flags) { // incompatible terrain
-					missile.position = position;
-					missile.MissileHit();
-					missile.TTL = 0;
-					return false;
-				}
+			const CMapField &mf = *Map.Field(tilePos);
+			if (missile.Type->MissileStopFlags & mf.Flags) { // incompatible terrain
+				missile.position = position;
+				missile.MissileHit();
+				missile.TTL = 0;
+				return false;
 			}
+		}
 	}
 
 	if (missile.CurrentStep == missile.TotalStep) {
