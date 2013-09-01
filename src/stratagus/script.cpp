@@ -1878,8 +1878,12 @@ static int CclStratagusLibraryPath(lua_State *l)
 */
 static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 {
-	LuaCheckArgs(l, 1);
+	const int args = lua_gettop(l);
+	if (args < 1 || args > 2) {
+		LuaError(l, "incorrect argument");
+	}
 	const char *userdir = lua_tostring(l, 1);
+	const int rel = args > 1 ? lua_toboolean(l, 2) : 0;
 	int n = strlen(userdir);
 
 	int pathtype = 0; // path relative to stratagus dir
@@ -1892,7 +1896,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	if (strpbrk(userdir, ":*?\"<>|") != 0 || strstr(userdir, "..") != 0) {
 		LuaError(l, "Forbidden directory");
 	}
-	char directory[256];
+	char directory[PATH_MAX];
 
 	if (pathtype == 1) {
 		++userdir;
@@ -1902,6 +1906,12 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 			dir += GameName;
 		}
 		snprintf(directory, sizeof(directory), "%s/%s", dir.c_str(), userdir);
+	} else if (rel) {
+		char path[PATH_MAX];
+
+		snprintf(path, sizeof(path), "%s", userdir);
+		LibraryFileName(path, directory, sizeof(directory));
+		lua_pop(l, 1);
 	} else {
 		snprintf(directory, sizeof(directory), "%s/%s", StratagusLibPath.c_str(), userdir);
 	}
