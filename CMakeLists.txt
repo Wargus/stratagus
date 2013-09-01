@@ -216,6 +216,7 @@ set(missile_SRCS
 	src/missile/missile_pointtopointbounce.cpp
 	src/missile/missile_pointtopointcycleonce.cpp
 	src/missile/missile_stay.cpp
+	src/missile/missile_straightfly.cpp
 	src/missile/missile_tracer.cpp
 	src/missile/missile_whirlwind.cpp
 	src/missile/missileconfig.cpp

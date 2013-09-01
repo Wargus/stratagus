@@ -69,6 +69,7 @@ static const char *MissileClassNames[] = {
 	"missile-class-tracer",
 	"missile-class-clip-to-target",
 	"missile-class-continious",
+	"missile-class-straight-fly",
 	NULL
 };
 
@@ -146,6 +147,8 @@ void MissileType::Load(lua_State *l)
 			this->ReduceFactor = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "SmokePrecision")) {
 			this->SmokePrecision = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "MissileStopFlags")) {
+			this->MissileStopFlags = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DrawLevel")) {
 			this->DrawLevel = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Range")) {

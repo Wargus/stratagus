@@ -69,7 +69,6 @@ static bool TracerMissile(Missile &missile)
 	const PixelPrecise oldPos((double)missile.position.x, (double)missile.position.y); // Remember old position
 	PixelPrecise pos(oldPos);
 	missile.position = missile.source + diff * missile.CurrentStep / missile.TotalStep;
-	Vec2i mapPos = Map.MapPixelPosToTilePos(missile.position);
 
 	for (; pos.x * sign.x <= missile.position.x * sign.x
 		&& pos.y * sign.y <= missile.position.y * sign.y;
@@ -98,18 +97,14 @@ static bool TracerMissile(Missile &missile)
 	}
 
 	// Handle wall blocking
-	mapPos = Map.MapPixelPosToTilePos(missile.position);
 	for (pos = oldPos; pos.x * sign.x <= missile.position.x * sign.x
 		&& pos.y * sign.y <= missile.position.y * sign.y;
 		pos.x += (double)diff.x / missile.TotalStep,
 		pos.y += (double)diff.y / missile.TotalStep) {
 			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
 				(int)pos.y + missile.Type->size.y / 2);
-			if (Map.MapPixelPosToTilePos(position) != mapPos) {
-				if (MissileHandleBlocking(missile, position)) {
-					return true;
-				}
-				mapPos = Map.MapPixelPosToTilePos(position);
+			if (MissileHandleBlocking(missile, position)) {
+				return true;
 			}
 	}
 

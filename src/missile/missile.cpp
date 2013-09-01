@@ -146,7 +146,7 @@ MissileType *NewMissileTypeSlot(const std::string &ident)
 Missile::Missile() :
 	Type(NULL), SpriteFrame(0), State(0), AnimWait(0), Wait(0),
 	Delay(0), SourceUnit(), TargetUnit(), Damage(0),
-	TTL(-1), Hidden(0),
+	TTL(-1), Hidden(0), DestroyMissile(0),
 	CurrentStep(0), TotalStep(0),
 	Local(0)
 {
@@ -223,6 +223,9 @@ Missile::Missile() :
 			break;
 		case MissileClassContinious :
 			missile = new MissileContinious;
+			break;
+		case MissileClassStraightFly :
+			missile = new MissileStraightFly;
 			break;
 	}
 	const PixelPos halfSize = mtype.size / 2;
@@ -666,8 +669,16 @@ void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 
 bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 {
-	if (missile.SourceUnit && (missile.SourceUnit->CurrentAction() == UnitActionAttackGround
-		|| (missile.TargetUnit && missile.SourceUnit->Type->UnitType == missile.TargetUnit->Type->UnitType))) {
+	const MissileType &mtype = *missile.Type;
+	if (missile.SourceUnit) {
+		bool shouldHit = false;
+		if (missile.TargetUnit && missile.SourceUnit->Type->UnitType == missile.TargetUnit->Type->UnitType) {
+			shouldHit = true;
+		}
+		if (mtype.Range && mtype.CorrectSphashDamage) {
+			shouldHit = true;
+		}
+		if (shouldHit) {
 			// search for blocking units
 			std::vector<CUnit *> blockingUnits;
 			const Vec2i missilePos = Map.MapPixelPosToTilePos(position);
@@ -686,20 +697,27 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 							} else {
 								missile.position = position;
 							}
+							missile.DestroyMissile = 1;
 							return true;
 					}
 				}
 				// missile can kill any unit on it's way
 				if (missile.Type->KillFirstUnit && &unit != missile.SourceUnit) {
+					// can't kill non-solid or dead units
+					if (unit.IsAliveOnMap() == false || unit.Type->BoolFlag[NONSOLID_INDEX].value) {
+						continue;
+					}
 					if (missile.Type->FriendlyFire == false || unit.IsEnemy(*missile.SourceUnit->Player)) {
 						missile.TargetUnit = &unit;
 						if (unit.Type->TileWidth == 1 || unit.Type->TileHeight == 1) {
 							missile.position = Map.TilePosToMapPixelPos_TopLeft(unit.tilePos);
 						}
+						missile.DestroyMissile = 1;
 						return true;
 					}
 				}
 			}
+		}
 	}
 	return false;
 }
@@ -725,7 +743,6 @@ bool PointToPointMissile(Missile &missile)
 	const PixelPrecise oldPos((double)missile.position.x, (double)missile.position.y); // Remember old position
 	PixelPrecise pos(oldPos);
 	missile.position = missile.source + diff * missile.CurrentStep / missile.TotalStep;
-	Vec2i mapPos = Map.MapPixelPosToTilePos(missile.position);
 
 	for (; pos.x * sign.x <= missile.position.x * sign.x
 		&& pos.y * sign.y <= missile.position.y * sign.y;
@@ -755,18 +772,29 @@ bool PointToPointMissile(Missile &missile)
 	}
 
 	// Handle wall blocking and kill first enemy
-	mapPos = Map.MapPixelPosToTilePos(missile.position);
 	for (pos = oldPos; pos.x * sign.x <= missile.position.x * sign.x
 		&& pos.y * sign.y <= missile.position.y * sign.y;
 		pos.x += (double)diff.x / missile.TotalStep,
 		pos.y += (double)diff.y / missile.TotalStep) {
 			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
 				(int)pos.y + missile.Type->size.y / 2);
-			if (Map.MapPixelPosToTilePos(position) != mapPos) {
-				if (MissileHandleBlocking(missile, position)) {
-					return true;
+			const Vec2i tilePos(Map.MapPixelPosToTilePos(position));
+
+			if (MissileHandleBlocking(missile, position)) {
+				return true;
+			}
+			if (missile.Type->MissileStopFlags) {
+				if (!Map.Info.IsPointOnMap(tilePos)) { // gone outside
+					missile.TTL = 0;
+					return false;
 				}
-				mapPos = Map.MapPixelPosToTilePos(position);
+				const CMapField &mf = *Map.Field(tilePos);
+				if (missile.Type->MissileStopFlags & mf.Flags) { // incompatible terrain
+					missile.position = position;
+					missile.MissileHit();
+					missile.TTL = 0;
+					return false;
+				}
 			}
 	}
 
@@ -1290,7 +1318,7 @@ MissileType::MissileType(const std::string &ident) :
 	AlwaysFire(false), Pierce(false), PierceOnce(false), IgnoreWalls(true), KillFirstUnit(false),
 	Class(), NumBounces(0),	ParabolCoefficient(2048), StartDelay(0),
 	Sleep(0), Speed(0), TTL(-1), Damage(0), ReduceFactor(100), SmokePrecision(0),
-	Range(0), SplashFactor(0),
+	MissileStopFlags(0), Range(0), SplashFactor(0),
 	ImpactParticle(NULL), SmokeParticle(NULL), OnImpact(NULL),
 	G(NULL)
 {
