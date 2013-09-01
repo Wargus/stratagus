@@ -947,7 +947,11 @@ static int CclGetUnitVariable(lua_State *l)
 	Assert(nargs == 2 || nargs == 3);
 
 	lua_pushvalue(l, 1);
-	const CUnit *unit = CclGetUnit(l);
+	CUnit *unit = CclGetUnit(l);
+	if (unit == NULL) {
+		return 1;
+	}
+	UpdateUnitVariables(*unit);
 	lua_pop(l, 1);
 
 	const char *const value = LuaToString(l, 2);
@@ -959,6 +963,8 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushstring(l, unit->Type->Ident.c_str());
 	} else if (!strcmp(value, "ResourcesHeld")) {
 		lua_pushnumber(l, unit->ResourcesHeld);
+	} else if (!strcmp(value, "Name")) {
+		lua_pushstring(l, unit->Type->Name.c_str());
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[value];// User variables
 		if (index == -1) {
