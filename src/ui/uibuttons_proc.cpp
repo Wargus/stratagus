@@ -35,9 +35,10 @@
 
 #include "stratagus.h"
 #include "ui.h"
-#include "video.h"
 #include "font.h"
 #include "menus.h"
+#include "player.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -85,7 +86,13 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 		pimage->Sprite->Load();
 	}
 	if (pimage->Sprite) {
-		pimage->Sprite->DrawFrame(pimage->Frame, x, y);
+		CPlayerColorGraphic* colorGraphic = dynamic_cast<CPlayerColorGraphic*>(pimage->Sprite);
+
+		if (colorGraphic && ThisPlayer) {
+			colorGraphic->DrawPlayerColorFrameClip(ThisPlayer->Index, pimage->Frame, x, y);
+		} else {
+			pimage->Sprite->DrawFrame(pimage->Frame, x, y);
+		}
 	}
 
 	//
