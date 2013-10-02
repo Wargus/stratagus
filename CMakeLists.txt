@@ -811,6 +811,7 @@ endif()
 
 if(APPLE)
 	add_definitions(-DUSE_MAC)
+	set(SDL_LIBRARY ${SDL_LIBRARY} SDLmain)	
 endif()
 
 if(BSD)
@@ -1068,6 +1069,10 @@ endif()
 
 if(WIN32 AND MINGW AND ENABLE_STATIC)
 	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc -static-libstdc++ -Wl,--stack,10485760")
+endif()
+
+if(APPLE)
+	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -framework libpng -lSDLmain")
 endif()
 
 ########### next target ###############
