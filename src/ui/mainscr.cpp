@@ -519,7 +519,7 @@ void DrawResources()
 
 			if (ThisPlayer->MaxResources[i] != -1) {
 				const int resAmount = ThisPlayer->StoredResources[i] + ThisPlayer->Resources[i];
-				char tmp[128];
+				char tmp[256];
 				snprintf(tmp, sizeof(tmp), "%d (%d)", resAmount, ThisPlayer->MaxResources[i] - ThisPlayer->StoredResources[i]);
 				label.SetFont(GetSmallFont());
 
@@ -532,7 +532,7 @@ void DrawResources()
 		}
 	}
 	if (UI.Resources[FoodCost].TextX != -1) {
-		char tmp[128];
+		char tmp[256];
 		snprintf(tmp, sizeof(tmp), "%d/%d", ThisPlayer->Demand, ThisPlayer->Supply);
 		label.SetFont(GetGameFont());
 		if (ThisPlayer->Supply < ThisPlayer->Demand) {
@@ -561,7 +561,7 @@ void DrawResources()
 
 #define MESSAGES_MAX  10                         /// How many can be displayed
 
-static char MessagesEvent[MESSAGES_MAX][128];    /// Array of event messages
+static char MessagesEvent[MESSAGES_MAX][256];    /// Array of event messages
 static int  MessagesEventX[MESSAGES_MAX];        /// X coordinate of event
 static int  MessagesEventY[MESSAGES_MAX];        /// Y coordinate of event
 static int  MessagesEventCount;                  /// Number of event messages
@@ -596,7 +596,7 @@ protected:
 	bool CheckRepeatMessage(const char *msg);
 
 private:
-	char Messages[MESSAGES_MAX][128];         /// Array of messages
+	char Messages[MESSAGES_MAX][256];         /// Array of messages
 	int  MessagesCount;                       /// Number of messages
 	int  MessagesSameCount;                   /// Counts same message repeats
 	int  MessagesScrollY;
@@ -818,7 +818,7 @@ bool MessagesDisplay::CheckRepeatMessage(const char *msg)
 		return true;
 	}
 	if (MessagesSameCount > 0) {
-		char temp[128];
+		char temp[256];
 		int n;
 
 		n = MessagesSameCount;
@@ -926,7 +926,7 @@ void SetMessageEvent(const Vec2i &pos, const char *fmt, ...)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
-	char temp[128];
+	char temp[256];
 	va_list va;
 
 	va_start(va, fmt);
