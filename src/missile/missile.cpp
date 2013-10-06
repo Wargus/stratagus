@@ -236,7 +236,6 @@ Missile::Missile() :
 	missile->Wait = mtype.Sleep;
 	missile->Delay = mtype.StartDelay;
 	missile->TTL = mtype.TTL;
-	missile->Damage = mtype.Damage;
 
 	return missile;
 }
@@ -317,19 +316,19 @@ static int CalculateDamageStats(const CUnitStats &attacker_stats,
 **
 **  @return          damage produces on goal.
 */
-static int CalculateDamage(const CUnit &attacker, const CUnit &goal)
+static int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *formula)
 {
-	if (!Damage) { // Use old method.
+	if (!formula) { // Use old method.
 		return CalculateDamageStats(*attacker.Stats, *goal.Stats,
 									attacker.Variable[BLOODLUST_INDEX].Value);
 	}
-	Assert(Damage);
+	Assert(formula);
 
 	UpdateUnitVariables(const_cast<CUnit &>(attacker));
 	UpdateUnitVariables(const_cast<CUnit &>(goal));
 	TriggerData.Attacker = const_cast<CUnit *>(&attacker);
 	TriggerData.Defender = const_cast<CUnit *>(&goal);
-	const int res = EvalNumber(Damage);
+	const int res = EvalNumber(formula);
 	TriggerData.Attacker = NULL;
 	TriggerData.Defender = NULL;
 	return res;
@@ -382,7 +381,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 			DebugPrint("Missile-none hits no unit, shouldn't happen!\n");
 			return;
 		}
-		HitUnit(&unit, *goal, CalculateDamage(unit, *goal));
+		HitUnit(&unit, *goal, CalculateDamage(unit, *goal, Damage));
 		return;
 	}
 
@@ -821,11 +820,14 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 	if (goal.CurrentAction() != UnitActionDie) {
 		int damage;
 
-		if (missile.Damage) {  // direct damage, spells mostly
+		if (missile.Type->Damage) {   // custom formula
+			Assert(missile.SourceUnit != NULL);
+			damage = CalculateDamage(*missile.SourceUnit, goal, missile.Type->Damage) / splash;
+		} else if (missile.Damage) {  // direct damage, spells mostly
 			damage = missile.Damage / splash;
 		} else {
 			Assert(missile.SourceUnit != NULL);
-			damage = CalculateDamage(*missile.SourceUnit, goal) / splash;
+			damage = CalculateDamage(*missile.SourceUnit, goal, Damage) / splash;
 		}
 		if (missile.Type->Pierce) {  // Handle pierce factor
 			for (size_t i = 0; i < (missile.PiercedUnits.size() - 1); ++i) {
@@ -1317,7 +1319,7 @@ MissileType::MissileType(const std::string &ident) :
 	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
 	AlwaysFire(false), Pierce(false), PierceOnce(false), IgnoreWalls(true), KillFirstUnit(false),
 	Class(), NumBounces(0),	ParabolCoefficient(2048), StartDelay(0),
-	Sleep(0), Speed(0), TTL(-1), Damage(0), ReduceFactor(100), SmokePrecision(0),
+	Sleep(0), Speed(0), TTL(-1), Damage(NULL), ReduceFactor(100), SmokePrecision(0),
 	MissileStopFlags(0), Range(0), SplashFactor(0),
 	ImpactParticle(NULL), SmokeParticle(NULL), OnImpact(NULL),
 	G(NULL)
@@ -1336,6 +1338,7 @@ MissileType::~MissileType()
 	delete ImpactParticle;
 	delete SmokeParticle;
 	delete OnImpact;
+	FreeNumberDesc(this->Damage);
 }
 
 /**

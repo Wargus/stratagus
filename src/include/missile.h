@@ -296,6 +296,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "missileconfig.h"
+#include "script.h"
 #include "unitptr.h"
 #include "unitsound.h"
 #include "vec2i.h"
@@ -387,10 +388,10 @@ public:
 	int Sleep;                 /// missile sleep
 	int Speed;                 /// missile speed
 	int TTL;                   /// missile time-to-live
-	int Damage;                /// missile damage (used for non-direct missiles, e.g. impacts)
 	int ReduceFactor;          /// Multiplier for reduce or increase damage dealt to the next unit
 	int SmokePrecision;        /// How frequently the smoke missile will generate itself
 	int MissileStopFlags;      /// On which terrain types missile won't fly
+	NumberDesc *Damage;        /// missile damage (used for non-direct missiles, e.g. impacts)
 
 	int Range;                             /// missile damage range
 	int SplashFactor;                      /// missile splash divisor

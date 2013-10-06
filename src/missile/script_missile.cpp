@@ -142,7 +142,8 @@ void MissileType::Load(lua_State *l)
 		} else if (!strcmp(value, "TTL")) {
 			this->TTL = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Damage")) {
-			this->Damage = LuaToNumber(l, -1);
+			this->Damage = CclParseNumberDesc(l);
+			lua_pushnil(l);
 		} else if (!strcmp(value, "ReduceFactor")) {
 			this->ReduceFactor = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "SmokePrecision")) {
