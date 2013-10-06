@@ -428,7 +428,7 @@ void CViewport::Draw() const
 		const Vec2i tilePos = this->ScreenToTilePos(CursorScreenPos);
 		const bool isMapFieldVisile = Map.Field(tilePos)->playerInfo.IsTeamVisible(*ThisPlayer);
 
-		if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos)
+		if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && UnitUnderCursor
 			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap)) {
 			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
 		} else if (!isMapFieldVisile) {
