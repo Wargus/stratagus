@@ -1000,7 +1000,7 @@ static int CclGetUnitVariable(lua_State *l)
 static int CclSetUnitVariable(lua_State *l)
 {
 	const int nargs = lua_gettop(l);
-	Assert(nargs == 3 || nargs == 4);
+	Assert(nargs >= 3 && nargs <= 5);
 
 	lua_pushvalue(l, 1);
 	CUnit *unit = CclGetUnit(l);
@@ -1016,7 +1016,23 @@ static int CclSetUnitVariable(lua_State *l)
 			LuaError(l, "Bad variable name '%s'\n" _C_ name);
 		}
 		value = LuaToNumber(l, 3);
-		if (nargs == 3) {
+		bool stats = false;
+		if (nargs == 5)
+			stats = LuaToBoolean(l, 5);
+		if (stats) { // stat variables
+			const char *const type = LuaToString(l, 4);
+			if (!strcmp(type, "Value")) {
+				unit->Stats->Variables[index].Value = std::min(unit->Stats->Variables[index].Max, value);
+			} else if (!strcmp(type, "Max")) {
+				unit->Stats->Variables[index].Max = value;
+			} else if (!strcmp(type, "Increase")) {
+				unit->Stats->Variables[index].Increase = value;
+			} else if (!strcmp(type, "Enable")) {
+				unit->Stats->Variables[index].Enable = value;
+			} else {
+				LuaError(l, "Bad variable type '%s'\n" _C_ type);
+			}
+		} else if (nargs == 3) {
 			unit->Variable[index].Value = std::min(unit->Variable[index].Max, value);
 		} else {
 			const char *const type = LuaToString(l, 4);
