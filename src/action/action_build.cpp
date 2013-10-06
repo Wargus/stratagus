@@ -446,7 +446,9 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 		return ;
 	}
 	if (this->State == State_BuildFromOutside) {
-		this->BuildFromOutside(unit);
+		if (this->BuildFromOutside(unit)) {
+			this->Finished = true;
+		}
 	}
 }
 
