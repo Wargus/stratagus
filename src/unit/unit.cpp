@@ -2659,22 +2659,6 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		AiHelpMe(attacker, target);
 	}
 
-	if (HitUnit_IsUnitWillDie(attacker, target, damage)) { // unit is killed or destroyed
-		if (attacker) {
-			//  Setting ai threshold counter to 0 so it can target other units
-			attacker->Threshold = 0;
-			if (target.IsEnemy(*attacker)) {
-				HitUnit_IncreaseScoreForKill(*attacker, target);
-			}
-		}
-		LetUnitDie(target);
-		return;
-	}
-
-	HitUnit_ApplyDamage(attacker, target, damage);
-	HitUnit_BuildingCapture(attacker, target, damage);
-	HitUnit_ShowDamageMissile(target, damage);
-
 	// OnHit callback
 	if (type->OnHit) {
 		const int slot = UnitNumber(target);
@@ -2699,6 +2683,22 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 			missile->Type->OnImpact->run();
 		}
 	}
+
+	if (HitUnit_IsUnitWillDie(attacker, target, damage)) { // unit is killed or destroyed
+		if (attacker) {
+			//  Setting ai threshold counter to 0 so it can target other units
+			attacker->Threshold = 0;
+			if (target.IsEnemy(*attacker)) {
+				HitUnit_IncreaseScoreForKill(*attacker, target);
+			}
+		}
+		LetUnitDie(target);
+		return;
+	}
+
+	HitUnit_ApplyDamage(attacker, target, damage);
+	HitUnit_BuildingCapture(attacker, target, damage);
+	HitUnit_ShowDamageMissile(target, damage);
 
 	HitUnit_ShowImpactMissile(target);
 
