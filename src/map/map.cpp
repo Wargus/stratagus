@@ -266,7 +266,9 @@ bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos)
 bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos)
 {
 	Assert(unit.Type);
-
+	if (unit.Type->BoolFlag[NONSOLID_INDEX].value) {
+		return true;
+	}
 	return UnitTypeCanBeAt(*unit.Type, pos);
 }
 
