@@ -103,7 +103,7 @@ void InitButtons()
 */
 int AddButton(int pos, int level, const std::string &icon_ident,
 			  ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
-			  const std::string &allow, const std::string &hint, const std::string &descr,
+			  const std::string &allow, const int key, const std::string &hint, const std::string &descr,
 			  const std::string &sound, const std::string &cursor, const std::string &umask,
 			  const std::string &popup, bool alwaysShow)
 {
@@ -153,10 +153,10 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 
 	ba->Allowed = func;
 	ba->AllowStr = allow;
-	int key = GetHotKey(hint);
+	/*int key = GetHotKey(hint);
 	if (isascii(key) && isupper(key)) {
 		key = tolower(key);
-	}
+	}*/
 	ba->Key = key;
 	ba->Hint = hint;
 	ba->Description = descr;

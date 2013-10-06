@@ -263,7 +263,7 @@ extern void CleanButtons();
 /// Make a new button
 extern int AddButton(int pos, int level, const std::string &IconIdent,
 					 ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
-					 const std::string &arg, const std::string &hint, const std::string &descr,
+					 const std::string &arg, const int key, const std::string &hint, const std::string &descr,
 					 const std::string &sound, const std::string &cursor, const std::string &umask,
 					 const std::string &popup, bool alwaysShow);
 // Check if the button is allowed for the unit.
