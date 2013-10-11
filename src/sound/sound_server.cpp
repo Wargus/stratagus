@@ -524,10 +524,8 @@ static CSample *LoadSample(const char *name, enum _play_audio_flags_ flag)
 */
 CSample *LoadSample(const std::string &name)
 {
-	char buf[PATH_MAX];
-
-	LibraryFileName(name.c_str(), buf, sizeof(buf));
-	CSample *sample = LoadSample(buf, PlayAudioLoadInMemory);
+	const std::string filename = LibraryFileName(name.c_str());
+	CSample *sample = LoadSample(filename.c_str(), PlayAudioLoadInMemory);
 
 	if (sample == NULL) {
 		fprintf(stderr, "Can't load the sound `%s'\n", name.c_str());
@@ -649,11 +647,9 @@ int PlayMusic(const std::string &file)
 	if (!SoundEnabled() || !IsMusicEnabled()) {
 		return -1;
 	}
-	char name[PATH_MAX];
-
-	LibraryFileName(file.c_str(), name, sizeof(name));
-	DebugPrint("play music %s\n" _C_ name);
-	CSample *sample = LoadSample(name, PlayAudioStream);
+	const std::string name = LibraryFileName(file.c_str());
+	DebugPrint("play music %s\n" _C_ name.c_str());
+	CSample *sample = LoadSample(name.c_str(), PlayAudioStream);
 
 	if (sample) {
 		StopMusic();

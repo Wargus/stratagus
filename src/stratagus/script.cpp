@@ -246,12 +246,10 @@ static int CclSavePreferences(lua_State *l)
 */
 static int CclLoad(lua_State *l)
 {
-	char buf[1024];
-
 	LuaCheckArgs(l, 1);
-	LibraryFileName(LuaToString(l, 1), buf, sizeof(buf));
-	if (LuaLoadFile(buf) == -1) {
-		DebugPrint("Load failed: %s\n" _C_ LuaToString(l, 1));
+	const std::string filename = LibraryFileName(LuaToString(l, 1));
+	if (LuaLoadFile(filename) == -1) {
+		DebugPrint("Load failed: %s\n" _C_ filename.c_str());
 	}
 	return 0;
 }
@@ -265,12 +263,10 @@ static int CclLoad(lua_State *l)
 */
 static int CclLoadBuffer(lua_State *l)
 {
-	char file[1024];
-	std::string content;
-
 	LuaCheckArgs(l, 1);
-	LibraryFileName(LuaToString(l, 1), file, sizeof(file));
-	DebugPrint("Loading '%s'\n" _C_ file);
+	const std::string file = LibraryFileName(LuaToString(l, 1));
+	DebugPrint("Loading '%s'\n" _C_ file.c_str());
+	std::string content;
 	if (GetFileContent(file, content) == false) {
 		return 0;
 	}
@@ -1907,10 +1903,8 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 		}
 		snprintf(directory, sizeof(directory), "%s/%s", dir.c_str(), userdir);
 	} else if (rel) {
-		char path[PATH_MAX];
-
-		snprintf(path, sizeof(path), "%s", userdir);
-		LibraryFileName(path, directory, sizeof(directory));
+		std::string dir = LibraryFileName(userdir);
+		snprintf(directory, sizeof(directory), "%s", dir.c_str());
 		lua_pop(l, 1);
 	} else {
 		snprintf(directory, sizeof(directory), "%s/%s", StratagusLibPath.c_str(), userdir);
@@ -2298,18 +2292,16 @@ void SavePreferences()
 */
 void LoadCcl(const std::string &filename)
 {
-	char buf[PATH_MAX];
-
 	//  Load and evaluate configuration file
 	CclInConfigFile = 1;
-	LibraryFileName(filename.c_str(), buf, sizeof(buf));
-	if (access(buf, R_OK)) {
+	const std::string name = LibraryFileName(filename.c_str());
+	if (access(name.c_str(), R_OK)) {
 		fprintf(stderr, "Maybe you need to specify another gamepath with '-d /path/to/datadir'?\n");
 		ExitFatal(-1);
 	}
 
-	ShowLoadProgress(_("Script %s\n"), buf);
-	LuaLoadFile(buf);
+	ShowLoadProgress(_("Script %s\n"), name.c_str());
+	LuaLoadFile(name);
 	CclInConfigFile = 0;
 	LuaGarbageCollect();
 }

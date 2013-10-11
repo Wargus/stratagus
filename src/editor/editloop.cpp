@@ -1750,19 +1750,17 @@ static void EditorCallbackExit()
 */
 void CEditor::Init()
 {
-	char buf[PATH_MAX];
-
 	// Load and evaluate the editor configuration file
-	LibraryFileName(Parameters::Instance.luaEditorStartFilename.c_str(), buf, sizeof(buf));
-	if (access(buf, R_OK)) {
+	const std::string filename = LibraryFileName(Parameters::Instance.luaEditorStartFilename.c_str());
+	if (access(filename.c_str(), R_OK)) {
 		fprintf(stderr, "Editor configuration file '%s' was not found\n"
 				"Specify another with '-E file.lua'\n",
 				Parameters::Instance.luaEditorStartFilename.c_str());
 		ExitFatal(-1);
 	}
 
-	ShowLoadProgress(_("Script %s"), buf);
-	LuaLoadFile(buf);
+	ShowLoadProgress(_("Script %s"), filename.c_str());
+	LuaLoadFile(filename);
 	LuaGarbageCollect();
 
 	ThisPlayer = &Players[0];

@@ -89,16 +89,13 @@ int LoadGraphicPNG(CGraphic *g)
 	if (g->File.empty()) {
 		return -1;
 	}
-	char name[PATH_MAX];
-
-	name[0] = '\0';
-	LibraryFileName(g->File.c_str(), name, sizeof(name));
-	if (name[0] == '\0') {
+	const std::string name = LibraryFileName(g->File.c_str());
+	if (name.empty()) {
 		return -1;
 	}
 	CFile fp;
 
-	if (fp.open(name, CL_OPEN_READ) == -1) {
+	if (fp.open(name.c_str(), CL_OPEN_READ) == -1) {
 		perror("Can't open file");
 		return -1;
 	}

@@ -173,8 +173,6 @@ static int TheoraProcessData(OggData *data)
 */
 int PlayMovie(const std::string &name)
 {
-	char buffer[PATH_MAX];
-
 	int videoWidth, videoHeight;
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	videoWidth  = Video.ViewportWidth;
@@ -184,10 +182,10 @@ int PlayMovie(const std::string &name)
 	videoHeight = Video.Height;
 #endif
 
-	LibraryFileName(name.c_str(), buffer, sizeof(buffer));
+	const std::string filename = LibraryFileName(name.c_str());
 
 	CFile f;
-	if (f.open(buffer, CL_OPEN_READ) == -1) {
+	if (f.open(filename.c_str(), CL_OPEN_READ) == -1) {
 		fprintf(stderr, "Can't open file `%s'\n", name.c_str());
 		return 0;
 	}
@@ -235,7 +233,7 @@ int PlayMovie(const std::string &name)
 	}
 
 	StopMusic();
-	CSample *sample = LoadVorbis(buffer, PlayAudioStream);
+	CSample *sample = LoadVorbis(filename.c_str(), PlayAudioStream);
 	if (sample) {
 		if ((sample->Channels != 1 && sample->Channels != 2) || sample->SampleSize != 16) {
 			fprintf(stderr, "Unsupported sound format in movie\n");

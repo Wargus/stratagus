@@ -408,15 +408,13 @@ static int CclDefinePlayerTypes(lua_State *l)
 */
 static int CclLoadTileModels(lua_State *l)
 {
-	char buf[1024];
-
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
 	Map.TileModelsFileName = LuaToString(l, 1);
-	LibraryFileName(Map.TileModelsFileName.c_str(), buf, sizeof(buf));
-	if (LuaLoadFile(buf) == -1) {
-		DebugPrint("Load failed: %s\n" _C_ LuaToString(l, 1));
+	const std::string filename = LibraryFileName(Map.TileModelsFileName.c_str());
+	if (LuaLoadFile(filename) == -1) {
+		DebugPrint("Load failed: %s\n" _C_ filename.c_str());
 	}
 	return 0;
 }

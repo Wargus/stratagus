@@ -136,7 +136,7 @@ enum {
 ----------------------------------------------------------------------------*/
 
 /// Build library path name
-extern char *LibraryFileName(const char *file, char *buffer, size_t buffersize);
+extern std::string LibraryFileName(const char *file);
 
 extern bool CanAccessFile(const char *filename);
 

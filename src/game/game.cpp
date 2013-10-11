@@ -805,9 +805,8 @@ void CreateGame(const std::string &filename, CMap *map)
 	InitPlayers();
 
 	if (Map.Info.Filename.empty() && !filename.empty()) {
-		char path[PATH_MAX];
+		const std::string path = LibraryFileName(filename.c_str());
 
-		LibraryFileName(filename.c_str(), path, sizeof(path));
 		if (strcasestr(filename.c_str(), ".smp")) {
 			LuaLoadFile(path);
 		}

@@ -270,7 +270,6 @@ void PreMenuSetup()
 */
 static int MenuLoop()
 {
-	char buf[1024];
 	int status;
 
 	initGuichan();
@@ -284,8 +283,8 @@ static int MenuLoop()
 	GameCursor = UI.Point.Cursor;
 
 	// FIXME delete this when switching to full guichan GUI
-	LibraryFileName("scripts/guichan.lua", buf, sizeof(buf));
-	status = LuaLoadFile(buf);
+	const std::string filename = LibraryFileName("scripts/guichan.lua");
+	status = LuaLoadFile(filename);
 
 	// We clean up later in Exit
 	return status;
