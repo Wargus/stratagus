@@ -52,9 +52,7 @@
 ----------------------------------------------------------------------------*/
 
 static int HashCount;
-
 static std::map<std::string, CGraphic *> GraphicHash;
-
 static std::list<CGraphic *> Graphics;
 
 /*----------------------------------------------------------------------------
@@ -304,17 +302,8 @@ void CGraphic::DrawFrameX(unsigned frame, int x, int y) const
 	} else
 #endif
 	{
-		SDL_Rect srect;
-		SDL_Rect drect;
-
-		srect.x = frameFlip_map[frame].x;
-		srect.y = frameFlip_map[frame].y;
-
-		srect.w = Width;
-		srect.h = Height;
-
-		drect.x = x;
-		drect.y = y;
+		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
+		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 
 		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
 	}
@@ -334,7 +323,7 @@ void CGraphic::DoDrawFrameClipX(GLuint *textures, unsigned frame,
 
 	if (w < Width) {
 		if (ox == 0) {
-			ox += Width - w;
+			ox = Width - w;
 		} else {
 			ox = 0;
 		}
@@ -362,25 +351,15 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y) const
 	} else
 #endif
 	{
-		SDL_Rect srect;
-		SDL_Rect drect;
-		int oldx;
-		int oldy;
+		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
 
-		srect.x = frameFlip_map[frame].x;
-		srect.y = frameFlip_map[frame].y;
-
-		srect.w = Width;
-		srect.h = Height;
-
-		oldx = x;
-		oldy = y;
+		const int oldx = x;
+		const int oldy = y;
 		CLIP_RECTANGLE(x, y, srect.w, srect.h);
 		srect.x += x - oldx;
 		srect.y += y - oldy;
 
-		drect.x = x;
-		drect.y = y;
+		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 
 		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
 	}
@@ -397,20 +376,10 @@ void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
 	} else
 #endif
 	{
-		SDL_Rect srect;
-		SDL_Rect drect;
-		int oldalpha;
+		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
+		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
+		const int oldalpha = Surface->format->alpha;
 
-		srect.x = frameFlip_map[frame].x;
-		srect.y = frameFlip_map[frame].y;
-
-		srect.w = Width;
-		srect.h = Height;
-
-		drect.x = x;
-		drect.y = y;
-
-		oldalpha = Surface->format->alpha;
 		SDL_SetAlpha(Surface, SDL_SRCALPHA, alpha);
 		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
 		SDL_SetAlpha(Surface, SDL_SRCALPHA, oldalpha);
@@ -428,27 +397,17 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 	} else
 #endif
 	{
-		SDL_Rect srect;
-		SDL_Rect drect;
-		int oldx;
-		int oldy;
-		int oldalpha;
+		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
 
-		srect.x = frameFlip_map[frame].x;
-		srect.y = frameFlip_map[frame].y;
-		srect.w = Width;
-		srect.h = Height;
-
-		oldx = x;
-		oldy = y;
+		const int oldx = x;
+		const int oldy = y;
 		CLIP_RECTANGLE(x, y, srect.w, srect.h);
 		srect.x += x - oldx;
 		srect.y += y - oldy;
 
-		drect.x = x;
-		drect.y = y;
+		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
+		const int oldalpha = Surface->format->alpha;
 
-		oldalpha = Surface->format->alpha;
 		SDL_SetAlpha(Surface, SDL_SRCALPHA, alpha);
 		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
 		SDL_SetAlpha(Surface, SDL_SRCALPHA, oldalpha);
@@ -499,8 +458,8 @@ CGraphic *CGraphic::New(const std::string &file, int w, int h)
 		return new CGraphic;
 	}
 
-	CGraphic *g = GraphicHash[file];
-	if (!g) {
+	CGraphic *&g = GraphicHash[file];
+	if (g == NULL) {
 		g = new CGraphic;
 		if (!g) {
 			fprintf(stderr, "Out of memory\n");
@@ -511,7 +470,6 @@ CGraphic *CGraphic::New(const std::string &file, int w, int h)
 		g->HashFile = g->File;
 		g->Width = w;
 		g->Height = h;
-		GraphicHash[g->HashFile] = g;
 	} else {
 		++g->Refs;
 		Assert((w == 0 || g->Width == w) && (g->Height == h || h == 0));
@@ -536,7 +494,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &file, int w, in
 	}
 
 	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(GraphicHash[file]);
-	if (!g) {
+	if (g == NULL) {
 		g = new CPlayerColorGraphic;
 		if (!g) {
 			fprintf(stderr, "Out of memory\n");
@@ -663,6 +621,43 @@ void CGraphic::GenFramesMap()
 	}
 }
 
+static void ApplyGrayScale(SDL_Surface* Surface, int Width, int Height)
+{
+	SDL_LockSurface(Surface);
+	const SDL_PixelFormat *f = Surface->format;
+	const int bpp = Surface->format->BytesPerPixel;
+	const double redGray = 0.21;
+	const double greenGray = 0.72;
+	const double blueGray = 0.07;
+
+	switch (bpp) {
+		case 1: {
+			SDL_Color colors[256];
+			SDL_Palette &pal = *Surface->format->palette;
+			for (int i = 0; i < 256; ++i) {
+				const int gray = redGray * pal.colors[i].r + greenGray * pal.colors[i].g + blueGray * pal.colors[i].b;
+				colors[i].r = colors[i].g = colors[i].b = gray;
+			}
+			SDL_SetColors(Surface, &colors[0], 0, 256);
+			break;
+		}
+		case 4: {
+			Uint32 *p;
+			for (int i = 0; i < Height; ++i) {
+				for (int j = 0; j < Width; ++j) {
+					p = (Uint32 *)(Surface->pixels) + i * Width + j * bpp;
+					const Uint32 gray = ((Uint8)((*p) * redGray) >> f->Rshift) +
+										((Uint8)(*(p + 1) * greenGray) >> f->Gshift) +
+										((Uint8)(*(p + 2) * blueGray) >> f->Bshift) +
+										((Uint8)(*(p + 3)) >> f->Ashift);
+					*p = gray;
+				}
+			}
+			break;
+		}
+	}
+	SDL_UnlockSurface(Surface);
+}
 
 /**
 **  Load a graphic
@@ -705,39 +700,7 @@ void CGraphic::Load(bool grayscale)
 	NumFrames = GraphicWidth / Width * GraphicHeight / Height;
 
 	if (grayscale) {
-		SDL_LockSurface(Surface);
-		const SDL_PixelFormat *f = Surface->format;
-		const int bpp = Surface->format->BytesPerPixel;
-		const double redGray = 0.21;
-		const double greenGray = 0.72;
-		const double blueGray = 0.07;
-		switch (bpp) {
-			case 1: {
-				SDL_Color colors[256];
-				SDL_Palette &pal = *Surface->format->palette;
-				for (int i = 0; i < 256; ++i) {
-					const int gray = redGray * pal.colors[i].r + greenGray * pal.colors[i].g + blueGray * pal.colors[i].b;
-					colors[i].r = colors[i].g = colors[i].b = gray;
-				}
-				SDL_SetColors(Surface, &colors[0], 0, 256);
-				break;
-			}
-			case 4: {
-				Uint32 *p;
-				for (int i = 0; i < Height; ++i) {
-					for (int j = 0; j < Width; ++j) {
-						p = (Uint32 *)(Surface->pixels) + i * Width + j * bpp;
-						const Uint32 gray = ((Uint8)((*p) * redGray) >> f->Rshift) +
-											((Uint8)(*(p + 1) * greenGray) >> f->Gshift) +
-											((Uint8)(*(p + 2) * blueGray) >> f->Bshift) +
-											((Uint8)(*(p + 3)) >> f->Ashift);
-						*p = gray;
-					}
-				}
-				break;
-			}
-		}
-		SDL_UnlockSurface(Surface);
+		ApplyGrayScale(Surface, Width, Height);
 	}
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -779,8 +742,6 @@ static void FreeSurface(SDL_Surface **surface)
 */
 void CGraphic::Free(CGraphic *g)
 {
-	//unsigned char *pixels;
-
 	if (!g) {
 		return;
 	}
@@ -997,9 +958,8 @@ void CGraphic::UseDisplayFormat()
 	if (UseOpenGL) { return; }
 #endif
 
-	SDL_Surface *s;
+	SDL_Surface *s = Surface;
 
-	s = Surface;
 	if (s->format->Amask != 0) {
 		Surface = SDL_DisplayFormatAlpha(s);
 	} else {
@@ -1044,34 +1004,19 @@ static int PowerOf2(int x)
 static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 						  int ow, int oh)
 {
-	int h;
-	int w;
-	unsigned char *tex;
-	unsigned char *tp;
-	const unsigned char *sp;
-	Uint32 ckey;
-	int useckey;
-	int bpp;
-	unsigned char alpha;
-	Uint32 b;
-	Uint32 c;
-	Uint32 pc;
-	SDL_PixelFormat *f;
-	int maxw;
-	int maxh;
-
-	useckey = g->Surface->flags & SDL_SRCCOLORKEY;
-	f = g->Surface->format;
-	bpp = f->BytesPerPixel;
-	ckey = f->colorkey;
+	int useckey = g->Surface->flags & SDL_SRCCOLORKEY;
+	SDL_PixelFormat *f = g->Surface->format;
+	int bpp = f->BytesPerPixel;
+	Uint32 ckey = f->colorkey;
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	maxw = std::min<int>(g->GraphicWidth - ow, GLMaxTextureSize);
-	maxh = std::min<int>(g->GraphicHeight - oh, GLMaxTextureSize);
-	w = PowerOf2(maxw);
-	h = PowerOf2(maxh);
-	tex = new unsigned char[w * h * 4];
+	int maxw = std::min<int>(g->GraphicWidth - ow, GLMaxTextureSize);
+	int maxh = std::min<int>(g->GraphicHeight - oh, GLMaxTextureSize);
+	int w = PowerOf2(maxw);
+	int h = PowerOf2(maxh);
+	unsigned char *tex = new unsigned char[w * h * 4];
 	memset(tex, 0, w * h * 4);
+	unsigned char alpha;
 	if (g->Surface->flags & SDL_SRCALPHA) {
 		alpha = f->alpha;
 	} else {
@@ -1084,6 +1029,13 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	unsigned char *tp;
+	const unsigned char *sp;
+	Uint32 b;
+	Uint32 c;
+	Uint32 pc;
+
 	for (int i = 0; i < maxh; ++i) {
 		sp = (const unsigned char *)g->Surface->pixels + ow * bpp +
 			 (oh + i) * g->Surface->pitch;
@@ -1245,13 +1197,6 @@ void MakePlayerColorTexture(CPlayerColorGraphic *g, int player)
 */
 void CGraphic::Resize(int w, int h)
 {
-	int i;
-	int j;
-	unsigned char *data;
-	unsigned char *pixels;
-	int x;
-	int bpp;
-
 	Assert(Surface); // can't resize before it's been loaded
 
 	if (GraphicWidth == w && GraphicHeight == h) {
@@ -1301,18 +1246,18 @@ void CGraphic::Resize(int w, int h)
 	Uint32 ckey = Surface->format->colorkey;
 	int useckey = Surface->flags & SDL_SRCCOLORKEY;
 
-	bpp = Surface->format->BytesPerPixel;
+	int bpp = Surface->format->BytesPerPixel;
 	if (bpp == 1) {
 		SDL_Color pal[256];
 
 		SDL_LockSurface(Surface);
 
-		pixels = (unsigned char *)Surface->pixels;
-		data = new unsigned char[w * h];
-		x = 0;
+		unsigned char *pixels = (unsigned char *)Surface->pixels;
+		unsigned char *data = new unsigned char[w * h];
+		int x = 0;
 
-		for (i = 0; i < h; ++i) {
-			for (j = 0; j < w; ++j) {
+		for (int i = 0; i < h; ++i) {
+			for (int j = 0; j < w; ++j) {
 				data[x] = pixels[(i * Height / h) * Surface->pitch + j * Width / w];
 				++x;
 			}
@@ -1330,34 +1275,30 @@ void CGraphic::Resize(int w, int h)
 		}
 		SDL_SetPalette(Surface, SDL_LOGPAL | SDL_PHYSPAL, pal, 0, 256);
 	} else {
-		int ix, iy;
-		float fx, fy, fz;
-		unsigned char *p1, *p2, *p3, *p4;
-
 		SDL_LockSurface(Surface);
 
-		pixels = (unsigned char *)Surface->pixels;
-		data = new unsigned char[w * h * bpp];
-		x = 0;
+		unsigned char *pixels = (unsigned char *)Surface->pixels;
+		unsigned char *data = new unsigned char[w * h * bpp];
+		int x = 0;
 
-		for (i = 0; i < h; ++i) {
-			fy = (float)i * Height / h;
-			iy = (int)fy;
+		for (int i = 0; i < h; ++i) {
+			float fy = (float)i * Height / h;
+			int iy = (int)fy;
 			fy -= iy;
-			for (j = 0; j < w; ++j) {
-				fx = (float)j * Width / w;
-				ix = (int)fx;
+			for (int j = 0; j < w; ++j) {
+				float fx = (float)j * Width / w;
+				int ix = (int)fx;
 				fx -= ix;
-				fz = (fx + fy) / 2;
+				float fz = (fx + fy) / 2;
 
-				p1 = &pixels[iy * Surface->pitch + ix * bpp];
-				p2 = (iy != Surface->h - 1) ?
+				unsigned char *p1 = &pixels[iy * Surface->pitch + ix * bpp];
+				unsigned char *p2 = (iy != Surface->h - 1) ?
 					 &pixels[(iy + 1) * Surface->pitch + ix * bpp] :
 					 p1;
-				p3 = (ix != Surface->w - 1) ?
+				unsigned char *p3 = (ix != Surface->w - 1) ?
 					 &pixels[iy * Surface->pitch + (ix + 1) * bpp] :
 					 p1;
-				p4 = (iy != Surface->h - 1 && ix != Surface->w - 1) ?
+				unsigned char *p4 = (iy != Surface->h - 1 && ix != Surface->w - 1) ?
 					 &pixels[(iy + 1) * Surface->pitch + (ix + 1) * bpp] :
 					 p1;
 
@@ -1422,18 +1363,14 @@ void CGraphic::Resize(int w, int h)
 */
 bool CGraphic::TransparentPixel(int x, int y)
 {
-	unsigned char *p;
-	int bpp;
-	bool ret;
-
-	bpp = Surface->format->BytesPerPixel;
+	int bpp = Surface->format->BytesPerPixel;
 	if ((bpp == 1 && !(Surface->flags & SDL_SRCCOLORKEY)) || bpp == 3) {
 		return false;
 	}
 
-	ret = 0;
+	bool ret = false;
 	SDL_LockSurface(Surface);
-	p = (unsigned char *)Surface->pixels + y * Surface->pitch + x * bpp;
+	unsigned char *p = (unsigned char *)Surface->pixels + y * Surface->pitch + x * bpp;
 	if (bpp == 1) {
 		if (*p == Surface->format->colorkey) {
 			ret = true;
@@ -1535,13 +1472,13 @@ void CFiller::bits_map::Init(CGraphic *g)
 		case 1: {
 			int ckey = s->format->colorkey;
 			unsigned char *ptr = (unsigned char *)s->pixels;
-			int i, j, k, p, l, lm;
-			for (i = 0; i < Height; ++i) {
-				l = i * Width;
-				lm = i * line;
-				k = 0;
-				p = 0;
-				for (j = 0; j < Width; ++j) {
+
+			for (int i = 0; i < Height; ++i) {
+				int l = i * Width;
+				int lm = i * line;
+				int k = 0;
+				int p = 0;
+				for (int j = 0; j < Width; ++j) {
 					bstore[lm + k] |= ((ptr[j + l] != ckey) ? (1 << p) : 0);
 					if (++p > 31) {
 						p = 0;
@@ -1558,13 +1495,13 @@ void CFiller::bits_map::Init(CGraphic *g)
 			if ((s->flags & SDL_SRCCOLORKEY) == SDL_SRCCOLORKEY) {
 				unsigned int ckey = s->format->colorkey;
 				unsigned int *ptr = (unsigned int *)s->pixels;
-				int i, j, k, p, l, lm;
-				for (i = 0; i < Height; ++i) {
-					l = i * Width;
-					lm = i * line;
-					k = 0;
-					p = 0;
-					for (j = 0; j < Width; ++j) {
+
+				for (int i = 0; i < Height; ++i) {
+					int l = i * Width;
+					int lm = i * line;
+					int k = 0;
+					int p = 0;
+					for (int j = 0; j < Width; ++j) {
 						bstore[lm + k] |= ((ptr[j + l] != ckey) ? (1 << p) : 0);
 						if (++p > 31) {
 							p = 0;
@@ -1574,13 +1511,13 @@ void CFiller::bits_map::Init(CGraphic *g)
 				}
 			} else {
 				unsigned int *ptr = (unsigned int *)s->pixels;
-				int i, j, k, p, l, lm;
-				for (i = 0; i < Height; ++i) {
-					l = i * Width;
-					lm = i * line;
-					k = 0;
-					p = 0;
-					for (j = 0; j < Width; ++j) {
+
+				for (int i = 0; i < Height; ++i) {
+					int l = i * Width;
+					int lm = i * line;
+					int k = 0;
+					int p = 0;
+					for (int j = 0; j < Width; ++j) {
 						bstore[lm + k] |= ((ptr[j + l] & AMASK) ? (1 << p) : 0);
 						if (++p > 31) {
 							p = 0;
