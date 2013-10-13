@@ -284,8 +284,6 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 	}
 }
 
-
-
 /**
 **  Draw graphic object unclipped and flipped in X direction.
 **
@@ -446,18 +444,19 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 /**
 **  Make a new graphic object.
 **
-**  @param file  Filename
+**  @param filename  Filename
 **  @param w     Width of a frame (optional)
 **  @param h     Height of a frame (optional)
 **
 **  @return      New graphic object
 */
-CGraphic *CGraphic::New(const std::string &file, int w, int h)
+CGraphic *CGraphic::New(const std::string &filename, int w, int h)
 {
-	if (file.empty()) {
+	if (filename.empty()) {
 		return new CGraphic;
 	}
 
+	const std::string file = LibraryFileName(filename.c_str());
 	CGraphic *&g = GraphicHash[file];
 	if (g == NULL) {
 		g = new CGraphic;
@@ -481,18 +480,19 @@ CGraphic *CGraphic::New(const std::string &file, int w, int h)
 /**
 **  Make a new player color graphic object.
 **
-**  @param file  Filename
+**  @param filename  Filename
 **  @param w     Width of a frame (optional)
 **  @param h     Height of a frame (optional)
 **
 **  @return      New graphic object
 */
-CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &file, int w, int h)
+CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filename, int w, int h)
 {
-	if (file.empty()) {
+	if (filename.empty()) {
 		return new CPlayerColorGraphic;
 	}
 
+	const std::string file = LibraryFileName(filename.c_str());
 	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(GraphicHash[file]);
 	if (g == NULL) {
 		g = new CPlayerColorGraphic;
