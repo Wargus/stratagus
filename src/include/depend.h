@@ -37,11 +37,9 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @struct _depend_rule_ depend.h
+**  @struct DependRule depend.h
 **
 **  \#include "depend.h"
-**
-**  typedef struct _depend_rule_ DependRule;
 **
 **  This structure is used define the requirements of upgrades or
 **  unit-types. The structure is used to define the base (the wanted)

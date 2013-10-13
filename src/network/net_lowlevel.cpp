@@ -55,12 +55,12 @@
 #define SIO_GET_INTERFACE_LIST 0x4004747F
 #define IFF_UP 1
 #define IFF_LOOPBACK 4
-typedef struct _OLD_INTERFACE_INFO {
+struct OLD_INTERFACE_INFO {
 	unsigned long iiFlags; /* Interface flags */
 	SOCKADDR   iiAddress;  /* Interface address */
 	SOCKADDR   iiBroadcastAddress; /* Broadcast address */
 	SOCKADDR   iiNetmask;  /* Network mask */
-} OLD_INTERFACE_INFO;
+};
 #define INTERFACE_INFO OLD_INTERFACE_INFO
 
 typedef const char *setsockopttype;

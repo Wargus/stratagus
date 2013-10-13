@@ -56,10 +56,10 @@ class CUnitType;
 class CFile;
 class CFont;
 
-typedef struct _lua_user_data_ {
+struct LuaUserData {
 	int Type;
 	void *Data;
-} LuaUserData;
+};
 
 enum {
 	LuaUnitType = 100,
@@ -95,7 +95,8 @@ inline size_t lua_rawlen(lua_State *l, int index)
 
 #endif
 
-typedef enum {
+/// All possible value for a number.
+enum ENumber {
 	ENumber_Lua,         /// a lua function.
 	ENumber_Dir,         /// directly a number.
 	ENumber_Add,         /// a + b.
@@ -119,16 +120,17 @@ typedef enum {
 	ENumber_UnitStat,    /// Property of Unit.
 	ENumber_TypeStat,    /// Property of UnitType.
 
-	ENumber_NumIf           /// If cond then Number1 else Number2.
-} ENumber; /// All possible value for a number.
+	ENumber_NumIf        /// If cond then Number1 else Number2.
+};
 
-
-typedef enum {
+/// All possible value for a unit.
+enum EUnit {
 	EUnit_Ref           /// Unit direct reference.
 	// FIXME: add others.
-} EUnit; /// All possible value for a unit.
+};
 
-typedef enum {
+/// All possible value for a string.
+enum EString {
 	EString_Lua,          /// a lua function.
 	EString_Dir,          /// directly a string.
 	EString_Concat,       /// a + b [+ c ...].
@@ -140,72 +142,71 @@ typedef enum {
 	EString_Line,         /// line n of the string.
 	EString_PlayerName    /// player name.
 	// add more...
-} EString; /// All possible value for a string.
+};
 
-typedef enum {
+/// All possible value for a game info string.
+enum ES_GameInfo {
 	ES_GameInfo_Objectives       /// All Objectives of the game.
-} ES_GameInfo; /// All possible value for a game info string.
+};
 
 /**
 **  Enumeration to know which variable to be selected.
 */
-typedef enum {
+enum EnumVariable {
 	VariableValue = 0,  /// Value of the variable.
 	VariableMax,        /// Max of the variable.
 	VariableIncrease,   /// Increase value of the variable.
 	VariableDiff,       /// (Max - Value)
 	VariablePercent,    /// (100 * Value / Max)
 	VariableName        /// Name of the variable.
-} EnumVariable;
+};
 
 /**
 **  Enumeration of unit
 */
-
-typedef enum {
+enum EnumUnit {
 	UnitRefItSelf = 0,      /// unit.
 	UnitRefInside,          /// unit->Inside.
 	UnitRefContainer,       /// Unit->Container.
 	UnitRefWorker,          /// unit->Data.Built.Worker
 	UnitRefGoal             /// unit->Goal
-} EnumUnit;
-
+};
 
 /**
 **  Number description.
 **  Use to describe complex number in script to use when game running.
+** [Deprecated]: give access to lua.
 */
-typedef struct _NumberDesc_ NumberDesc;
+struct NumberDesc;
 
 /**
 ** Unit description
 **  Use to describe complex unit in script to use when game running.
 */
-typedef struct _UnitDesc_ UnitDesc;
-
+struct UnitDesc;
 
 /**
 ** String description
 **  Use to describe complex string in script to use when game running.
 */
-typedef struct _StringDesc_ StringDesc;
+struct StringDesc;
 
-
-typedef struct _binop_ {
+/// for Bin operand  a ?? b
+struct BinOp {
 	NumberDesc *Left;           /// Left operand.
 	NumberDesc *Right;          /// Right operand.
-} BinOp;  /// for Bin operand  a ?? b
+};
 
 /**
 **  Number description.
 */
-struct _NumberDesc_ {
+struct NumberDesc {
 	ENumber e;       /// which number.
 	union {
 		unsigned int Index; /// index of the lua function.
 		int Val;       /// Direct value.
 		NumberDesc *N; /// Other number.
-		struct _binop_ BinOp;   /// For binary operand.
+		BinOp binOp;   /// For binary operand.
 		struct {
 			UnitDesc *Unit;            /// Which unit.
 			int Index;                 /// Which index variable.
@@ -236,7 +237,7 @@ struct _NumberDesc_ {
 /**
 **  Unit description.
 */
-struct _UnitDesc_ {
+struct UnitDesc {
 	EUnit e;       /// which unit;
 	union {
 		CUnit **AUnit; /// Address of the unit.
@@ -246,7 +247,7 @@ struct _UnitDesc_ {
 /**
 **  String description.
 */
-struct _StringDesc_ {
+struct StringDesc {
 	EString e;       /// which number.
 	union {
 		unsigned int Index; /// index of the lua function.

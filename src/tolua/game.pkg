@@ -14,14 +14,14 @@ int SaveReplay(const std::string filename);
 
 $#include "results.h"
 
-typedef enum {
+enum GameResults {
     GameNoResult,
     GameVictory,
     GameDefeat,
     GameDraw,
     GameQuitToMenu,
     GameRestart,
-} GameResults;
+};
 
 GameResults GameResult;
 

@@ -73,12 +73,12 @@ public:
 /**
 **  Data to referer game info when game running.
 */
-typedef struct {
+struct TriggerDataType {
 	CUnit *Attacker;  /// Unit which send the missile.
 	CUnit *Defender;  /// Unit which is hit by missile.
 	CUnit *Active;    /// Unit which is selected or else under cursor unit.
 	CUnitType *Type;  /// Type used in trigger;
-} TriggerDataType;
+};
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -88,7 +88,6 @@ extern CTimer GameTimer; /// the game timer
 
 /// Some data accessible for script during the game.
 extern TriggerDataType TriggerData;
-
 
 /*----------------------------------------------------------------------------
 --  Functions

@@ -44,13 +44,13 @@
 #include "ui.h"
 #include "video.h"
 
-typedef enum {
+enum UStrIntType {
 	USTRINT_STR, USTRINT_INT
-} UStrIntType;
-typedef struct {
+};
+struct UStrInt {
 	union {const char *s; int i;};
 	UStrIntType type;
-} UStrInt;
+};
 
 extern UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t);
 extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
@@ -59,7 +59,6 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 {
 	delete Condition;
 }
-
 
 /**
 **  Draw text with variable.

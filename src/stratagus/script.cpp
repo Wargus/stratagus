@@ -63,15 +63,15 @@ NumberDesc *Damage;                   /// Damage calculation for missile.
 static int NumberCounter = 0; /// Counter for lua function.
 static int StringCounter = 0; /// Counter for lua function.
 
-
 /// Useful for getComponent.
-typedef enum {
+enum UStrIntType {
 	USTRINT_STR, USTRINT_INT
-} UStrIntType;
-typedef struct {
+};
+struct UStrInt {
 	union {const char *s; int i;};
 	UStrIntType type;
-} UStrInt;
+};
+
 /// Get component for unit variable.
 extern UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t);
 /// Get component for unit type variable.
@@ -603,43 +603,43 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 		lua_rawgeti(l, -1, 2); // table
 		if (!strcmp(key, "Add")) {
 			res->e = ENumber_Add;
-			ParseBinOp(l, &res->D.BinOp);
+			ParseBinOp(l, &res->D.binOp);
 		} else if (!strcmp(key, "Sub")) {
 			res->e = ENumber_Sub;
-			ParseBinOp(l, &res->D.BinOp);
+			ParseBinOp(l, &res->D.binOp);
 		} else if (!strcmp(key, "Mul")) {
 			res->e = ENumber_Mul;
-			ParseBinOp(l, &res->D.BinOp);
+			ParseBinOp(l, &res->D.binOp);
 		} else if (!strcmp(key, "Div")) {
 			res->e = ENumber_Div;
-			ParseBinOp(l, &res->D.BinOp);
+			ParseBinOp(l, &res->D.binOp);
 		} else if (!strcmp(key, "Min")) {
 			res->e = ENumber_Min;
-			ParseBinOp(l, &res->D.BinOp);
+			ParseBinOp(l, &res->D.binOp);
 		} else if (!strcmp(key, "Max")) {
 			res->e = ENumber_Max;
-			ParseBinOp(l, &res->D.BinOp);
+			ParseBinOp(l, &res->D.binOp);
 		} else if (!strcmp(key, "Rand")) {
 			res->e = ENumber_Rand;
 			res->D.N = CclParseNumberDesc(l);
 		} else if (!strcmp(key, "GreaterThan")) {
 			res->e = ENumber_Gt;
-			ParseBinOp(l, &res->D.BinOp);
+			ParseBinOp(l, &res->D.binOp);
 		} else if (!strcmp(key, "GreaterThanOrEq")) {
 			res->e = ENumber_GtEq;
-			ParseBinOp(l, &res->D.BinOp);
+			ParseBinOp(l, &res->D.binOp);
 		} else if (!strcmp(key, "LessThan")) {
 			res->e = ENumber_Lt;
-			ParseBinOp(l, &res->D.BinOp);
+			ParseBinOp(l, &res->D.binOp);
 		} else if (!strcmp(key, "LessThanOrEq")) {
 			res->e = ENumber_LtEq;
-			ParseBinOp(l, &res->D.BinOp);
+			ParseBinOp(l, &res->D.binOp);
 		} else if (!strcmp(key, "Equal")) {
 			res->e = ENumber_Eq;
-			ParseBinOp(l, &res->D.BinOp);
+			ParseBinOp(l, &res->D.binOp);
 		} else if (!strcmp(key, "NotEqual")) {
 			res->e = ENumber_NEq;
-			ParseBinOp(l, &res->D.BinOp);
+			ParseBinOp(l, &res->D.binOp);
 		} else if (!strcmp(key, "UnitVar")) {
 			Assert(lua_istable(l, -1));
 
@@ -908,49 +908,49 @@ int EvalNumber(const NumberDesc *number)
 		case ENumber_Dir :     // directly a number.
 			return number->D.Val;
 		case ENumber_Add :     // a + b.
-			return EvalNumber(number->D.BinOp.Left) + EvalNumber(number->D.BinOp.Right);
+			return EvalNumber(number->D.binOp.Left) + EvalNumber(number->D.binOp.Right);
 		case ENumber_Sub :     // a - b.
-			return EvalNumber(number->D.BinOp.Left) - EvalNumber(number->D.BinOp.Right);
+			return EvalNumber(number->D.binOp.Left) - EvalNumber(number->D.binOp.Right);
 		case ENumber_Mul :     // a * b.
-			return EvalNumber(number->D.BinOp.Left) * EvalNumber(number->D.BinOp.Right);
+			return EvalNumber(number->D.binOp.Left) * EvalNumber(number->D.binOp.Right);
 		case ENumber_Div :     // a / b.
-			a = EvalNumber(number->D.BinOp.Left);
-			b = EvalNumber(number->D.BinOp.Right);
+			a = EvalNumber(number->D.binOp.Left);
+			b = EvalNumber(number->D.binOp.Right);
 			if (!b) { // FIXME : manage better this.
 				return 0;
 			}
 			return a / b;
 		case ENumber_Min :     // a <= b ? a : b
-			a = EvalNumber(number->D.BinOp.Left);
-			b = EvalNumber(number->D.BinOp.Right);
+			a = EvalNumber(number->D.binOp.Left);
+			b = EvalNumber(number->D.binOp.Right);
 			return std::min(a, b);
 		case ENumber_Max :     // a >= b ? a : b
-			a = EvalNumber(number->D.BinOp.Left);
-			b = EvalNumber(number->D.BinOp.Right);
+			a = EvalNumber(number->D.binOp.Left);
+			b = EvalNumber(number->D.binOp.Right);
 			return std::max(a, b);
 		case ENumber_Gt  :     // a > b  ? 1 : 0
-			a = EvalNumber(number->D.BinOp.Left);
-			b = EvalNumber(number->D.BinOp.Right);
+			a = EvalNumber(number->D.binOp.Left);
+			b = EvalNumber(number->D.binOp.Right);
 			return (a > b ? 1 : 0);
 		case ENumber_GtEq :    // a >= b ? 1 : 0
-			a = EvalNumber(number->D.BinOp.Left);
-			b = EvalNumber(number->D.BinOp.Right);
+			a = EvalNumber(number->D.binOp.Left);
+			b = EvalNumber(number->D.binOp.Right);
 			return (a >= b ? 1 : 0);
 		case ENumber_Lt  :     // a < b  ? 1 : 0
-			a = EvalNumber(number->D.BinOp.Left);
-			b = EvalNumber(number->D.BinOp.Right);
+			a = EvalNumber(number->D.binOp.Left);
+			b = EvalNumber(number->D.binOp.Right);
 			return (a < b ? 1 : 0);
 		case ENumber_LtEq :    // a <= b ? 1 : 0
-			a = EvalNumber(number->D.BinOp.Left);
-			b = EvalNumber(number->D.BinOp.Right);
+			a = EvalNumber(number->D.binOp.Left);
+			b = EvalNumber(number->D.binOp.Right);
 			return (a <= b ? 1 : 0);
 		case ENumber_Eq  :     // a == b ? 1 : 0
-			a = EvalNumber(number->D.BinOp.Left);
-			b = EvalNumber(number->D.BinOp.Right);
+			a = EvalNumber(number->D.binOp.Left);
+			b = EvalNumber(number->D.binOp.Right);
 			return (a == b ? 1 : 0);
 		case ENumber_NEq  :    // a != b ? 1 : 0
-			a = EvalNumber(number->D.BinOp.Left);
-			b = EvalNumber(number->D.BinOp.Right);
+			a = EvalNumber(number->D.binOp.Left);
+			b = EvalNumber(number->D.binOp.Right);
 			return (a != b ? 1 : 0);
 
 		case ENumber_Rand :    // random(a) [0..a-1]
@@ -1144,10 +1144,10 @@ void FreeNumberDesc(NumberDesc *number)
 		case ENumber_LtEq :    // a <= b ? 1 : 0
 		case ENumber_NEq  :    // a <> b ? 1 : 0
 		case ENumber_Eq  :     // a == b ? 1 : 0
-			FreeNumberDesc(number->D.BinOp.Left);
-			FreeNumberDesc(number->D.BinOp.Right);
-			delete number->D.BinOp.Left;
-			delete number->D.BinOp.Right;
+			FreeNumberDesc(number->D.binOp.Left);
+			FreeNumberDesc(number->D.binOp.Right);
+			delete number->D.binOp.Left;
+			delete number->D.binOp.Right;
 			break;
 		case ENumber_Rand :    // random(a) [0..a-1]
 			FreeNumberDesc(number->D.N);
