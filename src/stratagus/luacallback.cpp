@@ -64,7 +64,6 @@ void LuaCallback::pushPreamble()
 	arguments = 0;
 }
 
-
 /**
 **  Push a string argument for the callback on the stack.
 **
@@ -76,7 +75,6 @@ void LuaCallback::pushInteger(int value)
 	arguments++;
 }
 
-
 /**
 **  Push a string argument for the callback on the stack.
 **
@@ -87,7 +85,6 @@ void LuaCallback::pushString(const std::string &s)
 	lua_pushstring(luastate, s.c_str());
 	arguments++;
 }
-
 
 /**
 **  Called when an action is received from a Widget. It is used

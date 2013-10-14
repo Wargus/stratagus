@@ -36,18 +36,18 @@ struct lua_State;
 
 class LuaCallback
 {
+public:
+	LuaCallback(lua_State *lua, lua_Object luaref);
+	~LuaCallback();
+	void pushPreamble();
+	void pushInteger(int value);
+	void pushString(const std::string &eventId);
+	void run();
+private:
 	lua_State *luastate;
 	int luaref;
 	int arguments;
 	int base;
-public:
-	LuaCallback(lua_State *lua, lua_Object luaref);
-	virtual ~LuaCallback();
-	virtual void pushPreamble();
-	virtual void pushInteger(int value);
-	virtual void pushString(const std::string &eventId);
-	virtual void run();
 };
 
 #endif
-
