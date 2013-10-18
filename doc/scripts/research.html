@@ -55,21 +55,17 @@ Everything around researching and upgrades.
 <h2>Functions</h2>
 
 <a name="CheckDependency"></a>
-<h3>CheckDependency()</h3>
-
-NOT WRITTEN YET.
-
+<h3>CheckDependency(player, object)</h3>
+Checks if dependencies are met. Returns true if the dependencies are met.
 
 <dl>
-<dt>.</dt>
-<dd>.
-</dd>
+ <dt>player</dt><dd>Player</dd>
+ <dt>object</dt><dd>The object which we want to check the dependencies of.</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    CheckDependency()
+    CheckDependency(AiPlayer(), "upgrade-dwarves-level2")
 </pre>
 
 <a name="DefineUnitAllow"></a>
