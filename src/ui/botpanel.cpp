@@ -218,8 +218,8 @@ void CleanButtons()
 */
 static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 {
-	int res = 0;
-	int i;
+	unsigned int res = 0;
+	unsigned int i;
 
 	/* parallel drawing */
 	if (!NumSelected) {
@@ -760,7 +760,7 @@ void CButtonPanel::Draw()
 		bool gray = false;
 		bool cooldownSpell = false;
 		int maxCooldown = 0;
-		for (int j = 0; j < NumSelected; ++j) {
+		for (unsigned int j = 0; j < NumSelected; ++j) {
 			if (!IsButtonAllowed(*Selected[j], buttons[i])) {
 				gray = true;
 				break;
@@ -980,7 +980,7 @@ static void UpdateButtonPanelMultipleUnits(std::vector<ButtonAction> *buttonActi
 
 		bool allow = true;
 		if (UnitButtonTable[z]->AlwaysShow == false) {
-			for (int i = 0; i < NumSelected; i++) {
+			for (unsigned int i = 0; i < NumSelected; i++) {
 				if (!IsButtonAllowed(*Selected[i], *UnitButtonTable[z])) {
 					allow = false;
 					break;
@@ -1086,7 +1086,7 @@ void CButtonPanel::Update()
 
 	bool sameType = true;
 	// multiple selected
-	for (int i = 1; i < NumSelected; ++i) {
+	for (unsigned int i = 1; i < NumSelected; ++i) {
 		if (Selected[i]->Type != unit.Type) {
 			sameType = false;
 			break;
@@ -1151,13 +1151,13 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 		//autocast = 0;
 		// If any selected unit doesn't have autocast on turn it on
 		// for everyone
-		for (int i = 0; i < NumSelected; ++i) {
+		for (unsigned int i = 0; i < NumSelected; ++i) {
 			if (Selected[i]->AutoCastSpell[spellId] == 0) {
 				autocast = 1;
 				break;
 			}
 		}
-		for (int i = 0; i < NumSelected; ++i) {
+		for (unsigned int i = 0; i < NumSelected; ++i) {
 			if (Selected[i]->AutoCastSpell[spellId] != autocast) {
 				SendCommandAutoSpellCast(*Selected[i], spellId, autocast);
 			}
@@ -1167,7 +1167,7 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 	if (SpellTypeTable[spellId]->IsCasterOnly()) {
 		const int flush = !(KeyModifiers & ModifierShift);
 
-		for (int i = 0; i < NumSelected; ++i) {
+		for (unsigned int i = 0; i < NumSelected; ++i) {
 			CUnit &unit = *Selected[i];
 			// CursorValue here holds the spell type id
 			SendCommandSpellCast(unit, unit.tilePos, &unit, spellId, flush);
@@ -1183,13 +1183,13 @@ void CButtonPanel::DoClicked_Repair(int button)
 		unsigned autorepair = 0;
 		// If any selected unit doesn't have autocast on turn it on
 		// for everyone
-		for (int i = 0; i < NumSelected; ++i) {
+		for (unsigned int i = 0; i < NumSelected; ++i) {
 			if (Selected[i]->AutoRepair == 0) {
 				autorepair = 1;
 				break;
 			}
 		}
-		for (int i = 0; i < NumSelected; ++i) {
+		for (unsigned int i = 0; i < NumSelected; ++i) {
 			if (Selected[i]->AutoRepair != autorepair) {
 				SendCommandAutoRepair(*Selected[i], autorepair);
 			}
@@ -1202,21 +1202,21 @@ void CButtonPanel::DoClicked_Repair(int button)
 
 void CButtonPanel::DoClicked_Return()
 {
-	for (int i = 0; i < NumSelected; ++i) {
+	for (unsigned int i = 0; i < NumSelected; ++i) {
 		SendCommandReturnGoods(*Selected[i], NoUnitP, !(KeyModifiers & ModifierShift));
 	}
 }
 
 void CButtonPanel::DoClicked_Stop()
 {
-	for (int i = 0; i < NumSelected; ++i) {
+	for (unsigned int i = 0; i < NumSelected; ++i) {
 		SendCommandStopUnit(*Selected[i]);
 	}
 }
 
 void CButtonPanel::DoClicked_StandGround()
 {
-	for (int i = 0; i < NumSelected; ++i) {
+	for (unsigned int i = 0; i < NumSelected; ++i) {
 		SendCommandStandGround(*Selected[i], !(KeyModifiers & ModifierShift));
 	}
 }
@@ -1310,7 +1310,7 @@ void CButtonPanel::DoClicked_UpgradeTo(int button)
 {
 	// FIXME: store pointer in button table!
 	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
-	for (int i = 0; i < NumSelected; ++i) {
+	for (unsigned int i = 0; i < NumSelected; ++i) {
 		if (Selected[0]->Player->CheckLimits(type) != -6 && !Selected[i]->Player->CheckUnitType(type)) {
 			if (Selected[i]->CurrentAction() != UnitActionUpgradeTo) {
 				SendCommandUpgradeTo(*Selected[i], type, !(KeyModifiers & ModifierShift));

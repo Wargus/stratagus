@@ -57,7 +57,7 @@
 */
 struct CUnitGroup {
 	CUnit **Units;  /// Units in the group
-	int NumUnits;   /// How many units in the group
+	unsigned int NumUnits;  /// How many units in the group
 	bool tainted;    /// Group hold unit which can't be SelectableByRectangle
 };                                       /// group of units
 
@@ -94,7 +94,7 @@ void SaveGroups(CFile &file)
 
 	for (int g = 0; g < NUM_GROUPS; ++g) {
 		file.printf("Group(%d, %d, {", g, Groups[g].NumUnits);
-		for (int i = 0; i < Groups[g].NumUnits; ++i) {
+		for (unsigned int i = 0; i < Groups[g].NumUnits; ++i) {
 			file.printf("\"%s\", ", UnitReference(*Groups[g].Units[i]).c_str());
 		}
 		file.printf("})\n");
@@ -132,7 +132,7 @@ int GetNumberUnitsOfGroup(int num, GroupSelectionMode mode)
 	Assert(num < NUM_GROUPS);
 	if (mode != SELECT_ALL && Groups[num].tainted && Groups[num].NumUnits) {
 		int count = 0;
-		for (int i = 0; i < Groups[num].NumUnits; ++i) {
+		for (unsigned int i = 0; i < Groups[num].NumUnits; ++i) {
 			const CUnitType *type = Groups[num].Units[i]->Type;
 			if (type && type->CanSelect(mode)) {
 				count++;
@@ -166,7 +166,7 @@ void ClearGroup(int num)
 	Assert(num < NUM_GROUPS);
 	CUnitGroup &group = Groups[num];
 
-	for (int i = 0; i < group.NumUnits; ++i) {
+	for (unsigned int i = 0; i < group.NumUnits; ++i) {
 		group.Units[i]->GroupId &= ~(1 << num);
 		Assert(!group.Units[i]->Destroyed);
 	}
@@ -181,12 +181,12 @@ void ClearGroup(int num)
 **  @param nunits  Number of units in array.
 **  @param num     Group number for storage.
 */
-void AddToGroup(CUnit **units, int nunits, int num)
+void AddToGroup(CUnit **units, unsigned int nunits, int num)
 {
 	Assert(num <= NUM_GROUPS);
 
 	CUnitGroup &group = Groups[num];
-	for (int i = 0; group.NumUnits < MaxSelectable && i < nunits; ++i) {
+	for (unsigned int i = 0; group.NumUnits < MaxSelectable && i < nunits; ++i) {
 		// Add to group only if they are on our team
 		// Buildings can be in group but it "taint" the group.
 		// Taited groups normaly select only SelectableByRectangle units but
@@ -209,7 +209,7 @@ void AddToGroup(CUnit **units, int nunits, int num)
 **  @param nunits  Number of units in array.
 **  @param num     Group number for storage.
 */
-void SetGroup(CUnit **units, int nunits, int num)
+void SetGroup(CUnit **units, unsigned int nunits, int num)
 {
 	Assert(num <= NUM_GROUPS && nunits <= MaxSelectable);
 
@@ -232,7 +232,7 @@ void RemoveUnitFromGroups(CUnit &unit)
 		}
 		CUnitGroup &group = Groups[num];
 
-		int ind;
+		unsigned int ind;
 		for (ind = 0; group.Units[ind] != &unit; ++ind) {
 			Assert(ind < group.NumUnits); // oops not found
 		}
@@ -243,7 +243,7 @@ void RemoveUnitFromGroups(CUnit &unit)
 		// Update tainted flag.
 		if (group.tainted && !unit.Type->SelectableByRectangle) {
 			group.tainted = false;
-			for (int i = 0; i < group.NumUnits; ++i) {
+			for (unsigned int i = 0; i < group.NumUnits; ++i) {
 				if (group.Units[i]->Type && !group.Units[i]->Type->SelectableByRectangle) {
 					group.tainted = true;
 				}

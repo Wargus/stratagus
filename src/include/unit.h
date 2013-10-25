@@ -380,8 +380,8 @@ public:
 
 	unsigned long TTL;  /// time to live
 
-	int GroupId;        /// unit belongs to this group id
-	int LastGroup;      /// unit belongs to this last group
+	unsigned int GroupId;       /// unit belongs to this group id
+	unsigned int LastGroup;     /// unit belongs to this last group
 
 	unsigned int Wait;          /// action counter
 	int Threshold;              /// The counter while ai unit couldn't change target.
@@ -448,17 +448,15 @@ extern unsigned long ShowNameDelay;     /// Delay to show unit's name
 extern unsigned long ShowNameTime;      /// Show unit's name for some time
 extern bool EnableTrainingQueue;               /// Config: training queues enabled
 extern bool EnableBuildingCapture;             /// Config: building capture enabled
-extern bool RevealAttacker;				       /// Config: reveal attacker enabled
+extern bool RevealAttacker;                    /// Config: reveal attacker enabled
 extern int ResourcesMultiBuildersMultiplier;   /// Config: spend resources for building with multiple workers
 extern const CViewport *CurrentViewport; /// CurrentViewport
 extern void DrawUnitSelection(const CViewport &vp, const CUnit &unit);
 extern void (*DrawSelection)(IntColor, int, int, int, int);
-extern int MaxSelectable;                  /// How many units could be selected
 
-extern CUnit **Selected;                    /// currently selected units
-extern CUnit **TeamSelected[PlayerMax];     /// teams currently selected units
-extern int     NumSelected;                 /// how many units selected
-extern int     TeamNumSelected[PlayerMax];  /// Number of Units a team member has selected
+extern unsigned int MaxSelectable;    /// How many units could be selected
+extern CUnit **Selected;              /// currently selected units
+extern unsigned int     NumSelected;  /// how many units selected
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -614,9 +612,9 @@ extern CUnit **GetUnitsOfGroup(int num);
 /// Remove all units from a group
 extern void ClearGroup(int num);
 /// Add the array of units to the group
-extern void AddToGroup(CUnit **units, int nunits, int num);
+extern void AddToGroup(CUnit **units, unsigned int nunits, int num);
 /// Set the contents of a particular group with an array of units
-extern void SetGroup(CUnit **units, int nunits, int num);
+extern void SetGroup(CUnit **units, unsigned int nunits, int num);
 /// Remove a unit from a group
 extern void RemoveUnitFromGroups(CUnit &unit);
 /// Register CCL group features

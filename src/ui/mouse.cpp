@@ -567,7 +567,7 @@ void DoRightButton(const PixelPos &mapPixelPos)
 	}
 
 	if (dest != NULL && dest->Type->CanTransport()) {
-		for (int i = 0; i < NumSelected; i++) {
+		for (unsigned int i = 0; i < NumSelected; i++) {
 			if (CanTransport(*dest, *Selected[i])) {
 				// We are clicking on a transporter. We have to:
 				// 1) Flush the transporters orders.
@@ -583,7 +583,7 @@ void DoRightButton(const PixelPos &mapPixelPos)
 	}
 
 	int acknowledged = 0; // to play sound
-	for (int i = 0; i < NumSelected; ++i) {
+	for (unsigned int i = 0; i < NumSelected; ++i) {
 		Assert(Selected[i]);
 		CUnit &unit = *Selected[i];
 
@@ -949,7 +949,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			// 0 Test build, don't really build
 			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && buildable && (explored || ReplayRevealMap)) {
 				const int flush = !(KeyModifiers & ModifierShift);
-				for (int i = 0; i < NumSelected; ++i) {
+				for (unsigned int i = 0; i < NumSelected; ++i) {
 					SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush);
 				}
 				if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
@@ -1072,7 +1072,7 @@ static int SendRepair(const Vec2i &tilePos)
 	if (dest && dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max
 		&& dest->Type->RepairHP
 		&& (dest->Player == ThisPlayer || ThisPlayer->IsAllied(*dest))) {
-		for (int i = 0; i < NumSelected; ++i) {
+		for (unsigned int i = 0; i < NumSelected; ++i) {
 			CUnit *unit = Selected[i];
 
 			if (unit->Type->RepairRange) {
@@ -1104,7 +1104,7 @@ static int SendMove(const Vec2i &tilePos)
 
 	// Alt makes unit to defend goal
 	if (goal && (KeyModifiers & ModifierAlt)) {
-		for (int i = 0; i < NumSelected; ++i) {
+		for (unsigned int i = 0; i < NumSelected; ++i) {
 			CUnit *unit = Selected[i];
 
 			goal->Blink = 4;
@@ -1114,7 +1114,7 @@ static int SendMove(const Vec2i &tilePos)
 	} else {
 		// Move to a transporter.
 		if (goal && goal->Type->CanTransport()) {
-			int i;
+			unsigned int i;
 			for (i = 0; i < NumSelected; ++i) {
 				if (CanTransport(*goal, *Selected[i])) {
 					SendCommandStopUnit(*goal);
@@ -1129,7 +1129,7 @@ static int SendMove(const Vec2i &tilePos)
 			goal = NULL;
 		}
 
-		for (int i = 0; i < NumSelected; ++i) {
+		for (unsigned int i = 0; i < NumSelected; ++i) {
 			CUnit *unit = Selected[i];
 
 			if (goal && CanTransport(*goal, *unit)) {
@@ -1170,7 +1170,7 @@ static int SendAttack(const Vec2i &tilePos)
 	if (dest && dest->Type->Decoration) {
 		dest = NULL;
 	}
-	for (int i = 0; i < NumSelected; ++i) {
+	for (unsigned int i = 0; i < NumSelected; ++i) {
 		CUnit &unit = *Selected[i];
 
 		if (unit.Type->CanAttack) {
@@ -1201,7 +1201,7 @@ static int SendAttackGround(const Vec2i &tilePos)
 	const int flush = !(KeyModifiers & ModifierShift);
 	int ret = 0;
 
-	for (int i = 0; i < NumSelected; ++i) {
+	for (unsigned int i = 0; i < NumSelected; ++i) {
 		CUnit &unit = *Selected[i];
 		if (unit.Type->CanAttack) {
 			SendCommandAttackGround(unit, tilePos, flush);
@@ -1223,7 +1223,7 @@ static int SendPatrol(const Vec2i &tilePos)
 {
 	const int flush = !(KeyModifiers & ModifierShift);
 
-	for (int i = 0; i < NumSelected; ++i) {
+	for (unsigned int i = 0; i < NumSelected; ++i) {
 		CUnit &unit = *Selected[i];
 		SendCommandPatrol(unit, tilePos, flush);
 	}
@@ -1245,7 +1245,7 @@ static int SendResource(const Vec2i &pos)
 	const int flush = !(KeyModifiers & ModifierShift);
 	const CMapField &mf = *Map.Field(pos);
 
-	for (int i = 0; i < NumSelected; ++i) {
+	for (unsigned int i = 0; i < NumSelected; ++i) {
 		CUnit &unit = *Selected[i];
 
 		if (unit.Type->Harvester) {
@@ -1306,7 +1306,7 @@ static int SendUnload(const Vec2i &tilePos)
 {
 	const int flush = !(KeyModifiers & ModifierShift);
 
-	for (int i = 0; i < NumSelected; ++i) {
+	for (unsigned int i = 0; i < NumSelected; ++i) {
 		// FIXME: not only transporter selected?
 		SendCommandUnload(*Selected[i], tilePos, NoUnitP, flush);
 	}
@@ -1335,7 +1335,7 @@ static int SendSpellCast(const Vec2i &tilePos)
 	   (if exists). All checks are performed at spell cast handle
 	   function which will cancel function if cannot be executed
 	 */
-	for (int i = 0; i < NumSelected; ++i) {
+	for (unsigned int i = 0; i < NumSelected; ++i) {
 		CUnit &unit = *Selected[i];
 		if (!unit.Type->CanCastSpell) {
 			DebugPrint("but unit %d(%s) can't cast spells?\n" _C_
@@ -1402,7 +1402,7 @@ static void SendCommand(const Vec2i &tilePos)
 	}
 	if (ret) {
 		// Acknowledge the command with first selected unit.
-		for (int i = 0; i < NumSelected; ++i) {
+		for (unsigned int i = 0; i < NumSelected; ++i) {
 			if (ret == ButtonAttack || ret == ButtonAttackGround || ret == ButtonSpellCast) {
 				if (Selected[i]->Type->Sound.Attack.Sound) {
 					PlayUnitSound(*Selected[i], VoiceAttack);
@@ -1437,7 +1437,7 @@ static void DoSelectionButtons(int num, unsigned)
 		return;
 	}
 
-	if (num >= NumSelected || !(MouseButtons & LeftButton)) {
+	if (static_cast<unsigned int>(num) >= NumSelected || !(MouseButtons & LeftButton)) {
 		return;
 	}
 
@@ -1585,7 +1585,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && (explored || ReplayRevealMap)) {
 				const int flush = !(KeyModifiers & ModifierShift);
 				PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound, MaxSampleVolume);
-				for (int i = 0; i < NumSelected; ++i) {
+				for (unsigned int i = 0; i < NumSelected; ++i) {
 					SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush);
 				}
 				if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
@@ -2116,7 +2116,7 @@ void DrawPieMenu()
 			const PixelPos pos(x, y);
 
 			bool gray = false;
-			for (int j = 0; j < NumSelected; ++j) {
+			for (unsigned int j = 0; j < NumSelected; ++j) {
 				if (!IsButtonAllowed(*Selected[j], buttons[i])) {
 					gray = true;
 					break;

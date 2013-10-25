@@ -372,7 +372,7 @@ int AiForce::PlanAttack()
 	Vec2i pos = this->GoalPos;
 
 	if (AiFindTarget(*landUnit, transporterTerrainTraversal, &pos)) {
-		const int forceIndex = AiPlayer->Force.getIndex(this) + 1;
+		const unsigned int forceIndex = AiPlayer->Force.getIndex(this) + 1;
 
 		if (transporter->GroupId != forceIndex) {
 			DebugPrint("%d: Assign any transporter #%d\n" _C_ player.Index _C_ UnitNumber(*transporter));

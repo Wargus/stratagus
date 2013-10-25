@@ -52,16 +52,14 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-int NumSelected;                 /// Number of selected units
-int TeamNumSelected[PlayerMax];  /// How many units selected
-int MaxSelectable;               /// Maximum number of selected units
-CUnit **Selected;                 /// All selected units
-CUnit **TeamSelected[PlayerMax];  /// teams currently selected units
+unsigned int MaxSelectable;               /// Maximum number of selected units
 
-static int _NumSelected;                 /// save of NumSelected
-static int _TeamNumSelected[PlayerMax];  /// save of TeamNumSelected
-static CUnit **_Selected;                 /// save of Selected
-static CUnit **_TeamSelected[PlayerMax];  /// save of TeamSelected
+unsigned int NumSelected;                 /// Number of selected units
+CUnit **Selected;                 /// All selected units
+static std::vector<CUnit *> TeamSelected[PlayerMax];  /// teams currently selected units
+
+static std::vector<CUnit *> _Selected;                 /// save of Selected
+static std::vector<CUnit *> _TeamSelected[PlayerMax];  /// save of TeamSelected
 
 static unsigned GroupId;         /// Unique group # for automatic groups
 
@@ -75,14 +73,12 @@ static unsigned GroupId;         /// Unique group # for automatic groups
 void SaveSelection()
 {
 	for (int i = 0; i < PlayerMax; ++i) {
-		_TeamNumSelected[i] = TeamNumSelected[i];
-		for (int j = 0; j < TeamNumSelected[i]; ++j) {
-			_TeamSelected[i][j] = TeamSelected[i][j];
-		}
+		_TeamSelected[i] = TeamSelected[i];
 	}
-	_NumSelected = NumSelected;
-	for (int j = 0; j < NumSelected; ++j) {
-		_Selected[j] = Selected[j];
+	// TODO: _Selected = Selected;
+	_Selected.clear();
+	for (unsigned int j = 0; j < NumSelected; ++j) {
+		_Selected.push_back(Selected[j]);
 	}
 }
 
@@ -93,14 +89,13 @@ void RestoreSelection()
 {
 	UnSelectAll();
 	for (int i = 0; i < PlayerMax; ++i) {
-		TeamNumSelected[i] = _TeamNumSelected[i];
-		for (int j = 0; j < _TeamNumSelected[i]; ++j) {
-			TeamSelected[i][j] = _TeamSelected[i][j];
+		TeamSelected[i] = _TeamSelected[i];
+		for (size_t j = 0; j != _TeamSelected[i].size(); ++j) {
 			TeamSelected[i][j]->TeamSelected |= (1 << i);
 		}
 	}
-	NumSelected = _NumSelected;
-	for (int j = 0; j < _NumSelected; ++j) {
+	NumSelected = _Selected.size();
+	for (size_t j = 0; j != _Selected.size(); ++j) {
 		Selected[j] = _Selected[j];
 		Selected[j]->Selected = 1;
 	}
@@ -153,7 +148,7 @@ static void HandleSuicideClick(CUnit &unit)
 **  @param units  Array of units to be selected.
 **  @param count  Number of units in array to be selected.
 */
-static void ChangeSelectedUnits(CUnit **units, int count)
+static void ChangeSelectedUnits(CUnit **units, unsigned int count)
 {
 	Assert(count <= MaxSelectable);
 
@@ -167,8 +162,8 @@ static void ChangeSelectedUnits(CUnit **units, int count)
 	}
 	UnSelectAll();
 	NetworkSendSelection(units, count);
-	int n = 0;
-	for (int i = 0; i < count; ++i) {
+	unsigned int n = 0;
+	for (unsigned int i = 0; i < count; ++i) {
 		CUnit &unit = *units[i];
 		if (!unit.Removed && !unit.TeamSelected && !unit.Type->IsNotSelectable) {
 			Selected[n++] = &unit;
@@ -190,21 +185,21 @@ static void ChangeSelectedUnits(CUnit **units, int count)
 void ChangeTeamSelectedUnits(CPlayer &player, const std::vector<CUnit *> &units)
 {
 	// UnSelectAllTeam(player);
-	while (TeamNumSelected[player.Index]) {
-		CUnit *unit = TeamSelected[player.Index][--TeamNumSelected[player.Index]];
+	while (!TeamSelected[player.Index].empty()) {
+		CUnit *unit = TeamSelected[player.Index].back();
+		TeamSelected[player.Index].pop_back();
 		unit->TeamSelected &= ~(1 << player.Index);
-		TeamSelected[player.Index][TeamNumSelected[player.Index]] = NULL; // FIXME: only needed for old code
 	}
 	// Add to selection
 	for (size_t i = 0; i != units.size(); ++i) {
 		CUnit &unit = *units[i];
 		Assert(!unit.Removed);
 		if (!unit.Type->IsNotSelectable) {
-			TeamSelected[player.Index][TeamNumSelected[player.Index]++] = &unit;
+			TeamSelected[player.Index].push_back(&unit);
 			unit.TeamSelected |= 1 << player.Index;
 		}
 	}
-	Assert(TeamNumSelected[player.Index] <= MaxSelectable);
+	Assert(TeamSelected[player.Index].size() <= MaxSelectable);
 }
 
 /**
@@ -270,16 +265,14 @@ void UnSelectUnit(CUnit &unit)
 	if (unit.TeamSelected) {
 		for (int i = 0; i < PlayerMax; ++i) {
 			if (unit.TeamSelected & (1 << i)) {
-				int j;
+				size_t j;
 				for (j = 0; TeamSelected[i][j] != &unit; ++i) {
-					;
+					// Empty
 				}
-				Assert(j < TeamNumSelected[i]);
+				Assert(j < TeamSelected[i].size());
 
-				if (j < --TeamNumSelected[i]) {
-
-					TeamSelected[i][j] = TeamSelected[i][TeamNumSelected[i]];
-				}
+				std::swap(TeamSelected[i][j], TeamSelected[i].back());
+				TeamSelected[i].pop_back();
 				unit.TeamSelected &= ~(1 << i);
 			}
 		}
@@ -287,7 +280,7 @@ void UnSelectUnit(CUnit &unit)
 	if (!unit.Selected) {
 		return;
 	}
-	int j;
+	unsigned int j;
 
 	for (j = 0; Selected[j] != &unit; ++j) {
 		;
@@ -301,7 +294,7 @@ void UnSelectUnit(CUnit &unit)
 	if (NumSelected > 1) { // Assign new group to remaining units
 		while (!++GroupId) { // Advance group id, but keep non zero
 		}
-		for (int i = 0; i < NumSelected; ++i) {
+		for (unsigned int i = 0; i < NumSelected; ++i) {
 			Selected[i]->LastGroup = GroupId;
 		}
 	}
@@ -414,7 +407,7 @@ int SelectUnitsByType(CUnit &base)
 		}
 	}
 	if (NumSelected > 1) {
-		for (int i = 0; i < NumSelected; ++i) {
+		for (unsigned int i = 0; i < NumSelected; ++i) {
 			Selected[i]->LastGroup = GroupId;
 		}
 	}
@@ -540,7 +533,7 @@ int SelectGroup(int group_number, GroupSelectionMode mode)
 */
 int AddGroupFromUnitToSelection(CUnit &unit)
 {
-	int group = unit.LastGroup;
+	unsigned int group = unit.LastGroup;
 
 	if (!group) { // belongs to no group
 		return 0;
@@ -589,7 +582,7 @@ int SelectGroupFromUnit(CUnit &unit)
 */
 static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table)
 {
-	int n = 0;
+	unsigned int n = 0;
 
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
@@ -795,7 +788,7 @@ int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos 
 	Select(t0 - range, t1 + range, table);
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
-	int n = 0;
+	unsigned int n = 0;
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
@@ -839,7 +832,7 @@ int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &co
 
 	Select(t0 - range, t1 + range, table);
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
-	int n = 0;
+	unsigned int n = 0;
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->SelectableByRectangle) {
@@ -898,7 +891,7 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 	Select(t0 - range, t1 + range, table);
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
-	int n = 0;
+	unsigned int n = 0;
 	for (size_t i = 0; i < table.size(); ++i) {
 		CUnit &unit = *table[i];
 
@@ -922,7 +915,7 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 	}
 
 	// Add the units to selected.
-	for (int i = 0; i < n && NumSelected < MaxSelectable; ++i) {
+	for (unsigned int i = 0; i < n && NumSelected < MaxSelectable; ++i) {
 		SelectUnit(*table[i]);
 	}
 	return NumSelected;
@@ -959,7 +952,7 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 
 	Select(t0 - range, t1 + range, table);
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
-	int n = 0;
+	unsigned int n = 0;
 	for (size_t i = 0; i < table.size(); ++i) {
 		CUnit &unit = *table[i];
 		if (!CanSelectMultipleUnits(*unit.Player) ||
@@ -982,7 +975,7 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 	}
 
 	// Add the units to selected.
-	for (int i = 0; i < n && NumSelected < MaxSelectable; ++i) {
+	for (unsigned int i = 0; i < n && NumSelected < MaxSelectable; ++i) {
 		SelectUnit(*table[i]);
 	}
 	return NumSelected;
@@ -996,13 +989,6 @@ void InitSelections()
 	// This could have been initialized already when loading a game
 	if (!Selected) {
 		Selected = new CUnit *[MaxSelectable];
-		_Selected = new CUnit *[MaxSelectable];
-	}
-	for (int i = 0; i < PlayerMax; ++i) {
-		if (!TeamSelected[i]) {
-			TeamSelected[i] = new CUnit *[MaxSelectable];
-			_TeamSelected[i] = new CUnit *[MaxSelectable];
-		}
 	}
 }
 
@@ -1018,7 +1004,7 @@ void SaveSelections(CFile &file)
 
 	file.printf("SetGroupId(%d)\n", GroupId);
 	file.printf("Selection(%d, {", NumSelected);
-	for (int i = 0; i < NumSelected; ++i) {
+	for (unsigned int i = 0; i < NumSelected; ++i) {
 		file.printf("\"%s\", ", UnitReference(*Selected[i]).c_str());
 	}
 	file.printf("})\n");
@@ -1033,16 +1019,11 @@ void CleanSelections()
 	NumSelected = 0;
 	delete[] Selected;
 	Selected = NULL;
-	delete[] _Selected;
-	_Selected = NULL;
+	_Selected.clear();
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		delete[] TeamSelected[i];
-		TeamSelected[i] = NULL;
-		delete[] _TeamSelected[i];
-		_TeamSelected[i] = NULL;
-		TeamNumSelected[i] = 0;
-		_TeamNumSelected[i] = 0;
+		TeamSelected[i].clear();
+		_TeamSelected[i].clear();
 	}
 }
 

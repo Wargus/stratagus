@@ -1089,10 +1089,10 @@ void CInfoPanel::Draw()
 					UI.StatusLine.Set(Selected[i]->Type->Name);
 				}
 			}
-			if (NumSelected > (int)UI.SelectedButtons.size()) {
+			if (NumSelected > UI.SelectedButtons.size()) {
 				char buf[5];
 
-				sprintf(buf, "+%u", static_cast<unsigned int>(NumSelected - UI.SelectedButtons.size()));
+				sprintf(buf, "+%u", NumSelected - UI.SelectedButtons.size());
 				CLabel(*UI.MaxSelectedFont).Draw(UI.MaxSelectedTextX, UI.MaxSelectedTextY, buf);
 			}
 			return;

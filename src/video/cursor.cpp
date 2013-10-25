@@ -196,7 +196,7 @@ static void DrawBuildingCursor()
 	int f;
 	if (NumSelected) {
 		f = 1;
-		for (int i = 0; f && i < NumSelected; ++i) {
+		for (unsigned int i = 0; f && i < NumSelected; ++i) {
 			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos)) != NULL);
 			// Assign ontop or NULL
 			ontop = (ontop == Selected[i] ? NULL : ontop);
