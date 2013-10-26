@@ -152,31 +152,6 @@ bool IsGroupTainted(int num)
 }
 
 /**
-**  Return the number of units of group num
-**
-**  @param num  Group number.
-**
-**  @return     Returns the number of units in the group.
-*/
-int GetNumberUnitsOfGroup(int num, GroupSelectionMode mode)
-{
-	Assert(num < NUM_GROUPS);
-	const CUnitGroup& group = Groups[num];
-
-	if (mode != SELECT_ALL && group.isTainted() && !group.getUnits().empty()) {
-		int count = 0;
-		for (size_t i = 0; i != group.getUnits().size(); ++i) {
-			const CUnitType *type = group.getUnits()[i]->Type;
-			if (type && type->CanSelect(mode)) {
-				count++;
-			}
-		}
-		return count;
-	}
-	return group.getUnits().size();
-}
-
-/**
 **  Return the units of group num
 **
 **  @param num  Group number.

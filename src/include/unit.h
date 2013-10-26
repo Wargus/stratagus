@@ -600,10 +600,6 @@ extern void ShowOrder(const CUnit &unit);
 extern void SaveGroups(CFile &file);
 /// Cleanup groups
 extern void CleanGroups();
-
-// 2 functions to conseal the groups internal data structures...
-/// Get the number of units in a particular group
-extern int GetNumberUnitsOfGroup(int num, GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY);
 /// Get the array of units of a particular group
 extern const std::vector<CUnit *> &GetUnitsOfGroup(int num);
 
