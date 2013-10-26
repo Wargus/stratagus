@@ -944,11 +944,6 @@ void CreateGame(const std::string &filename, CMap *map)
 	InitSpells();
 
 	//
-	// Init units' groups
-	//
-	InitGroups();
-
-	//
 	// Init players?
 	//
 	DebugPlayers();

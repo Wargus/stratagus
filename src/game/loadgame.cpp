@@ -134,7 +134,6 @@ void InitModules()
 
 	InitUnits();
 	InitSelections();
-	InitGroups();
 	InitSpells();
 	InitUpgrades();
 	InitDependencies();
