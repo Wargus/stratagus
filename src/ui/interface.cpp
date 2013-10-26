@@ -147,28 +147,21 @@ static void UiUnselectAll()
 */
 static void UiCenterOnGroup(unsigned group, GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY)
 {
-	int n = GetNumberUnitsOfGroup(group, SELECT_ALL);
+	const std::vector<CUnit *> &units = GetUnitsOfGroup(group);
+	PixelPos pos(-1, -1);
 
-	if (n--) {
-		CUnit **units = GetUnitsOfGroup(group);
-		PixelPos pos(-1, -1);
-
-		// FIXME: what should we do with the removed units? ignore?
-		if (units[n]->Type && units[n]->Type->CanSelect(mode)) {
-			pos = units[n]->GetMapPixelPosCenter();
-		}
-		while (n--) {
-			if (units[n]->Type && units[n]->Type->CanSelect(mode)) {
-				if (pos.x != -1) {
-					pos += (units[n]->GetMapPixelPosCenter() - pos) / 2;
-				} else {
-					pos = units[n]->GetMapPixelPosCenter();
-				}
+	// FIXME: what should we do with the removed units? ignore?
+	for (size_t i = 0; i != units.size(); ++i) {
+		if (units[i]->Type && units[i]->Type->CanSelect(mode)) {
+			if (pos.x != -1) {
+				pos += (units[i]->GetMapPixelPosCenter() - pos) / 2;
+			} else {
+				pos = units[i]->GetMapPixelPosCenter();
 			}
 		}
-		if (pos.x != -1) {
-			UI.SelectedViewport->Center(pos);
-		}
+	}
+	if (pos.x != -1) {
+		UI.SelectedViewport->Center(pos);
 	}
 }
 
@@ -190,28 +183,22 @@ static void UiSelectGroup(unsigned group, GroupSelectionMode mode = SELECTABLE_B
 */
 static void UiAddGroupToSelection(unsigned group)
 {
-	CUnit **units;
-	int n;
+	const std::vector<CUnit *> &units = GetUnitsOfGroup(group);
 
-	if (!(n = GetNumberUnitsOfGroup(group, SELECT_ALL))) {
+	if (units.empty()) {
 		return;
 	}
 
-	//
 	//  Don't allow to mix units and buildings
-	//
 	if (NumSelected && Selected[0]->Type->Building) {
 		return;
 	}
 
-	units = GetUnitsOfGroup(group);
-
-	while (n--) {
-		if (!(units[n]->Removed || units[n]->Type->Building)) {
-			SelectUnit(*units[n]);
+	for (size_t i = 0; i != units.size(); ++i) {
+		if (!(units[i]->Removed || units[i]->Type->Building)) {
+			SelectUnit(*units[i]);
 		}
 	}
-
 	SelectionChanged();
 }
 

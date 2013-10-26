@@ -499,26 +499,26 @@ int ToggleUnitsByType(CUnit &base)
 */
 int SelectGroup(int group_number, GroupSelectionMode mode)
 {
-	int nunits = GetNumberUnitsOfGroup(group_number, SELECT_ALL);
-	if (nunits) {
-		if (mode == SELECT_ALL || !IsGroupTainted(group_number)) {
-			ChangeSelectedUnits(GetUnitsOfGroup(group_number), nunits);
-			return NumSelected;
-		} else {
-			std::vector<CUnit *> table;
-			CUnit **group = GetUnitsOfGroup(group_number);
+	const std::vector<CUnit *> &units = GetUnitsOfGroup(group_number);
 
-			for (int i = 0; i < nunits; ++i) {
-				const CUnitType *type = group[i]->Type;
-				if (type && type->CanSelect(mode)) {
-					table.push_back(group[i]);
-				}
-			}
-			if (table.empty() == false) {
-				ChangeSelectedUnits(&table[0], static_cast<int>(table.size()));
-				return NumSelected;
-			}
+	if (units.empty()) {
+		return 0;
+	}
+	if (mode == SELECT_ALL || !IsGroupTainted(group_number)) {
+		ChangeSelectedUnits(const_cast<CUnit**>(&units[0]), units.size());
+		return NumSelected;
+	}
+	std::vector<CUnit *> table;
+
+	for (size_t i = 0; i != units.size(); ++i) {
+		const CUnitType *type = units[i]->Type;
+		if (type && type->CanSelect(mode)) {
+			table.push_back(units[i]);
 		}
+	}
+	if (table.empty() == false) {
+		ChangeSelectedUnits(&table[0], table.size());
+		return NumSelected;
 	}
 	return 0;
 }

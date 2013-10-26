@@ -596,8 +596,6 @@ extern void ShowOrder(const CUnit &unit);
 
 // in groups.c
 
-/// Initialize data structures for groups
-extern void InitGroups();
 /// Save groups
 extern void SaveGroups(CFile &file);
 /// Cleanup groups
@@ -607,7 +605,7 @@ extern void CleanGroups();
 /// Get the number of units in a particular group
 extern int GetNumberUnitsOfGroup(int num, GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY);
 /// Get the array of units of a particular group
-extern CUnit **GetUnitsOfGroup(int num);
+extern const std::vector<CUnit *> &GetUnitsOfGroup(int num);
 
 /// Remove all units from a group
 extern void ClearGroup(int num);

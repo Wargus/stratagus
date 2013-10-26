@@ -38,10 +38,10 @@
 
 #include "unit.h"
 
+#include "iolib.h"
+#include "script.h"
 #include "unit_manager.h"
 #include "unittype.h"
-#include "script.h"
-#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -55,9 +55,58 @@
 /**
 **  Defines a group of units.
 */
-struct CUnitGroup {
-	CUnit **Units;  /// Units in the group
-	unsigned int NumUnits;  /// How many units in the group
+class CUnitGroup
+{
+public:
+	CUnitGroup() : tainted(false) {}
+
+	void init()
+	{
+		units.clear();
+		tainted = false;
+	}
+
+	bool isTainted() const { return tainted; }
+	const std::vector<CUnit *>& getUnits() const { return units; }
+
+	void add(CUnit& unit, unsigned int num)
+	{
+		if (ThisPlayer->IsTeamed(unit)) {
+			if (!tainted) {
+				tainted = unit.Type->SelectableByRectangle != true;
+			}
+			units.push_back(&unit);
+			unit.GroupId |= (1 << num);
+		}
+	}
+
+	void remove(CUnit& unit)
+	{
+		std::vector<CUnit *>::iterator it = find(units.begin(), units.end(), &unit);
+
+		Assert(it == units.end());
+		*it = units.back();
+		units.pop_back();
+
+		// Update tainted flag.
+		if (tainted && !unit.Type->SelectableByRectangle) {
+			updateTainted();
+		}
+	}
+
+private:
+	void updateTainted()
+	{
+		tainted = false;
+		for (size_t i = 0; i != units.size(); ++i) {
+			if (units[i]->Type && !units[i]->Type->SelectableByRectangle) {
+				tainted = true;
+			}
+		}
+	}
+
+private:
+	std::vector<CUnit *> units;  /// Units in the group
 	bool tainted;    /// Group hold unit which can't be SelectableByRectangle
 };                                       /// group of units
 
@@ -66,21 +115,6 @@ static CUnitGroup Groups[NUM_GROUPS];    /// Number of groups predefined
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**  Initialize group part.
-**
-**  @todo Not needed with the new unit code!
-*/
-void InitGroups()
-{
-	for (int i = 0; i < NUM_GROUPS; ++i) {
-		if (!Groups[i].Units) {
-			Groups[i].Units = new CUnit *[MaxSelectable];
-		}
-		Groups[i].tainted = 0;
-	}
-}
 
 /**
 **  Save groups.
@@ -93,9 +127,9 @@ void SaveGroups(CFile &file)
 	file.printf("--- MODULE: groups\n\n");
 
 	for (int g = 0; g < NUM_GROUPS; ++g) {
-		file.printf("Group(%d, %d, {", g, Groups[g].NumUnits);
-		for (unsigned int i = 0; i < Groups[g].NumUnits; ++i) {
-			file.printf("\"%s\", ", UnitReference(*Groups[g].Units[i]).c_str());
+		file.printf("Group(%d, %d, {", g, Groups[g].getUnits().size());
+		for (size_t i = 0; i < Groups[g].getUnits().size(); ++i) {
+			file.printf("\"%s\", ", UnitReference(*Groups[g].getUnits()[i]).c_str());
 		}
 		file.printf("})\n");
 	}
@@ -107,17 +141,14 @@ void SaveGroups(CFile &file)
 void CleanGroups()
 {
 	for (int i = 0; i < NUM_GROUPS; ++i) {
-		delete[] Groups[i].Units;
-		Groups[i].Units = NULL;
-		Groups[i].NumUnits = 0;
-		Groups[i].tainted = 0;
+		Groups[i].init();
 	}
 }
 
 bool IsGroupTainted(int num)
 {
 	Assert(num < NUM_GROUPS);
-	return Groups[num].tainted;
+	return Groups[num].isTainted();
 }
 
 /**
@@ -130,17 +161,19 @@ bool IsGroupTainted(int num)
 int GetNumberUnitsOfGroup(int num, GroupSelectionMode mode)
 {
 	Assert(num < NUM_GROUPS);
-	if (mode != SELECT_ALL && Groups[num].tainted && Groups[num].NumUnits) {
+	const CUnitGroup& group = Groups[num];
+
+	if (mode != SELECT_ALL && group.isTainted() && !group.getUnits().empty()) {
 		int count = 0;
-		for (unsigned int i = 0; i < Groups[num].NumUnits; ++i) {
-			const CUnitType *type = Groups[num].Units[i]->Type;
+		for (size_t i = 0; i != group.getUnits().size(); ++i) {
+			const CUnitType *type = group.getUnits()[i]->Type;
 			if (type && type->CanSelect(mode)) {
 				count++;
 			}
 		}
 		return count;
 	}
-	return Groups[num].NumUnits;
+	return group.getUnits().size();
 }
 
 /**
@@ -150,10 +183,10 @@ int GetNumberUnitsOfGroup(int num, GroupSelectionMode mode)
 **
 **  @return     Returns an array of all units in the group.
 */
-CUnit **GetUnitsOfGroup(int num)
+const std::vector<CUnit *> &GetUnitsOfGroup(int num)
 {
 	Assert(num < NUM_GROUPS);
-	return Groups[num].Units;
+	return Groups[num].getUnits();
 }
 
 /**
@@ -166,12 +199,12 @@ void ClearGroup(int num)
 	Assert(num < NUM_GROUPS);
 	CUnitGroup &group = Groups[num];
 
-	for (unsigned int i = 0; i < group.NumUnits; ++i) {
-		group.Units[i]->GroupId &= ~(1 << num);
-		Assert(!group.Units[i]->Destroyed);
+	for (size_t i = 0; i != group.getUnits().size(); ++i) {
+		CUnit& unit = *group.getUnits()[i];
+		unit.GroupId &= ~(1 << num);
+		Assert(!unit.Destroyed);
 	}
-	group.NumUnits = 0;
-	group.tainted = 0;
+	group.init();
 }
 
 /**
@@ -186,19 +219,14 @@ void AddToGroup(CUnit **units, unsigned int nunits, int num)
 	Assert(num <= NUM_GROUPS);
 
 	CUnitGroup &group = Groups[num];
-	for (unsigned int i = 0; group.NumUnits < MaxSelectable && i < nunits; ++i) {
+	for (size_t i = 0; group.getUnits().size() < MaxSelectable && i < nunits; ++i) {
 		// Add to group only if they are on our team
 		// Buildings can be in group but it "taint" the group.
 		// Taited groups normaly select only SelectableByRectangle units but
 		// you can force selection to show hiden members (with buildings) by
 		// selecting ALT-(SHIFT)-#
-		if (ThisPlayer->IsTeamed(*units[i])) {
-			if (!group.tainted) {
-				group.tainted = units[i]->Type->SelectableByRectangle != true;
-			}
-			group.Units[group.NumUnits++] = units[i];
-			units[i]->GroupId |= (1 << num);
-		}
+		CUnit &unit = *units[i];
+		group.add(unit, num);
 	}
 }
 
@@ -232,23 +260,7 @@ void RemoveUnitFromGroups(CUnit &unit)
 		}
 		CUnitGroup &group = Groups[num];
 
-		unsigned int ind;
-		for (ind = 0; group.Units[ind] != &unit; ++ind) {
-			Assert(ind < group.NumUnits); // oops not found
-		}
-		if (ind < --group.NumUnits) {
-			group.Units[ind] = group.Units[group.NumUnits];
-		}
-
-		// Update tainted flag.
-		if (group.tainted && !unit.Type->SelectableByRectangle) {
-			group.tainted = false;
-			for (unsigned int i = 0; i < group.NumUnits; ++i) {
-				if (group.Units[i]->Type && !group.Units[i]->Type->SelectableByRectangle) {
-					group.tainted = true;
-				}
-			}
-		}
+		group.remove(unit);
 	}
 }
 
@@ -263,18 +275,17 @@ static int CclGroup(lua_State *l)
 {
 	LuaCheckArgs(l, 3);
 
-	InitGroups();
 	const int grpNum = LuaToNumber(l, 1);
 	if (NUM_GROUPS <= grpNum) {
 		LuaError(l, "grpIndex out of bound");
 	}
 	CUnitGroup &grp = Groups[grpNum];
-	grp.NumUnits = LuaToNumber(l, 2);
-	int i = 0;
+	grp.init();
+	//grp.Units.size() = LuaToNumber(l, 2);
 	const int args = lua_rawlen(l, 3);
 	for (int j = 0; j < args; ++j) {
 		const char *str = LuaToString(l, 3, j + 1);
-		grp.Units[i++] = &UnitManager.GetSlotUnit(strtol(str + 1, NULL, 16));
+		grp.add(UnitManager.GetSlotUnit(strtol(str + 1, NULL, 16)), grpNum);
 	}
 	return 0;
 }
