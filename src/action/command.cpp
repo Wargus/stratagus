@@ -745,7 +745,7 @@ void CommandCancelUpgradeTo(CUnit &unit)
 	if (unit.CurrentAction() == UnitActionUpgradeTo) {
 		unit.CurrentOrder()->Cancel(unit);
 		RemoveOrder(unit, 0);
-		if (Selected) {
+		if (!Selected.empty()) {
 			SelectedUnitChanged();
 		}
 	}
@@ -787,7 +787,7 @@ void CommandCancelResearch(CUnit &unit)
 	if (unit.CurrentAction() == UnitActionResearch) {
 		unit.CurrentOrder()->Cancel(unit);
 		RemoveOrder(unit, 0);
-		if (Selected) {
+		if (!Selected.empty()) {
 			SelectedUnitChanged();
 		}
 	}

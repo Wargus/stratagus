@@ -181,7 +181,7 @@ int DoActionMove(CUnit &unit)
 
 		// Remove unit from the current selection
 		if (unit.Selected && !Map.Field(pos)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			if (NumSelected == 1) { //  Remove building cursor
+			if (IsOnlySelected(unit)) { //  Remove building cursor
 				CancelBuildingMode();
 			}
 			if (!ReplayRevealMap) {

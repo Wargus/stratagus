@@ -54,8 +54,7 @@
 
 unsigned int MaxSelectable;               /// Maximum number of selected units
 
-unsigned int NumSelected;                 /// Number of selected units
-CUnit **Selected;                 /// All selected units
+std::vector<CUnit *> Selected;                 /// All selected units
 static std::vector<CUnit *> TeamSelected[PlayerMax];  /// teams currently selected units
 
 static std::vector<CUnit *> _Selected;                 /// save of Selected
@@ -67,6 +66,11 @@ static unsigned GroupId;         /// Unique group # for automatic groups
 --  Functions
 ----------------------------------------------------------------------------*/
 
+bool IsOnlySelected(const CUnit &unit)
+{
+	return !Selected.empty() && Selected[0] == &unit;
+}
+
 /**
 **  Save selection to restore after.
 */
@@ -75,11 +79,7 @@ void SaveSelection()
 	for (int i = 0; i < PlayerMax; ++i) {
 		_TeamSelected[i] = TeamSelected[i];
 	}
-	// TODO: _Selected = Selected;
-	_Selected.clear();
-	for (unsigned int j = 0; j < NumSelected; ++j) {
-		_Selected.push_back(Selected[j]);
-	}
+	_Selected = Selected;
 }
 
 /**
@@ -94,10 +94,9 @@ void RestoreSelection()
 			TeamSelected[i][j]->TeamSelected |= (1 << i);
 		}
 	}
-	NumSelected = _Selected.size();
-	for (size_t j = 0; j != _Selected.size(); ++j) {
-		Selected[j] = _Selected[j];
-		Selected[j]->Selected = 1;
+	Selected = _Selected;
+	for (size_t i = 0; i != _Selected.size(); ++i) {
+		Selected[i]->Selected = 1;
 	}
 }
 
@@ -109,19 +108,18 @@ void UnSelectAll()
 	while (!++GroupId) { // Advance group id, but keep non zero
 	}
 
-	while (NumSelected) {
-		CUnit *unit = Selected[--NumSelected];
-		Selected[NumSelected] = NULL; // FIXME: only needed for old code
-		unit->Selected = 0;
+	for (size_t i = 0; i != Selected.size(); ++i) {
+		Selected[i]->Selected = 0;
 	}
+	Selected.clear();
 	UI.SelectedViewport->Unit = NULL;
-
 }
 
 /**
 **  Handle a suicide unit click
 **
 **  @param unit  suicide unit.
+**  @todo remove static (bug with save/load...)
 */
 static void HandleSuicideClick(CUnit &unit)
 {
@@ -131,7 +129,7 @@ static void HandleSuicideClick(CUnit &unit)
 	if (GameObserve) {
 		return;
 	}
-	if (NumSelected == 1 && Selected[0] == &unit) {
+	if (IsOnlySelected(unit)) {
 		NumClicks++;
 	} else {
 		NumClicks = 1;
@@ -162,18 +160,16 @@ static void ChangeSelectedUnits(CUnit **units, unsigned int count)
 	}
 	UnSelectAll();
 	NetworkSendSelection(units, count);
-	unsigned int n = 0;
 	for (unsigned int i = 0; i < count; ++i) {
 		CUnit &unit = *units[i];
 		if (!unit.Removed && !unit.TeamSelected && !unit.Type->IsNotSelectable) {
-			Selected[n++] = &unit;
+			Selected.push_back(&unit);
 			unit.Selected = 1;
 			if (count > 1) {
 				unit.LastGroup = GroupId;
 			}
 		}
 	}
-	NumSelected = n;
 }
 
 /**
@@ -223,7 +219,7 @@ int SelectUnit(CUnit &unit)
 		return 0;
 	}
 
-	if (NumSelected == MaxSelectable) {
+	if (Selected.size() == MaxSelectable) {
 		return 0;
 	}
 
@@ -235,9 +231,9 @@ int SelectUnit(CUnit &unit)
 		return 0;
 	}
 
-	Selected[NumSelected++] = &unit;
+	Selected.push_back(&unit);
 	unit.Selected = 1;
-	if (NumSelected > 1) {
+	if (Selected.size() > 1) {
 		Selected[0]->LastGroup = unit.LastGroup = GroupId;
 	}
 	return 1;
@@ -280,25 +276,19 @@ void UnSelectUnit(CUnit &unit)
 	if (!unit.Selected) {
 		return;
 	}
-	unsigned int j;
+	std::vector<CUnit *>::iterator it = std::find(Selected.begin(), Selected.end(), &unit);
+	Assert(it != Selected.end());
 
-	for (j = 0; Selected[j] != &unit; ++j) {
-		;
-	}
-	Assert(j < NumSelected);
+	*it = Selected.back();
+	Selected.pop_back();
 
-	if (j < --NumSelected) {
-		Selected[j] = Selected[NumSelected];
-	}
-
-	if (NumSelected > 1) { // Assign new group to remaining units
+	if (Selected.size() > 1) { // Assign new group to remaining units
 		while (!++GroupId) { // Advance group id, but keep non zero
 		}
-		for (unsigned int i = 0; i < NumSelected; ++i) {
+		for (size_t i = 0; i != Selected.size(); ++i) {
 			Selected[i]->LastGroup = GroupId;
 		}
 	}
-	Selected[NumSelected] = NULL; // FIXME: only needed for old code
 	unit.Selected = 0;
 
 	//Turn track unit mode off
@@ -360,14 +350,13 @@ int SelectUnitsByType(CUnit &base)
 	}
 
 	UnSelectAll();
-	Selected[0] = &base;
+	Selected.push_back(&base);
 	base.Selected = 1;
-	NumSelected = 1;
 
 	// if unit isn't belonging to the player or allied player, or is a static unit
 	// (like a building), only 1 unit can be selected at the same time.
 	if (!CanSelectMultipleUnits(*base.Player) || !type.SelectableByRectangle) {
-		return NumSelected;
+		return Selected.size();
 	}
 
 	//
@@ -400,19 +389,19 @@ int SelectUnitsByType(CUnit &base)
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
-		Selected[NumSelected++] = &unit;
+		Selected.push_back(&unit);
 		unit.Selected = 1;
-		if (NumSelected == MaxSelectable) {
+		if (Selected.size() == MaxSelectable) {
 			break;
 		}
 	}
-	if (NumSelected > 1) {
-		for (unsigned int i = 0; i < NumSelected; ++i) {
+	if (Selected.size() > 1) {
+		for (size_t i = 0; i != Selected.size(); ++i) {
 			Selected[i]->LastGroup = GroupId;
 		}
 	}
-	NetworkSendSelection(Selected, NumSelected);
-	return NumSelected;
+	NetworkSendSelection(&Selected[0], Selected.size());
+	return Selected.size();
 }
 
 /**
@@ -481,12 +470,12 @@ int ToggleUnitsByType(CUnit &base)
 			continue;
 		}
 		if (!SelectUnit(unit)) { // add unit to selection
-			return NumSelected;
+			return Selected.size();
 		}
 	}
 
-	NetworkSendSelection(Selected, NumSelected);
-	return NumSelected;
+	NetworkSendSelection(&Selected[0], Selected.size());
+	return Selected.size();
 }
 
 /**
@@ -506,7 +495,7 @@ int SelectGroup(int group_number, GroupSelectionMode mode)
 	}
 	if (mode == SELECT_ALL || !IsGroupTainted(group_number)) {
 		ChangeSelectedUnits(const_cast<CUnit**>(&units[0]), units.size());
-		return NumSelected;
+		return Selected.size();
 	}
 	std::vector<CUnit *> table;
 
@@ -518,7 +507,7 @@ int SelectGroup(int group_number, GroupSelectionMode mode)
 	}
 	if (table.empty() == false) {
 		ChangeSelectedUnits(&table[0], table.size());
-		return NumSelected;
+		return Selected.size();
 	}
 	return 0;
 }
@@ -543,12 +532,12 @@ int AddGroupFromUnitToSelection(CUnit &unit)
 		CUnit &unit = **it;
 		if (unit.LastGroup == group && !unit.Removed) {
 			SelectUnit(unit);
-			if (NumSelected == MaxSelectable) {
-				return NumSelected;
+			if (Selected.size() == MaxSelectable) {
+				return Selected.size();
 			}
 		}
 	}
-	return NumSelected;
+	return Selected.size();
 }
 
 /**
@@ -572,7 +561,7 @@ int SelectGroupFromUnit(CUnit &unit)
 }
 
 /**
-**  Select the units selecteable by rectangle in a local table.
+**  Select the units selectable by rectangle in a local table.
 **  Act like a filter: The source table is modified.
 **  Return the original table if no unit is found.
 **
@@ -737,13 +726,13 @@ int AddSelectedUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &
 	// Check if the original selected unit (if it's alone) is ours,
 	// and can be selectable by rectangle.
 	// In this case, do nothing.
-	if (NumSelected == 1
+	if (Selected.size() == 1
 		&& (!CanSelectMultipleUnits(*Selected[0]->Player)
 			|| !Selected[0]->Type->SelectableByRectangle)) {
-		return NumSelected;
+		return Selected.empty();
 	}
 	// If there is no selected unit yet, do a simple selection.
-	if (!NumSelected) {
+	if (Selected.empty()) {
 		return SelectUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
 	const Vec2i tilePos0 = Map.MapPixelPosToTilePos(corner_topleft);
@@ -755,19 +744,19 @@ int AddSelectedUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 	// If no unit in rectangle area... do nothing
 	if (table.empty()) {
-		return NumSelected;
+		return Selected.size();
 	}
 
 	// Now we should only have mobile (organic) units belonging to us,
 	// so if there's no such units in the rectangle, do nothing.
 	if (SelectOrganicUnitsInTable(table) == false) {
-		return NumSelected;
+		return Selected.size();
 	}
 
-	for (size_t i = 0; i < table.size() && NumSelected < MaxSelectable; ++i) {
+	for (size_t i = 0; i < table.size() && Selected.size() < MaxSelectable; ++i) {
 		SelectUnit(*table[i]);
 	}
-	return NumSelected;
+	return Selected.size();
 }
 
 /**
@@ -872,14 +861,14 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 	// Check if the original selected unit (if it's alone) is ours,
 	// and can be selectable by rectangle.
 	// In this case, do nothing.
-	if (NumSelected == 1
+	if (Selected.size() == 1
 		&& (!CanSelectMultipleUnits(*Selected[0]->Player)
 			|| !Selected[0]->Type->SelectableByRectangle)) {
-		return NumSelected;
+		return Selected.size();
 	}
 
 	// If there is no selected unit yet, do a simple selection.
-	if (!NumSelected) {
+	if (Selected.empty()) {
 		return SelectGroundUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
 
@@ -915,10 +904,10 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 	}
 
 	// Add the units to selected.
-	for (unsigned int i = 0; i < n && NumSelected < MaxSelectable; ++i) {
+	for (unsigned int i = 0; i < n && Selected.size() < MaxSelectable; ++i) {
 		SelectUnit(*table[i]);
 	}
-	return NumSelected;
+	return Selected.size();
 }
 
 /**
@@ -934,14 +923,14 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 	// Check if the original selected unit (if it's alone) is ours,
 	// and can be selectable by rectangle.
 	// In this case, do nothing.
-	if (NumSelected == 1
+	if (Selected.size() == 1
 		&& (!CanSelectMultipleUnits(*Selected[0]->Player)
 			|| !Selected[0]->Type->SelectableByRectangle)) {
-		return NumSelected;
+		return Selected.size();
 	}
 
 	// If there is no selected unit yet, do a simple selection.
-	if (!NumSelected) {
+	if (Selected.empty()) {
 		return SelectAirUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
 
@@ -975,22 +964,12 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 	}
 
 	// Add the units to selected.
-	for (unsigned int i = 0; i < n && NumSelected < MaxSelectable; ++i) {
+	for (unsigned int i = 0; i < n && Selected.size() < MaxSelectable; ++i) {
 		SelectUnit(*table[i]);
 	}
-	return NumSelected;
+	return Selected.size();
 }
 
-/**
-**  Initialize the selection module.
-*/
-void InitSelections()
-{
-	// This could have been initialized already when loading a game
-	if (!Selected) {
-		Selected = new CUnit *[MaxSelectable];
-	}
-}
 
 /**
 **  Save current selection state.
@@ -1003,8 +982,8 @@ void SaveSelections(CFile &file)
 	file.printf("--- MODULE: selection\n\n");
 
 	file.printf("SetGroupId(%d)\n", GroupId);
-	file.printf("Selection(%d, {", NumSelected);
-	for (unsigned int i = 0; i < NumSelected; ++i) {
+	file.printf("Selection(%d, {", Selected.size()); // TODO: remove
+	for (size_t i = 0; i != Selected.size(); ++i) {
 		file.printf("\"%s\", ", UnitReference(*Selected[i]).c_str());
 	}
 	file.printf("})\n");
@@ -1016,9 +995,7 @@ void SaveSelections(CFile &file)
 void CleanSelections()
 {
 	GroupId = 0;
-	NumSelected = 0;
-	delete[] Selected;
-	Selected = NULL;
+	Selected.clear();
 	_Selected.clear();
 
 	for (int i = 0; i < PlayerMax; ++i) {
@@ -1057,12 +1034,11 @@ static int CclSelection(lua_State *l)
 	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
-	InitSelections();
-	NumSelected = LuaToNumber(l, 1);
+	//NumSelected = LuaToNumber(l, 1);
 	const int args = lua_rawlen(l, 2);
 	for (int j = 0; j < args; ++j) {
 		const char *str = LuaToString(l, 2, j + 1);
-		Selected[j] = &UnitManager.GetSlotUnit(strtol(str + 1, NULL, 16));
+		Selected.push_back(&UnitManager.GetSlotUnit(strtol(str + 1, NULL, 16)));
 	}
 	return 0;
 }

@@ -920,8 +920,6 @@ void CreateGame(const std::string &filename, CMap *map)
 	LoadUnitTypes();
 	LoadDecorations();
 
-	InitSelections();
-
 	InitUserInterface();
 	UI.Load();
 

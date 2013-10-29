@@ -194,9 +194,9 @@ static void DrawBuildingCursor()
 	//  Draw the allow overlay
 	//
 	int f;
-	if (NumSelected) {
+	if (!Selected.empty()) {
 		f = 1;
-		for (unsigned int i = 0; f && i < NumSelected; ++i) {
+		for (size_t i = 0; f && i < Selected.size(); ++i) {
 			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos)) != NULL);
 			// Assign ontop or NULL
 			ontop = (ontop == Selected[i] ? NULL : ontop);
@@ -223,7 +223,7 @@ static void DrawBuildingCursor()
 
 			if (f && (ontop ||
 					  CanBuildOn(posIt, MapFogFilterFlags(*ThisPlayer, posIt,
-														  mask & ((NumSelected && Selected[0]->tilePos == posIt) ?
+														  mask & ((!Selected.empty() && Selected[0]->tilePos == posIt) ?
 																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1))))
 				&& Map.Field(posIt)->playerInfo.IsExplored(*ThisPlayer)) {
 				color = ColorGreen;

@@ -219,10 +219,9 @@ void CleanButtons()
 static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 {
 	unsigned int res = 0;
-	unsigned int i;
 
 	/* parallel drawing */
-	if (!NumSelected) {
+	if (Selected.empty()) {
 		return res;
 	}
 
@@ -261,20 +260,19 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 	}
 	// Simple case.
 	if (action != UnitActionNone) {
-		for (i = 0; i < NumSelected; ++i) {
+		for (size_t i = 0; i != Selected.size(); ++i) {
 			if (Selected[i]->CurrentAction() != action) {
-				break;
+				return res;
 			}
 		}
-		if (i == NumSelected) {
-			res |= IconSelected;
-		}
+		res |= IconSelected;
 		return res;
 	}
 	// other cases : manage AutoCast and different possible action.
+	size_t i;
 	switch (button.Action) {
 		case ButtonMove:
-			for (i = 0; i < NumSelected; ++i) {
+			for (i = 0; i < Selected.size(); ++i) {
 				int saction = Selected[i]->CurrentAction();
 				if (saction != UnitActionMove &&
 					saction != UnitActionBuild &&
@@ -283,7 +281,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 					break;
 				}
 			}
-			if (i == NumSelected) {
+			if (i == Selected.size()) {
 				res |= IconSelected;
 			}
 			break;
@@ -291,32 +289,32 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 			// FIXME : and IconSelected ?
 
 			// Autocast
-			for (i = 0; i < NumSelected; ++i) {
+			for (i = 0; i < Selected.size(); ++i) {
 				Assert(Selected[i]->AutoCastSpell);
 				if (Selected[i]->AutoCastSpell[button.Value] != 1) {
 					break;
 				}
 			}
-			if (i == NumSelected) {
+			if (i == Selected.size()) {
 				res |= IconAutoCast;
 			}
 			break;
 		case ButtonRepair:
-			for (i = 0; i < NumSelected; ++i) {
+			for (i = 0; i < Selected.size(); ++i) {
 				if (Selected[i]->CurrentAction() != UnitActionRepair) {
 					break;
 				}
 			}
-			if (i == NumSelected) {
+			if (i == Selected.size()) {
 				res |= IconSelected;
 			}
 			// Auto repair
-			for (i = 0; i < NumSelected; ++i) {
+			for (i = 0; i < Selected.size(); ++i) {
 				if (Selected[i]->AutoRepair != 1) {
 					break;
 				}
 			}
-			if (i == NumSelected) {
+			if (i == Selected.size()) {
 				res |= IconAutoCast;
 			}
 			break;
@@ -748,7 +746,7 @@ void CButtonPanel::Draw()
 	}
 	std::vector<ButtonAction> &buttons(CurrentButtons);
 
-	Assert(NumSelected > 0);
+	Assert(!Selected.empty());
 	char buf[8];
 
 	//  Draw all buttons.
@@ -760,7 +758,7 @@ void CButtonPanel::Draw()
 		bool gray = false;
 		bool cooldownSpell = false;
 		int maxCooldown = 0;
-		for (unsigned int j = 0; j < NumSelected; ++j) {
+		for (size_t j = 0; j != Selected.size(); ++j) {
 			if (!IsButtonAllowed(*Selected[j], buttons[i])) {
 				gray = true;
 				break;
@@ -980,7 +978,7 @@ static void UpdateButtonPanelMultipleUnits(std::vector<ButtonAction> *buttonActi
 
 		bool allow = true;
 		if (UnitButtonTable[z]->AlwaysShow == false) {
-			for (unsigned int i = 0; i < NumSelected; i++) {
+			for (size_t i = 0; i != Selected.size(); ++i) {
 				if (!IsButtonAllowed(*Selected[i], *UnitButtonTable[z])) {
 					allow = false;
 					break;
@@ -1072,7 +1070,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, std::vector<ButtonAct
 */
 void CButtonPanel::Update()
 {
-	if (!NumSelected) {
+	if (Selected.empty()) {
 		CurrentButtons.clear();
 		return;
 	}
@@ -1086,7 +1084,7 @@ void CButtonPanel::Update()
 
 	bool sameType = true;
 	// multiple selected
-	for (unsigned int i = 1; i < NumSelected; ++i) {
+	for (size_t i = 1; i < Selected.size(); ++i) {
 		if (Selected[i]->Type != unit.Type) {
 			sameType = false;
 			break;
@@ -1128,7 +1126,7 @@ void CButtonPanel::DoClicked_Unload(int button)
 	//  That or a bunker.
 	//  Unload on coast valid only for sea units
 	//
-	if ((NumSelected == 1 && Selected[0]->CurrentAction() == UnitActionStill
+	if ((Selected.size() == 1 && Selected[0]->CurrentAction() == UnitActionStill
 		 && Selected[0]->Type->UnitType == UnitTypeNaval && Map.Field(Selected[0]->tilePos)->CoastOnMap())
 		|| !Selected[0]->CanMove()) {
 		SendCommandUnload(*Selected[0], Selected[0]->tilePos, NoUnitP, flush);
@@ -1151,13 +1149,13 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 		//autocast = 0;
 		// If any selected unit doesn't have autocast on turn it on
 		// for everyone
-		for (unsigned int i = 0; i < NumSelected; ++i) {
+		for (size_t i = 0; i != Selected.size(); ++i) {
 			if (Selected[i]->AutoCastSpell[spellId] == 0) {
 				autocast = 1;
 				break;
 			}
 		}
-		for (unsigned int i = 0; i < NumSelected; ++i) {
+		for (size_t i = 0; i != Selected.size(); ++i) {
 			if (Selected[i]->AutoCastSpell[spellId] != autocast) {
 				SendCommandAutoSpellCast(*Selected[i], spellId, autocast);
 			}
@@ -1167,7 +1165,7 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 	if (SpellTypeTable[spellId]->IsCasterOnly()) {
 		const int flush = !(KeyModifiers & ModifierShift);
 
-		for (unsigned int i = 0; i < NumSelected; ++i) {
+		for (size_t i = 0; i != Selected.size(); ++i) {
 			CUnit &unit = *Selected[i];
 			// CursorValue here holds the spell type id
 			SendCommandSpellCast(unit, unit.tilePos, &unit, spellId, flush);
@@ -1183,13 +1181,13 @@ void CButtonPanel::DoClicked_Repair(int button)
 		unsigned autorepair = 0;
 		// If any selected unit doesn't have autocast on turn it on
 		// for everyone
-		for (unsigned int i = 0; i < NumSelected; ++i) {
+		for (size_t i = 0; i != Selected.size(); ++i) {
 			if (Selected[i]->AutoRepair == 0) {
 				autorepair = 1;
 				break;
 			}
 		}
-		for (unsigned int i = 0; i < NumSelected; ++i) {
+		for (size_t i = 0; i != Selected.size(); ++i) {
 			if (Selected[i]->AutoRepair != autorepair) {
 				SendCommandAutoRepair(*Selected[i], autorepair);
 			}
@@ -1197,26 +1195,25 @@ void CButtonPanel::DoClicked_Repair(int button)
 		return;
 	}
 	DoClicked_SelectTarget(button);
-
 }
 
 void CButtonPanel::DoClicked_Return()
 {
-	for (unsigned int i = 0; i < NumSelected; ++i) {
+	for (size_t i = 0; i != Selected.size(); ++i) {
 		SendCommandReturnGoods(*Selected[i], NoUnitP, !(KeyModifiers & ModifierShift));
 	}
 }
 
 void CButtonPanel::DoClicked_Stop()
 {
-	for (unsigned int i = 0; i < NumSelected; ++i) {
+	for (size_t i = 0; i != Selected.size(); ++i) {
 		SendCommandStopUnit(*Selected[i]);
 	}
 }
 
 void CButtonPanel::DoClicked_StandGround()
 {
-	for (unsigned int i = 0; i < NumSelected; ++i) {
+	for (size_t i = 0; i != Selected.size(); ++i) {
 		SendCommandStandGround(*Selected[i], !(KeyModifiers & ModifierShift));
 	}
 }
@@ -1230,7 +1227,7 @@ void CButtonPanel::DoClicked_Button(int button)
 
 void CButtonPanel::DoClicked_CancelUpgrade()
 {
-	if (NumSelected == 1) {
+	if (Selected.size() == 1) {
 		switch (Selected[0]->CurrentAction()) {
 			case UnitActionUpgradeTo:
 				SendCommandCancelUpgradeTo(*Selected[0]);
@@ -1263,7 +1260,7 @@ void CButtonPanel::DoClicked_CancelBuild()
 {
 	// FIXME: johns is this not sure, only building should have this?
 	Assert(Selected[0]->CurrentAction() == UnitActionBuilt);
-	if (NumSelected == 1) {
+	if (Selected.size() == 1) {
 		SendCommandDismiss(*Selected[0]);
 	}
 	UI.StatusLine.Clear();
@@ -1310,7 +1307,7 @@ void CButtonPanel::DoClicked_UpgradeTo(int button)
 {
 	// FIXME: store pointer in button table!
 	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
-	for (unsigned int i = 0; i < NumSelected; ++i) {
+	for (size_t i = 0; i != Selected.size(); ++i) {
 		if (Selected[0]->Player->CheckLimits(type) != -6 && !Selected[i]->Player->CheckUnitType(type)) {
 			if (Selected[i]->CurrentAction() != UnitActionUpgradeTo) {
 				SendCommandUpgradeTo(*Selected[i], type, !(KeyModifiers & ModifierShift));
@@ -1385,7 +1382,6 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonResearch: { DoClicked_Research(button); break; }
 	}
 }
-
 
 /**
 **  Lookup key for bottom panel buttons.

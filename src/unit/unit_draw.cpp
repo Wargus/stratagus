@@ -666,7 +666,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 	const CUnitStats &stats = *unit.Stats;
 
 	// For debug draw sight, react and attack range!
-	if (NumSelected == 1 && unit.Selected) {
+	if (IsOnlySelected(unit)) {
 		const PixelPos center(screenPos + type.GetPixelSize() / 2);
 
 		if (Preference.ShowSightRange) {

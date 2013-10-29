@@ -872,7 +872,7 @@ CUnit *EvalUnit(const UnitDesc *unitdesc)
 {
 	Assert(unitdesc);
 
-	if (NumSelected > 0) {
+	if (!Selected.empty()) {
 		TriggerData.Active = Selected[0];
 	} else {
 		TriggerData.Active = UnitUnderCursor;

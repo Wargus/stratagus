@@ -416,7 +416,7 @@ void CViewport::Draw() const
 	if (!Preference.ShowOrders) {
 	} else if (Preference.ShowOrders < 0
 			   || (ShowOrdersCount >= GameCycle) || (KeyModifiers & ModifierShift)) {
-		for (unsigned int i = 0; i < NumSelected; ++i) {
+		for (size_t i = 0; i != Selected.size(); ++i) {
 			ShowOrder(*Selected[i]);
 		}
 	}

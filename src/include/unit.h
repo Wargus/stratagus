@@ -455,8 +455,7 @@ extern void DrawUnitSelection(const CViewport &vp, const CUnit &unit);
 extern void (*DrawSelection)(IntColor, int, int, int, int);
 
 extern unsigned int MaxSelectable;    /// How many units could be selected
-extern CUnit **Selected;              /// currently selected units
-extern unsigned int     NumSelected;  /// how many units selected
+extern std::vector<CUnit *> Selected; /// currently selected units
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -618,7 +617,7 @@ extern bool IsGroupTainted(int num);
 // in selection.c
 
 /// Check if unit is the currently only selected
-#define IsOnlySelected(unit) (NumSelected == 1 && Selected[0] == &(unit))
+extern bool IsOnlySelected(const CUnit &unit);
 
 ///  Save selection to restore after.
 extern void SaveSelection();
@@ -659,8 +658,6 @@ extern int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, con
 /// Add flying units in the selection rectangle to the current selection
 extern int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright);
 
-/// Init selections
-extern void InitSelections();
 /// Save current selection state
 extern void SaveSelections(CFile &file);
 /// Clean up selections

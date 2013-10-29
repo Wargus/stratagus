@@ -430,7 +430,7 @@ static void DrawUnitInfo(CUnit &unit)
 	//
 	//  Show progress if they are selected.
 	//
-	if (NumSelected == 1 && Selected[0] == &unit) {
+	if (IsOnlySelected(unit)) {
 		switch (unit.CurrentAction()) {
 			case UnitActionTrain: { //  Building training units.
 				DrawUnitInfo_Training(unit);
@@ -1070,29 +1070,29 @@ static void DrawInfoPanelBackground(unsigned frame)
 */
 void CInfoPanel::Draw()
 {
-	if (NumSelected) {
-		if (NumSelected > 1) {
+	if (!Selected.empty()) {
+		if (Selected.size() > 1) {
 			//
 			//  If there are more units selected draw their pictures and a health bar
 			//
 			DrawInfoPanelBackground(0);
-			for (int i = 0; i < std::min<int>(NumSelected, UI.SelectedButtons.size()); ++i) {
+			for (size_t i = 0; i < std::min(Selected.size(), UI.SelectedButtons.size()); ++i) {
 				const CIcon &icon = *Selected[i]->Type->Icon.Icon;
 				const PixelPos pos(UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 				icon.DrawUnitIcon(*UI.SelectedButtons[i].Style,
-								  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?
+								  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
 								  (IconActive | (MouseButtons & LeftButton)) : 0,
 								  pos, "");
 				UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 
-				if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) {
+				if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int) i) {
 					UI.StatusLine.Set(Selected[i]->Type->Name);
 				}
 			}
-			if (NumSelected > UI.SelectedButtons.size()) {
+			if (Selected.size() > UI.SelectedButtons.size()) {
 				char buf[5];
 
-				sprintf(buf, "+%u", NumSelected - UI.SelectedButtons.size());
+				sprintf(buf, "+%u", Selected.size() - UI.SelectedButtons.size());
 				CLabel(*UI.MaxSelectedFont).Draw(UI.MaxSelectedTextX, UI.MaxSelectedTextY, buf);
 			}
 			return;

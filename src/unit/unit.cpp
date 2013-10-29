@@ -1151,8 +1151,8 @@ void CUnit::Remove(CUnit *host)
 	}
 
 	//  Remove unit from the current selection
-	if (Selected) {
-		if (NumSelected == 1) { //  Remove building cursor
+	if (this->Selected) {
+		if (::Selected.size() == 1) { //  Remove building cursor
 			CancelBuildingMode();
 		}
 		UnSelectUnit(*this);
@@ -2197,8 +2197,7 @@ CUnit *UnitOnScreen(int x, int y)
 			&& y >= unitSpritePos.y  && y < unitSpritePos.y + type.BoxHeight) {
 			// Check if there are other units on this place
 			candidate = &unit;
-			if ((candidate == Selected[0] && NumSelected == 1)
-				|| candidate->Type->IsNotSelectable) {
+			if (IsOnlySelected(*candidate) || candidate->Type->IsNotSelectable) {
 				continue;
 			} else {
 				break;

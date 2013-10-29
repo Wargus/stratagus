@@ -190,7 +190,7 @@ static void UiAddGroupToSelection(unsigned group)
 	}
 
 	//  Don't allow to mix units and buildings
-	if (NumSelected && Selected[0]->Type->Building) {
+	if (!Selected.empty() && Selected[0]->Type->Building) {
 		return;
 	}
 
@@ -209,12 +209,12 @@ static void UiAddGroupToSelection(unsigned group)
 */
 static void UiDefineGroup(unsigned group)
 {
-	for (unsigned int i = 0; i < NumSelected; ++i) {
+	for (size_t i = 0; i != Selected.size(); ++i) {
 		if (Selected[i]->Player == ThisPlayer && Selected[i]->GroupId) {
 			RemoveUnitFromGroups(*Selected[i]);
 		}
 	}
-	SetGroup(Selected, NumSelected, group);
+	SetGroup(&Selected[0], Selected.size(), group);
 }
 
 /**
@@ -224,7 +224,7 @@ static void UiDefineGroup(unsigned group)
 */
 static void UiAddToGroup(unsigned group)
 {
-	AddToGroup(Selected, NumSelected, group);
+	AddToGroup(&Selected[0], Selected.size(), group);
 }
 
 /**
@@ -377,16 +377,17 @@ static void UiSetDefaultGameSpeed()
 */
 static void UiCenterOnSelected()
 {
-	int n = NumSelected;
-
-	if (n) {
-		PixelPos pos = Selected[--n]->GetMapPixelPosCenter();
-
-		while (n--) {
-			pos += (Selected[n]->GetMapPixelPosCenter() - pos) / 2;
-		}
-		UI.SelectedViewport->Center(pos);
+	if (Selected.empty()) {
+		return;
 	}
+
+	PixelPos pos;
+
+	for (size_t i = 0; i != Selected.size(); ++i) {
+		pos += Selected[i]->GetMapPixelPosCenter();
+	}
+	pos /= Selected.size();
+	UI.SelectedViewport->Center(pos);
 }
 
 /**

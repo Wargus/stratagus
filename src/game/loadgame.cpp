@@ -133,7 +133,6 @@ void InitModules()
 	InitUnitTypes(0);
 
 	InitUnits();
-	InitSelections();
 	InitSpells();
 	InitUpgrades();
 	InitDependencies();

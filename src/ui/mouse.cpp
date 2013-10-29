@@ -546,7 +546,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 void DoRightButton(const PixelPos &mapPixelPos)
 {
 	// No unit selected
-	if (!NumSelected) {
+	if (Selected.empty()) {
 		return;
 	}
 	const Vec2i pos = Map.MapPixelPosToTilePos(mapPixelPos);
@@ -567,7 +567,7 @@ void DoRightButton(const PixelPos &mapPixelPos)
 	}
 
 	if (dest != NULL && dest->Type->CanTransport()) {
-		for (unsigned int i = 0; i < NumSelected; i++) {
+		for (size_t i = 0; i != Selected.size(); ++i) {
 			if (CanTransport(*dest, *Selected[i])) {
 				// We are clicking on a transporter. We have to:
 				// 1) Flush the transporters orders.
@@ -583,7 +583,7 @@ void DoRightButton(const PixelPos &mapPixelPos)
 	}
 
 	int acknowledged = 0; // to play sound
-	for (unsigned int i = 0; i < NumSelected; ++i) {
+	for (size_t i = 0; i != Selected.size(); ++i) {
 		Assert(Selected[i]);
 		CUnit &unit = *Selected[i];
 
@@ -679,8 +679,8 @@ static void HandleMouseOn(const PixelPos screenPos)
 			}
 		}
 	}
-	if (NumSelected > 0) {
-		if (NumSelected == 1 && Selected[0]->Type->CanTransport() && Selected[0]->BoardCount) {
+	if (!Selected.empty()) {
+		if (Selected.size() == 1 && Selected[0]->Type->CanTransport() && Selected[0]->BoardCount) {
 			const size_t size = UI.TransportingButtons.size();
 
 			for (size_t i = std::min<size_t>(Selected[0]->BoardCount, size); i != 0;) {
@@ -693,7 +693,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 				}
 			}
 		}
-		if (NumSelected == 1) {
+		if (Selected.size() == 1) {
 			if (Selected[0]->CurrentAction() == UnitActionTrain) {
 				if (Selected[0]->Orders.size() == 1) {
 					if (UI.SingleTrainingButton->Contains(screenPos)) {
@@ -732,7 +732,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 				}
 			}
 		}
-		if (NumSelected == 1) {
+		if (Selected.size() == 1) {
 			if (UI.SingleSelectedButton && UI.SingleSelectedButton->Contains(screenPos)) {
 				ButtonAreaUnderCursor = ButtonAreaSelected;
 				ButtonUnderCursor = 0;
@@ -742,7 +742,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 		} else {
 			const size_t size = UI.SelectedButtons.size();
 
-			for (size_t i = std::min<size_t>(NumSelected, size); i != 0;) {
+			for (size_t i = std::min(Selected.size(), size); i != 0;) {
 				--i;
 				if (UI.SelectedButtons[i].Contains(screenPos)) {
 					ButtonAreaUnderCursor = ButtonAreaSelected;
@@ -949,7 +949,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			// 0 Test build, don't really build
 			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && buildable && (explored || ReplayRevealMap)) {
 				const int flush = !(KeyModifiers & ModifierShift);
-				for (unsigned int i = 0; i < NumSelected; ++i) {
+				for (size_t i = 0; i != Selected.size(); ++i) {
 					SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush);
 				}
 				if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
@@ -1072,7 +1072,7 @@ static int SendRepair(const Vec2i &tilePos)
 	if (dest && dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max
 		&& dest->Type->RepairHP
 		&& (dest->Player == ThisPlayer || ThisPlayer->IsAllied(*dest))) {
-		for (unsigned int i = 0; i < NumSelected; ++i) {
+			for (size_t i = 0; i != Selected.size(); ++i) {
 			CUnit *unit = Selected[i];
 
 			if (unit->Type->RepairRange) {
@@ -1104,7 +1104,7 @@ static int SendMove(const Vec2i &tilePos)
 
 	// Alt makes unit to defend goal
 	if (goal && (KeyModifiers & ModifierAlt)) {
-		for (unsigned int i = 0; i < NumSelected; ++i) {
+		for (size_t i = 0; i != Selected.size(); ++i) {
 			CUnit *unit = Selected[i];
 
 			goal->Blink = 4;
@@ -1114,22 +1114,22 @@ static int SendMove(const Vec2i &tilePos)
 	} else {
 		// Move to a transporter.
 		if (goal && goal->Type->CanTransport()) {
-			unsigned int i;
-			for (i = 0; i < NumSelected; ++i) {
+			size_t i;
+			for (i = 0; i != Selected.size(); ++i) {
 				if (CanTransport(*goal, *Selected[i])) {
 					SendCommandStopUnit(*goal);
 					ret = 1;
 					break;
 				}
 			}
-			if (i == NumSelected) {
+			if (i == Selected.size()) {
 				goal = NULL;
 			}
 		} else {
 			goal = NULL;
 		}
 
-		for (unsigned int i = 0; i < NumSelected; ++i) {
+		for (size_t i = 0; i != Selected.size(); ++i) {
 			CUnit *unit = Selected[i];
 
 			if (goal && CanTransport(*goal, *unit)) {
@@ -1170,7 +1170,7 @@ static int SendAttack(const Vec2i &tilePos)
 	if (dest && dest->Type->Decoration) {
 		dest = NULL;
 	}
-	for (unsigned int i = 0; i < NumSelected; ++i) {
+	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
 
 		if (unit.Type->CanAttack) {
@@ -1201,7 +1201,7 @@ static int SendAttackGround(const Vec2i &tilePos)
 	const int flush = !(KeyModifiers & ModifierShift);
 	int ret = 0;
 
-	for (unsigned int i = 0; i < NumSelected; ++i) {
+	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
 		if (unit.Type->CanAttack) {
 			SendCommandAttackGround(unit, tilePos, flush);
@@ -1223,11 +1223,11 @@ static int SendPatrol(const Vec2i &tilePos)
 {
 	const int flush = !(KeyModifiers & ModifierShift);
 
-	for (unsigned int i = 0; i < NumSelected; ++i) {
+	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
 		SendCommandPatrol(unit, tilePos, flush);
 	}
-	return NumSelected != 0 ? 1 : 0;
+	return Selected.empty() ? 0 : 1;
 }
 
 /**
@@ -1245,7 +1245,7 @@ static int SendResource(const Vec2i &pos)
 	const int flush = !(KeyModifiers & ModifierShift);
 	const CMapField &mf = *Map.Field(pos);
 
-	for (unsigned int i = 0; i < NumSelected; ++i) {
+	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
 
 		if (unit.Type->Harvester) {
@@ -1306,11 +1306,11 @@ static int SendUnload(const Vec2i &tilePos)
 {
 	const int flush = !(KeyModifiers & ModifierShift);
 
-	for (unsigned int i = 0; i < NumSelected; ++i) {
+	for (size_t i = 0; i != Selected.size(); ++i) {
 		// FIXME: not only transporter selected?
 		SendCommandUnload(*Selected[i], tilePos, NoUnitP, flush);
 	}
-	return NumSelected != 0 ? 1 : 0;
+	return Selected.empty() ? 0 : 1;
 }
 
 /**
@@ -1335,7 +1335,7 @@ static int SendSpellCast(const Vec2i &tilePos)
 	   (if exists). All checks are performed at spell cast handle
 	   function which will cancel function if cannot be executed
 	 */
-	for (unsigned int i = 0; i < NumSelected; ++i) {
+	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
 		if (!unit.Type->CanCastSpell) {
 			DebugPrint("but unit %d(%s) can't cast spells?\n" _C_
@@ -1402,7 +1402,7 @@ static void SendCommand(const Vec2i &tilePos)
 	}
 	if (ret) {
 		// Acknowledge the command with first selected unit.
-		for (unsigned int i = 0; i < NumSelected; ++i) {
+		for (size_t i = 0; i != Selected.size(); ++i) {
 			if (ret == ButtonAttack || ret == ButtonAttackGround || ret == ButtonSpellCast) {
 				if (Selected[i]->Type->Sound.Attack.Sound) {
 					PlayUnitSound(*Selected[i], VoiceAttack);
@@ -1437,7 +1437,7 @@ static void DoSelectionButtons(int num, unsigned)
 		return;
 	}
 
-	if (static_cast<unsigned int>(num) >= NumSelected || !(MouseButtons & LeftButton)) {
+	if (static_cast<size_t>(num) >= Selected.size() || !(MouseButtons & LeftButton)) {
 		return;
 	}
 
@@ -1585,7 +1585,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && (explored || ReplayRevealMap)) {
 				const int flush = !(KeyModifiers & ModifierShift);
 				PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound, MaxSampleVolume);
-				for (unsigned int i = 0; i < NumSelected; ++i) {
+				for (size_t i = 0; i != Selected.size(); ++i) {
 					SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush);
 				}
 				if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
@@ -1604,7 +1604,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 		UnitUnderCursor = NULL;
 		GameCursor = UI.Point.Cursor;  // Reset
 		CursorStartScreenPos = CursorScreenPos;
-		if (NumSelected && Selected[0]->Player == ThisPlayer && CursorState == CursorStatePoint) {
+		if (!Selected.empty() && Selected[0]->Player == ThisPlayer && CursorState == CursorStatePoint) {
 			CursorState = CursorStatePieMenu;
 		}
 #ifdef USE_TOUCHSCREEN
@@ -1662,7 +1662,7 @@ static void UIHandleButtonDown_OnMinimap(unsigned button)
 static void UIHandleButtonDown_OnButton(unsigned button)
 {
 	// clicked on info panel - selection shown
-	if (NumSelected > 1 && ButtonAreaUnderCursor == ButtonAreaSelected) {
+	if (Selected.size() > 1 && ButtonAreaUnderCursor == ButtonAreaSelected) {
 		DoSelectionButtons(ButtonUnderCursor, button);
 	} else if ((MouseButtons & LeftButton)) {
 		//  clicked on menu button
@@ -1688,7 +1688,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			//  clicked on selected button
 		} else if (ButtonAreaUnderCursor == ButtonAreaSelected) {
 			//  clicked on single unit shown
-			if (ButtonUnderCursor == 0 && NumSelected == 1) {
+			if (ButtonUnderCursor == 0 && Selected.size() == 1) {
 				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 				UI.SelectedViewport->Center(Selected[0]->GetMapPixelPosCenter());
 			}
@@ -1706,7 +1706,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			//  clicked on upgrading button
 		} else if (ButtonAreaUnderCursor == ButtonAreaUpgrading) {
 			if (!GameObserve && !GamePaused && ThisPlayer->IsTeamed(*Selected[0])) {
-				if (ButtonUnderCursor == 0 && NumSelected == 1) {
+				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
 					DebugPrint("Cancel upgrade %s\n" _C_ Selected[0]->Type->Ident.c_str());
 					SendCommandCancelUpgradeTo(*Selected[0]);
 				}
@@ -1714,7 +1714,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			//  clicked on researching button
 		} else if (ButtonAreaUnderCursor == ButtonAreaResearching) {
 			if (!GameObserve && !GamePaused && ThisPlayer->IsTeamed(*Selected[0])) {
-				if (ButtonUnderCursor == 0 && NumSelected == 1) {
+				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
 					DebugPrint("Cancel research %s\n" _C_ Selected[0]->Type->Ident.c_str());
 					SendCommandCancelResearch(*Selected[0]);
 				}
@@ -1742,7 +1742,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 		}
 	} else if ((MouseButtons & MiddleButton)) {
 		//  clicked on info panel - single unit shown
-		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0 && NumSelected == 1) {
+		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0 && Selected.size() == 1) {
 			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 			if (UI.SelectedViewport->Unit == Selected[0]) {
 				UI.SelectedViewport->Unit = NULL;
@@ -2000,8 +2000,8 @@ void UIHandleButtonUp(unsigned button)
 				} else if (KeyModifiers & ModifierShift
 						   && (unit->Player == ThisPlayer || ThisPlayer->IsTeamed(*unit))
 						   && !unit->Type->Building
-						   && (NumSelected != 1 || !Selected[0]->Type->Building)
-						   && (NumSelected != 1 || Selected[0]->Player == ThisPlayer || ThisPlayer->IsTeamed(*Selected[0]))) {
+						   && (Selected.size() != 1 || !Selected[0]->Type->Building)
+						   && (Selected.size() != 1 || Selected[0]->Player == ThisPlayer || ThisPlayer->IsTeamed(*Selected[0]))) {
 					num = ToggleSelectUnit(*unit);
 					if (!num) {
 						SelectionChanged();
@@ -2027,7 +2027,7 @@ void UIHandleButtonUp(unsigned button)
 			//    This player, or neutral unit (goldmine,critter)
 			//    Other clicks.
 			//
-			if (NumSelected == 1) {
+			if (Selected.size() == 1) {
 				if (Selected[0]->CurrentAction() == UnitActionBuilt) {
 					PlayUnitSound(*Selected[0], VoiceBuilding);
 				} else if (Selected[0]->Burning) {
@@ -2116,7 +2116,7 @@ void DrawPieMenu()
 			const PixelPos pos(x, y);
 
 			bool gray = false;
-			for (unsigned int j = 0; j < NumSelected; ++j) {
+			for (size_t j = 0; j != Selected.size(); ++j) {
 				if (!IsButtonAllowed(*Selected[j], buttons[i])) {
 					gray = true;
 					break;
