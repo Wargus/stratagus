@@ -157,12 +157,9 @@ static mng_ptr MNG_DECL my_getcanvasline(mng_handle handle, mng_uint32 linenr)
 static mng_bool MNG_DECL my_refresh(mng_handle handle, mng_uint32, mng_uint32,
 									mng_uint32, mng_uint32)
 {
-	Mng *mng;
-	int i;
-
-	mng = (Mng *)mng_get_userdata(handle);
+	Mng *mng = (Mng *)mng_get_userdata(handle);
 	SDL_LockSurface(mng->surface);
-	for (i = 0; i < mng->surface->h; ++i) {
+	for (int i = 0; i < mng->surface->h; ++i) {
 		memcpy((char *)mng->surface->pixels + i * mng->surface->pitch,
 			   mng->buffer + i * mng->surface->w * 3, mng->surface->w * 3);
 	}
@@ -185,9 +182,7 @@ static mng_uint32 MNG_DECL my_gettickcount(mng_handle)
 
 static mng_bool MNG_DECL my_settimer(mng_handle handle, mng_uint32 msecs)
 {
-	Mng *mng;
-
-	mng = (Mng *)mng_get_userdata(handle);
+	Mng *mng = (Mng *)mng_get_userdata(handle);
 	mng->ticks = GetTicks() + msecs;
 
 	return MNG_TRUE;
@@ -196,9 +191,7 @@ static mng_bool MNG_DECL my_settimer(mng_handle handle, mng_uint32 msecs)
 static mng_bool MNG_DECL my_processmend(mng_handle handle, mng_uint32 iterationsdone,
 										mng_uint32)
 {
-	Mng *mng;
-
-	mng = (Mng *)mng_get_userdata(handle);
+	Mng *mng = (Mng *)mng_get_userdata(handle);
 	mng->iteration = iterationsdone;
 
 	return MNG_TRUE;
@@ -207,9 +200,7 @@ static mng_bool MNG_DECL my_processmend(mng_handle handle, mng_uint32 iterations
 static mng_bool MNG_DECL my_errorproc(mng_handle handle, mng_int32,
 									  mng_int8, mng_chunkid, mng_uint32, mng_int32, mng_int32, mng_pchar errortext)
 {
-	Mng *mng;
-
-	mng = (Mng *)mng_get_userdata(handle);
+	Mng *mng = (Mng *)mng_get_userdata(handle);
 	mng->iteration = 0x7fffffff;
 	if (errortext) {
 		DebugPrint("MNG error: %s\n" _C_ errortext);
@@ -319,11 +310,7 @@ void Mng::Draw(int x, int y)
 */
 int Mng::Load(const std::string &name)
 {
-	char buf[PATH_MAX];
-
-	LibraryFileName(name.c_str(), buf, sizeof(buf));
-
-	this->name = buf;
+	this->name = LibraryFileName(name.c_str());
 	handle = mng_initialize(this, my_alloc, my_free, MNG_NULL);
 	if (handle == MNG_NULL) {
 		return -1;

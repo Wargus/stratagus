@@ -540,10 +540,10 @@ static bool FindFileWithExtension(char (&file)[PATH_MAX])
 **  @param file        Filename to open.
 **  @param buffer      Allocated buffer for generated filename.
 */
-static void LibraryFileName(const char *file, char (&buffer)[MAX_PATH])
+static void LibraryFileName(const char *file, char (&buffer)[PATH_MAX])
 {
 	// Absolute path or in current directory.
-	strcpy_s(buffer, MAX_PATH, file);
+	strcpy_s(buffer, PATH_MAX, file);
 	if (*buffer == '/') {
 		return;
 	}
@@ -554,23 +554,23 @@ static void LibraryFileName(const char *file, char (&buffer)[MAX_PATH])
 	// Try in map directory
 	if (*CurrentMapPath) {
 		if (*CurrentMapPath == '.' || *CurrentMapPath == '/') {
-			strcpy_s(buffer, MAX_PATH, CurrentMapPath);
+			strcpy_s(buffer, PATH_MAX, CurrentMapPath);
 			char *s = strrchr(buffer, '/');
 			if (s) {
 				s[1] = '\0';
 			}
-			strcat_s(buffer, MAX_PATH, file);
+			strcat_s(buffer, PATH_MAX, file);
 		} else {
-			strcpy_s(buffer, MAX_PATH, StratagusLibPath.c_str());
+			strcpy_s(buffer, PATH_MAX, StratagusLibPath.c_str());
 			if (*buffer) {
-				strcat_s(buffer, MAX_PATH, "/");
+				strcat_s(buffer, PATH_MAX, "/");
 			}
-			strcat_s(buffer, MAX_PATH, CurrentMapPath);
+			strcat_s(buffer, PATH_MAX, CurrentMapPath);
 			char *s = strrchr(buffer, '/');
 			if (s) {
 				s[1] = '\0';
 			}
-			strcat_s(buffer, MAX_PATH, file);
+			strcat_s(buffer, PATH_MAX, file);
 		}
 		if (FindFileWithExtension(buffer)) {
 			return;
@@ -616,12 +616,12 @@ static void LibraryFileName(const char *file, char (&buffer)[MAX_PATH])
 	}
 
 	DebugPrint("File `%s' not found\n" _C_ file);
-	strcpy_s(buffer, MAX_PATH, file);
+	strcpy_s(buffer, PATH_MAX, file);
 }
 
 extern std::string LibraryFileName(const char *file)
 {
-	char buffer[MAX_PATH];
+	char buffer[PATH_MAX];
 	LibraryFileName(file, buffer);
 	return buffer;
 }
