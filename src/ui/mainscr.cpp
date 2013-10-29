@@ -69,37 +69,48 @@
 --  UI BUTTONS
 ----------------------------------------------------------------------------*/
 
+static void DrawMenuButtonArea_noNetwork()
+{
+	if (UI.MenuButton.X != -1) {
+		DrawUIButton(UI.MenuButton.Style,
+					 (ButtonAreaUnderCursor == ButtonAreaMenu
+					  && ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0) |
+					 (GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
+					 UI.MenuButton.X, UI.MenuButton.Y,
+					 UI.MenuButton.Text);
+	}
+}
+
+static void DrawMenuButtonArea_Network()
+{
+	if (UI.NetworkMenuButton.X != -1) {
+		DrawUIButton(UI.NetworkMenuButton.Style,
+					 (ButtonAreaUnderCursor == ButtonAreaMenu
+					  && ButtonUnderCursor == ButtonUnderNetworkMenu ? MI_FLAGS_ACTIVE : 0) |
+					 (GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
+					 UI.NetworkMenuButton.X, UI.NetworkMenuButton.Y,
+					 UI.NetworkMenuButton.Text);
+	}
+	if (UI.NetworkDiplomacyButton.X != -1) {
+		DrawUIButton(UI.NetworkDiplomacyButton.Style,
+					 (ButtonAreaUnderCursor == ButtonAreaMenu
+					  && ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MI_FLAGS_ACTIVE : 0) |
+					 (GameDiplomacyButtonClicked ? MI_FLAGS_CLICKED : 0),
+					 UI.NetworkDiplomacyButton.X, UI.NetworkDiplomacyButton.Y,
+					 UI.NetworkDiplomacyButton.Text);
+	}
+
+}
+
 /**
 **  Draw menu button area.
 */
 void DrawMenuButtonArea()
 {
 	if (!IsNetworkGame()) {
-		if (UI.MenuButton.X != -1) {
-			DrawUIButton(UI.MenuButton.Style,
-						 (ButtonAreaUnderCursor == ButtonAreaMenu
-						  && ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0) |
-						 (GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
-						 UI.MenuButton.X, UI.MenuButton.Y,
-						 UI.MenuButton.Text);
-		}
+		DrawMenuButtonArea_noNetwork();
 	} else {
-		if (UI.NetworkMenuButton.X != -1) {
-			DrawUIButton(UI.NetworkMenuButton.Style,
-						 (ButtonAreaUnderCursor == ButtonAreaMenu
-						  && ButtonUnderCursor == ButtonUnderNetworkMenu ? MI_FLAGS_ACTIVE : 0) |
-						 (GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
-						 UI.NetworkMenuButton.X, UI.NetworkMenuButton.Y,
-						 UI.NetworkMenuButton.Text);
-		}
-		if (UI.NetworkDiplomacyButton.X != -1) {
-			DrawUIButton(UI.NetworkDiplomacyButton.Style,
-						 (ButtonAreaUnderCursor == ButtonAreaMenu
-						  && ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MI_FLAGS_ACTIVE : 0) |
-						 (GameDiplomacyButtonClicked ? MI_FLAGS_CLICKED : 0),
-						 UI.NetworkDiplomacyButton.X, UI.NetworkDiplomacyButton.Y,
-						 UI.NetworkDiplomacyButton.Text);
-		}
+		DrawMenuButtonArea_Network();
 	}
 }
 
@@ -201,7 +212,6 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 	if (condition->BoolFlags && !unit.Type->CheckUserBoolFlags(condition->BoolFlags)) {
 		return false;
 	}
-
 	if (condition->Variables) {
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
@@ -214,7 +224,7 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 	return true;
 }
 
-enum  UStrIntType{
+enum UStrIntType{
 	USTRINT_STR, USTRINT_INT
 };
 struct UStrInt {
@@ -372,32 +382,8 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 	}
 }
 
-
-
-/**
-**  Draw the unit info into top-panel.
-**
-**  @param unit  Pointer to unit.
-*/
-static void DrawUnitInfo(CUnit &unit)
+static void DrawUnitInfo_portrait(const CUnitType& type)
 {
-	UpdateUnitVariables(unit);
-	for (size_t i = 0; i < UI.InfoPanelContents.size(); ++i) {
-		if (CanShowContent(UI.InfoPanelContents[i]->Condition, unit)) {
-			for (std::vector<CContentType *>::const_iterator content = UI.InfoPanelContents[i]->Contents.begin();
-				 content != UI.InfoPanelContents[i]->Contents.end(); ++content) {
-				if (CanShowContent((*content)->Condition, unit)) {
-					(*content)->Draw(unit, UI.InfoPanelContents[i]->DefaultFont);
-				}
-			}
-		}
-	}
-
-
-	const CUnitType &type = *unit.Type;
-	Assert(&type);
-
-	// Draw IconUnit
 #ifdef USE_MNG
 	if (type.Portrait.Num) {
 		type.Portrait.Mngs[type.Portrait.CurrMng]->Draw(
@@ -413,82 +399,117 @@ static void DrawUnitInfo(CUnit &unit)
 				type.Portrait.NumIterations = SyncRand() % 16 + 1;
 			}
 		}
-	} else
+		return;
+	}
 #endif
-		if (UI.SingleSelectedButton) {
-			const PixelPos pos(UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
-			const int flag = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
-							 (IconActive | (MouseButtons & LeftButton)) : 0;
+	if (UI.SingleSelectedButton) {
+		const PixelPos pos(UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
+		const int flag = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
+						 (IconActive | (MouseButtons & LeftButton)) : 0;
 
-			type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "");
+		type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "");
+	}
+}
+
+static bool DrawUnitInfo_single_selection(const CUnit& unit)
+{
+	switch (unit.CurrentAction()) {
+		case UnitActionTrain: { //  Building training units.
+			DrawUnitInfo_Training(unit);
+			return true;
 		}
+		case UnitActionUpgradeTo: { //  Building upgrading to better type.
+			if (UI.UpgradingButton) {
+				const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(unit.CurrentOrder());
+				CIcon &icon = *order.GetUnitType().Icon.Icon;
+				unsigned int flag = (ButtonAreaUnderCursor == ButtonAreaUpgrading
+									 && ButtonUnderCursor == 0) ?
+									(IconActive | (MouseButtons & LeftButton)) : 0;
+				const PixelPos pos(UI.UpgradingButton->X, UI.UpgradingButton->Y);
+				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "");
+			}
+			return true;
+		}
+		case UnitActionResearch: { //  Building research new technology.
+			if (UI.ResearchingButton) {
+				COrder_Research &order = *static_cast<COrder_Research *>(unit.CurrentOrder());
+				CIcon &icon = *order.GetUpgrade().Icon;
+				int flag = (ButtonAreaUnderCursor == ButtonAreaResearching
+							&& ButtonUnderCursor == 0) ?
+						   (IconActive | (MouseButtons & LeftButton)) : 0;
+				PixelPos pos(UI.ResearchingButton->X, UI.ResearchingButton->Y);
+				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "");
+			}
+			return true;
+		}
+		default:
+			return false;
+	}
+}
+
+static void DrawUnitInfo_transporter(CUnit &unit)
+{
+	CUnit *uins = unit.UnitInside;
+	size_t j = 0;
+
+	for (int i = 0; i < unit.InsideCount; ++i, uins = uins->NextContained) {
+		if (uins->Boarded && j < UI.TransportingButtons.size()) {
+			CIcon &icon = *uins->Type->Icon.Icon;
+			int flag = (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
+					   (IconActive | (MouseButtons & LeftButton)) : 0;
+			const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
+			icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "");
+			UiDrawLifeBar(*uins, pos.x, pos.y);
+			if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
+				UiDrawManaBar(*uins, pos.x, pos.y);
+			}
+			if (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) {
+				UI.StatusLine.Set(uins->Type->Name);
+			}
+			++j;
+		}
+	}
+}
+
+/**
+**  Draw the unit info into top-panel.
+**
+**  @param unit  Pointer to unit.
+*/
+static void DrawUnitInfo(CUnit &unit)
+{
+	UpdateUnitVariables(unit);
+	for (size_t i = 0; i != UI.InfoPanelContents.size(); ++i) {
+		if (CanShowContent(UI.InfoPanelContents[i]->Condition, unit)) {
+			for (std::vector<CContentType *>::const_iterator content = UI.InfoPanelContents[i]->Contents.begin();
+				 content != UI.InfoPanelContents[i]->Contents.end(); ++content) {
+				if (CanShowContent((*content)->Condition, unit)) {
+					(*content)->Draw(unit, UI.InfoPanelContents[i]->DefaultFont);
+				}
+			}
+		}
+	}
+
+	const CUnitType &type = *unit.Type;
+	Assert(&type);
+
+	// Draw IconUnit
+	DrawUnitInfo_portrait(type);
 
 	if (unit.Player != ThisPlayer && !ThisPlayer->IsAllied(*unit.Player)) {
 		return;
 	}
 
-	//
 	//  Show progress if they are selected.
-	//
 	if (IsOnlySelected(unit)) {
-		switch (unit.CurrentAction()) {
-			case UnitActionTrain: { //  Building training units.
-				DrawUnitInfo_Training(unit);
-				return;
-			}
-			case UnitActionUpgradeTo: { //  Building upgrading to better type.
-				if (UI.UpgradingButton) {
-					const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(unit.CurrentOrder());
-					CIcon &icon = *order.GetUnitType().Icon.Icon;
-					unsigned int flag = (ButtonAreaUnderCursor == ButtonAreaUpgrading
-										 && ButtonUnderCursor == 0) ?
-										(IconActive | (MouseButtons & LeftButton)) : 0;
-					const PixelPos pos(UI.UpgradingButton->X, UI.UpgradingButton->Y);
-					icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "");
-				}
-				return;
-			}
-			case UnitActionResearch: { //  Building research new technology.
-				if (UI.ResearchingButton) {
-					COrder_Research &order = *static_cast<COrder_Research *>(unit.CurrentOrder());
-					CIcon &icon = *order.GetUpgrade().Icon;
-					int flag = (ButtonAreaUnderCursor == ButtonAreaResearching
-								&& ButtonUnderCursor == 0) ?
-							   (IconActive | (MouseButtons & LeftButton)) : 0;
-					PixelPos pos(UI.ResearchingButton->X, UI.ResearchingButton->Y);
-					icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "");
-				}
-				return;
-			}
-			default:
-				break;
+		if (DrawUnitInfo_single_selection(unit)) {
+			return;
 		}
 	}
 
-	//
 	//  Transporting units.
-	//
 	if (type.CanTransport() && unit.BoardCount && CurrentButtonLevel == unit.Type->ButtonLevelForTransporter) {
-		CUnit *uins = unit.UnitInside;
-		size_t j = 0;
-
-		for (int i = 0; i < unit.InsideCount; ++i, uins = uins->NextContained) {
-			if (uins->Boarded && j < UI.TransportingButtons.size()) {
-				CIcon &icon = *uins->Type->Icon.Icon;
-				int flag = (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
-						   (IconActive | (MouseButtons & LeftButton)) : 0;
-				const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
-				icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "");
-				UiDrawLifeBar(*uins, pos.x, pos.y);
-				if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
-					UiDrawManaBar(*uins, pos.x, pos.y);
-				}
-				if (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) {
-					UI.StatusLine.Set(uins->Type->Name);
-				}
-				++j;
-			}
-		}
+		DrawUnitInfo_transporter(unit);
 		return;
 	}
 }
@@ -559,13 +580,12 @@ void DrawResources()
 --  MESSAGE
 ----------------------------------------------------------------------------*/
 
-#define MESSAGES_MAX  10                         /// How many can be displayed
+#define MESSAGES_MAX  10                       /// How many can be displayed
 
-static char MessagesEvent[MESSAGES_MAX][256];    /// Array of event messages
-static int  MessagesEventX[MESSAGES_MAX];        /// X coordinate of event
-static int  MessagesEventY[MESSAGES_MAX];        /// Y coordinate of event
-static int  MessagesEventCount;                  /// Number of event messages
-static int  MessagesEventIndex;                  /// FIXME: docu
+static char MessagesEvent[MESSAGES_MAX][256];  /// Array of event messages
+static Vec2i MessagesEventPos[MESSAGES_MAX];   /// coordinate of event
+static int MessagesEventCount;                 /// Number of event messages
+static int MessagesEventIndex;                 /// FIXME: docu
 
 class MessagesDisplay
 {
@@ -581,13 +601,9 @@ public:
 	void AddUniqueMessage(const char *s);
 	void DrawMessages();
 	void CleanMessages();
-	void ToggleShowMessages() {
-		show = !show;
-	};
+	void ToggleShowMessages() { show = !show; }
 #ifdef DEBUG
-	void ToggleShowBuilListMessages() {
-		showBuilList = !showBuilList;
-	};
+	void ToggleShowBuilListMessages() { showBuilList = !showBuilList; }
 #endif
 
 protected:
@@ -605,7 +621,6 @@ private:
 #ifdef DEBUG
 	bool showBuilList;
 #endif
-
 };
 
 /**
@@ -633,7 +648,7 @@ void MessagesDisplay::UpdateMessages()
 	}
 
 	// Scroll/remove old message line
-	unsigned long ticks = GetTicks();
+	const unsigned long ticks = GetTicks();
 	if (MessagesFrameTimeout < ticks) {
 		++MessagesScrollY;
 		if (MessagesScrollY == UI.MessageFont->Height() + 1) {
@@ -733,9 +748,6 @@ void MessagesDisplay::DrawMessages()
 */
 void MessagesDisplay::AddMessage(const char *msg)
 {
-	char *ptr;
-	char *message;
-	char *next;
 	unsigned long ticks = GetTicks();
 
 	if (!MessagesCount) {
@@ -748,8 +760,9 @@ void MessagesDisplay::AddMessage(const char *msg)
 		MessagesFrameTimeout = ticks + UI.MessageScrollSpeed * 1000;
 		MessagesScrollY = 0;
 	}
-
-	message = Messages[MessagesCount];
+	char *ptr;
+	char *next;
+	char *message = Messages[MessagesCount];
 	// Split long message into lines
 	if (strlen(msg) >= sizeof(Messages[0])) {
 		strncpy(message, msg, sizeof(Messages[0]) - 1);
@@ -819,9 +832,8 @@ bool MessagesDisplay::CheckRepeatMessage(const char *msg)
 	}
 	if (MessagesSameCount > 0) {
 		char temp[256];
-		int n;
+		int n = MessagesSameCount;
 
-		n = MessagesSameCount;
 		MessagesSameCount = 0;
 		// NOTE: vladi: yep it's a tricky one, but should work fine prbably :)
 		snprintf(temp, sizeof(temp), _("Last message repeated ~<%d~> times"), n + 1);
@@ -905,8 +917,7 @@ void ShiftMessagesEvent()
 	if (MessagesEventCount) {
 		--MessagesEventCount;
 		for (int z = 0; z < MessagesEventCount; ++z) {
-			MessagesEventX[z] = MessagesEventX[z + 1];
-			MessagesEventY[z] = MessagesEventY[z + 1];
+			MessagesEventPos[z] = MessagesEventPos[z + 1];
 			strcpy_s(MessagesEvent[z], sizeof(MessagesEvent[z]), MessagesEvent[z + 1]);
 		}
 	}
@@ -915,8 +926,7 @@ void ShiftMessagesEvent()
 /**
 **  Set message to display.
 **
-**  @param x    Message X map origin.
-**  @param y    Message Y map origin.
+**  @param pos    Message pos map origin.
 **  @param fmt  To be displayed in text overlay.
 **
 **  @note FIXME: vladi: I know this can be just separated func w/o msg but
@@ -940,8 +950,7 @@ void SetMessageEvent(const Vec2i &pos, const char *fmt, ...)
 	}
 
 	strcpy_s(MessagesEvent[MessagesEventCount], sizeof(MessagesEvent[MessagesEventCount]), temp);
-	MessagesEventX[MessagesEventCount] = pos.x;
-	MessagesEventY[MessagesEventCount] = pos.y;
+	MessagesEventPos[MessagesEventCount] = pos;
 	MessagesEventIndex = MessagesEventCount;
 	++MessagesEventCount;
 }
@@ -957,7 +966,7 @@ void CenterOnMessage()
 	if (MessagesEventCount == 0) {
 		return;
 	}
-	const Vec2i pos(MessagesEventX[MessagesEventIndex], MessagesEventY[MessagesEventIndex]);
+	const Vec2i& pos(MessagesEventPos[MessagesEventIndex]);
 	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(pos));
 	SetMessage(_("~<Event: %s~>"), MessagesEvent[MessagesEventIndex]);
 	++MessagesEventIndex;
@@ -1045,8 +1054,7 @@ void ClearCosts()
 /*----------------------------------------------------------------------------
 --  INFO PANEL
 ----------------------------------------------------------------------------*/
-//FIXME rb biger change require review.
-#if 1
+
 /**
 **  Draw info panel background.
 **
@@ -1059,74 +1067,8 @@ static void DrawInfoPanelBackground(unsigned frame)
 	}
 }
 
-/**
-**  Draw info panel.
-**
-**  Panel:
-**    neutral      - neutral or opponent
-**    normal       - not 1,3,4
-**    magic unit   - magic units
-**    construction - under construction
-*/
-void CInfoPanel::Draw()
+static void InfoPanel_draw_no_selection()
 {
-	if (!Selected.empty()) {
-		if (Selected.size() > 1) {
-			//
-			//  If there are more units selected draw their pictures and a health bar
-			//
-			DrawInfoPanelBackground(0);
-			for (size_t i = 0; i < std::min(Selected.size(), UI.SelectedButtons.size()); ++i) {
-				const CIcon &icon = *Selected[i]->Type->Icon.Icon;
-				const PixelPos pos(UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
-				icon.DrawUnitIcon(*UI.SelectedButtons[i].Style,
-								  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
-								  (IconActive | (MouseButtons & LeftButton)) : 0,
-								  pos, "");
-				UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
-
-				if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int) i) {
-					UI.StatusLine.Set(Selected[i]->Type->Name);
-				}
-			}
-			if (Selected.size() > UI.SelectedButtons.size()) {
-				char buf[5];
-
-				sprintf(buf, "+%u", Selected.size() - UI.SelectedButtons.size());
-				CLabel(*UI.MaxSelectedFont).Draw(UI.MaxSelectedTextX, UI.MaxSelectedTextY, buf);
-			}
-			return;
-		} else {
-			int panelIndex;
-			// FIXME: not correct for enemy's units
-			if (Selected[0]->Player == ThisPlayer
-				|| ThisPlayer->IsTeamed(*Selected[0])
-				|| ThisPlayer->IsAllied(*Selected[0])
-				|| ReplayRevealMap) {
-				if (Selected[0]->Orders[0]->Action == UnitActionBuilt
-					|| Selected[0]->Orders[0]->Action == UnitActionResearch
-					|| Selected[0]->Orders[0]->Action == UnitActionUpgradeTo
-					|| Selected[0]->Orders[0]->Action == UnitActionTrain) {
-					panelIndex = 3;
-				} else if (Selected[0]->Stats->Variables[MANA_INDEX].Max) {
-					panelIndex = 2;
-				} else {
-					panelIndex = 1;
-				}
-			} else {
-				panelIndex = 0;
-			}
-			DrawInfoPanelBackground(panelIndex);
-			DrawUnitInfo(*Selected[0]);
-			if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
-				UI.StatusLine.Set(Selected[0]->Type->Name);
-			}
-			return;
-		}
-	}
-
-	//  Nothing selected
-
 	DrawInfoPanelBackground(0);
 	if (UnitUnderCursor && UnitUnderCursor->IsVisible(*ThisPlayer)
 		&& !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
@@ -1134,7 +1076,6 @@ void CInfoPanel::Draw()
 		DrawUnitInfo(*UnitUnderCursor);
 	} else {
 		// FIXME: need some cool ideas for this.
-
 		int x = UI.InfoPanel.X + 16;
 		int y = UI.InfoPanel.Y + 8;
 
@@ -1159,7 +1100,6 @@ void CInfoPanel::Draw()
 				} else {
 					SetDefaultTextColors(nc, rc);
 				}
-
 				label.Draw(x + 15, y, i);
 
 				Video.DrawRectangleClip(ColorWhite, x, y, 12, 12);
@@ -1173,114 +1113,79 @@ void CInfoPanel::Draw()
 		SetDefaultTextColors(nc, rc);
 	}
 }
-#else
-/**
-**  Draw info panel with more than one unit selected
-*/
-static void DrawInfoPanelMultipleSelected()
-{
-	// Draw icons and a health bar
-	for (int i = 0; i < std::min<int>(NumSelected, (int)UI.SelectedButtons.size()); ++i) {
-		CUIButton *button = &UI.SelectedButtons[i];
-		bool mouseOver = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i);
-		CIcon &icon = *Selected[i]->Type->Icon.Icon;
-		int flag = mouseOver ? (IconActive | (MouseButtons & LeftButton)) : 0;
-		const PixelPos pos(button->X, button->Y);
-		icon.DrawUnitIcon(*button->Style, flag, pos, "");
-		UiDrawLifeBar(*Selected[i], pos.x, pos.y);
 
-		if (mouseOver) {
+static void InfoPanel_draw_single_selection()
+{
+	CUnit& unit = *Selected[0];
+	int panelIndex;
+
+	// FIXME: not correct for enemy's units
+	if (unit.Player == ThisPlayer
+		|| ThisPlayer->IsTeamed(unit)
+		|| ThisPlayer->IsAllied(unit)
+		|| ReplayRevealMap) {
+		if (unit.Orders[0]->Action == UnitActionBuilt
+			|| unit.Orders[0]->Action == UnitActionResearch
+			|| unit.Orders[0]->Action == UnitActionUpgradeTo
+			|| unit.Orders[0]->Action == UnitActionTrain) {
+			panelIndex = 3;
+		} else if (unit.Stats->Variables[MANA_INDEX].Max) {
+			panelIndex = 2;
+		} else {
+			panelIndex = 1;
+		}
+	} else {
+		panelIndex = 0;
+	}
+	DrawInfoPanelBackground(panelIndex);
+	DrawUnitInfo(unit);
+	if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
+		UI.StatusLine.Set(unit.Type->Name);
+	}
+}
+
+static void InfoPanel_draw_multiple_selection()
+{
+	//  If there are more units selected draw their pictures and a health bar
+	DrawInfoPanelBackground(0);
+	for (size_t i = 0; i != std::min(Selected.size(), UI.SelectedButtons.size()); ++i) {
+		const CIcon &icon = *Selected[i]->Type->Icon.Icon;
+		const PixelPos pos(UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
+		icon.DrawUnitIcon(*UI.SelectedButtons[i].Style,
+						  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
+						  (IconActive | (MouseButtons & LeftButton)) : 0,
+						  pos, "");
+		UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
+
+		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int) i) {
 			UI.StatusLine.Set(Selected[i]->Type->Name);
 		}
 	}
+	if (Selected.size() > UI.SelectedButtons.size()) {
+		char buf[5];
 
-	// Selected more than we can display
-	if (NumSelected > (int)UI.SelectedButtons.size()) {
-		std::ostringstream os;
-		os << "+" << (unsigned)(NumSelected - UI.SelectedButtons.size());
-
-		CLabel(*UI.MaxSelectedFont).Draw(UI.MaxSelectedTextX, UI.MaxSelectedTextY, os.str());
-	}
-}
-
-/**
-**  Draw info panel with one unit selected
-*/
-static void DrawInfoPanelSingleSelected()
-{
-	DrawUnitInfo(*Selected[0]);
-	if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
-		UI.StatusLine.Set(Selected[0]->Type->Name);
-	}
-}
-
-/**
-**  Draw info panel with no units selected
-*/
-static void DrawInfoPanelNoneSelected()
-{
-	CUnit *lock = UnitUnderCursor;
-	// Check if a unit is under the cursor
-	if (lock != NULL && lock->IsVisible(*ThisPlayer) && lock->Type->IsNotSelectable == false) {
-		DrawUnitInfo(*lock);
-		return;
-	}
-
-	std::string nc;
-	std::string rc;
-	int x = UI.InfoPanel.X + 16;
-	int y = UI.InfoPanel.Y + 8;
-	CLabel label(GetGameFont());
-
-	label.Draw(x, y, "Stratagus");
-	y += 16;
-	label.Draw(x, y, "Cycle:");
-	label.Draw(x + 48, y, GameCycle);
-	label.Draw(x + 110, y, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
-	y += 20;
-
-	if (y + PlayerMax * GetGameFont().Height() > Video.Height) {
-		x = 16;
-		y = 30;
-	}
-
-	GetDefaultTextColors(nc, rc);
-	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (Players[i].Type != PlayerNobody) {
-			if (ThisPlayer->IsAllied(Players[i])) {
-				label.SetNormalColor(FontGreen);
-			} else if (ThisPlayer->IsEnemy(Players[i])) {
-				label.SetNormalColor(FontRed);
-			} else {
-				label.SetNormalColor(nc);
-			}
-
-			label.Draw(x + 15, y, i);
-
-			Video.DrawRectangle(ColorWhite, x, y, 12, 12);
-			Video.FillRectangle(Players[i].Color, x + 1, y + 1, 10, 10);
-
-			label.Draw(x + 27, y, Players[i].Name);
-			label.Draw(x + 117, y, Players[i].Score);
-			y += 14;
-		}
+		sprintf(buf, "+%u", Selected.size() - UI.SelectedButtons.size());
+		CLabel(*UI.MaxSelectedFont).Draw(UI.MaxSelectedTextX, UI.MaxSelectedTextY, buf);
 	}
 }
 
 /**
 **  Draw info panel.
+**
+**  Panel:
+**    neutral      - neutral or opponent
+**    normal       - not 1,3,4
+**    magic unit   - magic units
+**    construction - under construction
 */
 void CInfoPanel::Draw()
 {
-	if (NumSelected > 1) {
-		DrawInfoPanelMultipleSelected();
-	} else if (NumSelected == 1) {
-		DrawInfoPanelSingleSelected();
-	} else {
-		DrawInfoPanelNoneSelected();
+	switch (Selected.size()) {
+		case 0: { InfoPanel_draw_no_selection(); break; }
+		case 1: { InfoPanel_draw_single_selection(); break; }
+		default: { InfoPanel_draw_multiple_selection(); break; }
 	}
 }
-#endif
 
 /*----------------------------------------------------------------------------
 --  TIMER

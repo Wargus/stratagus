@@ -1159,7 +1159,7 @@ static int SendMove(const Vec2i &tilePos)
 **
 **  @return 1 if any unit have a new order, 0 else.
 **
-**  @see Selected, @see NumSelected
+**  @see Selected
 */
 static int SendAttack(const Vec2i &tilePos)
 {
@@ -1322,7 +1322,7 @@ static int SendUnload(const Vec2i &tilePos)
 **
 **  @param tilePos  tile map position.
 **
-**  @see Selected, @see NumSelected
+**  @see Selected
 */
 static int SendSpellCast(const Vec2i &tilePos)
 {

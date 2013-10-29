@@ -204,7 +204,7 @@ void ChangeTeamSelectedUnits(CPlayer &player, const std::vector<CUnit *> &units)
 **  @param unit  Pointer to unit to add.
 **
 **  @return      true if added to selection, false otherwise
-**               (if NumSelected == MaxSelectable or
+**               (if Selected.size() == MaxSelectable or
 **                unit is already selected or unselectable)
 */
 int SelectUnit(CUnit &unit)
