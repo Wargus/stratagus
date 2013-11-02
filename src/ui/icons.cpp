@@ -82,14 +82,12 @@ CIcon::~CIcon()
 */
 /* static */ CIcon *CIcon::New(const std::string &ident)
 {
-	CIcon *icon = Icons[ident];
-	if (icon) {
-		return icon;
-	} else {
+	CIcon *&icon = Icons[ident];
+
+	if (icon == NULL) {
 		icon = new CIcon(ident);
-		Icons[ident] = icon;
-		return icon;
 	}
+	return icon;
 }
 
 /**
@@ -101,11 +99,11 @@ CIcon::~CIcon()
 */
 /* static */ CIcon *CIcon::Get(const std::string &ident)
 {
-	CIcon *icon = Icons[ident];
-	if (!icon) {
+	IconMap::iterator it = Icons.find(ident);
+	if (it == Icons.end()) {
 		DebugPrint("icon not found: %s\n" _C_ ident.c_str());
 	}
-	return icon;
+	return it->second;
 }
 
 void CIcon::Load()
@@ -156,8 +154,8 @@ void CIcon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
 	// TO-DO: implement more effect types (clock-like)
 	this->GScale->DrawFrameClip(this->Frame, pos.x, pos.y);
 	const int height = (G->Height * (100 - percent)) / 100;
-	this->G->DrawSubClip(G->frame_map[Frame].x, G->frame_map[Frame].y + G->Height - height, G->Width,
-						 height, pos.x, pos.y + G->Height - height);
+	this->G->DrawSubClip(G->frame_map[Frame].x, G->frame_map[Frame].y + G->Height - height,
+						 G->Width, height, pos.x, pos.y + G->Height - height);
 }
 
 /**
@@ -168,8 +166,8 @@ void CIcon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
 **  @param pos     display pixel position
 **  @param text    Optional text to display
 */
-void CIcon::DrawUnitIcon(const ButtonStyle &style,
-						 unsigned flags, const PixelPos &pos, const std::string &text) const
+void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
+						 const PixelPos &pos, const std::string &text) const
 {
 	ButtonStyle s(style);
 

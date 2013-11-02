@@ -106,17 +106,15 @@ void CancelBuildingMode()
 
 static bool CanBuildOnArea(const CUnit &unit, const Vec2i &pos)
 {
-	bool result = true;
-	for (int j = 0; result && j < unit.Type->TileHeight; ++j) {
+	for (int j = 0; j < unit.Type->TileHeight; ++j) {
 		for (int i = 0; i < unit.Type->TileWidth; ++i) {
 			const Vec2i tempPos(i, j);
 			if (!Map.Field(pos + tempPos)->playerInfo.IsExplored(*ThisPlayer)) {
-				result = false;
-				break;
+				return false;
 			}
 		}
 	}
-	return result;
+	return true;
 }
 
 static void DoRightButton_ForForeignUnit(CUnit *dest)
@@ -200,7 +198,64 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 	return false;
 }
 
-static bool DoRightButton_Harvest(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
+static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int &acknowledged)
+{
+	// Return a loaded harvester to deposit
+	if (unit.ResourcesHeld > 0
+		&& dest.Type->CanStore[unit.CurrentResource]
+		&& dest.Player == unit.Player) {
+		dest.Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		SendCommandReturnGoods(unit, &dest, flush);
+		return true;
+	}
+	// Go and harvest from a unit
+	const int res = dest.Type->GivesResource;
+	const CUnitType& type = *unit.Type;
+	if (res
+		&& type.ResInfo[res]
+		&& unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity
+		&& dest.Type->CanHarvest
+		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
+		dest.Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		SendCommandResource(unit, dest, flush);
+		return true;
+	}
+	return false;
+}
+
+static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, int &acknowledged)
+{
+	if (!Map.Field(pos)->playerInfo.IsExplored(*unit.Player)) {
+		return false;
+	}
+	const CUnitType& type = *unit.Type;
+	// FIXME: support harvesting more types of terrain.
+	for (int res = 0; res < MaxCosts; ++res) {
+		if (type.ResInfo[res]
+			&& type.ResInfo[res]->TerrainHarvester
+			&& Map.Field(pos)->IsTerrainResourceOnMap(res)
+			&& ((unit.CurrentResource != res)
+				|| (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity))) {
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceAcknowledging);
+				acknowledged = 1;
+			}
+			SendCommandResourceLoc(unit, pos, flush);
+			return true;
+		}
+	}
+	return false;
+}
+
+static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
 {
 	const CUnitType &type = *unit.Type;
 
@@ -220,50 +275,12 @@ static bool DoRightButton_Harvest(CUnit &unit, CUnit *dest, const Vec2i &pos, in
 	// Harvest
 	if (type.Harvester) {
 		if (dest != NULL) {
-			// Return a loaded harvester to deposit
-			if (unit.ResourcesHeld > 0
-				&& dest->Type->CanStore[unit.CurrentResource]
-				&& dest->Player == unit.Player) {
-				dest->Blink = 4;
-				if (!acknowledged) {
-					PlayUnitSound(unit, VoiceAcknowledging);
-					acknowledged = 1;
-				}
-				SendCommandReturnGoods(unit, dest, flush);
-				return true;
-			}
-			// Go and harvest from a unit
-			const int res = dest->Type->GivesResource;
-			if (res
-				&& type.ResInfo[res]
-				&& unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity
-				&& dest->Type->CanHarvest
-				&& (dest->Player == unit.Player || dest->Player->Index == PlayerNumNeutral)) {
-				dest->Blink = 4;
-				if (!acknowledged) {
-					PlayUnitSound(unit, VoiceAcknowledging);
-					acknowledged = 1;
-				}
-				SendCommandResource(unit, *dest, flush);
+			if (DoRightButton_Harvest_Unit(unit, *dest, flush, acknowledged)) {
 				return true;
 			}
 		} else {
-			if (Map.Field(pos)->playerInfo.IsExplored(*unit.Player)) {
-				// FIXME: support harvesting more types of terrain.
-				for (int res = 0; res < MaxCosts; ++res) {
-					if (type.ResInfo[res]
-						&& type.ResInfo[res]->TerrainHarvester
-						&& Map.Field(pos)->IsTerrainResourceOnMap(res)
-						&& ((unit.CurrentResource != res)
-							|| (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity))) {
-						if (!acknowledged) {
-							PlayUnitSound(unit, VoiceAcknowledging);
-							acknowledged = 1;
-						}
-						SendCommandResourceLoc(unit, pos, flush);
-						return true;
-					}
-				}
+			if (DoRightButton_Harvest_Pos(unit, pos, flush, acknowledged)) {
+				return true;
 			}
 		}
 	}
@@ -291,45 +308,53 @@ static bool DoRightButton_Harvest(CUnit &unit, CUnit *dest, const Vec2i &pos, in
 	return true;
 }
 
-static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
+static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos, int flush, int &acknowledged)
 {
 	const CUnitType &type = *unit.Type;
 	const int action = type.MouseAction;
 
-	if (dest != NULL && unit.CurrentAction() != UnitActionBuilt) {
-		if (action == MouseActionSpellCast || unit.IsEnemy(*dest)) {
-			dest->Blink = 4;
-			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAttack);
-				acknowledged = 1;
-			}
-			if (action == MouseActionSpellCast) {
-				// This is for demolition squads and such
-				Assert(unit.Type->CanCastSpell);
-				size_t spellnum;
-				for (spellnum = 0; !type.CanCastSpell[spellnum] && spellnum < SpellTypeTable.size() ; spellnum++) {
-				}
-				SendCommandSpellCast(unit, pos, dest, spellnum, flush);
-			} else {
-				if (CanTarget(type, *dest->Type)) {
-					SendCommandAttack(unit, pos, dest, flush);
-				} else { // No valid target
-					SendCommandAttack(unit, pos, NoUnitP, flush);
-				}
-			}
-			return;
+	if (action == MouseActionSpellCast || unit.IsEnemy(dest)) {
+		dest.Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAttack);
+			acknowledged = 1;
 		}
-		if ((dest->Player == unit.Player || unit.IsAllied(*dest)) && dest != &unit) {
-			dest->Blink = 4;
-			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAcknowledging);
-				acknowledged = 1;
+		if (action == MouseActionSpellCast) {
+			// This is for demolition squads and such
+			Assert(unit.Type->CanCastSpell);
+			size_t spellnum;
+			for (spellnum = 0; !type.CanCastSpell[spellnum] && spellnum < SpellTypeTable.size() ; spellnum++) {
 			}
-			if (dest->Type->CanMove() == false && !dest->Type->Teleporter) {
-				SendCommandMove(unit, pos, flush);
-			} else {
-				SendCommandFollow(unit, *dest, flush);
+			SendCommandSpellCast(unit, pos, &dest, spellnum, flush);
+		} else {
+			if (CanTarget(type, *dest.Type)) {
+				SendCommandAttack(unit, pos, &dest, flush);
+			} else { // No valid target
+				SendCommandAttack(unit, pos, NoUnitP, flush);
 			}
+		}
+		return true;
+	}
+	if ((dest.Player == unit.Player || unit.IsAllied(dest)) && &dest != &unit) {
+		dest.Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		if (!dest.Type->CanMove() && !dest.Type->Teleporter) {
+			SendCommandMove(unit, pos, flush);
+		} else {
+			SendCommandFollow(unit, dest, flush);
+		}
+		return true;
+	}
+	return false;
+}
+
+static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
+{
+	if (dest != NULL && unit.CurrentAction() != UnitActionBuilt) {
+		if (DoRightButton_AttackUnit(unit, *dest, pos, flush, acknowledged)) {
 			return;
 		}
 	}
@@ -501,7 +526,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 
 	//  Handle resource workers.
 	if (action == MouseActionHarvest) {
-		DoRightButton_Harvest(unit, dest, pos, flush, acknowledged);
+		DoRightButton_Worker(unit, dest, pos, flush, acknowledged);
 		return;
 	}
 
@@ -595,10 +620,9 @@ void DoRightButton(const PixelPos &mapPixelPos)
 /**
 **  Check if the mouse is on a button
 **
-**  @param x       X screen coordinate.
-**  @param y       Y screen coordinate.
+**  @param screenPos  screen coordinate.
 **
-**  @return        True if mouse is on the button, False otherwise.
+**  @return True if mouse is on the button, False otherwise.
 */
 bool CUIButton::Contains(const PixelPos &screenPos) const
 {
@@ -855,16 +879,14 @@ static void MouseScrollMap(const PixelPos &pos)
 /**
 **  Handle movement of the cursor.
 **
-**  @param mousePos  Screen X position.
+**  @param cursorPos  Screen X position.
 */
 void UIHandleMouseMove(const PixelPos &cursorPos)
 {
 	enum _cursor_on_ OldCursorOn;
 
 	OldCursorOn = CursorOn;
-	//
 	//  Selecting units.
-	//
 	if (CursorState == CursorStateRectangle) {
 		// Restrict cursor to viewport.
 		UI.SelectedViewport->Restrict(CursorScreenPos.x, CursorScreenPos.y);
@@ -872,9 +894,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		return;
 	}
 
-	//
 	//  Move map.
-	//
 	if (GameCursor == UI.Scroll.Cursor) {
 		MouseScrollMap(cursorPos);
 		return;
@@ -884,9 +904,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	GameCursor = UI.Point.Cursor;  // Reset
 	HandleMouseOn(cursorPos);
 
-	//
 	//  Make the piemenu "follow" the mouse
-	//
 	if (CursorState == CursorStatePieMenu && CursorOn == CursorOnMap) {
 		clamp(&CursorStartScreenPos.x, CursorScreenPos.x - UI.PieMenu.X[2], CursorScreenPos.x + UI.PieMenu.X[2]);
 		clamp(&CursorStartScreenPos.y, CursorScreenPos.y - UI.PieMenu.Y[4], CursorScreenPos.y + UI.PieMenu.Y[4]);
@@ -902,9 +920,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		return;
 	}
 
-	//
 	//  User may be draging with button pressed.
-	//
 	if (GameMenuButtonClicked || GameDiplomacyButtonClicked) {
 		return;
 	} else {
@@ -992,9 +1008,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		UnitUnderCursor = NULL;
 	}
 
-	//
 	//  Selecting target.
-	//
 	if (CursorState == CursorStateSelect) {
 		if (CursorOn == CursorOnMap || CursorOn == CursorOnMinimap) {
 			if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
@@ -1020,9 +1034,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			}
 			if (CursorOn == CursorOnMinimap && (MouseButtons & RightButton)) {
 				const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
-				//
 				//  Minimap move viewpoint
-				//
 				UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorPos));
 			}
 		}
@@ -1030,13 +1042,9 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		return;
 	}
 
-	//
 	//  Cursor pointing.
-	//
 	if (CursorOn == CursorOnMap) {
-		//
 		//  Map
-		//
 		if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->Decoration
 			&& (UnitUnderCursor->IsVisible(*ThisPlayer) || ReplayRevealMap)) {
 			GameCursor = UI.Glass.Cursor;
@@ -1045,9 +1053,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	}
 
 	if (CursorOn == CursorOnMinimap && (MouseButtons & LeftButton)) {
-		//
 		//  Minimap move viewpoint
-		//
 		const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorPos));
@@ -1072,7 +1078,7 @@ static int SendRepair(const Vec2i &tilePos)
 	if (dest && dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max
 		&& dest->Type->RepairHP
 		&& (dest->Player == ThisPlayer || ThisPlayer->IsAllied(*dest))) {
-			for (size_t i = 0; i != Selected.size(); ++i) {
+		for (size_t i = 0; i != Selected.size(); ++i) {
 			CUnit *unit = Selected[i];
 
 			if (unit->Type->RepairRange) {
@@ -1754,7 +1760,6 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 	}
 }
 
-
 /**
 **  Called if mouse button pressed down.
 **
@@ -1766,7 +1771,8 @@ void UIHandleButtonDown(unsigned button)
 	const bool longLeftButton = MouseButtons & ((LeftButton << MouseHoldShift));
 
 #ifdef USE_TOUCHSCREEN
-	// If we are moving with stylus/finger, left button on touch screen devices is still clicked
+	// If we are moving with stylus/finger,
+	// left button on touch screen devices is still clicked
 	// Ignore handle if left button is long cliked
 	if (longLeftButton) {
 		return;
@@ -1854,8 +1860,8 @@ void UIHandleButtonUp(unsigned button)
 	//
 	if (CursorState == CursorStatePieMenu) {
 		// Little threshold
-		if (CursorStartScreenPos.x < CursorScreenPos.x - 1 || CursorScreenPos.x + 1 < CursorStartScreenPos.x
-			|| CursorStartScreenPos.y < CursorScreenPos.y - 1 || CursorScreenPos.y + 1 < CursorStartScreenPos.y) {
+		if (1 < std::abs(CursorStartScreenPos.x - CursorScreenPos.x)
+			|| 1 < std::abs(CursorStartScreenPos.y - CursorScreenPos.y)) {
 			// there was a move, handle the selected button/pie
 			HandlePieMenuMouseSelection();
 		}

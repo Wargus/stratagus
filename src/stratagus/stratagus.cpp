@@ -724,7 +724,7 @@ int stratagusMain(int argc, char **argv)
 
 	// Init player data
 	ThisPlayer = NULL;
-	//Don't clear the Players strucure as it would erase the allowed units.
+	//Don't clear the Players structure as it would erase the allowed units.
 	// memset(Players, 0, sizeof(Players));
 	NumPlayers = 0;
 

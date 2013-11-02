@@ -97,10 +97,8 @@ CUnit *LastIdleWorker;               /// Last called idle worker
 */
 static void ShowInput()
 {
-	char *input;
-
 	snprintf(InputStatusLine, sizeof(InputStatusLine), _("MESSAGE:%s~!_"), Input);
-	input = InputStatusLine;
+	char *input = InputStatusLine;
 	// FIXME: This is slow!
 	while (UI.StatusLine.Font->Width(input) > UI.StatusLine.Width) {
 		++input;
@@ -433,8 +431,10 @@ void UiFindIdleWorker()
 	}
 	CUnit *unit = ThisPlayer->FreeWorkers[0];
 	if (LastIdleWorker) {
-		std::vector<CUnit *>::const_iterator it = std::find(ThisPlayer->FreeWorkers.begin(),
-															ThisPlayer->FreeWorkers.end(), LastIdleWorker);
+		const std::vector<CUnit *>& freeWorkers = ThisPlayer->FreeWorkers;
+		std::vector<CUnit *>::const_iterator it = std::find(freeWorkers.begin(),
+															freeWorkers.end(),
+															LastIdleWorker);
 		if (it != ThisPlayer->FreeWorkers.end()) {
 			if (*it != ThisPlayer->FreeWorkers.back()) {
 				unit = *(++it);
@@ -486,7 +486,6 @@ void UiTrackUnit()
 */
 bool HandleCommandKey(int key)
 {
-	bool ret;
 	int base = lua_gettop(Lua);
 
 	lua_getglobal(Lua, "HandleCommandKey");
@@ -500,13 +499,13 @@ bool HandleCommandKey(int key)
 	lua_pushboolean(Lua, (KeyModifiers & ModifierShift));
 	LuaCall(4, 0);
 	if (lua_gettop(Lua) - base == 1) {
-		ret = LuaToBoolean(Lua, base + 1);
+		bool ret = LuaToBoolean(Lua, base + 1);
 		lua_pop(Lua, 1);
+		return ret;
 	} else {
 		LuaError(Lua, "HandleCommandKey must return a boolean");
-		ret = false;
+		return false;
 	}
-	return ret;
 }
 
 #ifdef DEBUG
@@ -746,8 +745,6 @@ static bool CommandKey(int key)
 */
 int HandleCheats(const std::string &input)
 {
-	int ret;
-
 #if defined(DEBUG) || defined(PROF)
 	if (input == "ai me") {
 		if (ThisPlayer->AiEnabled) {
@@ -781,13 +778,42 @@ int HandleCheats(const std::string &input)
 	lua_pushstring(Lua, input.c_str());
 	LuaCall(1, 0, false);
 	if (lua_gettop(Lua) - base == 1) {
-		ret = LuaToBoolean(Lua, -1);
+		int ret = LuaToBoolean(Lua, -1);
 		lua_pop(Lua, 1);
+		return ret;
 	} else {
 		DebugPrint("HandleCheats must return a boolean");
-		ret = 0;
+		return 0;
 	}
-	return ret;
+}
+
+// Replace ~~ with ~
+static void Replace2TildeByTilde(char *s)
+{
+	for (char *p = s; *p; ++p) {
+		if (*p == '~') {
+			++p;
+		}
+		*s++ = *p;
+	}
+	*s = '\0';
+}
+
+// Replace ~ with ~~
+static void ReplaceTildeBy2Tilde(char *s)
+{
+	for (char *p = s; *p; ++p) {
+		if (*p != '~') {
+			continue;
+		}
+		char *q = p + strlen(p);
+		q[1] = '\0';
+		while (q > p) {
+			*q = *(q - 1);
+			--q;
+		}
+		++p;
+	}
 }
 
 /**
@@ -798,22 +824,11 @@ int HandleCheats(const std::string &input)
 */
 static int InputKey(int key)
 {
-	int i;
-	char *namestart;
-	char *p;
-	char *q;
-
 	switch (key) {
 		case SDLK_RETURN:
 		case SDLK_KP_ENTER: { // RETURN
 			// Replace ~~ with ~
-			for (p = q = Input; *p;) {
-				if (*p == '~') {
-					++p;
-				}
-				*q++ = *p++;
-			}
-			*q = '\0';
+			Replace2TildeByTilde(Input);
 #ifdef DEBUG
 			if (Input[0] == '-') {
 				if (!GameObserve && !GamePaused) {
@@ -841,17 +856,7 @@ static int InputKey(int key)
 
 			if (Input[0]) {
 				// Replace ~ with ~~
-				for (p = Input; *p; ++p) {
-					if (*p == '~') {
-						q = p + strlen(p);
-						q[1] = '\0';
-						while (q > p) {
-							*q = *(q - 1);
-							--q;
-						}
-						++p;
-					}
-				}
+				ReplaceTildeBy2Tilde(Input);
 				char chatMessage[sizeof(Input) + 40];
 				snprintf(chatMessage, sizeof(chatMessage), "~%s~<%s>~> %s",
 						 PlayerColorNames[ThisPlayer->Index].c_str(),
@@ -882,8 +887,8 @@ static int InputKey(int key)
 			}
 			return 1;
 
-		case SDLK_TAB:
-			namestart = strrchr(Input, ' ');
+		case SDLK_TAB: {
+			char *namestart = strrchr(Input, ' ');
 			if (namestart) {
 				++namestart;
 			} else {
@@ -892,7 +897,7 @@ static int InputKey(int key)
 			if (!strlen(namestart)) {
 				return 1;
 			}
-			for (i = 0; i < PlayerMax; ++i) {
+			for (int i = 0; i < PlayerMax; ++i) {
 				if (Players[i].Type != PlayerPerson) {
 					continue;
 				}
@@ -907,7 +912,7 @@ static int InputKey(int key)
 				}
 			}
 			return 1;
-
+		}
 		default:
 			if (key >= ' ') {
 				gcn::Key k(key);
@@ -940,9 +945,8 @@ static void Screenshot()
 {
 	CFile fd;
 	char filename[30];
-	int i;
 
-	for (i = 1; i <= 99; ++i) {
+	for (int i = 1; i <= 99; ++i) {
 		// FIXME: what if we can't write to this directory?
 		snprintf(filename, sizeof(filename), "screen%02d.png", i);
 		if (fd.open(filename, CL_OPEN_READ) == -1) {
@@ -1145,8 +1149,7 @@ void HandleKeyRepeat(unsigned, unsigned keychar)
 /**
 **  Handle the mouse in scroll area
 **
-**  @param x  Screen X position.
-**  @param y  Screen Y position.
+**  @param mousePos  Screen position.
 **
 **  @return   true if the mouse is in the scroll area, false otherwise
 */
@@ -1214,8 +1217,7 @@ void HandleCursorMove(int *x, int *y)
 /**
 **  Handle movement of the cursor.
 **
-**  @param x  screen pixel X position.
-**  @param y  screen pixel Y position.
+**  @param screePos  screen pixel position.
 */
 void HandleMouseMove(const PixelPos &screenPos)
 {
@@ -1252,23 +1254,22 @@ void HandleButtonUp(unsigned button)
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_TOUCHSCREEN
-int DoubleClickDelay = 1000;             /// Time to detect double clicks.
-int HoldClickDelay = 2000;              /// Time to detect hold clicks.
+int DoubleClickDelay = 1000;      /// Time to detect double clicks.
+int HoldClickDelay = 2000;        /// Time to detect hold clicks.
 #else
-int DoubleClickDelay = 300;             /// Time to detect double clicks.
-int HoldClickDelay = 1000;              /// Time to detect hold clicks.
+int DoubleClickDelay = 300;       /// Time to detect double clicks.
+int HoldClickDelay = 1000;        /// Time to detect hold clicks.
 #endif
 
 static enum {
-	InitialMouseState,                  /// start state
-	ClickedMouseState                   /// button is clicked
-} MouseState;                           /// Current state of mouse
+	InitialMouseState,            /// start state
+	ClickedMouseState             /// button is clicked
+} MouseState;                     /// Current state of mouse
 
-static int MouseX;                       /// Last mouse X position
-static int MouseY;                       /// Last mouse Y position
-static unsigned LastMouseButton;         /// last mouse button handled
-static unsigned StartMouseTicks;         /// Ticks of first click
-static unsigned LastMouseTicks;          /// Ticks of last mouse event
+static PixelPos LastMousePos;     /// Last mouse position
+static unsigned LastMouseButton;  /// last mouse button handled
+static unsigned StartMouseTicks;  /// Ticks of first click
+static unsigned LastMouseTicks;   /// Ticks of last mouse event
 
 /**
 **  Called if any mouse button is pressed down
@@ -1348,35 +1349,31 @@ void InputMouseButtonRelease(const EventCallback &callbacks,
 void InputMouseMove(const EventCallback &callbacks,
 					unsigned ticks, int x, int y)
 {
+	PixelPos mousePos(x, y);
 	// Don't reset the mouse state unless we really moved
 #ifdef USE_TOUCHSCREEN
 	const int buff = 32;
-	if (((x - buff) <= MouseX && MouseX <= (x + buff)) == 0
-		|| ((y - buff) <= MouseY && MouseY <= (y + buff)) == 0) {
+	const PixelDiff diff = LastMousePos - mousePos;
+
+	if (abs(diff.x) > buff || abs (diff.y) > buff) {
 		MouseState = InitialMouseState;
 		LastMouseTicks = ticks;
 		// Reset rectangle select cursor state if we moved by a lot
 		// - rectangle select should be a drag, not a tap
 		if (CursorState == CursorStateRectangle
-			&& (((x - buff * 2) <= MouseX && MouseX <= (x + buff * 2)) == 0
-				|| ((y - buff * 2) <= MouseY && MouseY <= (y + buff * 2)) == 0)) {
+			&& (abs(diff.x) > 2 * buff || abs (diff.y) > 2 * buff)) {
 			CursorState = CursorStatePoint;
 		}
 	}
-	if (MouseX != x || MouseY != y) {
-		MouseX = x;
-		MouseY = y;
-	}
+	LastMousePos = mousePos;
 #else
-	if (MouseX != x || MouseY != y) {
+	if (LastMousePos != mousePos) {
 		MouseState = InitialMouseState;
 		LastMouseTicks = ticks;
-		MouseX = x;
-		MouseY = y;
+		LastMousePos = mousePos;
 	}
 #endif
-	const PixelPos pos(x, y);
-	callbacks.MouseMoved(pos);
+	callbacks.MouseMoved(mousePos);
 }
 
 /**
@@ -1384,7 +1381,6 @@ void InputMouseMove(const EventCallback &callbacks,
 **
 **  @param callbacks  Callback structure for events.
 **  @param ticks      Denotes time-stamp of video-system
-**
 */
 void InputMouseExit(const EventCallback &callbacks, unsigned /* ticks */)
 {

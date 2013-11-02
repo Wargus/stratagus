@@ -99,7 +99,6 @@ static void DrawMenuButtonArea_Network()
 					 UI.NetworkDiplomacyButton.X, UI.NetworkDiplomacyButton.Y,
 					 UI.NetworkDiplomacyButton.Text);
 	}
-
 }
 
 /**
@@ -453,21 +452,23 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 	size_t j = 0;
 
 	for (int i = 0; i < unit.InsideCount; ++i, uins = uins->NextContained) {
-		if (uins->Boarded && j < UI.TransportingButtons.size()) {
-			CIcon &icon = *uins->Type->Icon.Icon;
-			int flag = (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
-					   (IconActive | (MouseButtons & LeftButton)) : 0;
-			const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
-			icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "");
-			UiDrawLifeBar(*uins, pos.x, pos.y);
-			if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
-				UiDrawManaBar(*uins, pos.x, pos.y);
-			}
-			if (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) {
-				UI.StatusLine.Set(uins->Type->Name);
-			}
-			++j;
+		if (!uins->Boarded || j >= UI.TransportingButtons.size()) {
+			continue;
 		}
+		CIcon &icon = *uins->Type->Icon.Icon;
+		int flag = (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
+				   (IconActive | (MouseButtons & LeftButton)) : 0;
+		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
+		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "");
+		UiDrawLifeBar(*uins, pos.x, pos.y);
+		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
+			UiDrawManaBar(*uins, pos.x, pos.y);
+		}
+		if (ButtonAreaUnderCursor == ButtonAreaTransporting
+			&& static_cast<size_t>(ButtonUnderCursor) == j) {
+			UI.StatusLine.Set(uins->Type->Name);
+		}
+		++j;
 	}
 }
 
