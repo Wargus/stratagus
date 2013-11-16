@@ -240,10 +240,12 @@ static void GameLogicLoop()
 		++GameCycle;
 		MultiPlayerReplayEachCycle();
 		NetworkCommands(); // Get network commands
+		TriggersEachCycle();// handle triggers
 		UnitActions();      // handle units
 		MissileActions();   // handle missiles
 		PlayersEachCycle(); // handle players
 		UpdateTimer();      // update game timer
+		
 
 		//
 		// Work todo each second.
@@ -289,7 +291,6 @@ static void GameLogicLoop()
 		}
 	}
 
-	TriggersEachCycle();  // handle triggers
 	UpdateMessages();     // update messages
 	ParticleManager.update(); // handle particles
 	CheckMusicFinished(); // Check for next song

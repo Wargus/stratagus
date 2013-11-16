@@ -1047,7 +1047,7 @@ static void NetworkExecCommands(unsigned long gameNetCycle)
 				break;
 			}
 			if (ncq.Time) {
-				Assert(ncq.Time == gameNetCycle * CNetworkParameter::Instance.gameCyclesPerUpdate);
+				Assert(ncq.Time == gameNetCycle);
 				NetworkExecCommand(ncq);
 			}
 		}
