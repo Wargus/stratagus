@@ -806,6 +806,9 @@ void AiAddUpgradeToRequest(CUnitType &type)
 		AiPlayer->NeededMask |= resourceNeeded;
 		return;
 	}
+	if (AiPlayer->Player->CheckLimits(type) < 0) {
+		return;
+	}
 	//
 	// Check if we have a place for the upgrade to.
 	//

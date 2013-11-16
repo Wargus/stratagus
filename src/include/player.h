@@ -165,6 +165,8 @@ public:
 	/// Check, if there enough resources for action.
 	bool CheckResource(const int resource, const int value);
 
+	/// Returns count of specified unittype
+	int GetUnitTotalCount(const CUnitType &type) const;
 	/// Check if the unit-type didn't break any unit limits and supply/demand
 	int CheckLimits(const CUnitType &type) const;
 

@@ -39,6 +39,7 @@
 
 #include "player.h"
 
+#include "action/action_upgradeto.h"
 #include "actions.h"
 #include "ai.h"
 #include "iolib.h"
@@ -945,6 +946,23 @@ bool CPlayer::CheckResource(const int resource, const int value)
 	return result < value ? false : true;
 }
 
+
+int CPlayer::GetUnitTotalCount(const CUnitType &type) const
+{
+	int count = UnitTypesCount[type.Slot];
+	for (std::vector<CUnit *>::const_iterator it = this->UnitBegin(); it != this->UnitEnd(); ++it) {
+		CUnit &unit = **it;
+
+		if (unit.CurrentAction() == UnitActionUpgradeTo) {
+			COrder_UpgradeTo &order = dynamic_cast<COrder_UpgradeTo &>(*unit.CurrentOrder());
+			if (order.GetUnitType().Slot == type.Slot) {
+				++count;
+			}
+		}
+	}
+	return count;
+}
+
 /**
 **  Check if the unit-type didn't break any unit limits.
 **
@@ -973,7 +991,7 @@ int CPlayer::CheckLimits(const CUnitType &type) const
 		Notify("%s", _("Total Unit Limit Reached"));
 		return -4;
 	}
-	if (UnitTypesCount[type.Slot] >=  Allow.Units[type.Slot]) {
+	if (GetUnitTotalCount(type) >= Allow.Units[type.Slot]) {
 		Notify(_("Limit of %d reached for this unit type"), Allow.Units[type.Slot]);
 		return -6;
 	}
