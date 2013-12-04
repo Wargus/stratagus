@@ -1635,7 +1635,6 @@ void UpdateUnitVariables(CUnit &unit)
 			clamp(&unit.Variable[i].Value, 0, unit.Variable[i].Max);
 		}
 	}
-	UI.ButtonPanel.Update();
 }
 
 /**
