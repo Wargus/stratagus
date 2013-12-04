@@ -85,7 +85,9 @@
 			}
 		}
 		if (!target) {
-			if (goal->CurrentAction() == UnitActionAttack || goal->CurrentAction() == UnitActionAttackGround) {
+			if (goal->CurrentAction() == UnitActionStandGround) {
+				return;
+			} else if (goal->CurrentAction() == UnitActionAttack || goal->CurrentAction() == UnitActionAttackGround) {
 				COrder_Attack &order = *static_cast<COrder_Attack *>(goal->CurrentOrder());
 				dest = Map.TilePosToMapPixelPos_Center(order.GetGoalPos());
 			} else if (goal->CurrentAction() == UnitActionSpellCast) {
