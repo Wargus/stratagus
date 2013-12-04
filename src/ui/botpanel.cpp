@@ -153,10 +153,6 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 
 	ba->Allowed = func;
 	ba->AllowStr = allow;
-	/*int key = GetHotKey(hint);
-	if (isascii(key) && isupper(key)) {
-		key = tolower(key);
-	}*/
 	ba->Key = key;
 	ba->Hint = hint;
 	ba->Description = descr;

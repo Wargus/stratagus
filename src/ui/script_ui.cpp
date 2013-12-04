@@ -1016,7 +1016,8 @@ static int CclDefineButton(lua_State *l)
 			}
 			ba.AllowStr = allowstr;
 		} else if (!strcmp(value, "Key")) {
-			ba.Key = *LuaToString(l, -1);
+			std::string key(LuaToString(l, -1));
+			ba.Key = GetHotKey(key);			
 		} else if (!strcmp(value, "Hint")) {
 			ba.Hint = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
