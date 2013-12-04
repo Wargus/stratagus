@@ -203,14 +203,15 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	// Return a loaded harvester to deposit
 	if (unit.ResourcesHeld > 0
 		&& dest.Type->CanStore[unit.CurrentResource]
-		&& dest.Player == unit.Player) {
-		dest.Blink = 4;
-		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
-			acknowledged = 1;
-		}
-		SendCommandReturnGoods(unit, &dest, flush);
-		return true;
+		&& (dest.Player == unit.Player
+		|| (dest.Player->IsAllied(*unit.Player) && unit.Player->IsAllied(*dest.Player)))) {
+			dest.Blink = 4;
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceAcknowledging);
+				acknowledged = 1;
+			}
+			SendCommandReturnGoods(unit, &dest, flush);
+			return true;
 	}
 	// Go and harvest from a unit
 	const int res = dest.Type->GivesResource;
@@ -939,39 +940,43 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		const CViewport &vp = *UI.MouseViewport;
 		const Vec2i tilePos = vp.ScreenToTilePos(cursorPos);
 
-		if (CursorBuilding && (MouseButtons & LeftButton) && Selected[0]
-			&& (KeyModifiers & (ModifierAlt | ModifierShift))) {
-			const CUnit &unit = *Selected[0];
-			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
-			bool explored = CanBuildOnArea(*Selected[0], tilePos);
+		try {
+			if (CursorBuilding && (MouseButtons & LeftButton) && Selected.at(0)
+				&& (KeyModifiers & (ModifierAlt | ModifierShift))) {
+				const CUnit &unit = *Selected[0];
+				const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
+				bool explored = CanBuildOnArea(*Selected[0], tilePos);
 
-			// We now need to check if there are another build commands on this build spot
-			bool buildable = true;
-			for (std::vector<COrderPtr>::const_iterator it = unit.Orders.begin();
-				 it != unit.Orders.end(); ++it) {
-				COrder &order = **it;
-				if (order.Action == UnitActionBuild) {
-					COrder_Build &build = dynamic_cast<COrder_Build &>(order);
-					if (tilePos.x >= build.GetGoalPos().x
-						&& tilePos.x < build.GetGoalPos().x + build.GetUnitType().TileWidth
-						&& tilePos.y >= build.GetGoalPos().y
-						&& tilePos.y < build.GetGoalPos().y + build.GetUnitType().TileHeight) {
-						buildable = false;
-						break;
+				// We now need to check if there are another build commands on this build spot
+				bool buildable = true;
+				for (std::vector<COrderPtr>::const_iterator it = unit.Orders.begin();
+					 it != unit.Orders.end(); ++it) {
+					COrder &order = **it;
+					if (order.Action == UnitActionBuild) {
+						COrder_Build &build = dynamic_cast<COrder_Build &>(order);
+						if (tilePos.x >= build.GetGoalPos().x
+							&& tilePos.x < build.GetGoalPos().x + build.GetUnitType().TileWidth
+							&& tilePos.y >= build.GetGoalPos().y
+							&& tilePos.y < build.GetGoalPos().y + build.GetUnitType().TileHeight) {
+							buildable = false;
+							break;
+						}
+					}
+				}
+
+				// 0 Test build, don't really build
+				if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && buildable && (explored || ReplayRevealMap)) {
+					const int flush = !(KeyModifiers & ModifierShift);
+					for (size_t i = 0; i != Selected.size(); ++i) {
+						SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush);
+					}
+					if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
+						CancelBuildingMode();
 					}
 				}
 			}
-
-			// 0 Test build, don't really build
-			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && buildable && (explored || ReplayRevealMap)) {
-				const int flush = !(KeyModifiers & ModifierShift);
-				for (size_t i = 0; i != Selected.size(); ++i) {
-					SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush);
-				}
-				if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
-					CancelBuildingMode();
-				}
-			}
+		} catch (const std::out_of_range &oor) {
+			DebugPrint("Selected is empty: %s\n" _C_ oor.what());
 		}
 		if (Preference.ShowNameDelay) {
 			ShowNameDelay = GameCycle + Preference.ShowNameDelay;
