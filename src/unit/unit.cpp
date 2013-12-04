@@ -37,6 +37,8 @@
 
 #include "unit.h"
 
+#include "action/action_attack.h"
+
 #include "actions.h"
 #include "ai.h"
 #include "animation.h"
@@ -2574,6 +2576,17 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 {
 	const int threshold = 30;
 	COrder *savedOrder = NULL;
+
+	if (target.Player->AiEnabled == false) {
+		if (target.CurrentAction() == UnitActionAttack) {
+			COrder_Attack &order = dynamic_cast<COrder_Attack &>(*target.CurrentOrder());
+			if (order.IsWeakTargetSelected() == false) {
+				return;
+			}
+		} else {
+			return;
+		}
+	}
 	if (target.CanStoreOrder(target.CurrentOrder())) {
 		savedOrder = target.CurrentOrder()->Clone();
 	}
@@ -2721,17 +2734,13 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		HitUnit_RunAway(target, *attacker);
 	}
 
-	// The rest instructions is only for AI units.
-	if (!target.Player->AiEnabled) {
-		return;
-	}
-
 	const int threshold = 30;
 
 	if (target.Threshold && target.CurrentOrder()->HasGoal() && target.CurrentOrder()->GetGoal() == attacker) {
 		target.Threshold = threshold;
 		return;
 	}
+
 	if (target.Threshold == 0 && target.IsAgressive() && target.CanMove() && !target.ReCast) {
 		// Attack units in range (which or the attacker?)
 		// Don't bother unit if it casting repeatable spell

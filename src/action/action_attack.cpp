@@ -563,7 +563,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 					const Vec2i dir = goal.tilePos + goal.Type->GetHalfTileSize() - unit.tilePos;
 
 					UnitHeadingFromDeltaXY(unit, dir);
-					this->State = ATTACK_TARGET;
+					this->State |= ATTACK_TARGET;
 					AttackTarget(unit);
 					return;
 				}

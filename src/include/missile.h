@@ -367,7 +367,6 @@ public:
 	int ChangeAmount;          /// how many to change
 	bool ChangeMax;            /// modify the max, if value will exceed it
 
-	/// @todo FiredSound defined but not used!
 	SoundConfig FiredSound;    /// fired sound
 	SoundConfig ImpactSound;   /// impact sound for this missile-type
 
@@ -600,6 +599,8 @@ extern Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, 
 /// create a local missile
 extern Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
 
+/// Calculates damage done to goal by attacker using formula
+extern int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *formula);
 /// fire a missile
 extern void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos);
 

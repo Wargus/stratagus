@@ -270,19 +270,18 @@ public:
 CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource)
 {
 	BestDepotFinder<true> finder(pos, resource, range);
-	CUnit *depot = finder.Find(p.UnitBegin(), p.UnitEnd());
-
-	if (!depot) {
-		for (int i = 0; i < PlayerMax; ++i) {
-			if (i != p.Index &&
-				Players[i].IsAllied(p) &&
-				p.IsAllied(Players[i])) {
-				finder.Find(Players[i].UnitBegin(), Players[i].UnitEnd());
+	std::vector<CUnit *> table;
+	for (std::vector<CUnit *>::iterator it = p.UnitBegin(); it != p.UnitEnd(); ++it) {
+		table.push_back(*it);
+	}
+	for (int i = 0; i < PlayerMax - 1; ++i) {
+		if (Players[i].IsAllied(p) && p.IsAllied(Players[i])) {
+			for (std::vector<CUnit *>::iterator it = Players[i].UnitBegin(); it != Players[i].UnitEnd(); ++it) {
+				table.push_back(*it);
 			}
 		}
-		depot = finder.best_depot;
 	}
-	return depot;
+	return finder.Find(table.begin(), table.end());
 }
 
 class CResourceFinder
@@ -456,18 +455,18 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 CUnit *FindDeposit(const CUnit &unit, int range, int resource)
 {
 	BestDepotFinder<false> finder(unit, resource, range);
-	CUnit *depot = finder.Find(unit.Player->UnitBegin(), unit.Player->UnitEnd());
-	if (!depot) {
-		for (int i = 0; i < PlayerMax; ++i) {
-			if (i != unit.Player->Index &&
-				Players[i].IsAllied(*unit.Player) &&
-				unit.Player->IsAllied(Players[i])) {
-				finder.Find(Players[i].UnitBegin(), Players[i].UnitEnd());
+	std::vector<CUnit *> table;
+	for (std::vector<CUnit *>::iterator it = unit.Player->UnitBegin(); it != unit.Player->UnitEnd(); ++it) {
+		table.push_back(*it);
+	}
+	for (int i = 0; i < PlayerMax - 1; ++i) {
+		if (Players[i].IsAllied(*unit.Player) && unit.Player->IsAllied(Players[i])) {
+			for (std::vector<CUnit *>::iterator it = Players[i].UnitBegin(); it != Players[i].UnitEnd(); ++it) {
+				table.push_back(*it);
 			}
 		}
-		depot = finder.best_depot;
 	}
-	return depot;
+	return finder.Find(table.begin(), table.end());
 }
 
 /**
@@ -704,10 +703,19 @@ private:
 			|| !CanTarget(type, dtype)) {
 			return INT_MAX;
 		}
+		// Don't attack invulnerable units
+		if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest->Variable[UNHOLYARMOR_INDEX].Value) {
+			return INT_MAX;
+		}
 		// Unit in range ?
 		const int d = attacker->MapDistanceTo(*dest);
 
 		if (d > attackrange && !UnitReachable(*attacker, *dest, attackrange)) {
+			return INT_MAX;
+		}
+
+		// Attack walls only if we are stuck in them
+		if (dtype.BoolFlag[WALL_INDEX].value && d > 1) {
 			return INT_MAX;
 		}
 
@@ -812,15 +820,23 @@ public:
 				dest->CacheLock = 1;
 				return;
 			}
+			// Don't attack invulnerable units
+			if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest->Variable[UNHOLYARMOR_INDEX].Value) {
+				dest->CacheLock = 1;
+				return;
+			}
 
 			//  Calculate the costs to attack the unit.
 			//  Unit with the smallest attack costs will be taken.
 
 			int cost = 0;
-			const int hp_damage_evaluate =
-				attacker->Stats->Variables[BASICDAMAGE_INDEX].Value
+			int hp_damage_evaluate;
+			if (Damage) {
+				hp_damage_evaluate = CalculateDamage(*attacker, *dest, Damage);
+			} else {
+				hp_damage_evaluate = attacker->Stats->Variables[BASICDAMAGE_INDEX].Value
 				+ attacker->Stats->Variables[PIERCINGDAMAGE_INDEX].Value;
-
+			}
 			if (!player.IsEnemy(*dest)) { // a friend or neutral
 				dest->CacheLock = 1;
 
@@ -870,7 +886,7 @@ public:
 					cost += CANATTACK_BONUS;
 				}
 
-				// the cost may be divided accros multiple cells
+				// the cost may be divided across multiple cells
 				cost = cost / (dtype.TileWidth * dtype.TileWidth);
 				cost = std::max(cost, 1);
 
@@ -887,6 +903,10 @@ public:
 					(d <= range && UnitReachable(*attacker, *dest, attackrange))) {
 					++enemy_count;
 				} else {
+					dest->CacheLock = 1;
+				}
+				// Attack walls only if we are stuck in them
+				if (dtype.BoolFlag[WALL_INDEX].value && d > 1) {
 					dest->CacheLock = 1;
 				}
 			}

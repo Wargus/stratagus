@@ -296,9 +296,12 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 			for (size_t i = 0; i != table.size(); ++i) {
 				// Check if unit in battle
 				if (autocast->Attacker == CONDITION_ONLY) {
-					if (table[i]->CurrentAction() != UnitActionAttack
+					const int range = table[i]->Player->Type == PlayerPerson ? table[i]->Type->ReactRangePerson : table[i]->Type->ReactRangeComputer;
+					if ((table[i]->CurrentAction() != UnitActionAttack
 						&& table[i]->CurrentAction() != UnitActionAttackGround
-						&& table[i]->CurrentAction() != UnitActionSpellCast) {
+						&& table[i]->CurrentAction() != UnitActionSpellCast)
+						|| table[i]->CurrentOrder()->HasGoal() == false
+						|| table[i]->MapDistanceTo(table[i]->CurrentOrder()->GetGoalPos()) > range) {
 						continue;
 					}
 				}

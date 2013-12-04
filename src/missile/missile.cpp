@@ -236,6 +236,9 @@ Missile::Missile() :
 	missile->Wait = mtype.Sleep;
 	missile->Delay = mtype.StartDelay;
 	missile->TTL = mtype.TTL;
+	if (mtype.FiredSound.Sound) {
+		PlayMissileSound(*missile, mtype.FiredSound.Sound);
+	}
 
 	return missile;
 }
@@ -313,10 +316,11 @@ static int CalculateDamageStats(const CUnitStats &attacker_stats,
 **
 **  @param attacker  Attacker.
 **  @param goal      Goal unit.
+**  @param formula   Formula used to calculate damage.
 **
 **  @return          damage produces on goal.
 */
-static int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *formula)
+int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *formula)
 {
 	if (!formula) { // Use old method.
 		return CalculateDamageStats(*attacker.Stats, *goal.Stats,
