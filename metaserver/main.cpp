@@ -223,14 +223,20 @@ int main(int argc, char **argv)
 	//
 	// Parse the command line.
 	//
-	while ((i = getopt(argc, argv, ":p:m:i:d:")) != -1) {
+	while ((i = getopt(argc, argv, "aP:pm:i:d:")) != -1) {
 		switch (i) {
-			case 'p':
+			case 'a':
+				EnableAssert = true;
+				continue;
+			case 'P':
 				Server.Port = atoi(optarg);
 				if (Server.Port <= 0) {
 					Server.Port = DEFAULT_PORT;
 				}
 				break;
+			case 'p':
+				EnableDebugPrint = true;
+				continue;
 			case 'm':
 				Server.MaxConnections = atoi(optarg);
 				break;

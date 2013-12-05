@@ -1,0 +1,22 @@
+$#include "master.h"
+
+struct CClientLog
+{
+	std::string entry;
+};
+
+class CMetaClient
+{
+public:
+	CMetaClient();
+	void SetMetaServer(const std::string host, const int port);
+	int Init();
+	void Close();
+	int Send(const std::string cmd);
+	int Recv();
+	int GetLastRecvState() { return lastRecvState; }
+	int GetLogSize() { return events.size(); }
+	CClientLog* GetLastMessage() { return events.back(); }
+};
+
+CMetaClient MetaClient;

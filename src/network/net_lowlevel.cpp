@@ -407,7 +407,7 @@ Socket NetOpenTCP(const char *addr, int port)
 		} else {
 			sock_addr.sin_addr.s_addr = INADDR_ANY;
 		}
-		sock_addr.sin_port = htons(port);
+		sock_addr.sin_port = port;
 
 		int opt = 1;
 		setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (setsockopttype)&opt, sizeof(opt));

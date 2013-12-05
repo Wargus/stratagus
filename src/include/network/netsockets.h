@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name udpsocket.h - The udp socket header file. */
+/**@name netsockets.h - TCP and UDP sockets. */
 //
-//      (c) Copyright 2013 by Joris Dauphin
+//      (c) Copyright 2013 by Joris Dauphin and cybermind
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,8 +26,8 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#ifndef UDPSOCKET_H
-#define UDPSOCKET_H
+#ifndef NETSOCKETS_H
+#define NETSOCKETS_H
 
 #include <string>
 
@@ -52,6 +52,7 @@ private:
 };
 
 class CUDPSocket_Impl;
+class CTCPSocket_Impl;
 
 class CUDPSocket
 {
@@ -96,6 +97,25 @@ private:
 	CUDPSocket_Impl *m_impl;
 };
 
+// Class representing TCP socket used in communication
+class CTCPSocket
+{
+public:
+	CTCPSocket();
+	~CTCPSocket();
+	bool Open(const CHost &host);
+	void Close();
+	bool Connect(const CHost &host);
+	int Send(const void *buf, unsigned int len);
+	int Recv(void *buf, int len);
+	void SetNonBlocking();
+	//
+	int HasDataToRead(int timeout);
+	bool IsValid() const;
+private:
+	CTCPSocket_Impl *m_impl;
+};
+
 //@}
 
-#endif // !UDPSOCKET_H
+#endif // !NETSOCKETS_H

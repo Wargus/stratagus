@@ -204,6 +204,14 @@ static int Parse5or6Args(char *buf, char **arg1, char **arg2, char **arg3,
 }
 
 /**
+**  Parse PING
+*/
+static void ParsePing(Session *session)
+{
+	Send(session, "PING_OK\n");
+}
+
+/**
 **  Parse USER
 */
 static void ParseUser(Session *session, char *buf)
@@ -480,8 +488,9 @@ static void ParseBuffer(Session *session)
 	}
 
 	buf = session->Buffer;
-
-	if (!session->UserData.LoggedIn) {
+	if (!strncmp(buf, "PING", 4)) {
+		ParsePing(session);
+	} else if (!session->UserData.LoggedIn) {
 		if (!strncmp(buf, "USER ", 5)) {
 			ParseUser(session, buf + 5);
 		} else if (!strncmp(buf, "REGISTER ", 9)) {
