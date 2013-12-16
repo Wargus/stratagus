@@ -783,7 +783,7 @@ bool PointToPointMissile(Missile &missile)
 								(int)pos.y + missile.Type->size.y / 2);
 		const Vec2i tilePos(Map.MapPixelPosToTilePos(position));
 
-		if (MissileHandleBlocking(missile, position)) {
+		if (Map.Info.IsPointOnMap(tilePos) && MissileHandleBlocking(missile, position)) {
 			return true;
 		}
 		if (missile.Type->MissileStopFlags) {
